@@ -1,0 +1,46 @@
+name: Update 50 Stock Data
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stock-data-update
+  cancel-in-progress: true
+
+jobs:
+  run-fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run script
+        run: python fetch_stocks.py
+
+      - name: Prepare deployment files
+        run: |
+          mkdir -p deploy
+          cp data.json deploy/data.json
+
+      - name: Deploy data.json to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          keep_files: false
+
+      - name: Purge jsDelivr cache
+        run: curl -X POST https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/data.json
