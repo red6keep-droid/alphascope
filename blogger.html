@@ -36,7 +36,8 @@
       const res = await fetch(`${DATA_URL}?v=${Date.now()}`);
       const json = await res.json();
       stockData = json.stocks || [];
-      document.getElementById("updateTime").innerText = `최종 갱신: ${json.updated_at || "-"}`;
+      const intervalLabel = json.interval ? ` · ${json.interval} 봉` : "";
+      document.getElementById("updateTime").innerText = `최종 갱신: ${json.updated_at || "-"}${intervalLabel}`;
       renderTable(stockData);
     } catch (e) {
       console.error(e);
@@ -68,7 +69,7 @@
   init();
 </script>
 
-<h3 style="text-align:center;">TradingView 실시간 차트</h3>
+<h3 style="text-align:center;">TradingView 실시간 차트 (15분)</h3>
 
 <!-- TradingView Widget BEGIN -->
 <div class="tradingview-widget-container">
@@ -77,56 +78,16 @@
   <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
   {
   "symbols": [
-    ["AAPL", "AAPL|1D"],
-    ["MSFT", "MSFT|1D"],
-    ["NVDA", "NVDA|1D"],
-    ["AMZN", "AMZN|1D"],
-    ["GOOGL", "GOOGL|1D"],
-    ["META", "META|1D"],
-    ["TSLA", "TSLA|1D"],
-    ["BRK-B", "BRK-B|1D"],
-    ["AVGO", "AVGO|1D"],
-    ["JPM", "JPM|1D"],
-    ["LLY", "LLY|1D"],
-    ["V", "V|1D"],
-    ["UNH", "UNH|1D"],
-    ["MA", "MA|1D"],
-    ["PG", "PG|1D"],
-    ["HD", "HD|1D"],
-    ["JNJ", "JNJ|1D"],
-    ["COST", "COST|1D"],
-    ["MRK", "MRK|1D"],
-    ["ABBV", "ABBV|1D"],
-    ["ORCL", "ORCL|1D"],
-    ["BAC", "BAC|1D"],
-    ["CVX", "CVX|1D"],
-    ["CRM", "CRM|1D"],
-    ["AMD", "AMD|1D"],
-    ["NFLX", "NFLX|1D"],
-    ["KO", "KO|1D"],
-    ["PEP", "PEP|1D"],
-    ["TSM", "TSM|1D"],
-    ["WMT", "WMT|1D"],
-    ["ACN", "ACN|1D"],
-    ["MCD", "MCD|1D"],
-    ["CSCO", "CSCO|1D"],
-    ["ABT", "ABT|1D"],
-    ["XOM", "XOM|1D"],
-    ["DIS", "DIS|1D"],
-    ["INTC", "INTC|1D"],
-    ["QCOM", "QCOM|1D"],
-    ["TXN", "TXN|1D"],
-    ["INTU", "INTU|1D"],
-    ["VZ", "VZ|1D"],
-    ["AMGN", "AMGN|1D"],
-    ["IBM", "IBM|1D"],
-    ["PFE", "PFE|1D"],
-    ["CMCSA", "CMCSA|1D"],
-    ["NOW", "NOW|1D"],
-    ["CAT", "CAT|1D"],
-    ["GE", "GE|1D"],
-    ["UBER", "UBER|1D"],
-    ["AMAT", "AMAT|1D"]
+    ["AAPL", "AAPL|15"],
+    ["MSFT", "MSFT|15"],
+    ["NVDA", "NVDA|15"],
+    ["AMZN", "AMZN|15"],
+    ["GOOGL", "GOOGL|15"],
+    ["META", "META|15"],
+    ["TSLA", "TSLA|15"],
+    ["BRK-B", "BRK-B|15"],
+    ["AVGO", "AVGO|15"],
+    ["JPM", "JPM|15"]
   ],
   "chartType": "area",
   "colorTheme": "light",
