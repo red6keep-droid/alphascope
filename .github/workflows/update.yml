@@ -43,4 +43,4 @@ jobs:
           keep_files: false
 
       - name: Purge jsDelivr cache
-        run: curl -X POST https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/data.json
+        run: curl -sS -f https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/data.json
