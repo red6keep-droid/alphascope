@@ -1,4 +1,4 @@
-name: Update 50 Stock Data
+name: Update 10 Stock Data (15m)
 
 on:
   schedule:
