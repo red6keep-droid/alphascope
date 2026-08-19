@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>뉴스 위젯 테스트</title>
+<style>
+  body { font-family: sans-serif; background: #f5f5f5; margin: 0; padding: 24px; }
+  .news-box { max-width: 700px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 4px; }
+  .news-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+  .news-headline { cursor: pointer; }
+  .news-body { display: none; padding-top: 8px; color: #555; font-size: 14px; }
+  #newsUpdateTime { font-size: 12px; color: #666; margin-bottom: 5px; }
+</style>
+</head>
+<body>
+
+<h3 style="text-align:center;">실시간 주요 기사 (테스트)</h3>
+
+<div class="news-box">
+  <div id="newsUpdateTime"></div>
+  <div id="newsList" style="color:#757575;">로딩 중...</div>
+</div>
+
+<script>
+  // 테스트용. 배포 후에는 jsDelivr URL을 그대로 사용합니다.
+  const NEWS_URL = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/news.json";
+
+  function formatKST(updatedAt) {
+    const m = String(updatedAt || "").match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})/);
+    if (!m) return updatedAt || "-";
+    const date = new Date(m[1] + "T" + m[2] + "Z");
+    if (isNaN(date)) return updatedAt;
+    return date.toLocaleString("ko-KR", {
+      timeZone: "Asia/Seoul",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+    });
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  async function initNews() {
+    const list = document.getElementById("newsList");
+    try {
+      const res = await fetch(`${NEWS_URL}?v=${Date.now()}`);
+      const json = await res.json();
+      const items = json.items || [];
+      document.getElementById("newsUpdateTime").innerText = `최종 갱신: ${formatKST(json.updated_at)} (KST)`;
+      if (!items.length) {
+        list.innerHTML = '<div style="text-align:center;">표시할 기사가 없습니다.</div>';
+        return;
+      }
+      list.innerHTML = items.map((it, i) => `
+        <div class="news-item">
+          <div class="news-headline" onclick="toggleNews(${i})">
+            <strong>${esc(it.title)}</strong>
+            <span style="color:#999; font-size:12px;"> · ${esc(it.source)}</span>
+          </div>
+          <div id="newsBody${i}" class="news-body">
+            <div style="margin-bottom:8px;">${esc(it.summary)}</div>
+            <div style="font-size:12px; color:#999;">
+              출처: ${esc(it.source)} · ${formatKST(it.published)}
+              <a href="${esc(it.link)}" target="_blank" rel="noopener nofollow" style="margin-left:8px;">원문 보기 →</a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } catch (e) {
+      console.error(e);
+      list.innerHTML = '<div style="text-align:center; color:red;">뉴스 로드 실패</div>';
+    }
+  }
+
+  function toggleNews(i) {
+    const el = document.getElementById("newsBody" + i);
+    el.style.display = el.style.display === "none" ? "block" : "none";
+  }
+
+  initNews();
+</script>
+
+</body>
+</html>

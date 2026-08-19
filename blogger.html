@@ -31,13 +31,25 @@
   const DATA_URL = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/data.json";
   let stockData = [];
 
+  function formatKST(updatedAt) {
+    const m = String(updatedAt || "").match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})/);
+    if (!m) return updatedAt || "-";
+    const date = new Date(m[1] + "T" + m[2] + "Z");
+    if (isNaN(date)) return updatedAt;
+    return date.toLocaleString("ko-KR", {
+      timeZone: "Asia/Seoul",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+    });
+  }
+
   async function init() {
     try {
       const res = await fetch(`${DATA_URL}?v=${Date.now()}`);
       const json = await res.json();
       stockData = json.stocks || [];
       const intervalLabel = json.interval ? ` · ${json.interval} 봉` : "";
-      document.getElementById("updateTime").innerText = `최종 갱신: ${json.updated_at || "-"}${intervalLabel}`;
+      document.getElementById("updateTime").innerText = `최종 갱신: ${formatKST(json.updated_at)} (KST)${intervalLabel}`;
       renderTable(stockData);
     } catch (e) {
       console.error(e);
@@ -69,35 +81,30 @@
   init();
 </script>
 
-<h3 style="text-align:center;">TradingView 실시간 차트 (15분)</h3>
+<h3 style="text-align:center;">TradingView 실시간 차트 (15분 봉)</h3>
 
-<!-- TradingView Widget BEGIN -->
-<div class="tradingview-widget-container">
-  <div class="tradingview-widget-container__widget"></div>
-  <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
-  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
-  {
-  "symbols": [
-    ["AAPL", "AAPL|15"],
-    ["MSFT", "MSFT|15"],
-    ["NVDA", "NVDA|15"],
-    ["AMZN", "AMZN|15"],
-    ["GOOGL", "GOOGL|15"],
-    ["META", "META|15"],
-    ["TSLA", "TSLA|15"],
-    ["BRK-B", "BRK-B|15"],
-    ["AVGO", "AVGO|15"],
-    ["JPM", "JPM|15"]
-  ],
-  "chartType": "area",
-  "colorTheme": "light",
-  "isTransparent": false,
-  "displayMode": "adaptive",
-  "width": "100%",
-  "height": "500",
-  "locale": "ko_KR",
-  "showVolume": false
-  }
-  </script>
+<div style="margin-bottom:10px;">
+  <label for="tvSymbol">종목:</label>
+  <select id="tvSymbol">
+    <option value="AAPL">AAPL</option>
+    <option value="MSFT">MSFT</option>
+    <option value="NVDA">NVDA</option>
+    <option value="AMZN">AMZN</option>
+    <option value="GOOGL">GOOGL</option>
+    <option value="META">META</option>
+    <option value="TSLA">TSLA</option>
+    <option value="BRK-B">BRK-B</option>
+    <option value="AVGO">AVGO</option>
+    <option value="JPM">JPM</option>
+  </select>
 </div>
-<!-- TradingView Widget END -->
+
+<iframe id="tvFrame" src="https://s.tradingview.com/widgetembed/?symbol=AAPL&interval=15&style=1&theme=light&locale=kr&timezone=Asia/Seoul&hidesidetoolbar=1&allow_symbol_change=0&autosize=1" style="width:100%; height:500px; border:none;"></iframe>
+
+<script>
+  document.getElementById("tvSymbol").addEventListener("change", function() {
+    const base = "https://s.tradingview.com/widgetembed/?symbol=" + this.value +
+      "&interval=15&style=1&theme=light&locale=kr&timezone=Asia/Seoul&hidesidetoolbar=1&allow_symbol_change=0&autosize=1";
+    document.getElementById("tvFrame").src = base;
+  });
+</script>

@@ -1,15 +1,15 @@
-name: Update 10 Stock Data (15m)
+name: Update News (2h)
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: stock-data-update
+  group: news-update
   cancel-in-progress: true
 
 jobs:
@@ -26,15 +26,15 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run script
-        run: python fetch_stocks.py
+      - name: Run news script
+        run: python fetch_news.py
 
       - name: Prepare deployment files
         run: |
           mkdir -p deploy
-          cp data.json deploy/data.json
+          cp news.json deploy/news.json
 
-      - name: Deploy data.json to gh-pages branch
+      - name: Deploy news.json to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -43,4 +43,4 @@ jobs:
           keep_files: true
 
       - name: Purge jsDelivr cache
-        run: curl -sS -f https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/data.json
+        run: curl -sS -f https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/news.json
