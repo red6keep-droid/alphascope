@@ -1,0 +1,88 @@
+name: Comment Reply
+
+on:
+  schedule:
+    # 5분마다 새 댓글 감지. 일정 실행은 알림 발송을 켠다.
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      notify:
+        description: 'Telegram 알림 발송 (true) / dry-run (false)'
+        type: boolean
+        required: false
+        default: false
+      test_comment:
+        description: '가상 댓글 텍스트 (예: 오늘 리포트 잘 봤습니다!)'
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: comment-reply
+  cancel-in-progress: true
+
+env:
+  BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+  BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+  BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  GEMINI_MODEL: gemini-3.5-flash
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  # 일정 실행(inputs 없음) = 발송 on, 수동 dispatch는 체크박스로 결정
+  SEND_NOTIFICATION: ${{ inputs.notify || 'true' }}
+
+jobs:
+  comment-reply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r experiments/comment-reply/requirements.txt
+
+      - name: Load previous state
+        run: |
+          git fetch origin comment-state || true
+          if git cat-file -e refs/remotes/origin/comment-state 2>/dev/null; then
+            mkdir -p experiments/comment-reply/output
+            git show origin/comment-state:experiments/comment-reply/output/state.json \
+              > experiments/comment-reply/output/state.json
+            echo "이전 상태 불러옴: $(cat experiments/comment-reply/output/state.json)"
+          else
+            echo "comment-state 브랜치 없음 (첫 실행)"
+          fi
+
+      - name: Run comment reply
+        env:
+          SEND: ${{ env.SEND_NOTIFICATION }}
+          TEST_COMMENT: ${{ inputs.test_comment }}
+        run: |
+          ARGS=()
+          if [ "$SEND" = "true" ]; then ARGS+=(--send); fi
+          if [ -n "$TEST_COMMENT" ]; then ARGS+=(--test-comment "$TEST_COMMENT"); fi
+          python experiments/comment-reply/main.py "${ARGS[@]}"
+
+      - name: Save state (comment-state branch)
+        if: always()
+        run: |
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git checkout --orphan comment-state
+          git add experiments/comment-reply/output/state.json
+          git commit -m "Update comment state [skip ci]" || echo "상태 변경 없음"
+          git push --force origin comment-state:comment-state
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: comment-reply-log
+          path: experiments/comment-reply/output/
