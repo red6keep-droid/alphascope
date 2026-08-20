@@ -1,0 +1,54 @@
+name: Test Daily Report
+
+on:
+  schedule:
+    # 매주 월~금 21:00 UTC = 한국 시간 다음날 06:00
+    - cron: '0 21 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Blogger에 실제 게시 (true) / 미리보기만 (false)'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-report
+  cancel-in-progress: true
+
+env:
+  FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  # 게시 시 필요. OAuth 데스크톱 클라이언트 + refresh token(setup_oauth.py로 발급).
+  BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+  BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+  BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+  # true(수동 dispatch에서 publish 선택)로 두면 --publish 동작, 아니면 dry-run
+  PUBLISH_BLOG: ${{ inputs.publish || 'false' }}
+
+jobs:
+  daily-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r experiments/daily-report/requirements.txt
+
+      - name: Run daily report
+        run: python experiments/daily-report/main.py
+
+      - name: Upload report artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-report
+          path: experiments/daily-report/output/
