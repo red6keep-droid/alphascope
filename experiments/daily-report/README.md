@@ -11,10 +11,12 @@ experiments/daily-report/
 ├── collect_fred.py          # FRED: 실업률(UNRATE), CPI(CPIAUCSL), VIX(VIXCLS)
 ├── collect_yahoo.py         # yfinance 지수(^GSPC ^IXIC ^DJI ^RUT ^VIX) + 급등주/관심종목 TOP5
 ├── collect_news.py          # CNBC RSS 20건 수집
-├── generate_report.py       # Gemini 호출 → 한국어 분석 + 뉴스 선택
-├── validate_report.py       # 구조/수치/뉴스 index 검증 (실패 시 중단)
-├── render_html.py           # 원본 숫자 + Gemini 문구 → HTML
+├── generate_report.py       # Gemini 호출 → 한국어 분석 + 뉴스 선택 + 이미지 프롬프트
+├── validate_report.py       # 구조/수치/뉴스 index/image_prompt 검증 (실패 시 중단)
+├── generate_image.py        # 커버 이미지 생성 (Pollinations → HF fallback → WebP)
+├── render_html.py           # 원본 숫자 + Gemini 문구 + 커버 이미지 → HTML
 ├── publish_blogger.py       # Blogger API v3 게시 (OAuth 2.0 Client ID + Refresh Token)
+├── publish_saved.py         # 저장된 output/ 리포트 게시 (GitHub Actions 후속 단계용)
 ├── setup_oauth.py           # 1회 브라우저 승인 → refresh token 발급
 ├── verify_blogger.py        # 게시 없이 인증/블로그 연결 확인
 ├── prompts/daily_report.txt # Gemini 지시문
@@ -29,6 +31,17 @@ experiments/daily-report/
   Gemini는 한국어 분석 문구와 뉴스 선택(목록의 index)만 생성 → 숫자 조작/환각을 원천 차단합니다.
 - **검증 후 게시** — 필수 필드 누락, 뉴스 index 오류 시 `exit(1)`로 중단하고 게시하지 않습니다.
 - **기본 dry-run** — `--publish` 없이는 Blogger에 아무것도 올라가지 않습니다.
+- **커버 이미지 자동 생성** — Gemini가 리포트와 함께 영문 이미지 프롬프트(`image_prompt`)를 출력하고,
+  Pollinations.ai(1차, 키 불필요) → Hugging Face FLUX.1-schnell(2차 fallback, `HF_TOKEN` 필요) 순서로 생성합니다.
+  고정 스타일 접미사(미니멀 3D 코퍼레이트 일러스트, 블루 계열, 문자 없음)를 붙여 매일 비슷한 톤을 유지하고,
+  Pillow로 WebP(quality=80) 변환해 용량을 줄입니다.
+- **이미지 호스팅은 GitHub** — Blogger API는 이미지 업로드를 지원하지 않으므로,
+  워크플로우가 `output/images/{date}.webp`를 gh-pages 브랜치에 배포하고 jsDelivr CDN URL
+  (`https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/{date}.webp`)을 게시글에 넣습니다.
+  파일명에 날짜가 들어가 캐시 문제가 없고, 저장소가 살아 있는 한 링크가 유지됩니다.
+- **게시 전 이미지 검증** — 워크플로우는 ①리포트+이미지 생성(dry-run) → ②gh-pages 배포 →
+  ③jsDelivr purge·HTTP 200 확인 → ④`publish_saved.py` 게시 순서로 동작해,
+  이미지 URL이 살아 있는 상태에서 글이 올라갑니다. 이미지 생성 실패 시 게시 단계는 중단됩니다.
 
 ## 준비 (1회성)
 
@@ -38,6 +51,7 @@ experiments/daily-report/
 |---|---|---|
 | FRED_API_KEY | https://fred.stlouisfed.org/docs/api/api_key.html | 실업률/CPI/VIX 수집 |
 | GEMINI_API_KEY | https://aistudio.google.com/app/apikey | 리포트 분석 (여러 키는 `;` 또는 `,`로 구분 → 앞 키가 한도 초과 시 다음 키로 자동 fallback) |
+| HF_TOKEN | https://huggingface.co/settings/tokens (Read 권한) | 커버 이미지 fallback (Pollinations 실패 시에만 사용, 선택) |
 
 ### 2. Blogger 게시용 OAuth 2.0 (자동 게시를 켤 때만 필요)
 
@@ -79,6 +93,7 @@ experiments/daily-report/
 **GitHub Actions용** — 저장소 `Settings > Secrets and variables > Actions`에 등록한다:
 - `FRED_API_KEY`
 - `GEMINI_API_KEY`
+- `HF_TOKEN` (커버 이미지 fallback용, 선택)
 - `BLOGGER_CLIENT_ID` (자동 게시 전환 시)
 - `BLOGGER_CLIENT_SECRET` (자동 게시 전환 시)
 - `BLOGGER_REFRESH_TOKEN` (자동 게시 전환 시)
@@ -95,13 +110,18 @@ pip install -r experiments/daily-report/requirements.txt
 python experiments/daily-report/collect_yahoo.py
 python experiments/daily-report/collect_news.py
 
-# 첫 실행 (수집→Gemini→검증→HTML, 게시 안 함)
+# 첫 실행 (수집→Gemini→검증→이미지→HTML, 게시 안 함)
 python experiments/daily-report/main.py --dry-run
 
 # 미리보기 확인
 start experiments/daily-report/output/report.html
 
+# 커버 이미지 생성기만 단독 테스트 (output/test_cover.webp 생성)
+python experiments/daily-report/generate_image.py
+
 # 실제 게시 (한 번만 사람이 직접 확인 후 사용)
+# ⚠️ 로컬 게시 시 커버 이미지 URL은 gh-pages 배포 후에만 유효하다.
+#    실게시는 GitHub Actions 수동 dispatch(publish 체크)를 권장.
 python experiments/daily-report/main.py --publish
 ```
 
@@ -110,17 +130,20 @@ python experiments/daily-report/main.py --publish
 `.github/workflows/test-daily-report.yml`
 
 - `schedule: cron '0 21 * * 1-5'` = 월~금 21:00 UTC (한국시간 다음날 06:00, 금요일 장 데이터는 토요일 아침 게시)
-- **일정 실행은 항상 dry-run** — 생성물(`output/`)이 workflow artifact로 업로드돼 웹에서 확인할 수 있습니다.
-- **수동 실행(workflow_dispatch)에서 "publish" 체크박스를 켜면 그 실행만 실제 게시**를 합니다. 게시하려면 `BLOGGER_CLIENT_ID`/`BLOGGER_CLIENT_SECRET`/`BLOGGER_REFRESH_TOKEN` 시크릿이 등록되어 있어야 합니다.
+- **실행 순서**: ① `main.py` dry-run(리포트+커버 이미지 생성) → ② 이미지 gh-pages 배포 →
+  ③ jsDelivr purge + HTTP 200 확인 → ④ publish 체크 시 `publish_saved.py`로 실제 게시 → ⑤ artifact 업로드
+- **일정 실행은 항상 dry-run** — 생성물(`output/`, 커버 이미지 포함)이 workflow artifact로 업로드돼 웹에서 확인할 수 있습니다.
+- **수동 실행(workflow_dispatch)에서 "publish" 체크박스를 켜면 그 실행만 실제 게시**를 합니다.
+  게시에는 `BLOGGER_*` 3종 시크릿과, 이미지 fallback 대비 `HF_TOKEN` 시크릿을 권장합니다.
 - 정가동(매일 자동 게시)으로 전환하려면:
-  1. 일정 실행도 게시하게 하려면 워크플로우의 `PUBLISH_BLOG`를 `inputs.publish || 'false'` → `'true'`로 변경
+  1. 워크플로우의 Publish 스텝 조건을 `if: inputs.publish` → `if: github.event_name == 'schedule' || inputs.publish` 로 변경
   2. 또는 그대로 두고 수동 dispatch로만 게시
 
 ## 테스트 순서 (권장)
 
 1. 로컬에서 3개 collector 수집 확인 → 급등주/관심종목이 실제 종목인지 육안 확인
-2. 로컬 dry-run → Gemini 리포트 JSON·HTML 미리보기 확인
+2. 로컬 dry-run → Gemini 리포트 JSON(`image_prompt` 포함)·HTML 미리보기·커버 이미지 WebP 확인
 3. OAuth 셋업 후 `verify_blogger.py`로 연결 확인
-4. 로컬 `--publish` 한 번 실행 → Blogspot에서 게시글 확인
-5. 워크플로우 수동 실행(dry-run) → artifact 확인
-6. 이슈 없으면 수동 dispatch로 게시 → 이후 정가동 전환
+4. 워크플로우 수동 실행(dry-run) → artifact + gh-pages 이미지 URL HTTP 200 확인
+5. 이슈 없으면 수동 dispatch(publish 체크)로 게시 → Blogspot에서 커버 이미지 포함 게시글 확인
+6. 이후 정가동 전환

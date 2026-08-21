@@ -11,7 +11,9 @@ import sys
 
 REQUIRED_LLM_KEYS = ["summary", "market_mood", "gainers_comment",
                      "attention_comment", "news", "macro_comment",
-                     "opinion", "risk"]
+                     "opinion", "risk", "image_prompt"]
+
+IMAGE_PROMPT_MAX_LEN = 300
 
 REQUIRED_MACRO = ["unemployment_rate", "cpi", "vix"]
 REQUIRED_INDICES = ["sp500", "nasdaq", "dow", "russell", "vix"]
@@ -52,6 +54,12 @@ def validate(input_path, output_path):
     for key in REQUIRED_LLM_KEYS:
         if key not in report or _is_bad(report.get(key)):
             errors.append(f"Gemini 출력 필수 키 누락: {key}")
+
+    image_prompt = str(report.get("image_prompt") or "")
+    if image_prompt and len(image_prompt) > IMAGE_PROMPT_MAX_LEN:
+        errors.append(
+            f"image_prompt 길이 초과: {len(image_prompt)}자 (최대 {IMAGE_PROMPT_MAX_LEN}자)"
+        )
 
     news_size = len(input_data.get("news", []))
     for i, item in enumerate(report.get("news", [])):

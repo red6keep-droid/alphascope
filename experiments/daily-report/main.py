@@ -9,8 +9,13 @@
     → report_input.json
     → generate_report (Gemini) → report.out.json
     → validate_report (실패 시 중단)
+    → generate_image (Pollinations → HF fallback) → output/images/{date}.webp
     → render_html → output/{report.html, report_body.html}
+    → title.txt / image_ref.txt 기록 (GitHub Actions 후속 단계용)
     → publish_blogger (--publish 시)
+
+GitHub Actions에서는 이 스크립트를 항상 dry-run으로 실행한 뒤,
+이미지를 gh-pages에 배포하고 publish_saved.py로 게시한다(2단계 분리).
 """
 
 import argparse
@@ -24,6 +29,7 @@ from dotenv import load_dotenv
 import collect_fred
 import collect_news
 import collect_yahoo
+import generate_image
 import generate_report
 import publish_blogger
 import render_html
@@ -37,6 +43,8 @@ OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 INPUT_PATH = os.path.join(OUTPUT_DIR, "report_input.json")
 REPORT_PATH = os.path.join(OUTPUT_DIR, "report.out.json")
 
+DEFAULT_REPO_SLUG = "red6keep-droid/alphascope"
+
 KST = datetime.timezone(datetime.timedelta(hours=9))
 
 
@@ -48,9 +56,13 @@ def _korean_date(date_str):
         return date_str
 
 
+def _repo_slug():
+    return os.environ.get("GITHUB_REPOSITORY") or DEFAULT_REPO_SLUG
+
+
 def collect():
     print("=" * 50)
-    print("[1/5] 데이터 수집")
+    print("[1/6] 데이터 수집")
     print("=" * 50)
 
     macro = collect_fred.collect_fred()
@@ -77,6 +89,30 @@ def collect():
     return input_data
 
 
+def make_cover(input_data):
+    """커버 이미지를 생성하고 (성공 여부, 공개 URL)을 반환한다."""
+    print("=" * 50)
+    print("[4/6] 커버 이미지 생성")
+    print("=" * 50)
+
+    with open(REPORT_PATH, "r", encoding="utf-8") as f:
+        image_prompt = str(json.load(f).get("image_prompt") or "").strip()
+
+    date_slug = input_data["date"]
+    image_ref = f"images/{date_slug}.webp"
+    images_dir = os.path.join(OUTPUT_DIR, "images")
+    os.makedirs(images_dir, exist_ok=True)
+    image_path = os.path.join(images_dir, f"{date_slug}.webp")
+
+    ok = bool(image_prompt) and generate_image.generate_image(image_prompt, image_path)
+    if not ok:
+        return False, None
+
+    cover_url = f"https://cdn.jsdelivr.net/gh/{_repo_slug()}@gh-pages/{image_ref}"
+    print(f"커버 이미지 URL: {cover_url}")
+    return True, cover_url
+
+
 def main():
     load_dotenv()
 
@@ -93,25 +129,38 @@ def main():
     input_data = collect()
 
     print("=" * 50)
-    print("[2/5] Gemini 리포트 생성")
+    print("[2/6] Gemini 리포트 생성")
     print("=" * 50)
     generate_report.generate_report(INPUT_PATH, REPORT_PATH)
 
     print("=" * 50)
-    print("[3/5] 검증")
+    print("[3/6] 검증")
     print("=" * 50)
     validate_report.validate(INPUT_PATH, REPORT_PATH)
 
+    image_ok, cover_url = make_cover(input_data)
+    if should_publish and not image_ok:
+        print("[게시 중단] 커버 이미지 생성 실패. 이미지 없이 게시하지 않습니다.")
+        sys.exit(1)
+
     print("=" * 50)
-    print("[4/5] HTML 렌더링")
+    print("[5/6] HTML 렌더링")
     print("=" * 50)
-    body, body_path, preview_path = render_html.render(INPUT_PATH, REPORT_PATH, OUTPUT_DIR)
+    body, body_path, preview_path = render_html.render(
+        INPUT_PATH, REPORT_PATH, OUTPUT_DIR, cover_url=cover_url
+    )
 
     title = f"미국 증시 데일리 브리핑 — {_korean_date(input_data['date'])}"
     print(f"제목: {title}")
 
+    # GitHub Actions 후속 단계(이미지 배포/게시)가 읽는 메타 파일
+    with open(os.path.join(OUTPUT_DIR, "title.txt"), "w", encoding="utf-8") as f:
+        f.write(title + "\n")
+    with open(os.path.join(OUTPUT_DIR, "image_ref.txt"), "w", encoding="utf-8") as f:
+        f.write((f"images/{input_data['date']}.webp" if image_ok else "") + "\n")
+
     print("=" * 50)
-    print("[5/5] 게시")
+    print("[6/6] 게시")
     print("=" * 50)
     if should_publish:
         url = publish_blogger.publish(title, body, dry_run=False)

@@ -13,7 +13,7 @@ on:
         default: false
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: daily-report
@@ -26,8 +26,8 @@ env:
   BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
   BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
   BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
-  # true(수동 dispatch에서 publish 선택)로 두면 --publish 동작, 아니면 dry-run
-  PUBLISH_BLOG: ${{ inputs.publish || 'false' }}
+  # 커버 이미지 fallback(Hugging Face Inference API)용. Pollinations만 성공하면 불필요.
+  HF_TOKEN: ${{ secrets.HF_TOKEN }}
 
 jobs:
   daily-report:
@@ -43,8 +43,46 @@ jobs:
       - name: Install dependencies
         run: pip install -r experiments/daily-report/requirements.txt
 
-      - name: Run daily report
+      # 항상 dry-run. output/에 report_body.html, title.txt, image_ref.txt,
+      # images/{date}.webp 를 남긴다.
+      - name: Run daily report (dry-run + cover image)
         run: python experiments/daily-report/main.py
+
+      - name: Prepare cover image for deploy
+        run: |
+          mkdir -p deploy/images
+          if compgen -G "experiments/daily-report/output/images/*.webp" > /dev/null; then
+            cp experiments/daily-report/output/images/*.webp deploy/images/
+            ls -la deploy/images/
+          else
+            echo "::warning::생성된 커버 이미지가 없습니다."
+          fi
+
+      - name: Deploy cover image to gh-pages branch
+        if: hashFiles('deploy/images/*.webp') != ''
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Purge and verify jsDelivr cache
+        if: hashFiles('experiments/daily-report/output/image_ref.txt') != ''
+        run: |
+          IMAGE_REF=$(cat experiments/daily-report/output/image_ref.txt)
+          if [ -z "$IMAGE_REF" ]; then
+            echo "::warning::커버 이미지 ref가 없습니다."; exit 0
+          fi
+          curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}"
+          sleep 5
+          curl -sS -f -o /dev/null "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}"
+          echo "커버 이미지 CDN 확인 완료: ${IMAGE_REF}"
+
+      # publish 체크 시에만 게시. publish_saved.py는 커버 이미지 URL까지 확인한다.
+      - name: Publish to Blogger
+        if: inputs.publish
+        run: python experiments/daily-report/publish_saved.py
 
       - name: Upload report artifacts
         if: always()

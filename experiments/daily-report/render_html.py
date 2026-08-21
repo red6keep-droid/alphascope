@@ -13,7 +13,7 @@ TEMPLATE_FILE = os.path.join(os.path.dirname(__file__), "templates", "report.htm
 MARKERS = [
     "SUMMARY", "MARKET_MOOD", "INDEX_TABLE", "GAINERS_TABLE", "GAINERS_COMMENT",
     "ATTENTION_TABLE", "ATTENTION_COMMENT", "NEWS_LIST", "MACRO_TABLE",
-    "MACRO_COMMENT", "OPINION", "RISK", "DATE", "UPDATED",
+    "MACRO_COMMENT", "OPINION", "RISK", "DATE", "UPDATED", "COVER_IMAGE",
 ]
 
 INDEX_LABELS = {
@@ -111,7 +111,18 @@ def _korean_date(date_str):
         return str(date_str)
 
 
-def build_tables(input_data, report):
+def _cover_image(cover_url):
+    if not cover_url:
+        return ""
+    src = html_mod.escape(str(cover_url), quote=True)
+    return (
+        f'<img src="{src}" alt="데일리 브리핑 커버 이미지" '
+        f'style="width:100%;max-width:760px;border-radius:8px;'
+        f'margin:0 0 16px 0;display:block;">'
+    )
+
+
+def build_tables(input_data, report, cover_url=None):
     indices = input_data.get("market", {}).get("indices", {})
 
     index_rows = []
@@ -171,6 +182,7 @@ def build_tables(input_data, report):
     macro_table = _paragraph(macro_rows, ["지표", "값", "기준일"])
 
     return {
+        "COVER_IMAGE": _cover_image(cover_url),
         "SUMMARY": _text_block(report.get("summary")),
         "MARKET_MOOD": _text_block(report.get("market_mood")),
         "INDEX_TABLE": index_table,
@@ -188,7 +200,7 @@ def build_tables(input_data, report):
     }
 
 
-def render(input_path, report_path, output_dir):
+def render(input_path, report_path, output_dir, cover_url=None):
     with open(input_path, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
@@ -202,7 +214,7 @@ def render(input_path, report_path, output_dir):
         template = f.read()
 
     body = template
-    built = build_tables(input_data, report)
+    built = build_tables(input_data, report, cover_url=cover_url)
     for marker in MARKERS:
         body = body.replace(f"__{marker}__", built[marker])
 
