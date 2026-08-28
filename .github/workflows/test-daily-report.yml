@@ -4,6 +4,9 @@ on:
   schedule:
     # 매주 월~금 21:00 UTC = 한국 시간 다음날 06:00
     - cron: '0 21 * * 1-5'
+    # 재시도. GitHub cron은 부하가 높으면 지연/누락되므로 90분 뒤 한 번 더 건다.
+    # 이미 게시됐으면 check_published.py가 이후 단계를 모두 건너뛴다.
+    - cron: '30 22 * * 1-5'
   workflow_dispatch:
     inputs:
       publish:
@@ -17,7 +20,8 @@ permissions:
 
 concurrency:
   group: daily-report
-  cancel-in-progress: true
+  # 재시도 cron이 진행 중인 정상 실행을 취소하면 안 된다. 큐에 넣고 기다린다.
+  cancel-in-progress: false
 
 env:
   FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
@@ -43,12 +47,21 @@ jobs:
       - name: Install dependencies
         run: pip install -r experiments/daily-report/requirements.txt
 
+      # 오늘(KST) 글이 이미 있으면 이후 단계를 전부 건너뛴다. 재시도 cron이
+      # Gemini 호출·이미지 생성을 헛돌리지 않게 가장 앞에서 확인한다.
+      - name: Check if today's report is already published
+        id: check
+        if: github.event_name == 'schedule' || inputs.publish
+        run: python experiments/daily-report/check_published.py
+
       # 항상 dry-run. output/에 report_body.html, title.txt, image_ref.txt,
       # images/{date}.webp 를 남긴다.
       - name: Run daily report (dry-run + cover image)
+        if: steps.check.outputs.already_published != 'true'
         run: python experiments/daily-report/main.py
 
       - name: Prepare cover image for deploy
+        if: steps.check.outputs.already_published != 'true'
         run: |
           mkdir -p deploy/images
           if compgen -G "experiments/daily-report/output/images/*.webp" > /dev/null; then
@@ -82,7 +95,9 @@ jobs:
       # 스케줄 실행은 자동 게시. 수동 실행은 publish 체크 시에만 게시.
       # publish_saved.py는 커버 이미지 URL까지 확인한다.
       - name: Publish to Blogger
-        if: github.event_name == 'schedule' || inputs.publish
+        if: |
+          steps.check.outputs.already_published != 'true'
+          && (github.event_name == 'schedule' || inputs.publish)
         run: python experiments/daily-report/publish_saved.py
 
       - name: Upload report artifacts

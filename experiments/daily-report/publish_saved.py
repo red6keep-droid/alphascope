@@ -8,9 +8,11 @@ report_body.html / title.txt / image_ref.txt를 남긴다.
 게시 조건:
     - title.txt / report_body.html 존재
     - image_ref.txt 존재 + jsDelivr CDN URL HTTP 200 (커버 이미지 보장)
+    - 같은 제목의 글이 아직 없음 (cron 이중화 대비 중복 방지)
 
 사용법:
     python experiments/daily-report/publish_saved.py
+    python experiments/daily-report/publish_saved.py --force  # 중복 확인 무시
 """
 
 import os
@@ -64,6 +66,16 @@ def main():
         print("이미지가 배포되지 않았거나 CDN 반영 전입니다. 게시를 중단합니다.")
         sys.exit(1)
     print(f"커버 이미지 확인 완료: {cover_url}")
+
+    # cron 이중화로 하루 두 번 실행될 수 있다. check_published.py가 앞단에서 걸러주지만,
+    # 확인 실패나 두 실행이 겹치는 경우를 대비한 2차 방어.
+    force = "--force" in sys.argv or os.environ.get("PUBLISH_FORCE", "").lower() == "true"
+    if not force:
+        existing = publish_blogger.find_post_by_title(title)
+        if existing:
+            print(f"같은 제목의 글이 이미 있습니다: {existing}")
+            print("중복 게시를 건너뜁니다. (다시 올리려면 --force)")
+            return
 
     url = publish_blogger.publish(title, body, dry_run=False)
     if url:

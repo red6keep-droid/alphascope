@@ -17,6 +17,8 @@ experiments/daily-report/
 ├── render_html.py           # 원본 숫자 + Gemini 문구 + 커버 이미지 → HTML
 ├── publish_blogger.py       # Blogger API v3 게시 (OAuth 2.0 Client ID + Refresh Token)
 ├── publish_saved.py         # 저장된 output/ 리포트 게시 (GitHub Actions 후속 단계용)
+├── report_title.py          # 날짜/제목 규칙 (main.py ↔ check_published.py 공유)
+├── check_published.py       # 오늘 글이 이미 게시됐는지 확인 (cron 이중화 중복 방지)
 ├── setup_oauth.py           # 1회 브라우저 승인 → refresh token 발급
 ├── verify_blogger.py        # 게시 없이 인증/블로그 연결 확인
 ├── prompts/daily_report.txt # Gemini 지시문
@@ -129,15 +131,31 @@ python experiments/daily-report/main.py --publish
 
 `.github/workflows/test-daily-report.yml`
 
-- `schedule: cron '0 21 * * 1-5'` = 월~금 21:00 UTC (한국시간 다음날 06:00, 금요일 장 데이터는 토요일 아침 게시)
-- **실행 순서**: ① `main.py` dry-run(리포트+커버 이미지 생성) → ② 이미지 gh-pages 배포 →
-  ③ jsDelivr purge + HTTP 200 확인 → ④ publish 체크 시 `publish_saved.py`로 실제 게시 → ⑤ artifact 업로드
-- **일정 실행은 항상 dry-run** — 생성물(`output/`, 커버 이미지 포함)이 workflow artifact로 업로드돼 웹에서 확인할 수 있습니다.
-- **수동 실행(workflow_dispatch)에서 "publish" 체크박스를 켜면 그 실행만 실제 게시**를 합니다.
-  게시에는 `BLOGGER_*` 3종 시크릿과, 이미지 fallback 대비 `HF_TOKEN` 시크릿을 권장합니다.
-- 정가동(매일 자동 게시)으로 전환하려면:
-  1. 워크플로우의 Publish 스텝 조건을 `if: inputs.publish` → `if: github.event_name == 'schedule' || inputs.publish` 로 변경
-  2. 또는 그대로 두고 수동 dispatch로만 게시
+- **정가동 중** — 스케줄 실행은 리포트를 만들고 **자동으로 게시**합니다.
+- `schedule`: 월~금 **21:00 UTC**(한국시간 다음날 06:00) + **22:30 UTC** 재시도 2회.
+  금요일 장 데이터는 토요일 아침에 올라갑니다.
+- **실행 순서**: ① `check_published.py`로 오늘(KST) 글 존재 확인 → ② `main.py` dry-run(리포트+커버
+  이미지 생성) → ③ 이미지 gh-pages 배포 → ④ jsDelivr purge + HTTP 200 확인 →
+  ⑤ `publish_saved.py`로 게시 → ⑥ artifact 업로드
+- **수동 실행(workflow_dispatch)** 은 기본이 미리보기입니다. "publish" 체크박스를 켠 실행만 게시합니다.
+  체크하지 않으면 ①을 건너뛰고 생성물만 artifact로 올립니다.
+- 게시에는 `BLOGGER_*` 3종 시크릿과, 이미지 fallback 대비 `HF_TOKEN` 시크릿을 권장합니다.
+
+### cron 누락 대비 (재시도 + 중복 방지)
+
+GitHub Actions의 `schedule`은 보장되지 않습니다. 실제로 2026-08-26·27 실행이 통째로 누락됐고,
+08-28 실행은 21:00 UTC 예정이 **02:26 UTC로 5시간 넘게 지연**됐습니다. 그래서 cron을 두 번 겁니다.
+
+중복 게시는 **제목 일치**로 막습니다. 제목은 `report_title.daily_title()` 한 곳에서만 만들어지므로
+파이프라인과 확인 스크립트의 판정이 어긋나지 않습니다.
+
+- **1차 (`check_published.py`)** — 잡 맨 앞에서 오늘 제목의 글을 찾으면 `already_published=true`를
+  출력하고 이후 스텝을 전부 건너뜁니다. Gemini 호출·이미지 생성 비용까지 아낍니다.
+  확인 자체가 실패하면 `false`로 간주해 그날 리포트가 누락되지 않게 합니다.
+- **2차 (`publish_saved.py`)** — 게시 직전에 한 번 더 확인합니다. 1차 확인이 실패했거나 두 실행이
+  겹칠 때의 안전망입니다. 의도적으로 다시 올리려면 `--force`(또는 `PUBLISH_FORCE=true`).
+- `concurrency.cancel-in-progress: false` — 재시도 cron이 진행 중인 정상 실행을 취소하지 않고
+  큐에서 대기합니다.
 
 ## 테스트 순서 (권장)
 

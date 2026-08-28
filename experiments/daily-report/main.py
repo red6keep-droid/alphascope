@@ -19,7 +19,6 @@ GitHub Actions에서는 이 스크립트를 항상 dry-run으로 실행한 뒤,
 """
 
 import argparse
-import datetime
 import json
 import os
 import sys
@@ -33,6 +32,7 @@ import generate_image
 import generate_report
 import publish_blogger
 import render_html
+import report_title
 import validate_report
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -44,16 +44,6 @@ INPUT_PATH = os.path.join(OUTPUT_DIR, "report_input.json")
 REPORT_PATH = os.path.join(OUTPUT_DIR, "report.out.json")
 
 DEFAULT_REPO_SLUG = "red6keep-droid/alphascope"
-
-KST = datetime.timezone(datetime.timedelta(hours=9))
-
-
-def _korean_date(date_str):
-    try:
-        y, m, d = str(date_str).split("-")[:3]
-        return f"{int(y)}년 {int(m)}월 {int(d)}일"
-    except Exception:
-        return date_str
 
 
 def _repo_slug():
@@ -69,7 +59,7 @@ def collect():
     yahoo = collect_yahoo.collect_yahoo()
     news = collect_news.collect_news()
 
-    today = datetime.datetime.now(KST).strftime("%Y-%m-%d")
+    today = report_title.today_kst()
     input_data = {
         "date": today,
         "updated_at": yahoo.get("updated_at"),
@@ -150,7 +140,7 @@ def main():
         INPUT_PATH, REPORT_PATH, OUTPUT_DIR, cover_url=cover_url
     )
 
-    title = f"미국 증시 데일리 브리핑 — {_korean_date(input_data['date'])}"
+    title = report_title.daily_title(input_data["date"])
     print(f"제목: {title}")
 
     # GitHub Actions 후속 단계(이미지 배포/게시)가 읽는 메타 파일

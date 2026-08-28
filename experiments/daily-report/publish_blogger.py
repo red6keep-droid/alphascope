@@ -63,6 +63,33 @@ def _blog_id(creds, blog_url):
     return resp.json()["id"]
 
 
+def find_post_by_title(title, blog_url=None, creds=None, max_results=15):
+    """같은 제목의 글이 이미 게시돼 있으면 그 URL을, 없으면 None을 반환한다.
+
+    cron 이중화(스케줄 누락 대비)로 하루에 두 번 실행될 수 있어, 같은 날짜 제목이
+    이미 있으면 다시 게시하지 않는다. 제목은 report_title.daily_title()이 만든다.
+    """
+    blog_url = blog_url or os.environ.get("BLOG_URL", DEFAULT_BLOG_URL)
+    creds = creds or _credentials()
+    blog_id = _blog_id(creds, blog_url)
+    resp = requests.get(
+        f"{BLOGGER_API}/blogs/{blog_id}/posts",
+        params={
+            "maxResults": max_results,
+            "fetchBodies": "false",
+            "fetchImages": "false",
+        },
+        headers={"Authorization": f"Bearer {creds.token}"},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    wanted = title.strip()
+    for post in resp.json().get("items", []):
+        if str(post.get("title", "")).strip() == wanted:
+            return post.get("url") or post.get("id")
+    return None
+
+
 def publish(title, content, labels=None, blog_url=None, dry_run=False):
     blog_url = blog_url or os.environ.get("BLOG_URL", DEFAULT_BLOG_URL)
     labels = labels or LABELS
