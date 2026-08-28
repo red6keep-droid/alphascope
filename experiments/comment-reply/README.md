@@ -73,7 +73,15 @@ python experiments/comment-reply/main.py --send
 
 - `schedule: cron '*/5 * * * *'` — 5분마다 감지. **일정 실행은 알림 발송을 켠 상태로 동작.**
 - 처리 이력(`output/state.json`)은 별도 브랜치 `comment-state` 에 저장되어
-  실행 간 중복 알림을 방지합니다.
+  실행 간 중복 알림을 방지합니다. 이 브랜치를 다룰 때 걸리기 쉬운 두 가지:
+  - `output/` 은 `.gitignore` 대상이라 `git add -f` 가 필요합니다.
+    없으면 git 이 종료코드 1을 반환해 스텝 전체가 죽습니다.
+  - `actions/checkout` 은 fetch refspec 을 `main` 으로 좁혀둡니다. 그래서
+    `git fetch origin comment-state:refs/comment-state` 처럼 **목적지를 명시**해야
+    ref 가 만들어집니다. 명시하지 않으면 FETCH_HEAD 만 갱신돼 상태를 읽지 못하고,
+    매번 '첫 실행'으로 오판해 baseline(=알림 없음)으로 빠집니다.
+  - `git checkout --orphan` 은 인덱스를 유지하므로 `git reset` 으로 비우지 않으면
+    state.json 하나가 아니라 리포 전체가 커밋됩니다.
 - `workflow_dispatch` — "notify" 체크박스로 발송 on/off, "test_comment" 로 테스트 가능.
 - Secrets: `BLOGGER_CLIENT_ID`, `BLOGGER_CLIENT_SECRET`, `BLOGGER_REFRESH_TOKEN`,
   `GEMINI_API_KEY`, `SLACK_WEBHOOK_URL`

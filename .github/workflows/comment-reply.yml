@@ -48,16 +48,22 @@ jobs:
       - name: Install dependencies
         run: pip install -r experiments/comment-reply/requirements.txt
 
+      # actions/checkout은 fetch refspec을 main으로 좁혀둔다. 목적지를 명시하지
+      # 않으면 FETCH_HEAD만 갱신되고 ref가 만들어지지 않아, 저장된 상태가 있어도
+      # 매번 '첫 실행'으로 오판해 baseline(=알림 없음)으로 빠진다.
       - name: Load previous state
         run: |
-          git fetch origin comment-state || true
-          if git cat-file -e refs/remotes/origin/comment-state 2>/dev/null; then
-            mkdir -p experiments/comment-reply/output
-            git show origin/comment-state:experiments/comment-reply/output/state.json \
-              > experiments/comment-reply/output/state.json
-            echo "이전 상태 불러옴: $(cat experiments/comment-reply/output/state.json)"
-          else
-            echo "comment-state 브랜치 없음 (첫 실행)"
+          STATE=experiments/comment-reply/output/state.json
+          if git fetch origin comment-state:refs/comment-state 2>/dev/null; then
+            if git show "refs/comment-state:$STATE" > state.json.tmp 2>/dev/null; then
+              mkdir -p experiments/comment-reply/output
+              mv state.json.tmp "$STATE"
+              echo "이전 상태 불러옴: $(cat "$STATE")"
+            fi
+          fi
+          if [ ! -f "$STATE" ]; then
+            rm -f state.json.tmp
+            echo "이전 상태 없음 (첫 실행)"
           fi
 
       - name: Run comment reply
@@ -73,10 +79,18 @@ jobs:
       - name: Save state (comment-state branch)
         if: always()
         run: |
+          STATE=experiments/comment-reply/output/state.json
+          if [ ! -f "$STATE" ]; then
+            echo "state.json 없음 — 저장을 건너뜁니다."
+            exit 0
+          fi
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
+          # --orphan은 인덱스를 유지한다. 리셋하지 않으면 리포 전체가 커밋된다.
           git checkout --orphan comment-state
-          git add experiments/comment-reply/output/state.json
+          git reset
+          # output/ 은 .gitignore 대상이라 -f 없이는 git add가 종료코드 1로 죽는다.
+          git add -f "$STATE"
           git commit -m "Update comment state [skip ci]" || echo "상태 변경 없음"
           git push --force origin comment-state:comment-state
 
