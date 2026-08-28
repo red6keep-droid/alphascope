@@ -79,9 +79,10 @@ jobs:
           curl -sS -f -o /dev/null "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}"
           echo "커버 이미지 CDN 확인 완료: ${IMAGE_REF}"
 
-      # publish 체크 시에만 게시. publish_saved.py는 커버 이미지 URL까지 확인한다.
+      # 스케줄 실행은 자동 게시. 수동 실행은 publish 체크 시에만 게시.
+      # publish_saved.py는 커버 이미지 URL까지 확인한다.
       - name: Publish to Blogger
-        if: inputs.publish
+        if: github.event_name == 'schedule' || inputs.publish
         run: python experiments/daily-report/publish_saved.py
 
       - name: Upload report artifacts
