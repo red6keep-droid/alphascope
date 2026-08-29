@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-08-29 10:08:52 UTC",
+  "updated_at": "2026-08-29 12:10:33 UTC",
   "items": [
+    {
+      "title": "Buffett remains active at 96, but Berkshire's shares aren't doing much",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/08/29/buffett-remains-active-at-96-but-berkshires-shares-arent-doing-much.html",
+      "published": "2026-08-29 11:53:36",
+      "summary": "Warren Buffett will be celebrating his 96th birthday on Sunday, but Berkshire Hathaway investors aren't celebrating the stock's anemic performance."
+    },
     {
       "title": "U.S. appeals court rules against prediction markets, sets up likely fight at Supreme Court",
       "source": "CNBC",
@@ -28,13 +35,6 @@
       "link": "https://www.cnbc.com/2026/08/24/a-massive-trade-just-happened-in-gold-the-options-market-is-buzzing.html",
       "published": "2026-08-25 14:47:58",
       "summary": "Twenty minutes after the market opened Monday, someone took profit on a $200 million GLD position"
-    },
-    {
-      "title": "From Nvidia earnings to trade war tape bombs, a simple strategy could be this week's best bet",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/08/24/from-nvidia-earnings-to-trade-war-tape-bombs-a-simple-strategy-could-be-this-weeks-best-bet.html",
-      "published": "2026-08-24 16:07:35",
-      "summary": "Mike Khouw gives a low-risk options strategy to play the next few weeks."
     }
   ]
 }
