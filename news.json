@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-08-30 10:09:02 UTC",
+  "updated_at": "2026-08-30 12:09:37 UTC",
   "items": [
+    {
+      "title": "Top Wall Street analysts suggest these 3 dividend stocks for consistent income",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/08/30/top-analysts-suggest-these-dividend-stocks-for-consistent-income.html",
+      "published": "2026-08-30 10:42:13",
+      "summary": "These three dividend stocks offer steady income in turbulent markets."
+    },
     {
       "title": "Buffett remains active at 96, but Berkshire's shares aren't doing much",
       "source": "CNBC",
@@ -28,13 +35,6 @@
       "link": "https://www.cnbc.com/2026/08/25/debasement-trade-debt-gold-bitcoin-dollar.html",
       "published": "2026-08-25 15:16:02",
       "summary": "Concern over the size and the cost of U.S. government spending has given new life to the debasement trade."
-    },
-    {
-      "title": "A massive trade just happened in gold. The options market is buzzing",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/08/24/a-massive-trade-just-happened-in-gold-the-options-market-is-buzzing.html",
-      "published": "2026-08-25 14:47:58",
-      "summary": "Twenty minutes after the market opened Monday, someone took profit on a $200 million GLD position"
     }
   ]
 }
