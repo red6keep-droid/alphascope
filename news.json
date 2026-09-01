@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-09-01 16:40:25 UTC",
+  "updated_at": "2026-09-01 18:19:39 UTC",
   "items": [
+    {
+      "title": "Prediction market traders think job creation rebounded in August",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/01/prediction-market-traders-think-job-creation-rebounded-in-august.html",
+      "published": "2026-09-01 18:16:44",
+      "summary": "Traders see 50-50 odds that the U.S. economy added more than 50,000 jobs last month."
+    },
     {
       "title": "Top Wall Street analysts suggest these 3 dividend stocks for consistent income",
       "source": "CNBC",
@@ -28,13 +35,6 @@
       "link": "https://www.cnbc.com/2026/08/26/las-vegas-sands-shares-are-about-to-catch-a-heater-says-mike-khouw.html",
       "published": "2026-08-26 18:17:04",
       "summary": "Although named after the Nevada gaming mecca, Las Vegas Sands has largely depended on the Asia/Macau story of the last decade."
-    },
-    {
-      "title": "The 'debasement trade' returns after Bessent bond maneuver. Crypto and gold are back in style",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/08/25/debasement-trade-debt-gold-bitcoin-dollar.html",
-      "published": "2026-08-25 15:16:02",
-      "summary": "Concern over the size and the cost of U.S. government spending has given new life to the debasement trade."
     }
   ]
 }
