@@ -1,11 +1,18 @@
 {
-  "updated_at": "2026-09-02 18:21:31 UTC",
+  "updated_at": "2026-09-02 20:17:25 UTC",
   "items": [
+    {
+      "title": "Traders are piling into this international stock market that just pulled ahead of the Nasdaq",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/02/traders-pile-into-this-international-stock-market-thats-beating-the-nasdaq.html",
+      "published": "2026-09-02 19:11:07",
+      "summary": "The rally might be tied to commodities, which are also surging, or an expression of optimism around the country's upcoming general election in October."
+    },
     {
       "title": "New Jersey asks the Supreme Court to take on prediction markets",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/09/02/new-jersey-asks-the-supreme-court-to-take-on-prediction-markets-.html",
-      "published": "2026-09-02 18:10:09",
+      "published": "2026-09-02 18:39:38",
       "summary": "The petition comes after a key ruling from the 9th U.S. Circuit Court of Appeals on sports-event contracts."
     },
     {
@@ -28,13 +35,6 @@
       "link": "https://www.cnbc.com/2026/08/30/top-analysts-suggest-these-dividend-stocks-for-consistent-income.html",
       "published": "2026-08-30 10:42:13",
       "summary": "These three dividend stocks offer steady income in turbulent markets."
-    },
-    {
-      "title": "Buffett remains active at 96, but Berkshire's shares aren't doing much",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/08/29/buffett-remains-active-at-96-but-berkshires-shares-arent-doing-much.html",
-      "published": "2026-08-29 11:53:36",
-      "summary": "Warren Buffett will be celebrating his 96th birthday on Sunday, but Berkshire Hathaway investors aren't celebrating the stock's anemic performance."
     }
   ]
 }
