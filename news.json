@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-09-03 18:20:12 UTC",
+  "updated_at": "2026-09-03 20:16:05 UTC",
   "items": [
+    {
+      "title": "Piper Sandler expects Robinhood to kickstart football season with a win",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/03/piper-sandler-expects-robinhood-to-start-football-season-with-a-win.html",
+      "published": "2026-09-03 19:01:36",
+      "summary": "With less than a week until the start of football season, Piper Sandler expects Rothera's prediction market activity to jump."
+    },
     {
       "title": "Traders are piling into this international stock market that just pulled ahead of the Nasdaq",
       "source": "CNBC",
@@ -28,13 +35,6 @@
       "link": "https://www.cnbc.com/2026/09/01/prediction-market-traders-think-job-creation-rebounded-in-august.html",
       "published": "2026-09-01 18:57:14",
       "summary": "Traders see 50-50 odds that the U.S. economy added more than 50,000 jobs last month."
-    },
-    {
-      "title": "Top Wall Street analysts suggest these 3 dividend stocks for consistent income",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/08/30/top-analysts-suggest-these-dividend-stocks-for-consistent-income.html",
-      "published": "2026-08-30 10:42:13",
-      "summary": "These three dividend stocks offer steady income in turbulent markets."
     }
   ]
 }
