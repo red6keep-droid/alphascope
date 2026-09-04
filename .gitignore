@@ -8,3 +8,4 @@ news.json
 experiments/daily-report/.env
 experiments/daily-report/output/
 experiments/comment-reply/output/
+preview.html
