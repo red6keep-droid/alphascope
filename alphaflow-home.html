@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AlphaFlow — 미국 증시 AI 데일리 브리핑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+/* ==========================================================================
+   AlphaFlow — main home
+   Figma: alphaflow-main-home (1440 x 2674)
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* surfaces */
+  --bg:            #F9FAFB;
+  --surface:       #FFFFFF;
+  --surface-sub:   #F8FAFC;
+  --border:        #F0F0F0;
+  --border-strong: #E2E8F0;
+
+  /* ink */
+  --ink:      #0F172A;
+  --ink-2:    #111827;
+  --gray-600: #4B5563;
+  --gray-500: #6B7280;
+  --gray-400: #94A3B8;
+  --gray-350: #9CA3AF;
+
+  /* 한국식 등락 표기: 상승 적색 / 하락 청색 */
+  --up:      #E53E3E;
+  --up-alt:  #ED3333;
+  --down:    #1A73E8;
+
+  --accent:      #FF3333;
+  --logo-red:    #DD0000;
+  --badge-blue:  #4963CA;
+  --badge-green: #10B981;
+
+  /* type */
+  --sans: 'Noto Sans KR', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --num:  'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* rhythm */
+  --gutter:  40px;
+  --shell:   1440px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+ul { margin: 0; padding: 0; list-style: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+.num { font-family: var(--num); font-variant-numeric: tabular-nums; }
+.up   { color: var(--up); }
+.down { color: var(--down); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ==========================================================================
+   navbar
+   ========================================================================== */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 72px;
+  padding: 0 var(--gutter);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.nav-left  { display: flex; align-items: center; gap: 40px; align-self: stretch; min-width: 0; }
+.nav-right { display: flex; align-items: center; gap: 20px; flex: none; }
+
+.logo { display: flex; align-items: center; gap: 8px; flex: none; }
+.logo-mark { width: 35px; height: 33px; flex: none; display: block; }
+.logo-word {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  line-height: 27px;
+  letter-spacing: -0.2px;
+  color: #000;
+  white-space: nowrap;
+}
+
+.menu-items { display: flex; align-items: stretch; gap: 12px; align-self: stretch; min-width: 0; }
+
+.nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px 12px;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 22px;
+  color: #000;
+  white-space: nowrap;
+  transition: color .15s ease;
+}
+.nav-item:hover { color: var(--accent); }
+.nav-item[aria-current="page"] { color: var(--accent); }
+.nav-item[aria-current="page"]::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 3px 3px 0 0;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 220px;
+  height: 34px;
+  padding: 8px 14px;
+  background: var(--surface-sub);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+}
+.search-bar svg { width: 14px; height: 14px; flex: none; color: var(--gray-400); }
+.search-bar input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink);
+}
+.search-bar input::placeholder { color: var(--gray-400); }
+
+.icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; flex: none;
+  color: var(--gray-500);
+}
+.icon-btn svg { width: 19px; height: 19px; display: block; }
+
+.avatar {
+  width: 36px; height: 36px; flex: none;
+  border-radius: 50%;
+  background: linear-gradient(140deg, #7C93C8 0%, #46557A 60%, #2B3350 100%);
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,.08);
+}
+
+.nav-toggle { display: none; }
+
+/* ==========================================================================
+   shell
+   ========================================================================== */
+
+.header-bar { height: 28px; padding: 10px var(--gutter) 0; }
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 27px;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 12px var(--gutter) 64px;
+}
+
+/* section heading */
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 25px;
+  letter-spacing: -0.3px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.section-title svg { width: 20px; height: 20px; flex: none; }
+.section-note { font-size: 12px; line-height: 18px; color: var(--gray-500); }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+/* ==========================================================================
+   1. AI daily briefing
+   ========================================================================== */
+
+.briefing { display: flex; flex-direction: column; gap: 6px; }
+
+.briefing-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.briefing-head-left { display: flex; align-items: center; gap: 24px; min-width: 0; flex-wrap: wrap; }
+.briefing-sub { font-size: 12px; line-height: 1.5; color: var(--gray-500); }
+
+.sync-stamp {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; line-height: 18px; color: var(--gray-500);
+  white-space: nowrap;
+}
+.sync-dot {
+  width: 8px; height: 8px; flex: none;
+  border-radius: 50%;
+  background: #C3C3C3;
+}
+
+.briefing-body { display: flex; align-items: flex-start; gap: 20px; }
+.briefing-main { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+
+.report-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.badge {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  color: #fff;
+  white-space: nowrap;
+}
+.badge--insight { background: var(--badge-blue); }
+.badge--outlook { background: var(--badge-green); }
+
+.report-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.report-columns ul { display: flex; flex-direction: column; }
+.report-columns li {
+  font-size: 14px;
+  line-height: 28px;
+  color: #000;
+}
+.report-columns li::before { content: '• '; }
+
+/* AI picks */
+.picks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 323px;
+  flex: none;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.picks h3 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 19px;
+  color: var(--ink);
+}
+.picks ul { display: flex; flex-direction: column; gap: 8px; }
+.pick {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface-sub);
+  border-radius: 8px;
+}
+.pick-name {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 19px;
+  color: var(--ink);
+}
+.pick-sector {
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--gray-500);
+}
+.pick-change {
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   2. index cards
+   ========================================================================== */
+
+.index-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.index-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.index-card-head { display: flex; align-items: center; gap: 6px; }
+.index-name {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--ink-2);
+}
+.index-status {
+  font-size: 12px;
+  line-height: 14px;
+  color: var(--gray-350);
+}
+
+.index-price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+.index-price {
+  font-family: var(--num);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 31px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.index-change {
+  font-family: var(--num);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.index-card hr {
+  height: 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+.index-meta {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+.index-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.index-meta-divider {
+  flex: none;
+  width: 1px;
+  background: var(--border);
+}
+.index-meta-title {
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 13px;
+  color: var(--gray-350);
+}
+.index-meta-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+}
+.index-meta-row dt {
+  font-size: 12px;
+  line-height: 14px;
+  color: var(--gray-600);
+  white-space: nowrap;
+}
+.index-meta--right .index-meta-row dt { color: var(--gray-350); }
+.index-meta-row dd {
+  margin: 0;
+  font-family: var(--num);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.index-meta--right .index-meta-row:first-child dd { color: var(--gray-600); }
+
+/* ==========================================================================
+   3. realtime rankings
+   ========================================================================== */
+
+.rankings { display: flex; flex-direction: column; gap: 14px; }
+
+.tabs { display: flex; align-items: flex-end; }
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 20px 0;
+  font-size: 14px;
+  line-height: 19px;
+  color: var(--gray-400);
+  white-space: nowrap;
+}
+.tab::after {
+  content: '';
+  display: block;
+  align-self: stretch;
+  height: 2px;
+  margin-top: 8px;
+  background: transparent;
+}
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { font-weight: 700; color: var(--ink); }
+.tab[aria-selected="true"]::after { background: var(--ink); }
+
+.table-wrap { overflow-x: auto; }
+
+.rank-table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+}
+.rank-table th,
+.rank-table td {
+  padding: 10px 8px;
+  text-align: right;
+  white-space: nowrap;
+}
+.rank-table thead th {
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--gray-400);
+  border-bottom: 1px solid var(--border);
+}
+.rank-table th:first-child,
+.rank-table td:first-child { padding-left: 16px; }
+.rank-table th:last-child,
+.rank-table td:last-child { padding-right: 16px; }
+
+.col-star { width: 32px; text-align: center !important; }
+.col-rank { width: 40px; text-align: center !important; }
+.col-name { text-align: left !important; }
+.col-sector { text-align: left !important; }
+
+.rank-table tbody tr { border-bottom: 1px solid var(--border); }
+.rank-table tbody tr:last-child { border-bottom: 0; }
+.rank-table tbody tr:hover { background: #FCFDFE; }
+
+.star {
+  color: #CBD5E1;
+  line-height: 1;
+  transition: color .15s ease;
+}
+.star:hover, .star[aria-pressed="true"] { color: #F5B400; }
+
+.rank-no {
+  font-family: var(--num);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--gray-600);
+}
+
+.stock-cell { display: flex; align-items: center; gap: 10px; }
+.stock-avatar {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; flex: none;
+  border-radius: 50%;
+  font-family: var(--num);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: -0.2px;
+  color: #fff;
+}
+.stock-label { display: flex; flex-direction: column; min-width: 0; }
+.stock-name {
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-2);
+}
+.stock-ticker {
+  font-family: var(--num);
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--gray-400);
+}
+
+.cell-price {
+  font-family: var(--num);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.cell-change {
+  font-family: var(--num);
+  font-weight: 600;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.cell-sector { font-size: 12px; color: var(--gray-600); }
+.cell-num {
+  font-family: var(--num);
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--gray-600);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   4. sector overview
+   ========================================================================== */
+
+.sector-card { padding: 24px; }
+
+.sector-body {
+  display: grid;
+  grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 20px;
+}
+
+.sector-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.sector-list-head h3 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 19px;
+  color: var(--ink);
+}
+.sector-total { font-size: 12px; color: var(--gray-500); }
+
+.sector-table { width: 100%; border-collapse: collapse; }
+.sector-table th {
+  padding: 0 4px 8px;
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--gray-400);
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+.sector-table th:first-child { width: 28px; }
+.sector-table th:nth-child(2) { text-align: left; }
+.sector-table td {
+  padding: 8px 4px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+.sector-table tbody tr:last-child td { border-bottom: 0; }
+.sector-table td:first-child {
+  font-family: var(--num);
+  font-size: 12px;
+  color: var(--gray-400);
+  text-align: center;
+}
+.sector-table td:nth-child(2) {
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.weight-cell { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.weight-bar {
+  width: 72px;
+  height: 5px;
+  flex: none;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.weight-bar span { display: block; height: 100%; border-radius: 3px; }
+.weight-val {
+  font-family: var(--num);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--gray-600);
+  font-variant-numeric: tabular-nums;
+}
+.sector-change {
+  font-family: var(--num);
+  font-weight: 700;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* treemap */
+.treemap-wrap { display: flex; flex-direction: column; gap: 12px; }
+.treemap {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 4px;
+  height: 320px;
+}
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: 12px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.tile-name { font-weight: 700; font-size: 13px; line-height: 18px; }
+.tile-val {
+  font-family: var(--num);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.tile--semis   { grid-column: 1 / 3; grid-row: 1; }
+.tile--bank    { grid-column: 3;     grid-row: 1; }
+.tile--online  { grid-column: 1;     grid-row: 2; }
+.tile--soft    { grid-column: 2;     grid-row: 2; }
+.tile-stack    { grid-column: 3; grid-row: 2; display: grid; grid-template-rows: 1fr 1fr; gap: 4px; }
+
+.treemap-legend { display: flex; flex-direction: column; gap: 4px; }
+.legend-scale {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg,
+    #1A56DB 0%, #7FB0F2 25%, #FFFFFF 50%, #F2A0A0 75%, #DB2828 100%);
+  border: 1px solid var(--border);
+}
+.legend-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--num);
+  font-size: 10px;
+  color: var(--gray-400);
+}
+
+/* ==========================================================================
+   5. news
+   ========================================================================== */
+
+.news-card { padding: 24px; }
+
+.news-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px minmax(0, 420px);
+  gap: 28px;
+  align-items: start;
+  margin-top: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.news-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.news-tag {
+  padding: 2px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--gray-600);
+  background: var(--surface-sub);
+}
+.news-time {
+  font-family: var(--num);
+  font-size: 12px;
+  color: var(--gray-400);
+}
+
+.news-headline {
+  margin: 0 0 14px;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.35;
+  letter-spacing: -0.6px;
+  color: var(--ink);
+}
+.news-summary {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--gray-600);
+}
+.news-source { font-size: 12px; color: var(--gray-400); }
+
+.news-hero-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background: linear-gradient(150deg, #0B2A5B 0%, #12508F 45%, #1E7FD0 100%);
+  position: relative;
+  overflow: hidden;
+}
+.news-hero-img::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 30% 35%, rgba(255,255,255,.35) 0 2px, transparent 3px),
+    radial-gradient(circle at 62% 22%, rgba(255,255,255,.3) 0 2px, transparent 3px),
+    radial-gradient(circle at 48% 58%, rgba(255,255,255,.4) 0 2px, transparent 3px),
+    radial-gradient(circle at 76% 66%, rgba(255,255,255,.28) 0 2px, transparent 3px),
+    radial-gradient(circle at 22% 74%, rgba(255,255,255,.3) 0 2px, transparent 3px),
+    linear-gradient(115deg, transparent 46%, rgba(255,255,255,.22) 50%, transparent 54%),
+    linear-gradient(65deg, transparent 58%, rgba(255,255,255,.16) 62%, transparent 66%);
+}
+
+.news-side { display: flex; flex-direction: column; gap: 4px; }
+.news-side-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.news-side-item:last-child { border-bottom: 0; }
+.news-side-item:first-child { padding-top: 0; }
+.news-side-title {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.news-side-meta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--gray-400);
+}
+.news-side-meta .num { margin-left: 8px; }
+.news-thumb {
+  width: 56px; height: 56px; flex: none;
+  border-radius: 8px;
+  background: linear-gradient(140deg, #C9D6E4 0%, #93A7BE 100%);
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+.news-grid-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background: linear-gradient(140deg, #16324F 0%, #26506F 55%, #3E7396 100%);
+}
+.news-grid-title {
+  margin: 0 0 6px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.news-grid-meta { font-size: 12px; color: var(--gray-400); }
+.news-grid-meta .num { margin-left: 8px; }
+
+/* ==========================================================================
+   6. breaking ticker + footer
+   ========================================================================== */
+
+.breaking {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px var(--gutter);
+  background: var(--surface);
+  border-top: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+  overflow: hidden;
+}
+.breaking-badge {
+  flex: none;
+  padding: 3px 8px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 15px;
+  letter-spacing: .4px;
+  color: var(--accent);
+}
+.breaking-track { flex: 1; min-width: 0; overflow: hidden; }
+.breaking-text {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--gray-600);
+  animation: ticker 46s linear infinite;
+}
+.breaking-track:hover .breaking-text { animation-play-state: paused; }
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .breaking-text { animation: none; }
+}
+
+.site-footer {
+  padding: 36px var(--gutter) 48px;
+  text-align: center;
+  background: var(--bg);
+}
+.footer-title {
+  margin: 0 0 14px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.footer-disclaimer {
+  max-width: 880px;
+  margin: 0 auto 16px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--gray-350);
+}
+.footer-copy {
+  margin: 0;
+  font-family: var(--num);
+  font-size: 11px;
+  color: var(--gray-400);
+}
+
+/* ==========================================================================
+   responsive
+   ========================================================================== */
+
+@media (max-width: 1360px) {
+  .briefing-body { flex-direction: column; }
+  .picks { width: 100%; }
+}
+
+@media (max-width: 1180px) {
+  :root { --gutter: 24px; }
+  .index-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sector-body { grid-template-columns: minmax(0, 1fr); }
+  .news-top { grid-template-columns: minmax(0, 1fr) 180px; }
+  .news-side { grid-column: 1 / -1; }
+}
+
+@media (max-width: 900px) {
+  .navbar { flex-wrap: wrap; height: auto; padding: 12px var(--gutter); }
+  .nav-left { gap: 20px; flex: 1; }
+  .nav-toggle {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; flex: none;
+    border: 1px solid var(--border-strong); border-radius: 8px;
+    color: var(--gray-600);
+  }
+  .menu-items {
+    order: 3;
+    width: 100%;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .menu-items::-webkit-scrollbar { display: none; }
+  .menu-items[hidden] { display: none; }
+  .nav-item { padding: 12px 10px; font-size: 15px; }
+  .search-bar { width: 160px; }
+  .report-columns { grid-template-columns: minmax(0, 1fr); }
+  .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .news-headline { font-size: 22px; }
+}
+
+@media (max-width: 680px) {
+  .index-row { grid-template-columns: minmax(0, 1fr); }
+  .news-top { grid-template-columns: minmax(0, 1fr); }
+  .news-hero-img { aspect-ratio: 16 / 9; max-width: 100%; }
+  .news-grid { grid-template-columns: minmax(0, 1fr); }
+  .sector-card, .news-card { padding: 16px; }
+  .treemap { height: 380px; grid-template-columns: 1fr 1fr; }
+  .tile--semis { grid-column: 1 / -1; }
+  .tile--bank { grid-column: 1; grid-row: 2; }
+  .tile--online { grid-column: 2; grid-row: 2; }
+  .tile--soft { grid-column: 1; grid-row: 3; }
+  .tile-stack { grid-column: 2; grid-row: 3; }
+  .treemap { grid-template-rows: 1.4fr 1fr 1fr; }
+  .tabs { overflow-x: auto; }
+  .tab { padding: 8px 12px 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ======================================================================
+     navbar
+     ====================================================================== -->
+<header class="navbar">
+  <div class="nav-left">
+    <a class="logo" href="/">
+      <svg class="logo-mark" viewBox="0 0 36 33" aria-hidden="true">
+        <path d="M13.2 0H32.6L19.4 16.6H0L13.2 0Z" fill="#000000"/>
+        <path d="M17.7 15.2H35.5L22.3 32.4H4.5L17.7 15.2Z" fill="#DD0000"/>
+      </svg>
+      <span class="logo-word">AlphaFlow</span>
+    </a>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M3 6h18M3 12h18M3 18h18"/>
+      </svg>
+      <span class="sr-only">메뉴 열기</span>
+    </button>
+
+    <nav class="menu-items" id="primary-menu" aria-label="주 메뉴">
+      <a class="nav-item" href="/" aria-current="page">홈</a>
+      <a class="nav-item" href="/search/label/시장">시장</a>
+      <a class="nav-item" href="/search/label/섹터">섹터</a>
+      <a class="nav-item" href="/search/label/종목">종목</a>
+      <a class="nav-item" href="/search/label/거시경제">거시경제</a>
+      <a class="nav-item" href="/search/label/뉴스">뉴스</a>
+      <a class="nav-item" href="/search/label/일정">일정</a>
+      <a class="nav-item" href="/search/label/관심종목">관심종목</a>
+    </nav>
+  </div>
+
+  <div class="nav-right">
+    <form class="search-bar" role="search" action="/search" method="get">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="5.75" cy="5.75" r="4.5"/>
+        <path d="M9.3 9.3 12.8 12.8" stroke-linecap="round"/>
+      </svg>
+      <input type="search" name="q" placeholder="종목, 뉴스, 매크로 검색..." aria-label="검색"/>
+    </form>
+
+    <button class="icon-btn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+      </svg>
+      <span class="sr-only">알림</span>
+    </button>
+
+    <div class="avatar" role="img" aria-label="내 프로필"></div>
+  </div>
+</header>
+
+<div class="header-bar"></div>
+
+<main class="main-content">
+
+  <!-- ====================================================================
+       1. AI 데일리 브리핑
+       ==================================================================== -->
+  <section class="briefing" aria-labelledby="briefing-title">
+    <div class="briefing-head">
+      <div class="briefing-head-left">
+        <h2 class="section-title" id="briefing-title">
+          <svg viewBox="0 0 20 20" aria-hidden="true" fill="#0F172A">
+            <rect x="2" y="16" width="16" height="1.5" rx=".75"/>
+            <rect x="3" y="11" width="3" height="5" rx=".5"/>
+            <rect x="8.5" y="8" width="3" height="8" rx=".5"/>
+            <rect x="14" y="4" width="3" height="12" rx=".5"/>
+          </svg>
+          미국 증시 데일리 브리핑
+        </h2>
+        <p class="briefing-sub">오늘의 시장 리포트 요약: AI가 분석한 핵심 인사이트, 추천 종목, 시장 전망을 한눈에 확인</p>
+      </div>
+      <p class="sync-stamp"><span class="sync-dot"></span><span id="sync-label">실시간 AI 동기화</span></p>
+    </div>
+
+    <div class="briefing-body">
+      <div class="briefing-main">
+        <!-- 연동 훅: generate_report 의 report.out.json 인사이트 문구를 여기에 렌더 -->
+        <article class="report-card" data-hook="insight">
+          <span class="badge badge--insight">오늘의 핵심 인사이트</span>
+          <div class="report-columns">
+            <ul>
+              <li>위험 자산 선호 흐름 지속 (72점) - 성장주 및 반도체 섹터 비중 확대</li>
+              <li>매크로 유동성 공급과 견조한 기업 실적 모멘텀이 상호 시너지 발휘 중</li>
+            </ul>
+            <ul>
+              <li>변동성 (VIX) 안정적 기조 유지</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="report-card" data-hook="outlook">
+          <span class="badge badge--outlook">시장 전망 요약</span>
+          <div class="report-columns">
+            <ul>
+              <li>종합 추세 전망: 강력한 상승 국면 유지</li>
+              <li>시장 참여폭: 업종 전반적인 고른 확산</li>
+            </ul>
+            <ul>
+              <li>금리 여건: 연준 피벗 대기 중립 상태</li>
+              <li>실물 경기: 완만한 연착륙 및 확장</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+
+      <aside class="picks" aria-labelledby="picks-title">
+        <h3 id="picks-title">AI 추천 종목</h3>
+        <ul id="picks-list">
+          <li class="pick">
+            <span>
+              <span class="pick-name">NVIDIA (NVDA)</span><br/>
+              <span class="pick-sector">AI/반도체</span>
+            </span>
+            <span class="pick-change up">+2.4%</span>
+          </li>
+          <li class="pick">
+            <span>
+              <span class="pick-name">Broadcom (AVGO)</span><br/>
+              <span class="pick-sector">반도체</span>
+            </span>
+            <span class="pick-change up">+1.8%</span>
+          </li>
+          <li class="pick">
+            <span>
+              <span class="pick-name">AMD (AMD)</span><br/>
+              <span class="pick-sector">반도체</span>
+            </span>
+            <span class="pick-change up">+1.3%</span>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       2. 지수 카드  (data.json 의 indices 연동)
+       ==================================================================== -->
+  <section class="index-row" id="index-row" aria-label="주요 지수"></section>
+
+  <!-- ====================================================================
+       3. 실시간 랭킹  (data.json 연동)
+       ==================================================================== -->
+  <section class="rankings" aria-labelledby="rankings-title">
+    <div class="section-head">
+      <h2 class="section-title" id="rankings-title">
+        <svg viewBox="0 0 20 20" aria-hidden="true" fill="#0F172A">
+          <rect x="2" y="10" width="4" height="10" rx="1"/>
+          <rect x="8" y="4" width="4" height="16" rx="1"/>
+          <rect x="14" y="13" width="4" height="7" rx="1"/>
+        </svg>
+        실시간 랭킹
+      </h2>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true"  data-sort="volume">거래상위</button>
+        <button class="tab" role="tab" aria-selected="false" data-sort="turnover">거래대금 상위</button>
+        <button class="tab" role="tab" aria-selected="false" data-sort="search">검색어 상위</button>
+        <button class="tab" role="tab" aria-selected="false" data-sort="gain">가격 상승</button>
+      </div>
+    </div>
+
+    <div class="card table-wrap">
+      <table class="rank-table">
+        <thead>
+          <tr>
+            <th class="col-star"><span class="sr-only">관심</span></th>
+            <th class="col-rank">순위</th>
+            <th class="col-name">종목명</th>
+            <th>현재가</th>
+            <th>전일대비</th>
+            <th class="col-sector">업종</th>
+            <th>거래량</th>
+            <th>거래대금</th>
+            <th>시가총액</th>
+          </tr>
+        </thead>
+        <tbody id="rank-body">
+          <tr><td colspan="9" style="text-align:center;padding:32px;color:var(--gray-400)">데이터를 불러오는 중…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       4. 주요 핵심 섹터 현황
+       ==================================================================== -->
+  <section class="card sector-card" aria-labelledby="sector-title">
+    <div class="section-head">
+      <h2 class="section-title" id="sector-title">주요 핵심 섹터 현황</h2>
+      <span class="section-note">일일 등락률 기준</span>
+    </div>
+
+    <div class="sector-body">
+      <div>
+        <div class="sector-list-head">
+          <h3>전체 업종</h3>
+          <span class="sector-total">총 $102조 545억</span>
+        </div>
+        <table class="sector-table">
+          <thead>
+            <tr>
+              <th><span class="sr-only">순위</span></th>
+              <th>업종명</th>
+              <th>비중</th>
+              <th>등락률</th>
+            </tr>
+          </thead>
+          <tbody id="sector-body"></tbody>
+        </table>
+      </div>
+
+      <div class="treemap-wrap">
+        <div class="treemap" id="treemap"></div>
+        <div class="treemap-legend">
+          <div class="legend-scale"></div>
+          <div class="legend-ticks">
+            <span>-10%</span><span>-5%</span><span>0</span><span>+5%</span><span>+10%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       5. 실시간 주요 뉴스  (news.json 연동)
+       ==================================================================== -->
+  <section class="card news-card" aria-labelledby="news-title">
+    <div class="section-head">
+      <h2 class="section-title" id="news-title">실시간 주요 뉴스</h2>
+      <span class="section-note">최신순</span>
+    </div>
+
+    <div class="news-top">
+      <article id="news-hero">
+        <div class="news-meta">
+          <span class="news-tag">AI</span>
+          <span class="news-time num">--:--</span>
+        </div>
+        <h3 class="news-headline">뉴스를 불러오는 중…</h3>
+        <p class="news-summary"></p>
+        <span class="news-source"></span>
+      </article>
+
+      <div class="news-hero-img" role="img" aria-label="주요 뉴스 이미지"></div>
+
+      <div class="news-side" id="news-side"></div>
+    </div>
+
+    <div class="news-grid" id="news-grid"></div>
+  </section>
+
+</main>
+
+<!-- ======================================================================
+     breaking ticker
+     ====================================================================== -->
+<div class="breaking">
+  <span class="breaking-badge">BREAKING</span>
+  <div class="breaking-track">
+    <span class="breaking-text" id="breaking-text">ALPHAFLOW 실시간 뉴스: 데이터를 불러오는 중…</span>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p class="footer-title">ALPHAFLOW AI 투자 의사 결정 보조 리포트 서비스</p>
+  <p class="footer-disclaimer">
+    면책사항: ALPHAFLOW 에서 제공하는 모든 분석 데이터 및 지표 스코어는 독자적인 AI 모델 및 알고리즘에 의한 가공적 연산 결과이며,
+    어떠한 경우에도 투자 수익률을 보장하거나 권유하지 않습니다. 최종 투자 의사 결정과 책임은 투자자 본인에게 있습니다.
+  </p>
+  <p class="footer-copy">© 2026 ALPHAFLOW. All rights reserved.</p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var GH = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/';
+  var DATA_URL = GH + 'data.json';
+  var NEWS_URL = GH + 'news.json';
+
+  /* ---------------------------------------------------------------- utils */
+
+  function fmt(n, digits) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return Number(n).toLocaleString('en-US', {
+      minimumFractionDigits: digits === undefined ? 2 : digits,
+      maximumFractionDigits: digits === undefined ? 2 : digits
+    });
+  }
+
+  /* 한국 금융 표기: 1억 단위 */
+  function eok(usd) {
+    if (!usd || isNaN(usd)) return '—';
+    return '$' + fmt(usd / 1e8, 2) + '억';
+  }
+
+  function signClass(v) { return v >= 0 ? 'up' : 'down'; }
+  function arrow(v) { return v >= 0 ? '▲' : '▼'; }
+
+  function kstTime(utcString) {
+    var m = String(utcString || '').match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})/);
+    if (!m) return null;
+    var d = new Date(m[1] + 'T' + m[2] + 'Z');
+    return isNaN(d) ? null : d;
+  }
+
+  function hhmm(date) {
+    if (!date) return '--:--';
+    return date.toLocaleTimeString('ko-KR', {
+      timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false
+    });
+  }
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  /* ------------------------------------------------- ticker → 한글 메타 */
+  /* data.json 은 티커만 담고 있어 표시용 메타는 여기서 매핑한다.
+     수집 단계에서 name/sector/marketCap 을 함께 내려주면 이 표는 제거 가능. */
+  var META = {
+    AAPL:   { name: '애플',            sector: '전화 및 소형 장치', color: '#8E9AAF' },
+    MSFT:   { name: '마이크로소프트',   sector: '소프트웨어',        color: '#2F6FBA' },
+    NVDA:   { name: '엔비디아',         sector: '반도체',            color: '#4A9E5C' },
+    AMZN:   { name: '아마존',           sector: '온라인 서비스',     color: '#D98324' },
+    GOOGL:  { name: '알파벳',           sector: '온라인 서비스',     color: '#C6483B' },
+    META:   { name: '메타 플랫폼스',    sector: '온라인 서비스',     color: '#3B5BA8' },
+    TSLA:   { name: '테슬라',           sector: '자동차 및 트럭 제조', color: '#C0392B' },
+    'BRK-B':{ name: '버크셔 해서웨이',  sector: '보험',              color: '#5D6D7E' },
+    AVGO:   { name: '브로드컴',         sector: '반도체',            color: '#B03A48' },
+    JPM:    { name: 'JP모간 체이스',    sector: '은행',              color: '#7A5EA8' }
+  };
+
+  function metaFor(ticker) {
+    return META[ticker] || { name: ticker, sector: '—', color: '#94A3B8' };
+  }
+
+  function initials(ticker) {
+    return String(ticker).replace(/[^A-Z]/g, '').slice(0, 2) || '?';
+  }
+
+  /* ============================================================= 지수 카드 */
+
+  /* 데이터가 오기 전(또는 수집 실패 시)에도 카드 틀은 유지한다. */
+  var INDEX_PLACEHOLDERS = [
+    { name: 'S&P 500' }, { name: '나스닥 종합' },
+    { name: '다우존스' }, { name: '러셀 2000' }
+  ];
+
+  function indexMetaRow(term, value, cls) {
+    var dl = el('dl', 'index-meta-row');
+    dl.appendChild(el('dt', null, term));
+    dl.appendChild(el('dd', cls || null, value));
+    return dl;
+  }
+
+  function indexCard(ix) {
+    var card = el('article', 'index-card');
+
+    var head = el('div', 'index-card-head');
+    head.appendChild(el('h3', 'index-name', ix.name || ix.s || '—'));
+    head.appendChild(el('span', 'index-status', ix.st ? '· ' + ix.st : ''));
+    card.appendChild(head);
+
+    var priceRow = el('div', 'index-price-row');
+    priceRow.appendChild(el('span', 'index-price', fmt(ix.p)));
+    if (ix.c !== undefined && ix.c !== null) {
+      priceRow.appendChild(el(
+        'span', 'index-change ' + signClass(ix.c),
+        arrow(ix.c) + ' ' + fmt(Math.abs(ix.c)) + '(' + (ix.cp >= 0 ? '+' : '-') +
+        fmt(Math.abs(ix.cp)) + '%)'
+      ));
+    } else {
+      priceRow.appendChild(el('span', 'index-change', '—'));
+    }
+    card.appendChild(priceRow);
+
+    card.appendChild(document.createElement('hr'));
+
+    var meta = el('div', 'index-meta');
+
+    var left = el('div', 'index-meta-col');
+    left.appendChild(el('span', 'index-meta-title', '52주 기준'));
+    left.appendChild(indexMetaRow('최고', fmt(ix.yh)));
+    left.appendChild(indexMetaRow('최저', fmt(ix.yl)));
+    meta.appendChild(left);
+
+    meta.appendChild(el('div', 'index-meta-divider'));
+
+    /* 당일 고가·저가는 전일 종가 대비 색을 입힌다. */
+    function vsPrev(v) {
+      if (v === null || v === undefined || !ix.prev) return null;
+      return signClass(v - ix.prev);
+    }
+
+    var right = el('div', 'index-meta-col index-meta--right');
+    right.appendChild(indexMetaRow('전일', fmt(ix.prev)));
+    right.appendChild(indexMetaRow('고가', fmt(ix.dh), vsPrev(ix.dh)));
+    right.appendChild(indexMetaRow('저가', fmt(ix.dl), vsPrev(ix.dl)));
+    meta.appendChild(right);
+
+    card.appendChild(meta);
+    return card;
+  }
+
+  function renderIndices(list) {
+    var row = document.getElementById('index-row');
+    if (!row) return;
+    var items = (list && list.length) ? list : INDEX_PLACEHOLDERS;
+    row.textContent = '';
+    items.forEach(function (ix) { row.appendChild(indexCard(ix)); });
+  }
+
+  renderIndices([]);
+
+  /* ================================================================ 랭킹 */
+
+  var stocks = [];
+  var activeSort = 'volume';
+
+  var SORTERS = {
+    volume:   function (a, b) { return (b.v || 0) - (a.v || 0); },
+    turnover: function (a, b) { return (b.p * b.v || 0) - (a.p * a.v || 0); },
+    gain:     function (a, b) { return (b.cp || 0) - (a.cp || 0); },
+    /* 검색어 상위 데이터 소스가 없어 거래대금 순으로 대체한다. */
+    search:   function (a, b) { return (b.p * b.v || 0) - (a.p * a.v || 0); }
+  };
+
+  function renderRankings() {
+    var body = document.getElementById('rank-body');
+    if (!body) return;
+    body.textContent = '';
+
+    if (!stocks.length) {
+      var tr = el('tr');
+      var td = el('td', null, '데이터를 불러올 수 없습니다.');
+      td.colSpan = 9;
+      td.style.cssText = 'text-align:center;padding:32px;color:var(--gray-400)';
+      tr.appendChild(td);
+      body.appendChild(tr);
+      return;
+    }
+
+    stocks.slice().sort(SORTERS[activeSort]).forEach(function (s, i) {
+      var meta = metaFor(s.s);
+      var turnover = (s.p || 0) * (s.v || 0);
+      var tr = el('tr');
+
+      /* 관심 */
+      var tdStar = el('td', 'col-star');
+      var star = el('button', 'star', '☆');
+      star.type = 'button';
+      star.setAttribute('aria-pressed', 'false');
+      star.setAttribute('aria-label', meta.name + ' 관심종목 추가');
+      star.addEventListener('click', function () {
+        var on = star.getAttribute('aria-pressed') === 'true';
+        star.setAttribute('aria-pressed', String(!on));
+        star.textContent = on ? '☆' : '★';
+      });
+      tdStar.appendChild(star);
+      tr.appendChild(tdStar);
+
+      /* 순위 */
+      var tdRank = el('td', 'col-rank');
+      tdRank.appendChild(el('span', 'rank-no', String(i + 1)));
+      tr.appendChild(tdRank);
+
+      /* 종목명 */
+      var tdName = el('td', 'col-name');
+      var cell = el('div', 'stock-cell');
+      var av = el('span', 'stock-avatar', initials(s.s));
+      av.style.background = meta.color;
+      var label = el('span', 'stock-label');
+      label.appendChild(el('span', 'stock-name', meta.name));
+      label.appendChild(el('span', 'stock-ticker', s.s));
+      cell.appendChild(av);
+      cell.appendChild(label);
+      tdName.appendChild(cell);
+      tr.appendChild(tdName);
+
+      /* 현재가 */
+      var tdPrice = el('td');
+      tdPrice.appendChild(el('span', 'cell-price', '$' + fmt(s.p)));
+      tr.appendChild(tdPrice);
+
+      /* 전일대비 */
+      var tdChange = el('td');
+      tdChange.appendChild(el(
+        'span',
+        'cell-change ' + signClass(s.cp),
+        arrow(s.cp) + fmt(Math.abs(s.c)) + ' (' + (s.cp >= 0 ? '+' : '-') + fmt(Math.abs(s.cp)) + '%)'
+      ));
+      tr.appendChild(tdChange);
+
+      /* 업종 */
+      var tdSector = el('td', 'col-sector');
+      tdSector.appendChild(el('span', 'cell-sector', meta.sector));
+      tr.appendChild(tdSector);
+
+      /* 거래량 / 거래대금 / 시가총액 */
+      var tdVol = el('td');
+      tdVol.appendChild(el('span', 'cell-num', Number(s.v || 0).toLocaleString('en-US') + '주'));
+      tr.appendChild(tdVol);
+
+      var tdTurn = el('td');
+      tdTurn.appendChild(el('span', 'cell-num', eok(turnover)));
+      tr.appendChild(tdTurn);
+
+      /* 시가총액은 수집 대상이 아니라 미표기 */
+      var tdCap = el('td');
+      tdCap.appendChild(el('span', 'cell-num', '—'));
+      tr.appendChild(tdCap);
+
+      body.appendChild(tr);
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (tab) {
+    tab.addEventListener('click', function () {
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (t) {
+        t.setAttribute('aria-selected', String(t === tab));
+      });
+      activeSort = tab.dataset.sort;
+      renderRankings();
+    });
+  });
+
+  fetch(DATA_URL + '?v=' + Date.now())
+    .then(function (r) { return r.json(); })
+    .then(function (json) {
+      stocks = json.stocks || [];
+      renderIndices(json.indices || []);
+      var d = kstTime(json.updated_at);
+      var syncLabel = document.getElementById('sync-label');
+      if (d && syncLabel) {
+        syncLabel.textContent =
+          d.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' })
+            .replace(/\. /g, '.').replace(/\.$/, '') + ' 기준 실시간 AI 동기화';
+      }
+      renderRankings();
+    })
+    .catch(function () { renderRankings(); });
+
+  /* ================================================================ 섹터 */
+  /* 섹터 집계 파이프라인이 없어 디자인 값을 유지한다.
+     collect_* 단계에서 sectors.json 을 내려주면 이 배열만 교체하면 된다. */
+  var SECTORS = [
+    { name: '반도체',            weight: 14.02, change: -1.39 },
+    { name: '온라인 서비스',     weight: 7.90,  change:  0.71 },
+    { name: '소프트웨어',        weight: 6.94,  change:  0.67 },
+    { name: '은행',              weight: 5.93,  change: -2.04 },
+    { name: '제약',              weight: 5.37,  change:  5.83 },
+    { name: '전화 및 소형 장치', weight: 4.53,  change:  2.19 },
+    { name: '백화점',            weight: 2.94,  change:  2.52 },
+    { name: '무선 통신 서비스',  weight: 2.48,  change: -1.83 },
+    { name: '항공우주 및 방위',  weight: 1.93,  change: -2.16 },
+    { name: '자동차 및 트럭 제조', weight: 1.92, change: 3.50 }
+  ];
+
+  /* 등락률 → 발산 색상 (±10% 클램프) */
+  function divergingColor(change) {
+    var t = Math.max(-1, Math.min(1, change / 10));
+    if (t >= 0) {
+      return 'rgb(' + Math.round(255 - 20 * t) + ',' +
+                      Math.round(255 - 120 * t) + ',' +
+                      Math.round(255 - 120 * t) + ')';
+    }
+    var a = -t;
+    return 'rgb(' + Math.round(255 - 110 * a) + ',' +
+                    Math.round(255 - 60 * a) + ',' +
+                    Math.round(255 - 12 * a) + ')';
+  }
+
+  (function renderSectorList() {
+    var body = document.getElementById('sector-body');
+    if (!body) return;
+    var max = Math.max.apply(null, SECTORS.map(function (s) { return s.weight; }));
+
+    SECTORS.forEach(function (s, i) {
+      var tr = el('tr');
+      tr.appendChild(el('td', null, String(i + 1)));
+      tr.appendChild(el('td', null, s.name));
+
+      var tdW = el('td');
+      var wrap = el('div', 'weight-cell');
+      var bar = el('div', 'weight-bar');
+      var fill = el('span');
+      fill.style.width = (s.weight / max * 100) + '%';
+      fill.style.background = s.change >= 0 ? 'var(--up)' : 'var(--down)';
+      bar.appendChild(fill);
+      wrap.appendChild(bar);
+      wrap.appendChild(el('span', 'weight-val', fmt(s.weight, 2) + '%'));
+      tdW.appendChild(wrap);
+      tr.appendChild(tdW);
+
+      var tdC = el('td');
+      tdC.appendChild(el('span', 'sector-change ' + signClass(s.change),
+        (s.change >= 0 ? '+' : '') + fmt(s.change, 2) + '%'));
+      tr.appendChild(tdC);
+
+      body.appendChild(tr);
+    });
+  })();
+
+  (function renderTreemap() {
+    var map = document.getElementById('treemap');
+    if (!map) return;
+    var layout = [
+      { key: '반도체',            cls: 'tile--semis'  },
+      { key: '은행',              cls: 'tile--bank'   },
+      { key: '온라인 서비스',     cls: 'tile--online' },
+      { key: '소프트웨어',        cls: 'tile--soft'   }
+    ];
+    var stacked = ['전화 및 소형 장치', '백화점'];
+
+    function tile(name, cls) {
+      var s = SECTORS.filter(function (x) { return x.name === name; })[0];
+      if (!s) return null;
+      var t = el('div', 'tile' + (cls ? ' ' + cls : ''));
+      t.style.background = divergingColor(s.change);
+      t.appendChild(el('span', 'tile-name', s.name));
+      t.appendChild(el('span', 'tile-val',
+        (s.change >= 0 ? '+' : '') + fmt(s.change, 2) + '%'));
+      return t;
+    }
+
+    layout.forEach(function (l) {
+      var t = tile(l.key, l.cls);
+      if (t) map.appendChild(t);
+    });
+
+    var stack = el('div', 'tile-stack');
+    stacked.forEach(function (name) {
+      var t = tile(name);
+      if (t) stack.appendChild(t);
+    });
+    map.appendChild(stack);
+  })();
+
+  /* ================================================================= 뉴스 */
+
+  function newsCategory(item) {
+    var t = (item.title || '').toLowerCase();
+    if (/\bai\b|nvidia|chip|semiconductor/.test(t)) return 'AI';
+    if (/fed|rate|inflation|cpi|yield/.test(t))     return '금리';
+    if (/oil|energy|crude/.test(t))                 return '에너지';
+    if (/bank|financial/.test(t))                   return '금융';
+    return '시장';
+  }
+
+  fetch(NEWS_URL + '?v=' + Date.now())
+    .then(function (r) { return r.json(); })
+    .then(function (json) {
+      var items = (json.items || []).filter(function (i) { return i && i.title; });
+      if (!items.length) throw new Error('no items');
+
+      /* BREAKING 티커 — 애니메이션이 -50% 로 감기므로 내용을 2회 반복 */
+      var line = items.slice(0, 6).map(function (i) { return i.title; }).join('  ·  ');
+      var tick = document.getElementById('breaking-text');
+      if (tick) tick.textContent =
+        'ALPHAFLOW 실시간 뉴스: ' + line + '  ·  ' +
+        'ALPHAFLOW 실시간 뉴스: ' + line + '  ·  ';
+
+      /* 헤드라인 */
+      var lead = items[0];
+      var hero = document.getElementById('news-hero');
+      if (!hero) return;
+      hero.querySelector('.news-tag').textContent = newsCategory(lead);
+      hero.querySelector('.news-time').textContent = hhmm(kstTime(lead.published));
+      var h = hero.querySelector('.news-headline');
+      h.textContent = lead.title;
+      if (lead.link) {
+        var a = el('a');
+        a.href = lead.link;
+        a.rel = 'noopener';
+        a.target = '_blank';
+        a.textContent = lead.title;
+        h.textContent = '';
+        h.appendChild(a);
+      }
+      hero.querySelector('.news-summary').textContent = lead.summary || '';
+      hero.querySelector('.news-source').textContent = lead.source || '';
+
+      /* 사이드 3건 */
+      var side = document.getElementById('news-side');
+      if (side) items.slice(1, 4).forEach(function (it) {
+        var wrap = el('div', 'news-side-item');
+        var textCol = el('div');
+        var a = el('a', 'news-side-title', it.title);
+        if (it.link) { a.href = it.link; a.target = '_blank'; a.rel = 'noopener'; }
+        textCol.appendChild(a);
+        var meta = el('div', 'news-side-meta');
+        meta.appendChild(el('span', null, newsCategory(it)));
+        meta.appendChild(el('span', 'num', hhmm(kstTime(it.published))));
+        textCol.appendChild(meta);
+        wrap.appendChild(textCol);
+        wrap.appendChild(el('div', 'news-thumb'));
+        side.appendChild(wrap);
+      });
+
+      /* 하단 카드 3건 — 기사 수가 부족하면 빈 영역을 남기지 않고 접는다 */
+      var grid = document.getElementById('news-grid');
+      var gridItems = items.slice(4, 7);
+      if (!grid) return;
+      if (!gridItems.length) grid.hidden = true;
+      gridItems.forEach(function (it) {
+        var card = el('article');
+        card.appendChild(el('div', 'news-grid-img'));
+        var title = el('h4', 'news-grid-title');
+        var a = el('a', null, it.title);
+        if (it.link) { a.href = it.link; a.target = '_blank'; a.rel = 'noopener'; }
+        title.appendChild(a);
+        card.appendChild(title);
+        var meta = el('div', 'news-grid-meta');
+        meta.appendChild(el('span', null, newsCategory(it)));
+        meta.appendChild(el('span', 'num', hhmm(kstTime(it.published))));
+        card.appendChild(meta);
+        grid.appendChild(card);
+      });
+
+    })
+    .catch(function () {
+      var hl = document.querySelector('#news-hero .news-headline');
+      if (hl) hl.textContent = '뉴스를 불러올 수 없습니다.';
+      var t2 = document.getElementById('breaking-text');
+      if (t2) t2.textContent = 'ALPHAFLOW 실시간 뉴스';
+    });
+
+  /* ============================================================ 모바일 메뉴 */
+
+  var toggle = document.querySelector('.nav-toggle');
+  var menu = document.getElementById('primary-menu');
+  if (!toggle || !menu) return;
+
+  function syncMenu() {
+    var narrow = window.matchMedia('(max-width: 900px)').matches;
+    menu.hidden = narrow && toggle.getAttribute('aria-expanded') !== 'true';
+  }
+
+  toggle.addEventListener('click', function () {
+    toggle.setAttribute('aria-expanded', String(toggle.getAttribute('aria-expanded') !== 'true'));
+    syncMenu();
+  });
+  window.addEventListener('resize', syncMenu);
+  syncMenu();
+})();
+</script>
+</body>
+</html>
