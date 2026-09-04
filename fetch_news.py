@@ -14,7 +14,7 @@ HEADERS = {
         "Chrome/120.0 Safari/537.36"
     )
 }
-MAX_ITEMS = 5
+MAX_ITEMS = 12
 
 SECTION_TITLES = {
     "investing", "market insider", "top news", "us top news and analysis",

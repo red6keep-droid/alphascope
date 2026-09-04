@@ -33,12 +33,18 @@ RETRY_SLEEP_SECONDS = 3
 HF_MODEL = "black-forest-labs/FLUX.1-schnell"
 
 STYLE_SUFFIX = (
-    ", clean minimalist 3D corporate illustration, deep blue and navy palette, "
-    "professional financial infographic style, no text, no numbers, no letters"
+    ", bright cheerful flat vector illustration, vibrant colorful modern editorial "
+    "art style, absolutely no photorealism, no photographs, no text, no numbers, "
+    "no letters"
+)
+
+NEGATIVE_PROMPT = (
+    "photorealistic, photograph, realistic photo, dark gloomy scene, "
+    "text, numbers, letters, watermark"
 )
 
 WIDTH = 1024
-HEIGHT = 576
+HEIGHT = 400
 WEBP_QUALITY = 80
 MIN_IMAGE_BYTES = 10 * 1024
 
@@ -110,7 +116,9 @@ def _try_huggingface(prompt):
 
     print(f"[HuggingFace] model={HF_MODEL} 시도")
     client = InferenceClient(HF_MODEL, token=token)
-    image = client.text_to_image(prompt, width=WIDTH, height=HEIGHT)
+    image = client.text_to_image(
+        prompt, width=WIDTH, height=HEIGHT, negative_prompt=NEGATIVE_PROMPT
+    )
     buf = io.BytesIO()
     image.save(buf, format="JPEG", quality=92)
     data = buf.getvalue()

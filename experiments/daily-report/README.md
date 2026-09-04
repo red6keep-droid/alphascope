@@ -35,8 +35,8 @@ experiments/daily-report/
 - **기본 dry-run** — `--publish` 없이는 Blogger에 아무것도 올라가지 않습니다.
 - **커버 이미지 자동 생성** — Gemini가 리포트와 함께 영문 이미지 프롬프트(`image_prompt`)를 출력하고,
   Pollinations.ai(1차, 키 불필요) → Hugging Face FLUX.1-schnell(2차 fallback, `HF_TOKEN` 필요) 순서로 생성합니다.
-  고정 스타일 접미사(미니멀 3D 코퍼레이트 일러스트, 블루 계열, 문자 없음)를 붙여 매일 비슷한 톤을 유지하고,
-  Pillow로 WebP(quality=80) 변환해 용량을 줄입니다.
+  고정 스타일 접미사(**밝은 톤 플랫 벡터 일러스트, 실사·문자 금지, 색상 제한 없음**)를 붙여 매일 비슷한 톤을
+  유지하고, 크기는 **1024×400 와이드**(세로 30% 축소)로 생성한 뒤 Pillow로 WebP(quality=80) 변환해 용량을 줄입니다.
 - **이미지 호스팅은 GitHub** — Blogger API는 이미지 업로드를 지원하지 않으므로,
   워크플로우가 `output/images/{date}.webp`를 gh-pages 브랜치에 배포하고 jsDelivr CDN URL
   (`https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/{date}.webp`)을 게시글에 넣습니다.
