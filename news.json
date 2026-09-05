@@ -1,6 +1,20 @@
 {
-  "updated_at": "2026-09-05 12:20:04 UTC",
+  "updated_at": "2026-09-05 14:15:15 UTC",
   "items": [
+    {
+      "title": "This enhanced geothermal project aims to unlock gigawatts of power to fuel the data center boom",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/05/fervo-energys-enhanced-geothermal-project-aims-to-power-data-center-boom.html",
+      "published": "2026-09-05 12:20:42",
+      "summary": "Power demand in the U.S. is rising. Fervo Energy bets that its project in Utah will prove that enhanced geothermal can be part of the power mix going forward."
+    },
+    {
+      "title": "Abel: Two ways Berkshire hopes to cash in on AI",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/05/abel-two-ways-berkshire-hopes-in-cash-in-on-ai.html",
+      "published": "2026-09-05 12:45:44",
+      "summary": "Berkshire Hathaway CEO Greg Abel tells CNBC the company is pursuing AI opportunities on two paths."
+    },
     {
       "title": "Piper Sandler expects Robinhood to kickstart football season with a win",
       "source": "CNBC",
@@ -21,13 +35,6 @@
       "link": "https://www.cnbc.com/2026/09/02/new-jersey-asks-the-supreme-court-to-take-on-prediction-markets-.html",
       "published": "2026-09-02 21:15:30",
       "summary": "The petition comes after a key ruling from the 9th U.S. Circuit Court of Appeals on sports-event contracts."
-    },
-    {
-      "title": "There is 'a lot more pushback' on data center construction, Berkshire CEO Greg Abel tells CNBC",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/02/there-is-a-lot-more-pushback-on-data-center-construction-berkshire-ceo-greg-abel-tells-cnbc.html",
-      "published": "2026-09-02 15:55:30",
-      "summary": "The resistance to data centers is gaining steam and occurring nationwide."
     },
     {
       "title": "Prediction market traders think job creation rebounded in August",
@@ -58,6 +65,13 @@
       "summary": "The 9th U.S. Circuit Court of Appeals ruled that sports-related event contracts are not swaps, contradicting a 3rd Circuit ruling from April."
     },
     {
+      "title": "There is 'a lot more pushback' on data center construction, Berkshire CEO Greg Abel tells CNBC",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/02/there-is-a-lot-more-pushback-on-data-center-construction-berkshire-ceo-greg-abel-tells-cnbc.html",
+      "published": "2026-09-02 15:55:30",
+      "summary": "The resistance to data centers is gaining steam and occurring nationwide."
+    },
+    {
       "title": "Las Vegas Sands shares are about to 'catch a heater,' says Mike Khouw",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/08/26/las-vegas-sands-shares-are-about-to-catch-a-heater-says-mike-khouw.html",
@@ -70,20 +84,6 @@
       "link": "https://www.cnbc.com/2026/08/25/debasement-trade-debt-gold-bitcoin-dollar.html",
       "published": "2026-08-25 15:16:02",
       "summary": "Concern over the size and the cost of U.S. government spending has given new life to the debasement trade."
-    },
-    {
-      "title": "A massive trade just happened in gold. The options market is buzzing",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/08/24/a-massive-trade-just-happened-in-gold-the-options-market-is-buzzing.html",
-      "published": "2026-08-25 14:47:58",
-      "summary": "Twenty minutes after the market opened Monday, someone took profit on a $200 million GLD position"
-    },
-    {
-      "title": "From Nvidia earnings to trade war tape bombs, a simple strategy could be this week's best bet",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/08/24/from-nvidia-earnings-to-trade-war-tape-bombs-a-simple-strategy-could-be-this-weeks-best-bet.html",
-      "published": "2026-08-24 16:07:35",
-      "summary": "Mike Khouw gives a low-risk options strategy to play the next few weeks."
     }
   ]
 }
