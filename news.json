@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-09-13 10:21:13 UTC",
+  "updated_at": "2026-09-13 12:20:44 UTC",
   "items": [
+    {
+      "title": "Top Wall Street analysts recommend these 3 dividend stocks for higher returns",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/13/top-wall-street-analysts-recommend-these-3-dividend-stocks-for-higher-returns.html",
+      "published": "2026-09-13 11:53:35",
+      "summary": "The ratings of these experts are backed by in-depth research of a company's financials, and thorough analysis of the factors affecting business performance."
+    },
     {
       "title": "Oil's roundtrip back to $100. Why China could determine what happens next",
       "source": "CNBC",
@@ -77,13 +84,6 @@
       "link": "https://www.cnbc.com/2026/09/02/new-jersey-asks-the-supreme-court-to-take-on-prediction-markets-.html",
       "published": "2026-09-02 21:15:30",
       "summary": "The petition comes after a key ruling from the 9th U.S. Circuit Court of Appeals on sports-event contracts."
-    },
-    {
-      "title": "Prediction market traders think job creation rebounded in August",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/01/prediction-market-traders-think-job-creation-rebounded-in-august.html",
-      "published": "2026-09-01 18:57:14",
-      "summary": "Traders see 50-50 odds that the U.S. economy added more than 50,000 jobs last month."
     }
   ]
 }
