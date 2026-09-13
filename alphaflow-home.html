@@ -59,7 +59,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -90,7 +90,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  height: 72px;
+  height: 86px;
   padding: 0 var(--gutter);
   background: var(--surface);
   border-bottom: 1px solid var(--border-strong);
@@ -104,8 +104,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .logo-word {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 900;
-  font-size: 20px;
-  line-height: 27px;
+  font-size: 24px;
+  line-height: 32px;
   letter-spacing: -0.2px;
   color: #000;
   white-space: nowrap;
@@ -120,8 +120,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   justify-content: center;
   padding: 20px 12px;
   font-weight: 700;
-  font-size: 16px;
-  line-height: 22px;
+  font-size: 19px;
+  line-height: 26px;
   color: #000;
   white-space: nowrap;
   transition: color .15s ease;
@@ -141,8 +141,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 220px;
-  height: 34px;
+  width: 264px;
+  height: 41px;
   padding: 8px 14px;
   background: var(--surface-sub);
   border: 1px solid var(--border-strong);
@@ -157,8 +157,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   padding: 0;
   background: none;
   font-family: inherit;
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 16px;
+  line-height: 22px;
   color: var(--ink);
 }
 .search-bar input::placeholder { color: var(--gray-400); }
@@ -208,14 +208,14 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   gap: 6px;
   margin: 0;
   font-weight: 700;
-  font-size: 18px;
-  line-height: 25px;
+  font-size: 22px;
+  line-height: 30px;
   letter-spacing: -0.3px;
   color: var(--ink);
   white-space: nowrap;
 }
 .section-title svg { width: 20px; height: 20px; flex: none; }
-.section-note { font-size: 12px; line-height: 18px; color: var(--gray-500); }
+.section-note { font-size: 14px; line-height: 22px; color: var(--gray-500); }
 
 .card {
   background: var(--surface);
@@ -237,11 +237,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   flex-wrap: wrap;
 }
 .briefing-head-left { display: flex; align-items: center; gap: 24px; min-width: 0; flex-wrap: wrap; }
-.briefing-sub { font-size: 12px; line-height: 1.5; color: var(--gray-500); }
+.briefing-sub { font-size: 14px; line-height: 1.5; color: var(--gray-500); }
 
 .sync-stamp {
   display: flex; align-items: center; gap: 8px;
-  font-size: 13px; line-height: 18px; color: var(--gray-500);
+  font-size: 16px; line-height: 22px; color: var(--gray-500);
   white-space: nowrap;
 }
 .sync-dot {
@@ -250,42 +250,62 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: #C3C3C3;
 }
 
-.briefing-body { display: flex; align-items: flex-start; gap: 20px; }
+/* stretch 라야 왼쪽 리포트 카드가 오른쪽 급등주 카드와 아래선까지 맞는다 */
+.briefing-body { display: flex; align-items: stretch; gap: 20px; }
 .briefing-main { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
 
+/* 카드 전체가 오늘 리포트로 가는 링크다. 구획(요약 / 핵심 인사이트)은 안에서 나눈다. */
 .report-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 18px;
+  flex: 1;
   padding: 16px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
+  color: inherit;
+  transition: border-color .15s ease, box-shadow .15s ease;
 }
+.report-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 14px rgba(15, 23, 42, .09);
+}
+.report-block { display: flex; flex-direction: column; gap: 10px; }
 
 .badge {
   align-self: flex-start;
   padding: 4px 10px;
   border-radius: 6px;
   font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 14px;
+  line-height: 19px;
   color: #fff;
   white-space: nowrap;
 }
+.badge--summary { background: var(--badge-green); }
 .badge--insight { background: var(--badge-blue); }
-.badge--outlook { background: var(--badge-green); }
 
 .report-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
-.report-columns ul { display: flex; flex-direction: column; }
+/* 문장이 하나뿐이면 두 칸으로 가르지 않고 통으로 쓴다 — 빈 칸이 남지 않게 */
+.report-columns--single { grid-template-columns: 1fr; }
+.report-columns ul { display: flex; flex-direction: column; gap: 10px; }
 .report-columns li {
-  font-size: 14px;
-  line-height: 28px;
+  /* 글머리표 폭만큼 들여쓰고 첫 줄만 되당겨, 넘어간 줄이 글머리표가 아니라
+     본문 왼쪽에 맞춰 선다. */
+  padding-left: 15px;
+  text-indent: -15px;
+  font-size: 18px;
+  line-height: 1.65;
   color: #000;
+  /* 한국어는 어절 중간에서 끊으면 읽기 나쁘다 — 띄어쓰기에서만 넘긴다.
+     끊을 곳이 없는 긴 영문·URL 은 그때만 강제로 넘긴다. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 .report-columns li::before { content: '• '; }
 
@@ -304,36 +324,43 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .picks h3 {
   margin: 0;
   font-weight: 700;
-  font-size: 14px;
-  line-height: 19px;
+  font-size: 17px;
+  line-height: 23px;
   color: var(--ink);
 }
 .picks ul { display: flex; flex-direction: column; gap: 8px; }
+/* 종목명 · 가격 · 등락률을 한 줄에 놓는다. 가격은 종목명 바로 뒤,
+   등락률은 오른쪽 끝에 붙는다. */
 .pick {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: baseline;
+  gap: 10px;
   padding: 10px 12px;
   background: var(--surface-sub);
   border-radius: 8px;
 }
 .pick-name {
   font-weight: 600;
+  font-size: 17px;
+  line-height: 23px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.pick-price {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--num);
+  font-weight: 600;
   font-size: 14px;
   line-height: 19px;
-  color: var(--ink);
-}
-.pick-sector {
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
   color: var(--gray-500);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .pick-change {
   font-weight: 700;
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 16px;
+  line-height: 22px;
   white-space: nowrap;
 }
 
@@ -344,7 +371,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .index-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
 .index-card {
@@ -360,13 +387,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .index-card-head { display: flex; align-items: center; gap: 6px; }
 .index-name {
   font-weight: 700;
-  font-size: 14px;
-  line-height: 17px;
+  font-size: 17px;
+  line-height: 20px;
   color: var(--ink-2);
 }
 .index-status {
-  font-size: 12px;
-  line-height: 14px;
+  font-size: 14px;
+  line-height: 17px;
   color: var(--gray-350);
 }
 
@@ -379,16 +406,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .index-price {
   font-family: var(--num);
   font-weight: 800;
-  font-size: 26px;
-  line-height: 31px;
+  font-size: 31px;
+  line-height: 37px;
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
 .index-change {
   font-family: var(--num);
   font-weight: 700;
-  font-size: 13px;
-  line-height: 16px;
+  font-size: 16px;
+  line-height: 19px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -418,8 +445,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .index-meta-title {
   font-weight: 500;
-  font-size: 11px;
-  line-height: 13px;
+  font-size: 13px;
+  line-height: 16px;
   color: var(--gray-350);
 }
 .index-meta-row {
@@ -430,8 +457,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   margin: 0;
 }
 .index-meta-row dt {
-  font-size: 12px;
-  line-height: 14px;
+  font-size: 14px;
+  line-height: 17px;
   color: var(--gray-600);
   white-space: nowrap;
 }
@@ -440,8 +467,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   margin: 0;
   font-family: var(--num);
   font-weight: 600;
-  font-size: 12px;
-  line-height: 15px;
+  font-size: 14px;
+  line-height: 18px;
   color: var(--ink-2);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -460,8 +487,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   flex-direction: column;
   align-items: center;
   padding: 8px 20px 0;
-  font-size: 14px;
-  line-height: 19px;
+  font-size: 17px;
+  line-height: 23px;
   color: var(--gray-400);
   white-space: nowrap;
 }
@@ -492,8 +519,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .rank-table thead th {
   font-weight: 500;
-  font-size: 11px;
-  line-height: 15px;
+  font-size: 13px;
+  line-height: 18px;
   color: var(--gray-400);
   border-bottom: 1px solid var(--border);
 }
@@ -521,7 +548,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .rank-no {
   font-family: var(--num);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--gray-600);
 }
 
@@ -532,43 +559,43 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   border-radius: 50%;
   font-family: var(--num);
   font-weight: 700;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: -0.2px;
   color: #fff;
 }
 .stock-label { display: flex; flex-direction: column; min-width: 0; }
 .stock-name {
   font-weight: 700;
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 16px;
+  line-height: 22px;
   color: var(--ink-2);
 }
 .stock-ticker {
   font-family: var(--num);
   font-weight: 600;
-  font-size: 11px;
-  line-height: 14px;
+  font-size: 13px;
+  line-height: 17px;
   color: var(--gray-400);
 }
 
 .cell-price {
   font-family: var(--num);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 16px;
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
 .cell-change {
   font-family: var(--num);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
-.cell-sector { font-size: 12px; color: var(--gray-600); }
+.cell-sector { font-size: 14px; color: var(--gray-600); }
 .cell-num {
   font-family: var(--num);
   font-weight: 500;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--gray-600);
   font-variant-numeric: tabular-nums;
 }
@@ -596,18 +623,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .sector-list-head h3 {
   margin: 0;
   font-weight: 700;
-  font-size: 14px;
-  line-height: 19px;
+  font-size: 17px;
+  line-height: 23px;
   color: var(--ink);
 }
-.sector-total { font-size: 12px; color: var(--gray-500); }
+.sector-total { font-size: 14px; color: var(--gray-500); }
 
 .sector-table { width: 100%; border-collapse: collapse; }
 .sector-table th {
   padding: 0 4px 8px;
   font-weight: 500;
-  font-size: 11px;
-  line-height: 15px;
+  font-size: 13px;
+  line-height: 18px;
   color: var(--gray-400);
   text-align: right;
   border-bottom: 1px solid var(--border);
@@ -622,14 +649,14 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .sector-table tbody tr:last-child td { border-bottom: 0; }
 .sector-table td:first-child {
   font-family: var(--num);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--gray-400);
   text-align: center;
 }
 .sector-table td:nth-child(2) {
   text-align: left;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 16px;
   color: var(--ink-2);
 }
 
@@ -645,14 +672,14 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .weight-val {
   font-family: var(--num);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--gray-600);
   font-variant-numeric: tabular-nums;
 }
 .sector-change {
   font-family: var(--num);
   font-weight: 700;
-  font-size: 12px;
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -663,7 +690,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   grid-template-columns: 1.55fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 4px;
-  height: 320px;
+  height: 384px;
 }
 .tile {
   position: relative;
@@ -675,12 +702,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   border-radius: 4px;
   overflow: hidden;
 }
-.tile-name { font-weight: 700; font-size: 13px; line-height: 18px; }
+.tile-name { font-weight: 700; font-size: 16px; line-height: 22px; }
 .tile-val {
   font-family: var(--num);
   font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 14px;
+  line-height: 19px;
   font-variant-numeric: tabular-nums;
 }
 .tile--semis   { grid-column: 1 / 3; grid-row: 1; }
@@ -701,7 +728,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex;
   justify-content: space-between;
   font-family: var(--num);
-  font-size: 10px;
+  font-size: 12px;
   color: var(--gray-400);
 }
 
@@ -727,32 +754,32 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   border: 1px solid var(--border-strong);
   border-radius: 4px;
   font-weight: 700;
-  font-size: 11px;
-  line-height: 16px;
+  font-size: 13px;
+  line-height: 19px;
   color: var(--gray-600);
   background: var(--surface-sub);
 }
 .news-time {
   font-family: var(--num);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--gray-400);
 }
 
 .news-headline {
   margin: 0 0 14px;
   font-weight: 700;
-  font-size: 26px;
+  font-size: 31px;
   line-height: 1.35;
   letter-spacing: -0.6px;
   color: var(--ink);
 }
 .news-summary {
   margin: 0 0 12px;
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.7;
   color: var(--gray-600);
 }
-.news-source { font-size: 12px; color: var(--gray-400); }
+.news-source { font-size: 14px; color: var(--gray-400); }
 
 .news-hero-img {
   width: 100%;
@@ -788,13 +815,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .news-side-item:first-child { padding-top: 0; }
 .news-side-title {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.45;
   color: var(--ink);
 }
 .news-side-meta {
   margin-top: 6px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--gray-400);
 }
 .news-side-meta .num { margin-left: 8px; }
@@ -820,11 +847,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .news-grid-title {
   margin: 0 0 6px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.5;
   color: var(--ink);
 }
-.news-grid-meta { font-size: 12px; color: var(--gray-400); }
+.news-grid-meta { font-size: 14px; color: var(--gray-400); }
 .news-grid-meta .num { margin-left: 8px; }
 
 /* ==========================================================================
@@ -847,8 +874,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   border: 1px solid var(--accent);
   border-radius: 4px;
   font-weight: 700;
-  font-size: 11px;
-  line-height: 15px;
+  font-size: 13px;
+  line-height: 18px;
   letter-spacing: .4px;
   color: var(--accent);
 }
@@ -856,7 +883,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .breaking-text {
   display: inline-block;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 16px;
   color: var(--gray-600);
   animation: ticker 46s linear infinite;
 }
@@ -877,20 +904,20 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .footer-title {
   margin: 0 0 14px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 17px;
   color: var(--ink-2);
 }
 .footer-disclaimer {
   max-width: 880px;
   margin: 0 auto 16px;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.8;
   color: var(--gray-350);
 }
 .footer-copy {
   margin: 0;
   font-family: var(--num);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--gray-400);
 }
 
@@ -929,11 +956,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   }
   .menu-items::-webkit-scrollbar { display: none; }
   .menu-items[hidden] { display: none; }
-  .nav-item { padding: 12px 10px; font-size: 15px; }
+  .nav-item { padding: 12px 10px; font-size: 18px; }
   .search-bar { width: 160px; }
   .report-columns { grid-template-columns: minmax(0, 1fr); }
   .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .news-headline { font-size: 22px; }
+  .news-headline { font-size: 26px; }
 }
 
 @media (max-width: 680px) {
@@ -942,7 +969,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .news-hero-img { aspect-ratio: 16 / 9; max-width: 100%; }
   .news-grid { grid-template-columns: minmax(0, 1fr); }
   .sector-card, .news-card { padding: 16px; }
-  .treemap { height: 380px; grid-template-columns: 1fr 1fr; }
+  .treemap { height: 456px; grid-template-columns: 1fr 1fr; }
   .tile--semis { grid-column: 1 / -1; }
   .tile--bank { grid-column: 1; grid-row: 2; }
   .tile--online { grid-column: 2; grid-row: 2; }
@@ -1028,65 +1055,57 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
           </svg>
           미국 증시 데일리 브리핑
         </h2>
-        <p class="briefing-sub">오늘의 시장 리포트 요약: AI가 분석한 핵심 인사이트, 추천 종목, 시장 전망을 한눈에 확인</p>
+        <p class="briefing-sub" id="briefing-sub">오늘의 시장 리포트 요약: AI가 분석한 핵심 인사이트, 급등주, 시장 전망을 한눈에 확인</p>
       </div>
       <p class="sync-stamp"><span class="sync-dot"></span><span id="sync-label">실시간 AI 동기화</span></p>
     </div>
 
     <div class="briefing-body">
       <div class="briefing-main">
-        <!-- 연동 훅: generate_report 의 report.out.json 인사이트 문구를 여기에 렌더 -->
-        <article class="report-card" data-hook="insight">
-          <span class="badge badge--insight">오늘의 핵심 인사이트</span>
-          <div class="report-columns">
-            <ul>
-              <li>위험 자산 선호 흐름 지속 (72점) - 성장주 및 반도체 섹터 비중 확대</li>
-              <li>매크로 유동성 공급과 견조한 기업 실적 모멘텀이 상호 시너지 발휘 중</li>
-            </ul>
-            <ul>
-              <li>변동성 (VIX) 안정적 기조 유지</li>
-            </ul>
+        <!-- 연동 훅: 카드 전체가 오늘 리포트 글로 가는 링크다.
+             href 와 본문 문구는 블로거 피드에서 채운다. -->
+        <a class="report-card" id="report-card" href="#">
+          <div class="report-block" data-hook="summary">
+            <span class="badge badge--summary">오늘의 시장 요약</span>
+            <div class="report-columns">
+              <ul>
+                <li>오늘 미국 증시는 3대 지수가 일제히 상승 마감했습니다. 반도체 섹터가 상승을 주도한 가운데 소프트웨어와 온라인 서비스가 뒤를 받쳤습니다.</li>
+              </ul>
+              <ul></ul>
+            </div>
           </div>
-        </article>
 
-        <article class="report-card" data-hook="outlook">
-          <span class="badge badge--outlook">시장 전망 요약</span>
-          <div class="report-columns">
-            <ul>
-              <li>종합 추세 전망: 강력한 상승 국면 유지</li>
-              <li>시장 참여폭: 업종 전반적인 고른 확산</li>
-            </ul>
-            <ul>
-              <li>금리 여건: 연준 피벗 대기 중립 상태</li>
-              <li>실물 경기: 완만한 연착륙 및 확장</li>
-            </ul>
+          <div class="report-block" data-hook="insight">
+            <span class="badge badge--insight">오늘의 핵심 인사이트</span>
+            <div class="report-columns">
+              <ul>
+                <li>상승 추세는 유지되나 지수 상승분이 소수 대형주에 쏠려 있어 참여폭을 함께 봐야 합니다.</li>
+              </ul>
+              <ul>
+                <li>금리 여건은 중립이며 연준의 다음 신호를 기다리는 국면입니다.</li>
+              </ul>
+            </div>
           </div>
-        </article>
+        </a>
       </div>
 
       <aside class="picks" aria-labelledby="picks-title">
-        <h3 id="picks-title">AI 추천 종목</h3>
+        <h3 id="picks-title">오늘의 급등주</h3>
         <ul id="picks-list">
           <li class="pick">
-            <span>
-              <span class="pick-name">NVIDIA (NVDA)</span><br/>
-              <span class="pick-sector">AI/반도체</span>
-            </span>
-            <span class="pick-change up">+2.4%</span>
+            <span class="pick-name">NVDA</span>
+            <span class="pick-price">$228.45</span>
+            <span class="pick-change up">+3.71%</span>
           </li>
           <li class="pick">
-            <span>
-              <span class="pick-name">Broadcom (AVGO)</span><br/>
-              <span class="pick-sector">반도체</span>
-            </span>
-            <span class="pick-change up">+1.8%</span>
+            <span class="pick-name">AVGO</span>
+            <span class="pick-price">$357.16</span>
+            <span class="pick-change up">+2.94%</span>
           </li>
           <li class="pick">
-            <span>
-              <span class="pick-name">AMD (AMD)</span><br/>
-              <span class="pick-sector">반도체</span>
-            </span>
-            <span class="pick-change up">+1.3%</span>
+            <span class="pick-name">AMD</span>
+            <span class="pick-price">$184.20</span>
+            <span class="pick-change up">+1.30%</span>
           </li>
         </ul>
       </aside>
@@ -1687,6 +1706,151 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       if (hl) hl.textContent = '뉴스를 불러올 수 없습니다.';
       var t2 = document.getElementById('breaking-text');
       if (t2) t2.textContent = 'ALPHAFLOW 실시간 뉴스';
+    });
+
+  /* ====================================================== 오늘의 데일리 리포트
+
+     블로거 피드에서 최신 글 1건만 받아 상단 브리핑을 채운다.
+
+     리포트 본문은 h2 로 구획이 나뉘어 있어 제목 글자로 구간을 찾는다. 본문 형식이
+     바뀌어 구간을 못 찾으면 그 카드는 기존 문구를 그대로 둔다 — 빈 카드보다 낫다. */
+
+  var FEED_URL = '/feeds/posts/default?alt=json&max-results=1';
+
+  /* 홈에는 리포트의 일부만 발췌해 싣는다. 게시된 글은 손대지 않는다 —
+     읽어와 보여주기만 하므로 상세 글에는 아홉 구간이 그대로 남는다. */
+  var REPORT_MAP = {
+    summary: ['오늘의 시장 요약'],
+    insight: ['종합 의견']
+  };
+  var PICKS_HEAD = '오늘의 급등주 TOP 5';
+
+  /* h2 제목 → 다음 h2 전까지의 형제 노드 */
+  function reportSections(html) {
+    var doc;
+    try { doc = new DOMParser().parseFromString(html, 'text/html'); }
+    catch (e) { return null; }
+    var out = {};
+    var heads = doc.getElementsByTagName('h2');
+    for (var i = 0; i < heads.length; i++) {
+      var nodes = [];
+      var n = heads[i].nextElementSibling;
+      while (n && n.tagName !== 'H2') { nodes.push(n); n = n.nextElementSibling; }
+      out[String(heads[i].textContent || '').trim()] = nodes;
+    }
+    return out;
+  }
+
+  /* 문단은 div 중첩으로 오므로 자식 없는 말단만 한 줄로 본다. 표는 건너뛴다. */
+  function linesOf(nodes) {
+    var lines = [];
+    function walk(n) {
+      if (!n || n.tagName === 'TABLE') return;
+      if (!n.children || !n.children.length) {
+        var t = String(n.textContent || '').trim();
+        if (t) lines.push(t);
+        return;
+      }
+      for (var i = 0; i < n.children.length; i++) walk(n.children[i]);
+    }
+    for (var i = 0; i < (nodes || []).length; i++) walk(nodes[i]);
+    return lines;
+  }
+
+  function fillCard(hook, lines) {
+    var block = document.querySelector('.report-block[data-hook="' + hook + '"]');
+    if (!block || !lines.length) return;
+    var grid = block.querySelector('.report-columns');
+    var cols = block.querySelectorAll('.report-columns ul');
+    if (!grid || !cols.length) return;
+
+    /* 한 문장뿐이면 칸을 가르지 않는다 */
+    var single = lines.length < 2;
+    grid.classList.toggle('report-columns--single', single);
+    var use = single ? 1 : cols.length;
+
+    for (var i = 0; i < cols.length; i++) {
+      cols[i].textContent = '';
+      cols[i].hidden = i >= use;
+    }
+    var per = Math.ceil(lines.length / use);
+    lines.forEach(function (t, i) {
+      cols[Math.min(Math.floor(i / per), use - 1)].appendChild(el('li', null, t));
+    });
+  }
+
+  /* 급등주 표의 종목 / 가격 / 등락률 세 칸을 사이드바로 옮긴다 */
+  function fillPicks(nodes) {
+    var list = document.getElementById('picks-list');
+    if (!list || !nodes) return;
+    var table = null;
+    for (var i = 0; i < nodes.length && !table; i++) {
+      if (nodes[i].tagName === 'TABLE') table = nodes[i];
+    }
+    if (!table) return;
+
+    var rows = table.rows || [], picks = [];
+    for (var r = 1; r < rows.length && picks.length < 5; r++) {
+      var c = rows[r].cells;
+      if (!c || c.length < 3) continue;
+      picks.push({
+        sym: String(c[0].textContent || '').trim(),
+        price: String(c[1].textContent || '').trim(),
+        chg: String(c[2].textContent || '').trim()
+      });
+    }
+    if (!picks.length) return;
+
+    list.textContent = '';
+    picks.forEach(function (p) {
+      var li = el('li', 'pick');
+      li.appendChild(el('span', 'pick-name', p.sym));
+      li.appendChild(el('span', 'pick-price', p.price));
+      li.appendChild(el('span', 'pick-change ' + (p.chg.charAt(0) === '-' ? 'down' : 'up'), p.chg));
+      list.appendChild(li);
+    });
+  }
+
+  fetch(FEED_URL)
+    .then(function (r) { return r.json(); })
+    .then(function (json) {
+      var entry = ((json.feed || {}).entry || [])[0];
+      if (!entry) throw new Error('no entry');
+
+      var title = (entry.title || {}).$t || '';
+      var day = String((entry.published || {}).$t || '').slice(0, 10).replace(/-/g, '.');
+
+      var sub = document.getElementById('briefing-sub');
+      if (sub && title) sub.textContent = day ? (day + ' · ' + title) : title;
+
+      /* 카드를 누르면 오늘 리포트 글로 간다 */
+      var href = '';
+      (entry.link || []).forEach(function (l) {
+        if (l.rel === 'alternate' && l.href) href = l.href;
+      });
+      var card = document.getElementById('report-card');
+      if (card && href) card.href = href;
+
+      var sec = reportSections((entry.content || {}).$t || '');
+      if (!sec) return;
+
+      function gather(names) {
+        var lines = [];
+        names.forEach(function (k) {
+          if (sec[k]) lines = lines.concat(linesOf(sec[k]));
+        });
+        return lines;
+      }
+
+      fillCard('summary', gather(REPORT_MAP.summary));
+      fillCard('insight', gather(REPORT_MAP.insight));
+      fillPicks(sec[PICKS_HEAD]);
+
+      var stamp = document.getElementById('sync-label');
+      if (stamp && day) stamp.textContent = day + ' 리포트 기준';
+    })
+    .catch(function () {
+      /* 피드를 못 받으면 카드에 적힌 기본 문구를 그대로 둔다 */
     });
 
   /* ============================================================ 모바일 메뉴 */

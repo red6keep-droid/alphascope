@@ -31,7 +31,7 @@ PREVIEW_WRAPPER = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>데일리 리포트 미리보기</title>
 </head>
-<body style="max-width:760px;margin:0 auto;padding:16px;background:#fff;">
+<body style="max-width:1440px;margin:0 auto;padding:16px;background:#fff;">
 __BODY__
 </body>
 </html>
@@ -74,7 +74,7 @@ def _pct_cell(change):
 
 
 def _paragraph(rows, headers):
-    parts = ['<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:14px;">']
+    parts = ['<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:17px;">']
     parts.append(
         "<tr>"
         + "".join(
@@ -117,7 +117,7 @@ def _cover_image(cover_url):
     src = html_mod.escape(str(cover_url), quote=True)
     return (
         f'<img src="{src}" alt="데일리 브리핑 커버 이미지" '
-        f'style="width:100%;max-width:760px;border-radius:8px;'
+        f'style="width:100%;max-width:1024px;border-radius:8px;'
         f'margin:0 0 16px 0;display:block;">'
     )
 
@@ -165,7 +165,7 @@ def build_tables(input_data, report, cover_url=None):
         news_rows.append(
             f'<div style="margin-bottom:10px;">'
             f'  <a href="{link}" target="_blank" rel="noopener nofollow" style="font-weight:bold;color:#2196f3;text-decoration:none;">{title}</a>'
-            f'  <div style="margin:4px 0 0 12px;color:#666;font-size:14px;">선정 이유: {why}</div>'
+            f'  <div style="margin:4px 0 0 12px;color:#666;font-size:17px;">선정 이유: {why}</div>'
             f'</div>'
         )
     news_list = "".join(news_rows) if news_rows else '<div>주요 뉴스 없음</div>'

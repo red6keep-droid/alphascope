@@ -100,19 +100,19 @@ BLOGGER_CSS = """
 .post-card-meta {
   display: flex; align-items: center; gap: 8px;
   font-family: var(--num);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--gray-400);
 }
 .post-card-title {
   margin: 0;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 19px;
   line-height: 1.45;
   letter-spacing: -.3px;
   color: var(--ink);
 }
 .post-card-title a:hover { color: var(--accent); }
-.post-card-snippet, .post-card-snippet p { margin: 0; font-size: 13px; line-height: 1.7; color: var(--gray-500); }
+.post-card-snippet, .post-card-snippet p { margin: 0; font-size: 16px; line-height: 1.7; color: var(--gray-500); }
 
 .blog-pager { display: flex; justify-content: center; gap: 12px; padding-top: 4px; }
 .blog-pager a {
@@ -120,7 +120,7 @@ BLOGGER_CSS = """
   background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--ink);
 }
@@ -130,7 +130,12 @@ BLOGGER_CSS = """
    Blogger — 글 보기
    ========================================================================== */
 
-.post-shell { width: 100%; max-width: 860px; margin: 0 auto; }
+/* main-content 는 border-box 라 좌우 gutter 가 안쪽 폭을 그만큼 깎는다. 그래서
+   셸에 --shell 을 그대로 주면 실제로는 1440 이 아니라 1360 으로 그려진다.
+   글 보기에서는 gutter 를 상쇄해 리포트 폭이 정확히 --shell 이 되게 한다. */
+body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2); }
+
+.post-shell { width: 100%; max-width: var(--shell); margin: 0 auto; }
 
 .post-outer-container {
   padding: 40px;
@@ -142,7 +147,7 @@ BLOGGER_CSS = """
 .post-title {
   margin: 0 0 10px;
   font-weight: 700;
-  font-size: 28px;
+  font-size: 34px;
   line-height: 1.4;
   letter-spacing: -.6px;
   color: var(--ink);
@@ -150,13 +155,13 @@ BLOGGER_CSS = """
 .post-title a { color: inherit; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
-.post-body { font-size: 15px; line-height: 1.8; color: #333; }
+.post-body { font-size: 18px; line-height: 1.8; color: #333; }
 .post-body img { max-width: 100%; height: auto; border-radius: 12px; }
 .post-body table { width: 100%; border-collapse: collapse; }
 .post-body a { color: var(--down); }
 
 .byline, .post-footer, .post-bottom, .post-labels {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--gray-400);
 }
 .post-labels a {
@@ -166,16 +171,90 @@ BLOGGER_CSS = """
   background: var(--surface-sub);
   border: 1px solid var(--border-strong);
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--gray-600);
 }
 .jump-link { display: none; }
 
+/* 글 아래 목록으로 돌아가는 버튼 */
+.post-nav { display: flex; justify-content: center; margin: 20px 0 0; }
+.post-nav-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 28px;
+  background: var(--surface);
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.post-nav-list::before { content: '\\2190'; }
+.post-nav-list:hover { border-color: var(--accent); color: var(--accent); }
+
+/* 이미 게시된 글 보정 — 리포트 본문은 인라인 font-size 를 달고 나오므로 CSS 가 밀린다.
+   옛 글(15/14/12px)만 골라 덮어쓰도록 태그 종류까지 지정한다. 새 글은 렌더러가
+   이미 18/17/14px 로 내보내므로 아래 선택자에 걸리지 않는다. */
+.post-body > div[style*="font-size:15px"] { font-size: 18px !important; }
+.post-body table[style*="font-size:14px"] { font-size: 17px !important; }
+.post-body div[style*="font-size:14px"] { font-size: 17px !important; }
+.post-body p[style*="font-size:12px"] { font-size: 14px !important; }
+.post-body img[style*="max-width:760px"] { max-width: 1024px !important; }
+
+/* 공유 버튼 — b:css='false' 로 블로거 기본 CSS 를 끈 상태라 위젯 스타일이 전혀 없다.
+   기본 CSS 가 없으면 (1) svg 가 크기 제약을 잃고 원본 크기로 커지고,
+   (2) 팝업을 접어두던 .hidden 규칙이 사라져 플랫폼 항목이 세로로 쌓인다.
+   토글 버튼을 감추고 목록을 항상 펼친 가로 줄로 보여준다. */
+.post-share-buttons { margin: 20px 0 0; }
+.goog-inline-block { display: inline-block; }
+.sharing { position: relative; display: inline-block; }
+.sharing-button { display: none; }
+
+.share-buttons-container { display: block; }
+.share-buttons,
+.share-buttons.hidden {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.share-buttons li { margin: 0; }
+
+.sharing-platform-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: var(--surface-sub);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-600);
+  cursor: pointer;
+}
+.sharing-platform-button:hover { border-color: var(--accent); color: var(--accent); }
+.platform-sharing-text { white-space: nowrap; }
+
+/* 크기 제약이 없어 깨져 보이던 아이콘 */
+.post-share-buttons svg,
+.sharing svg,
+svg.svg-icon-24,
+.touch-icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: currentColor;
+}
+
 /* 댓글 */
 .comments {
   width: 100%;
-  max-width: 860px;
+  max-width: var(--shell);
   margin: 20px auto 0;
   padding: 28px 40px 32px;
   background: var(--surface);
@@ -184,7 +263,7 @@ BLOGGER_CSS = """
 }
 .comments h3, .comments .comments-title {
   margin: 0 0 16px;
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--ink);
 }
@@ -192,22 +271,22 @@ BLOGGER_CSS = """
 .comments .comment { padding: 14px 0; border-bottom: 1px solid var(--border); }
 .comments .comment:last-child { border-bottom: 0; }
 .comments .comment-header .user, .comments .user a {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--ink);
 }
 .comments .datetime, .comments .comment-header .datetime a {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--gray-400);
 }
-.comments .comment-content { margin-top: 6px; font-size: 14px; line-height: 1.7; color: var(--gray-600); }
-.comments .comment-actions a { margin-right: 10px; font-size: 12px; color: var(--gray-400); }
+.comments .comment-content { margin-top: 6px; font-size: 17px; line-height: 1.7; color: var(--gray-600); }
+.comments .comment-actions a { margin-right: 10px; font-size: 14px; color: var(--gray-400); }
 .comments .avatar-image-container img { width: 36px; height: 36px; border-radius: 50%; }
 .comments iframe { width: 100%; border: 0; }
 .comments .continue a, .comments .loadmore a {
   display: inline-block;
   margin-top: 12px;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--accent);
 }
@@ -221,7 +300,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
 @media (max-width: 900px) {
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .post-outer-container, .comments { padding: 24px; }
-  .post-title { font-size: 22px; }
+  .post-title { font-size: 26px; }
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
@@ -356,14 +435,19 @@ __DASHBOARD__
                   <article class='post-outer-container'>
                     <b:include data='post' name='post'/>
                   </article>
+                  <p class='post-nav'>
+                    <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__LIST_PATH__&quot;'>목록</a>
+                  </p>
                   <b:include data='post' name='commentPicker'/>
                 </b:loop>
               </div>
+            <b:elseif cond='data:view.isHomepage'/>
+              <b:comment>홈은 상단 브리핑이 오늘 리포트를 대신 보여주므로 목록을 내지 않는다.</b:comment>
             <b:else/>
               <section class='reports'>
                 <div class='section-head'>
                   <h2 class='section-title'>
-                    <b:if cond='data:view.isHomepage'>최신 리포트<b:else/><data:view.title.escaped/></b:if>
+                    <b:if cond='data:view.isLabelSearch'>데일리 리포트 목록<b:else/><data:view.title.escaped/></b:if>
                   </h2>
                   <span class='section-note'>AI 자동 생성 · 매 거래일 06:00 KST</span>
                 </div>
@@ -457,6 +541,11 @@ __JS__
 
 NAV_LABELS = ["시장", "섹터", "종목", "거시경제", "뉴스", "일정", "관심종목"]
 
+# 데일리 리포트 목록 화면. publish_blogger.LABELS 의 첫 라벨과 같아야 한다 —
+# 파이프라인이 실제로 붙이는 라벨이라야 목록에 글이 잡힌다.
+REPORT_LABEL = "데일리 브리핑"
+LIST_PATH = "search/label/" + quote(REPORT_LABEL)
+
 
 def nav_items():
     out = []
@@ -506,6 +595,7 @@ def build_theme(parts):
     out = out.replace("__CSS__", parts["css"])
     out = out.replace("__BLOGGER_CSS__", BLOGGER_CSS.strip())
     out = out.replace("__NAV_ITEMS__", nav_items())
+    out = out.replace("__LIST_PATH__", LIST_PATH)
     out = out.replace("__DASHBOARD__", indent(to_xml_attrs(parts["dashboard"]), 6))
     out = out.replace("__BLOG_INCLUDABLES__", includables)
     out = out.replace("__BREAKING__", indent(to_xml_attrs(parts["breaking"]), 4))
@@ -575,8 +665,10 @@ PREVIEW_CSS = """
    preview.html 전용 — 테마(index.html)에는 들어가지 않는다
    ========================================================================== */
 
-/* 뷰 전환: 홈 / 목록 / 글 보기 */
-body[data-pv-view="home"] #pv-post { display: none; }
+/* 뷰 전환: 홈 / 목록 / 글 보기.
+   홈은 글 목록을 내지 않는다 — 오늘 리포트는 상단 브리핑이 대신한다. */
+body[data-pv-view="home"] #pv-post,
+body[data-pv-view="home"] #pv-reports { display: none; }
 body[data-pv-view="list"] #pv-dashboard,
 body[data-pv-view="list"] #pv-post { display: none; }
 body[data-pv-view="post"] #pv-dashboard,
@@ -597,7 +689,7 @@ body[data-pv-view="post"] #pv-reports { display: none; }
   font: 500 12px/1 system-ui, -apple-system, 'Segoe UI', sans-serif;
   color: #E2E8F0;
 }
-.pv-bar-label { padding: 0 4px; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #64748B; }
+.pv-bar-label { padding: 0 4px; font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #64748B; }
 .pv-bar button {
   padding: 6px 11px;
   background: transparent;
@@ -723,16 +815,16 @@ PREVIEW_COMMENTS = [
 
 PREVIEW_POST_TITLE = "미국 증시 데일리 브리핑 — 2026년 9월 3일"
 
-FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;line-height:1.7;color:#333;">
+FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:1.7;color:#333;">
 
-  <img src="__COVER__" alt="데일리 브리핑 커버 이미지" style="width:100%;max-width:760px;border-radius:8px;margin:0 0 16px 0;display:block;"/>
+  <img src="__COVER__" alt="데일리 브리핑 커버 이미지" style="width:100%;max-width:1024px;border-radius:8px;margin:0 0 16px 0;display:block;"/>
 
   <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">오늘의 시장 요약</h2>
   <div><div>오늘 미국 증시는 3대 지수가 일제히 상승 마감했습니다. 반도체 섹터가 상승을 주도한 가운데
   소프트웨어와 온라인 서비스가 뒤를 받쳤고, 변동성 지수는 15선 아래에서 안정적인 흐름을 유지했습니다.</div></div>
 
   <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">주요 지수</h2>
-  <table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:14px;">
+  <table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:17px;">
     <tr style="background:#f5f5f5;">
       <th style="padding:8px;border:1px solid #ddd;text-align:left;">지수</th>
       <th style="padding:8px;border:1px solid #ddd;text-align:right;">종가</th>
@@ -755,13 +847,65 @@ FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic N
     </tr>
   </table>
 
+  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">시장 분위기</h2>
+  <div><div>위험 자산 선호가 이어지며 방어 섹터에서 성장 섹터로 자금이 옮겨갔습니다.</div></div>
+
+  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">오늘의 급등주 TOP 5</h2>
+  <table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:17px;">
+    <tr style="background:#f5f5f5;">
+      <th style="padding:8px;border:1px solid #ddd;text-align:left;">종목</th>
+      <th style="padding:8px;border:1px solid #ddd;text-align:right;">가격</th>
+      <th style="padding:8px;border:1px solid #ddd;text-align:right;">등락률</th>
+      <th style="padding:8px;border:1px solid #ddd;text-align:right;">거래량</th>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd;">TSLA</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;">$376.37</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;"><span style="color:#d93025;font-weight:bold;">+4.26%</span></td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;">112,905,600</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd;">NVDA</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;">$228.45</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;"><span style="color:#d93025;font-weight:bold;">+3.71%</span></td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;">198,442,100</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd;">AVGO</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;">$357.16</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;"><span style="color:#d93025;font-weight:bold;">+2.94%</span></td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;">29,771,200</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd;">AAPL</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;">$328.21</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;"><span style="color:#d93025;font-weight:bold;">+1.62%</span></td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;">53,370,900</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd;">GOOGL</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;">$342.48</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;"><span style="color:#d93025;font-weight:bold;">+1.05%</span></td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:right;">26,890,400</td>
+    </tr>
+  </table>
+  <div style="margin-top:6px;"><div>반도체와 전기차가 상승을 이끌었고 거래량도 평균을 크게 웃돌았습니다.</div></div>
+
   <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">주요 뉴스</h2>
   <ul>
     <li><a href="#" style="color:#1a73e8;">반도체 ETF에 사상 최대 자금 유입</a> — CNBC</li>
     <li><a href="#" style="color:#1a73e8;">연준 위원 "금리 인하 서두를 필요 없다"</a> — Reuters</li>
   </ul>
 
-  <p style="margin-top:24px;font-size:12px;color:#999;border-top:1px solid #eee;padding-top:10px;">
+  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">종합 의견</h2>
+  <div><div>상승 추세는 유지되나 지수 상승분이 소수 대형주에 쏠려 있어 참여폭을 함께 봐야 합니다.</div>
+  <div>금리 여건은 중립이며 연준의 다음 신호를 기다리는 국면입니다.</div></div>
+
+  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">주의할 위험요인</h2>
+  <div><div>반도체 밸류에이션 부담과 차익 실현 물량이 단기 변동성을 키울 수 있습니다.</div>
+  <div>이번 주 발표될 고용지표가 금리 기대를 되돌릴 위험이 남아 있습니다.</div></div>
+
+  <p style="margin-top:24px;font-size:14px;color:#999;border-top:1px solid #eee;padding-top:10px;">
     본 리포트는 데이터 수집(FRED · Yahoo Finance)과 AI 분석(Gemini)을 자동으로 결합해 생성한 테스트 산출물입니다.
     투자 판단의 근거로 활용하지 마십시오. 데이터 출처: FRED, Yahoo Finance, CNBC.<br/>
     기준일: 2026-09-03 · 데이터 갱신: 2026-09-03 21:05 KST
@@ -813,7 +957,7 @@ def preview_reports():
     return (
         "  <section class=\"reports\" id=\"pv-reports\">\n"
         "    <div class=\"section-head\">\n"
-        "      <h2 class=\"section-title\" id=\"pv-reports-title\">최신 리포트</h2>\n"
+        "      <h2 class=\"section-title\" id=\"pv-reports-title\">데일리 리포트 목록</h2>\n"
         "      <span class=\"section-note\">AI 자동 생성 · 매 거래일 06:00 KST</span>\n"
         "    </div>\n"
         "    <div class=\"post-grid\">\n"
@@ -865,6 +1009,42 @@ def preview_comments():
     )
 
 
+# 블로거가 실제로 내보내는 공유 위젯 마크업. 아이콘 sprite 는 blogspot 도메인
+# 기준이라 로컬에서 못 받아오므로, 같은 클래스에 인라인 도형만 채워 넣는다.
+PREVIEW_SHARE_ICON = (
+    "<svg class=\"svg-icon-24 touch-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\">"
+    "<circle cx=\"18\" cy=\"5\" r=\"3\"/><circle cx=\"6\" cy=\"12\" r=\"3\"/>"
+    "<circle cx=\"18\" cy=\"19\" r=\"3\"/>"
+    "<path d=\"M8.6 10.7l6.8-4M8.6 13.3l6.8 4\" stroke=\"currentColor\" "
+    "stroke-width=\"2\" fill=\"none\"/></svg>"
+)
+
+PREVIEW_SHARE_PLATFORMS = ["링크 가져오기", "Facebook", "X", "Pinterest", "이메일"]
+
+
+def preview_share_buttons():
+    items = "\n".join(
+        "            <li><span class=\"sharing-platform-button\">%s"
+        "<span class=\"platform-sharing-text\">%s</span></span></li>"
+        % (PREVIEW_SHARE_ICON, html_mod.escape(name, quote=False))
+        for name in PREVIEW_SHARE_PLATFORMS
+    )
+    return (
+        "          <div class=\"post-share-buttons post-share-buttons-bottom\">\n"
+        "            <div class=\"byline post-share-buttons goog-inline-block\">\n"
+        "              <div class=\"sharing\">\n"
+        "                <button class=\"sharing-button touch-icon-button\">%s</button>\n"
+        "                <div class=\"share-buttons-container\">\n"
+        "                  <ul class=\"share-buttons hidden\">\n"
+        "%s\n"
+        "                  </ul>\n"
+        "                </div>\n"
+        "              </div>\n"
+        "            </div>\n"
+        "          </div>" % (PREVIEW_SHARE_ICON, items)
+    )
+
+
 def preview_post():
     body, _ = preview_post_body()
     return (
@@ -878,6 +1058,7 @@ def preview_post():
         "          <div class=\"post-body entry-content float-container\">\n"
         "%s\n"
         "          </div>\n"
+        "%s\n"
         "          <div class=\"post-bottom\">\n"
         "            <div class=\"post-footer float-container\">\n"
         "              <div class=\"post-labels\">라벨:\n"
@@ -887,10 +1068,14 @@ def preview_post():
         "          </div>\n"
         "        </div>\n"
         "      </article>\n"
+        "      <p class=\"post-nav\">\n"
+        "        <a class=\"post-nav-list\" href=\"#list\">목록</a>\n"
+        "      </p>\n"
         "%s\n"
         "    </div>\n"
         "  </div>"
-        % (html_mod.escape(PREVIEW_POST_TITLE, quote=False), indent(body, 12), preview_comments())
+        % (html_mod.escape(PREVIEW_POST_TITLE, quote=False), indent(body, 12),
+           preview_share_buttons(), preview_comments())
     )
 
 
@@ -965,18 +1150,37 @@ def preview_mock_js():
     }
     news = {"updated_at": "2026-09-03 20:41:00 UTC", "items": MOCK_NEWS}
 
+    # 상단 브리핑은 블로거 피드에서 최신 글을 읽어 채운다. 글 본문은 글 보기
+    # 탭과 같은 것을 써서, 두 화면의 내용이 어긋나 보이지 않게 한다.
+    body, _ = preview_post_body()
+    feed = {
+        "feed": {
+            "entry": [{
+                "title": {"$t": PREVIEW_POST_TITLE},
+                "published": {"$t": "2026-09-03T06:00:00.000+09:00"},
+                "content": {"$t": body},
+                "link": [{"rel": "alternate", "href": "#post"}],
+            }]
+        }
+    }
+
     return (
         "  var PV_DATA = %s;\n"
         "  var PV_NEWS = %s;\n"
+        "  var PV_FEED = %s;\n"
         "\n"
         "  /* 디자인만 확인하므로 실제 시세를 부르지 않는다. */\n"
         "  window.fetch = function (url) {\n"
-        "    var body = String(url).indexOf('news.json') >= 0 ? PV_NEWS : PV_DATA;\n"
+        "    var u = String(url), body;\n"
+        "    if (u.indexOf('/feeds/posts') >= 0) body = PV_FEED;\n"
+        "    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;\n"
+        "    else body = PV_DATA;\n"
         "    return Promise.resolve({ json: function () { return Promise.resolve(body); } });\n"
         "  };"
         % (
             json.dumps(data, ensure_ascii=False),
             json.dumps(news, ensure_ascii=False),
+            json.dumps(feed, ensure_ascii=False),
         )
     )
 
@@ -984,14 +1188,14 @@ def preview_mock_js():
 PREVIEW_SWITCH_JS = """  (function () {
     var body = document.body;
     var buttons = document.querySelectorAll('.pv-bar button');
-    var reportsTitle = document.getElementById('pv-reports-title');
     var homeLink = document.querySelector('.menu-items .nav-item');
 
     /* 테마는 홈이 아닌 뷰에 no-dashboard 를 붙인다 (b:class cond=!isHomepage). */
     function setView(view) {
       body.setAttribute('data-pv-view', view);
       body.classList.toggle('no-dashboard', view !== 'home');
-      if (reportsTitle) reportsTitle.textContent = (view === 'list') ? '시장' : '최신 리포트';
+      /* 테마의 b:class cond=data:view.isSingleItem 에 해당한다. */
+      body.classList.toggle('item-view', view === 'post');
       /* 메뉴의 현재 위치 표시도 뷰를 따라간다 (테마의 b:attr aria-current 흉내). */
       if (homeLink) {
         if (view === 'home') homeLink.setAttribute('aria-current', 'page');
@@ -1001,6 +1205,7 @@ PREVIEW_SWITCH_JS = """  (function () {
         b.setAttribute('aria-pressed', String(b.getAttribute('data-pv-view') === view));
       });
       try { sessionStorage.setItem('pv-view', view); } catch (e) {}
+      document.dispatchEvent(new Event('pv-view-change'));
     }
 
     Array.prototype.forEach.call(buttons, function (b) {
@@ -1026,10 +1231,19 @@ PREVIEW_SWITCH_JS = """  (function () {
     try { saved = sessionStorage.getItem('pv-view'); } catch (e) {}
     setView(fromHash() || saved || 'home');
 
-    /* 브레이크포인트(1360 / 1180 / 900 / 680) 확인용 폭 표시 */
+    /* 브레이크포인트(1360 / 1180 / 900 / 680) 확인용 폭 표시.
+       글 보기에서는 리포트가 실제로 몇 px 로 그려졌는지 같이 보여준다. */
     var readout = document.getElementById('pv-width');
-    function showWidth() { readout.textContent = window.innerWidth + 'px'; }
+    function showWidth() {
+      var text = window.innerWidth + 'px';
+      var shell = document.querySelector('#pv-post .post-shell');
+      if (shell && body.getAttribute('data-pv-view') === 'post') {
+        text += ' · 본문 ' + Math.round(shell.getBoundingClientRect().width) + 'px';
+      }
+      readout.textContent = text;
+    }
     window.addEventListener('resize', showWidth);
+    document.addEventListener('pv-view-change', showWidth);
     showWidth();
   })();"""
 
