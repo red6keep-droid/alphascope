@@ -2,9 +2,13 @@
 
 - 주요 지수: S&P 500(^GSPC), Nasdaq(^IXIC), Dow(^DJI), Russell 2000(^RUT), VIX(^VIX)
 - 급등주 TOP5 / 관심 종목(거래량 상위) TOP5
+- 분석용 시계열: 지수 + 광의 시장 ETF + 섹터 ETF + 금리·안전자산, 6개월 일봉 종가
 
 급등주·관심종목은 Yahoo screener API를 우선 시도하고,
 실패하면 정적 유니버스 리스트로 대체 수집한다.
+
+시계열은 analyze.py 전용이다. 지수의 당일 가격·등락률은 여전히 fast_info에서
+받는다 — 게시되는 표의 숫자 소스를 바꾸지 않기 위해서다.
 """
 
 import datetime
@@ -20,6 +24,22 @@ INDICES = {
     "russell": {"symbol": "^RUT", "name": "Russell 2000"},
     "vix": {"symbol": "^VIX", "name": "VIX"},
 }
+
+# analyze.py가 1D/5D/20D · 이동평균 · 연속성 · 상대강도를 계산하는 유니버스.
+# 그룹은 analyze.py의 규칙이 참조하므로 심볼을 옮기면 그쪽도 같이 본다.
+HISTORY_UNIVERSE = {
+    "indices": ["^GSPC", "^IXIC", "^DJI", "^RUT", "^VIX"],
+    "broad": ["SPY", "QQQ", "IWM", "RSP"],
+    "sectors": ["XLK", "XLF", "XLE", "XLV", "XLP", "XLY", "XLU", "XLI", "XLB", "XLRE", "XLC"],
+    "theme": ["SMH"],
+    "safe": ["TLT", "HYG", "GLD"],
+    "rates": ["^TNX", "^FVX", "^IRX"],
+}
+# 50일선과 그 기울기까지 보려면 3개월(약 63거래일)은 빠듯하다.
+HISTORY_PERIOD = "6mo"
+# 심볼마다 마지막 행 날짜가 다를 수 있다(^VIX는 다음 날 부분 바가 먼저 붙는다).
+# 이 심볼의 마지막 종가 날짜를 기준일로 삼아 모든 시계열을 거기까지로 자른다.
+HISTORY_ANCHOR = "^GSPC"
 
 SCREENER_URL = "https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved"
 TARGET_COUNT = 10
@@ -201,10 +221,66 @@ def collect_most_active(session_candidates=True):
     return result
 
 
+def collect_history():
+    """유니버스 전체의 일봉 종가를 받아 기준일까지로 정렬해 돌려준다.
+
+    반환: {"as_of", "period", "groups", "series": {symbol: {"dates": [...], "close": [...]}}}
+    기준일(anchor)의 종가가 없으면 None — 호출자가 분석을 건너뛴다.
+    """
+    symbols = [s for group in HISTORY_UNIVERSE.values() for s in group]
+    df = yf.download(symbols, period=HISTORY_PERIOD, interval="1d",
+                     group_by="ticker", auto_adjust=True, threads=True,
+                     progress=False)
+    if df is None or df.empty:
+        print("시계열 수집 실패: 빈 응답")
+        return None
+
+    def closes(symbol):
+        try:
+            s = df[symbol]["Close"].dropna()
+        except Exception:
+            return None
+        return s if len(s) else None
+
+    anchor = closes(HISTORY_ANCHOR)
+    if anchor is None:
+        print(f"시계열 수집 실패: 기준 심볼 {HISTORY_ANCHOR} 없음")
+        return None
+    as_of = anchor.index[-1]
+
+    series = {}
+    missing = []
+    for symbol in symbols:
+        s = closes(symbol)
+        if s is None:
+            missing.append(symbol)
+            continue
+        s = s[s.index <= as_of]
+        series[symbol] = {
+            "dates": [d.strftime("%Y-%m-%d") for d in s.index],
+            "close": [round(float(v), 4) for v in s.values],
+        }
+    if missing:
+        print(f"시계열 결측 심볼: {missing}")
+    print(f"시계열 수집 완료: {len(series)}/{len(symbols)} 심볼, 기준일 {as_of.date()}")
+    return {
+        "as_of": as_of.strftime("%Y-%m-%d"),
+        "period": HISTORY_PERIOD,
+        "groups": HISTORY_UNIVERSE,
+        "series": series,
+    }
+
+
 def collect_yahoo():
     indices = collect_indices()
     gainers = collect_gainers()
     most_active = collect_most_active()
+    # 시계열은 그림자 모드 분석용이라 실패해도 리포트를 막지 않는다.
+    try:
+        history = collect_history()
+    except Exception as e:
+        print(f"시계열 수집 실패 (분석 건너뜀): {e}")
+        history = None
     return {
         "updated_at": datetime.datetime.now(datetime.timezone.utc).strftime(
             "%Y-%m-%d %H:%M:%S UTC"
@@ -212,6 +288,7 @@ def collect_yahoo():
         "indices": indices,
         "gainers": gainers,
         "most_active": most_active,
+        "history": history,
     }
 
 

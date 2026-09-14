@@ -6,7 +6,8 @@
 
 흐름:
     collect_fred + collect_yahoo + collect_news
-    → report_input.json
+    → report_input.json (+ prices.json: 분석용 시계열)
+    → analyze → analysis.json, state/ (그림자 모드: 실패해도 리포트는 계속)
     → generate_report (Gemini) → report.out.json
     → validate_report (실패 시 중단)
     → generate_image (Pollinations → HF fallback) → output/images/{date}.webp
@@ -25,6 +26,7 @@ import sys
 
 from dotenv import load_dotenv
 
+import analyze
 import collect_fred
 import collect_news
 import collect_yahoo
@@ -41,6 +43,8 @@ sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 INPUT_PATH = os.path.join(OUTPUT_DIR, "report_input.json")
+PRICES_PATH = os.path.join(OUTPUT_DIR, "prices.json")
+ANALYSIS_PATH = os.path.join(OUTPUT_DIR, "analysis.json")
 REPORT_PATH = os.path.join(OUTPUT_DIR, "report.out.json")
 
 DEFAULT_REPO_SLUG = "red6keep-droid/alphascope"
@@ -76,7 +80,31 @@ def collect():
     with open(INPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(input_data, f, ensure_ascii=False, indent=2)
     print(f"report_input.json 저장 완료 -> {INPUT_PATH}")
+
+    # 시계열은 Gemini 입력(report_input.json)에 섞지 않고 따로 둔다.
+    history = yahoo.get("history")
+    if history:
+        with open(PRICES_PATH, "w", encoding="utf-8") as f:
+            json.dump(history, f, ensure_ascii=False)
+        print(f"prices.json 저장 완료 -> {PRICES_PATH}")
+    elif os.path.exists(PRICES_PATH):
+        os.remove(PRICES_PATH)
     return input_data
+
+
+def run_analysis():
+    """그림자 모드. 결과는 analysis.json과 state/에만 남고 게시물에는 아직 안 쓴다.
+    그래서 여기서 무엇이 실패하든 리포트를 멈추지 않는다."""
+    print("=" * 50)
+    print("[1.5/6] 분석 (그림자 모드)")
+    print("=" * 50)
+    if not os.path.exists(PRICES_PATH):
+        print("::warning::시계열이 없어 분석을 건너뜁니다.")
+        return
+    try:
+        analyze.analyze(INPUT_PATH, PRICES_PATH, ANALYSIS_PATH)
+    except Exception as e:
+        print(f"::warning::분석 실패 (리포트는 계속 진행): {e!r}")
 
 
 def make_cover(input_data):
@@ -117,6 +145,7 @@ def main():
     should_publish = args.publish or os.environ.get("PUBLISH_BLOG", "").lower() == "true"
 
     input_data = collect()
+    run_analysis()
 
     print("=" * 50)
     print("[2/6] Gemini 리포트 생성")

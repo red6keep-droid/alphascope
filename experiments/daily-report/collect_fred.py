@@ -1,7 +1,10 @@
 """FRED 경제 지표 수집
 
-실업률(UNRATE), CPI(CPIAUCSL), VIX(VIXCLS) 시계열의 최근 관측치를 가져온다.
-API 키는 FRED_API_KEY 환경 변수(.env)에서 읽는다.
+실업률(UNRATE), CPI(CPIAUCSL), VIX(VIXCLS)와 금리 4종(DGS10, DGS2, T10Y2Y, DFF)
+시계열의 최근 관측치를 가져온다. API 키는 FRED_API_KEY 환경 변수(.env)에서 읽는다.
+
+금리 일간 시리즈는 전 영업일 값으로 내려오는 날이 많다. 당일 10년물은
+analyze.py가 Yahoo ^TNX에서 따로 읽고, 여기 값은 2Y·스프레드·기준금리에 쓴다.
 """
 
 import datetime
@@ -15,6 +18,11 @@ SERIES = {
     "unemployment_rate": "UNRATE",
     "cpi": "CPIAUCSL",
     "vix": "VIXCLS",
+    # 금리 — validate_report의 REQUIRED_MACRO에는 넣지 않는다. 결측이어도 리포트는 나간다.
+    "us10y": "DGS10",
+    "us2y": "DGS2",
+    "spread_10_2": "T10Y2Y",
+    "fed_funds": "DFF",
 }
 
 TIMEOUT = 30

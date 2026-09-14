@@ -54,8 +54,26 @@ jobs:
         if: github.event_name == 'schedule' || inputs.publish
         run: python experiments/daily-report/check_published.py
 
+      # 분석 이력(Regime 점수 등)은 report-state orphan 브랜치에 산다. 어제 점수와
+      # 비교하려면 실행 전에 꺼내와야 한다. 없거나 실패해도 리포트는 진행한다.
+      # actions/checkout은 fetch refspec을 main으로 좁혀두므로 목적지 ref를 명시한다
+      # (comment-reply.yml과 같은 함정).
+      - name: Load analysis history (report-state branch)
+        if: steps.check.outputs.already_published != 'true'
+        run: |
+          STATE=experiments/daily-report/output/state
+          if git fetch origin report-state:refs/report-state 2>/dev/null; then
+            mkdir -p "$STATE"
+            if git archive refs/report-state "$STATE" | tar -x; then
+              echo "이전 분석 이력 불러옴: $(ls "$STATE"/history 2>/dev/null | wc -l)일"
+            fi
+          else
+            echo "이전 분석 이력 없음 (첫 실행)"
+          fi
+
       # 항상 dry-run. output/에 report_body.html, title.txt, image_ref.txt,
-      # images/{date}.webp 를 남긴다.
+      # images/{date}.webp 를 남긴다. 분석(analysis.json, state/)은 그림자 모드라
+      # 실패해도 여기서 멈추지 않는다.
       - name: Run daily report (dry-run + cover image)
         if: steps.check.outputs.already_published != 'true'
         run: python experiments/daily-report/main.py
@@ -99,6 +117,27 @@ jobs:
           steps.check.outputs.already_published != 'true'
           && (github.event_name == 'schedule' || inputs.publish)
         run: python experiments/daily-report/publish_saved.py
+
+      # 게시 성패와 무관하게 그날 분석은 남긴다. 게시가 skip된 날(already_published)은
+      # 분석도 안 돌았으니 저장할 게 없다. orphan 한 커밋에 전체 이력을 담아 force push
+      # 하므로 브랜치 커밋 수는 늘지 않는다.
+      - name: Save analysis history (report-state branch)
+        if: always() && steps.check.outputs.already_published != 'true'
+        run: |
+          STATE=experiments/daily-report/output/state
+          if [ ! -f "$STATE/regime.jsonl" ]; then
+            echo "분석 이력 없음 — 저장을 건너뜁니다."
+            exit 0
+          fi
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          # --orphan은 인덱스를 유지한다. 리셋하지 않으면 리포 전체가 커밋된다.
+          git checkout --orphan report-state
+          git reset
+          # output/ 은 .gitignore 대상이라 -f 없이는 git add가 종료코드 1로 죽는다.
+          git add -f "$STATE"
+          git commit -m "Update analysis history [skip ci]" || echo "이력 변경 없음"
+          git push --force origin report-state:report-state
 
       - name: Upload report artifacts
         if: always()
