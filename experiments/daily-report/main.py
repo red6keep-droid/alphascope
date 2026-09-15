@@ -96,15 +96,22 @@ def run_analysis():
     """그림자 모드. 결과는 analysis.json과 state/에만 남고 게시물에는 아직 안 쓴다.
     그래서 여기서 무엇이 실패하든 리포트를 멈추지 않는다."""
     print("=" * 50)
-    print("[1.5/6] 분석 (그림자 모드)")
+    print("[1.5/6] 분석")
     print("=" * 50)
+    # 어제 파일이 남아 있으면 오늘 분석이 실패했을 때 그걸 오늘 것으로 렌더한다. 먼저 지운다.
+    if os.path.exists(ANALYSIS_PATH):
+        os.remove(ANALYSIS_PATH)
     if not os.path.exists(PRICES_PATH):
         print("::warning::시계열이 없어 분석을 건너뜁니다.")
-        return
+        return None
     try:
         analyze.analyze(INPUT_PATH, PRICES_PATH, ANALYSIS_PATH)
+        return ANALYSIS_PATH
     except Exception as e:
         print(f"::warning::분석 실패 (리포트는 계속 진행): {e!r}")
+        if os.path.exists(ANALYSIS_PATH):
+            os.remove(ANALYSIS_PATH)
+        return None
 
 
 def make_cover(input_data):
@@ -145,17 +152,17 @@ def main():
     should_publish = args.publish or os.environ.get("PUBLISH_BLOG", "").lower() == "true"
 
     input_data = collect()
-    run_analysis()
+    analysis_path = run_analysis()
 
     print("=" * 50)
     print("[2/6] Gemini 리포트 생성")
     print("=" * 50)
-    generate_report.generate_report(INPUT_PATH, REPORT_PATH)
+    generate_report.generate_report(INPUT_PATH, REPORT_PATH, analysis_path=analysis_path)
 
     print("=" * 50)
     print("[3/6] 검증")
     print("=" * 50)
-    validate_report.validate(INPUT_PATH, REPORT_PATH)
+    validate_report.validate(INPUT_PATH, REPORT_PATH, analysis_path=analysis_path)
 
     image_ok, cover_url = make_cover(input_data)
     if should_publish and not image_ok:
@@ -166,7 +173,7 @@ def main():
     print("[5/6] HTML 렌더링")
     print("=" * 50)
     body, body_path, preview_path = render_html.render(
-        INPUT_PATH, REPORT_PATH, OUTPUT_DIR, cover_url=cover_url
+        INPUT_PATH, REPORT_PATH, OUTPUT_DIR, cover_url=cover_url, analysis_path=analysis_path
     )
 
     title = report_title.daily_title(input_data["date"])

@@ -1,7 +1,11 @@
 """Gemini를 호출하여 리포트 내러티브를 생성한다.
 
-입력: report_input.json (수집 데이터)
+입력: report_input.json (수집 데이터) + analysis.json (파이썬 분석, 있을 때)
 출력: report.out.json (Gemini가 생성한 한국어 분석 + 뉴스 선택)
+
+Gemini에 보내는 JSON은 항상 {"raw": 수집 원본, ...분석값} 구조다. analysis.json이
+있으면 그것을 그대로(raw 포함) 보내고, 없으면 {"raw": report_input}만 보낸다.
+프롬프트가 구조 하나만 설명하면 되게 하려는 것이다.
 
 숫자 자체는 이 단계에서 생성하지 않는다. Gemini는 오직 분석 문구와
 뉴스 index 선택만 담당한다.
@@ -55,14 +59,27 @@ def _mask(key):
     return key[:8] + "***"
 
 
-def generate_report(input_path, output_path):
+def _load_payload(input_path, analysis_path):
+    if analysis_path and os.path.exists(analysis_path):
+        with open(analysis_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data.get("raw"), dict):
+            print("[Gemini] 입력: analysis.json (원본 + 분석값)")
+            return data
+        print("[Gemini] analysis.json에 raw가 없어 원본만 보냅니다.")
+    else:
+        print("[Gemini] 입력: report_input.json (원본만 — 분석 없음)")
+    with open(input_path, "r", encoding="utf-8") as f:
+        return {"raw": json.load(f)}
+
+
+def generate_report(input_path, output_path, analysis_path=None):
     keys = _api_keys()
     model_name = os.environ.get("GEMINI_MODEL", DEFAULT_MODEL)
 
-    with open(input_path, "r", encoding="utf-8") as f:
-        input_data = json.load(f)
-
-    prompt = _load_prompt() + "\n\n" + json.dumps(input_data, ensure_ascii=False, indent=2)
+    payload = _load_payload(input_path, analysis_path)
+    prompt = _load_prompt() + "\n\n" + json.dumps(payload, ensure_ascii=False, indent=2)
+    print(f"[Gemini] 프롬프트 {len(prompt):,}자")
 
     errors = []
     for idx, key in enumerate(keys, 1):
@@ -102,4 +119,4 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
 
     load_dotenv()
-    generate_report("report_input.json", "report.out.json")
+    generate_report("report_input.json", "report.out.json", analysis_path="analysis.json")

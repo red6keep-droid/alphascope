@@ -9,7 +9,7 @@ import json
 import os
 import sys
 
-REQUIRED_LLM_KEYS = ["summary", "market_mood", "gainers_comment",
+REQUIRED_LLM_KEYS = ["summary", "change_comment", "market_mood", "gainers_comment",
                      "attention_comment", "news", "macro_comment",
                      "opinion", "risk", "image_prompt"]
 
@@ -27,7 +27,7 @@ def _is_bad(val):
     return False
 
 
-def validate(input_path, output_path):
+def validate(input_path, output_path, analysis_path=None):
     with open(input_path, "r", encoding="utf-8") as f:
         input_data = json.load(f)
     with open(output_path, "r", encoding="utf-8") as f:
@@ -35,6 +35,19 @@ def validate(input_path, output_path):
 
     errors = []
     warnings = []
+
+    # 분석은 있으면 좋고 없어도 리포트는 나간다. 있는데 핵심이 비면 렌더가 '—'로 채우니 경고만.
+    if analysis_path and os.path.exists(analysis_path):
+        with open(analysis_path, "r", encoding="utf-8") as f:
+            analysis = json.load(f)
+        if analysis.get("date") != input_data.get("date"):
+            warnings.append(f"analysis.json 날짜({analysis.get('date')})가 수집 날짜({input_data.get('date')})와 다릅니다.")
+        if not (analysis.get("series") or {}).get("^GSPC"):
+            warnings.append("analysis.series에 ^GSPC가 없어 지수 표의 5D/20D가 비게 됩니다.")
+        if analysis.get("history_stale"):
+            warnings.append(f"시계열에 오늘 바가 없는 것으로 보입니다 (당일가 대비 {analysis.get('history_gap_pct')}%).")
+    else:
+        warnings.append("analysis.json 없음 — 지수 표 3열, '무엇이 달라졌나' 생략.")
 
     macro = input_data.get("macro", {})
     for key in REQUIRED_MACRO:
@@ -88,4 +101,4 @@ def validate(input_path, output_path):
 
 
 if __name__ == "__main__":
-    validate("report_input.json", "report.out.json")
+    validate("report_input.json", "report.out.json", analysis_path="analysis.json")
