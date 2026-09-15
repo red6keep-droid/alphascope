@@ -2,18 +2,24 @@
 
   __COVER_IMAGE__
 
-  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">오늘의 시장 요약</h2>
-  <div>__SUMMARY__</div>
+  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">오늘 한 줄</h2>
+  <div style="font-size:20px;font-weight:bold;color:#111;">__ONE_LINE__</div>
+
+  __REGIME_SECTION__
 
   <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">주요 지수</h2>
   __INDEX_TABLE__
+  <div style="margin-top:6px;">__SUMMARY__</div>
 
   __CHANGE_SECTION__
 
+  __BREADTH_SECTION__
+
   __SECTOR_SECTION__
 
-  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">시장 분위기</h2>
-  <div>__MARKET_MOOD__</div>
+  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">금리 · 경제지표</h2>
+  __MACRO_TABLE__
+  <div style="margin-top:6px;">__MACRO_COMMENT__</div>
 
   <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">오늘의 급등주 TOP 5</h2>
   __GAINERS_TABLE__
@@ -26,19 +32,18 @@
   <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">주요 뉴스</h2>
   __NEWS_LIST__
 
-  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">금리 · 경제지표</h2>
-  __MACRO_TABLE__
-  <div style="margin-top:6px;">__MACRO_COMMENT__</div>
-
-  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">종합 의견</h2>
-  <div>__OPINION__</div>
-
-  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">주의할 위험요인</h2>
+  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">위험 지도</h2>
+  __STATUS_BOARD__
+  <div style="margin-top:10px;"><b>주의할 위험요인</b></div>
   <div>__RISK__</div>
 
+  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">종합 — 현재 시장 상태</h2>
+  <div>__OPINION__</div>
+
   <p style="margin-top:24px;font-size:14px;color:#999;border-top:1px solid #eee;padding-top:10px;">
-    본 리포트는 데이터 수집(FRED · Yahoo Finance)과 AI 분석(Gemini)을 자동으로 결합해 생성한 테스트 산출물입니다.
-    투자 판단의 근거로 활용하지 마십시오. 데이터 출처: FRED, Yahoo Finance, CNBC.<br>
+    본 리포트는 데이터 수집(FRED · Yahoo Finance)과 파이썬 계산, AI 해설(Gemini)을 자동으로 결합해 생성한 산출물입니다.
+    시장 상태 점수와 신호등은 규칙 기반 계산값이며 투자 판단의 근거로 활용하지 마십시오.
+    데이터 출처: FRED, Yahoo Finance, CNBC.<br>
     기준일: __DATE__ · 데이터 갱신: __UPDATED__
   </p>
 

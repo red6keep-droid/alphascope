@@ -14,11 +14,23 @@ import os
 TEMPLATE_FILE = os.path.join(os.path.dirname(__file__), "templates", "report.html")
 
 MARKERS = [
-    "SUMMARY", "MARKET_MOOD", "INDEX_TABLE", "CHANGE_SECTION", "SECTOR_SECTION",
-    "GAINERS_TABLE", "GAINERS_COMMENT", "ATTENTION_TABLE", "ATTENTION_COMMENT",
-    "NEWS_LIST", "MACRO_TABLE", "MACRO_COMMENT", "OPINION", "RISK", "DATE",
-    "UPDATED", "COVER_IMAGE",
+    "ONE_LINE", "REGIME_SECTION", "SUMMARY", "INDEX_TABLE", "CHANGE_SECTION",
+    "BREADTH_SECTION", "SECTOR_SECTION", "GAINERS_TABLE", "GAINERS_COMMENT",
+    "ATTENTION_TABLE", "ATTENTION_COMMENT", "NEWS_LIST", "MACRO_TABLE",
+    "MACRO_COMMENT", "STATUS_BOARD", "OPINION", "RISK", "DATE", "UPDATED",
+    "COVER_IMAGE",
 ]
+
+# 신호등 색. 등락률의 빨강/파랑과 헷갈리지 않게 따로 둔다.
+LIGHT_COLOR = {"🟢": "#2e9e5b", "🟡": "#d9a400", "🔴": "#d9534f"}
+
+REGIME_COMPONENT_LABELS = {
+    "trend": "추세",
+    "breadth": "시장 폭",
+    "volatility": "변동성",
+    "rates": "금리 환경",
+    "risk_appetite": "위험선호",
+}
 
 # 뉴스 테마 어휘. 프롬프트·validate_report와 같은 목록이어야 한다. 밖의 값은 '기타'로 접는다.
 THEME_VOCAB = ["금리", "AI/반도체", "실적", "매크로", "에너지", "정책/규제", "지정학", "기타"]
@@ -255,6 +267,137 @@ def _change_section(analysis, report):
     )
 
 
+def _regime_section(analysis, report):
+    """'시장 상태' — 점수 · 등급 · 어제 대비 · 요소별 막대, 그리고 Gemini의 regime_comment.
+    점수와 등급은 analyze.py가 만든 값을 그대로 찍는다. 분석이 없으면 '데이터 없음' 한 줄."""
+    regime = (analysis or {}).get("regime") or {}
+    comment = f'<div style="margin-top:6px;">{_text_block(report.get("regime_comment"))}</div>'
+    head = f'<h2 style="{H2_STYLE}">시장 상태 <span style="color:#888;font-size:15px;font-weight:normal;">Market Regime</span></h2>'
+    if regime.get("score") is None:
+        return head + '<div style="color:#999;">데이터 없음 — 오늘은 시장 상태 점수를 계산하지 못했습니다.</div>' + comment
+
+    light = regime.get("light") or "🟡"
+    color = LIGHT_COLOR.get(light, "#888")
+    if regime.get("score_prev") is not None:
+        delta = regime.get("delta") or 0
+        prev_txt = f'<span style="color:#666;font-size:16px;">어제 {regime["score_prev"]} · {delta:+d}</span>'
+    else:
+        prev_txt = '<span style="color:#999;font-size:16px;">어제 점수 없음</span>'
+    badge = (
+        f'<div style="margin:8px 0 12px 0;">'
+        f'<span style="display:inline-block;background:{color};color:#fff;font-weight:bold;font-size:18px;'
+        f'padding:4px 14px;border-radius:16px;vertical-align:middle;">{light} {_esc(regime.get("label") or "")}</span>'
+        f'&nbsp;&nbsp;<span style="font-size:28px;font-weight:bold;color:#111;vertical-align:middle;">{int(regime["score"])}</span>'
+        f'<span style="color:#888;font-size:16px;vertical-align:middle;"> / 100</span>'
+        f'&nbsp;&nbsp;{prev_txt}</div>'
+    )
+
+    rows = ['<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:17px;">']
+    for key, label in REGIME_COMPONENT_LABELS.items():
+        c = (regime.get("components") or {}).get(key) or {}
+        score, mx = c.get("score"), c.get("max")
+        if score is None or not mx:
+            continue
+        frac = score / mx
+        bar_color = LIGHT_COLOR["🟢"] if frac >= 0.7 else LIGHT_COLOR["🟡"] if frac >= 0.45 else LIGHT_COLOR["🔴"]
+        rows.append(
+            "<tr>"
+            f'<td style="border:1px solid #ddd;padding:6px 8px;white-space:nowrap;width:22%;">{_esc(label)}</td>'
+            f'<td style="border:1px solid #ddd;padding:6px 8px;">'
+            f'<div style="background:#eee;height:14px;border-radius:2px;">'
+            f'<div style="background:{bar_color};height:14px;width:{frac * 100:.0f}%;border-radius:2px;"></div></div></td>'
+            f'<td style="border:1px solid #ddd;padding:6px 8px;text-align:right;white-space:nowrap;width:18%;">{int(score)} / {int(mx)}</td>'
+            "</tr>"
+        )
+    rows.append("</table>")
+    return head + badge + _scroll("".join(rows)) + comment
+
+
+def _breadth_section(analysis):
+    """'시장 폭' — 프록시 모드는 섹터 ETF 상승 개수와 RSP−SPY. 전수 모드(3단계)는 상승/하락 종목 수.
+    파이썬 값만 찍는다. 해설 키는 3단계에서."""
+    b = (analysis or {}).get("breadth") or {}
+    if b.get("ratio") is None:
+        return ""
+    light = (b.get("label") or "")[:1]
+    color = LIGHT_COLOR.get(light, "#888")
+    if b.get("mode") == "full":
+        count_line = (f'상승 <b style="color:{UP_COLOR};">{b.get("advancers")}</b> · '
+                      f'하락 <b style="color:{DOWN_COLOR};">{b.get("decliners")}</b> 종목')
+        extra = ""
+        if b.get("new_high_52w") is not None:
+            extra = f' · 52주 신고가 {b["new_high_52w"]} · 신저가 {b["new_low_52w"]}'
+        basis = "S&P 500 구성종목"
+    else:
+        count_line = (f'섹터 ETF {b.get("sectors_counted")}개 중 상승 <b style="color:{UP_COLOR};">{b.get("sectors_up")}</b> · '
+                      f'하락 <b style="color:{DOWN_COLOR};">{b.get("sectors_down")}</b>')
+        extra = ""
+        basis = "섹터 ETF 프록시"
+    rsp_line = ""
+    if b.get("rsp_spy_1d") is not None:
+        rsp_line = (f'<div style="margin:4px 0;">동일가중(RSP) − 시총가중(SPY): 1D {_pct_cell(b["rsp_spy_1d"], unit="%p")} · '
+                    f'5D {_pct_cell(b.get("rsp_spy_5d"), unit="%p", missing="—")} '
+                    f'<span style="color:#888;font-size:15px;">— 양수면 상승이 소수 대형주에 몰리지 않은 것</span></div>')
+    return (
+        f'<h2 style="{H2_STYLE}">시장 폭 <span style="color:#888;font-size:15px;font-weight:normal;">Market Breadth · {_esc(basis)}</span></h2>'
+        f'<div style="margin:8px 0;">{count_line}{extra} · 상승 비율 <b>{b["ratio"]:.1f}%</b>'
+        f'&nbsp;&nbsp;<span style="display:inline-block;background:{color};color:#fff;font-weight:bold;font-size:15px;'
+        f'padding:2px 10px;border-radius:12px;">{_esc(b.get("label") or "")}</span></div>'
+        + rsp_line
+    )
+
+
+def _status_board(analysis):
+    """'위험 지도' 상태판 — 신호등 5개 + 종합. 근거 열은 계산값을 그대로 옮긴 것이다."""
+    a = analysis or {}
+    status = a.get("status") or {}
+    if not status.get("overall"):
+        return ""
+    spy = (a.get("series") or {}).get("SPY") or {}
+    vix = a.get("vix") or {}
+    breadth = a.get("breadth") or {}
+    rates = a.get("rates") or {}
+    pos = (a.get("position") or {}).get("SPY") or {}
+
+    def ma_text():
+        parts = []
+        if spy.get("above_ma20") is not None:
+            parts.append("20일선 " + ("위" if spy["above_ma20"] else "아래"))
+        if spy.get("above_ma50") is not None:
+            parts.append("50일선 " + ("위" if spy["above_ma50"] else "아래"))
+        return "SPY " + " · ".join(parts) if parts else "—"
+
+    def overheat_text():
+        if spy.get("ret_20d") is None:
+            return "—"
+        t = f"SPY 20D {spy['ret_20d']:+.2f}%"
+        if pos.get("from_high_pct") is not None:
+            t += f" · 20일 고점 대비 {pos['from_high_pct']:+.2f}%"
+        return t
+
+    items = [
+        ("추세 유지", status.get("trend"), ma_text()),
+        ("변동성", status.get("volatility"), f"VIX {vix['now']:.2f}" if vix.get("now") is not None else "—"),
+        ("시장 폭", status.get("breadth"), f"상승 비율 {breadth['ratio']:.1f}%" if breadth.get("ratio") is not None else "—"),
+        ("금리 리스크", status.get("rates"), f"10Y 5D {int(rates['us10y_change_5d_bp']):+d}bp" if rates.get("us10y_change_5d_bp") is not None else "—"),
+        ("과열 위험", status.get("overheat"), overheat_text()),
+    ]
+    rows = []
+    for label, light, basis in items:
+        light_cell = (f'<span style="font-size:20px;">{light}</span>' if light
+                      else '<span style="color:#999;">—</span>')
+        rows.append([_esc(label), light_cell, _esc(basis)])
+    overall = status["overall"]
+    color = LIGHT_COLOR.get(overall, "#888")
+    overall_word = {"🟢": "정상", "🟡": "주의", "🔴": "경계"}.get(overall, "")
+    return (
+        _scroll(_paragraph(rows, ["항목", "신호", "근거"]))
+        + f'<div style="margin:8px 0;">종합 &nbsp;<span style="display:inline-block;background:{color};color:#fff;'
+        f'font-weight:bold;font-size:16px;padding:3px 12px;border-radius:14px;">{overall} {overall_word}</span>'
+        f'&nbsp;<span style="color:#888;font-size:15px;">— 🔴가 하나라도 있으면 경계, 🟡가 둘 이상이면 주의</span></div>'
+    )
+
+
 def _rank_change_cell(delta):
     """5일 순위 대비 오늘 순위 변화. 양수면 올라온 것."""
     if delta is None:
@@ -427,11 +570,14 @@ def build_tables(input_data, report, cover_url=None, analysis=None):
 
     return {
         "COVER_IMAGE": _cover_image(cover_url),
+        "ONE_LINE": _text_block(report.get("one_line")),
+        "REGIME_SECTION": _regime_section(analysis, report),
         "SUMMARY": _text_block(report.get("summary")),
-        "MARKET_MOOD": _text_block(report.get("market_mood")),
         "INDEX_TABLE": index_table,
         "CHANGE_SECTION": _change_section(analysis, report),
+        "BREADTH_SECTION": _breadth_section(analysis),
         "SECTOR_SECTION": _sector_section(analysis, report),
+        "STATUS_BOARD": _status_board(analysis),
         "GAINERS_TABLE": gainers_table,
         "GAINERS_COMMENT": _text_block(report.get("gainers_comment")),
         "ATTENTION_TABLE": attention_table,

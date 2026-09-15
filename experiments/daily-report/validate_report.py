@@ -9,9 +9,12 @@ import json
 import os
 import sys
 
-REQUIRED_LLM_KEYS = ["summary", "change_comment", "market_mood", "sector_comment",
-                     "gainers_comment", "attention_comment", "news", "macro_comment",
-                     "opinion", "risk", "image_prompt"]
+REQUIRED_LLM_KEYS = ["one_line", "regime_echo", "regime_comment", "summary", "change_comment",
+                     "sector_comment", "gainers_comment", "attention_comment", "news",
+                     "macro_comment", "opinion", "risk", "image_prompt"]
+
+ONE_LINE_MAX_LEN = 120
+REGIME_LABELS = {"Risk-On", "Neutral", "Risk-Off"}
 
 # 프롬프트 규칙 10 · render_html.THEME_VOCAB 과 같은 목록
 THEME_VOCAB = {"금리", "AI/반도체", "실적", "매크로", "에너지", "정책/규제", "지정학", "기타"}
@@ -71,6 +74,23 @@ def validate(input_path, output_path, analysis_path=None):
     for key in REQUIRED_LLM_KEYS:
         if key not in report or _is_bad(report.get(key)):
             errors.append(f"Gemini 출력 필수 키 누락: {key}")
+
+    # regime_echo — Gemini가 등급을 반대로 읽었는지 기계적으로 잡는 유일한 장치.
+    # 파이썬이 만든 라벨과 글자 그대로 같아야 한다. 분석이 없는 날은 "데이터 없음"이어야 한다.
+    echo = str(report.get("regime_echo") or "").strip()
+    label = (analysis.get("regime") or {}).get("label")
+    if label:
+        if echo != label:
+            errors.append(f"regime_echo '{echo}' ≠ 계산된 등급 '{label}' — Gemini가 시장 상태를 다르게 읽었습니다.")
+        score = (analysis.get("regime") or {}).get("score")
+        if not isinstance(score, (int, float)) or not (0 <= score <= 100):
+            errors.append(f"regime.score({score})가 0~100 밖입니다.")
+    elif echo and echo in REGIME_LABELS:
+        warnings.append(f"분석이 없는데 regime_echo가 '{echo}' — 렌더는 '데이터 없음'으로 나가지만 해설이 등급을 언급할 수 있습니다.")
+
+    one_line = str(report.get("one_line") or "")
+    if len(one_line) > ONE_LINE_MAX_LEN:
+        warnings.append(f"one_line {len(one_line)}자 (권장 {ONE_LINE_MAX_LEN}자 이내)")
 
     image_prompt = str(report.get("image_prompt") or "")
     if image_prompt and len(image_prompt) > IMAGE_PROMPT_MAX_LEN:
