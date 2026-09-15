@@ -14,11 +14,20 @@ import os
 TEMPLATE_FILE = os.path.join(os.path.dirname(__file__), "templates", "report.html")
 
 MARKERS = [
-    "SUMMARY", "MARKET_MOOD", "INDEX_TABLE", "CHANGE_SECTION", "GAINERS_TABLE",
-    "GAINERS_COMMENT", "ATTENTION_TABLE", "ATTENTION_COMMENT", "NEWS_LIST",
-    "MACRO_TABLE", "MACRO_COMMENT", "OPINION", "RISK", "DATE", "UPDATED",
-    "COVER_IMAGE",
+    "SUMMARY", "MARKET_MOOD", "INDEX_TABLE", "CHANGE_SECTION", "SECTOR_SECTION",
+    "GAINERS_TABLE", "GAINERS_COMMENT", "ATTENTION_TABLE", "ATTENTION_COMMENT",
+    "NEWS_LIST", "MACRO_TABLE", "MACRO_COMMENT", "OPINION", "RISK", "DATE",
+    "UPDATED", "COVER_IMAGE",
 ]
+
+# 뉴스 테마 어휘. 프롬프트·validate_report와 같은 목록이어야 한다. 밖의 값은 '기타'로 접는다.
+THEME_VOCAB = ["금리", "AI/반도체", "실적", "매크로", "에너지", "정책/규제", "지정학", "기타"]
+
+# 뉴스 '관련 자산' 줄에서 심볼 대신 보여줄 이름
+SYMBOL_NAMES = {
+    "^GSPC": "S&P 500", "^IXIC": "Nasdaq", "^DJI": "Dow", "^RUT": "Russell 2000",
+    "^VIX": "VIX", "^TNX": "US10Y", "^FVX": "US5Y", "^IRX": "US3M",
+}
 
 INDEX_LABELS = {
     "sp500": "S&P 500",
@@ -246,6 +255,155 @@ def _change_section(analysis, report):
     )
 
 
+def _rank_change_cell(delta):
+    """5일 순위 대비 오늘 순위 변화. 양수면 올라온 것."""
+    if delta is None:
+        return ""
+    if delta > 0:
+        return f'<span style="color:{UP_COLOR};">▲{delta}</span>'
+    if delta < 0:
+        return f'<span style="color:{DOWN_COLOR};">▼{-delta}</span>'
+    return '<span style="color:#999;">–</span>'
+
+
+def _sector_section(analysis, report):
+    """'섹터 · 테마' — 섹터 ETF 12개의 1D 막대와 5일 순위 변화, 주도/약세, Gemini 해설."""
+    ranked = ((analysis or {}).get("sectors") or {}).get("ranked_1d") or []
+    if not ranked:
+        return ""
+    max_abs = max(abs(r["ret_1d"]) for r in ranked) or 1.0
+
+    parts = ['<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:17px;">',
+             '<tr>'
+             '<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:left;">테마 (ETF)</th>'
+             '<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:left;width:38%;">1D</th>'
+             '<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:right;">등락률</th>'
+             '<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:right;">5D 순위 대비</th>'
+             '</tr>']
+    for r in ranked:
+        pct = abs(r["ret_1d"]) / max_abs * 100
+        color = UP_COLOR if r["ret_1d"] >= 0 else DOWN_COLOR
+        parts.append(
+            "<tr>"
+            f'<td style="border:1px solid #ddd;padding:6px 8px;white-space:nowrap;">{_esc(r["theme"])} '
+            f'<span style="color:#888;font-size:14px;">({_esc(r["etf"])})</span></td>'
+            f'<td style="border:1px solid #ddd;padding:6px 8px;">'
+            f'<div style="background:{color};height:14px;width:{pct:.0f}%;min-width:2px;border-radius:2px;"></div></td>'
+            f'<td style="border:1px solid #ddd;padding:6px 8px;text-align:right;white-space:nowrap;">{_pct_cell(r["ret_1d"])}</td>'
+            f'<td style="border:1px solid #ddd;padding:6px 8px;text-align:right;">{_rank_change_cell(r.get("rank_change"))}</td>'
+            "</tr>"
+        )
+    parts.append("</table>")
+
+    by_etf = {r["etf"]: r for r in ranked}
+
+    def names(etfs):
+        return " · ".join(f'{_esc(by_etf[e]["theme"])}({_esc(e)})' for e in etfs if e in by_etf)
+
+    sectors = analysis["sectors"]
+    lead_line = (
+        f'<div style="margin:6px 0;"><b style="color:{UP_COLOR};">주도</b> {names(sectors.get("leaders") or [])}'
+        f'&nbsp;&nbsp;<b style="color:{DOWN_COLOR};">약세</b> {names(sectors.get("laggards") or [])}</div>'
+    )
+    return (
+        f'<h2 style="{H2_STYLE}">섹터 · 테마</h2>'
+        + _scroll("".join(parts)) + lead_line
+        + f'<div style="margin-top:6px;">{_text_block(report.get("sector_comment"))}</div>'
+    )
+
+
+def _bp_cell(bp):
+    """금리 변화. 색을 쓰지 않는다 — 금리 상승이 좋은지 나쁜지는 문맥이 정한다."""
+    if bp is None:
+        return '<span style="color:#999;">—</span>'
+    return f'<span style="color:#555;">{int(bp):+d}bp</span>'
+
+
+def _macro_table(macro, analysis):
+    """금리 · 경제지표 표. 금리 4행은 FRED(raw.macro)에서, 10Y의 당일값·bp 변화는 분석(^TNX)에서."""
+    rates = (analysis or {}).get("rates") or {}
+
+    def fred(key):
+        rec = macro.get(key)
+        if not rec or rec.get("value") is None:
+            return "데이터 없음", ""
+        return _esc(f"{rec['value']:.2f}"), _esc(rec.get("date", ""))
+
+    rows = []
+    v10, d10 = fred("us10y")
+    if rates.get("us10y") is not None:
+        v10 = _esc(f"{rates['us10y']:.2f}")
+        d10 = _esc((analysis or {}).get("as_of") or d10)
+    change_10y = (f"1D {_bp_cell(rates.get('us10y_change_1d_bp'))} · 5D {_bp_cell(rates.get('us10y_change_5d_bp'))}"
+                  if rates.get("us10y_change_5d_bp") is not None else "")
+    rows.append(["10년물 국채금리 (%)", v10, change_10y, d10])
+    for key, label in (("us2y", "2년물 국채금리 (%)"),
+                       ("spread_10_2", "10Y−2Y 스프레드 (%p)"),
+                       ("fed_funds", "연방기금금리 (%)"),
+                       ("unemployment_rate", "실업률 (%)"),
+                       ("cpi", "CPI (지수)"),
+                       ("vix", "VIX")):
+        if key in ("us2y", "spread_10_2", "fed_funds") and not macro.get(key):
+            continue  # 금리는 있을 때만 — 옛 입력 파일과도 호환
+        v, d = fred(key)
+        rows.append([label, v, "", d])
+    table = _scroll(_paragraph(rows, ["지표", "값", "변화", "기준일"]))
+
+    label = rates.get("growth_label")
+    if label:
+        table += f'<div style="margin:6px 0;">금리 ↔ 성장주: <b>{_esc(label)}</b></div>'
+    return table
+
+
+def _news_list(input_data, report, analysis):
+    """뉴스 카드. 테마 태그와 '관련 자산'의 실제 1D는 파이썬이 채운다. Gemini는 index·테마·심볼만 고른다."""
+    series = (analysis or {}).get("series") or {}
+    rates = (analysis or {}).get("rates") or {}
+    quotes = {q["symbol"]: q for q in input_data.get("gainers", []) + input_data.get("most_active", [])
+              if q.get("symbol")}
+    known = set(series) | set(quotes)
+
+    def reaction(sym):
+        if sym == "^TNX" and rates.get("us10y_change_1d_bp") is not None:
+            return _bp_cell(rates["us10y_change_1d_bp"])
+        if sym in series:
+            return _pct_cell(series[sym].get("ret_1d"), missing="—")
+        return _pct_cell(quotes[sym].get("change_pct"), missing="—")
+
+    rows = []
+    for item in report.get("news", []):
+        idx = item.get("index")
+        try:
+            news_item = input_data.get("news", [])[idx]
+        except (IndexError, TypeError):
+            continue
+        title = _esc(news_item.get("title") or "")
+        link = _esc(news_item.get("link") or "#")
+        why = _esc(item.get("why") or "")
+
+        theme = item.get("theme")
+        if theme and theme not in THEME_VOCAB:
+            theme = "기타"
+        tag = (f'<span style="display:inline-block;background:#eef3ff;color:#2a4d9b;font-size:14px;'
+               f'padding:1px 8px;border-radius:10px;margin-right:6px;vertical-align:middle;">{_esc(theme)}</span>'
+               if theme else "")
+
+        related = [s for s in (item.get("related") or []) if isinstance(s, str) and s in known][:4]
+        related_line = ""
+        if related:
+            cells = " · ".join(f'{_esc(SYMBOL_NAMES.get(s, s))} {reaction(s)}' for s in related)
+            related_line = f'<div style="margin:4px 0 0 12px;font-size:16px;">관련 자산: {cells}</div>'
+
+        rows.append(
+            f'<div style="margin-bottom:12px;">'
+            f'  {tag}<a href="{link}" target="_blank" rel="noopener nofollow" style="font-weight:bold;color:#2196f3;text-decoration:none;">{title}</a>'
+            f'  {related_line}'
+            f'  <div style="margin:4px 0 0 12px;color:#666;font-size:17px;">선정 이유: {why}</div>'
+            f'</div>'
+        )
+    return "".join(rows) if rows else '<div>주요 뉴스 없음</div>'
+
+
 def build_tables(input_data, report, cover_url=None, analysis=None):
     indices = input_data.get("market", {}).get("indices", {})
     index_table = _index_table(indices, analysis)
@@ -267,47 +425,19 @@ def build_tables(input_data, report, cover_url=None, analysis=None):
     most_active = input_data.get("most_active", [])
     attention_table = _paragraph(quote_rows(most_active), ["종목", "가격", "등락률", "거래량"]) if most_active else _text_block("")
 
-    news_rows = []
-    for item in report.get("news", []):
-        idx = item.get("index")
-        try:
-            news_item = input_data.get("news", [])[idx]
-        except (IndexError, TypeError):
-            continue
-        title = _esc(news_item.get("title") or "")
-        link = _esc(news_item.get("link") or "#")
-        why = _esc(item.get("why") or "")
-        news_rows.append(
-            f'<div style="margin-bottom:10px;">'
-            f'  <a href="{link}" target="_blank" rel="noopener nofollow" style="font-weight:bold;color:#2196f3;text-decoration:none;">{title}</a>'
-            f'  <div style="margin:4px 0 0 12px;color:#666;font-size:17px;">선정 이유: {why}</div>'
-            f'</div>'
-        )
-    news_list = "".join(news_rows) if news_rows else '<div>주요 뉴스 없음</div>'
-
-    macro = input_data.get("macro", {})
-    macro_rows = []
-    for key, label in (("unemployment_rate", "실업률 (%)"),
-                       ("cpi", "CPI (지수)"),
-                       ("vix", "VIX")):
-        rec = macro.get(key)
-        value = _esc(f"{rec['value']:.2f}") if (rec and rec.get("value") is not None) else "데이터 없음"
-        date = _esc(rec.get("date", "")) if rec else ""
-        macro_rows.append([label, value, date])
-    macro_table = _paragraph(macro_rows, ["지표", "값", "기준일"])
-
     return {
         "COVER_IMAGE": _cover_image(cover_url),
         "SUMMARY": _text_block(report.get("summary")),
         "MARKET_MOOD": _text_block(report.get("market_mood")),
         "INDEX_TABLE": index_table,
         "CHANGE_SECTION": _change_section(analysis, report),
+        "SECTOR_SECTION": _sector_section(analysis, report),
         "GAINERS_TABLE": gainers_table,
         "GAINERS_COMMENT": _text_block(report.get("gainers_comment")),
         "ATTENTION_TABLE": attention_table,
         "ATTENTION_COMMENT": _text_block(report.get("attention_comment")),
-        "NEWS_LIST": news_list,
-        "MACRO_TABLE": macro_table,
+        "NEWS_LIST": _news_list(input_data, report, analysis),
+        "MACRO_TABLE": _macro_table(input_data.get("macro", {}), analysis),
         "MACRO_COMMENT": _text_block(report.get("macro_comment")),
         "OPINION": _text_block(report.get("opinion")),
         "RISK": _text_block(report.get("risk")),

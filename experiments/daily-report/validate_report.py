@@ -9,9 +9,12 @@ import json
 import os
 import sys
 
-REQUIRED_LLM_KEYS = ["summary", "change_comment", "market_mood", "gainers_comment",
-                     "attention_comment", "news", "macro_comment",
+REQUIRED_LLM_KEYS = ["summary", "change_comment", "market_mood", "sector_comment",
+                     "gainers_comment", "attention_comment", "news", "macro_comment",
                      "opinion", "risk", "image_prompt"]
+
+# 프롬프트 규칙 10 · render_html.THEME_VOCAB 과 같은 목록
+THEME_VOCAB = {"금리", "AI/반도체", "실적", "매크로", "에너지", "정책/규제", "지정학", "기타"}
 
 IMAGE_PROMPT_MAX_LEN = 300
 
@@ -37,6 +40,7 @@ def validate(input_path, output_path, analysis_path=None):
     warnings = []
 
     # 분석은 있으면 좋고 없어도 리포트는 나간다. 있는데 핵심이 비면 렌더가 '—'로 채우니 경고만.
+    analysis = {}
     if analysis_path and os.path.exists(analysis_path):
         with open(analysis_path, "r", encoding="utf-8") as f:
             analysis = json.load(f)
@@ -74,6 +78,12 @@ def validate(input_path, output_path, analysis_path=None):
             f"image_prompt 길이 초과: {len(image_prompt)}자 (최대 {IMAGE_PROMPT_MAX_LEN}자)"
         )
 
+    # 뉴스의 theme·related는 렌더가 같은 규칙으로 걸러내므로 여기서는 경고만 남긴다.
+    # 어휘 밖 테마는 '기타'로, 모르는 심볼은 빠진다 — 게시를 막을 일은 아니다.
+    known_symbols = set(analysis.get("symbols") or [])
+    known_symbols |= {q["symbol"] for q in input_data.get("gainers", []) + input_data.get("most_active", [])
+                      if q.get("symbol")}
+
     news_size = len(input_data.get("news", []))
     for i, item in enumerate(report.get("news", [])):
         idx = item.get("index")
@@ -81,6 +91,18 @@ def validate(input_path, output_path, analysis_path=None):
             errors.append(
                 f"news[{i}] index({idx}) 유효하지 않음 (유효 범위 0~{news_size - 1})"
             )
+        theme = item.get("theme")
+        if theme is None:
+            warnings.append(f"news[{i}] theme 없음 — 태그 없이 렌더됩니다.")
+        elif theme not in THEME_VOCAB:
+            warnings.append(f"news[{i}] theme '{theme}' 어휘 밖 — '기타'로 표기됩니다.")
+        related = item.get("related")
+        if related is not None and not isinstance(related, list):
+            warnings.append(f"news[{i}] related가 배열이 아님 — 무시됩니다.")
+        elif related:
+            unknown = [s for s in related if s not in known_symbols]
+            if unknown:
+                warnings.append(f"news[{i}] related에 목록 밖 심볼 {unknown} — 제외됩니다.")
 
     if report.get("news"):
         selected = len(report["news"])

@@ -13,8 +13,14 @@
 - `rs` — 상대강도(5거래일, %p). `qqq_spy_5d` 양수면 성장주 우위, `iwm_spy_5d` 양수면 소형주 우위,
   `rsp_spy_5d` 양수면 상승이 넓게 퍼진 것. `qqq_streak`은 Nasdaq이 S&P 500을 웃돈 연속 일수.
 - `vix` — `now`, `prev_5d`, `change_5d`.
-- `breadth`, `sectors`, `rates`, `regime`, `status`, `watch` — 시장 폭·섹터 순위·금리·시장 상태 점수. 참고만 하십시오.
-- `series` 이하가 없으면 그날 분석이 실패한 것입니다. 그 경우 관련 문구는 "데이터 없음"으로 쓰십시오.
+- `sectors.ranked_1d` — 섹터·테마 ETF 12개를 당일 등락률 순으로. 각 항목 `etf`, `theme`(한국어 테마명), `ret_1d`, `ret_5d`,
+  `rank_change`(5일 순위 대비 오늘 순위 변화, 양수면 올라온 것). `sectors.leaders`가 주도 3개, `laggards`가 약세 3개.
+- `rates` — `us10y`(당일 10년물, %), `us2y`, `spread_10_2`, `fed_funds`, `us10y_change_1d_bp`/`us10y_change_5d_bp`(bp),
+  `growth_label`(금리 ↔ 성장주 관계 라벨 — 이 라벨을 그대로 따르십시오).
+- `symbols` — 뉴스의 `related`에 쓸 수 있는 **유일한** 심볼 목록. 지수(`^GSPC` 등)·ETF·급등주·관심종목이 들어 있습니다.
+- `breadth`, `regime`, `status`, `watch` — 시장 폭·시장 상태 점수. 참고만 하십시오.
+- `series` 이하가 없으면 그날 분석이 실패한 것입니다. 그 경우 관련 문구는 "데이터 없음"으로 쓰고,
+  뉴스의 `theme`은 그대로 고르되 `related`는 빈 배열로 두십시오.
 
 ## 엄격한 규칙
 
@@ -33,6 +39,9 @@
    gentle breeze on sunlit water"처럼 밝은 소재로 담아내십시오.
 9. 계산값의 방향·라벨은 그대로 따르십시오. `series`가 5일 하락인데 "상승 추세"라고 쓰거나,
    `position_label`이 "20일 저점 부근"인데 "고점 부근"이라고 쓰지 마십시오. 반대 해석은 오류입니다.
+10. 뉴스마다 `theme`은 아래 여덟 개 중 하나만, `related`는 `symbols` 목록에 있는 심볼만 0~3개 고르십시오.
+    목록에 없는 심볼(예: 목록에 없는 개별 종목)이나 다른 테마 이름을 쓰지 마십시오.
+    테마 어휘: `금리` · `AI/반도체` · `실적` · `매크로` · `에너지` · `정책/규제` · `지정학` · `기타`
 
 ## 출력 형식
 
@@ -42,15 +51,18 @@
   "summary": "오늘 미국 증시 전체를 요약하는 3~5문장 (한국어)",
   "change_comment": "어제와 무엇이 달라졌는지 2~3문장. series의 1D/5D/20D 방향과 연속성, position의 레인지 위치, rs의 상대강도, vix의 5일 변화가 함께 말하는 추세 변화를 설명. 숫자는 쓰지 말고 방향·관계·라벨만 (예: 'Nasdaq이 닷새 연속 S&P 500을 웃돌며 성장주 주도가 뚜렷해졌고, S&P 500은 20일 고점 부근까지 되돌아왔습니다')",
   "market_mood": "시장 분위기 분석 (VIX, 지수 방향성 등)",
+  "sector_comment": "오늘의 주도 섹터와 약세 섹터 해설 2~3문장. sectors.leaders/laggards와 rank_change가 말하는 로테이션(어느 테마로 돈이 옮겨갔는지)을 설명. 숫자는 쓰지 말고 테마 이름과 방향만",
   "gainers_comment": "오늘의 급등주에 대한 간단한 해설",
   "attention_comment": "시장 관심 종목(거래량 상위)에 대한 간단한 해설",
   "news": [
     {
       "index": 0,
-      "why": "선정 이유 1문장"
+      "why": "선정 이유 1문장",
+      "theme": "테마 어휘 중 하나",
+      "related": ["이 뉴스가 움직인 자산 심볼 0~3개 — symbols 목록에 있는 것만"]
     }
   ],
-  "macro_comment": "미국 경제지표(실업률, CPI, VIX) 해설",
+  "macro_comment": "금리와 경제지표 해설 2~3문장. rates의 10년물 방향(1D·5D bp)과 growth_label, 10Y−2Y 스프레드, 실업률·CPI·VIX를 함께. 숫자는 쓰지 말고 방향과 관계만",
   "opinion": "전체 시장에 대한 종합 의견 (2~3문장)",
   "risk": "주목할 위험요인 (2~5개, 불릿 스타일 아닌 문자열로 줄바꿈 구분)",
   "image_prompt": "리포트 전체를 대표하는 이미지 생성용 영문 프롬프트 1문장 (예: bullish market momentum visualized as ascending geometric arrows over a calm sea)"
@@ -58,6 +70,9 @@
 
 ## 뉴스 선정 지침
 
-`raw.news` 목록에서 오늘 미국 증시 전체에 영향을 줄 가능성이 높은 뉴스 3~5개를 선택하십시오. news 배열의 각 항목은 `raw.news`의 0부터 시작하는 index와 선정 이유만 담습니다.
+`raw.news` 목록에서 오늘 미국 증시 전체에 영향을 줄 가능성이 높은 뉴스 3~5개를 선택하십시오. news 배열의 각 항목은
+`raw.news`의 0부터 시작하는 index, 선정 이유, 테마, 관련 심볼을 담습니다. 관련 심볼은 그 뉴스가 실제로 움직였을
+자산입니다 — 예: 반도체 투자 뉴스면 `SMH`·`QQQ`(급등주 목록에 `NVDA`가 있으면 그것도), 금리 뉴스면 `^TNX`·`TLT`·`XLF`,
+유가 뉴스면 `XLE`. 확신이 없으면 빈 배열로 두십시오. 실제 등락률은 파이썬이 붙입니다.
 
 ## 아래는 오늘 수집된 데이터입니다.
