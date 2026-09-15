@@ -9,3 +9,7 @@ experiments/daily-report/.env
 experiments/daily-report/output/
 experiments/comment-reply/output/
 preview.html
+
+experiments/trump-trend/data/
+experiments/trump-trend/output/
+experiments/trump-trend/.env

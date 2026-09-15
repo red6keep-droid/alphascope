@@ -1,0 +1,109 @@
+{
+  "_comment": "기획서 4-B. 규칙 하나 = 섹터 하나 = ETF 상위 10종목. match는 AND 조건, 배열 값은 OR. 위에서부터 첫 일치 규칙 하나만 적용. companies는 수동 갱신(마지막 확인 2026-09).",
+  "rules": [
+    {
+      "rule_id": "trade_china_semis",
+      "match": {"topic": "Trade", "target_country": ["China", "Taiwan"]},
+      "sector": "Semiconductor",
+      "etf": "SMH",
+      "companies": ["NVDA", "TSM", "AVGO", "AMD", "ASML", "QCOM", "TXN", "AMAT", "LRCX", "MU"],
+      "path_text": "China/Taiwan → Import Tariff → Semiconductor (SMH)"
+    },
+    {
+      "rule_id": "trade_semis_sector",
+      "match": {"topic": "Trade", "target_sector": ["Semiconductor"]},
+      "sector": "Semiconductor",
+      "etf": "SMH",
+      "companies": ["NVDA", "TSM", "AVGO", "AMD", "ASML", "QCOM", "TXN", "AMAT", "LRCX", "MU"],
+      "path_text": "Tariff → Semiconductor (SMH)"
+    },
+    {
+      "rule_id": "trade_autos",
+      "match": {"topic": "Trade", "target_sector": ["Autos"]},
+      "sector": "Autos",
+      "etf": "XLY",
+      "companies": ["TSLA", "GM", "F", "TM", "HMC", "STLA", "RIVN", "APTV", "BWA", "LEA"],
+      "path_text": "Tariff → Autos (XLY 자동차)"
+    },
+    {
+      "rule_id": "trade_generic_tech",
+      "match": {"topic": "Trade", "target_sector": ["Technology", "Consumer"]},
+      "sector": "Technology",
+      "etf": "XLK",
+      "companies": ["AAPL", "MSFT", "NVDA", "AVGO", "ORCL", "CRM", "CSCO", "AMD", "ACN", "ADBE"],
+      "path_text": "Tariff → Technology hardware/consumer (XLK)"
+    },
+    {
+      "rule_id": "trade_broad",
+      "match": {"topic": "Trade"},
+      "sector": "Broad Market",
+      "etf": "SPY",
+      "companies": [],
+      "path_text": "Trade policy → Broad market (SPY/QQQ)"
+    },
+    {
+      "rule_id": "fed_rates",
+      "match": {"topic": "Fed"},
+      "sector": "Financials",
+      "etf": "XLF",
+      "companies": ["JPM", "BAC", "WFC", "GS", "MS", "C", "SCHW", "BLK", "AXP", "BRK-B"],
+      "path_text": "Fed / rates pressure → Financials (XLF) · Bonds (TLT)"
+    },
+    {
+      "rule_id": "energy_oil",
+      "match": {"topic": "Energy"},
+      "sector": "Energy",
+      "etf": "XLE",
+      "companies": ["XOM", "CVX", "COP", "EOG", "SLB", "MPC", "PSX", "VLO", "OXY", "WMB"],
+      "path_text": "Energy policy / oil → Energy (XLE)"
+    },
+    {
+      "rule_id": "regulation_pharma",
+      "match": {"topic": "Regulation", "target_sector": ["Healthcare"]},
+      "sector": "Healthcare",
+      "etf": "XLV",
+      "companies": ["LLY", "UNH", "JNJ", "ABBV", "MRK", "TMO", "ABT", "AMGN", "PFE", "ISRG"],
+      "path_text": "Drug pricing / regulation → Healthcare (XLV)"
+    },
+    {
+      "rule_id": "regulation_tech",
+      "match": {"topic": "Regulation", "target_sector": ["Technology"]},
+      "sector": "Technology",
+      "etf": "XLK",
+      "companies": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AMZN", "AVGO", "ORCL", "CRM", "ADBE"],
+      "path_text": "Tech regulation / antitrust → Technology (XLK)"
+    },
+    {
+      "rule_id": "geopolitics_defense",
+      "match": {"topic": "Geopolitics"},
+      "sector": "Defense",
+      "etf": "XLI",
+      "companies": ["LMT", "RTX", "NOC", "GD", "LHX", "BA", "HII", "TDG", "HWM", "LDOS"],
+      "path_text": "Geopolitics / conflict → Defense (XLI 방산) · Energy (XLE)"
+    },
+    {
+      "rule_id": "tax_broad",
+      "match": {"topic": "Tax"},
+      "sector": "Broad Market",
+      "etf": "SPY",
+      "companies": [],
+      "path_text": "Tax policy → Broad market (SPY)"
+    },
+    {
+      "rule_id": "immigration_labor",
+      "match": {"topic": "Immigration"},
+      "sector": "Industrials",
+      "etf": "XLI",
+      "companies": [],
+      "path_text": "Immigration / labor supply → Industrials · Consumer (XLI/XLY)"
+    },
+    {
+      "rule_id": "company_direct",
+      "match": {"topic": "Company"},
+      "sector": "Broad Market",
+      "etf": null,
+      "companies": [],
+      "path_text": "직접 언급 기업 (mentioned_companies 그대로)"
+    }
+  ]
+}

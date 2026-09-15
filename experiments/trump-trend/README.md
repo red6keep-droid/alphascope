@@ -1,0 +1,116 @@
+# 트럼프 SNS 트렌드 리포트 (experiments/trump-trend)
+
+Trump의 Truth Social 게시물을 매일 수집해 분류하고, **이벤트 단위**로 묶어 트렌드와 시장의 **초과 반응**을 계산하는
+그림자 모드 파이프라인이다. 어디에도 게시하지 않는다. 산출물은 `output/trump_report.md` 하나다.
+
+기획·설계 근거: [doc/트럼프-SNS-트렌드-리포트-기획.md](../../doc/트럼프-SNS-트렌드-리포트-기획.md)
+
+## 구조
+
+```
+experiments/trump-trend/
+├── main.py             # 실행 (수집 → 가격 → 캘린더 → 분류 → 이벤트 → 스터디 → 집계 → MD)
+├── config.py           # 확정값 전부 (enum · 가중치 · 임계값 · 유니버스 · 배치 크기)
+├── db.py               # SQLite 스키마 (trump_posts · trump_events · event_reactions · daily_bars · macro_calendar)
+├── collect_posts.py    # CNN Truth archive JSON → 새 id만 저장 + 사전 필터
+├── prefilter.py        # 1단계 노이즈 필터 (no_text / bare_reshare / self_repost / greeting / too_short)
+├── labels.py           # subtopic 표기 통일 (Tariffs → Tariff). 쓰기·읽기 양쪽에서 적용
+├── review_sample.py    # ④ 수동 검증용 표본 50개 → output/review_sample.md
+├── collect_prices.py   # yfinance 일봉 → daily_bars (첫 실행 2y 백필)
+├── calendar_macro.py   # FOMC(정적) + FRED 릴리스(CPI·NFP·GDP·PCE) + 관찰 종목 실적일
+├── gemini_client.py    # 다중 키 라운드로빈 · 429 쿨다운 · 503 백오프
+├── classify_posts.py   # 배치 Gemini 분류 → ai_* 컬럼 (항목별 검증)
+├── mapping_rules.json  # 섹터 → ETF → 상위 10종목 정적 규칙
+├── mapping.py          # 규칙 적용 (첫 일치 하나)
+├── cluster_events.py   # event_id · 방향/강도 재계산 · 세션 · 기준일 · confounded
+├── event_study.py      # 종가 기준 수익률 · SPY 대비 초과 반응
+├── aggregate.py        # 창별 트렌드 · Trend Score · 반응 통계 → output/trump_analysis.json
+├── narrate.py          # (선택) Gemini 서술 → output/narrative.json
+├── render_report.py    # → output/trump_report.md
+├── prompts/classify.txt · prompts/narrate.txt
+├── data/               # trump.db + raw/posts/*.jsonl  (gitignore)
+└── output/             # 산출물 (gitignore)
+```
+
+## 실행
+
+리포 루트의 `.env`에서 `GEMINI_API_KEY`(여러 키는 `;` 구분)와 `FRED_API_KEY`를 읽는다.
+
+```powershell
+pip install -r experiments/trump-trend/requirements.txt
+
+# 전체 (분류는 한 번에 최대 40배치 = 600건. 남은 건 다음 실행이 이어받는다)
+python experiments/trump-trend/main.py
+
+# Gemini 없이 — 수집·가격·집계·렌더만
+python experiments/trump-trend/main.py --skip-classify
+
+# 분류만 조금 (3배치 = 45건)
+python experiments/trump-trend/main.py --skip-collect --skip-prices --skip-calendar --max-batches 3
+
+# Gemini 서술까지
+python experiments/trump-trend/main.py --narrate
+
+# 사전 필터 규칙을 바꾼 뒤 — 전체 행 noise_reason 재계산 (분류 결과는 유지)
+python experiments/trump-trend/main.py --refilter --skip-classify
+
+# ④ 수동 검증 표본
+python experiments/trump-trend/review_sample.py
+```
+
+첫 실행은 archive 전체(약 3만 6천 건, 2022년~)를 DB에 넣고 일봉 2년치를 받는다. 이후 실행은 새 게시물만 추가한다.
+
+## 설계 핵심
+
+- **숫자는 파이썬, 문장은 Gemini.** Gemini는 게시물에 라벨을 붙이는 입력과 집계 JSON을 문장으로 옮기는 출력, 두 자리만 맡는다.
+  시장 영향(`market_impact`)은 AI가 판단하지 않고 가격으로 계산한다.
+- **게시물 1개 ≠ 이벤트 1개.** 같은 topic+subtopic+target이 60분 이내면 하나의 `event_id`. 방향은 intensity 가중 다수결, 강도는 최대값.
+  반응 통계는 전부 이벤트 단위.
+- **노이즈는 버리지 않고 표시.** `noise_reason`(사전 필터)과 `ai_market_relevance` 0–3(Gemini)으로 용도별 임계값을 다르게 쓴다.
+  게시량 통계는 전체, 트렌드는 relevance ≥ 1, 이벤트는 ≥ 2.
+- **초과 반응.** `abn = 자산 수익률 − SPY 수익률`. MVP는 당일·익일 종가. 분 단위 컬럼은 비워 두었다.
+- **confounded 두 플래그.** `confounded_daily`는 반응 측정일에 FOMC·CPI·NFP·GDP·PCE·관찰 종목 실적이 있으면 true.
+  `confounded_intraday`는 첫 게시물 ±30분에 발표 시각(CPI/NFP/GDP/PCE 08:30 ET, FOMC 14:00 ET)이 겹치면 true.
+  통계는 clean 이벤트만, N < 20이면 표를 내지 않는다.
+- **같은 날은 관측 하나.** 일 단위 구간에서 같은 주제의 이벤트가 같은 거래일에 여럿이면 수익률이 같으므로
+  (주제, 기준일, 측정일)로 합쳐 N을 센다. 리포트의 "같은 날 합침" 수가 그 개수다.
+- **Trend Score는 가중합.** 빈도 0.35 · 강도 0.30 · 최근성 0.25 · 신규성 0.10, 성분은 순위 백분위 0–100. 곱셈 아님.
+- **비교 구간은 같은 길이끼리.** 3D/3D · 7D/7D · 30D/30D · 90D/90D. 직전 구간 데이터가 없으면 수준값만.
+
+## 기획서와 다른 점 · 알아둘 것
+
+| 항목 | 상태 |
+| --- | --- |
+| 원본 스냅샷 | Parquet 대신 **JSONL** (`data/raw/posts/YYYY-MM-DD.jsonl`). pyarrow 의존을 피했다. 내용은 같다 |
+| 분봉 | **미구현.** `event_reactions.ret_5m/15m/60m` 컬럼만 있다. 무료 분봉 백필 경로가 정해지면 붙인다 |
+| 실적 발표일 | yfinance `earnings_dates`. 관찰 종목(NVDA·TSLA·AAPL)만. 신뢰도는 보통 |
+| FOMC 일정 | `config.FOMC_DECISION_DATES` 정적 목록 (2025–2026). **연도가 바뀌면 갱신** |
+| FRED 키 없을 때 | FOMC만 반영 → `confounded_daily` 과소 판정. 로그에 경고 |
+| Gemini 무료 한도 | 배치 15건 × 최대 40배치/실행. 503(수요 폭주)은 지수 백오프, 429는 키별 60초 쿨다운. 한도 숫자는 코드에 박지 않았다 |
+| 분류 대상 범위 | 최근 90일, 최신 글부터. 첫 실행 기준 약 1,300건 → 3~4회 실행으로 백필 완료 |
+| 이벤트·반응 테이블 | 매 실행 **전부 재생성**. 규칙이 결정적이라 같은 입력 → 같은 event_id |
+| 검증 실패 항목 | `analyzed_at` NULL로 남아 다음 실행이 재시도 |
+
+## 산출물 읽는 법
+
+`output/trump_report.md`의 **데이터 상태** 절을 먼저 본다. "최근 24시간 미분류 N건" 경고가 있으면
+오늘의 발언·이벤트가 불완전하다 — 분류를 한 번 더 돌린다. **과거 반응 이력**은 clean N ≥ 20인 주제만 표가 나온다.
+그 전까지는 "표본이 쌓이는 중"으로 표시된다. 90일 백필이 끝나면 Trade/Fed 같은 큰 주제부터 표가 생긴다.
+
+## 검증 기록
+
+| 날짜 | 내용 | 결과 |
+| --- | --- | --- |
+| 2026-09-15 | 90일 백필 (3회 실행, 85배치) | 1,295건 분류 · 검증 탈락 0 · 실패 0 · 이벤트 206개 |
+| 2026-09-15 | ④ 50개 수동 검증 (`output/review_sample.md`) | 사전 필터 17/17 · Gemini 분류 30/33 · **전체 94%**. 불일치 3건은 전부 relevance/intensity가 한 단계 높은 쪽. 놓친 글 없음 |
+| 2026-09-15 | 서술(`--narrate`) 시험 | 금지 표현 검증 통과. 통계 인용 시 N 병기 확인 |
+
+검증에서 나온 조정: `Tariffs`/`Tariff` 분리 집계 → `labels.py` 정규화 추가 · 자기 재게시(`RT @realDonaldTrump…`) 원문과 이중 계산 → `self_repost` 필터 추가 ·
+같은 주제 이벤트가 같은 거래일에 여럿일 때 N 과대 → 관측일 단위로 합침.
+
+## 다음 단계 (기획서 13절)
+
+- ④ (완료) 추가 표본은 `review_sample.py --seed N` 으로 다른 50개를 뽑아 반복. Company 주제 relevance 과대 경향은 프롬프트 보강 후보
+- ⑤ Trend Score 순위가 직관과 맞는지 보고 가중치·클러스터 간격 조정. 현재 7D 이벤트가 주제당 1~2개라 2주 더 쌓인 뒤 판단
+- ⑥ 분봉 경로 결정 → `ret_5m/15m/60m` 채우기
+- ⑦ 그림자 모드 2주 후 데일리 리포트 편입 (HTML 렌더 · GitHub Actions · SQLite 상태 저장 방식 결정)
