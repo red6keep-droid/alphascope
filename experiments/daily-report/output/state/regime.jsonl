@@ -1,0 +1,2 @@
+{"date": "2026-09-15", "as_of": "2026-09-14", "score": 29, "label": "Risk-Off", "components": {"trend": 10, "breadth": 0, "volatility": 14, "rates": 0, "risk_appetite": 5}, "overall": "🔴", "breadth_ratio": 27.3, "vix": 17.1, "us10y": 4.96, "spy_ret_1d": -0.45}
+{"date": "2026-09-16", "as_of": "2026-09-15", "score": 19, "label": "Risk-Off", "components": {"trend": 0, "breadth": 0, "volatility": 14, "rates": 0, "risk_appetite": 5}, "overall": "🔴", "breadth_ratio": 18.2, "vix": 17.2, "us10y": 5.0, "spy_ret_1d": -0.46}
