@@ -35,6 +35,7 @@ import config
 import db
 import event_study
 import render_report
+import state_io
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.stderr.reconfigure(encoding="utf-8", errors="replace")
@@ -57,6 +58,8 @@ def main():
     ap.add_argument("--since-days", type=int, default=config.CLASSIFY_SINCE_DAYS)
     ap.add_argument("--narrate", action="store_true", help="Gemini 서술 생성")
     ap.add_argument("--refilter", action="store_true", help="사전 필터 규칙 변경 후 전체 행 noise_reason 재계산")
+    ap.add_argument("--import-state", metavar="PATH", help="수집 직후 분류 결과 JSONL을 DB에 붙인다 (GitHub Actions용)")
+    ap.add_argument("--export-state", metavar="PATH", help="분류 직후 분류 결과를 JSONL로 내보낸다 (GitHub Actions용)")
     args = ap.parse_args()
 
     load_dotenv(os.path.join(config.BASE_DIR, "..", "..", ".env"))
@@ -76,6 +79,8 @@ def main():
             collect_posts.collect(conn)
         except Exception as e:  # noqa: BLE001
             print(f"[posts] 실패 — 기존 DB로 계속: {e}")
+    if args.import_state:
+        state_io.import_state(conn, args.import_state)
 
     _step(2, total, "일봉 수집 (yfinance)")
     if args.skip_prices:
@@ -100,6 +105,9 @@ def main():
         print("건너뜀")
     else:
         classify_posts.classify(conn, since_days=args.since_days, max_batches=args.max_batches)
+    if args.export_state:
+        # 분류 직후 바로 내보낸다 — 뒤 단계가 실패해도 Gemini 호출 결과는 남는다.
+        state_io.export_state(conn, args.export_state)
 
     _step(5, total, "이벤트 클러스터링")
     cluster_events.build(conn)

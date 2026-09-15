@@ -1,0 +1,105 @@
+name: Trump Trend (shadow)
+
+# 트럼프 SNS 트렌드 파이프라인 — 그림자 모드. 어디에도 게시하지 않는다.
+# 산출물(리포트 MD·분석 JSON)과 다시 만들 수 없는 상태(Gemini 분류 결과)는
+# trump-state orphan 브랜치 한 커밋에 담아 force push 한다 (report-state와 같은 방식).
+
+on:
+  schedule:
+    # 매일 22:30 UTC = 07:30 KST. 미국 정규장(20:00 UTC 마감) 종가가 yfinance에 확정된 뒤,
+    # 그 사이 올라온 게시물까지 한 번에 잡는다. 주말도 돈다 — 게시물은 주말에도 올라온다.
+    - cron: '30 22 * * *'
+  workflow_dispatch:
+    inputs:
+      max_batches:
+        description: 'Gemini 분류 최대 배치 수 (배치당 15건)'
+        type: number
+        required: false
+        default: 40
+      narrate:
+        description: 'Gemini 서술 생성'
+        type: boolean
+        required: false
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: trump-trend
+  cancel-in-progress: false
+
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+  STATE_DIR: experiments/trump-trend/output/state
+
+jobs:
+  trump-trend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r experiments/trump-trend/requirements.txt
+
+      # 이전 실행의 분류 결과. 없으면 첫 실행 — 90일 백필이 여러 날에 걸쳐 진행된다.
+      # actions/checkout은 fetch refspec을 main으로 좁혀두므로 목적지 ref를 명시한다.
+      - name: Load state (trump-state branch)
+        run: |
+          if git fetch origin trump-state:refs/trump-state 2>/dev/null; then
+            mkdir -p "$STATE_DIR"
+            if git archive refs/trump-state "$STATE_DIR" | tar -x; then
+              echo "분류 결과 불러옴: $(wc -l < "$STATE_DIR/classifications.jsonl" 2>/dev/null || echo 0)행"
+            fi
+          else
+            echo "이전 상태 없음 (첫 실행)"
+          fi
+
+      - name: Run pipeline
+        run: |
+          ARGS="--import-state $STATE_DIR/classifications.jsonl --export-state $STATE_DIR/classifications.jsonl"
+          ARGS="$ARGS --max-batches ${{ inputs.max_batches || 40 }}"
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.narrate }}" = "true" ]; then
+            ARGS="$ARGS --narrate"
+          fi
+          python experiments/trump-trend/main.py $ARGS
+
+      # 분류 결과가 있으면 뒤 단계가 실패했어도 저장한다 — Gemini 호출을 헛되게 하지 않기 위해.
+      - name: Save state + report (trump-state branch)
+        if: always()
+        run: |
+          if [ ! -f "$STATE_DIR/classifications.jsonl" ]; then
+            echo "저장할 상태 없음 — 건너뜁니다."
+            exit 0
+          fi
+          OUT=experiments/trump-trend/output
+          for f in trump_report.md trump_analysis.json narrative.json; do
+            [ -f "$OUT/$f" ] && cp "$OUT/$f" "$STATE_DIR/$f"
+          done
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          # --orphan은 인덱스를 유지한다. 리셋하지 않으면 리포 전체가 커밋된다.
+          git checkout --orphan trump-state
+          git reset
+          # output/ 은 .gitignore 대상이라 -f 없이는 git add가 종료코드 1로 죽는다.
+          git add -f "$STATE_DIR"
+          git commit -m "Update trump-trend state [skip ci]" || echo "변경 없음"
+          git push --force origin trump-state:trump-state
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trump-trend-report
+          path: |
+            experiments/trump-trend/output/trump_report.md
+            experiments/trump-trend/output/trump_analysis.json
+            experiments/trump-trend/output/narrative.json
+          if-no-files-found: ignore
+          retention-days: 14

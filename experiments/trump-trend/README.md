@@ -60,6 +60,33 @@ python experiments/trump-trend/review_sample.py
 
 첫 실행은 archive 전체(약 3만 6천 건, 2022년~)를 DB에 넣고 일봉 2년치를 받는다. 이후 실행은 새 게시물만 추가한다.
 
+## 자동 실행 — GitHub Actions
+
+[`.github/workflows/trump-trend.yml`](../../.github/workflows/trump-trend.yml)이 **매일 22:30 UTC(07:30 KST)** 에 돈다. 주말 포함.
+시크릿은 기존 `GEMINI_API_KEY`·`FRED_API_KEY`를 그대로 쓴다. `workflow_dispatch`로 수동 실행도 된다.
+
+런너는 매번 빈 환경이므로 **다시 만들 수 없는 것만** 저장한다. 게시물은 archive에서, 가격·캘린더는 API에서,
+이벤트·반응은 재계산으로 매번 복원되고, Gemini 분류 결과만 `classifications.jsonl`(수백 KB)로 남긴다.
+
+```
+trump-state (orphan 브랜치, 매 실행 force push — 커밋 수가 늘지 않는다)
+└── experiments/trump-trend/output/state/
+    ├── classifications.jsonl   # id + ai_* 컬럼. 이것이 상태의 전부
+    ├── trump_report.md         # 그날 리포트 — GitHub에서 바로 읽는다
+    ├── trump_analysis.json
+    └── narrative.json
+```
+
+실행 순서: 상태 브랜치 fetch → `main.py --import-state … --export-state … --narrate` → 상태+리포트를 브랜치에 push → 아티팩트 업로드.
+분류 결과는 분류 직후 바로 내보내므로 뒤 단계가 실패해도 Gemini 호출은 낭비되지 않는다.
+첫 실행부터 90일 백필이 시작되며 하루 40배치씩 3일에 걸쳐 끝난다.
+
+로컬 실행과 배타적이지 않다. 로컬 DB에서 내보낸 파일을 상태 브랜치에 넣으면 이미 끝난 백필을 그대로 이어받는다:
+
+```powershell
+python experiments/trump-trend/main.py --skip-classify --export-state experiments/trump-trend/output/state/classifications.jsonl
+```
+
 ## 설계 핵심
 
 - **숫자는 파이썬, 문장은 Gemini.** Gemini는 게시물에 라벨을 붙이는 입력과 집계 JSON을 문장으로 옮기는 출력, 두 자리만 맡는다.
