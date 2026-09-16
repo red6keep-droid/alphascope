@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-09-16 16:17:45 UTC",
+  "updated_at": "2026-09-16 18:19:43 UTC",
   "items": [
+    {
+      "title": "Hyperscaler debt signals warning sign, Apollo cautions",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/16/hyperscaler-debt-signals-warning-sign-apollo-cautions.html",
+      "published": "2026-09-16 16:51:18",
+      "summary": "Credit default swaps for companies building data centers are getting pricier, and it's not because banks are hedging more of their bets."
+    },
     {
       "title": "Bizarre volatility bet in the options pits is a head scratcher ahead of Fed rate decision",
       "source": "CNBC",
@@ -77,13 +84,6 @@
       "link": "https://www.cnbc.com/2026/09/05/abel-two-ways-berkshire-hopes-in-cash-in-on-ai.html",
       "published": "2026-09-05 12:45:44",
       "summary": "Berkshire Hathaway CEO Greg Abel tells CNBC the company is pursuing AI opportunities on two paths."
-    },
-    {
-      "title": "Piper Sandler expects Robinhood to kickstart football season with a win",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/03/piper-sandler-expects-robinhood-to-start-football-season-with-a-win.html",
-      "published": "2026-09-03 19:01:36",
-      "summary": "With less than a week until the start of football season, Piper Sandler expects Rothera's prediction market activity to jump."
     }
   ]
 }
