@@ -34,6 +34,8 @@ import collect_prices
 import config
 import db
 import event_study
+import publish
+import render_html
 import render_report
 import state_io
 
@@ -60,6 +62,7 @@ def main():
     ap.add_argument("--refilter", action="store_true", help="사전 필터 규칙 변경 후 전체 행 noise_reason 재계산")
     ap.add_argument("--import-state", metavar="PATH", help="수집 직후 분류 결과 JSONL을 DB에 붙인다 (GitHub Actions용)")
     ap.add_argument("--export-state", metavar="PATH", help="분류 직후 분류 결과를 JSONL로 내보낸다 (GitHub Actions용)")
+    ap.add_argument("--publish", action="store_true", help="Blogger에 별도 글로 실제 게시 (없으면 dry-run)")
     args = ap.parse_args()
 
     load_dotenv(os.path.join(config.BASE_DIR, "..", "..", ".env"))
@@ -67,7 +70,7 @@ def main():
 
     t0 = time.time()
     conn = db.connect()
-    total = 8
+    total = 9
 
     _step(1, total, "게시물 수집 (CNN archive)")
     if args.refilter:
@@ -131,6 +134,16 @@ def main():
     elif os.path.exists(narrative_path):
         os.remove(narrative_path)   # 지난 실행의 문장이 오늘 표에 붙지 않게
     path = render_report.render()
+    render_html.render()
+
+    _step(9, total, "Blogger 게시 (별도 글)" + ("" if args.publish else " — dry-run"))
+    try:
+        publish.publish(do_publish=args.publish)
+    except Exception as e:  # noqa: BLE001
+        print(f"[publish] 실패: {e}")
+        if args.publish:
+            conn.close()
+            sys.exit(1)
 
     conn.close()
     print(f"\n완료 — {time.time() - t0:.0f}s · {path}")

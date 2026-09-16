@@ -26,7 +26,10 @@ experiments/trump-trend/
 ├── event_study.py      # 종가 기준 수익률 · SPY 대비 초과 반응
 ├── aggregate.py        # 창별 트렌드 · Trend Score · 반응 통계 → output/trump_analysis.json
 ├── narrate.py          # (선택) Gemini 서술 → output/narrative.json
-├── render_report.py    # → output/trump_report.md
+├── render_report.py    # → output/trump_report.md (그림자 모드 점검용)
+├── render_html.py      # → output/trump_report_body.html (Blogger 본문) + trump_report.html (미리보기)
+├── report_title.py     # 글 제목 규칙 "트럼프 발언 트렌드 — YYYY년 M월 D일" · 라벨
+├── publish.py          # Blogger 게시 (daily-report의 publish_blogger 재사용, 같은 제목 있으면 건너뜀)
 ├── prompts/classify.txt · prompts/narrate.txt
 ├── data/               # trump.db + raw/posts/*.jsonl  (gitignore)
 └── output/             # 산출물 (gitignore)
@@ -59,6 +62,25 @@ python experiments/trump-trend/review_sample.py
 ```
 
 첫 실행은 archive 전체(약 3만 6천 건, 2022년~)를 DB에 넣고 일봉 2년치를 받는다. 이후 실행은 새 게시물만 추가한다.
+
+## 게시 — 별도 글 시리즈
+
+리포트는 데일리 브리핑에 끼우지 않고 **별도 글**로 나간다 (기획서 13절 ⑦ 결정, 2026-09-16).
+
+| 항목 | 값 |
+| --- | --- |
+| 제목 | `트럼프 발언 트렌드 — 2026년 9월 16일` (같은 날짜면 같은 문자열 → 중복 게시 방지 기준) |
+| 라벨 | 트럼프 트렌드 · 미국 증시 · 자동 리포트 |
+| 본문 | `render_html.py`가 만든 `trump_report_body.html`. 오늘 한 줄 → 오늘의 발언 → 급상승 주제 → 무엇이 달라졌나 → 30일 흐름 → 과거 시장 반응 → 왜 이 종목인가 → 내일 볼 것 → 출처·면책 |
+| 게시 모듈 | `publish.py` — `experiments/daily-report/publish_blogger.py`의 OAuth 경로 재사용. Blogger 시크릿 3개 동일 |
+
+**기본은 dry-run이다.** 로컬 `main.py`도, Actions 스케줄도 `--publish`가 없으면 본문만 만들고 올리지 않는다.
+
+- 로컬 실제 게시: `python experiments/trump-trend/main.py --publish`
+- **Actions 스케줄 게시 켜기: 저장소 변수 `TRUMP_PUBLISH` = `true`** (Settings → Secrets and variables → Actions → Variables). 코드 변경 없이 그림자 모드 종료
+- Actions 수동 실행: `publish` 입력을 켠 그 실행만 게시
+
+미리보기는 `output/trump_report.html`을 브라우저로 연다. 같은 파일이 `trump-state` 브랜치에도 매일 저장된다.
 
 ## 자동 실행 — GitHub Actions
 
@@ -140,4 +162,4 @@ python experiments/trump-trend/main.py --skip-classify --export-state experiment
 - ④ (완료) 추가 표본은 `review_sample.py --seed N` 으로 다른 50개를 뽑아 반복. Company 주제 relevance 과대 경향은 프롬프트 보강 후보
 - ⑤ Trend Score 순위가 직관과 맞는지 보고 가중치·클러스터 간격 조정. 현재 7D 이벤트가 주제당 1~2개라 2주 더 쌓인 뒤 판단
 - ⑥ 분봉 경로 결정 → `ret_5m/15m/60m` 채우기
-- ⑦ 그림자 모드 2주 후 데일리 리포트 편입 (HTML 렌더 · GitHub Actions · SQLite 상태 저장 방식 결정)
+- ⑦ (구현 완료 · 게시 대기) 별도 글로 결정. HTML 렌더·게시 경로·Actions 게이트까지 있다. 그림자 모드 2주 뒤 저장소 변수 `TRUMP_PUBLISH=true`로 켠다

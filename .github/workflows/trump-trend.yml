@@ -1,8 +1,13 @@
-name: Trump Trend (shadow)
+name: Trump Trend
 
-# 트럼프 SNS 트렌드 파이프라인 — 그림자 모드. 어디에도 게시하지 않는다.
-# 산출물(리포트 MD·분석 JSON)과 다시 만들 수 없는 상태(Gemini 분류 결과)는
-# trump-state orphan 브랜치 한 커밋에 담아 force push 한다 (report-state와 같은 방식).
+# 트럼프 SNS 트렌드 파이프라인. 별도 글 시리즈("트럼프 발언 트렌드 — YYYY년 M월 D일")로 게시한다.
+#
+# 게시 게이트: 저장소 변수 TRUMP_PUBLISH 가 'true' 일 때만 스케줄 실행이 실제 게시한다.
+# (Settings → Secrets and variables → Actions → Variables). 그 전까지는 그림자 모드 —
+# 리포트는 만들지만 Blogger에 올리지 않는다. 수동 실행은 publish 입력으로 개별 결정.
+#
+# 산출물과 다시 만들 수 없는 상태(Gemini 분류 결과)는 trump-state orphan 브랜치
+# 한 커밋에 담아 force push 한다 (report-state와 같은 방식).
 
 on:
   schedule:
@@ -21,6 +26,11 @@ on:
         type: boolean
         required: false
         default: true
+      publish:
+        description: 'Blogger에 실제 게시 (false면 dry-run)'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -32,7 +42,12 @@ concurrency:
 env:
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+  BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+  BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+  BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
   STATE_DIR: experiments/trump-trend/output/state
+  # 스케줄: 저장소 변수로 결정. 수동: 입력값으로 결정.
+  DO_PUBLISH: ${{ (github.event_name == 'schedule' && vars.TRUMP_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
 
 jobs:
   trump-trend:
@@ -45,8 +60,11 @@ jobs:
         with:
           python-version: '3.12'
 
+      # publish.py가 daily-report의 publish_blogger를 가져다 쓰므로 그쪽 의존성(google-auth)도 필요하다.
       - name: Install dependencies
-        run: pip install -r experiments/trump-trend/requirements.txt
+        run: |
+          pip install -r experiments/trump-trend/requirements.txt
+          pip install -r experiments/daily-report/requirements.txt
 
       # 이전 실행의 분류 결과. 없으면 첫 실행 — 90일 백필이 여러 날에 걸쳐 진행된다.
       # actions/checkout은 fetch refspec을 main으로 좁혀두므로 목적지 ref를 명시한다.
@@ -68,6 +86,12 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.narrate }}" = "true" ]; then
             ARGS="$ARGS --narrate"
           fi
+          if [ "$DO_PUBLISH" = "true" ]; then
+            echo "게시 모드 — Blogger에 올린다."
+            ARGS="$ARGS --publish"
+          else
+            echo "그림자 모드 — 게시하지 않는다. (스케줄 게시는 저장소 변수 TRUMP_PUBLISH=true 로 켠다)"
+          fi
           python experiments/trump-trend/main.py $ARGS
 
       # 분류 결과가 있으면 뒤 단계가 실패했어도 저장한다 — Gemini 호출을 헛되게 하지 않기 위해.
@@ -79,7 +103,7 @@ jobs:
             exit 0
           fi
           OUT=experiments/trump-trend/output
-          for f in trump_report.md trump_analysis.json narrative.json; do
+          for f in trump_report.md trump_report.html trump_analysis.json narrative.json title.txt post_url.txt; do
             [ -f "$OUT/$f" ] && cp "$OUT/$f" "$STATE_DIR/$f"
           done
           git config user.name "alphascope-bot"
@@ -99,6 +123,7 @@ jobs:
           name: trump-trend-report
           path: |
             experiments/trump-trend/output/trump_report.md
+            experiments/trump-trend/output/trump_report.html
             experiments/trump-trend/output/trump_analysis.json
             experiments/trump-trend/output/narrative.json
           if-no-files-found: ignore
