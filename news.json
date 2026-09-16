@@ -1,11 +1,18 @@
 {
-  "updated_at": "2026-09-16 18:19:43 UTC",
+  "updated_at": "2026-09-16 20:18:09 UTC",
   "items": [
+    {
+      "title": "Jeff Gundlach says the Fed should have hiked rates by more to fight rising inflation",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/16/gundlach-bonds-fed-rate-hike.html",
+      "published": "2026-09-16 19:38:41",
+      "summary": "The Fed should have hiked rates by half percentage point rather than a quarter, the investor told CNBC."
+    },
     {
       "title": "Hyperscaler debt signals warning sign, Apollo cautions",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/09/16/hyperscaler-debt-signals-warning-sign-apollo-cautions.html",
-      "published": "2026-09-16 16:51:18",
+      "published": "2026-09-16 19:29:18",
       "summary": "Credit default swaps for companies building data centers are getting pricier, and it's not because banks are hedging more of their bets."
     },
     {
@@ -77,13 +84,6 @@
       "link": "https://www.cnbc.com/2026/09/05/fervo-energys-enhanced-geothermal-project-aims-to-power-data-center-boom.html",
       "published": "2026-09-05 12:20:42",
       "summary": "Power demand in the U.S. is rising. Fervo Energy bets that its project in Utah will prove that enhanced geothermal can be part of the power mix going forward."
-    },
-    {
-      "title": "Abel: Two ways Berkshire hopes to cash in on AI",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/05/abel-two-ways-berkshire-hopes-in-cash-in-on-ai.html",
-      "published": "2026-09-05 12:45:44",
-      "summary": "Berkshire Hathaway CEO Greg Abel tells CNBC the company is pursuing AI opportunities on two paths."
     }
   ]
 }
