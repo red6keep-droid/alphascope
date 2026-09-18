@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-09-18 10:17:31 UTC",
+  "updated_at": "2026-09-18 16:17:30 UTC",
   "items": [
+    {
+      "title": "AI trade rebound sparks flurry of unusually bullish options activity",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/18/ai-trade-rebound-sparks-flurry-of-unusually-bullish-options-activity.html",
+      "published": "2026-09-18 11:20:56",
+      "summary": "Options traders stormed into tech trades on Thursday."
+    },
     {
       "title": "Jeff Gundlach says the Fed should have hiked rates by more to fight rising inflation",
       "source": "CNBC",
@@ -77,13 +84,6 @@
       "link": "https://www.cnbc.com/2026/09/07/top-wall-street-analysts-like-these-3-stocks-for-the-long-haul.html",
       "published": "2026-09-07 10:37:16",
       "summary": "The ratings of these experts are backed by in-depth research of a company's financials, and thorough analysis of the factors affecting business performance."
-    },
-    {
-      "title": "This enhanced geothermal project aims to unlock gigawatts of power to fuel the data center boom",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/05/fervo-energys-enhanced-geothermal-project-aims-to-power-data-center-boom.html",
-      "published": "2026-09-05 12:20:42",
-      "summary": "Power demand in the U.S. is rising. Fervo Energy bets that its project in Utah will prove that enhanced geothermal can be part of the power mix going forward."
     }
   ]
 }
