@@ -6,8 +6,11 @@ name: Trump Trend
 # (Settings → Secrets and variables → Actions → Variables). 그 전까지는 그림자 모드 —
 # 리포트는 만들지만 Blogger에 올리지 않는다. 수동 실행은 publish 입력으로 개별 결정.
 #
-# 산출물과 다시 만들 수 없는 상태(Gemini 분류 결과)는 trump-state orphan 브랜치
-# 한 커밋에 담아 force push 한다 (report-state와 같은 방식).
+# 상태(Gemini 분류 결과 · 일봉 CSV)와 산출물은 trump-state 브랜치에 저장한다.
+# 2026-09-18부터 매일 이전 커밋 위에 새 커밋을 쌓는다 (일반 push). 특정 날의 리포트·분류 결과를
+# git log로 되찾을 수 있고, 잘못 덮어써도 전날로 돌릴 수 있다. 하루 약 150KB(압축 후).
+# 브랜치는 저장소 파일을 건드리지 않고 임시 인덱스 + commit-tree 로 만든다 — checkout 하면
+# 방금 만든 output/state 가 옛 버전으로 덮어써지기 때문이다 (gitignore 파일은 git이 보호하지 않는다).
 
 on:
   schedule:
@@ -74,6 +77,7 @@ jobs:
             mkdir -p "$STATE_DIR"
             if git archive refs/trump-state "$STATE_DIR" | tar -x; then
               echo "분류 결과 불러옴: $(wc -l < "$STATE_DIR/classifications.jsonl" 2>/dev/null || echo 0)행"
+              echo "일봉 불러옴: $(wc -l < "$STATE_DIR/daily_bars.csv" 2>/dev/null || echo 0)행 (없으면 2년치를 새로 받는다)"
             fi
           else
             echo "이전 상태 없음 (첫 실행)"
@@ -82,6 +86,7 @@ jobs:
       - name: Run pipeline
         run: |
           ARGS="--import-state $STATE_DIR/classifications.jsonl --export-state $STATE_DIR/classifications.jsonl"
+          ARGS="$ARGS --import-bars $STATE_DIR/daily_bars.csv --export-bars $STATE_DIR/daily_bars.csv"
           ARGS="$ARGS --max-batches ${{ inputs.max_batches || 40 }}"
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.narrate }}" = "true" ]; then
             ARGS="$ARGS --narrate"
@@ -108,13 +113,26 @@ jobs:
           done
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
-          # --orphan은 인덱스를 유지한다. 리셋하지 않으면 리포 전체가 커밋된다.
-          git checkout --orphan trump-state
-          git reset
-          # output/ 은 .gitignore 대상이라 -f 없이는 git add가 종료코드 1로 죽는다.
+          # 임시 인덱스에 state 디렉터리만 담아 트리를 만든다. 작업 트리와 main 인덱스는 건드리지 않는다.
+          # 경로만 만든다(-u) — 0바이트 파일이 있으면 git이 "index file smaller than expected"로 죽는다.
+          # output/ 은 .gitignore 대상이라 -f 가 필요하다.
+          export GIT_INDEX_FILE="$(mktemp -u)"
           git add -f "$STATE_DIR"
-          git commit -m "Update trump-trend state [skip ci]" || echo "변경 없음"
-          git push --force origin trump-state:trump-state
+          TREE="$(git write-tree)"
+          unset GIT_INDEX_FILE
+          if PARENT="$(git rev-parse --verify -q refs/trump-state)"; then
+            if [ "$TREE" = "$(git rev-parse "$PARENT^{tree}")" ]; then
+              echo "변경 없음 — 커밋하지 않는다."
+              exit 0
+            fi
+            COMMIT="$(git commit-tree "$TREE" -p "$PARENT" -m "Update trump-trend state [skip ci]")"
+          else
+            echo "trump-state 브랜치 없음 — 첫 커밋을 만든다."
+            COMMIT="$(git commit-tree "$TREE" -m "Update trump-trend state [skip ci]")"
+          fi
+          # force 없음: 원격이 앞서 있으면 거부된다 (concurrency 그룹이 겹침을 막지만, 거부되는 쪽이 안전하다).
+          git push origin "$COMMIT:refs/heads/trump-state"
+          echo "저장: $COMMIT"
 
       - name: Upload report artifact
         if: always()

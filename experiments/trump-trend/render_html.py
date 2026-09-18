@@ -122,6 +122,22 @@ def sec_windows(a):
     return _table(["주제", "이벤트", "평균 강도", "부정 비율", "Δ이벤트(직전 30일 대비)"], rows) + _muted("최근 30일 기준" + note)
 
 
+def _x(v):
+    if v is None:
+        return f'<span style="color:{MUTED};">—</span>'
+    weight = "bold" if v >= 1.5 else "normal"
+    return f'<span style="font-weight:{weight};">{v:.2f}×</span>'
+
+
+def _p(st):
+    pl = (st or {}).get("placebo")
+    if not pl:
+        return f'<span style="color:{MUTED};">—</span>'
+    if pl["indistinguishable"]:
+        return f'<span style="color:{MUTED};">{pl["p_two_sided"]:.2f}</span>'
+    return f'<b>{pl["p_two_sided"]:.2f}</b>'
+
+
 def sec_reactions(a):
     today_keys = []
     for e in a["recent_events"]:
@@ -129,6 +145,7 @@ def sec_reactions(a):
             if k not in today_keys:
                 today_keys.append(k)
     keys = today_keys or sorted(a["reactions"], key=lambda k: -a["reactions"][k]["counts"]["clean"])[:3]
+    noise_p = a.get("config", {}).get("placebo_noise_p", config.PLACEBO_NOISE_P)
     out = []
     waiting = []
     for k in keys:
@@ -138,23 +155,30 @@ def sec_reactions(a):
         c = blk["counts"]
         rows = []
         for sym in config.ALL_SYMBOLS:
-            st = blk["symbols"].get(sym, {}).get("close")
+            hz = blk["symbols"].get(sym, {})
+            st = hz.get("close")
             if not st or not st["publishable"]:
                 continue
-            nx = blk["symbols"][sym].get("next_close") or {}
-            rows.append([f"<b>{sym}</b>", st["n"], _pct(st["mean"]), _pct(st["median"]),
-                         f"{st['std']:.2f}" if st["std"] is not None else "—", f"{st['neg_pct']:.0f}%", _pct(nx.get("mean"))])
+            g = lambda h: (hz.get(h) or {}).get("mean") if (hz.get(h) or {}).get("publishable") else None  # noqa: E731
+            rows.append([f"<b>{sym}</b>", st["n"], _pct(g("immediate")), _pct(st["mean"]), _pct(g("next_close")),
+                         _pct(g("d5")), f"{st['neg_pct']:.0f}%", _x(g("rel_range")), _x(g("rel_volume")), _p(st)])
         if rows:
+            ik = c.get("immediate_kinds", {})
             out.append(f'<div style="margin-top:14px;font-weight:bold;">{_esc(k)} — 과거 clean 관측일 {c["clean"]}일'
-                       f'<span style="color:{MUTED};font-weight:normal;"> (이벤트 {c["total"]} · 거시 발표 겹침 제외 {c["confounded"]})</span></div>'
-                       + _table(["자산", "N", "당일 평균", "중앙값", "표준편차", "하락 비율", "익일 평균"], rows))
+                       f'<span style="color:{MUTED};font-weight:normal;"> (이벤트 {c["total"]} · 거시 발표 겹침 제외 {c["confounded"]}'
+                       f' · 장외 {ik.get("gap", 0)} / 정규장 {ik.get("intraday", 0)})</span></div>'
+                       + _table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p"], rows))
         else:
             waiting.append(f"{k} ({c['clean']}/{config.MIN_CLEAN_N})")
     if waiting:
         out.append(_muted("표본 축적 중 (clean 관측일 / 필요 20): " + ", ".join(waiting)))
     if not out:
         return _muted("오늘 이벤트 주제에 해당하는 과거 반응 데이터가 아직 없습니다.")
-    out.append(_muted(f"수치는 {config.BENCHMARK} 대비 초과 반응(%)이며, {config.BENCHMARK}만 원수익률입니다. 발언 이후 관찰된 값이고 인과를 의미하지 않습니다."))
+    out.append(_muted(
+        f"수치는 {config.BENCHMARK} 대비 초과 반응(%)이며, {config.BENCHMARK}만 원수익률입니다. "
+        f"즉각 = 장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가. 변동폭·거래량은 직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수(1.00× = 보통). "
+        f"p = 같은 자산의 발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않습니다. "
+        f"발언 이후 관찰된 값이고 인과를 의미하지 않습니다."))
     return "".join(out)
 
 

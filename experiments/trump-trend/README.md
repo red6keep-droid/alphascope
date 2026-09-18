@@ -22,9 +22,9 @@ experiments/trump-trend/
 ├── classify_posts.py   # 배치 Gemini 분류 → ai_* 컬럼 (항목별 검증)
 ├── mapping_rules.json  # 섹터 → ETF → 상위 10종목 정적 규칙
 ├── mapping.py          # 규칙 적용 (첫 일치 하나)
-├── cluster_events.py   # event_id · 방향/강도 재계산 · 세션 · 기준일 · confounded
-├── event_study.py      # 종가 기준 수익률 · SPY 대비 초과 반응
-├── aggregate.py        # 창별 트렌드 · Trend Score · 반응 통계 → output/trump_analysis.json
+├── cluster_events.py   # event_id · 방향/강도 재계산 · 세션 · 기준일 · confounded_daily
+├── event_study.py      # 일봉 OHLCV로 구간 7개(즉각·당일·익일·+3D·+5D·변동폭·거래량 배수) · SPY 대비 초과 반응 · 플라시보 풀
+├── aggregate.py        # 창별 트렌드 · Trend Score · 반응 통계 + 플라시보 검정 → output/trump_analysis.json
 ├── narrate.py          # (선택) Gemini 서술 → output/narrative.json
 ├── render_report.py    # → output/trump_report.md (그림자 모드 점검용)
 ├── render_html.py      # → output/trump_report_body.html (Blogger 본문) + trump_report.html (미리보기)
@@ -87,19 +87,23 @@ python experiments/trump-trend/review_sample.py
 [`.github/workflows/trump-trend.yml`](../../.github/workflows/trump-trend.yml)이 **매일 22:30 UTC(07:30 KST)** 에 돈다. 주말 포함.
 시크릿은 기존 `GEMINI_API_KEY`·`FRED_API_KEY`를 그대로 쓴다. `workflow_dispatch`로 수동 실행도 된다.
 
-런너는 매번 빈 환경이므로 **다시 만들 수 없는 것만** 저장한다. 게시물은 archive에서, 가격·캘린더는 API에서,
-이벤트·반응은 재계산으로 매번 복원되고, Gemini 분류 결과만 `classifications.jsonl`(수백 KB)로 남긴다.
+런너는 매번 빈 환경이므로 상태를 브랜치에 남긴다. 게시물은 archive에서, 캘린더는 API에서, 이벤트·반응은 재계산으로
+매번 복원된다. Gemini 분류 결과(`classifications.jsonl`)는 다시 만들 수 없어 저장하고, 일봉(`daily_bars.csv`)은 다시 받을 수
+있지만 yfinance가 깨지는 날에도 리포트가 나오도록 저장한다 — 덕분에 매 실행 2년치 대신 최근 한 달만 받는다.
 
 ```
-trump-state (orphan 브랜치, 매 실행 force push — 커밋 수가 늘지 않는다)
+trump-state (2026-09-18부터 매일 이전 커밋 위에 커밋 — git log 로 특정 날의 리포트·분류 결과를 되찾을 수 있다)
 └── experiments/trump-trend/output/state/
-    ├── classifications.jsonl   # id + ai_* 컬럼. 이것이 상태의 전부
+    ├── classifications.jsonl   # id + ai_* 컬럼. 다시 만들 수 없는 상태
+    ├── daily_bars.csv          # 일봉 OHLCV 전체 (약 5,500행). 있으면 1개월 갱신, 없으면 2년치 백필
     ├── trump_report.md         # 그날 리포트 — GitHub에서 바로 읽는다
-    ├── trump_analysis.json
-    └── narrative.json
+    ├── trump_report.html · trump_analysis.json · narrative.json · title.txt
 ```
 
-실행 순서: 상태 브랜치 fetch → `main.py --import-state … --export-state … --narrate` → 상태+리포트를 브랜치에 push → 아티팩트 업로드.
+실행 순서: 상태 브랜치 fetch → `main.py --import-state … --export-state … --import-bars … --export-bars … --narrate`
+→ 상태+리포트를 브랜치에 커밋·push → 아티팩트 업로드. 저장 단계는 작업 트리를 checkout 하지 않고 임시 인덱스 + `commit-tree`로
+커밋을 만든다 (checkout 하면 방금 만든 `output/state`가 옛 버전으로 덮어써진다). 트리가 전날과 같으면 커밋하지 않는다.
+push는 `--force` 없음 — 원격이 앞서 있으면 거부된다.
 분류 결과는 분류 직후 바로 내보내므로 뒤 단계가 실패해도 Gemini 호출은 낭비되지 않는다.
 첫 실행부터 90일 백필이 시작되며 하루 40배치씩 3일에 걸쳐 끝난다.
 
@@ -117,10 +121,14 @@ python experiments/trump-trend/main.py --skip-classify --export-state experiment
   반응 통계는 전부 이벤트 단위.
 - **노이즈는 버리지 않고 표시.** `noise_reason`(사전 필터)과 `ai_market_relevance` 0–3(Gemini)으로 용도별 임계값을 다르게 쓴다.
   게시량 통계는 전체, 트렌드는 relevance ≥ 1, 이벤트는 ≥ 2.
-- **초과 반응.** `abn = 자산 수익률 − SPY 수익률`. MVP는 당일·익일 종가. 분 단위 컬럼은 비워 두었다.
-- **confounded 두 플래그.** `confounded_daily`는 반응 측정일에 FOMC·CPI·NFP·GDP·PCE·관찰 종목 실적이 있으면 true.
-  `confounded_intraday`는 첫 게시물 ±30분에 발표 시각(CPI/NFP/GDP/PCE 08:30 ET, FOMC 14:00 ET)이 겹치면 true.
-  통계는 clean 이벤트만, N < 20이면 표를 내지 않는다.
+- **초과 반응.** `abn = 자산 수익률 − SPY 수익률`. 구간은 전부 일봉 OHLCV (분봉은 쓰지 않는다 — 2026-09-18 결정):
+  `immediate`(장외 게시물은 다음 개장 갭 `ret_gap`, 정규장 게시물은 시가→종가 `ret_intraday`) · `close` · `next_close` · `d3` · `d5`.
+  방향 무관 지표로 `rel_range`·`rel_volume`(측정일 (고−저)/종가 · 거래량 ÷ 직전 20거래일, 1.0 = 보통)을 함께 낸다.
+- **플라시보 검정.** publishable 통계마다 같은 자산의 비이벤트 날(이벤트 측정일·거시 발표일 제외)에서 N개를 1,000회 뽑아
+  평균 분포를 만들고, 관측 평균이 그보다 극단적인 비율을 양측 p로 낸다. p ≥ 0.10이면 `indistinguishable` — 리포트는 `~`/회색으로
+  표시하고 서술은 그 수치를 관찰 대상의 근거로 들지 않는다. 시드가 문자열이라 실행마다 같은 값이다.
+- **confounded 플래그.** `confounded_daily`는 반응 측정일에 FOMC·CPI·NFP·GDP·PCE·관찰 종목 실적이 있으면 true.
+  통계는 clean 이벤트만, N < 20이면 표를 내지 않는다. (분 단위 플래그 `confounded_intraday`는 분봉과 함께 제거했다.)
 - **같은 날은 관측 하나.** 일 단위 구간에서 같은 주제의 이벤트가 같은 거래일에 여럿이면 수익률이 같으므로
   (주제, 기준일, 측정일)로 합쳐 N을 센다. 리포트의 "같은 날 합침" 수가 그 개수다.
 - **Trend Score는 가중합.** 빈도 0.35 · 강도 0.30 · 최근성 0.25 · 신규성 0.10, 성분은 순위 백분위 0–100. 곱셈 아님.
@@ -131,7 +139,7 @@ python experiments/trump-trend/main.py --skip-classify --export-state experiment
 | 항목 | 상태 |
 | --- | --- |
 | 원본 스냅샷 | Parquet 대신 **JSONL** (`data/raw/posts/YYYY-MM-DD.jsonl`). pyarrow 의존을 피했다. 내용은 같다 |
-| 분봉 | **미구현.** `event_reactions.ret_5m/15m/60m` 컬럼만 있다. 무료 분봉 백필 경로가 정해지면 붙인다 |
+| 분봉 | **쓰지 않는다 (2026-09-18 결정).** 대신 일봉 OHLCV로 갭·장중·+3D·+5D·변동폭·거래량 배수를 잰다. 옛 `ret_5m/15m/60m`·`confounded_intraday` 컬럼은 스키마에서 제거, 옛 DB는 첫 연결 때 두 테이블을 자동 재생성 |
 | 실적 발표일 | yfinance `earnings_dates`. 관찰 종목(NVDA·TSLA·AAPL)만. 신뢰도는 보통 |
 | FOMC 일정 | `config.FOMC_DECISION_DATES` 정적 목록 (2025–2026). **연도가 바뀌면 갱신** |
 | FRED 키 없을 때 | FOMC만 반영 → `confounded_daily` 과소 판정. 로그에 경고 |
@@ -145,6 +153,7 @@ python experiments/trump-trend/main.py --skip-classify --export-state experiment
 `output/trump_report.md`의 **데이터 상태** 절을 먼저 본다. "최근 24시간 미분류 N건" 경고가 있으면
 오늘의 발언·이벤트가 불완전하다 — 분류를 한 번 더 돌린다. **과거 반응 이력**은 clean N ≥ 20인 주제만 표가 나온다.
 그 전까지는 "표본이 쌓이는 중"으로 표시된다. 90일 백필이 끝나면 Trade/Fed 같은 큰 주제부터 표가 생긴다.
+표의 `p` 열이 `~`(MD) 또는 회색(HTML)이면 그 평균은 발언 없는 날과 구분되지 않는다는 뜻이다 — 값이 커 보여도 근거로 쓰지 않는다.
 
 ## 검증 기록
 
@@ -161,5 +170,5 @@ python experiments/trump-trend/main.py --skip-classify --export-state experiment
 
 - ④ (완료) 추가 표본은 `review_sample.py --seed N` 으로 다른 50개를 뽑아 반복. Company 주제 relevance 과대 경향은 프롬프트 보강 후보
 - ⑤ Trend Score 순위가 직관과 맞는지 보고 가중치·클러스터 간격 조정. 현재 7D 이벤트가 주제당 1~2개라 2주 더 쌓인 뒤 판단
-- ⑥ 분봉 경로 결정 → `ret_5m/15m/60m` 채우기
+- ⑥ (2026-09-18 마감) 분봉은 하지 않는다. 일봉 구간 확장(즉각·+3D·+5D·배수)과 플라시보 검정으로 대신했다. 남은 후보: 주제별 거시 자산(USD/CNH·원유·10년물·금·VIX) 추가
 - ⑦ (구현 완료 · 게시 대기) 별도 글로 결정. HTML 렌더·게시 경로·Actions 게이트까지 있다. 그림자 모드 2주 뒤 저장소 변수 `TRUMP_PUBLISH=true`로 켠다

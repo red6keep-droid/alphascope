@@ -82,7 +82,17 @@ TOP_TRENDS = 10
 # ── 이벤트 스터디 (8절) ───────────────────────────────────────────────────
 BENCHMARK = "SPY"
 MIN_CLEAN_N = 20                # 미만이면 리포트에 내지 않는다
-CONFOUND_INTRADAY_MINUTES = 30  # 분봉 확보 후 사용
+# 분봉은 쓰지 않는다 (2026-09-18 결정). 일봉 OHLCV만으로 아래 구간을 잰다.
+#   immediate : 장외 게시물 → 갭(기준 종가 → 측정일 시가) · 정규장 게시물 → 장중(측정일 시가 → 종가)
+#   close / next_close / d3 / d5 : 기준 종가 대비 당일·익일·+3·+5 거래일 종가
+#   rel_range / rel_volume : 측정일 (고−저)/종가 · 거래량을 직전 REL_LOOKBACK_DAYS 거래일 기준과 나눈 배수
+CAR_DAYS = [3, 5]               # 누적 반응 창 (거래일)
+REL_LOOKBACK_DAYS = 20          # 변동폭·거래량 배수의 기준 기간
+REL_MIN_LOOKBACK = 10           # 이보다 짧으면 배수를 계산하지 않는다
+# 플라시보 — 같은 자산의 비이벤트 거래일에서 N개를 뽑은 평균 분포와 비교한다 (결정적 시드).
+PLACEBO_RESAMPLES = 1000
+PLACEBO_MIN_POOL = 120          # 비이벤트 거래일이 이보다 적으면 검정하지 않는다
+PLACEBO_NOISE_P = 0.10          # 양측 p가 이 값 이상이면 "무작위 날과 구분되지 않음"
 # 기존 collect_yahoo.py 유니버스와 겹치는 심볼은 그쪽 일봉을 그대로 쓸 수 있지만,
 # 이 파이프라인은 독립 실행을 위해 자체 daily_bars 테이블을 채운다.
 UNIVERSE = {

@@ -15,6 +15,11 @@
 - data_status.posts_pending_recent 가 0보다 크면 첫 문장에서 최근 게시물 중 분류가 끝나지 않은 것이 있음을 밝힌다.
   posts_pending_all_time 은 인용하지 않는다 — 분류 범위(classify_since_days) 밖의 오래된 글이라 리포트와 무관하다.
 - reactions 통계를 인용할 때는 N을 함께 쓴다. 예: "과거 Tariff 이벤트 31건에서 SMH는 당일 평균 -0.71% 초과 반응이 관찰됐다."
+- reactions 구간: immediate(즉각 — 장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가), close(당일), next_close(익일), d3/d5(+3·+5거래일),
+  rel_range/rel_volume(변동폭·거래량 배수, unit "x", 1.0이 보통). 배수는 "평소의 1.6배"처럼 쓰고 %로 쓰지 않는다.
+- 통계에 placebo가 있으면 그 판단을 따른다. indistinguishable이 true(p ≥ 0.10)이면 그 수치를 관찰 대상의 근거로 들지 않고,
+  굳이 언급할 때는 "발언 없는 날과 구분되지 않았다"고 쓴다. false이면 "발언 없는 날 대비 드문 크기(p=0.03)"처럼 p를 병기한다.
+  placebo가 없는 통계는 p를 언급하지 않는다.
 - trend_scores 가 비어 있으면 what_changed 는 데이터가 아직 부족하다는 한 문장으로 끝낸다.
 
 분석 JSON:

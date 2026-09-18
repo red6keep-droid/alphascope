@@ -62,6 +62,8 @@ def main():
     ap.add_argument("--refilter", action="store_true", help="사전 필터 규칙 변경 후 전체 행 noise_reason 재계산")
     ap.add_argument("--import-state", metavar="PATH", help="수집 직후 분류 결과 JSONL을 DB에 붙인다 (GitHub Actions용)")
     ap.add_argument("--export-state", metavar="PATH", help="분류 직후 분류 결과를 JSONL로 내보낸다 (GitHub Actions용)")
+    ap.add_argument("--import-bars", metavar="PATH", help="일봉 수집 전에 보존된 일봉 CSV를 DB에 붙인다 (GitHub Actions용)")
+    ap.add_argument("--export-bars", metavar="PATH", help="일봉 수집 직후 일봉 전체를 CSV로 내보낸다 (GitHub Actions용)")
     ap.add_argument("--publish", action="store_true", help="Blogger에 별도 글로 실제 게시 (없으면 dry-run)")
     args = ap.parse_args()
 
@@ -86,6 +88,8 @@ def main():
         state_io.import_state(conn, args.import_state)
 
     _step(2, total, "일봉 수집 (yfinance)")
+    if args.import_bars:
+        state_io.import_bars(conn, args.import_bars)
     if args.skip_prices:
         print("건너뜀")
     else:
@@ -93,6 +97,8 @@ def main():
             collect_prices.collect(conn, force_backfill=args.backfill_prices)
         except Exception as e:  # noqa: BLE001
             print(f"[prices] 실패 — 기존 일봉으로 계속: {e}")
+    if args.export_bars:
+        state_io.export_bars(conn, args.export_bars)
 
     _step(3, total, "거시 캘린더")
     if args.skip_calendar:

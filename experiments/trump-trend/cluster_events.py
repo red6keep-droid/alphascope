@@ -1,4 +1,4 @@
-"""게시물 → 이벤트 클러스터링 (기획서 6절) + 세션·기준일·confounded (8절).
+"""게시물 → 이벤트 클러스터링 (기획서 6절) + 세션·기준일·confounded_daily (8절).
 
 매 실행마다 이벤트를 전부 다시 만든다. 규칙이 결정적이므로 같은 입력이면 같은 event_id가 나온다.
 """
@@ -18,10 +18,6 @@ import mapping
 
 ET = ZoneInfo("America/New_York")
 UTC = datetime.timezone.utc
-
-# 거시 발표 시각(ET) — confounded_intraday 근사. 분봉 확보 전에도 판정할 수 있게.
-RELEASE_TIME_ET = {"FOMC": (14, 0), "CPI": (8, 30), "NFP": (8, 30), "GDP": (8, 30), "PCE": (8, 30)}
-
 
 def _parse(ts):
     return datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
@@ -82,20 +78,10 @@ def _weighted_direction(posts):
     return ranked[0][0]
 
 
-def _confounds(conn, t_utc, effective_day):
+def _confounds(conn, effective_day):
+    """측정일에 거시 발표·관찰 종목 실적이 있으면 confounded_daily. 분 단위 플래그는 없다 (분봉 미사용)."""
     labels = calendar_macro.labels_on(conn, effective_day) if effective_day else []
-    daily = 1 if labels else 0
-    intraday = 0
-    t = t_utc.astimezone(ET)
-    for lab in labels:
-        kind = lab.split(":", 1)[0]
-        if kind not in RELEASE_TIME_ET or t.strftime("%Y-%m-%d") != effective_day:
-            continue
-        h, m = RELEASE_TIME_ET[kind]
-        release = t.replace(hour=h, minute=m, second=0, microsecond=0)
-        if abs((t - release).total_seconds()) <= config.CONFOUND_INTRADAY_MINUTES * 60:
-            intraday = 1
-    return daily, intraday, labels
+    return (1 if labels else 0), labels
 
 
 def load_candidates(conn):
@@ -163,7 +149,7 @@ def build(conn):
             "mentioned_companies": list(dict.fromkeys(mentioned)),
         })
         baseline, effective = _baseline_and_effective(t0, trading_days)
-        c_daily, c_intra, labels = _confounds(conn, t0, effective)
+        c_daily, labels = _confounds(conn, effective)
 
         rows.append({
             "event_id": event_id, "topic": topic, "subtopic": first["ai_subtopic"] or "",
@@ -177,7 +163,7 @@ def build(conn):
             "affected_companies": db.dumps(affected),
             "market_session": _session(t0, trading_set),
             "baseline_day": baseline, "effective_day": effective,
-            "confounded_intraday": c_intra, "confounded_daily": c_daily,
+            "confounded_daily": c_daily,
             "confound_labels": db.dumps(labels),
         })
         conn.executemany("UPDATE trump_posts SET event_id = ? WHERE id = ?",
@@ -188,12 +174,12 @@ def build(conn):
            (event_id, topic, subtopic, target, first_post_at, last_post_at, post_count,
             event_direction, event_intensity, mapping_rule_id, mentioned_companies, affected_companies,
             market_session, baseline_day, effective_day,
-            confounded_intraday, confounded_daily, confound_labels)
+            confounded_daily, confound_labels)
            VALUES
            (:event_id, :topic, :subtopic, :target, :first_post_at, :last_post_at, :post_count,
             :event_direction, :event_intensity, :mapping_rule_id, :mentioned_companies, :affected_companies,
             :market_session, :baseline_day, :effective_day,
-            :confounded_intraday, :confounded_daily, :confound_labels)""",
+            :confounded_daily, :confound_labels)""",
         rows,
     )
     conn.commit()

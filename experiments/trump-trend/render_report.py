@@ -84,14 +84,30 @@ def section_windows(a):
     return "\n".join(out)
 
 
+def _x(v):
+    return "—" if v is None else f"{v:.2f}×"
+
+
+def _p(st):
+    pl = (st or {}).get("placebo")
+    if not pl:
+        return "—"
+    return f"{pl['p_two_sided']:.2f}" + ("~" if pl["indistinguishable"] else "")
+
+
 def section_reactions(a):
-    """오늘 이벤트 주제의 과거 반응. publishable(N ≥ MIN_CLEAN_N)만 표로, 나머지는 축적 현황."""
+    """오늘 이벤트 주제의 과거 반응. publishable(N ≥ MIN_CLEAN_N)만 표로, 나머지는 축적 현황.
+
+    구간은 전부 일봉: 즉각(장외 글은 갭, 정규장 글은 시가→종가) · 당일 · 익일 · +3D · +5D 초과 반응(%),
+    변동폭·거래량 배수(1.0 = 직전 20거래일 보통). p는 플라시보 양측 p, '~'는 무작위 날과 구분되지 않음.
+    """
     today_keys = []
     for e in a["recent_events"]:
         for k in (f"{e['topic']} / {e['subtopic']}" if e["subtopic"] else None, e["topic"]):
             if k and k not in today_keys:
                 today_keys.append(k)
     keys = today_keys or sorted(a["reactions"], key=lambda k: -a["reactions"][k]["counts"]["clean"])[:5]
+    noise_p = a.get("config", {}).get("placebo_noise_p", config.PLACEBO_NOISE_P)
 
     out = []
     for k in keys:
@@ -99,21 +115,31 @@ def section_reactions(a):
         if not blk:
             continue
         c = blk["counts"]
+        ik = c.get("immediate_kinds", {})
         head = (f"**{k}** — 이벤트 {c['total']} · clean 관측일 {c['clean']} · confounded {c['confounded']}"
-                f" · 같은 날 합침 {c.get('same_day_merged', 0)} · 종가 대기 {c['pending']}")
+                f" · 같은 날 합침 {c.get('same_day_merged', 0)} · 종가 대기 {c['pending']}"
+                f" · 즉각 구간: 갭 {ik.get('gap', 0)} / 장중 {ik.get('intraday', 0)}")
         rows = []
         for sym in config.ALL_SYMBOLS:
-            st = blk["symbols"].get(sym, {}).get("close")
+            hz = blk["symbols"].get(sym, {})
+            st = hz.get("close")
             if not st or not st["publishable"]:
                 continue
-            nx = blk["symbols"][sym].get("next_close") or {}
-            rows.append([sym, st["n"], _pct(st["mean"]), _pct(st["median"]), f"{st['std']:.2f}" if st["std"] is not None else "—",
-                         f"{st['neg_pct']:.0f}%", _pct(nx.get("mean"))])
+            g = lambda h: (hz.get(h) or {}).get("mean") if (hz.get(h) or {}).get("publishable") else None  # noqa: E731
+            rows.append([sym, st["n"], _pct(g("immediate")), _pct(st["mean"]), _pct(st["median"]),
+                         _pct(g("next_close")), _pct(g("d3")), _pct(g("d5")), f"{st['neg_pct']:.0f}%",
+                         _x(g("rel_range")), _x(g("rel_volume")), _p(st)])
         if rows:
-            out.append(head + "\n\n" + _table(["자산", "N", "당일 Mean", "Median", "Std", "Neg%", "익일 Mean"], rows))
+            out.append(head + "\n\n" + _table(
+                ["자산", "N", "즉각", "당일", "중앙값", "익일", "+3D", "+5D", "Neg%", "변동폭", "거래량", "p"], rows))
         else:
             out.append(head + f"\n\n_clean N이 {config.MIN_CLEAN_N} 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._\n")
-    return "\n".join(out) if out else "_오늘 이벤트에 해당하는 주제가 없다._\n"
+    if not out:
+        return "_오늘 이벤트에 해당하는 주제가 없다._\n"
+    out.append(f"_즉각 = 장외 게시물은 다음 개장 갭, 정규장 게시물은 시가→종가. 변동폭·거래량은 직전 {config.REL_LOOKBACK_DAYS}거래일 대비 배수. "
+               f"p = 같은 자산의 비이벤트 날에서 N개를 뽑은 평균이 관측 평균보다 극단적인 비율(양측, {config.PLACEBO_RESAMPLES}회). "
+               f"{noise_p:.2f} 이상(~)이면 무작위 날과 구분되지 않는다._\n")
+    return "\n".join(out)
 
 
 def section_why(a):
@@ -156,7 +182,7 @@ def render(analysis_path=None, narrative_path=None, output_path=None):
         "## 🔥 급상승 트렌드 (7D · Trend Score)", section_trends(a),
         "## 무엇이 달라졌나", section_narrative(n, "what_changed", "Gemini 서술 없음 (--narrate 로 생성)"),
         "## 창별 트렌드", section_windows(a),
-        "## 과거 반응 이력 (clean 이벤트 · SPY 대비 초과 반응 · 단위 %)", section_reactions(a),
+        "## 과거 반응 이력 (clean 이벤트 · SPY 대비 초과 반응 % · 배수 · 플라시보 p)", section_reactions(a),
         "## 왜 이 종목인가", section_why(a),
         "## 내일 볼 것", section_narrative(n, "watch_tomorrow", "Gemini 서술 없음 (--narrate 로 생성)"),
     ]

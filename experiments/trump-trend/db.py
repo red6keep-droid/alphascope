@@ -52,27 +52,33 @@ CREATE TABLE IF NOT EXISTS trump_events (
     market_session      TEXT,   -- regular / pre / after / closed
     baseline_day        TEXT,   -- 기준 종가의 거래일 (YYYY-MM-DD)
     effective_day       TEXT,   -- 반응을 재는 거래일 D
-    confounded_intraday INTEGER DEFAULT 0,
-    confounded_daily    INTEGER DEFAULT 0,
+    confounded_daily    INTEGER DEFAULT 0,   -- 측정일에 FOMC·CPI·NFP·GDP·PCE·관찰 종목 실적
     confound_labels     TEXT    -- JSON array
 );
 CREATE INDEX IF NOT EXISTS idx_events_first ON trump_events(first_post_at);
 CREATE INDEX IF NOT EXISTS idx_events_topic ON trump_events(topic, subtopic, target);
 
+-- 이벤트 × 자산. 전부 일봉 OHLCV로 계산 (분봉 없음, 2026-09-18 결정).
+-- ret_* 는 기준 종가 대비 수익률, abn_* 는 같은 구간의 SPY 수익률을 뺀 초과 반응 (SPY 행은 NULL).
+-- rel_* 는 배수 (1.0 = 직전 20거래일 기준과 같음). 방향 무관.
 CREATE TABLE IF NOT EXISTS event_reactions (
     event_id        TEXT NOT NULL,
     symbol          TEXT NOT NULL,
     baseline_price  REAL,
-    ret_close       REAL,
-    ret_next_close  REAL,
-    ret_5m          REAL,
-    ret_15m         REAL,
-    ret_60m         REAL,
+    ret_gap         REAL,   -- open(D) / baseline − 1        장외 게시물의 즉각 반응
+    ret_intraday    REAL,   -- close(D) / open(D) − 1        정규장 게시물의 즉각 반응
+    ret_close       REAL,   -- close(D) / baseline − 1
+    ret_next_close  REAL,   -- close(D+1) / baseline − 1
+    ret_d3          REAL,   -- close(D+3) / baseline − 1
+    ret_d5          REAL,   -- close(D+5) / baseline − 1
+    abn_gap         REAL,
+    abn_intraday    REAL,
     abn_close       REAL,
     abn_next_close  REAL,
-    abn_5m          REAL,
-    abn_15m         REAL,
-    abn_60m         REAL,
+    abn_d3          REAL,
+    abn_d5          REAL,
+    rel_range       REAL,   -- ((high−low)/close)(D) ÷ 직전 20거래일 중앙값
+    rel_volume      REAL,   -- volume(D) ÷ 직전 20거래일 평균
     PRIMARY KEY (event_id, symbol)
 );
 
@@ -105,10 +111,17 @@ def connect(path=None):
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
+    _drop_legacy(conn)
     conn.executescript(SCHEMA)
     _migrate(conn)
     return conn
 
+
+# 매 실행 전부 재생성되는 테이블은 옛 스키마가 보이면 지우고 새로 만든다. (table, legacy_column)
+_REBUILD_IF_HAS = [
+    ("trump_events", "confounded_intraday"),     # 분봉 플래그 제거 (2026-09-18)
+    ("event_reactions", "ret_5m"),               # 분봉 컬럼 → 갭·장중·+3D·+5D·배수
+]
 
 # 이미 만들어진 DB에 컬럼이 추가될 때. (table, column, decl)
 _MIGRATIONS = [
@@ -116,10 +129,21 @@ _MIGRATIONS = [
 ]
 
 
+def _columns(conn, table):
+    return {r["name"] for r in conn.execute(f"PRAGMA table_info({table})")}
+
+
+def _drop_legacy(conn):
+    for table, legacy in _REBUILD_IF_HAS:
+        if legacy in _columns(conn, table):
+            conn.execute(f"DROP TABLE {table}")
+            print(f"[db] {table}: 옛 스키마({legacy}) → 다음 단계에서 재생성")
+    conn.commit()
+
+
 def _migrate(conn):
     for table, column, decl in _MIGRATIONS:
-        cols = {r["name"] for r in conn.execute(f"PRAGMA table_info({table})")}
-        if column not in cols:
+        if column not in _columns(conn, table):
             conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
     conn.commit()
 

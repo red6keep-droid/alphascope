@@ -1,4 +1,4 @@
-"""집계 — 창별 트렌드 · Trend Score · 반응 통계 · 오늘의 이벤트 (기획서 7·8·10절).
+"""집계 — 창별 트렌드 · Trend Score · 반응 통계(+플라시보) · 오늘의 이벤트 (기획서 7·8·10절).
 
 전부 파이썬이 계산한다. 출력은 output/trump_analysis.json 하나. Gemini는 이 JSON을 설명만 한다.
 """
@@ -6,12 +6,14 @@
 import datetime
 import json
 import os
+import random
 import statistics
 import sys
 from collections import defaultdict
 
 import config
 import db
+import event_study
 import mapping
 
 UTC = datetime.timezone.utc
@@ -198,26 +200,98 @@ def new_entrants(events, now):
 
 
 # ── 반응 통계 ────────────────────────────────────────────────────────────
+#
+# 구간(horizon) 7개. 전부 일봉 OHLCV (분봉 없음, 2026-09-18 결정).
+#   immediate  장외 게시물은 갭(abn_gap), 정규장 게시물은 장중(abn_intraday). 이벤트마다 종류가 다르다.
+#   close · next_close · d3 · d5   기준 종가 대비 초과 반응 (%)
+#   rel_range · rel_volume         변동폭·거래량 배수 (1.0 = 보통). 방향 무관, SPY 차감 없음
+HORIZONS = ["immediate", "close", "next_close", "d3", "d5", "rel_range", "rel_volume"]
+RATIO_HORIZONS = {"rel_range", "rel_volume"}
 
-def _stats(values):
-    vals = [v for v in values if v is not None]
+
+def _col(sym, hz):
+    if hz in RATIO_HORIZONS:
+        return hz
+    return f"ret_{hz}" if sym == config.BENCHMARK else f"abn_{hz}"
+
+
+def _immediate_kind(e):
+    return "intraday" if e["market_session"] == "regular" else "gap"
+
+
+def _stats(obs, ratio=False):
+    """obs = [(kind, value)] → 요약. ratio면 배수(중심 1)로 다룬다. 값이 없으면 None."""
+    vals = [v for _, v in obs if v is not None]
     if not vals:
         return None
+    if ratio:
+        mean, med = statistics.fmean(vals), statistics.median(vals)
+        std = statistics.pstdev(vals) if len(vals) > 1 else None
+        pos, neg = sum(v > 1 for v in vals), sum(v < 1 for v in vals)
+        rnd = lambda x: None if x is None else round(x, 2)   # noqa: E731
+    else:
+        mean, med = statistics.fmean(vals) * 100, statistics.median(vals) * 100
+        std = statistics.pstdev(vals) * 100 if len(vals) > 1 else None
+        pos, neg = sum(v > 0 for v in vals), sum(v < 0 for v in vals)
+        rnd = lambda x: None if x is None else round(x, 3)   # noqa: E731
     return {
-        "n": len(vals),
-        "mean": round(statistics.mean(vals) * 100, 3),
-        "median": round(statistics.median(vals) * 100, 3),
-        "std": round(statistics.pstdev(vals) * 100, 3) if len(vals) > 1 else None,
-        "pos_pct": round(sum(v > 0 for v in vals) / len(vals) * 100, 1),
-        "neg_pct": round(sum(v < 0 for v in vals) / len(vals) * 100, 1),
+        "n": len(vals), "unit": "x" if ratio else "pct",
+        "mean": rnd(mean), "median": rnd(med), "std": rnd(std),
+        "pos_pct": round(pos / len(vals) * 100, 1),
+        "neg_pct": round(neg / len(vals) * 100, 1),
         "publishable": len(vals) >= config.MIN_CLEAN_N,
     }
 
 
-def reaction_stats(events):
-    """(topic 또는 topic/subtopic) × symbol × horizon → 통계. clean 이벤트만."""
-    groups = defaultdict(lambda: defaultdict(lambda: {"close": [], "next_close": []}))
-    counts = defaultdict(lambda: {"total": 0, "clean": 0, "confounded": 0, "pending": 0, "same_day_merged": 0})
+def _placebo(obs, pool, seed, ratio=False):
+    """관측 평균이 '보통 날' N개 평균 분포에서 얼마나 극단적인가 (양측 p).
+
+    obs의 kind별 개수만큼 해당 kind의 풀에서 복원 추출해 평균을 만든다. 시드는 문자열이라 실행마다 같다.
+    풀이 PLACEBO_MIN_POOL보다 작으면 검정하지 않는다(None).
+    """
+    kinds = defaultdict(int)
+    vals = []
+    for kind, v in obs:
+        if v is not None:
+            kinds[kind] += 1
+            vals.append(v)
+    if not vals or any(len(pool.get(k, [])) < config.PLACEBO_MIN_POOL for k in kinds):
+        return None
+    center = 1.0 if ratio else 0.0
+    obs_mean = statistics.fmean(vals)
+    dist = abs(obs_mean - center)
+    rng = random.Random(seed)
+    n = len(vals)
+    extreme = 0
+    for _ in range(config.PLACEBO_RESAMPLES):
+        total = 0.0
+        for k, cnt in kinds.items():
+            total += sum(rng.choices(pool[k], k=cnt))
+        if abs(total / n - center) >= dist:
+            extreme += 1
+    union = [v for k in kinds for v in pool[k]]
+    base_neg = sum(v < center for v in union) / len(union) * 100
+    p = (extreme + 1) / (config.PLACEBO_RESAMPLES + 1)     # 0이 되지 않게 — 최소 1/(B+1)
+    return {
+        "p_two_sided": round(p, 3),
+        "pool_n": min(len(pool[k]) for k in kinds),
+        "pool_neg_pct": round(base_neg, 1),
+        "pool_mean": round(statistics.fmean(union) * (1 if ratio else 100), 3),
+        "indistinguishable": p >= config.PLACEBO_NOISE_P,
+    }
+
+
+def _exclude_days(conn, events):
+    days = {e["effective_day"] for e in events if e["effective_day"]}
+    days |= {r["day"] for r in conn.execute("SELECT DISTINCT day FROM macro_calendar")}
+    return days
+
+
+def reaction_stats(events, conn=None):
+    """(topic 또는 topic/subtopic) × symbol × horizon → 통계 (+ 플라시보). clean 이벤트만."""
+    groups = defaultdict(lambda: defaultdict(lambda: {hz: [] for hz in HORIZONS}))
+    counts = defaultdict(lambda: {"total": 0, "clean": 0, "confounded": 0, "pending": 0, "same_day_merged": 0,
+                                  "immediate_kinds": {"gap": 0, "intraday": 0}})
     # 일 단위 구간에서는 같은 주제의 이벤트가 같은 거래일에 여럿 있어도 관측값은 하나다
     # (기준일·측정일이 같으면 수익률이 같다). N을 부풀리지 않기 위해 (주제, 기준일, 측정일)로 합친다.
     seen_day = set()
@@ -237,21 +311,28 @@ def reaction_stats(events):
                 continue
             seen_day.add(day_key)
             counts[gkey]["clean"] += 1
+            ik = _immediate_kind(e)
+            counts[gkey]["immediate_kinds"][ik] += 1
             for sym, r in e["reactions"].items():
-                col_c = "ret_close" if sym == config.BENCHMARK else "abn_close"
-                col_n = "ret_next_close" if sym == config.BENCHMARK else "abn_next_close"
-                groups[gkey][sym]["close"].append(r.get(col_c))
-                groups[gkey][sym]["next_close"].append(r.get(col_n))
+                g = groups[gkey][sym]
+                g["immediate"].append((ik, r.get(_col(sym, ik))))
+                for hz in HORIZONS[1:]:
+                    g[hz].append((hz, r.get(_col(sym, hz))))
 
+    pools = event_study.placebo_pools(conn, _exclude_days(conn, events)) if conn is not None else {}
     out = {}
     for gkey, syms in groups.items():
-        out[gkey] = {
-            "counts": counts[gkey],
-            "symbols": {
-                sym: {h: _stats(vals) for h, vals in horizons.items()}
-                for sym, horizons in syms.items()
-            },
-        }
+        sym_out = {}
+        for sym, horizons in syms.items():
+            hz_out = {}
+            for hz, obs in horizons.items():
+                ratio = hz in RATIO_HORIZONS
+                st = _stats(obs, ratio)
+                if st and st["publishable"] and sym in pools:
+                    st["placebo"] = _placebo(obs, pools[sym], f"{gkey}|{sym}|{hz}", ratio)
+                hz_out[hz] = st
+            sym_out[sym] = hz_out
+        out[gkey] = {"counts": counts[gkey], "symbols": sym_out}
     for gkey, c in counts.items():
         out.setdefault(gkey, {"counts": c, "symbols": {}})
     return out
@@ -293,6 +374,8 @@ def build(conn, now=None, output_path=None):
             "windows_days": config.WINDOWS_DAYS, "trend_weights": config.TREND_WEIGHTS,
             "min_clean_n": config.MIN_CLEAN_N, "cluster_gap_minutes": config.CLUSTER_GAP_MINUTES,
             "benchmark": config.BENCHMARK, "universe": config.ALL_SYMBOLS,
+            "horizons": HORIZONS, "car_days": config.CAR_DAYS, "rel_lookback_days": config.REL_LOOKBACK_DAYS,
+            "placebo_resamples": config.PLACEBO_RESAMPLES, "placebo_noise_p": config.PLACEBO_NOISE_P,
         },
         "data_status": {
             "posts_total": conn.execute("SELECT COUNT(*) FROM trump_posts").fetchone()[0],
@@ -317,7 +400,7 @@ def build(conn, now=None, output_path=None):
         "trend_scores": trend_scores(events, now),
         "new_entrants": new_entrants(events, now),
         "windows": window_trends(events, now),
-        "reactions": reaction_stats(events),
+        "reactions": reaction_stats(events, conn),
     }
     output_path = output_path or os.path.join(config.OUTPUT_DIR, "trump_analysis.json")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
