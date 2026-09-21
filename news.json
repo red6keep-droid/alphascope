@@ -1,6 +1,20 @@
 {
-  "updated_at": "2026-09-21 15:02:48 UTC",
+  "updated_at": "2026-09-21 20:23:04 UTC",
   "items": [
+    {
+      "title": "Investors discover their new favorite consumer AI play in Meta. Options volume is surging",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/21/meta-investors-discover-new-ai-play.html",
+      "published": "2026-09-21 20:13:33",
+      "summary": "Shares of the social media giant surged 12% Monday."
+    },
+    {
+      "title": "Historic lawsuit sparks flurry of option activity in this stock",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/21/historic-lawsuit-sparks-flurry-of-option-activity-in-ny-times-stock.html",
+      "published": "2026-09-21 16:55:41",
+      "summary": "While President Donald Trump's war with the networks dominates the headlines, a far more consequential fight is unfolding in a Lower Manhattan courthouse."
+    },
     {
       "title": "Top Wall Street analysts find these 3 stocks attractive as long-term investments",
       "source": "CNBC",
@@ -70,20 +84,6 @@
       "link": "https://www.cnbc.com/2026/09/13/top-wall-street-analysts-recommend-these-3-dividend-stocks-for-higher-returns.html",
       "published": "2026-09-13 11:53:35",
       "summary": "The ratings of these experts are backed by in-depth research of a company's financials, and thorough analysis of the factors affecting business performance."
-    },
-    {
-      "title": "Oil's roundtrip back to $100. Why China could determine what happens next",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/12/oils-roundtrip-back-to-100-why-china-could-determine-what-happens-next.html",
-      "published": "2026-09-12 12:40:05",
-      "summary": "The U.S. crude oil price on Thursday topped $102 per barrel for its highest close since May."
-    },
-    {
-      "title": "Why data centers could be the next big market for catastrophe bonds",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/12/ai-data-centers-catastrophe-bonds-insurance.html",
-      "published": "2026-09-12 05:00:01",
-      "summary": "CAT bonds, or catastrophe bonds, could bring data center risk to capital markets, with the first dedicated deal potentially emerging within 12 to 18 months."
     }
   ]
 }
