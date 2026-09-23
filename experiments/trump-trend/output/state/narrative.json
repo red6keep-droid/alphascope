@@ -1,12 +1,12 @@
 {
   "what_changed": [
-    "Regulation / Artificial Intelligence 주제는 직전 7일간 0건에서 최근 7일간 2건으로 빈도가 늘어났으며, 평균 강도는 6.5, 트렌드 점수는 70.0점으로 나타났다.",
-    "Trade / Potash Import 주제는 지난 90일 대비 신규 등장하여 최근 7일간 1건의 이벤트가 발생했으며, 평균 강도는 7, 트렌드 점수는 63.3점으로 관찰됐다.",
-    "신규 유입 대상으로는 Belarus, Denmark, Russia 국가와 LMT 자산이 나타났다."
+    "Regulation / Artificial Intelligence 주제는 직전 7일간 0건에서 최근 7일간 2건으로 빈도가 늘어났으며, 평균 강도는 6.5로 나타났다.",
+    "Regulation / EPA Rollback(점수 69.6), Trade / Potash Import(점수 67.5), Geopolitics / Greenland Agreement(점수 61.1) 등 다수의 주제가 최근 90일 내 신규 주제로 나타났다.",
+    "신규 진입 대상으로는 Utilities, Denmark, Belarus, Russia와 자산 기호 LMT가 관찰됐다."
   ],
   "watch_tomorrow": [
-    "과거 Regulation 이벤트 22건에서 XLI는 당일 평균 -0.384%의 초과 반응이 발언 없는 날 대비 드문 크기(p=0.004)로 관찰됐다.",
-    "과거 Geopolitics 이벤트 30건에서 XLV는 +3거래일 평균 1.324%의 초과 반응이 발언 없는 날 대비 드문 크기(p=0.003)로 관찰됐다.",
-    "XLI와 XLV가 관찰 대상으로 나타났다."
+    "과거 Regulation 이벤트 23건에서 XLI는 당일 평균 -0.429% 반응이 발언 없는 날 대비 드문 크기(p=0.001)로 관찰됐으며, 이에 따라 관찰 대상으로 나타났다.",
+    "과거 Regulation 이벤트 22건에서 AAPL은 +3거래일 평균 1.956% 반응이 발언 없는 날 대비 드문 크기(p=0.006)로 관찰됐으며, 이에 따라 관찰 대상으로 나타났다.",
+    "과거 Regulation 이벤트 22건에서 XLE는 +5거래일 평균 1.811% 반응이 발언 없는 날 대비 드문 크기(p=0.036)로 나타났으며, 이에 따라 관찰 대상으로 나타났다."
   ]
 }
