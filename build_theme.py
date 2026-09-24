@@ -819,7 +819,7 @@ FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic N
 
   <img src="__COVER__" alt="데일리 브리핑 커버 이미지" style="width:100%;max-width:1024px;border-radius:8px;margin:0 0 16px 0;display:block;"/>
 
-  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">오늘의 시장 요약</h2>
+  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">오늘 한 줄</h2>
   <div><div>오늘 미국 증시는 3대 지수가 일제히 상승 마감했습니다. 반도체 섹터가 상승을 주도한 가운데
   소프트웨어와 온라인 서비스가 뒤를 받쳤고, 변동성 지수는 15선 아래에서 안정적인 흐름을 유지했습니다.</div></div>
 
@@ -897,7 +897,7 @@ FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic N
     <li><a href="#" style="color:#1a73e8;">연준 위원 "금리 인하 서두를 필요 없다"</a> — Reuters</li>
   </ul>
 
-  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">종합 의견</h2>
+  <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">종합 — 현재 시장 상태</h2>
   <div><div>상승 추세는 유지되나 지수 상승분이 소수 대형주에 쏠려 있어 참여폭을 함께 봐야 합니다.</div>
   <div>금리 여건은 중립이며 연준의 다음 신호를 기다리는 국면입니다.</div></div>
 
