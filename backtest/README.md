@@ -6,8 +6,9 @@
 | 파일 | 내용 | 출처 · 다시 받기 |
 | --- | --- | --- |
 | `data/bars.pkl` | S&P 500 500종목 + 섹터 ETF 11 + SPY + VIX 일봉 (OHLCV, 분할·배당 반영) · 68 MB | yfinance · `.venv/bin/python experiments/signal-study/main.py --refresh-prices` |
-| `data/universe.csv` | S&P 500 종목 · GICS 섹터 · 섹터 ETF (편입일 열 추가 예정) | Wikipedia · `--refresh-universe` |
-| `data/earnings.csv` | 종목별 실적 발표일 | yfinance · `--refresh-earnings` |
+| `data/universe.csv` | S&P 500 종목 · GICS 섹터 · 섹터 ETF · **편입일(`added`)** | Wikipedia · `--refresh-universe`, 편입일은 `extra_data.py` |
+| `data/removed.csv` · `data/removed.pkl` | 2016년 이후 지수에서 **빠진 종목** 218개의 제외일·사유·판정(`status`), 그중 일봉을 받을 수 있는 95종목 (생존 편향 측정용). 인수·합병으로 사라진 114종목은 yfinance에 없음. 티커가 다른 회사에 재사용된 9종목은 회사명 대조로 제외 | Wikipedia "Historical components" · `extra_data.py` |
+| `data/earnings.csv` | 종목별 실적 발표일 · **EPS 예상·실제·서프라이즈(%)** 499종목 43,126건 (XEL·XOM·XYL·XYZ 없음) | yfinance · `extra_data.py` |
 | `data/macro.pkl` | TLT · IEF · ^TNX · ^IRX · HYG · LQD · CL=F (WTI) · GC=F (금) · HG=F (구리) · ^GSPC · ^IXIC · ^DJI · ^RUT 일봉 · 1.7 MB | yfinance (2026-09-24 수집) |
 | `data/fred_*.csv` | UNRATE · CPIAUCSL · FEDFUNDS (월간) · DGS10 · DGS2 (일간) | FRED CSV, 키 불필요 |
 
