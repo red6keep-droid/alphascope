@@ -29,7 +29,7 @@ experiments/signal-study/
 ├── outcomes.py    # 조건값 · 매수 결과 — 모든 날
 ├── study.py       # 신호 · 군집 · 통계 · 플라시보 · 절제
 ├── render.py      # → output/results.md · output/events.csv
-├── data/          # 캐시 (gitignore)
+├── (data → 리포 루트 backtest/data/ · gitignore)
 └── output/        # 산출물 (gitignore)
 ```
 

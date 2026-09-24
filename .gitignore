@@ -14,6 +14,6 @@ experiments/trump-trend/data/
 experiments/trump-trend/output/
 experiments/trump-trend/.env
 
-experiments/signal-study/data/
+backtest/data/
 experiments/signal-study/output/
 .venv/

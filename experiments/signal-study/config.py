@@ -7,7 +7,7 @@
 import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(HERE, "data")
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(HERE)), "backtest", "data")   # 10년치 캐시는 리포 루트 backtest/data 에 모은다
 OUTPUT_DIR = os.path.join(HERE, "output")
 
 # ---------------------------------------------------------------- 데이터 범위
