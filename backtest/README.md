@@ -8,7 +8,7 @@
 | `data/bars.pkl` | S&P 500 500종목 + 섹터 ETF 11 + SPY + VIX 일봉 (OHLCV, 분할·배당 반영) · 68 MB | yfinance · `.venv/bin/python experiments/signal-study/main.py --refresh-prices` |
 | `data/universe.csv` | S&P 500 종목 · GICS 섹터 · 섹터 ETF (편입일 열 추가 예정) | Wikipedia · `--refresh-universe` |
 | `data/earnings.csv` | 종목별 실적 발표일 | yfinance · `--refresh-earnings` |
-| `data/macro.pkl` | TLT · IEF · ^TNX · ^IRX · HYG · LQD · CL=F · ^GSPC · ^IXIC · ^DJI · ^RUT 일봉 · 1.4 MB | yfinance (2026-09-24 수집) |
+| `data/macro.pkl` | TLT · IEF · ^TNX · ^IRX · HYG · LQD · CL=F (WTI) · GC=F (금) · HG=F (구리) · ^GSPC · ^IXIC · ^DJI · ^RUT 일봉 · 1.7 MB | yfinance (2026-09-24 수집) |
 | `data/fred_*.csv` | UNRATE · CPIAUCSL · FEDFUNDS (월간) · DGS10 · DGS2 (일간) | FRED CSV, 키 불필요 |
 
 읽는 코드: `experiments/signal-study/config.py`의 `DATA_DIR`이 이 폴더를 가리킨다.
