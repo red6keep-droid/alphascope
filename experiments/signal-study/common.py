@@ -168,7 +168,8 @@ def evaluate(D, mask, h, placebo=False, seed=0):
     payoff = pos.mean() / abs(neg.mean()) if len(pos) and len(neg) else np.nan
     mae = D.mae[h].values[m]
     gap = D.gap.values[m]
-    spy = D.spy_fwd[h].values[rows]
+    sv = D.spy_fwd[h].values
+    spy = sv[rows, cols] if sv.ndim == 2 else sv[rows]    # 규칙 청산은 종목마다 청산일이 달라 (날 × 종목)
     # 기준선 — 같은 종목 · 같은 필터 · 신호 아닌 날. 종목별 풀 승률을 신호 수로 가중
     pool = D.signal_ok.values & ~mask.values & fwd.notna().values
     pr = fwd.values - COST
@@ -268,3 +269,83 @@ def year_table(D, mask, h):
 
 def bool_axis(mask_true, label_true, label_false):
     return pd.DataFrame(np.where(mask_true.values, label_true, label_false), index=mask_true.index, columns=mask_true.columns)
+
+
+# ---------------------------------------------------------------- 규칙 청산 (r02)
+def _shift(a, d):
+    """(날 × 종목) 배열을 d 일 앞으로 — a[t+d]. 끝은 NaN."""
+    out = np.full_like(a, np.nan, dtype=float)
+    if d < a.shape[0]:
+        out[:-d] = a[d:]
+    return out
+
+
+def _register(D, key, exit_px, exit_d, mae_lo, is_open_exit):
+    """청산가·청산일로 fwd / mae / spy_fwd 를 등록. is_open_exit[t,s] = 시가 청산(True) / 종가 청산(False)."""
+    entry = D.O.shift(-1).values
+    n, m = exit_px.shape
+    so = D.spy["Open"].reindex(D.days).values.astype(float)
+    sc = D.spy["Close"].reindex(D.days).values.astype(float)
+    spy_mat = np.full((n, m), np.nan)
+    for d in np.unique(exit_d[~np.isnan(exit_d)]).astype(int):
+        sel = exit_d == d
+        rows = np.nonzero(sel)[0]
+        so_d, sc_d = _shift(so[:, None], d)[rows, 0], _shift(sc[:, None], d)[rows, 0]
+        spy_mat[sel] = np.where(is_open_exit[sel], so_d, sc_d)
+    D.fwd[key] = pd.DataFrame(exit_px / entry - 1, index=D.days, columns=D.syms)
+    D.mae[key] = pd.DataFrame(mae_lo / entry - 1, index=D.days, columns=D.syms)
+    D.spy_fwd[key] = pd.DataFrame(spy_mat / _shift(so[:, None], 1) - 1, index=D.days, columns=D.syms)
+    if not hasattr(D, "exit_days"):
+        D.exit_days = {}
+    D.exit_days[key] = pd.DataFrame(exit_d, index=D.days, columns=D.syms)
+
+
+def register_rule_exit(D, key, sell_cond, max_hold=20):
+    """조건 청산을 고정 보유처럼 쓸 수 있게 key 로 등록한다.
+
+    sell_cond: (거래일 × 종목) bool — t+d (d = 1..max_hold−1) 마감에 참이면 **t+d+1 시가**에 판다.
+    아무것도 없으면 t+max_hold 종가. MAE 는 청산일까지의 최저가.
+    """
+    n, m = D.C.shape
+    exit_px = np.full((n, m), np.nan); exit_d = np.full((n, m), np.nan)
+    resolved = np.zeros((n, m), dtype=bool); lo = np.full((n, m), np.inf); mae_lo = np.full((n, m), np.nan)
+    is_open = np.zeros((n, m), dtype=bool)
+    sc = sell_cond.values.astype(float)
+    L = D.L.values.astype(float); O = D.O.values.astype(float); C = D.C.values.astype(float)
+    for d in range(1, max_hold):
+        lo = np.minimum(lo, _shift(L, d))
+        cond = _shift(sc, d) == 1
+        nxt = _shift(O, d + 1)
+        hit = cond & ~resolved & ~np.isnan(nxt)
+        exit_px[hit] = nxt[hit]; exit_d[hit] = d + 1; mae_lo[hit] = np.minimum(lo, _shift(L, d + 1))[hit]
+        is_open[hit] = True; resolved |= hit
+    lo = np.minimum(lo, _shift(L, max_hold))
+    last = _shift(C, max_hold)
+    rest = ~resolved & ~np.isnan(last)
+    exit_px[rest] = last[rest]; exit_d[rest] = max_hold; mae_lo[rest] = lo[rest]
+    _register(D, key, exit_px, exit_d, mae_lo, is_open)
+
+
+def register_stop_target(D, key, stop=-0.07, target=0.10, max_hold=20):
+    """손절·목표 청산. 시가 갭은 시가 체결, 장중 터치는 그 가격, 같은 날 둘 다면 손절. 없으면 max_hold 종가."""
+    n, m = D.C.shape
+    entry = D.O.shift(-1).values.astype(float)
+    exit_px = np.full((n, m), np.nan); exit_d = np.full((n, m), np.nan)
+    resolved = np.zeros((n, m), dtype=bool); lo = np.full((n, m), np.inf); mae_lo = np.full((n, m), np.nan)
+    stop_px, tgt_px = entry * (1 + stop), entry * (1 + target)
+    O, H, L, C = (D.O.values.astype(float), D.H.values.astype(float), D.L.values.astype(float), D.C.values.astype(float))
+    for d in range(1, max_hold + 1):
+        od, hd, ld, cd = _shift(O, d), _shift(H, d), _shift(L, d), _shift(C, d)
+        lo = np.minimum(lo, ld)
+        valid = ~np.isnan(cd) & ~np.isnan(entry) & ~resolved
+        gap_s = (od <= stop_px) if d > 1 else np.zeros((n, m), bool)
+        gap_t = (od >= tgt_px) if d > 1 else np.zeros((n, m), bool)
+        for mask, px in ((valid & gap_s, od), (valid & ~gap_s & gap_t, od),
+                         (valid & ~gap_s & ~gap_t & (ld <= stop_px), stop_px),
+                         (valid & ~gap_s & ~gap_t & ~(ld <= stop_px) & (hd >= tgt_px), tgt_px)):
+            exit_px[mask] = px[mask]; exit_d[mask] = d; mae_lo[mask] = lo[mask]; resolved |= mask
+        if d == max_hold:
+            rest = valid & ~resolved
+            exit_px[rest] = cd[rest]; exit_d[rest] = d; mae_lo[rest] = lo[rest]
+    # SPY 는 장중 체결가를 흉내낼 수 없어 청산일 종가로 본다
+    _register(D, key, exit_px, exit_d, mae_lo, np.zeros((n, m), dtype=bool))
