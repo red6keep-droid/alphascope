@@ -13,3 +13,7 @@ preview.html
 experiments/trump-trend/data/
 experiments/trump-trend/output/
 experiments/trump-trend/.env
+
+experiments/signal-study/data/
+experiments/signal-study/output/
+.venv/
