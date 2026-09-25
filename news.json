@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-09-25 17:02:44 UTC",
+  "updated_at": "2026-09-25 21:27:19 UTC",
   "items": [
+    {
+      "title": "Appeals court rules that states can regulate Kalshi’s sports prediction markets, dealing another legal blow to platforms",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/25/appeals-court-rules-states-can-regulate-sports-prediction-markets.html",
+      "published": "2026-09-25 21:06:24",
+      "summary": "The decision is the second in less than a month by an appeals court that states have a role in regulating sports-related event contracts."
+    },
     {
       "title": "Meta's Muse reignites AI disruption fears. Traders are targeting this brokerage stock as next casualty",
       "source": "CNBC",
@@ -77,13 +84,6 @@
       "link": "https://www.cnbc.com/2026/09/16/gundlach-bonds-fed-rate-hike.html",
       "published": "2026-09-16 19:38:41",
       "summary": "The Fed should have hiked rates by half percentage point rather than a quarter, the investor told CNBC."
-    },
-    {
-      "title": "Hyperscaler debt signals warning sign, Apollo cautions",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/16/hyperscaler-debt-signals-warning-sign-apollo-cautions.html",
-      "published": "2026-09-16 19:29:18",
-      "summary": "Credit default swaps for companies building data centers are getting pricier, and it's not because banks are hedging more of their bets."
     }
   ]
 }
