@@ -99,11 +99,11 @@ def main():
                 o_d = O.loc[d, s_]
                 px = min(stop_px[s_], o_d) if d != t else stop_px[s_]
                 ret_stop[s_] = px / op[s_] - 1
-        rk = lambda x, asc=False: x.rank(pct=True, ascending=asc)
+        rk = lambda x, asc=True: x.rank(pct=True, ascending=asc)      # 백분위: 클수록 1 에 가깝다. 상위 N = 값이 큰 종목
         scores = {
             "S1 12−1 모멘텀": rk(pf["mom_12_1"]),
             "S2 성장 (EPS)": (rk(gf["eps_yoy"]) .fillna(0.5) + rk(gf["surp_avg4"]).fillna(0.5)) / 2,
-            "S3 저변동성": rk(pf["vol_3m"], asc=False),   # ascending=False → 변동성이 작을수록 백분위가 높다 (상위 = 저변동성)
+            "S3 저변동성": rk(pf["vol_3m"], asc=False),   # 변동성은 작을수록 좋다 → 내림차순 백분위
         }
         scores["S4 조합"] = (scores["S1 12−1 모멘텀"] + scores["S2 성장 (EPS)"] + scores["S3 저변동성"]) / 3
         spy_ok = bool(D.spy_ok.iloc[i - 1])
