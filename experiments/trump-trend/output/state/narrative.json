@@ -1,12 +1,12 @@
 {
   "what_changed": [
-    "Regulation / EPA Rollback, Company / Aircraft Sales, Trade / Potash Import 등 다수의 주제가 지난 90일 대비 신규 등장한 것으로 나타났다.",
-    "Regulation / Artificial Intelligence 주제는 직전 7일간 0건에서 최근 7일간 2건으로 빈도가 증가했으며 평균 강도는 6.5로 관찰됐다.",
+    "Regulation / Artificial Intelligence 주제는 직전 7일간 발생한 이벤트가 없었으나 최근 7일간 3회의 이벤트가 발생하며 평균 강도 5.67, 트렌드 점수 77.1점을 기록했다.",
+    "Regulation / EPA Rollback, Trade / Potash Import, Company / Aircraft Sales, Geopolitics / Greenland Agreement를 포함한 다수의 주제가 최근 90일 내 신규 주제로 등장했다.",
     "신규 진입 대상으로는 Belarus, Denmark, Russia, Turkey, Utilities와 자산 기호 LMT가 나타났다."
   ],
   "watch_tomorrow": [
-    "오늘 Turkey 대상의 Aircraft Sales 이벤트가 발생한 가운데, 과거 Trade 이벤트 22건에서 AAPL은 당일 초과 반응이 평균적으로 0.618%였고 이는 발언 없는 날 대비 드문 크기(p=0.036)로 관찰됐다.",
-    "동일한 Trade 이벤트 22건에서 XLI는 당일 초과 반응이 평균적으로 -0.33%였고 이는 발언 없는 날 대비 드문 크기(p=0.017)로 나타났다.",
-    "이에 AAPL과 XLI를 관찰 대상으로 든다."
+    "과거 Regulation 이벤트 23건에서 XLI의 당일 반응은 평균적으로 -0.429%였다.",
+    "이 반응은 발언 없는 날 대비 드문 크기(p=0.003)로 관찰됐으며, XLI와 AAPL을 관찰 대상으로 든다.",
+    "과거 Regulation 이벤트 22건에서 AAPL의 +3거래일 반응은 평균적으로 1.956%였고, 발언 없는 날 대비 드문 크기(p=0.003)로 나타났다."
   ]
 }
