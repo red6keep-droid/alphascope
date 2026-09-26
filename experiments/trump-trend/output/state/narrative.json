@@ -1,12 +1,12 @@
 {
   "what_changed": [
-    "Regulation / Artificial Intelligence 주제는 직전 7일간 발생한 이벤트가 없었으나 최근 7일간 3회의 이벤트가 발생하며 평균 강도 5.67, 트렌드 점수 77.1점을 기록했다.",
-    "Regulation / EPA Rollback, Trade / Potash Import, Company / Aircraft Sales, Geopolitics / Greenland Agreement를 포함한 다수의 주제가 최근 90일 내 신규 주제로 등장했다.",
-    "신규 진입 대상으로는 Belarus, Denmark, Russia, Turkey, Utilities와 자산 기호 LMT가 나타났다."
+    "Regulation / Artificial Intelligence 주제는 직전 7일간 0건에서 최근 7일간 4건으로 빈도가 증가했으며, 트렌드 점수 80.0점을 기록했다.",
+    "최근 90일 기준 신규 등장한 주제로는 Regulation / EPA Rollback, Trade / Potash Import, Company / Aircraft Sales 등이 관찰됐다.",
+    "신규 유입 대상으로 Belarus, Russia, Turkey, Utilities 및 자산 기호 LMT가 나타났다."
   ],
   "watch_tomorrow": [
-    "과거 Regulation 이벤트 23건에서 XLI의 당일 반응은 평균적으로 -0.429%였다.",
-    "이 반응은 발언 없는 날 대비 드문 크기(p=0.003)로 관찰됐으며, XLI와 AAPL을 관찰 대상으로 든다.",
-    "과거 Regulation 이벤트 22건에서 AAPL의 +3거래일 반응은 평균적으로 1.956%였고, 발언 없는 날 대비 드문 크기(p=0.003)로 나타났다."
+    "오늘 Regulation 관련 이벤트가 발생함에 따라, 과거 Regulation 이벤트 25건에서 즉각 평균 -0.243% 초과 반응이 관찰됐으며 이는 발언 없는 날 대비 드문 크기(p=0.051)로 나타난 XLK가 관찰 대상이다.",
+    "동일한 과거 Regulation 이벤트 25건에서 AAPL은 +3거래일 평균 1.837% 초과 반응이 관찰됐으며, 이는 발언 없는 날 대비 드문 크기(p=0.005)로 나타나 관찰 대상이다.",
+    "또한 과거 Regulation 이벤트 25건에서 XLI는 당일 평균 -0.414% 초과 반응이 관찰됐으며, 발언 없는 날 대비 드문 크기(p=0.001)로 나타나 관찰 대상이다."
   ]
 }
