@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-09-30 05:20:16 UTC",
+  "updated_at": "2026-09-30 12:24:46 UTC",
   "items": [
+    {
+      "title": "Robinhood unveils weekend hours, AI agents to allow users to trade nonstop",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/09/30/robinhood-unveils-weekend-hours-ai-agents-to-allow-users-to-trade-nonstop.html",
+      "published": "2026-09-30 12:02:39",
+      "summary": "Robinhood is broadening its offerings in a bid for more active traders who may be seeking trading access beyond traditional U.S. stock market hours."
+    },
     {
       "title": "IPO postponements are accelerating in third quarter, even beyond Oura",
       "source": "CNBC",
@@ -77,13 +84,6 @@
       "link": "https://www.cnbc.com/2026/09/19/warren-buffett-takes-next-step-in-plan-to-keep-berkshire-from-straying.html",
       "published": "2026-09-19 12:43:56",
       "summary": "Warren Buffett steps down as Berkshire Hathaway's chairman, passing the job to his son, Howard."
-    },
-    {
-      "title": "Three words from Kevin Warsh have Wall Street wondering how far the Fed will go with rate hikes",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/18/three-words-from-kevin-warsh-have-wall-street-wondering-how-far-the-fed-will-go-with-rate-hikes.html",
-      "published": "2026-09-18 18:28:31",
-      "summary": "The chairman both explained this week's decision to raise interest rates, and raised vexing questions about what comes next"
     }
   ]
 }
