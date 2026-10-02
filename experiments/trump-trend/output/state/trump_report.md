@@ -1,53 +1,61 @@
-# Trump Daily Market Trend — 2026-10-01
+# Trump Daily Market Trend — 2026-10-02
 
 > 그림자 모드 산출물. 게시되지 않는다. 표는 파이썬 계산값, 문장은 Gemini 서술.
 > 시장 반응은 **관찰된 값**이며 발언과의 인과를 의미하지 않는다.
 
 ## 데이터 상태
-- 생성 시각: 2026-10-01T01:25:35Z (UTC)
-- 게시물 누적 36,580 · 분류 완료 1,434 · 최근 90일 분류 대기 0 (범위 밖 미분류 17,904건은 의도적)
-- 이벤트 226 (첫 이벤트 2026-06-17T14:01:23Z) · 가격 마지막 거래일 2026-09-29
-- 지난 24시간: 게시물 10 · 노이즈 6 · 정책 글 1 · 미분류 0
+- 생성 시각: 2026-10-02T01:48:34Z (UTC)
+- 게시물 누적 36,620 · 분류 완료 1,449 · 최근 90일 분류 대기 7 (범위 밖 미분류 17,911건은 의도적)
+- 이벤트 228 (첫 이벤트 2026-06-17T14:01:23Z) · 가격 마지막 거래일 2026-10-01
+- 지난 24시간: 게시물 35 · 노이즈 14 · 정책 글 2 · 미분류 6
+- ⚠️ 최근 24시간 게시물 6건이 아직 분류되지 않았다. 오늘의 발언·이벤트가 불완전할 수 있다.
 
 ## 오늘의 발언 (최근 24시간 이벤트)
 | 시각(UTC) | 주제 | 대상 | 방향 | 강도 | 연타 | 세션 | 반응 측정일 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 09-30 19:48 | Fed / Monetary Policy | Bonds/Rates | 부정 | 7 | 1 | 휴장 | — |
+| 10-01 02:21 | Regulation / Fuel Economy Rules | Autos | 긍정 | 10 | 1 | 휴장 | 2026-10-01 |
+| 10-01 04:40 | Company / 737 Max | Industrials | 긍정 | 3 | 1 | 휴장 | 2026-10-01 |
 
 ## 🔥 급상승 트렌드 (7D · Trend Score)
 | # | 주제 | 점수 | 7D 이벤트 (직전) | 평균 강도 | 성분 |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Fed / Monetary Policy 🆕 | 78.3 | 1 (0) | 7 | F67 I67 R100 N100 |
-| 2 | Regulation / EV Mandate 🆕 | 75.8 | 1 (0) | 10 | F67 I100 R50 N100 |
-| 3 | Regulation / Animal Testing 🆕 | 61.7 | 1 (0) | 7 | F67 I67 R33 N100 |
-| 4 | Geopolitics / Strait of Hormuz | 46.7 | 1 (0) | 3 | F67 I8 R83 N0 |
-| 5 | Geopolitics / Sanctions | 42.5 | 1 (0) | 3 | F67 I8 R67 N0 |
-| 6 | Regulation / EPA Rollback | 27.1 | 1 (1) | 7 | F8 I67 R17 N0 |
-| 7 | Regulation / Artificial Intelligence | 12.9 | 2 (2) | 3.5 | F8 I33 R0 N0 |
+| 1 | Regulation / Fuel Economy Rules 🆕 | 81.9 | 1 (0) | 10 | F62 I94 R88 N100 |
+| 2 | Regulation / EV Mandate 🆕 | 69.4 | 1 (0) | 10 | F62 I94 R38 N100 |
+| 3 | Fed / Monetary Policy 🆕 | 69.4 | 1 (0) | 7 | F62 I62 R75 N100 |
+| 4 | Company / 737 Max 🆕 | 62.5 | 1 (0) | 3 | F62 I19 R100 N100 |
+| 5 | Regulation / Animal Testing 🆕 | 56.9 | 1 (0) | 7 | F62 I62 R25 N100 |
+| 6 | Geopolitics / Strait of Hormuz | 43.1 | 1 (0) | 3 | F62 I19 R62 N0 |
+| 7 | Geopolitics / Sanctions | 40.0 | 1 (0) | 3 | F62 I19 R50 N0 |
+| 8 | Regulation / EPA Rollback | 26.2 | 1 (1) | 7 | F12 I62 R12 N0 |
+| 9 | Regulation / Artificial Intelligence | 5.6 | 1 (3) | 3 | F0 I19 R0 N0 |
 
 ## 무엇이 달라졌나
-_Gemini 서술 없음 (--narrate 로 생성)_
+- 최근 수집된 게시물 중 7건은 아직 분류가 완료되지 않았다.
+- 직전 7일 대비 Regulation / Fuel Economy Rules, Regulation / EV Mandate, Fed / Monetary Policy, Company / 737 Max 주제의 이벤트 빈도가 각각 0건에서 1건으로 증가했으며, 이들은 모두 지난 90일 동안 나타나지 않았던 신규 주제로 분류됐다.
+- 신규 유입 대상으로는 STLA가 관찰됐다.
 
 ## 창별 트렌드
 **3D**
 
 | 주제 | 이벤트 | 게시물 | 평균 강도 | 부정 비율 | Δ이벤트 |
 | --- | --- | --- | --- | --- | --- |
+| Regulation / Fuel Economy Rules | 1 | 1 | 10 | 0% | +1 |
 | Fed / Monetary Policy | 1 | 1 | 7 | 100% | +1 |
 | Geopolitics / Strait of Hormuz | 1 | 1 | 3 | 100% | +1 |
-| Geopolitics / Sanctions | 1 | 1 | 3 | 100% | +1 |
+| Company / 737 Max | 1 | 1 | 3 | 0% | +1 |
 
 **7D**
 
 | 주제 | 이벤트 | 게시물 | 평균 강도 | 부정 비율 | Δ이벤트 |
 | --- | --- | --- | --- | --- | --- |
-| Regulation / Artificial Intelligence | 2 | 2 | 3.5 | 0% | +0 |
+| Regulation / Fuel Economy Rules | 1 | 1 | 10 | 0% | +1 |
 | Regulation / EV Mandate | 1 | 1 | 10 | 0% | +1 |
-| Regulation / Animal Testing | 1 | 1 | 7 | 0% | +1 |
 | Fed / Monetary Policy | 1 | 1 | 7 | 100% | +1 |
+| Regulation / Animal Testing | 1 | 1 | 7 | 0% | +1 |
 | Regulation / EPA Rollback | 1 | 1 | 7 | 0% | +0 |
 | Geopolitics / Sanctions | 1 | 1 | 3 | 100% | +1 |
 | Geopolitics / Strait of Hormuz | 1 | 1 | 3 | 100% | +1 |
+| Company / 737 Max | 1 | 1 | 3 | 0% | +1 |
 
 **30D**
 
@@ -60,7 +68,7 @@ _Gemini 서술 없음 (--narrate 로 생성)_
 | Geopolitics / Strait of Hormuz | 3 | 3 | 3 | 33% | +2 |
 | Regulation / EPA Rollback | 2 | 2 | 6.5 | 0% | +2 |
 | Energy / Oil Prices | 2 | 2 | 4.5 | 50% | +2 |
-| Geopolitics / Sanctions | 2 | 2 | 4 | 100% | -3 |
+| Regulation / EV Mandate | 1 | 1 | 10 | 0% | +1 |
 
 **90D** (직전 구간 데이터 없음 — 수준값만)
 
@@ -70,19 +78,39 @@ _Gemini 서술 없음 (--narrate 로 생성)_
 | Geopolitics / Sanctions | 11 | 14 | 6.27 | 91% | — |
 | Regulation / Drug Pricing | 8 | 9 | 4.12 | 0% | — |
 | Regulation / Artificial Intelligence | 5 | 5 | 4.8 | 0% | — |
-| Energy / Oil Prices | 4 | 4 | 3.75 | 25% | — |
 | Company / Investment | 4 | 7 | 3.75 | 0% | — |
 | Geopolitics / Strait of Hormuz | 4 | 5 | 3.75 | 50% | — |
+| Energy / Oil Prices | 4 | 4 | 3.75 | 25% | — |
 | Energy / Oil Deal | 3 | 3 | 7.67 | 0% | — |
 
 **7일 내 신규 등장 (직전 90일 없음)** — 대상: 없음 · 종목: STLA
 
 ## 과거 반응 이력 (clean 이벤트 · SPY 대비 초과 반응 % · 배수 · 플라시보 p)
-**Fed / Monetary Policy** — 이벤트 1 · clean 관측일 0 · confounded 0 · 같은 날 합침 0 · 종가 대기 1 · 즉각 구간: 갭 0 / 장중 0
+**Regulation / Fuel Economy Rules** — 이벤트 1 · clean 관측일 1 · confounded 0 · 같은 날 합침 0 · 종가 대기 0 · 즉각 구간: 갭 1 / 장중 0
 
 _clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
 
-**Fed** — 이벤트 10 · clean 관측일 5 · confounded 3 · 같은 날 합침 1 · 종가 대기 1 · 즉각 구간: 갭 3 / 장중 2
+**Regulation** — 이벤트 50 · clean 관측일 28 · confounded 4 · 같은 날 합침 18 · 종가 대기 0 · 즉각 구간: 갭 18 / 장중 10
+
+| 자산 | N | 즉각 | 당일 | 중앙값 | 익일 | +3D | +5D | Neg% | 변동폭 | 거래량 | p |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| SPY | 28 | +0.03% | +0.05% | -0.12% | +0.04% | -0.09% | -0.18% | 57% | 1.06× | 0.91× | 0.81~ |
+| QQQ | 28 | -0.07% | -0.04% | +0.00% | -0.03% | -0.17% | -0.28% | 50% | 1.00× | 0.92× | 0.74~ |
+| SMH | 28 | -0.30% | -0.35% | -0.04% | -0.19% | -0.32% | -0.84% | 54% | 0.97× | 0.83× | 0.29~ |
+| XLK | 28 | -0.20% | -0.17% | -0.17% | -0.12% | -0.04% | -0.17% | 54% | 1.00× | 0.92× | 0.36~ |
+| XLF | 28 | +0.02% | -0.04% | -0.02% | -0.14% | -0.20% | +0.02% | 50% | 1.12× | 1.06× | 0.80~ |
+| XLE | 28 | -0.15% | +0.07% | +0.10% | +0.52% | +0.93% | +1.47% | 46% | 1.02× | 1.01× | 0.82~ |
+| XLV | 27 | +0.15% | +0.36% | +0.28% | +0.56% | +0.99% | +1.15% | 44% | 1.13× | 0.97× | 0.08 |
+| XLI | 28 | -0.19% | -0.33% | -0.47% | -0.59% | -0.77% | -1.22% | 68% | 0.99× | 1.03× | 0.01 |
+| NVDA | 28 | -0.03% | -0.11% | -0.11% | +0.19% | +0.68% | +0.14% | 54% | 1.02× | 0.91× | 0.81~ |
+| TSLA | 28 | +0.33% | +0.49% | -0.11% | +0.69% | -0.28% | -0.28% | 54% | 1.10× | 0.97× | 0.46~ |
+| AAPL | 28 | +0.29% | +0.43% | +0.33% | +0.65% | +1.44% | +2.03% | 43% | 1.03× | 0.97× | 0.13~ |
+
+**Company / 737 Max** — 이벤트 1 · clean 관측일 1 · confounded 0 · 같은 날 합침 0 · 종가 대기 0 · 즉각 구간: 갭 1 / 장중 0
+
+_clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
+
+**Company** — 이벤트 23 · clean 관측일 16 · confounded 2 · 같은 날 합침 5 · 종가 대기 0 · 즉각 구간: 갭 11 / 장중 5
 
 _clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
 
@@ -91,7 +119,9 @@ _즉각 = 장외 게시물은 다음 개장 갭, 정규장 게시물은 시가�
 ## 왜 이 종목인가
 | 규칙 | 경로 | ETF | 영향 종목 (상위 10 + 언급) |
 | --- | --- | --- | --- |
-| fed_rates | Fed / rates pressure → Financials (XLF) · Bonds (TLT) | XLF | JPM, BAC, WFC, GS, MS, C, SCHW, BLK, AXP, BRK-B |
+| company_direct | 직접 언급 기업 (mentioned_companies 그대로) | — | BA |
 
 ## 내일 볼 것
-_Gemini 서술 없음 (--narrate 로 생성)_
+- 금일 Regulation 관련 이벤트가 발생한 가운데, XLI가 관찰 대상으로 나타났다.
+- 과거 Regulation 이벤트 28건에서 XLI는 당일 평균 -0.334% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.008)로 나타났다.
+- 또한 과거 Regulation 이벤트 25건에서 +5거래일 평균 2.033% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.006)로 나타난 AAPL이 관찰됐다.

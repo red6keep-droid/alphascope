@@ -1,12 +1,12 @@
 {
   "what_changed": [
-    "최근 90일 대비 신규 등장한 주제로 Regulation / EV Mandate, Regulation / EPA Rollback, Regulation / Animal Testing, Company / Aircraft Sales가 나타났다.",
-    "Regulation / EPA Rollback은 직전 7일 대비 최근 7일간 이벤트 건수가 0건에서 2건으로 증가했으며, 평균 강도는 6.5로 관찰됐다.",
-    "신규 진입 대상으로는 target에 Turkey와 Utilities, symbol에 STLA가 나타났다."
+    "최근 수집된 게시물 중 7건은 아직 분류가 완료되지 않았다.",
+    "직전 7일 대비 Regulation / Fuel Economy Rules, Regulation / EV Mandate, Fed / Monetary Policy, Company / 737 Max 주제의 이벤트 빈도가 각각 0건에서 1건으로 증가했으며, 이들은 모두 지난 90일 동안 나타나지 않았던 신규 주제로 분류됐다.",
+    "신규 유입 대상으로는 STLA가 관찰됐다."
   ],
   "watch_tomorrow": [
-    "최근 Geopolitics 관련 이벤트가 관찰된 가운데, 과거 Geopolitics 이벤트 31건에서 XLV는 +3거래일 평균 1.287% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.003)로 관찰되어 관찰 대상으로 든다.",
-    "과거 Geopolitics 이벤트 31건에서 QQQ는 +5거래일 평균 -0.529% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.041)로 나타나 관찰 대상으로 든다.",
-    "과거 Geopolitics 이벤트 31건에서 XLI는 +5거래일 평균 -0.66% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.022)로 관찰되어 관찰 대상으로 든다."
+    "금일 Regulation 관련 이벤트가 발생한 가운데, XLI가 관찰 대상으로 나타났다.",
+    "과거 Regulation 이벤트 28건에서 XLI는 당일 평균 -0.334% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.008)로 나타났다.",
+    "또한 과거 Regulation 이벤트 25건에서 +5거래일 평균 2.033% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.006)로 나타난 AAPL이 관찰됐다."
   ]
 }
