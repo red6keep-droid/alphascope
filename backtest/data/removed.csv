@@ -1,0 +1,219 @@
+symbol,name,removed,reason,bars,first_bar,last_bar,reused_suspect,max_gap_days,status,yahoo_name,name_match
+FOSL,Fossil Group,2016-01-05,Willis Holdings merged with Towers Watson and was renamed Willis Towers Watson.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Fossil Group, Inc.",True
+ACE,Chubb,2016-01-19,ACE Ltd acquired Chubb and retained the CB ticker.,0,,,False,,no_data,,False
+PCP,Precision Castparts Corporation,2016-02-01,,0,,,False,,no_data,,False
+BRCM,Broadcom Corporation,2016-02-01,,0,,,False,,no_data,,False
+PCL,Plum Creek Timber,2016-02-22,Weyerhaeuser acquired Plum Creek Timber.,285,2025-08-05,2026-09-23,True,4.0,ticker_reused,PGIM Corporate Bond 10+ Year ETF,False
+CNX,Consol Energy,2016-03-04,,2845,2015-06-01,2026-09-23,True,4.0,still_trading,CNX Resources Corporation,True
+GMCR,Keurig Green Mountain,2016-03-07,JAB Holding Company acquired Keurig Green Mountain.,0,,,False,,no_data,,False
+ESV,Ensco,2016-03-30,Centene acquired Health Net.,0,,,False,,no_data,,False
+POM,Pepco Holdings,2016-03-30,Exelon acquired Pepco.,240,2025-10-08,2026-09-23,True,4.0,ticker_reused,,False
+CAM,Cameron International,2016-04-04,Schlumberger acquired Cameron.,242,2025-10-06,2026-09-23,True,4.0,ticker_reused,,False
+THC,Tenet Healthcare,2016-04-18,,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Tenet Healthcare Corporation,True
+GME,GameStop,2016-04-25,Global Payments acquired Heartland Payment Systems.,2846,2015-06-01,2026-09-23,True,4.0,still_trading,GameStop Corp.,True
+ADT,ADT,2016-05-03,ADT was acquired by Apollo.,2180,2018-01-19,2026-09-23,True,4.0,still_trading,ADT Inc.,True
+TWC,Time Warner Cable,2016-05-18,Time Warner Cable was acquired by Charter.,0,,,False,,no_data,,False
+ARG,Airgas,2016-05-23,Airgas was acquired by Air Liquide.,0,,,False,,no_data,,False
+CCE,Coca-Cola Enterprises,2016-05-31,Coca-Cola Enterprises merged with European bottlers.,0,,,False,,no_data,,False
+BXLT,Baxalta,2016-06-03,SHPG acquired Baxalta.,0,,,False,,no_data,,False
+CVC,Cablevision Systems,2016-06-22,Cablevision Systems was acquired by Altice.,0,,,False,,no_data,,False
+GAS,AGL Resources,2016-07-01,AGL Resources was acquired by Southern Company.,0,,,False,,no_data,,False
+TE,TECO Energy,2016-07-01,TECO Energy was acquired by EMA.,1684,2020-01-10,2026-09-23,True,4.0,still_trading,T1 Energy Inc.,True
+CPGX,Columbia Pipeline Group,2016-07-05,CPGX was acquired by TRP.,0,,,False,,no_data,,False
+TYC,Tyco International,2016-09-06,TYC acquired JCI and retained JCI ticker.,0,,,False,,no_data,,False
+EMC,EMC Corporation,2016-09-08,Dell acquired EMC.,842,2023-05-15,2026-09-23,True,4.0,ticker_reused,Global X Emerging Markets Great Consumer ETF,False
+HOT,Starwood Hotels and Resorts,2016-09-22,MAR acquired Starwood Hotels,0,,,False,,no_data,,False
+DO,Diamond Offshore Drilling,2016-09-30,Siris Capital Group acquired Polycom.,0,,,False,,no_data,,False
+AA,Alcoa,2016-11-01,Alcoa completed the corporate spin-off off Arconic.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Alcoa Corporation,True
+LM,Legg Mason,2016-12-02,Market capitalization changes.,0,,,False,,no_data,,False
+OI,Owens-Illinois,2016-12-02,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"O-I Glass, Inc.",True
+STJ,St Jude Medical,2017-01-05,Abbott Laboratories acquired St. Jude Medical.,0,,,False,,no_data,,False
+SE,Spectra Energy,2017-02-28,SE was acquired by ENB,2241,2017-10-20,2026-09-23,True,4.0,ticker_reused,Sea Limited,False
+PBI,Pitney Bowes,2017-03-01,CBOE acquired BATS.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Pitney Bowes Inc.,True
+ENDP,Endo International,2017-03-02,Regency Centers acquired EQY.,0,,,False,,no_data,,False
+LLTC,Linear Technology,2017-03-13,Analog Devices acquired Linear Technology.,0,,,False,,no_data,,False
+HAR,Harman International,2017-03-16,Samsung Electronics acquired Harman International Industries.,0,,,False,,no_data,,False
+FTR,Frontier Communications,2017-03-20,Market capitalization changes.,0,,,False,,no_data,,False
+URBN,Urban Outfitters,2017-03-20,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Urban Outfitters, Inc.",True
+SWN,Southwestern Energy,2017-04-04,"HPE completed the corporate spin-off of Everett, merged with CSC to form DXC Technology.",0,,,False,,no_data,,False
+DNB,Dun & Bradstreet,2017-04-05,Gartner acquired CEB.,0,,,False,,no_data,,False
+TGNA,Tegna,2017-06-02,TGNA completed the corporate spin-off of Cars.com.,0,,,False,,no_data,,False
+MJN,Mead Johnson,2017-06-19,Reckitt Benckiser acquired Mead Johnson Nutrition.,0,,,False,,no_data,,False
+R,Ryder System,2017-06-19,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Ryder System, Inc.",True
+TDC,Teradata,2017-06-19,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Teradata Corporation,True
+YHOO,Yahoo!,2017-06-19,Verizon acquired Yahoo operations; remainder of Yahoo became Altaba.,0,,,False,,no_data,,False
+BHI,Baker Hughes,2017-07-07,Baker Hughes merged with GE Oil & Gas to form a new company.,0,,,False,,no_data,,False
+MNK,Mallinckrodt,2017-07-26,Market capitalization changes.,0,,,False,,no_data,,False
+MUR,Murphy Oil,2017-07-26,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Murphy Oil Corporation,True
+BBBY,Bed Bath & Beyond,2017-07-26,Market capitalization changes.,0,,,False,,no_data,,False
+RIG,Transocean,2017-07-26,Market capitalization changes.,2846,2015-06-01,2026-09-23,True,4.0,still_trading,Transocean Ltd.,True
+RAI,Reynolds American,2017-07-26,British American Tobacco (NYSE MKT:BTI) acquired Reynolds American.,0,,,False,,no_data,,False
+AN,AutoNation,2017-08-08,MetLife completed the corporate spin-off of Brighthouse Financial.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"AutoNation, Inc.",True
+WFM,Whole Foods Market,2017-08-29,Amazon acquired Whole Foods Market.,0,,,False,,no_data,,False
+SPLS,Staples,2017-09-18,Sycamore Partners acquired Staples.,171,2026-01-16,2026-09-23,True,4.0,ticker_reused,,False
+LVLT,Level 3 Communications,2017-10-13,CenturyLink acquired Level 3 Communications.,0,,,False,,no_data,,False
+BCR,CR Bard,2018-01-03,Becton Dickinson acquired CR Bard.,0,,,False,,no_data,,False
+SNI,Scripps Networks Interactive,2018-03-07,Discovery Communications acquired Scripps Networks Interactive.,0,,,False,,no_data,,False
+SIG,Signet Jewelers,2018-03-19,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Signet Jewelers Limited,True
+PDCO,Patterson Companies,2018-03-19,Market capitalization changes.,0,,,False,,no_data,,False
+CHK,Chesapeake Energy,2018-03-19,Market capitalization changes.,0,,,False,,no_data,,False
+CSRA,CSRA,2018-04-04,General Dynamics acquired CSRA.,0,,,False,,no_data,,False
+WYN,Wyndham Worldwide,2018-05-31,Wyndham Worldwide completed the corporate spin-off of Wyndham Hotels & Resorts.,0,,,False,,no_data,,False
+NAVI,Navient,2018-06-05,Westar Energy acquired Great Plains Energy and changed name to Evergy.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Navient Corporation,True
+MON,Monsanto,2018-06-07,Bayer acquired Monsanto.,0,,,False,,no_data,,False
+AYI,Acuity Brands,2018-06-18,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Acuity Inc.,True
+RRC,Range Resources,2018-06-18,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Range Resources Corporation,True
+TWX,Time Warner,2018-06-20,AT&T acquired Time Warner.,0,,,False,,no_data,,False
+DPS,Dr Pepper Snapple Group,2018-07-02,DPS was acquired by Keurig Green Mountain.,0,,,False,,no_data,,False
+GGP,GGP Inc.,2018-08-28,GGP was acquired by Brookfield Property Partners.,0,,,False,,no_data,,False
+XL,XL Group,2018-09-14,XL was acquired by Axa.,0,,,False,,no_data,,False
+ANDV,Andeavor,2018-10-01,ANDV was acquired by Marathon Petroleum.,0,,,False,,no_data,,False
+EVHC,Envision Healthcare,2018-10-11,EVHC was acquired by KKR.,0,,,False,,no_data,,False
+CA,CA Technologies,2018-11-06,CA was acquired by Broadcom.,0,,,False,,no_data,,False
+COL,Rockwell Collins,2018-12-03,UTX acquired Rockwell Collins.,0,,,False,,no_data,,False
+AET,Aetna,2018-12-03,CVS acquired Aetna.,0,,,False,,no_data,,False
+SRCL,Stericycle,2018-12-03,Market capitalization changes.,0,,,False,,no_data,,False
+ESRX,Express Scripts,2018-12-24,Cigna acquired Express Scripts.,0,,,False,,no_data,,False
+SCG,SCANA,2019-01-02,Dominion Energy acquired SCANA.,0,,,False,,no_data,,False
+NFX,Newfield Exploration,2019-02-15,Encana acquired Newfield Exploration.,0,,,False,,no_data,,False
+GT,The Goodyear Tire & Rubber Company,2019-02-27,Wabtec acquired GE transportation business,2845,2015-06-01,2026-09-23,True,4.0,still_trading,The Goodyear Tire & Rubber Company,True
+BHF,Brighthouse Financial,2019-04-02,DowDuPont completed the corporate spin-off of Dow Inc.,2309,2017-07-17,2026-09-23,True,4.0,still_trading,"Brighthouse Financial, Inc.",True
+FLR,Fluor Corporation,2019-06-03,DowDuPont completed the corporate spin-off of Corteva.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Fluor Corporation,True
+DWDP,DuPont,2019-06-03,DWDP changed to DD after spinning off Corteva.,0,,,False,,no_data,,False
+MAT,Mattel,2019-06-07,Merger of Bemis and Amcor; Bemis was the surviving entity.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Mattel, Inc.",True
+BMS,Bemis,2019-06-11,BMS changed to AMCR post merger with Amcor; subsequently renamed to Amcor.,0,,,False,,no_data,,False
+LLL,L3 Technologies,2019-07-01,L3 was acquired by Harris Corporation.,0,,,False,,no_data,,False
+RHT,Red Hat,2019-07-15,IBM acquired Red Hat.,0,,,False,,no_data,,False
+FL,Foot Locker,2019-08-09,Market capitalization changes.,0,,,False,,no_data,,False
+APC,Anadarko Petroleum,2019-08-09,Occidental Petroleum acquired Anadarko Petroleum.,153,2026-02-12,2026-09-23,True,4.0,ticker_reused,,False
+TSS,TSYS,2019-09-23,Global Payments acquired TSS.,0,,,False,,no_data,,False
+JEF,Jefferies Financial Group,2019-09-26,SPB completed the corporate spin-off of Jefferies Financial Group.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Jefferies Financial Group Inc.,True
+NKTR,Nektar Therapeutics,2019-10-03,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Nektar Therapeutics,True
+CELG,Celgene,2019-11-21,Bristol-Myers Squibb acquired Celgene.,0,,,False,,no_data,,False
+VIAB,Viacom,2019-12-05,CBS acquired Viacom to form ViacomCBS.,0,,,False,,no_data,,False
+STI,SunTrust Banks,2019-12-09,BB&T acquired SunTrust to form Truist Financial.,1103,2022-05-02,2026-09-23,True,4.0,ticker_reused,"Solidion Technology, Inc.",False
+MAC,Macerich,2019-12-23,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,The Macerich Company,True
+TRIP,TripAdvisor,2019-12-23,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Tripadvisor, Inc.",True
+AMG,Affiliated Managers Group,2019-12-23,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Affiliated Managers Group, Inc.",True
+WCG,WellCare,2020-01-28,Centene acquired Wellcare.,0,,,False,,no_data,,False
+XEC,Cimarex Energy,2020-03-02,"Gardner Denver acquired Ingersoll Rand's industrial businesses then changed its name to the ""new"" Ingersoll Rand Inc.",0,,,False,,no_data,,False
+ARNC,Arconic,2020-04-01,Arconic separated into 2 companies - Howmet remained in the index.,0,,,False,,no_data,,False
+RTN,Raytheon Company,2020-04-06,United Technologies corporate spin-off of Otis and Carrier and acquired Raytheon Company.,0,,,False,,no_data,,False
+M,Macy's,2020-04-06,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Macy's, Inc.",True
+AGN,Allergan,2020-05-12,Allergan was acquired by AbbVie.,0,,,False,,no_data,,False
+CPRI,Capri Holdings,2020-05-12,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Capri Holdings Limited,True
+HP,Helmerich & Payne,2020-05-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Helmerich & Payne, Inc.",True
+JWN,Nordstrom,2020-06-22,Market capitalization changes.,0,,,False,,no_data,,False
+HOG,Harley-Davidson,2020-06-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Harley-Davidson, Inc.",True
+ADS,Alliance Data Systems,2020-06-22,Market capitalization changes.,0,,,False,,no_data,,False
+KSS,Kohl's,2020-09-21,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Kohl's Corporation,True
+COTY,Coty,2020-09-21,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Coty Inc.,True
+HRB,H&R Block,2020-09-21,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"H&R Block, Inc.",True
+ETFC,E-Trade,2020-10-07,Morgan Stanley acquired E*Trade.,0,,,False,,no_data,,False
+NBL,Noble Energy,2020-10-12,Chevron acquired Noble Energy.,0,,,False,,no_data,,False
+AIV,Aimco,2020-12-21,Aimco completed the corporate spin-off of Apartment Income REIT.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Apartment Investment and Management Company,True
+TIF,Tiffany & Co,2021-01-07,LVMH Moet Hennessy-Louis Vuitton SE acquired Tiffany & Co.,0,,,False,,no_data,,False
+CXO,Concho Resources,2021-01-21,ConocoPhillips acquired Concho Resources.,0,,,False,,no_data,,False
+FTI,TechnipFMC,2021-02-12,Corporate spin-off of Technip Energies.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,TechnipFMC plc,True
+VNT,Vontier,2021-03-22,Market capitalization changes.,1505,2020-09-24,2026-09-23,True,4.0,still_trading,Vontier Corporation,True
+XRX,Xerox,2021-03-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Xerox Holdings Corporation,True
+SLG,SL Green Realty,2021-03-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,SL Green Realty Corp.,True
+FLS,Flowserve,2021-03-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Flowserve Corporation,True
+VAR,Varian Medical Systems,2021-04-20,Siemens Healthineers acquired Varian Medical Systems.,0,,,False,,no_data,,False
+FLIR,FLIR Systems,2021-05-14,Teledyne Technologies acquired FLIR Systems.,0,,,False,,no_data,,False
+HFC,HollyFrontier,2021-06-04,Market capitalization changes.,0,,,False,,no_data,,False
+ALXN,Alexion Pharmaceuticals,2021-07-21,AstraZeneca acquired Alexion Pharmaceuticals.,0,,,False,,no_data,,False
+MXIM,Maxim Integrated,2021-08-30,Analog Devices acquired Maxim Integrated Products.,0,,,False,,no_data,,False
+UNM,Unum,2021-09-20,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Unum Group,True
+PRGO,Perrigo,2021-09-20,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Perrigo Company plc,True
+NOV,Nov,2021-09-20,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,NOV Inc.,True
+KSU,Kansas City Southern,2021-12-14,Canadian Pacific acquired Kansas City Southern.,0,,,False,,no_data,,False
+WU,Western Union,2021-12-20,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,The Western Union Company,True
+HBI,Hanesbrands,2021-12-20,Market capitalization changes.,0,,,False,,no_data,,False
+LEG,Leggett & Platt,2021-12-20,Market capitalization changes.,0,,,False,,no_data,,False
+WLTW,Willis Towers Watson,2022-01-10,Willis Towers Watson changed its ticker symbol from WLTW to WTW.,0,,,False,,no_data,,False
+GPS,Gap,2022-02-03,Market capitalization changes.,0,,,False,,no_data,,False
+XLNX,Xilinx,2022-02-15,Advanced Micro Devices acquired Xilinx.,0,,,False,,no_data,,False
+INFO,IHS Markit,2022-03-02,S&P Global acquired IHS Markit.,488,2024-10-10,2026-09-23,True,4.0,ticker_reused,Harbor PanAgora Dynamic Large Cap Core ETF,False
+PBCT,People's United Financial,2022-04-04,M&T Bank acquired People's United Financial.,0,,,False,,no_data,,False
+DISCA,"Discovery, Inc.",2022-04-11,WarnerMedia and Discovery merged to create Warner Bros. Discovery.,0,,,False,,no_data,,False
+DISCK,"Discovery, Inc.",2022-04-11,WarnerMedia and Discovery merged to create Warner Bros. Discovery.,0,,,False,,no_data,,False
+CERN,Cerner,2022-06-08,Oracle acquired Cerner.,0,,,False,,no_data,,False
+IPGP,IPG Photonics,2022-06-21,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,IPG Photonics Corporation,True
+UAA,Under Armour (Class A),2022-06-21,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Under Armour, Inc.",True
+UA,Under Armour (Class C),2022-06-21,Market capitalization changes.,2641,2016-03-23,2026-09-23,True,4.0,still_trading,"Under Armour, Inc.",True
+PENN,Penn Entertainment,2022-09-19,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"PENN Entertainment, Inc.",True
+PVH,PVH,2022-09-19,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,PVH Corp.,True
+DRE,Duke Realty,2022-10-03,Prologis acquired Duke Realty.,0,,,False,,no_data,,False
+CTXS,Citrix Systems,2022-10-03,Vista Equity Partners acquired Citrix Systems.,0,,,False,,no_data,,False
+NLSN,Nielsen Holdings,2022-10-12,Elliott Investment Management acquired Nielsen Holdings.,0,,,False,,no_data,,False
+TWTR,Twitter,2022-11-01,Elon Musk acquired Twitter.,0,,,False,,no_data,,False
+MBC,MasterBrand,2022-12-19,Market capitalization changes.,948,2022-12-09,2026-09-23,True,4.0,still_trading,"MasterBrand, Inc.",True
+FBHS,Fortune Brands Home & Security,2022-12-19,Market capitalization changes.,0,,,False,,no_data,,False
+ABMD,Abiomed,2022-12-22,Johnson & Johnson acquired Abiomed.,0,,,False,,no_data,,False
+VNO,Vornado Realty Trust,2023-01-05,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Vornado Realty Trust,True
+SBNY,Signature Bank,2023-03-15,The FDIC placed Signature Bank into FDIC Receivership.,527,2024-08-15,2026-09-23,True,4.0,still_trading,Signature Bank,True
+SIVB,SVB Financial Group,2023-03-15,"The FDIC placed SVB's main subsidiary, Silicon Valley Bank, into receivership.",0,,,False,,no_data,,False
+LUMN,Lumen Technologies,2023-03-20,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Lumen Technologies, Inc.",True
+FRC,First Republic Bank,2023-05-04,The Federal Deposit Insurance Corporation (FDIC) placed First Republic Bank into receivership.,0,,,False,,no_data,,False
+DISH,Dish Network,2023-06-20,Market capitalization changes.,0,,,False,,no_data,,False
+AAP,Advance Auto Parts,2023-08-25,Johnson & Johnson offered to exchange the shares of Kenvue held for shares of Johnson & Johnson in a split-off exchange offer.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Advance Auto Parts, Inc.",True
+NWL,Newell Brands,2023-09-18,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Newell Brands Inc.,True
+LNC,Lincoln National Corporation,2023-09-18,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Lincoln National Corporation,True
+DXC,DXC Technology,2023-10-03,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,DXC Technology Company,True
+ATVI,Activision Blizzard,2023-10-18,Acquisition of Activision Blizzard by Microsoft.,0,,,False,,no_data,,False
+OGN,Organon & Co.,2023-10-18,Market capitalization changes.,1345,2021-05-14,2026-09-23,True,4.0,still_trading,Organon & Co.,True
+SEE,Sealed Air,2023-12-18,Market capitalization changes.,0,,,False,,no_data,,False
+SEDG,SolarEdge,2023-12-18,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"SolarEdge Technologies, Inc.",True
+ALK,Alaska Air Group,2023-12-18,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Alaska Air Group, Inc.",True
+CDAY,Ceridian,2024-02-01,Ceridian changed its ticker symbol from CDAY to DAY.,0,,,False,,no_data,,False
+ZION,Zions Bancorporation,2024-03-18,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Zions Bancorporation, National Association",True
+WHR,Whirlpool Corporation,2024-03-18,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Whirlpool Corporation,True
+VFC,VF Corporation,2024-04-03,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,V.F. Corporation,True
+XRAY,Dentsply Sirona,2024-04-03,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,DENTSPLY SIRONA Inc.,True
+PXD,Pioneer Natural Resources,2024-05-08,ExxonMobil acquired Pioneer Natural Resources.,0,,,False,,no_data,,False
+CMA,Comerica,2024-06-24,Market capitalization changes.,0,,,False,,no_data,,False
+RHI,Robert Half,2024-06-24,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Robert Half Inc.,True
+BIO,Bio-Rad Laboratories,2024-09-23,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Bio-Rad Laboratories, Inc.",True
+ETSY,Etsy,2024-09-23,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Etsy, Inc.",True
+AAL,American Airlines Group,2024-09-23,Market capitalization changes.,2846,2015-06-01,2026-09-23,True,4.0,still_trading,American Airlines Group Inc.,True
+BBWI,"Bath & Body Works, Inc.",2024-10-01,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Bath & Body Works, Inc.",True
+MRO,Marathon Oil,2024-11-26,ConocoPhillips acquired Marathon Oil.,0,,,False,,no_data,,False
+QRVO,Qorvo,2024-12-23,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Qorvo, Inc.",True
+CTLT,Catalent,2024-12-23,Novo Holdings A/S acquired Catalent.,0,,,False,,no_data,,False
+AMTM,Amentum,2024-12-23,Market capitalization changes.,500,2024-09-24,2026-09-23,True,4.0,still_trading,"Amentum Holdings, Inc.",True
+FMC,FMC Corporation,2025-03-24,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,FMC Corporation,True
+CE,Celanese,2025-03-24,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Celanese Corporation,True
+TFX,Teleflex,2025-03-24,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,Teleflex Incorporated,True
+BWA,BorgWarner,2025-03-24,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,BorgWarner Inc.,True
+DFS,Discover Financial,2025-05-19,Capital One acquired Discover Financial.,0,,,False,,no_data,,False
+JNPR,Juniper Networks,2025-07-09,Hewlett Packard Enterprise acquired Juniper Networks.,0,,,False,,no_data,,False
+ANSS,Ansys,2025-07-18,Synopsys acquired Ansys.,0,,,False,,no_data,,False
+HES,Hess Corporation,2025-07-23,Chevron acquired Hess.,0,,,False,,no_data,,False
+WBA,Walgreens Boots Alliance,2025-08-28,Sycamore Partners acquired Walgreen Boots Alliance.,0,,,False,,no_data,,False
+ENPH,Enphase Energy,2025-09-22,Market capitalization changes.,2846,2015-06-01,2026-09-23,True,4.0,still_trading,"Enphase Energy, Inc.",True
+MKTX,MarketAxess,2025-09-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,MarketAxess Holdings Inc.,True
+CZR,Caesars Entertainment,2025-09-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,True,4.0,still_trading,"Caesars Entertainment, Inc.",True
+KMX,CarMax,2025-10-31,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,"CarMax, Inc.",True
+EMN,Eastman Chemical Co.,2025-11-04,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,Eastman Chemical Company,True
+IPG,Interpublic Group,2025-11-28,Omnicom Group acquired (The) Interpublic Group.,0,,,False,,no_data,,False
+K,Kellanova,2025-12-11,Mars Inc. acquired Kellanova.,0,,,False,,no_data,,False
+MHK,Mohawk Industries,2025-12-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,"Mohawk Industries, Inc.",True
+SOLS,Solstice Advanced Materials,2025-12-22,Market capitalization changes.,232,2025-10-20,2026-09-23,False,4.0,delisted_soon,,False
+LKQ,LKQ Corporation,2025-12-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,LKQ Corporation,True
+DAY,Dayforce,2026-02-09,Thoma Bravo L.P. acquired Dayforce.,0,,,False,,no_data,,False
+MOH,Molina Healthcare,2026-03-23,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,"Molina Healthcare, Inc.",True
+MTCH,Match Group,2026-03-23,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,"Match Group, Inc.",True
+PAYC,Paycom,2026-03-23,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,"Paycom Software, Inc.",True
+LW,Lamb Weston,2026-03-23,Market capitalization changes.,2478,2016-11-10,2026-09-23,False,4.0,delisted_soon,"Lamb Weston Holdings, Inc.",True
+HOLX,Hologic,2026-04-09,Blackstone Inc. and TPG Inc. acquired Hologic.,0,,,False,,no_data,,False
+CTRA,Coterra Energy,2026-05-07,Devon Energy acquired Coterra Energy.,0,,,False,,no_data,,False
+EPAM,EPAM Systems,2026-06-02,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,"EPAM Systems, Inc.",True
+CPB,Campbell's,2026-06-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,The Campbell's Company,True
+POOL,Pool Corporation,2026-06-22,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,Pool Corporation,True
+CAG,Conagra Brands,2026-06-30,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,"Conagra Brands, Inc.",True
+EA,Electronic Arts,2026-08-05,"An investor consortium comprising Saudi Arabia's Public Investment Fund (PIF), Silver Lake, and Affinity Partners acquired Electronic Arts.",0,,,False,,no_data,,False
+AVB,AvalonBay Communities,2026-08-18,Equity Residential (now Vivmark Residential) acquired AvalonBay Communities.,0,,,False,,no_data,,False
+BLDR,Builders FirstSource,2026-09-21,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,"Builders FirstSource, Inc.",True
+TTD,The Trade Desk,2026-09-21,Market capitalization changes.,2515,2016-09-21,2026-09-23,False,4.0,delisted_soon,"The Trade Desk, Inc.",True
+TAP,Molson Coors,2026-09-21,Market capitalization changes.,2845,2015-06-01,2026-09-23,False,4.0,delisted_soon,Molson Coors Beverage Company,True
