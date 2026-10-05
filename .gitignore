@@ -16,3 +16,4 @@ experiments/trump-trend/.env
 
 experiments/signal-study/output/
 .venv/
+.DS_Store
