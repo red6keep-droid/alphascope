@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-10-05 05:21:45 UTC",
+  "updated_at": "2026-10-05 14:23:34 UTC",
   "items": [
+    {
+      "title": "Nvidia's $6 trillion milestone looms. Here's when options traders see it happening",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/05/nvidias-6-trillion-milestone-looms-heres-when-options-traders-see-it-happening.html",
+      "published": "2026-10-05 13:56:58",
+      "summary": "Nvidia will likely cross the $6 trillion threshold by the end of this month, according to options traders."
+    },
     {
       "title": "Top Wall Street analysts are upbeat about the prospects for these 3 stocks",
       "source": "CNBC",
@@ -77,13 +84,6 @@
       "link": "https://www.cnbc.com/2026/09/21/meta-investors-discover-new-ai-play.html",
       "published": "2026-09-21 20:13:33",
       "summary": "Shares of the social media giant surged 12% Monday."
-    },
-    {
-      "title": "Historic lawsuit sparks flurry of option activity in this stock",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/21/historic-lawsuit-sparks-flurry-of-option-activity-in-ny-times-stock.html",
-      "published": "2026-09-21 16:55:41",
-      "summary": "While President Donald Trump's war with the networks dominates the headlines, a far more consequential fight is unfolding in a Lower Manhattan courthouse."
     }
   ]
 }
