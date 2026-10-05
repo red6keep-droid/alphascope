@@ -1,102 +1,99 @@
-# Trump Daily Market Trend — 2026-10-04
+# Trump Daily Market Trend — 2026-10-05
 
 > 그림자 모드 산출물. 게시되지 않는다. 표는 파이썬 계산값, 문장은 Gemini 서술.
 > 시장 반응은 **관찰된 값**이며 발언과의 인과를 의미하지 않는다.
 
 ## 데이터 상태
-- 생성 시각: 2026-10-04T01:49:37Z (UTC)
-- 게시물 누적 36,669 · 분류 완료 1,484 · 최근 90일 분류 대기 0 (범위 밖 미분류 17,904건은 의도적)
-- 이벤트 237 (첫 이벤트 2026-06-17T14:01:23Z) · 가격 마지막 거래일 2026-10-02
-- 지난 24시간: 게시물 39 · 노이즈 17 · 정책 글 5 · 미분류 0
+- 생성 시각: 2026-10-05T01:07:59Z (UTC)
+- 게시물 누적 36,705 · 분류 완료 1,496 · 최근 90일 분류 대기 0 (범위 밖 미분류 17,904건은 의도적)
+- 이벤트 239 (첫 이벤트 2026-06-17T14:01:23Z) · 가격 마지막 거래일 2026-10-02
+- 지난 24시간: 게시물 36 · 노이즈 24 · 정책 글 2 · 미분류 0
 
 ## 오늘의 발언 (최근 24시간 이벤트)
 | 시각(UTC) | 주제 | 대상 | 방향 | 강도 | 연타 | 세션 | 반응 측정일 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 10-03 02:56 | Regulation / Medicare | Healthcare | 긍정 | 10 | 1 | 휴장 | — |
-| 10-03 22:20 | Trade / Tariff | Healthcare | 긍정 | 5 | 1 | 휴장 | — |
-| 10-03 03:37 | Fed / Fed Audit | Financials | 부정 | 5 | 1 | 휴장 | — |
-| 10-03 03:07 | Company / Retail Crime | Consumer | 긍정 | 3 | 1 | 휴장 | — |
+| 10-04 12:23 | Regulation / Artificial Intelligence | Technology | 긍정 | 10 | 1 | 휴장 | — |
+| 10-04 17:49 | Trade / Tariff | Healthcare | 긍정 | 4 | 1 | 휴장 | — |
 
 ## 🔥 급상승 트렌드 (7D · Trend Score)
 | # | 주제 | 점수 | 7D 이벤트 (직전) | 평균 강도 | 성분 |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Regulation / Medicare 🆕 | 71.0 | 1 (0) | 10 | F46 I88 R75 N100 |
-| 2 | Energy / Diesel Oil Release 🆕 | 69.0 | 1 (0) | 10 | F46 I88 R67 N100 |
-| 3 | Regulation / Fuel Economy Rules 🆕 | 62.7 | 1 (0) | 10 | F46 I88 R42 N100 |
-| 4 | Regulation / Fuel Economy Standards 🆕 | 60.6 | 1 (0) | 10 | F46 I88 R33 N100 |
-| 5 | Fed / Fed Audit 🆕 | 60.2 | 1 (0) | 5 | F46 I38 R92 N100 |
-| 6 | Energy / Oil Recovery Project 🆕 | 59.4 | 1 (0) | 9 | F46 I62 R58 N100 |
-| 7 | Trade / Tariff | 52.3 | 1 (0) | 5 | F46 I38 R100 N0 |
-| 8 | Company / Retail Crime 🆕 | 49.4 | 1 (0) | 3 | F46 I8 R83 N100 |
-| 9 | Trade / Korea Strategic Trade and Investment Deal 🆕 | 49.0 | 1 (0) | 9 | F46 I62 R17 N100 |
-| 10 | Geopolitics / Sanctions | 48.8 | 2 (0) | 4 | F100 I25 R25 N0 |
+| 1 | Regulation / Medicare 🆕 | 68.8 | 1 (0) | 10 | F46 I85 R69 N100 |
+| 2 | Trade / Tariff | 67.9 | 2 (0) | 4.5 | F96 I31 R100 N0 |
+| 3 | Energy / Diesel Oil Release 🆕 | 66.9 | 1 (0) | 10 | F46 I85 R62 N100 |
+| 4 | Regulation / Fuel Economy Rules 🆕 | 61.2 | 1 (0) | 10 | F46 I85 R38 N100 |
+| 5 | Regulation / Fuel Economy Standards 🆕 | 59.2 | 1 (0) | 10 | F46 I85 R31 N100 |
+| 6 | Fed / Fed Audit 🆕 | 58.8 | 1 (0) | 5 | F46 I38 R85 N100 |
+| 7 | Energy / Oil Recovery Project 🆕 | 56.9 | 1 (0) | 9 | F46 I58 R54 N100 |
+| 8 | Regulation / Artificial Intelligence | 48.5 | 1 (3) | 10 | F0 I85 R92 N0 |
+| 9 | Company / Retail Crime 🆕 | 47.7 | 1 (0) | 3 | F46 I8 R77 N100 |
+| 10 | Trade / Korea Strategic Trade and Investment Deal 🆕 | 47.3 | 1 (0) | 9 | F46 I58 R15 N100 |
 
 ## 무엇이 달라졌나
-- 최근 7일간 Geopolitics / Sanctions 주제는 직전 7일 대비 2건 증가한 2건의 이벤트가 관찰됐으며, 평균 강도는 4로 나타났다.
-- Regulation / Medicare, Energy / Diesel Oil Release, Regulation / Fuel Economy Rules 주제는 지난 90일 대비 신규 등장한 것으로 관찰됐으며, 최근 7일간 평균 강도는 모두 10으로 나타났다.
-- 신규 유입 대상으로는 국가 단위에서 South Korea가, 개별 종목에서는 BAYRY와 CVS가 관찰됐다.
+- 최근 90일간 등장하지 않았던 Regulation / Medicare 주제가 최근 7일간 1건 나타났으며 트렌드 점수 68.8점이 관찰됐다.
+- Trade / Tariff 주제는 직전 7일간 0건에서 최근 7일간 2건으로 증가한 변화가 관찰됐다.
+- 신규 진입 대상으로는 South Korea와 BAYRY, CVS가 나타났다.
 
 ## 창별 트렌드
 **3D**
 
 | 주제 | 이벤트 | 게시물 | 평균 강도 | 부정 비율 | Δ이벤트 |
 | --- | --- | --- | --- | --- | --- |
-| Regulation / Fuel Economy Rules | 1 | 1 | 10 | 0% | +1 |
-| Regulation / Fuel Economy Standards | 1 | 1 | 10 | 0% | +1 |
+| Trade / Tariff | 2 | 2 | 4.5 | 0% | +2 |
+| Regulation / Artificial Intelligence | 1 | 1 | 10 | 0% | +1 |
 | Energy / Diesel Oil Release | 1 | 1 | 10 | 0% | +1 |
 | Regulation / Medicare | 1 | 1 | 10 | 0% | +1 |
 | Energy / Oil Recovery Project | 1 | 1 | 9 | 0% | +1 |
-| Trade / Tariff | 1 | 1 | 5 | 0% | +1 |
 | Fed / Fed Audit | 1 | 1 | 5 | 100% | +1 |
-| Geopolitics / Sanctions | 1 | 1 | 5 | 100% | +0 |
+| Company / Retail Crime | 1 | 1 | 3 | 0% | +1 |
 
 **7D**
 
 | 주제 | 이벤트 | 게시물 | 평균 강도 | 부정 비율 | Δ이벤트 |
 | --- | --- | --- | --- | --- | --- |
+| Trade / Tariff | 2 | 2 | 4.5 | 0% | +2 |
 | Geopolitics / Sanctions | 2 | 2 | 4 | 100% | +2 |
-| Regulation / Fuel Economy Rules | 1 | 1 | 10 | 0% | +1 |
+| Regulation / Artificial Intelligence | 1 | 1 | 10 | 0% | -2 |
 | Energy / Diesel Oil Release | 1 | 1 | 10 | 0% | +1 |
 | Regulation / Fuel Economy Standards | 1 | 1 | 10 | 0% | +1 |
+| Regulation / Fuel Economy Rules | 1 | 1 | 10 | 0% | +1 |
 | Regulation / Medicare | 1 | 1 | 10 | 0% | +1 |
 | Energy / Oil Recovery Project | 1 | 1 | 9 | 0% | +1 |
-| Trade / Korea Strategic Trade and Investment Deal | 1 | 1 | 9 | 0% | +1 |
-| Fed / Monetary Policy | 1 | 1 | 7 | 100% | +1 |
 
 **30D**
 
 | 주제 | 이벤트 | 게시물 | 평균 강도 | 부정 비율 | Δ이벤트 |
 | --- | --- | --- | --- | --- | --- |
-| Trade / Tariff | 5 | 5 | 3.8 | 40% | -10 |
-| Regulation / Artificial Intelligence | 4 | 4 | 5 | 0% | +3 |
-| Fed / Interest Rates | 3 | 3 | 5 | 100% | +3 |
-| Regulation / AI Regulation | 3 | 3 | 5 | 67% | +3 |
+| Regulation / Artificial Intelligence | 5 | 5 | 6 | 0% | +4 |
+| Trade / Tariff | 5 | 5 | 3.8 | 40% | -11 |
 | Regulation / EPA Rollback | 2 | 2 | 6.5 | 0% | +2 |
+| Regulation / AI Regulation | 2 | 2 | 5.5 | 100% | +1 |
 | Energy / Oil Prices | 2 | 2 | 4.5 | 50% | +2 |
 | Geopolitics / Sanctions | 2 | 2 | 4 | 100% | -4 |
-| Regulation / Fuel Economy Rules | 1 | 1 | 10 | 0% | +1 |
+| Geopolitics / Greenland Agreement | 1 | 1 | 10 | 0% | +1 |
+| Energy / Diesel Oil Release | 1 | 1 | 10 | 0% | +1 |
 
 **90D** (직전 구간 데이터 없음 — 수준값만)
 
 | 주제 | 이벤트 | 게시물 | 평균 강도 | 부정 비율 | Δ이벤트 |
 | --- | --- | --- | --- | --- | --- |
-| Trade / Tariff | 29 | 31 | 5 | 45% | — |
+| Trade / Tariff | 30 | 32 | 4.97 | 43% | — |
 | Geopolitics / Sanctions | 11 | 14 | 6.36 | 100% | — |
 | Regulation / Drug Pricing | 8 | 9 | 4.12 | 0% | — |
-| Regulation / Artificial Intelligence | 5 | 5 | 4.8 | 0% | — |
-| Energy / Oil Prices | 4 | 4 | 3.75 | 25% | — |
+| Regulation / Artificial Intelligence | 6 | 6 | 5.67 | 0% | — |
 | Geopolitics / Strait of Hormuz | 4 | 5 | 3.75 | 50% | — |
 | Company / Investment | 4 | 7 | 3.75 | 0% | — |
 | Energy / Oil Deal | 3 | 3 | 7.67 | 0% | — |
+| Geopolitics / Military Threat | 3 | 3 | 6.67 | 100% | — |
 
 **7일 내 신규 등장 (직전 90일 없음)** — 대상: South Korea · 종목: BAYRY, CVS
 
 ## 과거 반응 이력 (clean 이벤트 · SPY 대비 초과 반응 % · 배수 · 플라시보 p)
-**Regulation / Medicare** — 이벤트 1 · clean 관측일 0 · confounded 0 · 같은 날 합침 0 · 종가 대기 1 · 즉각 구간: 갭 0 / 장중 0
+**Regulation / Artificial Intelligence** — 이벤트 6 · clean 관측일 4 · confounded 0 · 같은 날 합침 1 · 종가 대기 1 · 즉각 구간: 갭 3 / 장중 1
 
 _clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
 
-**Regulation** — 이벤트 52 · clean 관측일 28 · confounded 4 · 같은 날 합침 19 · 종가 대기 1 · 즉각 구간: 갭 18 / 장중 10
+**Regulation** — 이벤트 53 · clean 관측일 28 · confounded 4 · 같은 날 합침 19 · 종가 대기 2 · 즉각 구간: 갭 18 / 장중 10
 
 | 자산 | N | 즉각 | 당일 | 중앙값 | 익일 | +3D | +5D | Neg% | 변동폭 | 거래량 | p |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -112,11 +109,11 @@ _clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
 | TSLA | 28 | +0.33% | +0.49% | -0.11% | +0.79% | -0.28% | -0.35% | 54% | 1.10× | 0.97× | 0.46~ |
 | AAPL | 28 | +0.29% | +0.43% | +0.33% | +0.60% | +1.44% | +1.92% | 43% | 1.03× | 0.97× | 0.13~ |
 
-**Trade / Tariff** — 이벤트 30 · clean 관측일 17 · confounded 3 · 같은 날 합침 9 · 종가 대기 1 · 즉각 구간: 갭 8 / 장중 9
+**Trade / Tariff** — 이벤트 31 · clean 관측일 17 · confounded 3 · 같은 날 합침 9 · 종가 대기 2 · 즉각 구간: 갭 8 / 장중 9
 
 _clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
 
-**Trade** — 이벤트 47 · clean 관측일 23 · confounded 3 · 같은 날 합침 20 · 종가 대기 1 · 즉각 구간: 갭 16 / 장중 7
+**Trade** — 이벤트 48 · clean 관측일 23 · confounded 3 · 같은 날 합침 20 · 종가 대기 2 · 즉각 구간: 갭 16 / 장중 7
 
 | 자산 | N | 즉각 | 당일 | 중앙값 | 익일 | +3D | +5D | Neg% | 변동폭 | 거래량 | p |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -132,33 +129,14 @@ _clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
 | TSLA | 23 | +0.13% | +0.85% | +0.05% | +0.75% | +0.58% | -0.02% | 48% | 1.05× | 1.01× | 0.23~ |
 | AAPL | 23 | +0.15% | +0.55% | +0.36% | +0.94% | +2.00% | +1.70% | 35% | 1.01× | 1.01× | 0.08 |
 
-**Fed / Fed Audit** — 이벤트 1 · clean 관측일 0 · confounded 0 · 같은 날 합침 0 · 종가 대기 1 · 즉각 구간: 갭 0 / 장중 0
-
-_clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
-
-**Fed** — 이벤트 11 · clean 관측일 5 · confounded 4 · 같은 날 합침 1 · 종가 대기 1 · 즉각 구간: 갭 3 / 장중 2
-
-_clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
-
-**Company / Retail Crime** — 이벤트 1 · clean 관측일 0 · confounded 0 · 같은 날 합침 0 · 종가 대기 1 · 즉각 구간: 갭 0 / 장중 0
-
-_clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
-
-**Company** — 이벤트 24 · clean 관측일 16 · confounded 2 · 같은 날 합침 5 · 종가 대기 1 · 즉각 구간: 갭 11 / 장중 5
-
-_clean N이 20 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._
-
 _즉각 = 장외 게시물은 다음 개장 갭, 정규장 게시물은 시가→종가. 변동폭·거래량은 직전 20거래일 대비 배수. p = 같은 자산의 비이벤트 날에서 N개를 뽑은 평균이 관측 평균보다 극단적인 비율(양측, 1000회). 0.10 이상(~)이면 무작위 날과 구분되지 않는다._
 
 ## 왜 이 종목인가
 | 규칙 | 경로 | ETF | 영향 종목 (상위 10 + 언급) |
 | --- | --- | --- | --- |
-| regulation_pharma | Drug pricing / regulation → Healthcare (XLV) | XLV | LLY, UNH, JNJ, ABBV, MRK, TMO, ABT, AMGN, PFE, ISRG |
-| trade_broad | Trade policy → Broad market (SPY/QQQ) | SPY | BAYRY |
-| fed_rates | Fed / rates pressure → Financials (XLF) · Bonds (TLT) | XLF | JPM, BAC, WFC, GS, MS, C, SCHW, BLK, AXP, BRK-B |
-| company_direct | 직접 언급 기업 (mentioned_companies 그대로) | — | CVS |
+| regulation_tech | Tech regulation / antitrust → Technology (XLK) | XLK | AAPL, MSFT, NVDA, GOOGL, META, AMZN, AVGO, ORCL, CRM, ADBE |
+| trade_broad | Trade policy → Broad market (SPY/QQQ) | SPY | — |
 
 ## 내일 볼 것
-- 과거 Regulation 이벤트 28건에서 XLI는 익일 평균 -0.54% 초과 반응이 관찰됐고, 이는 발언 없는 날 대비 드문 크기(p=0.002)로 나타났으며, XLI를 관찰 대상으로 든다.
-- 과거 Trade 이벤트 23건에서 AAPL은 +3거래일 평균 2.001% 초과 반응이 관찰됐고, 이는 발언 없는 날 대비 드문 크기(p=0.002)로 나타났으며, AAPL을 관찰 대상으로 든다.
-- 과거 Regulation 이벤트 28건에서 AAPL은 +5거래일 평균 1.917% 초과 반응이 관찰됐고, 이는 발언 없는 날 대비 드문 크기(p=0.006)로 나타났으며, AAPL을 관찰 대상으로 든다.
+- 과거 Regulation 이벤트 28건에서 익일 평균 -0.54% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.002)로 관찰된 XLI가 관찰 대상으로 나타났다.
+- 과거 Trade 이벤트 23건에서 +3거래일 평균 2.001% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.002)로 관찰된 AAPL이 관찰 대상으로 나타났다.
