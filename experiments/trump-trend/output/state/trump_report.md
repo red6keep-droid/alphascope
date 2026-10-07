@@ -4,7 +4,7 @@
 > 시장 반응은 **관찰된 값**이며 발언과의 인과를 의미하지 않는다.
 
 ## 데이터 상태
-- 생성 시각: 2026-10-07T01:25:57Z (UTC)
+- 생성 시각: 2026-10-07T01:43:25Z (UTC)
 - 게시물 누적 36,727 · 분류 완료 1,518 · 최근 90일 분류 대기 0 (범위 밖 미분류 17,904건은 의도적)
 - 이벤트 243 (첫 이벤트 2026-06-17T14:01:23Z) · 가격 마지막 거래일 2026-10-06
 - 지난 24시간: 게시물 12 · 노이즈 0 · 정책 글 3 · 미분류 0
@@ -31,9 +31,9 @@
 | 10 | Company / Media Bias 🆕 | 50.3 | 1 (0) | 1 | F53 I0 R87 N100 |
 
 ## 무엇이 달라졌나
-- Trade / Tariff 주제는 최근 7일간 3건의 이벤트가 발생하며 직전 7일간 0건 대비 빈도가 증가했고, 평균 강도 6, 트렌드 점수 74.0점이 관찰됐다.
-- Regulation / Medicare, Energy / Diesel Oil Release, Regulation / Fuel Economy Rules를 포함한 다수의 주제가 최근 90일 내 신규 주제로 나타났다.
-- 신규 진입 대상으로는 South Korea가 관찰됐으며, 신규 진입 자산으로는 BAYRY, BDX, CVS, NYT가 나타났다.
+- Trade / Tariff 주제는 직전 7일간 0건에서 최근 7일간 3건으로 빈도가 늘어났으며, 평균 강도 6, 트렌드 점수 74.0점이 관찰됐다.
+- Regulation / Medicare 및 Energy / Diesel Oil Release를 포함한 다수의 주제가 최근 90일 내 신규 주제로 나타났다.
+- 신규 진입 대상으로는 South Korea와 함께 BAYRY, BDX, CVS, NYT 등의 자산이 관찰됐다.
 
 ## 창별 트렌드
 **3D**
@@ -52,10 +52,10 @@
 | --- | --- | --- | --- | --- | --- |
 | Trade / Tariff | 3 | 3 | 6 | 0% | +3 |
 | Regulation / Medicare | 1 | 1 | 10 | 0% | +1 |
-| Energy / Diesel Oil Release | 1 | 1 | 10 | 0% | +1 |
-| Regulation / Fuel Economy Rules | 1 | 1 | 10 | 0% | +1 |
 | Regulation / Fuel Economy Standards | 1 | 1 | 10 | 0% | +1 |
+| Regulation / Fuel Economy Rules | 1 | 1 | 10 | 0% | +1 |
 | Regulation / Artificial Intelligence | 1 | 1 | 10 | 0% | -1 |
+| Energy / Diesel Oil Release | 1 | 1 | 10 | 0% | +1 |
 | Trade / Korea Strategic Trade and Investment Deal | 1 | 1 | 9 | 0% | +1 |
 | Energy / Oil Recovery Project | 1 | 1 | 9 | 0% | +1 |
 
@@ -69,8 +69,8 @@
 | Regulation / AI Regulation | 2 | 2 | 5.5 | 100% | +1 |
 | Energy / Oil Prices | 2 | 2 | 4.5 | 50% | +2 |
 | Geopolitics / Sanctions | 2 | 2 | 4 | 100% | -4 |
-| Regulation / Medicare | 1 | 1 | 10 | 0% | +1 |
 | Regulation / Fuel Economy Rules | 1 | 1 | 10 | 0% | +1 |
+| Trade / Government Procurement | 1 | 1 | 10 | 100% | +1 |
 
 **90D** (직전 구간 데이터 없음 — 수준값만)
 
@@ -80,8 +80,8 @@
 | Geopolitics / Sanctions | 11 | 14 | 6.36 | 100% | — |
 | Regulation / Drug Pricing | 8 | 9 | 4.12 | 0% | — |
 | Regulation / Artificial Intelligence | 6 | 6 | 5.67 | 0% | — |
-| Geopolitics / Strait of Hormuz | 4 | 5 | 3.75 | 50% | — |
 | Company / Investment | 4 | 7 | 3.75 | 0% | — |
+| Geopolitics / Strait of Hormuz | 4 | 5 | 3.75 | 50% | — |
 | Energy / Oil Deal | 3 | 3 | 7.67 | 0% | — |
 | Geopolitics / Military Threat | 3 | 3 | 6.67 | 100% | — |
 
@@ -146,6 +146,6 @@ _즉각 = 장외 게시물은 다음 개장 갭, 정규장 게시물은 시가�
 | company_direct | 직접 언급 기업 (mentioned_companies 그대로) | — | NYT |
 
 ## 내일 볼 것
-- 과거 Trade 이벤트 25건에서 XLI는 당일 평균 -0.268% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.043)로 관찰됐다. 이에 XLI를 관찰 대상으로 든다.
-- 과거 Regulation 이벤트 30건에서 XLI는 당일 평균 -0.32% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.007)로 관찰됐다. 이에 XLI를 관찰 대상으로 든다.
-- 과거 Regulation 이벤트 30건에서 AAPL은 +3거래일 평균 1.318% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.016)로 관찰됐다. 이에 AAPL을 관찰 대상으로 든다.
+- 최근 Trade 이벤트가 발생함에 따라, 과거 Trade 이벤트 23건에서 XLI는 +3거래일 평균 -1.128% 반응이 관찰됐으며 이는 발언 없는 날 대비 드문 크기(p=0.001)로 나타나 관찰 대상으로 든다.
+- 또한 과거 Regulation 이벤트 27건에서 AAPL은 +5거래일 평균 1.74% 반응이 관찰됐으며 이는 발언 없는 날 대비 드문 크기(p=0.012)로 나타나 관찰 대상으로 든다.
+- 과거 Regulation 이벤트 30건에서 XLI는 즉각 평균 -0.186% 반응이 관찰됐으며 이는 발언 없는 날 대비 드문 크기(p=0.015)로 나타나 관찰 대상으로 든다.
