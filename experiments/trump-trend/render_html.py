@@ -130,12 +130,17 @@ def _x(v):
 
 
 def _p(st):
+    """p (보정 전) + q (주제 안 다중 검정 BH 보정). 회색 = 보통 날과 구분 안 됨, 굵게 = 보정 뒤에도 유의, 보통 = p만 작음."""
     pl = (st or {}).get("placebo")
     if not pl:
         return f'<span style="color:{MUTED};">—</span>'
+    q = pl.get("q_bh")
+    q_html = f'<span style="color:{MUTED};font-size:14px;"> q{q:.2f}</span>' if q is not None else ""
     if pl["indistinguishable"]:
-        return f'<span style="color:{MUTED};">{pl["p_two_sided"]:.2f}</span>'
-    return f'<b>{pl["p_two_sided"]:.2f}</b>'
+        return f'<span style="color:{MUTED};">{pl["p_two_sided"]:.2f}</span>{q_html}'
+    if pl.get("robust"):
+        return f'<b>{pl["p_two_sided"]:.2f}</b>{q_html}'
+    return f'{pl["p_two_sided"]:.2f}{q_html}'
 
 
 def sec_reactions(a):
@@ -166,8 +171,8 @@ def sec_reactions(a):
             ik = c.get("immediate_kinds", {})
             out.append(f'<div style="margin-top:14px;font-weight:bold;">{_esc(k)} — 과거 clean 관측일 {c["clean"]}일'
                        f'<span style="color:{MUTED};font-weight:normal;"> (이벤트 {c["total"]} · 거시 발표 겹침 제외 {c["confounded"]}'
-                       f' · 장외 {ik.get("gap", 0)} / 정규장 {ik.get("intraday", 0)})</span></div>'
-                       + _table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p"], rows))
+                       f' · 장외 {ik.get("gap", 0)} / 정규장 {ik.get("intraday", 0)} · 검정 {c.get("tests", 0)}개)</span></div>'
+                       + _table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows))
         else:
             waiting.append(f"{k} ({c['clean']}/{config.MIN_CLEAN_N})")
     if waiting:
@@ -178,6 +183,9 @@ def sec_reactions(a):
         f"수치는 {config.BENCHMARK} 대비 초과 반응(%)이며, {config.BENCHMARK}만 원수익률입니다. "
         f"즉각 = 장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가. 변동폭·거래량은 직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수(1.00× = 보통). "
         f"p = 같은 자산의 발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않습니다. "
+        f"q = 한 주제에서 자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값(Benjamini–Hochberg)입니다. "
+        f"검정이 많으면 p < 0.05가 우연으로도 몇 개 나오므로, q도 {noise_p:.2f} 미만(굵게)인 값만 보정 뒤에 남는 것으로 봅니다. "
+        f"+5일 구간은 발언이 몰린 시기에 창이 겹쳐 독립 표본이 아닙니다. "
         f"발언 이후 관찰된 값이고 인과를 의미하지 않습니다."))
     return "".join(out)
 
@@ -222,6 +230,8 @@ def build_body(a, n):
         _h2("같은 주제의 과거 시장 반응"), sec_reactions(a),
         _h2("왜 이 종목인가"), sec_why(a),
         _h2("내일 볼 것"), sec_narrative(n, "watch_tomorrow"),
+        _muted("관찰 대상은 위 과거 반응 표에서 고른 값입니다. 주제당 수십 개 조합을 검정했으므로 보정 q가 함께 작은 값만 근거로 삼으며, "
+               "+3일·+5일은 창이 겹친 관측입니다. 인과나 방향 예측이 아닙니다."),
         sec_footer(a),
         "</div>",
     ])

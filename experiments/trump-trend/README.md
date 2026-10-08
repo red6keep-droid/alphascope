@@ -131,6 +131,14 @@ python experiments/trump-trend/main.py --skip-classify --export-state experiment
   통계는 clean 이벤트만, N < 20이면 표를 내지 않는다. (분 단위 플래그 `confounded_intraday`는 분봉과 함께 제거했다.)
 - **같은 날은 관측 하나.** 일 단위 구간에서 같은 주제의 이벤트가 같은 거래일에 여럿이면 수익률이 같으므로
   (주제, 기준일, 측정일)로 합쳐 N을 센다. 리포트의 "같은 날 합침" 수가 그 개수다.
+- **다중 검정 보정 (2026-10-07).** 한 주제에서 자산 11 × 구간 7 = 최대 77개를 한꺼번에 검정하므로 p < 0.05 몇 개는 우연으로도 나온다.
+  `aggregate._apply_bh()`가 주제 안의 모든 플라시보 p에 Benjamini–Hochberg 보정을 걸어 `placebo.q_bh`·`placebo.robust`(q < 0.10)를 붙인다.
+  표는 p와 q를 같이 보여 주고(MD `0.03 (q0.47)`, `*`는 robust · HTML 굵게), 서술은 robust인 통계만 관찰 대상의 근거로 든다.
+  +3D·+5D는 이벤트가 몰린 시기에 창이 겹쳐 독립 표본이 아니라는 문구를 두 렌더 모두 고정 문장으로 붙인다.
+- **라벨 보정 규칙 (2026-10-07, `labels.adjust`).** Gemini 라벨 위에 결정적 규칙 두 개를 얹는다 — ① 기사 제목 + URL만 올린 글(URL 제외 40단어 이하)은
+  강도 상한 6 (남의 헤드라인은 본인의 발표가 아니다) ② "I am grateful…"·"Thank you to…"로 시작하는 글은 관련성 상한 1 (정책 조치가 없다).
+  하위주제는 " Rules"/" Standards"/" Policy" 꼬리말을 떼고 동의어 표로 합친다 (`Fuel Economy Rules`=`Fuel Economy Standards`→`Fuel Economy`, `AI Regulation`→`AI`).
+  분류 직후(`classify_posts`)와 매 실행 시작(`labels.reapply`, 멱등)에 적용해 과거 행과 상태 파일도 같은 기준을 따른다.
 - **Trend Score는 가중합.** 빈도 0.35 · 강도 0.30 · 최근성 0.25 · 신규성 0.10, 성분은 순위 백분위 0–100. 곱셈 아님.
 - **비교 구간은 같은 길이끼리.** 3D/3D · 7D/7D · 30D/30D · 90D/90D. 직전 구간 데이터가 없으면 수준값만.
 
@@ -162,9 +170,23 @@ python experiments/trump-trend/main.py --skip-classify --export-state experiment
 | 2026-09-15 | 90일 백필 (3회 실행, 85배치) | 1,295건 분류 · 검증 탈락 0 · 실패 0 · 이벤트 206개 |
 | 2026-09-15 | ④ 50개 수동 검증 (`output/review_sample.md`) | 사전 필터 17/17 · Gemini 분류 30/33 · **전체 94%**. 불일치 3건은 전부 relevance/intensity가 한 단계 높은 쪽. 놓친 글 없음 |
 | 2026-09-15 | 서술(`--narrate`) 시험 | 금지 표현 검증 통과. 통계 인용 시 N 병기 확인 |
+| 2026-10-07 | 첫 게시 글(10월 7일) 전수 검토 — 원본 22건·계산 JSON·게시 페이지 대조 | 수치(게시량·p·평균)는 전부 JSON과 일치. 라벨 오류 5종 발견 → 아래 조정. 재실행 뒤 이벤트 243→241, 감사 글 탈락, 연비 두 글 병합, BDX가 SPY→XLV 경로 |
 
 검증에서 나온 조정: `Tariffs`/`Tariff` 분리 집계 → `labels.py` 정규화 추가 · 자기 재게시(`RT @realDonaldTrump…`) 원문과 이중 계산 → `self_repost` 필터 추가 ·
 같은 주제 이벤트가 같은 거래일에 여럿일 때 N 과대 → 관측일 단위로 합침.
+
+2026-10-07 검토에서 나온 조정 (라벨은 Gemini 몫이지만 반복되는 오류는 규칙으로 막는다):
+
+| 발견 | 조정 | 파일 |
+| --- | --- | --- |
+| 기업 투자 발표(바이엘 22억·BD 30억)가 "Trade / Tariff"로. BD 글은 의료기기 관세 시행을 함께 말해 Trade가 틀리진 않지만, 매핑이 "Broad market(SPY)"였다 | 프롬프트에 투자 발표 ≠ 관세 규칙(둘 다면 Trade + 업종 target_sector). Trade·Regulation에 섹터별 규칙 8개 추가(Healthcare→XLV 등). 광역 규칙(SPY)에 떨어진 이벤트가 기업을 지목하면 `company_direct` | `prompts/classify.txt` · `mapping_rules.json` · `mapping.py` |
+| 자문위원 감사 글이 "Regulation / Healthcare" relevance 2 → XLV 10종목이 영향 종목으로 | 감사 인사 시작 글 relevance 상한 1 + 프롬프트 규칙 | `labels.py` · `config.py` · `prompts/classify.txt` |
+| 같은 뉴스의 링크 두 개가 "Fuel Economy Rules"/"Fuel Economy Standards"로 쪼개져 🆕 4·5위. "Artificial Intelligence"/"AI Regulation"도 | 꼬리말 제거 + 동의어 표. 프롬프트에 정식 하위주제 목록 | `labels.py` · `config.py` · `prompts/classify.txt` |
+| 로이터 링크 하나가 강도 10 (9월 검증의 "한 단계 높음" 경향) | 링크 글 강도 상한 6 (`LINK_POST_MAX_INTENSITY`) — 과거 행 24건 조정 | `labels.py` · `config.py` |
+| 주제당 77개 검정 중 p < 0.05를 그대로 "드문 크기"로 서술 | BH 보정 q·robust 추가, 표·서술·고정 문구 반영 | `aggregate.py` · `render_*.py` · `prompts/narrate.txt` |
+
+재실행(로컬, 10-07 상태 파일) 결과: 보정 규칙이 1,518행 중 94행 변경(subtopic 73 · 링크 강도 24 · 감사 1). 서술은 Trade/XLI 익일(p=0.004, q=0.077)과 AAPL +3D(q=0.077, "창이 겹친 관측" 명시)만 들었고,
+당일 XLI(p=0.03, q=0.47)는 더 이상 근거로 쓰지 않는다. 남은 한계: 이미 분류된 행의 topic은 바꾸지 않는다(프롬프트 규칙은 새 글부터). CVS·NYT 같은 "신규 진입 자산"은 본문 언급 기준이라 뉴스 링크·언론 비판 글에서도 나온다.
 
 ## 다음 단계 (기획서 13절)
 

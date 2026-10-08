@@ -45,10 +45,27 @@ MARKET_RELEVANCE (0-3):
   2  could directly affect an industry or asset class, but target is unspecified ("tariffs are good", "rates are too high")
   3  tariffs / rates / sanctions / regulation / a named company with a specified target — immediate market relevance ("reviewing tariffs on Chinese chips", "Powell must cut now")
 
+SUBTOPIC — use the SHORTEST canonical noun phrase and reuse it across posts. Do not append "Rules", "Standards",
+"Policy" or "Regulation" to it (write "Fuel Economy", not "Fuel Economy Rules" / "Fuel Economy Standards";
+write "AI", not "AI Regulation" / "Artificial Intelligence"; write "Iran", not "Iran Policy").
+Prefer these when they fit: Tariff, Trade Deal, Trade Deficit, Rate Cut, Interest Rates, Fed Chair, Inflation,
+Tax Cut, Oil Prices, Drilling, Gasoline Prices, Sanctions, Ceasefire, Drug Pricing, Medicare, Antitrust, AI,
+Crypto, Fuel Economy, EPA, Border, Deportation, Investment, Earnings, Price Cuts, Media Bias.
+
 Rules:
 - Attacks on the Fed chair are topic "Fed", relevance >= 2, even if phrased as a personal insult.
 - Praise or criticism of a named company is topic "Company", include its ticker, relevance >= 2.
+- A company investment / new plant / onshoring announcement (a named company investing, building, hiring) is
+  topic "Company", subtopic "Investment", with the company's ticker and its industry in target_sector —
+  even if the post credits tariffs for it. Use topic "Trade" only when the post itself states a tariff or trade
+  measure (new, upcoming, or changed). If it does both, choose "Trade" / "Tariff" but still fill target_sector
+  with the affected industry (e.g. "Healthcare" for medical devices) and mentioned_companies with the ticker.
+- Thanking or praising an advisor, staffer, friend or supporter, with no policy measure stated, is topic
+  "Personal" (or "Congratulations"), relevance <= 1, even if the text mentions an industry.
 - A post that only reposts a link or image with no words of its own: topic "Other", relevance 0.
+- A post that is a news headline plus a URL (shared article, no original statement by the author): label the
+  headline's subject, but intensity <= 6 — a shared headline is at most a strong claim, never the author's own
+  announcement, even if the headline says the administration did something.
 - If the post is about several things, label the dominant one.
 - Be consistent: identical wording must produce identical labels.
 

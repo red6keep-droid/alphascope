@@ -37,6 +37,10 @@ def apply(event):
     mentioned = [c for c in (event.get("mentioned_companies") or []) if c]
     for rule in load_rules():
         if _matches(rule["match"], event):
+            # 2026-10-07: 광역 규칙(종목 없음 → SPY)에 떨어졌는데 본문이 기업을 지목했으면 그 기업이 경로다.
+            # BDX 투자 발표가 "Trade policy → Broad market(SPY)"로 설명되던 문제.
+            if not rule["companies"] and mentioned and rule["rule_id"] != "company_direct":
+                return "company_direct", mentioned
             companies = list(dict.fromkeys(mentioned + rule["companies"]))
             return rule["rule_id"], companies
     return None, mentioned

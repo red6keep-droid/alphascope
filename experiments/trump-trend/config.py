@@ -55,7 +55,25 @@ SUBTOPIC_ALIASES = {
     "antitrust": "Antitrust", "crypto": "Crypto", "border": "Border", "deportation": "Deportation",
     "tax cut": "Tax Cut", "tax cuts": "Tax Cut", "military strike": "Military Strike", "war": "War",
     "ceasefire": "Ceasefire", "investment": "Investment", "earnings": "Earnings",
+    # 2026-10-07: 같은 뉴스가 다른 하위주제로 쪼개지던 것들
+    "artificial intelligence": "AI", "super intelligence": "AI", "superintelligence": "AI",
+    "fuel economy": "Fuel Economy", "cafe": "Fuel Economy",
+    "iran": "Iran", "media bias": "Media Bias", "healthcare": "Healthcare",
 }
+# subtopic 꼬리말 — 떼고 나서 앨리어스를 찾는다. "Fuel Economy Rules"/"Fuel Economy Standards" → "Fuel Economy",
+# "AI Regulation" → "AI", "Iran Policy" → "Iran". 긴 것부터 맞춘다.
+SUBTOPIC_STRIP_SUFFIXES = (
+    " regulations", " regulation", " standards", " standard", " policies", " policy", " rules", " rule",
+)
+
+# ── 라벨 보정 규칙 (labels.adjust, 2026-10-07) ─────────────────────────────
+# 기사 제목 + 링크만 올린 글: 남의 헤드라인은 본인의 정책 발표가 아니다 → 강도 상한.
+# (로이터 링크 하나가 강도 10으로 급상승 상위에 오르던 문제)
+LINK_POST_MAX_WORDS = 40          # URL을 뺀 단어 수가 이 이하이면 링크 글
+LINK_POST_MAX_INTENSITY = 6       # 강한 주장(5–6)까지만. 조치 명시(7+)·발표(9+)는 본인 글에만
+# 감사 인사로 시작하는 글: 정책 조치가 없다 → 관련성 상한 (이벤트 임계값 2 미만)
+GRATITUDE_PREFIXES = ("i am grateful", "i'm grateful", "thank you to", "i want to thank", "many thanks to")
+GRATITUDE_MAX_RELEVANCE = 1
 
 # ── 노이즈 필터 (5절) ──────────────────────────────────────────────────────
 GREETING_PREFIXES = (

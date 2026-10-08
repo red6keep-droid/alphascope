@@ -1,5 +1,5 @@
 {
-  "_comment": "기획서 4-B. 규칙 하나 = 섹터 하나 = ETF 상위 10종목. match는 AND 조건, 배열 값은 OR. 위에서부터 첫 일치 규칙 하나만 적용. companies는 수동 갱신(마지막 확인 2026-09).",
+  "_comment": "기획서 4-B. 규칙 하나 = 섹터 하나 = ETF 상위 10종목. match는 AND 조건, 배열 값은 OR. 위에서부터 첫 일치 규칙 하나만 적용. companies는 수동 갱신(마지막 확인 2026-09). 2026-10-07: Trade·Regulation에 섹터별 규칙 추가(광역 SPY 앞에). 광역 규칙에 떨어진 이벤트가 기업을 지목하면 mapping.py가 company_direct로 돌린다.",
   "rules": [
     {
       "rule_id": "trade_china_semis",
@@ -32,6 +32,38 @@
       "etf": "XLK",
       "companies": ["AAPL", "MSFT", "NVDA", "AVGO", "ORCL", "CRM", "CSCO", "AMD", "ACN", "ADBE"],
       "path_text": "Tariff → Technology hardware/consumer (XLK)"
+    },
+    {
+      "rule_id": "trade_healthcare",
+      "match": {"topic": "Trade", "target_sector": ["Healthcare"]},
+      "sector": "Healthcare",
+      "etf": "XLV",
+      "companies": ["LLY", "UNH", "JNJ", "ABBV", "MRK", "TMO", "ABT", "AMGN", "PFE", "ISRG"],
+      "path_text": "Tariff (의약품·의료기기) → Healthcare (XLV)"
+    },
+    {
+      "rule_id": "trade_energy",
+      "match": {"topic": "Trade", "target_sector": ["Energy"]},
+      "sector": "Energy",
+      "etf": "XLE",
+      "companies": ["XOM", "CVX", "COP", "EOG", "SLB", "MPC", "PSX", "VLO", "OXY", "WMB"],
+      "path_text": "Tariff / trade → Energy (XLE)"
+    },
+    {
+      "rule_id": "trade_industrials",
+      "match": {"topic": "Trade", "target_sector": ["Industrials", "Materials", "Defense"]},
+      "sector": "Industrials",
+      "etf": "XLI",
+      "companies": ["GE", "CAT", "RTX", "UNP", "HON", "ETN", "DE", "LMT", "BA", "UPS"],
+      "path_text": "Tariff (철강·소재·산업재) → Industrials (XLI)"
+    },
+    {
+      "rule_id": "trade_financials",
+      "match": {"topic": "Trade", "target_sector": ["Financials"]},
+      "sector": "Financials",
+      "etf": "XLF",
+      "companies": ["JPM", "BAC", "WFC", "GS", "MS", "C", "SCHW", "BLK", "AXP", "BRK-B"],
+      "path_text": "Trade / capital flows → Financials (XLF)"
     },
     {
       "rule_id": "trade_broad",
@@ -72,6 +104,38 @@
       "etf": "XLK",
       "companies": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AMZN", "AVGO", "ORCL", "CRM", "ADBE"],
       "path_text": "Tech regulation / antitrust → Technology (XLK)"
+    },
+    {
+      "rule_id": "regulation_energy",
+      "match": {"topic": "Regulation", "target_sector": ["Energy", "Utilities"]},
+      "sector": "Energy",
+      "etf": "XLE",
+      "companies": ["XOM", "CVX", "COP", "EOG", "SLB", "MPC", "PSX", "VLO", "OXY", "WMB"],
+      "path_text": "Energy / EPA regulation → Energy (XLE)"
+    },
+    {
+      "rule_id": "regulation_autos",
+      "match": {"topic": "Regulation", "target_sector": ["Autos"]},
+      "sector": "Autos",
+      "etf": "XLY",
+      "companies": ["TSLA", "GM", "F", "TM", "HMC", "STLA", "RIVN", "APTV", "BWA", "LEA"],
+      "path_text": "Auto / fuel economy regulation → Autos (XLY 자동차)"
+    },
+    {
+      "rule_id": "regulation_financials",
+      "match": {"topic": "Regulation", "target_sector": ["Financials", "Crypto"]},
+      "sector": "Financials",
+      "etf": "XLF",
+      "companies": ["JPM", "BAC", "WFC", "GS", "MS", "C", "SCHW", "BLK", "AXP", "BRK-B"],
+      "path_text": "Financial / crypto regulation → Financials (XLF)"
+    },
+    {
+      "rule_id": "regulation_industrials",
+      "match": {"topic": "Regulation", "target_sector": ["Industrials", "Materials", "Defense"]},
+      "sector": "Industrials",
+      "etf": "XLI",
+      "companies": ["GE", "CAT", "RTX", "UNP", "HON", "ETN", "DE", "LMT", "BA", "UPS"],
+      "path_text": "Industrial regulation → Industrials (XLI)"
     },
     {
       "rule_id": "geopolitics_defense",

@@ -89,10 +89,13 @@ def _x(v):
 
 
 def _p(st):
+    """'0.04 (q0.21)' — p는 보정 전, q는 주제 안 다중 검정 BH 보정값. '~'는 무작위 날과 구분되지 않음, '*'는 보정 뒤에도 유의."""
     pl = (st or {}).get("placebo")
     if not pl:
         return "—"
-    return f"{pl['p_two_sided']:.2f}" + ("~" if pl["indistinguishable"] else "")
+    tail = "~" if pl["indistinguishable"] else ("*" if pl.get("robust") else "")
+    q = f" (q{pl['q_bh']:.2f})" if pl.get("q_bh") is not None else ""
+    return f"{pl['p_two_sided']:.2f}{tail}{q}"
 
 
 def section_reactions(a):
@@ -130,15 +133,18 @@ def section_reactions(a):
                          _pct(g("next_close")), _pct(g("d3")), _pct(g("d5")), f"{st['neg_pct']:.0f}%",
                          _x(g("rel_range")), _x(g("rel_volume")), _p(st)])
         if rows:
+            head += f" · 검정 {c.get('tests', 0)}개"
             out.append(head + "\n\n" + _table(
-                ["자산", "N", "즉각", "당일", "중앙값", "익일", "+3D", "+5D", "Neg%", "변동폭", "거래량", "p"], rows))
+                ["자산", "N", "즉각", "당일", "중앙값", "익일", "+3D", "+5D", "Neg%", "변동폭", "거래량", "p (q)"], rows))
         else:
             out.append(head + f"\n\n_clean N이 {config.MIN_CLEAN_N} 미만 — 통계를 내지 않는다. 표본이 쌓이는 중._\n")
     if not out:
         return "_오늘 이벤트에 해당하는 주제가 없다._\n"
     out.append(f"_즉각 = 장외 게시물은 다음 개장 갭, 정규장 게시물은 시가→종가. 변동폭·거래량은 직전 {config.REL_LOOKBACK_DAYS}거래일 대비 배수. "
                f"p = 같은 자산의 비이벤트 날에서 N개를 뽑은 평균이 관측 평균보다 극단적인 비율(양측, {config.PLACEBO_RESAMPLES}회). "
-               f"{noise_p:.2f} 이상(~)이면 무작위 날과 구분되지 않는다._\n")
+               f"{noise_p:.2f} 이상(~)이면 무작위 날과 구분되지 않는다. "
+               f"q = 주제 안의 모든 자산 × 구간 검정에 대한 Benjamini–Hochberg 보정값 — 수십 개를 한꺼번에 검정하므로 p < 0.05 몇 개는 우연으로도 나온다. "
+               f"q < {noise_p:.2f}(*)만 보정 뒤에도 남는 값이다. +3D·+5D는 이벤트가 몰린 시기에 창이 겹쳐 독립 표본이 아니다._\n")
     return "\n".join(out)
 
 
@@ -184,7 +190,9 @@ def render(analysis_path=None, narrative_path=None, output_path=None):
         "## 창별 트렌드", section_windows(a),
         "## 과거 반응 이력 (clean 이벤트 · SPY 대비 초과 반응 % · 배수 · 플라시보 p)", section_reactions(a),
         "## 왜 이 종목인가", section_why(a),
-        "## 내일 볼 것", section_narrative(n, "watch_tomorrow", "Gemini 서술 없음 (--narrate 로 생성)"),
+        "## 내일 볼 것", section_narrative(n, "watch_tomorrow", "Gemini 서술 없음 (--narrate 로 생성)")
+        + "\n_관찰 대상은 과거 반응 표에서 고른 값이다. 주제당 수십 개 조합을 검정했으므로 보정 q가 함께 작은 값만 근거로 삼고, "
+          "+3D·+5D는 창이 겹친 관측이다. 인과나 방향 예측이 아니다._\n",
     ]
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:

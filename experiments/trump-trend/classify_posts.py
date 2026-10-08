@@ -109,10 +109,12 @@ def classify_batch(pool, prompt_head, batch):
     if not isinstance(result, list):
         return []
     batch_ids = {p["id"] for p in batch}
+    texts = {p["id"]: prefilter.clean_text(p["content"]) for p in batch}
     valid = []
     for item in result:
         v = validate_item(item, batch_ids)
         if v:
+            v, _ = labels.adjust(v, texts[v["id"]])   # 링크 글 강도 상한 · 감사 글 관련성 상한
             valid.append(v)
     return valid
 

@@ -34,6 +34,7 @@ import collect_prices
 import config
 import db
 import event_study
+import labels
 import publish
 import render_html
 import render_report
@@ -114,6 +115,9 @@ def main():
         print("건너뜀")
     else:
         classify_posts.classify(conn, since_days=args.since_days, max_batches=args.max_batches)
+    # 보정 규칙(링크 글 강도 상한 · 감사 글 관련성 상한 · 하위주제 통일)을 과거 행에도 적용한다.
+    # 멱등이라 매 실행 돌리고, 내보내기 앞에 둬서 상태 파일도 같은 기준을 따르게 한다.
+    labels.reapply(conn)
     if args.export_state:
         # 분류 직후 바로 내보낸다 — 뒤 단계가 실패해도 Gemini 호출 결과는 남는다.
         state_io.export_state(conn, args.export_state)

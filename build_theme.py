@@ -436,7 +436,12 @@ __DASHBOARD__
                     <b:include data='post' name='post'/>
                   </article>
                   <p class='post-nav'>
-                    <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__LIST_PATH__&quot;'>목록</a>
+                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 아니면 데일리 리포트 목록.</b:comment>
+                    <b:if cond='data:post.labels any (l =&gt; l.name == &quot;__TRUMP_LABEL__&quot;)'>
+                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__TRUMP_LIST_PATH__&quot;'>목록</a>
+                    <b:else/>
+                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__LIST_PATH__&quot;'>목록</a>
+                    </b:if>
                   </p>
                   <b:include data='post' name='commentPicker'/>
                 </b:loop>
@@ -447,9 +452,14 @@ __DASHBOARD__
               <section class='reports'>
                 <div class='section-head'>
                   <h2 class='section-title'>
-                    <b:if cond='data:view.isLabelSearch'>데일리 리포트 목록<b:else/><data:view.title.escaped/></b:if>
+                    <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;__TRUMP_LABEL__&quot;'>트럼프 SNS 트렌드 목록
+                    <b:elseif cond='data:view.isLabelSearch'/>데일리 리포트 목록
+                    <b:else/><data:view.title.escaped/></b:if>
                   </h2>
-                  <span class='section-note'>AI 자동 생성 · 매 거래일 06:00 KST</span>
+                  <span class='section-note'>
+                    <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;__TRUMP_LABEL__&quot;'>AI 자동 생성 · 매일 07:30 KST
+                    <b:else/>AI 자동 생성 · 매 거래일 06:00 KST</b:if>
+                  </span>
                 </div>
                 <div class='post-grid'>
                   <b:loop values='data:posts' var='post'>
@@ -539,20 +549,26 @@ __JS__
 </html>
 """
 
-NAV_LABELS = ["시장", "섹터", "종목", "거시경제", "뉴스", "일정", "관심종목"]
+NAV_LABELS = ["시장", "섹터", "종목", "거시경제", "뉴스", "일정", "관심종목", "트럼프 트렌드"]
 
 # 데일리 리포트 목록 화면. publish_blogger.LABELS 의 첫 라벨과 같아야 한다 —
 # 파이프라인이 실제로 붙이는 라벨이라야 목록에 글이 잡힌다.
 REPORT_LABEL = "데일리 브리핑"
 LIST_PATH = "search/label/" + quote(REPORT_LABEL)
 
+# 트럼프 SNS 트렌드 연재. experiments/trump-trend/report_title.LABELS 의 첫 라벨과 같아야 한다.
+# 글 하단 '목록' 버튼과 라벨 목록 화면 제목이 이 라벨로 연재를 가른다.
+TRUMP_LABEL = "트럼프 트렌드"
+TRUMP_LIST_PATH = "search/label/" + quote(TRUMP_LABEL)
+
 
 def nav_items():
     out = []
     for label in NAV_LABELS:
+        # 주소는 인코딩한다 — "트럼프 트렌드"처럼 띄어쓰기가 있는 라벨 때문. 비교는 원문으로.
         out.append(
-            "          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/{0}&quot;'>\n"
-            "            <b:attr cond='data:view.search.label == &quot;{0}&quot;' name='aria-current' value='page'/>{0}</a>".format(label)
+            "          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/{1}&quot;'>\n"
+            "            <b:attr cond='data:view.search.label == &quot;{0}&quot;' name='aria-current' value='page'/>{0}</a>".format(label, quote(label))
         )
     return "\n".join(out)
 
@@ -596,6 +612,8 @@ def build_theme(parts):
     out = out.replace("__BLOGGER_CSS__", BLOGGER_CSS.strip())
     out = out.replace("__NAV_ITEMS__", nav_items())
     out = out.replace("__LIST_PATH__", LIST_PATH)
+    out = out.replace("__TRUMP_LABEL__", TRUMP_LABEL)
+    out = out.replace("__TRUMP_LIST_PATH__", TRUMP_LIST_PATH)
     out = out.replace("__DASHBOARD__", indent(to_xml_attrs(parts["dashboard"]), 6))
     out = out.replace("__BLOG_INCLUDABLES__", includables)
     out = out.replace("__BREAKING__", indent(to_xml_attrs(parts["breaking"]), 4))
@@ -915,6 +933,22 @@ FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic N
 
 SAVED_POST_BODY = "experiments/daily-report/output/report_body.html"
 
+# 홈 두 번째 카드(트럼프 SNS 트렌드)용. 글 보기 탭은 데일리 리포트만 보여주므로
+# 이 본문은 홈 카드에만 쓰인다. h2 는 experiments/trump-trend/render_html.py build_body 와 같아야 한다.
+SAVED_TRUMP_BODY = "experiments/trump-trend/output/trump_report_body.html"
+PREVIEW_TRUMP_TITLE = "트럼프 발언 트렌드 — 2026년 9월 3일"
+FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:1.7;color:#333;">
+<h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘 한 줄</h2>
+<div style="font-size:20px;font-weight:bold;color:#111;">지난 24시간 게시물 <b>36</b>건 중 정책 관련 <b>2</b>건, 이벤트 <b>2</b>개. 가장 강한 발언은 <b>Regulation / Artificial Intelligence</b> (강도 10).</div>
+<h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘의 발언</h2>
+<table style="width:100%;border-collapse:collapse;"><tr><th>시각</th><th>주제</th></tr><tr><td>10-04 21:23</td><td>Regulation / AI</td></tr></table>
+<h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">무엇이 달라졌나</h2>
+<ul style='margin:8px 0 8px 20px;'><li style='margin:4px 0;'>최근 90일간 등장하지 않았던 Regulation / Medicare 주제가 최근 7일간 1건 나타났으며 트렌드 점수 68.8점이 관찰됐다.</li><li style='margin:4px 0;'>Trade / Tariff 주제는 직전 7일간 0건에서 최근 7일간 2건으로 증가한 변화가 관찰됐다.</li><li style='margin:4px 0;'>신규 진입 대상으로는 South Korea와 BAYRY, CVS가 나타났다.</li></ul>
+<h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">내일 볼 것</h2>
+<ul style='margin:8px 0 8px 20px;'><li style='margin:4px 0;'>과거 Regulation 이벤트 28건에서 익일 평균 -0.54% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.002)로 관찰된 XLI가 관찰 대상으로 나타났다.</li><li style='margin:4px 0;'>과거 Trade 이벤트 23건에서 +3거래일 평균 2.001% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.002)로 관찰된 AAPL이 관찰 대상으로 나타났다.</li></ul>
+<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:15px;color:#777;line-height:1.6;">데이터: Truth Social 게시물 공개 아카이브(CNN) · 가격 Yahoo Finance · 거시 일정 FRED. 이 글의 시장 반응 수치는 과거 발언 이후 <b>관찰된 값</b>이며 인과 관계나 향후 방향을 의미하지 않습니다. 투자 권고가 아닙니다.</div>
+</div>"""
+
 
 def preview_post_body():
     """실제로 생성된 리포트 본문이 로컬에 있으면 그걸 쓰고, 없으면 더미로 대체한다.
@@ -927,6 +961,15 @@ def preview_post_body():
     except OSError:
         cover = _svg_data_uri("#2563EB", "#7DD3FC")
         return FALLBACK_POST_BODY.replace("__COVER__", cover), "더미 본문"
+
+
+def preview_trump_body():
+    """트럼프 트렌드 본문 — 로컬 산출물이 있으면 그것, 없으면 더미."""
+    try:
+        body = io.open(SAVED_TRUMP_BODY, encoding="utf-8").read().strip()
+        return body, f"트럼프 본문({SAVED_TRUMP_BODY})"
+    except OSError:
+        return FALLBACK_TRUMP_BODY, "트럼프 더미 본문"
 
 
 def preview_reports():
@@ -1153,26 +1196,36 @@ def preview_mock_js():
     # 상단 브리핑은 블로거 피드에서 최신 글을 읽어 채운다. 글 본문은 글 보기
     # 탭과 같은 것을 써서, 두 화면의 내용이 어긋나 보이지 않게 한다.
     body, _ = preview_post_body()
-    feed = {
-        "feed": {
-            "entry": [{
-                "title": {"$t": PREVIEW_POST_TITLE},
-                "published": {"$t": "2026-09-03T06:00:00.000+09:00"},
-                "content": {"$t": body},
-                "link": [{"rel": "alternate", "href": "#post"}],
-            }]
+    trump_body, _ = preview_trump_body()
+
+    def one_entry_feed(title, body, href):
+        return {
+            "feed": {
+                "entry": [{
+                    "title": {"$t": title},
+                    "published": {"$t": "2026-09-03T06:00:00.000+09:00"},
+                    "content": {"$t": body},
+                    "link": [{"rel": "alternate", "href": href}],
+                }]
+            }
         }
-    }
+
+    feed = one_entry_feed(PREVIEW_POST_TITLE, body, "#post")
+    # 트럼프 카드. 글 보기 탭이 데일리 리포트 전용이라 라벨 목록 흉내(#list)로 보낸다.
+    trump_feed = one_entry_feed(PREVIEW_TRUMP_TITLE, trump_body, "#list")
 
     return (
         "  var PV_DATA = %s;\n"
         "  var PV_NEWS = %s;\n"
         "  var PV_FEED = %s;\n"
+        "  var PV_TRUMP_FEED = %s;\n"
         "\n"
-        "  /* 디자인만 확인하므로 실제 시세를 부르지 않는다. */\n"
+        "  /* 디자인만 확인하므로 실제 시세를 부르지 않는다. 피드는 라벨로 가른다. */\n"
         "  window.fetch = function (url) {\n"
         "    var u = String(url), body;\n"
-        "    if (u.indexOf('/feeds/posts') >= 0) body = PV_FEED;\n"
+        "    if (u.indexOf('/feeds/posts') >= 0) {\n"
+        "      body = decodeURIComponent(u).indexOf('트럼프 트렌드') >= 0 ? PV_TRUMP_FEED : PV_FEED;\n"
+        "    }\n"
         "    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;\n"
         "    else body = PV_DATA;\n"
         "    return Promise.resolve({ json: function () { return Promise.resolve(body); } });\n"
@@ -1181,6 +1234,7 @@ def preview_mock_js():
             json.dumps(data, ensure_ascii=False),
             json.dumps(news, ensure_ascii=False),
             json.dumps(feed, ensure_ascii=False),
+            json.dumps(trump_feed, ensure_ascii=False),
         )
     )
 
@@ -1315,6 +1369,7 @@ __SWITCH__
 def build_preview(parts):
     """브라우저로 여는 디자인 확인용 HTML 을 만든다."""
     _, body_source = preview_post_body()
+    _, trump_source = preview_trump_body()
 
     out = PREVIEW_TEMPLATE
     out = out.replace("__CSS__", parts["css"])
@@ -1337,7 +1392,7 @@ def build_preview(parts):
     io.open(PREVIEW_TARGET, "w", encoding="utf-8", newline="\n").write(out)
     print(
         f"{PREVIEW_TARGET} 생성 완료 — {out.count(chr(10)) + 1}줄, "
-        f"글 카드 {len(PREVIEW_POSTS)}개 · 댓글 {len(PREVIEW_COMMENTS)}개, {body_source}"
+        f"글 카드 {len(PREVIEW_POSTS)}개 · 댓글 {len(PREVIEW_COMMENTS)}개, {body_source}, {trump_source}"
     )
     print("  브라우저로 열어 홈 / 목록 / 글 보기 를 전환하며 확인하십시오.")
 

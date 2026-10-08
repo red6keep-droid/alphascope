@@ -281,6 +281,32 @@ def _placebo(obs, pool, seed, ratio=False):
     }
 
 
+def _apply_bh(sym_out):
+    """한 주제 안의 모든 (자산 × 구간) 플라시보 p에 Benjamini–Hochberg 보정을 건다 (2026-10-07).
+
+    자산 11개 × 구간 7개 = 최대 77개를 한꺼번에 검정하므로 p < 0.05 몇 개는 우연으로도 나온다.
+    각 placebo에 q_bh(보정 p)와 robust(q_bh < PLACEBO_NOISE_P)를 붙인다. indistinguishable(원 p 기준)은 그대로 둔다 —
+    표는 p를 보여 주고, 서술이 관찰 대상을 고를 때는 robust를 쓴다. 반환값은 검정 개수."""
+    tests = []
+    for hz_out in sym_out.values():
+        for st in hz_out.values():
+            pl = (st or {}).get("placebo")
+            if pl:
+                tests.append(pl)
+    m = len(tests)
+    if not m:
+        return 0
+    order = sorted(range(m), key=lambda i: tests[i]["p_two_sided"])
+    q_prev = 1.0
+    for rank in range(m, 0, -1):          # 큰 p부터 내려오며 누적 최소
+        i = order[rank - 1]
+        q = min(q_prev, tests[i]["p_two_sided"] * m / rank)
+        tests[i]["q_bh"] = round(q, 3)
+        tests[i]["robust"] = q < config.PLACEBO_NOISE_P
+        q_prev = q
+    return m
+
+
 def _exclude_days(conn, events):
     days = {e["effective_day"] for e in events if e["effective_day"]}
     days |= {r["day"] for r in conn.execute("SELECT DISTINCT day FROM macro_calendar")}
@@ -332,6 +358,7 @@ def reaction_stats(events, conn=None):
                     st["placebo"] = _placebo(obs, pools[sym], f"{gkey}|{sym}|{hz}", ratio)
                 hz_out[hz] = st
             sym_out[sym] = hz_out
+        counts[gkey]["tests"] = _apply_bh(sym_out)
         out[gkey] = {"counts": counts[gkey], "symbols": sym_out}
     for gkey, c in counts.items():
         out.setdefault(gkey, {"counts": c, "symbols": {}})

@@ -53,6 +53,8 @@
   --logo-red:    #DD0000;
   --badge-blue:  #4963CA;
   --badge-green: #10B981;
+  --badge-orange: #C2410C;
+  --badge-violet: #6D28D9;
 
   /* type */
   --sans: 'Noto Sans KR', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -265,14 +267,21 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* stretch 라야 왼쪽 리포트 카드가 오른쪽 급등주 카드와 아래선까지 맞는다 */
 .briefing-body { display: flex; align-items: stretch; gap: 20px; }
-.briefing-main { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+/* 데일리 리포트 · 트럼프 SNS 트렌드 — 두 카드를 같은 폭으로 나란히 둔다 */
+.briefing-main {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  flex: 1;
+  min-width: 0;
+}
 
-/* 카드 전체가 오늘 리포트로 가는 링크다. 구획(요약 / 핵심 인사이트)은 안에서 나눈다. */
+/* 카드 전체가 그 리포트 글로 가는 링크다. 구획(요약 / 핵심 인사이트 등)은 안에서 나눈다. */
 .report-card {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  flex: 1;
+  min-width: 0;
   padding: 16px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -283,6 +292,29 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .report-card:hover {
   border-color: var(--accent);
   box-shadow: 0 2px 14px rgba(15, 23, 42, .09);
+}
+/* 카드 머리: 어느 연재인지와 그 글의 날짜. 날짜는 피드에서 채운다. */
+.report-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.report-card-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.report-card-date {
+  font-family: var(--num);
+  font-size: 14px;
+  line-height: 19px;
+  color: var(--gray-500);
+  white-space: nowrap;
 }
 .report-block { display: flex; flex-direction: column; gap: 10px; }
 
@@ -298,21 +330,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .badge--summary { background: var(--badge-green); }
 .badge--insight { background: var(--badge-blue); }
+.badge--speech  { background: var(--badge-orange); }
+.badge--watch   { background: var(--badge-violet); }
 
-.report-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-/* 문장이 하나뿐이면 두 칸으로 가르지 않고 통으로 쓴다 — 빈 칸이 남지 않게 */
-.report-columns--single { grid-template-columns: 1fr; }
+/* 카드가 둘로 나뉘어 폭이 좁아졌으므로 문장은 한 칸으로만 흐른다 */
 .report-columns ul { display: flex; flex-direction: column; gap: 10px; }
 .report-columns li {
   /* 글머리표 폭만큼 들여쓰고 첫 줄만 되당겨, 넘어간 줄이 글머리표가 아니라
      본문 왼쪽에 맞춰 선다. */
   padding-left: 15px;
   text-indent: -15px;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.65;
   color: #000;
   /* 한국어는 어절 중간에서 끊으면 읽기 나쁘다 — 띄어쓰기에서만 넘긴다.
@@ -320,7 +348,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   word-break: keep-all;
   overflow-wrap: break-word;
 }
-.report-columns li::before { content: '• '; }
+/* 글머리표는 이스케이프로 쓴다 — 블로거가 b:skin 안의 비ASCII 문자를 &#8226; 같은
+   엔티티로 바꿔 저장하면, CSS 문자열에서는 그 엔티티가 글자 그대로 보인다. */
+.report-columns li::before { content: '\2022  '; }
 /* 불러오는 중 · 실패 안내 — 글머리표 없이 흐린 글자로 */
 .report-columns li.load-status,
 .picks li.load-status { color: var(--gray-400); }
@@ -977,7 +1007,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .menu-items[hidden] { display: none; }
   .nav-item { padding: 12px 10px; font-size: 18px; }
   .search-bar { width: 160px; }
-  .report-columns { grid-template-columns: minmax(0, 1fr); }
+  .briefing-main { grid-template-columns: minmax(0, 1fr); }
   .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .news-headline { font-size: 26px; }
 }
@@ -1289,20 +1319,22 @@ body.no-dashboard .main-content { padding-top: 32px; }
         <nav class='menu-items' id='primary-menu'>
           <a class='nav-item' expr:href='data:blog.homepageUrl'>
             <b:attr cond='data:view.isHomepage' name='aria-current' value='page'/>홈</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/시장&quot;'>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%8B%9C%EC%9E%A5&quot;'>
             <b:attr cond='data:view.search.label == &quot;시장&quot;' name='aria-current' value='page'/>시장</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/섹터&quot;'>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%84%B9%ED%84%B0&quot;'>
             <b:attr cond='data:view.search.label == &quot;섹터&quot;' name='aria-current' value='page'/>섹터</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/종목&quot;'>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%A2%85%EB%AA%A9&quot;'>
             <b:attr cond='data:view.search.label == &quot;종목&quot;' name='aria-current' value='page'/>종목</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/거시경제&quot;'>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EA%B1%B0%EC%8B%9C%EA%B2%BD%EC%A0%9C&quot;'>
             <b:attr cond='data:view.search.label == &quot;거시경제&quot;' name='aria-current' value='page'/>거시경제</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/뉴스&quot;'>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%89%B4%EC%8A%A4&quot;'>
             <b:attr cond='data:view.search.label == &quot;뉴스&quot;' name='aria-current' value='page'/>뉴스</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/일정&quot;'>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%9D%BC%EC%A0%95&quot;'>
             <b:attr cond='data:view.search.label == &quot;일정&quot;' name='aria-current' value='page'/>일정</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/관심종목&quot;'>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EA%B4%80%EC%8B%AC%EC%A2%85%EB%AA%A9&quot;'>
             <b:attr cond='data:view.search.label == &quot;관심종목&quot;' name='aria-current' value='page'/>관심종목</a>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C&quot;'>
+            <b:attr cond='data:view.search.label == &quot;트럼프 트렌드&quot;' name='aria-current' value='page'/>트럼프 트렌드</a>
         </nav>
       </div>
 
@@ -1354,33 +1386,50 @@ body.no-dashboard .main-content { padding-top: 32px; }
                 </svg>
                 미국 증시 데일리 브리핑
               </h2>
-              <p class='briefing-sub' id='briefing-sub'>오늘의 시장 리포트 요약: AI가 분석한 핵심 인사이트, 급등주, 시장 전망을 한눈에 확인</p>
+              <p class='briefing-sub'>데일리 리포트와 트럼프 SNS 트렌드의 핵심만 추렸습니다. 카드를 누르면 전체 글로 갑니다.</p>
             </div>
             <p class='sync-stamp'><span class='sync-dot'></span><span id='sync-label'>실시간 AI 동기화</span></p>
           </div>
 
           <div class='briefing-body'>
             <div class='briefing-main'>
-              <!-- 연동 훅: 카드 전체가 오늘 리포트 글로 가는 링크다.
-                   href 와 본문 문구는 블로거 피드에서 채운다. -->
+              <!-- 연동 훅: 카드 전체가 그 리포트 글로 가는 링크다.
+                   href · 날짜 · 본문 문구는 블로거 피드에서 채운다 (라벨별 최신 글 1건). -->
               <a class='report-card' id='report-card' href='#'>
+                <div class='report-card-head'>
+                  <h3 class='report-card-title'>데일리 리포트</h3>
+                  <span class='report-card-date' data-date='report-card'></span>
+                </div>
                 <div class='report-block' data-hook='summary'>
                   <span class='badge badge--summary'>오늘의 시장 요약</span>
-                  <div class='report-columns report-columns--single'>
-                    <ul>
-                      <li class='load-status'>리포트를 불러오는 중…</li>
-                    </ul>
-                    <ul hidden='hidden'></ul>
+                  <div class='report-columns'>
+                    <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
                   </div>
                 </div>
-
                 <div class='report-block' data-hook='insight'>
                   <span class='badge badge--insight'>오늘의 핵심 인사이트</span>
-                  <div class='report-columns report-columns--single'>
-                    <ul>
-                      <li class='load-status'>리포트를 불러오는 중…</li>
-                    </ul>
-                    <ul hidden='hidden'></ul>
+                  <div class='report-columns'>
+                    <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 트럼프 트렌드 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
+              <a class='report-card' id='trump-card' href='/search/label/트럼프%20트렌드'>
+                <div class='report-card-head'>
+                  <h3 class='report-card-title'>트럼프 SNS 트렌드</h3>
+                  <span class='report-card-date' data-date='trump-card'></span>
+                </div>
+                <div class='report-block' data-hook='speech'>
+                  <span class='badge badge--speech'>오늘의 발언</span>
+                  <div class='report-columns'>
+                    <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
+                  </div>
+                </div>
+                <div class='report-block' data-hook='watch'>
+                  <span class='badge badge--watch'>내일 볼 것</span>
+                  <div class='report-columns'>
+                    <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
                   </div>
                 </div>
               </a>
@@ -1528,7 +1577,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
                     <b:include data='post' name='post'/>
                   </article>
                   <p class='post-nav'>
-                    <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91&quot;'>목록</a>
+                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 아니면 데일리 리포트 목록.</b:comment>
+                    <b:if cond='data:post.labels any (l =&gt; l.name == &quot;트럼프 트렌드&quot;)'>
+                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C&quot;'>목록</a>
+                    <b:else/>
+                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91&quot;'>목록</a>
+                    </b:if>
                   </p>
                   <b:include data='post' name='commentPicker'/>
                 </b:loop>
@@ -1539,9 +1593,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
               <section class='reports'>
                 <div class='section-head'>
                   <h2 class='section-title'>
-                    <b:if cond='data:view.isLabelSearch'>데일리 리포트 목록<b:else/><data:view.title.escaped/></b:if>
+                    <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;트럼프 트렌드&quot;'>트럼프 SNS 트렌드 목록
+                    <b:elseif cond='data:view.isLabelSearch'/>데일리 리포트 목록
+                    <b:else/><data:view.title.escaped/></b:if>
                   </h2>
-                  <span class='section-note'>AI 자동 생성 · 매 거래일 06:00 KST</span>
+                  <span class='section-note'>
+                    <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;트럼프 트렌드&quot;'>AI 자동 생성 · 매일 07:30 KST
+                    <b:else/>AI 자동 생성 · 매 거래일 06:00 KST</b:if>
+                  </span>
                 </div>
                 <div class='post-grid'>
                   <b:loop values='data:posts' var='post'>
@@ -2551,24 +2610,47 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
         /* ====================================================== 오늘의 데일리 리포트
 
-           블로거 피드에서 데일리 브리핑 라벨의 최신 글 1건만 받아 상단 브리핑을 채운다.
-           라벨로 거르지 않으면 트럼프 트렌드 같은 다른 연재 글이 최신일 때 그 글을 읽는다.
+           블로거 피드에서 라벨별 최신 글 1건씩 받아 상단 카드 둘을 채운다 —
+           데일리 브리핑 → 데일리 리포트 카드(+ 급등주), 트럼프 트렌드 → 트럼프 SNS 트렌드 카드.
+           라벨로 거르지 않으면 다른 연재 글이 최신일 때 그 글을 읽는다.
 
            리포트 본문은 h2 로 구획이 나뉘어 있어 제목 글자로 구간을 찾는다. 카드는
-           '불러오는 중' 으로 시작하고, 피드를 못 받거나 구간을 못 찾으면 '불러올 수 없습니다'
-           로 바꾼다 — 예시 문구를 남기면 방문자가 오늘 시장 내용으로 오해한다.
-           그러니 experiments/daily-report/templates/report.html 의 h2 를 바꾸면 여기도 고친다. */
+           '불러오는 중' 으로 시작하고, 피드를 못 받거나 구간을 못 찾으면 '불러올 수 없습니다',
+           피드는 왔는데 글이 없으면 '아직 발행된 … 없습니다' 로 바꾼다 — 예시 문구를 남기면
+           방문자가 오늘 내용으로 오해한다. 그러니 두 리포트 템플릿의 h2 를 바꾸면 CARDS 도 고친다. */
 
-        var FEED_URL = '/feeds/posts/default/-/' + encodeURIComponent('데일리 브리핑') + '?alt=json&max-results=1';
+        /* 라벨별 최신 글 1건 */
+        function feedUrl(label) {
+          return '/feeds/posts/default/-/' + encodeURIComponent(label) + '?alt=json&max-results=1';
+        }
 
         /* 홈에는 리포트의 일부만 발췌해 싣는다. 게시된 글은 손대지 않는다 —
            읽어와 보여주기만 하므로 상세 글에는 모든 구간이 그대로 남는다.
-           시장 요약 = 한 줄 결론 + 지수 해설, 핵심 인사이트 = 종합 판단. */
-        var REPORT_MAP = {
-          summary: ['오늘 한 줄', '주요 지수'],
-          insight: ['종합 — 현재 시장 상태']
-        };
+           카드마다 라벨 · 구획(h2 제목 → 카드 훅) · 빈 피드 안내문을 둔다.
+
+           데일리 리포트 — experiments/daily-report/templates/report.html 의 h2:
+             시장 요약 = 한 줄 결론 + 지수 해설, 핵심 인사이트 = 종합 판단.
+           트럼프 트렌드 — experiments/trump-trend/render_html.py build_body 의 h2:
+             오늘의 발언 = 한 줄 결론 + 무엇이 달라졌나, 내일 볼 것 = 관찰 대상. */
+        var CARDS = [
+          {
+            id: 'report-card',
+            label: '데일리 브리핑',
+            map: { summary: ['오늘 한 줄', '주요 지수'], insight: ['종합 — 현재 시장 상태'] },
+            picks: true,
+            empty: '아직 발행된 리포트가 없습니다.'
+          },
+          {
+            id: 'trump-card',
+            label: '트럼프 트렌드',
+            map: { speech: ['오늘 한 줄', '무엇이 달라졌나'], watch: ['내일 볼 것'] },
+            picks: false,
+            empty: '아직 발행된 트렌드 리포트가 없습니다.'
+          }
+        ];
         var PICKS_HEAD = '오늘의 급등주 TOP 5';
+        /* 구획 하나에 싣는 최대 줄 수 — 카드는 요약이고 전체는 글에서 읽는다 */
+        var MAX_LINES = 5;
 
         /* h2 제목 → 다음 h2 전까지의 형제 노드 */
         function reportSections(html) {
@@ -2586,56 +2668,53 @@ body.no-dashboard .main-content { padding-top: 32px; }
           return out;
         }
 
-        /* 문단은 div 중첩으로 오므로 자식 없는 말단만 한 줄로 본다. 표는 건너뛴다. */
+        /* 구간의 문장들.
+           - 글머리표(li)가 있으면 그것만 쓴다 — 서술 뒤에 딸려 오는 다른 문단을 거른다.
+           - 없으면 블록 자식이 없는 요소를 한 줄로 본다. 문단은 div 중첩으로 오고
+             안에 b · span 같은 인라인만 있을 수 있으므로 그 요소 전체 글을 한 줄로 친다.
+           - 표는 건너뛴다. 출처·면책 문단은 두 리포트 템플릿 모두 윗줄(border-top)로
+             구분하므로 그 요소도 건너뛴다. */
+        var INLINE = { B: 1, I: 1, EM: 1, STRONG: 1, SPAN: 1, A: 1, BR: 1, SUP: 1, SUB: 1, CODE: 1, SMALL: 1, MARK: 1 };
+
         function linesOf(nodes) {
-          var lines = [];
+          var lines = [], bullets = [];
+          function text(n) { return String(n.textContent || '').replace(/\s+/g, ' ').trim(); }
+          function leaf(n) {
+            for (var i = 0; i < n.children.length; i++) {
+              if (!INLINE[n.children[i].tagName]) return false;
+            }
+            return true;
+          }
           function walk(n) {
             if (!n || n.tagName === 'TABLE') return;
-            if (!n.children || !n.children.length) {
-              var t = String(n.textContent || '').trim();
-              if (t) lines.push(t);
-              return;
-            }
+            if (/border-top/.test(n.getAttribute('style') || '')) return;
+            if (n.tagName === 'LI') { var b = text(n); if (b) bullets.push(b); return; }
+            if (leaf(n)) { var t = text(n); if (t) lines.push(t); return; }
             for (var i = 0; i < n.children.length; i++) walk(n.children[i]);
           }
           for (var i = 0; i < (nodes || []).length; i++) walk(nodes[i]);
-          return lines;
+          return bullets.length ? bullets : lines;
         }
 
         var LOAD_FAILED = '리포트를 불러올 수 없습니다.';
 
         function statusItem(msg) { return el('li', 'load-status', msg); }
 
-        function fillCard(hook, lines) {
+        function fillCard(hook, lines, emptyMsg) {
           var block = document.querySelector('.report-block[data-hook="' + hook + '"]');
-          if (!block) return;
-          var grid = block.querySelector('.report-columns');
-          var cols = block.querySelectorAll('.report-columns ul');
-          if (!grid || !cols.length) return;
-
+          var list = block && block.querySelector('.report-columns ul');
+          if (!list) return;
+          list.textContent = '';
           if (!lines.length) {
-            grid.classList.add('report-columns--single');
-            for (var k = 0; k < cols.length; k++) {
-              cols[k].textContent = '';
-              cols[k].hidden = k > 0;
-            }
-            cols[0].appendChild(statusItem(LOAD_FAILED));
+            list.appendChild(statusItem(emptyMsg || LOAD_FAILED));
             return;
           }
+          lines.forEach(function (t) { list.appendChild(el('li', null, t)); });
+        }
 
-          /* 한 문장뿐이면 칸을 가르지 않는다 */
-          var single = lines.length < 2;
-          grid.classList.toggle('report-columns--single', single);
-          var use = single ? 1 : cols.length;
-
-          for (var i = 0; i < cols.length; i++) {
-            cols[i].textContent = '';
-            cols[i].hidden = i >= use;
-          }
-          var per = Math.ceil(lines.length / use);
-          lines.forEach(function (t, i) {
-            cols[Math.min(Math.floor(i / per), use - 1)].appendChild(el('li', null, t));
-          });
+        function setDate(id, text) {
+          var d = document.querySelector('.report-card-date[data-date="' + id + '"]');
+          if (d) d.textContent = text;
         }
 
         /* 급등주 표의 종목 / 가격 / 등락률 세 칸을 사이드바로 옮긴다 */
@@ -2671,49 +2750,53 @@ body.no-dashboard .main-content { padding-top: 32px; }
           });
         }
 
-        fetch(FEED_URL)
-          .then(function (r) { return r.json(); })
-          .then(function (json) {
-            var entry = ((json.feed || {}).entry || [])[0];
-            if (!entry) throw new Error('no entry');
+        function failCard(card, msg) {
+          Object.keys(card.map).forEach(function (hook) { fillCard(hook, [], msg); });
+          if (card.picks) fillPicks(null);
+        }
 
-            var title = (entry.title || {}).$t || '';
-            var day = String((entry.published || {}).$t || '').slice(0, 10).replace(/-/g, '.');
+        function loadCard(card) {
+          fetch(feedUrl(card.label))
+            .then(function (r) { return r.json(); })
+            .then(function (json) {
+              var entry = ((json.feed || {}).entry || [])[0];
+              /* 피드는 왔는데 글이 없다 = 아직 발행 전. 실패와 다르게 알린다. */
+              if (!entry) { failCard(card, card.empty); return; }
 
-            var sub = document.getElementById('briefing-sub');
-            if (sub && title) sub.textContent = day ? (day + ' · ' + title) : title;
+              var title = (entry.title || {}).$t || '';
+              var day = String((entry.published || {}).$t || '').slice(0, 10).replace(/-/g, '.');
+              setDate(card.id, day);
 
-            /* 카드를 누르면 오늘 리포트 글로 간다 */
-            var href = '';
-            (entry.link || []).forEach(function (l) {
-              if (l.rel === 'alternate' && l.href) href = l.href;
-            });
-            var card = document.getElementById('report-card');
-            if (card && href) card.href = href;
-
-            var sec = reportSections((entry.content || {}).$t || '');
-            if (!sec) throw new Error('unparsable');
-
-            function gather(names) {
-              var lines = [];
-              names.forEach(function (k) {
-                if (sec[k]) lines = lines.concat(linesOf(sec[k]));
+              /* 카드를 누르면 그 글로 간다 */
+              var href = '';
+              (entry.link || []).forEach(function (l) {
+                if (l.rel === 'alternate' && l.href) href = l.href;
               });
-              return lines;
-            }
+              var a = document.getElementById(card.id);
+              if (a && href) a.href = href;
+              if (a && title) a.title = title;
 
-            fillCard('summary', gather(REPORT_MAP.summary));
-            fillCard('insight', gather(REPORT_MAP.insight));
-            fillPicks(sec[PICKS_HEAD]);
+              var sec = reportSections((entry.content || {}).$t || '');
+              if (!sec) throw new Error('unparsable');
 
-            var stamp = document.getElementById('sync-label');
-            if (stamp && day) stamp.textContent = day + ' 리포트 기준';
-          })
-          .catch(function () {
-            fillCard('summary', []);
-            fillCard('insight', []);
-            fillPicks(null);
-          });
+              Object.keys(card.map).forEach(function (hook) {
+                var lines = [];
+                card.map[hook].forEach(function (k) {
+                  if (sec[k]) lines = lines.concat(linesOf(sec[k]));
+                });
+                fillCard(hook, lines.slice(0, MAX_LINES));
+              });
+
+              if (card.picks) {
+                fillPicks(sec[PICKS_HEAD]);
+                var stamp = document.getElementById('sync-label');
+                if (stamp && day) stamp.textContent = day + ' 리포트 기준';
+              }
+            })
+            .catch(function () { failCard(card); });
+        }
+
+        CARDS.forEach(loadCard);
 
         /* ============================================================ 모바일 메뉴 */
 
