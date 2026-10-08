@@ -18,3 +18,6 @@ experiments/signal-study/output/
 .venv/
 .DS_Store
 reference2/doc/ytb/*당잠사*
+
+experiments/nvda-report/data/
+experiments/nvda-report/output/

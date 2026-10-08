@@ -1,0 +1,5 @@
+[
+  {"day": "2027-01-05", "kind": "EVENT", "label": "CES 2027 (라스베이거스, 1/5–1/8 추정)", "confirmed": false},
+  {"day": "2027-03-15", "kind": "EVENT", "label": "GTC 2027 (산호세, 3월 중순 추정 — 공식 발표 후 갱신)", "confirmed": false},
+  {"day": "2027-06-01", "kind": "EVENT", "label": "Computex 2027 (타이베이, 6월 초 추정)", "confirmed": false}
+]

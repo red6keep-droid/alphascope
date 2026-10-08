@@ -1,0 +1,6 @@
+requests>=2.31.0
+yfinance>=1.0
+pandas>=2.0
+python-dotenv>=1.0.1
+google-genai>=1.0.0
+tzdata; sys_platform == "win32"
