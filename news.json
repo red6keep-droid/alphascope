@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-10-09 08:50:42 UTC",
+  "updated_at": "2026-10-09 16:56:07 UTC",
   "items": [
+    {
+      "title": "Living with Mom and trading on margin. The regular investor gets in on Wall Street's record stock borrowing binge",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/09/margin-debt-stock-market-risk.html",
+      "published": "2026-10-09 13:03:19",
+      "summary": "Margin debt has surged to record levels as investors like 29-year-old Hy Luu borrow more against their portfolios. Here’s how leverage can amplify stock losses."
+    },
     {
       "title": "Unsure how long this AI bull has? Bonds now offer a cushion at the best values in years",
       "source": "CNBC",
@@ -77,13 +84,6 @@
       "link": "https://www.cnbc.com/2026/09/22/lennar-shares-pop-as-berkshire-builds-almost-a-10percent-stake-in-beleaguered-homebuilder.html",
       "published": "2026-09-22 22:35:50",
       "summary": "The conglomerate built by Warren Buffett and led today by Greg Abel holds a sizable stake in Miami-based homebuilder Lennar."
-    },
-    {
-      "title": "No new stock highs, no problem: Options traders bet they're coming in these names",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/22/no-new-stock-highs-no-problem-options-traders-bet-theyre-coming-in-these-names.html",
-      "published": "2026-09-22 18:09:32",
-      "summary": "Options activity shows traders anticipate fresh highs are around the corner for a handful of names."
     }
   ]
 }
