@@ -1017,6 +1017,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 
 @media (max-width: 680px) {
+  /* 홈(대시보드)에서는 카드가 화면 가장자리에서 10px (2026-10-10 사용자). 글 보기는 20px 별도 규칙 */
+  body:not(.item-view) .main-content { padding-left: 10px; padding-right: 10px; }
   .index-row { grid-template-columns: minmax(0, 1fr); }
   .news-top { grid-template-columns: minmax(0, 1fr); }
   .news-hero-img { aspect-ratio: 16 / 9; max-width: 100%; }
@@ -1696,6 +1698,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     .then(function (r) { return r.json(); })
     .then(function (json) {
       var items = (json.items || []).filter(function (i) { return i && i.title; });
+      /* 번역된 제목이 있으면 그것을 쓴다 (fetch_news.py 가 Gemini 로 채운 title_ko). 분류는 영문 원제로 한다. */
+      items.forEach(function (i) { i.title_en = i.title; if (i.title_ko) i.title = i.title_ko; });
       if (!items.length) throw new Error('no items');
 
       /* BREAKING 티커 — 애니메이션이 -50% 로 감기므로 내용을 2회 반복 */

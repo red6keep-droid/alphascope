@@ -27,6 +27,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run news script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 제목 한글 번역 (없으면 영문 유지)
         run: python fetch_news.py
 
       - name: Prepare deployment files
