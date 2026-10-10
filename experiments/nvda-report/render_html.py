@@ -57,10 +57,23 @@ def _tag(area, direction):
 
 # ── 섹션 ────────────────────────────────────────────────────────────────
 
+def _notice(a):
+    ds = a["data_status"]
+    parts = []
+    if ds.get("test_mode"):
+        parts.append(f"<b>🧪 테스트 운영 중</b> — {_esc(config.TEST_NOTICE)}")
+    if ds.get("items_pending"):
+        parts.append(f"⚠️ 기사 {ds['items_pending']}건이 아직 분류되지 않아 오늘 항목이 불완전할 수 있습니다 (다음 실행에서 이어서 분류).")
+    if not parts:
+        return ""
+    return ('<div style="background:#fff8e1;border:1px solid #f4d37a;border-radius:6px;padding:10px 14px;font-size:16px;line-height:1.6;margin:0 0 12px;">'
+            + "<br>".join(parts) + "</div>")
+
+
 def sec_headline(a):
     h = a["headline"]
     if h.get("close") is None:
-        return f'<div style="font-size:20px;font-weight:bold;">휴장 — 시세 섹션 없음</div>'
+        return f'<div style="font-size:20px;font-weight:bold;">휴장 — 시세는 다음 거래일에 채워집니다. 공시·기사·일정만 아래에 있습니다.</div>'
     line = (f'<b>NVDA ${h["close"]:,.2f}</b> ({_signed(h["ret_1d"])}) · SPY 대비 {_signed(h.get("ret_vs_spy"), 2, "%p")} · '
             f'SMH 대비 {_signed(h.get("ret_vs_smh"), 2, "%p")} · AMD 대비 {_signed(h.get("ret_vs_amd"), 2, "%p")} · '
             f'거래량 20일 평균의 {_esc(rr.fmt(h.get("vol_ratio_20d"), "x"))}')
@@ -90,7 +103,7 @@ def _event_html(e):
 
 def sec_events(a):
     if not a["events"]:
-        return _muted("특이 이벤트 없음.")
+        return _muted("오늘은 임계값을 넘은 이벤트가 없습니다 — 공시·기사·가격·옵션·추정치 어느 쪽도 기준에 걸리지 않았다는 뜻입니다.")
     out = "<ul style='margin:8px 0 8px 20px;padding:0;'>" + "".join(_event_html(e) for e in a["events"]) + "</ul>"
     if a["events_overflow"]:
         out += (f'<details style="margin:6px 0;"><summary style="cursor:pointer;color:{MUTED};">그 외 {len(a["events_overflow"])}건</summary>'
@@ -131,13 +144,14 @@ def sec_status(a):
         rows = []
         for c in cells:
             v = rr.fmt(c["value"], c["fmt"])
-            if c["key"] == "iv_rank_60d" and c["value"] is None:
-                v = f"집계 중 ({st.get('iv_rank_n', 0)}/{config.IV_RANK_WINDOW}일)"
+            if c["value"] is None or c["value"] == "":
+                hint = config.MISSING_HINTS.get(c["key"], config.MISSING_DEFAULT_HINT)
+                if c["key"] == "iv_rank_60d":
+                    hint += f" (현재 {st.get('iv_rank_n', 0)}/{config.IV_RANK_WINDOW}일)"
+                rows.append([_esc(rr.LABEL_KO.get(c["key"], c["key"])), f'<span style="color:{MUTED};">{_esc(hint)}</span>'])
+                continue
             rows.append([_esc(rr.LABEL_KO.get(c["key"], c["key"])), f"<b>{_esc(v)}</b>" if c["flag"] else _esc(v)])
         out.append(f'<div style="margin-top:10px;font-weight:bold;">{_esc(rr.GROUP_KO[group])}</div>' + _table(["지표", "값"], rows))
-    ds = a["data_status"]
-    if ds.get("missing_fields"):
-        out.append(_muted("미수집: " + ", ".join(ds["missing_fields"])))
     return "".join(out)
 
 
@@ -157,7 +171,7 @@ def sec_checklist(a):
     rows = []
     for r in a["checklist"]:
         if r.get("value") is None:
-            v = _esc(r.get("note") or "미수집")
+            v = f'<span style="color:{MUTED};">{_esc(r.get("note") or "이번 실행에서 받지 못함 — 다음 실행에서 재시도")}</span>'
         elif r["unit"] == "USD":
             v = f"${r['value'] / 1e9:,.2f}B" if abs(r["value"]) >= 1e9 else f"${r['value'] / 1e6:,.1f}M"
         elif r["unit"] in ("%", "% of shares"):
@@ -173,9 +187,9 @@ def sec_checklist(a):
     return _table(["지표", "값", "기준일", "비고"], rows)
 
 
-def sec_narrative(n):
+def sec_narrative(a, n):
     if not n or not n.get("today"):
-        return _muted("오늘의 해석 없음 (이벤트 0건이거나 서술 생략).")
+        return _muted("오늘은 이벤트가 없어 해석을 생략합니다." if not a["events"] else "서술을 만들지 못했습니다 — 수치 섹션만 참고하세요.")
     return "<ul style='margin:8px 0 8px 20px;'>" + "".join(f"<li style='margin:4px 0;'>{_esc(s)}</li>" for s in n["today"]) + "</ul>"
 
 
@@ -194,14 +208,15 @@ def sec_footer(a):
 def build_body(a, n):
     return "\n".join([
         '<div style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:18px;line-height:1.7;color:#333;">',
-        _muted(f"기준 거래일(뉴욕) {a['day']}" + ("" if a.get("published_mode") else " · 그림자 모드")),
+        _notice(a),
+        _muted(f"기준 거래일(뉴욕) {a['day']}"),
         _h2("① 오늘 한 줄"), sec_headline(a),
         _h2(f"② 오늘 바뀐 것 ({a['events_total']}건)"), sec_events(a),
         _h2(f"③ 다가오는 것 ({config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 일정 {config.COURT_LOOKAHEAD_DAYS}일)"), sec_upcoming(a),
         _h2("④ 상태판"), sec_status(a),
         _h2("⑤ 진행 중 사안"), sec_cases(a),
         _h2("⑥ 보유 논리 점검표"), sec_checklist(a),
-        _h2("⑦ 오늘의 해석"), sec_narrative(n),
+        _h2("⑦ 오늘의 해석"), sec_narrative(a, n),
         sec_footer(a),
         "</div>",
     ])

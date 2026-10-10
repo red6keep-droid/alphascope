@@ -442,7 +442,12 @@ def build(conn, day, run_date):
         "checklist": checklist(conn, day, s),
         "data_status": {"bars_last_day": bars_last, "state_collected_at": s.get("collected_at"), "missing_fields": missing,
                         "option_snapshot_days": n_snap_days, "iv_rank_days": rank_n, "items_by_kind": n_items,
-                        "option_expiries": db.loads(s.get("option_expiries"))},
+                        "option_expiries": db.loads(s.get("option_expiries")),
+                        "items_pending": conn.execute(
+                            f"""SELECT COUNT(*) FROM items WHERE kind IN ({','.join("'" + k + "'" for k in config.CLASSIFY_KINDS)})
+                                AND prefilter_reason IS NULL AND analyzed_at IS NULL AND published_at >= ?""",
+                            ((datetime.date.fromisoformat(day) - datetime.timedelta(days=config.CLASSIFY_SINCE_DAYS)).isoformat(),)).fetchone()[0],
+                        "test_mode": config.TEST_MODE},
         "thresholds": {k: getattr(config, k) for k in dir(config) if k.endswith("_EVENT") or k.endswith("_EVENT_PCT")
                        or k in ("IV_RANK_HIGH", "IV_RANK_LOW", "OI_JUMP_MULT", "OI_JUMP_MIN", "NEAR_52W_HIGH_PCT")},
     }

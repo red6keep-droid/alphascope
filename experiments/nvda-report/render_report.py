@@ -101,7 +101,7 @@ def title_for(run_date):
 def section_headline(a):
     h = a["headline"]
     if h.get("close") is None:
-        return "휴장 — 시세 섹션 없음\n"
+        return "휴장 — 시세는 다음 거래일에 채워진다. 공시·기사·일정만 아래에 있다.\n"
     line = (f"**NVDA ${h['close']:,.2f} ({h['ret_1d']:+.2f}%)** · SPY 대비 {fmt(h.get('ret_vs_spy'), 'pp_signed')} · "
             f"SMH 대비 {fmt(h.get('ret_vs_smh'), 'pp_signed')} · AMD 대비 {fmt(h.get('ret_vs_amd'), 'pp_signed')} · "
             f"거래량 20일 평균의 {fmt(h.get('vol_ratio_20d'), 'x')}")
@@ -134,7 +134,7 @@ def _event_line(e):
 
 def section_events(a):
     if not a["events"]:
-        return "특이 이벤트 없음.\n"
+        return "오늘은 임계값을 넘은 이벤트가 없다.\n"
     out = [_event_line(e) for e in a["events"]]
     if a["events_overflow"]:
         out.append(f"\n<details><summary>그 외 {len(a['events_overflow'])}건</summary>\n")
@@ -172,13 +172,13 @@ def section_status(a):
         rows = []
         for c in cells:
             v = fmt(c["value"], c["fmt"])
-            if c["key"] == "iv_rank_60d" and c["value"] is None:
-                v = f"집계 중 ({st.get('iv_rank_n', 0)}/{config.IV_RANK_WINDOW}일)"
+            if c["value"] is None or c["value"] == "":
+                v = config.MISSING_HINTS.get(c["key"], config.MISSING_DEFAULT_HINT)
+                if c["key"] == "iv_rank_60d":
+                    v += f" (현재 {st.get('iv_rank_n', 0)}/{config.IV_RANK_WINDOW}일)"
             rows.append([LABEL_KO.get(c["key"], c["key"]), f"**{v}**" if c["flag"] else v])
         out.append(f"**{GROUP_KO[group]}**\n\n" + _table(["지표", "값"], rows))
     ds = a["data_status"]
-    if ds.get("missing_fields"):
-        out.append(f"_미수집: {', '.join(ds['missing_fields'])}_\n")
     if ds.get("option_expiries"):
         out.append(f"_옵션 스냅샷 만기: {', '.join(ds['option_expiries'])} · 스냅샷 누적 {ds['option_snapshot_days']}일_\n")
     return "\n".join(out)
@@ -200,7 +200,7 @@ def section_checklist(a):
     rows = []
     for r in a["checklist"]:
         if r.get("value") is None:
-            v = r.get("note") or "미수집"
+            v = r.get("note") or "이번 실행에서 받지 못함 — 다음 실행에서 재시도"
         elif r["unit"] == "USD":
             v = f"${r['value'] / 1e9:,.2f}B" if abs(r["value"]) >= 1e9 else f"${r['value'] / 1e6:,.1f}M"
         elif r["unit"] in ("%", "% of shares"):
@@ -220,7 +220,7 @@ def section_checklist(a):
 def section_narrative(out_path):
     path = os.path.join(os.path.dirname(out_path), "narrative.json")
     if not os.path.exists(path):
-        return "_서술 없음 (이벤트 0건이거나 --narrate 없이 실행)._\n"
+        return "_오늘은 이벤트가 없어 해석을 생략한다._\n"
     with open(path, "r", encoding="utf-8") as f:
         n = json.load(f)
     return "\n".join(f"- {s}" for s in n.get("today", [])) + "\n"
@@ -244,7 +244,9 @@ def render(analysis_path=None, out_path=None):
         a = json.load(f)
     title = title_for(a["run_date"])
     parts = [
-        f"# {title}", f"_기준 거래일(뉴욕) {a['day']} · 그림자 모드_", "",
+        f"# {title}", f"_기준 거래일(뉴욕) {a['day']}_", "",
+        (f"> 🧪 **테스트 운영 중** — {config.TEST_NOTICE}\n" if a["data_status"].get("test_mode") else "")
+        + (f"> ⚠️ 기사 {a['data_status']['items_pending']}건이 아직 분류되지 않아 오늘 항목이 불완전할 수 있다.\n" if a["data_status"].get("items_pending") else ""),
         "## ① 오늘 한 줄", section_headline(a),
         f"## ② 오늘 바뀐 것 ({a['events_total']}건)", section_events(a),
         f"## ③ 다가오는 것 ({config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 일정 {config.COURT_LOOKAHEAD_DAYS}일)", section_upcoming(a),

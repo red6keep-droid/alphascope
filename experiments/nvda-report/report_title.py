@@ -2,10 +2,12 @@
 
 import datetime
 
+import config
+
 KST = datetime.timezone(datetime.timedelta(hours=9))
 
 TITLE_PREFIX = "엔비디아 데일리 — "
-LABELS = ["엔비디아", "미국 증시", "자동 리포트"]
+LABELS = ["엔비디아", "미국 증시", "자동 리포트"] + (["테스트 중"] if config.TEST_MODE else [])
 
 
 def today_kst():
