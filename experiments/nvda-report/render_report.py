@@ -14,7 +14,7 @@ DIR_KO = {"positive": "긍정", "negative": "부정", "uncertain": "불확실", 
 AREA_KO = {"Earnings": "실적", "Flows": "수급", "Regulation": "규제", "Legal": "법무", "Product": "제품", "Demand": "수요",
            "Supply": "공급", "Corporate": "기업", "Macro": "거시", "Other": "기타"}
 KIND_KO = {"EARNINGS": "NVDA 실적", "EARNINGS_PEER": "고객·공급·동종 실적", "FOMC": "FOMC", "CPI": "CPI", "NFP": "고용", "GDP": "GDP",
-           "PCE": "PCE", "TSMC_REV": "TSMC 월매출", "EVENT": "행사", "INDEX": "지수", "OPEX": "옵션 만기"}
+           "PCE": "PCE", "TSMC_REV": "TSMC 월매출", "EVENT": "행사", "INDEX": "지수", "OPEX": "옵션 만기", "COURT": "⚠ 법원"}
 LABEL_KO = {
     "close": "종가", "ret_1d": "등락", "ret_vs_spy": "SPY 대비", "ret_vs_smh": "SMH 대비", "ret_vs_amd": "AMD 대비", "gap": "시가 갭",
     "range_pct": "일중 변동폭", "vol_ratio_20d": "거래량 배수(20일)",
@@ -158,7 +158,7 @@ def section_upcoming(a):
             extra = f" · implied move ±{im:.1f}%" if im else ""
         rows.append([f"D{dn:+d}" if dn else "D0", c["day"], KIND_KO.get(c["kind"], c["kind"]), c["label"] + conf + extra])
     if not rows:
-        return f"{config.CALENDAR_LOOKAHEAD_DAYS}일 내 일정 없음.\n"
+        return f"{config.CALENDAR_LOOKAHEAD_DAYS}일 내 일정 없음 (법원 일정은 {config.COURT_LOOKAHEAD_DAYS}일).\n"
     return _table(["D-n", "날짜", "종류", "내용"], rows)
 
 
@@ -185,11 +185,15 @@ def section_status(a):
 
 
 def section_cases(a):
+    """추적 사건은 사건명과 다음 일정만. 판결·합의가 나면 ② "오늘 바뀐 것"에 올라간다 (2026-10-10 단순화)."""
     if not a["cases"]:
-        return "추적 사안 없음 (③단계에서 초기화).\n"
-    rows = [[c["title"], c.get("category") or "—", c.get("status") or "—", (c.get("last_activity_at") or "—")[:10],
-             c.get("last_activity_summary") or "—"] for c in a["cases"]]
-    return _table(["사안", "분류", "상태", "마지막 변동", "요약"], rows)
+        return "추적 사안 없음.\n"
+    rows = []
+    for c in a["cases"]:
+        nxt = f"{c['next_day']} {c['next_label']}" if c.get("next_day") else "잡힌 일정 없음"
+        last = f" · 최근 {c['last_activity_at'][:10]} {c['last_activity_summary']}" if c.get("last_activity_summary") else ""
+        rows.append([f"[{c.get('short_name') or c['title']}]({c['url']})", c.get("status") or "—", nxt + last])
+    return _table(["사건", "상태", "다음 일정"], rows)
 
 
 def section_checklist(a):
@@ -234,7 +238,7 @@ def render(analysis_path=None, out_path=None):
         f"# {title}", f"_기준 거래일(뉴욕) {a['day']} · 그림자 모드_", "",
         "## ① 오늘 한 줄", section_headline(a),
         f"## ② 오늘 바뀐 것 ({a['events_total']}건)", section_events(a),
-        f"## ③ 다가오는 것 ({config.CALENDAR_LOOKAHEAD_DAYS}일 이내)", section_upcoming(a),
+        f"## ③ 다가오는 것 ({config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 일정 {config.COURT_LOOKAHEAD_DAYS}일)", section_upcoming(a),
         "## ④ 상태판", section_status(a),
         "## ⑤ 진행 중 사안", section_cases(a),
         "## ⑥ 보유 논리 점검표", section_checklist(a),

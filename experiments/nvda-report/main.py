@@ -31,6 +31,7 @@ import collect_calendar
 import collect_edgar
 import collect_feeds
 import collect_market
+import cases_watch
 import collect_regulatory
 import config
 import db
@@ -129,6 +130,11 @@ def main():
             collect_regulatory.collect(conn, skip_courts=args.skip_courts)
         except Exception as e:  # noqa: BLE001
             print(f"[regulatory] 실패 — 계속: {e}")
+        if not args.skip_courts:
+            try:
+                cases_watch.run(conn, day)
+            except Exception as e:  # noqa: BLE001
+                print(f"[court] 추적 사건 실패 — 계속: {e}")
 
     _step(6, total, "중복 제거 + Gemini 분류")
     dedupe.run(conn)

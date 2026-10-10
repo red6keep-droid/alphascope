@@ -249,6 +249,16 @@ def news_events(today, avg):
     return []
 
 
+def upcoming_with_court(conn, day):
+    """7일 창 전체 + 30일 창의 법원 일정(COURT)만. 날짜순."""
+    rows = collect_calendar.upcoming(conn, day)
+    seen = {(r["day"], r["kind"], r["label"]) for r in rows}
+    for r in collect_calendar.upcoming(conn, day, config.COURT_LOOKAHEAD_DAYS):
+        if r["kind"] == "COURT" and (r["day"], r["kind"], r["label"]) not in seen:
+            rows.append(r)
+    return sorted(rows, key=lambda r: (r["day"], r["kind"]))
+
+
 def calendar_events(conn, day):
     out = []
     d0 = datetime.date.fromisoformat(day)
@@ -268,6 +278,8 @@ def calendar_events(conn, day):
             out.append(_ev("Earnings", "calendar", f"{c['symbol']} 실적 발표일", source="calendar"))
         elif c["kind"] == "FOMC":
             out.append(_ev("Macro", "calendar", "FOMC 결정일", source="calendar"))
+        elif c["kind"] == "COURT":
+            out.append(_ev("Legal", "calendar", f"⚠ 오늘 {c['label']}", direction="uncertain", emphasis=True, source="calendar"))
         elif c["kind"] in ("TSMC_REV", "EVENT", "INDEX"):
             out.append(_ev("Supply" if c["kind"] == "TSMC_REV" else ("Product" if c["kind"] == "EVENT" else "Flows"),
                            "calendar", c["label"], source="calendar"))
@@ -397,7 +409,14 @@ def build(conn, day, run_date):
     missing = db.loads(s.get("missing_fields_json"))
     n_snap_days = conn.execute("SELECT COUNT(DISTINCT day) FROM option_snapshots").fetchone()[0]
     n_items = {r["kind"]: r["n"] for r in conn.execute("SELECT kind, COUNT(*) n FROM items GROUP BY kind")}
-    cases = [dict(r) for r in conn.execute("SELECT * FROM cases WHERE watch = 1 ORDER BY last_activity_at DESC")]
+    cases = [dict(r) for r in conn.execute("SELECT * FROM cases WHERE watch = 1 ORDER BY opened_at")]
+    for c in cases:
+        import cases_watch
+        nxt = conn.execute("SELECT day, label FROM calendar WHERE kind = 'COURT' AND label LIKE ? AND day >= ? ORDER BY day LIMIT 1",
+                           (cases_watch.short_name(c) + " — %", day)).fetchone()
+        c["short_name"] = cases_watch.short_name(c)
+        c["next_day"] = nxt["day"] if nxt else None
+        c["next_label"] = nxt["label"].split(" — ", 1)[-1] if nxt else None
     analysis = {
         "generated_at": db.now_iso(), "run_date": run_date, "day": day,
         "is_latest_bar_today": bars_last == day,
@@ -405,7 +424,7 @@ def build(conn, day, run_date):
         "macro_today": [c["label"] for c in macro_today],
         "events": body, "events_overflow": overflow, "events_total": len(events),
         "analyst_target_only": target_only,
-        "upcoming": collect_calendar.upcoming(conn, day),
+        "upcoming": upcoming_with_court(conn, day),
         "next_earnings": collect_calendar.next_of(conn, "EARNINGS", day, config.SYMBOL),
         "status": dict(status_board(s, rank, rank_n), news=[
             {"key": "news_count", "value": n_news, "flag": bool(news_avg and n_news >= 5 and n_news / news_avg >= config.NEWS_COUNT_EVENT_MULT), "fmt": "int"},

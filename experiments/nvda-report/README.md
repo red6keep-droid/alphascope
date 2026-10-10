@@ -9,7 +9,7 @@ NVDA 한 종목의 **사실 추적** 리포트다. 매수·매도 신호를 만�
 - **①단계 뼈대 완료 (2026-10-08).** Gemini 없이 수집 → 판정 → MD. 연속 실행 멱등.
 - **②단계 문서 수집·분류 구현 완료 (2026-10-08).** 뉴스룸·블로그·CNBC·Google News·연방관보·CourtListener → 중복 제거 → Gemini 분류 → 보정 규칙.
   30일치 111건 분류, 검증 탈락 0, 이벤트 24건. **50건 수동 검증 48/50 = 96% (2026-10-10, 1차 Claude·최종 사용자)** — ng 2건(NVIDIA 자체 소비자 제품 가격 변경 → rel 2~3·new, 고객사 제품 출시 → rel 2)은 프롬프트 예시로 반영. rel 1의 novelty는 채점하지 않기로 함. `review_sample.py`에 Gemini가 본 `입력 요약` 열 추가.
-- **③ 일부 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만, 특허 10건은 전이 때만 이벤트). 남은 것: 도켓 변동 감지 · 트럼프 브리지.
+- **③ 소송 부분 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만) → `cases_watch.py`(매일: watch=1 도켓의 일정 명령문에서 심리·재판 날짜만 `calendar(COURT)`로, 판결·합의·기각 명령만 `items(court)` 이벤트). 사용자 지시: **단순하게 — 주가에 닿을 판결이 잡혀 있을 때만 미리 경고.** 법원 일정은 30일 창(`COURT_LOOKAHEAD_DAYS`). 남은 것: 트럼프 브리지 · 법적 기사 모니터링 강화.
 - ④(점검표 추출) · ⑤(서술·HTML·Actions) · ⑥(30일 그림자)는 아직이다.
 
 ```
@@ -30,6 +30,7 @@ experiments/nvda-report/
 ├── review_sample.py     # 수동 검증 표본 50건 → output/review_sample.md
 ├── cases_survey.py      # ③ CourtListener suitNature 쿼리(증권·반독점·특허 1년) → output/cases_survey.md/.json 검토 표
 ├── cases_init.py        # ③ 검토 표 + MANUAL 덮어쓰기 → cases 테이블 (watch=1은 증권만)
+├── cases_watch.py       # ③ watch=1 도켓 → 심리·재판 일정(calendar COURT, 30일 경고) · 판결·합의·기각 명령(items court 이벤트). Gemini 없음
 ├── judge.py             # 이벤트 판정 · 상태판 · 다가오는 것 · 점검표 · 기사 수 → output/nvda_analysis.json
 ├── render_report.py     # → output/nvda_report.md · title.txt
 ├── prompts/classify.txt # 영역 enum · 관련성 기준표 · 신규성 규칙 · 1차 행위 규칙
@@ -90,6 +91,18 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | Form 4·8-K·애널리스트 | Gemini를 거치지 않는다 (수집 시 `analyzed_at` 채움) | 구조화 공시 |
 | 기사 수 지표 | 기준일 기사 수(repeat·중복 포함, 키워드 탈락 제외) ÷ 직전 7일 하루 평균 ≥ 2 **and** ≥ 5건 → 이벤트 | #48 헤드라인 톤 |
 
+### ③단계 (2026-10-10)
+
+| 항목 | 결정 | 이유 |
+| --- | --- | --- |
+| 추적 범위 | `cases_survey.py`가 suitNature 쿼리 3개(증권·반독점 전부, 특허 1년)로 433건 중 59건만 받는다. 저장은 미종결 12건, **watch=1은 증권 2건** | 사용자: 특허 NPE 소송 10건이 ⑤에 늘 떠 있는 것은 원치 않음. 반독점은 전부 종결(최근 2008) |
+| CL 종결일 수동 덮어쓰기 | `cases_init.MANUAL` — 4:18-cv-07669는 CL이 2021 종결로 두지만 2023 파기환송·2024-12 대법원 각하 후 진행 중(도켓 문서 2026-10-08까지 확인) | CL의 dateTerminated는 항소 전 기준일 수 있다 |
+| 도켓 문서 처리 | **분류하지 않는다.** 일정 명령문의 `… set for M/D/YYYY` 중 심리·재판·약식판결·기각 신청·집단소송 인증만 캘린더로, 명령문 머리가 ORDER/JUDGMENT이고 결정 어구가 있을 때만 이벤트. Gemini 호출 0 | 사용자: "리포트를 복잡하게 만들지 마라. 주가에 영향 줄 판결이 예정될 때만 미리 경고" |
+| 경고 창 | 법원 일정만 30일, 나머지 캘린더는 7일 | 판결은 포지션을 미리 생각할 시간이 필요 |
+| ⑤ 섹션 | 사건명·상태·다음 일정 세 칸. 판결은 ②로 간다 | 단순화 |
+| 수정 일정 명령 | 그 사건의 미래 COURT 행을 지우고 최신 명령 기준으로 다시 넣는다 | 2026-05-04 수정 일정이 4월 일정을 대체한 사례 |
+| 첫 실행 판결 소급 | 3일(`COURT_RULING_BACKFILL_DAYS`) | 2026-03-25 집단소송 인증 명령 같은 과거 판결이 첫 리포트에 뜨지 않게 |
+
 ## 소스 확인 (실제 호출)
 
 | 소스 | 결과 |
@@ -100,6 +113,7 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | NVIDIA `releases.xml` · 블로그 `feed/` · CNBC Top/Tech · Google News RSS | 응답. 첫 수집 172건 |
 | Federal Register API | **기본 UA는 Cloudflare 403**, 브라우저 UA로 200 |
 | CourtListener `search/?type=d` | 익명 호출 **약 100초**, 토큰 있으면 **1~2초** (2026-10-10). 30일 신규 도켓 1건 (특허) |
+| CourtListener `docket-entries/?docket=` | 토큰으로 1초. 4:18-cv-07669 문서 366건, 일정 명령문(#296)에 `Motion Hearing set for 5/20/2027`·`Trial set for 8/17/2027`. Hu 사건(53건)은 최근 문서 설명이 비어 있음(RECAP 미수집) |
 | TSMC IR 월매출 | 브라우저 UA로도 403 — ④단계에서 뉴스 RSS 대체 |
 
 ## 알아둘 함정
