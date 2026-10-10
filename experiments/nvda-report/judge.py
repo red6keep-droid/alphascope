@@ -211,7 +211,7 @@ def item_events(conn, day):
         elif r["kind"] in ("8k", "10q", "10k"):
             emphasis = True
         elif r["kind"] in config.CLASSIFY_KINDS:
-            emphasis = (r["ai_relevance"] or 0) >= 3
+            emphasis = (r["ai_relevance"] or 0) >= 3 or (r["ai_area"] in config.PRIORITY_AREAS)
         events.append(_ev(r["ai_area"] or "Corporate", r["kind"], r["title"], r["ai_fact"] or r["summary"], r["url"],
                           r["ai_direction"] or "neutral", emphasis, r["source"], r["published_at"]))
     conn.execute("UPDATE items SET reported_on = ? WHERE reported_on IS NULL AND analyzed_at IS NOT NULL", (day,))
@@ -402,7 +402,7 @@ def build(conn, day, run_date):
               + news_events(n_news, news_avg))
     # 강조 → 종류 우선순위 → 같은 종류 안에서는 최신이 위 (안정 정렬 두 번)
     events.sort(key=lambda e: e.get("published_at") or "", reverse=True)
-    events.sort(key=lambda e: (0 if e["emphasis"] else 1, KIND_PRIORITY.get(e["kind"], 9)))
+    events.sort(key=lambda e: (0 if e["area"] in config.PRIORITY_AREAS else 1, 0 if e["emphasis"] else 1, KIND_PRIORITY.get(e["kind"], 9)))
     body, overflow = events[:config.MAX_EVENTS_IN_BODY], events[config.MAX_EVENTS_IN_BODY:]
     macro_today = [c for c in collect_calendar.on_day(conn, day) if c["kind"] in ("FOMC", "CPI", "NFP", "GDP", "PCE")]
     bars_last = collect_market.last_bar_day(conn)

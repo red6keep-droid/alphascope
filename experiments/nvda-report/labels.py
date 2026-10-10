@@ -51,14 +51,16 @@ def adjust(row):
     title = row.get("title") or ""
     opinion = any(p in src for p in OPINION_PUBLISHERS) or bool(OPINION_TITLE_RE.search(title))
     price_move = bool(PRICE_MOVE_RE.search(title)) and not ACTION_RE.search(title)
-    if opinion or price_move:
+    secondary = config.is_secondary_source(src)
+    if opinion or price_move or secondary:
+        tag = "opinion" if opinion else ("price_move" if price_move else "secondary_source")
         if rel > MAX_OPINION_RELEVANCE:
             row["ai_relevance"] = MAX_OPINION_RELEVANCE
-            reasons.append("opinion_cap" if opinion else "price_move_cap")
+            reasons.append(tag + "_cap")
         if nov in ("new", "update"):
             row["ai_novelty"] = "repeat"
-            reasons.append("opinion_repeat" if opinion else "price_move_repeat")
-    row["is_event"] = 1 if (row["ai_relevance"] >= config.RELEVANCE_EVENT_MIN and row["ai_novelty"] in ("new", "update")) else 0
+            reasons.append(tag + "_repeat")
+    row["is_event"] = 1 if (row["ai_relevance"] >= config.event_min(row.get("ai_area")) and row["ai_novelty"] in ("new", "update")) else 0
     return row, reasons
 
 

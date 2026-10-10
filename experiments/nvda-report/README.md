@@ -9,7 +9,7 @@ NVDA 한 종목의 **사실 추적** 리포트다. 매수·매도 신호를 만�
 - **①단계 뼈대 완료 (2026-10-08).** Gemini 없이 수집 → 판정 → MD. 연속 실행 멱등.
 - **②단계 문서 수집·분류 구현 완료 (2026-10-08).** 뉴스룸·블로그·CNBC·Google News·연방관보·CourtListener → 중복 제거 → Gemini 분류 → 보정 규칙.
   30일치 111건 분류, 검증 탈락 0, 이벤트 24건. **50건 수동 검증 48/50 = 96% (2026-10-10, 1차 Claude·최종 사용자)** — ng 2건(NVIDIA 자체 소비자 제품 가격 변경 → rel 2~3·new, 고객사 제품 출시 → rel 2)은 프롬프트 예시로 반영. rel 1의 novelty는 채점하지 않기로 함. `review_sample.py`에 Gemini가 본 `입력 요약` 열 추가.
-- **③ 소송 부분 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만) → `cases_watch.py`(매일: watch=1 도켓의 일정 명령문에서 심리·재판 날짜만 `calendar(COURT)`로, 판결·합의·기각 명령만 `items(court)` 이벤트). 사용자 지시: **단순하게 — 주가에 닿을 판결이 잡혀 있을 때만 미리 경고.** 법원 일정은 30일 창(`COURT_LOOKAHEAD_DAYS`). 남은 것: 트럼프 브리지 · 법적 기사 모니터링 강화.
+- **③ 소송 부분 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만) → `cases_watch.py`(매일: watch=1 도켓의 일정 명령문에서 심리·재판 날짜만 `calendar(COURT)`로, 판결·합의·기각 명령만 `items(court)` 이벤트). 사용자 지시: **단순하게 — 주가에 닿을 판결이 잡혀 있을 때만 미리 경고.** 법원 일정은 30일 창(`COURT_LOOKAHEAD_DAYS`). **법적 기사 모니터링 강화 완료 (2026-10-10, 아래 표).** 남은 것: 트럼프 브리지.
 - ④(점검표 추출) · ⑤(서술·HTML·Actions) · ⑥(30일 그림자)는 아직이다.
 
 ```
@@ -102,6 +102,15 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | ⑤ 섹션 | 사건명·상태·다음 일정 세 칸. 판결은 ②로 간다 | 단순화 |
 | 수정 일정 명령 | 그 사건의 미래 COURT 행을 지우고 최신 명령 기준으로 다시 넣는다 | 2026-05-04 수정 일정이 4월 일정을 대체한 사례 |
 | 첫 실행 판결 소급 | 3일(`COURT_RULING_BACKFILL_DAYS`) | 2026-03-25 집단소송 인증 명령 같은 과거 판결이 첫 리포트에 뜨지 않게 |
+
+### 법적·규제 기사 모니터링 강화 (2026-10-10, 사용자: "법적 문제 기사는 꼼꼼히")
+
+| 항목 | 결정 | 이유 |
+| --- | --- | --- |
+| 전용 Google News 쿼리 `gnews_legal` | `Nvidia (lawsuit OR antitrust OR DOJ OR FTC OR "export control" OR BIS OR tariff OR "export license" OR "chips to China" OR H20 OR H200 OR court OR ruling OR probe OR subpoena) when:7d` | `q=Nvidia` 100건 상한을 주가 해설이 채워 30일간 Legal 3건·Regulation 0건이었다. 추가 후 Legal 37건. `China` 단독은 SEO 사이트를 끌어와 뺐다 |
+| 키워드 필터 예외 `REGULATORY_KEYWORDS` | 제목에 Nvidia가 없어도 export control·chip export·AI chip·semiconductor tariff·BIS·entity list 등이 있으면 분류 | "미국, 중국 반도체 수출 규제 강화" 같은 기사. 무관하면 Gemini가 0 |
+| 우선 영역 `PRIORITY_AREAS` = Legal·Regulation | `config.event_min(area)`: 이 두 영역은 **relevance ≥ 1**이면 이벤트(나머지 ≥ 2), 강조·접히지 않음·② 맨 위 | 신규성 조건(new·update)은 그대로라 해설은 걸러진다 |
+| 2차 출처 `SECONDARY_SOURCES` + 도메인 문자열 정규식 | 중복 제거의 대표가 되지 못하고(공식 → 1차 매체 → 2차 순), 단독이면 relevance ≤ 1·repeat | 법적 쿼리가 YouTube·Stocktwits·tech-insider.org 같은 출처를 relevance 3로 올렸고, **TradingView 전재가 Reuters보다 20분 먼저 떠 대표가 되는 바람에 Reuters 보도가 통째로 사라졌다** (확인·수정) |
 
 ## 소스 확인 (실제 호출)
 

@@ -35,13 +35,13 @@ def jaccard(a, b):
 
 def has_keyword(text):
     t = (text or "").lower()
-    return any(k in t for k in config.NVDA_KEYWORDS)
+    return any(k in t for k in config.NVDA_KEYWORDS) or any(k in t for k in config.REGULATORY_KEYWORDS)
 
 
 def run(conn, since_days=config.CLASSIFY_SINCE_DAYS):
     since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=since_days + 2)).strftime("%Y-%m-%dT%H:%M:%SZ")
     rows = [dict(r) for r in conn.execute(
-        """SELECT item_id, kind, published_at, title, summary, prefilter_reason FROM items
+        """SELECT item_id, kind, published_at, title, summary, prefilter_reason, source FROM items
            WHERE kind IN ('news','newsroom','blog','fedreg','court') AND published_at >= ? ORDER BY published_at""", (since,))]
     n_kw = n_dup = 0
     # ① 키워드
@@ -55,7 +55,8 @@ def run(conn, since_days=config.CLASSIFY_SINCE_DAYS):
     for r in cands:
         r["_tok"] = normalize(r["title"])
         r["_day"] = datetime.date.fromisoformat(r["published_at"][:10])
-        r["_rank"] = (0 if r["kind"] in OFFICIAL_KINDS else 1, r["published_at"])
+        # 대표 순위: 공식 소스 → 1차 매체 → 2차 출처(전재·SEO). 같은 급이면 먼저 나온 것 (2026-10-10: 2차 전재가 Reuters를 가리던 문제)
+        r["_rank"] = (0 if r["kind"] in OFFICIAL_KINDS else (2 if config.is_secondary_source(r.get("source")) else 1), r["published_at"])
     cands.sort(key=lambda r: r["_rank"])
     reps = []   # 확정된 대표들
     for r in cands:

@@ -4,7 +4,7 @@
 - 배치 하나(20건)를 한 호출로. 항목별 검증(enum·범위·필수)에 통과한 것만 쓴다.
 - 신규성 판단용으로 최근 7일의 ai_fact 목록(최대 30)을 함께 준다.
 - 검증 탈락은 classify_attempts를 올리고, CLASSIFY_MAX_ATTEMPTS를 넘으면 prefilter_reason='classify_failed'로 제외한다.
-- is_event = relevance ≥ 2 and novelty ∈ {new, update}  (6절 문서형 조건)
+- is_event = relevance ≥ 2 and novelty ∈ {new, update}  (6절 문서형 조건). Legal·Regulation은 relevance ≥ 1 (config.event_min)
 """
 
 import datetime
@@ -88,7 +88,7 @@ def validate_item(item, batch_ids):
         "ai_fact": fact.strip()[:300],
         "ai_entities": db.dumps({"tickers": [t.upper() for t in _str_list(ents.get("tickers"))],
                                  "countries": _str_list(ents.get("countries")), "products": _str_list(ents.get("products"))}),
-        "is_event": 1 if (relevance >= config.RELEVANCE_EVENT_MIN and novelty in ("new", "update")) else 0,
+        "is_event": 1 if (relevance >= config.event_min(area) and novelty in ("new", "update")) else 0,
     }
 
 

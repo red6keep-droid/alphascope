@@ -5,6 +5,7 @@
 """
 
 import os
+import re
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -104,10 +105,30 @@ FEEDS = {
     "cnbc_top": ("news", "cnbc", "https://www.cnbc.com/id/100003114/device/rss/rss.html"),
     "cnbc_tech": ("news", "cnbc", "https://www.cnbc.com/id/19854910/device/rss/rss.html"),
     "gnews": ("news", "googlenews", "https://news.google.com/rss/search?q=Nvidia+when:7d&hl=en-US&gl=US&ceid=US:en"),
+    # 법적·규제 전용 (2026-10-10 사용자: 법적 문제 기사는 꼼꼼히). q=Nvidia 100건 상한을 주가 해설이 채우는 것을 피한다
+    "gnews_legal": ("news", "googlenews", "https://news.google.com/rss/search?q=Nvidia+(lawsuit+OR+antitrust+OR+DOJ+OR+FTC+OR+%22export+control%22+OR+BIS+OR+tariff+OR+%22export+license%22+OR+%22chips+to+China%22+OR+H20+OR+H200+OR+court+OR+ruling+OR+probe+OR+subpoena)+when:7d&hl=en-US&gl=US&ceid=US:en"),
 }
 # 외부 기사 1차 키워드 필터 — 제목+요약에 하나라도 있어야 분류 대상
 NVDA_KEYWORDS = ("nvidia", "nvda", "jensen huang", "geforce", "blackwell", "rubin", "cuda", "hopper",
                  "h20", "h100", "h200", "gb200", "gb300", "dgx", "rtx")
+# 제목에 Nvidia가 없어도 분류로 보내는 규제 어구 (2026-10-10). 무관하면 Gemini가 relevance 0으로 거른다
+REGULATORY_KEYWORDS = ("export control", "export controls", "chip export", "chip exports", "ai chip", "ai chips", "semiconductor tariff",
+                       "chip tariff", "bureau of industry and security", "entity list", "chip ban", "semiconductor export", "chips to china")
+# 2차 출처 (2026-10-10) — 법적 쿼리가 끌어온 SEO 사이트·소셜·전재 피드. 중복 제거의 대표가 되지 못하고(1차 보도 우선),
+# 단독이면 논평 취급(relevance ≤ 1 · repeat). 출처가 도메인 문자열이면 2차로 본다
+SECONDARY_SOURCES = (
+    "youtube", "stocktwits", "tradingview", "inshorts", "pluang", "biggo", "traders union", "crypto briefing", "beinsure",
+    "within nigeria", "xenospectrum", "dealroom", "howl.link", "marketscreener", "financial-news", "tech-insider", "shattered.io",
+    "startup fortune", "newsbytes", "sri lanka guardian", "wtvb", "devdiscourse",
+)
+SECONDARY_SOURCE_RE = re.compile(r"^(https?://|www\.)|\.(com|org|io|net|co\.uk|info|biz)/?$", re.I)
+
+
+def is_secondary_source(source):
+    s = (source or "").lower().strip()
+    return any(p in s for p in SECONDARY_SOURCES) or bool(SECONDARY_SOURCE_RE.search(s))
+
+
 NEWSROOM_BODY_MAX_CHARS = 6000    # 보도자료 본문 저장 상한 (raw_json)
 FEDREG_TERMS = ("Nvidia", "advanced computing", "semiconductor export")
 FEDREG_BACKFILL_DAYS = 30
@@ -133,6 +154,13 @@ DIRECTIONS = ["positive", "negative", "uncertain", "neutral"]
 NOVELTIES = ["new", "update", "repeat"]
 RELEVANCE_RANGE = (0, 3)
 RELEVANCE_EVENT_MIN = 2
+PRIORITY_AREAS = ("Legal", "Regulation")   # 법적·규제 영역은 relevance 1부터 이벤트, 접히지 않고 맨 위 (2026-10-10 사용자)
+PRIORITY_RELEVANCE_EVENT_MIN = 1
+
+
+def event_min(area):
+    """영역별 이벤트 relevance 하한."""
+    return PRIORITY_RELEVANCE_EVENT_MIN if area in PRIORITY_AREAS else RELEVANCE_EVENT_MIN
 NOVELTY_WINDOW_DAYS = 7           # 신규성 판단용 최근 사실 목록 창
 NOVELTY_CONTEXT_MAX = 30
 CLASSIFY_KINDS = ("news", "newsroom", "blog", "fedreg", "court")
