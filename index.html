@@ -1102,7 +1102,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    글 보기에서는 gutter 를 상쇄해 리포트 폭이 정확히 --shell 이 되게 한다. */
 body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2); }
 
-.post-shell { width: 100%; max-width: var(--shell); margin: 0 auto; }
+.post-shell { width: 100%; max-width: var(--shell); margin: 0 auto; min-width: 0; }
 
 .post-outer-container {
   padding: 40px;
@@ -1122,9 +1122,11 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title a { color: inherit; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
-.post-body { font-size: 18px; line-height: 1.8; color: #333; }
+.post-body { font-size: 18px; line-height: 1.8; color: #333; overflow-wrap: anywhere; }
 .post-body img { max-width: 100%; height: auto; border-radius: 12px; }
 .post-body table { width: 100%; border-collapse: collapse; }
+/* 셀에 nowrap 이 있는 표(리포트 본문)는 글 폭을 밀어내지 않고 표 안에서만 가로 스크롤한다 */
+.post-body table { display: block; max-width: 100%; overflow-x: auto; }
 .post-body a { color: var(--down); }
 
 .byline, .post-footer, .post-bottom, .post-labels {
@@ -1271,6 +1273,13 @@ body.no-dashboard .main-content { padding-top: 32px; }
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
+  /* 글 보기(모바일): 화면 가장자리에서 본문까지 정확히 20px. 카드 테두리·안쪽 패딩은 없앤다 (2026-10-10) */
+  body.item-view .main-content { padding-left: 20px; padding-right: 20px; }
+  .post-outer-container, .comments { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
+  .post-title { font-size: 24px; letter-spacing: -.3px; }
+  .post-body { font-size: 17px; line-height: 1.75; }
+  /* 데스크톱용 커버 이미지 확대 규칙(1024px !important)이 모바일에서 글 폭을 벌리지 않게 */
+  .post-body img, .post-body img[style*="max-width"] { max-width: 100% !important; }
 }
 ]]></b:skin>
 
