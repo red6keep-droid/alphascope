@@ -217,6 +217,15 @@ def section_checklist(a):
     return _table(["지표", "값", "기준일", "비고"], rows)
 
 
+def section_narrative(out_path):
+    path = os.path.join(os.path.dirname(out_path), "narrative.json")
+    if not os.path.exists(path):
+        return "_서술 없음 (이벤트 0건이거나 --narrate 없이 실행)._\n"
+    with open(path, "r", encoding="utf-8") as f:
+        n = json.load(f)
+    return "\n".join(f"- {s}" for s in n.get("today", [])) + "\n"
+
+
 def section_footer(a):
     ds = a["data_status"]
     return "\n".join([
@@ -242,7 +251,7 @@ def render(analysis_path=None, out_path=None):
         "## ④ 상태판", section_status(a),
         "## ⑤ 진행 중 사안", section_cases(a),
         "## ⑥ 보유 논리 점검표", section_checklist(a),
-        "## ⑦ 오늘의 해석", "_②단계(Gemini 서술) 전까지 생략._\n",
+        "## ⑦ 오늘의 해석", section_narrative(out_path),
         "## ⑧ 출처·면책", section_footer(a),
     ]
     os.makedirs(os.path.dirname(out_path), exist_ok=True)

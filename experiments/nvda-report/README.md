@@ -11,7 +11,7 @@ NVDA 한 종목의 **사실 추적** 리포트다. 매수·매도 신호를 만�
   30일치 111건 분류, 검증 탈락 0, 이벤트 24건. **50건 수동 검증 48/50 = 96% (2026-10-10, 1차 Claude·최종 사용자)** — ng 2건(NVIDIA 자체 소비자 제품 가격 변경 → rel 2~3·new, 고객사 제품 출시 → rel 2)은 프롬프트 예시로 반영. rel 1의 novelty는 채점하지 않기로 함. `review_sample.py`에 Gemini가 본 `입력 요약` 열 추가.
 - **③ 소송 부분 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만) → `cases_watch.py`(매일: watch=1 도켓의 일정 명령문에서 심리·재판 날짜만 `calendar(COURT)`로, 판결·합의·기각 명령만 `items(court)` 이벤트). 사용자 지시: **단순하게 — 주가에 닿을 판결이 잡혀 있을 때만 미리 경고.** 법원 일정은 30일 창(`COURT_LOOKAHEAD_DAYS`). **법적 기사 모니터링 강화 완료 (2026-10-10, 아래 표). 트럼프 브리지 완료 (`trump_bridge.py`, 한 줄).** ③ 끝.
 - **④ 점검표 완료 (2026-10-10):** `extract_quarterly.py` — SEC XBRL(매출·총마진·자사주) + 8-K 보도자료(데이터센터 매출·가이던스·non-GAAP 총마진) + 10-Q/10-K(중국 비중·10% 고객) 정규식. Gemini 없음. 최근 5분기 백필, 그 뒤엔 새 공시 날만. capex 가이던스·TSMC 월매출은 뺐다.
-- ⑤(서술·HTML·Actions) · ⑥(30일 그림자)는 아직이다.
+- **⑤ 렌더·Actions 완료 (2026-10-10):** `narrate.py`(⑦ 3문장 이내, 이벤트 0건이면 생략) · `render_html.py` · `publish.py`(dry-run 기본) · `state_io.py`(모든 테이블 JSONL) · `.github/workflows/nvda-report.yml`(22:45 UTC, `nvda-state`, `NVDA_PUBLISH` 게이트). **다음: 첫 수동 실행으로 `nvda-state` 시드 → ⑥ 30일 그림자.**
 
 ```
 experiments/nvda-report/
@@ -34,6 +34,12 @@ experiments/nvda-report/
 ├── cases_watch.py       # ③ watch=1 도켓 → 심리·재판 일정(calendar COURT, 30일 경고) · 판결·합의·기각 명령(items court 이벤트). Gemini 없음
 ├── trump_bridge.py      # ③ trump-state의 trump_analysis.json(raw URL, 실패 시 git show) → 그날 NVDA 발언 이벤트(강도 ≥ 5) 한 줄. robust 통계 있을 때만 괄호
 ├── extract_quarterly.py # ④ XBRL companyfacts + 8-K 보도자료(*pr.htm) + 10-Q/10-K 본문 → quarterly 테이블 (9지표). 정규식, Gemini 없음
+├── narrate.py           # ⑤ ⑦ 오늘의 해석 — Gemini 3문장 이내, 금지어 검증, 이벤트 0건이면 건너뜀
+├── render_html.py       # ⑤ nvda_analysis.json + narrative.json → Blogger 본문·미리보기 (trump-trend 시각 규칙)
+├── publish.py           # ⑤ daily-report publish_blogger 재사용, 같은 제목이면 건너뜀. 기본 dry-run
+├── report_title.py      # ⑤ 제목 '엔비디아 데일리 — YYYY년 M월 D일' · 라벨
+├── state_io.py          # ⑤ 모든 테이블 ↔ output/state/<table>.jsonl (Actions 상태 브랜치용)
+├── prompts/narrate.txt  # ⑤ 서술 규칙 (관찰 어법 · 평가어·인과·예측·매매 어휘 금지 · 60자)
 ├── judge.py             # 이벤트 판정 · 상태판 · 다가오는 것 · 점검표 · 기사 수 → output/nvda_analysis.json
 ├── render_report.py     # → output/nvda_report.md · title.txt
 ├── prompts/classify.txt # 영역 enum · 관련성 기준표 · 신규성 규칙 · 1차 행위 규칙
@@ -55,10 +61,12 @@ python experiments/nvda-report/main.py --skip-courts    # CourtListener 없이 (
 python experiments/nvda-report/main.py --skip-options   # 옵션 체인 없이
 python experiments/nvda-report/main.py --day 2026-10-06 # 특정 거래일 기준 판정·렌더
 python experiments/nvda-report/review_sample.py         # 수동 검증 표본
+python experiments/nvda-report/main.py --narrate --publish   # ⑦ 서술 + Blogger 실제 게시 (없으면 dry-run)
+python experiments/nvda-report/main.py --import-state DIR --export-state DIR   # Actions: 상태 JSONL 불러오기/내보내기
 python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 보기
 ```
 
-결과: `output/nvda_report.md` (점검용 MD) · `output/nvda_analysis.json` (렌더·서술의 유일한 입력) · `output/review_sample.md`.
+결과: `output/nvda_report.md` (점검용 MD) · `output/nvda_analysis.json` (렌더·서술의 유일한 입력) · `output/narrative.json` · `output/nvda_report_body.html`(Blogger 본문) · `output/nvda_report.html`(미리보기) · `output/review_sample.md`.
 
 ## 설계에서 못 박은 것
 
@@ -132,6 +140,17 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | 가이던스 대비 실제 | `guidance_revenue_next`는 **다음 분기** 행에 저장(`value_json.given_in`에 발표 분기), 실제 매출이 들어오면 `guidance_beat_pct` 계산 | |
 | 갱신 조건 | meta `quarterly_seen_accessions`에 없는 8-K 2.02·10-Q·10-K가 EDGAR submissions에 있을 때만. `--force`로 백필 | 하루 호출 1회(submissions)로 끝 |
 | 확인 | FY2027Q2: 매출 $96.22B · DC $89.0B(YoY +117%, QoQ +18.4%) · non-GAAP GM 75.0% · 다음 분기 가이던스 $108B ±2% · 가이던스 대비 +5.7% · 중국 8.2% · 10% 고객 16% · 자사주 $19.73B | 10-Q 원문 표와 일치 |
+
+### ⑤단계 (2026-10-10)
+
+| 항목 | 결정 | 이유 |
+| --- | --- | --- |
+| ⑦ 서술 | Gemini, **3문장 이내, 60자**. 1문장 = 맨 위 이벤트, 2문장 = 임계 초과 칸 또는 가장 가까운 일정, 3문장 = 점검표에서 ↓인 칸. 평가어·인과·예측·매매 어휘 금지(정규식 검증, 2회 실패면 서술 없이 렌더). 이벤트 0건이면 Gemini를 부르지 않는다 | 사용자: 세 문장 이내, robust 통계 없으면 숫자 해석 금지 |
+| 상태 저장 | trump-trend처럼 테이블을 골라 내보내지 않고 **모든 테이블을 JSONL 한 벌로** (`state_io`, 10테이블 1.5 MB). 불러오기는 INSERT OR IGNORE, meta만 REPLACE | DB가 작고 코드가 짧다. 기획서 11절의 파일 목록(items.jsonl·daily_state.csv…)을 이것으로 대체 |
+| HTML | `render_html.py`가 MD와 같은 섹션·라벨(render_report의 fmt·LABEL_KO 재사용), trump-trend 시각 규칙. 법원 일정은 주황 굵게 | |
+| 게시 | daily-report `publish_blogger` 재사용, 제목 중복이면 건너뜀. `--publish` 없으면 dry-run. 라벨 엔비디아 · 미국 증시 · 자동 리포트 | |
+| Actions | `nvda-report.yml` — 22:45 UTC(옵션 체인 유효 창 안, trump-trend 15분 뒤), `nvda-state` 브랜치에 commit-tree로 쌓음, `NVDA_PUBLISH` 변수 게이트, 시크릿에 `COURTLISTENER_TOKEN` 추가 | 기획서 11절 |
+| 확인 | 로컬 전 단계 통과(44초, 수집 생략): 상태 내보내기→빈 DB 불러오기 왕복 일치 · 서술 3문장 · HTML 28.5K자 · 게시 dry-run | |
 
 ### 법적·규제 기사 모니터링 강화 (2026-10-10, 사용자: "법적 문제 기사는 꼼꼼히")
 

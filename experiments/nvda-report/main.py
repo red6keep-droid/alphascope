@@ -39,7 +39,10 @@ import dedupe
 import extract_quarterly
 import judge
 import labels
+import publish
+import render_html
 import render_report
+import state_io
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.stderr.reconfigure(encoding="utf-8", errors="replace")
@@ -67,6 +70,10 @@ def main():
     ap.add_argument("--backfill-prices", action="store_true", help="일봉 2년치 강제 재수집")
     ap.add_argument("--edgar-days", type=int, default=None, help="첫 실행 EDGAR 백필 일수 (기본 config)")
     ap.add_argument("--day", metavar="YYYY-MM-DD", help="기준 거래일 (기본: 마지막 일봉)")
+    ap.add_argument("--import-state", metavar="DIR", help="시작 전에 상태 JSONL(테이블별)을 DB에 붙인다 (GitHub Actions용)")
+    ap.add_argument("--export-state", metavar="DIR", help="판정 뒤 모든 테이블을 JSONL로 내보낸다 (GitHub Actions용)")
+    ap.add_argument("--narrate", action="store_true", help="⑦ Gemini 서술 (이벤트 있을 때만, 3문장 이내)")
+    ap.add_argument("--publish", action="store_true", help="Blogger에 별도 글로 실제 게시 (없으면 dry-run)")
     args = ap.parse_args()
 
     load_dotenv(os.path.join(config.BASE_DIR, "..", "..", ".env"))
@@ -74,7 +81,9 @@ def main():
 
     t0 = time.time()
     conn = db.connect()
-    total = 8
+    total = 10
+    if args.import_state:
+        state_io.import_state(conn, args.import_state)
     run_date = datetime.datetime.now(KST).date().isoformat()
 
     _step(1, total, "일봉 수집 (yfinance)")
@@ -155,9 +164,26 @@ def main():
 
     _step(7, total, "판정 (이벤트 · 상태판 · 다가오는 것 · 점검표)")
     judge.build(conn, day, run_date)
+    if args.export_state:
+        state_io.export_state(conn, args.export_state)   # 판정까지 끝난 상태를 저장 — 뒤 단계가 실패해도 Gemini 호출을 헛되게 하지 않는다
 
-    _step(8, total, "렌더 (MD)")
+    _step(8, total, "⑦ 서술 (Gemini)" + ("" if args.narrate else " — 건너뜀"))
+    if args.narrate:
+        import narrate
+        try:
+            narrate.narrate()
+        except Exception as e:  # noqa: BLE001
+            print(f"[narrate] 실패 — 서술 없이 렌더: {e}")
+
+    _step(9, total, "렌더 (MD · HTML)")
     path = render_report.render()
+    render_html.render()
+
+    _step(10, total, "Blogger 게시 (별도 글)" + ("" if args.publish else " — dry-run"))
+    try:
+        publish.publish(do_publish=args.publish)
+    except Exception as e:  # noqa: BLE001
+        print(f"[publish] 실패: {e}")
 
     conn.close()
     print(f"\n완료 — {time.time() - t0:.0f}s · {path}")
