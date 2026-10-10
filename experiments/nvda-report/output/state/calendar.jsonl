@@ -1,0 +1,445 @@
+{"day": "2025-01-29", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2025-03-19", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2025-05-07", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2025-06-18", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2025-07-30", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2025-09-17", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2025-10-29", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2025-12-10", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2026-01-28", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2026-03-18", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2026-04-29", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2026-06-17", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2026-07-29", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2026-09-16", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2026-10-28", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2026-12-09", "kind": "FOMC", "label": "FOMC 결정", "symbol": null, "source": "static", "confirmed": 1}
+{"day": "2026-12-10", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-11-10", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-10-14", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-09-11", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-08-12", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-07-14", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-06-10", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-05-12", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-04-10", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-03-11", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-02-13", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-01-13", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-12-18", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-10-24", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-09-11", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-08-12", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-07-15", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-06-11", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-05-13", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-04-10", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-03-12", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-02-12", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-01-15", "kind": "CPI", "label": "CPI", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-12-04", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-11-06", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-10-02", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-09-04", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-08-07", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-07-02", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-06-05", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-05-08", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-04-03", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-03-06", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-02-11", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-01-09", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-12-16", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-11-20", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-09-05", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-08-01", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-07-03", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-06-06", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-05-02", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-04-04", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-03-07", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-02-07", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-01-10", "kind": "NFP", "label": "Employment Situation (NFP)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-12-23", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-11-25", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-10-29", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-09-30", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-08-26", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-07-30", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-06-25", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-05-28", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-04-30", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-04-09", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-03-13", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-02-20", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-01-22", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-12-23", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-09-25", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-08-28", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-07-30", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-06-26", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-05-29", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-04-30", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-03-27", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-02-27", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-01-30", "kind": "GDP", "label": "GDP", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-12-23", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-11-25", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-10-29", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-09-30", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-08-26", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-07-30", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-06-25", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-05-28", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-04-30", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-04-09", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-03-13", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-02-20", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2026-01-22", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-12-23", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-12-05", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-09-26", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-08-29", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-07-31", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-06-27", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-05-30", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-04-30", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-03-28", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-02-28", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2025-01-31", "kind": "PCE", "label": "Personal Income and Outlays (PCE)", "symbol": null, "source": "fred", "confirmed": 1}
+{"day": "2020-11-18", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2021-02-24", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2021-05-26", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2021-08-18", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2021-11-17", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2022-02-16", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2022-05-25", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2022-08-24", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2022-11-16", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2023-02-22", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2023-05-24", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2023-08-23", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2023-11-21", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2024-02-21", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2024-05-22", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2024-08-28", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2024-11-20", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2025-02-26", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2025-05-28", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2025-08-27", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2025-11-19", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2026-02-25", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2026-05-20", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2026-08-26", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
+{"day": "2026-11-17", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 0}
+{"day": "2020-10-27", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2021-01-26", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2021-04-27", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2021-07-27", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2021-10-26", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2022-01-25", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2022-04-26", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2022-07-26", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2022-10-25", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2023-01-24", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2023-04-25", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2023-07-25", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2023-10-24", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2024-01-30", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2024-04-25", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2024-07-30", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2024-10-30", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2025-01-29", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2025-04-30", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2025-07-30", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2025-10-29", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2026-01-28", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2026-04-29", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2026-07-29", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
+{"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 0}
+{"day": "2020-10-29", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-02-02", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-04-27", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-07-27", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-10-26", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-02-01", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-04-26", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-07-26", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-10-25", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-02-02", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-04-25", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-07-25", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-10-24", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-01-30", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-04-25", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-07-23", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-10-29", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-02-04", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-04-24", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-07-23", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-10-29", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-02-04", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-04-29", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-07-22", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 0}
+{"day": "2020-10-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2021-02-02", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2021-04-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2021-07-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2021-10-28", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2022-02-03", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2022-04-28", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2022-07-28", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2022-10-27", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2023-02-02", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2023-04-27", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2023-08-03", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2023-10-26", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2024-02-01", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2024-04-30", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2024-08-01", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2024-10-31", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2025-02-06", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2025-05-01", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2025-07-31", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2025-10-30", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2026-02-05", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2026-04-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2026-07-30", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
+{"day": "2026-10-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 0}
+{"day": "2020-10-29", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2021-01-27", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2021-04-28", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2021-07-28", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2021-10-25", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2022-02-02", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2022-04-27", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2022-07-27", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2022-10-26", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2023-02-01", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2023-04-26", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2023-07-26", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2023-10-25", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2024-02-01", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2024-04-24", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2024-07-31", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2024-10-30", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2025-01-29", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2025-04-30", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2025-07-30", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2025-10-29", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2026-01-28", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2026-04-29", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2026-07-29", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
+{"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 0}
+{"day": "2020-12-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-03-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-06-15", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-09-13", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-12-09", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-03-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-06-13", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-09-12", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-12-12", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-03-09", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-06-12", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-09-11", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-12-11", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-03-11", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-06-11", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-09-09", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-12-09", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-03-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-06-11", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-09-09", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-12-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-03-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-06-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-09-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-12-14", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 0}
+{"day": "2020-10-14", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2021-01-14", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2021-04-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2021-07-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2021-10-14", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2022-01-13", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2022-04-14", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2022-07-13", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2022-10-13", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2023-01-12", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2023-04-20", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2023-07-20", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2023-10-18", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2024-01-18", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2024-04-18", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2024-07-18", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2024-10-17", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2025-01-16", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2025-04-17", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2025-07-17", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2025-10-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2026-01-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2026-04-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2026-07-16", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
+{"day": "2026-10-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 0}
+{"day": "2020-10-27", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2021-01-26", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2021-04-27", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2021-07-27", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2021-10-26", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2022-02-01", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2022-05-03", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2022-08-02", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2022-11-01", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2023-01-31", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2023-05-02", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2023-08-01", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2023-10-31", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2024-01-30", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2024-04-30", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2024-07-30", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2024-10-29", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2025-02-04", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2025-05-06", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2025-08-05", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2025-11-04", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2026-02-03", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2026-05-05", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2026-08-04", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
+{"day": "2026-11-03", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 0}
+{"day": "2020-12-10", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2021-03-04", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2021-06-03", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2021-09-02", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2021-12-09", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2022-03-03", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2022-05-26", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2022-09-01", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2022-12-08", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2023-03-02", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2023-06-01", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2023-08-31", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2023-12-07", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2024-03-07", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2024-06-12", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2024-09-05", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2024-12-12", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2025-03-06", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2025-06-05", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2025-09-04", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2025-12-11", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2026-03-04", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2026-06-03", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2026-09-02", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
+{"day": "2026-12-09", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 0}
+{"day": "2021-01-07", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2021-03-31", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2021-06-30", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2021-09-28", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2021-12-20", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2022-03-29", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2022-06-30", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2022-09-29", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2022-12-21", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2023-03-28", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2023-06-28", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2023-09-27", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2023-12-20", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2024-03-20", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2024-06-26", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2024-09-25", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2024-12-18", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2025-03-20", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2025-06-25", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2025-09-23", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2025-12-17", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2026-03-18", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2026-06-24", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2026-09-30", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
+{"day": "2026-12-23", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 0}
+{"day": "2020-11-03", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2021-02-02", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2021-05-04", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2021-08-10", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2021-11-02", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2022-02-01", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2022-05-03", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2022-08-09", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2022-11-01", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2023-01-31", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2023-05-02", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2023-08-08", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2023-11-01", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2024-01-29", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2024-04-30", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2024-08-06", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2025-02-25", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2025-05-06", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2025-08-05", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2025-11-04", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2026-02-03", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2026-05-05", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2026-08-11", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
+{"day": "2026-11-03", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 0}
+{"day": "2020-11-24", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-02-25", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-05-27", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-08-26", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2021-11-23", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-02-24", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-05-26", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-08-25", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2022-11-21", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-03-02", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-06-01", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-08-31", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2023-11-30", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-02-29", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-05-30", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-08-29", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2024-11-26", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-02-27", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-05-29", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-08-28", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2025-11-25", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-02-26", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-05-28", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-09-01", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
+{"day": "2026-11-27", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 0}
+{"day": "2026-01-16", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-02-20", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-03-20", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-03-20", "kind": "INDEX", "label": "S&P 500 분기 리밸런싱 발효", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-04-17", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-05-15", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-06-19", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-06-19", "kind": "INDEX", "label": "S&P 500 분기 리밸런싱 발효", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-07-17", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-08-21", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-09-18", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-09-18", "kind": "INDEX", "label": "S&P 500 분기 리밸런싱 발효", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-10-16", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-11-20", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-12-18", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-12-18", "kind": "INDEX", "label": "S&P 500 분기 리밸런싱 발효", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2026-12-18", "kind": "INDEX", "label": "나스닥100 연례 재구성 발효", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-01-15", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-02-19", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-03-19", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-03-19", "kind": "INDEX", "label": "S&P 500 분기 리밸런싱 발효", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-04-16", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-05-21", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-06-18", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-06-18", "kind": "INDEX", "label": "S&P 500 분기 리밸런싱 발효", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-07-16", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-08-20", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-09-17", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-09-17", "kind": "INDEX", "label": "S&P 500 분기 리밸런싱 발효", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-10-15", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-11-19", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-12-17", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-12-17", "kind": "INDEX", "label": "S&P 500 분기 리밸런싱 발효", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-12-17", "kind": "INDEX", "label": "나스닥100 연례 재구성 발효", "symbol": null, "source": "computed", "confirmed": 1}
+{"day": "2027-01-05", "kind": "EVENT", "label": "CES 2027 (라스베이거스, 1/5–1/8 추정)", "symbol": null, "source": "static", "confirmed": 0}
+{"day": "2027-03-15", "kind": "EVENT", "label": "GTC 2027 (산호세, 3월 중순 추정 — 공식 발표 후 갱신)", "symbol": null, "source": "static", "confirmed": 0}
+{"day": "2027-06-01", "kind": "EVENT", "label": "Computex 2027 (타이베이, 6월 초 추정)", "symbol": null, "source": "static", "confirmed": 0}

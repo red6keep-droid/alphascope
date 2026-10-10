@@ -1,0 +1,557 @@
+{
+ "generated_at": "2026-10-10T11:27:59Z",
+ "run_date": "2026-10-10",
+ "day": "2026-10-09",
+ "is_latest_bar_today": true,
+ "headline": {
+  "close": 229.27999877929688,
+  "ret_1d": -0.5206512367610272,
+  "ret_vs_spy": -1.1201905610344176,
+  "ret_vs_smh": 0.12815445340749188,
+  "ret_vs_amd": 1.5061608464850718,
+  "vol_ratio_20d": 0.7743783887649036,
+  "gap": 1.4578274351946696
+ },
+ "macro_today": [],
+ "events": [
+  {
+   "area": "Flows",
+   "kind": "form4",
+   "title": "Form 4 — COXE TENCH (이사): 증여",
+   "fact": "Form 4 — COXE TENCH (이사): 증여",
+   "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764726000011/xslF345X06/wk-form4_1791579847.xml",
+   "direction": "neutral",
+   "emphasis": false,
+   "source": "edgar",
+   "published_at": "2026-10-10T01:04:09Z"
+  },
+  {
+   "area": "Corporate",
+   "kind": "news",
+   "title": "Nvidia backs startup Reactor as buzz grows for world models",
+   "fact": "엔비디아가 월드 모델을 개발하는 스타트업 리액터를 지원한다.",
+   "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNMEJqZ2o5Z3B2VnBpTXlHSEx5WksyMjl0eTg5WXlFUkFnMDY5cExqRFNlbnpZSVZwUy1nZ3RYSW0xeVRzT0N6cE9iYk1LUG8xRFg5c3JiVjhpT2dfVjc2N3BYeGpjS3M5Z0RzMVdIaS1ESlFjeUZMOUlQX0tjaDBRZnFGenN4c2syeHk0bw?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Fortune",
+   "published_at": "2026-10-06T00:42:00Z"
+  },
+  {
+   "area": "Earnings",
+   "kind": "estimates",
+   "title": "30일 EPS 상향 35 · 하향 2",
+   "fact": "상향:하향 비 35:2 (임계 3:1)",
+   "url": null,
+   "direction": "positive",
+   "emphasis": false,
+   "source": "yfinance",
+   "published_at": null
+  }
+ ],
+ "events_overflow": [],
+ "events_total": 3,
+ "analyst_target_only": [],
+ "upcoming": [
+  {
+   "day": "2026-10-14",
+   "kind": "CPI",
+   "label": "CPI",
+   "symbol": null,
+   "source": "fred",
+   "confirmed": 1
+  },
+  {
+   "day": "2026-10-15",
+   "kind": "EARNINGS_PEER",
+   "label": "TSM 실적",
+   "symbol": "TSM",
+   "source": "yfinance",
+   "confirmed": 0
+  },
+  {
+   "day": "2026-10-16",
+   "kind": "OPEX",
+   "label": "월간 옵션 만기",
+   "symbol": null,
+   "source": "computed",
+   "confirmed": 1
+  }
+ ],
+ "next_earnings": "2026-11-17",
+ "status": {
+  "price": [
+   {
+    "key": "close",
+    "value": 229.27999877929688,
+    "flag": false,
+    "fmt": "usd"
+   },
+   {
+    "key": "ret_1d",
+    "value": -0.5206512367610272,
+    "flag": false,
+    "fmt": "pct_signed"
+   },
+   {
+    "key": "ret_vs_spy",
+    "value": -1.1201905610344176,
+    "flag": false,
+    "fmt": "pp_signed"
+   },
+   {
+    "key": "ret_vs_smh",
+    "value": 0.12815445340749188,
+    "flag": false,
+    "fmt": "pp_signed"
+   },
+   {
+    "key": "ret_vs_amd",
+    "value": 1.5061608464850718,
+    "flag": false,
+    "fmt": "pp_signed"
+   },
+   {
+    "key": "gap",
+    "value": 1.4578274351946696,
+    "flag": false,
+    "fmt": "pct_signed"
+   },
+   {
+    "key": "range_pct",
+    "value": 2.09787054440096,
+    "flag": false,
+    "fmt": "pct"
+   },
+   {
+    "key": "vol_ratio_20d",
+    "value": 0.7743783887649036,
+    "flag": false,
+    "fmt": "x"
+   }
+  ],
+  "technical": [
+   {
+    "key": "ma50",
+    "value": 222.0774005126953,
+    "flag": false,
+    "fmt": "usd"
+   },
+   {
+    "key": "ma200",
+    "value": 202.15404998779297,
+    "flag": false,
+    "fmt": "usd"
+   },
+   {
+    "key": "pct_from_52w_high",
+    "value": -5.78953717409002,
+    "flag": false,
+    "fmt": "pct_signed"
+   },
+   {
+    "key": "rsi14",
+    "value": 52.96368502502982,
+    "flag": false,
+    "fmt": "num1"
+   },
+   {
+    "key": "ma_cross",
+    "value": null,
+    "flag": false,
+    "fmt": "text"
+   }
+  ],
+  "options": [
+   {
+    "key": "iv_atm_30d",
+    "value": 0.3006970000838898,
+    "flag": false,
+    "fmt": "iv"
+   },
+   {
+    "key": "iv_rank_60d",
+    "value": null,
+    "flag": false,
+    "fmt": "num0"
+   },
+   {
+    "key": "implied_move_next_earnings",
+    "value": 9.464410378372449,
+    "flag": false,
+    "fmt": "pct"
+   },
+   {
+    "key": "pc_ratio_oi",
+    "value": 0.707284556875901,
+    "flag": false,
+    "fmt": "num2"
+   },
+   {
+    "key": "pc_ratio_vol",
+    "value": 0.713437887633984,
+    "flag": false,
+    "fmt": "num2"
+   },
+   {
+    "key": "gex_approx",
+    "value": 686104772.8072488,
+    "flag": false,
+    "fmt": "gex"
+   },
+   {
+    "key": "gex_flip_strike",
+    "value": 230.0,
+    "flag": false,
+    "fmt": "usd0"
+   },
+   {
+    "key": "max_oi_strike_call",
+    "value": 220.0,
+    "flag": false,
+    "fmt": "usd0"
+   },
+   {
+    "key": "max_oi_strike_put",
+    "value": 220.0,
+    "flag": false,
+    "fmt": "usd0"
+   }
+  ],
+  "estimates": [
+   {
+    "key": "eps_est_cq",
+    "value": 2.47325,
+    "flag": false,
+    "fmt": "usd2"
+   },
+   {
+    "key": "eps_est_cq_7d_chg_pct",
+    "value": -0.012532544187315864,
+    "flag": false,
+    "fmt": "pct_signed2"
+   },
+   {
+    "key": "rev_est_cq",
+    "value": 108976837760.0,
+    "flag": false,
+    "fmt": "usd_bn"
+   },
+   {
+    "key": "rev_est_cq_7d_chg_pct",
+    "value": null,
+    "flag": false,
+    "fmt": "pct_signed2"
+   },
+   {
+    "key": "revisions_up_30d",
+    "value": 35,
+    "flag": false,
+    "fmt": "int"
+   },
+   {
+    "key": "revisions_down_30d",
+    "value": 2,
+    "flag": false,
+    "fmt": "int"
+   }
+  ],
+  "analysts": [
+   {
+    "key": "rating_counts",
+    "value": {
+     "strongBuy": 10,
+     "buy": 49,
+     "hold": 2,
+     "sell": 1,
+     "strongSell": 0
+    },
+    "flag": false,
+    "fmt": "ratings"
+   },
+   {
+    "key": "pt_mean",
+    "value": 328.71695,
+    "flag": false,
+    "fmt": "usd0"
+   },
+   {
+    "key": "pt_median",
+    "value": 315.0,
+    "flag": false,
+    "fmt": "usd0"
+   },
+   {
+    "key": "pt_high",
+    "value": 515.0,
+    "flag": false,
+    "fmt": "usd0"
+   },
+   {
+    "key": "pt_low",
+    "value": 180.0,
+    "flag": false,
+    "fmt": "usd0"
+   }
+  ],
+  "flows": [
+   {
+    "key": "smh_shares_out",
+    "value": null,
+    "flag": false,
+    "fmt": "int"
+   },
+   {
+    "key": "soxx_shares_out",
+    "value": null,
+    "flag": false,
+    "fmt": "int"
+   },
+   {
+    "key": "shares_short",
+    "value": 311389688.0,
+    "flag": false,
+    "fmt": "shares_m"
+   },
+   {
+    "key": "short_pct_float",
+    "value": 1.34000005,
+    "flag": false,
+    "fmt": "pct2"
+   },
+   {
+    "key": "short_asof",
+    "value": "2026-09-30",
+    "flag": false,
+    "fmt": "text"
+   }
+  ],
+  "valuation": [
+   {
+    "key": "forward_pe",
+    "value": 14.406896735029273,
+    "flag": false,
+    "fmt": "num1"
+   }
+  ],
+  "iv_rank_n": 1,
+  "news": [
+   {
+    "key": "news_count",
+    "value": 17,
+    "flag": false,
+    "fmt": "int"
+   },
+   {
+    "key": "news_avg_7d",
+    "value": 17.0,
+    "flag": false,
+    "fmt": "num1"
+   },
+   {
+    "key": "news_pending",
+    "value": 123,
+    "flag": false,
+    "fmt": "int"
+   }
+  ]
+ },
+ "cases": [],
+ "checklist": [
+  {
+   "metric": "revenue",
+   "label": "분기 매출",
+   "value": 96221000000.0,
+   "unit": "USD",
+   "asof": "FY2027Q2",
+   "source": "SEC XBRL",
+   "note": null,
+   "arrow": "↑",
+   "detail": "SEC XBRL"
+  },
+  {
+   "metric": "dc_revenue",
+   "label": "데이터센터 매출",
+   "value": 89000000000.0,
+   "unit": "USD",
+   "asof": "FY2027Q2",
+   "source": "실적 보도자료",
+   "note": null,
+   "arrow": "↑",
+   "detail": "실적 보도자료"
+  },
+  {
+   "metric": "dc_revenue_yoy",
+   "label": "데이터센터 매출 YoY",
+   "value": 117.0,
+   "unit": "%",
+   "asof": "FY2027Q2",
+   "source": "실적 보도자료",
+   "note": null,
+   "arrow": "↑",
+   "detail": "실적 보도자료"
+  },
+  {
+   "metric": "dc_revenue_qoq",
+   "label": "데이터센터 매출 QoQ",
+   "value": 18.4,
+   "unit": "%",
+   "asof": "FY2027Q2",
+   "source": "계산 (연속 분기 데이터센터 매출)",
+   "note": null,
+   "arrow": "↓",
+   "detail": "계산 (연속 분기 데이터센터 매출)"
+  },
+  {
+   "metric": "gross_margin_nongaap",
+   "label": "총마진 (non-GAAP)",
+   "value": 75.0,
+   "unit": "%",
+   "asof": "FY2027Q2",
+   "source": "실적 보도자료",
+   "note": null,
+   "arrow": "→",
+   "detail": "실적 보도자료"
+  },
+  {
+   "metric": "guidance_revenue_next",
+   "label": "다음 분기 매출 가이던스",
+   "value": 108000000000.0,
+   "unit": "USD",
+   "asof": "FY2027Q3",
+   "source": "실적 보도자료 (FY2027Q2 발표)",
+   "note": null,
+   "arrow": "↑",
+   "detail": "실적 보도자료 (FY2027Q2 발표) · ±2.0%"
+  },
+  {
+   "metric": "guidance_beat_pct",
+   "label": "가이던스 대비 실제",
+   "value": 5.7,
+   "unit": "%",
+   "asof": "FY2027Q2",
+   "source": "계산 (실제 ÷ 가이던스)",
+   "note": null,
+   "arrow": "↑",
+   "detail": "계산 (실제 ÷ 가이던스)"
+  },
+  {
+   "metric": "china_revenue_pct",
+   "label": "중국(홍콩 포함) 매출 비중",
+   "value": 8.2,
+   "unit": "%",
+   "asof": "FY2027Q2",
+   "source": "10-Q 지역별 매출 표",
+   "note": null,
+   "arrow": "↑",
+   "detail": "10-Q 지역별 매출 표"
+  },
+  {
+   "metric": "top_customer_pct",
+   "label": "10% 이상 고객 비중 합",
+   "value": 16.0,
+   "unit": "%",
+   "asof": "FY2027Q2",
+   "source": "10-Q 집중도 주석 (직접 1 · 간접 0)",
+   "note": null,
+   "arrow": "↓",
+   "detail": "10-Q 집중도 주석 (직접 1 · 간접 0)"
+  },
+  {
+   "metric": "buyback_amount",
+   "label": "분기 자사주 매입",
+   "value": 19732000000.0,
+   "unit": "USD",
+   "asof": "FY2027Q2",
+   "source": "SEC XBRL (누적 차분)",
+   "note": null,
+   "arrow": "↑",
+   "detail": "SEC XBRL (누적 차분)"
+  },
+  {
+   "metric": "insider_net_sold_90d",
+   "label": "90일 내부자 순매도",
+   "value": 967599313.4595,
+   "unit": "USD",
+   "asof": "2026-10-09",
+   "source": "EDGAR Form 4",
+   "note": null,
+   "arrow": null,
+   "detail": "매도 $967.6M · 매수 $0.0M · 공시 16건 (10b5-1 6건)"
+  },
+  {
+   "metric": "institutional_top10",
+   "label": "기관 상위 10곳 보유 합",
+   "value": 33.8100002,
+   "unit": "%",
+   "asof": "2026-06-30",
+   "source": "yfinance (13F 요약)",
+   "note": null,
+   "arrow": null,
+   "detail": "Blackrock Inc. 8.1% (+0.9%), Vanguard Capital Management LLC 6.4% (+0.1%), FMR, LLC 4.3% (+3.2%)"
+  },
+  {
+   "metric": "forward_pe",
+   "label": "선행 PER (현재가 ÷ 12개월 선행 EPS)",
+   "value": 14.406896735029273,
+   "unit": "배",
+   "asof": "2026-10-09",
+   "source": "yfinance",
+   "note": null,
+   "arrow": null,
+   "detail": null
+  },
+  {
+   "metric": "forward_pe_1y_pct",
+   "label": "선행 PER 1년 분위",
+   "value": null,
+   "unit": "분위",
+   "asof": null,
+   "source": null,
+   "note": "집계 중 (1/252일)",
+   "arrow": null,
+   "detail": null
+  }
+ ],
+ "data_status": {
+  "bars_last_day": "2026-10-09",
+  "state_collected_at": "2026-10-10T11:21:05Z",
+  "missing_fields": [],
+  "option_snapshot_days": 1,
+  "iv_rank_days": 1,
+  "items_by_kind": {
+   "10q": 1,
+   "8k": 3,
+   "analyst": 2,
+   "blog": 19,
+   "court": 1,
+   "fedreg": 21,
+   "form4": 16,
+   "news": 193,
+   "newsroom": 3
+  },
+  "option_expiries": [
+   "2026-10-12",
+   "2026-10-14",
+   "2026-10-16",
+   "2026-10-23",
+   "2026-11-06",
+   "2026-11-13",
+   "2026-11-20"
+  ]
+ },
+ "thresholds": {
+  "EST_CHG_EVENT_PCT": 1.0,
+  "ETF_SHARES_5D_EVENT_PCT": 2.0,
+  "IV_RANK_HIGH": 80,
+  "IV_RANK_LOW": 20,
+  "NEAR_52W_HIGH_PCT": -2.0,
+  "OI_JUMP_MIN": 10000,
+  "OI_JUMP_MULT": 2.0,
+  "PC_RATIO_CHG_EVENT": 0.2,
+  "RANGE_PCT_EVENT": 4.0,
+  "REL_SPY_EVENT": 3.0,
+  "REVISION_RATIO_EVENT": 3.0,
+  "SHORT_INTEREST_CHG_EVENT_PCT": 15.0,
+  "VOL_RATIO_EVENT": 2.0
+ }
+}
