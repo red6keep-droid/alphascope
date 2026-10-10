@@ -12,6 +12,14 @@ RSS_URL = "https://www.cnbc.com/id/15839069/device/rss/rss.html"
 # 이전 결과(gh-pages) — 이미 번역한 제목은 다시 번역하지 않는다
 PREV_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/news.json"
 GEMINI_MODEL = "gemini-3.5-flash"
+# 번역 사슬 (2026-10-11 사용자: 무료 한도·갑작스런 차단 대비 2중 3중): Groq gpt-oss-120b(0.9초) → NVIDIA gpt-oss-20b(5초) → Gemini.
+# 키 없는 단계는 건너뛴다. 사고는 low — 번역에 불필요하고 늘리면 느려지기만 한다
+TRANSLATE_CHAIN = [
+    {"name": "groq", "env": "GROQ_API_KEY", "url": "https://api.groq.com/openai/v1/chat/completions",
+     "model": "openai/gpt-oss-120b", "params": {"reasoning_effort": "low", "max_completion_tokens": 2000}, "timeout": 60},
+    {"name": "nvidia", "env": "NVIDIA_API_KEY", "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+     "model": "openai/gpt-oss-20b", "params": {"reasoning_effort": "low", "max_tokens": 2000}, "timeout": 90},   # 공용 엔드포인트, 지연 들쭉날쭉
+]
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
 HEADERS = {
     "User-Agent": (
@@ -58,18 +66,52 @@ def gemini_keys():
     return [k.strip().strip('"') for k in re.split(r"[;,]", raw) if k.strip()]
 
 
+def _translate_prompt(titles):
+    return (
+        "다음은 미국 경제 뉴스(CNBC)의 영문 제목 목록이다. 각 제목을 한국 경제지 헤드라인처럼 자연스러운 한국어로 옮겨라. "
+        "의미를 더하거나 빼지 말고, 고유명사(기업·인명·지수)는 통용 표기를 쓰며, 숫자·티커는 그대로 둔다. "
+        "결과는 입력과 같은 순서·같은 개수의 JSON 문자열 배열로만 답하라.\n\n" + json.dumps(titles, ensure_ascii=False)
+    )
+
+
+def _valid_translation(out, titles):
+    return isinstance(out, list) and len(out) == len(titles) and all(isinstance(x, str) and x.strip() for x in out)
+
+
+def translate_titles_openai_compat(step, titles):
+    """OpenAI 호환 공급자 한 단계로 번역. 키가 없거나 실패하면 None (호출자가 다음 단계로)."""
+    key = os.environ.get(step["env"], "").strip()
+    if not key:
+        return None
+    body = {"model": step["model"], "temperature": 0.2, "messages": [{"role": "user", "content": _translate_prompt(titles)}], **step["params"]}
+    try:
+        r = requests.post(step["url"], headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json", "Accept": "application/json"},
+                          json=body, timeout=step["timeout"])
+        if r.status_code != 200:
+            print(f"  [번역] {step['name']} {r.status_code} — 다음 단계")
+            return None
+        text = (r.json()["choices"][0]["message"].get("content") or "").strip()
+        out = json.loads(text[text.find("["): text.rfind("]") + 1])
+        if _valid_translation(out, titles):
+            return [x.strip() for x in out]
+        print(f"  [번역] {step['name']} 응답 형식 불일치 — 다음 단계")
+    except Exception as e:  # noqa: BLE001
+        print(f"  [번역] {step['name']} 실패: {str(e)[:100]} — 다음 단계")
+    return None
+
+
 def translate_titles(titles):
-    """영문 제목 목록 → 한국어 제목 목록 (같은 길이). 키를 돌아가며 시도, 전부 실패하면 None.
+    """영문 제목 목록 → 한국어 제목 목록 (같은 길이). TRANSLATE_CHAIN(Groq → NVIDIA) → Gemini 키 순서로 시도, 전부 실패하면 None.
 
     홈 화면 제목용 (2026-10-10 사용자: 최신 뉴스 제목은 한글로). 본문·요약은 번역하지 않는다.
     """
     if not titles:
         return []
-    prompt = (
-        "다음은 미국 경제 뉴스(CNBC)의 영문 제목 목록이다. 각 제목을 한국 경제지 헤드라인처럼 자연스러운 한국어로 옮겨라. "
-        "의미를 더하거나 빼지 말고, 고유명사(기업·인명·지수)는 통용 표기를 쓰며, 숫자·티커는 그대로 둔다. "
-        "결과는 입력과 같은 순서·같은 개수의 JSON 문자열 배열로만 답하라.\n\n" + json.dumps(titles, ensure_ascii=False)
-    )
+    for step in TRANSLATE_CHAIN:
+        ko = translate_titles_openai_compat(step, titles)
+        if ko is not None:
+            return ko
+    prompt = _translate_prompt(titles)
     body = {"contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2}}
     for key in gemini_keys():
@@ -81,7 +123,7 @@ def translate_titles(titles):
             r.raise_for_status()
             text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
             out = json.loads(text)
-            if isinstance(out, list) and len(out) == len(titles) and all(isinstance(x, str) and x.strip() for x in out):
+            if _valid_translation(out, titles):
                 return [x.strip() for x in out]
             print("  [번역] 응답 형식 불일치 — 다음 키")
         except Exception as e:  # noqa: BLE001
@@ -106,8 +148,8 @@ def add_korean_titles(items):
     if not todo:
         print(f"[번역] 새 제목 없음 (이전 번역 {len(items)}건 재사용)")
         return
-    if not gemini_keys():
-        print("[번역] GEMINI_API_KEY 없음 — 영문 제목 유지")
+    if not gemini_keys() and not any(os.environ.get(st["env"], "").strip() for st in TRANSLATE_CHAIN):
+        print("[번역] 번역 키 없음 (GROQ/NVIDIA/GEMINI) — 영문 제목 유지")
         return
     ko = translate_titles([it["title"] for it in todo])
     if ko is None:

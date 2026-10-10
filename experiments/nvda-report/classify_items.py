@@ -157,12 +157,12 @@ def classify(conn, since_days=config.CLASSIFY_SINCE_DAYS, max_batches=config.CLA
                 print("[classify] 연속 실패 — 이번 실행 중단. 다음 실행이 이어받는다.")
                 break
             continue
-        dropped = write_results(conn, valid, pool.model, batch)
+        dropped = write_results(conn, valid, pool.last_model, batch)   # 예비(DeepSeek)로 답한 배치는 그 이름이 남는다
         written += len(valid)
         dropped_total += dropped
         ev = sum(v["is_event"] for v in valid)
         print(f"[classify] 배치 {n}/{len(batches)}: {len(valid)}건 저장 (이벤트 {ev})" + (f" · {dropped}건 검증 탈락" if dropped else ""))
-    print(f"[classify] 완료 — 저장 {written:,}건 · 검증 탈락 {dropped_total} · Gemini 호출 {pool.calls}회")
+    print(f"[classify] 완료 — 저장 {written:,}건 · 검증 탈락 {dropped_total} · Gemini 호출 {pool.calls}회" + (f" (예비 {pool.fallback_calls}회)" if pool.fallback_calls else ""))
     db.set_meta(conn, "classify_last_run_at", db.now_iso())
     conn.commit()
     return written

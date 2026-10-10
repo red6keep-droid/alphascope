@@ -3,6 +3,9 @@
 기존 generate_report.py의 키 표기(`GEMINI_API_KEY="k1;k2"`)를 그대로 쓴다.
 차이는 순차 전환이 아니라 호출마다 다음 키로 돌고, 한도에 걸린 키는 잠시 쉰다는 것.
 모든 키가 같은 GEMINI_MODEL을 쓴다 — 라벨 일관성을 위해.
+
+예비 (2026-10-11): 모든 키가 쿨다운이거나 한도로 끝까지 실패하면 backup_llm 사슬(Groq gpt-oss-120b → NVIDIA DeepSeek)로 넘긴다.
+예비 키가 하나도 없으면 예전처럼 예외. 어느 모델이 답했는지는 last_model에 남는다 (ai_model 컬럼용).
 """
 
 import json
@@ -14,6 +17,7 @@ from google import genai
 from google.genai import types
 
 import config
+import backup_llm
 
 
 class AllKeysExhausted(RuntimeError):
@@ -61,7 +65,9 @@ class GeminiPool:
         self._cooldown_until = [0.0] * len(keys)
         self._next = 0
         self.calls = 0
-        print(f"[gemini] 키 {len(keys)}개 · model={self.model}")
+        self.last_model = self.model
+        self.fallback_calls = 0
+        print(f"[gemini] 키 {len(keys)}개 · model={self.model}" + (" · 예비 " + " → ".join(s["model"] for s in backup_llm.available()) if backup_llm.available() else " · 예비 없음"))
 
     def _pick(self):
         now = time.time()
@@ -78,10 +84,20 @@ class GeminiPool:
         time.sleep(max(wait, 1))
         return self._pick()
 
+    def _fallback(self, prompt, temperature, reason):
+        result, name = backup_llm.run_chain(prompt, temperature=temperature, reason=reason)
+        self.calls += 1
+        self.fallback_calls += 1
+        self.last_model = name
+        return result
+
     def generate_json(self, prompt, temperature=0.0):
         last_error = None
         for attempt in range(1, config.PER_BATCH_ATTEMPTS + 1):
-            i = self._pick()
+            try:
+                i = self._pick()
+            except AllKeysExhausted:
+                return self._fallback(prompt, temperature, "모든 키 쿨다운")
             key, client = self._clients[i]
             try:
                 resp = client.models.generate_content(
@@ -94,6 +110,7 @@ class GeminiPool:
                     ),
                 )
                 self.calls += 1
+                self.last_model = self.model
                 return _parse_json(resp.text)
             except Exception as e:  # noqa: BLE001
                 last_error = e
@@ -107,4 +124,6 @@ class GeminiPool:
                 else:
                     print(f"[gemini] 키 {_mask(key)} 시도 {attempt} 실패: {str(e)[:200]}")
                     time.sleep(config.RETRY_SLEEP_SECONDS)
+        if _is_rate_limit(last_error):
+            return self._fallback(prompt, temperature, f"{config.PER_BATCH_ATTEMPTS}회 모두 한도")
         raise RuntimeError(f"Gemini 호출 실패 ({config.PER_BATCH_ATTEMPTS}회): {str(last_error)[:200]}")

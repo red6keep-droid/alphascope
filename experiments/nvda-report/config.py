@@ -176,6 +176,13 @@ CLASSIFY_SINCE_DAYS = 30
 CLASSIFY_MAX_ATTEMPTS = 2         # 검증 탈락이 이 횟수를 넘으면 prefilter_reason='classify_failed'
 MAX_TEXT_CHARS = 1200
 DEFAULT_MODEL = "gemini-3.5-flash"
+# Gemini 예비 사슬 (2026-10-11 사용자: 무료 한도·갑작스런 차단 대비 2중 3중). 키 없는 단계는 건너뛴다. backup_llm.py 참고
+FALLBACK_CHAIN = [
+    {"provider": "groq", "model": "openai/gpt-oss-120b", "min_interval": 60, "timeout": 120,
+     "params": {"reasoning_effort": "low", "max_completion_tokens": 8000}},          # 분당 8,000토큰 → 호출 간격 60초
+    {"provider": "nvidia", "model": "deepseek-ai/deepseek-v4.1-flash", "timeout": 300,
+     "params": {"max_tokens": 8000, "chat_template_kwargs": {"thinking": False}}},   # 사고 끄기 — 켜면 답이 비거나 5분 초과
+]
 KEY_COOLDOWN_SECONDS = 60
 PER_BATCH_ATTEMPTS = 5
 RETRY_SLEEP_SECONDS = 3

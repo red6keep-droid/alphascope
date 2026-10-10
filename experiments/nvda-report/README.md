@@ -35,6 +35,7 @@ experiments/nvda-report/
 ├── trump_bridge.py      # ③ trump-state의 trump_analysis.json(raw URL, 실패 시 git show) → 그날 NVDA 발언 이벤트(강도 ≥ 5) 한 줄. robust 통계 있을 때만 괄호
 ├── extract_quarterly.py # ④ XBRL companyfacts + 8-K 보도자료(*pr.htm) + 10-Q/10-K 본문 → quarterly 테이블 (9지표). 정규식, Gemini 없음
 ├── narrate.py           # ⑤ ⑦ 오늘의 해석 — Gemini 3문장 이내, 금지어 검증, 이벤트 0건이면 건너뜀
+├── backup_llm.py        # Gemini 예비 사슬 (Groq gpt-oss-120b → NVIDIA DeepSeek, OpenAI 호환 REST) — gemini_client가 키 전멸 때 부른다
 ├── render_html.py       # ⑤ nvda_analysis.json + narrative.json → Blogger 본문·미리보기 (trump-trend 시각 규칙)
 ├── publish.py           # ⑤ daily-report publish_blogger 재사용, 같은 제목이면 건너뜀. 기본 dry-run
 ├── report_title.py      # ⑤ 제목 '엔비디아 데일리 — YYYY년 M월 D일' · 라벨
@@ -162,6 +163,23 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | 키워드 필터 예외 `REGULATORY_KEYWORDS` | 제목에 Nvidia가 없어도 export control·chip export·AI chip·semiconductor tariff·BIS·entity list 등이 있으면 분류 | "미국, 중국 반도체 수출 규제 강화" 같은 기사. 무관하면 Gemini가 0 |
 | 우선 영역 `PRIORITY_AREAS` = Legal·Regulation | `config.event_min(area)`: 이 두 영역은 **relevance ≥ 1**이면 이벤트(나머지 ≥ 2), 강조·접히지 않음·② 맨 위 | 신규성 조건(new·update)은 그대로라 해설은 걸러진다 |
 | 2차 출처 `SECONDARY_SOURCES` + 도메인 문자열 정규식 | 중복 제거의 대표가 되지 못하고(공식 → 1차 매체 → 2차 순), 단독이면 relevance ≤ 1·repeat | 법적 쿼리가 YouTube·Stocktwits·tech-insider.org 같은 출처를 relevance 3로 올렸고, **TradingView 전재가 Reuters보다 20분 먼저 떠 대표가 되는 바람에 Reuters 보도가 통째로 사라졌다** (확인·수정) |
+
+### 모델 역할 분담과 예비 사슬 (2026-10-11, 사용자: "역할별로 나누자" → "무료 한도·갑작스런 차단 대비 2중 3중으로")
+
+후보를 실제 프롬프트(분류 6건·20건 배치, 서술, 번역)로 돌려 본 뒤 정했다. 키는 `GEMINI_API_KEY`(5개) · `GROQ_API_KEY` · `NVIDIA_API_KEY`, .env와 GitHub secret 둘 다.
+
+| 역할 | 1순위 | 2순위 | 3순위 |
+| --- | --- | --- | --- |
+| 분류(classify) · 한 문장 사실 | **Gemini 3.5 Flash** (키 5개 라운드로빈) | Groq gpt-oss-120b (사고 low) | NVIDIA DeepSeek V4.1 Flash (사고 끔) |
+| 서술(narrate) | **Gemini 3.5 Flash** | Groq gpt-oss-120b | NVIDIA DeepSeek |
+| 홈 뉴스 제목 번역 (`fetch_news.py`) | **Groq gpt-oss-120b** (0.9초) | NVIDIA gpt-oss-20b (5초) | Gemini |
+
+- 분류·서술은 `gemini_client.py`가 모든 키 쿨다운이거나 5회 모두 한도일 때 `backup_llm.run_chain`으로 넘긴다. 답한 모델 이름이 `ai_model`에 남는다. 요약(ai_fact)은 분류 호출에 묶여 있어 떼지 않는다.
+- Gemini를 주 모델로 두는 이유: 수동 검증 96%를 통과한 조합이고 임계값 튜닝 중이라 라벨 분포를 흔들지 않는다. Gemini는 사고 기본값(켜짐) 유지.
+- Groq: 분류 20건 6.5초, Gemini 라벨과 24필드 중 18~19 일치, 서술 검증 통과. **무료 등급 분당 8,000토큰** → 20건 배치(≈7,000) 뒤 60초 간격(`min_interval`). 한 문장 사실이 존댓말로 나오는 경향.
+- NVIDIA DeepSeek: 18/24, 20건 배치 2분 안팎. 공용 엔드포인트라 지연이 들쭉날쭉(같은 모델이 3초↔19분) → 마지막 단.
+- 사고(reasoning) 모드: 라벨은 안 나아지고(low 18 → medium 19 → high 빈 응답, DeepSeek 켜면 5분 초과) 서술은 길어져 검증 탈락 → 예비는 전부 low/끔. 리포트 자체가 해석·전망을 넣지 않는 설계라 사고가 필요한 단계가 없다.
+- 떨어진 후보: Mistral — Large/Medium/Small/Magistral은 계정 등급 밖(분당 허용 0), Ministral 14B는 14/24에 Legal→Regulation 오분류·서술에 없는 내용 지어냄 · gpt-oss-20b 분류 전부 Other·0 · Nemotron 3 Super 빈 응답 · GLM 5.3 Flash 무응답 · Kimi K3 163초 · Gemma 4 31B 키와 무관하게 무응답(504).
 
 ## 소스 확인 (실제 호출)
 
