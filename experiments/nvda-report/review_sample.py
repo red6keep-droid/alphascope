@@ -33,15 +33,17 @@ def sample(conn, n, seed):
 def render(rows, path):
     lines = [
         "# 엔비디아 리포트 — 분류 수동 검증 표본", "",
-        "각 행의 `판정` 열에 `ok` / `ng`. ng이면 `메모`에 올바른 값. 기준: 사전 필터 사유가 맞는가 · area · relevance(0–3) · novelty · fact가 원문에 있는 사실인가", "",
-        "| # | 날짜 | 종류·출처 | 제목 | 필터 | area · dir | rel | nov | fact | 판정 | 메모 |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        "각 행의 `판정` 열에 `ok` / `ng`. ng이면 `메모`에 올바른 값. 기준: 사전 필터 사유가 맞는가 · area · relevance(0–3) · novelty · fact가 입력(제목·요약)에 있는 내용인가", "",
+        "`입력 요약` = Gemini가 제목과 함께 본 RSS 요약 전문. 비어 있으면 제목만 보고 분류한 것이다 (Google News). 기사를 열어 볼 필요는 없다.", "",
+        "| # | 날짜 | 종류·출처 | 제목 | 입력 요약 | 필터 | area · dir | rel | nov | fact | 판정 | 메모 |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for i, r in enumerate(rows, 1):
         title = (r["title"] or "")[:110].replace("|", "¦")
         ad = f"{r['ai_area']} · {r['ai_direction']}" if r["ai_area"] else "—"
         fact = (r["ai_fact"] or "—").replace("|", "¦")
-        lines.append(f"| {i} | {r['published_at'][:10]} | {r['kind']}·{r['source']} | {title} | {r['prefilter_reason'] or ''} | {ad} | "
+        summary = " ".join((r["summary"] or "").split()).replace("|", "¦") or "—"
+        lines.append(f"| {i} | {r['published_at'][:10]} | {r['kind']}·{r['source']} | {title} | {summary} | {r['prefilter_reason'] or ''} | {ad} | "
                      f"{r['ai_relevance'] if r['ai_relevance'] is not None else '—'} | {r['ai_novelty'] or '—'} | {fact} |  |  |")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:

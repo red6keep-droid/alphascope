@@ -52,6 +52,8 @@ What relevance 2-3 requires — a PRIMARY ACTION by a named actor (NVIDIA, a cus
   - a competitor's stock move (Cerebras, AMD, Micron falling or rising) → relevance 1
   - roundups that restate a known deal (e.g. "SpaceX's $40B GPU purchase keeps Cramer bullish") → relevance 1, "repeat"
   An article that reports a primary action AND adds commentary is labeled by the action.
+  - A price change, discontinuation or launch of NVIDIA's OWN product (including consumer products such as GeForce, Shield, DGX Spark) is a primary action: NVIDIA is the subject → relevance 3 if a figure is given, else 2; novelty "new" on first report.
+  - When a customer launches a product that merely contains an NVIDIA chip (e.g. a Microsoft laptop with an RTX chip), NVIDIA is NOT the subject → relevance 2 even if the price or date is given. Relevance 3 is reserved for NVIDIA's own announcements.
 
 Other rules:
   - NVIDIA blog posts and press releases are usually marketing: label them "Other"/0 unless they announce a product shipping date, a named customer deployment with scale, a financial figure, or an executive change.
