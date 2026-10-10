@@ -10,7 +10,8 @@ NVDA 한 종목의 **사실 추적** 리포트다. 매수·매도 신호를 만�
 - **②단계 문서 수집·분류 구현 완료 (2026-10-08).** 뉴스룸·블로그·CNBC·Google News·연방관보·CourtListener → 중복 제거 → Gemini 분류 → 보정 규칙.
   30일치 111건 분류, 검증 탈락 0, 이벤트 24건. **50건 수동 검증 48/50 = 96% (2026-10-10, 1차 Claude·최종 사용자)** — ng 2건(NVIDIA 자체 소비자 제품 가격 변경 → rel 2~3·new, 고객사 제품 출시 → rel 2)은 프롬프트 예시로 반영. rel 1의 novelty는 채점하지 않기로 함. `review_sample.py`에 Gemini가 본 `입력 요약` 열 추가.
 - **③ 소송 부분 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만) → `cases_watch.py`(매일: watch=1 도켓의 일정 명령문에서 심리·재판 날짜만 `calendar(COURT)`로, 판결·합의·기각 명령만 `items(court)` 이벤트). 사용자 지시: **단순하게 — 주가에 닿을 판결이 잡혀 있을 때만 미리 경고.** 법원 일정은 30일 창(`COURT_LOOKAHEAD_DAYS`). **법적 기사 모니터링 강화 완료 (2026-10-10, 아래 표). 트럼프 브리지 완료 (`trump_bridge.py`, 한 줄).** ③ 끝.
-- ④(점검표 추출) · ⑤(서술·HTML·Actions) · ⑥(30일 그림자)는 아직이다.
+- **④ 점검표 완료 (2026-10-10):** `extract_quarterly.py` — SEC XBRL(매출·총마진·자사주) + 8-K 보도자료(데이터센터 매출·가이던스·non-GAAP 총마진) + 10-Q/10-K(중국 비중·10% 고객) 정규식. Gemini 없음. 최근 5분기 백필, 그 뒤엔 새 공시 날만. capex 가이던스·TSMC 월매출은 뺐다.
+- ⑤(서술·HTML·Actions) · ⑥(30일 그림자)는 아직이다.
 
 ```
 experiments/nvda-report/
@@ -32,6 +33,7 @@ experiments/nvda-report/
 ├── cases_init.py        # ③ 검토 표 + MANUAL 덮어쓰기 → cases 테이블 (watch=1은 증권만)
 ├── cases_watch.py       # ③ watch=1 도켓 → 심리·재판 일정(calendar COURT, 30일 경고) · 판결·합의·기각 명령(items court 이벤트). Gemini 없음
 ├── trump_bridge.py      # ③ trump-state의 trump_analysis.json(raw URL, 실패 시 git show) → 그날 NVDA 발언 이벤트(강도 ≥ 5) 한 줄. robust 통계 있을 때만 괄호
+├── extract_quarterly.py # ④ XBRL companyfacts + 8-K 보도자료(*pr.htm) + 10-Q/10-K 본문 → quarterly 테이블 (9지표). 정규식, Gemini 없음
 ├── judge.py             # 이벤트 판정 · 상태판 · 다가오는 것 · 점검표 · 기사 수 → output/nvda_analysis.json
 ├── render_report.py     # → output/nvda_report.md · title.txt
 ├── prompts/classify.txt # 영역 enum · 관련성 기준표 · 신규성 규칙 · 1차 행위 규칙
@@ -114,6 +116,22 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | 통계 | `reactions[주제/하위주제 → 주제].symbols.NVDA`의 next_close·close·d3·d5 중 **placebo.robust가 true인 것 하나만** 괄호로. 없으면 아무 말 없음 | "구분되지 않음" 문구도 쓰지 않는다 — 한 줄 원칙 |
 | 신선도 | 상태 파일 generated_at 날짜 < 기준일이면 " (트럼프 데이터 전일 기준)" | 두 워크플로 시각 차 (22:30 / 22:45 UTC) |
 | 확인 | 2026-10-09 실제 상태: 에너지 발언 1건뿐 → 0건. 합성 이벤트로 선택·강도 하한·무관 규칙 제외·렌더 문구 확인 | |
+
+### ④단계 (2026-10-10)
+
+| 항목 | 결정 | 이유 |
+| --- | --- | --- |
+| 추출 방식 | **정규식, Gemini 없음.** 숫자는 XBRL 구조화 값이거나 원문 문장·표를 그대로 긁은 것이라 "원문 대조" 단계가 따로 없다 | 기획서 8절의 "Gemini 추출 → 파이썬 대조"를 대체. 복잡하게 만들지 않는다 |
+| 뺀 지표 | 하이퍼스케일러 capex 가이던스 · TSMC 월매출 YoY | 각사 표현이 제각각 / TSMC IR 403이라 뉴스 제목 긁기뿐. 사용자 확정 |
+| XBRL | `Revenues`·`GrossProfit`은 분기 프레임, Q4 = 10-K 연간 − Q1~Q3. `PaymentsForRepurchaseOfCommonStock`은 누적치라 차분 | companyfacts는 Q4 분기값을 따로 주지 않는다 |
+| 보도자료 | 8-K index.json에서 `*pr.htm`(ex99 이름이 아님). 분기는 **제목 앞 400자**에서만 — "Fourth Quarter and Fiscal 2026" 패턴 포함 | 본문의 전망 문구("first quarter of fiscal 2027")에 끌려 4분기 자료가 다음 분기로 들어가 1분기 값을 덮어쓴 적 있음 |
+| 10-Q/10-K 분기 | **보고 기간 날짜로만** (1월→Q4, 4월→Q1, 7월→Q2, 10월→Q3) | 본문 텍스트 매칭은 틀린다 (위와 같은 이유) |
+| 중국 비중 | "Geographic Revenue based upon Customer Headquarters Location" 표의 China 행 첫 숫자 ÷ Total revenue 첫 숫자. 10-K는 연간 | |
+| 10% 고객 | "For the second quarter of fiscal year 2027, one direct customer represented 16% of total revenue" — 그 분기 문장의 직접·간접 각 첫 문장만 합산, 반기·누적 제외 | 매출채권 기준 문장과 섞이지 않게 |
+| DC QoQ·YoY | 보도자료 문구가 없으면 연속 분기 `dc_revenue`에서 계산 | 보도자료 머리 글머리표에는 YoY만 있다 |
+| 가이던스 대비 실제 | `guidance_revenue_next`는 **다음 분기** 행에 저장(`value_json.given_in`에 발표 분기), 실제 매출이 들어오면 `guidance_beat_pct` 계산 | |
+| 갱신 조건 | meta `quarterly_seen_accessions`에 없는 8-K 2.02·10-Q·10-K가 EDGAR submissions에 있을 때만. `--force`로 백필 | 하루 호출 1회(submissions)로 끝 |
+| 확인 | FY2027Q2: 매출 $96.22B · DC $89.0B(YoY +117%, QoQ +18.4%) · non-GAAP GM 75.0% · 다음 분기 가이던스 $108B ±2% · 가이던스 대비 +5.7% · 중국 8.2% · 10% 고객 16% · 자사주 $19.73B | 10-Q 원문 표와 일치 |
 
 ### 법적·규제 기사 모니터링 강화 (2026-10-10, 사용자: "법적 문제 기사는 꼼꼼히")
 

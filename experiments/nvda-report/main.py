@@ -36,6 +36,7 @@ import collect_regulatory
 import config
 import db
 import dedupe
+import extract_quarterly
 import judge
 import labels
 import render_report
@@ -117,6 +118,10 @@ def main():
             collect_edgar.collect(conn, since_days=args.edgar_days)
         except Exception as e:  # noqa: BLE001
             print(f"[edgar] 실패 — 기존 공시로 계속: {e}")
+        try:
+            extract_quarterly.run(conn)          # 새 8-K 2.02 · 10-Q/10-K가 있을 때만 돈다 (④)
+        except Exception as e:  # noqa: BLE001
+            print(f"[quarterly] 실패 — 기존 점검표로 계속: {e}")
 
     _step(5, total, "문서 수집 (뉴스룸 · 블로그 · CNBC · Google News · 연방관보 · 법원)")
     if args.skip_feeds:

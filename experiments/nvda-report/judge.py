@@ -295,10 +295,10 @@ def checklist(conn, day, s):
         rows.append({"metric": metric, "label": label, "value": value, "unit": unit, "asof": asof,
                      "source": source, "note": note, "arrow": arrow, "detail": detail})
 
-    later = [("dc_revenue", "데이터센터 매출"), ("dc_revenue_yoy", "데이터센터 매출 YoY"), ("gross_margin_nongaap", "총마진 (non-GAAP)"),
-             ("guidance_revenue_next", "다음 분기 매출 가이던스"), ("guidance_beat_pct", "가이던스 대비 실제"),
-             ("china_revenue_pct", "중국 매출 비중"), ("top_customer_pct", "10% 이상 고객 비중"), ("buyback_amount", "분기 자사주 매입"),
-             ("hyperscaler_capex_guidance", "하이퍼스케일러 capex 가이던스"), ("tsmc_revenue_yoy_3m", "TSMC 3개월 매출 YoY")]
+    # ④ (2026-10-10): SEC 원문에서 추출(extract_quarterly). capex 가이던스·TSMC 월매출은 뺐다
+    later = [("revenue", "분기 매출"), ("dc_revenue", "데이터센터 매출"), ("dc_revenue_yoy", "데이터센터 매출 YoY"), ("dc_revenue_qoq", "데이터센터 매출 QoQ"),
+             ("gross_margin_nongaap", "총마진 (non-GAAP)"), ("guidance_revenue_next", "다음 분기 매출 가이던스"), ("guidance_beat_pct", "가이던스 대비 실제"),
+             ("china_revenue_pct", "중국(홍콩 포함) 매출 비중"), ("top_customer_pct", "10% 이상 고객 비중 합"), ("buyback_amount", "분기 자사주 매입")]
     for m, lab in later:
         q = conn.execute("SELECT * FROM quarterly WHERE metric = ? ORDER BY fiscal_quarter DESC LIMIT 2", (m,)).fetchall()
         if q:
@@ -306,9 +306,13 @@ def checklist(conn, day, s):
             arrow = None
             if len(q) > 1 and q[1]["value"] is not None and cur["value"] is not None:
                 arrow = "↑" if cur["value"] > q[1]["value"] else ("↓" if cur["value"] < q[1]["value"] else "→")
-            add(m, lab, cur["value"], cur["unit"], cur["fiscal_quarter"], cur["source"], arrow=arrow)
+            detail = cur["source"]
+            if m == "guidance_revenue_next" and cur.get("value_json"):
+                vj = db.loads(cur["value_json"], {}) or {}
+                detail = f"{cur['source']} · ±{vj.get('pm_pct')}%" if vj.get("pm_pct") else cur["source"]
+            add(m, lab, cur["value"], cur["unit"], cur["fiscal_quarter"], cur["source"], arrow=arrow, detail=detail)
         else:
-            add(m, lab, note="미수집 (④단계)")
+            add(m, lab, note="미수집")
     ins = collect_edgar.insider_net_sold(conn, day)
     add("insider_net_sold_90d", "90일 내부자 순매도", ins["net_sold_usd"], "USD", day, "EDGAR Form 4",
         detail=f"매도 ${ins['sold_usd'] / 1e6:,.1f}M · 매수 ${ins['bought_usd'] / 1e6:,.1f}M · 공시 {ins['filings']}건 (10b5-1 {ins['plan_filings']}건)")

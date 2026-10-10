@@ -202,7 +202,7 @@ def section_checklist(a):
         if r.get("value") is None:
             v = r.get("note") or "미수집"
         elif r["unit"] == "USD":
-            v = f"${r['value'] / 1e6:,.1f}M"
+            v = f"${r['value'] / 1e9:,.2f}B" if abs(r["value"]) >= 1e9 else f"${r['value'] / 1e6:,.1f}M"
         elif r["unit"] in ("%", "% of shares"):
             v = f"{r['value']:.1f}%"
         elif r["unit"] == "배":
