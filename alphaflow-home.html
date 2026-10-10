@@ -170,6 +170,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   width: 22px; height: 22px; flex: none;
   color: var(--gray-500);
 }
+/* 모바일 검색 아이콘 (로고 오른쪽). 데스크톱은 검색창을 그대로 쓰므로 숨긴다 (2026-10-10) */
+.search-toggle {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; flex: none;
+  border: 1px solid var(--border-strong); border-radius: 8px;
+  color: var(--gray-600);
+}
+.search-toggle svg { width: 16px; height: 16px; }
+.search-toggle[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
 .icon-btn svg { width: 19px; height: 19px; display: block; }
 
 .avatar {
@@ -993,7 +1002,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .menu-items::-webkit-scrollbar { display: none; }
   .menu-items[hidden] { display: none; }
   .nav-item { padding: 12px 10px; font-size: 18px; }
-  .search-bar { width: 160px; }
+  /* 검색: 아이콘만 보이고, 누르면 헤더 아래 한 줄 전체 폭으로 펼쳐진다 */
+  .search-toggle { display: flex; }
+  .nav-right { gap: 12px; }
+  .search-bar { display: none; order: 4; width: 100%; margin-top: 8px; }
+  .search-bar.is-open { display: flex; }
+  /* 검색을 열면 nav-right 를 풀어(display:contents) 종은 첫 줄 오른쪽에 그대로, 검색창만 다음 줄 전체 폭으로 */
+  .navbar.search-open .nav-right { display: contents; }
   .briefing-main { grid-template-columns: minmax(0, 1fr); }
   .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .news-headline { font-size: 26px; }
@@ -1032,6 +1047,14 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       <span class="logo-word">AlphaFlow</span>
     </a>
 
+    <button class="search-toggle" type="button" aria-expanded="false" aria-controls="site-search">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="5.75" cy="5.75" r="4.5"/>
+        <path d="M9.3 9.3 12.8 12.8" stroke-linecap="round"/>
+      </svg>
+      <span class="sr-only">검색 열기</span>
+    </button>
+
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M3 6h18M3 12h18M3 18h18"/>
@@ -1053,7 +1076,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   </div>
 
   <div class="nav-right">
-    <form class="search-bar" role="search" action="/search" method="get">
+    <form class="search-bar" id="site-search" role="search" action="/search" method="get">
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <circle cx="5.75" cy="5.75" r="4.5"/>
         <path d="M9.3 9.3 12.8 12.8" stroke-linecap="round"/>
@@ -1069,7 +1092,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       <span class="sr-only">알림</span>
     </button>
 
-    <div class="avatar" role="img" aria-label="내 프로필"></div>
   </div>
 </header>
 
@@ -1937,6 +1959,19 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   CARDS.forEach(loadCard);
 
   /* ============================================================ 모바일 메뉴 */
+
+  var searchToggle = document.querySelector('.search-toggle');
+  var searchBar = document.querySelector('.search-bar');
+  var navbar = document.querySelector('.navbar');
+  if (searchToggle && searchBar) {
+    searchToggle.addEventListener('click', function () {
+      var open = searchToggle.getAttribute('aria-expanded') !== 'true';
+      searchToggle.setAttribute('aria-expanded', String(open));
+      searchBar.classList.toggle('is-open', open);
+      if (navbar) navbar.classList.toggle('search-open', open);
+      if (open) { var input = searchBar.querySelector('input'); if (input) input.focus(); }
+    });
+  }
 
   var toggle = document.querySelector('.nav-toggle');
   var menu = document.getElementById('primary-menu');

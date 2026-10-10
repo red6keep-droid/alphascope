@@ -210,6 +210,8 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
    (2) 팝업을 접어두던 .hidden 규칙이 사라져 플랫폼 항목이 세로로 쌓인다.
    토글 버튼을 감추고 목록을 항상 펼친 가로 줄로 보여준다. */
 .post-share-buttons { margin: 20px 0 0; }
+/* 본문 아래 공유 줄 — 구분선으로 본문과 떼어 둔다 */
+.post-share-buttons-bottom { margin: 28px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }
 .goog-inline-block { display: inline-block; }
 .sharing { position: relative; display: inline-block; }
 .sharing-button { display: none; }
@@ -381,6 +383,14 @@ __BLOGGER_CSS__
           </b:widget>
         </b:section>
 
+        <button class='search-toggle' type='button' aria-controls='site-search' aria-expanded='false'>
+          <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='2'>
+            <circle cx='5.75' cy='5.75' r='4.5'/>
+            <path d='M9.3 9.3 12.8 12.8' stroke-linecap='round'/>
+          </svg>
+          <span class='sr-only'>검색 열기</span>
+        </button>
+
         <button class='nav-toggle' type='button' aria-controls='primary-menu' aria-expanded='false'>
           <svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
             <path d='M3 6h18M3 12h18M3 18h18'/>
@@ -399,7 +409,7 @@ __NAV_ITEMS__
         <b:section class='search-holder' id='search_top' maxwidgets='1' name='Search' showaddelement='false'>
           <b:widget id='BlogSearch1' locked='true' title='Search This Blog' type='BlogSearch' visible='true'>
             <b:includable id='main'>
-              <form class='search-bar' expr:action='data:blog.searchUrl' method='get' role='search'>
+              <form class='search-bar' id='site-search' expr:action='data:blog.searchUrl' method='get' role='search'>
                 <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='2'>
                   <circle cx='5.75' cy='5.75' r='4.5'/>
                   <path d='M9.3 9.3 12.8 12.8' stroke-linecap='round'/>
@@ -417,8 +427,6 @@ __NAV_ITEMS__
           </svg>
           <span class='sr-only'>알림</span>
         </button>
-
-        <div class='avatar'></div>
       </div>
     </header>
 
@@ -615,6 +623,11 @@ def indent(text, spaces):
 def build_theme(parts):
     """블로거에 붙여넣는 테마 XML 을 만든다."""
     includables, n = blog_includables()
+    # 공유 버튼: 제목 아래(headerByline)에는 두지 않고 본문 아래(postFooter)에만 (2026-10-10 사용자)
+    includables = includables.replace(
+        "<b:include cond='data:view.isMultipleItems or data:widgets.Blog.first.headerByline.items.share' data='{ shareButtonClass: &quot;post-share-buttons-top&quot;, overridden: true }' name='maybeAddShareButtons'/>",
+        "<b:comment>공유 버튼은 본문 아래(postFooter)에만 둔다</b:comment>")
+    includables = includables.replace("post-share-buttons-bottom invisible", "post-share-buttons-bottom")
 
     out = TEMPLATE
     out = out.replace("__CSS__", parts["css"])

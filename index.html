@@ -183,6 +183,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   width: 22px; height: 22px; flex: none;
   color: var(--gray-500);
 }
+/* 모바일 검색 아이콘 (로고 오른쪽). 데스크톱은 검색창을 그대로 쓰므로 숨긴다 (2026-10-10) */
+.search-toggle {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; flex: none;
+  border: 1px solid var(--border-strong); border-radius: 8px;
+  color: var(--gray-600);
+}
+.search-toggle svg { width: 16px; height: 16px; }
+.search-toggle[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
 .icon-btn svg { width: 19px; height: 19px; display: block; }
 
 .avatar {
@@ -1006,7 +1015,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .menu-items::-webkit-scrollbar { display: none; }
   .menu-items[hidden] { display: none; }
   .nav-item { padding: 12px 10px; font-size: 18px; }
-  .search-bar { width: 160px; }
+  /* 검색: 아이콘만 보이고, 누르면 헤더 아래 한 줄 전체 폭으로 펼쳐진다 */
+  .search-toggle { display: flex; }
+  .nav-right { gap: 12px; }
+  .search-bar { display: none; order: 4; width: 100%; margin-top: 8px; }
+  .search-bar.is-open { display: flex; }
+  /* 검색을 열면 nav-right 를 풀어(display:contents) 종은 첫 줄 오른쪽에 그대로, 검색창만 다음 줄 전체 폭으로 */
+  .navbar.search-open .nav-right { display: contents; }
   .briefing-main { grid-template-columns: minmax(0, 1fr); }
   .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .news-headline { font-size: 26px; }
@@ -1177,6 +1192,8 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
    (2) 팝업을 접어두던 .hidden 규칙이 사라져 플랫폼 항목이 세로로 쌓인다.
    토글 버튼을 감추고 목록을 항상 펼친 가로 줄로 보여준다. */
 .post-share-buttons { margin: 20px 0 0; }
+/* 본문 아래 공유 줄 — 구분선으로 본문과 떼어 둔다 */
+.post-share-buttons-bottom { margin: 28px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }
 .goog-inline-block { display: inline-block; }
 .sharing { position: relative; display: inline-block; }
 .sharing-button { display: none; }
@@ -1318,6 +1335,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
           </b:widget>
         </b:section>
 
+        <button class='search-toggle' type='button' aria-controls='site-search' aria-expanded='false'>
+          <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='2'>
+            <circle cx='5.75' cy='5.75' r='4.5'/>
+            <path d='M9.3 9.3 12.8 12.8' stroke-linecap='round'/>
+          </svg>
+          <span class='sr-only'>검색 열기</span>
+        </button>
+
         <button class='nav-toggle' type='button' aria-controls='primary-menu' aria-expanded='false'>
           <svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
             <path d='M3 6h18M3 12h18M3 18h18'/>
@@ -1351,7 +1376,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         <b:section class='search-holder' id='search_top' maxwidgets='1' name='Search' showaddelement='false'>
           <b:widget id='BlogSearch1' locked='true' title='Search This Blog' type='BlogSearch' visible='true'>
             <b:includable id='main'>
-              <form class='search-bar' expr:action='data:blog.searchUrl' method='get' role='search'>
+              <form class='search-bar' id='site-search' expr:action='data:blog.searchUrl' method='get' role='search'>
                 <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='2'>
                   <circle cx='5.75' cy='5.75' r='4.5'/>
                   <path d='M9.3 9.3 12.8 12.8' stroke-linecap='round'/>
@@ -1369,8 +1394,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
           </svg>
           <span class='sr-only'>알림</span>
         </button>
-
-        <div class='avatar'></div>
       </div>
     </header>
 
@@ -1833,7 +1856,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   </div>
 </b:includable>
           <b:includable id='headerByline'>
-          <b:include cond='data:view.isMultipleItems or data:widgets.Blog.first.headerByline.items.share' data='{ shareButtonClass: &quot;post-share-buttons-top&quot;, overridden: true }' name='maybeAddShareButtons'/>
+          <b:comment>공유 버튼은 본문 아래(postFooter)에만 둔다</b:comment>
           <b:include name='super.headerByline'/>
         </b:includable>
           <b:includable id='homePageLink'><b:comment>Don&#39;t show</b:comment></b:includable>
@@ -1914,7 +1937,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               <b:include cond='data:widget.type == &quot;Blog&quot;' data='post' name='postFooterAuthorProfile'/>
             </div>
             <b:if cond='data:view.isSingleItem'>
-                <b:include data='{ shareButtonClass: &quot;post-share-buttons-bottom invisible&quot;, overridden: true }' name='maybeAddShareButtons'/>
+                <b:include data='{ shareButtonClass: &quot;post-share-buttons-bottom&quot;, overridden: true }' name='maybeAddShareButtons'/>
             <b:else/>
               <b:include data='post' name='postFooterJumpLink'/>
             </b:if>
@@ -2808,6 +2831,19 @@ body.no-dashboard .main-content { padding-top: 32px; }
         CARDS.forEach(loadCard);
 
         /* ============================================================ 모바일 메뉴 */
+
+        var searchToggle = document.querySelector('.search-toggle');
+        var searchBar = document.querySelector('.search-bar');
+        var navbar = document.querySelector('.navbar');
+        if (searchToggle && searchBar) {
+          searchToggle.addEventListener('click', function () {
+            var open = searchToggle.getAttribute('aria-expanded') !== 'true';
+            searchToggle.setAttribute('aria-expanded', String(open));
+            searchBar.classList.toggle('is-open', open);
+            if (navbar) navbar.classList.toggle('search-open', open);
+            if (open) { var input = searchBar.querySelector('input'); if (input) input.focus(); }
+          });
+        }
 
         var toggle = document.querySelector('.nav-toggle');
         var menu = document.getElementById('primary-menu');
