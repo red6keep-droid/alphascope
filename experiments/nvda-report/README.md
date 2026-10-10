@@ -11,7 +11,7 @@ NVDA 한 종목의 **사실 추적** 리포트다. 매수·매도 신호를 만�
   30일치 111건 분류, 검증 탈락 0, 이벤트 24건. **50건 수동 검증 48/50 = 96% (2026-10-10, 1차 Claude·최종 사용자)** — ng 2건(NVIDIA 자체 소비자 제품 가격 변경 → rel 2~3·new, 고객사 제품 출시 → rel 2)은 프롬프트 예시로 반영. rel 1의 novelty는 채점하지 않기로 함. `review_sample.py`에 Gemini가 본 `입력 요약` 열 추가.
 - **③ 소송 부분 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만) → `cases_watch.py`(매일: watch=1 도켓의 일정 명령문에서 심리·재판 날짜만 `calendar(COURT)`로, 판결·합의·기각 명령만 `items(court)` 이벤트). 사용자 지시: **단순하게 — 주가에 닿을 판결이 잡혀 있을 때만 미리 경고.** 법원 일정은 30일 창(`COURT_LOOKAHEAD_DAYS`). **법적 기사 모니터링 강화 완료 (2026-10-10, 아래 표). 트럼프 브리지 완료 (`trump_bridge.py`, 한 줄).** ③ 끝.
 - **④ 점검표 완료 (2026-10-10):** `extract_quarterly.py` — SEC XBRL(매출·총마진·자사주) + 8-K 보도자료(데이터센터 매출·가이던스·non-GAAP 총마진) + 10-Q/10-K(중국 비중·10% 고객) 정규식. Gemini 없음. 최근 5분기 백필, 그 뒤엔 새 공시 날만. capex 가이던스·TSMC 월매출은 뺐다.
-- **⑤ 렌더·Actions 완료 (2026-10-10):** `narrate.py`(⑦ 3문장 이내, 이벤트 0건이면 생략) · `render_html.py` · `publish.py`(dry-run 기본) · `state_io.py`(모든 테이블 JSONL) · `.github/workflows/nvda-report.yml`(22:45 UTC, `nvda-state`, `NVDA_PUBLISH` 게이트). **다음: 첫 수동 실행으로 `nvda-state` 시드 → ⑥ 30일 그림자.**
+- **⑤ 렌더·Actions 완료 (2026-10-10):** `narrate.py`(⑦ 3문장 이내, 이벤트 0건이면 생략) · `render_html.py` · `publish.py`(dry-run 기본) · `state_io.py`(모든 테이블 JSONL) · `.github/workflows/nvda-report.yml`(22:45 UTC, `nvda-state`, `NVDA_PUBLISH` 게이트). **첫 수동 실행 성공(2026-10-10, run 38048054858, 487초) → `nvda-state` 시드 · `cases` 12행은 따로 심음 · main 머지 · 매일 22:45 UTC 스케줄 활성. ⑥ 30일 그림자 진행 중.**
 
 ```
 experiments/nvda-report/
@@ -176,6 +176,8 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 
 ## 알아둘 함정
 
+- **소송 추적 목록(`cases`)은 로컬 스크립트(`cases_survey`→`cases_init`)로 만든다.** Actions는 `nvda-state`의 `cases.jsonl`을 읽을 뿐 스스로 만들지 않는다. 목록을 바꾸면 로컬에서 다시 만들고 `state_io.export_state` 결과의 `cases.jsonl`을 `nvda-state`에 커밋한다 (2026-10-10 첫 시드 `1dbb2f4`).
+- **Gemini 503/500이 잦다** (2026-10-10 첫 Actions 실행에서 8배치 중 1배치만 성공). 분류는 다음 실행이 이어받으므로 리포트가 며칠 얇을 수 있다. 연속 실패 시 그 실행을 중단하는 로직이 있다.
 - **옵션 체인은 미국 장 마감 후 ~ 미국 자정(≈ 20:00–04:00 UTC) 사이에 받아야 한다.** 그 밖의 시각에 Yahoo는 호가 0·OI 0·IV≈0으로 리셋된 체인을 준다 (2026-10-08 04:34 UTC에 확인 — ATM IV 0.4%, P/C 31). `collect_options`의 품질 게이트가 그런 체인을 버리고 미수집으로 두지만, 그날 스냅샷은 비게 된다. Actions 22:45 UTC는 창 안이다. 로컬 점검은 `--skip-options`로.
 - IV 랭크(60일)·선행 PER 1년 분위는 스냅샷이 쌓여야 켜진다. **매일 돌려야 쌓인다.**
 - `upgrades_downgrades`는 첫 실행에 최근 14일만. 그 뒤는 meta `analyst_last_seen` 이후만.
