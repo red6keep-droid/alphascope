@@ -9,7 +9,8 @@ NVDA 한 종목의 **사실 추적** 리포트다. 매수·매도 신호를 만�
 - **①단계 뼈대 완료 (2026-10-08).** Gemini 없이 수집 → 판정 → MD. 연속 실행 멱등.
 - **②단계 문서 수집·분류 구현 완료 (2026-10-08).** 뉴스룸·블로그·CNBC·Google News·연방관보·CourtListener → 중복 제거 → Gemini 분류 → 보정 규칙.
   30일치 111건 분류, 검증 탈락 0, 이벤트 24건. **50건 수동 검증 48/50 = 96% (2026-10-10, 1차 Claude·최종 사용자)** — ng 2건(NVIDIA 자체 소비자 제품 가격 변경 → rel 2~3·new, 고객사 제품 출시 → rel 2)은 프롬프트 예시로 반영. rel 1의 novelty는 채점하지 않기로 함. `review_sample.py`에 Gemini가 본 `입력 요약` 열 추가.
-- ③(소송 추적·트럼프 브리지) · ④(점검표 추출) · ⑤(서술·HTML·Actions) · ⑥(30일 그림자)는 아직이다.
+- **③ 일부 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만, 특허 10건은 전이 때만 이벤트). 남은 것: 도켓 변동 감지 · 트럼프 브리지.
+- ④(점검표 추출) · ⑤(서술·HTML·Actions) · ⑥(30일 그림자)는 아직이다.
 
 ```
 experiments/nvda-report/
@@ -27,6 +28,8 @@ experiments/nvda-report/
 ├── labels.py            # 결정적 보정 — 해설 매체·주가 기사 relevance 상한 1·repeat / 같은 사건 병합(사실 2-gram 자카드 ≥ 0.30)
 ├── gemini_client.py     # trump-trend 복사본 + "Extra data" 파싱 보강
 ├── review_sample.py     # 수동 검증 표본 50건 → output/review_sample.md
+├── cases_survey.py      # ③ CourtListener suitNature 쿼리(증권·반독점·특허 1년) → output/cases_survey.md/.json 검토 표
+├── cases_init.py        # ③ 검토 표 + MANUAL 덮어쓰기 → cases 테이블 (watch=1은 증권만)
 ├── judge.py             # 이벤트 판정 · 상태판 · 다가오는 것 · 점검표 · 기사 수 → output/nvda_analysis.json
 ├── render_report.py     # → output/nvda_report.md · title.txt
 ├── prompts/classify.txt # 영역 enum · 관련성 기준표 · 신규성 규칙 · 1차 행위 규칙
@@ -96,7 +99,7 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | FRED release dates | 응답 |
 | NVIDIA `releases.xml` · 블로그 `feed/` · CNBC Top/Tech · Google News RSS | 응답. 첫 수집 172건 |
 | Federal Register API | **기본 UA는 Cloudflare 403**, 브라우저 UA로 200 |
-| CourtListener `search/?type=d` | 200, **약 100초**. 30일 신규 도켓 1건 (특허) |
+| CourtListener `search/?type=d` | 익명 호출 **약 100초**, 토큰 있으면 **1~2초** (2026-10-10). 30일 신규 도켓 1건 (특허) |
 | TSMC IR 월매출 | 브라우저 UA로도 403 — ④단계에서 뉴스 RSS 대체 |
 
 ## 알아둘 함정
