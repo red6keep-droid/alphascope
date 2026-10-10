@@ -11,7 +11,7 @@ NVDA 한 종목의 **사실 추적** 리포트다. 매수·매도 신호를 만�
   30일치 111건 분류, 검증 탈락 0, 이벤트 24건. **50건 수동 검증 48/50 = 96% (2026-10-10, 1차 Claude·최종 사용자)** — ng 2건(NVIDIA 자체 소비자 제품 가격 변경 → rel 2~3·new, 고객사 제품 출시 → rel 2)은 프롬프트 예시로 반영. rel 1의 novelty는 채점하지 않기로 함. `review_sample.py`에 Gemini가 본 `입력 요약` 열 추가.
 - **③ 소송 부분 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만) → `cases_watch.py`(매일: watch=1 도켓의 일정 명령문에서 심리·재판 날짜만 `calendar(COURT)`로, 판결·합의·기각 명령만 `items(court)` 이벤트). 사용자 지시: **단순하게 — 주가에 닿을 판결이 잡혀 있을 때만 미리 경고.** 법원 일정은 30일 창(`COURT_LOOKAHEAD_DAYS`). **법적 기사 모니터링 강화 완료 (2026-10-10, 아래 표). 트럼프 브리지 완료 (`trump_bridge.py`, 한 줄).** ③ 끝.
 - **④ 점검표 완료 (2026-10-10):** `extract_quarterly.py` — SEC XBRL(매출·총마진·자사주) + 8-K 보도자료(데이터센터 매출·가이던스·non-GAAP 총마진) + 10-Q/10-K(중국 비중·10% 고객) 정규식. Gemini 없음. 최근 5분기 백필, 그 뒤엔 새 공시 날만. capex 가이던스·TSMC 월매출은 뺐다.
-- **⑤ 렌더·Actions 완료 (2026-10-10):** `narrate.py`(⑦ 3문장 이내, 이벤트 0건이면 생략) · `render_html.py` · `publish.py`(dry-run 기본) · `state_io.py`(모든 테이블 JSONL) · `.github/workflows/nvda-report.yml`(22:45 UTC, `nvda-state`, `NVDA_PUBLISH` 게이트). **첫 수동 실행 성공(2026-10-10, run 38048054858, 487초) → `nvda-state` 시드 · `cases` 12행은 따로 심음 · main 머지 · 매일 22:45 UTC 스케줄 활성. ⑥ 30일 그림자 진행 중.**
+- **⑤ 렌더·Actions 완료 (2026-10-10):** `narrate.py`(⑦ 3문장 이내, 이벤트 0건이면 생략) · `render_html.py` · `publish.py`(dry-run 기본) · `state_io.py`(모든 테이블 JSONL) · `.github/workflows/nvda-report.yml`(22:45 UTC, `nvda-state`, `NVDA_PUBLISH` 게이트). **첫 수동 실행 성공(2026-10-10, run 38048054858, 487초) → `nvda-state` 시드 · `cases` 12행은 따로 심음 · main 머지 · 매일 22:45 UTC 스케줄 활성. **게시 켜짐 (2026-10-10, 테스트 라벨, `TEST_MODE=True`, 첫 글 https://alpha-scope.blogspot.com/2026/10/2026-10-10_01684406788.html).** 그림자 기간은 사용자 결정으로 생략.**
 
 ```
 experiments/nvda-report/
@@ -142,6 +142,8 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | 확인 | FY2027Q2: 매출 $96.22B · DC $89.0B(YoY +117%, QoQ +18.4%) · non-GAAP GM 75.0% · 다음 분기 가이던스 $108B ±2% · 가이던스 대비 +5.7% · 중국 8.2% · 10% 고객 16% · 자사주 $19.73B | 10-Q 원문 표와 일치 |
 
 ### ⑤단계 (2026-10-10)
+
+| 테스트 발행 (2026-10-10 저녁) | `config.TEST_MODE` → 라벨 "테스트 중" + 글 머리 노란 안내 띠 + 분류 대기 건수 경고. 빈 칸은 `MISSING_HINTS`(이유·채워질 시점)로, "미수집"·"—" 금지. 제목은 그대로 | 사용자: "테스트 중이라고 라벨을 붙이고 우선 발행, 부족한 데이터는 안내 문구로" |
 
 | 항목 | 결정 | 이유 |
 | --- | --- | --- |
