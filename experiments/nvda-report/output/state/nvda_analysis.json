@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-10T11:27:59Z",
+ "generated_at": "2026-10-10T12:01:11Z",
  "run_date": "2026-10-10",
  "day": "2026-10-09",
  "is_latest_bar_today": true,
@@ -349,13 +349,50 @@
    },
    {
     "key": "news_pending",
-    "value": 123,
+    "value": 83,
     "flag": false,
     "fmt": "int"
    }
   ]
  },
- "cases": [],
+ "cases": [
+  {
+   "case_id": "cl:8490233",
+   "kind": "court",
+   "title": "In re NVIDIA Corporation Securities Litigation",
+   "court": "CAND",
+   "docket_number": "4:18-cv-07669",
+   "url": "https://www.courtlistener.com/docket/8490233/in-re-nvidia-corporation-securities-litigation/",
+   "role": "defendant",
+   "category": "securities",
+   "status": "active",
+   "opened_at": "2018-12-21",
+   "last_activity_at": null,
+   "last_activity_summary": null,
+   "watch": 1,
+   "short_name": "증권 집단소송 (In re NVIDIA)",
+   "next_day": "2027-05-20",
+   "next_label": "본안 신청 심리"
+  },
+  {
+   "case_id": "cl:73459129",
+   "kind": "court",
+   "title": "Hu v. NVIDIA Corporation",
+   "court": "CAND",
+   "docket_number": "5:26-cv-05496",
+   "url": "https://www.courtlistener.com/docket/73459129/hu-v-nvidia-corporation/",
+   "role": "defendant",
+   "category": "securities",
+   "status": "active",
+   "opened_at": "2026-06-08",
+   "last_activity_at": null,
+   "last_activity_summary": null,
+   "watch": 1,
+   "short_name": "Hu v. NVIDIA",
+   "next_day": null,
+   "next_label": null
+  }
+ ],
  "checklist": [
   {
    "metric": "revenue",
@@ -514,7 +551,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-09",
-  "state_collected_at": "2026-10-10T11:21:05Z",
+  "state_collected_at": "2026-10-10T11:53:29Z",
   "missing_fields": [],
   "option_snapshot_days": 1,
   "iv_rank_days": 1,
@@ -526,7 +563,7 @@
    "court": 1,
    "fedreg": 21,
    "form4": 16,
-   "news": 193,
+   "news": 194,
    "newsroom": 3
   },
   "option_expiries": [
@@ -537,7 +574,9 @@
    "2026-11-06",
    "2026-11-13",
    "2026-11-20"
-  ]
+  ],
+  "items_pending": 83,
+  "test_mode": true
  },
  "thresholds": {
   "EST_CHG_EVENT_PCT": 1.0,

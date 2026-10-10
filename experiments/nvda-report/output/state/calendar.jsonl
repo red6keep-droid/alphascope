@@ -131,7 +131,6 @@
 {"day": "2026-02-25", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
 {"day": "2026-05-20", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
 {"day": "2026-08-26", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 1}
-{"day": "2026-11-17", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 0}
 {"day": "2020-10-27", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
 {"day": "2021-01-26", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
 {"day": "2021-04-27", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
@@ -156,7 +155,6 @@
 {"day": "2026-01-28", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
 {"day": "2026-04-29", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
 {"day": "2026-07-29", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 1}
-{"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 0}
 {"day": "2020-10-29", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
 {"day": "2021-02-02", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
 {"day": "2021-04-27", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
@@ -181,7 +179,6 @@
 {"day": "2026-02-04", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
 {"day": "2026-04-29", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
 {"day": "2026-07-22", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 1}
-{"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 0}
 {"day": "2020-10-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
 {"day": "2021-02-02", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
 {"day": "2021-04-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
@@ -206,7 +203,6 @@
 {"day": "2026-02-05", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
 {"day": "2026-04-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
 {"day": "2026-07-30", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 1}
-{"day": "2026-10-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 0}
 {"day": "2020-10-29", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
 {"day": "2021-01-27", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
 {"day": "2021-04-28", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
@@ -231,7 +227,6 @@
 {"day": "2026-01-28", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
 {"day": "2026-04-29", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
 {"day": "2026-07-29", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 1}
-{"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 0}
 {"day": "2020-12-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
 {"day": "2021-03-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
 {"day": "2021-06-15", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
@@ -256,7 +251,6 @@
 {"day": "2026-03-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
 {"day": "2026-06-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
 {"day": "2026-09-10", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 1}
-{"day": "2026-12-14", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 0}
 {"day": "2020-10-14", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
 {"day": "2021-01-14", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
 {"day": "2021-04-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
@@ -281,7 +275,6 @@
 {"day": "2026-01-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
 {"day": "2026-04-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
 {"day": "2026-07-16", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 1}
-{"day": "2026-10-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 0}
 {"day": "2020-10-27", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
 {"day": "2021-01-26", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
 {"day": "2021-04-27", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
@@ -306,7 +299,6 @@
 {"day": "2026-02-03", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
 {"day": "2026-05-05", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
 {"day": "2026-08-04", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 1}
-{"day": "2026-11-03", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 0}
 {"day": "2020-12-10", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
 {"day": "2021-03-04", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
 {"day": "2021-06-03", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
@@ -331,7 +323,6 @@
 {"day": "2026-03-04", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
 {"day": "2026-06-03", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
 {"day": "2026-09-02", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 1}
-{"day": "2026-12-09", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 0}
 {"day": "2021-01-07", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
 {"day": "2021-03-31", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
 {"day": "2021-06-30", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
@@ -356,7 +347,6 @@
 {"day": "2026-03-18", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
 {"day": "2026-06-24", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
 {"day": "2026-09-30", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 1}
-{"day": "2026-12-23", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 0}
 {"day": "2020-11-03", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
 {"day": "2021-02-02", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
 {"day": "2021-05-04", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
@@ -380,7 +370,6 @@
 {"day": "2026-02-03", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
 {"day": "2026-05-05", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
 {"day": "2026-08-11", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 1}
-{"day": "2026-11-03", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 0}
 {"day": "2020-11-24", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
 {"day": "2021-02-25", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
 {"day": "2021-05-27", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
@@ -405,7 +394,6 @@
 {"day": "2026-02-26", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
 {"day": "2026-05-28", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
 {"day": "2026-09-01", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 1}
-{"day": "2026-11-27", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 0}
 {"day": "2026-01-16", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
 {"day": "2026-02-20", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
 {"day": "2026-03-20", "kind": "OPEX", "label": "월간 옵션 만기", "symbol": null, "source": "computed", "confirmed": 1}
@@ -443,3 +431,17 @@
 {"day": "2027-01-05", "kind": "EVENT", "label": "CES 2027 (라스베이거스, 1/5–1/8 추정)", "symbol": null, "source": "static", "confirmed": 0}
 {"day": "2027-03-15", "kind": "EVENT", "label": "GTC 2027 (산호세, 3월 중순 추정 — 공식 발표 후 갱신)", "symbol": null, "source": "static", "confirmed": 0}
 {"day": "2027-06-01", "kind": "EVENT", "label": "Computex 2027 (타이베이, 6월 초 추정)", "symbol": null, "source": "static", "confirmed": 0}
+{"day": "2026-11-17", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 0}
+{"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 0}
+{"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 0}
+{"day": "2026-10-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 0}
+{"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 0}
+{"day": "2026-12-14", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 0}
+{"day": "2026-10-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 0}
+{"day": "2026-11-03", "kind": "EARNINGS_PEER", "label": "AMD 실적", "symbol": "AMD", "source": "yfinance", "confirmed": 0}
+{"day": "2026-12-09", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 0}
+{"day": "2026-12-23", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 0}
+{"day": "2026-11-03", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 0}
+{"day": "2026-11-27", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 0}
+{"day": "2027-05-20", "kind": "COURT", "label": "증권 집단소송 (In re NVIDIA) — 본안 신청 심리", "symbol": null, "source": "courtlistener #296", "confirmed": 1}
+{"day": "2027-08-17", "kind": "COURT", "label": "증권 집단소송 (In re NVIDIA) — 재판", "symbol": null, "source": "courtlistener #296", "confirmed": 1}
