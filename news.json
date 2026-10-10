@@ -1,89 +1,101 @@
 {
-  "updated_at": "2026-10-10 12:20:42 UTC",
+  "updated_at": "2026-10-10 12:31:23 UTC",
   "items": [
     {
       "title": "Junk bonds are 'flashing yellow.' Watch these warning signs",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/09/junk-bonds-are-flashing-yellow-watch-these-warning-signs.html",
       "published": "2026-10-09 20:51:25",
-      "summary": "Spreads have widened in the high-yield bond market, but that doesn't tell the whole story."
+      "summary": "Spreads have widened in the high-yield bond market, but that doesn't tell the whole story.",
+      "title_ko": "정크채권에 '노란불'… 이 경고 신호들에 주목하라"
     },
     {
       "title": "Living with Mom and trading on margin. The regular investor gets in on Wall Street's record stock borrowing binge",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/09/margin-debt-stock-market-risk.html",
       "published": "2026-10-09 13:03:19",
-      "summary": "Margin debt has surged to record levels as investors like 29-year-old Hy Luu borrow more against their portfolios. Here’s how leverage can amplify stock losses."
+      "summary": "Margin debt has surged to record levels as investors like 29-year-old Hy Luu borrow more against their portfolios. Here’s how leverage can amplify stock losses.",
+      "title_ko": "'엄마 집에 살며 빚투'… 월가의 역대급 주식 대출 광풍에 합류한 일반 투자자들"
     },
     {
       "title": "Unsure how long this AI bull has? Bonds now offer a cushion at the best values in years",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/06/unsure-how-long-this-ai-bull-has-bonds-now-offer-a-cushion-at-the-best-values-in-years.html",
       "published": "2026-10-06 11:08:28",
-      "summary": "See an AI-generated hypothetical portfolio derived from my TV talk and this column's archives."
+      "summary": "See an AI-generated hypothetical portfolio derived from my TV talk and this column's archives.",
+      "title_ko": "이번 AI 강세장 얼마나 갈까?… 수년 만에 최적의 가치로 완충재 역할 하는 채권"
     },
     {
       "title": "Nvidia's $6 trillion milestone looms. Here's when options traders see it happening",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/05/nvidias-6-trillion-milestone-looms-heres-when-options-traders-see-it-happening.html",
       "published": "2026-10-05 13:56:58",
-      "summary": "Nvidia will likely cross the $6 trillion threshold by the end of this month, according to options traders."
+      "summary": "Nvidia will likely cross the $6 trillion threshold by the end of this month, according to options traders.",
+      "title_ko": "엔비디아 6조 달러 이정표 눈앞… 옵션 트레이더들이 예측한 달성 시점은"
     },
     {
       "title": "Top Wall Street analysts are upbeat about the prospects for these 3 stocks",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/04/top-analysts-are-upbeat-about-the-prospects-for-these-3-stocks.html",
       "published": "2026-10-04 13:24:16",
-      "summary": "Investors with a long-term horizon can track ratings from top Wall Street analysts to find stocks with solid growth prospects."
+      "summary": "Investors with a long-term horizon can track ratings from top Wall Street analysts to find stocks with solid growth prospects.",
+      "title_ko": "월가 탑 애널리스트들이 전망을 긍정적으로 보는 3개 종목"
     },
     {
       "title": "Lula or Bolsonaro: Wall Street braces for two wildly different results in Brazil election",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/03/lula-or-bolsonaro-wall-street-braces-for-two-wildly-different-results-in-brazil-election.html",
       "published": "2026-10-03 13:12:27",
-      "summary": "With the first round of Brazil's presidential election taking place Sunday, Wall Street is gearing up with starkly different market predictions."
+      "summary": "With the first round of Brazil's presidential election taking place Sunday, Wall Street is gearing up with starkly different market predictions.",
+      "title_ko": "룰라냐 보소나루냐… 월가, 극명히 갈리는 브라질 대선 결과에 대비"
     },
     {
       "title": "Berkshire buys more Lennar shares, but pace of purchases slows",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/03/berkshire-buys-more-lennar-shares-but-pace-of-purchases-slows.html",
       "published": "2026-10-04 09:33:19",
-      "summary": "Berkshire Hathaway added to its bet on Lennar this week, raising its stake in the homebuilder to 11.2%, although the pace of its buying appears to be slowing."
+      "summary": "Berkshire Hathaway added to its bet on Lennar this week, raising its stake in the homebuilder to 11.2%, although the pace of its buying appears to be slowing.",
+      "title_ko": "버크셔, 레나 주식 추가 매수… 매수 속도는 둔화"
     },
     {
       "title": "Europe’s winter energy crunch may already be underway. Two U.S. stocks that may benefit",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/01/europes-winter-energy-crunch-may-already-be-underway-two-us-stocks-that-may-benefit.html",
       "published": "2026-10-01 20:41:38",
-      "summary": "BP's largest oil discovery in 25 years. What it means for the stock."
+      "summary": "BP's largest oil discovery in 25 years. What it means for the stock.",
+      "title_ko": "유럽의 겨울 에너지 위기 이미 시작됐을 수도… 수혜가 기대되는 미국 주식 2개"
     },
     {
       "title": "IPO postponements are accelerating in third quarter, even beyond Oura",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/09/29/ipo-postponements-are-accelerating-in-third-quarter-even-beyond-oura.html",
       "published": "2026-10-02 17:17:01",
-      "summary": "It's been a strong year for IPOs. But now, more companies are deciding to stay on the sidelines."
+      "summary": "It's been a strong year for IPOs. But now, more companies are deciding to stay on the sidelines.",
+      "title_ko": "오우라를 넘어 3분기 IPO 연기 가속화"
     },
     {
       "title": "Higher rates are wreaking havoc on these two ETFs. Traders see one bouncing back",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/09/29/higher-rates-are-wreaking-havoc-on-these-two-etfs-traders-see-one-bouncing-back.html",
       "published": "2026-09-29 11:28:27",
-      "summary": "The relentless surge in rates is breaking the back of two key macro trades that had been holding firm."
+      "summary": "The relentless surge in rates is breaking the back of two key macro trades that had been holding firm.",
+      "title_ko": "고금리로 휘청이는 2개 ETF… 트레이더들이 반등을 예상하는 1개 종목은"
     },
     {
       "title": "Nearly half the stocks in the S&P 500 are at cross purposes with the rest of the market",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/09/28/nearly-half-of-the-stocks-in-the-sp-500-are-working-against-it.html",
       "published": "2026-09-28 17:53:31",
-      "summary": "Almost half of the stocks in the S&P 500 have a negative beta, evidence of a chasm between the entire index and its individual components."
+      "summary": "Almost half of the stocks in the S&P 500 have a negative beta, evidence of a chasm between the entire index and its individual components.",
+      "title_ko": "S&P 500 종목 절반 가까이, 시장 나머지 흐름과 엇박자"
     },
     {
       "title": "Meta's Muse reignites AI disruption fears. Traders are targeting this brokerage stock as next casualty",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/09/23/metas-muse-ai-causes-schwab-selloff.html",
       "published": "2026-09-23 18:06:25",
-      "summary": "Meta's latest consumer AI product is sending such big shockwaves through the market that it's even inflaming a long-time rivalry in the brokerage business."
+      "summary": "Meta's latest consumer AI product is sending such big shockwaves through the market that it's even inflaming a long-time rivalry in the brokerage business.",
+      "title_ko": "메타 '뮤즈'로 AI 충격 우려 재점화… 트레이더들이 다음 희생양으로 지목한 증권주는"
     }
   ]
 }
