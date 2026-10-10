@@ -55,6 +55,7 @@
   --badge-green: #10B981;
   --badge-orange: #C2410C;
   --badge-violet: #6D28D9;
+  --badge-teal:  #0F766E;
 
   /* type */
   --sans: 'Noto Sans KR', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -276,10 +277,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* stretch 라야 왼쪽 리포트 카드가 오른쪽 급등주 카드와 아래선까지 맞는다 */
 .briefing-body { display: flex; align-items: stretch; gap: 20px; }
-/* 데일리 리포트 · 트럼프 SNS 트렌드 — 두 카드를 같은 폭으로 나란히 둔다 */
+/* 데일리 리포트 · 트럼프 SNS 트렌드 · 엔비디아 데일리 — 세 카드를 같은 폭으로 나란히 둔다 (2026-10-11 엔비디아 추가) */
 .briefing-main {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
   flex: 1;
   min-width: 0;
@@ -341,6 +342,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .badge--insight { background: var(--badge-blue); }
 .badge--speech  { background: var(--badge-orange); }
 .badge--watch   { background: var(--badge-violet); }
+.badge--nvda    { background: var(--badge-teal); }
+.badge--nvda-today { background: var(--badge-blue); }
 
 /* 카드가 둘로 나뉘어 폭이 좁아졌으므로 문장은 한 칸으로만 흐른다 */
 .report-columns ul { display: flex; flex-direction: column; gap: 10px; }
@@ -1002,6 +1005,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .sector-body { grid-template-columns: minmax(0, 1fr); }
   .news-top { grid-template-columns: minmax(0, 1fr) 180px; }
   .news-side { grid-column: 1 / -1; }
+  /* 세 카드가 좁아지면 두 칸 + 셋째(엔비디아)는 전폭 */
+  .briefing-main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #nvda-card { grid-column: 1 / -1; }
 }
 
 @media (max-width: 900px) {
@@ -1025,6 +1031,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .nav-item { padding: 12px 10px; font-size: 18px; }
 
   .briefing-main { grid-template-columns: minmax(0, 1fr); }
+  #nvda-card { grid-column: auto; }
   .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .news-headline { font-size: 26px; }
 }
@@ -1422,7 +1429,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
                 </svg>
                 미국 증시 데일리 브리핑
               </h2>
-              <p class='briefing-sub'>데일리 리포트와 트럼프 SNS 트렌드의 핵심만 추렸습니다. 카드를 누르면 전체 글로 갑니다.</p>
+              <p class='briefing-sub'>데일리 리포트·트럼프 SNS 트렌드·엔비디아 데일리의 핵심만 추렸습니다. 카드를 누르면 전체 글로 갑니다.</p>
             </div>
             <p class='sync-stamp'><span class='sync-dot'></span><span id='sync-label'>실시간 AI 동기화</span></p>
           </div>
@@ -1464,6 +1471,26 @@ body.no-dashboard .main-content { padding-top: 32px; }
                 </div>
                 <div class='report-block' data-hook='watch'>
                   <span class='badge badge--watch'>내일 볼 것</span>
+                  <div class='report-columns'>
+                    <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
+                  </div>
+                </div>
+              </a>
+
+              <!-- 엔비디아 데일리 (2026-10-11). 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
+              <a class='report-card' id='nvda-card' href='/search/label/엔비디아'>
+                <div class='report-card-head'>
+                  <h3 class='report-card-title'>엔비디아 데일리</h3>
+                  <span class='report-card-date' data-date='nvda-card'></span>
+                </div>
+                <div class='report-block' data-hook='nvda-headline'>
+                  <span class='badge badge--nvda'>오늘 한 줄</span>
+                  <div class='report-columns'>
+                    <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
+                  </div>
+                </div>
+                <div class='report-block' data-hook='nvda-today'>
+                  <span class='badge badge--nvda-today'>오늘의 해석</span>
                   <div class='report-columns'>
                     <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
                   </div>
@@ -2648,8 +2675,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
         /* ====================================================== 오늘의 데일리 리포트
 
-           블로거 피드에서 라벨별 최신 글 1건씩 받아 상단 카드 둘을 채운다 —
-           데일리 브리핑 → 데일리 리포트 카드(+ 급등주), 트럼프 트렌드 → 트럼프 SNS 트렌드 카드.
+           블로거 피드에서 라벨별 최신 글 1건씩 받아 상단 카드 셋을 채운다 —
+           데일리 브리핑 → 데일리 리포트 카드(+ 급등주), 트럼프 트렌드 → 트럼프 SNS 트렌드 카드,
+           엔비디아 → 엔비디아 데일리 카드.
            라벨로 거르지 않으면 다른 연재 글이 최신일 때 그 글을 읽는다.
 
            리포트 본문은 h2 로 구획이 나뉘어 있어 제목 글자로 구간을 찾는다. 카드는
@@ -2669,7 +2697,11 @@ body.no-dashboard .main-content { padding-top: 32px; }
            데일리 리포트 — experiments/daily-report/templates/report.html 의 h2:
              시장 요약 = 한 줄 결론 + 지수 해설, 핵심 인사이트 = 종합 판단.
            트럼프 트렌드 — experiments/trump-trend/render_html.py build_body 의 h2:
-             오늘의 발언 = 한 줄 결론 + 무엇이 달라졌나, 내일 볼 것 = 관찰 대상. */
+             오늘의 발언 = 한 줄 결론 + 무엇이 달라졌나, 내일 볼 것 = 관찰 대상.
+           엔비디아 데일리 — experiments/nvda-report/render_html.py 의 h2. 제목에 ①②… 번호와
+             "(3건)" 같은 괄호가 붙으므로 그것을 뗀 이름으로도 찾는다 (sectionKey):
+             오늘 한 줄 = 가격 한 줄, 오늘의 해석 = 3문장 (이벤트가 없는 날은 없다 → 오늘 바뀐 것으로 대신).
+             any: 훅의 후보 가운데 처음으로 줄이 나오는 구획만 쓴다 (이어 붙이지 않는다). */
         var CARDS = [
           {
             id: 'report-card',
@@ -2684,13 +2716,26 @@ body.no-dashboard .main-content { padding-top: 32px; }
             map: { speech: ['오늘 한 줄', '무엇이 달라졌나'], watch: ['내일 볼 것'] },
             picks: false,
             empty: '아직 발행된 트렌드 리포트가 없습니다.'
+          },
+          {
+            id: 'nvda-card',
+            label: '엔비디아',
+            map: { 'nvda-headline': ['오늘 한 줄'], 'nvda-today': ['오늘의 해석', '오늘 바뀐 것'] },
+            any: true,
+            picks: false,
+            empty: '아직 발행된 엔비디아 리포트가 없습니다.'
           }
         ];
         var PICKS_HEAD = '오늘의 급등주 TOP 5';
         /* 구획 하나에 싣는 최대 줄 수 — 카드는 요약이고 전체는 글에서 읽는다 */
         var MAX_LINES = 5;
 
-        /* h2 제목 → 다음 h2 전까지의 형제 노드 */
+        /* h2 제목에서 앞의 ①②… 번호와 뒤의 "(…)" 를 뗀 이름 — 엔비디아 리포트용 */
+        function sectionKey(title) {
+          return String(title || '').replace(/^[\u2460-\u2473\s]+/, '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+        }
+
+        /* h2 제목 → 다음 h2 전까지의 형제 노드. 원제목과 뗀 이름 둘 다로 찾을 수 있다 */
         function reportSections(html) {
           var doc;
           try { doc = new DOMParser().parseFromString(html, 'text/html'); }
@@ -2701,7 +2746,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
             var nodes = [];
             var n = heads[i].nextElementSibling;
             while (n && n.tagName !== 'H2') { nodes.push(n); n = n.nextElementSibling; }
-            out[String(heads[i].textContent || '').trim()] = nodes;
+            var title = String(heads[i].textContent || '').trim();
+            out[title] = nodes;
+            var key = sectionKey(title);
+            if (key && !out[key]) out[key] = nodes;
           }
           return out;
         }
@@ -2818,11 +2866,18 @@ body.no-dashboard .main-content { padding-top: 32px; }
               if (!sec) throw new Error('unparsable');
 
               Object.keys(card.map).forEach(function (hook) {
-                var lines = [];
+                var lines = [], used = null;
                 card.map[hook].forEach(function (k) {
-                  if (sec[k]) lines = lines.concat(linesOf(sec[k]));
+                  if (card.any && lines.length) return;
+                  if (sec[k]) { lines = lines.concat(linesOf(sec[k])); if (lines.length && !used) used = k; }
                 });
                 fillCard(hook, lines.slice(0, MAX_LINES));
+                /* any 카드가 후순위 구획으로 채워졌으면 배지도 그 구획 이름으로 — "오늘의 해석" 아래 이벤트 목록이 붙지 않게 */
+                if (card.any && used && used !== card.map[hook][0]) {
+                  var block = document.querySelector('.report-block[data-hook="' + hook + '"]');
+                  var badge = block && block.querySelector('.badge');
+                  if (badge) badge.textContent = used;
+                }
               });
 
               if (card.picks) {

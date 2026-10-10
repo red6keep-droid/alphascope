@@ -958,6 +958,8 @@ SAVED_POST_BODY = "experiments/daily-report/output/report_body.html"
 # 홈 두 번째 카드(트럼프 SNS 트렌드)용. 글 보기 탭은 데일리 리포트만 보여주므로
 # 이 본문은 홈 카드에만 쓰인다. h2 는 experiments/trump-trend/render_html.py build_body 와 같아야 한다.
 SAVED_TRUMP_BODY = "experiments/trump-trend/output/trump_report_body.html"
+SAVED_NVDA_BODY = "experiments/nvda-report/output/nvda_report_body.html"
+PREVIEW_NVDA_TITLE = "엔비디아 데일리 — 2026년 9월 3일"
 PREVIEW_TRUMP_TITLE = "트럼프 발언 트렌드 — 2026년 9월 3일"
 FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:1.7;color:#333;">
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘 한 줄</h2>
@@ -983,6 +985,26 @@ def preview_post_body():
     except OSError:
         cover = _svg_data_uri("#2563EB", "#7DD3FC")
         return FALLBACK_POST_BODY.replace("__COVER__", cover), "더미 본문"
+
+
+FALLBACK_NVDA_BODY = """<div style="font-size:18px;line-height:1.7;color:#333;">
+<h2>① 오늘 한 줄</h2>
+<div style="font-size:20px;color:#111;"><b>NVDA $229.28</b> (-0.52%) · SPY 대비 -1.12%p · SMH 대비 +0.13%p · AMD 대비 +1.51%p · 거래량 20일 평균의 0.77×</div>
+<h2>② 오늘 바뀐 것 (2건)</h2>
+<ul><li>수급 중립 · Form 4 — 이사 증여</li><li>기업 긍정 · 월드 모델 스타트업 투자</li></ul>
+<h2>⑦ 오늘의 해석</h2>
+<ul><li>수급 영역에서 중립 방향의 Form 4 이사 증여 사실이 공시됐다.</li><li>2026년 10월 14일에 CPI 일정이 잡혀 있다.</li><li>데이터센터 매출 QoQ는 직전 분기보다 낮아진 18.4%로 나타났다.</li></ul>
+<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:15px;color:#999;">데이터 출처 · 투자 권고가 아닙니다.</div>
+</div>"""
+
+
+def preview_nvda_body():
+    """엔비디아 데일리 본문 — 로컬 산출물이 있으면 그것, 없으면 더미."""
+    try:
+        body = io.open(SAVED_NVDA_BODY, encoding="utf-8").read().strip()
+        return body, f"엔비디아 본문({SAVED_NVDA_BODY})"
+    except OSError:
+        return FALLBACK_NVDA_BODY, "엔비디아 더미 본문"
 
 
 def preview_trump_body():
@@ -1219,6 +1241,7 @@ def preview_mock_js():
     # 탭과 같은 것을 써서, 두 화면의 내용이 어긋나 보이지 않게 한다.
     body, _ = preview_post_body()
     trump_body, _ = preview_trump_body()
+    nvda_body, _ = preview_nvda_body()
 
     def one_entry_feed(title, body, href):
         return {
@@ -1235,18 +1258,21 @@ def preview_mock_js():
     feed = one_entry_feed(PREVIEW_POST_TITLE, body, "#post")
     # 트럼프 카드. 글 보기 탭이 데일리 리포트 전용이라 라벨 목록 흉내(#list)로 보낸다.
     trump_feed = one_entry_feed(PREVIEW_TRUMP_TITLE, trump_body, "#list")
+    nvda_feed = one_entry_feed(PREVIEW_NVDA_TITLE, nvda_body, "#list")
 
     return (
         "  var PV_DATA = %s;\n"
         "  var PV_NEWS = %s;\n"
         "  var PV_FEED = %s;\n"
         "  var PV_TRUMP_FEED = %s;\n"
+        "  var PV_NVDA_FEED = %s;\n"
         "\n"
         "  /* 디자인만 확인하므로 실제 시세를 부르지 않는다. 피드는 라벨로 가른다. */\n"
         "  window.fetch = function (url) {\n"
         "    var u = String(url), body;\n"
         "    if (u.indexOf('/feeds/posts') >= 0) {\n"
-        "      body = decodeURIComponent(u).indexOf('트럼프 트렌드') >= 0 ? PV_TRUMP_FEED : PV_FEED;\n"
+        "      var lab = decodeURIComponent(u);\n"
+        "      body = lab.indexOf('트럼프 트렌드') >= 0 ? PV_TRUMP_FEED : lab.indexOf('엔비디아') >= 0 ? PV_NVDA_FEED : PV_FEED;\n"
         "    }\n"
         "    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;\n"
         "    else body = PV_DATA;\n"
@@ -1257,6 +1283,7 @@ def preview_mock_js():
             json.dumps(news, ensure_ascii=False),
             json.dumps(feed, ensure_ascii=False),
             json.dumps(trump_feed, ensure_ascii=False),
+            json.dumps(nvda_feed, ensure_ascii=False),
         )
     )
 
