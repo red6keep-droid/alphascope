@@ -13,10 +13,11 @@ import collect_market
 import config
 import db
 import indicators
+import trump_bridge
 
 TECH_FIELDS = ["close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_qqq", "gap", "range_pct",
                "volume", "vol_ratio_20d", "ma50", "ma200", "pct_from_52w_high", "rsi14", "ma_cross"]
-KIND_PRIORITY = {"8k": 0, "10q": 0, "10k": 0, "form4": 1, "fedreg": 1, "court": 1, "calendar": 2, "newsroom": 2,
+KIND_PRIORITY = {"8k": 0, "10q": 0, "10k": 0, "form4": 1, "fedreg": 1, "court": 1, "trump": 1, "calendar": 2, "newsroom": 2,
                  "analyst": 3, "news": 3, "blog": 3, "price": 4, "options": 5, "estimates": 6, "flows": 7, "news_volume": 8}
 
 
@@ -397,7 +398,7 @@ def build(conn, day, run_date):
         conn.commit()
     item_evs, target_only = item_events(conn, day)
     n_news, news_avg = news_count(conn, day)
-    events = (item_evs + calendar_events(conn, day) + price_events(s) + near_high_event(conn, day, s)
+    events = (item_evs + calendar_events(conn, day) + trump_bridge.events(day) + price_events(s) + near_high_event(conn, day, s)
               + option_events(conn, day, s, rank) + estimate_events(conn, day, s) + flow_events(conn, day, s)
               + news_events(n_news, news_avg))
     # 강조 → 종류 우선순위 → 같은 종류 안에서는 최신이 위 (안정 정렬 두 번)

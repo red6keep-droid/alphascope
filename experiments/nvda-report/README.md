@@ -9,7 +9,7 @@ NVDA 한 종목의 **사실 추적** 리포트다. 매수·매도 신호를 만�
 - **①단계 뼈대 완료 (2026-10-08).** Gemini 없이 수집 → 판정 → MD. 연속 실행 멱등.
 - **②단계 문서 수집·분류 구현 완료 (2026-10-08).** 뉴스룸·블로그·CNBC·Google News·연방관보·CourtListener → 중복 제거 → Gemini 분류 → 보정 규칙.
   30일치 111건 분류, 검증 탈락 0, 이벤트 24건. **50건 수동 검증 48/50 = 96% (2026-10-10, 1차 Claude·최종 사용자)** — ng 2건(NVIDIA 자체 소비자 제품 가격 변경 → rel 2~3·new, 고객사 제품 출시 → rel 2)은 프롬프트 예시로 반영. rel 1의 novelty는 채점하지 않기로 함. `review_sample.py`에 Gemini가 본 `입력 요약` 열 추가.
-- **③ 소송 부분 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만) → `cases_watch.py`(매일: watch=1 도켓의 일정 명령문에서 심리·재판 날짜만 `calendar(COURT)`로, 판결·합의·기각 명령만 `items(court)` 이벤트). 사용자 지시: **단순하게 — 주가에 닿을 판결이 잡혀 있을 때만 미리 경고.** 법원 일정은 30일 창(`COURT_LOOKAHEAD_DAYS`). **법적 기사 모니터링 강화 완료 (2026-10-10, 아래 표).** 남은 것: 트럼프 브리지.
+- **③ 소송 부분 완료 (2026-10-10):** `cases_survey.py`(검토 표) → `cases_init.py`(`cases` 12행, watch 2 = 증권만) → `cases_watch.py`(매일: watch=1 도켓의 일정 명령문에서 심리·재판 날짜만 `calendar(COURT)`로, 판결·합의·기각 명령만 `items(court)` 이벤트). 사용자 지시: **단순하게 — 주가에 닿을 판결이 잡혀 있을 때만 미리 경고.** 법원 일정은 30일 창(`COURT_LOOKAHEAD_DAYS`). **법적 기사 모니터링 강화 완료 (2026-10-10, 아래 표). 트럼프 브리지 완료 (`trump_bridge.py`, 한 줄).** ③ 끝.
 - ④(점검표 추출) · ⑤(서술·HTML·Actions) · ⑥(30일 그림자)는 아직이다.
 
 ```
@@ -31,6 +31,7 @@ experiments/nvda-report/
 ├── cases_survey.py      # ③ CourtListener suitNature 쿼리(증권·반독점·특허 1년) → output/cases_survey.md/.json 검토 표
 ├── cases_init.py        # ③ 검토 표 + MANUAL 덮어쓰기 → cases 테이블 (watch=1은 증권만)
 ├── cases_watch.py       # ③ watch=1 도켓 → 심리·재판 일정(calendar COURT, 30일 경고) · 판결·합의·기각 명령(items court 이벤트). Gemini 없음
+├── trump_bridge.py      # ③ trump-state의 trump_analysis.json(raw URL, 실패 시 git show) → 그날 NVDA 발언 이벤트(강도 ≥ 5) 한 줄. robust 통계 있을 때만 괄호
 ├── judge.py             # 이벤트 판정 · 상태판 · 다가오는 것 · 점검표 · 기사 수 → output/nvda_analysis.json
 ├── render_report.py     # → output/nvda_report.md · title.txt
 ├── prompts/classify.txt # 영역 enum · 관련성 기준표 · 신규성 규칙 · 1차 행위 규칙
@@ -102,6 +103,17 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | ⑤ 섹션 | 사건명·상태·다음 일정 세 칸. 판결은 ②로 간다 | 단순화 |
 | 수정 일정 명령 | 그 사건의 미래 COURT 행을 지우고 최신 명령 기준으로 다시 넣는다 | 2026-05-04 수정 일정이 4월 일정을 대체한 사례 |
 | 첫 실행 판결 소급 | 3일(`COURT_RULING_BACKFILL_DAYS`) | 2026-03-25 집단소송 인증 명령 같은 과거 판결이 첫 리포트에 뜨지 않게 |
+
+### 트럼프 브리지 (2026-10-10, 사용자: "한 줄만 붙여")
+
+| 항목 | 결정 | 이유 |
+| --- | --- | --- |
+| 읽는 곳 | `https://raw.githubusercontent.com/<repo>/trump-state/experiments/trump-trend/output/state/trump_analysis.json` (공개 리포). 실패하면 `git show origin/trump-state:…`, 그것도 실패하면 0건 | 기획서 9절 "trump-state에서 재계산" 대신 **이미 계산된 JSON을 읽는다** — 재계산도 DB 공유도 없음 |
+| 선택 | `recent_events` 중 effective_day = 기준일 · (affected에 NVDA 또는 rule_id ∈ trade_china_semis·trade_semis_sector) · intensity ≥ 5 | 기획서 9절 조건 그대로 |
+| 한 줄 | `트럼프 발언 — 주제/하위주제 · 강도 n · 방향 · 매핑 경로` (② 강조, kind=trump 우선순위 1). 영역은 Company면 기업, 아니면 규제 | 복잡하게 만들지 않는다 |
+| 통계 | `reactions[주제/하위주제 → 주제].symbols.NVDA`의 next_close·close·d3·d5 중 **placebo.robust가 true인 것 하나만** 괄호로. 없으면 아무 말 없음 | "구분되지 않음" 문구도 쓰지 않는다 — 한 줄 원칙 |
+| 신선도 | 상태 파일 generated_at 날짜 < 기준일이면 " (트럼프 데이터 전일 기준)" | 두 워크플로 시각 차 (22:30 / 22:45 UTC) |
+| 확인 | 2026-10-09 실제 상태: 에너지 발언 1건뿐 → 0건. 합성 이벤트로 선택·강도 하한·무관 규칙 제외·렌더 문구 확인 | |
 
 ### 법적·규제 기사 모니터링 강화 (2026-10-10, 사용자: "법적 문제 기사는 꼼꼼히")
 

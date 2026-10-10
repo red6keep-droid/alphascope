@@ -73,6 +73,12 @@ FOMC_DECISION_DATES = [
 # 지수 리밸런싱: S&P는 3·6·9·12월 셋째 금요일 발효, 나스닥100 연례 재구성은 12월 셋째 금요일.
 INDEX_REBALANCE_MONTHS = (3, 6, 9, 12)
 CALENDAR_LOOKAHEAD_DAYS = 7       # "다가오는 것"에 보이는 범위
+# 트럼프 브리지 (기획서 9절, 2026-10-10 "한 줄만") — trump-trend 상태 브랜치의 분석 JSON
+TRUMP_STATE_PATH = "experiments/trump-trend/output/state/trump_analysis.json"
+TRUMP_STATE_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/trump-state/" + TRUMP_STATE_PATH
+TRUMP_POST_URL = ""                 # 비우면 링크 없음. 블로그 글 주소는 매일 바뀌어 고정하지 않는다
+TRUMP_SEMI_RULES = ("trade_china_semis", "trade_semis_sector")
+TRUMP_MIN_INTENSITY = 5
 COURT_LOOKAHEAD_DAYS = 30         # 법원 일정(심리·재판)만 더 멀리 — 판결은 포지션을 미리 생각할 시간이 필요 (2026-10-10)
 COURT_RULING_BACKFILL_DAYS = 3    # 첫 실행에서 판결 이벤트를 소급할 일수
 CALENDAR_GENERATE_YEARS = 2       # 셋째 금요일(OPEX·INDEX)을 미리 만들어 둘 연수
