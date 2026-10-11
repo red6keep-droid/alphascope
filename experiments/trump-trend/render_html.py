@@ -425,7 +425,7 @@ def build_body(a, n):
         dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow")
                    + dk.guide("주의", [("근거", "시장 반응 탭에서 보정 q가 함께 작은 값만 고릅니다 — 주제당 수십 개 조합을 검정했기 때문"),
                                        ("+3일·+5일", "창이 겹친 관측"), ("성격", "인과나 방향 예측이 아닙니다")]), tab=TAB_TODAY),
-        dk.section("30일 흐름", sec_windows(a), tab=TAB_FLOW),
+        dk.section(TAB_FLOW, sec_windows(a), tab=TAB_FLOW),   # 탭 이름과 같은 제목 → 테마가 숨긴다 (2026-10-11 사용자: 30일 흐름 타이틀 삭제)
         dk.section("시장 반응", sec_reactions(a), tab=TAB_REACT),   # 탭 이름과 같아 제목은 숨고, 탭 아래 안내 문구는 두지 않는다 (2026-10-11 사용자)
         dk.section("관찰 종목", sec_why(a), tab=TAB_REACT),
         sec_footer(a),
