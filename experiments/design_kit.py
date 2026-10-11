@@ -116,10 +116,12 @@ def guide(title, body, line=True, grid=False):
 
 
 
-def guide_card(title, body):
-    """읽는 법 카드 (2026-10-11 사용자: "읽는 법만 카드를 분리하여 그래프 아래에, 일괄") — 그래프·표 바로 아래 옅은 회색 카드 안에 guide()."""
+def guide_card(title, body, notes=()):
+    """읽는 법 카드 (2026-10-11 사용자: "읽는 법만 카드를 분리하여 그래프 아래에, 일괄") — 그래프·표 바로 아래 옅은 회색 카드 안에 guide().
+    notes = [(제목, 내용), …] — 주의처럼 짧은 안내도 같은 카드 안 아래쪽에 한 줄씩 (2026-10-11 사용자: "주의도 읽는 법 카드에 포함")."""
+    extra = "".join(guide(t, x, line=False) for t, x in notes)
     return (f'<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:8px 14px 10px;margin:8px 0;">'
-            + guide(title, body, line=False, grid=True) + "</div>")   # 글머리표는 데스크톱에서 2열 (2026-10-11 사용자)
+            + guide(title, body, line=False, grid=True) + (f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid #E2E8F0;">{extra}</div>' if extra else "") + "</div>")   # 글머리표는 데스크톱에서 2열 (2026-10-11 사용자)
 
 
 def muted(t):

@@ -164,11 +164,11 @@ def _chart_card(rows, horizon):
         items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 보통 날과 구분되지 않음 (p {big['p']:.2f})"))
 
     def li(t, x):
-        head = f'<b>{_esc(t)}</b> · ' if t else ""
+        head = f'<b>{_esc(t)}</b>: ' if t else ""   # 라벨 글머리표는 "**라벨**: 내용" (가이드라인 3-3, 2026-10-11 사용자)
         return (f'<li style="display:flex;align-items:flex-start;gap:7px;margin:3px 0;color:#111;">'
                 f'<span style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-top:11px;"></span><span>{head}{_esc(x)}</span></li>')
     lis = "".join(li(t, x) for t, x in items)
-    note = dk.guide("주의", "5일 구간은 창이 겹쳐 실제보다 강해 보일 수 있고, 원인을 뜻하지 않습니다", line=False) if horizon == "d5" else ""
+    note = ""   # 주의는 읽는 법 카드 안으로 (_read_card) — 2026-10-11 사용자
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;">자산 {len(rows)}개</span><span style="font-weight:700;color:{color};white-space:nowrap;">{_esc(state)}</span></span> '
@@ -179,9 +179,10 @@ def _chart_card(rows, horizon):
 def _read_card(horizon):
     """그래프 읽는 법 — 그래프 바로 아래 별도 카드 (dk.guide_card)."""
     span = "당일" if horizon == "close" else "5거래일 동안"
+    notes = [("주의", "5일 구간은 창이 겹쳐 실제보다 강해 보일 수 있고, 원인을 뜻하지 않습니다")] if horizon == "d5" else []
     return dk.guide_card("읽는 법", [("막대", f"발언 뒤 {span} S&P 500 대비 평균"),
                                     ("회색 띠", "발언 없는 날에도 흔히 나오는 범위(95%)"),
-                                    ("진한 막대", "여러 자산을 함께 본 보정 뒤에도 남은 값")])
+                                    ("진한 막대", "여러 자산을 함께 본 보정 뒤에도 남은 값")], notes)
 
 
 def _table_fold(inner_html):
@@ -220,8 +221,8 @@ def _table_legend(noise_p):
                                 ("즉각", "장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가"),
                                 ("변동폭·거래량", f"직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수, 1.00× = 보통"),
                                 ("p", f"발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않음"),
-                                ("q", f"자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값 — {noise_p:.2f} 미만(굵게)만 보정 뒤에 남는 값")])
-            + dk.guide("주의", "+5일은 창이 겹친 관측이고, 모두 발언 뒤 관찰된 값이라 인과가 아닙니다"))
+                                ("q", f"자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값 — {noise_p:.2f} 미만(굵게)만 보정 뒤에 남는 값")],
+                            [("주의", "+5일은 창이 겹친 관측이고, 모두 발언 뒤 관찰된 값이라 인과가 아닙니다")]))
 
 
 def _group_panel(blk, gkey, charts, noise_p):
