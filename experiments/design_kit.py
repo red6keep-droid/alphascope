@@ -139,12 +139,15 @@ def dot_li(inner_html, size=3, color="#111", top=11, margin="3px 0"):
 GUIDE_SHORT = 70   # 이보다 짧은 한 문장은 한 줄 "제목: 내용"
 
 
-def guide(title, body, line=True, grid=False):
+GUIDE_IND = "padding-left:20px;"   # 카드 밖 안내 줄은 왼쪽 20px 들여쓰기, 카드 안 안내는 제외 (2026-10-11 사용자: 일괄)
+
+
+def guide(title, body, line=True, grid=False, in_card=False):
     """제목이 있는 안내 글 (가이드라인 3-3, 2026-10-11 사용자). 14px 안내 회색 + ⓘ.
     - 짧으면 한 줄: ⓘ **주의**: 내용
     - 길거나 항목이 여럿이면: ⓘ **읽는 법** 다음 줄부터 글머리표 "막대 = 내용", "회색 띠 = 내용"
     body: 문자열 또는 [(이름, 내용) | 문자열, ...]. line=True 면 위에 얇은 선(구획 안내 줄), 카드 안에서는 False."""
-    top = "margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;" if line else "margin:4px 0 0;"
+    top = ("margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;" if line else "margin:4px 0 0;") + ("" if in_card else GUIDE_IND)
     head = f'{INFO_ICON}<b style="color:#4B5563;">{esc(title)}</b>'
     if isinstance(body, str) and len(body) <= GUIDE_SHORT:
         return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head} : {esc(body)}</div>'
@@ -158,9 +161,9 @@ def guide(title, body, line=True, grid=False):
 def guide_card(title, body, notes=()):
     """읽는 법 카드 (2026-10-11 사용자: "읽는 법만 카드를 분리하여 그래프 아래에, 일괄") — 그래프·표 바로 아래 옅은 회색 카드 안에 guide().
     notes = [(제목, 내용), …] — 주의처럼 짧은 안내도 같은 카드 안 아래쪽에 한 줄씩 (2026-10-11 사용자: "주의도 읽는 법 카드에 포함")."""
-    extra = "".join(guide(t, x, line=False) for t, x in notes)
+    extra = "".join(guide(t, x, line=False, in_card=True) for t, x in notes)
     return (f'<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:8px 14px 10px;margin:8px 0;">'
-            + guide(title, body, line=False, grid=True) + (f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid #E2E8F0;">{extra}</div>' if extra else "") + "</div>")   # 글머리표는 데스크톱에서 2열 (2026-10-11 사용자)
+            + guide(title, body, line=False, grid=True, in_card=True) + (f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid #E2E8F0;">{extra}</div>' if extra else "") + "</div>")   # 글머리표는 데스크톱에서 2열 (2026-10-11 사용자)
 
 
 
@@ -178,7 +181,7 @@ def tip_line(items, in_title=False):
     inner = ' <span style="color:#CBD5E1;">·</span> '.join(f'<span style="white-space:nowrap;">{esc(k)}{tip(v)}</span>' for k, v in items)
     if in_title:   # 구획 제목 줄 오른쪽 (2026-10-11 사용자: "급상승 주제 타이틀 우측에") — 툴팁 상자는 position:relative 인 h2 기준
         return f'<span style="font-size:{TINY};font-weight:400;color:{NOTE};line-height:1.6;margin-left:auto;align-self:center;white-space:nowrap;flex:none;">{inner}</span>'
-    return f'<div style="position:relative;font-size:{TINY};color:{NOTE};line-height:1.6;margin:6px 0 2px;">{inner}</div>'
+    return f'<div style="position:relative;font-size:{TINY};color:{NOTE};line-height:1.6;margin:6px 0 2px;{GUIDE_IND}">{inner}</div>'
 
 
 
@@ -228,7 +231,7 @@ def capsules(items, size=None, in_title=False):
 
 def muted(t):
     """짧은 안내 글 (빈 구획 안내 등) — ⓘ 필수."""
-    return f'<div style="color:{NOTE};font-size:{TINY};margin:6px 0;">{INFO_ICON}{esc(t)}</div>'
+    return f'<div style="color:{NOTE};font-size:{TINY};margin:6px 0;{GUIDE_IND}">{INFO_ICON}{esc(t)}</div>'
 
 
 def notice(parts):
@@ -356,5 +359,5 @@ def table(headers, rows, note_text=""):
 
 
 def footer(data_line, disclaimer_line):
-    return (f'<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:{TINY};color:{NOTE};line-height:1.6;">'
+    return (f'<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:{TINY};color:{NOTE};line-height:1.6;{GUIDE_IND}">'
             f"{INFO_ICON}{data_line}<br>{INFO_ICON}{disclaimer_line}</div>")

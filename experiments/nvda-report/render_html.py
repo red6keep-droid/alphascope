@@ -141,7 +141,7 @@ def _note(t):
 
     제목에 넣던 조건·범위("7일 이내 · 법원 일정 30일", "15건")를 여기로 옮긴다. 홈 카드는 border-top 요소를 건너뛰므로 카드에 섞이지 않는다.
     """
-    return f'<div style="margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;font-size:{TINY};color:{NOTE};">{INFO_ICON}{_esc(t)}</div>'
+    return f'<div style="margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;font-size:{TINY};color:{NOTE};{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
 
 
 _SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")   # 범위(-0.63 ~ +0.63%)는 칠하지 않는다
@@ -181,7 +181,7 @@ def _dot_li(inner_html, size=3, color="#111", top=11, margin="3px 0"):
 def _guide(title, body, line=True):
     """제목이 있는 안내 글 (가이드라인 3-3, 2026-10-11 사용자) — design_kit.guide 와 같은 규칙.
     짧으면 한 줄 "ⓘ **제목**: 내용", 길거나 항목이 여럿이면 "ⓘ **제목**" 다음 줄부터 글머리표 "이름 = 내용"."""
-    top = "margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;" if line else "margin:4px 0 0;"
+    top = ("margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;" if line else "margin:4px 0 0;") + _dk.GUIDE_IND   # 카드 밖 안내 20px 들여쓰기 (2026-10-11 사용자)
     head = f'{INFO_ICON}<b style="color:#4B5563;">{_esc(title)}</b>'
     if isinstance(body, str) and len(body) <= 70:
         return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head} : {_esc(body)}</div>'
@@ -200,7 +200,7 @@ def _ul(items_html):
 
 def _muted(t):
     """짧은 안내 글 (기준 거래일, 빈 구획 안내 등) — 안내 글에는 아이콘을 꼭 붙인다 (2026-10-11 사용자)."""
-    return f'<div style="color:{NOTE};font-size:{TINY};margin:6px 0;">{INFO_ICON}{_esc(t)}</div>'
+    return f'<div style="color:{NOTE};font-size:{TINY};margin:6px 0;{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
 
 
 NEW_PILL = ('<span style="display:inline-block;background:#B91C1C;color:#fff;border-radius:3px;padding:1px 4px 0;font-size:10px;font-weight:700;'
@@ -841,7 +841,7 @@ def sec_narrative(a, n):
 
 def sec_footer(a):
     ds = a["data_status"]
-    return (f'<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:{TINY};color:{NOTE};line-height:1.6;">'
+    return (f'<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:{TINY};color:{NOTE};line-height:1.6;{_dk.GUIDE_IND}">'
             f"{INFO_ICON}데이터: yfinance(일봉·옵션·예상 실적·애널리스트·기관·공매도) · SEC 공시(임원 거래·수시·분기 보고) · FRED(거시 일정) · "
             f"NVIDIA 뉴스룸·블로그 · CNBC · Google News · 연방관보 · CourtListener · trump-trend. "
             f"분류 Gemini, 판정·계산 파이썬. 생성 {_esc(a['generated_at'])} (UTC) · 기준 거래일 {_esc(_d(a['day']))} · 일봉 마지막 {_esc(_d(ds['bars_last_day']) or '—')}.<br>"

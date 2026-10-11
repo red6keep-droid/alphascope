@@ -3059,7 +3059,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             if (sc.key === g.name) {   /* 탭 이름과 같은 제목은 숨기고, 제목 옆 요약은 패널 맨 위 안내 줄로 */
               var sm = sc.h.querySelector('[data-summary]');
               sc.h.style.display = 'none';
-              if (sm) { var d = document.createElement('div'); d.style.cssText = 'font-size:14px;color:#6B7280;margin:0 0 8px;'; d.innerHTML = sm.innerHTML; sc.h.insertAdjacentElement('afterend', d); }
+              if (sm) { var d = document.createElement('div'); d.style.cssText = 'font-size:14px;color:#6B7280;margin:0 0 8px;padding-left:20px;';   /* 안내 줄 20px 들여쓰기 (2026-10-11) */ d.innerHTML = sm.innerHTML; sc.h.insertAdjacentElement('afterend', d); }
             }
           });
           if (!p.children.length) return;
