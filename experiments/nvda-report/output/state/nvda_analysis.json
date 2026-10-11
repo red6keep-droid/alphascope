@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-11T10:02:16Z",
+ "generated_at": "2026-10-11T10:12:40Z",
  "run_date": "2026-10-11",
  "day": "2026-10-09",
  "is_latest_bar_today": true,
@@ -655,19 +655,19 @@
    },
    {
     "key": "pc_ratio_oi",
-    "value": 0.7031068498400768,
+    "value": 0.707284556875901,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "pc_ratio_vol",
-    "value": 0.7182258103188808,
+    "value": 0.713437887633984,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "gex_approx",
-    "value": 602145263.9002264,
+    "value": 684617313.8058236,
     "flag": false,
     "fmt": "gex"
    },
@@ -733,7 +733,7 @@
     "key": "rating_counts",
     "value": {
      "strongBuy": 10,
-     "buy": 48,
+     "buy": 49,
      "hold": 2,
      "sell": 1,
      "strongSell": 0
@@ -781,19 +781,19 @@
    },
    {
     "key": "shares_short",
-    "value": 294225803.0,
+    "value": 311389688.0,
     "flag": false,
     "fmt": "shares_m"
    },
    {
     "key": "short_pct_float",
-    "value": 1.27,
+    "value": 1.34000005,
     "flag": false,
     "fmt": "pct2"
    },
    {
     "key": "short_asof",
-    "value": "2026-09-15",
+    "value": "2026-09-30",
     "flag": false,
     "fmt": "text"
    },
@@ -822,7 +822,7 @@
   "news": [
    {
     "key": "news_count",
-    "value": 26,
+    "value": 27,
     "flag": false,
     "fmt": "int"
    },
@@ -1036,7 +1036,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-09",
-  "state_collected_at": "2026-10-11T10:01:16Z",
+  "state_collected_at": "2026-10-11T10:12:17Z",
   "missing_fields": [],
   "option_snapshot_days": 1,
   "iv_rank_days": 1,
@@ -1048,14 +1048,14 @@
    "court": 1,
    "fedreg": 21,
    "form4": 16,
-   "news": 241,
+   "news": 242,
    "newsroom": 3
   },
   "option_expiries": [
    "2026-10-12",
    "2026-10-14",
    "2026-10-16",
-   "2026-10-19",
+   "2026-10-23",
    "2026-11-06",
    "2026-11-13",
    "2026-11-20"
