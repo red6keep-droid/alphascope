@@ -124,6 +124,9 @@ class GeminiPool:
                 else:
                     print(f"[gemini] 키 {_mask(key)} 시도 {attempt} 실패: {str(e)[:200]}")
                     time.sleep(config.RETRY_SLEEP_SECONDS)
+        # 한도(429)뿐 아니라 503/500 수요 폭주가 끝까지 이어져도 예비로 — 2026-10-11 CI에서 배치 2가 503 5회로 그냥 실패했다
         if _is_rate_limit(last_error):
             return self._fallback(prompt, temperature, f"{config.PER_BATCH_ATTEMPTS}회 모두 한도")
+        if _is_transient(last_error):
+            return self._fallback(prompt, temperature, f"{config.PER_BATCH_ATTEMPTS}회 모두 일시 오류(503/500)")
         raise RuntimeError(f"Gemini 호출 실패 ({config.PER_BATCH_ATTEMPTS}회): {str(last_error)[:200]}")
