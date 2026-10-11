@@ -177,7 +177,7 @@ def _chart_card(rows, horizon):
     note = ""   # 주의는 읽는 법 카드 안으로 (_read_card) — 2026-10-11 사용자
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-            f'<span style="font-weight:700;color:#111;">시장의 반응: <span style="color:{color};">{_esc(state)}</span></span></span> '   # "시장의 반응: 평소와 같음" (2026-10-11 사용자). 자산 수는 설명 문장에
+            f'<span style="font-weight:700;color:#111;">시장의 반응 : <span style="color:{color};">{_esc(state)}</span></span></span> '   # "시장의 반응: 평소와 같음" (2026-10-11 사용자). 자산 수는 설명 문장에
             f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid {bd};font-size:{dk.SMALL};line-height:1.5;">'
             f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
 
