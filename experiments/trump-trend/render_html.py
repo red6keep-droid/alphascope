@@ -83,7 +83,12 @@ def sec_trends(a):
         rows.append((name, f"{t['score']:.0f}점", _esc(f"7일 이벤트 {t['events_7d']} (직전 {t['events_prev_7d']}) · 평균 강도 {t['avg_intensity']:.1f}")))
     if not rows:
         return dk.muted("최근 7일 이벤트가 없어 점수를 내지 않습니다.")
-    out = dk.ccard(rows, left="65%", emph=True) + dk.guide("기준", "최근 7일")   # 강조 카드 배경 · 기간 안내는 카드 아래 (2026-10-11 사용자). 용어 툴팁은 제목 오른쪽 — build_body
+    out = dk.ccard(rows, emph=True) + dk.guide_card("읽는 법", [   # 강조 카드 배경 · 읽는 법 카드는 카드 아래 (2026-10-11 사용자). 용어 툴팁은 제목 오른쪽 — build_body
+        ("기간", "최근 7일. 세부 주제마다 한 줄 — 예를 들어 에너지 / 경유"),
+        ("순서", "점수 순 — 직전 7일보다 늘어난 정도·강도·최근성·새로움을 합친 상대 점수라 갑자기 많아진 주제가 위로 옵니다"),
+        ("보조 줄", "7일 이벤트 수 (그 앞 7일 수) · 평균 강도. 용어는 제목 옆 ? 에서 자세히"),
+        ("30일 흐름과 차이", "30일 흐름은 큰 주제별로 한 달 동안 몇 건이었는지를 많은 순으로 봅니다. 급상승 주제는 최근 1주 안에 갑자기 늘어난 세부 주제를 찾습니다"),
+    ])
     ne = a["new_entrants"]
     if ne["target"] or ne["symbol"]:
         out += dk.guide("처음 등장", "직전 90일 없이 7일 안에 처음 나온 대상 — " + ", ".join(ne["target"] + ne["symbol"]))
@@ -114,13 +119,22 @@ def sec_windows(a):
     blk = a["windows"].get("30D") or {}
     rows = []
     for r in [x for x in blk.get("dims", {}).get("topic", []) if x["events"] > 0][:8]:
-        delta = "직전 30일 대비 —" if r["delta_events"] is None else f"직전 30일 대비 {r['delta_events']:+.0f}%"
+        delta = "직전 30일 대비 —" if r["delta_events"] is None else f"직전 30일 대비 {r['delta_events']:+.0f}건"   # 건수 차이 (전에는 % 로 잘못 붙어 있었다, 2026-10-11 수정)
         rows.append((_esc(_k(r["key"])), f"{r['events']}건",
                      _esc(f"평균 강도 {r['avg_intensity']:.1f} · 부정 비율 {int((r['neg_ratio'] or 0) * 100)}% · {delta}" if r["avg_intensity"] else delta)))
     if not rows:
         return dk.muted("30일 데이터가 아직 없습니다.")
-    note = "최근 30일" + ("" if blk.get("compare_to_previous") else " · 직전 30일 데이터가 없어 변화량은 표시하지 않습니다")
-    return dk.ccard(rows) + dk.guide("기준", note)   # 왼쪽은 항상 65% (가이드라인 2-1)
+    items = [
+        ("건수", f"최근 30일 동안 그 주제의 시장 관련 이벤트 수. 같은 주제 게시물이 {config.CLUSTER_GAP_MINUTES}분 안에 이어지면 한 건으로 묶고, "
+                f"시장 관련도 {config.RELEVANCE_EVENT_MIN} 이상(0~3)인 게시물만 셉니다 — 게시물 수가 아닙니다"),
+        ("순서", "건수가 많은 주제부터"),
+        ("평균 강도", "이벤트 강도의 평균(1~10). 말의 세기가 아니라 정책이 얼마나 구체적인지 — 1~2 지나가는 언급, 5~6 조치 없는 강한 주장, 9~10 정책 발표"),
+        ("부정 비율", "이벤트 가운데 대상(나라·기업·기관)에 부정적인 발언의 비율"),
+        ("직전 30일 대비", "그 앞 30일 건수와의 차이(건). −10건이면 그 앞 30일보다 10건 적습니다"
+                         + ("" if blk.get("compare_to_previous") else " — 아직 직전 30일 데이터가 없어 표시하지 않습니다")),
+        ("급상승 주제와 차이", "30일 흐름은 큰 주제(무역·연준 등)별로 한 달 동안 꾸준히 얼마나 말했는지, 급상승 주제는 최근 7일 세부 주제 가운데 갑자기 늘어난 것을 봅니다"),
+    ]
+    return dk.ccard(rows) + dk.guide_card("읽는 법", items)   # 기준(최근 30일)은 읽는 법 카드 안으로 (2026-10-11 사용자: 건수·차이를 안내 글에 자세히)
 
 
 def _x(v):
