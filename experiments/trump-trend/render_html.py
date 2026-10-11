@@ -120,7 +120,7 @@ def sec_windows(a):
     if not rows:
         return dk.muted("30일 데이터가 아직 없습니다.")
     note = "최근 30일" + ("" if blk.get("compare_to_previous") else " · 직전 30일 데이터가 없어 변화량은 표시하지 않습니다")
-    return dk.ccard(rows, left="55%") + dk.guide("기준", note)
+    return dk.ccard(rows) + dk.guide("기준", note)   # 왼쪽은 항상 65% (가이드라인 2-1)
 
 
 def _x(v):
