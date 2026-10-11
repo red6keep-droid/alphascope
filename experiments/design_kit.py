@@ -21,7 +21,8 @@ PILL = {"area": ("#CBD5E1", "#334155"), "positive": ("#FCA5A5", "#B91C1C"), "neg
         "uncertain": ("#FDBA74", "#C2410C"), "neutral": ("#CBD5E1", "#64748B")}
 PILL_BG = {"positive": "#FEF2F2", "negative": "#EFF6FF"}
 BAR_PASTEL = {"positive": ("#F8C4BF", "#7F1D1D"), "negative": ("#BCD3F5", "#1E3A8A"), "uncertain": ("#FADDB0", "#7C2D12"), "neutral": ("#E2E8F0", "#475569")}
-COL_L = "flex:0 0 65%;max-width:65%;min-width:0;white-space:normal;"   # 카드 왼쪽 65% (가이드라인 2-1, 2026-10-11 사용자: 꼭 지킨다)
+COL_L = "flex:0 0 65%;max-width:65%;min-width:0;white-space:normal;"
+COL_L75 = "flex:0 0 75%;max-width:75%;min-width:0;white-space:normal;"   # 값이 짧은 카드 (오른쪽 값 모두 5자 미만) — 2026-10-11 사용자   # 카드 왼쪽 65% (가이드라인 2-1, 2026-10-11 사용자: 꼭 지킨다)
 COL_R = "flex:1 1 0;min-width:0;text-align:right;white-space:normal;word-break:keep-all;"   # 카드 오른쪽 35%
 ROW = ("display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 6px;padding:8px 12px;"
        "background:#fff;border:1px solid #E2E8F0;border-radius:8px;white-space:nowrap;line-height:1.5;")
@@ -299,12 +300,26 @@ def multi2(items):
     return f'<span style="{MULTI}">{out}</span> '
 
 
-def crow(name_html, value_html, sub="", first=False, left=None):
+SHORT_VALUE = 5   # 오른쪽 값이 모두 이 글자 수 미만인 카드는 왼쪽 75% (2026-10-11 사용자: 30일 흐름 "1건" 같은 짧은 값)
+
+
+def value_len(value_html):
+    """값의 보이는 글자 수 (태그·공백 빼고)."""
+    t = html_mod.unescape(re.sub(r"<[^>]+>", "", value_html or ""))
+    return len(re.sub(r"\s+", "", t))
+
+
+def short_values(rows):
+    """카드의 오른쪽 값이 모두 SHORT_VALUE 자 미만인가 — 카드 단위로 정해 줄마다 칸이 같게."""
+    return bool(rows) and all(value_len(r[1]) < SHORT_VALUE for r in rows)
+
+
+def crow(name_html, value_html, sub="", first=False, left=None, short=False):
     """C 카드 한 줄 + 보조 줄(14px #7A7A7A). name_html 은 이스케이프된 HTML."""
     sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};white-space:normal;">{paren(sub)}</span>' if sub else ""
     return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
-            f'<span style="display:block;{COL_L}"><span style="font-weight:700;color:#111;">{paren(name_html)}</span>{sub_html}</span> '
-            f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35% 고정 — left 인자는 무시
+            f'<span style="display:block;{COL_L75 if short else COL_L}"><span style="font-weight:700;color:#111;">{paren(name_html)}</span>{sub_html}</span> '
+            f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 짧으면 75 · 25 — left 인자는 무시
 
 
 EMPH_BG, EMPH_BD = "#FFF7ED", "#FED7AA"   # 강조 카드 배경·테두리 (오렌지)
@@ -312,7 +327,8 @@ EMPH_BG, EMPH_BD = "#FFF7ED", "#FED7AA"   # 강조 카드 배경·테두리 (오
 
 def ccard(rows, left=None, attrs="", emph=False):
     """C 카드 묶음: rows = [(name_html, value_html, sub_html)]. emph=True 면 강조 카드 배경(오렌지, 줄 구분선도 오렌지) — 2026-10-11 사용자: 급상승 주제."""
-    inner = "".join(crow(n, v, sb, first=(i == 0), left=left) for i, (n, v, sb) in enumerate(rows))
+    short = short_values(rows)   # 값이 모두 5자 미만 → 왼쪽 75% (2026-10-11 사용자)
+    inner = "".join(crow(n, v, sb, first=(i == 0), short=short) for i, (n, v, sb) in enumerate(rows))
     box = MULTI
     if emph:
         inner = inner.replace(MULTI_SEP, f"border-top:1px solid {EMPH_BD};")

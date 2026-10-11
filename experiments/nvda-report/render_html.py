@@ -624,17 +624,18 @@ SIGNED_FMTS = ("pct_signed", "pct_signed2", "pp_signed")
 STATUS_KO = {"active": "진행 중", "closed": "종결", "stayed": "중지", "settled": "합의", "dismissed": "기각"}
 
 
-def _crow(name_html, value_html, sub="", first=False, left=None):
+def _crow(name_html, value_html, sub="", first=False, left=None, short=False):
     """C 카드의 한 줄 (가이드라인 2-1): 왼쪽 구분명(굵게) + 그 아래 보조 줄(14px #999), 오른쪽 값. 줄 사이 가로 구분선."""
     sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};white-space:normal;">{_paren(sub)}</span>' if sub else ""   # 보조 줄은 14px (안내)
     return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
-            f'<span style="display:block;{COL_L}"><span style="font-weight:700;color:#111;">{_paren(name_html)}</span>{sub_html}</span> '
-            f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35% 고정 — left 인자는 더 쓰지 않는다
+            f'<span style="display:block;{_dk.COL_L75 if short else COL_L}"><span style="font-weight:700;color:#111;">{_paren(name_html)}</span>{sub_html}</span> '
+            f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 5자 미만이면 75 · 25 (2026-10-11 사용자)
 
 
 def _ccard(rows, left=None):
     """C 카드 묶음: rows = [(name_html, value_html, sub_html)]. 카드 하나, 줄 사이 가로 구분선."""
-    inner = "".join(_crow(n, v, sb, first=(i == 0), left=left) for i, (n, v, sb) in enumerate(rows))
+    short = _dk.short_values(rows)
+    inner = "".join(_crow(n, v, sb, first=(i == 0), short=short) for i, (n, v, sb) in enumerate(rows))
     return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{MULTI}">{inner}</span></div>'   # 데스크톱 2열 (테마 CSS)
 
 
