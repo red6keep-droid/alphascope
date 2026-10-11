@@ -141,7 +141,7 @@ def _note(t):
 
     제목에 넣던 조건·범위("7일 이내 · 법원 일정 30일", "15건")를 여기로 옮긴다. 홈 카드는 border-top 요소를 건너뛰므로 카드에 섞이지 않는다.
     """
-    return f'<div style="margin:3.84px 0 1.92px;padding-top:2.88px;border-top:1px solid #f3f3f3;font-size:{TINY};color:{NOTE};{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
+    return f'<div style="margin:3.07px 0 1.54px;padding-top:2.3px;border-top:1px solid #f3f3f3;font-size:{TINY};color:{NOTE};{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
 
 
 _SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")   # 범위(-0.63 ~ +0.63%)는 칠하지 않는다
@@ -181,7 +181,7 @@ def _dot_li(inner_html, size=3, color="#111", top=11, margin="3px 0"):
 def _guide(title, body, line=True):
     """제목이 있는 안내 글 (가이드라인 3-3, 2026-10-11 사용자) — design_kit.guide 와 같은 규칙.
     짧으면 한 줄 "ⓘ **제목**: 내용", 길거나 항목이 여럿이면 "ⓘ **제목**" 다음 줄부터 글머리표 "이름 = 내용"."""
-    top = ("margin:3.84px 0 1.92px;padding-top:2.88px;border-top:1px solid #f3f3f3;" if line else "margin:1.92px 0 0;") + _dk.GUIDE_IND   # 여백 40% 줄임 (2026-10-11 사용자)   # 카드 밖 안내 20px 들여쓰기 (2026-10-11 사용자)
+    top = ("margin:3.07px 0 1.54px;padding-top:2.3px;border-top:1px solid #f3f3f3;" if line else "margin:1.54px 0 0;") + _dk.GUIDE_IND   # 여백 40% 줄임 (2026-10-11 사용자)   # 카드 밖 안내 20px 들여쓰기 (2026-10-11 사용자)
     head = f'{INFO_ICON}<b style="color:#4B5563;">{_esc(title)}</b>'
     if isinstance(body, str) and len(body) <= 70:
         return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head} : {_esc(body)}</div>'
@@ -200,7 +200,7 @@ def _ul(items_html):
 
 def _muted(t):
     """짧은 안내 글 (기준 거래일, 빈 구획 안내 등) — 안내 글에는 아이콘을 꼭 붙인다 (2026-10-11 사용자)."""
-    return f'<div style="color:{NOTE};font-size:{TINY};margin:2.88px 0;{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
+    return f'<div style="color:{NOTE};font-size:{TINY};margin:2.3px 0;{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
 
 
 NEW_PILL = ('<span style="display:inline-block;background:#B91C1C;color:#fff;border-radius:3px;padding:1px 4px 0;font-size:10px;font-weight:700;'
