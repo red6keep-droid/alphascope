@@ -1,6 +1,14 @@
 {
-  "updated_at": "2026-10-11 05:32:16 UTC",
+  "updated_at": "2026-10-11 12:36:56 UTC",
   "items": [
+    {
+      "title": "Top Wall Street analysts prefer these 3 dividend stocks for stable income",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/11/top-analysts-prefer-these-3-dividend-stocks-for-stable-income.html",
+      "published": "2026-10-11 11:42:31",
+      "summary": "Given a volatile backdrop, investors seeking stable income can consider enhancing their portfolios by adding dividend-paying stocks.",
+      "title_ko": "월스트리트 최고 애널리스트들이 안정적인 수익을 위해 선호하는 3대 배당주"
+    },
     {
       "title": "Junk bonds are 'flashing yellow.' Watch these warning signs",
       "source": "CNBC",
@@ -88,14 +96,6 @@
       "published": "2026-09-28 17:53:31",
       "summary": "Almost half of the stocks in the S&P 500 have a negative beta, evidence of a chasm between the entire index and its individual components.",
       "title_ko": "S&P 500 종목 절반 가까이, 시장 나머지 흐름과 엇박자"
-    },
-    {
-      "title": "Meta's Muse reignites AI disruption fears. Traders are targeting this brokerage stock as next casualty",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/23/metas-muse-ai-causes-schwab-selloff.html",
-      "published": "2026-09-23 18:06:25",
-      "summary": "Meta's latest consumer AI product is sending such big shockwaves through the market that it's even inflaming a long-time rivalry in the brokerage business.",
-      "title_ko": "메타 '뮤즈'로 AI 충격 우려 재점화… 트레이더들이 다음 희생양으로 지목한 증권주는"
     }
   ]
 }
