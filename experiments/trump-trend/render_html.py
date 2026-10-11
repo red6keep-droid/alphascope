@@ -29,7 +29,7 @@ PREVIEW = """<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
 <body style="max-width:900px;margin:0 auto;padding:16px;background:#fff;"><h1 style="font-size:26px;">__TITLE__</h1>__BODY__</body></html>"""
 
 _esc = dk.esc
-TAB_TODAY, TAB_FLOW, TAB_REACT = "오늘", "흐름", "과거 반응"   # 탭 이름 = 구획 이름이면 테마 JS가 구획 제목을 숨긴다 (2026-10-11 사용자: 과거 반응 타이틀 삭제)   # 탭 셋 (가이드라인 11절)
+TAB_TODAY, TAB_FLOW, TAB_REACT = "오늘", "흐름", "시장 반응"   # 탭 이름 = 구획 이름이면 테마 JS가 구획 제목을 숨긴다 (2026-10-11 사용자: 과거 반응 타이틀 삭제)   # 탭 셋 (가이드라인 11절)
 
 
 def _k(text):
@@ -130,36 +130,55 @@ ASSET_KO = {"SPY": "S&P 500", "QQQ": "나스닥 100", "SMH": "반도체", "XLK":
             "XLI": "산업재", "XLY": "경기소비재", "XLP": "필수소비재", "XLU": "유틸리티", "XLB": "소재", "XLRE": "부동산", "XLC": "통신",
             "NVDA": "엔비디아", "TSLA": "테슬라", "AAPL": "애플", "MSFT": "마이크로소프트", "AMZN": "아마존", "GOOGL": "알파벳", "META": "메타",
             "TLT": "장기 국채", "GLD": "금", "USO": "원유", "UUP": "달러"}
-HORIZON_KO = {"close": "당일", "d5": "5일"}
+HORIZON_KO = {"close": "오늘", "d5": "5일 이후"}   # 전환 버튼 이름 (2026-10-11 사용자)
 
 
 def _asset(sym):
     return f"{ASSET_KO[sym]}({sym})" if sym in ASSET_KO else sym
 
 
-def _chart_bullets(rows, horizon):
-    """그래프 설명 — 16px 검정 글머리표, 앞머리 굵은 제목 (2026-10-11 사용자: "안내글 폰트 말고 16 포인트, 블릿, 타이틀을 뽑아서")."""
+ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" '
+            'stroke-linecap="round" stroke-linejoin="round" style="flex:none;transition:transform .15s;"><path d="M4 6l4 4 4-4"/></svg>')
+
+
+def _chart_card(rows, horizon):
+    """그래프 설명 카드 (2026-10-11 사용자): 제목 = 결론 한 줄, 그 아래 설명 한 문장, 글머리표(16px 검정) 나머지, 읽는 법·주의는 카드 안 ⓘ 안내 글."""
     span = "당일" if horizon == "close" else "5거래일 동안"
     robust = [r for r in rows if r["robust"]]
-    out = []
-    if robust:
-        out.append(("결론", f"{len(rows)}개 자산 중 {len(robust)}개만 보통 날과 다른 움직임을 보였습니다"))
-        for r in robust:
-            out.append(("남은 반응", f"{_asset(r['sym'])} {r['mean']:+.2f}% · 보통 날 범위 {r['lo']:+.2f} ~ {r['hi']:+.2f}% 밖 · 보정 q {r['q']:.2f}"))
-    else:
-        out.append(("결론", f"{len(rows)}개 자산 모두 보통 날 범위 안 — 이 주제 발언 뒤 {span} 뚜렷한 반응은 없었습니다"))
     loose = [r for r in rows if not r["robust"] and r["lo"] is not None and not (r["lo"] <= r["mean"] <= r["hi"])]
-    if loose:   # 띠 밖이지만 옅은 막대 — 한 자산만 보면 드물지만, 여러 자산·구간을 함께 보면 우연으로도 나올 수 있는 값
-        out.append(("띠 밖이지만 옅은 막대", " · ".join(f"{_asset(r['sym'])} {r['mean']:+.2f}%" for r in loose)
-                    + f" — 하나만 보면 드물지만 {len(rows)}개 자산을 함께 보면 우연으로도 나올 수 있어 근거로 삼지 않습니다"))
+    if robust:
+        title = f"{len(rows)}개 자산 중 {len(robust)}개만 보통 날 범위 밖"
+        desc = (" · ".join(_asset(r["sym"]) for r in robust) + f"만 이 주제 발언 뒤 {span} 보통 날과 다르게 움직였고, 나머지는 구분되지 않았습니다.")
+        theme = "uncertain"
+    else:
+        title = f"{len(rows)}개 자산 모두 보통 날 범위 안"
+        desc = f"이 주제 발언 뒤 {span} 시장이 평소와 다르게 움직였다고 볼 근거가 없습니다."
+        theme = "neutral"
+    items = [("남은 반응", f"{_asset(r['sym'])} {r['mean']:+.2f}% · 보통 날 범위 {r['lo']:+.2f} ~ {r['hi']:+.2f}% 밖 · 보정 q {r['q']:.2f}") for r in robust]
+    if loose:
+        items.append(("띠 밖이지만 옅은 막대", " · ".join(f"{_asset(r['sym'])} {r['mean']:+.2f}%" for r in loose)
+                      + f" — 하나만 보면 드물지만 {len(rows)}개 자산을 함께 보면 우연으로도 나올 수 있어 근거로 삼지 않습니다"))
     big = max((r for r in rows if not r["robust"] and r not in loose), key=lambda r: abs(r["mean"]), default=None)
     if big:
-        out.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 보통 날과 구분되지 않음 (p {big['p']:.2f})"))
-    out.append(("읽는 법", f"막대 = 발언 뒤 {span} S&P 500 대비 평균 · 회색 띠 = 발언 없는 날에도 흔히 나오는 범위(95%) · 진한 막대 = 여러 자산을 함께 본 보정 뒤에도 남은 값"))
+        items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 보통 날과 구분되지 않음 (p {big['p']:.2f})"))
+    lis = "".join(f'<li style="margin:4px 0;"><b style="color:#111;">{_esc(t)}</b> · {_esc(x)}</li>' for t, x in items)
+    notes = [f"읽는 법 — 막대 = 발언 뒤 {span} S&P 500 대비 평균 · 회색 띠 = 발언 없는 날에도 흔히 나오는 범위(95%) · 진한 막대 = 여러 자산을 함께 본 보정 뒤에도 남은 값"]
     if horizon == "d5":
-        out.append(("주의", "5일 구간은 발언이 몰린 시기에 창이 겹쳐 실제보다 강해 보일 수 있습니다. 관찰된 값이며 원인을 뜻하지 않습니다"))
-    lis = "".join(f'<li style="margin:4px 0;"><b style="color:#111;">{_esc(t)}</b> · {_esc(x)}</li>' for t, x in out)
-    return f'<ul style="margin:8px 0 10px 20px;padding:0;list-style:disc;font-size:{dk.SMALL};color:#111;line-height:1.55;">{lis}</ul>'
+        notes.append("주의 — 5일 구간은 발언이 몰린 시기에 창이 겹쳐 실제보다 강해 보일 수 있습니다. 관찰된 값이며 원인을 뜻하지 않습니다")
+    note_html = "".join(f'<div style="font-size:{dk.TINY};color:{dk.NOTE};margin:4px 0 0;line-height:1.5;">{dk.INFO_ICON}{_esc(t)}</div>' for t in notes)
+    bg, bd = dk.CARD_DIR[theme]
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:12px 14px;margin:8px 0;">'
+            f'<div style="font-weight:700;color:#111;">{_esc(title)}</div>'
+            f'<div style="font-size:{dk.SMALL};color:#111;margin:2px 0 0;">{_esc(desc)}</div>'
+            + (f'<ul style="margin:8px 0 0 20px;padding:0;list-style:disc;font-size:{dk.SMALL};color:#111;line-height:1.55;">{lis}</ul>' if lis else "")
+            + f'<div style="margin-top:8px;padding-top:6px;border-top:1px solid {bd};">{note_html}</div></div>')
+
+
+def _table_fold(inner_html):
+    """표 접기 — '표 보기' 버튼을 누르면 펼친다 (details data-acc, 테마 CSS가 화살표를 돌린다)."""
+    return (f'<details data-acc="1" style="margin:4px 0 8px;"><summary style="cursor:pointer;list-style:none;display:flex;justify-content:center;align-items:center;gap:6px;'
+            f'padding:8px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;color:#111;font-size:{dk.SMALL};font-weight:700;">표 보기 {ACC_CHEV}</summary>'
+            f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 
 def _switch(panels):
@@ -188,7 +207,7 @@ def _reaction_charts(blk, topic, charts):
             continue
         img = (f'<a href="{_esc(info["url"])}" target="_blank" rel="noopener" title="그래프 확대 보기" style="display:block;max-width:720px;">'
                f'<img src="{_esc(info["url"])}" alt="{_esc(_k(topic))} {HORIZON_KO[h]} 반응 그래프" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/></a>')
-        panels.append((HORIZON_KO[h], img + _chart_bullets(rows, h)))
+        panels.append((HORIZON_KO[h], img + _chart_card(rows, h)))
     return _switch(panels) if panels else ""
 
 
@@ -220,8 +239,8 @@ def sec_reactions(a):
             ik = c.get("immediate_kinds", {})
             out.append(dk.sub_label(_k(k))   # 소제목은 주제 이름만 — 탭 JS가 서브탭 라벨로 쓴다
                        + _reaction_charts(blk, k, charts)   # 당일 · 5일 그래프 + 설명 (2026-10-11)
-                       + dk.muted(f"과거 관측일 {c['clean']}일 · 이벤트 {c['total']} · 거시 발표 겹침 제외 {c['confounded']} · 장외 {ik.get('gap', 0)} / 정규장 {ik.get('intraday', 0)} · 검정 {c.get('tests', 0)}개")
-                       + dk.table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows))
+                       + _table_fold(dk.muted(f"과거 관측일 {c['clean']}일 · 이벤트 {c['total']} · 거시 발표 겹침 제외 {c['confounded']} · 장외 {ik.get('gap', 0)} / 정규장 {ik.get('intraday', 0)} · 검정 {c.get('tests', 0)}개")
+                                     + dk.table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows)))   # 표는 접어 둔다 (2026-10-11 사용자)
         else:
             waiting.append(f"{_k(k)} ({c['clean']}/{config.MIN_CLEAN_N})")
     if waiting:
@@ -275,10 +294,10 @@ def build_body(a, n):
         dk.section("급상승 주제", sec_trends(a), summary="최근 7일", tab=TAB_TODAY),
         dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY),
         dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow")
-                   + dk.note("관찰 대상은 과거 반응 탭에서 고른 값입니다. 주제당 수십 개 조합을 검정했으므로 보정 q가 함께 작은 값만 근거로 삼으며, "
+                   + dk.note("관찰 대상은 시장 반응 탭에서 고른 값입니다. 주제당 수십 개 조합을 검정했으므로 보정 q가 함께 작은 값만 근거로 삼으며, "
                              "+3일·+5일은 창이 겹친 관측입니다. 인과나 방향 예측이 아닙니다."), tab=TAB_TODAY),
         dk.section("30일 흐름", sec_windows(a), tab=TAB_FLOW),
-        dk.section("과거 반응", sec_reactions(a), summary="오늘 주제의 과거 발언 뒤 시장 반응", tab=TAB_REACT),
+        dk.section("시장 반응", sec_reactions(a), tab=TAB_REACT),   # 탭 이름과 같아 제목은 숨고, 탭 아래 안내 문구는 두지 않는다 (2026-10-11 사용자)
         dk.section("관찰 종목", sec_why(a), tab=TAB_REACT),
         sec_footer(a),
         dk.WRAP_CLOSE,
