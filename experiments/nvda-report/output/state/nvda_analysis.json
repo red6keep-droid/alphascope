@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-11T10:24:09Z",
+ "generated_at": "2026-10-11T10:28:34Z",
  "run_date": "2026-10-11",
  "day": "2026-10-09",
  "is_latest_bar_today": true,
@@ -1036,7 +1036,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-09",
-  "state_collected_at": "2026-10-11T10:23:56Z",
+  "state_collected_at": "2026-10-11T10:28:27Z",
   "missing_fields": [],
   "option_snapshot_days": 1,
   "iv_rank_days": 1,
