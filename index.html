@@ -1153,6 +1153,11 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-body table { width: 100%; border-collapse: collapse; }
 /* 셀에 nowrap 이 있는 표(리포트 본문)는 글 폭을 밀어내지 않고 표 안에서만 가로 스크롤한다 */
 .post-body table { display: block; max-width: 100%; overflow-x: auto; }
+/* 표 칸은 글자 중간에서 끊지 않는다 — 좁은 화면에서 칸을 쥐어짜지 말고 표가 옆으로 넘쳐 스크롤되게 (2026-10-11 사용자) */
+.post-body td, .post-body th { word-break: keep-all; overflow-wrap: normal; }
+/* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11) */
+.post-body ul { list-style: disc; padding-left: 0; }
+.post-body ol { list-style: decimal; padding-left: 0; }
 .post-body a { color: var(--down); }
 
 .byline, .post-footer, .post-bottom, .post-labels {

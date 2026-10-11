@@ -16,7 +16,7 @@ AREA_KO = {"Earnings": "실적", "Flows": "수급", "Regulation": "규제", "Leg
 KIND_KO = {"EARNINGS": "NVDA 실적", "EARNINGS_PEER": "고객·공급·동종 실적", "FOMC": "FOMC", "CPI": "CPI", "NFP": "고용", "GDP": "GDP",
            "PCE": "PCE", "TSMC_REV": "TSMC 월매출", "EVENT": "행사", "INDEX": "지수", "OPEX": "옵션 만기", "COURT": "⚠ 법원"}
 LABEL_KO = {
-    "close": "종가", "ret_1d": "등락", "ret_vs_spy": "SPY 대비", "ret_vs_smh": "SMH 대비", "ret_vs_amd": "AMD 대비", "gap": "시가 갭",
+    "close": "종가", "ret_1d": "등락", "ret_vs_spy": "SPY 대비", "ret_vs_smh": "SMH 대비", "ret_vs_amd": "AMD 대비", "ret_vs_avgo": "AVGO 대비", "gap": "시가 갭",
     "range_pct": "일중 변동폭", "vol_ratio_20d": "거래량 배수(20일)",
     "ma50": "50일선", "ma200": "200일선", "pct_from_52w_high": "52주 고점 대비", "rsi14": "RSI 14", "ma_cross": "이평 교차",
     "iv_atm_30d": "ATM IV 30일", "iv_rank_60d": "IV 랭크 60일", "implied_move_next_earnings": "실적 implied move",
@@ -103,7 +103,7 @@ def section_headline(a):
     if h.get("close") is None:
         return "휴장 — 시세는 다음 거래일에 채워진다. 공시·기사·일정만 아래에 있다.\n"
     line = (f"**NVDA ${h['close']:,.2f} ({h['ret_1d']:+.2f}%)** · SPY 대비 {fmt(h.get('ret_vs_spy'), 'pp_signed')} · "
-            f"SMH 대비 {fmt(h.get('ret_vs_smh'), 'pp_signed')} · AMD 대비 {fmt(h.get('ret_vs_amd'), 'pp_signed')} · "
+            f"SMH 대비 {fmt(h.get('ret_vs_smh'), 'pp_signed')} · AMD 대비 {fmt(h.get('ret_vs_amd'), 'pp_signed')} · AVGO 대비 {fmt(h.get('ret_vs_avgo'), 'pp_signed')} · "
             f"거래량 20일 평균의 {fmt(h.get('vol_ratio_20d'), 'x')}")
     if a.get("macro_today"):
         line += f" · 거시 일정: {', '.join(a['macro_today'])}"

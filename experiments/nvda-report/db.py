@@ -132,6 +132,7 @@ CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 # 이미 만들어진 DB에 컬럼이 추가될 때. (table, column, decl)
 _MIGRATIONS = [
     ("items", "classify_attempts", "INTEGER DEFAULT 0"),   # ②단계: 검증 탈락 횟수
+    ("daily_state", "ret_vs_avgo", "REAL"),               # 2026-10-11: 브로드컴 대비 (SYMBOLS에 AVGO 추가)
 ]
 
 

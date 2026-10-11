@@ -50,7 +50,9 @@ def technical_rows(bars_by_symbol):
         if prev:
             row["ret_1d"] = (b["close"] / prev["close"] - 1) * 100
             row["gap"] = (b["open"] / prev["close"] - 1) * 100 if b["open"] else None
-            for s in ("SPY", "SMH", "AMD", "QQQ"):
+            for s in config.SYMBOLS:
+                if s == config.SYMBOL:
+                    continue
                 o, op = others[s].get(b["day"]), others[s].get(prev["day"])
                 row[f"ret_vs_{s.lower()}"] = (row["ret_1d"] - (o["close"] / op["close"] - 1) * 100) if o and op else None
         row["range_pct"] = (b["high"] - b["low"]) / b["close"] * 100 if b["close"] else None

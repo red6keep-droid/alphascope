@@ -15,7 +15,7 @@ import db
 import indicators
 import trump_bridge
 
-TECH_FIELDS = ["close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_qqq", "gap", "range_pct",
+TECH_FIELDS = ["close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_qqq", "ret_vs_avgo", "gap", "range_pct",
                "volume", "vol_ratio_20d", "ma50", "ma200", "pct_from_52w_high", "rsi14", "ma_cross"]
 KIND_PRIORITY = {"8k": 0, "10q": 0, "10k": 0, "form4": 1, "fedreg": 1, "court": 1, "trump": 1, "calendar": 2, "newsroom": 2,
                  "analyst": 3, "news": 3, "blog": 3, "price": 4, "options": 5, "estimates": 6, "flows": 7, "news_volume": 8}
@@ -353,6 +353,7 @@ def status_board(s, rank, rank_n):
             cell("close", s.get("close"), fmt="usd"), cell("ret_1d", s.get("ret_1d"), fmt="pct_signed"),
             cell("ret_vs_spy", s.get("ret_vs_spy"), abs(s.get("ret_vs_spy") or 0) >= config.REL_SPY_EVENT, "pp_signed"),
             cell("ret_vs_smh", s.get("ret_vs_smh"), fmt="pp_signed"), cell("ret_vs_amd", s.get("ret_vs_amd"), fmt="pp_signed"),
+            cell("ret_vs_avgo", s.get("ret_vs_avgo"), fmt="pp_signed"),
             cell("gap", s.get("gap"), fmt="pct_signed"),
             cell("range_pct", s.get("range_pct"), (s.get("range_pct") or 0) >= config.RANGE_PCT_EVENT, "pct"),
             cell("vol_ratio_20d", s.get("vol_ratio_20d"), (s.get("vol_ratio_20d") or 0) >= config.VOL_RATIO_EVENT, "x"),
@@ -425,7 +426,7 @@ def build(conn, day, run_date):
     analysis = {
         "generated_at": db.now_iso(), "run_date": run_date, "day": day,
         "is_latest_bar_today": bars_last == day,
-        "headline": {k: s.get(k) for k in ("close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "vol_ratio_20d", "gap")},
+        "headline": {k: s.get(k) for k in ("close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_avgo", "vol_ratio_20d", "gap")},
         "macro_today": [c["label"] for c in macro_today],
         "events": body, "events_overflow": overflow, "events_total": len(events),
         "analyst_target_only": target_only,

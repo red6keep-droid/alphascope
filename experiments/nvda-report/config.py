@@ -20,7 +20,7 @@ USER_AGENT = "Mozilla/5.0 (alphascope nvda-report; personal research)"
 # ── 관찰 심볼 (확정값: 5개, 늘리지 않는다) ─────────────────────────────────
 SYMBOL = "NVDA"
 BENCHMARK = "SPY"
-SYMBOLS = ["NVDA", "SPY", "SMH", "AMD", "QQQ"]
+SYMBOLS = ["NVDA", "SPY", "SMH", "AMD", "QQQ", "AVGO"]   # AVGO 2026-10-11 사용자: 브로드컴 대비 추가
 PRICE_BACKFILL_PERIOD = "2y"     # 첫 실행. 이후는 PRICE_UPDATE_PERIOD
 PRICE_UPDATE_PERIOD = "1mo"
 
