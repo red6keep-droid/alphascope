@@ -153,7 +153,7 @@ def _flow_card(blk):
     big = [r for r in rows if r["events"] >= 3]   # 3건 미만은 비율이 한두 건에 흔들려 뺀다
     if big:
         hi = max(big, key=lambda r: (r["neg_ratio"] or 0, r["events"]))
-        items.append(("부정 비율", f"전체 {neg * 100:.0f}% · 가장 높은 주제 {k(hi)} {(hi['neg_ratio'] or 0) * 100:.0f}% ({round((hi['neg_ratio'] or 0) * hi['events'])}/{hi['events']}건)"))
+        items.append(("부정 발언 비율", f"전체 {neg * 100:.0f}% · 가장 높은 주제 {k(hi)} {(hi['neg_ratio'] or 0) * 100:.0f}% ({round((hi['neg_ratio'] or 0) * hi['events'])}/{hi['events']}건)"))
         mx = max(r["avg_intensity"] for r in big)
         tops = [k(r) for r in big if abs(r["avg_intensity"] - mx) < 0.05]
         items.append(("평균 강도가 가장 높은 주제", f"{'·'.join(tops)} {mx:.1f} (1~10)"))
@@ -171,21 +171,17 @@ def _flow_card(blk):
 
 
 def sec_windows(a):
-    """30일 흐름 — C 카드: 주제, 값 이벤트 수, 보조 줄 평균 강도·부정 비율·직전 30일 대비."""
+    """30일 흐름 — C 카드: 주제, 값 이벤트 수, 보조 줄 평균 강도·부정 발언 비율·직전 30일 대비."""
     blk = a["windows"].get("30D") or {}
     rows = []
     for r in [x for x in blk.get("dims", {}).get("topic", []) if x["events"] > 0][:8]:
         delta = "직전 30일 대비 —" if r["delta_events"] is None else f"직전 30일 대비 {r['delta_events']:+.0f}건"   # 건수 차이 (전에는 % 로 잘못 붙어 있었다, 2026-10-11 수정)
         rows.append((_esc(_k(r["key"])), f"{r['events']}건",
-                     _esc(f"평균 강도 {r['avg_intensity']:.1f} · 부정 비율 {int((r['neg_ratio'] or 0) * 100)}% · {delta}" if r["avg_intensity"] else delta)))
+                     _esc(f"평균 강도 {r['avg_intensity']:.1f} · 부정 발언 비율 {int((r['neg_ratio'] or 0) * 100)}% · {delta}" if r["avg_intensity"] else delta)))
     if not rows:
         return dk.muted("30일 데이터가 아직 없습니다.")
-    items = [
-        ("건수", f"최근 30일 동안 그 주제의 시장 관련 이벤트 수. 같은 주제 게시물이 {config.CLUSTER_GAP_MINUTES}분 안에 이어지면 한 건으로 묶고, "
-                f"시장 관련도 {config.RELEVANCE_EVENT_MIN} 이상(0~3)인 게시물만 셉니다 — 게시물 수가 아닙니다"),
-        ("순서", "건수가 많은 주제부터"),
+    items = [   # 건수·순서·부정 발언 비율 줄은 뺐다 (2026-10-11 사용자)
         ("평균 강도", "이벤트 강도의 평균(1~10). 말의 세기가 아니라 정책이 얼마나 구체적인지 — 1~2 지나가는 언급, 5~6 조치 없는 강한 주장, 9~10 정책 발표"),
-        ("부정 비율", "이벤트 가운데 대상(나라·기업·기관)에 부정적인 발언의 비율"),
         ("직전 30일 대비", "그 앞 30일 건수와의 차이(건). −10건이면 그 앞 30일보다 10건 적습니다"
                          + ("" if blk.get("compare_to_previous") else " — 아직 직전 30일 데이터가 없어 표시하지 않습니다")),
         ("급상승 주제와 차이", "30일 흐름은 큰 주제(무역·연준 등)별로 한 달 동안 꾸준히 얼마나 말했는지, 급상승 주제는 최근 7일 세부 주제 가운데 갑자기 늘어난 것을 봅니다"),
