@@ -256,9 +256,9 @@ def _dir_switch(topic, a, charts, noise_p):
         if ok and first is None:
             first = i
         btns += (f'<button type="button" data-switch-btn="{i}" class="rt-dir"{"" if ok else " data-empty=\"1\""}>{_esc(label)} '
-                 f'<span style="font-weight:400;color:{dk.MUTED};">{n}일</span></button>')
+                 f'<span style="font-size:{dk.MICRO};font-weight:400;">({n}일)</span></button>')   # 괄호는 한 단계 작게 (가이드라인 3-3)
         body = _group_panel(blk, gkey, charts, noise_p) if blk else dk.muted("아직 이 방향의 발언이 없습니다.")
-        panels += f'<div data-switch-panel="{i}"><div data-switch-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:10px 0 4px;">{_esc(label)} · {n}일</div>{body}</div>'
+        panels += f'<div data-switch-panel="{i}"><div data-switch-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:10px 0 4px;">{_esc(label)} <span style="font-size:{dk.MICRO};font-weight:400;">({n}일)</span></div>{body}</div>'
     return (f'<div data-switch="1" data-switch-first="{first or 0}" style="margin:0 0 8px;">'
             f'<div class="rt-dirs" data-switch-bar="1" hidden>{btns}</div>{panels}</div>')
 

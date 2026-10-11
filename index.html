@@ -2998,6 +2998,15 @@ body.no-dashboard .main-content { padding-top: 32px; }
         var h2s = [].slice.call(root.querySelectorAll('h2'));
         if (h2s.length < 2) return;
         function key(t) { return t.replace(/^[①-⑳\s]+/, '').replace(/\s*\([^)]*\)\s*$/, '').trim(); }
+        /* 탭·서브탭 이름의 (…)는 한 단계 작게 — 가이드라인 3-3 (2026-10-11) */
+        function setLabel(btn, text) {
+          btn.textContent = '';
+          String(text).split(/(\([^)]*\))/).forEach(function (part) {
+            if (!part) return;
+            if (/^\(.*\)$/.test(part)) { var sp = document.createElement('span'); sp.style.cssText = 'font-size:14px;font-weight:400;'; sp.textContent = part; btn.appendChild(sp); }
+            else btn.appendChild(document.createTextNode(part));
+          });
+        }
         var secs = h2s.map(function (h) {
           var nodes = [h], n = h.nextElementSibling;
           while (n && n.tagName !== 'H2') { nodes.push(n); n = n.nextElementSibling; }
@@ -3046,7 +3055,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             }
           });
           if (!p.children.length) return;
-          var b = document.createElement('button'); b.className = 'rt-tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.textContent = g.name;
+          var b = document.createElement('button'); b.className = 'rt-tab'; b.type = 'button'; b.setAttribute('role', 'tab'); setLabel(b, g.name);
           var entry = { b: b, p: p };
           b.onclick = function () { select(panels.indexOf(entry)); };
           bar.appendChild(b); panels.push(entry);
@@ -3070,7 +3079,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           if (subs.length < 3) return;
           var sb = document.createElement('div'); sb.className = 'rt-sub';
           function sel2(i) { subs.forEach(function (s, j) { s.b.setAttribute('aria-selected', String(i === j)); s.nodes.forEach(function (n, k) { n.hidden = (i !== j) || k === 0; }); }); }
-          subs.forEach(function (s, i) { var b = document.createElement('button'); b.className = 'rt-subtab'; b.type = 'button'; b.textContent = s.name; b.onclick = function () { sel2(i); }; sb.appendChild(b); s.b = b; });
+          subs.forEach(function (s, i) { var b = document.createElement('button'); b.className = 'rt-subtab'; b.type = 'button'; setLabel(b, s.name); b.onclick = function () { sel2(i); }; sb.appendChild(b); s.b = b; });
           st.p.insertBefore(sb, subs[0].nodes[0]);
           sel2(0);
         });

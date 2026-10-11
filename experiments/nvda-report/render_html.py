@@ -600,7 +600,7 @@ def _ccard(rows, left=None):
 
 def _sub_label(t):
     """카드 묶음 위 소제목 — F 막대 라벨과 같은 모양 (14px 안내 회색). data-sub: 탭이 서브탭으로 쓴다."""
-    return f'<div data-sub="1" style="font-size:{SMALL};color:{NOTE};margin:10px 0 3px;">{_esc(t)}</div>'   # 소제목 16px
+    return f'<div data-sub="1" style="font-size:{SMALL};color:{NOTE};margin:10px 0 3px;">{_paren(_esc(t))}</div>'   # 소제목 16px
 
 
 CAL_DATE = f"font-size:{SMALL};font-weight:700;color:#111;"   # G 캘린더 카드: 날짜 첫 칸 16px 굵게

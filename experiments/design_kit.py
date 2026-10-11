@@ -207,7 +207,7 @@ def dcard(html, theme="neutral"):
 
 
 def sub_label(t):
-    return f'<div data-sub="1" style="font-size:{SMALL};color:{NOTE};margin:10px 0 3px;">{esc(t)}</div>'
+    return f'<div data-sub="1" style="font-size:{SMALL};color:{NOTE};margin:10px 0 3px;">{paren(esc(t))}</div>'
 
 
 def bar(label, segs):
