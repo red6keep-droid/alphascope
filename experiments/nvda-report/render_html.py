@@ -25,6 +25,7 @@ H2 = "color:#111;font-size:21px;font-weight:700;line-height:1.3;margin:28px 0 11
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"   # 구분선 위 여백 8 → 6 (20% 줄임, 2026-10-11)
 _NO_LINE_START = re.compile(r'^\s*(<div style="(?:overflow-x:auto;|background:)|<div data-cards|<img\b)')   # 표 래퍼 · 카드 · 카드 묶음 · 그림
 UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
+SUB = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
 # 글자 크기 체계 (디자인-가이드라인.md 3절): 본문은 바깥 div의 18px 하나 — 강조한다고 키우지 않는다. 라벨·날짜는 한 단계 작게(16px), 안내 글·범례·면책은 두 단계 작게(14px)
 SMALL, TINY = "16px", "14px"
 MICRO = "14px"   # 카드 구분명 안 괄호 부분 — 카드 글자(16px)보다 한 단계 작게, 볼드 없음 (2026-10-11 사용자: 안내 글 빼고 14 → 16)
@@ -528,7 +529,7 @@ def _event_html(e):
         head = _esc(e["title"])
         link = _link_icon(e.get("url"), f"{src} 원문")
         fact = f" — {_esc(e['fact'])}" if e.get("fact") and e["fact"] != e["title"] else ""
-    when = f' <span style="color:{MUTED};font-size:{SMALL};white-space:nowrap;">({_esc(_d(e["published_at"][:10]))})</span>' if e.get("published_at") else ""   # 날짜가 두 줄로 쪼개지지 않게
+    when = f' <span style="color:{SUB};font-size:{SMALL};white-space:nowrap;">({_esc(_d(e["published_at"][:10]))})</span>' if e.get("published_at") else ""   # 날짜가 두 줄로 쪼개지지 않게
     inner = f"{tag} · {head}{fact}{link}{when}"
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절)
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
@@ -625,7 +626,7 @@ STATUS_KO = {"active": "진행 중", "closed": "종결", "stayed": "중지", "se
 
 def _crow(name_html, value_html, sub="", first=False, left=None):
     """C 카드의 한 줄 (가이드라인 2-1): 왼쪽 구분명(굵게) + 그 아래 보조 줄(14px #999), 오른쪽 값. 줄 사이 가로 구분선."""
-    sub_html = f'<span style="display:block;color:{MUTED};font-weight:400;font-size:{TINY};white-space:normal;">{_paren(sub)}</span>' if sub else ""   # 보조 줄은 14px (안내)
+    sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};white-space:normal;">{_paren(sub)}</span>' if sub else ""   # 보조 줄은 14px (안내)
     return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
             f'<span style="display:block;{COL_L}"><span style="font-weight:700;color:#111;">{_paren(name_html)}</span>{sub_html}</span> '
             f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35% 고정 — left 인자는 더 쓰지 않는다
@@ -650,7 +651,7 @@ def _gcard(rows):
     rows = (날짜HTML, 라벨HTML, 내용HTML, 보조줄, D-n)."""
     inner = ""
     for i, (date_html, label_html, name_html, sub, right_html) in enumerate(rows):
-        sub_html = f'<span style="display:block;color:{MUTED};font-size:{TINY};white-space:normal;">{_paren(sub)}</span>' if sub else ""   # 보조 줄은 14px
+        sub_html = f'<span style="display:block;color:{SUB};font-size:{TINY};white-space:normal;">{_paren(sub)}</span>' if sub else ""   # 보조 줄은 14px
         inner += (f'<span style="{MULTI_ROW}{"" if i == 0 else MULTI_SEP}">'
                   f'<span style="display:block;{COL_L}">'
                   f'<span style="display:block;"><span style="{CAL_DATE}">{date_html}</span>{" " + label_html if label_html else ""}</span> '
@@ -676,7 +677,7 @@ def sec_upcoming(a):
         court = c["kind"] == "COURT"
         kind = rr.KIND_KO.get(c["kind"], c["kind"]).replace("⚠ ", "")
         label = _pill(kind, "uncertain" if court else "area") + _new(a, f"calendar:{c['kind']}:{c['day']}:{c['label']}")   # 라벨은 날짜 옆 (2026-10-11 사용자) · 새 일정은 N
-        tail = "".join(f'<span style="color:{MUTED};white-space:nowrap;"> · {_esc(x)}</span>'
+        tail = "".join(f'<span style="color:{SUB};white-space:nowrap;"> · {_esc(x)}</span>'
                        for x in ("추정" if not c.get("confirmed", 1) else "", extra) if x)   # '추정'은 구분점 뒤 같은 줄, 줄바꿈 없음
         name = (f'<span style="color:{WARN};">{_esc(c["label"])}</span>' if court else f'<span style="color:#111;">{_esc(c["label"])}</span>') + tail
         dcol = WARN if court else "#111"
@@ -777,7 +778,7 @@ def sec_targets(a):
     tn = next((_new(a, "status:" + k) for k in ("pt_mean", "pt_median", "pt_high", "pt_low", "rating_counts") if _new(a, "status:" + k)), "")   # 목표가·등급 중 하나라도 바뀐 날
     # 접힌 상태: 목표가 평균 줄 + 평균 등급 줄 (화살표는 평균 등급 줄 오른쪽, 2026-10-11 사용자)
     summary = (f'<span style="{MULTI_ROW}padding:8px 0 6px;"><span style="{COL_L}font-weight:700;color:#111;">목표가 평균{tn}</span> '
-               f'<span style="{COL_R}font-weight:700;">{_esc(rr.fmt(mean, "usd0"))} <span style="color:{MUTED};font-weight:400;">· 현재가 대비</span> {gap(mean)}</span></span>')
+               f'<span style="{COL_R}font-weight:700;">{_esc(rr.fmt(mean, "usd0"))} <span style="color:{SUB};font-weight:400;">· 현재가 대비</span> {gap(mean)}</span></span>')
     if n:   # 등급 분포 막대는 접힌 상태에도 보인다 (2026-10-11 사용자) — 목표가 평균 줄 아래
         summary += f'<span style="display:block;padding:6px 0 2px;{MULTI_SEP}">{bar}</span>'
         # 평균 등급 (2026-10-11 사용자: 네이버 컨센서스처럼 한 숫자로) — 강매수 5 … 강매도 1 가중 평균. 애널리스트 의견의 평균이지 리포트의 판단이 아니다
@@ -793,7 +794,7 @@ def sec_targets(a):
         if v is None:
             continue
         rows += (f'<span style="{MULTI_ROW}padding:6px 0;{MULTI_SEP if rows else ""}"><span style="{COL_L}font-weight:700;color:#111;">목표가 {name}</span> '
-                 f'<span style="{COL_R}font-weight:700;">{_esc(rr.fmt(v, "usd0"))} <span style="color:{MUTED};font-weight:400;">· 현재가 대비</span> {gap(v)}</span></span>')
+                 f'<span style="{COL_R}font-weight:700;">{_esc(rr.fmt(v, "usd0"))} <span style="color:{SUB};font-weight:400;">· 현재가 대비</span> {gap(v)}</span></span>')
     return _accordion(summary, f'<span style="display:block;">{rows}</span>', block=True)
 
 

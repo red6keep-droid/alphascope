@@ -9,6 +9,7 @@ import html as html_mod
 import re
 
 UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
+SUB = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
 NOTE = "#6B7280"          # 안내 글 회색
 BODY, SMALL, TINY, MICRO = "18px", "16px", "14px", "14px"
 H2 = "position:relative;color:#111;font-size:21px;font-weight:700;line-height:1.3;margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"
@@ -299,8 +300,8 @@ def multi2(items):
 
 
 def crow(name_html, value_html, sub="", first=False, left=None):
-    """C 카드 한 줄 + 보조 줄(14px #999). name_html 은 이스케이프된 HTML."""
-    sub_html = f'<span style="display:block;color:{MUTED};font-weight:400;font-size:{TINY};white-space:normal;">{paren(sub)}</span>' if sub else ""
+    """C 카드 한 줄 + 보조 줄(14px #7A7A7A). name_html 은 이스케이프된 HTML."""
+    sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};white-space:normal;">{paren(sub)}</span>' if sub else ""
     return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
             f'<span style="display:block;{COL_L}"><span style="font-weight:700;color:#111;">{paren(name_html)}</span>{sub_html}</span> '
             f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35% 고정 — left 인자는 무시

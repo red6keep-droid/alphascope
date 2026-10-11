@@ -209,7 +209,7 @@ def sec_regime(analysis, report):
     if regime.get("score") is None:
         return dk.muted("오늘은 시장 상태 점수를 계산하지 못했습니다.") + comment
     light = regime.get("light") or "🟡"
-    rows = [("점수", f'{int(regime["score"])} <span style="color:{MUTED};font-weight:400;">/ 100</span> ' + _light_pill(light, dk.ko(regime.get("label") or "", TERM_KO)), "")]
+    rows = [("점수", f'{int(regime["score"])} <span style="color:{dk.SUB};font-weight:400;">/ 100</span> ' + _light_pill(light, dk.ko(regime.get("label") or "", TERM_KO)), "")]
     if regime.get("score_prev") is not None:
         rows.append(("어제 대비", dk.arrow(regime.get("delta") or 0, 0, ""), _esc(f"어제 {regime['score_prev']}점")))
     else:
@@ -221,7 +221,7 @@ def sec_regime(analysis, report):
             continue
         frac = score / mx
         col = LIGHT_COLOR["🟢"] if frac >= 0.7 else LIGHT_COLOR["🟡"] if frac >= 0.45 else LIGHT_COLOR["🔴"]
-        rows.append((_esc(label), dk.hbar(score, mx, col) + f"{int(score)} <span style='color:{MUTED};font-weight:400;'>/ {int(mx)}</span>", ""))
+        rows.append((_esc(label), dk.hbar(score, mx, col) + f"{int(score)} <span style='color:{dk.SUB};font-weight:400;'>/ {int(mx)}</span>", ""))
     return dk.ccard(rows) + comment
 
 
@@ -404,7 +404,7 @@ def sec_news(input_data, report, analysis):
             subs.append("관련 자산 " + " · ".join(_named_reaction(s, reaction(s)) for s in related))   # 종목 이름도 증감 색 (가이드라인 3-3)
         if item.get("why"):
             subs.append("선정 이유 " + _esc(item["why"]))
-        sub_html = "".join(f'<span style="display:block;color:{MUTED};font-size:{dk.TINY};">{x}</span>' for x in subs)
+        sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};">{x}</span>' for x in subs)
         items.append(f"<li style='{dk.LI}'>{tag}<span style='color:#111;'>{title}</span>{link}{sub_html}</li>")
     return dk.ul(items) if items else dk.muted("주요 뉴스 없음")
 

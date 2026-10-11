@@ -135,9 +135,9 @@ def _p(st):
     if not pl:
         return dk.dash()
     q = pl.get("q_bh")
-    q_html = f'<span style="color:{MUTED};font-size:{dk.TINY};"> q{q:.2f}</span>' if q is not None else ""
+    q_html = f'<span style="color:{dk.SUB};font-size:{dk.TINY};"> q{q:.2f}</span>' if q is not None else ""
     if pl["indistinguishable"]:
-        return f'<span style="color:{MUTED};">{pl["p_two_sided"]:.2f}</span>{q_html}'
+        return f'<span style="color:{dk.SUB};">{pl["p_two_sided"]:.2f}</span>{q_html}'
     if pl.get("robust"):
         return f'<b>{pl["p_two_sided"]:.2f}</b>{q_html}'
     return f'{pl["p_two_sided"]:.2f}{q_html}'
