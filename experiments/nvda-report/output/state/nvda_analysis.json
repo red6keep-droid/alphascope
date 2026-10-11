@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-11T10:12:40Z",
+ "generated_at": "2026-10-11T10:24:09Z",
  "run_date": "2026-10-11",
  "day": "2026-10-09",
  "is_latest_bar_today": true,
@@ -822,7 +822,7 @@
   "news": [
    {
     "key": "news_count",
-    "value": 27,
+    "value": 28,
     "flag": false,
     "fmt": "int"
    },
@@ -1036,7 +1036,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-09",
-  "state_collected_at": "2026-10-11T10:12:17Z",
+  "state_collected_at": "2026-10-11T10:23:56Z",
   "missing_fields": [],
   "option_snapshot_days": 1,
   "iv_rank_days": 1,
@@ -1048,7 +1048,7 @@
    "court": 1,
    "fedreg": 21,
    "form4": 16,
-   "news": 242,
+   "news": 243,
    "newsroom": 3
   },
   "option_expiries": [
