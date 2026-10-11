@@ -130,7 +130,7 @@ ASSET_KO = {"SPY": "S&P 500", "QQQ": "나스닥 100", "SMH": "반도체", "XLK":
             "XLI": "산업재", "XLY": "경기소비재", "XLP": "필수소비재", "XLU": "유틸리티", "XLB": "소재", "XLRE": "부동산", "XLC": "통신",
             "NVDA": "엔비디아", "TSLA": "테슬라", "AAPL": "애플", "MSFT": "마이크로소프트", "AMZN": "아마존", "GOOGL": "알파벳", "META": "메타",
             "TLT": "장기 국채", "GLD": "금", "USO": "원유", "UUP": "달러"}
-HORIZON_KO = {"close": "오늘", "d5": "5일 이후"}   # 전환 버튼 이름 (2026-10-11 사용자)
+HORIZON_KO = {"close": "오늘", "d5": "5일"}   # 전환 버튼 이름 (2026-10-11 사용자)
 
 
 def _asset(sym):
@@ -167,7 +167,7 @@ def _chart_card(rows, horizon):
         notes.append("주의 — 5일 구간은 발언이 몰린 시기에 창이 겹쳐 실제보다 강해 보일 수 있습니다. 관찰된 값이며 원인을 뜻하지 않습니다")
     note_html = "".join(f'<div style="font-size:{dk.TINY};color:{dk.NOTE};margin:4px 0 0;line-height:1.5;">{dk.INFO_ICON}{_esc(t)}</div>' for t in notes)
     bg, bd = dk.CARD_DIR[theme]
-    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:12px 14px;margin:8px 0;">'
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'   # 강조 카드 형식 (가이드라인 2절)
             f'<div style="font-weight:700;color:#111;">{_esc(title)}</div>'
             f'<div style="font-size:{dk.SMALL};color:#111;margin:2px 0 0;">{_esc(desc)}</div>'
             + (f'<ul style="margin:8px 0 0 20px;padding:0;list-style:disc;font-size:{dk.SMALL};color:#111;line-height:1.55;">{lis}</ul>' if lis else "")
@@ -181,12 +181,7 @@ def _table_fold(inner_html):
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 
-def _switch(panels):
-    """당일 · 5일 전환 (data-switch) — 테마 JS가 버튼으로 하나씩 보여 준다. JS가 없으면 둘 다 세로로."""
-    btns = "".join(f'<button type="button" data-switch-btn="{i}" class="rt-seg">{_esc(lbl)}</button>' for i, (lbl, _) in enumerate(panels))
-    body = "".join(f'<div data-switch-panel="{i}"><div data-switch-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:8px 0 4px;">{_esc(lbl)}</div>{html}</div>'
-                   for i, (lbl, html) in enumerate(panels))
-    return f'<div data-switch="1" style="margin:0 0 8px;"><div class="rt-segs" hidden>{btns}</div>{body}</div>'
+DIR_TABS = (("negative", "부정 발언"), ("positive", "긍정 발언"), ("", "전체"))   # 하위탭 (2026-10-11 사용자)
 
 
 def _charts():
@@ -197,27 +192,79 @@ def _charts():
         return {}
 
 
-def _reaction_charts(blk, topic, charts):
+def _table_rows(blk):
+    rows = []
+    for sym in config.ALL_SYMBOLS:
+        hz = blk["symbols"].get(sym, {})
+        st = hz.get("close")
+        if not st or not st["publishable"]:
+            continue
+        g = lambda h: (hz.get(h) or {}).get("mean") if (hz.get(h) or {}).get("publishable") else None  # noqa: E731
+        rows.append([f"<b>{sym}</b>", st["n"], _pct(g("immediate")), _pct(st["mean"]), _pct(g("next_close")),
+                     _pct(g("d5")), f"{st['neg_pct']:.0f}%", _x(g("rel_range")), _x(g("rel_volume")), _p(st)])
+    return rows
+
+
+def _table_legend(noise_p):
+    return dk.note(
+        f"수치는 {config.BENCHMARK} 대비 초과 반응(%)이며, {config.BENCHMARK}만 원수익률입니다. "
+        f"즉각 = 장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가. 변동폭·거래량은 직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수(1.00× = 보통). "
+        f"p = 발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않습니다. "
+        f"q = 자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값 — {noise_p:.2f} 미만(굵게)인 값만 보정 뒤에 남는 것으로 봅니다. "
+        f"+5일 구간은 창이 겹쳐 독립 표본이 아닙니다. 발언 이후 관찰된 값이고 인과를 의미하지 않습니다.")
+
+
+def _group_panel(blk, gkey, charts, noise_p):
+    """한 그룹(주제 × 방향) — 오늘·5일 패널(data-hz-panel: 설명 카드가 그래프 위) + 표 접기."""
     import chart_reaction
-    panels = []
+    c = blk["counts"]
+    hz_html = ""
     for h in ("close", "d5"):
         rows = chart_reaction.rows_for(blk, h)
-        info = (charts.get(topic) or {}).get(h)
-        if not rows or not info:
+        info = (charts.get(gkey) or {}).get(h)
+        if not rows:   # 이 구간만 표본이 모자람 (5일 뒤 가격이 아직 없는 최근 발언 등) — 빈 화면 대신 안내
+            n_h = max((((blk["symbols"].get(sym) or {}).get(h) or {}).get("n") or 0) for sym in config.ALL_SYMBOLS)
+            hz_html += (f'<div data-hz-panel="{h}"><div data-hz-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:8px 0 4px;">{HORIZON_KO[h]}</div>'
+                        + dk.muted(f"{HORIZON_KO[h]} 구간은 표본 축적 중 — 관측일 {n_h}일 / 필요 {config.MIN_CLEAN_N}일. 쌓이면 그래프가 나옵니다.") + "</div>")
             continue
-        img = (f'<a href="{_esc(info["url"])}" target="_blank" rel="noopener" title="그래프 확대 보기" style="display:block;max-width:720px;">'
-               f'<img src="{_esc(info["url"])}" alt="{_esc(_k(topic))} {HORIZON_KO[h]} 반응 그래프" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/></a>')
-        panels.append((HORIZON_KO[h], img + _chart_card(rows, h)))
-    return _switch(panels) if panels else ""
+        img = ""
+        if info:
+            img = (f'<a href="{_esc(info["url"])}" target="_blank" rel="noopener" title="그래프 확대 보기" style="display:block;max-width:720px;">'
+                   f'<img src="{_esc(info["url"])}" alt="{_esc(_k(gkey.split("#")[0]))} {HORIZON_KO[h]} 반응 그래프" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/></a>')
+        hz_html += (f'<div data-hz-panel="{h}"><div data-hz-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:8px 0 4px;">{HORIZON_KO[h]}</div>'
+                    + _chart_card(rows, h) + img + "</div>")
+    rows = _table_rows(blk)
+    if not rows:
+        return dk.muted(f"표본 축적 중 — 관측일 {c['clean']}일 / 필요 {config.MIN_CLEAN_N}일. 쌓이면 그래프가 나옵니다.")
+    ik = c.get("immediate_kinds", {})
+    table = _table_fold(dk.muted(f"과거 관측일 {c['clean']}일 · 이벤트 {c['total']} · 거시 발표 겹침 제외 {c['confounded']} · 장외 {ik.get('gap', 0)} / 정규장 {ik.get('intraday', 0)} · 검정 {c.get('tests', 0)}개")
+                        + dk.table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows) + _table_legend(noise_p))
+    return hz_html + table
+
+
+def _dir_switch(topic, a, charts, noise_p):
+    """부정 발언 · 긍정 발언 · 전체 — 하위탭 (data-switch). 버튼에 관측일 수, 표본이 모자란 쪽은 회색. 첫 선택은 표본이 있는 첫 탭."""
+    btns, panels, first = "", "", None
+    for i, (d, label) in enumerate(DIR_TABS):
+        gkey = f"{topic}#{d}" if d else topic
+        blk = a["reactions"].get(gkey)
+        n = (blk or {}).get("counts", {}).get("clean", 0)
+        ok = bool(blk and _table_rows(blk))
+        if ok and first is None:
+            first = i
+        btns += (f'<button type="button" data-switch-btn="{i}" class="rt-dir"{"" if ok else " data-empty=\"1\""}>{_esc(label)} '
+                 f'<span style="font-weight:400;color:{dk.MUTED};">{n}일</span></button>')
+        body = _group_panel(blk, gkey, charts, noise_p) if blk else dk.muted("아직 이 방향의 발언이 없습니다.")
+        panels += f'<div data-switch-panel="{i}"><div data-switch-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:10px 0 4px;">{_esc(label)} · {n}일</div>{body}</div>'
+    return (f'<div data-switch="1" data-switch-first="{first or 0}" style="margin:0 0 8px;">'
+            f'<div class="rt-dirs" data-switch-bar="1" hidden>{btns}</div>{panels}</div>')
 
 
 def sec_reactions(a):
-    """과거 반응 — 자산 × 구간 통계 행렬이라 표를 쓴다 (가이드라인 7절 예외). 주제마다 소제목 + 표, 읽는 법은 ⓘ 안내 줄."""
-    today_keys = []
-    for e in a["recent_events"]:
-        if e["topic"] not in today_keys:
-            today_keys.append(e["topic"])
-    keys = today_keys or sorted(a["reactions"], key=lambda k: -a["reactions"][k]["counts"]["clean"])[:3]
+    """시장 반응 — 주제 서브탭(data-sub) × 방향 하위탭(부정·긍정·전체) × 오늘·5일 버튼(data-hz-control, 테마 JS가 서브탭 줄 오른쪽으로 옮긴다).
+    각 화면: 설명 카드(강조) → 그래프 → 표 접기 (2026-10-11 사용자)."""
+    import chart_reaction
+    keys = chart_reaction.topics_for(a)
     noise_p = a.get("config", {}).get("placebo_noise_p", config.PLACEBO_NOISE_P)
     charts = _charts()
     out, waiting = [], []
@@ -225,35 +272,17 @@ def sec_reactions(a):
         blk = a["reactions"].get(k)
         if not blk:
             continue
-        c = blk["counts"]
-        rows = []
-        for sym in config.ALL_SYMBOLS:
-            hz = blk["symbols"].get(sym, {})
-            st = hz.get("close")
-            if not st or not st["publishable"]:
-                continue
-            g = lambda h: (hz.get(h) or {}).get("mean") if (hz.get(h) or {}).get("publishable") else None  # noqa: E731
-            rows.append([f"<b>{sym}</b>", st["n"], _pct(g("immediate")), _pct(st["mean"]), _pct(g("next_close")),
-                         _pct(g("d5")), f"{st['neg_pct']:.0f}%", _x(g("rel_range")), _x(g("rel_volume")), _p(st)])
-        if rows:
-            ik = c.get("immediate_kinds", {})
-            out.append(dk.sub_label(_k(k))   # 소제목은 주제 이름만 — 탭 JS가 서브탭 라벨로 쓴다
-                       + _reaction_charts(blk, k, charts)   # 당일 · 5일 그래프 + 설명 (2026-10-11)
-                       + _table_fold(dk.muted(f"과거 관측일 {c['clean']}일 · 이벤트 {c['total']} · 거시 발표 겹침 제외 {c['confounded']} · 장외 {ik.get('gap', 0)} / 정규장 {ik.get('intraday', 0)} · 검정 {c.get('tests', 0)}개")
-                                     + dk.table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows)))   # 표는 접어 둔다 (2026-10-11 사용자)
+        if _table_rows(blk):
+            out.append(dk.sub_label(_k(k)) + _dir_switch(k, a, charts, noise_p))
         else:
-            waiting.append(f"{_k(k)} ({c['clean']}/{config.MIN_CLEAN_N})")
+            waiting.append(f"{_k(k)} ({blk['counts']['clean']}/{config.MIN_CLEAN_N})")
     if waiting:
         out.append(dk.muted("표본 축적 중 (관측일 / 필요 20): " + ", ".join(waiting)))
     if not out:
         return dk.muted("오늘 이벤트 주제에 해당하는 과거 반응 데이터가 아직 없습니다.")
-    out.append(dk.note(
-        f"수치는 {config.BENCHMARK} 대비 초과 반응(%)이며, {config.BENCHMARK}만 원수익률입니다. "
-        f"즉각 = 장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가. 변동폭·거래량은 직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수(1.00× = 보통). "
-        f"p = 발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않습니다. "
-        f"q = 한 주제에서 자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값(Benjamini–Hochberg) — {noise_p:.2f} 미만(굵게)인 값만 보정 뒤에 남는 것으로 봅니다. "
-        f"+5일 구간은 창이 겹쳐 독립 표본이 아닙니다. 발언 이후 관찰된 값이고 인과를 의미하지 않습니다."))
-    return "".join(out)
+    control = ('<div class="rt-segs" data-hz-control="1" hidden>'
+               + "".join(f'<button type="button" class="rt-seg" data-hz="{h}">{HORIZON_KO[h]}</button>' for h in ("close", "d5")) + "</div>")
+    return control + "".join(out)
 
 
 def sec_why(a):

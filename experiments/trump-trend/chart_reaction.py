@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import config  # noqa: E402
 
 HORIZONS = {"close": "Same day", "d5": "+5 trading days"}
+DIRECTIONS = (("negative", "negative posts"), ("positive", "positive posts"), ("", "all posts"))   # 그룹 키 "주제#방향", "" = 전체
 UP, DOWN = "#d93025", "#1a73e8"
 
 
@@ -82,7 +83,7 @@ def topics_for(a):
     for e in a["recent_events"]:
         if e["topic"] not in keys:
             keys.append(e["topic"])
-    return keys or sorted(a["reactions"], key=lambda k: -a["reactions"][k]["counts"]["clean"])[:3]
+    return keys or sorted((k for k in a["reactions"] if "#" not in k and " / " not in k), key=lambda k: -a["reactions"][k]["counts"]["clean"])[:3]
 
 
 def run(analysis=None, day=None):
@@ -93,19 +94,21 @@ def run(analysis=None, day=None):
     slug = _repo_slug()
     out, refs = {}, []
     for topic in topics_for(analysis):
-        blk = analysis["reactions"].get(topic)
-        if not blk:
-            continue
-        for h, label in HORIZONS.items():
-            rows = rows_for(blk, h)
-            if not rows:
+        for d, dlabel in DIRECTIONS:
+            gkey = f"{topic}#{d}" if d else topic
+            blk = analysis["reactions"].get(gkey)
+            if not blk:
                 continue
-            safe = re.sub(r"[^A-Za-z0-9]+", "-", topic).strip("-").lower()
-            ref = f"images/trump-reaction-{day}-{safe}-{h}.png"
-            path = os.path.join(config.OUTPUT_DIR, ref)
-            draw(rows, f"{topic} — {label} (n={rows[0]['n']})", path)
-            out.setdefault(topic, {})[h] = {"ref": ref, "path": path, "url": f"https://cdn.jsdelivr.net/gh/{slug}@gh-pages/{ref}"}
-            refs.append(ref)
+            for h, label in HORIZONS.items():
+                rows = rows_for(blk, h)
+                if not rows:
+                    continue
+                safe = re.sub(r"[^A-Za-z0-9]+", "-", gkey).strip("-").lower()
+                ref = f"images/trump-reaction-{day}-{safe}-{h}.png"
+                path = os.path.join(config.OUTPUT_DIR, ref)
+                draw(rows, f"{topic} — {dlabel} — {label} (n={rows[0]['n']})", path)
+                out.setdefault(gkey, {})[h] = {"ref": ref, "path": path, "url": f"https://cdn.jsdelivr.net/gh/{slug}@gh-pages/{ref}"}
+                refs.append(ref)
     with open(os.path.join(config.OUTPUT_DIR, "reaction_charts.json"), "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
     with open(os.path.join(config.OUTPUT_DIR, "image_refs.txt"), "w", encoding="utf-8") as f:

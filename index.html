@@ -1170,7 +1170,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-body .rt-tab { flex: none; padding: 8px 12px; font: inherit; font-size: 16px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
-.post-body .rt-sub { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
+.post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
 .post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 16px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
 /* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.
@@ -1188,7 +1188,14 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-body .rt-segs[hidden] { display: none; }
 .post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 16px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
 .post-body .rt-seg[aria-pressed="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
-.post-body [data-switch-panel][hidden] { display: none; }
+.post-body [data-switch-panel][hidden], .post-body [data-hz-panel][hidden] { display: none; }
+.post-body .rt-segs--in-sub { margin: 0 0 4px auto; flex: none; }
+/* 하위탭 (부정 발언 · 긍정 발언 · 전체): 서브탭보다 한 단계 아래 — 16px, 밑줄 2px 검정, 줄 아래 선 없음. 표본이 모자란 탭은 흐리게 (2026-10-11) */
+.post-body .rt-dirs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 0 8px; }
+.post-body .rt-dirs[hidden] { display: none; }
+.post-body .rt-dir { flex: none; padding: 4px 8px; font: inherit; font-size: 16px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
+.post-body .rt-dir[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: #111; }
+.post-body .rt-dir[data-empty] { color: #CBD5E1; }
 /* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11) */
 .post-body ul { list-style: disc; padding-left: 0; }
 .post-body ol { list-style: decimal; padding-left: 0; }
@@ -3069,23 +3076,39 @@ body.no-dashboard .main-content { padding-top: 32px; }
         });
       })();
 
-      /* ============================================================ 전환 버튼 (data-switch) — 당일 · 5일 그래프 (2026-10-11)
-         렌더러가 [data-switch] 안에 버튼(data-switch-btn)과 패널(data-switch-panel)을 둔다. JS가 없으면 패널이 세로로 다 보이고 버튼은 숨는다. */
+      /* ============================================================ 전환 버튼 (data-switch) · 오늘·5일 (data-hz-control) — 2026-10-11
+         data-switch: 렌더러가 버튼 줄([data-switch-bar])과 패널([data-switch-panel])을 둔다 — 트럼프 시장 반응의 부정·긍정·전체 하위탭.
+         data-hz-control: 오늘 · 5일 버튼 한 쌍 — 같은 탭 패널 안의 모든 [data-hz-panel]을 함께 바꾼다. 서브탭 줄(.rt-sub)이 있으면 그 오른쪽으로 옮긴다.
+         JS가 없으면 버튼은 숨고 패널은 세로로 다 보인다. */
       (function () {
         'use strict';
         [].slice.call(document.querySelectorAll('.post-body [data-switch]')).forEach(function (box) {
-          var bar = box.querySelector('.rt-segs');
-          var btns = [].slice.call(box.querySelectorAll('[data-switch-btn]'));
-          var panels = [].slice.call(box.querySelectorAll('[data-switch-panel]'));
+          var bar = box.querySelector('[data-switch-bar]');
+          var btns = [].slice.call(bar ? bar.querySelectorAll('[data-switch-btn]') : []);
+          var panels = [].slice.call(box.querySelectorAll(':scope > [data-switch-panel]'));
           if (!bar || btns.length < 2) return;
           bar.hidden = false;
-          [].slice.call(box.querySelectorAll('[data-switch-label]')).forEach(function (l) { l.hidden = true; });   /* 버튼이 이름을 대신한다 */
+          [].slice.call(box.querySelectorAll(':scope > [data-switch-panel] > [data-switch-label]')).forEach(function (l) { l.hidden = true; });
           function sel(i) {
-            btns.forEach(function (b, j) { b.setAttribute('aria-pressed', String(i === j)); });
+            btns.forEach(function (b, j) { b.setAttribute('aria-selected', String(i === j)); });
             panels.forEach(function (p, j) { p.hidden = i !== j; });
           }
           btns.forEach(function (b, j) { b.onclick = function () { sel(j); }; });
-          sel(0);
+          sel(parseInt(box.getAttribute('data-switch-first') || '0', 10) || 0);
+        });
+        [].slice.call(document.querySelectorAll('.post-body [data-hz-control]')).forEach(function (ctrl) {
+          var root = ctrl.closest('.rt-panel') || ctrl.closest('.post-body');
+          var sub = root.querySelector('.rt-sub');
+          if (sub) { sub.appendChild(ctrl); ctrl.classList.add('rt-segs--in-sub'); }
+          ctrl.hidden = false;
+          [].slice.call(root.querySelectorAll('[data-hz-label]')).forEach(function (l) { l.hidden = true; });
+          var btns = [].slice.call(ctrl.querySelectorAll('[data-hz]'));
+          function sel(h) {
+            btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-hz') === h)); });
+            [].slice.call(root.querySelectorAll('[data-hz-panel]')).forEach(function (p) { p.hidden = p.getAttribute('data-hz-panel') !== h; });
+          }
+          btns.forEach(function (b) { b.onclick = function () { sel(b.getAttribute('data-hz')); }; });
+          sel('close');
         });
       })();
       //]]>
