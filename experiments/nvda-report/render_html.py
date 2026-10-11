@@ -629,7 +629,7 @@ def _crow(name_html, value_html, sub="", first=False, left=None, short=False):
     sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};white-space:normal;">{_paren(sub)}</span>' if sub else ""   # 보조 줄은 14px (안내)
     return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
             f'<span style="display:block;{_dk.COL_L75 if short else COL_L}"><span style="font-weight:700;color:#111;">{_paren(name_html)}</span>{sub_html}</span> '
-            f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 5자 미만이면 75 · 25 (2026-10-11 사용자)
+            f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 5자 미만이면 80 · 20 (2026-10-11 사용자)
 
 
 def _ccard(rows, left=None):
