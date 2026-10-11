@@ -69,19 +69,19 @@ def dash():
     return f'<span style="color:{MUTED};">—</span>'
 
 
-def h2(t, line=True, summary="", tab=None):
+def h2(t, line=True, summary="", tab=None, aside=""):
     """구획 제목. tab = 이 구획이 들어갈 탭 이름 (가이드라인 11절) — 테마 JS가 h2[data-tab]을 읽어 탭을 만든다."""
     sm = (f' <span data-summary="1" style="font-size:{TINY};font-weight:400;color:{NOTE};line-height:1.5;white-space:normal;flex:1 1 220px;">{INFO_ICON}{summary}</span>'
           if summary else "")
     tb = f' data-tab="{esc(tab)}"' if tab else ""
-    return f'<h2{tb} style="{H2}{H2_LINE if line else ""}">{esc(t)}{sm}</h2>'
+    return f'<h2{tb} style="{H2}{H2_LINE if line else ""}">{esc(t)}{sm}{aside}</h2>'   # aside = 제목 줄 오른쪽 요소 (캡슐 줄 등)
 
 
-def section(title, html, summary="", line=None, tab=None):
+def section(title, html, summary="", line=None, tab=None, aside=""):
     """제목(+옆 요약) + 내용. 바로 아래가 카드·표·그림이면 구분선을 긋지 않는다 (가이드라인 2절)."""
     if line is None:
         line = not _NO_LINE_START.match(html or "")
-    return h2(title, line=line, summary=summary, tab=tab) + (html or "")
+    return h2(title, line=line, summary=summary, tab=tab, aside=aside) + (html or "")
 
 
 def ko(text, table):
@@ -176,12 +176,14 @@ def tip_line(items):
     return f'<div style="position:relative;font-size:{TINY};color:{NOTE};line-height:1.6;margin:6px 0 2px;">{inner}</div>'
 
 
-def capsules(items):
+def capsules(items, size=None, in_title=False):
     """캡슐 줄 (2026-10-11 사용자: "게시물 : 9건 캡슐 라인 디자인으로 연속해서") — 알약 모양 칸을 한 줄에 이어 놓고, 넘치면 다음 줄로.
     items = [(라벨, 값HTML)]. 라벨 16px 안내 회색 · 값 16px 검정 굵게, "라벨 : 값". 흰 바탕, 테두리 #E2E8F0, 모서리 끝까지 둥글게."""
     pill = ("display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:999px;"
-            f"font-size:{SMALL};line-height:1.4;white-space:nowrap;")
+            f"font-size:{size or SMALL};font-weight:400;line-height:1.4;white-space:nowrap;")
     inner = "".join(f'<span style="{pill}"><span style="color:{NOTE};">{esc(k)} :</span> <b style="color:#111;">{v}</b></span>' for k, v in items)
+    if in_title:   # 구획 제목 줄 오른쪽 (2026-10-11 사용자: "14 폰트로, 발언 타이틀 우측에") — 좁으면 제목 아래로 내려간다
+        return f'<span data-capsules="1" style="display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;align-self:center;">{inner}</span>'
     return f'<div data-capsules="1" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px;">{inner}</div>'
 
 

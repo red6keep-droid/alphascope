@@ -48,17 +48,15 @@ def _dir_pill(d):
 # ── 구획 ────────────────────────────────────────────────────────────────
 
 def sec_counts(a):
-    """지난 24시간 집계 — 캡슐 줄 (2026-10-11 사용자: 발언·급상승 주제 다음에 "게시물 : 9건" 캡슐을 연속으로). 글 머리 카드는 없앴다."""
+    """지난 24시간 집계 — 14px 캡슐 줄을 발언 제목 오른쪽에 (2026-10-11 사용자). 글 머리 카드는 없앴다. → (제목 옆 캡슐, 미분류 안내 줄)"""
     v = a["post_volume"]["last_24h"]
     ev = a["recent_events"]
     top = ev[0] if ev else None
     items = [("게시물", f"{v['total']}건"), ("정책 관련", f"{v['policy']}건"), ("시장 관련", f"{len(ev)}건")]
     if top:
         items.append(("가장 강한 발언", f"{_esc(_k(top['topic']))}{' / ' + _esc(_k(top['subtopic'])) if top['subtopic'] else ''} · 강도 {top['intensity']}"))
-    out = dk.capsules(items)
-    if v["pending"]:
-        out += dk.muted(f"최근 게시물 {v['pending']}건은 아직 분류되지 않아 오늘 항목이 불완전할 수 있습니다.")
-    return out
+    note = dk.muted(f"최근 게시물 {v['pending']}건은 아직 분류되지 않아 오늘 항목이 불완전할 수 있습니다.") if v["pending"] else ""
+    return dk.capsules(items, size=dk.TINY, in_title=True), note
 
 
 def sec_recent(a):
@@ -351,10 +349,11 @@ def sec_footer(a):
 # ── 조립 (구획 제목은 짧은 명사 — 가이드라인 2절. 홈 카드 CARDS: speech = (머리)·달라진 것, watch = 내일 볼 것) ──
 
 def build_body(a, n):
+    counts_aside, counts_note = sec_counts(a)
     return "\n".join([
         dk.WRAP_OPEN,
-        dk.section("발언", sec_recent(a), tab=TAB_TODAY),
-        dk.section("급상승 주제", sec_trends(a) + sec_counts(a), summary="최근 7일", tab=TAB_TODAY),   # 집계 캡슐은 급상승 주제 바로 다음 (2026-10-11 사용자)
+        dk.section("발언", counts_note + sec_recent(a), tab=TAB_TODAY, aside=counts_aside),   # 24시간 집계 캡슐은 발언 제목 오른쪽 (2026-10-11 사용자)
+        dk.section("급상승 주제", sec_trends(a), summary="최근 7일", tab=TAB_TODAY),
         dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY),
         dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow")
                    + dk.guide("주의", [("근거", "시장 반응 탭에서 보정 q가 함께 작은 값만 고릅니다 — 주제당 수십 개 조합을 검정했기 때문"),
