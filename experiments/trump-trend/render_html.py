@@ -47,15 +47,15 @@ def _dir_pill(d):
 
 # ── 구획 ────────────────────────────────────────────────────────────────
 
-def sec_lead(a, n):
-    """글 머리(제목 없음, data-lead): 24시간 집계 C 카드 + 가장 강한 발언 한 줄. 홈 카드는 이 묶음을 '(머리)'로 읽는다."""
+def sec_counts(a):
+    """지난 24시간 집계 — 캡슐 줄 (2026-10-11 사용자: 발언·급상승 주제 다음에 "게시물 : 9건" 캡슐을 연속으로). 글 머리 카드는 없앴다."""
     v = a["post_volume"]["last_24h"]
     ev = a["recent_events"]
     top = ev[0] if ev else None
-    rows = [("게시물 (지난 24시간)", f"{v['total']}건"), ("정책 관련", f"{v['policy']}건"), ("시장 관련 이벤트", f"{len(ev)}개")]
+    items = [("게시물", f"{v['total']}건"), ("정책 관련", f"{v['policy']}건"), ("시장 관련", f"{len(ev)}건")]
     if top:
-        rows.append(("가장 강한 발언", f"{_esc(_k(top['topic']))}{' / ' + _esc(_k(top['subtopic'])) if top['subtopic'] else ''} · 강도 {top['intensity']}"))
-    out = dk.cards(dk.multi(rows))
+        items.append(("가장 강한 발언", f"{_esc(_k(top['topic']))}{' / ' + _esc(_k(top['subtopic'])) if top['subtopic'] else ''} · 강도 {top['intensity']}"))
+    out = dk.capsules(items)
     if v["pending"]:
         out += dk.muted(f"최근 게시물 {v['pending']}건은 아직 분류되지 않아 오늘 항목이 불완전할 수 있습니다.")
     return out
@@ -334,9 +334,8 @@ def sec_footer(a):
 def build_body(a, n):
     return "\n".join([
         dk.WRAP_OPEN,
-        sec_lead(a, n),
         dk.section("발언", sec_recent(a), tab=TAB_TODAY),
-        dk.section("급상승 주제", sec_trends(a), summary="최근 7일", tab=TAB_TODAY),
+        dk.section("급상승 주제", sec_trends(a) + sec_counts(a), summary="최근 7일", tab=TAB_TODAY),   # 집계 캡슐은 급상승 주제 바로 다음 (2026-10-11 사용자)
         dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY),
         dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow")
                    + dk.guide("주의", [("근거", "시장 반응 탭에서 보정 q가 함께 작은 값만 고릅니다 — 주제당 수십 개 조합을 검정했기 때문"),

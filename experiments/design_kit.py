@@ -160,6 +160,16 @@ def guide_card(title, body, notes=()):
             + guide(title, body, line=False, grid=True) + (f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid #E2E8F0;">{extra}</div>' if extra else "") + "</div>")   # 글머리표는 데스크톱에서 2열 (2026-10-11 사용자)
 
 
+
+def capsules(items):
+    """캡슐 줄 (2026-10-11 사용자: "게시물 : 9건 캡슐 라인 디자인으로 연속해서") — 알약 모양 칸을 한 줄에 이어 놓고, 넘치면 다음 줄로.
+    items = [(라벨, 값HTML)]. 라벨 16px 안내 회색 · 값 16px 검정 굵게, "라벨 : 값". 흰 바탕, 테두리 #E2E8F0, 모서리 끝까지 둥글게."""
+    pill = ("display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:999px;"
+            f"font-size:{SMALL};line-height:1.4;white-space:nowrap;")
+    inner = "".join(f'<span style="{pill}"><span style="color:{NOTE};">{esc(k)} :</span> <b style="color:#111;">{v}</b></span>' for k, v in items)
+    return f'<div data-capsules="1" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px;">{inner}</div>'
+
+
 def muted(t):
     """짧은 안내 글 (빈 구획 안내 등) — ⓘ 필수."""
     return f'<div style="color:{NOTE};font-size:{TINY};margin:6px 0;">{INFO_ICON}{esc(t)}</div>'
