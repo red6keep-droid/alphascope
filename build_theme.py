@@ -205,6 +205,12 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-body .rt-dir { flex: none; padding: 4px 8px; font: inherit; font-size: 16px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
 .post-body .rt-dir[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: #111; }
 .post-body .rt-dir[data-empty] { color: #CBD5E1; }
+/* E 2열 카드는 폰에서 한 줄에 한 칸 — 칸 안 65% · 35% 규칙을 지키기 위해 (2026-10-11 사용자: 카드 줄 65/35 반드시) */
+@media (max-width: 680px) {
+  .post-body [data-pair] { flex-direction: column; }
+  .post-body [data-pair] > span + span { border-left: 0 !important; border-top: 1px solid #E2E8F0; }
+  .post-body [data-pair] > span:empty { display: none; }
+}
 /* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11) */
 .post-body ul { list-style: disc; padding-left: 0; }
 .post-body ol { list-style: decimal; padding-left: 0; }

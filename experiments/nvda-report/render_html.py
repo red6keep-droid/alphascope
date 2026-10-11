@@ -203,6 +203,8 @@ def _notice(a):
 
 
 # 카드 유형 (디자인-가이드라인.md 2절): 모든 증감 표시는 구분명 왼쪽 · 값 오른쪽, 여러 줄은 한 카드 안에서 가로 구분선으로 나눈다
+COL_L = "flex:0 0 65%;max-width:65%;min-width:0;white-space:normal;"   # 카드 왼쪽 65% (가이드라인 2-1, 2026-10-11 사용자: 꼭 지킨다)
+COL_R = "flex:1 1 0;min-width:0;text-align:right;white-space:normal;word-break:keep-all;"   # 카드 오른쪽 35%
 ROW = ("display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 6px;padding:8px 12px;"
        "background:#fff;border:1px solid #E2E8F0;border-radius:8px;white-space:nowrap;line-height:1.5;")   # A타입 (기준 카드, 본문 크기)
 ROW_SMALL = f"font-size:{SMALL};padding:6px 12px;"       # B타입 (비교 카드): 16px
@@ -219,22 +221,22 @@ def _arrow(v, digits=2, unit="%"):
         return f'<span style="color:{MUTED};">—</span>'
     col = UP if v > 0 else DOWN if v < 0 else MUTED
     tri = "▲" if v > 0 else "▼" if v < 0 else "–"
-    return f'<span style="color:{col};font-weight:700;">{tri} {abs(v):.{digits}f}{unit}</span>'
+    return f'<span style="color:{col};font-weight:700;white-space:nowrap;">{tri}&nbsp;{abs(v):.{digits}f}{unit}</span>'
 
 
 def _row(name, value_html, extra=""):
     """한 줄 카드: 이름 왼쪽, 가격 정보 오른쪽 (2026-10-11 사용자 규칙). span 으로만 짜서 홈 카드가 한 줄로 읽는다."""
     # 두 span 사이 공백: flex 컨테이너라 화면엔 안 보이고, 홈 카드가 textContent 로 읽을 때 이름과 값을 띄운다
-    return (f'<span style="{ROW}{extra}"><span style="font-weight:700;color:#111;">{_esc(name)}</span> '
-            f'<span>{value_html}</span></span> ')
+    return (f'<span style="{ROW}{extra}"><span style="{COL_L}font-weight:700;color:#111;">{_esc(name)}</span> '
+            f'<span style="{COL_R}">{value_html}</span></span> ')
 
 
 def _multi(rows):
     """C타입: (이름, 값HTML) 여러 줄을 한 카드에, 줄 사이 가로 구분선. span 으로만 짜서 홈 카드가 한 줄로 읽는다."""
     out = ""
     for i, (name, value_html) in enumerate(rows):
-        out += (f'<span style="{MULTI_ROW}{MULTI_SEP if i else ""}"><span style="font-weight:700;color:#111;">{_name(name)}</span> '
-                f'<span style="font-weight:700;">{value_html}</span></span> ')   # 줄 사이 공백: 홈 카드가 한 줄로 읽을 때 단어를 띄운다
+        out += (f'<span style="{MULTI_ROW}{MULTI_SEP if i else ""}"><span style="{COL_L}font-weight:700;color:#111;">{_name(name)}</span> '
+                f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 줄 사이 공백: 홈 카드가 한 줄로 읽을 때 단어를 띄운다
     return f'<span data-grid="2" style="{MULTI}">{out}</span> '   # data-grid=2: 데스크톱에서 테마 CSS가 2열 + 가운데 세로 구분선 (2026-10-11 사용자)
 
 
@@ -256,10 +258,10 @@ def _multi2(items):
         row = ""
         for j, (name, value_html) in enumerate(pair):
             row += (f'<span style="{cell}{"border-left:1px solid #E2E8F0;" if j else ""}">'
-                    f'<span style="font-weight:700;color:#111;">{_paren(_esc(name))}</span> <span style="font-weight:700;">{value_html}</span></span> ')
+                    f'<span style="{COL_L}font-weight:700;color:#111;">{_paren(_esc(name))}</span> <span style="{COL_R}font-weight:700;">{value_html}</span></span> ')
         if len(pair) == 1:
             row += f'<span style="{cell}border-left:1px solid #E2E8F0;"></span>'
-        out += f'<span style="display:flex;{MULTI_SEP if i else ""}">{row}</span> '
+        out += f'<span data-pair="1" style="display:flex;{MULTI_SEP if i else ""}">{row}</span> '
     return f'<span style="{MULTI}">{out}</span> '
 
 
@@ -321,7 +323,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip=""):
     lis = "".join(li(t) for t in lines)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:0 0 8px;">'
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다
-            f'<span style="font-weight:700;color:#111;">{_esc(title)}{_tip(tip)}{new_html}</span><span style="font-weight:700;color:{color};white-space:nowrap;">{_esc(state)}</span></span> '
+            f'<span style="{COL_L}font-weight:700;color:#111;">{_esc(title)}{_tip(tip)}{new_html}</span><span style="{COL_R}font-weight:700;color:{color};">{_esc(state)}</span></span> '
             f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid {bd};font-size:{SMALL};line-height:1.5;">'   # 글머리표 16px (2026-10-11 사용자)
             f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul></div></div>")
 
@@ -588,8 +590,8 @@ def _crow(name_html, value_html, sub="", first=False, left=None):
     """C 카드의 한 줄 (가이드라인 2-1): 왼쪽 구분명(굵게) + 그 아래 보조 줄(14px #999), 오른쪽 값. 줄 사이 가로 구분선."""
     sub_html = f'<span style="display:block;color:{MUTED};font-weight:400;font-size:{TINY};white-space:normal;">{_paren(sub)}</span>' if sub else ""   # 보조 줄은 14px (안내)
     return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
-            f'<span style="display:block;min-width:0;white-space:normal;{f"flex:0 0 {left};" if left else ""}"><span style="font-weight:700;color:#111;">{_paren(name_html)}</span>{sub_html}</span> '
-            f'<span style="{"flex:1;min-width:0;" if left else "flex:none;"}text-align:right;font-weight:700;">{value_html}</span></span> ')
+            f'<span style="display:block;{COL_L}"><span style="font-weight:700;color:#111;">{_paren(name_html)}</span>{sub_html}</span> '
+            f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35% 고정 — left 인자는 더 쓰지 않는다
 
 
 def _ccard(rows, left=None):
@@ -613,10 +615,10 @@ def _gcard(rows):
     for i, (date_html, label_html, name_html, sub, right_html) in enumerate(rows):
         sub_html = f'<span style="display:block;color:{MUTED};font-size:{TINY};white-space:normal;">{_paren(sub)}</span>' if sub else ""   # 보조 줄은 14px
         inner += (f'<span style="{MULTI_ROW}{"" if i == 0 else MULTI_SEP}">'
-                  f'<span style="display:block;min-width:0;white-space:normal;">'
+                  f'<span style="display:block;{COL_L}">'
                   f'<span style="display:block;"><span style="{CAL_DATE}">{date_html}</span>{" " + label_html if label_html else ""}</span> '
                   f'<span style="display:block;">{name_html}</span>{sub_html}</span> '
-                  f'<span style="flex:none;text-align:right;font-weight:700;">{right_html}</span></span> ')
+                  f'<span style="{COL_R}font-weight:700;">{right_html}</span></span> ')
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{inner}</span></div>'
 
 
@@ -737,14 +739,14 @@ def sec_targets(a):
     bar = _bar(f"애널리스트 {n}명", [(nm, rc.get(k, 0), bg, fg) for k, nm, bg, fg in RATING_PASTEL]) if n else ""
     tn = next((_new(a, "status:" + k) for k in ("pt_mean", "pt_median", "pt_high", "pt_low", "rating_counts") if _new(a, "status:" + k)), "")   # 목표가·등급 중 하나라도 바뀐 날
     # 접힌 상태: 목표가 평균 줄 + 평균 등급 줄 (화살표는 평균 등급 줄 오른쪽, 2026-10-11 사용자)
-    summary = (f'<span style="{MULTI_ROW}padding:8px 0 6px;"><span style="font-weight:700;color:#111;">목표가 평균{tn}</span> '
-               f'<span style="font-weight:700;">{_esc(rr.fmt(mean, "usd0"))} <span style="color:{MUTED};font-weight:400;">· 현재가 대비</span> {gap(mean)}</span></span>')
+    summary = (f'<span style="{MULTI_ROW}padding:8px 0 6px;"><span style="{COL_L}font-weight:700;color:#111;">목표가 평균{tn}</span> '
+               f'<span style="{COL_R}font-weight:700;">{_esc(rr.fmt(mean, "usd0"))} <span style="color:{MUTED};font-weight:400;">· 현재가 대비</span> {gap(mean)}</span></span>')
     if n:   # 등급 분포 막대는 접힌 상태에도 보인다 (2026-10-11 사용자) — 목표가 평균 줄 아래
         summary += f'<span style="display:block;padding:6px 0 2px;{MULTI_SEP}">{bar}</span>'
         # 평균 등급 (2026-10-11 사용자: 네이버 컨센서스처럼 한 숫자로) — 강매수 5 … 강매도 1 가중 평균. 애널리스트 의견의 평균이지 리포트의 판단이 아니다
         mean_r = sum(w * rc.get(k, 0) for k, w in (("strongBuy", 5), ("buy", 4), ("hold", 3), ("sell", 2), ("strongSell", 1))) / n
-        summary += (f'<span style="{MULTI_ROW}padding:6px 0 0;{MULTI_SEP}"><span style="font-weight:700;color:#111;">{_paren("평균 등급 (강매수 5 · 강매도 1)")}</span> '
-                    f'<span style="font-weight:700;display:inline-flex;align-items:center;">{mean_r:.1f}&nbsp;<span style="color:{MUTED};font-weight:400;">/ 5</span>{ACC_BTN}</span></span>')
+        summary += (f'<span style="{MULTI_ROW}padding:6px 0 0;{MULTI_SEP}"><span style="{COL_L}font-weight:700;color:#111;">{_paren("평균 등급 (강매수 5 · 강매도 1)")}</span> '
+                    f'<span style="{COL_R}font-weight:700;display:inline-flex;align-items:center;justify-content:flex-end;">{mean_r:.1f}&nbsp;<span style="color:{MUTED};font-weight:400;">/ 5</span>{ACC_BTN}</span></span>')
     else:
         summary += f'<span style="display:flex;justify-content:flex-end;padding:4px 0 0;">{ACC_BTN}</span>'
     # 펼친 상태: 목표가 중앙·최고·최저 (평균 줄과 같은 모양)
@@ -753,8 +755,8 @@ def sec_targets(a):
         v = (cells.get(key) or {}).get("value")
         if v is None:
             continue
-        rows += (f'<span style="{MULTI_ROW}padding:6px 0;{MULTI_SEP if rows else ""}"><span style="font-weight:700;color:#111;">목표가 {name}</span> '
-                 f'<span style="font-weight:700;">{_esc(rr.fmt(v, "usd0"))} <span style="color:{MUTED};font-weight:400;">· 현재가 대비</span> {gap(v)}</span></span>')
+        rows += (f'<span style="{MULTI_ROW}padding:6px 0;{MULTI_SEP if rows else ""}"><span style="{COL_L}font-weight:700;color:#111;">목표가 {name}</span> '
+                 f'<span style="{COL_R}font-weight:700;">{_esc(rr.fmt(v, "usd0"))} <span style="color:{MUTED};font-weight:400;">· 현재가 대비</span> {gap(v)}</span></span>')
     return _accordion(summary, f'<span style="display:block;">{rows}</span>', block=True)
 
 

@@ -20,6 +20,8 @@ PILL = {"area": ("#CBD5E1", "#334155"), "positive": ("#FCA5A5", "#B91C1C"), "neg
         "uncertain": ("#FDBA74", "#C2410C"), "neutral": ("#CBD5E1", "#64748B")}
 PILL_BG = {"positive": "#FEF2F2", "negative": "#EFF6FF"}
 BAR_PASTEL = {"positive": ("#F8C4BF", "#7F1D1D"), "negative": ("#BCD3F5", "#1E3A8A"), "uncertain": ("#FADDB0", "#7C2D12"), "neutral": ("#E2E8F0", "#475569")}
+COL_L = "flex:0 0 65%;max-width:65%;min-width:0;white-space:normal;"   # 카드 왼쪽 65% (가이드라인 2-1, 2026-10-11 사용자: 꼭 지킨다)
+COL_R = "flex:1 1 0;min-width:0;text-align:right;white-space:normal;word-break:keep-all;"   # 카드 오른쪽 35%
 ROW = ("display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 6px;padding:8px 12px;"
        "background:#fff;border:1px solid #E2E8F0;border-radius:8px;white-space:nowrap;line-height:1.5;")
 ROW_UP, ROW_DOWN = "background:#FFF7ED;border-color:#FED7AA;", "background:#EFF6FF;border-color:#BFDBFE;"
@@ -60,7 +62,7 @@ def arrow(v, digits=2, unit="%"):
         return f'<span style="color:{MUTED};">—</span>'
     col = UP if v > 0 else DOWN if v < 0 else MUTED
     tri = "▲" if v > 0 else "▼" if v < 0 else "–"
-    return f'<span style="color:{col};font-weight:700;">{tri} {abs(v):.{digits}f}{unit}</span>'
+    return f'<span style="color:{col};font-weight:700;white-space:nowrap;">{tri}&nbsp;{abs(v):.{digits}f}{unit}</span>'
 
 
 def dash():
@@ -162,15 +164,15 @@ def bullets(texts):
 
 def row(name, value_html, tone=""):
     """A타입 한 줄 카드: 이름 좌 · 값 우 (18px)."""
-    return f'<span style="{ROW}{tone}"><span style="font-weight:700;color:#111;">{esc(name)}</span> <span>{value_html}</span></span> '
+    return f'<span style="{ROW}{tone}"><span style="{COL_L}font-weight:700;color:#111;">{esc(name)}</span> <span style="{COL_R}">{value_html}</span></span> '
 
 
 def multi(rows):
     """C타입: (이름, 값HTML) 여러 줄을 한 카드에. data-grid=2: 데스크톱에서 2열 (테마 CSS)."""
     out = ""
     for i, (name, value_html) in enumerate(rows):
-        out += (f'<span style="{MULTI_ROW}{MULTI_SEP if i else ""}"><span style="font-weight:700;color:#111;">{paren(esc(name))}</span> '
-                f'<span style="font-weight:700;">{value_html}</span></span> ')
+        out += (f'<span style="{MULTI_ROW}{MULTI_SEP if i else ""}"><span style="{COL_L}font-weight:700;color:#111;">{paren(esc(name))}</span> '
+                f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')
     return f'<span data-grid="2" style="{MULTI}">{out}</span> '
 
 
@@ -183,10 +185,10 @@ def multi2(items):
         r = ""
         for j, (name, value_html) in enumerate(pair):
             r += (f'<span style="{cell}{"border-left:1px solid #E2E8F0;" if j else ""}">'
-                  f'<span style="font-weight:700;color:#111;">{paren(esc(name))}</span> <span style="font-weight:700;">{value_html}</span></span> ')
+                  f'<span style="{COL_L}font-weight:700;color:#111;">{paren(esc(name))}</span> <span style="{COL_R}font-weight:700;">{value_html}</span></span> ')
         if len(pair) == 1:
             r += f'<span style="{cell}border-left:1px solid #E2E8F0;"></span>'
-        out += f'<span style="display:flex;{MULTI_SEP if i else ""}">{r}</span> '
+        out += f'<span data-pair="1" style="display:flex;{MULTI_SEP if i else ""}">{r}</span> '
     return f'<span style="{MULTI}">{out}</span> '
 
 
@@ -194,8 +196,8 @@ def crow(name_html, value_html, sub="", first=False, left=None):
     """C 카드 한 줄 + 보조 줄(14px #999). name_html 은 이스케이프된 HTML."""
     sub_html = f'<span style="display:block;color:{MUTED};font-weight:400;font-size:{TINY};white-space:normal;">{paren(sub)}</span>' if sub else ""
     return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
-            f'<span style="display:block;min-width:0;white-space:normal;{f"flex:0 0 {left};" if left else ""}"><span style="font-weight:700;color:#111;">{paren(name_html)}</span>{sub_html}</span> '
-            f'<span style="{"flex:1;min-width:0;" if left else "flex:none;"}text-align:right;font-weight:700;">{value_html}</span></span> ')
+            f'<span style="display:block;{COL_L}"><span style="font-weight:700;color:#111;">{paren(name_html)}</span>{sub_html}</span> '
+            f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35% 고정 — left 인자는 무시
 
 
 def ccard(rows, left=None, attrs=""):
