@@ -148,20 +148,26 @@ def _chart_card(rows, horizon):
     span = "당일" if horizon == "close" else "5거래일 동안"
     robust = [r for r in rows if r["robust"]]
     loose = [r for r in rows if not r["robust"] and r["lo"] is not None and not (r["lo"] <= r["mean"] <= r["hi"])]
+    n = len(rows)
+    # 쉬운 말 (2026-10-11 사용자: "범위 밖 · 모두 범위 안은 어렵다, 자세히") — "보통 날" = 발언이 없던 날
     if robust:
-        state, color, (bg, bd) = f"{len(robust)}개 범위 밖", dk.WARN, dk.CARD_DIR["positive"]
-        desc = " · ".join(_asset(r["sym"]) for r in robust) + f"만 이 주제 발언 뒤 {span} 보통 날과 다르게 움직였고, 나머지는 구분되지 않았습니다"
+        state, color, (bg, bd) = f"평소와 다른 자산 {len(robust)}개", dk.WARN, dk.CARD_DIR["positive"]
+        names = " · ".join(f"{_asset(r['sym'])} {r['mean']:+.2f}%" for r in robust)
+        desc = (f"{n}개 자산 중 {names}만 발언이 없던 날에는 보기 드문 크기로 움직였습니다. "
+                f"나머지 {n - len(robust)}개는 이 주제 발언 뒤 {span}에도 평소와 비슷했습니다")
     else:
-        state, color, bg, bd = "모두 범위 안", "#64748B", "#F8FAFC", "#CBD5E1"
-        desc = f"이 주제 발언 뒤 {span} 시장이 평소와 다르게 움직였다고 볼 근거가 없습니다"
+        state, color, bg, bd = "평소와 같음", "#64748B", "#F8FAFC", "#CBD5E1"
+        desc = (f"{n}개 자산 모두 이 주제 발언 뒤 {span} 발언이 없던 날과 비슷한 정도로만 움직였습니다. "
+                f"이 발언이 시장을 따로 움직였다고 볼 근거가 없습니다")
     items = [(None, desc)]
-    items += [("남은 반응", f"{_asset(r['sym'])} {r['mean']:+.2f}% · 보통 날 범위 {r['lo']:+.2f} ~ {r['hi']:+.2f}% 밖 · 보정 q {r['q']:.2f}") for r in robust]
+    items += [("평소와 다른 움직임", f"{_asset(r['sym'])} {r['mean']:+.2f}% — 발언이 없던 날에는 보통 {r['lo']:+.2f} ~ {r['hi']:+.2f}% 사이에서 움직입니다. "
+                                   f"{n}개 자산을 한꺼번에 따져도 우연으로 보기 어려운 크기입니다 (q {r['q']:.2f})") for r in robust]
     if loose:
-        items.append(("띠 밖이지만 옅은 막대", " · ".join(f"{_asset(r['sym'])} {r['mean']:+.2f}%" for r in loose)
-                      + f" — 하나만 보면 드물지만 {len(rows)}개 자산을 함께 보면 우연으로도 나올 수 있어 근거로 삼지 않습니다"))
+        items.append(("우연일 수 있는 움직임", " · ".join(f"{_asset(r['sym'])} {r['mean']:+.2f}%" for r in loose)
+                      + f" — 이 자산 하나만 보면 평소보다 크지만, {n}개 자산을 동시에 보면 이 정도는 우연으로도 나올 수 있어 근거로 삼지 않습니다"))
     big = max((r for r in rows if not r["robust"] and r not in loose), key=lambda r: abs(r["mean"]), default=None)
     if big:
-        items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 보통 날과 구분되지 않음 (p {big['p']:.2f})"))
+        items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 그래도 발언이 없던 날에 흔히 나오는 크기입니다 (p {big['p']:.2f})"))
 
     def li(t, x):
         head = f'<b>{_esc(t)}</b>: ' if t else ""   # 라벨 글머리표는 "**라벨**: 내용" (가이드라인 3-3, 2026-10-11 사용자)
@@ -171,7 +177,7 @@ def _chart_card(rows, horizon):
     note = ""   # 주의는 읽는 법 카드 안으로 (_read_card) — 2026-10-11 사용자
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-            f'<span style="font-weight:700;color:#111;">자산 {len(rows)}개</span><span style="font-weight:700;color:{color};white-space:nowrap;">{_esc(state)}</span></span> '
+            f'<span style="font-weight:700;color:#111;">{len(rows)}개 자산의 반응</span><span style="font-weight:700;color:{color};white-space:nowrap;">{_esc(state)}</span></span> '
             f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid {bd};font-size:{dk.SMALL};line-height:1.5;">'
             f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
 
@@ -181,8 +187,8 @@ def _read_card(horizon):
     span = "당일" if horizon == "close" else "5거래일 동안"
     notes = [("주의", "5일 구간은 창이 겹쳐 실제보다 강해 보일 수 있고, 원인을 뜻하지 않습니다")] if horizon == "d5" else []
     return dk.guide_card("읽는 법", [("막대", f"발언 뒤 {span} S&P 500 대비 평균"),
-                                    ("회색 띠", "발언 없는 날에도 흔히 나오는 범위(95%)"),
-                                    ("진한 막대", "여러 자산을 함께 본 보정 뒤에도 남은 값")], notes)
+                                    ("회색 띠", "발언이 없던 날에도 100번 중 95번은 이 안에 드는 범위 — 막대가 띠 안이면 평소와 같은 움직임"),
+                                    ("진한 막대", "띠 밖으로 나갔고, 여러 자산을 함께 따져도 우연으로 보기 어려운 움직임")], notes)
 
 
 def _table_fold(inner_html):
