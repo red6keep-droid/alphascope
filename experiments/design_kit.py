@@ -11,7 +11,7 @@ import re
 UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
 NOTE = "#6B7280"          # 안내 글 회색
 BODY, SMALL, TINY, MICRO = "18px", "16px", "14px", "14px"
-H2 = "color:#111;font-size:21px;font-weight:700;line-height:1.3;margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"
+H2 = "position:relative;color:#111;font-size:21px;font-weight:700;line-height:1.3;margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"
 _NO_LINE_START = re.compile(r'^\s*(<div style="(?:overflow-x:auto;|background:)|<div data-cards|<div data-lead|<img\b|<details\b)')
 CARD = "background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px;"
@@ -31,6 +31,8 @@ MULTI_SEP = "border-top:1px solid #E2E8F0;"
 UL, LI = "margin:0 0 8px 20px;padding:0;list-style:disc;", "margin:6px 0;"
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor" stroke="none"/></svg>')
+QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자)
+                 '<circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5"/><circle cx="8" cy="11.4" r=".9" fill="currentColor" stroke="none"/></svg>')
 LINK_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
              '<path d="M9 3h4v4"/><path d="M13 3 7 9"/><path d="M11 9v4H3V5h4"/></svg>')
 NEW_PILL = ('<span style="display:inline-block;background:#B91C1C;color:#fff;border-radius:3px;padding:1px 4px 0;font-size:10px;font-weight:700;'
@@ -167,12 +169,14 @@ def tip(text):
     상자는 position:relative 인 가장 가까운 줄 기준으로 놓인다 — 아이콘은 그런 줄 안에 둔다."""
     t = esc(text).replace(chr(34), "&quot;").replace("\n", "&#10;")
     return (f'<span data-tip="{t}" tabindex="0" role="button" aria-label="{t}" '
-            f'style="color:{NOTE};cursor:help;vertical-align:middle;margin-left:2px;">{INFO_ICON.replace("margin-right:4px;", "")}</span>')
+            f'style="color:{NOTE};cursor:help;vertical-align:middle;margin-left:2px;">{QUESTION_ICON}</span>')
 
 
-def tip_line(items):
+def tip_line(items, in_title=False):
     """용어 툴팁 줄 — "용어ⓘ · 용어ⓘ". 14px 안내 회색. items = [(용어, 설명)]. 줄이 position:relative 라 상자가 줄 폭 안에 뜬다."""
     inner = ' <span style="color:#CBD5E1;">·</span> '.join(f'<span style="white-space:nowrap;">{esc(k)}{tip(v)}</span>' for k, v in items)
+    if in_title:   # 구획 제목 줄 오른쪽 (2026-10-11 사용자: "급상승 주제 타이틀 우측에") — 툴팁 상자는 position:relative 인 h2 기준
+        return f'<span style="font-size:{TINY};font-weight:400;color:{NOTE};line-height:1.6;margin-left:auto;align-self:center;">{inner}</span>'
     return f'<div style="position:relative;font-size:{TINY};color:{NOTE};line-height:1.6;margin:6px 0 2px;">{inner}</div>'
 
 
@@ -261,10 +265,17 @@ def crow(name_html, value_html, sub="", first=False, left=None):
             f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35% 고정 — left 인자는 무시
 
 
-def ccard(rows, left=None, attrs=""):
-    """C 카드 묶음: rows = [(name_html, value_html, sub_html)]."""
+EMPH_BG, EMPH_BD = "#FFF7ED", "#FED7AA"   # 강조 카드 배경·테두리 (오렌지)
+
+
+def ccard(rows, left=None, attrs="", emph=False):
+    """C 카드 묶음: rows = [(name_html, value_html, sub_html)]. emph=True 면 강조 카드 배경(오렌지, 줄 구분선도 오렌지) — 2026-10-11 사용자: 급상승 주제."""
     inner = "".join(crow(n, v, sb, first=(i == 0), left=left) for i, (n, v, sb) in enumerate(rows))
-    return f'<div data-cards="1" {attrs} style="margin:0 0 8px;"><span data-grid="2" style="{MULTI}">{inner}</span></div>'
+    box = MULTI
+    if emph:
+        inner = inner.replace(MULTI_SEP, f"border-top:1px solid {EMPH_BD};")
+        box = MULTI.replace("background:#fff;border:1px solid #E2E8F0;", f"background:{EMPH_BG};border:1px solid {EMPH_BD};--grid-line:{EMPH_BD};")
+    return f'<div data-cards="1" {attrs} style="margin:0 0 8px;"><span data-grid="2" style="{box}">{inner}</span></div>'
 
 
 def cards(html):

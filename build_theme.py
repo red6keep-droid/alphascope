@@ -185,7 +185,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
    data-grid=cards (상태 카드 묶음) → 카드 둘씩 나란히. 모바일(680px 이하)은 그대로 한 줄 */
 @media (min-width: 681px) {
   .post-body [data-grid="2"] { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .post-body [data-grid="2"] > span:nth-child(even) { border-left: 1px solid #E2E8F0; }
+  .post-body [data-grid="2"] > span:nth-child(even) { border-left: 1px solid var(--grid-line, #E2E8F0); }   /* 강조 카드는 --grid-line 으로 오렌지 */
   .post-body [data-grid="2"] > span:nth-child(2) { border-top: 0 !important; }
   .post-body [data-grid="cards"] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: stretch; }
   .post-body [data-grid="cards"] > div { margin: 0 !important; }

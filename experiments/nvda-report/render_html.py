@@ -129,6 +129,8 @@ def _section(title, html, summary="", line=None, tab=None):
 
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor" stroke="none"/></svg>')
+QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자)
+                 '<circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5"/><circle cx="8" cy="11.4" r=".9" fill="currentColor" stroke="none"/></svg>')
 NOTE = "#6B7280"   # 안내 줄 회색 (테마 gray-500)
 
 
@@ -368,7 +370,7 @@ def _tip(text):
         return ""
     t = _esc(text).replace(chr(34), "&quot;")
     return (f' <span data-tip="{t}" tabindex="0" role="button" aria-label="{t}" '
-            f'style="color:{NOTE};cursor:help;vertical-align:middle;">{INFO_ICON.replace("margin-right:4px;", "")}</span>')   # 툴팁 상자는 position:relative 인 제목 줄 기준 — 카드 폭 안에 들어간다
+            f'style="color:{NOTE};cursor:help;vertical-align:middle;">{QUESTION_ICON}</span>')   # 툴팁 상자는 position:relative 인 제목 줄 기준 — 카드 폭 안에 들어간다
 
 
 def regime_rule():
