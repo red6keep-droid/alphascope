@@ -126,6 +126,72 @@ def _p(st):
     return f'{pl["p_two_sided"]:.2f}{q_html}'
 
 
+ASSET_KO = {"SPY": "S&P 500", "QQQ": "나스닥 100", "SMH": "반도체", "XLK": "기술", "XLF": "금융", "XLE": "에너지", "XLV": "헬스케어",
+            "XLI": "산업재", "XLY": "경기소비재", "XLP": "필수소비재", "XLU": "유틸리티", "XLB": "소재", "XLRE": "부동산", "XLC": "통신",
+            "NVDA": "엔비디아", "TSLA": "테슬라", "AAPL": "애플", "MSFT": "마이크로소프트", "AMZN": "아마존", "GOOGL": "알파벳", "META": "메타",
+            "TLT": "장기 국채", "GLD": "금", "USO": "원유", "UUP": "달러"}
+HORIZON_KO = {"close": "당일", "d5": "5일"}
+
+
+def _asset(sym):
+    return f"{ASSET_KO[sym]}({sym})" if sym in ASSET_KO else sym
+
+
+def _chart_bullets(rows, horizon):
+    """그래프 설명 — 16px 검정 글머리표, 앞머리 굵은 제목 (2026-10-11 사용자: "안내글 폰트 말고 16 포인트, 블릿, 타이틀을 뽑아서")."""
+    span = "당일" if horizon == "close" else "5거래일 동안"
+    robust = [r for r in rows if r["robust"]]
+    out = []
+    if robust:
+        out.append(("결론", f"{len(rows)}개 자산 중 {len(robust)}개만 보통 날과 다른 움직임을 보였습니다"))
+        for r in robust:
+            out.append(("남은 반응", f"{_asset(r['sym'])} {r['mean']:+.2f}% · 보통 날 범위 {r['lo']:+.2f} ~ {r['hi']:+.2f}% 밖 · 보정 q {r['q']:.2f}"))
+    else:
+        out.append(("결론", f"{len(rows)}개 자산 모두 보통 날 범위 안 — 이 주제 발언 뒤 {span} 뚜렷한 반응은 없었습니다"))
+    loose = [r for r in rows if not r["robust"] and r["lo"] is not None and not (r["lo"] <= r["mean"] <= r["hi"])]
+    if loose:   # 띠 밖이지만 옅은 막대 — 한 자산만 보면 드물지만, 여러 자산·구간을 함께 보면 우연으로도 나올 수 있는 값
+        out.append(("띠 밖이지만 옅은 막대", " · ".join(f"{_asset(r['sym'])} {r['mean']:+.2f}%" for r in loose)
+                    + f" — 하나만 보면 드물지만 {len(rows)}개 자산을 함께 보면 우연으로도 나올 수 있어 근거로 삼지 않습니다"))
+    big = max((r for r in rows if not r["robust"] and r not in loose), key=lambda r: abs(r["mean"]), default=None)
+    if big:
+        out.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 보통 날과 구분되지 않음 (p {big['p']:.2f})"))
+    out.append(("읽는 법", f"막대 = 발언 뒤 {span} S&P 500 대비 평균 · 회색 띠 = 발언 없는 날에도 흔히 나오는 범위(95%) · 진한 막대 = 여러 자산을 함께 본 보정 뒤에도 남은 값"))
+    if horizon == "d5":
+        out.append(("주의", "5일 구간은 발언이 몰린 시기에 창이 겹쳐 실제보다 강해 보일 수 있습니다. 관찰된 값이며 원인을 뜻하지 않습니다"))
+    lis = "".join(f'<li style="margin:4px 0;"><b style="color:#111;">{_esc(t)}</b> · {_esc(x)}</li>' for t, x in out)
+    return f'<ul style="margin:8px 0 10px 20px;padding:0;list-style:disc;font-size:{dk.SMALL};color:#111;line-height:1.55;">{lis}</ul>'
+
+
+def _switch(panels):
+    """당일 · 5일 전환 (data-switch) — 테마 JS가 버튼으로 하나씩 보여 준다. JS가 없으면 둘 다 세로로."""
+    btns = "".join(f'<button type="button" data-switch-btn="{i}" class="rt-seg">{_esc(lbl)}</button>' for i, (lbl, _) in enumerate(panels))
+    body = "".join(f'<div data-switch-panel="{i}"><div data-switch-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:8px 0 4px;">{_esc(lbl)}</div>{html}</div>'
+                   for i, (lbl, html) in enumerate(panels))
+    return f'<div data-switch="1" style="margin:0 0 8px;"><div class="rt-segs" hidden>{btns}</div>{body}</div>'
+
+
+def _charts():
+    try:
+        with open(os.path.join(config.OUTPUT_DIR, "reaction_charts.json"), "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def _reaction_charts(blk, topic, charts):
+    import chart_reaction
+    panels = []
+    for h in ("close", "d5"):
+        rows = chart_reaction.rows_for(blk, h)
+        info = (charts.get(topic) or {}).get(h)
+        if not rows or not info:
+            continue
+        img = (f'<a href="{_esc(info["url"])}" target="_blank" rel="noopener" title="그래프 확대 보기" style="display:block;max-width:720px;">'
+               f'<img src="{_esc(info["url"])}" alt="{_esc(_k(topic))} {HORIZON_KO[h]} 반응 그래프" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/></a>')
+        panels.append((HORIZON_KO[h], img + _chart_bullets(rows, h)))
+    return _switch(panels) if panels else ""
+
+
 def sec_reactions(a):
     """과거 반응 — 자산 × 구간 통계 행렬이라 표를 쓴다 (가이드라인 7절 예외). 주제마다 소제목 + 표, 읽는 법은 ⓘ 안내 줄."""
     today_keys = []
@@ -134,6 +200,7 @@ def sec_reactions(a):
             today_keys.append(e["topic"])
     keys = today_keys or sorted(a["reactions"], key=lambda k: -a["reactions"][k]["counts"]["clean"])[:3]
     noise_p = a.get("config", {}).get("placebo_noise_p", config.PLACEBO_NOISE_P)
+    charts = _charts()
     out, waiting = [], []
     for k in keys:
         blk = a["reactions"].get(k)
@@ -152,6 +219,7 @@ def sec_reactions(a):
         if rows:
             ik = c.get("immediate_kinds", {})
             out.append(dk.sub_label(_k(k))   # 소제목은 주제 이름만 — 탭 JS가 서브탭 라벨로 쓴다
+                       + _reaction_charts(blk, k, charts)   # 당일 · 5일 그래프 + 설명 (2026-10-11)
                        + dk.muted(f"과거 관측일 {c['clean']}일 · 이벤트 {c['total']} · 거시 발표 겹침 제외 {c['confounded']} · 장외 {ik.get('gap', 0)} / 정규장 {ik.get('intraday', 0)} · 검정 {c.get('tests', 0)}개")
                        + dk.table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows))
         else:

@@ -190,6 +190,12 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   .post-body [data-grid="cards"] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: stretch; }
   .post-body [data-grid="cards"] > div { margin: 0 !important; }
 }
+/* 전환 버튼 (data-switch, 당일 · 5일 그래프): 회색 바탕 알약 둘, 선택은 흰 바탕 · 검정 굵게 (2026-10-11) */
+.post-body .rt-segs { display: inline-flex; gap: 2px; padding: 3px; margin: 4px 0 8px; background: #F1F5F9; border-radius: 8px; }
+.post-body .rt-segs[hidden] { display: none; }
+.post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 16px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
+.post-body .rt-seg[aria-pressed="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.post-body [data-switch-panel][hidden] { display: none; }
 /* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11) */
 .post-body ul { list-style: disc; padding-left: 0; }
 .post-body ol { list-style: decimal; padding-left: 0; }

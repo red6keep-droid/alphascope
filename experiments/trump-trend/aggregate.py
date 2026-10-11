@@ -263,12 +263,20 @@ def _placebo(obs, pool, seed, ratio=False):
     rng = random.Random(seed)
     n = len(vals)
     extreme = 0
+    sims = []
     for _ in range(config.PLACEBO_RESAMPLES):
         total = 0.0
         for k, cnt in kinds.items():
             total += sum(rng.choices(pool[k], k=cnt))
+        sims.append(total / n)
         if abs(total / n - center) >= dist:
             extreme += 1
+    scale = 1 if ratio else 100
+    # 반응 그래프의 회색 띠 (2026-10-11): 검정과 같은 기준 — 0(배수는 1)에서 보통 날 평균이 벗어나는 거리의 95% 분위.
+    # 막대가 띠 밖 ⇔ p < 0.05 가 되도록 0 중심 대칭으로 둔다 (분포 자체의 2.5~97.5% 로 그리면 p 와 어긋난다)
+    devs = sorted(abs(x - center) for x in sims)
+    r95 = devs[min(len(devs) - 1, int(len(devs) * 0.95))]
+    band = ((center - r95) * scale, (center + r95) * scale)
     union = [v for k in kinds for v in pool[k]]
     base_neg = sum(v < center for v in union) / len(union) * 100
     p = (extreme + 1) / (config.PLACEBO_RESAMPLES + 1)     # 0이 되지 않게 — 최소 1/(B+1)
@@ -278,6 +286,7 @@ def _placebo(obs, pool, seed, ratio=False):
         "pool_neg_pct": round(base_neg, 1),
         "pool_mean": round(statistics.fmean(union) * (1 if ratio else 100), 3),
         "indistinguishable": p >= config.PLACEBO_NOISE_P,
+        "band_lo": round(band[0], 3), "band_hi": round(band[1], 3),
     }
 
 

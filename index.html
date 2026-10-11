@@ -1183,6 +1183,12 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   .post-body [data-grid="cards"] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: stretch; }
   .post-body [data-grid="cards"] > div { margin: 0 !important; }
 }
+/* 전환 버튼 (data-switch, 당일 · 5일 그래프): 회색 바탕 알약 둘, 선택은 흰 바탕 · 검정 굵게 (2026-10-11) */
+.post-body .rt-segs { display: inline-flex; gap: 2px; padding: 3px; margin: 4px 0 8px; background: #F1F5F9; border-radius: 8px; }
+.post-body .rt-segs[hidden] { display: none; }
+.post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 16px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
+.post-body .rt-seg[aria-pressed="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.post-body [data-switch-panel][hidden] { display: none; }
 /* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11) */
 .post-body ul { list-style: disc; padding-left: 0; }
 .post-body ol { list-style: decimal; padding-left: 0; }
@@ -3060,6 +3066,26 @@ body.no-dashboard .main-content { padding-top: 32px; }
           subs.forEach(function (s, i) { var b = document.createElement('button'); b.className = 'rt-subtab'; b.type = 'button'; b.textContent = s.name; b.onclick = function () { sel2(i); }; sb.appendChild(b); s.b = b; });
           st.p.insertBefore(sb, subs[0].nodes[0]);
           sel2(0);
+        });
+      })();
+
+      /* ============================================================ 전환 버튼 (data-switch) — 당일 · 5일 그래프 (2026-10-11)
+         렌더러가 [data-switch] 안에 버튼(data-switch-btn)과 패널(data-switch-panel)을 둔다. JS가 없으면 패널이 세로로 다 보이고 버튼은 숨는다. */
+      (function () {
+        'use strict';
+        [].slice.call(document.querySelectorAll('.post-body [data-switch]')).forEach(function (box) {
+          var bar = box.querySelector('.rt-segs');
+          var btns = [].slice.call(box.querySelectorAll('[data-switch-btn]'));
+          var panels = [].slice.call(box.querySelectorAll('[data-switch-panel]'));
+          if (!bar || btns.length < 2) return;
+          bar.hidden = false;
+          [].slice.call(box.querySelectorAll('[data-switch-label]')).forEach(function (l) { l.hidden = true; });   /* 버튼이 이름을 대신한다 */
+          function sel(i) {
+            btns.forEach(function (b, j) { b.setAttribute('aria-pressed', String(i === j)); });
+            panels.forEach(function (p, j) { p.hidden = i !== j; });
+          }
+          btns.forEach(function (b, j) { b.onclick = function () { sel(j); }; });
+          sel(0);
         });
       })();
       //]]>

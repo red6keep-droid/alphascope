@@ -144,6 +144,11 @@ def main():
     elif os.path.exists(narrative_path):
         os.remove(narrative_path)   # 지난 실행의 문장이 오늘 표에 붙지 않게
     path = render_report.render()
+    try:
+        import chart_reaction
+        chart_reaction.run()   # 과거 반응 그래프 PNG (당일 · 5일) — 렌더가 reaction_charts.json 을 읽는다 (2026-10-11)
+    except Exception as e:  # noqa: BLE001
+        print(f"[chart] 실패 — 그래프 없이 렌더: {e}")
     render_html.render()
 
     _step(9, total, "Blogger 게시 (별도 글)" + ("" if args.publish else " — dry-run"))

@@ -91,13 +91,46 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.narrate }}" = "true" ]; then
             ARGS="$ARGS --narrate"
           fi
+          # 게시는 아래 별도 단계에서 — 과거 반응 그래프 PNG가 gh-pages에 먼저 올라가 있어야 글의 <img>가 깨지지 않는다 (2026-10-11)
+          python experiments/trump-trend/main.py $ARGS
+
+      - name: Prepare reaction charts for deploy
+        run: |
+          mkdir -p deploy/images
+          if compgen -G "experiments/trump-trend/output/images/*.png" > /dev/null; then
+            cp experiments/trump-trend/output/images/*.png deploy/images/
+            ls -la deploy/images/
+          else
+            echo "::warning::과거 반응 그래프가 없습니다 — 글은 그래프 없이 나간다."
+          fi
+
+      - name: Deploy reaction charts to gh-pages branch
+        if: hashFiles('deploy/images/*.png') != ''
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Purge jsDelivr cache for charts
+        if: hashFiles('experiments/trump-trend/output/image_refs.txt') != ''
+        run: |
+          while read -r REF; do
+            [ -z "$REF" ] && continue
+            curl -sS "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${REF}" > /dev/null || true
+          done < experiments/trump-trend/output/image_refs.txt
+          sleep 5
+
+      - name: Publish to Blogger
+        run: |
           if [ "$DO_PUBLISH" = "true" ]; then
             echo "게시 모드 — Blogger에 올린다."
-            ARGS="$ARGS --publish"
+            python experiments/trump-trend/publish.py --publish
           else
             echo "그림자 모드 — 게시하지 않는다. (스케줄 게시는 저장소 변수 TRUMP_PUBLISH=true 로 켠다)"
+            python experiments/trump-trend/publish.py
           fi
-          python experiments/trump-trend/main.py $ARGS
 
       # 분류 결과가 있으면 뒤 단계가 실패했어도 저장한다 — Gemini 호출을 헛되게 하지 않기 위해.
       - name: Save state + report (trump-state branch)

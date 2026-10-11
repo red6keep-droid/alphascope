@@ -2153,6 +2153,26 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     sel2(0);
   });
 })();
+
+/* ============================================================ 전환 버튼 (data-switch) — 당일 · 5일 그래프 (2026-10-11)
+   렌더러가 [data-switch] 안에 버튼(data-switch-btn)과 패널(data-switch-panel)을 둔다. JS가 없으면 패널이 세로로 다 보이고 버튼은 숨는다. */
+(function () {
+  'use strict';
+  [].slice.call(document.querySelectorAll('.post-body [data-switch]')).forEach(function (box) {
+    var bar = box.querySelector('.rt-segs');
+    var btns = [].slice.call(box.querySelectorAll('[data-switch-btn]'));
+    var panels = [].slice.call(box.querySelectorAll('[data-switch-panel]'));
+    if (!bar || btns.length < 2) return;
+    bar.hidden = false;
+    [].slice.call(box.querySelectorAll('[data-switch-label]')).forEach(function (l) { l.hidden = true; });   /* 버튼이 이름을 대신한다 */
+    function sel(i) {
+      btns.forEach(function (b, j) { b.setAttribute('aria-pressed', String(i === j)); });
+      panels.forEach(function (p, j) { p.hidden = i !== j; });
+    }
+    btns.forEach(function (b, j) { b.onclick = function () { sel(j); }; });
+    sel(0);
+  });
+})();
 </script>
 </body>
 </html>
