@@ -71,19 +71,20 @@ def dash():
     return f'<span style="color:{MUTED};">—</span>'
 
 
-def h2(t, line=True, summary="", tab=None, aside=""):
+def h2(t, line=True, summary="", tab=None, aside="", one_line=False):
     """구획 제목. tab = 이 구획이 들어갈 탭 이름 (가이드라인 11절) — 테마 JS가 h2[data-tab]을 읽어 탭을 만든다."""
     sm = (f' <span data-summary="1" style="font-size:{TINY};font-weight:400;color:{NOTE};line-height:1.5;white-space:normal;flex:1 1 220px;">{INFO_ICON}{summary}</span>'
           if summary else "")
     tb = f' data-tab="{esc(tab)}"' if tab else ""
-    return f'<h2{tb} style="{H2}{H2_LINE if line else ""}">{esc(t)}{sm}{aside}</h2>'   # aside = 제목 줄 오른쪽 요소 (캡슐 줄 등)
+    st = H2.replace("flex-wrap:wrap;", "flex-wrap:nowrap;") if one_line else H2   # one_line: 제목과 aside 를 폰에서도 한 줄로 (2026-10-11 사용자)
+    return f'<h2{tb} style="{st}{H2_LINE if line else ""}">{esc(t)}{sm}{aside}</h2>'   # aside = 제목 줄 오른쪽 요소 (캡슐 줄 등)
 
 
-def section(title, html, summary="", line=None, tab=None, aside=""):
+def section(title, html, summary="", line=None, tab=None, aside="", one_line=False):
     """제목(+옆 요약) + 내용. 바로 아래가 카드·표·그림이면 구분선을 긋지 않는다 (가이드라인 2절)."""
     if line is None:
         line = not _NO_LINE_START.match(html or "")
-    return h2(title, line=line, summary=summary, tab=tab, aside=aside) + (html or "")
+    return h2(title, line=line, summary=summary, tab=tab, aside=aside, one_line=one_line) + (html or "")
 
 
 def ko(text, table):
@@ -146,7 +147,7 @@ def guide(title, body, line=True, grid=False):
     top = "margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;" if line else "margin:4px 0 0;"
     head = f'{INFO_ICON}<b style="color:#4B5563;">{esc(title)}</b>'
     if isinstance(body, str) and len(body) <= GUIDE_SHORT:
-        return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}: {esc(body)}</div>'
+        return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head} : {esc(body)}</div>'
     items = [body] if isinstance(body, str) else body
     lis = "".join(dot_li(tint(esc(it[0]) + ' = ' + esc(it[1])) if isinstance(it, tuple) else tint(esc(it)), size=2, color=NOTE, top=9, margin="2px 0") for it in items)   # 14px 안내 → 2px 점
     return (f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}'
@@ -176,8 +177,42 @@ def tip_line(items, in_title=False):
     """용어 툴팁 줄 — "용어ⓘ · 용어ⓘ". 14px 안내 회색. items = [(용어, 설명)]. 줄이 position:relative 라 상자가 줄 폭 안에 뜬다."""
     inner = ' <span style="color:#CBD5E1;">·</span> '.join(f'<span style="white-space:nowrap;">{esc(k)}{tip(v)}</span>' for k, v in items)
     if in_title:   # 구획 제목 줄 오른쪽 (2026-10-11 사용자: "급상승 주제 타이틀 우측에") — 툴팁 상자는 position:relative 인 h2 기준
-        return f'<span style="font-size:{TINY};font-weight:400;color:{NOTE};line-height:1.6;margin-left:auto;align-self:center;">{inner}</span>'
+        return f'<span style="font-size:{TINY};font-weight:400;color:{NOTE};line-height:1.6;margin-left:auto;align-self:center;white-space:nowrap;flex:none;">{inner}</span>'
     return f'<div style="position:relative;font-size:{TINY};color:{NOTE};line-height:1.6;margin:6px 0 2px;">{inner}</div>'
+
+
+
+_COLON = re.compile(r"[ \t]*:[ \t]*")
+_TAG = re.compile(r"(<[^>]+>)")
+_TIP_ATTR = re.compile(r'((?:data-tip|title|aria-label)=")([^"]*)(")')
+
+
+def _space_colons(t):
+    def fix(m):
+        s, e = m.start(), m.end()
+        before, after = t[s - 1:s], t[e:e + 1]
+        if (before.isdigit() and after.isdigit()) or t[e:e + 2] == "//" or t[s:e].startswith("://"):
+            return m.group(0)   # 시각 09:30 · 비율 35:2 · 주소 https:// 는 그대로
+        return " : "
+    return _COLON.sub(fix, t)
+
+
+def fix_colons(html):
+    """보이는 글의 ":" 는 앞뒤를 한 칸씩 띄운다 — "라벨 : 값" (2026-10-11 사용자: 꼭 반드시, 모든 페이지 일괄).
+    글자 노드와 툴팁·제목 속성(data-tip · title · aria-label)만 고친다. style · script 안, 시각·비율(숫자:숫자), 주소(://)는 건드리지 않는다.
+    각 리포트의 build_body 마지막에 한 번 건다 — LLM 서술도 같이 고쳐진다."""
+    out, skip = [], False
+    for part in _TAG.split(html):
+        if part.startswith("<") and part.endswith(">"):
+            low = part[:8].lower()
+            if low.startswith(("<script", "<style")):
+                skip = True
+            elif low.startswith(("</script", "</style")):
+                skip = False
+            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _space_colons(m.group(2)) + m.group(3), part))
+        else:
+            out.append(part if skip else _space_colons(part))
+    return "".join(out)
 
 
 def capsules(items, size=None, in_title=False):
@@ -185,7 +220,7 @@ def capsules(items, size=None, in_title=False):
     items = [(라벨, 값HTML)]. 라벨 16px 안내 회색 · 값 16px 검정 굵게, "라벨 : 값". 흰 바탕, 테두리 #E2E8F0, 모서리 끝까지 둥글게."""
     pill = ("display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:999px;"
             f"font-size:{size or SMALL};font-weight:400;line-height:1.4;white-space:nowrap;")
-    inner = "".join(f'<span style="{pill}"><span style="color:{NOTE};">{esc(k)} :</span> <b style="color:#111;">{v}</b></span>' for k, v in items)
+    inner = "".join(f'<span style="{pill}"><span style="color:{NOTE};">{esc(k)} : </span><b style="color:#111;">{v}</b></span>' for k, v in items)
     if in_title:   # 구획 제목 줄 오른쪽 (2026-10-11 사용자: "14 폰트로, 발언 타이틀 우측에") — 좁으면 제목 아래로 내려간다
         return f'<span data-capsules="1" style="display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;align-self:center;">{inner}</span>'
     return f'<div data-capsules="1" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px;">{inner}</div>'

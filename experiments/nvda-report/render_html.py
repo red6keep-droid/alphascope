@@ -17,6 +17,8 @@ import sys
 import config
 import render_report as rr
 import report_title
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import design_kit as _dk  # noqa: E402  — 공통 마무리 처리 (fix_colons)
 
 # 구획 제목 (디자인-가이드라인.md 2절): 아래 여백 14px. 구분선은 바로 아래가 글(목록·문장)일 때만 — 카드·표·그림이 오면 그 테두리가 경계라 선을 긋지 않는다
 H2 = "color:#111;font-size:21px;font-weight:700;line-height:1.3;margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"   # 옆 요약이 폰에서는 제목 아래 줄로 내려온다
@@ -182,7 +184,7 @@ def _guide(title, body, line=True):
     top = "margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;" if line else "margin:4px 0 0;"
     head = f'{INFO_ICON}<b style="color:#4B5563;">{_esc(title)}</b>'
     if isinstance(body, str) and len(body) <= 70:
-        return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}: {_esc(body)}</div>'
+        return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head} : {_esc(body)}</div>'
     items = [body] if isinstance(body, str) else body
     lis = "".join(_dot_li(_tint(_esc(it[0]) + ' = ' + _esc(it[1])) if isinstance(it, tuple) else _tint(_esc(it)), size=2, color=NOTE, top=9, margin="2px 0") for it in items)   # 14px 안내 → 2px 점
     return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}<ul style="margin:2px 0 0 2px;padding:0;list-style:none;">{lis}</ul></div>'
@@ -852,7 +854,7 @@ def sec_footer(a):
 # ── 조립 ─────────────────────────────────────────────────────────────────
 
 def build_body(a, n):
-    return "\n".join([
+    return _dk.fix_colons("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지)
         # data-design="2": 테마의 옛 글 보정 규칙(div 14px → 17px !important)에서 이 글을 제외한다 (2026-10-11 — 안내 글이 17px로 커지던 원인)
         '<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:18px;line-height:1.53;color:#333;">',   # 행간 1.7 → 1.53 (10% 줄임, 2026-10-11 사용자)
         _notice(a),
@@ -868,7 +870,7 @@ def build_body(a, n):
 
         sec_footer(a),
         "</div>",
-    ])
+    ]))
 
 
 def render(analysis_path=None, narrative_path=None, output_dir=None):

@@ -83,7 +83,7 @@ def sec_trends(a):
         rows.append((name, f"{t['score']:.0f}점", _esc(f"7일 이벤트 {t['events_7d']} (직전 {t['events_prev_7d']}) · 평균 강도 {t['avg_intensity']:.1f}")))
     if not rows:
         return dk.muted("최근 7일 이벤트가 없어 점수를 내지 않습니다.")
-    out = dk.ccard(rows, left="65%", emph=True)   # 강조 카드 배경 (2026-10-11 사용자). 용어 툴팁은 제목 오른쪽 — build_body
+    out = dk.ccard(rows, left="65%", emph=True) + dk.guide("기준", "최근 7일")   # 강조 카드 배경 · 기간 안내는 카드 아래 (2026-10-11 사용자). 용어 툴팁은 제목 오른쪽 — build_body
     ne = a["new_entrants"]
     if ne["target"] or ne["symbol"]:
         out += dk.guide("처음 등장", "직전 90일 없이 7일 안에 처음 나온 대상 — " + ", ".join(ne["target"] + ne["symbol"]))
@@ -350,11 +350,11 @@ def sec_footer(a):
 
 def build_body(a, n):
     counts_aside, counts_note = sec_counts(a)
-    return "\n".join([
+    return dk.fix_colons("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지)
         dk.WRAP_OPEN,
         dk.section("발언", counts_note + sec_recent(a), tab=TAB_TODAY, aside=counts_aside),   # 24시간 집계 캡슐은 발언 제목 오른쪽 (2026-10-11 사용자)
-        dk.section("급상승 주제", sec_trends(a), summary="최근 7일", tab=TAB_TODAY,
-                   aside=dk.tip_line(_trend_tips(), in_title=True) if a["trend_scores"] else ""),   # ? 툴팁은 제목 오른쪽 (2026-10-11 사용자)
+        dk.section("급상승 주제", sec_trends(a), tab=TAB_TODAY, one_line=True,
+                   aside=dk.tip_line(_trend_tips(), in_title=True) if a["trend_scores"] else ""),   # ? 툴팁은 제목 오른쪽, 폰에서도 한 줄 · "최근 7일"은 카드 아래 (2026-10-11 사용자)
         dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY),
         dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow")
                    + dk.guide("주의", [("근거", "시장 반응 탭에서 보정 q가 함께 작은 값만 고릅니다 — 주제당 수십 개 조합을 검정했기 때문"),
@@ -364,7 +364,7 @@ def build_body(a, n):
         dk.section("관찰 종목", sec_why(a), tab=TAB_REACT),
         sec_footer(a),
         dk.WRAP_CLOSE,
-    ])
+    ]))
 
 
 def render(analysis_path=None, narrative_path=None, output_dir=None):

@@ -473,7 +473,7 @@ def build_body(input_data, report, cover_url=None, analysis=None):
         sec_footer(input_data),
         dk.WRAP_CLOSE,
     ]
-    return "\n".join(p for p in parts if p)
+    return dk.fix_colons("\n".join(p for p in parts if p))   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지)
 
 
 def build_tables(input_data, report, cover_url=None, analysis=None):
