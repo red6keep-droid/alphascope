@@ -1,5 +1,8 @@
 # 트럼프 SNS 트렌드 리포트 (experiments/trump-trend)
 
+- **디자인 가이드라인 적용 (2026-10-11, 사용자).** `render_html.py`를 `experiments/design_kit.py` 위에 다시 썼다. 머리(24시간 집계 C 카드, `data-lead`) → 발언 → 급상승 주제(N = 90일 내 처음) → 달라진 것 → 30일 흐름 → 과거 반응(통계 행렬이라 표 유지, 16px) → 관찰 종목 → 내일 볼 것. `publish.py`는 같은 제목이면 본문 갱신(엔비디아와 같은 규칙).
+
+
 Trump의 Truth Social 게시물을 매일 수집해 분류하고, **이벤트 단위**로 묶어 트렌드와 시장의 **초과 반응**을 계산하는
 그림자 모드 파이프라인이다. 어디에도 게시하지 않는다. 산출물은 `output/trump_report.md` 하나다.
 

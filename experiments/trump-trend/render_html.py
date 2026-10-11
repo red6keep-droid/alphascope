@@ -1,7 +1,6 @@
 """trump_analysis.json (+ narrative.json) → Blogger 본문 HTML (기획서 10절, 별도 글).
 
-기존 데일리 리포트(experiments/daily-report/render_html.py)와 같은 시각 규칙을 쓴다 —
-18px 본문, 회색 밑줄 H2, 상승 빨강·하락 파랑, 좁은 화면에서 표만 가로 스크롤.
+시각 규칙은 디자인-가이드라인.md 와 experiments/design_kit.py (2026-10-11): 18px 본문, 21px 구획 제목, C 카드, ⓘ 안내 글 14px, 라벨 알약, 표는 통계 행렬(과거 반응)에만.
 숫자는 여기서 파이썬이 그리고, 문장은 narrative.json에서만 가져온다.
 
 출력:
@@ -17,125 +16,103 @@ import sys
 import config
 import report_title
 
-H2 = "color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;"
-UP, DOWN, MUTED = "#d93025", "#1a73e8", "#999"
+# 시각 규칙은 디자인-가이드라인.md — 공통 조각 experiments/design_kit.py (2026-10-11 사용자: 데일리·트럼프도 새 디자인 규칙으로)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import design_kit as dk  # noqa: E402
+
+UP, DOWN, MUTED = dk.UP, dk.DOWN, dk.MUTED
 DIR_KO = {"positive": "긍정", "negative": "부정", "neutral": "중립"}
 SESSION_KO = {"regular": "정규장", "pre": "장전", "after": "장후", "closed": "휴장"}
-DIR_COLOR = {"positive": UP, "negative": DOWN, "neutral": MUTED}
 
 PREVIEW = """<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>__TITLE__</title></head>
 <body style="max-width:900px;margin:0 auto;padding:16px;background:#fff;"><h1 style="font-size:26px;">__TITLE__</h1>__BODY__</body></html>"""
 
-
-def _esc(t):
-    return html_mod.escape(str(t), quote=False)
+_esc = dk.esc
 
 
-def _pct(v, digits=2):
-    if v is None:
-        return f'<span style="color:{MUTED};">—</span>'
-    color = UP if v >= 0 else DOWN
-    return f'<span style="color:{color};font-weight:bold;">{v:+.{digits}f}%</span>'
+def _pct(v, digits=2, unit="%"):
+    return dk.arrow(v, digits, unit)
 
 
-def _table(headers, rows, widths=None):
-    th = "".join(f'<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:left;white-space:nowrap;">{_esc(h)}</th>' for h in headers)
-    body = "".join("<tr>" + "".join(f'<td style="border:1px solid #ddd;padding:6px 8px;">{c}</td>' for c in r) + "</tr>" for r in rows)
-    return (f'<div style="overflow-x:auto;"><table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:17px;">'
-            f"<tr>{th}</tr>{body}</table></div>")
+def _dir_pill(d):
+    return dk.pill(DIR_KO.get(d, d), d if d in ("positive", "negative") else "neutral")
 
 
-def _h2(t):
-    return f'<h2 style="{H2}">{_esc(t)}</h2>'
-
-
-def _muted(t):
-    return f'<div style="color:{MUTED};font-size:16px;margin:6px 0;">{_esc(t)}</div>'
-
-
-def _bullets(items):
-    return "<ul style='margin:8px 0 8px 20px;'>" + "".join(f"<li style='margin:4px 0;'>{_esc(s)}</li>" for s in items) + "</ul>"
-
-
-def _direction(d):
-    return f'<span style="color:{DIR_COLOR.get(d, MUTED)};font-weight:bold;">{DIR_KO.get(d, d)}</span>'
-
-
-# ── 섹션 ────────────────────────────────────────────────────────────────
+# ── 구획 ────────────────────────────────────────────────────────────────
 
 def sec_lead(a, n):
+    """글 머리(제목 없음, data-lead): 24시간 집계 C 카드 + 가장 강한 발언 한 줄. 홈 카드는 이 묶음을 '(머리)'로 읽는다."""
     v = a["post_volume"]["last_24h"]
     ev = a["recent_events"]
     top = ev[0] if ev else None
-    line = (f"지난 24시간 게시물 <b>{v['total']}</b>건 중 정책 관련 <b>{v['policy']}</b>건, 이벤트 <b>{len(ev)}</b>개."
-            + (f" 가장 강한 발언은 <b>{_esc(top['topic'])}{' / ' + _esc(top['subtopic']) if top['subtopic'] else ''}</b> (강도 {top['intensity']})." if top else ""))
-    out = f'<div style="font-size:20px;font-weight:bold;color:#111;">{line}</div>'
+    rows = [("게시물 (지난 24시간)", f"{v['total']}건"), ("정책 관련", f"{v['policy']}건"), ("시장 관련 이벤트", f"{len(ev)}개")]
+    if top:
+        rows.append(("가장 강한 발언", f"{_esc(top['topic'])}{' / ' + _esc(top['subtopic']) if top['subtopic'] else ''} · 강도 {top['intensity']}"))
+    out = dk.cards(dk.multi(rows))
     if v["pending"]:
-        out += _muted(f"⚠️ 최근 게시물 {v['pending']}건은 아직 분류되지 않아 오늘 항목이 불완전할 수 있습니다.")
+        out += dk.muted(f"최근 게시물 {v['pending']}건은 아직 분류되지 않아 오늘 항목이 불완전할 수 있습니다.")
     return out
 
 
 def sec_recent(a):
+    """발언 — C 카드: 주제/하위주제 + 방향·세션 라벨, 보조 줄에 시각·대상·연타, 값은 강도."""
     rows = []
     for e in a["recent_events"]:
-        rows.append([
-            _esc(report_title.kst_hm(e["first_post_at"])),
-            f"<b>{_esc(e['topic'])}</b>" + (f" / {_esc(e['subtopic'])}" if e["subtopic"] else ""),
-            _esc(e["target"]), _direction(e["direction"]), e["intensity"],
-            e["post_count"] if e["post_count"] > 1 else "",
-            _esc(SESSION_KO.get(e["session"], e["session"])),
-            (f'<span style="color:{MUTED};">⚠️ 거시 발표 겹침</span>' if e["confounded_daily"] else ""),
-        ])
+        name = f"<b>{_esc(e['topic'])}</b>" + (f" / {_esc(e['subtopic'])}" if e["subtopic"] else "") + " " + _dir_pill(e["direction"]) + " " + dk.pill(SESSION_KO.get(e["session"], e["session"]))
+        sub = [report_title.kst_hm(e["first_post_at"]), f"대상 {e['target']}" if e.get("target") else ""]
+        if e["post_count"] > 1:
+            sub.append(f"연타 {e['post_count']}")
+        if e["confounded_daily"]:
+            sub.append("거시 발표 겹침")
+        rows.append((name, f"강도 {e['intensity']}", _esc(" · ".join(x for x in sub if x))))
     if not rows:
-        return _muted("최근 24시간에 시장 관련 발언 이벤트가 없습니다.")
-    return _table(["시각(KST)", "주제", "대상", "방향", "강도", "연타", "세션", ""], rows)
+        return dk.muted("최근 24시간에 시장 관련 발언 이벤트가 없습니다.")
+    return dk.ccard(rows, left="65%")
 
 
 def sec_trends(a):
+    """급상승 주제 (7일) — C 카드: 주제(+N: 90일 내 처음), 값 점수, 보조 줄 7일 이벤트·평균 강도."""
     rows = []
     for i, t in enumerate(a["trend_scores"][:8], 1):
-        new = ' <span style="font-size:14px;color:#e8710a;">NEW</span>' if t["is_new_90d"] else ""
-        rows.append([i, f"<b>{_esc(t['key'])}</b>{new}", f"<b>{t['score']:.0f}</b>",
-                     f"{t['events_7d']} <span style='color:{MUTED};'>(직전 {t['events_prev_7d']})</span>",
-                     f"{t['avg_intensity']:.1f}"])
+        name = f"{i}. {_esc(t['key'])}" + (dk.NEW_PILL if t["is_new_90d"] else "")
+        rows.append((name, f"{t['score']:.0f}점", _esc(f"7일 이벤트 {t['events_7d']} (직전 {t['events_prev_7d']}) · 평균 강도 {t['avg_intensity']:.1f}")))
     if not rows:
-        return _muted("최근 7일 이벤트가 없어 점수를 내지 않습니다.")
-    out = _table(["#", "주제", "점수", "7일 이벤트", "평균 강도"], rows)
+        return dk.muted("최근 7일 이벤트가 없어 점수를 내지 않습니다.")
+    out = dk.ccard(rows, left="65%")
     ne = a["new_entrants"]
     if ne["target"] or ne["symbol"]:
-        out += _muted("7일 내 처음 등장 (직전 90일 없음): "
-                      + ", ".join(ne["target"] + ne["symbol"]))
+        out += dk.note("7일 내 처음 등장 (직전 90일 없음): " + ", ".join(ne["target"] + ne["symbol"]))
     return out
 
 
 def sec_windows(a):
+    """30일 흐름 — C 카드: 주제, 값 이벤트 수, 보조 줄 평균 강도·부정 비율·직전 30일 대비."""
     blk = a["windows"].get("30D") or {}
     rows = []
     for r in [x for x in blk.get("dims", {}).get("topic", []) if x["events"] > 0][:8]:
-        delta = f'<span style="color:{MUTED};">—</span>' if r["delta_events"] is None else _pct(r["delta_events"], 0).replace("%", "")
-        rows.append([f"<b>{_esc(r['key'])}</b>", r["events"], f"{r['avg_intensity']:.1f}" if r["avg_intensity"] else "—",
-                     f"{int((r['neg_ratio'] or 0) * 100)}%", delta])
+        delta = "직전 30일 대비 —" if r["delta_events"] is None else f"직전 30일 대비 {r['delta_events']:+.0f}%"
+        rows.append((_esc(r["key"]), f"{r['events']}건",
+                     _esc(f"평균 강도 {r['avg_intensity']:.1f} · 부정 비율 {int((r['neg_ratio'] or 0) * 100)}% · {delta}" if r["avg_intensity"] else delta)))
     if not rows:
-        return _muted("30일 데이터가 아직 없습니다.")
-    note = "" if blk.get("compare_to_previous") else " · 직전 30일 데이터가 없어 변화량은 표시하지 않습니다"
-    return _table(["주제", "이벤트", "평균 강도", "부정 비율", "Δ이벤트(직전 30일 대비)"], rows) + _muted("최근 30일 기준" + note)
+        return dk.muted("30일 데이터가 아직 없습니다.")
+    note = "최근 30일 기준" + ("" if blk.get("compare_to_previous") else " · 직전 30일 데이터가 없어 변화량은 표시하지 않습니다")
+    return dk.ccard(rows, left="55%") + dk.note(note)
 
 
 def _x(v):
     if v is None:
-        return f'<span style="color:{MUTED};">—</span>'
-    weight = "bold" if v >= 1.5 else "normal"
-    return f'<span style="font-weight:{weight};">{v:.2f}×</span>'
+        return dk.dash()
+    return f'<span style="font-weight:{"700" if v >= 1.5 else "400"};">{v:.2f}×</span>'
 
 
 def _p(st):
-    """p (보정 전) + q (주제 안 다중 검정 BH 보정). 회색 = 보통 날과 구분 안 됨, 굵게 = 보정 뒤에도 유의, 보통 = p만 작음."""
+    """p (보정 전) + q (주제 안 다중 검정 BH 보정). 회색 = 보통 날과 구분 안 됨, 굵게 = 보정 뒤에도 유의."""
     pl = (st or {}).get("placebo")
     if not pl:
-        return f'<span style="color:{MUTED};">—</span>'
+        return dk.dash()
     q = pl.get("q_bh")
-    q_html = f'<span style="color:{MUTED};font-size:14px;"> q{q:.2f}</span>' if q is not None else ""
+    q_html = f'<span style="color:{MUTED};font-size:{dk.TINY};"> q{q:.2f}</span>' if q is not None else ""
     if pl["indistinguishable"]:
         return f'<span style="color:{MUTED};">{pl["p_two_sided"]:.2f}</span>{q_html}'
     if pl.get("robust"):
@@ -144,15 +121,14 @@ def _p(st):
 
 
 def sec_reactions(a):
+    """과거 반응 — 자산 × 구간 통계 행렬이라 표를 쓴다 (가이드라인 7절 예외). 주제마다 소제목 + 표, 읽는 법은 ⓘ 안내 줄."""
     today_keys = []
     for e in a["recent_events"]:
-        for k in (e["topic"],):
-            if k not in today_keys:
-                today_keys.append(k)
+        if e["topic"] not in today_keys:
+            today_keys.append(e["topic"])
     keys = today_keys or sorted(a["reactions"], key=lambda k: -a["reactions"][k]["counts"]["clean"])[:3]
     noise_p = a.get("config", {}).get("placebo_noise_p", config.PLACEBO_NOISE_P)
-    out = []
-    waiting = []
+    out, waiting = [], []
     for k in keys:
         blk = a["reactions"].get(k)
         if not blk:
@@ -169,71 +145,68 @@ def sec_reactions(a):
                          _pct(g("d5")), f"{st['neg_pct']:.0f}%", _x(g("rel_range")), _x(g("rel_volume")), _p(st)])
         if rows:
             ik = c.get("immediate_kinds", {})
-            out.append(f'<div style="margin-top:14px;font-weight:bold;">{_esc(k)} — 과거 clean 관측일 {c["clean"]}일'
-                       f'<span style="color:{MUTED};font-weight:normal;"> (이벤트 {c["total"]} · 거시 발표 겹침 제외 {c["confounded"]}'
-                       f' · 장외 {ik.get("gap", 0)} / 정규장 {ik.get("intraday", 0)} · 검정 {c.get("tests", 0)}개)</span></div>'
-                       + _table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows))
+            out.append(dk.sub_label(f"{k} — 과거 관측일 {c['clean']}일 (이벤트 {c['total']} · 거시 발표 겹침 제외 {c['confounded']} · 장외 {ik.get('gap', 0)} / 정규장 {ik.get('intraday', 0)} · 검정 {c.get('tests', 0)}개)")
+                       + dk.table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows))
         else:
             waiting.append(f"{k} ({c['clean']}/{config.MIN_CLEAN_N})")
     if waiting:
-        out.append(_muted("표본 축적 중 (clean 관측일 / 필요 20): " + ", ".join(waiting)))
+        out.append(dk.muted("표본 축적 중 (관측일 / 필요 20): " + ", ".join(waiting)))
     if not out:
-        return _muted("오늘 이벤트 주제에 해당하는 과거 반응 데이터가 아직 없습니다.")
-    out.append(_muted(
+        return dk.muted("오늘 이벤트 주제에 해당하는 과거 반응 데이터가 아직 없습니다.")
+    out.append(dk.note(
         f"수치는 {config.BENCHMARK} 대비 초과 반응(%)이며, {config.BENCHMARK}만 원수익률입니다. "
         f"즉각 = 장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가. 변동폭·거래량은 직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수(1.00× = 보통). "
-        f"p = 같은 자산의 발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않습니다. "
-        f"q = 한 주제에서 자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값(Benjamini–Hochberg)입니다. "
-        f"검정이 많으면 p < 0.05가 우연으로도 몇 개 나오므로, q도 {noise_p:.2f} 미만(굵게)인 값만 보정 뒤에 남는 것으로 봅니다. "
-        f"+5일 구간은 발언이 몰린 시기에 창이 겹쳐 독립 표본이 아닙니다. "
-        f"발언 이후 관찰된 값이고 인과를 의미하지 않습니다."))
+        f"p = 발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않습니다. "
+        f"q = 한 주제에서 자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값(Benjamini–Hochberg) — {noise_p:.2f} 미만(굵게)인 값만 보정 뒤에 남는 것으로 봅니다. "
+        f"+5일 구간은 창이 겹쳐 독립 표본이 아닙니다. 발언 이후 관찰된 값이고 인과를 의미하지 않습니다."))
     return "".join(out)
 
 
 def sec_why(a):
+    """관찰 종목 — C 카드: 주제, 값 ETF, 보조 줄 경로·관찰 종목."""
     rows, seen = [], set()
     for e in a["recent_events"]:
         if not e["rule_id"] or e["rule_id"] in seen:
             continue
         seen.add(e["rule_id"])
-        rows.append([f"<b>{_esc(e['topic'])}</b>" + (f" / {_esc(e['subtopic'])}" if e["subtopic"] else ""),
-                     _esc(e["path_text"] or "—"), _esc(e["etf"] or "—"), _esc(", ".join(e["affected"][:10]) or "—")])
+        name = f"<b>{_esc(e['topic'])}</b>" + (f" / {_esc(e['subtopic'])}" if e["subtopic"] else "")
+        rows.append((name, _esc(e["etf"] or "—"), _esc(f"경로 {e['path_text'] or '—'} · 관찰 {', '.join(e['affected'][:10]) or '—'}")))
     if not rows:
-        return _muted("오늘 이벤트에 연결된 매핑 규칙이 없습니다.")
-    return _table(["오늘 주제", "경로", "ETF", "관찰 종목"], rows) + _muted("정적 매핑 규칙(섹터 → ETF → 상위 10종목 + 본문 언급 기업)입니다. AI 판단이 아닙니다.")
+        return dk.muted("오늘 이벤트에 연결된 매핑 규칙이 없습니다.")
+    return dk.ccard(rows, left="65%") + dk.note("정적 매핑 규칙(섹터 → ETF → 상위 10종목 + 본문 언급 기업)입니다. AI 판단이 아닙니다.")
 
 
 def sec_narrative(n, key):
     if not n or not n.get(key):
-        return _muted("서술 없음.")
-    return _bullets(n[key])
+        return dk.muted("서술 없음.")
+    return dk.bullets(n[key])
 
 
 def sec_footer(a):
     s = a["data_status"]
-    return (f'<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:15px;color:{MUTED};line-height:1.6;">'
-            f"데이터: Truth Social 게시물 공개 아카이브(CNN) · 가격 Yahoo Finance · 거시 일정 FRED. "
-            f"분류 Gemini, 집계·통계 파이썬. 이벤트 누적 {s['events_total']:,}개 · 가격 기준일 {_esc(s['bars_last_day'] or '—')}.<br>"
-            f"이 글의 시장 반응 수치는 과거 발언 이후 <b>관찰된 값</b>이며 인과 관계나 향후 방향을 의미하지 않습니다. 투자 권고가 아닙니다.</div>")
+    return dk.footer(
+        f"데이터: Truth Social 게시물 공개 아카이브(CNN) · 가격 Yahoo Finance · 거시 일정 FRED. 분류 Gemini, 집계·통계 파이썬. "
+        f"이벤트 누적 {s['events_total']:,}개 · 가격 기준일 {_esc(dk.day(s['bars_last_day']) or '—')}.",
+        "이 글의 시장 반응 수치는 과거 발언 이후 관찰된 값이며 인과 관계나 향후 방향을 의미하지 않습니다. 투자 권고가 아닙니다.")
 
 
-# ── 조립 ─────────────────────────────────────────────────────────────────
+# ── 조립 (구획 제목은 짧은 명사 — 가이드라인 2절. 홈 카드 CARDS: speech = (머리)·달라진 것, watch = 내일 볼 것) ──
 
 def build_body(a, n):
     return "\n".join([
-        '<div style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:18px;line-height:1.7;color:#333;">',
-        _h2("오늘 한 줄"), sec_lead(a, n),
-        _h2("오늘의 발언"), sec_recent(a),
-        _h2("급상승 주제 (7일)"), sec_trends(a),
-        _h2("무엇이 달라졌나"), sec_narrative(n, "what_changed"),
-        _h2("30일 흐름"), sec_windows(a),
-        _h2("같은 주제의 과거 시장 반응"), sec_reactions(a),
-        _h2("왜 이 종목인가"), sec_why(a),
-        _h2("내일 볼 것"), sec_narrative(n, "watch_tomorrow"),
-        _muted("관찰 대상은 위 과거 반응 표에서 고른 값입니다. 주제당 수십 개 조합을 검정했으므로 보정 q가 함께 작은 값만 근거로 삼으며, "
-               "+3일·+5일은 창이 겹친 관측입니다. 인과나 방향 예측이 아닙니다."),
+        dk.WRAP_OPEN,
+        sec_lead(a, n),
+        dk.section("발언", sec_recent(a)),
+        dk.section("급상승 주제", sec_trends(a), summary="최근 7일"),
+        dk.section("달라진 것", sec_narrative(n, "what_changed")),
+        dk.section("30일 흐름", sec_windows(a)),
+        dk.section("과거 반응", sec_reactions(a), summary="오늘 주제의 과거 발언 뒤 시장 반응"),
+        dk.section("관찰 종목", sec_why(a)),
+        dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow")
+                   + dk.note("관찰 대상은 위 과거 반응에서 고른 값입니다. 주제당 수십 개 조합을 검정했으므로 보정 q가 함께 작은 값만 근거로 삼으며, "
+                             "+3일·+5일은 창이 겹친 관측입니다. 인과나 방향 예측이 아닙니다.")),
         sec_footer(a),
-        "</div>",
+        dk.WRAP_CLOSE,
     ])
 
 

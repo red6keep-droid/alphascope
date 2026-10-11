@@ -1834,14 +1834,14 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     {
       id: 'report-card',
       label: '데일리 브리핑',
-      map: { summary: ['오늘 한 줄', '주요 지수'], insight: ['종합 — 현재 시장 상태'] },
+      map: { summary: ['(머리)', '오늘 한 줄', '주요 지수'], insight: ['종합', '종합 — 현재 시장 상태'] },   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용 */
       picks: true,
       empty: '아직 발행된 리포트가 없습니다.'
     },
     {
       id: 'trump-card',
       label: '트럼프 트렌드',
-      map: { speech: ['오늘 한 줄', '무엇이 달라졌나'], watch: ['내일 볼 것'] },
+      map: { speech: ['(머리)', '오늘 한 줄', '달라진 것', '무엇이 달라졌나'], watch: ['내일 볼 것'] },
       picks: false,
       empty: '아직 발행된 트렌드 리포트가 없습니다.'
     },
@@ -1854,7 +1854,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       empty: '아직 발행된 엔비디아 리포트가 없습니다.'
     }
   ];
-  var PICKS_HEAD = '오늘의 급등주 TOP 5';
+  var PICKS_HEADS = ['급등주', '오늘의 급등주 TOP 5'];   /* 새 디자인 제목 · 옛 글 제목 */
   /* 구획 하나에 싣는 최대 줄 수 — 카드는 요약이고 전체는 글에서 읽는다 */
   var MAX_LINES = 5;
 
@@ -1884,11 +1884,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     }
     /* 제목 없는 머리 구획 "(가격)": 엔비디아 글은 가격 카드·그래프가 첫 h2 앞에 제목 없이 온다 (2026-10-11).
        data-cards 를 단 첫 요소부터 첫 h2 전까지 — 그 앞의 안내 상자·기준 거래일은 뺀다. */
-    var lead = doc.querySelector('[data-cards]');
+    var lead = doc.querySelector('[data-cards], [data-lead]');   /* data-lead: 데일리·트럼프 머리 (2026-10-11) */
     if (lead) {
       var ln = [], m = lead;
       while (m && m.tagName !== 'H2') { ln.push(m); m = m.nextElementSibling; }
-      out['(가격)'] = ln;
+      out['(가격)'] = ln; out['(머리)'] = ln;
     }
     return out;
   }
@@ -1943,24 +1943,23 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     if (d) d.textContent = text;
   }
 
-  /* 급등주 표의 종목 / 가격 / 등락률 세 칸을 사이드바로 옮긴다 */
+  /* 급등주 — 새 디자인은 카드 행(data-pick 속성)에서, 옛 글은 표의 세 칸에서 종목 / 가격 / 등락률을 읽는다 (2026-10-11) */
   function fillPicks(nodes) {
     var list = document.getElementById('picks-list');
     if (!list) return;
-    var table = null;
-    for (var i = 0; nodes && i < nodes.length && !table; i++) {
-      if (nodes[i].tagName === 'TABLE') table = nodes[i];
+    var picks = [], table = null;
+    for (var i = 0; nodes && i < nodes.length; i++) {
+      var found = nodes[i].querySelectorAll ? nodes[i].querySelectorAll('[data-pick]') : [];
+      for (var k = 0; k < found.length && picks.length < 5; k++) {
+        picks.push({ sym: found[k].getAttribute('data-sym') || '', price: found[k].getAttribute('data-price') || '', chg: found[k].getAttribute('data-chg') || '' });
+      }
+      if (!table && nodes[i].tagName === 'TABLE') table = nodes[i];
     }
-
-    var rows = (table && table.rows) || [], picks = [];
+    var rows = (!picks.length && table && table.rows) || [];
     for (var r = 1; r < rows.length && picks.length < 5; r++) {
       var c = rows[r].cells;
       if (!c || c.length < 3) continue;
-      picks.push({
-        sym: String(c[0].textContent || '').trim(),
-        price: String(c[1].textContent || '').trim(),
-        chg: String(c[2].textContent || '').trim()
-      });
+      picks.push({ sym: String(c[0].textContent || '').trim(), price: String(c[1].textContent || '').trim(), chg: String(c[2].textContent || '').trim() });
     }
     list.textContent = '';
     if (!picks.length) {
@@ -2022,7 +2021,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
         });
 
         if (card.picks) {
-          fillPicks(sec[PICKS_HEAD]);
+          fillPicks(sec[PICKS_HEADS[0]] || sec[PICKS_HEADS[1]]);
           var stamp = document.getElementById('sync-label');
           if (stamp && day) stamp.textContent = day + ' 리포트 기준';
         }
@@ -2074,6 +2073,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   if (!document.body.classList.contains('item-view')) return;
   var root = document.querySelector('.post-body');
   if (!root || !root.querySelector('[data-cards]')) return;
+  if (root.querySelector('[data-lead]')) return;   /* 데일리·트럼프 글(머리 data-lead)은 탭을 쓰지 않는다 — 구획 이름이 다르다 (2026-10-11) */
   var h2s = [].slice.call(root.querySelectorAll('h2'));
   if (h2s.length < 4) return;
   function key(t) { return t.replace(/^[①-⑳\s]+/, '').replace(/\s*\([^)]*\)\s*$/, '').trim(); }

@@ -1,4 +1,4 @@
-"""렌더링: 수집 원본 숫자 + 분석 계산값 + Gemini 문구 → HTML
+"""렌더링: 수집 원본 숫자 + 분석 계산값 + Gemini 문구 → HTML (디자인-가이드라인.md · experiments/design_kit.py, 2026-10-11)
 
 모든 숫자는 수집 데이터(report_input.json)와 파이썬 분석(analysis.json)에서 직접
 렌더링한다. Gemini는 분석 문구(summary 등)와 뉴스 선택(index)만 사용한다.
@@ -10,6 +10,10 @@ analysis.json이 없으면(시계열 수집 실패) 지수 표는 기존 3열로
 import html as html_mod
 import json
 import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import design_kit as dk  # noqa: E402  — 디자인-가이드라인.md 공통 조각 (2026-10-11)
 
 TEMPLATE_FILE = os.path.join(os.path.dirname(__file__), "templates", "report.html")
 
@@ -75,6 +79,7 @@ __BODY__
 
 UP_COLOR = "#d93025"
 DOWN_COLOR = "#1a73e8"
+MUTED = dk.MUTED
 
 
 def _esc(text):
@@ -166,430 +171,302 @@ def _cover_image(cover_url):
     if not cover_url:
         return ""
     src = html_mod.escape(str(cover_url), quote=True)
-    return (
-        f'<img src="{src}" alt="데일리 브리핑 커버 이미지" '
-        f'style="width:100%;max-width:1024px;border-radius:8px;'
-        f'margin:0 0 16px 0;display:block;">'
-    )
+    return f'<img src="{src}" alt="데일리 브리핑 커버 이미지" style="width:100%;max-width:1024px;border-radius:8px;margin:0 0 16px 0;display:block;">'
 
 
-def _index_table(indices, analysis):
-    """지수 표. 가격·1D는 수집 원본(fast_info), 5D·20D·연속·위치는 분석값."""
-    if not analysis:
-        rows = []
-        for key in ("sp500", "nasdaq", "dow", "russell", "vix"):
-            rec = indices.get(key) or {}
-            rows.append([
-                _esc(INDEX_LABELS.get(key, key)),
-                _fmt_price(rec.get("price")),
-                _pct_cell(rec.get("change_pct")),
-            ])
-        return _paragraph(rows, ["지수", "가격", "등락률"])
-
-    series = analysis.get("series") or {}
-    position = analysis.get("position") or {}
-    rows = []
-    for key in ("sp500", "nasdaq", "dow", "russell", "vix"):
-        rec = indices.get(key) or {}
-        s = series.get(INDEX_SYMBOL[key]) or {}
-        label = (position.get(key) or {}).get("position_label")
-        rows.append([
-            _esc(INDEX_LABELS.get(key, key)),
-            _fmt_price(rec.get("price")),
-            _pct_cell(rec.get("change_pct")),
-            _pct_cell(s.get("ret_5d"), missing="—"),
-            _pct_cell(s.get("ret_20d"), missing="—"),
-            _arrows_cell(s.get("last5")),
-            _esc(label) if label else '<span style="color:#999;">—</span>',
-        ])
-    return _scroll(_paragraph(rows, ["지수", "가격", "1D", "5D", "20D", "최근 5일", "20일 레인지 위치"]))
+def _text(text):
+    """Gemini 문구 — 줄마다 문단(18px). 비어 있으면 ⓘ 안내."""
+    if not str(text or "").strip():
+        return dk.muted("데이터 없음")
+    return "".join(f'<div style="margin:0 0 6px;">{_esc(line)}</div>' for line in str(text).splitlines() if line.strip())
 
 
-def _change_section(analysis, report):
-    """'무엇이 달라졌나' — 상대강도 · VIX 5일 · 20일 중 상승/하락 일수 · 레인지 위치 + Gemini 해설.
-    분석이 없으면 섹션 제목까지 통째로 비운다."""
-    if not analysis:
-        return ""
-    series = analysis.get("series") or {}
-    position = analysis.get("position") or {}
-    rs = analysis.get("rs") or {}
-    vix = analysis.get("vix") or {}
-
-    rs_rows = [
-        ["Nasdaq(QQQ) − S&P 500(SPY)", _pct_cell(rs.get("qqq_spy_5d"), unit="%p", missing="—"),
-         "양수면 성장주 우위"],
-        ["소형주(IWM) − S&P 500(SPY)", _pct_cell(rs.get("iwm_spy_5d"), unit="%p", missing="—"),
-         "양수면 소형주·위험선호 우위"],
-        ["동일가중(RSP) − 시총가중(SPY)", _pct_cell(rs.get("rsp_spy_5d"), unit="%p", missing="—"),
-         "양수면 상승이 넓게 퍼짐"],
-    ]
-    streak = rs.get("qqq_streak")
-    if streak is not None:
-        rs_rows.append(["Nasdaq이 S&P 500을 웃돈 연속 일수",
-                        f"{int(streak)}일" if streak else "0일", "길수록 성장주 주도가 뚜렷"])
-    rs_table = _scroll(_paragraph(rs_rows, ["상대강도 (5거래일)", "차이", "읽는 법"]))
-
-    def updown(key):
-        s = series.get(INDEX_SYMBOL[key]) or {}
-        if s.get("up_days_20") is None:
-            return "—"
-        return (f'<span style="color:{UP_COLOR};">{s["up_days_20"]}↑</span> '
-                f'<span style="color:{DOWN_COLOR};">{s["down_days_20"]}↓</span>')
-
-    def range_pos(key):
-        p = position.get(key) or {}
-        if p.get("from_high_pct") is None:
-            return "—", "—", "—"
-        return (_pct_cell(p["from_high_pct"], missing="—"),
-                _pct_cell(p["from_low_pct"], missing="—"),
-                _esc(p.get("position_label") or "—"))
-
-    trend_rows = []
-    for key in ("sp500", "nasdaq", "russell"):
-        hi, lo, label = range_pos(key)
-        trend_rows.append([_esc(INDEX_LABELS[key]), updown(key), hi, lo, label])
-    trend_table = _scroll(_paragraph(
-        trend_rows, ["지수", "최근 20거래일", "20일 고점 대비", "20일 저점 대비", "위치"]))
-
-    if vix.get("now") is not None and vix.get("prev_5d") is not None:
-        chg = vix.get("change_5d") or 0.0
-        color = UP_COLOR if chg >= 0 else DOWN_COLOR
-        vix_line = (f'<div style="margin:8px 0;">VIX 5거래일: {vix["prev_5d"]:.2f} → '
-                    f'<b>{vix["now"]:.2f}</b> '
-                    f'<span style="color:{color};font-weight:bold;">({chg:+.2f})</span></div>')
-    else:
-        vix_line = ""
-
-    return (
-        f'<h2 style="{H2_STYLE}">무엇이 달라졌나</h2>'
-        + rs_table + trend_table + vix_line
-        + f'<div style="margin-top:6px;">{_text_block(report.get("change_comment"))}</div>'
-    )
+def _light_word(light):
+    return {"🟢": "정상", "🟡": "주의", "🔴": "경계"}.get(light, "")
 
 
-def _regime_section(analysis, report):
-    """'시장 상태' — 점수 · 등급 · 어제 대비 · 요소별 막대, 그리고 Gemini의 regime_comment.
-    점수와 등급은 analyze.py가 만든 값을 그대로 찍는다. 분석이 없으면 '데이터 없음' 한 줄."""
+def _light_pill(light, text=None):
+    kind = {"🟢": "positive", "🟡": "uncertain", "🔴": "negative"}.get(light, "neutral")
+    return dk.pill(text or _light_word(light) or "—", kind)
+
+
+def sec_lead(report, analysis):
+    """글 머리(제목 없음, data-lead): 한 줄 결론 D 카드. 홈 카드는 '(머리)'로 읽는다."""
+    one = str(report.get("one_line") or "").strip()
+    inner = f'<div style="font-weight:700;color:#111;">{_esc(one)}</div>' if one else dk.muted("한 줄 결론 없음")
+    return dk.cards(dk.dcard(inner, "neutral"))
+
+
+def sec_regime(analysis, report):
+    """시장 상태 — C 카드: 점수·등급·어제 대비 + 요소별 막대. 점수는 analyze.py 규칙값."""
     regime = (analysis or {}).get("regime") or {}
-    comment = f'<div style="margin-top:6px;">{_text_block(report.get("regime_comment"))}</div>'
-    head = f'<h2 style="{H2_STYLE}">시장 상태 <span style="color:#888;font-size:15px;font-weight:normal;">Market Regime</span></h2>'
+    comment = _text(report.get("regime_comment"))
     if regime.get("score") is None:
-        return head + '<div style="color:#999;">데이터 없음 — 오늘은 시장 상태 점수를 계산하지 못했습니다.</div>' + comment
-
+        return dk.muted("오늘은 시장 상태 점수를 계산하지 못했습니다.") + comment
     light = regime.get("light") or "🟡"
-    color = LIGHT_COLOR.get(light, "#888")
+    rows = [("점수", f'{int(regime["score"])} <span style="color:{MUTED};font-weight:400;">/ 100</span> ' + _light_pill(light, regime.get("label") or ""), "")]
     if regime.get("score_prev") is not None:
-        delta = regime.get("delta") or 0
-        prev_txt = f'<span style="color:#666;font-size:16px;">어제 {regime["score_prev"]} · {delta:+d}</span>'
+        rows.append(("어제 대비", dk.arrow(regime.get("delta") or 0, 0, ""), _esc(f"어제 {regime['score_prev']}점")))
     else:
-        prev_txt = '<span style="color:#999;font-size:16px;">어제 점수 없음</span>'
-    badge = (
-        f'<div style="margin:8px 0 12px 0;">'
-        f'<span style="display:inline-block;background:{color};color:#fff;font-weight:bold;font-size:18px;'
-        f'padding:4px 14px;border-radius:16px;vertical-align:middle;">{light} {_esc(regime.get("label") or "")}</span>'
-        f'&nbsp;&nbsp;<span style="font-size:28px;font-weight:bold;color:#111;vertical-align:middle;">{int(regime["score"])}</span>'
-        f'<span style="color:#888;font-size:16px;vertical-align:middle;"> / 100</span>'
-        f'&nbsp;&nbsp;{prev_txt}</div>'
-    )
-
-    rows = ['<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:17px;">']
+        rows.append(("어제 대비", dk.dash(), "어제 점수 없음"))
     for key, label in REGIME_COMPONENT_LABELS.items():
         c = (regime.get("components") or {}).get(key) or {}
         score, mx = c.get("score"), c.get("max")
         if score is None or not mx:
             continue
         frac = score / mx
-        bar_color = LIGHT_COLOR["🟢"] if frac >= 0.7 else LIGHT_COLOR["🟡"] if frac >= 0.45 else LIGHT_COLOR["🔴"]
-        rows.append(
-            "<tr>"
-            f'<td style="border:1px solid #ddd;padding:6px 8px;white-space:nowrap;width:22%;">{_esc(label)}</td>'
-            f'<td style="border:1px solid #ddd;padding:6px 8px;">'
-            f'<div style="background:#eee;height:14px;border-radius:2px;">'
-            f'<div style="background:{bar_color};height:14px;width:{frac * 100:.0f}%;border-radius:2px;"></div></div></td>'
-            f'<td style="border:1px solid #ddd;padding:6px 8px;text-align:right;white-space:nowrap;width:18%;">{int(score)} / {int(mx)}</td>'
-            "</tr>"
-        )
-    rows.append("</table>")
-    return head + badge + _scroll("".join(rows)) + comment
+        col = LIGHT_COLOR["🟢"] if frac >= 0.7 else LIGHT_COLOR["🟡"] if frac >= 0.45 else LIGHT_COLOR["🔴"]
+        rows.append((_esc(label), dk.hbar(score, mx, col) + f"{int(score)} <span style='color:{MUTED};font-weight:400;'>/ {int(mx)}</span>", ""))
+    return dk.ccard(rows) + comment
 
 
-def _breadth_section(analysis):
-    """'시장 폭' — 프록시 모드는 섹터 ETF 상승 개수와 RSP−SPY. 전수 모드(3단계)는 상승/하락 종목 수.
-    파이썬 값만 찍는다. 해설 키는 3단계에서."""
+def sec_indices(indices, analysis, report):
+    """주요 지수 — C 카드: 지수, 값 가격 + 1일 등락, 보조 줄 5일·20일·최근 5일·위치."""
+    series = (analysis or {}).get("series") or {}
+    position = (analysis or {}).get("position") or {}
+    rows = []
+    for key in ("sp500", "nasdaq", "dow", "russell", "vix"):
+        rec = indices.get(key) or {}
+        s = series.get(INDEX_SYMBOL[key]) or {}
+        label = (position.get(key) or {}).get("position_label")
+        value = f'{_esc(_fmt_price(rec.get("price")))} {dk.arrow(rec.get("change_pct"))}'
+        sub = []
+        if s.get("ret_5d") is not None:
+            sub.append(f"5일 {s['ret_5d']:+.2f}%")
+        if s.get("ret_20d") is not None:
+            sub.append(f"20일 {s['ret_20d']:+.2f}%")
+        if s.get("last5"):
+            sub.append("최근 5일 " + "".join(s["last5"]))
+        if label:
+            sub.append(label)
+        rows.append((_esc(INDEX_LABELS.get(key, key)), value, _esc(" · ".join(sub))))
+    return dk.ccard(rows) + _text(report.get("summary"))
+
+
+def sec_change(analysis, report):
+    """달라진 것 — 상대강도·추세·VIX C 카드 + 해설. 분석이 없으면 빈 문자열(구획 생략)."""
+    if not analysis:
+        return ""
+    series = analysis.get("series") or {}
+    position = analysis.get("position") or {}
+    rs = analysis.get("rs") or {}
+    vix = analysis.get("vix") or {}
+    rows = [("성장주 − 시장 (Nasdaq − S&P 500 · 5일)", dk.arrow(rs.get("qqq_spy_5d"), 2, "%p"), "양수면 성장주 우위"),
+            ("소형주 − 시장 (Russell 2000 − S&P 500 · 5일)", dk.arrow(rs.get("iwm_spy_5d"), 2, "%p"), "양수면 소형주·위험선호 우위"),
+            ("동일가중 − 시총가중 (RSP − SPY · 5일)", dk.arrow(rs.get("rsp_spy_5d"), 2, "%p"), "양수면 상승이 넓게 퍼짐")]
+    streak = rs.get("qqq_streak")
+    if streak is not None:
+        rows.append(("Nasdaq이 S&P 500을 웃돈 연속 일수", f"{int(streak)}일", "길수록 성장주 주도가 뚜렷"))
+    out = dk.sub_label("상대강도") + dk.ccard(rows, left="60%")
+    trows = []
+    for key in ("sp500", "nasdaq", "russell"):
+        s = series.get(INDEX_SYMBOL[key]) or {}
+        p = position.get(key) or {}
+        sub = []
+        if s.get("up_days_20") is not None:
+            sub.append(f"20일 중 상승 {s['up_days_20']} · 하락 {s['down_days_20']}")
+        if p.get("from_high_pct") is not None:
+            sub.append(f"20일 고점 대비 {p['from_high_pct']:+.2f}% · 저점 대비 {p['from_low_pct']:+.2f}%")
+        trows.append((_esc(INDEX_LABELS[key]), _esc(p.get("position_label") or "—"), _esc(" · ".join(sub))))
+    out += dk.sub_label("20일 위치") + dk.ccard(trows, left="40%")
+    if vix.get("now") is not None and vix.get("prev_5d") is not None:
+        out += dk.ccard([("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → <b>{vix["now"]:.2f}</b> {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}', "")])
+    return out + _text(report.get("change_comment"))
+
+
+def sec_breadth(analysis):
+    """시장 폭 — C 카드. 프록시 모드는 섹터 ETF 상승 개수, 전수 모드는 상승/하락 종목 수."""
     b = (analysis or {}).get("breadth") or {}
     if b.get("ratio") is None:
         return ""
     light = (b.get("label") or "")[:1]
-    color = LIGHT_COLOR.get(light, "#888")
+    rows = [("상승 비율", f'{b["ratio"]:.1f}% ' + _light_pill(light, (b.get("label") or "")[1:].strip() or None), "")]
     if b.get("mode") == "full":
-        count_line = (f'상승 <b style="color:{UP_COLOR};">{b.get("advancers")}</b> · '
-                      f'하락 <b style="color:{DOWN_COLOR};">{b.get("decliners")}</b> 종목')
-        extra = ""
+        rows.append(("상승 / 하락 종목", f'<span style="color:{UP_COLOR};">{b.get("advancers")}</span> / <span style="color:{DOWN_COLOR};">{b.get("decliners")}</span>', "S&P 500 구성종목"))
         if b.get("new_high_52w") is not None:
-            extra = f' · 52주 신고가 {b["new_high_52w"]} · 신저가 {b["new_low_52w"]}'
-        basis = "S&P 500 구성종목"
+            rows.append(("52주 신고가 / 신저가", f'{b["new_high_52w"]} / {b["new_low_52w"]}', ""))
     else:
-        count_line = (f'섹터 ETF {b.get("sectors_counted")}개 중 상승 <b style="color:{UP_COLOR};">{b.get("sectors_up")}</b> · '
-                      f'하락 <b style="color:{DOWN_COLOR};">{b.get("sectors_down")}</b>')
-        extra = ""
-        basis = "섹터 ETF 프록시"
-    rsp_line = ""
+        rows.append(("섹터 ETF 상승 / 하락", f'<span style="color:{UP_COLOR};">{b.get("sectors_up")}</span> / <span style="color:{DOWN_COLOR};">{b.get("sectors_down")}</span>',
+                     f"{b.get('sectors_counted')}개 섹터 ETF 기준"))
     if b.get("rsp_spy_1d") is not None:
-        rsp_line = (f'<div style="margin:4px 0;">동일가중(RSP) − 시총가중(SPY): 1D {_pct_cell(b["rsp_spy_1d"], unit="%p")} · '
-                    f'5D {_pct_cell(b.get("rsp_spy_5d"), unit="%p", missing="—")} '
-                    f'<span style="color:#888;font-size:15px;">— 양수면 상승이 소수 대형주에 몰리지 않은 것</span></div>')
-    return (
-        f'<h2 style="{H2_STYLE}">시장 폭 <span style="color:#888;font-size:15px;font-weight:normal;">Market Breadth · {_esc(basis)}</span></h2>'
-        f'<div style="margin:8px 0;">{count_line}{extra} · 상승 비율 <b>{b["ratio"]:.1f}%</b>'
-        f'&nbsp;&nbsp;<span style="display:inline-block;background:{color};color:#fff;font-weight:bold;font-size:15px;'
-        f'padding:2px 10px;border-radius:12px;">{_esc(b.get("label") or "")}</span></div>'
-        + rsp_line
-    )
+        rows.append(("동일가중 − 시총가중 (1일)", dk.arrow(b["rsp_spy_1d"], 2, "%p"), "양수면 상승이 소수 대형주에 몰리지 않은 것"))
+        if b.get("rsp_spy_5d") is not None:
+            rows.append(("동일가중 − 시총가중 (5일)", dk.arrow(b["rsp_spy_5d"], 2, "%p"), ""))
+    return dk.ccard(rows, left="60%")
 
 
-def _status_board(analysis):
-    """'위험 지도' 상태판 — 신호등 5개 + 종합. 근거 열은 계산값을 그대로 옮긴 것이다."""
-    a = analysis or {}
-    status = a.get("status") or {}
-    if not status.get("overall"):
-        return ""
-    spy = (a.get("series") or {}).get("SPY") or {}
-    vix = a.get("vix") or {}
-    breadth = a.get("breadth") or {}
-    rates = a.get("rates") or {}
-    pos = (a.get("position") or {}).get("SPY") or {}
-
-    def ma_text():
-        parts = []
-        if spy.get("above_ma20") is not None:
-            parts.append("20일선 " + ("위" if spy["above_ma20"] else "아래"))
-        if spy.get("above_ma50") is not None:
-            parts.append("50일선 " + ("위" if spy["above_ma50"] else "아래"))
-        return "SPY " + " · ".join(parts) if parts else "—"
-
-    def overheat_text():
-        if spy.get("ret_20d") is None:
-            return "—"
-        t = f"SPY 20D {spy['ret_20d']:+.2f}%"
-        if pos.get("from_high_pct") is not None:
-            t += f" · 20일 고점 대비 {pos['from_high_pct']:+.2f}%"
-        return t
-
-    items = [
-        ("추세 유지", status.get("trend"), ma_text()),
-        ("변동성", status.get("volatility"), f"VIX {vix['now']:.2f}" if vix.get("now") is not None else "—"),
-        ("시장 폭", status.get("breadth"), f"상승 비율 {breadth['ratio']:.1f}%" if breadth.get("ratio") is not None else "—"),
-        ("금리 리스크", status.get("rates"), f"10Y 5D {int(rates['us10y_change_5d_bp']):+d}bp" if rates.get("us10y_change_5d_bp") is not None else "—"),
-        ("과열 위험", status.get("overheat"), overheat_text()),
-    ]
-    rows = []
-    for label, light, basis in items:
-        light_cell = (f'<span style="font-size:20px;">{light}</span>' if light
-                      else '<span style="color:#999;">—</span>')
-        rows.append([_esc(label), light_cell, _esc(basis)])
-    overall = status["overall"]
-    color = LIGHT_COLOR.get(overall, "#888")
-    overall_word = {"🟢": "정상", "🟡": "주의", "🔴": "경계"}.get(overall, "")
-    return (
-        _scroll(_paragraph(rows, ["항목", "신호", "근거"]))
-        + f'<div style="margin:8px 0;">종합 &nbsp;<span style="display:inline-block;background:{color};color:#fff;'
-        f'font-weight:bold;font-size:16px;padding:3px 12px;border-radius:14px;">{overall} {overall_word}</span>'
-        f'&nbsp;<span style="color:#888;font-size:15px;">— 🔴가 하나라도 있으면 경계, 🟡가 둘 이상이면 주의</span></div>'
-    )
-
-
-def _rank_change_cell(delta):
-    """5일 순위 대비 오늘 순위 변화. 양수면 올라온 것."""
-    if delta is None:
-        return ""
-    if delta > 0:
-        return f'<span style="color:{UP_COLOR};">▲{delta}</span>'
-    if delta < 0:
-        return f'<span style="color:{DOWN_COLOR};">▼{-delta}</span>'
-    return '<span style="color:#999;">–</span>'
-
-
-def _sector_section(analysis, report):
-    """'섹터 · 테마' — 섹터 ETF 12개의 1D 막대와 5일 순위 변화, 주도/약세, Gemini 해설."""
+def sec_sectors(analysis, report):
+    """섹터 — C 카드: 테마(ETF), 값 = 막대 + 등락률, 보조 줄 5일 순위 대비. 주도·약세 줄, 해설."""
     ranked = ((analysis or {}).get("sectors") or {}).get("ranked_1d") or []
     if not ranked:
         return ""
     max_abs = max(abs(r["ret_1d"]) for r in ranked) or 1.0
-
-    parts = ['<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:17px;">',
-             '<tr>'
-             '<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:left;">테마 (ETF)</th>'
-             '<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:left;width:38%;">1D</th>'
-             '<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:right;">등락률</th>'
-             '<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:right;">5D 순위 대비</th>'
-             '</tr>']
+    rows = []
     for r in ranked:
-        pct = abs(r["ret_1d"]) / max_abs * 100
-        color = UP_COLOR if r["ret_1d"] >= 0 else DOWN_COLOR
-        parts.append(
-            "<tr>"
-            f'<td style="border:1px solid #ddd;padding:6px 8px;white-space:nowrap;">{_esc(r["theme"])} '
-            f'<span style="color:#888;font-size:14px;">({_esc(r["etf"])})</span></td>'
-            f'<td style="border:1px solid #ddd;padding:6px 8px;">'
-            f'<div style="background:{color};height:14px;width:{pct:.0f}%;min-width:2px;border-radius:2px;"></div></td>'
-            f'<td style="border:1px solid #ddd;padding:6px 8px;text-align:right;white-space:nowrap;">{_pct_cell(r["ret_1d"])}</td>'
-            f'<td style="border:1px solid #ddd;padding:6px 8px;text-align:right;">{_rank_change_cell(r.get("rank_change"))}</td>'
-            "</tr>"
-        )
-    parts.append("</table>")
-
+        col = UP_COLOR if r["ret_1d"] >= 0 else DOWN_COLOR
+        d = r.get("rank_change")
+        sub = "" if d is None else (f"5일 순위 대비 ▲{d}" if d > 0 else f"5일 순위 대비 ▼{-d}" if d < 0 else "5일 순위와 같음")
+        rows.append((f"{_esc(r['theme'])} ({_esc(r['etf'])})", dk.hbar(r["ret_1d"], max_abs, col) + dk.arrow(r["ret_1d"]), _esc(sub)))
     by_etf = {r["etf"]: r for r in ranked}
-
-    def names(etfs):
-        return " · ".join(f'{_esc(by_etf[e]["theme"])}({_esc(e)})' for e in etfs if e in by_etf)
-
+    names = lambda etfs: " · ".join(_esc(by_etf[e]["theme"]) for e in etfs if e in by_etf)  # noqa: E731
     sectors = analysis["sectors"]
-    lead_line = (
-        f'<div style="margin:6px 0;"><b style="color:{UP_COLOR};">주도</b> {names(sectors.get("leaders") or [])}'
-        f'&nbsp;&nbsp;<b style="color:{DOWN_COLOR};">약세</b> {names(sectors.get("laggards") or [])}</div>'
-    )
-    return (
-        f'<h2 style="{H2_STYLE}">섹터 · 테마</h2>'
-        + _scroll("".join(parts)) + lead_line
-        + f'<div style="margin-top:6px;">{_text_block(report.get("sector_comment"))}</div>'
-    )
+    lead = dk.ccard([("주도", names(sectors.get("leaders") or []) or dk.dash(), ""), ("약세", names(sectors.get("laggards") or []) or dk.dash(), "")])
+    return lead + dk.ccard(rows, left="45%") + _text(report.get("sector_comment"))
 
 
-def _bp_cell(bp):
-    """금리 변화. 색을 쓰지 않는다 — 금리 상승이 좋은지 나쁜지는 문맥이 정한다."""
-    if bp is None:
-        return '<span style="color:#999;">—</span>'
-    return f'<span style="color:#555;">{int(bp):+d}bp</span>'
+def _bp(bp):
+    return "—" if bp is None else f"{int(bp):+d}bp"
 
 
-def _macro_table(macro, analysis):
-    """금리 · 경제지표 표. 금리 4행은 FRED(raw.macro)에서, 10Y의 당일값·bp 변화는 분석(^TNX)에서."""
+def sec_macro(macro, analysis, report):
+    """금리·지표 — C 카드: 지표, 값, 보조 줄 변화·기준일. 금리 변화에는 색을 쓰지 않는다."""
     rates = (analysis or {}).get("rates") or {}
 
     def fred(key):
         rec = macro.get(key)
         if not rec or rec.get("value") is None:
-            return "데이터 없음", ""
-        return _esc(f"{rec['value']:.2f}"), _esc(rec.get("date", ""))
+            return None, ""
+        return f"{rec['value']:.2f}", rec.get("date", "")
 
     rows = []
     v10, d10 = fred("us10y")
     if rates.get("us10y") is not None:
-        v10 = _esc(f"{rates['us10y']:.2f}")
-        d10 = _esc((analysis or {}).get("as_of") or d10)
-    change_10y = (f"1D {_bp_cell(rates.get('us10y_change_1d_bp'))} · 5D {_bp_cell(rates.get('us10y_change_5d_bp'))}"
-                  if rates.get("us10y_change_5d_bp") is not None else "")
-    rows.append(["10년물 국채금리 (%)", v10, change_10y, d10])
-    for key, label in (("us2y", "2년물 국채금리 (%)"),
-                       ("spread_10_2", "10Y−2Y 스프레드 (%p)"),
-                       ("fed_funds", "연방기금금리 (%)"),
-                       ("unemployment_rate", "실업률 (%)"),
-                       ("cpi", "CPI (지수)"),
-                       ("vix", "VIX")):
+        v10, d10 = f"{rates['us10y']:.2f}", (analysis or {}).get("as_of") or d10
+    chg = f"1일 {_bp(rates.get('us10y_change_1d_bp'))} · 5일 {_bp(rates.get('us10y_change_5d_bp'))}" if rates.get("us10y_change_5d_bp") is not None else ""
+    rows.append(("10년물 국채금리 (%)", _esc(v10) if v10 else dk.dash(), _esc(" · ".join(x for x in (chg, dk.day(d10)) if x))))
+    for key, label in (("us2y", "2년물 국채금리 (%)"), ("spread_10_2", "10년 − 2년 (%p)"), ("fed_funds", "연방기금금리 (%)"),
+                       ("unemployment_rate", "실업률 (%)"), ("cpi", "소비자물가 CPI (지수)"), ("vix", "VIX")):
         if key in ("us2y", "spread_10_2", "fed_funds") and not macro.get(key):
-            continue  # 금리는 있을 때만 — 옛 입력 파일과도 호환
+            continue
         v, d = fred(key)
-        rows.append([label, v, "", d])
-    table = _scroll(_paragraph(rows, ["지표", "값", "변화", "기준일"]))
-
-    label = rates.get("growth_label")
-    if label:
-        table += f'<div style="margin:6px 0;">금리 ↔ 성장주: <b>{_esc(label)}</b></div>'
-    return table
+        rows.append((label, _esc(v) if v else dk.dash(), _esc(dk.day(d))))
+    out = dk.ccard(rows, left="55%")
+    if rates.get("growth_label"):
+        out += dk.ccard([("금리와 성장주", _esc(rates["growth_label"]), "")])
+    return out + _text(report.get("macro_comment"))
 
 
-def _news_list(input_data, report, analysis):
-    """뉴스 카드. 테마 태그와 '관련 자산'의 실제 1D는 파이썬이 채운다. Gemini는 index·테마·심볼만 고른다."""
+def _quote_rows(quotes):
+    """급등주·관심 종목 — 종목, 값 가격 + 등락, 보조 줄 거래량. data-pick: 홈 '오늘의 급등주' 카드가 읽는다."""
+    rows = []
+    for q in quotes or []:
+        sym = q.get("symbol") or "-"
+        r = dk.crow(_esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', _esc(f"거래량 {_fmt_volume(q.get('volume'))}"), first=not rows)
+        chg = q.get("change_pct")
+        r = r.replace('<span style="', f'<span data-pick="1" data-sym="{_esc(sym)}" data-price="{_esc(_fmt_price(q.get("price")))}" data-chg="{"" if chg is None else f"{float(chg):+.2f}%"}" style="', 1)
+        rows.append(r)
+    if not rows:
+        return dk.muted("데이터 없음")
+    return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(rows)}</span></div>'
+
+
+def sec_news(input_data, report, analysis):
+    """뉴스 — 목록: 테마 라벨 · 제목(글자) + 링크 아이콘, 보조 줄 관련 자산 반응 · 선정 이유 (14px)."""
     series = (analysis or {}).get("series") or {}
     rates = (analysis or {}).get("rates") or {}
-    quotes = {q["symbol"]: q for q in input_data.get("gainers", []) + input_data.get("most_active", [])
-              if q.get("symbol")}
+    quotes = {q["symbol"]: q for q in input_data.get("gainers", []) + input_data.get("most_active", []) if q.get("symbol")}
     known = set(series) | set(quotes)
 
     def reaction(sym):
         if sym == "^TNX" and rates.get("us10y_change_1d_bp") is not None:
-            return _bp_cell(rates["us10y_change_1d_bp"])
+            return _esc(_bp(rates["us10y_change_1d_bp"]))
         if sym in series:
-            return _pct_cell(series[sym].get("ret_1d"), missing="—")
-        return _pct_cell(quotes[sym].get("change_pct"), missing="—")
+            return dk.arrow(series[sym].get("ret_1d"))
+        return dk.arrow(quotes[sym].get("change_pct"))
 
-    rows = []
+    items = []
     for item in report.get("news", []):
-        idx = item.get("index")
         try:
-            news_item = input_data.get("news", [])[idx]
+            news_item = input_data.get("news", [])[item.get("index")]
         except (IndexError, TypeError):
             continue
-        title = _esc(news_item.get("title") or "")
-        link = _esc(news_item.get("link") or "#")
-        why = _esc(item.get("why") or "")
-
         theme = item.get("theme")
         if theme and theme not in THEME_VOCAB:
             theme = "기타"
-        tag = (f'<span style="display:inline-block;background:#eef3ff;color:#2a4d9b;font-size:14px;'
-               f'padding:1px 8px;border-radius:10px;margin-right:6px;vertical-align:middle;">{_esc(theme)}</span>'
-               if theme else "")
-
+        tag = (dk.pill(theme) + " ") if theme else ""
+        title = _esc(news_item.get("title_ko") or news_item.get("title") or "")
+        link = dk.link_icon(news_item.get("link"), news_item.get("title") or "원문")
         related = [s for s in (item.get("related") or []) if isinstance(s, str) and s in known][:4]
-        related_line = ""
+        subs = []
         if related:
-            cells = " · ".join(f'{_esc(SYMBOL_NAMES.get(s, s))} {reaction(s)}' for s in related)
-            related_line = f'<div style="margin:4px 0 0 12px;font-size:16px;">관련 자산: {cells}</div>'
+            subs.append("관련 자산 " + " · ".join(f"{_esc(SYMBOL_NAMES.get(s, s))} {reaction(s)}" for s in related))
+        if item.get("why"):
+            subs.append("선정 이유 " + _esc(item["why"]))
+        sub_html = "".join(f'<span style="display:block;color:{MUTED};font-size:{dk.TINY};">{x}</span>' for x in subs)
+        items.append(f"<li style='{dk.LI}'>{tag}<span style='color:#111;'>{title}</span>{link}{sub_html}</li>")
+    return dk.ul(items) if items else dk.muted("주요 뉴스 없음")
 
-        rows.append(
-            f'<div style="margin-bottom:12px;">'
-            f'  {tag}<a href="{link}" target="_blank" rel="noopener nofollow" style="font-weight:bold;color:#2196f3;text-decoration:none;">{title}</a>'
-            f'  {related_line}'
-            f'  <div style="margin:4px 0 0 12px;color:#666;font-size:17px;">선정 이유: {why}</div>'
-            f'</div>'
-        )
-    return "".join(rows) if rows else '<div>주요 뉴스 없음</div>'
+
+def sec_status(analysis, report):
+    """위험 지도 — C 카드: 종합 신호등 + 항목 5개(신호·근거). 규칙 설명은 ⓘ."""
+    a = analysis or {}
+    status = a.get("status") or {}
+    if not status.get("overall"):
+        return _text(report.get("risk"))
+    spy = (a.get("series") or {}).get("SPY") or {}
+    vix = a.get("vix") or {}
+    breadth = a.get("breadth") or {}
+    rates = a.get("rates") or {}
+    pos = (a.get("position") or {}).get("SPY") or {}
+    ma = [("20일선 " + ("위" if spy["above_ma20"] else "아래")) if spy.get("above_ma20") is not None else "",
+          ("50일선 " + ("위" if spy["above_ma50"] else "아래")) if spy.get("above_ma50") is not None else ""]
+    overheat = f"SPY 20일 {spy['ret_20d']:+.2f}%" + (f" · 20일 고점 대비 {pos['from_high_pct']:+.2f}%" if pos.get("from_high_pct") is not None else "") if spy.get("ret_20d") is not None else "—"
+    items = [("추세 유지", status.get("trend"), "SPY " + " · ".join(x for x in ma if x) if any(ma) else "—"),
+             ("변동성", status.get("volatility"), f"VIX {vix['now']:.2f}" if vix.get("now") is not None else "—"),
+             ("시장 폭", status.get("breadth"), f"상승 비율 {breadth['ratio']:.1f}%" if breadth.get("ratio") is not None else "—"),
+             ("금리 위험", status.get("rates"), f"10년물 5일 {int(rates['us10y_change_5d_bp']):+d}bp" if rates.get("us10y_change_5d_bp") is not None else "—"),
+             ("과열 위험", status.get("overheat"), overheat)]
+    overall = status["overall"]
+    rows = [("종합", _light_pill(overall, f"{overall} {_light_word(overall)}"), "")]
+    rows += [(_esc(label), _light_pill(light) if light else dk.dash(), _esc(basis)) for label, light, basis in items]
+    out = dk.ccard(rows, left="40%") + dk.note("🔴가 하나라도 있으면 경계, 🟡가 둘 이상이면 주의")
+    if str(report.get("risk") or "").strip():
+        out += dk.sub_label("주의할 위험요인") + _text(report.get("risk"))
+    return out
+
+
+def sec_footer(input_data):
+    return dk.footer(
+        f"데이터 수집(FRED · Yahoo Finance · CNBC)과 파이썬 계산, AI 해설(Gemini)을 자동으로 결합해 만든 글입니다. "
+        f"기준일 {_esc(dk.day(input_data.get('date')))} · 데이터 갱신 {_esc(input_data.get('updated_at') or '')}.",
+        "시장 상태 점수와 신호등은 규칙 기반 계산값이며 투자 판단의 근거로 활용하지 마십시오. 투자 권고가 아닙니다.")
+
+
+def build_body(input_data, report, cover_url=None, analysis=None):
+    """구획 제목은 짧은 명사 (가이드라인 2절). 홈 카드 CARDS: summary = (머리)·주요 지수, insight = 종합, picks = 급등주."""
+    indices = input_data.get("market", {}).get("indices", {})
+    parts = [
+        dk.WRAP_OPEN,
+        _cover_image(cover_url),
+        sec_lead(report, analysis),
+        dk.section("시장 상태", sec_regime(analysis, report), summary="규칙 점수 0~100"),
+        dk.section("주요 지수", sec_indices(indices, analysis, report)),
+    ]
+    change = sec_change(analysis, report)
+    if change:
+        parts.append(dk.section("달라진 것", change))
+    breadth = sec_breadth(analysis)
+    if breadth:
+        parts.append(dk.section("시장 폭", breadth))
+    sectors = sec_sectors(analysis, report)
+    if sectors:
+        parts.append(dk.section("섹터", sectors, summary="1일 등락률"))
+    parts += [
+        dk.section("금리·지표", sec_macro(input_data.get("macro", {}), analysis, report)),
+        dk.section("급등주", _quote_rows(input_data.get("gainers", [])) + _text(report.get("gainers_comment")), summary="상위 5"),
+        dk.section("관심 종목", _quote_rows(input_data.get("most_active", [])) + _text(report.get("attention_comment")), summary="거래 상위 5"),
+        dk.section("뉴스", sec_news(input_data, report, analysis)),
+        dk.section("위험 지도", sec_status(analysis, report)),
+        dk.section("종합", _text(report.get("opinion"))),
+        sec_footer(input_data),
+        dk.WRAP_CLOSE,
+    ]
+    return "\n".join(p for p in parts if p)
 
 
 def build_tables(input_data, report, cover_url=None, analysis=None):
-    indices = input_data.get("market", {}).get("indices", {})
-    index_table = _index_table(indices, analysis)
-
-    def quote_rows(quotes):
-        rows = []
-        for q in quotes or []:
-            rows.append([
-                _esc(q.get("symbol") or "-"),
-                _fmt_price(q.get("price")),
-                _pct_cell(q.get("change_pct")),
-                _fmt_volume(q.get("volume")),
-            ])
-        return rows
-
-    gainers = input_data.get("gainers", [])
-    gainers_table = _paragraph(quote_rows(gainers), ["종목", "가격", "등락률", "거래량"]) if gainers else _text_block("")
-
-    most_active = input_data.get("most_active", [])
-    attention_table = _paragraph(quote_rows(most_active), ["종목", "가격", "등락률", "거래량"]) if most_active else _text_block("")
-
-    return {
-        "COVER_IMAGE": _cover_image(cover_url),
-        "ONE_LINE": _text_block(report.get("one_line")),
-        "REGIME_SECTION": _regime_section(analysis, report),
-        "SUMMARY": _text_block(report.get("summary")),
-        "INDEX_TABLE": index_table,
-        "CHANGE_SECTION": _change_section(analysis, report),
-        "BREADTH_SECTION": _breadth_section(analysis),
-        "SECTOR_SECTION": _sector_section(analysis, report),
-        "STATUS_BOARD": _status_board(analysis),
-        "GAINERS_TABLE": gainers_table,
-        "GAINERS_COMMENT": _text_block(report.get("gainers_comment")),
-        "ATTENTION_TABLE": attention_table,
-        "ATTENTION_COMMENT": _text_block(report.get("attention_comment")),
-        "NEWS_LIST": _news_list(input_data, report, analysis),
-        "MACRO_TABLE": _macro_table(input_data.get("macro", {}), analysis),
-        "MACRO_COMMENT": _text_block(report.get("macro_comment")),
-        "OPINION": _text_block(report.get("opinion")),
-        "RISK": _text_block(report.get("risk")),
-        "DATE": _korean_date(input_data.get("date")),
-        "UPDATED": _esc(input_data.get("updated_at") or ""),
-    }
+    """(호환) 옛 템플릿 마커 — 더 쓰지 않는다. build_body 가 본문을 만든다."""
+    return {"BODY": build_body(input_data, report, cover_url, analysis)}
 
 
 def render(input_path, report_path, output_dir, cover_url=None, analysis_path=None):
@@ -609,13 +486,7 @@ def render(input_path, report_path, output_dir, cover_url=None, analysis_path=No
     else:
         print("analysis.json 없음 — 지수 표 3열, '무엇이 달라졌나' 생략")
 
-    with open(TEMPLATE_FILE, "r", encoding="utf-8") as f:
-        template = f.read()
-
-    body = template
-    built = build_tables(input_data, report, cover_url=cover_url, analysis=analysis)
-    for marker in MARKERS:
-        body = body.replace(f"__{marker}__", built[marker])
+    body = build_body(input_data, report, cover_url=cover_url, analysis=analysis)   # 템플릿 대신 코드로 (2026-10-11 디자인 가이드라인)
 
     body_path = os.path.join(output_dir, "report_body.html")
     preview_path = os.path.join(output_dir, "report.html")
