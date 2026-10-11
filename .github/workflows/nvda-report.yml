@@ -81,13 +81,48 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.narrate }}" = "true" ]; then
             ARGS="$ARGS --narrate"
           fi
+          # 게시는 아래 별도 단계에서 — 가격 그래프 PNG가 gh-pages에 먼저 올라가 있어야 글의 <img>가 깨지지 않는다 (2026-10-11)
+          python experiments/nvda-report/main.py $ARGS
+
+      # ① 아래 가격 그래프 (chart_price.py → output/images/nvda-price-{day}.png). daily-report 커버 이미지와 같은 경로
+      - name: Prepare chart image for deploy
+        run: |
+          mkdir -p deploy/images
+          if compgen -G "experiments/nvda-report/output/images/*.png" > /dev/null; then
+            cp experiments/nvda-report/output/images/*.png deploy/images/
+            ls -la deploy/images/
+          else
+            echo "::warning::가격 그래프가 없습니다 — 글은 그래프 없이 나간다."
+          fi
+
+      - name: Deploy chart image to gh-pages branch
+        if: hashFiles('deploy/images/*.png') != ''
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Purge and verify jsDelivr cache
+        if: hashFiles('experiments/nvda-report/output/image_ref.txt') != ''
+        run: |
+          IMAGE_REF=$(cat experiments/nvda-report/output/image_ref.txt)
+          [ -z "$IMAGE_REF" ] && { echo "::warning::그래프 ref 없음"; exit 0; }
+          curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}" || true
+          sleep 5
+          curl -sS -f -o /dev/null "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}" \
+            && echo "그래프 CDN 확인: ${IMAGE_REF}" || echo "::warning::CDN에서 아직 안 보임: ${IMAGE_REF}"
+
+      - name: Publish to Blogger
+        run: |
           if [ "$DO_PUBLISH" = "true" ]; then
             echo "게시 모드 — Blogger에 올린다."
-            ARGS="$ARGS --publish"
+            python experiments/nvda-report/publish.py --publish
           else
             echo "그림자 모드 — 게시하지 않는다. (스케줄 게시는 저장소 변수 NVDA_PUBLISH=true 로 켠다)"
+            python experiments/nvda-report/publish.py
           fi
-          python experiments/nvda-report/main.py $ARGS
 
       # 판정까지 끝난 상태가 있으면 뒤 단계가 실패했어도 저장한다 — Gemini 분류를 헛되게 하지 않기 위해.
       - name: Save state + report (nvda-state branch)

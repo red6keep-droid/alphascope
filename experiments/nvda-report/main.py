@@ -175,7 +175,15 @@ def main():
         except Exception as e:  # noqa: BLE001
             print(f"[narrate] 실패 — 서술 없이 렌더: {e}")
 
-    _step(9, total, "렌더 (MD · HTML)")
+    _step(9, total, "렌더 (가격 그래프 · MD · HTML)")
+    chart_path = os.path.join(config.OUTPUT_DIR, "chart.json")
+    if os.path.exists(chart_path):
+        os.remove(chart_path)           # 어제 그림이 오늘 글에 붙지 않게
+    try:
+        import chart_price
+        chart_price.run(conn, day)
+    except Exception as e:  # noqa: BLE001
+        print(f"[chart] 실패 — 그래프 없이 렌더: {e}")
     path = render_report.render()
     render_html.render()
 

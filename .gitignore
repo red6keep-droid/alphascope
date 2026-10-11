@@ -21,3 +21,6 @@ reference2/doc/ytb/*당잠사*
 
 experiments/nvda-report/data/
 experiments/nvda-report/output/
+
+# 참고용 복사본 (Expo 앱, node_modules 376MB + 자체 .env) — 커밋 금지 (2026-10-11)
+graph-v1 복사본/

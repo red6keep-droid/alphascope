@@ -6,6 +6,7 @@ NVDA 한 종목의 **사실 추적** 리포트다. 매수·매도 신호를 만�
 
 ## 상태
 
+- **① 아래 가격 그래프 (2026-10-11, 사용자: "표를 그래프로, 5·20·30일 누적 방향").** `chart_price.py`가 daily_bars로 30거래일 봉차트 + 5·20·60일선 + 볼린저 PNG를 만든다(graph-v1 앱의 색·구성을 따름: 상승 빨강·하락 파랑, 5일 주황·20일 보라·60일 파랑, 오른쪽 현재가 태그). 정적 그림이라 기간 버튼 대신 5·20거래일 전 세로선과 제목의 5·20·30일 변화율로 대신한다. 그림 글자는 영문(CI에 한글 폰트 없음), 한글 변화율 한 줄은 HTML에 — 홈 카드가 이 줄을 "오늘 한 줄" 아래에 같이 보여준다. 게시 경로는 daily-report 커버와 같다: 워크플로가 output/images/*.png를 gh-pages에 올리고 jsDelivr를 비운 뒤 `publish.py --publish`로 게시(그래서 main.py의 --publish는 워크플로에서 더 이상 쓰지 않는다). 다음 패널 후보: 거래량·RSI, 옵션(IV·P/C, 5일 쌓인 뒤), 추정치·목표가, 이벤트 영역별 누적.
 - **홈 카드 (2026-10-11, 사용자: 블로그에서 안 보인다 → 2번).** 블로그 홈은 글 목록을 내지 않고 라벨 피드 카드만 그리므로 글이 발행돼도 보이지 않았다. `alphaflow-home.html`에 '엔비디아' 라벨 피드 카드 추가(① 오늘 한 줄 + ⑦ 오늘의 해석, ⑦이 없는 날은 ② 오늘 바뀐 것). h2의 ①②… 번호와 "(3건)" 괄호는 `sectionKey`로 떼고 찾는다. 테마는 `python build_theme.py` → index.html을 Blogger에 올려야 반영된다.
 
 - **①단계 뼈대 완료 (2026-10-08).** Gemini 없이 수집 → 판정 → MD. 연속 실행 멱등.
@@ -37,6 +38,7 @@ experiments/nvda-report/
 ├── trump_bridge.py      # ③ trump-state의 trump_analysis.json(raw URL, 실패 시 git show) → 그날 NVDA 발언 이벤트(강도 ≥ 5) 한 줄. robust 통계 있을 때만 괄호
 ├── extract_quarterly.py # ④ XBRL companyfacts + 8-K 보도자료(*pr.htm) + 10-Q/10-K 본문 → quarterly 테이블 (9지표). 정규식, Gemini 없음
 ├── narrate.py           # ⑤ ⑦ 오늘의 해석 — Gemini 3문장 이내, 금지어 검증, 이벤트 0건이면 건너뜀
+├── chart_price.py       # ① 아래 가격 그래프 PNG (30거래일 봉·5/20/60일선·볼린저) → output/images, chart.json. 워크플로가 gh-pages로
 ├── backup_llm.py        # Gemini 예비 사슬 (Groq gpt-oss-120b → NVIDIA DeepSeek, OpenAI 호환 REST) — gemini_client가 키 전멸 때 부른다
 ├── render_html.py       # ⑤ nvda_analysis.json + narrative.json → Blogger 본문·미리보기 (trump-trend 시각 규칙)
 ├── publish.py           # ⑤ daily-report publish_blogger 재사용, 같은 제목이면 건너뜀. 기본 dry-run

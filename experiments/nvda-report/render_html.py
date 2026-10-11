@@ -85,6 +85,28 @@ def sec_headline(a):
     return out
 
 
+def sec_chart(output_dir=None):
+    """① 아래 가격 그래프 (chart_price.py가 만든 chart.json). 없으면 빈 문자열.
+
+    설명 글자는 그림 안에 영문으로 있고, 여기엔 5·20·30일 변화율 한 줄만 둔다 — 홈 카드가 ① 구획의 줄을 그대로 읽어
+    "오늘 한 줄" 아래에 붙이므로 누적 방향이 홈에서도 보인다. <img>는 글자가 없어 카드에 잡히지 않는다.
+    """
+    path = os.path.join(output_dir or config.OUTPUT_DIR, "chart.json")
+    if not os.path.exists(path):
+        return ""
+    with open(path, "r", encoding="utf-8") as f:
+        c = json.load(f)
+    ch = c.get("changes") or {}
+    parts = [f"{n}일 {_signed(ch[n], 1)}" for n in ("5", "20", "30") if ch.get(n) is not None]   # _signed는 색 span을 포함한 HTML
+    line = " · ".join(parts) + " (종가 기준 변화)" if parts else ""
+    return (f'<img src="{_esc(c["url"])}" alt="NVDA {c.get("window", 30)}거래일 봉차트" '
+            f'style="width:100%;max-width:1024px;display:block;margin:12px 0 6px;border:1px solid #eee;border-radius:8px;"/>'
+            + (f'<div style="font-size:17px;color:#333;">{line}</div>' if line else "")
+            # 범례 줄은 border-top 을 달아 홈 카드가 건너뛰게 한다 (카드는 border-top 요소를 출처·면책으로 보고 거른다)
+            + '<div style="margin-top:4px;padding-top:4px;border-top:1px solid #f3f3f3;font-size:14px;color:#999;">'
+              '30거래일 봉차트 · 5·20·60일선 · 볼린저(20, 2σ) · 세로 점선은 5·20거래일 전 · 상승 빨강, 하락 파랑</div>')
+
+
 def _event_html(e):
     tag = _tag(e["area"], e["direction"])
     src = rr.SOURCE_KO.get(e.get("source") or "", e.get("source") or "")
@@ -210,7 +232,7 @@ def build_body(a, n):
         '<div style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:18px;line-height:1.7;color:#333;">',
         _notice(a),
         _muted(f"기준 거래일(뉴욕) {a['day']}"),
-        _h2("① 오늘 한 줄"), sec_headline(a),
+        _h2("① 오늘 한 줄"), sec_headline(a), sec_chart(),
         _h2(f"② 오늘 바뀐 것 ({a['events_total']}건)"), sec_events(a),
         _h2(f"③ 다가오는 것 ({config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 일정 {config.COURT_LOOKAHEAD_DAYS}일)"), sec_upcoming(a),
         _h2("④ 상태판"), sec_status(a),
