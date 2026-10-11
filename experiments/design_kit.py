@@ -67,17 +67,29 @@ def dash():
     return f'<span style="color:{MUTED};">—</span>'
 
 
-def h2(t, line=True, summary=""):
+def h2(t, line=True, summary="", tab=None):
+    """구획 제목. tab = 이 구획이 들어갈 탭 이름 (가이드라인 11절) — 테마 JS가 h2[data-tab]을 읽어 탭을 만든다."""
     sm = (f' <span data-summary="1" style="font-size:{TINY};font-weight:400;color:{NOTE};line-height:1.5;white-space:normal;flex:1 1 220px;">{INFO_ICON}{summary}</span>'
           if summary else "")
-    return f'<h2 style="{H2}{H2_LINE if line else ""}">{esc(t)}{sm}</h2>'
+    tb = f' data-tab="{esc(tab)}"' if tab else ""
+    return f'<h2{tb} style="{H2}{H2_LINE if line else ""}">{esc(t)}{sm}</h2>'
 
 
-def section(title, html, summary="", line=None):
+def section(title, html, summary="", line=None, tab=None):
     """제목(+옆 요약) + 내용. 바로 아래가 카드·표·그림이면 구분선을 긋지 않는다 (가이드라인 2절)."""
     if line is None:
         line = not _NO_LINE_START.match(html or "")
-    return h2(title, line=line, summary=summary) + (html or "")
+    return h2(title, line=line, summary=summary, tab=tab) + (html or "")
+
+
+def ko(text, table):
+    """영어 용어 → 한국어 (가이드라인 3-4). table 의 키를 긴 것부터 단어 경계로 바꾼다. 없는 말은 그대로."""
+    if not text:
+        return text
+    out = str(text)
+    for en in sorted(table, key=len, reverse=True):
+        out = re.sub(r"(?<![A-Za-z])" + re.escape(en) + r"(?![A-Za-z])", table[en], out)
+    return out
 
 
 def note(t):

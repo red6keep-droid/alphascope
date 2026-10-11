@@ -2063,48 +2063,61 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   syncMenu();
 })();
 
-/* ============================================================ 리포트 탭 (엔비디아 글 보기)
-   디자인-가이드라인 11절 (2026-10-11 사용자: "목업 디자인이 구현이 안 되어 있는데?" → 테마에 이식).
-   글 본문의 h2 구획을 탭 4개(오늘 · 캘린더 · 기술지표 · 재무)로 바꾼다. JS 가 없으면 세로 그대로.
-   엔비디아 글(머리에 data-cards 가 있고 h2 가 4개 이상)에서만 동작한다. 선택 탭은 URL 해시 #tab-n 에 남긴다.
-   새 구획을 만들면 아래 groups 의 match 목록에도 넣는다 — 빠지면 어느 탭에도 안 들어가 제자리에 남는다. */
+/* ============================================================ 리포트 탭 (글 보기)
+   디자인-가이드라인 11절 (2026-10-11 사용자: "탭을 활용해서 적용"). 렌더러가 h2 에 단 data-tab 을 읽어 탭을 만든다 —
+   세 리포트 공통(엔비디아·데일리·트럼프). data-tab 이 하나도 없는 옛 엔비디아 글은 고정 그룹(groups)으로, 그 밖의 옛 글은 세로 그대로.
+   머리(data-cards 또는 data-lead 부터 첫 h2 전까지)는 첫 탭으로. 탭 이름과 같은 구획 제목은 숨기고 제목 옆 요약은 안내 줄로.
+   패널 안에 소제목(data-sub)이 셋 이상이면 서브탭. 선택 탭은 URL 해시 #tab-n 에 남긴다. */
 (function () {
   'use strict';
   if (!document.body.classList.contains('item-view')) return;
   var root = document.querySelector('.post-body');
-  if (!root || !root.querySelector('[data-cards]')) return;
-  if (root.querySelector('[data-lead]')) return;   /* 데일리·트럼프 글(머리 data-lead)은 탭을 쓰지 않는다 — 구획 이름이 다르다 (2026-10-11) */
+  if (!root) return;
   var h2s = [].slice.call(root.querySelectorAll('h2'));
-  if (h2s.length < 4) return;
+  if (h2s.length < 2) return;
   function key(t) { return t.replace(/^[①-⑳\s]+/, '').replace(/\s*\([^)]*\)\s*$/, '').trim(); }
-  var groups = [
-    { name: '오늘',     match: ['중요 이슈', '목표가', '기술', '뉴스', '오늘 한 줄', '오늘 바뀐 것', '오늘의 해석'] },
-    { name: '캘린더',   match: ['캘린더', '예정', '진행 중 사안'] },
-    { name: '기술지표', match: ['기술지표', '상태판'] },
-    { name: '재무',     match: ['재무', '보유 논리 점검표'] }
-  ];
   var secs = h2s.map(function (h) {
     var nodes = [h], n = h.nextElementSibling;
     while (n && n.tagName !== 'H2') { nodes.push(n); n = n.nextElementSibling; }
     var hc = h.cloneNode(true);
     [].slice.call(hc.querySelectorAll('[data-summary]')).forEach(function (x) { x.parentNode.removeChild(x); });
-    return { h: h, key: key(hc.textContent), nodes: nodes };
+    return { h: h, key: key(hc.textContent), nodes: nodes, tab: h.getAttribute('data-tab') || '' };
   });
+  var groups = [];
+  if (secs.some(function (s) { return s.tab; })) {
+    /* 새 글: data-tab 등장 순서대로 탭. 표시 없는 구획은 첫 탭에 */
+    secs.forEach(function (s) {
+      var name = s.tab || (groups[0] ? groups[0].name : '오늘');
+      var g = groups.filter(function (x) { return x.name === name; })[0];
+      if (!g) { g = { name: name, secs: [] }; groups.push(g); }
+      g.secs.push(s);
+    });
+  } else if (root.querySelector('[data-cards]') && !root.querySelector('[data-lead]') && h2s.length >= 4) {
+    /* 옛 엔비디아 글 (data-tab 이전) */
+    var legacy = [
+      { name: '오늘',     match: ['중요 이슈', '목표가', '기술', '뉴스', '오늘 한 줄', '오늘 바뀐 것', '오늘의 해석'] },
+      { name: '캘린더',   match: ['캘린더', '예정', '진행 중 사안'] },
+      { name: '기술지표', match: ['기술지표', '상태판'] },
+      { name: '재무',     match: ['재무', '보유 논리 점검표'] }
+    ];
+    legacy.forEach(function (l) { groups.push({ name: l.name, secs: secs.filter(function (s) { return l.match.indexOf(s.key) >= 0; }) }); });
+  } else {
+    return;
+  }
+  if (groups.length < 2) return;
   var first = h2s[0];
   var bar = document.createElement('div'); bar.className = 'rt-tabs'; bar.setAttribute('role', 'tablist');
-  /* 글 머리(data-cards 부터 첫 h2 전까지)는 '오늘' 탭 안으로. 그 앞의 안내 상자·기준 거래일은 탭 위에 남는다 */
-  var leadStart = root.querySelector('[data-cards]'), lead = [];
+  var leadStart = root.querySelector('[data-cards], [data-lead]'), lead = [];
   if (leadStart) { var q = leadStart; while (q && q.tagName !== 'H2') { lead.push(q); q = q.nextElementSibling; } }
   var host = first.parentNode;     /* 본문은 바깥 div 로 한 번 감싸여 있어 h2 의 부모는 .post-body 가 아니다 */
   host.insertBefore(bar, first);   /* 구획을 패널로 옮기기 전에 탭 막대를 첫 h2 자리에 꽂는다 */
   var panels = [];
   groups.forEach(function (g, i) {
     var p = document.createElement('div'); p.className = 'rt-panel'; p.setAttribute('role', 'tabpanel');
-    if (g.name === '오늘') lead.forEach(function (n) { p.appendChild(n); });
-    secs.forEach(function (s) { if (g.match.indexOf(s.key) >= 0) { s.nodes.forEach(function (n) { p.appendChild(n); }); } });
-    /* 탭 이름과 같은 제목은 숨기고, 제목 옆 요약(안내)은 패널 맨 위 안내 줄로 꺼낸다 */
-    secs.forEach(function (sc) {
-      if (sc.key === g.name) {
+    if (i === 0) lead.forEach(function (n) { p.appendChild(n); });
+    g.secs.forEach(function (s) { s.nodes.forEach(function (n) { p.appendChild(n); }); });
+    g.secs.forEach(function (sc) {
+      if (sc.key === g.name) {   /* 탭 이름과 같은 제목은 숨기고, 제목 옆 요약은 패널 맨 위 안내 줄로 */
         var sm = sc.h.querySelector('[data-summary]');
         sc.h.style.display = 'none';
         if (sm) { var d = document.createElement('div'); d.style.cssText = 'font-size:14px;color:#6B7280;margin:0 0 8px;'; d.innerHTML = sm.innerHTML; sc.h.insertAdjacentElement('afterend', d); }
@@ -2112,10 +2125,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     });
     if (!p.children.length) return;
     var b = document.createElement('button'); b.className = 'rt-tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.textContent = g.name;
-    b.onclick = function () { select(panels.indexOf(entry)); };
     var entry = { b: b, p: p };
+    b.onclick = function () { select(panels.indexOf(entry)); };
     bar.appendChild(b); panels.push(entry);
   });
+  if (panels.length < 2) { bar.parentNode.removeChild(bar); panels.forEach(function (x) { while (x.p.firstChild) host.appendChild(x.p.firstChild); }); return; }
   var anchor = bar; panels.forEach(function (x) { anchor.insertAdjacentElement('afterend', x.p); anchor = x.p; });
   function select(i, keepHash) {
     panels.forEach(function (x, j) { x.b.setAttribute('aria-selected', String(i === j)); x.p.hidden = i !== j; });
@@ -2123,21 +2137,21 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   }
   var hm = /^#tab-(\d)$/.exec(location.hash || '');
   select(hm ? Math.min(parseInt(hm[1], 10), panels.length - 1) : 0, true);
-  /* 기술지표 서브탭 — 소제목(data-sub)마다 밑줄 탭. 알약과 겹치는 소제목은 숨긴다 */
-  var st = panels.filter(function (x) { return x.b.textContent === '기술지표'; })[0];
-  if (!st) return;
-  var subs = [], cur = null;
-  [].slice.call(st.p.children).forEach(function (n) {
-    if (n.tagName === 'H2') return;
-    var isHead = n.hasAttribute && n.hasAttribute('data-sub');
-    if (isHead) { cur = { name: n.textContent.trim(), nodes: [n] }; subs.push(cur); } else if (cur) { cur.nodes.push(n); }
+  /* 서브탭 — 패널 안 소제목(data-sub)이 셋 이상일 때. 알약과 겹치는 소제목은 숨긴다 */
+  panels.forEach(function (st) {
+    var subs = [], cur = null;
+    [].slice.call(st.p.children).forEach(function (n) {
+      if (n.tagName === 'H2') return;
+      var isHead = n.hasAttribute && n.hasAttribute('data-sub');
+      if (isHead) { cur = { name: n.textContent.trim(), nodes: [n] }; subs.push(cur); } else if (cur) { cur.nodes.push(n); }
+    });
+    if (subs.length < 3) return;
+    var sb = document.createElement('div'); sb.className = 'rt-sub';
+    function sel2(i) { subs.forEach(function (s, j) { s.b.setAttribute('aria-selected', String(i === j)); s.nodes.forEach(function (n, k) { n.hidden = (i !== j) || k === 0; }); }); }
+    subs.forEach(function (s, i) { var b = document.createElement('button'); b.className = 'rt-subtab'; b.type = 'button'; b.textContent = s.name; b.onclick = function () { sel2(i); }; sb.appendChild(b); s.b = b; });
+    st.p.insertBefore(sb, subs[0].nodes[0]);
+    sel2(0);
   });
-  if (subs.length < 3) return;
-  var sb = document.createElement('div'); sb.className = 'rt-sub';
-  subs.forEach(function (s, i) { var b = document.createElement('button'); b.className = 'rt-subtab'; b.type = 'button'; b.textContent = s.name; b.onclick = function () { sel2(i); }; sb.appendChild(b); s.b = b; });
-  st.p.insertBefore(sb, st.p.children[1]);
-  function sel2(i) { subs.forEach(function (s, j) { s.b.setAttribute('aria-selected', String(i === j)); s.nodes.forEach(function (n, k) { n.hidden = (i !== j) || k === 0; }); }); }
-  sel2(0);
 })();
 </script>
 </body>

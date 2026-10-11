@@ -37,6 +37,30 @@ SECTORS = [
     "Real Estate", "Utilities", "Crypto", "Bonds/Rates", "Broad Market",
 ]
 DIRECTIONS = ["positive", "negative", "neutral"]
+# 리포트 표기용 한국어 (디자인-가이드라인 3-4, 2026-10-11 사용자: 용어는 한국어 위주). 분류 enum 은 영어 그대로 — 화면에서만 바꾼다
+TOPIC_KO = {"Trade": "무역", "Fed": "연준", "Tax": "세금", "Energy": "에너지", "Immigration": "이민", "Regulation": "규제",
+            "Geopolitics": "지정학", "Company": "기업", "Personal": "개인", "Sports": "스포츠", "Media/Press": "언론",
+            "Campaign/Politics": "정치", "Legal": "법무", "Congratulations": "축하", "Other": "기타"}
+SECTOR_KO = {"Semiconductor": "반도체", "Technology": "기술", "Financials": "금융", "Energy": "에너지", "Healthcare": "헬스케어",
+             "Industrials": "산업", "Consumer": "소비", "Autos": "자동차", "Defense": "방산", "Materials": "소재",
+             "Real Estate": "부동산", "Utilities": "유틸리티", "Crypto": "가상자산", "Bonds/Rates": "채권·금리", "Broad Market": "시장 전체"}
+SUBTOPIC_KO = {
+    "Tariff": "관세", "Trade Deal": "무역 합의", "Trade Relations": "무역 관계", "Trade Deficit": "무역 적자", "Reciprocity": "상호주의",
+    "Infrastructure Deal": "인프라 합의", "Sanctions": "제재", "Rate Cut": "금리 인하", "Interest Rates": "금리", "Inflation": "물가",
+    "Fed Chair": "연준 의장", "Fed Board Nomination": "연준 이사 지명", "Fed Building Costs": "연준 건물 비용", "Jobs Report": "고용 보고서",
+    "Oil Prices": "유가", "Oil Drilling": "석유 시추", "Drilling": "시추", "Oil Investment": "석유 투자", "Oil Production": "석유 생산",
+    "Diesel Fuel": "경유", "Gas Prices": "휘발유 가격", "Gasoline Prices": "휘발유 가격", "Fuel Economy": "연비",
+    "Drug Pricing": "약가", "Healthcare": "의료", "AI Regulation": "AI 규제", "Data Centers": "데이터센터", "Antitrust": "반독점",
+    "Crypto": "가상자산", "Trump Accounts": "트럼프 계좌", "Deforestation": "산림 파괴",
+    "Border": "국경", "Deportation": "추방", "Home Prices": "주택 가격", "Housing Prices": "주택 가격",
+    "Tax Cut": "감세", "Military Strike": "군사 공격", "Military Threat": "군사 위협", "War": "전쟁", "Iran War": "이란 전쟁",
+    "Ceasefire": "휴전", "Cease Fire": "휴전", "Retaliation": "보복", "Strait of Hormuz": "호르무즈 해협", "Hormuz Strait Tolls": "호르무즈 통행료",
+    "Iran": "이란", "Iran Deal": "이란 협상", "Investment": "투자", "Corporate Investment": "기업 투자", "Earnings": "실적",
+    "Price Cuts": "가격 인하", "Semiconductor Manufacturing": "반도체 제조", "Media Bias": "언론 편향", "Election Fraud": "선거 부정",
+}
+TERM_KO = dict(SUBTOPIC_KO)
+TERM_KO.update(SECTOR_KO)
+TERM_KO.update(TOPIC_KO)
 INTENSITY_RANGE = (1, 10)
 RELEVANCE_RANGE = (0, 3)
 

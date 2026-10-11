@@ -109,20 +109,22 @@ def _table(headers, rows):
             f"<tr>{th}</tr>{body}</table></div>")
 
 
-def _h2(t, line=True, summary=""):
-    """구획 제목. summary 가 있으면 제목 오른쪽에 요약(14px 회색, data-summary — 홈 카드는 제목 글자에서 이를 뺀다)."""
+def _h2(t, line=True, summary="", tab=None):
+    """구획 제목. summary 가 있으면 제목 오른쪽에 요약(14px 회색, data-summary — 홈 카드는 제목 글자에서 이를 뺀다).
+    tab = 들어갈 탭 이름(data-tab) — 테마 JS가 읽는다 (가이드라인 11절, 2026-10-11 세 리포트 공통)."""
     sm = (f' <span data-summary="1" style="font-size:{TINY};font-weight:400;color:{NOTE};line-height:1.5;white-space:normal;flex:1 1 220px;">{INFO_ICON}{summary}</span>'
           if summary else "")
-    return f'<h2 style="{H2}{H2_LINE if line else ""}">{_esc(t)}{sm}</h2>'
+    tb = f' data-tab="{_esc(tab)}"' if tab else ""
+    return f'<h2{tb} style="{H2}{H2_LINE if line else ""}">{_esc(t)}{sm}</h2>'
 
 
-def _section(title, html, summary="", line=None):
+def _section(title, html, summary="", line=None, tab=None):
     """제목(+옆 요약) + 내용. 내용의 첫 요소가 카드·표·그림이면 제목 밑 구분선을 뺀다 (2026-10-11 사용자 규칙).
 
     안내글 대신 제목 옆 요약을 쓴다 (2026-10-11 사용자: 안내글은 삭제하고 타이틀 옆에 요약)."""
     if line is None:
         line = not _NO_LINE_START.match(html or "")
-    return _h2(title, line=line, summary=summary) + (html or "")
+    return _h2(title, line=line, summary=summary, tab=tab) + (html or "")
 
 
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
@@ -806,13 +808,13 @@ def build_body(a, n):
         _notice(a),
         _muted(f"기준 거래일(뉴욕) {_d(a['day'])}"),
         sec_headline(a), sec_chart(a=a), sec_targets(a),   # 목표가는 200일선 카드 아래 (아코디언)   # 제목 없이 본문 머리에 (2026-10-11 사용자: 오늘 한 줄 타이틀 삭제)
-        _section("중요 이슈", sec_narrative(a, n)),   # 그래프 아래로 (2026-10-11 사용자)
-        _section("뉴스", sec_direction_bars(a) + sec_news_counts(a) + sec_events(a), line=True),   # 막대가 바로 와도 구분선
+        _section("중요 이슈", sec_narrative(a, n), tab="오늘"),   # 그래프 아래로 (2026-10-11 사용자)
+        _section("뉴스", sec_direction_bars(a) + sec_news_counts(a) + sec_events(a), line=True, tab="오늘"),   # 막대가 바로 와도 구분선
         # 탭 이름과 같은 제목(캘린더·기술지표·재무)은 탭 화면에서 숨긴다 — 본문(탭 없음)에서는 구획 경계로 남는다
-        _section("캘린더", sec_upcoming(a) + _note(f"{config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 {config.COURT_LOOKAHEAD_DAYS}일")),   # 안내는 카드 아래 (2026-10-11 사용자)
-        _section("진행 중 사안", sec_cases(a)),
-        _section("기술지표", sec_status(a)),
-        _section("재무", sec_checklist(a)),
+        _section("캘린더", sec_upcoming(a) + _note(f"{config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 {config.COURT_LOOKAHEAD_DAYS}일"), tab="캘린더"),   # 안내는 카드 아래 (2026-10-11 사용자)
+        _section("진행 중 사안", sec_cases(a), tab="캘린더"),
+        _section("기술지표", sec_status(a), tab="기술지표"),
+        _section("재무", sec_checklist(a), tab="재무"),
 
         sec_footer(a),
         "</div>",

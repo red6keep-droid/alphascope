@@ -29,6 +29,12 @@ PREVIEW = """<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
 <body style="max-width:900px;margin:0 auto;padding:16px;background:#fff;"><h1 style="font-size:26px;">__TITLE__</h1>__BODY__</body></html>"""
 
 _esc = dk.esc
+TAB_TODAY, TAB_FLOW, TAB_REACT = "오늘", "흐름", "반응"   # 탭 셋 (가이드라인 11절)
+
+
+def _k(text):
+    """주제 / 하위주제 / 섹터 영어 → 한국어 (config.TERM_KO). 'Energy / Diesel Fuel' → '에너지 / 경유'."""
+    return dk.ko(text, config.TERM_KO)
 
 
 def _pct(v, digits=2, unit="%"):
@@ -48,7 +54,7 @@ def sec_lead(a, n):
     top = ev[0] if ev else None
     rows = [("게시물 (지난 24시간)", f"{v['total']}건"), ("정책 관련", f"{v['policy']}건"), ("시장 관련 이벤트", f"{len(ev)}개")]
     if top:
-        rows.append(("가장 강한 발언", f"{_esc(top['topic'])}{' / ' + _esc(top['subtopic']) if top['subtopic'] else ''} · 강도 {top['intensity']}"))
+        rows.append(("가장 강한 발언", f"{_esc(_k(top['topic']))}{' / ' + _esc(_k(top['subtopic'])) if top['subtopic'] else ''} · 강도 {top['intensity']}"))
     out = dk.cards(dk.multi(rows))
     if v["pending"]:
         out += dk.muted(f"최근 게시물 {v['pending']}건은 아직 분류되지 않아 오늘 항목이 불완전할 수 있습니다.")
@@ -59,7 +65,7 @@ def sec_recent(a):
     """발언 — C 카드: 주제/하위주제 + 방향·세션 라벨, 보조 줄에 시각·대상·연타, 값은 강도."""
     rows = []
     for e in a["recent_events"]:
-        name = f"<b>{_esc(e['topic'])}</b>" + (f" / {_esc(e['subtopic'])}" if e["subtopic"] else "") + " " + _dir_pill(e["direction"]) + " " + dk.pill(SESSION_KO.get(e["session"], e["session"]))
+        name = f"<b>{_esc(_k(e['topic']))}</b>" + (f" / {_esc(_k(e['subtopic']))}" if e["subtopic"] else "") + " " + _dir_pill(e["direction"]) + " " + dk.pill(SESSION_KO.get(e["session"], e["session"]))
         sub = [report_title.kst_hm(e["first_post_at"]), f"대상 {e['target']}" if e.get("target") else ""]
         if e["post_count"] > 1:
             sub.append(f"연타 {e['post_count']}")
@@ -75,7 +81,7 @@ def sec_trends(a):
     """급상승 주제 (7일) — C 카드: 주제(+N: 90일 내 처음), 값 점수, 보조 줄 7일 이벤트·평균 강도."""
     rows = []
     for i, t in enumerate(a["trend_scores"][:8], 1):
-        name = f"{i}. {_esc(t['key'])}" + (dk.NEW_PILL if t["is_new_90d"] else "")
+        name = f"{i}. {_esc(_k(t['key']))}" + (dk.NEW_PILL if t["is_new_90d"] else "")
         rows.append((name, f"{t['score']:.0f}점", _esc(f"7일 이벤트 {t['events_7d']} (직전 {t['events_prev_7d']}) · 평균 강도 {t['avg_intensity']:.1f}")))
     if not rows:
         return dk.muted("최근 7일 이벤트가 없어 점수를 내지 않습니다.")
@@ -92,7 +98,7 @@ def sec_windows(a):
     rows = []
     for r in [x for x in blk.get("dims", {}).get("topic", []) if x["events"] > 0][:8]:
         delta = "직전 30일 대비 —" if r["delta_events"] is None else f"직전 30일 대비 {r['delta_events']:+.0f}%"
-        rows.append((_esc(r["key"]), f"{r['events']}건",
+        rows.append((_esc(_k(r["key"])), f"{r['events']}건",
                      _esc(f"평균 강도 {r['avg_intensity']:.1f} · 부정 비율 {int((r['neg_ratio'] or 0) * 100)}% · {delta}" if r["avg_intensity"] else delta)))
     if not rows:
         return dk.muted("30일 데이터가 아직 없습니다.")
@@ -145,10 +151,11 @@ def sec_reactions(a):
                          _pct(g("d5")), f"{st['neg_pct']:.0f}%", _x(g("rel_range")), _x(g("rel_volume")), _p(st)])
         if rows:
             ik = c.get("immediate_kinds", {})
-            out.append(dk.sub_label(f"{k} — 과거 관측일 {c['clean']}일 (이벤트 {c['total']} · 거시 발표 겹침 제외 {c['confounded']} · 장외 {ik.get('gap', 0)} / 정규장 {ik.get('intraday', 0)} · 검정 {c.get('tests', 0)}개)")
+            out.append(dk.sub_label(_k(k))   # 소제목은 주제 이름만 — 탭 JS가 서브탭 라벨로 쓴다
+                       + dk.muted(f"과거 관측일 {c['clean']}일 · 이벤트 {c['total']} · 거시 발표 겹침 제외 {c['confounded']} · 장외 {ik.get('gap', 0)} / 정규장 {ik.get('intraday', 0)} · 검정 {c.get('tests', 0)}개")
                        + dk.table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows))
         else:
-            waiting.append(f"{k} ({c['clean']}/{config.MIN_CLEAN_N})")
+            waiting.append(f"{_k(k)} ({c['clean']}/{config.MIN_CLEAN_N})")
     if waiting:
         out.append(dk.muted("표본 축적 중 (관측일 / 필요 20): " + ", ".join(waiting)))
     if not out:
@@ -169,8 +176,8 @@ def sec_why(a):
         if not e["rule_id"] or e["rule_id"] in seen:
             continue
         seen.add(e["rule_id"])
-        name = f"<b>{_esc(e['topic'])}</b>" + (f" / {_esc(e['subtopic'])}" if e["subtopic"] else "")
-        rows.append((name, _esc(e["etf"] or "—"), _esc(f"경로 {e['path_text'] or '—'} · 관찰 {', '.join(e['affected'][:10]) or '—'}")))
+        name = f"<b>{_esc(_k(e['topic']))}</b>" + (f" / {_esc(_k(e['subtopic']))}" if e["subtopic"] else "")
+        rows.append((name, _esc(e["etf"] or "—"), _esc(f"경로 {_k(e['path_text']) or '—'} · 관찰 {', '.join(e['affected'][:10]) or '—'}")))
     if not rows:
         return dk.muted("오늘 이벤트에 연결된 매핑 규칙이 없습니다.")
     return dk.ccard(rows, left="65%") + dk.note("정적 매핑 규칙(섹터 → ETF → 상위 10종목 + 본문 언급 기업)입니다. AI 판단이 아닙니다.")
@@ -179,7 +186,7 @@ def sec_why(a):
 def sec_narrative(n, key):
     if not n or not n.get(key):
         return dk.muted("서술 없음.")
-    return dk.bullets(n[key])
+    return dk.bullets(_k(t) for t in n[key])   # Gemini 문장 안의 영어 주제·섹터 이름도 한국어로
 
 
 def sec_footer(a):
@@ -196,15 +203,15 @@ def build_body(a, n):
     return "\n".join([
         dk.WRAP_OPEN,
         sec_lead(a, n),
-        dk.section("발언", sec_recent(a)),
-        dk.section("급상승 주제", sec_trends(a), summary="최근 7일"),
-        dk.section("달라진 것", sec_narrative(n, "what_changed")),
-        dk.section("30일 흐름", sec_windows(a)),
-        dk.section("과거 반응", sec_reactions(a), summary="오늘 주제의 과거 발언 뒤 시장 반응"),
-        dk.section("관찰 종목", sec_why(a)),
+        dk.section("발언", sec_recent(a), tab=TAB_TODAY),
+        dk.section("급상승 주제", sec_trends(a), summary="최근 7일", tab=TAB_TODAY),
+        dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY),
         dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow")
-                   + dk.note("관찰 대상은 위 과거 반응에서 고른 값입니다. 주제당 수십 개 조합을 검정했으므로 보정 q가 함께 작은 값만 근거로 삼으며, "
-                             "+3일·+5일은 창이 겹친 관측입니다. 인과나 방향 예측이 아닙니다.")),
+                   + dk.note("관찰 대상은 과거 반응 탭에서 고른 값입니다. 주제당 수십 개 조합을 검정했으므로 보정 q가 함께 작은 값만 근거로 삼으며, "
+                             "+3일·+5일은 창이 겹친 관측입니다. 인과나 방향 예측이 아닙니다."), tab=TAB_TODAY),
+        dk.section("30일 흐름", sec_windows(a), tab=TAB_FLOW),
+        dk.section("과거 반응", sec_reactions(a), summary="오늘 주제의 과거 발언 뒤 시장 반응", tab=TAB_REACT),
+        dk.section("관찰 종목", sec_why(a), tab=TAB_REACT),
         sec_footer(a),
         dk.WRAP_CLOSE,
     ])

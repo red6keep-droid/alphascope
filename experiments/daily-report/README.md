@@ -1,5 +1,7 @@
 # 알파스코프 데일리 리포트 (experiments/daily-report)
 
+- **탭·한국어 용어 (2026-10-11, 사용자).** 구획 h2에 `data-tab`(오늘 · 시장 · 종목·뉴스 · 위험) — 테마 JS가 탭으로 바꾼다. 표시 용어는 `render_html.TERM_KO`(Risk-On → 위험 선호 등)·`INDEX_LABELS`·`SYMBOL_NAMES`로 한국어, Gemini 문구도 같은 표로 치환. 프롬프트에도 한국어 규칙. 가이드라인 3-4·11절.
+
 - **디자인 가이드라인 적용 (2026-10-11, 사용자: "데일리 리포트도 새 디자인 규칙으로").** `render_html.py`가 `templates/report.html` 대신 `build_body`로 본문을 만든다 — 공통 조각 `experiments/design_kit.py`(18px 본문, 21px 짧은 구획 제목, C 카드, ⓘ 안내 14px, 라벨 알약 16px, 링크 아이콘). 구획: 머리(한 줄 결론, `data-lead`) → 시장 상태 → 주요 지수 → 달라진 것 → 시장 폭 → 섹터 → 금리·지표 → 급등주(`data-pick` 행, 홈 카드가 읽음) → 관심 종목 → 뉴스 → 위험 지도 → 종합. 홈 `CARDS`도 같이 바꿨다(옛 제목은 옛 글용으로 남김).
 
 

@@ -41,17 +41,22 @@ THEME_VOCAB = ["금리", "AI/반도체", "실적", "매크로", "에너지", "�
 
 # 뉴스 '관련 자산' 줄에서 심볼 대신 보여줄 이름
 SYMBOL_NAMES = {
-    "^GSPC": "S&P 500", "^IXIC": "Nasdaq", "^DJI": "Dow", "^RUT": "Russell 2000",
-    "^VIX": "VIX", "^TNX": "US10Y", "^FVX": "US5Y", "^IRX": "US3M",
+    "^GSPC": "S&P 500", "^IXIC": "나스닥", "^DJI": "다우", "^RUT": "러셀 2000",
+    "^VIX": "VIX", "^TNX": "미국 10년물 금리", "^FVX": "미국 5년물 금리", "^IRX": "미국 3개월물 금리",
 }
 
-INDEX_LABELS = {
+INDEX_LABELS = {   # 한국어 위주 (가이드라인 3-4). S&P 500·VIX 는 고유명으로 둔다
     "sp500": "S&P 500",
-    "nasdaq": "Nasdaq",
-    "dow": "Dow Jones",
-    "russell": "Russell 2000",
-    "vix": "VIX",
+    "nasdaq": "나스닥",
+    "dow": "다우존스",
+    "russell": "러셀 2000",
+    "vix": "VIX (변동성 지수)",
 }
+# 영어 용어 → 한국어 (Gemini 문구·라벨 표시용)
+TERM_KO = {"위험선호(Risk-On)": "위험 선호", "위험회피(Risk-Off)": "위험 회피", "위험 선호(Risk-On)": "위험 선호", "위험 회피(Risk-Off)": "위험 회피",
+           "Risk-On": "위험 선호", "Risk-Off": "위험 회피", "Risk On": "위험 선호", "Risk Off": "위험 회피", "Neutral": "중립",
+           "Nasdaq": "나스닥", "Dow Jones": "다우존스", "Dow": "다우", "Russell 2000": "러셀 2000", "Market Regime": "시장 상태"}
+TAB_TODAY, TAB_MARKET, TAB_STOCKS, TAB_RISK = "오늘", "시장", "종목·뉴스", "위험"
 
 # report_input.json의 지수 키 → analysis.json series의 심볼 (analyze.INDEX_SYMBOL과 동일)
 INDEX_SYMBOL = {
@@ -175,10 +180,10 @@ def _cover_image(cover_url):
 
 
 def _text(text):
-    """Gemini 문구 — 줄마다 문단(18px). 비어 있으면 ⓘ 안내."""
+    """Gemini 문구 — 줄마다 문단(18px), 영어 용어는 한국어로. 비어 있으면 ⓘ 안내."""
     if not str(text or "").strip():
         return dk.muted("데이터 없음")
-    return "".join(f'<div style="margin:0 0 6px;">{_esc(line)}</div>' for line in str(text).splitlines() if line.strip())
+    return "".join(f'<div style="margin:0 0 6px;">{_esc(dk.ko(line, TERM_KO))}</div>' for line in str(text).splitlines() if line.strip())
 
 
 def _light_word(light):
@@ -193,7 +198,7 @@ def _light_pill(light, text=None):
 def sec_lead(report, analysis):
     """글 머리(제목 없음, data-lead): 한 줄 결론 D 카드. 홈 카드는 '(머리)'로 읽는다."""
     one = str(report.get("one_line") or "").strip()
-    inner = f'<div style="font-weight:700;color:#111;">{_esc(one)}</div>' if one else dk.muted("한 줄 결론 없음")
+    inner = f'<div style="font-weight:700;color:#111;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")
     return dk.cards(dk.dcard(inner, "neutral"))
 
 
@@ -204,7 +209,7 @@ def sec_regime(analysis, report):
     if regime.get("score") is None:
         return dk.muted("오늘은 시장 상태 점수를 계산하지 못했습니다.") + comment
     light = regime.get("light") or "🟡"
-    rows = [("점수", f'{int(regime["score"])} <span style="color:{MUTED};font-weight:400;">/ 100</span> ' + _light_pill(light, regime.get("label") or ""), "")]
+    rows = [("점수", f'{int(regime["score"])} <span style="color:{MUTED};font-weight:400;">/ 100</span> ' + _light_pill(light, dk.ko(regime.get("label") or "", TERM_KO)), "")]
     if regime.get("score_prev") is not None:
         rows.append(("어제 대비", dk.arrow(regime.get("delta") or 0, 0, ""), _esc(f"어제 {regime['score_prev']}점")))
     else:
@@ -439,25 +444,25 @@ def build_body(input_data, report, cover_url=None, analysis=None):
         dk.WRAP_OPEN,
         _cover_image(cover_url),
         sec_lead(report, analysis),
-        dk.section("시장 상태", sec_regime(analysis, report), summary="규칙 점수 0~100"),
-        dk.section("주요 지수", sec_indices(indices, analysis, report)),
+        dk.section("시장 상태", sec_regime(analysis, report), summary="규칙 점수 0~100", tab=TAB_TODAY),
+        dk.section("주요 지수", sec_indices(indices, analysis, report), tab=TAB_TODAY),
     ]
     change = sec_change(analysis, report)
     if change:
-        parts.append(dk.section("달라진 것", change))
+        parts.append(dk.section("달라진 것", change, tab=TAB_TODAY))
+    parts.append(dk.section("종합", _text(report.get("opinion")), tab=TAB_TODAY))
     breadth = sec_breadth(analysis)
     if breadth:
-        parts.append(dk.section("시장 폭", breadth))
+        parts.append(dk.section("시장 폭", breadth, tab=TAB_MARKET))
     sectors = sec_sectors(analysis, report)
     if sectors:
-        parts.append(dk.section("섹터", sectors, summary="1일 등락률"))
+        parts.append(dk.section("섹터", sectors, summary="1일 등락률", tab=TAB_MARKET))
     parts += [
-        dk.section("금리·지표", sec_macro(input_data.get("macro", {}), analysis, report)),
-        dk.section("급등주", _quote_rows(input_data.get("gainers", [])) + _text(report.get("gainers_comment")), summary="상위 5"),
-        dk.section("관심 종목", _quote_rows(input_data.get("most_active", [])) + _text(report.get("attention_comment")), summary="거래 상위 5"),
-        dk.section("뉴스", sec_news(input_data, report, analysis)),
-        dk.section("위험 지도", sec_status(analysis, report)),
-        dk.section("종합", _text(report.get("opinion"))),
+        dk.section("금리·지표", sec_macro(input_data.get("macro", {}), analysis, report), tab=TAB_MARKET),
+        dk.section("급등주", _quote_rows(input_data.get("gainers", [])) + _text(report.get("gainers_comment")), summary="상위 5", tab=TAB_STOCKS),
+        dk.section("관심 종목", _quote_rows(input_data.get("most_active", [])) + _text(report.get("attention_comment")), summary="거래 상위 5", tab=TAB_STOCKS),
+        dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_STOCKS),
+        dk.section("위험 지도", sec_status(analysis, report), tab=TAB_RISK),
         sec_footer(input_data),
         dk.WRAP_CLOSE,
     ]
