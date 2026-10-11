@@ -13,24 +13,26 @@ import config
 DIR_KO = {"positive": "긍정", "negative": "부정", "uncertain": "불확실", "neutral": "중립"}
 AREA_KO = {"Earnings": "실적", "Flows": "수급", "Regulation": "규제", "Legal": "법무", "Product": "제품", "Demand": "수요",
            "Supply": "공급", "Corporate": "기업", "Macro": "거시", "Other": "기타"}
-KIND_KO = {"EARNINGS": "NVDA 실적", "EARNINGS_PEER": "고객·공급·동종 실적", "FOMC": "FOMC", "CPI": "CPI", "NFP": "고용", "GDP": "GDP",
-           "PCE": "PCE", "TSMC_REV": "TSMC 월매출", "EVENT": "행사", "INDEX": "지수", "OPEX": "옵션 만기", "COURT": "⚠ 법원"}
+KIND_KO = {"EARNINGS": "NVDA 실적", "EARNINGS_PEER": "고객·공급·동종 실적", "FOMC": "FOMC 금리 결정", "CPI": "소비자물가 (CPI)", "NFP": "고용 (비농업)", "GDP": "GDP 성장률",
+           "PCE": "개인소비지출 물가 (PCE)", "TSMC_REV": "TSMC 월매출", "EVENT": "행사", "INDEX": "지수 재편", "OPEX": "옵션 만기", "COURT": "⚠ 법원"}   # 쉬운 한국어 (가이드라인 3-4)
 LABEL_KO = {
     "close": "종가", "ret_1d": "등락", "ret_vs_spy": "SPY 대비", "ret_vs_smh": "SMH 대비", "ret_vs_amd": "AMD 대비", "ret_vs_avgo": "AVGO 대비", "gap": "시가 갭",
     "range_pct": "일중 변동폭", "vol_ratio_20d": "거래량 배수(20일)",
-    "ma50": "50일선", "ma200": "200일선", "pct_from_52w_high": "52주 고점 대비", "rsi14": "RSI 14", "ma_cross": "이평 교차",
-    "iv_atm_30d": "ATM IV 30일", "iv_rank_60d": "IV 랭크 60일", "implied_move_next_earnings": "실적 implied move",
-    "pc_ratio_oi": "풋/콜 (OI)", "pc_ratio_vol": "풋/콜 (거래량)", "gex_approx": "GEX 근사 (부호만)", "gex_flip_strike": "감마 0 행사가",
-    "max_oi_strike_call": "최대 OI 콜", "max_oi_strike_put": "최대 OI 풋",
-    "eps_est_cq": "당분기 EPS 컨센서스", "eps_est_cq_7d_chg_pct": "EPS 7일 변화", "rev_est_cq": "당분기 매출 컨센서스",
-    "rev_est_cq_7d_chg_pct": "매출 7일 변화", "revisions_up_30d": "30일 상향", "revisions_down_30d": "30일 하향",
+    "ma50": "50일선", "ma200": "200일선", "pct_from_52w_high": "52주 고점 대비", "rsi14": "RSI 14 (과열 70 · 침체 30)", "ma_cross": "평균선 교차 (50·200일)",
+    # 구분명은 쉬운 한국어, 기준·뜻은 괄호에 (디자인-가이드라인 3-4, 2026-10-11)
+    "iv_atm_30d": "내재변동성 30일 (옵션 가격이 보는 변동 폭 · 연율)", "iv_rank_60d": "변동성 순위 (최근 60일 중 · 0~100)", "implied_move_next_earnings": "실적 발표 예상 변동폭",
+    "pc_ratio_oi": "풋/콜 비율 (미결제약정)", "pc_ratio_vol": "풋/콜 비율 (거래량)", "gex_approx": "감마 노출 (부호만 · 근사)", "gex_flip_strike": "감마 전환 가격",
+    "max_oi_strike_call": "콜 최다 미결제 행사가", "max_oi_strike_put": "풋 최다 미결제 행사가",
+    "eps_est_cq": "이번 분기 주당순이익 예상 (애널리스트 평균)", "eps_est_cq_7d_chg_pct": "주당순이익 예상 7일 변화", "rev_est_cq": "이번 분기 매출 예상 (애널리스트 평균)",
+    "rev_est_cq_7d_chg_pct": "매출 예상 7일 변화", "revisions_up_30d": "30일 예상치 상향 (애널리스트 수)", "revisions_down_30d": "30일 예상치 하향 (애널리스트 수)",
     "rating_counts": "등급 분포", "pt_mean": "목표가 평균", "pt_median": "목표가 중앙", "pt_high": "목표가 최고", "pt_low": "목표가 최저",
-    "smh_shares_out": "SMH 발행주식수", "soxx_shares_out": "SOXX 발행주식수", "shares_short": "공매도 잔고", "short_pct_float": "유통주식 대비",
-    "short_asof": "공매도 기준일", "forward_pe": "선행 PER",
+    "smh_shares_out": "SMH 발행주식수 (반도체 ETF 자금 유입)", "soxx_shares_out": "SOXX 발행주식수 (반도체 ETF 자금 유입)", "shares_short": "공매도 잔고", "short_pct_float": "공매도 비율 (유통주식 대비)",
+    "short_asof": "공매도 기준일", "forward_pe": "선행 주가수익비율 (주가 ÷ 12개월 예상 주당순이익)",
+    "finra_short_ratio": "장외 공매도 비율 (FINRA 보고 장외 거래 중 공매도, 당일)", "finra_short_ratio_avg20": "장외 공매도 비율 20일 평균",
     "news_count": "기준일 NVDA 기사 수", "news_avg_7d": "직전 7일 하루 평균", "news_pending": "분류 대기 문서",
 }
-GROUP_KO = {"price": "가격·거래량", "technical": "기술", "options": "옵션", "estimates": "추정치", "analysts": "애널리스트",
-            "flows": "수급", "valuation": "밸류에이션", "news": "뉴스"}
+GROUP_KO = {"price": "가격·거래량", "technical": "기술", "options": "옵션", "estimates": "예상 실적", "analysts": "애널리스트",
+            "flows": "수급", "valuation": "주가 수준", "news": "뉴스"}
 
 
 def fmt(value, kind):
@@ -107,17 +109,25 @@ def section_headline(a):
             f"거래량 20일 평균의 {fmt(h.get('vol_ratio_20d'), 'x')}")
     if a.get("macro_today"):
         line += f" · 거시 일정: {', '.join(a['macro_today'])}"
+    if a.get("market_regime"):
+        mr = a["market_regime"]
+        line += f" · 시장 국면 {mr['regime']} (S&P 500 고점 대비 {mr['pct_from_high']:+.1f}%)"
+    if a.get("sector_flow"):
+        sf = a["sector_flow"]
+        line += f" · 반도체 자금 {sf['state']} (SMH {sf['days']}일 S&P 대비 {sf['rel_pp']:+.1f}%p · 앞선 섹터 " + ", ".join(x["name"] for x in sf["leaders"]) + ")"
     note = "" if a.get("is_latest_bar_today") else "\n\n_기준 거래일이 최신이 아닐 수 있다 — 일봉 수집 상태를 확인._"
     return line + note + "\n"
 
 
-SOURCE_KO = {"edgar": "EDGAR", "yfinance": "yfinance", "calendar": "캘린더", "nvidianews": "NVIDIA 뉴스룸", "nvidiablog": "NVIDIA 블로그",
+SOURCE_KO = {"edgar": "EDGAR", "yfinance": "yfinance", "finra": "FINRA", "calendar": "캘린더", "nvidianews": "NVIDIA 뉴스룸", "nvidiablog": "NVIDIA 블로그",
              "cnbc": "CNBC", "federalregister": "연방관보", "courtlistener": "CourtListener", "rss": "RSS"}
 DOC_KINDS = ("news", "newsroom", "blog", "fedreg", "court")
 
 
 def _event_line(e):
     tag = f"`{AREA_KO.get(e['area'], e['area'])}` {DIR_KO.get(e['direction'], e['direction'])}"
+    if e.get("speaker"):
+        tag += f" `{config.SPEAKER_KO.get(e['speaker'], e['speaker'])}`"
     if e["kind"] in DOC_KINDS:
         # 문서형: 사실 한 문장이 머리, 원문 제목은 링크 텍스트
         head = f"**{e['fact']}**" if e["emphasis"] else e["fact"]
@@ -155,7 +165,7 @@ def section_upcoming(a):
         extra = ""
         if c["kind"] == "EARNINGS":
             im = next((x["value"] for x in a["status"]["options"] if x["key"] == "implied_move_next_earnings"), None)
-            extra = f" · implied move ±{im:.1f}%" if im else ""
+            extra = f" · 예상 변동폭 ±{im:.1f}%" if im else ""
         rows.append([f"D{dn:+d}" if dn else "D0", c["day"], KIND_KO.get(c["kind"], c["kind"]), c["label"] + conf + extra])
     if not rows:
         return f"{config.CALENDAR_LOOKAHEAD_DAYS}일 내 일정 없음 (법원 일정은 {config.COURT_LOOKAHEAD_DAYS}일).\n"

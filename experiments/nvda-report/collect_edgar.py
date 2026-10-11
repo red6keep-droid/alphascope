@@ -22,7 +22,40 @@ import db
 SUBMISSIONS_URL = f"https://data.sec.gov/submissions/CIK{config.EDGAR_CIK}.json"
 ARCHIVE_BASE = f"https://www.sec.gov/Archives/edgar/data/{int(config.EDGAR_CIK)}"
 HEADERS = {"User-Agent": config.EDGAR_USER_AGENT, "Accept-Encoding": "gzip, deflate"}
-KIND_BY_FORM = {"4": "form4", "8-K": "8k", "10-Q": "10q", "10-K": "10k"}
+KIND_BY_FORM = {"4": "form4", "8-K": "8k", "10-Q": "10q", "10-K": "10k",
+                "SC 13D": "13dg", "SC 13D/A": "13dg", "SC 13G": "13dg", "SC 13G/A": "13dg"}   # 대량 보유 신고 (2026-10-11)
+_RP_NAME = re.compile(r"(?:Names?\s+of\s+Reporting\s+Persons?|Reporting\s+Person)\s*[-:：]?\s*(?:\d\.\s*)?([A-Za-z(][A-Za-z0-9&.,()' -]{2,160}?)(?=\s+2\.|\s+Check|\s+Item|$)", re.I)
+_RP_PCT = re.compile(r"Percent\s+of\s+Class[^%]{0,120}?([\d.]+)\s*%", re.I | re.S)
+_RP_XML_NAME = re.compile(r"<(?:reportingPersonName|name)>\s*([^<]{2,80}?)\s*<", re.I)
+_RP_XML_PCT = re.compile(r"<percentOfClass>\s*([\d.]+)", re.I)
+
+
+def parse_13dg(text):
+    """13D/13G 1차 보고자 이름·보유 비율 — 구조화 XML(2024-12 이후)이면 태그, 아니면 표지 문구 정규식. 못 찾으면 None."""
+    flat = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", text))
+    name = None
+    m = _RP_XML_NAME.search(text)
+    if m:
+        name = m.group(1)
+    else:
+        # 표지: "Name(s) of Reporting Person(s) [I.R.S. Identification No. of above person(s)] <이름> 2. Check ..." — 식별번호 안내 문구를 걷어내고 남는 첫 어구
+        for m in _RP_NAME.finditer(flat):
+            cand = re.sub(r"(?:S\.S\.|I\.R\.S\.)[^A-Za-z]*(?:or\s+I\.R\.S\.\s*)?Identification\s+Nos?\.?\s+of\s+above\s+persons?\s*(?:\(entities\s+only\))?", " ", m.group(1), flags=re.I)
+            cand = re.sub(r"\s+", " ", cand).strip(" -:")
+            if len(cand) >= 3 and not re.search(r"identification|above person", cand, re.I):
+                name = cand
+                break
+    pct = (_RP_XML_PCT.search(text) or _RP_PCT.search(flat))
+    if name:   # 꼬리의 I.R.S. 번호(" - 23-1945930")·각주 표시("(2)")·머리의 잘린 조각("s. ")을 걷어낸다
+        name = re.sub(r"\s*-?\s*\d{2}-\d{7}\s*$", "", name)
+        name = re.sub(r"\s*\(\d+\)\s*$", "", name)
+        name = re.sub(r"^(?:[a-z]{1,2}\.\s+)", "", name)
+        name = re.sub(r"\s+", " ", name).strip(" -:") or None
+    try:
+        pct = float(pct.group(1)) if pct else None
+    except ValueError:
+        pct = None
+    return {"filer": name, "pct": pct}
 TX_CODE_KO = {"S": "매도", "P": "매수", "M": "옵션 행사", "F": "세금 납부용 처분", "A": "부여", "G": "증여",
               "C": "전환", "D": "처분(기타)", "J": "기타"}
 ITEM_KO = {
@@ -131,9 +164,9 @@ def _form4_title(info):
     else:
         codes = sorted({TX_CODE_KO.get(t["code"], t["code"]) for t in info["transactions"] if t["code"]})
         what = " · ".join(codes) if codes else "파생 거래만"
-        return f"Form 4 — {info['owner']} ({_role(info)}): {what}"
-    plan = "10b5-1 계획" if info["is_plan"] else "계획 외"
-    return f"Form 4 — {info['owner']} ({_role(info)}): {what} [{plan}]"
+        return f"임원 거래 공시 — {info['owner']} ({_role(info)}): {what}"   # Form 4 (쉬운 한국어, 가이드라인 3-4)
+    plan = "사전 매도 계획" if info["is_plan"] else "계획 외"   # 10b5-1
+    return f"임원 거래 공시 — {info['owner']} ({_role(info)}): {what} [{plan}]"
 
 
 def _direction(info):
@@ -150,7 +183,7 @@ def collect(conn, since_days=None):
     if not since:
         since = (today - datetime.timedelta(days=since_days or config.EDGAR_BACKFILL_DAYS)).isoformat()
     filings = fetch_submissions()
-    existing = {r["item_id"] for r in conn.execute("SELECT item_id FROM items WHERE kind IN ('form4','8k','10q','10k')")}
+    existing = {r["item_id"] for r in conn.execute("SELECT item_id FROM items WHERE kind IN ('form4','8k','10q','10k','13dg')")}
     new, counts, latest = 0, {}, since
     for f in filings:
         kind = KIND_BY_FORM.get(f["form"])
@@ -181,11 +214,25 @@ def collect(conn, since_days=None):
                     + (f" @ ${t['price']:,.2f}" if t["price"] else "")
                     for t in info["transactions"] if t["shares"])
             else:
-                title = f"Form 4 — {f['accession']} (파싱 실패, 원문 확인)"
+                title = f"임원 거래 공시 — {f['accession']} (파싱 실패, 원문 확인)"
+        elif kind == "13dg":   # 5% 이상 대량 보유 신고 — 13D는 경영 관여 목적(능동), 13G는 단순 투자(수동). 사실만 적는다
+            area = "Flows"
+            info = {"filer": None, "pct": None}
+            try:
+                info = parse_13dg(_get(url).text)
+            except Exception as e:  # noqa: BLE001
+                print(f"[edgar] {f['form']} {f['accession']} 파싱 실패: {e}")
+            raw["13dg"] = info
+            who = info.get("filer") or "보고자 원문 확인"
+            pct = f" {info['pct']:.1f}%" if info.get("pct") is not None else ""
+            active = f["form"].startswith("SC 13D")
+            title = f"대량 보유 신고 {f['form']} — {who}{pct}" + (" (경영 관여 목적)" if active else " (단순 투자)")
+            direction = "uncertain" if active else "neutral"
+            summary = f["description"] or None
         elif kind == "8k":
             items = [i.strip() for i in (f["items"] or "").split(",") if i.strip()]
             raw["item_list"] = items
-            title = ("8-K — " + ", ".join(f"Item {i} {ITEM_KO.get(i, '')}".strip() for i in items)) if items else "8-K"
+            title = ("수시 공시 8-K — " + ", ".join(f"Item {i} {ITEM_KO.get(i, '')}".strip() for i in items)) if items else "수시 공시 8-K"
             area = "Earnings" if "2.02" in items else "Corporate"
             summary = f["description"] or None
         else:

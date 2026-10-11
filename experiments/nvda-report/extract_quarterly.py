@@ -217,7 +217,7 @@ def derive(conn):
     for r in conn.execute("SELECT fiscal_quarter, value FROM quarterly WHERE metric = 'guidance_revenue_next'").fetchall():
         act = conn.execute("SELECT value FROM quarterly WHERE metric = 'revenue' AND fiscal_quarter = ?", (r["fiscal_quarter"],)).fetchone()
         if act and act["value"] and r["value"]:
-            _put(conn, r["fiscal_quarter"], "guidance_beat_pct", round((act["value"] / r["value"] - 1) * 100, 1), "%", "계산 (실제 ÷ 가이던스)", None); n += 1
+            _put(conn, r["fiscal_quarter"], "guidance_beat_pct", round((act["value"] / r["value"] - 1) * 100, 1), "%", "계산 (실제 ÷ 회사 전망)", None); n += 1
     return n
 
 

@@ -1,4 +1,4 @@
-"""⑦ 오늘의 해석 — Gemini 서술, 3문장 이내 (기획서 10절 · 2026-10-10 사용자: 서술은 세 문장 이내, robust 통계 없으면 숫자 해석 금지).
+"""중요 이슈 (옛 ⑦ 오늘의 해석) — Gemini 요약 헤드라인 3줄 이내 (2026-10-11 사용자: 서술형 어미 금지, 요약체 · 2026-10-10: robust 통계 없으면 숫자 해석 금지).
 
 입력은 nvda_analysis.json 중 서술에 필요한 부분만. 출력은 금지어 검증 뒤 output/narrative.json.
 이벤트가 0건이면 Gemini를 부르지 않고 건너뛴다 (⑦ 생략).
@@ -15,8 +15,10 @@ from gemini_client import GeminiPool
 
 PROMPT_FILE = os.path.join(config.PROMPTS_DIR, "narrate.txt")
 FORBIDDEN = re.compile(r"때문에|영향을 미|하락시|상승시|원인|오를 것|내릴 것|전망|기대|우려|매수|매도|목표가|비중|사라|팔아|진입|청산|급격|폭발|역대급|긍정적|부정적|부담|안도")
+# 요약 헤드라인체 (2026-10-11 사용자: "~있다, ~했다, ~됐다 문체로 쓰지 마라") — 서술형 어미로 끝나면 거부
+VERB_ENDING = re.compile(r"(다|요)\.?$")
 MAX_SENTENCES = 3
-MAX_CHARS = 80
+MAX_CHARS = 48
 
 
 def _slim(a):
@@ -43,6 +45,8 @@ def validate(narrative):
         s = s.strip()
         if FORBIDDEN.search(s):
             raise ValueError(f"금지 표현: {s[:80]}")
+        if VERB_ENDING.search(s):
+            raise ValueError(f"서술형 어미 (요약 헤드라인체로): {s[:80]}")
         if len(s) > MAX_CHARS:
             raise ValueError(f"너무 긺 ({len(s)}자): {s[:60]}")
         out.append(s)

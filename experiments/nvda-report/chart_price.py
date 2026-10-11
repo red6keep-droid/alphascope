@@ -22,8 +22,10 @@ from matplotlib.patches import Rectangle  # noqa: E402
 import config  # noqa: E402
 
 WINDOW = 30            # 보이는 거래일
-MARKS = (5, 20)        # 세로선: n거래일 전
-LOOKBACK = 60          # 지표 계산용 추가 일수
+MARKS = (5, 20)        # 세로선: n거래일 전 (창 안에 있는 것만)
+CHANGE_WINDOWS = (5, 20, 60, 120)   # (옛) 기간 변화율 — 그림 제목에는 더 쓰지 않는다
+MA_WINDOWS = (5, 20, 60, 120, 200)  # 평균선 대비 (2026-10-11 사용자: 전부 평균선 대비로). 50일선은 60일선과 겹쳐 뺀다
+LOOKBACK = 200         # 200일 평균선 계산용
 UP, DOWN = "#f44336", "#2196f3"
 MA_COLORS = {5: "#ff5722", 20: "#9c27b0", 60: "#2196f3"}
 BOLL = "#2e7d32"
@@ -59,11 +61,20 @@ def _boll(values, n=20, k=2.0):
     return up, lo
 
 
-def changes(bars):
-    """5·20·30거래일 전 종가 대비 변화율 (%). 데이터가 모자라면 None."""
+def ma_rel(bars):
+    """현재 종가가 n일 평균선보다 몇 % 위·아래인지. 데이터가 모자라면 None."""
     closes = [b["close"] for b in bars]
     out = {}
-    for n in (5, 20, 30):
+    for n in MA_WINDOWS:
+        out[n] = (closes[-1] / (sum(closes[-n:]) / n) - 1) * 100 if len(closes) >= n else None
+    return out
+
+
+def changes(bars):
+    """CHANGE_WINDOWS 거래일 전 종가 대비 변화율 (%). 데이터가 모자라면 None."""
+    closes = [b["close"] for b in bars]
+    out = {}
+    for n in CHANGE_WINDOWS:
         out[n] = (closes[-1] / closes[-1 - n] - 1) * 100 if len(closes) > n else None
     return out
 
@@ -133,7 +144,8 @@ def draw(bars, path, symbol="NVDA"):
         ax.spines[sp].set_visible(False)
 
     ch = changes(bars)
-    sub = " · ".join(f"{n}d {ch[n]:+.1f}%" for n in (5, 20, 30) if ch[n] is not None)
+    mr = ma_rel(bars)
+    sub = "vs MA " + " · ".join(f"{n} {mr[n]:+.1f}%" for n in MA_WINDOWS if mr[n] is not None)
     ax.set_title(f"{symbol} — last {len(view)} trading days   {sub}", loc="left", fontsize=11, color="#111", pad=10)
     ax.legend(loc="upper left", fontsize=8, frameon=False, ncol=4)
 
@@ -157,7 +169,8 @@ def run(conn, day, symbol="NVDA"):
     with open(os.path.join(config.OUTPUT_DIR, "image_ref.txt"), "w", encoding="utf-8") as f:
         f.write(image_ref)
     with open(os.path.join(config.OUTPUT_DIR, "chart.json"), "w", encoding="utf-8") as f:
-        json.dump({"image_ref": image_ref, "url": url, "changes": {str(k): v for k, v in ch.items()}, "window": len(bars[-WINDOW:])}, f, ensure_ascii=False)
+        json.dump({"image_ref": image_ref, "url": url, "changes": {str(k): v for k, v in ch.items()},
+                   "ma_rel": {str(k): v for k, v in ma_rel(bars).items()}, "window": len(bars[-WINDOW:])}, f, ensure_ascii=False)
     print(f"[chart] {path} · {url} · " + " · ".join(f"{n}d {v:+.1f}%" for n, v in ch.items() if v is not None))
     return {"image_ref": image_ref, "url": url, "path": path, "changes": ch, "bars": len(bars)}
 

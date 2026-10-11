@@ -21,8 +21,39 @@ USER_AGENT = "Mozilla/5.0 (alphascope nvda-report; personal research)"
 SYMBOL = "NVDA"
 BENCHMARK = "SPY"
 SYMBOLS = ["NVDA", "SPY", "SMH", "AMD", "QQQ", "AVGO"]   # AVGO 2026-10-11 사용자: 브로드컴 대비 추가
+# 섹터 ETF 11개 — 반도체 자금 방향의 "어디로 갔나" 비교 (2026-10-11 사용자 승인). 데일리 브리핑과 같은 목록
+SECTOR_ETFS = {"XLK": "기술", "XLF": "금융", "XLE": "에너지", "XLV": "헬스케어", "XLP": "필수소비재", "XLY": "경기소비재",
+               "XLU": "유틸리티", "XLI": "산업재", "XLB": "소재", "XLRE": "부동산", "XLC": "통신"}
+EXTRA_BAR_SYMBOLS = ["^VIX"] + list(SECTOR_ETFS)   # 일봉만 받는 심볼 — 비교 칸(ret_vs_*)을 만들지 않는다. 시장 국면·반도체 자금용 (2026-10-11)
+# 반도체 자금 방향 (2026-10-11 사용자: "우리 섹터에서 자금이 모이는 중·빠져나가는 중, 쉽게"). 상태 셋 — 모이는 중 · 빠져나가는 중 · 뚜렷하지 않음
+SECTOR_FLOW_ETF = "SMH"
+SECTOR_FLOW_DAYS = 20             # 비교 창 (거래일)
+SECTOR_FLOW_PP = 2.0              # SMH − S&P 500 20일 수익률 차이가 이 %p 이상이면 방향 있음
+SECTOR_FLOW_NAMES = ("모이는 중", "빠져나가는 중", "뚜렷하지 않음")
+SECTOR_FLOW_DIRECTION = {"모이는 중": "positive", "빠져나가는 중": "negative", "뚜렷하지 않음": "neutral"}
 PRICE_BACKFILL_PERIOD = "2y"     # 첫 실행. 이후는 PRICE_UPDATE_PERIOD
 PRICE_UPDATE_PERIOD = "1mo"
+
+# ── 시장 국면 (기획서 7절, 2026-10-11 사용자 승인: 상태만 적고 매수·매도·비중·관망 어휘는 쓰지 않는다) ──
+REGIME_BENCHMARK = "SPY"          # S&P 500 대용 (일봉 2년 보유)
+REGIME_HIGH_DAYS = 252            # 52주 고점 (종가 기준)
+REGIME_MA_DAYS = 200
+REGIME_PULLBACK_PCT = -3.0        # 고점 대비 이 안이면 상승 추세, 그 아래 −10%까지 단기 조정
+REGIME_CORRECTION_PCT = -10.0     # 이 아래 또는 200일 평균 아래면 조정장
+REGIME_VIX_HIGH = 30.0            # VIX 이 이상이면 불안 국면 (위 셋보다 우선)
+REGIME_DIRECTION = {"상승 추세": "positive", "단기 조정": "neutral", "조정장": "negative", "불안 국면": "uncertain"}   # 전환 이벤트의 방향 라벨
+
+# ── 볼린저 밴드 카드 (2026-10-11 사용자: 하단에 도달했을 때 알려주는 카드) ──
+BOLL_WINDOW = 20
+BOLL_SIGMA = 2.0
+HISTORY_STATS_PATH = os.path.join(STATIC_DIR, "history_stats.json")   # history_stats.py 가 만든 10년 통계 (1년에 한 번 갱신)
+# 공포·탐욕 지수 (CNN) — 시장 국면 글머리표 (2026-10-11 사용자)
+FNG_URL = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
+# 과열 지표 카드 (2026-10-11 사용자: "이익 실현 구간" → 지시 대신, 조건에 닿은 날 10년 빈도를 사실로). 조건 셋, 하나라도 해당하면 카드
+OVERHEAT_RSI = 80.0               # RSI14 이 이상
+OVERHEAT_MA200_PCT = 40.0         # 종가가 200일 평균보다 이 % 이상 위
+OVERHEAT_RET20_PCT = 25.0         # 20거래일 수익률 이 % 이상
+OVERHEAT_KEYS = {"rsi80": "RSI 14 ≥ 80", "ma200_40": "200일 평균 대비 +40% 이상", "ret20_25": "20일 수익률 +25% 이상"}
 
 # ── 기술 지표 (7절) ──────────────────────────────────────────────────────
 VOL_LOOKBACK_DAYS = 20
@@ -52,7 +83,7 @@ EARNINGS_FUTURE_LIMIT_DAYS = 120  # 이보다 먼 추정 실적일은 넣지 않
 # ── EDGAR ────────────────────────────────────────────────────────────────
 EDGAR_CIK = "0001045810"
 EDGAR_USER_AGENT = os.environ.get("EDGAR_USER_AGENT", "alphascope nvda-report redkeep@futechsoft.com")
-EDGAR_FORMS = ("4", "8-K", "10-Q", "10-K")
+EDGAR_FORMS = ("4", "8-K", "10-Q", "10-K", "SC 13D", "SC 13D/A", "SC 13G", "SC 13G/A")   # 13D/G = 5% 이상 대량 보유 신고 (2026-10-11 스마트 머니 흔적 ①)
 EDGAR_BACKFILL_DAYS = 90          # 첫 실행에 받는 공시 범위
 EDGAR_REQUEST_GAP_SECONDS = 0.15  # 10 req/s 제한 아래
 
@@ -95,7 +126,12 @@ OI_JUMP_MULT = 2.0                # 특정 행사가 OI 전일 대비 2배
 OI_JUMP_MIN = 10_000              # 그 행사가의 OI가 이 이상일 때만
 EST_CHG_EVENT_PCT = 1.0           # EPS·매출 컨센서스 7일 변화 절대값 ≥ 1%
 REVISION_RATIO_EVENT = 3.0        # 30일 상향:하향 ≥ 3:1 (또는 반대)
-ETF_SHARES_5D_EVENT_PCT = 2.0
+ETF_SHARES_5D_EVENT_PCT = 2.0           # SMH·SOXX 발행주식수 5거래일 변화 (yfinance info.sharesOutstanding, 2026-10-11 수집 시작)
+# FINRA 일별 장외 공매도 비율 (2026-10-11 스마트 머니 흔적 ②) — 20일 평균에서 이만큼(%p) 벗어난 날만 이벤트
+FINRA_SHORT_URL = "https://cdn.finra.org/equity/regsho/daily/CNMSshvol{ymd}.txt"
+FINRA_BACKFILL_DAYS = 25
+FINRA_AVG_DAYS = 20
+FINRA_SHORT_RATIO_DEV_PP = 10.0
 SHORT_INTEREST_CHG_EVENT_PCT = 15.0
 MAX_EVENTS_IN_BODY = 8            # 넘으면 나머지는 접힘 목록
 EVENT_ITEM_MAX_AGE_DAYS = 3       # 지난 리포트 기록이 없을 때(첫 실행) 이보다 오래된 공시·문서는 '오늘 바뀐 것'이 아니라 백필
@@ -158,6 +194,9 @@ NEWS_COUNT_EVENT_MULT = 2.0       # 기사 수가 7일 평균의 2배 (#48 헤�
 AREAS = ["Earnings", "Flows", "Regulation", "Legal", "Product", "Demand", "Supply", "Corporate", "Macro", "Other"]
 DIRECTIONS = ["positive", "negative", "uncertain", "neutral"]
 NOVELTIES = ["new", "update", "repeat"]
+# 발언자 (2026-10-11 사용자: 대표 발언에 "누가 말했다" 표시). 문서가 그 사람·기관의 직접 발언·결정을 전할 때만. 아니면 none
+SPEAKERS = ["ceo", "nvidia_exec", "government", "customer_partner", "none"]
+SPEAKER_KO = {"ceo": "젠슨 황", "nvidia_exec": "엔비디아 임원", "government": "정부·규제 당국", "customer_partner": "고객·협력사", "none": ""}
 RELEVANCE_RANGE = (0, 3)
 RELEVANCE_EVENT_MIN = 2
 PRIORITY_AREAS = ("Legal", "Regulation")   # 법적·규제 영역은 relevance 1부터 이벤트, 접히지 않고 맨 위 (2026-10-10 사용자)
@@ -203,8 +242,12 @@ MISSING_HINTS = {
     "iv_rank_60d": "60거래일 스냅샷이 쌓인 뒤 표시",
     "rev_est_cq_7d_chg_pct": "7일치 스냅샷이 쌓인 뒤 표시",
     "ma_cross": "오늘 교차 없음",
-    "smh_shares_out": "ETF 발행주식수는 아직 수집하지 않습니다 (운용사 페이지 파싱 보류)",
-    "soxx_shares_out": "ETF 발행주식수는 아직 수집하지 않습니다 (운용사 페이지 파싱 보류)",
+    "smh_shares_out": "yfinance ETF 정보에서 받지 못함 — 다음 실행에서 재시도",
+    "soxx_shares_out": "yfinance ETF 정보에서 받지 못함 — 다음 실행에서 재시도",
+    "finra_short_ratio": "FINRA 파일은 미국 저녁에 올라옵니다 — 다음 실행에서 채움",
+    "finra_short_ratio_avg20": "장외 공매도 비율이 20일 쌓인 뒤 표시",
 }
 MISSING_DEFAULT_HINT = "이번 실행에서 받지 못함 — 다음 실행에서 재시도"
 REPORT_LABELS = ["엔비디아", "미국 증시", "자동 리포트"]
+# 고정 페이지 "리포트 읽는 법" (가이드라인 3-4, 2026-10-11). 비어 있으면 꼬리에 링크를 두지 않는다. publish.py --guide-page 가 올리고 주소를 알려준다
+GUIDE_URL = os.environ.get("NVDA_GUIDE_URL", "https://alpha-scope.blogspot.com/p/blog-page.html")   # 2026-10-11 생성

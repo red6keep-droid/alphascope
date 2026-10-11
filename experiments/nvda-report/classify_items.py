@@ -83,7 +83,9 @@ def validate_item(item, batch_ids):
     if area == "Other":
         relevance, direction = 0, "neutral"
     ents = item.get("entities") if isinstance(item.get("entities"), dict) else {}
+    speaker = item.get("speaker") if item.get("speaker") in config.SPEAKERS else "none"   # 발언자 (2026-10-11) — 값이 이상하면 none, 탈락시키지 않는다
     return {
+        "ai_speaker": speaker,
         "item_id": iid, "ai_area": area, "ai_direction": direction, "ai_novelty": novelty, "ai_relevance": relevance,
         "ai_fact": fact.strip()[:300],
         "ai_entities": db.dumps({"tickers": [t.upper() for t in _str_list(ents.get("tickers"))],
@@ -122,7 +124,7 @@ def write_results(conn, valid, model, batch):
     now = db.now_iso()
     conn.executemany(
         """UPDATE items SET ai_area=:ai_area, ai_direction=:ai_direction, ai_novelty=:ai_novelty, ai_relevance=:ai_relevance,
-             ai_fact=:ai_fact, ai_entities=:ai_entities, is_event=:is_event, analyzed_at=:analyzed_at, ai_model=:ai_model
+             ai_fact=:ai_fact, ai_entities=:ai_entities, ai_speaker=:ai_speaker, is_event=:is_event, analyzed_at=:analyzed_at, ai_model=:ai_model
            WHERE item_id=:item_id AND analyzed_at IS NULL""",
         [dict(v, analyzed_at=now, ai_model=model) for v in valid])
     ok = {v["item_id"] for v in valid}

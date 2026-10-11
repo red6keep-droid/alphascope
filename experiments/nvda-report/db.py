@@ -133,6 +133,12 @@ CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 _MIGRATIONS = [
     ("items", "classify_attempts", "INTEGER DEFAULT 0"),   # ②단계: 검증 탈락 횟수
     ("daily_state", "ret_vs_avgo", "REAL"),               # 2026-10-11: 브로드컴 대비 (SYMBOLS에 AVGO 추가)
+    ("daily_state", "finra_short_vol", "REAL"),           # 2026-10-11: FINRA 장외 공매도 거래량
+    ("daily_state", "finra_total_vol", "REAL"),
+    ("daily_state", "finra_short_ratio", "REAL"),         # % (short / total, 장외 보고분)
+    ("items", "ai_speaker", "TEXT"),                      # 2026-10-11: 발언자 (ceo · nvidia_exec · government · customer_partner · none)
+    ("daily_state", "fng_score", "REAL"),                 # 2026-10-11: CNN 공포·탐욕 지수 0~100
+    ("daily_state", "fng_rating", "TEXT"),
 ]
 
 

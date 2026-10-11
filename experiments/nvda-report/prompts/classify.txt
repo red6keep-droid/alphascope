@@ -11,7 +11,8 @@ For each item return:
   "novelty": "new" | "update" | "repeat",   // see NOVELTY
   "relevance": integer 0-3,     // see RELEVANCE
   "fact": string,               // ONE sentence in Korean stating what the document says happened. Only numbers that appear in the text. No adjectives, no causality, no advice. Max 120 Korean characters.
-  "entities": { "tickers": string[], "countries": string[], "products": string[] }   // only names that appear in the text; US tickers in uppercase
+  "entities": { "tickers": string[], "countries": string[], "products": string[] },   // only names that appear in the text; US tickers in uppercase
+  "speaker": "ceo" | "nvidia_exec" | "government" | "customer_partner" | "none"   // see SPEAKER
 }
 
 AREA:
@@ -31,6 +32,13 @@ RELEVANCE (direct connection to NVIDIA's business, NOT expected price impact):
   2  NVIDIA is the subject but the action is vague, OR a key customer/supplier/competitor (Microsoft, Google, Amazon, Meta, Oracle, OpenAI, TSMC, SK hynix, Micron, AMD, Broadcom) takes a concrete action that touches NVIDIA's demand or supply (capex guidance, monthly revenue, a rival chip order)
   1  Sector or industry context; NVIDIA is mentioned but is not the subject (AI industry outlook, a list of chip stocks, a product that uses NVIDIA GPUs as a detail)
   0  Unrelated, or promotional/marketing/educational content with no business action (conference participation, awards, tutorials, feature stories, partner showcases)
+
+SPEAKER — who is speaking or deciding in the document (the fact is a direct statement, quote, decision or filing BY this actor; reporting ABOUT them is "none"):
+  ceo               Jensen Huang himself (quote, interview statement, keynote claim, letter)
+  nvidia_exec       another NVIDIA executive or the company as speaker (CFO, press release statement, official blog, SEC filing)
+  government        a government official, agency, regulator, court or legislator (US or other country) stating or deciding something
+  customer_partner  a customer, supplier or partner company (Microsoft, TSMC, OpenAI, Dell…) stating or deciding something
+  none              nobody in particular, or a journalist/analyst/commentator; also any "profile of" or "according to sources" piece
 
 NOVELTY (compare with "recent_facts" AND with the other items in this same batch):
   new      a fact not present in recent_facts and not already covered by an earlier item in this batch (items are in chronological order — the earliest report of a story is "new", later reports of the same story are "repeat")

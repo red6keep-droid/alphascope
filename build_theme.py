@@ -162,6 +162,15 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-body table { display: block; max-width: 100%; overflow-x: auto; }
 /* 표 칸은 글자 중간에서 끊지 않는다 — 좁은 화면에서 칸을 쥐어짜지 말고 표가 옆으로 넘쳐 스크롤되게 (2026-10-11 사용자) */
 .post-body td, .post-body th { word-break: keep-all; overflow-wrap: normal; }
+/* 아코디언 (리포트 details[data-acc]): 기본 삼각형 숨기고 화살표 아이콘을 펼치면 위로 (2026-10-11) */
+.post-body details[data-acc] > summary::-webkit-details-marker { display: none; }
+.post-body details[data-acc][open] > summary .acc-chev { transform: rotate(180deg); }
+/* 툴팁 (리포트 [data-tip]): 마우스를 올리거나(PC) 누르면(폰, tabindex 포커스) 아이콘 아래에 바로 뜬다. title 툴팁은 느리고 폰에서 안 떠서 대체 (2026-10-11) */
+.post-body [data-tip] { outline: none; }
+.post-body [data-tip]::after { content: attr(data-tip); position: absolute; left: 0; top: calc(100% + 4px); z-index: 20; width: max-content; max-width: 100%;
+  padding: 8px 10px; background: #fff; color: #111; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.12);
+  font-size: 14px; font-weight: 400; line-height: 1.5; white-space: normal; word-break: keep-all; text-align: left; display: none; }
+.post-body [data-tip]:hover::after, .post-body [data-tip]:focus::after, .post-body [data-tip]:focus-within::after { display: block; }
 /* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11) */
 .post-body ul { list-style: disc; padding-left: 0; }
 .post-body ol { list-style: decimal; padding-left: 0; }
@@ -209,6 +218,10 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-body div[style*="font-size:14px"] { font-size: 17px !important; }
 .post-body p[style*="font-size:12px"] { font-size: 14px !important; }
 .post-body img[style*="max-width:760px"] { max-width: 1024px !important; }
+/* 새 디자인 글(data-design="2", 2026-10-11 디자인 가이드라인 적용분)은 위 보정에서 제외 — 안내 글 14px·표를 그대로 둔다 */
+.post-body [data-design="2"] div[style*="font-size:14px"] { font-size: 14px !important; }
+.post-body [data-design="2"] table[style*="font-size:14px"] { font-size: 14px !important; }
+.post-body [data-design="2"] > div[style*="font-size:15px"] { font-size: 15px !important; }
 
 /* 공유 버튼 — b:css='false' 로 블로거 기본 CSS 를 끈 상태라 위젯 스타일이 전혀 없다.
    기본 CSS 가 없으면 (1) svg 가 크기 제약을 잃고 원본 크기로 커지고,
@@ -314,7 +327,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
   /* 글 보기(모바일): 화면 가장자리에서 본문까지 정확히 20px. 카드 테두리·안쪽 패딩은 없앤다 (2026-10-10) */
-  body.item-view .main-content { padding-left: 20px; padding-right: 20px; }
+  body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px */
   .post-outer-container, .comments { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   .post-title { font-size: 24px; letter-spacing: -.3px; }
   .post-body { font-size: 17px; line-height: 1.75; }

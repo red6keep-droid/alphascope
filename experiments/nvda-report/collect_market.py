@@ -44,7 +44,7 @@ def fetch_daily(symbols, period):
 
 
 def collect_bars(conn, force_backfill=False):
-    symbols = config.SYMBOLS
+    symbols = config.SYMBOLS + config.EXTRA_BAR_SYMBOLS   # ^VIX는 일봉만 (시장 국면)
     backfill = [s for s in symbols if force_backfill or not _has_history(conn, s)]
     update = [s for s in symbols if s not in backfill]
     total = 0
@@ -373,6 +373,11 @@ def collect_holdings(conn, t, day, close):
         out["forward_pe"] = (close / fwd_eps) if close and fwd_eps else None
     except Exception as e:  # noqa: BLE001
         print(f"[holdings] info 실패: {e}")
+    for sym, key in (("SMH", "smh_shares_out"), ("SOXX", "soxx_shares_out")):   # 반도체 ETF 발행주식수 — 자금 유입·유출 (2026-10-11)
+        try:
+            out[key] = (yf.Ticker(sym).info or {}).get("sharesOutstanding")
+        except Exception as e:  # noqa: BLE001
+            print(f"[holdings] {sym} 발행주식수 실패: {e}")
     try:
         ih = t.institutional_holders
         if ih is not None and not ih.empty:
@@ -403,9 +408,10 @@ STATE_FIELDS_MARKET = [
     "revisions_up_30d", "revisions_down_30d", "eps_est_ny",
     "rating_counts_json", "pt_mean", "pt_high", "pt_low", "pt_median",
     "shares_short", "shares_short_prior", "short_pct_float", "short_asof", "forward_pe",
+    "smh_shares_out", "soxx_shares_out",   # 2026-10-11 수집 시작 (yfinance info)
 ]
 # 아직 수집기가 없는 칸 (④단계) — 미수집 목록에 세지 않는다
-STATE_FIELDS_LATER = ["smh_shares_out", "soxx_shares_out", "news_count"]
+STATE_FIELDS_LATER = ["news_count"]
 
 
 def collect_state(conn, day, next_earnings_day=None, skip_options=False):

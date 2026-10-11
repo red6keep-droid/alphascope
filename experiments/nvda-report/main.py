@@ -30,6 +30,8 @@ from dotenv import load_dotenv
 import collect_calendar
 import collect_edgar
 import collect_feeds
+import collect_finra
+import collect_fng
 import collect_market
 import cases_watch
 import collect_regulatory
@@ -119,7 +121,16 @@ def main():
         except Exception as e:  # noqa: BLE001
             print(f"[state] 실패 — 기존 상태판으로 계속: {e}")
 
-    _step(4, total, "EDGAR (Form 4 · 8-K · 10-Q · 10-K)")
+    if args.skip_market:
+        print("[finra] 건너뜀 (--skip-market)")
+    else:
+        try:
+            collect_finra.collect(conn, day)   # 장외 공매도 비율 — 상태판 수집과 같은 단계 (2026-10-11)
+        except Exception as e:  # noqa: BLE001
+            print(f"[finra] 실패 — 기존 값으로 계속: {e}")
+        collect_fng.collect(conn, day)         # 공포·탐욕 지수 (실패해도 조용히 None)
+
+    _step(4, total, "EDGAR (Form 4 · 8-K · 10-Q · 10-K · 13D/G)")
     if args.skip_edgar:
         print("건너뜀")
     else:

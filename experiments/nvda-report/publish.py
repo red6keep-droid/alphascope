@@ -3,6 +3,7 @@
 
     python experiments/nvda-report/publish.py            # dry-run
     python experiments/nvda-report/publish.py --publish  # 실제 게시
+    python experiments/nvda-report/publish.py --guide-page   # 고정 페이지 "리포트 읽는 법" 올리기/갱신 (static/reading_guide.html)
 """
 
 import os
@@ -39,8 +40,40 @@ def publish(output_dir=None, do_publish=False):
     return url
 
 
+GUIDE_TITLE = "리포트 읽는 법"
+GUIDE_PATH = os.path.join(config.STATIC_DIR, "reading_guide.html")
+
+
+def publish_guide_page(blog_url=None):
+    """고정 페이지 "리포트 읽는 법" — 같은 제목의 페이지가 있으면 본문을 갱신, 없으면 새로 만든다 (가이드라인 3-4, 2026-10-11).
+    Blogger pages API (posts 가 아니라 pages). 주소를 돌려주므로 config.GUIDE_URL 에 적는다."""
+    import requests
+    with open(GUIDE_PATH, "r", encoding="utf-8") as f:
+        content = f.read()
+    blog_url = blog_url or os.environ.get("BLOG_URL", publish_blogger.DEFAULT_BLOG_URL)
+    creds = publish_blogger._credentials()
+    blog_id = publish_blogger._blog_id(creds, blog_url)
+    headers = {"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"}
+    base = f"{publish_blogger.BLOGGER_API}/blogs/{blog_id}/pages"
+    r = requests.get(base, params={"fetchBodies": "false"}, headers=headers, timeout=30)
+    r.raise_for_status()
+    existing = next((p for p in r.json().get("items", []) if p.get("title") == GUIDE_TITLE), None)
+    payload = {"kind": "blogger#page", "title": GUIDE_TITLE, "content": content}
+    if existing:
+        r = requests.put(f"{base}/{existing['id']}", headers=headers, json=payload, timeout=30)
+    else:
+        r = requests.post(base, headers=headers, json=payload, timeout=30)
+    r.raise_for_status()
+    page = r.json()
+    print(f"[guide-page] {'갱신' if existing else '생성'}: {page.get('url')}")
+    return page.get("url")
+
+
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     from dotenv import load_dotenv
     load_dotenv(os.path.join(config.BASE_DIR, "..", "..", ".env"))
-    publish(do_publish="--publish" in sys.argv)
+    if "--guide-page" in sys.argv:
+        publish_guide_page()
+    else:
+        publish(do_publish="--publish" in sys.argv)
