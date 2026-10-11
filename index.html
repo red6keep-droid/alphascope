@@ -1182,6 +1182,8 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   .post-body [data-grid="2"] > span:nth-child(2) { border-top: 0 !important; }
   .post-body [data-grid="cards"] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: stretch; }
   .post-body [data-grid="cards"] > div { margin: 0 !important; }
+  /* 읽는 법 카드의 글머리표 2열 (data-guide-grid, 2026-10-11 사용자) */
+  .post-body ul[data-guide-grid] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 28px; }
 }
 /* 전환 버튼 (data-switch, 당일 · 5일 그래프): 회색 바탕 알약 둘, 선택은 흰 바탕 · 검정 굵게 (2026-10-11) */
 .post-body .rt-segs { display: inline-flex; gap: 2px; padding: 3px; margin: 4px 0 8px; background: #F1F5F9; border-radius: 8px; }

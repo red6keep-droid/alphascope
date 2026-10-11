@@ -100,7 +100,7 @@ def note(t):
 GUIDE_SHORT = 70   # 이보다 짧은 한 문장은 한 줄 "제목: 내용"
 
 
-def guide(title, body, line=True):
+def guide(title, body, line=True, grid=False):
     """제목이 있는 안내 글 (가이드라인 3-3, 2026-10-11 사용자). 14px 안내 회색 + ⓘ.
     - 짧으면 한 줄: ⓘ **주의**: 내용
     - 길거나 항목이 여럿이면: ⓘ **읽는 법** 다음 줄부터 글머리표 "막대 = 내용", "회색 띠 = 내용"
@@ -112,14 +112,14 @@ def guide(title, body, line=True):
     items = [body] if isinstance(body, str) else body
     lis = "".join(f"<li style='margin:2px 0;'>{esc(it[0]) + ' = ' + esc(it[1]) if isinstance(it, tuple) else esc(it)}</li>" for it in items)
     return (f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}'
-            f"<ul style='margin:2px 0 0 20px;padding:0;list-style:disc;'>{lis}</ul></div>")
+            f"<ul{' data-guide-grid=\"1\"' if grid else ''} style='margin:2px 0 0 20px;padding:0;list-style:disc;'>{lis}</ul></div>")   # grid: 데스크톱 2열 (테마 CSS)
 
 
 
 def guide_card(title, body):
     """읽는 법 카드 (2026-10-11 사용자: "읽는 법만 카드를 분리하여 그래프 아래에, 일괄") — 그래프·표 바로 아래 옅은 회색 카드 안에 guide()."""
     return (f'<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:8px 14px 10px;margin:8px 0;">'
-            + guide(title, body, line=False) + "</div>")
+            + guide(title, body, line=False, grid=True) + "</div>")   # 글머리표는 데스크톱에서 2열 (2026-10-11 사용자)
 
 
 def muted(t):
