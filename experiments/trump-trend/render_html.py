@@ -29,7 +29,7 @@ PREVIEW = """<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
 <body style="max-width:900px;margin:0 auto;padding:16px;background:#fff;"><h1 style="font-size:26px;">__TITLE__</h1>__BODY__</body></html>"""
 
 _esc = dk.esc
-TAB_TODAY, TAB_FLOW, TAB_REACT = "오늘", "흐름", "반응"   # 탭 셋 (가이드라인 11절)
+TAB_TODAY, TAB_FLOW, TAB_REACT = "오늘", "흐름", "과거 반응"   # 탭 이름 = 구획 이름이면 테마 JS가 구획 제목을 숨긴다 (2026-10-11 사용자: 과거 반응 타이틀 삭제)   # 탭 셋 (가이드라인 11절)
 
 
 def _k(text):
