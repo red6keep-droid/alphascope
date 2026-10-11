@@ -142,37 +142,38 @@ ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" ar
 
 
 def _chart_card(rows, horizon):
-    """그래프 설명 카드 (2026-10-11 사용자): 제목 = 결론 한 줄, 그 아래 설명 한 문장, 글머리표(16px 검정) 나머지, 읽는 법·주의는 카드 안 ⓘ 안내 글."""
+    """결론 카드 — 엔비디아 상태 카드(시장 국면) 형식 (2026-10-11 사용자: "배치·컬러·스타일 참고, 회색 배경 / 강조 컬러 배경").
+    첫 줄 왼쪽 `자산 n개`(굵게) · 오른쪽 상태(굵게: 모두 범위 안 = 회색 / k개 범위 밖 = 주황), 얇은 선 아래 3px 점 글머리표 16px 검정,
+    맨 아래 ⓘ 주의(5일). 배경: 남은 반응 없음 = 회색 #F8FAFC, 있음 = 강조 오렌지 #FFF7ED."""
     span = "당일" if horizon == "close" else "5거래일 동안"
     robust = [r for r in rows if r["robust"]]
     loose = [r for r in rows if not r["robust"] and r["lo"] is not None and not (r["lo"] <= r["mean"] <= r["hi"])]
     if robust:
-        title = f"{len(rows)}개 자산 중 {len(robust)}개만 보통 날 범위 밖"
-        desc = (" · ".join(_asset(r["sym"]) for r in robust) + f"만 이 주제 발언 뒤 {span} 보통 날과 다르게 움직였고, 나머지는 구분되지 않았습니다.")
-        theme = "uncertain"
+        state, color, (bg, bd) = f"{len(robust)}개 범위 밖", dk.WARN, dk.CARD_DIR["positive"]
+        desc = " · ".join(_asset(r["sym"]) for r in robust) + f"만 이 주제 발언 뒤 {span} 보통 날과 다르게 움직였고, 나머지는 구분되지 않았습니다"
     else:
-        title = f"{len(rows)}개 자산 모두 보통 날 범위 안"
-        desc = f"이 주제 발언 뒤 {span} 시장이 평소와 다르게 움직였다고 볼 근거가 없습니다."
-        theme = "neutral"
-    items = [("남은 반응", f"{_asset(r['sym'])} {r['mean']:+.2f}% · 보통 날 범위 {r['lo']:+.2f} ~ {r['hi']:+.2f}% 밖 · 보정 q {r['q']:.2f}") for r in robust]
+        state, color, bg, bd = "모두 범위 안", "#64748B", "#F8FAFC", "#CBD5E1"
+        desc = f"이 주제 발언 뒤 {span} 시장이 평소와 다르게 움직였다고 볼 근거가 없습니다"
+    items = [(None, desc)]
+    items += [("남은 반응", f"{_asset(r['sym'])} {r['mean']:+.2f}% · 보통 날 범위 {r['lo']:+.2f} ~ {r['hi']:+.2f}% 밖 · 보정 q {r['q']:.2f}") for r in robust]
     if loose:
         items.append(("띠 밖이지만 옅은 막대", " · ".join(f"{_asset(r['sym'])} {r['mean']:+.2f}%" for r in loose)
                       + f" — 하나만 보면 드물지만 {len(rows)}개 자산을 함께 보면 우연으로도 나올 수 있어 근거로 삼지 않습니다"))
     big = max((r for r in rows if not r["robust"] and r not in loose), key=lambda r: abs(r["mean"]), default=None)
     if big:
         items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 보통 날과 구분되지 않음 (p {big['p']:.2f})"))
-    lis = "".join(f'<li style="margin:4px 0;"><b style="color:#111;">{_esc(t)}</b> · {_esc(x)}</li>' for t, x in items)
-    note_html = ""   # 읽는 법은 그래프 아래 별도 카드(_read_card) — 2026-10-11 사용자
-    if horizon == "d5":
-        note_html += dk.guide("주의", "5일 구간은 창이 겹쳐 실제보다 강해 보일 수 있고, 원인을 뜻하지 않습니다", line=False)
-    bg, bd = dk.CARD_DIR[theme]
-    if theme == "neutral":
-        bd = "#CBD5E1"   # 회색 강조 카드도 일반 카드와 구분되게 테두리 한 단계 진하게 (2026-10-11 사용자: 1번 — 모양은 항상 강조 카드, 색만 결과로)
-    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'   # 강조 카드 형식 (가이드라인 2절)
-            f'<div style="font-weight:700;color:#111;">{_esc(title)}</div>'
-            f'<div style="font-size:{dk.SMALL};color:#111;margin:2px 0 0;">{_esc(desc)}</div>'
-            + (f'<ul style="margin:8px 0 0 20px;padding:0;list-style:disc;font-size:{dk.SMALL};color:#111;line-height:1.55;">{lis}</ul>' if lis else "")
-            + (f'<div style="margin-top:8px;padding-top:6px;border-top:1px solid {bd};">{note_html}</div>' if note_html else "") + "</div>")
+
+    def li(t, x):
+        head = f'<b>{_esc(t)}</b> · ' if t else ""
+        return (f'<li style="display:flex;align-items:flex-start;gap:7px;margin:3px 0;color:#111;">'
+                f'<span style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-top:11px;"></span><span>{head}{_esc(x)}</span></li>')
+    lis = "".join(li(t, x) for t, x in items)
+    note = dk.guide("주의", "5일 구간은 창이 겹쳐 실제보다 강해 보일 수 있고, 원인을 뜻하지 않습니다", line=False) if horizon == "d5" else ""
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'
+            f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
+            f'<span style="font-weight:700;color:#111;">자산 {len(rows)}개</span><span style="font-weight:700;color:{color};white-space:nowrap;">{_esc(state)}</span></span> '
+            f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid {bd};font-size:{dk.SMALL};line-height:1.5;">'
+            f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
 
 
 def _read_card(horizon):
