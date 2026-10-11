@@ -262,7 +262,7 @@ def sec_change(analysis, report):
     streak = rs.get("qqq_streak")
     if streak is not None:
         rows.append(("Nasdaq이 S&P 500을 웃돈 연속 일수", f"{int(streak)}일", "길수록 성장주 주도가 뚜렷"))
-    out = dk.sub_label("상대강도") + dk.ccard(rows, left="60%")
+    out = dk.sub_label("상대강도") + dk.ccard(rows)
     trows = []
     for key in ("sp500", "nasdaq", "russell"):
         s = series.get(INDEX_SYMBOL[key]) or {}
@@ -273,7 +273,7 @@ def sec_change(analysis, report):
         if p.get("from_high_pct") is not None:
             sub.append(f"20일 고점 대비 {p['from_high_pct']:+.2f}% · 저점 대비 {p['from_low_pct']:+.2f}%")
         trows.append((_esc(INDEX_LABELS[key]), _esc(p.get("position_label") or "—"), _esc(" · ".join(sub))))
-    out += dk.sub_label("20일 위치") + dk.ccard(trows, left="40%")
+    out += dk.sub_label("20일 위치") + dk.ccard(trows)
     if vix.get("now") is not None and vix.get("prev_5d") is not None:
         out += dk.ccard([("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → <b>{vix["now"]:.2f}</b> {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}', "")])
     return out + _text(report.get("change_comment"))
@@ -297,7 +297,7 @@ def sec_breadth(analysis):
         rows.append(("동일가중 − 시총가중 (1일)", dk.arrow(b["rsp_spy_1d"], 2, "%p"), "양수면 상승이 소수 대형주에 몰리지 않은 것"))
         if b.get("rsp_spy_5d") is not None:
             rows.append(("동일가중 − 시총가중 (5일)", dk.arrow(b["rsp_spy_5d"], 2, "%p"), ""))
-    return dk.ccard(rows, left="60%")
+    return dk.ccard(rows)
 
 
 def sec_sectors(analysis, report):
@@ -316,7 +316,7 @@ def sec_sectors(analysis, report):
     names = lambda etfs: " · ".join(_esc(by_etf[e]["theme"]) for e in etfs if e in by_etf)  # noqa: E731
     sectors = analysis["sectors"]
     lead = dk.ccard([("주도", names(sectors.get("leaders") or []) or dk.dash(), ""), ("약세", names(sectors.get("laggards") or []) or dk.dash(), "")])
-    return lead + dk.ccard(rows, left="45%") + _text(report.get("sector_comment"))
+    return lead + dk.ccard(rows) + _text(report.get("sector_comment"))
 
 
 def _bp(bp):
@@ -345,7 +345,7 @@ def sec_macro(macro, analysis, report):
             continue
         v, d = fred(key)
         rows.append((label, _esc(v) if v else dk.dash(), _esc(dk.day(d))))
-    out = dk.ccard(rows, left="55%")
+    out = dk.ccard(rows)
     if rates.get("growth_label"):
         out += dk.ccard([("금리와 성장주", _esc(rates["growth_label"]), "")])
     return out + _text(report.get("macro_comment"))
@@ -431,7 +431,7 @@ def sec_status(analysis, report):
     overall = status["overall"]
     rows = [("종합", _light_pill(overall, f"{overall} {_light_word(overall)}"), "")]
     rows += [(_esc(label), _light_pill(light) if light else dk.dash(), _esc(basis)) for label, light, basis in items]
-    out = dk.ccard(rows, left="40%") + dk.guide("판정", "🔴가 하나라도 있으면 경계, 🟡가 둘 이상이면 주의")
+    out = dk.ccard(rows) + dk.guide("판정", "🔴가 하나라도 있으면 경계, 🟡가 둘 이상이면 주의")
     if str(report.get("risk") or "").strip():
         out += dk.sub_label("주의할 위험요인") + _text(report.get("risk"))
     return out
