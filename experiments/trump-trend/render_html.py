@@ -85,11 +85,30 @@ def sec_trends(a):
         rows.append((name, f"{t['score']:.0f}점", _esc(f"7일 이벤트 {t['events_7d']} (직전 {t['events_prev_7d']}) · 평균 강도 {t['avg_intensity']:.1f}")))
     if not rows:
         return dk.muted("최근 7일 이벤트가 없어 점수를 내지 않습니다.")
-    out = dk.ccard(rows, left="65%")
+    out = dk.ccard(rows, left="65%") + dk.tip_line(_trend_tips())   # 점수·평균 강도 설명은 툴팁 (2026-10-11 사용자)
     ne = a["new_entrants"]
     if ne["target"] or ne["symbol"]:
         out += dk.guide("처음 등장", "직전 90일 없이 7일 안에 처음 나온 대상 — " + ", ".join(ne["target"] + ne["symbol"]))
     return out
+
+
+def _trend_tips():
+    """급상승 주제 용어 툴팁 — 계산은 aggregate.trend_scores(), 강도 척도는 prompts/classify.txt."""
+    w = config.TREND_WEIGHTS
+    pct = lambda k: f"{round(w[k] * 100)}%"
+    score = ("최근 7일에 나온 주제끼리 견준 상대 점수(0~100)입니다. 네 가지를 주제 사이 순위(0~100)로 바꿔 비중대로 더합니다.\n"
+             f"· 늘어난 정도 {pct('frequency')} = 7일 이벤트 수 − 직전 7일 이벤트 수\n"
+             f"· 강도 {pct('intensity')} = 평균 강도\n"
+             f"· 최근성 {pct('recency')} = 마지막 발언이 얼마나 최근인지\n"
+             f"· 새로움 {pct('novelty')} = 직전 {config.NOVELTY_LOOKBACK_DAYS}일에 없던 주제면 만점\n"
+             "순위로 매기므로 다른 날 점수와 견주는 값이 아닙니다.")
+    events = (f"같은 주제의 게시물이 {config.CLUSTER_GAP_MINUTES}분 안에 이어지면 한 건으로 묶은 것입니다. "
+              f"시장 관련도가 {config.RELEVANCE_EVENT_MIN} 이상인 게시물만 셉니다. 괄호는 그 앞 7일의 건수입니다.")
+    inten = ("이벤트 강도의 7일 평균(1~10)입니다. 강도는 말의 세기가 아니라 정책이 얼마나 구체적인지를 AI가 매긴 값이고, "
+             "이벤트 강도는 묶인 게시물 가운데 가장 높은 값입니다.\n"
+             "· 1~2 = 지나가는 언급\n· 3~4 = 의견·평가\n· 5~6 = 구체적 조치 없는 강한 주장·위협\n"
+             "· 7~8 = 정책 경고 또는 구체적 조치 언급\n· 9 = 정책 발표 예고\n· 10 = 즉시 시행 정책·행정명령 발표")
+    return [("점수", score), ("7일 이벤트", events), ("평균 강도", inten)]
 
 
 def sec_windows(a):

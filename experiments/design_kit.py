@@ -161,6 +161,21 @@ def guide_card(title, body, notes=()):
 
 
 
+
+def tip(text):
+    """ⓘ 툴팁 아이콘 — 글은 data-tip 속성, 모양은 테마 CSS(build_theme.py `[data-tip]::after`). 줄바꿈(\n)은 툴팁 안에서 줄을 바꾼다.
+    상자는 position:relative 인 가장 가까운 줄 기준으로 놓인다 — 아이콘은 그런 줄 안에 둔다."""
+    t = esc(text).replace(chr(34), "&quot;").replace("\n", "&#10;")
+    return (f'<span data-tip="{t}" tabindex="0" role="button" aria-label="{t}" '
+            f'style="color:{NOTE};cursor:help;vertical-align:middle;margin-left:2px;">{INFO_ICON.replace("margin-right:4px;", "")}</span>')
+
+
+def tip_line(items):
+    """용어 툴팁 줄 — "용어ⓘ · 용어ⓘ". 14px 안내 회색. items = [(용어, 설명)]. 줄이 position:relative 라 상자가 줄 폭 안에 뜬다."""
+    inner = ' <span style="color:#CBD5E1;">·</span> '.join(f'<span style="white-space:nowrap;">{esc(k)}{tip(v)}</span>' for k, v in items)
+    return f'<div style="position:relative;font-size:{TINY};color:{NOTE};line-height:1.6;margin:6px 0 2px;">{inner}</div>'
+
+
 def capsules(items):
     """캡슐 줄 (2026-10-11 사용자: "게시물 : 9건 캡슐 라인 디자인으로 연속해서") — 알약 모양 칸을 한 줄에 이어 놓고, 넘치면 다음 줄로.
     items = [(라벨, 값HTML)]. 라벨 16px 안내 회색 · 값 16px 검정 굵게, "라벨 : 값". 흰 바탕, 테두리 #E2E8F0, 모서리 끝까지 둥글게."""
