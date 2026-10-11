@@ -1,5 +1,5 @@
 """별도 글로 Blogger 게시 (기획서 10절). trump-trend publish.py와 같은 규칙 — daily-report의 publish_blogger를 가져다 쓰고,
-같은 제목(같은 날짜)의 글이 있으면 다시 올리지 않는다.
+같은 제목(같은 날짜)의 글이 있으면 **본문을 갱신한다** (2026-10-11: 디자인·코드가 바뀐 날 같은 글을 새 본문으로 다시 올릴 수 있게. 주소는 그대로).
 
     python experiments/nvda-report/publish.py            # dry-run
     python experiments/nvda-report/publish.py --publish  # 실제 게시
@@ -29,15 +29,43 @@ def publish(output_dir=None, do_publish=False):
     if not do_publish:
         print(f"[publish dry-run] 제목: {title} · 본문 {len(body):,}자 · 라벨 {report_title.LABELS}")
         return None
-    existing = publish_blogger.find_post_by_title(title)
+    existing = find_post_id(title)
     if existing:
-        print(f"[publish] 이미 게시됨 — 건너뜀: {existing}")
-        return existing
-    url = publish_blogger.publish(title, body, labels=report_title.LABELS)
+        url = update_post(existing["id"], title, body, report_title.LABELS)
+        print(f"[publish] 같은 제목이 있어 본문 갱신: {url}")
+    else:
+        url = publish_blogger.publish(title, body, labels=report_title.LABELS)
     with open(os.path.join(output_dir, "post_url.txt"), "w", encoding="utf-8") as f:
         f.write(url or "")
     print(f"[publish] 게시: {url}")
     return url
+
+
+def _api(blog_url=None):
+    import requests
+    blog_url = blog_url or os.environ.get("BLOG_URL", publish_blogger.DEFAULT_BLOG_URL)
+    creds = publish_blogger._credentials()
+    blog_id = publish_blogger._blog_id(creds, blog_url)
+    return requests, f"{publish_blogger.BLOGGER_API}/blogs/{blog_id}", {"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"}
+
+
+def find_post_id(title, max_results=15):
+    """같은 제목의 글 — {"id", "url"} 또는 None (최근 max_results건 안에서)."""
+    requests, base, headers = _api()
+    r = requests.get(f"{base}/posts", params={"maxResults": max_results, "fetchBodies": "false", "fetchImages": "false"}, headers=headers, timeout=30)
+    r.raise_for_status()
+    for p in r.json().get("items", []):
+        if str(p.get("title", "")).strip() == title.strip():
+            return {"id": p["id"], "url": p.get("url")}
+    return None
+
+
+def update_post(post_id, title, content, labels):
+    """기존 글의 본문·라벨을 바꾼다 (posts.update). 주소·게시 시각은 그대로."""
+    requests, base, headers = _api()
+    r = requests.put(f"{base}/posts/{post_id}", headers=headers, json={"kind": "blogger#post", "id": post_id, "title": title, "content": content, "labels": labels}, timeout=60)
+    r.raise_for_status()
+    return r.json().get("url")
 
 
 GUIDE_TITLE = "리포트 읽는 법"
