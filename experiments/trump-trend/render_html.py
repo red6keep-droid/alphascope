@@ -162,9 +162,7 @@ def _chart_card(rows, horizon):
     if big:
         items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 보통 날과 구분되지 않음 (p {big['p']:.2f})"))
     lis = "".join(f'<li style="margin:4px 0;"><b style="color:#111;">{_esc(t)}</b> · {_esc(x)}</li>' for t, x in items)
-    note_html = dk.guide("읽는 법", [("막대", f"발언 뒤 {span} S&P 500 대비 평균"),
-                                    ("회색 띠", "발언 없는 날에도 흔히 나오는 범위(95%)"),
-                                    ("진한 막대", "여러 자산을 함께 본 보정 뒤에도 남은 값")], line=False)
+    note_html = ""   # 읽는 법은 그래프 아래 별도 카드(_read_card) — 2026-10-11 사용자
     if horizon == "d5":
         note_html += dk.guide("주의", "5일 구간은 창이 겹쳐 실제보다 강해 보일 수 있고, 원인을 뜻하지 않습니다", line=False)
     bg, bd = dk.CARD_DIR[theme]
@@ -174,7 +172,15 @@ def _chart_card(rows, horizon):
             f'<div style="font-weight:700;color:#111;">{_esc(title)}</div>'
             f'<div style="font-size:{dk.SMALL};color:#111;margin:2px 0 0;">{_esc(desc)}</div>'
             + (f'<ul style="margin:8px 0 0 20px;padding:0;list-style:disc;font-size:{dk.SMALL};color:#111;line-height:1.55;">{lis}</ul>' if lis else "")
-            + f'<div style="margin-top:8px;padding-top:6px;border-top:1px solid {bd};">{note_html}</div></div>')
+            + (f'<div style="margin-top:8px;padding-top:6px;border-top:1px solid {bd};">{note_html}</div>' if note_html else "") + "</div>")
+
+
+def _read_card(horizon):
+    """그래프 읽는 법 — 그래프 바로 아래 별도 카드 (dk.guide_card)."""
+    span = "당일" if horizon == "close" else "5거래일 동안"
+    return dk.guide_card("읽는 법", [("막대", f"발언 뒤 {span} S&P 500 대비 평균"),
+                                    ("회색 띠", "발언 없는 날에도 흔히 나오는 범위(95%)"),
+                                    ("진한 막대", "여러 자산을 함께 본 보정 뒤에도 남은 값")])
 
 
 def _table_fold(inner_html):
@@ -209,7 +215,7 @@ def _table_rows(blk):
 
 
 def _table_legend(noise_p):
-    return (dk.guide("읽는 법", [("수치", f"{config.BENCHMARK} 대비 초과 반응(%) — {config.BENCHMARK} 행만 원수익률"),
+    return (dk.guide_card("읽는 법", [("수치", f"{config.BENCHMARK} 대비 초과 반응(%) — {config.BENCHMARK} 행만 원수익률"),
                                 ("즉각", "장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가"),
                                 ("변동폭·거래량", f"직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수, 1.00× = 보통"),
                                 ("p", f"발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않음"),
@@ -235,7 +241,7 @@ def _group_panel(blk, gkey, charts, noise_p):
             img = (f'<a href="{_esc(info["url"])}" target="_blank" rel="noopener" title="그래프 확대 보기" style="display:block;max-width:720px;">'
                    f'<img src="{_esc(info["url"])}" alt="{_esc(_k(gkey.split("#")[0]))} {HORIZON_KO[h]} 반응 그래프" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/></a>')
         hz_html += (f'<div data-hz-panel="{h}"><div data-hz-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:8px 0 4px;">{HORIZON_KO[h]}</div>'
-                    + _chart_card(rows, h) + img + "</div>")
+                    + _chart_card(rows, h) + img + (_read_card(h) if img else "") + "</div>")
     rows = _table_rows(blk)
     if not rows:
         return dk.muted(f"표본 축적 중 — 관측일 {c['clean']}일 / 필요 {config.MIN_CLEAN_N}일. 쌓이면 그래프가 나옵니다.")

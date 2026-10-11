@@ -115,6 +115,13 @@ def guide(title, body, line=True):
             f"<ul style='margin:2px 0 0 20px;padding:0;list-style:disc;'>{lis}</ul></div>")
 
 
+
+def guide_card(title, body):
+    """읽는 법 카드 (2026-10-11 사용자: "읽는 법만 카드를 분리하여 그래프 아래에, 일괄") — 그래프·표 바로 아래 옅은 회색 카드 안에 guide()."""
+    return (f'<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:8px 14px 10px;margin:8px 0;">'
+            + guide(title, body, line=False) + "</div>")
+
+
 def muted(t):
     """짧은 안내 글 (빈 구획 안내 등) — ⓘ 필수."""
     return f'<div style="color:{NOTE};font-size:{TINY};margin:6px 0;">{INFO_ICON}{esc(t)}</div>'
