@@ -140,6 +140,18 @@ def _note(t):
     return f'<div style="margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;font-size:{TINY};color:{NOTE};">{INFO_ICON}{_esc(t)}</div>'
 
 
+def _guide(title, body, line=True):
+    """제목이 있는 안내 글 (가이드라인 3-3, 2026-10-11 사용자) — design_kit.guide 와 같은 규칙.
+    짧으면 한 줄 "ⓘ **제목**: 내용", 길거나 항목이 여럿이면 "ⓘ **제목**" 다음 줄부터 글머리표 "이름 = 내용"."""
+    top = "margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;" if line else "margin:4px 0 0;"
+    head = f'{INFO_ICON}<b style="color:#4B5563;">{_esc(title)}</b>'
+    if isinstance(body, str) and len(body) <= 70:
+        return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}: {_esc(body)}</div>'
+    items = [body] if isinstance(body, str) else body
+    lis = "".join(f"<li style='margin:2px 0;'>{_esc(it[0]) + ' = ' + _esc(it[1]) if isinstance(it, tuple) else _esc(it)}</li>" for it in items)
+    return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}<ul style="margin:2px 0 0 20px;padding:0;list-style:disc;">{lis}</ul></div>'
+
+
 UL = "margin:0 0 8px 20px;padding:0;list-style:disc;"   # 위 여백 0 — 제목 아래 14px는 제목이 갖는다   # 모든 목록 공통 — 글머리표 기준선이 구획마다 달라지지 않게 (디자인-가이드라인 3절)
 LI = "margin:6px 0;"
 
@@ -649,11 +661,12 @@ def _status_value(c, st):
 
 
 # 묶음 설명 — 카드 아래 ⓘ 한 줄 (디자인-가이드라인 3-4, 2026-10-11). 뜻만 적고 평가하지 않는다
-GROUP_NOTE = {
-    "options": "옵션 시장이 가격에 담은 기대치 · 미국 장 마감 후 1회 스냅샷",
-    "estimates": "애널리스트 예상치의 평균 · 7일 변화는 예상치가 그 사이 움직인 폭",
-    "flows": "ETF 발행주식수는 자금 유입·유출(yfinance), 공매도 잔고는 격주 집계, 장외 공매도 비율은 FINRA 보고 장외 거래만(거래소 체결 제외) · 당일 파일이 늦으면 다음 실행에 채움",
-    "valuation": "주가가 앞으로 12개월 예상 이익의 몇 배인지",
+GROUP_NOTE = {   # 제목 있는 안내 (_guide) — 짧으면 한 줄, 길면 글머리표 (2026-10-11 사용자)
+    "options": ("옵션", [("뜻", "옵션 시장이 가격에 담은 기대치"), ("수집", "미국 장 마감 후 1회 스냅샷")]),
+    "estimates": ("예상 실적", [("값", "애널리스트 예상치의 평균"), ("7일 변화", "예상치가 일주일 사이 움직인 폭")]),
+    "flows": ("수급", [("ETF 발행주식수", "자금 유입·유출 (yfinance)"), ("공매도 잔고", "격주 집계"),
+                      ("장외 공매도 비율", "FINRA에 보고된 장외 거래만, 거래소 체결 제외 · 당일 파일이 늦으면 다음 실행에 채움")]),
+    "valuation": ("주가 수준", "주가가 앞으로 12개월 예상 이익의 몇 배인지"),
 }
 
 
@@ -669,7 +682,7 @@ def sec_status(a):
         for c in cells:
             v, sub = _status_value(c, st)
             rows.append((_esc(rr.LABEL_KO.get(c["key"], c["key"])) + _new(a, "status:" + c["key"]), v, sub))
-        out.append(_sub_label(rr.GROUP_KO[group]) + _ccard(rows) + (_note(GROUP_NOTE[group]) if GROUP_NOTE.get(group) else ""))
+        out.append(_sub_label(rr.GROUP_KO[group]) + _ccard(rows) + (_guide(*GROUP_NOTE[group]) if GROUP_NOTE.get(group) else ""))
     return "".join(out)
 
 
@@ -811,7 +824,7 @@ def build_body(a, n):
         _section("중요 이슈", sec_narrative(a, n), tab="오늘"),   # 그래프 아래로 (2026-10-11 사용자)
         _section("뉴스", sec_direction_bars(a) + sec_news_counts(a) + sec_events(a), line=True, tab="오늘"),   # 막대가 바로 와도 구분선
         # 탭 이름과 같은 제목(캘린더·기술지표·재무)은 탭 화면에서 숨긴다 — 본문(탭 없음)에서는 구획 경계로 남는다
-        _section("캘린더", sec_upcoming(a) + _note(f"{config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 {config.COURT_LOOKAHEAD_DAYS}일"), tab="캘린더"),   # 안내는 카드 아래 (2026-10-11 사용자)
+        _section("캘린더", sec_upcoming(a) + _guide("범위", f"{config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 일정은 {config.COURT_LOOKAHEAD_DAYS}일"), tab="캘린더"),   # 안내는 카드 아래 (2026-10-11 사용자)
         _section("진행 중 사안", sec_cases(a), tab="캘린더"),
         _section("기술지표", sec_status(a), tab="기술지표"),
         _section("재무", sec_checklist(a), tab="재무"),

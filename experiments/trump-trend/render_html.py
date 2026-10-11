@@ -88,7 +88,7 @@ def sec_trends(a):
     out = dk.ccard(rows, left="65%")
     ne = a["new_entrants"]
     if ne["target"] or ne["symbol"]:
-        out += dk.note("7일 내 처음 등장 (직전 90일 없음): " + ", ".join(ne["target"] + ne["symbol"]))
+        out += dk.guide("처음 등장", "직전 90일 없이 7일 안에 처음 나온 대상 — " + ", ".join(ne["target"] + ne["symbol"]))
     return out
 
 
@@ -102,8 +102,8 @@ def sec_windows(a):
                      _esc(f"평균 강도 {r['avg_intensity']:.1f} · 부정 비율 {int((r['neg_ratio'] or 0) * 100)}% · {delta}" if r["avg_intensity"] else delta)))
     if not rows:
         return dk.muted("30일 데이터가 아직 없습니다.")
-    note = "최근 30일 기준" + ("" if blk.get("compare_to_previous") else " · 직전 30일 데이터가 없어 변화량은 표시하지 않습니다")
-    return dk.ccard(rows, left="55%") + dk.note(note)
+    note = "최근 30일" + ("" if blk.get("compare_to_previous") else " · 직전 30일 데이터가 없어 변화량은 표시하지 않습니다")
+    return dk.ccard(rows, left="55%") + dk.guide("기준", note)
 
 
 def _x(v):
@@ -162,11 +162,14 @@ def _chart_card(rows, horizon):
     if big:
         items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 보통 날과 구분되지 않음 (p {big['p']:.2f})"))
     lis = "".join(f'<li style="margin:4px 0;"><b style="color:#111;">{_esc(t)}</b> · {_esc(x)}</li>' for t, x in items)
-    notes = [f"읽는 법 — 막대 = 발언 뒤 {span} S&P 500 대비 평균 · 회색 띠 = 발언 없는 날에도 흔히 나오는 범위(95%) · 진한 막대 = 여러 자산을 함께 본 보정 뒤에도 남은 값"]
+    note_html = dk.guide("읽는 법", [("막대", f"발언 뒤 {span} S&P 500 대비 평균"),
+                                    ("회색 띠", "발언 없는 날에도 흔히 나오는 범위(95%)"),
+                                    ("진한 막대", "여러 자산을 함께 본 보정 뒤에도 남은 값")], line=False)
     if horizon == "d5":
-        notes.append("주의 — 5일 구간은 발언이 몰린 시기에 창이 겹쳐 실제보다 강해 보일 수 있습니다. 관찰된 값이며 원인을 뜻하지 않습니다")
-    note_html = "".join(f'<div style="font-size:{dk.TINY};color:{dk.NOTE};margin:4px 0 0;line-height:1.5;">{dk.INFO_ICON}{_esc(t)}</div>' for t in notes)
+        note_html += dk.guide("주의", "5일 구간은 창이 겹쳐 실제보다 강해 보일 수 있고, 원인을 뜻하지 않습니다", line=False)
     bg, bd = dk.CARD_DIR[theme]
+    if theme == "neutral":
+        bd = "#CBD5E1"   # 회색 강조 카드도 일반 카드와 구분되게 테두리 한 단계 진하게 (2026-10-11 사용자: 1번 — 모양은 항상 강조 카드, 색만 결과로)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'   # 강조 카드 형식 (가이드라인 2절)
             f'<div style="font-weight:700;color:#111;">{_esc(title)}</div>'
             f'<div style="font-size:{dk.SMALL};color:#111;margin:2px 0 0;">{_esc(desc)}</div>'
@@ -206,12 +209,12 @@ def _table_rows(blk):
 
 
 def _table_legend(noise_p):
-    return dk.note(
-        f"수치는 {config.BENCHMARK} 대비 초과 반응(%)이며, {config.BENCHMARK}만 원수익률입니다. "
-        f"즉각 = 장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가. 변동폭·거래량은 직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수(1.00× = 보통). "
-        f"p = 발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않습니다. "
-        f"q = 자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값 — {noise_p:.2f} 미만(굵게)인 값만 보정 뒤에 남는 것으로 봅니다. "
-        f"+5일 구간은 창이 겹쳐 독립 표본이 아닙니다. 발언 이후 관찰된 값이고 인과를 의미하지 않습니다.")
+    return (dk.guide("읽는 법", [("수치", f"{config.BENCHMARK} 대비 초과 반응(%) — {config.BENCHMARK} 행만 원수익률"),
+                                ("즉각", "장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가"),
+                                ("변동폭·거래량", f"직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수, 1.00× = 보통"),
+                                ("p", f"발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않음"),
+                                ("q", f"자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값 — {noise_p:.2f} 미만(굵게)만 보정 뒤에 남는 값")])
+            + dk.guide("주의", "+5일은 창이 겹친 관측이고, 모두 발언 뒤 관찰된 값이라 인과가 아닙니다"))
 
 
 def _group_panel(blk, gkey, charts, noise_p):
@@ -296,7 +299,7 @@ def sec_why(a):
         rows.append((name, _esc(e["etf"] or "—"), _esc(f"경로 {_k(e['path_text']) or '—'} · 관찰 {', '.join(e['affected'][:10]) or '—'}")))
     if not rows:
         return dk.muted("오늘 이벤트에 연결된 매핑 규칙이 없습니다.")
-    return dk.ccard(rows, left="65%") + dk.note("정적 매핑 규칙(섹터 → ETF → 상위 10종목 + 본문 언급 기업)입니다. AI 판단이 아닙니다.")
+    return dk.ccard(rows, left="65%") + dk.guide("관찰 종목", [("고르는 법", "정적 매핑 규칙 — 섹터 → ETF → 상위 10종목 + 본문에 나온 기업"), ("성격", "AI 판단이 아닙니다")])
 
 
 def sec_narrative(n, key):
@@ -323,8 +326,8 @@ def build_body(a, n):
         dk.section("급상승 주제", sec_trends(a), summary="최근 7일", tab=TAB_TODAY),
         dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY),
         dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow")
-                   + dk.note("관찰 대상은 시장 반응 탭에서 고른 값입니다. 주제당 수십 개 조합을 검정했으므로 보정 q가 함께 작은 값만 근거로 삼으며, "
-                             "+3일·+5일은 창이 겹친 관측입니다. 인과나 방향 예측이 아닙니다."), tab=TAB_TODAY),
+                   + dk.guide("주의", [("근거", "시장 반응 탭에서 보정 q가 함께 작은 값만 고릅니다 — 주제당 수십 개 조합을 검정했기 때문"),
+                                       ("+3일·+5일", "창이 겹친 관측"), ("성격", "인과나 방향 예측이 아닙니다")]), tab=TAB_TODAY),
         dk.section("30일 흐름", sec_windows(a), tab=TAB_FLOW),
         dk.section("시장 반응", sec_reactions(a), tab=TAB_REACT),   # 탭 이름과 같아 제목은 숨고, 탭 아래 안내 문구는 두지 않는다 (2026-10-11 사용자)
         dk.section("관찰 종목", sec_why(a), tab=TAB_REACT),

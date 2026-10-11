@@ -424,7 +424,7 @@ def sec_status(analysis, report):
     overall = status["overall"]
     rows = [("종합", _light_pill(overall, f"{overall} {_light_word(overall)}"), "")]
     rows += [(_esc(label), _light_pill(light) if light else dk.dash(), _esc(basis)) for label, light, basis in items]
-    out = dk.ccard(rows, left="40%") + dk.note("🔴가 하나라도 있으면 경계, 🟡가 둘 이상이면 주의")
+    out = dk.ccard(rows, left="40%") + dk.guide("판정", "🔴가 하나라도 있으면 경계, 🟡가 둘 이상이면 주의")
     if str(report.get("risk") or "").strip():
         out += dk.sub_label("주의할 위험요인") + _text(report.get("risk"))
     return out

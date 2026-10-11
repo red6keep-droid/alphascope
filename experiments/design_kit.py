@@ -97,6 +97,24 @@ def note(t):
     return f'<div style="margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;font-size:{TINY};color:{NOTE};">{INFO_ICON}{esc(t)}</div>'
 
 
+GUIDE_SHORT = 70   # 이보다 짧은 한 문장은 한 줄 "제목: 내용"
+
+
+def guide(title, body, line=True):
+    """제목이 있는 안내 글 (가이드라인 3-3, 2026-10-11 사용자). 14px 안내 회색 + ⓘ.
+    - 짧으면 한 줄: ⓘ **주의**: 내용
+    - 길거나 항목이 여럿이면: ⓘ **읽는 법** 다음 줄부터 글머리표 "막대 = 내용", "회색 띠 = 내용"
+    body: 문자열 또는 [(이름, 내용) | 문자열, ...]. line=True 면 위에 얇은 선(구획 안내 줄), 카드 안에서는 False."""
+    top = "margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;" if line else "margin:4px 0 0;"
+    head = f'{INFO_ICON}<b style="color:#4B5563;">{esc(title)}</b>'
+    if isinstance(body, str) and len(body) <= GUIDE_SHORT:
+        return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}: {esc(body)}</div>'
+    items = [body] if isinstance(body, str) else body
+    lis = "".join(f"<li style='margin:2px 0;'>{esc(it[0]) + ' = ' + esc(it[1]) if isinstance(it, tuple) else esc(it)}</li>" for it in items)
+    return (f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}'
+            f"<ul style='margin:2px 0 0 20px;padding:0;list-style:disc;'>{lis}</ul></div>")
+
+
 def muted(t):
     """짧은 안내 글 (빈 구획 안내 등) — ⓘ 필수."""
     return f'<div style="color:{NOTE};font-size:{TINY};margin:6px 0;">{INFO_ICON}{esc(t)}</div>'
