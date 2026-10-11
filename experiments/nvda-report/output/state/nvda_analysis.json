@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-11T01:20:47Z",
+ "generated_at": "2026-10-11T03:32:40Z",
  "run_date": "2026-10-11",
  "day": "2026-10-09",
  "is_latest_bar_today": true,
@@ -35,6 +35,28 @@
    "emphasis": true,
    "source": "nvidianews",
    "published_at": "2026-10-08T14:31:00Z"
+  },
+  {
+   "area": "Product",
+   "kind": "news",
+   "title": "Nvidia reportedly halts GeForce RTX 5090 production in favor of AI data center and professional GPUs — impending supply drought expected to drive up prices, RTX 5080 24GB rumored as new gaming flagship",
+   "fact": "엔비디아가 AI 데이터센터용 GPU 생산을 위해 지포스 RTX 5090 생산을 중단한 것으로 전해졌다.",
+   "url": "https://news.google.com/rss/articles/CBMi5AJBVV95cUxQSjBCd255Y1gyWXBvSnlpVW4xNHVteF9MTG40Yngxdml6SnJ2R2JoNkF4OTdzMGJ1dkRIaVNoVlc0MnItdkNCTV9QX2FscW4zRGw1UkFTV285VW9DZS0tWmNXdmR2dUtCNmh6dWRWcmxSN3lVWDVhZ01qNUxGZ2k1bW03LWZPWndlX3NXcENxczczNUJNSUU4OHNzN3pQbmlkMmpPM2xfVXA1Z1E0b2dsMUZ4UXRGUkJ5aWh5MnVMUjZuNDMyeHBOUFdjNEJ1X3V2Wm1seDlfWHpEbC1idlR3RFhIMzhvTzRhYXFYWF91UEhXTEpfMldZUXNhMmt6Vmtsa0dnQ1B3eS15X0tmVEFXYWo5RFlUZWl6b21LTUtGM3FQbjJ0eFZscy1IOE9LaEdWb3F2Nnd4TWVXcnBKN2J1TTNzbEhaQ0ExVEpYQTRuaEhOLWg1elY2U0pYc3dvdHBac0JLLQ?oc=5",
+   "direction": "uncertain",
+   "emphasis": true,
+   "source": "Tom's Hardware",
+   "published_at": "2026-10-10T12:20:00Z"
+  },
+  {
+   "area": "Corporate",
+   "kind": "news",
+   "title": "Nvidia's head of corporate communications has left after roughly four months",
+   "fact": "엔비디아의 기업 커뮤니케이션 총괄이 임명 약 4개월 만에 사임했다.",
+   "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQaWQ4dnk4UGVwYTd3OXhhZnlMdjJtbUtCeDVyY2VrMHZaWW83T1R1cTU0YTlscDRfR1NpeVYzb0VPOTlhdkQ2UkNUSjdYQzhRdWRxRERpUFNaMzlhdWc1WkpEVHRyRUpXejRId3JuWXBPUnlVdVRPcFdXc2d5Ymd5THRuYldnUWFTWlJsVk1MYllLUUhWMkNiQ2x0dXEtaDlvYVA3Q0ZnMA?oc=5",
+   "direction": "negative",
+   "emphasis": true,
+   "source": "Business Insider",
+   "published_at": "2026-10-09T20:35:00Z"
   },
   {
    "area": "Flows",
@@ -79,7 +101,9 @@
    "emphasis": false,
    "source": "Reuters",
    "published_at": "2026-10-08T18:18:10Z"
-  },
+  }
+ ],
+ "events_overflow": [
   {
    "area": "Demand",
    "kind": "news",
@@ -101,9 +125,7 @@
    "emphasis": false,
    "source": "Reuters",
    "published_at": "2026-10-08T15:18:12Z"
-  }
- ],
- "events_overflow": [
+  },
   {
    "area": "Corporate",
    "kind": "news",
@@ -193,7 +215,7 @@
    "published_at": null
   }
  ],
- "events_total": 16,
+ "events_total": 18,
  "analyst_target_only": [],
  "upcoming": [
   {
@@ -326,7 +348,7 @@
    },
    {
     "key": "pc_ratio_oi",
-    "value": 0.7072850586328028,
+    "value": 0.707284556875901,
     "flag": false,
     "fmt": "num2"
    },
@@ -487,13 +509,13 @@
    },
    {
     "key": "news_avg_7d",
-    "value": 18.142857142857142,
+    "value": 18.428571428571427,
     "flag": false,
     "fmt": "num1"
    },
    {
     "key": "news_pending",
-    "value": 21,
+    "value": 3,
     "flag": false,
     "fmt": "int"
    }
@@ -695,7 +717,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-09",
-  "state_collected_at": "2026-10-11T01:16:25Z",
+  "state_collected_at": "2026-10-11T03:29:08Z",
   "missing_fields": [],
   "option_snapshot_days": 1,
   "iv_rank_days": 1,
@@ -707,7 +729,7 @@
    "court": 1,
    "fedreg": 21,
    "form4": 16,
-   "news": 230,
+   "news": 233,
    "newsroom": 3
   },
   "option_expiries": [
@@ -719,7 +741,7 @@
    "2026-11-13",
    "2026-11-20"
   ],
-  "items_pending": 21,
+  "items_pending": 3,
   "test_mode": true
  },
  "thresholds": {
