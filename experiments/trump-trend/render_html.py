@@ -454,7 +454,8 @@ def render(analysis_path=None, narrative_path=None, output_dir=None):
         f.write(PREVIEW.replace("__TITLE__", _esc(title)).replace("__BODY__", body))
     with open(os.path.join(output_dir, "title.txt"), "w", encoding="utf-8") as f:
         f.write(title)
-    print(f"[html] {len(body):,}자 → {body_path} · 미리보기 {preview_path}")
+    mock = dk.write_mock(body, os.path.join(output_dir, "trump_mock.html"), title)   # 테마 입힌 목업 (2026-10-11 사용자)
+    print(f"[html] {len(body):,}자 → {body_path} · 미리보기 {preview_path}" + (f" · 목업 {mock}" if mock else ""))
     return body_path, preview_path, title
 
 

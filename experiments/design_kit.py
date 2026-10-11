@@ -6,6 +6,7 @@
 """
 
 import html as html_mod
+import os
 import re
 
 UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
@@ -232,6 +233,33 @@ def capsules(items, size=None, in_title=False):
     if in_title:   # 구획 제목 줄 오른쪽 (2026-10-11 사용자: "14 폰트로, 발언 타이틀 우측에") — 좁으면 제목 아래로 내려간다
         return f'<span data-capsules="1" style="display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;align-self:center;">{inner}</span>'
     return f'<div data-capsules="1" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px;">{inner}</div>'
+
+
+
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+
+
+def write_mock(body, path, title):
+    """목업 화면 — 저장소의 index.html(블로그 테마) CSS·JS로 본문을 감싸 글 보기 화면처럼 보이게 한다 (2026-10-11 사용자: 목업으로 확인).
+    탭·툴팁·2열·읽는 법 2열이 블로그와 같게 그려진다. 그림은 gh-pages 주소 대신 로컬 output/images 를 쓴다.
+    index.html 이 없으면 만들지 않는다 (CI 등)."""
+    theme = os.path.join(_ROOT, "index.html")
+    if not os.path.exists(theme):
+        return None
+    idx = open(theme, encoding="utf-8").read()
+    css = re.search(r"<b:skin version='1.0'><!\[CDATA\[(.*?)\]\]></b:skin>", idx, re.S)
+    js = re.search(r"//<!\[CDATA\[(.*?)//\]\]>", idx, re.S)
+    if not (css and js):
+        return None
+    body = re.sub(r"https://cdn\.jsdelivr\.net/gh/[^\"]+?@gh-pages/(images/[^\"]+)", r"\1", body)
+    page = ('<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
+            f'<title>{esc(title)} — 목업</title><style>{css.group(1)}</style></head>'
+            '<body class="item-view no-dashboard"><main class="main-content"><div class="post-shell"><article class="post-outer-container"><div class="post">'
+            f'<h3 class="post-title">{esc(title)}</h3><div class="post-body entry-content">{body}</div></div></article></div></main>'
+            f'<script>{js.group(1)}</script></body></html>')
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(page)
+    return path
 
 
 def muted(t):

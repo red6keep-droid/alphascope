@@ -198,7 +198,7 @@ def _light_pill(light, text=None):
 def sec_lead(report, analysis):
     """글 머리(제목 없음, data-lead): 한 줄 결론 D 카드. 홈 카드는 '(머리)'로 읽는다."""
     one = str(report.get("one_line") or "").strip()
-    inner = f'<div style="font-weight:700;color:#111;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")
+    inner = f'<div style="color:#111;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 굵게 하지 않는다 — 강조는 카드로 (가이드라인 3-1)
     return dk.cards(dk.dcard(inner, "neutral"))
 
 
@@ -256,12 +256,12 @@ def sec_change(analysis, report):
     position = analysis.get("position") or {}
     rs = analysis.get("rs") or {}
     vix = analysis.get("vix") or {}
-    rows = [("성장주 − 시장 (Nasdaq − S&P 500 · 5일)", dk.arrow(rs.get("qqq_spy_5d"), 2, "%p"), "양수면 성장주 우위"),
-            ("소형주 − 시장 (Russell 2000 − S&P 500 · 5일)", dk.arrow(rs.get("iwm_spy_5d"), 2, "%p"), "양수면 소형주·위험선호 우위"),
-            ("동일가중 − 시총가중 (RSP − SPY · 5일)", dk.arrow(rs.get("rsp_spy_5d"), 2, "%p"), "양수면 상승이 넓게 퍼짐")]
+    rows = [("성장주 − 시장 (나스닥 − S&P 500 · 5일)", dk.arrow(rs.get("qqq_spy_5d"), 2, "%p"), ""),   # 뜻 풀이는 읽는 법 카드로 (가이드라인 3-3)
+            ("소형주 − 시장 (러셀 2000 − S&P 500 · 5일)", dk.arrow(rs.get("iwm_spy_5d"), 2, "%p"), ""),
+            ("동일가중 − 시총가중 (RSP − SPY · 5일)", dk.arrow(rs.get("rsp_spy_5d"), 2, "%p"), "")]
     streak = rs.get("qqq_streak")
     if streak is not None:
-        rows.append(("Nasdaq이 S&P 500을 웃돈 연속 일수", f"{int(streak)}일", "길수록 성장주 주도가 뚜렷"))
+        rows.append(("나스닥이 S&P 500을 웃돈 연속 일수", f"{int(streak)}일", ""))
     out = dk.sub_label("상대강도") + dk.ccard(rows)
     trows = []
     for key in ("sp500", "nasdaq", "russell"):
@@ -276,6 +276,13 @@ def sec_change(analysis, report):
     out += dk.sub_label("20일 위치") + dk.ccard(trows)
     if vix.get("now") is not None and vix.get("prev_5d") is not None:
         out += dk.ccard([("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → <b>{vix["now"]:.2f}</b> {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}', "")])
+    out += dk.guide_card("읽는 법", [
+        ("상대강도", "두 지수의 5거래일 수익률 차이(%p). 양수면 앞쪽이 더 많이 올랐습니다"),
+        ("성장주 − 시장", "양수면 나스닥(성장주)이 S&P 500보다 강했습니다"),
+        ("소형주 − 시장", "양수면 러셀 2000(소형주)이 S&P 500보다 강했습니다 — 위험을 감수하는 쪽으로 돈이 움직일 때 흔히 나타납니다"),
+        ("동일가중 − 시총가중", "양수면 종목을 똑같이 담은 지수(RSP)가 더 올랐습니다 — 상승이 소수 대형주가 아니라 넓게 퍼졌다는 뜻"),
+        ("20일 위치", "최근 20거래일의 고점·저점 사이에서 지금 어디에 있는지"),
+    ])
     return out + _text(report.get("change_comment"))
 
 
@@ -294,10 +301,13 @@ def sec_breadth(analysis):
         rows.append(("섹터 ETF 상승 / 하락", f'<span style="color:{UP_COLOR};">{b.get("sectors_up")}</span> / <span style="color:{DOWN_COLOR};">{b.get("sectors_down")}</span>',
                      f"{b.get('sectors_counted')}개 섹터 ETF 기준"))
     if b.get("rsp_spy_1d") is not None:
-        rows.append(("동일가중 − 시총가중 (1일)", dk.arrow(b["rsp_spy_1d"], 2, "%p"), "양수면 상승이 소수 대형주에 몰리지 않은 것"))
+        rows.append(("동일가중 − 시총가중 (1일)", dk.arrow(b["rsp_spy_1d"], 2, "%p"), ""))
         if b.get("rsp_spy_5d") is not None:
             rows.append(("동일가중 − 시총가중 (5일)", dk.arrow(b["rsp_spy_5d"], 2, "%p"), ""))
-    return dk.ccard(rows)
+    return dk.ccard(rows) + dk.guide_card("읽는 법", [
+        ("상승 비율", "오른 종목(또는 섹터 ETF)의 비율. 65% 이상 양호 · 45% 이상 보통 · 그 아래 취약"),
+        ("동일가중 − 시총가중", "양수면 상승이 소수 대형주에 몰리지 않고 넓게 퍼졌습니다"),
+    ])
 
 
 def sec_sectors(analysis, report):
@@ -315,7 +325,8 @@ def sec_sectors(analysis, report):
     by_etf = {r["etf"]: r for r in ranked}
     names = lambda etfs: " · ".join(_esc(by_etf[e]["theme"]) for e in etfs if e in by_etf)  # noqa: E731
     sectors = analysis["sectors"]
-    lead = dk.ccard([("주도", names(sectors.get("leaders") or []) or dk.dash(), ""), ("약세", names(sectors.get("laggards") or []) or dk.dash(), "")])
+    lis = "".join(dk.dot_li(f"<b>{k}</b> : {v}", size=3) for k, v in (("주도", names(sectors.get("leaders") or []) or "—"), ("약세", names(sectors.get("laggards") or []) or "—")))
+    lead = dk.dcard(f"<ul style='margin:0;padding:0;list-style:none;font-size:{dk.SMALL};line-height:1.5;'>{lis}</ul>", "neutral")   # 긴 이름 나열은 값 칸이 아니라 라벨 글머리표로 (가이드라인 3-3)
     return lead + dk.ccard(rows) + _text(report.get("sector_comment"))
 
 
@@ -345,10 +356,9 @@ def sec_macro(macro, analysis, report):
             continue
         v, d = fred(key)
         rows.append((label, _esc(v) if v else dk.dash(), _esc(dk.day(d))))
-    out = dk.ccard(rows)
     if rates.get("growth_label"):
-        out += dk.ccard([("금리와 성장주", _esc(rates["growth_label"]), "")])
-    return out + _text(report.get("macro_comment"))
+        rows.append(("금리와 성장주", _esc(rates["growth_label"]), ""))   # 따로 카드를 만들지 않고 같은 카드 안에 (가이드라인 2-1)
+    return dk.ccard(rows) + _text(report.get("macro_comment"))
 
 
 def _quote_rows(quotes):
@@ -401,9 +411,9 @@ def sec_news(input_data, report, analysis):
         related = [s for s in (item.get("related") or []) if isinstance(s, str) and s in known][:4]
         subs = []
         if related:
-            subs.append("관련 자산 " + " · ".join(_named_reaction(s, reaction(s)) for s in related))   # 종목 이름도 증감 색 (가이드라인 3-3)
+            subs.append("관련 자산 : " + " · ".join(_named_reaction(s, reaction(s)) for s in related))   # 종목 이름도 증감 색 (가이드라인 3-3)
         if item.get("why"):
-            subs.append("선정 이유 " + _esc(item["why"]))
+            subs.append("선정 이유 : " + _esc(item["why"]))
         sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};">{x}</span>' for x in subs)
         items.append(f"<li style='{dk.LI}'>{tag}<span style='color:#111;'>{title}</span>{link}{sub_html}</li>")
     return dk.ul(items) if items else dk.muted("주요 뉴스 없음")
@@ -431,10 +441,25 @@ def sec_status(analysis, report):
     overall = status["overall"]
     rows = [("종합", _light_pill(overall, f"{overall} {_light_word(overall)}"), "")]
     rows += [(_esc(label), _light_pill(light) if light else dk.dash(), _esc(basis)) for label, light, basis in items]
-    out = dk.ccard(rows) + dk.guide("판정", "🔴가 하나라도 있으면 경계, 🟡가 둘 이상이면 주의")
+    out = dk.ccard(rows)   # 판정 규칙은 제목 옆 ? 툴팁 (가이드라인 2-1 상태 카드 규칙)
     if str(report.get("risk") or "").strip():
         out += dk.sub_label("주의할 위험요인") + _text(report.get("risk"))
     return out
+
+
+REGIME_TIP = ("추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수를 더한 값(0~100)입니다. 70 이상 위험 선호 · 45~69 중립 · 45 미만 위험 회피.\n"
+              "· 추세 25 = S&P 500(SPY)이 20일선 위 10 · 50일선 위 10 · 20일선이 오르는 중 5\n"
+              "· 시장 폭 20 = 상승 비율 70% 이상 20 · 55% 이상 14 · 45% 이상 8\n"
+              "· 변동성 20 = VIX 15 미만 20 · 20 미만 14 · 25 미만 8 · 30 미만 3 (5일 동안 2 넘게 내리면 +2)\n"
+              "· 금리 환경 15 = 10년물 5일 변화 −10bp 이하 15 · 0 이하 11 · +10bp 이하 6\n"
+              "· 위험 선호 20 = 5일 동안 나스닥·러셀 2000이 S&P 500보다 강함 각 5 · 주식이 장기 국채(TLT)보다 강함 5 · 하이일드 채권(HYG) 상승 5\n"
+              "계산 규칙은 analyze.regime_score()")
+RISK_TIP = ("종합 = 경계가 하나라도 있으면 경계, 주의가 둘 이상이면 주의, 그 밖은 정상입니다.\n"
+            "· 추세 유지 = SPY가 20일선·50일선 둘 다 위 정상 · 하나만 위 주의 · 둘 다 아래 경계\n"
+            "· 변동성 = VIX 18 미만 정상 · 25 이하 주의 · 넘으면 경계\n"
+            "· 시장 폭 = 상승 비율 55% 이상 정상 · 45% 이상 주의 · 그 아래 경계\n"
+            "· 금리 위험 = 10년물 5일 변화 +5bp 이하 정상 · +15bp 이하 주의 · 넘으면 경계\n"
+            "· 과열 위험 = SPY 20일 +6% 이상이면서 20일 고점과 0.5% 안 경계 · +4% 이상 주의")
 
 
 def sec_footer(input_data):
@@ -451,7 +476,8 @@ def build_body(input_data, report, cover_url=None, analysis=None):
         dk.WRAP_OPEN,
         _cover_image(cover_url),
         sec_lead(report, analysis),
-        dk.section("시장 상태", sec_regime(analysis, report), summary="규칙 점수 0~100", tab=TAB_TODAY),
+        dk.section("시장 상태", sec_regime(analysis, report), tab=TAB_TODAY, one_line=True,
+                   aside=dk.tip_line([("점수 0~100", REGIME_TIP)], in_title=True)),   # 계산 규칙은 ? 툴팁 (2026-10-11 일괄 적용)
         dk.section("주요 지수", sec_indices(indices, analysis, report), tab=TAB_TODAY),
     ]
     change = sec_change(analysis, report)
@@ -469,7 +495,8 @@ def build_body(input_data, report, cover_url=None, analysis=None):
         dk.section("급등주", _quote_rows(input_data.get("gainers", [])) + _text(report.get("gainers_comment")), summary="상위 5", tab=TAB_STOCKS),
         dk.section("관심 종목", _quote_rows(input_data.get("most_active", [])) + _text(report.get("attention_comment")), summary="거래 상위 5", tab=TAB_STOCKS),
         dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_STOCKS),
-        dk.section("위험 지도", sec_status(analysis, report), tab=TAB_RISK),
+        dk.section("위험 지도", sec_status(analysis, report), tab=TAB_RISK, one_line=True,
+                   aside=dk.tip_line([("판정", RISK_TIP)], in_title=True)),   # 판정 규칙은 ? 툴팁 (안내 줄에서 옮김)
         sec_footer(input_data),
         dk.WRAP_CLOSE,
     ]
@@ -508,10 +535,18 @@ def render(input_path, report_path, output_dir, cover_url=None, analysis_path=No
     with open(preview_path, "w", encoding="utf-8") as f:
         f.write(PREVIEW_WRAPPER.replace("__BODY__", body))
 
+    title_path = os.path.join(output_dir, "title.txt")
+    title = open(title_path, encoding="utf-8").read().strip() if os.path.exists(title_path) else "미국 증시 데일리 리포트"
+    mock = dk.write_mock(body, os.path.join(output_dir, "daily_mock.html"), title)   # 테마 입힌 목업 (2026-10-11 사용자: 목업 화면 확인)
+    if mock:
+        print(f"목업 -> {mock}")
     print(f"HTML 렌더 완료 -> {body_path}")
     print(f"미리보기 완료 -> {preview_path}")
     return body, body_path, preview_path
 
 
 if __name__ == "__main__":
-    render("report_input.json", "report.out.json", "output", analysis_path="analysis.json")
+    # CI 는 작업 폴더에 입력이 있다. 로컬에서 목업만 다시 만들 때는 output/ 의 지난 입력을 쓴다 (python render_html.py)
+    base = "" if os.path.exists("report_input.json") else os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
+    render(os.path.join(base, "report_input.json"), os.path.join(base, "report.out.json"),
+           os.path.join(os.path.dirname(os.path.abspath(__file__)), "output") if base else "output", analysis_path=os.path.join(base, "analysis.json"))
