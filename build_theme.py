@@ -171,6 +171,15 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   padding: 8px 10px; background: #fff; color: #111; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.12);
   font-size: 14px; font-weight: 400; line-height: 1.5; white-space: normal; word-break: keep-all; text-align: left; display: none; }
 .post-body [data-tip]:hover::after, .post-body [data-tip]:focus::after, .post-body [data-tip]:focus-within::after { display: block; }
+/* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
+.post-body .rt-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
+.post-body .rt-tabs::-webkit-scrollbar { display: none; }
+.post-body .rt-tab { flex: none; padding: 8px 12px; font: inherit; font-size: 15px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }
+.post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.post-body .rt-panel[hidden] { display: none; }
+.post-body .rt-sub { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
+.post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 14px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
+.post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
 /* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11) */
 .post-body ul { list-style: disc; padding-left: 0; }
 .post-body ol { list-style: decimal; padding-left: 0; }
