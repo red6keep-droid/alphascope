@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-10-10T12:01:11Z",
- "run_date": "2026-10-10",
+ "generated_at": "2026-10-11T01:20:47Z",
+ "run_date": "2026-10-11",
  "day": "2026-10-09",
  "is_latest_bar_today": true,
  "headline": {
@@ -15,6 +15,28 @@
  "macro_today": [],
  "events": [
   {
+   "area": "Legal",
+   "kind": "news",
+   "title": "Super Micro Contractor Pleads Guilty to Illegal Export of Nvidia AI Servers to China",
+   "fact": "슈퍼마이크로 하청업체가 엔비디아 AI 서버의 중국 불법 수출 혐의에 대해 유죄를 인정했다.",
+   "url": "https://news.google.com/rss/articles/CBMiV0FVX3lxTFB0MlQ2QzFnQmpfSkN1ZkZVWDduZFgwbUZXRzJJWVFRanJ4aUNrYzQxNHNMVkRaeFdRdE9KT3dSZ2ZQTE1QYVlYNEtDQnpQbVVaZ0lCdDI0NA?oc=5",
+   "direction": "negative",
+   "emphasis": true,
+   "source": "OECD AI Policy Observatory",
+   "published_at": "2026-10-09T07:00:00Z"
+  },
+  {
+   "area": "Corporate",
+   "kind": "newsroom",
+   "title": "NVIDIA Commits $1 Billion to Advance US Science Over the Next Five Years",
+   "fact": "엔비디아가 미국 과학 기술 연구 지원을 위해 향후 5년간 10억 달러를 지원하기로 발표했다.",
+   "url": "https://nvidianews.nvidia.com/news/nvidia-commits-1-billion-to-advance-us-science-over-the-next-five-years",
+   "direction": "positive",
+   "emphasis": true,
+   "source": "nvidianews",
+   "published_at": "2026-10-08T14:31:00Z"
+  },
+  {
    "area": "Flows",
    "kind": "form4",
    "title": "Form 4 — COXE TENCH (이사): 증여",
@@ -24,6 +46,129 @@
    "emphasis": false,
    "source": "edgar",
    "published_at": "2026-10-10T01:04:09Z"
+  },
+  {
+   "area": "Corporate",
+   "kind": "news",
+   "title": "Nvidia to Invest in Chip Rival d-Matrix as Its Challengers Choose Partnership",
+   "fact": "엔비디아가 칩 경쟁사인 디매트릭스에 투자하기로 결정했다.",
+   "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPRmt5MUVxdjF6M2V6QlZPWVZyWVgwUWY2QzBiVE90elFIQ1Qxa0JYZVpEYmNUQTIwWEg4UzR5NUo3YWRSdEZzU0RoVzV6V2ZoVFJCYjBScWZ5Z29LVFVMTUJYTm03WjBxZFBmMWN6clFzRDlDamZ0N2c5dU9vcVBELTNwTmtIS3RDZ3h3czlyaElqMVQteTBWM0hObm5MN21iVTNmalRnbw?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "The Information",
+   "published_at": "2026-10-08T23:24:00Z"
+  },
+  {
+   "area": "Product",
+   "kind": "news",
+   "title": "Nebius achieves NVIDIA Exemplar Cloud on NVIDIA HGX B300 for training workloads",
+   "fact": "네비우스가 엔비디아 HGX B300 기반의 엔비디아 이그젬플러 클라우드 인증을 획득했다.",
+   "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNeURpbWswRTRtQjJKZkN4TWQweDU3Y2t0eXpfd0tXV05UZGk2WW1uUGJvdzc5aUE4R295ajk4eXF1VVk1Mlk5U2UzSVNXd1ZUdDFBMVpWc0xrWTJOQzVSSVAxRGZNajhjdWRLQ2FtVTJhbXlPSzVJZi1MY3I0MmEyaGNPQU1Tc1FiaGdzOU1UVnFnU1VqSVNoNmJzcHVDTVNq?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Nebius",
+   "published_at": "2026-10-08T18:32:44Z"
+  },
+  {
+   "area": "Corporate",
+   "kind": "news",
+   "title": "Nvidia-backed Iambic Therapeutics launches IPO as biotechs buck market gloom",
+   "fact": "엔비디아가 지원하는 아이앰빅 테라퓨틱스가 기업공개를 추진한다.",
+   "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOT2duSWZGV1gtNHhZUVRCMHQ4QTN4ZzAzOFR1QjVlbmNfdEYwRG9HRWc1ai1WUXV0TFlESmpzSnhQSW1jT2xDYmdhSXZrXzZTUFVyX1N5VFltX2VyVDZPeEUzZ0hxYnB1MmpYYVhvU3h0VlB3MjZrMThFZFhwMkk2cEw0eGdKSHdySTJEWTNsZklka25TamNFbG91UXRPSjJPYjl4d2JvREdwa2QyeTh5bHpRN3dmUXJzbXRUOFJacHpuM3M0?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Reuters",
+   "published_at": "2026-10-08T18:18:10Z"
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
+   "title": "Nvidia and Palantir plant a flag for sovereign AI inside 'the world's most complex supply chain'",
+   "fact": "엔비디아와 팔란티어가 소버린 AI 구축을 위해 협력한다.",
+   "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxOZER3ZzhjRXExd2N6dXo5RUFXUFJmbzJxWnF4VmN3WlZ0RmhxZ29oNlZnZUxwc242Q2FxdFo0eGVpYXIyNlhpYUpVd0YxQXhOOV9iQUM5ZVBFREdRVUg2QTItZFhNdEFtQ25aYk1VVFF0LTRZd1FSd3RSamJ2Q2x1VDV6cEJPUQ?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Fast Company",
+   "published_at": "2026-10-08T17:48:40Z"
+  },
+  {
+   "area": "Flows",
+   "kind": "news",
+   "title": "Trump discloses Nvidia stock trades as he prepares to honor CEO Huang",
+   "fact": "트럼프 전 대통령이 젠슨 황 최고경영자 수상을 준비하며 엔비디아 주식 거래 내역을 공개했다.",
+   "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPc0R0am1rbndOQjhQUzhJdTNHcXpnb3lDWFVteEs0SzJiVzc5cFNhMkNJZ2F5dzhjSTFlbFE1ZDRHNVE0MTNJM1phbUU1MVZXX0VkdmZoRUJDaU5OX3pPZ3V2bUZIaTMxZ0std2V2eVFyVUlaZGFXNjhCYTNtV1AxbnVsSlJnVXlWTW9JWWhiYTJaczdTR1JBcDNFaFg0YWRmZjRhZVR6c3dvd3pv?oc=5",
+   "direction": "neutral",
+   "emphasis": false,
+   "source": "Reuters",
+   "published_at": "2026-10-08T15:18:12Z"
+  }
+ ],
+ "events_overflow": [
+  {
+   "area": "Corporate",
+   "kind": "news",
+   "title": "Nvidia-backed Upscale AI launches platform to connect chips from rival suppliers",
+   "fact": "엔비디아가 지원하는 업스케일 AI가 경쟁사 칩을 연결하는 플랫폼을 출시했다.",
+   "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPeGdkZHlKUjgwWHQ4eXRUaTJZeFZBQkFLaENBNFYxTUh5SVFkaWNfVGh3MUtrcGdKYjZhWk03QlV1WV8zYmxkbl9fLVRIa0xwWlczbVRwVlRFUGZwMXFwM2lRck5BVmVhQ3JmVzNZS3U0OUpuLVdLU04wVVlkNE9jN2IyRW9YY0pla283VmJBa3FpVm5zX2xaQkw0X3JCcUx1djhraTRVTEQzeGJtNzZKQ3hLTHRRSUEt?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Reuters",
+   "published_at": "2026-10-08T12:01:28Z"
+  },
+  {
+   "area": "Product",
+   "kind": "news",
+   "title": "The first Nvidia RTX Spark laptops cost up to $7,000",
+   "fact": "엔비디아 RTX 스파크 탑재 랩탑 제품 가격이 최고 7,000달러에 달한다.",
+   "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQaFZoOTBRZVdoeGMteUNPemoyTmdZMDBjSjFyaVRyNXl4OE1nTzJHRElYeTRNY01IM0xCcjg4RGJxenVkaVZnSUFwT0l3OXVYejJYYW9STlJaNE9yQWVoWVZzSnNGa08zdjJ1Z2FRcGV2ck02UFZ2eUdhSGFpMlBOLXFYcGs3YWhraHNyTjk2V2tCMl9ObmZQTXNmWQ?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "The Verge",
+   "published_at": "2026-10-07T19:05:52Z"
+  },
+  {
+   "area": "Product",
+   "kind": "news",
+   "title": "Microsoft and Nvidia launch Surface Laptop Ultra with RTX Spark starting at $2,599 — coinciding with major Windows 11 changes for agentic AI",
+   "fact": "마이크로소프트와 엔비디아가 RTX 스파크를 탑재한 서피스 랩탑 울트라를 2,599달러에 출시했다.",
+   "url": "https://news.google.com/rss/articles/CBMikwJBVV95cUxQeHJ0QXM4cldZUWlId2djUG5Mc3FFVHVkWmdCemplNko0bEZrY1RqU3RETzE3ZVk0a1NwbWQyZVJKTGxrUzBrUGNxbVNSQ1A2dUtCbE53aEZkQ0E1UjczUGFkRURIVVcxOWtFQ0ctM2dEZG5OOU52MEtNX2hIeVI5amtnZjA1bnBFMm1iVVo0WV9tTlkwMFhUamZCMEMxQnRwUVRMZ05fbUhTQTBEaHRSZkhsVGVfWE1uc0xtSzZlSFhIcFZFZVR1TzE5T1JfQkVRaXhHQ0VWSjVGbDhIenc2cl8yVE9BTWNFUlR0b1lYcHowYWVPTUIydjRFNUFGZUtlZjFZUzFVYUVWX3VWRXItUkNkOA?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Tom's Hardware",
+   "published_at": "2026-10-07T18:07:54Z"
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
+   "title": "SpaceX looks to raise $40bn to buy Nvidia chips",
+   "fact": "스페이스엑스가 엔비디아 칩 구매를 위해 400억 달러 규모의 자금 조달을 추진 중이다.",
+   "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQdThuRWl1b3NtaUE5aFhSeXVUY0xfYjhBZXJJaG1VWWR0QXBSQ2txLTBrbTlKNm9KQmtqcG95Y3BLNlRQZF96a004TS1xaGlyQUVUaEdqNXZOTzZwdC1IU001ZmM5a191dGNRYjNCWXkwcEk0cjVhams2WUc5aGMxek13b1U?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Financial Times",
+   "published_at": "2026-10-06T22:28:55Z"
+  },
+  {
+   "area": "Corporate",
+   "kind": "news",
+   "title": "Nvidia-backed Lambda targets $4 billion raise ahead of planned IPO, WSJ reports",
+   "fact": "엔비디아가 지원하는 람다가 기업공개를 앞두고 40억 달러 자금 조달을 추진 중이다.",
+   "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQR3dfcjJxclVWTV9faDZyaUpIZ3F3cl95X2dFdzRaN0IxTWFuX0VwdWFBeEFtdjdqNVlKRHVCNVUzZF9paU9Cb0F3Y1NLR1l1UnNMVXNudDVYTEg4SVlVSHl2b1QwWjR6WV92ZV92MEUzRnozaEx4cHF6ZURxdUY2VDNlWWZSaGIxX3hsWEsxalhvZjhpSk85dWEwNWN6U0ZKeUNPdklHYnZpQjlORGpKemZOY0NfWkZFWHdvUkd3?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Reuters",
+   "published_at": "2026-10-06T19:01:28Z"
+  },
+  {
+   "area": "Product",
+   "kind": "news",
+   "title": "GeForce Game Ready Driver For Call of Duty®: Modern Warfare 4® Released",
+   "fact": "엔비디아가 Call of Duty: Modern Warfare 4용 지포스 게임 레디 드라이버를 출시했다.",
+   "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPUEtYWkRJUXRDOTVGMXJjWTJNdDdIUUh6OG83MGhrbDNZYWRYUTByM1ZvNDVjZUhRZmRuekNrQkkzTlN6N19zZHNvR3dqQURBTTY3eW9pUkhZSl9BY3g2czZlOHNkR2Q0S2x1TklhYjhYMXFheTNjS1VGR2IwTlNqaFRHWlMwRUxGVXJhRGtFeXdlOWFQTnVXaGl3c1NUZWxfRmdUZXhRdk9sU0xpTzVOT2Y1Tm0tdw?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "NVIDIA",
+   "published_at": "2026-10-06T13:29:05Z"
   },
   {
    "area": "Corporate",
@@ -48,8 +193,7 @@
    "published_at": null
   }
  ],
- "events_overflow": [],
- "events_total": 3,
+ "events_total": 16,
  "analyst_target_only": [],
  "upcoming": [
   {
@@ -164,7 +308,7 @@
   "options": [
    {
     "key": "iv_atm_30d",
-    "value": 0.3006970000838898,
+    "value": 0.30581342521373134,
     "flag": false,
     "fmt": "iv"
    },
@@ -182,7 +326,7 @@
    },
    {
     "key": "pc_ratio_oi",
-    "value": 0.707284556875901,
+    "value": 0.7072850586328028,
     "flag": false,
     "fmt": "num2"
    },
@@ -194,7 +338,7 @@
    },
    {
     "key": "gex_approx",
-    "value": 686104772.8072488,
+    "value": 684617313.8058236,
     "flag": false,
     "fmt": "gex"
    },
@@ -260,7 +404,7 @@
     "key": "rating_counts",
     "value": {
      "strongBuy": 10,
-     "buy": 49,
+     "buy": 48,
      "hold": 2,
      "sell": 1,
      "strongSell": 0
@@ -308,19 +452,19 @@
    },
    {
     "key": "shares_short",
-    "value": 311389688.0,
+    "value": 294225803.0,
     "flag": false,
     "fmt": "shares_m"
    },
    {
     "key": "short_pct_float",
-    "value": 1.34000005,
+    "value": 1.27,
     "flag": false,
     "fmt": "pct2"
    },
    {
     "key": "short_asof",
-    "value": "2026-09-30",
+    "value": "2026-09-15",
     "flag": false,
     "fmt": "text"
    }
@@ -337,19 +481,19 @@
   "news": [
    {
     "key": "news_count",
-    "value": 17,
+    "value": 22,
     "flag": false,
     "fmt": "int"
    },
    {
     "key": "news_avg_7d",
-    "value": 17.0,
+    "value": 18.142857142857142,
     "flag": false,
     "fmt": "num1"
    },
    {
     "key": "news_pending",
-    "value": 83,
+    "value": 21,
     "flag": false,
     "fmt": "int"
    }
@@ -551,7 +695,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-09",
-  "state_collected_at": "2026-10-10T11:53:29Z",
+  "state_collected_at": "2026-10-11T01:16:25Z",
   "missing_fields": [],
   "option_snapshot_days": 1,
   "iv_rank_days": 1,
@@ -563,7 +707,7 @@
    "court": 1,
    "fedreg": 21,
    "form4": 16,
-   "news": 194,
+   "news": 230,
    "newsroom": 3
   },
   "option_expiries": [
@@ -575,7 +719,7 @@
    "2026-11-13",
    "2026-11-20"
   ],
-  "items_pending": 83,
+  "items_pending": 21,
   "test_mode": true
  },
  "thresholds": {
