@@ -170,9 +170,8 @@ def _chart_card(rows, horizon):
         items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 그래도 발언이 없던 날에 흔히 나오는 크기입니다 (p {big['p']:.2f})"))
 
     def li(t, x):
-        head = f'<b>{_esc(t)}</b>: ' if t else ""   # 라벨 글머리표는 "**라벨**: 내용" (가이드라인 3-3, 2026-10-11 사용자)
-        return (f'<li style="display:flex;align-items:flex-start;gap:7px;margin:3px 0;color:#111;">'
-                f'<span style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-top:11px;"></span><span>{head}{_esc(x)}</span></li>')
+        head = f'<b>{_esc(t)}</b> : ' if t else ""   # 라벨 글머리표 "**라벨** : 내용", 증감 색 (가이드라인 3-3, 2026-10-11 사용자)
+        return dk.dot_li(head + dk.tint(_esc(x)), size=3)
     lis = "".join(li(t, x) for t, x in items)
     note = ""   # 주의는 읽는 법 카드 안으로 (_read_card) — 2026-10-11 사용자
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'

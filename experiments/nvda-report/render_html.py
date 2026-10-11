@@ -140,6 +140,29 @@ def _note(t):
     return f'<div style="margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;font-size:{TINY};color:{NOTE};">{INFO_ICON}{_esc(t)}</div>'
 
 
+_SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")   # 범위(-0.63 ~ +0.63%)는 칠하지 않는다
+_LABEL = re.compile(r"^([^:：]{1,24}?)\s*:\s+(.+)$", re.S)
+
+
+def _tint(html_text):
+    """이스케이프된 글 안의 부호 있는 증감(+1.30% · -0.60% · −6.3%p · +3bp)에 색 — 증가 빨강 · 감소 파랑 (가이드라인 3-3, 2026-10-11 사용자)."""
+    return _SIGNED.sub(lambda m: f'<span style="color:{UP if m.group(1) == "+" else DOWN};white-space:nowrap;">{m.group(0)}</span>', html_text)
+
+
+def _label_text(text):
+    """"라벨: 내용" 글 → **라벨** : 내용(증감 색). 라벨이 없으면 내용만 (가이드라인 3-3)."""
+    m = _LABEL.match(str(text))
+    if m:
+        return f"<b>{_esc(m.group(1))}</b> : {_tint(_esc(m.group(2)))}"
+    return _tint(_esc(text))
+
+
+def _dot_li(inner_html, size=3, color="#111", top=11, margin="3px 0"):
+    """점 글머리표 한 줄 — 16px 글은 3px 점, 14px 안내 글은 2px 점 (가이드라인 3-3)."""
+    return (f'<li style="display:flex;align-items:flex-start;gap:7px;margin:{margin};color:{color};">'
+            f'<span style="flex:none;width:{size}px;height:{size}px;border-radius:50%;background:{color};margin-top:{top}px;"></span><span>{inner_html}</span></li>')
+
+
 def _guide(title, body, line=True):
     """제목이 있는 안내 글 (가이드라인 3-3, 2026-10-11 사용자) — design_kit.guide 와 같은 규칙.
     짧으면 한 줄 "ⓘ **제목**: 내용", 길거나 항목이 여럿이면 "ⓘ **제목**" 다음 줄부터 글머리표 "이름 = 내용"."""
@@ -148,8 +171,8 @@ def _guide(title, body, line=True):
     if isinstance(body, str) and len(body) <= 70:
         return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}: {_esc(body)}</div>'
     items = [body] if isinstance(body, str) else body
-    lis = "".join(f"<li style='margin:2px 0;'>{_esc(it[0]) + ' = ' + _esc(it[1]) if isinstance(it, tuple) else _esc(it)}</li>" for it in items)
-    return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}<ul style="margin:2px 0 0 20px;padding:0;list-style:disc;">{lis}</ul></div>'
+    lis = "".join(_dot_li(_tint(_esc(it[0]) + ' = ' + _esc(it[1])) if isinstance(it, tuple) else _tint(_esc(it)), size=2, color=NOTE, top=9, margin="2px 0") for it in items)   # 14px 안내 → 2px 점
+    return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}<ul style="margin:2px 0 0 2px;padding:0;list-style:none;">{lis}</ul></div>'
 
 
 UL = "margin:0 0 8px 20px;padding:0;list-style:disc;"   # 위 여백 0 — 제목 아래 14px는 제목이 갖는다   # 모든 목록 공통 — 글머리표 기준선이 구획마다 달라지지 않게 (디자인-가이드라인 3절)
@@ -318,8 +341,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip=""):
     def li(item):
         text, kind = (item, "") if isinstance(item, str) else item
         col = NOTE if kind == "note" else "#111"
-        return (f'<li style="display:flex;align-items:flex-start;gap:7px;margin:3px 0;color:{col};">'
-                f'<span style="flex:none;width:3px;height:3px;border-radius:50%;background:{col};margin-top:9px;"></span><span>{_esc(text)}</span></li>')
+        return _dot_li(_label_text(text), size=3, color=col, top=11)   # 16px → 3px 점, "**라벨** : 내용", 증감 색 (2026-10-11 사용자)
     lis = "".join(li(t) for t in lines)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:0 0 8px;">'
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다

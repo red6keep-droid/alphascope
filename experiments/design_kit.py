@@ -99,6 +99,29 @@ def note(t):
     return f'<div style="margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;font-size:{TINY};color:{NOTE};">{INFO_ICON}{esc(t)}</div>'
 
 
+_SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")   # 범위(-0.63 ~ +0.63%)는 칠하지 않는다
+_LABEL = re.compile(r"^([^:：]{1,24}?)\s*:\s+(.+)$", re.S)
+
+
+def tint(html_text):
+    """이스케이프된 글 안의 부호 있는 증감(+1.30% · -0.60% · −6.3%p · +3bp)에 색 — 증가 빨강 · 감소 파랑 (가이드라인 3-3, 2026-10-11 사용자)."""
+    return _SIGNED.sub(lambda m: f'<span style="color:{UP if m.group(1) == "+" else DOWN};white-space:nowrap;">{m.group(0)}</span>', html_text)
+
+
+def label_text(text):
+    """"라벨: 내용" 글 → **라벨** : 내용(증감 색). 라벨이 없으면 내용만 (가이드라인 3-3)."""
+    m = _LABEL.match(str(text))
+    if m:
+        return f"<b>{esc(m.group(1))}</b> : {tint(esc(m.group(2)))}"
+    return tint(esc(text))
+
+
+def dot_li(inner_html, size=3, color="#111", top=11, margin="3px 0"):
+    """점 글머리표 한 줄 — 16px 글은 3px 점, 14px 안내 글은 2px 점 (가이드라인 3-3)."""
+    return (f'<li style="display:flex;align-items:flex-start;gap:7px;margin:{margin};color:{color};">'
+            f'<span style="flex:none;width:{size}px;height:{size}px;border-radius:50%;background:{color};margin-top:{top}px;"></span><span>{inner_html}</span></li>')
+
+
 GUIDE_SHORT = 70   # 이보다 짧은 한 문장은 한 줄 "제목: 내용"
 
 
@@ -112,9 +135,9 @@ def guide(title, body, line=True, grid=False):
     if isinstance(body, str) and len(body) <= GUIDE_SHORT:
         return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}: {esc(body)}</div>'
     items = [body] if isinstance(body, str) else body
-    lis = "".join(f"<li style='margin:2px 0;'>{esc(it[0]) + ' = ' + esc(it[1]) if isinstance(it, tuple) else esc(it)}</li>" for it in items)
+    lis = "".join(dot_li(tint(esc(it[0]) + ' = ' + esc(it[1])) if isinstance(it, tuple) else tint(esc(it)), size=2, color=NOTE, top=9, margin="2px 0") for it in items)   # 14px 안내 → 2px 점
     return (f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}'
-            f"<ul{' data-guide-grid=\"1\"' if grid else ''} style='margin:2px 0 0 20px;padding:0;list-style:disc;'>{lis}</ul></div>")   # grid: 데스크톱 2열 (테마 CSS)
+            f"<ul{' data-guide-grid=\"1\"' if grid else ''} style='margin:2px 0 0 2px;padding:0;list-style:none;'>{lis}</ul></div>")   # grid: 데스크톱 2열 (테마 CSS)
 
 
 
