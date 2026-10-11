@@ -221,7 +221,7 @@ def _multi(rows):
     for i, (name, value_html) in enumerate(rows):
         out += (f'<span style="{MULTI_ROW}{MULTI_SEP if i else ""}"><span style="font-weight:700;color:#111;">{_name(name)}</span> '
                 f'<span style="font-weight:700;">{value_html}</span></span> ')   # 줄 사이 공백: 홈 카드가 한 줄로 읽을 때 단어를 띄운다
-    return f'<span style="{MULTI}">{out}</span> '
+    return f'<span data-grid="2" style="{MULTI}">{out}</span> '   # data-grid=2: 데스크톱에서 테마 CSS가 2열 + 가운데 세로 구분선 (2026-10-11 사용자)
 
 
 def _name(name):
@@ -421,7 +421,7 @@ def sec_state_cards(a):
     oh = a.get("overheat")
     if oh and oh.get("active"):   # 과열 조건 하나라도 해당하는 날만 (2026-10-11 사용자) — 노랑(불확실) 테마, 상태 = 해당 조건 수
         out += _state_card("과열 지표", f"{len(oh['active'])}개 조건 해당", "uncertain", WARN, overheat_lines(oh), "", tip=overheat_rule())
-    return out
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""   # 데스크톱에서 2열 (테마 CSS, 2026-10-11 사용자)
 
 
 def sec_chart(output_dir=None, a=None):
@@ -581,7 +581,7 @@ def _crow(name_html, value_html, sub="", first=False, left=None):
 def _ccard(rows, left=None):
     """C 카드 묶음: rows = [(name_html, value_html, sub_html)]. 카드 하나, 줄 사이 가로 구분선."""
     inner = "".join(_crow(n, v, sb, first=(i == 0), left=left) for i, (n, v, sb) in enumerate(rows))
-    return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{inner}</span></div>'
+    return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{MULTI}">{inner}</span></div>'   # 데스크톱 2열 (테마 CSS)
 
 
 def _sub_label(t):

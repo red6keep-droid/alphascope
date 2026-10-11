@@ -1173,6 +1173,16 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-body .rt-sub { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
 .post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 14px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
+/* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.
+   data-grid=2 (C 카드 줄 묶음) → 2열 그리드 + 짝수 칸 왼쪽 세로 구분선. 둘째 칸의 인라인 border-top 은 지운다(첫 줄에 선이 생기지 않게).
+   data-grid=cards (상태 카드 묶음) → 카드 둘씩 나란히. 모바일(680px 이하)은 그대로 한 줄 */
+@media (min-width: 681px) {
+  .post-body [data-grid="2"] { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .post-body [data-grid="2"] > span:nth-child(even) { border-left: 1px solid #E2E8F0; }
+  .post-body [data-grid="2"] > span:nth-child(2) { border-top: 0 !important; }
+  .post-body [data-grid="cards"] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: stretch; }
+  .post-body [data-grid="cards"] > div { margin: 0 !important; }
+}
 /* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11) */
 .post-body ul { list-style: disc; padding-left: 0; }
 .post-body ol { list-style: decimal; padding-left: 0; }
