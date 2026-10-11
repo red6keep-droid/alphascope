@@ -103,9 +103,20 @@ _SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s
 _LABEL = re.compile(r"^([^:：]{1,24}?)\s*:\s+(.+)$", re.S)
 
 
+# 증감 값 앞의 종목 이름 — "산업재(XLI)", "나스닥 100(QQQ)", "1위 기술" (2026-10-11 사용자: 종목도 같이 색)
+_NAMED = re.compile(r"((?:\d+위 )?(?:[A-Za-z][A-Za-z&;]* |[가-힣A-Za-z]+ (?=\d))?[가-힣A-Za-z0-9&;]+(?:\([A-Z0-9^.&;\s]{1,12}\))|\d+위 [가-힣A-Za-z&;·]+)\s"
+                    r"(?<![\w.~])([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")
+
+
 def tint(html_text):
-    """이스케이프된 글 안의 부호 있는 증감(+1.30% · -0.60% · −6.3%p · +3bp)에 색 — 증가 빨강 · 감소 파랑 (가이드라인 3-3, 2026-10-11 사용자)."""
-    return _SIGNED.sub(lambda m: f'<span style="color:{UP if m.group(1) == "+" else DOWN};white-space:nowrap;">{m.group(0)}</span>', html_text)
+    """이스케이프된 글 안의 증감에 색 — 증가 빨강 · 감소 파랑 (가이드라인 3-3, 2026-10-11 사용자).
+    앞에 종목 이름(이름(티커) 또는 'n위 이름')이 붙어 있으면 이름까지 한 덩어리로 칠한다: 산업재(XLI) -0.25% 전체 파랑. 범위(-0.63 ~ +0.63%)는 칠하지 않는다."""
+    def named(m):
+        col = UP if m.group(2) == "+" else DOWN
+        return f'<span style="color:{col};">{m.group(1)} <span style="white-space:nowrap;">{m.group(2)}{m.group(3)}{m.group(4)}</span></span>'
+    out = _NAMED.sub(named, html_text)
+    parts = re.split(r"(<span[^>]*>.*?</span></span>)", out)   # 이미 칠한 덩어리는 건너뛰고 나머지의 맨 숫자만
+    return "".join(p if p.startswith("<span") else _SIGNED.sub(lambda m: f'<span style="color:{UP if m.group(1) == "+" else DOWN};white-space:nowrap;">{m.group(0)}</span>', p) for p in parts)
 
 
 def label_text(text):
@@ -182,7 +193,7 @@ def ul(items_html):
 
 
 def bullets(texts):
-    return ul(f"<li style='{LI}'>{esc(t)}</li>" for t in texts)
+    return ul(f"<li style='{LI}'>{tint(esc(t))}</li>" for t in texts)   # 서술 문장의 증감도 같은 색 규칙
 
 
 def row(name, value_html, tone=""):

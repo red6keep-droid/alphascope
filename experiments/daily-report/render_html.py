@@ -365,6 +365,13 @@ def _quote_rows(quotes):
     return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(rows)}</span></div>'
 
 
+def _named_reaction(sym, value_html):
+    """관련 자산 한 칸 — 이름까지 증감 색 (2026-10-11 사용자: % 만이 아니라 종목도 같이 색). 값이 bp 등 색 없는 경우는 이름도 기본색."""
+    name = _esc(SYMBOL_NAMES.get(sym, sym))
+    col = UP_COLOR if "▲" in value_html else DOWN_COLOR if "▼" in value_html else None
+    return f'<span style="color:{col};">{name}</span> {value_html}' if col else f"{name} {value_html}"
+
+
 def sec_news(input_data, report, analysis):
     """뉴스 — 목록: 테마 라벨 · 제목(글자) + 링크 아이콘, 보조 줄 관련 자산 반응 · 선정 이유 (14px)."""
     series = (analysis or {}).get("series") or {}
@@ -394,7 +401,7 @@ def sec_news(input_data, report, analysis):
         related = [s for s in (item.get("related") or []) if isinstance(s, str) and s in known][:4]
         subs = []
         if related:
-            subs.append("관련 자산 " + " · ".join(f"{_esc(SYMBOL_NAMES.get(s, s))} {reaction(s)}" for s in related))
+            subs.append("관련 자산 " + " · ".join(_named_reaction(s, reaction(s)) for s in related))   # 종목 이름도 증감 색 (가이드라인 3-3)
         if item.get("why"):
             subs.append("선정 이유 " + _esc(item["why"]))
         sub_html = "".join(f'<span style="display:block;color:{MUTED};font-size:{dk.TINY};">{x}</span>' for x in subs)
