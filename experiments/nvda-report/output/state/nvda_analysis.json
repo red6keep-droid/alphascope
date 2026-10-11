@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-11T03:32:40Z",
+ "generated_at": "2026-10-11T10:02:16Z",
  "run_date": "2026-10-11",
  "day": "2026-10-09",
  "is_latest_bar_today": true,
@@ -9,10 +9,267 @@
   "ret_vs_spy": -1.1201905610344176,
   "ret_vs_smh": 0.12815445340749188,
   "ret_vs_amd": 1.5061608464850718,
+  "ret_vs_avgo": -0.9093872392991087,
   "vol_ratio_20d": 0.7743783887649036,
   "gap": 1.4578274351946696
  },
  "macro_today": [],
+ "market_regime": {
+  "regime": "상승 추세",
+  "prev_regime": null,
+  "changed": false,
+  "pct_from_high": -0.06674703992154418,
+  "above_ma200": true,
+  "ma200": 722.9283996582031,
+  "vix": 14.84000015258789,
+  "streak": 1,
+  "benchmark": "SPY",
+  "bar_day": "2026-10-09",
+  "fng": {
+   "score": 45.0,
+   "rating": "fear",
+   "rating_ko": "공포"
+  }
+ },
+ "sector_flow": {
+  "state": "모이는 중",
+  "prev": null,
+  "changed": false,
+  "rel_pp": 4.252641933745682,
+  "days": 20,
+  "shares_5d": null,
+  "sectors": [
+   {
+    "etf": "XLK",
+    "name": "기술",
+    "rel": 4.051561655702707,
+    "rank": 1
+   },
+   {
+    "etf": "XLV",
+    "name": "헬스케어",
+    "rel": 1.4274328981871198,
+    "rank": 2
+   },
+   {
+    "etf": "XLP",
+    "name": "필수소비재",
+    "rel": -1.8084345440285698,
+    "rank": 3
+   },
+   {
+    "etf": "XLE",
+    "name": "에너지",
+    "rel": -1.960510180834718,
+    "rank": 4
+   },
+   {
+    "etf": "XLY",
+    "name": "경기소비재",
+    "rel": -1.9657847693833164,
+    "rank": 5
+   },
+   {
+    "etf": "XLI",
+    "name": "산업재",
+    "rel": -3.6784615985706814,
+    "rank": 6
+   },
+   {
+    "etf": "XLC",
+    "name": "통신",
+    "rel": -3.839986552744079,
+    "rank": 7
+   },
+   {
+    "etf": "XLU",
+    "name": "유틸리티",
+    "rel": -4.1802695844041065,
+    "rank": 8
+   },
+   {
+    "etf": "XLB",
+    "name": "소재",
+    "rel": -4.85172245608172,
+    "rank": 9
+   },
+   {
+    "etf": "XLRE",
+    "name": "부동산",
+    "rel": -6.036985083005431,
+    "rank": 10
+   },
+   {
+    "etf": "XLF",
+    "name": "금융",
+    "rel": -6.270152149347263,
+    "rank": 11
+   }
+  ],
+  "smh_rank": 1,
+  "n_sectors": 11,
+  "leaders": [
+   {
+    "etf": "XLK",
+    "name": "기술",
+    "rel": 4.051561655702707,
+    "rank": 1
+   },
+   {
+    "etf": "XLV",
+    "name": "헬스케어",
+    "rel": 1.4274328981871198,
+    "rank": 2
+   }
+  ],
+  "laggards": [
+   {
+    "etf": "XLF",
+    "name": "금융",
+    "rel": -6.270152149347263,
+    "rank": 11
+   },
+   {
+    "etf": "XLRE",
+    "name": "부동산",
+    "rel": -6.036985083005431,
+    "rank": 10
+   }
+  ]
+ },
+ "bollinger": {
+  "pctb": 0.5790805886693442,
+  "lower": 210.63650779197673,
+  "upper": 242.83149300148028,
+  "ma20": 226.7340003967285,
+  "close": 229.27999877929688,
+  "state": "밴드 안",
+  "days": 0,
+  "entered": false,
+  "stats": {
+   "symbol": "NVDA",
+   "window": "10y",
+   "from": "2016-10-10",
+   "to": "2026-10-09",
+   "days": 2514,
+   "base": {
+    "up20": 66,
+    "up60": 73,
+    "med20": 4.3,
+    "med60": 12.8
+   },
+   "boll_lower": {
+    "n": 56,
+    "up20": 73,
+    "med20": 6.2,
+    "up60": 71,
+    "med60": 13.9
+   },
+   "boll_upper": {
+    "n": 97,
+    "up20": 62,
+    "med20": 5.3,
+    "up60": 68,
+    "med60": 8.8
+   },
+   "rsi80": {
+    "n": 17,
+    "up20": 47,
+    "med20": -2.1,
+    "up60": 71,
+    "med60": 9.8
+   },
+   "ma200_40": {
+    "n": 32,
+    "up20": 56,
+    "med20": 0.9,
+    "up60": 72,
+    "med60": 20.3
+   },
+   "ret20_25": {
+    "n": 32,
+    "up20": 59,
+    "med20": 6.0,
+    "up60": 78,
+    "med60": 27.4
+   },
+   "rsi30": {
+    "n": 14,
+    "up20": 43,
+    "med20": -6.0,
+    "up60": 43,
+    "med60": -1.5
+   },
+   "generated_at": "2026-10-11",
+   "note": "각 조건 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률. base = 아무 날. 과거 빈도이지 예측이 아니다."
+  }
+ },
+ "overheat": {
+  "active": [],
+  "entered": [],
+  "values": {
+   "rsi80": 52.96368502502982,
+   "ma200_40": 13.418454289262026,
+   "ret20_25": 5.034589688570135
+  },
+  "stats": {
+   "symbol": "NVDA",
+   "window": "10y",
+   "from": "2016-10-10",
+   "to": "2026-10-09",
+   "days": 2514,
+   "base": {
+    "up20": 66,
+    "up60": 73,
+    "med20": 4.3,
+    "med60": 12.8
+   },
+   "boll_lower": {
+    "n": 56,
+    "up20": 73,
+    "med20": 6.2,
+    "up60": 71,
+    "med60": 13.9
+   },
+   "boll_upper": {
+    "n": 97,
+    "up20": 62,
+    "med20": 5.3,
+    "up60": 68,
+    "med60": 8.8
+   },
+   "rsi80": {
+    "n": 17,
+    "up20": 47,
+    "med20": -2.1,
+    "up60": 71,
+    "med60": 9.8
+   },
+   "ma200_40": {
+    "n": 32,
+    "up20": 56,
+    "med20": 0.9,
+    "up60": 72,
+    "med60": 20.3
+   },
+   "ret20_25": {
+    "n": 32,
+    "up20": 59,
+    "med20": 6.0,
+    "up60": 78,
+    "med60": 27.4
+   },
+   "rsi30": {
+    "n": 14,
+    "up20": 43,
+    "med20": -6.0,
+    "up60": 43,
+    "med60": -1.5
+   },
+   "generated_at": "2026-10-11",
+   "note": "각 조건 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률. base = 아무 날. 과거 빈도이지 예측이 아니다."
+  }
+ },
  "events": [
   {
    "area": "Legal",
@@ -23,7 +280,8 @@
    "direction": "negative",
    "emphasis": true,
    "source": "OECD AI Policy Observatory",
-   "published_at": "2026-10-09T07:00:00Z"
+   "published_at": "2026-10-09T07:00:00Z",
+   "speaker": null
   },
   {
    "area": "Corporate",
@@ -34,7 +292,8 @@
    "direction": "positive",
    "emphasis": true,
    "source": "nvidianews",
-   "published_at": "2026-10-08T14:31:00Z"
+   "published_at": "2026-10-08T14:31:00Z",
+   "speaker": null
   },
   {
    "area": "Product",
@@ -45,7 +304,8 @@
    "direction": "uncertain",
    "emphasis": true,
    "source": "Tom's Hardware",
-   "published_at": "2026-10-10T12:20:00Z"
+   "published_at": "2026-10-10T12:20:00Z",
+   "speaker": null
   },
   {
    "area": "Corporate",
@@ -56,7 +316,8 @@
    "direction": "negative",
    "emphasis": true,
    "source": "Business Insider",
-   "published_at": "2026-10-09T20:35:00Z"
+   "published_at": "2026-10-09T20:35:00Z",
+   "speaker": null
   },
   {
    "area": "Flows",
@@ -67,7 +328,20 @@
    "direction": "neutral",
    "emphasis": false,
    "source": "edgar",
-   "published_at": "2026-10-10T01:04:09Z"
+   "published_at": "2026-10-10T01:04:09Z",
+   "speaker": null
+  },
+  {
+   "area": "Corporate",
+   "kind": "news",
+   "title": "Nvidia-backed Firmus scraps $5 billion Australia IPO amid growing AI scrutiny",
+   "fact": "엔비디아가 지원하는 퍼머스가 AI에 대한 감시 강화 속에 50억 달러 규모의 호주 기업공개를 철회했다.",
+   "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQY21BNU1iQlJDajVWejFGYjVrM2J0cllKVmc5WEVZX2tMQnROZGFJRkRDekhCaFY0MzRnYXhYOGNaVi11cFlndVo5b1RIYUpaS25JbV92dVkwVEZpXzVaTWdtR3piN0d6SUI2OW9qaEI4eHVCV1VBQkFBWXhyemttZDlhMlFVa3hQdDhpWVZkLW95cmxNaEFzZGxWb2dzU3VPSzNlNTc4OEF5YXV1LVoxOHZuUzFsMTZfaDJuckx4UQ?oc=5",
+   "direction": "negative",
+   "emphasis": false,
+   "source": "Reuters",
+   "published_at": "2026-10-09T07:54:22Z",
+   "speaker": null
   },
   {
    "area": "Corporate",
@@ -78,7 +352,8 @@
    "direction": "positive",
    "emphasis": false,
    "source": "The Information",
-   "published_at": "2026-10-08T23:24:00Z"
+   "published_at": "2026-10-08T23:24:00Z",
+   "speaker": null
   },
   {
    "area": "Product",
@@ -89,8 +364,11 @@
    "direction": "positive",
    "emphasis": false,
    "source": "Nebius",
-   "published_at": "2026-10-08T18:32:44Z"
-  },
+   "published_at": "2026-10-08T18:32:44Z",
+   "speaker": null
+  }
+ ],
+ "events_overflow": [
   {
    "area": "Corporate",
    "kind": "news",
@@ -100,10 +378,9 @@
    "direction": "positive",
    "emphasis": false,
    "source": "Reuters",
-   "published_at": "2026-10-08T18:18:10Z"
-  }
- ],
- "events_overflow": [
+   "published_at": "2026-10-08T18:18:10Z",
+   "speaker": null
+  },
   {
    "area": "Demand",
    "kind": "news",
@@ -113,7 +390,8 @@
    "direction": "positive",
    "emphasis": false,
    "source": "Fast Company",
-   "published_at": "2026-10-08T17:48:40Z"
+   "published_at": "2026-10-08T17:48:40Z",
+   "speaker": null
   },
   {
    "area": "Flows",
@@ -124,7 +402,8 @@
    "direction": "neutral",
    "emphasis": false,
    "source": "Reuters",
-   "published_at": "2026-10-08T15:18:12Z"
+   "published_at": "2026-10-08T15:18:12Z",
+   "speaker": null
   },
   {
    "area": "Corporate",
@@ -135,7 +414,8 @@
    "direction": "positive",
    "emphasis": false,
    "source": "Reuters",
-   "published_at": "2026-10-08T12:01:28Z"
+   "published_at": "2026-10-08T12:01:28Z",
+   "speaker": null
   },
   {
    "area": "Product",
@@ -146,7 +426,8 @@
    "direction": "positive",
    "emphasis": false,
    "source": "The Verge",
-   "published_at": "2026-10-07T19:05:52Z"
+   "published_at": "2026-10-07T19:05:52Z",
+   "speaker": null
   },
   {
    "area": "Product",
@@ -157,7 +438,8 @@
    "direction": "positive",
    "emphasis": false,
    "source": "Tom's Hardware",
-   "published_at": "2026-10-07T18:07:54Z"
+   "published_at": "2026-10-07T18:07:54Z",
+   "speaker": null
   },
   {
    "area": "Demand",
@@ -168,7 +450,8 @@
    "direction": "positive",
    "emphasis": false,
    "source": "Financial Times",
-   "published_at": "2026-10-06T22:28:55Z"
+   "published_at": "2026-10-06T22:28:55Z",
+   "speaker": null
   },
   {
    "area": "Corporate",
@@ -179,7 +462,8 @@
    "direction": "positive",
    "emphasis": false,
    "source": "Reuters",
-   "published_at": "2026-10-06T19:01:28Z"
+   "published_at": "2026-10-06T19:01:28Z",
+   "speaker": null
   },
   {
    "area": "Product",
@@ -190,7 +474,8 @@
    "direction": "positive",
    "emphasis": false,
    "source": "NVIDIA",
-   "published_at": "2026-10-06T13:29:05Z"
+   "published_at": "2026-10-06T13:29:05Z",
+   "speaker": null
   },
   {
    "area": "Corporate",
@@ -201,21 +486,37 @@
    "direction": "positive",
    "emphasis": false,
    "source": "Fortune",
-   "published_at": "2026-10-06T00:42:00Z"
+   "published_at": "2026-10-06T00:42:00Z",
+   "speaker": null
   },
   {
    "area": "Earnings",
    "kind": "estimates",
-   "title": "30일 EPS 상향 35 · 하향 2",
+   "title": "30일 주당순이익 예상 상향 35 · 하향 2",
    "fact": "상향:하향 비 35:2 (임계 3:1)",
    "url": null,
    "direction": "positive",
    "emphasis": false,
    "source": "yfinance",
-   "published_at": null
+   "published_at": null,
+   "speaker": null
   }
  ],
- "events_total": 18,
+ "events_total": 19,
+ "direction_counts": {
+  "today": {
+   "positive": 13,
+   "negative": 3,
+   "uncertain": 1,
+   "neutral": 2
+  },
+  "week": {
+   "positive": 17,
+   "negative": 5,
+   "uncertain": 1,
+   "neutral": 2
+  }
+ },
  "analyst_target_only": [],
  "upcoming": [
   {
@@ -273,6 +574,12 @@
    {
     "key": "ret_vs_amd",
     "value": 1.5061608464850718,
+    "flag": false,
+    "fmt": "pp_signed"
+   },
+   {
+    "key": "ret_vs_avgo",
+    "value": -0.9093872392991087,
     "flag": false,
     "fmt": "pp_signed"
    },
@@ -348,19 +655,19 @@
    },
    {
     "key": "pc_ratio_oi",
-    "value": 0.707284556875901,
+    "value": 0.7031068498400768,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "pc_ratio_vol",
-    "value": 0.713437887633984,
+    "value": 0.7182258103188808,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "gex_approx",
-    "value": 684617313.8058236,
+    "value": 602145263.9002264,
     "flag": false,
     "fmt": "gex"
    },
@@ -462,13 +769,13 @@
   "flows": [
    {
     "key": "smh_shares_out",
-    "value": null,
+    "value": 11670900.0,
     "flag": false,
     "fmt": "int"
    },
    {
     "key": "soxx_shares_out",
-    "value": null,
+    "value": 7650000.0,
     "flag": false,
     "fmt": "int"
    },
@@ -489,6 +796,18 @@
     "value": "2026-09-15",
     "flag": false,
     "fmt": "text"
+   },
+   {
+    "key": "finra_short_ratio",
+    "value": 48.22902577828781,
+    "flag": false,
+    "fmt": "pct"
+   },
+   {
+    "key": "finra_short_ratio_avg20",
+    "value": 43.1781716576575,
+    "flag": false,
+    "fmt": "pct"
    }
   ],
   "valuation": [
@@ -503,19 +822,19 @@
   "news": [
    {
     "key": "news_count",
-    "value": 22,
+    "value": 26,
     "flag": false,
     "fmt": "int"
    },
    {
     "key": "news_avg_7d",
-    "value": 18.428571428571427,
+    "value": 18.714285714285715,
     "flag": false,
     "fmt": "num1"
    },
    {
     "key": "news_pending",
-    "value": 3,
+    "value": 1,
     "flag": false,
     "fmt": "int"
    }
@@ -584,7 +903,7 @@
   },
   {
    "metric": "dc_revenue_yoy",
-   "label": "데이터센터 매출 YoY",
+   "label": "데이터센터 매출 (전년 동기 대비)",
    "value": 117.0,
    "unit": "%",
    "asof": "FY2027Q2",
@@ -595,7 +914,7 @@
   },
   {
    "metric": "dc_revenue_qoq",
-   "label": "데이터센터 매출 QoQ",
+   "label": "데이터센터 매출 (직전 분기 대비)",
    "value": 18.4,
    "unit": "%",
    "asof": "FY2027Q2",
@@ -606,7 +925,7 @@
   },
   {
    "metric": "gross_margin_nongaap",
-   "label": "총마진 (non-GAAP)",
+   "label": "총이익률 (조정 기준 non-GAAP)",
    "value": 75.0,
    "unit": "%",
    "asof": "FY2027Q2",
@@ -617,7 +936,7 @@
   },
   {
    "metric": "guidance_revenue_next",
-   "label": "다음 분기 매출 가이던스",
+   "label": "다음 분기 매출 (회사 전망)",
    "value": 108000000000.0,
    "unit": "USD",
    "asof": "FY2027Q3",
@@ -628,7 +947,7 @@
   },
   {
    "metric": "guidance_beat_pct",
-   "label": "가이던스 대비 실제",
+   "label": "회사 전망 대비 실제 매출",
    "value": 5.7,
    "unit": "%",
    "asof": "FY2027Q2",
@@ -672,14 +991,14 @@
   },
   {
    "metric": "insider_net_sold_90d",
-   "label": "90일 내부자 순매도",
+   "label": "90일 임원·내부자 순매도",
    "value": 967599313.4595,
    "unit": "USD",
    "asof": "2026-10-09",
-   "source": "EDGAR Form 4",
+   "source": "SEC 임원 거래 공시 (Form 4)",
    "note": null,
    "arrow": null,
-   "detail": "매도 $967.6M · 매수 $0.0M · 공시 16건 (10b5-1 6건)"
+   "detail": "매도 $967.6M · 매수 $0.0M · 공시 16건 (사전 매도 계획 6건)"
   },
   {
    "metric": "institutional_top10",
@@ -694,7 +1013,7 @@
   },
   {
    "metric": "forward_pe",
-   "label": "선행 PER (현재가 ÷ 12개월 선행 EPS)",
+   "label": "선행 주가수익비율 (주가 ÷ 12개월 예상 주당순이익)",
    "value": 14.406896735029273,
    "unit": "배",
    "asof": "2026-10-09",
@@ -705,7 +1024,7 @@
   },
   {
    "metric": "forward_pe_1y_pct",
-   "label": "선행 PER 1년 분위",
+   "label": "선행 주가수익비율 1년 분위 (최근 1년 중 위치, 0~100)",
    "value": null,
    "unit": "분위",
    "asof": null,
@@ -717,7 +1036,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-09",
-  "state_collected_at": "2026-10-11T03:29:08Z",
+  "state_collected_at": "2026-10-11T10:01:16Z",
   "missing_fields": [],
   "option_snapshot_days": 1,
   "iv_rank_days": 1,
@@ -729,19 +1048,19 @@
    "court": 1,
    "fedreg": 21,
    "form4": 16,
-   "news": 233,
+   "news": 241,
    "newsroom": 3
   },
   "option_expiries": [
    "2026-10-12",
    "2026-10-14",
    "2026-10-16",
-   "2026-10-23",
+   "2026-10-19",
    "2026-11-06",
    "2026-11-13",
    "2026-11-20"
   ],
-  "items_pending": 3,
+  "items_pending": 1,
   "test_mode": true
  },
  "thresholds": {
@@ -758,5 +1077,6 @@
   "REVISION_RATIO_EVENT": 3.0,
   "SHORT_INTEREST_CHG_EVENT_PCT": 15.0,
   "VOL_RATIO_EVENT": 2.0
- }
+ },
+ "new_flags": []
 }

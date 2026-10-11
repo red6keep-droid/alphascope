@@ -1,10 +1,14 @@
-{"key": "calendar_last_refreshed_at", "value": "2026-10-11T03:29:04Z"}
+{"key": "calendar_last_refreshed_at", "value": "2026-10-11T10:01:06Z"}
 {"key": "analyst_last_seen", "value": "2026-10-01T10:34:36Z"}
 {"key": "edgar_last_filing_date", "value": "2026-10-09"}
 {"key": "quarterly_seen_accessions", "value": "[\"0001045810-25-000207\", \"0001045810-25-000209\", \"0001045810-25-000228\", \"0001045810-25-000230\", \"0001045810-26-000019\", \"0001045810-26-000021\", \"0001045810-26-000051\", \"0001045810-26-000052\", \"0001045810-26-000073\", \"0001045810-26-000075\"]"}
 {"key": "fedreg_last_date", "value": "2026-10-13"}
 {"key": "court_last_filed", "value": "2026-09-29"}
-{"key": "classify_last_run_at", "value": "2026-10-11T03:32:39Z"}
+{"key": "classify_last_run_at", "value": "2026-10-11T10:02:16Z"}
 {"key": "last_report_day", "value": "2026-10-09"}
 {"key": "court_seen_entry:cl:73459129", "value": "2026-10-08"}
 {"key": "court_seen_entry:cl:8490233", "value": "2026-10-08"}
+{"key": "market_regime", "value": "{\"day\": \"2026-10-09\", \"regime\": \"상승 추세\", \"prev_regime\": null}"}
+{"key": "sector_flow", "value": "{\"day\": \"2026-10-09\", \"cur\": \"모이는 중\", \"prev\": null}"}
+{"key": "overheat", "value": "{\"day\": \"2026-10-09\", \"cur\": [], \"prev\": null}"}
+{"key": "new_values", "value": "{\"day\": \"2026-10-09\", \"cur\": {\"status:ma_cross\": null, \"status:revisions_up_30d\": 35, \"status:revisions_down_30d\": 2, \"status:rating_counts\": {\"strongBuy\": 10, \"buy\": 48, \"hold\": 2, \"sell\": 1, \"strongSell\": 0}, \"status:pt_mean\": 328.71695, \"status:pt_median\": 315.0, \"status:pt_high\": 515.0, \"status:pt_low\": 180.0, \"status:smh_shares_out\": 11670900.0, \"status:soxx_shares_out\": 7650000.0, \"status:shares_short\": 294225803.0, \"status:short_pct_float\": 1.27, \"status:short_asof\": \"2026-09-15\", \"checklist:revenue\": [96221000000.0, \"FY2027Q2\"], \"checklist:dc_revenue\": [89000000000.0, \"FY2027Q2\"], \"checklist:dc_revenue_yoy\": [117.0, \"FY2027Q2\"], \"checklist:dc_revenue_qoq\": [18.4, \"FY2027Q2\"], \"checklist:gross_margin_nongaap\": [75.0, \"FY2027Q2\"], \"checklist:guidance_revenue_next\": [108000000000.0, \"FY2027Q3\"], \"checklist:guidance_beat_pct\": [5.7, \"FY2027Q2\"], \"checklist:china_revenue_pct\": [8.2, \"FY2027Q2\"], \"checklist:top_customer_pct\": [16.0, \"FY2027Q2\"], \"checklist:buyback_amount\": [19732000000.0, \"FY2027Q2\"], \"checklist:insider_net_sold_90d\": [967599313.4595, \"2026-10-09\"], \"checklist:institutional_top10\": [33.8100002, \"2026-06-30\"], \"checklist:forward_pe\": [14.406896735029273, \"2026-10-09\"], \"checklist:forward_pe_1y_pct\": [null, null], \"calendar:CPI:2026-10-14:CPI\": true, \"calendar:EARNINGS_PEER:2026-10-15:TSM 실적\": false, \"calendar:OPEX:2026-10-16:월간 옵션 만기\": true, \"case:cl:8490233\": [\"active\", \"2027-05-20\", null], \"case:cl:73459129\": [\"active\", null, null], \"regime\": \"상승 추세\", \"sector_flow\": \"모이는 중\"}, \"prev\": null}"}
