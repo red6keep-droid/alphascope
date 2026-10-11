@@ -114,6 +114,62 @@ def _trend_tips():
     return [("점수", score), ("7일 이벤트", events), ("평균 강도", inten)]
 
 
+FLOW_FLAT_PCT = 10   # 직전 30일 대비 전체 건수 변화가 이 % 미만이면 "비슷함"
+
+
+def _flow_card(blk):
+    """30일 흐름 요약 — 강조 카드 (2026-10-11 사용자: "결과 건수를 자료를 바탕으로 요약, 강조 카드 형식, 타이틀과 설명으로").
+    첫 줄 `발언 흐름 : 늘어남 / 줄어듦 / 비슷함`(증감 색), 얇은 선 아래 3px 점 글머리표 — 설명 문장, `**라벨** : 내용`.
+    사실만: 건수·차이·비율. 평가어·전망은 쓰지 않는다."""
+    rows = [x for x in blk.get("dims", {}).get("topic", []) if x["events"] > 0]
+    if not rows:
+        return ""
+    has_prev = blk.get("compare_to_previous")
+    total = sum(r["events"] for r in rows)
+    allr = blk["dims"]["topic"]
+    prev = sum(r["prev_events"] or 0 for r in allr) if has_prev else None
+    neg = sum((r["neg_ratio"] or 0) * r["events"] for r in rows) / total
+    k = lambda r: _k(r["key"])
+    if prev:
+        pct = (total - prev) / prev * 100
+        state, color = (("비슷함", "#64748B") if abs(pct) < FLOW_FLAT_PCT else ("늘어남", dk.UP) if pct > 0 else ("줄어듦", dk.DOWN))
+        up = [r for r in allr if (r["delta_events"] or 0) > 0]
+        down = [r for r in allr if (r["delta_events"] or 0) < 0]
+        tail = ("모든 주제가 줄었습니다" if not up and down else "모든 주제가 늘었습니다" if up and not down
+                else f"{len(up)}개 주제가 늘고 {len(down)}개 주제가 줄었습니다")
+        desc = f"최근 30일 시장 관련 이벤트는 {total}건으로, 그 앞 30일 {prev}건보다 {abs(total - prev)}건 {'많습니다' if total > prev else '적습니다' if total < prev else '같습니다'} ({pct:+.0f}%). {tail}"
+    else:
+        state, color = f"이벤트 {total}건", "#111"
+        desc = f"최근 30일 시장 관련 이벤트는 {total}건입니다. 그 앞 30일 데이터가 아직 없어 늘고 줄었는지는 보지 않습니다"
+    items = [(None, desc)]
+    top = rows[0]
+    items.append(("가장 많은 주제", f"{k(top)} {top['events']}건 — 전체의 {top['events'] / total * 100:.0f}%"))
+    if prev:
+        if up:
+            items.append(("늘어난 주제", " · ".join(f"{k(r)} {r['prev_events']}건 → {r['events']}건" for r in sorted(up, key=lambda r: -r["delta_events"])[:3])))
+        if down:
+            d = min(down, key=lambda r: r["delta_events"])
+            items.append(("가장 크게 줄어든 주제", f"{k(d)} {d['prev_events']}건 → {d['events']}건 ({d['delta_events']:+d}건)"))
+    big = [r for r in rows if r["events"] >= 3]   # 3건 미만은 비율이 한두 건에 흔들려 뺀다
+    if big:
+        hi = max(big, key=lambda r: (r["neg_ratio"] or 0, r["events"]))
+        items.append(("부정 비율", f"전체 {neg * 100:.0f}% · 가장 높은 주제 {k(hi)} {(hi['neg_ratio'] or 0) * 100:.0f}% ({round((hi['neg_ratio'] or 0) * hi['events'])}/{hi['events']}건)"))
+        mx = max(r["avg_intensity"] for r in big)
+        tops = [k(r) for r in big if abs(r["avg_intensity"] - mx) < 0.05]
+        items.append(("평균 강도가 가장 높은 주제", f"{'·'.join(tops)} {mx:.1f} (1~10)"))
+    bg, bd = dk.EMPH_BG, dk.EMPH_BD
+
+    def li(t, x):
+        head = f'<b>{_esc(t)}</b> : ' if t else ""
+        return dk.dot_li(head + dk.tint(_esc(x)), size=3)
+    lis = "".join(li(t, x) for t, x in items)
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'
+            f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
+            f'<span style="font-weight:700;color:#111;">발언 흐름 : <span style="color:{color};">{_esc(state)}</span></span></span> '
+            f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid {bd};font-size:{dk.SMALL};line-height:1.5;">'
+            f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul></div></div>")
+
+
 def sec_windows(a):
     """30일 흐름 — C 카드: 주제, 값 이벤트 수, 보조 줄 평균 강도·부정 비율·직전 30일 대비."""
     blk = a["windows"].get("30D") or {}
@@ -134,7 +190,7 @@ def sec_windows(a):
                          + ("" if blk.get("compare_to_previous") else " — 아직 직전 30일 데이터가 없어 표시하지 않습니다")),
         ("급상승 주제와 차이", "30일 흐름은 큰 주제(무역·연준 등)별로 한 달 동안 꾸준히 얼마나 말했는지, 급상승 주제는 최근 7일 세부 주제 가운데 갑자기 늘어난 것을 봅니다"),
     ]
-    return dk.ccard(rows) + dk.guide_card("읽는 법", items)   # 기준(최근 30일)은 읽는 법 카드 안으로 (2026-10-11 사용자: 건수·차이를 안내 글에 자세히)
+    return _flow_card(blk) + dk.ccard(rows) + dk.guide_card("읽는 법", items)   # 요약 강조 카드는 맨 위 (2026-10-11 사용자)   # 기준(최근 30일)은 읽는 법 카드 안으로 (2026-10-11 사용자: 건수·차이를 안내 글에 자세히)
 
 
 def _x(v):
