@@ -190,6 +190,7 @@ def dot_li(inner_html, size=3, color="#111", top=11, margin="3px 0"):
             f'<span style="flex:none;width:{size}px;height:{size}px;border-radius:50%;background:{color};margin-top:{top}px;"></span><span>{inner_html}</span></li>')
 
 
+GRID_ATTR = ' data-guide-grid="1"'   # f-string 안에 \" 를 쓰면 파이썬 3.10(CI)에서 문법 오류
 GUIDE_SHORT = 70   # 이보다 짧은 한 문장은 한 줄 "제목: 내용"
 
 
@@ -211,7 +212,7 @@ def guide(title, body, line=True, grid=False, in_card=False):
     items = [body] if isinstance(body, str) else body
     lis = "".join(dot_li(tint(esc(it[0]) + ' = ' + esc(it[1])) if isinstance(it, tuple) else tint(esc(it)), size=2, color=NOTE, top=9, margin="2px 0") for it in items)   # 14px 안내 → 2px 점
     return (f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}'
-            f"<ul{' data-guide-grid=\"1\"' if grid else ''} style='margin:2px 0 0 2px;padding:0;list-style:none;'>{lis}</ul></div>")   # grid: 데스크톱 2열 (테마 CSS)
+            f"<ul{GRID_ATTR if grid else ''} style='margin:2px 0 0 2px;padding:0;list-style:none;'>{lis}</ul></div>")   # grid: 데스크톱 2열 (테마 CSS)
 
 
 

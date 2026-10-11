@@ -280,6 +280,7 @@ def _table_fold(inner_html):
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 
+EMPTY_ATTR = ' data-empty="1"'   # f-string 안에 \" 를 쓰면 파이썬 3.10(CI)에서 문법 오류
 DIR_TABS = (("negative", "부정 발언"), ("positive", "긍정 발언"), ("", "전체"))   # 하위탭 (2026-10-11 사용자)
 
 
@@ -351,7 +352,7 @@ def _dir_switch(topic, a, charts, noise_p):
         ok = bool(blk and _table_rows(blk))
         if ok and first is None:
             first = i
-        btns += (f'<button type="button" data-switch-btn="{i}" class="rt-dir"{"" if ok else " data-empty=\"1\""}>{_esc(label)} '
+        btns += (f'<button type="button" data-switch-btn="{i}" class="rt-dir"{"" if ok else EMPTY_ATTR}>{_esc(label)} '
                  f'<span style="font-size:{dk.MICRO};font-weight:400;">({n}일)</span></button>')   # 괄호는 한 단계 작게 (가이드라인 3-3)
         body = _group_panel(blk, gkey, charts, noise_p) if blk else dk.muted("아직 이 방향의 발언이 없습니다.")
         panels += f'<div data-switch-panel="{i}"><div data-switch-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:10px 0 4px;">{_esc(label)} <span style="font-size:{dk.MICRO};font-weight:400;">({n}일)</span></div>{body}</div>'
