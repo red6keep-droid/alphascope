@@ -111,6 +111,8 @@ def validate(input_path, output_path, analysis_path=None):
             errors.append(
                 f"news[{i}] index({idx}) 유효하지 않음 (유효 범위 0~{news_size - 1})"
             )
+        if not str(item.get("title_ko") or "").strip():
+            warnings.append(f"news[{i}] title_ko 없음 — 원문(영어) 제목으로 렌더됩니다.")
         theme = item.get("theme")
         if theme is None:
             warnings.append(f"news[{i}] theme 없음 — 태그 없이 렌더됩니다.")

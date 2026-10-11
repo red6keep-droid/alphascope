@@ -1834,7 +1834,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     {
       id: 'report-card',
       label: '데일리 브리핑',
-      map: { summary: ['(머리)', '오늘 한 줄', '주요 지수'], insight: ['종합', '종합 — 현재 시장 상태'] },   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용 */
+      map: { summary: ['(머리)', '오늘 한 줄', '주요 지수'], insight: ['(종합)', '종합', '종합 — 현재 시장 상태'] },   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용. (종합) = 머리 카드 안 종합 문단 (2026-10-12) */
       picks: true,
       empty: '아직 발행된 리포트가 없습니다.'
     },
@@ -1890,6 +1890,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       while (m && m.tagName !== 'H2') { ln.push(m); m = m.nextElementSibling; }
       out['(가격)'] = ln; out['(머리)'] = ln;
     }
+    /* 데일리 종합은 2026-10-12부터 머리 카드 구분선 아래 data-insight 문단 — 구획 제목이 없다 */
+    var ins = doc.querySelector('[data-insight]');
+    if (ins) out['(종합)'] = [ins];
     return out;
   }
 

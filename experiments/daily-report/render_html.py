@@ -183,37 +183,75 @@ def _text(text):
     """Gemini 문구 — 줄마다 문단(18px), 영어 용어는 한국어로. 비어 있으면 ⓘ 안내."""
     if not str(text or "").strip():
         return dk.muted("데이터 없음")
-    return "".join(f'<div style="margin:0 0 6px;">{_esc(dk.ko(line, TERM_KO))}</div>' for line in str(text).splitlines() if line.strip())
+    return "".join(f'<div style="margin:0 0 6px;">{dk.tint(_esc(dk.ko(line, TERM_KO)))}</div>' for line in str(text).splitlines() if line.strip())   # 증감 색 (2026-10-12 사용자: 모든 곳)
 
 
 def _light_word(light):
     return {"🟢": "정상", "🟡": "주의", "🔴": "경계"}.get(light, "")
 
 
+LIGHT_KIND = {"🟢": "good", "🟡": "uncertain", "🔴": "negative"}   # 신호등 → 라벨·상태 카드 색 (🟢 녹색, 2026-10-12 사용자)
+GRADE_MEANING = {   # 시장 상태 등급의 뜻 — 점수 카드 설명 (2026-10-12 사용자)
+    "위험 선호": "70점 이상 — 투자자들이 위험을 감수하고 주식 쪽으로 돈이 움직이기 쉬운 환경입니다",
+    "중립": "45~69점 — 위험 선호와 위험 회피 어느 쪽으로도 기울지 않은 환경입니다",
+    "위험 회피": "45점 미만 — 투자자들이 위험을 피해 안전자산 쪽으로 움직이기 쉬운 환경입니다",
+}
+
+
+BREADTH_MEANING = {   # 시장 폭 등급의 뜻 — 상승 비율 카드 설명 (2026-10-12 사용자)
+    "양호": "65% 이상 — 상승이 시장 전반에 넓게 퍼졌습니다",
+    "보통": "45~65% — 오른 쪽과 내린 쪽이 비슷하게 섞였습니다",
+    "취약": "45% 미만 — 내린 쪽이 더 많아 상승이 일부에 몰렸습니다",
+}
+
+
+def _pos(label):
+    """20일 위치 라벨 — 고점·저점은 굵게, 라벨 전체 증감 색 (고점 빨강 · 저점 파랑, 2026-10-12 사용자)."""
+    if not label:
+        return ""
+    col = UP_COLOR if "고점" in label else DOWN_COLOR if "저점" in label else None
+    t = _esc(label).replace("고점", "<b>고점</b>").replace("저점", "<b>저점</b>")
+    return f'<span style="color:{col};">{t}</span>' if col else t
+
+
 def _light_pill(light, text=None):
-    kind = {"🟢": "positive", "🟡": "uncertain", "🔴": "negative"}.get(light, "neutral")
+    kind = LIGHT_KIND.get(light, "neutral")
     return dk.pill(text or _light_word(light) or "—", kind)
 
 
 def sec_lead(report, analysis):
-    """글 머리(제목 없음, data-lead): 한 줄 결론 D 카드. 홈 카드는 '(머리)'로 읽는다."""
+    """글 머리(제목 없음, data-lead): 한 줄 결론 + 종합을 한 강조 카드에 (2026-10-12 사용자: 하나의 카드로 통합, 가로 구분선, 16px).
+    홈 카드는 '(머리)'로 한 줄 결론을(구분선 아래는 건너뜀), '(종합)'으로 data-insight 문단을 읽는다."""
     one = str(report.get("one_line") or "").strip()
     inner = f'<div style="color:#111;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 굵게 하지 않는다 — 강조는 카드로 (가이드라인 3-1)
-    return dk.cards(dk.dcard(inner, "neutral"))
+    lines = [ln for ln in str(report.get("opinion") or "").splitlines() if ln.strip()]
+    if lines:
+        body = "".join(f'<div style="margin:0 0 4px;">{_esc(dk.ko(ln, TERM_KO))}</div>' for ln in lines)
+        inner += (f'<div style="margin:10px 0 0;padding-top:10px;border-top:1px solid {dk.EMPH_BD};">'
+                  f'<div data-insight="1" style="font-size:{dk.SMALL};color:#111;line-height:1.6;">{body}</div></div>')
+    return dk.cards(f'<div style="background:{dk.EMPH_BG};border:1px solid {dk.EMPH_BD};border-radius:10px;padding:12px 14px;margin:0 0 8px;">{inner}</div>')
 
 
 def sec_regime(analysis, report):
-    """시장 상태 — C 카드: 점수·등급·어제 대비 + 요소별 막대. 점수는 analyze.py 규칙값."""
+    """시장 상태 — 해설 먼저(2026-10-12 사용자: 모든 탭 일괄), C 카드: 점수·등급·어제 대비 + 요소별 막대. 점수는 analyze.py 규칙값."""
     regime = (analysis or {}).get("regime") or {}
     comment = _text(report.get("regime_comment"))
     if regime.get("score") is None:
         return dk.muted("오늘은 시장 상태 점수를 계산하지 못했습니다.") + comment
     light = regime.get("light") or "🟡"
-    rows = [("점수", f'{int(regime["score"])} <span style="color:{dk.SUB};font-weight:400;">/ 100</span> ' + _light_pill(light, dk.ko(regime.get("label") or "", TERM_KO)), "")]
+    grade = dk.ko(regime.get("label") or "", TERM_KO)
+    explain = [("점수", "추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수의 합(0~100)입니다. 높을수록 주식에 우호적인 환경")]
+    if GRADE_MEANING.get(grade):
+        explain.append((grade, GRADE_MEANING[grade]))
+    score_card = dk.state_card("점수", LIGHT_KIND.get(light, "neutral"),   # 따로 카드 + 설명, 배경은 등급 라벨 색 (2026-10-12 사용자)
+                               f'{int(regime["score"])} <span style="color:{dk.SUB};font-weight:400;">/ 100</span> ' + _light_pill(light, grade), items=explain)
+    rows = []
     if regime.get("score_prev") is not None:
         rows.append(("어제 대비", dk.arrow(regime.get("delta") or 0, 0, ""), _esc(f"어제 {regime['score_prev']}점")))
     else:
-        rows.append(("어제 대비", dk.dash(), "어제 점수 없음"))
+        rows.append(("어제 대비", dk.dash(), "어제 점수 없음"))   # 구분명 │ 보조 줄 한 줄 (crow, 2026-10-12 사용자)
+    html_rows = [dk.crow(n, v, sb, first=(i == 0)) for i, (n, v, sb) in enumerate(rows)]
+    bars = []
     for key, label in REGIME_COMPONENT_LABELS.items():
         c = (regime.get("components") or {}).get(key) or {}
         score, mx = c.get("score"), c.get("max")
@@ -221,12 +259,25 @@ def sec_regime(analysis, report):
             continue
         frac = score / mx
         col = LIGHT_COLOR["🟢"] if frac >= 0.7 else LIGHT_COLOR["🟡"] if frac >= 0.45 else LIGHT_COLOR["🔴"]
-        rows.append((_esc(label), dk.hbar(score, mx, col) + f"{int(score)} <span style='color:{dk.SUB};font-weight:400;'>/ {int(mx)}</span>", ""))
-    return dk.ccard(rows) + comment
+        bars.append((_esc(label), frac, col, f"{int(score)} <span style='color:{dk.SUB};font-weight:400;'>/ {int(mx)}</span>"))
+    if bars:   # 막대는 가장 긴 이름(금리 환경) + 14px 뒤에서 시작, 모두 같은 길이 (2026-10-12 사용자)
+        w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])
+        html_rows += [dk.bar_row(n, f, c, v, w) for n, f, c, v in bars]
+    return comment + score_card + dk.card_of(html_rows)
+
+
+def _arrows(last5):
+    """최근 5일 방향 ↑↓ — 왼쪽이 5거래일 전, 끝이 오늘. 상승 빨강 · 하락 파랑, 굵게 (2026-10-12 사용자)."""
+    colors = {"↑": UP_COLOR, "↓": DOWN_COLOR}
+    return "".join(f'<b style="color:{colors.get(a, MUTED)};">{_esc(a)}</b>' for a in last5)
+
+
+INDEX_SHOWN = 2   # S&P 500 · 나스닥만 보이고 나머지는 펼침 (2026-10-12 사용자) — FOLD_SHOWN 과 같은 값
 
 
 def sec_indices(indices, analysis, report):
-    """주요 지수 — C 카드: 지수, 값 가격 + 1일 등락, 보조 줄 5일·20일·최근 5일·위치."""
+    """주요 지수 — 해설 먼저(2026-10-12 사용자), C 카드(왼쪽 60%): 지수, 값 가격 + 1일 등락, 보조 줄 5일·20일·최근 5일·위치.
+    S&P 500 · 나스닥만 보이고 다우존스 · 러셀 2000 · VIX는 펼침 버튼 안."""
     series = (analysis or {}).get("series") or {}
     position = (analysis or {}).get("position") or {}
     rows = []
@@ -237,15 +288,18 @@ def sec_indices(indices, analysis, report):
         value = f'{_esc(_fmt_price(rec.get("price")))} {dk.arrow(rec.get("change_pct"))}'
         sub = []
         if s.get("ret_5d") is not None:
-            sub.append(f"5일 {s['ret_5d']:+.2f}%")
+            sub.append(f"5일 {s['ret_5d']:+.2f}%")   # 덩어리째 증감 색은 crow 의 tint
         if s.get("ret_20d") is not None:
             sub.append(f"20일 {s['ret_20d']:+.2f}%")
         if s.get("last5"):
-            sub.append("최근 5일 " + "".join(s["last5"]))
+            sub.append("최근 5일 " + _arrows(s["last5"]))
         if label:
-            sub.append(label)
-        rows.append((_esc(INDEX_LABELS.get(key, key)), value, _esc(" · ".join(sub))))
-    return dk.ccard(rows) + _text(report.get("summary"))
+            sub.append(_pos(label))   # 고점·저점 굵게 + 증감 색
+        rows.append((_esc(INDEX_LABELS.get(key, key)), value, " · ".join(sub)))
+    out = _text(report.get("summary")) + dk.ccard(rows[:INDEX_SHOWN], left=60)
+    if rows[INDEX_SHOWN:]:
+        out += dk.fold(f"지수 {len(rows) - INDEX_SHOWN}개 더 보기", dk.ccard(rows[INDEX_SHOWN:], left=60))
+    return out
 
 
 def sec_change(analysis, report):
@@ -262,7 +316,7 @@ def sec_change(analysis, report):
     streak = rs.get("qqq_streak")
     if streak is not None:
         rows.append(("나스닥이 S&P 500을 웃돈 연속 일수", f"{int(streak)}일", ""))
-    out = dk.sub_label("상대강도") + dk.ccard(rows)
+    out = _text(report.get("change_comment")) + dk.sub_label("상대강도") + dk.ccard(rows)   # 해설 먼저 (2026-10-12 사용자)
     trows = []
     for key in ("sp500", "nasdaq", "russell"):
         s = series.get(INDEX_SYMBOL[key]) or {}
@@ -272,10 +326,10 @@ def sec_change(analysis, report):
             sub.append(f"20일 중 상승 {s['up_days_20']} · 하락 {s['down_days_20']}")
         if p.get("from_high_pct") is not None:
             sub.append(f"20일 고점 대비 {p['from_high_pct']:+.2f}% · 저점 대비 {p['from_low_pct']:+.2f}%")
-        trows.append((_esc(INDEX_LABELS[key]), _esc(p.get("position_label") or "—"), _esc(" · ".join(sub))))
+        trows.append((_esc(INDEX_LABELS[key]), _pos(p.get("position_label")) or "—", _esc(" · ".join(sub))))
     out += dk.sub_label("20일 위치") + dk.ccard(trows)
     if vix.get("now") is not None and vix.get("prev_5d") is not None:
-        out += dk.ccard([("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → <b>{vix["now"]:.2f}</b> {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}', "")])
+        out += dk.ccard([("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → <b>{vix["now"]:.2f}</b> {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}', "", 35, True)])   # 값 한 줄 (2026-10-12 사용자)
     out += dk.guide_card("읽는 법", [
         ("상대강도", "두 지수의 5거래일 수익률 차이(%p). 양수면 앞쪽이 더 많이 올랐습니다"),
         ("성장주 − 시장", "양수면 나스닥(성장주)이 S&P 500보다 강했습니다"),
@@ -283,7 +337,13 @@ def sec_change(analysis, report):
         ("동일가중 − 시총가중", "양수면 종목을 똑같이 담은 지수(RSP)가 더 올랐습니다 — 상승이 소수 대형주가 아니라 넓게 퍼졌다는 뜻"),
         ("20일 위치", "최근 20거래일의 고점·저점 사이에서 지금 어디에 있는지"),
     ])
-    return out + _text(report.get("change_comment"))
+    return out
+
+
+def _up_down(up, down):
+    """상승 / 하락 개수 — ▲ 빨강 · ▼ 파랑 (2026-10-12 사용자: 증감 삼각형)."""
+    return (f'<span style="color:{UP_COLOR};white-space:nowrap;">▲&nbsp;{up}</span> / '
+            f'<span style="color:{DOWN_COLOR};white-space:nowrap;">▼&nbsp;{down}</span>')
 
 
 def sec_breadth(analysis):
@@ -292,73 +352,118 @@ def sec_breadth(analysis):
     if b.get("ratio") is None:
         return ""
     light = (b.get("label") or "")[:1]
-    rows = [("상승 비율", f'{b["ratio"]:.1f}% ' + _light_pill(light, (b.get("label") or "")[1:].strip() or None), "")]
+    grade = (b.get("label") or "")[1:].strip()
+    base = "S&P 500 구성종목" if b.get("mode") == "full" else f"섹터 ETF {b.get('sectors_counted')}개"
+    explain = [("상승 비율", f"오늘 {base} 가운데 오른 것의 비율입니다")]
+    if BREADTH_MEANING.get(grade):
+        explain.append((grade, BREADTH_MEANING[grade]))
+    ratio_card = dk.state_card("상승 비율", LIGHT_KIND.get(light, "neutral"), f'{b["ratio"]:.1f}% ' + _light_pill(light, grade or None), items=explain)   # 따로 카드, 배경은 등급 색 (2026-10-12 사용자)
+    rows = []
     if b.get("mode") == "full":
-        rows.append(("상승 / 하락 종목", f'<span style="color:{UP_COLOR};">{b.get("advancers")}</span> / <span style="color:{DOWN_COLOR};">{b.get("decliners")}</span>', "S&P 500 구성종목"))
+        rows.append(("상승 / 하락 종목", _up_down(b.get("advancers"), b.get("decliners")), "S&P 500 구성종목"))
         if b.get("new_high_52w") is not None:
             rows.append(("52주 신고가 / 신저가", f'{b["new_high_52w"]} / {b["new_low_52w"]}', ""))
     else:
-        rows.append(("섹터 ETF 상승 / 하락", f'<span style="color:{UP_COLOR};">{b.get("sectors_up")}</span> / <span style="color:{DOWN_COLOR};">{b.get("sectors_down")}</span>',
-                     f"{b.get('sectors_counted')}개 섹터 ETF 기준"))
+        rows.append(("섹터 ETF", _up_down(b.get("sectors_up"), b.get("sectors_down")),
+                     f"{b.get('sectors_counted')}개 기준"))   # 폰에서도 구분명 │ 보조 줄 한 줄 (2026-10-12 사용자) — 상승·하락은 ▲▼ 가 말한다
     if b.get("rsp_spy_1d") is not None:
         rows.append(("동일가중 − 시총가중 (1일)", dk.arrow(b["rsp_spy_1d"], 2, "%p"), ""))
         if b.get("rsp_spy_5d") is not None:
             rows.append(("동일가중 − 시총가중 (5일)", dk.arrow(b["rsp_spy_5d"], 2, "%p"), ""))
-    return dk.ccard(rows) + dk.guide_card("읽는 법", [
-        ("상승 비율", "오른 종목(또는 섹터 ETF)의 비율. 65% 이상 양호 · 45% 이상 보통 · 그 아래 취약"),
+    return ratio_card + dk.ccard(rows) + dk.guide_card("읽는 법", [   # 상승 비율 설명은 상태 카드로 옮김
         ("동일가중 − 시총가중", "양수면 상승이 소수 대형주에 몰리지 않고 넓게 퍼졌습니다"),
     ])
 
 
 def sec_sectors(analysis, report):
-    """섹터 — C 카드: 테마(ETF), 값 = 막대 + 등락률, 보조 줄 5일 순위 대비. 주도·약세 줄, 해설."""
+    """섹터 — 해설 먼저, 주도·약세 줄, 막대 카드: 테마(ETF) · 막대 · 등락률, 보조 줄 5일 순위 대비. 앞 3개만 보이고 나머지는 펼침 (2026-10-12 사용자)."""
     ranked = ((analysis or {}).get("sectors") or {}).get("ranked_1d") or []
     if not ranked:
         return ""
     max_abs = max(abs(r["ret_1d"]) for r in ranked) or 1.0
-    rows = []
+    bars = []
     for r in ranked:
         col = UP_COLOR if r["ret_1d"] >= 0 else DOWN_COLOR
         d = r.get("rank_change")
         sub = "" if d is None else (f"5일 순위 대비 ▲{d}" if d > 0 else f"5일 순위 대비 ▼{-d}" if d < 0 else "5일 순위와 같음")
-        rows.append((f"{_esc(r['theme'])} ({_esc(r['etf'])})", dk.hbar(r["ret_1d"], max_abs, col) + dk.arrow(r["ret_1d"]), _esc(sub)))
+        sub = " · ".join(x for x in (r["etf"], sub) if x)   # ETF 코드는 보조 줄로 — 이름 칸을 짧게 해 막대 자리를 둔다
+        bars.append((_esc(r["theme"]), abs(r["ret_1d"]) / max_abs, col, dk.arrow(r["ret_1d"]), _esc(sub)))
+    w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])   # 접힌 줄까지 같은 폭 → 막대 길이 모두 같음
+    rows = [dk.bar_row(n, f, c, v, w, sb, first=(i == 0 or i == FOLD_SHOWN)) for i, (n, f, c, v, sb) in enumerate(bars)]
     by_etf = {r["etf"]: r for r in ranked}
     names = lambda etfs: " · ".join(_esc(by_etf[e]["theme"]) for e in etfs if e in by_etf)  # noqa: E731
     sectors = analysis["sectors"]
     lis = "".join(dk.dot_li(f"<b>{k}</b> : {v}", size=3) for k, v in (("주도", names(sectors.get("leaders") or []) or "—"), ("약세", names(sectors.get("laggards") or []) or "—")))
-    lead = dk.dcard(f"<ul style='margin:0;padding:0;list-style:none;font-size:{dk.SMALL};line-height:1.5;'>{lis}</ul>", "neutral")   # 긴 이름 나열은 값 칸이 아니라 라벨 글머리표로 (가이드라인 3-3)
-    return lead + dk.ccard(rows) + _text(report.get("sector_comment"))
+    lead = dk.dcard(f"<ul style='margin:0;padding:0;list-style:none;font-size:{dk.SMALL};line-height:1.5;'>{lis}</ul>", "positive")   # 강조 카드 (2026-10-12 사용자)   # 긴 이름 나열은 값 칸이 아니라 라벨 글머리표로 (가이드라인 3-3)
+    return _text(report.get("sector_comment")) + lead + _folded(rows, "섹터")
 
 
 def _bp(bp):
     return "—" if bp is None else f"{int(bp):+d}bp"
 
 
+MACRO_ROWS = (   # (키, 이름, 단위, 증감 단위, 증감 배수) — 단위는 값에, 이름에서는 뺀다 (2026-10-12 사용자)
+    ("us2y", "2년물 금리", "%", "bp", 100),
+    ("spread_10_2", "10년 − 2년", "%p", "bp", 100),
+    ("fed_funds", "기준금리", "%", "bp", 100),
+    ("unemployment_rate", "실업률", "%", "%p", 1),
+    ("cpi", "소비자물가", "", "%", None),   # CPI 지수, 증감은 전월 대비 % — 이름을 줄여 `구분명 │ 날짜` 한 줄
+    ("vix", "VIX", "", "", 1),
+)
+
+
+def _macro_value(rec, unit, chg_unit, mult):
+    """값 + 단위, 뒤에 직전 관측 대비 증감(▲▼ 증감 색). 직전 값이 없으면 값만."""
+    if not rec or rec.get("value") is None:
+        return dk.dash()
+    out = f"{rec['value']:.2f}{unit}"
+    prev = rec.get("prev")
+    if prev is None:
+        return _esc(out)
+    if mult is None:   # 변화율 %
+        d = (rec["value"] - prev) / prev * 100 if prev else None
+        digits = 1
+    else:
+        d = (rec["value"] - prev) * mult
+        digits = 0 if chg_unit == "bp" else 2
+    if d is None:
+        return _esc(out)
+    if digits == 0:
+        d = round(d)
+    return f"{_esc(out)} {dk.arrow(d, digits, chg_unit)}"
+
+
 def sec_macro(macro, analysis, report):
-    """금리·지표 — C 카드: 지표, 값, 보조 줄 변화·기준일. 금리 변화에는 색을 쓰지 않는다."""
+    """금리·지표 — 해설 먼저, C 카드: 지표(단위 없음) · 값(단위 + 직전 관측 대비 증감) · 보조 줄 기준일.
+    10년물은 1일·5일 변화와 기준일을 줄 아래 한 줄로 (2026-10-12 사용자). 증감은 모두 색."""
     rates = (analysis or {}).get("rates") or {}
-
-    def fred(key):
-        rec = macro.get(key)
-        if not rec or rec.get("value") is None:
-            return None, ""
-        return f"{rec['value']:.2f}", rec.get("date", "")
-
     rows = []
-    v10, d10 = fred("us10y")
+    rec10 = macro.get("us10y") or {}
+    v10, d10 = rec10.get("value"), rec10.get("date", "")
     if rates.get("us10y") is not None:
-        v10, d10 = f"{rates['us10y']:.2f}", (analysis or {}).get("as_of") or d10
+        v10, d10 = rates["us10y"], (analysis or {}).get("as_of") or d10
     chg = f"1일 {_bp(rates.get('us10y_change_1d_bp'))} · 5일 {_bp(rates.get('us10y_change_5d_bp'))}" if rates.get("us10y_change_5d_bp") is not None else ""
-    rows.append(("10년물 국채금리 (%)", _esc(v10) if v10 else dk.dash(), _esc(" · ".join(x for x in (chg, dk.day(d10)) if x))))
-    for key, label in (("us2y", "2년물 국채금리 (%)"), ("spread_10_2", "10년 − 2년 (%p)"), ("fed_funds", "연방기금금리 (%)"),
-                       ("unemployment_rate", "실업률 (%)"), ("cpi", "소비자물가 CPI (지수)"), ("vix", "VIX")):
+    rows.append(("10년물 금리", _esc(f"{v10:.2f}%") if v10 is not None else dk.dash(), _esc(" · ".join(x for x in (chg, dk.day(d10)) if x)), None, False, True))
+    for key, label, unit, chg_unit, mult in MACRO_ROWS:
         if key in ("us2y", "spread_10_2", "fed_funds") and not macro.get(key):
             continue
-        v, d = fred(key)
-        rows.append((label, _esc(v) if v else dk.dash(), _esc(dk.day(d))))
+        rec = macro.get(key) or {}
+        rows.append((label, _macro_value(rec, unit, chg_unit, mult), _esc(dk.day(rec.get("date", ""))) if rec else ""))
     if rates.get("growth_label"):
         rows.append(("금리와 성장주", _esc(rates["growth_label"]), ""))   # 따로 카드를 만들지 않고 같은 카드 안에 (가이드라인 2-1)
-    return dk.ccard(rows) + _text(report.get("macro_comment"))
+    html_rows = [dk.crow(r[0], r[1], r[2], first=(i == 0 or i == FOLD_SHOWN), sub_below=bool(len(r) > 5 and r[5])) for i, r in enumerate(rows)]
+    return _text(report.get("macro_comment")) + _folded(html_rows, "지표")
+
+
+FOLD_SHOWN = 2   # 카드 줄이 많으면 앞 2줄만 보이고 나머지는 '더 보기' 펼침 (2026-10-12 사용자: "섹터는 2개만, 다른 탭에도 동일하게 2개만")
+
+
+def _folded(rows_html, noun):
+    """줄 목록 → 카드. FOLD_SHOWN 줄이 넘으면 나머지는 펼침 버튼 안의 둘째 카드로 (각 카드 첫 줄은 first=True 로 만들어 둔다)."""
+    if len(rows_html) <= FOLD_SHOWN:
+        return dk.card_of(rows_html)
+    rest = rows_html[FOLD_SHOWN:]
+    return dk.card_of(rows_html[:FOLD_SHOWN]) + dk.fold(f"{noun} {len(rest)}개 더 보기", dk.card_of(rest))
 
 
 def _quote_rows(quotes):
@@ -366,19 +471,22 @@ def _quote_rows(quotes):
     rows = []
     for q in quotes or []:
         sym = q.get("symbol") or "-"
-        r = dk.crow(_esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', _esc(f"거래량 {_fmt_volume(q.get('volume'))}"), first=not rows)
+        r = dk.crow(_esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', _esc(f"거래량 {_fmt_volume(q.get('volume'))}"), first=len(rows) in (0, FOLD_SHOWN))
         chg = q.get("change_pct")
         r = r.replace('<span style="', f'<span data-pick="1" data-sym="{_esc(sym)}" data-price="{_esc(_fmt_price(q.get("price")))}" data-chg="{"" if chg is None else f"{float(chg):+.2f}%"}" style="', 1)
         rows.append(r)
     if not rows:
         return dk.muted("데이터 없음")
-    return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(rows)}</span></div>'
+    return _folded(rows, "종목")
 
 
 def _named_reaction(sym, value_html):
     """관련 자산 한 칸 — 이름까지 증감 색 (2026-10-11 사용자: % 만이 아니라 종목도 같이 색). 값이 bp 등 색 없는 경우는 이름도 기본색."""
     name = _esc(SYMBOL_NAMES.get(sym, sym))
     col = UP_COLOR if "▲" in value_html else DOWN_COLOR if "▼" in value_html else None
+    if col is None and "<" not in value_html and value_html[:1] in "+-−":   # 금리 bp 처럼 색 없이 온 값도 증감 색 (2026-10-12 사용자)
+        col = UP_COLOR if value_html[0] == "+" else DOWN_COLOR
+        value_html = f'<span style="color:{col};font-weight:700;">{value_html}</span>'
     return f'<span style="color:{col};">{name}</span> {value_html}' if col else f"{name} {value_html}"
 
 
@@ -406,7 +514,7 @@ def sec_news(input_data, report, analysis):
         if theme and theme not in THEME_VOCAB:
             theme = "기타"
         tag = (dk.pill(theme) + " ") if theme else ""
-        title = _esc(news_item.get("title_ko") or news_item.get("title") or "")
+        title = _esc(item.get("title_ko") or news_item.get("title_ko") or news_item.get("title") or "")   # Gemini 가 옮긴 한국어 제목 먼저 (2026-10-12 사용자)
         link = dk.link_icon(news_item.get("link"), news_item.get("title") or "원문")
         related = [s for s in (item.get("related") or []) if isinstance(s, str) and s in known][:4]
         subs = []
@@ -419,8 +527,21 @@ def sec_news(input_data, report, analysis):
     return dk.ul(items) if items else dk.muted("주요 뉴스 없음")
 
 
+def _overall_text(overall, items):
+    """종합 설명 (결론, 이유) — 항목 신호 개수와 판정 규칙대로 왜 이 종합인지. 사실만."""
+    names = lambda lt: [label for label, light, _ in items if light == lt]  # noqa: E731
+    warn, caution = names("🔴"), names("🟡")
+    if overall == "🔴":
+        return f"경계 {len(warn)}개 ({' · '.join(warn)})", "경계가 하나라도 있으면 종합은 경계입니다"
+    if overall == "🟡":
+        return f"주의 {len(caution)}개 ({' · '.join(caution)})", "주의가 둘 이상이라 종합은 주의입니다"
+    if caution:
+        return f"주의 {len(caution)}개 ({' · '.join(caution)}), 나머지는 정상", "주의가 하나뿐이라 종합은 정상입니다"
+    return f"{len(items)}개 항목이 모두 정상입니다", "지금 켜진 위험 신호가 없습니다"
+
+
 def sec_status(analysis, report):
-    """위험 지도 — C 카드: 종합 신호등 + 항목 5개(신호·근거). 규칙 설명은 ⓘ."""
+    """주의할 위험요인 (옛 이름 위험 지도) — 위험요인 글, 그 아래 C 카드: 종합 설명 + 항목 5개(신호·근거). 규칙 설명은 제목 옆 ?."""
     a = analysis or {}
     status = a.get("status") or {}
     if not status.get("overall"):
@@ -439,12 +560,12 @@ def sec_status(analysis, report):
              ("금리 위험", status.get("rates"), f"10년물 5일 {int(rates['us10y_change_5d_bp']):+d}bp" if rates.get("us10y_change_5d_bp") is not None else "—"),
              ("과열 위험", status.get("overheat"), overheat)]
     overall = status["overall"]
-    rows = [("종합", _light_pill(overall, f"{overall} {_light_word(overall)}"), "")]
+    head, why = _overall_text(overall, items)
+    overall_card = dk.state_card(_esc(head), LIGHT_KIND.get(overall, "neutral"), sub_html=_esc(why))   # 종합은 따로 카드, 라벨 없이 설명, 배경은 신호 색 (2026-10-12 사용자)
+    rows = []
     rows += [(_esc(label), _light_pill(light) if light else dk.dash(), _esc(basis)) for label, light, basis in items]
-    out = dk.ccard(rows)   # 판정 규칙은 제목 옆 ? 툴팁 (가이드라인 2-1 상태 카드 규칙)
-    if str(report.get("risk") or "").strip():
-        out += dk.sub_label("주의할 위험요인") + _text(report.get("risk"))
-    return out
+    risks = [dk.ko(ln, TERM_KO) for ln in str(report.get("risk") or "").splitlines() if ln.strip()]
+    return dk.emph_list(risks) + overall_card + dk.ccard(rows)   # 글 먼저, 강조 카드 (2026-10-12 사용자), 소제목 없음 — 구획 제목이 '주의할 위험요인'   # 판정 규칙은 제목 옆 ? 툴팁 (가이드라인 2-1 상태 카드 규칙)
 
 
 REGIME_TIP = ("추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수를 더한 값(0~100)입니다. 70 이상 위험 선호 · 45~69 중립 · 45 미만 위험 회피.\n"
@@ -470,7 +591,8 @@ def sec_footer(input_data):
 
 
 def build_body(input_data, report, cover_url=None, analysis=None):
-    """구획 제목은 짧은 명사 (가이드라인 2절). 홈 카드 CARDS: summary = (머리)·주요 지수, insight = 종합, picks = 급등주."""
+    """구획 제목은 짧은 명사 (가이드라인 2절). 홈 카드 CARDS: summary = (머리)·주요 지수, insight = (종합) — 머리 카드의 data-insight, picks = 급등주.
+    종합은 따로 구획을 두지 않고 머리 카드 구분선 아래 (2026-10-12 사용자)."""
     indices = input_data.get("market", {}).get("indices", {})
     parts = [
         dk.WRAP_OPEN,
@@ -483,19 +605,18 @@ def build_body(input_data, report, cover_url=None, analysis=None):
     change = sec_change(analysis, report)
     if change:
         parts.append(dk.section("달라진 것", change, tab=TAB_TODAY))
-    parts.append(dk.section("종합", _text(report.get("opinion")), tab=TAB_TODAY))
     breadth = sec_breadth(analysis)
     if breadth:
-        parts.append(dk.section("시장 폭", breadth, tab=TAB_MARKET))
+        parts.append(dk.section(TAB_MARKET, breadth, tab=TAB_MARKET))   # 제목 삭제 — 탭 이름과 같은 구획 제목은 테마가 숨긴다 (2026-10-12 사용자)
     sectors = sec_sectors(analysis, report)
     if sectors:
         parts.append(dk.section("섹터", sectors, summary="1일 등락률", tab=TAB_MARKET))
     parts += [
         dk.section("금리·지표", sec_macro(input_data.get("macro", {}), analysis, report), tab=TAB_MARKET),
-        dk.section("급등주", _quote_rows(input_data.get("gainers", [])) + _text(report.get("gainers_comment")), summary="상위 5", tab=TAB_STOCKS),
-        dk.section("관심 종목", _quote_rows(input_data.get("most_active", [])) + _text(report.get("attention_comment")), summary="거래 상위 5", tab=TAB_STOCKS),
+        dk.section("급등주", _text(report.get("gainers_comment")) + _quote_rows(input_data.get("gainers", [])), summary="상위 5", tab=TAB_STOCKS),
+        dk.section("관심 종목", _text(report.get("attention_comment")) + _quote_rows(input_data.get("most_active", [])), summary="거래 상위 5", tab=TAB_STOCKS),
         dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_STOCKS),
-        dk.section("위험 지도", sec_status(analysis, report), tab=TAB_RISK, one_line=True,
+        dk.section("주의할 위험요인", sec_status(analysis, report), tab=TAB_RISK, one_line=True,
                    aside=dk.tip_line([("판정", RISK_TIP)], in_title=True)),   # 판정 규칙은 ? 툴팁 (안내 줄에서 옮김)
         sec_footer(input_data),
         dk.WRAP_CLOSE,

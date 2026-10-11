@@ -132,7 +132,7 @@ def _section(title, html, summary="", line=None, tab=None):
 
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor" stroke="none"/></svg>')
-QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자)
+QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="15.4" height="15.4" aria-hidden="true" style="vertical-align:-2.5px;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 14 → 15.4px (2026-10-12 사용자: 10% 크게, 모든 페이지)
                  '<circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5"/><circle cx="8" cy="11.4" r=".9" fill="currentColor" stroke="none"/></svg>')
 NOTE = "#6B7280"   # 안내 줄 회색 (테마 gray-500)
 
@@ -145,24 +145,13 @@ def _note(t):
     return f'<div style="margin:2.76px 0 1.38px;padding-top:2.07px;border-top:1px solid #f3f3f3;font-size:{TINY};color:{NOTE};{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
 
 
-_SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")   # 범위(-0.63 ~ +0.63%)는 칠하지 않는다
 _LABEL = re.compile(r"^([^:：]{1,24}?)\s*:\s+(.+)$", re.S)
-
-
-# 증감 값 앞의 종목 이름 — "산업재(XLI)", "나스닥 100(QQQ)", "1위 기술" (2026-10-11 사용자: 종목도 같이 색)
-_NAMED = re.compile(r"((?:\d+위 )?(?:[A-Za-z][A-Za-z&;]* |[가-힣A-Za-z]+ (?=\d))?[가-힣A-Za-z0-9&;]+(?:\([A-Z0-9^.&;\s]{1,12}\))|\d+위 [가-힣A-Za-z&;·]+)\s"
-                    r"(?<![\w.~])([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")
 
 
 def _tint(html_text):
     """이스케이프된 글 안의 증감에 색 — 증가 빨강 · 감소 파랑 (가이드라인 3-3, 2026-10-11 사용자).
     앞에 종목 이름(이름(티커) 또는 'n위 이름')이 붙어 있으면 이름까지 한 덩어리로 칠한다: 산업재(XLI) -0.25% 전체 파랑. 범위(-0.63 ~ +0.63%)는 칠하지 않는다."""
-    def named(m):
-        col = UP if m.group(2) == "+" else DOWN
-        return f'<span style="color:{col};">{m.group(1)} <span style="white-space:nowrap;">{m.group(2)}{m.group(3)}{m.group(4)}</span></span>'
-    out = _NAMED.sub(named, html_text)
-    parts = re.split(r"(<span[^>]*>.*?</span></span>)", out)   # 이미 칠한 덩어리는 건너뛰고 나머지의 맨 숫자만
-    return "".join(p if p.startswith("<span") else _SIGNED.sub(lambda m: f'<span style="color:{UP if m.group(1) == "+" else DOWN};white-space:nowrap;">{m.group(0)}</span>', p) for p in parts)
+    return _dk.tint(html_text)   # 공통 규칙: 짧은 덩어리는 구분명·종목명까지 통째로 (2026-10-12 사용자: 모든 페이지)
 
 
 def _label_text(text):
@@ -626,9 +615,8 @@ STATUS_KO = {"active": "진행 중", "closed": "종결", "stayed": "중지", "se
 
 def _crow(name_html, value_html, sub="", first=False, left=None, short=False):
     """C 카드의 한 줄 (가이드라인 2-1): 왼쪽 구분명(굵게) + 그 아래 보조 줄(14px #999), 오른쪽 값. 줄 사이 가로 구분선."""
-    sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};white-space:normal;">{_paren(sub)}</span>' if sub else ""   # 보조 줄은 14px (안내)
     return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
-            f'<span style="display:block;{_dk.COL_L75 if short else COL_L}"><span style="font-weight:700;color:#111;">{_paren(name_html)}</span>{sub_html}</span> '
+            f'<span style="display:block;line-height:1.5;{_dk.COL_L75 if short else COL_L}">{_dk.crow_left(name_html, sub)}</span> '
             f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 5자 미만이면 80 · 20 (2026-10-11 사용자)
 
 
@@ -652,7 +640,7 @@ def _gcard(rows):
     rows = (날짜HTML, 라벨HTML, 내용HTML, 보조줄, D-n)."""
     inner = ""
     for i, (date_html, label_html, name_html, sub, right_html) in enumerate(rows):
-        sub_html = f'<span style="display:block;color:{SUB};font-size:{TINY};white-space:normal;">{_paren(sub)}</span>' if sub else ""   # 보조 줄은 14px
+        sub_html = f'<span style="display:block;color:{SUB};font-size:{TINY};white-space:normal;">{_dk.sub_line(sub)}</span>' if sub else ""   # 보조 줄은 14px, 증감 색
         inner += (f'<span style="{MULTI_ROW}{"" if i == 0 else MULTI_SEP}">'
                   f'<span style="display:block;{COL_L}">'
                   f'<span style="display:block;"><span style="{CAL_DATE}">{date_html}</span>{" " + label_html if label_html else ""}</span> '

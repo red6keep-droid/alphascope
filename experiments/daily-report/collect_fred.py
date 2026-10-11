@@ -40,15 +40,23 @@ def _last_value(session, api_key, series_id):
     resp.raise_for_status()
     obs = resp.json().get("observations", [])
 
+    found = []   # 최근 관측 둘 — 값 옆 직전 대비 증감에 쓴다 (2026-10-12 사용자: "증감 표시는 안 되는 거야?")
     for o in obs:
         value = str(o.get("value") or "").strip()
         date = str(o.get("date") or "").strip()
         if value and value != "." and date:
             try:
-                return {"value": round(float(value), 2), "date": date}
+                found.append((round(float(value), 2), date))
             except (ValueError, TypeError):
                 continue
-    return None
+        if len(found) == 2:
+            break
+    if not found:
+        return None
+    rec = {"value": found[0][0], "date": found[0][1]}
+    if len(found) == 2:
+        rec["prev"], rec["prev_date"] = found[1]
+    return rec
 
 
 def collect_fred(api_key=None):

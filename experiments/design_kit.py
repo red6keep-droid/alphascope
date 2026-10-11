@@ -19,8 +19,9 @@ _NO_LINE_START = re.compile(r'^\s*(<div style="(?:overflow-x:auto;|background:)|
 CARD = "background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px;"
 CARD_DIR = {"positive": ("#FFF7ED", "#FED7AA"), "negative": ("#EFF6FF", "#BFDBFE"), "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#FFFBEB", "#FDE68A")}
 PILL = {"area": ("#CBD5E1", "#334155"), "positive": ("#FCA5A5", "#B91C1C"), "negative": ("#93C5FD", "#1D4ED8"),
-        "uncertain": ("#FDBA74", "#C2410C"), "neutral": ("#CBD5E1", "#64748B")}
-PILL_BG = {"positive": "#FEF2F2", "negative": "#EFF6FF"}
+        "uncertain": ("#FDBA74", "#C2410C"), "neutral": ("#CBD5E1", "#64748B"),
+        "good": ("#86EFAC", "#15803D")}   # 신호등 🟢 정상·양호 (2026-10-12 사용자: 정상 라벨은 녹색)
+PILL_BG = {"positive": "#FEF2F2", "negative": "#EFF6FF", "good": "#F0FDF4"}
 BAR_PASTEL = {"positive": ("#F8C4BF", "#7F1D1D"), "negative": ("#BCD3F5", "#1E3A8A"), "uncertain": ("#FADDB0", "#7C2D12"), "neutral": ("#E2E8F0", "#475569")}
 COL_L = "flex:0 0 65%;max-width:65%;min-width:0;white-space:normal;"
 COL_L75 = "flex:0 0 80%;max-width:80%;min-width:0;white-space:normal;"   # 이름은 그대로, 값은 80% (2026-10-11 사용자: 75 → 80)   # 값이 짧은 카드 (오른쪽 값 모두 5자 미만) — 2026-10-11 사용자   # 카드 왼쪽 65% (가이드라인 2-1, 2026-10-11 사용자: 꼭 지킨다)
@@ -34,7 +35,7 @@ MULTI_SEP = "border-top:1px solid #E2E8F0;"
 UL, LI = "margin:0 0 8px 20px;padding:0;list-style:disc;", "margin:6px 0;"
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor" stroke="none"/></svg>')
-QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자)
+QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="15.4" height="15.4" aria-hidden="true" style="vertical-align:-2.5px;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 14 → 15.4px (2026-10-12 사용자: 10% 크게, 모든 페이지)
                  '<circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5"/><circle cx="8" cy="11.4" r=".9" fill="currentColor" stroke="none"/></svg>')
 LINK_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
              '<path d="M9 3h4v4"/><path d="M13 3 7 9"/><path d="M11 9v4H3V5h4"/></svg>')
@@ -114,7 +115,57 @@ _NAMED = re.compile(r"((?:\d+위 )?(?:[A-Za-z][A-Za-z&;]* |[가-힣A-Za-z]+ (?=\
                     r"(?<![\w.~])([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")
 
 
+_DIR_WORD = re.compile(r"(상승|하락)\s?\d+(?:건|개|일)?$")   # "상승 9" · "하락 11" (끝에 올 때만 — "상승 52% (…)" 같은 확률은 아님)
+CHUNK_TINT = 32   # 이보다 짧은 덩어리는 이름·구분명까지 통째로 칠한다
+CHUNK_NOWRAP = 18   # 보조 줄에서 이보다 짧은 덩어리는 가운데서 줄을 바꾸지 않는다 (· 에서만 바뀜)
+
+
+def _chunk_dir(plain):
+    """덩어리 하나의 증감 방향: '+' · '-' · None(없음 또는 섞임·범위)."""
+    if "~" in plain:
+        return None
+    dirs = {"+" if m.group(1) == "+" else "-" for m in _SIGNED.finditer(plain)}
+    dirs |= {"+" if t == "▲" else "-" for t in re.findall("[▲▼]", plain)}
+    m = _DIR_WORD.search(plain.strip())
+    if m:
+        dirs.add("+" if m.group(1) == "상승" else "-")
+    return dirs.pop() if len(dirs) == 1 else None
+
+
 def tint(html_text):
+    """증감 색 (2026-10-12 사용자: "증감 정보는 모두 증감 컬러, 종목명·구분명도 같이"). " · " 로 나눈 덩어리마다:
+    짧은 덩어리(CHUNK_TINT 자 미만)에 증감이 한 방향뿐이면 통째로 — `SPY 20일 +2.12%` 전체 빨강, `20일 고점 대비 -0.07%` 전체 파랑,
+    `5일 순위 대비 ▲6` 빨강, `하락 11` 파랑. 긴 문장·섞인 덩어리는 아래 _tint_inline(숫자, 앞 종목 이름까지). 이미 태그가 든 덩어리는 그대로."""
+    out = []
+    for c in str(html_text).split(" · "):
+        if "<" not in c:
+            plain = html_mod.unescape(c).strip()
+            d = _chunk_dir(plain)
+            if d and len(plain) < CHUNK_TINT:
+                out.append(f'<span style="color:{UP if d == "+" else DOWN};">{c}</span>')
+                continue
+            out.append(_tint_inline(c))
+        else:
+            out.append(c)
+    return " · ".join(out)
+
+
+def sub_line(sub_html, lead=""):
+    """C 카드 보조 줄 내용 — 증감 색(tint) + 짧은 덩어리는 줄바꿈 없이 (· 에서만 줄이 바뀐다).
+    lead(세로 구분선)는 첫 덩어리에 붙여 줄 끝에 홀로 남지 않게 한다."""
+    chunks = tint(sub_html).split(" · ")
+    chunks[0] = lead + chunks[0]
+    parts = []
+    for i, c in enumerate(chunks):
+        sep = f'<span style="color:{SUB};">&nbsp;·</span>' if i < len(chunks) - 1 else ""   # 가운뎃점은 앞 덩어리에 붙여 줄 첫머리에 오지 않게
+        plain = html_mod.unescape(re.sub(r"<[^>]+>", "", c))
+        if i == 0 and lead:
+            plain = plain.strip()
+        parts.append(f'<span style="white-space:nowrap;">{c}{sep}</span>' if len(plain) < CHUNK_NOWRAP else c + sep)
+    return paren(" ".join(parts))
+
+
+def _tint_inline(html_text):
     """이스케이프된 글 안의 증감에 색 — 증가 빨강 · 감소 파랑 (가이드라인 3-3, 2026-10-11 사용자).
     앞에 종목 이름(이름(티커) 또는 'n위 이름')이 붙어 있으면 이름까지 한 덩어리로 칠한다: 산업재(XLI) -0.25% 전체 파랑. 범위(-0.63 ~ +0.63%)는 칠하지 않는다."""
     def named(m):
@@ -342,21 +393,42 @@ def short_values(rows):
     return bool(rows) and all(value_len(r[1]) < SHORT_VALUE for r in rows)
 
 
-def crow(name_html, value_html, sub="", first=False, left=None, short=False):
-    """C 카드 한 줄 + 보조 줄(14px #7A7A7A). name_html 은 이스케이프된 HTML."""
-    sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};white-space:normal;">{paren(sub)}</span>' if sub else ""
-    return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
-            f'<span style="display:block;{COL_L75 if short else COL_L}"><span style="font-weight:700;color:#111;">{paren(name_html)}</span>{sub_html}</span> '
-            f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 짧으면 80 · 20 — left 인자는 무시
+def crow_left(name_html, sub=""):
+    """C 카드 왼쪽 칸 안: 구분명(굵게) │ 보조 줄(14px #7A7A7A) 한 줄로 (2026-10-12 사용자: "구분선 넣고 한 줄로 표기 가능한 것은 모두").
+    넘치면 · 에서 다음 줄로 이어진다. 엔비디아 렌더러도 이것을 쓴다."""
+    if not sub:
+        return f'<span style="font-weight:700;color:#111;">{paren(name_html)}</span>'
+    return (f'<span style="font-weight:700;color:#111;">{paren(name_html)}</span>'
+            f'<span style="color:{SUB};font-weight:400;font-size:{TINY};">{sub_line(sub, lead=VSEP)}</span>')
+
+
+VSEP = '<span style="display:inline-block;width:1px;height:14px;background:#E2E8F0;margin:0 8px;vertical-align:-1px;"></span>'
+
+
+def crow(name_html, value_html, sub="", first=False, left=None, short=False, nowrap=False, sub_below=False):
+    """C 카드 한 줄: 왼쪽 구분명 │ 보조 줄, 오른쪽 값. name_html 은 이스케이프된 HTML.
+    left = 왼쪽 칸 % (카드별 예외, 가이드라인 2-1 — 2026-10-12 사용자). nowrap = 값을 한 줄로.
+    sub_below = 보조 줄을 구분명 옆이 아니라 줄 아래 카드 폭 전체 한 줄로 (옆에 들어가지 않을 때, 2026-10-12 사용자)."""
+    col_l = f"flex:0 0 {left}%;max-width:{left}%;min-width:0;white-space:normal;" if left else COL_L75 if short else COL_L
+    col_r = COL_R.replace("white-space:normal;", "white-space:nowrap;") if nowrap else COL_R
+    below = (f'<span style="flex:0 0 100%;color:{SUB};font-weight:400;font-size:{TINY};white-space:nowrap;">{sub_line(sub)}</span>'
+             if sub and sub_below else "")
+    row_st = MULTI_ROW + ("flex-wrap:wrap;row-gap:0;" if below else "")
+    return (f'<span style="{row_st}{"" if first else MULTI_SEP}">'
+            f'<span style="display:block;line-height:1.5;{col_l}">{crow_left(name_html, "" if below else sub)}</span> '
+            f'<span style="{col_r}font-weight:700;">{value_html}</span>{below}</span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 짧으면 80 · 20, left 가 있으면 그 값
 
 
 EMPH_BG, EMPH_BD = "#FFF7ED", "#FED7AA"   # 강조 카드 배경·테두리 (오렌지)
 
 
 def ccard(rows, left=None, attrs="", emph=False):
-    """C 카드 묶음: rows = [(name_html, value_html, sub_html)]. emph=True 면 강조 카드 배경(오렌지, 줄 구분선도 오렌지) — 2026-10-11 사용자: 급상승 주제."""
+    """C 카드 묶음: rows = [(name_html, value_html, sub_html[, left_pct[, nowrap[, sub_below]]])]. left = 카드 전체 왼쪽 %. emph=True 면 강조 카드 배경(오렌지, 줄 구분선도 오렌지) — 2026-10-11 사용자: 급상승 주제."""
     short = short_values(rows)   # 값이 모두 5자 미만 → 왼쪽 80% (2026-10-11 사용자)
-    inner = "".join(crow(n, v, sb, first=(i == 0), short=short) for i, (n, v, sb) in enumerate(rows))
+    # 줄 튜플 4번째 값 = 그 줄의 왼쪽 % (예: 시장 상태 막대 줄 30), 없으면 카드의 left (2026-10-12 사용자)
+    inner = "".join(crow(r[0], r[1], r[2], first=(i == 0), short=short, left=(r[3] if len(r) > 3 else left), nowrap=bool(len(r) > 4 and r[4]),
+                         sub_below=bool(len(r) > 5 and r[5]))
+                    for i, r in enumerate(rows))
     box = MULTI
     if emph:
         inner = inner.replace(MULTI_SEP, f"border-top:1px solid {EMPH_BD};")
@@ -375,6 +447,43 @@ def dcard(html, theme="neutral"):
     return f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:12px 14px;margin:0 0 8px;">{html}</div>'
 
 
+STATE_CARD = {"good": ("#F0FDF4", "#BBF7D0"), "uncertain": ("#FFFBEB", "#FDE68A"), "negative": ("#EFF6FF", "#BFDBFE"), "neutral": ("#F8FAFC", "#CBD5E1")}   # 신호 라벨 색의 카드판
+
+
+def state_card(head_html, kind="neutral", right_html="", sub_html="", items=()):
+    """상태 카드 (2026-10-12 사용자: 종합·점수 카드 분리, 배경은 신호 라벨 색). 첫 줄 왼쪽 결론(굵게 검정 16px) · 오른쪽 값,
+    둘째 줄 sub_html(14px 한 줄 설명), items = [(라벨, 내용)] 은 얇은 선 아래 3px 점 글머리표 14px."""
+    bg, bd = STATE_CARD.get(kind, STATE_CARD["neutral"])
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
+            f'<span style="font-weight:700;color:#111;font-size:{SMALL};">{head_html}</span>'
+            + (f'<span style="font-weight:700;white-space:nowrap;font-size:{SMALL};">{right_html}</span>' if right_html else "") + "</span>")
+    sub = f'<div style="font-size:{TINY};color:#374151;line-height:1.5;margin-top:2px;">{sub_html}</div>' if sub_html else ""
+    lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=3, color="#374151", top=9, margin="2px 0") for k, v in items)
+    body = (f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid {bd};font-size:{TINY};line-height:1.5;">'
+            f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul></div>") if lis else ""
+    return f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:0 0 8px;">{head}{sub}{body}</div>'
+
+
+def emph_list(lines):
+    """강조 카드 + 3px 점 글머리표 16px (2026-10-12 사용자: 주의할 위험요인 글을 강조 카드로). lines = 이스케이프 전 문장들. 증감은 색."""
+    lis = "".join(dot_li(tint(esc(t)), size=3) for t in lines if str(t).strip())
+    if not lis:
+        return ""
+    return (f'<div style="background:{EMPH_BG};border:1px solid {EMPH_BD};border-radius:10px;padding:10px 14px;margin:0 0 8px;">'
+            f"<ul style='margin:0;padding:0;list-style:none;font-size:{SMALL};line-height:1.5;color:#111;'>{lis}</ul></div>")
+
+
+ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" '
+            'stroke-linecap="round" stroke-linejoin="round" style="flex:none;transition:transform .15s;"><path d="M4 6l4 4 4-4"/></svg>')
+
+
+def fold(label, inner_html):
+    """펼침 버튼 (가이드라인 2-1 H 카드 버튼) — 눌러야 inner_html 이 보인다. details data-acc: 테마 CSS가 화살표를 돌리고 홈 카드는 건너뛴다."""
+    return (f'<details data-acc="1" style="margin:0 0 8px;"><summary style="cursor:pointer;list-style:none;display:flex;justify-content:center;align-items:center;gap:6px;'
+            f'padding:8px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;color:#111;font-size:{SMALL};font-weight:700;">{esc(label)} {ACC_CHEV}</summary>'
+            f'<div style="margin-top:8px;">{inner_html}</div></details>')
+
+
 def sub_label(t):
     return f'<div data-sub="1" style="font-size:{SMALL};color:{NOTE};margin:10px 0 3px;">{paren(esc(t))}</div>'
 
@@ -391,11 +500,45 @@ def bar(label, segs):
             f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 10px;">{body}</span>')
 
 
-def hbar(value, max_value, color):
-    """가로 막대 하나 (섹터 등락 등) — 카드 값 칸 안에 작게."""
+def hbar(value, max_value, color, width="80px"):
+    """가로 막대 하나 (섹터 등락 등) — 카드 값 칸 안에 작게. width 는 CSS 폭 (값 칸을 채우려면 calc(100% - n px))."""
     pct = 0 if not max_value else min(100, abs(value) / max_value * 100)
-    return (f'<span style="display:inline-block;vertical-align:middle;width:80px;height:10px;background:#F1F5F9;border-radius:3px;overflow:hidden;margin-right:8px;">'
+    return (f'<span style="display:inline-block;vertical-align:middle;width:{width};height:10px;background:#F1F5F9;border-radius:3px;overflow:hidden;margin-right:8px;">'
             f'<span style="display:block;height:100%;width:{pct:.0f}%;background:{color};"></span></span>')
+
+
+BAR_GAP = "14px"   # 가장 긴 이름과 막대 사이 (2026-10-12 사용자: "금리 환경 기준 14픽셀 여백")
+
+
+def bar_widths(names, values):
+    """막대 카드 한 묶음의 이름·값 목록 (HTML, 중복 제거). 칸마다 모두를 보이지 않게 겹쳐 두어 칸 폭 = 가장 넓은 글자 폭 (글꼴과 상관없이 정확).
+    접힌 부분까지 같은 목록을 써서 막대 길이가 모두 같다."""
+    return list(dict.fromkeys(names)), list(dict.fromkeys(values))
+
+
+def _sized(html, others, align="left"):
+    """html 을 칸에 두되, 칸 폭은 others 가운데 가장 넓은 것 — 같은 칸에 보이지 않게 겹침 (CSS grid 한 칸)."""
+    ghost = "".join(f'<span aria-hidden="true" style="grid-area:1/1;visibility:hidden;">{o}</span>' for o in others if o != html)
+    return f'<span style="display:grid;flex:none;text-align:{align};"><span style="grid-area:1/1;">{html}</span>{ghost}</span>'
+
+
+def bar_row(name_html, frac, color, value_html, widths, sub="", first=False):
+    """막대 줄 (2026-10-12 사용자: 막대는 가장 긴 이름 + 14px 뒤에서 왼쪽 정렬, 모든 막대 같은 길이).
+    이름 칸(고정 폭) · 14px · 막대(남은 폭) · 값 칸(고정 폭, 오른쪽 정렬). sub 는 줄 아래 전체 폭 14px 보조 줄."""
+    ln, lv = widths
+    pct = max(0.0, min(1.0, frac)) * 100
+    sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};white-space:normal;">{sub_line(sub)}</span>' if sub else ""
+    return (f'<span style="display:block;padding:8px 12px;line-height:1.5;{"" if first else MULTI_SEP}">'
+            f'<span style="display:flex;align-items:center;white-space:nowrap;">'
+            f'<span style="font-weight:700;color:#111;display:flex;">{_sized(paren(name_html), [paren(x) for x in ln])}</span>'
+            f'<span style="flex:1 1 0;min-width:24px;margin-left:{BAR_GAP};height:10px;background:#F1F5F9;border-radius:3px;overflow:hidden;">'
+            f'<span style="display:block;height:100%;width:{pct:.0f}%;background:{color};"></span></span>'
+            f'<span style="margin-left:10px;font-weight:700;display:flex;">{_sized(value_html, lv, "right")}</span></span>{sub_html}</span> ')
+
+
+def card_of(rows_html, attrs=""):
+    """미리 만든 줄(crow·bar_row)을 C 카드 하나로."""
+    return f'<div data-cards="1" {attrs} style="margin:0 0 8px;"><span data-grid="2" style="{MULTI}">{"".join(rows_html)}</span></div>'
 
 
 def table(headers, rows, note_text=""):
