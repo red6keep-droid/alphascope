@@ -376,8 +376,10 @@ body.menu-open { overflow: hidden; }
 .index-name { font-weight: 700; font-size: 16px; line-height: 24px; color: #111; }
 .index-status { margin-left: 6px; font-weight: 400; font-size: 14px; color: #7A7A7A; }
 .index-value { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
-.index-price { font-family: var(--num); font-weight: 700; font-size: 18px; line-height: 24px;   /* 등락(16px)보다 한 단계 큰 18px (2026-10-13 사용자) */ color: #111; font-variant-numeric: tabular-nums; }
-.index-change { font-family: var(--num); font-weight: 700; font-size: 16px; line-height: 24px; font-variant-numeric: tabular-nums; }
+/* 지수 값은 실시간 랭킹 현재가 칸과 같은 글자 — 숫자 16px 굵게 + 등락 14px, 둘 다 증감 색 (2026-10-13 사용자) */
+.index-price { font-family: var(--num); font-weight: 700; font-size: 16px; line-height: 24px; font-variant-numeric: tabular-nums; }
+.index-change { font-family: var(--num); font-weight: 600; font-size: 14px; line-height: 24px; font-variant-numeric: tabular-nums; }
+.index-value { gap: 6px; }
 /* 카드 안 더 보기 줄 — 펼침 버튼 모양(14px 굵게, 화살표), 카드 아래 둥근 모서리 그대로 */
 .index-card .fold-btn { border: 0; border-top: 1px solid #E2E8F0; border-radius: 0 0 8px 8px; }
 .fold-btn { display: flex; justify-content: center; align-items: center; gap: 6px; width: 100%; padding: 8px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
@@ -1991,9 +1993,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
           if (ix.st) name.appendChild(el('span', 'index-status', ix.st));
           row.appendChild(name);
           var val = el('span', 'index-value');
-          val.appendChild(el('span', 'index-price', fmt(ix.p)));
+          val.appendChild(el('span', 'index-price' + (ix.c !== undefined && ix.c !== null ? ' ' + signClass(ix.c) : ''), fmt(ix.p)));   /* 지수 숫자도 증감 색 (2026-10-13 사용자) */
           if (ix.c !== undefined && ix.c !== null) {
-            val.appendChild(el('span', 'index-change ' + signClass(ix.c), arrow(ix.c) + ' ' + fmt(Math.abs(ix.c)) + ' (' + (ix.cp >= 0 ? '+' : '-') + fmt(Math.abs(ix.cp)) + '%)'));
+            val.appendChild(el('span', 'index-change ' + signClass(ix.c), arrow(ix.c) + fmt(Math.abs(ix.c)) + ' (' + (ix.cp >= 0 ? '+' : '-') + fmt(Math.abs(ix.cp)) + '%)'));
           } else {
             val.appendChild(el('span', 'index-change', '—'));
           }
