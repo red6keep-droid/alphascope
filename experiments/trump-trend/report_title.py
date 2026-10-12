@@ -5,7 +5,7 @@ import datetime
 KST = datetime.timezone(datetime.timedelta(hours=9))
 UTC = datetime.timezone.utc
 
-TITLE_PREFIX = "트럼프 발언 트렌드 — "
+TITLE_PREFIX = "트럼프 SNS 트렌드 — "   # (2026-10-12 사용자: 리포트 이름을 미국 증시 리포트 · 트럼프 SNS 트렌드 · 엔비디아 리포트로)
 LABELS = ["트럼프 트렌드", "미국 증시", "자동 리포트"]
 
 

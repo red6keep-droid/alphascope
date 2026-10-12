@@ -398,7 +398,7 @@ def sec_sectors(analysis, report):
     names = lambda etfs: " · ".join(_esc(by_etf[e]["theme"]) for e in etfs if e in by_etf)  # noqa: E731
     sectors = analysis["sectors"]
     lis = "".join(dk.dot_li(f"<b>{k}</b> : {v}", size=3, lh=dk.LH_EMPH) for k, v in (("주도", names(sectors.get("leaders") or []) or "—"), ("약세", names(sectors.get("laggards") or []) or "—")))
-    lead = dk.dcard(f"<ul style='margin:-3px 0;padding:0;list-style:none;font-size:{dk.SMALL};'>{lis}</ul>", "positive")   # 강조 카드 (2026-10-12 사용자)   # 긴 이름 나열은 값 칸이 아니라 라벨 글머리표로 (가이드라인 3-3)
+    lead = dk.dcard(f"<ul style='margin:-9px 0;padding:0;list-style:none;font-size:{dk.SMALL};'>{lis}</ul>", "positive")   # 강조 카드 (2026-10-12 사용자)   # 긴 이름 나열은 값 칸이 아니라 라벨 글머리표로 (가이드라인 3-3)
     return _text(report.get("sector_comment")) + lead + _folded(rows, "섹터")
 
 
@@ -532,7 +532,7 @@ def sec_news(input_data, report, analysis):
             subs.append("선정 이유 : " + _esc(item["why"]))
         sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;">{x}</span>' for x in subs)
         items.append(f"<span style='color:#111;'>{title}</span>{tag}{link}{sub_html}")
-    return dk.item_cards(items) if items else dk.muted("주요 뉴스 없음")   # 기사마다 카드 (2026-10-12 사용자)
+    return dk.item_cards(items, sub=True) if items else dk.muted("주요 뉴스 없음")   # 기사마다 카드 (2026-10-12 사용자)
 
 
 def _overall_text(overall, items):
@@ -665,7 +665,7 @@ def render(input_path, report_path, output_dir, cover_url=None, analysis_path=No
         f.write(PREVIEW_WRAPPER.replace("__BODY__", body))
 
     title_path = os.path.join(output_dir, "title.txt")
-    title = open(title_path, encoding="utf-8").read().strip() if os.path.exists(title_path) else "미국 증시 데일리 리포트"
+    title = open(title_path, encoding="utf-8").read().strip() if os.path.exists(title_path) else "미국 증시 리포트"
     mock = dk.write_mock(body, os.path.join(output_dir, "daily_mock.html"), title)   # 테마 입힌 목업 (2026-10-11 사용자: 목업 화면 확인)
     if mock:
         print(f"목업 -> {mock}")

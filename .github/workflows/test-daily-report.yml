@@ -129,6 +129,13 @@ jobs:
             echo "분석 이력 없음 — 저장을 건너뜁니다."
             exit 0
           fi
+          # 그날 글의 렌더 입력도 남긴다 — 디자인이 바뀐 날 같은 글을 다시 그려 갱신할 수 있게 (2026-10-12 사용자:
+          # "데일리 리포트는 왜 디자인 변경된 것이 반영이 안 되었지"). 다시 그리기: state/last/* 를 output/ 에 복사 → render_html.py
+          OUT=experiments/daily-report/output
+          mkdir -p "$STATE/last"
+          for f in report_input.json report.out.json analysis.json title.txt image_ref.txt; do
+            [ -f "$OUT/$f" ] && cp "$OUT/$f" "$STATE/last/$f"
+          done
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
           # --orphan은 인덱스를 유지한다. 리셋하지 않으면 리포 전체가 커밋된다.

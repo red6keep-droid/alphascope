@@ -6,7 +6,7 @@ import config
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
 
-TITLE_PREFIX = "엔비디아 데일리 — "
+TITLE_PREFIX = "엔비디아 리포트 — "   # (2026-10-12 사용자: 리포트 이름을 미국 증시 리포트 · 트럼프 SNS 트렌드 · 엔비디아 리포트로)
 LABELS = ["엔비디아", "미국 증시", "자동 리포트"] + (["테스트 중"] if config.TEST_MODE else [])
 
 

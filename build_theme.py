@@ -148,18 +148,28 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   margin: 0 0 10px;
   font-weight: 700;
   font-size: 34px;
-  line-height: 1.4;
+  line-height: 48px;
   letter-spacing: -.6px;
   color: var(--ink);
 }
 .post-title a { color: inherit; }
 /* 글 제목 끝의 " — 날짜"는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다 */
-.post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; }
+.post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
+/* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
+   제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄에 날짜 왼쪽 · 버튼 오른쪽 */
+.post-title:has(.post-title-meta) { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; }
+.post-title-meta { flex: 1 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; letter-spacing: 0; }
+.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; cursor: pointer; }
+.title-share:hover { border-color: #111; }
+/* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
+.share-pop .share-buttons { justify-content: flex-start !important; }
 /* 제목 아래 날짜 줄(October 11, 2026) 삭제 (2026-10-12 사용자) */
 .post-timestamp { display: none !important; }
 /* 글 보기: 첫 제목 위 여백 70% 줄임 (2026-10-12 사용자) — 위 32+40 → 10+12 */
-body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 10px; }
-body.item-view .post-outer-container { padding-top: 12px; }
+body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 20px; }
+/* 글 제목 위 보이는 여백 20px — 홈 제목과 같다 (2026-10-12 사용자: "홈 상단 타이틀 위 여백 20, 모든 리포트의 상단 타이틀도 동일"). 행간 반쪽만큼 뺀 값 */
+body.item-view .post-outer-container { padding-top: 13px; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
 .post-body { font-size: 18px; line-height: 34px; color: #333; overflow-wrap: anywhere; }   /* 행간 px 정수 — 리포트 본문과 같은 34px (2026-10-12 사용자) */
@@ -182,7 +192,7 @@ body.item-view .post-outer-container { padding-top: 12px; }
 .rt-pop-title { margin: 0 40px 12px 0; font-size: 18px; font-weight: 700; line-height: 24px; color: #111; }
 .rt-pop-body { font-size: 18px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
 /* 툴팁 내용 행간 = 본문 34px (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
-.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 3px 0; }
+.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; }   /* 글머리표 사이 +6 (2026-10-12 사용자) */
 .rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
 .rt-pop-li > span:last-child { min-width: 0; }
 .rt-pop-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 20px; line-height: 28px; cursor: pointer; }
@@ -239,8 +249,8 @@ body.item-view .post-outer-container { padding-top: 12px; }
 /* 글 아래 라벨(데일리 브리핑 · 미국 증시 · 자동 리포트 …)은 보이지 않게 (2026-10-12 사용자: "이런 태그는 삭제").
    라벨 자체는 글에 남긴다 — 홈 카드 · 목록 · 메뉴가 라벨 피드로 글을 찾는다 */
 .post-labels { display: none !important; }
-/* 홈 맨 위 여백 70% 줄임 (2026-10-12 사용자): 헤더 아래 빈 띠 28 + 본문 위 12 = 40 → 12 (빈 띠를 홈에서만 없앤다) */
-body:not(.no-dashboard) .header-bar { height: 0; padding: 0; }
+/* 헤더 아래 빈 띠는 두지 않는다 — 제목 위 여백은 본문 영역이 갖는다(홈 · 글 보기 모두 보이는 20px, 2026-10-12 사용자) */
+.header-bar { height: 0 !important; padding: 0 !important; }
 .post-labels a {
   display: inline-block;
   margin: 6px 6px 0 0;
@@ -255,7 +265,7 @@ body:not(.no-dashboard) .header-bar { height: 0; padding: 0; }
 .jump-link { display: none; }
 
 /* 글 아래 목록으로 돌아가는 버튼 */
-.post-nav { display: flex; justify-content: center; margin: 20px 0 0; }
+.post-nav { display: flex; justify-content: center; margin: 40px 0 0; }
 .post-nav-list {
   display: inline-flex;
   align-items: center;
@@ -269,6 +279,11 @@ body:not(.no-dashboard) .header-bar { height: 0; padding: 0; }
   color: #fff;
 }
 .post-nav-list:hover { background: #000; color: #fff; }   /* 검은 테마 버튼 (2026-10-12 사용자) */
+/* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px (테마 JS .ends-text, 2026-10-12 사용자) */
+body.item-view .post-outer-container { padding-bottom: 0 !important; }
+body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0; }
+.post-shell .post-nav { margin: 40px 0 0; }
+.post-shell.ends-text .post-nav { margin-top: 17px; padding-top: 20px; border-top: 1px solid #E2E8F0; }   /* 끝 글자 → 구분선 20 (행간 반쪽 3 을 뺌) */
 
 /* 이미 게시된 글 보정 — 리포트 본문은 인라인 font-size 를 달고 나오므로 CSS 가 밀린다.
    옛 글(15/14/12px)만 골라 덮어쓰도록 태그 종류까지 지정한다. 새 글은 렌더러가
@@ -316,14 +331,18 @@ body:not(.no-dashboard) .header-bar { height: 0; padding: 0; }
 /* 댓글 (2026-10-12 사용자: 산만하고 가이드에 안 맞다, 버튼 정렬) — 블로거 threaded comments 마크업을 가이드 글자 체계로.
    제목 21px, 글 18px·행간 27px, 이름 16px 굵게, 날짜·동작 14px 회색, 버튼은 한 줄 오른쪽 정렬·같은 외곽선 모양 */
 .comments {
-  width: 100%; max-width: var(--shell); margin: 20px auto 0; padding: 28px 40px 32px;
-  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  width: 100%; max-width: var(--shell); margin: 40px auto 0; padding: 16px;   /* 목록 버튼과 40px (2026-10-12 사용자) */
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;   /* 카드 (2026-10-12 사용자: "댓글은 카드 형식으로") */
   font-size: 18px; line-height: 24px; color: #333; word-break: keep-all;
 }
 .comments h3, .comments .comments-title, .comments h3.title { margin: 0 0 14px; padding-bottom: 6px; border-bottom: 2px solid #eee; font-size: 21px; font-weight: 700; line-height: 27px; color: #111; }
 /* 댓글 접기 (2026-10-12 사용자: "하단 댓글은 접기 기능을 추가해서 평소에는 닫아줘") — 테마 JS가 제목을 버튼으로 바꾸고 나머지를 .comments-panel 로 감싼다.
    기본은 닫힘. 주소가 #comments · #comment-form · #c123 이면 열린 채로. 닫혀 있을 때는 제목 밑 구분선도 없앤다 */
-.comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 0; background: none; border: 0; font: inherit; font-size: 21px; font-weight: 700; line-height: 27px; color: #111; text-align: left; cursor: pointer; }
+.comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 12px 16px; background: none; border: 0; font: inherit; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; text-align: left; cursor: pointer; }   /* 제목 16px · 오른쪽 접기 화살표 (2026-10-12 사용자) */
+.comments.is-foldable { padding: 0; }
+.comments.is-foldable h3, .comments.is-foldable .comments-title { margin: 0 !important; padding: 0 !important; border: 0 !important; }
+.comments.is-foldable.is-open .comments-toggle { border-bottom: 1px solid #E2E8F0; }
+.comments-panel { padding: 14px 16px 16px; }
 .comments-toggle .acc-chev { flex: none; transition: transform .15s; }
 .comments.is-open .comments-toggle .acc-chev { transform: rotate(180deg); }
 .comments.is-foldable:not(.is-open) h3, .comments.is-foldable:not(.is-open) .comments-title { margin: 0; padding-bottom: 0; border-bottom: 0; }
@@ -344,7 +363,7 @@ body:not(.no-dashboard) .header-bar { height: 0; padding: 0; }
 .comments .comment-header .icon.user { display: none; }
 .comments .datetime, .comments .comment-header .datetime a, .comments .comment-footer .comment-timestamp a { font-size: 14px; line-height: 20px; color: #7A7A7A; }
 .comments .comment-content { margin: 4px 0 0; font-size: 18px; line-height: 24px; color: #333; }
-.comments .comment-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; }
+.comments .comment-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }   /* 버튼은 왼쪽부터 한 줄 (2026-10-12 사용자) */
 .comments .comment-actions a, .comments .comment-actions .item-control a, .comments .continue a, .comments .loadmore a, .comments .comment-footer a {
   display: inline-flex; align-items: center; margin: 0; padding: 5px 12px;
   background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px;
@@ -352,7 +371,7 @@ body:not(.no-dashboard) .header-bar { height: 0; padding: 0; }
 }
 .comments .comment-actions a:hover, .comments .continue a:hover, .comments .loadmore a:hover { border-color: #111; }
 .comments .item-control { display: inline; }
-.comments .continue, .comments .loadmore { display: flex; justify-content: flex-end; margin-top: 10px; }
+.comments .continue, .comments .loadmore { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 10px; }
 .comments .comment-footer, .comments .comment-form { margin-top: 18px; padding-top: 14px; border-top: 1px solid #E2E8F0; }
 .comments .comment-form p { margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #6B7280; }
 .comments iframe { width: 100%; border: 0; }
@@ -367,17 +386,18 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
 @media (max-width: 900px) {
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .post-outer-container, .comments { padding: 24px; }
-  body.item-view .post-outer-container { padding-top: 7px; }   /* 24 → 7 (70% 줄임) */
-  .post-title { font-size: 26px; }
+  .post-outer-container { padding: 24px; }
+  body.item-view .post-outer-container { padding-top: 13px; }   /* 카드 위 → 제목 글자 보이는 20 (2026-10-12 사용자) */
+  .post-title { font-size: 26px; line-height: 36px; }
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
   /* 글 보기(모바일): 화면 가장자리에서 본문까지 정확히 20px. 카드 테두리·안쪽 패딩은 없앤다 (2026-10-10) */
   body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px */
-  .post-outer-container, .comments { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
-  body.item-view .post-outer-container { padding-top: 5px; }   /* 16 → 5 (70% 줄임) */
-  .post-title { font-size: 24px; letter-spacing: -.3px; }
+  .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
+  body.item-view .post-outer-container { padding-top: 0; }
+  body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 21px; }   /* 헤더 → 제목 글자 보이는 20 (잰 값에 맞춤, 2026-10-12 사용자) */
+  .post-title { font-size: 24px; line-height: 34px; letter-spacing: -.3px; }
   .post-body { font-size: 18px; line-height: 34px; }
   /* 데스크톱용 커버 이미지 확대 규칙(1024px !important)이 모바일에서 글 폭을 벌리지 않게 */
   .post-body img, .post-body img[style*="max-width"] { max-width: 100% !important; }
@@ -524,6 +544,8 @@ __DASHBOARD__
                     <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 아니면 데일리 리포트 목록.</b:comment>
                     <b:if cond='data:post.labels any (l =&gt; l.name == &quot;__TRUMP_LABEL__&quot;)'>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__TRUMP_LIST_PATH__&quot;'>목록</a>
+                    <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;__NVDA_LABEL__&quot;)'/>
+                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__NVDA_LIST_PATH__&quot;'>목록</a>
                     <b:else/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__LIST_PATH__&quot;'>목록</a>
                     </b:if>
@@ -538,7 +560,8 @@ __DASHBOARD__
                 <div class='section-head'>
                   <h2 class='section-title'>
                     <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;__TRUMP_LABEL__&quot;'>트럼프 SNS 트렌드 목록
-                    <b:elseif cond='data:view.isLabelSearch'/>데일리 리포트 목록
+                    <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;__NVDA_LABEL__&quot;'/>엔비디아 리포트 목록
+                    <b:elseif cond='data:view.isLabelSearch'/>미국 증시 리포트 목록
                     <b:else/><data:view.title.escaped/></b:if>
                   </h2>
                   <span class='section-note'>
@@ -646,6 +669,10 @@ LIST_PATH = "search/label/" + quote(REPORT_LABEL)
 TRUMP_LABEL = "트럼프 트렌드"
 TRUMP_LIST_PATH = "search/label/" + quote(TRUMP_LABEL)
 
+# 엔비디아 리포트 연재 (experiments/nvda-report/report_title.LABELS 의 첫 라벨). 목록 버튼이 데일리 목록으로 가던 것을 바로잡음 (2026-10-12)
+NVDA_LABEL = "엔비디아"
+NVDA_LIST_PATH = "search/label/" + quote(NVDA_LABEL)
+
 
 def nav_items():
     out = []
@@ -704,6 +731,8 @@ def build_theme(parts):
     out = out.replace("__LIST_PATH__", LIST_PATH)
     out = out.replace("__TRUMP_LABEL__", TRUMP_LABEL)
     out = out.replace("__TRUMP_LIST_PATH__", TRUMP_LIST_PATH)
+    out = out.replace("__NVDA_LABEL__", NVDA_LABEL)
+    out = out.replace("__NVDA_LIST_PATH__", NVDA_LIST_PATH)
     out = out.replace("__DASHBOARD__", indent(to_xml_attrs(parts["dashboard"]), 6))
     out = out.replace("__BLOG_INCLUDABLES__", includables)
     out = out.replace("__BREAKING__", indent(to_xml_attrs(parts["breaking"]), 4))
@@ -857,7 +886,7 @@ def _avatar_data_uri(fill):
 PREVIEW_POSTS = [
     {
         "date": "2026.09.03",
-        "title": "미국 증시 데일리 브리핑 — 나스닥 사상 최고치 경신, 반도체와 소프트웨어가 함께 끌어올린 하루",
+        "title": "미국 증시 리포트 — 나스닥 사상 최고치 경신, 반도체와 소프트웨어가 함께 끌어올린 하루",
         "snippet": "3대 지수가 모두 상승 마감했습니다. 나스닥은 1.4% 오르며 사상 최고치를 다시 썼고, "
                    "반도체 섹터가 지수 상승분의 절반 이상을 설명했습니다.",
         "cover": ("#2563EB", "#7DD3FC"),
@@ -921,7 +950,7 @@ PREVIEW_COMMENTS = [
     },
 ]
 
-PREVIEW_POST_TITLE = "미국 증시 데일리 브리핑 — 2026년 9월 3일"
+PREVIEW_POST_TITLE = "미국 증시 리포트 — 2026년 9월 3일"
 
 FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:34px;color:#333;">
 
@@ -1027,8 +1056,8 @@ SAVED_POST_BODY = "experiments/daily-report/output/report_body.html"
 # 이 본문은 홈 카드에만 쓰인다. h2 는 experiments/trump-trend/render_html.py build_body 와 같아야 한다.
 SAVED_TRUMP_BODY = "experiments/trump-trend/output/trump_report_body.html"
 SAVED_NVDA_BODY = "experiments/nvda-report/output/nvda_report_body.html"
-PREVIEW_NVDA_TITLE = "엔비디아 데일리 — 2026년 9월 3일"
-PREVIEW_TRUMP_TITLE = "트럼프 발언 트렌드 — 2026년 9월 3일"
+PREVIEW_NVDA_TITLE = "엔비디아 리포트 — 2026년 9월 3일"
+PREVIEW_TRUMP_TITLE = "트럼프 SNS 트렌드 — 2026년 9월 3일"
 FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:34px;color:#333;">
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘 한 줄</h2>
 <div style="font-size:20px;font-weight:bold;color:#111;">지난 24시간 게시물 <b>36</b>건 중 정책 관련 <b>2</b>건, 이벤트 <b>2</b>개. 가장 강한 발언은 <b>Regulation / Artificial Intelligence</b> (강도 10).</div>
@@ -1112,7 +1141,7 @@ def preview_reports():
     return (
         "  <section class=\"reports\" id=\"pv-reports\">\n"
         "    <div class=\"section-head\">\n"
-        "      <h2 class=\"section-title\" id=\"pv-reports-title\">데일리 리포트 목록</h2>\n"
+        "      <h2 class=\"section-title\" id=\"pv-reports-title\">미국 증시 리포트 목록</h2>\n"
         "      <span class=\"section-note\">AI 자동 생성 · 매 거래일 06:00 KST</span>\n"
         "    </div>\n"
         "    <div class=\"post-grid\">\n"

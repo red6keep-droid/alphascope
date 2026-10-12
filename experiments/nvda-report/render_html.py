@@ -163,7 +163,7 @@ def _label_text(text):
     return _tint(_esc(text))
 
 
-def _dot_li(inner_html, size=3, color="#111", lh=None, margin="3px 0"):
+def _dot_li(inner_html, size=3, color="#111", lh=None, margin="9px 0"):
     """점 글머리표 한 줄 — 18px 글 3px 점 · 14px 안내 글 2px 점, 두 가지뿐 (2026-10-12 사용자). design_kit.dot_li 와 같다."""
     return _dk.dot_li(inner_html, size=size, color=color, lh=lh, margin=margin)
 
@@ -176,8 +176,8 @@ def _guide(title, body, line=True):
     if isinstance(body, str) and len(body) <= 70:
         return f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head} : {_esc(body)}</div>'   # data-guide: 홈 카드가 건너뛴다 (2026-10-12)
     items = [body] if isinstance(body, str) else body
-    lis = "".join(_dot_li(_tint(_esc(it[0]) + ' = ' + _esc(it[1])) if isinstance(it, tuple) else _tint(_esc(it)), size=2, color=NOTE, margin="2px 0") for it in items)   # 14px 안내 → 2px 점
-    return f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head}<ul style="margin:2px 0 0 2px;padding:0;list-style:none;">{lis}</ul></div>'
+    lis = "".join(_dot_li(_tint(_esc(it[0]) + ' = ' + _esc(it[1])) if isinstance(it, tuple) else _tint(_esc(it)), size=2, color=NOTE, margin="8px 0") for it in items)   # 14px 안내 → 2px 점
+    return f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head}<ul style="margin:-4px 0 -6px 2px;padding:0;list-style:none;">{lis}</ul></div>'
 
 
 def _muted(t):
@@ -335,7 +335,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip=""):
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다
             f'<span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_esc(title)}{_tip(tip)}{new_html}</span><span style="{COL_R}font-weight:700;color:{color};">{_esc(state)}</span></span> '
             f'<div style="margin-top:{14 - _dk.VP_EMPH}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
-            f"<ul style='margin:-3px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")   # 음수 margin = 첫·끝 li 의 3px 지우기
+            f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
 
 
 def _tip(text):
@@ -505,7 +505,7 @@ def _event_html(e):
     inner = f"{head}{fact} {tag}{link}{when}"   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절)
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
-        return f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{14 - _dk.VP}px 12px;margin:0 0 8px;line-height:{LH_CARD};">{inner}</div>'   # 일반 기사 카드와 같은 크기·여백, 배경만 방향 색
+        return f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{14 - _dk.NEWS_VP}px 12px;margin:0 0 8px;line-height:{_dk.LH_BODY};">{inner}</div>'   # 뉴스 제목 행간 34 (2026-10-12 사용자)   # 일반 기사 카드와 같은 크기·여백, 배경만 방향 색
     return inner   # 나머지는 글 항목 카드(_dk.list_card)의 한 줄 (2026-10-12 사용자: 뉴스는 카드 형식으로)
 
 
@@ -524,14 +524,17 @@ def _bar(label, segs, split="right"):
     pcts = " · ".join(f"{nm} {n / total * 100:.0f}%" for nm, n, _, _ in segs if n)
     body = "".join(f'<span style="display:block;width:{n / total * 100:.1f}%;background:{bg};color:{fg};font-size:{SMALL};font-weight:700;'
                    f'text-align:center;line-height:24px;overflow:hidden;white-space:nowrap;">{f"{n / total * 100:.0f}%" if n / total >= 0.08 else ""}</span>' for _, n, bg, fg in segs if n)   # 8% 미만 조각은 글자 생략 (라벨에 있음)
-    return (_dk.bar_label(label, pcts, split) +   # 왼쪽 라벨 · 오른쪽 비율, 또는 줄바꿈 (2026-10-12 사용자)
-            f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 10px;">{body}</span>')
+    bar_html = f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 {3 if split == "below" else 10}px;">{body}</span>'
+    if split == "below":   # 뉴스 막대: 라벨(오늘 15건) 위 · 비율(긍정 67% · 부정 20% …) 막대 아래 (2026-10-12 사용자)
+        st = f"display:block;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};color:{NOTE};"
+        return f'<span style="{st}margin:0 0 3px;">{_esc(label)}</span>{bar_html}<span style="{st}">{_esc(pcts)}</span>'
+    return _dk.bar_label(label, pcts, split) + bar_html   # 왼쪽 라벨 · 오른쪽 비율, 또는 줄바꿈 (2026-10-12 사용자)
 
 
 def _ratio_bar(label, counts):
     """뉴스 방향 막대: 긍정 · 부정 · 불확실 · 중립 (파스텔)."""
     total = sum(counts.values())
-    return _bar(f"{label} {total}건", [(rr.DIR_KO[d], counts.get(d, 0), *BAR_PASTEL[d]) for d in ("positive", "negative", "uncertain", "neutral")])
+    return _bar(f"{label} {total}건", [(rr.DIR_KO[d], counts.get(d, 0), *BAR_PASTEL[d]) for d in ("positive", "negative", "uncertain", "neutral")], split="below")
 
 
 ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" '
@@ -575,9 +578,9 @@ def sec_direction_bars(a):
     today, week = dc.get("today") or {}, dc.get("week") or {}
     if not sum(today.values()) and not sum(week.values()):
         return ""
-    # 두 막대 묶음 사이 보이는 24px (2026-10-12 사용자) = 막대 아래 margin 10 + 띄움 12 + 라벨 글자 상자까지 2 (잰 값)
+    # 두 막대 묶음 사이 보이는 24px (2026-10-12 사용자) — 앞 묶음 비율 글자 → 다음 라벨 글자, 행간 반쪽 3 + 3 을 뺀 값
     return (f'<div data-cards="1" style="margin:0 0 8px;">{_ratio_bar("오늘", today)}'
-            f'<span style="display:block;height:{BAR_GROUP_GAP - 12}px;"></span>{_ratio_bar("최근 7일", week)}</div>')
+            f'<span style="display:block;height:{BAR_GROUP_GAP - 5}px;"></span>{_ratio_bar("최근 7일", week)}</div>')
 
 
 def sec_events(a):
@@ -897,7 +900,7 @@ def write_mock_tabs(body_path=None, mock_path=None):
     with open(body_path, "r", encoding="utf-8") as f:
         body = f.read()
     title_path = os.path.join(config.OUTPUT_DIR, "title.txt")
-    title = open(title_path, encoding="utf-8").read().strip() if os.path.exists(title_path) else "엔비디아 데일리"
+    title = open(title_path, encoding="utf-8").read().strip() if os.path.exists(title_path) else "엔비디아 리포트"
     out = _dk.write_mock(body, mock_path, title)
     print(f"[mock-tabs] {'목업 → ' + out if out else 'index.html 이 없어 목업을 만들지 않음'}")
 

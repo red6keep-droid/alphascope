@@ -1,6 +1,6 @@
 name: NVDA Report
 
-# 엔비디아 데일리 리포트 (experiments/nvda-report). 별도 글 시리즈("엔비디아 데일리 — YYYY년 M월 D일").
+# 엔비디아 데일리 리포트 (experiments/nvda-report). 별도 글 시리즈("엔비디아 리포트 — YYYY년 M월 D일").
 # trump-trend.yml을 복제해 이름·경로·시각만 바꿨다 (기획서 11절).
 #
 # 게시 게이트: 저장소 변수 NVDA_PUBLISH 가 'true' 일 때만 스케줄 실행이 실제 게시한다. 그 전까지는 그림자 모드.

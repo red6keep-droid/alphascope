@@ -194,7 +194,7 @@ def label_text(text):
     return tint(esc(text))
 
 
-def dot_li(inner_html, size=3, color="#111", lh=None, margin="3px 0"):
+def dot_li(inner_html, size=3, color="#111", lh=None, margin="9px 0"):   # 사이 3 → 9 (글머리표 사이 +6px, 2026-10-12 사용자)
     """점 글머리표 한 줄 — 점은 두 가지뿐: 18px 글 3px · 14px 안내 글 2px (2026-10-12 사용자). 점은 첫 줄 가운데 (행간 lh 에서 계산)."""
     lh = int(str(lh or (LH_TINY if size == 2 else LH_CARD)).replace("px", ""))
     return (f'<li style="display:flex;align-items:flex-start;gap:7px;margin:{margin};color:{color};line-height:{lh}px;">'
@@ -221,9 +221,9 @@ def guide(title, body, line=True, grid=False, in_card=False):
     if isinstance(body, str) and len(body) <= GUIDE_SHORT:
         return f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head} : {esc(body)}</div>'   # data-guide: 홈 카드가 건너뛴다
     items = [body] if isinstance(body, str) else body
-    lis = "".join(dot_li(tint(esc(it[0]) + ' = ' + esc(it[1])) if isinstance(it, tuple) else tint(esc(it)), size=2, color=NOTE, margin="2px 0") for it in items)   # 14px 안내 → 2px 점
+    lis = "".join(dot_li(tint(esc(it[0]) + ' = ' + esc(it[1])) if isinstance(it, tuple) else tint(esc(it)), size=2, color=NOTE, margin="8px 0") for it in items)   # 14px 안내 → 2px 점
     return (f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head}'
-            f"<ul{GRID_ATTR if grid else ''} style='margin:2px 0 0 2px;padding:0;list-style:none;'>{lis}</ul></div>")   # grid: 데스크톱 2열 (테마 CSS)
+            f"<ul{GRID_ATTR if grid else ''} style='margin:-4px 0 -6px 2px;padding:0;list-style:none;'>{lis}</ul></div>")   # grid: 데스크톱 2열 (테마 CSS)
 
 
 
@@ -353,10 +353,14 @@ def link_icon(url, label):
             f'style="color:#1a73e8;text-decoration:none;white-space:nowrap;">{LINK_ICON}</a>')
 
 
-def item_cards(items_html):
+NEWS_VP = 7   # 18px 글 · 행간 34 의 반쪽
+
+
+def item_cards(items_html, sub=False):   # sub=True: 카드 끝 줄이 14px 보조 줄
     """기사 카드 — 뉴스 기사 하나가 카드 하나 (2026-10-12 사용자: "뉴스 기사는 카드 타입으로 각각"). 흰 바탕, 테두리, 모서리 8px,
     위아래 14px · 좌우 12px, 카드 사이 8px. 18px · 행간 27. 항목은 li — 홈 카드가 글머리표로 읽는다."""
-    lis = "".join(f'<li style="margin:0 0 8px;padding:{14 - VP}px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;line-height:{LH_CARD};">{h}</li>'
+    # 뉴스 제목은 본문 행간 34 (2026-10-12 사용자: "뉴스의 제목도 본문 행간 여백을 적용") — 행간 반쪽 7 만큼 padding 을 덜어 보이는 위아래 14 유지
+    lis = "".join(f'<li style="margin:0 0 8px;padding:{14 - NEWS_VP}px 12px {14 - (VP if sub else NEWS_VP)}px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;line-height:{LH_BODY};">{h}</li>'
                   for h in items_html)
     return f'<ul style="margin:0 0 8px;padding:0;list-style:none;font-size:{SMALL};">{lis}</ul>' if lis else ""
 
@@ -385,7 +389,7 @@ def bullets(texts):
     return dot_ul(dot_li(tint(esc(t)), size=3, lh=LH_BODY, margin=LI_MARGIN) for t in texts)
 
 
-LI_MARGIN = "6px 0"
+LI_MARGIN = "12px 0"   # 본문 글머리표 사이 6 → 12 (글머리표 사이 +6px, 2026-10-12 사용자)
 
 
 def dot_ul(items_html):
@@ -552,9 +556,9 @@ def state_card(head_html, kind="neutral", right_html="", sub_html="", items=()):
             f'<span style="font-weight:700;color:#111;font-size:{EMPH_NAME};">{head_html}</span>'
             + (f'<span style="font-weight:700;white-space:nowrap;font-size:{SMALL};">{right_html}</span>' if right_html else "") + "</span>")
     sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#374151;margin-top:2px;">{sub_html}</div>' if sub_html else ""
-    lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#374151", margin="2px 0") for k, v in items)
+    lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#374151", margin="8px 0") for k, v in items)
     body = (f'<div style="margin-top:{14 - VP_EMPH}px;padding-top:{14 - VP}px;border-top:1px solid {bd};font-size:{TINY};line-height:{LH_TINY};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자: 4 → 14)
-            f"<ul style='margin:-2px 0;padding:0;list-style:none;'>{lis}</ul></div>") if lis else ""   # 음수 margin = 첫·끝 li 의 2px 지우기
+            f"<ul style='margin:-8px 0;padding:0;list-style:none;'>{lis}</ul></div>") if lis else ""   # 음수 margin = 첫·끝 li 의 8px 지우기
     # 위아래 24 — 끝 줄이 14px 글(행간 20)이면 반쪽 2, 18px 제목이면 6 (2026-10-12 사용자)
     bottom = EMPH_PAD - (VP if (lis or sub_html) else VP_EMPH)
     return f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{EMPH_PAD - VP_EMPH}px 14px {bottom}px;margin:0 0 8px;line-height:{LH_EMPH};">{head}{sub}{body}</div>'
@@ -566,7 +570,7 @@ def emph_list(lines):
     if not lis:
         return ""
     return (f'<div style="background:{EMPH_BG};border:1px solid {EMPH_BD};border-radius:10px;padding:{EMPH_PAD - VP_EMPH}px 14px;margin:0 0 8px;line-height:{LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
-            f"<ul style='margin:-3px 0;padding:0;list-style:none;font-size:{SMALL};color:#111;'>{lis}</ul></div>")   # 음수 margin = 첫·끝 li 의 3px 지우기
+            f"<ul style='margin:-9px 0;padding:0;list-style:none;font-size:{SMALL};color:#111;'>{lis}</ul></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
 
 
 ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" '

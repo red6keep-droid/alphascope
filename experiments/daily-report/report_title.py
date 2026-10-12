@@ -8,7 +8,7 @@ import datetime
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
 
-TITLE_PREFIX = "미국 증시 데일리 브리핑 — "
+TITLE_PREFIX = "미국 증시 리포트 — "   # (2026-10-12 사용자: 리포트 이름을 미국 증시 리포트 · 트럼프 SNS 트렌드 · 엔비디아 리포트로)
 
 
 def today_kst():

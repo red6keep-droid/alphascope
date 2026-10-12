@@ -167,7 +167,7 @@ def _flow_card(blk):
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">발언 흐름 : <span style="color:{color};">{_esc(state)}</span></span></span> '
             f'<div style="margin-top:{14 - dk.VP_EMPH}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
-            f"<ul style='margin:-3px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")
+            f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")
 
 
 def sec_windows(a):
@@ -261,7 +261,7 @@ def _chart_card(rows, horizon):
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">시장의 반응 : <span style="color:{color};">{_esc(state)}</span></span></span> '   # "시장의 반응: 평소와 같음" (2026-10-11 사용자). 자산 수는 설명 문장에
             f'<div style="margin-top:{14 - dk.VP_EMPH}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
-            f"<ul style='margin:-3px 0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
+            f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
 
 
 def _read_card(horizon):

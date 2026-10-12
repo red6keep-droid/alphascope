@@ -16,6 +16,12 @@ INDICES = [
     ("^RUT", "러셀 2000"),
 ]
 
+# 홈 "주요 핵심 섹터 현황" — S&P 500 11개 업종 섹터 ETF 의 일일 등락률 (2026-10-12 사용자: 가짜 데이터 삭제 → 실제 값으로)
+SECTORS = [
+    ("XLK", "기술"), ("XLF", "금융"), ("XLV", "헬스케어"), ("XLY", "경기소비재"), ("XLP", "필수소비재"), ("XLE", "에너지"),
+    ("XLI", "산업재"), ("XLB", "소재"), ("XLU", "유틸리티"), ("XLRE", "부동산"), ("XLC", "커뮤니케이션"),
+]
+
 INTERVAL = "15m"
 PERIOD = "1d"
 
@@ -78,6 +84,22 @@ def fetch_indices():
     return index_list
 
 
+def fetch_sectors():
+    """섹터 ETF 11개의 현재가 · 전일 대비 등락률. 값이 없는 ETF 는 뺀다."""
+    out = []
+    for symbol, name in SECTORS:
+        try:
+            info = yf.Ticker(symbol).fast_info
+            price, prev = num(info.last_price), num(info.previous_close)
+            if price is None or not prev:
+                print(f"{symbol} 시세 없음 — 건너뜀")
+                continue
+            out.append({"s": symbol, "name": name, "p": price, "cp": round((price - prev) / prev * 100, 2)})
+        except Exception as e:
+            print(f"{symbol} 수집 실패: {e}")
+    return out
+
+
 def fetch_data():
     print(f"[{datetime.datetime.now()}] {len(TICKERS)}개 종목 15분봉 수집 시작...")
     tickers_str = " ".join(TICKERS)
@@ -135,19 +157,21 @@ def fetch_data():
             failed.append(symbol)
 
     index_list = fetch_indices()
+    sector_list = fetch_sectors()
 
     output = {
         "updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         "interval": INTERVAL,
         "indices": index_list,
-        "stocks": stock_list
+        "stocks": stock_list,
+        "sectors": sector_list
     }
 
     with open("data.json", "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False)
 
     print(f"data.json 생성 완료! 종목 {len(stock_list)}/{len(TICKERS)}, "
-          f"지수 {len(index_list)}/{len(INDICES)}")
+          f"지수 {len(index_list)}/{len(INDICES)}, 섹터 {len(sector_list)}/{len(SECTORS)}")
     for i in index_list:
         print(f"  {i['name']}: {i['p']} ({i['cp']:+.2f}%) {i['st']}")
     for s in stock_list:
