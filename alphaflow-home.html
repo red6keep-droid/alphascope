@@ -796,121 +796,25 @@ body.menu-open { overflow: hidden; }
 
 .news-card { padding: 24px; }
 
-.news-top {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 200px minmax(0, 420px);
-  gap: 28px;
-  align-items: start;
-  margin-top: 20px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
+/* 실시간 주요 뉴스 — 썸네일 없는 기사 카드 (2026-10-12 사용자: 리포트 뉴스 카드와 같은 디자인).
+   기사 하나가 카드 하나: 제목 18px·행간 27px + 분류 라벨 14px, 아래 14px 보조 줄(출처 · 시각). 데스크톱 2열, 폰 1열 */
+.news-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+.news-item {
+  margin: 0; padding: 14px 12px;
+  background: var(--surface); border: 1px solid #E2E8F0; border-radius: 8px;
+  font-size: 18px; line-height: 27px; color: #111; word-break: keep-all;
 }
-
-.news-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.news-item a { color: #111; }
+.news-item a:hover { color: var(--accent); }
 .news-tag {
-  padding: 2px 8px;
-  border: 1px solid var(--border-strong);
-  border-radius: 4px;
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 19px;
-  color: var(--gray-600);
-  background: var(--surface-sub);
+  display: inline-block; margin-left: 4px; padding: 3px 5px 2px;
+  border: 1px solid #CBD5E1; border-radius: 4px;
+  font-size: 14px; font-weight: 400; line-height: 1; color: #334155; background: #fff;
+  white-space: nowrap; vertical-align: middle;
 }
-.news-time {
-  font-family: var(--num);
-  font-size: 14px;
-  color: var(--gray-400);
-}
-
-.news-headline {
-  margin: 0 0 14px;
-  font-weight: 700;
-  font-size: 31px;
-  line-height: 1.35;
-  letter-spacing: -0.6px;
-  color: var(--ink);
-}
-.news-summary {
-  margin: 0 0 12px;
-  font-size: 18px;
-  line-height: 1.7;
-  color: var(--gray-600);
-}
-.news-source { font-size: 14px; color: var(--gray-400); }
-
-.news-hero-img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 8px;
-  background: linear-gradient(150deg, #0B2A5B 0%, #12508F 45%, #1E7FD0 100%);
-  position: relative;
-  overflow: hidden;
-}
-.news-hero-img::after {
-  content: '';
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(circle at 30% 35%, rgba(255,255,255,.35) 0 2px, transparent 3px),
-    radial-gradient(circle at 62% 22%, rgba(255,255,255,.3) 0 2px, transparent 3px),
-    radial-gradient(circle at 48% 58%, rgba(255,255,255,.4) 0 2px, transparent 3px),
-    radial-gradient(circle at 76% 66%, rgba(255,255,255,.28) 0 2px, transparent 3px),
-    radial-gradient(circle at 22% 74%, rgba(255,255,255,.3) 0 2px, transparent 3px),
-    linear-gradient(115deg, transparent 46%, rgba(255,255,255,.22) 50%, transparent 54%),
-    linear-gradient(65deg, transparent 58%, rgba(255,255,255,.16) 62%, transparent 66%);
-}
-
-.news-side { display: flex; flex-direction: column; gap: 4px; }
-.news-side-item {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-}
-.news-side-item:last-child { border-bottom: 0; }
-.news-side-item:first-child { padding-top: 0; }
-.news-side-title {
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 1.45;
-  color: var(--ink);
-}
-.news-side-meta {
-  margin-top: 6px;
-  font-size: 14px;
-  color: var(--gray-400);
-}
-.news-side-meta .num { margin-left: 8px; }
-.news-thumb {
-  width: 56px; height: 56px; flex: none;
-  border-radius: 8px;
-  background: linear-gradient(140deg, #C9D6E4 0%, #93A7BE 100%);
-}
-
-.news-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-  margin-top: 24px;
-}
-.news-grid-img {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  background: linear-gradient(140deg, #16324F 0%, #26506F 55%, #3E7396 100%);
-}
-.news-grid-title {
-  margin: 0 0 6px;
-  font-weight: 700;
-  font-size: 17px;
-  line-height: 1.5;
-  color: var(--ink);
-}
-.news-grid-meta { font-size: 14px; color: var(--gray-400); }
-.news-grid-meta .num { margin-left: 8px; }
+.news-sub { margin-top: 2px; font-size: 14px; line-height: 21px; color: #7A7A7A; }
+.news-sub .num { margin-left: 6px; }
+.news-item.load-status { color: var(--gray-400); }
 
 /* ==========================================================================
    6. breaking ticker + footer
@@ -999,8 +903,6 @@ body.menu-open { overflow: hidden; }
   .search-bar.is-open { display: flex; }
   .index-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sector-body { grid-template-columns: minmax(0, 1fr); }
-  .news-top { grid-template-columns: minmax(0, 1fr) 180px; }
-  .news-side { grid-column: 1 / -1; }
   /* 세 카드가 좁아지면 두 칸 + 셋째(엔비디아)는 전폭 */
   .briefing-main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #nvda-card { grid-column: 1 / -1; }
@@ -1035,17 +937,13 @@ body.menu-open { overflow: hidden; }
 
   .briefing-main { grid-template-columns: minmax(0, 1fr); }
   #nvda-card { grid-column: auto; }
-  .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .news-headline { font-size: 26px; }
 }
 
 @media (max-width: 680px) {
   /* 홈(대시보드)에서는 카드가 화면 가장자리에서 10px (2026-10-10 사용자). 글 보기는 20px 별도 규칙 */
   body:not(.item-view) .main-content { padding-left: 10px; padding-right: 10px; }
   .index-row { grid-template-columns: minmax(0, 1fr); }
-  .news-top { grid-template-columns: minmax(0, 1fr); }
-  .news-hero-img { aspect-ratio: 16 / 9; max-width: 100%; }
-  .news-grid { grid-template-columns: minmax(0, 1fr); }
+  .news-list { grid-template-columns: minmax(0, 1fr); }
   .sector-card, .news-card { padding: 16px; }
   .treemap { height: 456px; grid-template-columns: 1fr 1fr; }
   .tile--semis { grid-column: 1 / -1; }
@@ -1317,23 +1215,9 @@ body.menu-open { overflow: hidden; }
       <span class="section-note">최신순</span>
     </div>
 
-    <div class="news-top">
-      <article id="news-hero">
-        <div class="news-meta">
-          <span class="news-tag">AI</span>
-          <span class="news-time num">--:--</span>
-        </div>
-        <h3 class="news-headline">뉴스를 불러오는 중…</h3>
-        <p class="news-summary"></p>
-        <span class="news-source"></span>
-      </article>
-
-      <div class="news-hero-img" role="img" aria-label="주요 뉴스 이미지"></div>
-
-      <div class="news-side" id="news-side"></div>
+    <div class="news-list" id="news-list">
+      <article class="news-item load-status">뉴스를 불러오는 중…</article>
     </div>
-
-    <div class="news-grid" id="news-grid"></div>
   </section>
 
 </main>
@@ -1753,67 +1637,26 @@ body.menu-open { overflow: hidden; }
         'ALPHASCOPE 실시간 뉴스: ' + line + '  ·  ' +
         'ALPHASCOPE 실시간 뉴스: ' + line + '  ·  ';
 
-      /* 헤드라인 */
-      var lead = items[0];
-      var hero = document.getElementById('news-hero');
-      if (!hero) return;
-      hero.querySelector('.news-tag').textContent = newsCategory(lead);
-      hero.querySelector('.news-time').textContent = hhmm(kstTime(lead.published));
-      var h = hero.querySelector('.news-headline');
-      h.textContent = lead.title;
-      if (lead.link) {
-        var a = el('a');
-        a.href = lead.link;
-        a.rel = 'noopener';
-        a.target = '_blank';
-        a.textContent = lead.title;
-        h.textContent = '';
-        h.appendChild(a);
-      }
-      hero.querySelector('.news-summary').textContent = lead.summary || '';
-      hero.querySelector('.news-source').textContent = lead.source || '';
-
-      /* 사이드 3건 */
-      var side = document.getElementById('news-side');
-      if (side) items.slice(1, 4).forEach(function (it) {
-        var wrap = el('div', 'news-side-item');
-        var textCol = el('div');
-        var a = el('a', 'news-side-title', it.title);
-        if (it.link) { a.href = it.link; a.target = '_blank'; a.rel = 'noopener'; }
-        textCol.appendChild(a);
-        var meta = el('div', 'news-side-meta');
-        meta.appendChild(el('span', null, newsCategory(it)));
-        meta.appendChild(el('span', 'num', hhmm(kstTime(it.published))));
-        textCol.appendChild(meta);
-        wrap.appendChild(textCol);
-        wrap.appendChild(el('div', 'news-thumb'));
-        side.appendChild(wrap);
-      });
-
-      /* 하단 카드 3건 — 기사 수가 부족하면 빈 영역을 남기지 않고 접는다 */
-      var grid = document.getElementById('news-grid');
-      var gridItems = items.slice(4, 7);
-      if (!grid) return;
-      if (!gridItems.length) grid.hidden = true;
-      gridItems.forEach(function (it) {
-        var card = el('article');
-        card.appendChild(el('div', 'news-grid-img'));
-        var title = el('h4', 'news-grid-title');
+      /* 기사 카드 — 썸네일 없음, 기사 하나가 카드 하나 (2026-10-12 사용자) */
+      var list = document.getElementById('news-list');
+      if (!list) return;
+      list.textContent = '';
+      items.slice(0, 8).forEach(function (it) {
+        var card = el('article', 'news-item');
         var a = el('a', null, it.title);
         if (it.link) { a.href = it.link; a.target = '_blank'; a.rel = 'noopener'; }
-        title.appendChild(a);
-        card.appendChild(title);
-        var meta = el('div', 'news-grid-meta');
-        meta.appendChild(el('span', null, newsCategory(it)));
-        meta.appendChild(el('span', 'num', hhmm(kstTime(it.published))));
-        card.appendChild(meta);
-        grid.appendChild(card);
+        card.appendChild(a);
+        card.appendChild(el('span', 'news-tag', newsCategory(it)));
+        var sub = el('div', 'news-sub');
+        sub.appendChild(el('span', null, it.source || 'CNBC'));
+        sub.appendChild(el('span', 'num', hhmm(kstTime(it.published))));
+        card.appendChild(sub);
+        list.appendChild(card);
       });
-
     })
     .catch(function () {
-      var hl = document.querySelector('#news-hero .news-headline');
-      if (hl) hl.textContent = '뉴스를 불러올 수 없습니다.';
+      var l2 = document.getElementById('news-list');
+      if (l2) { l2.textContent = ''; l2.appendChild(el('article', 'news-item load-status', '뉴스를 불러올 수 없습니다.')); }
       var t2 = document.getElementById('breaking-text');
       if (t2) t2.textContent = 'ALPHASCOPE 실시간 뉴스';
     });
