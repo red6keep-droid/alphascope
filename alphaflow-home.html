@@ -259,18 +259,10 @@ body.menu-open { overflow: hidden; }
   flex-wrap: wrap;
 }
 .briefing-head-left { display: flex; align-items: center; gap: 24px; min-width: 0; flex-wrap: wrap; }
-.briefing-sub { font-size: 14px; line-height: 1.5; color: var(--gray-500); }
+/* 제목 옆 날짜 — 데일리 리포트 기준일 `2026.10.11`, 16px 보통 굵기 (2026-10-12 사용자: "미국 증시 데일리 브리핑 옆에 2026.10.11, 날짜는 16포인트").
+   안내 문장(핵심만 추렸습니다 …)과 따로 있던 "… 리포트 기준" 줄은 삭제 (2026-10-12 사용자) */
+.briefing-date { font-size: 16px; font-weight: 400; line-height: 30px; letter-spacing: 0; color: var(--gray-500); }
 
-.sync-stamp {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 16px; line-height: 22px; color: var(--gray-500);
-  white-space: nowrap;
-}
-.sync-dot {
-  width: 8px; height: 8px; flex: none;
-  border-radius: 50%;
-  background: #C3C3C3;
-}
 
 /* stretch 라야 왼쪽 리포트 카드가 오른쪽 급등주 카드와 아래선까지 맞는다 */
 .briefing-body { display: flex; align-items: stretch; gap: 20px; }
@@ -797,12 +789,12 @@ body.menu-open { overflow: hidden; }
 .news-card { padding: 24px; }
 
 /* 실시간 주요 뉴스 — 썸네일 없는 기사 카드 (2026-10-12 사용자: 리포트 뉴스 카드와 같은 디자인).
-   기사 하나가 카드 하나: 제목 18px·행간 27px + 분류 라벨 14px, 아래 14px 보조 줄(출처 · 시각). 데스크톱 2열, 폰 1열 */
+   기사 하나가 카드 하나: 제목 18px·행간 24px(2026-10-12, 리포트와 같이) + 분류 라벨 14px, 아래 14px 보조 줄(출처 · 시각). 데스크톱 2열, 폰 1열 */
 .news-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
 .news-item {
   margin: 0; padding: 14px 12px;
   background: var(--surface); border: 1px solid #E2E8F0; border-radius: 8px;
-  font-size: 18px; line-height: 27px; color: #111; word-break: keep-all;
+  font-size: 18px; line-height: 24px; color: #111; word-break: keep-all;
 }
 .news-item a { color: #111; }
 .news-item a:hover { color: var(--accent); }
@@ -812,7 +804,7 @@ body.menu-open { overflow: hidden; }
   font-size: 14px; font-weight: 400; line-height: 1; color: #334155; background: #fff;
   white-space: nowrap; vertical-align: middle;
 }
-.news-sub { margin-top: 2px; font-size: 14px; line-height: 21px; color: #7A7A7A; }
+.news-sub { margin-top: 2px; font-size: 14px; line-height: 20px; color: #7A7A7A; }
 .news-sub .num { margin-left: 6px; }
 .news-item.load-status { color: var(--gray-400); }
 
@@ -1039,10 +1031,9 @@ body.menu-open { overflow: hidden; }
             <rect x="14" y="4" width="3" height="12" rx=".5"/>
           </svg>
           미국 증시 데일리 브리핑
+          <span class="briefing-date" id="briefing-date"></span>
         </h2>
-        <p class="briefing-sub">데일리 리포트·트럼프 SNS 트렌드·엔비디아 데일리의 핵심만 추렸습니다. 카드를 누르면 전체 글로 갑니다.</p>
       </div>
-      <p class="sync-stamp"><span class="sync-dot"></span><span id="sync-label">실시간 AI 동기화</span></p>
     </div>
 
     <div class="briefing-body">
@@ -1900,8 +1891,9 @@ body.menu-open { overflow: hidden; }
 
         if (card.picks) {
           fillPicks(sec[PICKS_HEADS[0]] || sec[PICKS_HEADS[1]]);
-          var stamp = document.getElementById('sync-label');
-          if (stamp && day) stamp.textContent = day + ' 리포트 기준';
+          var stamp = document.getElementById('briefing-date');   /* 제목 옆 날짜 (2026-10-12 사용자) */
+          var tm = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/.exec(title);   /* 리포트 기준일은 글 제목의 날짜 (발행일은 다음 날일 수 있다) */
+          if (stamp && (tm || day)) stamp.textContent = tm ? tm[1] + '.' + parseInt(tm[2], 10) + '.' + parseInt(tm[3], 10) : day;
         }
       })
       .catch(function () { failCard(card); });
@@ -1996,6 +1988,32 @@ body.menu-open { overflow: hidden; }
   });
 })();
 
+/* ============================================================ 댓글 접기 (2026-10-12 사용자: "하단 댓글은 접기 기능을 추가해서 평소에는 닫아줘")
+   댓글 제목(h3)을 "댓글 n" 버튼으로 바꾸고, 나머지(댓글 목록 · 쓰기 폼)를 .comments-panel 로 감싸 기본은 닫는다.
+   주소가 #comments · #comment-form · #c123(댓글 링크)이면 열어 둔다. 모양은 테마 CSS(.comments-toggle). */
+(function () {
+  'use strict';
+  [].slice.call(document.querySelectorAll('.comments')).forEach(function (box) {
+    var head = box.querySelector('h3.title, h3.comments-title, .comments-title');
+    if (!head || box.classList.contains('is-foldable')) return;
+    var n = box.getAttribute('data-num-comments');
+    if (n === null) { var m = /\d+/.exec(head.textContent); n = m ? m[0] : String(box.querySelectorAll('.comment-content').length); }
+    var panel = document.createElement('div'); panel.className = 'comments-panel'; panel.id = 'comments-panel-' + Math.random().toString(36).slice(2, 8);
+    var after = false;
+    [].slice.call(box.childNodes).forEach(function (c) { if (c === head) { after = true; return; } if (after) panel.appendChild(c); });
+    box.appendChild(panel);
+    var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'comments-toggle';
+    btn.setAttribute('aria-controls', panel.id);
+    btn.innerHTML = '<span></span><svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>';
+    btn.firstChild.textContent = '댓글 ' + n;
+    head.textContent = ''; head.appendChild(btn);
+    box.classList.add('is-foldable');
+    function set(open) { box.classList.toggle('is-open', open); panel.hidden = !open; btn.setAttribute('aria-expanded', String(open)); }
+    btn.addEventListener('click', function () { set(panel.hidden); });
+    set(/^#(comments|comment-form|c\d+)/.test(location.hash));
+  });
+})();
+
 /* ============================================================ 툴팁 팝업창 (2026-10-12 사용자: "툴팁은 팝업창으로", 내용 18px)
    리포트의 ? 아이콘([data-tip])을 누르면 화면 가운데 창. 제목은 아이콘 앞 글자(예: "시장 국면", "판정"), 내용은 data-tip.
    닫기: × · 바깥 누르기 · Esc. 닫으면 포커스를 아이콘으로 돌려준다. */
@@ -2014,10 +2032,26 @@ body.menu-open { overflow: hidden; }
     if (host) { var c = host.cloneNode(true); [].slice.call(c.querySelectorAll('[data-tip], svg')).forEach(function (x) { x.parentNode.removeChild(x); }); t = c.textContent.replace(/\s+/g, ' ').trim(); }
     return t.length > 40 ? t.slice(0, 40) + '…' : (t || '설명');
   }
+  /* 줄마다 한 칸. "· " "• " "- " 로 시작하는 줄은 글머리표 — 점 칸과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게
+     (2026-10-12 사용자: "블릿과 글을 분리하여 줄바꿈 할 때 블릿 영역에 침범하지 않게, 툴팁도 포함") */
+  function fill(body, text) {
+    body.textContent = '';
+    text.split(/\n/).forEach(function (line) {
+      if (!line.trim()) return;
+      var m = /^\s*[·•\-]\s+(.*)$/.exec(line), row = document.createElement('div');
+      if (m) {
+        row.className = 'rt-pop-li';
+        var dot = document.createElement('span'); dot.className = 'rt-pop-dot';
+        var t = document.createElement('span'); t.textContent = m[1];
+        row.appendChild(dot); row.appendChild(t);
+      } else { row.className = 'rt-pop-p'; row.textContent = line; }
+      body.appendChild(row);
+    });
+  }
   function open(icon) {
     last = icon;
     pop.querySelector('.rt-pop-title').textContent = titleOf(icon);
-    pop.querySelector('.rt-pop-body').textContent = icon.getAttribute('data-tip');
+    fill(pop.querySelector('.rt-pop-body'), icon.getAttribute('data-tip') || '');
     pop.hidden = false;
     pop.querySelector('.rt-pop-close').focus();
   }
@@ -2098,7 +2132,7 @@ body.menu-open { overflow: hidden; }
       if (sc.key === g.name) {   /* 탭 이름과 같은 제목은 숨기고, 제목 옆 요약은 패널 맨 위 안내 줄로 */
         var sm = sc.h.querySelector('[data-summary]');
         sc.h.style.display = 'none';
-        if (sm) { var d = document.createElement('div'); d.style.cssText = 'font-size:14px;line-height:21px;color:#6B7280;margin:0 0 8px;padding-left:12px;';   /* 안내 줄 12px 들여쓰기 (2026-10-11) */ d.innerHTML = sm.innerHTML; sc.h.insertAdjacentElement('afterend', d); }
+        if (sm) { var d = document.createElement('div'); d.style.cssText = 'font-size:14px;line-height:20px;color:#6B7280;margin:0 0 8px;padding-left:12px;';   /* 안내 행간 20px (2026-10-12) */   /* 안내 줄 12px 들여쓰기 (2026-10-11) */ d.innerHTML = sm.innerHTML; sc.h.insertAdjacentElement('afterend', d); }
       }
     });
     if (!p.children.length) return;

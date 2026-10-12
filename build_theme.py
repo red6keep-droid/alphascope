@@ -162,7 +162,7 @@ body.item-view .main-content, body.item-view.no-dashboard .main-content { paddin
 body.item-view .post-outer-container { padding-top: 12px; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
-.post-body { font-size: 18px; line-height: 1.8; color: #333; overflow-wrap: anywhere; }
+.post-body { font-size: 18px; line-height: 34px; color: #333; overflow-wrap: anywhere; }   /* 행간 px 정수 — 리포트 본문과 같은 34px (2026-10-12 사용자) */
 .post-body img { max-width: 100%; height: auto; border-radius: 12px; }
 .post-body table { width: 100%; border-collapse: collapse; }
 /* 셀에 nowrap 이 있는 표(리포트 본문)는 글 폭을 밀어내지 않고 표 안에서만 가로 스크롤한다 */
@@ -179,17 +179,21 @@ body.item-view .post-outer-container { padding-top: 12px; }
 .rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.45); }
 .rt-pop[hidden] { display: none; }
 .rt-pop-box { position: relative; width: 100%; max-width: 520px; max-height: 80vh; overflow-y: auto; padding: 20px 20px 22px; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
-.rt-pop-title { margin: 0 40px 12px 0; font-size: 18px; font-weight: 700; line-height: 27px; color: #111; }
-.rt-pop-body { font-size: 18px; font-weight: 400; line-height: 27px; color: #333; white-space: pre-line; word-break: keep-all; }
+.rt-pop-title { margin: 0 40px 12px 0; font-size: 18px; font-weight: 700; line-height: 24px; color: #111; }
+.rt-pop-body { font-size: 18px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
+/* 툴팁 내용 행간 = 본문 34px (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
+.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 3px 0; }
+.rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
+.rt-pop-li > span:last-child { min-width: 0; }
 .rt-pop-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 20px; line-height: 28px; cursor: pointer; }
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
-.post-body .rt-tab { flex: none; padding: 8px 12px; font: inherit; font-size: 18px; line-height: 27px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) */
+.post-body .rt-tab { flex: none; padding: 8px 12px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) */
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
-.post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 18px; line-height: 27px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
+.post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
 /* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.
    data-grid=2 (C 카드 줄 묶음) → 2열 그리드 + 짝수 칸 왼쪽 세로 구분선. 둘째 칸의 인라인 border-top 은 지운다(첫 줄에 선이 생기지 않게).
@@ -206,14 +210,14 @@ body.item-view .post-outer-container { padding-top: 12px; }
 /* 전환 버튼 (data-switch, 당일 · 5일 그래프): 회색 바탕 알약 둘, 선택은 흰 바탕 · 검정 굵게 (2026-10-11) */
 .post-body .rt-segs { display: inline-flex; gap: 2px; padding: 3px; margin: 4px 0 8px; background: #F1F5F9; border-radius: 8px; }
 .post-body .rt-segs[hidden] { display: none; }
-.post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 18px; line-height: 27px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
+.post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
 .post-body .rt-seg[aria-pressed="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .post-body [data-switch-panel][hidden], .post-body [data-hz-panel][hidden] { display: none; }
 .post-body .rt-segs--in-sub { margin: 0 0 4px auto; flex: none; }
 /* 하위탭 (부정 발언 · 긍정 발언 · 전체): 서브탭보다 한 단계 아래 — 16px, 밑줄 2px 검정, 줄 아래 선 없음. 표본이 모자란 탭은 흐리게 (2026-10-11) */
 .post-body .rt-dirs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 0 8px; }
 .post-body .rt-dirs[hidden] { display: none; }
-.post-body .rt-dir { flex: none; padding: 4px 8px; font: inherit; font-size: 18px; line-height: 27px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
+.post-body .rt-dir { flex: none; padding: 4px 8px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
 .post-body .rt-dir[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: #111; }
 .post-body .rt-dir[data-empty] { color: #CBD5E1; }
 /* E 2열 카드는 폰에서도 2열 (2026-10-12 사용자: "왜 2열로 적용 안 했냐") — 예전의 폰 한 칸 쌓기 규칙 삭제.
@@ -221,15 +225,22 @@ body.item-view .post-outer-container { padding-top: 12px; }
 @media (max-width: 680px) {
   .post-body [data-pair] > span > span:last-child { flex-basis: 100% !important; text-align: right; }
 }
-/* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11) */
-.post-body ul { list-style: disc; padding-left: 0; }
-.post-body ol { list-style: decimal; padding-left: 0; }
+/* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11).
+   글머리표는 글 바깥 칸에(outside) — 줄이 바뀌어도 글이 글머리표 아래로 들어가지 않는다 (2026-10-12 사용자: "블릿과 글을 분리, 모든 블로그 글").
+   리포트 목록은 인라인 padding:0 · list-style:none + 점 칸(dot_li)이라 이 규칙을 받지 않는다 — 옛 글 목록용 */
+.post-body ul { list-style: disc outside; padding-left: 20px; }
+.post-body ol { list-style: decimal outside; padding-left: 24px; }
 .post-body a { color: var(--down); }
 
 .byline, .post-footer, .post-bottom, .post-labels {
   font-size: 14px;
   color: var(--gray-400);
 }
+/* 글 아래 라벨(데일리 브리핑 · 미국 증시 · 자동 리포트 …)은 보이지 않게 (2026-10-12 사용자: "이런 태그는 삭제").
+   라벨 자체는 글에 남긴다 — 홈 카드 · 목록 · 메뉴가 라벨 피드로 글을 찾는다 */
+.post-labels { display: none !important; }
+/* 홈 맨 위 여백 70% 줄임 (2026-10-12 사용자): 헤더 아래 빈 띠 28 + 본문 위 12 = 40 → 12 (빈 띠를 홈에서만 없앤다) */
+body:not(.no-dashboard) .header-bar { height: 0; padding: 0; }
 .post-labels a {
   display: inline-block;
   margin: 6px 6px 0 0;
@@ -257,7 +268,6 @@ body.item-view .post-outer-container { padding-top: 12px; }
   font-weight: 700;
   color: #fff;
 }
-.post-nav-list::before { content: '\\2190'; }
 .post-nav-list:hover { background: #000; color: #fff; }   /* 검은 테마 버튼 (2026-10-12 사용자) */
 
 /* 이미 게시된 글 보정 — 리포트 본문은 인라인 font-size 를 달고 나오므로 CSS 가 밀린다.
@@ -276,12 +286,13 @@ body.item-view .post-outer-container { padding-top: 12px; }
 /* 공유 버튼 (2026-10-12 사용자: 공유 아이콘을 누르면 소셜 아이콘이 보이게) — b:css='false' 라 블로거 위젯 CSS 가 없다.
    기본은 "공유" 버튼 하나, 누르면(.is-open, 테마 JS) 플랫폼 버튼 줄이 아래에 펼쳐진다. 창을 여는 JS 도 테마가 직접 단다 */
 .post-share-buttons { margin: 20px 0 0; }
-.post-share-buttons-bottom { margin: 28px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }
+.post-share-buttons-bottom { display: flex; justify-content: flex-end; margin: 28px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }   /* 공유는 콘텐츠 오른쪽 (2026-10-12 사용자) */
 .goog-inline-block { display: inline-block; }
-.sharing { position: relative; display: block; }
+.sharing { position: relative; display: flex; flex-direction: column; align-items: flex-end; }
+/* 공유 버튼은 16px 작은 버튼 (2026-10-12 사용자: "16포인트의 작은 버튼으로 콘텐츠 우측에 정렬") */
 .sharing-button {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 10px 16px;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; line-height: 24px;
   background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px;
   font-size: 16px; font-weight: 700; color: var(--ink); cursor: pointer;
 }
@@ -289,7 +300,7 @@ body.item-view .post-outer-container { padding-top: 12px; }
 .sharing-button:hover, .sharing.is-open .sharing-button { border-color: #111; }
 .share-buttons-container { display: none; margin-top: 10px; }
 .sharing.is-open .share-buttons-container { display: block; }
-.share-buttons, .share-buttons.hidden { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.share-buttons, .share-buttons.hidden { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .share-buttons li { margin: 0; }
 .sharing-platform-button {
   display: inline-flex; align-items: center; gap: 6px;
@@ -300,16 +311,24 @@ body.item-view .post-outer-container { padding-top: 12px; }
 .sharing-platform-button:hover { border-color: #111; color: #111; }
 .platform-sharing-text { white-space: nowrap; }
 .post-share-buttons svg, .sharing svg, svg.svg-icon-24, .touch-icon { width: 20px; height: 20px; flex: none; fill: currentColor; }
+.sharing-button svg, .sharing-button .touch-icon { width: 16px; height: 16px; }
 
 /* 댓글 (2026-10-12 사용자: 산만하고 가이드에 안 맞다, 버튼 정렬) — 블로거 threaded comments 마크업을 가이드 글자 체계로.
    제목 21px, 글 18px·행간 27px, 이름 16px 굵게, 날짜·동작 14px 회색, 버튼은 한 줄 오른쪽 정렬·같은 외곽선 모양 */
 .comments {
   width: 100%; max-width: var(--shell); margin: 20px auto 0; padding: 28px 40px 32px;
   background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-  font-size: 18px; line-height: 27px; color: #333; word-break: keep-all;
+  font-size: 18px; line-height: 24px; color: #333; word-break: keep-all;
 }
 .comments h3, .comments .comments-title, .comments h3.title { margin: 0 0 14px; padding-bottom: 6px; border-bottom: 2px solid #eee; font-size: 21px; font-weight: 700; line-height: 27px; color: #111; }
-.comments h4, .comments #comment-post-message { margin: 0 0 10px; font-size: 16px; font-weight: 700; line-height: 27px; color: #111; }
+/* 댓글 접기 (2026-10-12 사용자: "하단 댓글은 접기 기능을 추가해서 평소에는 닫아줘") — 테마 JS가 제목을 버튼으로 바꾸고 나머지를 .comments-panel 로 감싼다.
+   기본은 닫힘. 주소가 #comments · #comment-form · #c123 이면 열린 채로. 닫혀 있을 때는 제목 밑 구분선도 없앤다 */
+.comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 0; background: none; border: 0; font: inherit; font-size: 21px; font-weight: 700; line-height: 27px; color: #111; text-align: left; cursor: pointer; }
+.comments-toggle .acc-chev { flex: none; transition: transform .15s; }
+.comments.is-open .comments-toggle .acc-chev { transform: rotate(180deg); }
+.comments.is-foldable:not(.is-open) h3, .comments.is-foldable:not(.is-open) .comments-title { margin: 0; padding-bottom: 0; border-bottom: 0; }
+.comments-panel[hidden] { display: none; }
+.comments h4, .comments #comment-post-message { margin: 0 0 10px; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; }
 .comments ol, .comments ul { list-style: none; padding: 0; margin: 0; }
 .comments .comment-thread > ol > li, .comments ol > li.comment { padding: 14px 0; border-top: 1px solid #E2E8F0; }
 .comments .comment-thread > ol > li:first-child, .comments ol > li.comment:first-child { border-top: 0; padding-top: 0; }
@@ -323,8 +342,8 @@ body.item-view .post-outer-container { padding-top: 12px; }
 .comments .comment-header { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 0; }
 .comments .comment-header .user, .comments .user a, .comments .comment-author { font-size: 16px; font-weight: 700; color: #111; font-style: normal; }
 .comments .comment-header .icon.user { display: none; }
-.comments .datetime, .comments .comment-header .datetime a, .comments .comment-footer .comment-timestamp a { font-size: 14px; line-height: 21px; color: #7A7A7A; }
-.comments .comment-content { margin: 4px 0 0; font-size: 18px; line-height: 27px; color: #333; }
+.comments .datetime, .comments .comment-header .datetime a, .comments .comment-footer .comment-timestamp a { font-size: 14px; line-height: 20px; color: #7A7A7A; }
+.comments .comment-content { margin: 4px 0 0; font-size: 18px; line-height: 24px; color: #333; }
 .comments .comment-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; }
 .comments .comment-actions a, .comments .comment-actions .item-control a, .comments .continue a, .comments .loadmore a, .comments .comment-footer a {
   display: inline-flex; align-items: center; margin: 0; padding: 5px 12px;
@@ -335,7 +354,7 @@ body.item-view .post-outer-container { padding-top: 12px; }
 .comments .item-control { display: inline; }
 .comments .continue, .comments .loadmore { display: flex; justify-content: flex-end; margin-top: 10px; }
 .comments .comment-footer, .comments .comment-form { margin-top: 18px; padding-top: 14px; border-top: 1px solid #E2E8F0; }
-.comments .comment-form p { margin: 0 0 8px; font-size: 14px; line-height: 21px; color: #6B7280; }
+.comments .comment-form p { margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #6B7280; }
 .comments iframe { width: 100%; border: 0; }
 .comments .comment-replybox-single, .comments .comment-replybox-thread { margin-top: 10px; }
 #comment-popup { display: none; }
@@ -359,7 +378,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-outer-container, .comments { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 5px; }   /* 16 → 5 (70% 줄임) */
   .post-title { font-size: 24px; letter-spacing: -.3px; }
-  .post-body { font-size: 17px; line-height: 1.75; }
+  .post-body { font-size: 18px; line-height: 34px; }
   /* 데스크톱용 커버 이미지 확대 규칙(1024px !important)이 모바일에서 글 폭을 벌리지 않게 */
   .post-body img, .post-body img[style*="max-width"] { max-width: 100% !important; }
 }
@@ -904,7 +923,7 @@ PREVIEW_COMMENTS = [
 
 PREVIEW_POST_TITLE = "미국 증시 데일리 브리핑 — 2026년 9월 3일"
 
-FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:1.7;color:#333;">
+FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:34px;color:#333;">
 
   <img src="__COVER__" alt="데일리 브리핑 커버 이미지" style="width:100%;max-width:1024px;border-radius:8px;margin:0 0 16px 0;display:block;"/>
 
@@ -1010,7 +1029,7 @@ SAVED_TRUMP_BODY = "experiments/trump-trend/output/trump_report_body.html"
 SAVED_NVDA_BODY = "experiments/nvda-report/output/nvda_report_body.html"
 PREVIEW_NVDA_TITLE = "엔비디아 데일리 — 2026년 9월 3일"
 PREVIEW_TRUMP_TITLE = "트럼프 발언 트렌드 — 2026년 9월 3일"
-FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:1.7;color:#333;">
+FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:34px;color:#333;">
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘 한 줄</h2>
 <div style="font-size:20px;font-weight:bold;color:#111;">지난 24시간 게시물 <b>36</b>건 중 정책 관련 <b>2</b>건, 이벤트 <b>2</b>개. 가장 강한 발언은 <b>Regulation / Artificial Intelligence</b> (강도 10).</div>
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘의 발언</h2>
@@ -1019,7 +1038,7 @@ FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic 
 <ul style='margin:8px 0 8px 20px;'><li style='margin:4px 0;'>최근 90일간 등장하지 않았던 Regulation / Medicare 주제가 최근 7일간 1건 나타났으며 트렌드 점수 68.8점이 관찰됐다.</li><li style='margin:4px 0;'>Trade / Tariff 주제는 직전 7일간 0건에서 최근 7일간 2건으로 증가한 변화가 관찰됐다.</li><li style='margin:4px 0;'>신규 진입 대상으로는 South Korea와 BAYRY, CVS가 나타났다.</li></ul>
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">내일 볼 것</h2>
 <ul style='margin:8px 0 8px 20px;'><li style='margin:4px 0;'>과거 Regulation 이벤트 28건에서 익일 평균 -0.54% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.002)로 관찰된 XLI가 관찰 대상으로 나타났다.</li><li style='margin:4px 0;'>과거 Trade 이벤트 23건에서 +3거래일 평균 2.001% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.002)로 관찰된 AAPL이 관찰 대상으로 나타났다.</li></ul>
-<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:15px;color:#777;line-height:1.6;">데이터: Truth Social 게시물 공개 아카이브(CNN) · 가격 Yahoo Finance · 거시 일정 FRED. 이 글의 시장 반응 수치는 과거 발언 이후 <b>관찰된 값</b>이며 인과 관계나 향후 방향을 의미하지 않습니다. 투자 권고가 아닙니다.</div>
+<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:15px;color:#777;line-height:20px;">데이터: Truth Social 게시물 공개 아카이브(CNN) · 가격 Yahoo Finance · 거시 일정 FRED. 이 글의 시장 반응 수치는 과거 발언 이후 <b>관찰된 값</b>이며 인과 관계나 향후 방향을 의미하지 않습니다. 투자 권고가 아닙니다.</div>
 </div>"""
 
 
@@ -1036,7 +1055,7 @@ def preview_post_body():
         return FALLBACK_POST_BODY.replace("__COVER__", cover), "더미 본문"
 
 
-FALLBACK_NVDA_BODY = """<div style="font-size:18px;line-height:1.7;color:#333;">
+FALLBACK_NVDA_BODY = """<div style="font-size:18px;line-height:34px;color:#333;">
 <h2>① 오늘 한 줄</h2>
 <div style="font-size:20px;color:#111;"><b>NVDA $229.28</b> (-0.52%) · SPY 대비 -1.12%p · SMH 대비 +0.13%p · AMD 대비 +1.51%p · 거래량 20일 평균의 0.77×</div>
 <h2>② 오늘 바뀐 것 (2건)</h2>

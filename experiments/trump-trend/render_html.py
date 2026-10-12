@@ -161,13 +161,13 @@ def _flow_card(blk):
 
     def li(t, x):
         head = f'<b>{_esc(t)}</b> : ' if t else ""
-        return dk.dot_li(head + dk.tint(_esc(x)), size=3)
+        return dk.dot_li(head + dk.tint(_esc(x)), size=3, lh=dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32
     lis = "".join(li(t, x) for t, x in items)
-    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:14px 14px;margin:8px 0;">'
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px;margin:8px 0;line-height:{dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">발언 흐름 : <span style="color:{color};">{_esc(state)}</span></span></span> '
-            f'<div style="margin-top:4px;padding-top:14px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14 → 4px (70% 줄임, 2026-10-12 사용자)
-            f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul></div></div>")
+            f'<div style="margin-top:{14 - dk.VP_EMPH}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
+            f"<ul style='margin:-3px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")
 
 
 def sec_windows(a):
@@ -254,14 +254,14 @@ def _chart_card(rows, horizon):
 
     def li(t, x):
         head = f'<b>{_esc(t)}</b> : ' if t else ""   # 라벨 글머리표 "**라벨** : 내용", 증감 색 (가이드라인 3-3, 2026-10-11 사용자)
-        return dk.dot_li(head + dk.tint(_esc(x)), size=3)
+        return dk.dot_li(head + dk.tint(_esc(x)), size=3, lh=dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32
     lis = "".join(li(t, x) for t, x in items)
     note = ""   # 주의는 읽는 법 카드 안으로 (_read_card) — 2026-10-11 사용자
-    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:14px 14px;margin:8px 0;">'
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px;margin:8px 0;line-height:{dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">시장의 반응 : <span style="color:{color};">{_esc(state)}</span></span></span> '   # "시장의 반응: 평소와 같음" (2026-10-11 사용자). 자산 수는 설명 문장에
-            f'<div style="margin-top:4px;padding-top:14px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14 → 4px (70% 줄임, 2026-10-12 사용자)
-            f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
+            f'<div style="margin-top:{14 - dk.VP_EMPH}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
+            f"<ul style='margin:-3px 0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
 
 
 def _read_card(horizon):
@@ -275,8 +275,7 @@ def _read_card(horizon):
 
 def _table_fold(inner_html):
     """표 접기 — '표 보기' 버튼을 누르면 펼친다 (details data-acc, 테마 CSS가 화살표를 돌린다)."""
-    return (f'<details data-acc="1" style="margin:4px 0 8px;"><summary style="cursor:pointer;list-style:none;display:flex;justify-content:center;align-items:center;gap:6px;'
-            f'padding:10px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;color:#111;font-size:{dk.SMALL};line-height:{dk.LH_CARD};font-weight:700;">표 보기 {ACC_CHEV}</summary>'
+    return (f'<details data-acc="1" style="margin:4px 0 8px;"><summary style="{dk.FOLD_BTN}">표 보기 {ACC_CHEV}</summary>'
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 

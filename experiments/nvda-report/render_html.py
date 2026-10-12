@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import design_kit as _dk  # noqa: E402  — 공통 마무리 처리 (fix_colons)
 
 # 구획 제목 (디자인-가이드라인.md 2절): 아래 여백 14px. 구분선은 바로 아래가 글(목록·문장)일 때만 — 카드·표·그림이 오면 그 테두리가 경계라 선을 긋지 않는다
-H2 = "color:#111;font-size:21px;font-weight:700;line-height:27px;margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"   # 옆 요약이 폰에서는 제목 아래 줄로 내려온다
+H2 = f"color:#111;font-size:21px;font-weight:700;line-height:{_dk.LH_H2};margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"   # 옆 요약이 폰에서는 제목 아래 줄로 내려온다
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"   # 구분선 위 여백 8 → 6 (20% 줄임, 2026-10-11)
 _NO_LINE_START = re.compile(r'^\s*(<div style="(?:overflow-x:auto;|background:)|<div data-cards|<img\b)')   # 표 래퍼 · 카드 · 카드 묶음 · 그림
 UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
@@ -31,8 +31,8 @@ SMALL, TINY = "18px", "14px"   # 안내 글(14px)을 빼고 모두 18px (2026-10
 LH_CARD, LH_TINY = _dk.LH_CARD, _dk.LH_TINY   # 행간은 px 정수만 (2026-10-12 사용자)
 MICRO = "14px"   # 카드 구분명 안 괄호 부분 — 카드 글자(16px)보다 한 단계 작게, 볼드 없음 (2026-10-11 사용자: 안내 글 빼고 14 → 16)
 # 강조 카드 (가이드라인 2절): 크기 대신 연한 배경 카드로 강조. 라벨 pill 색
-CARD = "background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px 14px;"           # 기본 카드 (오늘 한 줄)
-CARD_EMPH = "background:#FFF7ED;border:1px solid #FFEDD5;border-radius:10px;padding:12px 14px;"       # (옛) 강조 카드
+CARD = f"background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:{14 - _dk.VP}px 14px;line-height:{LH_CARD};"   # 보이는 위아래 14 (2026-10-12)           # 기본 카드 (오늘 한 줄)
+CARD_EMPH = f"background:#FFF7ED;border:1px solid #FFEDD5;border-radius:10px;padding:{12 - _dk.VP}px 14px;line-height:{LH_CARD};"       # (옛) 강조 카드
 # 강조 이벤트 카드는 방향 테마 (2026-10-11 사용자): 긍정 오렌지 · 부정 파랑 · 중립 회색 · 불확실 노랑
 CARD_DIR = {"positive": ("#FFF7ED", "#FED7AA"), "negative": ("#EFF6FF", "#BFDBFE"),
             "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#FFFBEB", "#FDE68A")}
@@ -143,7 +143,7 @@ def _note(t):
 
     제목에 넣던 조건·범위("7일 이내 · 법원 일정 30일", "15건")를 여기로 옮긴다. 홈 카드는 border-top 요소를 건너뛰므로 카드에 섞이지 않는다.
     """
-    return f'<div style="margin:2.76px 0 1.38px;padding-top:2.07px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
+    return f'<div style="margin:3px 0 1px;padding-top:2px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
 
 
 _LABEL = re.compile(r"^([^:：]{1,24}?)\s*:\s+(.+)$", re.S)
@@ -171,7 +171,7 @@ def _dot_li(inner_html, size=3, color="#111", lh=None, margin="3px 0"):
 def _guide(title, body, line=True):
     """제목이 있는 안내 글 (가이드라인 3-3, 2026-10-11 사용자) — design_kit.guide 와 같은 규칙.
     짧으면 한 줄 "ⓘ **제목**: 내용", 길거나 항목이 여럿이면 "ⓘ **제목**" 다음 줄부터 글머리표 "이름 = 내용"."""
-    top = ("margin:2.76px 0 1.38px;padding-top:2.07px;border-top:1px solid #f3f3f3;" if line else "margin:1.38px 0 0;") + _dk.GUIDE_IND   # 여백 40% 줄임 (2026-10-11 사용자)   # 카드 밖 안내 20px 들여쓰기 (2026-10-11 사용자)
+    top = ("margin:3px 0 1px;padding-top:2px;border-top:1px solid #f3f3f3;" if line else "margin:1px 0 0;") + _dk.GUIDE_IND   # 여백 40% 줄임 (2026-10-11 사용자)   # 카드 밖 안내 20px 들여쓰기 (2026-10-11 사용자)
     head = f'{INFO_ICON}<b style="color:#4B5563;">{_esc(title)}</b>'
     if isinstance(body, str) and len(body) <= 70:
         return f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head} : {_esc(body)}</div>'   # data-guide: 홈 카드가 건너뛴다 (2026-10-12)
@@ -180,17 +180,9 @@ def _guide(title, body, line=True):
     return f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head}<ul style="margin:2px 0 0 2px;padding:0;list-style:none;">{lis}</ul></div>'
 
 
-UL = "margin:0 0 8px 20px;padding:0;list-style:disc;"   # 위 여백 0 — 제목 아래 14px는 제목이 갖는다   # 모든 목록 공통 — 글머리표 기준선이 구획마다 달라지지 않게 (디자인-가이드라인 3절)
-LI = "margin:6px 0;"
-
-
-def _ul(items_html):
-    return f"<ul style='{UL}'>" + "".join(items_html) + "</ul>"
-
-
 def _muted(t):
     """짧은 안내 글 (기준 거래일, 빈 구획 안내 등) — 안내 글에는 아이콘을 꼭 붙인다 (2026-10-11 사용자)."""
-    return f'<div style="color:{NOTE};font-size:{TINY};line-height:{LH_TINY};margin:2.07px 0;{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
+    return f'<div style="color:{NOTE};font-size:{TINY};line-height:{LH_TINY};margin:2px 0;{_dk.GUIDE_IND}">{INFO_ICON}{_esc(t)}</div>'
 
 
 NEW_PILL = ('<span style="display:inline-block;background:#B91C1C;color:#fff;border-radius:3px;padding:1px 4px 0;font-size:10px;font-weight:700;'
@@ -226,20 +218,22 @@ def _notice(a):
         parts.append(f"{INFO_ICON}기사 {ds['items_pending']}건이 아직 분류되지 않아 오늘 항목이 불완전할 수 있습니다 (다음 실행에서 이어서 분류).")
     if not parts:
         return ""
-    return (f'<div style="background:#fff8e1;border:1px solid #f4d37a;border-radius:6px;padding:12px 14px;font-size:{TINY};line-height:{LH_TINY};margin:0 0 12px;">'   # 안내 상자도 안내 글 크기(14px)
+    return (f'<div style="background:#fff8e1;border:1px solid #f4d37a;border-radius:6px;padding:{12 - _dk.VP}px 14px;font-size:{TINY};line-height:{LH_TINY};margin:0 0 12px;">'   # 안내 상자도 안내 글 크기(14px)
             + "<br>".join(parts) + "</div>")
 
 
 # 카드 유형 (디자인-가이드라인.md 2절): 모든 증감 표시는 구분명 왼쪽 · 값 오른쪽, 여러 줄은 한 카드 안에서 가로 구분선으로 나눈다
 COL_L = "flex:0 0 65%;max-width:65%;min-width:0;white-space:normal;"   # 카드 왼쪽 65% (가이드라인 2-1, 2026-10-11 사용자: 꼭 지킨다)
 COL_R = "flex:1 1 0;min-width:0;text-align:right;white-space:normal;word-break:keep-all;"   # 카드 오른쪽 35%
-ROW = ("display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 6px;padding:10px 12px;"
-       "background:#fff;border:1px solid #E2E8F0;border-radius:8px;white-space:nowrap;line-height:27px;")   # A타입 (기준 카드, 본문 크기)
-ROW_SMALL = f"font-size:{SMALL};padding:7px 12px;"       # B타입 (비교 카드)
-ROW_UP = "background:#FFF7ED;border-color:#FED7AA;"     # A타입 상승: 연한 오렌지
-ROW_DOWN = "background:#EFF6FF;border-color:#BFDBFE;"   # A타입 하락: 연한 파랑
-MULTI = f"display:block;margin:0 0 6px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font-size:{SMALL};"   # C타입 (멀티 카드, 16px — 2026-10-11 사용자: 안내 글 빼고 14 → 16)
-MULTI_ROW = "display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 12px;white-space:nowrap;line-height:27px;"   # 가로 구분선 기준 위아래 14px, 카드 가장자리도 같게 (2026-10-12 사용자)
+ROW = (f"display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 6px;padding:{10 - _dk.VP}px 12px;"
+       f"background:#fff;border:1px solid #E2E8F0;border-radius:8px;white-space:nowrap;line-height:{LH_CARD};")   # A타입 (기준 카드, 본문 크기)
+ROW_SMALL = f"font-size:{SMALL};padding:{7 - _dk.VP}px 12px;"       # B타입 (비교 카드)
+# A타입 색 배경(상승 오렌지 · 하락 파랑)은 강조 카드 — 행간 32 · 위아래 보이는 24 (2026-10-12 사용자: "NVDA 강조 카드는 왜 공통 여백 적용이 안 된 거지")
+_EMPH_ROW = f"padding:{_dk.EMPH_PAD - _dk.VP_EMPH}px 12px;line-height:{_dk.LH_EMPH};"
+ROW_UP = "background:#FFF7ED;border-color:#FED7AA;" + _EMPH_ROW     # A타입 상승: 연한 오렌지
+ROW_DOWN = "background:#EFF6FF;border-color:#BFDBFE;" + _EMPH_ROW   # A타입 하락: 연한 파랑
+MULTI = f"display:block;margin:0 0 6px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font-size:{SMALL};line-height:{LH_CARD};"   # C타입 (멀티 카드, 16px — 2026-10-11 사용자: 안내 글 빼고 14 → 16)
+MULTI_ROW = f"display:flex;justify-content:space-between;align-items:center;gap:12px;padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;white-space:nowrap;line-height:{LH_CARD};"   # 가로 구분선 기준 위아래 14px, 카드 가장자리도 같게 (2026-10-12 사용자)
 MULTI_SEP = "border-top:1px solid #E2E8F0;"            # C타입 줄 사이 가로 구분선
 
 
@@ -335,13 +329,13 @@ def _state_card(title, state, theme, color, lines, new_html="", tip=""):
     def li(item):
         text, kind = (item, "") if isinstance(item, str) else item
         col = NOTE if kind == "note" else "#111"
-        return _dot_li(_label_text(text), size=3, color=col)   # 16px → 3px 점, "**라벨** : 내용", 증감 색 (2026-10-11 사용자)
+        return _dot_li(_label_text(text), size=3, color=col, lh=_dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32 (2026-10-12 사용자)   # 16px → 3px 점, "**라벨** : 내용", 증감 색 (2026-10-11 사용자)
     lis = "".join(li(t) for t in lines)
-    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:14px 14px;margin:0 0 8px;">'
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{_dk.EMPH_PAD - _dk.VP_EMPH}px 14px;margin:0 0 8px;line-height:{_dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다
             f'<span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_esc(title)}{_tip(tip)}{new_html}</span><span style="{COL_R}font-weight:700;color:{color};">{_esc(state)}</span></span> '
-            f'<div style="margin-top:4px;padding-top:14px;border-top:1px solid {bd};font-size:{SMALL};">'   # 가로 구분선 위아래 14px (2026-10-12 사용자)
-            f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul></div></div>")
+            f'<div style="margin-top:{14 - _dk.VP_EMPH}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
+            f"<ul style='margin:-3px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")   # 음수 margin = 첫·끝 li 의 3px 지우기
 
 
 def _tip(text):
@@ -511,7 +505,7 @@ def _event_html(e):
     inner = f"{head}{fact} {tag}{link}{when}"   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절)
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
-        return f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:14px 12px;margin:0 0 8px;line-height:{LH_CARD};">{inner}</div>'   # 일반 기사 카드와 같은 크기·여백, 배경만 방향 색
+        return f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{14 - _dk.VP}px 12px;margin:0 0 8px;line-height:{LH_CARD};">{inner}</div>'   # 일반 기사 카드와 같은 크기·여백, 배경만 방향 색
     return inner   # 나머지는 글 항목 카드(_dk.list_card)의 한 줄 (2026-10-12 사용자: 뉴스는 카드 형식으로)
 
 
@@ -554,12 +548,12 @@ def _accordion(summary_html, body_html, open_=False, block=False):
     (2026-10-11 사용자: "항상 보이는 부분은 카드 우측까지 꽉 차게, 화살표는 네모 박스 안 버튼")."""
     if block:
         return (f'<details data-acc="1"{" open" if open_ else ""} style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font-size:{SMALL};line-height:{LH_CARD};">'
-                f'<summary style="display:block;padding:0 12px 14px;cursor:pointer;list-style:none;">{summary_html}</summary>'
+                f'<summary style="display:block;padding:0 12px {_dk.SEP_GAP - _dk.VP - 1}px;cursor:pointer;list-style:none;">{summary_html}</summary>'
                 f'<div style="padding:0 12px;border-top:1px solid #E2E8F0;">{body_html}</div></details>')   # 줄마다 위아래 10px (줄이 갖는다)
     return (f'<details data-acc="1"{" open" if open_ else ""} style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font-size:{SMALL};line-height:{LH_CARD};">'
-            f'<summary style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 12px;cursor:pointer;list-style:none;">'
+            f'<summary style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;cursor:pointer;list-style:none;">'
             f'<span style="flex:1;min-width:0;display:flex;justify-content:space-between;gap:12px;">{summary_html}</span>{ACC_CHEV}</summary>'
-            f'<div style="padding:14px 12px;border-top:1px solid #E2E8F0;">{body_html}</div></details>')
+            f'<div style="padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;border-top:1px solid #E2E8F0;">{body_html}</div></details>')
 
 
 def direction_summary(a):
@@ -572,13 +566,18 @@ def direction_summary(a):
     return _esc(f"오늘 {total}건 · " + " · ".join(parts))
 
 
+BAR_GROUP_GAP = 24   # 뉴스 막대 묶음(오늘 · 최근 7일) 사이 보이는 여백 (2026-10-12 사용자)
+
+
 def sec_direction_bars(a):
     """뉴스 제목 아래 비율 막대 두 개 (오늘 · 최근 7일), 콘텐츠 폭 전부. 안내글 없음 — 수치는 제목 옆 요약에."""
     dc = a.get("direction_counts") or {}
     today, week = dc.get("today") or {}, dc.get("week") or {}
     if not sum(today.values()) and not sum(week.values()):
         return ""
-    return f'<div data-cards="1" style="margin:0 0 8px;">{_ratio_bar("오늘", today)}{_ratio_bar("최근 7일", week)}</div>'
+    # 두 막대 묶음 사이 보이는 24px (2026-10-12 사용자) = 막대 아래 margin 10 + 띄움 12 + 라벨 글자 상자까지 2 (잰 값)
+    return (f'<div data-cards="1" style="margin:0 0 8px;">{_ratio_bar("오늘", today)}'
+            f'<span style="display:block;height:{BAR_GROUP_GAP - 12}px;"></span>{_ratio_bar("최근 7일", week)}</div>')
 
 
 def sec_events(a):
@@ -589,8 +588,7 @@ def sec_events(a):
     out = "".join(_event_html(e) for e in cards) + _dk.item_cards([_event_html(e) for e in plain])   # 기사마다 카드 (2026-10-12 사용자)
     if a["events_overflow"]:
         # 카드 버튼 (가운데, 검정) — 2026-10-11 사용자
-        out += (f'<details data-acc="1" style="margin:8px 0;"><summary style="cursor:pointer;list-style:none;display:flex;justify-content:center;align-items:center;gap:6px;'
-                f'padding:10px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;color:#111;font-size:{SMALL};line-height:{LH_CARD};font-weight:700;">그 외 {len(a["events_overflow"])}건 {ACC_CHEV}</summary>'
+        out += (f'<details data-acc="1" style="margin:8px 0;"><summary style="{_dk.FOLD_BTN}">그 외 {len(a["events_overflow"])}건 {ACC_CHEV}</summary>'
                 + '<div style="margin-top:8px;">' + _dk.item_cards([_event_html(dict(e, emphasis=False)) for e in a["events_overflow"]]) + "</div></details>")
     if a.get("analyst_target_only"):
         out += _muted(f"목표가만 바뀐 애널리스트 {len(a['analyst_target_only'])}건 (등급 변경 아님): "
@@ -767,13 +765,13 @@ def sec_targets(a):
     bar = _bar(f"애널리스트 {n}명", [(nm, rc.get(k, 0), bg, fg) for k, nm, bg, fg in RATING_PASTEL], split="break") if n else ""   # 인원 다음 줄에 비율 (2026-10-12 사용자)
     tn = next((_new(a, "status:" + k) for k in ("pt_mean", "pt_median", "pt_high", "pt_low", "rating_counts") if _new(a, "status:" + k)), "")   # 목표가·등급 중 하나라도 바뀐 날
     # 접힌 상태: 목표가 평균 줄 + 평균 등급 줄 (화살표는 평균 등급 줄 오른쪽, 2026-10-11 사용자)
-    summary = (f'<span style="{MULTI_ROW}padding:14px 0;"><span style="{tl}">목표가 평균{tn}</span> '
+    summary = (f'<span style="{MULTI_ROW}padding:{_dk.SEP_GAP - _dk.VP - 1}px 0;"><span style="{tl}">목표가 평균{tn}</span> '
                f'<span style="{tr}">{_esc(rr.fmt(mean, "usd0"))} {vs} {gap(mean)}</span></span>')
     if n:   # 등급 분포 막대는 접힌 상태에도 보인다 (2026-10-11 사용자) — 목표가 평균 줄 아래
-        summary += f'<span style="display:block;padding:14px 0 4px;{MULTI_SEP}">{bar}</span>'   # 막대 아래 10px + 4 = 14
+        summary += f'<span style="display:block;padding:{_dk.SEP_GAP - _dk.VP - 1}px 0 10px;{MULTI_SEP}">{bar}</span>'   # 막대 아래 margin 10 + 10 ≈ 보이는 22 (2026-10-12)
         # 평균 등급 (2026-10-11 사용자: 네이버 컨센서스처럼 한 숫자로) — 강매수 5 … 강매도 1 가중 평균. 애널리스트 의견의 평균이지 리포트의 판단이 아니다
         mean_r = sum(w * rc.get(k, 0) for k, w in (("strongBuy", 5), ("buy", 4), ("hold", 3), ("sell", 2), ("strongSell", 1))) / n
-        summary += (f'<span style="{MULTI_ROW}padding:14px 0 0;{MULTI_SEP}"><span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.NAME};">{_paren("평균 등급 (강매수 5 · 강매도 1)")}</span> '
+        summary += (f'<span style="{MULTI_ROW}padding:{_dk.SEP_GAP - _dk.VP - 1}px 0 0;{MULTI_SEP}"><span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.NAME};">{_paren("평균 등급 (강매수 5 · 강매도 1)")}</span> '
                     f'<span style="{COL_R}font-weight:700;display:inline-flex;align-items:center;justify-content:flex-end;">{mean_r:.1f}&nbsp;<span style="color:{MUTED};font-weight:400;">/ 5</span>{ACC_BTN}</span></span>')
     else:
         summary += f'<span style="display:flex;justify-content:flex-end;padding:4px 0 0;">{ACC_BTN}</span>'
@@ -783,8 +781,8 @@ def sec_targets(a):
         v = (cells.get(key) or {}).get("value")
         if v is None:
             continue
-        rows += (f'<span style="{MULTI_ROW}padding:{"14px 0" if rows else "0 0 14px"};{MULTI_SEP if rows else ""}"><span style="{tl}">목표가 {name}</span> '
-                 f'<span style="{tr}">{_esc(rr.fmt(v, "usd0"))} {vs} {gap(v)}</span></span>')   # 펼친 영역 위 14px 는 영역이 갖는다
+        rows += (f'<span style="{MULTI_ROW}padding:{_dk.SEP_GAP - _dk.VP - 1}px 0;{MULTI_SEP if rows else ""}"><span style="{tl}">목표가 {name}</span> '
+                 f'<span style="{tr}">{_esc(rr.fmt(v, "usd0"))} {vs} {gap(v)}</span></span>')   # 펼친 줄도 구분선 위아래 22 (2026-10-12 사용자: 콘텐츠 카드 일괄)
     return _accordion(summary, f'<span style="display:block;">{rows}</span>', block=True)
 
 
@@ -847,7 +845,7 @@ def sec_footer(a):
 def build_body(a, n):
     return _dk.fix_colons("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지)
         # data-design="2": 테마의 옛 글 보정 규칙(div 14px → 17px !important)에서 이 글을 제외한다 (2026-10-11 — 안내 글이 17px로 커지던 원인)
-        f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:18px;line-height:{_dk.LH_BODY};color:#333;">',   # 행간 1.53 → 33px (20% 넓게, 소수점 금지 — 2026-10-12 사용자)
+        f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:18px;line-height:{_dk.LH_BODY};color:#333;">',   # 행간 24px (2026-10-12 사용자, 소수점 금지 — 2026-10-12 사용자)
         _notice(a),
         # 기준 거래일 안내 줄 삭제 (2026-10-12 사용자) — 날짜는 글 제목에 있다
         sec_headline(a), sec_chart(a=a), sec_targets(a),   # 목표가는 200일선 카드 아래 (아코디언)   # 제목 없이 본문 머리에 (2026-10-11 사용자: 오늘 한 줄 타이틀 삭제)

@@ -191,6 +191,7 @@ def _light_word(light):
 
 
 LIGHT_KIND = {"🟢": "good", "🟡": "uncertain", "🔴": "negative"}   # 신호등 → 라벨·상태 카드 색 (🟢 녹색, 2026-10-12 사용자)
+SCORE_SIZE = "20px"   # 점수 카드의 "86 / 100" — 20px 굵게 (2026-10-12 사용자, 18·16·14 밖의 유일한 예외)
 GRADE_MEANING = {   # 시장 상태 등급의 뜻 — 점수 카드 설명 (2026-10-12 사용자)
     "위험 선호": "70점 이상 — 투자자들이 위험을 감수하고 주식 쪽으로 돈이 움직이기 쉬운 환경입니다",
     "중립": "45~69점 — 위험 선호와 위험 회피 어느 쪽으로도 기울지 않은 환경입니다",
@@ -219,6 +220,9 @@ def _light_pill(light, text=None):
     return dk.pill(text or _light_word(light) or "—", kind)
 
 
+LEAD_SUB_SIZE, LEAD_SUB_VP = "16px", 7   # 머리 카드 구분선 아래 종합 문단 16px — 행간 32 의 반쪽은 7px (2026-10-12 사용자)
+
+
 def sec_lead(report, analysis):
     """글 머리(제목 없음, data-lead): 한 줄 결론 + 종합을 한 강조 카드에 (2026-10-12 사용자: 하나의 카드로 통합, 가로 구분선, 16px).
     홈 카드는 '(머리)'로 한 줄 결론을(구분선 아래는 건너뜀), '(종합)'으로 data-insight 문단을 읽는다."""
@@ -226,10 +230,10 @@ def sec_lead(report, analysis):
     inner = f'<div style="color:#111;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 굵게 하지 않는다 — 강조는 카드로 (가이드라인 3-1)
     lines = [ln for ln in str(report.get("opinion") or "").splitlines() if ln.strip()]
     if lines:
-        body = "".join(f'<div style="margin:0 0 4px;">{_esc(dk.ko(ln, TERM_KO))}</div>' for ln in lines)
-        inner += (f'<div style="margin:14px 0 0;padding-top:14px;border-top:1px solid {dk.EMPH_BD};">'   # 가로 구분선 위아래 14px (2026-10-12 사용자)
-                  f'<div data-insight="1" style="font-size:{dk.SMALL};color:#111;">{body}</div></div>')   # 18px · 행간 33 은 바깥에서 물려받는다
-    return dk.cards(f'<div style="background:{dk.EMPH_BG};border:1px solid {dk.EMPH_BD};border-radius:10px;padding:14px 14px;margin:0 0 8px;">{inner}</div>')   # 위아래 12 → 14 (20%, 정수)
+        body = "".join(f'<div style="margin:{0 if i == 0 else 4}px 0 0;">{_esc(dk.ko(ln, TERM_KO))}</div>' for i, ln in enumerate(lines))   # 문단 사이만 4px — 끝 문단 아래 여백이 카드 여백에 더해지지 않게
+        inner += (f'<div style="margin:{14 - dk.VP_EMPH}px 0 0;padding-top:{14 - LEAD_SUB_VP}px;border-top:1px solid {dk.EMPH_BD};">'   # 가로 구분선 위아래 보이는 14px (행간 32)
+                  f'<div data-insight="1" style="font-size:{LEAD_SUB_SIZE};color:#111;">{body}</div></div>')   # 구분선 아래 종합 문단만 16px (2026-10-12 사용자: "이것만 16포인트")   # 18px · 행간 33 은 바깥에서 물려받는다
+    return dk.cards(f'<div style="background:{dk.EMPH_BG};border:1px solid {dk.EMPH_BD};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px {dk.EMPH_PAD - (LEAD_SUB_VP if lines else dk.VP_EMPH)}px;margin:0 0 8px;line-height:{dk.LH_EMPH};">{inner}</div>')   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
 
 
 def sec_regime(analysis, report):
@@ -240,11 +244,11 @@ def sec_regime(analysis, report):
         return dk.muted("오늘은 시장 상태 점수를 계산하지 못했습니다.") + comment
     light = regime.get("light") or "🟡"
     grade = dk.ko(regime.get("label") or "", TERM_KO)
-    explain = [("점수", "추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수의 합(0~100)입니다. 높을수록 주식에 우호적인 환경")]
-    if GRADE_MEANING.get(grade):
-        explain.append((grade, GRADE_MEANING[grade]))
-    score_card = dk.state_card("점수", LIGHT_KIND.get(light, "neutral"),   # 따로 카드 + 설명, 배경은 등급 라벨 색 (2026-10-12 사용자)
-                               f'{int(regime["score"])} <span style="color:{dk.SUB};font-weight:400;">/ 100</span> ' + _light_pill(light, grade), items=explain)
+    # 점수 · 등급 설명은 본문 글머리표가 아니라 "점수" 옆 ? 툴팁 (2026-10-12 사용자: "점수 위험 선호 내용은 툴팁으로 제공하고 본문에서 삭제")
+    explain = ("추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수의 합(0~100)입니다. 높을수록 주식에 우호적인 환경입니다.\n"
+               + "\n".join(f"· {g} = {m}" for g, m in GRADE_MEANING.items()))
+    score_card = dk.state_card("점수" + dk.tip(explain), LIGHT_KIND.get(light, "neutral"),   # 따로 카드, 배경은 등급 라벨 색 (2026-10-12 사용자)
+                               f'<span style="font-size:{SCORE_SIZE};">{int(regime["score"])} <span style="color:{dk.SUB};">/ 100</span></span> ' + _light_pill(light, grade))   # 86 / 100 은 20px 굵게 (2026-10-12 사용자)
     rows = []
     if regime.get("score_prev") is not None:
         rows.append(("어제 대비", dk.arrow(regime.get("delta") or 0, 0, ""), _esc(f"어제 {regime['score_prev']}점")))
@@ -316,7 +320,7 @@ def sec_change(analysis, report):
     streak = rs.get("qqq_streak")
     if streak is not None:
         rows.append(("나스닥이 S&P 500을 웃돈 연속 일수", f"{int(streak)}일", ""))
-    out = _text(report.get("change_comment")) + dk.sub_label("상대강도") + dk.ccard(rows)   # 해설 먼저 (2026-10-12 사용자)
+    out = _text(report.get("change_comment")) + dk.sub_label("상대강도") + dk.ccard(rows)   # 구분선 위아래 22 (콘텐츠 카드 일괄, 2026-10-12 사용자)
     trows = []
     for key in ("sp500", "nasdaq", "russell"):
         s = series.get(INDEX_SYMBOL[key]) or {}
@@ -393,8 +397,8 @@ def sec_sectors(analysis, report):
     by_etf = {r["etf"]: r for r in ranked}
     names = lambda etfs: " · ".join(_esc(by_etf[e]["theme"]) for e in etfs if e in by_etf)  # noqa: E731
     sectors = analysis["sectors"]
-    lis = "".join(dk.dot_li(f"<b>{k}</b> : {v}", size=3) for k, v in (("주도", names(sectors.get("leaders") or []) or "—"), ("약세", names(sectors.get("laggards") or []) or "—")))
-    lead = dk.dcard(f"<ul style='margin:0;padding:0;list-style:none;font-size:{dk.SMALL};'>{lis}</ul>", "positive")   # 강조 카드 (2026-10-12 사용자)   # 긴 이름 나열은 값 칸이 아니라 라벨 글머리표로 (가이드라인 3-3)
+    lis = "".join(dk.dot_li(f"<b>{k}</b> : {v}", size=3, lh=dk.LH_EMPH) for k, v in (("주도", names(sectors.get("leaders") or []) or "—"), ("약세", names(sectors.get("laggards") or []) or "—")))
+    lead = dk.dcard(f"<ul style='margin:-3px 0;padding:0;list-style:none;font-size:{dk.SMALL};'>{lis}</ul>", "positive")   # 강조 카드 (2026-10-12 사용자)   # 긴 이름 나열은 값 칸이 아니라 라벨 글머리표로 (가이드라인 3-3)
     return _text(report.get("sector_comment")) + lead + _folded(rows, "섹터")
 
 
