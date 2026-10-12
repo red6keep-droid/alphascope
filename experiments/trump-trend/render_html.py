@@ -83,12 +83,7 @@ def sec_trends(a):
         rows.append((name, f"{t['score']:.0f}점", _esc(f"7일 이벤트 {t['events_7d']} (직전 {t['events_prev_7d']}) · 평균 강도 {t['avg_intensity']:.1f}")))
     if not rows:
         return dk.muted("최근 7일 이벤트가 없어 점수를 내지 않습니다.")
-    out = dk.ccard(rows, emph=True) + dk.guide_card("읽는 법", [   # 강조 카드 배경 · 읽는 법 카드는 카드 아래 (2026-10-11 사용자). 용어 툴팁은 제목 오른쪽 — build_body
-        ("기간", "최근 7일. 세부 주제마다 한 줄 — 예를 들어 에너지 / 경유"),
-        ("순서", "점수 순 — 직전 7일보다 늘어난 정도·강도·최근성·새로움을 합친 상대 점수라 갑자기 많아진 주제가 위로 옵니다"),
-        ("보조 줄", "7일 이벤트 수 (그 앞 7일 수) · 평균 강도. 용어는 제목 옆 ? 에서 자세히"),
-        ("30일 흐름과 차이", "30일 흐름은 큰 주제별로 한 달 동안 몇 건이었는지를 많은 순으로 봅니다. 급상승 주제는 최근 1주 안에 갑자기 늘어난 세부 주제를 찾습니다"),
-    ])
+    out = dk.ccard(rows, emph=True)   # 읽는 법 · 용어는 제목 오른쪽 툴팁 둘 (2026-10-12 사용자: "읽는 법과 나머지를 통합해서 2개만 툴팁으로") — build_body
     ne = a["new_entrants"]
     if ne["target"] or ne["symbol"]:
         out += dk.guide("처음 등장", "직전 90일 없이 7일 안에 처음 나온 대상 — " + ", ".join(ne["target"] + ne["symbol"]))
@@ -111,7 +106,14 @@ def _trend_tips():
              "이벤트 강도는 묶인 게시물 가운데 가장 높은 값입니다.\n"
              "· 1~2 = 지나가는 언급\n· 3~4 = 의견·평가\n· 5~6 = 구체적 조치 없는 강한 주장·위협\n"
              "· 7~8 = 정책 경고 또는 구체적 조치 언급\n· 9 = 정책 발표 예고\n· 10 = 즉시 시행 정책·행정명령 발표")
-    return [("점수", score), ("7일 이벤트", events), ("평균 강도", inten)]
+    read = dk.read_text([
+        ("기간", "최근 7일. 세부 주제마다 한 줄 — 예를 들어 에너지 / 경유"),
+        ("순서", "점수 순 — 직전 7일보다 늘어난 정도 · 강도 · 최근성 · 새로움을 합친 상대 점수라 갑자기 많아진 주제가 위로 옵니다"),
+        ("보조 줄", "7일 이벤트 수 (그 앞 7일 수) · 평균 강도. 뜻은 옆의 용어 ? 에서"),
+        ("30일 흐름과 차이", "30일 흐름은 큰 주제별로 한 달 동안 몇 건이었는지를 많은 순으로 봅니다. 급상승 주제는 최근 1주 안에 갑자기 늘어난 세부 주제를 찾습니다"),
+    ])
+    terms = f"점수 : {score}\n7일 이벤트 : {events}\n평균 강도 : {inten}"   # 점수 · 7일 이벤트 · 평균 강도를 한 툴팁으로
+    return [("읽는 법", read), ("용어", terms)]
 
 
 FLOW_FLAT_PCT = 10   # 직전 30일 대비 전체 건수 변화가 이 % 미만이면 "비슷함"
@@ -186,7 +188,7 @@ def sec_windows(a):
                          + ("" if blk.get("compare_to_previous") else " — 아직 직전 30일 데이터가 없어 표시하지 않습니다")),
         ("급상승 주제와 차이", "30일 흐름은 큰 주제(무역·연준 등)별로 한 달 동안 꾸준히 얼마나 말했는지, 급상승 주제는 최근 7일 세부 주제 가운데 갑자기 늘어난 것을 봅니다"),
     ]
-    return _flow_card(blk) + dk.ccard(rows) + dk.guide_card("읽는 법", items)   # 요약 강조 카드는 맨 위 (2026-10-11 사용자)   # 기준(최근 30일)은 읽는 법 카드 안으로 (2026-10-11 사용자: 건수·차이를 안내 글에 자세히)
+    return _flow_card(blk) + dk.sub_label("주제별 30일", dk.read_text(items)) + dk.ccard(rows)   # 읽는 법은 소제목 옆 ? (2026-10-12 사용자)   # 요약 강조 카드는 맨 위 (2026-10-11 사용자)   # 기준(최근 30일)은 읽는 법 카드 안으로 (2026-10-11 사용자: 건수·차이를 안내 글에 자세히)
 
 
 def _x(v):
@@ -224,7 +226,7 @@ ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" ar
             'stroke-linecap="round" stroke-linejoin="round" style="flex:none;transition:transform .15s;"><path d="M4 6l4 4 4-4"/></svg>')
 
 
-def _chart_card(rows, horizon):
+def _chart_card(rows, horizon, read=""):   # read = 그래프 읽는 법 — 제목 줄 오른쪽 `읽는 법 ?` (2026-10-12 사용자)
     """결론 카드 — 엔비디아 상태 카드(시장 국면) 형식 (2026-10-11 사용자: "배치·컬러·스타일 참고, 회색 배경 / 강조 컬러 배경").
     첫 줄 왼쪽 `자산 n개`(굵게) · 오른쪽 상태(굵게: 모두 범위 안 = 회색 / k개 범위 밖 = 주황), 얇은 선 아래 3px 점 글머리표 16px 검정,
     맨 아래 ⓘ 주의(5일). 배경: 남은 반응 없음 = 회색 #F8FAFC, 있음 = 강조 오렌지 #FFF7ED."""
@@ -256,26 +258,27 @@ def _chart_card(rows, horizon):
         head = f'<b>{_esc(t)}</b> : ' if t else ""   # 라벨 글머리표 "**라벨** : 내용", 증감 색 (가이드라인 3-3, 2026-10-11 사용자)
         return dk.dot_li(head + dk.tint(_esc(x)), size=3, lh=dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32
     lis = "".join(li(t, x) for t, x in items)
-    note = ""   # 주의는 읽는 법 카드 안으로 (_read_card) — 2026-10-11 사용자
+    note = ""   # 주의는 제목 줄의 읽는 법 툴팁 안 (_read_text) — 2026-10-12 사용자
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px;margin:8px 0;line-height:{dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-            f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">시장의 반응 : <span style="color:{color};">{_esc(state)}</span></span></span> '   # "시장의 반응: 평소와 같음" (2026-10-11 사용자). 자산 수는 설명 문장에
+            f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">시장의 반응 : <span style="color:{color};">{_esc(state)}</span></span>'
+            f'{dk.tip_label("읽는 법", read) if read else ""}</span> '   # "시장의 반응: 평소와 같음" (2026-10-11 사용자). 자산 수는 설명 문장에
             f'<div style="margin-top:{14 - dk.VP_EMPH}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
 
 
-def _read_card(horizon):
-    """그래프 읽는 법 — 그래프 바로 아래 별도 카드 (dk.guide_card)."""
+def _read_text(horizon):
+    """그래프 읽는 법 — 결론 카드 제목 줄 오른쪽 `읽는 법 ?` 툴팁 글 (2026-10-12 사용자: 읽는 법 카드 대신 제목 옆 툴팁)."""
     span = "당일" if horizon == "close" else "5거래일 동안"
     notes = [("주의", "5일 구간은 창이 겹쳐 실제보다 강해 보일 수 있고, 원인을 뜻하지 않습니다")] if horizon == "d5" else []
-    return dk.guide_card("읽는 법", [("막대", f"발언 뒤 {span} S&P 500 대비 평균"),
-                                    ("회색 띠", "발언이 없던 날에도 100번 중 95번은 이 안에 드는 범위 — 막대가 띠 안이면 평소와 같은 움직임"),
-                                    ("진한 막대", "띠 밖으로 나갔고, 여러 자산을 함께 따져도 우연으로 보기 어려운 움직임")], notes)
+    return dk.read_text([("막대", f"발언 뒤 {span} S&P 500 대비 평균"),
+                         ("회색 띠", "발언이 없던 날에도 100번 중 95번은 이 안에 드는 범위 — 막대가 띠 안이면 평소와 같은 움직임"),
+                         ("진한 막대", "띠 밖으로 나갔고, 여러 자산을 함께 따져도 우연으로 보기 어려운 움직임")], notes)
 
 
-def _table_fold(inner_html):
-    """표 접기 — '표 보기' 버튼을 누르면 펼친다 (details data-acc, 테마 CSS가 화살표를 돌린다)."""
-    return (f'<details data-acc="1" style="margin:4px 0 8px;"><summary style="{dk.FOLD_BTN}">표 보기 {ACC_CHEV}</summary>'
+def _table_fold(inner_html, read=""):
+    """표 접기 — '표 보기' 버튼을 누르면 펼친다 (details data-acc, 테마 CSS가 화살표를 돌린다). read = 표 읽는 법 툴팁 글 — 버튼 글자 옆 ? (2026-10-12 사용자)."""
+    return (f'<details data-acc="1" style="margin:4px 0 8px;"><summary style="{dk.FOLD_BTN}">표 보기{dk.tip(read) if read else ""} {ACC_CHEV}</summary>'
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 
@@ -305,12 +308,12 @@ def _table_rows(blk):
 
 
 def _table_legend(noise_p):
-    return (dk.guide_card("읽는 법", [("수치", f"{config.BENCHMARK} 대비 초과 반응(%) — {config.BENCHMARK} 행만 원수익률"),
-                                ("즉각", "장외 발언은 다음 개장 갭, 정규장 발언은 시가→종가"),
-                                ("변동폭·거래량", f"직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수, 1.00× = 보통"),
-                                ("p", f"발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않음"),
-                                ("q", f"자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값 — {noise_p:.2f} 미만(굵게)만 보정 뒤에 남는 값")],
-                            [("주의", "+5일은 창이 겹친 관측이고, 모두 발언 뒤 관찰된 값이라 인과가 아닙니다")]))
+    return dk.read_text([("수치", f"{config.BENCHMARK} 대비 초과 반응(%) — {config.BENCHMARK} 행만 원수익률"),
+                         ("즉각", "장외 발언은 다음 개장 갭, 정규장 발언은 시가 → 종가"),
+                         ("변동폭 · 거래량", f"직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수, 1.00× = 보통"),
+                         ("p", f"발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않음"),
+                         ("q", f"자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값 — {noise_p:.2f} 미만(굵게)만 보정 뒤에 남는 값")],
+                        [("주의", "+5일은 창이 겹친 관측이고, 모두 발언 뒤 관찰된 값이라 인과가 아닙니다")])
 
 
 def _group_panel(blk, gkey, charts, noise_p):
@@ -331,13 +334,13 @@ def _group_panel(blk, gkey, charts, noise_p):
             img = (f'<a href="{_esc(info["url"])}" target="_blank" rel="noopener" title="그래프 확대 보기" style="display:block;max-width:720px;">'
                    f'<img src="{_esc(info["url"])}" alt="{_esc(_k(gkey.split("#")[0]))} {HORIZON_KO[h]} 반응 그래프" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/></a>')
         hz_html += (f'<div data-hz-panel="{h}"><div data-hz-label="1" style="font-size:{dk.SMALL};line-height:{dk.LH_CARD};font-weight:700;color:#111;margin:8px 0 4px;">{HORIZON_KO[h]}</div>'
-                    + _chart_card(rows, h) + img + (_read_card(h) if img else "") + "</div>")
+                    + _chart_card(rows, h, _read_text(h) if img else "") + img + "</div>")
     rows = _table_rows(blk)
     if not rows:
         return dk.muted(f"표본 축적 중 — 관측일 {c['clean']}일 / 필요 {config.MIN_CLEAN_N}일. 쌓이면 그래프가 나옵니다.")
     ik = c.get("immediate_kinds", {})
     table = _table_fold(dk.muted(f"과거 관측일 {c['clean']}일 · 이벤트 {c['total']} · 거시 발표 겹침 제외 {c['confounded']} · 장외 {ik.get('gap', 0)} / 정규장 {ik.get('intraday', 0)} · 검정 {c.get('tests', 0)}개")
-                        + dk.table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows) + _table_legend(noise_p))
+                        + dk.table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows), _table_legend(noise_p))
     return hz_html + table
 
 

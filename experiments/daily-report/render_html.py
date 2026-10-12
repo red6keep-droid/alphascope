@@ -314,13 +314,17 @@ def sec_change(analysis, report):
     position = analysis.get("position") or {}
     rs = analysis.get("rs") or {}
     vix = analysis.get("vix") or {}
-    rows = [("성장주 − 시장 (나스닥 − S&P 500 · 5일)", dk.arrow(rs.get("qqq_spy_5d"), 2, "%p"), ""),   # 뜻 풀이는 읽는 법 카드로 (가이드라인 3-3)
-            ("소형주 − 시장 (러셀 2000 − S&P 500 · 5일)", dk.arrow(rs.get("iwm_spy_5d"), 2, "%p"), ""),
-            ("동일가중 − 시총가중 (RSP − SPY · 5일)", dk.arrow(rs.get("rsp_spy_5d"), 2, "%p"), "")]
+    # 읽는 법은 카드가 아니라 그 내용의 제목(소제목 · 구분명) 옆 ? 툴팁 — 7번째 값 (2026-10-12 사용자: "해당 내용만 툴팁으로 타이틀 옆에")
+    rows = [("성장주 − 시장 (나스닥 − S&P 500 · 5일)", dk.arrow(rs.get("qqq_spy_5d"), 2, "%p"), "", None, False, False,
+             "양수면 나스닥(성장주)이 S&P 500보다 강했습니다"),
+            ("소형주 − 시장 (러셀 2000 − S&P 500 · 5일)", dk.arrow(rs.get("iwm_spy_5d"), 2, "%p"), "", None, False, False,
+             "양수면 러셀 2000(소형주)이 S&P 500보다 강했습니다 — 위험을 감수하는 쪽으로 돈이 움직일 때 흔히 나타납니다"),
+            ("동일가중 − 시총가중 (RSP − SPY · 5일)", dk.arrow(rs.get("rsp_spy_5d"), 2, "%p"), "", None, False, False,
+             "양수면 종목을 똑같이 담은 지수(RSP)가 더 올랐습니다 — 상승이 소수 대형주가 아니라 넓게 퍼졌다는 뜻")]
     streak = rs.get("qqq_streak")
     if streak is not None:
         rows.append(("나스닥이 S&P 500을 웃돈 연속 일수", f"{int(streak)}일", ""))
-    out = _text(report.get("change_comment")) + dk.sub_label("상대강도") + dk.ccard(rows)   # 구분선 위아래 22 (콘텐츠 카드 일괄, 2026-10-12 사용자)
+    out = _text(report.get("change_comment")) + dk.sub_label("상대강도", "두 지수의 5거래일 수익률 차이(%p). 양수면 앞쪽이 더 많이 올랐습니다") + dk.ccard(rows)   # 구분선 위아래 22 (콘텐츠 카드 일괄, 2026-10-12 사용자)
     trows = []
     for key in ("sp500", "nasdaq", "russell"):
         s = series.get(INDEX_SYMBOL[key]) or {}
@@ -331,16 +335,9 @@ def sec_change(analysis, report):
         if p.get("from_high_pct") is not None:
             sub.append(f"20일 고점 대비 {p['from_high_pct']:+.2f}% · 저점 대비 {p['from_low_pct']:+.2f}%")
         trows.append((_esc(INDEX_LABELS[key]), _pos(p.get("position_label")) or "—", _esc(" · ".join(sub))))
-    out += dk.sub_label("20일 위치") + dk.ccard(trows)
+    out += dk.sub_label("20일 위치", "최근 20거래일의 고점 · 저점 사이에서 지금 어디에 있는지") + dk.ccard(trows)
     if vix.get("now") is not None and vix.get("prev_5d") is not None:
         out += dk.ccard([("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → <b>{vix["now"]:.2f}</b> {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}', "", 35, True)])   # 값 한 줄 (2026-10-12 사용자)
-    out += dk.guide_card("읽는 법", [
-        ("상대강도", "두 지수의 5거래일 수익률 차이(%p). 양수면 앞쪽이 더 많이 올랐습니다"),
-        ("성장주 − 시장", "양수면 나스닥(성장주)이 S&P 500보다 강했습니다"),
-        ("소형주 − 시장", "양수면 러셀 2000(소형주)이 S&P 500보다 강했습니다 — 위험을 감수하는 쪽으로 돈이 움직일 때 흔히 나타납니다"),
-        ("동일가중 − 시총가중", "양수면 종목을 똑같이 담은 지수(RSP)가 더 올랐습니다 — 상승이 소수 대형주가 아니라 넓게 퍼졌다는 뜻"),
-        ("20일 위치", "최근 20거래일의 고점·저점 사이에서 지금 어디에 있는지"),
-    ])
     return out
 
 
@@ -371,12 +368,11 @@ def sec_breadth(analysis):
         rows.append(("섹터 ETF", _up_down(b.get("sectors_up"), b.get("sectors_down")),
                      f"{b.get('sectors_counted')}개 기준"))   # 폰에서도 구분명 │ 보조 줄 한 줄 (2026-10-12 사용자) — 상승·하락은 ▲▼ 가 말한다
     if b.get("rsp_spy_1d") is not None:
-        rows.append(("동일가중 − 시총가중 (1일)", dk.arrow(b["rsp_spy_1d"], 2, "%p"), ""))
+        rows.append(("동일가중 − 시총가중 (1일)", dk.arrow(b["rsp_spy_1d"], 2, "%p"), "", None, False, False,
+                     "양수면 상승이 소수 대형주에 몰리지 않고 넓게 퍼졌습니다"))   # 읽는 법은 구분명 옆 ? (2026-10-12 사용자)
         if b.get("rsp_spy_5d") is not None:
             rows.append(("동일가중 − 시총가중 (5일)", dk.arrow(b["rsp_spy_5d"], 2, "%p"), ""))
-    return ratio_card + dk.ccard(rows) + dk.guide_card("읽는 법", [   # 상승 비율 설명은 상태 카드로 옮김
-        ("동일가중 − 시총가중", "양수면 상승이 소수 대형주에 몰리지 않고 넓게 퍼졌습니다"),
-    ])
+    return ratio_card + dk.ccard(rows)
 
 
 def sec_sectors(analysis, report):

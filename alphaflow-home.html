@@ -1872,7 +1872,12 @@ body.menu-open { overflow: hidden; }
         var dot = document.createElement('span'); dot.className = 'rt-pop-dot';
         var t = document.createElement('span'); t.textContent = m[1];
         row.appendChild(dot); row.appendChild(t);
-      } else { row.className = 'rt-pop-p'; row.textContent = line; }
+      } else {
+        row.className = 'rt-pop-p';
+        var lm = /^\s*([^·:=]{1,14}?) : (.*)$/.exec(line);   /* "용어 : 설명" — 용어는 굵게, 앞 항목과 12px 띄움 (2026-10-12) */
+        if (lm) { row.className += ' has-label'; var b = document.createElement('b'); b.textContent = lm[1]; row.appendChild(b); row.appendChild(document.createTextNode(' : ' + lm[2])); }
+        else row.textContent = line;
+      }
       body.appendChild(row);
     });
   }

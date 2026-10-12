@@ -195,6 +195,8 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; }   /* 글머리표 사이 +6 (2026-10-12 사용자) */
 .rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
 .rt-pop-li > span:last-child { min-width: 0; }
+.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
+.rt-pop-p b { color: #111; }
 .rt-pop-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 20px; line-height: 28px; cursor: pointer; }
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }

@@ -245,6 +245,17 @@ def tip(text):
             f'style="color:{NOTE};cursor:help;vertical-align:middle;margin-left:2px;">{QUESTION_ICON}</span>')
 
 
+def read_text(items, notes=()):
+    """읽는 법 툴팁 글 — 항목은 `· 이름 = 내용` 줄(팝업이 글머리표로 그린다), notes 는 `제목 : 내용` 줄. 읽는 법 카드를 대신한다 (2026-10-12 사용자)."""
+    lines = [f"· {k} = {v}" if isinstance(k, str) and v is not None else f"· {k}" for k, v in ((it if isinstance(it, tuple) else (it, None)) for it in items)]
+    return "\n".join(lines + [f"{t} : {x}" for t, x in notes])
+
+
+def tip_label(label, text):
+    """제목 옆 `읽는 법 ?` — 14px 안내 회색 글자 + ? 툴팁 (팝업 제목은 이 글자). 읽는 법은 카드가 아니라 그 내용의 제목 옆 툴팁 (2026-10-12 사용자)."""
+    return f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};white-space:nowrap;margin-left:6px;">{esc(label)}{tip(text)}</span>'
+
+
 def tip_line(items, in_title=False):
     """용어 툴팁 줄 — "용어ⓘ · 용어ⓘ". 14px 안내 회색. items = [(용어, 설명)]. 줄이 position:relative 라 상자가 줄 폭 안에 뜬다."""
     inner = ' <span style="color:#CBD5E1;">·</span> '.join(f'<span style="white-space:nowrap;">{esc(k)}{tip(v)}</span>' for k, v in items)
@@ -480,10 +491,13 @@ def fits_inline(name_html, sub, left_pct=65, name_px=16):
     return need <= INLINE_ROOM * left_pct / 100 - 4
 
 
-def crow_left(name_html, sub="", left_pct=65, block=False, name_size=None):
+def crow_left(name_html, sub="", left_pct=65, block=False, name_size=None, tip_text=None):
     """C 카드 왼쪽 칸 안: 구분명(굵게) │ 보조 줄(14px #7A7A7A) 한 줄로 (2026-10-12 사용자: "구분선 넣고 한 줄로 표기 가능한 것은 모두").
     넘치면 · 에서 다음 줄로 이어진다. 엔비디아 렌더러도 이것을 쓴다."""
     ns = name_size or NAME
+    t = tip(tip_text) if tip_text else ""   # 구분명 옆 ? — 그 줄의 읽는 법 (2026-10-12 사용자)
+    if t:
+        return _crow_left_tip(name_html, sub, left_pct, block, ns, t)
     if not sub:
         return f'<span style="font-weight:700;color:#111;font-size:{ns};">{paren(name_html)}</span>'
     if block or not fits_inline(name_html, sub, left_pct, int(ns[:-2])):   # 한 줄에 못 들어가면(또는 block) 이름 아래 블록
@@ -493,10 +507,19 @@ def crow_left(name_html, sub="", left_pct=65, block=False, name_size=None):
             f'<span style="color:{SUB};font-weight:400;font-size:{TINY};line-height:{LH_TINY};">{sub_line(sub, lead=VSEP)}</span>')
 
 
+def _crow_left_tip(name_html, sub, left_pct, block, ns, t):
+    name = f'<span><span style="font-weight:700;color:#111;font-size:{ns};">{paren(name_html)}</span>{t}</span>'   # 한 span 으로 묶어 팝업 제목 = 구분명
+    if not sub:
+        return name
+    if block or not fits_inline(name_html + "??", sub, left_pct, int(ns[:-2])):
+        return name + f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};line-height:{LH_TINY};">{sub_line(sub)}</span>'
+    return name + f'<span style="color:{SUB};font-weight:400;font-size:{TINY};line-height:{LH_TINY};">{sub_line(sub, lead=VSEP)}</span>'
+
+
 VSEP = '<span style="display:inline-block;width:1px;height:14px;background:#E2E8F0;margin:0 8px;vertical-align:-1px;"></span>'
 
 
-def crow(name_html, value_html, sub="", first=False, left=None, short=False, nowrap=False, sub_below=False, sub_block=False, name_size=None):
+def crow(name_html, value_html, sub="", first=False, left=None, short=False, nowrap=False, sub_below=False, sub_block=False, name_size=None, tip_text=None):
     """C 카드 한 줄: 왼쪽 구분명 │ 보조 줄, 오른쪽 값. name_html 은 이스케이프된 HTML.
     left = 왼쪽 칸 % (카드별 예외, 가이드라인 2-1 — 2026-10-12 사용자). nowrap = 값을 한 줄로.
     sub_below = 보조 줄을 구분명 옆이 아니라 줄 아래 카드 폭 전체 한 줄로 (옆에 들어가지 않을 때, 2026-10-12 사용자).
@@ -507,7 +530,7 @@ def crow(name_html, value_html, sub="", first=False, left=None, short=False, now
              if sub and sub_below else "")
     row_st = MULTI_ROW + ("flex-wrap:wrap;row-gap:0;" if below else "")
     return (f'<span style="{row_st}{"" if first else MULTI_SEP}">'
-            f'<span style="display:block;line-height:{LH_CARD};{col_l}">{crow_left(name_html, "" if below else sub, left or (80 if short else 65), block=sub_block, name_size=name_size)}</span> '
+            f'<span style="display:block;line-height:{LH_CARD};{col_l}">{crow_left(name_html, "" if below else sub, left or (80 if short else 65), block=sub_block, name_size=name_size, tip_text=tip_text)}</span> '
             f'<span style="{col_r}font-weight:700;">{value_html}</span>{below}</span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 짧으면 80 · 20, left 가 있으면 그 값
 
 
@@ -519,7 +542,8 @@ def ccard(rows, left=None, attrs="", emph=False, pad=None):
     short = short_values(rows)   # 값이 모두 5자 미만 → 왼쪽 80% (2026-10-11 사용자)
     # 줄 튜플 4번째 값 = 그 줄의 왼쪽 % (예: 시장 상태 막대 줄 30), 없으면 카드의 left (2026-10-12 사용자)
     inner = "".join(crow(r[0], r[1], r[2], first=(i == 0), short=short, left=(r[3] if len(r) > 3 else left), nowrap=bool(len(r) > 4 and r[4]),
-                         sub_below=bool(len(r) > 5 and r[5]), name_size=EMPH_NAME if emph else None)   # 강조 카드는 왼쪽 18px (2026-10-12 사용자)
+                         sub_below=bool(len(r) > 5 and r[5]), name_size=EMPH_NAME if emph else None,
+                         tip_text=(r[6] if len(r) > 6 else None))   # 7번째 값 = 구분명 옆 ? 툴팁 (읽는 법, 2026-10-12 사용자)   # 강조 카드는 왼쪽 18px (2026-10-12 사용자)
                     for i, r in enumerate(rows))
     if pad is not None:   # 카드별 줄 위아래 보이는 여백 (예: 데일리 상대강도 20px — 2026-10-12 사용자)
         inner = inner.replace(f"padding:{SEP_GAP - VP - 1}px 12px;", f"padding:{pad - VP}px 12px;")
@@ -588,8 +612,10 @@ def fold(label, inner_html):
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 
-def sub_label(t):
-    return f'<div data-sub="1" style="font-size:{SMALL};line-height:{LH_CARD};color:{NOTE};margin:10px 0 3px;">{paren(esc(t))}</div>'
+def sub_label(t, tip_text=None):
+    """소제목. tip_text 가 있으면 소제목 바로 옆 ? 툴팁 — 그 소제목 내용의 읽는 법 (2026-10-12 사용자)."""
+    t_html = paren(esc(t)) + (tip(tip_text) if tip_text else "")
+    return f'<div data-sub="1" style="position:relative;font-size:{SMALL};line-height:{LH_CARD};color:{NOTE};margin:10px 0 3px;">{t_html}</div>'
 
 
 BAR_LABEL = "16px"   # F 막대 라벨 — `오늘 15건 … 긍정 67% · 부정 20% · 중립 13%` 가 폰 한 줄에 들도록 (2026-10-12)
