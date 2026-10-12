@@ -289,7 +289,7 @@ def sec_headline(a):
     tone = ROW_UP if r > 0 else ROW_DOWN if r < 0 else ""
     rows = _row("NVDA", f'<span style="color:{pcol};font-weight:700;">${h["close"]:,.2f}</span> {_arrow(h.get("ret_1d"))}', tone)   # A타입
     # 비교 4개는 따로 한 카드, 2열 + 세로 구분선 (E타입, 2026-10-11 사용자)
-    rows += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p"), tk) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])
+    rows += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p")) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])   # 비교 4종 앞 로고는 두지 않는다 (2026-10-13 사용자)
     items = []
     pc = {c["key"]: c for c in (a["status"].get("price") or [])}   # 상태판 가격·거래량 중 머리 카드에 없던 칸 (2026-10-11 사용자: 오늘로 모으고 기술지표에서 삭제)
     items.append(("시가 갭", _arrow((pc.get("gap") or {}).get("value"), 2)))
