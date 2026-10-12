@@ -289,7 +289,7 @@ def sec_headline(a):
     tone = ROW_UP if r > 0 else ROW_DOWN if r < 0 else ""
     rows = _row("NVDA", f'<span style="color:{pcol};font-weight:700;">${h["close"]:,.2f}</span> {_arrow(h.get("ret_1d"))}', tone)   # A타입
     # 비교 4개는 따로 한 카드, 2열 + 세로 구분선 (E타입, 2026-10-11 사용자)
-    rows += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p")) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])
+    rows += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p"), tk) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])
     items = []
     pc = {c["key"]: c for c in (a["status"].get("price") or [])}   # 상태판 가격·거래량 중 머리 카드에 없던 칸 (2026-10-11 사용자: 오늘로 모으고 기술지표에서 삭제)
     items.append(("시가 갭", _arrow((pc.get("gap") or {}).get("value"), 2)))
@@ -576,7 +576,7 @@ def sec_direction_bars(a):
     if not sum(today.values()) and not sum(week.values()):
         return ""
     # 두 막대 묶음 사이 보이는 24px (2026-10-12 사용자) — 앞 묶음 비율 글자 → 다음 라벨 글자, 행간 반쪽 3 + 3 을 뺀 값
-    return (f'<div data-cards="1" style="margin:0 0 8px;">{_ratio_bar("오늘", today)}'
+    return (f'<div data-cards="1" style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{14 - 3}px 12px {14 - 3 - 10}px;">{_ratio_bar("오늘", today)}'   # 두 막대를 카드 하나에 (2026-10-13 사용자)
             f'<span style="display:block;height:{BAR_GROUP_GAP - 5}px;"></span>{_ratio_bar("최근 7일", week)}</div>')
 
 
@@ -825,12 +825,15 @@ def sec_narrative(a, n):
         return _muted("오늘은 이벤트가 없어 해석을 생략합니다." if not a["events"] else "서술을 만들지 못했습니다 — 수치 섹션만 참고하세요.")
     areas = "|".join(re.escape(v) for v in rr.AREA_KO.values())
     lines = [re.sub(rf"^({areas})\s+(?!·)", r"\1 · ", t) for t in n["today"]]   # 영역 머리 뒤 구분점 보정
-    return _dk.dot_ul(_dot_li(_esc(t), size=3, lh=_dk.LH_BODY, margin=_dk.LI_MARGIN) for t in lines)   # 18px 글 → 3px 점 (2026-10-12 사용자)
+    lis = "".join(_dot_li(_esc(t), size=3, lh=_dk.LH_BODY, margin=_dk.LI_MARGIN) for t in lines)   # 18px 글 → 3px 점 (2026-10-12 사용자)
+    # 내용은 흰 카드 안 (2026-10-13 사용자: "중요 이슈의 내용 부분만 카드 디자인") — 보이는 위아래 14 = padding 14 − 행간 반쪽 7, 첫 · 끝 글머리표 margin 은 음수 margin 으로
+    return (f'<div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{14 - _dk.NEWS_VP}px 14px;margin:0 0 8px;line-height:{_dk.LH_BODY};">'
+            f"<ul style='margin:-12px 0;padding:0;list-style:none;'>{lis}</ul></div>")
 
 
 def sec_footer(a):
     ds = a["data_status"]
-    return (f'<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{_dk.GUIDE_IND}">'
+    return (f'<div data-footer="1" style="margin-top:3px;padding-top:2px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{_dk.GUIDE_IND}">'
             f"{INFO_ICON}데이터: yfinance(일봉·옵션·예상 실적·애널리스트·기관·공매도) · SEC 공시(임원 거래·수시·분기 보고) · FRED(거시 일정) · "
             f"NVIDIA 뉴스룸·블로그 · CNBC · Google News · 연방관보 · CourtListener · trump-trend. "
             f"분류 Gemini, 판정·계산 파이썬. 생성 {_esc(a['generated_at'])} (UTC) · 기준 거래일 {_esc(_d(a['day']))} · 일봉 마지막 {_esc(_d(ds['bars_last_day']) or '—')}.<br>"

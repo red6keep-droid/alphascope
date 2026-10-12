@@ -300,10 +300,7 @@ def sec_indices(indices, analysis, report):
         if label:
             sub.append(_pos(label))   # 고점·저점 굵게 + 증감 색
         rows.append((_esc(INDEX_LABELS.get(key, key)), value, " · ".join(sub)))
-    out = _text(report.get("summary")) + dk.ccard(rows[:INDEX_SHOWN], left=60)
-    if rows[INDEX_SHOWN:]:
-        out += dk.fold(f"지수 {len(rows) - INDEX_SHOWN}개 더 보기", dk.ccard(rows[INDEX_SHOWN:], left=60))
-    return out
+    return _text(report.get("summary")) + dk.ccard(rows, left=60, fold_at=INDEX_SHOWN, noun="지수")   # 펼침 버튼은 같은 카드 안 (2026-10-13 사용자)
 
 
 def sec_change(analysis, report):
@@ -389,7 +386,7 @@ def sec_sectors(analysis, report):
         sub = " · ".join(x for x in (r["etf"], sub) if x)   # ETF 코드는 보조 줄로 — 이름 칸을 짧게 해 막대 자리를 둔다
         bars.append((_esc(r["theme"]), abs(r["ret_1d"]) / max_abs, col, dk.arrow(r["ret_1d"]), _esc(sub)))
     w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])   # 접힌 줄까지 같은 폭 → 막대 길이 모두 같음
-    rows = [dk.bar_row(n, f, c, v, w, sb, first=(i == 0 or i == FOLD_SHOWN)) for i, (n, f, c, v, sb) in enumerate(bars)]
+    rows = [dk.bar_row(n, f, c, v, w, sb, first=(i == 0)) for i, (n, f, c, v, sb) in enumerate(bars)]
     by_etf = {r["etf"]: r for r in ranked}
     names = lambda etfs: " · ".join(_esc(by_etf[e]["theme"]) for e in etfs if e in by_etf)  # noqa: E731
     sectors = analysis["sectors"]
@@ -451,7 +448,7 @@ def sec_macro(macro, analysis, report):
         rows.append((label, _macro_value(rec, unit, chg_unit, mult), _esc(dk.day(rec.get("date", ""))) if rec else ""))
     if rates.get("growth_label"):
         rows.append(("금리와 성장주", _esc(rates["growth_label"]), ""))   # 따로 카드를 만들지 않고 같은 카드 안에 (가이드라인 2-1)
-    html_rows = [dk.crow(r[0], r[1], r[2], first=(i == 0 or i == FOLD_SHOWN), sub_below=bool(len(r) > 5 and r[5])) for i, r in enumerate(rows)]
+    html_rows = [dk.crow(r[0], r[1], r[2], first=(i == 0), sub_below=bool(len(r) > 5 and r[5])) for i, r in enumerate(rows)]
     return _text(report.get("macro_comment")) + _folded(html_rows, "지표")
 
 
@@ -463,7 +460,7 @@ def _folded(rows_html, noun):
     if len(rows_html) <= FOLD_SHOWN:
         return dk.card_of(rows_html)
     rest = rows_html[FOLD_SHOWN:]
-    return dk.card_of(rows_html[:FOLD_SHOWN]) + dk.fold(f"{noun} {len(rest)}개 더 보기", dk.card_of(rest))
+    return dk.card_of(rows_html, fold_at=FOLD_SHOWN, noun=noun)   # 펼침 버튼은 같은 카드 안 (2026-10-13 사용자)
 
 
 QUOTE_LEFT = 40   # 종목 칸 40% — 값 `$162.57 ▲ 1.25%` 이 한 줄에 들도록 (거래량은 종목 아래 줄)
@@ -474,7 +471,7 @@ def _quote_rows(quotes):
     rows = []
     for q in quotes or []:
         sym = q.get("symbol") or "-"
-        r = dk.crow(dk.ticker_logo(sym) + _esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', _esc(f"거래량 {_fmt_volume(q.get('volume'))}"), first=len(rows) in (0, FOLD_SHOWN),
+        r = dk.crow(dk.ticker_logo(sym) + _esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', _esc(f"거래량 {_fmt_volume(q.get('volume'))}"), first=len(rows) == 0,
                     left=QUOTE_LEFT, nowrap=True, sub_block=True)
         chg = q.get("change_pct")
         r = r.replace('<span style="', f'<span data-pick="1" data-sym="{_esc(sym)}" data-price="{_esc(_fmt_price(q.get("price")))}" data-chg="{"" if chg is None else f"{float(chg):+.2f}%"}" style="', 1)

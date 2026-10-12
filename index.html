@@ -313,7 +313,7 @@ body.menu-open { overflow: hidden; }
   box-shadow: 0 2px 14px rgba(15, 23, 42, .09);
 }
 /* 카드 머리: 어느 연재인지와 그 글의 날짜. 날짜는 피드에서 채운다. */
-.report-card-head { display: none; }   /* 이름은 카드 밖으로, 날짜는 홈 제목 옆 (2026-10-13 사용자) */
+.report-card-date { margin-left: auto; font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) */
 .report-block { display: flex; flex-direction: column; gap: 8px; }
 
 .badge {   /* 배경색이 있는 가이드 라벨(5절 긍정 · 부정 · 정상) — 14px, 볼드 없음 (2026-10-13 사용자) */
@@ -354,7 +354,7 @@ body.menu-open { overflow: hidden; }
    ========================================================================== */
 
 /* 지수 4개를 카드 하나에 줄로 — 이름 왼쪽 · 값(지수 숫자 21px 굵게 + 등락) 오른쪽, 줄 사이 구분선(위아래 22), S&P 500 · 나스닥만 보이고 나머지는 카드 안 더 보기 (2026-10-13 사용자) */
-.index-section { display: flex; flex-direction: column; }
+.index-section { display: flex; flex-direction: column; gap: 14px; }   /* 주요 지수 제목 추가 (2026-10-13 사용자) */
 .index-card { background: var(--surface); border: 1px solid #E2E8F0; border-radius: 8px; }
 .index-rows { display: flex; flex-direction: column; }
 .index-rows[hidden] { display: none; }
@@ -363,7 +363,7 @@ body.menu-open { overflow: hidden; }
 .index-name { font-weight: 700; font-size: 16px; line-height: 24px; color: #111; }
 .index-status { margin-left: 6px; font-weight: 400; font-size: 14px; color: #7A7A7A; }
 .index-value { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
-.index-price { font-family: var(--num); font-weight: 700; font-size: 21px; line-height: 27px; color: #111; font-variant-numeric: tabular-nums; }
+.index-price { font-family: var(--num); font-weight: 700; font-size: 18px; line-height: 24px;   /* 등락(16px)보다 한 단계 큰 18px (2026-10-13 사용자) */ color: #111; font-variant-numeric: tabular-nums; }
 .index-change { font-family: var(--num); font-weight: 700; font-size: 16px; line-height: 24px; font-variant-numeric: tabular-nums; }
 /* 카드 안 더 보기 줄 — 펼침 버튼 모양(14px 굵게, 화살표), 카드 아래 둥근 모서리 그대로 */
 .index-card .fold-btn { border: 0; border-top: 1px solid #E2E8F0; border-radius: 0 0 8px 8px; }
@@ -477,7 +477,10 @@ body.menu-open { overflow: hidden; }
   font-variant-numeric: tabular-nums;
 }
 .cell-price small { margin-left: 6px; font-weight: 600; font-size: 14px; }
-.rankings .fold-btn { margin-top: 8px; }
+.rank-card { overflow: hidden; border: 1px solid #E2E8F0; border-radius: 8px; }
+.rank-card .tabs { padding: 4px 8px 0; border-bottom: 1px solid #E2E8F0; overflow-x: auto; }
+.rank-card .table-wrap { overflow-x: auto; }
+.rank-card .fold-btn, .sector-card .fold-btn { border: 0; border-top: 1px solid #E2E8F0; border-radius: 0; }   /* 더 보기는 카드 안 맨 아래 줄 (2026-10-13 사용자) */
 .cell-change {
   font-family: var(--num);
   font-weight: 600;
@@ -498,7 +501,8 @@ body.menu-open { overflow: hidden; }
    ========================================================================== */
 
 .sector-section { display: flex; flex-direction: column; gap: 14px; }
-.sector-card { padding: 0 16px; }
+.sector-card { padding: 0; overflow: hidden; border: 1px solid #E2E8F0; border-radius: 8px; }
+.sector-card .sector-table { margin: 0 16px; width: calc(100% - 32px); }
 .sector-table { width: 100%; border-collapse: collapse; }
 .sector-table th { padding: 12px 4px 8px; font-weight: 500; font-size: 14px; line-height: 20px; color: var(--gray-400); text-align: right; border-bottom: 1px solid var(--border); }
 .sector-table th:first-child { width: 28px; }
@@ -661,7 +665,7 @@ body.menu-open { overflow: hidden; }
   /* 홈(대시보드)에서는 카드가 화면 가장자리에서 10px (2026-10-10 사용자). 글 보기는 20px 별도 규칙 */
   body:not(.item-view) .main-content { padding-left: 10px; padding-right: 10px; }
   .news-list { grid-template-columns: minmax(0, 1fr); }
-  .sector-card { padding: 0 12px; }
+  .sector-card .sector-table { margin: 0 12px; width: calc(100% - 24px); }
   .tabs { overflow-x: auto; }
   .tab { padding: 8px 12px 0; }
 }
@@ -757,6 +761,8 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   color: var(--ink);
 }
 .post-title a { color: inherit; }
+.post-title .title-logo { width: 32px; height: 32px; border-radius: 8px; margin-right: 10px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
+@media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } }
 /* 글 제목 끝의 " — 날짜"는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다 */
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
 /* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
@@ -786,14 +792,21 @@ body.item-view .post-outer-container { padding-top: 13px; }
 /* 아코디언 (리포트 details[data-acc]): 기본 삼각형 숨기고 화살표 아이콘을 펼치면 위로 (2026-10-11) */
 .post-body details[data-acc] > summary::-webkit-details-marker { display: none; }
 .post-body details[data-acc][open] > summary .acc-chev { transform: rotate(180deg); }
+/* 카드 안 펼침 (details[data-fold], 2026-10-13 사용자): 테마 JS가 펼친 줄을 버튼 위로 옮기고 글자를 '접기'로 — .is-open 이면 화살표 위로 */
+.post-body details[data-fold] > summary::-webkit-details-marker { display: none; }
+.post-body details[data-fold].is-open > summary .acc-chev { transform: rotate(180deg); }
+.post-body [data-fold-more][hidden] { display: none !important; }
 /* 툴팁 (리포트 [data-tip]) → 팝업창 (2026-10-12 사용자: "툴팁은 팝업창으로, 내용 18포인트"). ? 아이콘을 누르면(PC 클릭 · 폰 탭 · Enter) 화면 가운데 창이 뜬다.
    테마 JS가 .rt-pop 을 만든다. 닫기: × 버튼 · 바깥 누르기 · Esc. 줄바꿈(&#10;)은 창 안에서 줄을 바꾼다 */
 .post-body [data-tip] { outline: none; cursor: pointer; }
 .post-body [data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 50%; }
 .rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.45); }
 .rt-pop[hidden] { display: none; }
-.rt-pop-box { position: relative; width: 100%; max-width: 520px; max-height: 80vh; overflow-y: auto; padding: 20px 20px 22px; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
-.rt-pop-title { margin: 0 40px 12px 0; font-size: 18px; font-weight: 700; line-height: 24px; color: #111; }
+.rt-pop-box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+/* 팝업 제목 · 닫기는 위에 고정, 내용만 스크롤 (2026-10-13 사용자) */
+.rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; border-bottom: 1px solid #F1F5F9; }
+.rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
+.rt-pop-title { margin: 0; font-size: 18px; font-weight: 700; line-height: 24px; color: #111; }
 .rt-pop-body { font-size: 18px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
 /* 툴팁 내용 행간 = 본문 34px (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
 .rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; }   /* 글머리표 사이 +6 (2026-10-12 사용자) */
@@ -962,8 +975,11 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment { display: flex; gap: 12px; align-items: flex-start; }
 .comments .comment-replies .comment, .comments .comment .comment { padding-left: 0; }
 .comments .comment-replies { margin: 10px 0 0 48px; }
-/* 답글 · 삭제 버튼과 '답글' 글자는 두지 않는다 — 로그인 전에는 동작하지 않고, 테마가 로그인 여부를 알 수 없다. 댓글은 아래 댓글 쓰기 폼으로 (2026-10-13 사용자) */
-.comments .comment-actions, .comments .comment-replies > .thread-toggle, .comments .thread-chrome, .comments .comment-replybox-single, .comments .comment-replybox-thread, .comments .thread-expanded > .thread-toggle { display: none !important; }
+/* 답글 · 삭제 버튼과 '답글' 글자는 두지 않는다 — 로그인 전에는 동작하지 않고, 테마가 로그인 여부를 알 수 없다 (2026-10-13 사용자).
+   댓글 쓰기 폼이 옮겨 가는 자리(.comment-replybox-thread · single)는 숨기지 않는다 — 숨기면 첫 댓글 뒤 다시 쓸 수 없던 원인 (2026-10-13 사용자: "다시 댓글은 못 쓰는").
+   블로거 기본 CSS(b:css=false 라 없음)의 .hidden · .loaded 를 대신한다 — '더 보기'가 할 일이 없는데도 보이던 원인 */
+.comments .comment-actions .comment-reply, .comments .comment-actions .item-control, .comments .comment-replies > .thread-toggle, .comments .thread-chrome .thread-toggle { display: none !important; }
+.comments .hidden, .comments .loadmore.loaded, .comments [hidden] { display: none !important; }
 .comments .comment-replies { margin: 10px 0 0 24px; }
 .comments .avatar-image-container { flex: none; width: 36px; height: 36px; }
 .comments .avatar-image-container img { width: 36px; height: 36px; border-radius: 50%; display: block; }
@@ -986,6 +1002,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment-form p { margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #6B7280; }
 .comments iframe { width: 100%; border: 0; }
 .comments .comment-replybox-single, .comments .comment-replybox-thread { margin-top: 10px; }
+.comments .comment-replybox-single iframe, .comments .comment-replybox-thread iframe { display: block; width: 100%; min-height: 90px; }
 #comment-popup { display: none; }
 
 /* 레이아웃 모드에서만 보이는 보관용 위젯 */
@@ -1052,22 +1069,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
         <nav class='menu-items' id='primary-menu'>
           <a class='nav-item' expr:href='data:blog.homepageUrl'>
             <b:attr cond='data:view.isHomepage' name='aria-current' value='page'/>홈</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%8B%9C%EC%9E%A5&quot;'>
-            <b:attr cond='data:view.search.label == &quot;시장&quot;' name='aria-current' value='page'/>시장</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%84%B9%ED%84%B0&quot;'>
-            <b:attr cond='data:view.search.label == &quot;섹터&quot;' name='aria-current' value='page'/>섹터</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%A2%85%EB%AA%A9&quot;'>
-            <b:attr cond='data:view.search.label == &quot;종목&quot;' name='aria-current' value='page'/>종목</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EA%B1%B0%EC%8B%9C%EA%B2%BD%EC%A0%9C&quot;'>
-            <b:attr cond='data:view.search.label == &quot;거시경제&quot;' name='aria-current' value='page'/>거시경제</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%89%B4%EC%8A%A4&quot;'>
-            <b:attr cond='data:view.search.label == &quot;뉴스&quot;' name='aria-current' value='page'/>뉴스</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%9D%BC%EC%A0%95&quot;'>
-            <b:attr cond='data:view.search.label == &quot;일정&quot;' name='aria-current' value='page'/>일정</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EA%B4%80%EC%8B%AC%EC%A2%85%EB%AA%A9&quot;'>
-            <b:attr cond='data:view.search.label == &quot;관심종목&quot;' name='aria-current' value='page'/>관심종목</a>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91&quot;'>
+            <b:attr cond='data:view.search.label == &quot;데일리 브리핑&quot;' name='aria-current' value='page'/>미국 증시 리포트</a>
           <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C&quot;'>
-            <b:attr cond='data:view.search.label == &quot;트럼프 트렌드&quot;' name='aria-current' value='page'/>트럼프 트렌드</a>
+            <b:attr cond='data:view.search.label == &quot;트럼프 트렌드&quot;' name='aria-current' value='page'/>트럼프 SNS 트렌드</a>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84&quot;'>
+            <b:attr cond='data:view.search.label == &quot;엔비디아&quot;' name='aria-current' value='page'/>엔비디아 리포트</a>
         </nav>
       </div>
 
@@ -1123,29 +1130,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
              1. AI 데일리 브리핑
              ==================================================================== -->
         <section class='briefing' aria-labelledby='briefing-title'>
-          <div class='briefing-head'>
-            <div class='briefing-head-left'>
-              <h2 class='section-title' id='briefing-title'>
-                <svg viewBox='0 0 20 20' aria-hidden='true' fill='#0F172A'>
-                  <rect x='2' y='16' width='16' height='1.5' rx='.75'/>
-                  <rect x='3' y='11' width='3' height='5' rx='.5'/>
-                  <rect x='8.5' y='8' width='3' height='8' rx='.5'/>
-                  <rect x='14' y='4' width='3' height='12' rx='.5'/>
-                </svg>
-                미국 증시 데일리 브리핑
-                <span class='briefing-date' id='briefing-date'></span>
-              </h2>
-            </div>
-          </div>
-
+          <!-- 홈 맨 위 '미국 증시 데일리 브리핑 — 날짜' 줄은 두지 않는다 — 리포트 제목마다 발행 날짜 (2026-10-13 사용자) -->
           <div class='briefing-body'>
             <div class='briefing-main'>
               <!-- 연동 훅: 카드 전체가 그 리포트 글로 가는 링크다.
                    href · 날짜 · 본문 문구는 블로거 피드에서 채운다 (라벨별 최신 글 1건). -->
               <div class='report-col'>
-              <h3 class='report-title'><span class='report-icon' style='background:#E53E3E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='5' width='3' height='9' rx='.5'/><rect x='11' y='2' width='3' height='12' rx='.5'/></svg></span>미국 증시 리포트</h3>
+              <h3 class='report-title'><span class='report-icon' style='background:#E53E3E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='5' width='3' height='9' rx='.5'/><rect x='11' y='2' width='3' height='12' rx='.5'/></svg></span>미국 증시 리포트<span class='report-card-date' data-date='report-card'></span></h3>
               <a class='report-card' id='report-card' href='#'>
-                <div class='report-card-head'><span class='report-card-date' data-date='report-card'></span></div>
                 <div class='report-block' data-hook='summary'>
                   <span class='badge badge--summary'>오늘의 시장 요약</span>
                   <div class='report-columns'>
@@ -1163,9 +1155,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
               <!-- 트럼프 트렌드 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
               <div class='report-col'>
-              <h3 class='report-title'><span class='report-icon' style='background:#C2410C;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'><path d='M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z'/></svg></span>트럼프 SNS 트렌드</h3>
+              <h3 class='report-title'><span class='report-icon' style='background:#C2410C;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'><path d='M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z'/></svg></span>트럼프 SNS 트렌드<span class='report-card-date' data-date='trump-card'></span></h3>
               <a class='report-card' id='trump-card' href='/search/label/트럼프%20트렌드'>
-                <div class='report-card-head'><span class='report-card-date' data-date='trump-card'></span></div>
                 <div class='report-block' data-hook='speech'>
                   <span class='badge badge--speech'>오늘의 발언</span>
                   <div class='report-columns'>
@@ -1183,9 +1174,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
               <!-- 엔비디아 데일리 (2026-10-11). 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
               <div class='report-col'>
-              <h3 class='report-title'><span class='report-icon' style='background:#76B900;' aria-hidden='true'><img src='https://financialmodelingprep.com/image-stock/NVDA.png' alt='' onerror='this.hidden=true'/></span>엔비디아 리포트</h3>
+              <h3 class='report-title'><span class='report-icon' style='background:#76B900;' aria-hidden='true'><img src='https://financialmodelingprep.com/image-stock/NVDA.png' alt='' onerror='this.hidden=true'/></span>엔비디아 리포트<span class='report-card-date' data-date='nvda-card'></span></h3>
               <a class='report-card' id='nvda-card' href='/search/label/엔비디아'>
-                <div class='report-card-head'><span class='report-card-date' data-date='nvda-card'></span></div>
                 <div class='report-block' data-hook='nvda-headline'>
                   <span class='badge badge--nvda'>가격</span>
                   <div class='report-columns'>
@@ -1208,7 +1198,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
         <!-- ====================================================================
              2. 지수 카드  (data.json 의 indices 연동)
              ==================================================================== -->
-        <section class='index-section' aria-label='주요 지수'>
+        <section class='index-section' aria-labelledby='index-title'>
+          <div class='section-head'><h2 class='section-title' id='index-title'>주요 지수</h2></div>
           <!-- 지수 4개 = 카드 하나, S&P 500 · 나스닥 줄 + 더 보기 줄 안에 다우존스 · 러셀 2000 (2026-10-13 사용자) -->
           <div class='index-card'>
             <div class='index-rows' id='index-row'></div>
@@ -1231,14 +1222,16 @@ body.no-dashboard .main-content { padding-top: 32px; }
               </svg>
               실시간 랭킹
             </h2>
+          </div>
+
+          <!-- 탭 · 표 · 더 보기 버튼이 카드 하나 (2026-10-13 사용자) -->
+          <div class='card rank-card'>
             <div class='tabs' role='tablist'>
               <button class='tab' role='tab' aria-selected='true'  data-sort='volume'>거래상위</button>
               <button class='tab' role='tab' aria-selected='false' data-sort='turnover'>거래대금 상위</button>
               <button class='tab' role='tab' aria-selected='false' data-sort='gain'>가격 상승</button>
             </div>
-          </div>
-
-          <div class='card table-wrap'>
+            <div class='table-wrap'>
             <table class='rank-table'>
               <thead>
                 <tr>
@@ -1254,10 +1247,11 @@ body.no-dashboard .main-content { padding-top: 32px; }
                 <tr><td colspan='6' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
               </tbody>
             </table>
-          </div>
+            </div>
           <!-- 3위까지 보이고 나머지는 더 보기 (2026-10-13 사용자) -->
           <button type='button' class='fold-btn' id='rank-toggle' aria-expanded='false' hidden='hidden'><span>종목 더 보기</span>
             <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
+          </div>
         </section>
 
         <!-- ====================================================================
@@ -1287,6 +1281,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
               </thead>
               <tbody id='sector-body'><tr><td colspan='3' class='sector-empty'>데이터를 불러오는 중…</td></tr></tbody>
             </table>
+            <button type='button' class='fold-btn' id='sector-toggle' aria-expanded='false' hidden='hidden'><span>섹터 더 보기</span>
+              <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
           </div>
         </section>
 
@@ -2017,7 +2013,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
         (function () {
           var btn = document.getElementById('index-toggle'), more = document.getElementById('index-more');
           if (!btn || !more) return;
-          btn.addEventListener('click', function () { var open = more.hidden; more.hidden = !open; btn.setAttribute('aria-expanded', String(open)); });
+          var text = '';
+          btn.addEventListener('click', function () {
+            var open = more.hidden; more.hidden = !open; btn.setAttribute('aria-expanded', String(open));
+            if (open) text = btn.firstChild.textContent;
+            btn.firstChild.textContent = open ? '접기' : text;   /* 펼치면 '접기' (2026-10-13 사용자) */
+          });
         })();
 
         renderIndices([]);
@@ -2103,7 +2104,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             body.appendChild(tr);
           });
           var tg = document.getElementById('rank-toggle');
-          if (tg) { var n = stocks.length - RANK_SHOWN; tg.hidden = n <= 0; tg.firstChild.textContent = '종목 ' + n + '개 더 보기'; tg.setAttribute('aria-expanded', String(rankOpen)); }
+          if (tg) { var n = stocks.length - RANK_SHOWN; tg.hidden = n <= 0; tg.firstChild.textContent = rankOpen ? '접기' : '종목 ' + n + '개 더 보기'; tg.setAttribute('aria-expanded', String(rankOpen)); }
         }
         var RANK_SHOWN = 3, rankOpen = false;
         (function () {
@@ -2152,6 +2153,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           }
           list.slice().sort(function (a, b) { return (b.cp || 0) - (a.cp || 0); }).forEach(function (x, i) {
             var tr = el('tr');
+            if (i >= SECTOR_SHOWN) tr.hidden = !sectorOpen;   /* 3개까지, 나머지는 카드 안 더 보기 (2026-10-13 사용자) */
             tr.appendChild(el('td', null, String(i + 1)));
             var tdN = el('td', null, x.name);
             tdN.appendChild(el('span', 'sector-etf', x.s));
@@ -2161,7 +2163,15 @@ body.no-dashboard .main-content { padding-top: 32px; }
             tr.appendChild(tdC);
             body.appendChild(tr);
           });
+          var tg = document.getElementById('sector-toggle');
+          if (tg) { var n = list.length - SECTOR_SHOWN; tg.hidden = n <= 0; tg.firstChild.textContent = sectorOpen ? '접기' : '섹터 ' + n + '개 더 보기'; tg.setAttribute('aria-expanded', String(sectorOpen)); }
+          lastSectors = list;
         }
+        var SECTOR_SHOWN = 3, sectorOpen = false, lastSectors = [];
+        (function () {
+          var tg = document.getElementById('sector-toggle');
+          if (tg) tg.addEventListener('click', function () { sectorOpen = !sectorOpen; renderSectors(lastSectors); });
+        })();
 
         /* ================================================================= 뉴스 */
 
@@ -2572,7 +2582,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         title.appendChild(meta);
         var pop = document.createElement('div'); pop.className = 'rt-pop share-pop'; pop.hidden = true;
         pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-label="공유">' +
-          '<button type="button" class="rt-pop-close" aria-label="닫기">×</button><div class="rt-pop-title">공유</div><div class="share-pop-body"></div></div>';
+          '<div class="rt-pop-head"><div class="rt-pop-title">공유</div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div><div class="share-pop-body"></div></div>';
         document.body.appendChild(pop);
         var list = widget.querySelector('.share-buttons');
         if (list) { list.classList.remove('hidden'); pop.querySelector('.share-pop-body').appendChild(list); }
@@ -2592,14 +2602,21 @@ body.no-dashboard .main-content { padding-top: 32px; }
         'use strict';
         var body = document.querySelector('.post-outer-container .post-body'), shell = document.querySelector('.post-shell');
         if (!body || !shell) return;
-        var w = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, null), n, last = null;
-        while ((n = w.nextNode())) { if (n.textContent.trim()) last = n; }
-        var inCard = false;
-        for (var e = last && last.parentElement; e && e !== body; e = e.parentElement) {
-          var cs = getComputedStyle(e), bg = cs.backgroundColor;
-          if ((parseFloat(cs.borderBottomWidth) > 0 && parseFloat(cs.borderBottomLeftRadius) > 0) || (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)')) { inCard = true; break; }
+        /* 지금 보이는 내용의 마지막 글자로 정한다 — 탭이 있으면 탭을 바꿀 때마다 다시 (2026-10-13 사용자: 흐름 · 캘린더 탭은 카드로 끝나는데 구분선이 있던 원인 — 다른 탭의 출처 글을 보고 있었다) */
+        function visible(el) { return !!(el && el.getClientRects().length); }
+        function check() {
+          var w = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, null), n, last = null;
+          while ((n = w.nextNode())) { if (n.textContent.trim() && visible(n.parentElement)) last = n; }
+          var inCard = false;
+          for (var e = last && last.parentElement; e && e !== body; e = e.parentElement) {
+            var cs = getComputedStyle(e), bg = cs.backgroundColor;
+            if ((parseFloat(cs.borderBottomWidth) > 0 && parseFloat(cs.borderBottomLeftRadius) > 0) || (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)')) { inCard = true; break; }
+          }
+          shell.classList.toggle('ends-text', !!last && !inCard);
         }
-        shell.classList.toggle('ends-text', !!last && !inCard);
+        check();
+        window.addEventListener('load', check);
+        body.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.rt-tab, .rt-subtab, .rt-dir, .rt-seg, summary')) setTimeout(check, 0); });
       })();
 
       /* ============================================================ 댓글 한국어 (2026-10-12 사용자: "댓글의 버튼들은 전부 한글명, 안내글도 전부 한글")
@@ -2656,6 +2673,38 @@ body.no-dashboard .main-content { padding-top: 32px; }
         });
       })();
 
+      /* ============================================================ 카드 안 펼침 (2026-10-13 사용자: "더 보기 버튼은 지수 더 보기처럼 카드에 포함, 닫는 버튼도")
+         렌더러의 details[data-fold]: 펼친 줄을 버튼 위로 옮기고, 누르면 펼침 · 접기를 바꾸며 글자도 `○○ n개 더 보기` ↔ `접기`. JS가 없으면 그냥 details 로 열린다. */
+      (function () {
+        'use strict';
+        [].slice.call(document.querySelectorAll('.post-body details[data-fold]')).forEach(function (d) {
+          var sum = d.querySelector('summary'), more = sum && sum.nextElementSibling, label = sum && sum.querySelector('span');
+          if (!sum || !more) return;
+          more.setAttribute('data-fold-more', '1'); more.hidden = true;
+          d.parentNode.insertBefore(more, d);
+          var text = d.getAttribute('data-label') || (label ? label.textContent : '더 보기');
+          sum.addEventListener('click', function (e) {
+            e.preventDefault();
+            var open = more.hidden;
+            more.hidden = !open; d.classList.toggle('is-open', open);
+            if (label) label.textContent = open ? '접기' : text;
+          });
+        });
+      })();
+
+      /* ============================================================ 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) — 글 보기 · 목록 카드 제목 */
+      (function () {
+        'use strict';
+        [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
+          if (!/^\s*엔비디아 (리포트|데일리)/.test(h.textContent) || h.querySelector('.title-logo')) return;
+          var host = h.querySelector('a') || h;
+          var im = document.createElement('img'); im.className = 'title-logo'; im.alt = ''; im.width = 32; im.height = 32;
+          im.src = 'https://financialmodelingprep.com/image-stock/NVDA.png';
+          im.onerror = function () { if (im.parentNode) im.parentNode.removeChild(im); };
+          host.insertBefore(im, host.firstChild);
+        });
+      })();
+
       /* ============================================================ 툴팁 팝업창 (2026-10-12 사용자: "툴팁은 팝업창으로", 내용 18px)
          리포트의 ? 아이콘([data-tip])을 누르면 화면 가운데 창. 제목은 아이콘 앞 글자(예: "시장 국면", "판정"), 내용은 data-tip.
          닫기: × · 바깥 누르기 · Esc. 닫으면 포커스를 아이콘으로 돌려준다. */
@@ -2665,8 +2714,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
         if (!tips.length) return;
         var pop = document.createElement('div'); pop.className = 'rt-pop'; pop.hidden = true;
         pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-labelledby="rt-pop-title">' +
-          '<button type="button" class="rt-pop-close" aria-label="닫기">×</button>' +
-          '<div class="rt-pop-title" id="rt-pop-title"></div><div class="rt-pop-body"></div></div>';
+          '<div class="rt-pop-head"><div class="rt-pop-title" id="rt-pop-title"></div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +   /* 제목 · 닫기 고정, 내용만 스크롤 (2026-10-13 사용자) */
+          '<div class="rt-pop-body"></div></div>';
         document.body.appendChild(pop);
         var box = pop.firstChild, last = null;
         function titleOf(icon) {
@@ -2699,6 +2748,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           last = icon;
           pop.querySelector('.rt-pop-title').textContent = titleOf(icon);
           fill(pop.querySelector('.rt-pop-body'), icon.getAttribute('data-tip') || '');
+          pop.querySelector('.rt-pop-body').scrollTop = 0;
           pop.hidden = false;
           pop.querySelector('.rt-pop-close').focus();
         }
@@ -2800,7 +2850,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         panels.forEach(function (st) {
           var subs = [], cur = null;
           [].slice.call(st.p.children).forEach(function (n) {
-            if (n.tagName === 'H2') return;
+            if (n.tagName === 'H2') { cur = null; return; }   /* 다음 구획 제목에서 소제목 묶음이 끝난다 — 관찰 종목 내용이 마지막 소제목(무역)에 묶여 숨던 원인 (2026-10-13 사용자) */
             var isHead = n.hasAttribute && n.hasAttribute('data-sub');
             if (isHead) { cur = { name: n.textContent.trim(), nodes: [n] }; subs.push(cur); } else if (cur) { cur.nodes.push(n); }
           });

@@ -412,7 +412,7 @@ def stat_line(items):
     """한 줄 수치 카드 (2026-10-12 사용자: "기사 · 7일 평균 · 대기 문서, 구분선을 추가하여 한 줄에") — 카드 하나에 `이름 값`을 세로 구분선으로 나란히.
     이름 16px(왼쪽 정보) · 값 18px 굵게. items = [(이름, 값HTML)]. 칸은 글자 폭만큼, 남는 폭은 고르게."""
     cells = "".join(f'<span style="flex:1 1 auto;text-align:center;white-space:nowrap;padding:0 8px;{"border-left:1px solid #E2E8F0;" if i else ""}">'
-                    f'<span style="font-size:{NAME};font-weight:700;color:#111;">{esc(k)}</span> <b style="color:#111;">{v}</b></span>'
+                    f'<span style="font-size:{NAME};font-weight:700;color:#111;">{esc(k)}</span> : <b style="color:#111;">{v}</b></span>'   # `기사 : 29` (2026-10-13 사용자)
                     for i, (k, v) in enumerate(items))
     return (f'<div style="display:flex;align-items:center;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{10 - VP}px 4px;'
             f'margin:0 0 8px;font-size:{SMALL};line-height:{LH_CARD};">{cells}</div>')
@@ -461,9 +461,11 @@ def multi2(items):
     for i in range(0, len(items), 2):
         pair = items[i:i + 2]
         r = ""
-        for j, (name, value_html) in enumerate(pair):
+        for j, it in enumerate(pair):
+            name, value_html = it[0], it[1]
+            logo = ticker_logo(it[2]) if len(it) > 2 and it[2] else ""   # 3번째 값 = 티커 로고 (2026-10-13 사용자: SPY · SMH · AMD · AVGO)
             r += (f'<span style="{E_CELL}{"border-left:1px solid #E2E8F0;" if j else ""}">'
-                  f'<span style="{E_NAME}">{paren(esc(name))}</span> <span style="{E_VALUE}">{value_html}</span></span> ')
+                  f'<span style="{E_NAME}">{logo}{paren(esc(name))}</span> <span style="{E_VALUE}">{value_html}</span></span> ')
         if len(pair) == 1:
             r += f'<span style="{E_CELL}border-left:1px solid #E2E8F0;"></span>'
         out += f'<span data-pair="1" style="display:flex;{MULTI_SEP if i else ""}">{r}</span> '
@@ -562,16 +564,19 @@ def crow(name_html, value_html, sub="", first=False, left=None, short=False, now
 EMPH_BG, EMPH_BD = "#FFF7ED", "#FED7AA"   # 강조 카드 배경·테두리 (오렌지)
 
 
-def ccard(rows, left=None, attrs="", emph=False, pad=None):
+def ccard(rows, left=None, attrs="", emph=False, pad=None, fold_at=None, noun=""):
     """C 카드 묶음: rows = [(name_html, value_html, sub_html[, left_pct[, nowrap[, sub_below]]])]. left = 카드 전체 왼쪽 %. emph=True 면 강조 카드 배경(오렌지, 줄 구분선도 오렌지) — 2026-10-11 사용자: 급상승 주제."""
     short = short_values(rows)   # 값이 모두 5자 미만 → 왼쪽 80% (2026-10-11 사용자)
     # 줄 튜플 4번째 값 = 그 줄의 왼쪽 % (예: 시장 상태 막대 줄 30), 없으면 카드의 left (2026-10-12 사용자)
-    inner = "".join(crow(r[0], r[1], r[2], first=(i == 0), short=short, left=(r[3] if len(r) > 3 else left), nowrap=bool(len(r) > 4 and r[4]),
+    parts = [crow(r[0], r[1], r[2], first=(i == 0 or i == fold_at), short=short, left=(r[3] if len(r) > 3 else left), nowrap=bool(len(r) > 4 and r[4]),
                          sub_below=bool(len(r) > 5 and r[5]), name_size=EMPH_NAME if emph else None,
                          tip_text=(r[6] if len(r) > 6 else None))   # 7번째 값 = 구분명 옆 ? 툴팁 (읽는 법, 2026-10-12 사용자)   # 강조 카드는 왼쪽 18px (2026-10-12 사용자)
-                    for i, r in enumerate(rows))
-    if pad is not None:   # 카드별 줄 위아래 보이는 여백 (예: 데일리 상대강도 20px — 2026-10-12 사용자)
-        inner = inner.replace(f"padding:{SEP_GAP - VP - 1}px 12px;", f"padding:{pad - VP}px 12px;")
+             for i, r in enumerate(rows)]
+    if pad is not None:
+        parts = [x.replace(f"padding:{SEP_GAP - VP - 1}px 12px;", f"padding:{pad - VP}px 12px;") for x in parts]
+    if fold_at is not None and len(parts) > fold_at:   # 펼침은 같은 카드 안 (2026-10-13 사용자)
+        return fold_card("".join(parts[:fold_at]), "".join(parts[fold_at:]), f"{noun} {len(parts) - fold_at}개 더 보기", attrs=attrs)
+    inner = "".join(parts)
     box = MULTI
     if emph:   # 강조 C 카드: 행간 32, 구분선 위아래 14 그대로, 구분선이 여러 개라 카드 위 · 아래도 14 그대로 (2026-10-12 사용자)
         inner = inner.replace(MULTI_SEP, f"border-top:1px solid {EMPH_BD};").replace(f"line-height:{LH_CARD};", f"line-height:{LH_EMPH};")
@@ -706,9 +711,27 @@ def bar_row(name_html, frac, color, value_html, widths, sub="", first=False):
             f'<span style="margin-left:10px;font-weight:700;display:flex;">{_sized(value_html, lv, "right")}</span></span>{sub_html}</span> ')
 
 
-def card_of(rows_html, attrs=""):
-    """미리 만든 줄(crow·bar_row)을 C 카드 하나로."""
-    return f'<div data-cards="1" {attrs} style="margin:0 0 8px;"><span data-grid="2" style="{MULTI}">{"".join(rows_html)}</span></div>'
+def card_of(rows_html, attrs="", fold_at=None, noun=""):
+    """미리 만든 줄(crow·bar_row)을 C 카드 하나로. fold_at 이 있으면 그 줄부터는 **같은 카드 안** 펼침 버튼 아래 (2026-10-13 사용자: "더 보기 버튼은 지수 더 보기처럼 카드에 포함").
+    줄은 첫 줄만 first=True 로 만든다 — 펼친 줄도 같은 카드의 이어지는 줄이라 구분선이 있다."""
+    rows_html = list(rows_html)
+    if fold_at is None or len(rows_html) <= fold_at:
+        return f'<div data-cards="1" {attrs} style="margin:0 0 8px;"><span data-grid="2" style="{MULTI}">{"".join(rows_html)}</span></div>'
+    return fold_card("".join(rows_html[:fold_at]), "".join(rows_html[fold_at:]), f"{noun} {len(rows_html) - fold_at}개 더 보기", attrs=attrs)
+
+
+FOLD_IN_CARD = ("cursor:pointer;list-style:none;display:flex;justify-content:center;align-items:center;gap:6px;"
+                f"padding:{10 - VP}px 12px;border-top:1px solid #E2E8F0;color:#111;font-size:{TINY};line-height:{LH_TINY};font-weight:700;")
+
+
+def fold_card(shown_html, more_html, label, attrs="", box=None):
+    """카드 안 펼침 — 보이는 줄 · (펼친 줄) · 맨 아래 카드 폭 버튼 줄 `○○ n개 더 보기 ⌄` / 펼치면 `접기 ⌃` (2026-10-13 사용자).
+    JS 없이도 details 로 열리고(버튼이 펼친 줄 위), 테마 JS(details[data-fold])가 펼친 줄을 버튼 위로 옮기고 글자를 `접기`로 바꾼다. data-acc: 홈 카드가 건너뛴다."""
+    box = box or MULTI
+    return (f'<div data-cards="1" {attrs} style="margin:0 0 8px;"><span style="{box}">'
+            f'<span data-grid="2" style="display:block;">{shown_html}</span>'
+            f'<details data-acc="1" data-fold="1" data-label="{esc(label)}"><summary style="{FOLD_IN_CARD}"><span>{esc(label)}</span> {ACC_CHEV}</summary>'
+            f'<span data-grid="2" style="display:block;border-top:1px solid #E2E8F0;">{more_html}</span></details></span></div>')
 
 
 def table(headers, rows, note_text=""):
@@ -720,5 +743,5 @@ def table(headers, rows, note_text=""):
 
 
 def footer(data_line, disclaimer_line):
-    return (f'<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{GUIDE_IND}">'
+    return (f'<div data-footer="1" style="margin-top:3px;padding-top:2px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{GUIDE_IND}">'
             f"{INFO_ICON}{data_line}<br>{INFO_ICON}{disclaimer_line}</div>")

@@ -153,6 +153,8 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   color: var(--ink);
 }
 .post-title a { color: inherit; }
+.post-title .title-logo { width: 32px; height: 32px; border-radius: 8px; margin-right: 10px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
+@media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } }
 /* 글 제목 끝의 " — 날짜"는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다 */
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
 /* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
@@ -182,14 +184,21 @@ body.item-view .post-outer-container { padding-top: 13px; }
 /* 아코디언 (리포트 details[data-acc]): 기본 삼각형 숨기고 화살표 아이콘을 펼치면 위로 (2026-10-11) */
 .post-body details[data-acc] > summary::-webkit-details-marker { display: none; }
 .post-body details[data-acc][open] > summary .acc-chev { transform: rotate(180deg); }
+/* 카드 안 펼침 (details[data-fold], 2026-10-13 사용자): 테마 JS가 펼친 줄을 버튼 위로 옮기고 글자를 '접기'로 — .is-open 이면 화살표 위로 */
+.post-body details[data-fold] > summary::-webkit-details-marker { display: none; }
+.post-body details[data-fold].is-open > summary .acc-chev { transform: rotate(180deg); }
+.post-body [data-fold-more][hidden] { display: none !important; }
 /* 툴팁 (리포트 [data-tip]) → 팝업창 (2026-10-12 사용자: "툴팁은 팝업창으로, 내용 18포인트"). ? 아이콘을 누르면(PC 클릭 · 폰 탭 · Enter) 화면 가운데 창이 뜬다.
    테마 JS가 .rt-pop 을 만든다. 닫기: × 버튼 · 바깥 누르기 · Esc. 줄바꿈(&#10;)은 창 안에서 줄을 바꾼다 */
 .post-body [data-tip] { outline: none; cursor: pointer; }
 .post-body [data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 50%; }
 .rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.45); }
 .rt-pop[hidden] { display: none; }
-.rt-pop-box { position: relative; width: 100%; max-width: 520px; max-height: 80vh; overflow-y: auto; padding: 20px 20px 22px; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
-.rt-pop-title { margin: 0 40px 12px 0; font-size: 18px; font-weight: 700; line-height: 24px; color: #111; }
+.rt-pop-box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+/* 팝업 제목 · 닫기는 위에 고정, 내용만 스크롤 (2026-10-13 사용자) */
+.rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; border-bottom: 1px solid #F1F5F9; }
+.rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
+.rt-pop-title { margin: 0; font-size: 18px; font-weight: 700; line-height: 24px; color: #111; }
 .rt-pop-body { font-size: 18px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
 /* 툴팁 내용 행간 = 본문 34px (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
 .rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; }   /* 글머리표 사이 +6 (2026-10-12 사용자) */
@@ -358,8 +367,11 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment { display: flex; gap: 12px; align-items: flex-start; }
 .comments .comment-replies .comment, .comments .comment .comment { padding-left: 0; }
 .comments .comment-replies { margin: 10px 0 0 48px; }
-/* 답글 · 삭제 버튼과 '답글' 글자는 두지 않는다 — 로그인 전에는 동작하지 않고, 테마가 로그인 여부를 알 수 없다. 댓글은 아래 댓글 쓰기 폼으로 (2026-10-13 사용자) */
-.comments .comment-actions, .comments .comment-replies > .thread-toggle, .comments .thread-chrome, .comments .comment-replybox-single, .comments .comment-replybox-thread, .comments .thread-expanded > .thread-toggle { display: none !important; }
+/* 답글 · 삭제 버튼과 '답글' 글자는 두지 않는다 — 로그인 전에는 동작하지 않고, 테마가 로그인 여부를 알 수 없다 (2026-10-13 사용자).
+   댓글 쓰기 폼이 옮겨 가는 자리(.comment-replybox-thread · single)는 숨기지 않는다 — 숨기면 첫 댓글 뒤 다시 쓸 수 없던 원인 (2026-10-13 사용자: "다시 댓글은 못 쓰는").
+   블로거 기본 CSS(b:css=false 라 없음)의 .hidden · .loaded 를 대신한다 — '더 보기'가 할 일이 없는데도 보이던 원인 */
+.comments .comment-actions .comment-reply, .comments .comment-actions .item-control, .comments .comment-replies > .thread-toggle, .comments .thread-chrome .thread-toggle { display: none !important; }
+.comments .hidden, .comments .loadmore.loaded, .comments [hidden] { display: none !important; }
 .comments .comment-replies { margin: 10px 0 0 24px; }
 .comments .avatar-image-container { flex: none; width: 36px; height: 36px; }
 .comments .avatar-image-container img { width: 36px; height: 36px; border-radius: 50%; display: block; }
@@ -382,6 +394,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment-form p { margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #6B7280; }
 .comments iframe { width: 100%; border: 0; }
 .comments .comment-replybox-single, .comments .comment-replybox-thread { margin-top: 10px; }
+.comments .comment-replybox-single iframe, .comments .comment-replybox-thread iframe { display: block; width: 100%; min-height: 90px; }
 #comment-popup { display: none; }
 
 /* 레이아웃 모드에서만 보이는 보관용 위젯 */
@@ -663,7 +676,8 @@ __JS__
 </html>
 """
 
-NAV_LABELS = ["시장", "섹터", "종목", "거시경제", "뉴스", "일정", "관심종목", "트럼프 트렌드"]
+# 상단 메뉴 = 지금 있는 리포트 연재 (2026-10-13 사용자: "리포트들은 메뉴에 있어야 하고 클릭하면 리포트 리스트 화면으로"). (보이는 이름, 블로거 라벨)
+NAV_LABELS = [("미국 증시 리포트", "데일리 브리핑"), ("트럼프 SNS 트렌드", "트럼프 트렌드"), ("엔비디아 리포트", "엔비디아")]
 
 # 데일리 리포트 목록 화면. publish_blogger.LABELS 의 첫 라벨과 같아야 한다 —
 # 파이프라인이 실제로 붙이는 라벨이라야 목록에 글이 잡힌다.
@@ -682,11 +696,11 @@ NVDA_LIST_PATH = "search/label/" + quote(NVDA_LABEL)
 
 def nav_items():
     out = []
-    for label in NAV_LABELS:
+    for name, label in NAV_LABELS:
         # 주소는 인코딩한다 — "트럼프 트렌드"처럼 띄어쓰기가 있는 라벨 때문. 비교는 원문으로.
         out.append(
             "          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/{1}&quot;'>\n"
-            "            <b:attr cond='data:view.search.label == &quot;{0}&quot;' name='aria-current' value='page'/>{0}</a>".format(label, quote(label))
+            "            <b:attr cond='data:view.search.label == &quot;{0}&quot;' name='aria-current' value='page'/>{2}</a>".format(label, quote(label), name)
         )
     return "\n".join(out)
 

@@ -426,9 +426,9 @@ def build_body(a, n):
         dk.section("급상승 주제", sec_trends(a), tab=TAB_TODAY, one_line=True,
                    aside=dk.tips_right(_trend_tips(a)) if a["trend_scores"] else ""),   # ? 툴팁은 제목 오른쪽, 폰에서도 한 줄 · "최근 7일"은 카드 아래 (2026-10-11 사용자)
         dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY),
-        dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow")
-                   + dk.guide("주의", [("근거", "시장 반응 탭에서 보정 q가 함께 작은 값만 고릅니다 — 주제당 수십 개 조합을 검정했기 때문"),
-                                       ("+3일·+5일", "창이 겹친 관측"), ("성격", "인과나 방향 예측이 아닙니다")]), tab=TAB_TODAY),
+        dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow"), tab=TAB_TODAY, one_line=True,   # 주의는 제목 줄 오른쪽 툴팁 (2026-10-13 사용자)
+                   aside=dk.tips_right([("주의", dk.read_text([("근거", "시장 반응 탭에서 보정 q가 함께 작은 값만 고릅니다 — 주제당 수십 개 조합을 검정했기 때문"),
+                                                               ("+3일 · +5일", "창이 겹친 관측"), ("성격", "인과나 방향 예측이 아닙니다")]))])),
         dk.section(TAB_FLOW, sec_windows(a), tab=TAB_FLOW),   # 탭 이름과 같은 제목 → 테마가 숨긴다 (2026-10-11 사용자: 30일 흐름 타이틀 삭제)
         dk.section("시장 반응", sec_reactions(a), tab=TAB_REACT),   # 탭 이름과 같아 제목은 숨고, 탭 아래 안내 문구는 두지 않는다 (2026-10-11 사용자)
         dk.section("관찰 종목", sec_why(a), tab=TAB_REACT),
