@@ -153,7 +153,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   color: var(--ink);
 }
 .post-title a { color: inherit; }
-.post-title .title-logo { width: 32px; height: 32px; border-radius: 8px; margin-right: 10px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
+.post-title .title-logo { width: 32px; height: 32px; border-radius: 8px; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
 @media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } }
 /* 글 제목 끝의 " — 날짜"는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다 */
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }

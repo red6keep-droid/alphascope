@@ -302,6 +302,19 @@ body.menu-open { overflow: hidden; }
 /* 카드 머리: 어느 연재인지와 그 글의 날짜. 날짜는 피드에서 채운다. */
 .report-card-date { margin-left: auto; font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) */
 .report-block { display: flex; flex-direction: column; gap: 8px; }
+/* 홈 엔비디아 카드 — 가로 구분선 C 카드 규칙: 줄마다 왼쪽 정보명(16px 굵게) · 오른쪽 값(18px 굵게, 증감 색), 구분선 위아래 22 (2026-10-13 사용자) */
+#nvda-card { padding: 0 16px; gap: 0; }
+.kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
+.kv-row:first-child { border-top: 0; }
+.kv-name { flex: none; font-weight: 700; font-size: 16px; line-height: 24px; color: #111; }
+.kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 18px; line-height: 24px; color: #111; white-space: nowrap; }
+.kv-value.up { color: var(--up); } .kv-value.down { color: var(--down); }
+.kv-value small { font-size: 14px; font-weight: 400; color: #7A7A7A; }
+.kv-row--block { display: block; }
+.kv-row--block .kv-name { display: block; margin-bottom: 4px; }
+.kv-row--block ul { display: flex; flex-direction: column; gap: 12px; }
+.kv-row--block li { display: flex; align-items: flex-start; gap: 7px; font-size: 18px; line-height: 34px; color: #111; word-break: keep-all; }
+.kv-row--block li::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
 
 .badge {   /* 배경색이 있는 가이드 라벨(5절 긍정 · 부정 · 정상) — 14px, 볼드 없음 (2026-10-13 사용자) */
   align-self: flex-start;
@@ -649,6 +662,9 @@ body.menu-open { overflow: hidden; }
 }
 
 @media (max-width: 680px) {
+  /* 헤더 로고 · 아이콘도 본문과 같은 좌우 기준선 — 글 보기 14px, 홈 10px (2026-10-13 사용자: "블로그 로고 좌측 여백을 본문 기준에 맞춰") */
+  .navbar { padding-left: 14px; padding-right: 14px; }
+  body:not(.item-view) .navbar { padding-left: 10px; padding-right: 10px; }
   /* 홈(대시보드)에서는 카드가 화면 가장자리에서 10px (2026-10-10 사용자). 글 보기는 20px 별도 규칙 */
   body:not(.item-view) .main-content { padding-left: 10px; padding-right: 10px; }
   .news-list { grid-template-columns: minmax(0, 1fr); }
@@ -771,18 +787,8 @@ body.menu-open { overflow: hidden; }
         <div class="report-col">
         <h3 class="report-title"><span class="report-icon" style="background:#76B900;" aria-hidden="true"><img src="https://financialmodelingprep.com/image-stock/NVDA.png" alt="" onerror="this.hidden=true"/></span>엔비디아 리포트<span class="report-card-date" data-date="nvda-card"></span></h3>
         <a class="report-card" id="nvda-card" href="/search/label/엔비디아">
-          <div class="report-block" data-hook="nvda-headline">
-            <!-- 가격 라벨 삭제 (2026-10-13 사용자) -->
-            <div class="report-columns">
-              <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
-            </div>
-          </div>
-          <div class="report-block" data-hook="nvda-today">
-            <span class="badge badge--nvda-today">중요 이슈</span>
-            <div class="report-columns">
-              <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
-            </div>
-          </div>
+          <!-- 가로 구분선 줄: 가격 · 거래량 · 변동폭 · 시가 갭 · RSI · 중요 이슈 — 줄마다 왼쪽 정보명 · 오른쪽 값 (2026-10-13 사용자) -->
+          <div class="kv-rows" data-hook="nvda-rows"><div class="kv-row"><span class="kv-name">리포트를 불러오는 중…</span></div></div>
         </a>
         </div>
       </div>
@@ -1295,8 +1301,7 @@ body.menu-open { overflow: hidden; }
     {
       id: 'nvda-card',
       label: '엔비디아',
-      map: { 'nvda-headline': ['(가격)', '오늘 한 줄'], 'nvda-today': ['중요 이슈', '오늘의 해석', '뉴스', '오늘 바뀐 것'] },
-      pick: { 'nvda-headline': nvdaLines }, lines: { 'nvda-headline': 3 },
+      map: {}, fill: fillNvda,   /* 정보명 · 값 줄 카드 (2026-10-13 사용자) */
       any: true,
       picks: false,
       empty: '아직 발행된 엔비디아 리포트가 없습니다.'
@@ -1445,6 +1450,39 @@ body.menu-open { overflow: hidden; }
     return [price, mid, last].filter(Boolean);
   }
 
+  /* 홈 엔비디아 카드 줄 — 본문 카드의 줄(왼쪽 이름 · 오른쪽 값)을 그대로 읽어 정보명 · 값으로 (2026-10-13 사용자) */
+  function nvdaRows(sec) {
+    var kv = {};
+    (sec['(가격)'] || []).forEach(function (n) {
+      if (!n.querySelectorAll) return;
+      [].slice.call(n.querySelectorAll('span, div')).forEach(function (r) {
+        if (!/justify-content:\s*space-between/.test(r.getAttribute('style') || '') || r.children.length < 2) return;
+        var name = String(r.children[0].textContent || '').replace(/\s+/g, ' ').trim();
+        var val = String(r.children[r.children.length - 1].textContent || '').replace(/\s+/g, ' ').trim();
+        if (name && val && !(name in kv)) kv[name.replace(/\s*\(.*$/, '')] = val;
+      });
+    });
+    var rows = [['가격', kv['NVDA']], ['거래량', kv['거래량']], ['일중 변동폭', kv['일중 변동폭']], ['시가 갭', kv['시가 갭']], ['RSI 14', kv['RSI 14']]];
+    return rows.filter(function (r) { return r[1]; });
+  }
+  function fillNvda(sec) {
+    var box = document.querySelector('[data-hook="nvda-rows"]');
+    if (!box) return;
+    box.textContent = '';
+    nvdaRows(sec).forEach(function (r) {
+      var row = el('div', 'kv-row'), v = el('span', 'kv-value', r[1]);
+      var up = /▲/.test(r[1]), dn = /▼/.test(r[1]);
+      if (up !== dn) v.className += up ? ' up' : ' down';   /* 값만 증감 색 — 카드의 이름 칸은 칠하지 않는다 (3-3) */
+      row.appendChild(el('span', 'kv-name', r[0])); row.appendChild(v); box.appendChild(row);
+    });
+    var issues = linesOf(sec['중요 이슈'] || []).slice(0, 3);
+    if (issues.length) {
+      var ir = el('div', 'kv-row kv-row--block'); ir.appendChild(el('span', 'kv-name', '중요 이슈'));
+      var ul = el('ul'); issues.forEach(function (t) { ul.appendChild(tinted(t)); }); ir.appendChild(ul); box.appendChild(ir);
+    }
+    if (!box.children.length) box.appendChild(el('div', 'kv-row', LOAD_FAILED));
+  }
+
   function setDate(id, text) {
     var d = document.querySelector('.report-card-date[data-date="' + id + '"]');
     if (d) d.textContent = text;
@@ -1484,6 +1522,7 @@ body.menu-open { overflow: hidden; }
 
   function failCard(card, msg) {
     Object.keys(card.map).forEach(function (hook) { fillCard(hook, [], msg); });
+    if (card.fill) { var bx = document.querySelector('[data-hook="nvda-rows"]'); if (bx) { bx.textContent = ''; bx.appendChild(el('div', 'kv-row', msg || LOAD_FAILED)); } }
     if (card.picks) fillPicks(null);
   }
 
@@ -1512,6 +1551,7 @@ body.menu-open { overflow: hidden; }
         var sec = reportSections((entry.content || {}).$t || '');
         if (!sec) throw new Error('unparsable');
 
+        if (card.fill) card.fill(sec);
         Object.keys(card.map).forEach(function (hook) {
           var lines = [], used = null;
           if (card.pick && card.pick[hook]) { lines = card.pick[hook](sec); used = card.map[hook][0]; }

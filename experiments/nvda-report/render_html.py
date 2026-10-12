@@ -576,7 +576,7 @@ def sec_direction_bars(a):
     if not sum(today.values()) and not sum(week.values()):
         return ""
     # 두 막대 묶음 사이 보이는 24px (2026-10-12 사용자) — 앞 묶음 비율 글자 → 다음 라벨 글자, 행간 반쪽 3 + 3 을 뺀 값
-    return (f'<div data-cards="1" style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{14 - 3}px 12px {14 - 3 - 10}px;">{_ratio_bar("오늘", today)}'   # 두 막대를 카드 하나에 (2026-10-13 사용자)
+    return (f'<div data-cards="1" style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{_dk.SEP_GAP - 3}px 12px {_dk.SEP_GAP - 3 - 10}px;">{_ratio_bar("오늘", today)}'   # 두 막대를 카드 하나에 (2026-10-13 사용자)
             f'<span style="display:block;height:{BAR_GROUP_GAP - 5}px;"></span>{_ratio_bar("최근 7일", week)}</div>')
 
 
@@ -827,7 +827,7 @@ def sec_narrative(a, n):
     lines = [re.sub(rf"^({areas})\s+(?!·)", r"\1 · ", t) for t in n["today"]]   # 영역 머리 뒤 구분점 보정
     lis = "".join(_dot_li(_esc(t), size=3, lh=_dk.LH_BODY, margin=_dk.LI_MARGIN) for t in lines)   # 18px 글 → 3px 점 (2026-10-12 사용자)
     # 내용은 흰 카드 안 (2026-10-13 사용자: "중요 이슈의 내용 부분만 카드 디자인") — 보이는 위아래 14 = padding 14 − 행간 반쪽 7, 첫 · 끝 글머리표 margin 은 음수 margin 으로
-    return (f'<div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{14 - _dk.NEWS_VP}px 14px;margin:0 0 8px;line-height:{_dk.LH_BODY};">'
+    return (f'<div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 14px;margin:0 0 8px;line-height:{_dk.LH_BODY};">'   # 보이는 위아래 22 (콘텐츠 카드, 2026-10-13 사용자)
             f"<ul style='margin:-12px 0;padding:0;list-style:none;'>{lis}</ul></div>")
 
 
@@ -853,7 +853,7 @@ def build_body(a, n):
         # 기준 거래일 안내 줄 삭제 (2026-10-12 사용자) — 날짜는 글 제목에 있다
         sec_headline(a), sec_chart(a=a), sec_targets(a),   # 목표가는 200일선 카드 아래 (아코디언)   # 제목 없이 본문 머리에 (2026-10-11 사용자: 오늘 한 줄 타이틀 삭제)
         _section("중요 이슈", sec_narrative(a, n), tab="오늘"),   # 그래프 아래로 (2026-10-11 사용자)
-        _section("뉴스", sec_direction_bars(a) + sec_news_counts(a) + sec_events(a), line=True, tab="오늘"),   # 막대가 바로 와도 구분선
+        _section("뉴스", sec_direction_bars(a) + sec_news_counts(a) + sec_events(a), line=False, tab="오늘"),   # 바로 아래가 카드라 제목 밑 구분선 없음 (2026-10-13 사용자)   # 막대가 바로 와도 구분선
         # 탭 이름과 같은 제목(캘린더·기술지표·재무)은 탭 화면에서 숨긴다 — 본문(탭 없음)에서는 구획 경계로 남는다
         _section("캘린더", sec_upcoming(a) + _guide("범위", f"{config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 일정은 {config.COURT_LOOKAHEAD_DAYS}일"), tab="캘린더"),   # 안내는 카드 아래 (2026-10-11 사용자)
         _section("진행 중 사안", sec_cases(a), tab="캘린더"),
