@@ -1,6 +1,14 @@
 {
-  "updated_at": "2026-10-12 05:42:35 UTC",
+  "updated_at": "2026-10-12 15:10:31 UTC",
   "items": [
+    {
+      "title": "Banks are set to report this week. Here's what the options market expects",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/12/banks-are-set-to-report-this-week-heres-what-the-options-market-expects.html",
+      "published": "2026-10-12 13:27:20",
+      "summary": "Despite being flat on the year, the options market is pricing in some big financial sector moves as investor weigh the impact of higher rates.",
+      "title_ko": "은행들이 이번 주에 실적을 발표한다. 옵션 시장이 기대하는 바는"
+    },
     {
       "title": "Top Wall Street analysts prefer these 3 dividend stocks for stable income",
       "source": "CNBC",
@@ -88,14 +96,6 @@
       "published": "2026-09-29 11:28:27",
       "summary": "The relentless surge in rates is breaking the back of two key macro trades that had been holding firm.",
       "title_ko": "고금리로 휘청이는 2개 ETF… 트레이더들이 반등을 예상하는 1개 종목은"
-    },
-    {
-      "title": "Nearly half the stocks in the S&P 500 are at cross purposes with the rest of the market",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/28/nearly-half-of-the-stocks-in-the-sp-500-are-working-against-it.html",
-      "published": "2026-09-28 17:53:31",
-      "summary": "Almost half of the stocks in the S&P 500 have a negative beta, evidence of a chasm between the entire index and its individual components.",
-      "title_ko": "S&P 500 종목 절반 가까이, 시장 나머지 흐름과 엇박자"
     }
   ]
 }
