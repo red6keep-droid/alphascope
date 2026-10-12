@@ -1,6 +1,22 @@
 {
-  "updated_at": "2026-10-12 15:10:31 UTC",
+  "updated_at": "2026-10-12 22:51:24 UTC",
   "items": [
+    {
+      "title": "A massive trade just happened in surging shares of Snap",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/12/a-massive-trade-just-happens-in-surging-shares-of-snap.html",
+      "published": "2026-10-12 18:43:44",
+      "summary": "Options traders bet on 30% rally in Snap",
+      "title_ko": "스냅 주가 급등 속 대규모 거래가 발생했다"
+    },
+    {
+      "title": "UnitedHealth shares are doing something unusual ahead of earnings",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/12/unitedhealth-shares-are-doing-something-unusual-ahead-of-earnings.html",
+      "published": "2026-10-12 16:42:13",
+      "summary": "The only thing more expensive than health insurance is perhaps the costs of insuring shares of health insurers",
+      "title_ko": "유나이티드헬스 주가가 실적 발표 전 이상한 움직임을 보이고 있다"
+    },
     {
       "title": "Banks are set to report this week. Here's what the options market expects",
       "source": "CNBC",
@@ -80,22 +96,6 @@
       "published": "2026-10-01 20:41:38",
       "summary": "BP's largest oil discovery in 25 years. What it means for the stock.",
       "title_ko": "유럽의 겨울 에너지 위기 이미 시작됐을 수도… 수혜가 기대되는 미국 주식 2개"
-    },
-    {
-      "title": "IPO postponements are accelerating in third quarter, even beyond Oura",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/29/ipo-postponements-are-accelerating-in-third-quarter-even-beyond-oura.html",
-      "published": "2026-10-02 17:17:01",
-      "summary": "It's been a strong year for IPOs. But now, more companies are deciding to stay on the sidelines.",
-      "title_ko": "오우라를 넘어 3분기 IPO 연기 가속화"
-    },
-    {
-      "title": "Higher rates are wreaking havoc on these two ETFs. Traders see one bouncing back",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/09/29/higher-rates-are-wreaking-havoc-on-these-two-etfs-traders-see-one-bouncing-back.html",
-      "published": "2026-09-29 11:28:27",
-      "summary": "The relentless surge in rates is breaking the back of two key macro trades that had been holding firm.",
-      "title_ko": "고금리로 휘청이는 2개 ETF… 트레이더들이 반등을 예상하는 1개 종목은"
     }
   ]
 }
