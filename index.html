@@ -22,7 +22,7 @@
 */
 
 /* ==========================================================================
-   AlphaFlow — main home
+   AlphaScope — main home
    Figma: alphaflow-main-home (1440 x 2674)
    ========================================================================== */
 
@@ -203,6 +203,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 
 .nav-toggle { display: none; }
+/* 서랍 메뉴의 닫기 버튼·뒤 가림막 — JS가 만든다. 데스크톱에서는 쓰지 않는다 */
+.nav-close {
+  display: none; position: absolute; top: 16px; right: 16px;
+  width: 36px; height: 36px; align-items: center; justify-content: center;
+  border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600);
+}
+.nav-close svg { width: 16px; height: 16px; }
+.nav-overlay { position: fixed; inset: 0; z-index: 55; background: rgba(15,23,42,.45); }
+.nav-overlay[hidden] { display: none; }
+body.menu-open { overflow: hidden; }
 
 /* ==========================================================================
    shell
@@ -997,10 +1007,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   /* 메뉴 9개와 검색창이 겹치는 폭부터 검색은 아이콘 — 누르면 헤더 아래 한 줄 전체 폭 (2026-10-10) */
   .search-toggle { display: flex; }
   .nav-right { gap: 12px; }
-  .search-bar { display: none; order: 4; width: 100%; margin-top: 8px; }
+  /* 검색창은 헤더 아래로 내려오는 줄 — 아이콘들은 오른쪽에 그대로 (2026-10-12 사용자: 알림 · 검색 · 메뉴 우측 정렬) */
+  .search-bar { display: none; position: absolute; top: calc(100% + 8px); left: var(--gutter); right: var(--gutter); width: auto; box-shadow: 0 8px 24px rgba(15,23,42,.14); }
   .search-bar.is-open { display: flex; }
-  .navbar { flex-wrap: wrap; }
-  .navbar.search-open .nav-right { display: contents; }
   .index-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sector-body { grid-template-columns: minmax(0, 1fr); }
   .news-top { grid-template-columns: minmax(0, 1fr) 180px; }
@@ -1013,22 +1022,29 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @media (max-width: 900px) {
   .navbar { flex-wrap: wrap; height: auto; padding: 12px var(--gutter); }
   .nav-left { gap: 20px; flex: 1; }
-  .nav-toggle {
+  .nav-toggle, .icon-btn {
     display: flex; align-items: center; justify-content: center;
     width: 36px; height: 36px; flex: none;
     border: 1px solid var(--border-strong); border-radius: 8px;
     color: var(--gray-600);
   }
+  .nav-right { gap: 8px; }
+  /* 모바일 메뉴: 메뉴 아이콘을 누르면 오른쪽에서 서랍이 열린다 (2026-10-12 사용자). 열고 닫기는 JS(.is-open) */
   .menu-items {
-    order: 3;
-    width: 100%;
-    gap: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 60;
+    width: min(320px, 84vw);
+    flex-direction: column; align-items: stretch; gap: 0;
+    padding: 72px 0 24px;
+    background: var(--surface);
+    box-shadow: -8px 0 30px rgba(15,23,42,.18);
+    transform: translateX(100%);
+    transition: transform .22s ease;
+    overflow-y: auto;
   }
-  .menu-items::-webkit-scrollbar { display: none; }
-  .menu-items[hidden] { display: none; }
-  .nav-item { padding: 12px 10px; font-size: 18px; }
+  .menu-items.is-open { transform: none; }
+  .nav-item { padding: 14px 24px; font-size: 18px; line-height: 27px; border-bottom: 1px solid var(--border); }
+  .nav-item[aria-current="page"]::after { display: none; }
+  .nav-close { display: flex; }
 
   .briefing-main { grid-template-columns: minmax(0, 1fr); }
   #nvda-card { grid-column: auto; }
@@ -1146,6 +1162,13 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   color: var(--ink);
 }
 .post-title a { color: inherit; }
+/* 글 제목 끝의 " — 날짜"는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다 */
+.post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; }
+/* 제목 아래 날짜 줄(October 11, 2026) 삭제 (2026-10-12 사용자) */
+.post-timestamp { display: none !important; }
+/* 글 보기: 첫 제목 위 여백 70% 줄임 (2026-10-12 사용자) — 위 32+40 → 10+12 */
+body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 10px; }
+body.item-view .post-outer-container { padding-top: 12px; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
 .post-body { font-size: 18px; line-height: 1.8; color: #333; overflow-wrap: anywhere; }
@@ -1158,20 +1181,24 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 /* 아코디언 (리포트 details[data-acc]): 기본 삼각형 숨기고 화살표 아이콘을 펼치면 위로 (2026-10-11) */
 .post-body details[data-acc] > summary::-webkit-details-marker { display: none; }
 .post-body details[data-acc][open] > summary .acc-chev { transform: rotate(180deg); }
-/* 툴팁 (리포트 [data-tip]): 마우스를 올리거나(PC) 누르면(폰, tabindex 포커스) 아이콘 아래에 바로 뜬다. title 툴팁은 느리고 폰에서 안 떠서 대체 (2026-10-11) */
-.post-body [data-tip] { outline: none; }
-.post-body [data-tip]::after { content: attr(data-tip); position: absolute; left: 0; top: calc(100% + 4px); z-index: 20; width: max-content; max-width: 100%;
-  padding: 8px 10px; background: #fff; color: #111; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.12);
-  font-size: 14px; font-weight: 400; line-height: 1.5; white-space: pre-line; word-break: keep-all; text-align: left; display: none; }   /* pre-line: 툴팁 안 줄바꿈(&#10;) 허용 (2026-10-11) */
-.post-body [data-tip]:hover::after, .post-body [data-tip]:focus::after, .post-body [data-tip]:focus-within::after { display: block; }
+/* 툴팁 (리포트 [data-tip]) → 팝업창 (2026-10-12 사용자: "툴팁은 팝업창으로, 내용 18포인트"). ? 아이콘을 누르면(PC 클릭 · 폰 탭 · Enter) 화면 가운데 창이 뜬다.
+   테마 JS가 .rt-pop 을 만든다. 닫기: × 버튼 · 바깥 누르기 · Esc. 줄바꿈(&#10;)은 창 안에서 줄을 바꾼다 */
+.post-body [data-tip] { outline: none; cursor: pointer; }
+.post-body [data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 50%; }
+.rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.45); }
+.rt-pop[hidden] { display: none; }
+.rt-pop-box { position: relative; width: 100%; max-width: 520px; max-height: 80vh; overflow-y: auto; padding: 20px 20px 22px; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+.rt-pop-title { margin: 0 40px 12px 0; font-size: 18px; font-weight: 700; line-height: 27px; color: #111; }
+.rt-pop-body { font-size: 18px; font-weight: 400; line-height: 27px; color: #333; white-space: pre-line; word-break: keep-all; }
+.rt-pop-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 20px; line-height: 28px; cursor: pointer; }
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
-.post-body .rt-tab { flex: none; padding: 8px 12px; font: inherit; font-size: 16px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }
+.post-body .rt-tab { flex: none; padding: 8px 12px; font: inherit; font-size: 18px; line-height: 27px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) */
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
-.post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 16px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
+.post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 18px; line-height: 27px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
 /* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.
    data-grid=2 (C 카드 줄 묶음) → 2열 그리드 + 짝수 칸 왼쪽 세로 구분선. 둘째 칸의 인라인 border-top 은 지운다(첫 줄에 선이 생기지 않게).
@@ -1188,21 +1215,20 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 /* 전환 버튼 (data-switch, 당일 · 5일 그래프): 회색 바탕 알약 둘, 선택은 흰 바탕 · 검정 굵게 (2026-10-11) */
 .post-body .rt-segs { display: inline-flex; gap: 2px; padding: 3px; margin: 4px 0 8px; background: #F1F5F9; border-radius: 8px; }
 .post-body .rt-segs[hidden] { display: none; }
-.post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 16px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
+.post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 18px; line-height: 27px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
 .post-body .rt-seg[aria-pressed="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .post-body [data-switch-panel][hidden], .post-body [data-hz-panel][hidden] { display: none; }
 .post-body .rt-segs--in-sub { margin: 0 0 4px auto; flex: none; }
 /* 하위탭 (부정 발언 · 긍정 발언 · 전체): 서브탭보다 한 단계 아래 — 16px, 밑줄 2px 검정, 줄 아래 선 없음. 표본이 모자란 탭은 흐리게 (2026-10-11) */
 .post-body .rt-dirs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 0 8px; }
 .post-body .rt-dirs[hidden] { display: none; }
-.post-body .rt-dir { flex: none; padding: 4px 8px; font: inherit; font-size: 16px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
+.post-body .rt-dir { flex: none; padding: 4px 8px; font: inherit; font-size: 18px; line-height: 27px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
 .post-body .rt-dir[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: #111; }
 .post-body .rt-dir[data-empty] { color: #CBD5E1; }
-/* E 2열 카드는 폰에서 한 줄에 한 칸 — 칸 안 65% · 35% 규칙을 지키기 위해 (2026-10-11 사용자: 카드 줄 65/35 반드시) */
+/* E 2열 카드는 폰에서도 2열 (2026-10-12 사용자: "왜 2열로 적용 안 했냐") — 예전의 폰 한 칸 쌓기 규칙 삭제.
+   반 폭 칸에는 이름과 값이 한 줄에 들었다 안 들었다 해서, 폰에서는 칸마다 이름 위 · 값 아래 오른쪽으로 고르게 둔다 */
 @media (max-width: 680px) {
-  .post-body [data-pair] { flex-direction: column; }
-  .post-body [data-pair] > span + span { border-left: 0 !important; border-top: 1px solid #E2E8F0; }
-  .post-body [data-pair] > span:empty { display: none; }
+  .post-body [data-pair] > span > span:last-child { flex-basis: 100% !important; text-align: right; }
 }
 /* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11) */
 .post-body ul { list-style: disc; padding-left: 0; }
@@ -1232,16 +1258,16 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 11px 28px;
-  background: var(--surface);
-  border: 1px solid var(--ink);
+  padding: 12px 28px;
+  background: #111;
+  border: 1px solid #111;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 700;
-  color: var(--ink);
+  color: #fff;
 }
 .post-nav-list::before { content: '\2190'; }
-.post-nav-list:hover { border-color: var(--accent); color: var(--accent); }
+.post-nav-list:hover { background: #000; color: #fff; }   /* 검은 테마 버튼 (2026-10-12 사용자) */
 
 /* 이미 게시된 글 보정 — 리포트 본문은 인라인 font-size 를 달고 나오므로 CSS 가 밀린다.
    옛 글(15/14/12px)만 골라 덮어쓰도록 태그 종류까지 지정한다. 새 글은 렌더러가
@@ -1256,95 +1282,72 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-body [data-design="2"] table[style*="font-size:14px"] { font-size: 14px !important; }
 .post-body [data-design="2"] > div[style*="font-size:15px"] { font-size: 15px !important; }
 
-/* 공유 버튼 — b:css='false' 로 블로거 기본 CSS 를 끈 상태라 위젯 스타일이 전혀 없다.
-   기본 CSS 가 없으면 (1) svg 가 크기 제약을 잃고 원본 크기로 커지고,
-   (2) 팝업을 접어두던 .hidden 규칙이 사라져 플랫폼 항목이 세로로 쌓인다.
-   토글 버튼을 감추고 목록을 항상 펼친 가로 줄로 보여준다. */
+/* 공유 버튼 (2026-10-12 사용자: 공유 아이콘을 누르면 소셜 아이콘이 보이게) — b:css='false' 라 블로거 위젯 CSS 가 없다.
+   기본은 "공유" 버튼 하나, 누르면(.is-open, 테마 JS) 플랫폼 버튼 줄이 아래에 펼쳐진다. 창을 여는 JS 도 테마가 직접 단다 */
 .post-share-buttons { margin: 20px 0 0; }
-/* 본문 아래 공유 줄 — 구분선으로 본문과 떼어 둔다 */
 .post-share-buttons-bottom { margin: 28px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }
 .goog-inline-block { display: inline-block; }
-.sharing { position: relative; display: inline-block; }
-.sharing-button { display: none; }
-
-.share-buttons-container { display: block; }
-.share-buttons,
-.share-buttons.hidden {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.sharing { position: relative; display: block; }
+.sharing-button {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px;
+  font-size: 16px; font-weight: 700; color: var(--ink); cursor: pointer;
 }
+.sharing-button::after { content: '공유'; }
+.sharing-button:hover, .sharing.is-open .sharing-button { border-color: #111; }
+.share-buttons-container { display: none; margin-top: 10px; }
+.sharing.is-open .share-buttons-container { display: block; }
+.share-buttons, .share-buttons.hidden { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .share-buttons li { margin: 0; }
-
 .sharing-platform-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 12px;
-  background: var(--surface-sub);
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--gray-600);
-  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 12px;
+  background: var(--surface-sub); border: 1px solid var(--border-strong); border-radius: 8px;
+  font-size: 14px; font-weight: 700; color: var(--gray-600); cursor: pointer;
 }
-.sharing-platform-button:hover { border-color: var(--accent); color: var(--accent); }
+.sharing-platform-button:hover { border-color: #111; color: #111; }
 .platform-sharing-text { white-space: nowrap; }
+.post-share-buttons svg, .sharing svg, svg.svg-icon-24, .touch-icon { width: 20px; height: 20px; flex: none; fill: currentColor; }
 
-/* 크기 제약이 없어 깨져 보이던 아이콘 */
-.post-share-buttons svg,
-.sharing svg,
-svg.svg-icon-24,
-.touch-icon {
-  width: 20px;
-  height: 20px;
-  flex: none;
-  fill: currentColor;
-}
-
-/* 댓글 */
+/* 댓글 (2026-10-12 사용자: 산만하고 가이드에 안 맞다, 버튼 정렬) — 블로거 threaded comments 마크업을 가이드 글자 체계로.
+   제목 21px, 글 18px·행간 27px, 이름 16px 굵게, 날짜·동작 14px 회색, 버튼은 한 줄 오른쪽 정렬·같은 외곽선 모양 */
 .comments {
-  width: 100%;
-  max-width: var(--shell);
-  margin: 20px auto 0;
-  padding: 28px 40px 32px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  width: 100%; max-width: var(--shell); margin: 20px auto 0; padding: 28px 40px 32px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  font-size: 18px; line-height: 27px; color: #333; word-break: keep-all;
 }
-.comments h3, .comments .comments-title {
-  margin: 0 0 16px;
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--ink);
-}
+.comments h3, .comments .comments-title, .comments h3.title { margin: 0 0 14px; padding-bottom: 6px; border-bottom: 2px solid #eee; font-size: 21px; font-weight: 700; line-height: 27px; color: #111; }
+.comments h4, .comments #comment-post-message { margin: 0 0 10px; font-size: 16px; font-weight: 700; line-height: 27px; color: #111; }
 .comments ol, .comments ul { list-style: none; padding: 0; margin: 0; }
-.comments .comment { padding: 14px 0; border-bottom: 1px solid var(--border); }
-.comments .comment:last-child { border-bottom: 0; }
-.comments .comment-header .user, .comments .user a {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--ink);
+.comments .comment-thread > ol > li, .comments ol > li.comment { padding: 14px 0; border-top: 1px solid #E2E8F0; }
+.comments .comment-thread > ol > li:first-child, .comments ol > li.comment:first-child { border-top: 0; padding-top: 0; }
+.comments .comment { display: flex; gap: 12px; align-items: flex-start; }
+.comments .comment-replies .comment, .comments .comment .comment { padding-left: 0; }
+.comments .comment-replies { margin: 10px 0 0 48px; }
+.comments .comment-replies > .thread-toggle { font-size: 14px; color: var(--gray-500); }
+.comments .avatar-image-container { flex: none; width: 36px; height: 36px; }
+.comments .avatar-image-container img { width: 36px; height: 36px; border-radius: 50%; display: block; }
+.comments .comment-block { flex: 1; min-width: 0; }
+.comments .comment-header { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 0; }
+.comments .comment-header .user, .comments .user a, .comments .comment-author { font-size: 16px; font-weight: 700; color: #111; font-style: normal; }
+.comments .comment-header .icon.user { display: none; }
+.comments .datetime, .comments .comment-header .datetime a, .comments .comment-footer .comment-timestamp a { font-size: 14px; line-height: 21px; color: #7A7A7A; }
+.comments .comment-content { margin: 4px 0 0; font-size: 18px; line-height: 27px; color: #333; }
+.comments .comment-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; }
+.comments .comment-actions a, .comments .comment-actions .item-control a, .comments .continue a, .comments .loadmore a, .comments .comment-footer a {
+  display: inline-flex; align-items: center; margin: 0; padding: 5px 12px;
+  background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px;
+  font-size: 14px; line-height: 21px; font-weight: 700; color: #111; text-decoration: none;
 }
-.comments .datetime, .comments .comment-header .datetime a {
-  font-size: 14px;
-  color: var(--gray-400);
-}
-.comments .comment-content { margin-top: 6px; font-size: 17px; line-height: 1.7; color: var(--gray-600); }
-.comments .comment-actions a { margin-right: 10px; font-size: 14px; color: var(--gray-400); }
-.comments .avatar-image-container img { width: 36px; height: 36px; border-radius: 50%; }
+.comments .comment-actions a:hover, .comments .continue a:hover, .comments .loadmore a:hover { border-color: #111; }
+.comments .item-control { display: inline; }
+.comments .continue, .comments .loadmore { display: flex; justify-content: flex-end; margin-top: 10px; }
+.comments .comment-footer, .comments .comment-form { margin-top: 18px; padding-top: 14px; border-top: 1px solid #E2E8F0; }
+.comments .comment-form p { margin: 0 0 8px; font-size: 14px; line-height: 21px; color: #6B7280; }
 .comments iframe { width: 100%; border: 0; }
-.comments .continue a, .comments .loadmore a {
-  display: inline-block;
-  margin-top: 12px;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--accent);
-}
+.comments .comment-replybox-single, .comments .comment-replybox-thread { margin-top: 10px; }
+#comment-popup { display: none; }
 
 /* 레이아웃 모드에서만 보이는 보관용 위젯 */
 .hidden-widgets { display: none; }
@@ -1355,6 +1358,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
 @media (max-width: 900px) {
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .post-outer-container, .comments { padding: 24px; }
+  body.item-view .post-outer-container { padding-top: 7px; }   /* 24 → 7 (70% 줄임) */
   .post-title { font-size: 26px; }
 }
 @media (max-width: 680px) {
@@ -1362,6 +1366,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   /* 글 보기(모바일): 화면 가장자리에서 본문까지 정확히 20px. 카드 테두리·안쪽 패딩은 없앤다 (2026-10-10) */
   body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px */
   .post-outer-container, .comments { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
+  body.item-view .post-outer-container { padding-top: 5px; }   /* 16 → 5 (70% 줄임) */
   .post-title { font-size: 24px; letter-spacing: -.3px; }
   .post-body { font-size: 17px; line-height: 1.75; }
   /* 데스크톱용 커버 이미지 확대 규칙(1024px !important)이 모바일에서 글 폭을 벌리지 않게 */
@@ -1391,33 +1396,18 @@ body.no-dashboard .main-content { padding-top: 32px; }
     <header class='navbar'>
       <div class='nav-left'>
         <b:section class='logo-holder' id='header' maxwidgets='1' name='Header' showaddelement='false'>
-          <b:widget id='Header1' locked='true' title='AlphaFlow (Header)' type='Header' visible='true'>
+          <b:widget id='Header1' locked='true' title='AlphaScope (Header)' type='Header' visible='true'>
             <b:includable id='main'>
               <a class='logo' expr:href='data:blog.homepageUrl'>
                 <svg class='logo-mark' viewBox='0 0 36 33'>
                   <path d='M13.2 0H32.6L19.4 16.6H0L13.2 0Z' fill='#000000'/>
                   <path d='M17.7 15.2H35.5L22.3 32.4H4.5L17.7 15.2Z' fill='#DD0000'/>
                 </svg>
-                <span class='logo-word'>AlphaFlow</span>
+                <span class='logo-word'>AlphaScope</span>
               </a>
             </b:includable>
           </b:widget>
         </b:section>
-
-        <button class='search-toggle' type='button' aria-controls='site-search' aria-expanded='false'>
-          <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='2'>
-            <circle cx='5.75' cy='5.75' r='4.5'/>
-            <path d='M9.3 9.3 12.8 12.8' stroke-linecap='round'/>
-          </svg>
-          <span class='sr-only'>검색 열기</span>
-        </button>
-
-        <button class='nav-toggle' type='button' aria-controls='primary-menu' aria-expanded='false'>
-          <svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
-            <path d='M3 6h18M3 12h18M3 18h18'/>
-          </svg>
-          <span class='sr-only'>메뉴 열기</span>
-        </button>
 
         <nav class='menu-items' id='primary-menu'>
           <a class='nav-item' expr:href='data:blog.homepageUrl'>
@@ -1463,6 +1453,23 @@ body.no-dashboard .main-content { padding-top: 32px; }
           </svg>
           <span class='sr-only'>알림</span>
         </button>
+
+        <!-- 폰: 알림 · 검색 · 메뉴 순서로 오른쪽 정렬 (2026-10-12 사용자) -->
+        <button class='search-toggle' type='button' aria-controls='site-search' aria-expanded='false'>
+          <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='2'>
+            <circle cx='5.75' cy='5.75' r='4.5'/>
+            <path d='M9.3 9.3 12.8 12.8' stroke-linecap='round'/>
+          </svg>
+          <span class='sr-only'>검색 열기</span>
+        </button>
+
+        <button class='nav-toggle' type='button' aria-controls='primary-menu' aria-expanded='false'>
+          <svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
+            <path d='M3 6h18M3 12h18M3 18h18'/>
+          </svg>
+          <span class='sr-only'>메뉴 열기</span>
+        </button>
+
       </div>
     </header>
 
@@ -1686,7 +1693,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
       <!-- 게시글: 홈 하단의 최신 리포트 목록 / 글 보기 본문 -->
       <b:section class='page-body' id='page_body' name='Page Body' showaddelement='false'>
         <b:widget id='FeaturedPost1' locked='true' title='' type='FeaturedPost' visible='true'>
-          <b:includable id='main'><b:comment>AlphaFlow 테마에서는 표시하지 않음</b:comment></b:includable>
+          <b:includable id='main'><b:comment>AlphaScope 테마에서는 표시하지 않음</b:comment></b:includable>
         </b:widget>
 
         <b:widget id='Blog1' locked='true' title='Blog Posts' type='Blog' visible='true'>
@@ -2195,7 +2202,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         </b:widget>
 
         <b:widget id='PopularPosts1' locked='true' title='' type='PopularPosts' visible='true'>
-          <b:includable id='main'><b:comment>AlphaFlow 테마에서는 표시하지 않음</b:comment></b:includable>
+          <b:includable id='main'><b:comment>AlphaScope 테마에서는 표시하지 않음</b:comment></b:includable>
         </b:widget>
       </b:section>
     </main>
@@ -2203,14 +2210,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
     <div class='breaking'>
       <span class='breaking-badge'>BREAKING</span>
       <div class='breaking-track'>
-        <span class='breaking-text' id='breaking-text'>ALPHAFLOW 실시간 뉴스: 데이터를 불러오는 중…</span>
+        <span class='breaking-text' id='breaking-text'>ALPHASCOPE 실시간 뉴스: 데이터를 불러오는 중…</span>
       </div>
     </div>
 
     <footer class='site-footer'>
-      <p class='footer-title'>ALPHAFLOW AI 투자 의사 결정 보조 리포트 서비스</p>
+      <p class='footer-title'>ALPHASCOPE AI 투자 의사 결정 보조 리포트 서비스</p>
       <p class='footer-disclaimer'>
-        면책사항: ALPHAFLOW 에서 제공하는 모든 분석 데이터 및 지표 스코어는 독자적인 AI 모델 및 알고리즘에 의한 가공적 연산 결과이며,
+        면책사항: ALPHASCOPE 에서 제공하는 모든 분석 데이터 및 지표 스코어는 독자적인 AI 모델 및 알고리즘에 의한 가공적 연산 결과이며,
         어떠한 경우에도 투자 수익률을 보장하거나 권유하지 않습니다. 최종 투자 의사 결정과 책임은 투자자 본인에게 있습니다.
       </p>
       <b:section class='attribution' id='footer' name='Footer' showaddelement='false' tag='div'>
@@ -2223,7 +2230,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               <b:if cond='data:copyright != &quot;&quot;'>
                 <data:copyright/>
               <b:else/>
-                © 2026 ALPHAFLOW. All rights reserved.
+                © 2026 ALPHASCOPE. All rights reserved.
               </b:if>
             </p>
           </b:includable>
@@ -2663,8 +2670,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
             var line = items.slice(0, 6).map(function (i) { return i.title; }).join('  ·  ');
             var tick = document.getElementById('breaking-text');
             if (tick) tick.textContent =
-              'ALPHAFLOW 실시간 뉴스: ' + line + '  ·  ' +
-              'ALPHAFLOW 실시간 뉴스: ' + line + '  ·  ';
+              'ALPHASCOPE 실시간 뉴스: ' + line + '  ·  ' +
+              'ALPHASCOPE 실시간 뉴스: ' + line + '  ·  ';
 
             /* 헤드라인 */
             var lead = items[0];
@@ -2728,7 +2735,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             var hl = document.querySelector('#news-hero .news-headline');
             if (hl) hl.textContent = '뉴스를 불러올 수 없습니다.';
             var t2 = document.getElementById('breaking-text');
-            if (t2) t2.textContent = 'ALPHAFLOW 실시간 뉴스';
+            if (t2) t2.textContent = 'ALPHASCOPE 실시간 뉴스';
           });
 
         /* ====================================================== 오늘의 데일리 리포트
@@ -2764,14 +2771,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
           {
             id: 'report-card',
             label: '데일리 브리핑',
-            map: { summary: ['(머리)', '오늘 한 줄', '주요 지수'], insight: ['(종합)', '종합', '종합 — 현재 시장 상태'] },   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용. (종합) = 머리 카드 안 종합 문단 (2026-10-12) */
+            map: { summary: ['(머리)', '오늘 한 줄'], insight: ['(종합)', '종합', '종합 — 현재 시장 상태'] },   /* 주요 지수 수치는 홈에 싣지 않는다 — 한 줄 결론만 (2026-10-12 사용자: 요약 짧게) */   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용. (종합) = 머리 카드 안 종합 문단 (2026-10-12) */
             picks: true,
             empty: '아직 발행된 리포트가 없습니다.'
           },
           {
             id: 'trump-card',
             label: '트럼프 트렌드',
-            map: { speech: ['(머리)', '오늘 한 줄', '달라진 것', '무엇이 달라졌나'], watch: ['내일 볼 것'] },
+            map: { speech: ['발언', '오늘 한 줄', '달라진 것', '무엇이 달라졌나'], watch: ['내일 볼 것'] },   /* 트럼프는 머리 구획이 없다 — 발언 집계 줄부터 (2026-10-12) */
             picks: false,
             empty: '아직 발행된 트렌드 리포트가 없습니다.'
           },
@@ -2785,8 +2792,17 @@ body.no-dashboard .main-content { padding-top: 32px; }
           }
         ];
         var PICKS_HEADS = ['급등주', '오늘의 급등주 TOP 5'];   /* 새 디자인 제목 · 옛 글 제목 */
-        /* 구획 하나에 싣는 최대 줄 수 — 카드는 요약이고 전체는 글에서 읽는다 */
-        var MAX_LINES = 5;
+        /* 구획 하나에 싣는 최대 줄 수 — 카드는 요약이고 전체는 글에서 읽는다 (2026-10-12 사용자: 요약이 너무 길다 → 2줄, 한 줄 120자) */
+        var MAX_LINES = 2;
+        var MAX_CHARS = 120;
+        /* 긴 줄은 문장 끝(다. / . )에서 자르고, 문장 끝이 없으면 글자 수에서 자른 뒤 … */
+        function clip(t) {
+          if (t.length <= MAX_CHARS) return t;
+          var head = t.slice(0, MAX_CHARS);
+          var cut = Math.max(head.lastIndexOf('다. '), head.lastIndexOf('. '), head.lastIndexOf('다.'));
+          if (cut > MAX_CHARS * 0.4) return head.slice(0, cut + (head.charAt(cut) === '다' ? 2 : 1)).trim();
+          return head.replace(/\s+\S*$/, '').trim() + '…';
+        }
 
         /* h2 제목에서 앞의 ①②… 번호와 뒤의 "(…)" 를 뗀 이름 — 엔비디아 리포트용 */
         function sectionKey(title) {
@@ -2806,7 +2822,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
             while (n && n.tagName !== 'H2') { nodes.push(n); n = n.nextElementSibling; }
             /* 제목 옆 요약(data-summary)은 제목 글자에서 뺀다 — "뉴스 오늘 15건 · …" 가 아니라 "뉴스" 로 찾는다 (2026-10-11) */
             var hc = heads[i].cloneNode(true);
-            [].slice.call(hc.querySelectorAll('[data-summary]')).forEach(function (x) { x.parentNode.removeChild(x); });
+            /* 제목 글자만 — 요약(data-summary)·캡슐 줄·툴팁 등 제목 줄에 붙은 요소는 모두 뺀다 (2026-10-12: 트럼프 "발언" 제목에 캡슐 글자가 붙어 못 찾던 문제) */
+            [].slice.call(hc.children).forEach(function (x) { hc.removeChild(x); });
             var title = String(hc.textContent || '').trim();
             out[title] = nodes;
             var key = sectionKey(title);
@@ -2814,7 +2831,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
           }
           /* 제목 없는 머리 구획 "(가격)": 엔비디아 글은 가격 카드·그래프가 첫 h2 앞에 제목 없이 온다 (2026-10-11).
              data-cards 를 단 첫 요소부터 첫 h2 전까지 — 그 앞의 안내 상자·기준 거래일은 뺀다. */
-          var lead = doc.querySelector('[data-cards], [data-lead]');   /* data-lead: 데일리·트럼프 머리 (2026-10-11) */
+          var lead = doc.querySelector('[data-lead]') || doc.querySelector('[data-cards]');   /* data-lead: 데일리 머리 (2026-10-11) */
+          /* 첫 h2 뒤에 오는 data-cards(트럼프 급상승 주제 카드 등)는 머리가 아니다 — 읽는 법 글머리표가 홈에 실리던 원인 (2026-10-12) */
+          for (var q = lead; q; q = q.previousElementSibling) { if (q.tagName === 'H2') { lead = null; break; } }
           if (lead) {
             var ln = [], m = lead;
             while (m && m.tagName !== 'H2') { ln.push(m); m = m.nextElementSibling; }
@@ -2832,14 +2851,16 @@ body.no-dashboard .main-content { padding-top: 32px; }
              안에 b · span 같은 인라인만 있을 수 있으므로 그 요소 전체 글을 한 줄로 친다.
            - 표는 건너뛴다. 출처·면책 문단은 두 리포트 템플릿 모두 윗줄(border-top)로
              구분하므로 그 요소도 건너뛴다. */
-        var INLINE = { B: 1, I: 1, EM: 1, STRONG: 1, SPAN: 1, A: 1, BR: 1, SUP: 1, SUB: 1, CODE: 1, SMALL: 1, MARK: 1 };
+        var INLINE = { B: 1, I: 1, EM: 1, STRONG: 1, SPAN: 1, A: 1, BR: 1, SUP: 1, SUB: 1, CODE: 1, SMALL: 1, MARK: 1, SVG: 1 };   /* SVG: ⓘ 아이콘이 든 안내 줄도 한 줄로 읽는다 (2026-10-12) */
 
         function linesOf(nodes) {
           var lines = [], bullets = [];
           function text(n) { return String(n.textContent || '').replace(/\s+/g, ' ').trim(); }
+          /* 카드 줄처럼 display:flex·block·grid 인 span 은 한 줄(블록)로 본다 — 가격 카드가 통째로 한 줄이 되지 않게 (2026-10-12) */
+          function blockSpan(n) { return n.tagName === 'SPAN' && /display:\s*(flex|block|grid)\b/.test(n.getAttribute('style') || ''); }
           function leaf(n) {
             for (var i = 0; i < n.children.length; i++) {
-              if (!INLINE[n.children[i].tagName]) return false;
+              if (!INLINE[String(n.children[i].tagName).toUpperCase()] || blockSpan(n.children[i])) return false;   /* 인라인 svg 는 tagName 이 소문자 'svg' */
             }
             return true;
           }
@@ -2847,8 +2868,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
             if (!n || n.tagName === 'TABLE') return;
             if (/border-top/.test(n.getAttribute('style') || '')) return;
             if (n.hasAttribute('data-acc')) return;   /* 아코디언(목표가 등)은 홈 카드에 싣지 않는다 */
-            if (n.tagName === 'LI') { var b = text(n); if (b) bullets.push(b); return; }
-            if (leaf(n)) { var t = text(n); if (t) lines.push(t); return; }
+            if (n.hasAttribute('data-guide')) return;   /* 읽는 법 카드는 요약이 아니다 (2026-10-12) */
+            if (n.tagName === 'LI') { var b = text(n); if (b) bullets.push(clip(b)); return; }
+            if (leaf(n)) { var t = text(n); if (t) lines.push(clip(t)); return; }
             for (var i = 0; i < n.children.length; i++) walk(n.children[i]);
           }
           for (var i = 0; i < (nodes || []).length; i++) walk(nodes[i]);
@@ -2964,17 +2986,15 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
         CARDS.forEach(loadCard);
 
-        /* ============================================================ 모바일 메뉴 */
+        /* ============================================================ 모바일 메뉴 (2026-10-12 사용자: 메뉴를 누르면 오른쪽에서 열리는 서랍) */
 
         var searchToggle = document.querySelector('.search-toggle');
         var searchBar = document.querySelector('.search-bar');
-        var navbar = document.querySelector('.navbar');
         if (searchToggle && searchBar) {
           searchToggle.addEventListener('click', function () {
             var open = searchToggle.getAttribute('aria-expanded') !== 'true';
             searchToggle.setAttribute('aria-expanded', String(open));
             searchBar.classList.toggle('is-open', open);
-            if (navbar) navbar.classList.toggle('search-open', open);
             if (open) { var input = searchBar.querySelector('input'); if (input) input.focus(); }
           });
         }
@@ -2982,18 +3002,111 @@ body.no-dashboard .main-content { padding-top: 32px; }
         var toggle = document.querySelector('.nav-toggle');
         var menu = document.getElementById('primary-menu');
         if (!toggle || !menu) return;
-
-        function syncMenu() {
-          var narrow = window.matchMedia('(max-width: 900px)').matches;
-          menu.hidden = narrow && toggle.getAttribute('aria-expanded') !== 'true';
+        var overlay = document.createElement('div'); overlay.className = 'nav-overlay'; overlay.hidden = true;
+        document.body.appendChild(overlay);
+        var closeBtn = document.createElement('button'); closeBtn.type = 'button'; closeBtn.className = 'nav-close';
+        closeBtn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg><span class="sr-only">메뉴 닫기</span>';
+        menu.insertBefore(closeBtn, menu.firstChild);
+        function narrow() { return window.matchMedia('(max-width: 900px)').matches; }
+        function setMenu(open) {
+          toggle.setAttribute('aria-expanded', String(open));
+          menu.classList.toggle('is-open', open);
+          overlay.hidden = !open;
+          document.body.classList.toggle('menu-open', open);
+          if (open) closeBtn.focus(); else toggle.focus();
         }
+        toggle.addEventListener('click', function () { setMenu(toggle.getAttribute('aria-expanded') !== 'true'); });
+        closeBtn.addEventListener('click', function () { setMenu(false); });
+        overlay.addEventListener('click', function () { setMenu(false); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('is-open')) setMenu(false); });
+        window.addEventListener('resize', function () { if (!narrow() && menu.classList.contains('is-open')) setMenu(false); });
+      })();
 
-        toggle.addEventListener('click', function () {
-          toggle.setAttribute('aria-expanded', String(toggle.getAttribute('aria-expanded') !== 'true'));
-          syncMenu();
+      /* ============================================================ 글 제목의 " — 날짜" (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
+         "미국 증시 데일리 브리핑 — 2026년 10월 11일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양은 테마 CSS. */
+      (function () {
+        'use strict';
+        [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
+          var host = h.querySelector('a') || h;
+          if (host.children.length) return;
+          var m = /^(.*\S)\s+([—–-]\s*\d{4}\s*년.*)$/.exec(host.textContent.trim());
+          if (!m) return;
+          host.textContent = m[1] + ' ';
+          var sp = document.createElement('span'); sp.className = 'post-title-date'; sp.textContent = m[2];
+          host.appendChild(sp);
         });
-        window.addEventListener('resize', syncMenu);
-        syncMenu();
+      })();
+
+      /* ============================================================ 공유 버튼 (2026-10-12 사용자: 공유 아이콘을 누르면 소셜 아이콘, 기능이 안 되던 이유 해결)
+         블로거의 공유 위젯은 마크업만 내보내고, 눌렀을 때 창을 여는 JS는 블로거 기본 테마 스크립트(b:template-script)에 있다.
+         이 테마는 그 스크립트를 쓰지 않아 눌러도 아무 일이 없었다. 여기서 직접 연다: data-href 를 새 창으로, "링크 가져오기"는 주소 복사. */
+      (function () {
+        'use strict';
+        [].slice.call(document.querySelectorAll('.post-share-buttons .sharing')).forEach(function (box) {
+          var btn = box.querySelector('.sharing-button');
+          if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.addEventListener('click', function (e) {
+              e.preventDefault();
+              var open = !box.classList.contains('is-open');
+              box.classList.toggle('is-open', open);
+              btn.setAttribute('aria-expanded', String(open));
+            });
+          }
+          [].slice.call(box.querySelectorAll('.sharing-platform-button')).forEach(function (p) {
+            p.setAttribute('tabindex', '0');
+            function go(e) {
+              e.preventDefault();
+              var href = p.getAttribute('data-href') || '', url = p.getAttribute('data-url') || href;
+              if (/sharing-element-link/.test(p.className) || !href) {
+                var done = function () { var t = p.querySelector('.platform-sharing-text'); if (t) { var o = t.textContent; t.textContent = '복사됨'; setTimeout(function () { t.textContent = o; }, 1500); } };
+                if (navigator.clipboard && url) navigator.clipboard.writeText(url).then(done, function () { window.prompt('주소를 복사하세요', url); });
+                else window.prompt('주소를 복사하세요', url);
+                return;
+              }
+              if (/^mailto:/.test(href)) { location.href = href; return; }
+              window.open(href, '_blank', 'noopener,width=640,height=560');
+            }
+            p.addEventListener('click', go);
+            p.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') go(e); });
+          });
+        });
+      })();
+
+      /* ============================================================ 툴팁 팝업창 (2026-10-12 사용자: "툴팁은 팝업창으로", 내용 18px)
+         리포트의 ? 아이콘([data-tip])을 누르면 화면 가운데 창. 제목은 아이콘 앞 글자(예: "시장 국면", "판정"), 내용은 data-tip.
+         닫기: × · 바깥 누르기 · Esc. 닫으면 포커스를 아이콘으로 돌려준다. */
+      (function () {
+        'use strict';
+        var tips = document.querySelectorAll('.post-body [data-tip]');
+        if (!tips.length) return;
+        var pop = document.createElement('div'); pop.className = 'rt-pop'; pop.hidden = true;
+        pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-labelledby="rt-pop-title">' +
+          '<button type="button" class="rt-pop-close" aria-label="닫기">×</button>' +
+          '<div class="rt-pop-title" id="rt-pop-title"></div><div class="rt-pop-body"></div></div>';
+        document.body.appendChild(pop);
+        var box = pop.firstChild, last = null;
+        function titleOf(icon) {
+          var host = icon.parentNode, t = '';
+          if (host) { var c = host.cloneNode(true); [].slice.call(c.querySelectorAll('[data-tip], svg')).forEach(function (x) { x.parentNode.removeChild(x); }); t = c.textContent.replace(/\s+/g, ' ').trim(); }
+          return t.length > 40 ? t.slice(0, 40) + '…' : (t || '설명');
+        }
+        function open(icon) {
+          last = icon;
+          pop.querySelector('.rt-pop-title').textContent = titleOf(icon);
+          pop.querySelector('.rt-pop-body').textContent = icon.getAttribute('data-tip');
+          pop.hidden = false;
+          pop.querySelector('.rt-pop-close').focus();
+        }
+        function close() { pop.hidden = true; if (last) last.focus(); }
+        [].slice.call(tips).forEach(function (icon) {
+          icon.setAttribute('aria-haspopup', 'dialog');
+          icon.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); open(icon); });
+          icon.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(icon); } });
+        });
+        pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
+        pop.querySelector('.rt-pop-close').addEventListener('click', close);
+        document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
       })();
 
       /* ============================================================ 리포트 탭 (글 보기)
@@ -3062,7 +3175,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             if (sc.key === g.name) {   /* 탭 이름과 같은 제목은 숨기고, 제목 옆 요약은 패널 맨 위 안내 줄로 */
               var sm = sc.h.querySelector('[data-summary]');
               sc.h.style.display = 'none';
-              if (sm) { var d = document.createElement('div'); d.style.cssText = 'font-size:14px;color:#6B7280;margin:0 0 8px;padding-left:12px;';   /* 안내 줄 12px 들여쓰기 (2026-10-11) */ d.innerHTML = sm.innerHTML; sc.h.insertAdjacentElement('afterend', d); }
+              if (sm) { var d = document.createElement('div'); d.style.cssText = 'font-size:14px;line-height:21px;color:#6B7280;margin:0 0 8px;padding-left:12px;';   /* 안내 줄 12px 들여쓰기 (2026-10-11) */ d.innerHTML = sm.innerHTML; sc.h.insertAdjacentElement('afterend', d); }
             }
           });
           if (!p.children.length) return;

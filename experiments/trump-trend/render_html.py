@@ -163,10 +163,10 @@ def _flow_card(blk):
         head = f'<b>{_esc(t)}</b> : ' if t else ""
         return dk.dot_li(head + dk.tint(_esc(x)), size=3)
     lis = "".join(li(t, x) for t, x in items)
-    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:14px 14px;margin:8px 0;">'
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-            f'<span style="font-weight:700;color:#111;">발언 흐름 : <span style="color:{color};">{_esc(state)}</span></span></span> '
-            f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid {bd};font-size:{dk.SMALL};line-height:1.5;">'
+            f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">발언 흐름 : <span style="color:{color};">{_esc(state)}</span></span></span> '
+            f'<div style="margin-top:4px;padding-top:14px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14 → 4px (70% 줄임, 2026-10-12 사용자)
             f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul></div></div>")
 
 
@@ -201,7 +201,7 @@ def _p(st):
     if not pl:
         return dk.dash()
     q = pl.get("q_bh")
-    q_html = f'<span style="color:{dk.SUB};font-size:{dk.TINY};"> q{q:.2f}</span>' if q is not None else ""
+    q_html = f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};"> q{q:.2f}</span>' if q is not None else ""
     if pl["indistinguishable"]:
         return f'<span style="color:{dk.SUB};">{pl["p_two_sided"]:.2f}</span>{q_html}'
     if pl.get("robust"):
@@ -257,10 +257,10 @@ def _chart_card(rows, horizon):
         return dk.dot_li(head + dk.tint(_esc(x)), size=3)
     lis = "".join(li(t, x) for t, x in items)
     note = ""   # 주의는 읽는 법 카드 안으로 (_read_card) — 2026-10-11 사용자
-    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:8px 0;">'
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:14px 14px;margin:8px 0;">'
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-            f'<span style="font-weight:700;color:#111;">시장의 반응 : <span style="color:{color};">{_esc(state)}</span></span></span> '   # "시장의 반응: 평소와 같음" (2026-10-11 사용자). 자산 수는 설명 문장에
-            f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid {bd};font-size:{dk.SMALL};line-height:1.5;">'
+            f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">시장의 반응 : <span style="color:{color};">{_esc(state)}</span></span></span> '   # "시장의 반응: 평소와 같음" (2026-10-11 사용자). 자산 수는 설명 문장에
+            f'<div style="margin-top:4px;padding-top:14px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14 → 4px (70% 줄임, 2026-10-12 사용자)
             f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
 
 
@@ -276,7 +276,7 @@ def _read_card(horizon):
 def _table_fold(inner_html):
     """표 접기 — '표 보기' 버튼을 누르면 펼친다 (details data-acc, 테마 CSS가 화살표를 돌린다)."""
     return (f'<details data-acc="1" style="margin:4px 0 8px;"><summary style="cursor:pointer;list-style:none;display:flex;justify-content:center;align-items:center;gap:6px;'
-            f'padding:8px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;color:#111;font-size:{dk.SMALL};font-weight:700;">표 보기 {ACC_CHEV}</summary>'
+            f'padding:10px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;color:#111;font-size:{dk.SMALL};line-height:{dk.LH_CARD};font-weight:700;">표 보기 {ACC_CHEV}</summary>'
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 
@@ -324,14 +324,14 @@ def _group_panel(blk, gkey, charts, noise_p):
         info = (charts.get(gkey) or {}).get(h)
         if not rows:   # 이 구간만 표본이 모자람 (5일 뒤 가격이 아직 없는 최근 발언 등) — 빈 화면 대신 안내
             n_h = max((((blk["symbols"].get(sym) or {}).get(h) or {}).get("n") or 0) for sym in config.ALL_SYMBOLS)
-            hz_html += (f'<div data-hz-panel="{h}"><div data-hz-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:8px 0 4px;">{HORIZON_KO[h]}</div>'
+            hz_html += (f'<div data-hz-panel="{h}"><div data-hz-label="1" style="font-size:{dk.SMALL};line-height:{dk.LH_CARD};font-weight:700;color:#111;margin:8px 0 4px;">{HORIZON_KO[h]}</div>'
                         + dk.muted(f"{HORIZON_KO[h]} 구간은 표본 축적 중 — 관측일 {n_h}일 / 필요 {config.MIN_CLEAN_N}일. 쌓이면 그래프가 나옵니다.") + "</div>")
             continue
         img = ""
         if info:
             img = (f'<a href="{_esc(info["url"])}" target="_blank" rel="noopener" title="그래프 확대 보기" style="display:block;max-width:720px;">'
                    f'<img src="{_esc(info["url"])}" alt="{_esc(_k(gkey.split("#")[0]))} {HORIZON_KO[h]} 반응 그래프" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/></a>')
-        hz_html += (f'<div data-hz-panel="{h}"><div data-hz-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:8px 0 4px;">{HORIZON_KO[h]}</div>'
+        hz_html += (f'<div data-hz-panel="{h}"><div data-hz-label="1" style="font-size:{dk.SMALL};line-height:{dk.LH_CARD};font-weight:700;color:#111;margin:8px 0 4px;">{HORIZON_KO[h]}</div>'
                     + _chart_card(rows, h) + img + (_read_card(h) if img else "") + "</div>")
     rows = _table_rows(blk)
     if not rows:
@@ -355,7 +355,7 @@ def _dir_switch(topic, a, charts, noise_p):
         btns += (f'<button type="button" data-switch-btn="{i}" class="rt-dir"{"" if ok else EMPTY_ATTR}>{_esc(label)} '
                  f'<span style="font-size:{dk.MICRO};font-weight:400;">({n}일)</span></button>')   # 괄호는 한 단계 작게 (가이드라인 3-3)
         body = _group_panel(blk, gkey, charts, noise_p) if blk else dk.muted("아직 이 방향의 발언이 없습니다.")
-        panels += f'<div data-switch-panel="{i}"><div data-switch-label="1" style="font-size:{dk.SMALL};font-weight:700;color:#111;margin:10px 0 4px;">{_esc(label)} <span style="font-size:{dk.MICRO};font-weight:400;">({n}일)</span></div>{body}</div>'
+        panels += f'<div data-switch-panel="{i}"><div data-switch-label="1" style="font-size:{dk.SMALL};line-height:{dk.LH_CARD};font-weight:700;color:#111;margin:10px 0 4px;">{_esc(label)} <span style="font-size:{dk.MICRO};font-weight:400;">({n}일)</span></div>{body}</div>'
     return (f'<div data-switch="1" data-switch-first="{first or 0}" style="margin:0 0 8px;">'
             f'<div class="rt-dirs" data-switch-bar="1" hidden>{btns}</div>{panels}</div>')
 

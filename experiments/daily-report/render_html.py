@@ -227,9 +227,9 @@ def sec_lead(report, analysis):
     lines = [ln for ln in str(report.get("opinion") or "").splitlines() if ln.strip()]
     if lines:
         body = "".join(f'<div style="margin:0 0 4px;">{_esc(dk.ko(ln, TERM_KO))}</div>' for ln in lines)
-        inner += (f'<div style="margin:10px 0 0;padding-top:10px;border-top:1px solid {dk.EMPH_BD};">'
-                  f'<div data-insight="1" style="font-size:{dk.SMALL};color:#111;line-height:1.6;">{body}</div></div>')
-    return dk.cards(f'<div style="background:{dk.EMPH_BG};border:1px solid {dk.EMPH_BD};border-radius:10px;padding:12px 14px;margin:0 0 8px;">{inner}</div>')
+        inner += (f'<div style="margin:14px 0 0;padding-top:14px;border-top:1px solid {dk.EMPH_BD};">'   # 가로 구분선 위아래 14px (2026-10-12 사용자)
+                  f'<div data-insight="1" style="font-size:{dk.SMALL};color:#111;">{body}</div></div>')   # 18px · 행간 33 은 바깥에서 물려받는다
+    return dk.cards(f'<div style="background:{dk.EMPH_BG};border:1px solid {dk.EMPH_BD};border-radius:10px;padding:14px 14px;margin:0 0 8px;">{inner}</div>')   # 위아래 12 → 14 (20%, 정수)
 
 
 def sec_regime(analysis, report):
@@ -394,7 +394,7 @@ def sec_sectors(analysis, report):
     names = lambda etfs: " · ".join(_esc(by_etf[e]["theme"]) for e in etfs if e in by_etf)  # noqa: E731
     sectors = analysis["sectors"]
     lis = "".join(dk.dot_li(f"<b>{k}</b> : {v}", size=3) for k, v in (("주도", names(sectors.get("leaders") or []) or "—"), ("약세", names(sectors.get("laggards") or []) or "—")))
-    lead = dk.dcard(f"<ul style='margin:0;padding:0;list-style:none;font-size:{dk.SMALL};line-height:1.5;'>{lis}</ul>", "positive")   # 강조 카드 (2026-10-12 사용자)   # 긴 이름 나열은 값 칸이 아니라 라벨 글머리표로 (가이드라인 3-3)
+    lead = dk.dcard(f"<ul style='margin:0;padding:0;list-style:none;font-size:{dk.SMALL};'>{lis}</ul>", "positive")   # 강조 카드 (2026-10-12 사용자)   # 긴 이름 나열은 값 칸이 아니라 라벨 글머리표로 (가이드라인 3-3)
     return _text(report.get("sector_comment")) + lead + _folded(rows, "섹터")
 
 
@@ -466,12 +466,16 @@ def _folded(rows_html, noun):
     return dk.card_of(rows_html[:FOLD_SHOWN]) + dk.fold(f"{noun} {len(rest)}개 더 보기", dk.card_of(rest))
 
 
+QUOTE_LEFT = 40   # 종목 칸 40% — 값 `$162.57 ▲ 1.25%` 이 한 줄에 들도록 (거래량은 종목 아래 줄)
+
+
 def _quote_rows(quotes):
-    """급등주·관심 종목 — 종목, 값 가격 + 등락, 보조 줄 거래량. data-pick: 홈 '오늘의 급등주' 카드가 읽는다."""
+    """급등주·관심 종목 — 종목 아래 줄에 거래량, 값(가격 + 등락)은 한 줄 (2026-10-12 사용자). data-pick: 홈 '오늘의 급등주' 카드가 읽는다."""
     rows = []
     for q in quotes or []:
         sym = q.get("symbol") or "-"
-        r = dk.crow(_esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', _esc(f"거래량 {_fmt_volume(q.get('volume'))}"), first=len(rows) in (0, FOLD_SHOWN))
+        r = dk.crow(_esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', _esc(f"거래량 {_fmt_volume(q.get('volume'))}"), first=len(rows) in (0, FOLD_SHOWN),
+                    left=QUOTE_LEFT, nowrap=True, sub_block=True)
         chg = q.get("change_pct")
         r = r.replace('<span style="', f'<span data-pick="1" data-sym="{_esc(sym)}" data-price="{_esc(_fmt_price(q.get("price")))}" data-chg="{"" if chg is None else f"{float(chg):+.2f}%"}" style="', 1)
         rows.append(r)
@@ -491,7 +495,7 @@ def _named_reaction(sym, value_html):
 
 
 def sec_news(input_data, report, analysis):
-    """뉴스 — 목록: 테마 라벨 · 제목(글자) + 링크 아이콘, 보조 줄 관련 자산 반응 · 선정 이유 (14px)."""
+    """뉴스 — 글 항목 카드(2026-10-12 사용자: 카드 형식으로): 테마 라벨 · 제목(글자) + 링크 아이콘, 보조 줄 관련 자산 반응 · 선정 이유 (14px)."""
     series = (analysis or {}).get("series") or {}
     rates = (analysis or {}).get("rates") or {}
     quotes = {q["symbol"]: q for q in input_data.get("gainers", []) + input_data.get("most_active", []) if q.get("symbol")}
@@ -513,7 +517,7 @@ def sec_news(input_data, report, analysis):
         theme = item.get("theme")
         if theme and theme not in THEME_VOCAB:
             theme = "기타"
-        tag = (dk.pill(theme) + " ") if theme else ""
+        tag = (" " + dk.pill(theme)) if theme else ""   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
         title = _esc(item.get("title_ko") or news_item.get("title_ko") or news_item.get("title") or "")   # Gemini 가 옮긴 한국어 제목 먼저 (2026-10-12 사용자)
         link = dk.link_icon(news_item.get("link"), news_item.get("title") or "원문")
         related = [s for s in (item.get("related") or []) if isinstance(s, str) and s in known][:4]
@@ -522,9 +526,9 @@ def sec_news(input_data, report, analysis):
             subs.append("관련 자산 : " + " · ".join(_named_reaction(s, reaction(s)) for s in related))   # 종목 이름도 증감 색 (가이드라인 3-3)
         if item.get("why"):
             subs.append("선정 이유 : " + _esc(item["why"]))
-        sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};">{x}</span>' for x in subs)
-        items.append(f"<li style='{dk.LI}'>{tag}<span style='color:#111;'>{title}</span>{link}{sub_html}</li>")
-    return dk.ul(items) if items else dk.muted("주요 뉴스 없음")
+        sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;">{x}</span>' for x in subs)
+        items.append(f"<span style='color:#111;'>{title}</span>{tag}{link}{sub_html}")
+    return dk.item_cards(items) if items else dk.muted("주요 뉴스 없음")   # 기사마다 카드 (2026-10-12 사용자)
 
 
 def _overall_text(overall, items):

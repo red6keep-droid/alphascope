@@ -12,11 +12,15 @@ import re
 UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
 SUB = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
 NOTE = "#6B7280"          # 안내 글 회색
-BODY, SMALL, TINY, MICRO = "18px", "16px", "14px", "14px"
-H2 = "position:relative;color:#111;font-size:21px;font-weight:700;line-height:1.3;margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"
+BODY, SMALL, TINY, MICRO = "18px", "18px", "14px", "14px"   # 안내 글(14px)을 빼고 모두 18px (2026-10-12 사용자: "안내 14포인트를 제외하고 본문 폰트는 모두 18")
+NAME = "16px"   # 가로 구분선이 있는 카드의 왼쪽 정보(구분명) — 2026-10-12 사용자: "가로 구분선이 있는 카드의 좌측 정보는 16포인트"
+EMPH_NAME = "18px"   # 강조 카드(색 배경: 상태·결론·흐름·강조 C 카드)의 왼쪽 정보는 18px (2026-10-12 사용자)
+PILL_SIZE = "14px"   # 라벨(알약)은 어디서나 14px (2026-10-12 사용자: "라벨 폰트는 14 적용")
+LH_BODY, LH_CARD, LH_TINY = "33px", "27px", "21px"   # 행간은 px 정수만 (2026-10-12 사용자: "소수점으로 행간 값을 정하지마") — 글 33(1.53의 120%) · 카드 줄 27 · 안내 21
+H2 = "position:relative;color:#111;font-size:21px;font-weight:700;line-height:27px;margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"
-_NO_LINE_START = re.compile(r'^\s*(<div style="(?:overflow-x:auto;|background:)|<div data-cards|<div data-lead|<img\b|<details\b)')
-CARD = "background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px;"
+_NO_LINE_START = re.compile(r'^\s*(<(?:div|ul) style="(?:overflow-x:auto;|background:)|<div data-cards|<div data-lead|<img\b|<details\b)')
+CARD = "background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px 14px;"   # 카드 안쪽 위아래 12 → 14 (20% 늘리고 정수로, 2026-10-12 사용자)
 CARD_DIR = {"positive": ("#FFF7ED", "#FED7AA"), "negative": ("#EFF6FF", "#BFDBFE"), "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#FFFBEB", "#FDE68A")}
 PILL = {"area": ("#CBD5E1", "#334155"), "positive": ("#FCA5A5", "#B91C1C"), "negative": ("#93C5FD", "#1D4ED8"),
         "uncertain": ("#FDBA74", "#C2410C"), "neutral": ("#CBD5E1", "#64748B"),
@@ -26,23 +30,23 @@ BAR_PASTEL = {"positive": ("#F8C4BF", "#7F1D1D"), "negative": ("#BCD3F5", "#1E3A
 COL_L = "flex:0 0 65%;max-width:65%;min-width:0;white-space:normal;"
 COL_L75 = "flex:0 0 80%;max-width:80%;min-width:0;white-space:normal;"   # 이름은 그대로, 값은 80% (2026-10-11 사용자: 75 → 80)   # 값이 짧은 카드 (오른쪽 값 모두 5자 미만) — 2026-10-11 사용자   # 카드 왼쪽 65% (가이드라인 2-1, 2026-10-11 사용자: 꼭 지킨다)
 COL_R = "flex:1 1 0;min-width:0;text-align:right;white-space:normal;word-break:keep-all;"   # 카드 오른쪽 35%
-ROW = ("display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 6px;padding:8px 12px;"
-       "background:#fff;border:1px solid #E2E8F0;border-radius:8px;white-space:nowrap;line-height:1.5;")
+ROW = ("display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 6px;padding:10px 12px;"
+       "background:#fff;border:1px solid #E2E8F0;border-radius:8px;white-space:nowrap;line-height:27px;")
 ROW_UP, ROW_DOWN = "background:#FFF7ED;border-color:#FED7AA;", "background:#EFF6FF;border-color:#BFDBFE;"
 MULTI = f"display:block;margin:0 0 6px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font-size:{SMALL};"
-MULTI_ROW = "display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 12px;white-space:nowrap;line-height:1.5;"
+MULTI_ROW = "display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 12px;white-space:nowrap;line-height:27px;"   # 가로 구분선 기준 위아래 14px, 카드 가장자리도 같게 (2026-10-12 사용자)
 MULTI_SEP = "border-top:1px solid #E2E8F0;"
 UL, LI = "margin:0 0 8px 20px;padding:0;list-style:disc;", "margin:6px 0;"
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor" stroke="none"/></svg>')
-QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="15.4" height="15.4" aria-hidden="true" style="vertical-align:-2.5px;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 14 → 15.4px (2026-10-12 사용자: 10% 크게, 모든 페이지)
+QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" style="vertical-align:-3px;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 15.4 → 18px (2026-10-12 사용자: 20% 크게, 소수점 없이)
                  '<circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5"/><circle cx="8" cy="11.4" r=".9" fill="currentColor" stroke="none"/></svg>')
 LINK_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
              '<path d="M9 3h4v4"/><path d="M13 3 7 9"/><path d="M11 9v4H3V5h4"/></svg>')
 NEW_PILL = ('<span style="display:inline-block;background:#B91C1C;color:#fff;border-radius:3px;padding:1px 4px 0;font-size:10px;font-weight:700;'
             'line-height:13px;vertical-align:middle;margin-left:4px;">N</span>')
 WRAP_OPEN = ('<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;'
-             f'font-size:{BODY};line-height:1.53;color:#333;">')
+             f'font-size:{BODY};line-height:{LH_BODY};color:#333;">')   # 행간 1.53 → 33px (20% 넓게, 2026-10-12 사용자)
 WRAP_CLOSE = "</div>"
 _ISO_DAY = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 _PAREN = re.compile(r"\s*(\([^()]*\))")
@@ -77,7 +81,7 @@ def dash():
 
 def h2(t, line=True, summary="", tab=None, aside="", one_line=False):
     """구획 제목. tab = 이 구획이 들어갈 탭 이름 (가이드라인 11절) — 테마 JS가 h2[data-tab]을 읽어 탭을 만든다."""
-    sm = (f' <span data-summary="1" style="font-size:{TINY};font-weight:400;color:{NOTE};line-height:1.5;white-space:normal;flex:1 1 220px;">{INFO_ICON}{summary}</span>'
+    sm = (f' <span data-summary="1" style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};white-space:normal;flex:1 1 220px;">{INFO_ICON}{summary}</span>'
           if summary else "")
     tb = f' data-tab="{esc(tab)}"' if tab else ""
     st = H2.replace("flex-wrap:wrap;", "flex-wrap:nowrap;") if one_line else H2   # one_line: 제목과 aside 를 폰에서도 한 줄로 (2026-10-11 사용자)
@@ -103,7 +107,7 @@ def ko(text, table):
 
 def note(t):
     """구획 안내 줄 — 내용 아래, ⓘ, 14px 회색, 윗선."""
-    return f'<div style="margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;font-size:{TINY};color:{NOTE};">{INFO_ICON}{esc(t)}</div>'
+    return f'<div style="margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{INFO_ICON}{esc(t)}</div>'
 
 
 _SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")   # 범위(-0.63 ~ +0.63%)는 칠하지 않는다
@@ -184,10 +188,11 @@ def label_text(text):
     return tint(esc(text))
 
 
-def dot_li(inner_html, size=3, color="#111", top=11, margin="3px 0"):
-    """점 글머리표 한 줄 — 16px 글은 3px 점, 14px 안내 글은 2px 점 (가이드라인 3-3)."""
-    return (f'<li style="display:flex;align-items:flex-start;gap:7px;margin:{margin};color:{color};">'
-            f'<span style="flex:none;width:{size}px;height:{size}px;border-radius:50%;background:{color};margin-top:{top}px;"></span><span>{inner_html}</span></li>')
+def dot_li(inner_html, size=3, color="#111", lh=None, margin="3px 0"):
+    """점 글머리표 한 줄 — 점은 두 가지뿐: 18px 글 3px · 14px 안내 글 2px (2026-10-12 사용자). 점은 첫 줄 가운데 (행간 lh 에서 계산)."""
+    lh = int(str(lh or (LH_TINY if size == 2 else LH_CARD)).replace("px", ""))
+    return (f'<li style="display:flex;align-items:flex-start;gap:7px;margin:{margin};color:{color};line-height:{lh}px;">'
+            f'<span style="flex:none;width:{size}px;height:{size}px;border-radius:50%;background:{color};margin-top:{(lh - size) // 2}px;"></span><span>{inner_html}</span></li>')
 
 
 GRID_ATTR = ' data-guide-grid="1"'   # f-string 안에 \" 를 쓰면 파이썬 3.10(CI)에서 문법 오류
@@ -208,10 +213,10 @@ def guide(title, body, line=True, grid=False, in_card=False):
         top = ("margin:2.76px 0 1.38px;padding-top:2.07px;border-top:1px solid #f3f3f3;" if line else "margin:1.38px 0 0;") + GUIDE_IND
     head = f'{INFO_ICON}<b style="color:#4B5563;">{esc(title)}</b>'
     if isinstance(body, str) and len(body) <= GUIDE_SHORT:
-        return f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head} : {esc(body)}</div>'
+        return f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head} : {esc(body)}</div>'   # data-guide: 홈 카드가 건너뛴다
     items = [body] if isinstance(body, str) else body
-    lis = "".join(dot_li(tint(esc(it[0]) + ' = ' + esc(it[1])) if isinstance(it, tuple) else tint(esc(it)), size=2, color=NOTE, top=9, margin="2px 0") for it in items)   # 14px 안내 → 2px 점
-    return (f'<div style="{top}font-size:{TINY};color:{NOTE};line-height:1.5;">{head}'
+    lis = "".join(dot_li(tint(esc(it[0]) + ' = ' + esc(it[1])) if isinstance(it, tuple) else tint(esc(it)), size=2, color=NOTE, margin="2px 0") for it in items)   # 14px 안내 → 2px 점
+    return (f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head}'
             f"<ul{GRID_ATTR if grid else ''} style='margin:2px 0 0 2px;padding:0;list-style:none;'>{lis}</ul></div>")   # grid: 데스크톱 2열 (테마 CSS)
 
 
@@ -220,8 +225,8 @@ def guide_card(title, body, notes=()):
     """읽는 법 카드 (2026-10-11 사용자: "읽는 법만 카드를 분리하여 그래프 아래에, 일괄") — 그래프·표 바로 아래 옅은 회색 카드 안에 guide().
     notes = [(제목, 내용), …] — 주의처럼 짧은 안내도 같은 카드 안 아래쪽에 한 줄씩 (2026-10-11 사용자: "주의도 읽는 법 카드에 포함")."""
     extra = "".join(guide(t, x, line=False, in_card=True) for t, x in notes)
-    return (f'<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:8px 14px 10px;margin:8px 0;">'
-            + guide(title, body, line=False, grid=True, in_card=True) + (f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid #E2E8F0;">{extra}</div>' if extra else "") + "</div>")   # 글머리표는 데스크톱에서 2열 (2026-10-11 사용자)
+    return (f'<div data-guide="1" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px;margin:8px 0;">'   # data-guide: 홈 카드가 건너뛴다 (2026-10-12)
+            + guide(title, body, line=False, grid=True, in_card=True) + (f'<div style="margin-top:14px;padding-top:14px;border-top:1px solid #E2E8F0;">{extra}</div>' if extra else "") + "</div>")   # 글머리표는 데스크톱에서 2열 (2026-10-11 사용자)
 
 
 
@@ -238,8 +243,8 @@ def tip_line(items, in_title=False):
     """용어 툴팁 줄 — "용어ⓘ · 용어ⓘ". 14px 안내 회색. items = [(용어, 설명)]. 줄이 position:relative 라 상자가 줄 폭 안에 뜬다."""
     inner = ' <span style="color:#CBD5E1;">·</span> '.join(f'<span style="white-space:nowrap;">{esc(k)}{tip(v)}</span>' for k, v in items)
     if in_title:   # 구획 제목 줄 오른쪽 (2026-10-11 사용자: "급상승 주제 타이틀 우측에") — 툴팁 상자는 position:relative 인 h2 기준
-        return f'<span style="font-size:{TINY};font-weight:400;color:{NOTE};line-height:1.6;margin-left:auto;align-self:center;white-space:nowrap;flex:none;">{inner}</span>'
-    return f'<div style="position:relative;font-size:{TINY};color:{NOTE};line-height:1.6;margin:2.07px 0 0.69px;{GUIDE_IND}">{inner}</div>'
+        return f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};margin-left:auto;align-self:center;white-space:nowrap;flex:none;">{inner}</span>'
+    return f'<div style="position:relative;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};margin:2.07px 0 0.69px;{GUIDE_IND}">{inner}</div>'
 
 
 
@@ -279,8 +284,8 @@ def fix_colons(html):
 def capsules(items, size=None, in_title=False):
     """캡슐 줄 (2026-10-11 사용자: "게시물 : 9건 캡슐 라인 디자인으로 연속해서") — 알약 모양 칸을 한 줄에 이어 놓고, 넘치면 다음 줄로.
     items = [(라벨, 값HTML)]. 라벨 16px 안내 회색 · 값 16px 검정 굵게, "라벨 : 값". 흰 바탕, 테두리 #E2E8F0, 모서리 끝까지 둥글게."""
-    pill = ("display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:999px;"
-            f"font-size:{size or SMALL};font-weight:400;line-height:1.4;white-space:nowrap;")
+    pill = ("display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:999px;"
+            f"font-size:{size or SMALL};font-weight:400;line-height:{LH_TINY if (size or SMALL) == TINY else LH_CARD};white-space:nowrap;")
     inner = "".join(f'<span style="{pill}"><span style="color:{NOTE};">{esc(k)} : </span><b style="color:#111;">{v}</b></span>' for k, v in items)
     if in_title:   # 구획 제목 줄 오른쪽 (2026-10-11 사용자: "14 폰트로, 발언 타이틀 우측에") — 좁으면 제목 아래로 내려간다
         return f'<span data-capsules="1" style="display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;align-self:center;">{inner}</span>'
@@ -316,7 +321,7 @@ def write_mock(body, path, title):
 
 def muted(t):
     """짧은 안내 글 (빈 구획 안내 등) — ⓘ 필수."""
-    return f'<div style="color:{NOTE};font-size:{TINY};margin:2.07px 0;{GUIDE_IND}">{INFO_ICON}{esc(t)}</div>'   # 여백 40% 줄임 (2026-10-11 사용자)
+    return f'<div style="color:{NOTE};font-size:{TINY};line-height:{LH_TINY};margin:2.07px 0;{GUIDE_IND}">{INFO_ICON}{esc(t)}</div>'   # 여백 40% 줄임 (2026-10-11 사용자)
 
 
 def notice(parts):
@@ -324,7 +329,7 @@ def notice(parts):
     parts = [p for p in parts if p]
     if not parts:
         return ""
-    return (f'<div style="background:#fff8e1;border:1px solid #f4d37a;border-radius:6px;padding:10px 14px;font-size:{TINY};line-height:1.6;margin:0 0 12px;">'
+    return (f'<div style="background:#fff8e1;border:1px solid #f4d37a;border-radius:6px;padding:12px 14px;font-size:{TINY};line-height:{LH_TINY};margin:0 0 12px;">'
             + "<br>".join(INFO_ICON + p for p in parts) + "</div>")
 
 
@@ -332,7 +337,7 @@ def pill(text, kind="area"):
     bd, fg = PILL.get(kind, PILL["neutral"])
     bg = PILL_BG.get(kind, "#fff")
     return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;'
-            f'font-size:{SMALL};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{esc(text)}</span>')
+            f'font-size:{PILL_SIZE};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{esc(text)}</span>')   # 라벨 14px, 어디서나 (2026-10-12 사용자)
 
 
 def link_icon(url, label):
@@ -346,36 +351,81 @@ def ul(items_html):
     return f"<ul style='{UL}'>" + "".join(items_html) + "</ul>"
 
 
+def item_cards(items_html):
+    """기사 카드 — 뉴스 기사 하나가 카드 하나 (2026-10-12 사용자: "뉴스 기사는 카드 타입으로 각각"). 흰 바탕, 테두리, 모서리 8px,
+    위아래 14px · 좌우 12px, 카드 사이 8px. 18px · 행간 27. 항목은 li — 홈 카드가 글머리표로 읽는다."""
+    lis = "".join(f'<li style="margin:0 0 8px;padding:14px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;line-height:{LH_CARD};">{h}</li>'
+                  for h in items_html)
+    return f'<ul style="margin:0 0 8px;padding:0;list-style:none;font-size:{SMALL};">{lis}</ul>' if lis else ""
+
+
+def list_card(items_html):
+    """글 항목 카드 — 뉴스처럼 문장 항목을 한 카드 안에 가로 구분선으로 (2026-10-12 사용자: "뉴스는 카드 형식으로"). 18px, 행간 27.
+    항목은 li 로 둔다 — 홈 카드가 글머리표로 읽는다. 구분선은 border-top 대신 box-shadow (홈 카드는 border-top 요소를 건너뛴다)."""
+    lis = "".join(f'<li style="margin:0;padding:14px 12px;line-height:{LH_CARD};{"" if i == 0 else "box-shadow:inset 0 1px 0 #E2E8F0;"}">{h}</li>'
+                  for i, h in enumerate(items_html))
+    return (f'<ul style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:0;margin:0 0 8px;list-style:none;'
+            f'font-size:{SMALL};">{lis}</ul>') if lis else ""
+
+
+def stat_line(items):
+    """한 줄 수치 카드 (2026-10-12 사용자: "기사 · 7일 평균 · 대기 문서, 구분선을 추가하여 한 줄에") — 카드 하나에 `이름 값`을 세로 구분선으로 나란히.
+    이름 16px(왼쪽 정보) · 값 18px 굵게. items = [(이름, 값HTML)]. 칸은 글자 폭만큼, 남는 폭은 고르게."""
+    cells = "".join(f'<span style="flex:1 1 auto;text-align:center;white-space:nowrap;padding:0 8px;{"border-left:1px solid #E2E8F0;" if i else ""}">'
+                    f'<span style="font-size:{NAME};font-weight:700;color:#111;">{esc(k)}</span> <b style="color:#111;">{v}</b></span>'
+                    for i, (k, v) in enumerate(items))
+    return (f'<div style="display:flex;align-items:center;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:10px 4px;'
+            f'margin:0 0 8px;font-size:{SMALL};line-height:{LH_CARD};">{cells}</div>')
+
+
 def bullets(texts):
-    return ul(f"<li style='{LI}'>{tint(esc(t))}</li>" for t in texts)   # 서술 문장의 증감도 같은 색 규칙
+    """18px 글 목록 — 3px 점, 행간 33 (2026-10-12 사용자: 점은 18px 3px · 14px 2px 두 가지만). 서술 문장의 증감도 같은 색 규칙."""
+    return dot_ul(dot_li(tint(esc(t)), size=3, lh=LH_BODY, margin=LI_MARGIN) for t in texts)
+
+
+LI_MARGIN = "6px 0"
+
+
+def dot_ul(items_html):
+    """점 글머리표 목록 (dot_li 묶음) — 기본 원형 글머리표는 쓰지 않는다."""
+    return "<ul style='margin:0 0 8px;padding:0;list-style:none;'>" + "".join(items_html) + "</ul>"
+
+
+ROW_L = "flex:0 0 40%;max-width:40%;min-width:0;white-space:normal;"   # A 카드 이름 40% — 값 `$229.28 ▼ 0.52%` 한 줄 (2026-10-12 사용자)
+ROW_R = "flex:1 1 0;min-width:0;text-align:right;white-space:nowrap;"
 
 
 def row(name, value_html, tone=""):
-    """A타입 한 줄 카드: 이름 좌 · 값 우 (18px)."""
-    return f'<span style="{ROW}{tone}"><span style="{COL_L}font-weight:700;color:#111;">{esc(name)}</span> <span style="{COL_R}">{value_html}</span></span> '
+    """A타입 한 줄 카드: 이름 좌 · 값 우 한 줄 (18px, 구분선 없는 카드라 이름도 18px)."""
+    return f'<span style="{ROW}{tone}"><span style="{ROW_L}font-weight:700;color:#111;">{esc(name)}</span> <span style="{ROW_R}">{value_html}</span></span> '
 
 
 def multi(rows):
     """C타입: (이름, 값HTML) 여러 줄을 한 카드에. data-grid=2: 데스크톱에서 2열 (테마 CSS)."""
     out = ""
     for i, (name, value_html) in enumerate(rows):
-        out += (f'<span style="{MULTI_ROW}{MULTI_SEP if i else ""}"><span style="{COL_L}font-weight:700;color:#111;">{paren(esc(name))}</span> '
+        out += (f'<span style="{MULTI_ROW}{MULTI_SEP if i else ""}"><span style="{COL_L}font-weight:700;color:#111;font-size:{NAME};">{paren(esc(name))}</span> '
                 f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')
     return f'<span data-grid="2" style="{MULTI}">{out}</span> '
 
 
+E_CELL = "display:flex;flex:1;min-width:0;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:8px;padding:14px 12px;white-space:nowrap;line-height:27px;"
+E_NAME = "flex:0 1 auto;min-width:0;white-space:nowrap;font-weight:700;color:#111;font-size:16px;"
+E_VALUE = "flex:none;margin-left:auto;white-space:nowrap;font-weight:700;"
+
+
 def multi2(items):
-    """E타입 2열 멀티 카드: 한 줄에 둘, 세로 구분선."""
-    cell = "display:flex;flex:1;min-width:0;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;white-space:nowrap;line-height:1.5;"
+    """E타입 2열 멀티 카드: 한 줄에 둘, 세로 구분선 — 폰에서도 2열 (2026-10-12 사용자: "왜 2열 카드 유형 적용 안 했냐").
+    칸 안은 65/35 대신 이름 왼쪽 · 값 오른쪽, 한 줄에 안 들어가면 값이 칸 안 다음 줄 오른쪽으로 내려간다."""
     out = ""
     for i in range(0, len(items), 2):
         pair = items[i:i + 2]
         r = ""
         for j, (name, value_html) in enumerate(pair):
-            r += (f'<span style="{cell}{"border-left:1px solid #E2E8F0;" if j else ""}">'
-                  f'<span style="{COL_L}font-weight:700;color:#111;">{paren(esc(name))}</span> <span style="{COL_R}font-weight:700;">{value_html}</span></span> ')
+            r += (f'<span style="{E_CELL}{"border-left:1px solid #E2E8F0;" if j else ""}">'
+                  f'<span style="{E_NAME}">{paren(esc(name))}</span> <span style="{E_VALUE}">{value_html}</span></span> ')
         if len(pair) == 1:
-            r += f'<span style="{cell}border-left:1px solid #E2E8F0;"></span>'
+            r += f'<span style="{E_CELL}border-left:1px solid #E2E8F0;"></span>'
         out += f'<span data-pair="1" style="display:flex;{MULTI_SEP if i else ""}">{r}</span> '
     return f'<span style="{MULTI}">{out}</span> '
 
@@ -415,41 +465,43 @@ def _px(html_text, size):
 INLINE_ROOM = 294   # 폰(본문 320px)에서 C 카드 줄 안쪽 폭 — 왼쪽 칸 = 이 폭 × 65%(짧은 값 카드 80%)
 
 
-def fits_inline(name_html, sub, left_pct=65):
+def fits_inline(name_html, sub, left_pct=65, name_px=16):
     """구분명 │ 보조 줄 첫 덩어리(뒤 가운뎃점 포함)가 폰 한 줄에 들어가는가. 안 들어가면 보조 줄은 이름 아래(구분선 없이) —
     구분선이 둘째 줄 첫머리로 밀리지 않게 (2026-10-12, 트럼프 급상승 주제에서 발견)."""
     chunks = str(sub).split(" · ")
     pill = 18 if ">N</span>" in name_html else 0
-    need = _px(name_html.replace(">N</span>", "></span>"), 16) * 1.04 + pill + 17 + _px(chunks[0], 14) + (10 if len(chunks) > 1 else 0)
+    need = _px(name_html.replace(">N</span>", "></span>"), name_px) * 1.04 + pill + 17 + _px(chunks[0], 14) + (10 if len(chunks) > 1 else 0)
     return need <= INLINE_ROOM * left_pct / 100 - 4
 
 
-def crow_left(name_html, sub="", left_pct=65):
+def crow_left(name_html, sub="", left_pct=65, block=False, name_size=None):
     """C 카드 왼쪽 칸 안: 구분명(굵게) │ 보조 줄(14px #7A7A7A) 한 줄로 (2026-10-12 사용자: "구분선 넣고 한 줄로 표기 가능한 것은 모두").
     넘치면 · 에서 다음 줄로 이어진다. 엔비디아 렌더러도 이것을 쓴다."""
+    ns = name_size or NAME
     if not sub:
-        return f'<span style="font-weight:700;color:#111;">{paren(name_html)}</span>'
-    if not fits_inline(name_html, sub, left_pct):   # 한 줄에 못 들어가면 예전처럼 이름 아래 블록
-        return (f'<span style="font-weight:700;color:#111;">{paren(name_html)}</span>'
-                f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};">{sub_line(sub)}</span>')
-    return (f'<span style="font-weight:700;color:#111;">{paren(name_html)}</span>'
-            f'<span style="color:{SUB};font-weight:400;font-size:{TINY};">{sub_line(sub, lead=VSEP)}</span>')
+        return f'<span style="font-weight:700;color:#111;font-size:{ns};">{paren(name_html)}</span>'
+    if block or not fits_inline(name_html, sub, left_pct, int(ns[:-2])):   # 한 줄에 못 들어가면(또는 block) 이름 아래 블록
+        return (f'<span style="font-weight:700;color:#111;font-size:{ns};">{paren(name_html)}</span>'
+                f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};line-height:{LH_TINY};">{sub_line(sub)}</span>')
+    return (f'<span style="font-weight:700;color:#111;font-size:{ns};">{paren(name_html)}</span>'
+            f'<span style="color:{SUB};font-weight:400;font-size:{TINY};line-height:{LH_TINY};">{sub_line(sub, lead=VSEP)}</span>')
 
 
 VSEP = '<span style="display:inline-block;width:1px;height:14px;background:#E2E8F0;margin:0 8px;vertical-align:-1px;"></span>'
 
 
-def crow(name_html, value_html, sub="", first=False, left=None, short=False, nowrap=False, sub_below=False):
+def crow(name_html, value_html, sub="", first=False, left=None, short=False, nowrap=False, sub_below=False, sub_block=False, name_size=None):
     """C 카드 한 줄: 왼쪽 구분명 │ 보조 줄, 오른쪽 값. name_html 은 이스케이프된 HTML.
     left = 왼쪽 칸 % (카드별 예외, 가이드라인 2-1 — 2026-10-12 사용자). nowrap = 값을 한 줄로.
-    sub_below = 보조 줄을 구분명 옆이 아니라 줄 아래 카드 폭 전체 한 줄로 (옆에 들어가지 않을 때, 2026-10-12 사용자)."""
+    sub_below = 보조 줄을 구분명 옆이 아니라 줄 아래 카드 폭 전체 한 줄로 (옆에 들어가지 않을 때, 2026-10-12 사용자).
+    sub_block = 보조 줄을 구분명 아래 줄로 (왼쪽 칸 안) — 종목 아래 거래량 (2026-10-12 사용자)."""
     col_l = f"flex:0 0 {left}%;max-width:{left}%;min-width:0;white-space:normal;" if left else COL_L75 if short else COL_L
     col_r = COL_R.replace("white-space:normal;", "white-space:nowrap;") if nowrap else COL_R
-    below = (f'<span style="flex:0 0 100%;color:{SUB};font-weight:400;font-size:{TINY};white-space:nowrap;">{sub_line(sub)}</span>'
+    below = (f'<span style="flex:0 0 100%;color:{SUB};font-weight:400;font-size:{TINY};line-height:{LH_TINY};white-space:nowrap;">{sub_line(sub)}</span>'
              if sub and sub_below else "")
     row_st = MULTI_ROW + ("flex-wrap:wrap;row-gap:0;" if below else "")
     return (f'<span style="{row_st}{"" if first else MULTI_SEP}">'
-            f'<span style="display:block;line-height:1.5;{col_l}">{crow_left(name_html, "" if below else sub, left or (80 if short else 65))}</span> '
+            f'<span style="display:block;line-height:{LH_CARD};{col_l}">{crow_left(name_html, "" if below else sub, left or (80 if short else 65), block=sub_block, name_size=name_size)}</span> '
             f'<span style="{col_r}font-weight:700;">{value_html}</span>{below}</span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 짧으면 80 · 20, left 가 있으면 그 값
 
 
@@ -461,7 +513,7 @@ def ccard(rows, left=None, attrs="", emph=False):
     short = short_values(rows)   # 값이 모두 5자 미만 → 왼쪽 80% (2026-10-11 사용자)
     # 줄 튜플 4번째 값 = 그 줄의 왼쪽 % (예: 시장 상태 막대 줄 30), 없으면 카드의 left (2026-10-12 사용자)
     inner = "".join(crow(r[0], r[1], r[2], first=(i == 0), short=short, left=(r[3] if len(r) > 3 else left), nowrap=bool(len(r) > 4 and r[4]),
-                         sub_below=bool(len(r) > 5 and r[5]))
+                         sub_below=bool(len(r) > 5 and r[5]), name_size=EMPH_NAME if emph else None)   # 강조 카드는 왼쪽 18px (2026-10-12 사용자)
                     for i, r in enumerate(rows))
     box = MULTI
     if emph:
@@ -478,7 +530,7 @@ def cards(html):
 def dcard(html, theme="neutral"):
     """D 본문 카드 (문장·목록). 배경은 방향 테마."""
     bg, bd = CARD_DIR.get(theme, CARD_DIR["neutral"])
-    return f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:12px 14px;margin:0 0 8px;">{html}</div>'
+    return f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:14px 14px;margin:0 0 8px;">{html}</div>'
 
 
 STATE_CARD = {"good": ("#F0FDF4", "#BBF7D0"), "uncertain": ("#FFFBEB", "#FDE68A"), "negative": ("#EFF6FF", "#BFDBFE"), "neutral": ("#F8FAFC", "#CBD5E1")}   # 신호 라벨 색의 카드판
@@ -489,22 +541,22 @@ def state_card(head_html, kind="neutral", right_html="", sub_html="", items=()):
     둘째 줄 sub_html(14px 한 줄 설명), items = [(라벨, 내용)] 은 얇은 선 아래 3px 점 글머리표 14px."""
     bg, bd = STATE_CARD.get(kind, STATE_CARD["neutral"])
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-            f'<span style="font-weight:700;color:#111;font-size:{SMALL};">{head_html}</span>'
+            f'<span style="font-weight:700;color:#111;font-size:{EMPH_NAME};">{head_html}</span>'
             + (f'<span style="font-weight:700;white-space:nowrap;font-size:{SMALL};">{right_html}</span>' if right_html else "") + "</span>")
-    sub = f'<div style="font-size:{TINY};color:#374151;line-height:1.5;margin-top:2px;">{sub_html}</div>' if sub_html else ""
-    lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=3, color="#374151", top=9, margin="2px 0") for k, v in items)
-    body = (f'<div style="margin-top:6px;padding-top:4px;border-top:1px solid {bd};font-size:{TINY};line-height:1.5;">'
+    sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#374151;margin-top:2px;">{sub_html}</div>' if sub_html else ""
+    lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#374151", margin="2px 0") for k, v in items)
+    body = (f'<div style="margin-top:4px;padding-top:14px;border-top:1px solid {bd};font-size:{TINY};line-height:{LH_TINY};">'
             f"<ul style='margin:0;padding:0;list-style:none;'>{lis}</ul></div>") if lis else ""
-    return f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:0 0 8px;">{head}{sub}{body}</div>'
+    return f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:14px 14px;margin:0 0 8px;">{head}{sub}{body}</div>'
 
 
 def emph_list(lines):
     """강조 카드 + 3px 점 글머리표 16px (2026-10-12 사용자: 주의할 위험요인 글을 강조 카드로). lines = 이스케이프 전 문장들. 증감은 색."""
-    lis = "".join(dot_li(tint(esc(t)), size=3) for t in lines if str(t).strip())
+    lis = "".join(dot_li(tint(esc(t)), size=3, lh=LH_BODY) for t in lines if str(t).strip())   # 18px 글 → 행간 33
     if not lis:
         return ""
-    return (f'<div style="background:{EMPH_BG};border:1px solid {EMPH_BD};border-radius:10px;padding:10px 14px;margin:0 0 8px;">'
-            f"<ul style='margin:0;padding:0;list-style:none;font-size:{SMALL};line-height:1.5;color:#111;'>{lis}</ul></div>")
+    return (f'<div style="background:{EMPH_BG};border:1px solid {EMPH_BD};border-radius:10px;padding:12px 14px;margin:0 0 8px;">'
+            f"<ul style='margin:0;padding:0;list-style:none;font-size:{SMALL};color:#111;'>{lis}</ul></div>")
 
 
 ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" '
@@ -514,15 +566,28 @@ ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" ar
 def fold(label, inner_html):
     """펼침 버튼 (가이드라인 2-1 H 카드 버튼) — 눌러야 inner_html 이 보인다. details data-acc: 테마 CSS가 화살표를 돌리고 홈 카드는 건너뛴다."""
     return (f'<details data-acc="1" style="margin:0 0 8px;"><summary style="cursor:pointer;list-style:none;display:flex;justify-content:center;align-items:center;gap:6px;'
-            f'padding:8px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;color:#111;font-size:{SMALL};font-weight:700;">{esc(label)} {ACC_CHEV}</summary>'
+            f'padding:10px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;color:#111;font-size:{SMALL};line-height:{LH_CARD};font-weight:700;">{esc(label)} {ACC_CHEV}</summary>'
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 
 def sub_label(t):
-    return f'<div data-sub="1" style="font-size:{SMALL};color:{NOTE};margin:10px 0 3px;">{paren(esc(t))}</div>'
+    return f'<div data-sub="1" style="font-size:{SMALL};line-height:{LH_CARD};color:{NOTE};margin:10px 0 3px;">{paren(esc(t))}</div>'
 
 
-def bar(label, segs):
+BAR_LABEL = "16px"   # F 막대 라벨 — `오늘 15건 … 긍정 67% · 부정 20% · 중립 13%` 가 폰 한 줄에 들도록 (2026-10-12)
+
+
+def bar_label(label, pcts, split="right"):
+    """F 막대 위 라벨 (2026-10-12 사용자): split="right" — 왼쪽 `오늘 15건` · 비율은 오른쪽 정렬, 모자라면 비율이 다음 줄 오른쪽으로.
+    split="break" — 라벨 다음 줄에 비율 (`애널리스트 61명` / `강매수 16% · 매수 79% …`)."""
+    st = f"font-size:{BAR_LABEL};line-height:{LH_CARD};color:{NOTE};margin:0 0 3px;"
+    if split == "break":
+        return f'<span style="display:block;{st}">{esc(label)}<span style="display:block;">{esc(pcts)}</span></span>'
+    return (f'<span style="display:flex;flex-wrap:wrap;justify-content:space-between;column-gap:8px;{st}">'
+            f'<span style="white-space:nowrap;">{esc(label)}</span><span style="margin-left:auto;text-align:right;">{esc(pcts)}</span></span>')
+
+
+def bar(label, segs, split="right"):
     """F 비율 막대: segs = [(이름, 개수, 배경, 글자)]."""
     total = sum(n for _, n, _, _ in segs)
     if not total:
@@ -530,7 +595,7 @@ def bar(label, segs):
     pcts = " · ".join(f"{nm} {n / total * 100:.0f}%" for nm, n, _, _ in segs if n)
     body = "".join(f'<span style="display:block;width:{n / total * 100:.1f}%;background:{bg};color:{fg};font-size:{SMALL};font-weight:700;'
                    f'text-align:center;line-height:24px;overflow:hidden;white-space:nowrap;">{f"{n / total * 100:.0f}%" if n / total >= 0.08 else ""}</span>' for _, n, bg, fg in segs if n)
-    return (f'<span style="display:block;font-size:{SMALL};color:{NOTE};margin:0 0 3px;">{esc(label)} · {esc(pcts)}</span>'
+    return (bar_label(label, pcts, split) +
             f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 10px;">{body}</span>')
 
 
@@ -561,10 +626,10 @@ def bar_row(name_html, frac, color, value_html, widths, sub="", first=False):
     이름 칸(고정 폭) · 14px · 막대(남은 폭) · 값 칸(고정 폭, 오른쪽 정렬). sub 는 줄 아래 전체 폭 14px 보조 줄."""
     ln, lv = widths
     pct = max(0.0, min(1.0, frac)) * 100
-    sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};white-space:normal;">{sub_line(sub)}</span>' if sub else ""
-    return (f'<span style="display:block;padding:8px 12px;line-height:1.5;{"" if first else MULTI_SEP}">'
+    sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};line-height:{LH_TINY};white-space:normal;">{sub_line(sub)}</span>' if sub else ""
+    return (f'<span style="display:block;padding:14px 12px;line-height:{LH_CARD};{"" if first else MULTI_SEP}">'
             f'<span style="display:flex;align-items:center;white-space:nowrap;">'
-            f'<span style="font-weight:700;color:#111;display:flex;">{_sized(paren(name_html), [paren(x) for x in ln])}</span>'
+            f'<span style="font-weight:700;color:#111;font-size:{NAME};display:flex;">{_sized(paren(name_html), [paren(x) for x in ln])}</span>'
             f'<span style="flex:1 1 0;min-width:24px;margin-left:{BAR_GAP};height:10px;background:#F1F5F9;border-radius:3px;overflow:hidden;">'
             f'<span style="display:block;height:100%;width:{pct:.0f}%;background:{color};"></span></span>'
             f'<span style="margin-left:10px;font-weight:700;display:flex;">{_sized(value_html, lv, "right")}</span></span>{sub_html}</span> ')
@@ -577,12 +642,12 @@ def card_of(rows_html, attrs=""):
 
 def table(headers, rows, note_text=""):
     """표 — 카드로 못 푸는 통계 행렬에만. 16px, 칸은 어절 단위로만 줄바꿈, 좁은 화면은 표만 가로 스크롤."""
-    th = "".join(f'<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:left;white-space:nowrap;font-size:{TINY};color:{NOTE};font-weight:400;">{esc(h)}</th>' for h in headers)
+    th = "".join(f'<th style="border:1px solid #ddd;padding:6px 8px;background:#f5f5f5;text-align:left;white-space:nowrap;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};font-weight:400;">{esc(h)}</th>' for h in headers)
     body = "".join("<tr>" + "".join(f'<td style="border:1px solid #ddd;padding:6px 8px;white-space:nowrap;">{c}</td>' for c in r) + "</tr>" for r in rows)
-    return (f'<div style="overflow-x:auto;"><table style="border-collapse:collapse;width:100%;margin:0 0 8px;font-size:{SMALL};">'
+    return (f'<div style="overflow-x:auto;"><table style="border-collapse:collapse;width:100%;margin:0 0 8px;font-size:{SMALL};line-height:{LH_CARD};">'
             f"<tr>{th}</tr>{body}</table></div>") + (note(note_text) if note_text else "")
 
 
 def footer(data_line, disclaimer_line):
-    return (f'<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:{TINY};color:{NOTE};line-height:1.6;{GUIDE_IND}">'
+    return (f'<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{GUIDE_IND}">'
             f"{INFO_ICON}{data_line}<br>{INFO_ICON}{disclaimer_line}</div>")
