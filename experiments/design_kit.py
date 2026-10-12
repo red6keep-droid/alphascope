@@ -394,11 +394,44 @@ def short_values(rows):
     return bool(rows) and all(value_len(r[1]) < SHORT_VALUE for r in rows)
 
 
-def crow_left(name_html, sub=""):
+def _px(html_text, size):
+    """글자 폭 어림(px) — 한글 0.95em · 영문 대문자 0.68 · 소문자 0.52 · 숫자 0.58 · 공백 0.28 · 문장부호 0.32 (320px 화면에서 잰 값에 맞춤).
+    한 줄에 들어가는지 고르는 데만 쓴다."""
+    t = html_mod.unescape(re.sub(r"<[^>]+>", "", html_text or ""))
+
+    def w(ch):
+        if "\uac00" <= ch <= "\ud7a3":
+            return 0.95
+        if ch.isdigit():
+            return 0.58
+        if ch.isupper():
+            return 0.68
+        if ch.isalpha():
+            return 0.52
+        return 0.28 if ch == " " else 0.32
+    return sum(w(ch) for ch in t) * size
+
+
+INLINE_ROOM = 294   # 폰(본문 320px)에서 C 카드 줄 안쪽 폭 — 왼쪽 칸 = 이 폭 × 65%(짧은 값 카드 80%)
+
+
+def fits_inline(name_html, sub, left_pct=65):
+    """구분명 │ 보조 줄 첫 덩어리(뒤 가운뎃점 포함)가 폰 한 줄에 들어가는가. 안 들어가면 보조 줄은 이름 아래(구분선 없이) —
+    구분선이 둘째 줄 첫머리로 밀리지 않게 (2026-10-12, 트럼프 급상승 주제에서 발견)."""
+    chunks = str(sub).split(" · ")
+    pill = 18 if ">N</span>" in name_html else 0
+    need = _px(name_html.replace(">N</span>", "></span>"), 16) * 1.04 + pill + 17 + _px(chunks[0], 14) + (10 if len(chunks) > 1 else 0)
+    return need <= INLINE_ROOM * left_pct / 100 - 4
+
+
+def crow_left(name_html, sub="", left_pct=65):
     """C 카드 왼쪽 칸 안: 구분명(굵게) │ 보조 줄(14px #7A7A7A) 한 줄로 (2026-10-12 사용자: "구분선 넣고 한 줄로 표기 가능한 것은 모두").
     넘치면 · 에서 다음 줄로 이어진다. 엔비디아 렌더러도 이것을 쓴다."""
     if not sub:
         return f'<span style="font-weight:700;color:#111;">{paren(name_html)}</span>'
+    if not fits_inline(name_html, sub, left_pct):   # 한 줄에 못 들어가면 예전처럼 이름 아래 블록
+        return (f'<span style="font-weight:700;color:#111;">{paren(name_html)}</span>'
+                f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};">{sub_line(sub)}</span>')
     return (f'<span style="font-weight:700;color:#111;">{paren(name_html)}</span>'
             f'<span style="color:{SUB};font-weight:400;font-size:{TINY};">{sub_line(sub, lead=VSEP)}</span>')
 
@@ -416,7 +449,7 @@ def crow(name_html, value_html, sub="", first=False, left=None, short=False, now
              if sub and sub_below else "")
     row_st = MULTI_ROW + ("flex-wrap:wrap;row-gap:0;" if below else "")
     return (f'<span style="{row_st}{"" if first else MULTI_SEP}">'
-            f'<span style="display:block;line-height:1.5;{col_l}">{crow_left(name_html, "" if below else sub)}</span> '
+            f'<span style="display:block;line-height:1.5;{col_l}">{crow_left(name_html, "" if below else sub, left or (80 if short else 65))}</span> '
             f'<span style="{col_r}font-weight:700;">{value_html}</span>{below}</span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 짧으면 80 · 20, left 가 있으면 그 값
 
 

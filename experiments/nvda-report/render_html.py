@@ -616,7 +616,7 @@ STATUS_KO = {"active": "진행 중", "closed": "종결", "stayed": "중지", "se
 def _crow(name_html, value_html, sub="", first=False, left=None, short=False):
     """C 카드의 한 줄 (가이드라인 2-1): 왼쪽 구분명(굵게) + 그 아래 보조 줄(14px #999), 오른쪽 값. 줄 사이 가로 구분선."""
     return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
-            f'<span style="display:block;line-height:1.5;{_dk.COL_L75 if short else COL_L}">{_dk.crow_left(name_html, sub)}</span> '
+            f'<span style="display:block;line-height:1.5;{_dk.COL_L75 if short else COL_L}">{_dk.crow_left(name_html, sub, 80 if short else 65)}</span> '
             f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 5자 미만이면 80 · 20 (2026-10-11 사용자)
 
 

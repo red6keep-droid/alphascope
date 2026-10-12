@@ -1,6 +1,7 @@
 requests>=2.31.0
 yfinance>=0.2.30
 pandas>=2.0
+matplotlib>=3.8     # 과거 반응 그래프 PNG (chart_reaction.py)
 google-genai>=1.0.0
 python-dotenv>=1.0.1
 tzdata; sys_platform == "win32"
