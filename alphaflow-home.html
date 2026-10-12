@@ -734,7 +734,7 @@ body.menu-open { overflow: hidden; }
         <h3 class="report-title"><span class="report-icon" style="background:#E53E3E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="5" width="3" height="9" rx=".5"/><rect x="11" y="2" width="3" height="12" rx=".5"/></svg></span>미국 증시 리포트<span class="report-card-date" data-date="report-card"></span></h3>
         <a class="report-card" id="report-card" href="#">
           <div class="report-block" data-hook="summary">
-            <span class="badge badge--summary">오늘의 시장 요약</span>
+            <!-- 첫 구획 라벨은 두지 않는다 (2026-10-13 사용자) -->
             <div class="report-columns">
               <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
             </div>
@@ -772,7 +772,7 @@ body.menu-open { overflow: hidden; }
         <h3 class="report-title"><span class="report-icon" style="background:#76B900;" aria-hidden="true"><img src="https://financialmodelingprep.com/image-stock/NVDA.png" alt="" onerror="this.hidden=true"/></span>엔비디아 리포트<span class="report-card-date" data-date="nvda-card"></span></h3>
         <a class="report-card" id="nvda-card" href="/search/label/엔비디아">
           <div class="report-block" data-hook="nvda-headline">
-            <span class="badge badge--nvda">가격</span>
+            <!-- 가격 라벨 삭제 (2026-10-13 사용자) -->
             <div class="report-columns">
               <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
             </div>
@@ -1288,6 +1288,7 @@ body.menu-open { overflow: hidden; }
       id: 'trump-card',
       label: '트럼프 트렌드',
       map: { speech: ['발언', '오늘 한 줄', '달라진 것', '무엇이 달라졌나'], watch: ['내일 볼 것'] },   /* 트럼프는 머리 구획이 없다 — 발언 집계 줄부터 (2026-10-12) */
+      pick: { speech: speechLines },
       picks: false,
       empty: '아직 발행된 트렌드 리포트가 없습니다.'
     },
@@ -1295,6 +1296,7 @@ body.menu-open { overflow: hidden; }
       id: 'nvda-card',
       label: '엔비디아',
       map: { 'nvda-headline': ['(가격)', '오늘 한 줄'], 'nvda-today': ['중요 이슈', '오늘의 해석', '뉴스', '오늘 바뀐 것'] },
+      pick: { 'nvda-headline': nvdaLines }, lines: { 'nvda-headline': 3 },
       any: true,
       picks: false,
       empty: '아직 발행된 엔비디아 리포트가 없습니다.'
@@ -1399,7 +1401,48 @@ body.menu-open { overflow: hidden; }
       list.appendChild(statusItem(emptyMsg || LOAD_FAILED));
       return;
     }
-    lines.forEach(function (t) { list.appendChild(el('li', null, t)); });
+    lines.forEach(function (t) { list.appendChild(tinted(t)); });
+  }
+
+  /* 증감 색 — 가운뎃점(·)으로 나눈 덩어리마다 ▲만 있으면 빨강, ▼만 있으면 파랑, 종목 이름까지 한 덩어리로 (가이드라인 3-3, 2026-10-13 사용자) */
+  function tinted(t) {
+    var li = el('li'), box = el('span');
+    String(t).split(' · ').forEach(function (chunk, i) {
+      if (i) box.appendChild(document.createTextNode(' · '));
+      var up = /▲/.test(chunk), dn = /▼/.test(chunk);
+      box.appendChild(up !== dn ? el('span', up ? 'up' : 'down', chunk) : document.createTextNode(chunk));
+    });
+    li.appendChild(box);
+    return li;
+  }
+
+  /* 트럼프 `오늘의 발언` — 발언 이벤트 줄(주제 · 시각 · 강도)이 있으면 그 줄, 없으면 안내 (2026-10-13 사용자) */
+  function speechLines(sec) {
+    var rows = [];
+    (sec['발언'] || []).forEach(function (n) {
+      if (!n.querySelectorAll) return;
+      [].slice.call(n.querySelectorAll('[data-grid] > span')).forEach(function (r) { var t = String(r.textContent || '').replace(/\s+/g, ' ').trim(); if (t) rows.push(clip(t)); });
+    });
+    return rows.length ? rows : ['최근 24시간에 시장 관련 발언 이벤트가 없습니다.'];
+  }
+
+  /* 엔비디아 가격 — NVDA 한 줄 + 시가 갭 · 일중 변동폭 · 거래량 한 줄 + 과열(과열 지표 카드가 있으면 그것, 없으면 RSI) (2026-10-13 사용자) */
+  function nvdaLines(sec) {
+    var all = [];   /* 카드의 줄(이름 왼쪽 · 값 오른쪽 한 줄) 단위로 읽는다 — 글자 단위로 읽으면 이름과 값이 따로 나뉜다 */
+    (sec['(가격)'] || []).forEach(function (n) {
+      if (!n.querySelectorAll) return;
+      [].slice.call(n.querySelectorAll('span, div')).forEach(function (r) {
+        if (!/justify-content:\s*space-between/.test(r.getAttribute('style') || '')) return;
+        var t = String(r.textContent || '').replace(/\s+/g, ' ').trim(); if (t) all.push(t);
+      });
+    });
+    function pick(re) { for (var i = 0; i < all.length; i++) if (re.test(all[i])) return all[i]; return ''; }
+    function strip(t) { return t.replace(/\s*\([^)]*\)/g, '').replace(/\s안내\s/g, ' ').replace(/\s+/g, ' ').trim(); }
+    var price = pick(/^NVDA\b/);
+    var mid = [pick(/^시가 갭/), pick(/^일중 변동폭/), pick(/^거래량/)].filter(Boolean).map(strip).join(' · ');
+    var heat = pick(/^과열 지표/), rsi = pick(/^RSI/);
+    var last = heat ? strip(heat) : (rsi ? 'RSI ' + rsi.split(' ').pop() + ' · 과열 기준 70' : '');
+    return [price, mid, last].filter(Boolean);
   }
 
   function setDate(id, text) {
@@ -1471,11 +1514,12 @@ body.menu-open { overflow: hidden; }
 
         Object.keys(card.map).forEach(function (hook) {
           var lines = [], used = null;
-          card.map[hook].forEach(function (k) {
+          if (card.pick && card.pick[hook]) { lines = card.pick[hook](sec); used = card.map[hook][0]; }
+          else card.map[hook].forEach(function (k) {
             if (card.any && lines.length) return;
             if (sec[k]) { lines = lines.concat(linesOf(sec[k])); if (lines.length && !used) used = k; }
           });
-          fillCard(hook, lines.slice(0, MAX_LINES));
+          fillCard(hook, lines.slice(0, (card.lines && card.lines[hook]) || MAX_LINES));
           /* any 카드가 후순위 구획으로 채워졌으면 배지도 그 구획 이름으로 — "오늘의 해석" 아래 이벤트 목록이 붙지 않게 */
           if (card.any && used && used !== card.map[hook][0]) {
             var block = document.querySelector('.report-block[data-hook="' + hook + '"]');
