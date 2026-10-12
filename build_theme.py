@@ -167,8 +167,8 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 /* 제목 아래 날짜 줄(October 11, 2026) 삭제 (2026-10-12 사용자) */
 .post-timestamp { display: none !important; }
 /* 글 보기: 첫 제목 위 여백 70% 줄임 (2026-10-12 사용자) — 위 32+40 → 10+12 */
-body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 20px; }
-/* 글 제목 위 보이는 여백 20px — 홈 제목과 같다 (2026-10-12 사용자: "홈 상단 타이틀 위 여백 20, 모든 리포트의 상단 타이틀도 동일"). 행간 반쪽만큼 뺀 값 */
+body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 30px; }
+/* 글 제목 위 보이는 여백 30px (2026-10-12 사용자 20 → 2026-10-13 사용자: "상단 타이틀의 위쪽 여백을 10픽셀 추가"). 행간 반쪽만큼 뺀 값 */
 body.item-view .post-outer-container { padding-top: 13px; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
@@ -338,6 +338,8 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
   font-size: 18px; line-height: 24px; color: #333; word-break: keep-all;
 }
 .comments h3, .comments .comments-title, .comments h3.title { margin: 0 0 14px; padding-bottom: 6px; border-bottom: 2px solid #eee; font-size: 21px; font-weight: 700; line-height: 27px; color: #111; }
+/* 댓글 */
+.comments .comment-replies .thread-count, .comments .comment-replies .thread-arrow { display: none; }
 /* 댓글 접기 (2026-10-12 사용자: "하단 댓글은 접기 기능을 추가해서 평소에는 닫아줘") — 테마 JS가 제목을 버튼으로 바꾸고 나머지를 .comments-panel 로 감싼다.
    기본은 닫힘. 주소가 #comments · #comment-form · #c123 이면 열린 채로. 닫혀 있을 때는 제목 밑 구분선도 없앤다 */
 .comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 12px 16px; background: none; border: 0; font: inherit; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; text-align: left; cursor: pointer; }   /* 제목 16px · 오른쪽 접기 화살표 (2026-10-12 사용자) */
@@ -356,7 +358,9 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment { display: flex; gap: 12px; align-items: flex-start; }
 .comments .comment-replies .comment, .comments .comment .comment { padding-left: 0; }
 .comments .comment-replies { margin: 10px 0 0 48px; }
-.comments .comment-replies > .thread-toggle { font-size: 14px; color: var(--gray-500); }
+/* 답글 · 삭제 버튼과 '답글' 글자는 두지 않는다 — 로그인 전에는 동작하지 않고, 테마가 로그인 여부를 알 수 없다. 댓글은 아래 댓글 쓰기 폼으로 (2026-10-13 사용자) */
+.comments .comment-actions, .comments .comment-replies > .thread-toggle, .comments .thread-chrome, .comments .comment-replybox-single, .comments .comment-replybox-thread, .comments .thread-expanded > .thread-toggle { display: none !important; }
+.comments .comment-replies { margin: 10px 0 0 24px; }
 .comments .avatar-image-container { flex: none; width: 36px; height: 36px; }
 .comments .avatar-image-container img { width: 36px; height: 36px; border-radius: 50%; display: block; }
 .comments .comment-block { flex: 1; min-width: 0; }
@@ -398,7 +402,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px */
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
-  body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 21px; }   /* 헤더 → 제목 글자 보이는 20 (잰 값에 맞춤, 2026-10-12 사용자) */
+  body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 31px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) */
   .post-title { font-size: 24px; line-height: 34px; letter-spacing: -.3px; }
   .post-body { font-size: 18px; line-height: 34px; }
   /* 데스크톱용 커버 이미지 확대 규칙(1024px !important)이 모바일에서 글 폭을 벌리지 않게 */

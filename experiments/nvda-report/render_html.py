@@ -249,7 +249,7 @@ def _arrow(v, digits=2, unit="%"):
 def _row(name, value_html, extra=""):
     """한 줄 카드: 이름 왼쪽, 가격 정보 오른쪽 (2026-10-11 사용자 규칙). span 으로만 짜서 홈 카드가 한 줄로 읽는다."""
     # 두 span 사이 공백: flex 컨테이너라 화면엔 안 보이고, 홈 카드가 textContent 로 읽을 때 이름과 값을 띄운다
-    return (f'<span style="{ROW}{extra}"><span style="{_dk.ROW_L}font-weight:700;color:#111;">{_esc(name)}</span> '
+    return (f'<span style="{ROW}{extra}"><span style="{_dk.ROW_L}font-weight:700;color:#111;">{_dk.ticker_logo(name)}{_esc(name)}</span> '
             f'<span style="{_dk.ROW_R}">{value_html}</span></span> ')   # 값 `$229.28 ▼ 0.52%` 한 줄 (2026-10-12 사용자)
 
 
@@ -333,7 +333,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip=""):
     lis = "".join(li(t) for t in lines)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{_dk.EMPH_PAD - _dk.VP_EMPH}px 14px;margin:0 0 8px;line-height:{_dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다
-            f'<span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_esc(title)}{_tip(tip)}{new_html}</span><span style="{COL_R}font-weight:700;color:{color};">{_esc(state)}</span></span> '
+            f'<span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_esc(title)}{_dk.tip_anno(tip)}{new_html}</span><span style="{COL_R}font-weight:700;color:{color};">{_esc(state)}</span></span> '
             f'<div style="margin-top:{14 - _dk.VP_EMPH}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
 
@@ -505,7 +505,7 @@ def _event_html(e):
     inner = f"{head}{fact} {tag}{link}{when}"   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절)
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
-        return f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{14 - _dk.NEWS_VP}px 12px;margin:0 0 8px;line-height:{_dk.LH_BODY};">{inner}</div>'   # 뉴스 제목 행간 34 (2026-10-12 사용자)   # 일반 기사 카드와 같은 크기·여백, 배경만 방향 색
+        return f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px;margin:0 0 8px;line-height:{_dk.LH_BODY};">{inner}</div>'   # 뉴스 제목 행간 34 (2026-10-12 사용자)   # 일반 기사 카드와 같은 크기·여백, 배경만 방향 색
     return inner   # 나머지는 글 항목 카드(_dk.list_card)의 한 줄 (2026-10-12 사용자: 뉴스는 카드 형식으로)
 
 
@@ -524,11 +524,8 @@ def _bar(label, segs, split="right"):
     pcts = " · ".join(f"{nm} {n / total * 100:.0f}%" for nm, n, _, _ in segs if n)
     body = "".join(f'<span style="display:block;width:{n / total * 100:.1f}%;background:{bg};color:{fg};font-size:{SMALL};font-weight:700;'
                    f'text-align:center;line-height:24px;overflow:hidden;white-space:nowrap;">{f"{n / total * 100:.0f}%" if n / total >= 0.08 else ""}</span>' for _, n, bg, fg in segs if n)   # 8% 미만 조각은 글자 생략 (라벨에 있음)
-    bar_html = f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 {3 if split == "below" else 10}px;">{body}</span>'
-    if split == "below":   # 뉴스 막대: 라벨(오늘 15건) 위 · 비율(긍정 67% · 부정 20% …) 막대 아래 (2026-10-12 사용자)
-        st = f"display:block;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};color:{NOTE};"
-        return f'<span style="{st}margin:0 0 3px;">{_esc(label)}</span>{bar_html}<span style="{st}">{_esc(pcts)}</span>'
-    return _dk.bar_label(label, pcts, split) + bar_html   # 왼쪽 라벨 · 오른쪽 비율, 또는 줄바꿈 (2026-10-12 사용자)
+    bar_html = f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 3px;">{body}</span>'
+    return _dk.bar_label(label, pcts) + bar_html + _dk.bar_pcts(pcts)   # 라벨(검정 굵게) 위 · 막대 · 비율 아래 — 뉴스 · 애널리스트 모두 (2026-10-13 사용자)
 
 
 def _ratio_bar(label, counts):
@@ -541,7 +538,7 @@ ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" ar
             'stroke-linecap="round" stroke-linejoin="round" style="flex:none;transition:transform .15s;"><path d="M4 6l4 4 4-4"/></svg>')
 
 
-ACC_BTN = (f'<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:1px solid #E2E8F0;border-radius:6px;'
+ACC_BTN = (f'<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid #E2E8F0;border-radius:6px;'
            f'background:#fff;color:#111;margin-left:8px;vertical-align:middle;">{ACC_CHEV}</span>')   # 네모 박스 안 화살표 버튼 (2026-10-11 사용자)
 
 

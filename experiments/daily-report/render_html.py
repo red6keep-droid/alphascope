@@ -247,7 +247,7 @@ def sec_regime(analysis, report):
     # 점수 · 등급 설명은 본문 글머리표가 아니라 "점수" 옆 ? 툴팁 (2026-10-12 사용자: "점수 위험 선호 내용은 툴팁으로 제공하고 본문에서 삭제")
     explain = ("추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수의 합(0~100)입니다. 높을수록 주식에 우호적인 환경입니다.\n"
                + "\n".join(f"· {g} = {m}" for g, m in GRADE_MEANING.items()))
-    score_card = dk.state_card("점수" + dk.tip(explain), LIGHT_KIND.get(light, "neutral"),   # 따로 카드, 배경은 등급 라벨 색 (2026-10-12 사용자)
+    score_card = dk.state_card("점수" + dk.tip_anno(explain), LIGHT_KIND.get(light, "neutral"),   # `안내 ?` (2026-10-13 사용자: 아이콘만 두지 않는다) · 따로 카드, 배경은 등급 라벨 색 (2026-10-12 사용자)
                                f'<span style="font-size:{SCORE_SIZE};">{int(regime["score"])} <span style="color:{dk.SUB};">/ 100</span></span> ' + _light_pill(light, grade))   # 86 / 100 은 20px 굵게 (2026-10-12 사용자)
     rows = []
     if regime.get("score_prev") is not None:
@@ -474,7 +474,7 @@ def _quote_rows(quotes):
     rows = []
     for q in quotes or []:
         sym = q.get("symbol") or "-"
-        r = dk.crow(_esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', _esc(f"거래량 {_fmt_volume(q.get('volume'))}"), first=len(rows) in (0, FOLD_SHOWN),
+        r = dk.crow(dk.ticker_logo(sym) + _esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', _esc(f"거래량 {_fmt_volume(q.get('volume'))}"), first=len(rows) in (0, FOLD_SHOWN),
                     left=QUOTE_LEFT, nowrap=True, sub_block=True)
         chg = q.get("change_pct")
         r = r.replace('<span style="', f'<span data-pick="1" data-sym="{_esc(sym)}" data-price="{_esc(_fmt_price(q.get("price")))}" data-chg="{"" if chg is None else f"{float(chg):+.2f}%"}" style="', 1)

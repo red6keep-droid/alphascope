@@ -69,7 +69,7 @@ def day(t):
 
 def paren(name_html):
     """카드 구분명의 (…) 부분을 한 단계 작게·보통 굵기로 (이미 이스케이프된 HTML)."""
-    return _PAREN.sub(lambda m: f' <span style="font-size:{MICRO};font-weight:400;">{m.group(1)}</span>', name_html)
+    return _PAREN.sub(lambda m: f' <span style="display:inline-block;font-size:{MICRO};font-weight:400;">{m.group(1)}</span>', name_html)   # inline-block: 한 줄에 못 들면 괄호째 다음 줄로 (2026-10-13 사용자)
 
 
 def arrow(v, digits=2, unit="%"):
@@ -252,8 +252,19 @@ def read_text(items, notes=()):
 
 
 def tip_label(label, text):
-    """제목 옆 `읽는 법 ?` — 14px 안내 회색 글자 + ? 툴팁 (팝업 제목은 이 글자). 읽는 법은 카드가 아니라 그 내용의 제목 옆 툴팁 (2026-10-12 사용자)."""
+    """`읽는 법 ?` 같은 라벨 + ? 툴팁 — 14px 안내 회색, 팝업 제목은 이 라벨. 툴팁 아이콘은 늘 라벨과 짝 — 읽는 법 · 용어 · 주의 · 처음 등장, 그 밖은 `안내` (2026-10-13 사용자: "아이콘만 있는 경우는 안내 + 아이콘")."""
     return f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};white-space:nowrap;margin-left:6px;">{esc(label)}{tip(text)}</span>'
+
+
+def tip_anno(text):
+    """이름 옆 `안내 ?` — 라벨이 따로 없는 툴팁 (카드 구분명 · 상태 카드 제목 옆)."""
+    return tip_label("안내", text)
+
+
+def tips_right(pairs):
+    """제목 줄 오른쪽 끝에 툴팁 묶음 `읽는 법 ? · 주의 ?` — 모든 리포트의 툴팁 배치 (2026-10-13 사용자: "타이틀 줄에 우측 정렬로 툴팁 배치"). pairs = [(라벨, 글)]."""
+    inner = ' <span style="color:#CBD5E1;">·</span> '.join(f'<span style="white-space:nowrap;">{esc(k)}{tip(v)}</span>' for k, v in pairs if v)
+    return f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};margin-left:auto;align-self:center;white-space:nowrap;flex:none;">{inner}</span>' if inner else ""
 
 
 def tip_line(items, in_title=False):
@@ -357,6 +368,18 @@ def pill(text, kind="area"):
             f'font-size:{PILL_SIZE};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{esc(text)}</span>')   # 라벨 14px, 어디서나 (2026-10-12 사용자)
 
 
+LOGO_URL = "https://financialmodelingprep.com/image-stock/{sym}.png"   # 티커 로고 (키 없이 받아진다, 2026-10-13 확인). 없으면 img 가 스스로 숨는다
+
+
+def ticker_logo(sym, size=20):
+    """종목 이름 앞 티커 로고 (2026-10-13 사용자: "엔비디아는 티커 로고, 각각의 종목명에도 티커 아이콘"). 둥근 20px, 못 받으면 숨김(onerror)."""
+    sym = str(sym or "").strip().upper()
+    if not sym or not sym.replace("-", "").replace(".", "").isalnum():
+        return ""
+    return (f'<img src="{LOGO_URL.format(sym=sym)}" alt="" width="{size}" height="{size}" loading="lazy" onerror="this.style.display=\'none\'" '
+            f'style="width:{size}px;height:{size}px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;">')
+
+
 def link_icon(url, label):
     if not url:
         return ""
@@ -370,8 +393,8 @@ NEWS_VP = 7   # 18px 글 · 행간 34 의 반쪽
 def item_cards(items_html, sub=False):   # sub=True: 카드 끝 줄이 14px 보조 줄
     """기사 카드 — 뉴스 기사 하나가 카드 하나 (2026-10-12 사용자: "뉴스 기사는 카드 타입으로 각각"). 흰 바탕, 테두리, 모서리 8px,
     위아래 14px · 좌우 12px, 카드 사이 8px. 18px · 행간 27. 항목은 li — 홈 카드가 글머리표로 읽는다."""
-    # 뉴스 제목은 본문 행간 34 (2026-10-12 사용자: "뉴스의 제목도 본문 행간 여백을 적용") — 행간 반쪽 7 만큼 padding 을 덜어 보이는 위아래 14 유지
-    lis = "".join(f'<li style="margin:0 0 8px;padding:{14 - NEWS_VP}px 12px {14 - (VP if sub else NEWS_VP)}px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;line-height:{LH_BODY};">{h}</li>'
+    # 뉴스 제목은 본문 행간 34 (2026-10-12 사용자: "뉴스의 제목도 본문 행간 여백을 적용") — 행간 반쪽 7 만큼 padding 을 덜어 보이는 위아래 22 (콘텐츠 카드 여백, 2026-10-13 사용자)
+    lis = "".join(f'<li style="margin:0 0 8px;padding:{SEP_GAP - NEWS_VP}px 12px {SEP_GAP - (VP if sub else NEWS_VP)}px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;line-height:{LH_BODY};">{h}</li>'
                   for h in items_html)
     return f'<ul style="margin:0 0 8px;padding:0;list-style:none;font-size:{SMALL};">{lis}</ul>' if lis else ""
 
@@ -495,7 +518,7 @@ def crow_left(name_html, sub="", left_pct=65, block=False, name_size=None, tip_t
     """C 카드 왼쪽 칸 안: 구분명(굵게) │ 보조 줄(14px #7A7A7A) 한 줄로 (2026-10-12 사용자: "구분선 넣고 한 줄로 표기 가능한 것은 모두").
     넘치면 · 에서 다음 줄로 이어진다. 엔비디아 렌더러도 이것을 쓴다."""
     ns = name_size or NAME
-    t = tip(tip_text) if tip_text else ""   # 구분명 옆 ? — 그 줄의 읽는 법 (2026-10-12 사용자)
+    t = tip_anno(tip_text) if tip_text else ""   # 구분명 옆 `안내 ?` — 그 줄의 읽는 법 (2026-10-12 · 13 사용자)
     if t:
         return _crow_left_tip(name_html, sub, left_pct, block, ns, t)
     if not sub:
@@ -508,7 +531,9 @@ def crow_left(name_html, sub="", left_pct=65, block=False, name_size=None, tip_t
 
 
 def _crow_left_tip(name_html, sub, left_pct, block, ns, t):
-    name = f'<span><span style="font-weight:700;color:#111;font-size:{ns};">{paren(name_html)}</span>{t}</span>'   # 한 span 으로 묶어 팝업 제목 = 구분명
+    core, sep, par = name_html.partition(" (")   # `안내 ?` 는 이름 바로 뒤, 괄호는 그 뒤에(괄호째 줄바꿈) — 2026-10-13
+    name = (f'<span><span style="font-weight:700;color:#111;font-size:{ns};">{core}</span>{t}'
+            + (f'<span style="font-weight:700;color:#111;font-size:{ns};">{paren(sep + par)}</span>' if sep else "") + "</span>")   # 한 span 으로 묶어 팝업 제목 = 구분명
     if not sub:
         return name
     if block or not fits_inline(name_html + "??", sub, left_pct, int(ns[:-2])):
@@ -614,8 +639,9 @@ def fold(label, inner_html):
 
 def sub_label(t, tip_text=None):
     """소제목. tip_text 가 있으면 소제목 바로 옆 ? 툴팁 — 그 소제목 내용의 읽는 법 (2026-10-12 사용자)."""
-    t_html = paren(esc(t)) + (tip(tip_text) if tip_text else "")
-    return f'<div data-sub="1" style="position:relative;font-size:{SMALL};line-height:{LH_CARD};color:{NOTE};margin:10px 0 3px;">{t_html}</div>'
+    t_html = paren(esc(t)) + (tips_right([("읽는 법", tip_text)]) if tip_text else "")   # 읽는 법 ? 는 줄 오른쪽 끝 (2026-10-13 사용자)
+    # 바깥 div 에 display 를 주지 않는다 — 테마가 서브탭을 만들 때 hidden 을 거는데 인라인 display 가 이기면 숨지 않는다 (2026-10-13 발견)
+    return f'<div data-sub="1" style="position:relative;font-size:{SMALL};line-height:{LH_CARD};color:{NOTE};margin:10px 0 3px;"><span style="display:flex;align-items:center;gap:8px;">{t_html}</span></div>'
 
 
 BAR_LABEL = "16px"   # F 막대 라벨 — `오늘 15건 … 긍정 67% · 부정 20% · 중립 13%` 가 폰 한 줄에 들도록 (2026-10-12)
@@ -624,11 +650,12 @@ BAR_LABEL = "16px"   # F 막대 라벨 — `오늘 15건 … 긍정 67% · 부�
 def bar_label(label, pcts, split="right"):
     """F 막대 위 라벨 (2026-10-12 사용자): split="right" — 왼쪽 `오늘 15건` · 비율은 오른쪽 정렬, 모자라면 비율이 다음 줄 오른쪽으로.
     split="break" — 라벨 다음 줄에 비율 (`애널리스트 61명` / `강매수 16% · 매수 79% …`)."""
-    st = f"font-size:{BAR_LABEL};line-height:{LH_CARD};color:{NOTE};margin:0 0 3px;"
-    if split == "break":
-        return f'<span style="display:block;{st}">{esc(label)}<span style="display:block;">{esc(pcts)}</span></span>'
-    return (f'<span style="display:flex;flex-wrap:wrap;justify-content:space-between;column-gap:8px;{st}">'
-            f'<span style="white-space:nowrap;">{esc(label)}</span><span style="margin-left:auto;text-align:right;">{esc(pcts)}</span></span>')
+    return f'<span style="display:block;font-size:{BAR_LABEL};line-height:{LH_CARD};color:#111;font-weight:700;margin:0 0 3px;">{esc(label)}</span>'   # 막대 위 라벨은 검정 굵게, 비율은 막대 아래 (2026-10-13 사용자)
+
+
+def bar_pcts(pcts):
+    """막대 아래 비율 줄 `긍정 68% · 부정 16% …` (14px 안내 회색)."""
+    return f'<span style="display:block;font-size:{BAR_LABEL};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{esc(pcts)}</span>'
 
 
 def bar(label, segs, split="right"):
@@ -640,7 +667,7 @@ def bar(label, segs, split="right"):
     body = "".join(f'<span style="display:block;width:{n / total * 100:.1f}%;background:{bg};color:{fg};font-size:{SMALL};font-weight:700;'
                    f'text-align:center;line-height:24px;overflow:hidden;white-space:nowrap;">{f"{n / total * 100:.0f}%" if n / total >= 0.08 else ""}</span>' for _, n, bg, fg in segs if n)
     return (bar_label(label, pcts, split) +
-            f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 10px;">{body}</span>')
+            f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 3px;">{body}</span>' + bar_pcts(pcts))
 
 
 def hbar(value, max_value, color, width="80px"):
