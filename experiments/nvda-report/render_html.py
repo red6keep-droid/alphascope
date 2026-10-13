@@ -278,8 +278,13 @@ def _multi2(items):
     """E타입 2열 멀티 카드 — design_kit.multi2 와 같다: 폰에서도 2열, 값이 안 들어가면 칸 안 다음 줄 오른쪽 (2026-10-12 사용자)."""
     html = _dk.multi2([(it[0], f'<span style="{VAL}">{it[1]}</span>') + tuple(it[2:]) for it in items])   # 오른쪽 값 17px (2026-10-13 사용자)
     # 왼쪽 정보 14px · 보통 굵기, 이름과 값을 한 줄로 (2026-10-14 사용자). data-pair 를 빼야 테마의 폰 규칙(값을 다음 줄로)이 걸리지 않는다
-    cell = _dk.E_CELL.replace("px 12px;", "px 8px;", 1)   # 칸 좌우 12 → 8 — 폰 반 폭 칸에 `AVGO 대비 ▲ 0.59%p` 가 한 줄로 들게
-    return (html.replace(_dk.E_CELL, cell).replace(_dk.E_NAME, f"flex:0 1 auto;min-width:0;white-space:nowrap;font-weight:400;color:#111;font-size:{TINY};")
+    # 카드 바깥 좌우 = 1열 카드와 같은 12, 세로 구분선 쪽 안쪽만 8 — 폰 반 폭 칸에 `AVGO 대비 ▲ 0.59%p` 가 한 줄로 들게 (2026-10-14 사용자)
+    v = _dk.SEP_GAP - _dk.VP - 1
+    pad = f"padding:{v}px 12px;"
+    left = _dk.E_CELL.replace(pad, f"padding:{v}px 8px {v}px 12px;", 1)
+    right = _dk.E_CELL.replace(pad, f"padding:{v}px 12px {v}px 8px;", 1)
+    html = html.replace(f'style="{_dk.E_CELL}border-left', f'style="{right}border-left').replace(f'style="{_dk.E_CELL}"', f'style="{left}"')
+    return (html.replace(_dk.E_NAME, f"flex:0 1 auto;min-width:0;white-space:nowrap;font-weight:400;color:#111;font-size:{TINY};")
             .replace("flex-wrap:wrap;", "flex-wrap:nowrap;").replace(' data-pair="1"', ""))
 
 
@@ -550,7 +555,7 @@ RATING_PASTEL = [("strongBuy", "강매수", "#F4ACA6", "#7F1D1D"), ("buy", "매�
                  ("hold", "보유", "#E2E8F0", "#475569"), ("sell", "매도", "#C9DCF7", "#1E3A8A"), ("strongSell", "강매도", "#A9C5F2", "#1E3A8A")]
 
 
-BAR_H, BAR_NUM, BAR_PAD = 30, "18px", 5   # 높이 26 → 30 (+15%, 2026-10-14 사용자) · 막대 위아래 +5   # 막대 높이 24 → 26 (+10%, 정수) · 막대 안 숫자 19 → 18 (2026-10-13 사용자, 가이드라인 10-7)
+BAR_H, BAR_NUM, BAR_PAD = 30, "17px", 5   # 막대 안 숫자 18 → 17 (2026-10-14 사용자)   # 높이 26 → 30 (+15%, 2026-10-14 사용자) · 막대 위아래 +5   # 막대 높이 24 → 26 (+10%, 정수) · 막대 안 숫자 19 → 18 (2026-10-13 사용자, 가이드라인 10-7)
 
 
 def _bar(label, segs, split="right"):

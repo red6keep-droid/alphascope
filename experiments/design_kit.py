@@ -445,7 +445,7 @@ def stat_line(items):
     """한 줄 수치 카드 (2026-10-12 사용자: "기사 · 7일 평균 · 대기 문서, 구분선을 추가하여 한 줄에") — 카드 하나에 `이름 값`을 세로 구분선으로 나란히.
     이름 16px(왼쪽 정보) · 값 18px 굵게. items = [(이름, 값HTML)]. 칸은 글자 폭만큼, 남는 폭은 고르게."""
     cells = "".join(f'<span style="flex:1 1 auto;text-align:center;white-space:nowrap;padding:0 8px;{"border-left:1px solid #E2E8F0;" if i else ""}">'
-                    f'<span style="font-size:{NAME};font-weight:700;color:#111;">{esc(k)}</span> : <b style="color:#111;">{v}</b></span>'   # `기사 : 29` (2026-10-13 사용자)
+                    f'<span style="font-size:{NAME};font-weight:400;color:#111;">{esc(k)}</span> : <b style="color:#111;font-size:18px;">{v}</b></span>'   # 이름 보통 굵기 · 숫자 18px (2026-10-14 사用자)   # `기사 : 29` (2026-10-13 사용자)
                     for i, (k, v) in enumerate(items))
     return (f'<div style="display:flex;align-items:center;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{10 - VP}px 4px;'
             f'margin:0 0 8px;font-size:{SMALL};line-height:{LH_CARD};">{cells}</div>')
