@@ -345,7 +345,7 @@ def _tip(text):
         return ""
     t = _esc(text).replace(chr(34), "&quot;")
     return (f' <span data-tip="{t}" tabindex="0" role="button" aria-label="{t}" '
-            f'style="display:inline-flex;align-items:center;color:{NOTE};cursor:help;vertical-align:middle;position:relative;top:-1px;">{QUESTION_ICON}</span>')   # 20px, 글자와 세로 가운데 (2026-10-13 사용자)   # 툴팁 상자는 position:relative 인 제목 줄 기준 — 카드 폭 안에 들어간다
+            f'style="display:inline-flex;align-items:center;color:{NOTE};cursor:help;vertical-align:middle;position:relative;top:-1px;margin:0 {_dk.TIP_GAP}px;">{QUESTION_ICON}</span>')   # 20px, 글자와 세로 가운데 (2026-10-13 사용자)   # 툴팁 상자는 position:relative 인 제목 줄 기준 — 카드 폭 안에 들어간다
 
 
 def regime_rule():

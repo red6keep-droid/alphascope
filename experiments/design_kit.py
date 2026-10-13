@@ -237,12 +237,15 @@ def guide_card(title, body, notes=()):
 
 
 
+TIP_GAP = 3   # 툴팁 아이콘 좌우 바깥 여백 — 항상 (2026-10-13 사용자: "툴팁도 좌우 여백 3픽셀 여유는 항상")
+
+
 def tip(text):
     """ⓘ 툴팁 아이콘 — 글은 data-tip 속성, 모양은 테마 CSS(build_theme.py `[data-tip]::after`). 줄바꿈(\n)은 툴팁 안에서 줄을 바꾼다.
     상자는 position:relative 인 가장 가까운 줄 기준으로 놓인다 — 아이콘은 그런 줄 안에 둔다."""
     t = esc(text).replace(chr(34), "&quot;").replace("\n", "&#10;")
     return (f'<span data-tip="{t}" tabindex="0" role="button" aria-label="{t}" '
-            f'style="display:inline-flex;align-items:center;color:{NOTE};cursor:help;vertical-align:middle;position:relative;top:-1px;margin-left:2px;">{QUESTION_ICON}</span>')   # 글자와 세로 가운데 (2026-10-13 사용자)
+            f'style="display:inline-flex;align-items:center;color:{NOTE};cursor:help;vertical-align:middle;position:relative;top:-1px;margin:0 {TIP_GAP}px;">{QUESTION_ICON}</span>')   # 좌우 3px 항상 (2026-10-13 사용자)   # 글자와 세로 가운데 (2026-10-13 사용자)
 
 
 def read_text(items, notes=()):
@@ -258,12 +261,12 @@ def tip_label(label, text):
 
 def tip_icon(text):
     """상태 카드 제목 옆 툴팁 — `안내` 글자 없이 아이콘만 (2026-10-13 사용자: "점수 옆의 툴팁의 안내 글자는 삭제")."""
-    return tip(text).replace("margin-left:2px;", "margin-left:6px;", 1)   # 감싸지 않는다 — inline-flex 로 감싸면 아이콘이 글자 위로 뜬다
+    return tip(text)   # 감싸지 않는다 — inline-flex 로 감싸면 아이콘이 글자 위로 뜬다. 좌우 3px 는 tip 이 갖는다
 
 
 def tip_anno(text):
     """이름 옆 `안내 ?` — 라벨이 따로 없는 툴팁 (카드 구분명 · 상태 카드 제목 옆)."""
-    return tip_label("안내", text)
+    return tip_icon(text)   # `안내` 글자는 모두 삭제 — 아이콘만 (2026-10-13 사용자: "안내 + 툴팁은 전부 안내라는 글자 삭제")
 
 
 TIP_RIGHT = 10   # 줄 오른쪽 끝 툴팁 묶음의 오른쪽 여백 (2026-10-13 사용자: "우측 여백 들여쓰기 10픽셀")

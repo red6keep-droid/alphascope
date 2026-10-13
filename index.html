@@ -1090,13 +1090,13 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments-toggle .fold-box .acc-chev { transition: transform .15s; }
 .comments.is-open .comments-toggle .fold-box .acc-chev { transform: rotate(180deg); }
 /* 댓글 한 개 = 두 칸 grid(사진 | 글). 답글 묶음 · 답글 쓰기 자리는 글 칸 아래 줄 — flex 한 줄이라 셋째 칸으로 밀려 깨지던 것 (2026-10-13 사용자: "댓글에 댓글은 레이아웃이 깨진다") */
-.comments .comment { display: grid; grid-template-columns: 29px minmax(0, 1fr); column-gap: 10px; align-items: start; }
+.comments .comment { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 10px; align-items: start; }
 .comments .comment > .avatar-image-container { grid-column: 1; grid-row: 1; }
 .comments .comment > .comment-block { grid-column: 2; grid-row: 1; }
 .comments .comment > .comment-replies, .comments .comment > .comment-replybox-single { grid-column: 2; margin: 0; }
 .comments .comment-replies .comment-thread > ol > li, .comments .comment-replies ol > li.comment { padding: 14px 0 0; border-top: 0; }
 .comments .comment-replies .continue, .comments .comment-replies .thread-toggle { display: none !important; }   /* 답글 달기 없음 (10-2) */
-.comments .avatar-image-container, .comments .avatar-image-container img { width: 29px; height: 29px; }   /* 사진 36 → 29 (20% 작게, 2026-10-13 사용자) */
+.comments .avatar-image-container, .comments .avatar-image-container img { width: 24px; height: 24px; }   /* 사진 36 → 29 → 24 (2026-10-13 사용자) */
 /* 댓글 쓰기 = 블로거 전체 페이지로 가는 흰 버튼 하나 (2026-10-13 사용자: 흰색 버튼) — 글 안 쓰기 창 · 중복 제목은 테마 JS가 없앤다 */
 .comments .comment-write { margin-top: 0; padding-top: 14px; border-top: 1px solid #E2E8F0; }
 .comments .comment-write.is-first { padding-top: 14px; border-top: 0; }
