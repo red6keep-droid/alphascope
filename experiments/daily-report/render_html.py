@@ -259,7 +259,7 @@ def _pos(label):
 
 def _light_pill(light, text=None):
     kind = LIGHT_KIND.get(light, "neutral")
-    return dk.pill(text or _light_word(light) or "—", kind)
+    return dk.pill(text or _light_word(light) or "—", kind).replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 {dk.PILL_GAP + 5}px 0 {dk.PILL_GAP}px;", 1)   # 등급 라벨 오른쪽 +5 (2026-10-13 사용자)
 
 
 LEAD_VP = 8   # 머리 결론 18px · 행간 34 의 반쪽 — 구분선 위아래 보이는 14 (2026-10-13 사용자: 카드 없이)
@@ -291,7 +291,7 @@ def sec_regime(analysis, report, prev=None):
     explain = ("추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수의 합(0~100)입니다. 높을수록 주식에 우호적인 환경입니다.\n"
                + "\n".join(f"· {g} = {m}" for g, m in GRADE_MEANING.items()))
     score_card = dk.state_card("점수" + dk.tip_icon(explain), LIGHT_KIND.get(light, "neutral"),   # `안내 ?` (2026-10-13 사용자: 아이콘만 두지 않는다) · 따로 카드, 배경은 등급 라벨 색 (2026-10-12 사용자)
-                               _light_pill(light, grade) + f' <span style="font-size:{SCORE_SIZE};">{int(regime["score"])} <span style="color:{dk.SUB};">/ 100</span></span>', chev=True)   # 라벨이 점수 앞 (2026-10-13 사용자) · 86 / 100 은 20px 굵게 (2026-10-12 사용자)
+                               _light_pill(light, grade) + f' <span style="font-size:{SCORE_SIZE};">{int(regime["score"])} <span style="color:{dk.SUB};font-weight:400;">/ 100</span></span>', chev=True)   # 라벨이 점수 앞 (2026-10-13 사용자) · 86 / 100 은 20px 굵게 (2026-10-12 사용자)
     rows = []
     if regime.get("score_prev") is not None:
         rows.append(("어제 대비", dk.arrow(regime.get("delta") or 0, 0, ""), _esc(f"어제 {regime['score_prev']}점")))
@@ -334,7 +334,7 @@ def sec_indices(indices, analysis, report):
         rec = indices.get(key) or {}
         s = series.get(INDEX_SYMBOL[key]) or {}
         label = (position.get(key) or {}).get("position_label")
-        value = f'{_esc(_fmt_price(rec.get("price")))} {dk.arrow(rec.get("change_pct"))}'
+        value = f'<span style="font-weight:400;">{_esc(_fmt_price(rec.get("price")))}</span> {dk.arrow(rec.get("change_pct"))}'   # 지수 가격 보통 굵기 (2026-10-13 사용자)
         sub = []
         if s.get("ret_5d") is not None:
             sub.append(f"5일 {s['ret_5d']:+.2f}%")   # 덩어리째 증감 색은 crow 의 tint
@@ -588,8 +588,8 @@ def sec_news(input_data, report, analysis):
         sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;">{x}</span>' for x in subs)
         head = (f'<a href="{_esc(url)}" target="_blank" rel="noopener" style="color:#111;font-weight:700;text-decoration:none;">{title}</a>' if url
                 else f"<span style='color:#111;font-weight:700;'>{title}</span>")   # 제목이 원문 링크 — 새 창 아이콘 삭제 (2026-10-13 사용자)
-        lab = f'<span style="display:block;line-height:1;margin:0 0 4px;">{tag}</span>' if tag else ""   # 라벨 줄은 제목 위, 제목과 8 → 4 (2026-10-13 사용자: 50% 줄임)
-        items.append(f"{lab}{head}{sub_html}")
+        lab = f'<span style="display:block;line-height:1;margin:8px 0 0;">{tag}</span>' if tag else ""   # 라벨 줄은 기사 맨 아래 (2026-10-13 사용자)
+        items.append(f"{head}{sub_html}{lab}")
     return dk.item_rules(items, sub=True) if items else dk.muted("주요 뉴스 없음")   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
 
 
@@ -699,7 +699,7 @@ def build_body(input_data, report, cover_url=None, analysis=None):
         sec_footer(input_data),
         dk.WRAP_CLOSE,
     ]
-    return dk.fix_colons("\n".join(p for p in parts if p))   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지)
+    return dk.fix_colons(dk.as_rules("\n".join(p for p in parts if p)))   # 카드 → 구분선 (2026-10-13 사용자)   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지)
 
 
 def build_tables(input_data, report, cover_url=None, analysis=None):

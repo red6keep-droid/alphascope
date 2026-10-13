@@ -46,8 +46,9 @@ MULTI_ROW = f"display:flex;justify-content:space-between;align-items:center;gap:
 MULTI_SEP = "border-top:1px solid #E2E8F0;"
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor" stroke="none"/></svg>')
-QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block;" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">'   # 외곽선 1.2 × 20/16 = 보이는 1.5px (2026-10-13 사용자: "툴팁의 외각 라인은 1.5픽셀") · 툴팁 아이콘 = ? (2026-10-11 사용자), 15.4 → 18px (2026-10-12 사용자: 20% 크게, 소수점 없이)
-                 '<circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5"/><circle cx="8" cy="11.4" r=".9" fill="currentColor" stroke="none"/></svg>')
+QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block;" fill="none">'   # 원 선 1.2 × 20/16 = 보이는 1.5px (2026-10-13)
+                 '<circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>'
+                 '<text x="8" y="11.6" text-anchor="middle" fill="currentColor" stroke="none" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">?</text></svg>')   # ? 는 또렷한 글꼴의 글자 (2026-10-13 사용자: "다른 폰트로 명확하게")
 LINK_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
              '<path d="M9 3h4v4"/><path d="M13 3 7 9"/><path d="M11 9v4H3V5h4"/></svg>')
 NEW_PILL = ('<span style="display:inline-block;background:#B91C1C;color:#fff;border-radius:3px;padding:1px 4px 0;font-size:10px;font-weight:700;'
@@ -701,7 +702,7 @@ def state_fold(card_html, inner_html):
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 
-SUB_DOT = 2   # 소제목 앞 점 2px (2026-10-13 사용자: "2픽셀 블릿")
+SUB_DOT = 3   # 소제목 앞 점 (2026-10-13 사용자: 2 → "3픽셀")
 SUB_TOP_EXTRA = 15   # 소제목 위 여백 +15 → 29 (2026-10-13 사용자)
 
 
@@ -825,6 +826,14 @@ def table(headers, rows, note_text=""):
     body = "".join("<tr>" + "".join(f'<td style="border:1px solid #ddd;padding:6px 8px;white-space:nowrap;">{c}</td>' for c in r) + "</tr>" for r in rows)
     return (f'<div style="overflow-x:auto;"><table style="border-collapse:collapse;width:100%;margin:0 0 8px;font-size:{SMALL};line-height:{LH_CARD};">'
             f"<tr>{th}</tr>{body}</table></div>") + (note(note_text) if note_text else "")
+
+
+def as_rules(html):
+    """카드 → 구분선 (2026-10-13 사용자: "증시 리포트의 카드 형식의 정보들은 모두 구분선 정보로, 강조 카드는 위 · 아래 구분선이 있는 배경 컬러").
+    흰 콘텐츠 카드(MULTI 상자)는 위 · 아래 선만, 줄 좌우 여백 0. 색 배경 카드(모서리 10)는 배경 + 위 · 아래 선, 옆 테두리 · 모서리 없음. 데일리 build_body 끝에서 한 번."""
+    html = html.replace(MULTI, f"display:block;margin:0 0 6px;border-top:1px solid #E2E8F0;border-bottom:1px solid #E2E8F0;font-size:{SMALL};line-height:{LH_CARD};")
+    html = html.replace(f"padding:{SEP_GAP - VP - 1}px 12px;", f"padding:{SEP_GAP - VP - 1}px 0;")
+    return re.sub(r"border:1px solid (#[0-9A-Fa-f]{6});border-radius:10px;", r"border-top:1px solid \1;border-bottom:1px solid \1;", html)
 
 
 def footer(data_line, disclaimer_line):
