@@ -486,9 +486,9 @@ __BLOGGER_CSS__
           <b:widget id='Header1' locked='true' title='AlphaScope (Header)' type='Header' visible='true'>
             <b:includable id='main'>
               <a class='logo' expr:href='data:blog.homepageUrl'>
-                <svg class='logo-mark' viewBox='0 0 36 33'>
-                  <path d='M13.2 0H32.6L19.4 16.6H0L13.2 0Z' fill='#000000'/>
-                  <path d='M17.7 15.2H35.5L22.3 32.4H4.5L17.7 15.2Z' fill='#DD0000'/>
+                <svg class='logo-mark' viewBox='0 0 313 286'>
+                  <path d='M313 134L164.968 286H35L189.03 134H313Z' fill='#DD0000'/>
+                  <path d='M164.519 0H287L128.954 147H0L164.519 0Z' fill='#000000'/>
                 </svg>
                 <span class='logo-word'>AlphaScope</span>
               </a>
