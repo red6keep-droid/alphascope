@@ -470,7 +470,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
   <Variable name="body.text.color" description="Text color" type="color" default="#0F172A" value="#0F172A"/>
 </Group>
 <Group description="Backgrounds">
-  <Variable name="body.background.color" description="Page background" type="color" default="#F9FAFB" value="#F9FAFB"/>
+  <Variable name="body.background.color" description="Page background" type="color" default="#FFFFFF" value="#FFFFFF"/>
   <Variable name="posts.background.color" description="Card background" type="color" default="#FFFFFF" value="#FFFFFF"/>
 </Group>
 <Group description="Links">
