@@ -702,7 +702,7 @@ def state_fold(card_html, inner_html):
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 
-SUB_DOT = 3   # 소제목 앞 점 (2026-10-13 사용자: 2 → "3픽셀")
+SUB_DOT = 4   # 소제목 앞 점 (2026-10-13 사용자: 2 → 3 → 4)
 SUB_TOP_EXTRA = 15   # 소제목 위 여백 +15 → 29 (2026-10-13 사용자)
 
 

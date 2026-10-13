@@ -699,7 +699,7 @@ def build_body(input_data, report, cover_url=None, analysis=None):
         sec_footer(input_data),
         dk.WRAP_CLOSE,
     ]
-    return dk.fix_colons(dk.as_rules("\n".join(p for p in parts if p)))   # 카드 → 구분선 (2026-10-13 사용자)   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지)
+    return dk.fix_colons("\n".join(p for p in parts if p))   # 카드 → 구분선(as_rules)은 같은 날 원복 — 카드 스타일 (2026-10-13 사용자)   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지)
 
 
 def build_tables(input_data, report, cover_url=None, analysis=None):
