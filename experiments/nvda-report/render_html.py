@@ -288,7 +288,13 @@ def sec_headline(a):
     r = h.get("ret_1d") or 0
     pcol = UP if r > 0 else DOWN if r < 0 else "#111"
     tone = ROW_UP if r > 0 else ROW_DOWN if r < 0 else ""
-    rows = _row("NVDA", f'<span style="color:{pcol};font-weight:700;">${h["close"]:,.2f}</span> {_arrow(h.get("ret_1d"))}', tone)   # A타입
+    bg, bd = ("#FFF7ED", "#FED7AA") if r > 0 else ("#EFF6FF", "#BFDBFE") if r < 0 else ("#fff", "#E2E8F0")
+    # 가격 줄 맨 오른쪽 공식 접기 버튼, 기본 닫힘 — 펼치면 평균 대비 · 비교 · 시가 갭 등 (2026-10-13 사용자, 가이드라인 10-7). 버튼은 값 칸 안 — 홈 카드가 값 칸 글자를 읽는다
+    price = (f'<span style="display:inline-flex;align-items:center;justify-content:flex-end;">'
+             f'<span style="color:{pcol};font-weight:700;">${h["close"]:,.2f}</span>&nbsp;{_arrow(h.get("ret_1d"))}'
+             f'{_dk.fold_btn(_dk.lighten(bg), bd) if r else ACC_BTN}</span>')
+    head = _row("NVDA", price, tone).replace("margin:0 0 6px;", "margin:0;", 1)
+    rows = sec_ma(a)   # n일 평균 카드는 가격 카드 바로 아래 (2026-10-13 사용자)
     # 비교 4개는 따로 한 카드, 2열 + 세로 구분선 (E타입, 2026-10-11 사용자)
     rows += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p")) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])   # 비교 4종 앞 로고는 두지 않는다 (2026-10-13 사용자)
     items = []
@@ -311,7 +317,8 @@ def sec_headline(a):
     if a.get("macro_today"):
         items.append(("거시 일정", _esc(", ".join(a["macro_today"]))))
     rows += _multi(items)   # C타입: 비교 항목은 한 카드 안에 가로 구분선으로 (2026-10-11 사용자)
-    out = f'<div data-cards="1" style="margin:0 0 8px;">{rows}</div>'
+    out = (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
+           f'<div style="margin-top:6px;">{rows}</div></details></div>')
     out += sec_state_cards(a)   # 시장 국면 · 반도체 자금 — 이유를 담은 별도 카드 둘 (2026-10-11 사용자)
     if not a.get("is_latest_bar_today"):
         out += _muted("기준 거래일이 최신이 아닐 수 있습니다 — 일봉 수집 상태를 확인하세요.")
@@ -322,7 +329,7 @@ REGIME_THEME = {"상승 추세": ("positive", UP), "단기 조정": ("neutral", 
 FLOW_THEME = {"모이는 중": ("positive", UP), "빠져나가는 중": ("negative", DOWN), "뚜렷하지 않음": ("neutral", MUTED)}
 
 
-def _state_card(title, state, theme, color, lines, new_html="", tip=""):
+def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False):
     """상태 카드 (가이드라인 2-1 D, 2026-10-11 사용자: "별도 카드로 분리하고 이유도 카드에 포함" → "안내 아이콘 삭제, 글씨 검정, 블릿으로").
     첫 줄 구분명 좌·상태 우, 아래 얇은 선 뒤에 이유 글머리표(16px, 검정). 이유 묶음은 border-top — 홈 카드는 border-top 요소를 건너뛰므로 홈에는 첫 줄만 간다."""
     bg, bd = CARD_DIR[theme]
@@ -332,11 +339,15 @@ def _state_card(title, state, theme, color, lines, new_html="", tip=""):
         col = NOTE if kind == "note" else "#111"
         return _dot_li(_label_text(text), size=3, color=col, lh=_dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32 (2026-10-12 사용자)   # 16px → 3px 점, "**라벨** : 내용", 증감 색 (2026-10-11 사용자)
     lis = "".join(li(t) for t in lines)
+    # fold: 첫 줄 맨 오른쪽 공식 접기 버튼(카드 색 20% 밝은 바탕), 기본 닫힘 — 펼치면 이유 글머리표 (2026-10-13 사용자: 시장 국면 · 반도체 자금, 가이드라인 10-7)
+    state_html = (f'<span style="display:inline-flex;align-items:center;">{_esc(state)}{_dk.fold_btn(_dk.lighten(bg), bd)}</span>' if fold else _esc(state))
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다
+            f'<span style="{"flex:1 1 auto;min-width:0;" if fold else COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_esc(title)}{_dk.tip_icon(tip)}{new_html}</span><span style="{"flex:none;white-space:nowrap;" if fold else COL_R}font-weight:700;color:{color};">{state_html}</span></span> ')   # fold: 상태 + 버튼은 한 줄, 이름 칸이 남은 폭
+    body = (f'<div style="margin-top:{14 - _dk.VP_EMPH}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
+            f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
+    inner = (f'<details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{body}</details>' if fold else head + body)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{_dk.EMPH_PAD - _dk.VP_EMPH}px 14px;margin:0 0 8px;line-height:{_dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
-            f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다
-            f'<span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_esc(title)}{_dk.tip_icon(tip)}{new_html}</span><span style="{COL_R}font-weight:700;color:{color};">{_esc(state)}</span></span> '
-            f'<div style="margin-top:{14 - _dk.VP_EMPH}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
-            f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
+            f'{inner}</div>')
 
 
 def _tip(text):
@@ -436,11 +447,11 @@ def sec_state_cards(a):
     mr = a.get("market_regime")
     if mr:
         theme, col = REGIME_THEME.get(mr["regime"], ("neutral", MUTED))
-        out += _state_card("시장 국면", mr["regime"], theme, col, regime_lines(mr), _new(a, "regime"), tip=regime_rule())
+        out += _state_card("시장 국면", mr["regime"], theme, col, regime_lines(mr), _new(a, "regime"), tip=regime_rule(), fold=True)
     sf = a.get("sector_flow")
     if sf:
         theme, col = FLOW_THEME.get(sf["state"], ("neutral", MUTED))
-        out += _state_card("반도체 자금", sf["state"], theme, col, sector_flow_lines(sf), _new(a, "sector_flow"), tip=sector_flow_rule())
+        out += _state_card("반도체 자금", sf["state"], theme, col, sector_flow_lines(sf), _new(a, "sector_flow"), tip=sector_flow_rule(), fold=True)
     bb = a.get("bollinger")
     if bb and bb.get("state") in BOLL_THEME:   # 하단·상단에 닿은 날만 (2026-10-11 사용자)
         theme, col = BOLL_THEME[bb["state"]]
@@ -451,30 +462,37 @@ def sec_state_cards(a):
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""   # 데스크톱에서 2열 (테마 CSS, 2026-10-11 사용자)
 
 
-def sec_chart(output_dir=None, a=None):
-    """① 아래 가격 그래프 (chart_price.py가 만든 chart.json). 없으면 빈 문자열.
-
-    설명 글자는 그림 안에 영문으로 있고, 여기엔 5·20·30일 변화율 한 줄만 둔다 — 홈 카드가 ① 구획의 줄을 그대로 읽어
-    "오늘 한 줄" 아래에 붙이므로 누적 방향이 홈에서도 보인다. <img>는 글자가 없어 카드에 잡히지 않는다.
-    """
+def _chart_json(output_dir=None):
     path = os.path.join(output_dir or config.OUTPUT_DIR, "chart.json")
     if not os.path.exists(path):
-        return ""
+        return None
     with open(path, "r", encoding="utf-8") as f:
-        c = json.load(f)
-    ch = c.get("changes") or {}
-    # 전부 평균선 대비 (2026-10-11 사용자): 현재가가 n일 평균선보다 몇 % 위·아래. 5│20 / 60│120 / 200
-    mr = c.get("ma_rel") or {}
-    items = [(f"{n}일 평균", _arrow(mr[n], 1)) for n in ("20", "60", "120", "200") if mr.get(n) is not None]   # 5일선 삭제, 이름은 'n일 평균' (2026-10-11 사용자)
+        return json.load(f)
+
+
+def sec_chart(output_dir=None, a=None):
+    """가격 그래프 (chart_price.py가 만든 chart.json) — 본문 맨 앞, 탭 줄 위 (2026-10-13 사용자: 증시 리포트 커버 이미지 자리 · 여백). 없으면 빈 문자열.
+    data-cards 가 없어 테마 탭 JS가 첫 탭으로 옮기지 않는다. <img>는 글자가 없어 홈 카드에 잡히지 않는다."""
+    c = _chart_json(output_dir)
+    if not c:
+        return ""
     zoom = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'
             '<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg>')
-    # 확대 보기: 그림 전체가 원본 링크(새 창), 오른쪽 위에 돋보기 아이콘 (2026-10-11 사용자)
+    # 확대 보기: 그림 전체가 원본 링크(새 창), 오른쪽 아래 돋보기 아이콘 (2026-10-11 사용자). 아래 16px = 데일리 커버 이미지 (2026-10-13 사용자)
     return (f'<a href="{_esc(c["url"])}" target="_blank" rel="noopener" title="그래프 확대 보기" aria-label="그래프 확대 보기" '
-            f'style="position:relative;display:block;margin:12px 0 6px;max-width:1024px;">'
+            f'style="position:relative;display:block;margin:0 0 16px;max-width:1024px;">'
             f'<img src="{_esc(c["url"])}" alt="NVDA {c.get("window", 30)}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'
             f'<span style="position:absolute;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
-            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{zoom}</span></a>'
-            + (f'<div data-cards="1" style="margin:0 0 8px;">{_multi2(items)}</div>' if items else ""))   # E타입: 5일|20일 / 60일|120일. 범례 줄은 뺐다 (2026-10-11 사용자)
+            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{zoom}</span></a>')
+
+
+def sec_ma(a=None, output_dir=None):
+    """평균선 대비 카드 (E타입 2열: 20일|60일 / 120일|200일) — 현재가가 n일 평균선보다 몇 % 위·아래 (2026-10-11 사용자).
+    NVDA 가격 카드 바로 아래 (2026-10-13 사용자: "20일 평균이 있는 카드는 엔비디아 가격 카드 아래로")."""
+    c = _chart_json(output_dir) or {}
+    mr = c.get("ma_rel") or {}
+    items = [(f"{n}일 평균", _arrow(mr[n], 1)) for n in ("20", "60", "120", "200") if mr.get(n) is not None]   # 5일선 삭제, 이름은 'n일 평균' (2026-10-11 사용자)
+    return f'<div data-cards="1" style="margin:0 0 8px;">{_multi2(items)}</div>' if items else ""
 
 
 LINK_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
@@ -496,22 +514,21 @@ def _event_html(e):
     src = rr.SOURCE_KO.get(e.get("source") or "", e.get("source") or "")
     if e["kind"] in rr.DOC_KINDS:
         head = _esc(e["fact"])
-        link = _link_icon(e.get("url"), f"{src}: {e['title'][:90]}")   # 원문 제목은 툴팁에만
         fact = ""
     else:
         head = _esc(e["title"])
-        link = _link_icon(e.get("url"), f"{src} 원문")
         fact = f" — {_esc(e['fact'])}" if e.get("fact") and e["fact"] != e["title"] else ""
     when = f' <span style="color:{SUB};font-size:{TINY};white-space:nowrap;">({_esc(_d(e["published_at"][:10]))})</span>' if e.get("published_at") else ""   # 날짜가 두 줄로 쪼개지지 않게
-    inner = f'<span style="font-weight:700;color:#111;">{head}</span>{fact} {tag}{link}{when}'   # 기사 제목 굵게 (2026-10-13 사용자)   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
-    if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절)
-        bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
-        return f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px;margin:0 0 8px;line-height:{_dk.LH_BODY};">{inner}</div>'   # 뉴스 제목 행간 34 (2026-10-12 사용자)   # 일반 기사 카드와 같은 크기·여백, 배경만 방향 색
-    # 일반 기사: 라벨 줄이 제목 위, 새 창 아이콘 없이 제목이 원문 링크 (2026-10-13 사용자 — 강조 카드는 제외)
-    lab = f'<span style="display:block;line-height:1;margin:8px 0 0;">{tag.replace(f"margin:0 {_dk.PILL_GAP}px;", "margin:0;")}</span>'   # 라벨 줄: 여백 없이 왼쪽 정렬, 기사 맨 아래 (2026-10-13 사용자)
+    # 라벨 줄: 여백 없이 왼쪽 정렬, 기사 맨 아래 (2026-10-13 사용자) · 라벨 사이 여백도 없음 (2026-10-13 사용자: "라벨사이 여백은 삭제", 가이드라인 10-7)
+    lab = f'<span style="display:block;line-height:1;margin:8px 0 0;">{tag.replace(f"margin:0 {_dk.PILL_GAP}px;", "margin:0;").replace("</span> <span", "</span><span")}</span>'
+    # 일반 기사와 강조 카드 모두: 새 창 아이콘 없이 제목이 원문 링크 → 사실 · 날짜 → 라벨 줄 (2026-10-13 사용자: "강조 카드 내의 정보는 일반 뉴스의 정보 배치로")
     tip_t = _esc(f"{src}: {e['title'][:90]}" if e["kind"] in rr.DOC_KINDS else f"{src} 원문").replace(chr(34), "&quot;")
     head_html = (f'<a href="{_esc(e["url"])}" title="{tip_t}" target="_blank" rel="noopener" style="font-weight:700;color:#111;text-decoration:none;">{head}</a>'
                  if e.get("url") else f'<span style="font-weight:700;color:#111;">{head}</span>')
+    if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절) — 배경 · 테두리만 방향 색
+        bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
+        return (f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px {_dk.SEP_GAP - _dk.VP}px;margin:0 0 8px;line-height:{_dk.LH_BODY};">'   # 끝 줄이 라벨(행간 1)이라 아래는 VP 만 뺀다
+                f"{head_html}{fact}{when}{lab}</div>")
     return f"{head_html}{fact}{when}{lab}"
 
 
@@ -522,15 +539,18 @@ RATING_PASTEL = [("strongBuy", "강매수", "#F4ACA6", "#7F1D1D"), ("buy", "매�
                  ("hold", "보유", "#E2E8F0", "#475569"), ("sell", "매도", "#C9DCF7", "#1E3A8A"), ("strongSell", "강매도", "#A9C5F2", "#1E3A8A")]
 
 
+BAR_H, BAR_NUM = 26, "18px"   # 막대 높이 24 → 26 (+10%, 정수) · 막대 안 숫자 19 → 18 (2026-10-13 사용자, 가이드라인 10-7)
+
+
 def _bar(label, segs, split="right"):
     """F 막대 (가이드라인 2-1): 위 14px 라벨(합계 + 항목별 %), 아래 콘텐츠 폭 전부 가로 누적 막대. segs = [(이름, 개수, 배경, 글자)]."""
     total = sum(n for _, n, _, _ in segs)
     if not total:
         return ""
     pcts = " · ".join(f"{nm} {n / total * 100:.0f}%" for nm, n, _, _ in segs if n)
-    body = "".join(f'<span style="display:block;width:{n / total * 100:.1f}%;background:{bg};color:{fg};font-size:{SMALL};font-weight:700;'
-                   f'text-align:center;line-height:24px;overflow:hidden;white-space:nowrap;">{f"{n / total * 100:.0f}%" if n / total >= 0.08 else ""}</span>' for _, n, bg, fg in segs if n)   # 8% 미만 조각은 글자 생략 (라벨에 있음)
-    bar_html = f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 3px;">{body}</span>'
+    body = "".join(f'<span style="display:block;width:{n / total * 100:.1f}%;background:{bg};color:{fg};font-size:{BAR_NUM};font-weight:700;'
+                   f'text-align:center;line-height:{BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{n / total * 100:.0f}%" if n / total >= 0.08 else ""}</span>' for _, n, bg, fg in segs if n)   # 8% 미만 조각은 글자 생략 (라벨에 있음)
+    bar_html = f'<span style="display:flex;width:100%;height:{BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 3px;">{body}</span>'
     return _dk.bar_label(label, pcts) + bar_html + _dk.bar_pcts(pcts)   # 라벨(검정 굵게) 위 · 막대 · 비율 아래 — 뉴스 · 애널리스트 모두 (2026-10-13 사용자)
 
 
@@ -855,7 +875,8 @@ def build_body(a, n):
         # data-design="2": 테마의 옛 글 보정 규칙(div 14px → 17px !important)에서 이 글을 제외한다 (2026-10-11 — 안내 글이 17px로 커지던 원인)
         f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:{_dk.BODY};line-height:{_dk.LH_BODY};color:#333;">',   # 행간 24px (2026-10-12 사용자, 소수점 금지 — 2026-10-12 사용자)
         # 기준 거래일 안내 줄 삭제 (2026-10-12 사용자) — 날짜는 글 제목에 있다
-        sec_headline(a), sec_chart(a=a), sec_targets(a),   # 목표가는 200일선 카드 아래 (아코디언)   # 제목 없이 본문 머리에 (2026-10-11 사용자: 오늘 한 줄 타이틀 삭제)
+        sec_chart(a=a), sec_headline(a), sec_targets(a),   # 그래프는 탭 위, 평균 카드는 가격 카드 아래 (2026-10-13 사용자)
+        # 목표가는 상태 카드 아래 (아코디언) — 제목 없이 본문 머리에 (2026-10-11 사용자: 오늘 한 줄 타이틀 삭제)
         # 테스트 운영 안내는 머리 카드 뒤 (2026-10-13 사용자: 구글 검색) — 맨 앞이면 검색 결과 · 공유 미리보기 문구가 "테스트 운영 중 …"이 된다
         _notice(a),
         _section("중요 이슈", sec_narrative(a, n), tab="오늘"),   # 그래프 아래로 (2026-10-11 사용자)
