@@ -258,8 +258,8 @@ body.menu-open { overflow: hidden; }
   gap: 6px;
   margin: 0;
   font-weight: 700;
-  font-size: 21px;   /* 공식 구획 제목 크기 21 (폰 19) — 미국 증시 리포트 구획 제목과 같게 (2026-10-13 사용자, 가이드 3-1) */
-  line-height: 27px;
+  font-size: 22px;   /* 공식 구획 제목 크기 22 (폰 20) — 2026-10-13 사용자: +1. 처음 21 (폰 19) — 미국 증시 리포트 구획 제목과 같게 (2026-10-13 사용자, 가이드 3-1) */
+  line-height: 28px;
   font-family: var(--report-font);   /* 리포트 구획 제목과 같은 글꼴 · 자간 0 — Noto Sans KR · 자간 −0.3 이라 같은 21px 이 더 커 보였다 (2026-10-13 사용자, 가이드 10-6) */
   letter-spacing: 0;
   color: var(--ink);
@@ -306,7 +306,7 @@ body.menu-open { overflow: hidden; }
 
 /* 리포트 이름은 카드 밖 제목(21px 굵게 · 행간 27 = 구획 제목 글자) + 앞에 컬러 아이콘 (2026-10-13 사용자) */
 .report-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.report-title { display: flex; align-items: center; gap: 8px; margin: 0; font-family: var(--report-font); font-weight: 700; font-size: 21px; line-height: 27px; letter-spacing: 0; color: #111; }
+.report-title { display: flex; align-items: center; gap: 8px; margin: 0; font-family: var(--report-font); font-weight: 700; font-size: 22px; line-height: 28px; letter-spacing: 0; color: #111; }
 .report-title .report-icon { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex: none; border-radius: 6px; color: #fff; }
 .report-title .report-icon svg { width: 16px; height: 16px; }
 .report-title .report-icon img { width: 24px; height: 24px; border-radius: 6px; display: block; background: #F1F5F9; }
@@ -335,13 +335,13 @@ body.menu-open { overflow: hidden; }
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
 .kv-name { flex: none; font-weight: 700; font-size: 16px; line-height: 24px; color: #111; }
-.kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 18px; line-height: 24px; color: #111; white-space: nowrap; }
+.kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 19px; line-height: 24px; color: #111; white-space: nowrap; }
 .kv-value.up { color: var(--up); } .kv-value.down { color: var(--down); }
 .kv-value small { font-size: 14px; font-weight: 400; color: #7A7A7A; }
 .kv-row--block { display: block; }
 .kv-row--block .kv-name { display: block; margin-bottom: 4px; }
 .kv-row--block ul { display: flex; flex-direction: column; gap: 12px; }
-.kv-row--block li { display: flex; align-items: flex-start; gap: 7px; font-size: 18px; line-height: 34px; color: #111; word-break: keep-all; }
+.kv-row--block li { display: flex; align-items: flex-start; gap: 7px; font-size: 19px; line-height: 34px; color: #111; word-break: keep-all; }
 .kv-row--block li::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
 
 .badge {   /* 배경색이 있는 가이드 라벨(5절 긍정 · 부정 · 정상) — 14px, 볼드 없음 (2026-10-13 사용자) */
@@ -365,7 +365,7 @@ body.menu-open { overflow: hidden; }
   display: flex;
   align-items: flex-start;
   gap: 7px;
-  font-size: 18px;
+  font-size: 19px;   /* 본문 19 (2026-10-13 사용자) */
   line-height: 34px;
   color: #111;
   word-break: keep-all;
@@ -557,7 +557,7 @@ body.menu-open { overflow: hidden; }
 .news-item {   /* 리포트 뉴스 카드와 같다: 제목 18px · 행간 34(본문), 보이는 위아래 14 (2026-10-12 사용자) */
   margin: 0; padding: 15px 12px 20px;   /* 보이는 위아래 22 (콘텐츠 카드 여백, 2026-10-13 사용자) */
   background: var(--surface); border: 1px solid #E2E8F0; border-radius: 8px;
-  font-size: 18px; line-height: 34px; color: #111; word-break: keep-all;
+  font-size: 19px; line-height: 34px; color: #111; word-break: keep-all;
 }
 .news-item a { color: #111; }
 .news-item a:hover { color: var(--accent); }
@@ -702,8 +702,8 @@ body.menu-open { overflow: hidden; }
   .tabs { overflow-x: auto; }
   .tab { padding: 8px 12px 0; }
   /* 폰 제목은 모두 2px 작게 (2026-10-13 사용자, 디자인 가이드 9절) — 홈 · 목록 구획 제목 22 → 20, 홈 리포트 카드 제목 21 → 19 */
-  .section-title { font-size: 19px; line-height: 25px; }
-  .report-title { font-size: 19px; line-height: 25px; }
+  .section-title { font-size: 20px; line-height: 26px; }
+  .report-title { font-size: 20px; line-height: 26px; }
 }
 
 /* 홈 화면 추가 안내 (2026-10-13 사용자, 디자인 가이드 10-4). 폰에서만 JS가 붙인다 */
@@ -775,7 +775,7 @@ body.menu-open { overflow: hidden; }
 .post-card-title {
   margin: 0;
   font-weight: 700;
-  font-size: 19px;
+  font-size: 20px;   /* 목록 카드 제목 +1 (2026-10-13) */
   line-height: 1.45;
   letter-spacing: -.3px;
   color: var(--ink);
@@ -820,7 +820,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title {
   margin: 0 0 10px;
   font-weight: 700;
-  font-size: 34px;
+  font-size: 35px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") */
   line-height: 48px;
   letter-spacing: -.6px;
   color: var(--ink);
@@ -847,7 +847,7 @@ body.item-view .main-content, body.item-view.no-dashboard .main-content { paddin
 body.item-view .post-outer-container { padding-top: 13px; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
-.post-body { font-size: 18px; line-height: 34px; color: #333; overflow-wrap: anywhere; }   /* 행간 px 정수 — 리포트 본문과 같은 34px (2026-10-12 사용자) */
+.post-body { font-size: 19px; line-height: 34px; color: #333; overflow-wrap: anywhere; }   /* 행간 px 정수 — 리포트 본문과 같은 34px (2026-10-12 사용자) */
 .post-body img { max-width: 100%; height: auto; border-radius: 12px; }
 .post-body table { width: 100%; border-collapse: collapse; }
 /* 셀에 nowrap 이 있는 표(리포트 본문)는 글 폭을 밀어내지 않고 표 안에서만 가로 스크롤한다 */
@@ -871,8 +871,8 @@ body.item-view .post-outer-container { padding-top: 13px; }
 /* 팝업 제목 · 닫기는 위에 고정, 내용만 스크롤 (2026-10-13 사용자) */
 .rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; border-bottom: 1px solid #F1F5F9; }
 .rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
-.rt-pop-title { margin: 0; font-size: 18px; font-weight: 700; line-height: 24px; color: #111; }
-.rt-pop-body { font-size: 18px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
+.rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 24px; color: #111; }
+.rt-pop-body { font-size: 19px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
 /* 툴팁 내용 행간 = 본문 34px (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
 .rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; }   /* 글머리표 사이 +6 (2026-10-12 사용자) */
 .rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
@@ -883,11 +883,11 @@ body.item-view .post-outer-container { padding-top: 13px; }
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
-.post-body .rt-tab { flex: none; padding: 8px 12px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) */
+.post-body .rt-tab { flex: none; padding: 8px 12px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) */
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
-.post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
+.post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
 /* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.
    data-grid=2 (C 카드 줄 묶음) → 2열 그리드 + 짝수 칸 왼쪽 세로 구분선. 둘째 칸의 인라인 border-top 은 지운다(첫 줄에 선이 생기지 않게).
@@ -904,14 +904,14 @@ body.item-view .post-outer-container { padding-top: 13px; }
 /* 전환 버튼 (data-switch, 당일 · 5일 그래프): 회색 바탕 알약 둘, 선택은 흰 바탕 · 검정 굵게 (2026-10-11) */
 .post-body .rt-segs { display: inline-flex; gap: 2px; padding: 3px; margin: 4px 0 8px; background: #F1F5F9; border-radius: 8px; }
 .post-body .rt-segs[hidden] { display: none; }
-.post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
+.post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
 .post-body .rt-seg[aria-pressed="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .post-body [data-switch-panel][hidden], .post-body [data-hz-panel][hidden] { display: none; }
 .post-body .rt-segs--in-sub { margin: 0 0 4px auto; flex: none; }
 /* 하위탭 (부정 발언 · 긍정 발언 · 전체): 서브탭보다 한 단계 아래 — 16px, 밑줄 2px 검정, 줄 아래 선 없음. 표본이 모자란 탭은 흐리게 (2026-10-11) */
 .post-body .rt-dirs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 0 8px; }
 .post-body .rt-dirs[hidden] { display: none; }
-.post-body .rt-dir { flex: none; padding: 4px 8px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
+.post-body .rt-dir { flex: none; padding: 4px 8px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
 .post-body .rt-dir[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: #111; }
 .post-body .rt-dir[data-empty] { color: #CBD5E1; }
 /* E 2열 카드는 폰에서도 2열 (2026-10-12 사용자: "왜 2열로 적용 안 했냐") — 예전의 폰 한 칸 쌓기 규칙 삭제.
@@ -1024,7 +1024,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments {
   width: 100%; max-width: var(--shell); margin: 40px auto 0; padding: 16px;   /* 목록 버튼과 40px (2026-10-12 사용자) */
   background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;   /* 카드 (2026-10-12 사용자: "댓글은 카드 형식으로") */
-  font-size: 18px; line-height: 24px; color: #333; word-break: keep-all;
+  font-size: 19px; line-height: 24px; color: #333; word-break: keep-all;
 }
 .comments h3, .comments .comments-title, .comments h3.title { margin: 0 0 14px; padding-bottom: 6px; border-bottom: 2px solid #eee; font-size: 21px; font-weight: 700; line-height: 27px; color: #111; }
 /* 댓글 */
@@ -1060,7 +1060,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment-header .user, .comments .user a, .comments .comment-author { font-size: 16px; font-weight: 700; color: #111; font-style: normal; }
 .comments .comment-header .icon.user { display: none; }
 .comments .datetime, .comments .comment-header .datetime a, .comments .comment-footer .comment-timestamp a { font-size: 14px; line-height: 20px; color: #7A7A7A; }
-.comments .comment-content { margin: 4px 0 0; font-size: 18px; line-height: 24px; color: #333; }
+.comments .comment-content { margin: 4px 0 0; font-size: 19px; line-height: 24px; color: #333; }
 .comments .comment-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }   /* 버튼은 왼쪽부터 한 줄 (2026-10-12 사용자) */
 .comments .comment-actions a, .comments .comment-actions .item-control a, .comments .continue a, .comments .loadmore a, .comments .comment-footer a {
   display: inline-flex; align-items: center; margin: 0; padding: 5px 12px;
@@ -1106,7 +1106,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 /* 홈 최근 리포트 — 글 링크 줄 카드, 가로 구분선 콘텐츠 카드 여백(보이는 22, 2-1) (2026-10-13 사용자, 디자인 가이드 10-5) */
 .recent-section { display: flex; flex-direction: column; gap: 14px; }
 .recent-card { background: var(--surface); border: 1px solid #E2E8F0; border-radius: 8px; }
-.recent-row { display: block; padding: 19px 12px; border-top: 1px solid #E2E8F0; font-size: 18px; line-height: 24px; color: #111; word-break: keep-all; }
+.recent-row { display: block; padding: 19px 12px; border-top: 1px solid #E2E8F0; font-size: 19px; line-height: 24px; color: #111; word-break: keep-all; }
 .recent-row:first-child { border-top: 0; }
 .recent-row:hover { color: var(--accent); }
 
@@ -1120,7 +1120,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .post-outer-container { padding: 24px; }
   body.item-view .post-outer-container { padding-top: 13px; }   /* 카드 위 → 제목 글자 보이는 20 (2026-10-12 사용자) */
-  .post-title { font-size: 26px; line-height: 36px; }
+  .post-title { font-size: 27px; line-height: 36px; }
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
@@ -1129,9 +1129,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
   body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 31px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) */
-  .post-title { font-size: 22px; line-height: 32px; letter-spacing: -.3px; }   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
-  .post-body h2 { font-size: 19px !important; line-height: 25px !important; }   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
-  .post-body { font-size: 18px; line-height: 34px; }
+  .post-title { font-size: 23px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
+  .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
+  .post-body { font-size: 19px; line-height: 34px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
   /* 데스크톱용 커버 이미지 확대 규칙(1024px !important)이 모바일에서 글 폭을 벌리지 않게 */
   .post-body img, .post-body img[style*="max-width"] { max-width: 100% !important; }
 }

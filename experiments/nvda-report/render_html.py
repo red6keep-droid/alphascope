@@ -21,13 +21,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import design_kit as _dk  # noqa: E402  — 공통 마무리 처리 (fix_colons)
 
 # 구획 제목 (디자인-가이드라인.md 2절): 아래 여백 14px. 구분선은 바로 아래가 글(목록·문장)일 때만 — 카드·표·그림이 오면 그 테두리가 경계라 선을 긋지 않는다
-H2 = f"color:#111;font-size:21px;font-weight:700;line-height:{_dk.LH_H2};margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"   # 옆 요약이 폰에서는 제목 아래 줄로 내려온다
+H2 = f"color:#111;font-size:{_dk.H2_SIZE};font-weight:700;line-height:{_dk.LH_H2};margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"   # 옆 요약이 폰에서는 제목 아래 줄로 내려온다
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"   # 구분선 위 여백 8 → 6 (20% 줄임, 2026-10-11)
 _NO_LINE_START = re.compile(r'^\s*(<div style="(?:overflow-x:auto;|background:)|<div data-cards|<img\b)')   # 표 래퍼 · 카드 · 카드 묶음 · 그림
 UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
 SUB = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
 # 글자 크기 체계 (디자인-가이드라인.md 3절): 본문은 바깥 div의 18px 하나 — 강조한다고 키우지 않는다. 라벨·날짜는 한 단계 작게(16px), 안내 글·범례·면책은 두 단계 작게(14px)
-SMALL, TINY = "18px", "14px"   # 안내 글(14px)을 빼고 모두 18px (2026-10-12 사용자)
+SMALL, TINY = "19px", "14px"   # 본문 19 (2026-10-13 사용자)   # 안내 글(14px)을 빼고 모두 18px (2026-10-12 사용자)
 LH_CARD, LH_TINY = _dk.LH_CARD, _dk.LH_TINY   # 행간은 px 정수만 (2026-10-12 사용자)
 MICRO = "14px"   # 카드 구분명 안 괄호 부분 — 카드 글자(16px)보다 한 단계 작게, 볼드 없음 (2026-10-11 사용자: 안내 글 빼고 14 → 16)
 # 강조 카드 (가이드라인 2절): 크기 대신 연한 배경 카드로 강조. 라벨 pill 색
@@ -133,7 +133,7 @@ def _section(title, html, summary="", line=None, tab=None):
 
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor" stroke="none"/></svg>')
-QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 15.4 → 18px (2026-10-12 사용자: 20% 크게, 소수점 없이)
+QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block;" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 15.4 → 18px (2026-10-12 사용자: 20% 크게, 소수점 없이)
                  '<circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5"/><circle cx="8" cy="11.4" r=".9" fill="currentColor" stroke="none"/></svg>')
 NOTE = "#6B7280"   # 안내 줄 회색 (테마 gray-500)
 
@@ -852,7 +852,7 @@ def sec_footer(a):
 def build_body(a, n):
     return _dk.fix_colons("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지)
         # data-design="2": 테마의 옛 글 보정 규칙(div 14px → 17px !important)에서 이 글을 제외한다 (2026-10-11 — 안내 글이 17px로 커지던 원인)
-        f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:18px;line-height:{_dk.LH_BODY};color:#333;">',   # 행간 24px (2026-10-12 사용자, 소수점 금지 — 2026-10-12 사용자)
+        f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:{_dk.BODY};line-height:{_dk.LH_BODY};color:#333;">',   # 행간 24px (2026-10-12 사용자, 소수점 금지 — 2026-10-12 사용자)
         # 기준 거래일 안내 줄 삭제 (2026-10-12 사용자) — 날짜는 글 제목에 있다
         sec_headline(a), sec_chart(a=a), sec_targets(a),   # 목표가는 200일선 카드 아래 (아코디언)   # 제목 없이 본문 머리에 (2026-10-11 사용자: 오늘 한 줄 타이틀 삭제)
         # 테스트 운영 안내는 머리 카드 뒤 (2026-10-13 사용자: 구글 검색) — 맨 앞이면 검색 결과 · 공유 미리보기 문구가 "테스트 운영 중 …"이 된다

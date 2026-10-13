@@ -12,9 +12,9 @@ import re
 UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
 SUB = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
 NOTE = "#6B7280"          # 안내 글 회색
-BODY, SMALL, TINY, MICRO = "18px", "18px", "14px", "14px"   # 안내 글(14px)을 빼고 모두 18px (2026-10-12 사용자: "안내 14포인트를 제외하고 본문 폰트는 모두 18")
+BODY, SMALL, TINY, MICRO = "19px", "19px", "14px", "14px"   # 본문 18 → 19 (2026-10-13 사용자: "모든 리포트의 블로그 전체의 본문 폰트는 19포인트")   # 안내 글(14px)을 빼고 모두 18px (2026-10-12 사용자: "안내 14포인트를 제외하고 본문 폰트는 모두 18")
 NAME = "16px"   # 가로 구분선이 있는 카드의 왼쪽 정보(구분명) — 2026-10-12 사용자: "가로 구분선이 있는 카드의 좌측 정보는 16포인트"
-EMPH_NAME = "18px"   # 강조 카드(색 배경: 상태·결론·흐름·강조 C 카드)의 왼쪽 정보는 18px (2026-10-12 사용자)
+EMPH_NAME = "19px"   # 본문과 같이 19 (2026-10-13)   # 강조 카드(색 배경: 상태·결론·흐름·강조 C 카드)의 왼쪽 정보는 18px (2026-10-12 사용자)
 PILL_SIZE = "14px"   # 라벨(알약)은 어디서나 14px (2026-10-12 사용자: "라벨 폰트는 14 적용")
 # 카드 위아래 여백은 "보이는 여백"으로 정한다 (2026-10-12 사용자: "카드의 패딩은 상하 여백만 수정, 좌우는 유지").
 # 보이는 여백 = padding + 행간 반쪽(18px 글자 · 행간 24 → 약 2px). 그래서 위아래 padding = 목표 − VP. 카드 안 첫·끝 목록의 margin 은 ul 의 음수 margin 으로 지운다.
@@ -23,8 +23,9 @@ SEP_GAP = 22   # 줄 padding = 22 − VP − 1(보조 줄 · 괄호 글자 상�
 # 강조 카드(색 배경: 상태 · 결론 · 흐름 · 데일리 머리 · 강조 글머리표): 18px 글 행간 32, 카드 위 · 아래 보이는 여백 24 (2026-10-12 사용자: "강조 카드는 위 24 아래 24로 일괄").
 # 행간 32 · 18px 글자의 반쪽 ≈ 6px = VP_EMPH → padding = 24 − 6 (끝 줄이 14px 글이면 − 2). 가로 구분선이 여러 개인 강조 C 카드만 위아래 14 그대로("구분선이 여러 개 있는 건 기존 유지")
 LH_EMPH, VP_EMPH, EMPH_PAD = "32px", 6, 24
-LH_BODY, LH_CARD, LH_TINY, LH_H2 = "34px", "24px", "20px", "27px"   # 행간은 px 정수만. 본문(카드 밖 문단·글머리표)·툴팁 34 (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게, 34픽셀") · 카드 안 18·16px 24 (2026-10-12 사용자: "24픽셀만") · 16px 카드 이름도 24 · 14px 안내 20 · 21px 구획 제목 27. 행간 숫자를 직접 적지 말고 이 상수만
-H2 = f"position:relative;color:#111;font-size:21px;font-weight:700;line-height:{LH_H2};margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"
+H2_SIZE = "22px"   # 구획 제목 21 → 22 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게")
+LH_BODY, LH_CARD, LH_TINY, LH_H2 = "34px", "24px", "20px", "28px"   # 구획 제목 22px → 행간 28 (2026-10-13)   # 행간은 px 정수만. 본문(카드 밖 문단·글머리표)·툴팁 34 (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게, 34픽셀") · 카드 안 18·16px 24 (2026-10-12 사용자: "24픽셀만") · 16px 카드 이름도 24 · 14px 안내 20 · 21px 구획 제목 27. 행간 숫자를 직접 적지 말고 이 상수만
+H2 = f"position:relative;color:#111;font-size:{H2_SIZE};font-weight:700;line-height:{LH_H2};margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"
 _NO_LINE_START = re.compile(r'^\s*(<(?:div|ul) style="(?:overflow-x:auto;|background:)|<div data-cards|<div data-lead|<img\b|<details\b)')
 CARD = f"background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:{14 - VP}px 14px;line-height:{LH_CARD};"   # 보이는 위아래 14px (2026-10-12 사용자)
@@ -45,7 +46,7 @@ MULTI_ROW = f"display:flex;justify-content:space-between;align-items:center;gap:
 MULTI_SEP = "border-top:1px solid #E2E8F0;"
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor" stroke="none"/></svg>')
-QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 15.4 → 18px (2026-10-12 사용자: 20% 크게, 소수점 없이)
+QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block;" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">'   # 외곽선 1.2 × 20/16 = 보이는 1.5px (2026-10-13 사용자: "툴팁의 외각 라인은 1.5픽셀") · 툴팁 아이콘 = ? (2026-10-11 사용자), 15.4 → 18px (2026-10-12 사용자: 20% 크게, 소수점 없이)
                  '<circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5"/><circle cx="8" cy="11.4" r=".9" fill="currentColor" stroke="none"/></svg>')
 LINK_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
              '<path d="M9 3h4v4"/><path d="M13 3 7 9"/><path d="M11 9v4H3V5h4"/></svg>')

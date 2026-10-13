@@ -232,8 +232,8 @@ body.menu-open { overflow: hidden; }
   gap: 6px;
   margin: 0;
   font-weight: 700;
-  font-size: 21px;   /* 공식 구획 제목 크기 21 (폰 19) — 미국 증시 리포트 구획 제목과 같게 (2026-10-13 사용자, 가이드 3-1) */
-  line-height: 27px;
+  font-size: 22px;   /* 공식 구획 제목 크기 22 (폰 20) — 2026-10-13 사용자: +1. 처음 21 (폰 19) — 미국 증시 리포트 구획 제목과 같게 (2026-10-13 사용자, 가이드 3-1) */
+  line-height: 28px;
   font-family: var(--report-font);   /* 리포트 구획 제목과 같은 글꼴 · 자간 0 — Noto Sans KR · 자간 −0.3 이라 같은 21px 이 더 커 보였다 (2026-10-13 사용자, 가이드 10-6) */
   letter-spacing: 0;
   color: var(--ink);
@@ -280,7 +280,7 @@ body.menu-open { overflow: hidden; }
 
 /* 리포트 이름은 카드 밖 제목(21px 굵게 · 행간 27 = 구획 제목 글자) + 앞에 컬러 아이콘 (2026-10-13 사용자) */
 .report-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.report-title { display: flex; align-items: center; gap: 8px; margin: 0; font-family: var(--report-font); font-weight: 700; font-size: 21px; line-height: 27px; letter-spacing: 0; color: #111; }
+.report-title { display: flex; align-items: center; gap: 8px; margin: 0; font-family: var(--report-font); font-weight: 700; font-size: 22px; line-height: 28px; letter-spacing: 0; color: #111; }
 .report-title .report-icon { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex: none; border-radius: 6px; color: #fff; }
 .report-title .report-icon svg { width: 16px; height: 16px; }
 .report-title .report-icon img { width: 24px; height: 24px; border-radius: 6px; display: block; background: #F1F5F9; }
@@ -309,13 +309,13 @@ body.menu-open { overflow: hidden; }
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
 .kv-name { flex: none; font-weight: 700; font-size: 16px; line-height: 24px; color: #111; }
-.kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 18px; line-height: 24px; color: #111; white-space: nowrap; }
+.kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 19px; line-height: 24px; color: #111; white-space: nowrap; }
 .kv-value.up { color: var(--up); } .kv-value.down { color: var(--down); }
 .kv-value small { font-size: 14px; font-weight: 400; color: #7A7A7A; }
 .kv-row--block { display: block; }
 .kv-row--block .kv-name { display: block; margin-bottom: 4px; }
 .kv-row--block ul { display: flex; flex-direction: column; gap: 12px; }
-.kv-row--block li { display: flex; align-items: flex-start; gap: 7px; font-size: 18px; line-height: 34px; color: #111; word-break: keep-all; }
+.kv-row--block li { display: flex; align-items: flex-start; gap: 7px; font-size: 19px; line-height: 34px; color: #111; word-break: keep-all; }
 .kv-row--block li::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
 
 .badge {   /* 배경색이 있는 가이드 라벨(5절 긍정 · 부정 · 정상) — 14px, 볼드 없음 (2026-10-13 사용자) */
@@ -339,7 +339,7 @@ body.menu-open { overflow: hidden; }
   display: flex;
   align-items: flex-start;
   gap: 7px;
-  font-size: 18px;
+  font-size: 19px;   /* 본문 19 (2026-10-13 사용자) */
   line-height: 34px;
   color: #111;
   word-break: keep-all;
@@ -531,7 +531,7 @@ body.menu-open { overflow: hidden; }
 .news-item {   /* 리포트 뉴스 카드와 같다: 제목 18px · 행간 34(본문), 보이는 위아래 14 (2026-10-12 사용자) */
   margin: 0; padding: 15px 12px 20px;   /* 보이는 위아래 22 (콘텐츠 카드 여백, 2026-10-13 사용자) */
   background: var(--surface); border: 1px solid #E2E8F0; border-radius: 8px;
-  font-size: 18px; line-height: 34px; color: #111; word-break: keep-all;
+  font-size: 19px; line-height: 34px; color: #111; word-break: keep-all;
 }
 .news-item a { color: #111; }
 .news-item a:hover { color: var(--accent); }
@@ -676,8 +676,8 @@ body.menu-open { overflow: hidden; }
   .tabs { overflow-x: auto; }
   .tab { padding: 8px 12px 0; }
   /* 폰 제목은 모두 2px 작게 (2026-10-13 사용자, 디자인 가이드 9절) — 홈 · 목록 구획 제목 22 → 20, 홈 리포트 카드 제목 21 → 19 */
-  .section-title { font-size: 19px; line-height: 25px; }
-  .report-title { font-size: 19px; line-height: 25px; }
+  .section-title { font-size: 20px; line-height: 26px; }
+  .report-title { font-size: 20px; line-height: 26px; }
 }
 
 /* 홈 화면 추가 안내 (2026-10-13 사용자, 디자인 가이드 10-4). 폰에서만 JS가 붙인다 */

@@ -106,7 +106,7 @@ BLOGGER_CSS = """
 .post-card-title {
   margin: 0;
   font-weight: 700;
-  font-size: 19px;
+  font-size: 20px;   /* 목록 카드 제목 +1 (2026-10-13) */
   line-height: 1.45;
   letter-spacing: -.3px;
   color: var(--ink);
@@ -151,7 +151,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title {
   margin: 0 0 10px;
   font-weight: 700;
-  font-size: 34px;
+  font-size: 35px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") */
   line-height: 48px;
   letter-spacing: -.6px;
   color: var(--ink);
@@ -178,7 +178,7 @@ body.item-view .main-content, body.item-view.no-dashboard .main-content { paddin
 body.item-view .post-outer-container { padding-top: 13px; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
-.post-body { font-size: 18px; line-height: 34px; color: #333; overflow-wrap: anywhere; }   /* 행간 px 정수 — 리포트 본문과 같은 34px (2026-10-12 사용자) */
+.post-body { font-size: 19px; line-height: 34px; color: #333; overflow-wrap: anywhere; }   /* 행간 px 정수 — 리포트 본문과 같은 34px (2026-10-12 사용자) */
 .post-body img { max-width: 100%; height: auto; border-radius: 12px; }
 .post-body table { width: 100%; border-collapse: collapse; }
 /* 셀에 nowrap 이 있는 표(리포트 본문)는 글 폭을 밀어내지 않고 표 안에서만 가로 스크롤한다 */
@@ -202,8 +202,8 @@ body.item-view .post-outer-container { padding-top: 13px; }
 /* 팝업 제목 · 닫기는 위에 고정, 내용만 스크롤 (2026-10-13 사용자) */
 .rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; border-bottom: 1px solid #F1F5F9; }
 .rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
-.rt-pop-title { margin: 0; font-size: 18px; font-weight: 700; line-height: 24px; color: #111; }
-.rt-pop-body { font-size: 18px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
+.rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 24px; color: #111; }
+.rt-pop-body { font-size: 19px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
 /* 툴팁 내용 행간 = 본문 34px (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
 .rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; }   /* 글머리표 사이 +6 (2026-10-12 사용자) */
 .rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
@@ -214,11 +214,11 @@ body.item-view .post-outer-container { padding-top: 13px; }
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
-.post-body .rt-tab { flex: none; padding: 8px 12px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) */
+.post-body .rt-tab { flex: none; padding: 8px 12px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) */
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
-.post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
+.post-body .rt-subtab { flex: none; padding: 6px 10px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
 /* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.
    data-grid=2 (C 카드 줄 묶음) → 2열 그리드 + 짝수 칸 왼쪽 세로 구분선. 둘째 칸의 인라인 border-top 은 지운다(첫 줄에 선이 생기지 않게).
@@ -235,14 +235,14 @@ body.item-view .post-outer-container { padding-top: 13px; }
 /* 전환 버튼 (data-switch, 당일 · 5일 그래프): 회색 바탕 알약 둘, 선택은 흰 바탕 · 검정 굵게 (2026-10-11) */
 .post-body .rt-segs { display: inline-flex; gap: 2px; padding: 3px; margin: 4px 0 8px; background: #F1F5F9; border-radius: 8px; }
 .post-body .rt-segs[hidden] { display: none; }
-.post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
+.post-body .rt-seg { padding: 6px 14px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
 .post-body .rt-seg[aria-pressed="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .post-body [data-switch-panel][hidden], .post-body [data-hz-panel][hidden] { display: none; }
 .post-body .rt-segs--in-sub { margin: 0 0 4px auto; flex: none; }
 /* 하위탭 (부정 발언 · 긍정 발언 · 전체): 서브탭보다 한 단계 아래 — 16px, 밑줄 2px 검정, 줄 아래 선 없음. 표본이 모자란 탭은 흐리게 (2026-10-11) */
 .post-body .rt-dirs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 0 8px; }
 .post-body .rt-dirs[hidden] { display: none; }
-.post-body .rt-dir { flex: none; padding: 4px 8px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
+.post-body .rt-dir { flex: none; padding: 4px 8px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
 .post-body .rt-dir[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: #111; }
 .post-body .rt-dir[data-empty] { color: #CBD5E1; }
 /* E 2열 카드는 폰에서도 2열 (2026-10-12 사용자: "왜 2열로 적용 안 했냐") — 예전의 폰 한 칸 쌓기 규칙 삭제.
@@ -355,7 +355,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments {
   width: 100%; max-width: var(--shell); margin: 40px auto 0; padding: 16px;   /* 목록 버튼과 40px (2026-10-12 사용자) */
   background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;   /* 카드 (2026-10-12 사용자: "댓글은 카드 형식으로") */
-  font-size: 18px; line-height: 24px; color: #333; word-break: keep-all;
+  font-size: 19px; line-height: 24px; color: #333; word-break: keep-all;
 }
 .comments h3, .comments .comments-title, .comments h3.title { margin: 0 0 14px; padding-bottom: 6px; border-bottom: 2px solid #eee; font-size: 21px; font-weight: 700; line-height: 27px; color: #111; }
 /* 댓글 */
@@ -391,7 +391,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment-header .user, .comments .user a, .comments .comment-author { font-size: 16px; font-weight: 700; color: #111; font-style: normal; }
 .comments .comment-header .icon.user { display: none; }
 .comments .datetime, .comments .comment-header .datetime a, .comments .comment-footer .comment-timestamp a { font-size: 14px; line-height: 20px; color: #7A7A7A; }
-.comments .comment-content { margin: 4px 0 0; font-size: 18px; line-height: 24px; color: #333; }
+.comments .comment-content { margin: 4px 0 0; font-size: 19px; line-height: 24px; color: #333; }
 .comments .comment-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }   /* 버튼은 왼쪽부터 한 줄 (2026-10-12 사용자) */
 .comments .comment-actions a, .comments .comment-actions .item-control a, .comments .continue a, .comments .loadmore a, .comments .comment-footer a {
   display: inline-flex; align-items: center; margin: 0; padding: 5px 12px;
@@ -437,7 +437,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 /* 홈 최근 리포트 — 글 링크 줄 카드, 가로 구분선 콘텐츠 카드 여백(보이는 22, 2-1) (2026-10-13 사용자, 디자인 가이드 10-5) */
 .recent-section { display: flex; flex-direction: column; gap: 14px; }
 .recent-card { background: var(--surface); border: 1px solid #E2E8F0; border-radius: 8px; }
-.recent-row { display: block; padding: 19px 12px; border-top: 1px solid #E2E8F0; font-size: 18px; line-height: 24px; color: #111; word-break: keep-all; }
+.recent-row { display: block; padding: 19px 12px; border-top: 1px solid #E2E8F0; font-size: 19px; line-height: 24px; color: #111; word-break: keep-all; }
 .recent-row:first-child { border-top: 0; }
 .recent-row:hover { color: var(--accent); }
 
@@ -451,7 +451,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .post-outer-container { padding: 24px; }
   body.item-view .post-outer-container { padding-top: 13px; }   /* 카드 위 → 제목 글자 보이는 20 (2026-10-12 사용자) */
-  .post-title { font-size: 26px; line-height: 36px; }
+  .post-title { font-size: 27px; line-height: 36px; }
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
@@ -460,9 +460,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
   body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 31px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) */
-  .post-title { font-size: 22px; line-height: 32px; letter-spacing: -.3px; }   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
-  .post-body h2 { font-size: 19px !important; line-height: 25px !important; }   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
-  .post-body { font-size: 18px; line-height: 34px; }
+  .post-title { font-size: 23px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
+  .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
+  .post-body { font-size: 19px; line-height: 34px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
   /* 데스크톱용 커버 이미지 확대 규칙(1024px !important)이 모바일에서 글 폭을 벌리지 않게 */
   .post-body img, .post-body img[style*="max-width"] { max-width: 100% !important; }
 }
@@ -1050,7 +1050,7 @@ PREVIEW_COMMENTS = [
 
 PREVIEW_POST_TITLE = "미국 증시 리포트 — 2026년 9월 3일"
 
-FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:34px;color:#333;">
+FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:19px;line-height:34px;color:#333;">
 
   <img src="__COVER__" alt="데일리 브리핑 커버 이미지" style="width:100%;max-width:1024px;border-radius:8px;margin:0 0 16px 0;display:block;"/>
 
@@ -1156,7 +1156,7 @@ SAVED_TRUMP_BODY = "experiments/trump-trend/output/trump_report_body.html"
 SAVED_NVDA_BODY = "experiments/nvda-report/output/nvda_report_body.html"
 PREVIEW_NVDA_TITLE = "엔비디아 리포트 — 2026년 9월 3일"
 PREVIEW_TRUMP_TITLE = "트럼프 SNS 트렌드 — 2026년 9월 3일"
-FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:34px;color:#333;">
+FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:19px;line-height:34px;color:#333;">
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘 한 줄</h2>
 <div style="font-size:20px;font-weight:bold;color:#111;">지난 24시간 게시물 <b>36</b>건 중 정책 관련 <b>2</b>건, 이벤트 <b>2</b>개. 가장 강한 발언은 <b>Regulation / Artificial Intelligence</b> (강도 10).</div>
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘의 발언</h2>
@@ -1182,7 +1182,7 @@ def preview_post_body():
         return FALLBACK_POST_BODY.replace("__COVER__", cover), "더미 본문"
 
 
-FALLBACK_NVDA_BODY = """<div style="font-size:18px;line-height:34px;color:#333;">
+FALLBACK_NVDA_BODY = """<div style="font-size:19px;line-height:34px;color:#333;">
 <h2>① 오늘 한 줄</h2>
 <div style="font-size:20px;color:#111;"><b>NVDA $229.28</b> (-0.52%) · SPY 대비 -1.12%p · SMH 대비 +0.13%p · AMD 대비 +1.51%p · 거래량 20일 평균의 0.77×</div>
 <h2>② 오늘 바뀐 것 (2건)</h2>
