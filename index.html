@@ -224,7 +224,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600);
 }
 .nav-close svg { width: 16px; height: 16px; }
-.nav-overlay { position: fixed; inset: 0; z-index: 55; background: transparent; }   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
+.nav-overlay { position: fixed; inset: 0; z-index: 49; background: transparent; }   /* 헤더(50) 아래 — 서랍은 헤더 안에 있어 55로 두면 가림막이 서랍을 덮어 메뉴가 눌리지 않았다 (2026-10-13 사용자: "메뉴를 클릭시 목록 화면으로 이동되지 않는다")   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
 
@@ -777,18 +777,22 @@ body.menu-open { overflow: hidden; }
 }
 .post-card-title a:hover { color: var(--accent); }
 .post-card-snippet, .post-card-snippet p { margin: 0; font-size: 16px; line-height: 1.7; color: var(--gray-500); }
+/* 목록 카드 요약 (2026-10-13 사용자): 테마 JS가 홈 카드와 같은 2줄 요약(.report-columns)으로 바꾼다. 바꾸기 전 · 실패 시 블로거 기본 요약은 2줄에서 자른다 */
+.post-card-snippet:not(.report-columns) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 
 .blog-pager { display: flex; justify-content: center; gap: 12px; padding-top: 4px; }
+/* 글 더 보기 — 목록 버튼과 같은 검은 테마 버튼, 가로 30% 넓게 (2026-10-13 사용자: "모든 하단 버튼은 블랙 테마 버튼") */
 .blog-pager a {
-  padding: 10px 22px;
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
+  padding: 12px 42px;
+  background: #111;
+  border: 1px solid #111;
   border-radius: 8px;
   font-size: 16px;
+  line-height: 24px;
   font-weight: 700;
-  color: var(--ink);
+  color: #fff;
 }
-.blog-pager a:hover { border-color: var(--accent); color: var(--accent); }
+.blog-pager a:hover { background: #000; color: #fff; }
 
 /* ==========================================================================
    Blogger — 글 보기
@@ -945,7 +949,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 28px;
+  padding: 12px 42px;   /* 가로 30% 넓게 — 하단 버튼 공통 (2026-10-13 사용자) */
   background: #111;
   border: 1px solid #111;
   border-radius: 8px;
@@ -954,6 +958,12 @@ body.item-view .post-outer-container { padding-top: 13px; }
   color: #fff;
 }
 .post-nav-list:hover { background: #000; color: #fff; }   /* 검은 테마 버튼 (2026-10-12 사용자) */
+/* 글 아래 줄: 목록(검은 버튼)은 가운데, 오른쪽 끝에 TOP 글자 버튼 16px (2026-10-13 사용자) */
+.post-nav { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
+.post-nav .post-nav-list { grid-column: 2; }
+.post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
+  font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.post-nav-top:hover { color: var(--accent); }
 /* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px (테마 JS .ends-text, 2026-10-12 사용자) */
 body.item-view .post-outer-container { padding-bottom: 0 !important; }
 body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0; }
@@ -1375,7 +1385,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
                     <b:include data='post' name='post'/>
                   </article>
                   <p class='post-nav'>
-                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 아니면 데일리 리포트 목록.</b:comment>
+                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 아니면 데일리 리포트 목록.
+                      오른쪽 끝 TOP 은 맨 위로 (2026-10-13 사용자). 이전 글 · 다음 글은 같은 날 삭제.</b:comment>
                     <b:if cond='data:post.labels any (l =&gt; l.name == &quot;트럼프 트렌드&quot;)'>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C&quot;'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;엔비디아&quot;)'/>
@@ -1383,6 +1394,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
                     <b:else/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91&quot;'>목록</a>
                     </b:if>
+                    <button aria-label='맨 위로' class='post-nav-top' type='button'>TOP<svg aria-hidden='true' fill='none' height='16' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 16 16' width='16'><path d='M8 13V3M4 7l4-4 4 4'/></svg></button>
                   </p>
                   <b:include data='post' name='commentPicker'/>
                 </b:loop>
@@ -1416,6 +1428,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
                 <div class='post-grid'>
                   <b:loop values='data:posts' var='post'>
                     <article class='post-card'>
+                      <b:comment>트럼프 · 엔비디아 글은 카드 위 이미지를 두지 않는다 — 제목 · 요약만 (2026-10-13 사용자). 데일리는 커버 이미지 그대로.</b:comment>
+                      <b:if cond='!(data:post.labels any (l =&gt; l.name == &quot;트럼프 트렌드&quot; or l.name == &quot;엔비디아&quot;))'>
                       <a expr:href='data:post.url'>
                         <b:if cond='data:post.featuredImage'>
                           <img class='post-card-img' expr:alt='data:post.title' expr:src='data:post.featuredImage'/>
@@ -1423,6 +1437,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
                           <span class='post-card-img'></span>
                         </b:if>
                       </a>
+                      </b:if>
                       <div class='post-card-body'>
                         <div class='post-card-meta'>
                           <b:eval expr='data:post.date format &quot;yyyy.MM.dd&quot;'/>
@@ -2614,6 +2629,65 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
         CARDS.forEach(loadCard);
 
+        /* ====================================================== 목록 카드 요약 = 홈 카드 요약 (2026-10-13 사용자: "홈카드 요약글을 재활용")
+           블로거 기본 요약(postSnippet)은 본문 앞 약 860자를 통째로 자른 것이라 카드 숫자가 한 덩어리로 이어진다.
+           목록 화면의 글들을 피드로 한 번에 받아, 홈 카드와 같은 함수로 글마다 2줄을 뽑아 바꿔 단다. 못 받으면 원래 요약을 2줄로 자른 채 둔다(테마 CSS). */
+        function summaryLines(labels, sec) {
+          if (labels.indexOf('엔비디아') >= 0) {
+            var out = [];
+            nvdaRows(sec).forEach(function (r) { if (r[0] === '가격') out.push('NVDA ' + r[1]); });
+            var issue = linesOf(sec['중요 이슈'] || [])[0];
+            if (issue) out.push(issue);
+            return out;
+          }
+          /* 홈 카드의 구획(훅)마다 첫 줄 — 데일리는 요약 · 핵심 인사이트, 트럼프는 발언 · 내일 볼 것 */
+          var card = CARDS.filter(function (c) { return labels.indexOf(c.label) >= 0; })[0] || CARDS[0];
+          var picked = Object.keys(card.map).map(function (hook) {
+            if (card.pick && card.pick[hook]) return card.pick[hook](sec);
+            for (var i = 0; i < card.map[hook].length; i++) {
+              var k = card.map[hook][i];
+              if (sec[k]) { var ls = linesOf(sec[k]); if (ls.length) return ls; }
+            }
+            return [];
+          });
+          var out2 = picked.map(function (ls) { return ls[0]; }).filter(Boolean);
+          return out2.length >= MAX_LINES ? out2 : out2.concat((picked[0] || []).slice(1));
+        }
+
+        (function () {
+          var cards = [].slice.call(document.querySelectorAll('.post-grid .post-card'));
+          if (!cards.length) return;
+          var lm = /\/search\/label\/([^/?#]+)/.exec(location.pathname);
+          var q = '?alt=json&max-results=' + (cards.length + 5);
+          var um = /[?&]updated-max=([^&]+)/.exec(location.search);
+          if (um) q += '&updated-max=' + um[1];
+          var url = (lm ? '/feeds/posts/default/-/' + lm[1] : '/feeds/posts/default') + q;
+          function pathOf(h) { try { return new URL(h, location.href).pathname; } catch (e) { return h; } }
+          fetch(url)
+            .then(function (r) { return r.json(); })
+            .then(function (json) {
+              var byPath = {};
+              ((json.feed || {}).entry || []).forEach(function (e) {
+                (e.link || []).forEach(function (l) { if (l.rel === 'alternate') byPath[pathOf(l.href)] = e; });
+              });
+              cards.forEach(function (card) {
+                var a = card.querySelector('.post-card-title a'), box = card.querySelector('.post-card-snippet');
+                var e = a && box && byPath[pathOf(a.href)];
+                if (!e) return;
+                var labels = (e.category || []).map(function (c) { return c.term; });
+                var sec = reportSections((e.content || {}).$t || '');
+                var lines = sec ? summaryLines(labels, sec).slice(0, MAX_LINES) : [];
+                if (!lines.length) return;
+                var ul = el('ul');
+                lines.forEach(function (t) { ul.appendChild(tinted(t)); });
+                box.textContent = '';
+                box.classList.add('report-columns');
+                box.appendChild(ul);
+              });
+            })
+            .catch(function () {});
+        })();
+
         /* ============================================================ 모바일 메뉴 (2026-10-12 사용자: 메뉴를 누르면 오른쪽에서 열리는 서랍) */
 
         var searchToggle = document.querySelector('.search-toggle');
@@ -3037,6 +3111,19 @@ body.no-dashboard .main-content { padding-top: 32px; }
           }
           btns.forEach(function (b) { b.onclick = function () { sel(b.getAttribute('data-hz')); }; });
           sel('close');
+        });
+      })();
+
+      /* ============================================================ TOP 버튼 (2026-10-13 사용자: "목록 버튼 우측 끝에 화면 상단으로 올라가는 top + 화살표, 텍스트로만 된 버튼, 16포인트")
+         글 아래 목록 줄 오른쪽 끝의 .post-nav-top — 누르면 맨 위로 부드럽게. 이전 글 · 다음 글 버튼은 같은 날 삭제 (사용자) */
+      (function () {
+        'use strict';
+        /* 목록 화면 맨 아래 '더 많은 게시물'(블로그 언어가 영어라 More posts)은 한국어로 */
+        [].slice.call(document.querySelectorAll('.blog-pager-older-link')).forEach(function (a) { a.textContent = '글 더 보기'; });
+        [].slice.call(document.querySelectorAll('.post-nav-top')).forEach(function (b) {
+          b.addEventListener('click', function () {
+            try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+          });
         });
       })();
 

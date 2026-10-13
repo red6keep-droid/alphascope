@@ -113,18 +113,22 @@ BLOGGER_CSS = """
 }
 .post-card-title a:hover { color: var(--accent); }
 .post-card-snippet, .post-card-snippet p { margin: 0; font-size: 16px; line-height: 1.7; color: var(--gray-500); }
+/* 목록 카드 요약 (2026-10-13 사용자): 테마 JS가 홈 카드와 같은 2줄 요약(.report-columns)으로 바꾼다. 바꾸기 전 · 실패 시 블로거 기본 요약은 2줄에서 자른다 */
+.post-card-snippet:not(.report-columns) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 
 .blog-pager { display: flex; justify-content: center; gap: 12px; padding-top: 4px; }
+/* 글 더 보기 — 목록 버튼과 같은 검은 테마 버튼, 가로 30% 넓게 (2026-10-13 사용자: "모든 하단 버튼은 블랙 테마 버튼") */
 .blog-pager a {
-  padding: 10px 22px;
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
+  padding: 12px 42px;
+  background: #111;
+  border: 1px solid #111;
   border-radius: 8px;
   font-size: 16px;
+  line-height: 24px;
   font-weight: 700;
-  color: var(--ink);
+  color: #fff;
 }
-.blog-pager a:hover { border-color: var(--accent); color: var(--accent); }
+.blog-pager a:hover { background: #000; color: #fff; }
 
 /* ==========================================================================
    Blogger — 글 보기
@@ -281,7 +285,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 28px;
+  padding: 12px 42px;   /* 가로 30% 넓게 — 하단 버튼 공통 (2026-10-13 사용자) */
   background: #111;
   border: 1px solid #111;
   border-radius: 8px;
@@ -290,6 +294,12 @@ body.item-view .post-outer-container { padding-top: 13px; }
   color: #fff;
 }
 .post-nav-list:hover { background: #000; color: #fff; }   /* 검은 테마 버튼 (2026-10-12 사용자) */
+/* 글 아래 줄: 목록(검은 버튼)은 가운데, 오른쪽 끝에 TOP 글자 버튼 16px (2026-10-13 사용자) */
+.post-nav { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
+.post-nav .post-nav-list { grid-column: 2; }
+.post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
+  font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.post-nav-top:hover { color: var(--accent); }
 /* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px (테마 JS .ends-text, 2026-10-12 사용자) */
 body.item-view .post-outer-container { padding-bottom: 0 !important; }
 body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0; }
@@ -580,7 +590,8 @@ __DASHBOARD__
                     <b:include data='post' name='post'/>
                   </article>
                   <p class='post-nav'>
-                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 아니면 데일리 리포트 목록.</b:comment>
+                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 아니면 데일리 리포트 목록.
+                      오른쪽 끝 TOP 은 맨 위로 (2026-10-13 사용자). 이전 글 · 다음 글은 같은 날 삭제.</b:comment>
                     <b:if cond='data:post.labels any (l =&gt; l.name == &quot;__TRUMP_LABEL__&quot;)'>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__TRUMP_LIST_PATH__&quot;'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;__NVDA_LABEL__&quot;)'/>
@@ -588,6 +599,7 @@ __DASHBOARD__
                     <b:else/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__LIST_PATH__&quot;'>목록</a>
                     </b:if>
+                    <button aria-label='맨 위로' class='post-nav-top' type='button'>TOP<svg aria-hidden='true' fill='none' height='16' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 16 16' width='16'><path d='M8 13V3M4 7l4-4 4 4'/></svg></button>
                   </p>
                   <b:include data='post' name='commentPicker'/>
                 </b:loop>
@@ -621,6 +633,8 @@ __DASHBOARD__
                 <div class='post-grid'>
                   <b:loop values='data:posts' var='post'>
                     <article class='post-card'>
+                      <b:comment>트럼프 · 엔비디아 글은 카드 위 이미지를 두지 않는다 — 제목 · 요약만 (2026-10-13 사용자). 데일리는 커버 이미지 그대로.</b:comment>
+                      <b:if cond='!(data:post.labels any (l =&gt; l.name == &quot;__TRUMP_LABEL__&quot; or l.name == &quot;__NVDA_LABEL__&quot;))'>
                       <a expr:href='data:post.url'>
                         <b:if cond='data:post.featuredImage'>
                           <img class='post-card-img' expr:alt='data:post.title' expr:src='data:post.featuredImage'/>
@@ -628,6 +642,7 @@ __DASHBOARD__
                           <span class='post-card-img'></span>
                         </b:if>
                       </a>
+                      </b:if>
                       <div class='post-card-body'>
                         <div class='post-card-meta'>
                           <b:eval expr='data:post.date format &quot;yyyy.MM.dd&quot;'/>
@@ -1203,8 +1218,7 @@ def preview_reports():
         + "\n".join(cards) + "\n"
         "    </div>\n"
         "    <div class=\"blog-pager\">\n"
-        "      <a href=\"#\">이전 게시물</a>\n"
-        "      <a href=\"#\">홈</a>\n"
+        "      <a class=\"blog-pager-older-link\" href=\"#\">More posts</a>\n"
         "    </div>\n"
         "  </section>"
     )
@@ -1309,6 +1323,7 @@ def preview_post():
         "      </article>\n"
         "      <p class=\"post-nav\">\n"
         "        <a class=\"post-nav-list\" href=\"#list\">목록</a>\n"
+        "        <button class=\"post-nav-top\" type=\"button\" aria-label=\"맨 위로\">TOP<svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 13V3M4 7l4-4 4 4\"/></svg></button>\n"
         "      </p>\n"
         "%s\n"
         "    </div>\n"

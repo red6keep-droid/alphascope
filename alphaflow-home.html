@@ -198,7 +198,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600);
 }
 .nav-close svg { width: 16px; height: 16px; }
-.nav-overlay { position: fixed; inset: 0; z-index: 55; background: transparent; }   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
+.nav-overlay { position: fixed; inset: 0; z-index: 49; background: transparent; }   /* 헤더(50) 아래 — 서랍은 헤더 안에 있어 55로 두면 가림막이 서랍을 덮어 메뉴가 눌리지 않았다 (2026-10-13 사용자: "메뉴를 클릭시 목록 화면으로 이동되지 않는다")   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
 
@@ -1608,6 +1608,65 @@ body.menu-open { overflow: hidden; }
 
   CARDS.forEach(loadCard);
 
+  /* ====================================================== 목록 카드 요약 = 홈 카드 요약 (2026-10-13 사용자: "홈카드 요약글을 재활용")
+     블로거 기본 요약(postSnippet)은 본문 앞 약 860자를 통째로 자른 것이라 카드 숫자가 한 덩어리로 이어진다.
+     목록 화면의 글들을 피드로 한 번에 받아, 홈 카드와 같은 함수로 글마다 2줄을 뽑아 바꿔 단다. 못 받으면 원래 요약을 2줄로 자른 채 둔다(테마 CSS). */
+  function summaryLines(labels, sec) {
+    if (labels.indexOf('엔비디아') >= 0) {
+      var out = [];
+      nvdaRows(sec).forEach(function (r) { if (r[0] === '가격') out.push('NVDA ' + r[1]); });
+      var issue = linesOf(sec['중요 이슈'] || [])[0];
+      if (issue) out.push(issue);
+      return out;
+    }
+    /* 홈 카드의 구획(훅)마다 첫 줄 — 데일리는 요약 · 핵심 인사이트, 트럼프는 발언 · 내일 볼 것 */
+    var card = CARDS.filter(function (c) { return labels.indexOf(c.label) >= 0; })[0] || CARDS[0];
+    var picked = Object.keys(card.map).map(function (hook) {
+      if (card.pick && card.pick[hook]) return card.pick[hook](sec);
+      for (var i = 0; i < card.map[hook].length; i++) {
+        var k = card.map[hook][i];
+        if (sec[k]) { var ls = linesOf(sec[k]); if (ls.length) return ls; }
+      }
+      return [];
+    });
+    var out2 = picked.map(function (ls) { return ls[0]; }).filter(Boolean);
+    return out2.length >= MAX_LINES ? out2 : out2.concat((picked[0] || []).slice(1));
+  }
+
+  (function () {
+    var cards = [].slice.call(document.querySelectorAll('.post-grid .post-card'));
+    if (!cards.length) return;
+    var lm = /\/search\/label\/([^/?#]+)/.exec(location.pathname);
+    var q = '?alt=json&max-results=' + (cards.length + 5);
+    var um = /[?&]updated-max=([^&]+)/.exec(location.search);
+    if (um) q += '&updated-max=' + um[1];
+    var url = (lm ? '/feeds/posts/default/-/' + lm[1] : '/feeds/posts/default') + q;
+    function pathOf(h) { try { return new URL(h, location.href).pathname; } catch (e) { return h; } }
+    fetch(url)
+      .then(function (r) { return r.json(); })
+      .then(function (json) {
+        var byPath = {};
+        ((json.feed || {}).entry || []).forEach(function (e) {
+          (e.link || []).forEach(function (l) { if (l.rel === 'alternate') byPath[pathOf(l.href)] = e; });
+        });
+        cards.forEach(function (card) {
+          var a = card.querySelector('.post-card-title a'), box = card.querySelector('.post-card-snippet');
+          var e = a && box && byPath[pathOf(a.href)];
+          if (!e) return;
+          var labels = (e.category || []).map(function (c) { return c.term; });
+          var sec = reportSections((e.content || {}).$t || '');
+          var lines = sec ? summaryLines(labels, sec).slice(0, MAX_LINES) : [];
+          if (!lines.length) return;
+          var ul = el('ul');
+          lines.forEach(function (t) { ul.appendChild(tinted(t)); });
+          box.textContent = '';
+          box.classList.add('report-columns');
+          box.appendChild(ul);
+        });
+      })
+      .catch(function () {});
+  })();
+
   /* ============================================================ 모바일 메뉴 (2026-10-12 사용자: 메뉴를 누르면 오른쪽에서 열리는 서랍) */
 
   var searchToggle = document.querySelector('.search-toggle');
@@ -2031,6 +2090,19 @@ body.menu-open { overflow: hidden; }
     }
     btns.forEach(function (b) { b.onclick = function () { sel(b.getAttribute('data-hz')); }; });
     sel('close');
+  });
+})();
+
+/* ============================================================ TOP 버튼 (2026-10-13 사용자: "목록 버튼 우측 끝에 화면 상단으로 올라가는 top + 화살표, 텍스트로만 된 버튼, 16포인트")
+   글 아래 목록 줄 오른쪽 끝의 .post-nav-top — 누르면 맨 위로 부드럽게. 이전 글 · 다음 글 버튼은 같은 날 삭제 (사용자) */
+(function () {
+  'use strict';
+  /* 목록 화면 맨 아래 '더 많은 게시물'(블로그 언어가 영어라 More posts)은 한국어로 */
+  [].slice.call(document.querySelectorAll('.blog-pager-older-link')).forEach(function (a) { a.textContent = '글 더 보기'; });
+  [].slice.call(document.querySelectorAll('.post-nav-top')).forEach(function (b) {
+    b.addEventListener('click', function () {
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+    });
   });
 })();
 
