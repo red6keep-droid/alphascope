@@ -291,8 +291,23 @@ def _space_colons(t):
     return _COLON.sub(fix, t)
 
 
+_DOT = re.compile(r"[ \t]*·[ \t]*")
+
+
+def _space_dots(t):
+    """글자 "·" 앞뒤 한 칸 (2026-10-13 사용자: 앞뒤 모두 띄워쓰기). 글자 노드 맨 앞 · 맨 끝, 줄 첫머리 글머리표(`· `), &nbsp; 옆은 그대로 둔다."""
+    def fix(m):
+        s, e = m.start(), m.end()
+        before, after = t[s - 1:s], t[e:e + 1]
+        m0 = m.group(0)
+        lead = (" " if m0[:1] in " \t" else "") if s == 0 else ("" if before in "\n;" else " ")   # ; = &nbsp; · &#10; 같은 문자 참조 끝. 글자 노드 맨 앞은 원래 공백만
+        tail = (" " if m0[-1:] in " \t" else "") if e == len(t) else ("" if after in "\n&" else " ")
+        return f"{lead}·{tail}"
+    return _DOT.sub(fix, t)
+
+
 def fix_colons(html):
-    """보이는 글의 ":" 는 앞뒤를 한 칸씩 띄운다 — "라벨 : 값" (2026-10-11 사용자: 꼭 반드시, 모든 페이지 일괄).
+    """보이는 글의 ":" · "·" 는 앞뒤를 한 칸씩 띄운다 ("·" 는 2026-10-13 사용자) — "라벨 : 값" (2026-10-11 사용자: 꼭 반드시, 모든 페이지 일괄).
     글자 노드와 툴팁·제목 속성(data-tip · title · aria-label)만 고친다. style · script 안, 시각·비율(숫자:숫자), 주소(://)는 건드리지 않는다.
     각 리포트의 build_body 마지막에 한 번 건다 — LLM 서술도 같이 고쳐진다."""
     out, skip = [], False
@@ -303,9 +318,9 @@ def fix_colons(html):
                 skip = True
             elif low.startswith(("</script", "</style")):
                 skip = False
-            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _space_colons(m.group(2)) + m.group(3), part))
+            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _space_dots(_space_colons(m.group(2))) + m.group(3), part))
         else:
-            out.append(part if skip else _space_colons(part))
+            out.append(part if skip else _space_dots(_space_colons(part)))
     return "".join(out)
 
 
@@ -602,13 +617,14 @@ def dcard(html, theme="neutral"):
 STATE_CARD = {"good": ("#F0FDF4", "#BBF7D0"), "uncertain": ("#FFFBEB", "#FDE68A"), "negative": ("#EFF6FF", "#BFDBFE"), "neutral": ("#F8FAFC", "#CBD5E1")}   # 신호 라벨 색의 카드판
 
 
-def state_card(head_html, kind="neutral", right_html="", sub_html="", items=()):
+def state_card(head_html, kind="neutral", right_html="", sub_html="", items=(), chev=False):
     """상태 카드 (2026-10-12 사용자: 종합·점수 카드 분리, 배경은 신호 라벨 색). 첫 줄 왼쪽 결론(굵게 검정 16px) · 오른쪽 값,
     둘째 줄 sub_html(14px 한 줄 설명), items = [(라벨, 내용)] 은 얇은 선 아래 3px 점 글머리표 14px."""
     bg, bd = STATE_CARD.get(kind, STATE_CARD["neutral"])
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;font-size:{EMPH_NAME};">{head_html}</span>'
-            + (f'<span style="font-weight:700;white-space:nowrap;font-size:{SMALL};">{right_html}</span>' if right_html else "") + "</span>")
+            + (f'<span style="font-weight:700;white-space:nowrap;font-size:{SMALL};{"margin-left:auto;" if chev else ""}">{right_html}</span>' if right_html else "")
+            + (f'<span style="display:flex;color:#111;{"" if right_html else "margin-left:auto;"}">{ACC_CHEV}</span>' if chev else "") + "</span>")   # chev: 맨 오른쪽 펼침 화살표 (state_fold, 2026-10-13 사용자)
     sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#374151;margin-top:2px;">{sub_html}</div>' if sub_html else ""
     lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#374151", margin="8px 0") for k, v in items)
     body = (f'<div style="margin-top:{14 - VP_EMPH}px;padding-top:{14 - VP}px;border-top:1px solid {bd};font-size:{TINY};line-height:{LH_TINY};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자: 4 → 14)
@@ -640,6 +656,49 @@ def fold(label, inner_html):
     """펼침 버튼 (가이드라인 2-1 H 카드 버튼) — 눌러야 inner_html 이 보인다. details data-acc: 테마 CSS가 화살표를 돌리고 홈 카드는 건너뛴다."""
     return (f'<details data-acc="1" style="margin:0 0 8px;"><summary style="{FOLD_BTN}">{esc(label)} {ACC_CHEV}</summary>'
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
+
+
+def state_fold(card_html, inner_html):
+    """상태 카드를 버튼으로 — 누르면 아래 inner_html(카드)이 펼쳐진다, 기본 닫힘 (2026-10-13 사용자: "점수 … 우측 끝에 펼침아이콘, 6개 정보를 펼쳤을 때").
+    card_html 은 state_card(..., chev=True). details data-acc: 테마 CSS가 열리면 화살표를 위로 돌리고 홈 카드는 건너뛴다."""
+    card = card_html.replace("margin:0 0 8px;", "margin:0;", 1)   # 카드 아래 8px 은 details 가 갖는다
+    return (f'<details data-acc="1" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;display:block;">{card}</summary>'
+            f'<div style="margin-top:8px;">{inner_html}</div></details>')
+
+
+SUB_DOT = 2   # 소제목 앞 점 2px (2026-10-13 사용자: "2픽셀 블릿")
+
+
+def sub_fold(t, inner_html, tip_text=None, open_=False):
+    """접는 소제목 (2026-10-13 사용자: "하위 타이틀은 볼드에 2픽셀 블릿, 타이틀 우측에 펼침아이콘, 첫 부분만 노출하고 2번째 영역은 펼침 아이콘으로").
+    18px 굵게 #111 · 앞 2px 점 · 오른쪽 끝 `읽는 법 ?` 다음 화살표. open_=True 면 처음부터 펼침. data-sub 는 두지 않는다 — 테마가 서브탭으로 바꾸지 않게."""
+    lh = int(LH_CARD[:-2])
+    dot = f'<span style="flex:none;width:{SUB_DOT}px;height:{SUB_DOT}px;border-radius:50%;background:#111;margin-top:{(lh - SUB_DOT) // 2}px;align-self:flex-start;"></span>'
+    tip_html = tips_right([("읽는 법", tip_text)]) if tip_text else ""
+    head = (f'<span style="display:flex;align-items:center;gap:7px;position:relative;font-size:{SMALL};line-height:{LH_CARD};font-weight:700;color:#111;">'
+            f'{dot}<span>{paren(esc(t))}</span>{tip_html}<span style="display:flex;{"" if tip_html else "margin-left:auto;"}">{ACC_CHEV}</span></span>')
+    return (f'<details data-acc="1"{" open" if open_ else ""} style="margin:14px 0 0;"><summary style="list-style:none;cursor:pointer;display:block;padding:4px 0 6px;">{head}</summary>'
+            f'<div style="margin-top:4px;">{inner_html}</div></details>')
+
+
+RULE_GAP = SEP_GAP + 5   # 카드 없이 가로 구분선만 둔 목록 — 선 위아래 보이는 27 (2026-10-13 사용자: "기존 구분선 여백 상하 여백에 5픽셀씩 더")
+
+
+def item_rules(items_html, sub=False):
+    """기사 목록 — 카드 없이 기사 사이 가로 구분선 (2026-10-13 사용자: "뉴스는 강조 뉴스 카드를 제외하고 가로 구분선으로 뉴스 영역을 구분").
+    18px · 행간 34. 첫 기사 위는 구획 제목 밑줄이 대신한다. 항목은 li — 홈 카드가 글머리표로 읽는다. 구분선은 box-shadow (홈 카드는 border-top 요소를 건너뛴다)."""
+    bottom = RULE_GAP - (VP if sub else NEWS_VP)
+    lis = "".join(f'<li style="margin:0;padding:{(RULE_GAP - NEWS_VP) if i else 2}px 0 {bottom}px;line-height:{LH_BODY};{"box-shadow:inset 0 1px 0 #E2E8F0;" if i else ""}">{h}</li>'
+                  for i, h in enumerate(items_html))
+    return f'<ul style="margin:0 0 8px;padding:0;list-style:none;font-size:{SMALL};">{lis}</ul>' if lis else ""
+
+
+def rule_rows(rows):
+    """C 카드 줄을 카드 없이 가로 구분선으로만 (2026-10-13 사용자: "위험 탭에 추세유지 변동성 영역도 구분선으로") — 선 위아래 27, 좌우 여백 없음.
+    rows 는 ccard 와 같은 튜플."""
+    html = ccard(rows, pad=RULE_GAP - 1)
+    html = html.replace(MULTI, f"display:block;margin:0 0 6px;font-size:{SMALL};line-height:{LH_CARD};border-top:1px solid #E2E8F0;border-bottom:1px solid #E2E8F0;", 1)   # 목록 위아래 끝도 선
+    return html.replace(f"padding:{RULE_GAP - 1 - VP}px 12px;", f"padding:{RULE_GAP - 1 - VP}px 0;")
 
 
 def sub_label(t, tip_text=None):

@@ -271,10 +271,31 @@ def collect_history():
     }
 
 
+def add_sectors(*quote_lists):
+    """종목마다 섹터(yfinance info.sector, 영문)를 붙인다 — 급등주 · 관심 종목 섹터 라벨 (2026-10-13 사용자).
+    못 받으면 sector 없이 둔다. 리포트를 막지 않는다."""
+    cache = {}
+    for quotes in quote_lists:
+        for q in quotes or []:
+            sym = q.get("symbol")
+            if not sym:
+                continue
+            if sym not in cache:
+                try:
+                    cache[sym] = (yf.Ticker(sym).info or {}).get("sector")
+                except Exception as e:
+                    print(f"섹터 수집 실패 {sym}: {e}")
+                    cache[sym] = None
+            if cache[sym]:
+                q["sector"] = cache[sym]
+    print(f"섹터 수집 완료: {sum(1 for v in cache.values() if v)}/{len(cache)}")
+
+
 def collect_yahoo():
     indices = collect_indices()
     gainers = collect_gainers()
     most_active = collect_most_active()
+    add_sectors(gainers, most_active)
     # 시계열은 그림자 모드 분석용이라 실패해도 리포트를 막지 않는다.
     try:
         history = collect_history()

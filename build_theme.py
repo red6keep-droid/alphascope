@@ -300,6 +300,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
   font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .post-nav-top:hover { color: var(--accent); }
+.post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
 /* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px (테마 JS .ends-text, 2026-10-12 사용자) */
 body.item-view .post-outer-container { padding-bottom: 0 !important; }
 body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0; }
@@ -406,6 +407,18 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment-replybox-single, .comments .comment-replybox-thread { margin-top: 10px; }
 .comments .comment-replybox-single iframe, .comments .comment-replybox-thread iframe { display: block; width: 100%; min-height: 90px; }
 #comment-popup { display: none; }
+/* 댓글 쓰기 = 블로거 전체 페이지로 가는 검은 버튼 하나 (2026-10-13 사용자, 디자인 가이드 10-2) — 글 안 쓰기 창 · 중복 제목은 테마 JS가 없앤다 */
+.comments .comment-write { margin-top: 14px; padding-top: 14px; border-top: 1px solid #E2E8F0; }
+.comments .comment-write.is-first { margin-top: 0; padding-top: 0; border-top: 0; }   /* 댓글이 아직 없으면 위 선 없이 */
+.comments a.comment-write-btn { display: block; padding: 12px; background: #111; border: 0; border-radius: 8px; color: #fff; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }
+.comments a.comment-write-btn:hover { background: #000; color: #fff; }
+@media (max-width: 680px) {   /* 폰 댓글 카드 넓게 (2026-10-13 사용자: "모바일에서 너무 좁다") */
+  .comments-toggle { padding: 12px; }
+  .comments-panel { padding: 14px 12px 12px; }
+  .comments .comment { gap: 8px; }
+  .comments .avatar-image-container, .comments .avatar-image-container img { width: 28px; height: 28px; }
+  .comments .comment-replies { margin-left: 12px; }
+}
 
 /* 홈 최근 리포트 — 글 링크 줄 카드, 가로 구분선 콘텐츠 카드 여백(보이는 22, 2-1) (2026-10-13 사용자, 디자인 가이드 10-5) */
 .recent-section { display: flex; flex-direction: column; gap: 14px; }
@@ -433,7 +446,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
   body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 31px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) */
-  .post-title { font-size: 24px; line-height: 34px; letter-spacing: -.3px; }
+  .post-title { font-size: 22px; line-height: 32px; letter-spacing: -.3px; }   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
+  .post-body h2 { font-size: 19px !important; line-height: 25px !important; }   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
   .post-body { font-size: 18px; line-height: 34px; }
   /* 데스크톱용 커버 이미지 확대 규칙(1024px !important)이 모바일에서 글 폭을 벌리지 않게 */
   .post-body img, .post-body img[style*="max-width"] { max-width: 100% !important; }
@@ -1257,7 +1271,12 @@ def preview_comments():
         % len(PREVIEW_COMMENTS)
         + "\n".join(items) + "\n"
         "        </ol>\n"
-        "        <div class=\"continue\"><a href=\"#\">댓글 쓰기</a></div>\n"
+        "        <div id=\"top-continue\" class=\"continue\"><a class=\"comment-reply\">댓글 추가</a></div>\n"   # 실제 블로거 마크업 (2026-10-13 라이브 글에서 확인)
+        "        <div class=\"comment-replybox-thread\" id=\"top-ce\"></div>\n"
+        "        <p class=\"comment-footer\"></p>\n"
+        "        <div class=\"comment-form\"><a name=\"comment-form\"></a><h4 id=\"comment-post-message\">댓글 쓰기</h4>"
+        "<a href=\"https://www.blogger.com/comment/frame/2170661412485304541?po=3976095166505703509&amp;hl=ko\" id=\"comment-editor-src\"></a>"
+        "<iframe id=\"comment-editor\" height=\"410px\" width=\"100%\" src=\"about:blank\"></iframe></div>\n"
         "      </div>"
     )
 
