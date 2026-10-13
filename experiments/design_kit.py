@@ -579,7 +579,7 @@ def _crow_left_tip(name_html, sub, left_pct, block, ns, t):
 VSEP = '<span style="display:inline-block;width:1px;height:14px;background:#E2E8F0;margin:0 8px;vertical-align:-1px;"></span>'
 
 
-CHG_SIZE = "18px"   # 흰 카드 오른쪽 증감 숫자 19 → 18 (2026-10-13 사용자: 강조 카드 제외)
+CHG_SIZE = "17px"   # 흰 카드 오른쪽 증감 숫자 19 → 18 → 17 (2026-10-13 사용자: 강조 카드 제외)
 _ARROW_SPAN = re.compile(r'(<span style="color:#[0-9A-Fa-f]{3,6};font-weight:700;white-space:nowrap;)(">[▲▼–])')
 
 
