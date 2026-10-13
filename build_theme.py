@@ -432,6 +432,14 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
     <title><data:view.title.escaped/></title>
     <b:include data='blog' name='all-head-content'/>
+    <!-- 홈 화면 아이콘 (2026-10-13 사용자, 디자인 가이드 10-4). 블로거에는 파일을 못 올리므로 리포 pwa/ 를 jsDelivr 로 쓴다 -->
+    <link href='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/manifest.json' rel='manifest'/>
+    <link href='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/apple-touch-icon.png' rel='apple-touch-icon'/>
+    <meta content='#FFFFFF' name='theme-color'/>
+    <meta content='yes' name='mobile-web-app-capable'/>
+    <meta content='yes' name='apple-mobile-web-app-capable'/>
+    <meta content='AlphaScope' name='apple-mobile-web-app-title'/>
+    <meta content='default' name='apple-mobile-web-app-status-bar-style'/>
     <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap' rel='stylesheet'/>
 
     <b:skin version='1.0'><![CDATA[/*

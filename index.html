@@ -5,6 +5,14 @@
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
     <title><data:view.title.escaped/></title>
     <b:include data='blog' name='all-head-content'/>
+    <!-- 홈 화면 아이콘 (2026-10-13 사용자, 디자인 가이드 10-4). 블로거에는 파일을 못 올리므로 리포 pwa/ 를 jsDelivr 로 쓴다 -->
+    <link href='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/manifest.json' rel='manifest'/>
+    <link href='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/apple-touch-icon.png' rel='apple-touch-icon'/>
+    <meta content='#FFFFFF' name='theme-color'/>
+    <meta content='yes' name='mobile-web-app-capable'/>
+    <meta content='yes' name='apple-mobile-web-app-capable'/>
+    <meta content='AlphaScope' name='apple-mobile-web-app-title'/>
+    <meta content='default' name='apple-mobile-web-app-status-bar-style'/>
     <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap' rel='stylesheet'/>
 
     <b:skin version='1.0'><![CDATA[/*
@@ -687,6 +695,31 @@ body.menu-open { overflow: hidden; }
   .tabs { overflow-x: auto; }
   .tab { padding: 8px 12px 0; }
 }
+
+/* 홈 화면 추가 안내 (2026-10-13 사용자, 디자인 가이드 10-4). 폰에서만 JS가 붙인다 */
+.a2hs {
+  position: fixed; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 45;
+  max-width: 480px; margin: 0 auto; padding: 14px;
+  background: var(--surface); border: 1px solid var(--border-strong); border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(15,23,42,.18);
+}
+.a2hs[hidden], .a2hs [hidden] { display: none; }
+.a2hs-head { display: flex; align-items: center; gap: 12px; }
+.a2hs-icon { width: 44px; height: 44px; flex: none; border: 1px solid var(--border-strong); border-radius: 10px; }
+.a2hs-text { flex: 1; min-width: 0; }
+.a2hs-title { margin: 0; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; }
+.a2hs-sub { margin: 0; font-size: 14px; line-height: 20px; color: var(--gray-500); }
+.a2hs-close { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; color: var(--gray-500); -webkit-tap-highlight-color: transparent; }
+.a2hs-btn {
+  display: block; width: 100%; margin-top: 12px; padding: 10px 12px;
+  background: #111; color: #fff; border-radius: 8px;
+  font-size: 16px; line-height: 24px; font-weight: 700; text-align: center;
+}
+.a2hs-steps { margin: 12px 0 0; padding: 12px 0 0; border-top: 1px solid var(--border); }
+.a2hs-step { display: flex; gap: 8px; font-size: 16px; line-height: 24px; color: #333; }
+.a2hs-step + .a2hs-step { margin-top: 6px; }
+.a2hs-num { flex: none; width: 20px; font-family: var(--num); font-weight: 700; color: #111; }
+.a2hs-step svg { width: 18px; height: 18px; margin: 0 2px; vertical-align: -3px; }
 
 /* ==========================================================================
    Blogger — 최신 리포트 카드 목록
@@ -2983,6 +3016,84 @@ body.no-dashboard .main-content { padding-top: 32px; }
           btns.forEach(function (b) { b.onclick = function () { sel(b.getAttribute('data-hz')); }; });
           sel('close');
         });
+      })();
+
+      /* ============================================================ 홈 화면 추가 안내 (2026-10-13 사용자, 디자인 가이드 10-4)
+         폰 브라우저에서만 화면 아래에 뜬다. 홈 화면 아이콘으로 연 경우(standalone)에는 뜨지 않는다.
+         Android는 브라우저가 설치 창을 허락하면(beforeinstallprompt) 바로 띄우고, 아니면 메뉴 위치를 안내한다.
+         iPhone은 사이트가 설치 창을 띄울 수 없어 공유 → 홈 화면에 추가를 안내한다.
+         카카오톡 등 앱 안 브라우저는 추가가 안 되므로 바깥 브라우저로 내보낸다.
+         확인용: 주소 끝에 ?a2hs=ios · android · kakao · inapp 를 붙이면 기기 · 닫음 기록과 상관없이 뜬다. */
+      (function () {
+        'use strict';
+        var ICON = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/icon-192.png';
+        var KEY = 'as-a2hs-until';   // 이 시각(ms)까지 다시 띄우지 않는다
+        var DAY = 864e5;
+        var ua = navigator.userAgent;
+        var force = (location.search.match(/[?&]a2hs=(ios|android|kakao|inapp)\b/) || [])[1];
+
+        var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+        var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        var android = /Android/.test(ua);
+        var kakao = /KAKAOTALK/i.test(ua);
+        var inapp = /NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp|; wv\)/i.test(ua);
+        var mode = force || (standalone ? '' : kakao ? 'kakao' : inapp ? 'inapp' : ios ? 'ios' : android ? 'android' : '');
+        if (!mode) return;
+        if (!force) {
+          try { if (Date.now() < Number(localStorage.getItem(KEY) || 0)) return; } catch (e) {}
+        }
+
+        function quiet(days) { try { localStorage.setItem(KEY, String(Date.now() + days * DAY)); } catch (e) {} }
+
+        var deferred = null;
+        window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; });
+        window.addEventListener('appinstalled', function () { quiet(3650); hide(); });
+
+        var SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="공유"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
+        var DOTS = '<svg viewBox="0 0 24 24" fill="currentColor" aria-label="메뉴"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
+        var TEXT = {
+          ios:     { sub: '아이콘을 누르면 바로 열립니다', btn: '홈 화면에 추가',
+                     steps: ['공유 버튼 ' + SHARE + ' 누르기 (안 보이면 ··· 먼저)', '‘홈 화면에 추가’ 누르기'] },
+          android: { sub: '아이콘을 누르면 바로 열립니다', btn: '홈 화면에 추가',
+                     steps: ['브라우저 메뉴 ' + DOTS + ' 누르기 (삼성 인터넷은 ≡)', '‘홈 화면에 추가’ 또는 ‘앱 설치’ 누르기'] },
+          kakao:   { sub: '카카오톡 안에서는 추가할 수 없습니다', btn: '브라우저로 열기', steps: [] },
+          inapp:   { sub: '앱 안 브라우저에서는 추가할 수 없습니다', btn: '추가 방법 보기',
+                     steps: ['오른쪽 위 메뉴 누르기', '‘다른 브라우저로 열기’ 누르기', '열린 브라우저에서 이 안내를 다시 누르기'] }
+        }[mode];
+
+        var box = document.createElement('div');
+        box.className = 'a2hs'; box.hidden = true;
+        box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', '홈 화면에 추가');
+        box.innerHTML =
+          '<div class="a2hs-head">' +
+            '<img class="a2hs-icon" alt="" width="44" height="44" src="' + ICON + '"/>' +
+            '<div class="a2hs-text"><p class="a2hs-title">홈 화면에 AlphaScope 추가</p><p class="a2hs-sub">' + TEXT.sub + '</p></div>' +
+            '<button type="button" class="a2hs-close" aria-label="닫기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
+          '</div>' +
+          '<button type="button" class="a2hs-btn">' + TEXT.btn + '</button>' +
+          '<div class="a2hs-steps" hidden>' + TEXT.steps.map(function (s, i) {
+            return '<div class="a2hs-step"><span class="a2hs-num">' + (i + 1) + '</span><span>' + s + '</span></div>';
+          }).join('') + '</div>';
+
+        function hide() { box.hidden = true; }
+        box.querySelector('.a2hs-close').onclick = function () { quiet(14); hide(); };
+        box.querySelector('.a2hs-btn').onclick = function () {
+          if (mode === 'kakao') {
+            location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.href.replace(/[?&]a2hs=\w+/, ''));
+            return;
+          }
+          if (deferred) {
+            var d = deferred; deferred = null;
+            d.prompt();
+            d.userChoice.then(function (r) { if (r.outcome === 'accepted') { quiet(3650); hide(); } });
+            return;
+          }
+          box.querySelector('.a2hs-steps').hidden = false;
+          this.hidden = true;
+        };
+
+        document.body.appendChild(box);
+        setTimeout(function () { box.hidden = false; }, force ? 0 : 2500);
       })();
       //]]>
     </script>
