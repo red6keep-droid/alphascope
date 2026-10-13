@@ -334,12 +334,21 @@ body.menu-open { overflow: hidden; }
 #nvda-card { padding: 0 16px; gap: 0; }
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
+.kv-stats + .kv-row, .kv-row + .kv-row { border-top: 1px solid #E2E8F0; }
 .kv-name { flex: none; font-weight: 700; font-size: 16px; line-height: 24px; color: #111; }
 .kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 19px; line-height: 24px; color: #111; white-space: nowrap; }
 .kv-value.up { color: var(--up); } .kv-value.down { color: var(--down); }
 .kv-value small { font-size: 14px; font-weight: 400; color: #7A7A7A; }
 .kv-row--block { display: block; }
 .kv-row--block .kv-name { display: block; margin-bottom: 4px; }
+.kv-row--block .badge { display: inline-block; margin-bottom: 8px; }   /* 중요 이슈 = 라벨 (다른 카드의 오늘의 발언 · 내일 볼 것과 같다, 2026-10-14 사용자) */
+/* 가격 아래 네 정보 한 줄 — 칸 사이 세로 구분선, 칸마다 이름(14px 회색) 위 · 값(17px 굵게, 증감 색) 아래, 가운데 (2026-10-14 사용자) */
+.kv-stats { display: flex; padding: 16px 0; border-top: 1px solid #E2E8F0; }
+.kv-stat { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0 4px; text-align: center; }
+.kv-stat + .kv-stat { border-left: 1px solid #E2E8F0; }
+.kv-stat-name { font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
+.kv-stat-value { font-family: var(--num); font-weight: 700; font-size: 17px; line-height: 24px; color: #111; white-space: nowrap; }
+.kv-stat-value.up { color: var(--up); } .kv-stat-value.down { color: var(--down); }
 .kv-row--block ul { display: flex; flex-direction: column; gap: 12px; }
 .kv-row--block li { display: flex; align-items: flex-start; gap: 7px; font-size: 19px; line-height: 34px; color: #111; word-break: keep-all; }
 .kv-row--block li::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
@@ -551,22 +560,19 @@ body.menu-open { overflow: hidden; }
 
 .news-section { display: flex; flex-direction: column; gap: 14px; }
 
-/* 실시간 주요 뉴스 — 썸네일 없는 기사 카드 (2026-10-12 사용자: 리포트 뉴스 카드와 같은 디자인).
-   기사 하나가 카드 하나: 제목 18px·행간 24px(2026-10-12, 리포트와 같이) + 분류 라벨 14px, 아래 14px 보조 줄(출처 · 시각). 데스크톱 2열, 폰 1열 */
-.news-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.news-item {   /* 리포트 뉴스 카드와 같다: 제목 18px · 행간 34(본문), 보이는 위아래 14 (2026-10-12 사용자) */
-  margin: 0; padding: 15px 12px 20px;   /* 보이는 위아래 22 (콘텐츠 카드 여백, 2026-10-13 사용자) */
-  background: var(--surface); border: 1px solid #E2E8F0; border-radius: 8px;
-  font-size: 19px; line-height: 34px; color: #111; word-break: keep-all;
-}
-.news-item a { color: #111; }
+/* 실시간 주요 뉴스 — 증시 리포트 뉴스와 같은 구성 (2026-10-14 사용자: "홈 실시간 주요 뉴스도 증시 리포트 뉴스 구성 배치, 기사 제목 볼드").
+   카드 없이 기사 사이 1px 가로 구분선(위아래 보이는 27), 제목 19px 굵게 · 행간 34(원문 링크), 아래 14px 보조 줄(출처 · 시각), 맨 아래 라벨 줄(여백 없이 왼쪽, 위 8). 한 열 — design_kit.item_rules() */
+.news-list { display: flex; flex-direction: column; }
+.news-item { margin: 0; padding: 20px 0 25px; border-top: 1px solid #E2E8F0; font-size: 19px; line-height: 34px; color: #111; word-break: keep-all; }
+.news-item:first-child { padding-top: 2px; border-top: 0; }
+.news-item a { color: #111; font-weight: 700; }
 .news-item a:hover { color: var(--accent); }
-.news-tag {   /* 배경색 있는 가이드 라벨 (2026-10-13 사용자) */
-  display: inline-block; margin-left: 4px; padding: 3px 5px 2px;
-  border: 1px solid #93C5FD; border-radius: 4px;
-  font-size: 14px; font-weight: 400; line-height: 1; color: #1D4ED8; background: #EFF6FF;
-  white-space: nowrap; vertical-align: middle;
+.news-tag {   /* 영역 라벨 (가이드 5절): 회색 외곽선 · 흰 바탕 · 14px, 줄에 홀로 놓여 여백 없음 */
+  display: inline-block; padding: 3px 5px 2px;
+  border: 1px solid #CBD5E1; border-radius: 4px; background: #fff;
+  font-size: 14px; font-weight: 400; line-height: 1; color: #334155; white-space: nowrap;
 }
+.news-labels { display: block; margin-top: 8px; line-height: 1; }
 .news-sub { margin-top: 2px; font-size: 14px; line-height: 20px; color: #7A7A7A; }
 .news-sub .num { margin-left: 6px; }
 .news-item.load-status { color: var(--gray-400); }
@@ -657,7 +663,7 @@ body.menu-open { overflow: hidden; }
   .search-bar.is-open { display: flex; }
   /* 세 카드가 좁아지면 두 칸 + 셋째(엔비디아)는 전폭 */
   .briefing-main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  #nvda-card { grid-column: 1 / -1; }
+  .briefing-main > .report-col:last-child { grid-column: 1 / -1; }   /* 셋째 카드(트럼프, 2026-10-14 순서)는 전폭 */
 }
 
 @media (max-width: 900px) {
@@ -688,7 +694,7 @@ body.menu-open { overflow: hidden; }
   .nav-close { display: flex; }
 
   .briefing-main { grid-template-columns: minmax(0, 1fr); }
-  #nvda-card { grid-column: auto; }
+  .briefing-main > .report-col:last-child { grid-column: auto; }
 }
 
 @media (max-width: 680px) {
@@ -697,7 +703,6 @@ body.menu-open { overflow: hidden; }
   body:not(.item-view) .navbar { padding-left: 10px; padding-right: 10px; }
   /* 홈(대시보드)에서는 카드가 화면 가장자리에서 10px (2026-10-10 사용자). 글 보기는 20px 별도 규칙 */
   body:not(.item-view) .main-content { padding-left: 10px; padding-right: 10px; }
-  .news-list { grid-template-columns: minmax(0, 1fr); }
   .sector-card .sector-table { margin: 0 12px; width: calc(100% - 24px); }
   .tabs { overflow-x: auto; }
   .tab { padding: 8px 13px 0; }   /* 폰 탭 사이 24 → 26 (+10%) */
@@ -829,7 +834,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title .title-logo { width: 32px; height: 32px; border-radius: 8px; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
 @media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } }
 /* 글 제목 끝의 " — 날짜"는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다 */
-.post-title .post-title-date, .post-card-title .post-title-date, .recent-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
+.post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
 .post-title .post-title-date { font-size: 14px; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
 /* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
    제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄에 날짜 왼쪽 · 버튼 오른쪽 */
@@ -1106,12 +1111,6 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments a.comment-write-btn { display: block; padding: 11px 12px; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: #111; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }
 .comments a.comment-write-btn:hover { border-color: #111; color: #111; }
 
-/* 홈 최근 리포트 — 글 링크 줄 카드, 가로 구분선 콘텐츠 카드 여백(보이는 22, 2-1) (2026-10-13 사용자, 디자인 가이드 10-5) */
-.recent-section { display: flex; flex-direction: column; gap: 14px; }
-.recent-card { background: var(--surface); border: 1px solid #E2E8F0; border-radius: 8px; }
-.recent-row { display: block; padding: 19px 12px; border-top: 1px solid #E2E8F0; font-size: 19px; line-height: 24px; color: #111; word-break: keep-all; }
-.recent-row:first-child { border-top: 0; }
-.recent-row:hover { color: var(--accent); }
 
 /* 레이아웃 모드에서만 보이는 보관용 위젯 */
 .hidden-widgets { display: none; }
@@ -1262,6 +1261,15 @@ body.no-dashboard .main-content { padding-top: 32px; }
               </a>
               </div>
 
+              <!-- 엔비디아 데일리 (2026-10-11). 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
+              <div class='report-col'>
+              <h3 class='report-title'><span class='report-icon' style='background:#76B900;' aria-hidden='true'><img src='https://financialmodelingprep.com/image-stock/NVDA.png' alt='' onerror='this.hidden=true'/></span>엔비디아 리포트<span class='report-card-date' data-date='nvda-card'></span></h3>
+              <a class='report-card' id='nvda-card' href='/search/label/엔비디아'>
+                <!-- 가격 줄 → 거래량 · 변동폭 · 20일 평균 · RSI 14 한 줄(세로 구분선) → 중요 이슈 라벨 + 글머리표 (2026-10-14 사용자) -->
+                <div class='kv-rows' data-hook='nvda-rows'><div class='kv-row'><span class='kv-name'>리포트를 불러오는 중…</span></div></div>
+              </a>
+              </div>
+
               <!-- 트럼프 트렌드 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
               <div class='report-col'>
               <h3 class='report-title'><span class='report-icon' style='background:#C2410C;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'><path d='M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z'/></svg></span>트럼프 SNS 트렌드<span class='report-card-date' data-date='trump-card'></span></h3>
@@ -1278,15 +1286,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
                     <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
                   </div>
                 </div>
-              </a>
-              </div>
-
-              <!-- 엔비디아 데일리 (2026-10-11). 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
-              <div class='report-col'>
-              <h3 class='report-title'><span class='report-icon' style='background:#76B900;' aria-hidden='true'><img src='https://financialmodelingprep.com/image-stock/NVDA.png' alt='' onerror='this.hidden=true'/></span>엔비디아 리포트<span class='report-card-date' data-date='nvda-card'></span></h3>
-              <a class='report-card' id='nvda-card' href='/search/label/엔비디아'>
-                <!-- 가로 구분선 줄: 가격 · 거래량 · 변동폭 · 시가 갭 · RSI · 중요 이슈 — 줄마다 왼쪽 정보명 · 오른쪽 값 (2026-10-13 사용자) -->
-                <div class='kv-rows' data-hook='nvda-rows'><div class='kv-row'><span class='kv-name'>리포트를 불러오는 중…</span></div></div>
               </a>
               </div>
             </div>
@@ -1436,17 +1435,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
                 </b:loop>
               </div>
             <b:elseif cond='data:view.isHomepage'/>
-              <b:comment>홈 위 카드는 JS가 피드에서 채워 검색엔진이 글로 가는 링크를 못 본다. 최근 글 링크를 HTML 로 둔다 (2026-10-13 사용자, 디자인 가이드 10-5).</b:comment>
-              <section class='recent-section' aria-labelledby='recent-title'>
-                <div class='section-head'><h2 class='section-title' id='recent-title'>최근 리포트</h2></div>
-                <div class='recent-card'>
-                  <b:loop index='i' values='data:posts' var='post'>
-                    <b:if cond='data:i lt 6'>
-                      <a class='recent-row' expr:href='data:post.url'><span class='recent-title'><data:post.title/></span></a>
-                    </b:if>
-                  </b:loop>
-                </div>
-              </section>
+              <b:comment>홈 아래 최근 리포트 링크 영역은 삭제 (2026-10-14 사용자). 홈은 위 대시보드만.</b:comment>
             <b:else/>
               <section class='reports'>
                 <div class='section-head'>
@@ -2177,13 +2166,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
             /* 종목명 */
             var tdName = el('td', 'col-name');
             var cell = el('div', 'stock-cell');
-            /* 티커 로고 — 못 받으면 머리글자 원 (2026-10-13 사용자) */
-            var av = el('span', 'stock-avatar', initials(s.s));
-            av.style.background = meta.color;
-            var im = document.createElement('img'); im.alt = ''; im.width = 26; im.height = 26; im.loading = 'lazy';
+            /* 티커 로고 (2026-10-14 사용자) — 처음부터 아바타 안에 둔다. 못 받으면 머리글자 원.
+               예전엔 화면 밖 lazy 이미지의 onload 를 기다렸는데, 문서에 붙지 않은 lazy 이미지는 크롬이 불러오지 않아 늘 머리글자만 보였다 */
+            var av = el('span', 'stock-avatar');
+            var im = document.createElement('img'); im.alt = ''; im.width = 26; im.height = 26;
             im.style.cssText = 'width:26px;height:26px;display:block;';
-            im.onload = function () { av.textContent = ''; av.style.background = '#F1F5F9'; av.appendChild(im); };
+            im.onerror = (function (av, sym, color) { return function () { av.textContent = initials(sym); av.style.background = color; }; })(av, s.s, meta.color);
             im.src = LOGO_URL.replace('{sym}', s.s);
+            av.appendChild(im);
             var label = el('span', 'stock-label');
             label.appendChild(el('span', 'stock-name', meta.name));
             label.appendChild(el('span', 'stock-ticker', s.s));
@@ -2313,20 +2303,23 @@ body.no-dashboard .main-content { padding-top: 32px; }
               'ALPHASCOPE 실시간 뉴스: ' + line + '  ·  ' +
               'ALPHASCOPE 실시간 뉴스: ' + line + '  ·  ';
 
-            /* 기사 카드 — 썸네일 없음, 기사 하나가 카드 하나 (2026-10-12 사용자) */
+            /* 기사 목록 — 썸네일 없음, 기사 사이 가로 구분선 (2026-10-14 사용자) */
             var list = document.getElementById('news-list');
             if (!list) return;
             list.textContent = '';
             items.slice(0, 8).forEach(function (it) {
+              /* 증시 리포트 뉴스 구성: 굵은 제목(원문 링크) → 보조 줄(출처 · 시각) → 맨 아래 라벨 줄 (2026-10-14 사용자) */
               var card = el('article', 'news-item');
               var a = el('a', null, it.title);
               if (it.link) { a.href = it.link; a.target = '_blank'; a.rel = 'noopener'; }
               card.appendChild(a);
-              card.appendChild(el('span', 'news-tag', newsCategory(it)));
               var sub = el('div', 'news-sub');
               sub.appendChild(el('span', null, it.source || 'CNBC'));
               sub.appendChild(el('span', 'num', hhmm(kstTime(it.published))));
               card.appendChild(sub);
+              var labs = el('span', 'news-labels');
+              labs.appendChild(el('span', 'news-tag', newsCategory(it)));
+              card.appendChild(labs);
               list.appendChild(card);
             });
           })
@@ -2546,22 +2539,30 @@ body.no-dashboard .main-content { padding-top: 32px; }
               if (name && val && !(name in kv)) kv[name.replace(/\s*\(.*$/, '')] = val;
             });
           });
-          var rows = [['가격', kv['NVDA']], ['거래량', kv['거래량']], ['일중 변동폭', kv['일중 변동폭']], ['시가 갭', kv['시가 갭']], ['RSI 14', kv['RSI 14']]];
+          /* 가격 줄 + 네 정보(거래량 · 변동폭 · 20일 평균 · RSI 14). 시가 갭은 홈에서 뺐다 (2026-10-14 사용자) */
+          var rows = [['가격', kv['NVDA']], ['거래량', kv['거래량']], ['변동폭', kv['일중 변동폭']], ['20일 평균', kv['20일 평균']], ['RSI 14', kv['RSI 14']]];
           return rows.filter(function (r) { return r[1]; });
         }
         function fillNvda(sec) {
           var box = document.querySelector('[data-hook="nvda-rows"]');
           if (!box) return;
           box.textContent = '';
-          nvdaRows(sec).forEach(function (r) {
-            var row = el('div', 'kv-row'), v = el('span', 'kv-value', r[1]);
-            var up = /▲/.test(r[1]), dn = /▼/.test(r[1]);
-            if (up !== dn) v.className += up ? ' up' : ' down';   /* 값만 증감 색 — 카드의 이름 칸은 칠하지 않는다 (3-3) */
-            row.appendChild(el('span', 'kv-name', r[0])); row.appendChild(v); box.appendChild(row);
+          function tone(t) { var up = /▲/.test(t), dn = /▼/.test(t); return up !== dn ? (up ? ' up' : ' down') : ''; }   /* 값만 증감 색 (3-3) */
+          var rows = nvdaRows(sec), stats = el('div', 'kv-stats');
+          rows.forEach(function (r) {
+            if (r[0] === '가격') {
+              var row = el('div', 'kv-row');
+              row.appendChild(el('span', 'kv-name', r[0])); row.appendChild(el('span', 'kv-value' + tone(r[1]), r[1])); box.appendChild(row);
+              return;
+            }
+            var c = el('div', 'kv-stat');
+            c.appendChild(el('span', 'kv-stat-name', r[0])); c.appendChild(el('span', 'kv-stat-value' + tone(r[1]), r[1].replace(/\s+/g, ' ')));
+            stats.appendChild(c);
           });
+          if (stats.children.length) box.appendChild(stats);
           var issues = linesOf(sec['중요 이슈'] || []).slice(0, 3);
           if (issues.length) {
-            var ir = el('div', 'kv-row kv-row--block'); ir.appendChild(el('span', 'kv-name', '중요 이슈'));
+            var ir = el('div', 'kv-row kv-row--block'); ir.appendChild(el('span', 'badge badge--nvda-today', '중요 이슈'));
             var ul = el('ul'); issues.forEach(function (t) { ul.appendChild(tinted(t)); }); ir.appendChild(ul); box.appendChild(ir);
           }
           if (!box.children.length) box.appendChild(el('div', 'kv-row', LOAD_FAILED));
@@ -2764,7 +2765,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
          "미국 증시 데일리 브리핑 — 2026년 10월 11일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양은 테마 CSS. */
       (function () {
         'use strict';
-        [].slice.call(document.querySelectorAll('.post-title, .post-card-title, .recent-title')).forEach(function (h) {   /* .recent-title: 홈 최근 리포트 (2026-10-13) */
+        [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
           var host = h.querySelector('a') || h;
           if (host.children.length) return;
           var m = /^(.*\S)\s+([—–-]\s*\d{4}\s*년.*)$/.exec(host.textContent.trim());

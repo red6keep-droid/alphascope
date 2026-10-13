@@ -160,7 +160,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title .title-logo { width: 32px; height: 32px; border-radius: 8px; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
 @media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } }
 /* 글 제목 끝의 " — 날짜"는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다 */
-.post-title .post-title-date, .post-card-title .post-title-date, .recent-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
+.post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
 .post-title .post-title-date { font-size: 14px; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
 /* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
    제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄에 날짜 왼쪽 · 버튼 오른쪽 */
@@ -437,12 +437,6 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments a.comment-write-btn { display: block; padding: 11px 12px; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: #111; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }
 .comments a.comment-write-btn:hover { border-color: #111; color: #111; }
 
-/* 홈 최근 리포트 — 글 링크 줄 카드, 가로 구분선 콘텐츠 카드 여백(보이는 22, 2-1) (2026-10-13 사용자, 디자인 가이드 10-5) */
-.recent-section { display: flex; flex-direction: column; gap: 14px; }
-.recent-card { background: var(--surface); border: 1px solid #E2E8F0; border-radius: 8px; }
-.recent-row { display: block; padding: 19px 12px; border-top: 1px solid #E2E8F0; font-size: 19px; line-height: 24px; color: #111; word-break: keep-all; }
-.recent-row:first-child { border-top: 0; }
-.recent-row:hover { color: var(--accent); }
 
 /* 레이아웃 모드에서만 보이는 보관용 위젯 */
 .hidden-widgets { display: none; }
@@ -636,17 +630,7 @@ __DASHBOARD__
                 </b:loop>
               </div>
             <b:elseif cond='data:view.isHomepage'/>
-              <b:comment>홈 위 카드는 JS가 피드에서 채워 검색엔진이 글로 가는 링크를 못 본다. 최근 글 링크를 HTML 로 둔다 (2026-10-13 사용자, 디자인 가이드 10-5).</b:comment>
-              <section class='recent-section' aria-labelledby='recent-title'>
-                <div class='section-head'><h2 class='section-title' id='recent-title'>최근 리포트</h2></div>
-                <div class='recent-card'>
-                  <b:loop index='i' values='data:posts' var='post'>
-                    <b:if cond='data:i lt 6'>
-                      <a class='recent-row' expr:href='data:post.url'><span class='recent-title'><data:post.title/></span></a>
-                    </b:if>
-                  </b:loop>
-                </div>
-              </section>
+              <b:comment>홈 아래 최근 리포트 링크 영역은 삭제 (2026-10-14 사용자). 홈은 위 대시보드만.</b:comment>
             <b:else/>
               <section class='reports'>
                 <div class='section-head'>
@@ -1585,14 +1569,6 @@ __NAVBAR__
 <main class="main-content">
   <div id="pv-dashboard">
 __DASHBOARD__
-  <section class="recent-section">
-    <div class="section-head"><h2 class="section-title">최근 리포트</h2></div>
-    <div class="recent-card">
-      <a class="recent-row" href="#"><span class="recent-title">엔비디아 리포트 — 2026년 10월 13일</span></a>
-      <a class="recent-row" href="#"><span class="recent-title">트럼프 SNS 트렌드 — 2026년 10월 13일</span></a>
-      <a class="recent-row" href="#"><span class="recent-title">미국 증시 리포트 — 2026년 10월 13일</span></a>
-    </div>
-  </section>
   </div>
 
 __REPORTS__

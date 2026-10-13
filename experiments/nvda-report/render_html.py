@@ -25,6 +25,7 @@ H2 = f"color:#111;font-size:{_dk.H2_SIZE};font-weight:700;line-height:{_dk.LH_H2
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"   # 구분선 위 여백 8 → 6 (20% 줄임, 2026-10-11)
 _NO_LINE_START = re.compile(r'^\s*(<div style="(?:overflow-x:auto;|background:)|<div data-cards|<img\b)')   # 표 래퍼 · 카드 · 카드 묶음 · 그림
 UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
+VAL = f"font-size:{_dk.CHG_SIZE};"   # 흰 카드 오른쪽 정보 17px — 강조(색 배경) 카드 제외 (2026-10-13 사용자, 가이드라인 10-7)
 SUB = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
 # 글자 크기 체계 (디자인-가이드라인.md 3절): 본문은 바깥 div의 18px 하나 — 강조한다고 키우지 않는다. 라벨·날짜는 한 단계 작게(16px), 안내 글·범례·면책은 두 단계 작게(14px)
 SMALL, TINY = "19px", "14px"   # 본문 19 (2026-10-13 사용자)   # 안내 글(14px)을 빼고 모두 18px (2026-10-12 사용자)
@@ -259,7 +260,7 @@ def _multi(rows):
     out = ""
     for i, (name, value_html) in enumerate(rows):
         out += (f'<span style="{MULTI_ROW}{MULTI_SEP if i else ""}"><span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.NAME};">{_name(name)}</span> '
-                f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 줄 사이 공백: 홈 카드가 한 줄로 읽을 때 단어를 띄운다
+                f'<span style="{COL_R}{VAL}font-weight:700;">{value_html}</span></span> ')   # 줄 사이 공백: 홈 카드가 한 줄로 읽을 때 단어를 띄운다
     return f'<span data-grid="2" style="{MULTI}">{out}</span> '   # data-grid=2: 데스크톱에서 테마 CSS가 2열 + 가운데 세로 구분선 (2026-10-11 사용자)
 
 
@@ -274,7 +275,7 @@ def _name(name):
 
 def _multi2(items):
     """E타입 2열 멀티 카드 — design_kit.multi2 와 같다: 폰에서도 2열, 값이 안 들어가면 칸 안 다음 줄 오른쪽 (2026-10-12 사용자)."""
-    return _dk.multi2(items)
+    return _dk.multi2([(it[0], f'<span style="{VAL}">{it[1]}</span>') + tuple(it[2:]) for it in items])   # 오른쪽 값 17px (2026-10-13 사용자)
 
 
 def sec_headline(a):
@@ -629,7 +630,7 @@ def _crow(name_html, value_html, sub="", first=False, left=None, short=False):
     """C 카드의 한 줄 (가이드라인 2-1): 왼쪽 구분명(굵게) + 그 아래 보조 줄(14px #999), 오른쪽 값. 줄 사이 가로 구분선."""
     return (f'<span style="{MULTI_ROW}{"" if first else MULTI_SEP}">'
             f'<span style="display:block;line-height:{LH_CARD};{_dk.COL_L75 if short else COL_L}">{_dk.crow_left(name_html, sub, 80 if short else 65)}</span> '
-            f'<span style="{COL_R}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 5자 미만이면 80 · 20 (2026-10-11 사용자)
+            f'<span style="{COL_R}{VAL}font-weight:700;">{value_html}</span></span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 5자 미만이면 80 · 20 (2026-10-11 사용자)
 
 
 def _ccard(rows, left=None):
@@ -657,7 +658,7 @@ def _gcard(rows):
                   f'<span style="display:block;{COL_L}font-size:{_dk.NAME};">'
                   f'<span style="display:block;"><span style="{CAL_DATE}">{date_html}</span></span> '
                   f'<span style="display:block;">{name_html}{" " + label_html if label_html else ""}</span>{sub_html}</span> '   # 라벨은 내용 끝 — 뉴스 라벨과 같은 모양·자리 (2026-10-12 사용자)
-                  f'<span style="{COL_R}font-weight:700;">{right_html}</span></span> ')
+                  f'<span style="{COL_R}{VAL}font-weight:700;">{right_html}</span></span> ')
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{inner}</span></div>'
 
 
@@ -783,7 +784,7 @@ def sec_targets(a):
     gap = lambda v: _arrow((v / close - 1) * 100, 1) if close else ""
     # 목표가 줄은 값 `$329 · 현재가 대비 ▲ 43.4%` 를 한 줄로 (2026-10-12 사용자) — 이름은 글자 폭만, 값은 남은 폭 줄바꿈 없이, `· 현재가 대비` 14px
     tl = f"flex:none;font-weight:700;color:#111;font-size:{_dk.NAME};"
-    tr = "flex:1 1 0;min-width:0;text-align:right;white-space:nowrap;font-weight:700;"
+    tr = f"flex:1 1 0;min-width:0;text-align:right;white-space:nowrap;font-weight:700;{VAL}"
     vs = f'<span style="color:{SUB};font-weight:400;font-size:{TINY};">· 현재가 대비</span>'
     rc = (cells.get("rating_counts") or {}).get("value") or {}
     n = sum(rc.values()) if rc else 0
@@ -797,7 +798,7 @@ def sec_targets(a):
         # 평균 등급 (2026-10-11 사용자: 네이버 컨센서스처럼 한 숫자로) — 강매수 5 … 강매도 1 가중 평균. 애널리스트 의견의 평균이지 리포트의 판단이 아니다
         mean_r = sum(w * rc.get(k, 0) for k, w in (("strongBuy", 5), ("buy", 4), ("hold", 3), ("sell", 2), ("strongSell", 1))) / n
         summary += (f'<span style="{MULTI_ROW}padding:{_dk.SEP_GAP - _dk.VP - 1}px 0 0;{MULTI_SEP}"><span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.NAME};">{_paren("평균 등급 (강매수 5 · 강매도 1)")}</span> '
-                    f'<span style="{COL_R}font-weight:700;display:inline-flex;align-items:center;justify-content:flex-end;">{mean_r:.1f}&nbsp;<span style="color:{MUTED};font-weight:400;">/ 5</span>{ACC_BTN}</span></span>')
+                    f'<span style="{COL_R}{VAL}font-weight:700;display:inline-flex;align-items:center;justify-content:flex-end;">{mean_r:.1f}&nbsp;<span style="color:{MUTED};font-weight:400;">/ 5</span>{ACC_BTN}</span></span>')
     else:
         summary += f'<span style="display:flex;justify-content:flex-end;padding:4px 0 0;">{ACC_BTN}</span>'
     # 펼친 상태: 목표가 중앙·최고·최저 (평균 줄과 같은 모양)
@@ -851,9 +852,8 @@ def sec_narrative(a, n):
     areas = "|".join(re.escape(v) for v in rr.AREA_KO.values())
     lines = [re.sub(rf"^({areas})\s+(?!·)", r"\1 · ", t) for t in n["today"]]   # 영역 머리 뒤 구분점 보정
     lis = "".join(_dot_li(_esc(t), size=3, lh=_dk.LH_BODY, margin=_dk.LI_MARGIN) for t in lines)   # 18px 글 → 3px 점 (2026-10-12 사용자)
-    # 내용은 흰 카드 안 (2026-10-13 사용자: "중요 이슈의 내용 부분만 카드 디자인") — 보이는 위아래 14 = padding 14 − 행간 반쪽 7, 첫 · 끝 글머리표 margin 은 음수 margin 으로
-    return (f'<div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 14px;margin:0 0 8px;line-height:{_dk.LH_BODY};">'   # 보이는 위아래 22 (콘텐츠 카드, 2026-10-13 사용자)
-            f"<ul style='margin:-12px 0;padding:0;list-style:none;'>{lis}</ul></div>")
+    # 카드 없이 본문 글머리표 — 제목 아래 구분선은 _section 이 긋는다 (2026-10-13 사용자: "중요 이슈 카드 디자인 삭제하고 타이틀 아래 구분선")
+    return _dk.dot_ul([lis])
 
 
 def sec_footer(a):
