@@ -161,6 +161,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 @media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } }
 /* 글 제목 끝의 " — 날짜"는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다 */
 .post-title .post-title-date, .post-card-title .post-title-date, .recent-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
+.post-title .post-title-date { font-size: 14px; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
 /* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
    제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄에 날짜 왼쪽 · 버튼 오른쪽 */
 .post-title:has(.post-title-meta) { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; }
