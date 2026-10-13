@@ -1,82 +1,73 @@
-# 엔비디아 데일리 — 2026년 10월 12일
-_기준 거래일(뉴욕) 2026-10-09_
+# 엔비디아 리포트 — 2026년 10월 13일
+_기준 거래일(뉴욕) 2026-10-12_
 
 > 🧪 **테스트 운영 중** — 이 리포트는 테스트 운영 중입니다. 수집·판정 규칙과 문구가 바뀔 수 있고, 일부 칸은 데이터가 쌓이는 중이라 비어 있습니다. 빈 칸에는 이유와 채워질 시점을 적어 두었습니다.
-> ⚠️ 기사 1건이 아직 분류되지 않아 오늘 항목이 불완전할 수 있다.
 
 ## ① 오늘 한 줄
-**NVDA $229.28 (-0.52%)** · SPY 대비 -1.12%p · SMH 대비 +0.13%p · AMD 대비 +1.51%p · AVGO 대비 -0.91%p · 거래량 20일 평균의 0.77× · 시장 국면 상승 추세 (S&P 500 고점 대비 -0.1%) · 반도체 자금 모이는 중 (SMH 20일 S&P 대비 +4.3%p · 앞선 섹터 기술, 헬스케어)
+**NVDA $226.32 (-1.29%)** · SPY 대비 -1.23%p · SMH 대비 +0.75%p · AMD 대비 +0.99%p · AVGO 대비 +0.59%p · 거래량 20일 평균의 0.64× · 시장 국면 상승 추세 (S&P 500 고점 대비 -0.1%) · 반도체 자금 모이는 중 (SMH 20일 S&P 대비 +6.9%p · 앞선 섹터 기술, 헬스케어)
 
-## ② 오늘 바뀐 것 (19건)
-- `법무` 부정 · **슈퍼마이크로 하청업체가 엔비디아 AI 서버의 중국 불법 수출 혐의에 대해 유죄를 인정했다.** [OECD AI Policy Observatory: Super Micro Contractor Pleads Guilty to Illegal Export of Nvidia AI Se](https://news.google.com/rss/articles/CBMiV0FVX3lxTFB0MlQ2QzFnQmpfSkN1ZkZVWDduZFgwbUZXRzJJWVFRanJ4aUNrYzQxNHNMVkRaeFdRdE9KT3dSZ2ZQTE1QYVlYNEtDQnpQbVVaZ0lCdDI0NA?oc=5) (2026-10-09)
-- `기업` 긍정 · **엔비디아가 미국 과학 기술 연구 지원을 위해 향후 5년간 10억 달러를 지원하기로 발표했다.** [NVIDIA 뉴스룸: NVIDIA Commits $1 Billion to Advance US Science Over the Next Five Yea](https://nvidianews.nvidia.com/news/nvidia-commits-1-billion-to-advance-us-science-over-the-next-five-years) (2026-10-08)
-- `제품` 불확실 · **엔비디아가 AI 데이터센터용 GPU 생산을 위해 지포스 RTX 5090 생산을 중단한 것으로 전해졌다.** [Tom's Hardware: Nvidia reportedly halts GeForce RTX 5090 production in favor of AI dat](https://news.google.com/rss/articles/CBMi5AJBVV95cUxQSjBCd255Y1gyWXBvSnlpVW4xNHVteF9MTG40Yngxdml6SnJ2R2JoNkF4OTdzMGJ1dkRIaVNoVlc0MnItdkNCTV9QX2FscW4zRGw1UkFTV285VW9DZS0tWmNXdmR2dUtCNmh6dWRWcmxSN3lVWDVhZ01qNUxGZ2k1bW03LWZPWndlX3NXcENxczczNUJNSUU4OHNzN3pQbmlkMmpPM2xfVXA1Z1E0b2dsMUZ4UXRGUkJ5aWh5MnVMUjZuNDMyeHBOUFdjNEJ1X3V2Wm1seDlfWHpEbC1idlR3RFhIMzhvTzRhYXFYWF91UEhXTEpfMldZUXNhMmt6Vmtsa0dnQ1B3eS15X0tmVEFXYWo5RFlUZWl6b21LTUtGM3FQbjJ0eFZscy1IOE9LaEdWb3F2Nnd4TWVXcnBKN2J1TTNzbEhaQ0ExVEpYQTRuaEhOLWg1elY2U0pYc3dvdHBac0JLLQ?oc=5) (2026-10-10)
-- `기업` 부정 · **엔비디아의 기업 커뮤니케이션 총괄이 임명 약 4개월 만에 사임했다.** [Business Insider: Nvidia's head of corporate communications has left after roughly four ](https://news.google.com/rss/articles/CBMipwFBVV95cUxQaWQ4dnk4UGVwYTd3OXhhZnlMdjJtbUtCeDVyY2VrMHZaWW83T1R1cTU0YTlscDRfR1NpeVYzb0VPOTlhdkQ2UkNUSjdYQzhRdWRxRERpUFNaMzlhdWc1WkpEVHRyRUpXejRId3JuWXBPUnlVdVRPcFdXc2d5Ymd5THRuYldnUWFTWlJsVk1MYllLUUhWMkNiQ2x0dXEtaDlvYVA3Q0ZnMA?oc=5) (2026-10-09)
-- `수급` 중립 · Form 4 — COXE TENCH (이사): 증여 [출처](https://www.sec.gov/Archives/edgar/data/1045810/000119764726000011/xslF345X06/wk-form4_1791579847.xml) (2026-10-10)
-- `기업` 부정 · 엔비디아가 지원하는 퍼머스가 AI에 대한 감시 강화 속에 50억 달러 규모의 호주 기업공개를 철회했다. [Reuters: Nvidia-backed Firmus scraps $5 billion Australia IPO amid growing AI s](https://news.google.com/rss/articles/CBMivwFBVV95cUxQY21BNU1iQlJDajVWejFGYjVrM2J0cllKVmc5WEVZX2tMQnROZGFJRkRDekhCaFY0MzRnYXhYOGNaVi11cFlndVo5b1RIYUpaS25JbV92dVkwVEZpXzVaTWdtR3piN0d6SUI2OW9qaEI4eHVCV1VBQkFBWXhyemttZDlhMlFVa3hQdDhpWVZkLW95cmxNaEFzZGxWb2dzU3VPSzNlNTc4OEF5YXV1LVoxOHZuUzFsMTZfaDJuckx4UQ?oc=5) (2026-10-09)
-- `기업` 긍정 · 엔비디아가 칩 경쟁사인 디매트릭스에 투자하기로 결정했다. [The Information: Nvidia to Invest in Chip Rival d-Matrix as Its Challengers Choose Part](https://news.google.com/rss/articles/CBMipwFBVV95cUxPRmt5MUVxdjF6M2V6QlZPWVZyWVgwUWY2QzBiVE90elFIQ1Qxa0JYZVpEYmNUQTIwWEg4UzR5NUo3YWRSdEZzU0RoVzV6V2ZoVFJCYjBScWZ5Z29LVFVMTUJYTm03WjBxZFBmMWN6clFzRDlDamZ0N2c5dU9vcVBELTNwTmtIS3RDZ3h3czlyaElqMVQteTBWM0hObm5MN21iVTNmalRnbw?oc=5) (2026-10-08)
-- `제품` 긍정 · 네비우스가 엔비디아 HGX B300 기반의 엔비디아 이그젬플러 클라우드 인증을 획득했다. [Nebius: Nebius achieves NVIDIA Exemplar Cloud on NVIDIA HGX B300 for training ](https://news.google.com/rss/articles/CBMioAFBVV95cUxNeURpbWswRTRtQjJKZkN4TWQweDU3Y2t0eXpfd0tXV05UZGk2WW1uUGJvdzc5aUE4R295ajk4eXF1VVk1Mlk5U2UzSVNXd1ZUdDFBMVpWc0xrWTJOQzVSSVAxRGZNajhjdWRLQ2FtVTJhbXlPSzVJZi1MY3I0MmEyaGNPQU1Tc1FiaGdzOU1UVnFnU1VqSVNoNmJzcHVDTVNq?oc=5) (2026-10-08)
+## ② 오늘 바뀐 것 (11건)
+- `법무` 불확실 `정부·규제 당국` · **S.A. Jamendo가 엔비디아를 상대로 저작권 침해 소송을 제기했다.** [CourtListener: S.A. Jamendo v. NVIDIA Corporation (CAND 5:26-cv-11754)](https://www.courtlistener.com/docket/74950728/sa-jamendo-v-nvidia-corporation/) (2026-10-12)
+- `법무` 부정 `정부·규제 당국` · **Quartz는 슈퍼마이크로 계약자가 25억 달러 규모의 엔비디아 AI 서버를 중국에 밀수한 사실을 보도했다.** [Quartz: Super Micro contractor pleaded guilty to smuggling $2.5B in Nvidia AI ](https://news.google.com/rss/articles/CBMihwFBVV95cUxQOTRLZFJhaUh6NGFhdFVBekhsZjVoTW15NDREWFYyZ1RXTTJhRnBycUFqejdmODNHOFNkcUtfY3ptN3hRSTZiS1RSaEthTkQzekV6WGJtWXk3OC10MENsWXNRdUJ0MTI3eENHNVI1clJfM1BGS3RrOVZRaUJfT2hvcFl1OC1xZUU?oc=5) (2026-10-12)
+- `법무` 부정 `정부·규제 당국` · **China Economic Review는 계약자가 엔비디아 칩을 미국에서 중국으로 전송한 혐의에 대해 유죄를 인정했다고 보도했다.** [China Economic Review: Contractor pleads guilty to diverting Nvidia chips from US to China](https://news.google.com/rss/articles/CBMiogFBVV95cUxPeEo1ZzIyVjk1XzVEMkNlYy1GZ1ZBeGVpbXBna3dnbEMzWGZ5ZWd5OWQyVERhZlNFblIzZE1mVFVaTGlBWHBaS3RlNUk2SjRhanA4dWlVQjJseHNnSHZxN2EyVVpIZUtpQy1FYnhyRWFqRUdpcnl1N0dNTWJEajdmY1NpbS1oV0czQWR6Rlh2VGw5enowenJHS0hmUy0waVBMSEHSAacBQVVfeXFMT2gwY0UxOVBFQzRIMkM4YVJ6RXZYand3ODlGQVg3Q1l4X0VQYWloanlXUHl5TGh4cVplWFdWeVVJMHBPZGFtZUNUREwyanJyWUticXVjVElaT2RKbkQza1N0eWNhd1EyN0o2a2RhcWJZRWVoaVZ3b3p5NU5HcnEweGt3Y2s2bUlkcjZLX3VjTUR4UFV1X2paN3BzX3BHWDhOZllUYkJfV2s?oc=5) (2026-10-12)
+- `제품` 긍정 `엔비디아 임원` · **NVIDIA와 Cisco는 400Gb/s 레인 광모듈 USFP를 공동 발표했다.** [NVIDIA 뉴스룸: NVIDIA and Cisco Introduce New Pluggable Optics Form Factor to Scale A](https://nvidianews.nvidia.com/news/nvidia-and-cisco-introduce-new-pluggable-optics-form-factor-to-scale-ai-factories) (2026-10-12)
+- `제품` 중립 `엔비디아 임원` · NVIDIA 개발자 블로그는 ReplaySSM 기술을 소개했다. [NVIDIA Developer: ReplaySSM: Rethinking State Storage for Faster Hybrid-Model Decoding |](https://news.google.com/rss/articles/CBMipAFBVV95cUxQaExhQ2xYdmsyQUNRQ2hOa2F0MEJ3T05LR2llbVBiWE9kTmdjQ0cxNWljSXRnOWlPcTdZZ3RSQUMwdGNybXFLVHdIVHdpeHFDeVkxd1NOWkh4ZDR2SjFNZ0xjNjY4UXlrMzlOSWdVNXo0Q0pkTk0xREk2UlFtOU1lcjY0SFZ2YTFQSUVvTVBXejVkRGNmVF9Lc3dmTThsSGU0Z25iWg?oc=5) (2026-10-12)
+- `제품` 긍정 `엔비디아 임원` · NVIDIA 블로그는 OCP 서밋에서 Vera Rubin 아키텍처를 공개했다고 발표했다. [NVIDIA 블로그: OCP Global Summit: Amid Ecosystem Adoption, NVIDIA Opens Vera Rubin Ar](https://blogs.nvidia.com/blog/ocp-global-summit-vera-rubin-scale-ai-factories/) (2026-10-12)
+- `기업` 긍정 · Yahoo Finance는 NVIDIA·AMD·Google·Meta가 데이터센터 설계 청사진에 협력한다고 보도했다. [Yahoo Finance: Nvidia, AMD, Google, and Meta team up on global blueprint for data cen](https://news.google.com/rss/articles/CBMi0wFBVV95cUxPdFN3R3NFLVVVZE40T3c5ZmVhdzFFQ24taFViMElfVC1STTkwSWlIMHJ5X1BCZWJWQ2Vkck1EWklDS2Z1cEktb3NyY2FNMzBST2ozM08wUU44VnUwc3hKQ0pwT2JtQlpsd1RrMzlPbWh1UVQxM2Z1ZzRNclhCbTFMdDd0LU56MmRIYTM3cGpBZl9zaklycS1VMmlycHNPTGpQN21lNUxEbDVzMXByMDBrazZfbmRCLXlialBEbFVaN1N5SFRnRlRFOThFUXA0Yl9jdjNN?oc=5) (2026-10-12)
+- `제품` 부정 `고객·협력사` · Yahoo Finance는 마이크로소프트가 엔비디아 의존도를 낮추기 위해 Maia 300 AI 칩을 공개했다고 보도했다. [Yahoo Finance: Microsoft reveals Maia 300 AI chip as it works to reduce dependence on](https://news.google.com/rss/articles/CBMi2AFBVV95cUxPdzlOWjZPREptdmhCandwSVY1VlRpbGZfbTFKalh1a29UT192S0FiVnpQSHZKb1ZiRjRWQnVMLW5LdTVxUjBWbWM5VXl4czJnLWM4aFpnWU1NYk80VW5KYjJxQUt5THB5QkpVZkFXU2hNQ28wdlIwWmhyRENSTWY0d2phRklOb05XdFVaQS1YRFNyZHE3blRsYk12X2hZS0MySlBSb0ZUUGJPYS1rNUR1N0NCczZneFcyVUk1cTVSaXZURWVwTXV6SGJ6RG5TNzFOd1p2TDhodGM?oc=5) (2026-10-12)
 
-<details><summary>그 외 11건</summary>
+<details><summary>그 외 3건</summary>
 
-- `기업` 긍정 · 엔비디아가 지원하는 아이앰빅 테라퓨틱스가 기업공개를 추진한다. [Reuters: Nvidia-backed Iambic Therapeutics launches IPO as biotechs buck market](https://news.google.com/rss/articles/CBMixAFBVV95cUxOT2duSWZGV1gtNHhZUVRCMHQ4QTN4ZzAzOFR1QjVlbmNfdEYwRG9HRWc1ai1WUXV0TFlESmpzSnhQSW1jT2xDYmdhSXZrXzZTUFVyX1N5VFltX2VyVDZPeEUzZ0hxYnB1MmpYYVhvU3h0VlB3MjZrMThFZFhwMkk2cEw0eGdKSHdySTJEWTNsZklka25TamNFbG91UXRPSjJPYjl4d2JvREdwa2QyeTh5bHpRN3dmUXJzbXRUOFJacHpuM3M0?oc=5) (2026-10-08)
-- `수요` 긍정 · 엔비디아와 팔란티어가 소버린 AI 구축을 위해 협력한다. [Fast Company: Nvidia and Palantir plant a flag for sovereign AI inside 'the world's ](https://news.google.com/rss/articles/CBMihgFBVV95cUxOZER3ZzhjRXExd2N6dXo5RUFXUFJmbzJxWnF4VmN3WlZ0RmhxZ29oNlZnZUxwc242Q2FxdFo0eGVpYXIyNlhpYUpVd0YxQXhOOV9iQUM5ZVBFREdRVUg2QTItZFhNdEFtQ25aYk1VVFF0LTRZd1FSd3RSamJ2Q2x1VDV6cEJPUQ?oc=5) (2026-10-08)
-- `수급` 중립 · 트럼프 전 대통령이 젠슨 황 최고경영자 수상을 준비하며 엔비디아 주식 거래 내역을 공개했다. [Reuters: Trump discloses Nvidia stock trades as he prepares to honor CEO Huang](https://news.google.com/rss/articles/CBMirAFBVV95cUxPc0R0am1rbndOQjhQUzhJdTNHcXpnb3lDWFVteEs0SzJiVzc5cFNhMkNJZ2F5dzhjSTFlbFE1ZDRHNVE0MTNJM1phbUU1MVZXX0VkdmZoRUJDaU5OX3pPZ3V2bUZIaTMxZ0std2V2eVFyVUlaZGFXNjhCYTNtV1AxbnVsSlJnVXlWTW9JWWhiYTJaczdTR1JBcDNFaFg0YWRmZjRhZVR6c3dvd3pv?oc=5) (2026-10-08)
-- `기업` 긍정 · 엔비디아가 지원하는 업스케일 AI가 경쟁사 칩을 연결하는 플랫폼을 출시했다. [Reuters: Nvidia-backed Upscale AI launches platform to connect chips from rival](https://news.google.com/rss/articles/CBMiuAFBVV95cUxPeGdkZHlKUjgwWHQ4eXRUaTJZeFZBQkFLaENBNFYxTUh5SVFkaWNfVGh3MUtrcGdKYjZhWk03QlV1WV8zYmxkbl9fLVRIa0xwWlczbVRwVlRFUGZwMXFwM2lRck5BVmVhQ3JmVzNZS3U0OUpuLVdLU04wVVlkNE9jN2IyRW9YY0pla283VmJBa3FpVm5zX2xaQkw0X3JCcUx1djhraTRVTEQzeGJtNzZKQ3hLTHRRSUEt?oc=5) (2026-10-08)
-- `제품` 긍정 · 엔비디아 RTX 스파크 탑재 랩탑 제품 가격이 최고 7,000달러에 달한다. [The Verge: The first Nvidia RTX Spark laptops cost up to $7,000](https://news.google.com/rss/articles/CBMimwFBVV95cUxQaFZoOTBRZVdoeGMteUNPemoyTmdZMDBjSjFyaVRyNXl4OE1nTzJHRElYeTRNY01IM0xCcjg4RGJxenVkaVZnSUFwT0l3OXVYejJYYW9STlJaNE9yQWVoWVZzSnNGa08zdjJ1Z2FRcGV2ck02UFZ2eUdhSGFpMlBOLXFYcGs3YWhraHNyTjk2V2tCMl9ObmZQTXNmWQ?oc=5) (2026-10-07)
-- `제품` 긍정 · 마이크로소프트와 엔비디아가 RTX 스파크를 탑재한 서피스 랩탑 울트라를 2,599달러에 출시했다. [Tom's Hardware: Microsoft and Nvidia launch Surface Laptop Ultra with RTX Spark starti](https://news.google.com/rss/articles/CBMikwJBVV95cUxQeHJ0QXM4cldZUWlId2djUG5Mc3FFVHVkWmdCemplNko0bEZrY1RqU3RETzE3ZVk0a1NwbWQyZVJKTGxrUzBrUGNxbVNSQ1A2dUtCbE53aEZkQ0E1UjczUGFkRURIVVcxOWtFQ0ctM2dEZG5OOU52MEtNX2hIeVI5amtnZjA1bnBFMm1iVVo0WV9tTlkwMFhUamZCMEMxQnRwUVRMZ05fbUhTQTBEaHRSZkhsVGVfWE1uc0xtSzZlSFhIcFZFZVR1TzE5T1JfQkVRaXhHQ0VWSjVGbDhIenc2cl8yVE9BTWNFUlR0b1lYcHowYWVPTUIydjRFNUFGZUtlZjFZUzFVYUVWX3VWRXItUkNkOA?oc=5) (2026-10-07)
-- `수요` 긍정 · 스페이스엑스가 엔비디아 칩 구매를 위해 400억 달러 규모의 자금 조달을 추진 중이다. [Financial Times: SpaceX looks to raise $40bn to buy Nvidia chips](https://news.google.com/rss/articles/CBMihAFBVV95cUxQdThuRWl1b3NtaUE5aFhSeXVUY0xfYjhBZXJJaG1VWWR0QXBSQ2txLTBrbTlKNm9KQmtqcG95Y3BLNlRQZF96a004TS1xaGlyQUVUaEdqNXZOTzZwdC1IU001ZmM5a191dGNRYjNCWXkwcEk0cjVhams2WUc5aGMxek13b1U?oc=5) (2026-10-06)
-- `기업` 긍정 · 엔비디아가 지원하는 람다가 기업공개를 앞두고 40억 달러 자금 조달을 추진 중이다. [Reuters: Nvidia-backed Lambda targets $4 billion raise ahead of planned IPO, WS](https://news.google.com/rss/articles/CBMivgFBVV95cUxQR3dfcjJxclVWTV9faDZyaUpIZ3F3cl95X2dFdzRaN0IxTWFuX0VwdWFBeEFtdjdqNVlKRHVCNVUzZF9paU9Cb0F3Y1NLR1l1UnNMVXNudDVYTEg4SVlVSHl2b1QwWjR6WV92ZV92MEUzRnozaEx4cHF6ZURxdUY2VDNlWWZSaGIxX3hsWEsxalhvZjhpSk85dWEwNWN6U0ZKeUNPdklHYnZpQjlORGpKemZOY0NfWkZFWHdvUkd3?oc=5) (2026-10-06)
-- `제품` 긍정 · 엔비디아가 Call of Duty: Modern Warfare 4용 지포스 게임 레디 드라이버를 출시했다. [NVIDIA: GeForce Game Ready Driver For Call of Duty®: Modern Warfare 4® Release](https://news.google.com/rss/articles/CBMitgFBVV95cUxPUEtYWkRJUXRDOTVGMXJjWTJNdDdIUUh6OG83MGhrbDNZYWRYUTByM1ZvNDVjZUhRZmRuekNrQkkzTlN6N19zZHNvR3dqQURBTTY3eW9pUkhZSl9BY3g2czZlOHNkR2Q0S2x1TklhYjhYMXFheTNjS1VGR2IwTlNqaFRHWlMwRUxGVXJhRGtFeXdlOWFQTnVXaGl3c1NUZWxfRmdUZXhRdk9sU0xpTzVOT2Y1Tm0tdw?oc=5) (2026-10-06)
-- `기업` 긍정 · 엔비디아가 월드 모델을 개발하는 스타트업 리액터를 지원한다. [Fortune: Nvidia backs startup Reactor as buzz grows for world models](https://news.google.com/rss/articles/CBMijAFBVV95cUxNMEJqZ2o5Z3B2VnBpTXlHSEx5WksyMjl0eTg5WXlFUkFnMDY5cExqRFNlbnpZSVZwUy1nZ3RYSW0xeVRzT0N6cE9iYk1LUG8xRFg5c3JiVjhpT2dfVjc2N3BYeGpjS3M5Z0RzMVdIaS1ESlFjeUZMOUlQX0tjaDBRZnFGenN4c2syeHk0bw?oc=5) (2026-10-06)
-- `실적` 긍정 · 30일 주당순이익 예상 상향 35 · 하향 2 — 상향:하향 비 35:2 (임계 3:1)
+- `수급` 긍정 · 2026-10-16 $238 콜 미결제약정 3.3배 — 미결제약정 12,685 → 42,425 (임계 2.0배 · 미결제약정 ≥ 10,000)
+- `수급` 부정 · 2026-10-16 $222 풋 미결제약정 2.3배 — 미결제약정 5,112 → 11,800 (임계 2.0배 · 미결제약정 ≥ 10,000)
+- `수급` 긍정 · 2026-10-16 $232 콜 미결제약정 2.3배 — 미결제약정 17,359 → 39,819 (임계 2.0배 · 미결제약정 ≥ 10,000)
 
 </details>
 
 ## ③ 다가오는 것 (7일 이내 · 법원 일정 30일)
 | D-n | 날짜 | 종류 | 내용 |
 | --- | --- | --- | --- |
-| D+5 | 2026-10-14 | 소비자물가 (CPI) | CPI |
-| D+6 | 2026-10-15 | 고객·공급·동종 실적 | TSM 실적 (추정) |
-| D+7 | 2026-10-16 | 옵션 만기 | 월간 옵션 만기 |
+| D+2 | 2026-10-14 | 소비자물가 (CPI) | CPI |
+| D+3 | 2026-10-15 | 고객·공급·동종 실적 | TSM 실적 (추정) |
+| D+4 | 2026-10-16 | 옵션 만기 | 월간 옵션 만기 |
 
 ## ④ 상태판
 **가격·거래량**
 
 | 지표 | 값 |
 | --- | --- |
-| 종가 | $229.28 |
-| 등락 | -0.52% |
-| SPY 대비 | -1.12%p |
-| SMH 대비 | +0.13%p |
-| AMD 대비 | +1.51%p |
-| AVGO 대비 | -0.91%p |
-| 시가 갭 | +1.46% |
-| 일중 변동폭 | 2.1% |
-| 거래량 배수(20일) | 0.77× |
+| 종가 | $226.32 |
+| 등락 | -1.29% |
+| SPY 대비 | -1.23%p |
+| SMH 대비 | +0.75%p |
+| AMD 대비 | +0.99%p |
+| AVGO 대비 | +0.59%p |
+| 시가 갭 | -0.24% |
+| 일중 변동폭 | 1.7% |
+| 거래량 배수(20일) | 0.64× |
 
 **기술**
 
 | 지표 | 값 |
 | --- | --- |
-| 50일선 | $222.08 |
-| 200일선 | $202.15 |
-| 52주 고점 대비 | -5.79% |
-| RSI 14 (과열 70 · 침체 30) | 53.0 |
+| 50일선 | $222.59 |
+| 200일선 | $202.34 |
+| 52주 고점 대비 | -7.01% |
+| RSI 14 (과열 70 · 침체 30) | 49.4 |
 | 평균선 교차 (50·200일) | 오늘 교차 없음 |
 
 **옵션**
 
 | 지표 | 값 |
 | --- | --- |
-| 내재변동성 30일 (옵션 가격이 보는 변동 폭 · 연율) | 31.1% |
-| 변동성 순위 (최근 60일 중 · 0~100) | 60거래일 스냅샷이 쌓인 뒤 표시 (현재 1/60일) |
-| 실적 발표 예상 변동폭 | 9.5% |
-| 풋/콜 비율 (미결제약정) | 0.71 |
-| 풋/콜 비율 (거래량) | 0.71 |
-| 감마 노출 (부호만 · 근사) | 양(+) · $0.68B/1% |
+| 내재변동성 30일 (옵션 가격이 보는 변동 폭 · 연율) | 31.0% |
+| 변동성 순위 (최근 60일 중 · 0~100) | 60거래일 스냅샷이 쌓인 뒤 표시 (현재 2/60일) |
+| 실적 발표 예상 변동폭 | 9.3% |
+| 풋/콜 비율 (미결제약정) | 0.72 |
+| 풋/콜 비율 (거래량) | 0.64 |
+| 감마 노출 (부호만 · 근사) | 양(+) · $0.55B/1% |
 | 감마 전환 가격 | $230 |
-| 콜 최다 미결제 행사가 | $220 |
+| 콜 최다 미결제 행사가 | $245 |
 | 풋 최다 미결제 행사가 | $220 |
 
 **예상 실적**
@@ -94,7 +85,7 @@ _기준 거래일(뉴욕) 2026-10-09_
 
 | 지표 | 값 |
 | --- | --- |
-| 등급 분포 | 강매수 10 · 매수 48 · 보유 2 · 매도 1 |
+| 등급 분포 | 강매수 10 · 매수 49 · 보유 2 · 매도 1 |
 | 목표가 평균 | $329 |
 | 목표가 중앙 | $315 |
 | 목표가 최고 | $515 |
@@ -104,29 +95,29 @@ _기준 거래일(뉴욕) 2026-10-09_
 
 | 지표 | 값 |
 | --- | --- |
-| SMH 발행주식수 (반도체 ETF 자금 유입) | 11,670,900 |
+| SMH 발행주식수 (반도체 ETF 자금 유입) | yfinance ETF 정보에서 받지 못함 — 다음 실행에서 재시도 |
 | SOXX 발행주식수 (반도체 ETF 자금 유입) | 7,650,000 |
-| 공매도 잔고 | 294.2M주 |
-| 공매도 비율 (유통주식 대비) | 1.27% |
-| 공매도 기준일 | 2026-09-15 |
-| 장외 공매도 비율 (FINRA 보고 장외 거래 중 공매도, 당일) | 48.2% |
-| 장외 공매도 비율 20일 평균 | 43.2% |
+| 공매도 잔고 | 311.4M주 |
+| 공매도 비율 (유통주식 대비) | 1.34% |
+| 공매도 기준일 | 2026-09-30 |
+| 장외 공매도 비율 (FINRA 보고 장외 거래 중 공매도, 당일) | 41.6% |
+| 장외 공매도 비율 20일 평균 | 43.7% |
 
 **주가 수준**
 
 | 지표 | 값 |
 | --- | --- |
-| 선행 주가수익비율 (주가 ÷ 12개월 예상 주당순이익) | 14.4 |
+| 선행 주가수익비율 (주가 ÷ 12개월 예상 주당순이익) | 14.2 |
 
 **뉴스**
 
 | 지표 | 값 |
 | --- | --- |
-| 기준일 NVDA 기사 수 | 29 |
-| 직전 7일 하루 평균 | 18.9 |
+| 기준일 NVDA 기사 수 | 21 |
+| 직전 7일 하루 평균 | 26.0 |
 | 분류 대기 문서 | 1 |
 
-_옵션 스냅샷 만기: 2026-10-12, 2026-10-14, 2026-10-16, 2026-10-23, 2026-11-06, 2026-11-13, 2026-11-20 · 스냅샷 누적 1일_
+_옵션 스냅샷 만기: 2026-10-14, 2026-10-16, 2026-10-19, 2026-10-21, 2026-11-06, 2026-11-13, 2026-11-20 · 스냅샷 누적 2일_
 
 ## ⑤ 진행 중 사안
 | 사건 | 상태 | 다음 일정 |
@@ -147,19 +138,19 @@ _옵션 스냅샷 만기: 2026-10-12, 2026-10-14, 2026-10-16, 2026-10-23, 2026-1
 | 중국(홍콩 포함) 매출 비중 | 8.2% ↑ | FY2027Q2 | 10-Q 지역별 매출 표 |
 | 10% 이상 고객 비중 합 | 16.0% ↓ | FY2027Q2 | 10-Q 집중도 주석 (직접 1 · 간접 0) |
 | 분기 자사주 매입 | $19.73B ↑ | FY2027Q2 | SEC XBRL (누적 차분) |
-| 90일 임원·내부자 순매도 | $967.6M | 2026-10-09 | 매도 $967.6M · 매수 $0.0M · 공시 16건 (사전 매도 계획 6건) |
+| 90일 임원·내부자 순매도 | $967.6M | 2026-10-12 | 매도 $967.6M · 매수 $0.0M · 공시 16건 (사전 매도 계획 6건) |
 | 기관 상위 10곳 보유 합 | 33.8% | 2026-06-30 | Blackrock Inc. 8.1% (+0.9%), Vanguard Capital Management LLC 6.4% (+0.1%), FMR, LLC 4.3% (+3.2%) |
-| 선행 주가수익비율 (주가 ÷ 12개월 예상 주당순이익) | 14.4배 | 2026-10-09 | yfinance |
-| 선행 주가수익비율 1년 분위 (최근 1년 중 위치, 0~100) | 집계 중 (1/252일) | — | — |
+| 선행 주가수익비율 (주가 ÷ 12개월 예상 주당순이익) | 14.2배 | 2026-10-12 | yfinance |
+| 선행 주가수익비율 1년 분위 (최근 1년 중 위치, 0~100) | 집계 중 (2/252일) | — | — |
 
 ## ⑦ 오늘의 해석
-- 법무 슈퍼마이크로 하청업체 AI 서버 불법 수출 유죄 인정
+- 법무 저작권 침해 소송 제기
 - 10월 14일 CPI 발표 예정
-- 데이터센터 매출 직전 분기 대비 18.4%
+- 데이터센터 매출 직전 분기 대비 18.4% 감소
 
 ## ⑧ 출처·면책
 - 데이터: yfinance(일봉·옵션·추정치·애널리스트·기관·공매도) · SEC EDGAR(Form 4·8-K·10-Q) · FRED(거시 일정) · 정적 캘린더
-- 생성 2026-10-12T01:50:24Z (UTC) · 기준 거래일 2026-10-09 · 일봉 마지막 2026-10-09 · 수집 항목 {'10q': 1, '8k': 3, 'analyst': 2, 'blog': 19, 'court': 1, 'fedreg': 21, 'form4': 16, 'news': 267, 'newsroom': 3}
+- 생성 2026-10-13T03:16:07Z (UTC) · 기준 거래일 2026-10-12 · 일봉 마지막 2026-10-12 · 수집 항목 {'10q': 1, '8k': 3, 'analyst': 2, 'blog': 20, 'court': 2, 'fedreg': 21, 'form4': 16, 'news': 323, 'newsroom': 4}
 - 이 글은 보유 종목의 사실 추적이다. 매수·매도 판단을 담지 않으며, 사건과 가격 변화 사이의 인과를 단정하지 않는다.
 - 옵션 지표는 장 마감 후 1회 스냅샷이며 GEX는 딜러 포지션 가정이 조잡한 근사다. 부호만 참고.
 - 임계값은 초안이다. 30일 그림자 운영 뒤 '오늘 바뀐 것'이 하루 1~3건이 되도록 조정한다.

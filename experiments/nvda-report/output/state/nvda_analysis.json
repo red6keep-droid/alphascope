@@ -1,108 +1,108 @@
 {
- "generated_at": "2026-10-12T01:50:24Z",
- "run_date": "2026-10-12",
- "day": "2026-10-09",
+ "generated_at": "2026-10-13T03:16:07Z",
+ "run_date": "2026-10-13",
+ "day": "2026-10-12",
  "is_latest_bar_today": true,
  "headline": {
-  "close": 229.27999877929688,
-  "ret_1d": -0.5206512367610272,
-  "ret_vs_spy": -1.1201905610344176,
-  "ret_vs_smh": 0.12815445340749188,
-  "ret_vs_amd": 1.5061608464850718,
-  "ret_vs_avgo": -0.9093872392991087,
-  "vol_ratio_20d": 0.7743783887649036,
-  "gap": 1.4578274351946696
+  "close": 226.32000732421875,
+  "ret_1d": -1.2909941865131391,
+  "ret_vs_spy": -1.230623027354738,
+  "ret_vs_smh": 0.75432537424579,
+  "ret_vs_amd": 0.9882338858457906,
+  "ret_vs_avgo": 0.5926140996075913,
+  "vol_ratio_20d": 0.6438434428561042,
+  "gap": -0.23988270005498302
  },
  "macro_today": [],
  "market_regime": {
   "regime": "상승 추세",
-  "prev_regime": null,
+  "prev_regime": "상승 추세",
   "changed": false,
-  "pct_from_high": -0.06674703992154418,
+  "pct_from_high": -0.12707790311823342,
   "above_ma200": true,
-  "ma200": 722.9283996582031,
-  "vix": 14.84000015258789,
-  "streak": 1,
+  "ma200": 723.3790994262695,
+  "vix": 15.210000038146973,
+  "streak": -1,
   "benchmark": "SPY",
-  "bar_day": "2026-10-09",
+  "bar_day": "2026-10-12",
   "fng": {
-   "score": 45.0,
-   "rating": "fear",
-   "rating_ko": "공포"
+   "score": 45.7428571428571,
+   "rating": "neutral",
+   "rating_ko": "중립"
   }
  },
  "sector_flow": {
   "state": "모이는 중",
-  "prev": null,
+  "prev": "모이는 중",
   "changed": false,
-  "rel_pp": 4.252641933745682,
+  "rel_pp": 6.876260615382157,
   "days": 20,
   "shares_5d": null,
   "sectors": [
    {
     "etf": "XLK",
     "name": "기술",
-    "rel": 4.051561655702707,
+    "rel": 4.292077962720775,
     "rank": 1
    },
    {
     "etf": "XLV",
     "name": "헬스케어",
-    "rel": 1.4274328981871198,
+    "rel": 0.2644089671421712,
     "rank": 2
-   },
-   {
-    "etf": "XLP",
-    "name": "필수소비재",
-    "rel": -1.8084345440285698,
-    "rank": 3
    },
    {
     "etf": "XLE",
     "name": "에너지",
-    "rel": -1.960510180834718,
+    "rel": 0.03034704419480061,
+    "rank": 3
+   },
+   {
+    "etf": "XLP",
+    "name": "필수소비재",
+    "rel": -2.2750041248812303,
     "rank": 4
    },
    {
-    "etf": "XLY",
-    "name": "경기소비재",
-    "rel": -1.9657847693833164,
+    "etf": "XLU",
+    "name": "유틸리티",
+    "rel": -2.7174898895310107,
     "rank": 5
    },
    {
     "etf": "XLI",
     "name": "산업재",
-    "rel": -3.6784615985706814,
+    "rel": -2.7221769333378054,
     "rank": 6
    },
    {
-    "etf": "XLC",
-    "name": "통신",
-    "rel": -3.839986552744079,
+    "etf": "XLY",
+    "name": "경기소비재",
+    "rel": -2.777123306373097,
     "rank": 7
-   },
-   {
-    "etf": "XLU",
-    "name": "유틸리티",
-    "rel": -4.1802695844041065,
-    "rank": 8
    },
    {
     "etf": "XLB",
     "name": "소재",
-    "rel": -4.85172245608172,
-    "rank": 9
+    "rel": -4.342790799163221,
+    "rank": 8
    },
    {
     "etf": "XLRE",
     "name": "부동산",
-    "rel": -6.036985083005431,
+    "rel": -5.046098289972556,
+    "rank": 9
+   },
+   {
+    "etf": "XLC",
+    "name": "통신",
+    "rel": -5.409078677056101,
     "rank": 10
    },
    {
     "etf": "XLF",
     "name": "금융",
-    "rel": -6.270152149347263,
+    "rel": -5.7350212863909515,
     "rank": 11
    }
   ],
@@ -112,13 +112,13 @@
    {
     "etf": "XLK",
     "name": "기술",
-    "rel": 4.051561655702707,
+    "rel": 4.292077962720775,
     "rank": 1
    },
    {
     "etf": "XLV",
     "name": "헬스케어",
-    "rel": 1.4274328981871198,
+    "rel": 0.2644089671421712,
     "rank": 2
    }
   ],
@@ -126,23 +126,23 @@
    {
     "etf": "XLF",
     "name": "금융",
-    "rel": -6.270152149347263,
+    "rel": -5.7350212863909515,
     "rank": 11
    },
    {
-    "etf": "XLRE",
-    "name": "부동산",
-    "rel": -6.036985083005431,
+    "etf": "XLC",
+    "name": "통신",
+    "rel": -5.409078677056101,
     "rank": 10
    }
   ]
  },
  "bollinger": {
-  "pctb": 0.5790805886693442,
-  "lower": 210.63650779197673,
-  "upper": 242.83149300148028,
-  "ma20": 226.7340003967285,
-  "close": 229.27999877929688,
+  "pctb": 0.45865225115041725,
+  "lower": 213.20868173500892,
+  "upper": 241.79531911948325,
+  "ma20": 227.5020004272461,
+  "close": 226.32000732421875,
   "state": "밴드 안",
   "days": 0,
   "entered": false,
@@ -208,9 +208,9 @@
   "active": [],
   "entered": [],
   "values": {
-   "rsi80": 52.96368502502982,
-   "ma200_40": 13.418454289262026,
-   "ret20_25": 5.034589688570135
+   "rsi80": 49.35496682924711,
+   "ma200_40": 11.851564070730136,
+   "ret20_25": 7.281001195257297
   },
   "stats": {
    "symbol": "NVDA",
@@ -273,248 +273,152 @@
  "events": [
   {
    "area": "Legal",
-   "kind": "news",
-   "title": "Super Micro Contractor Pleads Guilty to Illegal Export of Nvidia AI Servers to China",
-   "fact": "슈퍼마이크로 하청업체가 엔비디아 AI 서버의 중국 불법 수출 혐의에 대해 유죄를 인정했다.",
-   "url": "https://news.google.com/rss/articles/CBMiV0FVX3lxTFB0MlQ2QzFnQmpfSkN1ZkZVWDduZFgwbUZXRzJJWVFRanJ4aUNrYzQxNHNMVkRaeFdRdE9KT3dSZ2ZQTE1QYVlYNEtDQnpQbVVaZ0lCdDI0NA?oc=5",
-   "direction": "negative",
+   "kind": "court",
+   "title": "S.A. Jamendo v. NVIDIA Corporation (CAND 5:26-cv-11754)",
+   "fact": "S.A. Jamendo가 엔비디아를 상대로 저작권 침해 소송을 제기했다.",
+   "url": "https://www.courtlistener.com/docket/74950728/sa-jamendo-v-nvidia-corporation/",
+   "direction": "uncertain",
    "emphasis": true,
-   "source": "OECD AI Policy Observatory",
-   "published_at": "2026-10-09T07:00:00Z",
-   "speaker": null
+   "source": "courtlistener",
+   "published_at": "2026-10-12T00:00:00Z",
+   "speaker": "government"
   },
   {
-   "area": "Corporate",
+   "area": "Legal",
+   "kind": "news",
+   "title": "Super Micro contractor pleaded guilty to smuggling $2.5B in Nvidia AI servers to China",
+   "fact": "Quartz는 슈퍼마이크로 계약자가 25억 달러 규모의 엔비디아 AI 서버를 중국에 밀수한 사실을 보도했다.",
+   "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQOTRLZFJhaUh6NGFhdFVBekhsZjVoTW15NDREWFYyZ1RXTTJhRnBycUFqejdmODNHOFNkcUtfY3ptN3hRSTZiS1RSaEthTkQzekV6WGJtWXk3OC10MENsWXNRdUJ0MTI3eENHNVI1clJfM1BGS3RrOVZRaUJfT2hvcFl1OC1xZUU?oc=5",
+   "direction": "negative",
+   "emphasis": true,
+   "source": "Quartz",
+   "published_at": "2026-10-12T12:47:14Z",
+   "speaker": "government"
+  },
+  {
+   "area": "Legal",
+   "kind": "news",
+   "title": "Contractor pleads guilty to diverting Nvidia chips from US to China",
+   "fact": "China Economic Review는 계약자가 엔비디아 칩을 미국에서 중국으로 전송한 혐의에 대해 유죄를 인정했다고 보도했다.",
+   "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPeEo1ZzIyVjk1XzVEMkNlYy1GZ1ZBeGVpbXBna3dnbEMzWGZ5ZWd5OWQyVERhZlNFblIzZE1mVFVaTGlBWHBaS3RlNUk2SjRhanA4dWlVQjJseHNnSHZxN2EyVVpIZUtpQy1FYnhyRWFqRUdpcnl1N0dNTWJEajdmY1NpbS1oV0czQWR6Rlh2VGw5enowenJHS0hmUy0waVBMSEHSAacBQVVfeXFMT2gwY0UxOVBFQzRIMkM4YVJ6RXZYand3ODlGQVg3Q1l4X0VQYWloanlXUHl5TGh4cVplWFdWeVVJMHBPZGFtZUNUREwyanJyWUticXVjVElaT2RKbkQza1N0eWNhd1EyN0o2a2RhcWJZRWVoaVZ3b3p5NU5HcnEweGt3Y2s2bUlkcjZLX3VjTUR4UFV1X2paN3BzX3BHWDhOZllUYkJfV2s?oc=5",
+   "direction": "negative",
+   "emphasis": true,
+   "source": "China Economic Review",
+   "published_at": "2026-10-12T08:25:52Z",
+   "speaker": "government"
+  },
+  {
+   "area": "Product",
    "kind": "newsroom",
-   "title": "NVIDIA Commits $1 Billion to Advance US Science Over the Next Five Years",
-   "fact": "엔비디아가 미국 과학 기술 연구 지원을 위해 향후 5년간 10억 달러를 지원하기로 발표했다.",
-   "url": "https://nvidianews.nvidia.com/news/nvidia-commits-1-billion-to-advance-us-science-over-the-next-five-years",
+   "title": "NVIDIA and Cisco Introduce New Pluggable Optics Form Factor to Scale AI Factories",
+   "fact": "NVIDIA와 Cisco는 400Gb/s 레인 광모듈 USFP를 공동 발표했다.",
+   "url": "https://nvidianews.nvidia.com/news/nvidia-and-cisco-introduce-new-pluggable-optics-form-factor-to-scale-ai-factories",
    "direction": "positive",
    "emphasis": true,
    "source": "nvidianews",
-   "published_at": "2026-10-08T14:31:00Z",
-   "speaker": null
+   "published_at": "2026-10-12T15:00:00Z",
+   "speaker": "nvidia_exec"
   },
   {
    "area": "Product",
    "kind": "news",
-   "title": "Nvidia reportedly halts GeForce RTX 5090 production in favor of AI data center and professional GPUs — impending supply drought expected to drive up prices, RTX 5080 24GB rumored as new gaming flagship",
-   "fact": "엔비디아가 AI 데이터센터용 GPU 생산을 위해 지포스 RTX 5090 생산을 중단한 것으로 전해졌다.",
-   "url": "https://news.google.com/rss/articles/CBMi5AJBVV95cUxQSjBCd255Y1gyWXBvSnlpVW4xNHVteF9MTG40Yngxdml6SnJ2R2JoNkF4OTdzMGJ1dkRIaVNoVlc0MnItdkNCTV9QX2FscW4zRGw1UkFTV285VW9DZS0tWmNXdmR2dUtCNmh6dWRWcmxSN3lVWDVhZ01qNUxGZ2k1bW03LWZPWndlX3NXcENxczczNUJNSUU4OHNzN3pQbmlkMmpPM2xfVXA1Z1E0b2dsMUZ4UXRGUkJ5aWh5MnVMUjZuNDMyeHBOUFdjNEJ1X3V2Wm1seDlfWHpEbC1idlR3RFhIMzhvTzRhYXFYWF91UEhXTEpfMldZUXNhMmt6Vmtsa0dnQ1B3eS15X0tmVEFXYWo5RFlUZWl6b21LTUtGM3FQbjJ0eFZscy1IOE9LaEdWb3F2Nnd4TWVXcnBKN2J1TTNzbEhaQ0ExVEpYQTRuaEhOLWg1elY2U0pYc3dvdHBac0JLLQ?oc=5",
-   "direction": "uncertain",
-   "emphasis": true,
-   "source": "Tom's Hardware",
-   "published_at": "2026-10-10T12:20:00Z",
-   "speaker": null
-  },
-  {
-   "area": "Corporate",
-   "kind": "news",
-   "title": "Nvidia's head of corporate communications has left after roughly four months",
-   "fact": "엔비디아의 기업 커뮤니케이션 총괄이 임명 약 4개월 만에 사임했다.",
-   "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQaWQ4dnk4UGVwYTd3OXhhZnlMdjJtbUtCeDVyY2VrMHZaWW83T1R1cTU0YTlscDRfR1NpeVYzb0VPOTlhdkQ2UkNUSjdYQzhRdWRxRERpUFNaMzlhdWc1WkpEVHRyRUpXejRId3JuWXBPUnlVdVRPcFdXc2d5Ymd5THRuYldnUWFTWlJsVk1MYllLUUhWMkNiQ2x0dXEtaDlvYVA3Q0ZnMA?oc=5",
-   "direction": "negative",
-   "emphasis": true,
-   "source": "Business Insider",
-   "published_at": "2026-10-09T20:35:00Z",
-   "speaker": null
-  },
-  {
-   "area": "Flows",
-   "kind": "form4",
-   "title": "Form 4 — COXE TENCH (이사): 증여",
-   "fact": "Form 4 — COXE TENCH (이사): 증여",
-   "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764726000011/xslF345X06/wk-form4_1791579847.xml",
+   "title": "ReplaySSM: Rethinking State Storage for Faster Hybrid-Model Decoding | NVIDIA Technical Blog",
+   "fact": "NVIDIA 개발자 블로그는 ReplaySSM 기술을 소개했다.",
+   "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQaExhQ2xYdmsyQUNRQ2hOa2F0MEJ3T05LR2llbVBiWE9kTmdjQ0cxNWljSXRnOWlPcTdZZ3RSQUMwdGNybXFLVHdIVHdpeHFDeVkxd1NOWkh4ZDR2SjFNZ0xjNjY4UXlrMzlOSWdVNXo0Q0pkTk0xREk2UlFtOU1lcjY0SFZ2YTFQSUVvTVBXejVkRGNmVF9Lc3dmTThsSGU0Z25iWg?oc=5",
    "direction": "neutral",
    "emphasis": false,
-   "source": "edgar",
-   "published_at": "2026-10-10T01:04:09Z",
-   "speaker": null
+   "source": "NVIDIA Developer",
+   "published_at": "2026-10-12T16:18:23Z",
+   "speaker": "nvidia_exec"
   },
   {
-   "area": "Corporate",
-   "kind": "news",
-   "title": "Nvidia-backed Firmus scraps $5 billion Australia IPO amid growing AI scrutiny",
-   "fact": "엔비디아가 지원하는 퍼머스가 AI에 대한 감시 강화 속에 50억 달러 규모의 호주 기업공개를 철회했다.",
-   "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQY21BNU1iQlJDajVWejFGYjVrM2J0cllKVmc5WEVZX2tMQnROZGFJRkRDekhCaFY0MzRnYXhYOGNaVi11cFlndVo5b1RIYUpaS25JbV92dVkwVEZpXzVaTWdtR3piN0d6SUI2OW9qaEI4eHVCV1VBQkFBWXhyemttZDlhMlFVa3hQdDhpWVZkLW95cmxNaEFzZGxWb2dzU3VPSzNlNTc4OEF5YXV1LVoxOHZuUzFsMTZfaDJuckx4UQ?oc=5",
-   "direction": "negative",
-   "emphasis": false,
-   "source": "Reuters",
-   "published_at": "2026-10-09T07:54:22Z",
-   "speaker": null
-  },
-  {
-   "area": "Corporate",
-   "kind": "news",
-   "title": "Nvidia to Invest in Chip Rival d-Matrix as Its Challengers Choose Partnership",
-   "fact": "엔비디아가 칩 경쟁사인 디매트릭스에 투자하기로 결정했다.",
-   "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPRmt5MUVxdjF6M2V6QlZPWVZyWVgwUWY2QzBiVE90elFIQ1Qxa0JYZVpEYmNUQTIwWEg4UzR5NUo3YWRSdEZzU0RoVzV6V2ZoVFJCYjBScWZ5Z29LVFVMTUJYTm03WjBxZFBmMWN6clFzRDlDamZ0N2c5dU9vcVBELTNwTmtIS3RDZ3h3czlyaElqMVQteTBWM0hObm5MN21iVTNmalRnbw?oc=5",
+   "area": "Product",
+   "kind": "blog",
+   "title": "OCP Global Summit: Amid Ecosystem Adoption, NVIDIA Opens Vera Rubin Architecture to Help Scale AI Factories Worldwide",
+   "fact": "NVIDIA 블로그는 OCP 서밋에서 Vera Rubin 아키텍처를 공개했다고 발표했다.",
+   "url": "https://blogs.nvidia.com/blog/ocp-global-summit-vera-rubin-scale-ai-factories/",
    "direction": "positive",
    "emphasis": false,
-   "source": "The Information",
-   "published_at": "2026-10-08T23:24:00Z",
+   "source": "nvidiablog",
+   "published_at": "2026-10-12T15:00:25Z",
+   "speaker": "nvidia_exec"
+  },
+  {
+   "area": "Corporate",
+   "kind": "news",
+   "title": "Nvidia, AMD, Google, and Meta team up on global blueprint for data center design",
+   "fact": "Yahoo Finance는 NVIDIA·AMD·Google·Meta가 데이터센터 설계 청사진에 협력한다고 보도했다.",
+   "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPdFN3R3NFLVVVZE40T3c5ZmVhdzFFQ24taFViMElfVC1STTkwSWlIMHJ5X1BCZWJWQ2Vkck1EWklDS2Z1cEktb3NyY2FNMzBST2ozM08wUU44VnUwc3hKQ0pwT2JtQlpsd1RrMzlPbWh1UVQxM2Z1ZzRNclhCbTFMdDd0LU56MmRIYTM3cGpBZl9zaklycS1VMmlycHNPTGpQN21lNUxEbDVzMXByMDBrazZfbmRCLXlialBEbFVaN1N5SFRnRlRFOThFUXA0Yl9jdjNN?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Yahoo Finance",
+   "published_at": "2026-10-12T15:00:00Z",
    "speaker": null
   },
   {
    "area": "Product",
    "kind": "news",
-   "title": "Nebius achieves NVIDIA Exemplar Cloud on NVIDIA HGX B300 for training workloads",
-   "fact": "네비우스가 엔비디아 HGX B300 기반의 엔비디아 이그젬플러 클라우드 인증을 획득했다.",
-   "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNeURpbWswRTRtQjJKZkN4TWQweDU3Y2t0eXpfd0tXV05UZGk2WW1uUGJvdzc5aUE4R295ajk4eXF1VVk1Mlk5U2UzSVNXd1ZUdDFBMVpWc0xrWTJOQzVSSVAxRGZNajhjdWRLQ2FtVTJhbXlPSzVJZi1MY3I0MmEyaGNPQU1Tc1FiaGdzOU1UVnFnU1VqSVNoNmJzcHVDTVNq?oc=5",
-   "direction": "positive",
+   "title": "Microsoft reveals Maia 300 AI chip as it works to reduce dependence on Nvidia, AMD",
+   "fact": "Yahoo Finance는 마이크로소프트가 엔비디아 의존도를 낮추기 위해 Maia 300 AI 칩을 공개했다고 보도했다.",
+   "url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxPdzlOWjZPREptdmhCandwSVY1VlRpbGZfbTFKalh1a29UT192S0FiVnpQSHZKb1ZiRjRWQnVMLW5LdTVxUjBWbWM5VXl4czJnLWM4aFpnWU1NYk80VW5KYjJxQUt5THB5QkpVZkFXU2hNQ28wdlIwWmhyRENSTWY0d2phRklOb05XdFVaQS1YRFNyZHE3blRsYk12X2hZS0MySlBSb0ZUUGJPYS1rNUR1N0NCczZneFcyVUk1cTVSaXZURWVwTXV6SGJ6RG5TNzFOd1p2TDhodGM?oc=5",
+   "direction": "negative",
    "emphasis": false,
-   "source": "Nebius",
-   "published_at": "2026-10-08T18:32:44Z",
-   "speaker": null
+   "source": "Yahoo Finance",
+   "published_at": "2026-10-12T13:00:00Z",
+   "speaker": "customer_partner"
   }
  ],
  "events_overflow": [
   {
-   "area": "Corporate",
-   "kind": "news",
-   "title": "Nvidia-backed Iambic Therapeutics launches IPO as biotechs buck market gloom",
-   "fact": "엔비디아가 지원하는 아이앰빅 테라퓨틱스가 기업공개를 추진한다.",
-   "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOT2duSWZGV1gtNHhZUVRCMHQ4QTN4ZzAzOFR1QjVlbmNfdEYwRG9HRWc1ai1WUXV0TFlESmpzSnhQSW1jT2xDYmdhSXZrXzZTUFVyX1N5VFltX2VyVDZPeEUzZ0hxYnB1MmpYYVhvU3h0VlB3MjZrMThFZFhwMkk2cEw0eGdKSHdySTJEWTNsZklka25TamNFbG91UXRPSjJPYjl4d2JvREdwa2QyeTh5bHpRN3dmUXJzbXRUOFJacHpuM3M0?oc=5",
+   "area": "Flows",
+   "kind": "options",
+   "title": "2026-10-16 $238 콜 미결제약정 3.3배",
+   "fact": "미결제약정 12,685 → 42,425 (임계 2.0배 · 미결제약정 ≥ 10,000)",
+   "url": null,
    "direction": "positive",
    "emphasis": false,
-   "source": "Reuters",
-   "published_at": "2026-10-08T18:18:10Z",
-   "speaker": null
-  },
-  {
-   "area": "Demand",
-   "kind": "news",
-   "title": "Nvidia and Palantir plant a flag for sovereign AI inside 'the world's most complex supply chain'",
-   "fact": "엔비디아와 팔란티어가 소버린 AI 구축을 위해 협력한다.",
-   "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxOZER3ZzhjRXExd2N6dXo5RUFXUFJmbzJxWnF4VmN3WlZ0RmhxZ29oNlZnZUxwc242Q2FxdFo0eGVpYXIyNlhpYUpVd0YxQXhOOV9iQUM5ZVBFREdRVUg2QTItZFhNdEFtQ25aYk1VVFF0LTRZd1FSd3RSamJ2Q2x1VDV6cEJPUQ?oc=5",
-   "direction": "positive",
-   "emphasis": false,
-   "source": "Fast Company",
-   "published_at": "2026-10-08T17:48:40Z",
+   "source": "yfinance options",
+   "published_at": null,
    "speaker": null
   },
   {
    "area": "Flows",
-   "kind": "news",
-   "title": "Trump discloses Nvidia stock trades as he prepares to honor CEO Huang",
-   "fact": "트럼프 전 대통령이 젠슨 황 최고경영자 수상을 준비하며 엔비디아 주식 거래 내역을 공개했다.",
-   "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPc0R0am1rbndOQjhQUzhJdTNHcXpnb3lDWFVteEs0SzJiVzc5cFNhMkNJZ2F5dzhjSTFlbFE1ZDRHNVE0MTNJM1phbUU1MVZXX0VkdmZoRUJDaU5OX3pPZ3V2bUZIaTMxZ0std2V2eVFyVUlaZGFXNjhCYTNtV1AxbnVsSlJnVXlWTW9JWWhiYTJaczdTR1JBcDNFaFg0YWRmZjRhZVR6c3dvd3pv?oc=5",
-   "direction": "neutral",
+   "kind": "options",
+   "title": "2026-10-16 $222 풋 미결제약정 2.3배",
+   "fact": "미결제약정 5,112 → 11,800 (임계 2.0배 · 미결제약정 ≥ 10,000)",
+   "url": null,
+   "direction": "negative",
    "emphasis": false,
-   "source": "Reuters",
-   "published_at": "2026-10-08T15:18:12Z",
+   "source": "yfinance options",
+   "published_at": null,
    "speaker": null
   },
   {
-   "area": "Corporate",
-   "kind": "news",
-   "title": "Nvidia-backed Upscale AI launches platform to connect chips from rival suppliers",
-   "fact": "엔비디아가 지원하는 업스케일 AI가 경쟁사 칩을 연결하는 플랫폼을 출시했다.",
-   "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPeGdkZHlKUjgwWHQ4eXRUaTJZeFZBQkFLaENBNFYxTUh5SVFkaWNfVGh3MUtrcGdKYjZhWk03QlV1WV8zYmxkbl9fLVRIa0xwWlczbVRwVlRFUGZwMXFwM2lRck5BVmVhQ3JmVzNZS3U0OUpuLVdLU04wVVlkNE9jN2IyRW9YY0pla283VmJBa3FpVm5zX2xaQkw0X3JCcUx1djhraTRVTEQzeGJtNzZKQ3hLTHRRSUEt?oc=5",
-   "direction": "positive",
-   "emphasis": false,
-   "source": "Reuters",
-   "published_at": "2026-10-08T12:01:28Z",
-   "speaker": null
-  },
-  {
-   "area": "Product",
-   "kind": "news",
-   "title": "The first Nvidia RTX Spark laptops cost up to $7,000",
-   "fact": "엔비디아 RTX 스파크 탑재 랩탑 제품 가격이 최고 7,000달러에 달한다.",
-   "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQaFZoOTBRZVdoeGMteUNPemoyTmdZMDBjSjFyaVRyNXl4OE1nTzJHRElYeTRNY01IM0xCcjg4RGJxenVkaVZnSUFwT0l3OXVYejJYYW9STlJaNE9yQWVoWVZzSnNGa08zdjJ1Z2FRcGV2ck02UFZ2eUdhSGFpMlBOLXFYcGs3YWhraHNyTjk2V2tCMl9ObmZQTXNmWQ?oc=5",
-   "direction": "positive",
-   "emphasis": false,
-   "source": "The Verge",
-   "published_at": "2026-10-07T19:05:52Z",
-   "speaker": null
-  },
-  {
-   "area": "Product",
-   "kind": "news",
-   "title": "Microsoft and Nvidia launch Surface Laptop Ultra with RTX Spark starting at $2,599 — coinciding with major Windows 11 changes for agentic AI",
-   "fact": "마이크로소프트와 엔비디아가 RTX 스파크를 탑재한 서피스 랩탑 울트라를 2,599달러에 출시했다.",
-   "url": "https://news.google.com/rss/articles/CBMikwJBVV95cUxQeHJ0QXM4cldZUWlId2djUG5Mc3FFVHVkWmdCemplNko0bEZrY1RqU3RETzE3ZVk0a1NwbWQyZVJKTGxrUzBrUGNxbVNSQ1A2dUtCbE53aEZkQ0E1UjczUGFkRURIVVcxOWtFQ0ctM2dEZG5OOU52MEtNX2hIeVI5amtnZjA1bnBFMm1iVVo0WV9tTlkwMFhUamZCMEMxQnRwUVRMZ05fbUhTQTBEaHRSZkhsVGVfWE1uc0xtSzZlSFhIcFZFZVR1TzE5T1JfQkVRaXhHQ0VWSjVGbDhIenc2cl8yVE9BTWNFUlR0b1lYcHowYWVPTUIydjRFNUFGZUtlZjFZUzFVYUVWX3VWRXItUkNkOA?oc=5",
-   "direction": "positive",
-   "emphasis": false,
-   "source": "Tom's Hardware",
-   "published_at": "2026-10-07T18:07:54Z",
-   "speaker": null
-  },
-  {
-   "area": "Demand",
-   "kind": "news",
-   "title": "SpaceX looks to raise $40bn to buy Nvidia chips",
-   "fact": "스페이스엑스가 엔비디아 칩 구매를 위해 400억 달러 규모의 자금 조달을 추진 중이다.",
-   "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQdThuRWl1b3NtaUE5aFhSeXVUY0xfYjhBZXJJaG1VWWR0QXBSQ2txLTBrbTlKNm9KQmtqcG95Y3BLNlRQZF96a004TS1xaGlyQUVUaEdqNXZOTzZwdC1IU001ZmM5a191dGNRYjNCWXkwcEk0cjVhams2WUc5aGMxek13b1U?oc=5",
-   "direction": "positive",
-   "emphasis": false,
-   "source": "Financial Times",
-   "published_at": "2026-10-06T22:28:55Z",
-   "speaker": null
-  },
-  {
-   "area": "Corporate",
-   "kind": "news",
-   "title": "Nvidia-backed Lambda targets $4 billion raise ahead of planned IPO, WSJ reports",
-   "fact": "엔비디아가 지원하는 람다가 기업공개를 앞두고 40억 달러 자금 조달을 추진 중이다.",
-   "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQR3dfcjJxclVWTV9faDZyaUpIZ3F3cl95X2dFdzRaN0IxTWFuX0VwdWFBeEFtdjdqNVlKRHVCNVUzZF9paU9Cb0F3Y1NLR1l1UnNMVXNudDVYTEg4SVlVSHl2b1QwWjR6WV92ZV92MEUzRnozaEx4cHF6ZURxdUY2VDNlWWZSaGIxX3hsWEsxalhvZjhpSk85dWEwNWN6U0ZKeUNPdklHYnZpQjlORGpKemZOY0NfWkZFWHdvUkd3?oc=5",
-   "direction": "positive",
-   "emphasis": false,
-   "source": "Reuters",
-   "published_at": "2026-10-06T19:01:28Z",
-   "speaker": null
-  },
-  {
-   "area": "Product",
-   "kind": "news",
-   "title": "GeForce Game Ready Driver For Call of Duty®: Modern Warfare 4® Released",
-   "fact": "엔비디아가 Call of Duty: Modern Warfare 4용 지포스 게임 레디 드라이버를 출시했다.",
-   "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPUEtYWkRJUXRDOTVGMXJjWTJNdDdIUUh6OG83MGhrbDNZYWRYUTByM1ZvNDVjZUhRZmRuekNrQkkzTlN6N19zZHNvR3dqQURBTTY3eW9pUkhZSl9BY3g2czZlOHNkR2Q0S2x1TklhYjhYMXFheTNjS1VGR2IwTlNqaFRHWlMwRUxGVXJhRGtFeXdlOWFQTnVXaGl3c1NUZWxfRmdUZXhRdk9sU0xpTzVOT2Y1Tm0tdw?oc=5",
-   "direction": "positive",
-   "emphasis": false,
-   "source": "NVIDIA",
-   "published_at": "2026-10-06T13:29:05Z",
-   "speaker": null
-  },
-  {
-   "area": "Corporate",
-   "kind": "news",
-   "title": "Nvidia backs startup Reactor as buzz grows for world models",
-   "fact": "엔비디아가 월드 모델을 개발하는 스타트업 리액터를 지원한다.",
-   "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNMEJqZ2o5Z3B2VnBpTXlHSEx5WksyMjl0eTg5WXlFUkFnMDY5cExqRFNlbnpZSVZwUy1nZ3RYSW0xeVRzT0N6cE9iYk1LUG8xRFg5c3JiVjhpT2dfVjc2N3BYeGpjS3M5Z0RzMVdIaS1ESlFjeUZMOUlQX0tjaDBRZnFGenN4c2syeHk0bw?oc=5",
-   "direction": "positive",
-   "emphasis": false,
-   "source": "Fortune",
-   "published_at": "2026-10-06T00:42:00Z",
-   "speaker": null
-  },
-  {
-   "area": "Earnings",
-   "kind": "estimates",
-   "title": "30일 주당순이익 예상 상향 35 · 하향 2",
-   "fact": "상향:하향 비 35:2 (임계 3:1)",
+   "area": "Flows",
+   "kind": "options",
+   "title": "2026-10-16 $232 콜 미결제약정 2.3배",
+   "fact": "미결제약정 17,359 → 39,819 (임계 2.0배 · 미결제약정 ≥ 10,000)",
    "url": null,
    "direction": "positive",
    "emphasis": false,
-   "source": "yfinance",
+   "source": "yfinance options",
    "published_at": null,
    "speaker": null
   }
  ],
- "events_total": 19,
+ "events_total": 11,
  "direction_counts": {
   "today": {
-   "positive": 13,
-   "negative": 3,
+   "positive": 5,
+   "negative": 4,
    "uncertain": 1,
-   "neutral": 2
+   "neutral": 1
   },
   "week": {
-   "positive": 17,
-   "negative": 5,
-   "uncertain": 1,
-   "neutral": 2
+   "positive": 15,
+   "negative": 6,
+   "uncertain": 2,
+   "neutral": 3
   }
  },
  "analyst_target_only": [],
@@ -549,55 +453,55 @@
   "price": [
    {
     "key": "close",
-    "value": 229.27999877929688,
+    "value": 226.32000732421875,
     "flag": false,
     "fmt": "usd"
    },
    {
     "key": "ret_1d",
-    "value": -0.5206512367610272,
+    "value": -1.2909941865131391,
     "flag": false,
     "fmt": "pct_signed"
    },
    {
     "key": "ret_vs_spy",
-    "value": -1.1201905610344176,
+    "value": -1.230623027354738,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "ret_vs_smh",
-    "value": 0.12815445340749188,
+    "value": 0.75432537424579,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "ret_vs_amd",
-    "value": 1.5061608464850718,
+    "value": 0.9882338858457906,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "ret_vs_avgo",
-    "value": -0.9093872392991087,
+    "value": 0.5926140996075913,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "gap",
-    "value": 1.4578274351946696,
+    "value": -0.23988270005498302,
     "flag": false,
     "fmt": "pct_signed"
    },
    {
     "key": "range_pct",
-    "value": 2.09787054440096,
+    "value": 1.7497377985651128,
     "flag": false,
     "fmt": "pct"
    },
    {
     "key": "vol_ratio_20d",
-    "value": 0.7743783887649036,
+    "value": 0.6438434428561042,
     "flag": false,
     "fmt": "x"
    }
@@ -605,25 +509,25 @@
   "technical": [
    {
     "key": "ma50",
-    "value": 222.0774005126953,
+    "value": 222.5888006591797,
     "flag": false,
     "fmt": "usd"
    },
    {
     "key": "ma200",
-    "value": 202.15404998779297,
+    "value": 202.33959999084473,
     "flag": false,
     "fmt": "usd"
    },
    {
     "key": "pct_from_52w_high",
-    "value": -5.78953717409002,
+    "value": -7.005788772259636,
     "flag": false,
     "fmt": "pct_signed"
    },
    {
     "key": "rsi14",
-    "value": 52.96368502502982,
+    "value": 49.35496682924711,
     "flag": false,
     "fmt": "num1"
    },
@@ -637,7 +541,7 @@
   "options": [
    {
     "key": "iv_atm_30d",
-    "value": 0.31125634002786673,
+    "value": 0.31023313870889785,
     "flag": false,
     "fmt": "iv"
    },
@@ -649,25 +553,25 @@
    },
    {
     "key": "implied_move_next_earnings",
-    "value": 9.464410378372449,
+    "value": 9.27889683651171,
     "flag": false,
     "fmt": "pct"
    },
    {
     "key": "pc_ratio_oi",
-    "value": 0.7072850586328028,
+    "value": 0.717428878906502,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "pc_ratio_vol",
-    "value": 0.713437887633984,
+    "value": 0.6353558926487748,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "gex_approx",
-    "value": 682976084.222651,
+    "value": 550014538.8354902,
     "flag": false,
     "fmt": "gex"
    },
@@ -679,7 +583,7 @@
    },
    {
     "key": "max_oi_strike_call",
-    "value": 220.0,
+    "value": 245.0,
     "flag": false,
     "fmt": "usd0"
    },
@@ -733,7 +637,7 @@
     "key": "rating_counts",
     "value": {
      "strongBuy": 10,
-     "buy": 48,
+     "buy": 49,
      "hold": 2,
      "sell": 1,
      "strongSell": 0
@@ -769,7 +673,7 @@
   "flows": [
    {
     "key": "smh_shares_out",
-    "value": 11670900.0,
+    "value": null,
     "flag": false,
     "fmt": "int"
    },
@@ -781,31 +685,31 @@
    },
    {
     "key": "shares_short",
-    "value": 294225803.0,
+    "value": 311389688.0,
     "flag": false,
     "fmt": "shares_m"
    },
    {
     "key": "short_pct_float",
-    "value": 1.27,
+    "value": 1.34000005,
     "flag": false,
     "fmt": "pct2"
    },
    {
     "key": "short_asof",
-    "value": "2026-09-15",
+    "value": "2026-09-30",
     "flag": false,
     "fmt": "text"
    },
    {
     "key": "finra_short_ratio",
-    "value": 48.22902577828781,
+    "value": 41.60976076672058,
     "flag": false,
     "fmt": "pct"
    },
    {
     "key": "finra_short_ratio_avg20",
-    "value": 43.1781716576575,
+    "value": 43.69295828224652,
     "flag": false,
     "fmt": "pct"
    }
@@ -813,22 +717,22 @@
   "valuation": [
    {
     "key": "forward_pe",
-    "value": 14.406896735029273,
+    "value": 14.220904535723093,
     "flag": false,
     "fmt": "num1"
    }
   ],
-  "iv_rank_n": 1,
+  "iv_rank_n": 2,
   "news": [
    {
     "key": "news_count",
-    "value": 29,
+    "value": 21,
     "flag": false,
     "fmt": "int"
    },
    {
     "key": "news_avg_7d",
-    "value": 18.857142857142858,
+    "value": 26.0,
     "flag": false,
     "fmt": "num1"
    },
@@ -994,7 +898,7 @@
    "label": "90일 임원·내부자 순매도",
    "value": 967599313.4595,
    "unit": "USD",
-   "asof": "2026-10-09",
+   "asof": "2026-10-12",
    "source": "SEC 임원 거래 공시 (Form 4)",
    "note": null,
    "arrow": null,
@@ -1014,9 +918,9 @@
   {
    "metric": "forward_pe",
    "label": "선행 주가수익비율 (주가 ÷ 12개월 예상 주당순이익)",
-   "value": 14.406896735029273,
+   "value": 14.220904535723093,
    "unit": "배",
-   "asof": "2026-10-09",
+   "asof": "2026-10-12",
    "source": "yfinance",
    "note": null,
    "arrow": null,
@@ -1029,38 +933,40 @@
    "unit": "분위",
    "asof": null,
    "source": null,
-   "note": "집계 중 (1/252일)",
+   "note": "집계 중 (2/252일)",
    "arrow": null,
    "detail": null
   }
  ],
  "data_status": {
-  "bars_last_day": "2026-10-09",
-  "state_collected_at": "2026-10-12T01:48:42Z",
-  "missing_fields": [],
-  "option_snapshot_days": 1,
-  "iv_rank_days": 1,
+  "bars_last_day": "2026-10-12",
+  "state_collected_at": "2026-10-13T03:12:01Z",
+  "missing_fields": [
+   "smh_shares_out"
+  ],
+  "option_snapshot_days": 2,
+  "iv_rank_days": 2,
   "items_by_kind": {
    "10q": 1,
    "8k": 3,
    "analyst": 2,
-   "blog": 19,
-   "court": 1,
+   "blog": 20,
+   "court": 2,
    "fedreg": 21,
    "form4": 16,
-   "news": 267,
-   "newsroom": 3
+   "news": 323,
+   "newsroom": 4
   },
   "option_expiries": [
-   "2026-10-12",
    "2026-10-14",
    "2026-10-16",
-   "2026-10-23",
+   "2026-10-19",
+   "2026-10-21",
    "2026-11-06",
    "2026-11-13",
    "2026-11-20"
   ],
-  "items_pending": 1,
+  "items_pending": 0,
   "test_mode": true
  },
  "thresholds": {
@@ -1078,5 +984,13 @@
   "SHORT_INTEREST_CHG_EVENT_PCT": 15.0,
   "VOL_RATIO_EVENT": 2.0
  },
- "new_flags": []
+ "new_flags": [
+  "checklist:forward_pe",
+  "checklist:insider_net_sold_90d",
+  "status:rating_counts",
+  "status:shares_short",
+  "status:short_asof",
+  "status:short_pct_float",
+  "status:smh_shares_out"
+ ]
 }
