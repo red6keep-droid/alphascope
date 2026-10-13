@@ -1648,7 +1648,7 @@ body.menu-open { overflow: hidden; }
    "미국 증시 데일리 브리핑 — 2026년 10월 11일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양은 테마 CSS. */
 (function () {
   'use strict';
-  [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
+  [].slice.call(document.querySelectorAll('.post-title, .post-card-title, .recent-title')).forEach(function (h) {   /* .recent-title: 홈 최근 리포트 (2026-10-13) */
     var host = h.querySelector('a') || h;
     if (host.children.length) return;
     var m = /^(.*\S)\s+([—–-]\s*\d{4}\s*년.*)$/.exec(host.textContent.trim());
