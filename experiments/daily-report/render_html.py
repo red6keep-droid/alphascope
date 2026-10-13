@@ -262,6 +262,7 @@ def _light_pill(light, text=None):
     return dk.pill(text or _light_word(light) or "—", kind).replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 {dk.PILL_GAP + 5}px 0 {dk.PILL_GAP}px;", 1)   # 등급 라벨 오른쪽 +5 (2026-10-13 사용자)
 
 
+TAB_TOP = 10   # 오늘 · 시장 탭 첫 콘텐츠 위 여백 +10 — margin 은 탭 줄 아래 14 와 겹쳐 사라지므로 padding (2026-10-13 사용자: "오늘, 시장 탭의 콘텐츠 시작 위쪽 여백을 10픽셀 추가")
 LEAD_VP = 8   # 머리 결론 18px · 행간 34 의 반쪽 — 구분선 위아래 보이는 14 (2026-10-13 사용자: 카드 없이)
 
 
@@ -275,7 +276,7 @@ def sec_lead(report, analysis):
         body = "".join(f'<div style="margin:{0 if i == 0 else 4}px 0 0;">{_esc(dk.ko(ln, TERM_KO))}</div>' for i, ln in enumerate(lines))   # 문단 사이만 4px — 끝 문단 아래 여백이 카드 여백에 더해지지 않게
         inner += (f'<div style="margin:{14 - LEAD_VP}px 0 0;padding-top:{14 - LEAD_VP}px;border-top:1px solid #E2E8F0;">'   # 일반 구분선, 위아래 보이는 14 (2026-10-13 사용자: "구분선은 일반 구분선 컬러로 유지")
                   f'<div data-insight="1" style="font-size:{dk.BODY};color:#111;">{body}</div></div>')   # 구분선 아래 18px (2026-10-13 사용자)   # 구분선 아래 종합 문단만 16px (2026-10-12 사용자: "이것만 16포인트")   # 18px · 행간 33 은 바깥에서 물려받는다
-    return dk.cards(f'<div style="margin:0 0 8px;line-height:{dk.LH_BODY};">{inner}</div>')   # 강조 카드 디자인 삭제 — 배경 · 테두리 · 안쪽 여백 없음 (2026-10-13 사용자)
+    return dk.cards(f'<div style="margin:0 0 8px;padding-top:{TAB_TOP}px;line-height:{dk.LH_BODY};">{inner}</div>')   # 오늘 탭 첫 콘텐츠 위 +10 (2026-10-13 사용자)   # 강조 카드 디자인 삭제 — 배경 · 테두리 · 안쪽 여백 없음 (2026-10-13 사용자)
 
 
 def sec_regime(analysis, report, prev=None):
@@ -423,7 +424,7 @@ def sec_breadth(analysis, prev=None):
                      "양수면 상승이 소수 대형주에 몰리지 않고 넓게 퍼졌습니다"))   # 읽는 법은 구분명 옆 ? (2026-10-12 사용자)
         if b.get("rsp_spy_5d") is not None:
             rows.append(("동일가중 − 시총가중 (5일)", dk.arrow(b["rsp_spy_5d"], 2, "%p"), _vs(b["rsp_spy_5d"], pb.get("rsp_spy_5d")), None, False, True))
-    return dk.state_fold(ratio_card, dk.ccard(rows))   # 상승 비율 카드를 누르면 펼침 (2026-10-13 사용자)
+    return dk.state_fold(ratio_card, dk.ccard(rows)).replace('<details data-acc="1" style="margin:0 0 8px;">', f'<details data-acc="1" style="margin:0 0 8px;padding-top:{TAB_TOP}px;">', 1)   # 시장 탭 첫 콘텐츠 위 +10 (2026-10-13 사용자)   # 상승 비율 카드를 누르면 펼침 (2026-10-13 사용자)
 
 
 def sec_sectors(analysis, report):
