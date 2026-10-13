@@ -392,11 +392,11 @@ PILL_GAP = 5   # 라벨 좌우 바깥 여백 — 모든 라벨 (2026-10-13 사�
 PILL_MID = "position:relative;top:-1px;"   # vertical-align:middle 은 한글 가운데보다 약 1px 낮다 (잰 값) — 이어지는 글자와 가운데 (2026-10-13 사용자)
 
 
-def pill(text, kind="area", lead=False):
-    """라벨(알약). 이어지는 글자와 세로 가운데, 좌우 5px — 모든 라벨 (lead 는 옛 인자, 무시)."""
+def pill(text, kind="area", lead=False, bare=False):
+    """라벨(알약). 이어지는 글자와 세로 가운데, 좌우 5px. bare=True: 바깥 여백 없음 — 줄에 홀로 놓인 라벨(급등주 섹터 · 뉴스 라벨 줄, 2026-10-13 사용자) (lead 는 옛 인자, 무시)."""
     bd, fg = PILL.get(kind, PILL["neutral"])
     bg = PILL_BG.get(kind, "#fff")
-    return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;margin:0 {PILL_GAP}px;{PILL_MID}'
+    return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;margin:0 {0 if bare else PILL_GAP}px;{PILL_MID}'
             f'font-size:{PILL_SIZE};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{esc(text)}</span>')   # 라벨 14px, 어디서나 (2026-10-12 사용자)
 
 

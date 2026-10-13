@@ -527,9 +527,9 @@ def _quote_rows(quotes):
         sym = q.get("symbol") or "-"
         sector = SECTOR_KO.get(q.get("sector") or "", q.get("sector") or "")
         vol = '<span style="white-space:nowrap;">' + _esc("거래량 " + _fmt_volume(q.get("volume"))) + "</span>"   # 라벨과 거래량 사이에서만 줄이 바뀌게
-        tag = dk.pill(sector, lead=True) if sector else ""   # 줄 첫머리 라벨 — 왼쪽 0, 오른쪽 4   # 섹터 라벨이 거래량보다 앞 (2026-10-13 사용자: "어느 섹터인지가 더 중요")
-        value = ((f'<span style="display:block;line-height:1;margin:0 0 6px;">{tag}</span>' if tag else "")   # 섹터 라벨은 증감 위 줄, 오른쪽 정렬 (2026-10-13 사용자)
-                 + f'<span style="font-weight:400;">{_esc(_fmt_price(q.get("price")))}</span> {dk.arrow(q.get("change_pct"))}')   # 가격은 보통 굵기 (2026-10-13 사용자)
+        tag = dk.pill(sector, bare=True) if sector else ""   # 여백 없음 (2026-10-13 사용자)   # 줄 첫머리 라벨 — 왼쪽 0, 오른쪽 4   # 섹터 라벨이 거래량보다 앞 (2026-10-13 사용자: "어느 섹터인지가 더 중요")
+        value = (f'<span style="font-weight:400;">{_esc(_fmt_price(q.get("price")))}</span> {dk.arrow(q.get("change_pct"))}'   # 가격은 보통 굵기 (2026-10-13 사용자)
+                 + (f'<span style="display:block;line-height:1;margin:6px 0 0;">{tag}</span>' if tag else ""))   # 섹터 라벨은 증감 아래 줄, 오른쪽 정렬, 여백 없음 (2026-10-13 사용자)
         r = dk.crow(dk.ticker_logo(sym) + _esc(sym), value, vol, first=len(rows) == 0,
                     left=QUOTE_LEFT, nowrap=True, sub_block=True)
         chg = q.get("change_pct")
@@ -576,7 +576,7 @@ def sec_news(input_data, report, analysis):
         theme = item.get("theme")
         if theme and theme not in THEME_VOCAB:
             theme = "기타"
-        tag = dk.pill(theme) if theme else ""   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
+        tag = dk.pill(theme, bare=True) if theme else ""   # 라벨 줄 — 여백 없이 왼쪽 정렬 (2026-10-13 사용자)   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
         title = _esc(item.get("title_ko") or news_item.get("title_ko") or news_item.get("title") or "")   # Gemini 가 옮긴 한국어 제목 먼저 (2026-10-12 사용자)
         url = news_item.get("link")
         related = [s for s in (item.get("related") or []) if isinstance(s, str) and s in known][:4]
@@ -588,7 +588,7 @@ def sec_news(input_data, report, analysis):
         sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;">{x}</span>' for x in subs)
         head = (f'<a href="{_esc(url)}" target="_blank" rel="noopener" style="color:#111;font-weight:700;text-decoration:none;">{title}</a>' if url
                 else f"<span style='color:#111;font-weight:700;'>{title}</span>")   # 제목이 원문 링크 — 새 창 아이콘 삭제 (2026-10-13 사용자)
-        lab = f'<span style="display:block;line-height:1;margin:0 0 8px;">{tag}</span>' if tag else ""   # 라벨 줄은 제목 위 (2026-10-13 사용자)
+        lab = f'<span style="display:block;line-height:1;margin:0 0 4px;">{tag}</span>' if tag else ""   # 라벨 줄은 제목 위, 제목과 8 → 4 (2026-10-13 사용자: 50% 줄임)
         items.append(f"{lab}{head}{sub_html}")
     return dk.item_rules(items, sub=True) if items else dk.muted("주요 뉴스 없음")   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
 

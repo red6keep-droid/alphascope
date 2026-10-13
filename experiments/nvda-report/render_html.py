@@ -507,7 +507,7 @@ def _event_html(e):
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
         return f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px;margin:0 0 8px;line-height:{_dk.LH_BODY};">{inner}</div>'   # 뉴스 제목 행간 34 (2026-10-12 사용자)   # 일반 기사 카드와 같은 크기·여백, 배경만 방향 색
     # 일반 기사: 라벨 줄이 제목 위, 새 창 아이콘 없이 제목이 원문 링크 (2026-10-13 사용자 — 강조 카드는 제외)
-    lab = f'<span style="display:block;line-height:1;margin:0 0 8px;">{tag}</span>'
+    lab = f'<span style="display:block;line-height:1;margin:0 0 4px;">{tag.replace(f"margin:0 {_dk.PILL_GAP}px;", "margin:0;")}</span>'   # 라벨 줄: 여백 없이 왼쪽 정렬, 제목과 4 (2026-10-13 사용자)
     tip_t = _esc(f"{src}: {e['title'][:90]}" if e["kind"] in rr.DOC_KINDS else f"{src} 원문").replace(chr(34), "&quot;")
     head_html = (f'<a href="{_esc(e["url"])}" title="{tip_t}" target="_blank" rel="noopener" style="font-weight:700;color:#111;text-decoration:none;">{head}</a>'
                  if e.get("url") else f'<span style="font-weight:700;color:#111;">{head}</span>')
