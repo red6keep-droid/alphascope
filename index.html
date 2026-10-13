@@ -257,8 +257,8 @@ body.menu-open { overflow: hidden; }
   gap: 6px;
   margin: 0;
   font-weight: 700;
-  font-size: 22px;
-  line-height: 30px;
+  font-size: 21px;   /* 공식 구획 제목 크기 21 (폰 19) — 미국 증시 리포트 구획 제목과 같게 (2026-10-13 사용자, 가이드 3-1) */
+  line-height: 27px;
   letter-spacing: -0.3px;
   color: var(--ink);
   white-space: nowrap;
@@ -700,7 +700,7 @@ body.menu-open { overflow: hidden; }
   .tabs { overflow-x: auto; }
   .tab { padding: 8px 12px 0; }
   /* 폰 제목은 모두 2px 작게 (2026-10-13 사용자, 디자인 가이드 9절) — 홈 · 목록 구획 제목 22 → 20, 홈 리포트 카드 제목 21 → 19 */
-  .section-title { font-size: 20px; line-height: 28px; }
+  .section-title { font-size: 19px; line-height: 25px; }
   .report-title { font-size: 19px; line-height: 25px; }
 }
 
@@ -1074,18 +1074,32 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment-replybox-single, .comments .comment-replybox-thread { margin-top: 10px; }
 .comments .comment-replybox-single iframe, .comments .comment-replybox-thread iframe { display: block; width: 100%; min-height: 90px; }
 #comment-popup { display: none; }
-/* 댓글 쓰기 = 블로거 전체 페이지로 가는 검은 버튼 하나 (2026-10-13 사용자, 디자인 가이드 10-2) — 글 안 쓰기 창 · 중복 제목은 테마 JS가 없앤다 */
-.comments .comment-write { margin-top: 14px; padding-top: 14px; border-top: 1px solid #E2E8F0; }
-.comments .comment-write.is-first { margin-top: 0; padding-top: 0; border-top: 0; }   /* 댓글이 아직 없으면 위 선 없이 */
-.comments a.comment-write-btn { display: block; padding: 12px; background: #111; border: 0; border-radius: 8px; color: #fff; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }
-.comments a.comment-write-btn:hover { background: #000; color: #fff; }
-@media (max-width: 680px) {   /* 폰 댓글 카드 넓게 (2026-10-13 사용자: "모바일에서 너무 좁다") */
-  .comments-toggle { padding: 12px; }
-  .comments-panel { padding: 14px 12px 12px; }
-  .comments .comment { gap: 8px; }
-  .comments .avatar-image-container, .comments .avatar-image-container img { width: 28px; height: 28px; }
-  .comments .comment-replies { margin-left: 12px; }
-}
+/* 댓글은 열기 버튼만 카드, 펼친 목록 · 쓰기 버튼은 카드 밖 구분선 디자인 (2026-10-13 사용자: "댓글 열기 버튼을 제외하고 카드 디자인 말고 구분선 디자인", 가이드 10-2) */
+.comments.is-foldable { background: none; border: 0; border-radius: 0; }
+.comments.is-foldable .comments-toggle { padding: 8px 8px 8px 16px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; }
+.comments.is-foldable.is-open .comments-toggle { border-bottom: 1px solid #E2E8F0; }
+.comments-panel { padding: 0; }
+.comments .comments-panel > *:first-child { margin-top: 0; }
+.comments #comment-holder { margin-top: 0; }
+.comments .comment-thread > ol > li, .comments ol > li.comment { padding: 14px 0; border-top: 1px solid #E2E8F0; }
+.comments .comment-thread.toplevel-thread > ol > li:first-child { border-top: 0; padding-top: 18px; }
+/* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
+.fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
+.comments-toggle .fold-box .acc-chev { transition: transform .15s; }
+.comments.is-open .comments-toggle .fold-box .acc-chev { transform: rotate(180deg); }
+/* 댓글 한 개 = 두 칸 grid(사진 | 글). 답글 묶음 · 답글 쓰기 자리는 글 칸 아래 줄 — flex 한 줄이라 셋째 칸으로 밀려 깨지던 것 (2026-10-13 사용자: "댓글에 댓글은 레이아웃이 깨진다") */
+.comments .comment { display: grid; grid-template-columns: 29px minmax(0, 1fr); column-gap: 10px; align-items: start; }
+.comments .comment > .avatar-image-container { grid-column: 1; grid-row: 1; }
+.comments .comment > .comment-block { grid-column: 2; grid-row: 1; }
+.comments .comment > .comment-replies, .comments .comment > .comment-replybox-single { grid-column: 2; margin: 0; }
+.comments .comment-replies .comment-thread > ol > li, .comments .comment-replies ol > li.comment { padding: 14px 0 0; border-top: 0; }
+.comments .comment-replies .continue, .comments .comment-replies .thread-toggle { display: none !important; }   /* 답글 달기 없음 (10-2) */
+.comments .avatar-image-container, .comments .avatar-image-container img { width: 29px; height: 29px; }   /* 사진 36 → 29 (20% 작게, 2026-10-13 사용자) */
+/* 댓글 쓰기 = 블로거 전체 페이지로 가는 흰 버튼 하나 (2026-10-13 사용자: 흰색 버튼) — 글 안 쓰기 창 · 중복 제목은 테마 JS가 없앤다 */
+.comments .comment-write { margin-top: 0; padding-top: 14px; border-top: 1px solid #E2E8F0; }
+.comments .comment-write.is-first { padding-top: 14px; border-top: 0; }
+.comments a.comment-write-btn { display: block; padding: 11px 12px; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: #111; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }
+.comments a.comment-write-btn:hover { border-color: #111; color: #111; }
 
 /* 홈 최근 리포트 — 글 링크 줄 카드, 가로 구분선 콘텐츠 카드 여백(보이는 22, 2-1) (2026-10-13 사용자, 디자인 가이드 10-5) */
 .recent-section { display: flex; flex-direction: column; gap: 14px; }
@@ -2918,7 +2932,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           box.appendChild(panel);
           var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'comments-toggle';
           btn.setAttribute('aria-controls', panel.id);
-          btn.innerHTML = '<span></span><svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>';
+          btn.innerHTML = '<span></span><span class="fold-box"><svg class="acc-chev" viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></span>';   /* 공식 접기 버튼 (2026-10-13 사용자) */
           btn.firstChild.textContent = '댓글 ' + n;
           head.textContent = ''; head.appendChild(btn);
           box.classList.add('is-foldable');

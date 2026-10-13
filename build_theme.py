@@ -407,18 +407,32 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment-replybox-single, .comments .comment-replybox-thread { margin-top: 10px; }
 .comments .comment-replybox-single iframe, .comments .comment-replybox-thread iframe { display: block; width: 100%; min-height: 90px; }
 #comment-popup { display: none; }
-/* 댓글 쓰기 = 블로거 전체 페이지로 가는 검은 버튼 하나 (2026-10-13 사용자, 디자인 가이드 10-2) — 글 안 쓰기 창 · 중복 제목은 테마 JS가 없앤다 */
-.comments .comment-write { margin-top: 14px; padding-top: 14px; border-top: 1px solid #E2E8F0; }
-.comments .comment-write.is-first { margin-top: 0; padding-top: 0; border-top: 0; }   /* 댓글이 아직 없으면 위 선 없이 */
-.comments a.comment-write-btn { display: block; padding: 12px; background: #111; border: 0; border-radius: 8px; color: #fff; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }
-.comments a.comment-write-btn:hover { background: #000; color: #fff; }
-@media (max-width: 680px) {   /* 폰 댓글 카드 넓게 (2026-10-13 사용자: "모바일에서 너무 좁다") */
-  .comments-toggle { padding: 12px; }
-  .comments-panel { padding: 14px 12px 12px; }
-  .comments .comment { gap: 8px; }
-  .comments .avatar-image-container, .comments .avatar-image-container img { width: 28px; height: 28px; }
-  .comments .comment-replies { margin-left: 12px; }
-}
+/* 댓글은 열기 버튼만 카드, 펼친 목록 · 쓰기 버튼은 카드 밖 구분선 디자인 (2026-10-13 사용자: "댓글 열기 버튼을 제외하고 카드 디자인 말고 구분선 디자인", 가이드 10-2) */
+.comments.is-foldable { background: none; border: 0; border-radius: 0; }
+.comments.is-foldable .comments-toggle { padding: 8px 8px 8px 16px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; }
+.comments.is-foldable.is-open .comments-toggle { border-bottom: 1px solid #E2E8F0; }
+.comments-panel { padding: 0; }
+.comments .comments-panel > *:first-child { margin-top: 0; }
+.comments #comment-holder { margin-top: 0; }
+.comments .comment-thread > ol > li, .comments ol > li.comment { padding: 14px 0; border-top: 1px solid #E2E8F0; }
+.comments .comment-thread.toplevel-thread > ol > li:first-child { border-top: 0; padding-top: 18px; }
+/* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
+.fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
+.comments-toggle .fold-box .acc-chev { transition: transform .15s; }
+.comments.is-open .comments-toggle .fold-box .acc-chev { transform: rotate(180deg); }
+/* 댓글 한 개 = 두 칸 grid(사진 | 글). 답글 묶음 · 답글 쓰기 자리는 글 칸 아래 줄 — flex 한 줄이라 셋째 칸으로 밀려 깨지던 것 (2026-10-13 사용자: "댓글에 댓글은 레이아웃이 깨진다") */
+.comments .comment { display: grid; grid-template-columns: 29px minmax(0, 1fr); column-gap: 10px; align-items: start; }
+.comments .comment > .avatar-image-container { grid-column: 1; grid-row: 1; }
+.comments .comment > .comment-block { grid-column: 2; grid-row: 1; }
+.comments .comment > .comment-replies, .comments .comment > .comment-replybox-single { grid-column: 2; margin: 0; }
+.comments .comment-replies .comment-thread > ol > li, .comments .comment-replies ol > li.comment { padding: 14px 0 0; border-top: 0; }
+.comments .comment-replies .continue, .comments .comment-replies .thread-toggle { display: none !important; }   /* 답글 달기 없음 (10-2) */
+.comments .avatar-image-container, .comments .avatar-image-container img { width: 29px; height: 29px; }   /* 사진 36 → 29 (20% 작게, 2026-10-13 사용자) */
+/* 댓글 쓰기 = 블로거 전체 페이지로 가는 흰 버튼 하나 (2026-10-13 사용자: 흰색 버튼) — 글 안 쓰기 창 · 중복 제목은 테마 JS가 없앤다 */
+.comments .comment-write { margin-top: 0; padding-top: 14px; border-top: 1px solid #E2E8F0; }
+.comments .comment-write.is-first { padding-top: 14px; border-top: 0; }
+.comments a.comment-write-btn { display: block; padding: 11px 12px; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: #111; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }
+.comments a.comment-write-btn:hover { border-color: #111; color: #111; }
 
 /* 홈 최근 리포트 — 글 링크 줄 카드, 가로 구분선 콘텐츠 카드 여백(보이는 22, 2-1) (2026-10-13 사용자, 디자인 가이드 10-5) */
 .recent-section { display: flex; flex-direction: column; gap: 14px; }
@@ -1239,39 +1253,44 @@ def preview_reports():
 
 
 def preview_comments():
-    items = []
-    for c in PREVIEW_COMMENTS:
-        items.append(
-            "          <li class=\"comment%s\">\n"
-            "            <div class=\"avatar-image-container\"><img src=\"%s\" alt=\"\"/></div>\n"
-            "            <div class=\"comment-block\">\n"
-            "              <div class=\"comment-header\">\n"
-            "                <cite class=\"user\">%s</cite>\n"
-            "                <span class=\"datetime\"><a href=\"#\">%s</a></span>\n"
-            "              </div>\n"
-            "              <p class=\"comment-content\">%s</p>\n"
-            "              <div class=\"comment-actions\">\n"
-            "                <a href=\"#\">답글</a><a href=\"#\">삭제</a>\n"
-            "              </div>\n"
-            "            </div>\n"
-            "          </li>"
-            % (
-                " comment-reply" if c["reply"] else "",
-                _avatar_data_uri(c["avatar"]),
-                html_mod.escape(c["author"], quote=False),
-                c["when"],
-                html_mod.escape(c["body"], quote=False),
-            )
+    """블로거 threaded comments 와 같은 마크업 — 답글은 앞 댓글 li 안의 .comment-replies 묶음 (2026-10-13: 답글 레이아웃 확인용)."""
+    def li(c, replies=""):
+        return (
+            "<li class=\"comment\">"
+            "<div class=\"avatar-image-container\"><img src=\"%s\" alt=\"\"/></div>"
+            "<div class=\"comment-block\"><div class=\"comment-header\"><cite class=\"user\">%s</cite>"
+            "<span class=\"datetime secondary-text\"><a href=\"#\">%s</a></span></div>"
+            "<p class=\"comment-content\">%s</p>"
+            "<span class=\"comment-actions secondary-text\"><a class=\"comment-reply\">답글</a><span class=\"item-control blog-admin\"><a href=\"#\">삭제</a></span></span></div>"
+            "<div class=\"comment-replies\">%s</div><div class=\"comment-replybox-single\"></div></li>"
+            % (_avatar_data_uri(c["avatar"]), html_mod.escape(c["author"], quote=False), c["when"], html_mod.escape(c["body"], quote=False), replies)
         )
+    tops = []
+    for c in PREVIEW_COMMENTS:
+        if c["reply"] and tops:
+            prev, kids = tops[-1]
+            kids.append(c)
+        else:
+            tops.append((c, []))
+    items = []
+    for c, kids in tops:
+        rep = ""
+        if kids:
+            rep = ("<div class=\"comment-thread inline-thread\"><span class=\"thread-toggle thread-expanded\"><span class=\"thread-arrow\"></span><span class=\"thread-count\"><a>답글</a></span></span>"
+                   "<ol class=\"thread-chrome thread-expanded\"><div>" + "".join(li(k) for k in kids) + "</div>"
+                   "<div class=\"continue\"><a class=\"comment-reply\">답글</a></div></ol></div>")
+        else:
+            rep = "<div class=\"comment-thread inline-thread hidden\"></div>"
+        items.append("          " + li(c, rep))
 
     return (
         "      <div class=\"comments\">\n"
         "        <h3 class=\"comments-title\">댓글 %d</h3>\n"
-        "        <ol>\n"
+        "        <div class=\"comments-content\"><div id=\"comment-holder\"><div class=\"comment-thread toplevel-thread\"><ol id=\"top-ra\">\n"
         % len(PREVIEW_COMMENTS)
         + "\n".join(items) + "\n"
         "        </ol>\n"
-        "        <div id=\"top-continue\" class=\"continue\"><a class=\"comment-reply\">댓글 추가</a></div>\n"   # 실제 블로거 마크업 (2026-10-13 라이브 글에서 확인)
+        "        <div id=\"top-continue\" class=\"continue\"><a class=\"comment-reply\">댓글 추가</a></div></div></div></div>\n"   # 실제 블로거 마크업 (2026-10-13 라이브 글에서 확인)
         "        <div class=\"comment-replybox-thread\" id=\"top-ce\"></div>\n"
         "        <p class=\"comment-footer\"></p>\n"
         "        <div class=\"comment-form\"><a name=\"comment-form\"></a><h4 id=\"comment-post-message\">댓글 쓰기</h4>"

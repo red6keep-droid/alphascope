@@ -122,7 +122,7 @@ def _vs(cur, prev, digits=2, unit="%p", word="어제 대비"):
     if cur is None or prev is None:
         return ""
     d = round(float(cur) - float(prev), digits)
-    return f"{word} {dk.arrow(d, digits, unit)}"
+    return f'<span style="white-space:nowrap;">{word} {dk.arrow(d, digits, unit)}</span>'   # 덩어리 가운데서 줄이 바뀌지 않게
 
 
 def _join(*parts):
@@ -367,7 +367,8 @@ def sec_change(analysis, report, prev=None):
     streak = rs.get("qqq_streak")
     if streak is not None:
         rows.append(("나스닥이 S&P 500을 웃돈 연속 일수", f"{int(streak)}일", _vs(streak, prs.get("qqq_streak"), 0, "일"), None, False, True))
-    out = _text(report.get("change_comment")) + dk.sub_fold("상대강도", dk.ccard(rows), "두 지수의 5거래일 수익률 차이(%p). 양수면 앞쪽이 더 많이 올랐습니다", open_=True)   # 첫 소제목은 펼친 채 (2026-10-13 사용자)
+    out = (_text(report.get("change_comment")) + dk.sub_label("상대강도", "두 지수의 5거래일 수익률 차이(%p). 양수면 앞쪽이 더 많이 올랐습니다")
+           + dk.ccard(rows, fold_at=FOLD_SHOWN, noun="항목"))   # 앞 2줄 + 카드 아래 더 보기 (2026-10-13 사용자: 소제목 화살표 대신)
     trows = []
     for key in ("sp500", "nasdaq", "russell"):
         s = series.get(INDEX_SYMBOL[key]) or {}
@@ -379,11 +380,10 @@ def sec_change(analysis, report, prev=None):
             sub.append(_esc(f"20일 고점 대비 {p['from_high_pct']:+.2f}% · 저점 대비 {p['from_low_pct']:+.2f}%"))
             sub.append(_vs(p["from_high_pct"], _get(prev, "position", key, "from_high_pct"), word="고점 대비 어제보다"))   # 고점과의 거리 변화 (2026-10-13 사용자: 어제 대비)
         trows.append((_esc(INDEX_LABELS[key]), _pos(p.get("position_label")) or "—", _join(*sub)))
-    more = dk.ccard(trows)
-    if vix.get("now") is not None and vix.get("prev_5d") is not None:
-        more += dk.ccard([("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → <b>{vix["now"]:.2f}</b> {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}',
-                           _vs(vix["now"], _get(prev, "vix", "now"), 2, ""), 35, True, True)])   # 값 한 줄 (2026-10-12 사용자), 어제 대비는 줄 아래
-    return out + dk.sub_fold("20일 위치", more, "최근 20거래일의 고점 · 저점 사이에서 지금 어디에 있는지")   # 둘째 소제목은 닫힌 채 (2026-10-13 사용자)
+    if vix.get("now") is not None and vix.get("prev_5d") is not None:   # VIX 는 같은 카드 마지막 줄 (2026-10-13 사용자: 더 보기 안으로)
+        trows.append(("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → <b>{vix["now"]:.2f}</b> {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}',
+                      _vs(vix["now"], _get(prev, "vix", "now"), 2, ""), 35, True, True))   # 값 한 줄 (2026-10-12 사용자), 어제 대비는 줄 아래
+    return out + dk.sub_label("20일 위치", "최근 20거래일의 고점 · 저점 사이에서 지금 어디에 있는지") + dk.ccard(trows, fold_at=FOLD_SHOWN, noun="항목")
 
 
 def _up_down(up, down):
@@ -527,7 +527,7 @@ def _quote_rows(quotes):
         sym = q.get("symbol") or "-"
         sector = SECTOR_KO.get(q.get("sector") or "", q.get("sector") or "")
         vol = '<span style="white-space:nowrap;">' + _esc("거래량 " + _fmt_volume(q.get("volume"))) + "</span>"   # 라벨과 거래량 사이에서만 줄이 바뀌게
-        tag = (dk.pill(sector) + " ") if sector else ""   # 섹터 라벨이 거래량보다 앞 (2026-10-13 사용자: "어느 섹터인지가 더 중요")
+        tag = dk.pill(sector, lead=True) if sector else ""   # 줄 첫머리 라벨 — 왼쪽 0, 오른쪽 4   # 섹터 라벨이 거래량보다 앞 (2026-10-13 사용자: "어느 섹터인지가 더 중요")
         r = dk.crow(dk.ticker_logo(sym) + _esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', tag + vol, first=len(rows) == 0,
                     left=QUOTE_LEFT, nowrap=True, sub_block=True)
         chg = q.get("change_pct")
@@ -571,7 +571,7 @@ def sec_news(input_data, report, analysis):
         theme = item.get("theme")
         if theme and theme not in THEME_VOCAB:
             theme = "기타"
-        tag = (" " + dk.pill(theme)) if theme else ""   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
+        tag = dk.pill(theme) if theme else ""   # 라벨 좌우 4px 는 pill 이 갖는다   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
         title = _esc(item.get("title_ko") or news_item.get("title_ko") or news_item.get("title") or "")   # Gemini 가 옮긴 한국어 제목 먼저 (2026-10-12 사용자)
         link = dk.link_icon(news_item.get("link"), news_item.get("title") or "원문")
         related = [s for s in (item.get("related") or []) if isinstance(s, str) and s in known][:4]
@@ -581,7 +581,7 @@ def sec_news(input_data, report, analysis):
         if item.get("why"):
             subs.append("선정 이유 : " + _esc(item["why"]))
         sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;">{x}</span>' for x in subs)
-        items.append(f"<span style='color:#111;'>{title}</span>{tag}{link}{sub_html}")
+        items.append(f"<span style='color:#111;font-weight:700;'>{title}</span>{tag}{link}{sub_html}")   # 기사 제목 굵게 (2026-10-13 사용자)
     return dk.item_rules(items, sub=True) if items else dk.muted("주요 뉴스 없음")   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
 
 

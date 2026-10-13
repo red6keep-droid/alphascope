@@ -198,7 +198,7 @@ def _pill(text, kind):
     bd, fg = PILL.get(kind, PILL["neutral"])
     bg = PILL_BG.get(kind, "#fff")
     # 박스는 글자에 맞게: line-height 1 + 위아래 같은 안쪽 여백 → 글자가 위로 쏠리지 않는다. 본문 줄 가운데에 맞춤(middle)
-    return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;'
+    return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;margin:0 {_dk.PILL_GAP}px;'
             f'font-size:{_dk.PILL_SIZE};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{_esc(text)}</span>')   # 라벨 14px, 어디서나 (2026-10-12 사용자)
 
 
@@ -502,7 +502,7 @@ def _event_html(e):
         link = _link_icon(e.get("url"), f"{src} 원문")
         fact = f" — {_esc(e['fact'])}" if e.get("fact") and e["fact"] != e["title"] else ""
     when = f' <span style="color:{SUB};font-size:{TINY};white-space:nowrap;">({_esc(_d(e["published_at"][:10]))})</span>' if e.get("published_at") else ""   # 날짜가 두 줄로 쪼개지지 않게
-    inner = f"{head}{fact} {tag}{link}{when}"   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
+    inner = f'<span style="font-weight:700;color:#111;">{head}</span>{fact} {tag}{link}{when}'   # 기사 제목 굵게 (2026-10-13 사용자)   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절)
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
         return f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px;margin:0 0 8px;line-height:{_dk.LH_BODY};">{inner}</div>'   # 뉴스 제목 행간 34 (2026-10-12 사용자)   # 일반 기사 카드와 같은 크기·여백, 배경만 방향 색
@@ -538,8 +538,7 @@ ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" ar
             'stroke-linecap="round" stroke-linejoin="round" style="flex:none;transition:transform .15s;"><path d="M4 6l4 4 4-4"/></svg>')
 
 
-ACC_BTN = (f'<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid #E2E8F0;border-radius:6px;'
-           f'background:#fff;color:#111;margin-left:8px;vertical-align:middle;">{ACC_CHEV}</span>')   # 네모 박스 안 화살표 버튼 (2026-10-11 사용자)
+ACC_BTN = _dk.fold_btn()   # 네모 박스 안 화살표 버튼 (2026-10-11 사용자) = 공식 접기 버튼, 28 → 31px (2026-10-13 사용자, 가이드라인 10-6)
 
 
 def _accordion(summary_html, body_html, open_=False, block=False):
@@ -552,7 +551,7 @@ def _accordion(summary_html, body_html, open_=False, block=False):
                 f'<div style="padding:0 12px;border-top:1px solid #E2E8F0;">{body_html}</div></details>')   # 줄마다 위아래 10px (줄이 갖는다)
     return (f'<details data-acc="1"{" open" if open_ else ""} style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font-size:{SMALL};line-height:{LH_CARD};">'
             f'<summary style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;cursor:pointer;list-style:none;">'
-            f'<span style="flex:1;min-width:0;display:flex;justify-content:space-between;gap:12px;">{summary_html}</span>{ACC_CHEV}</summary>'
+            f'<span style="flex:1;min-width:0;display:flex;justify-content:space-between;gap:12px;">{summary_html}</span>{ACC_BTN}</summary>'
             f'<div style="padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;border-top:1px solid #E2E8F0;">{body_html}</div></details>')
 
 
@@ -585,11 +584,11 @@ def sec_events(a):
         return _muted("오늘은 임계값을 넘은 이벤트가 없습니다 — 공시·기사·가격·옵션·예상 실적 어느 쪽도 기준에 걸리지 않았다는 뜻입니다.")
     cards = [e for e in a["events"] if e.get("emphasis")]
     plain = [e for e in a["events"] if not e.get("emphasis")]
-    out = "".join(_event_html(e) for e in cards) + _dk.item_cards([_event_html(e) for e in plain])   # 기사마다 카드 (2026-10-12 사용자)
+    out = "".join(_event_html(e) for e in cards) + _dk.item_rules([_event_html(e) for e in plain])   # 강조 카드만 카드, 나머지는 가로 구분선 목록 (2026-10-13 사용자)
     if a["events_overflow"]:
         # 카드 버튼 (가운데, 검정) — 2026-10-11 사용자
         out += (f'<details data-acc="1" style="margin:8px 0;"><summary style="{_dk.FOLD_BTN}">그 외 {len(a["events_overflow"])}건 {ACC_CHEV}</summary>'
-                + '<div style="margin-top:8px;">' + _dk.item_cards([_event_html(dict(e, emphasis=False)) for e in a["events_overflow"]]) + "</div></details>")
+                + '<div style="margin-top:8px;">' + _dk.item_rules([_event_html(dict(e, emphasis=False)) for e in a["events_overflow"]]) + "</div></details>")
     if a.get("analyst_target_only"):
         out += _muted(f"목표가만 바뀐 애널리스트 {len(a['analyst_target_only'])}건 (등급 변경 아님): "
                       + " · ".join(t["title"] for t in a["analyst_target_only"][:6]))

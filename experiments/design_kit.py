@@ -376,10 +376,14 @@ def notice(parts):
             + "<br>".join(INFO_ICON + p for p in parts) + "</div>")
 
 
-def pill(text, kind="area"):
+PILL_GAP = 4   # 라벨 좌우 바깥 여백 — 항상 (2026-10-13 사용자: "라벨의 좌우 여백은 4픽셀 정도 여백을 항상 확보")
+
+
+def pill(text, kind="area", lead=False):
+    """라벨(알약). 이어지는 글자와 세로 가운데(middle), 좌우 4px. lead=True: 줄 첫머리 라벨 — 왼쪽 0 으로 줄 왼쪽 선을 맞춘다."""
     bd, fg = PILL.get(kind, PILL["neutral"])
     bg = PILL_BG.get(kind, "#fff")
-    return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;'
+    return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;margin:0 {PILL_GAP}px 0 {0 if lead else PILL_GAP}px;'
             f'font-size:{PILL_SIZE};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{esc(text)}</span>')   # 라벨 14px, 어디서나 (2026-10-12 사용자)
 
 
@@ -623,8 +627,8 @@ def state_card(head_html, kind="neutral", right_html="", sub_html="", items=(), 
     bg, bd = STATE_CARD.get(kind, STATE_CARD["neutral"])
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;font-size:{EMPH_NAME};">{head_html}</span>'
-            + (f'<span style="font-weight:700;white-space:nowrap;font-size:{SMALL};{"margin-left:auto;" if chev else ""}">{right_html}</span>' if right_html else "")
-            + (f'<span style="display:flex;color:#111;{"" if right_html else "margin-left:auto;"}">{ACC_CHEV}</span>' if chev else "") + "</span>")   # chev: 맨 오른쪽 펼침 화살표 (state_fold, 2026-10-13 사용자)
+            + (f'<span style="display:inline-flex;align-items:center;font-weight:700;white-space:nowrap;font-size:{SMALL};{"margin-left:auto;" if chev else ""}">{right_html}</span>' if right_html else "")   # 라벨 · 숫자 세로 가운데 (2026-10-13 사용자)
+            + ((("" if right_html else '<span style="margin-left:auto;"></span>') + fold_btn(lighten(bg), bd)) if chev else "") + "</span>")   # chev: 맨 오른쪽 공식 접기 버튼, 바탕은 카드 색 20% 밝게 (2026-10-13 사용자)
     sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#374151;margin-top:2px;">{sub_html}</div>' if sub_html else ""
     lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#374151", margin="8px 0") for k, v in items)
     body = (f'<div style="margin-top:{14 - VP_EMPH}px;padding-top:{14 - VP}px;border-top:1px solid {bd};font-size:{TINY};line-height:{LH_TINY};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자: 4 → 14)
@@ -645,6 +649,24 @@ def emph_list(lines):
 
 ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" '
             'stroke-linecap="round" stroke-linejoin="round" style="flex:none;transition:transform .15s;"><path d="M4 6l4 4 4-4"/></svg>')
+
+
+def lighten(hex_color, amt=0.2):
+    """흰색 쪽으로 amt 만큼 섞은 색 — 공식 접기 버튼 바탕 (색 배경 위에서 20% 밝게, 2026-10-13 사용자)."""
+    h = hex_color.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return "#" + "".join(f"{round(c + (255 - c) * amt):02X}" for c in (r, g, b))
+
+
+FOLD_BOX, FOLD_RADIUS, FOLD_ICON, FOLD_LEFT = 31, 7, 18, 4   # 공식 접기 버튼: 엔비디아 평균 등급 네모 28 → 10% 크게 31, 화살표 16 → 18, 왼쪽 여백 4 (2026-10-13 사용자)
+
+
+def fold_btn(bg="#fff", bd="#E2E8F0"):
+    """공식 접기 버튼 — 줄 오른쪽 끝 네모 안 화살표 (가이드라인 10-6). 흰 카드 위에선 흰 바탕, 색 배경 카드 위에선 bg = 그 배경을 20% 밝게(lighten), bd = 카드 테두리.
+    바깥 details[data-acc][open] 이면 테마 CSS가 화살표를 위로 돌린다."""
+    chev = ACC_CHEV.replace('width="16" height="16"', f'width="{FOLD_ICON}" height="{FOLD_ICON}"')
+    return (f'<span style="display:inline-flex;flex:none;align-items:center;justify-content:center;width:{FOLD_BOX}px;height:{FOLD_BOX}px;box-sizing:border-box;'
+            f'border:1px solid {bd};border-radius:{FOLD_RADIUS}px;background:{bg};color:#111;margin-left:{FOLD_LEFT}px;vertical-align:middle;">{chev}</span>')
 
 
 # 펼침 · 접기 카드 버튼 (`○○ n개 더 보기` · `그 외 n건` · `표 보기`) — 글자 14px (2026-10-12 사용자: "더 보기 버튼의 폰트 사이즈는 14, 블로그 모두 일괄")
@@ -669,18 +691,6 @@ def state_fold(card_html, inner_html):
 SUB_DOT = 2   # 소제목 앞 점 2px (2026-10-13 사용자: "2픽셀 블릿")
 
 
-def sub_fold(t, inner_html, tip_text=None, open_=False):
-    """접는 소제목 (2026-10-13 사용자: "하위 타이틀은 볼드에 2픽셀 블릿, 타이틀 우측에 펼침아이콘, 첫 부분만 노출하고 2번째 영역은 펼침 아이콘으로").
-    18px 굵게 #111 · 앞 2px 점 · 오른쪽 끝 `읽는 법 ?` 다음 화살표. open_=True 면 처음부터 펼침. data-sub 는 두지 않는다 — 테마가 서브탭으로 바꾸지 않게."""
-    lh = int(LH_CARD[:-2])
-    dot = f'<span style="flex:none;width:{SUB_DOT}px;height:{SUB_DOT}px;border-radius:50%;background:#111;margin-top:{(lh - SUB_DOT) // 2}px;align-self:flex-start;"></span>'
-    tip_html = tips_right([("읽는 법", tip_text)]) if tip_text else ""
-    head = (f'<span style="display:flex;align-items:center;gap:7px;position:relative;font-size:{SMALL};line-height:{LH_CARD};font-weight:700;color:#111;">'
-            f'{dot}<span>{paren(esc(t))}</span>{tip_html}<span style="display:flex;{"" if tip_html else "margin-left:auto;"}">{ACC_CHEV}</span></span>')
-    return (f'<details data-acc="1"{" open" if open_ else ""} style="margin:14px 0 0;"><summary style="list-style:none;cursor:pointer;display:block;padding:4px 0 6px;">{head}</summary>'
-            f'<div style="margin-top:4px;">{inner_html}</div></details>')
-
-
 RULE_GAP = SEP_GAP + 5   # 카드 없이 가로 구분선만 둔 목록 — 선 위아래 보이는 27 (2026-10-13 사용자: "기존 구분선 여백 상하 여백에 5픽셀씩 더")
 
 
@@ -703,9 +713,11 @@ def rule_rows(rows):
 
 def sub_label(t, tip_text=None):
     """소제목. tip_text 가 있으면 소제목 바로 옆 ? 툴팁 — 그 소제목 내용의 읽는 법 (2026-10-12 사용자)."""
-    t_html = paren(esc(t)) + (tips_right([("읽는 법", tip_text)]) if tip_text else "")   # 읽는 법 ? 는 줄 오른쪽 끝 (2026-10-13 사용자)
+    lh = int(LH_CARD[:-2])
+    dot = f'<span style="flex:none;align-self:flex-start;width:{SUB_DOT}px;height:{SUB_DOT}px;border-radius:50%;background:#111;margin-top:{(lh - SUB_DOT) // 2}px;"></span>'   # 2px 점 (2026-10-13 사용자)
+    t_html = dot + f"<span>{paren(esc(t))}</span>" + (tips_right([("읽는 법", tip_text)]) if tip_text else "")   # 읽는 법 ? 는 줄 오른쪽 끝 (2026-10-13 사용자)
     # 바깥 div 에 display 를 주지 않는다 — 테마가 서브탭을 만들 때 hidden 을 거는데 인라인 display 가 이기면 숨지 않는다 (2026-10-13 발견)
-    return f'<div data-sub="1" style="position:relative;font-size:{SMALL};line-height:{LH_CARD};color:{NOTE};margin:10px 0 3px;"><span style="display:flex;align-items:center;gap:8px;">{t_html}</span></div>'
+    return f'<div data-sub="1" style="position:relative;font-size:{SMALL};line-height:{LH_CARD};color:#111;font-weight:700;margin:14px 0 6px;"><span style="display:flex;align-items:center;gap:7px;">{t_html}</span></div>'   # 굵게 검정 (2026-10-13 사용자)
 
 
 BAR_LABEL = "16px"   # F 막대 라벨 — `오늘 15건 … 긍정 67% · 부정 20% · 중립 13%` 가 폰 한 줄에 들도록 (2026-10-12)
