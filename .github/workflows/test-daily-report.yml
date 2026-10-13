@@ -14,6 +14,11 @@ on:
         type: boolean
         required: false
         default: false
+      scheduled:
+        description: '외부 cron(Cloudflare Worker)용 — 스케줄 실행과 똑같이 동작 (사람은 끄고 쓴다)'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -24,6 +29,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  # GitHub cron은 자주 늦거나 빠진다. 같은 시각에 Cloudflare Worker가 scheduled=true 로
+  # workflow_dispatch를 건다 — 그 실행도 스케줄로 취급한다 (infra/cron-trigger).
+  IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
   FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   # 게시 시 필요. OAuth 데스크톱 클라이언트 + refresh token(setup_oauth.py로 발급).
@@ -51,7 +59,7 @@ jobs:
       # Gemini 호출·이미지 생성을 헛돌리지 않게 가장 앞에서 확인한다.
       - name: Check if today's report is already published
         id: check
-        if: github.event_name == 'schedule' || inputs.publish
+        if: env.IS_SCHEDULED == 'true' || inputs.publish
         run: python experiments/daily-report/check_published.py
 
       # 분석 이력(Regime 점수 등)은 report-state orphan 브랜치에 산다. 어제 점수와
@@ -110,12 +118,12 @@ jobs:
           curl -sS -f -o /dev/null "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}"
           echo "커버 이미지 CDN 확인 완료: ${IMAGE_REF}"
 
-      # 스케줄 실행은 자동 게시. 수동 실행은 publish 체크 시에만 게시.
+      # 스케줄 실행(외부 cron 포함)은 자동 게시. 수동 실행은 publish 체크 시에만 게시.
       # publish_saved.py는 커버 이미지 URL까지 확인한다.
       - name: Publish to Blogger
         if: |
           steps.check.outputs.already_published != 'true'
-          && (github.event_name == 'schedule' || inputs.publish)
+          && (env.IS_SCHEDULED == 'true' || inputs.publish)
         run: python experiments/daily-report/publish_saved.py
 
       # 게시 성패와 무관하게 그날 분석은 남긴다. 게시가 skip된 날(already_published)은

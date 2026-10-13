@@ -1,0 +1,10 @@
+name = "alphascope-cron-trigger"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = false   # HTTP 엔드포인트 없음 — cron으로만 돈다
+
+[triggers]
+# UTC. src/index.js의 JOBS 키와 문자열이 정확히 같아야 한다.
+crons = ["0 21 * * *", "30 22 * * *", "45 22 * * *"]
+
+# 비밀값은 여기 쓰지 않는다: npx wrangler secret put GITHUB_TOKEN

@@ -11,10 +11,18 @@ GITHUB_OUTPUT에 already_published=true|false 를 기록한다.
 확인 자체가 실패하면 false로 기록해 그날 리포트가 누락되지 않게 한다.
 (중복 게시는 publish_saved.py의 2차 확인에서 다시 걸러진다.)
 
+트럼프·NVDA 시리즈도 같은 방식으로 확인한다(--series). 그쪽 publish.py는 같은 제목이면
+덮어쓰므로 중복 글은 생기지 않지만, 외부 cron과 GitHub cron이 둘 다 도는 날
+Gemini 호출과 상태 커밋이 두 번 일어나는 것을 막는다 (2026-10-13).
+
 사용법:
-    python experiments/daily-report/check_published.py
+    python experiments/daily-report/check_published.py                  # 데일리
+    python experiments/daily-report/check_published.py --series trump   # 트럼프 SNS 트렌드
+    python experiments/daily-report/check_published.py --series nvda    # 엔비디아 리포트
 """
 
+import argparse
+import importlib.util
 import os
 import sys
 
@@ -25,6 +33,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import publish_blogger
 import report_title
 
+EXPERIMENTS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SERIES_DIRS = {"trump": "trump-trend", "nvda": "nvda-report"}
+
 
 def _set_output(already_published):
     path = os.environ.get("GITHUB_OUTPUT")
@@ -34,10 +45,28 @@ def _set_output(already_published):
         f.write(f"already_published={'true' if already_published else 'false'}\n")
 
 
+def _title(series):
+    if series == "daily":
+        return report_title.daily_title(report_title.today_kst())
+    # 시리즈마다 report_title.py가 있어 이름이 겹친다. 파일 경로로 따로 불러온다.
+    # nvda의 report_title은 같은 폴더의 config를 import하므로 그 폴더를 경로 앞에 둔다.
+    series_dir = os.path.join(EXPERIMENTS, SERIES_DIRS[series])
+    sys.path.insert(0, series_dir)
+    spec = importlib.util.spec_from_file_location(
+        f"{series}_report_title", os.path.join(series_dir, "report_title.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.post_title(module.today_kst())
+
+
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--series", choices=["daily", *SERIES_DIRS], default="daily")
+    args = parser.parse_args()
+
     load_dotenv()
 
-    title = report_title.daily_title(report_title.today_kst())
+    title = _title(args.series)
     print(f"확인할 제목: {title}")
 
     try:

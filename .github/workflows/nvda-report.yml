@@ -26,6 +26,11 @@ on:
         type: boolean
         required: false
         default: false
+      scheduled:
+        description: '외부 cron(Cloudflare Worker)용 — 스케줄 실행과 똑같이 동작 (사람은 끄고 쓴다)'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -44,10 +49,38 @@ env:
   BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
   BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
   STATE_DIR: experiments/nvda-report/output/state
-  DO_PUBLISH: ${{ (github.event_name == 'schedule' && vars.NVDA_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+  # GitHub cron은 자주 늦거나 빠진다(2026-10-13 하루치 전부 누락). 같은 시각에 Cloudflare Worker가
+  # scheduled=true 로 workflow_dispatch를 건다 — 그 실행도 스케줄로 취급한다 (infra/cron-trigger).
+  IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
+  DO_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.NVDA_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
 
 jobs:
+  # 스케줄(외부 cron 포함)은 GitHub cron과 외부 cron이 하루 두 번 걸 수 있다. 오늘 글이 이미 있으면
+  # 본 작업을 통째로 건너뛴다. 수동 실행은 확인하지 않는다 — 같은 제목 글을 덮어써 다시 만드는 용도.
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      already_published: ${{ steps.check.outputs.already_published }}
+    steps:
+      - uses: actions/checkout@v5
+        if: env.IS_SCHEDULED == 'true'
+
+      - name: Set up Python
+        if: env.IS_SCHEDULED == 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Check if today's report is already published
+        id: check
+        if: env.IS_SCHEDULED == 'true'
+        run: |
+          pip install -r experiments/daily-report/requirements.txt
+          python experiments/daily-report/check_published.py --series nvda
+
   nvda-report:
+    needs: check
+    if: needs.check.outputs.already_published != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -78,7 +111,7 @@ jobs:
       - name: Run pipeline
         run: |
           ARGS="--import-state $STATE_DIR --export-state $STATE_DIR"
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.narrate }}" = "true" ]; then
+          if [ "$IS_SCHEDULED" = "true" ] || [ "${{ inputs.narrate }}" = "true" ]; then
             ARGS="$ARGS --narrate"
           fi
           # 게시는 아래 별도 단계에서 — 가격 그래프 PNG가 gh-pages에 먼저 올라가 있어야 글의 <img>가 깨지지 않는다 (2026-10-11)
