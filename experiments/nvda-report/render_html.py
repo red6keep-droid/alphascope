@@ -133,7 +133,7 @@ def _section(title, html, summary="", line=None, tab=None):
 
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor" stroke="none"/></svg>')
-QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" style="vertical-align:-3px;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 15.4 → 18px (2026-10-12 사용자: 20% 크게, 소수점 없이)
+QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 15.4 → 18px (2026-10-12 사용자: 20% 크게, 소수점 없이)
                  '<circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5"/><circle cx="8" cy="11.4" r=".9" fill="currentColor" stroke="none"/></svg>')
 NOTE = "#6B7280"   # 안내 줄 회색 (테마 gray-500)
 
@@ -198,7 +198,7 @@ def _pill(text, kind):
     bd, fg = PILL.get(kind, PILL["neutral"])
     bg = PILL_BG.get(kind, "#fff")
     # 박스는 글자에 맞게: line-height 1 + 위아래 같은 안쪽 여백 → 글자가 위로 쏠리지 않는다. 본문 줄 가운데에 맞춤(middle)
-    return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;margin:0 {_dk.PILL_GAP}px;'
+    return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;margin:0 {_dk.PILL_GAP}px;{_dk.PILL_MID}'
             f'font-size:{_dk.PILL_SIZE};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{_esc(text)}</span>')   # 라벨 14px, 어디서나 (2026-10-12 사용자)
 
 
@@ -333,7 +333,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip=""):
     lis = "".join(li(t) for t in lines)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{_dk.EMPH_PAD - _dk.VP_EMPH}px 14px;margin:0 0 8px;line-height:{_dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다
-            f'<span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_esc(title)}{_dk.tip_anno(tip)}{new_html}</span><span style="{COL_R}font-weight:700;color:{color};">{_esc(state)}</span></span> '
+            f'<span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_esc(title)}{_dk.tip_icon(tip)}{new_html}</span><span style="{COL_R}font-weight:700;color:{color};">{_esc(state)}</span></span> '
             f'<div style="margin-top:{14 - _dk.VP_EMPH}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
 
@@ -345,7 +345,7 @@ def _tip(text):
         return ""
     t = _esc(text).replace(chr(34), "&quot;")
     return (f' <span data-tip="{t}" tabindex="0" role="button" aria-label="{t}" '
-            f'style="color:{NOTE};cursor:help;vertical-align:middle;">{QUESTION_ICON}</span>')   # 툴팁 상자는 position:relative 인 제목 줄 기준 — 카드 폭 안에 들어간다
+            f'style="display:inline-flex;align-items:center;color:{NOTE};cursor:help;vertical-align:middle;position:relative;top:-1px;">{QUESTION_ICON}</span>')   # 20px, 글자와 세로 가운데 (2026-10-13 사용자)   # 툴팁 상자는 position:relative 인 제목 줄 기준 — 카드 폭 안에 들어간다
 
 
 def regime_rule():
@@ -506,7 +506,12 @@ def _event_html(e):
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절)
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
         return f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px;margin:0 0 8px;line-height:{_dk.LH_BODY};">{inner}</div>'   # 뉴스 제목 행간 34 (2026-10-12 사용자)   # 일반 기사 카드와 같은 크기·여백, 배경만 방향 색
-    return inner   # 나머지는 글 항목 카드(_dk.list_card)의 한 줄 (2026-10-12 사용자: 뉴스는 카드 형식으로)
+    # 일반 기사: 라벨 줄이 제목 위, 새 창 아이콘 없이 제목이 원문 링크 (2026-10-13 사용자 — 강조 카드는 제외)
+    lab = f'<span style="display:block;line-height:1;margin:0 0 8px;">{tag}</span>'
+    tip_t = _esc(f"{src}: {e['title'][:90]}" if e["kind"] in rr.DOC_KINDS else f"{src} 원문").replace(chr(34), "&quot;")
+    head_html = (f'<a href="{_esc(e["url"])}" title="{tip_t}" target="_blank" rel="noopener" style="font-weight:700;color:#111;text-decoration:none;">{head}</a>'
+                 if e.get("url") else f'<span style="font-weight:700;color:#111;">{head}</span>')
+    return f"{lab}{head_html}{fact}{when}"
 
 
 # 막대는 파스텔 톤 (2026-10-11 사용자: 너무 빨갛다, 눈의 피로) — (배경, 글자)

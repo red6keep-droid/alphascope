@@ -45,7 +45,7 @@ MULTI_ROW = f"display:flex;justify-content:space-between;align-items:center;gap:
 MULTI_SEP = "border-top:1px solid #E2E8F0;"
 INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="5" r=".9" fill="currentColor" stroke="none"/></svg>')
-QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" style="vertical-align:-3px;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 15.4 → 18px (2026-10-12 사용자: 20% 크게, 소수점 없이)
+QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block;" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'   # 툴팁 아이콘 = ? (2026-10-11 사용자), 15.4 → 18px (2026-10-12 사용자: 20% 크게, 소수점 없이)
                  '<circle cx="8" cy="8" r="6.5"/><path d="M6.1 6.2a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5"/><circle cx="8" cy="11.4" r=".9" fill="currentColor" stroke="none"/></svg>')
 LINK_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
              '<path d="M9 3h4v4"/><path d="M13 3 7 9"/><path d="M11 9v4H3V5h4"/></svg>')
@@ -242,7 +242,7 @@ def tip(text):
     상자는 position:relative 인 가장 가까운 줄 기준으로 놓인다 — 아이콘은 그런 줄 안에 둔다."""
     t = esc(text).replace(chr(34), "&quot;").replace("\n", "&#10;")
     return (f'<span data-tip="{t}" tabindex="0" role="button" aria-label="{t}" '
-            f'style="color:{NOTE};cursor:help;vertical-align:middle;margin-left:2px;">{QUESTION_ICON}</span>')
+            f'style="display:inline-flex;align-items:center;color:{NOTE};cursor:help;vertical-align:middle;position:relative;top:-1px;margin-left:2px;">{QUESTION_ICON}</span>')   # 글자와 세로 가운데 (2026-10-13 사용자)
 
 
 def read_text(items, notes=()):
@@ -256,22 +256,30 @@ def tip_label(label, text):
     return f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};white-space:nowrap;margin-left:6px;">{esc(label)}{tip(text)}</span>'
 
 
+def tip_icon(text):
+    """상태 카드 제목 옆 툴팁 — `안내` 글자 없이 아이콘만 (2026-10-13 사용자: "점수 옆의 툴팁의 안내 글자는 삭제")."""
+    return tip(text).replace("margin-left:2px;", "margin-left:6px;", 1)   # 감싸지 않는다 — inline-flex 로 감싸면 아이콘이 글자 위로 뜬다
+
+
 def tip_anno(text):
     """이름 옆 `안내 ?` — 라벨이 따로 없는 툴팁 (카드 구분명 · 상태 카드 제목 옆)."""
     return tip_label("안내", text)
 
 
+TIP_RIGHT = 10   # 줄 오른쪽 끝 툴팁 묶음의 오른쪽 여백 (2026-10-13 사용자: "우측 여백 들여쓰기 10픽셀")
+
+
 def tips_right(pairs):
     """제목 줄 오른쪽 끝에 툴팁 묶음 `읽는 법 ? · 주의 ?` — 모든 리포트의 툴팁 배치 (2026-10-13 사용자: "타이틀 줄에 우측 정렬로 툴팁 배치"). pairs = [(라벨, 글)]."""
     inner = ' <span style="color:#CBD5E1;">·</span> '.join(f'<span style="white-space:nowrap;">{esc(k)}{tip(v)}</span>' for k, v in pairs if v)
-    return f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};margin-left:auto;align-self:center;white-space:nowrap;flex:none;">{inner}</span>' if inner else ""
+    return f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};margin-left:auto;margin-right:{TIP_RIGHT}px;align-self:center;white-space:nowrap;flex:none;">{inner}</span>' if inner else ""   # 오른쪽 10px 안쪽 (2026-10-13 사용자)
 
 
 def tip_line(items, in_title=False):
     """용어 툴팁 줄 — "용어ⓘ · 용어ⓘ". 14px 안내 회색. items = [(용어, 설명)]. 줄이 position:relative 라 상자가 줄 폭 안에 뜬다."""
     inner = ' <span style="color:#CBD5E1;">·</span> '.join(f'<span style="white-space:nowrap;">{esc(k)}{tip(v)}</span>' for k, v in items)
     if in_title:   # 구획 제목 줄 오른쪽 (2026-10-11 사용자: "급상승 주제 타이틀 우측에") — 툴팁 상자는 position:relative 인 h2 기준
-        return f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};margin-left:auto;align-self:center;white-space:nowrap;flex:none;">{inner}</span>'
+        return f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};margin-left:auto;margin-right:{TIP_RIGHT}px;align-self:center;white-space:nowrap;flex:none;">{inner}</span>'
     return f'<div style="position:relative;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};margin:2px 0 1px;{GUIDE_IND}">{inner}</div>'
 
 
@@ -376,14 +384,15 @@ def notice(parts):
             + "<br>".join(INFO_ICON + p for p in parts) + "</div>")
 
 
-PILL_GAP = 4   # 라벨 좌우 바깥 여백 — 항상 (2026-10-13 사용자: "라벨의 좌우 여백은 4픽셀 정도 여백을 항상 확보")
+PILL_GAP = 5   # 라벨 좌우 바깥 여백 — 모든 라벨 (2026-10-13 사용자: 4 → "5픽셀, 반드시 모든 라벨에 공통")
+PILL_MID = "position:relative;top:-1px;"   # vertical-align:middle 은 한글 가운데보다 약 1px 낮다 (잰 값) — 이어지는 글자와 가운데 (2026-10-13 사용자)
 
 
 def pill(text, kind="area", lead=False):
-    """라벨(알약). 이어지는 글자와 세로 가운데(middle), 좌우 4px. lead=True: 줄 첫머리 라벨 — 왼쪽 0 으로 줄 왼쪽 선을 맞춘다."""
+    """라벨(알약). 이어지는 글자와 세로 가운데, 좌우 5px — 모든 라벨 (lead 는 옛 인자, 무시)."""
     bd, fg = PILL.get(kind, PILL["neutral"])
     bg = PILL_BG.get(kind, "#fff")
-    return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;margin:0 {PILL_GAP}px 0 {0 if lead else PILL_GAP}px;'
+    return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;margin:0 {PILL_GAP}px;{PILL_MID}'
             f'font-size:{PILL_SIZE};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{esc(text)}</span>')   # 라벨 14px, 어디서나 (2026-10-12 사용자)
 
 
@@ -689,6 +698,7 @@ def state_fold(card_html, inner_html):
 
 
 SUB_DOT = 2   # 소제목 앞 점 2px (2026-10-13 사용자: "2픽셀 블릿")
+SUB_TOP_EXTRA = 15   # 소제목 위 여백 +15 → 29 (2026-10-13 사용자)
 
 
 RULE_GAP = SEP_GAP + 5   # 카드 없이 가로 구분선만 둔 목록 — 선 위아래 보이는 27 (2026-10-13 사용자: "기존 구분선 여백 상하 여백에 5픽셀씩 더")
@@ -717,7 +727,7 @@ def sub_label(t, tip_text=None):
     dot = f'<span style="flex:none;align-self:flex-start;width:{SUB_DOT}px;height:{SUB_DOT}px;border-radius:50%;background:#111;margin-top:{(lh - SUB_DOT) // 2}px;"></span>'   # 2px 점 (2026-10-13 사용자)
     t_html = dot + f"<span>{paren(esc(t))}</span>" + (tips_right([("읽는 법", tip_text)]) if tip_text else "")   # 읽는 법 ? 는 줄 오른쪽 끝 (2026-10-13 사용자)
     # 바깥 div 에 display 를 주지 않는다 — 테마가 서브탭을 만들 때 hidden 을 거는데 인라인 display 가 이기면 숨지 않는다 (2026-10-13 발견)
-    return f'<div data-sub="1" style="position:relative;font-size:{SMALL};line-height:{LH_CARD};color:#111;font-weight:700;margin:14px 0 6px;"><span style="display:flex;align-items:center;gap:7px;">{t_html}</span></div>'   # 굵게 검정 (2026-10-13 사용자)
+    return f'<div data-sub="1" style="position:relative;font-size:{SMALL};line-height:{LH_CARD};color:#111;font-weight:700;margin:{14 + SUB_TOP_EXTRA}px 0 6px;"><span style="display:flex;align-items:center;gap:7px;">{t_html}</span></div>'   # 굵게 검정 (2026-10-13 사용자)
 
 
 BAR_LABEL = "16px"   # F 막대 라벨 — `오늘 15건 … 긍정 67% · 부정 20% · 중립 13%` 가 폰 한 줄에 들도록 (2026-10-12)

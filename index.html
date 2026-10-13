@@ -73,6 +73,7 @@
   /* type */
   --sans: 'Noto Sans KR', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --num:  'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --report-font: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;   /* 리포트 본문 글꼴 (design_kit.WRAP_OPEN) — 홈 · 목록 구획 제목도 이것 (2026-10-13) */
 
   /* rhythm */
   --gutter:  40px;
@@ -259,7 +260,8 @@ body.menu-open { overflow: hidden; }
   font-weight: 700;
   font-size: 21px;   /* 공식 구획 제목 크기 21 (폰 19) — 미국 증시 리포트 구획 제목과 같게 (2026-10-13 사용자, 가이드 3-1) */
   line-height: 27px;
-  letter-spacing: -0.3px;
+  font-family: var(--report-font);   /* 리포트 구획 제목과 같은 글꼴 · 자간 0 — Noto Sans KR · 자간 −0.3 이라 같은 21px 이 더 커 보였다 (2026-10-13 사용자, 가이드 10-6) */
+  letter-spacing: 0;
   color: var(--ink);
   white-space: nowrap;
 }
@@ -304,7 +306,7 @@ body.menu-open { overflow: hidden; }
 
 /* 리포트 이름은 카드 밖 제목(21px 굵게 · 행간 27 = 구획 제목 글자) + 앞에 컬러 아이콘 (2026-10-13 사용자) */
 .report-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.report-title { display: flex; align-items: center; gap: 8px; margin: 0; font-weight: 700; font-size: 21px; line-height: 27px; color: #111; }
+.report-title { display: flex; align-items: center; gap: 8px; margin: 0; font-family: var(--report-font); font-weight: 700; font-size: 21px; line-height: 27px; letter-spacing: 0; color: #111; }
 .report-title .report-icon { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex: none; border-radius: 6px; color: #fff; }
 .report-title .report-icon svg { width: 16px; height: 16px; }
 .report-title .report-icon img { width: 24px; height: 24px; border-radius: 6px; display: block; background: #F1F5F9; }

@@ -262,20 +262,20 @@ def _light_pill(light, text=None):
     return dk.pill(text or _light_word(light) or "—", kind)
 
 
-LEAD_SUB_SIZE, LEAD_SUB_VP = "16px", 7   # 머리 카드 구분선 아래 종합 문단 16px — 행간 32 의 반쪽은 7px (2026-10-12 사용자)
+LEAD_VP = 8   # 머리 결론 18px · 행간 34 의 반쪽 — 구분선 위아래 보이는 14 (2026-10-13 사용자: 카드 없이)
 
 
 def sec_lead(report, analysis):
     """글 머리(제목 없음, data-lead): 한 줄 결론 + 종합을 한 강조 카드에 (2026-10-12 사용자: 하나의 카드로 통합, 가로 구분선, 16px).
     홈 카드는 '(머리)'로 한 줄 결론을(구분선 아래는 건너뜀), '(종합)'으로 data-insight 문단을 읽는다."""
     one = str(report.get("one_line") or "").strip()
-    inner = f'<div style="color:#111;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 굵게 하지 않는다 — 강조는 카드로 (가이드라인 3-1)
+    inner = f'<div style="color:#111;font-weight:700;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 카드 대신 굵게 (2026-10-13 사용자)
     lines = [ln for ln in str(report.get("opinion") or "").splitlines() if ln.strip()]
     if lines:
         body = "".join(f'<div style="margin:{0 if i == 0 else 4}px 0 0;">{_esc(dk.ko(ln, TERM_KO))}</div>' for i, ln in enumerate(lines))   # 문단 사이만 4px — 끝 문단 아래 여백이 카드 여백에 더해지지 않게
-        inner += (f'<div style="margin:{14 - dk.VP_EMPH}px 0 0;padding-top:{14 - LEAD_SUB_VP}px;border-top:1px solid {dk.EMPH_BD};">'   # 가로 구분선 위아래 보이는 14px (행간 32)
-                  f'<div data-insight="1" style="font-size:{LEAD_SUB_SIZE};color:#111;">{body}</div></div>')   # 구분선 아래 종합 문단만 16px (2026-10-12 사용자: "이것만 16포인트")   # 18px · 행간 33 은 바깥에서 물려받는다
-    return dk.cards(f'<div style="background:{dk.EMPH_BG};border:1px solid {dk.EMPH_BD};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px {dk.EMPH_PAD - (LEAD_SUB_VP if lines else dk.VP_EMPH)}px;margin:0 0 8px;line-height:{dk.LH_EMPH};">{inner}</div>')   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
+        inner += (f'<div style="margin:{14 - LEAD_VP}px 0 0;padding-top:{14 - LEAD_VP}px;border-top:1px solid #E2E8F0;">'   # 일반 구분선, 위아래 보이는 14 (2026-10-13 사용자: "구분선은 일반 구분선 컬러로 유지")
+                  f'<div data-insight="1" style="font-size:{dk.BODY};color:#111;">{body}</div></div>')   # 구분선 아래 18px (2026-10-13 사용자)   # 구분선 아래 종합 문단만 16px (2026-10-12 사용자: "이것만 16포인트")   # 18px · 행간 33 은 바깥에서 물려받는다
+    return dk.cards(f'<div style="margin:0 0 8px;line-height:{dk.LH_BODY};">{inner}</div>')   # 강조 카드 디자인 삭제 — 배경 · 테두리 · 안쪽 여백 없음 (2026-10-13 사용자)
 
 
 def sec_regime(analysis, report, prev=None):
@@ -290,7 +290,7 @@ def sec_regime(analysis, report, prev=None):
     # 점수 · 등급 설명은 본문 글머리표가 아니라 "점수" 옆 ? 툴팁 (2026-10-12 사용자: "점수 위험 선호 내용은 툴팁으로 제공하고 본문에서 삭제")
     explain = ("추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수의 합(0~100)입니다. 높을수록 주식에 우호적인 환경입니다.\n"
                + "\n".join(f"· {g} = {m}" for g, m in GRADE_MEANING.items()))
-    score_card = dk.state_card("점수" + dk.tip_anno(explain), LIGHT_KIND.get(light, "neutral"),   # `안내 ?` (2026-10-13 사용자: 아이콘만 두지 않는다) · 따로 카드, 배경은 등급 라벨 색 (2026-10-12 사용자)
+    score_card = dk.state_card("점수" + dk.tip_icon(explain), LIGHT_KIND.get(light, "neutral"),   # `안내 ?` (2026-10-13 사용자: 아이콘만 두지 않는다) · 따로 카드, 배경은 등급 라벨 색 (2026-10-12 사용자)
                                _light_pill(light, grade) + f' <span style="font-size:{SCORE_SIZE};">{int(regime["score"])} <span style="color:{dk.SUB};">/ 100</span></span>', chev=True)   # 라벨이 점수 앞 (2026-10-13 사용자) · 86 / 100 은 20px 굵게 (2026-10-12 사용자)
     rows = []
     if regime.get("score_prev") is not None:
@@ -312,7 +312,7 @@ def sec_regime(analysis, report, prev=None):
     if bars:   # 막대는 가장 긴 이름(금리 환경) + 14px 뒤에서 시작, 모두 같은 길이 (2026-10-12 사용자)
         w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])
         html_rows += [dk.bar_row(n, f, c, v, w) for n, f, c, v in bars]
-    return comment + dk.state_fold(score_card, dk.card_of(html_rows))   # 점수 카드를 누르면 6개 정보 (2026-10-13 사용자)
+    return dk.state_fold(score_card, dk.card_of(html_rows)) + comment   # 제목 밑줄 없이 바로 점수 카드, 해설은 아래 (2026-10-13 사용자) · 누르면 6개 정보
 
 
 def _arrows(last5):
@@ -403,7 +403,7 @@ def sec_breadth(analysis, prev=None):
     base = "S&P 500 구성종목" if b.get("mode") == "full" else f"섹터 ETF {b.get('sectors_counted')}개"
     explain = (f"오늘 {base} 가운데 오른 것의 비율입니다.\n"
                + "\n".join(f"· {g} = {m}" for g, m in BREADTH_MEANING.items()))   # 등급 설명은 본문 글머리표 대신 `안내 ?` (점수 카드와 같게, 2026-10-13 사용자)
-    ratio_card = dk.state_card("상승 비율" + dk.tip_anno(explain), LIGHT_KIND.get(light, "neutral"),
+    ratio_card = dk.state_card("상승 비율" + dk.tip_icon(explain), LIGHT_KIND.get(light, "neutral"),
                                _light_pill(light, grade or None) + f' {b["ratio"]:.1f}%', chev=True)   # 따로 카드, 배경은 등급 색 (2026-10-12 사용자) · 라벨이 비율 앞 (2026-10-13 사용자)
     pb = (prev or {}).get("breadth") or {}
     rows = []
@@ -528,7 +528,9 @@ def _quote_rows(quotes):
         sector = SECTOR_KO.get(q.get("sector") or "", q.get("sector") or "")
         vol = '<span style="white-space:nowrap;">' + _esc("거래량 " + _fmt_volume(q.get("volume"))) + "</span>"   # 라벨과 거래량 사이에서만 줄이 바뀌게
         tag = dk.pill(sector, lead=True) if sector else ""   # 줄 첫머리 라벨 — 왼쪽 0, 오른쪽 4   # 섹터 라벨이 거래량보다 앞 (2026-10-13 사용자: "어느 섹터인지가 더 중요")
-        r = dk.crow(dk.ticker_logo(sym) + _esc(sym), f'{_esc(_fmt_price(q.get("price")))} {dk.arrow(q.get("change_pct"))}', tag + vol, first=len(rows) == 0,
+        value = ((f'<span style="display:block;line-height:1;margin:0 0 6px;">{tag}</span>' if tag else "")   # 섹터 라벨은 증감 위 줄, 오른쪽 정렬 (2026-10-13 사용자)
+                 + f'<span style="font-weight:400;">{_esc(_fmt_price(q.get("price")))}</span> {dk.arrow(q.get("change_pct"))}')   # 가격은 보통 굵기 (2026-10-13 사용자)
+        r = dk.crow(dk.ticker_logo(sym) + _esc(sym), value, vol, first=len(rows) == 0,
                     left=QUOTE_LEFT, nowrap=True, sub_block=True)
         chg = q.get("change_pct")
         r = r.replace('<span style="', f'<span data-pick="1" data-sym="{_esc(sym)}" data-price="{_esc(_fmt_price(q.get("price")))}" data-chg="{"" if chg is None else f"{float(chg):+.2f}%"}" style="', 1)
@@ -546,6 +548,9 @@ def _named_reaction(sym, value_html):
         col = UP_COLOR if value_html[0] == "+" else DOWN_COLOR
         value_html = f'<span style="color:{col};font-weight:700;">{value_html}</span>'
     return f'<span style="color:{col};">{name}</span> {value_html}' if col else f"{name} {value_html}"
+
+
+NEWS_REL_SIZE = "15px"   # 뉴스 `관련 자산` 줄 14 → 15 굵게 (2026-10-13 사용자)
 
 
 def sec_news(input_data, report, analysis):
@@ -571,17 +576,20 @@ def sec_news(input_data, report, analysis):
         theme = item.get("theme")
         if theme and theme not in THEME_VOCAB:
             theme = "기타"
-        tag = dk.pill(theme) if theme else ""   # 라벨 좌우 4px 는 pill 이 갖는다   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
+        tag = dk.pill(theme) if theme else ""   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
         title = _esc(item.get("title_ko") or news_item.get("title_ko") or news_item.get("title") or "")   # Gemini 가 옮긴 한국어 제목 먼저 (2026-10-12 사용자)
-        link = dk.link_icon(news_item.get("link"), news_item.get("title") or "원문")
+        url = news_item.get("link")
         related = [s for s in (item.get("related") or []) if isinstance(s, str) and s in known][:4]
         subs = []
         if related:
-            subs.append("관련 자산 : " + " · ".join(_named_reaction(s, reaction(s)) for s in related))   # 종목 이름도 증감 색 (가이드라인 3-3)
+            subs.append(f'<span style="font-size:{NEWS_REL_SIZE};font-weight:700;">관련 자산 : ' + " · ".join(_named_reaction(s, reaction(s)) for s in related) + "</span>")   # 15px 굵게 (2026-10-13 사용자) · 종목 이름도 증감 색 (가이드라인 3-3)
         if item.get("why"):
             subs.append("선정 이유 : " + _esc(item["why"]))
         sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;">{x}</span>' for x in subs)
-        items.append(f"<span style='color:#111;font-weight:700;'>{title}</span>{tag}{link}{sub_html}")   # 기사 제목 굵게 (2026-10-13 사용자)
+        head = (f'<a href="{_esc(url)}" target="_blank" rel="noopener" style="color:#111;font-weight:700;text-decoration:none;">{title}</a>' if url
+                else f"<span style='color:#111;font-weight:700;'>{title}</span>")   # 제목이 원문 링크 — 새 창 아이콘 삭제 (2026-10-13 사용자)
+        lab = f'<span style="display:block;line-height:1;margin:0 0 8px;">{tag}</span>' if tag else ""   # 라벨 줄은 제목 위 (2026-10-13 사용자)
+        items.append(f"{lab}{head}{sub_html}")
     return dk.item_rules(items, sub=True) if items else dk.muted("주요 뉴스 없음")   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
 
 
