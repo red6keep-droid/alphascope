@@ -470,7 +470,7 @@ def _macro_value(rec, unit, chg_unit, mult):
     out = f"{rec['value']:.2f}{unit}"
     prev = rec.get("prev")
     if prev is None:
-        return _esc(out)
+        return f'<span style="font-weight:400;">{_esc(out)}</span>'   # 증감 아닌 값은 보통 굵기 (2026-10-13 사용자)
     if mult is None:   # 변화율 %
         d = (rec["value"] - prev) / prev * 100 if prev else None
         digits = 1
@@ -478,10 +478,10 @@ def _macro_value(rec, unit, chg_unit, mult):
         d = (rec["value"] - prev) * mult
         digits = 0 if chg_unit == "bp" else 2
     if d is None:
-        return _esc(out)
+        return f'<span style="font-weight:400;">{_esc(out)}</span>'
     if digits == 0:
         d = round(d)
-    return f"{_esc(out)} {dk.arrow(d, digits, chg_unit)}"
+    return f'<span style="font-weight:400;">{_esc(out)}</span> {dk.arrow(d, digits, chg_unit)}'
 
 
 def sec_macro(macro, analysis, report):
@@ -494,14 +494,14 @@ def sec_macro(macro, analysis, report):
     if rates.get("us10y") is not None:
         v10, d10 = rates["us10y"], (analysis or {}).get("as_of") or d10
     chg = f"1일 {_bp(rates.get('us10y_change_1d_bp'))} · 5일 {_bp(rates.get('us10y_change_5d_bp'))}" if rates.get("us10y_change_5d_bp") is not None else ""
-    rows.append(("10년물 금리", _esc(f"{v10:.2f}%") if v10 is not None else dk.dash(), _esc(" · ".join(x for x in (chg, dk.day(d10)) if x)), None, False, True))
+    rows.append(("10년물 금리", f'<span style="font-weight:400;">{_esc(f"{v10:.2f}%")}</span>' if v10 is not None else dk.dash(), _esc(" · ".join(x for x in (chg, dk.day(d10)) if x)), None, False, True))
     for key, label, unit, chg_unit, mult in MACRO_ROWS:
         if key in ("us2y", "spread_10_2", "fed_funds") and not macro.get(key):
             continue
         rec = macro.get(key) or {}
         rows.append((label, _macro_value(rec, unit, chg_unit, mult), _esc(dk.day(rec.get("date", ""))) if rec else ""))
     if rates.get("growth_label"):
-        rows.append(("금리와 성장주", _esc(rates["growth_label"]), ""))   # 따로 카드를 만들지 않고 같은 카드 안에 (가이드라인 2-1)
+        rows.append(("금리와 성장주", f'<span style="font-weight:400;">{_esc(rates["growth_label"])}</span>', ""))   # 따로 카드를 만들지 않고 같은 카드 안에 (가이드라인 2-1)
     html_rows = [dk.crow(r[0], r[1], r[2], first=(i == 0), sub_below=bool(len(r) > 5 and r[5])) for i, r in enumerate(rows)]
     return _text(report.get("macro_comment")) + _folded(html_rows, "지표")
 
@@ -636,13 +636,14 @@ def sec_status(analysis, report, prev=None):
     was = {"추세 유지": pst.get("trend"), "변동성": pst.get("volatility"), "시장 폭": pst.get("breadth"), "금리 위험": pst.get("rates"), "과열 위험": pst.get("overheat")}
     overall = status["overall"]
     head, why = _overall_text(overall, items)
-    overall_card = dk.state_card(_esc(head), LIGHT_KIND.get(overall, "neutral"), sub_html=_esc(why))   # 종합은 따로 카드, 라벨 없이 설명, 배경은 신호 색 (2026-10-12 사용자)
+    overall_card = dk.state_card(_esc(head), LIGHT_KIND.get(overall, "neutral"), sub_html=_esc(why), center=True)   # 가운데 정렬 (2026-10-13 사용자)   # 종합은 따로 카드, 라벨 없이 설명, 배경은 신호 색 (2026-10-12 사용자)
     rows = []
     for label, light, basis in items:
         changed = f"어제 {_light_word(was[label])}" if was.get(label) and light and was[label] != light else ""   # 신호가 바뀐 날만 어제 신호
         rows.append((_esc(label), _light_pill(light) if light else dk.dash(), _join(_esc(basis), vs.get(label, ""), _esc(changed))))
     risks = [dk.ko(ln, TERM_KO) for ln in str(report.get("risk") or "").splitlines() if ln.strip()]
-    return dk.emph_list(risks) + overall_card + dk.rule_rows(rows)   # 신호 줄은 흰 카드 대신 가로 구분선 (2026-10-13 사용자)   # 글 먼저, 강조 카드 (2026-10-12 사용자), 소제목 없음 — 구획 제목이 '주의할 위험요인'   # 판정 규칙은 제목 옆 ? 툴팁 (가이드라인 2-1 상태 카드 규칙)
+    risk_ul = dk.dot_ul([dk.dot_li(dk.tint(_esc(t)), size=3, lh=dk.LH_BODY, margin=dk.LI_MARGIN) for t in risks]) if risks else ""   # 강조 카드 삭제 — 본문 글머리표 (2026-10-13 사용자)
+    return risk_ul + overall_card + dk.rule_rows(rows)   # 신호 줄은 흰 카드 대신 가로 구분선 (2026-10-13 사용자)   # 글 먼저, 강조 카드 (2026-10-12 사용자), 소제목 없음 — 구획 제목이 '주의할 위험요인'   # 판정 규칙은 제목 옆 ? 툴팁 (가이드라인 2-1 상태 카드 규칙)
 
 
 REGIME_TIP = ("추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수를 더한 값(0~100)입니다. 70 이상 위험 선호 · 45~69 중립 · 45 미만 위험 회피.\n"
@@ -664,7 +665,7 @@ def sec_footer(input_data):
     return dk.footer(
         f"데이터 수집(FRED · Yahoo Finance · CNBC)과 파이썬 계산, AI 해설(Gemini)을 자동으로 결합해 만든 글입니다. "
         f"기준일 {_esc(dk.day(input_data.get('date')))} · 데이터 갱신 {_esc(input_data.get('updated_at') or '')}.",
-        "시장 상태 점수와 신호등은 규칙 기반 계산값이며 투자 판단의 근거로 활용하지 마십시오. 투자 권고가 아닙니다.")
+        "시장 상태 점수와 신호등은 규칙 기반 계산값이며 투자 판단의 근거로 활용하지 마십시오. 투자 권고가 아닙니다.", indent=False)   # 위 신호 줄과 같은 왼쪽 선 (2026-10-13 사용자)
 
 
 def build_body(input_data, report, cover_url=None, analysis=None):
@@ -694,7 +695,7 @@ def build_body(input_data, report, cover_url=None, analysis=None):
         dk.section("급등주", _text(report.get("gainers_comment")) + _quote_rows(input_data.get("gainers", [])), summary="상위 5", tab=TAB_STOCKS),
         dk.section("관심 종목", _text(report.get("attention_comment")) + _quote_rows(input_data.get("most_active", [])), summary="거래 상위 5", tab=TAB_STOCKS),
         dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_STOCKS),
-        dk.section("주의할 위험요인", sec_status(analysis, report, prev), tab=TAB_RISK, one_line=True,
+        dk.section("주의 위험요인", sec_status(analysis, report, prev), tab=TAB_RISK, one_line=True,
                    aside=dk.tip_line([("판정", RISK_TIP)], in_title=True)),   # 판정 규칙은 ? 툴팁 (안내 줄에서 옮김)
         sec_footer(input_data),
         dk.WRAP_CLOSE,

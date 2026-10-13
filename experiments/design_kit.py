@@ -579,11 +579,22 @@ def _crow_left_tip(name_html, sub, left_pct, block, ns, t):
 VSEP = '<span style="display:inline-block;width:1px;height:14px;background:#E2E8F0;margin:0 8px;vertical-align:-1px;"></span>'
 
 
+CHG_SIZE = "18px"   # 흰 카드 오른쪽 증감 숫자 19 → 18 (2026-10-13 사용자: 강조 카드 제외)
+_ARROW_SPAN = re.compile(r'(<span style="color:#[0-9A-Fa-f]{3,6};font-weight:700;white-space:nowrap;)(">[▲▼–])')
+
+
+def small_chg(value_html):
+    """값 칸의 증감(arrow) 글자만 CHG_SIZE 로."""
+    return _ARROW_SPAN.sub(lambda m: f"{m.group(1)}font-size:{CHG_SIZE};{m.group(2)}", value_html)
+
+
 def crow(name_html, value_html, sub="", first=False, left=None, short=False, nowrap=False, sub_below=False, sub_block=False, name_size=None, tip_text=None):
     """C 카드 한 줄: 왼쪽 구분명 │ 보조 줄, 오른쪽 값. name_html 은 이스케이프된 HTML.
     left = 왼쪽 칸 % (카드별 예외, 가이드라인 2-1 — 2026-10-12 사용자). nowrap = 값을 한 줄로.
     sub_below = 보조 줄을 구분명 옆이 아니라 줄 아래 카드 폭 전체 한 줄로 (옆에 들어가지 않을 때, 2026-10-12 사용자).
     sub_block = 보조 줄을 구분명 아래 줄로 (왼쪽 칸 안) — 종목 아래 거래량 (2026-10-12 사용자)."""
+    if name_size != EMPH_NAME:   # 흰 카드만 증감 18px — 강조 카드 제외 (2026-10-13 사용자)
+        value_html = small_chg(value_html)
     col_l = f"flex:0 0 {left}%;max-width:{left}%;min-width:0;white-space:normal;" if left else COL_L75 if short else COL_L
     col_r = COL_R.replace("white-space:normal;", "white-space:nowrap;") if nowrap else COL_R
     below = (f'<span style="flex:0 0 100%;color:{SUB};font-weight:400;font-size:{TINY};line-height:{LH_TINY};white-space:nowrap;">{sub_line(sub)}</span>'
@@ -635,15 +646,15 @@ def dcard(html, theme="neutral"):
 STATE_CARD = {"good": ("#F0FDF4", "#BBF7D0"), "uncertain": ("#FFFBEB", "#FDE68A"), "negative": ("#EFF6FF", "#BFDBFE"), "neutral": ("#F8FAFC", "#CBD5E1")}   # 신호 라벨 색의 카드판
 
 
-def state_card(head_html, kind="neutral", right_html="", sub_html="", items=(), chev=False):
+def state_card(head_html, kind="neutral", right_html="", sub_html="", items=(), chev=False, center=False):
     """상태 카드 (2026-10-12 사용자: 종합·점수 카드 분리, 배경은 신호 라벨 색). 첫 줄 왼쪽 결론(굵게 검정 16px) · 오른쪽 값,
     둘째 줄 sub_html(14px 한 줄 설명), items = [(라벨, 내용)] 은 얇은 선 아래 3px 점 글머리표 14px."""
     bg, bd = STATE_CARD.get(kind, STATE_CARD["neutral"])
-    head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
+    head = (f'<span style="display:flex;justify-content:{"center" if center else "space-between"};align-items:center;gap:12px;{"text-align:center;" if center else ""}">'
             f'<span style="font-weight:700;color:#111;font-size:{EMPH_NAME};">{head_html}</span>'
             + (f'<span style="display:inline-flex;align-items:center;font-weight:700;white-space:nowrap;font-size:{SMALL};{"margin-left:auto;" if chev else ""}">{right_html}</span>' if right_html else "")   # 라벨 · 숫자 세로 가운데 (2026-10-13 사용자)
             + ((("" if right_html else '<span style="margin-left:auto;"></span>') + fold_btn(lighten(bg), bd)) if chev else "") + "</span>")   # chev: 맨 오른쪽 공식 접기 버튼, 바탕은 카드 색 20% 밝게 (2026-10-13 사용자)
-    sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#374151;margin-top:2px;">{sub_html}</div>' if sub_html else ""
+    sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#374151;margin-top:2px;{"text-align:center;" if center else ""}">{sub_html}</div>' if sub_html else ""   # center: 종합 상태 카드 가운데 (2026-10-13 사용자)
     lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#374151", margin="8px 0") for k, v in items)
     body = (f'<div style="margin-top:{14 - VP_EMPH}px;padding-top:{14 - VP}px;border-top:1px solid {bd};font-size:{TINY};line-height:{LH_TINY};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자: 4 → 14)
             f"<ul style='margin:-8px 0;padding:0;list-style:none;'>{lis}</ul></div>") if lis else ""   # 음수 margin = 첫·끝 li 의 8px 지우기
@@ -722,7 +733,8 @@ def rule_rows(rows):
     """C 카드 줄을 카드 없이 가로 구분선으로만 (2026-10-13 사용자: "위험 탭에 추세유지 변동성 영역도 구분선으로") — 선 위아래 27, 좌우 여백 없음.
     rows 는 ccard 와 같은 튜플."""
     html = ccard(rows, pad=RULE_GAP - 1)
-    html = html.replace(MULTI, f"display:block;margin:0 0 6px;font-size:{SMALL};line-height:{LH_CARD};border-top:1px solid #E2E8F0;border-bottom:1px solid #E2E8F0;", 1)   # 목록 위아래 끝도 선
+    html = html.replace(MULTI, f"display:block;margin:0 0 6px;font-size:{SMALL};line-height:{LH_CARD};border-bottom:1px solid #E2E8F0;", 1)   # 맨 위 선은 없음, 아래 끝만 (2026-10-13 사용자: "추세유지 위쪽 구분선은 삭제")
+    html = html.replace(f"padding:{RULE_GAP - 1 - VP}px 12px;", f"padding:{RULE_GAP - 1 - VP + 5}px 0 {RULE_GAP - 1 - VP}px;", 1)   # 첫 줄 위 여백 +5 (같은 날 사용자)
     return html.replace(f"padding:{RULE_GAP - 1 - VP}px 12px;", f"padding:{RULE_GAP - 1 - VP}px 0;")
 
 
@@ -787,6 +799,7 @@ def bar_row(name_html, frac, color, value_html, widths, sub="", first=False):
     """막대 줄 (2026-10-12 사용자: 막대는 가장 긴 이름 + 14px 뒤에서 왼쪽 정렬, 모든 막대 같은 길이).
     이름 칸(고정 폭) · 14px · 막대(남은 폭) · 값 칸(고정 폭, 오른쪽 정렬). sub 는 줄 아래 전체 폭 14px 보조 줄."""
     ln, lv = widths
+    value_html, lv = small_chg(value_html), [small_chg(x) for x in lv]   # 증감 18px (2026-10-13 사용자)
     pct = max(0.0, min(1.0, frac)) * 100
     sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};line-height:{LH_TINY};white-space:normal;">{sub_line(sub)}</span>' if sub else ""
     return (f'<span style="display:block;padding:{SEP_GAP - VP - 1}px 12px;line-height:{LH_CARD};{"" if first else MULTI_SEP}">'
@@ -836,6 +849,7 @@ def as_rules(html):
     return re.sub(r"border:1px solid (#[0-9A-Fa-f]{6});border-radius:10px;", r"border-top:1px solid \1;border-bottom:1px solid \1;", html)
 
 
-def footer(data_line, disclaimer_line):
-    return (f'<div data-footer="1" style="margin-top:3px;padding-top:2px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{GUIDE_IND}">'
+def footer(data_line, disclaimer_line, indent=True):
+    """출처 · 면책 줄. indent=False: 들여쓰기 없이 위 목록과 같은 왼쪽 선 (데일리 위험 탭, 2026-10-13 사용자)."""
+    return (f'<div data-footer="1" style="margin-top:3px;padding-top:2px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{GUIDE_IND if indent else ""}">'
             f"{INFO_ICON}{data_line}<br>{INFO_ICON}{disclaimer_line}</div>")

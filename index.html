@@ -1087,6 +1087,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comment-thread.toplevel-thread > ol > li:first-child { border-top: 0; padding-top: 18px; }
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
+.comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
 .comments-toggle .fold-box .acc-chev { transition: transform .15s; }
 .comments.is-open .comments-toggle .fold-box .acc-chev { transform: rotate(180deg); }
 /* 댓글 한 개 = 두 칸 grid(사진 | 글). 답글 묶음 · 답글 쓰기 자리는 글 칸 아래 줄 — flex 한 줄이라 셋째 칸으로 밀려 깨지던 것 (2026-10-13 사용자: "댓글에 댓글은 레이아웃이 깨진다") */
