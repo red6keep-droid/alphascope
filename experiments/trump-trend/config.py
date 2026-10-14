@@ -163,17 +163,7 @@ FOMC_DECISION_DATES = [
 ]
 
 # ── Gemini (12절) ────────────────────────────────────────────────────────
-DEFAULT_MODEL = "gemini-3.5-flash"
 CLASSIFY_BATCH_SIZE = 15
 CLASSIFY_MAX_BATCHES_PER_RUN = 40   # 무료 한도 안에서 하루치. 남은 건 다음 실행이 이어받는다
 CLASSIFY_SINCE_DAYS = 90            # 백필 범위
-# Gemini 가 한도(429) · 수요 폭주(503)로 끝까지 실패하면 이 순서로 (backup_llm). nvda-report config 와 같다 (2026-10-14)
-FALLBACK_CHAIN = [
-    {"provider": "groq", "model": "openai/gpt-oss-120b", "min_interval": 60, "timeout": 120,
-     "params": {"reasoning_effort": "low", "max_completion_tokens": 8000}},          # 분당 8,000토큰 → 호출 간격 60초
-    {"provider": "nvidia", "model": "deepseek-ai/deepseek-v4.1-flash", "timeout": 300,
-     "params": {"max_tokens": 8000, "chat_template_kwargs": {"thinking": False}}},   # 사고 끄기 — 켜면 답이 비거나 5분 초과
-]
-KEY_COOLDOWN_SECONDS = 60           # 429를 받은 키의 휴식
-PER_BATCH_ATTEMPTS = 5              # 503(수요 폭주)은 3·6·12·24·48s 지수 백오프
-RETRY_SLEEP_SECONDS = 3
+# LLM 모델 · 예비 사슬 · 키 쿨다운은 experiments/llm_chain.py 하나로 (2026-10-14 — 모든 리포트 공용)

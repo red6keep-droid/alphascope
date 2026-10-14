@@ -11,7 +11,8 @@ import sys
 
 import config
 import render_report as rr
-from gemini_client import GeminiPool
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from llm_chain import LLMPool, usage_line  # noqa: E402  — 모든 리포트 공용 LLM 사슬 (experiments/llm_chain.py, 2026-10-14)
 
 PROMPT_FILE = os.path.join(config.PROMPTS_DIR, "narrate.txt")
 FORBIDDEN = re.compile(r"때문에|영향을 미|하락시|상승시|원인|오를 것|내릴 것|전망|기대|우려|매수|매도|목표가|비중|사라|팔아|진입|청산|급격|폭발|역대급|긍정적|부정적|부담|안도")
@@ -67,18 +68,19 @@ def narrate(analysis_path=None, output_path=None):
         return None
     with open(PROMPT_FILE, "r", encoding="utf-8") as f:
         prompt = f.read() + json.dumps(_slim(a), ensure_ascii=False, indent=1)
-    pool = GeminiPool()
+    pool = LLMPool("json", label="nvda-narrate")
     last = None
     for attempt in range(1, 3):
         try:
-            result = validate(pool.generate_json(prompt, temperature=0.2))
+            # 둘째 시도는 검증까지 사슬 안에서 — Gemini 답이 또 탈락하면 예비 모델로 넘어간다 (2026-10-14)
+            result = validate(pool.generate_json(prompt, temperature=0.2, validate=validate if attempt == 2 else None))
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(result, f, ensure_ascii=False, indent=2)
             print(f"[narrate] {len(result['today'])}문장 → {output_path}")
             return result
-        except ValueError as e:
+        except (ValueError, RuntimeError) as e:   # RuntimeError = 사슬 전부 실패
             last = e
-            print(f"[narrate] 검증 실패 ({attempt}/2): {e}")
+            print(f"[narrate] 검증 실패 ({attempt}/2): {str(e)[:300]}")
     raise RuntimeError(f"서술 생성 실패: {last}")
 
 

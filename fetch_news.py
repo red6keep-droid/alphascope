@@ -6,21 +6,16 @@ import xml.etree.ElementTree as ET
 
 import os
 
+import sys
+
 import requests
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments"))
+from llm_chain import LLMPool, gemini_keys, STEPS, CHAINS  # noqa: E402  — 모든 리포트 공용 LLM 사슬 (2026-10-14)
 
 RSS_URL = "https://www.cnbc.com/id/15839069/device/rss/rss.html"
 # 이전 결과(gh-pages) — 이미 번역한 제목은 다시 번역하지 않는다
 PREV_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/news.json"
-GEMINI_MODEL = "gemini-3.5-flash"
-# 번역 사슬 (2026-10-11 사용자: 무료 한도·갑작스런 차단 대비 2중 3중): Groq gpt-oss-120b(0.9초) → NVIDIA gpt-oss-20b(5초) → Gemini.
-# 키 없는 단계는 건너뛴다. 사고는 low — 번역에 불필요하고 늘리면 느려지기만 한다
-TRANSLATE_CHAIN = [
-    {"name": "groq", "env": "GROQ_API_KEY", "url": "https://api.groq.com/openai/v1/chat/completions",
-     "model": "openai/gpt-oss-120b", "params": {"reasoning_effort": "low", "max_completion_tokens": 2000}, "timeout": 60},
-    {"name": "nvidia", "env": "NVIDIA_API_KEY", "url": "https://integrate.api.nvidia.com/v1/chat/completions",
-     "model": "openai/gpt-oss-20b", "params": {"reasoning_effort": "low", "max_tokens": 2000}, "timeout": 90},   # 공용 엔드포인트, 지연 들쭉날쭉
-]
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -61,11 +56,6 @@ def parse_published(rfc822):
         return rfc822.strip()
 
 
-def gemini_keys():
-    raw = os.environ.get("GEMINI_API_KEY", "")
-    return [k.strip().strip('"') for k in re.split(r"[;,]", raw) if k.strip()]
-
-
 def _translate_prompt(items):
     """items: [{"title", "summary"}] — 제목 번역(t) + 선정 이유(why) 한 문장 (2026-10-14 사용자: 홈 뉴스에 선정 이유)."""
     src = [{"title": it["title"], "summary": it.get("summary", "")} for it in items]
@@ -86,57 +76,26 @@ def _clean_out(out):
     return [{"t": x["t"].strip(), "why": x["why"].strip()} for x in out]
 
 
-def translate_titles_openai_compat(step, titles):
-    """OpenAI 호환 공급자 한 단계로 번역. 키가 없거나 실패하면 None (호출자가 다음 단계로)."""
-    key = os.environ.get(step["env"], "").strip()
-    if not key:
-        return None
-    body = {"model": step["model"], "temperature": 0.2, "messages": [{"role": "user", "content": _translate_prompt(titles)}], **step["params"]}
-    try:
-        r = requests.post(step["url"], headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json", "Accept": "application/json"},
-                          json=body, timeout=step["timeout"])
-        if r.status_code != 200:
-            print(f"  [번역] {step['name']} {r.status_code} — 다음 단계")
-            return None
-        text = (r.json()["choices"][0]["message"].get("content") or "").strip()
-        out = json.loads(text[text.find("["): text.rfind("]") + 1])
-        if _valid_translation(out, titles):
-            return _clean_out(out)
-        print(f"  [번역] {step['name']} 응답 형식 불일치 — 다음 단계")
-    except Exception as e:  # noqa: BLE001
-        print(f"  [번역] {step['name']} 실패: {str(e)[:100]} — 다음 단계")
-    return None
-
-
 def translate_titles(titles):
-    """뉴스 항목 목록 → [{"t": 한국어 제목, "why": 선정 이유}] (같은 길이, 2026-10-14 선정 이유 추가). TRANSLATE_CHAIN(Groq → NVIDIA) → Gemini 키 순서로 시도, 전부 실패하면 None.
+    """뉴스 항목 목록 → [{"t": 한국어 제목, "why": 선정 이유}] (같은 길이, 2026-10-14 선정 이유 추가). 전부 실패하면 None.
 
     홈 화면 제목용 (2026-10-10 사용자: 최신 뉴스 제목은 한글로). 본문·요약은 번역하지 않는다.
+    공용 사슬 "translate" (experiments/llm_chain.py): Groq gpt-oss-120b → NVIDIA gpt-oss-20b → Gemini 키들. 형식이 어긋나면 다음 단계.
     """
     if not titles:
         return []
-    for step in TRANSLATE_CHAIN:
-        ko = translate_titles_openai_compat(step, titles)
-        if ko is not None:
-            return ko
-    prompt = _translate_prompt(titles)
-    body = {"contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2}}
-    for key in gemini_keys():
-        try:
-            r = requests.post(GEMINI_URL.format(model=GEMINI_MODEL, key=key), json=body, timeout=60)
-            if r.status_code in (429, 503, 500):
-                print(f"  [번역] {r.status_code} — 다음 키")
-                continue
-            r.raise_for_status()
-            text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
-            out = json.loads(text)
-            if _valid_translation(out, titles):
-                return _clean_out(out)
-            print("  [번역] 응답 형식 불일치 — 다음 키")
-        except Exception as e:  # noqa: BLE001
-            print(f"  [번역] 실패: {str(e)[:100]} — 다음 키")
-    return None
+
+    def check(out):
+        if not _valid_translation(out, titles):
+            raise ValueError("응답 형식 불일치")
+        return _clean_out(out)
+
+    try:
+        pool = LLMPool("translate", label="번역")
+        return pool.generate_json(_translate_prompt(titles), temperature=0.2, validate=check)
+    except RuntimeError as e:
+        print(f"  [번역] {str(e)[:200]}")
+        return None
 
 
 def previous_translations():
@@ -157,7 +116,7 @@ def add_korean_titles(items):
     if not todo:
         print(f"[번역] 새 제목 없음 (이전 번역 {len(items)}건 재사용)")
         return
-    if not gemini_keys() and not any(os.environ.get(st["env"], "").strip() for st in TRANSLATE_CHAIN):
+    if not gemini_keys() and not any(os.environ.get(STEPS[st].get("env", ""), "").strip() for st in CHAINS["translate"]):
         print("[번역] 번역 키 없음 (GROQ/NVIDIA/GEMINI) — 영문 제목 유지")
         return
     ko = translate_titles(todo)

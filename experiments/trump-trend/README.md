@@ -23,7 +23,6 @@ experiments/trump-trend/
 ├── review_sample.py    # ④ 수동 검증용 표본 50개 → output/review_sample.md
 ├── collect_prices.py   # yfinance 일봉 → daily_bars (첫 실행 2y 백필)
 ├── calendar_macro.py   # FOMC(정적) + FRED 릴리스(CPI·NFP·GDP·PCE) + 관찰 종목 실적일
-├── gemini_client.py    # 다중 키 라운드로빈 · 429 쿨다운 · 503 백오프
 ├── classify_posts.py   # 배치 Gemini 분류 → ai_* 컬럼 (항목별 검증)
 ├── mapping_rules.json  # 섹터 → ETF → 상위 10종목 정적 규칙
 ├── mapping.py          # 규칙 적용 (첫 일치 하나)

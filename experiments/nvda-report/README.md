@@ -41,7 +41,6 @@ experiments/nvda-report/
 ├── dedupe.py            # 키워드 1차 필터(news만) · 제목 토큰 자카드 ≥ 0.6 중복 표시 (공식 소스가 대표)
 ├── classify_items.py    # Gemini 배치 분류(20건, 오래된 것부터) → ai_* · is_event. 검증 탈락 2회면 classify_failed
 ├── labels.py            # 결정적 보정 — 해설 매체·주가 기사 relevance 상한 1·repeat / 같은 사건 병합(사실 2-gram 자카드 ≥ 0.30)
-├── gemini_client.py     # trump-trend 복사본 + "Extra data" 파싱 보강
 ├── review_sample.py     # 수동 검증 표본 50건 → output/review_sample.md
 ├── cases_survey.py      # ③ CourtListener suitNature 쿼리(증권·반독점·특허 1년) → output/cases_survey.md/.json 검토 표
 ├── cases_init.py        # ③ 검토 표 + MANUAL 덮어쓰기 → cases 테이블 (watch=1은 증권만)
@@ -50,7 +49,6 @@ experiments/nvda-report/
 ├── extract_quarterly.py # ④ XBRL companyfacts + 8-K 보도자료(*pr.htm) + 10-Q/10-K 본문 → quarterly 테이블 (9지표). 정규식, Gemini 없음
 ├── narrate.py           # ⑤ ⑦ 오늘의 해석 — Gemini 3문장 이내, 금지어 검증, 이벤트 0건이면 건너뜀
 ├── chart_price.py       # ① 아래 가격 그래프 PNG (30거래일 봉·5/20/60일선·볼린저) → output/images, chart.json. 워크플로가 gh-pages로
-├── backup_llm.py        # Gemini 예비 사슬 (Groq gpt-oss-120b → NVIDIA DeepSeek, OpenAI 호환 REST) — gemini_client가 키 전멸 때 부른다
 ├── render_html.py       # ⑤ nvda_analysis.json + narrative.json → Blogger 본문·미리보기 (trump-trend 시각 규칙)
 ├── publish.py           # ⑤ daily-report publish_blogger 재사용, 같은 제목이면 건너뜀. 기본 dry-run
 ├── report_title.py      # ⑤ 제목 '엔비디아 데일리 — YYYY년 M월 D일' · 라벨
@@ -189,7 +187,7 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | 서술(narrate) | **Gemini 3.5 Flash** | Groq gpt-oss-120b | NVIDIA DeepSeek |
 | 홈 뉴스 제목 번역 (`fetch_news.py`) | **Groq gpt-oss-120b** (0.9초) | NVIDIA gpt-oss-20b (5초) | Gemini |
 
-- 분류·서술은 `gemini_client.py`가 모든 키 쿨다운이거나 5회 모두 한도(429)·일시 오류(503/500)일 때 `backup_llm.run_chain`으로 넘긴다 (503은 2026-10-11 CI 드라이런에서 배치 하나가 그냥 실패한 뒤 추가). 답한 모델 이름이 `ai_model`에 남는다. 요약(ai_fact)은 분류 호출에 묶여 있어 떼지 않는다.
+- 분류·서술은 모든 리포트 공용 `experiments/llm_chain.py`(2026-10-14, 예전 gemini_client.py · backup_llm.py 를 합침)의 사슬 "json"을 쓴다 — Gemini 키들이 5회 모두 한도(429)·일시 오류(503/500)·형식 오류면 Groq → NVIDIA DeepSeek 로 넘긴다 (503은 2026-10-11 CI 드라이런에서 배치 하나가 그냥 실패한 뒤 추가). 답한 모델 이름이 `ai_model`에 남는다. 요약(ai_fact)은 분류 호출에 묶여 있어 떼지 않는다.
 - Gemini를 주 모델로 두는 이유: 수동 검증 96%를 통과한 조합이고 임계값 튜닝 중이라 라벨 분포를 흔들지 않는다. Gemini는 사고 기본값(켜짐) 유지.
 - Groq: 분류 20건 6.5초, Gemini 라벨과 24필드 중 18~19 일치, 서술 검증 통과. **무료 등급 분당 8,000토큰** → 20건 배치(≈7,000) 뒤 60초 간격(`min_interval`). 한 문장 사실이 존댓말로 나오는 경향.
 - NVIDIA DeepSeek: 18/24, 20건 배치 2분 안팎. 공용 엔드포인트라 지연이 들쭉날쭉(같은 모델이 3초↔19분) → 마지막 단.

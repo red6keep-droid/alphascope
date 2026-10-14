@@ -15,7 +15,8 @@ import sys
 import config
 import db
 import labels
-from gemini_client import GeminiPool
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from llm_chain import LLMPool, usage_line  # noqa: E402  — 모든 리포트 공용 LLM 사슬 (experiments/llm_chain.py, 2026-10-14)
 
 PROMPT_FILE = os.path.join(config.PROMPTS_DIR, "classify.txt")
 
@@ -143,7 +144,7 @@ def classify(conn, since_days=config.CLASSIFY_SINCE_DAYS, max_batches=config.CLA
     if not items:
         print(f"[classify] 대기 0건 (최근 {since_days}일)")
         return 0
-    pool = GeminiPool()
+    pool = LLMPool("json", label="nvda-classify")
     prompt_head = _load_prompt()
     batches = [items[i:i + batch_size] for i in range(0, len(items), batch_size)]
     print(f"[classify] 대기 {len(items):,}건 → {len(batches)}배치")
@@ -164,7 +165,7 @@ def classify(conn, since_days=config.CLASSIFY_SINCE_DAYS, max_batches=config.CLA
         dropped_total += dropped
         ev = sum(v["is_event"] for v in valid)
         print(f"[classify] 배치 {n}/{len(batches)}: {len(valid)}건 저장 (이벤트 {ev})" + (f" · {dropped}건 검증 탈락" if dropped else ""))
-    print(f"[classify] 완료 — 저장 {written:,}건 · 검증 탈락 {dropped_total} · Gemini 호출 {pool.calls}회" + (f" (예비 {pool.fallback_calls}회)" if pool.fallback_calls else ""))
+    print(f"[classify] 완료 — 저장 {written:,}건 · 검증 탈락 {dropped_total} · 호출 {pool.calls}회 (예비 {pool.fallback_calls}회) · 단계별 성공/시도 {usage_line()}")
     db.set_meta(conn, "classify_last_run_at", db.now_iso())
     conn.commit()
     return written
