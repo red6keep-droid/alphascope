@@ -66,6 +66,9 @@ CHAINS = {
     # Groq 둘은 짧은 요청(분류 · 답글)용 3 · 4순위
     "json": ["gemini", "nvidia-deepseek", "groq-qwen", "groq"],
     "translate": ["groq", "nvidia-gptoss20", "gemini"],          # 홈 뉴스 제목 번역 — 빠른 것부터 (2026-10-11)
+    # 댓글 답글 — Gemini 는 맨 뒤 (2026-10-14 사용자: 댓글 한 건에 한도 1회가 나가니 리포트 몫을 남기자). 답글은 짧고 숫자를 쓰지 않아 예비 모델로 충분.
+    # DeepSeek 가 첫째 — 비교에서 답글 품질이 가장 좋았고, 봇은 5분마다 돌아 30초쯤 걸려도 된다
+    "comment": ["nvidia-deepseek", "groq", "groq-qwen", "gemini"],
 }
 
 USAGE = defaultdict(lambda: {"ok": 0, "fail": 0})   # 단계 → 성공 · 실패 수 (이번 실행)
