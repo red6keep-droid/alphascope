@@ -17,10 +17,12 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from llm_chain import LLMPool  # noqa: E402  — 모든 리포트 공용 LLM 사슬 (2026-10-14)
+import fact_check  # noqa: E402  — 서술 숫자 · 방향 검사 (2026-10-14)
+from validate_report import REQUIRED_LLM_KEYS  # noqa: E402
 
 PROMPT_FILE = os.path.join(os.path.dirname(__file__), "prompts", "daily_report.txt")
-# report.out.json 의 핵심 칸 — 빠지면 그 모델 답은 버리고 다음 단계로
-REQUIRED_KEYS = ("one_line", "summary", "opinion", "risk", "news")
+# 숫자 검사를 하지 않는 칸 — 그림 프롬프트(영어 묘사), 뉴스(제목 번역 · 선정 이유는 기사 원문 숫자를 옮긴다)
+NO_FACT_CHECK = ("image_prompt", "news")
 
 
 def _load_prompt():
@@ -49,15 +51,42 @@ def generate_report(input_path, output_path, analysis_path=None):
     prompt = _load_prompt() + "\n\n" + json.dumps(payload, ensure_ascii=False, indent=2)
     print(f"[Gemini] 프롬프트 {len(prompt):,}자")
 
-    def check(report):   # 예비 모델이 형식을 빠뜨리면 다음 단계로 — 렌더러가 읽는 핵심 칸 (2026-10-14)
+    def structure(report):   # validate_report 가 볼 칸이 모두 있어야 한다
         if not isinstance(report, dict):
             raise ValueError("리포트 JSON 객체가 아님")
-        missing = [k for k in REQUIRED_KEYS if not report.get(k)]
+        missing = [k for k in REQUIRED_LLM_KEYS if k not in report]
         if missing or not isinstance(report.get("news"), list):
             raise ValueError(f"필수 칸 누락: {missing or 'news(list)'}")
 
+    def check(report):   # 구조 + 숫자 검사 — 걸리면 그 모델 답은 버리고 다음 단계로
+        structure(report)
+        problems = fact_check.check([v for k, v in report.items() if k not in NO_FACT_CHECK and isinstance(v, str)], payload)
+        if problems:
+            raise ValueError("숫자 검사 — " + " / ".join(problems))
+
     pool = LLMPool("json", label="daily-report")
-    report = pool.generate_json(prompt, temperature=None, validate=check)
+    try:
+        report = pool.generate_json(prompt, temperature=None, validate=check)
+    except RuntimeError:
+        # 모든 모델이 검사에 걸린 날: 구조가 맞는 첫 답에서 틀린 문장만 빼고 쓴다 — 리포트 전체가 빠지는 것보다 낫다 (2026-10-14)
+        report, used = None, None
+        for name, value, _why in pool.rejected:
+            try:
+                structure(value)
+            except ValueError:
+                continue
+            report, used = value, name
+            break
+        if report is None:
+            raise
+        for k, v in list(report.items()):
+            if k in NO_FACT_CHECK or not isinstance(v, str):
+                continue
+            fixed, problems = fact_check.drop_bad(v, payload)
+            if problems:
+                print(f"[검사] {k}: 틀린 문장 {len(problems)}개 뺌 — " + " / ".join(problems)[:300])
+                report[k] = fixed
+        pool.last_model = f"{used} (틀린 문장 뺌)"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
     print(f"[Gemini] 리포트 생성 완료 -> {output_path} (모델: {pool.last_model})")

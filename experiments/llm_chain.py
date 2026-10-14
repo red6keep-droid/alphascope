@@ -102,6 +102,7 @@ class LLMPool:
         self.last_model = self.model
         self.calls = 0
         self.fallback_calls = 0
+        self.rejected = []   # validate 에서 떨어진 답 [(단계, 값, 이유)] — 전부 실패했을 때 호출자가 고쳐 쓸 수 있게 (데일리)
         keys = gemini_keys()
         self._keys = keys
         self._cooldown_until = [0.0] * len(keys)
@@ -210,7 +211,11 @@ class LLMPool:
                         else self._openai(name, step, prompt, temperature, max_tokens))
                 value = parse_json(text)
                 if validate is not None:
-                    checked = validate(value)
+                    try:
+                        checked = validate(value)
+                    except Exception as e:  # noqa: BLE001
+                        self.rejected.append((name, value, str(e)))
+                        raise
                     if checked is not None:
                         value = checked
             except Exception as e:  # noqa: BLE001
