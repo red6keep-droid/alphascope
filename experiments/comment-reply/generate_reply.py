@@ -4,7 +4,7 @@
 숫자/주장을 지어내지 않도록 지시문(prompts/comment_reply.txt)으로 제약한다.
 결과는 {"reply": "..."} JSON 으로 받아 문자열만 꺼낸다.
 
-모델 호출은 모든 리포트 공용 사슬 experiments/llm_chain.py ("json": Gemini 키들 → Groq → NVIDIA DeepSeek, 2026-10-14).
+모델 호출은 모든 리포트 공용 사슬 experiments/llm_chain.py ("json": Gemini 키들 → NVIDIA DeepSeek → Groq Qwen → Groq gpt-oss, 2026-10-14).
 환경변수: GEMINI_API_KEY (; 또는 , 로 여럿) · GROQ_API_KEY · NVIDIA_API_KEY — 키 없는 단계는 건너뛴다.
 """
 

@@ -187,7 +187,7 @@ python experiments/nvda-report/labels.py --verbose      # 보정·병합 결과 
 | 서술(narrate) | **Gemini 3.5 Flash** | Groq gpt-oss-120b | NVIDIA DeepSeek |
 | 홈 뉴스 제목 번역 (`fetch_news.py`) | **Groq gpt-oss-120b** (0.9초) | NVIDIA gpt-oss-20b (5초) | Gemini |
 
-- 분류·서술은 모든 리포트 공용 `experiments/llm_chain.py`(2026-10-14, 예전 gemini_client.py · backup_llm.py 를 합침)의 사슬 "json"을 쓴다 — Gemini 키들이 5회 모두 한도(429)·일시 오류(503/500)·형식 오류면 Groq → NVIDIA DeepSeek 로 넘긴다 (503은 2026-10-11 CI 드라이런에서 배치 하나가 그냥 실패한 뒤 추가). 답한 모델 이름이 `ai_model`에 남는다. 요약(ai_fact)은 분류 호출에 묶여 있어 떼지 않는다.
+- 분류·서술은 모든 리포트 공용 `experiments/llm_chain.py`(2026-10-14, 예전 gemini_client.py · backup_llm.py 를 합침)의 사슬 "json"을 쓴다 — Gemini 키들이 5회 모두 한도(429)·일시 오류(503/500)·형식 오류면 NVIDIA DeepSeek → Groq Qwen → Groq gpt-oss 로 넘긴다 (2026-10-14 순서 변경 — 비교 결과는 llm_chain.py 머리말) (503은 2026-10-11 CI 드라이런에서 배치 하나가 그냥 실패한 뒤 추가). 답한 모델 이름이 `ai_model`에 남는다. 요약(ai_fact)은 분류 호출에 묶여 있어 떼지 않는다.
 - Gemini를 주 모델로 두는 이유: 수동 검증 96%를 통과한 조합이고 임계값 튜닝 중이라 라벨 분포를 흔들지 않는다. Gemini는 사고 기본값(켜짐) 유지.
 - Groq: 분류 20건 6.5초, Gemini 라벨과 24필드 중 18~19 일치, 서술 검증 통과. **무료 등급 분당 8,000토큰** → 20건 배치(≈7,000) 뒤 60초 간격(`min_interval`). 한 문장 사실이 존댓말로 나오는 경향.
 - NVIDIA DeepSeek: 18/24, 20건 배치 2분 안팎. 공용 엔드포인트라 지연이 들쭉날쭉(같은 모델이 3초↔19분) → 마지막 단.

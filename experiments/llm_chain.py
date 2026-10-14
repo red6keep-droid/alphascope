@@ -20,8 +20,9 @@ Gemini 키는 GEMINI_API_KEY 에 ; 또는 , 로 여럿 (2026-10-14 사용자: �
 - Groq gpt-oss-120b (사고 low): 분류 20건 6.5초, Gemini 라벨과 24필드 중 18~19 일치, 서술 검증 통과.
   무료 등급 분당 8,000토큰 → 다음 호출까지 60초 간격. 미국 증시 리포트처럼 긴 프롬프트(3만 자 넘음)는 413 으로 바로 다음 단계.
 - NVIDIA DeepSeek V4.1 Flash (사고 끔): 18/24, 20건 배치 2분 안팎. 공용 엔드포인트라 지연이 들쭉날쭉(3초↔19분).
+- Groq Qwen 3.8 27B (사고 끔, 2026-10-14 추가): 분류 20건 6초, 80칸 중 56 — gpt-oss 와 같은 키, 한도는 모델마다 따로.
 - NVIDIA gpt-oss-20b: 번역 5초 — 번역 전용 (분류는 전부 Other · 0 으로 탈락).
-떨어진 후보: Mistral(Ministral 14B 14/24, Legal→Regulation 오분류, 서술에 없는 내용), Nemotron Super(빈 응답), GLM Flash(무응답), Gemma 4(504).
+떨어진 후보: Llama(2026-10-14 — Groq 에서 내려감, NVIDIA Nemotron 70B · Ultra 253B 는 404), OpenRouter 무료 DeepSeek 없음(유료만), Mistral(Ministral 14B 14/24, Legal→Regulation 오분류, 서술에 없는 내용), Nemotron Super(빈 응답), GLM Flash(무응답), Gemma 4(504).
 사고 모드는 켜도 라벨이 안 나아지고(low 18 → medium 19 → high 빈 응답) 서술은 길어져 검증 탈락 → 전부 low/끔.
 새 공급자는 실제 프롬프트로 정확도를 비교한 뒤에만 STEPS · CHAINS 에 넣는다.
 """
@@ -46,6 +47,9 @@ STEPS = {
     "groq": {"kind": "openai", "env": "GROQ_API_KEY", "url": "https://api.groq.com/openai/v1/chat/completions",
              "model": "openai/gpt-oss-120b", "min_interval": 60, "timeout": 120,
              "params": {"reasoning_effort": "low", "max_completion_tokens": 8000}},   # 분당 8,000토큰 → 호출 간격 60초
+    "groq-qwen": {"kind": "openai", "env": "GROQ_API_KEY", "url": "https://api.groq.com/openai/v1/chat/completions",
+                  "model": "qwen/qwen3.8-27b", "min_interval": 60, "timeout": 120,
+                  "params": {"reasoning_effort": "none", "max_completion_tokens": 8000}},   # gpt-oss 와 한도가 따로 (모델마다 분당 8,000토큰)
     "nvidia-deepseek": {"kind": "openai", "env": "NVIDIA_API_KEY", "url": "https://integrate.api.nvidia.com/v1/chat/completions",
                         "model": "deepseek-ai/deepseek-v4.1-flash", "timeout": 300,
                         "params": {"max_tokens": 8000, "chat_template_kwargs": {"thinking": False}}},   # 사고 끄기 — 켜면 답이 비거나 5분 초과
@@ -56,12 +60,15 @@ STEPS = {
 
 # 용도별 순서
 CHAINS = {
-    "json": ["gemini", "groq", "nvidia-deepseek"],               # 분류 · 서술 · 리포트 · 댓글 답글
+    # 분류 · 서술 · 리포트 · 댓글 답글. DeepSeek 가 2순위 (2026-10-14 비교: 분류 Gemini 라벨과 80칸 중 DeepSeek 58 · Qwen 56 · gpt-oss 51,
+    # 서술 세 가지를 모두 통과한 예비는 DeepSeek 뿐 — Groq 둘은 트럼프 서술 · 데일리가 분당 8,000토큰을 넘어 413, gpt-oss 는 NVDA 서술 숫자 방향을 틀림).
+    # Groq 둘은 짧은 요청(분류 · 답글)용 3 · 4순위
+    "json": ["gemini", "nvidia-deepseek", "groq-qwen", "groq"],
     "translate": ["groq", "nvidia-gptoss20", "gemini"],          # 홈 뉴스 제목 번역 — 빠른 것부터 (2026-10-11)
 }
 
 USAGE = defaultdict(lambda: {"ok": 0, "fail": 0})   # 단계 → 성공 · 실패 수 (이번 실행)
-_last_call = {}   # OpenAI 호환 공급자 → 마지막 호출 시각 (분당 토큰 한도 간격용)
+_last_call = {}   # (주소, 모델) → 마지막 호출 시각 (분당 토큰 한도 간격용 — Groq 는 모델마다 한도가 따로)
 
 
 class StepFailed(RuntimeError):
@@ -173,7 +180,7 @@ class LLMPool:
     # ---------------------------------------------------------------- OpenAI 호환
     def _openai(self, name, step, prompt, temperature, max_tokens):
         key = os.environ.get(step["env"], "").strip()
-        gap = step.get("min_interval", 0) - (time.time() - _last_call.get(step["url"], 0))
+        gap = step.get("min_interval", 0) - (time.time() - _last_call.get((step["url"], step["model"]), 0))
         if gap > 0:
             print(f"[{self.label}] {name} 분당 한도 간격 — {gap:.0f}s 대기")
             time.sleep(gap)
@@ -192,7 +199,7 @@ class LLMPool:
             raise StepFailed(f"{name} 네트워크: {str(e)[:120]}")
         if r.status_code != 200:
             raise StepFailed(f"{name} {r.status_code}: {r.text[:160]}")
-        _last_call[step["url"]] = time.time()   # 토큰을 실제로 쓴 호출만 간격 계산에 (401 · 413 같은 즉시 거절은 제외)
+        _last_call[(step["url"], step["model"])] = time.time()   # 토큰을 실제로 쓴 호출만 간격 계산에 (401 · 413 같은 즉시 거절은 제외)
         text = (r.json()["choices"][0]["message"].get("content") or "").strip()
         if not text:
             raise StepFailed(f"{name}: 빈 응답 (사고 토큰이 출력 한도를 다 쓴 경우)")

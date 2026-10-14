@@ -45,8 +45,8 @@ def _load_payload(input_path, analysis_path):
 
 
 def generate_report(input_path, output_path, analysis_path=None):
-    """예전에는 Gemini 키만 차례로 돌았다. 이제 공용 사슬 "json" — Gemini 키들 → Groq → NVIDIA DeepSeek (2026-10-14).
-    프롬프트가 3만 자를 넘어 Groq 무료 등급(분당 8,000토큰)은 413 으로 바로 넘어가고, 실제 예비는 DeepSeek 다."""
+    """예전에는 Gemini 키만 차례로 돌았다. 이제 공용 사슬 "json" — Gemini 키들 → NVIDIA DeepSeek → Groq (2026-10-14).
+    프롬프트가 3만 자를 넘어 Groq 무료 등급(분당 8,000토큰)은 413 이라, 실제 예비는 DeepSeek 다 (2026-10-14 비교: 75초, 13칸 · 숫자 검사 통과)."""
     payload = _load_payload(input_path, analysis_path)
     prompt = _load_prompt() + "\n\n" + json.dumps(payload, ensure_ascii=False, indent=2)
     print(f"[Gemini] 프롬프트 {len(prompt):,}자")
