@@ -206,7 +206,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 24px; color: #111; }
 .rt-pop-body { font-size: 19px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
 /* 툴팁 내용 행간 = 본문 34px (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
-.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; padding-left: 14px; }   /* 팝업 글머리표도 14px 들여쓰기 (2026-10-14 사용자) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
+.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; padding-left: 8px; }   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
 .rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
 .rt-pop-li > span:last-child { min-width: 0; }
 .rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
@@ -302,6 +302,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
   font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .post-nav-top:hover { color: var(--accent); }
+.post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
 .post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
 /* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px (테마 JS .ends-text, 2026-10-12 사용자) */
 body.item-view .post-outer-container { padding-bottom: 0 !important; }
@@ -371,10 +372,10 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments.is-open .comments-toggle .fold-box .acc-chev { transform: rotate(180deg); }
 /* 댓글 목록 — 댓글 사이 1px 구분선(위아래 14), 첫 댓글은 선 없이 위 18 */
 .comments .cm-list, .comments .cm-replies { list-style: none; margin: 0; padding: 0; }
-.comments .cm-list > .cm-item { padding: 14px 0; border-top: 1px solid #E2E8F0; }
+.comments .cm-list > .cm-item { padding: 18px 0; border-top: 1px solid #E2E8F0; }   /* 댓글 사이 위아래 14 → 18 (+30%, 2026-10-14 사용자) */
 .comments .cm-list > .cm-item:first-child { border-top: 0; padding-top: 18px; }
 /* 댓글 한 개 = 두 칸 grid(사진 | 글). 답글 묶음 · 답글 쓰기 칸은 글 칸 아래 줄 (2026-10-13 사용자: "댓글에 댓글은 레이아웃이 깨진다") */
-.comments .cm-item { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 10px; align-items: start; }
+.comments .cm-item { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 7px; align-items: start; }   /* 사진 · 이름 10 → 7 (−30%, 2026-10-14 사용자) */
 .comments .cm-avatar { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-top: 0; border-radius: 50%; overflow: hidden; background: #94A3B8; color: #fff; font-family: var(--num); font-weight: 700; font-size: 12px; line-height: 24px; }   /* 사진 24px (2026-10-13 사용자) — 사진이 없으면 머리글자 원 */
 .comments .cm-avatar img { width: 24px; height: 24px; display: block; }
 .comments .cm-avatar.is-owner { background: #fff; border: 1px solid #E2E8F0; box-sizing: border-box; }   /* 운영자 = AlphaScope 로고 (2026-10-14 사용자) */
@@ -393,7 +394,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-btn:hover { border-color: #111; }
 .comments .cm-btn[disabled] { opacity: .4; cursor: default; }
 .comments .cm-replies { grid-column: 2; margin: 0; }   /* 답글은 원 댓글 글 왼쪽 선에 맞춰 */
-.comments .cm-replies > .cm-item { padding: 14px 0 0; border-top: 0; }
+.comments .cm-replies > .cm-item { padding: 18px 0 0; border-top: 0; }
 .comments .cm-replybox { grid-column: 2; margin-top: 10px; }
 .comments .cm-replybox:empty { display: none; }
 .comments .cm-status { padding: 14px 0; font-size: 14px; line-height: 20px; color: #7A7A7A; text-align: center; }   /* 불러오는 중 · 못 불러옴 · 첫 댓글 안내도 가운데 (2026-10-14 사용자) */
@@ -404,7 +405,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-login { display: block; width: 100%; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; color: #111; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 공식 흰 버튼 — 외곽선 #E2E8F0 → 20% 진하게 #B5BAC0 (2026-10-14 사용자, 가이드 2-3 흰 버튼) */
 .comments .cm-login:hover { border-color: #111; }
 .comments .cm-login[disabled] { opacity: .5; cursor: default; }
-.comments .cm-me { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; line-height: 24px; }
+.comments .cm-me { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; line-height: 24px; }
 .comments .cm-me .cm-avatar { grid-column: auto; grid-row: auto; }
 .comments .cm-link { margin-left: auto; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; line-height: 20px; color: #7A7A7A; cursor: pointer; }
 .comments .cm-link:hover { color: #111; }
@@ -607,7 +608,7 @@ __DASHBOARD__
                     <b:else/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__LIST_PATH__&quot;'>목록</a>
                     </b:if>
-                    <button aria-label='맨 위로' class='post-nav-top' type='button'>TOP<svg aria-hidden='true' fill='none' height='16' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 16 16' width='16'><path d='M8 13V3M4 7l4-4 4 4'/></svg></button>
+                    <button aria-label='맨 위로' class='post-nav-top' type='button'>TOP<svg aria-hidden='true' fill='none' height='22' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.6' viewBox='0 0 22 22' width='22'><circle cx='11' cy='11' r='10'/><path d='M11 15.5V7M7.5 10.5 11 7l3.5 3.5'/></svg></button>
                   </p>
                   <b:comment>댓글은 우리 것 — 테마 JS "댓글" IIFE 가 Firebase 로 그린다 (2026-10-14 사용자: 폰에서 블로거 댓글 입력창이 좁다). 블로거 댓글(commentPicker)은 더 쓰지 않는다.</b:comment>
                   <section class='comments' expr:data-post-id='data:post.id' id='comments'><h3 class='comments-title'>댓글</h3></section>
@@ -1276,7 +1277,7 @@ def preview_post():
         "      </article>\n"
         "      <p class=\"post-nav\">\n"
         "        <a class=\"post-nav-list\" href=\"#list\">목록</a>\n"
-        "        <button class=\"post-nav-top\" type=\"button\" aria-label=\"맨 위로\">TOP<svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 13V3M4 7l4-4 4 4\"/></svg></button>\n"
+        "        <button class=\"post-nav-top\" type=\"button\" aria-label=\"맨 위로\">TOP<svg viewBox=\"0 0 22 22\" width=\"22\" height=\"22\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"10\"/><path d=\"M11 15.5V7M7.5 10.5 11 7l3.5 3.5\"/></svg></button>\n"
         "      </p>\n"
         "%s\n"
         "    </div>\n"

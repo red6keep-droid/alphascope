@@ -543,7 +543,7 @@ def _event_html(e):
                  if e.get("url") else f'<span style="font-weight:700;color:#111;">{head}</span>')
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절) — 배경 · 테두리만 방향 색
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
-        return (f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px {_dk.SEP_GAP - _dk.VP}px;margin:0 0 8px;line-height:{_dk.LH_BODY};">'   # 끝 줄이 라벨(행간 1)이라 아래는 VP 만 뺀다
+        return (f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px {_dk.SEP_GAP - _dk.VP}px;margin:0 -13px 8px;line-height:{_dk.LH_BODY};">'   # 좌우 −13(안쪽 12 + 테두리 1): 강조 카드 제목 = 일반 기사 제목 왼쪽 선 (2026-10-14 사용자)   # 끝 줄이 라벨(행간 1)이라 아래는 VP 만 뺀다
                 f"{head_html}{fact}{when}{lab}</div>")
     return f"{head_html}{fact}{when}{lab}"
 

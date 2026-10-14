@@ -45,11 +45,11 @@ SYMBOL_NAMES = {
     "^VIX": "VIX", "^TNX": "미국 10년물 금리", "^FVX": "미국 5년물 금리", "^IRX": "미국 3개월물 금리",
 }
 
-INDEX_LABELS = {   # 한국어 위주 (가이드라인 3-4). S&P 500·VIX 는 고유명으로 둔다
-    "sp500": "S&P 500",
-    "nasdaq": "나스닥",
-    "dow": "다우존스",
-    "russell": "러셀 2000",
+INDEX_LABELS = {   # 한국어 위주 (가이드라인 3-4). S&P 500·VIX 는 고유명으로 둔다. 이름 옆 (의미)는 작은 글씨 — dk.paren (2026-10-14 사용자: 블로그 모든 지수 이름)
+    "sp500": "S&P 500 (대형주)",
+    "nasdaq": "나스닥 (기술주)",
+    "dow": "다우존스 (우량주)",
+    "russell": "러셀 2000 (소형주)",
     "vix": "VIX (변동성 지수)",
 }
 # 영어 용어 → 한국어 (Gemini 문구·라벨 표시용)
@@ -359,11 +359,11 @@ def sec_change(analysis, report, prev=None):
     vix = analysis.get("vix") or {}
     # 읽는 법은 카드가 아니라 그 내용의 제목(소제목 · 구분명) 옆 ? 툴팁 — 7번째 값 (2026-10-12 사용자: "해당 내용만 툴팁으로 타이틀 옆에")
     prs = (prev or {}).get("rs") or {}
-    rows = [("성장주 − 시장 (나스닥 − S&P 500 · 5일)", dk.arrow(rs.get("qqq_spy_5d"), 2, "%p"), _vs(rs.get("qqq_spy_5d"), prs.get("qqq_spy_5d")), None, False, True,
+    rows = [("성장주 vs 시장 (나스닥 vs S&P 500 · 5일)", dk.arrow(rs.get("qqq_spy_5d"), 2, "%p"), _vs(rs.get("qqq_spy_5d"), prs.get("qqq_spy_5d")), None, False, True,
              "양수면 나스닥(성장주)이 S&P 500보다 강했습니다"),
-            ("소형주 − 시장 (러셀 2000 − S&P 500 · 5일)", dk.arrow(rs.get("iwm_spy_5d"), 2, "%p"), _vs(rs.get("iwm_spy_5d"), prs.get("iwm_spy_5d")), None, False, True,
+            ("소형주 vs 시장 (러셀 2000 vs S&P 500 · 5일)", dk.arrow(rs.get("iwm_spy_5d"), 2, "%p"), _vs(rs.get("iwm_spy_5d"), prs.get("iwm_spy_5d")), None, False, True,
              "양수면 러셀 2000(소형주)이 S&P 500보다 강했습니다 — 위험을 감수하는 쪽으로 돈이 움직일 때 흔히 나타납니다"),
-            ("동일가중 − 시총가중 (RSP − SPY · 5일)", dk.arrow(rs.get("rsp_spy_5d"), 2, "%p"), _vs(rs.get("rsp_spy_5d"), prs.get("rsp_spy_5d")), None, False, True,
+            ("동일가중 vs 시총가중 (RSP vs SPY · 5일)", dk.arrow(rs.get("rsp_spy_5d"), 2, "%p"), _vs(rs.get("rsp_spy_5d"), prs.get("rsp_spy_5d")), None, False, True,
              "양수면 종목을 똑같이 담은 지수(RSP)가 더 올랐습니다 — 상승이 소수 대형주가 아니라 넓게 퍼졌다는 뜻")]   # 어제 대비는 줄 아래 한 줄 (sub_below)
     streak = rs.get("qqq_streak")
     if streak is not None:
@@ -639,7 +639,8 @@ def sec_status(analysis, report, prev=None):
     head, why = _overall_text(overall, items)
     overall_card = dk.state_card(_esc(head), LIGHT_KIND.get(overall, "neutral"), sub_html=_esc(why), center=True)   # 가운데 정렬 (2026-10-13 사용자)
     pad_old = f"padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px {dk.EMPH_PAD - dk.VP}px;margin:0 0 8px;"
-    overall_card = overall_card.replace(pad_old, f"padding:{dk.EMPH_PAD - dk.VP_EMPH - 4}px 14px {dk.EMPH_PAD - dk.VP - 5}px;margin:20px 0 8px;", 1)   # 높이 약 10% 줄임(위아래 −4 · −5) · 위 여백 +20 (2026-10-13 사용자)   # 종합은 따로 카드, 라벨 없이 설명, 배경은 신호 색 (2026-10-12 사용자)
+    overall_card = overall_card.replace(pad_old, f"padding:{dk.EMPH_PAD - dk.VP_EMPH - 12}px 14px {dk.EMPH_PAD - dk.VP - 13}px;margin:40px 0 8px;", 1)   # 높이 −20%(83 → 66: 위아래 패딩 −8 · −8) · 위 여백 20 → 40 (2026-10-14 사용자)
+    overall_card = overall_card.replace("color:#374151;margin-top:2px;", "color:#374151;margin-top:1px;", 1)   # 두 문장 사이 보이는 12 → 11 (−10%, 같은 날)   # 높이 약 10% 줄임(위아래 −4 · −5) · 위 여백 +20 (2026-10-13 사용자)   # 종합은 따로 카드, 라벨 없이 설명, 배경은 신호 색 (2026-10-12 사용자)
     rows = []
     for label, light, basis in items:
         changed = f"어제 {_light_word(was[label])}" if was.get(label) and light and was[label] != light else ""   # 신호가 바뀐 날만 어제 신호

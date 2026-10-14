@@ -239,7 +239,11 @@ body.menu-open { overflow: hidden; }
   color: var(--ink);
   white-space: nowrap;
 }
-.section-title svg { display: none; }   /* 홈 구획 제목 앞 아이콘 없음 (2026-10-13 사용자) */
+.section-title > svg { display: none; }
+/* 홈 구획 제목 앞 아이콘 — 리포트 제목 아이콘과 같은 24px 색 네모 + 흰 글자 16px, 글자와 8px (2026-10-14 사용자: "홈 화면에서 각 타이틀 앞에 아이콘") */
+.section-title:has(.report-icon) { gap: 8px; }
+.section-title .report-icon { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex: none; border-radius: 6px; color: #fff; }
+.section-title .report-icon svg { width: 16px; height: 16px; display: block; }
 .section-note { margin-right: 8px; font-size: 14px; line-height: 22px; color: var(--gray-500); }   /* 오른쪽 안내 글은 오른쪽 끝에서 8px 들여쓰기 (2026-10-14 사용자) */
 
 .card {
@@ -376,7 +380,7 @@ body.menu-open { overflow: hidden; }
 .index-status { margin-left: 6px; font-weight: 400; font-size: 14px; color: #7A7A7A; }
 .index-value { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
 /* 지수 값은 실시간 랭킹 현재가 칸과 같은 글자 — 숫자 16px 굵게 + 등락 14px, 둘 다 증감 색 (2026-10-13 사용자) */
-.index-price { font-family: var(--num); font-weight: 400; font-size: 16px; line-height: 24px; font-variant-numeric: tabular-nums; }
+.index-price { font-family: var(--num); font-weight: 700; font-size: 16px; line-height: 24px; font-variant-numeric: tabular-nums; }
 .index-change { font-family: var(--num); font-weight: 600; font-size: 14px; line-height: 24px; font-variant-numeric: tabular-nums; }
 .index-value { gap: 6px; }
 /* 카드 안 더 보기 줄 — 펼침 버튼 모양(14px 굵게, 화살표), 카드 아래 둥근 모서리 그대로 */
@@ -840,7 +844,7 @@ body.menu-open { overflow: hidden; }
        2. 지수 카드  (data.json 의 indices 연동)
        ==================================================================== -->
   <section class="index-section" aria-labelledby="index-title">
-    <div class="section-head"><h2 class="section-title" id="index-title">주요 지수</h2></div>
+    <div class="section-head"><h2 class="section-title" id="index-title"><span class="report-icon" style="background:#4963CA;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l4-4 3 3 5-6"/><path d="M10 5h4v4"/></svg></span>주요 지수</h2></div>
     <!-- 지수 4개 = 카드 하나, S&P 500 · 나스닥 줄 + 더 보기 줄 안에 다우존스 · 러셀 2000 (2026-10-13 사용자) -->
     <div class="index-card">
       <div class="index-rows" id="index-row"></div>
@@ -856,12 +860,7 @@ body.menu-open { overflow: hidden; }
   <section class="rankings" aria-labelledby="rankings-title">
     <div class="section-head">
       <h2 class="section-title" id="rankings-title">
-        <svg viewBox="0 0 20 20" aria-hidden="true" fill="#0F172A">
-          <rect x="2" y="10" width="4" height="10" rx="1"/>
-          <rect x="8" y="4" width="4" height="16" rx="1"/>
-          <rect x="14" y="13" width="4" height="7" rx="1"/>
-        </svg>
-        실시간 랭킹
+        <span class="report-icon" style="background:#6D28D9;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="8" width="3" height="6" rx=".5"/><rect x="6.5" y="3" width="3" height="11" rx=".5"/><rect x="11" y="10" width="3" height="4" rx=".5"/></svg></span>실시간 랭킹
       </h2>
     </div>
 
@@ -896,18 +895,14 @@ body.menu-open { overflow: hidden; }
   </section>
 
   <!-- ====================================================================
-       4. 주요 핵심 섹터 현황
+       4. 섹터 현황 (2026-10-14 사용자: 주요 핵심 섹터 현황 → 섹터 현황)
        ==================================================================== -->
   <!-- 섹터는 섹터 ETF 11개의 실제 일일 등락률(data.json sectors, fetch_stocks.py) — 손으로 넣은 업종 비중 · 히트맵은 삭제 (2026-10-12 사용자: "히트맵은 정확한 정보가 아니면 삭제", "가짜 데이터는 모두 삭제").
        제목은 카드 밖 + 아이콘 -->
   <section class="sector-section" aria-labelledby="sector-title">
     <div class="section-head">
       <h2 class="section-title" id="sector-title">
-        <svg viewBox="0 0 20 20" aria-hidden="true" fill="#0F172A">
-          <rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/>
-          <rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/>
-        </svg>
-        주요 핵심 섹터 현황
+        <span class="report-icon" style="background:#0F766E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></span>섹터 현황
       </h2>
       <span class="section-note">섹터 ETF 11개 · 일일 등락률</span>
     </div>
@@ -928,16 +923,13 @@ body.menu-open { overflow: hidden; }
   </section>
 
   <!-- ====================================================================
-       5. 실시간 주요 뉴스  (news.json 연동)
+       5. 실시간 뉴스  (news.json 연동, 2026-10-14 사용자: 실시간 주요 뉴스 → 실시간 뉴스)
        ==================================================================== -->
   <!-- 카드 안 카드를 두지 않는다 — 리포트 뉴스 카드를 그대로 (2026-10-12 사용자) -->
   <section class="news-section" aria-labelledby="news-title">
     <div class="section-head">
       <h2 class="section-title" id="news-title">
-        <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="#0F172A" stroke-width="1.8" stroke-linecap="round">
-          <rect x="2.5" y="3.5" width="15" height="13" rx="2"/><path d="M6 8h8M6 11h8M6 14h5"/>
-        </svg>
-        실시간 주요 뉴스
+        <span class="report-icon" style="background:#475569;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><path d="M5 6h6M5 8.5h6M5 11h4"/></svg></span>실시간 뉴스
       </h2>
     </div>
     <div class="news-list" id="news-list">
@@ -1042,6 +1034,10 @@ body.menu-open { overflow: hidden; }
   /* ============================================================= 지수 카드 */
 
   /* 데이터가 오기 전(또는 수집 실패 시)에도 카드 틀은 유지한다. */
+  /* 지수가 나타내는 것 — 이름 옆 작은 괄호 (2026-10-14 사용자: "모든 지수 타이틀옆에 (소형주) 이렇게"). 데일리 렌더러 INDEX_LABELS 와 같다 */
+  var INDEX_MEANING = { '^GSPC': '대형주', '^IXIC': '기술주', '^DJI': '우량주', '^RUT': '소형주',
+    'S&P 500': '대형주', '나스닥 종합': '기술주', '다우존스': '우량주', '러셀 2000': '소형주' };
+
   var INDEX_PLACEHOLDERS = [
     { name: 'S&P 500' }, { name: '나스닥 종합' },
     { name: '다우존스' }, { name: '러셀 2000' }
@@ -1051,7 +1047,8 @@ body.menu-open { overflow: hidden; }
   function indexCard(ix) {
     var row = el('div', 'index-rowline');
     var name = el('span', 'index-name', ix.name || ix.s || '—');
-    if (ix.st) name.appendChild(el('span', 'index-status', ix.st));
+    var mean = INDEX_MEANING[ix.s] || INDEX_MEANING[ix.name];   /* 지수 이름 옆 (의미) — 블로그 모든 지수 이름 (2026-10-14 사용자). 장중 · 장마감 글자는 삭제 (같은 날) */
+    if (mean) name.appendChild(el('span', 'index-status', '(' + mean + ')'));
     row.appendChild(name);
     var val = el('span', 'index-value');
     val.appendChild(el('span', 'index-price' + (ix.c !== undefined && ix.c !== null ? ' ' + signClass(ix.c) : ''), fmt(ix.p)));   /* 지수 숫자도 증감 색 (2026-10-13 사용자) */
@@ -1973,7 +1970,6 @@ body.menu-open { overflow: hidden; }
     li.appendChild(avatar(c));
     var body = el('div', 'cm-body'), h = el('div', 'cm-head');
     h.appendChild(el('span', 'cm-name', nameOf(c)));
-    if (isOwnerC(c)) h.appendChild(el('span', 'cm-tag', '운영자'));
     h.appendChild(el('span', 'cm-date', when(c.created)));
     body.appendChild(h);
     body.appendChild(el('p', 'cm-text', c.text));
