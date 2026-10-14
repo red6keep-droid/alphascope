@@ -1,11 +1,20 @@
 {
-  "updated_at": "2026-10-14 13:35:33 UTC",
+  "updated_at": "2026-10-14 18:29:00 UTC",
   "items": [
+    {
+      "title": "Traders pile into 'bubble puts' on CoreWeave as neocloud stocks plunge",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/14/coreweave-put-options-ai-trade.html",
+      "published": "2026-10-14 17:10:59",
+      "summary": "As a key corner of the artificial intelligence trade takes a beating on Wednesday, traders are betting it could get even worse.",
+      "title_ko": "CoreWeave에 ‘버블 풋’ 몰려… 네오클라우드 주식 급락",
+      "why_ko": "AI 핵심 주식이 급락해 풋 옵션 매수가 늘고 있다."
+    },
     {
       "title": "Don't let inflation bite — how to hedge with TIPS, commodities and infrastructure funds",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/13/inflation-hedge-tips-commodities-infrastructure.html",
-      "published": "2026-10-13 20:52:22",
+      "published": "2026-10-14 15:20:04",
       "summary": "TIPS are looking attractive but they aren't the only way to get inflation protection.",
       "title_ko": "인플레이션 방어, TIPS·원자재·인프라 펀드 활용법",
       "why_ko": "TIPS가 매력적이지만 인플레이션 보호 수단은 다양하다는 점을 알 수 있다."
@@ -99,15 +108,6 @@
       "summary": "With the first round of Brazil's presidential election taking place Sunday, Wall Street is gearing up with starkly different market predictions.",
       "title_ko": "브라질 대선, 루라 vs 볼소나루…월스트리트는 양극단 전망",
       "why_ko": "브라질 대통령 선거 1차 투표가 다가오면서 시장 예측이 크게 갈리고 있다."
-    },
-    {
-      "title": "Berkshire buys more Lennar shares, but pace of purchases slows",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/03/berkshire-buys-more-lennar-shares-but-pace-of-purchases-slows.html",
-      "published": "2026-10-04 09:33:19",
-      "summary": "Berkshire Hathaway added to its bet on Lennar this week, raising its stake in the homebuilder to 11.2%, although the pace of its buying appears to be slowing.",
-      "title_ko": "버크셔, 렌나르 주식 추가 매입…구매 속도는 둔화",
-      "why_ko": "버크셔가 렌나르 지분을 11.2%까지 늘렸지만 매입 속도는 이전보다 느려졌다."
     }
   ]
 }
