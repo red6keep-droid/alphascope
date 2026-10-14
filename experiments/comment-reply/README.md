@@ -1,10 +1,16 @@
-﻿# 알파스코프 댓글 자동 답글 (experiments/comment-reply)
+# 알파스코프 댓글 자동 답글 (experiments/comment-reply)
 
 블로그에 새 댓글이 달리면 감지 → Gemini로 답글 생성 → **Slack으로 알림**까지 자동.
 최종 등록(붙여넣기)만 사람이 하는 **반자동** 방식.
 
 > 공식 Blogger API를 사용하며, 댓글 *작성(insert)*은 API에 존재하지 않으므로
 > 생성된 답글을 관리자가 복사/붙여넣기해 직접 등록합니다. (가장 안전한 방식)
+
+> **2026-10-14 완전 자동으로 전환.** 댓글이 블로거에서 우리 댓글(Firebase Firestore)로 옮겨 가면서
+> 봇이 Firestore 에서 새 댓글을 읽고, Gemini 답글을 **주인 이름(AlphaScope)으로 바로 게시**하고, 스팸은 지운 뒤
+> Slack 에는 한 일만 알린다 (`firestore_client.py`). 아래의 "반자동 · 붙여넣기" 설명은 옛 방식 기록이다.
+> 필요: GitHub Secret `FIREBASE_SERVICE_ACCOUNT`(서비스 계정 키 JSON 전체). 블로거 OAuth 는 글 제목 조회에만 쓴다.
+> 처리 이력 키는 `fs_processed` — 없으면 첫 실행에서 기준선만 잡고 옛 댓글에는 답하지 않는다.
 
 ## 동작 흐름
 

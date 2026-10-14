@@ -1,8 +1,10 @@
-"""처리 완료 댓글 ID 추적 (중복 알림 방지)
+"""처리한 댓글 ID 추적 (같은 댓글에 두 번 답하지 않게)
 
-state 파일은 experiments/comment-reply/output/state.json 에 저장된다.
-디렉토리는 .gitignore 에 등록되어 있어 커밋되지 않는다.
-GitHub Actions 에서는 별도 분기(comment-state)로 보관해 실행 간 지속시킨다.
+state 파일은 experiments/comment-reply/output/state.json — output/ 은 .gitignore 대상.
+GitHub Actions 에서는 comment-state 브랜치에 보관해 실행 간 이어 간다.
+
+2026-10-14 Firestore 이전: 키를 "fs_processed" 로 바꿨다. 예전 "processed" 는 블로거 댓글 ID 라 남겨만 둔다.
+"fs_processed" 가 없으면 load() 가 None — main 이 첫 실행으로 보고 기준선만 잡는다.
 """
 
 import json
@@ -11,20 +13,27 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 STATE_FILE = os.path.join(OUTPUT_DIR, "state.json")
+KEY = "fs_processed"
+
+
+def _read():
+    try:
+        with open(STATE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
 
 
 def load():
-    if os.path.exists(STATE_FILE):
-        try:
-            with open(STATE_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            return [str(i) for i in data.get("processed", [])]
-        except Exception:
-            return []
-    return []
+    data = _read()
+    if KEY not in data:
+        return None
+    return [str(i) for i in data[KEY]]
 
 
 def save(processed):
+    data = _read()
+    data[KEY] = [str(i) for i in processed]
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(STATE_FILE, "w", encoding="utf-8") as f:
-        json.dump({"processed": [str(i) for i in processed]}, f, ensure_ascii=False, indent=2)
+        json.dump(data, f, ensure_ascii=False, indent=2)
