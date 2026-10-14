@@ -29,9 +29,10 @@ Gemini 키는 GEMINI_API_KEY 에 ; 또는 , 로 여럿 (2026-10-14 사용자: �
 
 import json
 import os
+import atexit
 import re
 import time
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 import requests
 
@@ -68,6 +69,34 @@ CHAINS = {
 }
 
 USAGE = defaultdict(lambda: {"ok": 0, "fail": 0})   # 단계 → 성공 · 실패 수 (이번 실행)
+EVENTS = Counter()   # 알릴 일 (이번 실행): "한도 Gemini 키 AIza***" · "예비 nvda-narrate → nvidia-deepseek" · "전부 실패 …" · "검사 탈락 …"
+# Slack 알림 (2026-10-14 사용자: "한도가 걸린 걸 알림으로 보내줘") — 실행이 끝날 때 EVENTS 가 비어 있지 않으면 한 번만, SLACK_WEBHOOK_URL 로.
+# 한도(429) · 예비 모델 사용 · 사슬 전부 실패 · 검사 탈락이 대상. 503 재시도는 흔해서 알리지 않는다 (예비로 넘어가면 그때 알린다)
+
+
+def event(kind, detail):
+    EVENTS[f"{kind} {detail}"] += 1
+
+
+def _notify_summary():
+    url = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
+    if not EVENTS or not url:
+        return
+    run = os.environ.get("GITHUB_WORKFLOW") or "로컬 실행"
+    link = ""
+    if os.environ.get("GITHUB_RUN_ID"):
+        link = f"\n🔗 https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+    lines = [f"⚠️ AI 호출 알림 — {run}", ""]
+    for k, n in EVENTS.most_common():
+        lines.append(f"• {k}" + (f" ×{n}" if n > 1 else ""))
+    lines += ["", f"단계별 성공/시도: {usage_line()}", link]
+    try:
+        requests.post(url, json={"text": "\n".join(lines), "unfurl_links": False}, timeout=20)
+    except Exception as e:  # noqa: BLE001
+        print(f"[llm] Slack 알림 실패: {e}")
+
+
+atexit.register(_notify_summary)
 _last_call = {}   # (주소, 모델) → 마지막 호출 시각 (분당 토큰 한도 간격용 — Groq 는 모델마다 한도가 따로)
 
 
@@ -155,6 +184,7 @@ class LLMPool:
             if r.status_code == 429:
                 self._cooldown_until[i] = time.time() + KEY_COOLDOWN_SECONDS
                 last = "429 한도"
+                event("한도", f"Gemini 키 {_mask(key)} ({self.label})")
                 print(f"[{self.label}] Gemini 키 {_mask(key)} 한도 → {KEY_COOLDOWN_SECONDS}s 휴식")
                 continue
             if r.status_code in (500, 502, 503, 504):
@@ -213,6 +243,7 @@ class LLMPool:
             step = STEPS[name]
             if n:
                 print(f"[{self.label}] 예비 → {name}({step['model']})")
+                event("예비", f"{self.label} → {name}")
             try:
                 text = (self._gemini(step, prompt, temperature, max_tokens) if step["kind"] == "gemini"
                         else self._openai(name, step, prompt, temperature, max_tokens))
@@ -222,6 +253,7 @@ class LLMPool:
                         checked = validate(value)
                     except Exception as e:  # noqa: BLE001
                         self.rejected.append((name, value, str(e)))
+                        event("검사 탈락", f"{self.label} {name}: {str(e)[:120]}")
                         raise
                     if checked is not None:
                         value = checked
@@ -235,6 +267,7 @@ class LLMPool:
             self.fallback_calls += n > 0
             self.last_model = step["model"] if step["kind"] == "gemini" else f"{name.split('-')[0]}:{step['model']}"
             return value
+        event("전부 실패", f"{self.label}: " + " / ".join(errors)[:200])
         raise RuntimeError(f"[{self.label}] 사슬 전부 실패 · " + " / ".join(errors))
 
 

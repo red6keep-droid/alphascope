@@ -31,6 +31,7 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}       # 제목 한글 번역 1순위 gpt-oss-120b (2026-10-11)
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}   # 2순위 gpt-oss-20b
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 제목 한글 번역 예비 (둘 다 없으면 영문 유지)
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # AI 호출 알림 (llm_chain, 2026-10-14)
         run: python fetch_news.py
 
       - name: Prepare deployment files
