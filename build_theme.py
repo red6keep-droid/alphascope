@@ -206,7 +206,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 24px; color: #111; }
 .rt-pop-body { font-size: 19px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
 /* 툴팁 내용 행간 = 본문 34px (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
-.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; }   /* 글머리표 사이 +6 (2026-10-12 사용자) */
+.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; padding-left: 14px; }   /* 팝업 글머리표도 14px 들여쓰기 (2026-10-14 사용자) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
 .rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
 .rt-pop-li > span:last-child { min-width: 0; }
 .rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
@@ -352,91 +352,74 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .post-share-buttons svg, .sharing svg, svg.svg-icon-24, .touch-icon { width: 20px; height: 20px; flex: none; fill: currentColor; }
 .sharing-button svg, .sharing-button .touch-icon { width: 16px; height: 16px; }
 
-/* 댓글 (2026-10-12 사용자: 산만하고 가이드에 안 맞다, 버튼 정렬) — 블로거 threaded comments 마크업을 가이드 글자 체계로.
-   제목 21px, 글 18px·행간 27px, 이름 16px 굵게, 날짜·동작 14px 회색, 버튼은 한 줄 오른쪽 정렬·같은 외곽선 모양 */
+/* 댓글 — 우리 것 (2026-10-14 사용자: "우리가 댓글 프로그램을 만드는 건 어때?" — 폰에서 블로거 댓글 입력창이 좁다. 디자인 가이드 10-2).
+   블로거 댓글(blogger.com iframe · 전체 페이지)을 버리고 테마 JS 가 Firebase(Firestore REST + Google 로그인)로 그린다.
+   마크업은 테마 JS "댓글" IIFE 가 만든다 — 열기 버튼만 카드, 펼친 목록 · 쓰기 칸은 카드 밖 본문 폭 전체, 댓글 사이 1px 구분선.
+   글자: 이름 16px 굵게, 글 19px · 행간 24, 날짜 · 안내 · 버튼 14px. 사진 24px. 입력창은 본문 폭 전체(폰 화면 − 28px). */
 .comments {
-  width: 100%; max-width: var(--shell); margin: 40px auto 0; padding: 16px;   /* 목록 버튼과 40px (2026-10-12 사용자) */
-  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;   /* 카드 (2026-10-12 사용자: "댓글은 카드 형식으로") */
+  width: 100%; max-width: var(--shell); margin: 40px auto 0;   /* 목록 버튼과 40px (2026-10-12 사용자) */
   font-size: 19px; line-height: 24px; color: #333; word-break: keep-all;
 }
-.comments h3, .comments .comments-title, .comments h3.title { margin: 0 0 14px; padding-bottom: 6px; border-bottom: 2px solid #eee; font-size: 21px; font-weight: 700; line-height: 27px; color: #111; }
-/* 댓글 */
-.comments .comment-replies .thread-count, .comments .comment-replies .thread-arrow { display: none; }
-/* 댓글 접기 (2026-10-12 사용자: "하단 댓글은 접기 기능을 추가해서 평소에는 닫아줘") — 테마 JS가 제목을 버튼으로 바꾸고 나머지를 .comments-panel 로 감싼다.
-   기본은 닫힘. 주소가 #comments · #comment-form · #c123 이면 열린 채로. 닫혀 있을 때는 제목 밑 구분선도 없앤다 */
-.comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 12px 16px; background: none; border: 0; font: inherit; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; text-align: left; cursor: pointer; }   /* 제목 16px · 오른쪽 접기 화살표 (2026-10-12 사용자) */
-.comments.is-foldable { padding: 0; }
-.comments.is-foldable h3, .comments.is-foldable .comments-title { margin: 0 !important; padding: 0 !important; border: 0 !important; }
-.comments.is-foldable.is-open .comments-toggle { border-bottom: 1px solid #E2E8F0; }
-.comments-panel { padding: 14px 16px 16px; }
-.comments-toggle .acc-chev { flex: none; transition: transform .15s; }
-.comments.is-open .comments-toggle .acc-chev { transform: rotate(180deg); }
-.comments.is-foldable:not(.is-open) h3, .comments.is-foldable:not(.is-open) .comments-title { margin: 0; padding-bottom: 0; border-bottom: 0; }
+.comments .comments-title { margin: 0; padding: 0; border: 0; font-size: 16px; line-height: 24px; }
+/* 열기 버튼 = 흰 카드, `댓글 n` 16px 굵게 · 오른쪽 공식 접기 화살표(테두리 없이). 기본 닫힘, 주소가 #comments · #c… 면 열린 채로 (2026-10-12 · 13 사용자) */
+.comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 8px 8px 8px 16px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .comments-panel[hidden] { display: none; }
-.comments h4, .comments #comment-post-message { margin: 0 0 10px; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; }
-.comments ol, .comments ul { list-style: none; padding: 0; margin: 0; }
-.comments .comment-thread > ol > li, .comments ol > li.comment { padding: 14px 0; border-top: 1px solid #E2E8F0; }
-.comments .comment-thread > ol > li:first-child, .comments ol > li.comment:first-child { border-top: 0; padding-top: 0; }
-.comments .comment { display: flex; gap: 12px; align-items: flex-start; }
-.comments .comment-replies .comment, .comments .comment .comment { padding-left: 0; }
-.comments .comment-replies { margin: 10px 0 0 48px; }
-/* 답글 · 삭제 버튼과 '답글' 글자는 두지 않는다 — 로그인 전에는 동작하지 않고, 테마가 로그인 여부를 알 수 없다 (2026-10-13 사용자).
-   댓글 쓰기 폼이 옮겨 가는 자리(.comment-replybox-thread · single)는 숨기지 않는다 — 숨기면 첫 댓글 뒤 다시 쓸 수 없던 원인 (2026-10-13 사용자: "다시 댓글은 못 쓰는").
-   블로거 기본 CSS(b:css=false 라 없음)의 .hidden · .loaded 를 대신한다 — '더 보기'가 할 일이 없는데도 보이던 원인 */
-.comments .comment-actions .comment-reply, .comments .comment-actions .item-control, .comments .comment-replies > .thread-toggle, .comments .thread-chrome .thread-toggle { display: none !important; }
-.comments .hidden, .comments .loadmore.loaded, .comments [hidden] { display: none !important; }
-.comments .comment-replies { margin: 10px 0 0 24px; }
-.comments .avatar-image-container { flex: none; width: 36px; height: 36px; }
-.comments .avatar-image-container img { width: 36px; height: 36px; border-radius: 50%; display: block; }
-.comments .comment-block { flex: 1; min-width: 0; }
-.comments .comment-header { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 0; }
-.comments .comment-header .user, .comments .user a, .comments .comment-author { font-size: 16px; font-weight: 700; color: #111; font-style: normal; }
-.comments .comment-header .icon.user { display: none; }
-.comments .datetime, .comments .comment-header .datetime a, .comments .comment-footer .comment-timestamp a { font-size: 14px; line-height: 20px; color: #7A7A7A; }
-.comments .comment-content { margin: 4px 0 0; font-size: 19px; line-height: 24px; color: #333; }
-.comments .comment-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }   /* 버튼은 왼쪽부터 한 줄 (2026-10-12 사용자) */
-.comments .comment-actions a, .comments .comment-actions .item-control a, .comments .continue a, .comments .loadmore a, .comments .comment-footer a {
-  display: inline-flex; align-items: center; margin: 0; padding: 5px 12px;
-  background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px;
-  font-size: 14px; line-height: 21px; font-weight: 700; color: #111; text-decoration: none;
-}
-.comments .comment-actions a:hover, .comments .continue a:hover, .comments .loadmore a:hover { border-color: #111; }
-.comments .item-control { display: inline; }
-.comments .continue, .comments .loadmore { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 10px; }
-.comments .comment-footer, .comments .comment-form { margin-top: 18px; padding-top: 14px; border-top: 1px solid #E2E8F0; }
-.comments .comment-form p { margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #6B7280; }
-.comments iframe { width: 100%; border: 0; }
-.comments .comment-replybox-single, .comments .comment-replybox-thread { margin-top: 10px; }
-.comments .comment-replybox-single iframe, .comments .comment-replybox-thread iframe { display: block; width: 100%; min-height: 90px; }
-#comment-popup { display: none; }
-/* 댓글은 열기 버튼만 카드, 펼친 목록 · 쓰기 버튼은 카드 밖 구분선 디자인 (2026-10-13 사용자: "댓글 열기 버튼을 제외하고 카드 디자인 말고 구분선 디자인", 가이드 10-2) */
-.comments.is-foldable { background: none; border: 0; border-radius: 0; }
-.comments.is-foldable .comments-toggle { padding: 8px 8px 8px 16px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; }
-.comments.is-foldable.is-open .comments-toggle { border-bottom: 1px solid #E2E8F0; }
-.comments-panel { padding: 0; }
-.comments .comments-panel > *:first-child { margin-top: 0; }
-.comments #comment-holder { margin-top: 0; }
-.comments .comment-thread > ol > li, .comments ol > li.comment { padding: 14px 0; border-top: 1px solid #E2E8F0; }
-.comments .comment-thread.toplevel-thread > ol > li:first-child { border-top: 0; padding-top: 18px; }
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
 .comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
 .comments-toggle .fold-box .acc-chev { transition: transform .15s; }
 .comments.is-open .comments-toggle .fold-box .acc-chev { transform: rotate(180deg); }
-/* 댓글 한 개 = 두 칸 grid(사진 | 글). 답글 묶음 · 답글 쓰기 자리는 글 칸 아래 줄 — flex 한 줄이라 셋째 칸으로 밀려 깨지던 것 (2026-10-13 사용자: "댓글에 댓글은 레이아웃이 깨진다") */
-.comments .comment { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 10px; align-items: start; }
-.comments .comment > .avatar-image-container { grid-column: 1; grid-row: 1; }
-.comments .comment > .comment-block { grid-column: 2; grid-row: 1; }
-.comments .comment > .comment-replies, .comments .comment > .comment-replybox-single { grid-column: 2; margin: 0; }
-.comments .comment-replies .comment-thread > ol > li, .comments .comment-replies ol > li.comment { padding: 14px 0 0; border-top: 0; }
-.comments .comment-replies .continue, .comments .comment-replies .thread-toggle { display: none !important; }   /* 답글 달기 없음 (10-2) */
-.comments .avatar-image-container, .comments .avatar-image-container img { width: 24px; height: 24px; }   /* 사진 36 → 29 → 24 (2026-10-13 사용자) */
-/* 댓글 쓰기 = 블로거 전체 페이지로 가는 흰 버튼 하나 (2026-10-13 사용자: 흰색 버튼) — 글 안 쓰기 창 · 중복 제목은 테마 JS가 없앤다 */
-.comments .comment-write { margin-top: 0; padding-top: 14px; border-top: 1px solid #E2E8F0; }
-.comments .comment-write.is-first { padding-top: 14px; border-top: 0; }
-.comments a.comment-write-btn { display: block; padding: 11px 12px; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: #111; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }
-.comments a.comment-write-btn:hover { border-color: #111; color: #111; }
-
+/* 댓글 목록 — 댓글 사이 1px 구분선(위아래 14), 첫 댓글은 선 없이 위 18 */
+.comments .cm-list, .comments .cm-replies { list-style: none; margin: 0; padding: 0; }
+.comments .cm-list > .cm-item { padding: 14px 0; border-top: 1px solid #E2E8F0; }
+.comments .cm-list > .cm-item:first-child { border-top: 0; padding-top: 18px; }
+/* 댓글 한 개 = 두 칸 grid(사진 | 글). 답글 묶음 · 답글 쓰기 칸은 글 칸 아래 줄 (2026-10-13 사용자: "댓글에 댓글은 레이아웃이 깨진다") */
+.comments .cm-item { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 10px; align-items: start; }
+.comments .cm-avatar { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-top: 0; border-radius: 50%; overflow: hidden; background: #94A3B8; color: #fff; font-family: var(--num); font-weight: 700; font-size: 12px; line-height: 24px; }   /* 사진 24px (2026-10-13 사용자) — 사진이 없으면 머리글자 원 */
+.comments .cm-avatar img { width: 24px; height: 24px; display: block; }
+.comments .cm-avatar.is-owner { background: #fff; border: 1px solid #E2E8F0; box-sizing: border-box; }   /* 운영자 = AlphaScope 로고 (2026-10-14 사용자) */
+.comments .cm-avatar.is-owner svg { width: 14px; height: 13px; display: block; }
+.comments .cm-body { grid-column: 2; grid-row: 1; min-width: 0; }
+.comments .cm-head { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 0; line-height: 24px; }
+.comments .cm-name { font-size: 16px; font-weight: 700; color: #111; }
+.comments .cm-tag { display: inline-block; margin: 0; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; vertical-align: middle; position: relative; top: -1px; }   /* 운영자 라벨 — 영역 라벨 모양 (가이드 5절) */
+.comments .cm-date { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
+.comments .cm-text { margin: 4px 0 0; font-size: 19px; line-height: 24px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comments .cm-text.is-deleted { color: #94A3B8; font-size: 14px; line-height: 20px; }   /* 원 댓글이 지워진 답글 묶음의 자리 */
+/* 동작 버튼(답글 · 삭제)은 할 수 있는 사람에게만 — 로그인 전에는 보이지 않는다 (2026-10-13 사용자: "로그인 전에는 기능이 안 되는 버튼은 노출하지 마라") */
+.comments .cm-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }
+.comments .cm-actions:empty { display: none; }
+.comments .cm-btn { display: inline-flex; align-items: center; margin: 0; padding: 5px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 14px; line-height: 21px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.comments .cm-btn:hover { border-color: #111; }
+.comments .cm-btn[disabled] { opacity: .4; cursor: default; }
+.comments .cm-replies { grid-column: 2; margin: 0; }   /* 답글은 원 댓글 글 왼쪽 선에 맞춰 */
+.comments .cm-replies > .cm-item { padding: 14px 0 0; border-top: 0; }
+.comments .cm-replybox { grid-column: 2; margin-top: 10px; }
+.comments .cm-replybox:empty { display: none; }
+.comments .cm-status { padding: 14px 0; font-size: 14px; line-height: 20px; color: #7A7A7A; text-align: center; }   /* 불러오는 중 · 못 불러옴 · 첫 댓글 안내도 가운데 (2026-10-14 사용자) */
+.comments .cm-status[hidden] { display: none; }
+/* 쓰기 칸 — 윗선 아래. 댓글이 없으면 선 없이 (댓글 목록 바로 아래 흰 버튼 하나였던 자리, 2026-10-13 사용자) */
+.comments .cm-write { margin-top: 0; padding-top: 14px; border-top: 1px solid #E2E8F0; }
+.comments .cm-write.is-first { border-top: 0; }
+.comments .cm-login { display: block; width: 100%; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; color: #111; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 공식 흰 버튼 — 외곽선 #E2E8F0 → 20% 진하게 #B5BAC0 (2026-10-14 사용자, 가이드 2-3 흰 버튼) */
+.comments .cm-login:hover { border-color: #111; }
+.comments .cm-login[disabled] { opacity: .5; cursor: default; }
+.comments .cm-me { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; line-height: 24px; }
+.comments .cm-me .cm-avatar { grid-column: auto; grid-row: auto; }
+.comments .cm-link { margin-left: auto; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; line-height: 20px; color: #7A7A7A; cursor: pointer; }
+.comments .cm-link:hover { color: #111; }
+/* 입력창 — 본문 폭 전체, 테두리 #E2E8F0 · 모서리 8, 안쪽 11 · 12, 글 19px · 행간 24, 처음 4줄 높이. 글을 쓰면 아래로 늘어난다 */
+.comments .cm-input { display: block; width: 100%; min-height: 118px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 19px; line-height: 24px; color: #333; resize: none; overflow: hidden; }
+.comments .cm-input:focus { outline: none; border-color: #111; }
+.comments .cm-input::placeholder { color: #94A3B8; }
+.comments .cm-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.comments .cm-count { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; font-variant-numeric: tabular-nums; }
+.comments .cm-foot-btns { display: flex; align-items: center; gap: 6px; }
+.comments .cm-submit { display: inline-flex; align-items: center; margin: 0; padding: 8px 24px; background: #111; border: 1px solid #111; border-radius: 8px; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 등록 — 검은 테마 버튼 (2026-10-13 사용자: "모든 하단 버튼은 블랙 테마 버튼") */
+.comments .cm-submit:hover { background: #000; }
+.comments .cm-submit[disabled] { opacity: .4; cursor: default; }
+.comments .cm-error { margin-top: 8px; font-size: 14px; line-height: 20px; color: #B91C1C; text-align: center; }   /* 오류 안내는 가운데 (2026-10-14 사용자) */
+.comments .cm-error:empty { display: none; }
 
 /* 레이아웃 모드에서만 보이는 보관용 위젯 */
 .hidden-widgets { display: none; }
@@ -626,7 +609,8 @@ __DASHBOARD__
                     </b:if>
                     <button aria-label='맨 위로' class='post-nav-top' type='button'>TOP<svg aria-hidden='true' fill='none' height='16' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 16 16' width='16'><path d='M8 13V3M4 7l4-4 4 4'/></svg></button>
                   </p>
-                  <b:include data='post' name='commentPicker'/>
+                  <b:comment>댓글은 우리 것 — 테마 JS "댓글" IIFE 가 Firebase 로 그린다 (2026-10-14 사용자: 폰에서 블로거 댓글 입력창이 좁다). 블로거 댓글(commentPicker)은 더 쓰지 않는다.</b:comment>
+                  <section class='comments' expr:data-post-id='data:post.id' id='comments'><h3 class='comments-title'>댓글</h3></section>
                 </b:loop>
               </div>
             <b:elseif cond='data:view.isHomepage'/>
@@ -1010,29 +994,14 @@ PREVIEW_POSTS = [
     },
 ]
 
-PREVIEW_COMMENTS = [
-    {
-        "author": "김투자",
-        "when": "2026년 9월 3일 오전 9:12",
-        "body": "반도체 비중 확대 의견 잘 봤습니다. 다만 밸류에이션 부담은 어떻게 보시나요?",
-        "avatar": "#2563EB",
-        "reply": None,
-    },
-    {
-        "author": "AlphaScope",
-        "when": "2026년 9월 3일 오전 10:04",
-        "body": "선행 PER 기준으로는 5년 평균을 웃돌지만, 실적 상향 속도가 더 빨라 부담이 완화되는 구간으로 "
-                "보고 있습니다. 다만 가이던스가 꺾이면 되돌림이 클 수 있어 분할 접근을 권합니다.",
-        "avatar": "#DD0000",
-        "reply": True,
-    },
-    {
-        "author": "장기보유",
-        "when": "2026년 9월 3일 오후 2:47",
-        "body": "매일 잘 보고 있습니다. 러셀 2000 지표도 같이 실어주시면 좋겠어요.",
-        "avatar": "#14B8A6",
-        "reply": None,
-    },
+PREVIEW_COMMENTS = [   # 우리 댓글(Firestore 문서)과 같은 꼴 — avatar 는 미리보기용 색 (2026-10-14)
+    {"id": "c1", "uid": "u1", "name": "김투자", "avatar": "#2563EB", "parent": "", "created": "2026-09-03T00:12:00Z",
+     "text": "반도체 비중 확대 의견 잘 봤습니다. 다만 밸류에이션 부담은 어떻게 보시나요?"},
+    {"id": "c2", "uid": "owner", "name": "AlphaScope", "avatar": "#DD0000", "parent": "c1", "created": "2026-09-03T01:04:00Z",
+     "text": "선행 PER 기준으로는 5년 평균을 웃돌지만, 실적 상향 속도가 더 빨라 부담이 완화되는 구간으로 "
+             "보고 있습니다. 다만 가이던스가 꺾이면 되돌림이 클 수 있어 분할 접근을 권합니다."},
+    {"id": "c3", "uid": "u3", "name": "장기보유", "avatar": "#14B8A6", "parent": "", "created": "2026-09-03T05:47:00Z",
+     "text": "매일 잘 보고 있습니다.\n러셀 2000 지표도 같이 실어주시면 좋겠어요."},
 ]
 
 PREVIEW_POST_TITLE = "미국 증시 리포트 — 2026년 9월 3일"
@@ -1240,50 +1209,9 @@ def preview_reports():
 
 
 def preview_comments():
-    """블로거 threaded comments 와 같은 마크업 — 답글은 앞 댓글 li 안의 .comment-replies 묶음 (2026-10-13: 답글 레이아웃 확인용)."""
-    def li(c, replies=""):
-        return (
-            "<li class=\"comment\">"
-            "<div class=\"avatar-image-container\"><img src=\"%s\" alt=\"\"/></div>"
-            "<div class=\"comment-block\"><div class=\"comment-header\"><cite class=\"user\">%s</cite>"
-            "<span class=\"datetime secondary-text\"><a href=\"#\">%s</a></span></div>"
-            "<p class=\"comment-content\">%s</p>"
-            "<span class=\"comment-actions secondary-text\"><a class=\"comment-reply\">답글</a><span class=\"item-control blog-admin\"><a href=\"#\">삭제</a></span></span></div>"
-            "<div class=\"comment-replies\">%s</div><div class=\"comment-replybox-single\"></div></li>"
-            % (_avatar_data_uri(c["avatar"]), html_mod.escape(c["author"], quote=False), c["when"], html_mod.escape(c["body"], quote=False), replies)
-        )
-    tops = []
-    for c in PREVIEW_COMMENTS:
-        if c["reply"] and tops:
-            prev, kids = tops[-1]
-            kids.append(c)
-        else:
-            tops.append((c, []))
-    items = []
-    for c, kids in tops:
-        rep = ""
-        if kids:
-            rep = ("<div class=\"comment-thread inline-thread\"><span class=\"thread-toggle thread-expanded\"><span class=\"thread-arrow\"></span><span class=\"thread-count\"><a>답글</a></span></span>"
-                   "<ol class=\"thread-chrome thread-expanded\"><div>" + "".join(li(k) for k in kids) + "</div>"
-                   "<div class=\"continue\"><a class=\"comment-reply\">답글</a></div></ol></div>")
-        else:
-            rep = "<div class=\"comment-thread inline-thread hidden\"></div>"
-        items.append("          " + li(c, rep))
-
+    """템플릿과 같은 빈 댓글 영역 — 안은 테마 JS "댓글" IIFE 가 PV_COMMENTS_MOCK 으로 그린다 (2026-10-14)."""
     return (
-        "      <div class=\"comments\">\n"
-        "        <h3 class=\"comments-title\">댓글 %d</h3>\n"
-        "        <div class=\"comments-content\"><div id=\"comment-holder\"><div class=\"comment-thread toplevel-thread\"><ol id=\"top-ra\">\n"
-        % len(PREVIEW_COMMENTS)
-        + "\n".join(items) + "\n"
-        "        </ol>\n"
-        "        <div id=\"top-continue\" class=\"continue\"><a class=\"comment-reply\">댓글 추가</a></div></div></div></div>\n"   # 실제 블로거 마크업 (2026-10-13 라이브 글에서 확인)
-        "        <div class=\"comment-replybox-thread\" id=\"top-ce\"></div>\n"
-        "        <p class=\"comment-footer\"></p>\n"
-        "        <div class=\"comment-form\"><a name=\"comment-form\"></a><h4 id=\"comment-post-message\">댓글 쓰기</h4>"
-        "<a href=\"https://www.blogger.com/comment/frame/2170661412485304541?po=3976095166505703509&amp;hl=ko\" id=\"comment-editor-src\"></a>"
-        "<iframe id=\"comment-editor\" height=\"410px\" width=\"100%\" src=\"about:blank\"></iframe></div>\n"
-        "      </div>"
+        "      <section class=\"comments\" id=\"comments\" data-post-id=\"preview\"><h3 class=\"comments-title\">댓글</h3></section>"
     )
 
 
@@ -1394,7 +1322,9 @@ MOCK_NEWS = [
     {"title": "Semiconductor ETFs see record inflows as AI capex guidance climbs",
      "summary": "Investors poured a record $4.1 billion into chip-focused funds last week, "
                 "betting that AI infrastructure spending has further to run.",
-     "source": "CNBC", "published": "2026-09-03 20:41:00", "link": "#"},
+     "source": "CNBC", "published": "2026-09-03 20:41:00", "link": "#",
+     "title_ko": "AI 설비투자 전망 상향에 반도체 ETF로 사상 최대 자금 유입",
+     "why_ko": "지난주 반도체 펀드에 41억 달러가 들어와 AI 투자 기대가 이어지고 있다."},   # 선정 이유 미리보기 (2026-10-14)
     {"title": "Fed official says there is no rush to cut rates further",
      "summary": "The policymaker pointed to resilient consumer spending.",
      "source": "Reuters", "published": "2026-09-03 19:55:00", "link": "#"},
@@ -1469,6 +1399,21 @@ def preview_mock_js():
         "    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;\n"
         "    else body = PV_DATA;\n"
         "    return Promise.resolve({ json: function () { return Promise.resolve(body); } });\n"
+        "  };\n"
+        "\n"
+        "  /* 댓글 미리보기 — Firebase 대신 메모리. 로그인 버튼을 누르면 운영자(AlphaScope)로 로그인한 셈이 된다 (2026-10-14) */\n"
+        "  var PV_CM = %s, pvUser = null, pvCb = function () {};\n"
+        "  window.PV_COMMENTS_MOCK = {\n"
+        "    owner: 'owner',\n"
+        "    list: function () { return Promise.resolve(PV_CM.slice()); },\n"
+        "    add: function (d) { d.id = 'm' + Date.now(); d.created = new Date().toISOString(); PV_CM.push(d); return Promise.resolve(d); },\n"
+        "    del: function (id) { PV_CM = PV_CM.filter(function (c) { return c.id !== id; }); return Promise.resolve({}); },\n"
+        "    auth: {\n"
+        "      onAuth: function (cb) { pvCb = cb; cb(pvUser); },\n"
+        "      login: function () { pvUser = { uid: 'owner', name: 'AlphaScope', photo: '' }; pvCb(pvUser); return Promise.resolve(); },\n"
+        "      logout: function () { pvUser = null; pvCb(null); return Promise.resolve(); },\n"
+        "      token: function () { return Promise.resolve('mock'); }\n"
+        "    }\n"
         "  };"
         % (
             json.dumps(data, ensure_ascii=False),
@@ -1476,6 +1421,7 @@ def preview_mock_js():
             json.dumps(feed, ensure_ascii=False),
             json.dumps(trump_feed, ensure_ascii=False),
             json.dumps(nvda_feed, ensure_ascii=False),
+            json.dumps([dict(c, photo=_avatar_data_uri(c["avatar"])) for c in PREVIEW_COMMENTS], ensure_ascii=False),
         )
     )
 

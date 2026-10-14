@@ -461,7 +461,7 @@ LI_MARGIN = "12px 0"   # 본문 글머리표 사이 6 → 12 (글머리표 사�
 
 def dot_ul(items_html):
     """점 글머리표 목록 (dot_li 묶음) — 기본 원형 글머리표는 쓰지 않는다."""
-    return "<ul style='margin:0 0 8px;padding:0;list-style:none;'>" + "".join(items_html) + "</ul>"
+    return "<ul style='margin:0 0 8px;padding:0 0 0 14px;list-style:none;'>" + "".join(items_html) + "</ul>"   # 카드 밖 글머리표는 왼쪽 14px 들여쓰기 (2026-10-14 사용자: 블로그 모든 곳)
 
 
 ROW_L = "flex:0 0 40%;max-width:40%;min-width:0;white-space:normal;"   # A 카드 이름 40% — 값 `$229.28 ▼ 0.52%` 한 줄 (2026-10-12 사용자)
@@ -593,6 +593,8 @@ def crow(name_html, value_html, sub="", first=False, left=None, short=False, now
     left = 왼쪽 칸 % (카드별 예외, 가이드라인 2-1 — 2026-10-12 사용자). nowrap = 값을 한 줄로.
     sub_below = 보조 줄을 구분명 옆이 아니라 줄 아래 카드 폭 전체 한 줄로 (옆에 들어가지 않을 때, 2026-10-12 사용자).
     sub_block = 보조 줄을 구분명 아래 줄로 (왼쪽 칸 안) — 종목 아래 거래량 (2026-10-12 사용자)."""
+    if isinstance(left, str):   # 호출부가 left="65%" 로 넘기는 곳이 있다 — 숫자로 (2026-10-14: 트럼프 발언 카드에서 fits_inline 이 '65%' / 100 으로 죽던 것)
+        left = int(left.rstrip("%"))
     if name_size != EMPH_NAME:   # 흰 카드만 증감 18px — 강조 카드 제외 (2026-10-13 사용자)
         value_html = small_chg(value_html)
     col_l = f"flex:0 0 {left}%;max-width:{left}%;min-width:0;white-space:normal;" if left else COL_L75 if short else COL_L

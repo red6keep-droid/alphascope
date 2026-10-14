@@ -1,0 +1,44 @@
+// AlphaScope 댓글 — Firestore 보안 규칙 (2026-10-14 사용자: "우리가 댓글 프로그램을 만드는 건 어때?")
+//
+// 블로거 댓글(blogger.com iframe)은 아이폰 사파리가 다른 도메인 쿠키를 막아 로그인을 못 보고,
+// 전체 페이지는 구글 CSS 라 폰에서 입력창이 좁다(좌 48 · 우 16). 그래서 댓글을 우리 페이지 안에서
+// Firebase 로 돌린다. 테마 JS 는 Firestore REST 로 읽고 쓰며, 로그인은 Firebase Auth(Google 팝업).
+//
+// 구조:  posts/{postId}/comments/{commentId}
+//   uid      작성자 Firebase UID
+//   name     표시 이름 (Google 프로필 이름)
+//   photo    프로필 사진 URL ('' 가능)
+//   text     댓글 글 (1 ~ 2000자)
+//   created  서버 시각 (REQUEST_TIME 변환으로만 넣는다)
+//   parent   답글이면 원 댓글 ID (없으면 최상위 댓글)
+//
+// 블로그 주인(아래 isOwner 의 UID — 2026-10-14 사용자 계정 "keep red6")은 모든 댓글을 지울 수 있다. 수정은 없다 — 지우고 다시 쓴다.
+// 적용: Firebase 콘솔 → Firestore Database → 규칙 → 이 파일 내용 붙여넣기 → 게시.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isOwner() { return signedIn() && request.auth.uid == 'u1vln4bbDgSgWQDe2F2FaNs81D43'; }
+
+    match /posts/{postId}/comments/{commentId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'photo', 'text', 'created', 'parent'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.name is string && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 60
+        && request.resource.data.photo is string && request.resource.data.photo.size() <= 400
+        && request.resource.data.text is string && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 2000
+        && request.resource.data.created == request.time
+        && (!('parent' in request.resource.data) || (request.resource.data.parent is string && request.resource.data.parent.size() <= 40));
+
+      allow update: if false;
+
+      allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isOwner());
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

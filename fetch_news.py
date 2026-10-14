@@ -66,16 +66,24 @@ def gemini_keys():
     return [k.strip().strip('"') for k in re.split(r"[;,]", raw) if k.strip()]
 
 
-def _translate_prompt(titles):
+def _translate_prompt(items):
+    """items: [{"title", "summary"}] — 제목 번역(t) + 선정 이유(why) 한 문장 (2026-10-14 사용자: 홈 뉴스에 선정 이유)."""
+    src = [{"title": it["title"], "summary": it.get("summary", "")} for it in items]
     return (
-        "다음은 미국 경제 뉴스(CNBC)의 영문 제목 목록이다. 각 제목을 한국 경제지 헤드라인처럼 자연스러운 한국어로 옮겨라. "
-        "의미를 더하거나 빼지 말고, 고유명사(기업·인명·지수)는 통용 표기를 쓰며, 숫자·티커는 그대로 둔다. "
-        "결과는 입력과 같은 순서·같은 개수의 JSON 문자열 배열로만 답하라.\n\n" + json.dumps(titles, ensure_ascii=False)
+        "다음은 미국 경제 뉴스(CNBC)의 영문 제목과 요약 목록이다. 항목마다 두 가지를 만들어라.\n"
+        "1) t: 제목을 한국 경제지 헤드라인처럼 자연스러운 한국어로. 의미를 더하거나 빼지 말고, 고유명사(기업·인명·지수)는 통용 표기, 숫자·티커는 그대로.\n"
+        "2) why: 투자자가 이 기사를 볼 만한 이유 한 문장(40자 안팎, '~다'로 끝냄). 요약에 있는 사실만 쓰고, 매수·매도 권유나 전망 단정은 하지 않는다.\n"
+        '결과는 입력과 같은 순서·같은 개수의 JSON 배열 [{"t": "...", "why": "..."}] 로만 답하라.\n\n' + json.dumps(src, ensure_ascii=False)
     )
 
 
-def _valid_translation(out, titles):
-    return isinstance(out, list) and len(out) == len(titles) and all(isinstance(x, str) and x.strip() for x in out)
+def _valid_translation(out, items):
+    return (isinstance(out, list) and len(out) == len(items)
+            and all(isinstance(x, dict) and isinstance(x.get("t"), str) and x["t"].strip() and isinstance(x.get("why"), str) for x in out))
+
+
+def _clean_out(out):
+    return [{"t": x["t"].strip(), "why": x["why"].strip()} for x in out]
 
 
 def translate_titles_openai_compat(step, titles):
@@ -93,7 +101,7 @@ def translate_titles_openai_compat(step, titles):
         text = (r.json()["choices"][0]["message"].get("content") or "").strip()
         out = json.loads(text[text.find("["): text.rfind("]") + 1])
         if _valid_translation(out, titles):
-            return [x.strip() for x in out]
+            return _clean_out(out)
         print(f"  [번역] {step['name']} 응답 형식 불일치 — 다음 단계")
     except Exception as e:  # noqa: BLE001
         print(f"  [번역] {step['name']} 실패: {str(e)[:100]} — 다음 단계")
@@ -101,7 +109,7 @@ def translate_titles_openai_compat(step, titles):
 
 
 def translate_titles(titles):
-    """영문 제목 목록 → 한국어 제목 목록 (같은 길이). TRANSLATE_CHAIN(Groq → NVIDIA) → Gemini 키 순서로 시도, 전부 실패하면 None.
+    """뉴스 항목 목록 → [{"t": 한국어 제목, "why": 선정 이유}] (같은 길이, 2026-10-14 선정 이유 추가). TRANSLATE_CHAIN(Groq → NVIDIA) → Gemini 키 순서로 시도, 전부 실패하면 None.
 
     홈 화면 제목용 (2026-10-10 사용자: 최신 뉴스 제목은 한글로). 본문·요약은 번역하지 않는다.
     """
@@ -124,7 +132,7 @@ def translate_titles(titles):
             text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
             out = json.loads(text)
             if _valid_translation(out, titles):
-                return [x.strip() for x in out]
+                return _clean_out(out)
             print("  [번역] 응답 형식 불일치 — 다음 키")
         except Exception as e:  # noqa: BLE001
             print(f"  [번역] 실패: {str(e)[:100]} — 다음 키")
@@ -134,7 +142,7 @@ def translate_titles(titles):
 def previous_translations():
     try:
         j = requests.get(PREV_URL, timeout=20).json()
-        return {it["link"]: it["title_ko"] for it in j.get("items", []) if it.get("title_ko") and it.get("link")}
+        return {it["link"]: it for it in j.get("items", []) if it.get("title_ko") and it.get("why_ko") and it.get("link")}
     except Exception:  # noqa: BLE001
         return {}
 
@@ -143,20 +151,23 @@ def add_korean_titles(items):
     prev = previous_translations()
     for it in items:
         if prev.get(it["link"]):
-            it["title_ko"] = prev[it["link"]]
-    todo = [it for it in items if not it.get("title_ko")]
+            it["title_ko"] = prev[it["link"]]["title_ko"]
+            it["why_ko"] = prev[it["link"]]["why_ko"]
+    todo = [it for it in items if not (it.get("title_ko") and it.get("why_ko"))]   # 선정 이유가 없는 옛 번역도 다시 만든다
     if not todo:
         print(f"[번역] 새 제목 없음 (이전 번역 {len(items)}건 재사용)")
         return
     if not gemini_keys() and not any(os.environ.get(st["env"], "").strip() for st in TRANSLATE_CHAIN):
         print("[번역] 번역 키 없음 (GROQ/NVIDIA/GEMINI) — 영문 제목 유지")
         return
-    ko = translate_titles([it["title"] for it in todo])
+    ko = translate_titles(todo)
     if ko is None:
         print(f"[번역] 실패 — {len(todo)}건 영문 제목 유지 (다음 실행에서 재시도)")
         return
     for it, t in zip(todo, ko):
-        it["title_ko"] = t
+        it["title_ko"] = t["t"]
+        if t["why"]:
+            it["why_ko"] = t["why"]
     print(f"[번역] 새 제목 {len(todo)}건 번역 · 재사용 {len(items) - len(todo)}건")
 
 

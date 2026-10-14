@@ -422,9 +422,9 @@ def build_body(a, n):
     counts_aside, counts_note = sec_counts(a)
     return dk.fix_colons("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지)
         dk.WRAP_OPEN,
-        dk.section("발언", counts_note + sec_recent(a), tab=TAB_TODAY, aside=counts_aside),   # 24시간 집계 캡슐은 발언 제목 오른쪽 (2026-10-11 사용자)
         dk.section("급상승 주제", sec_trends(a), tab=TAB_TODAY, one_line=True,
                    aside=dk.tips_right(_trend_tips(a)) if a["trend_scores"] else ""),   # ? 툴팁은 제목 오른쪽, 폰에서도 한 줄 · "최근 7일"은 카드 아래 (2026-10-11 사용자)
+        dk.section("발언", counts_note + sec_recent(a), tab=TAB_TODAY, aside=counts_aside),   # 급상승 주제 아래로 (2026-10-14 사용자) · 24시간 집계 캡슐은 발언 제목 오른쪽 (2026-10-11 사용자)
         dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY),
         dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow"), tab=TAB_TODAY, one_line=True,   # 주의는 제목 줄 오른쪽 툴팁 (2026-10-13 사용자)
                    aside=dk.tips_right([("주의", dk.read_text([("근거", "시장 반응 탭에서 보정 q가 함께 작은 값만 고릅니다 — 주제당 수십 개 조합을 검정했기 때문"),
