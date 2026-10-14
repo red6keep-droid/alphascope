@@ -6,12 +6,16 @@
 
 환경변수: GEMINI_API_KEY (다중 키는 ; 또는 , 로 구분, 실패 시 다음 키 fallback)
          GEMINI_MODEL (기본 gemini-3.5-flash)
+         GROQ_API_KEY · NVIDIA_API_KEY (선택) — Gemini 키가 모두 실패하면 이 순서로 예비 (2026-10-14,
+         Gemini 무료 한도가 프로젝트당 하루 약 20회라 다른 리포트와 나눠 쓰면 넘칠 수 있다). 모델은 NVDA 리포트 예비 사슬과 같다.
 """
 
 import json
 import os
 import re
 import time
+
+import requests
 
 from google import genai
 from google.genai import types
@@ -56,6 +60,44 @@ def _mask(key):
     return key[:8] + "***"
 
 
+# 예비 사슬 — experiments/nvda-report/config.FALLBACK_CHAIN 과 같은 모델 (OpenAI 호환 REST)
+FALLBACK_CHAIN = [
+    {"name": "groq", "env": "GROQ_API_KEY", "url": "https://api.groq.com/openai/v1/chat/completions",
+     "model": "openai/gpt-oss-120b", "params": {"reasoning_effort": "low", "max_completion_tokens": 2000}},
+    {"name": "nvidia", "env": "NVIDIA_API_KEY", "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+     "model": "deepseek-ai/deepseek-v4.1-flash", "params": {"max_tokens": 2000, "chat_template_kwargs": {"thinking": False}}},
+]
+
+
+def _reply_of(text):
+    reply = (_parse_json(text).get("reply") or "").strip()
+    if not reply:
+        raise ValueError("reply 필드가 비어 있습니다")
+    return reply
+
+
+def _fallback(prompt, errors):
+    for step in FALLBACK_CHAIN:
+        key = os.environ.get(step["env"], "").strip()
+        if not key:
+            continue
+        try:
+            print(f"[예비] {step['name']}:{step['model']} 시도")
+            body = {"model": step["model"], "temperature": 0.3, "messages": [{"role": "user", "content": prompt}]}
+            body.update(step["params"])
+            r = requests.post(step["url"], json=body, timeout=180,
+                              headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+            if r.status_code != 200:
+                raise RuntimeError(f"{r.status_code}: {r.text[:160]}")
+            reply = _reply_of(r.json()["choices"][0]["message"].get("content") or "")
+            print(f"[예비] 답글 생성 완료 ({step['name']})")
+            return reply
+        except Exception as e:
+            print(f"[예비] {step['name']} 실패: {e}")
+            errors.append(f"{step['name']}: {e}")
+    raise RuntimeError("답글 생성 실패 (Gemini 키 · 예비 모두 소진)\n" + "\n".join(errors))
+
+
 def generate_reply(post_title, comment_content, comment_author=""):
     keys = _api_keys()
     model_name = os.environ.get("GEMINI_MODEL", DEFAULT_MODEL)
@@ -79,10 +121,7 @@ def generate_reply(post_title, comment_content, comment_author=""):
                         response_mime_type="application/json",
                     ),
                 )
-                report = _parse_json(response.text)
-                reply = (report.get("reply") or "").strip()
-                if not reply:
-                    raise ValueError("reply 필드가 비어 있습니다")
+                reply = _reply_of(response.text)
                 print(f"[Gemini] 답글 생성 완료 (사용 키: {masked})")
                 return reply
             except Exception as e:
@@ -92,4 +131,4 @@ def generate_reply(post_title, comment_content, comment_author=""):
                     time.sleep(RETRY_SLEEP_SECONDS)
         errors.append(f"키{idx}({masked}): {last_error}")
 
-    raise RuntimeError("답글 생성 실패 (모든 키 소진)\n" + "\n".join(errors))
+    return _fallback(prompt, errors)

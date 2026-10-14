@@ -162,12 +162,12 @@ def classify(conn, since_days=config.CLASSIFY_SINCE_DAYS,
                 print("[classify] 연속 실패 — 이번 실행 중단. 다음 실행이 이어받는다.")
                 break
             continue
-        write_results(conn, valid, pool.model)
+        write_results(conn, valid, pool.last_model)   # 예비 모델이 답했으면 그 이름 (2026-10-14)
         written += len(valid)
         dropped = len(batch) - len(valid)
         print(f"[classify] 배치 {n}/{len(batches)}: {len(valid)}건 저장" + (f" · {dropped}건 검증 탈락" if dropped else ""))
 
-    print(f"[classify] 완료 — 저장 {written:,}건 · Gemini 호출 {pool.calls}회")
+    print(f"[classify] 완료 — 저장 {written:,}건 · 호출 {pool.calls}회 (예비 {pool.fallback_calls}회)")
     db.set_meta(conn, "classify_last_run_at", _utc_now())
     conn.commit()
     return written

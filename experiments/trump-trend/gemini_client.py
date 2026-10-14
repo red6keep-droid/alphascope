@@ -1,8 +1,11 @@
-"""Gemini 호출 — 여러 키 라운드로빈 + 429 쿨다운 (기획서 12절).
+"""Gemini 호출 — 여러 키 라운드로빈 + 429 쿨다운 (기획서 12절). nvda-report gemini_client.py 와 같다 (2026-10-14 예비 사슬을 이쪽에도).
 
 기존 generate_report.py의 키 표기(`GEMINI_API_KEY="k1;k2"`)를 그대로 쓴다.
 차이는 순차 전환이 아니라 호출마다 다음 키로 돌고, 한도에 걸린 키는 잠시 쉰다는 것.
 모든 키가 같은 GEMINI_MODEL을 쓴다 — 라벨 일관성을 위해.
+
+예비 (2026-10-11): 모든 키가 쿨다운이거나 한도로 끝까지 실패하면 backup_llm 사슬(Groq gpt-oss-120b → NVIDIA DeepSeek)로 넘긴다.
+예비 키가 하나도 없으면 예전처럼 예외. 어느 모델이 답했는지는 last_model에 남는다 (ai_model 컬럼용).
 """
 
 import json
@@ -14,6 +17,7 @@ from google import genai
 from google.genai import types
 
 import config
+import backup_llm
 
 
 class AllKeysExhausted(RuntimeError):
@@ -25,7 +29,14 @@ def _parse_json(text):
     if not m:
         raise ValueError("JSON 시작 문자를 찾지 못했습니다.")
     end = max(text.rfind("}"), text.rfind("]"))
-    return json.loads(text[m.start(): end + 1])
+    try:
+        return json.loads(text[m.start(): end + 1])
+    except json.JSONDecodeError as e:
+        # 모델이 JSON 값 뒤에 무언가를 더 붙인 경우("Extra data") — 첫 값만 취한다 (2026-10-08, nvda-report 배치 2에서 5회 연속)
+        if "Extra data" not in str(e):
+            raise
+        value, _ = json.JSONDecoder().raw_decode(text[m.start():])
+        return value
 
 
 def _mask(key):
@@ -54,7 +65,9 @@ class GeminiPool:
         self._cooldown_until = [0.0] * len(keys)
         self._next = 0
         self.calls = 0
-        print(f"[gemini] 키 {len(keys)}개 · model={self.model}")
+        self.last_model = self.model
+        self.fallback_calls = 0
+        print(f"[gemini] 키 {len(keys)}개 · model={self.model}" + (" · 예비 " + " → ".join(s["model"] for s in backup_llm.available()) if backup_llm.available() else " · 예비 없음"))
 
     def _pick(self):
         now = time.time()
@@ -71,10 +84,20 @@ class GeminiPool:
         time.sleep(max(wait, 1))
         return self._pick()
 
+    def _fallback(self, prompt, temperature, reason):
+        result, name = backup_llm.run_chain(prompt, temperature=temperature, reason=reason)
+        self.calls += 1
+        self.fallback_calls += 1
+        self.last_model = name
+        return result
+
     def generate_json(self, prompt, temperature=0.0):
         last_error = None
         for attempt in range(1, config.PER_BATCH_ATTEMPTS + 1):
-            i = self._pick()
+            try:
+                i = self._pick()
+            except AllKeysExhausted:
+                return self._fallback(prompt, temperature, "모든 키 쿨다운")
             key, client = self._clients[i]
             try:
                 resp = client.models.generate_content(
@@ -87,6 +110,7 @@ class GeminiPool:
                     ),
                 )
                 self.calls += 1
+                self.last_model = self.model
                 return _parse_json(resp.text)
             except Exception as e:  # noqa: BLE001
                 last_error = e
@@ -100,4 +124,9 @@ class GeminiPool:
                 else:
                     print(f"[gemini] 키 {_mask(key)} 시도 {attempt} 실패: {str(e)[:200]}")
                     time.sleep(config.RETRY_SLEEP_SECONDS)
+        # 한도(429)뿐 아니라 503/500 수요 폭주가 끝까지 이어져도 예비로 — 2026-10-11 CI에서 배치 2가 503 5회로 그냥 실패했다
+        if _is_rate_limit(last_error):
+            return self._fallback(prompt, temperature, f"{config.PER_BATCH_ATTEMPTS}회 모두 한도")
+        if _is_transient(last_error):
+            return self._fallback(prompt, temperature, f"{config.PER_BATCH_ATTEMPTS}회 모두 일시 오류(503/500)")
         raise RuntimeError(f"Gemini 호출 실패 ({config.PER_BATCH_ATTEMPTS}회): {str(last_error)[:200]}")
