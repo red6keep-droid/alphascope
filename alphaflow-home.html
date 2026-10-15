@@ -382,7 +382,7 @@ body.menu-open { overflow: hidden; }
 .fold-btn { display: flex; justify-content: center; align-items: center; gap: 6px; width: 100%; padding: 8px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
   font: inherit; font-size: 14px; line-height: 20px; font-weight: 700; color: #111; cursor: pointer; }
 .fold-btn[hidden] { display: none; }
-.fold-btn .acc-chev { transition: transform .15s; }
+.fold-btn .acc-chev { position: relative; top: 1px; transition: transform .15s; }   /* 화살표는 글자 가운데에서 1px 아래 (2026-10-15 사용자) */
 .fold-btn[aria-expanded="true"] .acc-chev { transform: rotate(180deg); }
 
 /* ==========================================================================
@@ -644,7 +644,7 @@ body.menu-open { overflow: hidden; }
   background: var(--surface);
   border: 1px solid #f3f4f6;
   border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, .032), 0 8px 10px -6px rgba(0, 0, 0, .032);   /* 그림자 20% 옅게 (.04 → .032, 2026-10-15 사용자) */
+  box-shadow: 0 10px 22.5px -5px rgba(0, 0, 0, .029), 0 8px 9px -6px rgba(0, 0, 0, .029);   /* 그림자 20% 옅게 (.04 → .032) → 퍼짐 · 진하기 각 10% 더 (25 → 22.5 · 10 → 9, .032 → .029) (2026-10-15 사용자) */
 }
 /* 카드 머리 — 제목 줄 + 구분선.
    카드 안 구분선은 모두 엔비디아 카드 '가격' 아래 선과 같은 폭 — 카드 안쪽에서 좌우 16 더 들어간다 (2026-10-15 사용자) */
@@ -672,7 +672,12 @@ body.menu-open { overflow: hidden; }
 .home-cards .index-card .fold-btn,
 .home-cards .rank-card .fold-btn,
 .home-cards .sector-card .fold-btn { border-radius: 0; padding-top: 13px; }   /* 더 보기 위 +5 (2026-10-15 사용자) */
-.home-cards .briefing-main { gap: 20px; }   /* 제목이 카드 안으로 들어가 쌓일 때 위 여백 +15 는 필요 없음 */
+.home-cards .briefing-main { gap: 20px; }
+/* 미국 증시 리포트 카드 내용은 글머리표 없이 (2026-10-15 사용자) */
+#report-card .report-columns li { gap: 0; }
+#report-card .report-columns li::before { content: none; }
+/* 첫 탭(거래상위)은 왼쪽 여백 없이 구분선 시작점에서 (2026-10-15 사용자) */
+.home-cards .rank-card .tab:first-child { padding-left: 0; }   /* 제목이 카드 안으로 들어가 쌓일 때 위 여백 +15 는 필요 없음 */
 
 /* ==========================================================================
    responsive
@@ -1098,7 +1103,7 @@ body.menu-open { overflow: hidden; }
   /* 지수 한 줄 — 이름(+장중·장마감) 왼쪽, 지수 숫자(21px) + 등락 오른쪽. 간략 정보만 (2026-10-13 사용자) */
   function indexCard(ix) {
     var row = el('div', 'index-rowline');
-    var name = el('span', 'index-name', ix.name || ix.s || '—');
+    var name = el('span', 'index-name', String(ix.name || ix.s || '—').replace(/\s*종합$/, ''));   /* 나스닥 종합 → 나스닥 (2026-10-15 사용자) */
     var mean = INDEX_MEANING[ix.s] || INDEX_MEANING[ix.name];   /* 지수 이름 옆 (의미) — 블로그 모든 지수 이름 (2026-10-14 사용자). 장중 · 장마감 글자는 삭제 (같은 날) */
     if (mean) name.appendChild(el('span', 'index-status', '(' + mean + ')'));
     row.appendChild(name);
