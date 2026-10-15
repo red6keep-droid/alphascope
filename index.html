@@ -653,7 +653,7 @@ body.menu-open { overflow: hidden; }
 .home-cards {
   display: flex;
   flex-direction: column;
-  gap: 27px;
+  gap: 20px;   /* 카드 사이는 모두 리포트 카드 사이와 같은 20 (2026-10-15 사용자) */
   margin-top: -36px;   /* main-content 위 여백까지 회색으로 — 헤더 바로 아래부터 */
   padding: 36px 0 40px;
   background: #F3F4F6;
@@ -665,6 +665,8 @@ body.menu-open { overflow: hidden; }
 .home-cards .rankings,
 .home-cards .sector-section {
   gap: 0;
+  margin-top: 0;   /* 구획 제목 위 +15 는 제목이 카드 밖일 때 것 */
+  padding: 16px 10px;   /* 카드 안쪽 여백 상하 16 · 좌우 10 (2026-10-15 사용자) */
   background: var(--surface);
   border: 1px solid #f3f4f6;
   border-radius: 12px;
@@ -687,10 +689,10 @@ body.menu-open { overflow: hidden; }
 /* 안쪽 카드는 테두리 · 모서리를 겉 카드에 맡긴다 */
 .home-cards .index-card,
 .home-cards .rank-card,
-.home-cards .sector-card { border: 0; border-radius: 0 0 12px 12px; background: transparent; }
+.home-cards .sector-card { border: 0; border-radius: 0; background: transparent; }
 .home-cards .index-card .fold-btn,
 .home-cards .rank-card .fold-btn,
-.home-cards .sector-card .fold-btn { border-radius: 0 0 12px 12px; }
+.home-cards .sector-card .fold-btn { border-radius: 0; }
 .home-cards .briefing-main { gap: 20px; }   /* 제목이 카드 안으로 들어가 쌓일 때 위 여백 +15 는 필요 없음 */
 
 /* ==========================================================================
