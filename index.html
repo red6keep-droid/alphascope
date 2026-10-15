@@ -1205,58 +1205,63 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-body img, .post-body img[style*="max-width"] { max-width: 100% !important; }
 }
 
-/* PC 글자 크기 — build_theme.pc_type_css 가 만든다. 직접 고치지 말 것 (2026-10-15 사용자, 네이버 뉴스 PC 기사 기준) */
+/* PC 글자 — build_theme.pc_type_css 가 만든다. 직접 고치지 말 것 (2026-10-15 사용자, 네이버 블로그 글 기준) */
+@font-face { font-family: 'AS Barun'; font-weight: 400; font-display: swap; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumBarunGothic/NanumBarunGothicWeb.woff) format('woff'); }
+@font-face { font-family: 'AS Barun'; font-weight: 700; font-display: swap; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumBarunGothic/NanumBarunGothicWebBold.woff) format('woff'); }
 @media (min-width: 901px) {
-  body { font-size: 17px; }
-  .logo-word { font-size: 21.5px; line-height: 28.5px; }
-  .nav-item { font-size: 17px; line-height: 23.5px; }
-  .section-title { font-size: 19.5px; line-height: 25px; }
-  .report-title { font-size: 19.5px; line-height: 25px; }
-  .kv-value { font-size: 17px; line-height: 21.5px; }
-  .kv-stat-value { font-size: 17px; line-height: 24px; }
-  .kv-row--block li { font-size: 17px; line-height: 26.5px; }
-  .report-columns li { font-size: 17px; line-height: 26.5px; }
-  .tab { font-size: 17px; line-height: 23px; }
-  .news-item { font-size: 17px; line-height: 26.5px; }
-  .footer-title { font-size: 17px; }
-  .post-card-title { font-size: 18px; }
+  body { font-size: 16px; }
+  .logo-word { font-size: 20px; line-height: 26.5px; }
+  .nav-item { font-size: 16px; line-height: 22px; }
+  .section-title { font-size: 18.5px; line-height: 23.5px; }
+  .report-title { font-size: 18.5px; line-height: 23.5px; }
+  .kv-value { font-size: 16px; line-height: 20px; }
+  .kv-stat-value { font-size: 16px; line-height: 22.5px; }
+  .kv-row--block li { font-size: 16px; line-height: 32px; }
+  .report-columns li { font-size: 16px; line-height: 32px; }
+  .tab { font-size: 16px; line-height: 21.5px; }
+  .news-item { font-size: 16px; line-height: 32px; }
+  .footer-title { font-size: 16px; }
+  .post-card-title { font-size: 17px; }
   .post-title { font-size: 28px; line-height: 36px; }
-  .post-body { font-size: 17px; line-height: 26.5px; }
-  .rt-pop-title { font-size: 17px; line-height: 21.5px; }
-  .rt-pop-body { font-size: 17px; line-height: 26.5px; }
-  .rt-pop-close { font-size: 18px; line-height: 25px; }
-  .post-body .rt-tab { font-size: 17px; line-height: 21.5px; }
-  .post-body .rt-subtab { font-size: 17px; line-height: 21.5px; }
-  .post-body .rt-seg { font-size: 17px; line-height: 21.5px; }
-  .post-body .rt-dir { font-size: 17px; line-height: 21.5px; }
-  .post-body > div[style*="font-size:15px"] { font-size: 17px !important; }
-  .post-body table[style*="font-size:14px"] { font-size: 17px !important; }
-  .post-body div[style*="font-size:14px"] { font-size: 17px !important; }
-  .comments { font-size: 17px; line-height: 21.5px; }
-  .comments .cm-text { font-size: 17px; line-height: 21.5px; }
-  .comments .cm-input { font-size: 17px; line-height: 21.5px; }
-  .post-body [style*="font-size:17px"], .post-body [style*="font-size: 17px"] { font-size: 17px !important; }
-  .post-body [style*="font-size:18px"], .post-body [style*="font-size: 18px"] { font-size: 17px !important; }
-  .post-body [style*="font-size:19px"], .post-body [style*="font-size: 19px"] { font-size: 17px !important; }
-  .post-body [style*="font-size:20px"], .post-body [style*="font-size: 20px"] { font-size: 18px !important; }
-  .post-body [style*="font-size:21px"], .post-body [style*="font-size: 21px"] { font-size: 19px !important; }
-  .post-body [style*="font-size:22px"], .post-body [style*="font-size: 22px"] { font-size: 19.5px !important; }
-  .post-body [style*="font-size:26px"], .post-body [style*="font-size: 26px"] { font-size: 23.5px !important; }
-  .post-body [style*="font-size:28px"], .post-body [style*="font-size: 28px"] { font-size: 25px !important; }
-  .post-body [style*="line-height:27px"], .post-body [style*="line-height: 27px"] { line-height: 24px !important; }
-  .post-body li[style*="line-height:27px"] > span[style*="height:2px"][style*="margin-top:12px"] { margin-top: 11px !important; }
+  .post-body { font-size: 16px; line-height: 32px; }
+  .rt-pop-title { font-size: 16px; line-height: 20px; }
+  .rt-pop-body { font-size: 16px; line-height: 32px; }
+  .rt-pop-close { font-size: 17px; line-height: 24px; }
+  .post-body .rt-tab { font-size: 16px; line-height: 20px; }
+  .post-body .rt-subtab { font-size: 16px; line-height: 20px; }
+  .post-body .rt-seg { font-size: 16px; line-height: 20px; }
+  .post-body .rt-dir { font-size: 16px; line-height: 20px; }
+  .post-body > div[style*="font-size:15px"] { font-size: 16px !important; }
+  .post-body table[style*="font-size:14px"] { font-size: 16px !important; }
+  .post-body div[style*="font-size:14px"] { font-size: 16px !important; }
+  .comments { font-size: 16px; line-height: 20px; }
+  .comments .cm-text { font-size: 16px; line-height: 20px; }
+  .comments .cm-input { font-size: 16px; line-height: 20px; }
+  .post-body [style*="font-size:17px"], .post-body [style*="font-size: 17px"] { font-size: 16px !important; }
+  .post-body [style*="font-size:18px"], .post-body [style*="font-size: 18px"] { font-size: 16px !important; }
+  .post-body [style*="font-size:19px"], .post-body [style*="font-size: 19px"] { font-size: 16px !important; }
+  .post-body [style*="font-size:20px"], .post-body [style*="font-size: 20px"] { font-size: 17px !important; }
+  .post-body [style*="font-size:21px"], .post-body [style*="font-size: 21px"] { font-size: 17.5px !important; }
+  .post-body [style*="font-size:22px"], .post-body [style*="font-size: 22px"] { font-size: 18.5px !important; }
+  .post-body [style*="font-size:26px"], .post-body [style*="font-size: 26px"] { font-size: 22px !important; }
+  .post-body [style*="font-size:28px"], .post-body [style*="font-size: 28px"] { font-size: 23.5px !important; }
+  .post-body [style*="line-height:27px"], .post-body [style*="line-height: 27px"] { line-height: 22.5px !important; }
+  .post-body li[style*="line-height:27px"] > span[style*="height:2px"][style*="margin-top:12px"] { margin-top: 10px !important; }
   .post-body li[style*="line-height:27px"] > span[style*="height:3px"][style*="margin-top:12px"] { margin-top: 10px !important; }
-  .post-body [style*="line-height:28px"], .post-body [style*="line-height: 28px"] { line-height: 25px !important; }
-  .post-body li[style*="line-height:28px"] > span[style*="height:2px"][style*="margin-top:13px"] { margin-top: 12px !important; }
-  .post-body li[style*="line-height:28px"] > span[style*="height:3px"][style*="margin-top:12px"] { margin-top: 11px !important; }
-  .post-body [style*="line-height:32px"], .post-body [style*="line-height: 32px"] { line-height: 26.5px !important; }
-  .post-body li[style*="line-height:32px"] > span[style*="height:2px"][style*="margin-top:15px"] { margin-top: 12px !important; }
-  .post-body li[style*="line-height:32px"] > span[style*="height:3px"][style*="margin-top:14px"] { margin-top: 12px !important; }
-  .post-body [style*="line-height:34px"], .post-body [style*="line-height: 34px"] { line-height: 26.5px !important; }
-  .post-body li[style*="line-height:34px"] > span[style*="height:2px"][style*="margin-top:16px"] { margin-top: 12px !important; }
-  .post-body li[style*="line-height:34px"] > span[style*="height:3px"][style*="margin-top:15px"] { margin-top: 12px !important; }
-  .report-columns li::before, .kv-row--block li::before, .rt-pop-dot { margin-top: 12px; }
-  .post-body, .post-title, .report-columns li, .kv-row--block li, .news-item, .rt-pop-body, .comments .cm-text { letter-spacing: -0.3px; }
+  .post-body [style*="line-height:28px"], .post-body [style*="line-height: 28px"] { line-height: 23.5px !important; }
+  .post-body li[style*="line-height:28px"] > span[style*="height:2px"][style*="margin-top:13px"] { margin-top: 11px !important; }
+  .post-body li[style*="line-height:28px"] > span[style*="height:3px"][style*="margin-top:12px"] { margin-top: 10px !important; }
+  .post-body [style*="line-height:32px"], .post-body [style*="line-height: 32px"] { line-height: 32px !important; }
+  .post-body li[style*="line-height:32px"] > span[style*="height:2px"][style*="margin-top:15px"] { margin-top: 15px !important; }
+  .post-body li[style*="line-height:32px"] > span[style*="height:3px"][style*="margin-top:14px"] { margin-top: 14px !important; }
+  .post-body [style*="line-height:34px"], .post-body [style*="line-height: 34px"] { line-height: 32px !important; }
+  .post-body li[style*="line-height:34px"] > span[style*="height:2px"][style*="margin-top:16px"] { margin-top: 15px !important; }
+  .post-body li[style*="line-height:34px"] > span[style*="height:3px"][style*="margin-top:15px"] { margin-top: 14px !important; }
+  .report-columns li::before, .kv-row--block li::before, .rt-pop-dot { margin-top: 14px; }
+  :root { --sans: 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; --report-font: 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
+  .logo-word { font-family: 'Noto Sans KR', sans-serif; }
+  .post-body [style*="font-family"]:not([style*="monospace"]) { font-family: var(--report-font) !important; }
+  body { -webkit-text-stroke: 0.25px; }
 }
 ]]></b:skin>
 

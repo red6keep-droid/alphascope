@@ -785,19 +785,23 @@ def indent(text, spaces):
     return "\n".join(pad + line if line.strip() else line for line in text.split("\n"))
 
 
-# PC 글자 크기 — 네이버 뉴스 기사 PC 본문 기준 (2026-10-15 사용자: "pc 폰트를 네이버 뉴스 기사 폰트 참고해서 수정해").
-# 네이버 PC 기사(news.css, 글자 크기 기본 fs2 · as_mp_layout): 본문 17px · 행간 1.56 · 자간 -0.3px, 제목 28px · 행간 36.
-# 그래서 본문 19 → 17, 16px 보다 큰 글자는 같은 비율(17/19)로 줄이되 17 아래로는 내리지 않는다(18 → 17). 16px 이하는 그대로.
-# 문단 글(행간이 글자의 1.6배 이상)은 행간을 네이버처럼 글자 × 1.56, 한 줄짜리 글은 글자와 같은 비율로.
-# (처음 같은 날은 본문 16 · 비율 16/19 — 사용자: "기존의 16포인트 쓰던 글자는 그대로 유지, 모바일은 절대로 수정하지마")
+# PC 글자 — 네이버 블로그 글(스마트에디터 ONE) 기준 (2026-10-15 사용자: "blog.naver.com/lmkek41/224417597667 화면 참고해서 폰트 적용,
+# 본문 폰트 사이즈도 이것으로, 행간은 기존보다 늘었어, 폰트 두께는 1단계 두껍게" — PC 만).
+# 그 글: 나눔바른고딕(se-ff-nanumbarungothic) · 본문 16px(se-fs-fs16) · 행간 2.0 · 자간 0.
+# 그래서 본문 19 → 16, 16px 보다 큰 글자는 같은 비율(16/19)로 줄이되 16 아래로는 내리지 않는다(17 · 18 → 16). 16px 이하는 그대로.
+# 문단 글(행간이 글자의 1.6배 이상)은 행간 = 글자 × 2.0, 한 줄짜리 글은 글자와 같은 비율로.
+# 굵기: 나눔바른고딕은 Regular 다음이 Bold 라 Medium 이 없다 → 아주 얇은 윤곽선(0.25px)으로 한 단계 두껍게 보이게 (사용자 선택).
+# (같은 날 앞서: 본문 16 · 16/19 → 네이버 뉴스 기사 17 · 행간 1.56 · 자간 -0.3 → 지금)
 # 손으로 적지 않고 빌드 때 테마 CSS 를 읽어 만든다 — 새로 넣는 큰 글자도 PC 에서 같이 줄어든다.
-# 모바일 · 태블릿(900px 이하)용 규칙은 읽지 않고, 결과는 모두 @media (min-width: 901px) 안이다.
+# 모바일 · 태블릿(900px 이하)용 규칙은 읽지 않고, 결과는 모두 @media (min-width: 901px) 안이다(@font-face 만 밖 — 쓰일 때만 내려받는다).
 PC_MIN = 901
-PC_BODY = 17
+PC_BODY = 16
 PC_RATIO = PC_BODY / 19
-PC_PARA_LH = 1.56          # 네이버 .newsct_article line-height
-PC_TRACKING = "-0.3px"     # 네이버 본문 · 제목 자간
-PC_FIXED = {".post-title": (28, 36)}   # 글 제목 = 네이버 기사 제목 28 · 36
+PC_PARA_LH = 2.0           # 네이버 블로그 본문 문단 line-height:2.0
+PC_FONT = "'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif"
+PC_STROKE = "0.25px"       # 한 단계 두껍게 (Medium 대신)
+BARUN = "https://hangeul.pstatic.net/hangeul_static/webfont/NanumBarunGothic/"   # 네이버 한글 글꼴 공식 배포
+PC_FIXED = {".post-title": (28, 36)}   # 글 제목 28 · 36 (네이버 뉴스 기사 제목, 같은 날)
 POST_INLINE_SIZES = (17, 18, 19, 20, 21, 22, 26, 28)   # 리포트 렌더러가 본문에 인라인으로 넣는 16 초과 크기
 POST_INLINE_LH = {27: 19, 28: 22, 32: 18, 34: 19}       # 렌더러 인라인 행간 → 그 행간을 쓰는 글자 크기
 
@@ -871,9 +875,15 @@ def pc_type_css(css):
                        f' {{ margin-top: {round((new_lh - dot) / 2)}px !important; }}')
     # 테마의 3px 점 — 본문 행간(17 × 1.56 = 26.5)의 첫 줄 가운데
     out.append(f"  .report-columns li::before, .kv-row--block li::before, .rt-pop-dot {{ margin-top: {round((round(PC_BODY * PC_PARA_LH * 2) / 2 - 3) / 2)}px; }}")
-    # 자간 — 네이버 본문 · 제목처럼 -0.3px (문단 글과 글 제목만. 메뉴 · 숫자 칸 · 라벨은 그대로)
-    out.append(f"  .post-body, .post-title, .report-columns li, .kv-row--block li, .news-item, .rt-pop-body, .comments .cm-text {{ letter-spacing: {PC_TRACKING}; }}")
-    return ("/* PC 글자 크기 — build_theme.pc_type_css 가 만든다. 직접 고치지 말 것 (2026-10-15 사용자, 네이버 뉴스 PC 기사 기준) */\n"
+    # 글꼴 — 나눔바른고딕. 테마의 글꼴 변수와 리포트 본문 인라인 글꼴(design_kit.WRAP_OPEN)을 바꾼다. 숫자 칸(--num, Inter)은 그대로
+    out.append(f"  :root {{ --sans: {PC_FONT}; --report-font: {PC_FONT}; }}")
+    out.append("  .logo-word { font-family: 'Noto Sans KR', sans-serif; }")   # 로고 글자는 그대로
+    out.append("  .post-body [style*=\"font-family\"]:not([style*=\"monospace\"]) { font-family: var(--report-font) !important; }")
+    out.append(f"  body {{ -webkit-text-stroke: {PC_STROKE}; }}")
+    face = ("@font-face {{ font-family: 'AS Barun'; font-weight: {w}; font-display: swap; "
+            "src: url({u}NanumBarunGothicWeb{s}.woff) format('woff'); }}")
+    return ("/* PC 글자 — build_theme.pc_type_css 가 만든다. 직접 고치지 말 것 (2026-10-15 사용자, 네이버 블로그 글 기준) */\n"
+            + face.format(w=400, u=BARUN, s="") + "\n" + face.format(w=700, u=BARUN, s="Bold") + "\n"
             f"@media (min-width: {PC_MIN}px) {{\n" + "\n".join(out) + "\n}")
 
 
