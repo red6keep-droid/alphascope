@@ -304,6 +304,12 @@ body.menu-open { overflow: hidden; }
 .report-block { display: flex; flex-direction: column; gap: 8px; }
 /* 홈 엔비디아 카드 — 가로 구분선 C 카드 규칙: 줄마다 왼쪽 정보명(16px 굵게) · 오른쪽 값(18px 굵게, 증감 색), 구분선 위아래 22 (2026-10-13 사용자) */
 #nvda-card { padding: 0 16px; gap: 0; }
+/* 홈 트럼프 카드 — 발언 줄: 주제 라벨(영역 라벨 모양) + 세부 주제 · 방향 · 대상 왼쪽, 강도 오른쪽, 줄 사이 구분선 (2026-10-15 사용자) */
+#trump-card { padding: 0 16px; gap: 0; }
+.tr-main { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; font-size: 16px; line-height: 24px; color: #111; }
+.tr-tag { display: inline-block; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; white-space: nowrap; }
+.tr-int { flex: none; font-weight: 700; font-size: 16px; line-height: 24px; color: #111; white-space: nowrap; }
+#trump-card .kv-row.is-note { font-size: 16px; line-height: 24px; color: var(--gray-400); }
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
 .kv-stats + .kv-row, .kv-row + .kv-row { border-top: 1px solid #E2E8F0; }
@@ -878,18 +884,8 @@ body.menu-open { overflow: hidden; }
         <div class="report-col">
         <h3 class="report-title"><span class="report-icon" style="background:#C2410C;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z"/></svg></span>트럼프 SNS 트렌드<span class="report-card-date" data-date="trump-card"></span></h3>
         <a class="report-card" id="trump-card" href="/search/label/트럼프%20트렌드">
-          <div class="report-block" data-hook="speech">
-            <span class="badge badge--speech">오늘의 발언</span>
-            <div class="report-columns">
-              <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
-            </div>
-          </div>
-          <div class="report-block" data-hook="watch">
-            <span class="badge badge--watch">내일 볼 것</span>
-            <div class="report-columns">
-              <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
-            </div>
-          </div>
+          <!-- 최근 24시간 발언 이벤트 4개까지 — 줄마다 주제 라벨 · 세부 주제 · 방향 · 대상(한글) 왼쪽, 강도 오른쪽. '오늘의 발언' 라벨 · 내일 볼 것 · 장 구분 · 시각은 두지 않는다 (2026-10-15 사용자) -->
+          <div class="kv-rows" data-hook="trump-rows"><div class="kv-row"><span class="kv-name">리포트를 불러오는 중…</span></div></div>
         </a>
         </div>
       </div>
@@ -1394,14 +1390,15 @@ body.menu-open { overflow: hidden; }
       id: 'trump-card',
       label: '트럼프 트렌드',
       map: { speech: ['발언', '오늘 한 줄', '달라진 것', '무엇이 달라졌나'], watch: ['내일 볼 것'] },   /* 트럼프는 머리 구획이 없다 — 발언 집계 줄부터 (2026-10-12) */
-      pick: { speech: speechLines },
+      pick: { speech: speechLines },   /* map · pick 은 목록 화면 요약용 — 홈 카드는 fill 이 그린다 (2026-10-15) */
+      fill: fillTrump, rows: 'trump-rows',
       picks: false,
       empty: '아직 발행된 트렌드 리포트가 없습니다.'
     },
     {
       id: 'nvda-card',
       label: '엔비디아',
-      map: {}, fill: fillNvda,   /* 정보명 · 값 줄 카드 (2026-10-13 사용자) */
+      map: {}, fill: fillNvda, rows: 'nvda-rows',   /* 정보명 · 값 줄 카드 (2026-10-13 사용자) */
       any: true,
       picks: false,
       empty: '아직 발행된 엔비디아 리포트가 없습니다.'
@@ -1566,6 +1563,63 @@ body.menu-open { overflow: hidden; }
     var rows = [['가격', kv['NVDA']], ['SPY 대비', kv['SPY 대비']], ['거래량', kv['거래량']], ['변동폭', kv['일중 변동폭']], ['20일 평균', kv['20일 평균']], ['RSI 14', kv['RSI 14']]];
     return rows.filter(function (r) { return r[1]; });
   }
+  /* 홈 트럼프 카드 — 리포트 '발언' 카드의 줄(트럼프 render_html.sec_recent)을 읽어 다시 그린다 (2026-10-15 사용자).
+     줄 구조: 왼쪽 첫 칸 = <b>주제</b> / 세부 주제 + 라벨(방향 · 장 구분), 둘째 칸 = 시각 · 대상 X · 거시 발표 겹침, 오른쪽 = 강도 N */
+  var KO_PLACE = { 'Japan': '일본', 'South Korea': '한국', 'Korea': '한국', 'North Korea': '북한', 'China': '중국', 'Taiwan': '대만', 'Hong Kong': '홍콩',
+    'Greenland': '그린란드', 'Canada': '캐나다', 'Mexico': '멕시코', 'United States': '미국', 'USA': '미국', 'US': '미국',
+    'EU': '유럽연합', 'European Union': '유럽연합', 'Europe': '유럽', 'Germany': '독일', 'France': '프랑스', 'UK': '영국', 'United Kingdom': '영국', 'Italy': '이탈리아', 'Spain': '스페인',
+    'Switzerland': '스위스', 'Netherlands': '네덜란드', 'Denmark': '덴마크', 'Norway': '노르웨이', 'Sweden': '스웨덴', 'Poland': '폴란드',
+    'Russia': '러시아', 'Ukraine': '우크라이나', 'Turkey': '튀르키예', 'Israel': '이스라엘', 'Iran': '이란', 'Iraq': '이라크', 'Syria': '시리아', 'Gaza': '가자',
+    'Saudi Arabia': '사우디아라비아', 'Qatar': '카타르', 'UAE': '아랍에미리트', 'United Arab Emirates': '아랍에미리트', 'Egypt': '이집트',
+    'India': '인도', 'Pakistan': '파키스탄', 'Vietnam': '베트남', 'Thailand': '태국', 'Indonesia': '인도네시아', 'Philippines': '필리핀', 'Singapore': '싱가포르', 'Malaysia': '말레이시아', 'Australia': '호주',
+    'Brazil': '브라질', 'Argentina': '아르헨티나', 'Venezuela': '베네수엘라', 'Colombia': '콜롬비아', 'Cuba': '쿠바', 'Panama': '파나마', 'Chile': '칠레', 'Peru': '페루', 'South Africa': '남아프리카공화국',
+    'Energy': '에너지', 'Technology': '기술', 'Tech': '기술', 'Semiconductors': '반도체', 'Autos': '자동차', 'Pharma': '제약', 'Pharmaceuticals': '제약', 'Banks': '은행', 'Steel': '철강', 'Agriculture': '농업', 'Oil': '원유' };
+  var SESSIONS = { '정규장': 1, '장전': 1, '장후': 1, '휴장': 1 };
+  function trumpRows(sec) {
+    var out = [];
+    (sec['발언'] || []).forEach(function (n) {
+      if (!n.querySelectorAll) return;
+      [].slice.call(n.querySelectorAll('[data-grid] > span')).forEach(function (r) {
+        var left = r.children[0], right = r.children[r.children.length - 1];
+        var head = left && left.children[0], b = head && head.querySelector('b');
+        if (!b || r.children.length < 2) return;
+        var h = head.cloneNode(true), dir = '';
+        [].slice.call(h.children).forEach(function (x) {
+          var t = String(x.textContent || '').trim();
+          if (x.tagName === 'SPAN' && !SESSIONS[t] && !dir) dir = t;   /* 방향 라벨(긍정 · 부정 · 중립)만 — 장 구분은 뺀다 */
+          h.removeChild(x);
+        });
+        var subtopic = String(h.textContent || '').replace(/\s+/g, ' ').replace(/^\s*\/\s*/, '').trim();
+        var tm = /대상\s+([^·]+)/.exec(String((left.children[1] || {}).textContent || '')), target = tm ? tm[1].trim() : '';
+        var topic = String(b.textContent || '').trim();
+        target = KO_PLACE[target] || target;
+        if (target === topic) target = '';   /* 대상이 주제와 같으면(에너지 / 에너지) 한 번만 */
+        var im = /(\d+)/.exec(String(right.textContent || ''));
+        out.push({ topic: topic, text: [subtopic, dir, target].filter(Boolean).join(' · '), intensity: im ? im[1] : '' });
+      });
+    });
+    return out;
+  }
+  function fillTrump(sec) {
+    var box = document.querySelector('[data-hook="trump-rows"]');
+    if (!box) return;
+    box.textContent = '';
+    var rows = trumpRows(sec).slice(0, 4);   /* 발언 4개까지 (2026-10-15 사용자) */
+    if (!rows.length) {
+      /* 이벤트가 없는 날 · 줄 구조가 다른 옛 글은 리포트의 안내 문장 그대로 */
+      box.appendChild(el('div', 'kv-row is-note', speechLines(sec)[0] || LOAD_FAILED));
+      return;
+    }
+    rows.forEach(function (r) {
+      var row = el('div', 'kv-row'), main = el('span', 'tr-main');
+      main.appendChild(el('span', 'tr-tag', r.topic));
+      if (r.text) main.appendChild(el('span', null, r.text));
+      row.appendChild(main);
+      if (r.intensity) row.appendChild(el('span', 'tr-int', '강도 : ' + r.intensity));
+      box.appendChild(row);
+    });
+  }
+
   function fillNvda(sec) {
     var box = document.querySelector('[data-hook="nvda-rows"]');
     if (!box) return;
@@ -1638,7 +1692,7 @@ body.menu-open { overflow: hidden; }
 
   function failCard(card, msg) {
     Object.keys(card.map).forEach(function (hook) { fillCard(hook, [], msg); });
-    if (card.fill) { var bx = document.querySelector('[data-hook="nvda-rows"]'); if (bx) { bx.textContent = ''; bx.appendChild(el('div', 'kv-row', msg || LOAD_FAILED)); } }
+    if (card.fill) { var bx = document.querySelector('[data-hook="' + card.rows + '"]'); if (bx) { bx.textContent = ''; bx.appendChild(el('div', 'kv-row', msg || LOAD_FAILED)); } }
     if (card.picks) fillPicks(null);
   }
 
