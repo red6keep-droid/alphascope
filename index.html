@@ -315,21 +315,15 @@ body.menu-open { overflow: hidden; }
 .report-title .report-icon svg { width: 16px; height: 16px; }
 .report-title .report-icon img { width: 24px; height: 24px; border-radius: 6px; display: block; background: #F1F5F9; }
 /* 카드 전체가 그 리포트 글로 가는 링크다. 구획(요약 / 핵심 인사이트 등)은 안에서 나눈다. */
+/* 카드 = .report-col (제목 + 날짜 + 구분선 + 본문 링크). 외곽선 · 그림자는 아래 '홈 카드' 블록 (2026-10-15 사용자) */
 .report-card {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  flex: 1;
   min-width: 0;
   padding: 16px;
-  background: var(--surface);
-  border: 1px solid #C0C0C0;   /* 외곽선 #F0F0F0 → 20% 진하게 (2026-10-14 사용자) */
-  border-radius: 12px;
   color: inherit;
-  transition: border-color .15s ease, box-shadow .15s ease;
-}
-.report-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 2px 14px rgba(15, 23, 42, .09);
 }
 /* 카드 머리: 어느 연재인지와 그 글의 날짜. 날짜는 피드에서 채운다. */
 .report-card-date { margin-left: auto; margin-right: 8px; font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) */
@@ -650,6 +644,54 @@ body.menu-open { overflow: hidden; }
   font-size: 13px;
   color: var(--gray-400);
 }
+
+/* ==========================================================================
+   홈 카드 (2026-10-15 사용자) — 회색 바탕 #F3F4F6 위 흰 카드,
+   옅은 외곽선 #f3f4f6 + 부드러운 그림자, 올리면 외곽선 gray-300.
+   제목(아이콘) · 오른쪽 날짜 · 안내 글은 카드 안 맨 위, 아래 구분선으로 본문과 나눈다.
+   ========================================================================== */
+.home-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 27px;
+  margin-top: -36px;   /* main-content 위 여백까지 회색으로 — 헤더 바로 아래부터 */
+  padding: 36px 0 40px;
+  background: #F3F4F6;
+  box-shadow: 0 0 0 100vmax #F3F4F6;   /* 화면 전체 폭으로 — 가로 스크롤 없이 */
+  clip-path: inset(0 -100vmax);
+}
+.home-cards .report-col,
+.home-cards .index-section,
+.home-cards .rankings,
+.home-cards .sector-section {
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, .04), 0 8px 10px -6px rgba(0, 0, 0, .04);
+  transition: border-color .15s ease;
+}
+.home-cards .report-col:hover,
+.home-cards .index-section:hover,
+.home-cards .rankings:hover,
+.home-cards .sector-section:hover { border-color: #d1d5db; }
+/* 카드 머리 — 제목 줄 + 구분선 */
+.home-cards .report-title,
+.home-cards .section-head {
+  align-items: center;
+  padding: 14px 16px 13px;
+  border-bottom: 1px solid #E5E7EB;
+}
+.home-cards .report-card-date,
+.home-cards .section-note { margin-right: 0; }
+/* 안쪽 카드는 테두리 · 모서리를 겉 카드에 맡긴다 */
+.home-cards .index-card,
+.home-cards .rank-card,
+.home-cards .sector-card { border: 0; border-radius: 0 0 12px 12px; background: transparent; }
+.home-cards .index-card .fold-btn,
+.home-cards .rank-card .fold-btn,
+.home-cards .sector-card .fold-btn { border-radius: 0 0 12px 12px; }
+.home-cards .briefing-main { gap: 20px; }   /* 제목이 카드 안으로 들어가 쌓일 때 위 여백 +15 는 필요 없음 */
 
 /* ==========================================================================
    responsive
@@ -1228,6 +1270,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
         <!-- ====================================================================
              1. AI 데일리 브리핑
              ==================================================================== -->
+        <!-- 카드 구역 = 회색 바탕 #F3F4F6 (헤더 · 뉴스 구역 제외, 2026-10-15 사용자) -->
+        <div class='home-cards'>
         <section class='briefing' aria-labelledby='briefing-title'>
           <!-- 홈 맨 위 '미국 증시 데일리 브리핑 — 날짜' 줄은 두지 않는다 — 리포트 제목마다 발행 날짜 (2026-10-13 사용자) -->
           <div class='briefing-body'>
@@ -1365,6 +1409,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
           </div>
         </section>
+        </div><!-- /home-cards -->
 
         <!-- ====================================================================
              5. 실시간 뉴스  (news.json 연동, 2026-10-14 사용자: 실시간 주요 뉴스 → 실시간 뉴스)
