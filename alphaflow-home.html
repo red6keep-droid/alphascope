@@ -686,6 +686,11 @@ body.menu-open { overflow: hidden; }
 #report-card .report-columns li::before { content: none; }
 /* 첫 탭(거래상위)은 왼쪽 여백 없이 구분선 시작점에서 (2026-10-15 사용자) */
 .home-cards .rank-card .tab:first-child { padding-left: 0; }   /* 제목이 카드 안으로 들어가 쌓일 때 위 여백 +15 는 필요 없음 */
+/* 카드 순서: 리포트 → 주요 지수 → 섹터 현황 → 실시간 랭킹. PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭, 지수 · 섹터가 나란히 (2026-10-15 사용자) */
+@media (min-width: 901px) {
+  .home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-cards > .briefing, .home-cards > .rankings { grid-column: 1 / -1; }
+}
 
 /* ==========================================================================
    responsive
@@ -909,6 +914,34 @@ body.menu-open { overflow: hidden; }
   </section>
 
   <!-- ====================================================================
+       4. 섹터 현황 (2026-10-14 사용자: 주요 핵심 섹터 현황 → 섹터 현황)
+       ==================================================================== -->
+  <!-- 섹터는 섹터 ETF 11개의 실제 일일 등락률(data.json sectors, fetch_stocks.py) — 손으로 넣은 업종 비중 · 히트맵은 삭제 (2026-10-12 사용자: "히트맵은 정확한 정보가 아니면 삭제", "가짜 데이터는 모두 삭제").
+       제목은 카드 밖 + 아이콘 -->
+  <section class="sector-section" aria-labelledby="sector-title">
+    <div class="section-head">
+      <h2 class="section-title" id="sector-title">
+        <span class="report-icon" style="background:#0F766E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></span>섹터 현황
+      </h2>
+      <span class="section-note">섹터 ETF 11개 · 일일 등락률</span>
+    </div>
+    <div class="card sector-card">
+      <table class="sector-table">
+        <thead>
+          <tr>
+            <th><span class="sr-only">순위</span></th>
+            <th>업종명</th>
+            <th>등락률</th>
+          </tr>
+        </thead>
+        <tbody id="sector-body"><tr><td colspan="3" class="sector-empty">데이터를 불러오는 중…</td></tr></tbody>
+      </table>
+      <button type="button" class="fold-btn" id="sector-toggle" aria-expanded="false" hidden="hidden"><span>섹터 더 보기</span>
+        <svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></button>
+    </div>
+  </section>
+
+  <!-- ====================================================================
        3. 실시간 랭킹  (data.json 연동)
        ==================================================================== -->
   <section class="rankings" aria-labelledby="rankings-title">
@@ -945,34 +978,6 @@ body.menu-open { overflow: hidden; }
     <!-- 3위까지 보이고 나머지는 더 보기 (2026-10-13 사용자) -->
     <button type="button" class="fold-btn" id="rank-toggle" aria-expanded="false" hidden="hidden"><span>종목 더 보기</span>
       <svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></button>
-    </div>
-  </section>
-
-  <!-- ====================================================================
-       4. 섹터 현황 (2026-10-14 사용자: 주요 핵심 섹터 현황 → 섹터 현황)
-       ==================================================================== -->
-  <!-- 섹터는 섹터 ETF 11개의 실제 일일 등락률(data.json sectors, fetch_stocks.py) — 손으로 넣은 업종 비중 · 히트맵은 삭제 (2026-10-12 사용자: "히트맵은 정확한 정보가 아니면 삭제", "가짜 데이터는 모두 삭제").
-       제목은 카드 밖 + 아이콘 -->
-  <section class="sector-section" aria-labelledby="sector-title">
-    <div class="section-head">
-      <h2 class="section-title" id="sector-title">
-        <span class="report-icon" style="background:#0F766E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></span>섹터 현황
-      </h2>
-      <span class="section-note">섹터 ETF 11개 · 일일 등락률</span>
-    </div>
-    <div class="card sector-card">
-      <table class="sector-table">
-        <thead>
-          <tr>
-            <th><span class="sr-only">순위</span></th>
-            <th>업종명</th>
-            <th>등락률</th>
-          </tr>
-        </thead>
-        <tbody id="sector-body"><tr><td colspan="3" class="sector-empty">데이터를 불러오는 중…</td></tr></tbody>
-      </table>
-      <button type="button" class="fold-btn" id="sector-toggle" aria-expanded="false" hidden="hidden"><span>섹터 더 보기</span>
-        <svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></button>
     </div>
   </section>
   </div><!-- /home-cards -->
