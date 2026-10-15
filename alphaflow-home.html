@@ -283,11 +283,12 @@ body.menu-open { overflow: hidden; }
 /* 데일리 리포트 · 트럼프 SNS 트렌드 · 엔비디아 데일리 — 세 카드를 같은 폭으로 나란히 둔다 (2026-10-11 엔비디아 추가) */
 .briefing-main {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));   /* PC 폭 980 에서는 2열 + 셋째(트럼프) 전폭 — 3개 한 줄은 카드가 310 이라 제목 · 가격 줄이 넘쳤다 (2026-10-15 사용자) */
   gap: 35px 20px;   /* 카드가 위아래로 쌓일 때 엔비디아 · 트럼프 제목 위 +15 (20 → 35, 2026-10-14 사용자) — 나란할 때는 영향 없음 */
   flex: 1;
   min-width: 0;
 }
+.briefing-main > .report-col:last-child { grid-column: 1 / -1; }
 
 /* 리포트 이름은 카드 밖 제목(21px 굵게 · 행간 27 = 구획 제목 글자) + 앞에 컬러 아이콘 (2026-10-13 사용자) */
 .report-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
