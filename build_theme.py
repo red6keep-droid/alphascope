@@ -785,15 +785,21 @@ def indent(text, spaces):
     return "\n".join(pad + line if line.strip() else line for line in text.split("\n"))
 
 
-# PC 글자 크기 (2026-10-15 사용자: "pc 화면에서는 본문 폰트를 16 폰트로 하고 그와 동일한 비율로 전체적인 폰트를 줄여줘.
-# 기존의 16포인트 쓰던 글자는 그대로 유지, 모바일은 절대로 수정하지마").
-# 본문 19 → 16 과 같은 비율(16/19)로 16px 보다 큰 글자만 줄이고, 16 아래로는 내리지 않는다(17 · 18 → 16).
+# PC 글자 크기 — 네이버 뉴스 기사 PC 본문 기준 (2026-10-15 사용자: "pc 폰트를 네이버 뉴스 기사 폰트 참고해서 수정해").
+# 네이버 PC 기사(news.css, 글자 크기 기본 fs2 · as_mp_layout): 본문 17px · 행간 1.56 · 자간 -0.3px, 제목 28px · 행간 36.
+# 그래서 본문 19 → 17, 16px 보다 큰 글자는 같은 비율(17/19)로 줄이되 17 아래로는 내리지 않는다(18 → 17). 16px 이하는 그대로.
+# 문단 글(행간이 글자의 1.6배 이상)은 행간을 네이버처럼 글자 × 1.56, 한 줄짜리 글은 글자와 같은 비율로.
+# (처음 같은 날은 본문 16 · 비율 16/19 — 사용자: "기존의 16포인트 쓰던 글자는 그대로 유지, 모바일은 절대로 수정하지마")
 # 손으로 적지 않고 빌드 때 테마 CSS 를 읽어 만든다 — 새로 넣는 큰 글자도 PC 에서 같이 줄어든다.
 # 모바일 · 태블릿(900px 이하)용 규칙은 읽지 않고, 결과는 모두 @media (min-width: 901px) 안이다.
 PC_MIN = 901
-PC_RATIO = 16 / 19
+PC_BODY = 17
+PC_RATIO = PC_BODY / 19
+PC_PARA_LH = 1.56          # 네이버 .newsct_article line-height
+PC_TRACKING = "-0.3px"     # 네이버 본문 · 제목 자간
+PC_FIXED = {".post-title": (28, 36)}   # 글 제목 = 네이버 기사 제목 28 · 36
 POST_INLINE_SIZES = (17, 18, 19, 20, 21, 22, 26, 28)   # 리포트 렌더러가 본문에 인라인으로 넣는 16 초과 크기
-POST_INLINE_LH = (27, 28, 32, 34)                      # 그 글자들의 행간 (24 이하는 16px 글자에도 맞아 둔다)
+POST_INLINE_LH = {27: 19, 28: 22, 32: 18, 34: 19}       # 렌더러 인라인 행간 → 그 행간을 쓰는 글자 크기
 
 
 def _half(x):
@@ -801,8 +807,17 @@ def _half(x):
     return f"{v:g}px"
 
 
+def _pc_size(size):
+    return max(float(PC_BODY), round(size * PC_RATIO * 2) / 2)
+
+
+def _pc_lh(size, lh):
+    new = _pc_size(size)
+    return new * PC_PARA_LH if lh / size >= 1.6 else lh * new / size
+
+
 def pc_type_css(css):
-    """16px 초과 font-size 규칙을 PC 에서 16/19 로 줄이는 CSS. 같은 선택자는 마지막 선언 기준."""
+    """16px 초과 font-size 규칙을 PC 에서 네이버 기사 기준(본문 17)으로 줄이는 CSS. 같은 선택자는 마지막 선언 기준."""
     css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
     rules = {}   # 선택자 → (크기, 행간, !important) — 순서 유지, 같은 선택자는 나중 것이 이긴다
 
@@ -835,26 +850,30 @@ def pc_type_css(css):
     for sel, (size, lh, imp) in rules.items():
         if size <= 16:
             continue
-        new = max(16.0, round(size * PC_RATIO * 2) / 2)
         bang = " !important" if imp else ""
-        decl = f"font-size: {new:g}px{bang};"
+        if sel in PC_FIXED:
+            fs_, lh_ = PC_FIXED[sel]
+            out.append(f"  {sel} {{ font-size: {fs_}px{bang}; line-height: {lh_}px{bang}; }}")
+            continue
+        decl = f"font-size: {_pc_size(size):g}px{bang};"
         if lh:
-            decl += f" line-height: {_half(lh * new / size)}{bang};"
+            decl += f" line-height: {_half(_pc_lh(size, lh))}{bang};"
         out.append(f"  {sel} {{ {decl} }}")
     # 리포트 본문의 인라인 크기 (렌더러 style="font-size:19px" 등) — 테마 규칙보다 이기도록 !important
     for n in POST_INLINE_SIZES:
-        new = max(16.0, round(n * PC_RATIO * 2) / 2)
-        out.append(f'  .post-body [style*="font-size:{n}px"], .post-body [style*="font-size: {n}px"] {{ font-size: {new:g}px !important; }}')
-    for n in POST_INLINE_LH:
-        out.append(f'  .post-body [style*="line-height:{n}px"], .post-body [style*="line-height: {n}px"] {{ line-height: {_half(n * PC_RATIO)} !important; }}')
+        out.append(f'  .post-body [style*="font-size:{n}px"], .post-body [style*="font-size: {n}px"] {{ font-size: {_pc_size(n):g}px !important; }}')
+    for n, size in POST_INLINE_LH.items():
+        new_lh = round(_pc_lh(size, n) * 2) / 2
+        out.append(f'  .post-body [style*="line-height:{n}px"], .post-body [style*="line-height: {n}px"] {{ line-height: {new_lh:g}px !important; }}')
         # 글머리표 점(design_kit.dot_li)은 첫 줄 가운데 = (행간 − 점) / 2 — 행간이 줄면 점도 올린다
         for dot in (2, 3):
-            new_lh = round(n * PC_RATIO * 2) / 2
             out.append(f'  .post-body li[style*="line-height:{n}px"] > span[style*="height:{dot}px"][style*="margin-top:{(n - dot) // 2}px"]'
                        f' {{ margin-top: {round((new_lh - dot) / 2)}px !important; }}')
-    # 테마의 3px 점 (본문 행간 34 → 28.5 에 맞춰 15 → 13)
-    out.append("  .report-columns li::before, .kv-row--block li::before, .rt-pop-dot { margin-top: 13px; }")
-    return ("/* PC 글자 크기 — build_theme.pc_type_css 가 만든다. 직접 고치지 말 것 (2026-10-15 사용자) */\n"
+    # 테마의 3px 점 — 본문 행간(17 × 1.56 = 26.5)의 첫 줄 가운데
+    out.append(f"  .report-columns li::before, .kv-row--block li::before, .rt-pop-dot {{ margin-top: {round((round(PC_BODY * PC_PARA_LH * 2) / 2 - 3) / 2)}px; }}")
+    # 자간 — 네이버 본문 · 제목처럼 -0.3px (문단 글과 글 제목만. 메뉴 · 숫자 칸 · 라벨은 그대로)
+    out.append(f"  .post-body, .post-title, .report-columns li, .kv-row--block li, .news-item, .rt-pop-body, .comments .cm-text {{ letter-spacing: {PC_TRACKING}; }}")
+    return ("/* PC 글자 크기 — build_theme.pc_type_css 가 만든다. 직접 고치지 말 것 (2026-10-15 사용자, 네이버 뉴스 PC 기사 기준) */\n"
             f"@media (min-width: {PC_MIN}px) {{\n" + "\n".join(out) + "\n}")
 
 
