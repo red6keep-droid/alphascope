@@ -460,6 +460,8 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
     <b:include data='blog' name='all-head-content'/>
     <!-- 검색 (2026-10-13 사용자): Google Search Console 소유 확인. 블로거 설정의 검색 설명이 비어 있으면 홈 · 목록에 기본 설명을 단다(글 보기는 블로거가 본문 앞부분으로 채운다) -->
     <meta content='GWtZLHo2CgnmBBgSxQQg0BKY_xKZJTSba7BBOZ6e4Ts' name='google-site-verification'/>
+    <!-- 네이버 서치어드바이저 소유 확인 (2026-10-15 사용자). 블로거는 루트에 HTML 파일을 못 올려 메타 태그 방식 -->
+    <meta content='4b16f0e43da3e199130fd61a86cb96dff343fb9d' name='naver-site-verification'/>
     <b:if cond='!data:view.isSingleItem and data:blog.metaDescription == &quot;&quot;'>
       <meta content='__SITE_DESC__' name='description'/>
     </b:if>
