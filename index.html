@@ -333,7 +333,7 @@ body.menu-open { overflow: hidden; }
 /* 홈 트럼프 카드 — 발언 줄: 주제 라벨(영역 라벨 모양) + 세부 주제 · 방향 · 대상 왼쪽, 강도 오른쪽, 줄 사이 구분선 (2026-10-15 사용자) */
 #trump-card { padding: 0 16px; gap: 0; }
 .tr-main { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; font-size: 16px; line-height: 24px; color: #111; }
-.tr-tag { display: inline-block; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; white-space: nowrap; }
+.tr-tag { display: inline-block; text-align: center; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; white-space: nowrap; }
 .tr-int { flex: none; font-weight: 400; font-size: 16px; line-height: 24px; color: #111; white-space: nowrap; }
 .tr-int b { font-weight: 700; }
 #trump-card .kv-row.is-note { font-size: 16px; line-height: 24px; color: var(--gray-400); }
@@ -2641,6 +2641,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
             if (r.intensity) { var it = el('span', 'tr-int', '강도 : '); it.appendChild(el('b', null, r.intensity)); row.appendChild(it); }   /* '강도 :' 보통 굵기 · 숫자만 굵게 (2026-10-15 사용자) */
             box.appendChild(row);
           });
+          /* 라벨 폭을 가장 넓은 라벨에 맞춰 뒤 글자의 세로 기준선을 맞춘다 (2026-10-15 사용자). 웹 글꼴이 늦게 오면 다시 잰다 */
+          function evenTags() {
+            var tags = [].slice.call(box.querySelectorAll('.tr-tag')), w = 0;
+            tags.forEach(function (t) { t.style.minWidth = ''; w = Math.max(w, t.getBoundingClientRect().width); });
+            if (w) tags.forEach(function (t) { t.style.minWidth = Math.ceil(w) + 'px'; });
+          }
+          evenTags();
+          if (document.fonts && document.fonts.ready) document.fonts.ready.then(evenTags);
         }
 
         function fillNvda(sec) {
