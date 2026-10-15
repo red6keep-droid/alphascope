@@ -1596,8 +1596,8 @@ body.menu-open { overflow: hidden; }
         target = KO_PLACE[target] || target;
         if (target === topic) target = '';   /* 대상이 주제와 같으면(에너지 / 에너지) 한 번만 */
         var im = /(\d+)/.exec(String(right.textContent || ''));
-        /* 주제 라벨 · 세부 주제 · 대상 · 방향 · 강도 순서 (2026-10-15 사용자) */
-        out.push({ topic: topic, text: [subtopic, target, dir].filter(Boolean).join(' · '), intensity: im ? im[1] : '' });
+        /* 주제 라벨 · 대상 · 세부 주제 · 방향 · 강도 순서 (2026-10-15 사용자: 장소를 세부 주제 앞으로) */
+        out.push({ topic: topic, text: [target, subtopic, dir].filter(Boolean).join(' · '), intensity: im ? im[1] : '' });
       });
     });
     return out;
