@@ -311,8 +311,7 @@ body.menu-open { overflow: hidden; }
 .kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 19px; line-height: 24px; color: #111; white-space: nowrap; }
 .kv-value.up { color: var(--up); } .kv-value.down { color: var(--down); }
 .kv-value small { font-size: 14px; font-weight: 400; color: #7A7A7A; }
-.kv-rel { font-family: var(--num); font-weight: 600; font-size: 16px; }   /* 가격 줄 왼쪽 시장 대비 값 — 증감 색 (2026-10-15 사용자) */
-.kv-rel.up { color: var(--up); } .kv-rel.down { color: var(--down); }
+.kv-rel { display: inline-flex; align-items: baseline; gap: 6px; flex: none; }   /* 가격 줄 왼쪽: 시장 대비 증감 값 + '시장 대비' (2026-10-15 사용자) */
 .kv-row--block { display: block; }
 .kv-row--block .kv-name { display: block; margin-bottom: 4px; }
 .kv-row--block .badge { display: inline-block; margin-bottom: 8px; }   /* 중요 이슈 = 라벨 (다른 카드의 오늘의 발언 · 내일 볼 것과 같다, 2026-10-14 사용자) */
@@ -1578,8 +1577,12 @@ body.menu-open { overflow: hidden; }
     rows.forEach(function (r) {
       if (r[0] === 'SPY 대비') return;
       if (r[0] === '가격') {
-        var row = el('div', 'kv-row'), name = el('span', 'kv-name', rel ? '시장 대비 ' : r[0]);
-        if (rel) name.appendChild(el('span', 'kv-rel' + tone(rel), rel.replace(/\s+/g, '')));
+        var row = el('div', 'kv-row'), name;
+        if (rel) {   /* 증감 값 앞 · '시장 대비' 뒤 — 값은 아래 칸 값(20일 평균)과, 글자는 칸 이름(거래량)과 같은 모양 (2026-10-15 사용자) */
+          name = el('span', 'kv-rel');
+          name.appendChild(el('span', 'kv-stat-value' + tone(rel), rel.replace(/\s+/g, ' ')));
+          name.appendChild(el('span', 'kv-stat-name', '시장 대비'));
+        } else name = el('span', 'kv-name', r[0]);
         row.appendChild(name); row.appendChild(el('span', 'kv-value' + tone(r[1]), r[1])); box.appendChild(row);
         return;
       }
