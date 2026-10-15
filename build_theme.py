@@ -786,6 +786,79 @@ def indent(text, spaces):
     return "\n".join(pad + line if line.strip() else line for line in text.split("\n"))
 
 
+# PC 글자 크기 (2026-10-15 사용자: "pc 화면에서는 본문 폰트를 16 폰트로 하고 그와 동일한 비율로 전체적인 폰트를 줄여줘.
+# 기존의 16포인트 쓰던 글자는 그대로 유지, 모바일은 절대로 수정하지마").
+# 본문 19 → 16 과 같은 비율(16/19)로 16px 보다 큰 글자만 줄이고, 16 아래로는 내리지 않는다(17 · 18 → 16).
+# 손으로 적지 않고 빌드 때 테마 CSS 를 읽어 만든다 — 새로 넣는 큰 글자도 PC 에서 같이 줄어든다.
+# 모바일 · 태블릿(900px 이하)용 규칙은 읽지 않고, 결과는 모두 @media (min-width: 901px) 안이다.
+PC_MIN = 901
+PC_RATIO = 16 / 19
+POST_INLINE_SIZES = (17, 18, 19, 20, 21, 22, 26, 28)   # 리포트 렌더러가 본문에 인라인으로 넣는 16 초과 크기
+POST_INLINE_LH = (27, 28, 32, 34)                      # 그 글자들의 행간 (24 이하는 16px 글자에도 맞아 둔다)
+
+
+def _half(x):
+    v = round(x * 2) / 2
+    return f"{v:g}px"
+
+
+def pc_type_css(css):
+    """16px 초과 font-size 규칙을 PC 에서 16/19 로 줄이는 CSS. 같은 선택자는 마지막 선언 기준."""
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    rules = {}   # 선택자 → (크기, 행간, !important) — 순서 유지, 같은 선택자는 나중 것이 이긴다
+
+    def walk(text, skip):
+        i = 0
+        while i < len(text):
+            j = text.find("{", i)
+            if j < 0:
+                return
+            head = text[i:j].strip()
+            depth, k = 1, j + 1
+            while depth and k < len(text):
+                depth += {"{": 1, "}": -1}.get(text[k], 0)
+                k += 1
+            body = text[j + 1:k - 1]
+            if head.startswith("@media"):
+                walk(body, skip or "max-width" in head or "prefers-reduced-motion" in head)
+            elif head.startswith("@"):
+                pass   # @keyframes 등
+            elif not skip:
+                fs = re.search(r"(?<![-\w])font-size:\s*([\d.]+)px\s*(!important)?", body)
+                if fs:
+                    lh = re.search(r"(?<![-\w])line-height:\s*([\d.]+)px", body)
+                    rules.pop(head, None)
+                    rules[head] = (float(fs.group(1)), float(lh.group(1)) if lh else None, bool(fs.group(2)))
+            i = k
+
+    walk(css, False)
+    out = []
+    for sel, (size, lh, imp) in rules.items():
+        if size <= 16:
+            continue
+        new = max(16.0, round(size * PC_RATIO * 2) / 2)
+        bang = " !important" if imp else ""
+        decl = f"font-size: {new:g}px{bang};"
+        if lh:
+            decl += f" line-height: {_half(lh * new / size)}{bang};"
+        out.append(f"  {sel} {{ {decl} }}")
+    # 리포트 본문의 인라인 크기 (렌더러 style="font-size:19px" 등) — 테마 규칙보다 이기도록 !important
+    for n in POST_INLINE_SIZES:
+        new = max(16.0, round(n * PC_RATIO * 2) / 2)
+        out.append(f'  .post-body [style*="font-size:{n}px"], .post-body [style*="font-size: {n}px"] {{ font-size: {new:g}px !important; }}')
+    for n in POST_INLINE_LH:
+        out.append(f'  .post-body [style*="line-height:{n}px"], .post-body [style*="line-height: {n}px"] {{ line-height: {_half(n * PC_RATIO)} !important; }}')
+        # 글머리표 점(design_kit.dot_li)은 첫 줄 가운데 = (행간 − 점) / 2 — 행간이 줄면 점도 올린다
+        for dot in (2, 3):
+            new_lh = round(n * PC_RATIO * 2) / 2
+            out.append(f'  .post-body li[style*="line-height:{n}px"] > span[style*="height:{dot}px"][style*="margin-top:{(n - dot) // 2}px"]'
+                       f' {{ margin-top: {round((new_lh - dot) / 2)}px !important; }}')
+    # 테마의 3px 점 (본문 행간 34 → 28.5 에 맞춰 15 → 13)
+    out.append("  .report-columns li::before, .kv-row--block li::before, .rt-pop-dot { margin-top: 13px; }")
+    return ("/* PC 글자 크기 — build_theme.pc_type_css 가 만든다. 직접 고치지 말 것 (2026-10-15 사용자) */\n"
+            f"@media (min-width: {PC_MIN}px) {{\n" + "\n".join(out) + "\n}")
+
+
 def build_theme(parts):
     """블로거에 붙여넣는 테마 XML 을 만든다."""
     includables, n = blog_includables()
@@ -797,7 +870,7 @@ def build_theme(parts):
 
     out = TEMPLATE
     out = out.replace("__CSS__", parts["css"])
-    out = out.replace("__BLOGGER_CSS__", BLOGGER_CSS.strip())
+    out = out.replace("__BLOGGER_CSS__", BLOGGER_CSS.strip() + "\n\n" + pc_type_css(parts["css"] + "\n" + BLOGGER_CSS))
     out = out.replace("__NAV_ITEMS__", nav_items())
     out = out.replace("__SITE_DESC__", html_mod.escape(SITE_DESC, quote=True))
     out = out.replace("__LIST_PATH__", LIST_PATH)
@@ -1563,7 +1636,7 @@ def build_preview(parts):
 
     out = PREVIEW_TEMPLATE
     out = out.replace("__CSS__", parts["css"])
-    out = out.replace("__BLOGGER_CSS__", BLOGGER_CSS.strip())
+    out = out.replace("__BLOGGER_CSS__", BLOGGER_CSS.strip() + "\n\n" + pc_type_css(parts["css"] + "\n" + BLOGGER_CSS))
     out = out.replace("__PREVIEW_CSS__", PREVIEW_CSS.strip())
     out = out.replace("__NAVBAR__", parts["navbar"])
     out = out.replace("__DASHBOARD__", indent(parts["dashboard"], 2))
