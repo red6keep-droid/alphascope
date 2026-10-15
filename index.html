@@ -2611,13 +2611,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
                 if (x.tagName === 'SPAN' && !SESSIONS[t] && !dir) dir = t;   /* 방향 라벨(긍정 · 부정 · 중립)만 — 장 구분은 뺀다 */
                 h.removeChild(x);
               });
+              var subtopic = String(h.textContent || '').replace(/\s+/g, ' ').replace(/^\s*\/\s*/, '').trim();
               var tm = /대상\s+([^·]+)/.exec(String((left.children[1] || {}).textContent || '')), target = tm ? tm[1].trim() : '';
               var topic = String(b.textContent || '').trim();
               target = KO_PLACE[target] || target;
               if (target === topic) target = '';   /* 대상이 주제와 같으면(에너지 / 에너지) 한 번만 */
               var im = /(\d+)/.exec(String(right.textContent || ''));
-              /* 주제 라벨 · 대상 · 방향 · 강도 순서, 세부 주제(시추 · 투자 …)는 홈에서 뺀다 (2026-10-15 사용자) */
-              out.push({ topic: topic, text: [target, dir].filter(Boolean).join(' · '), intensity: im ? im[1] : '' });
+              /* 주제 라벨 · 세부 주제 · 대상 · 방향 · 강도 순서 (2026-10-15 사용자) */
+              out.push({ topic: topic, text: [subtopic, target, dir].filter(Boolean).join(' · '), intensity: im ? im[1] : '' });
             });
           });
           return out;
