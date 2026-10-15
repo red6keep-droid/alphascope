@@ -79,7 +79,7 @@
 
   /* rhythm */
   --gutter:  40px;
-  --shell:   1280px;   /* PC 콘텐츠 폭 1280 — 홈 · 목록 · 글 보기 모두 (2026-10-15 사용자, 전 1440) */
+  --shell:   980px;   /* PC 콘텐츠 폭 980 — 홈 · 목록 · 글 보기 · 헤더 안쪽 모두 (2026-10-15 사용자: 1440 → 1280 → 980) */
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -182,6 +182,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   border-radius: 8px;
 }
 .search-bar svg { width: 14px; height: 14px; flex: none; color: var(--gray-400); }
+/* 헤더 안쪽 980 에 로고 · 메뉴 · 검색창이 다 들어가도록 검색창은 남는 폭만큼 (264 → 최소 150) — 검색창이 보이는 PC 폭에서만 (2026-10-15 사용자: PC 980) */
+@media (min-width: 1181px) {
+  .nav-left { flex: none; }   /* 메뉴는 줄지 않고 검색창이 준다 — 메뉴가 검색창 위로 겹치던 원인 */
+  .nav-right { flex: 0 1 auto; min-width: 0; }
+  .nav-right > .search-holder, .nav-right > .search-bar { flex: 0 1 264px; min-width: 150px; }
+  .search-bar { width: 100%; }
+}
 .search-bar input {
   flex: 1;
   min-width: 0;
@@ -884,7 +891,7 @@ body.menu-open { overflow: hidden; }
    Blogger — 글 보기
    ========================================================================== */
 
-/* main-content 는 border-box 라 좌우 gutter 가 안쪽 폭을 그만큼 깎는다. gutter 를 더해 콘텐츠 폭이 정확히 --shell(1280).
+/* main-content 는 border-box 라 좌우 gutter 가 안쪽 폭을 그만큼 깎는다. gutter 를 더해 콘텐츠 폭이 정확히 --shell(980).
    2026-10-15 부터 홈 · 목록도 테마 .main-content 가 같은 식이라 이 줄은 글 보기용 중복 (지워도 같다) */
 body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2); }
 
