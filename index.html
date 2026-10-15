@@ -123,7 +123,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   justify-content: space-between;
   gap: 24px;
   height: 86px;
-  padding: 0 var(--gutter);
+  padding: 0 max(var(--gutter), calc((100% - var(--shell)) / 2));   /* 헤더 안쪽도 콘텐츠와 같은 1280 — 바탕 · 아래 선은 화면 전체 (2026-10-15 사용자) */
   background: var(--surface);
   border-bottom: 1px solid var(--border-strong);
 }
