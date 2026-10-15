@@ -14,7 +14,7 @@ validate 탈락 모두) 다음 단계로. 전부 실패하면 RuntimeError.
 
 Gemini 는 REST 로 부른다 — 홈 뉴스 워크플로에는 google-genai 가 없다. 필요한 패키지는 requests 하나.
 Gemini 키는 GEMINI_API_KEY 에 ; 또는 , 로 여럿 (2026-10-14 사용자: 키 5개 모두 다른 프로젝트 → 프로젝트당 하루 약 20회씩).
-호출마다 다음 키로 돌고, 429 를 받은 키는 KEY_COOLDOWN_SECONDS 쉰다. 503/500 은 키 문제가 아니라 기다렸다 다시(3·6·12·24·48s).
+호출마다 다음 키로 돌고, 429 분당 한도를 받은 키는 KEY_COOLDOWN_SECONDS 한 번 쉬고, 하루 한도(PerDay)면 그 실행 동안 버린다. 503/500 은 키 문제가 아니라 기다렸다 다시(3·6·12·24·48s).
 
 모델 실측 (2026-10-11, NVDA 실제 분류 프롬프트 6건 · 20건, 서술 프롬프트):
 - Groq gpt-oss-120b (사고 low): 분류 20건 6.5초, Gemini 라벨과 24필드 중 18~19 일치, 서술 검증 통과.
@@ -100,6 +100,9 @@ def _notify_summary():
 
 
 atexit.register(_notify_summary)
+# 하루 한도(429 PerDay)를 받은 Gemini 키 — 태평양 자정까지 다시 오지 않으니 이번 실행(프로세스) 동안 건너뛴다.
+# 2026-10-15: 키 1개가 429 를 받고도 60초 휴식 × 5회를 호출마다 반복해 트럼프 1,471초 · NVDA 1,117초가 걸림
+_EXHAUSTED_KEYS = set()
 _last_call = {}   # (주소, 모델) → 마지막 호출 시각 (분당 토큰 한도 간격용 — Groq 는 모델마다 한도가 따로)
 
 
@@ -151,14 +154,17 @@ class LLMPool:
 
     # ---------------------------------------------------------------- Gemini
     def _pick_key(self):
+        live = [i for i, k in enumerate(self._keys) if k not in _EXHAUSTED_KEYS]
+        if not live:
+            raise StepFailed("Gemini 하루 한도 소진 — 이번 실행은 건너뜀")
         now = time.time()
         n = len(self._keys)
         for offset in range(n):
             i = (self._next + offset) % n
-            if self._cooldown_until[i] <= now:
+            if i in live and self._cooldown_until[i] <= now:
                 self._next = (i + 1) % n
                 return i
-        wait = min(self._cooldown_until) - now
+        wait = min(self._cooldown_until[i] for i in live) - now
         if wait > KEY_COOLDOWN_SECONDS * 3:
             raise StepFailed("Gemini 모든 키 쿨다운")
         print(f"[{self.label}] Gemini 모든 키 쿨다운 — {wait:.0f}s 대기")
@@ -173,6 +179,7 @@ class LLMPool:
             gen["maxOutputTokens"] = max_tokens
         body = {"contents": [{"role": "user", "parts": [{"text": prompt}]}], "generationConfig": gen}
         last = ""
+        minute_429 = 0
         for attempt in range(1, GEMINI_ATTEMPTS + 1):
             i = self._pick_key()
             key = self._keys[i]
@@ -185,10 +192,21 @@ class LLMPool:
                 time.sleep(wait)
                 continue
             if r.status_code == 429:
+                # 본문의 quotaId 로 하루 한도와 분당 한도를 가른다 (…PerDay… / …PerMinute…)
+                quota = (re.findall(r'"quotaId":\s*"([^"]+)"', r.text) or ["?"])[0]
+                event("한도", f"Gemini 키 {_mask(key)} {quota} ({self.label})")
+                if "PerDay" in r.text:
+                    _EXHAUSTED_KEYS.add(key)
+                    print(f"[{self.label}] Gemini 키 {_mask(key)} 하루 한도({quota}) → 이번 실행은 이 키를 쓰지 않음")
+                    if all(k in _EXHAUSTED_KEYS for k in self._keys):
+                        raise StepFailed(f"Gemini 하루 한도 소진 ({quota})")
+                    continue
+                minute_429 += 1
+                last = f"429 한도 ({quota})"
+                if minute_429 > len(self._keys):   # 분당 한도는 키마다 한 번만 쉬고 다시 — 그래도 429 면 예비로
+                    raise StepFailed(f"Gemini 분당 한도 반복 ({quota})")
                 self._cooldown_until[i] = time.time() + KEY_COOLDOWN_SECONDS
-                last = "429 한도"
-                event("한도", f"Gemini 키 {_mask(key)} ({self.label})")
-                print(f"[{self.label}] Gemini 키 {_mask(key)} 한도 → {KEY_COOLDOWN_SECONDS}s 휴식")
+                print(f"[{self.label}] Gemini 키 {_mask(key)} 분당 한도({quota}) → {KEY_COOLDOWN_SECONDS}s 휴식")
                 continue
             if r.status_code in (500, 502, 503, 504):
                 last = f"{r.status_code} 서버 과부하"
