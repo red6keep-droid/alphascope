@@ -33,7 +33,7 @@ env:
   # workflow_dispatch를 건다 — 그 실행도 스케줄로 취급한다 (infra/cron-trigger).
   IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
   FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_DAILY || secrets.GEMINI_API_KEY }}   # 리포트별 프로젝트 키 (2026-10-15) — 없으면 공용 키
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # AI 호출 알림 — 한도 · 예비 사용 · 전부 실패 (llm_chain, 2026-10-14)
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}       # 예비 1순위 (긴 프롬프트는 413 으로 건너뜀) — experiments/llm_chain.py (2026-10-14)
   NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}   # 예비 2순위 DeepSeek — 미국 증시 리포트의 실제 예비
