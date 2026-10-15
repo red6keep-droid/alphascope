@@ -134,9 +134,8 @@ BLOGGER_CSS = """
    Blogger — 글 보기
    ========================================================================== */
 
-/* main-content 는 border-box 라 좌우 gutter 가 안쪽 폭을 그만큼 깎는다. 그래서
-   셸에 --shell 을 그대로 주면 실제로는 1440 이 아니라 1360 으로 그려진다.
-   글 보기에서는 gutter 를 상쇄해 리포트 폭이 정확히 --shell 이 되게 한다. */
+/* main-content 는 border-box 라 좌우 gutter 가 안쪽 폭을 그만큼 깎는다. gutter 를 더해 콘텐츠 폭이 정확히 --shell(1280).
+   2026-10-15 부터 홈 · 목록도 테마 .main-content 가 같은 식이라 이 줄은 글 보기용 중복 (지워도 같다) */
 body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2); }
 
 .post-shell { width: 100%; max-width: var(--shell); margin: 0 auto; min-width: 0; }
