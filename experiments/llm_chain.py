@@ -77,7 +77,7 @@ CHAINS = {
 PROVISIONAL_SQL = "ai_model LIKE '%:%'"
 
 USAGE = defaultdict(lambda: {"ok": 0, "fail": 0})   # 단계 → 성공 · 실패 수 (이번 실행)
-EVENTS = Counter()   # 알릴 일 (이번 실행): "한도 Gemini 키 AIza***" · "예비 nvda-narrate → nvidia-deepseek" · "전부 실패 …" · "검사 탈락 …"
+EVENTS = Counter()   # 알릴 일 (이번 실행): "한도 Gemini 키 #1" · "예비 nvda-narrate → nvidia-deepseek" · "전부 실패 …" · "검사 탈락 …"
 # Slack 알림 (2026-10-14 사용자: "한도가 걸린 걸 알림으로 보내줘") — 실행이 끝날 때 EVENTS 가 비어 있지 않으면 한 번만, SLACK_WEBHOOK_URL 로.
 # 한도(429) · 예비 모델 사용 · 사슬 전부 실패 · 검사 탈락이 대상. 503 재시도는 흔해서 알리지 않는다 (예비로 넘어가면 그때 알린다)
 
@@ -131,7 +131,9 @@ def gemini_keys():
 
 
 def _mask(key):
-    return key[:8] + "***" if len(key) > 8 else key[:3] + "***"
+    """로그 · Slack 에 쓰는 키 이름 — 값은 앞자리도 내보내지 않는다 (2026-10-15 사용자: 키는 절대 노출 금지, 공개 리포라 로그도 공개)."""
+    keys = gemini_keys()
+    return f"#{keys.index(key) + 1}" if key in keys else "#?"
 
 
 def _available(name):
