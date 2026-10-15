@@ -308,7 +308,8 @@ body.menu-open { overflow: hidden; }
 #trump-card { padding: 0 16px; gap: 0; }
 .tr-main { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; font-size: 16px; line-height: 24px; color: #111; }
 .tr-tag { display: inline-block; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; white-space: nowrap; }
-.tr-int { flex: none; font-weight: 700; font-size: 16px; line-height: 24px; color: #111; white-space: nowrap; }
+.tr-int { flex: none; font-weight: 400; font-size: 16px; line-height: 24px; color: #111; white-space: nowrap; }
+.tr-int b { font-weight: 700; }
 #trump-card .kv-row.is-note { font-size: 16px; line-height: 24px; color: var(--gray-400); }
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
@@ -1589,13 +1590,13 @@ body.menu-open { overflow: hidden; }
           if (x.tagName === 'SPAN' && !SESSIONS[t] && !dir) dir = t;   /* 방향 라벨(긍정 · 부정 · 중립)만 — 장 구분은 뺀다 */
           h.removeChild(x);
         });
-        var subtopic = String(h.textContent || '').replace(/\s+/g, ' ').replace(/^\s*\/\s*/, '').trim();
         var tm = /대상\s+([^·]+)/.exec(String((left.children[1] || {}).textContent || '')), target = tm ? tm[1].trim() : '';
         var topic = String(b.textContent || '').trim();
         target = KO_PLACE[target] || target;
         if (target === topic) target = '';   /* 대상이 주제와 같으면(에너지 / 에너지) 한 번만 */
         var im = /(\d+)/.exec(String(right.textContent || ''));
-        out.push({ topic: topic, text: [subtopic, dir, target].filter(Boolean).join(' · '), intensity: im ? im[1] : '' });
+        /* 주제 라벨 · 대상 · 방향 · 강도 순서, 세부 주제(시추 · 투자 …)는 홈에서 뺀다 (2026-10-15 사용자) */
+        out.push({ topic: topic, text: [target, dir].filter(Boolean).join(' · '), intensity: im ? im[1] : '' });
       });
     });
     return out;
@@ -1615,7 +1616,7 @@ body.menu-open { overflow: hidden; }
       main.appendChild(el('span', 'tr-tag', r.topic));
       if (r.text) main.appendChild(el('span', null, r.text));
       row.appendChild(main);
-      if (r.intensity) row.appendChild(el('span', 'tr-int', '강도 : ' + r.intensity));
+      if (r.intensity) { var it = el('span', 'tr-int', '강도 : '); it.appendChild(el('b', null, r.intensity)); row.appendChild(it); }   /* '강도 :' 보통 굵기 · 숫자만 굵게 (2026-10-15 사용자) */
       box.appendChild(row);
     });
   }
