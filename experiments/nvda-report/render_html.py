@@ -897,7 +897,7 @@ def sec_footer(a):
     return (f'<div data-footer="1" style="margin-top:3px;padding-top:2px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{_dk.GUIDE_IND}">'
             f"{INFO_ICON}데이터: yfinance(일봉·옵션·예상 실적·애널리스트·기관·공매도) · SEC 공시(임원 거래·수시·분기 보고) · FRED(거시 일정) · "
             f"NVIDIA 뉴스룸·블로그 · CNBC · Google News · 연방관보 · CourtListener · trump-trend. "
-            f"분류 Gemini, 판정·계산 파이썬. 생성 {_esc(a['generated_at'])} (UTC) · 기준 거래일 {_esc(_d(a['day']))} · 일봉 마지막 {_esc(_d(ds['bars_last_day']) or '—')}.<br>"
+            f"분류 Gemini(한도 때는 예비 모델이 임시 분류, 다음 실행에서 Gemini 로 다시), 판정·계산 파이썬. 생성 {_esc(a['generated_at'])} (UTC) · 기준 거래일 {_esc(_d(a['day']))} · 일봉 마지막 {_esc(_d(ds['bars_last_day']) or '—')}.<br>"
             f"{INFO_ICON}이 글은 보유 종목의 사실 추적입니다. 매수·매도 판단을 담지 않으며, 사건과 가격 변화 사이의 인과를 단정하지 않습니다. "
             f"옵션 지표는 장 마감 후 1회 스냅샷이고 감마 노출은 조잡한 근사입니다. 트럼프 과거 반응 통계는 다중 검정 보정(q)을 거친 값만 인용합니다. 투자 권고가 아닙니다."
             + (f"<br>{INFO_ICON}용어와 각 구획을 읽는 법은 <b>리포트 읽는 법</b>{_link_icon(config.GUIDE_URL, '리포트 읽는 법')}" if config.GUIDE_URL else "")   # 고정 페이지 (가이드라인 3-4·6절)

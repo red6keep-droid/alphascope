@@ -151,6 +151,16 @@ def main():
         print(f"[chart] 실패 — 그래프 없이 렌더: {e}")
     render_html.render()
 
+    # 예비 모델이 임시로 분류한 게시물을 Gemini 로 다시 — 글을 다 만든 뒤라 오늘 글 · 서술 몫 한도는 건드리지 않는다 (2026-10-15)
+    if not args.skip_classify:
+        try:
+            if classify_posts.reclassify(conn, since_days=args.since_days):
+                labels.reapply(conn)
+                if args.export_state:
+                    state_io.export_state(conn, args.export_state)
+        except Exception as e:  # noqa: BLE001
+            print(f"[reclassify] 실패 — 다음 실행이 이어받는다: {e}")
+
     _step(9, total, "Blogger 게시 (별도 글)" + ("" if args.publish else " — dry-run"))
     try:
         publish.publish(do_publish=args.publish)

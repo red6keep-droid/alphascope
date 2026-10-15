@@ -17,7 +17,7 @@ import db
 import labels
 import prefilter
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-from llm_chain import LLMPool, usage_line  # noqa: E402  — 모든 리포트 공용 LLM 사슬 (experiments/llm_chain.py, 2026-10-14)
+from llm_chain import PROVISIONAL_SQL, LLMPool, usage_line  # noqa: E402  — 모든 리포트 공용 LLM 사슬 (experiments/llm_chain.py, 2026-10-14)
 
 PROMPT_FILE = os.path.join(config.PROMPTS_DIR, "classify.txt")
 TICKER_RE = re.compile(r"^[A-Z]{1,5}(?:[.-][A-Z])?$")
@@ -171,6 +171,56 @@ def classify(conn, since_days=config.CLASSIFY_SINCE_DAYS,
     print(f"[classify] 완료 — 저장 {written:,}건 · 호출 {pool.calls}회 (예비 {pool.fallback_calls}회) · 단계별 성공/시도 {usage_line()}")
     db.set_meta(conn, "classify_last_run_at", _utc_now())
     conn.commit()
+    return written
+
+
+def reclassify(conn, since_days=config.CLASSIFY_SINCE_DAYS, max_batches=config.RECLASSIFY_MAX_BATCHES_PER_RUN,
+               batch_size=config.CLASSIFY_BATCH_SIZE):
+    """예비 모델(DeepSeek · Groq)이 임시로 분류한 게시물을 Gemini 로 다시 분류한다 (2026-10-15).
+
+    10-15 DeepSeek 35건은 관련도 0 비율 63%(Gemini 30%) · 빈 하위주제 49%(6%) — 90일 반응 통계에 그대로 남는다.
+    렌더가 끝난 뒤에 돌려 그날 글 · 서술 몫의 Gemini 한도는 건드리지 않는다. Gemini 가 실패하면 그대로 두고 멈춘다.
+    """
+    since = (datetime.datetime.now(datetime.timezone.utc)
+             - datetime.timedelta(days=since_days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    rows = conn.execute(
+        f"""SELECT id, published_at, content FROM trump_posts
+            WHERE {PROVISIONAL_SQL} AND analyzed_at IS NOT NULL AND noise_reason IS NULL AND published_at >= ?
+            ORDER BY published_at DESC LIMIT ?""", (since, max_batches * batch_size)).fetchall()
+    posts = [dict(r) for r in rows]
+    left = conn.execute(f"SELECT COUNT(*) FROM trump_posts WHERE {PROVISIONAL_SQL} AND analyzed_at IS NOT NULL AND noise_reason IS NULL "
+                        "AND published_at >= ?", (since,)).fetchone()[0]
+    if not posts:
+        print("[reclassify] 예비 모델 분류 0건")
+        return 0
+    try:
+        pool = LLMPool("json-gemini", label="trump-reclassify")
+    except RuntimeError as e:
+        print(f"[reclassify] 건너뜀 — {e}")
+        return 0
+    prompt_head = _load_prompt()
+    batches = [posts[i:i + batch_size] for i in range(0, len(posts), batch_size)]
+    print(f"[reclassify] 예비 모델 분류 {left}건 중 {len(posts)}건 → {len(batches)}배치 (Gemini 만)")
+    written = 0
+    for n, batch in enumerate(batches, 1):
+        try:
+            valid = classify_batch(pool, prompt_head, batch)
+        except Exception as e:  # noqa: BLE001
+            print(f"[reclassify] 배치 {n}/{len(batches)} 실패 — 예비 분류를 그대로 두고 멈춤: {str(e)[:200]}")
+            break
+        conn.executemany(
+            f"""UPDATE trump_posts SET
+                 ai_topic=:ai_topic, ai_subtopic=:ai_subtopic,
+                 ai_target_country=:ai_target_country, ai_target_sector=:ai_target_sector,
+                 ai_mentioned_companies=:ai_mentioned_companies, ai_direction=:ai_direction,
+                 ai_intensity=:ai_intensity, ai_market_relevance=:ai_market_relevance,
+                 analyzed_at=:analyzed_at, ai_model=:ai_model
+               WHERE id=:id AND {PROVISIONAL_SQL}""",
+            [dict(v, analyzed_at=_utc_now(), ai_model=pool.last_model) for v in valid])
+        conn.commit()
+        written += len(valid)
+        print(f"[reclassify] 배치 {n}/{len(batches)}: {len(valid)}/{len(batch)}건 Gemini 로 교체")
+    print(f"[reclassify] 완료 — {written}건 교체 · 남은 예비 분류 {left - written}건")
     return written
 
 

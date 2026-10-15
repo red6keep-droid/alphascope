@@ -411,7 +411,7 @@ def sec_narrative(n, key):
 def sec_footer(a):
     s = a["data_status"]
     return dk.footer(
-        f"데이터: Truth Social 게시물 공개 아카이브(CNN) · 가격 Yahoo Finance · 거시 일정 FRED. 분류 Gemini, 집계·통계 파이썬. "
+        f"데이터: Truth Social 게시물 공개 아카이브(CNN) · 가격 Yahoo Finance · 거시 일정 FRED. 분류 Gemini(한도 때는 예비 모델이 임시 분류, 다음 실행에서 Gemini 로 다시), 집계·통계 파이썬. "
         f"이벤트 누적 {s['events_total']:,}개 · 가격 기준일 {_esc(dk.day(s['bars_last_day']) or '—')}.",
         "이 글의 시장 반응 수치는 과거 발언 이후 관찰된 값이며 인과 관계나 향후 방향을 의미하지 않습니다. 투자 권고가 아닙니다.")
 

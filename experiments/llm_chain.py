@@ -69,7 +69,12 @@ CHAINS = {
     # 댓글 답글 — Gemini 는 맨 뒤 (2026-10-14 사용자: 댓글 한 건에 한도 1회가 나가니 리포트 몫을 남기자). 답글은 짧고 숫자를 쓰지 않아 예비 모델로 충분.
     # DeepSeek 가 첫째 — 비교에서 답글 품질이 가장 좋았고, 봇은 5분마다 돌아 30초쯤 걸려도 된다
     "comment": ["nvidia-deepseek", "groq", "groq-qwen", "gemini"],
+    # 예비 모델이 임시로 분류한 행을 Gemini 로 다시 분류할 때 (2026-10-15) — 예비로 덮어쓰지 않도록 Gemini 만
+    "json-gemini": ["gemini"],
 }
+
+# 예비 모델이 남긴 ai_model 은 "공급자:모델" (nvidia:… · groq:…). Gemini("gemini-…") · 규칙("rule") 에는 콜론이 없다
+PROVISIONAL_SQL = "ai_model LIKE '%:%'"
 
 USAGE = defaultdict(lambda: {"ok": 0, "fail": 0})   # 단계 → 성공 · 실패 수 (이번 실행)
 EVENTS = Counter()   # 알릴 일 (이번 실행): "한도 Gemini 키 AIza***" · "예비 nvda-narrate → nvidia-deepseek" · "전부 실패 …" · "검사 탈락 …"

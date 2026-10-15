@@ -198,6 +198,17 @@ def main():
     path = render_report.render()
     render_html.render()
 
+    # 예비 모델이 임시로 분류한 행을 Gemini 로 다시 — 글을 다 만든 뒤라 오늘 글 · 서술 몫 한도는 건드리지 않는다 (2026-10-15)
+    if not args.skip_classify:
+        import classify_items
+        try:
+            if classify_items.reclassify(conn):
+                labels.reapply(conn)
+                if args.export_state:
+                    state_io.export_state(conn, args.export_state)
+        except Exception as e:  # noqa: BLE001
+            print(f"[reclassify] 실패 — 다음 실행이 이어받는다: {e}")
+
     _step(10, total, "Blogger 게시 (별도 글)" + ("" if args.publish else " — dry-run"))
     try:
         publish.publish(do_publish=args.publish)

@@ -165,5 +165,6 @@ FOMC_DECISION_DATES = [
 # ── Gemini (12절) ────────────────────────────────────────────────────────
 CLASSIFY_BATCH_SIZE = 15
 CLASSIFY_MAX_BATCHES_PER_RUN = 40   # 무료 한도 안에서 하루치. 남은 건 다음 실행이 이어받는다
+RECLASSIFY_MAX_BATCHES_PER_RUN = 2  # 예비 모델 분류를 Gemini 로 다시 — 실행당 상한 (Gemini 하루 한도 보호, 2026-10-15)
 CLASSIFY_SINCE_DAYS = 90            # 백필 범위
 # LLM 모델 · 예비 사슬 · 키 쿨다운은 experiments/llm_chain.py 하나로 (2026-10-14 — 모든 리포트 공용)

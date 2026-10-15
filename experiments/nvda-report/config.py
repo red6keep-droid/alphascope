@@ -212,6 +212,7 @@ CLASSIFY_KINDS = ("news", "newsroom", "blog", "fedreg", "court")
 CLASSIFY_BATCH_SIZE = 20
 CLASSIFY_MAX_BATCHES_PER_RUN = 12
 CLASSIFY_SINCE_DAYS = 30
+RECLASSIFY_MAX_BATCHES_PER_RUN = 2  # 예비 모델 분류를 Gemini 로 다시 — 실행당 상한 (Gemini 하루 한도 보호, 2026-10-15)
 CLASSIFY_MAX_ATTEMPTS = 2         # 검증 탈락이 이 횟수를 넘으면 prefilter_reason='classify_failed'
 MAX_TEXT_CHARS = 1200
 # LLM 모델 · 예비 사슬 · 키 쿨다운은 experiments/llm_chain.py 하나로 (2026-10-14 — 모든 리포트 공용)

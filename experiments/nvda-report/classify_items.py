@@ -16,7 +16,7 @@ import config
 import db
 import labels
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-from llm_chain import LLMPool, usage_line  # noqa: E402  — 모든 리포트 공용 LLM 사슬 (experiments/llm_chain.py, 2026-10-14)
+from llm_chain import PROVISIONAL_SQL, LLMPool, usage_line  # noqa: E402  — 모든 리포트 공용 LLM 사슬 (experiments/llm_chain.py, 2026-10-14)
 
 PROMPT_FILE = os.path.join(config.PROMPTS_DIR, "classify.txt")
 
@@ -37,12 +37,14 @@ def pending_items(conn, since_days, limit):
     return [dict(r) for r in rows]
 
 
-def recent_facts(conn, days=config.NOVELTY_WINDOW_DAYS, limit=config.NOVELTY_CONTEXT_MAX):
+def recent_facts(conn, days=config.NOVELTY_WINDOW_DAYS, limit=config.NOVELTY_CONTEXT_MAX, exclude=()):
+    """exclude: 재분류하는 기사 자신 — 제 예전 요약을 보고 'repeat' 로 판정하지 않게."""
     since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    skip = f"AND item_id NOT IN ({','.join('?' * len(exclude))})" if exclude else ""
     rows = conn.execute(
-        """SELECT published_at, ai_area, ai_fact FROM items
-           WHERE analyzed_at IS NOT NULL AND ai_fact IS NOT NULL AND ai_relevance >= 1 AND published_at >= ?
-           ORDER BY published_at DESC LIMIT ?""", (since, limit)).fetchall()
+        f"""SELECT published_at, ai_area, ai_fact FROM items
+           WHERE analyzed_at IS NOT NULL AND ai_fact IS NOT NULL AND ai_relevance >= 1 AND published_at >= ? {skip}
+           ORDER BY published_at DESC LIMIT ?""", (since, *exclude, limit)).fetchall()
     return [f"{r['published_at'][:10]} [{r['ai_area']}] {r['ai_fact']}" for r in rows]
 
 
@@ -168,6 +170,53 @@ def classify(conn, since_days=config.CLASSIFY_SINCE_DAYS, max_batches=config.CLA
     print(f"[classify] 완료 — 저장 {written:,}건 · 검증 탈락 {dropped_total} · 호출 {pool.calls}회 (예비 {pool.fallback_calls}회) · 단계별 성공/시도 {usage_line()}")
     db.set_meta(conn, "classify_last_run_at", db.now_iso())
     conn.commit()
+    return written
+
+
+def reclassify(conn, since_days=config.CLASSIFY_SINCE_DAYS, max_batches=config.RECLASSIFY_MAX_BATCHES_PER_RUN,
+               batch_size=config.CLASSIFY_BATCH_SIZE):
+    """예비 모델(DeepSeek · Groq)이 임시로 분류한 행을 Gemini 로 다시 분류한다 (2026-10-15).
+
+    예비 분류는 Gemini 와 80칸 중 58칸만 일치하고(Gemini 재실행 70), 한 번 저장되면 다시 분류되지 않아 신규성 판정에 남는다.
+    렌더가 끝난 뒤에 돌려 그날 글 · 서술 몫의 Gemini 한도는 건드리지 않는다. Gemini 가 실패하면 그대로 두고 멈춘다(다음 실행이 이어받음).
+    """
+    since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=since_days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    rows = conn.execute(
+        f"""SELECT item_id, kind, source, published_at, title, summary, raw_json FROM items
+            WHERE {PROVISIONAL_SQL} AND analyzed_at IS NOT NULL AND prefilter_reason IS NULL AND published_at >= ?
+            ORDER BY published_at ASC LIMIT ?""", (since, max_batches * batch_size)).fetchall()
+    items = [dict(r) for r in rows]
+    left = conn.execute(f"SELECT COUNT(*) FROM items WHERE {PROVISIONAL_SQL} AND analyzed_at IS NOT NULL AND prefilter_reason IS NULL "
+                        "AND published_at >= ?", (since,)).fetchone()[0]
+    if not items:
+        print("[reclassify] 예비 모델 분류 0건")
+        return 0
+    try:
+        pool = LLMPool("json-gemini", label="nvda-reclassify")
+    except RuntimeError as e:
+        print(f"[reclassify] 건너뜀 — {e}")
+        return 0
+    prompt_head = _load_prompt()
+    batches = [items[i:i + batch_size] for i in range(0, len(items), batch_size)]
+    print(f"[reclassify] 예비 모델 분류 {left}건 중 {len(items)}건 → {len(batches)}배치 (Gemini 만)")
+    written = 0
+    for n, batch in enumerate(batches, 1):
+        facts = recent_facts(conn, exclude=[it["item_id"] for it in batch])
+        try:
+            valid = classify_batch(pool, prompt_head, batch, facts)
+        except Exception as e:  # noqa: BLE001
+            print(f"[reclassify] 배치 {n}/{len(batches)} 실패 — 예비 분류를 그대로 두고 멈춤: {str(e)[:200]}")
+            break
+        now = db.now_iso()
+        conn.executemany(
+            f"""UPDATE items SET ai_area=:ai_area, ai_direction=:ai_direction, ai_novelty=:ai_novelty, ai_relevance=:ai_relevance,
+                 ai_fact=:ai_fact, ai_entities=:ai_entities, ai_speaker=:ai_speaker, is_event=:is_event, analyzed_at=:analyzed_at, ai_model=:ai_model
+               WHERE item_id=:item_id AND {PROVISIONAL_SQL}""",
+            [dict(v, analyzed_at=now, ai_model=pool.last_model) for v in valid])
+        conn.commit()
+        written += len(valid)
+        print(f"[reclassify] 배치 {n}/{len(batches)}: {len(valid)}/{len(batch)}건 Gemini 로 교체")
+    print(f"[reclassify] 완료 — {written}건 교체 · 남은 예비 분류 {left - written}건")
     return written
 
 
