@@ -495,7 +495,8 @@ def sec_chart(output_dir=None, a=None):
     zoom = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'
             '<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg>')
     # 확대 보기: 그림 전체가 원본 링크(새 창), 오른쪽 아래 돋보기 아이콘 (2026-10-11 사용자). 아래 16px = 데일리 커버 이미지 (2026-10-13 사용자)
-    return (f'<a href="{_esc(c["url"])}" target="_blank" rel="noopener" title="그래프 확대 보기" aria-label="그래프 확대 보기" '
+    # data-zoom: 테마 JS 가 새 창 대신 전체 화면 팝업 + 가로 스크롤로 연다 (2026-10-16 사용자, 가이드 8절). JS 없으면 원본 링크
+    return (f'<a href="{_esc(c["url"])}" data-zoom="1" target="_blank" rel="noopener" title="그래프 확대 보기" aria-label="그래프 확대 보기" '
             f'style="position:relative;display:block;margin:0 0 16px;max-width:1024px;">'
             f'<img src="{_esc(c["url"])}" alt="NVDA {c.get("window", 30)}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'
             f'<span style="position:absolute;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'

@@ -214,6 +214,15 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .rt-pop-li > span:last-child { min-width: 0; }
 .rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
 .rt-pop-p b { color: #111; }
+/* 그래프 확대 팝업 (2026-10-16 사용자) — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
+.img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); }
+.img-pop[hidden] { display: none; }
+.img-pop-head { position: relative; flex: none; display: flex; align-items: center; min-height: 56px; padding: 12px 60px 12px 16px; color: #fff; }
+.img-pop-title { font-size: 16px; line-height: 24px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.img-pop .rt-pop-close { top: 12px; }
+.img-pop-scroll { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 0 16px; }
+.img-pop-scroll img { display: block; flex: none; max-width: none; height: auto; border-radius: 8px; background: #fff; }
+.img-pop-hint { flex: none; padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); font-size: 14px; line-height: 20px; color: rgba(255,255,255,.8); text-align: center; }
 .rt-pop-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 20px; line-height: 28px; cursor: pointer; }
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }

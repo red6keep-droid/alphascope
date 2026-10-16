@@ -2237,6 +2237,40 @@ body.menu-open { overflow: hidden; }
   });
 })();
 
+/* ============================================================ 그래프 확대 (2026-10-16 사용자: "폰에서 그래프를 확대해도 똑같다 — 손가락으로 좌우로 스크롤하듯")
+   리포트의 그래프 링크(a[data-zoom], 옛 글은 aria-label "그래프 확대 보기")를 누르면 새 창 대신 전체 화면 팝업에
+   그림을 화면 폭의 2.2배(최소 원본 폭, 최대 원본의 2배)로 띄우고 가로 스크롤 — 처음 위치는 오른쪽 끝(최근 봉). 닫기 × · 바깥 · Esc. 디자인 가이드 8절 */
+(function () {
+  'use strict';
+  var links = document.querySelectorAll('.post-body a[data-zoom], .post-body a[aria-label="그래프 확대 보기"]');
+  if (!links.length) return;
+  var pop = document.createElement('div'); pop.className = 'img-pop'; pop.hidden = true;
+  pop.innerHTML = '<div class="img-pop-head"><span class="img-pop-title"></span><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
+    '<div class="img-pop-scroll"><img alt=""/></div><div class="img-pop-hint">좌우로 밀어서 보세요</div>';
+  document.body.appendChild(pop);
+  var box = pop.querySelector('.img-pop-scroll'), im = pop.querySelector('img'), last = null;
+  function size(nat) {
+    var w = Math.round(window.innerWidth * 2.2);
+    w = Math.max(w, nat || 1024); w = Math.min(w, (nat || 1024) * 2);
+    im.style.width = w + 'px';
+  }
+  function open(a) {
+    last = a;
+    var src = a.querySelector('img'); im.src = (src && src.currentSrc) || a.getAttribute('href');
+    im.alt = (src && src.alt) || '';
+    pop.querySelector('.img-pop-title').textContent = (src && src.alt) || '그래프';
+    pop.hidden = false; document.body.classList.add('menu-open');   /* 뒤 화면 스크롤 잠금 (메뉴 서랍과 같은 규칙) */
+    var go = function () { size(im.naturalWidth); box.scrollLeft = box.scrollWidth; pop.querySelector('.rt-pop-close').focus(); };
+    if (im.complete && im.naturalWidth) go(); else im.onload = go;
+  }
+  function close() { pop.hidden = true; document.body.classList.remove('menu-open'); if (last) last.focus(); }
+  [].slice.call(links).forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); open(a); }); });
+  pop.addEventListener('click', function (e) { if (e.target === pop || e.target === box) close(); });
+  pop.querySelector('.rt-pop-close').addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
+  window.addEventListener('resize', function () { if (!pop.hidden) size(im.naturalWidth); });
+})();
+
 /* ============================================================ 툴팁 팝업창 (2026-10-12 사용자: "툴팁은 팝업창으로", 내용 18px)
    리포트의 ? 아이콘([data-tip])을 누르면 화면 가운데 창. 제목은 아이콘 앞 글자(예: "시장 국면", "판정"), 내용은 data-tip.
    닫기: × · 바깥 누르기 · Esc. 닫으면 포커스를 아이콘으로 돌려준다. */
