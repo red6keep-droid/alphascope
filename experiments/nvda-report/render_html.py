@@ -436,7 +436,15 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
     bg, bd = CARD_DIR[theme]
     # 글머리표는 3px 점, 글자 14px (2026-10-11 사용자). 규칙 줄은 안내 색(NOTE). lines 항목은 str 또는 (str, "note")
     def li(item):
-        text, kind = (item, "") if isinstance(item, str) else item
+        # 항목: str · (str, "note") · (str, "plain") · ("row", 이름, 값, 뜻)
+        kind = "row" if isinstance(item, tuple) and item[0] == "row" else ("" if isinstance(item, str) else item[1])
+        text = item if isinstance(item, str) else item[0]
+        if kind == "row":   # 근거 줄 — 블릿 · 콜론 없이 이름 왼쪽 | 값 오른쪽, 아래 14px 회색 뜻 (2026-10-16 사용자: "블릿과 근거 사이 점들이 헷갈린다, 근거를 자세히")
+            _, name, value, note = item
+            return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd};">'
+                    f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
+                    f'<span style="flex:none;white-space:nowrap;color:#111;">{_esc(name)}</span><span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value))}</span></span>'
+                    + (f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span>' if note else "") + '</li>')
         if kind == "plain":   # 쉬운 말 한 줄 — 점 없이 굵게, 아래 8px (2026-10-16 사용자: 강조 카드 펼침 맨 위에 쉬운 설명)
             return f'<li style="list-style:none;margin:9px 0 17px;font-weight:700;color:#111;line-height:{_dk.LH_EMPH};">{_esc(text)}</li>'
         col = NOTE if kind == "note" else "#111"
@@ -484,31 +492,34 @@ FLOW_PLAIN = {"모이는 중": "한 달간 반도체가 시장보다 강함", "�
 
 
 def regime_lines(mr):
-    """짧은 블릿 "라벨 : 값" (2026-10-16 사용자: 문장을 길게 쓰지 마). 규칙은 툴팁 (regime_rule)."""
+    """근거 줄 — 이름 | 값, 아래 뜻 (2026-10-16 사용자: 블릿 · 콜론 없이, 근거를 자세히). 규칙 전체는 툴팁 (regime_rule)."""
+    pb, cr = abs(config.REGIME_PULLBACK_PCT), abs(config.REGIME_CORRECTION_PCT)
     st = mr.get("streak") or 0
     lines = [(REGIME_PLAIN.get(mr["regime"], ""), "plain"),
-             f"S&P 500 고점 대비 : {mr['pct_from_high']:+.1f}%",
-             f"200일 평균 : {'위' if mr['above_ma200'] else '아래'}"]
+             ("row", "S&P 500 고점 대비", f"{mr['pct_from_high']:+.1f}%", f"1년 최고가보다 얼마나 아래인지 — −{pb:.0f}% 안이면 상승 추세, −{cr:.0f}% 넘게 빠지면 조정장"),
+             ("row", "200일 평균선", "위" if mr["above_ma200"] else "아래", "약 10개월 평균 가격 — 위에 있으면 긴 흐름이 오름세")]
     if mr.get("vix") is not None:
-        lines.append(f"시장 흔들림 (VIX) : {mr['vix']:.1f} (30 이상 불안)")
-    lines.append(f"연속 : {abs(st)}일 {'상승' if st > 0 else '하락'}" if st else "연속 : 보합")
+        lines.append(("row", "시장 흔들림 (VIX)", f"{mr['vix']:.1f}", f"앞으로 한 달 S&P 500 이 얼마나 흔들릴지 옵션 시장이 보는 값 — 20 아래 차분, {config.REGIME_VIX_HIGH:.0f} 넘으면 불안"))
+    lines.append(("row", "연속 등락", (f"{abs(st)}일 {'상승' if st > 0 else '하락'}" if st else "보합"), "S&P 500 이 며칠째 같은 방향으로 마감했는지"))
     if mr.get("fng"):   # CNN 공포·탐욕 지수 — 국면 판정에는 쓰지 않고 보여 주기만
-        lines.append(f"공포·탐욕 지수 : {mr['fng']['score']:.0f} {mr['fng'].get('rating_ko') or mr['fng'].get('rating')} (0 공포 ~ 100 탐욕)")
+        lines.append(("row", "공포·탐욕 지수", f"{mr['fng']['score']:.0f} {mr['fng'].get('rating_ko') or mr['fng'].get('rating')}", "CNN 이 7가지 지표로 낸 투자 심리 — 0 극단적 공포 ~ 100 극단적 탐욕"))
     return lines
 
 
 def sector_flow_lines(sf):
-    """짧은 블릿 "라벨 : 값" (2026-10-16 사용자). 규칙은 툴팁 (sector_flow_rule)."""
+    """근거 줄 — 이름 | 값, 아래 뜻 (2026-10-16 사용자). 규칙 전체는 툴팁 (sector_flow_rule)."""
+    pp = config.SECTOR_FLOW_PP
     lines = [(FLOW_PLAIN.get(sf["state"], ""), "plain"),
-             f"반도체 vs 시장 ({sf['days']}일) : {sf['rel_pp']:+.1f}%p (±{config.SECTOR_FLOW_PP:.0f}%p 넘으면 방향)"]
+             ("row", f"반도체 vs 시장 ({sf['days']}일)", f"{sf['rel_pp']:+.1f}%p",
+              f"반도체 ETF(SMH) {sf['days']}일 수익률에서 S&P 500 수익률을 뺀 값 — +{pp:.0f}%p 넘으면 돈이 모이는 중, −{pp:.0f}%p 아래면 빠지는 중")]
     if sf.get("smh_rank"):
-        lines.append(f"섹터 순위 : 12개 중 {sf['smh_rank']}위")
+        lines.append(("row", "섹터 순위", f"12개 중 {sf['smh_rank']}위", "같은 기간 11개 섹터와 반도체를 수익률 순으로 세운 자리"))
     secs = sf.get("sectors") or []
     if secs:
-        lines.append("앞선 섹터 : " + " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[:3]))
-        lines.append("뒤처진 섹터 : " + " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[-3:][::-1]))
+        lines.append(("row", "앞선 섹터", " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[:2]), "시장보다 가장 많이 오른 섹터 — 돈이 간 곳"))
+        lines.append(("row", "뒤처진 섹터", " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[-2:][::-1]), "시장보다 가장 못 간 섹터"))
     if sf.get("shares_5d") is not None:
-        lines.append(f"반도체 ETF 주식수 5일 : {sf['shares_5d']:+.1f}%")
+        lines.append(("row", "반도체 ETF 주식 수 (5일)", f"{sf['shares_5d']:+.1f}%", "ETF 에 실제로 들어온 돈 — 늘면 유입, 줄면 유출"))
     return lines
 
 
@@ -521,19 +532,19 @@ def bollinger_rule():
 
 
 def bollinger_lines(bb):
-    """짧은 블릿 — "라벨 : 값" 한 줄씩 (2026-10-16 사용자: "블릿으로, 문장을 길게 쓰지 마")."""
+    """근거 줄 — 이름 | 값, 아래 뜻 (2026-10-16 사용자)."""
     low = bb["state"] == "하단 도달"
     lines = [("한 달 범위 " + ("아래로 나감" if low else "위로 나감"), "plain"),
-             f"한 달 범위 : ${bb['lower']:,.0f} ~ ${bb['upper']:,.0f}",
-             f"오늘 종가 : ${bb['close']:,.2f}"]
+             ("row", "한 달 범위", f"${bb['lower']:,.0f} ~ ${bb['upper']:,.0f}", "최근 20일 평균 가격 ± 보통 흔들림 2배 — 가격이 대부분 이 안에서 움직인다 (볼린저 밴드)"),
+             ("row", "오늘 종가", f"${bb['close']:,.2f}", f"범위 {'아래' if low else '위'} — 한 달 기준으로 {'많이 내린' if low else '많이 오른'} 날")]
     if bb.get("days", 0) > 1:
-        lines.append(f"연속 : {bb['days']}일째")
+        lines.append(("row", "연속", f"{bb['days']}일째", f"범위 {'아래' if low else '위'}에 머문 날 수"))
     st = (bb.get("stats") or {}).get("boll_lower" if low else "boll_upper")
     base = (bb.get("stats") or {}).get("base") or {}
     if st and base:
-        lines.append(f"과거 10년 : {st['n']}회")
-        lines.append(f"20일 뒤 오른 비율 : {st['up20']}% (평소 {base['up20']}%)")
-        lines.append(f"60일 뒤 오른 비율 : {st['up60']}% (평소 {base['up60']}%)")
+        lines.append(("row", "과거 10년 같은 날", f"{st['n']}회", f"엔비디아가 범위 {'아래' if low else '위'}로 처음 나간 날의 수"))
+        lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"그 날들 가운데 20거래일 뒤 가격이 더 높았던 비율 — 아무 날이나 고르면 {base['up20']}%"))
+        lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"같은 방식으로 60거래일 뒤 — 아무 날 {base['up60']}%. 과거 빈도이지 예측이 아니다"))
     return lines
 
 
@@ -542,22 +553,24 @@ def overheat_rule():
             f"하나라도 해당하는 날만 카드. 통계는 10년간 그 조건에 처음 들어간 날의 20·60일 뒤 수익률 빈도이지 예측이 아니다")
 
 
-OVERHEAT_SHORT = {"rsi80": ("단기 과열 온도", "80 이상", ""), "ma200_40": ("200일 평균 대비", "+40% 이상", "%"), "ret20_25": ("20일 수익률", "+25% 이상", "%")}
+OVERHEAT_SHORT = {"rsi80": ("단기 과열 온도 (RSI 14)", "80 이상", "", "최근 14일 오른 힘과 내린 힘의 비율 0~100 — 70 넘으면 과열, 80 은 드문 수준"),
+                  "ma200_40": ("200일 평균선과의 거리", "+40% 이상", "%", "약 10개월 평균 가격보다 얼마나 위에 있는지 — 40% 넘게 벌어지는 일은 드물다"),
+                  "ret20_25": ("20일 수익률", "+25% 이상", "%", "한 달(20거래일) 동안 오른 폭")}
 
 
 def overheat_lines(oh):
-    """짧은 블릿 — 조건마다 값 · 과거 10년 횟수 · 20 · 60일 뒤 오른 비율 (2026-10-16 사용자: "블릿으로, 문장을 길게 쓰지 마")."""
+    """근거 줄 — 조건마다 값 · 과거 10년 횟수 · 20 · 60일 뒤 오른 비율, 아래 뜻 (2026-10-16 사용자)."""
     lines = [("짧은 기간에 빠르게 오름", "plain")]
     stats, base = (oh.get("stats") or {}), ((oh.get("stats") or {}).get("base") or {})
     for k in oh["active"]:
-        name, rule, unit = OVERHEAT_SHORT[k]
+        name, rule, unit, note = OVERHEAT_SHORT[k]
         v = oh["values"].get(k)
-        lines.append(f"{name} : {v:+.1f}{unit} (기준 {rule})" if unit else f"{name} : {v:.1f} (기준 {rule})")
+        lines.append(("row", name, (f"{v:+.1f}{unit}" if unit else f"{v:.1f}"), f"기준 {rule} — {note}"))
         st = stats.get(k) or {}
         if st and base:
-            lines.append(f"과거 10년 : {st['n']}회")
-            lines.append(f"20일 뒤 오른 비율 : {st['up20']}% (평소 {base['up20']}%)")
-            lines.append(f"60일 뒤 오른 비율 : {st['up60']}% (평소 {base['up60']}%)")
+            lines.append(("row", "과거 10년 같은 날", f"{st['n']}회", "이 조건에 처음 들어간 날의 수"))
+            lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"그 날들 가운데 20거래일 뒤 가격이 더 높았던 비율 — 아무 날 {base['up20']}%"))
+            lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"60거래일 뒤 — 아무 날 {base['up60']}%. 과거 빈도이지 예측이 아니다"))
     return lines
 
 
