@@ -490,23 +490,17 @@ FLOW_PLAIN = {"모이는 중": "한 달간 반도체가 시장보다 강함", "�
 
 
 def regime_plain(mr):
-    """2번 카드 첫 줄 — 값으로 만든 상세 설명 2문장 (2026-10-17 사용자: "줄이지 말고 상세하게"). 평가어 없이."""
-    pb, cr = abs(config.REGIME_PULLBACK_PCT), abs(config.REGIME_CORRECTION_PCT)
+    """2번 카드 첫 줄 — 값으로 만든 2문장 (2026-10-17 사용자: 상세하게 → "약간만 줄여"). 평가어 없이."""
     ph, above = mr["pct_from_high"], mr["above_ma200"]
     where = f"1년 최고가보다 {abs(ph):.1f}% 아래" if ph < -0.05 else "1년 최고가 근처"
-    first = f"S&P 500이 {where}이고 200일 평균선 {'위' if above else '아래'}에 있어 '{mr['regime']}'으로 분류한다."
-    if mr["regime"] == "상승 추세":
-        first += f" 고점에서 {pb:.0f}% 안쪽이면 이렇게 본다."
-    elif mr["regime"] == "단기 조정":
-        first += f" 고점에서 {pb:.0f}~{cr:.0f}% 빠진 구간이다."
-    elif mr["regime"] == "조정장":
-        first += f" 고점에서 {cr:.0f}% 넘게 빠졌거나 200일 평균선 아래인 구간이다."
+    reg = mr["regime"]
+    cop = "이다" if (ord(reg[-1]) - 0xAC00) % 28 else "다"   # 받침 있으면 '이다' (상승 추세다 · 단기 조정이다)
+    first = f"S&P 500이 {where}, 200일 평균선 {'위' if above else '아래'}라 '{reg}'{cop}."
     vix = mr.get("vix")
     if vix is not None:
         calm = "차분한 편" if vix < 20 else ("보통보다 높은 편" if vix < config.REGIME_VIX_HIGH else "크게 흔들리는 편")
         first += f" 시장 흔들림(VIX)은 {vix:.1f}로 {calm}이다."
     return first
-
 
 def regime_lines(mr):
     """2번 카드 — 상세 첫 줄 + 근거 줄(이름 | 값 · 짧은 뜻). 규칙 전체는 툴팁 (regime_rule)."""
@@ -524,20 +518,12 @@ def regime_lines(mr):
 
 
 def flow_plain(sf):
-    """3번 카드 첫 줄 — 상세 설명 (2026-10-17 사용자)."""
+    """3번 카드 첫 줄 — 2문장 (2026-10-17 사용자)."""
     pp, rel, n = config.SECTOR_FLOW_PP, sf["rel_pp"], sf["days"]
     more = f"{abs(rel):.1f}%p 더 올랐다" if rel > 0.05 else (f"{abs(rel):.1f}%p 덜 올랐다" if rel < -0.05 else "비슷하게 움직였다")
-    first = f"최근 {n}거래일 동안 반도체 ETF(SMH)가 S&P 500보다 {more}."
-    if sf["state"] == "모이는 중":
-        first += f" 차이가 +{pp:.0f}%p를 넘어 돈이 반도체로 모이는 중으로 본다."
-    elif sf["state"] == "빠져나가는 중":
-        first += f" 차이가 −{pp:.0f}%p 아래라 돈이 반도체에서 빠지는 중으로 본다."
-    else:
-        first += f" 차이가 ±{pp:.0f}%p 안이라 돈이 어느 쪽으로 움직인다고 보기 어렵다."
-    if sf.get("smh_rank"):
-        first += f" 11개 섹터와 같이 세우면 {sf['smh_rank']}위다."
-    return first
-
+    tail = {"모이는 중": f"차이가 +{pp:.0f}%p를 넘어 돈이 반도체로 모이는 중이다.",
+            "빠져나가는 중": f"차이가 −{pp:.0f}%p 아래라 돈이 반도체에서 빠지는 중이다."}.get(sf["state"], f"차이가 ±{pp:.0f}%p 안이라 돈의 방향은 뚜렷하지 않다.")
+    return f"최근 {n}거래일 반도체 ETF가 S&P 500보다 {more}. {tail}"
 
 def sector_flow_lines(sf):
     """3번 카드 — 상세 첫 줄 + 근거 줄. 규칙 전체는 툴팁 (sector_flow_rule)."""
@@ -570,10 +556,9 @@ def bollinger_lines(bb):
     base = (bb.get("stats") or {}).get("base") or {}
     side, days = ("아래" if low else "위"), bb.get("days", 0)
     reach = "끝에 닿았다" if days <= 1 else f"끝을 {days}일째 넘어 있다"
-    plain = (f"최근 한 달 엔비디아는 대개 ${bb['lower']:,.0f}~${bb['upper']:,.0f} 사이에서 움직였는데, 오늘 종가 ${bb['close']:,.2f}로 "
-             f"그 {side} {reach}. 한 달 기준으로 {'많이 내린' if low else '많이 오른'} 날이다.")
+    plain = f"최근 한 달 대개 ${bb['lower']:,.0f}~${bb['upper']:,.0f}에서 움직였는데 오늘 ${bb['close']:,.2f}로 {side} {reach}."   # 2문장 (2026-10-17 사용자: 약간만 줄여)
     if st and base:
-        plain += f" 과거 10년 이런 날은 {st['n']}번 있었고, 그중 {st['up20']}%가 20거래일 뒤 더 높았다(아무 날 {base['up20']}%)."
+        plain += f" 과거 10년 이런 날의 {st['up20']}%가 20거래일 뒤 더 높았다(아무 날 {base['up20']}%)."
     lines = [(plain, "plain"),
              ("row", "한 달 범위", f"${bb['lower']:,.0f} ~ ${bb['upper']:,.0f}", "20일 평균 ± 보통 흔들림 2배"),
              ("row", "오늘 종가", f"${bb['close']:,.2f}", f"범위 {'아래' if low else '위'}")]
@@ -603,7 +588,7 @@ def overheat_lines(oh):
     """과열 카드 — 상세 첫 줄 + 조건마다 근거 줄 (2026-10-17 사용자: 2번 카드와 같게)."""
     stats, base = (oh.get("stats") or {}), ((oh.get("stats") or {}).get("base") or {})
     parts = [OVERHEAT_PLAIN[k].format(v=oh["values"].get(k) or 0) for k in oh["active"]]
-    plain = " · ".join(parts) + ". 짧은 기간에 빠르게 오른 상태다."
+    plain = " · ".join(parts) + "."
     k0 = oh["active"][0] if oh["active"] else None
     if k0 and stats.get(k0) and base:
         plain += f" 과거 10년 이런 날의 {stats[k0]['up20']}%가 20거래일 뒤 더 높았다(아무 날 {base['up20']}%)."
