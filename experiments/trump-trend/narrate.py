@@ -17,6 +17,51 @@ import fact_check  # noqa: E402  — 서술 숫자 · 방향 검사 (2026-10-14,
 PROMPT_FILE = os.path.join(config.PROMPTS_DIR, "narrate.txt")
 FORBIDDEN = re.compile(r"때문에|영향을 미|하락시|상승시|원인|오를 것|내릴 것|전망")
 
+# watch_tomorrow 문장 검사 (2026-10-16). 지시문("오늘 이벤트 주제 · robust 통계만 · d3/d5 금지")을 모델이 지키는지 코드가 확인한다 —
+# 예비 · 대체 모델(DeepSeek 10-15, flash-lite 10-16)이 오늘 이벤트 0건인 날 robust 아닌 과거 통계를 인용한 문장을 만들었다.
+# 문장 모양은 프롬프트가 고정한다: "과거 [주제] 발언 [N]번 뒤, [이름(티커)]은 [그날 / 다음 날] 평균 [x.x]% [올랐다 / 내렸다] — 내일 관찰 대상."
+NONE_WATCH = "오늘 주제에서는 발언 뒤 평소와 다르게 움직인 자산이 없다."
+WATCH_RE = re.compile(r"과거\s*(?P<topic>.+?)\s*발언\s*(?P<n>\d+)\s*번\s*뒤,?\s*(?P<name>[^()]*?)\((?P<sym>[A-Z]{1,5})\)\s*(?:은|는|이|가)?\s*"
+                      r"(?P<hz>그날|다음\s*날)\s*평균\s*(?P<val>\d+(?:\.\d+)?)\s*%\s*(?P<dir>올랐다|내렸다)")
+HORIZON = {"그날": "close", "다음날": "next_close"}
+
+
+def _topic_names(block_key):
+    """reactions 블록 이름 → 문장이 쓸 수 있는 한국어 주제 ("Regulation#positive" → {"규제"}, "Trade / Tariff" → {"무역", "관세"})."""
+    parts = [p.strip() for p in block_key.split("#")[0].split(" / ")]
+    names = {config.TOPIC_KO.get(parts[0], parts[0])}
+    if len(parts) > 1:
+        names.add(config.TERM_KO.get(parts[1], parts[1]))
+    return names
+
+
+def check_watch(sentences, slim):
+    """각 문장을 reactions 의 통계와 대조해 맞는 것만 남긴다. 조건: 주제가 오늘(24h) 이벤트 주제이고, N · 시점 · 방향 · 소수 첫째 자리
+    수치가 같은 placebo.robust 통계가 있을 것. 남는 문장이 없으면 고정 문장 하나 (오늘 이벤트가 없는 날도 여기로 온다)."""
+    today = {e.get("topic") for e in slim.get("recent_events", [])}
+    kept, dropped = [], []
+    for s in sentences:
+        if NONE_WATCH[:14] in s:
+            continue   # 고정 문장은 다른 문장이 하나도 안 남을 때만
+        m = WATCH_RE.search(s)
+        ok = False
+        if m:
+            hz = HORIZON[m["hz"].replace(" ", "")]
+            up = m["dir"] == "올랐다"
+            for key, blk in slim["reactions_publishable"].items():
+                if key.split("#")[0].split(" / ")[0] not in today or m["topic"].strip() not in _topic_names(key):
+                    continue
+                st = (blk["symbols"].get(m["sym"]) or {}).get(hz)
+                if not st or not (st.get("placebo") or {}).get("robust"):
+                    continue
+                if st["n"] == int(m["n"]) and (st["mean"] > 0) == up and abs(round(abs(st["mean"]), 1) - float(m["val"])) < 0.051:
+                    ok = True
+                    break
+        (kept if ok else dropped).append(s)
+    for s in dropped:
+        print(f"[narrate] 관찰 문장 탈락 — 오늘 주제 · robust 통계와 불일치: {s[:100]}")
+    return kept or [NONE_WATCH]
+
 
 def _load_prompt():
     with open(PROMPT_FILE, "r", encoding="utf-8") as f:
@@ -65,6 +110,7 @@ def validate(narrative, source=None):
             raise ValueError(f"{key} 비어 있음")
         out[key] = clean[:4]
     if source is not None:
+        out["watch_tomorrow"] = check_watch(out["watch_tomorrow"], source)
         problems = fact_check.check(out["what_changed"] + out["watch_tomorrow"], source)
         if problems:
             raise ValueError("숫자 검사 — " + " / ".join(problems))
