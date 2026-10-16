@@ -1,0 +1,26 @@
+day,scope,symbols,note
+1996-07-26,섹터,^SOX,검색: semiconductor stocks rally July 26 1996 — 해당 일자 기사 없음
+1996-11-22,섹터,^SOX,검색: chip stocks surge November 22 1996 — 해당 일자 기사 없음
+1997-02-12,섹터,^SOX,검색: semiconductor stocks soar February 12 1997 — 확인 못 함
+1997-06-12,시장,JPY=X,검색: dollar yen June 12 1997 — 날짜 맞는 기사 없음
+1997-08-08,시장,JPY=X,검색: dollar falls against yen August 8 1997 — 해당 일자 기사 없음
+1998-01-05,시장,^TNX,검색: Treasury yields fall January 5 1998 — 당일 기사 없음 (아시아 위기 안전자산 선호 배경)
+1998-01-23,시장,^TNX DX-Y.NYB,검색: bonds slump dollar falls January 23 1998 — 해당 일자 기사 없음
+1998-06-10,섹터,^SOX,검색: chip stocks plunge June 10 1998 — 반도체 언급 기사 없음
+1999-06-08,시장,DX-Y.NYB,검색: dollar falls June 8 1999 — 기사 없음
+1999-07-19,시장,JPY=X,검색: yen surges July 19 1999 — 당일 기사 없음
+1999-08-19,종목,NVDA,검색: Nvidia stock jumps August 1999 — 기사 없음
+1999-11-19,종목,NVDA,검색: Nvidia shares surge November 1999 — 3분기 사상 최대 실적 기사 있으나 날짜 일치 확인 못 함
+1999-12-06,시장,DX-Y.NYB,검색: dollar falls December 6 1999 — 기사 없음
+2000-02-10,종목,NVDA,검색: Nvidia shares jump February 2000 — 기사 없음
+2000-08-10,시장,^TNX,검색: Treasury bonds rally August 10 2000 — 원인 미기재
+2000-11-14,종목,NVDA,검색: Nvidia 2000-11-14 급등 — 당일 주가 기사 못 찾음
+2001-09-04,시장,^TNX DX-Y.NYB,검색: 2001-09-04 국채 금리 급등·달러 강세 — 당일 기사 없음
+2002-03-07,시장,JPY=X,검색: 2002-03-07 엔화 급등 — 당일 기사 없음
+2003-04-23,시장,CL=F,검색: 2003-04-23 WTI 급락 — 당일 기사 없음 (월물 교체 가능성)
+2003-07-07,섹터,^SOX SMH,검색: 2003-07-07 반도체지수 7% 급등 — 당일 기사 없음
+2005-01-27,종목,NVDA,검색: 엔비디아 2005-01-27 8% 상승 — 당일 기사 없음
+2005-10-06,시장,DX-Y.NYB,검색: 2005-10-06 달러 지수 하락 — 당일 기사 없음
+2007-04-05,종목,NVDA,검색: Nvidia shares jump April 5 2007 — 해당일 기사 없음
+2007-06-21,종목,NVDA,검색: Nvidia stock June 21 2007 analyst — 날짜 맞는 기사 없음
+2012-02-27,,JPY=X,"검색: 'yen falls February 27 2012' — 2월 중순 BOJ 추가 완화(2-14) 이후 엔 약세 흐름 기사만 확인, 2-27 당일 원인 기사 없음"

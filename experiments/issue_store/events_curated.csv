@@ -1,27 +1,93 @@
 start,window_days,kind,subkind,scope,symbols,title,note,confidence
+1996-02-20,5,금리 · 중앙은행,연준 의장 발언,시장,^TNX,"그린스펀 상·하원 반기 증언, 채권시장이 추가 금리 인하 없음 신호로 해석해 장기금리 급등",Motley Fool Evening News 1996-02-21 https://g.foolcdn.com/EveningNews/1996/eia_0221.htm,기사 확인 (2026-10-17 검색)
+1996-04-08,5,경제지표,고용 충격,시장,^TNX,"3월 고용보고서(4/5 성금요일 발표, 주식시장 휴장) 고용 증가 2개월 연속 — 금리 인하 기대 소멸, 채권 급락","Christian Science Monitor 1996-04-08 https://www.csmonitor.com/layout/set/amphtml/1996/0408/08012.html (움직임은 4/5, 데이터상 4/8)",기사 확인 (2026-10-17 검색)
+1997-02-26,5,금리 · 중앙은행,연준 의장 발언,시장,^TNX,"그린스펀 상원 반기 통화정책 증언, 과도한 낙관론 경고로 국채·주식 하락",WSJ Interactive via NYU https://pages.stern.nyu.edu/~adamodar/New_Home_Page/articles/junkbond.htm,기사 확인 (2026-10-17 검색)
+1997-04-29,5,경제지표,임금 지표 둔화,시장,^TNX,"1분기 고용비용지수(ECI) 상승폭 예상 하회·내구재 부진 — 30년물 7% 아래로, 채권 랠리",BLS ECI 1997-04-29 https://www.bls.gov/news.release/history/eci_042997.txt,기사 확인 (2026-10-17 검색)
+1997-05-09,5,인물 발언,환율 구두 개입,시장,JPY=X,"사카키바라 일본 대장성 국제금융국장 '연말 달러당 103엔' 발언, 엔화 급등",Spokesman-Review(AP) 1997-05-09 https://www.spokesman.com/stories/1997/may/09/bearish-remarks-torpedo-dollar/,기사 확인 (2026-10-17 검색)
+1997-09-02,5,수급 · 변동성 충격,급락 후 반등,시장,^GSPC,"노동절 연휴 뒤 매수세 복귀 — 다우 사상 최대 포인트 상승(+257), 채권 동반 랠리",CNN Money 1997-09-02 https://money.cnn.com/1997/09/02/markets/marketwrap/,기사 확인 (2026-10-17 검색)
 1997-10-27,5,수급 · 변동성 충격,외환위기 충격,시장,,아시아 외환위기 미니 크래시 (다우 -7%),,기억
 1998-08-17,20,지정학,국가 부도,시장,,러시아 모라토리엄,LTCM 위기로 이어짐,기억
 1998-09-23,10,수급 · 변동성 충격,헤지펀드 붕괴,시장,,LTCM 구제,,기억
+2000-01-03,5,금리 · 중앙은행,금리 인상 우려,시장,^GSPC ^TNX,"2월 FOMC 금리 인상 우려로 이틀 연속 급락 — 1/4 나스닥 사상 최대 포인트 하락, S&P -3.8%",CNN Money 2000-01-04 https://money.cnn.com/2000/01/04/markets/markets_newyork/,기사 확인 (2026-10-17 검색)
+2000-03-07,5,기업,대형 공급 계약,종목,NVDA,마이크로소프트 Xbox 에 엔비디아 그래픽 채택 보도 — 주가 약 38% 급등 (계약 3/5),CNN Money 2000-03-07 https://money.cnn.com/2000/03/07/markets/hotstox/,기사 확인 (2026-10-17 검색)
 2000-03-10,60,수급 · 변동성 충격,거품 붕괴,시장,QQQ,IT 거품 정점 — 나스닥 붕괴 시작,바닥 2002-10-09,기억
+2000-09-06,10,수급 · 변동성 충격,유로화 급락,시장,DX-Y.NYB,"9월 첫째 주 글로벌 포트폴리오 재편 속 유로화 하락 가속, 사상 최저 근접 (9/22 G7 공동 개입)",NY Fed 2000년 3분기 외환 보고서 https://www.newyorkfed.org/medialibrary/media/newsevents/news/markets/2000/fxq300.pdf (주 단위 서술),기사 확인 (2026-10-17 검색)
+2000-09-22,5,정책 · 규제,환율 공동 개입,시장,DX-Y.NYB EURUSD=X,ECB·Fed·BOJ·BOE·캐나다은행이 유로화 매수 공동 개입 — 유로 4% 넘게 반등·달러 약세,CNN Money https://money.cnn.com/2000/09/22/worldbiz/euro/,기사 확인 (2026-10-17 검색)
+2001-03-12,5,수급 · 변동성 충격,약세장 진입,시장,^GSPC ^IXIC,경기 둔화가 기업 이익을 더 깎을 것이라는 우려로 나스닥 6.3% 급락해 2000선 붕괴·S&P 500 약세장 진입,CNN Money https://money.cnn.com/2001/03/12/markets/markets_newyork/index.htm,기사 확인 (2026-10-17 검색)
+2001-04-05,5,실적,실적 전망 상향,시장,^GSPC DELL AA,델 컴퓨터의 긍정적 실적 가이던스와 알코아 호실적에 다우 4%·나스닥 8.9% 급등,CNN Money https://money.cnn.com/2001/04/05/markets/markets_newyork/,기사 확인 (2026-10-17 검색)
 2001-09-17,20,지정학,테러,시장,,9/11 테러 뒤 증시 재개,9/11~9/14 휴장,기억
+2001-11-15,5,수급 · 변동성 충격,유가 급락,시장,CL=F ^TNX,러시아 상징적 감산 제시로 OPEC 감산 무산·가격전쟁 우려 — WTI 18달러로 급락 (금리 급등 직접 원인은 미확인),Dawn https://www.dawn.com/news/6450,기사 확인 (2026-10-17 검색)
 2001-12-02,5,기업,대형 파산,시장,,엔론 파산,,기억
 2002-07-21,5,기업,대형 파산,시장,,월드컴 파산,,기억
 2002-10-09,20,수급 · 변동성 충격,바닥,시장,,IT 거품 붕괴 바닥,,기억
+2003-03-13,5,지정학,전쟁 조기 종결 기대,시장,DX-Y.NYB ^GSPC,이라크 군부와의 비밀 항복 협상 보도로 전쟁 조기 종결 기대 — 주가 급등·달러 강세,CNN Money https://money.cnn.com/2003/03/13/markets/markets_newyork/index.htm,기사 확인 (2026-10-17 검색)
 2003-03-20,20,지정학,전쟁 발발,시장,,이라크 전쟁 개시,,기억
+2003-07-15,10,금리 · 중앙은행,연준 의장 발언,시장,^TNX,그린스펀 의회 증언 경기 낙관·비전통적 완화 기대 약화로 국채 매도 — 10년 금리 3.71%→3.94%,CNN Money https://money.cnn.com/2003/07/15/markets/bondcenter/bonds/index.htm,기사 확인 (2026-10-17 검색)
+2003-07-21,20,금리 · 중앙은행,채권 매도 국면,시장,^TNX,경기 회복 금리 상승 우려로 국채 매도 지속 — 10년 금리 7개월 최고 (모기지 헤지 매도),CNN Money https://money.cnn.com/2003/07/21/markets/bondcenter/bonds/index.htm,기사 확인 (2026-10-17 검색)
+2003-09-02,5,수급 · 변동성 충격,유가 급락,시장,CL=F,노동절 연휴 뒤 휘발유 선물 2년 만에 최대 폭 급락(헤지펀드 청산) — 원유 동반 하락,Oil & Gas Journal https://www.ogj.com/general-interest/article/17291713/market-watch-crude-prices-decline-on-nymex,기사 확인 (2026-10-17 검색)
+2003-09-22,10,정책 · 규제,G7 환율 성명,시장,JPY=X,두바이 G7 성명(9/20) 환율 유연성 문구가 일본 개입 중단 신호로 해석 — 엔/달러 3년 최저,Dawn https://www.dawn.com/news/116602,기사 확인 (2026-10-17 검색)
+2004-06-01,5,지정학,테러 공격,시장,CL=F,사우디 알코바르 석유회사 시설 테러(5/29~30) 뒤 공급 불안 — WTI 42.33달러 사상 최고,Al Jazeera https://www.aljazeera.com/news/2004/6/1/oil-prices-continue-to-rise,기사 확인 (2026-10-17 검색)
+2005-01-04,5,금리 · 중앙은행,FOMC 의사록,시장,DX-Y.NYB,12월 FOMC 의사록이 추가 금리 인상·물가 위험 시사 — 달러 강세,Bank of Mauritius 월간 보고 https://www.bom.mu/sites/default/files/pdf/Research_and_Publications/Monthly_statistical_bulletin/Jan2005/Overview.pdf,기사 확인 (2026-10-17 검색)
+2005-05-31,10,지정학,해외 정치,시장,DX-Y.NYB EURUSD=X,프랑스 국민투표 EU 헌법 부결(5/29) — 유로 7개월 최저·달러 강세,NBC News https://www.nbcnews.com/id/wbna8037381,기사 확인 (2026-10-17 검색)
+2005-07-21,5,정책 · 규제,환율 정책,시장,JPY=X CNY=X,중국 위안화 2.1% 절상·달러 페그 폐지 — 엔화 급등,Bank of Mauritius https://www.bom.mu/sites/default/files/pdf/Research_and_Publications/Monthly_statistical_bulletin/Jul2005/Overview.pdf,기사 확인 (2026-10-17 검색)
+2005-09-19,5,수급 · 변동성 충격,허리케인 공급 차질,시장,CL=F,허리케인 리타 걸프만 생산·정유시설 위협 — WTI 4.39달러 상승(1983년 이후 최대 하루 상승폭),Oil & Gas Journal https://www.ogj.com/general-interest/companies/article/17235736/oil-gas-prices-leap-on-approach-of-hurricane-rita,기사 확인 (2026-10-17 검색)
+2006-04-24,10,정책 · 규제,G7 환율 성명,시장,JPY=X DX-Y.NYB,G7 성명(4/21) 아시아 환율 유연성 요구가 달러 약세 용인으로 해석 — 엔화 등 아시아 통화 급등,NY Fed 2006년 2분기 외환 보고 https://www.newyorkfed.org/medialibrary/media/newsevents/news/markets/2006/fxq206.pdf,기사 확인 (2026-10-17 검색)
+2006-05-30,5,경제지표,소비자신뢰 하락,시장,^VIX ^GSPC,5월 소비자신뢰 하락·월마트 매출 부진·유가 상승 — S&P 500 -1.6%,CNN Money https://money.cnn.com/2006/05/30/markets/markets_newyork/index.htm,기사 확인 (2026-10-17 검색)
+2006-07-24,5,기업,경쟁사 인수합병,종목,NVDA AMD,AMD의 ATI 54억 달러 인수 발표 — 엔비디아 유일한 대형 독립 GPU 업체로 부각 (+10%),Redmond Magazine https://redmondmag.com/articles/2006/07/25/amd-to-buy-graphics-chip-maker-ati.aspx,기사 확인 (2026-10-17 검색)
+2007-01-23,5,정책 · 규제,유가 급등,섹터,CL=F,부시 대통령 전략비축유(SPR) 2배 확대 계획 발표·미국 한파,CNBC https://www.cnbc.com/2007/01/23/oil-spikes-on-us-plan-to-double-strategic-reserves.html,기사 확인 (2026-10-17 검색)
 2007-02-27,5,수급 · 변동성 충격,해외 폭락,시장,,중국 증시 폭락 (상하이 -9%),,기억
+2007-03-13,10,수급 · 변동성 충격,서브프라임 위기,시장,^GSPC,뉴센추리 등 서브프라임 대출업체 부실·NYSE 거래정지·MBA 압류 사상 최대 발표,CNNMoney https://money.cnn.com/2007/03/13/markets/markets_0530/index.htm,기사 확인 (2026-10-17 검색)
+2007-07-10,10,수급 · 변동성 충격,서브프라임 위기,시장,JPY=X,S&P·무디스 서브프라임 MBS 대규모 강등 경고 — 엔 캐리 청산·달러 약세,CNNMoney https://money.cnn.com/2007/07/13/markets/dollar_yen_carry/index.htm,기사 확인 (2026-10-17 검색)
+2007-07-26,10,수급 · 변동성 충격,신용 경색,시장,^GSPC JPY=X,신규주택판매 6.6% 감소·LBO 자금 경색 우려로 다우 311p 급락,CNNMoney https://money.cnn.com/2007/07/26/markets/markets_445/,기사 확인 (2026-10-17 검색)
 2007-08-09,20,수급 · 변동성 충격,신용 경색,시장,XLF,BNP 파리바 펀드 동결 — 서브프라임 경색,,기억
+2007-10-19,5,실적,실적 발표,시장,^SOX ^GSPC,캐터필러 가이던스 하향·경기침체 경고·와코비아 부실 공개로 다우 367p 급락,Ritholtz/Bloomberg https://ritholtz.com/2007/10/earnings-drag-the-dow-lower,기사 확인 (2026-10-17 검색)
+2007-11-26,5,수급 · 변동성 충격,안전자산 선호,시장,^TNX,모기지 연체·신용 손실 우려로 주식 급락·국채 도피 매수 — 10년 금리 2004년 이후 최저,Reuters via Ambito https://www.ambito.com/economia/everything-goes-down-n3473611,기사 확인 (2026-10-17 검색)
 2008-03-17,10,기업,금융기관 구제,시장,XLF,베어스턴스 구제 (3/16 일요일 발표),,기억
+2008-08-08,10,금리 · 중앙은행,해외 위기,시장,DX-Y.NYB EURUSD=X,트리셰 ECB 총재 유로존 성장 '특히 약할 것' 발언·이탈리아 GDP 감소 — 유로 2004년 이후 최대 하락,Bloomberg via TradingEconomics https://tradingeconomics.com/articles/08082008064219.htm,기사 확인 (2026-10-17 검색)
 2008-09-15,20,기업,대형 파산,시장,XLF,리먼 브라더스 파산,,기억
 2008-09-29,5,정책 · 규제,구제 법안,시장,,TARP 하원 부결 (S&P -8.8%),10/3 통과,기억
+2008-10-22,10,수급 · 변동성 충격,금융위기,시장,^VIX ^GSPC,리먼 사태 후 은행 지급능력 우려로 S&P 5.7% 급락·VIX 장중 80 첫 돌파,Cboe https://www.cboe.com/insights/posts/vix-index-attribution-of-notable-tail-events,기사 확인 (2026-10-17 검색)
+2008-10-28,10,금리 · 중앙은행,금리 인하 기대,시장,^GSPC,연준·각국 중앙은행 추가 금리 인하 기대와 저가 매수로 다우 889p 급등,CNNMoney https://money.cnn.com/2008/10/28/markets/markets_newyork/,기사 확인 (2026-10-17 검색)
 2009-03-09,20,수급 · 변동성 충격,바닥,시장,,금융위기 바닥,,기억
+2010-01-22,10,정책 · 규제,금융 규제,시장,^SOX ^GSPC,오바마 은행 규제안(볼커 룰) 발표·버냉키 연임 불확실성으로 글로벌 증시 급락,"Reuters via Investing.com https://investing.com/news/forex-news/global-markets-commodities,-stock-tumble-on-obama-bank-plans-114863",기사 확인 (2026-10-17 검색)
+2010-02-04,10,지정학,해외 위기,시장,^GSPC,그리스·스페인·포르투갈 재정위기 우려와 실업수당 청구 증가로 다우 268p 급락,CNNMoney https://money.cnn.com/2010/02/04/markets/markets_newyork/,기사 확인 (2026-10-17 검색)
+2010-03-24,5,지정학,해외 위기,시장,JPY=X DX-Y.NYB,피치 포르투갈 신용등급 AA-로 강등 — 유로 10개월 최저·달러 강세,Reuters via finance.cz https://www.finance.cz/zpravy/reuters/MTFH44106nN24152656-global-markets-portugal-downgrade-hits-stocks-boosts-dollar,기사 확인 (2026-10-17 검색)
+2010-04-27,10,지정학,해외 위기,시장,^VIX ^GSPC,S&P 그리스 정크 등급 강등·포르투갈 2단계 강등,Reuters via finance.cz https://www.finance.cz/zpravy/reuters/MTFH56236nN2761222-global-markets-stocks-euro-plunge-on-greece-portugal-ratings,기사 확인 (2026-10-17 검색)
 2010-05-06,5,수급 · 변동성 충격,플래시 크래시,시장,,플래시 크래시,,기억
+2010-07-29,5,실적,실적 경고,종목,NVDA,엔비디아 2분기 매출 전망 9.5억→8~8.2억달러로 하향(메모리 원가·유럽·중국 수요 둔화),APH Networks https://aphnetworks.com/news/2010/07/29/nvidia-dramatically-lowers-revenue-guidance-quarter,기사 확인 (2026-10-17 검색)
+2010-10-19,5,금리 · 중앙은행,해외 금리 인상,시장,DX-Y.NYB,중국 인민은행 3년 만에 기준금리 기습 인상 — 위험회피·달러 강세,"Reuters via Investing.com https://investing.com/news/forex-news/global-markets-dollar-rallies,-stocks-slide-on-china-rate-move-167718",기사 확인 (2026-10-17 검색)
+2010-12-07,10,정책 · 규제,재정 정책,시장,^TNX,오바마-공화당 감세 2년 연장·급여세 인하 합의 — 국채 매도(10년 2.92→3.13%),CNNMoney https://money.cnn.com/2010/12/07/markets/bondcenter/treasuries/index.htm,기사 확인 (2026-10-17 검색)
+2011-01-05,10,기업,신제품 발표,종목,NVDA,CES에서 ARM 기반 CPU '프로젝트 덴버' 발표·마이크로소프트 윈도 ARM 지원 발표,HPCwire https://www.hpcwire.com/2011/01/06/nvidia_arms_itself_for_heterogeneous_computing_future/,기사 확인 (2026-10-17 검색)
+2011-01-12,10,기업,모바일 기대,종목,NVDA,모바일(테그라) 기대 속 매수 재유입 — 특정 뉴스 없음 (1/10 인텔 15억 달러 특허 합의 직후),Motley Fool https://www.fool.com/investing/general/2011/01/12/nvidia-shares-popped-what-you-need-to-know.aspx,기사 확인 (2026-10-17 검색)
+2011-01-24,5,기업,언론 보도,종목,NVDA,배런스 주말 기사 '엔비디아 2011년 80% 상승 가능' 보도,Motley Fool https://www.fool.com/investing/general/2011/01/24/nvidia-shares-popped-what-you-need-to-know.aspx,기사 확인 (2026-10-17 검색)
+2011-02-22,10,지정학,중동 사태 · 유가 급등,시장,CL=F ^GSPC ^VIX,리비아 유혈 사태 확산으로 중동 산유국 공급 차질 우려 · 유가 급등과 주가 급락,Bloomberg https://www.bloomberg.com/news/2011-02-22/oil-gold-gain-as-libya-turmoil-worsens-asia-stocks-u-s-futures-decline.html ; NPR https://www.npr.org/sections/thetwo-way/2011/02/22/133966620/stocks-down-sharply-on-news-from-libya-higher-oil-prices,기사 확인 (2026-10-17 검색)
 2011-03-11,10,지정학,자연재해,시장,,동일본 대지진,,기억
+2011-05-05,5,금리 · 중앙은행,ECB 발언 · 원자재 급락,시장,CL=F DX-Y.NYB,트리셰 ECB 총재가 6월 금리 인상 신호를 주지 않아 유로 급락 · 달러 강세 · 원유 등 원자재 2009년 이후 최대 낙폭,Bloomberg https://www.bloomberg.com/news/articles/2011-05-05/crude-gasoline-heating-oil-tumble-on-economy-oil-products,기사 확인 (2026-10-17 검색)
+2011-06-01,5,경제지표,고용 · 제조업 충격,시장,^GSPC,ADP 5월 민간고용 3만8천 명(예상 18만)과 ISM 제조업 53.5(전월 60.4) 급락으로 경기 둔화 우려,CNN Money https://money.cnn.com/2011/06/01/markets/markets_newyork/index.htm,기사 확인 (2026-10-17 검색)
 2011-08-08,20,정책 · 규제,신용등급 강등,시장,,미국 신용등급 강등 (8/5 금요일 장 뒤 발표),,기억
+2011-11-01,5,정책 · 규제,환율 개입,시장,JPY=X,일본 재무성이 엔화 전후 최고치(75.32엔) 후 사상 최대 규모 엔 매도 개입(10-31 실시 · 11-1~4 추가),AP via Honolulu Star-Advertiser https://www.staradvertiser.com/2011/10/31/breaking-news/japan-intervenes-in-currency-market-to-weaken-yen/ (개입은 10-31; 데이터 날짜가 하루 뒤로 잡힘),기사 확인 (2026-10-17 검색)
+2011-11-09,10,지정학,해외 위기 · 유럽 재정위기,시장,^VIX ^GSPC,이탈리아 10년물 국채금리 7% 돌파(유로 출범 이후 최고)로 유럽 재정위기 확산 우려 · S&P 500 -3.7%,CNN Money https://money.cnn.com/2011/11/09/markets/markets_newyork/index.htm,기사 확인 (2026-10-17 검색)
+2012-07-05,5,금리 · 중앙은행,금리 인하,시장,DX-Y.NYB EURUSD=X,ECB 기준금리 0.75%로 사상 최저 인하(예치금리 0%) · 중국 인민은행 깜짝 인하 · 영란은행 QE 500억 파운드 확대로 유로 급락,Business Standard (PTI) https://www.business-standard.com/amp/article/pti-stories/europe-china-ease-rates-boe-unveils-50-bn-pounds-stimulus-112070500464_1.html,기사 확인 (2026-10-17 검색)
 2012-07-26,10,금리 · 중앙은행,해외 중앙은행,시장,,드라기 '무엇이든 하겠다',,기억
+2012-11-07,10,정책 · 규제,대선 · 재정절벽,시장,^GSPC,오바마 재선 직후 재정절벽(1월 1일 자동 증세·지출 삭감) 우려와 금융 규제 강화 전망으로 다우 312p 하락,Motley Fool https://www.fool.com/investing/general/2012/11/07/why-the-dow-took-a-300-point-beating-today.aspx,기사 확인 (2026-10-17 검색)
+2013-01-02,5,정책 · 규제,재정절벽 합의,시장,^GSPC ^SOX,미 하원이 재정절벽 회피 법안 통과(257-167) · S&P 500 +2.5% 나스닥 +3.1%,CNN Money https://money.cnn.com/2013/01/02/investing/stocks-markets/index.html,기사 확인 (2026-10-17 검색)
+2013-01-25,10,금리 · 중앙은행,아베노믹스 · 엔 약세,시장,JPY=X,아베 정부의 공격적 금융완화 압박 속 엔화가 1월 24~25일 급락해 달러당 91엔대(2010년 이후 최저),ForexLive https://investinglive.com/news/!/forexlive-asia-wrap-yen-has-a-choppy-day-near-the-bottom-of-its-recent-run-20130128/ (당일 원인은 약한 일치),기사 확인 (2026-10-17 검색)
+2013-02-25,5,지정학,해외 정치 · 이탈리아 총선,시장,^VIX ^GSPC,이탈리아 총선에서 의회 교착(헝 의회) 전망으로 유럽 위기 재발 우려 · VIX +34%,CNN Money https://money.cnn.com/2013/02/25/investing/stocks-markets/index.html,기사 확인 (2026-10-17 검색)
+2013-04-15,5,수급 · 변동성 충격,금 폭락 · 중국 GDP 부진,시장,^VIX ^GSPC GC=F,중국 1분기 GDP 7.7%(예상 8%) 부진 · 금값 하루 9% 넘게 폭락 · 장 막판 보스턴 마라톤 폭탄 테러,Fox Business https://www.foxbusiness.com/markets/market-wrap-for-monday-april-15-major-sell-off-sweeps-wall-street-gold-plunges-to-2-year-low,기사 확인 (2026-10-17 검색)
 2013-05-22,20,금리 · 중앙은행,긴축 신호,시장,,버냉키 테이퍼 발언 (긴축 발작),,기억
+2013-10-10,10,정책 · 규제,부채한도 협상,시장,^GSPC,하원 공화당이 부채한도 단기 상향(11-22까지) 제안하며 디폴트 회피 기대 · 다우 323p 상승,AP via Washington Times https://www.washingtontimes.com/news/2013/oct/10/stocks-soar-possible-debt-breakthrough/,기사 확인 (2026-10-17 검색)
+2014-01-24,10,지정학,해외 위기 · 신흥국 통화 급락,시장,^VIX ^GSPC,아르헨티나 페소 하루 10%대 폭락 · 터키 리라 사상 최저 등 신흥국 통화 위기와 중국 둔화 우려,NBC News https://www.nbcnews.com/business/business-news/stocks-slide-again-one-day-after-triple-digit-dow-drop-flna2D11988419,기사 확인 (2026-10-17 검색)
+2014-02-03,5,경제지표,제조업 지표 충격,시장,^GSPC,1월 ISM 제조업지수 51.3(전월 56.5 · 예상 56)로 급락 · 신규주문 1980년 이후 최대 낙폭,NBC News https://www.nbcnews.com/business/business-news/stocks-fluctuate-ahead-manufacturing-report-flna2D12044713,기사 확인 (2026-10-17 검색)
 2014-06-20,60,수급 · 변동성 충격,유가 폭락,시장,XLE,유가 폭락 시작 (WTI 고점),,확인 필요 — 고점일 다시 확인
+2014-10-10,10,기업,반도체 업황 · 실적 경고,섹터,^SOX MCHP NXPI,마이크로칩이 중국 부진으로 분기 매출 전망 하향하며 반도체 업황 조정 시작 경고 · SOX -6.9%,Taipei Times (Bloomberg) https://www.taipeitimes.com/News/biz/archives/2014/10/13/2003601918,기사 확인 (2026-10-17 검색)
+2014-11-03,10,금리 · 중앙은행,깜짝 완화,시장,JPY=X,일본은행이 본원통화 연간 증가 목표를 80조 엔으로 깜짝 확대(5대4) · 달러/엔 110엔 돌파,Reuters via Business Standard https://www.business-standard.com/amp/article/reuters/japan-shares-soar-yen-skids-after-boj-stuns-with-more-easing-steps-114103100280_1.html (발표는 10-31),기사 확인 (2026-10-17 검색)
+2014-11-28,10,정책 · 규제,유가 급락 · OPEC 감산 거부,시장,CL=F,OPEC 총회(11-27)에서 사우디 주도로 감산 거부 · 추수감사절 다음 날 WTI 10% 폭락,Reuters via Business Standard https://www.business-standard.com/amp/article/reuters/brent-near-four-year-low-after-opec-decides-against-output-cut-114112800074_1.html,기사 확인 (2026-10-17 검색)
+2015-01-22,5,금리 · 중앙은행,양적완화 도입,시장,DX-Y.NYB EURUSD=X,ECB가 월 600억 유로 국채 매입 양적완화 발표 · 유로 2% 넘게 급락,Nasdaq (RTTNews) https://www.nasdaq.com/articles/forex-euro-drops-after-ecb-launches-qe-program-2015-01-22,기사 확인 (2026-10-17 검색)
+2015-06-29,10,지정학,해외 위기 · 그리스 사태,시장,^VIX ^GSPC,그리스 협상 결렬로 ECB 긴급자금 동결 · 그리스 은행 휴업과 자본통제 도입 · VIX +34.5%,Fortune https://fortune.com/2015/06/29/stock-market-greece-debt,기사 확인 (2026-10-17 검색)
+2015-07-06,10,지정학,유가 급락 · 해외 위기,시장,CL=F,그리스 국민투표 구제금융안 부결 · 중국 증시 폭락 · 이란 핵협상 타결 시 공급 증가 우려로 WTI 7.7% 급락,Bloomberg via World Oil https://worldoil.com/news/2015/7/06/oil-falls-most-in-five-months-as-greece-china-boost-demand-risk/,기사 확인 (2026-10-17 검색)
 2015-08-11,10,정책 · 규제,환율 절하,시장,,위안화 기습 절하,,기억
 2015-08-24,5,수급 · 변동성 충격,해외 폭락,시장,,8월 블랙 먼데이 (다우 장중 -1000),,기억
+2015-12-03,5,금리 · 중앙은행,ECB 완화 기대 미달,시장,DX-Y.NYB EURUSD=X ^TNX,ECB가 예치금리 -0.3%로 0.1%p만 인하하고 월 매입액 600억 유로 유지(시장 기대 미달) · 유로 급등 · 달러 지수 2% 하락,Sharecast https://sharecast.com/amp/news/fx/fx-roundup-euro-jumps-in-wake-of-ecb-move--952739.html,기사 확인 (2026-10-17 검색)
 2016-01-04,10,수급 · 변동성 충격,해외 폭락,시장,,중국 증시 서킷브레이커,,기억
 2016-02-11,5,수급 · 변동성 충격,원유 · 엔화 급변,시장,CL=F JPY=X,유가 바닥 반등 · 엔화 급등 (일본 마이너스 금리 여파),시장 감지,기억 · 시장 감지
 2016-06-24,10,지정학,정치 충격,시장,,브렉시트 국민투표 결과,6/23 투표,기억

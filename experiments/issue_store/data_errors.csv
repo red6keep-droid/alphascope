@@ -1,0 +1,4 @@
+day,series,note
+2008-04-08,JPY=X,"엔 하루 ±5% 보도 없음, 급등 직후 반락 — yfinance 틱 오류로 보임"
+2008-12-08,JPY=X,"엔 하루 +17.7% 후 -15.5% 반락 — 실제 보도와 맞지 않음, yfinance 틱 오류"
+2008-12-22,CL=F,연속선물 월물 교체 착시 — 실제 12/22 WTI는 $2.45 하락 (OGJ https://www.ogj.com/general-interest/article/17275969/market-watch-oil-prices-end-2008-above-44bbl)

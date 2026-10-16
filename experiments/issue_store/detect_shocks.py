@@ -78,8 +78,23 @@ def explain(df):
     return df
 
 
+def drop_data_errors(df):
+    """기사 확인 중 드러난 데이터 오류(yfinance 틱 오류 · 선물 월물 교체 착시)는 빼고, 반락한 다음 거래일까지 함께 뺀다. 목록: data_errors.csv"""
+    p = os.path.join(ROOT, "experiments", "issue_store", "data_errors.csv")
+    if not os.path.exists(p):
+        return df
+    name = {sym.replace("_", "^", 1) if sym.startswith("_") else sym.replace("_X", "=X").replace("_F", "=F"): v[0] for sym, v in SERIES.items()}
+    keep = pd.Series(True, index=df.index)
+    for _, r in pd.read_csv(p, parse_dates=["day"]).iterrows():
+        mk = name.get(str(r["series"]).strip())
+        hit = (df["market"] == mk) & (df["day"] >= r["day"]) & (df["day"] <= r["day"] + pd.Timedelta(days=4))
+        keep &= ~hit
+    print(f"데이터 오류로 뺀 줄 {int((~keep).sum())}")
+    return df[keep]
+
+
 if __name__ == "__main__":
-    df = explain(detect())
+    df = explain(drop_data_errors(detect()))
     df.to_csv(os.path.join(CAL, "shocks.csv"), index=False)
     ep = df.groupby("episode").agg(start=("day", "min"), end=("day", "max"), markets=("market", lambda x: " · ".join(sorted(set(x)))),
                                    explained=("explained_by", lambda x: next((v for v in x if v), "")))
