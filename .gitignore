@@ -27,3 +27,6 @@ graph-v1 복사본/
 
 # wrangler 로컬 캐시 (infra/cron-trigger)
 .wrangler/
+
+# 로컬 30년 종목 데이터 저장소 (doc/볼린저-이슈별-검증-계획.md 6절)
+data/store/
