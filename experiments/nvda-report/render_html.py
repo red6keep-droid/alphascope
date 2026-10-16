@@ -79,7 +79,8 @@ _PAREN = re.compile(r"\s*(\([^()]*\))")
 
 def _paren(name_html):
     """카드 구분명의 (…) 부분을 한 단계 작게(12px)·보통 굵기로. 이미 이스케이프된 HTML 에 적용한다."""
-    return _PAREN.sub(lambda m: f' <span style="font-size:{MICRO};font-weight:400;">{m.group(1)}</span>', name_html)
+    # inline-block: 한 줄에 못 들면 괄호째 다음 줄로 — design_kit.paren 과 같다 (2026-10-17 사용자: 52주 고점 대비 · 단기 과열 온도의 괄호가 중간에서 끊김)
+    return _PAREN.sub(lambda m: f' <span style="display:inline-block;font-size:{MICRO};font-weight:400;">{m.group(1)}</span>', name_html)
 
 
 def _esc(t):
