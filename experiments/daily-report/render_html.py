@@ -241,7 +241,8 @@ def _text(text):
     paras = _paragraphs(text)
     if not paras:
         return dk.muted("데이터 없음")
-    return "".join(f'<div style="margin:{PARA_GAP if i else 0}px 0 6px;">' + "".join(f"<div>{dk.tint(_esc(dk.ko(s, TERM_KO)))}</div>" for s in sents) + "</div>"   # 증감 색 (2026-10-12 사용자: 모든 곳)
+    # data-para · data-sent: 테마 CSS 가 PC 에서는 문장을 블록(한 줄씩), 모바일(≤900px)에서는 인라인(이어 흐름)으로 — 문장 뒤 공백은 인라인일 때의 띄어쓰기
+    return "".join(f'<div data-para="1" style="margin:{PARA_GAP if i else 0}px 0 6px;">' + "".join(f'<span data-sent="1">{dk.tint(_esc(dk.ko(s, TERM_KO)))}</span> ' for s in sents) + "</div>"   # 증감 색 (2026-10-12 사용자: 모든 곳)
                    for i, sents in enumerate(paras))
 
 
@@ -291,7 +292,7 @@ def sec_lead(report, analysis):
     paras = _paragraphs(report.get("opinion"))
     if paras:
         # 문장마다 한 줄, 문단 사이 빈 줄 하나 (2026-10-16 사용자) — 끝 문단 아래 여백은 두지 않아 카드 여백에 더해지지 않게
-        body = "".join(f'<div style="margin:{PARA_GAP if i else 0}px 0 0;">' + "".join(f"<div>{_esc(dk.ko(s, TERM_KO))}</div>" for s in sents) + "</div>" for i, sents in enumerate(paras))
+        body = "".join(f'<div data-para="1" style="margin:{PARA_GAP if i else 0}px 0 0;">' + "".join(f'<span data-sent="1">{_esc(dk.ko(s, TERM_KO))}</span> ' for s in sents) + "</div>" for i, sents in enumerate(paras))   # PC 한 줄씩 · 모바일 이어 흐름 (테마 CSS)
         inner += (f'<div style="margin:{14 - LEAD_VP}px 0 0;padding-top:{14 - LEAD_VP}px;border-top:1px solid #E2E8F0;">'   # 일반 구분선, 위아래 보이는 14 (2026-10-13 사용자: "구분선은 일반 구분선 컬러로 유지")
                   f'<div data-insight="1" style="font-size:{dk.BODY};color:#111;">{body}</div></div>')   # 구분선 아래 18px (2026-10-13 사용자)   # 구분선 아래 종합 문단만 16px (2026-10-12 사용자: "이것만 16포인트")   # 18px · 행간 33 은 바깥에서 물려받는다
     return dk.cards(f'<div style="margin:0 0 8px;padding-top:{TAB_TOP}px;line-height:{dk.LH_BODY};">{inner}</div>')   # 오늘 탭 첫 콘텐츠 위 +10 (2026-10-13 사용자)   # 강조 카드 디자인 삭제 — 배경 · 테두리 · 안쪽 여백 없음 (2026-10-13 사용자)

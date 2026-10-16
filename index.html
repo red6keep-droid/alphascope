@@ -937,6 +937,10 @@ body.item-view .post-outer-container { padding-top: 13px; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
 .post-body { font-size: 19px; line-height: 34px; color: #333; overflow-wrap: anywhere; }   /* 행간 px 정수 — 리포트 본문과 같은 34px (2026-10-12 사용자) */
+/* 데일리 문단: PC 는 문장마다 한 줄(data-sent 블록), 모바일은 문장이 이어 흐른다(아래 @media) — 좁은 화면에서 "니다." 만 남는 고아 줄 방지 (2026-10-16 사용자).
+   keep-all 로 단어 중간에서 끊지 않고, text-wrap: pretty 로 마지막 줄이 너무 짧지 않게 (지원 브라우저만) */
+.post-body [data-para] { word-break: keep-all; text-wrap: pretty; }
+.post-body [data-sent] { display: block; }
 .post-body img { max-width: 100%; height: auto; border-radius: 12px; }
 .post-body table { width: 100%; border-collapse: collapse; }
 /* 셀에 nowrap 이 있는 표(리포트 본문)는 글 폭을 밀어내지 않고 표 안에서만 가로 스크롤한다 */
@@ -1201,6 +1205,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-title { font-size: 23px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
   .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
   .post-body { font-size: 19px; line-height: 34px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
+  .post-body [data-sent] { display: inline; }   /* 모바일: 문장 줄바꿈 없이 이어 흐른다 — 문단(빈 줄)만 남는다 (2026-10-16 사용자) */
   /* 데스크톱용 커버 이미지 확대 규칙(1024px !important)이 모바일에서 글 폭을 벌리지 않게 */
   .post-body img, .post-body img[style*="max-width"] { max-width: 100% !important; }
 }
