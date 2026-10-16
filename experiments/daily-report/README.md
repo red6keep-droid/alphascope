@@ -137,7 +137,8 @@ python experiments/daily-report/main.py --publish
 `.github/workflows/test-daily-report.yml`
 
 - **정가동 중** — 스케줄 실행은 리포트를 만들고 **자동으로 게시**합니다.
-- `schedule`: 월~금 **21:00 UTC**(한국시간 다음날 06:00) + **22:30 UTC** 재시도 2회.
+- 정시 실행: Cloudflare Worker가 뉴욕 월~금 **17:00**(KST 다음날 06:00 서머타임 / 07:00 표준시)과 18:30 재시도에 건다
+  ([infra/cron-trigger](../../infra/cron-trigger/README.md)). GitHub `schedule`은 예비 — **22:00 · 23:30 UTC**.
   금요일 장 데이터는 토요일 아침에 올라갑니다.
 - **실행 순서**: ① `check_published.py`로 오늘(KST) 글 존재 확인 → ② `main.py` dry-run(리포트+커버
   이미지 생성) → ③ 이미지 gh-pages 배포 → ④ jsDelivr purge + HTTP 200 확인 →

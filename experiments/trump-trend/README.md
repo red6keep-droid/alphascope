@@ -88,7 +88,7 @@ python experiments/trump-trend/review_sample.py
 
 ## 자동 실행 — GitHub Actions
 
-[`.github/workflows/trump-trend.yml`](../../.github/workflows/trump-trend.yml)이 **매일 22:30 UTC(07:30 KST)** 에 돈다. 주말 포함.
+[`.github/workflows/trump-trend.yml`](../../.github/workflows/trump-trend.yml)이 **매일 뉴욕 17:15(KST 06:15 서머타임 / 07:15 표준시)** 에 돈다. 주말 포함. 정시 실행은 Cloudflare Worker(`infra/cron-trigger`), GitHub cron(22:15 UTC)은 예비.
 시크릿은 기존 `GEMINI_API_KEY`·`FRED_API_KEY`를 그대로 쓴다. `workflow_dispatch`로 수동 실행도 된다.
 
 런너는 매번 빈 환경이므로 상태를 브랜치에 남긴다. 게시물은 archive에서, 캘린더는 API에서, 이벤트·반응은 재계산으로

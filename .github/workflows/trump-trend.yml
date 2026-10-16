@@ -14,9 +14,10 @@ name: Trump Trend
 
 on:
   schedule:
-    # 매일 22:30 UTC = 07:30 KST. 미국 정규장(20:00 UTC 마감) 종가가 yfinance에 확정된 뒤,
-    # 그 사이 올라온 게시물까지 한 번에 잡는다. 주말도 돈다 — 게시물은 주말에도 올라온다.
-    - cron: '30 22 * * *'
+    # 정시 실행은 Cloudflare Worker가 뉴욕 17:15(KST 06:15 서머타임 / 07:15 표준시)에 건다 (infra/cron-trigger).
+    # 미국 정규장 마감 종가가 yfinance에 확정된 뒤, 그 사이 올라온 게시물까지 한 번에 잡는다.
+    # 주말도 돈다 — 게시물은 주말에도 올라온다. GitHub cron은 예비 — 22:15 UTC = 07:15 KST, 계절과 상관없이 장 마감 뒤.
+    - cron: '15 22 * * *'
   workflow_dispatch:
     inputs:
       max_batches:

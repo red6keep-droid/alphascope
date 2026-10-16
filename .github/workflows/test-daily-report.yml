@@ -2,11 +2,12 @@ name: Test Daily Report
 
 on:
   schedule:
-    # 매주 월~금 21:00 UTC = 한국 시간 다음날 06:00
-    - cron: '0 21 * * 1-5'
-    # 재시도. GitHub cron은 부하가 높으면 지연/누락되므로 90분 뒤 한 번 더 건다.
-    # 이미 게시됐으면 check_published.py가 이후 단계를 모두 건너뛴다.
-    - cron: '30 22 * * 1-5'
+    # 정시 실행은 Cloudflare Worker가 뉴욕 17:00(장 마감 1시간 뒤, KST 06:00 서머타임 / 07:00 표준시)에 건다
+    # (infra/cron-trigger). GitHub cron은 예비 — UTC 고정이라 계절과 상관없이 장 마감 뒤인 시각에 둔다.
+    # 22:00 UTC = KST 07:00. 이미 게시됐으면 check_published.py가 이후 단계를 모두 건너뛴다.
+    - cron: '0 22 * * 1-5'
+    # 재시도. GitHub cron은 부하가 높으면 지연/누락되므로 90분 뒤 한 번 더 건다. 23:30 UTC = KST 08:30.
+    - cron: '30 23 * * 1-5'
   workflow_dispatch:
     inputs:
       publish:

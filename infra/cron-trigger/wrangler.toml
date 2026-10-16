@@ -4,7 +4,8 @@ compatibility_date = "2026-10-01"
 workers_dev = false   # HTTP 엔드포인트 없음 — cron으로만 돈다
 
 [triggers]
-# UTC. src/index.js의 JOBS 키와 문자열이 정확히 같아야 한다.
-crons = ["0 21 * * *", "30 22 * * *", "45 22 * * *"]
+# UTC. 뉴욕 17:00·17:15·17:30·18:30 의 서머타임(UTC-4)·표준시(UTC-5) 후보를 모두 덮는다.
+# 실제로 걸지는 src/index.js가 뉴욕 시각으로 판단한다. 트리거 1개 (무료 플랜 한도 5개).
+crons = ["0,15,30 21-23 * * *"]
 
 # 비밀값은 여기 쓰지 않는다: npx wrangler secret put GITHUB_TOKEN

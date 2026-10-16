@@ -627,8 +627,8 @@ __DASHBOARD__
                     <b:else/><data:view.title.escaped/></b:if>
                   </h2>
                   <span class='section-note'>
-                    <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;__TRUMP_LABEL__&quot;'>AI 자동 생성 · 매일 07:30 KST
-                    <b:else/>AI 자동 생성 · 매 거래일 06:00 KST</b:if>
+                    <b:if cond='data:view.isLabelSearch and (data:view.search.label == &quot;__TRUMP_LABEL__&quot; or data:view.search.label == &quot;__NVDA_LABEL__&quot;)'>AI 자동 생성 · 매일 아침 · 미국장 마감 후
+                    <b:else/>AI 자동 생성 · 매 거래일 아침 · 미국장 마감 후</b:if>
                   </span>
                 </div>
                 <div class='post-grid'>
@@ -1300,7 +1300,7 @@ def preview_reports():
         "  <section class=\"reports\" id=\"pv-reports\">\n"
         "    <div class=\"section-head\">\n"
         "      <h2 class=\"section-title\" id=\"pv-reports-title\">미국 증시 리포트 목록</h2>\n"
-        "      <span class=\"section-note\">AI 자동 생성 · 매 거래일 06:00 KST</span>\n"
+        "      <span class=\"section-note\">AI 자동 생성 · 매 거래일 아침 · 미국장 마감 후</span>\n"
         "    </div>\n"
         "    <div class=\"post-grid\">\n"
         + "\n".join(cards) + "\n"

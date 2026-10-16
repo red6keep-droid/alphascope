@@ -1553,8 +1553,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
                     <b:else/><data:view.title.escaped/></b:if>
                   </h2>
                   <span class='section-note'>
-                    <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;트럼프 트렌드&quot;'>AI 자동 생성 · 매일 07:30 KST
-                    <b:else/>AI 자동 생성 · 매 거래일 06:00 KST</b:if>
+                    <b:if cond='data:view.isLabelSearch and (data:view.search.label == &quot;트럼프 트렌드&quot; or data:view.search.label == &quot;엔비디아&quot;)'>AI 자동 생성 · 매일 아침 · 미국장 마감 후
+                    <b:else/>AI 자동 생성 · 매 거래일 아침 · 미국장 마감 후</b:if>
                   </span>
                 </div>
                 <div class='post-grid'>
