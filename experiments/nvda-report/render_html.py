@@ -365,12 +365,13 @@ def sec_glance(a, n=None):
     light = (f'<span style="display:inline-flex;align-items:center;gap:6px;padding:2px 8px 2px 6px;border-radius:999px;background:{bg};color:{fg};font-weight:700;white-space:nowrap;">'
              f'<span style="width:10px;height:10px;border-radius:50%;background:{dot};"></span>{state}</span>')
     reason = f' <span style="color:{NOTE};">— {_esc(" · ".join(reasons))}</span>' if reasons else ""
-    # 소제목은 문장으로 — "얼마나 · 왜 · 상태" 는 너무 줄였다 (2026-10-16 사용자). 소제목 줄(14px 회색) 아래 본문 줄, 항목 사이 10px
-    rows = [("얼마나 움직였나요?", how), ("무슨 일이 있었나요?", why), ("오늘 변화는 얼마나 큰가요?" + _dk.tip_icon(GLANCE_TIP), light + reason)]
+    # 소제목 줄(14px 회색) 아래 본문 줄, 항목 사이 10px. "얼마나 · 왜 · 상태" 는 너무 줄였고 의문형은 가벼웠다 (2026-10-16 사용자)
+    # 명사형 소제목 (2026-10-16 사용자: 의문형은 "전문가스럽지 않다" → A안)
+    rows = [("등락 (평소 대비)", how), ("주요 이슈", why), ("변화 강도" + _dk.tip_icon(GLANCE_TIP), light + reason)]
     lis = "".join(f'<div style="margin-top:{0 if i == 0 else 10}px;"><div style="font-size:{TINY};line-height:20px;color:{NOTE};">{k}</div>'
                   f'<div style="line-height:{_dk.LH_BODY};color:#111;word-break:keep-all;">{v}</div></div>' for i, (k, v) in enumerate(rows))
     return (f'<div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:14px 14px 16px;margin:0 0 8px;">'
-            f'<div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};margin:0 0 10px;">오늘 엔비디아는 어땠나요?</div>{lis}</div>')
+            f'<div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};margin:0 0 10px;">오늘 요약</div>{lis}</div>')
 
 
 def sec_headline(a):
