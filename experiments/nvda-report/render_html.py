@@ -493,9 +493,7 @@ def regime_plain(mr):
     """2번 카드 첫 줄 — 값으로 만든 2문장 (2026-10-17 사용자: 상세하게 → "약간만 줄여"). 평가어 없이."""
     ph, above = mr["pct_from_high"], mr["above_ma200"]
     where = f"1년 최고가보다 {abs(ph):.1f}% 아래" if ph < -0.05 else "1년 최고가 근처"
-    reg = mr["regime"]
-    cop = "이다" if (ord(reg[-1]) - 0xAC00) % 28 else "다"   # 받침 있으면 '이다' (상승 추세다 · 단기 조정이다)
-    first = f"S&P 500이 {where}, 200일 평균선 {'위' if above else '아래'}라 '{reg}'{cop}."
+    first = f"S&P 500이 {where}, 200일 평균선 {'위' if above else '아래'}, '{mr['regime']}'이다."   # 사용자 문구 (2026-10-17)
     vix = mr.get("vix")
     if vix is not None:
         calm = "차분한 편" if vix < 20 else ("보통보다 높은 편" if vix < config.REGIME_VIX_HIGH else "크게 흔들리는 편")
@@ -556,9 +554,9 @@ def bollinger_lines(bb):
     base = (bb.get("stats") or {}).get("base") or {}
     side, days = ("아래" if low else "위"), bb.get("days", 0)
     reach = "끝에 닿았다" if days <= 1 else f"끝을 {days}일째 넘어 있다"
-    plain = f"최근 한 달 대개 ${bb['lower']:,.0f}~${bb['upper']:,.0f}에서 움직였는데 오늘 ${bb['close']:,.2f}로 {side} {reach}."   # 2문장 (2026-10-17 사용자: 약간만 줄여)
+    plain = f"최근 한 달 평소 ${bb['lower']:,.0f}~${bb['upper']:,.0f}에서 움직였는데 오늘 ${bb['close']:,.2f}로 {side} {reach}."   # 2문장 (2026-10-17 사용자: 약간만 줄여)
     if st and base:
-        plain += f" 과거 10년 이런 날의 {st['up20']}%가 20거래일 뒤 더 높았다(아무 날 {base['up20']}%)."
+        plain += f" 과거 10년 이런 날의 {st['up20']}%가 20거래일 뒤 더 높았다(일반적인 날 {base['up20']}%)."
     lines = [(plain, "plain"),
              ("row", "한 달 범위", f"${bb['lower']:,.0f} ~ ${bb['upper']:,.0f}", "20일 평균 ± 보통 흔들림 2배"),
              ("row", "오늘 종가", f"${bb['close']:,.2f}", f"범위 {'아래' if low else '위'}")]
@@ -566,8 +564,8 @@ def bollinger_lines(bb):
         lines.append(("row", "연속", f"{bb['days']}일째", f"범위 {'아래' if low else '위'}에 머문 날"))
     if st and base:
         lines.append(("row", "과거 10년 같은 날", f"{st['n']}회", f"범위 {'아래' if low else '위'}로 처음 나간 날"))
-        lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"아무 날 {base['up20']}%"))
-        lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"아무 날 {base['up60']}% · 예측 아님"))
+        lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"일반적인 날 {base['up20']}%"))
+        lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"일반적인 날 {base['up60']}% · 예측 아님"))
     return lines
 
 
@@ -591,7 +589,7 @@ def overheat_lines(oh):
     plain = " · ".join(parts) + "."
     k0 = oh["active"][0] if oh["active"] else None
     if k0 and stats.get(k0) and base:
-        plain += f" 과거 10년 이런 날의 {stats[k0]['up20']}%가 20거래일 뒤 더 높았다(아무 날 {base['up20']}%)."
+        plain += f" 과거 10년 이런 날의 {stats[k0]['up20']}%가 20거래일 뒤 더 높았다(일반적인 날 {base['up20']}%)."
     lines = [(plain, "plain")]
     for k in oh["active"]:
         name, rule, unit, note = OVERHEAT_SHORT[k]
@@ -600,8 +598,8 @@ def overheat_lines(oh):
         st = stats.get(k) or {}
         if st and base:
             lines.append(("row", "과거 10년 같은 날", f"{st['n']}회", "이 조건에 처음 들어간 날"))
-            lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"아무 날 {base['up20']}%"))
-            lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"아무 날 {base['up60']}% · 예측 아님"))
+            lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"일반적인 날 {base['up20']}%"))
+            lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"일반적인 날 {base['up60']}% · 예측 아님"))
     return lines
 
 
