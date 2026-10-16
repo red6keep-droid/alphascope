@@ -14,7 +14,18 @@ validate 탈락 모두) 다음 단계로. 전부 실패하면 RuntimeError.
 
 Gemini 는 REST 로 부른다 — 홈 뉴스 워크플로에는 google-genai 가 없다. 필요한 패키지는 requests 하나.
 Gemini 키는 GEMINI_API_KEY 에 ; 또는 , 로 여럿 (2026-10-14 사용자: 키 5개 모두 다른 프로젝트 → 프로젝트당 하루 약 20회씩).
-호출마다 다음 키로 돌고, 429 분당 한도를 받은 키는 KEY_COOLDOWN_SECONDS 한 번 쉬고, 하루 한도(PerDay)면 그 실행 동안 버린다. 503/500 은 키 문제가 아니라 기다렸다 다시(3·6·12·24·48s).
+호출마다 다음 키로 돌고, 429 분당 한도를 받은 키는 KEY_COOLDOWN_SECONDS 한 번 쉬고, 하루 한도(PerDay)면 그 실행 동안 그 (키, 모델)을 버린다.
+503/500 은 키 문제가 아니라 기다렸다 다시 — 단계마다 attempts 횟수만큼(3·6·12·24s…).
+
+Gemini 과부하(503) · 하루 한도 실측 (2026-10-16):
+- 503 은 시간대가 아니라 날짜 단위로 오고(나쁜 날은 하루 종일), 같은 순간에도 모델마다 다르다 — 3.5-flash 가 503 일 때 3.5-flash-lite 는 200.
+- 하루 한도 이름은 GenerateRequestsPerDayPerProjectPerModel — 프로젝트 × 모델. NVDA · 트럼프 프로젝트는 503 재시도까지 합쳐 20회째에
+  걸렸다(503 도 횟수에 드는 것으로 보임). 데일리 프로젝트는 36회에도 안 걸림 — 프로젝트마다 한도가 다르다(AI Studio 할당량 화면에서 확인).
+  3.6-flash 는 3.5-flash 가 소진된 키에서 첫 호출부터 PerDay → 3.x flash 끼리 한 버킷으로 보임. flash-lite 는 버킷이 따로(소진된 키로도 200).
+- 그래서 3.5-flash 는 503 재시도를 2회로 줄이고(한도를 재시도로 태우지 않게) 바로 gemini-lite(3.5-flash-lite) 로 넘어간다.
+  lite 정확도(2026-10-16, 저장된 Gemini 라벨 기준): NVDA 분류 80칸 중 75(3.5-flash 재실행 70 · DeepSeek 58) · 트럼프 120칸 중 85
+  (주제 · 방향 26/30, 강도 11/30 — ±1 허용 54/60). 응답 15초 · 9초. lite 의 ai_model("gemini-3.5-flash-lite") 에는 콜론이 없어
+  정식 분류로 남는다(재분류 대상 아님). 3.7 · 3.8-flash 는 측정 내내 503, 3.1-flash-lite 도 대부분 503 이라 후보에서 제외.
 
 모델 실측 (2026-10-11, NVDA 실제 분류 프롬프트 6건 · 20건, 서술 프롬프트):
 - Groq gpt-oss-120b (사고 low): 분류 20건 6.5초, Gemini 라벨과 24필드 중 18~19 일치, 서술 검증 통과.
@@ -37,6 +48,7 @@ from collections import Counter, defaultdict
 import requests
 
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "").strip() or "gemini-3.5-flash"
+GEMINI_LITE_MODEL = os.environ.get("GEMINI_LITE_MODEL", "").strip() or "gemini-3.5-flash-lite"   # 대체 모델 (2026-10-16) — 과부하 · 하루 한도 버킷이 따로
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 KEY_COOLDOWN_SECONDS = 60
 GEMINI_ATTEMPTS = 5
@@ -44,7 +56,10 @@ RETRY_SLEEP_SECONDS = 3
 
 # 공급자 단계. kind: gemini(REST, 다중 키) · openai(OpenAI 호환 REST)
 STEPS = {
-    "gemini": {"kind": "gemini", "env": "GEMINI_API_KEY", "model": GEMINI_MODEL, "timeout": 300},
+    "gemini": {"kind": "gemini", "env": "GEMINI_API_KEY", "model": GEMINI_MODEL, "timeout": 300,
+               "attempts": 2},   # 503 재시도 2회만 — 하루 20회 한도를 재시도로 태우지 않게, 바로 gemini-lite 로 (2026-10-16)
+    "gemini-lite": {"kind": "gemini", "env": "GEMINI_API_KEY", "model": GEMINI_LITE_MODEL, "timeout": 300,
+                    "attempts": 4},   # 같은 키 · 다른 모델 — 3.5-flash 가 503 이거나 하루 한도여도 보통 바로 답한다 (2026-10-16)
     "groq": {"kind": "openai", "env": "GROQ_API_KEY", "url": "https://api.groq.com/openai/v1/chat/completions",
              "model": "openai/gpt-oss-120b", "min_interval": 60, "timeout": 120,
              "params": {"reasoning_effort": "low", "max_completion_tokens": 8000}},   # 분당 8,000토큰 → 호출 간격 60초
@@ -64,13 +79,14 @@ CHAINS = {
     # 분류 · 서술 · 리포트 · 댓글 답글. DeepSeek 가 2순위 (2026-10-14 비교: 분류 Gemini 라벨과 80칸 중 DeepSeek 58 · Qwen 56 · gpt-oss 51,
     # 서술 세 가지를 모두 통과한 예비는 DeepSeek 뿐 — Groq 둘은 트럼프 서술 · 데일리가 분당 8,000토큰을 넘어 413, gpt-oss 는 NVDA 서술 숫자 방향을 틀림).
     # Groq 둘은 짧은 요청(분류 · 답글)용 3 · 4순위
-    "json": ["gemini", "nvidia-deepseek", "groq-qwen", "groq"],
-    "translate": ["groq", "nvidia-gptoss20", "gemini"],          # 홈 뉴스 제목 번역 — 빠른 것부터 (2026-10-11)
+    # gemini-lite 가 2순위 (2026-10-16): 3.5-flash 과부하 · 하루 한도 때 같은 키의 다른 모델이 먼저 받는다 — 분류 일치율이 DeepSeek 보다 높고 빠르다
+    "json": ["gemini", "gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
+    "translate": ["groq", "nvidia-gptoss20", "gemini-lite", "gemini"],          # 홈 뉴스 제목 번역 — 빠른 것부터 (2026-10-11)
     # 댓글 답글 — Gemini 는 맨 뒤 (2026-10-14 사용자: 댓글 한 건에 한도 1회가 나가니 리포트 몫을 남기자). 답글은 짧고 숫자를 쓰지 않아 예비 모델로 충분.
     # DeepSeek 가 첫째 — 비교에서 답글 품질이 가장 좋았고, 봇은 5분마다 돌아 30초쯤 걸려도 된다
-    "comment": ["nvidia-deepseek", "groq", "groq-qwen", "gemini"],
-    # 예비 모델이 임시로 분류한 행을 Gemini 로 다시 분류할 때 (2026-10-15) — 예비로 덮어쓰지 않도록 Gemini 만
-    "json-gemini": ["gemini"],
+    "comment": ["nvidia-deepseek", "groq", "groq-qwen", "gemini-lite", "gemini"],
+    # 예비 모델이 임시로 분류한 행을 Gemini 로 다시 분류할 때 (2026-10-15) — 예비로 덮어쓰지 않도록 Gemini 만 (lite 도 Gemini, 정식 분류)
+    "json-gemini": ["gemini", "gemini-lite"],
 }
 
 # 예비 모델이 남긴 ai_model 은 "공급자:모델" (nvidia:… · groq:…). Gemini("gemini-…") · 규칙("rule") 에는 콜론이 없다
@@ -105,8 +121,9 @@ def _notify_summary():
 
 
 atexit.register(_notify_summary)
-# 하루 한도(429 PerDay)를 받은 Gemini 키 — 태평양 자정까지 다시 오지 않으니 이번 실행(프로세스) 동안 건너뛴다.
+# 하루 한도(429 PerDay)를 받은 (Gemini 키, 모델) — 태평양 자정까지 다시 오지 않으니 이번 실행(프로세스) 동안 건너뛴다.
 # 2026-10-15: 키 1개가 429 를 받고도 60초 휴식 × 5회를 호출마다 반복해 트럼프 1,471초 · NVDA 1,117초가 걸림
+# 2026-10-16: 한도 이름이 …PerDayPerProjectPerModel — 모델마다 따로다. 키 단위로 버리면 같은 키의 다른 모델(대체 모델)까지 건너뛴다
 _EXHAUSTED_KEYS = set()
 _last_call = {}   # (주소, 모델) → 마지막 호출 시각 (분당 토큰 한도 간격용 — Groq 는 모델마다 한도가 따로)
 
@@ -121,7 +138,12 @@ def parse_json(text):
     m = re.search(r"[\[{]", text)
     if not m:
         raise ValueError("JSON 시작 문자를 찾지 못했습니다.")
-    value, _ = json.JSONDecoder().raw_decode(text[m.start():])
+    text = text[m.start():]
+    try:
+        value, _ = json.JSONDecoder().raw_decode(text)
+    except ValueError:
+        # 닫는 괄호 앞 쉼표(`,}` · `,]`) — 2026-10-16 flash-lite 분류 4배치 중 1배치가 문법 오류로 떨어짐. 내용 검증은 호출자의 validate 가 한다
+        value, _ = json.JSONDecoder().raw_decode(re.sub(r",\s*([}\]])", r"\1", text))
     return value
 
 
@@ -160,8 +182,8 @@ class LLMPool:
               + (f" · Gemini 키 {len(keys)}개" if "gemini" in self.chain else ""))
 
     # ---------------------------------------------------------------- Gemini
-    def _pick_key(self):
-        live = [i for i, k in enumerate(self._keys) if k not in _EXHAUSTED_KEYS]
+    def _pick_key(self, model):
+        live = [i for i, k in enumerate(self._keys) if (k, model) not in _EXHAUSTED_KEYS]
         if not live:
             raise StepFailed("Gemini 하루 한도 소진 — 이번 실행은 건너뜀")
         now = time.time()
@@ -176,7 +198,7 @@ class LLMPool:
             raise StepFailed("Gemini 모든 키 쿨다운")
         print(f"[{self.label}] Gemini 모든 키 쿨다운 — {wait:.0f}s 대기")
         time.sleep(max(wait, 1))
-        return self._pick_key()
+        return self._pick_key(model)
 
     def _gemini(self, step, prompt, temperature, max_tokens):
         gen = {"responseMimeType": "application/json"}
@@ -187,15 +209,16 @@ class LLMPool:
         body = {"contents": [{"role": "user", "parts": [{"text": prompt}]}], "generationConfig": gen}
         last = ""
         minute_429 = 0
-        for attempt in range(1, GEMINI_ATTEMPTS + 1):
-            i = self._pick_key()
+        attempts = step.get("attempts", GEMINI_ATTEMPTS)
+        for attempt in range(1, attempts + 1):
+            i = self._pick_key(step["model"])
             key = self._keys[i]
             try:
                 r = requests.post(GEMINI_URL.format(model=step["model"]), params={"key": key}, json=body, timeout=step["timeout"])
             except requests.RequestException as e:
                 last = f"네트워크: {str(e)[:120]}"
                 wait = RETRY_SLEEP_SECONDS * (2 ** (attempt - 1))
-                print(f"[{self.label}] Gemini {last} — {wait}s 뒤 재시도 ({attempt}/{GEMINI_ATTEMPTS})")
+                print(f"[{self.label}] Gemini {last} — {wait}s 뒤 재시도 ({attempt}/{attempts})")
                 time.sleep(wait)
                 continue
             if r.status_code == 429:
@@ -203,9 +226,9 @@ class LLMPool:
                 quota = (re.findall(r'"quotaId":\s*"([^"]+)"', r.text) or ["?"])[0]
                 event("한도", f"Gemini 키 {_mask(key)} {quota} ({self.label})")
                 if "PerDay" in r.text:
-                    _EXHAUSTED_KEYS.add(key)
-                    print(f"[{self.label}] Gemini 키 {_mask(key)} 하루 한도({quota}) → 이번 실행은 이 키를 쓰지 않음")
-                    if all(k in _EXHAUSTED_KEYS for k in self._keys):
+                    _EXHAUSTED_KEYS.add((key, step["model"]))
+                    print(f"[{self.label}] Gemini 키 {_mask(key)} {step['model']} 하루 한도({quota}) → 이번 실행은 이 키로 이 모델을 쓰지 않음")
+                    if all((k, step["model"]) in _EXHAUSTED_KEYS for k in self._keys):
                         raise StepFailed(f"Gemini 하루 한도 소진 ({quota})")
                     continue
                 minute_429 += 1
@@ -218,7 +241,7 @@ class LLMPool:
             if r.status_code in (500, 502, 503, 504):
                 last = f"{r.status_code} 서버 과부하"
                 wait = RETRY_SLEEP_SECONDS * (2 ** (attempt - 1))
-                print(f"[{self.label}] Gemini {r.status_code} — {wait}s 뒤 재시도 ({attempt}/{GEMINI_ATTEMPTS})")
+                print(f"[{self.label}] Gemini {r.status_code} — {wait}s 뒤 재시도 ({attempt}/{attempts})")
                 time.sleep(wait)
                 continue
             if r.status_code != 200:
@@ -233,7 +256,7 @@ class LLMPool:
             except Exception as e:  # noqa: BLE001  — 안전 차단 등으로 본문이 없는 응답
                 last = f"빈 응답: {str(e)[:80]} {r.text[:120]}"
                 print(f"[{self.label}] Gemini {last}")
-        raise StepFailed(f"Gemini {GEMINI_ATTEMPTS}회 실패 · 마지막 {last}")
+        raise StepFailed(f"Gemini {step['model']} {attempts}회 실패 · 마지막 {last}")
 
     # ---------------------------------------------------------------- OpenAI 호환
     def _openai(self, name, step, prompt, temperature, max_tokens):
@@ -270,8 +293,9 @@ class LLMPool:
         for n, name in enumerate(self.chain):
             step = STEPS[name]
             if n:
-                print(f"[{self.label}] 예비 → {name}({step['model']})")
-                event("예비", f"{self.label} → {name}")
+                kind = "대체" if step["kind"] == "gemini" else "예비"   # 같은 Gemini 의 다른 모델은 '대체' — Slack 에서 다른 공급자(예비)와 구분
+                print(f"[{self.label}] {kind} → {name}({step['model']})")
+                event(kind, f"{self.label} → {name}")
             try:
                 text = (self._gemini(step, prompt, temperature, max_tokens) if step["kind"] == "gemini"
                         else self._openai(name, step, prompt, temperature, max_tokens))
