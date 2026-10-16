@@ -444,7 +444,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
                     f'<span style="flex:none;white-space:nowrap;color:#111;">{_esc(name)}</span><span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value))}</span></span>'
                     + (f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span>' if note else "") + '</li>')
         if kind == "plain":   # 쉬운 말 한 줄 — 점 없이 굵게, 아래 8px (2026-10-16 사용자: 강조 카드 펼침 맨 위에 쉬운 설명)
-            return f'<li style="list-style:none;margin:9px 0 17px;font-weight:700;color:#111;line-height:{_dk.LH_EMPH};">{_esc(text)}</li>'
+            return f'<li style="list-style:none;margin:9px 0 17px;font-weight:400;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{_tint(_esc(text))}</li>'   # 상세 설명 2~3문장이라 보통 굵기 (2026-10-17)
         col = NOTE if kind == "note" else "#111"
         return _dot_li(_label_text(text), size=3, color=col, lh=_dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32 (2026-10-12 사용자)   # 16px → 3px 점, "**라벨** : 내용", 증감 색 (2026-10-11 사용자)
     lis = "".join(li(t) for t in lines)
@@ -489,35 +489,69 @@ FLOW_PLAIN = {"모이는 중": "한 달간 반도체가 시장보다 강함", "�
               "뚜렷하지 않음": "한 달간 반도체와 시장 차이 작음"}
 
 
+def regime_plain(mr):
+    """2번 카드 첫 줄 — 값으로 만든 상세 설명 2문장 (2026-10-17 사용자: "줄이지 말고 상세하게"). 평가어 없이."""
+    pb, cr = abs(config.REGIME_PULLBACK_PCT), abs(config.REGIME_CORRECTION_PCT)
+    ph, above = mr["pct_from_high"], mr["above_ma200"]
+    where = f"1년 최고가보다 {abs(ph):.1f}% 아래" if ph < -0.05 else "1년 최고가 근처"
+    first = f"S&P 500이 {where}이고 200일 평균선 {'위' if above else '아래'}에 있어 '{mr['regime']}'으로 분류한다."
+    if mr["regime"] == "상승 추세":
+        first += f" 고점에서 {pb:.0f}% 안쪽이면 이렇게 본다."
+    elif mr["regime"] == "단기 조정":
+        first += f" 고점에서 {pb:.0f}~{cr:.0f}% 빠진 구간이다."
+    elif mr["regime"] == "조정장":
+        first += f" 고점에서 {cr:.0f}% 넘게 빠졌거나 200일 평균선 아래인 구간이다."
+    vix = mr.get("vix")
+    if vix is not None:
+        calm = "차분한 편" if vix < 20 else ("보통보다 높은 편" if vix < config.REGIME_VIX_HIGH else "크게 흔들리는 편")
+        first += f" 시장 흔들림(VIX)은 {vix:.1f}로 {calm}이다."
+    return first
+
+
 def regime_lines(mr):
-    """근거 줄 — 이름 | 값, 아래 뜻 (2026-10-16 사용자: 블릿 · 콜론 없이, 근거를 자세히). 규칙 전체는 툴팁 (regime_rule)."""
+    """2번 카드 — 상세 첫 줄 + 근거 줄(이름 | 값 · 짧은 뜻). 규칙 전체는 툴팁 (regime_rule)."""
     pb, cr = abs(config.REGIME_PULLBACK_PCT), abs(config.REGIME_CORRECTION_PCT)
     st = mr.get("streak") or 0
-    lines = [(REGIME_PLAIN.get(mr["regime"], ""), "plain"),
-             ("row", "S&P 500 고점 대비", f"{mr['pct_from_high']:+.1f}%", f"1년 최고가보다 얼마나 아래인지 — −{pb:.0f}% 안이면 상승 추세, −{cr:.0f}% 넘게 빠지면 조정장"),
-             ("row", "200일 평균선", "위" if mr["above_ma200"] else "아래", "약 10개월 평균 가격 — 위에 있으면 긴 흐름이 오름세")]
+    lines = [(regime_plain(mr), "plain"),
+             ("row", "S&P 500 고점 대비", f"{mr['pct_from_high']:+.1f}%", f"−{pb:.0f}% 안 상승 추세 · −{cr:.0f}% 넘으면 조정장"),
+             ("row", "200일 평균선", "위" if mr["above_ma200"] else "아래", "약 10개월 평균 가격")]
     if mr.get("vix") is not None:
-        lines.append(("row", "시장 흔들림 (VIX)", f"{mr['vix']:.1f}", f"앞으로 한 달 S&P 500 이 얼마나 흔들릴지 옵션 시장이 보는 값 — 20 아래 차분, {config.REGIME_VIX_HIGH:.0f} 넘으면 불안"))
-    lines.append(("row", "연속 등락", (f"{abs(st)}일 {'상승' if st > 0 else '하락'}" if st else "보합"), "S&P 500 이 며칠째 같은 방향으로 마감했는지"))
+        lines.append(("row", "시장 흔들림 (VIX)", f"{mr['vix']:.1f}", f"20 아래 차분 · {config.REGIME_VIX_HIGH:.0f} 넘으면 불안"))
+    lines.append(("row", "연속 등락", (f"{abs(st)}일 {'상승' if st > 0 else '하락'}" if st else "보합"), "S&P 500 같은 방향 마감 일수"))
     if mr.get("fng"):   # CNN 공포·탐욕 지수 — 국면 판정에는 쓰지 않고 보여 주기만
-        lines.append(("row", "공포·탐욕 지수", f"{mr['fng']['score']:.0f} {mr['fng'].get('rating_ko') or mr['fng'].get('rating')}", "CNN 이 7가지 지표로 낸 투자 심리 — 0 극단적 공포 ~ 100 극단적 탐욕"))
+        lines.append(("row", "공포·탐욕 지수", f"{mr['fng']['score']:.0f} {mr['fng'].get('rating_ko') or mr['fng'].get('rating')}", "CNN 투자 심리 · 0 공포 ~ 100 탐욕"))
     return lines
 
 
-def sector_flow_lines(sf):
-    """근거 줄 — 이름 | 값, 아래 뜻 (2026-10-16 사용자). 규칙 전체는 툴팁 (sector_flow_rule)."""
-    pp = config.SECTOR_FLOW_PP
-    lines = [(FLOW_PLAIN.get(sf["state"], ""), "plain"),
-             ("row", f"반도체 vs 시장 ({sf['days']}일)", f"{sf['rel_pp']:+.1f}%p",
-              f"반도체 ETF(SMH) {sf['days']}일 수익률에서 S&P 500 수익률을 뺀 값 — +{pp:.0f}%p 넘으면 돈이 모이는 중, −{pp:.0f}%p 아래면 빠지는 중")]
+def flow_plain(sf):
+    """3번 카드 첫 줄 — 상세 설명 (2026-10-17 사용자)."""
+    pp, rel, n = config.SECTOR_FLOW_PP, sf["rel_pp"], sf["days"]
+    more = f"{abs(rel):.1f}%p 더 올랐다" if rel > 0.05 else (f"{abs(rel):.1f}%p 덜 올랐다" if rel < -0.05 else "비슷하게 움직였다")
+    first = f"최근 {n}거래일 동안 반도체 ETF(SMH)가 S&P 500보다 {more}."
+    if sf["state"] == "모이는 중":
+        first += f" 차이가 +{pp:.0f}%p를 넘어 돈이 반도체로 모이는 중으로 본다."
+    elif sf["state"] == "빠져나가는 중":
+        first += f" 차이가 −{pp:.0f}%p 아래라 돈이 반도체에서 빠지는 중으로 본다."
+    else:
+        first += f" 차이가 ±{pp:.0f}%p 안이라 돈이 어느 쪽으로 움직인다고 보기 어렵다."
     if sf.get("smh_rank"):
-        lines.append(("row", "섹터 순위", f"12개 중 {sf['smh_rank']}위", "같은 기간 11개 섹터와 반도체를 수익률 순으로 세운 자리"))
+        first += f" 11개 섹터와 같이 세우면 {sf['smh_rank']}위다."
+    return first
+
+
+def sector_flow_lines(sf):
+    """3번 카드 — 상세 첫 줄 + 근거 줄. 규칙 전체는 툴팁 (sector_flow_rule)."""
+    pp = config.SECTOR_FLOW_PP
+    lines = [(flow_plain(sf), "plain"),
+             ("row", f"반도체 vs 시장 ({sf['days']}일)", f"{sf['rel_pp']:+.1f}%p", f"+{pp:.0f}%p 넘으면 유입 · −{pp:.0f}%p 아래면 유출")]
+    if sf.get("smh_rank"):
+        lines.append(("row", "섹터 순위", f"12개 중 {sf['smh_rank']}위", "같은 기간 수익률 순"))
     secs = sf.get("sectors") or []
     if secs:
-        lines.append(("row", "앞선 섹터", " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[:2]), "시장보다 가장 많이 오른 섹터 — 돈이 간 곳"))
-        lines.append(("row", "뒤처진 섹터", " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[-2:][::-1]), "시장보다 가장 못 간 섹터"))
+        lines.append(("row", "앞선 섹터", " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[:2]), "시장보다 많이 오른 곳"))
+        lines.append(("row", "뒤처진 섹터", " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[-2:][::-1]), "시장보다 못 간 곳"))
     if sf.get("shares_5d") is not None:
-        lines.append(("row", "반도체 ETF 주식 수 (5일)", f"{sf['shares_5d']:+.1f}%", "ETF 에 실제로 들어온 돈 — 늘면 유입, 줄면 유출"))
+        lines.append(("row", "반도체 ETF 주식 수 (5일)", f"{sf['shares_5d']:+.1f}%", "늘면 유입 · 줄면 유출"))
     return lines
 
 
@@ -530,19 +564,25 @@ def bollinger_rule():
 
 
 def bollinger_lines(bb):
-    """근거 줄 — 이름 | 값, 아래 뜻 (2026-10-16 사용자)."""
+    """4번 카드 — 상세 첫 줄 + 근거 줄 (2026-10-17 사용자)."""
     low = bb["state"] == "하단 도달"
-    lines = [("한 달 범위 " + ("아래로 나감" if low else "위로 나감"), "plain"),
-             ("row", "한 달 범위", f"${bb['lower']:,.0f} ~ ${bb['upper']:,.0f}", "최근 20일 평균 가격 ± 보통 흔들림 2배 — 가격이 대부분 이 안에서 움직인다 (볼린저 밴드)"),
-             ("row", "오늘 종가", f"${bb['close']:,.2f}", f"범위 {'아래' if low else '위'} — 한 달 기준으로 {'많이 내린' if low else '많이 오른'} 날")]
-    if bb.get("days", 0) > 1:
-        lines.append(("row", "연속", f"{bb['days']}일째", f"범위 {'아래' if low else '위'}에 머문 날 수"))
     st = (bb.get("stats") or {}).get("boll_lower" if low else "boll_upper")
     base = (bb.get("stats") or {}).get("base") or {}
+    side, days = ("아래" if low else "위"), bb.get("days", 0)
+    reach = "끝에 닿았다" if days <= 1 else f"끝을 {days}일째 넘어 있다"
+    plain = (f"최근 한 달 엔비디아는 대개 ${bb['lower']:,.0f}~${bb['upper']:,.0f} 사이에서 움직였는데, 오늘 종가 ${bb['close']:,.2f}로 "
+             f"그 {side} {reach}. 한 달 기준으로 {'많이 내린' if low else '많이 오른'} 날이다.")
     if st and base:
-        lines.append(("row", "과거 10년 같은 날", f"{st['n']}회", f"엔비디아가 범위 {'아래' if low else '위'}로 처음 나간 날의 수"))
-        lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"그 날들 가운데 20거래일 뒤 가격이 더 높았던 비율 — 아무 날이나 고르면 {base['up20']}%"))
-        lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"같은 방식으로 60거래일 뒤 — 아무 날 {base['up60']}%. 과거 빈도이지 예측이 아니다"))
+        plain += f" 과거 10년 이런 날은 {st['n']}번 있었고, 그중 {st['up20']}%가 20거래일 뒤 더 높았다(아무 날 {base['up20']}%)."
+    lines = [(plain, "plain"),
+             ("row", "한 달 범위", f"${bb['lower']:,.0f} ~ ${bb['upper']:,.0f}", "20일 평균 ± 보통 흔들림 2배"),
+             ("row", "오늘 종가", f"${bb['close']:,.2f}", f"범위 {'아래' if low else '위'}")]
+    if bb.get("days", 0) > 1:
+        lines.append(("row", "연속", f"{bb['days']}일째", f"범위 {'아래' if low else '위'}에 머문 날"))
+    if st and base:
+        lines.append(("row", "과거 10년 같은 날", f"{st['n']}회", f"범위 {'아래' if low else '위'}로 처음 나간 날"))
+        lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"아무 날 {base['up20']}%"))
+        lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"아무 날 {base['up60']}% · 예측 아님"))
     return lines
 
 
@@ -551,24 +591,32 @@ def overheat_rule():
             f"하나라도 해당하는 날만 카드. 통계는 10년간 그 조건에 처음 들어간 날의 20·60일 뒤 수익률 빈도이지 예측이 아니다")
 
 
-OVERHEAT_SHORT = {"rsi80": ("단기 과열 온도 (RSI 14)", "80 이상", "", "최근 14일 오른 힘과 내린 힘의 비율 0~100 — 70 넘으면 과열, 80 은 드문 수준"),
-                  "ma200_40": ("200일 평균선과의 거리", "+40% 이상", "%", "약 10개월 평균 가격보다 얼마나 위에 있는지 — 40% 넘게 벌어지는 일은 드물다"),
-                  "ret20_25": ("20일 수익률", "+25% 이상", "%", "한 달(20거래일) 동안 오른 폭")}
+OVERHEAT_SHORT = {"rsi80": ("단기 과열 온도 (RSI 14)", "80 이상", "", "14일 오른 힘 비율 0~100"),
+                  "ma200_40": ("200일 평균선과의 거리", "+40% 이상", "%", "10개월 평균보다 얼마나 위"),
+                  "ret20_25": ("20일 수익률", "+25% 이상", "%", "한 달 동안 오른 폭")}
+OVERHEAT_PLAIN = {"rsi80": "단기 과열 온도(RSI 14)가 {v:.0f}로 기준 80을 넘었다",
+                  "ma200_40": "가격이 200일 평균선보다 {v:.0f}% 위로 기준 40%를 넘었다",
+                  "ret20_25": "최근 20거래일 동안 {v:.0f}% 올라 기준 25%를 넘었다"}
 
 
 def overheat_lines(oh):
-    """근거 줄 — 조건마다 값 · 과거 10년 횟수 · 20 · 60일 뒤 오른 비율, 아래 뜻 (2026-10-16 사용자)."""
-    lines = [("짧은 기간에 빠르게 오름", "plain")]
+    """과열 카드 — 상세 첫 줄 + 조건마다 근거 줄 (2026-10-17 사용자: 2번 카드와 같게)."""
     stats, base = (oh.get("stats") or {}), ((oh.get("stats") or {}).get("base") or {})
+    parts = [OVERHEAT_PLAIN[k].format(v=oh["values"].get(k) or 0) for k in oh["active"]]
+    plain = " · ".join(parts) + ". 짧은 기간에 빠르게 오른 상태다."
+    k0 = oh["active"][0] if oh["active"] else None
+    if k0 and stats.get(k0) and base:
+        plain += f" 과거 10년 이런 날의 {stats[k0]['up20']}%가 20거래일 뒤 더 높았다(아무 날 {base['up20']}%)."
+    lines = [(plain, "plain")]
     for k in oh["active"]:
         name, rule, unit, note = OVERHEAT_SHORT[k]
         v = oh["values"].get(k)
-        lines.append(("row", name, (f"{v:+.1f}{unit}" if unit else f"{v:.1f}"), f"기준 {rule} — {note}"))
+        lines.append(("row", name, (f"{v:+.1f}{unit}" if unit else f"{v:.1f}"), f"기준 {rule} · {note}"))
         st = stats.get(k) or {}
         if st and base:
-            lines.append(("row", "과거 10년 같은 날", f"{st['n']}회", "이 조건에 처음 들어간 날의 수"))
-            lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"그 날들 가운데 20거래일 뒤 가격이 더 높았던 비율 — 아무 날 {base['up20']}%"))
-            lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"60거래일 뒤 — 아무 날 {base['up60']}%. 과거 빈도이지 예측이 아니다"))
+            lines.append(("row", "과거 10년 같은 날", f"{st['n']}회", "이 조건에 처음 들어간 날"))
+            lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"아무 날 {base['up20']}%"))
+            lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"아무 날 {base['up60']}% · 예측 아님"))
     return lines
 
 
