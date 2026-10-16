@@ -10,6 +10,7 @@ analysis.json이 없으면(시계열 수집 실패) 지수 표는 기존 3열로
 import html as html_mod
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
@@ -221,11 +222,27 @@ def _cover_image(cover_url):
     return f'<img src="{src}" alt="데일리 브리핑 커버 이미지" style="width:100%;max-width:1024px;border-radius:8px;margin:0 0 16px 0;display:block;">'
 
 
+PARA_GAP = int(dk.LH_BODY[:-2])   # 문단 사이 = 빈 줄 하나 (본문 행간)
+
+
+def _paragraphs(text):
+    """Gemini 문구 → [[문장, …], …]. 빈 줄이 문단 경계(내용이 바뀌는 곳), 마침표 뒤 공백이나 줄바꿈이 문장 끝.
+    (2026-10-16 사용자: "문장이 길면 마침표 뒤에 줄바꿈, 내용이 바뀌면 줄바꿈 두 번") — 프롬프트가 주제가 바뀌는 곳에 빈 줄을 넣는다."""
+    paras = []
+    for block in re.split(r"\n\s*\n", str(text or "").strip()):
+        sents = [s.strip() for s in re.split(r"(?<=\.)\s+|\n", block) if s.strip()]
+        if sents:
+            paras.append(sents)
+    return paras
+
+
 def _text(text):
-    """Gemini 문구 — 줄마다 문단(18px), 영어 용어는 한국어로. 비어 있으면 ⓘ 안내."""
-    if not str(text or "").strip():
+    """Gemini 문구 — 문장마다 한 줄, 문단 사이 빈 줄 하나(PARA_GAP), 영어 용어는 한국어로. 비어 있으면 ⓘ 안내."""
+    paras = _paragraphs(text)
+    if not paras:
         return dk.muted("데이터 없음")
-    return "".join(f'<div style="margin:0 0 6px;">{dk.tint(_esc(dk.ko(line, TERM_KO)))}</div>' for line in str(text).splitlines() if line.strip())   # 증감 색 (2026-10-12 사용자: 모든 곳)
+    return "".join(f'<div style="margin:{PARA_GAP if i else 0}px 0 6px;">' + "".join(f"<div>{dk.tint(_esc(dk.ko(s, TERM_KO)))}</div>" for s in sents) + "</div>"   # 증감 색 (2026-10-12 사용자: 모든 곳)
+                   for i, sents in enumerate(paras))
 
 
 def _light_word(light):
@@ -271,9 +288,10 @@ def sec_lead(report, analysis):
     홈 카드는 '(머리)'로 한 줄 결론을(구분선 아래는 건너뜀), '(종합)'으로 data-insight 문단을 읽는다."""
     one = str(report.get("one_line") or "").strip()
     inner = f'<div style="color:#111;font-weight:700;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 카드 대신 굵게 (2026-10-13 사용자)
-    lines = [ln for ln in str(report.get("opinion") or "").splitlines() if ln.strip()]
-    if lines:
-        body = "".join(f'<div style="margin:{0 if i == 0 else 4}px 0 0;">{_esc(dk.ko(ln, TERM_KO))}</div>' for i, ln in enumerate(lines))   # 문단 사이만 4px — 끝 문단 아래 여백이 카드 여백에 더해지지 않게
+    paras = _paragraphs(report.get("opinion"))
+    if paras:
+        # 문장마다 한 줄, 문단 사이 빈 줄 하나 (2026-10-16 사용자) — 끝 문단 아래 여백은 두지 않아 카드 여백에 더해지지 않게
+        body = "".join(f'<div style="margin:{PARA_GAP if i else 0}px 0 0;">' + "".join(f"<div>{_esc(dk.ko(s, TERM_KO))}</div>" for s in sents) + "</div>" for i, sents in enumerate(paras))
         inner += (f'<div style="margin:{14 - LEAD_VP}px 0 0;padding-top:{14 - LEAD_VP}px;border-top:1px solid #E2E8F0;">'   # 일반 구분선, 위아래 보이는 14 (2026-10-13 사용자: "구분선은 일반 구분선 컬러로 유지")
                   f'<div data-insight="1" style="font-size:{dk.BODY};color:#111;">{body}</div></div>')   # 구분선 아래 18px (2026-10-13 사용자)   # 구분선 아래 종합 문단만 16px (2026-10-12 사용자: "이것만 16포인트")   # 18px · 행간 33 은 바깥에서 물려받는다
     return dk.cards(f'<div style="margin:0 0 8px;padding-top:{TAB_TOP}px;line-height:{dk.LH_BODY};">{inner}</div>')   # 오늘 탭 첫 콘텐츠 위 +10 (2026-10-13 사용자)   # 강조 카드 디자인 삭제 — 배경 · 테두리 · 안쪽 여백 없음 (2026-10-13 사용자)
