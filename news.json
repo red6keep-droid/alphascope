@@ -1,6 +1,15 @@
 {
-  "updated_at": "2026-10-16 13:10:40 UTC",
+  "updated_at": "2026-10-16 17:56:15 UTC",
   "items": [
+    {
+      "title": "Prediction market odds on Tesla-SpaceX merger are above 50% for early 2027",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/16/tesla-spacex-merger-odds-rise-on-kalshi.html",
+      "published": "2026-10-16 17:02:40",
+      "summary": "Kalshi odds for a Tesla-SpaceX merger rose above 50% for early 2027 as Barclays outlined how a deal could work.",
+      "title_ko": "테슬라‑스페이스X 합병, 2027년 초 전망 50% 초과",
+      "why_ko": "칼시 예측 시장에서 2027년 초 합병 확률이 50%를 넘어섰다."
+    },
     {
       "title": "Brian Sullivan: Why the 'real' price of oil is likely $30-$40 higher than where it is now",
       "source": "CNBC",
@@ -99,15 +108,6 @@
       "summary": "See an AI-generated hypothetical portfolio derived from my TV talk and this column's archives.",
       "title_ko": "AI 버블 지속 여부 불투명, 채권이 최저가치 방어선",
       "why_ko": "AI 관련 가상 포트폴리오가 제시한 바와 같이 채권이 현재 최적의 방어 수단이다."
-    },
-    {
-      "title": "Nvidia's $6 trillion milestone looms. Here's when options traders see it happening",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/05/nvidias-6-trillion-milestone-looms-heres-when-options-traders-see-it-happening.html",
-      "published": "2026-10-05 13:56:58",
-      "summary": "Nvidia will likely cross the $6 trillion threshold by the end of this month, according to options traders.",
-      "title_ko": "엔비디아, 6조 달러 시가총액 임박…옵션 트레이더는 언제라 예측",
-      "why_ko": "옵션 트레이더들은 이번 달 말까지 엔비디아가 6조 달러를 넘어설 것으로 보고 있다."
     }
   ]
 }
