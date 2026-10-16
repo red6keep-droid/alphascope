@@ -19,8 +19,24 @@ sys.path.append(os.path.abspath(DAILY_REPORT_DIR))
 import publish_blogger  # noqa: E402  (daily-report 모듈)
 
 
+def event_count(output_dir=None):
+    """최근 24시간 이벤트 수 (aggregate 가 쓴 trump_analysis.json). 파일이 없으면 -1."""
+    import json
+    path = os.path.join(output_dir or config.OUTPUT_DIR, "trump_analysis.json")
+    if not os.path.exists(path):
+        return -1
+    with open(path, "r", encoding="utf-8") as f:
+        return len(json.load(f).get("recent_events") or [])
+
+
 def publish(output_dir=None, do_publish=False):
     output_dir = output_dir or config.OUTPUT_DIR
+    # 이벤트 0건인 날은 게시하지 않는다 (2026-10-16 사용자: 발언 없는 날은 통계 반복뿐, 매일 볼 이유가 없다 — 인물-발언-레이더-기획 5절).
+    # 렌더 · 상태 저장은 그대로. 다음 날 check_published 는 오늘 글이 없으니 정상 실행된다
+    n = event_count(output_dir)
+    if n == 0:
+        print("[publish] 최근 24시간 이벤트 0건 — 오늘은 게시하지 않는다")
+        return None
     body_path = os.path.join(output_dir, "trump_report_body.html")
     if not os.path.exists(body_path):
         raise FileNotFoundError(f"본문 없음: {body_path} — render_html 먼저")

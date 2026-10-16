@@ -133,6 +133,11 @@ def main():
 
     _step(8, total, "서술 + 렌더")
     narrative_path = os.path.join(config.OUTPUT_DIR, "narrative.json")
+    # 최근 24시간 이벤트가 0건이면 서술을 만들지 않는다 — 게시도 publish.py 가 건너뛴다 (2026-10-16 사용자: 발언 없는 날의 글은 통계 반복뿐).
+    # 렌더 · 상태 저장은 그대로 — 다음 날 비교와 미리보기에 쓴다
+    if args.narrate and publish.event_count() == 0:
+        print("[narrate] 최근 24시간 이벤트 0건 — 서술 생략 (오늘 글은 게시되지 않는다)")
+        args.narrate = False
     if args.narrate:
         import narrate
         try:

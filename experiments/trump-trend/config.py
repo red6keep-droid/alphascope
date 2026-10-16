@@ -119,6 +119,8 @@ WINDOWS_DAYS = [3, 7, 30, 90]
 TREND_WEIGHTS = {"frequency": 0.35, "intensity": 0.30, "recency": 0.25, "novelty": 0.10}
 TREND_SCORE_WINDOW = 7          # Trend Score 계산 창
 NOVELTY_LOOKBACK_DAYS = 90
+# "내일 볼 것"에 근거로 쓸 robust 통계가 없을 때의 고정 문장 — narrate(검사) · render(구획 생략)가 같이 본다 (2026-10-16)
+NONE_WATCH = "오늘 주제에서는 발언 뒤 평소와 다르게 움직인 자산이 없다."
 TOP_TRENDS = 10
 
 # ── 이벤트 스터디 (8절) ───────────────────────────────────────────────────

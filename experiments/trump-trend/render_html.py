@@ -402,6 +402,11 @@ def sec_why(a):
     return dk.ccard(rows, left="65%") + dk.guide("관찰 종목", [("고르는 법", "정적 매핑 규칙 — 섹터 → ETF → 상위 10종목 + 본문에 나온 기업"), ("성격", "AI 판단이 아닙니다")])
 
 
+def _has_watch(n):
+    """'내일 볼 것'에 고정 문장(관찰 대상 없음) 말고 실제 문장이 있나."""
+    return any(config.NONE_WATCH[:14] not in s for s in (n or {}).get("watch_tomorrow") or [])
+
+
 def sec_narrative(n, key):
     if not n or not n.get(key):
         return dk.muted("서술 없음.")
@@ -425,10 +430,12 @@ def build_body(a, n):
         dk.section("급상승 주제", sec_trends(a), tab=TAB_TODAY, one_line=True,
                    aside=dk.tips_right(_trend_tips(a)) if a["trend_scores"] else ""),   # ? 툴팁은 제목 오른쪽, 폰에서도 한 줄 · "최근 7일"은 카드 아래 (2026-10-11 사용자)
         dk.section("발언", counts_note + sec_recent(a), tab=TAB_TODAY, aside=counts_aside),   # 급상승 주제 아래로 (2026-10-14 사용자) · 24시간 집계 캡슐은 발언 제목 오른쪽 (2026-10-11 사용자)
-        dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY),
+        # 서술이 없거나 "없다" 고정 문장뿐이면 구획을 통째로 뺀다 — 매일 같은 문장이 반복되는 글은 비슷한 글로 분류된다 (2026-10-16 사용자, 인물-발언-레이더-기획 5절)
+        dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY) if (n or {}).get("what_changed") else "",
         dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow"), tab=TAB_TODAY, one_line=True,   # 주의는 제목 줄 오른쪽 툴팁 (2026-10-13 사용자)
                    aside=dk.tips_right([("주의", dk.read_text([("근거", "시장 반응 탭에서 보정 q가 함께 작은 값만 고릅니다 — 주제당 수십 개 조합을 검정했기 때문"),
-                                                               ("+3일 · +5일", "창이 겹친 관측"), ("성격", "인과나 방향 예측이 아닙니다")]))])),
+                                                               ("+3일 · +5일", "창이 겹친 관측"), ("성격", "인과나 방향 예측이 아닙니다")]))]))
+        if _has_watch(n) else "",
         dk.section(TAB_FLOW, sec_windows(a), tab=TAB_FLOW),   # 탭 이름과 같은 제목 → 테마가 숨긴다 (2026-10-11 사용자: 30일 흐름 타이틀 삭제)
         dk.section("시장 반응", sec_reactions(a), tab=TAB_REACT),   # 탭 이름과 같아 제목은 숨고, 탭 아래 안내 문구는 두지 않는다 (2026-10-11 사용자)
         dk.section("관찰 종목", sec_why(a), tab=TAB_REACT),
