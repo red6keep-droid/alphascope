@@ -568,7 +568,7 @@ def sec_state_cards(a):
     bb = a.get("bollinger")
     if bb and bb.get("state") in BOLL_THEME:   # 하단·상단에 닿은 날만 (2026-10-11 사용자)
         theme, col = BOLL_THEME[bb["state"]]
-        out += _state_card("한 달간 가격 변화 범위는?", {"하단 도달": "맨 아래에 닿음", "상단 도달": "맨 위에 닿음"}[bb["state"]], theme, col, bollinger_lines(bb), "", tip=bollinger_rule(), fold=True)   # 접기 버튼 (2026-10-16 사용자: 시장 국면 · 반도체 자금과 같게)
+        out += _state_card("한 달간 변화 범위는?", {"하단 도달": "맨 아래에 닿음", "상단 도달": "맨 위에 닿음"}[bb["state"]], theme, col, bollinger_lines(bb), "", tip=bollinger_rule(), fold=True)   # 접기 버튼 (2026-10-16 사용자: 시장 국면 · 반도체 자금과 같게)
     oh = a.get("overheat")
     if oh and oh.get("active"):   # 과열 조건 하나라도 해당하는 날만 (2026-10-11 사용자) — 노랑(불확실) 테마, 상태 = 해당 조건 수
         out += _state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "uncertain", WARN, overheat_lines(oh), "", tip=overheat_rule())
