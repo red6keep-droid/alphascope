@@ -4,6 +4,7 @@
     python experiments/nvda-report/publish.py            # dry-run
     python experiments/nvda-report/publish.py --publish  # 실제 게시
     python experiments/nvda-report/publish.py --guide-page   # 고정 페이지 "리포트 읽는 법" 올리기/갱신 (static/reading_guide.html)
+    python experiments/nvda-report/publish.py --draft        # 비공개 초안 "[초안] …" 올리기/갱신 — 폰에서 Blogger 미리보기로 확인 (2026-10-16, 공개 테스트 글 금지)
 """
 
 import os
@@ -68,6 +69,29 @@ def update_post(post_id, title, content, labels):
     return r.json().get("url")
 
 
+def publish_draft(output_dir=None):
+    """같은 본문을 비공개 초안으로 — 독자 · 검색엔진에 안 보이고 글 수에 들지 않는다. 제목 앞 `[초안]`, 라벨 없음. 같은 초안이 있으면 갱신.
+    확인: 폰에서 blogger.com 에 로그인 → 글 목록 → 이 초안 → 미리보기 (실제 테마로 보인다)."""
+    output_dir = output_dir or config.OUTPUT_DIR
+    with open(os.path.join(output_dir, "nvda_report_body.html"), "r", encoding="utf-8") as f:
+        body = f.read()
+    with open(os.path.join(output_dir, "title.txt"), "r", encoding="utf-8") as f:
+        title = "[초안] " + (f.read().strip() or report_title.post_title(report_title.today_kst()))
+    requests, base, headers = _api()
+    r = requests.get(f"{base}/posts", params={"status": "draft", "maxResults": 20, "fetchBodies": "false"}, headers=headers, timeout=30)
+    r.raise_for_status()
+    found = next((p for p in r.json().get("items", []) if str(p.get("title", "")).strip() == title), None)
+    if found:
+        r = requests.put(f"{base}/posts/{found['id']}", headers=headers, json={"kind": "blogger#post", "id": found["id"], "title": title, "content": body}, timeout=60)
+        r.raise_for_status()
+        print(f"[draft] 초안 갱신: {title} (id {found['id']})")
+    else:
+        r = requests.post(f"{base}/posts", params={"isDraft": "true"}, headers=headers, json={"kind": "blogger#post", "title": title, "content": body}, timeout=60)
+        r.raise_for_status()
+        print(f"[draft] 초안 생성: {title} (id {r.json().get('id')})")
+    print("[draft] 폰에서 blogger.com 로그인 → 글 → 초안 → 미리보기")
+
+
 GUIDE_TITLE = "리포트 읽는 법"
 GUIDE_PATH = os.path.join(config.STATIC_DIR, "reading_guide.html")
 
@@ -103,5 +127,7 @@ if __name__ == "__main__":
     load_dotenv(os.path.join(config.BASE_DIR, "..", "..", ".env"))
     if "--guide-page" in sys.argv:
         publish_guide_page()
+    elif "--draft" in sys.argv:
+        publish_draft()
     else:
         publish(do_publish="--publish" in sys.argv)

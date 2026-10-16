@@ -15,7 +15,7 @@ import db
 import indicators
 import trump_bridge
 
-TECH_FIELDS = ["close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_qqq", "ret_vs_avgo", "gap", "range_pct",
+TECH_FIELDS = ["close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_qqq", "ret_vs_avgo", "gap", "range_pct", "ret_sigma_20d",
                "volume", "vol_ratio_20d", "ma50", "ma200", "pct_from_52w_high", "rsi14", "ma_cross"]
 KIND_PRIORITY = {"8k": 0, "10q": 0, "10k": 0, "form4": 1, "13dg": 1, "fedreg": 1, "court": 1, "trump": 1, "calendar": 2, "newsroom": 2,
                  "analyst": 3, "news": 3, "blog": 3, "regime": 2, "sector_flow": 2, "price": 4, "options": 5, "estimates": 6, "flows": 7, "news_volume": 8}
@@ -717,7 +717,7 @@ def build(conn, day, run_date):
     analysis = {
         "generated_at": db.now_iso(), "run_date": run_date, "day": day,
         "is_latest_bar_today": bars_last == day,
-        "headline": {k: s.get(k) for k in ("close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_avgo", "vol_ratio_20d", "gap")},
+        "headline": {k: s.get(k) for k in ("close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_avgo", "vol_ratio_20d", "gap", "range_pct", "ret_sigma_20d")},
         "macro_today": [c["label"] for c in macro_today],
         "market_regime": mr,   # 시장 국면 (2026-10-11): 글 머리 한 줄 + ⓘ 규칙
         "sector_flow": sf,     # 반도체 자금 방향 (2026-10-11): 글 머리 한 줄 + ⓘ 쉬운 설명

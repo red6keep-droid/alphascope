@@ -56,6 +56,11 @@ def technical_rows(bars_by_symbol):
                 o, op = others[s].get(b["day"]), others[s].get(prev["day"])
                 row[f"ret_vs_{s.lower()}"] = (row["ret_1d"] - (o["close"] / op["close"] - 1) * 100) if o and op else None
         row["range_pct"] = (b["high"] - b["low"]) / b["close"] * 100 if b["close"] else None
+        # 평소 하루 움직임 — 최근 20거래일 등락률의 표준편차(%). "오늘 한눈에" 의 기준 (2026-10-16 초보자 원칙, 가이드 2-4)
+        rets = [r["ret_1d"] for r in out[-19:] if r.get("ret_1d") is not None] + ([row["ret_1d"]] if row.get("ret_1d") is not None else [])
+        if len(rets) >= 10:
+            m = sum(rets) / len(rets)
+            row["ret_sigma_20d"] = (sum((x - m) ** 2 for x in rets) / len(rets)) ** 0.5
         look = config.VOL_LOOKBACK_DAYS
         if len(vols) > look and vols[-1]:
             base = sum(vols[-look - 1:-1]) / look
