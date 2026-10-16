@@ -475,6 +475,7 @@ def sector_flow_rule():
             f"발행주식수 5일 변화가 반대면 뚜렷하지 않음")
 
 
+# 상태 카드 제목에 원래 용어 괄호를 두지 않는다 (2026-10-16 사용자: "() 내용은 삭제") — 용어는 ? 툴팁 규칙 글과 읽는 법 페이지에
 # 쉬운 말 줄도 1절 규칙 — 평가어("좋음 · 조심") 없이 상태만 (2026-10-16)
 REGIME_PLAIN = {"상승 추세": "시장(S&P 500)이 1년 최고가 근처에서 오르는 중", "단기 조정": "오르던 시장이 잠시 쉬는 중 — 고점에서 3~10% 아래",
                 "조정장": "시장이 고점보다 10% 넘게 내려와 있거나 200일 평균 아래", "불안 국면": "변동성 지수(VIX)가 30을 넘어 크게 흔들리는 중"}
@@ -559,18 +560,18 @@ def sec_state_cards(a):
     mr = a.get("market_regime")
     if mr:
         theme, col = REGIME_THEME.get(mr["regime"], ("neutral", MUTED))
-        out += _state_card("시장 분위기는? (시장 국면)", mr["regime"], theme, col, regime_lines(mr), _new(a, "regime"), tip=regime_rule(), fold=True)
+        out += _state_card("시장 분위기는?", mr["regime"], theme, col, regime_lines(mr), _new(a, "regime"), tip=regime_rule(), fold=True)
     sf = a.get("sector_flow")
     if sf:
         theme, col = FLOW_THEME.get(sf["state"], ("neutral", MUTED))
-        out += _state_card("반도체로 돈이 올까? (반도체 자금)", sf["state"], theme, col, sector_flow_lines(sf), _new(a, "sector_flow"), tip=sector_flow_rule(), fold=True)
+        out += _state_card("반도체로 돈이 올까?", sf["state"], theme, col, sector_flow_lines(sf), _new(a, "sector_flow"), tip=sector_flow_rule(), fold=True)
     bb = a.get("bollinger")
     if bb and bb.get("state") in BOLL_THEME:   # 하단·상단에 닿은 날만 (2026-10-11 사용자)
         theme, col = BOLL_THEME[bb["state"]]
-        out += _state_card("한 달간 가격 변화 범위는? (볼린저 밴드)", {"하단 도달": "맨 아래에 닿음", "상단 도달": "맨 위에 닿음"}[bb["state"]], theme, col, bollinger_lines(bb), "", tip=bollinger_rule(), fold=True)   # 접기 버튼 (2026-10-16 사용자: 시장 국면 · 반도체 자금과 같게)
+        out += _state_card("한 달간 가격 변화 범위는?", {"하단 도달": "맨 아래에 닿음", "상단 도달": "맨 위에 닿음"}[bb["state"]], theme, col, bollinger_lines(bb), "", tip=bollinger_rule(), fold=True)   # 접기 버튼 (2026-10-16 사용자: 시장 국면 · 반도체 자금과 같게)
     oh = a.get("overheat")
     if oh and oh.get("active"):   # 과열 조건 하나라도 해당하는 날만 (2026-10-11 사용자) — 노랑(불확실) 테마, 상태 = 해당 조건 수
-        out += _state_card("과열 신호는? (과열 지표)", f"{len(oh['active'])}개 조건 해당", "uncertain", WARN, overheat_lines(oh), "", tip=overheat_rule())
+        out += _state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "uncertain", WARN, overheat_lines(oh), "", tip=overheat_rule())
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""   # 데스크톱에서 2열 (테마 CSS, 2026-10-11 사용자)
 
 

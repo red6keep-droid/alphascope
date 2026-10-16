@@ -75,6 +75,8 @@ def publish_draft(output_dir=None):
     output_dir = output_dir or config.OUTPUT_DIR
     with open(os.path.join(output_dir, "nvda_report_body.html"), "r", encoding="utf-8") as f:
         body = f.read()
+    # Blogger 미리보기는 테마 JS(접기 · 탭)를 돌리지 않아 펼침 안 내용을 볼 수 없다 (2026-10-16 사용자) → 초안은 모든 접기를 연 채로
+    body = body.replace('<details data-acc="1">', '<details data-acc="1" open>').replace('<details data-fold="1"', '<details open data-fold="1"')
     with open(os.path.join(output_dir, "title.txt"), "r", encoding="utf-8") as f:
         title = "[초안] " + (f.read().strip() or report_title.post_title(report_title.today_kst()))
     requests, base, headers = _api()
