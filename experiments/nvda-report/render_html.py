@@ -293,7 +293,7 @@ def _multi2(items):
 GLANCE_COLORS = {"조용함": ("#F3F4F6", "#9CA3AF", "#4B5563"), "주의": ("#FFF7ED", "#FB923C", "#C2410C"), "큰 변화": ("#FEF2F2", "#F87171", "#B91C1C")}   # 배경 · 점 · 글자
 GLANCE_TIP = ("상태 신호등 : 오늘 변화가 얼마나 큰지만 나타냅니다 — 오르고 내린 방향이나 좋고 나쁨이 아닙니다\n"
               "· 큰 변화 : 등락이 평소(최근 20일)의 2배 이상, 거래량이 평소의 2배 이상, 하루 흔들림(고가−저가) 4% 이상, 시장(S&P 500)보다 3%p 이상 다르게 움직임 — 하나라도 해당\n"
-              "· 주의 : 등락이 평소보다 큼(1배 이상), 거래량 1.5배 이상, 과열 신호 — 하나라도 해당\n"
+              "· 주의 : 등락이 평소보다 큼(1배 이상), 거래량 1.5배 이상, 눈에 띄는 소식, 한 달 가격 범위 끝에 닿음, 과열 신호 — 하나라도 해당\n"
               "· 조용함 : 위에 해당하는 것이 없음")
 
 
@@ -315,12 +315,13 @@ def _glance_state(a):
         big.append(f"하루 흔들림 {rg:.1f}%")
     if vs >= config.REL_SPY_EVENT:
         big.append(f"시장과 {vs:.1f}%p 다르게 움직임")
-    # 소식 건수 · 한 달 범위는 판정에서 뺀다 (2026-10-17 사용자) — 신호등은 가격 · 거래량 움직임만. 범위는 '한 달간 변화 범위는?' 카드가 따로 보여 준다
+    # 소식 · 한 달 범위 끝은 판정에는 넣고 이유 글에는 쓰지 않는다 (2026-10-17 사용자: "글은 삭제" → "두 조건은 남겨줘")
+    hidden = bool([e for e in a.get("events") or [] if e.get("emphasis")]) or (a.get("bollinger") or {}).get("state") in BOLL_THEME
     if (a.get("overheat") or {}).get("active"):
         mid.append("과열 신호")
     if big:
         return "큰 변화", big + mid
-    if mid:
+    if mid or hidden:
         return "주의", mid
     return "조용함", []
 
