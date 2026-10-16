@@ -477,40 +477,39 @@ def sector_flow_rule():
 
 # 상태 카드 제목에 원래 용어 괄호를 두지 않는다 (2026-10-16 사용자: "() 내용은 삭제") — 용어는 ? 툴팁 규칙 글과 읽는 법 페이지에
 # 쉬운 말 줄도 1절 규칙 — 평가어("좋음 · 조심") 없이 상태만 (2026-10-16)
-REGIME_PLAIN = {"상승 추세": "시장(S&P 500)이 1년 최고가 근처에서 오르는 중", "단기 조정": "오르던 시장이 잠시 쉬는 중 — 고점에서 3~10% 아래",
-                "조정장": "시장이 고점보다 10% 넘게 내려와 있거나 200일 평균 아래", "불안 국면": "변동성 지수(VIX)가 30을 넘어 크게 흔들리는 중"}
-FLOW_PLAIN = {"모이는 중": "최근 한 달 반도체가 시장보다 잘 가 돈이 들어오는 모습", "빠져나가는 중": "최근 한 달 반도체가 시장보다 못 가 돈이 빠지는 모습",
-              "뚜렷하지 않음": "최근 한 달 반도체와 시장의 차이가 작아 방향을 말하기 어려움"}
+REGIME_PLAIN = {"상승 추세": "시장이 1년 최고가 근처", "단기 조정": "시장이 고점보다 3~10% 아래",
+                "조정장": "시장이 고점보다 10% 넘게 아래", "불안 국면": "시장 흔들림(VIX) 30 이상"}
+FLOW_PLAIN = {"모이는 중": "한 달간 반도체가 시장보다 강함", "빠져나가는 중": "한 달간 반도체가 시장보다 약함",
+              "뚜렷하지 않음": "한 달간 반도체와 시장 차이 작음"}
 
 
 def regime_lines(mr):
-    """시장 국면 이유 — 쉬운 말 한 줄(굵게) + 오늘 수치 두 줄 (규칙은 툴팁)."""
+    """짧은 블릿 "라벨 : 값" (2026-10-16 사용자: 문장을 길게 쓰지 마). 규칙은 툴팁 (regime_rule)."""
     st = mr.get("streak") or 0
-    second = f"200일 평균 {'위' if mr['above_ma200'] else '아래'}" + (f" · VIX {mr['vix']:.1f}" if mr.get("vix") is not None else "") \
-             + (f" · {abs(st)}일 연속 {'상승' if st > 0 else '하락'}" if st else " · 보합")
-    lines = [(REGIME_PLAIN.get(mr["regime"], ""), "plain"), f"S&P 500(SPY) 52주 고점 대비 {mr['pct_from_high']:+.1f}%", second]   # 쉬운 말 줄 먼저 (2026-10-16 사용자)
-    if mr.get("fng"):   # CNN 공포·탐욕 지수 (2026-10-11 사용자) — 국면 판정에는 쓰지 않고 보여 주기만
-        lines.append(f"공포·탐욕 지수 {mr['fng']['score']:.0f} ({mr['fng'].get('rating_ko') or mr['fng'].get('rating')}) · 0 극단적 공포 ~ 100 극단적 탐욕")
+    lines = [(REGIME_PLAIN.get(mr["regime"], ""), "plain"),
+             f"S&P 500 고점 대비 : {mr['pct_from_high']:+.1f}%",
+             f"200일 평균 : {'위' if mr['above_ma200'] else '아래'}"]
+    if mr.get("vix") is not None:
+        lines.append(f"시장 흔들림 (VIX) : {mr['vix']:.1f} (30 이상 불안)")
+    lines.append(f"연속 : {abs(st)}일 {'상승' if st > 0 else '하락'}" if st else "연속 : 보합")
+    if mr.get("fng"):   # CNN 공포·탐욕 지수 — 국면 판정에는 쓰지 않고 보여 주기만
+        lines.append(f"공포·탐욕 지수 : {mr['fng']['score']:.0f} {mr['fng'].get('rating_ko') or mr['fng'].get('rating')} (0 공포 ~ 100 탐욕)")
     return lines
 
 
 def sector_flow_lines(sf):
-    """반도체 자금 이유 — 반도체 수치와 뜻, 섹터 순위(앞선 셋·뒤처진 셋), 발행주식수 (2026-10-11 사용자: 순위를 알려주기)."""
-    n, rel = sf["days"], sf["rel_pp"]
-    rank = f" · 11개 섹터와 같이 세우면 {sf['smh_rank']}위" if sf.get("smh_rank") else ""
-    meaning = {"모이는 중": "돈이 반도체로 옮겨 오는 중", "빠져나가는 중": "돈이 다른 섹터로 돌고 있는 중"}.get(sf["state"], "섹터 간 이동이 뚜렷하지 않음")
-    if sf.get("shares_5d") is not None and sf["state"] == "뚜렷하지 않음" and abs(rel) >= config.SECTOR_FLOW_PP:
-        meaning = "가격과 실제 자금(발행주식수)이 엇갈려 방향을 두지 않음"
-    lines = [(FLOW_PLAIN.get(sf["state"], ""), "plain"), f"반도체 ETF(SMH) {n}일 수익률, 시장(S&P 500) 대비 {rel:+.1f}%p{rank} → {meaning}"]   # 쉬운 말 줄 먼저
+    """짧은 블릿 "라벨 : 값" (2026-10-16 사용자). 규칙은 툴팁 (sector_flow_rule)."""
+    lines = [(FLOW_PLAIN.get(sf["state"], ""), "plain"),
+             f"반도체 vs 시장 ({sf['days']}일) : {sf['rel_pp']:+.1f}%p (±{config.SECTOR_FLOW_PP:.0f}%p 넘으면 방향)"]
+    if sf.get("smh_rank"):
+        lines.append(f"섹터 순위 : 12개 중 {sf['smh_rank']}위")
     secs = sf.get("sectors") or []
     if secs:
-        top = " · ".join(f"{x['rank']}위 {x['name']} {x['rel']:+.1f}%p" for x in secs[:3])
-        bot = " · ".join(f"{x['rank']}위 {x['name']} {x['rel']:+.1f}%p" for x in secs[-3:][::-1])
-        lines.append(f"앞선 섹터: {top}")
-        lines.append(f"뒤처진 섹터: {bot}")
+        lines.append("앞선 섹터 : " + " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[:3]))
+        lines.append("뒤처진 섹터 : " + " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[-3:][::-1]))
     if sf.get("shares_5d") is not None:
-        lines.append(f"반도체 ETF 발행주식수 5일 {sf['shares_5d']:+.1f}%")
-    return lines   # 규칙은 툴팁 (sector_flow_rule)
+        lines.append(f"반도체 ETF 주식수 5일 : {sf['shares_5d']:+.1f}%")
+    return lines
 
 
 BOLL_THEME = {"하단 도달": ("negative", DOWN), "상단 도달": ("positive", UP)}
@@ -522,17 +521,19 @@ def bollinger_rule():
 
 
 def bollinger_lines(bb):
+    """짧은 블릿 — "라벨 : 값" 한 줄씩 (2026-10-16 사용자: "블릿으로, 문장을 길게 쓰지 마")."""
     low = bb["state"] == "하단 도달"
-    plain = (f"최근 한 달 가격이 보통 ${bb['lower']:,.0f}~${bb['upper']:,.0f} 사이에서 움직였는데, 오늘 종가가 그 {'아래' if low else '위'}로 나감 — "
-             f"한 달 기준으로 {'많이 내린' if low else '많이 오른'} 날 (과거 같은 날들의 통계는 아래)")
-    lines = [(plain, "plain"), f"종가 ${bb['close']:,.2f} · {'하단' if low else '상단'} ${(bb['lower'] if low else bb['upper']):,.2f} · 20일 평균 ${bb['ma20']:,.2f} · %B {bb['pctb']:.2f}"]
+    lines = [("한 달 범위 " + ("아래로 나감" if low else "위로 나감"), "plain"),
+             f"한 달 범위 : ${bb['lower']:,.0f} ~ ${bb['upper']:,.0f}",
+             f"오늘 종가 : ${bb['close']:,.2f}"]
     if bb.get("days", 0) > 1:
-        lines.append(f"{bb['days']}일째 {'하단 아래' if low else '상단 위'}")
+        lines.append(f"연속 : {bb['days']}일째")
     st = (bb.get("stats") or {}).get("boll_lower" if low else "boll_upper")
     base = (bb.get("stats") or {}).get("base") or {}
     if st and base:
-        lines.append(f"과거 10년 {'하단' if low else '상단'} 진입 {st['n']}회 — 20일 뒤 상승 {st['up20']}% (아무 날 {base['up20']}%) · "
-                     f"60일 뒤 상승 {st['up60']}% (아무 날 {base['up60']}%) · 중앙값 20일 {st['med20']:+.1f}%")
+        lines.append(f"과거 10년 : {st['n']}회")
+        lines.append(f"20일 뒤 오른 비율 : {st['up20']}% (평소 {base['up20']}%)")
+        lines.append(f"60일 뒤 오른 비율 : {st['up60']}% (평소 {base['up60']}%)")
     return lines
 
 
@@ -541,17 +542,22 @@ def overheat_rule():
             f"하나라도 해당하는 날만 카드. 통계는 10년간 그 조건에 처음 들어간 날의 20·60일 뒤 수익률 빈도이지 예측이 아니다")
 
 
+OVERHEAT_SHORT = {"rsi80": ("단기 과열 온도", "80 이상", ""), "ma200_40": ("200일 평균 대비", "+40% 이상", "%"), "ret20_25": ("20일 수익률", "+25% 이상", "%")}
+
+
 def overheat_lines(oh):
-    lines = [("짧은 기간에 빠르게 오른 상태 — 조건마다 과거 10년 통계를 아래에", "plain")]
+    """짧은 블릿 — 조건마다 값 · 과거 10년 횟수 · 20 · 60일 뒤 오른 비율 (2026-10-16 사용자: "블릿으로, 문장을 길게 쓰지 마")."""
+    lines = [("짧은 기간에 빠르게 오름", "plain")]
     stats, base = (oh.get("stats") or {}), ((oh.get("stats") or {}).get("base") or {})
     for k in oh["active"]:
+        name, rule, unit = OVERHEAT_SHORT[k]
         v = oh["values"].get(k)
-        head = f"{config.OVERHEAT_KEYS[k]} — 현재 {v:.1f}{'' if k == 'rsi80' else '%'}"
+        lines.append(f"{name} : {v:+.1f}{unit} (기준 {rule})" if unit else f"{name} : {v:.1f} (기준 {rule})")
         st = stats.get(k) or {}
         if st and base:
-            head += (f" · 과거 10년 진입 {st['n']}회: 20일 뒤 상승 {st['up20']}% (아무 날 {base['up20']}%) · 60일 뒤 {st['up60']}% (아무 날 {base['up60']}%) · "
-                     f"중앙값 20일 {st['med20']:+.1f}%")
-        lines.append(head)
+            lines.append(f"과거 10년 : {st['n']}회")
+            lines.append(f"20일 뒤 오른 비율 : {st['up20']}% (평소 {base['up20']}%)")
+            lines.append(f"60일 뒤 오른 비율 : {st['up60']}% (평소 {base['up60']}%)")
     return lines
 
 
