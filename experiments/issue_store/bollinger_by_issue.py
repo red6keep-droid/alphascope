@@ -84,8 +84,10 @@ def build():
         g["VIX · " + name] = (vix > lo_) & (vix <= hi_)
     # 캘린더 (발표일 ±1거래일)
     ec = pd.read_csv(os.path.join(CAL, "econ_releases.csv"), parse_dates=["day"])
-    for sub in ("CPI", "고용 보고서", "PCE", "PPI", "GDP", "소매판매"):
+    for sub in sorted(ec.subkind.unique()):   # 저장소의 경제지표 전부 (2026-10-17 사용자: 확보한 이슈 포함)
         g["경제지표 · " + sub + " ±1일"] = near(ec[ec.subkind == sub].day, idx)
+    for grp in sorted(ec.group.unique()):
+        g["경제지표 분류 · " + grp + " ±1일"] = near(ec[ec.group == grp].day, idx)
     fo = pd.read_csv(os.path.join(CAL, "fomc.csv"), parse_dates=["day"])
     for dec in ("인상", "동결", "인하"):
         g["FOMC · " + dec + " ±1일"] = near(fo[fo.decision == dec].day, idx)
@@ -100,6 +102,12 @@ def build():
     # 사건 기간 (사건표, 시작일 ~ +window_days 거래일)
     ev = pd.read_csv(os.path.join(ROOT, "experiments", "issue_store", "events_curated.csv"), parse_dates=["start"])
     ev = ev[ev.confidence.astype(str).str.contains("기억|기사 확인")]
+    for subk, sub in ev.dropna(subset=["subkind"]).groupby("subkind"):   # 세부 종류 (전쟁 발발 · 관세 · 금리 인상 …)
+        m = np.zeros(len(idx), bool)
+        for _, r in sub.iterrows():
+            p = idx.searchsorted(r.start)
+            m[p:min(len(idx), p + int(r.window_days))] = True
+        g["사건 세부 · " + subk] = pd.Series(m, index=idx)
     for kind, sub in ev.groupby("kind"):
         m = np.zeros(len(idx), bool)
         for _, r in sub.iterrows():
@@ -111,6 +119,12 @@ def build():
     for _, r in nvd.iterrows():
         p = idx.searchsorted(r.start); m[p:min(len(idx), p + int(r.window_days))] = True
     g["사건 · 엔비디아 · 반도체 관련"] = pd.Series(m, index=idx)
+    # 큰 움직임 직후 (detect_shocks.py, 데이터 오류 제외) — 그날 ~ 5거래일
+    sh = pd.read_csv(os.path.join(CAL, "shocks.csv"), parse_dates=["day"])
+    g["큰 움직임 직후 · 아무 시장 (5일 안)"] = near(sh.day, idx, 0, 5)
+    for mk in sorted(sh.market.unique()):
+        g["큰 움직임 직후 · " + mk + " (5일 안)"] = near(sh[sh.market == mk].day, idx, 0, 5)
+    g["큰 움직임 직후 · 원인 미확인 (5일 안)"] = near(sh[sh.explained_by.isna()].day, idx, 0, 5)
     g = {k: v.reindex(idx).fillna(False).astype(bool) for k, v in g.items()}
     return idx, fwd, sig, g
 
@@ -131,8 +145,14 @@ def boot_p(entry_fwd, base_rate, months):
     return float(np.mean(np.abs(centered) >= abs(obs)))
 
 
+DROPPED = []
+
+
 def run():
     idx, fwd, sig, groups = build()
+    for gname, gm in groups.items():
+        if int(gm.sum()) < 10:
+            DROPPED.append((gname, int(gm.sum())))
     rows = []
     for sname, s in sig.items():
         for gname, gm in groups.items():
@@ -141,17 +161,20 @@ def run():
                 f = fwd[h]
                 e = f[ent].dropna()
                 b = f[gm].dropna()
-                if len(e) < 5 or len(b) < 50:
+                if len(b) < 10:   # 묶음 날 자체가 10일 미만이면 비교 불가 — 아래 '빠진 묶음' 에 이유와 함께 남는다
                     continue
-                r = {"신호": sname, "묶음": gname, "기간": h, "n": len(e), "오른 비율": 100 * (e > 0).mean(), "일반 오른 비율": 100 * (b > 0).mean(),
+                if len(e) == 0:   # 이 묶음 기간에 진입이 없었다 — 표에 n 0 으로 남긴다
+                    rows.append({"신호": sname, "묶음": gname, "기간": h, "n": 0, "일반 오른 비율": 100 * (b > 0).mean(), "묶음 날 수": len(b)})
+                    continue
+                r = {"신호": sname, "묶음": gname, "기간": h, "n": len(e), "묶음 날 수": len(b), "오른 비율": 100 * (e > 0).mean(), "일반 오른 비율": 100 * (b > 0).mean(),
                      "중앙값": 100 * e.median(), "일반 중앙값": 100 * b.median(), "나쁜 쪽 10%": 100 * e.quantile(.1), "일반 나쁜 쪽 10%": 100 * b.quantile(.1)}
                 r["차이"] = r["오른 비율"] - r["일반 오른 비율"]
                 r["p"] = boot_p(e, (b > 0).mean(), e.index.to_period("M")) if len(e) >= N_MIN and h in MAIN_HZ else np.nan
                 # 두 기간 방향 (1999~2012 · 2013~2026)
                 e1, e2 = e[e.index < SPLIT], e[e.index >= SPLIT]
                 b1, b2 = b[b.index < SPLIT], b[b.index >= SPLIT]
-                d1 = (100 * (e1 > 0).mean() - 100 * (b1 > 0).mean()) if len(e1) >= 5 and len(b1) >= 50 else np.nan
-                d2 = (100 * (e2 > 0).mean() - 100 * (b2 > 0).mean()) if len(e2) >= 5 and len(b2) >= 50 else np.nan
+                d1 = (100 * (e1 > 0).mean() - 100 * (b1 > 0).mean()) if len(e1) >= 1 and len(b1) >= 10 else np.nan
+                d2 = (100 * (e2 > 0).mean() - 100 * (b2 > 0).mean()) if len(e2) >= 1 and len(b2) >= 10 else np.nan
                 r["차이 1999~2012"], r["차이 2013~2026"] = d1, d2
                 r["n 1999~2012"], r["n 2013~2026"] = len(e1), len(e2)
                 rows.append(r)
@@ -165,7 +188,7 @@ def run():
     df.loc[m, "q"] = np.minimum(q, 1)
     same = np.sign(df["차이 1999~2012"]) == np.sign(df["차이 2013~2026"])
     df["판정"] = np.where(m & (df["q"] < Q_MAX) & same & (df["n"] >= N_MIN), "효과 있음",
-                        np.where(df["n"] < N_MIN, "표본 부족", "뚜렷한 차이 없음"))
+                        np.where(df["n"] == 0, "진입 없음", np.where(df["n"] < N_MIN, "표본 부족", "뚜렷한 차이 없음")))
     return df.round(2)
 
 
@@ -184,6 +207,7 @@ def report(df):
         lines += ["", f"## {s} — 5 · 10일, 전체 묶음 (차이 순)", "", "| 묶음 | 기간 | n | 오른 비율 | 일반 | 차이 | 중앙값 | 일반 중앙값 | 나쁜 쪽 10% | 1999~2012 | 2013~2026 | q | 판정 |", "|" + "---|" * 13]
         lines += [f"| {r['묶음']} | {r['기간']} | {r['n']} | {r['오른 비율']:.0f}% | {r['일반 오른 비율']:.0f}% | {r['차이']:+.0f} | {r['중앙값']:+.1f}% | {r['일반 중앙값']:+.1f}% | {r['나쁜 쪽 10%']:+.1f}% | "
                   f"{r['차이 1999~2012']:+.0f} | {r['차이 2013~2026']:+.0f} | {r['q'] if pd.notna(r['q']) else '-'} | {r['판정']} |" for _, r in sub.iterrows()]
+    lines += ["", "## 비교할 날이 10일 미만이라 뺀 묶음", ""] + [f"- {n} ({k}일)" for n, k in DROPPED]
     open(os.path.join(OUT, "bollinger_nvda.md"), "w", encoding="utf-8").write("\n".join(lines).replace("nan", "-"))
     print(f"칸 {len(df)} · 판정 대상 {int(df['p'].notna().sum())} · 효과 있음 {len(eff)} → results/bollinger_nvda.md")
 
