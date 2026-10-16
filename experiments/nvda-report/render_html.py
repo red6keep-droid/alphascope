@@ -333,7 +333,7 @@ def _glance_state(a):
 def _plain_rows(rows):
     """펼친 카드 맨 위의 쉬운 말 줄 묶음 (2026-10-16 사용자: "오늘 요약을 별도 영역으로 두지 마, 강조 카드를 펼쳤을 때 추가 내용으로 상단에").
     소제목(14px 회색) 한 줄 아래 본문 한 줄, 항목 사이 10px, 아래 구분선. 홈 카드가 값 줄로 읽지 않게 space-between 을 쓰지 않는다."""
-    lis = "".join(f'<div style="margin-top:{0 if i == 0 else 10}px;"><div style="font-size:{TINY};line-height:20px;color:{NOTE};">{k}</div>'
+    lis = "".join(f'<div style="margin-top:{0 if i == 0 else 10}px;">' + (f'<div style="font-size:{TINY};line-height:20px;color:{NOTE};">{k}</div>' if k else "") +
                   f'<div style="line-height:{_dk.LH_BODY};color:#111;word-break:keep-all;">{v}</div></div>' for i, (k, v) in enumerate(rows))
     return f'<div style="padding:4px 12px 14px;margin:0 0 8px;border-bottom:1px solid #E2E8F0;">{lis}</div>'
 
@@ -370,7 +370,8 @@ def glance_rows(a, n=None):
     light = (f'<span style="display:inline-flex;align-items:center;gap:6px;padding:2px 8px 2px 6px;border-radius:999px;background:{bg};color:{fg};font-weight:700;white-space:nowrap;">'
              f'<span style="width:10px;height:10px;border-radius:50%;background:{dot};"></span>{state}</span>')
     reason = f' <span style="color:{NOTE};">— {_esc(" · ".join(reasons))}</span>' if reasons else ""
-    return _plain_rows([("등락 (평소 대비)", how), ("주요 이슈", why), ("변화 강도" + _dk.tip_icon(GLANCE_TIP), light + reason)])
+    # 1번 카드(가격 카드) 펼침 맨 위 — 작은 소제목 없이 두 줄, 주요 이슈 줄은 뺀다 (2026-10-17 사용자). ? 툴팁은 신호등 뒤
+    return _plain_rows([("", how), ("", light + _dk.tip_icon(GLANCE_TIP) + reason)])
 
 
 def sec_headline(a, n=None):
