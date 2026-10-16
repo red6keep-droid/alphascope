@@ -471,7 +471,7 @@ def sec_state_cards(a):
     bb = a.get("bollinger")
     if bb and bb.get("state") in BOLL_THEME:   # 하단·상단에 닿은 날만 (2026-10-11 사용자)
         theme, col = BOLL_THEME[bb["state"]]
-        out += _state_card("볼린저 밴드", bb["state"], theme, col, bollinger_lines(bb), "", tip=bollinger_rule())
+        out += _state_card("볼린저 밴드", bb["state"], theme, col, bollinger_lines(bb), "", tip=bollinger_rule(), fold=True)   # 접기 버튼 (2026-10-16 사용자: 시장 국면 · 반도체 자금과 같게)
     oh = a.get("overheat")
     if oh and oh.get("active"):   # 과열 조건 하나라도 해당하는 날만 (2026-10-11 사용자) — 노랑(불확실) 테마, 상태 = 해당 조건 수
         out += _state_card("과열 지표", f"{len(oh['active'])}개 조건 해당", "uncertain", WARN, overheat_lines(oh), "", tip=overheat_rule())
@@ -543,7 +543,7 @@ def _event_html(e):
                  if e.get("url") else f'<span style="font-weight:700;color:#111;">{head}</span>')
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절) — 배경 · 테두리만 방향 색
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
-        return (f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px {_dk.SEP_GAP - _dk.VP}px;margin:0 -13px 8px;line-height:{_dk.LH_BODY};">'   # 좌우 −13(안쪽 12 + 테두리 1): 강조 카드 제목 = 일반 기사 제목 왼쪽 선 (2026-10-14 사용자)   # 끝 줄이 라벨(행간 1)이라 아래는 VP 만 뺀다
+        return (f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px {_dk.SEP_GAP - _dk.VP}px;margin:0 0 8px;line-height:{_dk.LH_BODY};">'   # 폭은 다른 카드와 같게, 대신 일반 기사를 NEWS_INDENT 만큼 들여 제목 왼쪽 선을 맞춘다 (2026-10-16 사용자; 10-14 의 좌우 −13 은 되돌림)   # 끝 줄이 라벨(행간 1)이라 아래는 VP 만 뺀다
                 f"{head_html}{fact}{when}{lab}</div>")
     return f"{head_html}{fact}{when}{lab}"
 
@@ -555,6 +555,7 @@ RATING_PASTEL = [("strongBuy", "강매수", "#F4ACA6", "#7F1D1D"), ("buy", "매�
                  ("hold", "보유", "#E2E8F0", "#475569"), ("sell", "매도", "#C9DCF7", "#1E3A8A"), ("strongSell", "강매도", "#A9C5F2", "#1E3A8A")]
 
 
+NEWS_INDENT = 13   # 일반 기사 좌우 들여쓰기 = 강조 카드 테두리 1 + 안쪽 12 (2026-10-16 사용자: 강조 카드 폭은 다른 카드와 같게, 제목 왼쪽 선은 맞게)
 BAR_H, BAR_NUM, BAR_PAD = 30, "17px", 5   # 막대 안 숫자 18 → 17 (2026-10-14 사용자)   # 높이 26 → 30 (+15%, 2026-10-14 사용자) · 막대 위아래 +5   # 막대 높이 24 → 26 (+10%, 정수) · 막대 안 숫자 19 → 18 (2026-10-13 사용자, 가이드라인 10-7)
 
 
@@ -633,7 +634,8 @@ def sec_events(a):
         return _muted("오늘은 임계값을 넘은 이벤트가 없습니다 — 공시·기사·가격·옵션·예상 실적 어느 쪽도 기준에 걸리지 않았다는 뜻입니다.")
     cards = [e for e in a["events"] if e.get("emphasis")]
     plain = [e for e in a["events"] if not e.get("emphasis")]
-    out = "".join(_event_html(e) for e in cards) + _dk.item_rules([_event_html(e) for e in plain])   # 강조 카드만 카드, 나머지는 가로 구분선 목록 (2026-10-13 사용자)
+    # 강조 카드만 카드, 나머지는 가로 구분선 목록 (2026-10-13 사용자). 일반 기사는 카드 안쪽만큼(테두리 1 + 안쪽 12) 들여 제목 왼쪽 선을 강조 카드 제목에 맞춘다 (2026-10-16 사용자)
+    out = "".join(_event_html(e) for e in cards) + _dk.item_rules([f'<span style="display:block;padding:0 {NEWS_INDENT}px;">{_event_html(e)}</span>' for e in plain])
     if a["events_overflow"]:
         # 카드 버튼 (가운데, 검정) — 2026-10-11 사용자
         out += (f'<details data-acc="1" style="margin:8px 0;"><summary style="{_dk.FOLD_BTN}">그 외 {len(a["events_overflow"])}건 {ACC_CHEV}</summary>'
@@ -826,24 +828,23 @@ def sec_targets(a):
     n = sum(rc.values()) if rc else 0
     bar = _bar(f"애널리스트 {n}명", [(nm, rc.get(k, 0), bg, fg) for k, nm, bg, fg in RATING_PASTEL], split="break") if n else ""   # 인원 다음 줄에 비율 (2026-10-12 사용자)
     tn = next((_new(a, "status:" + k) for k in ("pt_mean", "pt_median", "pt_high", "pt_low", "rating_counts") if _new(a, "status:" + k)), "")   # 목표가·등급 중 하나라도 바뀐 날
-    # 접힌 상태: 목표가 평균 줄 + 평균 등급 줄 (화살표는 평균 등급 줄 오른쪽, 2026-10-11 사용자)
-    summary = (f'<span style="{MULTI_ROW}padding:{_dk.SEP_GAP - _dk.VP - 1}px 0;"><span style="{tl}">목표가 평균{tn}</span> '
-               f'<span style="{tr}">{_esc(rr.fmt(mean, "usd0"))} {vs} {gap(mean)}</span></span>')
-    if n:   # 등급 분포 막대는 접힌 상태에도 보인다 (2026-10-11 사용자) — 목표가 평균 줄 아래
-        summary += f'<span style="display:block;padding:{_dk.SEP_GAP - _dk.VP - 1}px 0 10px;{MULTI_SEP}">{bar}</span>'   # 막대 아래 margin 10 + 10 ≈ 보이는 22 (2026-10-12)
+    # 접힌 상태: 애널리스트 N명 등급 분포 막대가 맨 위 + 평균 등급 줄 (화살표는 이 줄 오른쪽). 목표가 평균은 펼친 영역의 첫 줄로
+    # (2026-10-16 사용자: "애널리스트 62명 내용을 맨 처음에, 목표가 평균은 목표가 중앙 위에 · 펼쳤을 때 나오는 영역에")
+    if n:
+        summary = f'<span style="display:block;padding:{_dk.SEP_GAP - _dk.VP - 1}px 0 10px;">{bar}</span>'   # 막대 아래 margin 10 + 10 ≈ 보이는 22 (2026-10-12)
         # 평균 등급 (2026-10-11 사용자: 네이버 컨센서스처럼 한 숫자로) — 강매수 5 … 강매도 1 가중 평균. 애널리스트 의견의 평균이지 리포트의 판단이 아니다
         mean_r = sum(w * rc.get(k, 0) for k, w in (("strongBuy", 5), ("buy", 4), ("hold", 3), ("sell", 2), ("strongSell", 1))) / n
         summary += (f'<span style="{MULTI_ROW}padding:{_dk.SEP_GAP - _dk.VP - 1}px 0 0;{MULTI_SEP}"><span style="{COL_L}font-weight:700;color:#111;font-size:{_dk.NAME};">{_paren("평균 등급 (강매수 5 · 강매도 1)")}</span> '
                     f'<span style="{COL_R}{VAL}font-weight:700;display:inline-flex;align-items:center;justify-content:flex-end;">{mean_r:.1f}&nbsp;<span style="color:{MUTED};font-weight:400;">/ 5</span>{ACC_BTN}</span></span>')
     else:
-        summary += f'<span style="display:flex;justify-content:flex-end;padding:4px 0 0;">{ACC_BTN}</span>'
-    # 펼친 상태: 목표가 중앙·최고·최저 (평균 줄과 같은 모양)
+        summary = f'<span style="display:flex;justify-content:flex-end;padding:4px 0 0;">{ACC_BTN}</span>'
+    # 펼친 상태: 목표가 평균·중앙·최고·최저 (같은 줄 모양) — 바뀐 날 표시(tn)는 평균 줄에
     rows = ""
-    for key, name in (("pt_median", "중앙"), ("pt_high", "최고"), ("pt_low", "최저")):
+    for key, name in (("pt_mean", "평균"), ("pt_median", "중앙"), ("pt_high", "최고"), ("pt_low", "최저")):
         v = (cells.get(key) or {}).get("value")
         if v is None:
             continue
-        rows += (f'<span style="{MULTI_ROW}padding:{_dk.SEP_GAP - _dk.VP - 1}px 0;{MULTI_SEP if rows else ""}"><span style="{tl}">목표가 {name}</span> '
+        rows += (f'<span style="{MULTI_ROW}padding:{_dk.SEP_GAP - _dk.VP - 1}px 0;{MULTI_SEP if rows else ""}"><span style="{tl}">목표가 {name}{tn if key == "pt_mean" else ""}</span> '
                  f'<span style="{tr}">{_esc(rr.fmt(v, "usd0"))} {vs} {gap(v)}</span></span>')   # 펼친 줄도 구분선 위아래 22 (2026-10-12 사용자: 콘텐츠 카드 일괄)
     return _accordion(summary, f'<span style="display:block;">{rows}</span>', block=True)
 
