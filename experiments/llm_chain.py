@@ -81,6 +81,9 @@ CHAINS = {
     # Groq 둘은 짧은 요청(분류 · 답글)용 3 · 4순위
     # gemini-lite 가 2순위 (2026-10-16): 3.5-flash 과부하 · 하루 한도 때 같은 키의 다른 모델이 먼저 받는다 — 분류 일치율이 DeepSeek 보다 높고 빠르다
     "json": ["gemini", "gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
+    # 데일리 서술만 DeepSeek 이 lite 보다 앞 (2026-10-16 사용자): 같은 데이터로 비교하니 lite 는 숫자는 맞지만 두루뭉술하고("다양한 업종")
+    # 뉘앙스가 어긋남(+0.08% 를 "약보합", 전 지수 상승을 "혼조"). DeepSeek 이 더 구체적 — 단 10-15 에 방향 오류 2건 이력
+    "json-daily": ["gemini", "nvidia-deepseek", "gemini-lite", "groq-qwen", "groq"],
     "translate": ["groq", "nvidia-gptoss20", "gemini-lite", "gemini"],          # 홈 뉴스 제목 번역 — 빠른 것부터 (2026-10-11)
     # 댓글 답글 — Gemini 는 맨 뒤 (2026-10-14 사용자: 댓글 한 건에 한도 1회가 나가니 리포트 몫을 남기자). 답글은 짧고 숫자를 쓰지 않아 예비 모델로 충분.
     # DeepSeek 가 첫째 — 비교에서 답글 품질이 가장 좋았고, 봇은 5분마다 돌아 30초쯤 걸려도 된다

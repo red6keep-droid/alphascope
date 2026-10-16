@@ -64,7 +64,7 @@ def generate_report(input_path, output_path, analysis_path=None):
         if problems:
             raise ValueError("숫자 검사 — " + " / ".join(problems))
 
-    pool = LLMPool("json", label="daily-report")
+    pool = LLMPool("json-daily", label="daily-report")   # flash → DeepSeek → lite (2026-10-16, 데일리만 — llm_chain.CHAINS 참조)
     try:
         report = pool.generate_json(prompt, temperature=None, validate=check)
     except RuntimeError:
