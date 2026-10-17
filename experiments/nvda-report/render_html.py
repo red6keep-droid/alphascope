@@ -507,7 +507,7 @@ def _est_w(text, px):
 INLINE_W = 316   # 상태 카드 줄 안쪽 폭 어림 (390px 폰 − 여백 · 카드 안쪽) − 이름과 값 사이 간격
 
 
-def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False):
+def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False):
     """상태 카드 (가이드라인 2-1 D, 2026-10-11 사용자: "별도 카드로 분리하고 이유도 카드에 포함" → "안내 아이콘 삭제, 글씨 검정, 블릿으로").
     첫 줄 구분명 좌·상태 우, 아래 얇은 선 뒤에 이유 글머리표(16px, 검정). 이유 묶음은 border-top — 홈 카드는 border-top 요소를 건너뛰므로 홈에는 첫 줄만 간다."""
     bg, bd = CARD_DIR[theme]
@@ -519,7 +519,8 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
         if kind == "row":   # 근거 줄 — 블릿 · 콜론 없이 이름 왼쪽 | 값 오른쪽, 아래 14px 회색 뜻 (2026-10-16 사용자: "블릿과 근거 사이 점들이 헷갈린다, 근거를 자세히")
             _, name, value, note = item
             multi = "\n" in str(value)
-            inline = bool(note) and not multi and _est_w(name, 17) + _est_w(f"({note})", 14) + _est_w(value, 17) <= INLINE_W   # 설명을 괄호로 이름 옆에 (2026-10-17 사용자)
+            fits = _est_w(name, 17) + _est_w(f"({note})", 14) + _est_w(value, 17) <= INLINE_W
+            inline = bool(note) and not multi and (fits or inline_notes)   # 설명을 괄호로 이름 옆에 (2026-10-17 사용자). inline_notes=True 면 길어도 모두 괄호 — 줄이 바뀐다
             if multi:   # 값이 여러 줄이면 설명은 이름 아래 왼쪽 — 줄 수를 늘리지 않는다 (2026-10-17 사용자: 모바일에서 여러 단 쓰지 말 것)
                 vals = _tint(_esc(value)).replace(chr(10), "<br>")
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd};">'
@@ -527,10 +528,11 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
                         f'<span style="flex:none;color:#111;">{_esc(name)}<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span></span>'
                         f'<span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{vals}</span></span></li>')
             if inline:
+                lw = "flex:1 1 auto;min-width:0;word-break:keep-all;" if not fits else "flex:none;white-space:nowrap;"   # 안 들어가면 왼쪽 칸 안에서 줄바꿈
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
-                        f'<span style="flex:none;white-space:nowrap;color:#111;">{_esc(name)} <span style="font-size:{TINY};color:{NOTE};">({_esc(note)})</span></span>'
-                        f'<span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value))}</span></span></li>')
+                        f'<span style="{lw}color:#111;">{_esc(name)} <span style="font-size:{TINY};color:{NOTE};">({_esc(note)})</span></span>'
+                        f'<span style="flex:none;text-align:right;font-weight:700;white-space:nowrap;">{_tint(_esc(value))}</span></span></li>')
             return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd};">'
                     f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
                     f'<span style="flex:none;white-space:nowrap;color:#111;">{_esc(name)}</span><span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value)).replace(chr(10), "<br>")}</span></span>'
@@ -724,7 +726,7 @@ def sec_state_cards(a):
     bb = a.get("bollinger")
     if bb and bb.get("state") in BOLL_THEME:   # 하단·상단에 닿은 날만 (2026-10-11 사용자)
         theme, col = BOLL_THEME[bb["state"]]
-        out += _state_card("한 달간 변화 범위는?", {"하단 도달": "하락 범위에 닿음", "상단 도달": "상승 범위에 닿음"}[bb["state"]], theme, col, bollinger_lines(bb), "", tip=bollinger_rule(), fold=True)   # 접기 버튼 (2026-10-16 사용자: 시장 국면 · 반도체 자금과 같게)
+        out += _state_card("한 달간 변화 범위는?", {"하단 도달": "하락 범위에 닿음", "상단 도달": "상승 범위에 닿음"}[bb["state"]], theme, col, bollinger_lines(bb), "", tip=bollinger_rule(), fold=True, inline_notes=True)   # 작은 글씨는 모두 괄호 (2026-10-17 사용자)   # 접기 버튼 (2026-10-16 사용자: 시장 국면 · 반도체 자금과 같게)
     oh = a.get("overheat")
     if oh and oh.get("active"):   # 과열 조건 하나라도 해당하는 날만 (2026-10-11 사용자) — 노랑(불확실) 테마, 상태 = 해당 조건 수
         out += _state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", MUTED, overheat_lines(oh), "", tip=overheat_rule())   # 노랑 → 회색 (2026-10-17 W7)
