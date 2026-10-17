@@ -563,12 +563,19 @@ def sec_drawdown(a):
         def cell(txt, first=False, style=""):
             return (f'<span style="flex:1 1 0;min-width:0;box-sizing:border-box;padding:0 8px;text-align:{"left" if first else "center"};'
                     f'{"" if first else vb}{style}">{txt}</span>')
-        head_cells = cell("", True) + "".join(cell(f'<span style="color:{DOWN};font-weight:700;">−{lv}%</span>') for lv, _, _ in cols)
+        head_cells = cell(f'<span style="color:{DOWN};font-weight:700;">하락비율</span>', True) + "".join(cell(f'<span style="color:{DOWN};font-weight:700;">−{lv}%</span>') for lv, _, _ in cols)   # 엔비디아 글씨 위 파란 `하락비율` (2026-10-17 사용자)
         r1 = cell("엔비디아", True) + "".join(cell(f"{a:.0f}%") for _, a, _ in cols)
         r2 = cell("기술주 15개", True) + "".join(cell(f"{b:.0f}%") for _, _, b in cols)
         tbl = "".join(f'<span style="display:flex;align-items:stretch;line-height:24px;">{r}</span>' for r in (head_cells, r1, r2))
-        tail = (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};color:{NOTE};">'
-                f'<span style="display:block;font-weight:700;margin:0 0 4px;">회복에 1년(250거래일) 넘게 걸린 비율</span>{tbl}</span>')
+        x20, y20 = st.get("20") or {}, pk.get("20") or {}
+        tip = ("회복에 1년 넘게 걸린 비율 : 고점 아래로 −10% · −20% · −30% 넘게 내려간 일 가운데, 그 고점을 다시 넘기까지 1년(250거래일) 넘게 걸린 것의 비율\n"
+               + (f"· 예 : 엔비디아는 −20% 넘게 {x20['n']}번 내려갔고 그중 {x20['over_year']}번({x20['over_year'] / x20['recovered'] * 100:.0f}%)이 1년 넘게 걸렸다. "
+                  f"15종목을 합치면 {y20['n']}번 중 {y20['over_year']}번({y20['over_year'] / y20['recovered'] * 100:.0f}%)\n" if x20.get("n") and y20.get("n") else "")
+               + "· 많이 내려갈수록 1년 넘게 걸린 비율이 커진다 — 오래 물릴 수 있다는 기록이지 앞으로 그렇다는 뜻은 아니다")
+        title_line = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 4px;">'
+                      f'<span style="color:#111;font-weight:700;white-space:nowrap;">{_tipx(tip)}회복에 1년 넘게 걸린 비율</span>'
+                      f'<span style="flex:none;font-size:{MICRO};font-weight:400;color:{NOTE};text-align:right;">({span} 동안 기간 중)</span></span>')   # 안내 기호 앞 · 오른쪽 작은 글씨 (2026-10-17 사용자)
+        tail = (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};color:{NOTE};">{title_line}{tbl}</span>')
     return _card_title("고점 하락 후 가격 회복", DD_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}{tail}</span></div>'
 
 
