@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-17T16:58:59Z",
+ "generated_at": "2026-10-17T21:32:25Z",
  "run_date": "2026-10-18",
  "day": "2026-10-16",
  "is_latest_bar_today": true,
@@ -575,6 +575,30 @@
    "speaker": "nvidia_exec"
   },
   {
+   "area": "Product",
+   "kind": "blog",
+   "title": "RTX Spark Ignites Global Celebration as New Windows PCs Arrive",
+   "fact": "엔비디아가 시작가 2,399달러의 Blackwell RTX 그래픽 탑재 RTX 스파크 랩톱을 공식 출시했다.",
+   "url": "https://blogs.nvidia.com/blog/local-ai-rtx-spark-windows-laptops-celebration/",
+   "direction": "positive",
+   "emphasis": true,
+   "source": "nvidiablog",
+   "published_at": "2026-10-17T21:00:13Z",
+   "speaker": "nvidia_exec"
+  },
+  {
+   "area": "Product",
+   "kind": "news",
+   "title": "Nvidia reportedly insists the RTX 5090 isn't dead despite severe shortages and removed listings at multiple retailers — flagship GPU is missing from Nvidia's store and commands $8,500 on Amazon",
+   "fact": "엔비디아가 공급 부족 속에서도 RTX 5090 단종설을 부인한 가운데 아마존에서 해당 제품이 8,500달러에 판매되고 있다.",
+   "url": "https://news.google.com/rss/articles/CBMi2wJBVV95cUxQQ0ZlM0FDbXNGbHEwWmhnMXNZbmdwaDMwekowZ2xtczNtOTA1WFJlWHlOQV9qZ0s3V1B6cUYtcy1pckdNUDdWWi1tVm1ZZFFxRzUtdUNGQ2Z4OGx4aXRoX3cwa0FUWVRyMy1pcGFuc0E4clRMS0JtU2pybGZ3ME1fejMtMjZZTEl1LUR5amRDR2lnM1hVMkxselVkbXlKWUZ3QjI1XzJWQkFFNVZkMFZ5TEdzLVRNQktwVHFXYTdpNG50Uk50aWZDOFRDU1hKS18ybXlFWnlyYXI2cTdrUWQxdjFfYmJCNklsYXR4RW1WR09mUm9veEZ1bHNSd2hYdnpsRGFiclVEYUpBLUVlOW14Q2J2XzFwU2xra0QwMkN2dkhRdUZ5cVVkeXAtbC1VSVNIbVNuNWdrYWdtQXptWWhCVi1aMEZ0eDhXUnNJYVpPYTVNeWNuQWxRWlpkaw?oc=5",
+   "direction": "uncertain",
+   "emphasis": true,
+   "source": "Tom's Hardware",
+   "published_at": "2026-10-17T14:38:18Z",
+   "speaker": null
+  },
+  {
    "area": "Demand",
    "kind": "newsroom",
    "title": "Mercedes-Benz and NVIDIA Expand Strategic Partnership to Advance Safe Highly Automated Driving in the Next Decade",
@@ -609,7 +633,9 @@
    "source": "Growth Dragons",
    "published_at": "2026-10-17T02:03:11Z",
    "speaker": null
-  },
+  }
+ ],
+ "events_overflow": [
   {
    "area": "Corporate",
    "kind": "news",
@@ -633,9 +659,7 @@
    "source": "Bisinfotech",
    "published_at": "2026-10-16T14:23:39Z",
    "speaker": "customer_partner"
-  }
- ],
- "events_overflow": [
+  },
   {
    "area": "Product",
    "kind": "news",
@@ -709,18 +733,18 @@
    "speaker": null
   }
  ],
- "events_total": 14,
+ "events_total": 16,
  "direction_counts": {
   "today": {
-   "positive": 6,
+   "positive": 7,
    "negative": 6,
-   "uncertain": 0,
+   "uncertain": 1,
    "neutral": 2
   },
   "week": {
-   "positive": 26,
+   "positive": 27,
    "negative": 18,
-   "uncertain": 1,
+   "uncertain": 2,
    "neutral": 6
   }
  },
@@ -968,7 +992,7 @@
   "flows": [
    {
     "key": "smh_shares_out",
-    "value": null,
+    "value": 11670900.0,
     "flag": false,
     "fmt": "int"
    },
@@ -1027,7 +1051,7 @@
    },
    {
     "key": "news_avg_7d",
-    "value": 29.714285714285715,
+    "value": 30.142857142857142,
     "flag": false,
     "fmt": "num1"
    },
@@ -1235,21 +1259,19 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-16",
-  "state_collected_at": "2026-10-17T16:58:22Z",
-  "missing_fields": [
-   "smh_shares_out"
-  ],
+  "state_collected_at": "2026-10-17T21:31:55Z",
+  "missing_fields": [],
   "option_snapshot_days": 6,
   "iv_rank_days": 6,
   "items_by_kind": {
    "10q": 1,
    "8k": 3,
    "analyst": 2,
-   "blog": 30,
+   "blog": 31,
    "court": 2,
    "fedreg": 24,
    "form4": 16,
-   "news": 623,
+   "news": 629,
    "newsroom": 10
   },
   "option_expiries": [
@@ -1281,7 +1303,6 @@
  "new_flags": [
   "checklist:forward_pe",
   "checklist:insider_net_sold_90d",
-  "sector_flow",
-  "status:smh_shares_out"
+  "sector_flow"
  ]
 }
