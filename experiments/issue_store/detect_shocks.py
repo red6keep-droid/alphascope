@@ -64,6 +64,7 @@ def explain(df):
             if f == "fomc.csv":
                 t["subkind"] = "FOMC " + t["decision"].fillna("")
             if f == "earnings.csv":
+                t = t[t["symbol"] == "NVDA"].copy()   # 실적표는 15종목 (2026-10-17)
                 t["subkind"] = "엔비디아 실적 " + t["surprise_band"].fillna("")
             cal.append(t[["day", "subkind"]])
     cal = pd.concat(cal)

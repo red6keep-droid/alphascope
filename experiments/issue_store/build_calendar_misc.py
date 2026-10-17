@@ -13,7 +13,8 @@ import pandas as pd
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT = os.path.join(ROOT, "data", "store", "calendar")
-TRACK = ["NVDA"]   # 종목을 늘리면 여기에
+TRACK = ["NVDA", "AMD", "QCOM", "AVGO", "AMAT", "LRCX", "KLAC", "MU", "INTC", "TXN",
+         "MSFT", "AAPL", "AMZN", "GOOGL", "CSCO"]   # 종목 확대 15 (2026-10-17, 볼린저 계획 4-1). 전부 장 마감 뒤 발표로 본다
 
 
 def earnings():

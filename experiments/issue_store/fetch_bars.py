@@ -24,6 +24,9 @@ MANIFEST = os.path.join(STORE, "manifest.json")
 # 반응을 시장 · 섹터 · 종목 몫으로 나누는 데 필요한 것 (이슈 저장소 6절)
 DEFAULT = [
     "NVDA",
+    # 종목 확대 15 (2026-10-17 확정, 볼린저 계획 4-1) — 설계 · 장비 · 메모리/제조/아날로그 · 플랫폼 · 거품 뒤 횡보
+    "AMD", "QCOM", "AVGO", "AMAT", "LRCX", "KLAC", "MU", "INTC", "TXN",
+    "MSFT", "AAPL", "AMZN", "GOOGL", "CSCO",
     "^GSPC", "SPY", "QQQ", "^IXIC",                 # 시장 (^GSPC 1927~, SPY 1993~)
     "SMH", "SOXX", "^SOX",                          # 반도체 섹터 (^SOX 1994~)
     "XLK", "XLF", "XLE", "XLV", "XLI", "XLY", "XLP", "XLU", "XLB", "XLRE", "XLC",   # 섹터 ETF (1998~, XLRE 2015 · XLC 2018)
