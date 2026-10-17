@@ -4,6 +4,7 @@
 이벤트가 0건이면 Gemini를 부르지 않고 건너뛴다 (⑦ 생략).
 """
 
+import datetime
 import json
 import os
 import re
@@ -24,15 +25,21 @@ MAX_CHARS = 48
 
 
 def _slim(a):
+    """서술 입력 — **새로 바뀐 것만** (2026-10-17 사용자: 같은 내용이 며칠째 반복된다). 일정은 새로 잡혔거나 내일 · 오늘인 것만,
+    점검표는 값이 바뀐 것(새 분기)만 넣는다. 안 바뀐 사실은 재무 · 캘린더 탭에 있다."""
+    new = set(a.get("new_flags") or ())
+    today = datetime.date.fromisoformat(a["day"])
+    upcoming = [c for c in a["upcoming"]
+                if f"calendar:{c['kind']}:{c['day']}:{c['label']}" in new or (datetime.date.fromisoformat(c["day"]) - today).days <= 1][:3]
     return {
         "day": a["day"],
         "headline": a["headline"],
         "events": [{"area": rr.AREA_KO.get(e["area"], e["area"]), "direction": rr.DIR_KO.get(e["direction"], e["direction"]),
                     "fact": e["fact"], "source": e.get("source")} for e in a["events"][:5]],
         "status_flags": [{"key": x["key"], "value": x["value"]} for grp in a["status"].values() if isinstance(grp, list) for x in grp if x.get("flag")],
-        "upcoming": a["upcoming"][:3],
+        "upcoming": upcoming,
         "checklist_down": [{"metric": r["metric"], "label": r["label"], "value": r["value"], "unit": r["unit"], "asof": r["asof"]}
-                           for r in a["checklist"] if r.get("arrow") == "↓"],
+                           for r in a["checklist"] if r.get("arrow") == "↓" and f"checklist:{r['metric']}" in new],
     }
 
 
@@ -69,11 +76,11 @@ def narrate(analysis_path=None, output_path=None):
         a = json.load(f)
     if os.path.exists(output_path):
         os.remove(output_path)
-    if not a.get("events"):
-        print("[narrate] 이벤트 0건 — ⑦ 생략")
+    slim = _slim(a)
+    if not (slim["events"] or slim["upcoming"] or slim["checklist_down"] or slim["status_flags"]):
+        print("[narrate] 새로 바뀐 것 0건 — ⑦ 생략")
         return None
     with open(PROMPT_FILE, "r", encoding="utf-8") as f:
-        slim = _slim(a)
         prompt = f.read() + json.dumps(slim, ensure_ascii=False, indent=1)
 
     def check(v):

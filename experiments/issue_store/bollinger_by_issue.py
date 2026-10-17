@@ -123,6 +123,7 @@ def build():
         g["FOMC · " + dec + " ±1일"] = near(fo[fo.decision == dec].day, idx)
     g["FOMC · 긴급 결정 ±1일"] = near(fo[(~fo.scheduled.astype(bool)) & fo.decision.isin(["인상", "인하"])].day, idx)
     er = pd.read_csv(os.path.join(CAL, "earnings.csv"), parse_dates=["day"])
+    er = er[er.symbol == "NVDA"]   # 실적표는 15종목 (2026-10-17)
     g["엔비디아 실적 · 발표 다음 날 ±1일"] = near(er.day, idx, 0, 2)   # 장 마감 뒤 발표 → 다음 날부터
     for band in ("크게 상회", "상회", "부합", "하회"):
         g["엔비디아 실적 · " + band] = near(er[er.surprise_band == band].day, idx, 0, 2)

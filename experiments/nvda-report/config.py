@@ -22,7 +22,7 @@ SYMBOL = "NVDA"
 BENCHMARK = "SPY"
 SYMBOLS = ["NVDA", "SPY", "SMH", "AMD", "QQQ", "AVGO"]   # AVGO 2026-10-11 사용자: 브로드컴 대비 추가
 # 섹터 ETF 11개 — 반도체 자금 방향의 "어디로 갔나" 비교 (2026-10-11 사용자 승인). 데일리 브리핑과 같은 목록
-SECTOR_ETFS = {"XLK": "기술", "XLF": "금융", "XLE": "에너지", "XLV": "헬스케어", "XLP": "필수소비재", "XLY": "경기소비재",
+SECTOR_ETFS = {"XLK": "기술", "XLF": "금융", "XLE": "에너지", "XLV": "헬스케어", "XLP": "필수 소비재", "XLY": "경기 소비재",
                "XLU": "유틸리티", "XLI": "산업재", "XLB": "소재", "XLRE": "부동산", "XLC": "통신"}
 EXTRA_BAR_SYMBOLS = ["^VIX"] + list(SECTOR_ETFS)   # 일봉만 받는 심볼 — 비교 칸(ret_vs_*)을 만들지 않는다. 시장 국면·반도체 자금용 (2026-10-11)
 # 반도체 자금 방향 (2026-10-11 사용자: "우리 섹터에서 자금이 모이는 중·빠져나가는 중, 쉽게"). 상태 셋 — 모이는 중 · 빠져나가는 중 · 뚜렷하지 않음
@@ -46,10 +46,10 @@ REGIME_DIRECTION = {"상승 추세": "positive", "단기 조정": "neutral", "�
 # ── 볼린저 밴드 카드 (2026-10-11 사용자: 하단에 도달했을 때 알려주는 카드) ──
 BOLL_WINDOW = 20
 BOLL_SIGMA = 2.0
-HISTORY_STATS_PATH = os.path.join(STATIC_DIR, "history_stats.json")   # history_stats.py 가 만든 10년 통계 (1년에 한 번 갱신)
+HISTORY_STATS_PATH = os.path.join(STATIC_DIR, "history_stats.json")   # history_stats.py 가 만든 상장 이후 전체 기간 통계(엔비디아 1999년~, 1년에 한 번 갱신)
 # 공포·탐욕 지수 (CNN) — 시장 국면 글머리표 (2026-10-11 사용자)
 FNG_URL = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
-# 과열 지표 카드 (2026-10-11 사용자: "이익 실현 구간" → 지시 대신, 조건에 닿은 날 10년 빈도를 사실로). 조건 셋, 하나라도 해당하면 카드
+# 과열 지표 카드 (2026-10-11 사용자: "이익 실현 구간" → 지시 대신, 조건에 닿은 날 과거 빈도를 사실로). 조건 셋, 하나라도 해당하면 카드
 OVERHEAT_RSI = 80.0               # RSI14 이 이상
 OVERHEAT_MA200_PCT = 40.0         # 종가가 200일 평균보다 이 % 이상 위
 OVERHEAT_RET20_PCT = 25.0         # 20거래일 수익률 이 % 이상
