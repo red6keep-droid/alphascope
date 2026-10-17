@@ -423,6 +423,52 @@ def _fd(d):
     return f"{int(y)}년 {int(m)}월 {int(dd)}일"
 
 
+PERIODS_TIP = ("기간별 수익률 : 지금 종가가 1주(5거래일) · 1개월(21) · 3개월(63) · 6개월(126) · 1년(252) 전 종가보다 몇 % 올랐거나 내렸는지\n"
+               "· 괄호 안은 같은 기간 S&P 500(SPY)의 수익률 — 시장보다 더 올랐는지 덜 올랐는지 비교하는 용도\n"
+               "· 과거 수익률이지 앞으로를 말하지 않는다. 우리 검증 : 15종목 30년(1999~), 최근 몇 달 오른 종목이 그 뒤에도 아무 날보다 잘 오르지는 않았다는 결론은 아직 없음 — 판단 유보")
+YEAR_TIP = ("1년 가격 범위 : 지난 1년(52주) 동안의 최저가와 최고가(장중 기준) 사이에서 오늘 종가가 어디쯤인지. 오른쪽 끝이 1년 최고가\n"
+            "· 최고가 대비 : 1년 최고가보다 몇 % 아래인지\n"
+            "· 우리 검증(물림) : 15종목 30년(1999~), 52주 고점 근처 · 볼린저 하단 · 고점 대비 −25% 에서 산 뒤 6개월 · 1년 뒤 산 가격 아래인 비율은 아무 날에 산 것과 다르지 않았다. "
+            "아무 날에 사도 6개월 뒤 약 30% 는 산 가격 아래였다")
+VOL_TIP = ("거래량 : 오늘 거래된 주식 수가 최근 20일 평균의 몇 배인지. 평소보다 많이 거래된 날은 그만큼 많은 사람이 움직였다는 뜻일 뿐 방향을 말하지 않는다")
+
+
+def sec_periods(a):
+    """기간별 수익률 카드 (2026-10-17 사용자: 쉬운 정보로) — 이름 `1개월 (S&P 500 +0.5%)` · 값 ▼ 1.7%. 작은 글씨는 괄호."""
+    rows = []
+    for p in a.get("periods") or []:
+        if p.get("nvda") is None:
+            continue
+        name = p["label"] + (f" (S&P 500 {p['spy']:+.1f}%)" if p.get("spy") is not None else "")
+        rows.append((name, _arrow(p["nvda"], 1)))
+    if not rows:
+        return ""
+    return _sub_label("기간별 수익률", PERIODS_TIP) + f'<div data-cards="1" style="margin:0 0 8px;">{_multi_single(rows)}</div>'
+
+
+def _multi_single(rows):
+    """한 줄 카드 묶음 — `_multi` 와 같은 모양, 데스크톱 2열 없이 한 열."""
+    return _multi(rows).replace(' data-grid="2"', "", 1)
+
+
+def sec_year_range(a):
+    """1년 가격 범위 막대 (2026-10-17 사용자: 쉬운 정보로) — 최저 · 최고 사이 오늘 종가 위치 + 최고가 대비 %."""
+    y = a.get("year_range")
+    if not y:
+        return ""
+    pad = _dk.SEP_GAP - _dk.VP - 1
+    pos = max(0.0, min(100.0, y["pos_pct"]))
+    head = (f'<span style="{MULTI_ROW}"><span style="flex:1 1 auto;min-width:0;font-weight:700;color:#111;font-size:{_dk.NAME};">1년 가격 범위{_dk.tip_icon(YEAR_TIP)}</span>'
+            f'<span style="flex:none;text-align:right;white-space:nowrap;{VAL}font-weight:700;"><span style="font-size:{TINY};font-weight:400;color:{NOTE};">(최고가 대비)</span> {_arrow(y["pct_from_high"], 1)}</span></span>')
+    track = (f'<span style="display:block;position:relative;height:8px;border-radius:4px;background:#E2E8F0;margin:6px 0 10px;">'
+             f'<span style="position:absolute;left:0;top:0;height:8px;width:{pos:.1f}%;border-radius:4px;background:#BFDBFE;"></span>'
+             f'<span style="position:absolute;top:-4px;left:{pos:.1f}%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#111;border:2px solid #fff;box-sizing:border-box;"></span></span>')
+    ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
+            f'<span>최저 ${y["low"]:,.2f}</span><span>(오늘 ${y["close"]:,.2f})</span><span>최고 ${y["high"]:,.2f}</span></span>')
+    body = f'<span style="display:block;padding:0 12px {pad}px;">{track}{ends}</span>'
+    return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{head}{body}</span></div>'
+
+
 def sec_headline(a, n=None):
     """오늘 한 줄 — 한 줄 카드 6장 (NVDA · SPY·SMH·AMD·AVGO 대비 · 거래량). 카드 안에 카드를 만들지 않는다.
 
@@ -445,21 +491,19 @@ def sec_headline(a, n=None):
         head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1)   # 위쪽 여백 16 → 6px (60% 줄임, 2026-10-17 사용자) — 공통 gap:12px 가 세로 간격까지 12 로 덮어쓰고 있었다
         k = head.rstrip().rfind("</span>")
         head = head[:k] + sub + head[k:]
-    rows = glance_rows(a, n) + sec_ma(a)   # 펼치면 맨 위에 쉬운 말 줄(등락 · 이슈 · 변화 강도), 그 아래 n일 평균 카드 (2026-10-16 사용자)
-    # 비교 4개는 따로 한 카드, 2열 + 세로 구분선 (E타입, 2026-10-11 사용자)
-    rows += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p")) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])   # 비교 4종 앞 로고는 두지 않는다 (2026-10-13 사용자)
+    # 펼침 1층 = 초보자도 읽는 정보 (2026-10-17 사용자: 평균선 · 갭 같은 차트 지표는 우리 방향과 다르다) — 기간별 수익률 · 1년 가격 범위 · 거래량.
+    # 2층(접힘) = 차트 보는 분을 위한 지표 — 평균선 · 1일 비교 · 시가 갭 · 일중 변동폭 · 과열(RSI) · 교차, 우리 검증은 ? 툴팁
+    rows = glance_rows(a, n) + sec_periods(a) + sec_year_range(a)
+    vr = h.get("vol_ratio_20d")
+    rows += f'<div data-cards="1" style="margin:0 0 8px;">{_multi_single([("거래량 (평소의 몇 배)", f"<span style=\"font-weight:700;\">{_esc(rr.fmt(vr, 'x'))}</span>", VOL_TIP)])}</div>'
+    deep = sec_ma(a)
+    deep += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p")) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])   # 하루 등락 차이 (2026-10-11 사용자)
     items = []
-    pc = {c["key"]: c for c in (a["status"].get("price") or [])}   # 상태판 가격·거래량 중 머리 카드에 없던 칸 (2026-10-11 사용자: 오늘로 모으고 기술지표에서 삭제)
+    pc = {c["key"]: c for c in (a["status"].get("price") or [])}
     items.append(("시가 갭", _arrow((pc.get("gap") or {}).get("value"), 2), GAP_TIP))
     rg = pc.get("range_pct") or {}
-    # 기준 괄호는 "흔히 ~로 봄" 말투, 경고색 없음 (2026-10-17 4단계 W7 · 가이드라인 2-5)
     items.append((f"일중 변동폭 (고가−저가 · 흔히 {config.RANGE_PCT_EVENT:.0f}% 넘으면 큰 흔들림으로 봄)", f'<span style="color:#111;font-weight:700;">{_esc(rr.fmt(rg.get("value"), "pct"))}</span>'))
-    vr = h.get("vol_ratio_20d")
-    vcol = "#111"
-    items.append((f"거래량 (평소의 몇 배 · 흔히 {config.VOL_RATIO_EVENT:.0f}배 넘으면 많다고 봄)", f'<span style="color:{vcol};font-weight:700;">{_esc(rr.fmt(vr, "x"))}</span>'))
-    # 거래량 정보에 52주 고점 대비 · RSI · 이평 교차 포함 (2026-10-11 사용자)
     tc = {c["key"]: c for c in (a["status"].get("technical") or [])}
-    items.append(("52주 고점 대비 (1년 최고가보다 얼마나 아래)", _arrow((tc.get("pct_from_52w_high") or {}).get("value"), 2)))
     rsi = (tc.get("rsi14") or {}).get("value")
     items.append(("단기 과열 온도 (RSI 14 · 흔히 70 넘으면 과열 · 30 아래면 침체로 읽음)", f'<span style="color:#111;font-weight:700;">{rsi:.1f}</span>' if rsi is not None else f'<span style="color:{MUTED};">—</span>', RSI_TIP))
     mc = (tc.get("ma_cross") or {}).get("value")
@@ -468,7 +512,9 @@ def sec_headline(a, n=None):
     items.append(("평균선 교차 (50일선이 200일선 위로 = 골든크로스)" + _new(a, "status:ma_cross"), mc_html, CROSS_TIP))
     if a.get("macro_today"):
         items.append(("거시 일정", _esc(", ".join(a["macro_today"]))))
-    rows += _multi(items)   # C타입: 비교 항목은 한 카드 안에 가로 구분선으로 (2026-10-11 사용자)
+    deep += _multi(items)
+    rows += (f'<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{_fold_row("차트 지표 보기")}</summary>'
+             f'<div style="margin-top:6px;">{deep}</div></details>')
     out = (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
            f'<div style="margin-top:6px;">{rows}</div></details></div>')
     out += sec_state_cards(a)   # 시장 국면 · 반도체 자금 — 이유를 담은 별도 카드 둘 (2026-10-11 사용자)
@@ -933,9 +979,9 @@ def _ccard(rows, left=None):
     return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{MULTI}">{inner}</span></div>'   # 데스크톱 2열 (테마 CSS)
 
 
-def _sub_label(t):
-    """카드 묶음 위 소제목 — F 막대 라벨과 같은 모양 (14px 안내 회색). data-sub: 탭이 서브탭으로 쓴다."""
-    return f'<div data-sub="1" style="font-size:{SMALL};line-height:{LH_CARD};color:{NOTE};margin:10px 0 3px;">{_paren(_esc(t))}</div>'   # 소제목 16px
+def _sub_label(t, tip=""):
+    """카드 묶음 위 소제목 — F 막대 라벨과 같은 모양 (14px 안내 회색). data-sub: 탭이 서브탭으로 쓴다. tip = 제목 바로 옆 ? 툴팁."""
+    return f'<div data-sub="1" style="font-size:{SMALL};line-height:{LH_CARD};color:{NOTE};margin:10px 0 3px;">{_paren(_esc(t))}{_dk.tip_icon(tip) if tip else ""}</div>'   # 소제목 16px
 
 
 CAL_DATE = "font-weight:700;color:#111;"   # G 캘린더 카드: 날짜 첫 칸 굵게 (왼쪽 칸 전체 16px — 2026-10-12 사용자)

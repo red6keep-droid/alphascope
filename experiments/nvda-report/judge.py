@@ -682,6 +682,33 @@ def _direction_counts(evs):
     return out
 
 
+PERIODS = (("1주", 5), ("1개월", 21), ("3개월", 63), ("6개월", 126), ("1년", 252))   # 거래일 수 (2026-10-17 사용자: 쉬운 정보로)
+
+
+def period_returns(conn, day):
+    """기간별 수익률 — 엔비디아 · S&P 500(SPY) · 반도체 ETF(SMH), n거래일 전 종가 대비 (2026-10-17: 평균선 대비 % 대신 초보자도 읽는 정보)."""
+    series = {k: [b["close"] for b in collect_market.bars(conn, sym) if b["day"] <= day] for k, sym in (("nvda", config.SYMBOL), ("spy", "SPY"), ("smh", "SMH"))}
+    out = []
+    for label, n in PERIODS:
+        row = {"label": label, "days": n}
+        for k, cl in series.items():
+            row[k] = (cl[-1] / cl[-1 - n] - 1) * 100 if len(cl) > n and cl[-1 - n] else None
+        out.append(row)
+    return out
+
+
+def year_range(conn, day):
+    """1년(52주) 가격 범위 — 최저 · 최고(장중 고저)와 오늘 종가의 위치 (0% = 최저, 100% = 최고)."""
+    bars = [b for b in collect_market.bars(conn, config.SYMBOL) if b["day"] <= day][-config.HIGH_52W_DAYS:]
+    if len(bars) < 200:
+        return None
+    hi, lo = max(bars, key=lambda b: b["high"]), min(bars, key=lambda b: b["low"])
+    close = bars[-1]["close"]
+    span = hi["high"] - lo["low"]
+    return {"high": hi["high"], "high_day": hi["day"], "low": lo["low"], "low_day": lo["day"], "close": close,
+            "pos_pct": (close - lo["low"]) / span * 100 if span else 50.0, "pct_from_high": (close / hi["high"] - 1) * 100}
+
+
 def build(conn, day, run_date):
     update_technicals(conn)
     s = _state(conn, day)
@@ -726,6 +753,7 @@ def build(conn, day, run_date):
         "is_latest_bar_today": bars_last == day,
         "headline": {k: s.get(k) for k in ("close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_avgo", "vol_ratio_20d", "gap", "range_pct", "ret_sigma_20d")},
         "macro_today": [c["label"] for c in macro_today],
+        "periods": period_returns(conn, day), "year_range": year_range(conn, day),   # 쉬운 정보 (2026-10-17)
         "normal_range": normal_range_line.compute(conn, day),   # 평소 범위 (EWMA 자) · 시장 충격 (2026-10-17, 4단계 W1 · W2)
         "market_regime": mr,   # 시장 국면 (2026-10-11): 글 머리 한 줄 + ⓘ 규칙
         "sector_flow": sf,     # 반도체 자금 방향 (2026-10-11): 글 머리 한 줄 + ⓘ 쉬운 설명
