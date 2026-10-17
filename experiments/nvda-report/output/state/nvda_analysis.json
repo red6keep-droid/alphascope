@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-10-17T12:58:11Z",
- "run_date": "2026-10-17",
+ "generated_at": "2026-10-17T16:58:59Z",
+ "run_date": "2026-10-18",
  "day": "2026-10-16",
  "is_latest_bar_today": true,
  "headline": {
@@ -16,6 +16,164 @@
   "ret_sigma_20d": 1.5175701451224022
  },
  "macro_today": [],
+ "periods": [
+  {
+   "label": "1주",
+   "days": 5,
+   "nvda": -6.607638685076777,
+   "spy": -1.9677109547117544,
+   "smh": -10.531556074233595
+  },
+  {
+   "label": "1개월",
+   "days": 21,
+   "nvda": -2.375303885321578,
+   "spy": 0.0852379274681958,
+   "smh": -3.713813144295386
+  },
+  {
+   "label": "3개월",
+   "days": 63,
+   "nvda": 5.337468599306505,
+   "spy": 2.851402441587103,
+   "smh": -3.40712532974744
+  },
+  {
+   "label": "6개월",
+   "days": 126,
+   "nvda": 6.173151854009529,
+   "spy": 7.478804778780868,
+   "smh": 16.29394471055936
+  },
+  {
+   "label": "1년",
+   "days": 252,
+   "nvda": 19.073570985102762,
+   "spy": 14.745105703768857,
+   "smh": 57.93492303682495
+  }
+ ],
+ "year_range": {
+  "high": 243.3699951171875,
+  "high_day": "2026-10-06",
+  "low": 164.27000427246094,
+  "low_day": "2026-03-30",
+  "close": 214.1300048828125,
+  "pos_pct": 63.034142074967924,
+  "pct_from_high": -12.014624161164711
+ },
+ "drawdown": {
+  "stats": {
+   "from": "1999-01-22",
+   "to": "2026-10-16",
+   "nvda": {
+    "10": {
+     "n": 38,
+     "recovered": 38,
+     "median_days": 46,
+     "over_year": 4,
+     "longest_days": 2138
+    },
+    "20": {
+     "n": 16,
+     "recovered": 16,
+     "median_days": 121,
+     "over_year": 4,
+     "longest_days": 2138
+    },
+    "30": {
+     "n": 11,
+     "recovered": 11,
+     "median_days": 123,
+     "over_year": 4,
+     "longest_days": 2138
+    }
+   },
+   "peers": {
+    "10": {
+     "n": 565,
+     "recovered": 553,
+     "median_days": 50,
+     "over_year": 92,
+     "longest_days": 5403
+    },
+    "20": {
+     "n": 248,
+     "recovered": 239,
+     "median_days": 159,
+     "over_year": 91,
+     "longest_days": 5403
+    },
+    "30": {
+     "n": 143,
+     "recovered": 136,
+     "median_days": 349,
+     "over_year": 84,
+     "longest_days": 5403
+    }
+   },
+   "peers_n": 15,
+   "peers_span": "1999~",
+   "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다."
+  },
+  "days_since_high": 8,
+  "pct_from_high": -12.014624161164711,
+  "high_day": "2026-10-06"
+ },
+ "earnings_moves": {
+  "moves": [
+   {
+    "day": "2024-11-21",
+    "ret": 0.5346485588869188
+   },
+   {
+    "day": "2025-02-27",
+    "ret": -8.47806014389847
+   },
+   {
+    "day": "2025-05-29",
+    "ret": 3.24902081606282
+   },
+   {
+    "day": "2025-08-28",
+    "ret": -0.7874492767115715
+   },
+   {
+    "day": "2025-11-20",
+    "ret": -3.152479491810023
+   },
+   {
+    "day": "2026-02-26",
+    "ret": -5.456125128938172
+   },
+   {
+    "day": "2026-05-21",
+    "ret": -1.7720529342800773
+   },
+   {
+    "day": "2026-08-27",
+    "ret": 8.73795275466771
+   }
+  ],
+  "median_abs": 3.24902081606282,
+  "normal_abs": 1.5507705530775517,
+  "n_up": 3
+ },
+ "normal_range": {
+  "ret_log": -0.014373350379771355,
+  "ret_pct": -1.427054691201457,
+  "sigma_pct": 1.8012052095704005,
+  "z": -0.7979851658989758,
+  "outside": false,
+  "n_year": 94,
+  "n_past": 248,
+  "earnings_day": false,
+  "market_shock": {
+   "active": false,
+   "start": null,
+   "vix": 19.989999771118164
+  }
+ },
  "market_regime": {
   "regime": "상승 추세",
   "prev_regime": "상승 추세",
@@ -23,6 +181,7 @@
   "pct_from_high": -2.0331446058168168,
   "above_ma200": true,
   "ma200": 725.0145993041992,
+  "pct_vs_ma200": 5.273742174639717,
   "vix": 19.989999771118164,
   "streak": -1,
   "benchmark": "SPY",
@@ -49,7 +208,7 @@
    },
    {
     "etf": "XLP",
-    "name": "필수소비재",
+    "name": "필수 소비재",
     "rel": 5.616448046526101,
     "rank": 2
    },
@@ -73,7 +232,7 @@
    },
    {
     "etf": "XLY",
-    "name": "경기소비재",
+    "name": "경기 소비재",
     "rel": 1.083133076364673,
     "rank": 6
    },
@@ -119,7 +278,7 @@
    },
    {
     "etf": "XLP",
-    "name": "필수소비재",
+    "name": "필수 소비재",
     "rel": 5.616448046526101,
     "rank": 2
    }
@@ -150,59 +309,112 @@
   "entered": false,
   "stats": {
    "symbol": "NVDA",
-   "window": "10y",
-   "from": "2016-10-10",
-   "to": "2026-10-09",
-   "days": 2514,
+   "window": "all",
+   "from": "1999-01-22",
+   "to": "2026-10-16",
+   "days": 6977,
    "base": {
-    "up20": 66,
-    "up60": 73,
-    "med20": 4.3,
-    "med60": 12.8
+    "up20": 59,
+    "up60": 67,
+    "med20": 2.9,
+    "med60": 9.4
    },
    "boll_lower": {
-    "n": 56,
-    "up20": 73,
-    "med20": 6.2,
-    "up60": 71,
-    "med60": 13.9
+    "n": 150,
+    "up20": 60,
+    "med20": 4.1,
+    "up60": 64,
+    "med60": 7.7
    },
    "boll_upper": {
-    "n": 97,
-    "up20": 62,
-    "med20": 5.3,
-    "up60": 68,
-    "med60": 8.8
+    "n": 245,
+    "up20": 60,
+    "med20": 4.4,
+    "up60": 66,
+    "med60": 8.3
    },
    "rsi80": {
-    "n": 17,
-    "up20": 47,
-    "med20": -2.1,
-    "up60": 71,
-    "med60": 9.8
+    "n": 38,
+    "up20": 50,
+    "med20": 0.2,
+    "up60": 61,
+    "med60": 7.2
    },
    "ma200_40": {
-    "n": 32,
-    "up20": 56,
-    "med20": 0.9,
-    "up60": 72,
-    "med60": 20.3
+    "n": 88,
+    "up20": 67,
+    "med20": 5.1,
+    "up60": 50,
+    "med60": 0.6
    },
    "ret20_25": {
-    "n": 32,
+    "n": 109,
     "up20": 59,
-    "med20": 6.0,
-    "up60": 78,
-    "med60": 27.4
+    "med20": 4.7,
+    "up60": 69,
+    "med60": 17.6
    },
    "rsi30": {
-    "n": 14,
+    "n": 60,
     "up20": 43,
-    "med20": -6.0,
-    "up60": 43,
-    "med60": -1.5
+    "med20": -4.6,
+    "up60": 50,
+    "med60": 1.3
    },
-   "generated_at": "2026-10-11",
+   "drawdown": {
+    "from": "1999-01-22",
+    "to": "2026-10-16",
+    "nvda": {
+     "10": {
+      "n": 38,
+      "recovered": 38,
+      "median_days": 46,
+      "over_year": 4,
+      "longest_days": 2138
+     },
+     "20": {
+      "n": 16,
+      "recovered": 16,
+      "median_days": 121,
+      "over_year": 4,
+      "longest_days": 2138
+     },
+     "30": {
+      "n": 11,
+      "recovered": 11,
+      "median_days": 123,
+      "over_year": 4,
+      "longest_days": 2138
+     }
+    },
+    "peers": {
+     "10": {
+      "n": 565,
+      "recovered": 553,
+      "median_days": 50,
+      "over_year": 92,
+      "longest_days": 5403
+     },
+     "20": {
+      "n": 248,
+      "recovered": 239,
+      "median_days": 159,
+      "over_year": 91,
+      "longest_days": 5403
+     },
+     "30": {
+      "n": 143,
+      "recovered": 136,
+      "median_days": 349,
+      "over_year": 84,
+      "longest_days": 5403
+     }
+    },
+    "peers_n": 15,
+    "peers_span": "1999~",
+    "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다."
+   },
+   "generated_at": "2026-10-18",
    "note": "각 조건 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률. base = 아무 날. 과거 빈도이지 예측이 아니다."
   }
  },
@@ -216,59 +428,112 @@
   },
   "stats": {
    "symbol": "NVDA",
-   "window": "10y",
-   "from": "2016-10-10",
-   "to": "2026-10-09",
-   "days": 2514,
+   "window": "all",
+   "from": "1999-01-22",
+   "to": "2026-10-16",
+   "days": 6977,
    "base": {
-    "up20": 66,
-    "up60": 73,
-    "med20": 4.3,
-    "med60": 12.8
+    "up20": 59,
+    "up60": 67,
+    "med20": 2.9,
+    "med60": 9.4
    },
    "boll_lower": {
-    "n": 56,
-    "up20": 73,
-    "med20": 6.2,
-    "up60": 71,
-    "med60": 13.9
+    "n": 150,
+    "up20": 60,
+    "med20": 4.1,
+    "up60": 64,
+    "med60": 7.7
    },
    "boll_upper": {
-    "n": 97,
-    "up20": 62,
-    "med20": 5.3,
-    "up60": 68,
-    "med60": 8.8
+    "n": 245,
+    "up20": 60,
+    "med20": 4.4,
+    "up60": 66,
+    "med60": 8.3
    },
    "rsi80": {
-    "n": 17,
-    "up20": 47,
-    "med20": -2.1,
-    "up60": 71,
-    "med60": 9.8
+    "n": 38,
+    "up20": 50,
+    "med20": 0.2,
+    "up60": 61,
+    "med60": 7.2
    },
    "ma200_40": {
-    "n": 32,
-    "up20": 56,
-    "med20": 0.9,
-    "up60": 72,
-    "med60": 20.3
+    "n": 88,
+    "up20": 67,
+    "med20": 5.1,
+    "up60": 50,
+    "med60": 0.6
    },
    "ret20_25": {
-    "n": 32,
+    "n": 109,
     "up20": 59,
-    "med20": 6.0,
-    "up60": 78,
-    "med60": 27.4
+    "med20": 4.7,
+    "up60": 69,
+    "med60": 17.6
    },
    "rsi30": {
-    "n": 14,
+    "n": 60,
     "up20": 43,
-    "med20": -6.0,
-    "up60": 43,
-    "med60": -1.5
+    "med20": -4.6,
+    "up60": 50,
+    "med60": 1.3
    },
-   "generated_at": "2026-10-11",
+   "drawdown": {
+    "from": "1999-01-22",
+    "to": "2026-10-16",
+    "nvda": {
+     "10": {
+      "n": 38,
+      "recovered": 38,
+      "median_days": 46,
+      "over_year": 4,
+      "longest_days": 2138
+     },
+     "20": {
+      "n": 16,
+      "recovered": 16,
+      "median_days": 121,
+      "over_year": 4,
+      "longest_days": 2138
+     },
+     "30": {
+      "n": 11,
+      "recovered": 11,
+      "median_days": 123,
+      "over_year": 4,
+      "longest_days": 2138
+     }
+    },
+    "peers": {
+     "10": {
+      "n": 565,
+      "recovered": 553,
+      "median_days": 50,
+      "over_year": 92,
+      "longest_days": 5403
+     },
+     "20": {
+      "n": 248,
+      "recovered": 239,
+      "median_days": 159,
+      "over_year": 91,
+      "longest_days": 5403
+     },
+     "30": {
+      "n": 143,
+      "recovered": 136,
+      "median_days": 349,
+      "over_year": 84,
+      "longest_days": 5403
+     }
+    },
+    "peers_n": 15,
+    "peers_span": "1999~",
+    "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다."
+   },
+   "generated_at": "2026-10-18",
    "note": "각 조건 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률. base = 아무 날. 과거 빈도이지 예측이 아니다."
   }
  },
@@ -325,7 +590,7 @@
    "area": "Flows",
    "kind": "sector_flow",
    "title": "반도체 자금 — 뚜렷하지 않음 → 빠져나가는 중",
-   "fact": "반도체 ETF(SMH) 20일 S&P 500 대비 -6.0%p · 같은 기간 앞선 섹터 에너지 +5.9%p · 필수소비재 +5.6%p",
+   "fact": "반도체 ETF(SMH) 20일 S&P 500 대비 -6.0%p · 같은 기간 앞선 섹터 에너지 +5.9%p · 필수 소비재 +5.6%p",
    "url": null,
    "direction": "negative",
    "emphasis": false,
@@ -453,9 +718,9 @@
    "neutral": 2
   },
   "week": {
-   "positive": 27,
-   "negative": 17,
-   "uncertain": 2,
+   "positive": 26,
+   "negative": 18,
+   "uncertain": 1,
    "neutral": 6
   }
  },
@@ -756,13 +1021,13 @@
   "news": [
    {
     "key": "news_count",
-    "value": 27,
+    "value": 30,
     "flag": false,
     "fmt": "int"
    },
    {
     "key": "news_avg_7d",
-    "value": 29.428571428571427,
+    "value": 29.714285714285715,
     "flag": false,
     "fmt": "num1"
    },
@@ -970,7 +1235,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-16",
-  "state_collected_at": "2026-10-17T12:57:52Z",
+  "state_collected_at": "2026-10-17T16:58:22Z",
   "missing_fields": [
    "smh_shares_out"
   ],
@@ -984,7 +1249,7 @@
    "court": 2,
    "fedreg": 24,
    "form4": 16,
-   "news": 608,
+   "news": 623,
    "newsroom": 10
   },
   "option_expiries": [
