@@ -705,7 +705,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
     """상태 카드 (가이드라인 2-1 D, 2026-10-11 사용자: "별도 카드로 분리하고 이유도 카드에 포함" → "안내 아이콘 삭제, 글씨 검정, 블릿으로").
     첫 줄 구분명 좌·상태 우, 아래 얇은 선 뒤에 이유 글머리표(16px, 검정). 이유 묶음은 border-top — 홈 카드는 border-top 요소를 건너뛰므로 홈에는 첫 줄만 간다."""
     bg, bd = CARD_DIR[theme]
-    bd_row = _dk.lighten(bd)   # 펼친 카드 안 줄 사이 구분선은 제목 아래 첫 구분선보다 20% 연하게 (2026-10-17 사용자)
+    bd_row = _dk.lighten(_dk.lighten(bd), 0.3)   # 펼친 카드 안 줄 사이 구분선: 첫 구분선보다 20% 연하게, 사용자 요청으로 거기서 30% 더 (합쳐 약 44%) (2026-10-17)
     # 글머리표는 3px 점, 글자 14px (2026-10-11 사용자). 규칙 줄은 안내 색(NOTE). lines 항목은 str 또는 (str, "note")
     def li(item):
         # 항목: str · (str, "note") · (str, "plain") · ("row", 이름, 값, 뜻)
