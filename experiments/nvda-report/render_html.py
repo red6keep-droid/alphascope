@@ -453,11 +453,11 @@ def sec_headline(a, n=None):
     tc = {c["key"]: c for c in (a["status"].get("technical") or [])}
     items.append(("52주 고점 대비 (1년 최고가보다 얼마나 아래)", _arrow((tc.get("pct_from_52w_high") or {}).get("value"), 2)))
     rsi = (tc.get("rsi14") or {}).get("value")
-    items.append(("단기 과열 온도 (RSI 14 · 흔히 70 넘으면 과열 · 30 아래면 침체로 읽음)", f'<span style="color:#111;font-weight:700;">{rsi:.1f}</span>' if rsi is not None else f'<span style="color:{MUTED};">—</span>'))
+    items.append(("단기 과열 온도 (RSI 14 · 흔히 70 넘으면 과열 · 30 아래면 침체로 읽음)", f'<span style="color:#111;font-weight:700;">{rsi:.1f}</span>' if rsi is not None else f'<span style="color:{MUTED};">—</span>', RSI_TIP))
     mc = (tc.get("ma_cross") or {}).get("value")
     mc_html = {"golden": f'<span style="color:{UP};font-weight:700;">골든크로스</span>', "dead": f'<span style="color:{DOWN};font-weight:700;">데드크로스</span>'}.get(
         mc, f'<span style="color:{MUTED};">교차 없음</span>')
-    items.append(("평균선 교차 (50일선이 200일선 위로 = 골든크로스)" + _new(a, "status:ma_cross"), mc_html))
+    items.append(("평균선 교차 (50일선이 200일선 위로 = 골든크로스)" + _new(a, "status:ma_cross"), mc_html, CROSS_TIP))
     if a.get("macro_today"):
         items.append(("거시 일정", _esc(", ".join(a["macro_today"]))))
     rows += _multi(items)   # C타입: 비교 항목은 한 카드 안에 가로 구분선으로 (2026-10-11 사용자)
@@ -469,6 +469,10 @@ def sec_headline(a, n=None):
     return out
 
 
+RSI_TIP = ("단기 과열 온도(RSI 14) : 최근 14일 오른 힘의 비율 0~100. 흔히 70 넘으면 과열, 30 아래면 침체로 읽는다\n"
+           "· 우리 검증 : 15종목 30년(1999~), RSI 가 70 을 넘거나 30 아래로 내려간 뒤 20 · 60거래일은 아무 날과 다르지 않았다")
+CROSS_TIP = ("평균선 교차 : 50일 평균선이 200일 평균선 위로 올라서면 골든크로스, 아래로 내려가면 데드크로스\n"
+             "· 우리 검증 : 15종목 30년(1999~), 골든크로스 · 데드크로스 뒤 20 · 60거래일은 아무 날과 다르지 않았다 — 2010년대와 2020년 이후 방향도 서로 반대였다")
 GAP_TIP = ("시가 갭 : 오늘 시가가 전날 종가보다 몇 % 높게(▲) 또는 낮게(▼)시작했는지\n"
            "· 밤사이 실적 · 뉴스 · 해외 시장이 반영된 출발 위치\n"
            "· 갭이 크면 장 초반 변동이 커지기 쉽다 — 장중에 메워지기도 한다")   # 2026-10-14 사용자: "시가 갭은 뭔지 툴팁"
