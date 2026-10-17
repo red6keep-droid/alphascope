@@ -573,7 +573,7 @@ def sec_drawdown(a):
                   f"15종목을 합치면 {y20['n']}번 중 {y20['over_year']}번({y20['over_year'] / y20['recovered'] * 100:.0f}%)\n" if x20.get("n") and y20.get("n") else "")
                + "· 많이 내려갈수록 1년 넘게 걸린 비율이 커진다 — 오래 물릴 수 있다는 기록이지 앞으로 그렇다는 뜻은 아니다")
         title_line = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 4px;">'
-                      f'<span style="color:#111;font-weight:700;white-space:nowrap;">{_tipx(tip)}회복에 1년 넘게 걸린 비율</span>'
+                      f'<span style="color:#111;font-weight:700;white-space:nowrap;">{_tip_mark(tip.replace("15종목", "기술주 15개"))}회복에 1년 넘게 걸린 비율</span>'
                       f'<span style="flex:none;font-size:{MICRO};font-weight:400;color:{NOTE};text-align:right;">({span} 동안 기간 중)</span></span>')   # 안내 기호 앞 · 오른쪽 작은 글씨 (2026-10-17 사용자)
         tail = (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};color:{NOTE};">{title_line}{tbl}</span>')
     return _card_title("고점 하락 후 가격 회복", DD_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}{tail}</span></div>'
@@ -675,6 +675,13 @@ FLOW_THEME = {"모이는 중": ("positive", UP), "빠져나가는 중": ("negati
 
 PEERS_DEF = ("기술주 15개 : 엔비디아와 비교하려고 고른 미국 대형 기술주 — 반도체 10개(엔비디아 · AMD · 퀄컴 · 브로드컴 · 어플라이드머티어리얼즈 · 램리서치 · KLA · 마이크론 · 인텔 · 텍사스인스트루먼츠) "
              "+ 대형 기술 5개(애플 · 마이크로소프트 · 아마존 · 알파벳 · 시스코). 오늘 살아남은 종목들이라 실제보다 낙관적으로 나올 수 있다 (2026-10-17 사용자: 15종목이 무엇인지 설명)")
+
+
+def _tip_mark(text, mark="※"):
+    """당구장표시(※) 안내 기호 — 글자 앞에 두는 주석 표시, 누르면 같은 툴팁 팝업 (2026-10-17 사용자: 안내 기호는 당구장표시로). ? 아이콘과 같은 data-tip 속성이라 테마 JS 가 그대로 처리한다."""
+    t = _esc(text).replace(chr(34), "&quot;")
+    return (f'<span data-tip="{t}" tabindex="0" role="button" aria-label="{t}" '
+            f'style="display:inline-block;color:{NOTE};cursor:help;font-weight:400;margin:0 4px 0 0;">{mark}</span>')
 
 
 def _tipx(text):
