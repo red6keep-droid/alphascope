@@ -16,6 +16,57 @@ import yfinance as yf
 import config
 
 
+PEERS = ["NVDA", "AMD", "QCOM", "AVGO", "AMAT", "LRCX", "KLAC", "MU", "INTC", "TXN", "AAPL", "MSFT", "AMZN", "GOOGL", "CSCO"]   # 15종목 (검증과 같은 목록)
+DD_LEVELS = (10, 20, 30)
+
+
+def drawdown_cycles(c):
+    """종가가 직전 최고 종가에서 몇 % 내려갔다가 그 고점을 다시 넘을 때까지 — 사이클마다 (깊이 %, 고점 날짜부터 센 거래일, 회복 여부)."""
+    v = c.values
+    peak, peak_i, trough = v[0], 0, 0.0
+    out = []
+    for i in range(1, len(v)):
+        if v[i] >= peak:
+            if trough < 0:
+                out.append((trough * 100, i - peak_i, True))
+            peak, peak_i, trough = v[i], i, 0.0
+        else:
+            trough = min(trough, v[i] / peak - 1)
+    if trough < 0:
+        out.append((trough * 100, len(v) - 1 - peak_i, False))   # 아직 회복 못 한 지금 사이클
+    return out
+
+
+def dd_summary(cycles):
+    """수준별 요약: 깊이가 그 수준을 넘은 사이클 수 · 회복한 것의 중앙값 · 1년(250거래일) 넘게 걸린 수 · 가장 오래 걸린 값."""
+    res = {}
+    for lv in DD_LEVELS:
+        hit = [(d, n, ok) for d, n, ok in cycles if d <= -lv]
+        rec = sorted(n for d, n, ok in hit if ok)
+        res[str(lv)] = {"n": len(hit), "recovered": len(rec), "median_days": int(rec[len(rec) // 2]) if rec else None,
+                        "over_year": sum(1 for n in rec if n > 250), "longest_days": max(rec) if rec else None}
+    return res
+
+
+def drawdown_stats():
+    store = os.path.abspath(os.path.join(config.BASE_DIR, "..", "..", "data", "store", "bars"))
+    per, pooled = {}, []
+    for sym in PEERS:
+        f = os.path.join(store, f"{sym}.parquet")
+        if not os.path.exists(f):
+            continue
+        c = pd.read_parquet(f)["close"]
+        c.index = pd.to_datetime(c.index)
+        c = c[c > 0].dropna()
+        cy = drawdown_cycles(c)
+        per[sym] = dd_summary(cy)
+        pooled += cy
+    if "NVDA" not in per:
+        return None
+    return {"nvda": per["NVDA"], "peers": dd_summary(pooled), "peers_n": len(per),
+            "peers_span": "1999~" , "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다."}
+
+
 def main():
     store = os.path.abspath(os.path.join(config.BASE_DIR, "..", "..", "data", "store", "bars", f"{config.SYMBOL}.parquet"))
     if os.path.exists(store):
@@ -53,6 +104,7 @@ def main():
              "base": base, "boll_lower": stat(pctb <= 0), "boll_upper": stat(pctb >= 1),
              "rsi80": stat(rsi >= config.OVERHEAT_RSI), "ma200_40": stat(dist200 >= config.OVERHEAT_MA200_PCT / 100),
              "ret20_25": stat(ret20 >= config.OVERHEAT_RET20_PCT / 100), "rsi30": stat(rsi <= 30),
+             "drawdown": drawdown_stats(),
              "generated_at": datetime.date.today().isoformat(),
              "note": "각 조건 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률. base = 아무 날. 과거 빈도이지 예측이 아니다."}
     with open(config.HISTORY_STATS_PATH, "w", encoding="utf-8") as f:

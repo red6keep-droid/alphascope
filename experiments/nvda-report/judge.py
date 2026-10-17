@@ -709,6 +709,38 @@ def year_range(conn, day):
             "pos_pct": (close - lo["low"]) / span * 100 if span else 50.0, "pct_from_high": (close / hi["high"] - 1) * 100}
 
 
+def earnings_moves(conn, day, n=8):
+    """실적 발표 다음 거래일 움직임 — 엔비디아는 장 마감 뒤 발표 → 다음 거래일 종가 / 발표일 종가. 최근 n번 + 평소 하루 움직임(최근 1년 |등락| 중앙값) (2026-10-17)."""
+    bars = [b for b in collect_market.bars(conn, config.SYMBOL) if b["day"] <= day]
+    days = [b["day"] for b in bars]
+    moves = []
+    for r in conn.execute("SELECT day FROM calendar WHERE kind = 'EARNINGS' AND (symbol = ? OR symbol IS NULL) AND day < ? ORDER BY day", (config.SYMBOL, day)):
+        j = next((i for i, d in enumerate(days) if d > r["day"]), None)
+        if j and j >= 1:
+            moves.append({"day": days[j], "ret": (bars[j]["close"] / bars[j - 1]["close"] - 1) * 100})
+    moves = moves[-n:]
+    rets = sorted(abs((bars[i]["close"] / bars[i - 1]["close"] - 1) * 100) for i in range(max(1, len(bars) - 252), len(bars)))
+    if not moves or not rets:
+        return None
+    absm = sorted(abs(m["ret"]) for m in moves)
+    return {"moves": moves, "median_abs": absm[len(absm) // 2], "normal_abs": rets[len(rets) // 2], "n_up": sum(1 for m in moves if m["ret"] > 0)}
+
+
+def drawdown_now(conn, day, yr=None):
+    """고점 대비 하락 기록 (정적 통계 history_stats.json 의 drawdown) + 지금 위치 — 1년 최고가 이후 며칠째 · 몇 % 아래."""
+    try:
+        with open(config.HISTORY_STATS_PATH, "r", encoding="utf-8") as f:
+            st = (json.load(f) or {}).get("drawdown")
+    except (OSError, ValueError):
+        st = None
+    yr = yr or year_range(conn, day)
+    if not st or not yr:
+        return None
+    bars = [b for b in collect_market.bars(conn, config.SYMBOL) if b["day"] <= day]
+    since = sum(1 for b in bars if b["day"] > yr["high_day"])
+    return {"stats": st, "days_since_high": since, "pct_from_high": yr["pct_from_high"], "high_day": yr["high_day"]}
+
+
 def build(conn, day, run_date):
     update_technicals(conn)
     s = _state(conn, day)
@@ -754,6 +786,7 @@ def build(conn, day, run_date):
         "headline": {k: s.get(k) for k in ("close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_avgo", "vol_ratio_20d", "gap", "range_pct", "ret_sigma_20d")},
         "macro_today": [c["label"] for c in macro_today],
         "periods": period_returns(conn, day), "year_range": year_range(conn, day),   # 쉬운 정보 (2026-10-17)
+        "drawdown": drawdown_now(conn, day), "earnings_moves": earnings_moves(conn, day),
         "normal_range": normal_range_line.compute(conn, day),   # 평소 범위 (EWMA 자) · 시장 충격 (2026-10-17, 4단계 W1 · W2)
         "market_regime": mr,   # 시장 국면 (2026-10-11): 글 머리 한 줄 + ⓘ 규칙
         "sector_flow": sf,     # 반도체 자금 방향 (2026-10-11): 글 머리 한 줄 + ⓘ 쉬운 설명

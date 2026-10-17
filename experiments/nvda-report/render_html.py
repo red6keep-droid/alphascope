@@ -469,6 +469,55 @@ def sec_year_range(a):
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{head}{body}</span></div>'
 
 
+DD_TIP = ("고점에서 내려갔을 때 : 엔비디아 일봉 1999년 이후, 종가가 직전 최고 종가보다 10% · 20% · 30% 넘게 내려갔다가 그 고점을 다시 넘을 때까지 걸린 거래일 수(고점 날짜부터 센다)\n"
+          "· 과거 기록이지 앞으로 같은 시간이 걸린다는 뜻이 아니다 — 분포가 매우 넓다(가장 짧은 것 며칠 ~ 가장 긴 것 2,138거래일)\n"
+          "· 엔비디아는 회복이 빨랐던 종목이라 15종목(같은 기간)을 합치면 훨씬 오래 걸렸다 — 괄호 안이 15종목 합침 기록\n"
+          "· 우리 검증(물림) : 15종목 30년, 고점 근처 · 볼린저 하단 · 고점 대비 −25% 에서 산 뒤 6개월 · 1년 뒤 산 가격 아래인 비율은 아무 날에 산 것과 다르지 않았다")
+EARN_TIP = ("실적 발표 : 엔비디아는 장 마감 뒤에 발표하므로 움직임은 다음 거래일에 나타난다. 평소 하루는 최근 1년 하루 등락 폭(절댓값)의 중앙값\n"
+            "· 방향이 아니라 크기를 본다 — 우리 검증 : 15종목 30년(1999~), 예상을 크게 넘긴 실적도 꾸준히 좋은 실적도 발표 다음 거래일 이후 20 · 60 · 250거래일은 아무 날과 다르지 않았다. "
+            "발표 다음 날 하루는 예상을 크게 넘기면 평균 +0.9%, 조금 넘기면 오히려 −0.8%, 못 미치면 −2.6% 였다")
+
+
+def sec_drawdown(a):
+    """고점에서 내려갔을 때 — 정적 통계(1999년 이후) + 지금 위치 (2026-10-17 사용자: 쉬운 정보 ③). 작은 글씨는 괄호."""
+    d = a.get("drawdown")
+    if not d:
+        return ""
+    st, pk = d["stats"]["nvda"], d["stats"]["peers"]
+    rows = [(f"지금 (1년 최고가 이후 {d['days_since_high']}거래일째)", _arrow(d["pct_from_high"], 1))]
+    for lv in ("10", "20", "30"):
+        x, y = st.get(lv) or {}, pk.get(lv) or {}
+        if not x.get("n") or x.get("median_days") is None:
+            continue
+        pct = f" · 1년 넘게 {y['over_year'] / y['recovered'] * 100:.0f}%" if y.get("recovered") else ""
+        note = f"{x['n']}번 · 15종목 합쳐 중앙값 {y['median_days']}일{pct}" if y.get("median_days") is not None else f"{x['n']}번"
+        rows.append((f"−{lv}% 넘게 내려간 뒤 되찾기까지 ({note})", f"중앙값 {x['median_days']}일"))
+    return _sub_label("고점에서 내려갔을 때 (1999년 이후 거래일)", DD_TIP) + f'<div data-cards="1" style="margin:0 0 8px;">{_multi_single(rows)}</div>'
+
+
+def sec_earnings(a):
+    """실적 발표 — 다음 발표까지 · 최근 발표 다음 날 움직임 크기 (2026-10-17 사용자: 쉬운 정보 ④). 방향이 아니라 크기만."""
+    em = a.get("earnings_moves")
+    nxt = a.get("next_earnings")
+    if not em and not nxt:
+        return ""
+    rows = []
+    if nxt:
+        try:
+            left = (datetime.date.fromisoformat(str(nxt)[:10]) - datetime.date.fromisoformat(a["day"])).days
+            md = datetime.date.fromisoformat(str(nxt)[:10])
+            rows.append((f"다음 실적 발표 ({md.month}월 {md.day}일 · 장 마감 뒤)", f"{left}일 뒤" if left > 0 else "오늘"))
+        except ValueError:
+            pass
+    if em:
+        n = len(em["moves"])
+        times = em["median_abs"] / em["normal_abs"] if em["normal_abs"] else None
+        rows.append((f"발표 다음 날 움직임 (최근 {n}번 중앙값" + (f" · 평소 하루 ±{em['normal_abs']:.1f}%의 약 {times:.0f}배)" if times else ")"), f"±{em['median_abs']:.1f}%"))
+        seq = " ".join(_arrow(m["ret"], 1) for m in em["moves"])
+        rows.append((f"최근 {n}번 (오른쪽이 가장 최근 · {em['n_up']}번 상승)", f'<span style="font-size:{TINY};">{seq}</span>'))
+    return _sub_label("실적 발표", EARN_TIP) + f'<div data-cards="1" style="margin:0 0 8px;">{_multi_single(rows)}</div>'
+
+
 def sec_headline(a, n=None):
     """오늘 한 줄 — 한 줄 카드 6장 (NVDA · SPY·SMH·AMD·AVGO 대비 · 거래량). 카드 안에 카드를 만들지 않는다.
 
@@ -493,7 +542,7 @@ def sec_headline(a, n=None):
         head = head[:k] + sub + head[k:]
     # 펼침 1층 = 초보자도 읽는 정보 (2026-10-17 사용자: 평균선 · 갭 같은 차트 지표는 우리 방향과 다르다) — 기간별 수익률 · 1년 가격 범위 · 거래량.
     # 2층(접힘) = 차트 보는 분을 위한 지표 — 평균선 · 1일 비교 · 시가 갭 · 일중 변동폭 · 과열(RSI) · 교차, 우리 검증은 ? 툴팁
-    rows = glance_rows(a, n) + sec_periods(a) + sec_year_range(a)
+    rows = glance_rows(a, n) + sec_periods(a) + sec_year_range(a) + sec_drawdown(a) + sec_earnings(a)
     vr = h.get("vol_ratio_20d")
     rows += f'<div data-cards="1" style="margin:0 0 8px;">{_multi_single([("거래량 (평소의 몇 배)", f"<span style=\"font-weight:700;\">{_esc(rr.fmt(vr, 'x'))}</span>", VOL_TIP)])}</div>'
     deep = sec_ma(a)
