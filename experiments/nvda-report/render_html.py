@@ -306,13 +306,11 @@ def _multi2(items):
 
 
 # ── 오늘 한눈에 (2026-10-16 사용자: "주식 초보자도 알기 쉽게" — 가이드 2-4 · 기획 9절) ─────────────────────────────
-# 세 줄: ① 얼마나 움직였나(평소 대비) ② 왜(이벤트) ③ 상태 신호등. 숫자는 전부 파이썬 값, 글은 고정 틀 — 모델이 쓰지 않는다.
-# 경고색(빨강 · 주황) 없이 회색 농도로만 (2026-10-17 사용자 결정 · 디자인 가이드라인 2-5: 크게 움직였다는 사실만으로 강조하지 않는다)
-GLANCE_COLORS = {"조용함": ("#F3F4F6", "#D1D5DB", "#6B7280"), "주의": ("#F3F4F6", "#9CA3AF", "#374151"), "큰 변화": ("#E5E7EB", "#4B5563", "#111827")}   # 배경 · 점 · 글자
-GLANCE_TIP = ("상태 신호등 : 오늘 변화가 얼마나 큰지만 나타냅니다 — 오르고 내린 방향이나 좋고 나쁨이 아닙니다\n"
-              "· 큰 변화 : 등락이 평소 범위 밖(평소 하루 흔들림의 2배 이상), 거래량이 평소의 2배 이상, 하루 흔들림(고가−저가) 4% 이상, 시장(S&P 500)보다 3%p 이상 다르게 움직임 — 하나라도 해당\n"
-              "· 주의 : 등락이 평소 하루 흔들림보다 큼(1배 이상), 거래량이 평소의 1.5배 이상 — 하나라도 해당\n"
-              "· 조용함 : 위에 해당하는 것이 없음")
+# 가격 카드 머리 작은 글씨 한 줄(glance_sub) + 평소 범위 밖일 때 펼침 맨 위 설명(glance_rows). 신호등 라벨은 2026-10-17 없앴다(사용자: 조용함 은 뜻을 모른다). 숫자는 전부 파이썬 값, 글은 고정 틀 — 모델이 쓰지 않는다.
+GLANCE_TIP = ("평소 범위 : 이 종목의 최근 하루 움직임(최근일수록 무게를 더 둔 흔들림)을 기준으로, 오늘 등락이 그 2배 안이면 '안', 넘으면 '밖'\n"
+              "· 평소 하루 ±1.8% : 그 기준 흔들림의 크기\n"
+              f"· 함께 적는 것 : 거래량이 평소의 1.5배 이상 · 하루 흔들림(고가−저가) {config.RANGE_PCT_EVENT:.0f}% 이상 · 시장(S&P 500)보다 {config.REL_SPY_EVENT:.0f}%p 이상 다르게 움직인 날\n"
+              "· 실적 발표 다음 거래일은 '실적 발표 반응일'로 따로 적는다")
 
 
 def _glance_state(a):
@@ -352,55 +350,44 @@ def _plain_rows(rows):
     return f'<div style="padding:4px 12px 14px;margin:0 0 8px;border-bottom:1px solid #E2E8F0;">{lis}</div>'
 
 
-def glance_rows(a, n=None):
-    """가격 카드 펼침 맨 위 — 등락(평소 대비) · 주요 이슈 · 변화 강도. 전부 파이썬 값, 고정 틀.
-    "주요 이슈" 는 중요 이슈 첫 줄(헤드라인체 · 검증 통과)이 있으면 그것, 없으면 첫 이벤트의 사실 문장."""
+def glance_sub(a):
+    """가격 카드 머리 · 가격 줄 아래 작은 글씨 한 줄 (2026-10-17 사용자: 조용함 라벨은 뜻을 모르겠고, 등락률은 가격 줄과 겹친다 → 신호등을 없애고 글로).
+    `평소 범위 안 (평소 하루 ±1.8%)` · 바깥이면 `평소 범위 밖 · 평소의 2.2배 (평소 하루 ±2.2%)` · 거래량 · 하루 흔들림 · 시장과 차이가 큰 날은 ` · ` 로 이어 붙인다. 숫자는 전부 파이썬 값."""
     h = a["headline"]
     if h.get("close") is None:
         return ""
-    r, sig = h.get("ret_1d") or 0, h.get("ret_sigma_20d")
-    nr = a.get("normal_range")
-    extra = []
-    if nr:   # 4단계 W1 (2026-10-17): 자 = 검증된 평소 범위(EWMA λ 0.94, 실적 반응일 제외), 밖 = 평소 하루 흔들림의 2배 이상
+    nr, sig, r = a.get("normal_range"), h.get("ret_sigma_20d"), h.get("ret_1d") or 0
+    if nr:   # 자 = 검증된 평소 범위(EWMA λ 0.94, 실적 반응일 제외) — 밖 = 평소 하루 흔들림의 2배 이상 (4단계 W1)
         k, sd = abs(nr["z"]), nr["sigma_pct"]
-        unit = f' <span style="color:{NOTE};font-weight:400;">(평소 하루 ±{sd:.1f}%)</span>'
-        if nr.get("earnings_day"):
-            how = f"{_arrow(r)} — 실적 발표 반응일, 평소의 {k:.1f}배{unit}"
-        elif k < 2:
-            how = f"{_arrow(r)} — 평소 범위 안{unit}"
-        else:
-            how = f"{_arrow(r)} — 평소 범위 밖, 평소의 {k:.1f}배{unit}"
-            extra.append(f"지난 1년 이만큼 움직인 날은 {nr['n_year']}번이었다.")
-            if not (nr.get("market_shock") or {}).get("active"):   # 충격 국면은 시장 충격 카드가 말한다 (A3)
-                extra.append("S&P 500 종목 기준, 평소 국면에서 이렇게 크게 움직인 다음 날 사고판 것은 아무 날에 사고판 것과 다르지 않았다."
-                             + _dk.tip_icon(NORMAL_DAY_TIP))
+        earn = nr.get("earnings_day")
     elif sig:
-        k = abs(r) / sig
-        size = "평소 범위 안" if k < 1 else ("평소보다 큰 편" if k < 2 else "평소의 2배 넘게")
-        how = f"{_arrow(r)} — {size} <span style=\"color:{NOTE};font-weight:400;\">(평소 하루 ±{sig:.1f}%)</span>"
+        k, sd, earn = abs(r) / sig, sig, False
     else:
-        how = f"{_arrow(r)}"
-    evs = a.get("events") or []
-    top = next((e for e in evs if e.get("emphasis")), evs[0] if evs else None)
-    head = ((n or {}).get("today") or [None])[0]
-    if head:
-        areas = "|".join(re.escape(v) for v in rr.AREA_KO.values())
-        head = re.sub(rf"^({areas})\s+(?!·)", r"\1 · ", head.strip())   # sec_narrative 와 같은 보정
-        why = _esc(head) + (f" <span style=\"color:{NOTE};\">외 {len(evs) - 1}건</span>" if len(evs) > 1 else "")
-    elif top:
-        fact = (top.get("fact") or top.get("title") or "").strip().rstrip(".")
-        if len(fact) > 48:
-            fact = fact[:47].rstrip() + "…"
-        why = f"{_esc(rr.AREA_KO.get(top['area'], top['area']))} · {_esc(fact)}" + (f" <span style=\"color:{NOTE};\">외 {len(evs) - 1}건</span>" if len(evs) > 1 else "")
+        return ""
+    if earn:
+        first = f"실적 발표 반응일 · 평소의 {k:.1f}배"
+    elif k < 2:
+        first = "평소 범위 안" + (f" · 평소의 {k:.1f}배" if k >= 1 else "")
     else:
-        why = f"<span style=\"color:{NOTE};\">특별한 소식 없음</span>"
-    state, reasons = _glance_state(a)
-    bg, dot, fg = GLANCE_COLORS[state]
-    light = (f'<span style="display:inline-flex;align-items:center;gap:6px;padding:2px 8px 2px 6px;border-radius:999px;background:{bg};color:{fg};font-weight:700;white-space:nowrap;">'
-             f'<span style="width:10px;height:10px;border-radius:50%;background:{dot};"></span>{state}</span>')
-    reason = f' <span style="color:{NOTE};">— {_esc(" · ".join(reasons))}</span>' if reasons else ""
-    # 1번 카드(가격 카드) 펼침 맨 위 — 작은 소제목 없이 두 줄, 주요 이슈 줄은 뺀다 (2026-10-17 사용자). ? 툴팁은 신호등 뒤
-    return _plain_rows([("", how)] + [("", x) for x in extra] + [("", light + _dk.tip_icon(GLANCE_TIP) + reason)])
+        first = f"평소 범위 밖 · 평소의 {k:.1f}배"
+    first += f" (평소 하루 ±{sd:.1f}%)"
+    _, reasons = _glance_state(a)
+    parts = [first] + [x for x in reasons if not x.startswith("등락이 평소의")]   # 등락 배수는 첫 마디에 있다
+    return (f'<span style="flex:0 0 100%;min-width:0;display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;word-break:keep-all;">'
+            f'{_esc(" · ".join(parts))}{_dk.tip_icon(GLANCE_TIP)}</span>')
+
+
+def glance_rows(a, n=None):
+    """가격 카드 펼침 맨 위 — 평소 범위 **밖**인 날(충격 국면 아님)의 추가 설명 둘: 지난 1년 횟수 · 우리 검증. 평소 범위 안이면 없다
+    (평소 범위 한 줄은 카드 머리 glance_sub 로 옮겼다 — 2026-10-17 사용자)."""
+    nr = a.get("normal_range")
+    if not nr or nr.get("earnings_day") or abs(nr["z"]) < 2:
+        return ""
+    extra = [f"지난 1년 이만큼 움직인 날은 {nr['n_year']}번이었다."]
+    if not (nr.get("market_shock") or {}).get("active"):   # 충격 국면은 시장 충격 카드가 말한다 (A3)
+        extra.append("S&P 500 종목 기준, 평소 국면에서 이렇게 크게 움직인 다음 날 사고판 것은 아무 날에 사고판 것과 다르지 않았다."
+                     + _dk.tip_icon(NORMAL_DAY_TIP))
+    return _plain_rows([("", x) for x in extra])
 
 
 NORMAL_DAY_TIP = ("우리 검증 : 1999년부터 S&P 500 소속 종목(일봉이 있는 568개)에서, 시장 충격이 아닌 때 하루 움직임이 평소의 2배를 넘은 다음 날 시가에 "
@@ -451,6 +438,11 @@ def sec_headline(a, n=None):
              f'<span style="color:{pcol};font-weight:700;">${h["close"]:,.2f}</span>&nbsp;{_arrow(h.get("ret_1d"))}'
              f'{_fold_btn(_dk.lighten(bg), bd) if r else ACC_BTN}</span>')
     head = _row("NVDA", price, tone).replace("margin:0 0 6px;", "margin:0;", 1)
+    sub = glance_sub(a)
+    if sub:   # 같은 카드 안 두 번째 줄 — 가격 줄 아래 작은 글씨 (2026-10-17 사용자). 홈 카드는 data-acc 안을 읽지 않아 영향 없다
+        head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;row-gap:2px;", 1)
+        k = head.rstrip().rfind("</span>")
+        head = head[:k] + sub + head[k:]
     rows = glance_rows(a, n) + sec_ma(a)   # 펼치면 맨 위에 쉬운 말 줄(등락 · 이슈 · 변화 강도), 그 아래 n일 평균 카드 (2026-10-16 사용자)
     # 비교 4개는 따로 한 카드, 2열 + 세로 구분선 (E타입, 2026-10-11 사용자)
     rows += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p")) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])   # 비교 4종 앞 로고는 두지 않는다 (2026-10-13 사용자)
