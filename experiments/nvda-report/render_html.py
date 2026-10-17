@@ -319,13 +319,16 @@ def _glance_state(a):
         big.append(f"하루 흔들림 {rg:.1f}%")
     if vs >= config.REL_SPY_EVENT:
         big.append(f"시장과 {vs:.1f}%p 다르게 움직임")
-    # 소식 · 한 달 범위 끝은 판정에는 넣고 이유 글에는 쓰지 않는다 (2026-10-17 사용자: "글은 삭제" → "두 조건은 남겨줘")
-    hidden = bool([e for e in a.get("events") or [] if e.get("emphasis")]) or (a.get("bollinger") or {}).get("state") in BOLL_THEME
+    # 이유는 항상 보여 준다 (2026-10-17 사용자: "주의라는 라벨만 있고 내용은 없다" — 10-17 아침 "글은 삭제" 결정을 되돌림)
+    if [e for e in a.get("events") or [] if e.get("emphasis")]:
+        mid.append("강조할 소식이 있음")
+    if (a.get("bollinger") or {}).get("state") in BOLL_THEME:
+        mid.append("한 달 가격 범위의 끝에 닿음")
     if (a.get("overheat") or {}).get("active"):
         mid.append("과열 신호")
     if big:
         return "큰 변화", big + mid
-    if mid or hidden:
+    if mid:
         return "주의", mid
     return "조용함", []
 
@@ -351,11 +354,11 @@ def glance_rows(a, n=None):
         k, sd = abs(nr["z"]), nr["sigma_pct"]
         unit = f' <span style="color:{NOTE};font-weight:400;">(평소 하루 ±{sd:.1f}%)</span>'
         if nr.get("earnings_day"):
-            how = f"오늘 {_arrow(r)} — 실적 발표 반응일, 평소의 {k:.1f}배{unit}"
+            how = f"{_arrow(r)} — 실적 발표 반응일, 평소의 {k:.1f}배{unit}"
         elif k < 2:
-            how = f"오늘 {_arrow(r)} — 평소 범위 안{unit}"
+            how = f"{_arrow(r)} — 평소 범위 안{unit}"
         else:
-            how = f"오늘 {_arrow(r)} — 평소 범위 밖, 평소의 {k:.1f}배{unit}"
+            how = f"{_arrow(r)} — 평소 범위 밖, 평소의 {k:.1f}배{unit}"
             extra.append(f"지난 1년 이만큼 움직인 날은 {nr['n_year']}번이었다.")
             if not (nr.get("market_shock") or {}).get("active"):   # 충격 국면은 시장 충격 카드가 말한다 (A3)
                 extra.append("S&P 500 종목 기준, 평소 국면에서 이렇게 크게 움직인 다음 날 사고판 것은 아무 날에 사고판 것과 다르지 않았다."
@@ -363,9 +366,9 @@ def glance_rows(a, n=None):
     elif sig:
         k = abs(r) / sig
         size = "평소 범위 안" if k < 1 else ("평소보다 큰 편" if k < 2 else "평소의 2배 넘게")
-        how = f"오늘 {_arrow(r)} — {size} <span style=\"color:{NOTE};font-weight:400;\">(평소 하루 ±{sig:.1f}%)</span>"
+        how = f"{_arrow(r)} — {size} <span style=\"color:{NOTE};font-weight:400;\">(평소 하루 ±{sig:.1f}%)</span>"
     else:
-        how = f"오늘 {_arrow(r)}"
+        how = f"{_arrow(r)}"
     evs = a.get("events") or []
     top = next((e for e in evs if e.get("emphasis")), evs[0] if evs else None)
     head = ((n or {}).get("today") or [None])[0]
@@ -495,7 +498,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
             _, name, value, note = item
             return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd};">'
                     f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
-                    f'<span style="flex:none;white-space:nowrap;color:#111;">{_esc(name)}</span><span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value))}</span></span>'
+                    f'<span style="flex:none;white-space:nowrap;color:#111;">{_esc(name)}</span><span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value)).replace(chr(10), "<br>")}</span></span>'
                     + (f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span>' if note else "") + '</li>')
         if kind == "plain":   # 쉬운 말 한 줄 — 점 없이 굵게, 아래 8px (2026-10-16 사용자: 강조 카드 펼침 맨 위에 쉬운 설명)
             return f'<li style="list-style:none;margin:9px 0 17px;font-weight:400;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{_tint(_esc(text))}</li>'   # 상세 설명 2~3문장이라 보통 굵기 (2026-10-17)
@@ -547,7 +550,9 @@ def regime_plain(mr):
     """2번 카드 첫 줄 — 값으로 만든 2문장 (2026-10-17 사용자: 상세하게 → "약간만 줄여"). 평가어 없이."""
     ph, above = mr["pct_from_high"], mr["above_ma200"]
     where = f"1년 최고가보다 {abs(ph):.1f}% 아래" if ph < -0.05 else "1년 최고가 근처"
-    first = f"S&P 500이 {where}, 200일 평균선 {'위' if above else '아래'}, '{mr['regime']}'이다."   # 사용자 문구 (2026-10-17)
+    pm = mr.get("pct_vs_ma200")
+    ma_part = f"200일 평균선보다 {abs(pm):.1f}% {'위' if above else '아래'}" if pm is not None else f"200일 평균선 {'위' if above else '아래'}"   # 괄호 설명은 첫 줄에 두지 않는다 (2026-10-17 사용자)
+    first = f"S&P 500이 {where}, {ma_part}, '{mr['regime']}'이다."   # 사용자 문구 (2026-10-17)
     vix = mr.get("vix")
     if vix is not None:
         calm = "차분한 편" if vix < 20 else ("보통보다 높은 편" if vix < config.REGIME_VIX_HIGH else "크게 흔들리는 편")
@@ -560,7 +565,8 @@ def regime_lines(mr):
     st = mr.get("streak") or 0
     lines = [(regime_plain(mr), "plain"),
              ("row", "S&P 500 고점 대비", f"{mr['pct_from_high']:+.1f}%", f"−{pb:.0f}% 안 상승 추세 · −{cr:.0f}% 넘으면 조정장"),
-             ("row", "200일 평균선", "위" if mr["above_ma200"] else "아래", "약 10개월 평균 가격")]
+             ("row", "200일 평균선과의 거리", (f"{mr['pct_vs_ma200']:+.1f}%" if mr.get("pct_vs_ma200") is not None else ("위" if mr["above_ma200"] else "아래")),
+              "약 10개월 평균 가격보다 아래로 내려가면 조정장")]   # 사용자 문구 (2026-10-17)
     if mr.get("vix") is not None:
         lines.append(("row", "시장 흔들림 (VIX)", f"{mr['vix']:.1f}", f"20 아래 차분 · {config.REGIME_VIX_HIGH:.0f} 넘으면 불안"))
     lines.append(("row", "연속 등락", (f"{abs(st)}일 {'상승' if st > 0 else '하락'}" if st else "보합"), "S&P 500 같은 방향 마감 일수"))
@@ -586,8 +592,8 @@ def sector_flow_lines(sf):
         lines.append(("row", "섹터 순위", f"12개 중 {sf['smh_rank']}위", "같은 기간 수익률 순"))
     secs = sf.get("sectors") or []
     if secs:
-        lines.append(("row", "앞선 섹터", " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[:2]), "시장보다 많이 오른 곳"))
-        lines.append(("row", "뒤처진 섹터", " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[-2:][::-1]), "시장보다 못 간 곳"))
+        lines.append(("row", "앞선 섹터", "\n".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[:2]), "시장보다 많이 오른 곳"))   # 섹터마다 한 줄 (2026-10-17 사용자)
+        lines.append(("row", "뒤처진 섹터", "\n".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[-2:][::-1]), "시장보다 못 간 곳"))
     if sf.get("shares_5d") is not None:
         lines.append(("row", "반도체 ETF 주식 수 (5일)", f"{sf['shares_5d']:+.1f}%", "늘면 유입 · 줄면 유출"))
     return lines

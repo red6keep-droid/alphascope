@@ -463,7 +463,7 @@ def market_regime(conn, day):
         db.set_meta(conn, "market_regime", json.dumps({"day": day, "regime": regime, "prev_regime": prev}, ensure_ascii=False))
         conn.commit()
     return {"regime": regime, "prev_regime": prev, "changed": bool(prev and prev != regime), "pct_from_high": pct_from_high,
-            "above_ma200": above_ma, "ma200": ma, "vix": vix, "streak": streak, "benchmark": config.REGIME_BENCHMARK, "bar_day": bars[-1]["day"]}
+            "above_ma200": above_ma, "ma200": ma, "pct_vs_ma200": (close / ma - 1) * 100, "vix": vix, "streak": streak, "benchmark": config.REGIME_BENCHMARK, "bar_day": bars[-1]["day"]}
 
 
 def _rel_return(conn, symbol, day, n, spy_closes=None):
