@@ -545,7 +545,7 @@ def sec_drawdown(a):
     st, pk = d["stats"]["nvda"], d["stats"]["peers"]
     span = _span_label(d["stats"])
     rows = _row_html("지금", _arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True, inline_note=True)   # 줄바꿈 없이 (2026-10-17 사용자)
-    over = []
+    over, cols = [], []
     for lv in ("10", "20", "30"):
         x, y = st.get(lv) or {}, pk.get(lv) or {}
         if not x.get("n") or x.get("median_days") is None or y.get("median_days") is None:
@@ -556,9 +556,19 @@ def sec_drawdown(a):
         right = (f'<span style="{sm}">보통</span> {x["median_days"]}일<br>'   # 엔비디아 글자는 뺐다(카드가 엔비디아 기준) · 보통 은 작은 글씨 (2026-10-17 사용자: 평균 → 보통)
                  f'<span style="{sm}">기술주 15개 보통 {y["median_days"]}일</span>')
         rows += _row_html(left, right, note)
-        over.append(f"−{lv}% 엔비디아 {x['over_year'] / x['recovered'] * 100:.0f}% · 기술주 15개 {y['over_year'] / y['recovered'] * 100:.0f}%")
-    tail = (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
-            f'<span style="font-weight:700;">회복에 1년(250거래일) 넘게 걸린 비율</span> — {_esc(" / ".join(over))}</span>') if over else ""   # 제목 굵게 (2026-10-17 사용자)
+        cols.append((lv, x["over_year"] / x["recovered"] * 100, y["over_year"] / y["recovered"] * 100))
+    tail = ""
+    if cols:   # 세로 구분선 (2026-10-17 사용자: 괄호 대신 세로 구분선) — 첫 칸 = 이름, 나머지 = −10 · −20 · −30%
+        vb = "border-left:1px solid #E2E8F0;"
+        def cell(txt, first=False, style=""):
+            return (f'<span style="flex:1 1 0;min-width:0;box-sizing:border-box;padding:0 8px;text-align:{"left" if first else "center"};'
+                    f'{"" if first else vb}{style}">{txt}</span>')
+        head_cells = cell("", True) + "".join(cell(f'<span style="color:{DOWN};font-weight:700;">−{lv}%</span>') for lv, _, _ in cols)
+        r1 = cell("엔비디아", True) + "".join(cell(f"{a:.0f}%") for _, a, _ in cols)
+        r2 = cell("기술주 15개", True) + "".join(cell(f"{b:.0f}%") for _, _, b in cols)
+        tbl = "".join(f'<span style="display:flex;align-items:stretch;line-height:24px;">{r}</span>' for r in (head_cells, r1, r2))
+        tail = (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};color:{NOTE};">'
+                f'<span style="display:block;font-weight:700;margin:0 0 4px;">회복에 1년(250거래일) 넘게 걸린 비율</span>{tbl}</span>')
     return _card_title("고점 하락 후 가격 회복", DD_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}{tail}</span></div>'
 
 
@@ -573,7 +583,7 @@ def sec_earnings(a):
         try:
             md = datetime.date.fromisoformat(str(nxt)[:10])
             left = (md - datetime.date.fromisoformat(a["day"])).days
-            rows += _row_html("다음 실적 발표", f"{left}일 뒤" if left > 0 else "오늘", f"{md.month}월 {md.day}일 · 장 마감 뒤", first=first)
+            rows += _row_html("다음 실적 발표", f"{left}일 뒤" if left > 0 else "오늘", f"{md.month}월 {md.day}일 · 장 마감 뒤", first=first, inline_note=True)   # 줄바꿈 없이 (2026-10-17 사용자)
             first = False
         except ValueError:
             pass
@@ -585,7 +595,7 @@ def sec_earnings(a):
         chart = _col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in em["moves"]], [_sign_bg], [_sign_fg], height=130)
         rows += (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px 0;">'
                  f'<span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 {n}번의 실적 발표 다음 날 (%)</span>'
-                 f'<span style="display:block;font-size:{MICRO};line-height:20px;font-weight:400;color:{NOTE};margin:0 0 6px;">(왼쪽이 오래된 것 · 아래 숫자는 연.월)</span>{chart}</span>')
+                 f'<span style="display:block;height:6px;"></span>{chart}</span>')   # 설명 글(왼쪽이 오래된 것 · 연.월)은 삭제 (2026-10-17 사용자)
     return _card_title("실적 발표 후 가격 변동", EARN_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}</span></div>'
 
 
