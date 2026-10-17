@@ -61,9 +61,11 @@ def drawdown_stats():
         cy = drawdown_cycles(c)
         per[sym] = dd_summary(cy)
         pooled += cy
+        if sym == "NVDA":
+            span = {"from": str(c.index[0].date()), "to": str(c.index[-1].date())}
     if "NVDA" not in per:
         return None
-    return {"nvda": per["NVDA"], "peers": dd_summary(pooled), "peers_n": len(per),
+    return {**span, "nvda": per["NVDA"], "peers": dd_summary(pooled), "peers_n": len(per),
             "peers_span": "1999~" , "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다."}
 
 

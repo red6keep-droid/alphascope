@@ -285,7 +285,7 @@ def _name_tip(name, tip):
         name, rest = name.split(marker, 1)
         pill = marker + rest
     head, sep, paren = name.partition(" (")
-    icon = _dk.tip_icon(tip)
+    icon = _tipx(tip)
     if not sep:
         return _paren(_esc(head)) + icon + pill
     return _paren(_esc(head)) + icon + _paren(_esc(" (" + paren)) + pill
@@ -376,7 +376,7 @@ def glance_sub(a):
     # 우측 정렬은 가격 숫자(`$214.13 ▼1.43%`)의 오른쪽 끝 세로선에 맞춘다 = 접기 버튼 폭 + 왼쪽 여백만큼 안쪽 (2026-10-17 사용자). 툴팁 아이콘은 글자 앞
     return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:right;padding-right:{FOLD_LEFT + _dk.FOLD_BOX}px;margin-top:3px;'
             f'font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;word-break:keep-all;">'
-            f'{_dk.tip_icon(GLANCE_TIP)}{_esc(" · ".join(parts))}</span>')
+            f'{_tipx(GLANCE_TIP)}{_esc(" · ".join(parts))}</span>')
 
 
 def glance_rows(a, n=None):
@@ -388,7 +388,7 @@ def glance_rows(a, n=None):
     extra = [f"지난 1년 이만큼 움직인 날은 {nr['n_year']}번이었다."]
     if not (nr.get("market_shock") or {}).get("active"):   # 충격 국면은 시장 충격 카드가 말한다 (A3)
         extra.append("S&P 500 종목 기준, 평소 국면에서 이렇게 크게 움직인 다음 날 사고판 것은 아무 날에 사고판 것과 다르지 않았다."
-                     + _dk.tip_icon(NORMAL_DAY_TIP))
+                     + _tipx(NORMAL_DAY_TIP))
     return _plain_rows([("", x) for x in extra])
 
 
@@ -423,6 +423,49 @@ def _fd(d):
     return f"{int(y)}년 {int(m)}월 {int(dd)}일"
 
 
+CHART_H, CHART_LBL = 150, 16
+
+
+def _legend_chips(items):
+    """색 범례 칩 한 줄 — 왼쪽 10px 들여쓰기, 칩 9px (범례 막대와 같은 모양). items = [(이름, 색)]."""
+    chips = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
+                     f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{c};"></span>{_esc(nm)}</span>' for nm, c in items)
+    return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
+
+
+def _col_chart(groups, colors, label_colors, height=CHART_H):
+    """세로 막대 그래프 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수. 값은 막대 끝에 숫자 (2026-10-17 사용자: 그래프화)."""
+    vals = [v for _, vs in groups for v in vs if v is not None]
+    if not vals:
+        return ""
+    mp, mn = max(0.0, max(vals)), max(0.0, -min(vals))
+    scale = (height - 2 * CHART_LBL) / ((mp + mn) or 1)
+    top = CHART_LBL + mp * scale
+    n, ns = len(groups), len(groups[0][1])
+    parts = [f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>']
+    for i, (_, vs) in enumerate(groups):
+        for k, v in enumerate(vs):
+            if v is None:
+                continue
+            h = max(1.0, abs(v) * scale)
+            left = (i + (0.15 + 0.70 * k / ns)) * 100 / n
+            width = 0.70 / ns * 100 / n
+            y, ly = (top - h, top - h - 15) if v >= 0 else (top, top + h + 1)
+            rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
+            parts.append(f'<span style="position:absolute;left:{left:.2f}%;width:{width:.2f}%;top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
+            txt = f"{v:+.1f}".replace("-", "−")
+            parts.append(f'<span style="position:absolute;left:{left - 2:.2f}%;width:{width + 4:.2f}%;top:{ly:.1f}px;height:14px;line-height:14px;text-align:center;font-size:11px;'
+                         f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt}</span>')
+    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;">{_esc(g)}</span>' for g, _ in groups)
+    return (f'<span style="display:block;position:relative;height:{height}px;">{"".join(parts)}</span>'
+            f'<span style="display:flex;font-size:{TINY};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>')
+
+
+_PASTEL_UP, _PASTEL_DN, _GRAY_BAR = "#F8C4BF", "#BCD3F5", "#CBD5E1"   # 막대 파스텔 — BAR_PASTEL 의 긍정 · 부정과 같은 값
+_sign_bg = lambda v: _PASTEL_UP if v > 0 else _PASTEL_DN   # noqa: E731
+_sign_fg = lambda v: UP if v > 0 else DOWN   # noqa: E731
+
+
 PERIODS_TIP = ("기간별 수익률 : 지금 종가가 1주(5거래일) · 1개월(21) · 3개월(63) · 6개월(126) · 1년(252) 전 종가보다 몇 % 올랐거나 내렸는지\n"
                "· 괄호 안은 같은 기간 S&P 500(SPY)의 수익률 — 시장보다 더 올랐는지 덜 올랐는지 비교하는 용도\n"
                "· 과거 수익률이지 앞으로를 말하지 않는다. 우리 검증 : 15종목 30년(1999~), 최근 몇 달 오른 종목이 그 뒤에도 아무 날보다 잘 오르지는 않았다는 결론은 아직 없음 — 판단 유보")
@@ -434,16 +477,15 @@ VOL_TIP = ("거래량 : 오늘 거래된 주식 수가 최근 20일 평균의 �
 
 
 def sec_periods(a):
-    """기간별 수익률 카드 (2026-10-17 사용자: 쉬운 정보로) — 이름 `1개월 (S&P 500 +0.5%)` · 값 ▼ 1.7%. 작은 글씨는 괄호."""
-    rows = []
-    for p in a.get("periods") or []:
-        if p.get("nvda") is None:
-            continue
-        name = p["label"] + (f" (S&P 500 {p['spy']:+.1f}%)" if p.get("spy") is not None else "")
-        rows.append((name, _arrow(p["nvda"], 1)))
-    if not rows:
+    """기간별 수익률 그래프 (2026-10-17 사용자: 1주 · 1개월 · 3개월 · 6개월 · 1년을 그래프로) — 엔비디아(오름 빨강 · 내림 파랑)와 S&P 500(회색) 세로 막대."""
+    ps = [p for p in a.get("periods") or [] if p.get("nvda") is not None]
+    if not ps:
         return ""
-    return _sub_label("기간별 수익률", PERIODS_TIP) + f'<div data-cards="1" style="margin:0 0 8px;">{_multi_single(rows)}</div>'
+    pad = _dk.SEP_GAP - _dk.VP - 1
+    chart = _col_chart([(p["label"], [p["nvda"], p.get("spy")]) for p in ps], [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE])
+    legend = _legend_chips([("엔비디아 오름", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), ("S&P 500", _GRAY_BAR)])
+    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}{legend}</span></span></div>'
+    return _sub_label("기간별 수익률 (%)", PERIODS_TIP) + card
 
 
 def _multi_single(rows):
@@ -458,7 +500,7 @@ def sec_year_range(a):
         return ""
     pad = _dk.SEP_GAP - _dk.VP - 1
     pos = max(0.0, min(100.0, y["pos_pct"]))
-    head = (f'<span style="{MULTI_ROW}"><span style="flex:1 1 auto;min-width:0;font-weight:700;color:#111;font-size:{_dk.NAME};">1년 가격 범위{_dk.tip_icon(YEAR_TIP)}</span>'
+    head = (f'<span style="{MULTI_ROW}"><span style="flex:1 1 auto;min-width:0;font-weight:700;color:#111;font-size:{_dk.NAME};">1년 가격 범위{_tipx(YEAR_TIP)}</span>'
             f'<span style="flex:none;text-align:right;white-space:nowrap;{VAL}font-weight:700;"><span style="font-size:{TINY};font-weight:400;color:{NOTE};">(최고가 대비)</span> {_arrow(y["pct_from_high"], 1)}</span></span>')
     track = (f'<span style="display:block;position:relative;height:8px;border-radius:4px;background:#E2E8F0;margin:6px 0 10px;">'
              f'<span style="position:absolute;left:0;top:0;height:8px;width:{pos:.1f}%;border-radius:4px;background:#BFDBFE;"></span>'
@@ -469,53 +511,74 @@ def sec_year_range(a):
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{head}{body}</span></div>'
 
 
-DD_TIP = ("고점에서 내려갔을 때 : 엔비디아 일봉 1999년 이후, 종가가 직전 최고 종가보다 10% · 20% · 30% 넘게 내려갔다가 그 고점을 다시 넘을 때까지 걸린 거래일 수(고점 날짜부터 센다)\n"
-          "· 과거 기록이지 앞으로 같은 시간이 걸린다는 뜻이 아니다 — 분포가 매우 넓다(가장 짧은 것 며칠 ~ 가장 긴 것 2,138거래일)\n"
-          "· 엔비디아는 회복이 빨랐던 종목이라 15종목(같은 기간)을 합치면 훨씬 오래 걸렸다 — 괄호 안이 15종목 합침 기록\n"
+DD_TIP = ("고점 하락 후 가격 회복 : 엔비디아 일봉 약 30년(1999년~) 기록에서, 종가가 직전 최고 종가보다 10% · 20% · 30% 넘게 내려갔다가 그 고점을 다시 넘을 때까지 걸린 거래일 수(고점 날짜부터 센다)\n"
+          "· 숫자는 '절반은 이 기간 안에 회복했다'는 뜻(중앙값). 나머지 절반은 더 오래 걸렸다 — 분포가 매우 넓다(가장 긴 것 엔비디아 2,138거래일)\n"
+          "· 'N번' 은 약 30년 동안 그만큼 내려간 일이 몇 번 있었는지\n"
+          "· 엔비디아는 회복이 빨랐던 종목이라 15종목을 합치면 훨씬 오래 걸렸다(−20%: 엔비디아 1년 넘게 25% · 15종목 38%)\n"
           "· 우리 검증(물림) : 15종목 30년, 고점 근처 · 볼린저 하단 · 고점 대비 −25% 에서 산 뒤 6개월 · 1년 뒤 산 가격 아래인 비율은 아무 날에 산 것과 다르지 않았다")
-EARN_TIP = ("실적 발표 : 엔비디아는 장 마감 뒤에 발표하므로 움직임은 다음 거래일에 나타난다. 평소 하루는 최근 1년 하루 등락 폭(절댓값)의 중앙값\n"
+EARN_TIP = ("실적 발표 후 가격 변동 : 엔비디아는 장 마감 뒤에 발표하므로 움직임은 다음 거래일에 나타난다. 평소 하루는 최근 1년 하루 등락 폭의 중앙값\n"
             "· 방향이 아니라 크기를 본다 — 우리 검증 : 15종목 30년(1999~), 예상을 크게 넘긴 실적도 꾸준히 좋은 실적도 발표 다음 거래일 이후 20 · 60 · 250거래일은 아무 날과 다르지 않았다. "
             "발표 다음 날 하루는 예상을 크게 넘기면 평균 +0.9%, 조금 넘기면 오히려 −0.8%, 못 미치면 −2.6% 였다")
 
 
+def _row_html(left_html, right_html, note="", first=False):
+    """카드 한 줄 — 왼쪽(이름 + 아래 작은 설명) · 오른쪽(값, 여러 줄 가능)."""
+    pad = _dk.SEP_GAP - _dk.VP - 1
+    sep = "" if first else MULTI_SEP
+    nt = f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;">{note}</span>' if note else ""
+    return (f'<span style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:{pad}px 12px;line-height:{LH_CARD};{sep}">'
+            f'<span style="flex:1 1 auto;min-width:0;color:#111;font-weight:700;white-space:normal;word-break:keep-all;">{left_html}{nt}</span>'
+            f'<span style="flex:none;text-align:right;white-space:nowrap;font-weight:700;{VAL}">{right_html}</span></span>')
+
+
 def sec_drawdown(a):
-    """고점에서 내려갔을 때 — 정적 통계(1999년 이후) + 지금 위치 (2026-10-17 사용자: 쉬운 정보 ③). 작은 글씨는 괄호."""
+    """고점 하락 후 가격 회복 — 약 30년 기록, 엔비디아와 기술주 15개 (2026-10-17 사용자). 숫자 = 절반은 이 거래일 안에 회복."""
     d = a.get("drawdown")
     if not d:
         return ""
     st, pk = d["stats"]["nvda"], d["stats"]["peers"]
-    rows = [(f"지금 (1년 최고가 이후 {d['days_since_high']}거래일째)", _arrow(d["pct_from_high"], 1))]
+    span = _span_label(d["stats"])
+    rows = _row_html("지금", _arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True)
+    over = []
     for lv in ("10", "20", "30"):
         x, y = st.get(lv) or {}, pk.get(lv) or {}
-        if not x.get("n") or x.get("median_days") is None:
+        if not x.get("n") or x.get("median_days") is None or y.get("median_days") is None:
             continue
-        pct = f" · 1년 넘게 {y['over_year'] / y['recovered'] * 100:.0f}%" if y.get("recovered") else ""
-        note = f"{x['n']}번 · 15종목 합쳐 중앙값 {y['median_days']}일{pct}" if y.get("median_days") is not None else f"{x['n']}번"
-        rows.append((f"−{lv}% 넘게 내려간 뒤 되찾기까지 ({note})", f"중앙값 {x['median_days']}일"))
-    return _sub_label("고점에서 내려갔을 때 (1999년 이후 거래일)", DD_TIP) + f'<div data-cards="1" style="margin:0 0 8px;">{_multi_single(rows)}</div>'
+        left = f'<span style="color:{DOWN};">−{lv}%</span> 넘게 내려가면'
+        note = f"{span} 동안 엔비디아 {x['n']}번 · 기술주 15개 합쳐 {y['n']}번"
+        right = f'엔비디아 {x["median_days"]}일<br>기술주 15개 {y["median_days"]}일'
+        rows += _row_html(left, right, note)
+        over.append(f"−{lv}% 엔비디아 {x['over_year'] / x['recovered'] * 100:.0f}% · 기술주 15개 {y['over_year'] / y['recovered'] * 100:.0f}%")
+    tail = (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
+            f'회복에 1년(250거래일) 넘게 걸린 비율 — {_esc(" / ".join(over))}</span>') if over else ""
+    return _sub_label(f"고점 하락 후 가격 회복 ({span} 기록 · 절반은 이 거래일 안에 회복)", DD_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}{tail}</span></div>'
 
 
 def sec_earnings(a):
-    """실적 발표 — 다음 발표까지 · 최근 발표 다음 날 움직임 크기 (2026-10-17 사용자: 쉬운 정보 ④). 방향이 아니라 크기만."""
+    """실적 발표 후 가격 변동 — 다음 발표 · 발표 다음 날 보통 변동 · 최근 8번 막대 (2026-10-17 사용자). 방향이 아니라 크기만."""
     em = a.get("earnings_moves")
     nxt = a.get("next_earnings")
     if not em and not nxt:
         return ""
-    rows = []
+    rows, first = "", True
     if nxt:
         try:
-            left = (datetime.date.fromisoformat(str(nxt)[:10]) - datetime.date.fromisoformat(a["day"])).days
             md = datetime.date.fromisoformat(str(nxt)[:10])
-            rows.append((f"다음 실적 발표 ({md.month}월 {md.day}일 · 장 마감 뒤)", f"{left}일 뒤" if left > 0 else "오늘"))
+            left = (md - datetime.date.fromisoformat(a["day"])).days
+            rows += _row_html("다음 실적 발표", f"{left}일 뒤" if left > 0 else "오늘", f"{md.month}월 {md.day}일 · 장 마감 뒤", first=first)
+            first = False
         except ValueError:
             pass
     if em:
         n = len(em["moves"])
         times = em["median_abs"] / em["normal_abs"] if em["normal_abs"] else None
-        rows.append((f"발표 다음 날 움직임 (최근 {n}번 중앙값" + (f" · 평소 하루 ±{em['normal_abs']:.1f}%의 약 {times:.0f}배)" if times else ")"), f"±{em['median_abs']:.1f}%"))
-        seq = " ".join(_arrow(m["ret"], 1) for m in em["moves"])
-        rows.append((f"최근 {n}번 (오른쪽이 가장 최근 · {em['n_up']}번 상승)", f'<span style="font-size:{TINY};">{seq}</span>'))
-    return _sub_label("실적 발표", EARN_TIP) + f'<div data-cards="1" style="margin:0 0 8px;">{_multi_single(rows)}</div>'
+        note = f"최근 {n}번 기준" + (f" · 평소 하루 ±{em['normal_abs']:.1f}%의 약 {times:.0f}배" if times else "")
+        rows += _row_html("발표 다음 날 보통 변동", f"±{em['median_abs']:.1f}%", note, first=first)
+        chart = _col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in em["moves"]], [_sign_bg], [_sign_fg], height=130)
+        rows += (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px 0;">'
+                 f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">최근 {n}번의 실적 발표 다음 날 (%)'
+                 f'<span style="font-size:{TINY};font-weight:400;color:{NOTE};"> (왼쪽이 오래된 것 · 아래 숫자는 연.월)</span></span>{chart}</span>')
+    return _sub_label("실적 발표 후 가격 변동", EARN_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}</span></div>'
 
 
 def sec_headline(a, n=None):
@@ -585,6 +648,17 @@ REGIME_THEME = {"상승 추세": ("positive", UP), "단기 조정": ("neutral", 
 FLOW_THEME = {"모이는 중": ("positive", UP), "빠져나가는 중": ("negative", DOWN), "뚜렷하지 않음": ("neutral", MUTED)}
 
 
+PEERS_DEF = ("기술주 15개 : 엔비디아와 비교하려고 고른 미국 대형 기술주 — 반도체 10개(엔비디아 · AMD · 퀄컴 · 브로드컴 · 어플라이드머티어리얼즈 · 램리서치 · KLA · 마이크론 · 인텔 · 텍사스인스트루먼츠) "
+             "+ 대형 기술 5개(애플 · 마이크로소프트 · 아마존 · 알파벳 · 시스코). 오늘 살아남은 종목들이라 실제보다 낙관적으로 나올 수 있다 (2026-10-17 사용자: 15종목이 무엇인지 설명)")
+
+
+def _tipx(text):
+    """툴팁 아이콘 — 글에 `15종목` 이 있으면 `기술주 15개` 로 바꾸고 구성 한 줄을 붙인다."""
+    if text and "15종목" in text:
+        text = text.replace("15종목", "기술주 15개") + "\n· " + PEERS_DEF
+    return _dk.tip_icon(text)
+
+
 def _title_with_icon(title, tail_html):
     """제목 + 툴팁 아이콘 · N 알약 — 마지막 단어와 아이콘을 줄바꿈 없이 묶어 아이콘이 다음 줄로 떨어지지 않게 (2026-10-17 사용자: 툴팁 아이콘은 타이틀 옆)."""
     t = _esc(title)
@@ -640,7 +714,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
     # fold: 첫 줄 맨 오른쪽 공식 접기 버튼(카드 색 20% 밝은 바탕), 기본 닫힘 — 펼치면 이유 글머리표 (2026-10-13 사용자: 시장 국면 · 반도체 자금, 가이드라인 10-7)
     state_html = (f'<span style="display:inline-flex;align-items:center;">{_esc(state)}{_fold_btn(_dk.lighten(bg), bd)}</span>' if fold else _esc(state))
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다
-            f'<span style="{"flex:1 1 auto;min-width:0;" if fold else COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_title_with_icon(title, _dk.tip_icon(tip) + new_html)}</span><span style="{"flex:none;white-space:nowrap;" if fold else COL_R}font-weight:700;color:{color};">{state_html}</span></span> ')   # fold: 상태 + 버튼은 한 줄, 이름 칸이 남은 폭
+            f'<span style="{"flex:1 1 auto;min-width:0;" if fold else COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_title_with_icon(title, _tipx(tip) + new_html)}</span><span style="{"flex:none;white-space:nowrap;" if fold else COL_R}font-weight:700;color:{color};">{state_html}</span></span> ')   # fold: 상태 + 버튼은 한 줄, 이름 칸이 남은 폭
     body = (f'<div style="margin-top:{14 - _dk.VP_EMPH}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
     inner = (f'<details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{body}</details>' if fold else head + body)
@@ -1030,7 +1104,7 @@ def _ccard(rows, left=None):
 
 def _sub_label(t, tip=""):
     """카드 묶음 위 소제목 — F 막대 라벨과 같은 모양 (14px 안내 회색). data-sub: 탭이 서브탭으로 쓴다. tip = 제목 바로 옆 ? 툴팁."""
-    return f'<div data-sub="1" style="font-size:{SMALL};line-height:{LH_CARD};color:{NOTE};margin:10px 0 3px;">{_paren(_esc(t))}{_dk.tip_icon(tip) if tip else ""}</div>'   # 소제목 16px
+    return f'<div data-sub="1" style="font-size:{SMALL};line-height:{LH_CARD};color:{NOTE};margin:10px 0 3px;">{_paren(_esc(t))}{_tipx(tip) if tip else ""}</div>'   # 소제목 16px
 
 
 CAL_DATE = "font-weight:700;color:#111;"   # G 캘린더 카드: 날짜 첫 칸 굵게 (왼쪽 칸 전체 16px — 2026-10-12 사용자)
@@ -1171,7 +1245,7 @@ def sec_news_counts(a):
         return ""
     # 줄 오른쪽 끝 ? — 세 수치의 뜻 (2026-10-14 사용자). 팝업 제목은 숨긴 글자 `뉴스 수치`
     tipc = (f'<span style="flex:none;display:inline-flex;align-items:center;padding:0 6px 0 2px;">'
-            f'<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">뉴스 수치</span>{_dk.tip_icon(NEWS_STAT_TIP)}</span>')
+            f'<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">뉴스 수치</span>{_tipx(NEWS_STAT_TIP)}</span>')
     html = _dk.stat_line(items)
     return html[:-len("</div>")] + tipc + "</div>"
 
