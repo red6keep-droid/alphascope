@@ -461,7 +461,7 @@ def _col_chart(groups, colors, label_colors, height=CHART_H):
             f'<span style="display:flex;font-size:{TINY};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>')
 
 
-_PASTEL_UP, _PASTEL_DN, _GRAY_BAR = "#F2A6A0", "#9CC0F2", "#CBD5E1"   # 엔비디아 막대 — 파스텔(#F8C4BF · #BCD3F5)을 포화색(#d93025 · #1a73e8) 쪽으로 20% 진하게 (2026-10-17 사용자), S&P 500 회색은 그대로
+_PASTEL_UP, _PASTEL_DN, _GRAY_BAR = "#ED8E87", "#82B1F0", "#CBD5E1"   # 엔비디아 막대 — 파스텔(#F8C4BF · #BCD3F5)을 포화색(#d93025 · #1a73e8) 쪽으로 20% 진하게 한 번(#F2A6A0 · #9CC0F2), 사용자 요청으로 한 번 더 20% (2026-10-17), S&P 500 회색은 그대로
 _sign_bg = lambda v: _PASTEL_UP if v > 0 else _PASTEL_DN   # noqa: E731
 _sign_fg = lambda v: UP if v > 0 else DOWN   # noqa: E731
 
@@ -513,8 +513,8 @@ def sec_year_range(a):
 
 DD_TIP = ("약 30년 기록 · 절반은 이 거래일 안에 회복\n"
           "· 고점 하락 후 가격 회복 : 엔비디아 일봉 약 30년(1999년~) 기록에서, 종가가 직전 최고 종가보다 10% · 20% · 30% 넘게 내려갔다가 그 고점을 다시 넘을 때까지 걸린 거래일 수(고점 날짜부터 센다)\n"
-          "· 카드의 '평균'은 '절반은 이 기간 안에 회복했다'는 뜻(정확히는 중앙값)이다. 나머지 절반은 더 오래 걸렸고 아주 오래 걸린 몇 번 때문에 산술 평균은 훨씬 길다 — 분포가 매우 넓다(가장 긴 것 엔비디아 2,138거래일)\n"
-          "· 'N번' 은 약 30년 동안 그만큼 내려간 일이 몇 번 있었는지\n"
+          "· 카드의 '보통'은 '절반은 이 기간 안에 회복했다'는 뜻(정확히는 중앙값)이다. 나머지 절반은 더 오래 걸렸고 아주 오래 걸린 몇 번 때문에 산술 평균은 훨씬 길다 — 분포가 매우 넓다(가장 긴 것 엔비디아 2,138거래일)\n"
+          "· 'N번 발생' 은 약 30년 동안 그만큼 내려간 일이 몇 번 있었는지\n"
           "· 엔비디아는 회복이 빨랐던 종목이라 15종목을 합치면 훨씬 오래 걸렸다(−20%: 엔비디아 1년 넘게 25% · 15종목 38%)\n"
           "· 우리 검증(물림) : 15종목 30년, 고점 근처 · 볼린저 하단 · 고점 대비 −25% 에서 산 뒤 6개월 · 1년 뒤 산 가격 아래인 비율은 아무 날에 산 것과 다르지 않았다")
 EARN_TIP = ("실적 발표 후 가격 변동 : 엔비디아는 장 마감 뒤에 발표하므로 움직임은 다음 거래일에 나타난다. 평소 하루는 최근 1년 하루 등락 폭의 중앙값\n"
@@ -533,7 +533,7 @@ def _row_html(left_html, right_html, note="", first=False, inline_note=False):
         nt = f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;">{note}</span>' if note else ""
         nowrap = "white-space:normal;word-break:keep-all;"
     return (f'<span style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:{pad}px 12px;line-height:{LH_CARD};{sep}">'
-            f'<span style="flex:1 1 auto;min-width:0;color:#111;font-weight:700;{nowrap}">{left_html}{nt}</span>'
+            f'<span style="flex:1 1 auto;min-width:0;color:#111;font-weight:700;font-size:{_dk.NAME};{nowrap}">{left_html}{nt}</span>'
             f'<span style="flex:none;text-align:right;white-space:nowrap;font-weight:700;{VAL}">{right_html}</span></span>')
 
 
@@ -551,14 +551,14 @@ def sec_drawdown(a):
         if not x.get("n") or x.get("median_days") is None or y.get("median_days") is None:
             continue
         left = f'<span style="color:{DOWN};">−{lv}%</span> 넘게 내려가면'
-        note = f"{span} 동안 엔비디아 {x['n']}번"   # 기술주 15개 합친 횟수는 뺐다 (2026-10-17 사용자)
+        note = f"{span} 동안 엔비디아 {x['n']}번 발생"   # 기술주 15개 합친 횟수는 뺐다 · `발생` (2026-10-17 사용자)
         sm = f'font-size:{TINY};font-weight:400;color:{NOTE};'
-        right = (f'<span style="{sm}">평균</span> {x["median_days"]}일<br>'   # 엔비디아 글자는 뺐다(카드가 엔비디아 기준) · 평균 은 작은 글씨
-                 f'<span style="{sm}">기술주 15개 평균 {y["median_days"]}일</span>')
+        right = (f'<span style="{sm}">보통</span> {x["median_days"]}일<br>'   # 엔비디아 글자는 뺐다(카드가 엔비디아 기준) · 보통 은 작은 글씨 (2026-10-17 사용자: 평균 → 보통)
+                 f'<span style="{sm}">기술주 15개 보통 {y["median_days"]}일</span>')
         rows += _row_html(left, right, note)
         over.append(f"−{lv}% 엔비디아 {x['over_year'] / x['recovered'] * 100:.0f}% · 기술주 15개 {y['over_year'] / y['recovered'] * 100:.0f}%")
     tail = (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
-            f'회복에 1년(250거래일) 넘게 걸린 비율 — {_esc(" / ".join(over))}</span>') if over else ""
+            f'<span style="font-weight:700;">회복에 1년(250거래일) 넘게 걸린 비율</span> — {_esc(" / ".join(over))}</span>') if over else ""   # 제목 굵게 (2026-10-17 사용자)
     return _card_title("고점 하락 후 가격 회복", DD_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}{tail}</span></div>'
 
 
@@ -584,7 +584,7 @@ def sec_earnings(a):
         rows += _row_html("발표 다음 날 보통 변동", f"±{em['median_abs']:.1f}%", note, first=first)
         chart = _col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in em["moves"]], [_sign_bg], [_sign_fg], height=130)
         rows += (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px 0;">'
-                 f'<span style="display:block;font-weight:700;color:#111;">최근 {n}번의 실적 발표 다음 날 (%)</span>'
+                 f'<span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 {n}번의 실적 발표 다음 날 (%)</span>'
                  f'<span style="display:block;font-size:{MICRO};line-height:20px;font-weight:400;color:{NOTE};margin:0 0 6px;">(왼쪽이 오래된 것 · 아래 숫자는 연.월)</span>{chart}</span>')
     return _card_title("실적 발표 후 가격 변동", EARN_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}</span></div>'
 
@@ -1113,7 +1113,7 @@ def _ccard(rows, left=None):
 def _card_title(t, tip=""):
     """가격 카드 펼침 안 카드 제목 — 굵게 · 검정 · 위쪽 여백 10px (네 카드 공통, 2026-10-17 사용자: 타이틀 스타일 통일). 설명은 툴팁 안으로.
     data-sub 를 붙이지 않는다 — 테마 탭이 서브탭으로 읽는 표시라 오늘 탭에 서브탭이 생길 수 있다."""
-    return (f'<div style="font-size:{_dk.EMPH_NAME};line-height:{LH_CARD};font-weight:700;color:#111;margin:10px 0 3px;">'
+    return (f'<div style="font-size:{_dk.EMPH_NAME};line-height:{LH_CARD};font-weight:700;color:#111;margin:25px 0 3px;">'
             f'{_paren(_esc(t))}{_tipx(tip) if tip else ""}</div>')
 
 
