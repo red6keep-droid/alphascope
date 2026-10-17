@@ -705,6 +705,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
     """상태 카드 (가이드라인 2-1 D, 2026-10-11 사용자: "별도 카드로 분리하고 이유도 카드에 포함" → "안내 아이콘 삭제, 글씨 검정, 블릿으로").
     첫 줄 구분명 좌·상태 우, 아래 얇은 선 뒤에 이유 글머리표(16px, 검정). 이유 묶음은 border-top — 홈 카드는 border-top 요소를 건너뛰므로 홈에는 첫 줄만 간다."""
     bg, bd = CARD_DIR[theme]
+    bd_row = _dk.lighten(bd)   # 펼친 카드 안 줄 사이 구분선은 제목 아래 첫 구분선보다 20% 연하게 (2026-10-17 사용자)
     # 글머리표는 3px 점, 글자 14px (2026-10-11 사용자). 규칙 줄은 안내 색(NOTE). lines 항목은 str 또는 (str, "note")
     def li(item):
         # 항목: str · (str, "note") · (str, "plain") · ("row", 이름, 값, 뜻)
@@ -717,17 +718,17 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
             inline = bool(note) and not multi and (fits or inline_notes)   # 설명을 괄호로 이름 옆에 (2026-10-17 사용자). inline_notes=True 면 길어도 모두 괄호 — 줄이 바뀐다
             if multi:   # 값이 여러 줄이면 설명은 이름 아래 왼쪽 — 줄 수를 늘리지 않는다 (2026-10-17 사용자: 모바일에서 여러 단 쓰지 말 것)
                 vals = _tint(_esc(value)).replace(chr(10), "<br>")
-                return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd};">'
+                return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">'
                         f'<span style="flex:none;color:#111;">{_esc(name)}<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span></span>'
                         f'<span style="min-width:0;text-align:right;font-weight:700;font-size:{_dk.NAME};word-break:keep-all;">{vals}</span></span></li>')   # 섹터 목록 값은 한 단계 작게 16px (2026-10-17 사용자)
             if inline:
                 lw = "flex:1 1 auto;min-width:0;word-break:keep-all;" if not fits else "flex:none;white-space:nowrap;"   # 안 들어가면 왼쪽 칸 안에서 줄바꿈
-                return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd};">'
+                return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
                         f'<span style="{lw}color:#111;">{_esc(name)} <span style="font-size:{TINY};color:{NOTE};">({_esc(note)})</span></span>'
                         f'<span style="flex:none;text-align:right;font-weight:700;white-space:nowrap;">{_tint(_esc(value))}</span></span></li>')
-            return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd};">'
+            return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'
                     f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
                     f'<span style="flex:none;white-space:nowrap;color:#111;">{_esc(name)}</span><span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value)).replace(chr(10), "<br>")}</span></span>'
                     + (f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span>' if note else "") + '</li>')
