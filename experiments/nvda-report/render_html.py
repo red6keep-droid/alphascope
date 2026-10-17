@@ -373,8 +373,10 @@ def glance_sub(a):
     first += f" (평소 하루 ±{sd:.1f}%)"
     _, reasons = _glance_state(a)
     parts = [first] + [x for x in reasons if not x.startswith("등락이 평소의")]   # 등락 배수는 첫 마디에 있다
-    return (f'<span style="flex:0 0 100%;min-width:0;display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;word-break:keep-all;">'
-            f'{_esc(" · ".join(parts))}{_dk.tip_icon(GLANCE_TIP)}</span>')
+    # 우측 정렬은 가격 숫자(`$214.13 ▼1.43%`)의 오른쪽 끝 세로선에 맞춘다 = 접기 버튼 폭 + 왼쪽 여백만큼 안쪽 (2026-10-17 사용자). 툴팁 아이콘은 글자 앞
+    return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:right;padding-right:{FOLD_LEFT + _dk.FOLD_BOX}px;margin-top:2px;'
+            f'font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;word-break:keep-all;">'
+            f'{_dk.tip_icon(GLANCE_TIP)}{_esc(" · ".join(parts))}</span>')
 
 
 def glance_rows(a, n=None):
@@ -638,6 +640,7 @@ BOLL_THEME = {"하단 도달": ("negative", DOWN), "상단 도달": ("positive",
 def bollinger_rule():
     return (f"규칙: 20일 평균 ± 2σ 밴드. 종가가 하단 이하면 '하단 도달', 상단 이상이면 '상단 도달'. %B = (종가 − 하단) ÷ (상단 − 하단), 0 = 하단 · 1 = 상단. "
             f"밴드 안에 있는 날은 카드를 두지 않는다. 과거 통계는 진입일의 빈도이지 예측이 아니다\n"
+            f"· 하락 범위 · 상승 범위 : 한 달 평소 범위(20일 평균 ± 2σ)의 아래 끝 이하 · 위 끝 이상. 지금 가격이 어디에 있는지를 말할 뿐 앞으로를 말하지 않는다\n"
             f"· 우리 검증 (하단) : 15종목 30년(1999~), 하단에 처음 닿은 날 산 뒤 가장 좋은 때 팔았다고 쳐도 아무 날에 산 것과 다르지 않았다 — "
             f"하단 무렵은 위아래로 크게 흔들리는 때일 뿐 바닥은 아니었다")
 
@@ -656,16 +659,16 @@ def bollinger_lines(bb):
     low = bb["state"] == "하단 도달"
     st = (bb.get("stats") or {}).get("boll_lower" if low else "boll_upper")
     base = (bb.get("stats") or {}).get("base") or {}
-    side, days = ("아래" if low else "위"), bb.get("days", 0)
-    reach = "끝에 닿았다" if days <= 1 else f"끝을 {days}일째 넘어 있다"
-    plain = f"최근 한 달 평소 ${bb['lower']:,.0f}~${bb['upper']:,.0f}에서 움직였는데 오늘 ${bb['close']:,.2f}로 {side} {reach}."   # 2문장 (2026-10-17 사용자: 약간만 줄여)
+    zone, days = ("하락" if low else "상승"), bb.get("days", 0)   # 2026-10-17 사용자: "아래 끝을 넘어 있다" 대신 "하락 범위에 닿음"
+    reach = "닿았다" if days <= 1 else f"{days}일째 닿아 있다"
+    plain = f"최근 한 달 평소 ${bb['lower']:,.0f}~${bb['upper']:,.0f}에서 움직였는데 오늘 ${bb['close']:,.2f}로 {zone} 범위에 {reach}."   # 2문장 (2026-10-17 사용자: 약간만 줄여)
     lines = [(plain, "plain"),
              ("row", "한 달 범위", f"${bb['lower']:,.0f} ~ ${bb['upper']:,.0f}", "20일 평균 ± 보통 흔들림 2배"),
-             ("row", "오늘 종가", f"${bb['close']:,.2f}", f"범위 {'아래' if low else '위'}")]
+             ("row", "오늘 종가", f"${bb['close']:,.2f}", f"{zone} 범위")]
     if bb.get("days", 0) > 1:
-        lines.append(("row", "연속", f"{bb['days']}일째", f"범위 {'아래' if low else '위'}에 머문 날"))
+        lines.append(("row", "연속", f"{bb['days']}일째", f"{zone} 범위에 머문 날"))
     if st and base:
-        lines.append(("row", f"{_span_label(bb.get('stats'))} 같은 날", f"{st['n']}회", f"범위 {'아래' if low else '위'}로 처음 나간 날"))
+        lines.append(("row", f"{_span_label(bb.get('stats'))} 같은 날", f"{st['n']}회", f"{zone} 범위에 처음 닿은 날"))
         lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"일반적인 날 {base['up20']}%"))
         lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"일반적인 날 {base['up60']}% · 예측 아님"))
     return lines
@@ -721,7 +724,7 @@ def sec_state_cards(a):
     bb = a.get("bollinger")
     if bb and bb.get("state") in BOLL_THEME:   # 하단·상단에 닿은 날만 (2026-10-11 사용자)
         theme, col = BOLL_THEME[bb["state"]]
-        out += _state_card("한 달간 변화 범위는?", {"하단 도달": "맨 아래에 닿음", "상단 도달": "맨 위에 닿음"}[bb["state"]], theme, col, bollinger_lines(bb), "", tip=bollinger_rule(), fold=True)   # 접기 버튼 (2026-10-16 사용자: 시장 국면 · 반도체 자금과 같게)
+        out += _state_card("한 달간 변화 범위는?", {"하단 도달": "하락 범위에 닿음", "상단 도달": "상승 범위에 닿음"}[bb["state"]], theme, col, bollinger_lines(bb), "", tip=bollinger_rule(), fold=True)   # 접기 버튼 (2026-10-16 사용자: 시장 국면 · 반도체 자금과 같게)
     oh = a.get("overheat")
     if oh and oh.get("active"):   # 과열 조건 하나라도 해당하는 날만 (2026-10-11 사용자) — 노랑(불확실) 테마, 상태 = 해당 조건 수
         out += _state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", MUTED, overheat_lines(oh), "", tip=overheat_rule())   # 노랑 → 회색 (2026-10-17 W7)
@@ -823,13 +826,12 @@ def _bar(label, segs, split="right"):
 
 
 def _rating_bar(n, rc):
-    """애널리스트 등급 막대 — 제목 `애널리스트 등급`(왼쪽, 검정 굵게) · `62명`(오른쪽, 덜 강조) · 막대 · 막대 색과 같은 범례 칩 (2026-10-17 사용자)."""
+    """애널리스트 등급 막대 — 제목 `애널리스트 62명 의견`(왼쪽, 검정 굵게) · 막대 · 막대 색과 같은 범례 칩 (2026-10-17 사용자)."""
     segs = [(nm, rc.get(k, 0), bg, fg) for k, nm, bg, fg in RATING_PASTEL if rc.get(k, 0)]
     total = sum(x[1] for x in segs)
     if not total:
         return ""
-    title = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};margin:0 0 3px;">'
-             f'<span style="color:#111;font-weight:700;">애널리스트 등급</span><span style="color:{NOTE};font-weight:400;">{n}명</span></span>')
+    title = (f'<span style="display:block;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};margin:0 0 3px;color:#111;font-weight:700;">애널리스트 {n}명 의견</span>')   # 인원은 제목 안에 (2026-10-17 사용자: 우측 62명 삭제)
     body = "".join(f'<span style="display:block;width:{c / total * 100:.1f}%;background:{bg};color:{fg};font-size:{BAR_NUM};font-weight:700;'
                    f'text-align:center;line-height:{BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{c / total * 100:.0f}%" if c / total >= 0.08 else ""}</span>' for _, c, bg, fg in segs)
     bar_html = f'<span style="display:flex;width:100%;height:{BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:{BAR_PAD}px 0 {3 + BAR_PAD}px;">{body}</span>'
