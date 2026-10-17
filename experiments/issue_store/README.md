@@ -9,5 +9,6 @@
 | `fetch_fomc.py` | FOMC 회의 (연준 홈페이지) + 결정 (DFEDTAR · DFEDTARU) | `data/store/calendar/fomc.csv` |
 | `build_calendar_misc.py` | 실적(9월 백테스트 earnings.csv) · 옵션 만기 · 분기 말 | `earnings.csv`, `market_structure.csv` |
 | `events_curated.csv` | **큰 사건표 — 사람이 고친다** (시작일 · 기간 · 종류 · 대상) | 깃에 올림 |
+| `event_vocab.py` | 사건표 세부 종류 **고정 어휘 21개** + 세부 종류별 대분류 (2026-10-17 확정). 원래 표현은 `detail` 칸. 사건표를 고친 뒤 한 번 돌리면 정리 · 검사 | `events_curated.csv` 덮어씀 |
 
 다른 PC에서: `.venv/bin/pip install pyarrow` 뒤 위 네 스크립트를 순서대로 (FRED_API_KEY 필요).

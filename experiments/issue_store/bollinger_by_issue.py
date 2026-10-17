@@ -4,10 +4,15 @@
 
 - 진입일: 종가가 볼린저(20일) 2σ · 1.5σ 하단 이하(상단 이상)로 처음 들어간 날 (연속 구간 첫날)
 - 결과: 진입일 종가 → 1 · 5 · 10 · 20거래일 뒤 종가 수익률. 오른 비율 · 중앙값 · 나쁜 쪽 10%
-- 비교(일반적인 날): **같은 묶음에 속한 모든 날** 의 같은 기간 수익률
+- 비교 둘 (2026-10-17 사용자: "둘 다 보여줘"):
+    구간 대비 = **같은 묶음에 속한 모든 날** — 그 구간에서 볼린저가 더 알려 주는 게 있나 (리포트의 '볼린저 효과' 문장은 이것만)
+    전체 대비 = **1999~ 모든 날** — 그 구간의 하단 진입이 평소보다 나은가 (구간 자체의 힘이 섞인다)
 - 묶음: 그날 아침에 알 수 있던 것만 — 캘린더(발표일 ±1) · 사건 기간 · 시장 상태(전날 종가) · 엔비디아 추세 · 회사 시기
 - 판정: n ≥ 30 (엔비디아 단독은 '참고' 수준), 차이의 블록 부트스트랩(월 단위) 양측 p → 전체 칸 BH 보정 q < 0.1,
-        두 기간(1999~2012 · 2013~2026) 방향 일치 — 셋 다 넘어야 '효과 있음'
+        두 기간(1999~2012 · 2013~2026) 방향 일치 — 셋 다 넘어야 '효과 있음'. 두 비교에 같은 규칙, 보정은 비교별로 따로
+- 가설 H1 · H2 · H3 · H5 (2026-10-17 사용자 확정) 는 구간 가족 — 하락이 시장 동반인가 · 스퀴즈 직후인가 · 갭인가 · 200일선 위인가
+- 묶음 두 가족 (2026-10-17 사용자: "떼어내") — **구간**(회사 시기 · 추세 · 성장 · 변동성 · 시장 상태, 사용자 가설) 과
+        **이슈**(경제지표 · FOMC · 실적 · 시장 구조 · 사건 · 큰 움직임). BH 보정은 가족 안에서만 — 이슈 칸 수가 구간 판정을 엄격하게 만들지 않게
 결과: results/bollinger_nvda.md · bollinger_nvda.csv
 """
 
@@ -15,6 +20,8 @@ import os
 
 import numpy as np
 import pandas as pd
+
+from event_vocab import check as check_vocab
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 STORE = os.path.join(ROOT, "data", "store")
@@ -24,6 +31,8 @@ HZ = [1, 5, 10, 20]
 MAIN_HZ = [1, 5, 10]   # 판정은 단기 (사용자 2026-10-17), 20일은 참고
 SPLIT = pd.Timestamp("2013-01-01")
 N_MIN, Q_MAX, BOOT = 30, 0.10, 2000
+REGIME = ("전체", "회사 시기", "엔비디아 1년 수익률", "200일선 기울기", "횡보", "엔비디아 하루 변동성", "시장 ·", "시장 낙폭", "VIX",
+          "H1 ", "H2 ", "H3 ", "H5 ")   # 구간 가족 (나머지는 이슈)
 rng = np.random.default_rng(20261017)
 
 
@@ -71,6 +80,27 @@ def build():
     vol = (c.pct_change().rolling(20).std() * 100).shift(1)
     for lo_, hi_, name in ((0, 2, "2% 아래"), (2, 3, "2~3%"), (3, 5, "3~5%"), (5, 1e9, "5% 위")):
         g["엔비디아 하루 변동성 · " + name] = (vol > lo_) & (vol <= hi_)
+    # 하락의 성격 — 가설 H1 · H2 · H3 · H5 (2026-10-17 사용자 확정, 볼린저 계획 4-5, 결과 보기 전 고정)
+    # H1 시장 동반 vs 엔비디아만: 진입일까지 5일 엔비디아 − 반도체 지수(^SOX, 1994~) 수익률 (%p)
+    sox = bars("_SOX")["close"].reindex(idx).ffill()
+    rel5 = ((c / c.shift(5)) - (sox / sox.shift(5))) * 100
+    g["H1 하락 성격 · 엔비디아만 (반도체 대비 −5%p 아래)"] = rel5 <= -5
+    g["H1 하락 성격 · 섞임 (−5~−2%p)"] = (rel5 > -5) & (rel5 <= -2)
+    g["H1 하락 성격 · 시장 동반 (−2%p 위)"] = rel5 > -2
+    # H2 스퀴즈: 전날 밴드 폭(4σ ÷ 평균)이 지난 252일 중 몇 번째로 좁은가
+    width = (4 * sd / ma).shift(1)
+    wrank = width.rolling(252).rank(pct=True)
+    g["H2 밴드 폭 · 좁음 (1년 중 하위 20%, 스퀴즈)"] = wrank <= 0.2
+    g["H2 밴드 폭 · 중간"] = (wrank > 0.2) & (wrank < 0.8)
+    g["H2 밴드 폭 · 넓음 (상위 20%)"] = wrank >= 0.8
+    # H3 갭 하락: 그날 시가 ÷ 전날 종가
+    gap = (nv["open"] / c.shift(1) - 1) * 100
+    g["H3 시가 갭 · −3% 아래 (갭 하락)"] = gap <= -3
+    g["H3 시가 갭 · −3% 위"] = gap > -3
+    # H5 장기 추세 위치: 전날 종가가 200일선 위 · 아래
+    pos200 = (c > ma200).shift(1)
+    g["H5 200일선 위치 · 위"] = pos200 == True
+    g["H5 200일선 위치 · 아래"] = pos200 == False
     # 시장 상태 (S&P 500 · VIX, 전날 종가)
     sp = bars("_GSPC")["close"].reindex(idx).ffill()
     above = (sp > sp.rolling(200).mean()).shift(1)
@@ -101,8 +131,9 @@ def build():
     g["시장 구조 · 분기 말 ±1일"] = near(ms[ms.subkind.isin(["분기 말", "연말"])].day, idx)
     # 사건 기간 (사건표, 시작일 ~ +window_days 거래일)
     ev = pd.read_csv(os.path.join(ROOT, "experiments", "issue_store", "events_curated.csv"), parse_dates=["start"])
+    check_vocab(ev)   # 세부 종류는 고정 어휘 21개 (event_vocab.py)
     ev = ev[ev.confidence.astype(str).str.contains("기억|기사 확인")]
-    for subk, sub in ev.dropna(subset=["subkind"]).groupby("subkind"):   # 세부 종류 (전쟁 발발 · 관세 · 금리 인상 …)
+    for subk, sub in ev.dropna(subset=["subkind"]).groupby("subkind"):   # 세부 종류 (전쟁 · 테러 · 관세 · 무역 · 연준 긴축 신호 …)
         m = np.zeros(len(idx), bool)
         for _, r in sub.iterrows():
             p = idx.searchsorted(r.start)
@@ -148,6 +179,33 @@ def boot_p(entry_fwd, base_rate, months):
 DROPPED = []
 
 
+def compare(e, b, tag):
+    """진입일 수익률 e 를 비교 날 b 와 — 오른 비율 차이 · p · 두 기간 차이. tag = '' (구간 대비) 또는 '전체 ' (전체 대비)."""
+    r = {tag + "비교 오른 비율" if tag else "일반 오른 비율": 100 * (b > 0).mean()}
+    base = r[tag + "비교 오른 비율" if tag else "일반 오른 비율"]
+    r[tag + "차이"] = 100 * (e > 0).mean() - base
+    e1, e2 = e[e.index < SPLIT], e[e.index >= SPLIT]
+    b1, b2 = b[b.index < SPLIT], b[b.index >= SPLIT]
+    r[tag + "차이 1999~2012"] = (100 * (e1 > 0).mean() - 100 * (b1 > 0).mean()) if len(e1) >= 1 and len(b1) >= 10 else np.nan
+    r[tag + "차이 2013~2026"] = (100 * (e2 > 0).mean() - 100 * (b2 > 0).mean()) if len(e2) >= 1 and len(b2) >= 10 else np.nan
+    return r
+
+
+def verdict(df, tag):
+    """BH 보정(판정 대상 칸만, 가족 안에서) + 판정 — 비교별로 따로."""
+    m = df[tag + "p"].notna()
+    for fam in df["가족"].unique():
+        mf = m & (df["가족"] == fam)
+        p = df.loc[mf, tag + "p"].values
+        order = np.argsort(p)
+        q = np.empty_like(p)
+        q[order] = np.minimum.accumulate((p[order] * len(p) / np.arange(1, len(p) + 1))[::-1])[::-1]
+        df.loc[mf, tag + "q"] = np.minimum(q, 1)
+    same = np.sign(df[tag + "차이 1999~2012"]) == np.sign(df[tag + "차이 2013~2026"])
+    return np.where(m & (df[tag + "q"] < Q_MAX) & same & (df["n"] >= N_MIN), "효과 있음",
+                    np.where(df["n"] == 0, "진입 없음", np.where(df["n"] < N_MIN, "표본 부족", "뚜렷한 차이 없음")))
+
+
 def run():
     idx, fwd, sig, groups = build()
     for gname, gm in groups.items():
@@ -163,32 +221,24 @@ def run():
                 b = f[gm].dropna()
                 if len(b) < 10:   # 묶음 날 자체가 10일 미만이면 비교 불가 — 아래 '빠진 묶음' 에 이유와 함께 남는다
                     continue
+                a = f.dropna()   # 전체 대비 — 1999~ 모든 날
                 if len(e) == 0:   # 이 묶음 기간에 진입이 없었다 — 표에 n 0 으로 남긴다
-                    rows.append({"신호": sname, "묶음": gname, "기간": h, "n": 0, "일반 오른 비율": 100 * (b > 0).mean(), "묶음 날 수": len(b)})
+                    rows.append({"신호": sname, "묶음": gname, "기간": h, "n": 0, "일반 오른 비율": 100 * (b > 0).mean(),
+                                 "전체 비교 오른 비율": 100 * (a > 0).mean(), "묶음 날 수": len(b)})
                     continue
-                r = {"신호": sname, "묶음": gname, "기간": h, "n": len(e), "묶음 날 수": len(b), "오른 비율": 100 * (e > 0).mean(), "일반 오른 비율": 100 * (b > 0).mean(),
-                     "중앙값": 100 * e.median(), "일반 중앙값": 100 * b.median(), "나쁜 쪽 10%": 100 * e.quantile(.1), "일반 나쁜 쪽 10%": 100 * b.quantile(.1)}
-                r["차이"] = r["오른 비율"] - r["일반 오른 비율"]
-                r["p"] = boot_p(e, (b > 0).mean(), e.index.to_period("M")) if len(e) >= N_MIN and h in MAIN_HZ else np.nan
-                # 두 기간 방향 (1999~2012 · 2013~2026)
-                e1, e2 = e[e.index < SPLIT], e[e.index >= SPLIT]
-                b1, b2 = b[b.index < SPLIT], b[b.index >= SPLIT]
-                d1 = (100 * (e1 > 0).mean() - 100 * (b1 > 0).mean()) if len(e1) >= 1 and len(b1) >= 10 else np.nan
-                d2 = (100 * (e2 > 0).mean() - 100 * (b2 > 0).mean()) if len(e2) >= 1 and len(b2) >= 10 else np.nan
-                r["차이 1999~2012"], r["차이 2013~2026"] = d1, d2
-                r["n 1999~2012"], r["n 2013~2026"] = len(e1), len(e2)
+                r = {"신호": sname, "묶음": gname, "기간": h, "n": len(e), "묶음 날 수": len(b), "오른 비율": 100 * (e > 0).mean(),
+                     "중앙값": 100 * e.median(), "일반 중앙값": 100 * b.median(), "전체 중앙값": 100 * a.median(),
+                     "나쁜 쪽 10%": 100 * e.quantile(.1), "일반 나쁜 쪽 10%": 100 * b.quantile(.1)}
+                judged = len(e) >= N_MIN and h in MAIN_HZ
+                for base, tag in ((b, ""), (a, "전체 ")):
+                    r.update(compare(e, base, tag))
+                    r[tag + "p"] = boot_p(e, (base > 0).mean(), e.index.to_period("M")) if judged else np.nan
+                r["n 1999~2012"], r["n 2013~2026"] = int((e.index < SPLIT).sum()), int((e.index >= SPLIT).sum())
                 rows.append(r)
     df = pd.DataFrame(rows)
-    # BH 보정 — 판정 대상 칸(n ≥ 30, 단기)만
-    m = df["p"].notna()
-    p = df.loc[m, "p"].values
-    order = np.argsort(p)
-    q = np.empty_like(p)
-    q[order] = np.minimum.accumulate((p[order] * len(p) / np.arange(1, len(p) + 1))[::-1])[::-1]
-    df.loc[m, "q"] = np.minimum(q, 1)
-    same = np.sign(df["차이 1999~2012"]) == np.sign(df["차이 2013~2026"])
-    df["판정"] = np.where(m & (df["q"] < Q_MAX) & same & (df["n"] >= N_MIN), "효과 있음",
-                        np.where(df["n"] == 0, "진입 없음", np.where(df["n"] < N_MIN, "표본 부족", "뚜렷한 차이 없음")))
+    df.insert(0, "가족", np.where(df["묶음"].str.startswith(REGIME), "구간", "이슈"))
+    df["판정"] = verdict(df, "")             # 구간 대비 — 리포트의 '볼린저 효과' 문장은 이것만
+    df["전체 대비 판정"] = verdict(df, "전체 ")
     return df.round(2)
 
 
@@ -197,19 +247,31 @@ def report(df):
     df.to_csv(os.path.join(OUT, "bollinger_nvda.csv"), index=False)
     lines = ["# 엔비디아 볼린저 — 이슈 · 상황별 결과", "",
              f"생성 {pd.Timestamp.today().date()} · 규칙 doc/볼린저-이슈별-검증-계획.md 3절 · 판정 = n ≥ {N_MIN} · BH q < {Q_MAX} · 두 기간 방향 일치 (단기 1 · 5 · 10일)", ""]
-    eff = df[df["판정"] == "효과 있음"].sort_values(["신호", "묶음", "기간"])
-    lines += [f"## 효과 있음 — {len(eff)}칸", ""]
-    cols = ["신호", "묶음", "기간", "n", "오른 비율", "일반 오른 비율", "차이", "중앙값", "일반 중앙값", "나쁜 쪽 10%", "차이 1999~2012", "차이 2013~2026", "q"]
-    if len(eff):
-        lines += ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)] + ["| " + " | ".join(str(r[c]) for c in cols) + " |" for _, r in eff.iterrows()]
-    for s in ("하단 2.0σ", "하단 1.5σ", "상단 2.0σ"):
-        sub = df[(df["신호"] == s) & (df["기간"].isin([5, 10]))].sort_values("차이", ascending=False)
-        lines += ["", f"## {s} — 5 · 10일, 전체 묶음 (차이 순)", "", "| 묶음 | 기간 | n | 오른 비율 | 일반 | 차이 | 중앙값 | 일반 중앙값 | 나쁜 쪽 10% | 1999~2012 | 2013~2026 | q | 판정 |", "|" + "---|" * 13]
-        lines += [f"| {r['묶음']} | {r['기간']} | {r['n']} | {r['오른 비율']:.0f}% | {r['일반 오른 비율']:.0f}% | {r['차이']:+.0f} | {r['중앙값']:+.1f}% | {r['일반 중앙값']:+.1f}% | {r['나쁜 쪽 10%']:+.1f}% | "
-                  f"{r['차이 1999~2012']:+.0f} | {r['차이 2013~2026']:+.0f} | {r['q'] if pd.notna(r['q']) else '-'} | {r['판정']} |" for _, r in sub.iterrows()]
+    lines += ["비교 둘: **구간 대비** = 같은 묶음의 모든 날 (볼린저가 그 구간에서 더 알려 주나 — 리포트 문장 기준) · "
+              "**전체 대비** = 1999~ 모든 날 (그 구간의 하단 진입이 평소보다 나은가 — 구간 자체의 힘이 섞임)", ""]
+    for fam, col, tag, title in ((f, c, t, f"{f} 가족 · {ti}") for f in ("구간", "이슈")
+                                 for c, t, ti in (("판정", "", "구간 대비"), ("전체 대비 판정", "전체 ", "전체 대비"))):
+        eff = df[(df["가족"] == fam) & (df[col] == "효과 있음")].sort_values(["신호", "묶음", "기간"])
+        base = "일반 오른 비율" if not tag else "전체 비교 오른 비율"
+        lines += [f"## 효과 있음 ({title}) — {len(eff)}칸", ""]
+        cols = ["신호", "묶음", "기간", "n", "오른 비율", base, tag + "차이", "중앙값", "나쁜 쪽 10%", tag + "차이 1999~2012", tag + "차이 2013~2026", tag + "q",
+                "판정" if tag else "전체 대비 판정"]
+        if len(eff):
+            lines += ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)] + ["| " + " | ".join(str(r[c]) for c in cols) + " |" for _, r in eff.iterrows()]
+        lines += [""]
+    for fam, s in ((f, s) for f in ("구간", "이슈") for s in ("하단 2.0σ", "하단 1.5σ", "상단 2.0σ")):
+        sub = df[(df["가족"] == fam) & (df["신호"] == s) & (df["기간"].isin([5, 10]))].sort_values("차이", ascending=False)
+        lines += ["", f"## {fam} 가족 · {s} — 5 · 10일 (구간 대비 차이 순)", "",
+                  "| 묶음 | 기간 | n | 오른 비율 | 구간 아무 날 | 구간 대비 차이 | 전체 아무 날 | 전체 대비 차이 | 중앙값 | 나쁜 쪽 10% | 1999~2012 | 2013~2026 | q | 판정 (구간) | 판정 (전체) |", "|" + "---|" * 15]
+        lines += [f"| {r['묶음']} | {r['기간']} | {r['n']} | {r['오른 비율']:.0f}% | {r['일반 오른 비율']:.0f}% | {r['차이']:+.0f} | {r['전체 비교 오른 비율']:.0f}% | {r['전체 차이']:+.0f} | "
+                  f"{r['중앙값']:+.1f}% | {r['나쁜 쪽 10%']:+.1f}% | {r['차이 1999~2012']:+.0f} | {r['차이 2013~2026']:+.0f} | {r['q'] if pd.notna(r['q']) else '-'} | {r['판정']} | {r['전체 대비 판정']} |"
+                  for _, r in sub.iterrows()]
     lines += ["", "## 비교할 날이 10일 미만이라 뺀 묶음", ""] + [f"- {n} ({k}일)" for n, k in DROPPED]
     open(os.path.join(OUT, "bollinger_nvda.md"), "w", encoding="utf-8").write("\n".join(lines).replace("nan", "-"))
-    print(f"칸 {len(df)} · 판정 대상 {int(df['p'].notna().sum())} · 효과 있음 {len(eff)} → results/bollinger_nvda.md")
+    for fam, d in df.groupby("가족"):
+        print(f"{fam} 가족: 칸 {len(d)} · 판정 대상 {int(d['p'].notna().sum())} · 효과 있음 구간 대비 {int((d['판정'] == '효과 있음').sum())} · "
+              f"전체 대비 {int((d['전체 대비 판정'] == '효과 있음').sum())}")
+    print("→ results/bollinger_nvda.md")
 
 
 if __name__ == "__main__":
