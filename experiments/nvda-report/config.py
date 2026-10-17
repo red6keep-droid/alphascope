@@ -46,10 +46,10 @@ REGIME_DIRECTION = {"상승 추세": "positive", "단기 조정": "neutral", "�
 # ── 볼린저 밴드 카드 (2026-10-11 사용자: 하단에 도달했을 때 알려주는 카드) ──
 BOLL_WINDOW = 20
 BOLL_SIGMA = 2.0
-HISTORY_STATS_PATH = os.path.join(STATIC_DIR, "history_stats.json")   # history_stats.py 가 만든 10년 통계 (1년에 한 번 갱신)
+HISTORY_STATS_PATH = os.path.join(STATIC_DIR, "history_stats.json")   # history_stats.py 가 만든 상장 이후 전체 기간 통계(엔비디아 1999년~, 1년에 한 번 갱신)
 # 공포·탐욕 지수 (CNN) — 시장 국면 글머리표 (2026-10-11 사용자)
 FNG_URL = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
-# 과열 지표 카드 (2026-10-11 사용자: "이익 실현 구간" → 지시 대신, 조건에 닿은 날 10년 빈도를 사실로). 조건 셋, 하나라도 해당하면 카드
+# 과열 지표 카드 (2026-10-11 사용자: "이익 실현 구간" → 지시 대신, 조건에 닿은 날 과거 빈도를 사실로). 조건 셋, 하나라도 해당하면 카드
 OVERHEAT_RSI = 80.0               # RSI14 이 이상
 OVERHEAT_MA200_PCT = 40.0         # 종가가 200일 평균보다 이 % 이상 위
 OVERHEAT_RET20_PCT = 25.0         # 20거래일 수익률 이 % 이상

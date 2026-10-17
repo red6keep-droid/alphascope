@@ -535,7 +535,7 @@ def sector_flow_events(sf):
 
 
 def bollinger(conn, day, stats_path=None):
-    """볼린저 밴드(20, 2σ) 위치 — %B, 하단·상단 도달, 연속 일수, 진입일 여부, 10년 통계 (2026-10-11 사용자: 하단 도달 카드)."""
+    """볼린저 밴드(20, 2σ) 위치 — %B, 하단·상단 도달, 연속 일수, 진입일 여부, 상장 이후 통계 (2026-10-11 사용자: 하단 도달 카드)."""
     closes = [b["close"] for b in collect_market.bars(conn, config.SYMBOL) if b["day"] <= day]
     w = config.BOLL_WINDOW
     if len(closes) < w + 1:
@@ -579,7 +579,7 @@ def bollinger_events(bb):
 
 
 def overheat(conn, day, s, stats=None):
-    """과열 지표 — RSI14 ≥ 80 · 200일 평균 대비 +40% · 20일 +25% 중 해당하는 조건과 10년 진입일 통계 (2026-10-11 사용자: "이익 실현 구간").
+    """과열 지표 — RSI14 ≥ 80 · 200일 평균 대비 +40% · 20일 +25% 중 해당하는 조건과 상장 이후 진입일 통계 (2026-10-11 사용자: "이익 실현 구간").
     구간을 지시하지 않는다 — 조건에 닿은 날 과거 빈도만. 새로 들어간 조건은 meta `overheat`(전 거래일 집합)과 비교해 이벤트."""
     closes = [b["close"] for b in collect_market.bars(conn, config.SYMBOL) if b["day"] <= day]
     if len(closes) < 21:
@@ -610,7 +610,8 @@ def overheat_events(oh):
         v = oh["values"].get(k)
         st = ((oh.get("stats") or {}).get(k)) or {}
         base = ((oh.get("stats") or {}).get("base")) or {}
-        tail = f" · 과거 10년 진입 {st['n']}회, 20일 뒤 상승 {st['up20']}% (아무 날 {base.get('up20')}%)" if st and base else ""
+        since = str((oh.get("stats") or {}).get("from") or "")[:4]
+        tail = f" · {since + '년 이후' if since.isdigit() else '과거'} 진입 {st['n']}회, 20일 뒤 상승 {st['up20']}% (아무 날 {base.get('up20')}%)" if st and base else ""
         out.append(_ev("Flows", "price", f"과열 지표 진입 — {config.OVERHEAT_KEYS[k]}",
                        f"{config.OVERHEAT_KEYS[k]} (현재 {v:.1f}{'%' if k != 'rsi80' else ''}){tail}", direction="uncertain", source="yfinance"))
     return out

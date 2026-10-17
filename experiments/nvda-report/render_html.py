@@ -609,6 +609,12 @@ def bollinger_rule():
             f"하단 무렵은 위아래로 크게 흔들리는 때일 뿐 바닥은 아니었다")
 
 
+def _since(stats):
+    """통계가 시작한 해 — "1999년 이후" (2026-10-17: 10년 → 30년 저장소, 문구는 파일의 from 에서 읽는다)."""
+    y = str((stats or {}).get("from") or "")[:4]
+    return f"{y}년 이후" if y.isdigit() else "과거"
+
+
 def bollinger_lines(bb):
     """4번 카드 — 상세 첫 줄 + 근거 줄 (2026-10-17 사용자)."""
     low = bb["state"] == "하단 도달"
@@ -618,14 +624,14 @@ def bollinger_lines(bb):
     reach = "끝에 닿았다" if days <= 1 else f"끝을 {days}일째 넘어 있다"
     plain = f"최근 한 달 평소 ${bb['lower']:,.0f}~${bb['upper']:,.0f}에서 움직였는데 오늘 ${bb['close']:,.2f}로 {side} {reach}."   # 2문장 (2026-10-17 사용자: 약간만 줄여)
     if st and base:
-        plain += f" 과거 10년 이런 날의 {st['up20']}%가 20거래일 뒤 더 높았다(일반적인 날 {base['up20']}%)."
+        plain += f" {_since(bb.get('stats'))} 이런 날의 {st['up20']}%가 20거래일 뒤 더 높았다(일반적인 날 {base['up20']}%)."
     lines = [(plain, "plain"),
              ("row", "한 달 범위", f"${bb['lower']:,.0f} ~ ${bb['upper']:,.0f}", "20일 평균 ± 보통 흔들림 2배"),
              ("row", "오늘 종가", f"${bb['close']:,.2f}", f"범위 {'아래' if low else '위'}")]
     if bb.get("days", 0) > 1:
         lines.append(("row", "연속", f"{bb['days']}일째", f"범위 {'아래' if low else '위'}에 머문 날"))
     if st and base:
-        lines.append(("row", "과거 10년 같은 날", f"{st['n']}회", f"범위 {'아래' if low else '위'}로 처음 나간 날"))
+        lines.append(("row", f"{_since(bb.get('stats'))} 같은 날", f"{st['n']}회", f"범위 {'아래' if low else '위'}로 처음 나간 날"))
         lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"일반적인 날 {base['up20']}%"))
         lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"일반적인 날 {base['up60']}% · 예측 아님"))
     return lines
@@ -653,7 +659,7 @@ def overheat_lines(oh):
     plain = " · ".join(parts) + "."
     k0 = oh["active"][0] if oh["active"] else None
     if k0 and stats.get(k0) and base:
-        plain += f" 과거 10년 이런 날의 {stats[k0]['up20']}%가 20거래일 뒤 더 높았다(일반적인 날 {base['up20']}%)."
+        plain += f" {_since(stats)} 이런 날의 {stats[k0]['up20']}%가 20거래일 뒤 더 높았다(일반적인 날 {base['up20']}%)."
     lines = [(plain, "plain")]
     for k in oh["active"]:
         name, rule, unit, note = OVERHEAT_SHORT[k]
@@ -661,7 +667,7 @@ def overheat_lines(oh):
         lines.append(("row", name, (f"{v:+.1f}{unit}" if unit else f"{v:.1f}"), f"기준 {rule} · {note}"))
         st = stats.get(k) or {}
         if st and base:
-            lines.append(("row", "과거 10년 같은 날", f"{st['n']}회", "이 조건에 처음 들어간 날"))
+            lines.append(("row", f"{_since(stats)} 같은 날", f"{st['n']}회", "이 조건에 처음 들어간 날"))
             lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"일반적인 날 {base['up20']}%"))
             lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"일반적인 날 {base['up60']}% · 예측 아님"))
     return lines

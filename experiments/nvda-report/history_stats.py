@@ -1,21 +1,30 @@
-"""10년 조건부 통계 → static/history_stats.json (1년에 한 번 손으로 갱신: python history_stats.py).
+"""조건부 통계 (상장 이후 전체 — 엔비디아는 1999년~, 2026-10-17 10년 → 30년) → static/history_stats.json (1년에 한 번 손으로 갱신: python history_stats.py).
+
+자료: 이 저장소의 30년 저장소 data/store/bars/<종목>.parquet 가 있으면 그것(수정주가), 없으면 yfinance 전체 기간. 두 곳 모두 yfinance auto_adjust 라 같다.
 
 볼린저(20, 2σ) 하단 이하·상단 이상 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률과, 비교용 '아무 날' 값.
-과거 빈도이지 예측이 아니다 — 리포트는 n·아무 날 비율과 함께만 보여 준다 (2026-10-11 사용자: 이익 실현 구간을 찾을 수 있나 → 10년 통계로 답함).
+과거 빈도이지 예측이 아니다 — 리포트는 n·아무 날 비율과 함께만 보여 준다 (2026-10-11 사용자: 이익 실현 구간을 찾을 수 있나 → 처음엔 10년 통계로 답했고, 2026-10-17 30년 저장소가 생겨 전체 기간으로 바꿈: 같은 정의로 10년 73% vs 66% 이던 하단 뒤 20일 상승 비율이 30년으로는 60% vs 59%).
 """
 
 import datetime
 import json
 import os
 
+import pandas as pd
 import yfinance as yf
 
 import config
 
 
 def main():
-    df = yf.download(config.SYMBOL, period="10y", interval="1d", auto_adjust=True, progress=False)
-    c = df["Close"].squeeze()
+    store = os.path.abspath(os.path.join(config.BASE_DIR, "..", "..", "data", "store", "bars", f"{config.SYMBOL}.parquet"))
+    if os.path.exists(store):
+        c = pd.read_parquet(store)["close"]
+        c.index = pd.to_datetime(c.index)
+    else:
+        df = yf.download(config.SYMBOL, period="max", interval="1d", auto_adjust=True, progress=False)
+        c = df["Close"].squeeze()
+    c = c[c > 0].dropna()
     ma = c.rolling(config.BOLL_WINDOW).mean()
     sd = c.rolling(config.BOLL_WINDOW).std()
     lower, upper = ma - config.BOLL_SIGMA * sd, ma + config.BOLL_SIGMA * sd
@@ -40,7 +49,7 @@ def main():
 
     base = {f"up{n}": round(float((fwd[n].dropna() > 0).mean() * 100)) for n in (20, 60)}
     base.update({f"med{n}": round(float(fwd[n].dropna().median() * 100), 1) for n in (20, 60)})
-    stats = {"symbol": config.SYMBOL, "window": "10y", "from": str(c.index[0].date()), "to": str(c.index[-1].date()), "days": int(len(c)),
+    stats = {"symbol": config.SYMBOL, "window": "all", "from": str(c.index[0].date()), "to": str(c.index[-1].date()), "days": int(len(c)),
              "base": base, "boll_lower": stat(pctb <= 0), "boll_upper": stat(pctb >= 1),
              "rsi80": stat(rsi >= config.OVERHEAT_RSI), "ma200_40": stat(dist200 >= config.OVERHEAT_MA200_PCT / 100),
              "ret20_25": stat(ret20 >= config.OVERHEAT_RET20_PCT / 100), "rsi30": stat(rsi <= 30),
