@@ -13,6 +13,7 @@ import collect_market
 import config
 import db
 import indicators
+import normal_range_line
 import trump_bridge
 
 TECH_FIELDS = ["close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_qqq", "ret_vs_avgo", "gap", "range_pct", "ret_sigma_20d",
@@ -719,6 +720,7 @@ def build(conn, day, run_date):
         "is_latest_bar_today": bars_last == day,
         "headline": {k: s.get(k) for k in ("close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_avgo", "vol_ratio_20d", "gap", "range_pct", "ret_sigma_20d")},
         "macro_today": [c["label"] for c in macro_today],
+        "normal_range": normal_range_line.compute(conn, day),   # 평소 범위 (EWMA 자) · 시장 충격 (2026-10-17, 4단계 W1 · W2)
         "market_regime": mr,   # 시장 국면 (2026-10-11): 글 머리 한 줄 + ⓘ 규칙
         "sector_flow": sf,     # 반도체 자금 방향 (2026-10-11): 글 머리 한 줄 + ⓘ 쉬운 설명
         "bollinger": bb,       # 볼린저 밴드 (2026-10-11): 하단·상단 도달 때만 카드

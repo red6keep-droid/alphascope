@@ -291,9 +291,10 @@ def _multi2(items):
 
 # ── 오늘 한눈에 (2026-10-16 사용자: "주식 초보자도 알기 쉽게" — 가이드 2-4 · 기획 9절) ─────────────────────────────
 # 세 줄: ① 얼마나 움직였나(평소 대비) ② 왜(이벤트) ③ 상태 신호등. 숫자는 전부 파이썬 값, 글은 고정 틀 — 모델이 쓰지 않는다.
-GLANCE_COLORS = {"조용함": ("#F3F4F6", "#9CA3AF", "#4B5563"), "주의": ("#FFF7ED", "#FB923C", "#C2410C"), "큰 변화": ("#FEF2F2", "#F87171", "#B91C1C")}   # 배경 · 점 · 글자
+# 경고색(빨강 · 주황) 없이 회색 농도로만 (2026-10-17 사용자 결정 · 디자인 가이드라인 2-5: 크게 움직였다는 사실만으로 강조하지 않는다)
+GLANCE_COLORS = {"조용함": ("#F3F4F6", "#D1D5DB", "#6B7280"), "주의": ("#F3F4F6", "#9CA3AF", "#374151"), "큰 변화": ("#E5E7EB", "#4B5563", "#111827")}   # 배경 · 점 · 글자
 GLANCE_TIP = ("상태 신호등 : 오늘 변화가 얼마나 큰지만 나타냅니다 — 오르고 내린 방향이나 좋고 나쁨이 아닙니다\n"
-              "· 큰 변화 : 등락이 평소(최근 20일)의 2배 이상, 거래량이 평소의 2배 이상, 하루 흔들림(고가−저가) 4% 이상, 시장(S&P 500)보다 3%p 이상 다르게 움직임 — 하나라도 해당\n"
+              "· 큰 변화 : 등락이 평소 범위 밖(평소 하루 흔들림의 2배 이상), 거래량이 평소의 2배 이상, 하루 흔들림(고가−저가) 4% 이상, 시장(S&P 500)보다 3%p 이상 다르게 움직임 — 하나라도 해당\n"
               "· 주의 : 등락이 평소보다 큼(1배 이상), 거래량 1.5배 이상, 눈에 띄는 소식, 한 달 가격 범위 끝에 닿음, 과열 신호 — 하나라도 해당\n"
               "· 조용함 : 위에 해당하는 것이 없음")
 
@@ -302,12 +303,14 @@ def _glance_state(a):
     """신호등 판정 — 규칙은 GLANCE_TIP 과 같다. (상태, 이유 목록)"""
     h = a["headline"]
     r, sig = abs(h.get("ret_1d") or 0), h.get("ret_sigma_20d")
+    nr = a.get("normal_range")
+    k = abs(nr["z"]) if nr else (r / sig if sig else None)   # 자 = 검증된 평소 범위 EWMA (2026-10-17, 4단계 W1), 없으면 예전 20일
     vr, rg, vs = h.get("vol_ratio_20d") or 0, h.get("range_pct") or 0, abs(h.get("ret_vs_spy") or 0)
     big, mid = [], []
-    if sig and r >= 2 * sig:
-        big.append(f"등락이 평소의 {r / sig:.1f}배")
-    elif sig and r >= sig:
-        mid.append(f"등락이 평소의 {r / sig:.1f}배")
+    if k is not None and k >= 2:
+        big.append(f"등락이 평소의 {k:.1f}배")
+    elif k is not None and k >= 1:
+        mid.append(f"등락이 평소의 {k:.1f}배")
     if vr >= config.VOL_RATIO_EVENT:
         big.append(f"거래량 평소의 {vr:.1f}배")
     elif vr >= 1.5:
@@ -342,7 +345,22 @@ def glance_rows(a, n=None):
     if h.get("close") is None:
         return ""
     r, sig = h.get("ret_1d") or 0, h.get("ret_sigma_20d")
-    if sig:
+    nr = a.get("normal_range")
+    extra = []
+    if nr:   # 4단계 W1 (2026-10-17): 자 = 검증된 평소 범위(EWMA λ 0.94, 실적 반응일 제외), 밖 = 평소 하루 흔들림의 2배 이상
+        k, sd = abs(nr["z"]), nr["sigma_pct"]
+        unit = f' <span style="color:{NOTE};font-weight:400;">(평소 하루 ±{sd:.1f}%)</span>'
+        if nr.get("earnings_day"):
+            how = f"오늘 {_arrow(r)} — 실적 발표 반응일, 평소의 {k:.1f}배{unit}"
+        elif k < 2:
+            how = f"오늘 {_arrow(r)} — 평소 범위 안{unit}"
+        else:
+            how = f"오늘 {_arrow(r)} — 평소 범위 밖, 평소의 {k:.1f}배{unit}"
+            extra.append(f"지난 1년 이만큼 움직인 날은 {nr['n_year']}번이었다.")
+            if not (nr.get("market_shock") or {}).get("active"):   # 충격 국면은 시장 충격 카드가 말한다 (A3)
+                extra.append("S&P 500 종목 기준, 평소 국면에서 이렇게 크게 움직인 다음 날 사고판 것은 아무 날에 사고판 것과 다르지 않았다."
+                             + _dk.tip_icon(NORMAL_DAY_TIP))
+    elif sig:
         k = abs(r) / sig
         size = "평소 범위 안" if k < 1 else ("평소보다 큰 편" if k < 2 else "평소의 2배 넘게")
         how = f"오늘 {_arrow(r)} — {size} <span style=\"color:{NOTE};font-weight:400;\">(평소 하루 ±{sig:.1f}%)</span>"
@@ -368,7 +386,38 @@ def glance_rows(a, n=None):
              f'<span style="width:10px;height:10px;border-radius:50%;background:{dot};"></span>{state}</span>')
     reason = f' <span style="color:{NOTE};">— {_esc(" · ".join(reasons))}</span>' if reasons else ""
     # 1번 카드(가격 카드) 펼침 맨 위 — 작은 소제목 없이 두 줄, 주요 이슈 줄은 뺀다 (2026-10-17 사용자). ? 툴팁은 신호등 뒤
-    return _plain_rows([("", how), ("", light + _dk.tip_icon(GLANCE_TIP) + reason)])
+    return _plain_rows([("", how)] + [("", x) for x in extra] + [("", light + _dk.tip_icon(GLANCE_TIP) + reason)])
+
+
+NORMAL_DAY_TIP = ("우리 검증 : 1999년부터 S&P 500 소속 종목(일봉이 있는 568개)에서, 시장 충격이 아닌 때 하루 움직임이 평소의 2배를 넘은 다음 날 시가에 "
+                  "팔거나 산 경우를 같은 종목 · 같은 시기의 아무 날과 비교\n"
+                  "· 2010~2019년 · 2020년 이후 두 시기 모두 20일 · 60일 뒤 결과가 아무 날과 구분되지 않음\n"
+                  "· 크게 움직인 하루는 그 자체로 사고팔 이유가 되지 않았다는 뜻 — 앞으로도 그렇다는 보장은 아님")
+SHOCK_TIP = ("시장 충격 국면 : 시장 흔들림 지수(VIX) 종가가 35 이상이면 시작, 25 아래로 내려오면 끝\n"
+             "· 1999년 이후 16번 (2010년 이후 9번 : 2010-05 · 2011-08 · 2015-08 · 2018-02 · 2018-12 · 2020-02 · 2022-03 · 2024-08 · 2025-04)\n"
+             "· 우리 검증 : S&P 500 소속 종목에서 이 국면 중 급락 다음 날 시가에 판 경우 vs 계속 들고 있던 경우, 아무 날에 판 경우와 비교 — 2010~2019년 · 2020년 이후 모두 판 쪽이 특히 나빴음(종목의 67~79% 가 같은 쪽)\n"
+             "· 흔들림이 가라앉는 시간 : 15종목 30년, 충격 첫 5일 흔들림 크기별 중앙값 — 가격 회복 시점이 아님")
+
+
+def shock_lines(ms):
+    lines = [("지금은 시장 충격 국면이다. 시장 흔들림 지수(VIX)가 35를 넘은 " + _fd(ms["start"]) + "에 시작해 오늘로 " + f"{ms.get('days_in') or 1}거래일째이고, "
+              "25 아래로 내려오면 끝난 것으로 본다.", "plain"),
+             ("과거 S&P 500 종목 기준, 이런 국면에서 급락 다음 날 판 경우는 20거래일 뒤 아무 날에 판 경우보다 약 2~3%p, 60거래일 뒤 약 3~7%p 더 손해였다. "
+              "판 것이 나았던 경우도 있었다 — 중앙값 기준이다.", "plain")]
+    rec = ms.get("recovery")
+    if ms.get("early_complete") and rec:
+        lines.append(("row", "충격 첫 5일 흔들림", f"평소의 {ms['early_x']:.1f}배", "1.5배 아래 작음 · 1.8배 넘으면 큼"))
+        lines.append(("row", "흔들림이 가라앉기까지 (과거)", f"보통 {rec['median_days']}거래일", f"대개 {rec['q1']}~{rec['q3']}거래일 · 가격이 아니라 흔들림"))
+    else:
+        lines.append(("충격 첫 5거래일이 지나면 흔들림이 가라앉는 데 걸린 과거 기간을 함께 보여 준다.", "note"))
+    if ms.get("vix") is not None:
+        lines.append(("row", "VIX 종가", f"{ms['vix']:.1f}", "35 이상 시작 · 25 아래 끝"))
+    return lines
+
+
+def _fd(d):
+    y, m, dd = d.split("-")
+    return f"{int(y)}년 {int(m)}월 {int(dd)}일"
 
 
 def sec_headline(a, n=None):
@@ -605,6 +654,9 @@ def overheat_lines(oh):
 
 def sec_state_cards(a):
     out = ""
+    ms = (a.get("normal_range") or {}).get("market_shock") or {}
+    if ms.get("active"):   # 시장 충격 국면 (4단계 W2 · 적용 기준 A3) — 강조를 쓰는 유일한 경우, 그날만 맨 앞
+        out += _state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", WARN, shock_lines(ms), "", tip=SHOCK_TIP, fold=True)
     mr = a.get("market_regime")
     if mr:
         theme, col = REGIME_THEME.get(mr["regime"], ("neutral", MUTED))
