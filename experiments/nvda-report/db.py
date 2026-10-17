@@ -139,6 +139,7 @@ _MIGRATIONS = [
     ("items", "ai_speaker", "TEXT"),                      # 2026-10-11: 발언자 (ceo · nvidia_exec · government · customer_partner · none)
     ("daily_state", "fng_score", "REAL"),                 # 2026-10-11: CNN 공포·탐욕 지수 0~100
     ("daily_state", "fng_rating", "TEXT"),
+    ("daily_state", "ret_sigma_20d", "REAL"),             # 2026-10-16: 평소 하루 움직임(20일 표준편차) — 빠져 있어 10-16 · 10-17 실행 실패
 ]
 
 
