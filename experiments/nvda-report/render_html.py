@@ -374,7 +374,7 @@ def glance_sub(a):
     _, reasons = _glance_state(a)
     parts = [first] + [x for x in reasons if not x.startswith("등락이 평소의")]   # 등락 배수는 첫 마디에 있다
     # 우측 정렬은 가격 숫자(`$214.13 ▼1.43%`)의 오른쪽 끝 세로선에 맞춘다 = 접기 버튼 폭 + 왼쪽 여백만큼 안쪽 (2026-10-17 사용자). 툴팁 아이콘은 글자 앞
-    return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:right;padding-right:{FOLD_LEFT + _dk.FOLD_BOX}px;margin-top:2px;'
+    return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:right;padding-right:{FOLD_LEFT + _dk.FOLD_BOX}px;margin-top:3px;'
             f'font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;word-break:keep-all;">'
             f'{_dk.tip_icon(GLANCE_TIP)}{_esc(" · ".join(parts))}</span>')
 
@@ -442,7 +442,7 @@ def sec_headline(a, n=None):
     head = _row("NVDA", price, tone).replace("margin:0 0 6px;", "margin:0;", 1)
     sub = glance_sub(a)
     if sub:   # 같은 카드 안 두 번째 줄 — 가격 줄 아래 작은 글씨 (2026-10-17 사용자). 홈 카드는 data-acc 안을 읽지 않아 영향 없다
-        head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;row-gap:2px;", 1)
+        head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1)   # 위쪽 여백 16 → 6px (60% 줄임, 2026-10-17 사용자) — 공통 gap:12px 가 세로 간격까지 12 로 덮어쓰고 있었다
         k = head.rstrip().rfind("</span>")
         head = head[:k] + sub + head[k:]
     rows = glance_rows(a, n) + sec_ma(a)   # 펼치면 맨 위에 쉬운 말 줄(등락 · 이슈 · 변화 강도), 그 아래 n일 평균 카드 (2026-10-16 사용자)
@@ -813,37 +813,35 @@ NEWS_INDENT = 13   # 일반 기사 좌우 들여쓰기 = 강조 카드 테두리
 BAR_H, BAR_NUM, BAR_PAD = 30, "17px", 5   # 막대 안 숫자 18 → 17 (2026-10-14 사용자)   # 높이 26 → 30 (+15%, 2026-10-14 사용자) · 막대 위아래 +5   # 막대 높이 24 → 26 (+10%, 정수) · 막대 안 숫자 19 → 18 (2026-10-13 사용자, 가이드라인 10-7)
 
 
-def _bar(label, segs, split="right"):
-    """F 막대 (가이드라인 2-1): 위 14px 라벨(합계 + 항목별 %), 아래 콘텐츠 폭 전부 가로 누적 막대. segs = [(이름, 개수, 배경, 글자)]."""
-    total = sum(n for _, n, _, _ in segs)
-    if not total:
-        return ""
-    pcts = " · ".join(f"{nm} {n / total * 100:.0f}%" for nm, n, _, _ in segs if n)
-    body = "".join(f'<span style="display:block;width:{n / total * 100:.1f}%;background:{bg};color:{fg};font-size:{BAR_NUM};font-weight:700;'
-                   f'text-align:center;line-height:{BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{n / total * 100:.0f}%" if n / total >= 0.08 else ""}</span>' for _, n, bg, fg in segs if n)   # 8% 미만 조각은 글자 생략 (라벨에 있음)
-    bar_html = f'<span style="display:flex;width:100%;height:{BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:{BAR_PAD}px 0 {3 + BAR_PAD}px;">{body}</span>'
-    return _dk.bar_label(label, pcts) + bar_html + _dk.bar_pcts(pcts)   # 라벨(검정 굵게) 위 · 막대 · 비율 아래 — 뉴스 · 애널리스트 모두 (2026-10-13 사용자)
+LEGEND_CHIP = 9      # 범례 색 사각형 11 → 9px (20% 줄임, 2026-10-17 사용자)
+LEGEND_INDENT = 10   # 범례 왼쪽 들여쓰기 (2026-10-17 사용자)
 
 
-def _rating_bar(n, rc):
-    """애널리스트 등급 막대 — 제목 `애널리스트 62명 의견`(왼쪽, 검정 굵게) · 막대 · 막대 색과 같은 범례 칩 (2026-10-17 사용자)."""
-    segs = [(nm, rc.get(k, 0), bg, fg) for k, nm, bg, fg in RATING_PASTEL if rc.get(k, 0)]
+def _legend_bar(title, segs):
+    """막대 + 색 범례 — 제목(왼쪽, 검정 굵게) · 막대 · 막대 색과 같은 범례 칩 (애널리스트 · 뉴스 공통, 2026-10-17 사용자: 뉴스도 같은 모양).
+    segs = [(이름, 개수, 배경, 글자)], 0건은 뺀다. 범례는 왼쪽에서 10px 들여쓴다."""
+    segs = [x for x in segs if x[1]]
     total = sum(x[1] for x in segs)
     if not total:
         return ""
-    title = (f'<span style="display:block;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};margin:0 0 3px;color:#111;font-weight:700;">애널리스트 {n}명 의견</span>')   # 인원은 제목 안에 (2026-10-17 사용자: 우측 62명 삭제)
+    head = f'<span style="display:block;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};margin:0 0 3px;color:#111;font-weight:700;">{_esc(title)}</span>'
     body = "".join(f'<span style="display:block;width:{c / total * 100:.1f}%;background:{bg};color:{fg};font-size:{BAR_NUM};font-weight:700;'
                    f'text-align:center;line-height:{BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{c / total * 100:.0f}%" if c / total >= 0.08 else ""}</span>' for _, c, bg, fg in segs)
     bar_html = f'<span style="display:flex;width:100%;height:{BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:{BAR_PAD}px 0 {3 + BAR_PAD}px;">{body}</span>'
     legend = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
-                     f'<span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:{bg};"></span>{nm} {c / total * 100:.0f}%</span>' for nm, c, bg, _ in segs)
-    return title + bar_html + f'<span style="display:block;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{legend}</span>'
+                     f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{nm} {c / total * 100:.0f}%</span>' for nm, c, bg, _ in segs)
+    return head + bar_html + (f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{legend}</span>')
+
+
+def _rating_bar(n, rc):
+    """애널리스트 등급 막대 — 제목 `애널리스트 62명 의견` (2026-10-17 사용자)."""
+    return _legend_bar(f"애널리스트 {n}명 의견", [(nm, rc.get(k, 0), bg, fg) for k, nm, bg, fg in RATING_PASTEL])
 
 
 def _ratio_bar(label, counts):
-    """뉴스 방향 막대: 긍정 · 부정 · 불확실 · 중립 (파스텔)."""
+    """뉴스 방향 막대: 긍정 · 부정 · 불확실 · 중립 (파스텔) — 애널리스트와 같은 범례 모양 (2026-10-17 사용자)."""
     total = sum(counts.values())
-    return _bar(f"{label} {total}건", [(rr.DIR_KO[d], counts.get(d, 0), *BAR_PASTEL[d]) for d in ("positive", "negative", "uncertain", "neutral")], split="below")
+    return _legend_bar(f"{label} {total}건", [(rr.DIR_KO[d], counts.get(d, 0), *BAR_PASTEL[d]) for d in ("positive", "negative", "uncertain", "neutral")])
 
 
 ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" '
