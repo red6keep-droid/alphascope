@@ -30,3 +30,7 @@ graph-v1 복사본/
 
 # 로컬 30년 종목 데이터 저장소 (doc/볼린저-이슈별-검증-계획.md 6절)
 data/store/
+
+# 실패 비용 원자료 — 로컬만 (failure_cost.py 로 약 3분에 다시 만듦)
+experiments/issue_store/results/failure_cost_events.csv.gz
+experiments/issue_store/results/failure_cost_cells.csv.gz
