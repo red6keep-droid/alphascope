@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-17T12:49:38Z",
+ "generated_at": "2026-10-17T12:58:11Z",
  "run_date": "2026-10-17",
  "day": "2026-10-16",
  "is_latest_bar_today": true,
@@ -396,6 +396,18 @@
    "speaker": null
   },
   {
+   "area": "Product",
+   "kind": "news",
+   "title": "NVIDIA’s New Frame Generation Mode Significantly Boosts FPS on RTX 50 & RTX 40 GPUs With Only A Minor Trade-off In Visual Quality",
+   "fact": "엔비디아가 RTX 50 및 RTX 40 GPU의 프레임률을 향상시키는 새로운 프레임 생성 모드를 공개했다.",
+   "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOWFNJczRoU3lJZVdYd1pnbFRCWTc1d0ZuRmNMUDc4S3JJeU53SGtLQWY4Tmtrd2ZKaDFyZzNQdTNmanZFc3JwOVVTVzkxYUxIbUc0b0xDR3hoV1ZCeGx2LXNfNkczYndYejhyeTZLaHN4Yi1INGtGaWhsbUpnLVR6aUpXTE1VMHBaODFTekFTUDJqQTM4QW1jQWRjaFpWQnF3Ynpn0gGoAUFVX3lxTE1FR3dFNDRseFZreF8tSkFjdk50VHV4cGt5Y1JWUGk3cEFDV3dFWl9PTGM3SVdpZkVBaWlxTXVYRmE4d3JPS0J0eHhXT3VVbUIwbktlcEhsRUxHZTNoY3BRaXFJZEh0cUdaYmMxV2pmRE1NZmxtNzVmQkx6Y0VENWMwVkFUd0dvMDEzN3MyU2xqdnBFZ0QzZWFHRnBPNDlaVmk1d1B4R1hZUA?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Wccftech",
+   "published_at": "2026-10-13T13:00:06Z",
+   "speaker": null
+  },
+  {
    "area": "Flows",
    "kind": "options",
    "title": "2026-10-23 $220 콜 미결제약정 4.1배",
@@ -432,19 +444,19 @@
    "speaker": null
   }
  ],
- "events_total": 13,
+ "events_total": 14,
  "direction_counts": {
   "today": {
-   "positive": 5,
+   "positive": 6,
    "negative": 6,
    "uncertain": 0,
    "neutral": 2
   },
   "week": {
-   "positive": 25,
-   "negative": 15,
-   "uncertain": 4,
-   "neutral": 7
+   "positive": 27,
+   "negative": 17,
+   "uncertain": 2,
+   "neutral": 6
   }
  },
  "analyst_target_only": [],
@@ -750,7 +762,7 @@
    },
    {
     "key": "news_avg_7d",
-    "value": 29.285714285714285,
+    "value": 29.428571428571427,
     "flag": false,
     "fmt": "num1"
    },
@@ -958,7 +970,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-16",
-  "state_collected_at": "2026-10-17T12:48:00Z",
+  "state_collected_at": "2026-10-17T12:57:52Z",
   "missing_fields": [
    "smh_shares_out"
   ],
@@ -972,7 +984,7 @@
    "court": 2,
    "fedreg": 24,
    "form4": 16,
-   "news": 606,
+   "news": 608,
    "newsroom": 10
   },
   "option_expiries": [
