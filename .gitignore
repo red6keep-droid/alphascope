@@ -34,3 +34,6 @@ data/store/
 # 실패 비용 원자료 — 로컬만 (failure_cost.py 로 약 3분에 다시 만듦)
 experiments/issue_store/results/failure_cost_events.csv.gz
 experiments/issue_store/results/failure_cost_cells.csv.gz
+
+# Claude Code 개인 설정
+.claude/settings.local.json
