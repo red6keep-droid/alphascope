@@ -720,7 +720,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">'
                         f'<span style="flex:none;color:#111;">{_esc(name)}<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span></span>'
-                        f'<span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{vals}</span></span></li>')
+                        f'<span style="min-width:0;text-align:right;font-weight:700;font-size:{_dk.NAME};word-break:keep-all;">{vals}</span></span></li>')   # 섹터 목록 값은 한 단계 작게 16px (2026-10-17 사용자)
             if inline:
                 lw = "flex:1 1 auto;min-width:0;word-break:keep-all;" if not fits else "flex:none;white-space:nowrap;"   # 안 들어가면 왼쪽 칸 안에서 줄바꿈
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd};">'
