@@ -444,15 +444,16 @@ def sec_headline(a, n=None):
     pc = {c["key"]: c for c in (a["status"].get("price") or [])}   # 상태판 가격·거래량 중 머리 카드에 없던 칸 (2026-10-11 사용자: 오늘로 모으고 기술지표에서 삭제)
     items.append(("시가 갭", _arrow((pc.get("gap") or {}).get("value"), 2), GAP_TIP))
     rg = pc.get("range_pct") or {}
-    items.append((f"일중 변동폭 (고가−저가 · {config.RANGE_PCT_EVENT:.0f}%부터 큰 흔들림)", f'<span style="color:{WARN if rg.get("flag") else "#111"};font-weight:700;">{_esc(rr.fmt(rg.get("value"), "pct"))}</span>'))
+    # 기준 괄호는 "흔히 ~로 봄" 말투, 경고색 없음 (2026-10-17 4단계 W7 · 가이드라인 2-5)
+    items.append((f"일중 변동폭 (고가−저가 · 흔히 {config.RANGE_PCT_EVENT:.0f}% 넘으면 큰 흔들림으로 봄)", f'<span style="color:#111;font-weight:700;">{_esc(rr.fmt(rg.get("value"), "pct"))}</span>'))
     vr = h.get("vol_ratio_20d")
-    vcol = WARN if (vr or 0) >= config.VOL_RATIO_EVENT else "#111"
-    items.append((f"거래량 (평소의 몇 배 · {config.VOL_RATIO_EVENT:.0f}배부터 많음)", f'<span style="color:{vcol};font-weight:700;">{_esc(rr.fmt(vr, "x"))}</span>'))
+    vcol = "#111"
+    items.append((f"거래량 (평소의 몇 배 · 흔히 {config.VOL_RATIO_EVENT:.0f}배 넘으면 많다고 봄)", f'<span style="color:{vcol};font-weight:700;">{_esc(rr.fmt(vr, "x"))}</span>'))
     # 거래량 정보에 52주 고점 대비 · RSI · 이평 교차 포함 (2026-10-11 사용자)
     tc = {c["key"]: c for c in (a["status"].get("technical") or [])}
     items.append(("52주 고점 대비 (1년 최고가보다 얼마나 아래)", _arrow((tc.get("pct_from_52w_high") or {}).get("value"), 2)))
     rsi = (tc.get("rsi14") or {}).get("value")
-    items.append(("단기 과열 온도 (RSI 14 · 70 넘으면 과열 · 30 아래면 침체)", f'<span style="color:#111;font-weight:700;">{rsi:.1f}</span>' if rsi is not None else f'<span style="color:{MUTED};">—</span>'))
+    items.append(("단기 과열 온도 (RSI 14 · 흔히 70 넘으면 과열 · 30 아래면 침체로 읽음)", f'<span style="color:#111;font-weight:700;">{rsi:.1f}</span>' if rsi is not None else f'<span style="color:{MUTED};">—</span>'))
     mc = (tc.get("ma_cross") or {}).get("value")
     mc_html = {"golden": f'<span style="color:{UP};font-weight:700;">골든크로스</span>', "dead": f'<span style="color:{DOWN};font-weight:700;">데드크로스</span>'}.get(
         mc, f'<span style="color:{MUTED};">교차 없음</span>')
@@ -473,7 +474,7 @@ GAP_TIP = ("시가 갭 : 오늘 시가가 전날 종가보다 몇 % 높게(▲) 
            "· 갭이 크면 장 초반 변동이 커지기 쉽다 — 장중에 메워지기도 한다")   # 2026-10-14 사용자: "시가 갭은 뭔지 툴팁"
 
 
-REGIME_THEME = {"상승 추세": ("positive", UP), "단기 조정": ("neutral", MUTED), "조정장": ("negative", DOWN), "불안 국면": ("uncertain", WARN)}
+REGIME_THEME = {"상승 추세": ("positive", UP), "단기 조정": ("neutral", MUTED), "조정장": ("negative", DOWN), "불안 국면": ("neutral", MUTED)}   # 불안 국면 노랑 → 회색 (2026-10-17 W7: 노랑 강조는 시장 충격 국면만)
 FLOW_THEME = {"모이는 중": ("positive", UP), "빠져나가는 중": ("negative", DOWN), "뚜렷하지 않음": ("neutral", MUTED)}
 
 
@@ -593,7 +594,9 @@ BOLL_THEME = {"하단 도달": ("negative", DOWN), "상단 도달": ("positive",
 
 def bollinger_rule():
     return (f"규칙: 20일 평균 ± 2σ 밴드. 종가가 하단 이하면 '하단 도달', 상단 이상이면 '상단 도달'. %B = (종가 − 하단) ÷ (상단 − 하단), 0 = 하단 · 1 = 상단. "
-            f"밴드 안에 있는 날은 카드를 두지 않는다. 과거 통계는 10년간 진입일의 빈도이지 예측이 아니다")
+            f"밴드 안에 있는 날은 카드를 두지 않는다. 과거 통계는 진입일의 빈도이지 예측이 아니다\n"
+            f"· 우리 검증 (하단) : 15종목 30년(1999~), 하단에 처음 닿은 날 산 뒤 가장 좋은 때 팔았다고 쳐도 아무 날에 산 것과 다르지 않았다 — "
+            f"하단 무렵은 위아래로 크게 흔들리는 때일 뿐 바닥은 아니었다")
 
 
 def bollinger_lines(bb):
@@ -671,7 +674,7 @@ def sec_state_cards(a):
         out += _state_card("한 달간 변화 범위는?", {"하단 도달": "맨 아래에 닿음", "상단 도달": "맨 위에 닿음"}[bb["state"]], theme, col, bollinger_lines(bb), "", tip=bollinger_rule(), fold=True)   # 접기 버튼 (2026-10-16 사용자: 시장 국면 · 반도체 자금과 같게)
     oh = a.get("overheat")
     if oh and oh.get("active"):   # 과열 조건 하나라도 해당하는 날만 (2026-10-11 사용자) — 노랑(불확실) 테마, 상태 = 해당 조건 수
-        out += _state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "uncertain", WARN, overheat_lines(oh), "", tip=overheat_rule())
+        out += _state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", MUTED, overheat_lines(oh), "", tip=overheat_rule())   # 노랑 → 회색 (2026-10-17 W7)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""   # 데스크톱에서 2열 (테마 CSS, 2026-10-11 사용자)
 
 
@@ -921,7 +924,7 @@ def _status_value(c, st):
     if c["fmt"] in SIGNED_FMTS and isinstance(c["value"], (int, float)):
         return _arrow(c["value"], 2, "%p" if c["fmt"] == "pp_signed" else "%"), ""
     v = _esc(_d(rr.fmt(c["value"], c["fmt"])))
-    return (f'<span style="color:{WARN};font-weight:700;">{v}</span>' if c["flag"] else v), ""
+    return (f'<span style="color:#111;font-weight:700;">{v}</span>' if c["flag"] else v), ""   # 경고색 없이 굵게만 (2026-10-17 W7)
 
 
 # 묶음 설명 — 카드 아래 ⓘ 한 줄 (디자인-가이드라인 3-4, 2026-10-11). 뜻만 적고 평가하지 않는다
@@ -1000,7 +1003,7 @@ def sec_news_counts(a):
     for c in a["status"].get("news") or []:
         v = rr.fmt(c["value"], c["fmt"]) if c.get("value") is not None else "—"
         items.append((NEWS_STAT_KO.get(c["key"], rr.LABEL_KO.get(c["key"], c["key"])),
-                      f'<span style="color:{WARN};">{_esc(v)}</span>' if c.get("flag") else _esc(v)))
+                      f'<span style="font-weight:700;">{_esc(v)}</span>' if c.get("flag") else _esc(v)))   # 경고색 없이 (2026-10-17 W7)
     if not items:
         return ""
     # 줄 오른쪽 끝 ? — 세 수치의 뜻 (2026-10-14 사용자). 팝업 제목은 숨긴 글자 `뉴스 수치`
