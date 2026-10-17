@@ -1,13 +1,13 @@
-# Trump Daily Market Trend — 2026-10-16
+# Trump Daily Market Trend — 2026-10-17
 
 > 그림자 모드 산출물. 게시되지 않는다. 표는 파이썬 계산값, 문장은 Gemini 서술.
 > 시장 반응은 **관찰된 값**이며 발언과의 인과를 의미하지 않는다.
 
 ## 데이터 상태
-- 생성 시각: 2026-10-16T21:17:04Z (UTC)
+- 생성 시각: 2026-10-17T00:26:55Z (UTC)
 - 게시물 누적 36,929 · 분류 완료 1,604 · 최근 90일 분류 대기 0 (범위 밖 미분류 17,904건은 의도적)
 - 이벤트 251 (첫 이벤트 2026-06-17T14:01:23Z) · 가격 마지막 거래일 2026-10-16
-- 지난 24시간: 게시물 12 · 노이즈 5 · 정책 글 0 · 미분류 0
+- 지난 24시간: 게시물 10 · 노이즈 4 · 정책 글 0 · 미분류 0
 
 ## 오늘의 발언 (최근 24시간 이벤트)
 _데이터 없음_
@@ -40,8 +40,8 @@ _Gemini 서술 없음 (--narrate 로 생성)_
 | --- | --- | --- | --- | --- | --- |
 | Energy / Drilling | 2 | 2 | 4 | 0% | +2 |
 | Geopolitics / Ceasefire | 1 | 1 | 10 | 0% | +1 |
-| Energy / Investment | 1 | 1 | 9 | 0% | +1 |
 | Company / Investment | 1 | 1 | 9 | 0% | +1 |
+| Energy / Investment | 1 | 1 | 9 | 0% | +1 |
 | Geopolitics / Oil Prices | 1 | 1 | 5 | 100% | +1 |
 | Energy | 1 | 1 | 4 | 100% | +1 |
 
@@ -55,8 +55,8 @@ _Gemini 서술 없음 (--narrate 로 생성)_
 | Regulation / EPA Rollback | 2 | 2 | 6 | 0% | +2 |
 | Energy / Gasoline Prices | 2 | 2 | 4 | 100% | +2 |
 | Energy / Drilling | 2 | 2 | 4 | 0% | +2 |
-| Energy / Diesel Oil Release | 1 | 1 | 10 | 0% | +1 |
-| Regulation / Medicare | 1 | 1 | 10 | 0% | +1 |
+| Regulation / EV Mandate | 1 | 1 | 10 | 0% | +1 |
+| Geopolitics / Ceasefire | 1 | 1 | 10 | 0% | +1 |
 
 **90D** (직전 구간 데이터 없음 — 수준값만)
 
