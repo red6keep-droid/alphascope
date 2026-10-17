@@ -430,7 +430,7 @@ def _legend_chips(items):
     """색 범례 칩 한 줄 — 왼쪽 10px 들여쓰기, 칩 9px (범례 막대와 같은 모양). items = [(이름, 색)]."""
     chips = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
                      f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{c};"></span>{_esc(nm)}</span>' for nm, c in items)
-    return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
+    return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
 
 
 def _col_chart(groups, colors, label_colors, height=CHART_H):
@@ -461,7 +461,7 @@ def _col_chart(groups, colors, label_colors, height=CHART_H):
             f'<span style="display:flex;font-size:{TINY};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>')
 
 
-_PASTEL_UP, _PASTEL_DN, _GRAY_BAR = "#F8C4BF", "#BCD3F5", "#CBD5E1"   # 막대 파스텔 — BAR_PASTEL 의 긍정 · 부정과 같은 값
+_PASTEL_UP, _PASTEL_DN, _GRAY_BAR = "#F2A6A0", "#9CC0F2", "#CBD5E1"   # 엔비디아 막대 — 파스텔(#F8C4BF · #BCD3F5)을 포화색(#d93025 · #1a73e8) 쪽으로 20% 진하게 (2026-10-17 사용자), S&P 500 회색은 그대로
 _sign_bg = lambda v: _PASTEL_UP if v > 0 else _PASTEL_DN   # noqa: E731
 _sign_fg = lambda v: UP if v > 0 else DOWN   # noqa: E731
 
@@ -485,7 +485,7 @@ def sec_periods(a):
     chart = _col_chart([(p["label"], [p["nvda"], p.get("spy")]) for p in ps], [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE])
     legend = _legend_chips([("엔비디아 오름", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), ("S&P 500", _GRAY_BAR)])
     card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}{legend}</span></span></div>'
-    return _sub_label("기간별 수익률 (%)", PERIODS_TIP) + card
+    return _card_title("기간별 수익률 (%)", PERIODS_TIP) + card
 
 
 def _multi_single(rows):
@@ -494,25 +494,26 @@ def _multi_single(rows):
 
 
 def sec_year_range(a):
-    """1년 가격 범위 막대 (2026-10-17 사용자: 쉬운 정보로) — 최저 · 최고 사이 오늘 종가 위치 + 최고가 대비 %."""
+    """1년 가격 범위 막대 (2026-10-17 사용자: 쉬운 정보) — 제목은 카드 밖(공통 제목 스타일), 카드 안: `최고가 대비 ▼ 12.0%` · 막대 · 최저 · 최고."""
     y = a.get("year_range")
     if not y:
         return ""
     pad = _dk.SEP_GAP - _dk.VP - 1
     pos = max(0.0, min(100.0, y["pos_pct"]))
-    head = (f'<span style="{MULTI_ROW}"><span style="flex:1 1 auto;min-width:0;font-weight:700;color:#111;font-size:{_dk.NAME};">1년 가격 범위{_tipx(YEAR_TIP)}</span>'
-            f'<span style="flex:none;text-align:right;white-space:nowrap;{VAL}font-weight:700;"><span style="font-size:{TINY};font-weight:400;color:{NOTE};">(최고가 대비)</span> {_arrow(y["pct_from_high"], 1)}</span></span>')
+    head = (f'<span style="{MULTI_ROW}"><span style="flex:1 1 auto;min-width:0;font-weight:700;color:#111;font-size:{_dk.NAME};">최고가 대비</span>'
+            f'<span style="flex:none;text-align:right;white-space:nowrap;{VAL}font-weight:700;">{_arrow(y["pct_from_high"], 1)}</span></span>')
     track = (f'<span style="display:block;position:relative;height:8px;border-radius:4px;background:#E2E8F0;margin:6px 0 10px;">'
              f'<span style="position:absolute;left:0;top:0;height:8px;width:{pos:.1f}%;border-radius:4px;background:#BFDBFE;"></span>'
              f'<span style="position:absolute;top:-4px;left:{pos:.1f}%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#111;border:2px solid #fff;box-sizing:border-box;"></span></span>')
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
             f'<span>최저 ${y["low"]:,.2f}</span><span>(오늘 ${y["close"]:,.2f})</span><span>최고 ${y["high"]:,.2f}</span></span>')
     body = f'<span style="display:block;padding:0 12px {pad}px;">{track}{ends}</span>'
-    return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{head}{body}</span></div>'
+    return _card_title("1년 가격 범위", YEAR_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{head}{body}</span></div>'
 
 
-DD_TIP = ("고점 하락 후 가격 회복 : 엔비디아 일봉 약 30년(1999년~) 기록에서, 종가가 직전 최고 종가보다 10% · 20% · 30% 넘게 내려갔다가 그 고점을 다시 넘을 때까지 걸린 거래일 수(고점 날짜부터 센다)\n"
-          "· 숫자는 '절반은 이 기간 안에 회복했다'는 뜻(중앙값). 나머지 절반은 더 오래 걸렸다 — 분포가 매우 넓다(가장 긴 것 엔비디아 2,138거래일)\n"
+DD_TIP = ("약 30년 기록 · 절반은 이 거래일 안에 회복\n"
+          "· 고점 하락 후 가격 회복 : 엔비디아 일봉 약 30년(1999년~) 기록에서, 종가가 직전 최고 종가보다 10% · 20% · 30% 넘게 내려갔다가 그 고점을 다시 넘을 때까지 걸린 거래일 수(고점 날짜부터 센다)\n"
+          "· 카드의 '평균'은 '절반은 이 기간 안에 회복했다'는 뜻(정확히는 중앙값)이다. 나머지 절반은 더 오래 걸렸고 아주 오래 걸린 몇 번 때문에 산술 평균은 훨씬 길다 — 분포가 매우 넓다(가장 긴 것 엔비디아 2,138거래일)\n"
           "· 'N번' 은 약 30년 동안 그만큼 내려간 일이 몇 번 있었는지\n"
           "· 엔비디아는 회복이 빨랐던 종목이라 15종목을 합치면 훨씬 오래 걸렸다(−20%: 엔비디아 1년 넘게 25% · 15종목 38%)\n"
           "· 우리 검증(물림) : 15종목 30년, 고점 근처 · 볼린저 하단 · 고점 대비 −25% 에서 산 뒤 6개월 · 1년 뒤 산 가격 아래인 비율은 아무 날에 산 것과 다르지 않았다")
@@ -521,13 +522,18 @@ EARN_TIP = ("실적 발표 후 가격 변동 : 엔비디아는 장 마감 뒤에
             "발표 다음 날 하루는 예상을 크게 넘기면 평균 +0.9%, 조금 넘기면 오히려 −0.8%, 못 미치면 −2.6% 였다")
 
 
-def _row_html(left_html, right_html, note="", first=False):
-    """카드 한 줄 — 왼쪽(이름 + 아래 작은 설명) · 오른쪽(값, 여러 줄 가능)."""
+def _row_html(left_html, right_html, note="", first=False, inline_note=False):
+    """카드 한 줄 — 왼쪽(이름 + 설명) · 오른쪽(값, 여러 줄 가능). inline_note 면 설명을 괄호로 이름 옆에 같은 줄(줄바꿈 없이), 아니면 이름 아래."""
     pad = _dk.SEP_GAP - _dk.VP - 1
     sep = "" if first else MULTI_SEP
-    nt = f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;">{note}</span>' if note else ""
+    if note and inline_note:
+        left_html = f'{left_html} <span style="font-size:{MICRO};font-weight:400;color:{NOTE};">({note})</span>'
+        nt, nowrap = "", "white-space:nowrap;"
+    else:
+        nt = f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;">{note}</span>' if note else ""
+        nowrap = "white-space:normal;word-break:keep-all;"
     return (f'<span style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:{pad}px 12px;line-height:{LH_CARD};{sep}">'
-            f'<span style="flex:1 1 auto;min-width:0;color:#111;font-weight:700;white-space:normal;word-break:keep-all;">{left_html}{nt}</span>'
+            f'<span style="flex:1 1 auto;min-width:0;color:#111;font-weight:700;{nowrap}">{left_html}{nt}</span>'
             f'<span style="flex:none;text-align:right;white-space:nowrap;font-weight:700;{VAL}">{right_html}</span></span>')
 
 
@@ -538,20 +544,22 @@ def sec_drawdown(a):
         return ""
     st, pk = d["stats"]["nvda"], d["stats"]["peers"]
     span = _span_label(d["stats"])
-    rows = _row_html("지금", _arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True)
+    rows = _row_html("지금", _arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True, inline_note=True)   # 줄바꿈 없이 (2026-10-17 사용자)
     over = []
     for lv in ("10", "20", "30"):
         x, y = st.get(lv) or {}, pk.get(lv) or {}
         if not x.get("n") or x.get("median_days") is None or y.get("median_days") is None:
             continue
         left = f'<span style="color:{DOWN};">−{lv}%</span> 넘게 내려가면'
-        note = f"{span} 동안 엔비디아 {x['n']}번 · 기술주 15개 합쳐 {y['n']}번"
-        right = f'엔비디아 {x["median_days"]}일<br>기술주 15개 {y["median_days"]}일'
+        note = f"{span} 동안 엔비디아 {x['n']}번"   # 기술주 15개 합친 횟수는 뺐다 (2026-10-17 사용자)
+        sm = f'font-size:{TINY};font-weight:400;color:{NOTE};'
+        right = (f'<span style="{sm}">평균</span> {x["median_days"]}일<br>'   # 엔비디아 글자는 뺐다(카드가 엔비디아 기준) · 평균 은 작은 글씨
+                 f'<span style="{sm}">기술주 15개 평균 {y["median_days"]}일</span>')
         rows += _row_html(left, right, note)
         over.append(f"−{lv}% 엔비디아 {x['over_year'] / x['recovered'] * 100:.0f}% · 기술주 15개 {y['over_year'] / y['recovered'] * 100:.0f}%")
     tail = (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
             f'회복에 1년(250거래일) 넘게 걸린 비율 — {_esc(" / ".join(over))}</span>') if over else ""
-    return _sub_label(f"고점 하락 후 가격 회복 ({span} 기록 · 절반은 이 거래일 안에 회복)", DD_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}{tail}</span></div>'
+    return _card_title("고점 하락 후 가격 회복", DD_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}{tail}</span></div>'
 
 
 def sec_earnings(a):
@@ -576,9 +584,9 @@ def sec_earnings(a):
         rows += _row_html("발표 다음 날 보통 변동", f"±{em['median_abs']:.1f}%", note, first=first)
         chart = _col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in em["moves"]], [_sign_bg], [_sign_fg], height=130)
         rows += (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px 0;">'
-                 f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">최근 {n}번의 실적 발표 다음 날 (%)'
-                 f'<span style="font-size:{TINY};font-weight:400;color:{NOTE};"> (왼쪽이 오래된 것 · 아래 숫자는 연.월)</span></span>{chart}</span>')
-    return _sub_label("실적 발표 후 가격 변동", EARN_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}</span></div>'
+                 f'<span style="display:block;font-weight:700;color:#111;">최근 {n}번의 실적 발표 다음 날 (%)</span>'
+                 f'<span style="display:block;font-size:{MICRO};line-height:20px;font-weight:400;color:{NOTE};margin:0 0 6px;">(왼쪽이 오래된 것 · 아래 숫자는 연.월)</span>{chart}</span>')
+    return _card_title("실적 발표 후 가격 변동", EARN_TIP) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}</span></div>'
 
 
 def sec_headline(a, n=None):
@@ -628,7 +636,7 @@ def sec_headline(a, n=None):
     rows += (f'<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{_fold_row("차트 지표 보기")}</summary>'
              f'<div style="margin-top:6px;">{deep}</div></details>')
     out = (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-           f'<div style="margin-top:6px;">{rows}</div></details></div>')
+           f'<div style="margin-top:8px;">{rows}</div></details></div>')
     out += sec_state_cards(a)   # 시장 국면 · 반도체 자금 — 이유를 담은 별도 카드 둘 (2026-10-11 사용자)
     if not a.get("is_latest_bar_today"):
         out += _muted("기준 거래일이 최신이 아닐 수 있습니다 — 일봉 수집 상태를 확인하세요.")
@@ -1001,7 +1009,7 @@ def _legend_bar(title, segs):
     bar_html = f'<span style="display:flex;width:100%;height:{BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:{BAR_PAD}px 0 {3 + BAR_PAD}px;">{body}</span>'
     legend = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
                      f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{nm} {c / total * 100:.0f}%</span>' for nm, c, bg, _ in segs)
-    return head + bar_html + (f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{_dk.BAR_LABEL};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{legend}</span>')
+    return head + bar_html + (f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{legend}</span>')
 
 
 def _rating_bar(n, rc):
@@ -1100,6 +1108,13 @@ def _ccard(rows, left=None):
     short = _dk.short_values(rows)
     inner = "".join(_crow(n, v, sb, first=(i == 0), short=short) for i, (n, v, sb) in enumerate(rows))
     return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{MULTI}">{inner}</span></div>'   # 데스크톱 2열 (테마 CSS)
+
+
+def _card_title(t, tip=""):
+    """가격 카드 펼침 안 카드 제목 — 굵게 · 검정 · 위쪽 여백 10px (네 카드 공통, 2026-10-17 사용자: 타이틀 스타일 통일). 설명은 툴팁 안으로.
+    data-sub 를 붙이지 않는다 — 테마 탭이 서브탭으로 읽는 표시라 오늘 탭에 서브탭이 생길 수 있다."""
+    return (f'<div style="font-size:{_dk.EMPH_NAME};line-height:{LH_CARD};font-weight:700;color:#111;margin:10px 0 3px;">'
+            f'{_paren(_esc(t))}{_tipx(tip) if tip else ""}</div>')
 
 
 def _sub_label(t, tip=""):
