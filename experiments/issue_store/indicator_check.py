@@ -50,7 +50,22 @@ def conditions_overheat(c):
             "ret20_25": ret20 >= nvda_config.OVERHEAT_RET20_PCT}
 
 
-INDICATORS = {"overheat": conditions_overheat}
+def conditions_rsi(c):
+    r = rsi_wilder(c, nvda_config.RSI_PERIOD)
+    return {"rsi70": r >= 70, "rsi30": r <= 30}
+
+
+def conditions_cross(c):
+    cs = pd.Series(c)
+    s, l = cs.rolling(nvda_config.MA_SHORT).mean().values, cs.rolling(nvda_config.MA_LONG).mean().values
+    above = s > l
+    ok = np.isfinite(s) & np.isfinite(l)
+    prev = np.concatenate([[False], above[:-1]])
+    prev_ok = np.concatenate([[False], ok[:-1]])
+    return {"golden": ok & prev_ok & above & ~prev, "dead": ok & prev_ok & ~above & prev}
+
+
+INDICATORS = {"overheat": conditions_overheat, "rsi": conditions_rsi, "cross": conditions_cross}
 
 
 def first_entries(cond):
@@ -66,7 +81,8 @@ def stock_table(sym, name):
     b = bar_frame(sym)
     c, o, idx = b.close.values.astype(float), b.open.values.astype(float), b.index
     conds = INDICATORS[name](c)
-    conds["any"] = np.logical_or.reduce([np.nan_to_num(v.astype(float), nan=0).astype(bool) for v in conds.values()])
+    if name == "overheat":
+        conds["any"] = np.logical_or.reduce([np.nan_to_num(v.astype(float), nan=0).astype(bool) for v in conds.values()])
     sigs = {k: first_entries(v) for k, v in conds.items()}
     r = np.log(pd.Series(c)).diff()
     s252 = r.rolling(252, min_periods=200).std().shift(1).values
