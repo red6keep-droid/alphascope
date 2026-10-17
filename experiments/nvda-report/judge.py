@@ -610,8 +610,13 @@ def overheat_events(oh):
         v = oh["values"].get(k)
         st = ((oh.get("stats") or {}).get(k)) or {}
         base = ((oh.get("stats") or {}).get("base")) or {}
-        since = str((oh.get("stats") or {}).get("from") or "")[:4]
-        tail = f" · {since + '년 이후' if since.isdigit() else '과거'} 진입 {st['n']}회, 20일 뒤 상승 {st['up20']}% (아무 날 {base.get('up20')}%)" if st and base else ""
+        sts = oh.get("stats") or {}
+        try:
+            yrs = (datetime.date.fromisoformat(sts["to"]) - datetime.date.fromisoformat(sts["from"])).days / 365.25
+            span = f"약 {max(10, round(yrs / 10) * 10)}년"
+        except (KeyError, TypeError, ValueError):
+            span = "과거"
+        tail = f" · {span} 진입 {st['n']}회, 20일 뒤 상승 {st['up20']}% (아무 날 {base.get('up20')}%)" if st and base else ""
         out.append(_ev("Flows", "price", f"과열 지표 진입 — {config.OVERHEAT_KEYS[k]}",
                        f"{config.OVERHEAT_KEYS[k]} (현재 {v:.1f}{'%' if k != 'rsi80' else ''}){tail}", direction="uncertain", source="yfinance"))
     return out
