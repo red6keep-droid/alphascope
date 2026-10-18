@@ -61,12 +61,13 @@ def page_url(sym):
     return f"{BLOG}/p/{BY_SYM[sym][2]}.html"
 
 
-TITLE_NAME = {"GOOGL": "구글 알파벳"}   # 제목에서 괄호가 겹치지 않게 · 검색어(구글 주가)를 앞에
+TITLE_NAME = {"GOOGL": "구글 알파벳"}   # 이름의 괄호(알파벳(구글))를 빼고 · 검색어(구글 주가)를 앞에
 
 
 def page_title(sym):
-    """제목 = 검색어(이름 · 티커 · 주가) + 페이지에 실제로 있는 것(실적 일정). 테마가 `(티커) 주가` 에서 티커를 읽어 로고를 단다 (2026-10-18)."""
-    return f"{TITLE_NAME.get(sym, name(sym))}({sym}) 주가 · 실적 일정"
+    """제목 = 검색어(이름 · 티커 · 주가) + 페이지에 실제로 있는 것(실적 일정). 괄호 없이 `테슬라 TSLA 주가` — 엔비디아 글 제목과 같게 (2026-10-18 사용자).
+    테마가 `티커 주가` 에서 티커를 읽어 로고를 단다."""
+    return f"{TITLE_NAME.get(sym, name(sym))} {sym} 주가 · 실적 일정"
 
 
 def slug_title(sym):
@@ -74,3 +75,36 @@ def slug_title(sym):
 
 
 LIST_URL = f"{BLOG}/p/{LIST_SLUG}.html"
+
+
+# 함께 보는 회사 (캘린더 `함께 보는 회사 실적은?`) — 종목마다 한 번 정한다 (2026-10-18 Claude 설계, 사용자 "AI 없이 올릴 수 있는 것까지").
+# NVDA 리포트 cal_cards.PEER_ROLE 과 같은 뜻 : 고객 · 공급 · 경쟁 (+ 버크셔는 큰 보유 종목). 실적 일정을 받을 수 있는 미국 상장 종목만 (TSMC 는 ADR).
+PEERS = {
+    "AAPL": {"TSM": "공급", "QCOM": "공급", "AVGO": "공급", "GOOGL": "협력"},
+    "GOOGL": {"MSFT": "경쟁", "META": "경쟁", "AMZN": "경쟁", "NVDA": "공급"},
+    "MSFT": {"GOOGL": "경쟁", "AMZN": "경쟁", "ORCL": "경쟁", "NVDA": "공급"},
+    "AMZN": {"WMT": "경쟁", "MSFT": "경쟁", "GOOGL": "경쟁", "UPS": "협력"},
+    "META": {"GOOGL": "경쟁", "SNAP": "경쟁", "PINS": "경쟁", "NVDA": "공급"},
+    "AVGO": {"NVDA": "경쟁", "MRVL": "경쟁", "AAPL": "고객", "GOOGL": "고객"},
+    "TSLA": {"GM": "경쟁", "F": "경쟁", "RIVN": "경쟁", "NVDA": "공급"},
+    "BRK-B": {"AAPL": "보유", "AXP": "보유", "BAC": "보유", "KO": "보유"},
+    "LLY": {"NVO": "경쟁", "MRK": "경쟁", "PFE": "경쟁", "ABBV": "경쟁"},
+    "MU": {"NVDA": "고객", "AMD": "고객", "WDC": "경쟁", "AAPL": "고객"},
+    "WMT": {"COST": "경쟁", "TGT": "경쟁", "AMZN": "경쟁", "KR": "경쟁"},
+    "JPM": {"BAC": "경쟁", "WFC": "경쟁", "C": "경쟁", "GS": "경쟁"},
+    "AMD": {"NVDA": "경쟁", "INTC": "경쟁", "TSM": "공급", "MSFT": "고객"},
+    "V": {"MA": "경쟁", "AXP": "경쟁", "PYPL": "경쟁"},
+    "XOM": {"CVX": "경쟁", "COP": "경쟁", "SLB": "공급"},
+    "JNJ": {"PFE": "경쟁", "MRK": "경쟁", "ABT": "경쟁"},
+    "MA": {"V": "경쟁", "AXP": "경쟁", "PYPL": "경쟁"},
+    "ABBV": {"LLY": "경쟁", "MRK": "경쟁", "AMGN": "경쟁"},
+    "INTC": {"AMD": "경쟁", "NVDA": "경쟁", "TSM": "경쟁", "QCOM": "경쟁"},
+}
+PEER_KO = {"TSM": "TSMC", "QCOM": "퀄컴", "ORCL": "오라클", "UPS": "UPS", "SNAP": "스냅", "PINS": "핀터레스트", "MRVL": "마벨", "GM": "GM", "F": "포드",
+           "RIVN": "리비안", "AXP": "아메리칸 익스프레스", "BAC": "뱅크오브아메리카", "KO": "코카콜라", "NVO": "노보 노디스크", "MRK": "머크", "PFE": "화이자",
+           "WDC": "웨스턴디지털", "COST": "코스트코", "TGT": "타깃", "KR": "크로거", "WFC": "웰스파고", "C": "씨티그룹", "GS": "골드만삭스", "PYPL": "페이팔",
+           "CVX": "셰브런", "COP": "코노코필립스", "SLB": "SLB", "ABT": "애보트", "AMGN": "암젠"}
+
+
+def peer_name(sym):
+    return BY_SYM[sym][1] if sym in BY_SYM else PEER_KO.get(sym, sym)

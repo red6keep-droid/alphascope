@@ -95,6 +95,10 @@ def _text(el, path):
     return (x.text or "").strip() if x is not None and x.text else ""
 
 
+def _yes(v):
+    return v.strip().lower() in ("1", "true")
+
+
 def parse_form4(xml_text):
     root = ET.fromstring(xml_text)
     owner = root.find("reportingOwner")
@@ -102,12 +106,12 @@ def parse_form4(xml_text):
     info = {
         "owner": _text(owner, "reportingOwnerId/rptOwnerName"),
         "owner_cik": _text(owner, "reportingOwnerId/rptOwnerCik"),
-        "is_director": _text(rel, "isDirector") == "1",
-        "is_officer": _text(rel, "isOfficer") == "1",
-        "is_ten_percent": _text(rel, "isTenPercentOwner") == "1",
+        "is_director": _yes(_text(rel, "isDirector")),   # 공시마다 "1" 또는 "true" (2026-10-18 발견: 팀 쿡이 '내부자'로 나옴)
+        "is_officer": _yes(_text(rel, "isOfficer")),
+        "is_ten_percent": _yes(_text(rel, "isTenPercentOwner")),
         "title": _text(rel, "officerTitle"),
         "period": _text(root, "periodOfReport"),
-        "aff10b5one": _text(root, "aff10b5One") == "1",
+        "aff10b5one": _yes(_text(root, "aff10b5One")),
         "transactions": [],
         "derivative_count": len(root.findall("derivativeTable/derivativeTransaction")),
     }

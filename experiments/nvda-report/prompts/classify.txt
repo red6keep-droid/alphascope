@@ -10,7 +10,7 @@ For each item return:
   "direction": "positive" | "negative" | "uncertain" | "neutral",   // for NVIDIA's business, as the document states it. "uncertain" = raises uncertainty without a clear sign
   "novelty": "new" | "update" | "repeat",   // see NOVELTY
   "relevance": integer 0-3,     // see RELEVANCE
-  "fact": string,               // ONE sentence in Korean stating what the document says happened. Only numbers that appear in the text. No adjectives, no causality, no advice. Max 120 Korean characters. Never use the dash character "—" in Korean output; use a comma or " · " instead.
+  "fact": string,               // ONE Korean headline in noun-ending headline style (명사형 요약 헤드라인, like a news headline): end with a noun or number such as 발표 · 출시 · 승소 · 인상 · 예정 · 기록 · 감소, never with a verb ending (-다 · -했다 · -합니다 · -있다) and no final period. Examples: "테슬라, 자율주행 구매자 소송 승소" / "마이크론, 자사주 매입에 350억 달러 투입" / "애플 4분기 실적 발표 10월 30일 예정". It states what the item says happened. Only numbers that appear in the text. No adjectives, no causality, no advice. Max 120 Korean characters. Never use the dash character "—" in Korean output; use a comma or " · " instead.
   "entities": { "tickers": string[], "countries": string[], "products": string[] },   // only names that appear in the text; US tickers in uppercase
   "speaker": "ceo" | "nvidia_exec" | "government" | "customer_partner" | "none"   // see SPEAKER
 }

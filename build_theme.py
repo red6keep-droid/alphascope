@@ -211,7 +211,8 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .rt-pop[hidden] { display: none; }
 .rt-pop-box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
 /* 팝업 제목 · 닫기는 위에 고정, 내용만 스크롤 (2026-10-13 사용자) */
-.rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색 (2026-10-18 사용자: 툴팁 타이틀 아래 구분선, 이전 #F1F5F9 는 거의 안 보였다) */
+.rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; }
+.rt-pop-head::after { content: ""; position: absolute; left: 20px; right: 12px; bottom: 0; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색 (2026-10-18 사용자). 폭은 제목 왼쪽 선(20px) ~ 닫기 버튼 오른쪽 선(12px)까지 (같은 날 사용자) */
 .rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
 .rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 24px; color: #111; }
 .rt-pop-body { font-size: 19px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }

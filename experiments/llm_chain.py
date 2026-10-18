@@ -90,6 +90,8 @@ CHAINS = {
     "comment": ["nvidia-deepseek", "groq", "groq-qwen", "gemini-lite", "gemini"],
     # 예비 모델이 임시로 분류한 행을 Gemini 로 다시 분류할 때 (2026-10-15) — 예비로 덮어쓰지 않도록 Gemini 만 (lite 도 Gemini, 정식 분류)
     "json-gemini": ["gemini", "gemini-lite"],
+    # 시총 TOP 10 뉴스 분류 — lite 먼저 (doc/종목-레이더-기획.md 10-4: flash 하루 약 20회는 NVDA 리포트 몫으로 남긴다, lite 는 버킷이 따로)
+    "json-lite": ["gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
 }
 
 # 예비 모델이 남긴 ai_model 은 "공급자:모델" (nvidia:… · groq:…). Gemini("gemini-…") · 규칙("rule") 에는 콜론이 없다
