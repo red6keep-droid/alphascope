@@ -37,3 +37,5 @@ experiments/issue_store/results/failure_cost_cells.csv.gz
 
 # Claude Code 개인 설정
 .claude/settings.local.json
+experiments/stock-radar/data/
+experiments/stock-radar/output/
