@@ -444,7 +444,7 @@
 {"day": "2026-12-23", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 0}
 {"day": "2026-11-03", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 0}
 {"day": "2026-11-27", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 0}
-{"day": "2026-11-19", "kind": "COURT", "label": "Hu v. NVIDIA — 본안 신청 심리", "symbol": null, "source": "courtlistener #39", "confirmed": 1}
-{"day": "2026-11-19", "kind": "COURT", "label": "Hu v. NVIDIA — 기각 신청 심리", "symbol": null, "source": "courtlistener #32", "confirmed": 1}
-{"day": "2027-05-20", "kind": "COURT", "label": "증권 집단소송 (In re NVIDIA) — 본안 신청 심리", "symbol": null, "source": "courtlistener #296", "confirmed": 1}
-{"day": "2027-08-17", "kind": "COURT", "label": "증권 집단소송 (In re NVIDIA) — 재판", "symbol": null, "source": "courtlistener #296", "confirmed": 1}
+{"day": "2026-11-19", "kind": "COURT", "label": "Hu v. NVIDIA · 본안 신청 심리", "symbol": null, "source": "courtlistener #39", "confirmed": 1}
+{"day": "2026-11-19", "kind": "COURT", "label": "Hu v. NVIDIA · 기각 신청 심리", "symbol": null, "source": "courtlistener #32", "confirmed": 1}
+{"day": "2027-05-20", "kind": "COURT", "label": "증권 집단소송 (In re NVIDIA) · 본안 신청 심리", "symbol": null, "source": "courtlistener #296", "confirmed": 1}
+{"day": "2027-08-17", "kind": "COURT", "label": "증권 집단소송 (In re NVIDIA) · 재판", "symbol": null, "source": "courtlistener #296", "confirmed": 1}

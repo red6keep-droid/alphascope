@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-10-17T21:32:25Z",
- "run_date": "2026-10-18",
+ "generated_at": "2026-10-18T21:32:49Z",
+ "run_date": "2026-10-19",
  "day": "2026-10-16",
  "is_latest_bar_today": true,
  "headline": {
@@ -539,6 +539,30 @@
  },
  "events": [
   {
+   "area": "Legal",
+   "kind": "news",
+   "title": "Faces Up to 20 Years: California CEO in Nvidia Server Case",
+   "fact": "엔비디아 서버 관련 사건으로 캘리포니아 CEO 최고 20년형 위기",
+   "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTFBWbVhsZTViVnRsR1NmSkZYMmctbEVDQkdIN2xMclZseVVsZ2Z6RHdvb19tN2hZYWJsd2c0YU1qRVNxRUF1Y3BadmF3YnpqeUQ2UEtNcVp4YThDeGdkXzh3ZVplbklpWC0tQVY4SXN4NVRFTTA?oc=5",
+   "direction": "negative",
+   "emphasis": true,
+   "source": "Grit Daily News",
+   "published_at": "2026-10-18T14:42:06Z",
+   "speaker": null
+  },
+  {
+   "area": "Regulation",
+   "kind": "news",
+   "title": "Nvidia Tightens AI Chip Sales With New Asia Customer White List",
+   "fact": "엔비디아, 아시아 고객 대상 신규 화이트리스트 도입으로 AI 칩 판매 규제 강화",
+   "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOcnktNkw0cUN3WXhKTXVkOTNuWE9FN05Ob0dzSkJER3RCMWpLRlR5MFhEVS04VEhTcVRPNi1oU1ZVU2lGOUxiX3diYmxfQTVrc3JSeDBKUHExZlFRejgxZmswT2RRYWpxSnYySDVKVVBpSF9GeHhNUGMtYzBfN0k2SjRZTWN3RFYxckhpZy1DdVZpZw?oc=5",
+   "direction": "negative",
+   "emphasis": true,
+   "source": "Lapaas Voice",
+   "published_at": "2026-10-17T15:25:21Z",
+   "speaker": null
+  },
+  {
    "area": "Regulation",
    "kind": "news",
    "title": "Taiwan to curb AI chip sales to China for more U.S. alignment- Bloomberg",
@@ -575,6 +599,18 @@
    "speaker": "nvidia_exec"
   },
   {
+   "area": "Supply",
+   "kind": "news",
+   "title": "Nvidia RTX 5090 shipment worth $470,000 goes missing in Brazilian airport — two pallets disappear, distributor seeks explanations but met with zero answers",
+   "fact": "브라질 공항에서 47만 달러 규모의 엔비디아 RTX 5090 화물 분실",
+   "url": "https://news.google.com/rss/articles/CBMiqgJBVV95cUxQdVRCd045dWpxbE5idXhyVzhYNV9ydG9fTm9ycTl1QmtPXzhFT01CSTlYamI5NUVCV0U3YmtBNmZpOF9CeV92LXFvbEVoa1lMTXhuVUhNUDgxREMzeTVqR1lqNmN3Tll1cDNmMnQ1M21mOU5fU3hwZTBSLXNkQV9pbnAxWDVuZnpSaVB3Vk5WR01tY0p2ajNhWmpkaVpoa05CeGx2UUZMeTVyVlFicXYxdG1iR2hZbFVkdHBQb3hWdkFNSWRwRU1Nc2JZelF6YnhkOEhrODRYaTJYNVhYMHBUcXFsc1FhbTM2UVlGcDZtNHBtbFFFNlcxNzRKRXIwNkhsa2dWaFIwM3h2QUVfWDBvOThvWndMd3oxQ3ZIby1wZE5DX2I5bXgzcURn?oc=5",
+   "direction": "negative",
+   "emphasis": true,
+   "source": "Tom's Hardware",
+   "published_at": "2026-10-18T13:24:23Z",
+   "speaker": null
+  },
+  {
    "area": "Product",
    "kind": "blog",
    "title": "RTX Spark Ignites Global Celebration as New Windows PCs Arrive",
@@ -597,7 +633,9 @@
    "source": "Tom's Hardware",
    "published_at": "2026-10-17T14:38:18Z",
    "speaker": null
-  },
+  }
+ ],
+ "events_overflow": [
   {
    "area": "Demand",
    "kind": "newsroom",
@@ -613,7 +651,7 @@
   {
    "area": "Flows",
    "kind": "sector_flow",
-   "title": "반도체 자금 — 뚜렷하지 않음 → 빠져나가는 중",
+   "title": "반도체 자금 : 뚜렷하지 않음 → 빠져나가는 중",
    "fact": "반도체 ETF(SMH) 20일 S&P 500 대비 -6.0%p · 같은 기간 앞선 섹터 에너지 +5.9%p · 필수 소비재 +5.6%p",
    "url": null,
    "direction": "negative",
@@ -633,9 +671,7 @@
    "source": "Growth Dragons",
    "published_at": "2026-10-17T02:03:11Z",
    "speaker": null
-  }
- ],
- "events_overflow": [
+  },
   {
    "area": "Corporate",
    "kind": "news",
@@ -733,17 +769,17 @@
    "speaker": null
   }
  ],
- "events_total": 16,
+ "events_total": 19,
  "direction_counts": {
   "today": {
    "positive": 7,
-   "negative": 6,
+   "negative": 9,
    "uncertain": 1,
    "neutral": 2
   },
   "week": {
    "positive": 27,
-   "negative": 18,
+   "negative": 21,
    "uncertain": 2,
    "neutral": 6
   }
@@ -860,7 +896,7 @@
   "options": [
    {
     "key": "iv_atm_30d",
-    "value": 0.3758135736376212,
+    "value": 0.3821354349491291,
     "flag": false,
     "fmt": "iv"
    },
@@ -878,19 +914,19 @@
    },
    {
     "key": "pc_ratio_oi",
-    "value": 0.6682347493513225,
+    "value": 0.6685754519449114,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "pc_ratio_vol",
-    "value": 0.6517170084101543,
+    "value": 0.6524042884860157,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "gex_approx",
-    "value": 73915317.88835934,
+    "value": 94173753.54085922,
     "flag": false,
     "fmt": "gex"
    },
@@ -1045,13 +1081,13 @@
   "news": [
    {
     "key": "news_count",
-    "value": 30,
+    "value": 32,
     "flag": false,
     "fmt": "int"
    },
    {
     "key": "news_avg_7d",
-    "value": 30.142857142857142,
+    "value": 31.0,
     "flag": false,
     "fmt": "num1"
    },
@@ -1259,7 +1295,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-16",
-  "state_collected_at": "2026-10-17T21:31:55Z",
+  "state_collected_at": "2026-10-18T21:32:03Z",
   "missing_fields": [],
   "option_snapshot_days": 6,
   "iv_rank_days": 6,
@@ -1271,7 +1307,7 @@
    "court": 2,
    "fedreg": 24,
    "form4": 16,
-   "news": 629,
+   "news": 660,
    "newsroom": 10
   },
   "option_expiries": [
@@ -1304,5 +1340,496 @@
   "checklist:forward_pe",
   "checklist:insider_net_sold_90d",
   "sector_flow"
- ]
+ ],
+ "expect": {
+  "revenue": {
+   "state": "늘고 있음",
+   "yoy": 105.85114348672526,
+   "rev": 96221000000,
+   "end": "2026-07-26",
+   "qoq": 17.896220057587463,
+   "bars": [
+    {
+     "cq": "2024Q3",
+     "end": "2024-10-27",
+     "stock": 93.60927152317882,
+     "peers": 16.04472990427659,
+     "n_peers": 15
+    },
+    {
+     "cq": "2024Q4",
+     "end": "2025-01-26",
+     "stock": 77.9441704745962,
+     "peers": 12.273460174137373,
+     "n_peers": 15
+    },
+    {
+     "cq": "2025Q1",
+     "end": "2025-04-27",
+     "stock": 69.18292121025955,
+     "peers": 13.269100197225914,
+     "n_peers": 15
+    },
+    {
+     "cq": "2025Q2",
+     "end": "2025-07-27",
+     "stock": 55.60252996005326,
+     "peers": 17.238203699914312,
+     "n_peers": 14
+    },
+    {
+     "cq": "2025Q3",
+     "end": "2025-10-26",
+     "stock": 62.49358645459211,
+     "peers": 13.819547669671694,
+     "n_peers": 14
+    },
+    {
+     "cq": "2025Q4",
+     "end": "2026-01-25",
+     "stock": 73.21451272533118,
+     "peers": 14.640681160327262,
+     "n_peers": 14
+    },
+    {
+     "cq": "2026Q1",
+     "end": "2026-04-26",
+     "stock": 85.22763378875223,
+     "peers": 17.452139588619985,
+     "n_peers": 14
+    },
+    {
+     "cq": "2026Q2",
+     "end": "2026-07-26",
+     "stock": 105.85114348672526,
+     "peers": 23.824029313935867,
+     "n_peers": 14
+    }
+   ],
+   "peers_last": 23.824029313935867,
+   "dc_yoy": 117.0,
+   "beat": 5.7,
+   "margin": 75.0,
+   "guide_next": 108000000000.0
+  },
+  "eps": {
+   "state": "올라가는 중",
+   "c30": 2.229448088425068,
+   "bars": [
+    {
+     "label": "7일",
+     "stock": 0.7302254603547054,
+     "peers": 0.21244265161504128
+    },
+    {
+     "label": "30일",
+     "stock": 2.229448088425068,
+     "peers": 0.6880836807467317
+    },
+    {
+     "label": "60일",
+     "stock": 24.132745426706805,
+     "peers": 1.4866350344376666
+    },
+    {
+     "label": "90일",
+     "stock": 24.687099202969698,
+     "peers": 8.093904754573678
+    }
+   ],
+   "current": 15.9146,
+   "up30": 7,
+   "down30": 0
+  },
+  "move": {
+   "state": "평소보다 큼",
+   "exp": 2.407226971478323,
+   "sigma": 1.8012052095704005,
+   "ratio": 1.3364534805295523,
+   "spy": {
+    "exp": 0.9441573163409227,
+    "sigma": 0.6421386634560088
+   },
+   "earn": null,
+   "next_earnings": "2026-11-17",
+   "earn_in_window": false,
+   "days_to": 32,
+   "iv": 0.3821354349491291,
+   "rank": null,
+   "imp": 9.888852340702323,
+   "earn_day": 6.9440286317774635,
+   "past": 3.24902081606282
+  },
+  "short": {
+   "state": "큰 변화 없음",
+   "chg": 4.387528650992678,
+   "pct": 1.3460780453711625,
+   "prior_pct": 1.2895008271262123,
+   "asof": "2026-09-30",
+   "prior_asof": "2026-08-31",
+   "shares": 311389688,
+   "peers_pct": 1.7117135004558408,
+   "peers_prior_pct": 1.9754175383405854
+  }
+ },
+ "calendar_cards": {
+  "earnings": {
+   "day": "2026-11-17",
+   "left": 32,
+   "confirmed": false,
+   "bars": [
+    {
+     "day": "2024-11-21",
+     "ret": 0.5346485588869188,
+     "move": 0.5346485588869188,
+     "normal": 2.2206983712501427
+    },
+    {
+     "day": "2025-02-27",
+     "ret": -8.47806014389847,
+     "move": 8.47806014389847,
+     "normal": 3.7705055888147383
+    },
+    {
+     "day": "2025-05-29",
+     "ret": 3.24902081606282,
+     "move": 3.24902081606282,
+     "normal": 3.176062235072577
+    },
+    {
+     "day": "2025-08-28",
+     "ret": -0.7874492767115715,
+     "move": 0.7874492767115715,
+     "normal": 1.536453920744954
+    },
+    {
+     "day": "2025-11-20",
+     "ret": -3.152479491810023,
+     "move": 3.152479491810023,
+     "normal": 2.6422272196820753
+    },
+    {
+     "day": "2026-02-26",
+     "ret": -5.456125128938172,
+     "move": 5.456125128938172,
+     "normal": 2.0894986955843757
+    },
+    {
+     "day": "2026-05-21",
+     "ret": -1.7720529342800773,
+     "move": 1.7720529342800773,
+     "normal": 2.5084648220654864
+    },
+    {
+     "day": "2026-08-27",
+     "ret": 8.73795275466771,
+     "move": 8.73795275466771,
+     "normal": 2.166807723884373
+    }
+   ],
+   "median": 3.24902081606282,
+   "normal": 1.8012052095704005,
+   "market_exp": 6.9440286317774635
+  },
+  "peers": {
+   "upcoming": [
+    {
+     "day": "2026-10-21",
+     "symbol": "META",
+     "confirmed": 0
+    },
+    {
+     "day": "2026-10-28",
+     "symbol": "GOOGL",
+     "confirmed": 0
+    },
+    {
+     "day": "2026-10-28",
+     "symbol": "MSFT",
+     "confirmed": 0
+    },
+    {
+     "day": "2026-10-29",
+     "symbol": "AMZN",
+     "confirmed": 0
+    },
+    {
+     "day": "2026-11-03",
+     "symbol": "AMD",
+     "confirmed": 0
+    },
+    {
+     "day": "2026-11-03",
+     "symbol": "SMCI",
+     "confirmed": 0
+    }
+   ],
+   "effect": {
+    "AMD": {
+     "median": 3.2552239138451347,
+     "n": 8
+    },
+    "AMZN": {
+     "median": 2.4612672272201044,
+     "n": 8
+    },
+    "GOOGL": {
+     "median": 1.8688343386966788,
+     "n": 8
+    },
+    "META": {
+     "median": 2.2370727598735707,
+     "n": 8
+    },
+    "MSFT": {
+     "median": 2.2370727598735707,
+     "n": 8
+    },
+    "SMCI": {
+     "median": 3.1002260125796877,
+     "n": 7
+    }
+   },
+   "normal": 1.5409127292339675
+  },
+  "macro": {
+   "upcoming": [
+    {
+     "day": "2026-10-28",
+     "kind": "FOMC",
+     "label": "FOMC 결정"
+    },
+    {
+     "day": "2026-10-29",
+     "kind": "GDP",
+     "label": "GDP"
+    },
+    {
+     "day": "2026-10-29",
+     "kind": "PCE",
+     "label": "Personal Income and Outlays (PCE)"
+    },
+    {
+     "day": "2026-11-06",
+     "kind": "NFP",
+     "label": "Employment Situation (NFP)"
+    },
+    {
+     "day": "2026-11-10",
+     "kind": "CPI",
+     "label": "CPI"
+    }
+   ],
+   "effect": {
+    "FOMC": {
+     "median": 0.4307711265846226,
+     "n": 14
+    },
+    "CPI": {
+     "median": 0.5306541044969082,
+     "n": 21
+    },
+    "NFP": {
+     "median": 0.788139987465386,
+     "n": 21
+    },
+    "PCE": {
+     "median": 0.532191395620385,
+     "n": 21
+    },
+    "GDP": {
+     "median": 0.4918333816082976,
+     "n": 20
+    },
+    "OPEX": {
+     "median": 0.7231785221302411,
+     "n": 9
+    },
+    "INDEX": {
+     "median": 0.3146979693962715,
+     "n": 3
+    }
+   },
+   "normal": 0.5004515439429702
+  },
+  "court": {
+   "cases": [
+    {
+     "name": "Hu v. NVIDIA",
+     "day": "2026-11-19",
+     "label": "기각 신청 심리",
+     "left": 34
+    },
+    {
+     "name": "증권 집단소송 (In re NVIDIA)",
+     "day": "2027-05-20",
+     "label": "본안 신청 심리",
+     "left": 216
+    }
+   ]
+  },
+  "all": [
+   {
+    "day": "2026-10-21",
+    "kind": "EARNINGS_PEER",
+    "label": "META 실적",
+    "symbol": "META",
+    "confirmed": 0
+   },
+   {
+    "day": "2026-10-28",
+    "kind": "EARNINGS_PEER",
+    "label": "GOOGL 실적",
+    "symbol": "GOOGL",
+    "confirmed": 0
+   },
+   {
+    "day": "2026-10-28",
+    "kind": "EARNINGS_PEER",
+    "label": "MSFT 실적",
+    "symbol": "MSFT",
+    "confirmed": 0
+   },
+   {
+    "day": "2026-10-28",
+    "kind": "FOMC",
+    "label": "FOMC 결정",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-10-29",
+    "kind": "EARNINGS_PEER",
+    "label": "AMZN 실적",
+    "symbol": "AMZN",
+    "confirmed": 0
+   },
+   {
+    "day": "2026-10-29",
+    "kind": "GDP",
+    "label": "GDP",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-10-29",
+    "kind": "PCE",
+    "label": "Personal Income and Outlays (PCE)",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-11-03",
+    "kind": "EARNINGS_PEER",
+    "label": "AMD 실적",
+    "symbol": "AMD",
+    "confirmed": 0
+   },
+   {
+    "day": "2026-11-03",
+    "kind": "EARNINGS_PEER",
+    "label": "SMCI 실적",
+    "symbol": "SMCI",
+    "confirmed": 0
+   },
+   {
+    "day": "2026-11-06",
+    "kind": "NFP",
+    "label": "Employment Situation (NFP)",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-11-10",
+    "kind": "CPI",
+    "label": "CPI",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-11-17",
+    "kind": "EARNINGS",
+    "label": "NVDA 실적",
+    "symbol": "NVDA",
+    "confirmed": 0
+   },
+   {
+    "day": "2026-11-19",
+    "kind": "COURT",
+    "label": "Hu v. NVIDIA · 기각 신청 심리",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-11-19",
+    "kind": "COURT",
+    "label": "Hu v. NVIDIA · 본안 신청 심리",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-11-20",
+    "kind": "OPEX",
+    "label": "월간 옵션 만기",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-11-25",
+    "kind": "GDP",
+    "label": "GDP",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-11-25",
+    "kind": "PCE",
+    "label": "Personal Income and Outlays (PCE)",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-11-27",
+    "kind": "EARNINGS_PEER",
+    "label": "DELL 실적",
+    "symbol": "DELL",
+    "confirmed": 0
+   },
+   {
+    "day": "2026-12-04",
+    "kind": "NFP",
+    "label": "Employment Situation (NFP)",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-12-09",
+    "kind": "EARNINGS_PEER",
+    "label": "AVGO 실적",
+    "symbol": "AVGO",
+    "confirmed": 0
+   },
+   {
+    "day": "2026-12-09",
+    "kind": "FOMC",
+    "label": "FOMC 결정",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-12-10",
+    "kind": "CPI",
+    "label": "CPI",
+    "symbol": null,
+    "confirmed": 1
+   },
+   {
+    "day": "2026-12-14",
+    "kind": "EARNINGS_PEER",
+    "label": "ORCL 실적",
+    "symbol": "ORCL",
+    "confirmed": 0
+   }
+  ]
+ }
 }
