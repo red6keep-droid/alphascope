@@ -158,13 +158,17 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title a { color: inherit; }
 .post-title .title-logo { width: 32px; height: 32px; border-radius: 8px; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
 @media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } }
-/* 글 제목 끝의 " — 날짜"는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다 */
+/* 글 제목 끝의 날짜는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다.
+   날짜는 오른쪽 정렬 (2026-10-18 사용자: "글 제목에 날짜는 우측 정렬하고 기호는 삭제") — 목록 카드는 제목 줄 오른쪽 끝, 좁으면 다음 줄 오른쪽 */
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
+.post-card-title a:has(.post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
+.post-card-title .post-title-date { margin-left: auto; }
 .post-title .post-title-date { font-size: 14px; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
 /* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
-   제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄에 날짜 왼쪽 · 버튼 오른쪽 */
+   날짜 · 버튼 둘 다 오른쪽 끝 (2026-10-18 사용자: 날짜 우측 정렬) — 제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄 오른쪽 */
 .post-title:has(.post-title-meta) { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; }
-.post-title-meta { flex: 1 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; letter-spacing: 0; }
+.post-title-meta { flex: 1 0 auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
+.post-title-meta .title-share { margin-left: 0; }
 .title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
   background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; cursor: pointer; }
 .title-share:hover { border-color: #111; }
@@ -791,6 +795,12 @@ def blog_includables(backup_path="index.indie-backup.html"):
     )
     if len(blocks) < 20:
         sys.exit(f"[build_theme] Blog1 includable 추출이 부족합니다 ({len(blocks)}개).")
+    # 글 보기 제목은 h1 (검색 노출, 2026-10-18 사용자 — 가이드라인 10-5). 원래 테마는 h3. 모양은 .post-title 클래스라 그대로
+    for i, b in enumerate(blocks):
+        if b.startswith("<b:includable id='postTitle'"):
+            if "<h3 class='post-title entry-title'>" not in b:
+                sys.exit("[build_theme] postTitle 의 h3 제목을 찾을 수 없습니다.")
+            blocks[i] = b.replace("<h3 class='post-title entry-title'>", "<h1 class='post-title entry-title'>").replace("</h3>", "</h1>")
     return "\n".join("          " + b.strip() for b in blocks), len(blocks)
 
 
@@ -1122,7 +1132,7 @@ PREVIEW_COMMENTS = [   # 우리 댓글(Firestore 문서)과 같은 꼴 — avata
      "text": "매일 잘 보고 있습니다.\n러셀 2000 지표도 같이 실어주시면 좋겠어요."},
 ]
 
-PREVIEW_POST_TITLE = "미국 증시 리포트 — 2026년 9월 3일"
+PREVIEW_POST_TITLE = "미국 증시 리포트 2026년 9월 3일"
 
 FALLBACK_POST_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:19px;line-height:34px;color:#333;">
 
@@ -1228,8 +1238,8 @@ SAVED_POST_BODY = "experiments/daily-report/output/report_body.html"
 # 이 본문은 홈 카드에만 쓰인다. h2 는 experiments/trump-trend/render_html.py build_body 와 같아야 한다.
 SAVED_TRUMP_BODY = "experiments/trump-trend/output/trump_report_body.html"
 SAVED_NVDA_BODY = "experiments/nvda-report/output/nvda_report_body.html"
-PREVIEW_NVDA_TITLE = "엔비디아 리포트 — 2026년 9월 3일"
-PREVIEW_TRUMP_TITLE = "트럼프 SNS 트렌드 — 2026년 9월 3일"
+PREVIEW_NVDA_TITLE = "엔비디아(NVDA) 주가 리포트 2026년 9월 3일"
+PREVIEW_TRUMP_TITLE = "트럼프 SNS 발언 트렌드 2026년 9월 3일"
 FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:19px;line-height:34px;color:#333;">
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘 한 줄</h2>
 <div style="font-size:20px;font-weight:bold;color:#111;">지난 24시간 게시물 <b>36</b>건 중 정책 관련 <b>2</b>건, 이벤트 <b>2</b>개. 가장 강한 발언은 <b>Regulation / Artificial Intelligence</b> (강도 10).</div>

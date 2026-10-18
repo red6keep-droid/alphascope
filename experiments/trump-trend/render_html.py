@@ -59,6 +59,44 @@ def sec_counts(a):
     return dk.capsules(items, size=dk.TINY, in_title=True), note
 
 
+SEO_LEAD_MAX = 120   # 검색 결과 요약 문단 글자 수 상한 (2026-10-18 검색 노출)
+
+
+def _topic_name(topic, subtopic=None):
+    return _k(topic) + (f" / {_k(subtopic)}" if subtopic else "")
+
+
+def sec_seo_lead(a, date_str):
+    """본문 맨 위 요약 한 문단 — 구글 · 네이버가 검색 결과 요약으로 쓰게 (2026-10-18 검색 노출).
+    파이썬 값만으로 만든다(LLM 없음). data-lead · data-cards 를 달지 않는다 — 홈 카드 파서(reportSections)가 머리로 읽지 않게.
+    빠진 값은 그 조각을 뺀다. 길면 뒤 조각부터 뺀다: 30일 최다 주제 → 가장 강한 발언 → 급상승 주제."""
+    try:
+        _, m, d = date_str.split("-")[:3]
+        date = f"{int(m)}월 {int(d)}일 "
+    except (ValueError, AttributeError):
+        date = ""
+    ev = a.get("recent_events") or []
+    head = f"{date}트럼프 SNS 발언 가운데 최근 24시간 시장 관련 이벤트는 {len(ev)}건입니다."
+    parts = []
+    ts = a.get("trend_scores") or []
+    if ts:
+        parts.append(f"최근 7일 가장 빠르게 늘어난 주제는 {_k(ts[0]['key'])}")
+    if ev:
+        parts.append(f"가장 강한 발언은 {_topic_name(ev[0]['topic'], ev[0].get('subtopic'))}(강도 {ev[0]['intensity']})")   # recent_events 는 강도 순
+    top30 = next((x for x in ((a.get("windows") or {}).get("30D") or {}).get("dims", {}).get("topic", []) if x["events"] > 0), None)
+    if top30:
+        parts.append(f"30일 동안 가장 많이 말한 주제는 {_k(top30['key'])}")
+    while parts:
+        text = head + " " + ", ".join(parts) + "입니다."
+        if len(text) <= SEO_LEAD_MAX:
+            break
+        parts.pop()
+    else:
+        text = head
+    return ('<p data-seo-lead="1" style="font-size:16px;line-height:24px;color:#333;margin:0 0 12px;word-break:keep-all;">'
+            f"{_esc(text)}</p>")
+
+
 def sec_recent(a):
     """발언 — C 카드: 주제/하위주제 + 방향·세션 라벨, 보조 줄에 시각·대상·연타, 값은 강도."""
     rows = []
@@ -451,6 +489,7 @@ def build_body(a, n):
     counts_aside, counts_note = sec_counts(a)
     return dk.fix_colons("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지)
         dk.WRAP_OPEN,
+        sec_seo_lead(a, report_title.today_kst()),   # 본문 첫 요소 = 검색 결과 요약 문단 (2026-10-18 검색 노출). 날짜는 글 제목과 같은 today_kst
         dk.section("급상승 주제", sec_trends(a), tab=TAB_TODAY, one_line=True,
                    aside=dk.tips_right(_trend_tips(a)) if a["trend_scores"] else ""),   # ? 툴팁은 제목 오른쪽, 폰에서도 한 줄 · "최근 7일"은 카드 아래 (2026-10-11 사용자)
         dk.section("발언", counts_note + sec_recent(a), tab=TAB_TODAY, aside=counts_aside),   # 급상승 주제 아래로 (2026-10-14 사용자) · 24시간 집계 캡슐은 발언 제목 오른쪽 (2026-10-11 사용자)

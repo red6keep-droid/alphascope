@@ -42,18 +42,19 @@ def publish(output_dir=None, do_publish=False):
         raise FileNotFoundError(f"본문 없음: {body_path} — render_html 먼저")
     with open(body_path, "r", encoding="utf-8") as f:
         body = f.read()
-    title = report_title.post_title(report_title.today_kst())
+    day = report_title.today_kst()
+    title = report_title.post_title(day)
 
     if not do_publish:
         print(f"[publish dry-run] 제목: {title} · 본문 {len(body):,}자 · 라벨 {report_title.LABELS}")
         return None
 
-    existing = find_post_id(title)
-    if existing:   # 같은 제목이면 본문 갱신 — 디자인·코드가 바뀐 날 새 본문으로 다시 올린다 (2026-10-11). 주소는 그대로
-        url = update_post(existing["id"], title, body, report_title.LABELS)
+    existing = find_post_id(report_title.match_titles(day))
+    if existing:   # 같은 날 글(새 · 옛 · 영문 제목)이면 본문 · 제목 갱신 — 디자인·코드가 바뀐 날 새 본문으로 다시 올린다 (2026-10-11). 주소는 그대로
+        url = update_post(existing["id"], title, publish_blogger.with_related(body, report_title.LABELS, report_title.match_titles(day)), report_title.LABELS)
         print(f"[publish] 같은 제목이 있어 본문 갱신: {url}")
     else:
-        url = publish_blogger.publish(title, body, labels=report_title.LABELS)
+        url = publish_blogger.publish(title, body, labels=report_title.LABELS, slug_title=report_title.slug_title(day))   # 영문 주소 (2026-10-18)
     with open(os.path.join(output_dir, "post_url.txt"), "w", encoding="utf-8") as f:
         f.write(url or "")
     return url
@@ -72,7 +73,7 @@ def find_post_id(title, max_results=15):
     r = requests.get(f"{base}/posts", params={"maxResults": max_results, "fetchBodies": "false", "fetchImages": "false"}, headers=headers, timeout=30)
     r.raise_for_status()
     for p in r.json().get("items", []):
-        if str(p.get("title", "")).strip() == title.strip():
+        if str(p.get("title", "")).strip() in {t.strip() for t in ([title] if isinstance(title, str) else title)}:   # 목록 = 그날 제목들
             return {"id": p["id"], "url": p.get("url")}
     return None
 

@@ -189,7 +189,7 @@ def main():
     print("[6/6] 게시")
     print("=" * 50)
     if should_publish:
-        url = publish_blogger.publish(title, body, dry_run=False)
+        url = publish_blogger.publish(title, body, dry_run=False, slug_title=report_title.slug_title(input_data["date"]))
         if url:
             print(f"게시글 URL: {url}")
     else:

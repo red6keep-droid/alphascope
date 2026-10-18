@@ -47,7 +47,7 @@ def _set_output(already_published):
 
 def _title(series):
     if series == "daily":
-        return report_title.daily_title(report_title.today_kst())
+        return report_title.match_titles(report_title.today_kst())
     # 시리즈마다 report_title.py가 있어 이름이 겹친다. 파일 경로로 따로 불러온다.
     # nvda의 report_title은 같은 폴더의 config를 import하므로 그 폴더를 경로 앞에 둔다.
     series_dir = os.path.join(EXPERIMENTS, SERIES_DIRS[series])
@@ -56,7 +56,7 @@ def _title(series):
         f"{series}_report_title", os.path.join(series_dir, "report_title.py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.post_title(module.today_kst())
+    return module.match_titles(module.today_kst())   # 새 · 옛(줄표) · 영문 제목 모두 그날 글 (2026-10-18)
 
 
 def main():
@@ -67,7 +67,7 @@ def main():
     load_dotenv()
 
     title = _title(args.series)
-    print(f"확인할 제목: {title}")
+    print(f"확인할 제목: {' / '.join(title)}")
 
     try:
         url = publish_blogger.find_post_by_title(title)

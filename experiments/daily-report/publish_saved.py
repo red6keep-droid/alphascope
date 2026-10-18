@@ -23,6 +23,7 @@ import requests
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import publish_blogger
+import report_title
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
@@ -71,13 +72,15 @@ def main():
     # 확인 실패나 두 실행이 겹치는 경우를 대비한 2차 방어.
     force = "--force" in sys.argv or os.environ.get("PUBLISH_FORCE", "").lower() == "true"
     if not force:
-        existing = publish_blogger.find_post_by_title(title)
+        d = report_title.date_of(title)
+        existing = publish_blogger.find_post_by_title(report_title.match_titles(d) + [title] if d else title)   # 옛 제목(줄표) · 영문 제목으로 남은 그날 글도 같은 글
         if existing:
             print(f"같은 제목의 글이 이미 있습니다: {existing}")
             print("중복 게시를 건너뜁니다. (다시 올리려면 --force)")
             return
 
-    url = publish_blogger.publish(title, body, dry_run=False)
+    d = report_title.date_of(title)
+    url = publish_blogger.publish(title, body, dry_run=False, slug_title=report_title.slug_title(d) if d else None)   # 영문 주소 (2026-10-18)
     if url:
         print(f"게시글 URL: {url}")
 

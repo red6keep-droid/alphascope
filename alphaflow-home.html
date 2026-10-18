@@ -1765,7 +1765,7 @@ body.menu-open { overflow: hidden; }
           fillPicks(sec[PICKS_HEADS[0]] || sec[PICKS_HEADS[1]]);
           var stamp = document.getElementById('briefing-date');   /* 제목 옆 날짜 (2026-10-12 사용자) */
           var tm = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/.exec(title);   /* 리포트 기준일은 글 제목의 날짜 (발행일은 다음 날일 수 있다) */
-          /* 리포트 제목의 날짜와 같은 표기 "— 2026년 10월 11일" (2026-10-12 사용자) */
+          /* 리포트 제목의 날짜와 같은 표기 "2026년 10월 11일" (2026-10-12 사용자, 줄표는 2026-10-18 삭제) */
           if (stamp && tm) stamp.textContent = tm[1] + '년 ' + parseInt(tm[2], 10) + '월 ' + parseInt(tm[3], 10) + '일';
         }
       })
@@ -1869,14 +1869,15 @@ body.menu-open { overflow: hidden; }
   window.addEventListener('resize', function () { if (!narrow() && menu.classList.contains('is-open')) setMenu(false); });
 })();
 
-/* ============================================================ 글 제목의 " — 날짜" (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
-   "미국 증시 데일리 브리핑 — 2026년 10월 11일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양은 테마 CSS. */
+/* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
+   "엔비디아(NVDA) 주가 리포트 2026년 10월 19일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양 · 오른쪽 정렬은 테마 CSS (2026-10-18 사용자: 날짜는 우측 정렬, 줄표 삭제).
+   옛 글 "엔비디아 리포트 — 2026년 10월 11일" 도 줄표를 떼고 날짜만 감싼다. */
 (function () {
   'use strict';
   [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
     var host = h.querySelector('a') || h;
     if (host.children.length) return;
-    var m = /^(.*\S)\s+([—–-]\s*\d{4}\s*년.*)$/.exec(host.textContent.trim());
+    var m = /^(.*\S)\s+(?:[—–-]\s*)?(\d{4}\s*년.*)$/.exec(host.textContent.trim());
     if (!m) return;
     host.textContent = m[1] + ' ';
     var sp = document.createElement('span'); sp.className = 'post-title-date'; sp.textContent = m[2];
@@ -2228,7 +2229,7 @@ body.menu-open { overflow: hidden; }
 (function () {
   'use strict';
   [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
-    if (!/^\s*엔비디아 (리포트|데일리)/.test(h.textContent) || h.querySelector('.title-logo')) return;
+    if (!/^\s*엔비디아/.test(h.textContent) || h.querySelector('.title-logo')) return;   /* 새 제목 "엔비디아(NVDA) 주가 리포트 …" · 옛 "엔비디아 리포트 — …" (2026-10-18) */
     var host = h.querySelector('a') || h;
     var im = document.createElement('img'); im.className = 'title-logo'; im.alt = ''; im.width = 32; im.height = 32;
     im.src = 'https://financialmodelingprep.com/image-stock/NVDA.png';
@@ -2356,7 +2357,7 @@ body.menu-open { overflow: hidden; }
   }
   var secs = h2s.map(function (h) {
     var nodes = [h], n = h.nextElementSibling;
-    while (n && n.tagName !== 'H2') { nodes.push(n); n = n.nextElementSibling; }
+    while (n && n.tagName !== 'H2' && !n.hasAttribute('data-related')) { nodes.push(n); n = n.nextElementSibling; }   /* 함께 보는 리포트(data-related)는 탭 밖 글 맨 아래에 남긴다 (2026-10-18) */
     var hc = h.cloneNode(true);
     [].slice.call(hc.querySelectorAll('[data-summary]')).forEach(function (x) { x.parentNode.removeChild(x); });
     return { h: h, key: key(hc.textContent), nodes: nodes, tab: h.getAttribute('data-tab') || '' };

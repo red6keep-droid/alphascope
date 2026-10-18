@@ -30,12 +30,13 @@ def publish(output_dir=None, do_publish=False):
     if not do_publish:
         print(f"[publish dry-run] 제목: {title} · 본문 {len(body):,}자 · 라벨 {report_title.LABELS}")
         return None
-    existing = find_post_id(title)
+    day = report_title.date_of(title) or report_title.today_kst()
+    existing = find_post_id(report_title.match_titles(day) + [title])   # 옛 제목(줄표) · 영문 제목으로 남은 그날 글도 같은 글 (2026-10-18)
     if existing:
-        url = update_post(existing["id"], title, body, report_title.LABELS)
+        url = update_post(existing["id"], title, publish_blogger.with_related(body, report_title.LABELS, report_title.match_titles(day) + [title]), report_title.LABELS)
         print(f"[publish] 같은 제목이 있어 본문 갱신: {url}")
     else:
-        url = publish_blogger.publish(title, body, labels=report_title.LABELS)
+        url = publish_blogger.publish(title, body, labels=report_title.LABELS, slug_title=report_title.slug_title(day))   # 영문 주소
     with open(os.path.join(output_dir, "post_url.txt"), "w", encoding="utf-8") as f:
         f.write(url or "")
     print(f"[publish] 게시: {url}")
@@ -56,7 +57,7 @@ def find_post_id(title, max_results=15):
     r = requests.get(f"{base}/posts", params={"maxResults": max_results, "fetchBodies": "false", "fetchImages": "false"}, headers=headers, timeout=30)
     r.raise_for_status()
     for p in r.json().get("items", []):
-        if str(p.get("title", "")).strip() == title.strip():
+        if str(p.get("title", "")).strip() in {t.strip() for t in ([title] if isinstance(title, str) else title)}:   # 목록 = 그날 제목들
             return {"id": p["id"], "url": p.get("url")}
     return None
 

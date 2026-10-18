@@ -916,13 +916,17 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title a { color: inherit; }
 .post-title .title-logo { width: 32px; height: 32px; border-radius: 8px; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
 @media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } }
-/* 글 제목 끝의 " — 날짜"는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다 */
+/* 글 제목 끝의 날짜는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다.
+   날짜는 오른쪽 정렬 (2026-10-18 사용자: "글 제목에 날짜는 우측 정렬하고 기호는 삭제") — 목록 카드는 제목 줄 오른쪽 끝, 좁으면 다음 줄 오른쪽 */
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
+.post-card-title a:has(.post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
+.post-card-title .post-title-date { margin-left: auto; }
 .post-title .post-title-date { font-size: 14px; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
 /* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
-   제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄에 날짜 왼쪽 · 버튼 오른쪽 */
+   날짜 · 버튼 둘 다 오른쪽 끝 (2026-10-18 사용자: 날짜 우측 정렬) — 제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄 오른쪽 */
 .post-title:has(.post-title-meta) { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; }
-.post-title-meta { flex: 1 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; letter-spacing: 0; }
+.post-title-meta { flex: 1 0 auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
+.post-title-meta .title-share { margin-left: 0; }
 .title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
   background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; cursor: pointer; }
 .title-share:hover { border-color: #111; }
@@ -1933,13 +1937,13 @@ body.no-dashboard .main-content { padding-top: 32px; }
           <b:includable id='postTitle' var='post'>
   <a expr:name='data:post.id'/>
   <b:if cond='data:post.title != &quot;&quot;'>
-    <h3 class='post-title entry-title'>
+    <h1 class='post-title entry-title'>
       <b:if cond='data:post.link or (data:post.url and data:view.url != data:post.url)'>
         <a expr:href='data:post.link ?: data:post.url'><data:post.title/></a>
       <b:else/>
         <data:post.title/>
       </b:if>
-    </h3>
+    </h1>
   </b:if>
 </b:includable>
           <b:includable id='previousPageLink'><b:comment>Don&#39;t show</b:comment></b:includable>
@@ -2860,7 +2864,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
                 fillPicks(sec[PICKS_HEADS[0]] || sec[PICKS_HEADS[1]]);
                 var stamp = document.getElementById('briefing-date');   /* 제목 옆 날짜 (2026-10-12 사용자) */
                 var tm = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/.exec(title);   /* 리포트 기준일은 글 제목의 날짜 (발행일은 다음 날일 수 있다) */
-                /* 리포트 제목의 날짜와 같은 표기 "— 2026년 10월 11일" (2026-10-12 사용자) */
+                /* 리포트 제목의 날짜와 같은 표기 "2026년 10월 11일" (2026-10-12 사용자, 줄표는 2026-10-18 삭제) */
                 if (stamp && tm) stamp.textContent = tm[1] + '년 ' + parseInt(tm[2], 10) + '월 ' + parseInt(tm[3], 10) + '일';
               }
             })
@@ -2964,14 +2968,15 @@ body.no-dashboard .main-content { padding-top: 32px; }
         window.addEventListener('resize', function () { if (!narrow() && menu.classList.contains('is-open')) setMenu(false); });
       })();
 
-      /* ============================================================ 글 제목의 " — 날짜" (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
-         "미국 증시 데일리 브리핑 — 2026년 10월 11일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양은 테마 CSS. */
+      /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
+         "엔비디아(NVDA) 주가 리포트 2026년 10월 19일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양 · 오른쪽 정렬은 테마 CSS (2026-10-18 사용자: 날짜는 우측 정렬, 줄표 삭제).
+         옛 글 "엔비디아 리포트 — 2026년 10월 11일" 도 줄표를 떼고 날짜만 감싼다. */
       (function () {
         'use strict';
         [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
           var host = h.querySelector('a') || h;
           if (host.children.length) return;
-          var m = /^(.*\S)\s+([—–-]\s*\d{4}\s*년.*)$/.exec(host.textContent.trim());
+          var m = /^(.*\S)\s+(?:[—–-]\s*)?(\d{4}\s*년.*)$/.exec(host.textContent.trim());
           if (!m) return;
           host.textContent = m[1] + ' ';
           var sp = document.createElement('span'); sp.className = 'post-title-date'; sp.textContent = m[2];
@@ -3323,7 +3328,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
       (function () {
         'use strict';
         [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
-          if (!/^\s*엔비디아 (리포트|데일리)/.test(h.textContent) || h.querySelector('.title-logo')) return;
+          if (!/^\s*엔비디아/.test(h.textContent) || h.querySelector('.title-logo')) return;   /* 새 제목 "엔비디아(NVDA) 주가 리포트 …" · 옛 "엔비디아 리포트 — …" (2026-10-18) */
           var host = h.querySelector('a') || h;
           var im = document.createElement('img'); im.className = 'title-logo'; im.alt = ''; im.width = 32; im.height = 32;
           im.src = 'https://financialmodelingprep.com/image-stock/NVDA.png';
@@ -3451,7 +3456,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         }
         var secs = h2s.map(function (h) {
           var nodes = [h], n = h.nextElementSibling;
-          while (n && n.tagName !== 'H2') { nodes.push(n); n = n.nextElementSibling; }
+          while (n && n.tagName !== 'H2' && !n.hasAttribute('data-related')) { nodes.push(n); n = n.nextElementSibling; }   /* 함께 보는 리포트(data-related)는 탭 밖 글 맨 아래에 남긴다 (2026-10-18) */
           var hc = h.cloneNode(true);
           [].slice.call(hc.querySelectorAll('[data-summary]')).forEach(function (x) { x.parentNode.removeChild(x); });
           return { h: h, key: key(hc.textContent), nodes: nodes, tab: h.getAttribute('data-tab') || '' };

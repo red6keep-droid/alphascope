@@ -417,6 +417,40 @@ TAB_TOP = 10   # 오늘 · 시장 탭 첫 콘텐츠 위 여백 +10 — margin �
 LEAD_VP = 8   # 머리 결론 18px · 행간 34 의 반쪽 — 구분선 위아래 보이는 14 (2026-10-13 사용자: 카드 없이)
 
 
+SEO_GRADE = {"Risk-On": "위험 선호", "Neutral": "중립", "Risk-Off": "위험 회피"}   # analyze.regime_score 라벨 → 한국어
+SEO_INDICES = (("sp500", "S&P 500"), ("nasdaq", "나스닥"), ("dow", "다우"))
+
+
+def sec_seo_lead(input_data, analysis):
+    """검색 결과 요약 문단 (2026-10-18, 검색 노출) — 본문 맨 앞, 파이썬 값만으로 1~2문장.
+    data-lead · data-cards 를 달지 않는다: 홈 카드 · 목록 요약은 data-lead 부터 읽으므로 이 문단은 거기 실리지 않는다.
+    날짜는 시계열 기준 거래일(analysis.as_of, 뉴욕). 값이 없는 부분은 문장에서 뺀다."""
+    a = analysis or {}
+    as_of = a.get("as_of")
+    day = ""
+    if as_of:
+        try:
+            _, m, d = str(as_of).split("-")[:3]
+            day = f"{int(m)}월 {int(d)}일 "
+        except ValueError:
+            day = ""
+    indices = (input_data.get("market") or {}).get("indices") or {}
+    chg = [f"{name} {float(indices[k]['change_pct']):+.2f}%" for k, name in SEO_INDICES
+           if (indices.get(k) or {}).get("change_pct") is not None]
+    regime = a.get("regime") or {}
+    score, grade = regime.get("score"), SEO_GRADE.get(regime.get("label") or "")
+    sents = []
+    if chg:
+        sents.append(f"{day}미국 증시는 " + " · ".join(chg) + "로 마감했습니다.")
+    if score is not None:
+        tail = f"{int(score)}점, {grade}입니다." if grade else f"{int(score)}점입니다."
+        sents.append(("" if chg else f"{day}미국 증시의 ") + "시장 점수는 " + tail)
+    if not sents:
+        return ""
+    return ('<p data-seo-lead="1" style="font-size:16px;line-height:24px;color:#333;margin:0 0 12px;word-break:keep-all;">'
+            + _esc(" ".join(sents)) + "</p>")
+
+
 def sec_lead(report, analysis):
     """글 머리(제목 없음, data-lead): 한 줄 결론 + 종합을 한 강조 카드에 (2026-10-12 사용자: 하나의 카드로 통합, 가로 구분선, 16px).
     홈 카드는 '(머리)'로 한 줄 결론을(구분선 아래는 건너뜀), '(종합)'으로 data-insight 문단을 읽는다."""
@@ -813,6 +847,7 @@ def build_body(input_data, report, cover_url=None, analysis=None):
     prev = _prev_analysis(analysis)   # 어제 대비 (2026-10-13 사용자)
     parts = [
         dk.WRAP_OPEN,
+        sec_seo_lead(input_data, analysis),   # 검색 결과 요약 — 보이는 첫 요소, data-lead 보다 앞 (2026-10-18)
         _cover_image(cover_url),
         sec_lead(report, analysis),
         dk.section("시장 상태", sec_regime(analysis, report, prev), tab=TAB_TODAY, one_line=True,

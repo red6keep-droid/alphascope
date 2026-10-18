@@ -1482,11 +1482,44 @@ def sec_footer(a):
 
 # ── 조립 ─────────────────────────────────────────────────────────────────
 
+def seo_lead(a):
+    """글 맨 앞 요약 1~2문장 (검색 노출, 2026-10-18 사용자 — 가이드라인 10-5). 검색 결과 · 공유 미리보기 문구가 본문 앞부분이라 숫자 카드 대신 사람이 읽는 글로 시작한다.
+    파이썬 값만 · 평가 · 예측 어휘 없음. data-cards 가 아니라 홈 카드 · 탭 머리에 잡히지 않는다."""
+    h = a.get("headline") or {}
+    if h.get("close") is None:
+        return ""
+    try:
+        d = datetime.date.fromisoformat(a["day"])
+        day = f"{d.month}월 {d.day}일 "
+    except (KeyError, ValueError):
+        day = ""
+    r = h.get("ret_1d") or 0
+    move = f"전날보다 {abs(r):.2f}% {'올랐다' if r > 0 else '내렸다'}" if abs(r) >= 0.005 else "전날과 같았다"
+    first = f"{day}엔비디아(NVDA) 종가는 ${h['close']:,.2f}로 {move}."
+    more = []
+    nr = a.get("normal_range")
+    if nr and not nr.get("earnings_day"):
+        more.append("평소 하루 움직임" + (" 안의 변화였고" if abs(nr["z"]) < 2 else f"의 {abs(nr['z']):.1f}배였고"))
+    elif nr:
+        more.append("실적 발표 다음 날이었고")
+    if a.get("market_regime"):
+        more.append(f"미국 시장은 {a['market_regime']['regime']}")
+    if a.get("sector_flow"):
+        more.append(f"반도체 자금은 {a['sector_flow']['state']}")
+    second = ""
+    if more:
+        head = more[0] + ", " if more[0].endswith("고") else ""
+        rest = more[1:] if head else more
+        second = (" " + head + ", ".join(rest) + "이다.") if rest else (" " + more[0][:-1] + "다." if head else "")
+    return f'<p data-seo-lead="1" style="font-size:{_dk.NAME};line-height:{LH_CARD};color:#333;margin:0 0 12px;word-break:keep-all;">{_esc(first + second)}</p>'
+
+
 def build_body(a, n):
     return _dk.fix_colons("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지)
         # data-design="2": 테마의 옛 글 보정 규칙(div 14px → 17px !important)에서 이 글을 제외한다 (2026-10-11 — 안내 글이 17px로 커지던 원인)
         f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:{_dk.BODY};line-height:{_dk.LH_BODY};color:#333;">',   # 행간 24px (2026-10-12 사용자, 소수점 금지 — 2026-10-12 사용자)
         # 기준 거래일 안내 줄 삭제 (2026-10-12 사용자) — 날짜는 글 제목에 있다
+        seo_lead(a),   # 글 맨 앞 요약 (검색 결과 문구, 2026-10-18)
         sec_chart(a=a), sec_headline(a, n), sec_targets(a),   # 쉬운 말 줄은 가격 카드 펼침 안 (2026-10-16 사용자)   # 그래프는 탭 위, 평균 카드는 가격 카드 아래 (2026-10-13 사용자)
         # 목표가는 상태 카드 아래 (아코디언) — 제목 없이 본문 머리에 (2026-10-11 사용자: 오늘 한 줄 타이틀 삭제)
         # 테스트 운영 안내는 머리 카드 뒤 (2026-10-13 사용자: 구글 검색) — 맨 앞이면 검색 결과 · 공유 미리보기 문구가 "테스트 운영 중 …"이 된다

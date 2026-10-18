@@ -96,8 +96,8 @@ def _table(headers, rows):
 
 
 def title_for(run_date):
-    d = datetime.date.fromisoformat(run_date)
-    return f"{config.REPORT_TITLE_PREFIX} — {d.year}년 {d.month}월 {d.day}일"
+    import report_title   # 게시 제목은 한 곳(report_title.post_title)에서만 만든다 — 예전에는 여기 따로 `엔비디아 리포트 — 날짜` 가 있었다 (2026-10-18)
+    return report_title.post_title(run_date)
 
 
 def section_headline(a):
