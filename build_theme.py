@@ -774,7 +774,12 @@ def nav_items():
             "          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/{1}&quot;'>\n"
             "            <b:attr cond='data:view.search.label == &quot;{0}&quot;' name='aria-current' value='page'/>{2}</a>".format(label, quote(label), name)
         )
+    # 시총 TOP 10 목록 고정 페이지 (experiments/stock-radar/universe.LIST_SLUG, 2026-10-18 첫 발행) — 라벨 목록이 아니라 페이지 주소
+    out.append("          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;p/{0}.html&quot;'>{1}</a>".format(TOP10_SLUG, TOP10_NAME))
     return "\n".join(out)
+
+
+TOP10_SLUG, TOP10_NAME = "us-market-cap-top10", "시총 TOP 10"
 
 
 def blog_includables(backup_path="index.indie-backup.html"):

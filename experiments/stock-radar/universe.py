@@ -67,7 +67,8 @@ TITLE_NAME = {"GOOGL": "구글 알파벳"}   # 이름의 괄호(알파벳(구글
 def page_title(sym):
     """제목 = 검색어(이름 · 티커 · 주가) + 페이지에 실제로 있는 것(실적 일정). 괄호 없이 `테슬라 TSLA 주가` — 엔비디아 글 제목과 같게 (2026-10-18 사용자).
     테마가 `티커 주가` 에서 티커를 읽어 로고를 단다."""
-    return f"{TITLE_NAME.get(sym, name(sym))} {sym} 주가 · 실적 일정"
+    nm = TITLE_NAME.get(sym, name(sym))
+    return f"{sym} 주가 · 실적 일정" if nm == sym else f"{nm} {sym} 주가 · 실적 일정"   # AMD 처럼 이름 = 티커면 한 번만 (2026-10-18)
 
 
 def slug_title(sym):

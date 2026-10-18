@@ -120,6 +120,20 @@ jobs:
           # 게시는 아래 별도 단계에서 — 가격 그래프 PNG가 gh-pages에 먼저 올라가 있어야 글의 <img>가 깨지지 않는다 (2026-10-11)
           python experiments/nvda-report/main.py $ARGS
 
+      # 시총 TOP 10 고정 페이지 20개 (experiments/stock-radar, 2026-10-18 첫 발행). 엔비디아 DB(일정) · 그래프 코드를 같이 쓰므로 이 실행 안에서 돈다.
+      # 이어서 쌓는 파일(뉴스 분류 · 변동성 이력 · 순위 교체 상태)만 nvda-state 의 radar/ 에 둔다. 일봉 snapshot 은 매번 새로 받는다.
+      # 실패해도 엔비디아 글은 나간다 (continue-on-error).
+      - name: Run stock radar (시총 TOP 10 pages)
+        continue-on-error: true
+        run: |
+          mkdir -p experiments/stock-radar/data
+          if [ -d "$STATE_DIR/radar" ]; then cp "$STATE_DIR"/radar/*.json experiments/stock-radar/data/ 2>/dev/null || true; fi
+          python experiments/stock-radar/main.py
+          mkdir -p "$STATE_DIR/radar"
+          for f in news.json iv_history.json history.json rank_state.json; do
+            [ -f "experiments/stock-radar/data/$f" ] && cp "experiments/stock-radar/data/$f" "$STATE_DIR/radar/$f"
+          done
+
       # ① 아래 가격 그래프 (chart_price.py → output/images/nvda-price-{day}.png). daily-report 커버 이미지와 같은 경로
       - name: Prepare chart image for deploy
         run: |
@@ -129,6 +143,10 @@ jobs:
             ls -la deploy/images/
           else
             echo "::warning::가격 그래프가 없습니다 — 글은 그래프 없이 나간다."
+          fi
+          # 시총 TOP 10 종목 그래프 (고정 이름 radar-<slug>-price.png — 매일 덮어쓴다)
+          if compgen -G "experiments/stock-radar/output/images/radar-*.png" > /dev/null; then
+            cp experiments/stock-radar/output/images/radar-*.png deploy/images/
           fi
 
       - name: Deploy chart image to gh-pages branch
@@ -159,6 +177,16 @@ jobs:
             echo "그림자 모드 — 게시하지 않는다. (스케줄 게시는 저장소 변수 NVDA_PUBLISH=true 로 켠다)"
             python experiments/nvda-report/publish.py
           fi
+
+      # 시총 TOP 10 페이지 갱신 — 엔비디아 글 뒤(목록의 엔비디아 링크 = 오늘 글 post_url.txt). 그래프는 이름이 고정이라 jsDelivr 캐시를 먼저 비운다.
+      - name: Publish stock pages (시총 TOP 10)
+        if: env.DO_PUBLISH == 'true'
+        continue-on-error: true
+        run: |
+          for f in experiments/stock-radar/output/images/radar-*.png; do
+            [ -f "$f" ] && curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/$(basename "$f")" || true
+          done
+          python experiments/stock-radar/publish_pages.py
 
       # 판정까지 끝난 상태가 있으면 뒤 단계가 실패했어도 저장한다 — Gemini 분류를 헛되게 하지 않기 위해.
       - name: Save state + report (nvda-state branch)

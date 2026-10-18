@@ -499,7 +499,8 @@ body.menu-open { overflow: hidden; }
   color: var(--gray-600);
 }
 
-.stock-cell { display: flex; align-items: center; gap: 10px; }
+.stock-cell { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; }   /* 종목 상세 링크 (2026-10-18) */
+a.stock-cell:hover .stock-name { text-decoration: underline; }
 .stock-avatar {
   display: flex; align-items: center; justify-content: center;
   width: 26px; height: 26px; flex: none;
@@ -1331,6 +1332,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             <b:attr cond='data:view.search.label == &quot;트럼프 트렌드&quot;' name='aria-current' value='page'/>트럼프 SNS 트렌드</a>
           <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84&quot;'>
             <b:attr cond='data:view.search.label == &quot;엔비디아&quot;' name='aria-current' value='page'/>엔비디아 리포트</a>
+          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;p/us-market-cap-top10.html&quot;'>시총 TOP 10</a>
         </nav>
       </div>
 
@@ -2198,6 +2200,20 @@ body.no-dashboard .main-content { padding-top: 32px; }
           JPM:    { name: 'JP모간 체이스',    sector: '은행',              color: '#7A5EA8' }   /* 옛 data.json 용 */
         };
 
+        /* 종목 상세 주소 — experiments/stock-radar/universe.py CANDIDATES 의 slug (한 번 정하면 바꾸지 않는 주소) */
+        var PAGE_SLUG = { AAPL: 'apple-aapl-stock', GOOGL: 'alphabet-googl-stock', MSFT: 'microsoft-msft-stock', AMZN: 'amazon-amzn-stock',
+          META: 'meta-stock', AVGO: 'broadcom-avgo-stock', TSLA: 'tesla-tsla-stock', 'BRK-B': 'berkshire-hathaway-brk-b-stock', LLY: 'eli-lilly-lly-stock',
+          MU: 'micron-mu-stock', WMT: 'walmart-wmt-stock', JPM: 'jpmorgan-jpm-stock', AMD: 'amd-stock', V: 'visa-v-stock', XOM: 'exxonmobil-xom-stock',
+          JNJ: 'johnson-johnson-jnj-stock', MA: 'mastercard-ma-stock', ABBV: 'abbvie-abbv-stock', INTC: 'intel-intc-stock' };
+        var BLOG_HOME = 'https://alpha-scope.blogspot.com/';
+        function pageFor(ticker) {
+          if (ticker === 'NVDA') {
+            var nv = document.getElementById('nvda-card');
+            return (nv && nv.href && nv.href.indexOf('/20') > 0) ? nv.href : BLOG_HOME + 'search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84';
+          }
+          return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
+        }
+
         function metaFor(ticker) {
           return META[ticker] || { name: ticker, sector: '—', color: '#94A3B8' };
         }
@@ -2307,7 +2323,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
             /* 종목명 */
             var tdName = el('td', 'col-name');
-            var cell = el('div', 'stock-cell');
+            /* 종목 이름을 누르면 상세로 (2026-10-18 종목 페이지 첫 발행) — 엔비디아는 홈 엔비디아 카드가 가리키는 최신 리포트, 나머지는 시총 TOP 10 고정 페이지 */
+            var cell = el('a', 'stock-cell');
+            cell.href = pageFor(s.s);
             /* 티커 로고 (2026-10-14 사용자) — 처음부터 아바타 안에 둔다. 못 받으면 머리글자 원.
                예전엔 화면 밖 lazy 이미지의 onload 를 기다렸는데, 문서에 붙지 않은 lazy 이미지는 크롬이 불러오지 않아 늘 머리글자만 보였다 */
             var av = el('span', 'stock-avatar');
