@@ -26,6 +26,8 @@ import json
 import os
 import sys
 
+import daily_view
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 STATE_DIR = os.path.join(OUTPUT_DIR, "state")
@@ -607,6 +609,8 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "symbols": symbols,
         "raw": raw,
     }
+    # 재설계 계산 (2026-10-18, doc/데일리-리포트-기획.md 6절) — 평소 범위 · 충격 · 한국 연결 · 환율 · 일정
+    analysis.update(daily_view.build(raw, closes, series))
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:

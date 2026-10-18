@@ -27,6 +27,8 @@ import sys
 from dotenv import load_dotenv
 
 import analyze
+import chart_spx
+import collect_calendar
 import collect_fred
 import collect_news
 import collect_yahoo
@@ -62,6 +64,11 @@ def collect():
     macro = collect_fred.collect_fred()
     yahoo = collect_yahoo.collect_yahoo()
     news = collect_news.collect_news()
+    try:   # 일정 탭 (D5) — 실패해도 리포트는 나간다
+        calendar = collect_calendar.collect_calendar()
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::일정 수집 실패: {e!r}")
+        calendar = None
 
     today = report_title.today_kst()
     input_data = {
@@ -74,6 +81,7 @@ def collect():
         "gainers": yahoo["gainers"],
         "most_active": yahoo["most_active"],
         "news": news,
+        "calendar": calendar,
     }
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -111,6 +119,23 @@ def run_analysis():
         print(f"::warning::분석 실패 (리포트는 계속 진행): {e!r}")
         if os.path.exists(ANALYSIS_PATH):
             os.remove(ANALYSIS_PATH)
+        return None
+
+
+def make_chart(input_data):
+    """S&P 500 가격 그래프 (탭 위, 2026-10-18 사용자). 어제 그림이 오늘 글에 붙지 않게 먼저 지운다. 실패해도 리포트는 그래프 없이 나간다."""
+    for name in ("chart.json", "chart_ref.txt"):
+        path = os.path.join(OUTPUT_DIR, name)
+        if os.path.exists(path):
+            os.remove(path)
+    as_of = None
+    if os.path.exists(ANALYSIS_PATH):
+        with open(ANALYSIS_PATH, "r", encoding="utf-8") as f:
+            as_of = json.load(f).get("as_of")
+    try:
+        return chart_spx.run(input_data["date"], as_of=as_of, output_dir=OUTPUT_DIR)
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::그래프 실패 — 그래프 없이 렌더: {e!r}")
         return None
 
 
@@ -164,6 +189,7 @@ def main():
     print("=" * 50)
     validate_report.validate(INPUT_PATH, REPORT_PATH, analysis_path=analysis_path)
 
+    make_chart(input_data)
     image_ok, cover_url = make_cover(input_data)
     if should_publish and not image_ok:
         print("[게시 중단] 커버 이미지 생성 실패. 이미지 없이 게시하지 않습니다.")

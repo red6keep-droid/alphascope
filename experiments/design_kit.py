@@ -56,6 +56,7 @@ NEW_PILL = ('<span style="display:inline-block;background:#B91C1C;color:#fff;bor
 WRAP_OPEN = ('<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;'
              f'font-size:{BODY};line-height:{LH_BODY};color:#333;">')   # 본문 행간 34px — 카드는 각자 LH_CARD 24px 를 단다 (2026-10-12 사용자)
 WRAP_CLOSE = "</div>"
+SEO_LEAD = f"font-size:{BODY};line-height:{LH_BODY};color:#333;margin:0 0 12px;word-break:keep-all;"   # 글 맨 앞 요약 p[data-seo-lead] — 본문과 같은 19px · 행간 34 (2026-10-18 사용자: "이 문장은 폰트 사이즈가 다른데", 16px 이던 것). 모든 리포트 · 종목 페이지 공통
 _ISO_DAY = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 _PAREN = re.compile(r"\s*(\([^()]*\))")
 
@@ -346,6 +347,107 @@ def _sign_text(t, color):
     return _CHANGE.sub(lambda m: paint("+" if m.group(4) else "−", m.group(1), m.group(2)) + m.group(3), t)
 
 
+# ---------------------------------------------------------------- 합니다체 (2026-10-18 사용자: "반말 문장은 -했습니다 · -입니다로, 엔비디아 · 종목 페이지 모두")
+# 문장 끝 "…다" 만 바꾼다 — 끝 = 마침표 · 줄바꿈 · 글 끝 앞(괄호 덧붙임은 건너뜀). "S&P 500보다 " 같은 문장 중간 "다" 는 그대로.
+_FINAL_DA = re.compile(r"([가-힣]+)다(?=(?:\([^()<>]*\))?(?:\.|\n|$|<))")
+_IRREG = {"아니": "아닙니다", "다르": "다릅니다", "크": "큽니다", "빠르": "빠릅니다", "느리": "느립니다", "이르": "이릅니다", "모르": "모릅니다", "보": None, "마": None}
+
+
+def _jong(ch):
+    return (ord(ch) - 0xAC00) % 28 if "가" <= ch <= "힣" else -1
+
+
+def _with_jong(ch, j):
+    return chr(ord(ch) - _jong(ch) + j)
+
+
+def _formal_word(w):
+    """`…다` 앞 낱말 w → 합니다체 꼬리. None 이면 바꾸지 않는다."""
+    if w.endswith("니") and len(w) >= 2 and _jong(w[-2]) == 17 or w.endswith("습니"):   # 이미 합니다체 (없습니다 · 합니다 · 입니다)
+        return None
+    for k, v in _IRREG.items():
+        if w.endswith(k) and (len(w) == len(k) or k not in ("크", "보", "마")):
+            return None if v is None else w[: -len(k)] + v
+    x = w[-1]
+    if w.endswith("는"):                       # 받는다 · 않는다 → 받습니다 · 않습니다
+        return w[:-1] + "습니다"
+    if x == "이":                              # …이다 → …입니다
+        return w[:-1] + "입니다"
+    j = _jong(x)
+    if j == 4:                                 # ㄴ받침 현재형 : 한다 · 된다 · 만든다 → 합니다 · 됩니다 · 만듭니다
+        return w[:-1] + _with_jong(x, 17) + "니다"
+    if j > 0:                                  # 했다 · 있다 · 같다 · 없다 → …습니다
+        return w + "습니다"
+    if x == "하":                              # 비슷하다 → 비슷합니다
+        return w[:-1] + "합니다"
+    return w + "입니다"                        # 받침 없는 이름씨 + 다 : 회사다 · 날짜다 → 회사입니다 · 날짜입니다
+
+
+def _formal_text(s):
+    return _FINAL_DA.sub(lambda m: (_formal_word(m.group(1)) or m.group(1) + "다"), s)
+
+
+# ---------------------------------------------------------------- 뉴스 · 중요 이슈 = 명사형 헤드라인체 (2026-10-18 사용자: "원래 이슈와 뉴스 문체는 다 로 끝나지 않았다 — 데일리 확인")
+# 분류 프롬프트가 헤드라인체로 쓰게 했고, 이미 저장된 "-했다." 사실 문장은 화면에 낼 때 여기서 바꾼다(안전망). 모르는 끝말은 마침표만 뺀다.
+_HEAD_WORD = {"말했다": "발언", "밝혔다": "발표", "늘었다": "증가", "줄었다": "감소", "올랐다": "상승", "내렸다": "하락", "떨어졌다": "하락",
+              "넘었다": "돌파", "밑돌았다": "하회", "웃돌았다": "상회", "알려졌다": "알려짐", "밝혀졌다": "밝혀짐", "나왔다": "나옴", "받았다": "받음",
+              "보였다": "보임", "있다": "있음", "없다": "없음", "않았다": "않음", "않는다": "않음", "같다": "같음", "높였다": "상향", "낮췄다": "하향",
+              "올렸다": "상향", "내놓았다": "공개", "내놨다": "공개", "세웠다": "수립", "맺었다": "체결", "잡았다": "확보", "얻었다": "확보", "섰다": "진입"}
+_HEAD_RULES = [(re.compile(r"할 예정이다$"), " 예정"), (re.compile(r"(?:되고|하고) 있다$"), " 중"), (re.compile(r"(?:하였|했|되었|됐|한|된)다$"), ""),
+               (re.compile(r"(?:이었|였|이)다$"), ""), (re.compile(r"(?<=[가-힣])다$"), "")]
+
+
+def headline(text):
+    """사실 문장 → 명사형 헤드라인 (`…를 공식 출시했다.` → `…를 공식 출시`). 이미 헤드라인이면 그대로."""
+    if not text:
+        return text
+    s = text.strip().rstrip(".").rstrip()
+    for rx, rep in _HEAD_RULES[:2]:   # `할 예정이다` · `-고 있다` 가 낱말 표(있다 → 있음)보다 먼저
+        if rx.search(s):
+            return rx.sub(rep, s)
+    last = s.rsplit(" ", 1)[-1]
+    if last in _HEAD_WORD:
+        return s[: len(s) - len(last)] + _HEAD_WORD[last]
+    for rx, rep in _HEAD_RULES:
+        if rx.search(s):
+            out = rx.sub(rep, s)
+            if rx.pattern == r"(?<=[가-힣])다$" and not re.search(r"[가-힣]{2,}$", out):
+                break
+            return out
+    return s
+
+
+TONE_OFF, TONE_ON = "<!--tone:off-->", "<!--tone:on-->"   # 이 사이는 문체를 바꾸지 않는다 — 뉴스 · 중요 이슈 (2026-10-18 사용자: "뉴스와 중요 이슈는 원복")
+
+
+def keep_tone(html):
+    """뉴스 · 중요 이슈처럼 원래 문체(사실 문장 · 요약 헤드라인)를 그대로 두는 구획을 감싼다."""
+    return TONE_OFF + html + TONE_ON if html else html
+
+
+def formal(html):
+    """보이는 글과 툴팁 속성의 반말 문장 끝을 합니다체로 (엔비디아 리포트 · 종목 페이지 build 마지막에 한 번). style · script 안 · keep_tone 구획은 건드리지 않는다."""
+    out, skip, off = [], False, False
+    for part in _TAG.split(html):
+        if part == TONE_OFF or part == TONE_ON:
+            off = part == TONE_OFF
+            continue   # 표시는 결과에 남기지 않는다
+        if off:
+            out.append(part)
+            continue
+        if part.startswith("<") and part.endswith(">"):
+            low = part[:8].lower()
+            if low.startswith(("<script", "<style")):
+                skip = True
+            elif low.startswith(("</script", "</style")):
+                skip = False
+            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _formal_text(m.group(2).replace("&#10;", "\n")).replace("\n", "&#10;") + m.group(3)
+                                     if "&#10;" in m.group(2) else m.group(1) + _formal_text(m.group(2)) + m.group(3), part))
+        else:
+            out.append(part if skip else _formal_text(part))
+    return "".join(out)
+
+
 def fix_colons(html):
     """보이는 글의 ":" · "·" 는 앞뒤를 한 칸씩 띄운다 ("·" 는 2026-10-13 사용자) — "라벨 : 값" (2026-10-11 사용자: 꼭 반드시, 모든 페이지 일괄).
     글자 노드와 툴팁·제목 속성(data-tip · title · aria-label)만 고친다. style · script 안, 시각·비율(숫자:숫자), 주소(://)는 건드리지 않는다.
@@ -392,10 +494,15 @@ def write_mock(body, path, title):
     if not (css and js):
         return None
     body = re.sub(r"https://cdn\.jsdelivr\.net/gh/[^\"]+?@gh-pages/(images/[^\"]+)", r"\1", body)
+    # 글 아래 [목록] · TOP 줄 — 블로그 테마의 글 보기와 같은 마크업 (2026-10-18 사용자: 모든 페이지 공통). 목록 주소는 본문 [data-list-url] 이 있으면 그것
+    lu = re.search(r'data-list-url="([^"]+)"', body)
+    nav = (f'<p class="post-nav"><a class="post-nav-list" href="{lu.group(1) if lu else "#"}">목록</a>'
+           '<button aria-label="맨 위로" class="post-nav-top" type="button">TOP<svg aria-hidden="true" fill="none" height="22" stroke="currentColor" stroke-linecap="round" '
+           'stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 22 22" width="22"><circle cx="11" cy="11" r="10"/><path d="M11 15.5V7M7.5 10.5 11 7l3.5 3.5"/></svg></button></p>')
     page = ('<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<title>{esc(title)} — 목업</title><style>{css.group(1)}</style></head>'
             '<body class="item-view no-dashboard"><main class="main-content"><div class="post-shell"><article class="post-outer-container"><div class="post">'
-            f'<h3 class="post-title">{esc(title)}</h3><div class="post-body entry-content">{body}</div></div></article></div></main>'
+            f'<h3 class="post-title">{esc(title)}</h3><div class="post-body entry-content">{body}</div></div></article>{nav}</div></main>'
             f'<script>{js.group(1)}</script></body></html>')
     with open(path, "w", encoding="utf-8") as f:
         f.write(page)

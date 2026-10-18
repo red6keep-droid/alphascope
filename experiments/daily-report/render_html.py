@@ -15,6 +15,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import design_kit as dk  # noqa: E402  — 디자인-가이드라인.md 공통 조각 (2026-10-11)
+import cards  # noqa: E402  — 질문 카드 · 막대 그래프 (2026-10-18 재설계)
+import sections as sx  # noqa: E402  — 독자 질문 D1 ~ D6 · K1 ~ K3 구획 (doc/데일리-리포트-기획.md 6절)
 
 TEMPLATE_FILE = os.path.join(os.path.dirname(__file__), "templates", "report.html")
 
@@ -42,6 +44,7 @@ THEME_VOCAB = ["금리", "AI/반도체", "실적", "매크로", "에너지", "�
 
 # 뉴스 '관련 자산' 줄에서 심볼 대신 보여줄 이름
 SYMBOL_NAMES = {
+    **sx.MEGA_KO, "^SOX": "미국 반도체 지수", "KRW=X": "원/달러",
     "^GSPC": "S&P 500", "^IXIC": "나스닥", "^DJI": "다우", "^RUT": "러셀 2000",
     "^VIX": "VIX", "^TNX": "미국 10년물 금리", "^FVX": "미국 5년물 금리", "^IRX": "미국 3개월물 금리",
 }
@@ -58,6 +61,7 @@ TERM_KO = {"위험선호(Risk-On)": "위험 선호", "위험회피(Risk-Off)": "
            "Risk-On": "위험 선호", "Risk-Off": "위험 회피", "Risk On": "위험 선호", "Risk Off": "위험 회피", "Neutral": "중립",
            "Nasdaq": "나스닥", "Dow Jones": "다우존스", "Dow": "다우", "Russell 2000": "러셀 2000", "Market Regime": "시장 상태"}
 TAB_TODAY, TAB_MARKET, TAB_STOCKS, TAB_RISK = "오늘", "시장", "종목 · 뉴스", "위험"   # "·" 앞뒤 띄우기 (2026-10-13 사용자)
+TAB_KOREA, TAB_CAL = "한국장", "일정"   # 2026-10-18 재설계: 오늘 · 한국장 · 시장 · 일정 (종목 · 뉴스 · 위험 탭은 없앰 — 기획 6절)
 
 # report_input.json의 지수 키 → analysis.json series의 심볼 (analyze.INDEX_SYMBOL과 동일)
 INDEX_SYMBOL = {
@@ -213,6 +217,26 @@ def _korean_date(date_str):
         return f"{int(y)}년 {int(m)}월 {int(d)}일"
     except Exception:
         return str(date_str)
+
+
+ZOOM_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'
+             '<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg>')
+
+
+def sec_chart(output_dir):
+    """S&P 500 가격 그래프 — 본문 맨 앞, 탭 줄 위 (2026-10-18 사용자: "다른 리포트처럼 상단에, 클릭하면 새 창"). 엔비디아 sec_chart 와 같은 모양.
+    data-zoom: 테마 JS 가 전체 화면 팝업 + 가로 스크롤로 연다(가이드 8절), JS 없으면 원본 링크 새 창. chart.json 이 없으면 빈 문자열."""
+    path = os.path.join(output_dir or "", "chart.json")
+    if not output_dir or not os.path.exists(path):
+        return ""
+    with open(path, encoding="utf-8") as f:
+        c = json.load(f)
+    url = _esc(c["url"])
+    return (f'<a href="{url}" data-zoom="1" target="_blank" rel="noopener" title="그래프 확대 보기" aria-label="그래프 확대 보기" '
+            f'style="position:relative;display:block;margin:0 0 16px;max-width:1024px;">'
+            f'<img src="{url}" alt="S&amp;P 500 {c.get("window", 30)}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'
+            f'<span style="position:absolute;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
+            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{ZOOM_ICON}</span></a>')
 
 
 def _cover_image(cover_url):
@@ -437,17 +461,19 @@ def sec_seo_lead(input_data, analysis):
     indices = (input_data.get("market") or {}).get("indices") or {}
     chg = [f"{name} {float(indices[k]['change_pct']):+.2f}%" for k, name in SEO_INDICES
            if (indices.get(k) or {}).get("change_pct") is not None]
-    regime = a.get("regime") or {}
-    score, grade = regime.get("score"), SEO_GRADE.get(regime.get("label") or "")
     sents = []
     if chg:
         sents.append(f"{day}미국 증시는 " + " · ".join(chg) + "로 마감했습니다.")
-    if score is not None:
-        tail = f"{int(score)}점, {grade}입니다." if grade else f"{int(score)}점입니다."
-        sents.append(("" if chg else f"{day}미국 증시의 ") + "시장 점수는 " + tail)
+    nr = (a.get("normal") or {})
+    outs = [sx.INDEX_NAME[k] for k in ("^GSPC", "^IXIC", "^DJI") if (nr.get(k) or {}).get("outside")]
+    if nr.get("^GSPC"):   # 점수 대신 평소 범위 (2026-10-18 재설계 — 점수는 앞날을 가르지 못했다)
+        sents.append((sx.eun(" · ".join(outs)) + " 평소 하루 움직임의 범위를 벗어났습니다.") if outs else "주요 지수는 모두 평소 하루 움직임의 범위 안이었습니다.")
+    k = sx.seo_korea(a)   # 코스피 영향 한 문장 — 검색어 "코스피 영향" (2026-10-18 사용자)
+    if k:
+        sents.append(k)
     if not sents:
         return ""
-    return ('<p data-seo-lead="1" style="font-size:16px;line-height:24px;color:#333;margin:0 0 12px;word-break:keep-all;">'
+    return (f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">'
             + _esc(" ".join(sents)) + "</p>")
 
 
@@ -587,8 +613,8 @@ def sec_breadth(analysis, prev=None):
     light = (b.get("label") or "")[:1]
     grade = (b.get("label") or "")[1:].strip()
     explain = breadth_tip(b)   # 등급 설명은 본문 글머리표 대신 `안내 ?` (점수 카드와 같게, 2026-10-13 사용자) · 뜻 · 오늘 · 나누는 법 (가이드라인 2-6)
-    ratio_card = dk.state_card("상승 비율" + dk.tip_icon(explain), LIGHT_KIND.get(light, "neutral"),
-                               _light_pill(light, grade or None) + f' {b["ratio"]:.1f}%', chev=True)   # 따로 카드, 배경은 등급 색 (2026-10-12 사용자) · 라벨이 비율 앞 (2026-10-13 사용자)
+    ratio_card = dk.state_card("상승 비율" + dk.tip_icon(explain), "neutral",   # 신호 색 없음 (2026-10-18 재설계 B5 — 등급이 앞날을 가르지 못했다)
+                               dk.pill(grade, "area").replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 {dk.PILL_GAP + 5}px 0 {dk.PILL_GAP}px;", 1) + f' {b["ratio"]:.1f}%' if grade else f'{b["ratio"]:.1f}%', chev=True)   # 따로 카드, 배경은 등급 색 (2026-10-12 사용자) · 라벨이 비율 앞 (2026-10-13 사용자)
     pb = (prev or {}).get("breadth") or {}
     rows = []
     if pb.get("ratio") is not None:
@@ -741,7 +767,7 @@ def sec_news(input_data, report, analysis):
     """뉴스 — 글 항목 카드(2026-10-12 사용자: 카드 형식으로): 테마 라벨 · 제목(글자) + 링크 아이콘, 보조 줄 관련 자산 반응 · 선정 이유 (14px)."""
     series = (analysis or {}).get("series") or {}
     rates = (analysis or {}).get("rates") or {}
-    quotes = {q["symbol"]: q for q in input_data.get("gainers", []) + input_data.get("most_active", []) if q.get("symbol")}
+    quotes = {q["symbol"]: q for q in input_data.get("gainers", []) + input_data.get("most_active", []) if q.get("symbol")}   # 옛 입력용 (2026-10-18 부터 빈 목록)
     known = set(series) | set(quotes)
 
     def reaction(sym):
@@ -833,47 +859,49 @@ def sec_status(analysis, report, prev=None):
     return risk_ul + overall_card + dk.rule_rows(rows)   # 신호 줄은 흰 카드 대신 가로 구분선 (2026-10-13 사용자)   # 글 먼저, 강조 카드 (2026-10-12 사용자), 소제목 없음 — 구획 제목이 '주의할 위험요인'   # 판정 규칙은 제목 옆 ? 툴팁 (가이드라인 2-1 상태 카드 규칙)
 
 
-def sec_footer(input_data):
-    return dk.footer(
-        f"데이터 수집(FRED · Yahoo Finance · CNBC)과 파이썬 계산, AI 해설(Gemini)을 자동으로 결합해 만든 글입니다. "
-        f"기준일 {_esc(dk.day(input_data.get('date')))} · 데이터 갱신 {_esc(input_data.get('updated_at') or '')}.",
-        "시장 상태 점수와 신호등은 규칙 기반 계산값이며 투자 판단의 근거로 활용하지 마십시오. 투자 권고가 아닙니다.", indent=False)   # 위 신호 줄과 같은 왼쪽 선 (2026-10-13 사용자)
-
-
-def build_body(input_data, report, cover_url=None, analysis=None):
-    """구획 제목은 짧은 명사 (가이드라인 2절). 홈 카드 CARDS: summary = (머리)·주요 지수, insight = (종합) — 머리 카드의 data-insight, picks = 급등주.
-    종합은 따로 구획을 두지 않고 머리 카드 구분선 아래 (2026-10-12 사용자)."""
+def build_body(input_data, report, cover_url=None, analysis=None, output_dir=None):
+    """2026-10-18 재설계 (doc/데일리-리포트-기획.md 6절) — 탭 = 독자 질문 묶음.
+    오늘(D1 · D2 · D3 · D6) · 한국장(K1 · K2 · K3) · 시장(D4) · 일정(D5). 시장 상태 점수 · 신호등 · 급등주 · 거래 상위 · 위험요인은 뺐다 (5절 B5 · B6).
+    홈 카드 CARDS: summary = (머리), insight = (종합) — 머리 카드의 data-insight 그대로."""
     indices = input_data.get("market", {}).get("indices", {})
     prev = _prev_analysis(analysis)   # 어제 대비 (2026-10-13 사용자)
+    a = analysis or {}
     parts = [
         dk.WRAP_OPEN,
         sec_seo_lead(input_data, analysis),   # 검색 결과 요약 — 보이는 첫 요소, data-lead 보다 앞 (2026-10-18)
-        _cover_image(cover_url),
+        # S&P 500 그래프가 커버 이미지 자리 (2026-10-18 사용자, 엔비디아처럼). 그래프가 없는 날만 AI 커버
+        sec_chart(output_dir) or _cover_image(cover_url),
         sec_lead(report, analysis),
-        dk.section("시장 상태", sec_regime(analysis, report, prev), tab=TAB_TODAY, one_line=True,
-                   aside=dk.tip_line([("점수 0~100", regime_rule((analysis or {}).get("regime")))], in_title=True)),   # 계산 규칙은 ? 툴팁 (2026-10-11 일괄 적용)
-        dk.section("주요 지수", sec_indices(indices, analysis, report), tab=TAB_TODAY),
     ]
-    change = sec_change(analysis, report, prev)
-    if change:
-        parts.append(dk.section("달라진 것", change, tab=TAB_TODAY))
+    today_cards = sx.normal_card(a) + sx.shock_card(a) + sx.market_now_card(a)
+    if today_cards:
+        parts.append(dk.section("핵심 질문", cards.cards_grid(today_cards), tab=TAB_TODAY))
+    parts += [
+        dk.section("주요 지수", sec_indices(indices, analysis, report), tab=TAB_TODAY),
+        dk.keep_tone(dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_TODAY)),   # 뉴스는 헤드라인체 그대로 (2026-10-18 사용자)
+    ]
+    korea = sx.korea_open_card(a) + sx.korea_pairs_card(a) + sx.fx_card(a)
+    if korea:
+        parts.append(dk.section(TAB_KOREA, cards.cards_grid(korea), tab=TAB_KOREA))   # 탭 이름과 같은 구획 제목은 테마가 탭 화면에서 숨긴다
+    mega = sx.mega_rows(a)
+    if mega:
+        parts.append(dk.section("대형주", _folded(mega, "종목"), summary="평소 범위 기준 크게 움직인 순", tab=TAB_MARKET,
+                                aside=dk.tip_line([("읽는 법", sx.mega_tip(a))], in_title=True)))
     breadth = sec_breadth(analysis, prev)
     if breadth:
-        parts.append(dk.section(TAB_MARKET, breadth, tab=TAB_MARKET))   # 제목 삭제 — 탭 이름과 같은 구획 제목은 테마가 숨긴다 (2026-10-12 사용자)
+        parts.append(dk.section("시장 폭", breadth, tab=TAB_MARKET))
+    change = sec_change(analysis, report, prev)
+    if change:
+        parts.append(dk.section("달라진 것", change, tab=TAB_MARKET))
     sectors = sec_sectors(analysis, report)
     if sectors:
         parts.append(dk.section("섹터", sectors, summary="1일 등락률", tab=TAB_MARKET))
-    parts += [
-        dk.section("금리·지표", sec_macro(input_data.get("macro", {}), analysis, report), tab=TAB_MARKET),
-        dk.section("급등주", _text(report.get("gainers_comment")) + _quote_rows(input_data.get("gainers", [])), summary="상위 5", tab=TAB_STOCKS),
-        dk.section("관심 종목", _text(report.get("attention_comment")) + _quote_rows(input_data.get("most_active", [])), summary="거래 상위 5", tab=TAB_STOCKS),
-        dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_STOCKS),
-        dk.section("주의 위험요인", sec_status(analysis, report, prev), tab=TAB_RISK, one_line=True,
-                   aside=dk.tip_line([("판정", risk_rule((analysis or {}).get("status")))], in_title=True)),   # 판정 규칙은 ? 툴팁 (안내 줄에서 옮김)
-        sec_footer(input_data),
-        dk.WRAP_CLOSE,
-    ]
-    return dk.fix_colons("\n".join(p for p in parts if p))   # 카드 → 구분선(as_rules)은 같은 날 원복 — 카드 스타일 (2026-10-13 사용자)   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지)
+    parts.append(dk.section("금리·지표", sec_macro(input_data.get("macro", {}), analysis, report), tab=TAB_MARKET))
+    if a.get("calendar"):
+        parts.append(dk.section(TAB_CAL, cards.cards_grid(sx.macro_cal_card(a) + sx.earnings_cal_card(a)), tab=TAB_CAL))
+    parts.append(dk.WRAP_CLOSE)   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지, 가이드라인 6절)
+    # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지) · 반말 문장 끝은 합니다체 (2026-10-18 사용자: 블로그 기본 문체, 데일리는 재작업 때 일괄 — 지금)
+    return dk.formal(dk.fix_colons("\n".join(p for p in parts if p)))
 
 
 def build_tables(input_data, report, cover_url=None, analysis=None):
@@ -898,7 +926,7 @@ def render(input_path, report_path, output_dir, cover_url=None, analysis_path=No
     else:
         print("analysis.json 없음 — 지수 표 3열, '무엇이 달라졌나' 생략")
 
-    body = build_body(input_data, report, cover_url=cover_url, analysis=analysis)   # 템플릿 대신 코드로 (2026-10-11 디자인 가이드라인)
+    body = build_body(input_data, report, cover_url=cover_url, analysis=analysis, output_dir=output_dir)   # 템플릿 대신 코드로 (2026-10-11 디자인 가이드라인)
 
     body_path = os.path.join(output_dir, "report_body.html")
     preview_path = os.path.join(output_dir, "report.html")

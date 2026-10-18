@@ -96,13 +96,19 @@ jobs:
           mkdir -p deploy/images
           if compgen -G "experiments/daily-report/output/images/*.webp" > /dev/null; then
             cp experiments/daily-report/output/images/*.webp deploy/images/
-            ls -la deploy/images/
           else
             echo "::warning::생성된 커버 이미지가 없습니다."
           fi
+          # S&P 500 가격 그래프 (chart_spx.py, 2026-10-18)
+          if compgen -G "experiments/daily-report/output/images/*.png" > /dev/null; then
+            cp experiments/daily-report/output/images/*.png deploy/images/
+          else
+            echo "::warning::S&P 500 그래프가 없습니다 (글은 커버 이미지로 나갑니다)."
+          fi
+          ls -la deploy/images/ || true
 
       - name: Deploy cover image to gh-pages branch
-        if: hashFiles('deploy/images/*.webp') != ''
+        if: hashFiles('deploy/images/*.webp') != '' || hashFiles('deploy/images/*.png') != ''
         uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -121,6 +127,12 @@ jobs:
           sleep 5
           curl -sS -f -o /dev/null "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}"
           echo "커버 이미지 CDN 확인 완료: ${IMAGE_REF}"
+          # S&P 500 그래프 — 확인 실패는 경고만 (글은 그래프 자리가 빈 채로 나가지 않게 publish_saved 가 다시 본다)
+          CHART_REF=$(cat experiments/daily-report/output/chart_ref.txt 2>/dev/null || true)
+          if [ -n "$CHART_REF" ]; then
+            curl -sS "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${CHART_REF}" || true
+            curl -sS -f -o /dev/null "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${CHART_REF}" && echo "그래프 CDN 확인 완료: ${CHART_REF}" || echo "::warning::그래프 CDN 확인 실패: ${CHART_REF}"
+          fi
 
       # 스케줄 실행(외부 cron 포함)은 자동 게시. 수동 실행은 publish 체크 시에만 게시.
       # publish_saved.py는 커버 이미지 URL까지 확인한다.

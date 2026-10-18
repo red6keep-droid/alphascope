@@ -969,7 +969,8 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .rt-pop[hidden] { display: none; }
 .rt-pop-box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
 /* 팝업 제목 · 닫기는 위에 고정, 내용만 스크롤 (2026-10-13 사용자) */
-.rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색 (2026-10-18 사용자: 툴팁 타이틀 아래 구분선, 이전 #F1F5F9 는 거의 안 보였다) */
+.rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; }
+.rt-pop-head::after { content: ""; position: absolute; left: 20px; right: 12px; bottom: 0; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색 (2026-10-18 사용자). 폭은 제목 왼쪽 선(20px) ~ 닫기 버튼 오른쪽 선(12px)까지 (같은 날 사용자) */
 .rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
 .rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 24px; color: #111; }
 .rt-pop-body { font-size: 19px; font-weight: 400; line-height: 34px; color: #333; word-break: keep-all; }
@@ -2066,10 +2067,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
     </div>
 
     <footer class='site-footer'>
-      <p class='footer-title'>ALPHASCOPE AI 투자 의사 결정 보조 리포트 서비스</p>
+      <!-- 2026-10-18 사용자: "투자 의사 결정 보조" 문구 수정 · 리포트 꼬리말의 출처 · 투자 권유 안내를 이 푸터 하나로 모은다 (Claude 문안).
+           "의사 결정 보조"는 투자 자문처럼 읽히고, "AI 모델의 가공적 연산"은 사실과 다르다(계산은 정해진 규칙). 2026-10-18 밤: AI 해설 문장(데일리 · 엔비디아 · 트럼프 서술)도 있어 "뉴스 분류와 해설 문장"으로 고침, 글마다의 꼬리말은 모두 뺐다 (사용자: 중복 안내 금지) -->
+      <p class='footer-title'>ALPHASCOPE 미국 주식 데이터 리포트</p>
       <p class='footer-disclaimer'>
-        면책사항: ALPHASCOPE 에서 제공하는 모든 분석 데이터 및 지표 스코어는 독자적인 AI 모델 및 알고리즘에 의한 가공적 연산 결과이며,
-        어떠한 경우에도 투자 수익률을 보장하거나 권유하지 않습니다. 최종 투자 의사 결정과 책임은 투자자 본인에게 있습니다.
+        면책 사항 : ALPHASCOPE 의 리포트는 공개된 시장 데이터(Yahoo Finance · SEC 공시 · FRED · 뉴스 RSS 등)를 정해진 규칙으로 계산해 정리한 사실 기록입니다. 숫자는 모두 코드가 계산하고, AI 는 뉴스 분류와 해설 문장에만 씁니다. 지난 기록은 앞으로의 결과를 보장하지 않습니다.
+        특정 종목의 매수 · 매도를 권유하지 않으며 수익을 보장하지 않습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다. 투자 판단과 책임은 투자자 본인에게 있습니다.
       </p>
       <b:section class='attribution' id='footer' name='Footer' showaddelement='false' tag='div'>
         <b:widget id='Attribution1' locked='true' title='' type='Attribution' visible='true'>
@@ -3582,6 +3585,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
         'use strict';
         /* 목록 화면 맨 아래 '더 많은 게시물'(블로그 언어가 영어라 More posts)은 한국어로 */
         [].slice.call(document.querySelectorAll('.blog-pager-older-link')).forEach(function (a) { a.textContent = '글 더 보기'; });
+        /* 목록 버튼이 갈 곳을 본문이 정할 때 (2026-10-18 사용자: 종목 고정 페이지 하단에도 엔비디아 글과 같은 목록 · TOP) —
+           본문의 [data-list-url] 이 있으면 그 주소로. 고정 페이지는 라벨이 없어 테마 기본값(데일리 목록)으로 가던 것을 바로잡는다 */
+        var lu = document.querySelector('.post-body [data-list-url]');
+        if (lu) [].slice.call(document.querySelectorAll('.post-nav-list')).forEach(function (a) { a.href = lu.getAttribute('data-list-url'); });
         [].slice.call(document.querySelectorAll('.post-nav-top')).forEach(function (b) {
           b.addEventListener('click', function () {
             try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }

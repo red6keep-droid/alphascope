@@ -36,6 +36,10 @@ def _load_payload(input_path, analysis_path):
             data = json.load(f)
         if isinstance(data.get("raw"), dict):
             print("[Gemini] 입력: analysis.json (원본 + 분석값)")
+            # 앞날을 가르지 못한 점수 · 신호등 · 내일 체크와 한국 · 일정 기록은 보내지 않는다 — 문장이 등급을 말하거나 한국장을 내다보지 않게 (2026-10-18)
+            for k in ("regime", "status", "watch", "korea", "fx", "calendar", "regime_check", "krw_check"):
+                data.pop(k, None)
+            data["raw"].pop("calendar", None)
             return data
         print("[Gemini] analysis.json에 raw가 없어 원본만 보냅니다.")
     else:

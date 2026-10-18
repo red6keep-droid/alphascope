@@ -34,9 +34,14 @@ HISTORY_UNIVERSE = {
     "theme": ["SMH"],
     "safe": ["TLT", "HYG", "GLD"],
     "rates": ["^TNX", "^FVX", "^IRX"],
+    # 2026-10-18 재설계 (doc/데일리-리포트-기획.md 6절): 대형주 10개 평소 범위(D4) · 한국 짝의 미국 쪽(K2) · 원/달러(K3)
+    "mega": ["NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "JPM"],
+    "link": ["^SOX"],
+    "fx": ["KRW=X"],
 }
 # 50일선과 그 기울기까지 보려면 3개월(약 63거래일)은 빠듯하다.
-HISTORY_PERIOD = "6mo"
+# 평소 범위의 "1년에 몇 번"은 지난 252거래일 z 가 필요해 2년 (2026-10-18)
+HISTORY_PERIOD = "2y"
 # 심볼마다 마지막 행 날짜가 다를 수 있다(^VIX는 다음 날 부분 바가 먼저 붙는다).
 # 이 심볼의 마지막 종가 날짜를 기준일로 삼아 모든 시계열을 거기까지로 자른다.
 HISTORY_ANCHOR = "^GSPC"
@@ -293,9 +298,9 @@ def add_sectors(*quote_lists):
 
 def collect_yahoo():
     indices = collect_indices()
-    gainers = collect_gainers()
-    most_active = collect_most_active()
-    add_sectors(gainers, most_active)
+    # 급등주 · 거래 상위 목록은 2026-10-18 재설계에서 뺐다 — 주목이 이끈 매수는 뒤가 나빴다 (doc/데일리-리포트-기획.md 5절 B6).
+    # 키는 빈 목록으로 남겨 옛 입력을 읽는 코드가 깨지지 않게 한다. 함수(collect_gainers 등)는 되돌릴 때를 위해 둔다
+    gainers, most_active = [], []
     # 시계열은 그림자 모드 분석용이라 실패해도 리포트를 막지 않는다.
     try:
         history = collect_history()

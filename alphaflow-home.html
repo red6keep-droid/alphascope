@@ -1018,10 +1018,12 @@ body.menu-open { overflow: hidden; }
 </div>
 
 <footer class="site-footer">
-  <p class="footer-title">ALPHASCOPE AI 투자 의사 결정 보조 리포트 서비스</p>
+  <!-- 2026-10-18 사용자: "투자 의사 결정 보조" 문구 수정 · 리포트 꼬리말의 출처 · 투자 권유 안내를 이 푸터 하나로 모은다 (Claude 문안).
+       "의사 결정 보조"는 투자 자문처럼 읽히고, "AI 모델의 가공적 연산"은 사실과 다르다(계산은 정해진 규칙). 2026-10-18 밤: AI 해설 문장(데일리 · 엔비디아 · 트럼프 서술)도 있어 "뉴스 분류와 해설 문장"으로 고침, 글마다의 꼬리말은 모두 뺐다 (사용자: 중복 안내 금지) -->
+  <p class="footer-title">ALPHASCOPE 미국 주식 데이터 리포트</p>
   <p class="footer-disclaimer">
-    면책사항: ALPHASCOPE 에서 제공하는 모든 분석 데이터 및 지표 스코어는 독자적인 AI 모델 및 알고리즘에 의한 가공적 연산 결과이며,
-    어떠한 경우에도 투자 수익률을 보장하거나 권유하지 않습니다. 최종 투자 의사 결정과 책임은 투자자 본인에게 있습니다.
+    면책 사항 : ALPHASCOPE 의 리포트는 공개된 시장 데이터(Yahoo Finance · SEC 공시 · FRED · 뉴스 RSS 등)를 정해진 규칙으로 계산해 정리한 사실 기록입니다. 숫자는 모두 코드가 계산하고, AI 는 뉴스 분류와 해설 문장에만 씁니다. 지난 기록은 앞으로의 결과를 보장하지 않습니다.
+    특정 종목의 매수 · 매도를 권유하지 않으며 수익을 보장하지 않습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다. 투자 판단과 책임은 투자자 본인에게 있습니다.
   </p>
   <p class="footer-copy">© 2026 ALPHASCOPE. All rights reserved.</p>
 </footer>
@@ -2480,6 +2482,10 @@ body.menu-open { overflow: hidden; }
   'use strict';
   /* 목록 화면 맨 아래 '더 많은 게시물'(블로그 언어가 영어라 More posts)은 한국어로 */
   [].slice.call(document.querySelectorAll('.blog-pager-older-link')).forEach(function (a) { a.textContent = '글 더 보기'; });
+  /* 목록 버튼이 갈 곳을 본문이 정할 때 (2026-10-18 사용자: 종목 고정 페이지 하단에도 엔비디아 글과 같은 목록 · TOP) —
+     본문의 [data-list-url] 이 있으면 그 주소로. 고정 페이지는 라벨이 없어 테마 기본값(데일리 목록)으로 가던 것을 바로잡는다 */
+  var lu = document.querySelector('.post-body [data-list-url]');
+  if (lu) [].slice.call(document.querySelectorAll('.post-nav-list')).forEach(function (a) { a.href = lu.getAttribute('data-list-url'); });
   [].slice.call(document.querySelectorAll('.post-nav-top')).forEach(function (b) {
     b.addEventListener('click', function () {
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }

@@ -6,3 +6,4 @@ google-auth-oauthlib>=1.2.0
 python-dotenv>=1.0.1
 pillow>=10.0.0
 huggingface_hub>=0.24.0
+matplotlib>=3.8     # S&P 500 가격 그래프 PNG (chart_spx.py, 2026-10-18)

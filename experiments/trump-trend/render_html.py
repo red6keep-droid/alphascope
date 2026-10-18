@@ -93,7 +93,7 @@ def sec_seo_lead(a, date_str):
         parts.pop()
     else:
         text = head
-    return ('<p data-seo-lead="1" style="font-size:16px;line-height:24px;color:#333;margin:0 0 12px;word-break:keep-all;">'
+    return (f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">'
             f"{_esc(text)}</p>")
 
 
@@ -475,14 +475,6 @@ def sec_narrative(n, key):
     return dk.bullets(_k(t) for t in n[key])   # Gemini 문장 안의 영어 주제·섹터 이름도 한국어로
 
 
-def sec_footer(a):
-    s = a["data_status"]
-    return dk.footer(
-        f"데이터: Truth Social 게시물 공개 아카이브(CNN) · 가격 Yahoo Finance · 거시 일정 FRED. 분류 Gemini(한도 때는 예비 모델이 임시 분류, 다음 실행에서 Gemini 로 다시), 집계·통계 파이썬. "
-        f"이벤트 누적 {s['events_total']:,}개 · 가격 기준일 {_esc(dk.day(s['bars_last_day']) or '—')}.",
-        "이 글의 시장 반응 수치는 과거 발언 이후 관찰된 값이며 인과 관계나 향후 방향을 의미하지 않습니다. 투자 권고가 아닙니다.")
-
-
 # ── 조립 (구획 제목은 짧은 명사 — 가이드라인 2절. 홈 카드 CARDS: speech = (머리)·달라진 것, watch = 내일 볼 것) ──
 
 def build_body(a, n):
@@ -501,7 +493,7 @@ def build_body(a, n):
         dk.section(TAB_FLOW, sec_windows(a), tab=TAB_FLOW),   # 탭 이름과 같은 제목 → 테마가 숨긴다 (2026-10-11 사용자: 30일 흐름 타이틀 삭제)
         dk.section("시장 반응", sec_reactions(a), tab=TAB_REACT),   # 탭 이름과 같아 제목은 숨고, 탭 아래 안내 문구는 두지 않는다 (2026-10-11 사용자)
         dk.section("관찰 종목", sec_why(a), tab=TAB_REACT),
-        sec_footer(a),
+        # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지)
         dk.WRAP_CLOSE,
     ]))
 

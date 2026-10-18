@@ -389,18 +389,13 @@ def glance_sub(a):
         k, sd, earn = abs(r) / sig, sig, False
     else:
         return ""
-    if earn:
-        first = f"실적 발표 반응일 · 평소의 {k:.1f}배"
-    elif k < 2:
-        first = "평소 범위 안" + (f" · 평소의 {k:.1f}배" if k >= 1 else "")
-    else:
-        first = f"평소 범위 밖 · 평소의 {k:.1f}배"
-    first += f" (하루 ±{sd:.1f}%)"   # `평소` 두 번 → 한 번 (2026-10-18 사용자)
+    # 짧게 : `평소 범위 · 1.0배(하루 ±2.1%) · 흔들림 6.0% · 거래량 1.8배` (2026-10-18 사용자 — 종목 페이지에서 먼저 정하고 엔비디아에도). 배수는 늘 보인다
+    first = ("실적 반응일" if earn else "평소 범위" if k < 2 else "평소 범위 밖") + f" · {k:.1f}배(하루 ±{sd:.1f}%)"
     _, reasons = _glance_state(a)
-    parts = [first] + [x for x in reasons if not x.startswith("등락이 평소의")]   # 등락 배수는 첫 마디에 있다
+    parts = [first] + [x.replace("하루 흔들림", "흔들림").replace("거래량 평소의", "거래량") for x in reasons if not x.startswith("등락이 평소의")]   # 등락 배수는 첫 마디에 있다
     vr = h.get("vol_ratio_20d")
     if vr and not any(x.startswith("거래량") for x in parts):   # 거래량은 늘 보인다 — 1.5배 넘는 날만이 아니라 (2026-10-18 사용자: 가격 정보 줄에 거래량)
-        parts.append(f"거래량 평소의 {vr:.1f}배")
+        parts.append(f"거래량 {vr:.1f}배")
     # 우측 정렬은 가격 숫자(`$214.13 ▼1.43%`)의 오른쪽 끝 세로선에 맞춘다 = 접기 버튼 폭 + 왼쪽 여백만큼 안쪽 (2026-10-17 사용자). 툴팁 아이콘은 글자 앞
     # 오른쪽 정렬 · 접기 버튼 앞 가격 글자(`$214.13 ▼1.43%`)의 오른쪽 선에 맞춤, 툴팁 없음 (2026-10-18 사용자 — 같은 날 왼쪽 정렬 · 툴팁을 시험했다가 바꿈)
     return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:right;padding-right:{FOLD_LEFT + _dk.FOLD_BOX}px;margin-top:-2px;'
@@ -502,8 +497,7 @@ def periods_tip(ps):
         d = p["nvda"] - p["spy"]
         now = (f"\n· {p['label']} {_sgn(p['nvda'])}% : 같은 기간 S&P 500(회색 막대 {_sgn(p['spy'])}%)보다 "
                + (f"{abs(d):.1f}%p 앞섰다" if d > 0 else f"{abs(d):.1f}%p 뒤처졌다" if d < 0 else "같았다"))
-    return ("지금 가격이 1주 · 1개월 · 3개월 · 6개월 · 1년 전보다 얼마나 오르거나 내렸는지" + now +
-            "\n· 참고 : 지난 수익률이라 앞으로를 말하지 않는다")
+    return "지금 가격이 1주 · 1개월 · 3개월 · 6개월 · 1년 전보다 얼마나 오르거나 내렸는지" + now   # `앞으로를 말하지 않는다` 줄 삭제 (2026-10-18 사용자)
 
 
 def year_tip(y):
@@ -519,8 +513,7 @@ def vol_tip(vr):
     if vr is not None:
         how = "평소보다 적게" if vr < 0.8 else "평소와 비슷하게" if vr < 1.5 else "평소보다 많이"
         now = f"\n· 오늘 {vr:.1f}배 : {how} 거래됐다. 1.5배를 넘으면 관심이 몰린 날"
-    return ("오늘 사고판 주식 수를 최근 한 달(20거래일) 평균과 견준 것" + now +
-            "\n· 참고 : 거래가 많다는 것이지, 오르거나 내린다는 뜻은 아니다")
+    return "오늘 사고판 주식 수를 최근 한 달(20거래일) 평균과 견준 것" + now
 
 
 def sec_periods(a):
@@ -636,7 +629,7 @@ def sec_drawdown(a):
         tip = ("크게 떨어진 일 가운데, 최고가를 되찾기까지 1년(250거래일) 넘게 걸린 경우의 비율"
                + (f"\n· 엔비디아 {x20['over_year'] / x20['recovered'] * 100:.0f}% : −20% 넘게 빠졌다가 회복한 {x20['recovered']}번 중 {x20['over_year']}번이 1년 넘게 걸렸다. "
                   f"다른 대형 기술주는 {y20['over_year'] / y20['recovered'] * 100:.0f}%" if x20.get("recovered") and y20.get("recovered") else "")
-               + ("\n· 참고 : 많이 빠질수록 오래 걸린 경우가 늘었다. 앞으로도 그렇다는 뜻은 아니다" if mono else ""))
+               + ("\n· 참고 : 많이 빠질수록 오래 걸린 경우가 늘었다" if mono else ""))
         title_line = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 4px;">'
                       f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율{_tipx(tip)}</span>'
                       f'<span style="flex:none;font-size:{MICRO};font-weight:400;color:{NOTE};text-align:right;">({span} 기간 중)</span></span>')   # 안내 기호 앞 · 오른쪽 작은 글씨 (2026-10-17 사용자)
@@ -1092,11 +1085,11 @@ def _event_html(e):
         tag += " " + _pill(config.SPEAKER_KO.get(e["speaker"], e["speaker"]), "area")
     src = rr.SOURCE_KO.get(e.get("source") or "", e.get("source") or "")
     if e["kind"] in rr.DOC_KINDS:
-        head = _esc(e["fact"])
+        head = _esc(_dk.headline(e["fact"]))   # 뉴스 = 명사형 헤드라인체 (2026-10-18 사용자: 데일리와 같게, "-했다." 로 끝내지 않는다)
         fact = ""
     else:
         head = _esc(e["title"])
-        fact = f" · {_esc(e['fact'])}" if e.get("fact") and e["fact"] != e["title"] else ""
+        fact = f" · {_esc(_dk.headline(e['fact']))}" if e.get("fact") and e["fact"] != e["title"] else ""
     when = f' <span style="color:{SUB};font-size:{TINY};white-space:nowrap;">({_esc(_d(e["published_at"][:10]))})</span>' if e.get("published_at") else ""   # 날짜가 두 줄로 쪼개지지 않게
     # 라벨 줄: 여백 없이 왼쪽 정렬, 기사 맨 아래 (2026-10-13 사용자) · 라벨 사이 3px (2026-10-14 사용자: 0 → 3, 가이드라인 10-7)
     lab = f'<span style="display:block;line-height:1;margin:8px 0 0;">{tag.replace(f"margin:0 {_dk.PILL_GAP}px;", "margin:0 3px 0 0;").replace("</span> <span", "</span><span")}</span>'
@@ -1597,8 +1590,7 @@ def card_move(c):
         lines.append(("row", "실적 발표 하루 시장 예상 (추정)", f"±{c['earn_day']:.1f}%", f"지난 8번 실제 보통 ±{c['past']:.1f}% · 다음 발표 {_fd(c['next_earnings'])}"))
     tip = ("옵션 가격에는 앞으로 주가가 얼마나 흔들릴지에 대한 시장의 예상이 담겨 있다(내재변동성). 이를 하루 단위로 바꿔 평소와 견준 것\n"
            f"· 오늘 {c['ratio']:.1f}배 : 시장 예상 ±{c['exp']:.1f}%, 평소 ±{c['sigma']:.1f}%\n"
-           "· 나누는 법 : 1.3배 이상 평소보다 큼, 0.8배 이하 평소보다 작음, 그 사이는 평소 수준\n"
-           "· 참고 : 크기만 말한다. 오를지 내릴지는 말하지 않는다")
+           "· 나누는 법 : 1.3배 이상 평소보다 큼, 0.8배 이하 평소보다 작음, 그 사이는 평소 수준")
     return lines, tip
 
 
@@ -1776,7 +1768,7 @@ def sec_calendar(a):
     """캘린더 탭 — 질문 카드 넷 (가이드라인 2-8). 맨 아래 `전체 일정 보기` = 60일 목록 + 진행 중 사안."""
     cc = a.get("calendar_cards") or {}
     out = ""
-    specs = [("다음 실적 발표는?", "earnings", cal_earnings), ("엔비디아와 함께 보는 회사 실적은?", "peers", cal_peers),
+    specs = [("다음 실적 발표는?", "earnings", cal_earnings), ("함께 보는 회사 실적은?", "peers", cal_peers),
              ("시장 전체를 흔들 일정은?", "macro", cal_macro), ("진행 중 소송 일정은?", "court", cal_court)]
     first_card = True
     for title, key, fn in specs:
@@ -1806,15 +1798,11 @@ def sec_narrative(a, n):
 
 
 def sec_footer(a):
-    ds = a["data_status"]
+    """글 끝 한 줄 — 리포트 읽는 법 링크만. 출처 · 면책은 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지, 가이드라인 6절)."""
+    if not config.GUIDE_URL:
+        return ""
     return (f'<div data-footer="1" style="margin-top:3px;padding-top:2px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{_dk.GUIDE_IND}">'
-            f"{INFO_ICON}데이터: yfinance(일봉·옵션·예상 실적·애널리스트·기관·공매도) · SEC 공시(임원 거래·수시·분기 보고) · FRED(거시 일정) · "
-            f"NVIDIA 뉴스룸·블로그 · CNBC · Google News · 연방관보 · CourtListener · trump-trend. "
-            f"분류 Gemini(한도 때는 예비 모델이 임시 분류, 다음 실행에서 Gemini 로 다시), 판정·계산 파이썬. 생성 {_esc(a['generated_at'])} (UTC) · 기준 거래일 {_esc(_d(a['day']))} · 일봉 마지막 {_esc(_d(ds['bars_last_day']) or '—')}.<br>"
-            f"{INFO_ICON}이 글은 한 종목의 사실 기록입니다. 매수·매도 판단을 담지 않으며, 사건과 가격 변화 사이의 인과를 단정하지 않습니다. "
-            f"옵션 지표는 장 마감 후 1회 스냅샷이고 감마 노출은 조잡한 근사입니다. 트럼프 과거 반응 통계는 다중 검정 보정(q)을 거친 값만 인용합니다. 투자 권고가 아닙니다."
-            + (f"<br>{INFO_ICON}용어와 각 구획을 읽는 법은 <b>리포트 읽는 법</b>{_link_icon(config.GUIDE_URL, '리포트 읽는 법')}" if config.GUIDE_URL else "")   # 고정 페이지 (가이드라인 3-4·6절)
-            + "</div>")
+            f"{INFO_ICON}용어와 각 구획을 읽는 법은 <b>리포트 읽는 법</b>{_link_icon(config.GUIDE_URL, '리포트 읽는 법')}</div>")
 
 
 # ── 조립 ─────────────────────────────────────────────────────────────────
@@ -1848,11 +1836,11 @@ def seo_lead(a):
         head = more[0] + ", " if more[0].endswith("고") else ""
         rest = more[1:] if head else more
         second = (" " + head + ", ".join(rest) + "이다.") if rest else (" " + more[0][:-1] + "다." if head else "")
-    return f'<p data-seo-lead="1" style="font-size:{_dk.NAME};line-height:{LH_CARD};color:#333;margin:0 0 12px;word-break:keep-all;">{_esc(first + second)}</p>'
+    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_esc(first + second)}</p>'
 
 
 def build_body(a, n):
-    return _dk.fix_colons("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지)
+    return _dk.formal(_dk.fix_colons("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지) · 반말 문장 끝은 합니다체 (2026-10-18 사용자)
         # data-design="2": 테마의 옛 글 보정 규칙(div 14px → 17px !important)에서 이 글을 제외한다 (2026-10-11 — 안내 글이 17px로 커지던 원인)
         f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:{_dk.BODY};line-height:{_dk.LH_BODY};color:#333;">',   # 행간 24px (2026-10-12 사용자, 소수점 금지 — 2026-10-12 사용자)
         # 기준 거래일 안내 줄 삭제 (2026-10-12 사용자) — 날짜는 글 제목에 있다
@@ -1861,8 +1849,8 @@ def build_body(a, n):
         # 목표가는 상태 카드 아래 (아코디언) — 제목 없이 본문 머리에 (2026-10-11 사용자: 오늘 한 줄 타이틀 삭제)
         # 테스트 운영 안내는 머리 카드 뒤 (2026-10-13 사용자: 구글 검색) — 맨 앞이면 검색 결과 · 공유 미리보기 문구가 "테스트 운영 중 …"이 된다
         _notice(a),
-        _section("중요 이슈", sec_narrative(a, n), tab="오늘"),   # 그래프 아래로 (2026-10-11 사용자)
-        _section("뉴스", sec_direction_bars(a) + sec_news_counts(a) + sec_events(a), line=False, tab="오늘"),   # 바로 아래가 카드라 제목 밑 구분선 없음 (2026-10-13 사용자)   # 막대가 바로 와도 구분선
+        _dk.keep_tone(_section("중요 이슈", sec_narrative(a, n), tab="오늘")),   # 그래프 아래로 (2026-10-11 사용자) · 뉴스 · 중요 이슈는 합니다체로 바꾸지 않는다 (2026-10-18 사용자)
+        _dk.keep_tone(_section("뉴스", sec_direction_bars(a) + sec_news_counts(a) + sec_events(a), line=False, tab="오늘")),   # 바로 아래가 카드라 제목 밑 구분선 없음 (2026-10-13 사용자)   # 막대가 바로 와도 구분선
         # 탭 이름과 같은 제목(캘린더·시장 지표·재무)은 탭 화면에서 숨긴다 — 본문(탭 없음)에서는 구획 경계로 남는다
         _section("실적과 기대", sec_expect(a), tab="실적과 기대"),   # 시장 지표 · 재무 두 탭을 합침 — 질문 카드 넷 + 자세한 지표 보기 (가이드라인 2-7, 2026-10-18)
         _section("캘린더", sec_calendar(a), tab="캘린더"),   # 질문 카드 넷 + 전체 일정 보기(60일 · 진행 중 사안) (가이드라인 2-8, 2026-10-18)
@@ -1870,7 +1858,7 @@ def build_body(a, n):
 
         sec_footer(a),
         "</div>",
-    ]))
+    ])))
 
 
 def render(analysis_path=None, narrative_path=None, output_dir=None):

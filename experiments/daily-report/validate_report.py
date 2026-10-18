@@ -1,6 +1,6 @@
 """리포트 검증
 
-1. 수집 데이터(sanity): 지수/경제지표가 존재해야 한다. 급등주·관심종목은 비어 있어도 되지만 경고.
+1. 수집 데이터(sanity): 지수/경제지표가 존재해야 한다.
 2. Gemini 출력(구조): 필수 키 존재, 뉴스 index가 수집 뉴스 목록 범위 안인지 확인.
 실패하면 프로세스 종료(exit 1) → 게시 단계로 진행하지 않는다.
 """
@@ -9,12 +9,11 @@ import json
 import os
 import sys
 
-REQUIRED_LLM_KEYS = ["one_line", "regime_echo", "regime_comment", "summary", "change_comment",
-                     "sector_comment", "gainers_comment", "attention_comment", "news",
-                     "macro_comment", "opinion", "risk", "image_prompt"]
+# 2026-10-18 재설계: 시장 상태 점수 해설(regime_*) · 급등주 · 관심 종목 · 위험요인 칸을 뺐다 (doc/데일리-리포트-기획.md 5절 B5 · B6)
+REQUIRED_LLM_KEYS = ["one_line", "summary", "change_comment", "sector_comment", "news",
+                     "macro_comment", "opinion", "image_prompt"]
 
 ONE_LINE_MAX_LEN = 120
-REGIME_LABELS = {"Risk-On", "Neutral", "Risk-Off"}
 
 # 프롬프트 규칙 10 · render_html.THEME_VOCAB 과 같은 목록
 THEME_VOCAB = {"금리", "AI/반도체", "실적", "매크로", "에너지", "정책/규제", "지정학", "기타"}
@@ -67,26 +66,14 @@ def validate(input_path, output_path, analysis_path=None):
         if rec.get("price") is None:
             errors.append(f"지수 데이터 누락: {key}")
 
-    for section in ("gainers", "most_active"):
-        if not input_data.get(section):
-            warnings.append(f"{section} 목록이 비어 있어 '데이터 없음'으로 표기됩니다.")
-
     for key in REQUIRED_LLM_KEYS:
         if key not in report or _is_bad(report.get(key)):
             errors.append(f"Gemini 출력 필수 키 누락: {key}")
 
-    # regime_echo — Gemini가 등급을 반대로 읽었는지 기계적으로 잡는 유일한 장치.
-    # 파이썬이 만든 라벨과 글자 그대로 같아야 한다. 분석이 없는 날은 "데이터 없음"이어야 한다.
-    echo = str(report.get("regime_echo") or "").strip()
-    label = (analysis.get("regime") or {}).get("label")
-    if label:
-        if echo != label:
-            errors.append(f"regime_echo '{echo}' ≠ 계산된 등급 '{label}' — Gemini가 시장 상태를 다르게 읽었습니다.")
-        score = (analysis.get("regime") or {}).get("score")
-        if not isinstance(score, (int, float)) or not (0 <= score <= 100):
-            errors.append(f"regime.score({score})가 0~100 밖입니다.")
-    elif echo and echo in REGIME_LABELS:
-        warnings.append(f"분석이 없는데 regime_echo가 '{echo}' — 렌더는 '데이터 없음'으로 나가지만 해설이 등급을 언급할 수 있습니다.")
+    # 점수 · 등급 말투가 남았는지 — 지시문 규칙 9. 게시를 막지는 않는다
+    for k in ("one_line", "opinion", "summary"):
+        if any(w in str(report.get(k) or "") for w in ("위험 선호", "위험 회피", "Risk-On", "Risk-Off")):
+            warnings.append(f"{k} 에 시장 등급 말투가 있습니다 (규칙 9).")
 
     one_line = str(report.get("one_line") or "")
     if len(one_line) > ONE_LINE_MAX_LEN:
@@ -101,8 +88,6 @@ def validate(input_path, output_path, analysis_path=None):
     # 뉴스의 theme·related는 렌더가 같은 규칙으로 걸러내므로 여기서는 경고만 남긴다.
     # 어휘 밖 테마는 '기타'로, 모르는 심볼은 빠진다 — 게시를 막을 일은 아니다.
     known_symbols = set(analysis.get("symbols") or [])
-    known_symbols |= {q["symbol"] for q in input_data.get("gainers", []) + input_data.get("most_active", [])
-                      if q.get("symbol")}
 
     news_size = len(input_data.get("news", []))
     for i, item in enumerate(report.get("news", [])):

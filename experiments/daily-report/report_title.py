@@ -8,7 +8,8 @@ import datetime
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
 
-TITLE_NAME = "미국 증시 리포트"   # (2026-10-12 사용자: 리포트 이름을 미국 증시 리포트 · 트럼프 SNS 트렌드 · 엔비디아 리포트로)
+TITLE_NAME = "미국 증시 리포트 · 코스피 영향"   # 검색어 "코스피 영향" (2026-10-18 사용자: 한국장 탭 재설계와 함께). 날짜는 끝 — 테마가 떼어 오른쪽에 둔다
+PREV_NAME = "미국 증시 리포트"   # 2026-10-18 까지의 이름 (2026-10-12 사용자: 리포트 이름을 미국 증시 리포트 · 트럼프 SNS 트렌드 · 엔비디아 리포트로)
 LEGACY_PREFIX = "미국 증시 리포트 — "   # 2026-10-18 이전 제목. 줄표는 쓰지 않는다 (가이드라인 2-6)
 SLUG_NAME = "us stock market report"   # 영문 주소 (검색 노출, 2026-10-18 사용자)
 
@@ -38,14 +39,19 @@ def legacy_title(date_str):
     return LEGACY_PREFIX + korean_date(date_str)
 
 
+def prev_title(date_str):
+    """바로 전 제목 `미국 증시 리포트 날짜` (2026-10-18 이름 바꾸기 전). 이미 올린 글을 찾을 때만 쓴다."""
+    return f"{PREV_NAME} {korean_date(date_str)}"
+
+
 def slug_title(date_str):
     """처음 올릴 때만 쓰는 영문 제목 — Blogger 주소가 이 제목으로 정해지고, 바로 한글 제목으로 바꾼다 (2026-10-18 시험: 바꿔도 주소는 그대로)."""
     return f"{SLUG_NAME} {str(date_str)[:10]}"
 
 
 def match_titles(date_str):
-    """이미 올린 그날 글로 볼 제목들 — 새 제목 · 옛 제목 · 영문 제목(한글로 바꾸기 전에 멈춘 글)."""
-    return [post_title(date_str), legacy_title(date_str), slug_title(date_str)]
+    """이미 올린 그날 글로 볼 제목들 — 새 제목 · 바로 전 제목 · 옛 제목(줄표) · 영문 제목(한글로 바꾸기 전에 멈춘 글)."""
+    return [post_title(date_str), prev_title(date_str), legacy_title(date_str), slug_title(date_str)]
 
 
 def date_of(title):

@@ -23,6 +23,7 @@ import requests
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import publish_blogger
+import render_html
 import report_title
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -33,6 +34,25 @@ DEFAULT_REPO_SLUG = "red6keep-droid/alphascope"
 def _read(path):
     with open(path, "r", encoding="utf-8") as f:
         return f.read().strip()
+
+
+def _chart_or_cover(body, repo_slug, cover_url):
+    """S&P 500 그래프(탭 위, 2026-10-18)가 CDN 에서 열리지 않으면 깨진 그림 대신 커버 이미지로 바꿔 올린다. 그래프가 없으면 본문 그대로."""
+    chart_ref = _read(os.path.join(OUTPUT_DIR, "chart_ref.txt")) if os.path.exists(os.path.join(OUTPUT_DIR, "chart_ref.txt")) else ""
+    if not chart_ref:
+        return body
+    chart_url = f"https://cdn.jsdelivr.net/gh/{repo_slug}@gh-pages/{chart_ref}"
+    try:
+        requests.head(chart_url, timeout=30, allow_redirects=True).raise_for_status()
+        print(f"그래프 확인 완료: {chart_url}")
+        return body
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::그래프 URL 확인 실패 ({e}) — 커버 이미지로 바꿔 게시합니다.")
+    start = body.find('<a href="' + chart_url + '" data-zoom="1"')
+    end = body.find("</a>", start)
+    if start < 0 or end < 0:
+        return body
+    return body[:start] + render_html._cover_image(cover_url) + body[end + 4:]
 
 
 def main():
@@ -67,6 +87,7 @@ def main():
         print("이미지가 배포되지 않았거나 CDN 반영 전입니다. 게시를 중단합니다.")
         sys.exit(1)
     print(f"커버 이미지 확인 완료: {cover_url}")
+    body = _chart_or_cover(body, repo_slug, cover_url)
 
     # cron 이중화로 하루 두 번 실행될 수 있다. check_published.py가 앞단에서 걸러주지만,
     # 확인 실패나 두 실행이 겹치는 경우를 대비한 2차 방어.
