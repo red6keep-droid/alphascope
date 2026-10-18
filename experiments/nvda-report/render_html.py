@@ -372,9 +372,6 @@ def _plain_rows(rows):
     return f'<div style="padding:4px 12px 14px;margin:0 0 8px;border-bottom:1px solid #E2E8F0;">{lis}</div>'
 
 
-LOGO_W = 26   # 티커 로고 20 + 오른쪽 여백 6 (design_kit.ticker_logo) — 가격 카드 머리 작은 글씨를 `NVDA` 의 N 왼쪽 선에 맞춘다 (2026-10-18 사용자)
-
-
 def glance_sub(a):
     """가격 카드 머리 · 가격 줄 아래 작은 글씨 한 줄 (2026-10-17 사용자: 조용함 라벨은 뜻을 모르겠고, 등락률은 가격 줄과 겹친다 → 신호등을 없애고 글로).
     `평소 범위 안 (평소 하루 ±1.8%)` · 바깥이면 `평소 범위 밖 · 평소의 2.2배 (평소 하루 ±2.2%)` · 거래량 · 하루 흔들림 · 시장과 차이가 큰 날은 ` · ` 로 이어 붙인다. 숫자는 전부 파이썬 값."""
@@ -402,12 +399,9 @@ def glance_sub(a):
     if vr and not any(x.startswith("거래량") for x in parts):   # 거래량은 늘 보인다 — 1.5배 넘는 날만이 아니라 (2026-10-18 사용자: 가격 정보 줄에 거래량)
         parts.append(f"거래량 평소의 {vr:.1f}배")
     # 우측 정렬은 가격 숫자(`$214.13 ▼1.43%`)의 오른쪽 끝 세로선에 맞춘다 = 접기 버튼 폭 + 왼쪽 여백만큼 안쪽 (2026-10-17 사용자). 툴팁 아이콘은 글자 앞
-    # 왼쪽 정렬 · NVDA 로고 왼쪽 선에 맞춤(줄 안쪽 여백 그대로), 툴팁은 글자 뒤 (2026-10-18 사용자. 이전 : 가격 숫자 오른쪽 선에 맞춘 오른쪽 정렬 · 툴팁 앞)
-    txt = " · ".join(parts)
-    head, _, last = txt.rpartition(" ")   # 툴팁은 마지막 낱말과 묶어 홀로 다음 줄로 떨어지지 않게
-    return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:left;padding-left:{LOGO_W}px;margin-top:3px;'
-            f'font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;word-break:keep-all;">'
-            f'{_esc(head)} <span style="white-space:nowrap;">{_esc(last)}{_tipx(_glance_tip(r, k, sd, earn))}</span></span>')
+    # 오른쪽 정렬 · 접기 버튼 앞 가격 글자(`$214.13 ▼1.43%`)의 오른쪽 선에 맞춤, 툴팁 없음 (2026-10-18 사용자 — 같은 날 왼쪽 정렬 · 툴팁을 시험했다가 바꿈)
+    return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:right;padding-right:{FOLD_LEFT + _dk.FOLD_BOX}px;margin-top:3px;'
+            f'font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;word-break:keep-all;">{_esc(" · ".join(parts))}</span>')
 
 
 def glance_rows(a, n=None):
