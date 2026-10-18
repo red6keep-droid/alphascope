@@ -96,12 +96,16 @@ def publish_draft(output_dir=None):
 
 
 GUIDE_TITLE = "리포트 읽는 법"
+GUIDE_SLUG_TITLE = "nvda report guide"   # 영문 주소 /p/nvda-report-guide.html (검색 노출, 2026-10-18 — 처음 만들 때만 이 제목, 바로 한글로)
+GUIDE_OLD_URL = "https://alpha-scope.blogspot.com/p/blog-page.html"   # 2026-10-11 한글 제목으로 만든 옛 주소 — 옮김 안내만 남긴다
 GUIDE_PATH = os.path.join(config.STATIC_DIR, "reading_guide.html")
 
 
 def publish_guide_page(blog_url=None):
-    """고정 페이지 "리포트 읽는 법" — 같은 제목의 페이지가 있으면 본문을 갱신, 없으면 새로 만든다 (가이드라인 3-4, 2026-10-11).
-    Blogger pages API (posts 가 아니라 pages). 주소를 돌려주므로 config.GUIDE_URL 에 적는다."""
+    """고정 페이지 "리포트 읽는 법" — config.GUIDE_URL 의 페이지가 있으면 본문을 갱신, 없으면 영문 제목으로 만든 뒤 한글 제목으로 바꾼다 (가이드라인 3-4 · 10-5).
+    옛 주소(GUIDE_OLD_URL) 페이지는 지우지 않고 새 주소로 가는 안내로 바꾼다 — 이미 발행된 글의 꼬리가 옛 주소를 가리킨다.
+    Blogger pages API (posts 가 아니라 pages)."""
+    import html as _h
     import requests
     with open(GUIDE_PATH, "r", encoding="utf-8") as f:
         content = f.read()
@@ -112,14 +116,30 @@ def publish_guide_page(blog_url=None):
     base = f"{publish_blogger.BLOGGER_API}/blogs/{blog_id}/pages"
     r = requests.get(base, params={"fetchBodies": "false"}, headers=headers, timeout=30)
     r.raise_for_status()
-    existing = next((p for p in r.json().get("items", []) if p.get("title") == GUIDE_TITLE), None)
-    payload = {"kind": "blogger#page", "title": GUIDE_TITLE, "content": content}
+    pages = r.json().get("items", [])
+    norm = lambda u: str(u or "").replace("http://", "https://").rstrip("/")   # noqa: E731
+    existing = next((p for p in pages if norm(p.get("url")) == norm(config.GUIDE_URL)), None)
     if existing:
-        r = requests.put(f"{base}/{existing['id']}", headers=headers, json=payload, timeout=30)
+        r = requests.put(f"{base}/{existing['id']}", headers=headers, json={"kind": "blogger#page", "id": existing["id"], "title": GUIDE_TITLE, "content": content}, timeout=30)
+        r.raise_for_status()
+        page = r.json()
     else:
-        r = requests.post(base, headers=headers, json=payload, timeout=30)
-    r.raise_for_status()
-    page = r.json()
+        r = requests.post(base, headers=headers, json={"kind": "blogger#page", "title": GUIDE_SLUG_TITLE, "content": content}, timeout=30)
+        r.raise_for_status()
+        page = r.json()
+        r = requests.put(f"{base}/{page['id']}", headers=headers, json={"kind": "blogger#page", "id": page["id"], "title": GUIDE_TITLE, "content": content}, timeout=30)
+        r.raise_for_status()
+        page = r.json()
+        if norm(page.get("url")) != norm(config.GUIDE_URL):
+            print(f"[guide-page] 주의: 새 주소 {page.get('url')} 가 config.GUIDE_URL({config.GUIDE_URL}) 과 다르다 — config 를 맞출 것")
+    old = next((p for p in pages if norm(p.get("url")) == norm(GUIDE_OLD_URL)), None)
+    if old and norm(page.get("url")) != norm(GUIDE_OLD_URL):
+        new_url = _h.escape(page.get("url") or config.GUIDE_URL)
+        moved = (f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:19px;line-height:34px;color:#333;">'
+                 f'<p>리포트 읽는 법 페이지는 새 주소로 옮겼습니다.</p><p><a href="{new_url}" style="color:#1a73e8;">리포트 읽는 법 바로 가기</a></p></div>')
+        r = requests.put(f"{base}/{old['id']}", headers=headers, json={"kind": "blogger#page", "id": old["id"], "title": "리포트 읽는 법 (옮김)", "content": moved}, timeout=30)
+        r.raise_for_status()
+        print(f"[guide-page] 옛 주소는 옮김 안내로: {old.get('url')}")
     print(f"[guide-page] {'갱신' if existing else '생성'}: {page.get('url')}")
     return page.get("url")
 

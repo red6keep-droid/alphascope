@@ -240,4 +240,4 @@ MISSING_HINTS = {
 MISSING_DEFAULT_HINT = "이번 실행에서 받지 못함, 다음 실행에서 재시도"
 REPORT_LABELS = ["엔비디아", "미국 증시", "자동 리포트"]
 # 고정 페이지 "리포트 읽는 법" (가이드라인 3-4, 2026-10-11). 비어 있으면 꼬리에 링크를 두지 않는다. publish.py --guide-page 가 올리고 주소를 알려준다
-GUIDE_URL = os.environ.get("NVDA_GUIDE_URL", "https://alpha-scope.blogspot.com/p/blog-page.html")   # 2026-10-11 생성
+GUIDE_URL = os.environ.get("NVDA_GUIDE_URL", "https://alpha-scope.blogspot.com/p/nvda-report-guide.html")   # 2026-10-18 영문 주소로 다시 만듦 (옛 /p/blog-page.html 은 옮김 안내)
