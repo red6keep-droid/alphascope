@@ -1,6 +1,15 @@
 {
-  "updated_at": "2026-10-18 10:51:45 UTC",
+  "updated_at": "2026-10-18 15:45:27 UTC",
   "items": [
+    {
+      "title": "Top Wall Street analysts are bullish on the growth potential of these 3 stocks",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/18/top-analysts-are-bullish-on-the-growth-potential-of-these-3-stocks.html",
+      "published": "2026-10-18 12:34:51",
+      "summary": "Amid fear of rate hikes and oil prices, investors can look past volatility and track Street analysts' stock picks with strong long-term growth potential.",
+      "title_ko": "월스트리트 최고 애널리스트들, 3개 종목 성장 잠재력에 강세",
+      "why_ko": "금리·유가 우려에도 장기 성장 가능성이 높은 3종목을 확인할 수 있다."
+    },
     {
       "title": "The Austin Powers steamroller: How to trade CoreWeave's slow moving crisis",
       "source": "CNBC",
@@ -99,15 +108,6 @@
       "summary": "Margin debt has surged to record levels as investors like 29-year-old Hy Luu borrow more against their portfolios. Here’s how leverage can amplify stock losses.",
       "title_ko": "마진 부채 사상 최고치, 투자자 레버리지 위험 확대",
       "why_ko": "마진 부채가 사상 최고 수준에 도달해 레버리지가 손실을 증폭시킬 수 있다."
-    },
-    {
-      "title": "Unsure how long this AI bull has? Bonds now offer a cushion at the best values in years",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/06/unsure-how-long-this-ai-bull-has-bonds-now-offer-a-cushion-at-the-best-values-in-years.html",
-      "published": "2026-10-06 11:08:28",
-      "summary": "See an AI-generated hypothetical portfolio derived from my TV talk and this column's archives.",
-      "title_ko": "AI 버블 지속 여부 불투명, 채권이 최저가치 방어선",
-      "why_ko": "AI 관련 가상 포트폴리오가 제시한 바와 같이 채권이 현재 최적의 방어 수단이다."
     }
   ]
 }
