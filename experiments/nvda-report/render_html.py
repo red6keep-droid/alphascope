@@ -696,8 +696,7 @@ def sec_headline(a, n=None):
     # 펼침 1층 = 초보자도 읽는 정보 (2026-10-17 사용자: 평균선 · 갭 같은 차트 지표는 우리 방향과 다르다) — 기간별 수익률 · 1년 가격 범위 · 거래량.
     # 2층(접힘) = 차트 보는 분을 위한 지표 — 평균선 · 1일 비교 · 시가 갭 · 일중 변동폭 · 과열(RSI) · 교차, 우리 검증은 ? 툴팁
     rows = glance_rows(a, n) + sec_periods(a) + sec_year_range(a) + sec_drawdown(a) + sec_earnings(a)
-    vr = h.get("vol_ratio_20d")
-    rows += f'<div data-cards="1" style="margin:0 0 8px;">{_multi_single([("거래량 (평소의 몇 배)", f"<span style=\"font-weight:700;\">{_esc(rr.fmt(vr, 'x'))}</span>", vol_tip(vr))])}</div>'
+    # 거래량 카드는 뺐다 — 가격 카드 머리 작은 글씨에 늘 있다 (2026-10-18 사용자)
     deep = sec_ma(a)
     deep += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p")) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])   # 하루 등락 차이 (2026-10-11 사용자)
     items = []
