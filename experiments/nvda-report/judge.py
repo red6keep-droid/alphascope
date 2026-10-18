@@ -6,6 +6,7 @@
 import datetime
 import json
 import os
+import re
 
 import collect_calendar
 import collect_edgar
@@ -65,7 +66,7 @@ def price_events(s):
     out = []
     if s.get("vol_ratio_20d") and s["vol_ratio_20d"] >= config.VOL_RATIO_EVENT:
         out.append(_ev("Flows", "price", f"거래량 20일 평균의 {s['vol_ratio_20d']:.1f}배",
-                       f"거래량 {s['volume'] / 1e6:,.0f}M주 — 20일 평균 대비 {s['vol_ratio_20d']:.1f}배 (임계 {config.VOL_RATIO_EVENT}배)",
+                       f"거래량 {s['volume'] / 1e6:,.0f}M주, 20일 평균 대비 {s['vol_ratio_20d']:.1f}배 (임계 {config.VOL_RATIO_EVENT}배)",
                        source="yfinance"))
     if s.get("range_pct") and s["range_pct"] >= config.RANGE_PCT_EVENT:
         out.append(_ev("Flows", "price", f"일중 변동폭 {s['range_pct']:.1f}%",
@@ -104,7 +105,7 @@ def option_events(conn, day, s, rank):
     # IV 랭크는 상태값이라 극단에 '들어간 날'만 이벤트 (전일도 극단이면 상태판 굵은 글씨로만)
     if _extreme(rank) and not (p and _extreme(p.get("iv_rank_60d"))):
         out.append(_ev("Flows", "options", f"변동성 순위 {rank:.0f}",
-                       f"30일 내재변동성 {s['iv_atm_30d'] * 100:.1f}% — 최근 60일 중 순위 {rank:.0f} (임계 ≥{config.IV_RANK_HIGH} 또는 ≤{config.IV_RANK_LOW})",
+                       f"30일 내재변동성 {s['iv_atm_30d'] * 100:.1f}%, 최근 60일 중 순위 {rank:.0f} (임계 ≥{config.IV_RANK_HIGH} 또는 ≤{config.IV_RANK_LOW})",
                        source="yfinance options"))
     if p and p.get("pc_ratio_oi") and s.get("pc_ratio_oi"):
         chg = s["pc_ratio_oi"] / p["pc_ratio_oi"] - 1
@@ -182,7 +183,7 @@ def flow_events(conn, day, s):
     r, avg = s.get("finra_short_ratio"), s.get("finra_short_ratio_avg20")
     if r is not None and avg is not None and abs(r - avg) >= config.FINRA_SHORT_RATIO_DEV_PP:
         out.append(_ev("Flows", "flows", f"장외 공매도 비율 {r:.0f}% (20일 평균 {avg:.0f}%)",
-                       f"FINRA 보고 장외 거래 중 공매도 {r:.1f}% — 20일 평균 {avg:.1f}% (임계 ±{config.FINRA_SHORT_RATIO_DEV_PP:.0f}%p)",
+                       f"FINRA 보고 장외 거래 중 공매도 {r:.1f}%, 20일 평균 {avg:.1f}% (임계 ±{config.FINRA_SHORT_RATIO_DEV_PP:.0f}%p)",
                        direction="negative" if r > avg else "positive", source="finra"))
     # 반도체 ETF 발행주식수 5거래일 변화 (2026-10-11 수집 시작)
     for key, name in (("smh_shares_out", "SMH"), ("soxx_shares_out", "SOXX")):
@@ -192,7 +193,7 @@ def flow_events(conn, day, s):
             chg = (cur / prior[-1]["v"] - 1) * 100
             if abs(chg) >= config.ETF_SHARES_5D_EVENT_PCT:
                 out.append(_ev("Flows", "flows", f"{name} 발행주식수 5일 {chg:+.1f}%",
-                               f"{prior[-1]['v'] / 1e6:,.2f}M → {cur / 1e6:,.2f}M주 (임계 ±{config.ETF_SHARES_5D_EVENT_PCT:.0f}%) — ETF 자금 {'유입' if chg > 0 else '유출'}",
+                               f"{prior[-1]['v'] / 1e6:,.2f}M → {cur / 1e6:,.2f}M주 (임계 ±{config.ETF_SHARES_5D_EVENT_PCT:.0f}%), ETF 자금 {'유입' if chg > 0 else '유출'}",
                                direction="positive" if chg > 0 else "negative", source="yfinance"))
     return out
 
@@ -529,7 +530,7 @@ def sector_flow_events(sf):
     if not sf or not sf.get("changed"):
         return []
     lead = " · ".join(f"{x['name']} {x['rel']:+.1f}%p" for x in sf["leaders"])
-    return [_ev("Flows", "sector_flow", f"반도체 자금 — {sf['prev']} → {sf['state']}",
+    return [_ev("Flows", "sector_flow", f"반도체 자금 : {sf['prev']} → {sf['state']}",
                 f"반도체 ETF(SMH) {sf['days']}일 S&P 500 대비 {sf['rel_pp']:+.1f}%p · 같은 기간 앞선 섹터 {lead}",
                 direction=config.SECTOR_FLOW_DIRECTION.get(sf["state"], "neutral"), source="yfinance")]
 
@@ -617,7 +618,7 @@ def overheat_events(oh):
         except (KeyError, TypeError, ValueError):
             span = "과거"
         tail = f" · {span} 진입 {st['n']}회, 20일 뒤 상승 {st['up20']}% (아무 날 {base.get('up20')}%)" if st and base else ""
-        out.append(_ev("Flows", "price", f"과열 지표 진입 — {config.OVERHEAT_KEYS[k]}",
+        out.append(_ev("Flows", "price", f"과열 지표 진입 : {config.OVERHEAT_KEYS[k]}",
                        f"{config.OVERHEAT_KEYS[k]} (현재 {v:.1f}{'%' if k != 'rsi80' else ''}){tail}", direction="uncertain", source="yfinance"))
     return out
 
@@ -627,7 +628,7 @@ def regime_events(mr):
     if not mr or not mr.get("changed"):
         return []
     fact = f"S&P 500 고점 대비 {mr['pct_from_high']:+.1f}% · 200일 평균 {'위' if mr['above_ma200'] else '아래'}" + (f" · VIX {mr['vix']:.1f}" if mr.get("vix") is not None else "")
-    return [_ev("Macro", "regime", f"시장 국면 전환 — {mr['prev_regime']} → {mr['regime']}", fact,
+    return [_ev("Macro", "regime", f"시장 국면 전환 : {mr['prev_regime']} → {mr['regime']}", fact,
                 direction=config.REGIME_DIRECTION.get(mr["regime"], "neutral"), source="calendar")]
 
 
@@ -775,11 +776,11 @@ def build(conn, day, run_date):
     cases = [dict(r) for r in conn.execute("SELECT * FROM cases WHERE watch = 1 ORDER BY opened_at")]
     for c in cases:
         import cases_watch
-        nxt = conn.execute("SELECT day, label FROM calendar WHERE kind = 'COURT' AND label LIKE ? AND day >= ? ORDER BY day LIMIT 1",
-                           (cases_watch.short_name(c) + " — %", day)).fetchone()
+        nxt = conn.execute("SELECT day, label FROM calendar WHERE kind = 'COURT' AND (label LIKE ? OR label LIKE ?) AND day >= ? ORDER BY day LIMIT 1",
+                           (cases_watch.short_name(c) + cases_watch.SEP + "%", cases_watch.short_name(c) + cases_watch.OLD_SEP + "%", day)).fetchone()   # 옛 행은 ` — ` (2026-10-18 줄표 금지 전)
         c["short_name"] = cases_watch.short_name(c)
         c["next_day"] = nxt["day"] if nxt else None
-        c["next_label"] = nxt["label"].split(" — ", 1)[-1] if nxt else None
+        c["next_label"] = re.split(r" — | · ", nxt["label"], maxsplit=1)[-1] if nxt else None
     analysis = {
         "generated_at": db.now_iso(), "run_date": run_date, "day": day,
         "is_latest_bar_today": bars_last == day,

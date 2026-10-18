@@ -303,7 +303,7 @@ body.menu-open { overflow: hidden; }
 .briefing-head-left { display: flex; align-items: center; gap: 24px; min-width: 0; flex-wrap: wrap; }
 /* 제목 옆 날짜 — 데일리 리포트 기준일 `2026.10.11`, 16px 보통 굵기 (2026-10-12 사용자: "미국 증시 데일리 브리핑 옆에 2026.10.11, 날짜는 16포인트").
    안내 문장(핵심만 추렸습니다 …)과 따로 있던 "… 리포트 기준" 줄은 삭제 (2026-10-12 사용자) */
-.briefing-date { font-size: 16px; font-weight: 400; line-height: 30px; letter-spacing: 0; color: var(--gray-500); white-space: nowrap; }   /* "— 2026년 10월 11일" — 리포트 제목의 날짜와 같은 표기 (2026-10-12 사용자) */
+.briefing-date { font-size: 16px; font-weight: 400; line-height: 30px; letter-spacing: 0; color: var(--gray-500); white-space: nowrap; }   /* "2026년 10월 11일" — 리포트 제목의 날짜와 같은 표기 (2026-10-12 사용자). 앞 줄표는 뺐다 (2026-10-18 사용자: 줄표 금지) */
 
 
 /* 오늘의 급등주는 홈에서 삭제 (2026-10-12 사용자) — 리포트 카드 셋만 */
@@ -2861,7 +2861,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
                 var stamp = document.getElementById('briefing-date');   /* 제목 옆 날짜 (2026-10-12 사용자) */
                 var tm = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/.exec(title);   /* 리포트 기준일은 글 제목의 날짜 (발행일은 다음 날일 수 있다) */
                 /* 리포트 제목의 날짜와 같은 표기 "— 2026년 10월 11일" (2026-10-12 사용자) */
-                if (stamp && tm) stamp.textContent = '— ' + tm[1] + '년 ' + parseInt(tm[2], 10) + '월 ' + parseInt(tm[3], 10) + '일';
+                if (stamp && tm) stamp.textContent = tm[1] + '년 ' + parseInt(tm[2], 10) + '월 ' + parseInt(tm[3], 10) + '일';
               }
             })
             .catch(function () { failCard(card); });

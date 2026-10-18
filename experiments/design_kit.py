@@ -319,10 +319,19 @@ def _space_dots(t):
     return _DOT.sub(fix, t)
 
 
+_DASH = re.compile(r"[ \t]+—[ \t]+")
+
+
+def _no_dash(t):
+    """줄표 ` — ` 는 쓰지 않는다 (2026-10-18 사용자: "이 기호는 이제 안 쓸 거야", 가이드라인 2-6). 손으로 고친 고정 글 뒤의 안전망 — LLM 서술 · 기사 제목에 남은 것은 쉼표로.
+    빈 값 자리 표시 `—`(앞뒤 공백 없음)는 그대로."""
+    return _DASH.sub(", ", t)
+
+
 def fix_colons(html):
     """보이는 글의 ":" · "·" 는 앞뒤를 한 칸씩 띄운다 ("·" 는 2026-10-13 사용자) — "라벨 : 값" (2026-10-11 사용자: 꼭 반드시, 모든 페이지 일괄).
     글자 노드와 툴팁·제목 속성(data-tip · title · aria-label)만 고친다. style · script 안, 시각·비율(숫자:숫자), 주소(://)는 건드리지 않는다.
-    각 리포트의 build_body 마지막에 한 번 건다 — LLM 서술도 같이 고쳐진다."""
+    각 리포트의 build_body 마지막에 한 번 건다 — LLM 서술도 같이 고쳐진다. 줄표 ` — ` 도 여기서 쉼표로 (_no_dash)."""
     out, skip = [], False
     for part in _TAG.split(html):
         if part.startswith("<") and part.endswith(">"):
@@ -331,9 +340,9 @@ def fix_colons(html):
                 skip = True
             elif low.startswith(("</script", "</style")):
                 skip = False
-            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _space_dots(_space_colons(m.group(2))) + m.group(3), part))
+            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _space_dots(_space_colons(_no_dash(m.group(2)))) + m.group(3), part))
         else:
-            out.append(part if skip else _space_dots(_space_colons(part)))
+            out.append(part if skip else _space_dots(_space_colons(_no_dash(part))))
     return "".join(out)
 
 

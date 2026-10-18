@@ -164,9 +164,9 @@ def _form4_title(info):
     else:
         codes = sorted({TX_CODE_KO.get(t["code"], t["code"]) for t in info["transactions"] if t["code"]})
         what = " · ".join(codes) if codes else "파생 거래만"
-        return f"임원 거래 공시 — {info['owner']} ({_role(info)}): {what}"   # Form 4 (쉬운 한국어, 가이드라인 3-4)
+        return f"임원 거래 공시 · {info['owner']} ({_role(info)}): {what}"   # Form 4 (쉬운 한국어, 가이드라인 3-4)
     plan = "사전 매도 계획" if info["is_plan"] else "계획 외"   # 10b5-1
-    return f"임원 거래 공시 — {info['owner']} ({_role(info)}): {what} [{plan}]"
+    return f"임원 거래 공시 · {info['owner']} ({_role(info)}): {what} [{plan}]"
 
 
 def _direction(info):
@@ -214,7 +214,7 @@ def collect(conn, since_days=None):
                     + (f" @ ${t['price']:,.2f}" if t["price"] else "")
                     for t in info["transactions"] if t["shares"])
             else:
-                title = f"임원 거래 공시 — {f['accession']} (파싱 실패, 원문 확인)"
+                title = f"임원 거래 공시 · {f['accession']} (파싱 실패, 원문 확인)"
         elif kind == "13dg":   # 5% 이상 대량 보유 신고 — 13D는 경영 관여 목적(능동), 13G는 단순 투자(수동). 사실만 적는다
             area = "Flows"
             info = {"filer": None, "pct": None}
@@ -226,17 +226,17 @@ def collect(conn, since_days=None):
             who = info.get("filer") or "보고자 원문 확인"
             pct = f" {info['pct']:.1f}%" if info.get("pct") is not None else ""
             active = f["form"].startswith("SC 13D")
-            title = f"대량 보유 신고 {f['form']} — {who}{pct}" + (" (경영 관여 목적)" if active else " (단순 투자)")
+            title = f"대량 보유 신고 {f['form']} · {who}{pct}" + (" (경영 관여 목적)" if active else " (단순 투자)")
             direction = "uncertain" if active else "neutral"
             summary = f["description"] or None
         elif kind == "8k":
             items = [i.strip() for i in (f["items"] or "").split(",") if i.strip()]
             raw["item_list"] = items
-            title = ("수시 공시 8-K — " + ", ".join(f"Item {i} {ITEM_KO.get(i, '')}".strip() for i in items)) if items else "수시 공시 8-K"
+            title = ("수시 공시 8-K · " + ", ".join(f"Item {i} {ITEM_KO.get(i, '')}".strip() for i in items)) if items else "수시 공시 8-K"
             area = "Earnings" if "2.02" in items else "Corporate"
             summary = f["description"] or None
         else:
-            title = f"{f['form']} — {f['description'] or '분기·연간 보고서'} (보고 기간 {f['report_date']})"
+            title = f"{f['form']} · {f['description'] or '분기·연간 보고서'} (보고 기간 {f['report_date']})"
             area = "Earnings"
         conn.execute(
             """INSERT OR IGNORE INTO items(item_id, kind, published_at, title, summary, url, source, raw_json, collected_at,

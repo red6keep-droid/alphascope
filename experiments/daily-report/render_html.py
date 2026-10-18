@@ -252,18 +252,151 @@ def _light_word(light):
 
 LIGHT_KIND = {"🟢": "good", "🟡": "uncertain", "🔴": "negative"}   # 신호등 → 라벨·상태 카드 색 (🟢 녹색, 2026-10-12 사용자)
 SCORE_SIZE = "20px"   # 점수 카드의 "86 / 100" — 20px 굵게 (2026-10-12 사용자, 18·16·14 밖의 유일한 예외)
-GRADE_MEANING = {   # 시장 상태 등급의 뜻 — 점수 카드 설명 (2026-10-12 사용자)
-    "위험 선호": "70점 이상 — 투자자들이 위험을 감수하고 주식 쪽으로 돈이 움직이기 쉬운 환경입니다",
-    "중립": "45~69점 — 위험 선호와 위험 회피 어느 쪽으로도 기울지 않은 환경입니다",
-    "위험 회피": "45점 미만 — 투자자들이 위험을 피해 안전자산 쪽으로 움직이기 쉬운 환경입니다",
+# 툴팁 글은 뜻 · 오늘 · 기록상(또는 참고) 세 줄 (디자인-가이드라인.md 2-6, 2026-10-18 사용자: "툴팁은 어려운 용어를 쉽게 전달하는 것인데 숫자만 나열돼 있다").
+# 오늘 값을 읽어 줘야 하므로 툴팁은 상수가 아니라 데이터를 받는 함수. 이 리포트의 지표는 아직 우리 검증 결과가 없어 `기록상` 줄은 두지 않는다.
+# 등급 경계는 analyze.py 와 같아야 한다 — 시장 상태 70 · 45 (REGIME_RISK_ON · OFF), 상승 비율 65 · 45 (breadth_proxy), 위험 신호는 status_board.
+REGIME_GRADE_NOW = {   # 점수 카드 툴팁의 오늘 줄 — 등급의 뜻 (옛 GRADE_MEANING, 2026-10-12 사용자)
+    "위험 선호": "위험 선호 구간. 투자자들이 위험을 감수하고 주식 쪽으로 움직이기 쉬운 환경",
+    "중립": "중립 구간. 위험 선호와 위험 회피 어느 쪽으로도 크게 기울지 않았다",
+    "위험 회피": "위험 회피 구간. 투자자들이 위험을 피해 안전한 자산 쪽으로 움직이기 쉬운 환경",
 }
+BREADTH_GRADE_NOW = {   # 상승 비율 카드 툴팁의 오늘 줄 — 등급의 뜻 (옛 BREADTH_MEANING, 2026-10-12 사용자)
+    "양호": "상승이 시장 전반에 넓게 퍼졌다",
+    "보통": "오른 쪽과 내린 쪽이 비슷하게 섞였다",
+    "취약": "내린 쪽이 더 많아 상승이 일부에 몰렸다",
+}
+STATUS_KEYS = {"trend": "추세 유지", "volatility": "변동성", "breadth": "시장 폭", "rates": "금리 위험", "overheat": "과열 위험"}
 
 
-BREADTH_MEANING = {   # 시장 폭 등급의 뜻 — 상승 비율 카드 설명 (2026-10-12 사용자)
-    "양호": "65% 이상 — 상승이 시장 전반에 넓게 퍼졌습니다",
-    "보통": "45~65% — 오른 쪽과 내린 쪽이 비슷하게 섞였습니다",
-    "취약": "45% 미만 — 내린 쪽이 더 많아 상승이 일부에 몰렸습니다",
-}
+def _ahead(v, a, b):
+    """상대강도 값 → `나스닥이 S&P 500보다 1.23%p 앞섰다` (둘 다 내린 날도 맞게 '더 올랐다' 대신 앞섰다 · 뒤처졌다). a 는 조사까지 붙여 넘긴다."""
+    if v > 0:
+        return f"{a} {b}보다 {abs(v):.2f}%p 앞섰다"
+    if v < 0:
+        return f"{a} {b}보다 {abs(v):.2f}%p 뒤처졌다"
+    return "두 지수가 같았다"
+
+
+def score_tip(regime):
+    """점수 카드 ? — 오늘 점수가 어느 등급인지와 등급의 뜻 (구성 요소 규칙은 구획 제목 옆 `점수 0~100` 툴팁, regime_rule)."""
+    s = int(regime["score"])
+    grade = "위험 선호" if s >= 70 else "중립" if s >= 45 else "위험 회피"
+    return ("지금 시장이 주식에 우호적인 환경인지를 점수로 나타낸 것. 높을수록 우호적\n"
+            f"· 오늘 {s}점 : {REGIME_GRADE_NOW[grade]}\n"
+            "· 나누는 법 : 70 이상 위험 선호, 45~69 중립, 45 미만 위험 회피")
+
+
+def regime_rule(regime):
+    """구획 제목 옆 `점수 0~100` ? — 다섯 항목이 무엇이고 오늘 가장 강한 · 약한 항목 (옛 REGIME_TIP 의 점수표는 analyze.regime_score() 에)."""
+    comps = [(REGIME_COMPONENT_LABELS[k], c["score"], c["max"]) for k, c in ((regime or {}).get("components") or {}).items()
+             if k in REGIME_COMPONENT_LABELS and c.get("score") is not None and c.get("max")]
+    now = ""
+    if comps and regime.get("score") is not None:
+        hi = max(comps, key=lambda c: c[1] / c[2])
+        lo = min(comps, key=lambda c: c[1] / c[2])
+        if hi[1] / hi[2] == lo[1] / lo[2]:
+            now = f"\n· 오늘 {int(regime['score'])}점 : 다섯 항목이 고르게 {hi[1] / hi[2] * 100:.0f}% 수준"
+        else:
+            now = (f"\n· 오늘 {int(regime['score'])}점 : 가장 탄탄한 항목은 {hi[0]}({int(hi[2])}점 중 {int(hi[1])}점), "
+                   f"가장 약한 항목은 {lo[0]}({int(lo[2])}점 중 {int(lo[1])}점)")
+    return ("추세 · 시장 폭 · 변동성 · 금리 환경 · 위험 선호 다섯 항목의 점수를 더한 것" + now +
+            "\n· 점수 매기는 법 : 지수가 평균 가격선 위에 있을수록, 상승 비율이 높을수록, VIX가 낮을수록, 금리가 내릴수록, "
+            "성장주 · 소형주처럼 위험한 자산이 강할수록 점수가 오른다"
+            "\n· 참고 : 정해 둔 규칙으로 계산한 값이라, 앞으로 오를지를 맞힌다는 뜻은 아니다")
+
+
+def breadth_tip(b):
+    """상승 비율 카드 ? — 무엇 가운데 몇 개가 올랐고 그 등급이 무슨 뜻인지."""
+    full = b.get("mode") == "full"
+    ratio = b["ratio"]
+    grade = (b.get("label") or "")[1:].strip() or ("양호" if ratio >= 65 else "보통" if ratio >= 45 else "취약")
+    if full:
+        head = "오늘 S&P 500 종목 가운데 오른 종목이 얼마나 되는지"
+        cnt = f"{b.get('advancers')}개 오르고 {b.get('decliners')}개 내렸다" if b.get("advancers") is not None else ""
+    else:
+        head = "오늘 미국 주요 업종 가운데 오른 업종이 얼마나 되는지"
+        cnt = f"업종 {b.get('sectors_counted')}개 중 {b.get('sectors_up')}개가 올랐다" if b.get("sectors_up") is not None else ""
+    mean = BREADTH_GRADE_NOW.get(grade, "")
+    return (head + f"\n· 오늘 {ratio:.1f}% : " + ". ".join(x for x in (cnt, mean) if x) +
+            "\n· 나누는 법 : 65% 이상 양호, 45~65% 보통, 45% 미만 취약")
+
+
+def rs_group_tip(rs):
+    """`상대강도` 소제목 ? — 세 비교 가운데 앞쪽이 강했던 것."""
+    won = [w for k, w in (("qqq_spy_5d", "성장주"), ("iwm_spy_5d", "소형주"), ("rsp_spy_5d", "고르게 담은 지수")) if (rs.get(k) or 0) > 0]
+    known = [k for k in ("qqq_spy_5d", "iwm_spy_5d", "rsp_spy_5d") if rs.get(k) is not None]
+    now = ""
+    if known:
+        now = (f"\n· 오늘 {len(known)}개 중 {len(won)}개 : " +
+               (" · ".join(won) + " 쪽이 시장 전체보다 강했다" if won else "모두 큰 회사 위주의 시장 전체 쪽이 강했다"))
+    return ("최근 일주일 동안 두 지수 중 어느 쪽이 더 강했는지 견준 것" + now +
+            "\n· 참고 : 값이 플러스면 앞에 적힌 쪽이 더 많이 올랐다는 뜻")
+
+
+def _sgn(v):
+    return f"{v:+.2f}".replace("-", "−")   # 툴팁 숫자 부호는 엔비디아와 같게 `−`
+
+
+def qqq_tip(v):
+    now = "" if v is None else f"\n· 오늘 {_sgn(v)}%p : {_ahead(v, '나스닥이', 'S&P 500')}. " + (
+        "성장주 쪽이 강했던 한 주" if v > 0 else "성장주가 쉬어 간 한 주" if v < 0 else "어느 쪽도 앞서지 않았다")
+    return "나스닥(성장주)이 S&P 500(시장 전체)보다 최근 일주일 동안 더 강했는지" + now
+
+
+def iwm_tip(v):
+    now = "" if v is None else f"\n· 오늘 {_sgn(v)}%p : {_ahead(v, '러셀 2000이', 'S&P 500')}. " + (
+        "위험을 감수하는 쪽으로 돈이 움직일 때 흔히 보이는 모습" if v > 0 else "돈이 큰 회사 쪽에 머문 한 주" if v < 0 else "어느 쪽도 앞서지 않았다")
+    return "러셀 2000(소형주)이 S&P 500보다 최근 일주일 동안 더 강했는지" + now
+
+
+def rsp_tip(v, span="최근 일주일"):
+    """동일가중(RSP) − 시총가중(SPY). span = `최근 일주일`(달라진 것) · `오늘 하루`(시장 탭)."""
+    if v is None:
+        now = ""
+    elif v > 0:
+        now = f"\n· 오늘 {_sgn(v)}%p : 고르게 담은 쪽이 {abs(v):.2f}%p 앞섰다. 상승이 소수 대형주가 아니라 넓게 퍼졌다"
+    elif v < 0:
+        now = f"\n· 오늘 {_sgn(v)}%p : 큰 회사 위주 쪽이 {abs(v):.2f}%p 앞섰다. 소수 대형주가 지수를 끌었다"
+    else:
+        now = f"\n· 오늘 {_sgn(v)}%p : 두 지수가 같았다"
+    return f"종목을 똑같이 담은 지수와 큰 회사 위주 지수 중 {span} 어느 쪽이 더 강했는지" + now
+
+
+POSITION_NOW = {"20일 고점 부근": "고점 근처", "단기 고점 부근 · 과열 주의": "고점 근처인데 한 달 새 5% 넘게 올라 과열 주의",
+                "20일 저점 부근": "저점 근처", "박스 중간": "고점과 저점 사이"}   # analyze.position_stats 라벨 → 쉬운 말
+
+
+def position_tip(p):
+    """`20일 위치` 소제목 ? — S&P 500 으로 오늘을 읽어 준다."""
+    now = ""
+    fh, fl, label = (p or {}).get("from_high_pct"), (p or {}).get("from_low_pct"), (p or {}).get("position_label")
+    if fh is not None and label:
+        if "저점" in label and fl is not None:
+            where = f"한 달 저점보다 {abs(fl):.1f}% 위"
+        else:
+            where = "한 달 고점에 있다" if fh >= -0.05 else f"한 달 고점보다 {abs(fh):.1f}% 아래"
+        now = f"\n· 오늘 S&P 500 : {where}, {POSITION_NOW.get(label, label)}"
+    return ("최근 한 달 동안 가장 높았던 값과 가장 낮았던 값 사이에서 지수가 지금 어디쯤인지" + now +
+            "\n· 나누는 법 : 고점과 1% 안이면 고점 부근, 저점과 1% 안이면 저점 부근, 그 사이는 박스 중간. 고점 부근이면서 한 달에 5% 넘게 오르면 과열 주의")
+
+
+def risk_rule(status):
+    """구획 제목 옆 `판정` ? — 오늘 종합이 왜 그렇게 나왔는지와 판정 규칙 (옛 RISK_TIP)."""
+    status = status or {}
+    names = lambda lt: [n for k, n in STATUS_KEYS.items() if status.get(k) == lt]  # noqa: E731
+    overall = status.get("overall")
+    now = ""
+    if overall == "🔴":
+        now = f"\n· 오늘 경계 : {' · '.join(names('🔴'))}에 경계가 켜졌다"
+    elif overall == "🟡":
+        now = f"\n· 오늘 주의 : {' · '.join(names('🟡'))}에 주의가 켜져 조심할 신호가 여럿"
+    elif overall == "🟢":
+        c = names("🟡")
+        now = "\n· 오늘 정상 : " + (f"주의가 {c[0]} 하나뿐이라 정상" if c else "켜진 위험 신호가 없다")
+    return ("다섯 가지 위험 신호를 정상 · 주의 · 경계로 나눠, 시장이 지금 얼마나 불안한지 보는 것" + now +
+            "\n· 나누는 법 : 경계가 하나라도 있으면 경계, 주의가 둘 이상이면 주의, 그 밖은 정상"
+            "\n· 주의가 켜지는 때 : S&P 500이 평균 가격선 아래로 내려가거나, VIX가 18 이상, 상승 비율 55% 미만, "
+            "금리가 일주일에 0.05%p 넘게 오르거나, 지수가 한 달에 4% 이상 오를 때")
 
 
 def _pos(label):
@@ -308,8 +441,7 @@ def sec_regime(analysis, report, prev=None):
     light = regime.get("light") or "🟡"
     grade = dk.ko(regime.get("label") or "", TERM_KO)
     # 점수 · 등급 설명은 본문 글머리표가 아니라 "점수" 옆 ? 툴팁 (2026-10-12 사용자: "점수 위험 선호 내용은 툴팁으로 제공하고 본문에서 삭제")
-    explain = ("추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수의 합(0~100)입니다. 높을수록 주식에 우호적인 환경입니다.\n"
-               + "\n".join(f"· {g} = {m}" for g, m in GRADE_MEANING.items()))
+    explain = score_tip(regime)   # 뜻 · 오늘 · 나누는 법 (가이드라인 2-6)
     score_card = dk.state_card("점수" + dk.tip_icon(explain), LIGHT_KIND.get(light, "neutral"),   # `안내 ?` (2026-10-13 사용자: 아이콘만 두지 않는다) · 따로 카드, 배경은 등급 라벨 색 (2026-10-12 사용자)
                                _light_pill(light, grade) + f' <span style="font-size:{SCORE_SIZE};">{int(regime["score"])} <span style="color:{dk.SUB};font-weight:400;">/ 100</span></span>', chev=True)   # 라벨이 점수 앞 (2026-10-13 사용자) · 86 / 100 은 20px 굵게 (2026-10-12 사용자)
     rows = []
@@ -379,15 +511,15 @@ def sec_change(analysis, report, prev=None):
     # 읽는 법은 카드가 아니라 그 내용의 제목(소제목 · 구분명) 옆 ? 툴팁 — 7번째 값 (2026-10-12 사용자: "해당 내용만 툴팁으로 타이틀 옆에")
     prs = (prev or {}).get("rs") or {}
     rows = [("성장주 vs 시장 (나스닥 vs S&P 500 · 5일)", dk.arrow(rs.get("qqq_spy_5d"), 2, "%p"), _vs(rs.get("qqq_spy_5d"), prs.get("qqq_spy_5d")), None, False, True,
-             "양수면 나스닥(성장주)이 S&P 500보다 강했습니다"),
+             qqq_tip(rs.get("qqq_spy_5d"))),
             ("소형주 vs 시장 (러셀 2000 vs S&P 500 · 5일)", dk.arrow(rs.get("iwm_spy_5d"), 2, "%p"), _vs(rs.get("iwm_spy_5d"), prs.get("iwm_spy_5d")), None, False, True,
-             "양수면 러셀 2000(소형주)이 S&P 500보다 강했습니다 — 위험을 감수하는 쪽으로 돈이 움직일 때 흔히 나타납니다"),
+             iwm_tip(rs.get("iwm_spy_5d"))),
             ("동일가중 vs 시총가중 (RSP vs SPY · 5일)", dk.arrow(rs.get("rsp_spy_5d"), 2, "%p"), _vs(rs.get("rsp_spy_5d"), prs.get("rsp_spy_5d")), None, False, True,
-             "양수면 종목을 똑같이 담은 지수(RSP)가 더 올랐습니다 — 상승이 소수 대형주가 아니라 넓게 퍼졌다는 뜻")]   # 어제 대비는 줄 아래 한 줄 (sub_below)
+             rsp_tip(rs.get("rsp_spy_5d")))]   # 어제 대비는 줄 아래 한 줄 (sub_below)
     streak = rs.get("qqq_streak")
     if streak is not None:
         rows.append(("나스닥이 S&P 500을 웃돈 연속 일수", f"{int(streak)}일", _vs(streak, prs.get("qqq_streak"), 0, "일"), None, False, True))
-    out = (_text(report.get("change_comment")) + dk.sub_label("상대강도", "두 지수의 5거래일 수익률 차이(%p). 양수면 앞쪽이 더 많이 올랐습니다")
+    out = (_text(report.get("change_comment")) + dk.sub_label("상대강도", rs_group_tip(rs))
            + dk.ccard(rows, fold_at=FOLD_SHOWN, noun="항목"))   # 앞 2줄 + 카드 아래 더 보기 (2026-10-13 사용자: 소제목 화살표 대신)
     trows = []
     for key in ("sp500", "nasdaq", "russell"):
@@ -403,7 +535,7 @@ def sec_change(analysis, report, prev=None):
     if vix.get("now") is not None and vix.get("prev_5d") is not None:   # VIX 는 같은 카드 마지막 줄 (2026-10-13 사용자: 더 보기 안으로)
         trows.append(("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → <b>{vix["now"]:.2f}</b> {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}',
                       _vs(vix["now"], _get(prev, "vix", "now"), 2, ""), 35, True, True))   # 값 한 줄 (2026-10-12 사용자), 어제 대비는 줄 아래
-    return out + dk.sub_label("20일 위치", "최근 20거래일의 고점 · 저점 사이에서 지금 어디에 있는지") + dk.ccard(trows, fold_at=FOLD_SHOWN, noun="항목")
+    return out + dk.sub_label("20일 위치", position_tip(position.get("sp500"))) + dk.ccard(trows, fold_at=FOLD_SHOWN, noun="항목")
 
 
 def _up_down(up, down):
@@ -420,9 +552,7 @@ def sec_breadth(analysis, prev=None):
         return ""
     light = (b.get("label") or "")[:1]
     grade = (b.get("label") or "")[1:].strip()
-    base = "S&P 500 구성종목" if b.get("mode") == "full" else f"섹터 ETF {b.get('sectors_counted')}개"
-    explain = (f"오늘 {base} 가운데 오른 것의 비율입니다.\n"
-               + "\n".join(f"· {g} = {m}" for g, m in BREADTH_MEANING.items()))   # 등급 설명은 본문 글머리표 대신 `안내 ?` (점수 카드와 같게, 2026-10-13 사용자)
+    explain = breadth_tip(b)   # 등급 설명은 본문 글머리표 대신 `안내 ?` (점수 카드와 같게, 2026-10-13 사용자) · 뜻 · 오늘 · 나누는 법 (가이드라인 2-6)
     ratio_card = dk.state_card("상승 비율" + dk.tip_icon(explain), LIGHT_KIND.get(light, "neutral"),
                                _light_pill(light, grade or None) + f' {b["ratio"]:.1f}%', chev=True)   # 따로 카드, 배경은 등급 색 (2026-10-12 사용자) · 라벨이 비율 앞 (2026-10-13 사용자)
     pb = (prev or {}).get("breadth") or {}
@@ -440,7 +570,7 @@ def sec_breadth(analysis, prev=None):
                      _join(f"{b.get('sectors_counted')}개 기준", _vs(b.get("sectors_up"), pb.get("sectors_up"), 0, "개", "상승 어제 대비"))))   # 폰에서도 구분명 │ 보조 줄 한 줄 (2026-10-12 사용자) — 상승·하락은 ▲▼ 가 말한다
     if b.get("rsp_spy_1d") is not None:
         rows.append(("동일가중 − 시총가중 (1일)", dk.arrow(b["rsp_spy_1d"], 2, "%p"), _vs(b["rsp_spy_1d"], pb.get("rsp_spy_1d")), None, False, True,
-                     "양수면 상승이 소수 대형주에 몰리지 않고 넓게 퍼졌습니다"))   # 읽는 법은 구분명 옆 ? (2026-10-12 사용자)
+                     rsp_tip(b["rsp_spy_1d"], "오늘 하루")))   # 읽는 법은 구분명 옆 ? (2026-10-12 사용자)
         if b.get("rsp_spy_5d") is not None:
             rows.append(("동일가중 − 시총가중 (5일)", dk.arrow(b["rsp_spy_5d"], 2, "%p"), _vs(b["rsp_spy_5d"], pb.get("rsp_spy_5d")), None, False, True))
     return dk.state_fold(ratio_card, dk.ccard(rows)).replace('<details data-acc="1" style="margin:0 0 8px;">', f'<details data-acc="1" style="margin:0 0 8px;padding-top:{TAB_TOP}px;">', 1)   # 시장 탭 첫 콘텐츠 위 +10 (2026-10-13 사용자)   # 상승 비율 카드를 누르면 펼침 (2026-10-13 사용자)
@@ -669,21 +799,6 @@ def sec_status(analysis, report, prev=None):
     return risk_ul + overall_card + dk.rule_rows(rows)   # 신호 줄은 흰 카드 대신 가로 구분선 (2026-10-13 사용자)   # 글 먼저, 강조 카드 (2026-10-12 사용자), 소제목 없음 — 구획 제목이 '주의할 위험요인'   # 판정 규칙은 제목 옆 ? 툴팁 (가이드라인 2-1 상태 카드 규칙)
 
 
-REGIME_TIP = ("추세·시장 폭·변동성·금리 환경·위험 선호 다섯 항목 점수를 더한 값(0~100)입니다. 70 이상 위험 선호 · 45~69 중립 · 45 미만 위험 회피.\n"
-              "· 추세 25 = S&P 500(SPY)이 20일선 위 10 · 50일선 위 10 · 20일선이 오르는 중 5\n"
-              "· 시장 폭 20 = 상승 비율 70% 이상 20 · 55% 이상 14 · 45% 이상 8\n"
-              "· 변동성 20 = VIX 15 미만 20 · 20 미만 14 · 25 미만 8 · 30 미만 3 (5일 동안 2 넘게 내리면 +2)\n"
-              "· 금리 환경 15 = 10년물 5일 변화 −10bp 이하 15 · 0 이하 11 · +10bp 이하 6\n"
-              "· 위험 선호 20 = 5일 동안 나스닥·러셀 2000이 S&P 500보다 강함 각 5 · 주식이 장기 국채(TLT)보다 강함 5 · 하이일드 채권(HYG) 상승 5\n"
-              "계산 규칙은 analyze.regime_score()")
-RISK_TIP = ("종합 = 경계가 하나라도 있으면 경계, 주의가 둘 이상이면 주의, 그 밖은 정상입니다.\n"
-            "· 추세 유지 = SPY가 20일선·50일선 둘 다 위 정상 · 하나만 위 주의 · 둘 다 아래 경계\n"
-            "· 변동성 = VIX 18 미만 정상 · 25 이하 주의 · 넘으면 경계\n"
-            "· 시장 폭 = 상승 비율 55% 이상 정상 · 45% 이상 주의 · 그 아래 경계\n"
-            "· 금리 위험 = 10년물 5일 변화 +5bp 이하 정상 · +15bp 이하 주의 · 넘으면 경계\n"
-            "· 과열 위험 = SPY 20일 +6% 이상이면서 20일 고점과 0.5% 안 경계 · +4% 이상 주의")
-
-
 def sec_footer(input_data):
     return dk.footer(
         f"데이터 수집(FRED · Yahoo Finance · CNBC)과 파이썬 계산, AI 해설(Gemini)을 자동으로 결합해 만든 글입니다. "
@@ -701,7 +816,7 @@ def build_body(input_data, report, cover_url=None, analysis=None):
         _cover_image(cover_url),
         sec_lead(report, analysis),
         dk.section("시장 상태", sec_regime(analysis, report, prev), tab=TAB_TODAY, one_line=True,
-                   aside=dk.tip_line([("점수 0~100", REGIME_TIP)], in_title=True)),   # 계산 규칙은 ? 툴팁 (2026-10-11 일괄 적용)
+                   aside=dk.tip_line([("점수 0~100", regime_rule((analysis or {}).get("regime")))], in_title=True)),   # 계산 규칙은 ? 툴팁 (2026-10-11 일괄 적용)
         dk.section("주요 지수", sec_indices(indices, analysis, report), tab=TAB_TODAY),
     ]
     change = sec_change(analysis, report, prev)
@@ -719,7 +834,7 @@ def build_body(input_data, report, cover_url=None, analysis=None):
         dk.section("관심 종목", _text(report.get("attention_comment")) + _quote_rows(input_data.get("most_active", [])), summary="거래 상위 5", tab=TAB_STOCKS),
         dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_STOCKS),
         dk.section("주의 위험요인", sec_status(analysis, report, prev), tab=TAB_RISK, one_line=True,
-                   aside=dk.tip_line([("판정", RISK_TIP)], in_title=True)),   # 판정 규칙은 ? 툴팁 (안내 줄에서 옮김)
+                   aside=dk.tip_line([("판정", risk_rule((analysis or {}).get("status")))], in_title=True)),   # 판정 규칙은 ? 툴팁 (안내 줄에서 옮김)
         sec_footer(input_data),
         dk.WRAP_CLOSE,
     ]

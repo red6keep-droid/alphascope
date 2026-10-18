@@ -52,6 +52,9 @@ RULINGS = [  # (패턴, 한국어, NVDA(피고) 기준 방향, cases.status 전�
 EXCLUDE_RE = re.compile(r"seal|administrative motion|pro hac vice|withdraw|extension of time|leave to file", re.I)
 
 
+SEP, OLD_SEP = " · ", " — "   # 일정 이름 = `사건 · 일정`. 옛 행은 ` — ` (2026-10-18 줄표 금지 전), 지우기 · 찾기는 둘 다 본다
+
+
 def short_name(case):
     t = case["title"]
     if re.match(r"in re", t, re.I):
@@ -139,11 +142,11 @@ def run(conn, day, dry_run=False):
         last_seen = db.get_meta(conn, seen_key)
         # 1) 일정 — 미래 COURT 행을 이 사건 기준으로 갈아 끼운다
         ms = milestones_from(entries, today)
-        prefix = f"{name} — "
+        prefix = f"{name}{SEP}"
         for label, (d, num, filed) in sorted(ms.items(), key=lambda kv: kv[1][0]):
             print(f"  [court] {name}: {label} {d} (문서 #{num}, {filed})")
         if not dry_run:
-            conn.execute("DELETE FROM calendar WHERE kind = 'COURT' AND label LIKE ? AND day > ?", (prefix + "%", day))
+            conn.execute("DELETE FROM calendar WHERE kind = 'COURT' AND (label LIKE ? OR label LIKE ?) AND day > ?", (prefix + "%", f"{name}{OLD_SEP}%", day))
             for label, (d, num, filed) in ms.items():
                 conn.execute("INSERT OR IGNORE INTO calendar(day, kind, label, symbol, source, confirmed) VALUES (?,?,?,?,?,1)",
                              (d, "COURT", prefix + label, None, f"courtlistener #{num}"))
@@ -160,7 +163,7 @@ def run(conn, day, dry_run=False):
                 """INSERT OR IGNORE INTO items(item_id, kind, published_at, title, summary, url, source, raw_json, collected_at,
                        ai_area, ai_direction, ai_novelty, ai_relevance, ai_fact, ai_model, analyzed_at, is_event)
                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)""",
-                (item_id, "court", f"{filed}T00:00:00Z", f"{name} — {ko}", text[:500], c["url"], "courtlistener",
+                (item_id, "court", f"{filed}T00:00:00Z", f"{name}{SEP}{ko}", text[:500], c["url"], "courtlistener",
                  db.dumps({"case_id": c["case_id"], "entry": e.get("entry_number"), "ruling": ko}), db.now_iso(),
                  "Legal", direction, "update", 3, f"{name}: {ko} ({filed}, 문서 #{e.get('entry_number')})", "rule", db.now_iso()))
             conn.execute("UPDATE cases SET last_activity_at = ?, last_activity_summary = ?, status = COALESCE(?, status) WHERE case_id = ?",

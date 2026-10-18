@@ -10,7 +10,7 @@ For each item return:
   "direction": "positive" | "negative" | "uncertain" | "neutral",   // for NVIDIA's business, as the document states it. "uncertain" = raises uncertainty without a clear sign
   "novelty": "new" | "update" | "repeat",   // see NOVELTY
   "relevance": integer 0-3,     // see RELEVANCE
-  "fact": string,               // ONE sentence in Korean stating what the document says happened. Only numbers that appear in the text. No adjectives, no causality, no advice. Max 120 Korean characters.
+  "fact": string,               // ONE sentence in Korean stating what the document says happened. Only numbers that appear in the text. No adjectives, no causality, no advice. Max 120 Korean characters. Never use the dash character "—" in Korean output; use a comma or " · " instead.
   "entities": { "tickers": string[], "countries": string[], "products": string[] },   // only names that appear in the text; US tickers in uppercase
   "speaker": "ceo" | "nvidia_exec" | "government" | "customer_partner" | "none"   // see SPEAKER
 }

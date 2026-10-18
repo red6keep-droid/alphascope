@@ -225,7 +225,7 @@ TEST_NOTICE = ("이 리포트는 테스트 운영 중입니다. 수집·판정 �
                "빈 칸에는 이유와 채워질 시점을 적어 두었습니다.")
 # 빈 칸 안내 문구 — 상태판 key별. 없는 key는 기본 문구
 MISSING_HINTS = {
-    "iv_atm_30d": "옵션 체인은 미국 장 마감 후에만 받습니다 — 다음 실행에서 채움",
+    "iv_atm_30d": "옵션 체인은 미국 장 마감 후에만 받습니다. 다음 실행에서 채움",
     "implied_move_next_earnings": "옵션 체인 수집 후 계산",
     "pc_ratio_oi": "옵션 체인 수집 후 계산", "pc_ratio_vol": "옵션 체인 수집 후 계산",
     "gex_approx": "옵션 체인 수집 후 계산", "gex_flip_strike": "옵션 체인 수집 후 계산",
@@ -233,12 +233,12 @@ MISSING_HINTS = {
     "iv_rank_60d": "60거래일 스냅샷이 쌓인 뒤 표시",
     "rev_est_cq_7d_chg_pct": "7일치 스냅샷이 쌓인 뒤 표시",
     "ma_cross": "오늘 교차 없음",
-    "smh_shares_out": "yfinance ETF 정보에서 받지 못함 — 다음 실행에서 재시도",
-    "soxx_shares_out": "yfinance ETF 정보에서 받지 못함 — 다음 실행에서 재시도",
-    "finra_short_ratio": "FINRA 파일은 미국 저녁에 올라옵니다 — 다음 실행에서 채움",
+    "smh_shares_out": "yfinance ETF 정보에서 받지 못함, 다음 실행에서 재시도",
+    "soxx_shares_out": "yfinance ETF 정보에서 받지 못함, 다음 실행에서 재시도",
+    "finra_short_ratio": "FINRA 파일은 미국 저녁에 올라옵니다. 다음 실행에서 채움",
     "finra_short_ratio_avg20": "장외 공매도 비율이 20일 쌓인 뒤 표시",
 }
-MISSING_DEFAULT_HINT = "이번 실행에서 받지 못함 — 다음 실행에서 재시도"
+MISSING_DEFAULT_HINT = "이번 실행에서 받지 못함, 다음 실행에서 재시도"
 REPORT_LABELS = ["엔비디아", "미국 증시", "자동 리포트"]
 # 고정 페이지 "리포트 읽는 법" (가이드라인 3-4, 2026-10-11). 비어 있으면 꼬리에 링크를 두지 않는다. publish.py --guide-page 가 올리고 주소를 알려준다
 GUIDE_URL = os.environ.get("NVDA_GUIDE_URL", "https://alpha-scope.blogspot.com/p/blog-page.html")   # 2026-10-11 생성

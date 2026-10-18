@@ -106,7 +106,7 @@ def run(analysis=None, day=None):
                 safe = re.sub(r"[^A-Za-z0-9]+", "-", gkey).strip("-").lower()
                 ref = f"images/trump-reaction-{day}-{safe}-{h}.png"
                 path = os.path.join(config.OUTPUT_DIR, ref)
-                draw(rows, f"{topic} — {dlabel} — {label} (n={rows[0]['n']})", path)
+                draw(rows, f"{topic} | {dlabel} | {label} (n={rows[0]['n']})", path)
                 out.setdefault(gkey, {})[h] = {"ref": ref, "path": path, "url": f"https://cdn.jsdelivr.net/gh/{slug}@gh-pages/{ref}"}
                 refs.append(ref)
     with open(os.path.join(config.OUTPUT_DIR, "reaction_charts.json"), "w", encoding="utf-8") as f:

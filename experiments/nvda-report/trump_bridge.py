@@ -82,7 +82,7 @@ def events(day):
     out = []
     for e in select(state, day):
         topic = f"{e.get('topic')}" + (f"/{e.get('subtopic')}" if e.get("subtopic") else "")
-        title = (f"트럼프 발언 — {topic} · 강도 {e.get('intensity')} · {DIR_KO.get(e.get('direction'), e.get('direction'))}"
+        title = (f"트럼프 발언 : {topic} · 강도 {e.get('intensity')} · {DIR_KO.get(e.get('direction'), e.get('direction'))}"
                  + (f" · {e['path_text']}" if e.get("path_text") else "") + stale)
         stat = robust_stat(state, e)
         area = "Corporate" if e.get("topic") == "Company" else "Regulation"

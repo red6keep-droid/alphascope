@@ -87,31 +87,32 @@ def sec_trends(a):
     return out   # 처음 등장은 제목 줄 툴팁 (2026-10-13 사용자)
 
 
+# 강도 척도 (prompts/classify.txt) — 툴팁에서 오늘 평균 강도를 쉬운 말로 읽어 준다
+INTENSITY_WORDS = ((2, "지나가는 언급"), (4, "의견 · 평가"), (6, "조치 없는 강한 주장"), (8, "정책 경고나 구체적 조치 언급"),
+                   (9, "정책 발표 예고"), (10, "바로 시행하는 정책 발표"))
+
+
+def _inten_word(v):
+    r = round(v)
+    return next(w for top, w in INTENSITY_WORDS if r <= top)
+
+
 def _trend_tips(a):
-    """급상승 주제 용어 툴팁 — 계산은 aggregate.trend_scores(), 강도 척도는 prompts/classify.txt."""
-    w = config.TREND_WEIGHTS
-    pct = lambda k: f"{round(w[k] * 100)}%"
-    score = ("최근 7일에 나온 주제끼리 견준 상대 점수(0~100)입니다. 네 가지를 주제 사이 순위(0~100)로 바꿔 비중대로 더합니다.\n"
-             f"· 늘어난 정도 {pct('frequency')} = 7일 이벤트 수 − 직전 7일 이벤트 수\n"
-             f"· 강도 {pct('intensity')} = 평균 강도\n"
-             f"· 최근성 {pct('recency')} = 마지막 발언이 얼마나 최근인지\n"
-             f"· 새로움 {pct('novelty')} = 직전 {config.NOVELTY_LOOKBACK_DAYS}일에 없던 주제면 만점\n"
-             "순위로 매기므로 다른 날 점수와 견주는 값이 아닙니다.")
-    events = (f"같은 주제의 게시물이 {config.CLUSTER_GAP_MINUTES}분 안에 이어지면 한 건으로 묶은 것입니다. "
-              f"시장 관련도가 {config.RELEVANCE_EVENT_MIN} 이상인 게시물만 셉니다. 괄호는 그 앞 7일의 건수입니다.")
-    inten = ("이벤트 강도의 7일 평균(1~10)입니다. 강도는 말의 세기가 아니라 정책이 얼마나 구체적인지를 AI가 매긴 값이고, "
-             "이벤트 강도는 묶인 게시물 가운데 가장 높은 값입니다.\n"
-             "· 1~2 = 지나가는 언급\n· 3~4 = 의견·평가\n· 5~6 = 구체적 조치 없는 강한 주장·위협\n"
-             "· 7~8 = 정책 경고 또는 구체적 조치 언급\n· 9 = 정책 발표 예고\n· 10 = 즉시 시행 정책·행정명령 발표")
-    read = dk.read_text([
-        ("기간", "최근 7일. 세부 주제마다 한 줄 — 예를 들어 에너지 / 경유"),
-        ("순서", "점수 순 — 직전 7일보다 늘어난 정도 · 강도 · 최근성 · 새로움을 합친 상대 점수라 갑자기 많아진 주제가 위로 옵니다"),
-        ("보조 줄", "7일 이벤트 수 (그 앞 7일 수) · 평균 강도. 뜻은 옆의 용어 ? 에서"),
-        ("30일 흐름과 차이", "30일 흐름은 큰 주제별로 한 달 동안 몇 건이었는지를 많은 순으로 봅니다. 급상승 주제는 최근 1주 안에 갑자기 늘어난 세부 주제를 찾습니다"),
-    ])
-    terms = f"점수 : {score}\n7일 이벤트 : {events}\n평균 강도 : {inten}"   # 점수 · 7일 이벤트 · 평균 강도를 한 툴팁으로
+    """급상승 주제 툴팁 — 계산은 aggregate.trend_scores(), 강도 척도는 prompts/classify.txt.
+    툴팁 글 틀은 디자인-가이드라인 2-6 (뜻 · 오늘 · 기록상, 2026-10-18 사용자). 점수 = 늘어난 정도 · 강도 · 최근성 · 새로움의
+    주제 사이 순위를 config.TREND_WEIGHTS 비중대로 더한 값 — 공식은 툴팁에 두지 않는다."""
+    t = a["trend_scores"][0]
+    read = ("최근 7일 동안 갑자기 많이 말하기 시작한 세부 주제를 점수 순으로 줄 세운 것\n"
+            f"· 오늘 1위 : {_k(t['key'])}, 그 앞 7일 {t['events_prev_7d']}건에서 이번 7일 {t['events_7d']}건이 됐다\n"
+            "· 30일 흐름과 차이 : 30일 흐름은 큰 주제별 한 달 건수, 여기는 최근 1주에 갑자기 늘어난 세부 주제")
+    terms = ("카드 오른쪽 점수와 아래 작은 줄 숫자의 뜻\n"
+             f"· 점수 {t['score']:.0f}점 : 늘어난 정도 · 구체성 · 최근인지 · 처음인지를 합쳐 오늘 주제끼리 견준 값. 다른 날과는 견주지 않는다\n"
+             f"· 7일 이벤트 {t['events_7d']}건 : 이어 올린 글은 한 건으로 센 발언 수. 괄호는 그 앞 7일\n"
+             f"· 평균 강도 {t['avg_intensity']:.1f} : 정책이 얼마나 구체적인지 1~10으로 매긴 값. 이 정도면 {_inten_word(t['avg_intensity'])}")
     ne = a["new_entrants"]
-    first = ("직전 90일 없이 7일 안에 처음 나온 대상 — " + ", ".join(ne["target"] + ne["symbol"])) if (ne["target"] or ne["symbol"]) else ""
+    names = ne["target"] + ne["symbol"]
+    first = ("그 앞 90일 동안 없다가 최근 7일에 처음 이름이 나온 나라 · 종목\n"
+             f"· 오늘 {len(names)}개 : {', '.join(names)}") if names else ""
     return [("읽는 법", read), ("용어", terms)] + ([("처음 등장", first)] if first else [])   # 처음 등장도 툴팁 (2026-10-13 사용자)
 
 
@@ -144,7 +145,7 @@ def _flow_card(blk):
         desc = f"최근 30일 시장 관련 이벤트는 {total}건입니다. 그 앞 30일 데이터가 아직 없어 늘고 줄었는지는 보지 않습니다"
     items = [(None, desc)]
     top = rows[0]
-    items.append(("가장 많은 주제", f"{k(top)} {top['events']}건 — 전체의 {top['events'] / total * 100:.0f}%"))
+    items.append(("가장 많은 주제", f"{k(top)} {top['events']}건, 전체의 {top['events'] / total * 100:.0f}%"))
     if prev:
         if up:
             items.append(("늘어난 주제", " · ".join(f"{k(r)} {r['prev_events']}건 → {r['events']}건" for r in sorted(up, key=lambda r: -r["delta_events"])[:3])))
@@ -171,6 +172,23 @@ def _flow_card(blk):
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")
 
 
+def _windows_tip(blk):
+    """주제별 30일 읽는 법 툴팁 — 가이드라인 2-6 틀. 맨 위 주제의 건수 · 직전 30일 차이 · 평균 강도를 읽어 준다.
+    부정 발언 비율 줄은 툴팁에 두지 않는다 (2026-10-11 사용자)."""
+    top = next(x for x in blk["dims"]["topic"] if x["events"] > 0)
+    if blk.get("compare_to_previous") and top["delta_events"] is not None:
+        d = top["delta_events"]
+        cmp_ = f"그 앞 30일 {top['prev_events']}건보다 {abs(d)}건 {'많다' if d > 0 else '적다'}" if d else f"그 앞 30일과 같은 {top['prev_events']}건"
+        now = f"· {_k(top['key'])} {top['events']}건 : 가장 많이 말한 주제. {cmp_}"
+    else:
+        now = f"· {_k(top['key'])} {top['events']}건 : 가장 많이 말한 주제. 그 앞 30일 자료가 아직 없어 늘고 준 것은 보지 않는다"
+    lines = ["큰 주제(무역 · 연준 등)별로 최근 30일 동안 몇 번 말했는지를 많은 순으로 본 것", now]
+    if top["avg_intensity"]:
+        lines.append(f"· 평균 강도 {top['avg_intensity']:.1f} : 정책이 얼마나 구체적인지 1~10으로 매긴 값. 이 정도면 {_inten_word(top['avg_intensity'])}")
+    lines.append("· 급상승 주제와 차이 : 여기는 한 달 동안 꾸준히 말한 양, 급상승 주제는 최근 1주에 갑자기 늘어난 것")
+    return "\n".join(lines)
+
+
 def sec_windows(a):
     """30일 흐름 — C 카드: 주제, 값 이벤트 수, 보조 줄 평균 강도·부정 발언 비율·직전 30일 대비."""
     blk = a["windows"].get("30D") or {}
@@ -181,13 +199,7 @@ def sec_windows(a):
                      _esc(f"평균 강도 {r['avg_intensity']:.1f} · 부정 발언 비율 {int((r['neg_ratio'] or 0) * 100)}% · {delta}" if r["avg_intensity"] else delta)))
     if not rows:
         return dk.muted("30일 데이터가 아직 없습니다.")
-    items = [   # 건수·순서·부정 발언 비율 줄은 뺐다 (2026-10-11 사용자)
-        ("평균 강도", "이벤트 강도의 평균(1~10). 말의 세기가 아니라 정책이 얼마나 구체적인지 — 1~2 지나가는 언급, 5~6 조치 없는 강한 주장, 9~10 정책 발표"),
-        ("직전 30일 대비", "그 앞 30일 건수와의 차이(건). −10건이면 그 앞 30일보다 10건 적습니다"
-                         + ("" if blk.get("compare_to_previous") else " — 아직 직전 30일 데이터가 없어 표시하지 않습니다")),
-        ("급상승 주제와 차이", "30일 흐름은 큰 주제(무역·연준 등)별로 한 달 동안 꾸준히 얼마나 말했는지, 급상승 주제는 최근 7일 세부 주제 가운데 갑자기 늘어난 것을 봅니다"),
-    ]
-    return _flow_card(blk) + dk.section("주제별 30일", dk.ccard(rows), tab=TAB_FLOW, one_line=True, aside=dk.tips_right([("읽는 법", dk.read_text(items))]))   # 일반 구획 제목 + 읽는 법 ? 오른쪽 (2026-10-13 사용자)   # 읽는 법은 소제목 옆 ? (2026-10-12 사용자)   # 요약 강조 카드는 맨 위 (2026-10-11 사용자)   # 기준(최근 30일)은 읽는 법 카드 안으로 (2026-10-11 사용자: 건수·차이를 안내 글에 자세히)
+    return _flow_card(blk) + dk.section("주제별 30일", dk.ccard(rows), tab=TAB_FLOW, one_line=True, aside=dk.tips_right([("읽는 법", _windows_tip(blk))]))   # 일반 구획 제목 + 읽는 법 ? 오른쪽 (2026-10-13 사용자)   # 읽는 법은 소제목 옆 ? (2026-10-12 사용자)   # 요약 강조 카드는 맨 위 (2026-10-11 사용자)   # 기준(최근 30일)은 읽는 법 카드 안으로 (2026-10-11 사용자: 건수·차이를 안내 글에 자세히)
 
 
 def _x(v):
@@ -244,14 +256,14 @@ def _chart_card(rows, horizon, read=""):   # read = 그래프 읽는 법 — 제
         desc = (f"{n}개 자산 모두 이 주제 발언 뒤 {span} 발언이 없던 날과 비슷한 정도로만 움직였습니다. "
                 f"이 발언이 시장을 따로 움직였다고 볼 근거가 없습니다")
     items = [(None, desc)]
-    items += [("평소와 다른 움직임", f"{_asset(r['sym'])} {r['mean']:+.2f}% — 발언이 없던 날에는 보통 {r['lo']:+.2f} ~ {r['hi']:+.2f}% 사이에서 움직입니다. "
+    items += [("평소와 다른 움직임", f"{_asset(r['sym'])} {r['mean']:+.2f}%. 발언이 없던 날에는 보통 {r['lo']:+.2f} ~ {r['hi']:+.2f}% 사이에서 움직입니다. "
                                    f"{n}개 자산을 한꺼번에 따져도 우연으로 보기 어려운 크기입니다 (q {r['q']:.2f})") for r in robust]
     if loose:
         items.append(("우연일 수 있는 움직임", " · ".join(f"{_asset(r['sym'])} {r['mean']:+.2f}%" for r in loose)
-                      + f" — 이 자산 하나만 보면 평소보다 크지만, {n}개 자산을 동시에 보면 이 정도는 우연으로도 나올 수 있어 근거로 삼지 않습니다"))
+                      + f". 이 자산 하나만 보면 평소보다 크지만, {n}개 자산을 동시에 보면 이 정도는 우연으로도 나올 수 있어 근거로 삼지 않습니다"))
     big = max((r for r in rows if not r["robust"] and r not in loose), key=lambda r: abs(r["mean"]), default=None)
     if big:
-        items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}% — 그래도 발언이 없던 날에 흔히 나오는 크기입니다 (p {big['p']:.2f})"))
+        items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}%. 그래도 발언이 없던 날에 흔히 나오는 크기입니다 (p {big['p']:.2f})"))
 
     def li(t, x):
         head = f'<b>{_esc(t)}</b> : ' if t else ""   # 라벨 글머리표 "**라벨** : 내용", 증감 색 (가이드라인 3-3, 2026-10-11 사용자)
@@ -266,13 +278,19 @@ def _chart_card(rows, horizon, read=""):   # read = 그래프 읽는 법 — 제
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
 
 
-def _read_text(horizon):
-    """그래프 읽는 법 — 결론 카드 제목 줄 오른쪽 `읽는 법 ?` 툴팁 글 (2026-10-12 사용자: 읽는 법 카드 대신 제목 옆 툴팁)."""
+def _read_text(rows, horizon):
+    """그래프 읽는 법 · 주의 — 결론 카드 제목 줄 오른쪽 툴팁 (2026-10-12 사용자: 읽는 법 카드 대신 제목 옆 툴팁).
+    가이드라인 2-6 틀. 진한 막대 = placebo.robust (다중 검정 보정 q < PLACEBO_NOISE_P), 회색 띠 = 발언 없는 날 평균의 95% 범위."""
     span = "당일" if horizon == "close" else "5거래일 동안"
-    read = dk.read_text([("막대", f"발언 뒤 {span} S&P 500 대비 평균"),
-                         ("회색 띠", "발언이 없던 날에도 100번 중 95번은 이 안에 드는 범위 — 막대가 띠 안이면 평소와 같은 움직임"),
-                         ("진한 막대", "띠 밖으로 나갔고, 여러 자산을 함께 따져도 우연으로 보기 어려운 움직임")])
-    caution = "5일 구간은 창이 겹쳐 실제보다 강해 보일 수 있고, 원인을 뜻하지 않습니다" if horizon == "d5" else ""
+    robust = [r for r in rows if r["robust"]]
+    if robust:
+        now = f"· 진한 막대 {len(robust)}개 : 발언 없던 날에는 보기 드문 크기로 움직인 자산. {', '.join(_asset(r['sym']) for r in robust)}"
+    else:
+        now = "· 진한 막대 0개 : 모든 자산이 평소 범위 안이라 발언 뒤 따로 움직였다고 보기 어렵다"
+    read = (f"이 주제 발언 뒤 {span} 자산마다 S&P 500보다 더 오르거나 내린 평균을 막대로 그린 것\n" + now + "\n"
+            "· 나누는 법 : 막대가 회색 띠(발언 없던 날에 흔한 범위) 밖이고, 여러 자산을 함께 따져도 남으면 진하게")
+    caution = ("5일 동안의 움직임은 발언이 몰린 시기에 기간이 겹쳐 실제보다 강해 보일 수 있다\n"
+               "· 참고 : 발언 뒤에 관찰된 움직임일 뿐, 발언이 원인이라는 뜻은 아니다") if horizon == "d5" else ""
     return [("읽는 법", read), ("주의", caution)]   # 주의도 툴팁, 둘 다 제목 줄 오른쪽 (2026-10-13 사용자)
 
 
@@ -309,11 +327,11 @@ def _table_rows(blk):
 
 def _table_legend(noise_p):
     """펼친 표 아래 본문 안내 — ⓘ 읽는 법 글머리표 + ⓘ 주의 한 줄 (2026-10-13 사용자: 버튼 툴팁 대신 표 아래 본문에)."""
-    return (dk.guide("읽는 법", [("수치", f"{config.BENCHMARK} 대비 초과 반응(%) — {config.BENCHMARK} 행만 원수익률"),
+    return (dk.guide("읽는 법", [("수치", f"{config.BENCHMARK} 대비 초과 반응(%), {config.BENCHMARK} 행만 원수익률"),
                              ("즉각", "장외 발언은 다음 개장 갭, 정규장 발언은 시가 → 종가"),
                              ("변동폭 · 거래량", f"직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수, 1.00× = 보통"),
-                             ("p", f"발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율 — {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않음"),
-                             ("q", f"자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값 — {noise_p:.2f} 미만(굵게)만 보정 뒤에 남는 값")])
+                             ("p", f"발언 없는 날에서 같은 수만큼 뽑았을 때 이 정도 평균이 우연히 나올 비율. {noise_p:.2f} 이상(회색)이면 보통 날과 구분되지 않음"),
+                             ("q", f"자산 × 구간 수십 개를 한꺼번에 검정한 데 대한 보정값. {noise_p:.2f} 미만(굵게)만 보정 뒤에 남는 값")])
             + dk.guide("주의", "+5일은 창이 겹친 관측이고, 모두 발언 뒤 관찰된 값이라 인과가 아닙니다", line=False))
 
 
@@ -328,17 +346,17 @@ def _group_panel(blk, gkey, charts, noise_p):
         if not rows:   # 이 구간만 표본이 모자람 (5일 뒤 가격이 아직 없는 최근 발언 등) — 빈 화면 대신 안내
             n_h = max((((blk["symbols"].get(sym) or {}).get(h) or {}).get("n") or 0) for sym in config.ALL_SYMBOLS)
             hz_html += (f'<div data-hz-panel="{h}"><div data-hz-label="1" style="font-size:{dk.SMALL};line-height:{dk.LH_CARD};font-weight:700;color:#111;margin:8px 0 4px;">{HORIZON_KO[h]}</div>'
-                        + dk.muted(f"{HORIZON_KO[h]} 구간은 표본 축적 중 — 관측일 {n_h}일 / 필요 {config.MIN_CLEAN_N}일. 쌓이면 그래프가 나옵니다.") + "</div>")
+                        + dk.muted(f"{HORIZON_KO[h]} 구간은 표본 축적 중. 관측일 {n_h}일 / 필요 {config.MIN_CLEAN_N}일. 쌓이면 그래프가 나옵니다.") + "</div>")
             continue
         img = ""
         if info:
             img = (f'<a href="{_esc(info["url"])}" target="_blank" rel="noopener" title="그래프 확대 보기" style="display:block;max-width:720px;">'
                    f'<img src="{_esc(info["url"])}" alt="{_esc(_k(gkey.split("#")[0]))} {HORIZON_KO[h]} 반응 그래프" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/></a>')
         hz_html += (f'<div data-hz-panel="{h}"><div data-hz-label="1" style="font-size:{dk.SMALL};line-height:{dk.LH_CARD};font-weight:700;color:#111;margin:8px 0 4px;">{HORIZON_KO[h]}</div>'
-                    + _chart_card(rows, h, _read_text(h) if img else "") + img + "</div>")
+                    + _chart_card(rows, h, _read_text(rows, h) if img else "") + img + "</div>")
     rows = _table_rows(blk)
     if not rows:
-        return dk.muted(f"표본 축적 중 — 관측일 {c['clean']}일 / 필요 {config.MIN_CLEAN_N}일. 쌓이면 그래프가 나옵니다.")
+        return dk.muted(f"표본 축적 중. 관측일 {c['clean']}일 / 필요 {config.MIN_CLEAN_N}일. 쌓이면 그래프가 나옵니다.")
     ik = c.get("immediate_kinds", {})
     table = _table_fold(dk.muted(f"과거 관측일 {c['clean']}일 · 이벤트 {c['total']} · 거시 발표 겹침 제외 {c['confounded']} · 장외 {ik.get('gap', 0)} / 정규장 {ik.get('intraday', 0)} · 검정 {c.get('tests', 0)}개")
                         + dk.table(["자산", "N", "즉각", "당일", "익일", "+5일", "하락 비율", "변동폭", "거래량", "p · q"], rows) + _table_legend(noise_p))
@@ -399,7 +417,13 @@ def sec_why(a):
         rows.append((name, _esc(e["etf"] or "—"), _esc(f"경로 {_k(e['path_text']) or '—'} · 관찰 {', '.join(e['affected'][:10]) or '—'}")))
     if not rows:
         return dk.muted("오늘 이벤트에 연결된 매핑 규칙이 없습니다.")
-    return dk.ccard(rows, left="65%") + dk.guide("관찰 종목", [("고르는 법", "정적 매핑 규칙 — 섹터 → ETF → 상위 10종목 + 본문에 나온 기업"), ("성격", "AI 판단이 아닙니다")])
+    return dk.ccard(rows, left="65%") + dk.guide("관찰 종목", [("고르는 법", "정적 매핑 규칙(섹터 → ETF → 상위 10종목 + 본문에 나온 기업)"), ("성격", "AI 판단이 아닙니다")])
+
+
+# 내일 볼 것 주의 툴팁 — 가이드라인 2-6 틀. 고르는 근거 = placebo.robust (주제당 수십 개 조합을 검정해 보정 q 로 거른다, narrate.check_watch)
+WATCH_TIP = ("과거 같은 주제 발언 뒤 평소와 다르게 움직였던 자산만 골라 적은 관찰 목록\n"
+             "· 고르는 법 : 여러 자산을 한꺼번에 따져도 우연으로 보기 어려운 움직임만 남긴다\n"
+             "· 참고 : 과거에 관찰된 움직임일 뿐, 내일 방향을 알려 주지 않는다")
 
 
 def _has_watch(n):
@@ -433,8 +457,7 @@ def build_body(a, n):
         # 서술이 없거나 "없다" 고정 문장뿐이면 구획을 통째로 뺀다 — 매일 같은 문장이 반복되는 글은 비슷한 글로 분류된다 (2026-10-16 사용자, 인물-발언-레이더-기획 5절)
         dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY) if (n or {}).get("what_changed") else "",
         dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow"), tab=TAB_TODAY, one_line=True,   # 주의는 제목 줄 오른쪽 툴팁 (2026-10-13 사용자)
-                   aside=dk.tips_right([("주의", dk.read_text([("근거", "시장 반응 탭에서 보정 q가 함께 작은 값만 고릅니다 — 주제당 수십 개 조합을 검정했기 때문"),
-                                                               ("+3일 · +5일", "창이 겹친 관측"), ("성격", "인과나 방향 예측이 아닙니다")]))]))
+                   aside=dk.tips_right([("주의", WATCH_TIP)]))
         if _has_watch(n) else "",
         dk.section(TAB_FLOW, sec_windows(a), tab=TAB_FLOW),   # 탭 이름과 같은 제목 → 테마가 숨긴다 (2026-10-11 사용자: 30일 흐름 타이틀 삭제)
         dk.section("시장 반응", sec_reactions(a), tab=TAB_REACT),   # 탭 이름과 같아 제목은 숨고, 탭 아래 안내 문구는 두지 않는다 (2026-10-11 사용자)
