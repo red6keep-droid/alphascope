@@ -3324,14 +3324,18 @@ body.no-dashboard .main-content { padding-top: 32px; }
         });
       })();
 
-      /* ============================================================ 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) — 글 보기 · 목록 카드 제목 */
+      /* ============================================================ 종목 제목 앞 티커 로고 (2026-10-13 사용자: 엔비디아 → 2026-10-18 사용자: 시총 TOP 10 종목 페이지도) — 글 보기 · 목록 카드 제목
+         제목의 "(티커) 주가" 에서 티커를 읽는다: "엔비디아(NVDA) 주가 리포트 …" · "테슬라(TSLA) 주가 · 실적 일정". 옛 "엔비디아 리포트 — …" 는 NVDA */
       (function () {
         'use strict';
         [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
-          if (!/^\s*엔비디아/.test(h.textContent) || h.querySelector('.title-logo')) return;   /* 새 제목 "엔비디아(NVDA) 주가 리포트 …" · 옛 "엔비디아 리포트 — …" (2026-10-18) */
+          if (h.querySelector('.title-logo')) return;
+          var m = /\(([A-Z][A-Z.\-]{0,5})\)\s*주가/.exec(h.textContent);
+          var sym = m ? m[1] : (/^\s*엔비디아/.test(h.textContent) ? 'NVDA' : '');
+          if (!sym) return;
           var host = h.querySelector('a') || h;
           var im = document.createElement('img'); im.className = 'title-logo'; im.alt = ''; im.width = 32; im.height = 32;
-          im.src = 'https://financialmodelingprep.com/image-stock/NVDA.png';
+          im.src = 'https://financialmodelingprep.com/image-stock/' + sym + '.png';
           im.onerror = function () { if (im.parentNode) im.parentNode.removeChild(im); };
           host.insertBefore(im, host.firstChild);
         });

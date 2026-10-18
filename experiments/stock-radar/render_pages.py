@@ -162,10 +162,10 @@ def sec_earnings(s, today):
     e = s.get("earnings") or {}
     if not e.get("next") and not e.get("moves"):
         return ""
-    rows, first = "", True
+    head, rows, first = "", "", True
     if e.get("next"):
         left = (datetime.date.fromisoformat(e["next"]) - datetime.date.fromisoformat(today)).days
-        rows += R._row_html("다음 실적 발표", f"{left}일 뒤" if left > 0 else "오늘", f"{_md(e['next'])} 예정", first=True, inline_note=True)
+        head = R._row_html("다음 실적 발표", f"{left}일 뒤" if left > 0 else "오늘", f"{_md(e['next'])} 예정", first=True, inline_note=True)
         first = False
     if e.get("median_abs") is not None:
         n = len(e["moves"])
@@ -176,7 +176,14 @@ def sec_earnings(s, today):
         rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">'
                  f'<span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 {n}번의 실적 발표 다음 날 (%)</span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')
-    return R._card_title("실적 발표 후 가격 변동", earn_tip(s, e)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
+    if head and rows:   # 다음 발표 줄 오른쪽 접기 버튼 — 보통 변동 · 최근 8번은 펼쳤을 때만 (2026-10-18 사용자)
+        k = head.rfind("</span></span>")
+        head = head[:k] + R.ACC_BTN + head[k:]
+        head = head.replace("align-items:flex-start;", "align-items:center;", 1)
+        inner = f'<details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{rows}</details>'
+    else:
+        inner = head + rows
+    return R._card_title("실적 발표 후 가격 변동", earn_tip(s, e)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{inner}</span></div>'
 
 
 def related(s):

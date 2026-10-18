@@ -50,8 +50,12 @@ def page_url(sym):
     return f"{BLOG}/p/{BY_SYM[sym][2]}.html"
 
 
+TITLE_NAME = {"GOOGL": "구글 알파벳"}   # 제목에서 괄호가 겹치지 않게 · 검색어(구글 주가)를 앞에
+
+
 def page_title(sym):
-    return f"{name(sym)}({sym}) 주가 정보"
+    """제목 = 검색어(이름 · 티커 · 주가) + 페이지에 실제로 있는 것(실적 일정). 테마가 `(티커) 주가` 에서 티커를 읽어 로고를 단다 (2026-10-18)."""
+    return f"{TITLE_NAME.get(sym, name(sym))}({sym}) 주가 · 실적 일정"
 
 
 def slug_title(sym):
