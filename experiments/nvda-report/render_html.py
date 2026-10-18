@@ -395,6 +395,9 @@ def glance_sub(a):
     first += f" (평소 하루 ±{sd:.1f}%)"
     _, reasons = _glance_state(a)
     parts = [first] + [x for x in reasons if not x.startswith("등락이 평소의")]   # 등락 배수는 첫 마디에 있다
+    vr = h.get("vol_ratio_20d")
+    if vr and not any(x.startswith("거래량") for x in parts):   # 거래량은 늘 보인다 — 1.5배 넘는 날만이 아니라 (2026-10-18 사용자: 가격 정보 줄에 거래량)
+        parts.append(f"거래량 평소의 {vr:.1f}배")
     # 우측 정렬은 가격 숫자(`$214.13 ▼1.43%`)의 오른쪽 끝 세로선에 맞춘다 = 접기 버튼 폭 + 왼쪽 여백만큼 안쪽 (2026-10-17 사용자). 툴팁 아이콘은 글자 앞
     return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:right;padding-right:{FOLD_LEFT + _dk.FOLD_BOX}px;margin-top:3px;'
             f'font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;word-break:keep-all;">'
@@ -585,6 +588,15 @@ def _row_html(left_html, right_html, note="", first=False, inline_note=False):
             f'<span style="flex:none;text-align:right;white-space:nowrap;font-weight:700;{VAL}">{right_html}</span></span>')
 
 
+def _fold_rows(head, rest):
+    """카드 첫 줄 오른쪽 끝에 접기 버튼 — 나머지 줄은 펼쳤을 때만 (2026-10-18 사용자: 고점 회복 · 실적 카드). 버튼은 값 칸 안, 세로 가운데."""
+    if not rest:
+        return head
+    k = head.rfind("</span></span>")
+    head = (head[:k] + ACC_BTN + head[k:]).replace("align-items:flex-start;", "align-items:center;", 1)
+    return f'<details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{rest}</details>'
+
+
 def sec_drawdown(a):
     """고점 하락 후 가격 회복 — 약 30년 기록, 엔비디아와 기술주 15개 (2026-10-17 사용자). 숫자 = 절반은 이 거래일 안에 회복."""
     d = a.get("drawdown")
@@ -592,7 +604,8 @@ def sec_drawdown(a):
         return ""
     st, pk = d["stats"]["nvda"], d["stats"]["peers"]
     span = _span_label(d["stats"])
-    rows = _row_html("지금", _arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True, inline_note=True)   # 줄바꿈 없이 (2026-10-17 사용자)
+    head = _row_html("지금", _arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True, inline_note=True)   # 줄바꿈 없이 (2026-10-17 사용자)
+    rows = ""
     over, cols = [], []
     for lv in ("10", "20", "30"):
         x, y = st.get(lv) or {}, pk.get(lv) or {}
@@ -625,7 +638,7 @@ def sec_drawdown(a):
                       f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율{_tipx(tip)}</span>'
                       f'<span style="flex:none;font-size:{MICRO};font-weight:400;color:{NOTE};text-align:right;">({span} 기간 중)</span></span>')   # 안내 기호 앞 · 오른쪽 작은 글씨 (2026-10-17 사용자)
         tail = (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};color:{NOTE};">{title_line}{tbl}</span>')
-    return _card_title("고점 하락 후 가격 회복", dd_tip(d)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}{tail}</span></div>'
+    return _card_title("고점 하락 후 가격 회복", dd_tip(d)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{_fold_rows(head, rows + tail)}</span></div>'
 
 
 def sec_earnings(a):
@@ -634,12 +647,12 @@ def sec_earnings(a):
     nxt = a.get("next_earnings")
     if not em and not nxt:
         return ""
-    rows, first, tip_now = "", True, ""
+    head, rows, first, tip_now = "", "", True, ""
     if nxt:
         try:
             md = datetime.date.fromisoformat(str(nxt)[:10])
             left = (md - datetime.date.fromisoformat(a["day"])).days
-            rows += _row_html("다음 실적 발표", f"{left}일 뒤" if left > 0 else "오늘", f"{md.month}월 {md.day}일 · 장 마감 뒤", first=first, inline_note=True)   # 줄바꿈 없이 (2026-10-17 사용자)
+            head = _row_html("다음 실적 발표", f"{left}일 뒤" if left > 0 else "오늘", f"{md.month}월 {md.day}일 · 장 마감 뒤", first=first, inline_note=True)   # 줄바꿈 없이 (2026-10-17 사용자)
             first = False
         except ValueError:
             pass
@@ -654,7 +667,8 @@ def sec_earnings(a):
         rows += (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px 0;">'
                  f'<span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 {n}번의 실적 발표 다음 날 (%)</span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')   # 설명 글(왼쪽이 오래된 것 · 연.월)은 삭제 (2026-10-17 사용자)
-    return _card_title("실적 발표 후 가격 변동", EARN_TIP_HEAD + tip_now + "\n" + EARN_TIP_REC) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{rows}</span></div>'
+    body = _fold_rows(head, rows) if head else rows   # 다음 발표 줄 오른쪽 접기 — 보통 변동 · 최근 8번은 펼쳤을 때만 (2026-10-18 사용자)
+    return _card_title("실적 발표 후 가격 변동", EARN_TIP_HEAD + tip_now + "\n" + EARN_TIP_REC) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{body}</span></div>'
 
 
 def sec_headline(a, n=None):
@@ -771,7 +785,7 @@ def _est_w(text, px):
 INLINE_W = 316   # 상태 카드 줄 안쪽 폭 어림 (390px 폰 − 여백 · 카드 안쪽) − 이름과 값 사이 간격
 
 
-def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False):
+def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False, opened=False):
     """상태 카드 (가이드라인 2-1 D, 2026-10-11 사용자: "별도 카드로 분리하고 이유도 카드에 포함" → "안내 아이콘 삭제, 글씨 검정, 블릿으로").
     첫 줄 구분명 좌·상태 우, 아래 얇은 선 뒤에 이유 글머리표(16px, 검정). 이유 묶음은 border-top — 홈 카드는 border-top 요소를 건너뛰므로 홈에는 첫 줄만 간다."""
     bg, bd = CARD_DIR[theme]
@@ -789,23 +803,23 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
             if multi:   # 값이 여러 줄이면 설명은 이름 아래 왼쪽 — 줄 수를 늘리지 않는다 (2026-10-17 사용자: 모바일에서 여러 단 쓰지 말 것)
                 vals = _tint(_esc(value)).replace(chr(10), "<br>")
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'
-                        f'<span style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">'
+                        f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'   # 오른쪽 값은 세로 가운데 (2026-10-18 사용자, 2-4 C-6)
                         f'<span style="flex:none;color:#111;">{_esc(name)}<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span></span>'
                         f'<span style="min-width:0;text-align:right;font-weight:700;font-size:{_dk.NAME};word-break:keep-all;">{vals}</span></span></li>')   # 섹터 목록 값은 한 단계 작게 16px (2026-10-17 사용자)
             if inline:
                 lw = "flex:1 1 auto;min-width:0;word-break:keep-all;" if not fits else "flex:none;white-space:nowrap;"   # 안 들어가면 왼쪽 칸 안에서 줄바꿈
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'
-                        f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
+                        f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
                         f'<span style="{lw}color:#111;">{_esc(name)} <span style="font-size:{TINY};color:{NOTE};">({_esc(note)})</span></span>'
                         f'<span style="flex:none;text-align:right;font-weight:700;white-space:nowrap;">{_tint(_esc(value))}</span></span></li>')
-            return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'
-                    f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
-                    f'<span style="flex:none;white-space:nowrap;color:#111;">{_esc(name)}</span><span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value)).replace(chr(10), "<br>")}</span></span>'
-                    + (f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span>' if note else "") + '</li>')
-        if kind == "html":   # 그래프 · 자세한 숫자 보기 같은 HTML 조각 (실적과 기대 탭, 2026-10-18)
+            nt = f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};white-space:normal;">{_esc(note)}</span>' if note else ""
+            return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'   # 뜻 줄을 이름 칸 안에 두어 오른쪽 값이 두 줄의 세로 가운데 (2026-10-18 사용자)
+                    f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
+                    f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{_esc(name)}</span>{nt}</span><span style="flex:none;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value)).replace(chr(10), "<br>")}</span></span></li>')
+        if kind == "html":   # 그래프 · 자세한 지표 보기 같은 HTML 조각 (실적과 기대 탭, 2026-10-18)
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
         if kind == "plain":   # 쉬운 말 한 줄 — 점 없이 굵게, 아래 8px (2026-10-16 사용자: 강조 카드 펼침 맨 위에 쉬운 설명)
-            return f'<li style="list-style:none;margin:9px 0 17px;font-weight:400;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{_tint(_esc(text))}</li>'   # 상세 설명 2~3문장이라 보통 굵기 (2026-10-17)
+            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{_tint(_esc(text))}</li>'   # 상세 설명 2~3문장이라 보통 굵기 (2026-10-17)
         col = NOTE if kind == "note" else "#111"
         return _dot_li(_label_text(text), size=3, color=col, lh=_dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32 (2026-10-12 사용자)   # 16px → 3px 점, "**라벨** : 내용", 증감 색 (2026-10-11 사용자)
     lis = "".join(li(t) for t in lines)
@@ -815,7 +829,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
             f'<span style="{"flex:1 1 auto;min-width:0;" if fold else COL_L}font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">{_title_with_icon(title, _tipx(tip) + new_html)}</span><span style="{"flex:none;white-space:nowrap;" if fold else COL_R}font-weight:700;color:{color};">{state_html}</span></span> ')   # fold: 상태 + 버튼은 한 줄, 이름 칸이 남은 폭
     body = (f'<div style="margin-top:{14 - _dk.VP_EMPH}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
-    inner = (f'<details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{body}</details>' if fold else head + body)
+    inner = (f'<details data-acc="1"{" open" if opened else ""}><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{body}</details>' if fold else head + body)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{_dk.EMPH_PAD - _dk.VP_EMPH}px 14px;margin:0 0 8px;line-height:{_dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
             f'{inner}</div>')
 
@@ -1306,7 +1320,7 @@ GROUP_NOTE = {   # 제목 있는 안내 (_guide) — 짧으면 한 줄, 길면 �
 def _fold_row(label):
     """카드 안 접기 줄 — 지수 더 보기와 같은 버튼 모양 (가이드 10-6). 테마 JS 가 펼친 내용을 이 줄 위로 옮기고 글자를 `접기` 로 바꾼다."""
     return (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;padding:8px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;'
-            f'font-size:{TINY};line-height:20px;font-weight:700;color:#111;"><span>{_esc(label)}</span>{_dk.ACC_CHEV}</span>')
+            f'font-size:{TINY};line-height:20px;font-weight:700;color:#111;"><span data-fold-label="1">{_esc(label)}</span>{_dk.ACC_CHEV}</span>')   # 테마가 이 칸 글자만 `접기` 로 바꾼다 — 화살표는 남는다 (2026-10-18)
 
 
 def sec_status(a):
@@ -1323,7 +1337,7 @@ def sec_status(a):
             rows.append((_esc(rr.LABEL_KO.get(c["key"], c["key"])) + _new(a, "status:" + c["key"]), v, sub))
         card = _ccard(rows) + (_guide(*GROUP_NOTE[group]) if GROUP_NOTE.get(group) else "")
         if group == "options":   # 전문 지표는 기본 접힘 — 카드 안 접기(details[data-fold], 테마 JS) (2026-10-16 초보자 원칙, 가이드 2-4)
-            card = (f'<details data-fold="1" data-label="자세한 숫자 보기"><summary style="list-style:none;cursor:pointer;">{_fold_row("자세한 숫자 보기")}</summary>{card}</details>')
+            card = (f'<details data-fold="1" data-label="자세한 지표 보기"><summary style="list-style:none;cursor:pointer;">{_fold_row("자세한 지표 보기")}</summary>{card}</details>')
         out.append(_sub_label(rr.GROUP_KO[group]) + card)
     return "".join(out)
 
@@ -1461,7 +1475,7 @@ def sec_checklist(a):
 
 
 # ---------------------------------------------------------------- 실적과 기대 탭 (가이드라인 2-7 · 1-4-1, 2026-10-18)
-# 시장 지표 · 재무 두 탭을 합쳤다. 1층 = 질문 카드 넷(상태 카드 틀), 펼치면 첫 줄 문단 · 비교 그래프 · 근거 줄, 맨 아래 `자세한 숫자 보기`(옛 두 탭의 칸 전부).
+# 시장 지표 · 재무 두 탭을 합쳤다. 1층 = 질문 카드 넷(상태 카드 틀), 펼치면 첫 줄 문단 · 비교 그래프 · 근거 줄, 맨 아래 `자세한 지표 보기`(옛 두 탭의 칸 전부).
 
 _AMBER, _PEER_LBL = "#F5B971", "기술주 15개 (중앙값)"
 
@@ -1471,7 +1485,7 @@ def _ok(b):
 
 
 def _detail_fold(inner):
-    return (f'<details data-fold="1" data-label="자세한 숫자 보기"><summary style="list-style:none;cursor:pointer;">{_fold_row("자세한 숫자 보기")}</summary>'
+    return (f'<details data-fold="1" data-label="자세한 지표 보기"><summary style="list-style:none;cursor:pointer;">{_fold_row("자세한 지표 보기")}</summary>'
             f'<div style="margin-top:6px;">{inner}</div></details>')
 
 
@@ -1611,14 +1625,14 @@ EXPECT_THEME = {"늘고 있음": ("positive", UP), "줄고 있음": ("negative",
 
 
 def sec_expect(a):
-    """실적과 기대 탭 — 질문 카드 넷 (가이드라인 2-7). 카드마다 맨 아래 `자세한 숫자 보기` = 옛 시장 지표 · 재무 탭의 칸."""
+    """실적과 기대 탭 — 질문 카드 넷 (가이드라인 2-7). 카드마다 맨 아래 `자세한 지표 보기` = 옛 시장 지표 · 재무 탭의 칸."""
     ex = a.get("expect") or {}
     spec = [("회사는 돈을 더 벌고 있나?", "revenue", card_revenue, sec_checklist(a)),
             ("애널리스트 기대는 올라가나?", "eps", card_eps, _status_group(a, "estimates") + _status_group(a, "valuation")),
             ("시장은 큰 움직임을 예상하나?", "move", card_move, _status_group(a, "options")),
             ("하락에 거는 돈은?", "short", card_short, _status_group(a, "flows"))]
     out = ""
-    for title, key, fn, detail in spec:
+    for i, (title, key, fn, detail) in enumerate(spec):
         c = ex.get(key)
         if c:
             lines, tip = fn(c)
@@ -1628,7 +1642,7 @@ def sec_expect(a):
         if detail:
             lines.append((_detail_fold(detail), "html"))
         theme, col = EXPECT_THEME.get(state, ("neutral", MUTED))
-        out += _state_card(title, state, theme, col, lines, "", tip=tip, fold=True)
+        out += _state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=i == 0)   # 탭에 들어가면 첫 카드는 열려 있다 (2026-10-18 사용자)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>'
 
 
@@ -1701,7 +1715,7 @@ def build_body(a, n):
         _section("중요 이슈", sec_narrative(a, n), tab="오늘"),   # 그래프 아래로 (2026-10-11 사용자)
         _section("뉴스", sec_direction_bars(a) + sec_news_counts(a) + sec_events(a), line=False, tab="오늘"),   # 바로 아래가 카드라 제목 밑 구분선 없음 (2026-10-13 사용자)   # 막대가 바로 와도 구분선
         # 탭 이름과 같은 제목(캘린더·시장 지표·재무)은 탭 화면에서 숨긴다 — 본문(탭 없음)에서는 구획 경계로 남는다
-        _section("실적과 기대", sec_expect(a), tab="실적과 기대"),   # 시장 지표 · 재무 두 탭을 합침 — 질문 카드 넷 + 자세한 숫자 보기 (가이드라인 2-7, 2026-10-18)
+        _section("실적과 기대", sec_expect(a), tab="실적과 기대"),   # 시장 지표 · 재무 두 탭을 합침 — 질문 카드 넷 + 자세한 지표 보기 (가이드라인 2-7, 2026-10-18)
         _section("캘린더", sec_upcoming(a) + _guide("범위", f"{config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 일정은 {config.COURT_LOOKAHEAD_DAYS}일"), tab="캘린더"),   # 안내는 카드 아래 (2026-10-11 사용자)
         _section("진행 중 사안", sec_cases(a), tab="캘린더"),
         # "기술지표" → "시장 지표" (2026-10-16 사용자): 내용이 옵션 · 예상 실적 · 수급 · 주가 수준이고, 진짜 기술지표(이평선 · RSI)는 10-11 에 오늘 탭으로 갔다

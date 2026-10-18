@@ -2211,7 +2211,8 @@ body.menu-open { overflow: hidden; }
 (function () {
   'use strict';
   [].slice.call(document.querySelectorAll('.post-body details[data-fold]')).forEach(function (d) {
-    var sum = d.querySelector('summary'), more = sum && sum.nextElementSibling, label = sum && sum.querySelector('span');
+    var sum = d.querySelector('summary'), more = sum && sum.nextElementSibling,
+        label = sum && (sum.querySelector('[data-fold-label]') || sum.querySelector('span span') || sum.querySelector('span'));   /* 바깥 칸 글자를 통째로 바꾸면 화살표까지 지워진다 (2026-10-18 발견) — 글자 칸만 */
     if (!sum || !more) return;
     more.setAttribute('data-fold-more', '1'); more.hidden = true;
     d.parentNode.insertBefore(more, d);
