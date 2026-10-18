@@ -1620,7 +1620,8 @@ def card_short(c):
     return lines, tip
 
 
-EXPECT_THEME = {"늘고 있음": ("positive", UP), "줄고 있음": ("negative", DOWN), "올라가는 중": ("positive", UP), "내려가는 중": ("negative", DOWN)}
+EXPECT_THEME = {"늘고 있음": ("positive", UP), "줄고 있음": ("negative", DOWN), "올라가는 중": ("positive", UP), "내려가는 중": ("negative", DOWN),
+                "평소보다 큼": ("uncertain", WARN), "평소보다 작음": ("negative", DOWN)}   # 시장 예상 움직임 : 크면 노랑 · 작으면 파랑 (2026-10-18 사용자)
 
 
 def sec_expect(a):
