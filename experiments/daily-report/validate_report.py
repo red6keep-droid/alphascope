@@ -7,13 +7,14 @@
 
 import json
 import os
+import re
 import sys
 
 # 2026-10-18 재설계: 시장 상태 점수 해설(regime_*) · 급등주 · 관심 종목 · 위험요인 칸을 뺐다 (doc/데일리-리포트-기획.md 5절 B5 · B6)
 REQUIRED_LLM_KEYS = ["one_line", "summary", "change_comment", "sector_comment", "news",
                      "macro_comment", "opinion", "image_prompt"]
 
-ONE_LINE_MAX_LEN = 120
+ONE_LINE_MAX_LEN = 80   # 원인 하나 한 문장 (2026-10-18 재설계 — 지수 등락 · 평소 범위는 맨 앞 요약이 말한다)
 
 # 프롬프트 규칙 10 · render_html.THEME_VOCAB 과 같은 목록
 THEME_VOCAB = {"금리", "AI/반도체", "실적", "매크로", "에너지", "정책/규제", "지정학", "기타"}
@@ -76,6 +77,16 @@ def validate(input_path, output_path, analysis_path=None):
             warnings.append(f"{k} 에 시장 등급 말투가 있습니다 (규칙 9).")
         if any(w in str(report.get(k) or "") for w in ("지지선", "저항선", "저점 시험", "돌파", "급등했", "폭등")):
             warnings.append(f"{k} 에 차트 해석 · 과장 말투가 있습니다 (규칙 9).")
+
+    # 칸끼리 같은 말 되풀이 — 한 줄 결론과 종합이 같은 낱말을 많이 나누면 경고 (2026-10-18 사용자: 홈 카드 요약이 같은 말 반복)
+    def _words(t):
+        return {w for w in re.findall(r"[가-힣A-Za-z0-9]{2,}", str(t or "")) if len(w) >= 2}
+    a_, b_ = _words(report.get("one_line")), _words(report.get("opinion"))
+    if a_ and b_ and len(a_ & b_) / max(1, min(len(a_), len(b_))) >= 0.5:
+        warnings.append(f"one_line 과 opinion 이 같은 말을 되풀이합니다 (겹치는 낱말 {sorted(a_ & b_)[:8]}).")
+    for k in ("one_line", "opinion", "summary"):
+        if "평소 범위" in str(report.get(k) or "") or "평소 하루" in str(report.get(k) or ""):
+            warnings.append(f"{k} 에 '평소 범위' 이야기가 있습니다 — 맨 앞 요약 · 카드와 겹칩니다.")
 
     one_line = str(report.get("one_line") or "")
     if len(one_line) > ONE_LINE_MAX_LEN:
