@@ -824,6 +824,8 @@ def build(conn, day, run_date):
                        or k in ("IV_RANK_HIGH", "IV_RANK_LOW", "OI_JUMP_MULT", "OI_JUMP_MIN", "NEAR_52W_HIGH_PCT")},
     }
     analysis["new_flags"] = new_flags(conn, day, occasional_values(analysis))   # "N" 라벨 (2026-10-11)
+    import expect
+    analysis["expect"] = expect.build(conn, day, analysis)   # 실적과 기대 탭 질문 카드 넷 (가이드라인 2-7, 2026-10-18)
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     path = os.path.join(config.OUTPUT_DIR, "nvda_analysis.json")
     with open(path, "w", encoding="utf-8") as f:

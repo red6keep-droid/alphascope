@@ -129,6 +129,8 @@ def main():
         except Exception as e:  # noqa: BLE001
             print(f"[finra] 실패 — 기존 값으로 계속: {e}")
         collect_fng.collect(conn, day)         # 공포·탐욕 지수 (실패해도 조용히 None)
+        import expect
+        expect.collect(conn, day)              # 실적과 기대 탭 재료 — 기술주 15개 매출(주 1회) · 예상치 · 공매도 · SPY 옵션 (2026-10-18)
 
     _step(4, total, "EDGAR (Form 4 · 8-K · 10-Q · 10-K · 13D/G)")
     if args.skip_edgar:

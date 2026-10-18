@@ -456,7 +456,7 @@ def _legend_chips(items):
     return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
 
 
-def _col_chart(groups, colors, label_colors, height=CHART_H):
+def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
     """세로 막대 그래프 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수. 값은 막대 끝에 숫자 (2026-10-17 사용자: 그래프화)."""
     vals = [v for _, vs in groups for v in vs if v is not None]
     if not vals:
@@ -476,7 +476,7 @@ def _col_chart(groups, colors, label_colors, height=CHART_H):
             y, ly = (top - h, top - h - 15) if v >= 0 else (top, top + h + 1)
             rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
             parts.append(f'<span style="position:absolute;left:{left:.2f}%;width:{width:.2f}%;top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
-            txt = f"{v:+.1f}".replace("-", "−")
+            txt = fmt(v) if fmt else f"{v:+.1f}".replace("-", "−")
             parts.append(f'<span style="position:absolute;left:{left - 2:.2f}%;width:{width + 4:.2f}%;top:{ly:.1f}px;height:14px;line-height:14px;text-align:center;font-size:11px;'
                          f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt}</span>')
     xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;">{_esc(g)}</span>' for g, _ in groups)
@@ -802,6 +802,8 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
                     f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
                     f'<span style="flex:none;white-space:nowrap;color:#111;">{_esc(name)}</span><span style="min-width:0;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value)).replace(chr(10), "<br>")}</span></span>'
                     + (f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span>' if note else "") + '</li>')
+        if kind == "html":   # 그래프 · 자세한 숫자 보기 같은 HTML 조각 (실적과 기대 탭, 2026-10-18)
+            return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
         if kind == "plain":   # 쉬운 말 한 줄 — 점 없이 굵게, 아래 8px (2026-10-16 사용자: 강조 카드 펼침 맨 위에 쉬운 설명)
             return f'<li style="list-style:none;margin:9px 0 17px;font-weight:400;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{_tint(_esc(text))}</li>'   # 상세 설명 2~3문장이라 보통 굵기 (2026-10-17)
         col = NOTE if kind == "note" else "#111"
@@ -1458,6 +1460,178 @@ def sec_checklist(a):
     return _ccard(rows, left="65%")   # 재무: 왼쪽 65% 고정 — 긴 지표 이름·출처는 다음 줄로 (2026-10-11 사용자)
 
 
+# ---------------------------------------------------------------- 실적과 기대 탭 (가이드라인 2-7 · 1-4-1, 2026-10-18)
+# 시장 지표 · 재무 두 탭을 합쳤다. 1층 = 질문 카드 넷(상태 카드 틀), 펼치면 첫 줄 문단 · 비교 그래프 · 근거 줄, 맨 아래 `자세한 숫자 보기`(옛 두 탭의 칸 전부).
+
+_AMBER, _PEER_LBL = "#F5B971", "기술주 15개 (중앙값)"
+
+
+def _ok(b):
+    return f"{b / 1e8:,.0f}억 달러"
+
+
+def _detail_fold(inner):
+    return (f'<details data-fold="1" data-label="자세한 숫자 보기"><summary style="list-style:none;cursor:pointer;">{_fold_row("자세한 숫자 보기")}</summary>'
+            f'<div style="margin-top:6px;">{inner}</div></details>')
+
+
+def _status_group(a, group):
+    """옛 시장 지표 탭의 한 묶음 — C 카드 + 안내 (sec_status 와 같은 칸)."""
+    st = a["status"]
+    rows = []
+    for c in st.get(group) or []:
+        v, sub = _status_value(c, st)
+        rows.append((_esc(rr.LABEL_KO.get(c["key"], c["key"])) + _new(a, "status:" + c["key"]), v, sub))
+    if not rows:
+        return ""
+    return _sub_label(rr.GROUP_KO[group]) + _ccard(rows) + (_guide(*GROUP_NOTE[group]) if GROUP_NOTE.get(group) else "")
+
+
+def _chart_card(groups, colors, label_colors, legend, fmt=None):
+    pad = _dk.SEP_GAP - _dk.VP - 1
+    chart = _col_chart(groups, colors, label_colors, fmt=fmt)
+    return f'<span style="{MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}{_legend_chips(legend)}</span></span>'
+
+
+def _gray(v):
+    return _GRAY_BAR
+
+
+def _note_fg(v):
+    return NOTE
+
+
+def _pp(v, d=0):
+    return f"{v:+.{d}f}%p".replace("-", "−")
+
+
+def card_revenue(c):
+    p = c.get("peers_last")
+    first = f"최근 분기({_fd(c['end'])}까지 석 달) 매출은 {_ok(c['rev'])}로 1년 전보다 {abs(c['yoy']):.0f}% {'늘었다' if c['yoy'] >= 0 else '줄었다'}."
+    if p is not None:
+        first += f" 같은 때 기술주 15개는 보통 {_sgn(p, 0)}%였다."
+    if c.get("beat") is not None and c.get("guide_next"):
+        first += f" 회사가 미리 내놓은 전망보다 {abs(c['beat']):.1f}% {'많았고' if c['beat'] >= 0 else '적었고'}, 다음 분기는 {_ok(c['guide_next'])}를 내다봤다."
+    groups = [(f"{b['cq'][2:4]}.{b['cq'][-1]}Q", [b["stock"], b["peers"]]) for b in c["bars"]]
+    chart = _chart_card(groups, [_sign_bg, _gray], [_sign_fg, _note_fg], [("엔비디아 늘어남", _PASTEL_UP), ("엔비디아 줄어듦", _PASTEL_DN), (_PEER_LBL, _GRAY_BAR)],
+                        fmt=lambda v: f"{v:+.0f}".replace("-", "−"))
+    lines = [(first, "plain"), (f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">분기 매출, 1년 전 대비 (%)</span>{chart}', "html")]
+    if p is not None:
+        lines.append(("row", "기술주 15개와 차이", _pp(c["yoy"] - p), "같은 달력 분기 중앙값과 비교"))
+    if c.get("qoq") is not None:
+        lines.append(("row", "직전 분기 대비", f"{_sgn(c['qoq'])}%", "석 달 전 분기보다"))
+    if c.get("dc_yoy") is not None:
+        lines.append(("row", "데이터센터 매출 (1년 전 대비)", f"{_sgn(c['dc_yoy'], 0)}%", "매출의 대부분을 차지하는 사업"))
+    if c.get("beat") is not None:
+        lines.append(("row", "회사 전망 대비 실제", f"{_sgn(c['beat'])}%", "분기 전에 회사가 내놓은 매출 전망과 비교"))
+    if c.get("guide_next"):
+        lines.append(("row", "다음 분기 회사 전망", _ok(c["guide_next"]), f"이번 분기보다 {_sgn((c['guide_next'] / c['rev'] - 1) * 100, 0)}%"))
+    if c.get("margin") is not None:
+        lines.append(("row", "총이익률", f"{c['margin']:.1f}%", "매출에서 만드는 데 든 돈을 뺀 몫"))
+    tip = ("회사가 물건 · 서비스를 팔아 들어온 돈(매출)이 1년 전 같은 석 달보다 늘었는지\n"
+           f"· 최근 분기 {_sgn(c['yoy'], 0)}% : " + (f"기술주 15개 보통 {_sgn(p, 0)}%보다 {abs(c['yoy'] - p):.0f}%p {'앞섰다' if c['yoy'] >= p else '뒤처졌다'}" if p is not None else "비교 묶음 값 없음") + "\n"
+           "· 나누는 법 : 1년 전보다 5% 넘게 늘면 늘고 있음, 5% 넘게 줄면 줄고 있음, 그 사이는 비슷함\n"
+           "· 참고 : 다른 회사와는 회계 분기가 달라, 분기 한가운데 날짜가 속한 달력 분기로 맞췄다")
+    return lines, tip
+
+
+def card_eps(c):
+    p30 = c["bars"][1]["peers"]
+    move = "올렸다" if c["c30"] > 0 else "내렸다" if c["c30"] < 0 else "그대로 두었다"
+    first = f"애널리스트들이 내다본 엔비디아의 내년 1주당 이익은 ${c['current']:.2f}로, 30일 전보다 {abs(c['c30']):.1f}% {move}."
+    if p30 is not None:
+        first += f" 같은 기간 기술주 15개는 보통 {_sgn(p30)}% 바뀌었다."
+    if c.get("up30") is not None:
+        first += f" 30일 동안 {c['up30']}명이 올리고 {c['down30']}명이 내렸다."
+    groups = [(b["label"], [b["stock"], b["peers"]]) for b in c["bars"]]
+    chart = _chart_card(groups, [_sign_bg, _gray], [_sign_fg, _note_fg], [("엔비디아 올림", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), (_PEER_LBL, _GRAY_BAR)])
+    lines = [(first, "plain"), (f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">내년 1주당 이익 예상, ○일 전 대비 (%)</span>{chart}', "html")]
+    if p30 is not None:
+        lines.append(("row", "기술주 15개와 차이 (30일)", _pp(c["c30"] - p30, 1), "같은 기간 중앙값과 비교"))
+    if c.get("up30") is not None:
+        lines.append(("row", "30일간 올린 애널리스트", f"{c['up30']}명", "예상치를 올린 사람 수"))
+        lines.append(("row", "30일간 내린 애널리스트", f"{c['down30']}명", "예상치를 내린 사람 수"))
+    lines.append(("row", "내년 1주당 이익 예상", f"${c['current']:.2f}", "애널리스트 평균"))
+    tip = ("애널리스트들이 내놓은 내년 이익 예상치가 요즘 얼마나 바뀌었는지. 1주당 이익(EPS)은 회사 이익을 주식 수로 나눈 값\n"
+           f"· 30일 {_sgn(c['c30'])}% : " + (f"기술주 15개 보통 {_sgn(p30)}%와 견준 값" if p30 is not None else "비교 묶음 값 없음") + "\n"
+           "· 나누는 법 : 30일 전보다 1% 넘게 오르면 올라가는 중, 1% 넘게 내리면 내려가는 중, 그 사이는 큰 변화 없음\n"
+           "· 참고 : 예상치는 실적 발표 직후 한꺼번에 바뀌는 일이 많다")
+    return lines, tip
+
+
+def card_move(c):
+    sp = c.get("spy") or {}
+    first = (f"옵션 가격으로 본 앞으로 한 달 엔비디아의 하루 움직임 예상은 ±{c['exp']:.1f}%로, 최근 평소 하루 움직임 ±{c['sigma']:.1f}%의 {c['ratio']:.1f}배다.")
+    if c.get("days_to") is not None and c["days_to"] <= 35:
+        first += f" {_fd(c['next_earnings'])} 실적 발표가 가까워 그 예상이 함께 들어 있을 수 있다."
+    if sp.get("exp") and sp.get("sigma"):
+        first += f" 시장 전체(S&P 500)는 예상 ±{sp['exp']:.1f}%, 평소 ±{sp['sigma']:.1f}%다."
+    groups = [("엔비디아", [c["exp"], c["sigma"]])]
+    if sp.get("exp") and sp.get("sigma"):
+        groups.append(("S&P 500", [sp["exp"], sp["sigma"]]))
+    if c.get("earn"):
+        groups.append(("실적 다음 날", [c["earn"]["exp"], c["earn"]["past"]]))
+    chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("시장 예상 (옵션)", _AMBER), ("평소 실제", _GRAY_BAR)],
+                        fmt=lambda v: f"±{v:.1f}")
+    lines = [(first, "plain"), (f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">하루 움직임 (%)</span>{chart}', "html"),
+             ("row", "시장 예상 하루 움직임", f"±{c['exp']:.1f}%", "옵션 가격에 담긴 앞으로 한 달"),
+             ("row", "평소 하루 움직임", f"±{c['sigma']:.1f}%", "가격 카드의 평소 범위와 같은 자"),
+             ("row", "평소 대비", f"{c['ratio']:.1f}배", "1.3배 이상 큼 · 0.8배 이하 작음")]
+    if c.get("earn_day") and c.get("past"):   # 만기까지 평소 몫을 뺀 실적 하루 몫 (expect._earnings_day_move)
+        lines.append(("row", "실적 발표 하루 시장 예상 (추정)", f"±{c['earn_day']:.1f}%", f"지난 8번 실제 보통 ±{c['past']:.1f}% · 다음 발표 {_fd(c['next_earnings'])}"))
+    tip = ("옵션 가격에는 앞으로 주가가 얼마나 흔들릴지에 대한 시장의 예상이 담겨 있다(내재변동성). 이를 하루 단위로 바꿔 평소와 견준 것\n"
+           f"· 오늘 {c['ratio']:.1f}배 : 시장 예상 ±{c['exp']:.1f}%, 평소 ±{c['sigma']:.1f}%\n"
+           "· 나누는 법 : 1.3배 이상 평소보다 큼, 0.8배 이하 평소보다 작음, 그 사이는 평소 수준\n"
+           "· 참고 : 크기만 말한다. 오를지 내릴지는 말하지 않는다")
+    return lines, tip
+
+
+def card_short(c):
+    move = "늘었다" if c["chg"] > 0 else "줄었다"
+    first = f"주가가 내리면 돈을 버는 공매도 잔고는 유통 주식의 {c['pct']:.2f}%로, 한 달 전보다 {abs(c['chg']):.0f}% {move}."
+    if c.get("peers_pct") is not None:
+        first += f" 기술주 15개는 보통 {c['peers_pct']:.2f}%다."
+    lab = lambda d: f"{int(d[5:7])}월 {int(d[8:10])}일" if d else "—"   # noqa: E731
+    groups = [(lab(c.get("prior_asof")), [c.get("prior_pct"), c.get("peers_prior_pct")]), (lab(c.get("asof")), [c.get("pct"), c.get("peers_pct")])]
+    chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("엔비디아", _AMBER), (_PEER_LBL, _GRAY_BAR)], fmt=lambda v: f"{v:.2f}")
+    lines = [(first, "plain"), (f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">공매도 비율, 유통 주식 대비 (%)</span>{chart}', "html"),
+             ("row", "공매도 비율", f"{c['pct']:.2f}%", "유통 주식 대비"),
+             ("row", "잔고 변화 (한 달)", f"{_sgn(c['chg'])}%", "10% 넘게 늘면 늘어나는 중")]
+    if c.get("peers_pct") is not None:
+        lines.append(("row", "기술주 15개 보통", f"{c['peers_pct']:.2f}%", "같은 집계일 중앙값"))
+    lines.append(("row", "집계 기준일", lab(c.get("asof")), "한 달에 두 번 집계, 약 2주 늦게 나온다"))
+    tip = ("주가가 내리면 돈을 버는 거래(공매도)가 얼마나 쌓여 있는지\n"
+           f"· 오늘 {c['pct']:.2f}% : 유통 주식 100주 중 약 {c['pct']:.1f}주, 한 달 전보다 {abs(c['chg']):.0f}% {move}\n"
+           "· 나누는 법 : 잔고가 한 달 전보다 10% 넘게 늘면 늘어나는 중, 10% 넘게 줄면 줄어드는 중, 그 사이는 큰 변화 없음\n"
+           "· 참고 : 집계가 약 2주 늦게 나온다")
+    return lines, tip
+
+
+EXPECT_THEME = {"늘고 있음": ("positive", UP), "줄고 있음": ("negative", DOWN), "올라가는 중": ("positive", UP), "내려가는 중": ("negative", DOWN)}
+
+
+def sec_expect(a):
+    """실적과 기대 탭 — 질문 카드 넷 (가이드라인 2-7). 카드마다 맨 아래 `자세한 숫자 보기` = 옛 시장 지표 · 재무 탭의 칸."""
+    ex = a.get("expect") or {}
+    spec = [("회사는 돈을 더 벌고 있나?", "revenue", card_revenue, sec_checklist(a)),
+            ("애널리스트 기대는 올라가나?", "eps", card_eps, _status_group(a, "estimates") + _status_group(a, "valuation")),
+            ("시장은 큰 움직임을 예상하나?", "move", card_move, _status_group(a, "options")),
+            ("하락에 거는 돈은?", "short", card_short, _status_group(a, "flows"))]
+    out = ""
+    for title, key, fn, detail in spec:
+        c = ex.get(key)
+        if c:
+            lines, tip = fn(c)
+            state = c["state"]
+        else:
+            lines, tip, state = [("이번 실행에서 재료를 받지 못했다. 다음 실행에서 다시 받는다.", "plain")], "", "판단 유보"
+        if detail:
+            lines.append((_detail_fold(detail), "html"))
+        theme, col = EXPECT_THEME.get(state, ("neutral", MUTED))
+        out += _state_card(title, state, theme, col, lines, "", tip=tip, fold=True)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>'
+
+
 def sec_narrative(a, n):
     if not n or not n.get("today"):
         return _muted("어제 이후 새로 바뀐 중요 소식이 없습니다." if not a["events"] or (n is not None and not n.get("today")) else "서술을 만들지 못했습니다. 수치 섹션만 참고하세요.")   # 같은 줄을 매일 반복하지 않는다 (2026-10-17 사용자)
@@ -1527,11 +1701,10 @@ def build_body(a, n):
         _section("중요 이슈", sec_narrative(a, n), tab="오늘"),   # 그래프 아래로 (2026-10-11 사용자)
         _section("뉴스", sec_direction_bars(a) + sec_news_counts(a) + sec_events(a), line=False, tab="오늘"),   # 바로 아래가 카드라 제목 밑 구분선 없음 (2026-10-13 사용자)   # 막대가 바로 와도 구분선
         # 탭 이름과 같은 제목(캘린더·시장 지표·재무)은 탭 화면에서 숨긴다 — 본문(탭 없음)에서는 구획 경계로 남는다
+        _section("실적과 기대", sec_expect(a), tab="실적과 기대"),   # 시장 지표 · 재무 두 탭을 합침 — 질문 카드 넷 + 자세한 숫자 보기 (가이드라인 2-7, 2026-10-18)
         _section("캘린더", sec_upcoming(a) + _guide("범위", f"{config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 일정은 {config.COURT_LOOKAHEAD_DAYS}일"), tab="캘린더"),   # 안내는 카드 아래 (2026-10-11 사용자)
         _section("진행 중 사안", sec_cases(a), tab="캘린더"),
         # "기술지표" → "시장 지표" (2026-10-16 사용자): 내용이 옵션 · 예상 실적 · 수급 · 주가 수준이고, 진짜 기술지표(이평선 · RSI)는 10-11 에 오늘 탭으로 갔다
-        _section("시장 지표", sec_status(a), tab="시장 지표"),
-        _section("재무", sec_checklist(a), tab="재무"),
 
         sec_footer(a),
         "</div>",
