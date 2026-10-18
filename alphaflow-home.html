@@ -389,7 +389,7 @@ body.menu-open { overflow: hidden; }
 .index-name { font-weight: 700; font-size: 16px; line-height: 24px; color: #111; }
 .index-status { margin-left: 6px; font-weight: 400; font-size: 14px; color: #7A7A7A; }
 .index-value { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
-/* 지수 값은 실시간 랭킹 현재가 칸과 같은 글자 — 숫자 16px 굵게 + 등락 14px, 둘 다 증감 색 (2026-10-13 사용자) */
+/* 지수 값은 시총 TOP 10 현재가 칸과 같은 글자 — 숫자 16px 굵게 + 등락 14px, 둘 다 증감 색 (2026-10-13 사용자) */
 .index-price { font-family: var(--num); font-weight: 700; font-size: 16px; line-height: 24px; font-variant-numeric: tabular-nums; }
 .index-change { font-family: var(--num); font-weight: 600; font-size: 14px; line-height: 24px; font-variant-numeric: tabular-nums; }
 .index-value { gap: 6px; }
@@ -694,7 +694,7 @@ body.menu-open { overflow: hidden; }
 #report-card .report-columns li::before { content: none; }
 /* 첫 탭(거래상위)은 왼쪽 여백 없이 구분선 시작점에서 (2026-10-15 사용자) */
 .home-cards .rank-card .tab:first-child { padding-left: 0; }   /* 제목이 카드 안으로 들어가 쌓일 때 위 여백 +15 는 필요 없음 */
-/* 카드 순서: 리포트 → 주요 지수 → 섹터 현황 → 실시간 랭킹. PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭, 지수 · 섹터가 나란히 (2026-10-15 사용자) */
+/* 카드 순서: 리포트 → 주요 지수 → 섹터 현황 → 시총 TOP 10. PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭, 지수 · 섹터가 나란히 (2026-10-15 사용자) */
 @media (min-width: 901px) {
   .home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-cards > .briefing, .home-cards > .rankings { grid-column: 1 / -1; }
@@ -950,19 +950,20 @@ body.menu-open { overflow: hidden; }
   </section>
 
   <!-- ====================================================================
-       3. 실시간 랭킹  (data.json 연동)
+       3. 시총 TOP 10  (data.json 연동) — 옛 이름 실시간 랭킹 (2026-10-18 사용자: 고정 10종목이라 이름이 틀림, 기획 10-10)
        ==================================================================== -->
   <section class="rankings" aria-labelledby="rankings-title">
     <div class="section-head">
       <h2 class="section-title" id="rankings-title">
-        <span class="report-icon" style="background:#6D28D9;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="8" width="3" height="6" rx=".5"/><rect x="6.5" y="3" width="3" height="11" rx=".5"/><rect x="11" y="10" width="3" height="4" rx=".5"/></svg></span>실시간 랭킹
+        <span class="report-icon" style="background:#6D28D9;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="8" width="3" height="6" rx=".5"/><rect x="6.5" y="3" width="3" height="11" rx=".5"/><rect x="11" y="10" width="3" height="4" rx=".5"/></svg></span>시총 TOP 10
       </h2>
     </div>
 
     <!-- 탭 · 표 · 더 보기 버튼이 카드 하나 (2026-10-13 사용자) -->
     <div class="card rank-card">
       <div class="tabs" role="tablist">
-        <button class="tab" role="tab" aria-selected="true"  data-sort="volume">거래상위</button>
+        <button class="tab" role="tab" aria-selected="true"  data-sort="cap">시가총액</button>
+        <button class="tab" role="tab" aria-selected="false" data-sort="volume">거래상위</button>
         <button class="tab" role="tab" aria-selected="false" data-sort="turnover">거래대금 상위</button>
         <button class="tab" role="tab" aria-selected="false" data-sort="gain">가격 상승</button>
       </div>
@@ -1090,7 +1091,8 @@ body.menu-open { overflow: hidden; }
     TSLA:   { name: '테슬라',           sector: '자동차 및 트럭 제조', color: '#C0392B' },
     'BRK-B':{ name: '버크셔 해서웨이',  sector: '보험',              color: '#5D6D7E' },
     AVGO:   { name: '브로드컴',         sector: '반도체',            color: '#B03A48' },
-    JPM:    { name: 'JP모간 체이스',    sector: '은행',              color: '#7A5EA8' }
+    LLY:    { name: '일라이 릴리',      sector: '제약',              color: '#C8102E' },   /* 2026-10-18 시총 10위로 들어옴 */
+    JPM:    { name: 'JP모간 체이스',    sector: '은행',              color: '#7A5EA8' }   /* 옛 data.json 용 */
   };
 
   function metaFor(ticker) {
@@ -1162,9 +1164,13 @@ body.menu-open { overflow: hidden; }
   /* ================================================================ 랭킹 */
 
   var stocks = [];
-  var activeSort = 'volume';
+  var activeSort = 'cap';   /* 시총 TOP 10 이라 기본은 시가총액 순 (2026-10-18) */
+  /* data.json 에 시총(mc)이 없던 때의 순서 — fetch_stocks.TICKERS 와 같은 2026-10-18 장 마감 순위 */
+  var CAP_ORDER = ['NVDA', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'AVGO', 'TSLA', 'BRK-B', 'LLY'];
+  function capRank(x) { var i = CAP_ORDER.indexOf(x.s); return i < 0 ? 99 : i; }
 
   var SORTERS = {
+    cap:      function (a, b) { return (a.mc && b.mc) ? b.mc - a.mc : capRank(a) - capRank(b); },
     volume:   function (a, b) { return (b.v || 0) - (a.v || 0); },
     turnover: function (a, b) { return (b.p * b.v || 0) - (a.p * a.v || 0); },
     gain:     function (a, b) { return (b.cp || 0) - (a.cp || 0); }   /* 검색어 상위는 데이터가 없어 탭을 삭제 (2026-10-12 사용자) */

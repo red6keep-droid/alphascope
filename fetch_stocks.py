@@ -4,8 +4,11 @@ from zoneinfo import ZoneInfo
 
 import yfinance as yf
 
+# 홈 "시총 TOP 10" — 미국 시가총액 상위 10개 (doc/종목-레이더-기획.md 10-10, 2026-10-18 장 마감 기준 순서).
+# experiments/stock-radar/universe.py CANDIDATES 앞 10개와 같아야 한다. 교체(11위 밖 5거래일)가 생기면 두 곳을 같이 고친다.
+# 2026-10-18: JPM(13위) 빠지고 LLY(10위) 들어옴
 TICKERS = [
-    "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "BRK-B", "AVGO", "JPM"
+    "NVDA", "AAPL", "GOOGL", "MSFT", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "LLY"
 ]
 
 # 홈 화면 상단 "주요 지수" 카드 4개. (yfinance 심볼, 표시 이름)
@@ -100,6 +103,14 @@ def fetch_sectors():
     return out
 
 
+def _market_cap(info):
+    try:
+        v = info.market_cap
+        return int(v) if v else None
+    except Exception:  # noqa: BLE001 — 시총을 못 받아도 가격 줄은 낸다
+        return None
+
+
 def fetch_data():
     print(f"[{datetime.datetime.now()}] {len(TICKERS)}개 종목 15분봉 수집 시작...")
     tickers_str = " ".join(TICKERS)
@@ -149,6 +160,7 @@ def fetch_data():
                 "c": round(float(change), 2),
                 "cp": round(float(change_pct), 2),
                 "v": int(info.last_volume or 0),
+                "mc": _market_cap(info),   # 시가총액(달러) — 홈 시총 TOP 10 기본 정렬 (2026-10-18)
                 "n": len(candles),
                 "candles": candles
             })

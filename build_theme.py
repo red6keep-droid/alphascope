@@ -1442,11 +1442,12 @@ _MOCK_ROWS = [
     ("TSLA", 376.37, 4.26, 112905600),
     ("BRK-B", 508.13, 0.11, 3204100),
     ("AVGO", 357.16, 2.94, 29771200),
-    ("JPM", 362.06, -0.73, 9880500),
+    ("LLY", 1257.03, -0.73, 3880500),   # 2026-10-18 시총 TOP 10 (JPM → LLY)
 ]
+_MOCK_CAP = {"NVDA": 5171, "AAPL": 5013, "GOOGL": 4165, "MSFT": 3928, "AMZN": 2697, "META": 1807, "AVGO": 1569, "TSLA": 1401, "BRK-B": 1139, "LLY": 1121}   # $B, 시가총액 탭
 
 MOCK_STOCKS = [
-    {"s": t, "p": p, "c": round(p * cp / (100 + cp), 2), "cp": cp, "v": v, "n": 26, "candles": []}
+    {"s": t, "p": p, "c": round(p * cp / (100 + cp), 2), "cp": cp, "v": v, "mc": _MOCK_CAP[t] * 10**9, "n": 26, "candles": []}
     for t, p, cp, v in _MOCK_ROWS
 ]
 

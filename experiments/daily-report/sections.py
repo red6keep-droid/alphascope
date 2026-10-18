@@ -11,10 +11,11 @@ import design_kit as dk
 
 INDEX_NAME = {"^GSPC": "S&P 500", "^IXIC": "나스닥", "^DJI": "다우", "^RUT": "러셀 2000", "^SOX": "미국 반도체 지수"}
 INDEX_SHORT = {"^GSPC": "S&P 500", "^IXIC": "나스닥", "^DJI": "다우", "^RUT": "러셀"}
+# 대형주 10개 = 홈 시총 TOP 10 (fetch_stocks.TICKERS · stock-radar/universe.py, 2026-10-18 JPM → LLY)
 MEGA_KO = {"NVDA": "엔비디아", "AAPL": "애플", "MSFT": "마이크로소프트", "GOOGL": "알파벳(구글)", "AMZN": "아마존", "META": "메타",
-           "AVGO": "브로드컴", "TSLA": "테슬라", "BRK-B": "버크셔 해서웨이", "JPM": "JP모건"}
+           "AVGO": "브로드컴", "TSLA": "테슬라", "BRK-B": "버크셔 해서웨이", "LLY": "일라이 릴리"}
 MEGA_SHORT = {"NVDA": "엔비디아", "AAPL": "애플", "MSFT": "MS", "GOOGL": "구글", "AMZN": "아마존", "META": "메타",
-              "AVGO": "브로드컴", "TSLA": "테슬라", "BRK-B": "버크셔", "JPM": "JP모건"}
+              "AVGO": "브로드컴", "TSLA": "테슬라", "BRK-B": "버크셔", "LLY": "릴리"}
 MACRO_KO = {"FOMC": "금리 결정 (FOMC)", "CPI": "소비자물가 (CPI)", "NFP": "고용 보고서", "PCE": "물가 (PCE)", "GDP": "성장률 (GDP)", "OPEX": "월간 옵션 만기"}
 MACRO_SHORT = {"FOMC": "FOMC", "CPI": "CPI", "NFP": "고용", "PCE": "PCE", "GDP": "GDP", "OPEX": "옵션 만기"}
 # 표본이 적어 화면에서 빼는 짝 (기획 4-1: LG에너지솔루션은 2022년 상장, 크게 움직인 밤 17 · 23번 — 판단 유보)

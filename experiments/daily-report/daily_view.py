@@ -18,7 +18,7 @@ STATS = os.path.join(BASE, "static", "daily_stats.json")
 LAM, Z_OUT = 0.94, 2.0
 VIX_IN, VIX_OUT = 35.0, 25.0
 NORMAL_SYMBOLS = ["^GSPC", "^IXIC", "^DJI", "^RUT", "^SOX",
-                  "NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "JPM"]
+                  "NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "LLY"]
 
 
 def load_stats():

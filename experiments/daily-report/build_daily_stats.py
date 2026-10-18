@@ -42,7 +42,7 @@ PAIRS = [
     ("006400.KS", "TSLA", "삼성SDI", "테슬라"),
     ("373220.KS", "TSLA", "LG에너지솔루션", "테슬라"),
 ]
-MEGA = ["NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "JPM"]
+MEGA = ["NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "LLY"]
 
 
 def _dl(sym, start=START):

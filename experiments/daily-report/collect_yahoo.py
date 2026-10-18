@@ -35,7 +35,7 @@ HISTORY_UNIVERSE = {
     "safe": ["TLT", "HYG", "GLD"],
     "rates": ["^TNX", "^FVX", "^IRX"],
     # 2026-10-18 재설계 (doc/데일리-리포트-기획.md 6절): 대형주 10개 평소 범위(D4) · 한국 짝의 미국 쪽(K2) · 원/달러(K3)
-    "mega": ["NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "JPM"],
+    "mega": ["NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "LLY"],
     "link": ["^SOX"],
     "fx": ["KRW=X"],
 }
@@ -55,7 +55,7 @@ MIN_VOLUME = 1_000_000
 
 FALLBACK_UNIVERSE = [
     "NVDA", "AAPL", "MSFT", "AMZN", "GOOGL", "META", "TSLA", "AVGO", "NFLX",
-    "JPM", "BAC", "WFC", "C", "GS", "MS", "WMT", "COST", "TGT", "XOM", "CVX",
+    "LLY", "BAC", "WFC", "C", "GS", "MS", "WMT", "COST", "TGT", "XOM", "CVX",
     "V", "MA", "UNH", "JNJ", "PFE", "MRK", "ABBV", "LLY", "CRM", "ORCL",
     "AMD", "MU", "INTC", "QCOM", "TXN", "CSCO", "ADBE", "ACN", "PEP", "PG",
     "KO", "MCD", "DIS", "HD", "NKE", "SBUX", "BA", "GE", "CAT", "DE",
