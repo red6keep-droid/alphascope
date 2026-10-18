@@ -2673,8 +2673,11 @@ body.no-dashboard .main-content { padding-top: 32px; }
             if (!n.querySelectorAll) return;
             [].slice.call(n.querySelectorAll('span, div')).forEach(function (r) {
               if (!/justify-content:\s*space-between/.test(r.getAttribute('style') || '') || r.children.length < 2) return;
-              var name = String(r.children[0].textContent || '').replace(/\s+/g, ' ').trim();
-              var val = String(r.children[r.children.length - 1].textContent || '').replace(/\s+/g, ' ').trim();
+              /* 툴팁 아이콘(svg 안 "?" 글자) · data-tip 은 글자에서 뺀다. 칸이 셋이면(이름 · 값 · 아래 한 줄 — 2026-10-17 엔비디아 가격 줄의 평소 범위 줄)
+                 값은 둘째 칸 — 마지막 칸을 값으로 읽어 가격 대신 "?평소 범위 안 …" 이 나오던 것 (2026-10-18 사용자: 홈 엔비디아 가격 이상) */
+              function txt(x) { var c = x.cloneNode(true); [].slice.call(c.querySelectorAll('svg, [data-tip]')).forEach(function (t) { t.parentNode.removeChild(t); }); return String(c.textContent || '').replace(/\s+/g, ' ').trim(); }
+              var name = txt(r.children[0]);
+              var val = txt(r.children[r.children.length > 2 ? 1 : r.children.length - 1]);
               if (name && val && !(name in kv)) kv[name.replace(/\s*\(.*$/, '')] = val;
             });
           });
@@ -2834,7 +2837,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
               var title = (entry.title || {}).$t || '';
               /* 날짜 표기 2026.10.9 (점, 앞자리 0 없음 — 디자인-가이드라인 3-3) */
-              var day = String((entry.published || {}).$t || '').slice(0, 10).split('-').map(function (x, i) { return i ? String(parseInt(x, 10)) : x; }).join('.');
+              /* 글 제목의 날짜(한국 날짜)를 먼저 — 피드 published 는 블로그 시간대(미국 태평양)라 제목보다 하루 이르게 나왔다 (2026-10-18 사용자: 홈 카드 이상). 제목에 날짜가 없으면 published */
+              var tm = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/.exec(title);
+              var day = tm ? [tm[1], String(parseInt(tm[2], 10)), String(parseInt(tm[3], 10))].join('.')
+                : String((entry.published || {}).$t || '').slice(0, 10).split('-').map(function (x, i) { return i ? String(parseInt(x, 10)) : x; }).join('.');
               setDate(card.id, day);
 
               /* 카드를 누르면 그 글로 간다 */

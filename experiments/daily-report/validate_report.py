@@ -74,6 +74,8 @@ def validate(input_path, output_path, analysis_path=None):
     for k in ("one_line", "opinion", "summary"):
         if any(w in str(report.get(k) or "") for w in ("위험 선호", "위험 회피", "Risk-On", "Risk-Off")):
             warnings.append(f"{k} 에 시장 등급 말투가 있습니다 (규칙 9).")
+        if any(w in str(report.get(k) or "") for w in ("지지선", "저항선", "저점 시험", "돌파", "급등했", "폭등")):
+            warnings.append(f"{k} 에 차트 해석 · 과장 말투가 있습니다 (규칙 9).")
 
     one_line = str(report.get("one_line") or "")
     if len(one_line) > ONE_LINE_MAX_LEN:
