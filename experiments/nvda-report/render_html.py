@@ -17,6 +17,7 @@ import sys
 import config
 import render_report as rr
 import report_title
+import cal_cards
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import design_kit as _dk  # noqa: E402  — 공통 마무리 처리 (fix_colons)
 
@@ -1647,6 +1648,150 @@ def sec_expect(a):
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>'
 
 
+# ---------------------------------------------------------------- 캘린더 탭 (가이드라인 2-8 · 1-4-1, 2026-10-18 Claude 설계)
+# 1층 = 질문 카드 넷(실적과 기대 탭과 같은 틀), 펼치면 첫 줄 문단 · 비교 그래프 · 근거 줄. 맨 아래 `전체 일정 보기`(60일 목록 · 진행 중 사안).
+
+def _left(n):
+    return "오늘" if n == 0 else "내일" if n == 1 else f"{n}일 뒤"
+
+
+def _md_short(d):
+    return f"{int(d[5:7])}월 {int(d[8:10])}일"
+
+
+def _soon_theme(n):
+    return ("positive", WARN) if n is not None and n <= cal_cards.SOON_DAYS else ("neutral", "#111")
+
+
+def cal_earnings(c):
+    r = (c["median"] / c["normal"]) if c.get("median") and c.get("normal") else None
+    first = f"엔비디아의 다음 실적 발표는 {_md_short(c['day'])} 장 마감 뒤로, {c['left']}일 남았다."
+    if not c["confirmed"]:
+        first += " 아직 회사가 확정하지 않은 추정 날짜다."
+    if r:
+        first += f" 지난 {len(c['bars'])}번 발표 다음 날 주가는 보통 ±{c['median']:.1f}% 움직여 평소 하루(±{c['normal']:.1f}%)의 약 {r:.1f}배였다."
+    if c.get("market_exp"):
+        first += f" 옵션 시장은 이번 발표 하루에 약 ±{c['market_exp']:.1f}%를 예상한다(추정)."
+    lines = [(first, "plain")]
+    if c["bars"]:
+        groups = [(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["move"], b["normal"]]) for b in c["bars"]]
+        chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("발표 다음 날 움직임", _AMBER), ("그때 평소 하루", _GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
+        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">최근 {len(c["bars"])}번 발표 다음 날 (%)</span>{chart}', "html"))
+    lines.append(("row", "발표일", _md_short(c["day"]), "장 마감 뒤 · " + ("회사 확정" if c["confirmed"] else "추정")))
+    if c.get("median"):
+        lines.append(("row", "발표 다음 날 보통", f"±{c['median']:.1f}%", f"지난 {len(c['bars'])}번 중앙값"))
+    if c.get("normal"):
+        lines.append(("row", "평소 하루", f"±{c['normal']:.1f}%", "가격 카드와 같은 자"))
+    if c.get("market_exp"):
+        lines.append(("row", "이번 발표 시장 예상 (추정)", f"±{c['market_exp']:.1f}%", "옵션 가격에서 평소 몫을 뺀 값"))
+    tip = ("회사가 석 달마다 실적을 발표하면 그 다음 날 주가가 크게 움직이곤 한다. 오른 날 · 내린 날을 가리지 않고 크기만 본다\n"
+           f"· {_left(c['left'])} : {_md_short(c['day'])}" + ("" if c["confirmed"] else ", 회사 확정 전 추정 날짜") + "\n"
+           f"· 나누는 법 : {cal_cards.SOON_DAYS}일 안으로 다가오면 카드가 주황색")
+    return lines, tip, _left(c["left"]), c["left"]
+
+
+def cal_peers(c):
+    up = c["upcoming"]
+    if not up:
+        return [("앞으로 30일 안에 실적을 발표하는 고객 · 경쟁사가 없다.", "plain")], "", "없음", None
+    names = [f"{cal_cards.PEER_KO.get(u['symbol'], u['symbol'])}({_md_short(u['day'])})" for u in up]
+    eff = [c["effect"][s]["median"] for s in dict.fromkeys(u["symbol"] for u in up) if c["effect"].get(s, {}).get("median")]
+    first = f"앞으로 30일 안에 {' · '.join(names)}가 실적을 발표한다. 엔비디아 칩을 사는 큰 고객이거나 경쟁 · 공급 회사다."
+    if eff and c.get("normal"):
+        first += f" 최근 2년 이 회사들의 발표 다음 날 엔비디아는 보통 ±{min(eff):.1f}~{max(eff):.1f}% 움직였다(엔비디아 보통 날 ±{c['normal']:.1f}%)."
+    lines = [(first, "plain")]
+    syms = [s for s in dict.fromkeys(u["symbol"] for u in up) if c["effect"].get(s, {}).get("median")]
+    if syms and c.get("normal"):
+        groups = [(s, [c["effect"][s]["median"], c["normal"]]) for s in syms]
+        chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("그 회사 발표 다음 날 엔비디아", _AMBER), ("엔비디아 보통 날", _GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
+        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">발표 다음 날 엔비디아 움직임 (%)</span>{chart}', "html"))
+    d0 = None
+    for u in up:
+        s = u["symbol"]
+        e = c["effect"].get(s) or {}
+        note = cal_cards.PEER_ROLE.get(s, "") + (f" · 다음 날 엔비디아 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else "")
+        lines.append(("row", f"{cal_cards.PEER_KO.get(s, s)} ({s})", _md_short(u["day"]), note))
+    first_left = (datetime.date.fromisoformat(up[0]["day"]) - datetime.date.fromisoformat(c.get("today") or up[0]["day"])).days if c.get("today") else None
+    tip = ("엔비디아 칩을 사는 큰 고객(클라우드 회사 등), 경쟁사, 부품 공급사의 실적 발표. 이 회사들이 내놓는 투자 계획 · 주문 소식에 엔비디아 주가도 함께 움직이곤 한다\n"
+           f"· 30일 안 {len(up)}곳 : 가장 가까운 발표는 {cal_cards.PEER_KO.get(up[0]['symbol'], up[0]['symbol'])} {_md_short(up[0]['day'])}\n"
+           "· 참고 : 같은 날 발표한 회사들은 같은 날 움직임으로 셌다. 최근 2년, 회사마다 8번 안팎이라 숫자는 대략으로 본다")
+    return lines, tip, f"{len(up)}곳 · 30일 안", first_left
+
+
+def cal_macro(c):
+    up = c["upcoming"]
+    if not up:
+        return [("앞으로 30일 안에 잡힌 큰 경제 일정이 없다.", "plain")], "", "없음", None
+    kinds = list(dict.fromkeys(u["kind"] for u in up))
+    names = [f"{cal_cards.MACRO_KO.get(u['kind'], u['label'])}({_md_short(u['day'])})" for u in up]
+    eff = {k: c["effect"][k] for k in kinds if k in c["effect"]}
+    first = f"앞으로 30일 안에 {' · '.join(names)}가 있다."
+    if eff and c.get("normal"):
+        lo, hi = min(e["median"] for e in eff.values()), max(e["median"] for e in eff.values())
+        first += f" 2025년 이후 이런 날 S&P 500은 보통 ±{lo:.1f}~{hi:.1f}% 움직였고, 보통 날은 ±{c['normal']:.1f}%였다."
+    lines = [(first, "plain")]
+    if eff and c.get("normal"):
+        groups = [(cal_cards.MACRO_KO.get(k, k).split(" (")[-1].rstrip(")") if "(" in cal_cards.MACRO_KO.get(k, k) else cal_cards.MACRO_KO.get(k, k), [eff[k]["median"], c["normal"]]) for k in eff]
+        chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("그 일정 날 S&P 500", _AMBER), ("S&P 500 보통 날", _GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
+        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">그날 S&P 500 움직임 (%)</span>{chart}', "html"))
+    for u in up:
+        e = c["effect"].get(u["kind"]) or {}
+        lines.append(("row", cal_cards.MACRO_KO.get(u["kind"], u["label"]), _md_short(u["day"]), f"그날 S&P 500 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else ""))
+    tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정\n"
+           f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {cal_cards.MACRO_KO.get(up[0]['kind'], up[0]['label'])} {_md_short(up[0]['day'])}\n"
+           "· 참고 : 2025년 이후 지난 일정 날의 S&P 500 움직임을 보통 날과 견줬다. 일정이 있다고 늘 크게 움직이지는 않았다")
+    return lines, tip, f"{len(up)}건 · 30일 안", None
+
+
+def cal_court(c):
+    cs = c["cases"]
+    nxt = cs[0]
+    first = (f"추적 중인 소송은 {len(cs)}건이다. 가장 가까운 일정은 {nxt['name']}의 {nxt['label'] or '심리'}로 {_md_short(nxt['day'])}, {nxt['left']}일 뒤다."
+             f" 법원 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드 색이 주황으로 바뀐다.")
+    lines = [(first, "plain")] + [("row", x["name"], _md_short(x["day"]), f"{x['label'] or '일정'} · {_left(x['left'])}") for x in cs]
+    tip = ("엔비디아가 당사자인 소송 가운데 주가에 닿을 수 있는 것(주주 집단소송 등)의 법원 일정\n"
+           f"· {_left(nxt['left'])} : {nxt['name']} {nxt['label'] or ''}\n"
+           f"· 나누는 법 : 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드가 주황색")
+    theme = ("positive", WARN) if nxt["left"] <= config.COURT_LOOKAHEAD_DAYS else ("neutral", "#111")
+    return lines, tip, f"{_left(nxt['left'])} 심리", theme
+
+
+def _all_list(a, items):
+    d0 = datetime.date.fromisoformat(a["day"])
+    rows = []
+    for c in items:
+        court = c["kind"] == "COURT"
+        kind = rr.KIND_KO.get(c["kind"], c["kind"]).replace("⚠ ", "")
+        tail = f'<span style="color:{SUB};white-space:nowrap;"> · 추정</span>' if not c.get("confirmed", 1) else ""
+        name = f'<span style="color:{WARN if court else "#111"};">{_esc(c["label"])}</span>' + tail
+        dcol = WARN if court else "#111"
+        rows.append((f'<span style="color:{dcol};">{_esc(_d(c["day"]))}</span>', _pill(kind, "uncertain" if court else "area"), name, "", f'<span style="color:{dcol};">{_dn(d0, c["day"])}</span>'))
+    return _gcard(rows) if rows else _muted("잡힌 일정이 없습니다.")
+
+
+def sec_calendar(a):
+    """캘린더 탭 — 질문 카드 넷 (가이드라인 2-8). 맨 아래 `전체 일정 보기` = 60일 목록 + 진행 중 사안."""
+    cc = a.get("calendar_cards") or {}
+    out = ""
+    specs = [("다음 실적 발표는?", "earnings", cal_earnings), ("엔비디아와 함께 보는 회사 실적은?", "peers", cal_peers),
+             ("시장 전체를 흔들 일정은?", "macro", cal_macro), ("진행 중 소송 일정은?", "court", cal_court)]
+    first_card = True
+    for title, key, fn in specs:
+        c = cc.get(key)
+        if not c:
+            continue
+        if key == "peers":
+            c = dict(c, today=a["day"])
+        lines, tip, state, extra = fn(c)
+        theme, col = extra if isinstance(extra, tuple) else _soon_theme(extra)
+        out += _state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=first_card)
+        first_card = False
+    allx = _all_list(a, cc.get("all") or []) + _sub_label("진행 중 사안") + sec_cases(a)
+    fold = (f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{_fold_row("전체 일정 보기")}</summary>'
+            f'<div style="margin-top:6px;">{allx}</div></details>')
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' + fold
+
+
 def sec_narrative(a, n):
     if not n or not n.get("today"):
         return _muted("어제 이후 새로 바뀐 중요 소식이 없습니다." if not a["events"] or (n is not None and not n.get("today")) else "서술을 만들지 못했습니다. 수치 섹션만 참고하세요.")   # 같은 줄을 매일 반복하지 않는다 (2026-10-17 사용자)
@@ -1717,8 +1862,7 @@ def build_body(a, n):
         _section("뉴스", sec_direction_bars(a) + sec_news_counts(a) + sec_events(a), line=False, tab="오늘"),   # 바로 아래가 카드라 제목 밑 구분선 없음 (2026-10-13 사용자)   # 막대가 바로 와도 구분선
         # 탭 이름과 같은 제목(캘린더·시장 지표·재무)은 탭 화면에서 숨긴다 — 본문(탭 없음)에서는 구획 경계로 남는다
         _section("실적과 기대", sec_expect(a), tab="실적과 기대"),   # 시장 지표 · 재무 두 탭을 합침 — 질문 카드 넷 + 자세한 지표 보기 (가이드라인 2-7, 2026-10-18)
-        _section("캘린더", sec_upcoming(a) + _guide("범위", f"{config.CALENDAR_LOOKAHEAD_DAYS}일 이내 · 법원 일정은 {config.COURT_LOOKAHEAD_DAYS}일"), tab="캘린더"),   # 안내는 카드 아래 (2026-10-11 사용자)
-        _section("진행 중 사안", sec_cases(a), tab="캘린더"),
+        _section("캘린더", sec_calendar(a), tab="캘린더"),   # 질문 카드 넷 + 전체 일정 보기(60일 · 진행 중 사안) (가이드라인 2-8, 2026-10-18)
         # "기술지표" → "시장 지표" (2026-10-16 사용자): 내용이 옵션 · 예상 실적 · 수급 · 주가 수준이고, 진짜 기술지표(이평선 · RSI)는 10-11 에 오늘 탭으로 갔다
 
         sec_footer(a),

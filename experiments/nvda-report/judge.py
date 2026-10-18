@@ -826,6 +826,8 @@ def build(conn, day, run_date):
     analysis["new_flags"] = new_flags(conn, day, occasional_values(analysis))   # "N" 라벨 (2026-10-11)
     import expect
     analysis["expect"] = expect.build(conn, day, analysis)   # 실적과 기대 탭 질문 카드 넷 (가이드라인 2-7, 2026-10-18)
+    import cal_cards
+    analysis["calendar_cards"] = cal_cards.build(conn, day, analysis)   # 캘린더 탭 질문 카드 넷 (가이드라인 2-8, 2026-10-18)
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     path = os.path.join(config.OUTPUT_DIR, "nvda_analysis.json")
     with open(path, "w", encoding="utf-8") as f:
