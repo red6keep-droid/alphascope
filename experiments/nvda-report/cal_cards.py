@@ -55,7 +55,7 @@ def card_earnings(conn, day, a):
     bars = []
     for m in em.get("moves") or []:
         s = sd.get(m["day"])
-        bars.append({"day": m["day"], "move": abs(m["ret"]), "normal": s * 100 if s else None})
+        bars.append({"day": m["day"], "ret": m["ret"], "move": abs(m["ret"]), "normal": s * 100 if s else None})
     left = (_d(nxt) - _d(day)).days
     exp = (a.get("expect") or {}).get("move") or {}
     return {"day": nxt, "left": left, "confirmed": bool(row["confirmed"]) if row else False, "bars": bars,

@@ -37,7 +37,9 @@ CARD = f"background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:
 CARD_EMPH = f"background:#FFF7ED;border:1px solid #FFEDD5;border-radius:10px;padding:{12 - _dk.VP}px 14px;line-height:{LH_CARD};"       # (옛) 강조 카드
 # 강조 이벤트 카드는 방향 테마 (2026-10-11 사용자): 긍정 오렌지 · 부정 파랑 · 중립 회색 · 불확실 노랑
 CARD_DIR = {"positive": ("#FFF7ED", "#FED7AA"), "negative": ("#EFF6FF", "#BFDBFE"),
-            "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#FFFBEB", "#FDE68A")}
+            "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#FFFBEB", "#FDE68A"),
+            "soon": ("#F5F3FF", "#DDD6FE")}   # 보라 = 다가오는 일정 (캘린더 탭, 2026-10-18 사용자)
+SOON = "#6D28D9"   # 보라 카드 상태 글자
 # 라벨 (가이드라인 5절, 2026-10-11 사용자): 외곽선 박스, 모서리 4px, 볼드 없음, 14px. (테두리색, 글자색)
 PILL = {"area": ("#CBD5E1", "#334155"), "positive": ("#FCA5A5", "#B91C1C"), "negative": ("#93C5FD", "#1D4ED8"),
         "uncertain": ("#FDBA74", "#C2410C"), "neutral": ("#CBD5E1", "#64748B")}
@@ -1660,7 +1662,7 @@ def _md_short(d):
 
 
 def _soon_theme(n):
-    return ("positive", WARN) if n is not None and n <= cal_cards.SOON_DAYS else ("neutral", "#111")
+    return ("soon", SOON) if n is not None and n <= cal_cards.SOON_DAYS else ("neutral", "#111")   # 다가오면 보라 (2026-10-18 사용자, 주황 → 보라)
 
 
 def cal_earnings(c):
@@ -1673,10 +1675,11 @@ def cal_earnings(c):
     if c.get("market_exp"):
         first += f" 옵션 시장은 이번 발표 하루에 약 ±{c['market_exp']:.1f}%를 예상한다(추정)."
     lines = [(first, "plain")]
-    if c["bars"]:
-        groups = [(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["move"], b["normal"]]) for b in c["bars"]]
-        chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("발표 다음 날 움직임", _AMBER), ("그때 평소 하루", _GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
-        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">최근 {len(c["bars"])}번 발표 다음 날 (%)</span>{chart}', "html"))
+    if c["bars"]:   # 오늘 탭 `실적 발표 후 가격 변동` 그래프와 같게 (2026-10-18 사용자)
+        chart = _col_chart([(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["ret"]]) for b in c["bars"]], [_sign_bg], [_sign_fg], height=130)
+        pad = _dk.SEP_GAP - _dk.VP - 1
+        card = f'<span style="{MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}</span></span>'
+        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">최근 {len(c["bars"])}번의 실적 발표 다음 날 (%)</span>{card}', "html"))
     lines.append(("row", "발표일", _md_short(c["day"]), "장 마감 뒤 · " + ("회사 확정" if c["confirmed"] else "추정")))
     if c.get("median"):
         lines.append(("row", "발표 다음 날 보통", f"±{c['median']:.1f}%", f"지난 {len(c['bars'])}번 중앙값"))
@@ -1686,7 +1689,7 @@ def cal_earnings(c):
         lines.append(("row", "이번 발표 시장 예상 (추정)", f"±{c['market_exp']:.1f}%", "옵션 가격에서 평소 몫을 뺀 값"))
     tip = ("회사가 석 달마다 실적을 발표하면 그 다음 날 주가가 크게 움직이곤 한다. 오른 날 · 내린 날을 가리지 않고 크기만 본다\n"
            f"· {_left(c['left'])} : {_md_short(c['day'])}" + ("" if c["confirmed"] else ", 회사 확정 전 추정 날짜") + "\n"
-           f"· 나누는 법 : {cal_cards.SOON_DAYS}일 안으로 다가오면 카드가 주황색")
+           f"· 나누는 법 : {cal_cards.SOON_DAYS}일 안으로 다가오면 카드가 보라색")
     return lines, tip, _left(c["left"]), c["left"]
 
 
@@ -1747,12 +1750,12 @@ def cal_court(c):
     cs = c["cases"]
     nxt = cs[0]
     first = (f"추적 중인 소송은 {len(cs)}건이다. 가장 가까운 일정은 {nxt['name']}의 {nxt['label'] or '심리'}로 {_md_short(nxt['day'])}, {nxt['left']}일 뒤다."
-             f" 법원 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드 색이 주황으로 바뀐다.")
+             f" 법원 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드 색이 보라로 바뀐다.")
     lines = [(first, "plain")] + [("row", x["name"], _md_short(x["day"]), f"{x['label'] or '일정'} · {_left(x['left'])}") for x in cs]
     tip = ("엔비디아가 당사자인 소송 가운데 주가에 닿을 수 있는 것(주주 집단소송 등)의 법원 일정\n"
            f"· {_left(nxt['left'])} : {nxt['name']} {nxt['label'] or ''}\n"
-           f"· 나누는 법 : 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드가 주황색")
-    theme = ("positive", WARN) if nxt["left"] <= config.COURT_LOOKAHEAD_DAYS else ("neutral", "#111")
+           f"· 나누는 법 : 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드가 보라색")
+    theme = ("soon", SOON) if nxt["left"] <= config.COURT_LOOKAHEAD_DAYS else ("neutral", "#111")
     return lines, tip, f"{_left(nxt['left'])} 심리", theme
 
 
