@@ -193,7 +193,7 @@ def _no_record(tip):
 
 def sector_lines(sf):
     pp, rel, n = R.config.SECTOR_FLOW_PP, sf["rel_pp"], sf["days"]
-    more = f"{abs(rel):.1f}%p 더 올랐다" if rel > 0.05 else (f"{abs(rel):.1f}%p 덜 올랐다" if rel < -0.05 else "비슷하게 움직였다")
+    more = f"{abs(rel):.1f}%p 앞섰다" if rel > 0.05 else (f"{abs(rel):.1f}%p 뒤처졌다" if rel < -0.05 else "비슷하게 움직였다")
     tail = {"모이는 중": f"차이가 +{pp:.0f}%p를 넘어 돈이 {sf['name']} 쪽으로 모이는 중이다.",
             "빠져나가는 중": f"차이가 −{pp:.0f}%p 아래라 돈이 {sf['name']} 쪽에서 빠지는 중이다."}.get(sf["state"], f"차이가 ±{pp:.0f}%p 안이라 돈의 방향은 뚜렷하지 않다.")
     lines = [(f"최근 {n}거래일 {sf['name']} 업종 ETF({sf['etf']})가 S&P 500보다 {more}. {tail}", "plain"),

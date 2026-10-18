@@ -328,6 +328,24 @@ def _no_dash(t):
     return _DASH.sub(", ", t)
 
 
+# 변화 숫자 앞 부호 (2026-10-18 사용자: "늘었다 앞의 % 는 +106% 늘었다, 줄었다 앞은 −50%, 증감 색도", 가이드라인 3-3-1)
+_NUM = r"(?<![+\-−±~\d.,])(\d[\d,]*(?:\.\d+)?)(%p|%)"
+_UP_V = r"(?:더 )?(?:올랐|올라|오른|오르고|올렸|올린|늘었|늘어|늘고|늘린|늘며|증가|상승|앞섰|앞선|앞서|많았|많고|뛰었)"
+_DN_V = r"(?:내렸|내려|내린|내리고|떨어졌|떨어진|줄었|줄어|줄고|줄인|줄며|감소|하락|뒤처졌|뒤처진|뒤처져|적었|적고|빠졌|빠진)"
+_CHANGE = re.compile(_NUM + r"(\s*)(?=(" + _UP_V + r")|(" + _DN_V + r"))")   # "덜 올랐다" 는 방향이 반대라 잡지 않는다 (코드에서 앞섰다 · 뒤처졌다로)
+_WHERE = re.compile(r"보다 " + _NUM + r" ?(위|아래)(?=로|에|인|이고|이다|였|,|\.|\s|\)|$)")   # "고점보다 2.0% 아래" → "고점 대비 −2.0%"
+
+
+def _sign_text(t, color):
+    """변화를 말하는 숫자에 + · − 를 붙이고(이미 있으면 그대로), 글자 노드면 증감 색. 크기(±) · 수준(공매도 비율 1.35%) · 범위(3~10%)는 건드리지 않는다.
+    위치를 말하는 `보다 n% 위 · 아래` 는 이중 부정이 되지 않게 `대비 +n% · −n%` 로 바꾼다."""
+    def paint(sign, num, unit):
+        s = f"{sign}{num}{unit}"
+        return f'<span style="color:{UP if sign == "+" else DOWN};white-space:nowrap;">{s}</span>' if color else s
+    t = _WHERE.sub(lambda m: " 대비 " + paint("+" if m.group(3) == "위" else "−", m.group(1), m.group(2)), t)
+    return _CHANGE.sub(lambda m: paint("+" if m.group(4) else "−", m.group(1), m.group(2)) + m.group(3), t)
+
+
 def fix_colons(html):
     """보이는 글의 ":" · "·" 는 앞뒤를 한 칸씩 띄운다 ("·" 는 2026-10-13 사용자) — "라벨 : 값" (2026-10-11 사용자: 꼭 반드시, 모든 페이지 일괄).
     글자 노드와 툴팁·제목 속성(data-tip · title · aria-label)만 고친다. style · script 안, 시각·비율(숫자:숫자), 주소(://)는 건드리지 않는다.
@@ -340,9 +358,9 @@ def fix_colons(html):
                 skip = True
             elif low.startswith(("</script", "</style")):
                 skip = False
-            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _space_dots(_space_colons(_no_dash(m.group(2)))) + m.group(3), part))
+            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _sign_text(_space_dots(_space_colons(_no_dash(m.group(2)))), False) + m.group(3), part))
         else:
-            out.append(part if skip else _space_dots(_space_colons(_no_dash(part))))
+            out.append(part if skip else _sign_text(_space_dots(_space_colons(_no_dash(part))), True))
     return "".join(out)
 
 

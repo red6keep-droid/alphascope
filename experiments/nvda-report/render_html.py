@@ -896,7 +896,7 @@ def regime_lines(mr):
 def flow_plain(sf):
     """3번 카드 첫 줄 — 2문장 (2026-10-17 사용자)."""
     pp, rel, n = config.SECTOR_FLOW_PP, sf["rel_pp"], sf["days"]
-    more = f"{abs(rel):.1f}%p 더 올랐다" if rel > 0.05 else (f"{abs(rel):.1f}%p 덜 올랐다" if rel < -0.05 else "비슷하게 움직였다")
+    more = f"{abs(rel):.1f}%p 앞섰다" if rel > 0.05 else (f"{abs(rel):.1f}%p 뒤처졌다" if rel < -0.05 else "비슷하게 움직였다")   # "덜 올랐다" 는 부호 규칙(3-3-1)과 방향이 엇갈려 앞섰다 · 뒤처졌다로 (2026-10-18)
     tail = {"모이는 중": f"차이가 +{pp:.0f}%p를 넘어 돈이 반도체로 모이는 중이다.",
             "빠져나가는 중": f"차이가 −{pp:.0f}%p 아래라 돈이 반도체에서 빠지는 중이다."}.get(sf["state"], f"차이가 ±{pp:.0f}%p 안이라 돈의 방향은 뚜렷하지 않다.")
     return f"최근 {n}거래일 반도체 ETF가 S&P 500보다 {more}. {tail}"
