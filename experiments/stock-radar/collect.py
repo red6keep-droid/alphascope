@@ -14,7 +14,11 @@ import yfinance as yf
 
 import universe as U
 
+SECTOR_ETFS = ("XLK", "XLF", "XLE", "XLV", "XLP", "XLY", "XLI", "XLB", "XLU", "XLRE", "XLC")   # NVDA 리포트 config.SECTOR_ETFS 와 같은 11개
+HIST_MAX_AGE_DAYS = 7
+
 BASE = os.path.dirname(os.path.abspath(__file__))
+HIST = os.path.join(BASE, "data", "history.json")
 SNAP = os.path.join(BASE, "data", "snapshot.json")
 NY = ZoneInfo("America/New_York")
 
@@ -28,7 +32,7 @@ def _bars(symbols):
         except KeyError:
             print(f"[collect] {s}: 일봉 없음")
             continue
-        out[s] = [{"day": i.strftime("%Y-%m-%d"), "high": float(r["High"]), "low": float(r["Low"]), "close": float(r["Close"]),
+        out[s] = [{"day": i.strftime("%Y-%m-%d"), "open": float(r["Open"]) if r["Open"] == r["Open"] else None, "high": float(r["High"]), "low": float(r["Low"]), "close": float(r["Close"]),
                    "adj": float(r["Adj Close"]), "volume": float(r["Volume"] or 0)} for i, r in sub.iterrows()]
     return out
 
@@ -60,16 +64,51 @@ def _earnings(s):
 
 def run():
     syms = [c[0] for c in U.CANDIDATES]
-    bars = _bars(syms + [U.BENCH])
+    extra = sorted({U.BENCH, "^VIX", "SMH", *SECTOR_ETFS})
+    bars = _bars(syms + extra)
     with ThreadPoolExecutor(8) as ex:
         caps = dict(ex.map(_cap, syms))
         earn = dict(ex.map(_earnings, syms))
-    snap = {"fetched_at": datetime.datetime.now(NY).isoformat(timespec="minutes"), "bars": bars, "caps": caps, "earnings": earn}
+    snap = {"fetched_at": datetime.datetime.now(NY).isoformat(timespec="minutes"), "bars": bars, "caps": caps, "earnings": earn, "history": history()}
     os.makedirs(os.path.dirname(SNAP), exist_ok=True)
     with open(SNAP, "w", encoding="utf-8") as f:
         json.dump(snap, f)
     print(f"[collect] 일봉 {len(bars)} · 시총 {sum(1 for v in caps.values() if v)} · 실적일 {sum(1 for v in earn.values() if v)} → {SNAP}")
     return snap
+
+
+def history():
+    """고점 하락 후 회복 통계 — 1999년부터(검증 데이터 기준과 같게) 종가 사이클. 일주일에 한 번만 다시 받는다.
+    계산은 NVDA 리포트 history_stats 와 같은 함수(drawdown_cycles · dd_summary)."""
+    try:
+        with open(HIST, encoding="utf-8") as f:
+            h = json.load(f)
+        if (datetime.date.today() - datetime.date.fromisoformat(h["built"])).days < HIST_MAX_AGE_DAYS:
+            return h
+    except (OSError, ValueError, KeyError):
+        pass
+    import sys
+    sys.path.insert(0, os.path.join(BASE, "..", "nvda-report"))
+    import history_stats as HS
+    syms = [c[0] for c in U.CANDIDATES] + [U.BENCH]
+    df = yf.download(syms, start="1999-01-01", interval="1d", auto_adjust=False, group_by="ticker", progress=False, threads=True)
+    out = {"built": datetime.date.today().isoformat(), "stats": {}}
+    spy = df[U.BENCH]["Close"].dropna()
+    for s in syms:
+        try:
+            c = df[s]["Close"].dropna()
+        except KeyError:
+            continue
+        c = c[c > 0]
+        if len(c) < 500:
+            continue
+        out["stats"][s] = {"from": c.index[0].strftime("%Y-%m-%d"), "to": c.index[-1].strftime("%Y-%m-%d"), "dd": HS.dd_summary(HS.drawdown_cycles(c)),
+                           "spy_dd": HS.dd_summary(HS.drawdown_cycles(spy[spy.index >= c.index[0]]))}   # S&P 500 도 이 종목과 같은 기간
+    os.makedirs(os.path.dirname(HIST), exist_ok=True)
+    with open(HIST, "w", encoding="utf-8") as f:
+        json.dump(out, f)
+    print(f"[collect] 고점 회복 통계 {len(out['stats'])}종목 → {HIST}")
+    return out
 
 
 def load():

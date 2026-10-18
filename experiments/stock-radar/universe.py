@@ -31,6 +31,17 @@ CANDIDATES = [
 TOP_N = 10
 SWAP_DAYS = 5      # 11위 밖으로 5거래일 연속 밀리면 빠진다 (10-10)
 BENCH = "SPY"      # 기간별 수익률 비교 = S&P 500
+SECTOR_ETF = {"반도체": ("SMH", "반도체"), "빅테크": ("XLK", "기술"), "소비 · 플랫폼": ("XLY", "경기 소비재"), "금융": ("XLF", "금융"),
+              "헬스케어": ("XLV", "헬스케어"), "필수 소비재": ("XLP", "필수 소비재"), "에너지": ("XLE", "에너지"), "결제": ("XLF", "금융")}
+# 구글 · 메타는 S&P 업종 분류상 커뮤니케이션 (XLC)
+SECTOR_OVERRIDE = {"GOOGL": ("XLC", "커뮤니케이션"), "META": ("XLC", "커뮤니케이션")}
+
+
+def sector_etf(sym):
+    """종목이 속한 업종 ETF · 이름 — '○○ 업종으로 돈이 올까?' 카드와 업종 대비 하루 등락에 쓴다."""
+    return SECTOR_OVERRIDE.get(sym) or SECTOR_ETF[BY_SYM[sym][3]]
+
+
 REPORT_TYPE = {"NVDA"}   # 매일 리포트가 나가는 종목 = 상세가 리포트형 (최신 리포트 글로 링크)
 
 BLOG = "https://alpha-scope.blogspot.com"

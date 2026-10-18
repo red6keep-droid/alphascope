@@ -9,7 +9,13 @@ import json
 import math
 import os
 
-import universe as U
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "nvda-report"))
+import config as NC  # noqa: E402  — NVDA 리포트 기준값(국면 · 섹터 흐름 · 볼린저 · 과열)을 그대로 쓴다
+import indicators  # noqa: E402
+
+import universe as U  # noqa: E402
 
 LAM, Z_OUT = 0.94, 2.0
 PERIODS = (("1주", 5), ("1개월", 21), ("3개월", 63), ("6개월", 126), ("1년", 252))
@@ -83,6 +89,133 @@ def earnings(bars, evs, today, n=8):
     return out
 
 
+def _closes(snap, sym):
+    return [x["close"] for x in snap["bars"].get(sym) or []]
+
+
+def technical(bars, snap, sym):
+    """차트 지표 (2층) — NVDA 리포트 indicators 와 같은 정의. 하루 대비는 S&P 500 · 업종 ETF."""
+    c = [x["close"] for x in bars]
+    t, p = bars[-1], bars[-2]
+    ma = lambda n: sum(c[-n:]) / n if len(c) >= n else None   # noqa: E731
+    out = {"ma_rel": {n: (c[-1] / ma(n) - 1) * 100 for n in (20, 60, 120, 200) if ma(n)},
+           "ma50": ma(50), "ma200": ma(200), "rsi14": indicators.rsi(c[-(NC.RSI_PERIOD * 10):]),
+           "gap": (t["open"] / p["close"] - 1) * 100 if t.get("open") else None,
+           "range_pct": (t["high"] - t["low"]) / t["close"] * 100 if t["close"] else None}
+    pm50 = sum(c[-51:-1]) / 50 if len(c) >= 51 else None
+    pm200 = sum(c[-201:-1]) / 200 if len(c) >= 201 else None
+    cross = None
+    if out["ma50"] and out["ma200"] and pm50 and pm200:
+        cross = "golden" if pm50 <= pm200 and out["ma50"] > out["ma200"] else "death" if pm50 >= pm200 and out["ma50"] < out["ma200"] else None
+    out["ma_cross"] = cross
+    r1 = (t["close"] / p["close"] - 1) * 100
+    for key, ref in (("vs_spy", U.BENCH), ("vs_sector", U.sector_etf(sym)[0])):
+        rb = {x["day"]: x["close"] for x in snap["bars"].get(ref) or []}
+        out[key] = r1 - (rb[t["day"]] / rb[p["day"]] - 1) * 100 if t["day"] in rb and p["day"] in rb else None
+    return out
+
+
+def market_regime(snap):
+    """시장 분위기 — NVDA 리포트 judge.market_regime 과 같은 규칙 (전환 기록 없이 오늘 상태만)."""
+    c = _closes(snap, NC.REGIME_BENCHMARK)
+    if len(c) < NC.REGIME_MA_DAYS:
+        return None
+    vix = _closes(snap, "^VIX")
+    vix = vix[-1] if vix else None
+    ph = (c[-1] / max(c[-NC.REGIME_HIGH_DAYS:]) - 1) * 100
+    ma = sum(c[-NC.REGIME_MA_DAYS:]) / NC.REGIME_MA_DAYS
+    streak = 0
+    for i in range(len(c) - 1, 0, -1):
+        d = c[i] - c[i - 1]
+        if d == 0 or (streak and (d > 0) != (streak > 0)):
+            break
+        streak += 1 if d > 0 else -1
+    regime = ("불안 국면" if vix is not None and vix >= NC.REGIME_VIX_HIGH else
+              "조정장" if ph <= NC.REGIME_CORRECTION_PCT or c[-1] < ma else "단기 조정" if ph <= NC.REGIME_PULLBACK_PCT else "상승 추세")
+    return {"regime": regime, "prev_regime": None, "changed": False, "pct_from_high": ph, "above_ma200": c[-1] >= ma, "ma200": ma,
+            "pct_vs_ma200": (c[-1] / ma - 1) * 100, "vix": vix, "streak": streak}
+
+
+def market_shock(snap):
+    """시장 충격 — VIX 종가 35 이상 시작 · 25 아래 끝 (normal_range_line.market_shock 과 같다). 흔들림 회복 묶음은 NVDA 리포트에만."""
+    inside, start, days_in = False, None, 0
+    for x in snap["bars"].get("^VIX") or []:
+        if not inside and x["close"] >= 35:
+            inside, start, days_in = True, x["day"], 0
+        elif inside and x["close"] < 25:
+            inside, start = False, None
+        if inside:
+            days_in += 1
+    v = _closes(snap, "^VIX")
+    return {"active": inside, "start": start, "vix": v[-1] if v else None, "days_in": days_in, "early_complete": False}
+
+
+def _rel(snap, etf, n):
+    a, b = _closes(snap, etf), _closes(snap, U.BENCH)
+    if len(a) <= n or len(b) <= n:
+        return None
+    return ((a[-1] / a[-1 - n]) - (b[-1] / b[-1 - n])) * 100
+
+
+def sector_flow(snap, sym):
+    """'○○ 업종으로 돈이 올까?' — NVDA 리포트 sector_flow 와 같은 규칙(20거래일 · ±2%p), 기준 ETF 만 종목의 업종으로. ETF 주식 수 확인은 없다."""
+    etf, name = U.sector_etf(sym)
+    n, pp = NC.SECTOR_FLOW_DAYS, NC.SECTOR_FLOW_PP
+    rel = _rel(snap, etf, n)
+    if rel is None:
+        return None
+    sectors = sorted(({"etf": e, "name": nm, "rel": r} for e, nm in NC.SECTOR_ETFS.items() if (r := _rel(snap, e, n)) is not None), key=lambda x: -x["rel"])
+    pool = sectors + ([{"etf": "SMH", "name": "반도체", "rel": rel}] if etf == "SMH" else [])
+    rank = 1 + sum(1 for x in pool if x["rel"] > rel)
+    return {"etf": etf, "name": name, "state": "모이는 중" if rel >= pp else "빠져나가는 중" if rel <= -pp else "뚜렷하지 않음",
+            "rel_pp": rel, "days": n, "sectors": sectors, "rank": rank, "n_pool": len(pool)}
+
+
+def bollinger(bars):
+    """한 달간 변화 범위 — NVDA 리포트 judge.bollinger 와 같은 정의(20일 · 2σ). 과거 통계는 없다(이 종목은 검증하지 않았다)."""
+    c, w = [x["close"] for x in bars], NC.BOLL_WINDOW
+
+    def at(i):
+        win = c[i - w + 1:i + 1]
+        m = sum(win) / w
+        sd = (sum((x - m) ** 2 for x in win) / (w - 1)) ** 0.5
+        lo, hi = m - NC.BOLL_SIGMA * sd, m + NC.BOLL_SIGMA * sd
+        return ((c[i] - lo) / (hi - lo) if hi > lo else 0.5), lo, hi, m
+    if len(c) < w + 1:
+        return None
+    pb, lo, hi, m = at(len(c) - 1)
+    state = "하단 도달" if pb <= 0 else "상단 도달" if pb >= 1 else "밴드 안"
+    days = 0
+    if state != "밴드 안":
+        for i in range(len(c) - 1, w - 1, -1):
+            q = at(i)[0]
+            if (q <= 0) if state == "하단 도달" else (q >= 1):
+                days += 1
+            else:
+                break
+    return {"pctb": pb, "lower": lo, "upper": hi, "ma20": m, "close": c[-1], "state": state, "days": days, "stats": None}
+
+
+def overheat(bars, tech):
+    c = [x["close"] for x in bars]
+    if len(c) < 21:
+        return None
+    ret20 = (c[-1] / c[-21] - 1) * 100
+    d200 = (c[-1] / tech["ma200"] - 1) * 100 if tech.get("ma200") else None
+    rsi = tech.get("rsi14")
+    active = [k for k, ok in (("rsi80", rsi is not None and rsi >= NC.OVERHEAT_RSI), ("ma200_40", d200 is not None and d200 >= NC.OVERHEAT_MA200_PCT),
+                              ("ret20_25", ret20 >= NC.OVERHEAT_RET20_PCT)) if ok]
+    return {"active": active, "values": {"rsi80": rsi, "ma200_40": d200, "ret20_25": ret20}, "stats": None}
+
+
+def drawdown(bars, yr, snap, sym):
+    """고점 하락 후 가격 회복 — 이 종목 1999년부터(상장이 늦으면 상장부터) · S&P 500 같은 기간 통계 + 지금 위치."""
+    h = (snap.get("history") or {}).get("stats") or {}
+    if sym not in h or U.BENCH not in h or not yr:
+        return None
+    return {"stock": h[sym], "spy": h[U.BENCH], "pct_from_high": yr["pct_from_high"], "days_since_high": sum(1 for x in bars if x["day"] > yr["high_day"])}
+
+
 def stock(sym, snap):
     bars = snap["bars"].get(sym) or []
     if len(bars) < 2:
@@ -96,7 +229,7 @@ def stock(sym, snap):
             "vol_ratio": t["volume"] / (sum(vol20) / len(vol20)) if vol20 and t["volume"] else None,
             "cap": snap["caps"].get(sym), "normal_range": normal_range(bars, earn_days),
             "periods": period_returns(bars, snap["bars"].get(U.BENCH) or []), "year_range": year_range(bars),
-            "earnings": earnings(bars, evs, t["day"])}
+            "earnings": earnings(bars, evs, t["day"]), "_bars": bars}
 
 
 def update_ranks(stocks, day, path=STATE):
@@ -134,6 +267,15 @@ def update_ranks(stocks, day, path=STATE):
 
 def run(snap):
     stocks = [x for x in (stock(c[0], snap) for c in U.CANDIDATES) if x]
+    mr, ms = market_regime(snap), market_shock(snap)
+    for s in stocks:
+        bars = s.pop("_bars")
+        s["tech"] = technical(bars, snap, s["sym"])
+        s["market_regime"], s["market_shock"] = mr, ms
+        s["sector_flow"] = sector_flow(snap, s["sym"])
+        s["bollinger"] = bollinger(bars)
+        s["overheat"] = overheat(bars, s["tech"])
+        s["drawdown"] = drawdown(bars, s["year_range"], snap, s["sym"])
     day = max(s["day"] for s in stocks)
     return {"day": day, "fetched_at": snap["fetched_at"], "stocks": update_ranks(stocks, day)}
 

@@ -186,6 +186,125 @@ def sec_earnings(s, today):
     return R._card_title("실적 발표 후 가격 변동", earn_tip(s, e)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{inner}</span></div>'
 
 
+def _no_record(tip):
+    """NVDA 리포트 툴팁에서 `· 기록상 : …` 줄을 뺀다 — 우리 검증은 엔비디아 · 기술주 기준이라 다른 종목에 옮기지 않는다 (지표 검증 대원칙)."""
+    return "\n".join(x for x in tip.split("\n") if not x.startswith("· 기록상"))
+
+
+def sector_lines(sf):
+    pp, rel, n = R.config.SECTOR_FLOW_PP, sf["rel_pp"], sf["days"]
+    more = f"{abs(rel):.1f}%p 더 올랐다" if rel > 0.05 else (f"{abs(rel):.1f}%p 덜 올랐다" if rel < -0.05 else "비슷하게 움직였다")
+    tail = {"모이는 중": f"차이가 +{pp:.0f}%p를 넘어 돈이 {sf['name']} 쪽으로 모이는 중이다.",
+            "빠져나가는 중": f"차이가 −{pp:.0f}%p 아래라 돈이 {sf['name']} 쪽에서 빠지는 중이다."}.get(sf["state"], f"차이가 ±{pp:.0f}%p 안이라 돈의 방향은 뚜렷하지 않다.")
+    lines = [(f"최근 {n}거래일 {sf['name']} 업종 ETF({sf['etf']})가 S&P 500보다 {more}. {tail}", "plain"),
+             ("row", f"{sf['name']} vs 시장 ({n}일)", f"{_sgn(rel)}%p", f"+{pp:.0f}%p 넘으면 유입 · −{pp:.0f}%p 아래면 유출"),
+             ("row", "업종 순위", f"{sf['n_pool']}개 중 {sf['rank']}위", "같은 기간 수익률 순")]
+    secs = sf.get("sectors") or []
+    if secs:
+        lines.append(("row", "앞선 업종", "\n".join(f"{x['name']} {_sgn(x['rel'])}%p" for x in secs[:2]), "시장보다 많이 오른 업종"))
+        lines.append(("row", "뒤처진 업종", "\n".join(f"{x['name']} {_sgn(x['rel'])}%p" for x in secs[-2:][::-1]), "시장보다 내린 업종"))
+    return lines
+
+
+def sector_rule(sf):
+    pp, rel = R.config.SECTOR_FLOW_PP, sf["rel_pp"]
+    return (f"투자자 돈이 {sf['name']} 업종으로 들어오는지 빠지는지, 최근 한 달 수익률을 시장과 견줘 본다\n"
+            f"· 오늘 {_sgn(rel)}%p : {sf['name']} 업종이 시장보다 {abs(rel):.1f}%p {'앞섰다' if rel > 0 else '뒤처졌다'}, {sf['n_pool']}개 업종 중 {sf['rank']}위\n"
+            f"· 나누는 법 : 시장보다 {pp:.0f}%p 넘게 앞서면 모이는 중, {pp:.0f}%p 넘게 뒤지면 빠져나가는 중, 그 사이는 뚜렷하지 않음")
+
+
+def sec_states(s):
+    """상태 카드 — NVDA 리포트와 같은 카드 · 규칙. 업종 카드만 종목의 업종 ETF 로. 시장 충격 · 한 달 범위 · 과열은 해당하는 날만."""
+    out = ""
+    ms = s.get("market_shock") or {}
+    if ms.get("active"):
+        out += R._state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", R.WARN, R.shock_lines(ms), "", tip=_no_record(R.shock_tip(ms)), fold=True)
+    mr = s.get("market_regime")
+    if mr:
+        th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
+        out += R._state_card("시장 분위기는?", mr["regime"], th, col, R.regime_lines(mr), "", tip=R.regime_rule(mr), fold=True)
+    sf = s.get("sector_flow")
+    if sf:
+        th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
+        title = "반도체로 돈이 올까?" if sf["name"] == "반도체" else f"{sf['name']} 업종으로 돈이 올까?"
+        out += R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True)
+    bb = s.get("bollinger")
+    if bb and bb["state"] in R.BOLL_THEME:
+        th, col = R.BOLL_THEME[bb["state"]]
+        out += R._state_card("한 달간 변화 범위는?", {"하단 도달": "하락 범위에 닿음", "상단 도달": "상승 범위에 닿음"}[bb["state"]], th, col,
+                             R.bollinger_lines(bb), "", tip=R.bollinger_rule(bb), fold=True, inline_notes=True)
+    oh = s.get("overheat")
+    if oh and oh["active"]:
+        out += R._state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", R.MUTED, R.overheat_lines(oh), "", tip=_no_record(R.overheat_rule(oh)))
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
+
+
+def sec_volume(s):
+    vr = s.get("vol_ratio")
+    v = f'<span style="font-weight:700;">{vr:.1f}배</span>' if vr else f'<span style="color:{R.MUTED};">—</span>'
+    return f'<div data-cards="1" style="margin:0 0 8px;">{R._multi_single([("거래량 (평소의 몇 배)", v, R.vol_tip(vr))])}</div>'
+
+
+def sec_chart_indicators(s):
+    """2층 · 접힘 `차트 지표 보기` — NVDA 리포트와 같은 칸, 하루 비교는 S&P 500 · 업종 ETF."""
+    tc = s["tech"]
+    etf = U.sector_etf(s["sym"])[0]
+    deep = R._multi2([(f"{n}일 평균", R._arrow(v, 1)) for n, v in sorted(tc["ma_rel"].items(), key=lambda x: int(x[0]))])
+    deep += R._multi2([("S&P 500 대비", R._arrow(tc.get("vs_spy"), 2, "%p")), (f"{etf} 대비", R._arrow(tc.get("vs_sector"), 2, "%p"))])
+    rsi, mc = tc.get("rsi14"), tc.get("ma_cross")
+    mc_html = {"golden": f'<span style="color:{UP};font-weight:700;">골든크로스</span>', "death": f'<span style="color:{DOWN};font-weight:700;">데드크로스</span>'}.get(
+        mc, f'<span style="color:{R.MUTED};">교차 없음</span>')
+    items = [("시가 갭", R._arrow(tc.get("gap"), 2), R.gap_tip(tc.get("gap"))),
+             (f"일중 변동폭 (고가−저가 · 흔히 {R.config.RANGE_PCT_EVENT:.0f}% 넘으면 큰 흔들림으로 봄)",
+              f'<span style="color:#111;font-weight:700;">{tc["range_pct"]:.2f}%</span>' if tc.get("range_pct") is not None else "—"),
+             ("단기 과열 온도 (RSI 14 · 흔히 70 넘으면 과열 · 30 아래면 침체로 읽음)",
+              f'<span style="color:#111;font-weight:700;">{rsi:.1f}</span>' if rsi is not None else "—", _no_record(R.rsi_tip(rsi))),
+             ("평균선 교차 (50일선이 200일선 위로 = 골든크로스)", mc_html, _no_record(R.cross_tip(mc)))]
+    deep += R._multi(items)
+    return (f'<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{R._fold_row("차트 지표 보기")}</summary>'
+            f'<div style="margin-top:6px;">{deep}</div></details>')
+
+
+def sec_drawdown(s):
+    """고점 하락 후 가격 회복 — 이 종목과 S&P 500 (NVDA 리포트는 기술주 15개와 견준다). 숫자 = 절반은 이 거래일 안에 회복."""
+    d = s.get("drawdown")
+    if not d:
+        return ""
+    st, sp = d["stock"]["dd"], d["stock"]["spy_dd"]   # S&P 500 은 이 종목과 같은 기간
+    span = R._span_label(d["stock"])
+    sm = f'font-size:{TINY};font-weight:400;color:{NOTE};'
+    rows = R._row_html("지금", R._arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True, inline_note=True)
+    cols = []
+    for lv in ("10", "20", "30"):
+        x, y = st.get(lv) or {}, sp.get(lv) or {}
+        if not x.get("n") or x.get("median_days") is None:
+            continue
+        right = f'<span style="{sm}">보통</span> {x["median_days"]}일' + (f'<br><span style="{sm}">S&amp;P 500 보통 {y["median_days"]}일</span>' if y.get("median_days") is not None else "")
+        rows += R._row_html(f'<span style="color:{DOWN};">−{lv}%</span> 넘게 내려가면', right, f"{span} 동안 {s['name']} {x['n']}번 발생")
+        if x.get("recovered") and y.get("recovered"):
+            cols.append((lv, x["over_year"] / x["recovered"] * 100, y["over_year"] / y["recovered"] * 100))
+    tail = ""
+    if cols:
+        vb = "border-left:1px solid #E2E8F0;"
+        cell = lambda txt, first=False: (f'<span style="flex:1 1 0;min-width:0;box-sizing:border-box;padding:0 8px;text-align:{"left" if first else "center"};{"" if first else vb}">{txt}</span>')   # noqa: E731
+        head = cell(f'<span style="color:{DOWN};font-weight:700;">하락비율</span>', True) + "".join(cell(f'<span style="color:{DOWN};font-weight:700;">−{lv}%</span>') for lv, _, _ in cols)
+        r1 = cell(_esc(s["name"]), True) + "".join(cell(f"{a:.0f}%") for _, a, _ in cols)
+        r2 = cell("S&amp;P 500", True) + "".join(cell(f"{b:.0f}%") for _, _, b in cols)
+        tbl = "".join(f'<span style="display:flex;align-items:stretch;line-height:24px;">{r}</span>' for r in (head, r1, r2))
+        tip = "크게 떨어진 일 가운데, 최고가를 되찾기까지 1년(250거래일) 넘게 걸린 경우의 비율\n· 참고 : 지난 기록이라 앞으로도 그렇다는 뜻은 아니다"
+        title = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 4px;">'
+                 f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율{R._tipx(tip)}</span>'
+                 f'<span style="flex:none;font-size:{_dk.MICRO};font-weight:400;color:{NOTE};">({span} 기간 중)</span></span>')
+        tail = f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px;font-size:{TINY};color:{NOTE};">{title}{tbl}</span>'
+    x = d["pct_from_high"]
+    lv = next((l for l in ("30", "20", "10") if -x > int(l) and (st.get(l) or {}).get("median_days") is not None), None)
+    now = (f"\n· 지금 {_sgn(x)}% : −{lv}% 넘게 빠졌을 때 절반은 {st[lv]['median_days']}거래일 안에 최고가를 되찾았다" if lv else
+           f"\n· 지금 {_sgn(x)}% : 1년 최고가에서 10% 안쪽")
+    ttip = (f"주가가 최고가에서 크게 떨어졌을 때 그 최고가를 다시 넘기까지 걸린 거래일. '보통' 은 절반이 이보다 빨리 회복한 값" + now +
+            "\n· 참고 : 지난 기록이라 앞으로를 말하지 않는다")
+    return R._card_title("고점 하락 후 가격 회복", ttip) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}{tail}</span></div>'
+
+
 def related(s):
     """함께 보는 리포트 (가이드라인 10-5 4) — HTML 링크라 검색엔진이 따라간다."""
     links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("엔비디아(NVDA) 주가 리포트", U.NVDA_REPORTS_URL)]
@@ -195,7 +314,8 @@ def related(s):
 
 
 def detail_body(s, today):
-    return wrap(lead(s) + updated_line(s) + price_card(s) + sec_periods(s) + sec_year_range(s) + sec_earnings(s, today)
+    return wrap(lead(s) + updated_line(s) + price_card(s) + sec_states(s) + sec_periods(s) + sec_year_range(s) + sec_drawdown(s) + sec_earnings(s, today)
+                + sec_volume(s) + sec_chart_indicators(s)
                 + button("시총 TOP 10 목록", U.LIST_URL) + related(s) + foot())
 
 
