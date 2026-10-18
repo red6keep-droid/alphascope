@@ -1870,7 +1870,7 @@ body.menu-open { overflow: hidden; }
 })();
 
 /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
-   "엔비디아(NVDA) 주가 리포트 2026년 10월 19일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양 · 오른쪽 정렬은 테마 CSS (2026-10-18 사용자: 날짜는 우측 정렬, 줄표 삭제).
+   "엔비디아 NVDA 주가 2026년 10월 19일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양 · 오른쪽 정렬은 테마 CSS (2026-10-18 사용자: 날짜는 우측 정렬, 줄표 삭제).
    옛 글 "엔비디아 리포트 — 2026년 10월 11일" 도 줄표를 떼고 날짜만 감싼다. */
 (function () {
   'use strict';
@@ -2227,12 +2227,12 @@ body.menu-open { overflow: hidden; }
 })();
 
 /* ============================================================ 종목 제목 앞 티커 로고 (2026-10-13 사용자: 엔비디아 → 2026-10-18 사용자: 시총 TOP 10 종목 페이지도) — 글 보기 · 목록 카드 제목
-   제목의 "(티커) 주가" 에서 티커를 읽는다: "엔비디아(NVDA) 주가 리포트 …" · "테슬라(TSLA) 주가 · 실적 일정". 옛 "엔비디아 리포트 — …" 는 NVDA */
+   제목의 "티커 주가" · "(티커) 주가" 에서 티커를 읽는다: "엔비디아 NVDA 주가 …"(2026-10-18 괄호 삭제) · "테슬라(TSLA) 주가 · 실적 일정". 옛 "엔비디아 리포트 — …" 는 NVDA */
 (function () {
   'use strict';
   [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
     if (h.querySelector('.title-logo')) return;
-    var m = /\(([A-Z][A-Z.\-]{0,5})\)\s*주가/.exec(h.textContent);
+    var m = /(?:\(|\s)([A-Z][A-Z.\-]{0,5})\)?\s+주가/.exec(h.textContent) || /\(([A-Z][A-Z.\-]{0,5})\)\s*주가/.exec(h.textContent);
     var sym = m ? m[1] : (/^\s*엔비디아/.test(h.textContent) ? 'NVDA' : '');
     if (!sym) return;
     var host = h.querySelector('a') || h;

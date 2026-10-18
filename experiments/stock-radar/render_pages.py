@@ -307,7 +307,7 @@ def sec_drawdown(s):
 
 def related(s):
     """함께 보는 리포트 (가이드라인 10-5 4) — HTML 링크라 검색엔진이 따라간다."""
-    links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("엔비디아(NVDA) 주가 리포트", U.NVDA_REPORTS_URL)]
+    links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("엔비디아 NVDA 주가", U.NVDA_REPORTS_URL)]
     items = "".join(f'<li style="margin:4px 0;"><a href="{_esc(u)}" style="color:#1a73e8;text-decoration:none;">{_esc(t)}</a></li>' for t, u in links)
     return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">함께 보는 페이지</div>'
             f'<ul style="margin:6px 0 0;padding-left:20px;font-size:{_dk.NAME};line-height:{R.LH_CARD};">{items}</ul></div>')

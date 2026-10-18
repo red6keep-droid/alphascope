@@ -163,7 +163,10 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
 .post-card-title a:has(.post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
 .post-card-title .post-title-date { margin-left: auto; }
-.post-title .post-title-date { font-size: 14px; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
+.post-title .post-title-date { font-size: 14px; }
+/* 공유 버튼이 없는 화면(초안 미리보기 · 목업)에서도 날짜는 제목 줄 오른쪽 끝 (2026-10-18 사용자) */
+.post-title:has(> .post-title-date), .post-title a:has(> .post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
+.post-title > .post-title-date, .post-title a > .post-title-date { margin-left: auto; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
 /* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
    날짜 · 버튼 둘 다 오른쪽 끝 (2026-10-18 사용자: 날짜 우측 정렬) — 제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄 오른쪽 */
 .post-title:has(.post-title-meta) { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; }
@@ -1238,7 +1241,7 @@ SAVED_POST_BODY = "experiments/daily-report/output/report_body.html"
 # 이 본문은 홈 카드에만 쓰인다. h2 는 experiments/trump-trend/render_html.py build_body 와 같아야 한다.
 SAVED_TRUMP_BODY = "experiments/trump-trend/output/trump_report_body.html"
 SAVED_NVDA_BODY = "experiments/nvda-report/output/nvda_report_body.html"
-PREVIEW_NVDA_TITLE = "엔비디아(NVDA) 주가 리포트 2026년 9월 3일"
+PREVIEW_NVDA_TITLE = "엔비디아 NVDA 주가 2026년 9월 3일"
 PREVIEW_TRUMP_TITLE = "트럼프 SNS 발언 트렌드 2026년 9월 3일"
 FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:19px;line-height:34px;color:#333;">
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘 한 줄</h2>

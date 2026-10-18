@@ -921,7 +921,10 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
 .post-card-title a:has(.post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
 .post-card-title .post-title-date { margin-left: auto; }
-.post-title .post-title-date { font-size: 14px; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
+.post-title .post-title-date { font-size: 14px; }
+/* 공유 버튼이 없는 화면(초안 미리보기 · 목업)에서도 날짜는 제목 줄 오른쪽 끝 (2026-10-18 사용자) */
+.post-title:has(> .post-title-date), .post-title a:has(> .post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
+.post-title > .post-title-date, .post-title a > .post-title-date { margin-left: auto; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
 /* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
    날짜 · 버튼 둘 다 오른쪽 끝 (2026-10-18 사용자: 날짜 우측 정렬) — 제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄 오른쪽 */
 .post-title:has(.post-title-meta) { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; }
@@ -2969,7 +2972,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
       })();
 
       /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
-         "엔비디아(NVDA) 주가 리포트 2026년 10월 19일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양 · 오른쪽 정렬은 테마 CSS (2026-10-18 사용자: 날짜는 우측 정렬, 줄표 삭제).
+         "엔비디아 NVDA 주가 2026년 10월 19일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양 · 오른쪽 정렬은 테마 CSS (2026-10-18 사용자: 날짜는 우측 정렬, 줄표 삭제).
          옛 글 "엔비디아 리포트 — 2026년 10월 11일" 도 줄표를 떼고 날짜만 감싼다. */
       (function () {
         'use strict';
@@ -3326,12 +3329,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
       })();
 
       /* ============================================================ 종목 제목 앞 티커 로고 (2026-10-13 사용자: 엔비디아 → 2026-10-18 사용자: 시총 TOP 10 종목 페이지도) — 글 보기 · 목록 카드 제목
-         제목의 "(티커) 주가" 에서 티커를 읽는다: "엔비디아(NVDA) 주가 리포트 …" · "테슬라(TSLA) 주가 · 실적 일정". 옛 "엔비디아 리포트 — …" 는 NVDA */
+         제목의 "티커 주가" · "(티커) 주가" 에서 티커를 읽는다: "엔비디아 NVDA 주가 …"(2026-10-18 괄호 삭제) · "테슬라(TSLA) 주가 · 실적 일정". 옛 "엔비디아 리포트 — …" 는 NVDA */
       (function () {
         'use strict';
         [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
           if (h.querySelector('.title-logo')) return;
-          var m = /\(([A-Z][A-Z.\-]{0,5})\)\s*주가/.exec(h.textContent);
+          var m = /(?:\(|\s)([A-Z][A-Z.\-]{0,5})\)?\s+주가/.exec(h.textContent) || /\(([A-Z][A-Z.\-]{0,5})\)\s*주가/.exec(h.textContent);
           var sym = m ? m[1] : (/^\s*엔비디아/.test(h.textContent) ? 'NVDA' : '');
           if (!sym) return;
           var host = h.querySelector('a') || h;

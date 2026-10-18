@@ -6,8 +6,9 @@ import config
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
 
-TITLE_NAME = "엔비디아(NVDA) 주가 리포트"   # (2026-10-12 사용자: 엔비디아 리포트) — 검색어 `NVDA` · `주가` 를 넣었다 (2026-10-18 검색 노출)
+TITLE_NAME = "엔비디아 NVDA 주가"   # 2026-10-18 사용자: `리포트` 와 괄호 기호 삭제 (검색어 엔비디아 · NVDA · 주가는 그대로). 이전 "엔비디아(NVDA) 주가 리포트" · (2026-10-12 사용자: 엔비디아 리포트) — 검색어 `NVDA` · `주가` 를 넣었다 (2026-10-18 검색 노출)
 LEGACY_PREFIX = "엔비디아 리포트 — "   # 2026-10-18 이전 제목
+PREV_NAME = "엔비디아(NVDA) 주가 리포트"   # 2026-10-18 검색 노출 작업 때 잠시 쓴 제목 (브랜치) — 그날 글을 찾을 때만
 SLUG_NAME = "nvidia nvda stock report"
 LABELS = ["엔비디아", "미국 증시", "자동 리포트"] + (["테스트 중"] if config.TEST_MODE else [])
 
@@ -39,8 +40,8 @@ def slug_title(date_str):
 
 
 def match_titles(date_str):
-    """이미 올린 그날 글로 볼 제목들 — 새 제목 · 옛 제목 · 영문 제목(한글로 바꾸기 전에 멈춘 글)."""
-    return [post_title(date_str), legacy_title(date_str), slug_title(date_str)]
+    """이미 올린 그날 글로 볼 제목들 — 새 제목 · 잠시 쓴 제목 · 줄표 뺀 옛 제목 · 줄표 옛 제목 · 영문 제목(한글로 바꾸기 전에 멈춘 글)."""
+    return [post_title(date_str), f"{PREV_NAME} {korean_date(date_str)}", f"엔비디아 리포트 {korean_date(date_str)}", legacy_title(date_str), slug_title(date_str)]
 
 
 def date_of(title):
