@@ -1621,7 +1621,8 @@ def card_short(c):
 
 
 EXPECT_THEME = {"늘고 있음": ("positive", UP), "줄고 있음": ("negative", DOWN), "올라가는 중": ("positive", UP), "내려가는 중": ("negative", DOWN),
-                "평소보다 큼": ("positive", WARN), "평소보다 작음": ("negative", DOWN)}   # 시장 예상 움직임 : 크면 주황 바탕 · 주황 글자, 작으면 파랑 (2026-10-18 사용자, 노랑 → 주황)
+                "평소보다 큼": ("positive", WARN), "평소보다 작음": ("negative", DOWN),
+                "늘어나는 중": ("negative", DOWN), "줄어드는 중": ("positive", UP)}   # 공매도 : 숫자와 반대 — 하락에 거는 돈이 늘면 파랑 · 줄면 주황 (2026-10-18 사용자)   # 시장 예상 움직임 : 크면 주황 바탕 · 주황 글자, 작으면 파랑 (2026-10-18 사용자, 노랑 → 주황)
 
 
 def sec_expect(a):
