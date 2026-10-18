@@ -399,9 +399,12 @@ def glance_sub(a):
     if vr and not any(x.startswith("거래량") for x in parts):   # 거래량은 늘 보인다 — 1.5배 넘는 날만이 아니라 (2026-10-18 사용자: 가격 정보 줄에 거래량)
         parts.append(f"거래량 평소의 {vr:.1f}배")
     # 우측 정렬은 가격 숫자(`$214.13 ▼1.43%`)의 오른쪽 끝 세로선에 맞춘다 = 접기 버튼 폭 + 왼쪽 여백만큼 안쪽 (2026-10-17 사용자). 툴팁 아이콘은 글자 앞
-    return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:right;padding-right:{FOLD_LEFT + _dk.FOLD_BOX}px;margin-top:3px;'
+    # 왼쪽 정렬 · NVDA 로고 왼쪽 선에 맞춤(줄 안쪽 여백 그대로), 툴팁은 글자 뒤 (2026-10-18 사용자. 이전 : 가격 숫자 오른쪽 선에 맞춘 오른쪽 정렬 · 툴팁 앞)
+    txt = " · ".join(parts)
+    head, _, last = txt.rpartition(" ")   # 툴팁은 마지막 낱말과 묶어 홀로 다음 줄로 떨어지지 않게
+    return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:left;margin-top:3px;'
             f'font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;word-break:keep-all;">'
-            f'{_tipx(_glance_tip(r, k, sd, earn))}{_esc(" · ".join(parts))}</span>')
+            f'{_esc(head)} <span style="white-space:nowrap;">{_esc(last)}{_tipx(_glance_tip(r, k, sd, earn))}</span></span>')
 
 
 def glance_rows(a, n=None):
