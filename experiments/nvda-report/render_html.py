@@ -400,7 +400,7 @@ def glance_sub(a):
         parts.append(f"거래량 평소의 {vr:.1f}배")
     # 우측 정렬은 가격 숫자(`$214.13 ▼1.43%`)의 오른쪽 끝 세로선에 맞춘다 = 접기 버튼 폭 + 왼쪽 여백만큼 안쪽 (2026-10-17 사용자). 툴팁 아이콘은 글자 앞
     # 오른쪽 정렬 · 접기 버튼 앞 가격 글자(`$214.13 ▼1.43%`)의 오른쪽 선에 맞춤, 툴팁 없음 (2026-10-18 사용자 — 같은 날 왼쪽 정렬 · 툴팁을 시험했다가 바꿈)
-    return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:right;padding-right:{FOLD_LEFT + _dk.FOLD_BOX}px;margin-top:3px;'
+    return (f'<span style="flex:0 0 100%;min-width:0;box-sizing:border-box;display:block;text-align:right;padding-right:{FOLD_LEFT + _dk.FOLD_BOX}px;margin-top:-2px;'
             f'font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;white-space:normal;word-break:keep-all;">{_esc(" · ".join(parts))}</span>')
 
 
