@@ -793,6 +793,26 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .a2hs-step + .a2hs-step { margin-top: 6px; }
 .a2hs-num { flex: none; width: 20px; font-family: var(--num); font-weight: 700; color: #111; }
 .a2hs-step svg { width: 18px; height: 18px; margin: 0 2px; vertical-align: -3px; }
+
+/* ================================================================ 터치 (2026-10-19 사용자)
+   "터치하는 영역이 너무 작다 — 종목은 한 행, 독립 링크 카드는 카드 전체" · "눌렀는지 모르겠다 — 터치 효과, 느리면 로딩 표시".
+   행 · 카드 전체 이동은 아래 스크립트(터치 장치)가 한다. 여기는 모양만. 가이드라인 10-9 */
+.rank-table tbody tr, .post-card, .news-item:not(.load-status), [data-row-link] { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+a, button, summary, .tab { -webkit-tap-highlight-color: transparent; }
+.is-pressed { transition: none !important; }
+.rank-table tbody tr.is-pressed, .rank-table tbody tr.is-pressed td,
+.news-item.is-pressed, [data-row-link].is-pressed { background-color: #EEF2F7 !important; }
+a.report-card.is-pressed, .post-card.is-pressed { background-color: #F1F5F9 !important; transform: scale(.985); }
+a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-pressed { opacity: .55; }
+.news-item:not(.load-status), [data-row-link] { transition: background-color .15s ease; }
+.news-item:not(.load-status) { margin-left: -12px; margin-right: -12px; padding-left: 12px; padding-right: 12px; border-radius: 8px; }
+/* 페이지 이동 표시: 맨 위 진행 막대는 바로, 0.4초 넘게 걸리면 가운데 돌기 */
+#nav-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: #E53E3E; z-index: 10000; opacity: 0; pointer-events: none; transition: width 6s cubic-bezier(.08, .7, .2, 1), opacity .2s; }
+#nav-progress.on { opacity: 1; width: 88%; }
+#nav-veil { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; background: rgba(255, 255, 255, .5); }
+#nav-veil.on { display: flex; }
+#nav-veil span { width: 34px; height: 34px; border: 3px solid #CBD5E1; border-top-color: #111; border-radius: 50%; animation: nav-spin .8s linear infinite; }
+@keyframes nav-spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -2695,6 +2715,79 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   document.body.appendChild(box);
   setTimeout(function () { box.hidden = false; }, force ? 0 : 2500);
 })();
+/* ================================================================ 터치 장치 (2026-10-19 사용자, 가이드라인 10-9)
+   1) 행 · 카드 전체가 그 안의 첫 링크로 간다 — 시총 TOP 10 줄 · 뉴스 · 글 목록 카드 · 본문의 [data-row-link] 줄.
+      안쪽의 다른 링크 · 버튼 · 툴팁 · 접기를 누른 것은 그것대로 둔다.
+   2) 누르는 순간 눌림 표시(.is-pressed) — 링크 · 버튼 · 탭 · 행 · 카드 모두.
+   3) 같은 창에서 다른 페이지로 넘어갈 때 맨 위 진행 막대, 0.4초 넘으면 가운데 돌기. 뒤로 가기로 돌아오면 지운다. 새 창 링크는 눌림 표시만. */
+(function () {
+  'use strict';
+  var ROWS = '.rank-table tbody tr, .post-card, .news-item:not(.load-status), [data-row-link]';
+  var PRESS = ROWS + ', a[href], button, summary, .tab';
+  var INNER = 'a[href], button, summary, details, input, select, label, [data-tip], [role="button"]';
+
+  var bar, veil, veilTimer;
+  function startNav() {
+    if (!bar) {
+      bar = document.createElement('div'); bar.id = 'nav-progress'; document.body.appendChild(bar);
+      veil = document.createElement('div'); veil.id = 'nav-veil'; veil.appendChild(document.createElement('span')); document.body.appendChild(veil);
+    }
+    bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on');
+    clearTimeout(veilTimer);
+    veilTimer = setTimeout(function () { veil.classList.add('on'); }, 400);
+  }
+  function stopNav() {
+    clearTimeout(veilTimer);
+    if (bar) { bar.classList.remove('on'); veil.classList.remove('on'); }
+    [].slice.call(document.querySelectorAll('.is-pressed')).forEach(function (x) { x.classList.remove('is-pressed'); });
+  }
+  window.addEventListener('pageshow', stopNav);   /* 뒤로 가기(bfcache)로 돌아왔을 때 막대 · 눌림이 남지 않게 */
+
+  function samePageOrNewTab(a, e) {
+    var h = a.getAttribute('href') || '';
+    if (!h || h.charAt(0) === '#' || /^(javascript|mailto|tel):/i.test(h)) return true;
+    if (a.target && a.target !== '_self') return true;
+    if (a.hasAttribute('download') || a.hasAttribute('data-zoom')) return true;   /* 그래프 확대는 팝업 */
+    if (e && (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0)) return true;
+    try { var u = new URL(a.href, location.href); if (u.pathname === location.pathname && u.search === location.search && u.hash) return true; } catch (err) { return true; }
+    return false;
+  }
+
+  /* 2) 눌림 표시 — 손가락이 닿는 순간. 스크롤하려고 댄 손가락은 움직이면 바로 지운다 */
+  var pressed = null, startY = 0, pressTimer;
+  function clearPress() { clearTimeout(pressTimer); if (pressed) pressed.classList.remove('is-pressed'); pressed = null; }
+  document.addEventListener('pointerdown', function (e) {
+    if (e.button > 0) return;
+    var t = e.target.closest ? e.target.closest(PRESS) : null;
+    if (!t) return;
+    var row = t.closest(ROWS);
+    if (row && t !== row && !t.closest(INNER)) t = row;   /* 행 안의 글자를 눌러도 행 전체가 눌림 */
+    clearPress(); pressed = t; startY = e.clientY; t.classList.add('is-pressed');
+  }, { passive: true });
+  document.addEventListener('pointermove', function (e) { if (pressed && Math.abs(e.clientY - startY) > 10) clearPress(); }, { passive: true });
+  document.addEventListener('pointercancel', clearPress, { passive: true });
+  document.addEventListener('pointerup', function () { var p = pressed; pressTimer = setTimeout(function () { if (pressed === p) clearPress(); }, 450); }, { passive: true });   /* 잠깐 남겨 눈에 보이게 */
+
+  /* 1) 행 · 카드 전체 → 그 안의 첫 링크. 3) 같은 창 이동이면 진행 표시 */
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented) return;
+    var tgt = e.target;
+    var row = tgt.closest ? tgt.closest(ROWS) : null;
+    var inner = tgt.closest ? tgt.closest(INNER) : null;
+    if (row && (!inner || !row.contains(inner) || inner === row)) {
+      var link = row.matches('a[href]') ? row : row.querySelector('a[href]');
+      if (!link) return;
+      e.preventDefault();
+      if (link.target === '_blank') { window.open(link.href, '_blank', 'noopener'); return; }
+      if (!samePageOrNewTab(link, e)) startNav();
+      location.href = link.href;
+      return;
+    }
+    var a = inner && inner.matches('a[href]') ? inner : null;
+    if (a && !samePageOrNewTab(a, e)) startNav();
+  });
+})();
+
 </script>
 </body>
 </html>
