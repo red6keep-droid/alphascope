@@ -94,6 +94,8 @@ CHAINS = {
     "json-gemini": ["gemini", "gemini-lite"],
     # 시총 TOP 10 뉴스 분류 — lite 먼저 (doc/종목-레이더-기획.md 10-4: flash 하루 약 20회는 NVDA 리포트 몫으로 남긴다, lite 는 버킷이 따로)
     "json-lite": ["gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
+    # 새 기능 — 예비 공급자 먼저, Gemini 는 맨 뒤 (2026-10-19, 위 머리말: 키 하나를 모든 리포트가 나눠 쓴다). 인물 발언 레이더 인용 추출
+    "json-backup-first": ["nvidia-deepseek", "groq-qwen", "groq", "gemini-lite"],
 }
 
 # 예비 모델이 남긴 ai_model 은 "공급자:모델" (nvidia:… · groq:…). Gemini("gemini-…") · 규칙("rule") 에는 콜론이 없다

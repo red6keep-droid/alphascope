@@ -31,6 +31,24 @@ CREATE INDEX IF NOT EXISTS idx_st_speaker ON statements(speaker, published_at);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_st_url ON statements(speaker, url);
 """
 
+# 나중에 붙은 열 (로컬 DB 는 connect 때 ALTER). 인용 추출 열(3단계)은 2차 항목에만 채운다
+EXTRA_COLUMNS = {
+    "ext_id": "TEXT",             # 소스 쪽 id — Truth Social 게시물 id (trump-trend 분류를 그대로 쓴다, 4단계)
+    "prefilter_reason": "TEXT",   # no_name · no_speech — LLM 전에 버린 이유. NULL = 통과
+    "group_id": "TEXT",           # 같은 발언 묶음 = 대표 항목 id (대표 자신 포함)
+    "group_size": "INTEGER",      # 대표 행에만: 묶음의 매체 수
+    "is_statement": "INTEGER",    # 1 = 그 인물이 직접 한 새 발언 · 행동, 0 = 해설 · 남의 말 · 오래된 말
+    "quote": "TEXT",              # 발언 한 문장 (영어, 기사 제목에서 옮김)
+    "dup_of_primary": "TEXT",     # 같은 발언의 1차 항목 id — 있으면 2차는 카드에 쓰지 않는다
+    "extract_model": "TEXT",
+    "extracted_at": "TEXT",
+    # 4단계 분류 (classify.py) — trump-trend 와 같은 8칸. 배열은 JSON 문자열
+    "noise_reason": "TEXT",
+    "ai_topic": "TEXT", "ai_subtopic": "TEXT", "ai_target_country": "TEXT", "ai_target_sector": "TEXT",
+    "ai_mentioned_companies": "TEXT", "ai_direction": "TEXT", "ai_intensity": "INTEGER", "ai_market_relevance": "INTEGER",
+    "analyzed_at": "TEXT", "ai_model": "TEXT",
+}
+
 
 def now_iso():
     return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -41,6 +59,10 @@ def connect(path=config.DB_PATH):
     conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
+    have = {r["name"] for r in conn.execute("PRAGMA table_info(statements)")}
+    for col, typ in EXTRA_COLUMNS.items():
+        if col not in have:
+            conn.execute(f"ALTER TABLE statements ADD COLUMN {col} {typ}")
     return conn
 
 

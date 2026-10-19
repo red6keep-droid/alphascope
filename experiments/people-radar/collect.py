@@ -85,12 +85,12 @@ def _rss_items(content):
 
 
 def _row(collector, speaker, attribution, title, url, published, body=None, publisher=None,
-         sub_speaker=None, source_kind="primary"):
+         sub_speaker=None, source_kind="primary", ext_id=None):
     return {
         "id": f"{collector}:{_hash(url or title + published)}", "speaker": speaker, "sub_speaker": sub_speaker,
         "source_kind": source_kind, "attribution": attribution, "collector": collector,
         "publisher": publisher, "published_at": published, "title": title[:400],
-        "body": (body or "")[:config.PRIMARY_BODY_MAX_CHARS] or None, "url": url,
+        "body": (body or "")[:config.PRIMARY_BODY_MAX_CHARS] or None, "url": url, "ext_id": ext_id,
     }
 
 
@@ -156,7 +156,7 @@ def c_cnn_archive(speaker, _arg, attribution):
             continue
         title = content[:200] or "(미디어만 있는 게시물)"
         out.append(_row("cnn_archive", speaker, attribution, title, rec.get("url") or f"truth:{rec.get('id')}", ts,
-                        body=content, publisher="truthsocial.com"))
+                        body=content, publisher="truthsocial.com", ext_id=str(rec.get("id") or "") or None))
     return out
 
 
@@ -215,11 +215,13 @@ def _insert(conn, rows, since):
             continue
         cur = conn.execute(
             """INSERT OR IGNORE INTO statements(id, speaker, sub_speaker, source_kind, attribution, collector, publisher,
-                   published_at, title, body, url, collected_at)
+                   published_at, title, body, url, ext_id, collected_at)
                VALUES (:id, :speaker, :sub_speaker, :source_kind, :attribution, :collector, :publisher,
-                   :published_at, :title, :body, :url, :collected_at)""",
+                   :published_at, :title, :body, :url, :ext_id, :collected_at)""",
             dict(r, collected_at=db.now_iso()))
         new += cur.rowcount
+        if not cur.rowcount and r.get("ext_id"):   # 2단계 때 ext_id 없이 들어간 행 채우기
+            conn.execute("UPDATE statements SET ext_id=? WHERE id=? AND ext_id IS NULL", (r["ext_id"], r["id"]))
     return new
 
 
