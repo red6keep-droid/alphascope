@@ -222,12 +222,25 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .rt-pop-li > span:last-child { min-width: 0; }
 .rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
 .rt-pop-p b { color: #111; }
+/* 기사 번역 안내 (2026-10-19 사용자) — 기사 제목은 원문, 옆 '번역 방법' 14px 회색 밑줄 글자 버튼. 누르면 브라우저 번역법 팝업(툴팁 팝업과 같은 상자).
+   구글 번역 주소로 여는 방식은 한국에서 막혀 있어 뺐다 (같은 날) */
+.news-orig { margin: 0 0 0 6px; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; cursor: pointer; vertical-align: baseline; -webkit-tap-highlight-color: transparent; }
+.news-orig:hover { color: #111; }
+.news-pop-lead { margin: 0; }
+.news-pop-steps { margin: 12px 0 0; padding: 0; list-style: none; }
+.news-pop-steps li { display: flex; align-items: flex-start; gap: 8px; }
+.news-pop-steps li + li { margin-top: 4px; }
+.news-pop-steps b, .news-pop-tip b { color: #111; }
+.news-pop-num { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-top: 6px; border-radius: 50%; background: #111; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 1; }
+.news-pop-tip { margin: 14px 0 0; padding: 10px 12px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 16px; line-height: 26px; }
+.news-pop-go { display: block; margin-top: 18px; padding: 10px 12px; background: #111; border: 1px solid #111; border-radius: 8px; color: #fff !important; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }   /* 검은 테마 버튼 */
+.news-pop-go:hover { background: #000; }
 /* 그래프 확대 팝업 (2026-10-16 사용자) — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
 .img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); }
 .img-pop[hidden] { display: none; }
 .img-pop-head { position: relative; flex: none; display: flex; align-items: center; min-height: 56px; padding: 12px 60px 12px 16px; color: #fff; }
 .img-pop-title { font-size: 16px; line-height: 24px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.img-pop .rt-pop-close { top: 12px; }
+.img-pop .rt-pop-close { top: 8px; width: 40px; height: 40px; line-height: 36px; touch-action: manipulation; }   /* 손가락 크기 — 폰에서 한 번에 닫히게 (2026-10-19 사용자) */
 .img-pop-scroll { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 0 16px; }
 .img-pop-scroll img { display: block; flex: none; max-width: none; height: auto; border-radius: 8px; background: #fff; }
 .img-pop-hint { flex: none; padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); font-size: 14px; line-height: 20px; color: rgba(255,255,255,.8); text-align: center; }
@@ -1462,7 +1475,8 @@ MOCK_NEWS = [
                 "betting that AI infrastructure spending has further to run.",
      "source": "CNBC", "published": "2026-09-03 20:41:00", "link": "#",
      "title_ko": "AI 설비투자 전망 상향에 반도체 ETF로 사상 최대 자금 유입",
-     "why_ko": "지난주 반도체 펀드에 41억 달러가 들어와 AI 투자 기대가 이어지고 있다."},   # 선정 이유 미리보기 (2026-10-14)
+     "why_ko": "지난주 반도체 펀드에 41억 달러가 들어와 AI 투자 기대가 이어지고 있다.",
+     "summary_ko": "기사는 대형 기술 기업들이 AI 설비투자 계획을 늘리면서 지난주 반도체 ETF에 41억 달러가 들어와 주간 최대를 기록했다고 전한다."},   # 기사 소개 미리보기 (2026-10-19)   # 선정 이유 미리보기 (2026-10-14)
     {"title": "Fed official says there is no rush to cut rates further",
      "summary": "The policymaker pointed to resilient consumer spending.",
      "source": "Reuters", "published": "2026-09-03 19:55:00", "link": "#"},

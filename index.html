@@ -593,6 +593,7 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 }
 .news-labels { display: flex; align-items: center; gap: 6px; margin-top: 8px; line-height: 20px; }   /* 라벨 뒤에 출처 · 시각 (2026-10-14 사용자) */
 .news-sub { font-size: 14px; line-height: 20px; color: #7A7A7A; }
+.news-sum { display: block; margin-top: 4px; font-size: 16px; line-height: 26px; font-weight: 400; color: #333; word-break: keep-all; }   /* 기사 소개 (2026-10-19 사용자) — 제목 아래, 선정 이유 위 */
 .news-why { display: block; margin-top: 2px; font-size: 14px; line-height: 20px; color: #7A7A7A; word-break: keep-all; }   /* 선정 이유 (2026-10-14 사용자) — 제목은 18px(19 − 1) */
 .news-sub .num { margin-left: 6px; }
 .news-item.load-status { color: var(--gray-400); }
@@ -981,12 +982,25 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .rt-pop-li > span:last-child { min-width: 0; }
 .rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
 .rt-pop-p b { color: #111; }
+/* 기사 번역 안내 (2026-10-19 사용자) — 기사 제목은 원문, 옆 '번역 방법' 14px 회색 밑줄 글자 버튼. 누르면 브라우저 번역법 팝업(툴팁 팝업과 같은 상자).
+   구글 번역 주소로 여는 방식은 한국에서 막혀 있어 뺐다 (같은 날) */
+.news-orig { margin: 0 0 0 6px; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; cursor: pointer; vertical-align: baseline; -webkit-tap-highlight-color: transparent; }
+.news-orig:hover { color: #111; }
+.news-pop-lead { margin: 0; }
+.news-pop-steps { margin: 12px 0 0; padding: 0; list-style: none; }
+.news-pop-steps li { display: flex; align-items: flex-start; gap: 8px; }
+.news-pop-steps li + li { margin-top: 4px; }
+.news-pop-steps b, .news-pop-tip b { color: #111; }
+.news-pop-num { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-top: 6px; border-radius: 50%; background: #111; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 1; }
+.news-pop-tip { margin: 14px 0 0; padding: 10px 12px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 16px; line-height: 26px; }
+.news-pop-go { display: block; margin-top: 18px; padding: 10px 12px; background: #111; border: 1px solid #111; border-radius: 8px; color: #fff !important; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }   /* 검은 테마 버튼 */
+.news-pop-go:hover { background: #000; }
 /* 그래프 확대 팝업 (2026-10-16 사용자) — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
 .img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); }
 .img-pop[hidden] { display: none; }
 .img-pop-head { position: relative; flex: none; display: flex; align-items: center; min-height: 56px; padding: 12px 60px 12px 16px; color: #fff; }
 .img-pop-title { font-size: 16px; line-height: 24px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.img-pop .rt-pop-close { top: 12px; }
+.img-pop .rt-pop-close { top: 8px; width: 40px; height: 40px; line-height: 36px; touch-action: manipulation; }   /* 손가락 크기 — 폰에서 한 번에 닫히게 (2026-10-19 사용자) */
 .img-pop-scroll { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 0 16px; }
 .img-pop-scroll img { display: block; flex: none; max-width: none; height: auto; border-radius: 8px; background: #fff; }
 .img-pop-hint { flex: none; padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); font-size: 14px; line-height: 20px; color: rgba(255,255,255,.8); text-align: center; }
@@ -1528,6 +1542,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             <h2 class='section-title' id='news-title'>
               <span class='report-icon' style='background:#475569;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round'><rect x='2' y='2.5' width='12' height='11' rx='1.5'/><path d='M5 6h6M5 8.5h6M5 11h4'/></svg></span>실시간 뉴스
             </h2>
+            <span class='section-note'>기사는 원문(영어)으로 열려요</span>
           </div>
           <div class='news-list' id='news-list'>
             <article class='news-item load-status'>뉴스를 불러오는 중…</article>
@@ -2473,6 +2488,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
               var a = el('a', null, it.title);
               if (it.link) { a.href = it.link; a.target = '_blank'; a.rel = 'noopener'; }
               card.appendChild(a);
+              if (it.link && window.asNewsLink) window.asNewsLink(a);   /* 제목 옆 '번역 방법' — 브라우저 번역 안내 (2026-10-19 사용자) */
+              /* 제목 아래 기사 소개 한 문장 "기사는 … 전한다" — RSS 요약을 한국어로 옮긴 것 (2026-10-19 사용자: 원문이 영어라 내용을 한국어로 조금). fetch_news.py 가 summary_ko 를 채운다 */
+              if (it.summary_ko) card.appendChild(el('span', 'news-sum', it.summary_ko));
               /* 제목 아래 선정 이유 14px 회색 — 증시 리포트 뉴스와 같다 (2026-10-14 사용자). fetch_news.py 가 제목 번역과 함께 why_ko 를 채운다 */
               if (it.why_ko) card.appendChild(el('span', 'news-why', '선정 이유 : ' + it.why_ko));
               var labs = el('span', 'news-labels');   /* 라벨 줄: 분류 라벨 뒤에 출처 · 시각 (2026-10-14 사용자) */
@@ -3401,13 +3419,22 @@ body.no-dashboard .main-content { padding-top: 32px; }
           im.alt = (src && src.alt) || '';
           pop.querySelector('.img-pop-title').textContent = (src && src.alt) || '그래프';
           pop.hidden = false; document.body.classList.add('menu-open');   /* 뒤 화면 스크롤 잠금 (메뉴 서랍과 같은 규칙) */
-          var go = function () { size(im.naturalWidth); box.scrollLeft = box.scrollWidth; pop.querySelector('.rt-pop-close').focus(); };
+          var go = function () { size(im.naturalWidth); box.scrollLeft = box.scrollWidth; pop.querySelector('.rt-pop-close').focus({ preventScroll: true }); };
           if (im.complete && im.naturalWidth) go(); else im.onload = go;
         }
-        function close() { pop.hidden = true; document.body.classList.remove('menu-open'); if (last) last.focus(); }
+        function close() {
+          if (pop.hidden) return;
+          pop.hidden = true; document.body.classList.remove('menu-open');
+          if (last) { try { last.focus({ preventScroll: true }); } catch (e) { last.focus(); } }
+        }
         [].slice.call(links).forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); open(a); }); });
-        pop.addEventListener('click', function (e) { if (e.target === pop || e.target === box) close(); });
-        pop.querySelector('.rt-pop-close').addEventListener('click', close);
+        /* 폰에서 두 번 눌러야 닫히던 문제 (2026-10-19 사용자: "모바일에서 2번 클릭 해야 닫힌다"):
+           그림을 밀고 나면 관성 스크롤이 도는 동안 첫 탭은 click 이 안 오고 멈춤에만 쓰인다. × 는 touchend 에서 바로 닫고
+           (preventDefault 로 뒤따르는 click 이 아래 그래프 링크를 다시 여는 것도 막는다), 바깥은 그림이 아닌 곳(제목줄 · 안내 줄 포함) 어디든 닫힌다 */
+        var x = pop.querySelector('.rt-pop-close');
+        x.addEventListener('touchend', function (e) { e.preventDefault(); close(); });
+        x.addEventListener('click', close);
+        pop.addEventListener('click', function (e) { if (e.target !== im && e.target !== x) close(); });
         document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
         window.addEventListener('resize', function () { if (!pop.hidden) size(im.naturalWidth); });
       })();
@@ -3471,6 +3498,88 @@ body.no-dashboard .main-content { padding-top: 32px; }
         pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
         pop.querySelector('.rt-pop-close').addEventListener('click', close);
         document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
+      })();
+
+      /* ============================================================ 기사 번역 안내 (2026-10-19 사용자: "뉴스를 누르면 새 창이 자동으로 번역돼서 보이게")
+         사이트가 크롬 번역을 대신 켜 줄 수는 없다(다른 사이트 창은 손댈 수 없다). 구글 번역 주소(*.translate.goog)로 열어 보았으나
+         한국에서는 "This translation service isn't available in your region" 으로 막혀 있고(같은 날 사용자 확인), 파파고 웹사이트 번역은 종료 · 얀덱스는 오류.
+         그래서 기사 제목은 원문으로 바로 열고, 제목 옆 `번역 방법` 을 누르면 이 기기에서 브라우저 번역을 켜는 법을 팝업으로 보여 준다.
+         크롬 · 엣지 · 안드로이드는 번역할 때 '영어 항상 번역'을 켜 두면 다음부터 자동으로 번역된다 — 그 한 줄을 함께 안내한다.
+         대상: 홈 실시간 뉴스(window.asNewsLink 로 붙인다) · 글 본문의 새 창 기사 링크(글자 링크만 — 그래프 · 아이콘 링크는 그대로). */
+      (function () {
+        'use strict';
+        var SKIP = /(^|\.)(google\.[a-z.]+|blogspot\.com|blogger\.com|naver\.com|daum\.net|jsdelivr\.net|github\.com|githubusercontent\.com)$|\.kr$/i;
+
+        function external(href) {
+          var u;
+          try { u = new URL(href, location.href); } catch (e) { return false; }
+          return /^https?:$/.test(u.protocol) && u.hostname !== location.hostname && !SKIP.test(u.hostname);
+        }
+
+        /* 이 기기에서 브라우저 번역을 켜는 법 — 두 단계, 그리고 자동 번역을 켜는 한 줄 */
+        function howto() {
+          var ua = navigator.userAgent;
+          var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+          var AUTO = '번역할 때 <b>영어 항상 번역</b>을 켜 두면 다음부터는 기사가 자동으로 한국어로 열려요.';
+          if (/KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|DaumApps/i.test(ua))
+            return { steps: ['오른쪽 위 메뉴에서 <b>다른 브라우저로 열기</b> 누르기', '열린 브라우저에서 이 안내를 다시 보기'], note: '앱 안에서는 번역이 안 될 수 있어요.' };
+          if (ios && /CriOS/.test(ua)) return { steps: ['기사 화면 아래쪽 <b>···</b> 버튼 누르기', '<b>번역</b> 누르기'], tip: AUTO };
+          if (ios) return { steps: ['기사 화면 주소창 왼쪽 <b>가가</b> 버튼 누르기', '<b>한국어로 번역</b> 누르기'] };
+          if (/SamsungBrowser/.test(ua)) return { steps: ['기사 화면 아래쪽 <b>≡</b> 메뉴 누르기', '<b>번역</b> 누르기'] };
+          if (/Android/.test(ua)) return { steps: ['기사 화면 오른쪽 위 <b>⋮</b> 메뉴 누르기', '<b>번역</b> 누르기'], tip: AUTO };
+          return { steps: ['기사 화면 빈 곳에서 <b>마우스 오른쪽 버튼</b> 누르기', '<b>한국어로 번역</b> 누르기'], tip: /Firefox/.test(ua) ? '' : AUTO };
+        }
+
+        var pop = null, opener = null;
+        function guide(href, from) {
+          if (!pop) {
+            var h = howto();
+            pop = document.createElement('div'); pop.className = 'rt-pop news-pop'; pop.hidden = true;
+            pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-labelledby="news-pop-title">' +
+              '<div class="rt-pop-head"><div class="rt-pop-title" id="news-pop-title">기사를 한국어로 보는 법</div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
+              '<div class="rt-pop-body">' +
+                '<p class="news-pop-lead">기사는 언론사 원문(영어)으로 열려요. ' + (h.note || '브라우저 번역 기능으로 한국어로 볼 수 있어요.') + '</p>' +
+                '<ol class="news-pop-steps"></ol>' +
+                (h.tip ? '<p class="news-pop-tip">' + h.tip + '</p>' : '') +
+                '<a class="news-pop-go" target="_blank" rel="noopener">기사 열기</a>' +
+              '</div></div>';
+            document.body.appendChild(pop);
+            var ol = pop.querySelector('.news-pop-steps');
+            h.steps.forEach(function (s, i) {
+              var li = document.createElement('li'), n = document.createElement('span'), t = document.createElement('span');
+              n.className = 'news-pop-num'; n.textContent = String(i + 1); t.innerHTML = s;
+              li.appendChild(n); li.appendChild(t); ol.appendChild(li);
+            });
+            var close = function () { pop.hidden = true; if (opener) opener.focus(); };
+            pop.querySelector('.rt-pop-close').addEventListener('click', close);
+            pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
+            document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
+            pop.querySelector('.news-pop-go').addEventListener('click', function () { setTimeout(close, 0); });
+          }
+          opener = from;
+          pop.querySelector('.news-pop-go').href = href;
+          pop.hidden = false;
+          pop.querySelector('.rt-pop-body').scrollTop = 0;
+          pop.querySelector('.rt-pop-close').focus();
+        }
+
+        function decorate(a) {
+          if (!a || a.getAttribute('data-trhelp')) return;
+          var href = a.getAttribute('href') || '';
+          if (!external(href)) return;
+          a.setAttribute('data-trhelp', '1');
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'news-orig'; b.textContent = '번역 방법';
+          b.setAttribute('aria-haspopup', 'dialog');
+          b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); guide(a.href, b); });
+          a.insertAdjacentElement('afterend', b);
+        }
+        window.asNewsLink = decorate;
+
+        [].slice.call(document.querySelectorAll('.post-body a[target="_blank"]')).forEach(function (a) {
+          if (a.hasAttribute('data-zoom') || a.querySelector('img, svg') || !String(a.textContent || '').trim()) return;
+          decorate(a);
+        });
       })();
 
       /* ============================================================ 리포트 탭 (글 보기)

@@ -57,30 +57,40 @@ def parse_published(rfc822):
 
 
 def _translate_prompt(items):
-    """items: [{"title", "summary"}] — 제목 번역(t) + 선정 이유(why) 한 문장 (2026-10-14 사용자: 홈 뉴스에 선정 이유)."""
+    """items: [{"title", "summary"}] — 제목 번역(t) + 선정 이유(why) 한 문장 (2026-10-14 사용자: 홈 뉴스에 선정 이유)
+    + 소개 한 문장(s) (2026-10-19 사용자: 원문이 영어라 기사 내용을 한국어로 조금 — 같은 호출에서 받으므로 AI 호출 수는 그대로)."""
     src = [{"title": it["title"], "summary": it.get("summary", "")} for it in items]
     return (
-        "다음은 미국 경제 뉴스(CNBC)의 영문 제목과 요약 목록이다. 항목마다 두 가지를 만들어라.\n"
+        "다음은 미국 경제 뉴스(CNBC)의 영문 제목과 요약 목록이다. 항목마다 세 가지를 만들어라.\n"
         "1) t: 제목을 한국 경제지 헤드라인처럼 자연스러운 한국어로. 의미를 더하거나 빼지 말고, 고유명사(기업·인명·지수)는 통용 표기, 숫자·티커는 그대로.\n"
         "2) why: 투자자가 이 기사를 볼 만한 이유 한 문장(40자 안팎, '~다'로 끝냄). 요약에 있는 사실만 쓰고, 매수·매도 권유나 전망 단정은 하지 않는다.\n"
-        '결과는 입력과 같은 순서·같은 개수의 JSON 배열 [{"t": "...", "why": "..."}] 로만 답하라.\n\n' + json.dumps(src, ensure_ascii=False)
+        "3) s: 영문 요약을 옮긴 기사 소개 한 문장(100자 안팎). 반드시 '기사는'으로 시작하고 '~고 전한다' 또는 '~고 본다'로 끝낸다 — 기사의 주장임이 드러나게. "
+        "요약에 있는 내용만 쓰고 새 내용·의견을 더하지 않는다. 숫자·비교(무엇보다 높고 낮은지)·시간 순서는 원문 그대로 옮긴다. "
+        "예: 'The odds are higher than before X, but lower than after Y' → '기사는 확률이 X 전보다 높지만 Y 직후보다는 낮다고 전한다'. 요약이 비었거나 제목과 같은 내용뿐이면 빈 문자열.\n"
+        '결과는 입력과 같은 순서·같은 개수의 JSON 배열 [{"t": "...", "why": "...", "s": "..."}] 로만 답하라.\n\n' + json.dumps(src, ensure_ascii=False)
     )
 
 
 def _valid_translation(out, items):
     return (isinstance(out, list) and len(out) == len(items)
-            and all(isinstance(x, dict) and isinstance(x.get("t"), str) and x["t"].strip() and isinstance(x.get("why"), str) for x in out))
+            and all(isinstance(x, dict) and isinstance(x.get("t"), str) and x["t"].strip() and isinstance(x.get("why"), str) and isinstance(x.get("s", ""), str) for x in out))
 
 
 def _clean_out(out):
-    return [{"t": x["t"].strip(), "why": x["why"].strip()} for x in out]
+    return [{"t": x["t"].strip(), "why": x["why"].strip(), "s": _intro(x.get("s"))} for x in out]
+
+
+def _intro(s):
+    """기사 소개 — '기사는 …' 으로 시작하는 문장만 싣는다. 형식이 어긋나면(기사 속 의견이 우리 말처럼 읽힐 수 있다) 빈 문자열 (2026-10-19)."""
+    s = str(s or "").strip()
+    return s if s.startswith("기사는") and len(s) <= 200 else ""
 
 
 def translate_titles(titles):
-    """뉴스 항목 목록 → [{"t": 한국어 제목, "why": 선정 이유}] (같은 길이, 2026-10-14 선정 이유 추가). 전부 실패하면 None.
+    """뉴스 항목 목록 → [{"t": 한국어 제목, "why": 선정 이유, "s": 소개}] (같은 길이, 2026-10-14 선정 이유 · 2026-10-19 소개 추가). 전부 실패하면 None.
 
-    홈 화면 제목용 (2026-10-10 사용자: 최신 뉴스 제목은 한글로). 본문·요약은 번역하지 않는다.
-    공용 사슬 "translate" (experiments/llm_chain.py): Groq gpt-oss-120b → NVIDIA gpt-oss-20b → Gemini 키들. 형식이 어긋나면 다음 단계.
+    홈 화면 제목용 (2026-10-10 사용자: 최신 뉴스 제목은 한글로). 기사 본문은 가져오지도 옮기지도 않는다 — 소개(s)는 RSS 요약만 옮긴다.
+    공용 사슬 "translate" (experiments/llm_chain.py): Groq gpt-oss-120b → NVIDIA gpt-oss-20b → Gemini(예비). 형식이 어긋나면 다음 단계.
     """
     if not titles:
         return []
@@ -112,7 +122,10 @@ def add_korean_titles(items):
         if prev.get(it["link"]):
             it["title_ko"] = prev[it["link"]]["title_ko"]
             it["why_ko"] = prev[it["link"]]["why_ko"]
-    todo = [it for it in items if not (it.get("title_ko") and it.get("why_ko"))]   # 선정 이유가 없는 옛 번역도 다시 만든다
+            if "summary_ko" in prev[it["link"]]:
+                it["summary_ko"] = prev[it["link"]]["summary_ko"]
+    # 선정 이유 · 소개가 없는 옛 번역도 다시 만든다. 소개는 빈 문자열("요약이 제목뿐")도 만든 것으로 친다 — 매번 다시 묻지 않게
+    todo = [it for it in items if not (it.get("title_ko") and it.get("why_ko") and "summary_ko" in it)]
     if not todo:
         print(f"[번역] 새 제목 없음 (이전 번역 {len(items)}건 재사용)")
         return
@@ -127,6 +140,7 @@ def add_korean_titles(items):
         it["title_ko"] = t["t"]
         if t["why"]:
             it["why_ko"] = t["why"]
+        it["summary_ko"] = t["s"]
     print(f"[번역] 새 제목 {len(todo)}건 번역 · 재사용 {len(items) - len(todo)}건")
 
 

@@ -13,8 +13,10 @@
 validate 탈락 모두) 다음 단계로. 전부 실패하면 RuntimeError.
 
 Gemini 는 REST 로 부른다 — 홈 뉴스 워크플로에는 google-genai 가 없다. 필요한 패키지는 requests 하나.
-Gemini 키는 GEMINI_API_KEY 에 ; 또는 , 로 여럿 (2026-10-14 사용자: 키 5개 모두 다른 프로젝트 → 프로젝트당 하루 약 20회씩).
-호출마다 다음 키로 돌고, 429 분당 한도를 받은 키는 KEY_COOLDOWN_SECONDS 한 번 쉬고, 하루 한도(PerDay)면 그 실행 동안 그 (키, 모델)을 버린다.
+Gemini 키는 하나 — 프로젝트 하나 (2026-10-19 사용자: 한 블로그에서 키 · 프로젝트를 여러 개 돌려 한도를 늘리는 건 약관 위반(사용량 제한 우회)).
+GEMINI_API_KEY 에 키가 여럿 들어 있어도 첫 키만 쓴다(gemini_keys). 하루 한도는 모든 리포트가 나눠 쓰는 예산 — 새 기능은 Groq · NVIDIA 를 먼저 쓰고 Gemini 는 예비로.
+(2026-10-14 ~ 10-18 에는 다른 프로젝트의 키 5개를 돌려 썼다 — 아래 프로젝트별 실측은 그때 기록.)
+429 분당 한도를 받으면 KEY_COOLDOWN_SECONDS 한 번 쉬고, 하루 한도(PerDay)면 그 실행 동안 그 모델을 버린다.
 503/500 은 키 문제가 아니라 기다렸다 다시 — 단계마다 attempts 횟수만큼(3·6·12·24s…).
 
 Gemini 과부하(503) · 하루 한도 실측 (2026-10-16):
@@ -152,9 +154,18 @@ def parse_json(text):
     return value
 
 
+_WARNED_KEYS = False
+
+
 def gemini_keys():
+    """Gemini 키는 하나만 (2026-10-19 사용자: 여러 키 · 프로젝트로 한도를 늘리는 건 약관 위반). 여럿 들어 있으면 첫 키만 쓰고 한 번 알린다."""
+    global _WARNED_KEYS
     raw = os.environ.get("GEMINI_API_KEY", "")
-    return [k.strip().strip('"') for k in re.split(r"[;,]", raw) if k.strip()]
+    keys = [k.strip().strip('"') for k in re.split(r"[;,]", raw) if k.strip()]
+    if len(keys) > 1 and not _WARNED_KEYS:
+        _WARNED_KEYS = True
+        print(f"[Gemini] GEMINI_API_KEY 에 키가 {len(keys)}개. 첫 키만 씁니다 (키 하나 원칙)")
+    return keys[:1]
 
 
 def _mask(key):
