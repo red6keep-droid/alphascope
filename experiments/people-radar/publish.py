@@ -30,6 +30,10 @@ def match_titles(day):
     return [render_html.post_title(day), f"{render_html.SLUG_NAME} {day}"]
 
 
+def labels():
+    return render_html.LABELS + (["테스트 중"] if config.TEST_MODE else [])
+
+
 def publish(output_dir=None, do_publish=False):
     output_dir = output_dir or config.OUTPUT_DIR
     if event_count(output_dir) <= 0:
@@ -40,7 +44,7 @@ def publish(output_dir=None, do_publish=False):
     day = render_html.today_kst()
     title = render_html.post_title(day)
     if not do_publish:
-        print(f"[publish dry-run] 제목: {title} · 본문 {len(body):,}자 · 라벨 {render_html.LABELS}")
+        print(f"[publish dry-run] 제목: {title} · 본문 {len(body):,}자 · 라벨 {labels()}")
         return None
     sys.path.append(os.path.abspath(os.path.join(config.BASE_DIR, "..", "trump-trend")))
     from importlib import util
@@ -49,10 +53,10 @@ def publish(output_dir=None, do_publish=False):
     spec.loader.exec_module(tp)   # find_post_id · update_post 를 그대로 쓴다
     existing = tp.find_post_id(match_titles(day))
     if existing:
-        url = tp.update_post(existing["id"], title, publish_blogger.with_related(body, render_html.LABELS, match_titles(day)), render_html.LABELS)
+        url = tp.update_post(existing["id"], title, publish_blogger.with_related(body, labels(), match_titles(day)), labels())
         print(f"[publish] 같은 날 글이 있어 본문 갱신: {url}")
     else:
-        url = publish_blogger.publish(title, body, labels=render_html.LABELS, slug_title=f"{render_html.SLUG_NAME} {day}")
+        url = publish_blogger.publish(title, body, labels=labels(), slug_title=f"{render_html.SLUG_NAME} {day}")
     with open(os.path.join(output_dir, "post_url.txt"), "w", encoding="utf-8") as f:
         f.write(url or "")
     return url

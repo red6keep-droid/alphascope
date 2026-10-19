@@ -21,6 +21,9 @@ COLLECT_SINCE_HOURS = 72
 GOOGLE_NEWS_WHEN = "2d"
 PRIMARY_BODY_MAX_CHARS = 4000   # 1차 소스 본문 — 분류 · 인용 추출 입력 상한
 
+# 첫 발행은 '테스트 중' 라벨로 (NVDA 첫 발행 때 사용자 결정 10-10 과 같게). 테스트를 끝낼 때 False
+TEST_MODE = True
+
 # ── 3단계 인용 추출 (extract.py) ─────────────────────────────────────────
 # 새 기능은 예비 공급자 먼저, Gemini 는 맨 뒤 (llm_chain 머리말 2026-10-19: 키 하나를 모든 리포트가 나눠 쓴다)
 EXTRACT_CHAIN = "json-backup-first"
