@@ -39,3 +39,6 @@ experiments/issue_store/results/failure_cost_cells.csv.gz
 .claude/settings.local.json
 experiments/stock-radar/data/
 experiments/stock-radar/output/
+
+experiments/people-radar/data/
+experiments/people-radar/output/
