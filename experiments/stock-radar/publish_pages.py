@@ -76,9 +76,20 @@ def publish(only=None, dry=False):
     blog_id = publish_blogger._blog_id(creds, blog_url)
     headers = {"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"}
     base = f"{publish_blogger.BLOGGER_API}/blogs/{blog_id}/pages"
-    r = requests.get(base, params={"fetchBodies": "false", "status": ["live", "draft"]}, headers=headers, timeout=30)
-    r.raise_for_status()
-    by_url = {_norm(p.get("url")): p for p in r.json().get("items", [])}
+    # 페이지 목록은 한 번에 10개씩 온다 — 다음 쪽(nextPageToken)까지 다 읽는다.
+    # 첫 쪽만 읽어 이미 있는 10개를 "없다"고 보고 _숫자 주소의 중복 페이지 10개를 만든 적이 있다 (2026-10-18 CI 첫 실행)
+    items, token = [], None
+    while True:
+        params = {"fetchBodies": "false", "status": ["live", "draft"], "maxResults": 50}
+        if token:
+            params["pageToken"] = token
+        r = _call(requests, "get", base, params=params, headers=headers)
+        j = r.json()
+        items += j.get("items", [])
+        token = j.get("nextPageToken")
+        if not token:
+            break
+    by_url = {_norm(p.get("url")): p for p in items}
     made = updated = failed = 0
     for key, title, slug, url, path in targets(only):
         page = by_url.get(_norm(url))
