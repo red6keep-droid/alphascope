@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19 04:24:06 UTC",
+  "updated_at": "2026-10-19 12:53:39 UTC",
   "items": [
     {
       "title": "Top Wall Street analysts are bullish on the growth potential of these 3 stocks",
@@ -7,8 +7,9 @@
       "link": "https://www.cnbc.com/2026/10/18/top-analysts-are-bullish-on-the-growth-potential-of-these-3-stocks.html",
       "published": "2026-10-18 12:34:51",
       "summary": "Amid fear of rate hikes and oil prices, investors can look past volatility and track Street analysts' stock picks with strong long-term growth potential.",
-      "title_ko": "월스트리트 최고 애널리스트들, 3개 종목 성장 잠재력에 강세",
-      "why_ko": "금리·유가 우려에도 장기 성장 가능성이 높은 3종목을 확인할 수 있다."
+      "title_ko": "월스트리트 최고 애널리스트 3개 종목 성장 잠재력에 강세",
+      "why_ko": "금리 인상과 유가 우려 속에서도 장기 성장 잠재력 높은 종목을 제시한다.",
+      "summary_ko": "기사는 금리 인상과 유가 상승 우려에도 변동성을 넘어 장기 성장 잠재력이 강한 종목을 애널리스트가 선정했다고 전한다."
     },
     {
       "title": "The Austin Powers steamroller: How to trade CoreWeave's slow moving crisis",
@@ -16,8 +17,9 @@
       "link": "https://www.cnbc.com/2026/10/16/playing-the-coreweave-disconnect.html",
       "published": "2026-10-16 18:24:35",
       "summary": "After a 27.5% drop from last Friday's close to this Thursday morning's 52-week lows, followed by a 17% rebound, equity traders holding CoreWeave are dazed.",
-      "title_ko": "오스틴 파워스 급부상: CoreWeave의 침체를 어떻게 거래할까",
-      "why_ko": "주가 27.5% 급락 후 17% 회복으로 투자자가 당황한다."
+      "title_ko": "오스틴 파워스 급강하: CoreWeave 위기 매매 방법",
+      "why_ko": "지난 금요일 종가 대비 27.5% 하락 후 17% 반등한 상황을 투자자가 주목한다.",
+      "summary_ko": "기사는 CoreWeave가 지난 금요일 종가 대비 27.5% 하락해 52주 최저치에 머물다 17% 반등했으며, 이에 따라 주식 트레이더가 혼란스러워한다고 전한다."
     },
     {
       "title": "Brian Sullivan: Why the 'real' price of oil is likely $30-$40 higher than where it is now",
@@ -25,8 +27,9 @@
       "link": "https://www.cnbc.com/2026/10/15/brian-sullivan-why-the-real-price-of-oil-is-likely-30-40-higher-than-where-it-is-now.html",
       "published": "2026-10-15 19:53:29",
       "summary": "Physical oil can cost about $38 a barrel more to deliver, as tanker rates surge.",
-      "title_ko": "브라이언 설리번: 실제 원유 가격이 현재보다 30~40달러 높을 가능성",
-      "why_ko": "물류 비용 급등으로 배럴당 38달러 추가 비용이 발생한다."
+      "title_ko": "Brian Sullivan: 현재보다 석유 실물 가격이 $30‑$40 높을 가능성",
+      "why_ko": "탱커 운임 급등으로 배달 비용이 배럴당 약 $38 상승한다는 점을 알린다.",
+      "summary_ko": "기사는 물리적 석유를 배달하는 데 탱커 운임 상승으로 배럴당 약 $38 추가 비용이 발생한다고 전한다."
     },
     {
       "title": "CoreWeave credit default swaps hit distress levels as investors sour on AI debt",
@@ -34,8 +37,9 @@
       "link": "https://www.cnbc.com/2026/10/15/coreweave-credit-default-swaps-hit-distress-levels-as-investors-sour-on-ai-debt.html",
       "published": "2026-10-15 21:33:24",
       "summary": "Signs of distressed deepened in CoreWeave on Thursday.",
-      "title_ko": "코어웨이브 신용부도스왑, AI 부채에 투자자들 우려로 위기 수준 도달",
-      "why_ko": "코어웨이브의 AI 부채가 악화돼 CDS가 위험 구간에 진입한다."
+      "title_ko": "CoreWeave CDS, AI 부채 투자자들 우려에 위험 수준 도달",
+      "why_ko": "목요일에 CoreWeave의 신용부도스왑이 위험 수준에 이른 점을 알린다.",
+      "summary_ko": "기사는 목요일에 CoreWeave의 신용부도스왑이 위험 수준에 도달해 AI 부채에 대한 투자자 우려가 심화됐다고 전한다."
     },
     {
       "title": "Traders pile into 'bubble puts' on CoreWeave as neocloud stocks plunge",
@@ -43,8 +47,9 @@
       "link": "https://www.cnbc.com/2026/10/14/coreweave-put-options-ai-trade.html",
       "published": "2026-10-14 21:19:09",
       "summary": "As a key corner of the artificial intelligence trade takes a beating on Wednesday, traders are betting it could get even worse.",
-      "title_ko": "CoreWeave에 ‘버블 풋’ 몰려… 네오클라우드 주식 급락",
-      "why_ko": "AI 핵심 주식이 급락해 풋 옵션 매수가 늘고 있다."
+      "title_ko": "CoreWeave 주가 급락에 트레이더, '버블 풋' 매수",
+      "why_ko": "수요일에 인공지능 관련 주가가 급락하면서 더 큰 하락을 예상한다.",
+      "summary_ko": "기사는 수요일에 인공지능 거래 핵심 종목이 급락하면서 트레이더가 더 큰 하락을 예상해 '버블 풋'에 베팅하고 있다고 전한다."
     },
     {
       "title": "Don't let inflation bite — how to hedge with TIPS, commodities and infrastructure funds",
@@ -52,8 +57,9 @@
       "link": "https://www.cnbc.com/2026/10/13/inflation-hedge-tips-commodities-infrastructure.html",
       "published": "2026-10-14 15:20:04",
       "summary": "TIPS are looking attractive but they aren't the only way to get inflation protection.",
-      "title_ko": "인플레이션 방어, TIPS·원자재·인프라 펀드 활용법",
-      "why_ko": "TIPS가 매력적이지만 인플레이션 보호 수단은 다양하다는 점을 알 수 있다."
+      "title_ko": "인플레이션 대비 TIPS·원자재·인프라 펀드로 헤지하라",
+      "why_ko": "TIPS가 매력적이지만 인플레이션 보호 수단이 다양함을 알린다.",
+      "summary_ko": "기사는 TIPS가 매력적이지만 인플레이션 보호를 위해 원자재와 인프라 펀드도 고려할 수 있다고 전한다."
     },
     {
       "title": "A massive trade just happened in surging shares of Snap",
@@ -61,8 +67,9 @@
       "link": "https://www.cnbc.com/2026/10/12/a-massive-trade-just-happens-in-surging-shares-of-snap.html",
       "published": "2026-10-12 18:43:44",
       "summary": "Options traders bet on 30% rally in Snap",
-      "title_ko": "스냅 주가 급등, 옵션 트레이더 30% 상승에 베팅",
-      "why_ko": "옵션 거래자들이 스냅 주가 30% 상승을 예상하고 포지션을 잡았다."
+      "title_ko": "Snap 주가 급등, 대규모 옵션 거래 발생",
+      "why_ko": "옵션 트레이더가 Snap의 30% 상승을 예상해 베팅하고 있다.",
+      "summary_ko": "기사는 옵션 트레이더가 Snap 주가가 30% 상승할 것이라 예상하며 대규모 옵션 거래를 진행했다고 전한다."
     },
     {
       "title": "UnitedHealth shares are doing something unusual ahead of earnings",
@@ -70,8 +77,9 @@
       "link": "https://www.cnbc.com/2026/10/12/unitedhealth-shares-are-doing-something-unusual-ahead-of-earnings.html",
       "published": "2026-10-12 16:42:13",
       "summary": "The only thing more expensive than health insurance is perhaps the costs of insuring shares of health insurers",
-      "title_ko": "유나이티드헬스, 실적 발표 전 주가 이상 움직임",
-      "why_ko": "헬스케어 주식의 주가 위험을 보험하는 비용이 보험료보다 비쌀 수 있다."
+      "title_ko": "UnitedHealth 주가, 실적 발표 전 이례적 움직임",
+      "why_ko": "건강보험보다 주식 보험 비용이 더 비쌀 수 있다는 점을 강조한다.",
+      "summary_ko": "기사는 건강보험보다 건강보험사 주식의 보험 비용이 더 비쌀 수 있다고 전한다."
     },
     {
       "title": "Banks are set to report this week. Here's what the options market expects",
@@ -79,8 +87,9 @@
       "link": "https://www.cnbc.com/2026/10/12/banks-are-set-to-report-this-week-heres-what-the-options-market-expects.html",
       "published": "2026-10-12 13:27:20",
       "summary": "Despite being flat on the year, the options market is pricing in some big financial sector moves as investor weigh the impact of higher rates.",
-      "title_ko": "은행 실적 발표 임박, 옵션 시장은 큰 변동 예측",
-      "why_ko": "옵션 시장이 금리 상승 영향을 반영해 금융 부문 큰 움직임을 가격에 반영하고 있다."
+      "title_ko": "은행주 옵션 시장, 이번 주 보고서 기대감 반영",
+      "why_ko": "옵션 시장이 금리 상승 영향에 따라 금융 섹터 변동성을 예상한다.",
+      "summary_ko": "기사는 옵션 시장이 연간 변동은 없지만 금리 상승 영향을 고려해 금융 섹터의 큰 움직임을 가격에 반영하고 있다고 전한다."
     },
     {
       "title": "Top Wall Street analysts prefer these 3 dividend stocks for stable income",
@@ -88,8 +97,9 @@
       "link": "https://www.cnbc.com/2026/10/11/top-analysts-prefer-these-3-dividend-stocks-for-stable-income.html",
       "published": "2026-10-11 11:42:31",
       "summary": "Given a volatile backdrop, investors seeking stable income can consider enhancing their portfolios by adding dividend-paying stocks.",
-      "title_ko": "월스트리트 애널리스트 3대 배당주, 안정적 수익 선호",
-      "why_ko": "변동성 높은 환경에서 배당주가 안정적 소득을 제공한다는 점을 강조한다."
+      "title_ko": "월스트리트 최고 애널리스트 3개 배당주 안정적 수익 선호",
+      "why_ko": "변동성 속에서 배당주가 안정적 수익을 제공한다는 점을 제시한다.",
+      "summary_ko": "기사는 변동성 높은 상황에서 안정적인 수익을 원하는 투자자가 배당주를 포트폴리오에 추가하면 좋다고 전한다."
     },
     {
       "title": "Junk bonds are 'flashing yellow.' Watch these warning signs",
@@ -97,8 +107,9 @@
       "link": "https://www.cnbc.com/2026/10/09/junk-bonds-are-flashing-yellow-watch-these-warning-signs.html",
       "published": "2026-10-09 20:51:25",
       "summary": "Spreads have widened in the high-yield bond market, but that doesn't tell the whole story.",
-      "title_ko": "고수익채권 ‘노란불’ 경고, 스프레드 확대가 전부는 아니다",
-      "why_ko": "고수익채권 시장 스프레드가 넓어졌지만 전체 상황을 보여주지는 않는다."
+      "title_ko": "정크본드 '노란불' 경고 신호 감시",
+      "why_ko": "고수익채권 스프레드 확대가 전체 상황을 완전히 설명하지 않는다.",
+      "summary_ko": "기사는 고수익채권 시장에서 스프레드가 확대됐지만 이것만으로 전체 상황을 판단하기엔 부족하다고 전한다."
     },
     {
       "title": "Living with Mom and trading on margin. The regular investor gets in on Wall Street's record stock borrowing binge",
@@ -106,8 +117,9 @@
       "link": "https://www.cnbc.com/2026/10/09/margin-debt-stock-market-risk.html",
       "published": "2026-10-09 13:03:19",
       "summary": "Margin debt has surged to record levels as investors like 29-year-old Hy Luu borrow more against their portfolios. Here’s how leverage can amplify stock losses.",
-      "title_ko": "마진 부채 사상 최고치, 투자자 레버리지 위험 확대",
-      "why_ko": "마진 부채가 사상 최고 수준에 도달해 레버리지가 손실을 증폭시킬 수 있다."
+      "title_ko": "엄마와 동거·마진 거래, 투자자 레버리지 급증",
+      "why_ko": "29세 투자자 Hy Luu가 포트폴리오 담보로 마진 부채를 사상 최고 수준까지 늘렸다.",
+      "summary_ko": "기사는 29세 투자자 Hy Luu가 마진 부채를 사상 최고 수준으로 늘리며 레버리지가 주식 손실을 확대할 수 있다고 전한다."
     }
   ]
 }
