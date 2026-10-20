@@ -234,8 +234,9 @@ def stock(sym, snap):
 
 def update_ranks(stocks, day, path=STATE):
     """순위 + 교체 (10-10): 시총 순위를 날마다 적고, 지금 TOP 10 종목이 11위 밖으로 SWAP_DAYS 거래일 연속 밀리면
-    그 기간 가장 높았던 후보(평균 순위)와 바꾼다. 처음에는 그날 시총 상위 10개."""
-    ranked = sorted((s for s in stocks if s.get("cap")), key=lambda s: -s["cap"])
+    그 기간 가장 높았던 후보(평균 순위)와 바꾼다. 처음에는 그날 시총 상위 10개.
+    순위 · TOP 10 은 U.TOP_EXCLUDE(외국 ADR · S&P 500 밖)를 빼고 매긴다 — 그 종목은 순위가 없다 (2026-10-20, 48개 확대)."""
+    ranked = sorted((s for s in stocks if s.get("cap") and s["sym"] not in U.TOP_EXCLUDE), key=lambda s: -s["cap"])
     today = {s["sym"]: i + 1 for i, s in enumerate(ranked)}
     try:
         with open(path, encoding="utf-8") as f:
@@ -286,5 +287,5 @@ if __name__ == "__main__":
     for s in a["stocks"]:
         nr = s["normal_range"] or {}
         e = s["earnings"]
-        print(f"{s['rank']:>2} {'*' if s['in_top'] else ' '} {s['sym']:6} ${s['close']:>9,.2f} {s['ret_1d']:+6.2f}% z={nr.get('z', 0):+.1f} σ={nr.get('sigma_pct', 0):.1f}% "
+        print(f"{s['rank'] or '-':>2} {'*' if s['in_top'] else ' '} {s['sym']:6} ${s['close']:>9,.2f} {s['ret_1d']:+6.2f}% z={nr.get('z', 0):+.1f} σ={nr.get('sigma_pct', 0):.1f}% "
               f"next={e['next']} med={e.get('median_abs', 0):.1f} n={len(e['moves'])}")

@@ -38,7 +38,13 @@ DIRS = ("positive", "negative", "uncertain", "neutral")
 EN = {"NVDA": "Nvidia", "AAPL": "Apple", "GOOGL": "Alphabet Google", "MSFT": "Microsoft", "AMZN": "Amazon", "META": "Meta Platforms",
       "AVGO": "Broadcom", "TSLA": "Tesla", "BRK-B": "Berkshire Hathaway", "LLY": "Eli Lilly", "MU": "Micron", "WMT": "Walmart",
       "JPM": "JPMorgan", "AMD": "AMD", "V": "Visa", "XOM": "Exxon Mobil", "JNJ": "Johnson & Johnson", "MA": "Mastercard",
-      "ABBV": "AbbVie", "INTC": "Intel"}
+      "ABBV": "AbbVie", "INTC": "Intel",
+      # 2026-10-20 추가 29개 (doc/종목-레이더-기획.md 10-12)
+      "TSM": "TSMC", "ASML": "ASML", "LRCX": "Lam Research", "AMAT": "Applied Materials", "ORCL": "Oracle", "ANET": "Arista Networks",
+      "VRT": "Vertiv", "EQIX": "Equinix", "CEG": "Constellation Energy", "CRWV": "CoreWeave", "SPCX": "SpaceX", "RKLB": "Rocket Lab",
+      "KO": "Coca-Cola", "PG": "Procter & Gamble", "PM": "Philip Morris", "NFLX": "Netflix", "DIS": "Disney", "HD": "Home Depot",
+      "MCD": "McDonald's", "CAT": "Caterpillar", "GE": "GE Aerospace", "COST": "Costco", "CVX": "Chevron", "LIN": "Linde",
+      "NEM": "Newmont", "WELL": "Welltower", "PLD": "Prologis", "NEE": "NextEra Energy", "SO": "Southern Company"}
 
 
 def _env():

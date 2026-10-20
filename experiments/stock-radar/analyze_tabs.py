@@ -1,7 +1,7 @@
 """상세 페이지 탭 재료 — 실적과 기대 카드 넷 · 캘린더 카드 셋 · 애널리스트. 모두 파이썬 값 (AI 없음).
 
 판정 규칙과 기준값은 NVDA 리포트 expect.py · cal_cards.py 와 같다. 바뀐 것은 비교 묶음뿐이다:
-  - NVDA 리포트 `기술주 15개` → 여기서는 `시총 상위 20개`(후보 20개 중앙값, 이 종목 포함 — NVDA 도 자기를 넣는다)
+  - NVDA 리포트 `기술주 15개` → 여기서는 `시총 상위 20개`(순위 대상 가운데 시총 상위 20개의 중앙값 — peer_group. 후보가 20개였을 때는 후보 전체)
   - `함께 보는 회사 실적` = 후보 20개 가운데 같은 업종 회사 (NVDA 는 고객 · 공급 · 경쟁사 목록)
   - 소송 카드는 없다 — 사건을 추적하는 종목이 NVDA 뿐이다
 시장 일정(금리 결정 · 물가 · 고용 · 옵션 만기 …)은 시장 전체 일정이라 NVDA 리포트 DB 의 calendar 를 같이 읽는다.
@@ -34,15 +34,23 @@ def _med(xs, need=EX.MIN_PEERS):
     return statistics.median(xs) if len(xs) >= need else None
 
 
+def peer_group(snap):
+    """비교 묶음 `시총 상위 20개` 의 종목 — 순위 대상(TOP_EXCLUDE 밖) 가운데 시총 상위 PEER_GROUP_N 개.
+    후보가 20개였을 때는 후보 전체였다. 48개로 늘린 뒤에도 묶음 이름과 뜻이 같게 (2026-10-20)."""
+    caps = snap.get("caps") or {}
+    pool = [c[0] for c in U.CANDIDATES if c[0] not in U.TOP_EXCLUDE and caps.get(c[0])]
+    return set(sorted(pool, key=lambda s: -caps[s])[:U.PEER_GROUP_N])
+
+
 # ---------------------------------------------------------------- 실적과 기대 (EX.card_* 와 같은 판정)
 
-def card_revenue(sym, extra):
+def card_revenue(sym, extra, group):
     series = ((extra.get("revenue") or {}).get("series")) or {}
     me = [r for r in series.get(sym) or [] if r.get("yoy") is not None][-8:]
     if not me:
         return None
     by_cq = {}
-    for rows in series.values():
+    for rows in (v for k, v in series.items() if k in group):   # 비교 = 시총 상위 20개만
         for r in rows:
             if r.get("yoy") is not None:
                 by_cq.setdefault(r["cq"], []).append(r["yoy"])
@@ -54,9 +62,10 @@ def card_revenue(sym, extra):
             "qoq": (last["rev"] / prev[-1]["rev"] - 1) * 100 if prev else None, "bars": bars, "peers_last": bars[-1]["peers"]}
 
 
-def card_eps(sym, extra):
+def card_eps(sym, extra, group):
     allx = {s: (v or {}).get("eps") or {} for s, v in (extra.get("stocks") or {}).items()}
     me = allx.get(sym) or {}
+    allx = {s: v for s, v in allx.items() if s in group}   # 비교 = 시총 상위 20개만
     if "current" not in me:
         return None
 
@@ -91,9 +100,10 @@ def card_move(s, snap, extra):
             "iv": x["iv"], "earn_day": earn_day, "past": e.get("median_abs")}
 
 
-def card_short(sym, extra):
+def card_short(sym, extra, group):
     allx = {s: (v or {}).get("short") or {} for s, v in (extra.get("stocks") or {}).items()}
     me = allx.get(sym) or {}
+    allx = {s: v for s, v in allx.items() if s in group}   # 비교 = 시총 상위 20개만
     if not me.get("shares") or not me.get("prior") or me.get("pct") is None:
         return None
     chg = (me["shares"] / me["prior"] - 1) * 100
@@ -218,8 +228,9 @@ def all_upcoming(s, peers, macro):
 def build(s, snap, extra):
     """s 에 expect · calendar_cards · analysts 를 단다."""
     s["expect"] = {}
-    for k, f in (("revenue", lambda: card_revenue(s["sym"], extra)), ("eps", lambda: card_eps(s["sym"], extra)),
-                 ("move", lambda: card_move(s, snap, extra)), ("short", lambda: card_short(s["sym"], extra))):
+    group = peer_group(snap)
+    for k, f in (("revenue", lambda: card_revenue(s["sym"], extra, group)), ("eps", lambda: card_eps(s["sym"], extra, group)),
+                 ("move", lambda: card_move(s, snap, extra)), ("short", lambda: card_short(s["sym"], extra, group))):
         try:
             s["expect"][k] = f()
         except Exception as e:   # noqa: BLE001

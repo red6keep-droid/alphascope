@@ -118,9 +118,13 @@ def price_card(s, today):
             f'<div style="margin-top:8px;">{rows}</div></details></div>')
 
 
+IMAGE_BRANCH = "radar-images"   # 종목 그래프 전용 브랜치 — 매 실행 그날 그림만 담아 덮어쓴다(이력 없음). 지난 그림은 남지 않는다 (2026-10-20 사용자: 이미지는 휘발성)
+
+
 def chart_url(sym):
-    """가격 그래프 주소 — 고정 페이지라 파일 이름도 고정(날짜 없음). 게시 때 gh-pages 에 올리고 jsDelivr 캐시를 비운다 (NVDA 그래프와 같은 경로)."""
-    return f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@gh-pages/images/{chart_ref(sym)}"
+    """가격 그래프 주소 — 고정 페이지라 파일 이름도 고정(날짜 없음). 게시 때 radar-images 브랜치에 올리고 jsDelivr 캐시를 비운다.
+    gh-pages(keep_files)에 두면 매일 49장이 커밋 이력에 쌓여 저장소가 커진다 — 그래서 따로 (2026-10-20)."""
+    return f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{chart_ref(sym)}"
 
 
 def chart_ref(sym):
@@ -453,7 +457,7 @@ def cal_earnings(s, c):
     return [tuple(fix(v) for v in ln) for ln in lines], fix(tip), state, left
 
 
-ROLE_ORDER = ("고객", "공급", "협력", "경쟁", "보유")
+ROLE_ORDER = ("고객", "공급", "협력", "경쟁", "동종", "유통", "보유")   # 동종 · 유통 : 2026-10-20 추가 종목 (같은 업종 회사 · 파는 곳)
 
 
 def cal_peers(s, c):
@@ -562,13 +566,13 @@ def list_row(s, first):
 
 def list_body(a):
     top = [s for s in a["stocks"] if s["in_top"]]
-    rest = [s for s in a["stocks"] if not s["in_top"]]
+    rest = [s for s in a["stocks"] if not s["in_top"] and s.get("rank") and s["rank"] <= U.PEER_GROUP_N]   # 목록은 시총 상위 20위까지 — 48개 확대 뒤에도 같은 목록 (2026-10-20)
     card = lambda xs: f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{"".join(list_row(s, i == 0) for i, s in enumerate(xs))}</span></div>'   # noqa: E731
     tip = ("미국 S&P 500 종목 가운데 회사 전체 값(주가 × 주식 수)이 가장 큰 10개\n"
            f"· 오늘 1위 : {top[0]['name']} {cap_text(top[0]['cap'])}\n"
            f"· 나누는 법 : 11위 밖으로 {U.SWAP_DAYS}거래일 연속 밀리면 후보 중 가장 높았던 종목과 바꾼다")
     body = (list_lead(a) + updated_line(a) + R._card_title("시가총액 순위", tip) + card(top)
-            + _dk.fold(f"후보 11~{len(a['stocks'])}위 보기", card(rest))
+            + _dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest))
             + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다. 엔비디아는 매일 나오는 리포트로 갑니다."))
     return wrap(body)
 

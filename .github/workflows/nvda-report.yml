@@ -144,10 +144,7 @@ jobs:
           else
             echo "::warning::가격 그래프가 없습니다 — 글은 그래프 없이 나간다."
           fi
-          # 시총 TOP 10 종목 그래프 (고정 이름 radar-<slug>-price.png — 매일 덮어쓴다)
-          if compgen -G "experiments/stock-radar/output/images/radar-*.png" > /dev/null; then
-            cp experiments/stock-radar/output/images/radar-*.png deploy/images/
-          fi
+          # 종목 그래프(radar-*.png)는 여기 넣지 않는다 — 아래 radar-images 단계 (2026-10-20 휘발성)
 
       - name: Deploy chart image to gh-pages branch
         if: hashFiles('deploy/images/*.png') != ''
@@ -157,6 +154,22 @@ jobs:
           publish_dir: ./deploy
           publish_branch: gh-pages
           keep_files: true
+
+      # 종목 그래프 — radar-images 브랜치를 그날 그림만으로 새로 만들어 덮어쓴다(부모 커밋 없음 = 이력 없음, 2026-10-20 사용자: 이미지는 휘발성).
+      # gh-pages(keep_files)에 두면 매일 수십 장이 커밋 이력에 쌓인다. 페이지 <img> 주소는 render_pages.chart_url (@radar-images).
+      - name: Deploy stock charts (radar-images branch, no history)
+        if: hashFiles('experiments/stock-radar/output/images/radar-*.png') != ''
+        run: |
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          # 트리를 직접 만든다 (images/ 아래 그날 PNG 만) — 작업 폴더 · 다른 브랜치 내용이 섞이지 않게
+          SUB="$(for f in experiments/stock-radar/output/images/radar-*.png; do
+            printf '100644 blob %s\t%s\n' "$(git hash-object -w "$f")" "$(basename "$f")"
+          done | git mktree)"
+          TREE="$(printf '040000 tree %s\timages\n' "$SUB" | git mktree)"
+          COMMIT="$(git commit-tree "$TREE" -m "Stock charts $(date -u +%F) [skip ci]")"
+          git push --force origin "$COMMIT:refs/heads/radar-images"
+          echo "종목 그래프 $(git ls-tree "$SUB" | wc -l)장 → radar-images (이력 없이 덮어씀)"
 
       - name: Purge and verify jsDelivr cache
         if: hashFiles('experiments/nvda-report/output/image_ref.txt') != ''
@@ -184,7 +197,7 @@ jobs:
         continue-on-error: true
         run: |
           for f in experiments/stock-radar/output/images/radar-*.png; do
-            [ -f "$f" ] && curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/$(basename "$f")" || true
+            [ -f "$f" ] && curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@radar-images/images/$(basename "$f")" || true
           done
           python experiments/stock-radar/publish_pages.py
 

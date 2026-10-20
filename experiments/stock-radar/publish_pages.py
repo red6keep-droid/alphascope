@@ -1,4 +1,4 @@
-"""시총 TOP 10 고정 페이지 게시 — 목록 1 + 간단형 상세 19 (doc/종목-레이더-기획.md 10-3 · 10-8 1단계, 2026-10-18 사용자 "발행까지").
+"""종목 고정 페이지 게시 — 목록 1 + 간단형 상세 (후보 수 − NVDA), 새 페이지는 하루 universe.NEW_PAGES_PER_RUN 개까지 (doc/종목-레이더-기획.md 10-3 · 10-8 1단계, 2026-10-18 사용자 "발행까지").
 
     python experiments/stock-radar/publish_pages.py            # 실제 게시 (main.py 가 만든 output/*.html)
     python experiments/stock-radar/publish_pages.py --dry      # 무엇을 만들고 / 갱신할지만
@@ -90,9 +90,13 @@ def publish(only=None, dry=False):
         if not token:
             break
     by_url = {_norm(p.get("url")): p for p in items}
-    made = updated = failed = 0
+    made = updated = failed = waiting = new_tries = 0
     for key, title, slug, url, path in targets(only):
         page = by_url.get(_norm(url))
+        if not page and new_tries >= U.NEW_PAGES_PER_RUN:   # 새 페이지는 실행 한 번에 상한까지 — 나머지는 다음 날 (2026-10-20 사용자: "하루에 조금씩")
+            waiting += 1
+            continue
+        new_tries += 0 if page else 1   # 만들다 실패한 것도 센다 — 429 가 나는 날 더 밀어붙이지 않게
         if dry:
             print(f"[pages] {'갱신' if page else '생성'} {key}: {title} → {url}")
             continue
@@ -115,7 +119,7 @@ def publish(only=None, dry=False):
             failed += 1
             print(f"::warning::[pages] {key} 실패: {str(e)[:200]}")
         time.sleep(4)   # API 버스트를 피한다 (1초 간격은 6번째부터 429)
-    print(f"[pages] 생성 {made} · 갱신 {updated} · 실패 {failed}")
+    print(f"[pages] 생성 {made} · 갱신 {updated} · 실패 {failed}" + (f" · 다음 실행으로 미룸 {waiting} (하루 새 페이지 {U.NEW_PAGES_PER_RUN}개까지)" if waiting else ""))
     return failed == 0
 
 
