@@ -64,9 +64,11 @@ def _translate_prompt(items):
         "다음은 미국 경제 뉴스(CNBC)의 영문 제목과 요약 목록이다. 항목마다 세 가지를 만들어라.\n"
         "1) t: 제목을 한국 경제지 헤드라인처럼 자연스러운 한국어로. 의미를 더하거나 빼지 말고, 고유명사(기업·인명·지수)는 통용 표기, 숫자·티커는 그대로.\n"
         "2) why: 투자자가 이 기사를 볼 만한 이유 한 문장(40자 안팎, '~다'로 끝냄). 요약에 있는 사실만 쓰고, 매수·매도 권유나 전망 단정은 하지 않는다.\n"
-        "3) s: 영문 요약을 옮긴 기사 소개 한 문장(100자 안팎). 반드시 '기사는'으로 시작하고 '~고 전한다' 또는 '~고 본다'로 끝낸다 — 기사의 주장임이 드러나게. "
+        "3) s: 영문 요약을 옮긴 기사 소개 한 줄(100자 안팎). 뉴스 헤드라인처럼 명사형으로 끝낸다 — '~ 선정' · '~ 전망' · '~ 유입' · '~ 기록'. "
+        "'기사는'으로 시작하지 않고, '~다' · '전한다' · '본다' · '밝혔다'로 끝내지 않는다. 누구의 말·판단인지는 주어로 밝힌다(예: '애널리스트가 선정', '연준 위원, 추가 인하 서두를 필요 없다는 입장'). "
         "요약에 있는 내용만 쓰고 새 내용·의견을 더하지 않는다. 숫자·비교(무엇보다 높고 낮은지)·시간 순서는 원문 그대로 옮긴다. "
-        "예: 'The odds are higher than before X, but lower than after Y' → '기사는 확률이 X 전보다 높지만 Y 직후보다는 낮다고 전한다'. 요약이 비었거나 제목과 같은 내용뿐이면 빈 문자열.\n"
+        "예: 'Analysts picked these 5 stocks to buy in October' → '10월에 살 만한 종목 5개, 애널리스트가 선정' · "
+        "'The odds are higher than before X, but lower than after Y' → '확률이 X 전보다 높지만 Y 직후보다는 낮은 수준'. 요약이 비었거나 제목과 같은 내용뿐이면 빈 문자열.\n"
         '결과는 입력과 같은 순서·같은 개수의 JSON 배열 [{"t": "...", "why": "...", "s": "..."}] 로만 답하라.\n\n' + json.dumps(src, ensure_ascii=False)
     )
 
@@ -80,10 +82,13 @@ def _clean_out(out):
     return [{"t": x["t"].strip(), "why": x["why"].strip(), "s": _intro(x.get("s"))} for x in out]
 
 
+SUMMARY_STYLE = 2   # 소개 문체 판 — 2: 명사형 "… 애널리스트가 선정" (2026-10-20 사용자: "전한다" 금지). 판이 다른 옛 소개는 다시 만든다
+
+
 def _intro(s):
-    """기사 소개 — '기사는 …' 으로 시작하는 문장만 싣는다. 형식이 어긋나면(기사 속 의견이 우리 말처럼 읽힐 수 있다) 빈 문자열 (2026-10-19)."""
-    s = str(s or "").strip()
-    return s if s.startswith("기사는") and len(s) <= 200 else ""
+    """기사 소개 — 명사형으로 끝나는 한 줄만 싣는다 (2026-10-20 사용자). '기사는 …' 으로 시작하거나 '~다' 로 끝나면 빈 문자열."""
+    s = str(s or "").strip().rstrip(".")
+    return s if s and not s.startswith("기사는") and not s.endswith("다") and len(s) <= 200 else ""
 
 
 def translate_titles(titles):
@@ -122,8 +127,9 @@ def add_korean_titles(items):
         if prev.get(it["link"]):
             it["title_ko"] = prev[it["link"]]["title_ko"]
             it["why_ko"] = prev[it["link"]]["why_ko"]
-            if "summary_ko" in prev[it["link"]]:
+            if "summary_ko" in prev[it["link"]] and prev[it["link"]].get("summary_v") == SUMMARY_STYLE:   # 옛 문체("기사는 … 전한다")는 다시 만든다
                 it["summary_ko"] = prev[it["link"]]["summary_ko"]
+                it["summary_v"] = SUMMARY_STYLE
     # 선정 이유 · 소개가 없는 옛 번역도 다시 만든다. 소개는 빈 문자열("요약이 제목뿐")도 만든 것으로 친다 — 매번 다시 묻지 않게
     todo = [it for it in items if not (it.get("title_ko") and it.get("why_ko") and "summary_ko" in it)]
     if not todo:
@@ -141,6 +147,7 @@ def add_korean_titles(items):
         if t["why"]:
             it["why_ko"] = t["why"]
         it["summary_ko"] = t["s"]
+        it["summary_v"] = SUMMARY_STYLE
     print(f"[번역] 새 제목 {len(todo)}건 번역 · 재사용 {len(items) - len(todo)}건")
 
 

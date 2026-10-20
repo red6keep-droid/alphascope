@@ -1477,7 +1477,7 @@ MOCK_NEWS = [
      "source": "CNBC", "published": "2026-09-03 20:41:00", "link": "#",
      "title_ko": "AI 설비투자 전망 상향에 반도체 ETF로 사상 최대 자금 유입",
      "why_ko": "지난주 반도체 펀드에 41억 달러가 들어와 AI 투자 기대가 이어지고 있다.",
-     "summary_ko": "기사는 대형 기술 기업들이 AI 설비투자 계획을 늘리면서 지난주 반도체 ETF에 41억 달러가 들어와 주간 최대를 기록했다고 전한다."},   # 기사 소개 미리보기 (2026-10-19)   # 선정 이유 미리보기 (2026-10-14)
+     "summary_ko": "대형 기술 기업 AI 설비투자 확대로 지난주 반도체 ETF에 41억 달러 유입, 주간 최대 기록"},   # 기사 소개 미리보기 (2026-10-19)   # 선정 이유 미리보기 (2026-10-14)
     {"title": "Fed official says there is no rush to cut rates further",
      "summary": "The policymaker pointed to resilient consumer spending.",
      "source": "Reuters", "published": "2026-09-03 19:55:00", "link": "#"},
