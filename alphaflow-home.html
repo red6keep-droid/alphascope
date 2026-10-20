@@ -280,7 +280,7 @@ body.menu-open { overflow: hidden; }
 
 /* 오늘의 급등주는 홈에서 삭제 (2026-10-12 사용자) — 리포트 카드 셋만 */
 .briefing-body { display: flex; align-items: stretch; gap: 20px; }
-/* 데일리 리포트 · 트럼프 SNS 트렌드 · 엔비디아 데일리 — 세 카드를 같은 폭으로 나란히 둔다 (2026-10-11 엔비디아 추가) */
+/* 미국 증시 리포트 · 트럼프 SNS 트렌드 · 인물 발언 — 두 칸 + 셋째(인물 발언)는 전폭 (2026-10-20 엔비디아 카드 삭제 · 인물 발언 추가) */
 .briefing-main {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));   /* PC 폭 980 에서는 2열 + 셋째(트럼프) 전폭 — 3개 한 줄은 카드가 310 이라 제목 · 가격 줄이 넘쳤다 (2026-10-15 사용자) */
@@ -310,8 +310,8 @@ body.menu-open { overflow: hidden; }
 /* 카드 머리: 어느 연재인지와 그 글의 날짜. 날짜는 피드에서 채운다. */
 .report-card-date { margin-left: auto; margin-right: 8px; font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) */
 .report-block { display: flex; flex-direction: column; gap: 8px; }
-/* 홈 엔비디아 카드 — 가로 구분선 C 카드 규칙: 줄마다 왼쪽 정보명(16px 굵게) · 오른쪽 값(18px 굵게, 증감 색), 구분선 위아래 22 (2026-10-13 사용자) */
-#nvda-card { padding: 0 16px; gap: 0; }
+/* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
+#radar-card { padding: 0 16px; gap: 0; }
 /* 홈 트럼프 카드 — 발언 줄: 주제 라벨(영역 라벨 모양) + 세부 주제 · 방향 · 대상 왼쪽, 강도 오른쪽, 줄 사이 구분선 (2026-10-15 사용자) */
 #trump-card { padding: 0 16px; gap: 0; }
 .tr-main { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; font-size: 16px; line-height: 24px; color: #111; }
@@ -696,7 +696,7 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 #report-card .report-columns li::before { content: none; }
 /* 첫 탭(거래상위)은 왼쪽 여백 없이 구분선 시작점에서 (2026-10-15 사용자) */
 .home-cards .rank-card .tab:first-child { padding-left: 0; }   /* 제목이 카드 안으로 들어가 쌓일 때 위 여백 +15 는 필요 없음 */
-/* 카드 순서: 리포트 → 주요 지수 → 섹터 현황 → 시총 TOP 10. PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭, 지수 · 섹터가 나란히 (2026-10-15 사용자) */
+/* 카드 순서: 리포트 → 시총 TOP 10 (주요 지수 · 섹터 현황은 2026-10-20 삭제). PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭 (2026-10-15 사용자) */
 @media (min-width: 901px) {
   .home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-cards > .briefing, .home-cards > .rankings { grid-column: 1 / -1; }
@@ -719,9 +719,9 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   /* 검색창은 헤더 아래로 내려오는 줄 — 아이콘들은 오른쪽에 그대로 (2026-10-12 사용자: 알림 · 검색 · 메뉴 우측 정렬) */
   .search-bar { display: none; position: absolute; top: calc(100% + 8px); left: var(--gutter); right: var(--gutter); width: auto; box-shadow: 0 8px 24px rgba(15,23,42,.14); }
   .search-bar.is-open { display: flex; }
-  /* 세 카드가 좁아지면 두 칸 + 셋째(엔비디아)는 전폭 */
+  /* 세 카드가 좁아지면 두 칸 + 셋째(인물 발언)는 전폭 */
   .briefing-main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .briefing-main > .report-col:last-child { grid-column: 1 / -1; }   /* 셋째 카드(트럼프, 2026-10-14 순서)는 전폭 */
+  .briefing-main > .report-col:last-child { grid-column: 1 / -1; }   /* 셋째 카드(인물 발언, 2026-10-20 순서)는 전폭 */
 }
 
 @media (max-width: 900px) {
@@ -892,14 +892,9 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         <div class="report-col">
         <h3 class="report-title"><span class="report-icon" style="background:#E53E3E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="5" width="3" height="9" rx=".5"/><rect x="11" y="2" width="3" height="12" rx=".5"/></svg></span>미국 증시 리포트<span class="report-card-date" data-date="report-card"></span></h3>
         <a class="report-card" id="report-card" href="#">
+          <!-- 요약은 한 줄만 — 자세한 것은 글에서 (2026-10-20 사용자: "너무 길다"). 핵심 인사이트 구획은 삭제 -->
           <div class="report-block" data-hook="summary">
             <!-- 첫 구획 라벨은 두지 않는다 (2026-10-13 사용자) -->
-            <div class="report-columns">
-              <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
-            </div>
-          </div>
-          <div class="report-block" data-hook="insight">
-            <span class="badge badge--insight">오늘의 핵심 인사이트</span>
             <div class="report-columns">
               <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
             </div>
@@ -907,14 +902,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         </a>
         </div>
 
-        <!-- 엔비디아 데일리 (2026-10-11). 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
-        <div class="report-col">
-        <h3 class="report-title"><span class="report-icon" style="background:#76B900;" aria-hidden="true"><img src="https://financialmodelingprep.com/image-stock/NVDA.png" alt="" onerror="this.hidden=true"/></span>엔비디아 리포트<span class="report-card-date" data-date="nvda-card"></span></h3>
-        <a class="report-card" id="nvda-card" href="/search/label/엔비디아">
-          <!-- 가격 줄 → 거래량 · 변동폭 · 20일 평균 · RSI 14 한 줄(세로 구분선) → 중요 이슈 라벨 + 글머리표 (2026-10-14 사용자) -->
-          <div class="kv-rows" data-hook="nvda-rows"><div class="kv-row"><span class="kv-name">리포트를 불러오는 중…</span></div></div>
-        </a>
-        </div>
+        <!-- 엔비디아 리포트 카드는 삭제 (2026-10-20 사용자). 메뉴 · 시총 TOP 10 의 NVDA 줄은 엔비디아 글 목록으로 간다 -->
 
         <!-- 트럼프 트렌드 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
         <div class="report-col">
@@ -924,52 +912,20 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
           <div class="kv-rows" data-hook="trump-rows"><div class="kv-row"><span class="kv-name">리포트를 불러오는 중…</span></div></div>
         </a>
         </div>
+
+        <!-- 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 인물마다 가장 강한 발언 한 줄 — 이름 라벨 · 헤드라인 왼쪽, 강도 오른쪽 (트럼프 카드와 같은 줄) -->
+        <div class="report-col">
+        <h3 class="report-title"><span class="report-icon" style="background:#0F766E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4"/></svg></span>인물 발언<span class="report-card-date" data-date="radar-card"></span></h3>
+        <a class="report-card" id="radar-card" href="/search/label/인물%20발언">
+          <div class="kv-rows" data-hook="radar-rows"><div class="kv-row"><span class="kv-name">리포트를 불러오는 중…</span></div></div>
+        </a>
+        </div>
       </div>
 
     </div>
   </section>
 
-  <!-- ====================================================================
-       2. 지수 카드  (data.json 의 indices 연동)
-       ==================================================================== -->
-  <section class="index-section" aria-labelledby="index-title">
-    <div class="section-head"><h2 class="section-title" id="index-title"><span class="report-icon" style="background:#4963CA;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l4-4 3 3 5-6"/><path d="M10 5h4v4"/></svg></span>주요 지수</h2></div>
-    <!-- 지수 4개 = 카드 하나, S&P 500 · 나스닥 줄 + 더 보기 줄 안에 다우존스 · 러셀 2000 (2026-10-13 사용자) -->
-    <div class="index-card">
-      <div class="index-rows" id="index-row"></div>
-      <div class="index-rows" id="index-more" hidden="hidden"></div>
-      <button type="button" class="fold-btn" id="index-toggle" aria-expanded="false" aria-controls="index-more" hidden="hidden"><span>지수 더 보기</span>
-        <svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></button>
-    </div>
-  </section>
-
-  <!-- ====================================================================
-       4. 섹터 현황 (2026-10-14 사용자: 주요 핵심 섹터 현황 → 섹터 현황)
-       ==================================================================== -->
-  <!-- 섹터는 섹터 ETF 11개의 실제 일일 등락률(data.json sectors, fetch_stocks.py) — 손으로 넣은 업종 비중 · 히트맵은 삭제 (2026-10-12 사용자: "히트맵은 정확한 정보가 아니면 삭제", "가짜 데이터는 모두 삭제").
-       제목은 카드 밖 + 아이콘 -->
-  <section class="sector-section" aria-labelledby="sector-title">
-    <div class="section-head">
-      <h2 class="section-title" id="sector-title">
-        <span class="report-icon" style="background:#0F766E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></span>섹터 현황
-      </h2>
-      <span class="section-note">섹터 ETF 11개 · 일일 등락률</span>
-    </div>
-    <div class="card sector-card">
-      <table class="sector-table">
-        <thead>
-          <tr>
-            <th><span class="sr-only">순위</span></th>
-            <th>업종명</th>
-            <th>등락률</th>
-          </tr>
-        </thead>
-        <tbody id="sector-body"><tr><td colspan="3" class="sector-empty">데이터를 불러오는 중…</td></tr></tbody>
-      </table>
-      <button type="button" class="fold-btn" id="sector-toggle" aria-expanded="false" hidden="hidden"><span>섹터 더 보기</span>
-        <svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></button>
-    </div>
-  </section>
+  <!-- 주요 지수 · 섹터 현황 카드는 삭제 — 미국 증시 리포트에 나온다 (2026-10-20 사용자) -->
 
   <!-- ====================================================================
        3. 시총 TOP 10  (data.json 연동) — 옛 이름 실시간 랭킹 (2026-10-18 사용자: 고정 10종목이라 이름이 틀림, 기획 10-10)
@@ -1125,10 +1081,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     JNJ: 'johnson-johnson-jnj-stock', MA: 'mastercard-ma-stock', ABBV: 'abbvie-abbv-stock', INTC: 'intel-intc-stock' };
   var BLOG_HOME = 'https://alpha-scope.blogspot.com/';
   function pageFor(ticker) {
-    if (ticker === 'NVDA') {
-      var nv = document.getElementById('nvda-card');
-      return (nv && nv.href && nv.href.indexOf('/20') > 0) ? nv.href : BLOG_HOME + 'search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84';
-    }
+    if (ticker === 'NVDA') return BLOG_HOME + 'search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84';   /* 엔비디아 글 목록 — 홈 엔비디아 카드(최신 글 주소)는 2026-10-20 삭제 */
     return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
   }
 
@@ -1140,63 +1093,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     return String(ticker).replace(/[^A-Z]/g, '').slice(0, 2) || '?';
   }
 
-  /* ============================================================= 지수 카드 */
-
-  /* 데이터가 오기 전(또는 수집 실패 시)에도 카드 틀은 유지한다. */
-  /* 지수가 나타내는 것 — 이름 옆 작은 괄호 (2026-10-14 사용자: "모든 지수 타이틀옆에 (소형주) 이렇게"). 데일리 렌더러 INDEX_LABELS 와 같다 */
-  var INDEX_MEANING = { '^GSPC': '대형주', '^IXIC': '기술주', '^DJI': '우량주', '^RUT': '소형주',
-    'S&P 500': '대형주', '나스닥 종합': '기술주', '다우존스': '우량주', '러셀 2000': '소형주' };
-
-  var INDEX_PLACEHOLDERS = [
-    { name: 'S&P 500' }, { name: '나스닥 종합' },
-    { name: '다우존스' }, { name: '러셀 2000' }
-  ];
-
-  /* 지수 한 줄 — 이름(+장중·장마감) 왼쪽, 지수 숫자(21px) + 등락 오른쪽. 간략 정보만 (2026-10-13 사용자) */
-  function indexCard(ix) {
-    var row = el('div', 'index-rowline');
-    var name = el('span', 'index-name', String(ix.name || ix.s || '—').replace(/\s*종합$/, ''));   /* 나스닥 종합 → 나스닥 (2026-10-15 사용자) */
-    var mean = INDEX_MEANING[ix.s] || INDEX_MEANING[ix.name];   /* 지수 이름 옆 (의미) — 블로그 모든 지수 이름 (2026-10-14 사용자). 장중 · 장마감 글자는 삭제 (같은 날) */
-    if (mean) name.appendChild(el('span', 'index-status', '(' + mean + ')'));
-    row.appendChild(name);
-    var val = el('span', 'index-value');
-    val.appendChild(el('span', 'index-price' + (ix.c !== undefined && ix.c !== null ? ' ' + signClass(ix.c) : ''), fmt(ix.p)));   /* 지수 숫자도 증감 색 (2026-10-13 사용자) */
-    if (ix.c !== undefined && ix.c !== null) {
-      val.appendChild(el('span', 'index-change ' + signClass(ix.c), arrow(ix.c) + fmt(Math.abs(ix.c)) + ' (' + (ix.cp >= 0 ? '+' : '-') + fmt(Math.abs(ix.cp)) + '%)'));
-    } else {
-      val.appendChild(el('span', 'index-change', '—'));
-    }
-    row.appendChild(val);
-    return row;
-  }
-
-  /* 지수 카드: S&P 500 · 나스닥만 보이고 다우존스부터는 펼침 버튼 안 (2026-10-12 사용자) */
-  var INDEX_SHOWN = 2;
-  function renderIndices(list) {
-    var row = document.getElementById('index-row'), more = document.getElementById('index-more'), btn = document.getElementById('index-toggle');
-    if (!row) return;
-    var items = (list && list.length) ? list : INDEX_PLACEHOLDERS;
-    row.textContent = '';
-    if (more) more.textContent = '';
-    items.forEach(function (ix, i) { (i < INDEX_SHOWN || !more ? row : more).appendChild(indexCard(ix)); });
-    if (btn && more) {
-      var n = items.length - INDEX_SHOWN;
-      btn.hidden = n <= 0;
-      btn.firstChild.textContent = '지수 ' + n + '개 더 보기';
-    }
-  }
-  (function () {
-    var btn = document.getElementById('index-toggle'), more = document.getElementById('index-more');
-    if (!btn || !more) return;
-    var text = '';
-    btn.addEventListener('click', function () {
-      var open = more.hidden; more.hidden = !open; btn.setAttribute('aria-expanded', String(open));
-      if (open) text = btn.firstChild.textContent;
-      btn.firstChild.textContent = open ? '접기' : text;   /* 펼치면 '접기' (2026-10-13 사용자) */
-    });
-  })();
-
-  renderIndices([]);
+  /* 지수 카드는 삭제 (2026-10-20 사용자: 미국 증시 리포트에 나온다) */
 
   /* ================================================================ 랭킹 */
 
@@ -1309,8 +1206,6 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     .then(function (r) { return r.json(); })
     .then(function (json) {
       stocks = json.stocks || [];
-      renderIndices(json.indices || []);
-      renderSectors(json.sectors || []);
       var d = kstTime(json.updated_at);
       var syncLabel = document.getElementById('sync-label');
       if (d && syncLabel) {
@@ -1320,40 +1215,9 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       }
       renderRankings();
     })
-    .catch(function () { renderRankings(); renderSectors([]); });
+    .catch(function () { renderRankings(); });
 
-  /* ================================================================ 섹터 */
-  /* 섹터 ETF 11개의 실제 일일 등락률 (data.json sectors — fetch_stocks.py). 손으로 넣은 업종 비중 · 히트맵은 삭제 (2026-10-12 사용자) */
-  function renderSectors(list) {
-    var body = document.getElementById('sector-body');
-    if (!body) return;
-    body.textContent = '';
-    if (!list || !list.length) {
-      var tr = el('tr'), td = el('td', 'sector-empty', '섹터 데이터를 아직 받지 못했습니다.');
-      td.colSpan = 3; tr.appendChild(td); body.appendChild(tr);
-      return;
-    }
-    list.slice().sort(function (a, b) { return (b.cp || 0) - (a.cp || 0); }).forEach(function (x, i) {
-      var tr = el('tr');
-      if (i >= SECTOR_SHOWN) tr.hidden = !sectorOpen;   /* 3개까지, 나머지는 카드 안 더 보기 (2026-10-13 사용자) */
-      tr.appendChild(el('td', null, String(i + 1)));
-      var tdN = el('td', null, x.name);
-      tdN.appendChild(el('span', 'sector-etf', x.s));
-      tr.appendChild(tdN);
-      var tdC = el('td');
-      tdC.appendChild(el('span', 'sector-change ' + signClass(x.cp), arrow(x.cp) + fmt(Math.abs(x.cp)) + '%'));
-      tr.appendChild(tdC);
-      body.appendChild(tr);
-    });
-    var tg = document.getElementById('sector-toggle');
-    if (tg) { var n = list.length - SECTOR_SHOWN; tg.hidden = n <= 0; tg.firstChild.textContent = sectorOpen ? '접기' : '섹터 ' + n + '개 더 보기'; tg.setAttribute('aria-expanded', String(sectorOpen)); }
-    lastSectors = list;
-  }
-  var SECTOR_SHOWN = 3, sectorOpen = false, lastSectors = [];
-  (function () {
-    var tg = document.getElementById('sector-toggle');
-    if (tg) tg.addEventListener('click', function () { sectorOpen = !sectorOpen; renderSectors(lastSectors); });
-  })();
+  /* 섹터 현황 카드는 삭제 (2026-10-20 사용자: 미국 증시 리포트에 나온다) */
 
   /* ================================================================= 뉴스 */
 
@@ -1446,7 +1310,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     {
       id: 'report-card',
       label: '데일리 브리핑',
-      map: { summary: ['(머리)', '오늘 한 줄'], insight: ['(종합)', '종합', '종합 — 현재 시장 상태'] },   /* 주요 지수 수치는 홈에 싣지 않는다 — 한 줄 결론만 (2026-10-12 사용자: 요약 짧게) */   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용. (종합) = 머리 카드 안 종합 문단 (2026-10-12) */
+      map: { summary: ['(머리)', '오늘 한 줄'] },   /* 주요 지수 수치는 홈에 싣지 않는다 — 한 줄 결론만 (2026-10-12 사용자: 요약 짧게) */   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용 */
+      lines: { summary: 1 },   /* 머리 첫 줄(오늘 결론)만 — 핵심 인사이트 구획은 삭제 (2026-10-20 사용자: "너무 길다, 상세는 페이지에서") */
       picks: true,
       empty: '아직 발행된 리포트가 없습니다.'
     },
@@ -1460,12 +1325,12 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       empty: '아직 발행된 트렌드 리포트가 없습니다.'
     },
     {
-      id: 'nvda-card',
-      label: '엔비디아',
-      map: {}, fill: fillNvda, rows: 'nvda-rows',   /* 정보명 · 값 줄 카드 (2026-10-13 사용자) */
-      any: true,
+      id: 'radar-card',
+      label: '인물 발언',
+      map: { lead: ['(머리)'] },   /* 목록 화면 요약용 — `발언 N건 · M명` · 가장 강한 발언. 홈 카드는 fill 이 그린다 */
+      fill: fillRadar, rows: 'radar-rows',   /* 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 엔비디아 카드는 삭제 (같은 날) */
       picks: false,
-      empty: '아직 발행된 엔비디아 리포트가 없습니다.'
+      empty: '아직 발행된 인물 발언 리포트가 없습니다.'
     }
   ];
   var PICKS_HEADS = ['급등주', '오늘의 급등주 TOP 5'];   /* 새 디자인 제목 · 옛 글 제목 */
@@ -1686,47 +1551,54 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       if (r.intensity) { var it = el('span', 'tr-int', '강도 : '); it.appendChild(el('b', null, r.intensity)); row.appendChild(it); }   /* '강도 :' 보통 굵기 · 숫자만 굵게 (2026-10-15 사용자) */
       box.appendChild(row);
     });
-    /* 라벨 폭을 가장 넓은 라벨에 맞춰 뒤 글자의 세로 기준선을 맞춘다 (2026-10-15 사용자). 웹 글꼴이 늦게 오면 다시 잰다 */
-    function evenTags() {
+    evenTags(box);
+  }
+
+  /* 라벨 폭을 가장 넓은 라벨에 맞춰 뒤 글자의 세로 기준선을 맞춘다 (2026-10-15 사용자). 웹 글꼴이 늦게 오면 다시 잰다 — 트럼프 · 인물 발언 카드 */
+  function evenTags(box) {
+    function run() {
       var tags = [].slice.call(box.querySelectorAll('.tr-tag')), w = 0;
       tags.forEach(function (t) { t.style.minWidth = ''; w = Math.max(w, t.getBoundingClientRect().width); });
       if (w) tags.forEach(function (t) { t.style.minWidth = Math.ceil(w) + 'px'; });
     }
-    evenTags();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(evenTags);
+    run();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(run);
   }
 
-  function fillNvda(sec) {
-    var box = document.querySelector('[data-hook="nvda-rows"]');
-    if (!box) return;
-    box.textContent = '';
-    function tone(t) { var up = /▲/.test(t), dn = /▼/.test(t); return up !== dn ? (up ? ' up' : ' down') : ''; }   /* 값만 증감 색 (3-3) */
-    var rows = nvdaRows(sec), stats = el('div', 'kv-stats');
-    /* 가격 줄 왼쪽은 '가격' 대신 오늘 시장(SPY) 대비 — 하락 · 상승이 엔비디아만의 일인지 (2026-10-15 사용자). 값이 없는 옛 글은 '가격' */
-    var rel = (rows.filter(function (r) { return r[0] === 'SPY 대비'; })[0] || [])[1];
-    rows.forEach(function (r) {
-      if (r[0] === 'SPY 대비') return;
-      if (r[0] === '가격') {
-        var row = el('div', 'kv-row'), name;
-        if (rel) {   /* 증감 값 앞 · '시장 대비' 뒤 — 값은 아래 칸 값(20일 평균)과, 글자는 칸 이름(거래량)과 같은 모양 (2026-10-15 사용자) */
-          name = el('span', 'kv-rel');
-          name.appendChild(el('span', 'kv-stat-value' + tone(rel), rel.replace(/\s+/g, ' ')));
-          name.appendChild(el('span', 'kv-stat-name', '시장 대비'));
-        } else name = el('span', 'kv-name', r[0]);
-        row.appendChild(name); row.appendChild(el('span', 'kv-value' + tone(r[1]), r[1])); box.appendChild(row);
+  /* 홈 인물 발언 카드 (2026-10-20 사용자) — 레이더 글 '발언' 구획(people-radar render_html.sec_people)을 읽는다.
+     구조: 인물 소제목(data-sub, "이름 (직함)") 뒤에 발언 목록(li — 첫 칸 = 헤드라인, 라벨 줄에 `강도 N`). 인물마다 첫 발언(가장 강한 것) 하나씩 4명까지 */
+  function radarRows(sec) {
+    var out = [], who = '', used = {};
+    function walk(n) {
+      if (!n || !n.getAttribute) return;
+      if (n.hasAttribute('data-sub')) { who = String((n.querySelector('span > span:last-child') || n).textContent || '').replace(/\s*\([^)]*\)\s*$/, '').replace(/\s+/g, ' ').trim(); return; }
+      if (n.tagName === 'LI') {
+        if (!who || used[who]) return;
+        var head = n.children[0], im = /강도\s*(\d+)/.exec(String(n.textContent || ''));
+        var text = head ? String(head.textContent || '').replace(/\s+/g, ' ').trim() : '';
+        if (text) { used[who] = 1; out.push({ topic: who, text: clip(text), intensity: im ? im[1] : '' }); }
         return;
       }
-      var c = el('div', 'kv-stat');
-      c.appendChild(el('span', 'kv-stat-name', r[0])); c.appendChild(el('span', 'kv-stat-value' + tone(r[1]), r[1].replace(/\s+/g, ' ')));
-      stats.appendChild(c);
-    });
-    if (stats.children.length) box.appendChild(stats);
-    var issues = linesOf(sec['중요 이슈'] || []).slice(0, 3);
-    if (issues.length) {
-      var ir = el('div', 'kv-row kv-row--block'); ir.appendChild(el('span', 'badge badge--nvda-today', '중요 이슈'));
-      var ul = el('ul'); issues.forEach(function (t) { ul.appendChild(tinted(t)); }); ir.appendChild(ul); box.appendChild(ir);
+      for (var i = 0; i < n.children.length; i++) walk(n.children[i]);
     }
-    if (!box.children.length) box.appendChild(el('div', 'kv-row', LOAD_FAILED));
+    (sec['발언'] || []).forEach(walk);
+    return out;
+  }
+  function fillRadar(sec) {
+    var box = document.querySelector('[data-hook="radar-rows"]');
+    if (!box) return;
+    box.textContent = '';
+    var rows = radarRows(sec).slice(0, 4);
+    if (!rows.length) { box.appendChild(el('div', 'kv-row is-note', linesOf(sec['(머리)'] || [])[0] || LOAD_FAILED)); return; }
+    rows.forEach(function (r) {
+      var row = el('div', 'kv-row'), main = el('span', 'tr-main');
+      main.appendChild(el('span', 'tr-tag', r.topic));
+      main.appendChild(el('span', null, r.text));
+      row.appendChild(main);
+      if (r.intensity) { var it = el('span', 'tr-int', '강도 : '); it.appendChild(el('b', null, r.intensity)); row.appendChild(it); }
+      box.appendChild(row);
+    });
+    evenTags(box);
   }
 
   function setDate(id, text) {
