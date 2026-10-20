@@ -307,7 +307,7 @@ def macro_cal_card(a, opened=True):
     tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정\n"
            f"· {days}일 안 {len(items)}건 : 가장 가까운 일정은 {MACRO_KO[items[0]['kind']]} {_md(items[0]['day'])}\n"
            "· 기록상 : 1996년 이후 일정 날의 S&P 500 움직임을 일정 없는 날과 견줬습니다. 일정이 있다고 늘 크게 움직이지는 않았습니다")
-    return C.question_card("다가오는 경제 일정은?", f"{len(items)}건 · {days}일 안", theme, col, lines, tip=tip, opened=opened)
+    return C.question_card("다가오는 경제 일정은?", f"{len(items)}건 · {days}일 안", theme, col, lines, tip=dk.with_src(tip, "FRED · Yahoo Finance"), opened=opened)   # 일정 = FRED 발표일, 움직임 = 가격 (2026-10-20 툴팁 출처)
 
 
 def earnings_cal_card(a):

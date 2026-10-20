@@ -260,7 +260,7 @@ def sec_states(s):
     mr = s.get("market_regime")
     if mr:
         th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
-        out += R._state_card("시장 분위기는?", mr["regime"], th, col, R.regime_lines(mr), "", tip=R.regime_rule(mr), fold=True)
+        out += R._state_card("시장 분위기는?", mr["regime"], th, col, R.regime_lines(mr), "", tip=_dk.with_src(R.regime_rule(mr), "Yahoo Finance · CNN"), fold=True)
     sf = s.get("sector_flow")
     if sf:
         th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))

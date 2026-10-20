@@ -2388,6 +2388,9 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     last = icon;
     pop.querySelector('.rt-pop-title').textContent = titleOf(icon);
     fill(pop.querySelector('.rt-pop-body'), icon.getAttribute('data-tip') || '');
+    /* 데이터 근거 한 줄 (2026-10-20 사용자: "툴팁에 데이터 근거가 명시되어야 한다 · 짧게 반복되는 내용이라 일괄 표시") — 출처는 리포트가 data-src 로 준다 */
+    var src = icon.getAttribute('data-src');
+    if (src) { var sr = document.createElement('div'); sr.className = 'rt-pop-src'; sr.textContent = '출처 : ' + src + ' 데이터로 계산한 내용입니다.'; pop.querySelector('.rt-pop-body').appendChild(sr); }
     pop.querySelector('.rt-pop-body').scrollTop = 0;
     pop.hidden = false;
     pop.querySelector('.rt-pop-close').focus();

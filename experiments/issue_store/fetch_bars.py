@@ -1,4 +1,4 @@
-"""로컬 30년 종목 데이터 저장소 — 일봉 받기 (doc/볼린저-이슈별-검증-계획.md 6절 · doc/이슈-저장소-기획.md).
+"""로컬 30년 종목 데이터 저장소 — 일봉 받기 (doc/볼린저-이슈별-검증-계획.md 6절 · doc/데이터-기록-계획.md 2부).
 
     python experiments/issue_store/fetch_bars.py            # 기본 심볼 전부, 있으면 마지막 날짜 뒤만 이어 받기
     python experiments/issue_store/fetch_bars.py NVDA AMD   # 지정 심볼만

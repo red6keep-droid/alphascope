@@ -222,6 +222,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .rt-pop-li > span:last-child { min-width: 0; }
 .rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
 .rt-pop-p b { color: #111; }
+.rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 14px; line-height: 20px; color: #7A7A7A; }   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 (2026-10-20 사용자) */
 /* 기사 번역 안내 (2026-10-19 사용자) — 기사 제목은 원문, 옆 '번역 방법' 14px 회색 밑줄 글자 버튼. 누르면 브라우저 번역법 팝업(툴팁 팝업과 같은 상자).
    구글 번역 주소로 여는 방식은 한국에서 막혀 있어 뺐다 (같은 날) */
 .news-orig { margin: 0 0 0 6px; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; cursor: pointer; vertical-align: baseline; -webkit-tap-highlight-color: transparent; }

@@ -243,11 +243,37 @@ def guide_card(title, body, notes=()):
 TIP_GAP = 3   # 툴팁 아이콘 좌우 바깥 여백 — 항상 (2026-10-13 사용자: "툴팁도 좌우 여백 3픽셀 여유는 항상")
 
 
+# 툴팁 데이터 근거 (2026-10-20 사용자: "툴팁에 데이터 근거가 명시되어야 한다 · 짧게 반복되는 내용이라 일괄 표시").
+# 리포트마다 기본 출처를 TIP_SRC 에 정하고, 다른 데이터를 쓰는 툴팁만 with_src() 로 바꾼다. 출처는 data-src 속성으로 나가고
+# 테마 팝업이 맨 아래에 `출처 : X 데이터로 계산한 내용입니다.` 한 줄로 그린다. 출처 줄은 글 끝 줄로 실어 나르므로 툴팁 글을 고치는 함수(replace · split)를 거쳐도 남는다.
+TIP_SRC = ""
+SRC_MARK = "출처 : "
+
+
+def with_src(text, src):
+    """이 툴팁만 기본(TIP_SRC)과 다른 데이터 출처 — 예: with_src(tip, "CNN")."""
+    return f"{text}\n{SRC_MARK}{src}" if text and src else text
+
+
+def src_sentence(src):
+    return f"출처 : {src} 데이터로 계산한 내용입니다."
+
+
+def _split_src(text):
+    lines = str(text).split("\n")
+    found = [x[len(SRC_MARK):].strip() for x in lines if x.startswith(SRC_MARK)]
+    return "\n".join(x for x in lines if not x.startswith(SRC_MARK)), (found[-1] if found else TIP_SRC)
+
+
 def tip(text):
     """ⓘ 툴팁 아이콘 — 글은 data-tip 속성, 모양은 테마 CSS(build_theme.py `[data-tip]::after`). 줄바꿈(\n)은 툴팁 안에서 줄을 바꾼다.
-    상자는 position:relative 인 가장 가까운 줄 기준으로 놓인다 — 아이콘은 그런 줄 안에 둔다."""
-    t = esc(text).replace(chr(34), "&quot;").replace("\n", "&#10;")
-    return (f'<span data-tip="{t}" tabindex="0" role="button" aria-label="{t}" '
+    상자는 position:relative 인 가장 가까운 줄 기준으로 놓인다 — 아이콘은 그런 줄 안에 둔다. 데이터 출처는 data-src (위 TIP_SRC)."""
+    text, src = _split_src(text)
+    q = lambda x: esc(x).replace(chr(34), "&quot;").replace("\n", "&#10;")   # noqa: E731
+    t = q(text)
+    s = f' data-src="{q(src)}"' if src else ""
+    label = q(text + ("\n" + src_sentence(src) if src else ""))
+    return (f'<span data-tip="{t}"{s} tabindex="0" role="button" aria-label="{label}" '
             f'style="display:inline-flex;align-items:center;color:{NOTE};cursor:help;vertical-align:middle;position:relative;top:-1px;margin:0 {TIP_GAP}px;">{QUESTION_ICON}</span>')   # 좌우 3px 항상 (2026-10-13 사용자)   # 글자와 세로 가운데 (2026-10-13 사용자)
 
 

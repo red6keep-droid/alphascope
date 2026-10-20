@@ -15,6 +15,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import design_kit as dk  # noqa: E402  — 디자인-가이드라인.md 공통 조각 (2026-10-11)
+
+dk.TIP_SRC = "Yahoo Finance"   # 툴팁 기본 데이터 출처. 금리 · 경제 일정이 들어간 툴팁만 with_src (2026-10-20 사용자)
 import cards  # noqa: E402  — 질문 카드 · 막대 그래프 (2026-10-18 재설계)
 import sections as sx  # noqa: E402  — 독자 질문 D1 ~ D6 · K1 ~ K3 구획 (doc/데일리-리포트-기획.md 6절)
 
@@ -326,7 +328,8 @@ def regime_rule(regime):
     return ("추세 · 시장 폭 · 변동성 · 금리 환경 · 위험 선호 다섯 항목의 점수를 더한 것" + now +
             "\n· 점수 매기는 법 : 지수가 평균 가격선 위에 있을수록, 상승 비율이 높을수록, VIX가 낮을수록, 금리가 내릴수록, "
             "성장주 · 소형주처럼 위험한 자산이 강할수록 점수가 오른다"
-            "\n· 참고 : 정해 둔 규칙으로 계산한 값이라, 앞으로 오를지를 맞힌다는 뜻은 아니다")
+            "\n· 참고 : 정해 둔 규칙으로 계산한 값이라, 앞으로 오를지를 맞힌다는 뜻은 아니다"
+            "\n" + dk.SRC_MARK + "Yahoo Finance · FRED")   # 금리 환경 = FRED (2026-10-20 툴팁 출처)
 
 
 def breadth_tip(b):

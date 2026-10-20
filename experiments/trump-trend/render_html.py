@@ -20,6 +20,8 @@ import report_title
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import design_kit as dk  # noqa: E402
 
+dk.TIP_SRC = "CNN · Yahoo Finance"   # 툴팁 기본 데이터 출처 — 게시물(CNN Truth Social 아카이브) · 가격. 게시물만 세는 툴팁은 CNN (2026-10-20 사용자)
+
 UP, DOWN, MUTED = dk.UP, dk.DOWN, dk.MUTED
 DIR_KO = {"positive": "긍정", "negative": "부정", "neutral": "중립"}
 SESSION_KO = {"regular": "정규장", "pre": "장전", "after": "장후", "closed": "휴장"}
@@ -151,7 +153,7 @@ def _trend_tips(a):
     names = ne["target"] + ne["symbol"]
     first = ("그 앞 90일 동안 없다가 최근 7일에 처음 이름이 나온 나라 · 종목\n"
              f"· 오늘 {len(names)}개 : {', '.join(names)}") if names else ""
-    return [("읽는 법", read), ("용어", terms)] + ([("처음 등장", first)] if first else [])   # 처음 등장도 툴팁 (2026-10-13 사용자)
+    return [(k, dk.with_src(v, "CNN")) for k, v in [("읽는 법", read), ("용어", terms)] + ([("처음 등장", first)] if first else [])]   # 처음 등장도 툴팁 (2026-10-13 사용자)
 
 
 FLOW_FLAT_PCT = 10   # 직전 30일 대비 전체 건수 변화가 이 % 미만이면 "비슷함"
@@ -237,7 +239,7 @@ def sec_windows(a):
                      _esc(f"평균 강도 {r['avg_intensity']:.1f} · 부정 발언 비율 {int((r['neg_ratio'] or 0) * 100)}% · {delta}" if r["avg_intensity"] else delta)))
     if not rows:
         return dk.muted("30일 데이터가 아직 없습니다.")
-    return _flow_card(blk) + dk.section("주제별 30일", dk.ccard(rows), tab=TAB_FLOW, one_line=True, aside=dk.tips_right([("읽는 법", _windows_tip(blk))]))   # 일반 구획 제목 + 읽는 법 ? 오른쪽 (2026-10-13 사용자)   # 읽는 법은 소제목 옆 ? (2026-10-12 사용자)   # 요약 강조 카드는 맨 위 (2026-10-11 사용자)   # 기준(최근 30일)은 읽는 법 카드 안으로 (2026-10-11 사용자: 건수·차이를 안내 글에 자세히)
+    return _flow_card(blk) + dk.section("주제별 30일", dk.ccard(rows), tab=TAB_FLOW, one_line=True, aside=dk.tips_right([("읽는 법", dk.with_src(_windows_tip(blk), "CNN"))]))   # 일반 구획 제목 + 읽는 법 ? 오른쪽 (2026-10-13 사용자)   # 읽는 법은 소제목 옆 ? (2026-10-12 사용자)   # 요약 강조 카드는 맨 위 (2026-10-11 사용자)   # 기준(최근 30일)은 읽는 법 카드 안으로 (2026-10-11 사용자: 건수·차이를 안내 글에 자세히)
 
 
 def _x(v):

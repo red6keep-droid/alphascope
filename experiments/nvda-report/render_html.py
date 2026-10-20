@@ -21,6 +21,8 @@ import cal_cards
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import design_kit as _dk  # noqa: E402  — 공통 마무리 처리 (fix_colons)
 
+_dk.TIP_SRC = "Yahoo Finance"   # 툴팁 기본 데이터 출처 — 가격 · 거래량 · 옵션 · 예상치 · 공매도 잔고. 다른 데이터는 툴팁마다 with_src (2026-10-20 사용자)
+
 # 구획 제목 (디자인-가이드라인.md 2절): 아래 여백 14px. 구분선은 바로 아래가 글(목록·문장)일 때만 — 카드·표·그림이 오면 그 테두리가 경계라 선을 긋지 않는다
 H2 = f"color:#111;font-size:{_dk.H2_SIZE};font-weight:700;line-height:{_dk.LH_H2};margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"   # 옆 요약이 폰에서는 제목 아래 줄로 내려온다
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"   # 구분선 위 여백 8 → 6 (20% 줄임, 2026-10-11)
@@ -834,9 +836,7 @@ def _tip(text):
     PC는 마우스를 올리면, 폰은 누르면(tabindex 포커스) 바로 뜬다. title 툴팁은 느리고 폰에서 안 떠서 쓰지 않는다 (2026-10-11 사용자)."""
     if not text:
         return ""
-    t = _esc(text).replace(chr(34), "&quot;")
-    return (f' <span data-tip="{t}" tabindex="0" role="button" aria-label="{t}" '
-            f'style="display:inline-flex;align-items:center;color:{NOTE};cursor:help;vertical-align:middle;position:relative;top:-1px;margin:0 {_dk.TIP_GAP}px;">{QUESTION_ICON}</span>')   # 20px, 글자와 세로 가운데 (2026-10-13 사용자)   # 툴팁 상자는 position:relative 인 제목 줄 기준 — 카드 폭 안에 들어간다
+    return " " + _dk.tip(text)   # 출처(data-src)까지 공통 툴팁과 같게 (2026-10-20)   # 20px, 글자와 세로 가운데 (2026-10-13 사용자)   # 툴팁 상자는 position:relative 인 제목 줄 기준 — 카드 폭 안에 들어간다
 
 
 def regime_rule(mr):
@@ -1018,7 +1018,7 @@ def sec_state_cards(a):
     mr = a.get("market_regime")
     if mr:
         theme, col = REGIME_THEME.get(mr["regime"], ("neutral", MUTED))
-        out += _state_card("시장 분위기는?", mr["regime"], theme, col, regime_lines(mr), _new(a, "regime"), tip=regime_rule(mr), fold=True)
+        out += _state_card("시장 분위기는?", mr["regime"], theme, col, regime_lines(mr), _new(a, "regime"), tip=_dk.with_src(regime_rule(mr), "Yahoo Finance · CNN"), fold=True)
     sf = a.get("sector_flow")
     if sf:
         theme, col = FLOW_THEME.get(sf["state"], ("neutral", MUTED))
@@ -1375,10 +1375,11 @@ NEWS_STAT_KO = {"news_count": "기사", "news_avg_7d": "7일 평균", "news_pend
 def news_stat_tip(a):
     v = {c["key"]: c.get("value") for c in a["status"].get("news") or []}
     f = lambda k, d: "" if v.get(k) is None else f" {v[k]:.{d}f}"   # noqa: E731
-    return ("오늘 엔비디아 관련 기사가 얼마나 나왔는지\n"
+    return _dk.with_src("오늘 엔비디아 관련 기사가 얼마나 나왔는지\n"
             f"· 기사{f('news_count', 0)} : 기준 거래일에 나온 관련 기사 전체. 위 막대의 이벤트는 그중 중요한 것만 골라 더 적다\n"
             f"· 7일 평균{f('news_avg_7d', 1)} : 지난 7일 하루 평균. 오늘 기사가 평소보다 많은지 견줘 보는 기준\n"
-            f"· 대기 문서{f('news_pending', 0)} : 모았지만 아직 분류하지 못한 문서. 다음 실행에서 이어서 분류한다")
+            f"· 대기 문서{f('news_pending', 0)} : 모았지만 아직 분류하지 못한 문서. 다음 실행에서 이어서 분류한다",
+            "NVIDIA 뉴스룸 · CNBC · Google News")
 
 
 def sec_news_counts(a):
@@ -1541,7 +1542,7 @@ def card_revenue(c):
            f"· 최근 분기 {_sgn(c['yoy'], 0)}% : " + (f"기술주 15개 보통 {_sgn(p, 0)}%보다 {abs(c['yoy'] - p):.0f}%p {'앞섰다' if c['yoy'] >= p else '뒤처졌다'}" if p is not None else "비교 묶음 값 없음") + "\n"
            "· 나누는 법 : 1년 전보다 5% 넘게 늘면 늘고 있음, 5% 넘게 줄면 줄고 있음, 그 사이는 비슷함\n"
            "· 참고 : 다른 회사와는 회계 분기가 달라, 분기 한가운데 날짜가 속한 달력 분기로 맞췄다")
-    return lines, tip
+    return lines, _dk.with_src(tip, "SEC EDGAR")   # 매출 = 회사 공시 (2026-10-20 툴팁 출처)
 
 
 def card_eps(c):
@@ -1735,7 +1736,7 @@ def cal_macro(c):
     tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정\n"
            f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {cal_cards.MACRO_KO.get(up[0]['kind'], up[0]['label'])} {_md_short(up[0]['day'])}\n"
            "· 참고 : 2025년 이후 지난 일정 날의 S&P 500 움직임을 보통 날과 견줬다. 일정이 있다고 늘 크게 움직이지는 않았다")
-    return lines, tip, f"{len(up)}건 · 30일 안", None
+    return lines, _dk.with_src(tip, "FRED"), f"{len(up)}건 · 30일 안", None
 
 
 def cal_court(c):
@@ -1748,7 +1749,7 @@ def cal_court(c):
            f"· {_left(nxt['left'])} : {nxt['name']} {nxt['label'] or ''}\n"
            f"· 나누는 법 : 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드가 보라색")
     theme = ("soon", SOON) if nxt["left"] <= config.COURT_LOOKAHEAD_DAYS else ("neutral", "#111")
-    return lines, tip, f"{_left(nxt['left'])} 심리", theme
+    return lines, _dk.with_src(tip, "CourtListener"), f"{_left(nxt['left'])} 심리", theme
 
 
 def _all_list(a, items):
