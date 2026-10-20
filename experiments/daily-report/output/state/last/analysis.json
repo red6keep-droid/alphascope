@@ -1,0 +1,2110 @@
+{
+  "date": "2026-10-21",
+  "as_of": "2026-10-20",
+  "history_stale": false,
+  "history_gap_pct": -0.0,
+  "series": {
+    "^GSPC": {
+      "last": 7712.5698,
+      "ret_1d": 0.28,
+      "ret_5d": -1.19,
+      "ret_20d": -0.67,
+      "ma20": 7732.9395,
+      "ma50": 7704.2672,
+      "above_ma20": false,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 2,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 9,
+      "down_days_20": 11,
+      "bars": 501
+    },
+    "^IXIC": {
+      "last": 26424.8164,
+      "ret_1d": -0.02,
+      "ret_5d": -2.87,
+      "ret_20d": -3.01,
+      "ma20": 26975.6392,
+      "ma50": 26622.4077,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": -1,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↑",
+        "↓"
+      ],
+      "up_days_20": 10,
+      "down_days_20": 10,
+      "bars": 501
+    },
+    "^DJI": {
+      "last": 52495.8789,
+      "ret_1d": 1.02,
+      "ret_5d": 1.6,
+      "ret_20d": 1.22,
+      "ma20": 51558.549,
+      "ma50": 52389.2887,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 1,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 10,
+      "down_days_20": 10,
+      "bars": 501
+    },
+    "^RUT": {
+      "last": 2773.4197,
+      "ret_1d": 1.65,
+      "ret_5d": -0.36,
+      "ret_20d": -4.03,
+      "ma20": 2797.1745,
+      "ma50": 2896.5078,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": 2,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 9,
+      "down_days_20": 11,
+      "bars": 501
+    },
+    "^VIX": {
+      "last": 17.31,
+      "ret_1d": -6.13,
+      "ret_5d": 13.36,
+      "ret_20d": 21.82,
+      "ma20": 16.064,
+      "ma50": 15.7006,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": -2,
+      "last5": [
+        "↑",
+        "↓",
+        "↑",
+        "↓",
+        "↓"
+      ],
+      "up_days_20": 12,
+      "down_days_20": 8,
+      "bars": 503
+    },
+    "SPY": {
+      "last": 769.05,
+      "ret_1d": 0.34,
+      "ret_5d": -1.15,
+      "ret_20d": -0.56,
+      "ma20": 770.6165,
+      "ma50": 767.2614,
+      "above_ma20": false,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 2,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 9,
+      "down_days_20": 11,
+      "bars": 501
+    },
+    "QQQ": {
+      "last": 717.63,
+      "ret_1d": -0.1,
+      "ret_5d": -3.49,
+      "ret_20d": -3.99,
+      "ma20": 739.872,
+      "ma50": 726.1979,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": -1,
+      "last5": [
+        "↓",
+        "↓",
+        "↓",
+        "↑",
+        "↓"
+      ],
+      "up_days_20": 9,
+      "down_days_20": 11,
+      "bars": 501
+    },
+    "IWM": {
+      "last": 275.78,
+      "ret_1d": 1.66,
+      "ret_5d": -0.33,
+      "ret_20d": -3.98,
+      "ma20": 278.0245,
+      "ma50": 287.6089,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": 2,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 8,
+      "down_days_20": 12,
+      "bars": 501
+    },
+    "RSP": {
+      "last": 215.86,
+      "ret_1d": 1.15,
+      "ret_5d": 1.2,
+      "ret_20d": 1.44,
+      "ma20": 211.728,
+      "ma50": 215.1566,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 1,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 11,
+      "down_days_20": 9,
+      "bars": 501
+    },
+    "XLK": {
+      "last": 185.44,
+      "ret_1d": -0.28,
+      "ret_5d": -5.52,
+      "ret_20d": -5.52,
+      "ma20": 194.8365,
+      "ma50": 189.7532,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": -1,
+      "last5": [
+        "↓",
+        "↓",
+        "↓",
+        "↑",
+        "↓"
+      ],
+      "up_days_20": 8,
+      "down_days_20": 12,
+      "bars": 501
+    },
+    "XLF": {
+      "last": 55.72,
+      "ret_1d": 1.2,
+      "ret_5d": 1.64,
+      "ret_20d": 1.68,
+      "ma20": 54.451,
+      "ma50": 56.0709,
+      "above_ma20": true,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": 1,
+      "last5": [
+        "↓",
+        "↑",
+        "↑",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 11,
+      "down_days_20": 9,
+      "bars": 501
+    },
+    "XLE": {
+      "last": 67.97,
+      "ret_1d": 0.25,
+      "ret_5d": 1.15,
+      "ret_20d": 10.02,
+      "ma20": 64.498,
+      "ma50": 63.687,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 1,
+      "last5": [
+        "↑",
+        "↓",
+        "↑",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 13,
+      "down_days_20": 7,
+      "bars": 501
+    },
+    "XLV": {
+      "last": 179.82,
+      "ret_1d": 2.37,
+      "ret_5d": 5.99,
+      "ret_20d": 5.84,
+      "ma20": 170.969,
+      "ma50": 170.0608,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 1,
+      "last5": [
+        "↑",
+        "↑",
+        "↓",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 10,
+      "down_days_20": 10,
+      "bars": 501
+    },
+    "XLP": {
+      "last": 87.75,
+      "ret_1d": 0.62,
+      "ret_5d": 4.23,
+      "ret_20d": 6.07,
+      "ma20": 83.3545,
+      "ma50": 83.8771,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 1,
+      "last5": [
+        "↑",
+        "↑",
+        "↑",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 12,
+      "down_days_20": 8,
+      "bars": 501
+    },
+    "XLY": {
+      "last": 115.5,
+      "ret_1d": 0.91,
+      "ret_5d": 2.79,
+      "ret_20d": 2.82,
+      "ma20": 111.3695,
+      "ma50": 113.5328,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 2,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 11,
+      "down_days_20": 9,
+      "bars": 501
+    },
+    "XLU": {
+      "last": 41.88,
+      "ret_1d": 1.26,
+      "ret_5d": 0.02,
+      "ret_20d": 3.33,
+      "ma20": 40.6805,
+      "ma50": 41.7734,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 1,
+      "last5": [
+        "↓",
+        "↓",
+        "↑",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 11,
+      "down_days_20": 9,
+      "bars": 501
+    },
+    "XLI": {
+      "last": 166.8,
+      "ret_1d": 0.07,
+      "ret_5d": -1.11,
+      "ret_20d": -2.04,
+      "ma20": 168.7,
+      "ma50": 173.1248,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": 1,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 10,
+      "down_days_20": 10,
+      "bars": 501
+    },
+    "XLB": {
+      "last": 51.23,
+      "ret_1d": 0.55,
+      "ret_5d": 3.04,
+      "ret_20d": 1.39,
+      "ma20": 49.6915,
+      "ma50": 50.9576,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 4,
+      "last5": [
+        "↓",
+        "↑",
+        "↑",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 12,
+      "down_days_20": 8,
+      "bars": 501
+    },
+    "XLRE": {
+      "last": 42.38,
+      "ret_1d": 1.7,
+      "ret_5d": 1.31,
+      "ret_20d": -0.28,
+      "ma20": 41.419,
+      "ma50": 42.7989,
+      "above_ma20": true,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": 1,
+      "last5": [
+        "↓",
+        "↑",
+        "↑",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 8,
+      "down_days_20": 12,
+      "bars": 501
+    },
+    "XLC": {
+      "last": 110.19,
+      "ret_1d": 0.09,
+      "ret_5d": -1.86,
+      "ret_20d": -2.94,
+      "ma20": 111.3975,
+      "ma50": 111.6412,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": 1,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 10,
+      "down_days_20": 10,
+      "bars": 501
+    },
+    "SMH": {
+      "last": 546.36,
+      "ret_1d": -0.38,
+      "ret_5d": -7.1,
+      "ret_20d": -10.06,
+      "ma20": 595.607,
+      "ma50": 577.8842,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": -1,
+      "last5": [
+        "↓",
+        "↓",
+        "↓",
+        "↑",
+        "↓"
+      ],
+      "up_days_20": 7,
+      "down_days_20": 13,
+      "bars": 501
+    },
+    "TLT": {
+      "last": 80.13,
+      "ret_1d": 0.84,
+      "ret_5d": 2.25,
+      "ret_20d": -1.59,
+      "ma20": 78.4715,
+      "ma50": 80.297,
+      "above_ma20": true,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": 1,
+      "last5": [
+        "↑",
+        "↑",
+        "↑",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 10,
+      "down_days_20": 10,
+      "bars": 501
+    },
+    "HYG": {
+      "last": 76.83,
+      "ret_1d": 0.0,
+      "ret_5d": -0.34,
+      "ret_20d": -1.9,
+      "ma20": 77.1173,
+      "ma50": 78.0548,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": 0,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↓",
+        "→"
+      ],
+      "up_days_20": 7,
+      "down_days_20": 12,
+      "bars": 501
+    },
+    "GLD": {
+      "last": 377.65,
+      "ret_1d": -0.54,
+      "ret_5d": -1.05,
+      "ret_20d": -5.6,
+      "ma20": 382.2645,
+      "ma50": 396.3106,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": -3,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↓",
+        "↓"
+      ],
+      "up_days_20": 7,
+      "down_days_20": 13,
+      "bars": 501
+    },
+    "^TNX": {
+      "last": 5.117,
+      "ret_1d": -0.37,
+      "ret_5d": -1.92,
+      "ret_20d": 3.0,
+      "ma20": 5.209,
+      "ma50": 4.9619,
+      "above_ma20": false,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": -1,
+      "last5": [
+        "↓",
+        "↓",
+        "↑",
+        "↑",
+        "↓"
+      ],
+      "up_days_20": 12,
+      "down_days_20": 8,
+      "bars": 501
+    },
+    "^FVX": {
+      "last": 4.935,
+      "ret_1d": 0.12,
+      "ret_5d": -1.44,
+      "ret_20d": 1.92,
+      "ma20": 5.0058,
+      "ma50": 4.7334,
+      "above_ma20": false,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 2,
+      "last5": [
+        "↓",
+        "↓",
+        "→",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 9,
+      "down_days_20": 10,
+      "bars": 501
+    },
+    "^IRX": {
+      "last": 4.08,
+      "ret_1d": 0.12,
+      "ret_5d": 0.57,
+      "ret_20d": 1.87,
+      "ma20": 4.0495,
+      "ma50": 3.8952,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 2,
+      "last5": [
+        "↑",
+        "↑",
+        "↓",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 14,
+      "down_days_20": 5,
+      "bars": 501
+    },
+    "NVDA": {
+      "last": 216.47,
+      "ret_1d": -0.29,
+      "ret_5d": -5.27,
+      "ret_20d": -5.42,
+      "ma20": 227.0425,
+      "ma50": 222.814,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": -1,
+      "last5": [
+        "↓",
+        "↓",
+        "↓",
+        "↑",
+        "↓"
+      ],
+      "up_days_20": 9,
+      "down_days_20": 11,
+      "bars": 501
+    },
+    "AAPL": {
+      "last": 339.5,
+      "ret_1d": -1.0,
+      "ret_5d": -0.52,
+      "ret_20d": -0.07,
+      "ma20": 337.6095,
+      "ma50": 326.9164,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": -2,
+      "last5": [
+        "↑",
+        "↓",
+        "↑",
+        "↓",
+        "↓"
+      ],
+      "up_days_20": 10,
+      "down_days_20": 10,
+      "bars": 501
+    },
+    "MSFT": {
+      "last": 531.87,
+      "ret_1d": -0.31,
+      "ret_5d": -2.13,
+      "ret_20d": 6.8,
+      "ma20": 523.5095,
+      "ma50": 506.5901,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": -1,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↑",
+        "↓"
+      ],
+      "up_days_20": 12,
+      "down_days_20": 8,
+      "bars": 501
+    },
+    "GOOGL": {
+      "last": 340.275,
+      "ret_1d": -1.13,
+      "ret_5d": -3.82,
+      "ret_20d": -3.1,
+      "ma20": 345.3303,
+      "ma50": 343.9538,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": -1,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↑",
+        "↓"
+      ],
+      "up_days_20": 12,
+      "down_days_20": 8,
+      "bars": 501
+    },
+    "AMZN": {
+      "last": 262.63,
+      "ret_1d": 0.07,
+      "ret_5d": 1.57,
+      "ret_20d": 3.0,
+      "ma20": 253.8085,
+      "ma50": 256.5262,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 2,
+      "last5": [
+        "↓",
+        "↑",
+        "↓",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 11,
+      "down_days_20": 9,
+      "bars": 501
+    },
+    "META": {
+      "last": 694.25,
+      "ret_1d": -1.59,
+      "ret_5d": -8.95,
+      "ret_20d": -5.75,
+      "ma20": 731.867,
+      "ma50": 659.2277,
+      "above_ma20": false,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": -5,
+      "last5": [
+        "↓",
+        "↓",
+        "↓",
+        "↓",
+        "↓"
+      ],
+      "up_days_20": 8,
+      "down_days_20": 12,
+      "bars": 501
+    },
+    "AVGO": {
+      "last": 334.37,
+      "ret_1d": -0.07,
+      "ret_5d": -6.42,
+      "ret_20d": -8.28,
+      "ma20": 352.482,
+      "ma50": 361.7261,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": -1,
+      "last5": [
+        "↓",
+        "↓",
+        "↓",
+        "↑",
+        "↓"
+      ],
+      "up_days_20": 9,
+      "down_days_20": 11,
+      "bars": 501
+    },
+    "TSLA": {
+      "last": 373.71,
+      "ret_1d": 1.54,
+      "ret_5d": -0.41,
+      "ret_20d": -1.37,
+      "ma20": 369.712,
+      "ma50": 361.1084,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": -1,
+      "streak": 2,
+      "last5": [
+        "↓",
+        "↓",
+        "↓",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 8,
+      "down_days_20": 12,
+      "bars": 501
+    },
+    "BRK-B": {
+      "last": 539.82,
+      "ret_1d": 1.43,
+      "ret_5d": 3.69,
+      "ret_20d": 7.22,
+      "ma20": 513.069,
+      "ma50": 508.9224,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 3,
+      "last5": [
+        "↑",
+        "↓",
+        "↑",
+        "↑",
+        "↑"
+      ],
+      "up_days_20": 15,
+      "down_days_20": 5,
+      "bars": 501
+    },
+    "LLY": {
+      "last": 1283.66,
+      "ret_1d": 3.49,
+      "ret_5d": 10.04,
+      "ret_20d": 9.7,
+      "ma20": 1188.212,
+      "ma50": 1182.3685,
+      "above_ma20": true,
+      "above_ma50": true,
+      "ma20_slope": 1,
+      "streak": 1,
+      "last5": [
+        "↑",
+        "↑",
+        "↑",
+        "↓",
+        "↑"
+      ],
+      "up_days_20": 12,
+      "down_days_20": 8,
+      "bars": 501
+    },
+    "^SOX": {
+      "last": 11283.8115,
+      "ret_1d": -0.29,
+      "ret_5d": -7.58,
+      "ret_20d": -11.08,
+      "ma20": 12374.2946,
+      "ma50": 12028.5585,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": -1,
+      "last5": [
+        "↓",
+        "↓",
+        "↓",
+        "↑",
+        "↓"
+      ],
+      "up_days_20": 7,
+      "down_days_20": 13,
+      "bars": 501
+    },
+    "KRW=X": {
+      "last": 1325.55,
+      "ret_1d": -0.59,
+      "ret_5d": -0.64,
+      "ret_20d": -3.5,
+      "ma20": 1346.245,
+      "ma50": 1364.3898,
+      "above_ma20": false,
+      "above_ma50": false,
+      "ma20_slope": -1,
+      "streak": -2,
+      "last5": [
+        "↑",
+        "↓",
+        "↑",
+        "↓",
+        "↓"
+      ],
+      "up_days_20": 9,
+      "down_days_20": 11,
+      "bars": 517
+    }
+  },
+  "position": {
+    "sp500": {
+      "high_20d": 7818.9302,
+      "low_20d": 7651.54,
+      "from_high_pct": -1.36,
+      "from_low_pct": 0.8,
+      "position_label": "20일 저점 부근"
+    },
+    "nasdaq": {
+      "high_20d": 27599.7891,
+      "low_20d": 26140.0293,
+      "from_high_pct": -4.26,
+      "from_low_pct": 1.09,
+      "position_label": "박스 중간"
+    },
+    "dow": {
+      "high_20d": 52495.8789,
+      "low_20d": 50906.0508,
+      "from_high_pct": 0.0,
+      "from_low_pct": 3.12,
+      "position_label": "20일 고점 부근"
+    },
+    "russell": {
+      "high_20d": 2847.1399,
+      "low_20d": 2721.3701,
+      "from_high_pct": -2.59,
+      "from_low_pct": 1.91,
+      "position_label": "박스 중간"
+    },
+    "SPY": {
+      "high_20d": 779.09,
+      "low_20d": 762.63,
+      "from_high_pct": -1.29,
+      "from_low_pct": 0.84,
+      "position_label": "20일 저점 부근"
+    },
+    "QQQ": {
+      "high_20d": 759.66,
+      "low_20d": 709.8,
+      "from_high_pct": -5.53,
+      "from_low_pct": 1.1,
+      "position_label": "박스 중간"
+    },
+    "IWM": {
+      "high_20d": 283.38,
+      "low_20d": 270.44,
+      "from_high_pct": -2.68,
+      "from_low_pct": 1.97,
+      "position_label": "박스 중간"
+    }
+  },
+  "vix": {
+    "now": 17.31,
+    "prev_5d": 15.27,
+    "change_5d": 2.04
+  },
+  "rs": {
+    "qqq_spy_5d": -2.34,
+    "iwm_spy_5d": 0.82,
+    "rsp_spy_5d": 2.35,
+    "qqq_streak": 0
+  },
+  "breadth": {
+    "mode": "proxy",
+    "sectors_up": 10,
+    "sectors_down": 1,
+    "sectors_counted": 11,
+    "ratio": 90.9,
+    "label": "🟢 양호",
+    "rsp_spy_1d": 0.81,
+    "rsp_spy_5d": 2.35
+  },
+  "sectors": {
+    "ranked_1d": [
+      {
+        "etf": "XLV",
+        "theme": "헬스케어",
+        "ret_1d": 2.37,
+        "ret_5d": 5.99,
+        "ret_20d": 5.84,
+        "rank_1d": 1,
+        "rank_5d": 1,
+        "rank_change": 0
+      },
+      {
+        "etf": "XLRE",
+        "theme": "리츠",
+        "ret_1d": 1.7,
+        "ret_5d": 1.31,
+        "ret_20d": -0.28,
+        "rank_1d": 2,
+        "rank_5d": 6,
+        "rank_change": 4
+      },
+      {
+        "etf": "XLU",
+        "theme": "유틸리티",
+        "ret_1d": 1.26,
+        "ret_5d": 0.02,
+        "ret_20d": 3.33,
+        "rank_1d": 3,
+        "rank_5d": 8,
+        "rank_change": 5
+      },
+      {
+        "etf": "XLF",
+        "theme": "금융",
+        "ret_1d": 1.2,
+        "ret_5d": 1.64,
+        "ret_20d": 1.68,
+        "rank_1d": 4,
+        "rank_5d": 5,
+        "rank_change": 1
+      },
+      {
+        "etf": "XLY",
+        "theme": "소비 (경기민감)",
+        "ret_1d": 0.91,
+        "ret_5d": 2.79,
+        "ret_20d": 2.82,
+        "rank_1d": 5,
+        "rank_5d": 4,
+        "rank_change": -1
+      },
+      {
+        "etf": "XLP",
+        "theme": "소비 (필수)",
+        "ret_1d": 0.62,
+        "ret_5d": 4.23,
+        "ret_20d": 6.07,
+        "rank_1d": 6,
+        "rank_5d": 2,
+        "rank_change": -4
+      },
+      {
+        "etf": "XLB",
+        "theme": "소재",
+        "ret_1d": 0.55,
+        "ret_5d": 3.04,
+        "ret_20d": 1.39,
+        "rank_1d": 7,
+        "rank_5d": 3,
+        "rank_change": -4
+      },
+      {
+        "etf": "XLE",
+        "theme": "에너지",
+        "ret_1d": 0.25,
+        "ret_5d": 1.15,
+        "ret_20d": 10.02,
+        "rank_1d": 8,
+        "rank_5d": 7,
+        "rank_change": -1
+      },
+      {
+        "etf": "XLC",
+        "theme": "통신",
+        "ret_1d": 0.09,
+        "ret_5d": -1.86,
+        "ret_20d": -2.94,
+        "rank_1d": 9,
+        "rank_5d": 10,
+        "rank_change": 1
+      },
+      {
+        "etf": "XLI",
+        "theme": "산업",
+        "ret_1d": 0.07,
+        "ret_5d": -1.11,
+        "ret_20d": -2.04,
+        "rank_1d": 10,
+        "rank_5d": 9,
+        "rank_change": -1
+      },
+      {
+        "etf": "XLK",
+        "theme": "기술",
+        "ret_1d": -0.28,
+        "ret_5d": -5.52,
+        "ret_20d": -5.52,
+        "rank_1d": 11,
+        "rank_5d": 11,
+        "rank_change": 0
+      },
+      {
+        "etf": "SMH",
+        "theme": "AI / 반도체",
+        "ret_1d": -0.38,
+        "ret_5d": -7.1,
+        "ret_20d": -10.06,
+        "rank_1d": 12,
+        "rank_5d": 12,
+        "rank_change": 0
+      }
+    ],
+    "leaders": [
+      "XLV",
+      "XLRE",
+      "XLU"
+    ],
+    "laggards": [
+      "SMH",
+      "XLK",
+      "XLI"
+    ]
+  },
+  "rates": {
+    "us10y": 5.12,
+    "us10y_fred": 5.15,
+    "us2y": 4.77,
+    "spread_10_2": 0.38,
+    "fed_funds": 3.88,
+    "us10y_change_1d_bp": -2,
+    "us10y_change_5d_bp": -10,
+    "growth_label": "금리 영향 중립"
+  },
+  "regime": {
+    "score": 69,
+    "label": "Neutral",
+    "light": "🟡",
+    "components": {
+      "trend": {
+        "score": 15,
+        "max": 25
+      },
+      "breadth": {
+        "score": 20,
+        "max": 20
+      },
+      "volatility": {
+        "score": 14,
+        "max": 20
+      },
+      "rates": {
+        "score": 15,
+        "max": 15
+      },
+      "risk_appetite": {
+        "score": 5,
+        "max": 20
+      }
+    },
+    "score_prev": 34,
+    "prev_date": "2026-10-20",
+    "delta": 35
+  },
+  "status": {
+    "trend": "🟡",
+    "volatility": "🟢",
+    "breadth": "🟢",
+    "rates": "🟢",
+    "overheat": "🟢",
+    "overall": "🟢"
+  },
+  "watch": [
+    {
+      "id": "spx_low",
+      "metric": "S&P 500 20일 저점",
+      "level": 7651.54,
+      "direction": "하향 이탈 여부"
+    },
+    {
+      "id": "spx_ma20",
+      "metric": "S&P 500 20일선",
+      "level": 7732.94,
+      "direction": "회복/이탈 여부"
+    },
+    {
+      "id": "vix_20",
+      "metric": "VIX",
+      "level": 20,
+      "direction": "상향 돌파 여부"
+    },
+    {
+      "id": "us10y_level",
+      "metric": "미국 10년물 금리 (%)",
+      "level": 5.2,
+      "direction": "상향 돌파 여부"
+    },
+    {
+      "id": "leader_rs",
+      "metric": "주도 섹터 XLV (헬스케어)",
+      "level": "1D·5D 모두 상위 3위",
+      "direction": "상대강도 유지 여부"
+    }
+  ],
+  "symbols": [
+    "AAPL",
+    "AMZN",
+    "AVGO",
+    "BRK-B",
+    "GLD",
+    "GOOGL",
+    "HYG",
+    "IWM",
+    "KRW=X",
+    "LLY",
+    "META",
+    "MSFT",
+    "NVDA",
+    "QQQ",
+    "RSP",
+    "SMH",
+    "SPY",
+    "TLT",
+    "TSLA",
+    "XLB",
+    "XLC",
+    "XLE",
+    "XLF",
+    "XLI",
+    "XLK",
+    "XLP",
+    "XLRE",
+    "XLU",
+    "XLV",
+    "XLY",
+    "^DJI",
+    "^FVX",
+    "^GSPC",
+    "^IRX",
+    "^IXIC",
+    "^RUT",
+    "^SOX",
+    "^TNX",
+    "^VIX"
+  ],
+  "raw": {
+    "date": "2026-10-21",
+    "updated_at": "2026-10-20 21:02:01 UTC",
+    "macro": {
+      "unemployment_rate": {
+        "value": 4.2,
+        "date": "2026-09-01",
+        "prev": 4.1,
+        "prev_date": "2026-08-01"
+      },
+      "cpi": {
+        "value": 336.3,
+        "date": "2026-09-01",
+        "prev": 334.13,
+        "prev_date": "2026-08-01"
+      },
+      "vix": {
+        "value": 18.44,
+        "date": "2026-10-19",
+        "prev": 19.99,
+        "prev_date": "2026-10-16"
+      },
+      "us10y": {
+        "value": 5.15,
+        "date": "2026-10-19",
+        "prev": 5.09,
+        "prev_date": "2026-10-16"
+      },
+      "us2y": {
+        "value": 4.77,
+        "date": "2026-10-19",
+        "prev": 4.74,
+        "prev_date": "2026-10-16"
+      },
+      "spread_10_2": {
+        "value": 0.38,
+        "date": "2026-10-19",
+        "prev": 0.35,
+        "prev_date": "2026-10-16"
+      },
+      "fed_funds": {
+        "value": 3.88,
+        "date": "2026-10-19",
+        "prev": 3.88,
+        "prev_date": "2026-10-18"
+      }
+    },
+    "market": {
+      "indices": {
+        "sp500": {
+          "name": "S&P 500",
+          "symbol": "^GSPC",
+          "price": 7712.57,
+          "change_pct": 0.28,
+          "volume": 2721619000
+        },
+        "nasdaq": {
+          "name": "Nasdaq",
+          "symbol": "^IXIC",
+          "price": 26424.82,
+          "change_pct": -0.02,
+          "volume": 6876343000
+        },
+        "dow": {
+          "name": "Dow Jones",
+          "symbol": "^DJI",
+          "price": 52495.88,
+          "change_pct": 1.02,
+          "volume": 368648006
+        },
+        "russell": {
+          "name": "Russell 2000",
+          "symbol": "^RUT",
+          "price": 2773.42,
+          "change_pct": 1.65,
+          "volume": 0
+        },
+        "vix": {
+          "name": "VIX",
+          "symbol": "^VIX",
+          "price": 17.31,
+          "change_pct": -6.08,
+          "volume": 0
+        }
+      }
+    },
+    "gainers": [],
+    "most_active": [],
+    "news": [
+      {
+        "title": "Top Wall Street analysts are bullish on the growth potential of these 3 stocks",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/18/top-analysts-are-bullish-on-the-growth-potential-of-these-3-stocks.html",
+        "published": "2026-10-18 12:34:51",
+        "summary": "Amid fear of rate hikes and oil prices, investors can look past volatility and track Street analysts' stock picks with strong long-term growth potential."
+      },
+      {
+        "title": "The Austin Powers steamroller: How to trade CoreWeave's slow moving crisis",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/16/playing-the-coreweave-disconnect.html",
+        "published": "2026-10-16 18:24:35",
+        "summary": "After a 27.5% drop from last Friday's close to this Thursday morning's 52-week lows, followed by a 17% rebound, equity traders holding CoreWeave are dazed."
+      },
+      {
+        "title": "Brian Sullivan: Why the 'real' price of oil is likely $30-$40 higher than where it is now",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/15/brian-sullivan-why-the-real-price-of-oil-is-likely-30-40-higher-than-where-it-is-now.html",
+        "published": "2026-10-15 19:53:29",
+        "summary": "Physical oil can cost about $38 a barrel more to deliver, as tanker rates surge."
+      },
+      {
+        "title": "CoreWeave credit default swaps hit distress levels as investors sour on AI debt",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/15/coreweave-credit-default-swaps-hit-distress-levels-as-investors-sour-on-ai-debt.html",
+        "published": "2026-10-15 21:33:24",
+        "summary": "Signs of distressed deepened in CoreWeave on Thursday."
+      },
+      {
+        "title": "Traders pile into 'bubble puts' on CoreWeave as neocloud stocks plunge",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/14/coreweave-put-options-ai-trade.html",
+        "published": "2026-10-14 21:19:09",
+        "summary": "As a key corner of the artificial intelligence trade takes a beating on Wednesday, traders are betting it could get even worse."
+      },
+      {
+        "title": "Don't let inflation bite — how to hedge with TIPS, commodities and infrastructure funds",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/13/inflation-hedge-tips-commodities-infrastructure.html",
+        "published": "2026-10-14 15:20:04",
+        "summary": "TIPS are looking attractive but they aren't the only way to get inflation protection."
+      },
+      {
+        "title": "A massive trade just happened in surging shares of Snap",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/12/a-massive-trade-just-happens-in-surging-shares-of-snap.html",
+        "published": "2026-10-12 18:43:44",
+        "summary": "Options traders bet on 30% rally in Snap"
+      },
+      {
+        "title": "UnitedHealth shares are doing something unusual ahead of earnings",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/12/unitedhealth-shares-are-doing-something-unusual-ahead-of-earnings.html",
+        "published": "2026-10-12 16:42:13",
+        "summary": "The only thing more expensive than health insurance is perhaps the costs of insuring shares of health insurers"
+      },
+      {
+        "title": "Banks are set to report this week. Here's what the options market expects",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/12/banks-are-set-to-report-this-week-heres-what-the-options-market-expects.html",
+        "published": "2026-10-12 13:27:20",
+        "summary": "Despite being flat on the year, the options market is pricing in some big financial sector moves as investor weigh the impact of higher rates."
+      },
+      {
+        "title": "Top Wall Street analysts prefer these 3 dividend stocks for stable income",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/11/top-analysts-prefer-these-3-dividend-stocks-for-stable-income.html",
+        "published": "2026-10-11 11:42:31",
+        "summary": "Given a volatile backdrop, investors seeking stable income can consider enhancing their portfolios by adding dividend-paying stocks."
+      },
+      {
+        "title": "Junk bonds are 'flashing yellow.' Watch these warning signs",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/09/junk-bonds-are-flashing-yellow-watch-these-warning-signs.html",
+        "published": "2026-10-09 20:51:25",
+        "summary": "Spreads have widened in the high-yield bond market, but that doesn't tell the whole story."
+      },
+      {
+        "title": "Living with Mom and trading on margin. The regular investor gets in on Wall Street's record stock borrowing binge",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/09/margin-debt-stock-market-risk.html",
+        "published": "2026-10-09 13:03:19",
+        "summary": "Margin debt has surged to record levels as investors like 29-year-old Hy Luu borrow more against their portfolios. Here’s how leverage can amplify stock losses."
+      },
+      {
+        "title": "Unsure how long this AI bull has? Bonds now offer a cushion at the best values in years",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/06/unsure-how-long-this-ai-bull-has-bonds-now-offer-a-cushion-at-the-best-values-in-years.html",
+        "published": "2026-10-06 11:08:28",
+        "summary": "See an AI-generated hypothetical portfolio derived from my TV talk and this column's archives."
+      },
+      {
+        "title": "Nvidia's $6 trillion milestone looms. Here's when options traders see it happening",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/05/nvidias-6-trillion-milestone-looms-heres-when-options-traders-see-it-happening.html",
+        "published": "2026-10-05 13:56:58",
+        "summary": "Nvidia will likely cross the $6 trillion threshold by the end of this month, according to options traders."
+      },
+      {
+        "title": "Top Wall Street analysts are upbeat about the prospects for these 3 stocks",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/04/top-analysts-are-upbeat-about-the-prospects-for-these-3-stocks.html",
+        "published": "2026-10-04 13:24:16",
+        "summary": "Investors with a long-term horizon can track ratings from top Wall Street analysts to find stocks with solid growth prospects."
+      },
+      {
+        "title": "Lula or Bolsonaro: Wall Street braces for two wildly different results in Brazil election",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/03/lula-or-bolsonaro-wall-street-braces-for-two-wildly-different-results-in-brazil-election.html",
+        "published": "2026-10-03 13:12:27",
+        "summary": "With the first round of Brazil's presidential election taking place Sunday, Wall Street is gearing up with starkly different market predictions."
+      },
+      {
+        "title": "Berkshire buys more Lennar shares, but pace of purchases slows",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/03/berkshire-buys-more-lennar-shares-but-pace-of-purchases-slows.html",
+        "published": "2026-10-04 09:33:19",
+        "summary": "Berkshire Hathaway added to its bet on Lennar this week, raising its stake in the homebuilder to 11.2%, although the pace of its buying appears to be slowing."
+      },
+      {
+        "title": "Europe’s winter energy crunch may already be underway. Two U.S. stocks that may benefit",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/10/01/europes-winter-energy-crunch-may-already-be-underway-two-us-stocks-that-may-benefit.html",
+        "published": "2026-10-01 20:41:38",
+        "summary": "BP's largest oil discovery in 25 years. What it means for the stock."
+      },
+      {
+        "title": "IPO postponements are accelerating in third quarter, even beyond Oura",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/09/29/ipo-postponements-are-accelerating-in-third-quarter-even-beyond-oura.html",
+        "published": "2026-10-02 17:17:01",
+        "summary": "It's been a strong year for IPOs. But now, more companies are deciding to stay on the sidelines."
+      },
+      {
+        "title": "Higher rates are wreaking havoc on these two ETFs. Traders see one bouncing back",
+        "source": "CNBC",
+        "link": "https://www.cnbc.com/2026/09/29/higher-rates-are-wreaking-havoc-on-these-two-etfs-traders-see-one-bouncing-back.html",
+        "published": "2026-09-29 11:28:27",
+        "summary": "The relentless surge in rates is breaking the back of two key macro trades that had been holding firm."
+      }
+    ],
+    "calendar": {
+      "from": "2026-10-20",
+      "to": "2026-11-03",
+      "days": 14,
+      "items": [
+        {
+          "day": "2026-10-21",
+          "kind": "EARNINGS",
+          "symbol": "META",
+          "after_close": true
+        },
+        {
+          "day": "2026-10-21",
+          "kind": "EARNINGS",
+          "symbol": "TSLA",
+          "after_close": true
+        },
+        {
+          "day": "2026-10-28",
+          "kind": "EARNINGS",
+          "symbol": "MSFT",
+          "after_close": true
+        },
+        {
+          "day": "2026-10-28",
+          "kind": "EARNINGS",
+          "symbol": "GOOGL",
+          "after_close": true
+        },
+        {
+          "day": "2026-10-28",
+          "kind": "FOMC"
+        },
+        {
+          "day": "2026-10-29",
+          "kind": "EARNINGS",
+          "symbol": "AMZN",
+          "after_close": true
+        },
+        {
+          "day": "2026-10-29",
+          "kind": "EARNINGS",
+          "symbol": "LLY",
+          "after_close": false
+        },
+        {
+          "day": "2026-10-29",
+          "kind": "GDP"
+        },
+        {
+          "day": "2026-10-29",
+          "kind": "PCE"
+        },
+        {
+          "day": "2026-11-02",
+          "kind": "EARNINGS",
+          "symbol": "AAPL",
+          "after_close": false
+        }
+      ]
+    }
+  },
+  "normal": {
+    "^GSPC": {
+      "ret_pct": 0.28,
+      "sigma_pct": 0.63,
+      "z": 0.45,
+      "outside": false,
+      "n_year": 158,
+      "n_past": 252
+    },
+    "^IXIC": {
+      "ret_pct": -0.02,
+      "sigma_pct": 1.04,
+      "z": -0.02,
+      "outside": false,
+      "n_year": 249,
+      "n_past": 252
+    },
+    "^DJI": {
+      "ret_pct": 1.02,
+      "sigma_pct": 0.6,
+      "z": 1.68,
+      "outside": false,
+      "n_year": 26,
+      "n_past": 252
+    },
+    "^RUT": {
+      "ret_pct": 1.65,
+      "sigma_pct": 0.93,
+      "z": 1.77,
+      "outside": false,
+      "n_year": 21,
+      "n_past": 252
+    },
+    "^SOX": {
+      "ret_pct": -0.29,
+      "sigma_pct": 2.39,
+      "z": -0.12,
+      "outside": false,
+      "n_year": 226,
+      "n_past": 252
+    },
+    "NVDA": {
+      "ret_pct": -0.29,
+      "sigma_pct": 1.87,
+      "z": -0.15,
+      "outside": false,
+      "n_year": 221,
+      "n_past": 252
+    },
+    "AAPL": {
+      "ret_pct": -1.0,
+      "sigma_pct": 1.13,
+      "z": -0.89,
+      "outside": false,
+      "n_year": 69,
+      "n_past": 252
+    },
+    "MSFT": {
+      "ret_pct": -0.31,
+      "sigma_pct": 1.55,
+      "z": -0.2,
+      "outside": false,
+      "n_year": 204,
+      "n_past": 252
+    },
+    "GOOGL": {
+      "ret_pct": -1.13,
+      "sigma_pct": 1.46,
+      "z": -0.78,
+      "outside": false,
+      "n_year": 89,
+      "n_past": 252
+    },
+    "AMZN": {
+      "ret_pct": 0.07,
+      "sigma_pct": 2.04,
+      "z": 0.03,
+      "outside": false,
+      "n_year": 244,
+      "n_past": 252
+    },
+    "META": {
+      "ret_pct": -1.59,
+      "sigma_pct": 2.78,
+      "z": -0.58,
+      "outside": false,
+      "n_year": 113,
+      "n_past": 252
+    },
+    "AVGO": {
+      "ret_pct": -0.07,
+      "sigma_pct": 2.42,
+      "z": -0.03,
+      "outside": false,
+      "n_year": 244,
+      "n_past": 252
+    },
+    "TSLA": {
+      "ret_pct": 1.54,
+      "sigma_pct": 2.34,
+      "z": 0.65,
+      "outside": false,
+      "n_year": 123,
+      "n_past": 252
+    },
+    "BRK-B": {
+      "ret_pct": 1.43,
+      "sigma_pct": 0.73,
+      "z": 1.94,
+      "outside": false,
+      "n_year": 16,
+      "n_past": 252
+    },
+    "LLY": {
+      "ret_pct": 3.49,
+      "sigma_pct": 1.75,
+      "z": 1.97,
+      "outside": false,
+      "n_year": 14,
+      "n_past": 252
+    }
+  },
+  "shock": {
+    "active": false,
+    "days_in": null,
+    "vix": 17.31
+  },
+  "korea": [
+    {
+      "kr": "^KS11",
+      "kr_name": "코스피",
+      "us": "^GSPC",
+      "us_name": "S&P 500",
+      "us_ret": 0.28,
+      "us_z": 0.45,
+      "bucket": "normal",
+      "beta": 0.56,
+      "corr": 0.71,
+      "r2": 0.51,
+      "intra_any": -0.04,
+      "first": "2000-07-10",
+      "record": {
+        "n": 4693,
+        "gap": 0.11,
+        "intra": -0.05,
+        "against": 54,
+        "t": -3.1,
+        "decades": [
+          {
+            "from": "2000",
+            "to": "2009",
+            "n": 1635,
+            "intra": -0.02,
+            "intra_any": -0.02
+          },
+          {
+            "from": "2010",
+            "to": "2019",
+            "n": 1817,
+            "intra": -0.07,
+            "intra_any": -0.05
+          },
+          {
+            "from": "2020",
+            "to": "2026",
+            "n": 1241,
+            "intra": -0.06,
+            "intra_any": -0.06
+          }
+        ]
+      },
+      "buckets": {
+        "up": {
+          "gap": 1.75,
+          "intra": -0.42,
+          "n": 165
+        },
+        "down": {
+          "gap": -1.78,
+          "intra": 0.28,
+          "n": 213
+        },
+        "normal": {
+          "gap": 0.11,
+          "intra": -0.05,
+          "n": 4693
+        }
+      }
+    },
+    {
+      "kr": "^KQ11",
+      "kr_name": "코스닥",
+      "us": "^IXIC",
+      "us_name": "나스닥",
+      "us_ret": -0.02,
+      "us_z": -0.02,
+      "bucket": "normal",
+      "beta": 0.46,
+      "corr": 0.74,
+      "r2": 0.54,
+      "intra_any": -0.22,
+      "first": "2001-04-23",
+      "record": {
+        "n": 4513,
+        "gap": 0.29,
+        "intra": -0.24,
+        "against": 54,
+        "t": -12.7,
+        "decades": [
+          {
+            "from": "2000",
+            "to": "2009",
+            "n": 1516,
+            "intra": -0.26,
+            "intra_any": -0.27
+          },
+          {
+            "from": "2010",
+            "to": "2019",
+            "n": 1808,
+            "intra": -0.29,
+            "intra_any": -0.24
+          },
+          {
+            "from": "2020",
+            "to": "2026",
+            "n": 1189,
+            "intra": -0.12,
+            "intra_any": -0.11
+          }
+        ]
+      },
+      "buckets": {
+        "up": {
+          "gap": 1.61,
+          "intra": -0.74,
+          "n": 156
+        },
+        "down": {
+          "gap": -1.74,
+          "intra": 0.03,
+          "n": 200
+        },
+        "normal": {
+          "gap": 0.29,
+          "intra": -0.24,
+          "n": 4513
+        }
+      }
+    },
+    {
+      "kr": "005930.KS",
+      "kr_name": "삼성전자",
+      "us": "^SOX",
+      "us_name": "미국 반도체 지수",
+      "us_ret": -0.29,
+      "us_z": -0.12,
+      "bucket": "normal",
+      "beta": 0.43,
+      "corr": 0.64,
+      "r2": 0.41,
+      "intra_any": 0.01,
+      "first": "2000-07-20",
+      "record": {
+        "n": 4023,
+        "gap": 0.07,
+        "intra": -0.01,
+        "against": 54,
+        "t": -0.3,
+        "decades": [
+          {
+            "from": "2000",
+            "to": "2009",
+            "n": 1410,
+            "intra": 0.04,
+            "intra_any": 0.07
+          },
+          {
+            "from": "2010",
+            "to": "2019",
+            "n": 1538,
+            "intra": -0.02,
+            "intra_any": 0.0
+          },
+          {
+            "from": "2020",
+            "to": "2026",
+            "n": 1075,
+            "intra": -0.06,
+            "intra_any": -0.06
+          }
+        ]
+      },
+      "buckets": {
+        "up": {
+          "gap": 2.35,
+          "intra": -0.32,
+          "n": 148
+        },
+        "down": {
+          "gap": -2.16,
+          "intra": 0.38,
+          "n": 171
+        },
+        "normal": {
+          "gap": 0.07,
+          "intra": -0.01,
+          "n": 4023
+        }
+      }
+    },
+    {
+      "kr": "000660.KS",
+      "kr_name": "SK하이닉스",
+      "us": "^SOX",
+      "us_name": "미국 반도체 지수",
+      "us_ret": -0.29,
+      "us_z": -0.12,
+      "bucket": "normal",
+      "beta": 0.58,
+      "corr": 0.58,
+      "r2": 0.34,
+      "intra_any": -0.22,
+      "first": "2000-07-26",
+      "record": {
+        "n": 4123,
+        "gap": 0.26,
+        "intra": -0.19,
+        "against": 55,
+        "t": -4.1,
+        "decades": [
+          {
+            "from": "2000",
+            "to": "2009",
+            "n": 1459,
+            "intra": -0.32,
+            "intra_any": -0.4
+          },
+          {
+            "from": "2010",
+            "to": "2019",
+            "n": 1595,
+            "intra": -0.2,
+            "intra_any": -0.17
+          },
+          {
+            "from": "2020",
+            "to": "2026",
+            "n": 1069,
+            "intra": -0.02,
+            "intra_any": -0.03
+          }
+        ]
+      },
+      "buckets": {
+        "up": {
+          "gap": 3.56,
+          "intra": -0.99,
+          "n": 150
+        },
+        "down": {
+          "gap": -2.77,
+          "intra": 0.56,
+          "n": 172
+        },
+        "normal": {
+          "gap": 0.26,
+          "intra": -0.19,
+          "n": 4123
+        }
+      }
+    },
+    {
+      "kr": "006400.KS",
+      "kr_name": "삼성SDI",
+      "us": "TSLA",
+      "us_name": "테슬라",
+      "us_ret": 1.54,
+      "us_z": 0.65,
+      "bucket": "normal",
+      "beta": 0.17,
+      "corr": 0.41,
+      "r2": 0.17,
+      "intra_any": -0.05,
+      "first": "2011-01-25",
+      "record": {
+        "n": 2484,
+        "gap": 0.17,
+        "intra": -0.05,
+        "against": 55,
+        "t": -1.0,
+        "decades": [
+          {
+            "from": "2010",
+            "to": "2019",
+            "n": 1391,
+            "intra": -0.05,
+            "intra_any": -0.05
+          },
+          {
+            "from": "2020",
+            "to": "2026",
+            "n": 1093,
+            "intra": -0.05,
+            "intra_any": -0.06
+          }
+        ]
+      },
+      "buckets": {
+        "up": {
+          "gap": 1.15,
+          "intra": -0.06,
+          "n": 93
+        },
+        "down": {
+          "gap": -1.6,
+          "intra": 0.07,
+          "n": 87
+        },
+        "normal": {
+          "gap": 0.17,
+          "intra": -0.05,
+          "n": 2484
+        }
+      }
+    },
+    {
+      "kr": "373220.KS",
+      "kr_name": "LG에너지솔루션",
+      "us": "TSLA",
+      "us_name": "테슬라",
+      "us_ret": 1.54,
+      "us_z": 0.65,
+      "bucket": "normal",
+      "beta": 0.17,
+      "corr": 0.44,
+      "r2": 0.19,
+      "intra_any": -0.15,
+      "first": "2022-08-26",
+      "record": {
+        "n": 674,
+        "gap": 0.24,
+        "intra": -0.15,
+        "against": 53,
+        "t": -1.5,
+        "decades": [
+          {
+            "from": "2020",
+            "to": "2026",
+            "n": 674,
+            "intra": -0.15,
+            "intra_any": -0.15
+          }
+        ]
+      },
+      "buckets": {
+        "up": {
+          "gap": 1.4,
+          "intra": -0.71,
+          "n": 17
+        },
+        "down": {
+          "gap": -1.42,
+          "intra": 0.62,
+          "n": 23
+        },
+        "normal": {
+          "gap": 0.24,
+          "intra": -0.15,
+          "n": 674
+        }
+      }
+    }
+  ],
+  "fx": {
+    "krw": 1325.55,
+    "ret_1d": -0.59,
+    "ret_5d": -0.64,
+    "spx_won": -0.31
+  },
+  "calendar": {
+    "from": "2026-10-20",
+    "to": "2026-11-03",
+    "days": 14,
+    "items": [
+      {
+        "day": "2026-10-21",
+        "kind": "EARNINGS",
+        "symbol": "META",
+        "after_close": true,
+        "effect": {
+          "median": 5.46,
+          "normal": 1.13,
+          "n": 57
+        }
+      },
+      {
+        "day": "2026-10-21",
+        "kind": "EARNINGS",
+        "symbol": "TSLA",
+        "after_close": true,
+        "effect": {
+          "median": 7.04,
+          "normal": 1.77,
+          "n": 63
+        }
+      },
+      {
+        "day": "2026-10-28",
+        "kind": "EARNINGS",
+        "symbol": "MSFT",
+        "after_close": true,
+        "effect": {
+          "median": 3.02,
+          "normal": 0.81,
+          "n": 67
+        }
+      },
+      {
+        "day": "2026-10-28",
+        "kind": "EARNINGS",
+        "symbol": "GOOGL",
+        "after_close": true,
+        "effect": {
+          "median": 4.17,
+          "normal": 0.85,
+          "n": 67
+        }
+      },
+      {
+        "day": "2026-10-28",
+        "kind": "FOMC",
+        "effect": {
+          "median": 0.79,
+          "normal": 0.57,
+          "n": 54,
+          "since": "2020"
+        }
+      },
+      {
+        "day": "2026-10-29",
+        "kind": "EARNINGS",
+        "symbol": "AMZN",
+        "after_close": true,
+        "effect": {
+          "median": 6.33,
+          "normal": 1.05,
+          "n": 64
+        }
+      },
+      {
+        "day": "2026-10-29",
+        "kind": "EARNINGS",
+        "symbol": "LLY",
+        "after_close": false,
+        "effect": {
+          "median": 2.6,
+          "normal": 0.76,
+          "n": 67
+        }
+      },
+      {
+        "day": "2026-10-29",
+        "kind": "GDP",
+        "effect": {
+          "median": 0.56,
+          "normal": 0.57,
+          "n": 88,
+          "since": "2020"
+        }
+      },
+      {
+        "day": "2026-10-29",
+        "kind": "PCE",
+        "effect": {
+          "median": 0.66,
+          "normal": 0.57,
+          "n": 80,
+          "since": "2020"
+        }
+      },
+      {
+        "day": "2026-11-02",
+        "kind": "EARNINGS",
+        "symbol": "AAPL",
+        "after_close": false,
+        "effect": {
+          "median": 3.56,
+          "normal": 0.86,
+          "n": 67
+        }
+      }
+    ]
+  },
+  "regime_check": {
+    "from": "2008-01",
+    "to": "2026-10",
+    "n_days": 4746,
+    "up20": {
+      "Risk-On": 68,
+      "Neutral": 67,
+      "Risk-Off": 65,
+      "any": 67
+    },
+    "mean20": {
+      "Risk-On": 0.68,
+      "Neutral": 1.04,
+      "Risk-Off": 1.26,
+      "any": 0.96
+    },
+    "red_share_calm": 53
+  },
+  "krw_check": {
+    "first": "2003-12-02",
+    "n": 5722,
+    "corr": -0.07,
+    "big_down": {
+      "n": 203,
+      "spx": -2.98,
+      "fx": 0.21,
+      "won": -2.77,
+      "cushion_share": 54
+    }
+  },
+  "stats_built": "2026-10-18"
+}
