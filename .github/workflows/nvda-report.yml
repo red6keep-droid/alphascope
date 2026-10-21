@@ -213,6 +213,20 @@ jobs:
           python experiments/stock-radar/home_feed.py
           mkdir -p deploy-home && cp experiments/stock-radar/output/home/stocks.json deploy-home/stocks.json
 
+      # 테마 페이지 3개 (doc/테마-모니터-기획.md, 2026-10-21) — 레이더 자료(snapshot · extra)를 그대로 쓴다. 게시 · 홈 카드(themes.json)
+      - name: Theme pages (AI 투자 · 연준 기대 · 임원 매매)
+        if: env.DO_PUBLISH == 'true'
+        continue-on-error: true
+        run: |
+          mkdir -p experiments/theme-monitor/data
+          [ -f "$STATE_DIR/themes/page_hashes.json" ] && cp "$STATE_DIR/themes/page_hashes.json" experiments/theme-monitor/data/ || true
+          python experiments/theme-monitor/main.py
+          python experiments/theme-monitor/publish.py
+          python experiments/theme-monitor/home_feed.py
+          mkdir -p deploy-home "$STATE_DIR/themes"
+          cp experiments/theme-monitor/output/home/themes.json deploy-home/themes.json
+          [ -f experiments/theme-monitor/data/page_hashes.json ] && cp experiments/theme-monitor/data/page_hashes.json "$STATE_DIR/themes/page_hashes.json" || true
+
       - name: Deploy home stocks.json to gh-pages branch
         if: env.DO_PUBLISH == 'true' && hashFiles('deploy-home/stocks.json') != ''
         continue-on-error: true
@@ -226,7 +240,9 @@ jobs:
       - name: Purge home stocks.json cache
         if: env.DO_PUBLISH == 'true' && hashFiles('deploy-home/stocks.json') != ''
         continue-on-error: true
-        run: curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/stocks.json" || true
+        run: |
+          curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/stocks.json" || true
+          curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/themes.json" || true
 
       # 판정까지 끝난 상태가 있으면 뒤 단계가 실패했어도 저장한다 — Gemini 분류를 헛되게 하지 않기 위해.
       - name: Save state + report (nvda-state branch)

@@ -732,6 +732,19 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   .home-cards > .briefing, .home-cards > .rankings { grid-column: 1 / -1; }
   .home-cards > .stock-section { grid-column: auto; }   /* 관심 종목 · 섹터 상위 종목은 PC 에서 나란히 (2026-10-21) */
 }
+/* 테마 카드 (2026-10-21) — 줄마다 테마 이름(굵게) · 상태 라벨 오른쪽, 아래 줄 핵심 숫자. 줄 전체가 테마 페이지 링크, 줄 사이 구분선 */
+.theme-list { margin: 0 16px; }
+.theme-row { display: block; padding: 14px 0; border-top: 1px solid #E5E7EB; color: inherit; text-decoration: none; }
+.theme-row:first-child { border-top: 0; }
+.theme-row.load-status { color: var(--gray-400); text-align: center; padding: 24px 0; }
+.theme-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.theme-name { font-size: 18px; font-weight: 700; color: var(--ink); line-height: 26px; }
+.theme-state { flex: none; font-size: 14px; font-weight: 700; line-height: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid #E2E8F0; background: #F8FAFC; color: #475569; white-space: nowrap; }
+.theme-state.positive { background: #FFF7ED; border-color: #FED7AA; color: #d93025; }
+.theme-state.negative { background: #EFF6FF; border-color: #BFDBFE; color: #1a73e8; }
+.theme-sub { display: block; margin-top: 4px; font-size: 14px; line-height: 20px; color: var(--gray-600); }
+.theme-sub .up { color: #d93025; font-weight: 700; } .theme-sub .down { color: #1a73e8; font-weight: 700; }
+a.theme-row:hover .theme-name { text-decoration: underline; }
 /* 섹터 상위 종목 — 2위 · 3위는 1위 아래 작은 줄 */
 .sector-sub { display: block; margin-top: 4px; font-size: 14px; line-height: 20px; color: var(--gray-600); white-space: nowrap; }
 .sector-sub a { color: inherit; text-decoration: none; }
@@ -1288,6 +1301,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .tab { font-size: 16px; line-height: 21.5px; }
   .news-item { font-size: 16px; line-height: 32px; }
   .footer-title { font-size: 16px; }
+  .theme-name { font-size: 16px; line-height: 23px; }
   .post-card-title { font-size: 17px; }
   .post-title { font-size: 28px; line-height: 36px; }
   .post-body { font-size: 16px; line-height: 32px; }
@@ -1523,6 +1537,22 @@ body.no-dashboard .main-content { padding-top: 32px; }
              2026-10-21 사용자: "홈에 관심 종목 카드 · 섹터 상위 종목 카드, 그걸 타고 가서 개별 종목을 볼 수 있게".
              줄의 종목명이 그 종목 고정 페이지 링크. 페이지가 아직 없는 종목(하루 10개씩 만드는 중)은 목록 페이지로.
              ==================================================================== -->
+        <!-- ====================================================================
+             테마  (themes.json 연동 — experiments/theme-monitor/home_feed.py, 하루 1회)
+             2026-10-21 사용자: "홈에 카드를 만들어 각각의 테마 페이지로 진입할 수 있게". 줄 전체가 그 테마 페이지 링크.
+             ==================================================================== -->
+        <section class='rankings theme-section' aria-labelledby='theme-title'>
+          <div class='section-head'>
+            <h2 class='section-title' id='theme-title'>
+              <span class='report-icon' style='background:#4338CA;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12l4-4 3 3 5-6'/><path d='M10 5h4v4'/></svg></span>테마
+            </h2>
+            <span class='section-note' data-note='themes-day'></span>
+          </div>
+          <div class='theme-list' id='theme-list'>
+            <div class='theme-row load-status'>테마를 불러오는 중…</div>
+          </div>
+        </section>
+
         <section class='rankings stock-section' aria-labelledby='watch-title'>
           <div class='section-head'>
             <h2 class='section-title' id='watch-title'>
@@ -2206,6 +2236,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         var GH = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/';
         var DATA_URL = GH + 'data.json';
         /* 티커 로고 핫링크(financialmodelingprep)는 2026-10-21 뺐다 — 운영지침 4-6 (로고 금지 · 제3자 약관). 아바타는 머리글자 원 */
+        var THEMES_URL = GH + 'themes.json';   /* 테마 카드 (experiments/theme-monitor/home_feed.py, 하루 1회) */
         var STOCKS_URL = GH + 'stocks.json';   /* 관심 종목 · 섹터 상위 종목 (experiments/stock-radar/home_feed.py, 하루 1회) */
         var NEWS_URL = GH + 'news.json';
 
@@ -2524,6 +2555,43 @@ body.no-dashboard .main-content { padding-top: 32px; }
             renderWatchTabs(); renderWatch(); renderSectorTop();
           })
           .catch(function () { renderWatch(); renderSectorTop(); });
+
+        /* ================================================= 테마 (themes.json, 2026-10-21 사용자) */
+
+        /* "−7.0%p" · "+14bp" 같은 증감 덩어리에 색 — 가이드라인 3-3-1 (예외 없음) */
+        function tintText(box, text) {
+          var re = /([+−\-]\d[\d.,]*(?:%p|%|bp))/g, last = 0, m;
+          while ((m = re.exec(text))) {
+            if (m.index > last) box.appendChild(document.createTextNode(text.slice(last, m.index)));
+            box.appendChild(el('span', m[1].charAt(0) === '+' ? 'up' : 'down', m[1]));
+            last = re.lastIndex;
+          }
+          if (last < text.length) box.appendChild(document.createTextNode(text.slice(last)));
+        }
+        fetch(THEMES_URL + '?v=' + Date.now())
+          .then(function (r) { return r.json(); })
+          .then(function (json) {
+            var box = document.getElementById('theme-list');
+            if (!box) return;
+            var rows = json.themes || [];
+            if (!rows.length) throw new Error('no themes');
+            box.textContent = '';
+            rows.forEach(function (t) {
+              var a = el('a', 'theme-row'); a.href = t.url;
+              var head = el('span', 'theme-head');
+              head.appendChild(el('span', 'theme-name', t.title));
+              head.appendChild(el('span', 'theme-state ' + (t.kind || 'neutral'), t.state || '—'));
+              a.appendChild(head);
+              var sub = el('span', 'theme-sub'); tintText(sub, t.sub || t.question || ''); a.appendChild(sub);
+              box.appendChild(a);
+            });
+            var note = document.querySelector('[data-note="themes-day"]');
+            if (note && json.day) { var p = json.day.split('-'); note.textContent = p[0] + '.' + Number(p[1]) + '.' + Number(p[2]) + ' 종가 기준'; }
+          })
+          .catch(function () {
+            var box = document.getElementById('theme-list');
+            if (box) { box.textContent = ''; box.appendChild(el('div', 'theme-row load-status', '테마를 불러올 수 없습니다.')); }
+          });
 
         /* ================================================================= 뉴스 */
 
