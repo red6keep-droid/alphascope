@@ -841,12 +841,12 @@
       "bars": 501
     },
     "KRW=X": {
-      "last": 1325.99,
-      "ret_1d": -0.3,
-      "ret_5d": -1.07,
-      "ret_20d": -1.8,
-      "ma20": 1345.249,
-      "ma50": 1362.755,
+      "last": 1326.41,
+      "ret_1d": -0.27,
+      "ret_5d": -1.04,
+      "ret_20d": -1.77,
+      "ma20": 1345.27,
+      "ma50": 1362.7634,
       "above_ma20": false,
       "above_ma50": false,
       "ma20_slope": -1,
@@ -1186,7 +1186,7 @@
   ],
   "raw": {
     "date": "2026-10-22",
-    "updated_at": "2026-10-21 21:01:26 UTC",
+    "updated_at": "2026-10-21 22:31:13 UTC",
     "macro": {
       "unemployment_rate": null,
       "cpi": null,
@@ -1209,8 +1209,8 @@
           "name": "Nasdaq",
           "symbol": "^IXIC",
           "price": 26702.86,
-          "change_pct": 1.05,
-          "volume": 6845377000
+          "change_pct": 1.06,
+          "volume": 6898345000
         },
         "dow": {
           "name": "Dow Jones",
@@ -1384,18 +1384,6 @@
       "to": "2026-11-04",
       "days": 14,
       "items": [
-        {
-          "day": "2026-10-21",
-          "kind": "EARNINGS",
-          "symbol": "META",
-          "after_close": true
-        },
-        {
-          "day": "2026-10-21",
-          "kind": "EARNINGS",
-          "symbol": "TSLA",
-          "after_close": true
-        },
         {
           "day": "2026-10-28",
           "kind": "EARNINGS",
@@ -1842,38 +1830,16 @@
     }
   ],
   "fx": {
-    "krw": 1325.99,
-    "ret_1d": -0.3,
-    "ret_5d": -1.07,
-    "spx_won": 0.28
+    "krw": 1326.41,
+    "ret_1d": -0.27,
+    "ret_5d": -1.04,
+    "spx_won": 0.31
   },
   "calendar": {
     "from": "2026-10-21",
     "to": "2026-11-04",
     "days": 14,
     "items": [
-      {
-        "day": "2026-10-21",
-        "kind": "EARNINGS",
-        "symbol": "META",
-        "after_close": true,
-        "effect": {
-          "median": 5.46,
-          "normal": 1.13,
-          "n": 57
-        }
-      },
-      {
-        "day": "2026-10-21",
-        "kind": "EARNINGS",
-        "symbol": "TSLA",
-        "after_close": true,
-        "effect": {
-          "median": 7.04,
-          "normal": 1.77,
-          "n": 63
-        }
-      },
       {
         "day": "2026-10-28",
         "kind": "EARNINGS",
