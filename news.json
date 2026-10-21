@@ -1,6 +1,17 @@
 {
-  "updated_at": "2026-10-20 21:29:57 UTC",
+  "updated_at": "2026-10-21 00:30:36 UTC",
   "items": [
+    {
+      "title": "This Janus Henderson fund manager owns CoreWeave debt — here's why he's sticking with it",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/20/coreweave-debt-janus-henderson-lloyd.html",
+      "published": "2026-10-21 00:12:44",
+      "summary": "Janus Henderson portfolio manager John Lloyd, whose fund owns CoreWeave bonds, sees a buying opportunity for this 'best in class' data center play.",
+      "title_ko": "Janus Henderson 펀드 매니저, CoreWeave 채권 보유… 지속 이유는",
+      "why_ko": "CoreWeave 채권을 ‘최고 수준’이라 판단해 매수 기회라 보고 있다다",
+      "summary_ko": "John Lloyd가 ‘최고 수준’ 데이터센터 투자라며 CoreWeave 채권 보유 지속, 투자 기회로 평가",
+      "summary_v": 2
+    },
     {
       "title": "Top Wall Street analysts are bullish on the growth potential of these 3 stocks",
       "source": "CNBC",
@@ -120,17 +131,6 @@
       "title_ko": "고수익채권, ‘노란 불빛’ 경고 신호와 주의점",
       "why_ko": "고수익채권 스프레드가 확대됐지만 전체 상황을 완전히 설명하지 않는다.",
       "summary_ko": "고수익채권 스프레드 확대, 경고 신호와 시장 상황 분석",
-      "summary_v": 2
-    },
-    {
-      "title": "Living with Mom and trading on margin. The regular investor gets in on Wall Street's record stock borrowing binge",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/09/margin-debt-stock-market-risk.html",
-      "published": "2026-10-09 13:03:19",
-      "summary": "Margin debt has surged to record levels as investors like 29-year-old Hy Luu borrow more against their portfolios. Here’s how leverage can amplify stock losses.",
-      "title_ko": "마진 부채, 사상 최고치 기록… 29세 투자자도 포트폴리오 레버리지 확대",
-      "why_ko": "마진 부채가 사상 최고 수준에 도달해 레버리지가 주식 손실을 확대한다.",
-      "summary_ko": "마진 부채 사상 최고치 기록, 투자자 레버리지 확대와 손실 위험",
       "summary_v": 2
     }
   ]
