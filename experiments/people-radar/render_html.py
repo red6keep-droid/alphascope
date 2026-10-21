@@ -62,10 +62,12 @@ def _dir_pill(d):
 
 
 def _card_text(s, cards):
+    """(헤드라인, 설명). 서술(narrate)이 없는 신호는 (None, "") — 영문 원문(quote · 기사 제목)을 그대로 내보내지 않는다
+    (2026-10-21, 운영지침 4-3 · D3-1f: 매체 문장 재배포 금지). 호출자가 None 이면 그 항목을 뺀다."""
     c = (cards or {}).get(s["lead"]["id"])
     if c:
         return c["headline"], c["detail"]
-    return s["lead"]["quote"] or s["lead"]["title"], ""   # 서술이 없으면 원문 (영어) 그대로
+    return None, ""
 
 
 # ── 구획 ────────────────────────────────────────────────────────────────
@@ -76,8 +78,8 @@ def sec_seo_lead(r, d, cards):
     names = [p["name_ko"] for p in r["people"]]
     text = f"{int(m)}월 {int(dd)}일 최근 24시간 시장 관련 발언은 {r['event_count']}건, 말한 사람은 {', '.join(names[:4])}" + (" 등" if len(names) > 4 else "") + "입니다."
     top = r["people"][0]["signals"][0] if r["people"] else None
-    if top:
-        h, _ = _card_text(top, cards)
+    h = _card_text(top, cards)[0] if top else None
+    if h:
         more = f" 가장 강한 발언은 {h}입니다."
         if len(text + more) <= SEO_LEAD_MAX:
             text += more
@@ -88,15 +90,17 @@ def sec_head(r, cards):
     """머리 강조 카드 — 인물 수 · 건수, 아래 줄 가장 강한 발언 (홈 카드가 data-lead 로 읽는다)."""
     top = r["people"][0]["signals"][0]
     h, _ = _card_text(top, cards)
-    sub = f"가장 강한 발언 : {_esc(h)}"   # 헤드라인이 "인물, 무엇" 이라 이름을 따로 붙이지 않는다
+    sub = f"가장 강한 발언 : {_esc(h)}" if h else ""   # 헤드라인이 "인물, 무엇" 이라 이름을 따로 붙이지 않는다. 서술이 없으면 줄을 뺀다
     if r.get("only_reports"):
-        sub += " (오늘은 보도된 발언만 있습니다)"
+        sub = (sub + " " if sub else "") + "(오늘은 보도된 발언만 있습니다)"
     card = dk.state_card(f"발언 {r['event_count']}건 · {r['people_count']}명", kind="neutral", sub_html=sub)
     return dk.cards(card)
 
 
 def _signal_item(p, s, cards):
     h, detail = _card_text(s, cards)
+    if not h:
+        return ""   # 서술 없는 신호는 싣지 않는다 (영문 원문 노출 금지) — sec_people 이 빈 항목을 거른다
     url = s["lead"]["url"] if (s["lead"]["url"] or "").startswith("http") else None
     head = (f'<a href="{_esc(url)}" target="_blank" rel="noopener" style="color:#111;font-weight:700;text-decoration:none;">{_esc(h)}</a>'
             if url else f"<span style='color:#111;font-weight:700;'>{_esc(h)}</span>")
@@ -107,6 +111,9 @@ def _signal_item(p, s, cards):
         meta.append({"self": "본인 글", "office": "기관 발표", "trade": "매매 공시"}.get(s["attribution"], "원문"))
     if s["n_reports"]:
         meta.append(f"보도 {s['n_reports']}곳")
+    pub = (s["lead"].get("publisher") or "").strip()   # 매체명을 보이는 글자로 (2026-10-21, 운영지침 D4-3)
+    if pub and pub != "googlenews" and s["source_kind"] != "primary":
+        meta.append(pub)
     targets = [x for x in s["companies"][:4]] + [config.SECTOR_KO.get(x, x) for x in s["sectors"][:2]]
     subs = [_esc(" · ".join(meta))]
     if detail:
@@ -125,7 +132,9 @@ def _signal_item(p, s, cards):
 def sec_people(r, cards):
     out = []
     for p in r["people"]:
-        items = [_signal_item(p, s, cards) for s in p["signals"]]
+        items = [x for x in (_signal_item(p, s, cards) for s in p["signals"]) if x]
+        if not items:
+            continue
         shown, more = items[:MAX_SIGNALS_PER_PERSON], items[MAX_SIGNALS_PER_PERSON:]
         out.append(dk.sub_label(f"{p['name_ko']} ({p['title_ko']})"))
         out.append(dk.item_rules(shown, sub=True))
@@ -182,7 +191,7 @@ def render(radar_path=None, narrative_path=None, output_dir=None):
         return None
     d = today_kst()
     title = post_title(d)
-    body = build_body(r, n, d)
+    body = dk.with_ai_model(build_body(r, n, d), (n or {}).get("model"))   # 글 끝 "AI 서술 · 모델명" (운영지침 D3-1d)
     body_path = os.path.join(output_dir, "radar_body.html")
     with open(body_path, "w", encoding="utf-8") as f:
         f.write(body)

@@ -26,6 +26,9 @@ import sys
 
 from dotenv import load_dotenv
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import notify  # noqa: E402  — 운영 알림 (experiments/notify.py, 2026-10-21)
+
 import analyze
 import chart_spx
 import collect_calendar
@@ -189,11 +192,15 @@ def main():
     print("=" * 50)
     validate_report.validate(INPUT_PATH, REPORT_PATH, analysis_path=analysis_path)
 
-    make_chart(input_data)
+    chart_ok = bool(make_chart(input_data))
     image_ok, cover_url = make_cover(input_data)
-    if should_publish and not image_ok:
-        print("[게시 중단] 커버 이미지 생성 실패. 이미지 없이 게시하지 않습니다.")
+    # 그래프(chart_spx)가 커버 자리라 커버는 그래프가 없는 날만 쓰인다 (render_html.build_body). 커버 생성 실패가 그래프 있는 날의 게시까지
+    # 막던 단일 실패점을 풀었다 — 둘 다 없을 때만 멈춘다 (2026-10-21, 운영지침 D6-2; "이미지 없이 게시하지 않는다"는 그대로)
+    if should_publish and not image_ok and not chart_ok:
+        print("[게시 중단] 그래프도 커버 이미지도 없습니다. 이미지 없이 게시하지 않습니다.")
         sys.exit(1)
+    if should_publish and not image_ok:
+        print("::warning::커버 이미지 생성 실패 — 그래프가 있어 그대로 진행합니다.")
 
     print("=" * 50)
     print("[5/6] HTML 렌더링")
@@ -227,4 +234,13 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # 데일리는 CNBC · FRED · 지수 · LLM · 커버 중 하나라도 죽으면 중단하는 구조 — 중단 이유를 Slack 으로 (2026-10-21, 운영지침 D6-2)
+    try:
+        main()
+    except SystemExit as e:
+        if e.code not in (0, None):
+            notify.now(f"데일리 리포트 중단 (exit {e.code}) — 로그 확인")
+        raise
+    except Exception as e:  # noqa: BLE001
+        notify.now(f"데일리 리포트 예외로 중단 — {type(e).__name__}: {str(e)[:160]}")
+        raise

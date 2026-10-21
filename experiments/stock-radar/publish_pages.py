@@ -11,17 +11,42 @@
 Blogger pages API. 인증은 데일리 publish_blogger 와 같다(BLOGGER_* 환경 변수).
 """
 
+import hashlib
+import json
 import os
 import sys
 import time
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(BASE, "..", "daily-report"))
+sys.path.insert(0, os.path.join(BASE, ".."))
 import publish_blogger  # noqa: E402
 import universe as U  # noqa: E402
+import notify  # noqa: E402  — 운영 알림 (experiments/notify.py, 2026-10-21)
 
 OUT = os.path.join(BASE, "output")
 NVDA_POST_URL = os.path.join(BASE, "..", "nvda-report", "output", "post_url.txt")
+# 마지막으로 올린 본문의 해시 — 같으면 PUT 하지 않는다 (2026-10-21, 운영지침 D2-2: 매 실행 전부 PUT → 하루 50회 쓰기, 실행 994초).
+# nvda-state 의 radar/ 에 같이 보관한다 (nvda-report.yml)
+HASHES = os.path.join(BASE, "data", "page_hashes.json")
+
+
+def _load_hashes():
+    try:
+        with open(HASHES, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def _save_hashes(h):
+    os.makedirs(os.path.dirname(HASHES), exist_ok=True)
+    with open(HASHES, "w", encoding="utf-8") as f:
+        json.dump(h, f, ensure_ascii=False, indent=0, sort_keys=True)
+
+
+def _digest(title, content):
+    return hashlib.sha1((title + "\n" + content).encode("utf-8")).hexdigest()
 
 
 def _norm(u):
@@ -90,17 +115,23 @@ def publish(only=None, dry=False):
         if not token:
             break
     by_url = {_norm(p.get("url")): p for p in items}
-    made = updated = failed = waiting = new_tries = 0
+    hashes = _load_hashes()
+    made = updated = failed = waiting = new_tries = unchanged = 0
+    stopped = False
     for key, title, slug, url, path in targets(only):
         page = by_url.get(_norm(url))
         if not page and new_tries >= U.NEW_PAGES_PER_RUN:   # 새 페이지는 실행 한 번에 상한까지 — 나머지는 다음 날 (2026-10-20 사용자: "하루에 조금씩")
             waiting += 1
             continue
+        content = _body(path)
+        digest = _digest(title, content)
+        if page and hashes.get(key) == digest:   # 바뀐 것이 없으면 쓰지 않는다 (운영지침 2-2)
+            unchanged += 1
+            continue
         new_tries += 0 if page else 1   # 만들다 실패한 것도 센다 — 429 가 나는 날 더 밀어붙이지 않게
         if dry:
             print(f"[pages] {'갱신' if page else '생성'} {key}: {title} → {url}")
             continue
-        content = _body(path)
         try:
             if page:
                 r = _call(requests, "put", f"{base}/{page['id']}", headers=headers, json={"kind": "blogger#page", "id": page["id"], "title": title, "content": content})
@@ -114,12 +145,22 @@ def publish(only=None, dry=False):
                 if _norm(got) != _norm(url):
                     print(f"::warning::[pages] {key}: 주소가 계획({url})과 다름 → {got}")
                 made += 1
+            hashes[key] = digest
             print(f"[pages] {'갱신' if page else '생성'} {key}: {r.json().get('url')}")
-        except Exception as e:  # noqa: BLE001 — 한 페이지 실패가 나머지를 막지 않게
+        except Exception as e:  # noqa: BLE001 — 한 페이지 실패가 나머지를 막지 않게 (429 끝까지 실패는 예외 — 아래)
             failed += 1
             print(f"::warning::[pages] {key} 실패: {str(e)[:200]}")
+            if getattr(getattr(e, "response", None), "status_code", None) == 429:
+                # 백오프(20·45·90·180초)를 다 쓰고도 429 — 더 밀어붙이면 스팸 신호. 이 실행의 나머지 쓰기는 멈춘다 (운영지침 2-2 · D2-3, 2026-10-21)
+                notify.event("블로거 429", f"고정 페이지 {key} — 백오프 후에도 429, 이 실행의 나머지 쓰기 중단")
+                stopped = True
+                break
         time.sleep(4)   # API 버스트를 피한다 (1초 간격은 6번째부터 429)
-    print(f"[pages] 생성 {made} · 갱신 {updated} · 실패 {failed}" + (f" · 다음 실행으로 미룸 {waiting} (하루 새 페이지 {U.NEW_PAGES_PER_RUN}개까지)" if waiting else ""))
+    if not dry:
+        _save_hashes(hashes)
+    print(f"[pages] 생성 {made} · 갱신 {updated} · 변경 없음 {unchanged} · 실패 {failed}"
+          + (f" · 다음 실행으로 미룸 {waiting} (하루 새 페이지 {U.NEW_PAGES_PER_RUN}개까지)" if waiting else "")
+          + (" · 429 로 중단" if stopped else ""))
     return failed == 0
 
 

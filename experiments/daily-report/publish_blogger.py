@@ -136,6 +136,19 @@ def with_related(content, labels, self_titles, blog_url=None, creds=None):
         return content
 
 
+def _write(method, url, **kw):
+    """글 POST · PUT — 429(요청 제한)면 20 · 45초 뒤 두 번 더 (2026-10-21, 운영지침 D2-3: 글 쓰기에는 429 재시도가 없었다).
+    고정 페이지(publish_pages._call)와 같은 생각. 세 번째도 429 면 그 응답을 그대로 돌려줘 호출자가 raise_for_status 로 끝낸다."""
+    for wait in (0, 20, 45):
+        if wait:
+            print(f"[게시] 429 — {wait}초 뒤 다시")
+            time.sleep(wait)
+        r = getattr(requests, method)(url, **kw)
+        if r.status_code != 429:
+            return r
+    return r
+
+
 def publish(title, content, labels=None, blog_url=None, dry_run=False, slug_title=None):
     """새 글 게시. slug_title 이 있으면 그 영문 제목으로 먼저 올려 주소를 영문으로 정하고, 바로 진짜 제목으로 바꾼다
     (2026-10-18 시험: 제목을 바꿔도 Blogger 주소는 처음 것 그대로 — 검색 노출, 가이드라인 10-5). 바꾸기에 실패해 영문 제목 글이 남아도
@@ -157,7 +170,8 @@ def publish(title, content, labels=None, blog_url=None, dry_run=False, slug_titl
     creds = _credentials()
     blog_id = _blog_id(creds, blog_url)
     content = payload["content"] = with_related(content, labels, [title] + ([slug_title] if slug_title else []), blog_url, creds)
-    resp = requests.post(
+    resp = _write(
+        "post",
         f"{BLOGGER_API}/blogs/{blog_id}/posts/",
         headers={
             "Authorization": f"Bearer {creds.token}",
@@ -171,9 +185,9 @@ def publish(title, content, labels=None, blog_url=None, dry_run=False, slug_titl
     post_url = post.get("url")
     if slug_title and slug_title != title:
         for attempt in range(3):   # 영문 제목이 피드에 오래 남지 않게 바로 바꾼다
-            r = requests.put(f"{BLOGGER_API}/blogs/{blog_id}/posts/{post['id']}",
-                             headers={"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"},
-                             json={"kind": "blogger#post", "id": post["id"], "title": title, "content": content, "labels": labels}, timeout=60)
+            r = _write("put", f"{BLOGGER_API}/blogs/{blog_id}/posts/{post['id']}",
+                       headers={"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"},
+                       json={"kind": "blogger#post", "id": post["id"], "title": title, "content": content, "labels": labels}, timeout=60)
             if r.ok:
                 post_url = r.json().get("url") or post_url
                 break

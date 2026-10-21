@@ -24,9 +24,13 @@
 
 import argparse
 import datetime
+import os
 import sys
 
 from dotenv import load_dotenv
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import notify  # noqa: E402  — 운영 알림 (experiments/notify.py, 2026-10-21)
 
 import blogger_client
 import firestore_client
@@ -96,11 +100,20 @@ def main():
         return
 
     fs = firestore_client.FirestoreClient()
-    comments = fs.list_comments()
     processed = state.load()
+    since = None
+    if processed is not None and not args.baseline and state.last_created():
+        # 마지막으로 본 댓글보다 3일 앞부터만 읽는다 — 주인이 먼저 답한 스레드 판정(threads_answered)에 필요한 앞 댓글은 그 안에 있다
+        try:
+            t = datetime.datetime.fromisoformat(state.last_created().replace("Z", "+00:00")) - datetime.timedelta(days=3)
+            since = t.astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            since = None
+    comments = fs.list_comments(since=since)
+    newest = max((c["created"] for c in comments), default=None)
 
     if args.baseline or processed is None:
-        state.save([c["id"] for c in comments])
+        state.save([c["id"] for c in comments], newest_created=newest)
         print(f"[baseline] 지금 댓글 {len(comments)}건을 '처리됨'으로 등록했습니다. 답글 없음.")
         return
 
@@ -136,9 +149,10 @@ def main():
                 print(f"[Slack] 알림 실패 (게시는 끝남): {e}")
         except Exception as e:
             print(f"[오류] comment={c['id']} 처리 실패 (다음 실행에 다시): {e}")
+            notify.event("댓글 처리 실패", f"comment={c['id']} — {str(e)[:120]}")   # 성공만 알리던 것을 실패도 (2026-10-21)
 
-    if handled and args.send:
-        state.save(sorted(done | set(handled)))
+    if args.send and (handled or newest):
+        state.save(sorted(done | set(handled)), newest_created=newest)
         print(f"[state] 처리됨 {len(handled)}건 저장 -> {state.STATE_FILE}")
 
 

@@ -561,16 +561,18 @@ def pill(text, kind="area", lead=False, bare=False):
             f'font-size:{PILL_SIZE};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{esc(text)}</span>')   # 라벨 14px, 어디서나 (2026-10-12 사용자)
 
 
-LOGO_URL = "https://financialmodelingprep.com/image-stock/{sym}.png"   # 티커 로고 (키 없이 받아진다, 2026-10-13 확인). 없으면 img 가 스스로 숨는다
-
-
 def ticker_logo(sym, size=20):
-    """종목 이름 앞 티커 로고 (2026-10-13 사용자: "엔비디아는 티커 로고, 각각의 종목명에도 티커 아이콘"). 둥근 20px, 못 받으면 숨김(onerror)."""
+    """종목 이름 앞 둥근 글자 배지 (2026-10-13 사용자: "각각의 종목명에도 티커 아이콘").
+    2026-10-21 까지는 financialmodelingprep.com 의 회사 로고를 핫링크했다 — 상표 · 제3자 약관 · 가용성에 묶여 운영지침 4-6(로고 금지)에
+    어긋나 뺐다 (D4-6). 지금은 티커 앞 두 글자를 우리 색으로 그린다. 함수 이름 · 호출처는 그대로."""
     sym = str(sym or "").strip().upper()
     if not sym or not sym.replace("-", "").replace(".", "").isalnum():
         return ""
-    return (f'<img src="{LOGO_URL.format(sym=sym)}" alt="" width="{size}" height="{size}" loading="lazy" onerror="this.style.display=\'none\'" '
-            f'style="width:{size}px;height:{size}px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;">')
+    txt = sym.replace("-", "").replace(".", "")[:2]
+    fs = max(8, int(size * 0.42))
+    return (f'<span aria-hidden="true" style="display:inline-block;width:{size}px;height:{size}px;line-height:{size}px;border-radius:50%;'
+            f'vertical-align:-4px;margin-right:6px;background:#E2E8F0;color:#334155;font-size:{fs}px;font-weight:700;text-align:center;'
+            f'letter-spacing:0;white-space:nowrap;overflow:hidden;">{txt}</span>')
 
 
 def link_icon(url, label):
@@ -1009,6 +1011,27 @@ def as_rules(html):
     html = html.replace(MULTI, f"display:block;margin:0 0 6px;border-top:1px solid #E2E8F0;border-bottom:1px solid #E2E8F0;font-size:{SMALL};line-height:{LH_CARD};")
     html = html.replace(f"padding:{SEP_GAP - VP - 1}px 12px;", f"padding:{SEP_GAP - VP - 1}px 0;")
     return re.sub(r"border:1px solid (#[0-9A-Fa-f]{6});border-radius:10px;", r"border-top:1px solid \1;border-bottom:1px solid \1;", html)
+
+
+def ai_model_line(model):
+    """AI 가 쓴 문장이 있는 글의 맨 끝 한 줄 — "AI 서술 · gemini-3.5-flash" (운영지침 3-4 · D3-1d, 2026-10-21).
+    예비 모델이 답한 날은 그 모델명이 그대로 보인다(pool.last_model). 숫자는 파이썬이 계산한다는 설명은 공통 푸터가 맡는다."""
+    if not model:
+        return ""
+    return (f'<div data-ai-model="1" style="margin-top:14px;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">'
+            f'AI 서술 · {esc(str(model))}</div>')
+
+
+def with_ai_model(body, model):
+    """본문 맨 끝(WRAP_CLOSE 안쪽)에 ai_model_line 을 넣는다. 모델이 없으면 그대로."""
+    line = ai_model_line(model)
+    if not line:
+        return body
+    s = body.rstrip()
+    if s.endswith(WRAP_CLOSE):
+        i = s.rfind(WRAP_CLOSE)
+        return s[:i] + line + s[i:]
+    return body + line
 
 
 def footer(data_line, disclaimer_line, indent=True):

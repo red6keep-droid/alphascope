@@ -46,6 +46,21 @@ def import_state(conn, state_dir):
     return total
 
 
+def _strip_third_party_text(row):
+    """공개 nvda-state 브랜치(PUBLIC 저장소 = 배포)에 매체 요약문 · 보도자료 본문 원문을 남기지 않는다 (2026-10-21, 운영지침 4-2 · D4-2).
+    제목 · 링크 · 매체 · 우리 분류(ai_*) · 사실 문장은 남는다. 이미 분류된 행이라 요약이 없어도 다시 쓸 일이 없다."""
+    row["summary"] = None
+    raw = row.get("raw_json")
+    if raw:
+        try:
+            d = json.loads(raw)
+        except (TypeError, ValueError):
+            return
+        if isinstance(d, dict) and "body" in d:
+            d.pop("body", None)
+            row["raw_json"] = json.dumps(d, ensure_ascii=False)
+
+
 def export_state(conn, state_dir):
     os.makedirs(state_dir, exist_ok=True)
     total = 0
@@ -53,6 +68,8 @@ def export_state(conn, state_dir):
         rows = [dict(r) for r in conn.execute(f"SELECT * FROM {table}")]
         with open(os.path.join(state_dir, f"{table}.jsonl"), "w", encoding="utf-8") as f:
             for r in rows:
+                if table == "items":
+                    _strip_third_party_text(r)
                 f.write(json.dumps(r, ensure_ascii=False, default=str) + "\n")
         total += len(rows)
     print(f"[state] {len(TABLES)}개 테이블 {total:,}행 → {state_dir}")

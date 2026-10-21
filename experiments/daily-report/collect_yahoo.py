@@ -13,9 +13,13 @@
 
 import datetime
 import os
+import sys
 
 import requests
 import yfinance as yf
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import price_source  # noqa: E402  — yfinance 예비 (FRED), 2026-10-21
 
 INDICES = {
     "sp500": {"symbol": "^GSPC", "name": "S&P 500"},
@@ -97,6 +101,11 @@ def collect_indices():
         except Exception as e:
             print(f"{meta['symbol']} 지수 수집 실패: {e}")
             rec = None
+        if rec is None:
+            # yfinance 가 막힌 날 — FRED(공식) 종가로 채운다. 하루 늦을 수 있다 (experiments/price_source.py, 2026-10-21)
+            fb = price_source.quote(meta["symbol"])
+            if fb:
+                rec = {"symbol": meta["symbol"], **fb}
         result[key] = {"name": meta["name"], "symbol": meta["symbol"], **(
             rec or {
                 "price": None,

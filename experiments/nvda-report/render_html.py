@@ -1091,6 +1091,9 @@ def _event_html(e):
         head = _esc(e["title"])
         fact = f" · {_esc(_dk.headline(e['fact']))}" if e.get("fact") and e["fact"] != e["title"] else ""
     when = f' <span style="color:{SUB};font-size:{TINY};white-space:nowrap;">({_esc(_d(e["published_at"][:10]))})</span>' if e.get("published_at") else ""   # 날짜가 두 줄로 쪼개지지 않게
+    if e["kind"] in rr.DOC_KINDS and src and src != "googlenews":
+        # 매체명을 보이는 글자로 (2026-10-21, 운영지침 D4-3): 툴팁(title)은 모바일에서 안 뜬다. 날짜 뒤 " · CNBC"
+        when += f' <span style="color:{SUB};font-size:{TINY};white-space:nowrap;">· {_esc(src)}</span>'
     # 라벨 줄: 여백 없이 왼쪽 정렬, 기사 맨 아래 (2026-10-13 사용자) · 라벨 사이 3px (2026-10-14 사용자: 0 → 3, 가이드라인 10-7)
     lab = f'<span style="display:block;line-height:1;margin:8px 0 0;">{tag.replace(f"margin:0 {_dk.PILL_GAP}px;", "margin:0 3px 0 0;").replace("</span> <span", "</span><span")}</span>'
     # 일반 기사와 강조 카드 모두: 새 창 아이콘 없이 제목이 원문 링크 → 사실 · 날짜 → 라벨 줄 (2026-10-13 사용자: "강조 카드 내의 정보는 일반 뉴스의 정보 배치로")
@@ -1873,7 +1876,7 @@ def render(analysis_path=None, narrative_path=None, output_dir=None):
         with open(narrative_path, "r", encoding="utf-8") as f:
             n = json.load(f)
     title = report_title.post_title(a.get("run_date") or report_title.today_kst())
-    body = build_body(a, n)
+    body = _dk.with_ai_model(build_body(a, n), (n or {}).get("model"))   # 글 끝 "AI 서술 · 모델명" (운영지침 D3-1d)
     body_path = os.path.join(output_dir, "nvda_report_body.html")
     preview_path = os.path.join(output_dir, "nvda_report.html")
     with open(body_path, "w", encoding="utf-8") as f:

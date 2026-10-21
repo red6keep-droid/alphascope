@@ -801,7 +801,10 @@ def sec_news(input_data, report, analysis):
         sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;">{x}</span>' for x in subs)
         head = (f'<a href="{_esc(url)}" target="_blank" rel="noopener" style="color:#111;font-weight:700;text-decoration:none;">{title}</a>' if url
                 else f"<span style='color:#111;font-weight:700;'>{title}</span>")   # 제목이 원문 링크 — 새 창 아이콘 삭제 (2026-10-13 사용자)
-        lab = f'<span style="display:block;line-height:1;margin:8px 0 0;">{tag}</span>' if tag else ""   # 라벨 줄은 기사 맨 아래 (2026-10-13 사용자)
+        # 매체명을 보이는 글자로 — 출처 명시(저작권법 제37조)는 툴팁이 아니라 본문 글자여야 한다 (2026-10-21, 운영지침 D4-3)
+        src = news_item.get("source") or ""
+        src_html = f'<span style="color:{dk.SUB};font-size:{dk.TINY};vertical-align:middle;margin-left:{6 if tag else 0}px;">{_esc(src)}</span>' if src else ""
+        lab = f'<span style="display:block;line-height:1;margin:8px 0 0;">{tag}{src_html}</span>' if (tag or src_html) else ""   # 라벨 줄은 기사 맨 아래 (2026-10-13 사용자)
         items.append(f"{head}{sub_html}{lab}")
     return dk.item_rules(items, sub=True) if items else dk.muted("주요 뉴스 없음")   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
 
@@ -902,6 +905,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     parts.append(dk.section("금리·지표", sec_macro(input_data.get("macro", {}), analysis, report), tab=TAB_MARKET))
     if a.get("calendar"):
         parts.append(dk.section(TAB_CAL, cards.cards_grid(sx.macro_cal_card(a) + sx.earnings_cal_card(a)), tab=TAB_CAL))
+    parts.append(dk.ai_model_line(report.get("model")))   # "AI 서술 · 모델명" 한 줄 (운영지침 D3-1d, 2026-10-21)
     parts.append(dk.WRAP_CLOSE)   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지, 가이드라인 6절)
     # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지) · 반말 문장 끝은 합니다체 (2026-10-18 사용자: 블로그 기본 문체, 데일리는 재작업 때 일괄 — 지금)
     return dk.formal(dk.fix_colons("\n".join(p for p in parts if p)))

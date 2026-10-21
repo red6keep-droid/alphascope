@@ -16,7 +16,9 @@ import report_title
 DAILY_REPORT_DIR = os.path.join(config.BASE_DIR, "..", "daily-report")
 # 뒤에 붙인다 — 앞에 넣으면 daily-report의 render_html.py·report_title.py가 이쪽 모듈을 가린다.
 sys.path.append(os.path.abspath(DAILY_REPORT_DIR))
+sys.path.append(os.path.abspath(os.path.join(config.BASE_DIR, "..")))
 import publish_blogger  # noqa: E402  (daily-report 모듈)
+import notify  # noqa: E402  (experiments/notify.py — 운영 알림, 2026-10-21)
 
 
 def event_count(output_dir=None):
@@ -36,6 +38,8 @@ def publish(output_dir=None, do_publish=False):
     n = event_count(output_dir)
     if n == 0:
         print("[publish] 최근 24시간 이벤트 0건 — 오늘은 게시하지 않는다")
+        if do_publish:   # 미게시도 알린다 — 수집 실패로 0건이 된 날과 구분하려면 같은 알림의 "수집 실패" 줄을 본다 (2026-10-21)
+            notify.event("미게시", "트럼프 — 최근 24시간 이벤트 0건")
         return None
     body_path = os.path.join(output_dir, "trump_report_body.html")
     if not os.path.exists(body_path):

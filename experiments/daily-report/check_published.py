@@ -27,9 +27,12 @@ import os
 import sys
 
 from dotenv import load_dotenv
+from google.auth.exceptions import RefreshError
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
+import notify  # noqa: E402  — 운영 알림 (experiments/notify.py, 2026-10-21)
 import publish_blogger
 import report_title
 
@@ -72,6 +75,11 @@ def main():
     try:
         url = publish_blogger.find_post_by_title(title)
     except Exception as e:
+        # refresh token 이 무효(만료 · 철회 · 비밀번호 변경 · 50개 초과)면 뒤 단계가 다 돌아도 게시에서 실패한다 —
+        # Gemini 를 헛쓰기 전에 여기서 멈추고 알린다 (2026-10-21, 운영지침 D2-6 · 10절). 네트워크 같은 일시 오류는 예전처럼 진행
+        if isinstance(e, RefreshError) or "invalid_grant" in str(e):
+            notify.now("Blogger OAuth 토큰 무효 (invalid_grant) — setup_oauth.py 로 재발급 후 BLOGGER_REFRESH_TOKEN 교체. 파이프라인 중단")
+            sys.exit(1)
         print(f"::warning::게시 여부 확인 실패 ({e}) — 게시되지 않은 것으로 간주하고 진행합니다.")
         _set_output(False)
         return

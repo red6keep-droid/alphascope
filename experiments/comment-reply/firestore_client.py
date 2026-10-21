@@ -72,11 +72,21 @@ class FirestoreClient:
             "created": (f.get("created") or {}).get("timestampValue") or doc.get("createTime", ""),
         }
 
-    def list_comments(self):
-        """모든 글의 댓글 (컬렉션 그룹 질의). 필터 · 정렬이 없어야 색인 없이 돈다 — 정렬은 여기서."""
-        rows = self._call("POST", f"{self.base}:runQuery", {
-            "structuredQuery": {"from": [{"collectionId": "comments", "allDescendants": True}]}
-        })
+    def list_comments(self, since=None):
+        """댓글 (컬렉션 그룹 질의). since(ISO 시각)가 있으면 그 뒤에 쓰인 것만 — 실행마다 전체를 읽어 무료 읽기 한도(하루 5만)를
+        갉아먹던 것을 줄인다 (2026-10-21, 운영지침 D7-4). created 범위 필터는 **컬렉션 그룹 색인**이 필요하다
+        (Firestore 콘솔 → 색인 → 단일 필드 → comments.created 에 '컬렉션 그룹' 범위 켜기). 색인이 없으면 400 이 오고 — 그때는
+        예전처럼 전체를 읽고 경고만 남긴다. 정렬은 여기서."""
+        q = {"from": [{"collectionId": "comments", "allDescendants": True}]}
+        if since:
+            q["where"] = {"fieldFilter": {"field": {"fieldPath": "created"}, "op": "GREATER_THAN_OR_EQUAL", "value": {"timestampValue": since}}}
+        try:
+            rows = self._call("POST", f"{self.base}:runQuery", {"structuredQuery": q})
+        except RuntimeError as e:
+            if not since or "400" not in str(e):
+                raise
+            print(f"::warning::[firestore] created 필터 질의 실패 (컬렉션 그룹 색인 없음?) — 전체 읽기로 대신: {str(e)[:120]}")
+            rows = self._call("POST", f"{self.base}:runQuery", {"structuredQuery": {"from": [{"collectionId": "comments", "allDescendants": True}]}})
         items = [self._from_doc(r["document"]) for r in rows if r.get("document")]
         return sorted(items, key=lambda c: c["created"])
 

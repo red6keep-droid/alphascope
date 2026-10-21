@@ -14,6 +14,10 @@ import yfinance as yf
 
 import universe as U
 
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import price_source  # noqa: E402  — yfinance 예비 사슬 (2026-10-21)
+
 SECTOR_ETFS = ("XLK", "XLF", "XLE", "XLV", "XLP", "XLY", "XLI", "XLB", "XLU", "XLRE", "XLC")   # NVDA 리포트 config.SECTOR_ETFS 와 같은 11개
 HIST_MAX_AGE_DAYS = 7
 
@@ -29,8 +33,15 @@ def _bars(symbols):
     for s in symbols:
         try:
             sub = df[s].dropna(subset=["Close"])
-        except KeyError:
-            print(f"[collect] {s}: 일봉 없음")
+        except (KeyError, TypeError):
+            sub = None
+        if sub is None or sub.empty:
+            # yfinance 가 비면 예비 사슬(FRED → Polygon → Twelve Data → Alpha Vantage, 키 있는 것만) — 2026-10-21 price_source
+            fb = price_source.daily_bars(s, (datetime.date.today() - datetime.timedelta(days=731)).isoformat())
+            if not fb:
+                print(f"[collect] {s}: 일봉 없음")
+                continue
+            out[s] = [{"day": b["day"], "open": b["open"], "high": b["high"], "low": b["low"], "close": b["close"], "adj": b["close"], "volume": float(b["volume"] or 0)} for b in fb]
             continue
         out[s] = [{"day": i.strftime("%Y-%m-%d"), "open": float(r["Open"]) if r["Open"] == r["Open"] else None, "high": float(r["High"]), "low": float(r["Low"]), "close": float(r["Close"]),
                    "adj": float(r["Adj Close"]), "volume": float(r["Volume"] or 0)} for i, r in sub.iterrows()]
@@ -66,7 +77,8 @@ def run():
     syms = [c[0] for c in U.CANDIDATES]
     extra = sorted({U.BENCH, "^VIX", "SMH", *SECTOR_ETFS})
     bars = _bars(syms + extra)
-    with ThreadPoolExecutor(8) as ex:
+    # 스레드 8 → 3: 49종목 × 2 호출을 한꺼번에 쏘면 러너 IP 가 Yahoo 에 막힐 때 전부 같이 죽는다 (운영지침 D6-1, 2026-10-21)
+    with ThreadPoolExecutor(3) as ex:
         caps = dict(ex.map(_cap, syms))
         earn = dict(ex.map(_earnings, syms))
     snap = {"fetched_at": datetime.datetime.now(NY).isoformat(timespec="minutes"), "bars": bars, "caps": caps, "earnings": earn, "history": history()}

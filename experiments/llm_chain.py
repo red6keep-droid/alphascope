@@ -98,6 +98,13 @@ CHAINS = {
     "json-backup-first": ["nvidia-deepseek", "groq-qwen", "groq", "gemini-lite"],
 }
 
+# NVIDIA(build.nvidia.com) 무료 엔드포인트는 공식 FAQ 상 개발 · 테스트 · 연구 · 평가 전용 — "실제 최종 사용자에게 서비스하는 활동" 은
+# production 이라 NVIDIA AI Enterprise 라이선스가 필요하다 (doc/블로그-운영-지침.md D3-2, 2026-10-21). 독자에게 나가는 글 · 댓글 답글에
+# 쓰는 것은 그 경계를 넘으므로 운영 사슬에서 뺀다. 로컬 비교 실험(정확도 측정)에만 LLM_ALLOW_NVIDIA=1 로 되살린다.
+# STEPS 정의는 그대로 둔다 — 실험 · 옛 실측 기록의 참조용.
+if os.environ.get("LLM_ALLOW_NVIDIA", "").strip() != "1":
+    CHAINS = {name: [s for s in steps if not s.startswith("nvidia")] for name, steps in CHAINS.items()}
+
 # 예비 모델이 남긴 ai_model 은 "공급자:모델" (nvidia:… · groq:…). Gemini("gemini-…") · 규칙("rule") 에는 콜론이 없다
 PROVISIONAL_SQL = "ai_model LIKE '%:%'"
 

@@ -16,6 +16,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.parse
 import xml.etree.ElementTree as ET
 
@@ -93,6 +94,7 @@ def collect(store):
     seen = {_key(v["title"]): k for k, v in store.items()}
     new = 0
     for sym, *_ in U.CANDIDATES:
+        time.sleep(1)   # 종목당 1회, 사이 1초 — 기획(알파-종목-리포트 341)대로. 49회 연속 요청을 피한다 (2026-10-21)
         try:
             items = fetch(sym)
         except Exception as e:   # noqa: BLE001

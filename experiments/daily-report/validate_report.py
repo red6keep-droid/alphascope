@@ -22,7 +22,9 @@ THEME_VOCAB = {"금리", "AI/반도체", "실적", "매크로", "에너지", "�
 IMAGE_PROMPT_MAX_LEN = 300
 
 REQUIRED_MACRO = ["unemployment_rate", "cpi", "vix"]
-REQUIRED_INDICES = ["sp500", "nasdaq", "dow", "russell", "vix"]
+# 러셀 2000 은 yfinance 예비(FRED)에 없어 막힌 날 못 채운다 — 빠져도 글은 나가게 경고로 내렸다 (2026-10-21, 운영지침 D6-1)
+REQUIRED_INDICES = ["sp500", "nasdaq", "dow", "vix"]
+OPTIONAL_INDICES = ["russell"]
 
 
 def _is_bad(val):
@@ -66,6 +68,12 @@ def validate(input_path, output_path, analysis_path=None):
         rec = indices.get(key) or {}
         if rec.get("price") is None:
             errors.append(f"지수 데이터 누락: {key}")
+    for key in OPTIONAL_INDICES:
+        if ((indices.get(key) or {}).get("price")) is None:
+            warnings.append(f"지수 데이터 누락 (선택): {key} — 표에서 '—' 로 나갑니다.")
+    fb = [k for k, v in indices.items() if (v or {}).get("source") == "FRED"]
+    if fb:
+        warnings.append(f"yfinance 대신 FRED 종가로 채운 지수: {', '.join(fb)} (하루 늦을 수 있음)")
 
     for key in REQUIRED_LLM_KEYS:
         if key not in report or _is_bad(report.get(key)):

@@ -41,6 +41,7 @@ env:
 jobs:
   comment-reply:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
 
@@ -104,3 +105,9 @@ jobs:
         with:
           name: comment-reply-log
           path: experiments/comment-reply/output/
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — ${{ github.workflow }}\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

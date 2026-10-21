@@ -512,7 +512,7 @@ def render(analysis_path=None, narrative_path=None, output_dir=None):
             n = json.load(f)
 
     title = report_title.post_title(report_title.today_kst())
-    body = build_body(a, n)
+    body = dk.with_ai_model(build_body(a, n), (n or {}).get("model"))   # 글 끝 "AI 서술 · 모델명" (운영지침 D3-1d)
     body_path = os.path.join(output_dir, "trump_report_body.html")
     preview_path = os.path.join(output_dir, "trump_report.html")
     with open(body_path, "w", encoding="utf-8") as f:

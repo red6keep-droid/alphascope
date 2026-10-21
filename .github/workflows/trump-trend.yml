@@ -51,6 +51,11 @@ concurrency:
 env:
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_TRUMP || secrets.GEMINI_API_KEY }}   # 리포트별 프로젝트 키 (2026-10-15) — 없으면 공용 키
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # AI 호출 알림 — 한도 · 예비 사용 · 전부 실패 (llm_chain, 2026-10-14)
+  # yfinance 예비 사슬 (experiments/price_source.py, 2026-10-21). 없는 키는 그 단계를 건너뛴다
+  POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+  TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
+  FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+  ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}       # Gemini 한도 · 503 때 예비 1순위 gpt-oss-120b (2026-10-14)
   NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}   # 예비 2순위 DeepSeek
   FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
@@ -92,6 +97,7 @@ jobs:
     needs: check
     if: needs.check.outputs.already_published != 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v5
 
@@ -216,3 +222,9 @@ jobs:
             experiments/trump-trend/output/narrative.json
           if-no-files-found: ignore
           retention-days: 14
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — ${{ github.workflow }}\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

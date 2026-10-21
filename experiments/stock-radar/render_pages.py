@@ -382,9 +382,11 @@ def _news_for(s, news):
             continue
         counted.append((x, sc))
         prio = x["area"] in R.config.PRIORITY_AREAS
+        if not x.get("fact"):
+            continue   # 사실 문장 검사에서 두 번 탈락한 기사 = 영문 원제를 그대로 싣게 되므로 뺀다. 방향 집계(counted)에는 남는다 (2026-10-21, 운영지침 D3-1f)
         if sc["relevance"] >= (1 if prio else 2):
-            out.append({"area": x["area"], "kind": "news", "title": x["title"], "fact": x.get("fact") or x["title"],   # 문장 검사에서 두 번 탈락 = 원문 제목
-                        "has_fact": bool(x.get("fact")), "url": x.get("url"), "direction": sc["direction"],
+            out.append({"area": x["area"], "kind": "news", "title": x["title"], "fact": x["fact"],
+                        "has_fact": True, "url": x.get("url"), "direction": sc["direction"],
                         "emphasis": sc["relevance"] >= 3 or prio, "source": x.get("source"), "published_at": x["published_at"], "rel": sc["relevance"], "prio": prio})
     for f in s.get("filings") or []:   # SEC 공시 — NVDA 리포트처럼 기사와 같은 목록에 (제목은 파이썬 규칙, AI 없음)
         if f["filed"] >= cut:

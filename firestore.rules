@@ -20,21 +20,48 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function isOwner() { return signedIn() && request.auth.uid == 'u1vln4bbDgSgWQDe2F2FaNs81D43'; }
 
+    // 쓰기 남용 방어 (2026-10-21, doc/블로그-운영-지침.md D7-4). 전에는 로그인만 하면 아무 postId 아래에 무제한으로 쓸 수 있었다.
+    //  ① postId 는 블로거 글 ID(숫자 5~25자리) 모양이어야 한다 — 임의 경로에 쓰레기를 쌓지 못하게
+    //  ② 답글(parent)은 같은 글의 실제 댓글을 가리켜야 한다 (exists = 읽기 1회)
+    //  ③ 같은 사람은 20초에 한 번 — 테마 JS 가 댓글과 함께 users/{uid}.last 를 같은 commit 으로 쓴다 (alphaflow-home.html store.add).
+    //     users 문서가 없으면(옛 테마) 통과 → 테마를 새로 붙여넣은 뒤부터 제한이 걸린다
+    function postIdOk(postId) { return postId.matches('^[0-9]{5,25}$'); }
+    function parentOk(postId, data) {
+      return !('parent' in data)
+        || (data.parent is string && data.parent.size() <= 40
+            && exists(/databases/$(database)/documents/posts/$(postId)/comments/$(data.parent)));
+    }
+    function notTooFast() {
+      return !exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.last < request.time - duration.value(20, 's');
+    }
+
     match /posts/{postId}/comments/{commentId} {
       allow read: if true;
 
       allow create: if signedIn()
+        && postIdOk(postId)
         && request.resource.data.keys().hasOnly(['uid', 'name', 'photo', 'text', 'created', 'parent'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.name is string && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 60
         && request.resource.data.photo is string && request.resource.data.photo.size() <= 400
         && request.resource.data.text is string && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 2000
         && request.resource.data.created == request.time
-        && (!('parent' in request.resource.data) || (request.resource.data.parent is string && request.resource.data.parent.size() <= 40));
+        && parentOk(postId, request.resource.data)
+        && notTooFast();
 
       allow update: if false;
 
       allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isOwner());
+    }
+
+    // 사용자별 마지막 댓글 시각 — 본인만, 필드는 last 하나, 값은 서버 시각
+    match /users/{uid} {
+      allow read: if false;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['last'])
+        && request.resource.data.last == request.time;
+      allow delete: if false;
     }
 
     match /{document=**} {

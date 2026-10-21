@@ -27,6 +27,9 @@ import time
 
 from dotenv import load_dotenv
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import notify  # noqa: E402  — 운영 알림 (experiments/notify.py, 2026-10-21)
+
 import collect_calendar
 import collect_edgar
 import collect_feeds
@@ -96,9 +99,10 @@ def main():
             collect_market.collect_bars(conn, force_backfill=args.backfill_prices)
         except Exception as e:  # noqa: BLE001
             print(f"[prices] 실패 — 기존 일봉으로 계속: {e}")
+            notify.event("수집 실패", f"NVDA 일봉 (yfinance) — {str(e)[:120]}")
     day = args.day or collect_market.last_bar_day(conn)
     if not day:
-        print("일봉이 없다 — 중단")
+        notify.now("NVDA 일봉이 하나도 없음 — 중단 (yfinance 차단?)")
         sys.exit(1)
     print(f"기준 거래일 {day} · 실행일(KST) {run_date}")
 
@@ -140,6 +144,7 @@ def main():
             collect_edgar.collect(conn, since_days=args.edgar_days)
         except Exception as e:  # noqa: BLE001
             print(f"[edgar] 실패 — 기존 공시로 계속: {e}")
+            notify.event("수집 실패", f"NVDA EDGAR — {str(e)[:120]}")
         try:
             extract_quarterly.run(conn)          # 새 8-K 2.02 · 10-Q/10-K가 있을 때만 돈다 (④)
         except Exception as e:  # noqa: BLE001
@@ -153,10 +158,12 @@ def main():
             collect_feeds.collect(conn)
         except Exception as e:  # noqa: BLE001
             print(f"[feeds] 실패 — 계속: {e}")
+            notify.event("수집 실패", f"NVDA 문서 피드 — {str(e)[:120]}")
         try:
             collect_regulatory.collect(conn, skip_courts=args.skip_courts)
         except Exception as e:  # noqa: BLE001
             print(f"[regulatory] 실패 — 계속: {e}")
+            notify.event("수집 실패", f"NVDA 규제 · 법원 — {str(e)[:120]}")
         if not args.skip_courts:
             try:
                 cases_watch.run(conn, day)

@@ -134,6 +134,7 @@ def narrate(analysis_path=None, output_path=None):
         try:
             # 둘째 시도는 검증까지 사슬 안에서 — Gemini 답이 또 탈락하면 예비 모델로 넘어간다 (2026-10-14)
             result = check(pool.generate_json(prompt, temperature=0.3, validate=check if attempt == 2 else None))
+            result["model"] = pool.last_model   # 글 끝 "AI 서술 · 모델명" (운영지침 D3-1d, 2026-10-21)
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(result, f, ensure_ascii=False, indent=2)
             print(f"[narrate] → {output_path}")

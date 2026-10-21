@@ -12,9 +12,19 @@ concurrency:
   group: stock-data-update
   cancel-in-progress: true
 
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # 운영 알림 — 수집 0건 · 워크플로 실패 (experiments/notify.py, 2026-10-21)
+  # yfinance 예비 사슬 (experiments/price_source.py, 2026-10-21 사용자: "동일하면 수집 순위로, 예비로"). 없는 키는 그 단계를 건너뛴다
+  FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+  POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+  TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
+  FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+  ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+
 jobs:
   run-fetch:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
 
@@ -26,6 +36,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # yfinance 가 막혀 수집이 부족하면 fetch_stocks.py 가 data.json 을 쓰지 않고 실패한다 → 배포 건너뜀, 예전 파일 유지
       - name: Run script
         run: python fetch_stocks.py
 
@@ -44,3 +55,9 @@ jobs:
 
       - name: Purge jsDelivr cache
         run: curl -sS -f https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/data.json
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — ${{ github.workflow }}\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

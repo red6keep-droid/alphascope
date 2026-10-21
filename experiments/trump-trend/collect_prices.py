@@ -4,6 +4,7 @@ yfinance 무료·키 없음. 첫 실행은 2년치를 받고, 이후엔 최근 �
 분봉은 경로가 정해지면 별도 모듈로 붙인다 — 이 파일은 일봉만 다룬다.
 """
 
+import os
 import sys
 
 import pandas as pd
@@ -11,6 +12,17 @@ import yfinance as yf
 
 import config
 import db
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import price_source  # noqa: E402  — yfinance 예비 사슬, 2026-10-21
+
+
+def _fallback_start(period):
+    """yfinance period("2y" · "1mo" …) → 예비 소스의 시작일(YYYY-MM-DD)."""
+    import datetime
+    n, unit = int("".join(ch for ch in period if ch.isdigit()) or 1), period.lstrip("0123456789")
+    days = {"d": 1, "wk": 7, "mo": 31, "y": 366}.get(unit, 31) * n
+    return (datetime.date.today() - datetime.timedelta(days=days)).isoformat()
 
 
 def _has_history(conn, symbol):
@@ -25,10 +37,17 @@ def fetch_daily(symbols, period):
     for sym in symbols:
         try:
             sub = df[sym] if isinstance(df.columns, pd.MultiIndex) else df
-        except KeyError:
-            print(f"[prices] {sym}: 데이터 없음")
+            sub = sub.dropna(subset=["Close"])
+        except (KeyError, TypeError, ValueError):
+            sub = None
+        if sub is None or sub.empty:
+            # yfinance 가 비면 예비 사슬(FRED → Polygon → Twelve Data → Alpha Vantage)로 (2026-10-21, price_source)
+            fb = price_source.daily_bars(sym, _fallback_start(period))
+            if not fb:
+                print(f"[prices] {sym}: 데이터 없음")
+                continue
+            rows.extend((sym, b["day"], b["open"], b["high"], b["low"], b["close"], b["volume"]) for b in fb)
             continue
-        sub = sub.dropna(subset=["Close"])
         for idx, r in sub.iterrows():
             rows.append((
                 sym, idx.strftime("%Y-%m-%d"),

@@ -31,9 +31,18 @@ def load():
     return [str(i) for i in data[KEY]]
 
 
-def save(processed):
+SINCE_KEY = "fs_last_created"   # 마지막으로 본 댓글의 created — 다음 실행은 이보다 3일 앞부터만 읽는다 (2026-10-21)
+
+
+def last_created():
+    return _read().get(SINCE_KEY)
+
+
+def save(processed, newest_created=None):
     data = _read()
     data[KEY] = [str(i) for i in processed]
+    if newest_created:
+        data[SINCE_KEY] = max(newest_created, data.get(SINCE_KEY) or "")
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)

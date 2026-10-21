@@ -231,7 +231,7 @@ def run(snap):
             nxt = next((e["day"] for e in snap["earnings"].get(sym) or [] if e["day"] >= day), None)
             if bars:
                 jobs.append((sym, bars[-1]["close"], day, nxt))
-        with ThreadPoolExecutor(6) as ex:
+        with ThreadPoolExecutor(3) as ex:   # 6 → 3 (운영지침 D6-1, 2026-10-21)
             out["stocks"] = dict(ex.map(_one, jobs))
         _, spy = _one((U.BENCH, snap["bars"][U.BENCH][-1]["close"], day, None), only=("options",))   # S&P 500 은 옵션만 (ETF 라 재무 값이 없다)
         out["spy_iv"] = spy.get("iv")

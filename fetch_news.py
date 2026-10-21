@@ -183,6 +183,10 @@ def main():
 
     results = items[:MAX_ITEMS]
     add_korean_titles(results)
+    # 영문 RSS 요약은 번역 입력으로만 쓰고 공개 파일(gh-pages, PUBLIC 저장소 = 배포)에는 남기지 않는다 (2026-10-21, 운영지침 4-2 · D4-2).
+    # 홈은 summary_ko(우리 소개 한 줄)만 쓴다
+    for it in results:
+        it.pop("summary", None)
     output = {
         "updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         "items": results,

@@ -52,6 +52,9 @@ def _chart_or_cover(body, repo_slug, cover_url):
     end = body.find("</a>", start)
     if start < 0 or end < 0:
         return body
+    if not cover_url:
+        print("그래프 CDN 확인 실패 + 커버 없음 — 이미지 없이는 게시하지 않습니다.")
+        sys.exit(1)
     return body[:start] + render_html._cover_image(cover_url) + body[end + 4:]
 
 
@@ -73,21 +76,27 @@ def main():
         print("제목 또는 본문이 비어 있어 게시를 중단합니다.")
         sys.exit(1)
 
-    if not image_ref:
-        print("image_ref.txt가 비어 있음 — 커버 이미지 없이는 게시하지 않습니다.")
-        sys.exit(1)
-
     repo_slug = os.environ.get("GITHUB_REPOSITORY") or DEFAULT_REPO_SLUG
-    cover_url = f"https://cdn.jsdelivr.net/gh/{repo_slug}@gh-pages/{image_ref}"
-    try:
-        resp = requests.head(cover_url, timeout=30, allow_redirects=True)
-        resp.raise_for_status()
-    except Exception as e:
-        print(f"커버 이미지 URL 확인 실패 ({cover_url}): {e}")
-        print("이미지가 배포되지 않았거나 CDN 반영 전입니다. 게시를 중단합니다.")
+    chart_ref_path = os.path.join(OUTPUT_DIR, "chart_ref.txt")
+    chart_ref = _read(chart_ref_path) if os.path.exists(chart_ref_path) else ""
+    cover_url = None
+    if image_ref:
+        cover_url = f"https://cdn.jsdelivr.net/gh/{repo_slug}@gh-pages/{image_ref}"
+        try:
+            resp = requests.head(cover_url, timeout=30, allow_redirects=True)
+            resp.raise_for_status()
+            print(f"커버 이미지 확인 완료: {cover_url}")
+        except Exception as e:
+            print(f"::warning::커버 이미지 URL 확인 실패 ({cover_url}): {e}")
+            cover_url = None
+    if not cover_url and not chart_ref:
+        # 그래프도 커버도 없으면 게시하지 않는다 (이미지 없는 글 금지는 그대로). 커버만 없는 날은 그래프로 간다 (2026-10-21, 운영지침 D6-2)
+        print("그래프(chart_ref.txt)도 커버 이미지도 없음 — 이미지 없이는 게시하지 않습니다.")
         sys.exit(1)
-    print(f"커버 이미지 확인 완료: {cover_url}")
     body = _chart_or_cover(body, repo_slug, cover_url)
+    if '<a href="https://cdn.jsdelivr.net/gh/' not in body and not cover_url:
+        print("그래프 URL 을 확인하지 못했고 커버 이미지도 없음 — 게시를 중단합니다.")
+        sys.exit(1)
 
     # cron 이중화로 하루 두 번 실행될 수 있다. check_published.py가 앞단에서 걸러주지만,
     # 확인 실패나 두 실행이 겹치는 경우를 대비한 2차 방어.

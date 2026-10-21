@@ -91,6 +91,7 @@ def generate_report(input_path, output_path, analysis_path=None):
                 print(f"[검사] {k}: 틀린 문장 {len(problems)}개 뺌 — " + " / ".join(problems)[:300])
                 report[k] = fixed
         pool.last_model = f"{used} (틀린 문장 뺌)"
+    report["model"] = pool.last_model   # 글 끝 "AI 서술 · 모델명" (운영지침 D3-1d, 2026-10-21)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
     print(f"[Gemini] 리포트 생성 완료 -> {output_path} (모델: {pool.last_model})")

@@ -25,6 +25,9 @@ import time
 
 from dotenv import load_dotenv
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import notify  # noqa: E402  — 운영 알림 (experiments/notify.py, 2026-10-21)
+
 import aggregate
 import calendar_macro
 import classify_posts
@@ -84,7 +87,10 @@ def main():
         try:
             collect_posts.collect(conn)
         except Exception as e:  # noqa: BLE001
+            # CI 에서는 DB 를 매번 새로 만들므로 "기존 DB" 가 비어 있다 → 이벤트 0건 → 소리 없이 미게시가 되던 경로.
+            # 알림을 보내 사람이 안다 (2026-10-21, 운영지침 D6-2)
             print(f"[posts] 실패 — 기존 DB로 계속: {e}")
+            notify.event("수집 실패", f"트럼프 게시물 (CNN 아카이브) — {str(e)[:120]}")
     if args.import_state:
         state_io.import_state(conn, args.import_state)
 
@@ -98,6 +104,7 @@ def main():
             collect_prices.collect(conn, force_backfill=args.backfill_prices)
         except Exception as e:  # noqa: BLE001
             print(f"[prices] 실패 — 기존 일봉으로 계속: {e}")
+            notify.event("수집 실패", f"트럼프 일봉 (yfinance) — {str(e)[:120]}")
     if args.export_bars:
         state_io.export_bars(conn, args.export_bars)
 
