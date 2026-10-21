@@ -47,6 +47,7 @@ EXTRA_COLUMNS = {
     "ai_topic": "TEXT", "ai_subtopic": "TEXT", "ai_target_country": "TEXT", "ai_target_sector": "TEXT",
     "ai_mentioned_companies": "TEXT", "ai_direction": "TEXT", "ai_intensity": "INTEGER", "ai_market_relevance": "INTEGER",
     "analyzed_at": "TEXT", "ai_model": "TEXT",
+    "ai_issue": "TEXT",           # 이슈 코드 (experiments/issue_codes.py, 2026-10-21) — 옛 행은 NULL, 주제 대응표로 채울 수 있다
 }
 
 

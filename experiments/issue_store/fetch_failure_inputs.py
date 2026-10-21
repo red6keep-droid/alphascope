@@ -1,4 +1,4 @@
-"""실패 비용 검증 재료 — doc/실패-비용-검증-계획.md F1 · F3 · F6.
+"""실패 비용 검증 재료 — doc/리포트-재설계/실패-비용-검증-계획.md F1 · F3 · F6.
 
 - S&P 500 역대 구성 (GitHub fja05680/sp500, 날짜별 구성 목록) → data/store/calendar/sp500_components.csv
 - 미 국채 3개월 FRED DTB3 (일별, 연 %) → data/store/bars/DTB3.parquet

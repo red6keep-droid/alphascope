@@ -1,4 +1,4 @@
-"""흔들림 회복 일수 — doc/평소-범위-검증-계획.md 8절 (결과 보기 전 고정).
+"""흔들림 회복 일수 — doc/리포트-재설계/평소-범위-검증-계획.md 8절 (결과 보기 전 고정).
 
     .venv/bin/python experiments/issue_store/normal_range_recovery.py
 
@@ -86,7 +86,7 @@ def early():
     lab = lambda x: "작음" if x < q1 else ("중간" if x < q2 else "큼")
     D["group"] = D.early_x.map(lab)
     sw["group"] = sw.early_x.map(lab)
-    L = ["# C10 — 충격 초기 크기로 흔들림 회복 기간이 갈리나", "", "계획: doc/평소-범위-검증-계획.md 9절. 초기 크기 = 시작일 포함 5거래일 마감까지 EWMA 최대 ÷ 직전 1년.", "",
+    L = ["# C10 — 충격 초기 크기로 흔들림 회복 기간이 갈리나", "", "계획: doc/리포트-재설계/평소-범위-검증-계획.md 9절. 초기 크기 = 시작일 포함 5거래일 마감까지 EWMA 최대 ÷ 직전 1년.", "",
          f"## ① 갈리나: {'**초기 크기로 갈린다**' if split else '**판정 기준 미달**'}", "",
          f"- 스피어만 {rho:.2f} (묶음 붓스트랩 95% {lo:.2f} ~ {hi:.2f}, 묶음 {len(cl)}개 · 충격 {len(sw)}건)",
          f"- 앞 시기(< 2013) {r_a:.2f} (n {int((yr < 2013).sum())}) · 뒤 시기(≥ 2013) {r_b:.2f} (n {int((yr >= 2013).sum())})", "",
@@ -124,7 +124,7 @@ def main():
     D.to_csv(os.path.join(OUT, "normal_range_recovery.csv"), index=False)
     D["rec"] = pd.to_numeric(D.recovery_days, errors="coerce")
     L = ["# 흔들림 회복 일수 (충격 뒤 EWMA 가 직전 1년 수준 × 1.25 안으로 돌아오기까지)", "",
-         "계획: doc/평소-범위-검증-계획.md 8절. 흔들림 회복이지 주가 회복이 아님.", "",
+         "계획: doc/리포트-재설계/평소-범위-검증-계획.md 8절. 흔들림 회복이지 주가 회복이 아님.", "",
          "| 종목 | 종류 | 충격 수 | 부풀지 않음 | 회복 중앙값(일) | 사분위 25 ~ 75 | 500 넘음 · 진행 중 | 정점 배수 중앙값 |",
          "|---|---|---|---|---|---|---|---|"]
     for (sym, kind), g in D.groupby(["symbol", "kind"], sort=False):

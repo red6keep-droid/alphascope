@@ -1,4 +1,4 @@
-"""공용 뉴스 수집 · 분류 (doc/종목-레이더-기획.md 10-4 · 10-8 2단계) — 상세 페이지 `오늘` 탭의 중요 이슈 · 뉴스.
+"""공용 뉴스 수집 · 분류 (doc/기획/종목-레이더-기획.md 10-4 · 10-8 2단계) — 상세 페이지 `오늘` 탭의 중요 이슈 · 뉴스.
 
 - 수집 : 후보 20개마다 Google News RSS(최근 7일, 영어) 최근 PER_STOCK 건. 같은 제목은 한 건으로 친다(여러 종목에 겹치는 기사).
 - 분류 : 기사마다 **한 번만**, 한 호출 BATCH 건. 한 호출에서 종목별 관련도 · 방향을 같이 받는다(scores). 영어 사실 문장(fact_en)도 같은 호출 — 영어판 준비(10-6).
@@ -26,7 +26,9 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(BASE, ".."))
 sys.path.insert(0, os.path.join(BASE, "..", "nvda-report"))
 
-import universe as U  # noqa: E402
+import universe as U
+sys.path.insert(0, os.path.join(BASE, ".."))
+import issue_codes  # noqa: E402  — 이슈 코드 어휘 (공용, doc/기획/이슈-분류-코드표.md)
 
 NEWS = os.path.join(BASE, "data", "news.json")
 PROMPT = os.path.join(BASE, "prompts", "classify.txt")
@@ -40,7 +42,7 @@ EN = {"NVDA": "Nvidia", "AAPL": "Apple", "GOOGL": "Alphabet Google", "MSFT": "Mi
       "AVGO": "Broadcom", "TSLA": "Tesla", "BRK-B": "Berkshire Hathaway", "LLY": "Eli Lilly", "MU": "Micron", "WMT": "Walmart",
       "JPM": "JPMorgan", "AMD": "AMD", "V": "Visa", "XOM": "Exxon Mobil", "JNJ": "Johnson & Johnson", "MA": "Mastercard",
       "ABBV": "AbbVie", "INTC": "Intel",
-      # 2026-10-20 추가 29개 (doc/종목-레이더-기획.md 10-12)
+      # 2026-10-20 추가 29개 (doc/기획/종목-레이더-기획.md 10-12)
       "TSM": "TSMC", "ASML": "ASML", "LRCX": "Lam Research", "AMAT": "Applied Materials", "ORCL": "Oracle", "ANET": "Arista Networks",
       "VRT": "Vertiv", "EQIX": "Equinix", "CEG": "Constellation Energy", "CRWV": "CoreWeave", "SPCX": "SpaceX", "RKLB": "Rocket Lab",
       "KO": "Coca-Cola", "PG": "Procter & Gamble", "PM": "Philip Morris", "NFLX": "Netflix", "DIS": "Disney", "HD": "Home Depot",
@@ -200,6 +202,7 @@ def _apply(store, res, model, label):
     for r in res:
         x = store[r["item_id"]]
         x.update(area=r["area"], scores=r["scores"], fact=r["fact"].replace(" — ", ", ").replace("—", ", "), fact_en=r.get("fact_en"), ai_model=model)
+        x.update(issue_codes.coerce(r))   # 이슈 코드 · 세부 주제 · 범위 · 국가 · 예정 · 놀람 (doc/기획/이슈-분류-코드표.md, 2026-10-21) — 어휘 밖이면 OTHER
         _cap(x)
         why = fact_problem(x)
         if why:

@@ -864,9 +864,11 @@ FOLD_BTN = ("cursor:pointer;list-style:none;display:flex;justify-content:center;
 
 
 def fold(label, inner_html):
-    """펼침 버튼 (가이드라인 2-1 H 카드 버튼) — 눌러야 inner_html 이 보인다. details data-acc: 테마 CSS가 화살표를 돌리고 홈 카드는 건너뛴다."""
-    return (f'<details data-acc="1" style="margin:0 0 8px;"><summary style="{FOLD_BTN}">{esc(label)} {ACC_CHEV}</summary>'
-            f'<div style="margin-top:8px;">{inner_html}</div></details>')
+    """펼침 버튼 (가이드라인 2-1 H 카드 버튼) — 눌러야 inner_html 이 보인다. details data-acc: 테마 CSS가 화살표를 돌리고 홈 카드는 건너뛴다.
+    data-fold · data-label: 테마 JS(details[data-fold])가 펼친 내용을 버튼 위로 옮기고 글자를 `접기`로 바꾼다 — 펼친 뒤에도 버튼이 맨 아래 (2026-10-21 사용자:
+    "더 보기를 누르면 펼쳐진 것 아래에 버튼이 있어야 한다"). fold_card 와 같은 동작. JS 없으면 그냥 details."""
+    return (f'<details data-acc="1" data-fold="1" data-label="{esc(label)}" style="margin:0 0 8px;"><summary style="{FOLD_BTN}"><span>{esc(label)}</span> {ACC_CHEV}</summary>'
+            f'<div style="margin-top:8px;margin-bottom:8px;">{inner_html}</div></details>')
 
 
 def state_fold(card_html, inner_html):

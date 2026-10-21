@@ -20,10 +20,11 @@ import db
 
 sys.path.insert(0, os.path.join(config.BASE_DIR, ".."))
 from llm_chain import LLMPool, usage_line  # noqa: E402
+import issue_codes  # noqa: E402  — 이슈 코드 어휘 (공용, doc/기획/이슈-분류-코드표.md)
 
 TICKER_RE = re.compile(r"^[A-Z][A-Z0-9.\-]{0,6}$")
 LABEL_COLS = ["ai_topic", "ai_subtopic", "ai_target_country", "ai_target_sector", "ai_mentioned_companies",
-              "ai_direction", "ai_intensity", "ai_market_relevance"]
+              "ai_direction", "ai_intensity", "ai_market_relevance", "ai_issue"]
 
 
 def _since(hours):
@@ -112,6 +113,7 @@ def validate_item(item, ids, group):
         "ai_target_sector": db.dumps(_str_list(item.get("target_sector"), allowed=config.SECTORS)[:4]),
         "ai_mentioned_companies": db.dumps(_str_list(item.get("mentioned_companies"), pattern=TICKER_RE)[:8]),
         "ai_direction": item["direction"], "ai_intensity": inten, "ai_market_relevance": rel,
+        "ai_issue": item.get("issue") if item.get("issue") in issue_codes.ISSUES else issue_codes.FROM_PEOPLE_TOPIC.get(item["topic"], "OTHER"),   # 이슈 코드 (공용 어휘, 2026-10-21) — 모델이 빼먹으면 주제 대응표
     }
 
 

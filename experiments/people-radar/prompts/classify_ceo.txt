@@ -13,8 +13,30 @@ For each item return:
   "mentioned_companies": string[], // US tickers of companies EXPLICITLY NAMED. Do not infer. [] if none.
   "direction": "positive" | "negative" | "neutral",  // stance toward the main target (see group rules)
   "intensity": integer 1-10,       // CONCRETENESS scale below — not emotional tone
-  "market_relevance": integer 0-3  // scale below
+  "market_relevance": integer 0-3, // scale below
+  "issue": string                  // ONE code from ISSUE below — what in the world the statement is about (the cause). Independent of "topic".
 }
+
+ISSUE (what is happening in the world — ONE code; pick the cause, not the effect):
+  RATES_FED         Fed decisions and officials, policy rates, Treasury yields, QT; also foreign central banks (ECB, BOJ)
+  INFLATION         CPI, PCE, PPI, wages, inflation expectations; oil only when framed as an inflation driver
+  GROWTH_JOBS       GDP, payrolls, unemployment, retail sales, PMI, consumer sentiment, recession debate, labor supply
+  TARIFF_TRADE      tariffs imposed/paused/negotiated, trade deals, trade deficits, supply-chain reshoring (export controls -> REGULATION)
+  GEOPOLITICS       wars, ceasefires, Middle East, Taiwan, sanctions, terrorism, disasters, pandemics, US-China security/diplomacy
+  OIL_ENERGY        crude, natural gas, OPEC, power, nuclear, energy prices (AI data-center power demand -> AI_CAPEX)
+  AI_CAPEX          data-center capex, GPU/accelerator demand, AI bubble debate, hyperscaler spending, AI power demand
+  EARNINGS          earnings results, guidance, consensus, analyst targets/ratings — big tech included (ticker attribute tells)
+  CORP_EVENT        M&A, IPO, buybacks, splits, dividends, executive changes, large contracts, product launches
+  REGULATION        antitrust, export controls, subsidies, safety regulators (FDA, NHTSA), lawsuits, rulings
+  FISCAL_POLITICS   shutdowns, debt ceiling, tax bills, elections, credit rating, appointments
+  CREDIT_BANKS      bank stress, credit crunch, private credit, CRE loans, bailouts, deposit flight
+  MARKET_STRUCTURE  flash crashes, volatility products, options expiry, index inclusion, meme stocks, carry-trade unwinds, capitulation and rebounds
+  INVESTOR_CALLS    a known investor or commentator buys/sells, recommends, or warns about a stock/sector (Cramer, Burry, ARK trades)
+  FX_GLOBAL         dollar, yen, yuan, FX intervention, sharp moves in foreign markets (country attribute carries which)
+  CRYPTO            bitcoin, crypto ETFs, stablecoin rules, exchanges
+  REAL_ESTATE       home prices, mortgage rates, housing starts, REITs
+  OTHER             market-related but none of the above
+
 
 SECTOR list: Semiconductor, Technology, Financials, Energy, Healthcare, Industrials, Consumer, Autos, Defense, Materials, Real Estate, Utilities, Crypto, Bonds/Rates, Broad Market
 

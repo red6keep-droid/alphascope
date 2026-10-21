@@ -1,4 +1,4 @@
-"""엔비디아 볼린저 하단 · 상단 진입 — 이슈 · 상황별 검증 (doc/볼린저-이슈별-검증-계획.md 3절 규칙 그대로).
+"""엔비디아 볼린저 하단 · 상단 진입 — 이슈 · 상황별 검증 (doc/검증/볼린저-이슈별-검증-계획.md 3절 규칙 그대로).
 
     python experiments/issue_store/bollinger_by_issue.py
 
@@ -247,7 +247,7 @@ def report(df):
     os.makedirs(OUT, exist_ok=True)
     df.to_csv(os.path.join(OUT, "bollinger_nvda.csv"), index=False)
     lines = ["# 엔비디아 볼린저 — 이슈 · 상황별 결과", "",
-             f"생성 {pd.Timestamp.today().date()} · 규칙 doc/볼린저-이슈별-검증-계획.md 3절 · 판정 = n ≥ {N_MIN} · BH q < {Q_MAX} · 두 기간 방향 일치 (단기 1 · 5 · 10일)", ""]
+             f"생성 {pd.Timestamp.today().date()} · 규칙 doc/검증/볼린저-이슈별-검증-계획.md 3절 · 판정 = n ≥ {N_MIN} · BH q < {Q_MAX} · 두 기간 방향 일치 (단기 1 · 5 · 10일)", ""]
     lines += ["비교 둘: **구간 대비** = 같은 묶음의 모든 날 (볼린저가 그 구간에서 더 알려 주나 — 리포트 문장 기준) · "
               "**전체 대비** = 1999~ 모든 날 (그 구간의 하단 진입이 평소보다 나은가 — 구간 자체의 힘이 섞임)", ""]
     for fam, col, tag, title in ((f, c, t, f"{f} 가족 · {ti}") for f in ("구간", "이슈")

@@ -1,4 +1,4 @@
-"""데일리 리포트의 '기록상' 숫자 — 로컬에서 가끔 다시 만들어 static/daily_stats.json 으로 커밋한다 (doc/데일리-리포트-기획.md 5절).
+"""데일리 리포트의 '기록상' 숫자 — 로컬에서 가끔 다시 만들어 static/daily_stats.json 으로 커밋한다 (doc/기획/데일리-리포트-기획.md 5절).
 
 CI 에는 data/store(약 30년 일봉 · 일정)가 없다. 그래서 오래 걸리는 기록 계산은 여기서 한 번 하고,
 매일 리포트는 이 파일의 숫자와 그날 값만 맞춘다. 숫자는 전부 파이썬, 문장은 render_html 의 고정 틀.
@@ -185,7 +185,7 @@ def earnings_effect(cache):
 
 def regime_verdict():
     """옛 시장 상태 점수 · 신호등 우리 검증 (2026-10-18, analyze.regime_score · status_board 를 2008 ~ 매일 다시 계산).
-    결과만 적는다 — 다시 돌리려면 doc/데일리-리포트-기획.md 4-3 의 절차."""
+    결과만 적는다 — 다시 돌리려면 doc/기획/데일리-리포트-기획.md 4-3 의 절차."""
     return {"from": "2008-01", "to": "2026-10", "n_days": 4746,
             "up20": {"Risk-On": 68, "Neutral": 67, "Risk-Off": 65, "any": 67},
             "mean20": {"Risk-On": 0.68, "Neutral": 1.04, "Risk-Off": 1.26, "any": 0.96},

@@ -1,4 +1,4 @@
-"""파동 주기는 이어지는가 — 1단계 (doc/볼린저-이슈별-검증-계획.md 4-13, 결과 보기 전 고정).
+"""파동 주기는 이어지는가 — 1단계 (doc/검증/볼린저-이슈별-검증-계획.md 4-13, 결과 보기 전 고정).
 
     .venv/bin/python experiments/issue_store/cycle_persistence.py                    # 검증 ("검증해" 때만)
     FC_SMOKE=1 .venv/bin/python experiments/issue_store/cycle_persistence.py --out 스크래치   # 점검 (진짜도 섞은 자료)

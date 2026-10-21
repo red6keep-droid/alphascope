@@ -1,4 +1,4 @@
-"""다가오는 일정 (D5, doc/데일리-리포트-기획.md 6절 일정 탭) — 앞으로 LOOKAHEAD 일.
+"""다가오는 일정 (D5, doc/기획/데일리-리포트-기획.md 6절 일정 탭) — 앞으로 LOOKAHEAD 일.
 
 - FOMC 결정일: static/daily_stats.json 의 fomc_upcoming (data/store/calendar/fomc.csv 에서 build_daily_stats.py 가 옮김)
 - CPI · 고용 보고서 · GDP · PCE: FRED release/dates API (FRED_API_KEY, 엔비디아 collect_calendar 와 같은 release id)

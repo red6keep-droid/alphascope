@@ -2,7 +2,7 @@
 
 Trump의 Truth Social 게시물을 매일 수집해 구조화하고, 발언을 **이벤트 단위**로 묶어 3일·7일·30일·90일 누적 경향과
 시장의 **초과 반응(abnormal return)** 을 결합해 **Trump Daily Market Trend Report**를 만든다.
-기존 [데일리 리포트 파이프라인](데일리-리포트-파이프라인.md)의 설계 원칙 — 숫자는 파이썬이, 문장은 Gemini가 — 을 그대로 따른다.
+기존 [데일리 리포트 파이프라인](../운영/데일리-리포트-파이프라인.md)의 설계 원칙 — 숫자는 파이썬이, 문장은 Gemini가 — 을 그대로 따른다.
 
 작성일: 2026-09-15 · 개정 1: 이벤트 클러스터링 · 초과 반응 · 노이즈 필터 · Gemini 호출 유의점 ·
 개정 2 (2026-09-15): 개발 전 확정값 5개 · **무료 플랜 기준 가격 데이터 재검토** ·
@@ -870,6 +870,6 @@ DB를 Parquet로 내보내 저장해야 한다. Actions로 옮길 때 결정한�
 - [Trump's Truth][1] — 공개 아카이브. 2순위 소스
 - [Reuters — TMTG 공식 Truth API 출시][2] — 직접 크롤링을 피하는 이유
 - [stiles/trump-truth-social-archive][3] — CNN 5분 갱신 archive JSON/CSV/Parquet 안내. 1순위 소스
-- [데일리 리포트 파이프라인](데일리-리포트-파이프라인.md) — 재사용할 기존 구조
+- [데일리 리포트 파이프라인](../운영/데일리-리포트-파이프라인.md) — 재사용할 기존 구조
 - [`generate_report.py`](../experiments/daily-report/generate_report.py) — 다중 키 처리의 현재 구현
 - [`collect_yahoo.py`](../experiments/daily-report/collect_yahoo.py) — 일봉 수집기. 관찰 종목을 여기에 추가한다

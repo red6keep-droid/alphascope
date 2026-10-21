@@ -1,4 +1,4 @@
-"""C9 — 매일 바뀌는 범위(EWMA)가 고정 범위보다 나은가 (doc/평소-범위-검증-계획.md 7절, 결과 보기 전 고정).
+"""C9 — 매일 바뀌는 범위(EWMA)가 고정 범위보다 나은가 (doc/리포트-재설계/평소-범위-검증-계획.md 7절, 결과 보기 전 고정).
 
     .venv/bin/python experiments/issue_store/normal_range_skill.py
 
@@ -101,7 +101,7 @@ def main():
     R = pd.DataFrame(res)
     R.to_csv(os.path.join(OUT, "normal_range_skill.csv"), index=False)
     L = ["# C9 — 매일 바뀌는 범위(EWMA) vs 고정 범위", "",
-         "계획: doc/평소-범위-검증-계획.md 7절. B1 = 지난 1년, B3 = 2010년대 고정을 2020년대에. QLIKE · Diebold-Mariano.", ""]
+         "계획: doc/리포트-재설계/평소-범위-검증-계획.md 7절. B1 = 지난 1년, B3 = 2010년대 고정을 2020년대에. QLIKE · Diebold-Mariano.", ""]
     for setname in SETS:
         for base, lab in (("vs_b1", "B1 지난 1년 대비 (P3 · P4 둘 다)"), ("vs_b3", "B3 2010년대 고정 대비 (P4)")):
             L += [f"## {setname} · {lab}", "", "| 종목 | " + " | ".join(f"{h}일" for h in HZ) + " |", "|---|" + "---|" * len(HZ)]

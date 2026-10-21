@@ -1,4 +1,4 @@
-"""테마 신호 — 전부 파이썬 (doc/테마-모니터-기획.md 3절). 입력은 레이더 snapshot(일봉) · extra(공시 · 공매도) · FRED.
+"""테마 신호 — 전부 파이썬 (doc/기획/테마-모니터-기획.md 3절). 입력은 레이더 snapshot(일봉) · extra(공시 · 공매도) · FRED.
 
     python experiments/theme-monitor/theme_analyze.py     # 로컬 data 로 계산해 output/themes_analysis.json
 """

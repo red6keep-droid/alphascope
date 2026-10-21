@@ -10,7 +10,10 @@ import os
 import re
 import sys
 
-# 2026-10-18 재설계: 시장 상태 점수 해설(regime_*) · 급등주 · 관심 종목 · 위험요인 칸을 뺐다 (doc/데일리-리포트-기획.md 5절 B5 · B6)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import issue_codes  # noqa: E402
+
+# 2026-10-18 재설계: 시장 상태 점수 해설(regime_*) · 급등주 · 관심 종목 · 위험요인 칸을 뺐다 (doc/기획/데일리-리포트-기획.md 5절 B5 · B6)
 REQUIRED_LLM_KEYS = ["one_line", "summary", "change_comment", "sector_comment", "news",
                      "macro_comment", "opinion", "image_prompt"]
 
@@ -122,6 +125,10 @@ def validate(input_path, output_path, analysis_path=None):
         theme = item.get("theme")
         if theme is None:
             warnings.append(f"news[{i}] theme 없음 — 태그 없이 렌더됩니다.")
+        issue = item.get("issue")   # 이슈 코드 (doc/기획/이슈-분류-코드표.md) — 없거나 어휘 밖이면 경고만, 렌더에는 안 쓴다
+        if issue is not None and issue not in issue_codes.ISSUES:
+            warnings.append(f"news[{i}] issue '{issue}' 어휘 밖 — 저장은 OTHER 로")
+            item["issue"] = "OTHER"
         elif theme not in THEME_VOCAB:
             warnings.append(f"news[{i}] theme '{theme}' 어휘 밖 — '기타'로 표기됩니다.")
         related = item.get("related")

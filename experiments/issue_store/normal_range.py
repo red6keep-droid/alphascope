@@ -1,4 +1,4 @@
-"""평소 범위 검증 — doc/평소-범위-검증-계획.md C1 ~ C8 (결과 보기 전 고정).
+"""평소 범위 검증 — doc/리포트-재설계/평소-범위-검증-계획.md C1 ~ C8 (결과 보기 전 고정).
 
     .venv/bin/python experiments/issue_store/normal_range.py --check   # 진입 수만 (검증 아님)
     .venv/bin/python experiments/issue_store/normal_range.py           # 검증 ("검증해" 때만)
@@ -494,7 +494,7 @@ def run_all():
 
 
 def write_md(J, O, ES, K, C, FY, M):
-    L = ["# 평소 범위 검증 결과", "", "계획: doc/평소-범위-검증-계획.md (C1 ~ C8). 판정 = 주 방법 EWMA, 평소 구간, P3 약속 → P4 채점.", ""]
+    L = ["# 평소 범위 검증 결과", "", "계획: doc/리포트-재설계/평소-범위-검증-계획.md (C1 ~ C8). 판정 = 주 방법 EWMA, 평소 구간, P3 약속 → P4 채점.", ""]
     main = J[(J.group == "15") & (J.method == "ewma")]
     for cur in ("USD", "KRW"):
         L += [f"## 1. 15종목 판정 ({cur})", "", "| 종목 | " + " | ".join(f"{h}일" for h in HZ) + " |", "|---|" + "---|" * len(HZ)]

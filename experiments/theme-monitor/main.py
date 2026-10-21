@@ -1,4 +1,4 @@
-"""테마 모니터 — 레이더 자료로 신호 계산 → 테마 페이지 HTML · 목업 (doc/테마-모니터-기획.md, 1단계 2026-10-21).
+"""테마 모니터 — 레이더 자료로 신호 계산 → 테마 페이지 HTML · 목업 (doc/기획/테마-모니터-기획.md, 1단계 2026-10-21).
 
     python experiments/theme-monitor/main.py          # data/*.json(레이더 수집 결과) + FRED → output/<slug>.html · mock_<slug>.html · themes_analysis.json
 엔비디아 워크플로의 레이더 단계 뒤에서 돈다 (같은 snapshot · extra). 게시는 3단계(publish).

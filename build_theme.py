@@ -14,6 +14,7 @@ Blogger 전용 부분(위젯 선언, 뷰 분기, 글 보기·댓글 스타일)�
 
 import html as html_mod
 import io
+import os
 import json
 import re
 import sys
@@ -239,7 +240,20 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .news-pop-go { display: block; margin-top: 18px; padding: 10px 12px; background: #111; border: 1px solid #111; border-radius: 8px; color: #fff !important; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }   /* 검은 테마 버튼 */
 .news-pop-go:hover { background: #000; }
 /* 그래프 확대 팝업 (2026-10-16 사용자) — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
-.img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); }
+.img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); cursor: pointer; }   /* cursor:pointer — 아이폰은 누를 수 있는 모양이 없는 요소의 탭을 click 으로 올리지 않아 바깥 탭이 두 번째에야 닫혔다 (2026-10-21 사용자) */
+.img-pop-scroll img { cursor: default; }
+/* 인물 발언 — 추이 탭 인물 목록 · 인물 상세 (2026-10-21 사용자). 줄 눌림 표시, 상세 맨 위 '목록으로' 버튼 */
+.post-body [data-person].is-pressed, .post-body [data-person]:active { background-color: #EEF2F7; }
+/* 인물 발언 고정 머리 (2026-10-21 사용자): 글 제목을 네모 화살표와 함께 헤더 바로 아래 붙인다(top 은 JS 가 헤더 높이로), 아래 구분선, 본문만 스크롤.
+   목록 화면 = 글 제목 · 화살표는 글 목록, 인물 화면 = 이름 · 직함 · 화살표는 목록으로. 글자 크기는 글 제목(.post-title) 그대로 */
+.pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 6px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
+.pr-sticky .post-title { margin: 0; min-width: 0; }
+.pr-sticky .post-title .pr-role { margin-left: 10px; font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }
+.pr-back { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111 !important; cursor: pointer; text-decoration: none; }   /* 네모 박스 안 화살표 — 공식 접기 버튼과 같은 상자 */
+.pr-back svg { width: 20px; height: 20px; }
+.pr-sticky .post-title { display: flex; align-items: center; }
+.pr-sticky .post-title .pr-photo { flex: none; width: 36px; height: 36px; margin-right: 10px; border-radius: 50%; object-fit: cover; background: #F1F5F9; border: 1px solid #E2E8F0; }   /* 상세 제목 앞 공직자 얼굴 */
+@media (max-width: 680px) { .pr-sticky { background: var(--bg); padding-top: 4px; } .pr-sticky .post-title .pr-role { font-size: 14px; line-height: 20px; margin-left: 8px; } }
 .img-pop[hidden] { display: none; }
 .img-pop-head { position: relative; flex: none; display: flex; align-items: center; min-height: 56px; padding: 12px 60px 12px 16px; color: #fff; }
 .img-pop-title { font-size: 16px; line-height: 24px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -473,7 +487,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
   /* 글 보기(모바일): 화면 가장자리에서 본문까지 정확히 20px. 카드 테두리·안쪽 패딩은 없앤다 (2026-10-10) */
-  body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px */
+  body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px — 인물 발언의 기사 목록만 +6 (렌더러, 2026-10-21 사용자) */
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
   body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 31px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) */
@@ -1265,6 +1279,37 @@ SAVED_TRUMP_BODY = "experiments/trump-trend/output/trump_report_body.html"
 SAVED_NVDA_BODY = "experiments/nvda-report/output/nvda_report_body.html"
 PREVIEW_NVDA_TITLE = "엔비디아 NVDA 주가 2026년 9월 3일"
 PREVIEW_TRUMP_TITLE = "트럼프 SNS 발언 트렌드 2026년 9월 3일"
+SAVED_RADAR_BODY = "experiments/people-radar/output/radar_body.html"   # 인물 발언 홈 카드 (2026-10-21)
+PREVIEW_RADAR_TITLE = "주요 인물 발언"
+
+# 홈 테마 · 관심 종목 · 섹터 종목 탭 카드 (2026-10-21) — stocks.json · themes.json 흉내. 실제 파일은 gh-pages 에만 있다
+MOCK_PICK_STOCKS = [
+    {"s": "NVDA", "name": "엔비디아", "sector": "반도체", "p": 183.22, "cp": 1.84, "page": True, "slug": "nvidia-nvda"},
+    {"s": "AVGO", "name": "브로드컴", "sector": "반도체", "p": 346.10, "cp": -0.92, "page": True, "slug": "broadcom-avgo"},
+    {"s": "AMD", "name": "AMD", "sector": "반도체", "p": 232.40, "cp": 3.21, "page": False, "slug": ""},
+    {"s": "TSM", "name": "TSMC", "sector": "반도체", "p": 301.15, "cp": 0.44, "page": True, "slug": "tsmc-tsm"},
+    {"s": "MSFT", "name": "마이크로소프트", "sector": "소프트웨어", "p": 512.30, "cp": -0.31, "page": True, "slug": "microsoft-msft"},
+    {"s": "VRT", "name": "버티브", "sector": "산업재", "p": 162.80, "cp": 2.75, "page": False, "slug": ""},
+    {"s": "RKLB", "name": "로켓랩", "sector": "우주항공", "p": 61.42, "cp": -4.10, "page": False, "slug": ""},
+    {"s": "LMT", "name": "록히드마틴", "sector": "방산", "p": 498.60, "cp": 0.12, "page": True, "slug": "lockheed-lmt"},
+    {"s": "PG", "name": "P&G", "sector": "필수소비재", "p": 151.20, "cp": 0.65, "page": True, "slug": "procter-pg"},
+    {"s": "JNJ", "name": "존슨앤드존슨", "sector": "헬스케어", "p": 188.74, "cp": -0.22, "page": True, "slug": "jnj"},
+    {"s": "XOM", "name": "엑슨모빌", "sector": "에너지", "p": 112.05, "cp": 1.10, "page": True, "slug": "exxon-xom"},
+    {"s": "JPM", "name": "JP모건", "sector": "금융", "p": 309.40, "cp": 0.58, "page": True, "slug": "jpmorgan-jpm"},
+]
+MOCK_PICKS = {
+    "day": "2026-09-03", "stocks": MOCK_PICK_STOCKS,
+    "watch": [{"group": "반도체", "syms": ["NVDA", "AVGO", "AMD", "TSM"]}, {"group": "데이터 센터", "syms": ["MSFT", "VRT", "NVDA"]},
+              {"group": "우주항공", "syms": ["RKLB", "LMT"]}, {"group": "경기 방어주", "syms": ["PG", "JNJ"]}],
+    "sectors": [{"sector": "반도체", "syms": ["NVDA", "AVGO", "TSM"]}, {"sector": "소프트웨어", "syms": ["MSFT"]}, {"sector": "에너지", "syms": ["XOM"]},
+                {"sector": "금융", "syms": ["JPM"]}, {"sector": "헬스케어", "syms": ["JNJ"]}, {"sector": "방산", "syms": ["LMT"]}],
+}
+MOCK_THEMES = {"day": "2026-09-03", "themes": [
+    {"title": "AI 반도체", "state": "강세", "kind": "positive", "sub": "20일 S&P 500 대비 +6.2%p", "url": "#list"},
+    {"title": "금리 인하", "state": "관망", "kind": "neutral", "sub": "10년물 4.12% · 전주 −8bp", "url": "#list"},
+    {"title": "관세", "state": "약세", "kind": "negative", "sub": "관련 종목 20일 −3.4%p", "url": "#list"},
+    {"title": "전력 인프라", "state": "강세", "kind": "positive", "sub": "20일 S&P 500 대비 +4.1%p", "url": "#list"},
+]}
 FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:19px;line-height:34px;color:#333;">
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">오늘 한 줄</h2>
 <div style="font-size:20px;font-weight:bold;color:#111;">지난 24시간 게시물 <b>36</b>건 중 정책 관련 <b>2</b>건, 이벤트 <b>2</b>개. 가장 강한 발언은 <b>Regulation / Artificial Intelligence</b> (강도 10).</div>
@@ -1285,6 +1330,8 @@ def preview_post_body():
     """
     try:
         body = io.open(SAVED_POST_BODY, encoding="utf-8").read().strip()
+        # 로컬에서 만든 그래프는 gh-pages 에 없다(404) — 미리보기만 가장 최근 발행된 날짜의 그래프로 바꿔 홈 카드 · 글 보기에 그림이 보이게 (2026-10-21)
+        body = re.sub(r"images/spx-price-\d{4}-\d{2}-\d{2}\.png", "images/spx-price-2026-10-21.png", body)
         return body, f"실제 리포트 본문({SAVED_POST_BODY})"
     except OSError:
         cover = _svg_data_uri("#2563EB", "#7DD3FC")
@@ -1318,6 +1365,17 @@ def preview_trump_body():
         return body, f"트럼프 본문({SAVED_TRUMP_BODY})"
     except OSError:
         return FALLBACK_TRUMP_BODY, "트럼프 더미 본문"
+
+
+def preview_radar_body():
+    """인물 발언 본문 — 로컬 산출물이 있으면 그것, 없으면 빈 글(카드는 '불러올 수 없습니다')."""
+    try:
+        mock = SAVED_RADAR_BODY.replace("radar_body.html", "radar_body_mock.html")   # 목업 본문이 있으면 그것 (새 구조를 홈 카드로 확인, 2026-10-21)
+        if os.path.exists(mock):
+            return io.open(mock, encoding="utf-8").read().strip(), f"인물 발언 목업 본문({mock})"
+        return io.open(SAVED_RADAR_BODY, encoding="utf-8").read().strip(), f"인물 발언 본문({SAVED_RADAR_BODY})"
+    except OSError:
+        return "", "인물 발언 본문 없음"
 
 
 def preview_reports():
@@ -1536,6 +1594,8 @@ def preview_mock_js():
     # 트럼프 카드. 글 보기 탭이 데일리 리포트 전용이라 라벨 목록 흉내(#list)로 보낸다.
     trump_feed = one_entry_feed(PREVIEW_TRUMP_TITLE, trump_body, "#list")
     nvda_feed = one_entry_feed(PREVIEW_NVDA_TITLE, nvda_body, "#list")
+    radar_body, _ = preview_radar_body()
+    radar_feed = one_entry_feed(PREVIEW_RADAR_TITLE, radar_body, "#list") if radar_body else {"feed": {"entry": []}}
 
     return (
         "  var PV_DATA = %s;\n"
@@ -1543,15 +1603,20 @@ def preview_mock_js():
         "  var PV_FEED = %s;\n"
         "  var PV_TRUMP_FEED = %s;\n"
         "  var PV_NVDA_FEED = %s;\n"
+        "  var PV_RADAR_FEED = %s;\n"
+        "  var PV_PICKS = %s;\n"
+        "  var PV_THEMES = %s;\n"
         "\n"
         "  /* 디자인만 확인하므로 실제 시세를 부르지 않는다. 피드는 라벨로 가른다. */\n"
         "  window.fetch = function (url) {\n"
         "    var u = String(url), body;\n"
         "    if (u.indexOf('/feeds/posts') >= 0) {\n"
         "      var lab = decodeURIComponent(u);\n"
-        "      body = lab.indexOf('트럼프 트렌드') >= 0 ? PV_TRUMP_FEED : lab.indexOf('엔비디아') >= 0 ? PV_NVDA_FEED : PV_FEED;\n"
+        "      body = lab.indexOf('트럼프 트렌드') >= 0 ? PV_TRUMP_FEED : lab.indexOf('엔비디아') >= 0 ? PV_NVDA_FEED : lab.indexOf('인물 발언') >= 0 ? PV_RADAR_FEED : PV_FEED;\n"
         "    }\n"
         "    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;\n"
+        "    else if (u.indexOf('stocks.json') >= 0) body = PV_PICKS;\n"
+        "    else if (u.indexOf('themes.json') >= 0) body = PV_THEMES;\n"
         "    else body = PV_DATA;\n"
         "    return Promise.resolve({ json: function () { return Promise.resolve(body); } });\n"
         "  };\n"
@@ -1576,6 +1641,9 @@ def preview_mock_js():
             json.dumps(feed, ensure_ascii=False),
             json.dumps(trump_feed, ensure_ascii=False),
             json.dumps(nvda_feed, ensure_ascii=False),
+            json.dumps(radar_feed, ensure_ascii=False),
+            json.dumps(MOCK_PICKS, ensure_ascii=False),
+            json.dumps(MOCK_THEMES, ensure_ascii=False),
             json.dumps([dict(c, photo=_avatar_data_uri(c["avatar"])) for c in PREVIEW_COMMENTS], ensure_ascii=False),
         )
     )

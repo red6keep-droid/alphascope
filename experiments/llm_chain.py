@@ -92,14 +92,14 @@ CHAINS = {
     "comment": ["nvidia-deepseek", "groq", "groq-qwen", "gemini-lite", "gemini"],
     # 예비 모델이 임시로 분류한 행을 Gemini 로 다시 분류할 때 (2026-10-15) — 예비로 덮어쓰지 않도록 Gemini 만 (lite 도 Gemini, 정식 분류)
     "json-gemini": ["gemini", "gemini-lite"],
-    # 시총 TOP 10 뉴스 분류 — lite 먼저 (doc/종목-레이더-기획.md 10-4: flash 하루 약 20회는 NVDA 리포트 몫으로 남긴다, lite 는 버킷이 따로)
+    # 시총 TOP 10 뉴스 분류 — lite 먼저 (doc/기획/종목-레이더-기획.md 10-4: flash 하루 약 20회는 NVDA 리포트 몫으로 남긴다, lite 는 버킷이 따로)
     "json-lite": ["gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
     # 새 기능 — 예비 공급자 먼저, Gemini 는 맨 뒤 (2026-10-19, 위 머리말: 키 하나를 모든 리포트가 나눠 쓴다). 인물 발언 레이더 인용 추출
     "json-backup-first": ["nvidia-deepseek", "groq-qwen", "groq", "gemini-lite"],
 }
 
 # NVIDIA(build.nvidia.com) 무료 엔드포인트는 공식 FAQ 상 개발 · 테스트 · 연구 · 평가 전용 — "실제 최종 사용자에게 서비스하는 활동" 은
-# production 이라 NVIDIA AI Enterprise 라이선스가 필요하다 (doc/블로그-운영-지침.md D3-2, 2026-10-21). 독자에게 나가는 글 · 댓글 답글에
+# production 이라 NVIDIA AI Enterprise 라이선스가 필요하다 (doc/운영/블로그-운영-지침.md D3-2, 2026-10-21). 독자에게 나가는 글 · 댓글 답글에
 # 쓰는 것은 그 경계를 넘으므로 운영 사슬에서 뺀다. 로컬 비교 실험(정확도 측정)에만 LLM_ALLOW_NVIDIA=1 로 되살린다.
 # STEPS 정의는 그대로 둔다 — 실험 · 옛 실측 기록의 참조용.
 if os.environ.get("LLM_ALLOW_NVIDIA", "").strip() != "1":

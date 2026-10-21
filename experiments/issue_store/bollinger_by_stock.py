@@ -1,4 +1,4 @@
-"""볼린저 하단 · 상단 진입 — 15종목 · 업종 묶음별 이슈 · 상황 검증 (doc/볼린저-이슈별-검증-계획.md 3절 · 4-1 규칙 그대로).
+"""볼린저 하단 · 상단 진입 — 15종목 · 업종 묶음별 이슈 · 상황 검증 (doc/검증/볼린저-이슈별-검증-계획.md 3절 · 4-1 규칙 그대로).
 
     python experiments/issue_store/bollinger_by_stock.py           # 계산 ("검증해" 때만)
     python experiments/issue_store/bollinger_by_stock.py --check   # 종목별 진입 수 · 묶음 수만 (수익률 안 봄)
@@ -353,7 +353,7 @@ def report(df, dropped):
     pq = [c for c in df.columns if c in ("p", "q", "전체 p", "전체 q")]   # p · q 는 반올림하지 않는다
     df.drop(columns=[c for c in df.columns if c.startswith("_")]).round({c: 2 for c in df.columns if c not in pq}).to_csv(os.path.join(OUT, stem + ".csv.gz"), index=False)
     L = ["# 볼린저 — 15종목 · 업종 묶음별 이슈 · 상황 결과", "",
-         f"생성 {pd.Timestamp.today().date()} · 규칙 doc/볼린저-이슈별-검증-계획.md 3절 · 4-1 · 판정 = n ≥ {N_MIN} · BH q < {Q_MAX} (가족 × 층) · "
+         f"생성 {pd.Timestamp.today().date()} · 규칙 doc/검증/볼린저-이슈별-검증-계획.md 3절 · 4-1 · 판정 = n ≥ {N_MIN} · BH q < {Q_MAX} (가족 × 층) · "
          "두 기간(1999~2012 · 2013~2026) 방향 일치 · 단기 1 · 5 · 10일. 전체 칸은 `bollinger_15.csv.gz`", "",
          "비교 둘: **구간 대비** = 같은 묶음의 모든 날 (리포트 문장 기준) · **전체 대비** = 1999~ 모든 날 (구간 자체의 힘이 섞임)", "",
          "## 칸 수", "", "| 층 | 가족 | 칸 | 판정 대상 | 구간 대비 판정 | 전체 대비 판정 |", "|---|---|---|---|---|---|"]

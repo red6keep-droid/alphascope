@@ -1,4 +1,4 @@
-"""지표 우리 검증 — doc/지표-우리검증-계획.md (결과 보기 전 고정). 4단계 W8.
+"""지표 우리 검증 — doc/리포트-재설계/지표-우리검증-계획.md (결과 보기 전 고정). 4단계 W8.
 
     .venv/bin/python experiments/issue_store/indicator_check.py overheat              # 검증 ("검증해" 때만)
     FC_SMOKE=1 .venv/bin/python experiments/issue_store/indicator_check.py overheat --out 스크래치   # 점검 (섞은 수익률)

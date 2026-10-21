@@ -3,7 +3,7 @@
 "특정 주식이 조건에 맞는 상승을 시작했을 때 사면 수익이 날 확률은?"에 과거 데이터로 답하는 일회성 스터디.
 어디에도 게시하지 않는다. 산출물은 `output/results.md`(표) 와 `output/events.csv`(신호 목록) 둘이다.
 
-규칙은 `reference2/doc/MRH_v1/MRH_Signal_Engine_Core_Specification_V1.md` 6~10장의 값을 그대로 쓴다 (2026-09-24 확정).
+규칙은 `reference2/../../reference2/doc/MRH_v1/MRH_Signal_Engine_Core_Specification_V1.md` 6~10장의 값을 그대로 쓴다 (2026-09-24 확정).
 손절 −7% / 목표 +10% 는 같은 날 사용자가 정했다.
 
 ## 방법
