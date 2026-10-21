@@ -1,6 +1,16 @@
 {
-  "updated_at": "2026-10-21 18:31:56 UTC",
+  "updated_at": "2026-10-21 23:09:50 UTC",
   "items": [
+    {
+      "title": "BlackRock's Rick Rieder sees 'historic' opportunity in high-quality bonds",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/21/rick-rieder-investment-grade-bonds.html",
+      "published": "2026-10-21 19:54:16",
+      "title_ko": "블랙록 리크 리더, 고품질 채권에 ‘역사적’ 기회 전망",
+      "why_ko": "리크 리더가 4분기 기대와 최적 기회 분야를 제시한다",
+      "summary_ko": "리크 리더, 고품질 채권에 역사적 기회 전망, 애널리스트가 제시",
+      "summary_v": 2
+    },
     {
       "title": "This Janus Henderson fund manager owns CoreWeave debt — here's why he's sticking with it",
       "source": "CNBC",
@@ -109,16 +119,6 @@
       "title_ko": "월스트리트 최고 애널리스트 3개 배당주, 안정적 수익 선호",
       "why_ko": "변동성 높은 상황에서 배당주를 통해 포트폴리오 수익을 강화할 수 있다.",
       "summary_ko": "안정적 수익 추구 투자자를 위한 배당주 3종, 월스트리트 애널리스트가 선정",
-      "summary_v": 2
-    },
-    {
-      "title": "Junk bonds are 'flashing yellow.' Watch these warning signs",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/09/junk-bonds-are-flashing-yellow-watch-these-warning-signs.html",
-      "published": "2026-10-09 20:51:25",
-      "title_ko": "고수익채권, ‘노란 불빛’ 경고 신호와 주의점",
-      "why_ko": "고수익채권 스프레드가 확대됐지만 전체 상황을 완전히 설명하지 않는다.",
-      "summary_ko": "고수익채권 스프레드 확대, 경고 신호와 시장 상황 분석",
       "summary_v": 2
     }
   ]
