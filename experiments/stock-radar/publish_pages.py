@@ -29,6 +29,7 @@ NVDA_POST_URL = os.path.join(BASE, "..", "nvda-report", "output", "post_url.txt"
 # 마지막으로 올린 본문의 해시 — 같으면 PUT 하지 않는다 (2026-10-21, 운영지침 D2-2: 매 실행 전부 PUT → 하루 50회 쓰기, 실행 994초).
 # nvda-state 의 radar/ 에 같이 보관한다 (nvda-report.yml)
 HASHES = os.path.join(BASE, "data", "page_hashes.json")
+PAGES_LIVE = os.path.join(BASE, "data", "pages_live.json")   # 발행된 페이지 키 목록 — home_feed.py 가 읽는다
 
 
 def _load_hashes():
@@ -158,6 +159,10 @@ def publish(only=None, dry=False):
         time.sleep(4)   # API 버스트를 피한다 (1초 간격은 6번째부터 429)
     if not dry:
         _save_hashes(hashes)
+        # 실제로 있는 페이지 목록 — 홈 카드(home_feed.py)가 없는 페이지로 링크하지 않게 (2026-10-21)
+        live = sorted({key for key, *_r, url, _p in targets() if _norm(url) in by_url} | {k for k in hashes})
+        with open(PAGES_LIVE, "w", encoding="utf-8") as f:
+            json.dump(live, f, ensure_ascii=False)
     print(f"[pages] 생성 {made} · 갱신 {updated} · 변경 없음 {unchanged} · 실패 {failed}"
           + (f" · 다음 실행으로 미룸 {waiting} (하루 새 페이지 {U.NEW_PAGES_PER_RUN}개까지)" if waiting else "")
           + (" · 429 로 중단" if stopped else ""))

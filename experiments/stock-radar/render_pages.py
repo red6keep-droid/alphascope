@@ -76,7 +76,7 @@ def lead(s):
     if nxt:
         more.append(f"다음 실적 발표는 {_md(nxt)} 예정")
     text = first + (" " + "이고, ".join(more) + "이다." if more else "")
-    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_esc(text)}</p>'
+    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_dk.tint(_esc(text))}</p>'   # 요약 문장의 증감도 색 (가이드라인 3-3, 2026-10-21)
 
 
 def range_tip(s):

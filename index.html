@@ -730,7 +730,12 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 @media (min-width: 901px) {
   .home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-cards > .briefing, .home-cards > .rankings { grid-column: 1 / -1; }
+  .home-cards > .stock-section { grid-column: auto; }   /* 관심 종목 · 섹터 상위 종목은 PC 에서 나란히 (2026-10-21) */
 }
+/* 섹터 상위 종목 — 2위 · 3위는 1위 아래 작은 줄 */
+.sector-sub { display: block; margin-top: 4px; font-size: 14px; line-height: 20px; color: var(--gray-600); white-space: nowrap; }
+.sector-sub a { color: inherit; text-decoration: none; }
+.sector-sub a:hover { text-decoration: underline; }
 
 /* ==========================================================================
    responsive
@@ -939,7 +944,9 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 }
 .post-title a { color: inherit; }
 .post-title .title-logo { width: 32px; height: 32px; border-radius: 8px; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
-@media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } }
+.title-badge { display: inline-flex; align-items: center; justify-content: center; background: #E2E8F0; color: #334155; font-weight: 700; font-size: 13px; line-height: 1; }   /* 2026-10-21: 로고 핫링크 대신 티커 두 글자 배지 (운영지침 4-6) */
+.post-card-title .title-badge { width: 24px; height: 24px; border-radius: 6px; margin-right: 5px; vertical-align: -5px; font-size: 11px; }
+@media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } .post-title .title-badge { font-size: 11px; } }
 /* 글 제목 끝의 날짜는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다.
    날짜는 오른쪽 정렬 (2026-10-18 사용자: "글 제목에 날짜는 우측 정렬하고 기호는 삭제") — 목록 카드는 제목 줄 오른쪽 끝, 좁으면 다음 줄 오른쪽 */
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
@@ -1507,6 +1514,67 @@ body.no-dashboard .main-content { padding-top: 32px; }
             </div>
           <!-- 3위까지 보이고 나머지는 더 보기 (2026-10-13 사용자) -->
           <button type='button' class='fold-btn' id='rank-toggle' aria-expanded='false' hidden='hidden'><span>종목 더 보기</span>
+            <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             4. 관심 종목 · 섹터 상위 종목  (stocks.json 연동 — experiments/stock-radar/home_feed.py, 하루 1회 종가 기준)
+             2026-10-21 사용자: "홈에 관심 종목 카드 · 섹터 상위 종목 카드, 그걸 타고 가서 개별 종목을 볼 수 있게".
+             줄의 종목명이 그 종목 고정 페이지 링크. 페이지가 아직 없는 종목(하루 10개씩 만드는 중)은 목록 페이지로.
+             ==================================================================== -->
+        <section class='rankings stock-section' aria-labelledby='watch-title'>
+          <div class='section-head'>
+            <h2 class='section-title' id='watch-title'>
+              <span class='report-icon' style='background:#0E7490;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M8 2.5l1.7 3.6 3.9.5-2.9 2.7.8 3.9L8 11.3l-3.5 1.9.8-3.9L2.4 6.6l3.9-.5z'/></svg></span>관심 종목
+            </h2>
+            <span class='section-note' data-note='stocks-day'></span>
+          </div>
+          <div class='card rank-card'>
+            <!-- 탭 = universe.WATCH 묶음 (반도체 · 데이터 센터 · 우주항공 · 경기 방어주) — stocks.json 의 watch 로 그린다 -->
+            <div class='tabs' role='tablist' id='watch-tabs'></div>
+            <div class='table-wrap'>
+            <table class='rank-table'>
+              <thead>
+                <tr>
+                  <th class='col-name'>종목명</th>
+                  <th>종가 · 전일 대비</th>
+                  <th class='col-sector'>업종</th>
+                </tr>
+              </thead>
+              <tbody id='watch-body'>
+                <tr><td colspan='3' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
+              </tbody>
+            </table>
+            </div>
+          <button type='button' class='fold-btn' id='watch-toggle' aria-expanded='false' hidden='hidden'><span>종목 더 보기</span>
+            <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
+          </div>
+        </section>
+
+        <section class='rankings stock-section' aria-labelledby='sector-top-title'>
+          <div class='section-head'>
+            <h2 class='section-title' id='sector-top-title'>
+              <span class='report-icon' style='background:#B45309;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='2' width='5' height='5' rx='1'/><rect x='9' y='2' width='5' height='5' rx='1'/><rect x='2' y='9' width='5' height='5' rx='1'/><rect x='9' y='9' width='5' height='5' rx='1'/></svg></span>섹터 상위 종목
+            </h2>
+            <span class='section-note'>업종마다 시가총액 1위</span>
+          </div>
+          <div class='card rank-card'>
+            <div class='table-wrap'>
+            <table class='rank-table'>
+              <thead>
+                <tr>
+                  <th class='col-sector'>업종</th>
+                  <th class='col-name'>1위 종목</th>
+                  <th>종가 · 전일 대비</th>
+                </tr>
+              </thead>
+              <tbody id='sector-top-body'>
+                <tr><td colspan='3' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
+              </tbody>
+            </table>
+            </div>
+          <button type='button' class='fold-btn' id='sector-top-toggle' aria-expanded='false' hidden='hidden'><span>업종 더 보기</span>
             <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
           </div>
         </section>
@@ -2137,7 +2205,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
         var GH = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/';
         var DATA_URL = GH + 'data.json';
-        var LOGO_URL = 'https://financialmodelingprep.com/image-stock/{sym}.png';   /* 티커 로고 (2026-10-13 사용자) — 리포트 렌더러 design_kit.LOGO_URL 과 같다 */
+        /* 티커 로고 핫링크(financialmodelingprep)는 2026-10-21 뺐다 — 운영지침 4-6 (로고 금지 · 제3자 약관). 아바타는 머리글자 원 */
+        var STOCKS_URL = GH + 'stocks.json';   /* 관심 종목 · 섹터 상위 종목 (experiments/stock-radar/home_feed.py, 하루 1회) */
         var NEWS_URL = GH + 'news.json';
 
         /* ---------------------------------------------------------------- utils */
@@ -2264,14 +2333,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
             /* 종목 이름을 누르면 상세로 (2026-10-18 종목 페이지 첫 발행) — 엔비디아는 홈 엔비디아 카드가 가리키는 최신 리포트, 나머지는 시총 TOP 10 고정 페이지 */
             var cell = el('a', 'stock-cell');
             cell.href = pageFor(s.s);
-            /* 티커 로고 (2026-10-14 사용자) — 처음부터 아바타 안에 둔다. 못 받으면 머리글자 원.
-               예전엔 화면 밖 lazy 이미지의 onload 를 기다렸는데, 문서에 붙지 않은 lazy 이미지는 크롬이 불러오지 않아 늘 머리글자만 보였다 */
-            var av = el('span', 'stock-avatar');
-            var im = document.createElement('img'); im.alt = ''; im.width = 26; im.height = 26;
-            im.style.cssText = 'width:26px;height:26px;display:block;';
-            im.onerror = (function (av, sym, color) { return function () { av.textContent = initials(sym); av.style.background = color; }; })(av, s.s, meta.color);
-            im.src = LOGO_URL.replace('{sym}', s.s);
-            av.appendChild(im);
+            /* 머리글자 원 (2026-10-21: 제3자 로고 핫링크 중단 — 운영지침 4-6 · D4-6, 리포트 design_kit.ticker_logo 와 같게) */
+            var av = el('span', 'stock-avatar', initials(s.s));
+            av.style.background = meta.color;
             var label = el('span', 'stock-label');
             label.appendChild(el('span', 'stock-name', meta.name));
             label.appendChild(el('span', 'stock-ticker', s.s));
@@ -2341,6 +2405,125 @@ body.no-dashboard .main-content { padding-top: 32px; }
           .catch(function () { renderRankings(); });
 
         /* 섹터 현황 카드는 삭제 (2026-10-20 사용자: 미국 증시 리포트에 나온다) */
+
+        /* ================================================= 관심 종목 · 섹터 상위 종목 (stocks.json, 2026-10-21 사용자) */
+
+        var feedStocks = {}, feedWatch = [], feedSectors = [];
+        var watchTab = 0, watchOpen = false, sectorOpen = false;
+        var WATCH_SHOWN = 3, SECTOR_SHOWN = 3;
+        var COLORS = ['#0E7490', '#7C3AED', '#B45309', '#15803D', '#BE123C', '#1D4ED8', '#4D7C0F', '#9F1239', '#0F766E', '#6D28D9'];
+        function feedColor(sym) { var h = 0; for (var i = 0; i < sym.length; i++) h = (h * 31 + sym.charCodeAt(i)) % 997; return COLORS[h % COLORS.length]; }
+        /* 종목 줄 링크 — 페이지가 있으면 그 종목 고정 페이지, 아직 없으면(하루 10개씩 만드는 중) 목록 페이지. 엔비디아는 리포트 글 목록 */
+        function feedPage(r) {
+          if (r.s === 'NVDA') return pageFor('NVDA');
+          return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
+        }
+        function feedCell(r) {
+          var cell = el('a', 'stock-cell');
+          cell.href = feedPage(r);
+          var av = el('span', 'stock-avatar', initials(r.s));
+          av.style.background = (META[r.s] && META[r.s].color) || feedColor(r.s);
+          var label = el('span', 'stock-label');
+          label.appendChild(el('span', 'stock-name', r.name));
+          label.appendChild(el('span', 'stock-ticker', r.s));
+          cell.appendChild(av);
+          cell.appendChild(label);
+          return cell;
+        }
+        function feedPrice(r) {
+          var cp = r.cp == null ? 0 : r.cp;
+          var pr = el('span', 'cell-price ' + signClass(cp), '$' + fmt(r.p));
+          if (r.cp != null) pr.appendChild(el('small', null, arrow(cp) + fmt(Math.abs(cp)) + '%'));
+          return pr;
+        }
+        function feedEmpty(body, cols, text) {
+          body.textContent = '';
+          var tr = el('tr'), td = el('td', null, text);
+          td.colSpan = cols; td.style.cssText = 'text-align:center;padding:32px;color:var(--gray-400)';
+          tr.appendChild(td); body.appendChild(tr);
+        }
+        function setFold(id, hiddenCount, open, noun) {
+          var tg = document.getElementById(id);
+          if (!tg) return;
+          tg.hidden = hiddenCount <= 0;
+          tg.firstChild.textContent = open ? '접기' : noun + ' ' + hiddenCount + '개 더 보기';
+          tg.setAttribute('aria-expanded', String(open));
+        }
+
+        function renderWatchTabs() {
+          var box = document.getElementById('watch-tabs');
+          if (!box) return;
+          box.textContent = '';
+          feedWatch.forEach(function (g, i) {
+            var b = el('button', 'tab', g.group);
+            b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(i === watchTab));
+            b.addEventListener('click', function () { watchTab = i; watchOpen = false; renderWatchTabs(); renderWatch(); });
+            box.appendChild(b);
+          });
+        }
+        function renderWatch() {
+          var body = document.getElementById('watch-body');
+          if (!body) return;
+          var g = feedWatch[watchTab];
+          var rows = g ? g.syms.map(function (s) { return feedStocks[s]; }).filter(Boolean) : [];
+          if (!rows.length) { feedEmpty(body, 3, '데이터를 불러올 수 없습니다.'); setFold('watch-toggle', 0, false, '종목'); return; }
+          body.textContent = '';
+          rows.sort(function (a, b) { return Math.abs(b.cp || 0) - Math.abs(a.cp || 0); });   /* 크게 움직인 순 */
+          rows.forEach(function (r, i) {
+            var tr = el('tr');
+            var tdName = el('td', 'col-name'); tdName.appendChild(feedCell(r)); tr.appendChild(tdName);
+            var tdPrice = el('td'); tdPrice.appendChild(feedPrice(r)); tr.appendChild(tdPrice);
+            var tdSector = el('td', 'col-sector'); tdSector.appendChild(el('span', 'cell-sector', r.sector)); tr.appendChild(tdSector);
+            if (i >= WATCH_SHOWN) { tr.className = 'rank-more'; tr.hidden = !watchOpen; }
+            body.appendChild(tr);
+          });
+          setFold('watch-toggle', rows.length - WATCH_SHOWN, watchOpen, '종목');
+        }
+        function renderSectorTop() {
+          var body = document.getElementById('sector-top-body');
+          if (!body) return;
+          var rows = feedSectors.filter(function (x) { return x.syms && x.syms.length && feedStocks[x.syms[0]]; });
+          if (!rows.length) { feedEmpty(body, 3, '데이터를 불러올 수 없습니다.'); setFold('sector-top-toggle', 0, false, '업종'); return; }
+          body.textContent = '';
+          rows.forEach(function (x, i) {
+            var top = feedStocks[x.syms[0]];
+            var tr = el('tr');
+            var tdSector = el('td', 'col-sector'); tdSector.appendChild(el('span', 'cell-sector', x.sector)); tr.appendChild(tdSector);
+            var tdName = el('td', 'col-name');
+            tdName.appendChild(feedCell(top));
+            var others = x.syms.slice(1, 3).map(function (s) { return feedStocks[s]; }).filter(Boolean);
+            if (others.length) {   /* 2위 · 3위는 작은 줄 — 각각 그 종목 페이지로 */
+              var sub = el('span', 'sector-sub');
+              others.forEach(function (o, j) {
+                if (j) sub.appendChild(document.createTextNode(' · '));
+                var a = el('a', null, o.name); a.href = feedPage(o); sub.appendChild(a);
+                sub.appendChild(el('span', signClass(o.cp || 0), ' ' + arrow(o.cp || 0) + fmt(Math.abs(o.cp || 0)) + '%'));
+              });
+              tdName.appendChild(sub);
+            }
+            tr.appendChild(tdName);
+            var tdPrice = el('td'); tdPrice.appendChild(feedPrice(top)); tr.appendChild(tdPrice);
+            if (i >= SECTOR_SHOWN) { tr.className = 'rank-more'; tr.hidden = !sectorOpen; }
+            body.appendChild(tr);
+          });
+          setFold('sector-top-toggle', rows.length - SECTOR_SHOWN, sectorOpen, '업종');
+        }
+        (function () {
+          var a = document.getElementById('watch-toggle'), b = document.getElementById('sector-top-toggle');
+          if (a) a.addEventListener('click', function () { watchOpen = !watchOpen; renderWatch(); });
+          if (b) b.addEventListener('click', function () { sectorOpen = !sectorOpen; renderSectorTop(); });
+        })();
+        fetch(STOCKS_URL + '?v=' + Date.now())
+          .then(function (r) { return r.json(); })
+          .then(function (json) {
+            (json.stocks || []).forEach(function (r) { feedStocks[r.s] = r; });
+            feedWatch = json.watch || [];
+            feedSectors = json.sectors || [];
+            var note = document.querySelector('[data-note="stocks-day"]');
+            if (note && json.day) { var p = json.day.split('-'); note.textContent = p[0] + '.' + Number(p[1]) + '.' + Number(p[2]) + ' 종가 기준'; }
+            renderWatchTabs(); renderWatch(); renderSectorTop();
+          })
+          .catch(function () { renderWatch(); renderSectorTop(); });
 
         /* ================================================================= 뉴스 */
 
@@ -3305,10 +3488,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var sym = m ? m[1] : (/^\s*엔비디아/.test(h.textContent) ? 'NVDA' : '');
           if (!sym) return;
           var host = h.querySelector('a') || h;
-          var im = document.createElement('img'); im.className = 'title-logo'; im.alt = ''; im.width = 32; im.height = 32;
-          im.src = 'https://financialmodelingprep.com/image-stock/' + sym + '.png';
-          im.onerror = function () { if (im.parentNode) im.parentNode.removeChild(im); };
-          host.insertBefore(im, host.firstChild);
+          /* 2026-10-21: 제3자 로고 핫링크(financialmodelingprep) 중단 — 운영지침 4-6. 티커 두 글자 둥근 배지(리포트 design_kit.ticker_logo 와 같은 모양) */
+          var b = document.createElement('span'); b.className = 'title-logo title-badge'; b.setAttribute('aria-hidden', 'true');
+          b.textContent = sym.replace(/[^A-Z]/g, '').slice(0, 2);   /* 크기 · 여백은 테마 CSS .post-title .title-logo (build_theme.py) */
+          host.insertBefore(b, host.firstChild);
         });
       })();
 

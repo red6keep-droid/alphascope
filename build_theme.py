@@ -157,7 +157,9 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 }
 .post-title a { color: inherit; }
 .post-title .title-logo { width: 32px; height: 32px; border-radius: 8px; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
-@media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } }
+.title-badge { display: inline-flex; align-items: center; justify-content: center; background: #E2E8F0; color: #334155; font-weight: 700; font-size: 13px; line-height: 1; }   /* 2026-10-21: 로고 핫링크 대신 티커 두 글자 배지 (운영지침 4-6) */
+.post-card-title .title-badge { width: 24px; height: 24px; border-radius: 6px; margin-right: 5px; vertical-align: -5px; font-size: 11px; }
+@media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } .post-title .title-badge { font-size: 11px; } }
 /* 글 제목 끝의 날짜는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다.
    날짜는 오른쪽 정렬 (2026-10-18 사용자: "글 제목에 날짜는 우측 정렬하고 기호는 삭제") — 목록 카드는 제목 줄 오른쪽 끝, 좁으면 다음 줄 오른쪽 */
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }

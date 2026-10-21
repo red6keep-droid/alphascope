@@ -459,15 +459,24 @@ def _legend_chips(items):
     return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
 
 
+def _chart_label_px(bars):
+    """막대 끝 숫자 글자 크기 — 막대가 적으면 크게, 많으면 겹치지 않게 작게 (2026-10-21 사용자: "막대 개수가 적으면 폰트를 크게 해도 된다").
+    한 줄의 막대 수(가로축 묶음 × 시리즈) 기준: 3개 이하 17px · 6개 이하 15px · 10개 이하 13px · 그 위 11px(예전 값)."""
+    return 17 if bars <= 3 else 15 if bars <= 6 else 13 if bars <= 10 else 11
+
+
 def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
-    """세로 막대 그래프 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수. 값은 막대 끝에 숫자 (2026-10-17 사용자: 그래프화)."""
+    """세로 막대 그래프 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수. 값은 막대 끝에 숫자 (2026-10-17 사용자: 그래프화).
+    숫자 글자는 막대 수에 따라 11~17px (_chart_label_px). 글자 자리(위아래 여백)도 그만큼 넓힌다."""
     vals = [v for _, vs in groups for v in vs if v is not None]
     if not vals:
         return ""
-    mp, mn = max(0.0, max(vals)), max(0.0, -min(vals))
-    scale = (height - 2 * CHART_LBL) / ((mp + mn) or 1)
-    top = CHART_LBL + mp * scale
     n, ns = len(groups), len(groups[0][1])
+    fs = _chart_label_px(n * ns)
+    lbl = max(CHART_LBL, fs + 4)   # 숫자 한 줄 자리
+    mp, mn = max(0.0, max(vals)), max(0.0, -min(vals))
+    scale = (height - 2 * lbl) / ((mp + mn) or 1)
+    top = lbl + mp * scale
     parts = [f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>']
     for i, (_, vs) in enumerate(groups):
         for k, v in enumerate(vs):
@@ -476,11 +485,11 @@ def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
             h = max(1.0, abs(v) * scale)
             left = (i + (0.15 + 0.70 * k / ns)) * 100 / n
             width = 0.70 / ns * 100 / n
-            y, ly = (top - h, top - h - 15) if v >= 0 else (top, top + h + 1)
+            y, ly = (top - h, top - h - lbl + 1) if v >= 0 else (top, top + h + 1)
             rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
             parts.append(f'<span style="position:absolute;left:{left:.2f}%;width:{width:.2f}%;top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
             txt = fmt(v) if fmt else f"{v:+.1f}".replace("-", "−")
-            parts.append(f'<span style="position:absolute;left:{left - 2:.2f}%;width:{width + 4:.2f}%;top:{ly:.1f}px;height:14px;line-height:14px;text-align:center;font-size:11px;'
+            parts.append(f'<span style="position:absolute;left:{left - 4:.2f}%;width:{width + 8:.2f}%;top:{ly:.1f}px;height:{lbl - 2}px;line-height:{lbl - 2}px;text-align:center;font-size:{fs}px;'
                          f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt}</span>')
     xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;">{_esc(g)}</span>' for g, _ in groups)
     return (f'<span style="display:block;position:relative;height:{height}px;">{"".join(parts)}</span>'
@@ -782,7 +791,7 @@ def _est_w(text, px):
 INLINE_W = 316   # 상태 카드 줄 안쪽 폭 어림 (390px 폰 − 여백 · 카드 안쪽) − 이름과 값 사이 간격
 
 
-def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False, opened=False):
+def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False, opened=False, below_notes=False):
     """상태 카드 (가이드라인 2-1 D, 2026-10-11 사용자: "별도 카드로 분리하고 이유도 카드에 포함" → "안내 아이콘 삭제, 글씨 검정, 블릿으로").
     첫 줄 구분명 좌·상태 우, 아래 얇은 선 뒤에 이유 글머리표(16px, 검정). 이유 묶음은 border-top — 홈 카드는 border-top 요소를 건너뛰므로 홈에는 첫 줄만 간다."""
     bg, bd = CARD_DIR[theme]
@@ -793,12 +802,16 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
         kind = "row" if isinstance(item, tuple) and item[0] == "row" else ("" if isinstance(item, str) else item[1])
         text = item if isinstance(item, str) else item[0]
         if kind == "row":   # 근거 줄 — 블릿 · 콜론 없이 이름 왼쪽 | 값 오른쪽, 아래 14px 회색 뜻 (2026-10-16 사용자: "블릿과 근거 사이 점들이 헷갈린다, 근거를 자세히")
-            _, name, value, note = item
-            multi = "\n" in str(value)
-            fits = _est_w(name, 17) + _est_w(f"({note})", 14) + _est_w(value, 17) <= INLINE_W
-            inline = bool(note) and not multi and (fits or inline_notes)   # 설명을 괄호로 이름 옆에 (2026-10-17 사용자). inline_notes=True 면 길어도 모두 괄호 — 줄이 바뀐다
+            # ("row", 이름, 값, 뜻[, 값이 HTML]) — 다섯째가 참이면 값을 이스케이프 · 색칠 없이 그대로 (값 안에 보통 굵기 조각을 섞을 때, 2026-10-21 테마 페이지)
+            _, name, value, note, *rest = item
+            raw = bool(rest and rest[0])
+            vhtml = value if raw else _tint(_esc(value))
+            vplain = re.sub(r"<[^>]+>", "", str(value)) if raw else str(value)
+            multi = "\n" in vplain
+            fits = _est_w(name, 17) + _est_w(f"({note})", 14) + _est_w(vplain, 17) <= INLINE_W
+            inline = bool(note) and not multi and not below_notes and (fits or inline_notes)   # below_notes: 괄호 없이 늘 이름 아래 줄 (2026-10-21 테마 페이지). 설명을 괄호로 이름 옆에 (2026-10-17 사용자). inline_notes=True 면 길어도 모두 괄호 — 줄이 바뀐다
             if multi:   # 값이 여러 줄이면 설명은 이름 아래 왼쪽 — 줄 수를 늘리지 않는다 (2026-10-17 사용자: 모바일에서 여러 단 쓰지 말 것)
-                vals = _tint(_esc(value)).replace(chr(10), "<br>")
+                vals = vhtml.replace(chr(10), "<br>")
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'   # 오른쪽 값은 세로 가운데 (2026-10-18 사용자, 2-4 C-6)
                         f'<span style="flex:none;color:#111;">{_esc(name)}<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(note)}</span></span>'
@@ -808,11 +821,11 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
                         f'<span style="{lw}color:#111;">{_esc(name)} <span style="font-size:{TINY};color:{NOTE};">({_esc(note)})</span></span>'
-                        f'<span style="flex:none;text-align:right;font-weight:700;white-space:nowrap;">{_tint(_esc(value))}</span></span></li>')
+                        f'<span style="flex:none;text-align:right;font-weight:700;white-space:nowrap;">{vhtml}</span></span></li>')
             nt = f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};white-space:normal;">{_esc(note)}</span>' if note else ""
             return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'   # 뜻 줄을 이름 칸 안에 두어 오른쪽 값이 두 줄의 세로 가운데 (2026-10-18 사용자)
                     f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-                    f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{_esc(name)}</span>{nt}</span><span style="flex:none;text-align:right;font-weight:700;word-break:keep-all;">{_tint(_esc(value)).replace(chr(10), "<br>")}</span></span></li>')
+                    f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{_esc(name)}</span>{nt}</span><span style="flex:none;text-align:right;font-weight:700;word-break:keep-all;">{vhtml.replace(chr(10), "<br>")}</span></span></li>')
         if kind == "html":   # 그래프 · 자세한 지표 보기 같은 HTML 조각 (실적과 기대 탭, 2026-10-18)
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
         if kind == "plain":   # 쉬운 말 한 줄 — 점 없이 굵게, 아래 8px (2026-10-16 사용자: 강조 카드 펼침 맨 위에 쉬운 설명)

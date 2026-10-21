@@ -209,6 +209,24 @@ jobs:
           # 올린 본문 해시 — 다음 실행에서 같은 페이지를 다시 PUT 하지 않게 (publish_pages.HASHES, 2026-10-21 운영지침 D2-2)
           mkdir -p "$STATE_DIR/radar"
           [ -f experiments/stock-radar/data/page_hashes.json ] && cp experiments/stock-radar/data/page_hashes.json "$STATE_DIR/radar/page_hashes.json" || true
+          # 홈 `관심 종목` · `섹터 상위 종목` 카드 데이터 (2026-10-21 사용자) — 발행된 페이지만 링크
+          python experiments/stock-radar/home_feed.py
+          mkdir -p deploy-home && cp experiments/stock-radar/output/home/stocks.json deploy-home/stocks.json
+
+      - name: Deploy home stocks.json to gh-pages branch
+        if: env.DO_PUBLISH == 'true' && hashFiles('deploy-home/stocks.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-home
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Purge home stocks.json cache
+        if: env.DO_PUBLISH == 'true' && hashFiles('deploy-home/stocks.json') != ''
+        continue-on-error: true
+        run: curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/stocks.json" || true
 
       # 판정까지 끝난 상태가 있으면 뒤 단계가 실패했어도 저장한다 — Gemini 분류를 헛되게 하지 않기 위해.
       - name: Save state + report (nvda-state branch)
