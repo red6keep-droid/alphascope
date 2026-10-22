@@ -32,13 +32,22 @@ def _clean_sym(s):
     return re.sub(r"\(.*?\)$", "", str(s or "")).strip().upper()
 
 
+# 종목 겹침으로 묶을 때 빼는 것 — 지수 · 섹터 ETF 와 '모두가 말하는' 대형주는 겹쳐도 같은 이슈가 아니다 (2026-10-22 첫 실행: NVDA 로 AI 이슈가 전부 한 묶음이 됐다)
+_BROAD = {"SPY", "QQQ", "DIA", "IWM", "SMH", "SOXX", "XLK", "XLF", "XLE", "XLV", "XLY", "XLP", "XLI", "XLU", "XLB", "XLRE", "XLC", "TLT", "GLD", "USO", "NVDA", "AAPL", "MSFT", "TSLA"}
+
+
 def _similar(a, b):
     if a["category"] != b["category"]:
         return False
-    if set(_clean_sym(x) for x in a["tickers"]) & set(_clean_sym(x) for x in b["tickers"]):
-        return True
     wa, wb = _words(a["topic"]), _words(b["topic"])
-    return bool(wa and wb and len(wa & wb) >= max(1, min(2, min(len(wa), len(wb)) // 2)))
+    if wa and wb and len(wa & wb) >= max(1, min(2, min(len(wa), len(wb)) // 2)):
+        return True
+    # 종목 겹침은 둘 다 개별 종목 이슈(scope=stock)이고 넓은 종목이 아닐 때만
+    if a.get("scope") == "stock" and b.get("scope") == "stock":
+        ta = {_clean_sym(x) for x in a["tickers"]} - _BROAD
+        tb = {_clean_sym(x) for x in b["tickers"]} - _BROAD
+        return bool(ta & tb)
+    return False
 
 
 def _issue_rows(items):

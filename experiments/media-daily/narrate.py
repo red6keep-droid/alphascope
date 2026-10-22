@@ -66,7 +66,11 @@ def narrate(media_path=None, out_path=None):
     ids = {x["id"] for x in inputs}
 
     def validate(obj):
-        return isinstance(obj, dict) and isinstance(obj.get("items"), list) and any(isinstance(i, dict) and i.get("id") in ids for i in obj["items"])
+        # llm_chain.generate_json: 예외 = 탈락, 반환값이 None 이 아니면 그것으로 바꿔 쓴다 — 그래서 True 를 돌려주면 안 된다 (2026-10-22 CI 에서 'bool' 오류)
+        ok = isinstance(obj, dict) and isinstance(obj.get("items"), list) and any(isinstance(i, dict) and i.get("id") in ids for i in obj["items"])
+        if not ok:
+            raise ValueError("items 가 없거나 id 가 맞지 않음")
+        return None
 
     try:
         res = pool.generate_json(PROMPT + json.dumps(inputs, ensure_ascii=False), temperature=0.2, validate=validate)
