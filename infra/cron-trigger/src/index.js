@@ -37,11 +37,21 @@ const JOBS = {
   "17:15": [{ workflow: "trump-trend.yml" }],
   // NVDA 리포트(매일) — 트럼프가 trump-state에 올린 결과를 읽으므로 15분 뒤. KST 06:30 / 07:30.
   "17:30": [{ workflow: "nvda-report.yml" }],
+  // 인물 발언 레이더(매일) — trump-state · report-state 를 읽으므로 데일리 · 트럼프 뒤. KST 07:00 / 08:00 (2026-10-22).
+  // 같은 날 글이 있으면 갱신만 하므로 두 번 돌아도 겹치지 않는다.
+  "18:00": [{ workflow: "people-radar.yml" }],
   // 데일리 재시도(이미 게시됐으면 스스로 건너뜀). KST 07:30 / 08:30.
   "18:30": [{ workflow: "test-daily-report.yml", when: WEEKDAY }],
 };
 
-async function dispatch(workflow, token) {
+// 고빈도 수집 (2026-10-22 사용자) — GitHub cron 만으로는 하루 15분 시세 96회 중 7회, 2시간 뉴스 12회 중 4회만 돌았다.
+// 시각이 아니라 간격이라 UTC 분 · 시로 판단한다. 두 워크플로는 scheduled 입력이 없다 → inputs 없이 건다.
+const REPEAT = [
+  { workflow: "update.yml", inputs: null, when: (u) => u.m % 15 === 0 },                 // 시세 15분마다
+  { workflow: "news.yml", inputs: null, when: (u) => u.m === 0 && u.h % 2 === 0 },        // 뉴스 2시간마다 (UTC 짝수 시)
+];
+
+async function dispatch(workflow, token, inputs = { scheduled: "true" }) {
   const res = await fetch(
     `https://api.github.com/repos/${REPO}/actions/workflows/${workflow}/dispatches`,
     {
@@ -52,7 +62,7 @@ async function dispatch(workflow, token) {
         "X-GitHub-Api-Version": "2022-11-28",
         "User-Agent": "alphascope-cron-trigger",
       },
-      body: JSON.stringify({ ref: REF, inputs: { scheduled: "true" } }),
+      body: JSON.stringify(inputs ? { ref: REF, inputs } : { ref: REF }),
     },
   );
   if (res.status !== 204) {
@@ -63,12 +73,19 @@ async function dispatch(workflow, token) {
 
 export default {
   async scheduled(event, env, ctx) {
-    const ny = nyTime(new Date(event.scheduledTime));
-    const due = (JOBS[ny.hm] || []).filter((j) => !j.when || j.when(ny));
-    if (!due.length) return; // 다른 계절의 후보 시각 — 할 일 없음
+    const at = new Date(event.scheduledTime);
+    const ny = nyTime(at);
+    const utc = { h: at.getUTCHours(), m: at.getUTCMinutes() };
+    const due = [
+      ...(JOBS[ny.hm] || []).filter((j) => !j.when || j.when(ny)),
+      ...REPEAT.filter((j) => j.when(utc)),
+    ];
+    if (!due.length) return; // 할 일 없는 회차
 
     // 하나가 실패해도 나머지는 건다. 실패는 마지막에 던져 Cloudflare 대시보드에 남긴다.
-    const results = await Promise.allSettled(due.map((j) => dispatch(j.workflow, env.GITHUB_TOKEN)));
+    const results = await Promise.allSettled(
+      due.map((j) => dispatch(j.workflow, env.GITHUB_TOKEN, j.inputs)),
+    );
     const failed = results.filter((r) => r.status === "rejected").map((r) => r.reason.message);
     if (failed.length) throw new Error(failed.join("\n"));
   },

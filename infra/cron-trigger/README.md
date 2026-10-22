@@ -15,7 +15,18 @@ cron 하나(`0,15,30 21-23 * * *` UTC)가 서머타임·표준시 양쪽 후보 
 | 17:00 (월~금) | 06:00 | 07:00 | test-daily-report.yml |
 | 17:15 | 06:15 | 07:15 | trump-trend.yml |
 | 17:30 | 06:30 | 07:30 | nvda-report.yml (트럼프가 올린 trump-state를 읽으므로 15분 뒤) |
+| 18:00 | 07:00 | 08:00 | people-radar.yml (trump-state · report-state 를 읽는다. 같은 날 글은 갱신만) |
 | 18:30 (월~금) | 07:30 | 08:30 | test-daily-report.yml 재시도 |
+
+고빈도 수집도 같은 Worker가 건다 (2026-10-22). GitHub cron 만으로는 하루 15분 시세 96회 중 7회,
+2시간 뉴스 12회 중 4회만 돌았다. 간격 작업이라 시각은 UTC 로 판단하고, 두 워크플로에는 `scheduled` 입력이 없어 inputs 없이 건다.
+
+| 간격 | 워크플로 |
+|---|---|
+| 15분마다 (UTC :00 · :15 · :30 · :45) | update.yml (시세) |
+| 2시간마다 (UTC 짝수 시 :00) | news.yml (뉴스) |
+
+cron 은 `*/15 * * * *` 하나 — 하루 96번 깨어나고 대부분은 update.yml 만 건다.
 
 GitHub cron도 그대로 둔다. 둘 다 도는 날은 뒤에 도는 실행이 `check_published.py`로
 오늘 글이 이미 있는 것을 보고 건너뛴다. 수동 실행(`scheduled` 끔)은 이 확인을 하지 않는다.

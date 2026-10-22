@@ -9,7 +9,8 @@ name: People Radar
 
 on:
   schedule:
-    # 23:00 UTC = KST 08:00. 트럼프(22:15 UTC) · 데일리(22:00 UTC) GitHub cron 예비 시각보다 뒤.
+    # 정시 실행은 Cloudflare Worker가 뉴욕 18:00(KST 07:00 서머타임 / 08:00 표준시)에 건다 (infra/cron-trigger).
+    # 이 cron 은 예비 — 23:00 UTC = KST 08:00. 트럼프(22:15 UTC) · 데일리(22:00 UTC) GitHub cron 예비 시각보다 뒤.
     - cron: '0 23 * * *'
   workflow_dispatch:
     inputs:
