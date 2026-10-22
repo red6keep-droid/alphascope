@@ -47,8 +47,9 @@ const JOBS = {
 // 고빈도 수집 (2026-10-22 사용자) — GitHub cron 만으로는 하루 15분 시세 96회 중 7회, 2시간 뉴스 12회 중 4회만 돌았다.
 // 시각이 아니라 간격이라 UTC 분 · 시로 판단한다. 두 워크플로는 scheduled 입력이 없다 → inputs 없이 건다.
 const REPEAT = [
-  { workflow: "update.yml", inputs: null, when: (u) => u.m % 15 === 0 },                 // 시세 15분마다
-  { workflow: "news.yml", inputs: null, when: (u) => u.m === 0 && u.h % 2 === 0 },        // 뉴스 2시간마다 (UTC 짝수 시)
+// 분을 리포트 시각(:00 · :15 · :30)에서 비켜 둔다 — 셋 다 gh-pages 에 push 해서, 같은 분에 돌면 한쪽 push 가 거부된다.
+  { workflow: "update.yml", inputs: null, when: (u) => [7, 22, 37, 52].includes(u.m) },     // 시세 15분마다
+  { workflow: "news.yml", inputs: null, when: (u) => u.m === 45 && u.h % 2 === 0 },         // 뉴스 2시간마다 (UTC 짝수 시 :45 — 리포트 · 시세 어느 쪽과도 안 겹침)
 ];
 
 async function dispatch(workflow, token, inputs = { scheduled: "true" }) {

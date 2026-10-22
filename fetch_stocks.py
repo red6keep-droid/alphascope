@@ -10,6 +10,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "exp
 import notify  # noqa: E402  — 운영 알림 (experiments/notify.py)
 import price_source  # noqa: E402  — yfinance 예비 사슬 (experiments/price_source.py, 2026-10-21)
 
+# 15분마다 도는 수집이라 하루 한도가 작은 키는 쓰지 않는다 — 리포트(데일리 · NVDA)의 예비 몫 (2026-10-22, 운영지침 11절 영향 점검)
+FREQUENT_SKIP = ("TwelveData", "AlphaVantage")
+
 # 홈 "시총 TOP 10" — 미국 시가총액 상위 10개 (doc/기획/종목-레이더-기획.md 10-10, 2026-10-18 장 마감 기준 순서).
 # experiments/stock-radar/universe.py CANDIDATES 앞 10개와 같아야 한다. 교체(11위 밖 5거래일)가 생기면 두 곳을 같이 고친다.
 # 2026-10-18: JPM(13위) 빠지고 LLY(10위) 들어옴
@@ -76,7 +79,7 @@ def fetch_indices():
             print(f"{symbol} 수집 실패: {e}")
         if rec is None:
             # yfinance 가 비면 예비 사슬(FRED → Polygon → Twelve Data → Finnhub → Alpha Vantage) — 2026-10-21 price_source
-            q = price_source.quote(symbol)
+            q = price_source.quote(symbol, skip=FREQUENT_SKIP)
             if q and q.get("prev"):
                 rec = {"p": q["price"], "prev": q["prev"], "dh": num(q.get("day_high")), "dl": num(q.get("day_low")), "yh": None, "yl": None}
         if rec is None:
@@ -111,7 +114,7 @@ def fetch_sectors():
         except Exception as e:
             print(f"{symbol} 수집 실패: {e}")
         if price is None or not prev:
-            q = price_source.quote(symbol)   # 예비 사슬 (2026-10-21)
+            q = price_source.quote(symbol, skip=FREQUENT_SKIP)   # 예비 사슬 (2026-10-21)
             if q and q.get("prev"):
                 price, prev = q["price"], q["prev"]
         if price is None or not prev:
@@ -167,7 +170,7 @@ def fetch_data():
         if not (last_price and prev_close):
             # yfinance 가 비면 예비 사슬(FRED → Polygon → Twelve Data → Finnhub → Alpha Vantage, 키 있는 것만) — 2026-10-21 price_source.
             # 분봉은 Twelve Data 만 준다(Polygon 무료는 종가). 시총은 예비에 없어 None — 홈 정렬은 지난 값 없이 가격 줄만
-            q = price_source.quote(symbol)
+            q = price_source.quote(symbol, skip=FREQUENT_SKIP)
             if q and q.get("prev"):
                 last_price, prev_close, volume = q["price"], q["prev"], q.get("volume") or 0
                 candles = price_source.intraday_bars(symbol, INTERVAL) or []

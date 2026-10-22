@@ -298,9 +298,13 @@ _QUOTE_CHAIN = (("FRED", _fred_quote), ("Polygon", _polygon_quote), ("TwelveData
 _BARS_CHAIN = (("FRED", _fred_bars), ("Polygon", _polygon_bars), ("TwelveData", _twelve_bars), ("AlphaVantage", _alpha_bars))
 
 
-def quote(symbol):
-    """가격 · 전일 · 등락률. 사슬을 차례로, 실패 · 대체 불가면 None."""
+def quote(symbol, skip=()):
+    """가격 · 전일 · 등락률. 사슬을 차례로, 실패 · 대체 불가면 None.
+    skip: 건너뛸 공급자 이름 — 고빈도 수집(fetch_stocks 15분)이 리포트가 기대는 하루 한도 키(Twelve Data 800 · Alpha Vantage 25)를
+    먼저 써 버리지 않게 한다 (2026-10-22)."""
     for name, fn in _QUOTE_CHAIN:
+        if name in skip:
+            continue
         try:
             q = fn(symbol)
         except Exception as e:  # noqa: BLE001

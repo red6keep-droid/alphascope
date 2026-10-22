@@ -2,7 +2,7 @@ name: Update 10 Stock Data (15m)
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '7,22,37,52 * * * *'   # 예비 — 정시는 Cloudflare Worker (infra/cron-trigger). 리포트 시각(:00 · :15 · :30)과 gh-pages push 가 겹치지 않게 비킨다
   workflow_dispatch:
 
 permissions:

@@ -2,7 +2,7 @@ name: Update News (2h)
 
 on:
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '45 */2 * * *'   # 예비 — 정시는 Cloudflare Worker. 리포트 · 시세와 gh-pages push 가 겹치지 않게 :45
   workflow_dispatch:
 
 permissions:
