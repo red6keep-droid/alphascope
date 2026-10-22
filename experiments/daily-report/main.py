@@ -73,6 +73,8 @@ def collect():
         print(f"::warning::일정 수집 실패: {e!r}")
         calendar = None
 
+    collect_fred.apply_fallbacks(macro, yahoo.get("history"), yahoo.get("indices"))
+
     today = report_title.today_kst()
     input_data = {
         "date": today,

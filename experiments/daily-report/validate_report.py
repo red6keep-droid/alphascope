@@ -62,6 +62,9 @@ def validate(input_path, output_path, analysis_path=None):
     for key in REQUIRED_MACRO:
         if _is_bad(macro.get(key)):
             errors.append(f"매크로 데이터 누락: {key}")
+    subs = [f"{k}({(v or {}).get('source')}, {(v or {}).get('date')})" for k, v in macro.items() if (v or {}).get("source")]
+    if subs:
+        warnings.append(f"FRED 대신 예비 값으로 채운 지표: {', '.join(subs)}")
 
     indices = input_data.get("market", {}).get("indices", {})
     for key in REQUIRED_INDICES:
