@@ -42,14 +42,21 @@ const JOBS = {
   "18:00": [{ workflow: "people-radar.yml" }],
   // 데일리 재시도(이미 게시됐으면 스스로 건너뜀). KST 07:30 / 08:30.
   "18:30": [{ workflow: "test-daily-report.yml", when: WEEKDAY }],
+  // 홈 시세(update.yml) — 블로그는 종가 기준(doc/기획/블로그-목적과-방향.md 5절, 2026-10-22). 장 마감 20분 뒤 확정 1회 +
+  // 장중 1시간 간격 (뉴욕 월~금). 15분 수집(하루 96회, 야후 ~3,400호출)은 가격 알림 성격이라 뺐다. scheduled 입력이 없어 inputs 없이 건다.
+  "10:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
+  "11:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
+  "12:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
+  "13:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
+  "14:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
+  "15:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
+  "16:20": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
 };
 
-// 고빈도 수집 (2026-10-22 사용자) — GitHub cron 만으로는 하루 15분 시세 96회 중 7회, 2시간 뉴스 12회 중 4회만 돌았다.
-// 시각이 아니라 간격이라 UTC 분 · 시로 판단한다. 두 워크플로는 scheduled 입력이 없다 → inputs 없이 건다.
+// 간격 수집 (2026-10-22 사용자) — GitHub cron 만으로는 2시간 뉴스가 하루 12회 중 4회만 돌았다. UTC 분 · 시로 판단한다.
+// 분을 리포트 · 시세 시각(:00 · :15 · :20 · :30)에서 비켜 둔다 — 모두 gh-pages 에 push 해서, 같은 분에 돌면 한쪽 push 가 거부된다.
 const REPEAT = [
-// 분을 리포트 시각(:00 · :15 · :30)에서 비켜 둔다 — 셋 다 gh-pages 에 push 해서, 같은 분에 돌면 한쪽 push 가 거부된다.
-  { workflow: "update.yml", inputs: null, when: (u) => [7, 22, 37, 52].includes(u.m) },     // 시세 15분마다
-  { workflow: "news.yml", inputs: null, when: (u) => u.m === 45 && u.h % 2 === 0 },         // 뉴스 2시간마다 (UTC 짝수 시 :45 — 리포트 · 시세 어느 쪽과도 안 겹침)
+  { workflow: "news.yml", inputs: null, when: (u) => u.m === 45 && u.h % 2 === 0 },         // 뉴스 2시간마다 (UTC 짝수 시 :45)
 ];
 
 async function dispatch(workflow, token, inputs = { scheduled: "true" }) {

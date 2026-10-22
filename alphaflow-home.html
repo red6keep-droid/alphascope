@@ -975,6 +975,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       <h2 class="section-title" id="rankings-title">
         <span class="report-icon" style="background:#6D28D9;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="8" width="3" height="6" rx=".5"/><rect x="6.5" y="3" width="3" height="11" rx=".5"/><rect x="11" y="10" width="3" height="4" rx=".5"/></svg></span>시총 TOP 10
       </h2>
+      <!-- 종가 기준 표시 (2026-10-22 사용자: 블로그는 종가 기준 — 기획/블로그-목적과-방향 5절). data.json 의 trade_date · market 으로 "10.21 종가 기준" / "10.22 장중" -->
+      <span class="section-note" id="rank-basis"></span>
     </div>
 
     <!-- 탭 · 표 · 더 보기 버튼이 카드 하나 (2026-10-13 사용자) -->
@@ -1072,13 +1074,13 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   </div><!-- /home-cards -->
 
   <!-- ====================================================================
-       5. 실시간 뉴스  (news.json 연동, 2026-10-14 사용자: 실시간 주요 뉴스 → 실시간 뉴스)
+       5. 주요 뉴스  (news.json 연동, 2026-10-14 사용자: 실시간 주요 뉴스 → 실시간 뉴스 → 2026-10-22 종가 기준 블로그라 "실시간" 을 뺌)
        ==================================================================== -->
   <!-- 카드 안 카드를 두지 않는다 — 리포트 뉴스 카드를 그대로 (2026-10-12 사용자) -->
   <section class="news-section" aria-labelledby="news-title">
     <div class="section-head">
       <h2 class="section-title" id="news-title">
-        <span class="report-icon" style="background:#475569;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><path d="M5 6h6M5 8.5h6M5 11h4"/></svg></span>실시간 뉴스
+        <span class="report-icon" style="background:#475569;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><path d="M5 6h6M5 8.5h6M5 11h4"/></svg></span>주요 뉴스
       </h2>
       <span class="section-note">기사는 원문(영어)으로 열려요</span>
     </div>
@@ -1096,9 +1098,9 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
      breaking ticker
      ====================================================================== -->
 <div class="breaking">
-  <span class="breaking-badge">BREAKING</span>
+  <span class="breaking-badge">주요 뉴스</span>
   <div class="breaking-track">
-    <span class="breaking-text" id="breaking-text">ALPHASCOPE 실시간 뉴스: 데이터를 불러오는 중…</span>
+    <span class="breaking-text" id="breaking-text">ALPHASCOPE 주요 뉴스: 데이터를 불러오는 중…</span>
   </div>
 </div>
 
@@ -1322,12 +1324,13 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     .then(function (r) { return r.json(); })
     .then(function (json) {
       stocks = json.stocks || [];
-      var d = kstTime(json.updated_at);
-      var syncLabel = document.getElementById('sync-label');
-      if (d && syncLabel) {
-        syncLabel.textContent =
-          d.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' })
-            .replace(/\. /g, '.').replace(/\.$/, '') + ' 기준 실시간 AI 동기화';
+      /* "10.21 종가 기준" — 장이 열려 있는 동안만 "장중" (2026-10-22, 종가 기준 블로그). 옛 data.json(trade_date 없음)은 받은 시각으로 */
+      var basis = document.getElementById('rank-basis');
+      if (basis) {
+        var td = String(json.trade_date || '').split('-');
+        var day = td.length === 3 ? parseInt(td[1], 10) + '.' + parseInt(td[2], 10) : '';
+        if (!day) { var d = kstTime(json.updated_at); if (d) day = (d.getMonth() + 1) + '.' + d.getDate(); }
+        basis.textContent = day ? day + (json.market === '장중' ? ' 장중' : ' 종가 기준') : '';
       }
       renderRankings();
     })
@@ -1512,7 +1515,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     return '시장';
   }
 
-  var NEWS_SHOWN = 3;   /* 홈 실시간 뉴스는 3개까지, 나머지는 더 보기 (2026-10-20 사용자) */
+  var NEWS_SHOWN = 3;   /* 홈 주요 뉴스는 3개까지, 나머지는 더 보기 (2026-10-20 사용자) */
   fetch(NEWS_URL + '?v=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (json) {
@@ -1525,8 +1528,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       var line = items.slice(0, 6).map(function (i) { return i.title; }).join('  ·  ');
       var tick = document.getElementById('breaking-text');
       if (tick) tick.textContent =
-        'ALPHASCOPE 실시간 뉴스: ' + line + '  ·  ' +
-        'ALPHASCOPE 실시간 뉴스: ' + line + '  ·  ';
+        'ALPHASCOPE 주요 뉴스: ' + line + '  ·  ' +
+        'ALPHASCOPE 주요 뉴스: ' + line + '  ·  ';
 
       /* 기사 목록 — 썸네일 없음, 기사 사이 가로 구분선 (2026-10-14 사용자) */
       var list = document.getElementById('news-list');
@@ -1569,7 +1572,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       var l2 = document.getElementById('news-list');
       if (l2) { l2.textContent = ''; l2.appendChild(el('article', 'news-item load-status', '뉴스를 불러올 수 없습니다.')); }
       var t2 = document.getElementById('breaking-text');
-      if (t2) t2.textContent = 'ALPHASCOPE 실시간 뉴스';
+      if (t2) t2.textContent = 'ALPHASCOPE 주요 뉴스';
     });
 
   /* ====================================================== 오늘의 데일리 리포트

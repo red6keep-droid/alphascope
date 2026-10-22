@@ -34,8 +34,9 @@ SECTORS = [
     ("XLI", "산업재"), ("XLB", "소재"), ("XLU", "유틸리티"), ("XLRE", "부동산"), ("XLC", "커뮤니케이션"),
 ]
 
-INTERVAL = "15m"
-PERIOD = "1d"
+# 2026-10-22: 블로그는 종가 기준(doc/기획/블로그-목적과-방향.md) — 15분봉은 홈이 쓰지 않아 받지 않는다 (종목마다 history 1회 = 야후 호출 10회 절감).
+# 키 n · candles 는 옛 data.json 읽는 쪽을 위해 빈 값으로 남긴다.
+INTERVAL = "1d"
 
 NY = ZoneInfo("America/New_York")
 
@@ -149,21 +150,6 @@ def fetch_data():
                 info = ticker.fast_info
                 last_price, prev_close = info.last_price, info.previous_close
                 volume, mcap = int(info.last_volume or 0), _market_cap(info)
-                df = ticker.history(period=PERIOD, interval=INTERVAL)
-                if df is not None and not df.empty:
-                    for idx, row in df.iterrows():
-                        vol = row["Volume"]
-                        try:
-                            candles.append({
-                                "t": int(idx.timestamp()),
-                                "o": round(float(row["Open"]), 2),
-                                "h": round(float(row["High"]), 2),
-                                "l": round(float(row["Low"]), 2),
-                                "c": round(float(row["Close"]), 2),
-                                "v": int(vol) if (vol == vol and vol is not None) else 0
-                            })
-                        except (ValueError, TypeError):
-                            continue
         except Exception as e:
             print(f"{symbol} 수집 실패: {e}")
 
@@ -173,7 +159,6 @@ def fetch_data():
             q = price_source.quote(symbol, skip=FREQUENT_SKIP)
             if q and q.get("prev"):
                 last_price, prev_close, volume = q["price"], q["prev"], q.get("volume") or 0
-                candles = price_source.intraday_bars(symbol, INTERVAL) or []
         if not (last_price and prev_close):
             failed.append(symbol)
             continue
@@ -210,6 +195,9 @@ def fetch_data():
     output = {
         "updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         "interval": INTERVAL,
+        # 종가 기준 표시용 — 홈이 "M.D 종가 기준" 또는 "M.D 장중" 으로 보여 준다 (2026-10-22)
+        "market": market_status(),
+        "trade_date": datetime.datetime.now(NY).strftime("%Y-%m-%d"),
         "indices": index_list,
         "stocks": stock_list,
         "sectors": sector_list

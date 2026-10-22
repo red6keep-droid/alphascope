@@ -1567,7 +1567,8 @@ def preview_mock_js():
     """fetch 를 가로채 고정 데이터를 돌려준다. 네트워크도 서버도 필요 없다."""
     data = {
         "updated_at": "2026-09-03 20:45:00 UTC",
-        "interval": "15m",
+        "interval": "1d",
+        "market": "장마감", "trade_date": "2026-09-03",
         "indices": MOCK_INDICES,
         "stocks": MOCK_STOCKS,
     }
