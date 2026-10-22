@@ -30,6 +30,21 @@ function nyTime(d) {
 
 const WEEKDAY = (ny) => !["Sat", "Sun"].includes(ny.weekday); // 뉴욕 월~금 = 미국장이 열린 날
 
+function kstTime(d) {
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Seoul", hour12: false, weekday: "short", hour: "2-digit", minute: "2-digit" })
+      .formatToParts(d).map((x) => [x.type, x.value]),
+  );
+  return { hm: `${p.hour}:${p.minute}`, weekday: p.weekday };
+}
+
+// 한국 시각 표 (2026-10-22): 한국 방송 시각에 묶인 작업 — 서머타임을 따르면 안 된다.
+// 미디어 데일리: 08:00 1차 발행(밤사이 클립 + 당잠사) · 10:15 같은 글 갱신(Mad Money · 증시각도기). 평일만.
+const KST_JOBS = {
+  "08:00": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "1" }, when: WEEKDAY }],
+  "10:15": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "2" }, when: WEEKDAY }],
+};
+
 const JOBS = {
   // 데일리 리포트 (뉴욕 월~금) — 장 마감 1시간 뒤. KST 06:00 (EDT) / 07:00 (EST).
   "17:00": [{ workflow: "test-daily-report.yml", when: WEEKDAY }],
@@ -83,9 +98,11 @@ export default {
   async scheduled(event, env, ctx) {
     const at = new Date(event.scheduledTime);
     const ny = nyTime(at);
+    const kst = kstTime(at);
     const utc = { h: at.getUTCHours(), m: at.getUTCMinutes() };
     const due = [
       ...(JOBS[ny.hm] || []).filter((j) => !j.when || j.when(ny)),
+      ...(KST_JOBS[kst.hm] || []).filter((j) => !j.when || j.when(kst)),
       ...REPEAT.filter((j) => j.when(utc)),
     ];
     if (!due.length) return; // 할 일 없는 회차

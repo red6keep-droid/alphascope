@@ -78,3 +78,7 @@ FROM_PEOPLE_TOPIC = {
     "Macro Warning": "MARKET_STRUCTURE", "Market Outlook": "MARKET_STRUCTURE", "Earnings": "EARNINGS", "Industry View": "AI_CAPEX",
     "Policy": "FISCAL_POLITICS",
 }
+
+# 유튜브 수집기(red9keep/yutb-sub) 요약의 분류 17개 → 이슈 코드 (doc/기획/유튜브-자막-기사-검토.md 1절, 2026-10-22). 이름이 다른 셋만 바뀐다
+FROM_YTB_CATEGORY = {k: k for k in ISSUES}
+FROM_YTB_CATEGORY.update({"RATES_CB": "RATES_FED", "ENERGY_COMMODITY": "OIL_ENERGY", "FX": "FX_GLOBAL"})

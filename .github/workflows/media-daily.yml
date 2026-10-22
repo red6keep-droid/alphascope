@@ -1,0 +1,128 @@
+name: Media Daily
+
+# 미디어 데일리 (experiments/media-daily) — 유튜브 수집기(red9keep/yutb-sub) 요약으로 "방송이 본 미국장" 글.
+# 평일 KST 08:00 1차 발행(밤사이 클립 + 당잠사), 10:15 같은 글 갱신(Mad Money · 증시각도기). 기획: doc/기획/유튜브-자막-기사-검토.md 11절.
+#
+# 정시 실행은 Cloudflare Worker 가 KST 표로 건다 (infra/cron-trigger, 한국 방송 시각에 묶여 있어 서머타임을 따르지 않는다). 아래 cron 은 예비.
+# 게시 게이트: 저장소 변수 MEDIA_PUBLISH 가 'true' 일 때만 스케줄 실행이 실제 게시한다 — 그 전까지 그림자 모드(본문만 만들어 artifact 로).
+# 재료(Firestore)는 Secret YTB_FIRESTORE_KEY(읽기 전용 서비스 계정) 로 읽는다. 우리 기록(records/)은 media-state 브랜치에 쌓는다.
+
+on:
+  schedule:
+    - cron: '0 23 * * 0-4'    # 예비 — 23:00 UTC = KST 08:00 (월~금)
+    - cron: '15 1 * * 1-5'    # 예비 — 01:15 UTC = KST 10:15 (월~금)
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: '1 = 아침 1차 (07:55 컷), 2 = 10:15 갱신, auto = 한국 시각으로 판단'
+        type: string
+        required: false
+        default: 'auto'
+      publish:
+        description: 'Blogger에 실제 게시 (false면 dry-run)'
+        type: boolean
+        required: false
+        default: false
+      scheduled:
+        description: '외부 cron(Cloudflare Worker)용 — 스케줄 실행과 똑같이 동작 (사람은 끄고 쓴다)'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: media-daily
+  cancel-in-progress: false
+
+env:
+  YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+  BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+  BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+  STATE_DIR: experiments/media-daily/output/state
+  IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
+  DO_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.MEDIA_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish == true) }}
+
+jobs:
+  media-daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r experiments/media-daily/requirements.txt
+          pip install -r experiments/daily-report/requirements.txt
+
+      # cluster.py 가 데일리 기록(origin/report-state records/issues)으로 중복을 표시한다. 우리 기록은 media-state 에
+      - name: Fetch report-state / media-state
+        run: |
+          for b in report-state media-state; do
+            git fetch --no-tags origin "$b:refs/remotes/origin/$b" 2>/dev/null && echo "$b 받음" || echo "$b 없음"
+          done
+          if git rev-parse --verify -q refs/remotes/origin/media-state > /dev/null; then
+            git archive refs/remotes/origin/media-state "$STATE_DIR" | tar -x && echo "기록 불러옴"
+          fi
+
+      - name: Run pipeline
+        working-directory: experiments/media-daily
+        run: |
+          PHASE="${{ inputs.phase || 'auto' }}"
+          if [ "$PHASE" = "auto" ]; then
+            # 한국 시각 09:30 전이면 1차, 뒤면 2차 갱신
+            if [ "$(TZ=Asia/Seoul date +%H%M)" -lt 0930 ]; then PHASE=1; else PHASE=2; fi
+          fi
+          echo "phase=$PHASE publish=$DO_PUBLISH"
+          if [ "$DO_PUBLISH" = "true" ]; then
+            python main.py --phase "$PHASE" --state output/state --publish
+          else
+            python main.py --phase "$PHASE" --state output/state
+          fi
+
+      - name: Save records (media-state branch)
+        if: always()
+        run: |
+          if [ ! -d "$STATE_DIR/records" ]; then echo "기록 없음 — 건너뜀"; exit 0; fi
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          export GIT_INDEX_FILE="$(mktemp -u)"
+          git add -f "$STATE_DIR"
+          TREE="$(git write-tree)"
+          unset GIT_INDEX_FILE
+          if PARENT="$(git rev-parse --verify -q refs/remotes/origin/media-state)"; then
+            if [ "$TREE" = "$(git rev-parse "$PARENT^{tree}")" ]; then echo "변경 없음"; exit 0; fi
+            COMMIT="$(git commit-tree "$TREE" -p "$PARENT" -m "Update media-daily records [skip ci]")"
+          else
+            COMMIT="$(git commit-tree "$TREE" -m "Update media-daily records [skip ci]")"
+          fi
+          git push origin "$COMMIT:refs/heads/media-state"   # force 없음
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: media-daily
+          path: |
+            experiments/media-daily/output/media.json
+            experiments/media-daily/output/media.html
+            experiments/media-daily/output/narrative.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — ${{ github.workflow }}\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
