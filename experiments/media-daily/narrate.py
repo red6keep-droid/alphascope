@@ -49,7 +49,7 @@ def _ok(text, limit, source):
         return None
     if len(fact_check.split_sentences(t)) > 1:
         return None
-    if fact_check.check([t], source) is not True and fact_check.drop_bad(t, source) != t:
+    if fact_check.check([t], source):   # 문제 목록 — 비어 있으면 통과 (2026-10-22 두 번째 CI: 반환값을 잘못 봐서 5/5 를 버렸다)
         return None
     return t
 
