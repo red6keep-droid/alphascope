@@ -1,0 +1,122 @@
+name: People Radar
+
+# 인물 발언 레이더 (experiments/people-radar). "트럼프 · 연준 · 월가 인물 발언" 글을 하루 한 번 게시한다.
+# 신호 0개면 게시하지 않고, 같은 날 글이 이미 있으면 본문을 갱신한다(publish.py) — 두 번 돌아도 글이 겹치지 않는다.
+#
+# 트럼프 Truth Social 라벨(trump-state)과 데일리 시장 맥락(report-state)을 읽으므로 두 실행이 끝난 뒤에 돈다.
+# 발언 이력(statements.jsonl, 30일)은 radar-state 브랜치에 trump-state 와 같은 방식(이전 커밋 위 일반 push)으로 남긴다.
+# 2026-10-22 사용자: "인물 발언 자동실행해줘".
+
+on:
+  schedule:
+    # 23:00 UTC = KST 08:00. 트럼프(22:15 UTC) · 데일리(22:00 UTC) GitHub cron 예비 시각보다 뒤.
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Blogger에 실제 게시 (false면 dry-run)'
+        type: boolean
+        required: false
+        default: false
+      scheduled:
+        description: '외부 cron용 — 스케줄 실행과 똑같이 동작 (사람은 끄고 쓴다)'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: people-radar
+  cancel-in-progress: false
+
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+  BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+  BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+  STATE_DIR: experiments/people-radar/output/state
+  DO_PUBLISH: ${{ github.event_name == 'schedule' || inputs.scheduled == true || inputs.publish == true }}
+
+jobs:
+  people-radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # publish.py 가 daily-report 의 publish_blogger 를 쓴다
+      - name: Install dependencies
+        run: |
+          pip install -r experiments/people-radar/requirements.txt
+          pip install -r experiments/daily-report/requirements.txt
+
+      # classify.py 는 origin/trump-state, aggregate.py 는 origin/report-state 를 git show 로 읽는다.
+      # actions/checkout 은 main 만 받으므로 원격 추적 ref 로 따로 받는다. 없으면 각 단계가 알아서 건너뛴다.
+      - name: Fetch trump-state / report-state / radar-state
+        run: |
+          for b in trump-state report-state radar-state; do
+            git fetch --no-tags origin "$b:refs/remotes/origin/$b" 2>/dev/null && echo "$b 받음" || echo "$b 없음"
+          done
+          if git rev-parse --verify -q refs/remotes/origin/radar-state > /dev/null; then
+            git archive refs/remotes/origin/radar-state "$STATE_DIR" | tar -x
+            echo "발언 이력 불러옴: $(wc -l < "$STATE_DIR/statements.jsonl" 2>/dev/null || echo 0)행"
+          else
+            echo "radar-state 없음 (첫 실행)"
+          fi
+
+      - name: Run pipeline
+        working-directory: experiments/people-radar
+        run: |
+          if [ "$DO_PUBLISH" = "true" ]; then
+            python main.py --state output/state --publish
+          else
+            python main.py --state output/state
+          fi
+
+      # 추출 · 분류 결과는 뒤 단계가 실패해도 남긴다 — LLM 호출을 헛되게 하지 않기 위해.
+      - name: Save state (radar-state branch)
+        if: always()
+        run: |
+          if [ ! -f "$STATE_DIR/statements.jsonl" ]; then
+            echo "저장할 상태 없음 — 건너뜁니다."
+            exit 0
+          fi
+          OUT=experiments/people-radar/output
+          for f in radar.json narrative.json; do
+            [ -f "$OUT/$f" ] && cp "$OUT/$f" "$STATE_DIR/$f"
+          done
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          export GIT_INDEX_FILE="$(mktemp -u)"
+          git add -f "$STATE_DIR"
+          TREE="$(git write-tree)"
+          unset GIT_INDEX_FILE
+          if PARENT="$(git rev-parse --verify -q refs/remotes/origin/radar-state)"; then
+            if [ "$TREE" = "$(git rev-parse "$PARENT^{tree}")" ]; then
+              echo "변경 없음 — 커밋하지 않는다."
+              exit 0
+            fi
+            COMMIT="$(git commit-tree "$TREE" -p "$PARENT" -m "Update people-radar state [skip ci]")"
+          else
+            echo "radar-state 브랜치 없음 — 첫 커밋을 만든다."
+            COMMIT="$(git commit-tree "$TREE" -m "Update people-radar state [skip ci]")"
+          fi
+          # force 없음: 원격이 앞서 있으면 거부된다
+          git push origin "$COMMIT:refs/heads/radar-state"
+          echo "저장: $COMMIT"
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — ${{ github.workflow }}\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
