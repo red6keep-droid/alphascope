@@ -1,4 +1,4 @@
-"""가격 데이터 예비 소스 — yfinance 가 막힌 날을 위한 공식 API 사슬 (2026-10-21, doc/블로그-운영-지침.md D6-1 · D4-7-1).
+"""가격 데이터 예비 소스 — yfinance 가 막힌 날을 위한 공식 API 사슬 (2026-10-21, doc/운영/블로그-운영-지침.md D6-1 · D4-7-1).
 
 순서 (키가 있는 것만, 없으면 건너뜀):
     FRED(공식 · 지수 · VIX · 금리 · 환율, 키 FRED_API_KEY) → Polygon/Massive → Twelve Data → Finnhub(호가만) → Alpha Vantage(하루 25회, 맨 뒤)

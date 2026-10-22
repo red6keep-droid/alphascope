@@ -1,4 +1,4 @@
-"""재설계 계산 (doc/데일리-리포트-기획.md 4 ~ 6절) — analyze.analyze 가 부르고 analysis.json 에 붙인다.
+"""재설계 계산 (doc/기획/데일리-리포트-기획.md 4 ~ 6절) — analyze.analyze 가 부르고 analysis.json 에 붙인다.
 
 - normal  (D3): 지수 · 대형주의 평소 범위. EWMA σ(λ 0.94, 로그 수익률), 전날까지의 σ 로 오늘을 잰다. |z| ≥ 2 = 평소 밖,
                 "1년에 몇 번" = 지난 252거래일 중 |z| 가 오늘 이상이었던 날 수 (엔비디아 normal_range_line 과 같은 자)

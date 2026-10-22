@@ -18,7 +18,7 @@ import design_kit as dk  # noqa: E402  — 디자인-가이드라인.md 공통 �
 
 dk.TIP_SRC = "Yahoo Finance"   # 툴팁 기본 데이터 출처. 금리 · 경제 일정이 들어간 툴팁만 with_src (2026-10-20 사용자)
 import cards  # noqa: E402  — 질문 카드 · 막대 그래프 (2026-10-18 재설계)
-import sections as sx  # noqa: E402  — 독자 질문 D1 ~ D6 · K1 ~ K3 구획 (doc/데일리-리포트-기획.md 6절)
+import sections as sx  # noqa: E402  — 독자 질문 D1 ~ D6 · K1 ~ K3 구획 (doc/기획/데일리-리포트-기획.md 6절)
 
 TEMPLATE_FILE = os.path.join(os.path.dirname(__file__), "templates", "report.html")
 
@@ -866,7 +866,7 @@ def sec_status(analysis, report, prev=None):
 
 
 def build_body(input_data, report, cover_url=None, analysis=None, output_dir=None):
-    """2026-10-18 재설계 (doc/데일리-리포트-기획.md 6절) — 탭 = 독자 질문 묶음.
+    """2026-10-18 재설계 (doc/기획/데일리-리포트-기획.md 6절) — 탭 = 독자 질문 묶음.
     오늘(D1 · D2 · D3 · D6) · 한국장(K1 · K2 · K3) · 시장(D4) · 일정(D5). 시장 상태 점수 · 신호등 · 급등주 · 거래 상위 · 위험요인은 뺐다 (5절 B5 · B6).
     홈 카드 CARDS: summary = (머리), insight = (종합) — 머리 카드의 data-insight 그대로."""
     indices = input_data.get("market", {}).get("indices", {})

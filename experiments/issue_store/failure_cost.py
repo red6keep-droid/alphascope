@@ -1,4 +1,4 @@
-"""실패 비용 검증 — doc/실패-비용-검증-계획.md F1 ~ F6 (결과 보기 전 고정).
+"""실패 비용 검증 — doc/리포트-재설계/실패-비용-검증-계획.md F1 ~ F6 (결과 보기 전 고정).
 
     .venv/bin/python experiments/issue_store/failure_cost.py --check   # 사전 점검 (검증 아님)
     .venv/bin/python experiments/issue_store/failure_cost.py           # 검증 ("검증해" 때만)
@@ -478,7 +478,7 @@ def md(df, index=True):
 
 def write_md(C, PL, cov, scr, errs, secs):
     L = ["# 실패 비용 검증 결과", "",
-         f"계획: doc/실패-비용-검증-계획.md F1 ~ F6 · F4 보완. 실행 {secs:.0f}초. 오류 {len(errs)}: {errs[:5]}", "",
+         f"계획: doc/리포트-재설계/실패-비용-검증-계획.md F1 ~ F6 · F4 보완. 실행 {secs:.0f}초. 오류 {len(errs)}: {errs[:5]}", "",
          "판 사람 값 = 판 쪽 − 들고 있기 로그 수익률 (음수 = 판 것이 손해). 산 사람 값 = 급등 다음 그 뒤 수익률. "
          "판정 = 아무 날 플라시보(종목 = 21일 블록, 묶음 = 원형 이동), P3 · P4 둘 다 같은 쪽일 때만.", "",
          "## 1. 덮는 비율 (그때 소속 중 계산한 비율)", "", md(cov, False), ""]

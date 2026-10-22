@@ -1,4 +1,4 @@
-"""시총 TOP 10 — 수집 → 분석 → 목록 · 간단형 상세 HTML (게시는 아직 없음, doc/종목-레이더-기획.md 10-8).
+"""시총 TOP 10 — 수집 → 분석 → 목록 · 간단형 상세 HTML (게시는 아직 없음, doc/기획/종목-레이더-기획.md 10-8).
 
     python experiments/stock-radar/main.py            # 받고 그리기 (일봉 · 추가 재료 · 뉴스 수집 · 분류)
     python experiments/stock-radar/main.py --cached   # 받은 것(data/*.json)으로 그리기만

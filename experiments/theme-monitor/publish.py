@@ -1,4 +1,4 @@
-"""테마 고정 페이지 게시 — 없으면 만들고(영문 제목으로 주소를 정한 뒤 한글 제목으로), 있으면 바뀐 것만 갱신 (doc/테마-모니터-기획.md 7절 3단계).
+"""테마 고정 페이지 게시 — 없으면 만들고(영문 제목으로 주소를 정한 뒤 한글 제목으로), 있으면 바뀐 것만 갱신 (doc/기획/테마-모니터-기획.md 7절 3단계).
 
     python experiments/theme-monitor/publish.py          # output/<slug>.html 을 게시
     python experiments/theme-monitor/publish.py --dry    # 무엇을 만들고 / 갱신할지만

@@ -51,6 +51,27 @@
 10. 뉴스마다 `theme`은 아래 여덟 개 중 하나만, `related`는 `symbols` 목록에 있는 심볼만 0~3개 고르십시오.
     목록에 없는 심볼(예: 목록에 없는 개별 종목)이나 다른 테마 이름을 쓰지 마십시오.
     테마 어휘: `금리` · `AI/반도체` · `실적` · `매크로` · `에너지` · `정책/규제` · `지정학` · `기타`
+    `issue`는 아래 ISSUE 코드 중 하나(세상에 무슨 일이 났나 — 결과가 아니라 원인), `scope`는 시장 전체 · 업종 · 개별 종목,
+    `scheduled`는 예정된 발표 · 결정 · 실적이면 true, `surprise`는 예정 발표에 한해 예상 대비(-2 훨씬 나쁨 ~ +2 훨씬 좋음, 모르면 0).
+ISSUE (what is happening in the world — ONE code; pick the cause, not the effect):
+      RATES_FED         Fed decisions and officials, policy rates, Treasury yields, QT; also foreign central banks (ECB, BOJ)
+      INFLATION         CPI, PCE, PPI, wages, inflation expectations; oil only when framed as an inflation driver
+      GROWTH_JOBS       GDP, payrolls, unemployment, retail sales, PMI, consumer sentiment, recession debate, labor supply
+      TARIFF_TRADE      tariffs imposed/paused/negotiated, trade deals, trade deficits, supply-chain reshoring (export controls -> REGULATION)
+      GEOPOLITICS       wars, ceasefires, Middle East, Taiwan, sanctions, terrorism, disasters, pandemics, US-China security/diplomacy
+      OIL_ENERGY        crude, natural gas, OPEC, power, nuclear, energy prices (AI data-center power demand -> AI_CAPEX)
+      AI_CAPEX          data-center capex, GPU/accelerator demand, AI bubble debate, hyperscaler spending, AI power demand
+      EARNINGS          earnings results, guidance, consensus, analyst targets/ratings — big tech included (ticker attribute tells)
+      CORP_EVENT        M&A, IPO, buybacks, splits, dividends, executive changes, large contracts, product launches
+      REGULATION        antitrust, export controls, subsidies, safety regulators (FDA, NHTSA), lawsuits, rulings
+      FISCAL_POLITICS   shutdowns, debt ceiling, tax bills, elections, credit rating, appointments
+      CREDIT_BANKS      bank stress, credit crunch, private credit, CRE loans, bailouts, deposit flight
+      MARKET_STRUCTURE  flash crashes, volatility products, options expiry, index inclusion, meme stocks, carry-trade unwinds, capitulation and rebounds
+      INVESTOR_CALLS    a known investor or commentator buys/sells, recommends, or warns about a stock/sector (Cramer, Burry, ARK trades)
+      FX_GLOBAL         dollar, yen, yuan, FX intervention, sharp moves in foreign markets (country attribute carries which)
+      CRYPTO            bitcoin, crypto ETFs, stablecoin rules, exchanges
+      REAL_ESTATE       home prices, mortgage rates, housing starts, REITs
+      OTHER             market-related but none of the above
 11. 출력하는 글 어디에도 줄표 "—"(em dash)를 쓰지 마십시오. 두 말을 이어 붙일 때는 " : " 나 쉼표를 쓰거나 문장을 둘로 나누십시오.
 
 ## 톤 : 상태를 말하고 행동은 말하지 않습니다
@@ -76,6 +97,10 @@
       "title_ko": "그 뉴스 제목을 한국어로 옮긴 것 (뜻 그대로, 평가어를 보태지 않는다. 티커·회사 이름은 그대로 둬도 된다). 명사형 헤드라인체, 마침표 없음 (예: '테슬라, 소송 승소')",
       "why": "선정 이유 1문장",
       "theme": "테마 어휘 중 하나",
+      "issue": "ISSUE 코드 중 하나 (영어 그대로)",
+      "scope": "market | sector | stock",
+      "scheduled": true,
+      "surprise": 0,
       "related": ["이 뉴스가 움직인 자산 심볼 0~3개, symbols 목록에 있는 것만"]
     }
   ],

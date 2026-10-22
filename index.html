@@ -338,6 +338,8 @@ body.menu-open { overflow: hidden; }
 /* 카드 머리: 어느 연재인지와 그 글의 날짜. 날짜는 피드에서 채운다. */
 .report-card-date { margin-left: auto; margin-right: 8px; font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) */
 .report-block { display: flex; flex-direction: column; gap: 8px; }
+.report-chart { display: block; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px; cursor: zoom-in; }   /* 홈 미국 증시 카드의 S&P 500 그래프 (2026-10-21 사용자) */
+.report-chart[hidden] { display: none; }
 /* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
 #radar-card { padding: 0 16px; gap: 0; }
 /* 홈 트럼프 카드 — 발언 줄: 주제 라벨(영역 라벨 모양) + 세부 주제 · 방향 · 대상 왼쪽, 강도 오른쪽, 줄 사이 구분선 (2026-10-15 사용자) */
@@ -730,9 +732,22 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 @media (min-width: 901px) {
   .home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-cards > .briefing, .home-cards > .rankings { grid-column: 1 / -1; }
-  .home-cards > .stock-section { grid-column: auto; }   /* 관심 종목 · 섹터 상위 종목은 PC 에서 나란히 (2026-10-21) */
 }
-/* 테마 카드 (2026-10-21) — 줄마다 테마 이름(굵게) · 상태 라벨 오른쪽, 아래 줄 핵심 숫자. 줄 전체가 테마 페이지 링크, 줄 사이 구분선 */
+/* 테마 · 관심 종목 · 섹터 종목 탭 카드 (2026-10-21 사용자) — 탭 줄 오른쪽 끝 기준일, 관심 종목 묶음은 탭 아래 작은 알약 줄 */
+.picks-section .tabs { align-items: flex-end; }
+.picks-day { padding: 8px 16px 0; font-family: var(--num); font-size: 14px; line-height: 20px; color: var(--gray-400); text-align: right; }   /* 기준일 — 탭 아래 오른쪽 한 줄 (탭 줄에 두면 폰에서 잘린다) */
+.picks-day:empty { display: none; }
+.pick-panel[hidden] { display: none; }
+.picks-section .rank-table { min-width: 0; width: 100%; }
+@media (max-width: 600px) {   /* 폰: 전일 대비는 종가 아래 줄, 머리글은 줄바꿈 — 업종 · 1위 종목 · 종가 세 칸이 한 화면에 들게 */
+  .picks-section .rank-table th, .picks-section .rank-table td { white-space: normal; }
+  .picks-section .cell-price small { display: block; margin-left: 0; }
+}   /* 3칸 표는 폰 폭에 맞춘다 — 시총 TOP 10 의 min-width 760 을 물려받으면 종가 · 업종 칸이 오른쪽으로 밀려 안 보였다 */
+.seg-row { display: flex; gap: 6px; padding: 12px 16px 4px; overflow-x: auto; scrollbar-width: none; }
+.seg-row::-webkit-scrollbar { display: none; }
+.seg { flex: none; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 999px; background: #fff; font: inherit; font-size: 14px; line-height: 20px; color: var(--gray-600); white-space: nowrap; cursor: pointer; }
+.seg[aria-selected="true"] { background: #111; border-color: #111; color: #fff; font-weight: 700; }
+/* 테마 목록 — 줄마다 테마 이름(굵게) · 상태 라벨 오른쪽, 아래 줄 핵심 숫자. 줄 전체가 테마 페이지 링크, 줄 사이 구분선 */
 .theme-list { margin: 0 16px; }
 .theme-row { display: block; padding: 14px 0; border-top: 1px solid #E5E7EB; color: inherit; text-decoration: none; }
 .theme-row:first-child { border-top: 0; }
@@ -746,7 +761,7 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .theme-sub .up { color: #d93025; font-weight: 700; } .theme-sub .down { color: #1a73e8; font-weight: 700; }
 a.theme-row:hover .theme-name { text-decoration: underline; }
 /* 섹터 상위 종목 — 2위 · 3위는 1위 아래 작은 줄 */
-.sector-sub { display: block; margin-top: 4px; font-size: 14px; line-height: 20px; color: var(--gray-600); white-space: nowrap; }
+.sector-sub { display: block; margin-top: 4px; font-size: 14px; line-height: 20px; color: var(--gray-600); }   /* 줄바꿈 허용 — nowrap 이면 폰에서 종가 칸이 오른쪽으로 밀려 잘렸다 (2026-10-21) */
 .sector-sub a { color: inherit; text-decoration: none; }
 .sector-sub a:hover { text-decoration: underline; }
 
@@ -1039,7 +1054,20 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .news-pop-go { display: block; margin-top: 18px; padding: 10px 12px; background: #111; border: 1px solid #111; border-radius: 8px; color: #fff !important; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }   /* 검은 테마 버튼 */
 .news-pop-go:hover { background: #000; }
 /* 그래프 확대 팝업 (2026-10-16 사용자) — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
-.img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); }
+.img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); cursor: pointer; }   /* cursor:pointer — 아이폰은 누를 수 있는 모양이 없는 요소의 탭을 click 으로 올리지 않아 바깥 탭이 두 번째에야 닫혔다 (2026-10-21 사용자) */
+.img-pop-scroll img { cursor: default; }
+/* 인물 발언 — 추이 탭 인물 목록 · 인물 상세 (2026-10-21 사용자). 줄 눌림 표시, 상세 맨 위 '목록으로' 버튼 */
+.post-body [data-person].is-pressed, .post-body [data-person]:active { background-color: #EEF2F7; }
+/* 인물 발언 고정 머리 (2026-10-21 사용자): 글 제목을 네모 화살표와 함께 헤더 바로 아래 붙인다(top 은 JS 가 헤더 높이로), 아래 구분선, 본문만 스크롤.
+   목록 화면 = 글 제목 · 화살표는 글 목록, 인물 화면 = 이름 · 직함 · 화살표는 목록으로. 글자 크기는 글 제목(.post-title) 그대로 */
+.pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 6px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
+.pr-sticky .post-title { margin: 0; min-width: 0; }
+.pr-sticky .post-title .pr-role { margin-left: 10px; font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }
+.pr-back { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111 !important; cursor: pointer; text-decoration: none; }   /* 네모 박스 안 화살표 — 공식 접기 버튼과 같은 상자 */
+.pr-back svg { width: 20px; height: 20px; }
+.pr-sticky .post-title { display: flex; align-items: center; }
+.pr-sticky .post-title .pr-photo { flex: none; width: 36px; height: 36px; margin-right: 10px; border-radius: 50%; object-fit: cover; background: #F1F5F9; border: 1px solid #E2E8F0; }   /* 상세 제목 앞 공직자 얼굴 */
+@media (max-width: 680px) { .pr-sticky { background: var(--bg); padding-top: 4px; } .pr-sticky .post-title .pr-role { font-size: 14px; line-height: 20px; margin-left: 8px; } }
 .img-pop[hidden] { display: none; }
 .img-pop-head { position: relative; flex: none; display: flex; align-items: center; min-height: 56px; padding: 12px 60px 12px 16px; color: #fff; }
 .img-pop-title { font-size: 16px; line-height: 24px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1273,7 +1301,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
   /* 글 보기(모바일): 화면 가장자리에서 본문까지 정확히 20px. 카드 테두리·안쪽 패딩은 없앤다 (2026-10-10) */
-  body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px */
+  body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px — 인물 발언의 기사 목록만 +6 (렌더러, 2026-10-21 사용자) */
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
   body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 31px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) */
@@ -1454,8 +1482,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
               <!-- 연동 훅: 카드 전체가 그 리포트 글로 가는 링크다.
                    href · 날짜 · 본문 문구는 블로거 피드에서 채운다 (라벨별 최신 글 1건). -->
               <div class='report-col'>
-              <h3 class='report-title'><span class='report-icon' style='background:#E53E3E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='5' width='3' height='9' rx='.5'/><rect x='11' y='2' width='3' height='12' rx='.5'/></svg></span>미국 증시 리포트<span class='report-card-date' data-date='report-card'></span></h3>
+              <h3 class='report-title'><span class='report-icon' style='background:#E53E3E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='5' width='3' height='9' rx='.5'/><rect x='11' y='2' width='3' height='12' rx='.5'/></svg></span>미국 증시<span class='report-card-date' data-date='report-card'></span></h3>
               <a class='report-card' id='report-card' href='#'>
+                <!-- 리포트 본문 맨 위 S&P 500 그래프를 그대로 복제해 카드 안에 (2026-10-21 사용자: "상세 페이지 그래프는 그대로, 복제해서 홈 카드에"). 그래프를 누르면 확대 팝업, 그 밖은 글로 -->
+                <img class='report-chart' data-hook='report-chart' data-zoom='1' alt='' hidden='hidden'/>
                 <!-- 요약은 한 줄만 — 자세한 것은 글에서 (2026-10-20 사용자: "너무 길다"). 핵심 인사이트 구획은 삭제 -->
                 <div class='report-block' data-hook='summary'>
                   <!-- 첫 구획 라벨은 두지 않는다 (2026-10-13 사용자) -->
@@ -1470,7 +1500,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
               <!-- 트럼프 트렌드 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
               <div class='report-col'>
-              <h3 class='report-title'><span class='report-icon' style='background:#C2410C;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'><path d='M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z'/></svg></span>트럼프 SNS 트렌드<span class='report-card-date' data-date='trump-card'></span></h3>
+              <h3 class='report-title'><span class='report-icon' style='background:#C2410C;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'><path d='M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z'/></svg></span>트럼프 SNS<span class='report-card-date' data-date='trump-card'></span></h3>
               <a class='report-card' id='trump-card' href='/search/label/트럼프%20트렌드'>
                 <!-- 최근 24시간 발언 이벤트 4개까지 — 줄마다 주제 라벨 · 세부 주제 · 방향 · 대상(한글) 왼쪽, 강도 오른쪽. '오늘의 발언' 라벨 · 내일 볼 것 · 장 구분 · 시각은 두지 않는다 (2026-10-15 사용자) -->
                 <div class='kv-rows' data-hook='trump-rows'><div class='kv-row'><span class='kv-name'>리포트를 불러오는 중…</span></div></div>
@@ -1479,7 +1509,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
               <!-- 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 인물마다 가장 강한 발언 한 줄 — 이름 라벨 · 헤드라인 왼쪽, 강도 오른쪽 (트럼프 카드와 같은 줄) -->
               <div class='report-col'>
-              <h3 class='report-title'><span class='report-icon' style='background:#0F766E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='5.5' r='2.5'/><path d='M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4'/></svg></span>인물 발언<span class='report-card-date' data-date='radar-card'></span></h3>
+              <h3 class='report-title'><span class='report-icon' style='background:#0F766E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='5.5' r='2.5'/><path d='M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4'/></svg></span>주요 인물 발언<span class='report-card-date' data-date='radar-card'></span></h3>
               <a class='report-card' id='radar-card' href='/search/label/인물%20발언'>
                 <div class='kv-rows' data-hook='radar-rows'><div class='kv-row'><span class='kv-name'>리포트를 불러오는 중…</span></div></div>
               </a>
@@ -1533,79 +1563,64 @@ body.no-dashboard .main-content { padding-top: 32px; }
         </section>
 
         <!-- ====================================================================
-             4. 관심 종목 · 섹터 상위 종목  (stocks.json 연동 — experiments/stock-radar/home_feed.py, 하루 1회 종가 기준)
-             2026-10-21 사용자: "홈에 관심 종목 카드 · 섹터 상위 종목 카드, 그걸 타고 가서 개별 종목을 볼 수 있게".
-             줄의 종목명이 그 종목 고정 페이지 링크. 페이지가 아직 없는 종목(하루 10개씩 만드는 중)은 목록 페이지로.
+             4. 테마 · 관심 종목 · 섹터 종목 — 카드 하나에 탭 셋, 카드 제목 없음 (2026-10-21 사용자: "홈 카드에 테마, 관심 종목, 섹터 종목 탭으로, 그냥 탭으로")
+             테마 = themes.json (experiments/theme-monitor/home_feed.py), 종목 = stocks.json (experiments/stock-radar/home_feed.py), 하루 1회 종가 기준.
+             줄 전체가 그 테마 · 종목 페이지 링크. 페이지가 아직 없는 종목(하루 10개씩 만드는 중)은 목록 페이지로.
              ==================================================================== -->
-        <!-- ====================================================================
-             테마  (themes.json 연동 — experiments/theme-monitor/home_feed.py, 하루 1회)
-             2026-10-21 사용자: "홈에 카드를 만들어 각각의 테마 페이지로 진입할 수 있게". 줄 전체가 그 테마 페이지 링크.
-             ==================================================================== -->
-        <section class='rankings theme-section' aria-labelledby='theme-title'>
-          <div class='section-head'>
-            <h2 class='section-title' id='theme-title'>
-              <span class='report-icon' style='background:#4338CA;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12l4-4 3 3 5-6'/><path d='M10 5h4v4'/></svg></span>테마
-            </h2>
-            <span class='section-note' data-note='themes-day'></span>
-          </div>
-          <div class='theme-list' id='theme-list'>
-            <div class='theme-row load-status'>테마를 불러오는 중…</div>
-          </div>
-        </section>
-
-        <section class='rankings stock-section' aria-labelledby='watch-title'>
-          <div class='section-head'>
-            <h2 class='section-title' id='watch-title'>
-              <span class='report-icon' style='background:#0E7490;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M8 2.5l1.7 3.6 3.9.5-2.9 2.7.8 3.9L8 11.3l-3.5 1.9.8-3.9L2.4 6.6l3.9-.5z'/></svg></span>관심 종목
-            </h2>
-            <span class='section-note' data-note='stocks-day'></span>
-          </div>
+        <section class='rankings picks-section' aria-label='테마 · 관심 종목 · 섹터 종목'>
           <div class='card rank-card'>
-            <!-- 탭 = universe.WATCH 묶음 (반도체 · 데이터 센터 · 우주항공 · 경기 방어주) — stocks.json 의 watch 로 그린다 -->
-            <div class='tabs' role='tablist' id='watch-tabs'></div>
-            <div class='table-wrap'>
-            <table class='rank-table'>
-              <thead>
-                <tr>
-                  <th class='col-name'>종목명</th>
-                  <th>종가 · 전일 대비</th>
-                  <th class='col-sector'>업종</th>
-                </tr>
-              </thead>
-              <tbody id='watch-body'>
-                <tr><td colspan='3' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
-              </tbody>
-            </table>
+            <div class='tabs' role='tablist' id='picks-tabs'>
+              <button class='tab' role='tab' aria-selected='true'  data-pick='theme'>테마</button>
+              <button class='tab' role='tab' aria-selected='false' data-pick='watch'>관심 종목</button>
+              <button class='tab' role='tab' aria-selected='false' data-pick='sector'>섹터 종목</button>
             </div>
-          <button type='button' class='fold-btn' id='watch-toggle' aria-expanded='false' hidden='hidden'><span>종목 더 보기</span>
-            <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
-          </div>
-        </section>
+            <div class='picks-day' data-note='picks-day'></div>
 
-        <section class='rankings stock-section' aria-labelledby='sector-top-title'>
-          <div class='section-head'>
-            <h2 class='section-title' id='sector-top-title'>
-              <span class='report-icon' style='background:#B45309;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='2' width='5' height='5' rx='1'/><rect x='9' y='2' width='5' height='5' rx='1'/><rect x='2' y='9' width='5' height='5' rx='1'/><rect x='9' y='9' width='5' height='5' rx='1'/></svg></span>섹터 상위 종목
-            </h2>
-            <span class='section-note'>업종마다 시가총액 1위</span>
-          </div>
-          <div class='card rank-card'>
-            <div class='table-wrap'>
-            <table class='rank-table'>
-              <thead>
-                <tr>
-                  <th class='col-sector'>업종</th>
-                  <th class='col-name'>1위 종목</th>
-                  <th>종가 · 전일 대비</th>
-                </tr>
-              </thead>
-              <tbody id='sector-top-body'>
-                <tr><td colspan='3' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
-              </tbody>
-            </table>
+            <div class='pick-panel' data-pick-panel='theme'>
+              <div class='theme-list' id='theme-list'>
+                <div class='theme-row load-status'>테마를 불러오는 중…</div>
+              </div>
             </div>
-          <button type='button' class='fold-btn' id='sector-top-toggle' aria-expanded='false' hidden='hidden'><span>업종 더 보기</span>
-            <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
+
+            <div class='pick-panel' data-pick-panel='watch' hidden='hidden'>
+              <!-- 묶음 = universe.WATCH (반도체 · 데이터 센터 · 우주항공 · 경기 방어주) — 탭 아래 작은 알약 줄 -->
+              <div class='seg-row' role='tablist' id='watch-tabs'></div>
+              <div class='table-wrap'>
+              <table class='rank-table'>
+                <thead>
+                  <tr>
+                    <th class='col-name'>종목명</th>
+                    <th>종가 · 전일 대비</th>
+                    <th class='col-sector'>업종</th>
+                  </tr>
+                </thead>
+                <tbody id='watch-body'>
+                  <tr><td colspan='3' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
+                </tbody>
+              </table>
+              </div>
+              <button type='button' class='fold-btn' id='watch-toggle' aria-expanded='false' hidden='hidden'><span>종목 더 보기</span>
+                <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
+            </div>
+
+            <div class='pick-panel' data-pick-panel='sector' hidden='hidden'>
+              <div class='table-wrap'>
+              <table class='rank-table'>
+                <thead>
+                  <tr>
+                    <th class='col-sector'>업종</th>
+                    <th class='col-name'>1위 종목</th>
+                    <th>종가 · 전일 대비</th>
+                  </tr>
+                </thead>
+                <tbody id='sector-top-body'>
+                  <tr><td colspan='3' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
+                </tbody>
+              </table>
+              </div>
+              <button type='button' class='fold-btn' id='sector-top-toggle' aria-expanded='false' hidden='hidden'><span>업종 더 보기</span>
+                <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
+            </div>
           </div>
         </section>
         </div><!-- /home-cards -->
@@ -2486,7 +2501,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           if (!box) return;
           box.textContent = '';
           feedWatch.forEach(function (g, i) {
-            var b = el('button', 'tab', g.group);
+            var b = el('button', 'seg', g.group);   /* 묶음은 탭 아래 알약 줄 — 바깥 탭(테마 · 관심 종목 · 섹터 종목)과 구분 (2026-10-21) */
             b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(i === watchTab));
             b.addEventListener('click', function () { watchTab = i; watchOpen = false; renderWatchTabs(); renderWatch(); });
             box.appendChild(b);
@@ -2543,15 +2558,27 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var a = document.getElementById('watch-toggle'), b = document.getElementById('sector-top-toggle');
           if (a) a.addEventListener('click', function () { watchOpen = !watchOpen; renderWatch(); });
           if (b) b.addEventListener('click', function () { sectorOpen = !sectorOpen; renderSectorTop(); });
+          /* 테마 · 관심 종목 · 섹터 종목 탭 (2026-10-21 사용자) */
+          var tabs = [].slice.call(document.querySelectorAll('#picks-tabs [data-pick]'));
+          tabs.forEach(function (t) {
+            t.addEventListener('click', function () {
+              var k = t.getAttribute('data-pick');
+              tabs.forEach(function (x) { x.setAttribute('aria-selected', String(x === t)); });
+              [].slice.call(document.querySelectorAll('[data-pick-panel]')).forEach(function (p) { p.hidden = p.getAttribute('data-pick-panel') !== k; });
+            });
+          });
         })();
+        function setPicksDay(day) {   /* 탭 줄 오른쪽 기준일 — stocks.json · themes.json 둘 다 같은 날(종가 기준). 먼저 온 쪽이 채운다 */
+          var note = document.querySelector('[data-note="picks-day"]');
+          if (note && day && !note.textContent) { var p = day.split('-'); note.textContent = p[0] + '.' + Number(p[1]) + '.' + Number(p[2]) + ' 종가 기준'; }
+        }
         fetch(STOCKS_URL + '?v=' + Date.now())
           .then(function (r) { return r.json(); })
           .then(function (json) {
             (json.stocks || []).forEach(function (r) { feedStocks[r.s] = r; });
             feedWatch = json.watch || [];
             feedSectors = json.sectors || [];
-            var note = document.querySelector('[data-note="stocks-day"]');
-            if (note && json.day) { var p = json.day.split('-'); note.textContent = p[0] + '.' + Number(p[1]) + '.' + Number(p[2]) + ' 종가 기준'; }
+            setPicksDay(json.day);
             renderWatchTabs(); renderWatch(); renderSectorTop();
           })
           .catch(function () { renderWatch(); renderSectorTop(); });
@@ -2585,8 +2612,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               var sub = el('span', 'theme-sub'); tintText(sub, t.sub || t.question || ''); a.appendChild(sub);
               box.appendChild(a);
             });
-            var note = document.querySelector('[data-note="themes-day"]');
-            if (note && json.day) { var p = json.day.split('-'); note.textContent = p[0] + '.' + Number(p[1]) + '.' + Number(p[2]) + ' 종가 기준'; }
+            setPicksDay(json.day);
           })
           .catch(function () {
             var box = document.getElementById('theme-list');
@@ -2697,6 +2723,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           {
             id: 'report-card',
             label: '데일리 브리핑',
+            chart: 'report-chart',   /* 본문 맨 위 그래프(a[data-zoom] img)를 카드에 복제 (2026-10-21 사용자) */
             map: { summary: ['(머리)', '오늘 한 줄'] },   /* 주요 지수 수치는 홈에 싣지 않는다 — 한 줄 결론만 (2026-10-12 사용자: 요약 짧게) */   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용 */
             lines: { summary: 1 },   /* 머리 첫 줄(오늘 결론)만 — 핵심 인사이트 구획은 삭제 (2026-10-20 사용자: "너무 길다, 상세는 페이지에서") */
             picks: true,
@@ -3025,6 +3052,18 @@ body.no-dashboard .main-content { padding-top: 32px; }
           });
         }
 
+        /* 홈 미국 증시 카드 — 리포트 본문 맨 위 그래프(a[data-zoom] > img)를 그대로 복제 (2026-10-21 사용자). 없으면 자리를 비운다 */
+        function fillChart(hook, html) {
+          var im = document.querySelector('[data-hook="' + hook + '"]');
+          if (!im) return;
+          var doc;
+          try { doc = new DOMParser().parseFromString(html, 'text/html'); } catch (e) { return; }
+          var src = doc.querySelector('a[data-zoom] img, a[aria-label="그래프 확대 보기"] img');
+          if (!src || !src.getAttribute('src')) return;
+          im.src = src.getAttribute('src'); im.alt = src.getAttribute('alt') || 'S&P 500 그래프';
+          im.hidden = false;
+        }
+
         function failCard(card, msg) {
           Object.keys(card.map).forEach(function (hook) { fillCard(hook, [], msg); });
           if (card.fill) { var bx = document.querySelector('[data-hook="' + card.rows + '"]'); if (bx) { bx.textContent = ''; bx.appendChild(el('div', 'kv-row', msg || LOAD_FAILED)); } }
@@ -3043,6 +3082,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
               /* 날짜 표기 2026.10.9 (점, 앞자리 0 없음 — 디자인-가이드라인 3-3) */
               /* 글 제목의 날짜(한국 날짜)를 먼저 — 피드 published 는 블로그 시간대(미국 태평양)라 제목보다 하루 이르게 나왔다 (2026-10-18 사용자: 홈 카드 이상). 제목에 날짜가 없으면 published */
               var tm = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/.exec(title);
+              /* 제목에 날짜가 없는 글(주요 인물 발언, 2026-10-21)은 본문 첫 줄의 "M월 D일 기준"을 읽는다 — 발행일(블로그 시간대, 하루 이름)보다 먼저 */
+              if (!tm) { var bm = /(\d{1,2})월\s*(\d{1,2})일\s*기준/.exec(String((entry.content || {}).$t || '').replace(/<[^>]+>/g, ' ').slice(0, 1200)); if (bm) tm = [null, String(new Date().getFullYear()), bm[1], bm[2]]; }
               var day = tm ? [tm[1], String(parseInt(tm[2], 10)), String(parseInt(tm[3], 10))].join('.')
                 : String((entry.published || {}).$t || '').slice(0, 10).split('-').map(function (x, i) { return i ? String(parseInt(x, 10)) : x; }).join('.');
               setDate(card.id, day);
@@ -3058,6 +3099,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
               var sec = reportSections((entry.content || {}).$t || '');
               if (!sec) throw new Error('unparsable');
+              if (card.chart) fillChart(card.chart, (entry.content || {}).$t || '');
 
               if (card.fill) card.fill(sec);
               Object.keys(card.map).forEach(function (hook) {
@@ -3568,7 +3610,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
          그림을 화면 폭의 2.2배(최소 원본 폭, 최대 원본의 2배)로 띄우고 가로 스크롤 — 처음 위치는 오른쪽 끝(최근 봉). 닫기 × · 바깥 · Esc. 디자인 가이드 8절 */
       (function () {
         'use strict';
-        var links = document.querySelectorAll('.post-body a[data-zoom], .post-body a[aria-label="그래프 확대 보기"]');
+        var links = document.querySelectorAll('.post-body a[data-zoom], .post-body a[aria-label="그래프 확대 보기"], .report-chart[data-zoom]');   /* .report-chart: 홈 미국 증시 카드의 그래프 (2026-10-21) */
         if (!links.length) return;
         var pop = document.createElement('div'); pop.className = 'img-pop'; pop.hidden = true;
         pop.innerHTML = '<div class="img-pop-head"><span class="img-pop-title"></span><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
@@ -3582,7 +3624,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         }
         function open(a) {
           last = a;
-          var src = a.querySelector('img'); im.src = (src && src.currentSrc) || a.getAttribute('href');
+          var src = a.tagName === 'IMG' ? a : a.querySelector('img'); im.src = (src && src.currentSrc) || a.getAttribute('href') || (src && src.src);
           im.alt = (src && src.alt) || '';
           pop.querySelector('.img-pop-title').textContent = (src && src.alt) || '그래프';
           pop.hidden = false; document.body.classList.add('menu-open');   /* 뒤 화면 스크롤 잠금 (메뉴 서랍과 같은 규칙) */
@@ -3594,12 +3636,19 @@ body.no-dashboard .main-content { padding-top: 32px; }
           pop.hidden = true; document.body.classList.remove('menu-open');
           if (last) { try { last.focus({ preventScroll: true }); } catch (e) { last.focus(); } }
         }
-        [].slice.call(links).forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); open(a); }); });
-        /* 폰에서 두 번 눌러야 닫히던 문제 (2026-10-19 사용자: "모바일에서 2번 클릭 해야 닫힌다"):
-           그림을 밀고 나면 관성 스크롤이 도는 동안 첫 탭은 click 이 안 오고 멈춤에만 쓰인다. × 는 touchend 에서 바로 닫고
-           (preventDefault 로 뒤따르는 click 이 아래 그래프 링크를 다시 여는 것도 막는다), 바깥은 그림이 아닌 곳(제목줄 · 안내 줄 포함) 어디든 닫힌다 */
-        var x = pop.querySelector('.rt-pop-close');
-        x.addEventListener('touchend', function (e) { e.preventDefault(); close(); });
+        [].slice.call(links).forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); open(a); }); });   /* stopPropagation: 홈 카드(글 링크) 안의 그래프는 글로 가지 않고 팝업만 */
+        /* 폰에서 두 번 눌러야 닫히던 문제 (2026-10-19 · 10-21 사용자: "아직도 두 번 클릭해야 닫힌다"):
+           ① 아이폰은 누를 수 있는 모양(cursor:pointer)이 없는 요소에서 click 을 조상 리스너로 올리지 않는다 — 바깥(어두운 곳)을 눌러도 첫 탭은 '가리키기'로 끝났다 → 테마 CSS 에 .img-pop { cursor:pointer }.
+           ② 그림을 밀고 나면 관성 스크롤이 도는 동안 첫 탭은 click 이 안 오고 멈춤에만 쓰인다.
+           그래서 팝업 어디든(그림 자체만 빼고) touchend 에서 바로 닫는다 — 손가락이 10px 넘게 움직였으면(밀기) 닫지 않는다. preventDefault 로 뒤따르는 click 이 아래 그래프 링크를 다시 여는 것도 막는다 */
+        var x = pop.querySelector('.rt-pop-close'), t0 = null;
+        pop.addEventListener('touchstart', function (e) { var t = e.touches[0]; t0 = t ? { x: t.clientX, y: t.clientY } : null; }, { passive: true });
+        pop.addEventListener('touchend', function (e) {
+          var t = e.changedTouches[0];
+          var moved = t0 && t && (Math.abs(t.clientX - t0.x) > 10 || Math.abs(t.clientY - t0.y) > 10);
+          if (e.target === im || moved) return;
+          e.preventDefault(); close();
+        });
         x.addEventListener('click', close);
         pop.addEventListener('click', function (e) { if (e.target !== im && e.target !== x) close(); });
         document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
@@ -3849,6 +3898,79 @@ body.no-dashboard .main-content { padding-top: 32px; }
           subs.forEach(function (s, i) { var b = document.createElement('button'); b.className = 'rt-subtab'; b.type = 'button'; setLabel(b, s.name); b.onclick = function () { sel2(i); }; sb.appendChild(b); s.b = b; });
           st.p.insertBefore(sb, subs[0].nodes[0]);
           sel2(0);
+        });
+      })();
+
+      /* ============================================================ 인물 발언 — 인물 목록 → 인물 상세 (2026-10-21 사용자, 저녁: 탭 없이)
+         글 = 인물 목록([data-people-list]) · 언급 대상 · (숨김) h2[data-person-pages] + 인물별 발언 묶음([data-person-page]) + 30일 띠([data-person-strip]).
+         처음에 발언 묶음 · 띠 · 그 h2 를 숨긴다. 인물 줄을 누르면 목록 쪽을 숨기고 그 자리에 제목 줄(왼쪽 네모 화살표 = 목록으로 · 이름 · 직함) +
+         30일 띠 + 발언 묶음(소제목은 빼고)을 **옮겨** 보여 준다 — 복제가 아니라 옮기므로 더 보기(details[data-fold]) 동작이 그대로다. 목록으로 → 제자리로.
+         JS 가 없으면 목록 아래에 발언이 모두 보인다 (홈 카드 · 검색 엔진이 읽는 것은 그 본문) */
+      (function () {
+        'use strict';
+        var list = document.querySelector('.post-body [data-people-list]');
+        if (!list) return;
+        var host = list.parentNode;
+        var always = [].slice.call(host.querySelectorAll('[data-person-pages], [data-person-page], [data-person-strip]'));
+        always.forEach(function (n) { n.hidden = true; n.style.display = 'none'; });
+        var detail = document.createElement('div'); detail.setAttribute('data-people-detail', '1'); detail.hidden = true;
+        host.insertBefore(detail, list);
+        /* 제목 줄 = 글 제목(.post-title)을 고정 머리로 (2026-10-21 사용자): 왼쪽 네모 화살표 · 제목 · 아래 구분선, 헤더 바로 아래 붙어 본문만 스크롤.
+           목록 화면: 화살표 = 글 목록(아래 [목록] 버튼과 같은 주소), 제목 = 글 제목. 인물 화면: 화살표 = 목록으로, 제목 = 이름 · 직함(같은 글자 크기) */
+        var title = document.querySelector('.post-outer-container .post-title') || document.querySelector('.post-title');
+        var ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8 10 12.5"/></svg>';
+        var headBox, backBtn, titleText = title ? title.innerHTML : '';
+        if (title) {
+          headBox = document.createElement('div'); headBox.className = 'pr-sticky';
+          title.parentNode.insertBefore(headBox, title);
+          backBtn = document.createElement('a'); backBtn.className = 'pr-back'; backBtn.setAttribute('aria-label', '목록');
+          var lu = document.querySelector('.post-nav-list'); backBtn.href = (lu && lu.getAttribute('href')) || '/';
+          backBtn.innerHTML = ARROW;
+          headBox.appendChild(backBtn); headBox.appendChild(title);
+          var nav = document.querySelector('.navbar');
+          function place() { headBox.style.top = (nav ? nav.getBoundingClientRect().height : 0) + 'px'; }
+          place(); window.addEventListener('resize', place);
+        }
+        var saved = [], moved = [];
+        function setHead(name, role, photo) {
+          if (!title) return;
+          if (name == null) { title.innerHTML = titleText; backBtn.href = backBtn.getAttribute('data-list') || backBtn.href; backBtn.onclick = null; return; }
+          backBtn.setAttribute('data-list', backBtn.href);
+          title.textContent = '';
+          if (photo) { var im = document.createElement('img'); im.className = 'pr-photo'; im.alt = ''; im.src = photo; title.appendChild(im); }   /* 공직자만 얼굴 사진 (2026-10-21 사용자) */
+          title.appendChild(document.createTextNode(name));
+          if (role) { var r = document.createElement('span'); r.className = 'pr-role'; r.textContent = role; title.appendChild(r); }
+          backBtn.onclick = function (e) { e.preventDefault(); back(); };
+        }
+        function back() {
+          moved.forEach(function (m) { m.n.hidden = true; m.n.style.display = 'none'; m.parent.insertBefore(m.n, m.next); });
+          moved = [];
+          saved.forEach(function (x) { x.n.hidden = x.h; x.n.style.display = x.d; });
+          saved = []; detail.hidden = true; detail.innerHTML = '';
+          setHead(null);
+          try { window.scrollTo(0, 0); } catch (e) {}
+        }
+        function take(n) { moved.push({ n: n, parent: n.parentNode, next: n.nextSibling }); n.hidden = false; n.style.display = ''; detail.appendChild(n); }
+        function openPerson(a) {
+          var key = a.getAttribute('data-person');
+          var page = host.querySelector('[data-person-page="' + key + '"]');
+          if (!page) return;
+          detail.innerHTML = '';
+          setHead(a.getAttribute('data-name') || '', a.getAttribute('data-title') || '', a.getAttribute('data-photo') || '');
+          saved = [].slice.call(host.children).filter(function (c) { return c !== detail && always.indexOf(c) < 0; }).map(function (c) { return { n: c, h: c.hidden, d: c.style.display }; });
+          saved.forEach(function (x) { x.n.hidden = true; x.n.style.display = 'none'; });
+          var strip = host.querySelector('[data-person-strip="' + key + '"]');
+          if (strip) take(strip);
+          take(page);
+          var sub = page.querySelector('[data-sub]'); if (sub) sub.style.display = 'none';   /* 소제목(이름 · 직함)은 제목 줄이 대신한다 */
+          detail.hidden = false;
+          try { window.scrollTo(0, 0); } catch (e) {}
+        }
+        [].slice.call(list.querySelectorAll('[data-person]')).forEach(function (a) {
+          a.addEventListener('click', function (e) { e.preventDefault(); openPerson(a); });
+          a.addEventListener('touchstart', function () { a.classList.add('is-pressed'); }, { passive: true });
+          a.addEventListener('touchend', function () { setTimeout(function () { a.classList.remove('is-pressed'); }, 150); }, { passive: true });
+          a.addEventListener('touchcancel', function () { a.classList.remove('is-pressed'); }, { passive: true });
         });
       })();
 

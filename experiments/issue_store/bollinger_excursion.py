@@ -1,4 +1,4 @@
-"""볼린저 하단이 바닥인가 — 출구를 뺀 확인 (doc/볼린저-이슈별-검증-계획.md 4-11, 결과 보기 전 고정).
+"""볼린저 하단이 바닥인가 — 출구를 뺀 확인 (doc/검증/볼린저-이슈별-검증-계획.md 4-11, 결과 보기 전 고정).
 
     .venv/bin/python experiments/issue_store/bollinger_excursion.py            # 검증 ("검증해" 때만)
     FC_SMOKE=1 ... bollinger_excursion.py --out 스크래치                         # 점검 (섞은 수익률)

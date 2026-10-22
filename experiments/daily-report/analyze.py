@@ -1,7 +1,7 @@
 """분석: 수집 원본 + 시계열 → analysis.json
 
 LLM 호출이 없다. 순수 산술이고 같은 입력이면 같은 출력이다.
-계산하는 것은 doc/데일리-리포트-파이프라인.md 2부 B절의 B-1 ~ B-10:
+계산하는 것은 doc/운영/데일리-리포트-파이프라인.md 2부 B절의 B-1 ~ B-10:
 
     1D/5D/20D 수익률 · 이동평균 · 연속성 · 20일 고저점 대비 위치 · 상대강도
     시장 폭(프록시) · 섹터 로테이션 · 금리 ↔ 성장주 · Regime Score · 상태판 · 내일 체크
@@ -609,7 +609,7 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "symbols": symbols,
         "raw": raw,
     }
-    # 재설계 계산 (2026-10-18, doc/데일리-리포트-기획.md 6절) — 평소 범위 · 충격 · 한국 연결 · 환율 · 일정
+    # 재설계 계산 (2026-10-18, doc/기획/데일리-리포트-기획.md 6절) — 평소 범위 · 충격 · 한국 연결 · 환율 · 일정
     analysis.update(daily_view.build(raw, closes, series))
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)

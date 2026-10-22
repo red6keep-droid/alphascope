@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "exp
 import notify  # noqa: E402  — 운영 알림 (experiments/notify.py)
 import price_source  # noqa: E402  — yfinance 예비 사슬 (experiments/price_source.py, 2026-10-21)
 
-# 홈 "시총 TOP 10" — 미국 시가총액 상위 10개 (doc/종목-레이더-기획.md 10-10, 2026-10-18 장 마감 기준 순서).
+# 홈 "시총 TOP 10" — 미국 시가총액 상위 10개 (doc/기획/종목-레이더-기획.md 10-10, 2026-10-18 장 마감 기준 순서).
 # experiments/stock-radar/universe.py CANDIDATES 앞 10개와 같아야 한다. 교체(11위 밖 5거래일)가 생기면 두 곳을 같이 고친다.
 # 2026-10-18: JPM(13위) 빠지고 LLY(10위) 들어옴
 TICKERS = [

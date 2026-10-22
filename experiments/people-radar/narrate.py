@@ -26,9 +26,12 @@ PROMPT = """너는 시장 리서치 블로그의 편집자다. 아래 JSON 은 �
 
 headline: 48자 이내 명사형 헤드라인. "인물, 무엇" 형태. 끝은 명사 (예: "베센트, 이란 전쟁 뒤 물가 하락 전망" · "캐시 우드, 아처 에비에이션 1,210만 달러 매수").
           "~했다" · "~이다" 같은 서술형 끝말과 마침표 금지.
-detail: 한 문장, 합니다체("~했습니다"), 140자 이내. 원문에 있는 사실만 — 무엇을 말했는지 또는 했는지, 대상(국가 · 회사 · 자산)과 숫자.
+detail: 한 문장, 합니다체("~했습니다" · "~입니다"), 140자 이내. 원문에 있는 사실만 — 무엇을 말했는지 또는 했는지, 대상(국가 · 회사 · 자산)과 숫자.
+        발언 내용을 바로 서술한다. 인물 이름 · 직함을 다시 쓰지 말고(헤드라인에 있다), "~고 말했습니다" · "~고 밝혔습니다" · "~것으로 보도됐습니다" 같은
+        인용 꼬리를 붙이지 말 것 (누가 말했는지 · 보도인지는 카드의 다른 줄이 보여 준다).
+        예: "미국이 러시아산 원유 구매를 이유로 유럽 동맹국에 인도 · 중국 2차 관세를 요청했으나 거부당했습니다."
+            "엔화를 지키기 위한 미국의 개입을 옹호하며 안정적인 엔화가 매우 중요하다고 했습니다." 가 아니라 "엔화를 지키기 위한 미국의 개입을 옹호했고, 안정적인 엔화가 매우 중요하다는 입장입니다."
         시장 영향 · 앞으로의 방향 · 투자 판단을 쓰지 말 것. 원문에 없는 숫자를 만들지 말 것.
-        "attribution" 이 "report" 면 기사로 전해진 발언이므로 "~고 말한 것으로 보도됐습니다" 처럼 쓴다.
         "attribution" 이 "office" 면 본인이 아니라 기관 발표다 ("백악관은 ~ 발표했습니다").
 종목은 회사 이름을 한국어로 쓰고 티커는 괄호 (예: 테슬라(TSLA)). 사람 이름은 한국어 표기.
 
@@ -91,6 +94,43 @@ def _validate(v, src, min_ratio=0.7):
     return out
 
 
+SUBTOPIC_KO_PATH = os.path.join(config.BASE_DIR, "ref", "subtopic_ko.json")   # ref/ 는 깃에 남는다 (render_html 과 같은 경로)
+SUBTOPIC_PROMPT = """아래 JSON 배열은 미국 시장 뉴스의 짧은 영어 명사구(세부 주제)다. 각각을 2~4 어절의 한국어 명사구로 옮겨 JSON 객체 하나로만 답하라
+(설명 · 마크다운 금지): {"<영어 그대로>": "<한국어>", ...}. 회사 이름은 한국어 표기(티커 금지), 고유명사는 통용 표기. 예: "Tariff" → "관세", "Oil Prices" → "유가",
+"Memory Chips" → "메모리 반도체", "Rocket Lab" → "로켓랩", "Put Options" → "풋옵션", "ARK Daily Trades" → "ARK 일일 매매".
+
+INPUT:
+"""
+
+
+def translate_subtopics(radar, pool):
+    """radar.keywords 의 세부 주제 가운데 subtopic_ko.json 에 없는 것만 한 번에 번역해 누적한다 (2026-10-21 사용자: 키워드로). 실패하면 영어 그대로 보인다."""
+    try:
+        with open(SUBTOPIC_KO_PATH, encoding="utf-8") as f:
+            cache = json.load(f)
+    except (OSError, ValueError):
+        cache = {}
+    have = {k.lower() for k in cache}
+    need = sorted({k["key"] for kws in (radar.get("keywords") or {}).values() for k in kws if k["key"].lower() not in have and k["key"] not in config.TOPIC_KO})
+    if not need:
+        return cache
+    try:
+        got = pool.generate_json(SUBTOPIC_PROMPT + json.dumps(need, ensure_ascii=False), temperature=0.1,
+                                 validate=lambda v: isinstance(v, dict) and sum(1 for k in need if isinstance(v.get(k), str) and 0 < len(v[k]) <= 24) >= len(need) * 0.7)
+    except RuntimeError as e:
+        print(f"[narrate] 세부 주제 번역 실패 — 영어 그대로: {str(e)[:120]}")
+        return cache
+    for k in need:
+        v = got.get(k)
+        if isinstance(v, str) and 0 < len(v.strip()) <= 24:
+            cache[k] = v.strip()
+    os.makedirs(os.path.dirname(SUBTOPIC_KO_PATH), exist_ok=True)
+    with open(SUBTOPIC_KO_PATH, "w", encoding="utf-8") as f:
+        json.dump(cache, f, ensure_ascii=False, indent=1)
+    print(f"[narrate] 세부 주제 번역 {len(need)}개 → {SUBTOPIC_KO_PATH}")
+    return cache
+
+
 def narrate(radar_path=None, out_path=None):
     radar_path = radar_path or os.path.join(config.OUTPUT_DIR, "radar.json")
     out_path = out_path or os.path.join(config.OUTPUT_DIR, "narrative.json")
@@ -117,6 +157,7 @@ def narrate(radar_path=None, out_path=None):
     out = {"model": pool.last_model, "cards": got}
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
+    translate_subtopics(radar, pool)
     print(f"[narrate] 카드 {len(got)}/{len(src)} · {pool.last_model} → {out_path} · {usage_line()}")
     return out
 

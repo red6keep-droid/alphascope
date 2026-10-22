@@ -38,7 +38,7 @@ HISTORY_UNIVERSE = {
     "theme": ["SMH"],
     "safe": ["TLT", "HYG", "GLD"],
     "rates": ["^TNX", "^FVX", "^IRX"],
-    # 2026-10-18 재설계 (doc/데일리-리포트-기획.md 6절): 대형주 10개 평소 범위(D4) · 한국 짝의 미국 쪽(K2) · 원/달러(K3)
+    # 2026-10-18 재설계 (doc/기획/데일리-리포트-기획.md 6절): 대형주 10개 평소 범위(D4) · 한국 짝의 미국 쪽(K2) · 원/달러(K3)
     "mega": ["NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "LLY"],
     "link": ["^SOX"],
     "fx": ["KRW=X"],
@@ -307,7 +307,7 @@ def add_sectors(*quote_lists):
 
 def collect_yahoo():
     indices = collect_indices()
-    # 급등주 · 거래 상위 목록은 2026-10-18 재설계에서 뺐다 — 주목이 이끈 매수는 뒤가 나빴다 (doc/데일리-리포트-기획.md 5절 B6).
+    # 급등주 · 거래 상위 목록은 2026-10-18 재설계에서 뺐다 — 주목이 이끈 매수는 뒤가 나빴다 (doc/기획/데일리-리포트-기획.md 5절 B6).
     # 키는 빈 목록으로 남겨 옛 입력을 읽는 코드가 깨지지 않게 한다. 함수(collect_gainers 등)는 되돌릴 때를 위해 둔다
     gainers, most_active = [], []
     # 시계열은 그림자 모드 분석용이라 실패해도 리포트를 막지 않는다.

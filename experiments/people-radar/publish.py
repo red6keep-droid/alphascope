@@ -30,6 +30,19 @@ def match_titles(day):
     return [render_html.post_title(day), f"{render_html.SLUG_NAME} {day}"]
 
 
+def find_same_day(tp, day):
+    """같은 날 글 찾기 — 제목이 아니라 **주소의 날짜**로 (2026-10-21: 제목에서 날짜를 뺐기 때문에 제목으로 찾으면 어제 글을 덮어쓴다).
+    주소는 slug_title "market moving remarks YYYY-MM-DD" 에서 나와 'market-moving-remarks-YYYY-MM-DD' 를 품는다. 옛 제목(날짜 포함)도 같이 본다."""
+    requests, base, headers = tp._api()
+    r = requests.get(f"{base}/posts", params={"maxResults": 15, "fetchBodies": "false", "fetchImages": "false"}, headers=headers, timeout=30)
+    r.raise_for_status()
+    slug = f"{render_html.SLUG_NAME} {day}".replace(" ", "-")
+    for p in r.json().get("items", []):
+        if slug in str(p.get("url", "")) or str(p.get("title", "")).strip() == f"{render_html.TITLE_NAME} {render_html.korean_date(day)}":
+            return {"id": p["id"], "url": p.get("url")}
+    return None
+
+
 def labels():
     return render_html.LABELS + (["테스트 중"] if config.TEST_MODE else [])
 
@@ -51,7 +64,7 @@ def publish(output_dir=None, do_publish=False):
     spec = util.spec_from_file_location("trump_publish", os.path.join(config.BASE_DIR, "..", "trump-trend", "publish.py"))
     tp = util.module_from_spec(spec)
     spec.loader.exec_module(tp)   # find_post_id · update_post 를 그대로 쓴다
-    existing = tp.find_post_id(match_titles(day))
+    existing = find_same_day(tp, day)   # 제목(날짜 없음)으로 찾지 않는다
     if existing:
         url = tp.update_post(existing["id"], title, publish_blogger.with_related(body, labels(), match_titles(day)), labels())
         print(f"[publish] 같은 날 글이 있어 본문 갱신: {url}")

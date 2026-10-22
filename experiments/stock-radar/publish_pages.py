@@ -1,4 +1,4 @@
-"""종목 고정 페이지 게시 — 목록 1 + 간단형 상세 (후보 수 − NVDA), 새 페이지는 하루 universe.NEW_PAGES_PER_RUN 개까지 (doc/종목-레이더-기획.md 10-3 · 10-8 1단계, 2026-10-18 사용자 "발행까지").
+"""종목 고정 페이지 게시 — 목록 1 + 간단형 상세 (후보 수 − NVDA), 새 페이지는 하루 universe.NEW_PAGES_PER_RUN 개까지 (doc/기획/종목-레이더-기획.md 10-3 · 10-8 1단계, 2026-10-18 사용자 "발행까지").
 
     python experiments/stock-radar/publish_pages.py            # 실제 게시 (main.py 가 만든 output/*.html)
     python experiments/stock-radar/publish_pages.py --dry      # 무엇을 만들고 / 갱신할지만

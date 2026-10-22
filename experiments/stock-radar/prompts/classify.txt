@@ -12,7 +12,13 @@ For each item return:
   ],
   "fact": string,               // ONE Korean headline in noun-ending headline style (명사형 요약 헤드라인, like a news headline): end with a noun or number such as 발표 · 출시 · 승소 · 인상 · 예정 · 기록 · 감소, never with a verb ending (-다 · -했다 · -합니다 · -있다) and no final period. Examples: "테슬라, 자율주행 구매자 소송 승소" / "마이크론, 자사주 매입에 350억 달러 투입" / "애플 4분기 실적 발표 10월 30일 예정". It states what the item says happened. Only numbers that appear in the text. No adjectives, no causality, no advice. Max 120 Korean characters. Write company names in Korean (테슬라, 애플, 마이크로소프트 …). Never use the dash character "—"; use a comma or " · " instead.
   // Amounts: convert English units exactly — $930 million = 9억 3천만 달러, $1.3 billion = 13억 달러, $37 billion = 370억 달러, $350 billion = 3,500억 달러, $5 trillion = 5조 달러. Write percentages with "%" (2.04%), not "퍼센트".
-  "fact_en": string             // the same fact as a plain English sentence, max 160 characters
+  "fact_en": string,            // the same fact as a plain English sentence, max 160 characters
+  "issue": string,              // ONE code from ISSUE below
+  "subtopic": string,           // SHORTEST canonical noun phrase, 2-4 words, reused across items ("Tariff", "Oil Prices", "Memory Chips"). "" if none
+  "scope": "market" | "sector" | "stock",   // what the item is about: the whole market, one sector, or one company
+  "countries": string[],        // countries/regions involved, English short names ("China", "EU", "Japan"). [] if none
+  "scheduled": boolean,         // true if a pre-announced release/decision/report (CPI, FOMC, earnings date), false if unexpected
+  "surprise": integer -2..2     // for scheduled items: vs expectations (-2 much worse ... +2 much better); 0 if unknown or unscheduled
 }
 
 AREA:
@@ -26,6 +32,26 @@ AREA:
   Corporate    M&A, investments, executive changes, CEO personally, splits, dividends
   Macro        interest rates, broad market moves where the company is one of many
   Other        none of the above (marketing, events, how-to, unrelated). relevance MUST be 0 for every score.
+
+ISSUE (what is happening in the world — ONE code; pick the cause, not the effect):
+  RATES_FED         Fed decisions and officials, policy rates, Treasury yields, QT; also foreign central banks (ECB, BOJ)
+  INFLATION         CPI, PCE, PPI, wages, inflation expectations; oil only when framed as an inflation driver
+  GROWTH_JOBS       GDP, payrolls, unemployment, retail sales, PMI, consumer sentiment, recession debate, labor supply
+  TARIFF_TRADE      tariffs imposed/paused/negotiated, trade deals, trade deficits, supply-chain reshoring (export controls -> REGULATION)
+  GEOPOLITICS       wars, ceasefires, Middle East, Taiwan, sanctions, terrorism, disasters, pandemics, US-China security/diplomacy
+  OIL_ENERGY        crude, natural gas, OPEC, power, nuclear, energy prices (AI data-center power demand -> AI_CAPEX)
+  AI_CAPEX          data-center capex, GPU/accelerator demand, AI bubble debate, hyperscaler spending, AI power demand
+  EARNINGS          earnings results, guidance, consensus, analyst targets/ratings — big tech included (ticker attribute tells)
+  CORP_EVENT        M&A, IPO, buybacks, splits, dividends, executive changes, large contracts, product launches
+  REGULATION        antitrust, export controls, subsidies, safety regulators (FDA, NHTSA), lawsuits, rulings
+  FISCAL_POLITICS   shutdowns, debt ceiling, tax bills, elections, credit rating, appointments
+  CREDIT_BANKS      bank stress, credit crunch, private credit, CRE loans, bailouts, deposit flight
+  MARKET_STRUCTURE  flash crashes, volatility products, options expiry, index inclusion, meme stocks, carry-trade unwinds, capitulation and rebounds
+  INVESTOR_CALLS    a known investor or commentator buys/sells, recommends, or warns about a stock/sector (Cramer, Burry, ARK trades)
+  FX_GLOBAL         dollar, yen, yuan, FX intervention, sharp moves in foreign markets (country attribute carries which)
+  CRYPTO            bitcoin, crypto ETFs, stablecoin rules, exchanges
+  REAL_ESTATE       home prices, mortgage rates, housing starts, REITs
+  OTHER             market-related but none of the above
 
 RELEVANCE (direct connection to that company's business, NOT expected price impact):
   3  the company is the subject AND the item contains a concrete number or action (recall of N vehicles, guidance figure, contract value, lawsuit filed, approval granted, delivery count)

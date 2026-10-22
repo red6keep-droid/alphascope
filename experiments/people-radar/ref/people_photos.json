@@ -1,0 +1,37 @@
+{
+ "trump": {
+  "file": "trump.jpg",
+  "source_file": "Official_Presidential_Portrait_of_President_Donald_J._Trump_(2025).jpg",
+  "license": "Public domain",
+  "author": "Daniel Torok",
+  "page": "https://commons.wikimedia.org/wiki/File:Official_Presidential_Portrait_of_President_Donald_J._Trump_(2025).jpg"
+ },
+ "bessent": {
+  "file": "bessent.jpg",
+  "source_file": "Official_portrait_of_Treasury_Secretary_Scott_Bessent_(borderless)_(cropped).jpg",
+  "license": "Public domain",
+  "author": "U.S. Department of the Treasury",
+  "page": "https://commons.wikimedia.org/wiki/File:Official_portrait_of_Treasury_Secretary_Scott_Bessent_(borderless)_(cropped).jpg"
+ },
+ "lutnick": {
+  "file": "lutnick.jpg",
+  "source_file": "Howard_Lutnick_2025.jpg",
+  "license": "Public domain",
+  "author": "Daniel Torok",
+  "page": "https://commons.wikimedia.org/wiki/File:Howard_Lutnick_2025.jpg"
+ },
+ "greer": {
+  "file": "greer.jpg",
+  "source_file": "Official_portrait_of_U.S._Trade_Representative_Jamieson_Greer_(cropped_2).jpg",
+  "license": "Public domain",
+  "author": "Office of the United States Trade Representative",
+  "page": "https://commons.wikimedia.org/wiki/File:Official_portrait_of_U.S._Trade_Representative_Jamieson_Greer_(cropped_2).jpg"
+ },
+ "fed": {
+  "file": "fed.jpg",
+  "source_file": "Seal_of_the_United_States_Federal_Reserve_System.svg",
+  "license": "Public domain",
+  "author": "U.S. Government",
+  "page": "https://commons.wikimedia.org/wiki/File:Seal_of_the_United_States_Federal_Reserve_System.svg"
+ }
+}

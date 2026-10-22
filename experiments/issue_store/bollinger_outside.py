@@ -1,4 +1,4 @@
-"""바깥 확인 — 15종목 밖 S&P 500, 30년 저장소 (doc/볼린저-이슈별-검증-계획.md 4-10, 결과 보기 전 고정).
+"""바깥 확인 — 15종목 밖 S&P 500, 30년 저장소 (doc/검증/볼린저-이슈별-검증-계획.md 4-10, 결과 보기 전 고정).
 
     python experiments/issue_store/fetch_bars.py <바깥 종목들>      # 먼저 30년 일봉 (data/store/bars)
     python experiments/issue_store/bollinger_outside.py
@@ -66,7 +66,7 @@ def main():
                 continue
         missing.append(s)
     L = ["# 볼린저 — 15종목 밖 바깥 확인 (30년 저장소)", "",
-         f"생성 {pd.Timestamp.today().date()} · 등록 doc/볼린저-이슈별-검증-계획.md 4-10 · 종목 {len(got)} (못 받음 · 300일 미만 {len(missing)}) · 1999 ~", "",
+         f"생성 {pd.Timestamp.today().date()} · 등록 doc/검증/볼린저-이슈별-검증-계획.md 4-10 · 종목 {len(got)} (못 받음 · 300일 미만 {len(missing)}) · 1999 ~", "",
          f"판정 = n ≥ 30 · p < {P_MAX} (가설 둘) · 두 기간(1999~2012 · 2013~2026) 모두 +", ""]
     for key, (title, k) in HYP.items():
         L += [f"## 가설 {key} — {title} × 하단 {k}σ", "",

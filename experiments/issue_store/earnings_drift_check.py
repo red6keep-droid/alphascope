@@ -1,4 +1,4 @@
-"""실적 서프라이즈 뒤 — 좋은 실적은 그 뒤에도 이어지나 (doc/지표-우리검증-계획.md 5절, 결과 보기 전 고정).
+"""실적 서프라이즈 뒤 — 좋은 실적은 그 뒤에도 이어지나 (doc/리포트-재설계/지표-우리검증-계획.md 5절, 결과 보기 전 고정).
 
     .venv/bin/python experiments/issue_store/earnings_drift_check.py              # 검증 ("검증해" 때만)
     FC_SMOKE=1 .venv/bin/python experiments/issue_store/earnings_drift_check.py --out 스크래치   # 점검 (섞은 수익률)
