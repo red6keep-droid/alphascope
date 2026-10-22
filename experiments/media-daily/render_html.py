@@ -30,9 +30,20 @@ def _short(ch):
 
 
 def _who(name):
-    """발언자 한국어 표기 — 아는 이름만 (config.SPEAKER_KO), 소속 괄호는 뗀다."""
+    """발언자 한국어 표기 — 아는 이름만 (config.SPEAKER_KO), 소속 괄호는 뗀다. 영문 한 낱말짜리("Dan")는 이름이 아니라 버린다."""
     base = re.sub(r"\s*\(.*?\)\s*$", "", str(name or "")).strip()
-    return config.SPEAKER_KO.get(base, base)
+    if base in config.SPEAKER_KO:
+        return config.SPEAKER_KO[base]
+    if re.fullmatch(r"[A-Za-z.'-]+", base):
+        return ""
+    return base
+
+
+def _speakers(names, channel=None):
+    """채널이 곧 화자인 한국 유튜브(당잠사 · 증시각도기)는 채널 이름으로 — 요약이 적은 화자 이름("각도이 각산")이 뒤틀려 있다 (2026-10-22 실데이터)."""
+    if channel in config.KOREA_CHANNELS:
+        return [_short(channel)]
+    return [w for w in (_who(x) for x in names or []) if w]
 
 
 def _stance_text(c):
@@ -54,8 +65,8 @@ def _cluster_item(i, c, narrative):
     if c["surprise"]:
         meta.append("예상 밖")
     subs = [_esc(" · ".join(meta)), _esc(detail)]
-    if c["speakers"]:
-        subs.append("발언 : " + _esc(" · ".join(_who(x) for x in c["speakers"][:3])))
+    if _speakers(c["speakers"]):
+        subs.append("발언 : " + _esc(" · ".join(dict.fromkeys(_speakers(c["speakers"][:4])))))
     if c["tickers"]:
         subs.append("종목 : " + _esc(" · ".join(t for t in c["tickers"] if "(비상장)" not in t)[:120]))
     if c.get("daily"):
@@ -87,7 +98,7 @@ def sec_issues(m, narrative):
 def sec_korea(m):
     rows = []
     for k in m["korea"]:
-        who = _who((k["speakers"] or [_short(k["channel"])])[0])
+        who = (_speakers(k["speakers"], k["channel"]) or [_short(k["channel"])])[0]
         text = f"{who} — {k['topic']} ({config.STANCE_KO.get(k['stance'], '')}{' · 예상 밖' if k['surprise'] == 'surprise' else ''})"
         syms = " · ".join(t.replace("(KR)", "") for t in k["tickers"][:4])
         link = f'<a href="{_esc(k["url"])}" target="_blank" rel="noopener" data-trhelp="skip" style="color:#1a73e8;text-decoration:none;">{_esc(_short(k["channel"]))}</a>'
@@ -107,7 +118,7 @@ def sec_required(m):
     rows = []
     for ch in ("CNBC Mad Money", "증시각도기", "당잠사"):
         for r in m["required"].get(ch, []):
-            who = _who((r["speakers"] or [_short(ch)])[0])
+            who = (_speakers(r["speakers"], ch) or [_short(ch)])[0]
             text = f"{who} — {r['topic']} ({config.STANCE_KO.get(r['stance'], '')})"
             syms = " · ".join(t for t in r["tickers"][:4] if "(비상장)" not in t)
             link = f'<a href="{_esc(r["url"])}" target="_blank" rel="noopener" data-trhelp="skip" style="color:#1a73e8;text-decoration:none;">{_esc(_short(ch))}</a>'
