@@ -1,0 +1,290 @@
+{
+ "_note": "종목 로고 — 식별 용도. 각 로고는 해당 회사의 상표. 출처 MrChartist/global-stock-logos (TradingView 로고 서비스)",
+ "logos": {
+  "AAPL": {
+   "file": "AAPL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "ADBE": {
+   "file": "ADBE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "AMAT": {
+   "file": "AMAT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "AMD": {
+   "file": "AMD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "AMZN": {
+   "file": "AMZN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "ANET": {
+   "file": "ANET.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "ARM": {
+   "file": "ARM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "ASML": {
+   "file": "ASML.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "AVGO": {
+   "file": "AVGO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "BRK-B": {
+   "file": "BRK-B.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "CAT": {
+   "file": "CAT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "CEG": {
+   "file": "CEG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "COIN": {
+   "file": "COIN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "COST": {
+   "file": "COST.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "CRM": {
+   "file": "CRM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "CRWV": {
+   "file": "CRWV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "CVX": {
+   "file": "CVX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "DELL": {
+   "file": "DELL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "DIS": {
+   "file": "DIS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "EQIX": {
+   "file": "EQIX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "GE": {
+   "file": "GE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "GOOGL": {
+   "file": "GOOGL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "HD": {
+   "file": "HD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "INTC": {
+   "file": "INTC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "JNJ": {
+   "file": "JNJ.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "KO": {
+   "file": "KO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "LIN": {
+   "file": "LIN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "LLY": {
+   "file": "LLY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "LRCX": {
+   "file": "LRCX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "MA": {
+   "file": "MA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "MCD": {
+   "file": "MCD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "MSFT": {
+   "file": "MSFT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "MSTR": {
+   "file": "MSTR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "MU": {
+   "file": "MU.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "NEE": {
+   "file": "NEE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "NEM": {
+   "file": "NEM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "NFLX": {
+   "file": "NFLX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "NVDA": {
+   "file": "NVDA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "ORCL": {
+   "file": "ORCL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "PLD": {
+   "file": "PLD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "PLTR": {
+   "file": "PLTR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "PM": {
+   "file": "PM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "QCOM": {
+   "file": "QCOM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "RKLB": {
+   "file": "RKLB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "SHOP": {
+   "file": "SHOP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "SMCI": {
+   "file": "SMCI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "SO": {
+   "file": "SO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "SPCX": {
+   "file": "SPCX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "TSLA": {
+   "file": "TSLA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "TSM": {
+   "file": "TSM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "TXN": {
+   "file": "TXN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "UBER": {
+   "file": "UBER.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "V": {
+   "file": "V.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "VRT": {
+   "file": "VRT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "WELL": {
+   "file": "WELL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "WMT": {
+   "file": "WMT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  },
+  "XOM": {
+   "file": "XOM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-22"
+  }
+ }
+}

@@ -561,13 +561,36 @@ def pill(text, kind="area", lead=False, bare=False):
             f'font-size:{PILL_SIZE};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{esc(text)}</span>')   # 라벨 14px, 어디서나 (2026-10-12 사용자)
 
 
+LOGO_BASE = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/"   # 우리 gh-pages 사본 (핫링크 아님)
+_LOGO_META = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ref", "ticker_logos.json")   # fetch_ticker_logos.py 가 만든다
+_logos = None
+
+
+def _logo_files():
+    global _logos
+    if _logos is None:
+        try:
+            import json
+            with open(_LOGO_META, encoding="utf-8") as f:
+                _logos = json.load(f).get("logos") or {}
+        except (OSError, ValueError):
+            _logos = {}
+    return _logos
+
+
 def ticker_logo(sym, size=20):
-    """종목 이름 앞 둥근 글자 배지 (2026-10-13 사용자: "각각의 종목명에도 티커 아이콘").
-    2026-10-21 까지는 financialmodelingprep.com 의 회사 로고를 핫링크했다 — 상표 · 제3자 약관 · 가용성에 묶여 운영지침 4-6(로고 금지)에
-    어긋나 뺐다 (D4-6). 지금은 티커 앞 두 글자를 우리 색으로 그린다. 함수 이름 · 호출처는 그대로."""
+    """종목 이름 앞 둥근 로고 (2026-10-13 사용자: "각각의 종목명에도 티커 아이콘").
+    2026-10-21: 제3자 핫링크(financialmodelingprep)를 빼고 티커 두 글자 배지로 바꿨다 (D4-6).
+    2026-10-22 사용자: 로고는 신뢰도 — 우리 gh-pages 에 복사한 로고(ref/ticker_logos.json 에 있는 종목)만 쓴다. 식별 용도로
+    원래 모양 그대로 작게. 목록에 없는 종목(ETF · 삭제 요청)은 예전처럼 두 글자 배지 (운영지침 4-6)."""
     sym = str(sym or "").strip().upper()
     if not sym or not sym.replace("-", "").replace(".", "").isalnum():
         return ""
+    rec = _logo_files().get(sym)
+    if rec:
+        return (f'<img src="{LOGO_BASE}{esc(rec["file"])}" alt="" width="{size}" height="{size}" loading="lazy" '
+                f'style="display:inline-block;width:{size}px;height:{size}px;border-radius:50%;vertical-align:-4px;margin-right:6px;'
+                f'background:#F1F5F9;object-fit:cover;">')
     txt = sym.replace("-", "").replace(".", "")[:2]
     fs = max(8, int(size * 0.42))
     return (f'<span aria-hidden="true" style="display:inline-block;width:{size}px;height:{size}px;line-height:{size}px;border-radius:50%;'

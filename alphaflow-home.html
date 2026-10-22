@@ -485,7 +485,10 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   font-size: 12px;
   letter-spacing: -0.2px;
   color: #fff;
+  position: relative;
 }
+.stock-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }   /* 로고가 머리글자를 덮는다 (2026-10-22) */
+.stock-avatar.has-logo { background: #F1F5F9 !important; }
 .stock-label { display: flex; flex-direction: column; min-width: 0; }
 .stock-name {
   font-weight: 700;
@@ -1106,6 +1109,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   <p class="footer-disclaimer">
     면책 사항 : ALPHASCOPE 의 리포트는 공개된 시장 데이터(Yahoo Finance · SEC 공시 · FRED · 뉴스 RSS 등)를 정해진 규칙으로 계산해 정리한 사실 기록입니다. 숫자는 모두 코드가 계산하고, AI 는 뉴스 분류와 해설 문장에만 씁니다. 지난 기록은 앞으로의 결과를 보장하지 않습니다.
     특정 종목의 매수 · 매도를 권유하지 않으며 수익을 보장하지 않습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다. 투자 판단과 책임은 투자자 본인에게 있습니다.
+    종목 로고는 각 회사의 상표로, 종목을 구분하는 용도로만 사용하며 해당 회사와 제휴 관계가 없습니다.
   </p>
   <p class="footer-copy">© 2026 ALPHASCOPE. All rights reserved.</p>
 </footer>
@@ -1196,6 +1200,20 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   function initials(ticker) {
     return String(ticker).replace(/[^A-Z]/g, '').slice(0, 2) || '?';
   }
+  /* 종목 로고 (2026-10-22 사용자: 로고는 신뢰도) — 우리 gh-pages 사본만 (운영지침 4-6, experiments/fetch_ticker_logos.py).
+     머리글자 원 위에 로고를 얹고, 로고가 없는 종목(ETF · 삭제 요청)은 불러오기 실패 때 로고를 지워 머리글자 원이 남는다 */
+  var LOGO_BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/';
+  function stockAvatar(ticker, color) {
+    var av = el('span', 'stock-avatar', initials(ticker));
+    av.style.background = color;
+    var img = document.createElement('img');
+    img.alt = ''; img.loading = 'lazy'; img.width = 26; img.height = 26;
+    img.onload = function () { av.classList.add('has-logo'); };
+    img.onerror = function () { if (img.parentNode) img.parentNode.removeChild(img); };
+    img.src = LOGO_BASE + encodeURIComponent(String(ticker).toUpperCase()) + '.svg';
+    av.appendChild(img);
+    return av;
+  }
 
   /* 지수 카드는 삭제 (2026-10-20 사용자: 미국 증시 리포트에 나온다) */
 
@@ -1245,9 +1263,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       /* 종목 이름을 누르면 상세로 (2026-10-18 종목 페이지 첫 발행) — 엔비디아는 홈 엔비디아 카드가 가리키는 최신 리포트, 나머지는 시총 TOP 10 고정 페이지 */
       var cell = el('a', 'stock-cell');
       cell.href = pageFor(s.s);
-      /* 머리글자 원 (2026-10-21: 제3자 로고 핫링크 중단 — 운영지침 4-6 · D4-6, 리포트 design_kit.ticker_logo 와 같게) */
-      var av = el('span', 'stock-avatar', initials(s.s));
-      av.style.background = meta.color;
+      /* 로고 (우리 gh-pages 사본) — 없으면 머리글자 원 (2026-10-22, 리포트 design_kit.ticker_logo 와 같게) */
+      var av = stockAvatar(s.s, meta.color);
       var label = el('span', 'stock-label');
       label.appendChild(el('span', 'stock-name', meta.name));
       label.appendChild(el('span', 'stock-ticker', s.s));
@@ -1333,8 +1350,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   function feedCell(r) {
     var cell = el('a', 'stock-cell');
     cell.href = feedPage(r);
-    var av = el('span', 'stock-avatar', initials(r.s));
-    av.style.background = (META[r.s] && META[r.s].color) || feedColor(r.s);
+    var av = stockAvatar(r.s, (META[r.s] && META[r.s].color) || feedColor(r.s));
     var label = el('span', 'stock-label');
     label.appendChild(el('span', 'stock-name', r.name));
     label.appendChild(el('span', 'stock-ticker', r.s));
@@ -2468,6 +2484,10 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var b = document.createElement('span'); b.className = 'title-logo title-badge'; b.setAttribute('aria-hidden', 'true');
     b.textContent = sym.replace(/[^A-Z]/g, '').slice(0, 2);   /* 크기 · 여백은 테마 CSS .post-title .title-logo (build_theme.py) */
     host.insertBefore(b, host.firstChild);
+    /* 2026-10-22 사용자: 로고는 신뢰도 — 우리 gh-pages 사본이 있으면 배지 자리를 로고로 바꾼다. 없으면 배지 그대로 (운영지침 4-6) */
+    var img = document.createElement('img'); img.alt = ''; img.className = 'title-logo';
+    img.onload = function () { if (b.parentNode) b.parentNode.replaceChild(img, b); };
+    img.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/' + encodeURIComponent(sym.replace('.', '-')) + '.svg';
   });
 })();
 
