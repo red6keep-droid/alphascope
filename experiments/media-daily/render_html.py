@@ -83,7 +83,11 @@ def _cluster_item(i, c, narrative):
 def sec_lead(m, narrative, d):
     top = m["clusters"][0] if m["clusters"] else None
     _, mo, dd = d.split("-")
-    first = (narrative or {}).get("lead") or (f"방송 {top['n_channels']}곳이 '{top['topic']}' 를 가장 많이 다뤘습니다." if top else "")
+    # 머리 한 줄은 파이썬이 센 숫자로 — 모델이 "방송 5곳" 처럼 수를 지어냈다 (2026-10-22 세 번째 CI, 100 미만 정수는 fact_check 가 보지 않는다)
+    first = ""
+    if top:
+        view = "엇갈립니다" if top["split"] else {"bullish": "긍정 쪽입니다", "bearish": "부정 쪽입니다"}.get(max(top["stances"], key=top["stances"].get), "중립입니다")
+        first = f"방송 {top['n_channels']}곳 · 영상 {top['n_videos']}개가 '{top['topic']}' 를 가장 많이 다뤘고, 시각은 {view}."
     second = f"{int(mo)}월 {int(dd)}일 아침 기준 영상 {m['n_items']}개 · 채널 {m['n_channels']}곳 · 이슈 묶음 {m['n_clusters']}개"
     if m["phase"] == 1:
         second += " · 10시 15분에 Mad Money · 증시각도기를 더해 갱신합니다"
