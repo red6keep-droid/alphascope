@@ -35,6 +35,8 @@ import cluster_events
 import collect_posts
 import collect_prices
 import config
+import record_store  # noqa: E402  — 이벤트 · 추이 판정 누적 (experiments/record_store.py, 2026-10-22)
+import report_title
 import db
 import event_study
 import labels
@@ -137,6 +139,16 @@ def main():
 
     _step(7, total, "집계")
     aggregate.build(conn)
+    if args.export_state:
+        # 최근 24시간 이벤트 · 추이 상위를 trump-state 의 records/ 에 덧붙인다 — trump_analysis.json 은 덮어써진다 (2026-10-22)
+        try:
+            with open(os.path.join(config.OUTPUT_DIR, "trump_analysis.json"), encoding="utf-8") as f:
+                _v, _i = record_store.trump_rows(json.load(f), report_title.today_kst())
+            _dir = os.path.dirname(os.path.abspath(args.export_state))
+            record_store.append(_dir, "verdicts", _v)
+            record_store.append(_dir, "issues", _i)
+        except Exception as e:  # noqa: BLE001
+            print(f"::warning::기록 저장 실패 (게시는 계속): {e!r}")
 
     _step(8, total, "서술 + 렌더")
     narrative_path = os.path.join(config.OUTPUT_DIR, "narrative.json")

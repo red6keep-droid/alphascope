@@ -21,6 +21,9 @@ import publish
 import render_html
 import state_io
 
+sys.path.append(os.path.join(config.BASE_DIR, ".."))   # 뒤에 붙인다 — 이쪽 모듈 이름을 가리지 않게
+import record_store  # noqa: E402  — 신호 누적 (experiments/record_store.py, 2026-10-22). statements.jsonl 은 30일만 남아 신호는 따로 쌓는다
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -43,6 +46,10 @@ def main():
     if state_file:
         state_io.export_state(conn, state_file)
     print("[4/7] 집계"); radar = aggregate.build(conn)
+    if a.state:
+        _v, _i = record_store.radar_rows(radar, render_html.today_kst())
+        record_store.append(a.state, "verdicts", _v)
+        record_store.append(a.state, "issues", _i)
     narrative_path = os.path.join(config.OUTPUT_DIR, "narrative.json")
     if os.path.exists(narrative_path):
         os.remove(narrative_path)   # 지난 실행의 문장이 오늘 카드에 붙지 않게

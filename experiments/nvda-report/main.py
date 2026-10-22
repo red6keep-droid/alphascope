@@ -39,6 +39,7 @@ import collect_market
 import cases_watch
 import collect_regulatory
 import config
+import record_store  # noqa: E402  — 판정 · 이벤트 누적 (experiments/record_store.py, 2026-10-22)
 import db
 import dedupe
 import extract_quarterly
@@ -186,6 +187,14 @@ def main():
     judge.build(conn, day, run_date)
     if args.export_state:
         state_io.export_state(conn, args.export_state)   # 판정까지 끝난 상태를 저장 — 뒤 단계가 실패해도 Gemini 호출을 헛되게 하지 않는다
+        # 그날 판정(상태판 flag · 헤드라인 수치) · 이벤트를 nvda-state 의 records/ 에 덧붙인다 — nvda_analysis.json 은 덮어써진다 (2026-10-22)
+        try:
+            with open(os.path.join(config.OUTPUT_DIR, "nvda_analysis.json"), encoding="utf-8") as f:
+                _v, _i = record_store.nvda_rows(json.load(f))
+            record_store.append(args.export_state, "verdicts", _v)
+            record_store.append(args.export_state, "issues", _i)
+        except Exception as e:  # noqa: BLE001
+            print(f"::warning::기록 저장 실패 (게시는 계속): {e!r}")
 
     _step(8, total, "⑦ 서술 (Gemini)" + ("" if args.narrate else " — 건너뜀"))
     if args.narrate:

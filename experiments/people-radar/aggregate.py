@@ -14,6 +14,8 @@ import subprocess
 import sys
 
 import config
+sys.path.append(os.path.join(config.BASE_DIR, ".."))
+import issue_codes  # noqa: E402
 import db
 
 RELEVANCE_EVENT_MIN = 2   # trump-trend 와 같다
@@ -60,6 +62,7 @@ def build_signals(rows):
         s.update({
             "intensity": max(r["ai_intensity"] for r in items),
             "relevance": max(r["ai_market_relevance"] for r in items),
+            "issue": (lead["ai_issue"] if "ai_issue" in lead.keys() else None) or issue_codes.FROM_PEOPLE_TOPIC.get(s["topic"], "OTHER"),   # 이슈 코드 — 기록(records)용 (2026-10-22)
             "direction": lead["ai_direction"] if dirs.count(lead["ai_direction"]) * 2 >= len(dirs) else max(set(dirs), key=dirs.count),
             "source_kind": "primary" if prim else "secondary",
             "attribution": lead["attribution"],

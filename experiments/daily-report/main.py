@@ -28,6 +28,7 @@ from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import notify  # noqa: E402  — 운영 알림 (experiments/notify.py, 2026-10-21)
+import record_store  # noqa: E402  — 판정 · 이슈 누적 (experiments/record_store.py, 2026-10-22)
 
 import analyze
 import chart_spx
@@ -193,6 +194,20 @@ def main():
     print("[3/6] 검증")
     print("=" * 50)
     validate_report.validate(INPUT_PATH, REPORT_PATH, analysis_path=analysis_path)
+
+    # 그날 판정 · 선정 뉴스(이슈 코드)를 report-state 의 records/ 에 덧붙인다 — 덮어쓰지 않는 우리 기록 (블로그-목적과-방향 6절 1번, 2026-10-22)
+    try:
+        with open(REPORT_PATH, encoding="utf-8") as f:
+            _report = json.load(f)
+        _analysis = None
+        if analysis_path and os.path.exists(analysis_path):
+            with open(analysis_path, encoding="utf-8") as f:
+                _analysis = json.load(f)
+        _v, _i = record_store.daily_rows(input_data, _report, _analysis)
+        record_store.append(os.path.join(OUTPUT_DIR, "state"), "verdicts", _v)
+        record_store.append(os.path.join(OUTPUT_DIR, "state"), "issues", _i)
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::기록 저장 실패 (게시는 계속): {e!r}")
 
     chart_ok = bool(make_chart(input_data))
     image_ok, cover_url = make_cover(input_data)
