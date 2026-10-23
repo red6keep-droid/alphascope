@@ -3,7 +3,7 @@
 틀 (기획 11절 초안 — 발행하며 고친다):
     맨 앞 요약 두 줄(data-seo-lead) → 머리 카드(방송이 가장 많이 다룬 이슈 · 우리 숫자 한 줄)
     → 방송이 본 이슈 (상위 n, 카드마다: 소주제 · 영상 n · 채널 m · 방향 · 예상 밖 · 발언자 · [데일리 다룸 →] · 영상 링크)
-    → 한국 연결 → 방송에서 언급된 종목(글자만) → 장 초반에 이어 볼 것(2차) → 출처(영상 목록)
+    → 한국장에 영향을 줄 만한 소식(옛 한국 연결) → 방송에서 언급된 종목(글자만) → 장 초반에 이어 볼 것(2차) → 출처(영상 목록)
 쓰지 않는 것: 요약 문장 · 자막 수치 · 종목 링크 · 가격 · 추천 어투. 영문 원문 제목은 출처 목록의 링크 글자로만.
 """
 
@@ -143,7 +143,7 @@ def build_body(m, narrative, d):
         parts.append(dk.section("방송이 본 이슈", issues, summary="영상 · 채널 수가 많은 순"))
     korea = sec_korea(m)
     if korea:
-        parts.append(dk.section("한국 연결", korea))
+        parts.append(dk.section("한국장에 영향을 줄 만한 소식", korea))   # 옛 제목 "한국 연결" (2026-10-23 사용자)
     tick = sec_tickers(m)
     if tick:
         parts.append(dk.section("방송에서 언급된 종목", tick))
