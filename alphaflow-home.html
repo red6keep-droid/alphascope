@@ -288,7 +288,9 @@ body.menu-open { overflow: hidden; }
   flex: 1;
   min-width: 0;
 }
-.briefing-main > .report-col:last-child { grid-column: 1 / -1; }
+/* 카드 넷(미디어 데일리 추가, 2026-10-23 사용자 목업)은 2 × 2 — 셋일 때의 "셋째 전폭" 규칙은 뺐다 */
+/* 홈 미디어 데일리 카드 — 인물 발언 카드와 같은 줄 모양: 분야 라벨 · 이슈 이름 왼쪽, 방송 수 오른쪽 */
+#media-card { padding: 0 16px; gap: 0; }
 
 /* 리포트 이름은 카드 밖 제목(21px 굵게 · 행간 27 = 구획 제목 글자) + 앞에 컬러 아이콘 (2026-10-13 사용자) */
 .report-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -757,9 +759,8 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
   /* 검색창은 헤더 아래로 내려오는 줄 — 아이콘들은 오른쪽에 그대로 (2026-10-12 사용자: 알림 · 검색 · 메뉴 우측 정렬) */
   .search-bar { display: none; position: absolute; top: calc(100% + 8px); left: var(--gutter); right: var(--gutter); width: auto; box-shadow: 0 8px 24px rgba(15,23,42,.14); }
   .search-bar.is-open { display: flex; }
-  /* 세 카드가 좁아지면 두 칸 + 셋째(인물 발언)는 전폭 */
+  /* 카드 넷이 좁아지면 2 × 2 (미디어 데일리 추가, 2026-10-23) */
   .briefing-main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .briefing-main > .report-col:last-child { grid-column: 1 / -1; }   /* 셋째 카드(인물 발언, 2026-10-20 순서)는 전폭 */
 }
 
 @media (max-width: 900px) {
@@ -958,6 +959,14 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         <h3 class="report-title"><span class="report-icon" style="background:#0F766E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4"/></svg></span>주요 인물 발언<span class="report-card-date" data-date="radar-card"></span></h3>
         <a class="report-card" id="radar-card" href="/search/label/인물%20발언">
           <div class="kv-rows" data-hook="radar-rows"><div class="kv-row"><span class="kv-name">리포트를 불러오는 중…</span></div></div>
+        </a>
+        </div>
+
+        <!-- 미디어 데일리 (2026-10-23 사용자 목업). '방송이 본 이슈' 상위 4개 — 분야 라벨 · 이슈 이름 왼쪽, 방송 수 오른쪽 (인물 발언 카드와 같은 줄) -->
+        <div class="report-col">
+        <h3 class="report-title"><span class="report-icon" style="background:#7C3AED;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3.5" width="12" height="8.5" rx="1.5"/><path d="M6 14h4"/><path d="M7 6.2v3.6L10 8z" fill="currentColor"/></svg></span>미디어 데일리<span class="report-card-date" data-date="media-card"></span></h3>
+        <a class="report-card" id="media-card" href="/search/label/미디어%20데일리">
+          <div class="kv-rows" data-hook="media-rows"><div class="kv-row"><span class="kv-name">리포트를 불러오는 중…</span></div></div>
         </a>
         </div>
       </div>
@@ -1630,6 +1639,14 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       fill: fillRadar, rows: 'radar-rows',   /* 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 엔비디아 카드는 삭제 (같은 날) */
       picks: false,
       empty: '아직 발행된 인물 발언 리포트가 없습니다.'
+    },
+    {
+      id: 'media-card',
+      label: '미디어 데일리',
+      map: { lead: ['(머리)'] },   /* 목록 화면 요약용 — 머리 첫 줄. 홈 카드는 fill 이 그린다 */
+      fill: fillMedia, rows: 'media-rows',   /* 미디어 데일리 (2026-10-23 사용자 목업) */
+      picks: false,
+      empty: '아직 발행된 미디어 데일리가 없습니다.'
     }
   ];
   var PICKS_HEADS = ['급등주', '오늘의 급등주 TOP 5'];   /* 새 디자인 제목 · 옛 글 제목 */
@@ -1895,6 +1912,45 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       main.appendChild(el('span', null, r.text));
       row.appendChild(main);
       if (r.intensity) { var it = el('span', 'tr-int', '강도 : '); it.appendChild(el('b', null, r.intensity)); row.appendChild(it); }
+      box.appendChild(row);
+    });
+    evenTags(box);
+  }
+
+  /* 홈 미디어 데일리 카드 (2026-10-23 사용자 목업) — 이슈 카드(media-daily render_html.sec_issues)를 읽는다.
+     항목(li): 첫 칸 = 이슈 이름, 둘째 칸 = 라벨 줄(첫 알약 = 분야), 어딘가에 `방송 n곳`. 옛 글은 마지막 줄이 라벨 · `채널 n곳`. 많이 다룬 순으로 4개까지 */
+  function mediaRows(sec) {
+    var out = [];
+    function walk(n) {
+      if (!n || !n.getAttribute || out.length >= 4) return;
+      if (n.tagName === 'LI') {
+        var head = n.children[0], pills = n.querySelector('[data-pills]') || n.children[n.children.length - 1];
+        var tag = pills && pills.children[0] ? String(pills.children[0].textContent || '').trim() : '';
+        var cm = /(?:방송|채널)\s*(\d+)\s*곳/.exec(String(n.textContent || ''));
+        var iv = n.querySelector('[data-interest]');   /* 관심도 1~10 (2026-10-23 사용자) — 옛 글은 방송 n곳 */
+        var text = head ? String(head.textContent || '').replace(/\s+/g, ' ').trim() : '';
+        if (text) out.push({ topic: tag, text: clip(text), interest: iv ? iv.getAttribute('data-interest') : '', channels: cm ? cm[1] : '' });
+        return;
+      }
+      for (var i = 0; i < n.children.length; i++) walk(n.children[i]);
+    }
+    (sec['방송이 본 이슈'] || sec['(머리)'] || []).forEach(walk);   /* 2026-10-23부터 이슈 카드는 제목 없이 머리(data-lead) 구획 안 — 옛 글은 '방송이 본 이슈' 제목 아래 */
+    return out;
+  }
+  function fillMedia(sec) {
+    var box = document.querySelector('[data-hook="media-rows"]');
+    if (!box) return;
+    box.textContent = '';
+    var rows = mediaRows(sec);
+    if (!rows.length) { box.appendChild(el('div', 'kv-row is-note', linesOf(sec['(머리)'] || [])[0] || LOAD_FAILED)); return; }
+    rows.forEach(function (r) {
+      var row = el('div', 'kv-row'), main = el('span', 'tr-main');
+      if (r.topic) main.appendChild(el('span', 'tr-tag', r.topic));
+      main.appendChild(el('span', null, r.text));
+      row.appendChild(main);
+      /* 오른쪽 = 관심도 (트럼프 · 인물 발언의 `강도 : 8` 과 같은 모양). 옛 글은 방송 n곳 */
+      if (r.interest) { var iv = el('span', 'tr-int', '관심도 : '); iv.appendChild(el('b', null, r.interest)); row.appendChild(iv); }
+      else if (r.channels) { var it = el('span', 'tr-int', '방송 : '); it.appendChild(el('b', null, r.channels + '곳')); row.appendChild(it); }
       box.appendChild(row);
     });
     evenTags(box);
@@ -2861,6 +2917,27 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     a.addEventListener('touchend', function () { setTimeout(function () { a.classList.remove('is-pressed'); }, 150); }, { passive: true });
     a.addEventListener('touchcancel', function () { a.classList.remove('is-pressed'); }, { passive: true });
   });
+})();
+
+/* ============================================================ 제목 왼쪽 화살표 (2026-10-23 사용자: "주요 인물 발언 상세처럼 홈으로 가는 화살표를 타이틀에")
+   본문에 [data-title-back="주소"] 가 있는 글 — 인물 발언과 같은 고정 제목 줄(.pr-sticky) + 네모 화살표(.pr-back)를 그 주소로.
+   인물 발언 글은 위 IIFE 가 이미 만들었으므로 건너뛴다. 지금 쓰는 글: 미디어 데일리(홈으로) */
+(function () {
+  'use strict';
+  var mark = document.querySelector('.post-body [data-title-back]');
+  if (!mark || document.querySelector('.pr-sticky')) return;
+  var title = document.querySelector('.post-outer-container .post-title') || document.querySelector('.post-title');
+  if (!title) return;
+  var head = document.createElement('div'); head.className = 'pr-sticky';
+  title.parentNode.insertBefore(head, title);
+  var back = document.createElement('a'); back.className = 'pr-back';
+  back.href = mark.getAttribute('data-title-back') || '/';
+  back.setAttribute('aria-label', mark.getAttribute('data-title-back-label') || '홈');
+  back.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8 10 12.5"/></svg>';
+  head.appendChild(back); head.appendChild(title);
+  var nav = document.querySelector('.navbar');
+  function place() { head.style.top = (nav ? nav.getBoundingClientRect().height : 0) + 'px'; }
+  place(); window.addEventListener('resize', place);
 })();
 
 /* ============================================================ 전환 버튼 (data-switch) · 오늘·5일 (data-hz-control) — 2026-10-11

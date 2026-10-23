@@ -962,6 +962,33 @@ def bar(label, segs, split="right"):
             f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 3px;">{body}</span>' + bar_pcts(pcts))
 
 
+# 범례 막대 — 지금 기준 모양 (가이드라인 1절 4-1 9 · 10-7: 엔비디아 `_legend_bar` 애널리스트 · 뉴스 막대와 같은 값). 위 bar() 는 2026-10-13 이전 모양이라
+# 새 막대는 이것을 쓴다 (2026-10-23 사용자: "다른 막대 그래프와 같은 규칙인지 — 범례 · 타이틀 · 막대 높이 · 막대 안 숫자 크기가 다르다")
+LEGEND_BAR_H, LEGEND_BAR_NUM, LEGEND_BAR_PAD = 30, "17px", 5   # 막대 높이 30 · 막대 안 숫자 17 · 위아래 바깥 +5 (2026-10-14 사용자)
+LEGEND_CHIP, LEGEND_INDENT = 9, 10   # 범례 색 사각형 9px · 범례 왼쪽 들여쓰기 10px (2026-10-17 사용자)
+
+
+def legend_bar(title, segs, aside=""):
+    """제목(왼쪽, 16px 검정 굵게) · 막대 · 막대 색과 같은 범례 칩 `■ 긍정 47% ■ 부정 37%`. segs = [(이름, 개수, 배경, 글자)], 0건은 뺀다.
+    aside: 제목 줄 오른쪽 글(14px 안내 회색) — 기준 규칙은 비워 두지만, 미디어 데일리는 `영상 n개 · 방송 n곳` (2026-10-23 사용자)."""
+    segs = [x for x in segs if x[1]]
+    total = sum(x[1] for x in segs)
+    if not total:
+        return ""
+    title_html = f'<b style="color:#111;font-weight:700;">{esc(title)}</b>'
+    if aside:
+        title_html += f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};white-space:nowrap;">{aside}</span>'
+    head = f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:{BAR_LABEL};line-height:{LH_CARD};margin:0 0 3px;">{title_html}</span>'
+    body = "".join(f'<span style="display:block;width:{c / total * 100:.1f}%;background:{bg};color:{fg};font-size:{LEGEND_BAR_NUM};font-weight:700;'
+                   f'text-align:center;line-height:{LEGEND_BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{c / total * 100:.0f}%" if c / total >= 0.08 else ""}</span>' for _, c, bg, fg in segs)
+    bar_html = (f'<span style="display:flex;width:100%;height:{LEGEND_BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;'
+                f'margin:{LEGEND_BAR_PAD}px 0 {3 + LEGEND_BAR_PAD}px;">{body}</span>')
+    legend = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
+                     f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{esc(nm)} {c / total * 100:.0f}%</span>'
+                     for nm, c, bg, _ in segs)
+    return head + bar_html + (f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{legend}</span>')
+
+
 def hbar(value, max_value, color, width="80px"):
     """가로 막대 하나 (섹터 등락 등) — 카드 값 칸 안에 작게. width 는 CSS 폭 (값 칸을 채우려면 calc(100% - n px))."""
     pct = 0 if not max_value else min(100, abs(value) / max_value * 100)

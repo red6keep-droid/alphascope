@@ -253,6 +253,8 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .pr-back { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111 !important; cursor: pointer; text-decoration: none; }   /* 네모 박스 안 화살표 — 공식 접기 버튼과 같은 상자 */
 .pr-back svg { width: 20px; height: 20px; }
 .pr-sticky .post-title { display: flex; align-items: center; }
+.pr-sticky .post-title { flex: 1 1 auto; }   /* 날짜가 든 제목(미디어 데일리, 2026-10-23)도 날짜는 오른쪽 끝 — 가이드라인 3-1 */
+.pr-sticky .post-title .post-title-date, .pr-sticky .post-title .post-title-meta { margin-left: auto; }
 .pr-sticky .post-title .pr-photo { flex: none; width: 36px; height: 36px; margin-right: 10px; border-radius: 50%; object-fit: cover; background: #F1F5F9; border: 1px solid #E2E8F0; }   /* 상세 제목 앞 공직자 얼굴 */
 @media (max-width: 680px) { .pr-sticky { background: var(--bg); padding-top: 4px; } .pr-sticky .post-title .pr-role { font-size: 14px; line-height: 20px; margin-left: 8px; } }
 .img-pop[hidden] { display: none; }
@@ -1282,6 +1284,8 @@ PREVIEW_NVDA_TITLE = "엔비디아 NVDA 주가 2026년 9월 3일"
 PREVIEW_TRUMP_TITLE = "트럼프 SNS 발언 트렌드 2026년 9월 3일"
 SAVED_RADAR_BODY = "experiments/people-radar/output/radar_body.html"   # 인물 발언 홈 카드 (2026-10-21)
 PREVIEW_RADAR_TITLE = "주요 인물 발언"
+SAVED_MEDIA_BODY = "experiments/media-daily/output/media_body.html"   # 미디어 데일리 홈 카드 (2026-10-23) — media_body_mock.html 이 있으면 그것
+PREVIEW_MEDIA_TITLE = "미디어 데일리 2026년 10월 23일"
 
 # 홈 테마 · 관심 종목 · 섹터 종목 탭 카드 (2026-10-21) — stocks.json · themes.json 흉내. 실제 파일은 gh-pages 에만 있다
 MOCK_PICK_STOCKS = [
@@ -1377,6 +1381,14 @@ def preview_radar_body():
         return io.open(SAVED_RADAR_BODY, encoding="utf-8").read().strip(), f"인물 발언 본문({SAVED_RADAR_BODY})"
     except OSError:
         return "", "인물 발언 본문 없음"
+
+
+def preview_media_body():
+    """미디어 데일리 본문 — 목업 본문(실제 발행 글을 받아 둔 것)이 있으면 그것, 없으면 로컬 산출물, 둘 다 없으면 빈 글."""
+    for path in (SAVED_MEDIA_BODY.replace("media_body.html", "media_body_mock.html"), SAVED_MEDIA_BODY):
+        if os.path.exists(path):
+            return io.open(path, encoding="utf-8").read().strip(), f"미디어 데일리 본문({path})"
+    return "", "미디어 데일리 본문 없음"
 
 
 def preview_reports():
@@ -1598,6 +1610,11 @@ def preview_mock_js():
     nvda_feed = one_entry_feed(PREVIEW_NVDA_TITLE, nvda_body, "#list")
     radar_body, _ = preview_radar_body()
     radar_feed = one_entry_feed(PREVIEW_RADAR_TITLE, radar_body, "#list") if radar_body else {"feed": {"entry": []}}
+    media_body, _ = preview_media_body()
+    # 카드를 누르면 상세 목업(design_kit.write_mock 으로 만든 글 보기 화면)이 열리게 — 없으면 목록 흉내
+    media_detail = "experiments/media-daily/output/media_mock_live.html"
+    media_feed = (one_entry_feed(PREVIEW_MEDIA_TITLE, media_body, media_detail if os.path.exists(media_detail) else "#list")
+                  if media_body else {"feed": {"entry": []}})
 
     return (
         "  var PV_DATA = %s;\n"
@@ -1606,6 +1623,7 @@ def preview_mock_js():
         "  var PV_TRUMP_FEED = %s;\n"
         "  var PV_NVDA_FEED = %s;\n"
         "  var PV_RADAR_FEED = %s;\n"
+        "  var PV_MEDIA_FEED = %s;\n"
         "  var PV_PICKS = %s;\n"
         "  var PV_THEMES = %s;\n"
         "\n"
@@ -1614,7 +1632,7 @@ def preview_mock_js():
         "    var u = String(url), body;\n"
         "    if (u.indexOf('/feeds/posts') >= 0) {\n"
         "      var lab = decodeURIComponent(u);\n"
-        "      body = lab.indexOf('트럼프 트렌드') >= 0 ? PV_TRUMP_FEED : lab.indexOf('엔비디아') >= 0 ? PV_NVDA_FEED : lab.indexOf('인물 발언') >= 0 ? PV_RADAR_FEED : PV_FEED;\n"
+        "      body = lab.indexOf('트럼프 트렌드') >= 0 ? PV_TRUMP_FEED : lab.indexOf('엔비디아') >= 0 ? PV_NVDA_FEED : lab.indexOf('인물 발언') >= 0 ? PV_RADAR_FEED : lab.indexOf('미디어 데일리') >= 0 ? PV_MEDIA_FEED : PV_FEED;\n"
         "    }\n"
         "    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;\n"
         "    else if (u.indexOf('stocks.json') >= 0) body = PV_PICKS;\n"
@@ -1644,6 +1662,7 @@ def preview_mock_js():
             json.dumps(trump_feed, ensure_ascii=False),
             json.dumps(nvda_feed, ensure_ascii=False),
             json.dumps(radar_feed, ensure_ascii=False),
+            json.dumps(media_feed, ensure_ascii=False),
             json.dumps(MOCK_PICKS, ensure_ascii=False),
             json.dumps(MOCK_THEMES, ensure_ascii=False),
             json.dumps([dict(c, photo=_avatar_data_uri(c["avatar"])) for c in PREVIEW_COMMENTS], ensure_ascii=False),

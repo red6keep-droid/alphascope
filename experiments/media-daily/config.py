@@ -14,7 +14,7 @@ KST = datetime.timezone(datetime.timedelta(hours=9))
 FIRESTORE_PROJECT = "ytb-v1-b96d5"
 KEY_ENV = "YTB_FIRESTORE_KEY"   # 서비스 계정 키 JSON 전체 (GitHub Secret). 없으면 gcloud 기본 인증(ADC)
 
-TITLE_NAME = "미디어 데일리 · 방송이 본 미국장"
+TITLE_NAME = "미디어 데일리"   # 옛 "미디어 데일리 · 방송이 본 미국장" (2026-10-23 사용자: 뒤를 삭제). 같은 날 글 찾기는 주소(slug)의 날짜라 옛 제목 글도 찾는다
 SLUG_NAME = "media daily"          # 주소 고정용 영문 제목 "media daily YYYY-MM-DD" → /media-daily-YYYY-MM-DD.html
 LABELS = ["미디어 데일리", "미국 증시", "자동 리포트"]
 TEST_MODE = True                   # 첫 발행 2~4주 `테스트 중` 라벨 (운영지침 2-2)
@@ -24,6 +24,11 @@ PHASE1_CUTOFF = (7, 55)
 MIN_ITEMS = 5                      # 재료가 이보다 적으면 그날은 내지 않는다 (빈 구획 · "자료 없음" 금지)
 TOP_ISSUES = 5                     # 본문 이슈 상위 n
 MIN_CLUSTER = 1                    # 이슈 묶음 최소 영상 수 (1 = 혼자 다룬 이슈도 후보, 순서는 채널 수 · 영상 수가 정한다)
+# 관심도 1~10 (2026-10-23 사용자: "점수로 하자, 관심도") — 파이썬 계산, AI 판정 아님.
+# 10 × (W_CH × 방송 비율 + (1 − W_CH) × 영상 점수). 방송 비율 = 다룬 방송 수 ÷ 오늘 방송 수, 영상 점수 = min(1, 영상 수 ÷ FULL_VIDEOS). 반올림 · 최소 1.
+# 넓이(몇 곳이 다뤘나)를 더 무겁게 — 한 방송이 클립을 여럿 올리면 영상 수만 커진다. 기록이 쌓이면 최근 30일 대비 상대 점수로 바꿀 수 있다
+INTEREST_W_CH = 0.6
+INTEREST_FULL_VIDEOS = 10
 REQUIRED_CHANNELS = {"당잠사", "증시각도기", "CNBC Mad Money"}   # 필수 채널 — 2차 "장 초반에 이어 볼 것" 과 한국 연결의 재료
 KOREA_CHANNELS = {"당잠사", "증시각도기"}
 
