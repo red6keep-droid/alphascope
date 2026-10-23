@@ -21,7 +21,9 @@ import sys
 import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
+import ops_log  # noqa: E402,F401  — 운영 기록 (experiments/ops_log.py, 2026-10-23): 게시 결과 · 중단 이유
 import publish_blogger
 import render_html
 import report_title

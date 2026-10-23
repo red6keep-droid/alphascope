@@ -49,6 +49,8 @@ from collections import Counter, defaultdict
 
 import requests
 
+import ops_log  # noqa: F401  — 운영 기록 (experiments/ops_log.py, 2026-10-23): USAGE · EVENTS 를 실행 끝에 KV 로
+
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "").strip() or "gemini-3.5-flash"
 GEMINI_LITE_MODEL = os.environ.get("GEMINI_LITE_MODEL", "").strip() or "gemini-3.5-flash-lite"   # 대체 모델 (2026-10-16) — 과부하 · 하루 한도 버킷이 따로
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"

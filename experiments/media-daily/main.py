@@ -19,6 +19,7 @@ import publish
 import render_html
 
 sys.path.append(os.path.join(config.BASE_DIR, ".."))   # 뒤에 붙인다 — 이쪽 모듈 이름을 가리지 않게
+import ops_log  # noqa: E402,F401  — 운영 기록 (experiments/ops_log.py, 2026-10-23)
 import record_store  # noqa: E402
 
 

@@ -1,0 +1,17 @@
+name = "alphascope-ops-console"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true   # https://alphascope-ops-console.<계정>.workers.dev — 반드시 Cloudflare Access 를 켠다 (README 2단계)
+
+# 운영 기록 (experiments/ops_log.py 가 Cloudflare API 로 쓴다). id 는 `npx wrangler kv namespace create OPS_KV` 결과로 바꾼다
+[[kv_namespaces]]
+binding = "OPS_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[vars]
+# Access 설정 — 비어 있으면 Worker 가 모든 요청을 거부한다 (README 2단계에서 채운다)
+ACCESS_TEAM_DOMAIN = ""   # 예: myteam.cloudflareaccess.com
+ACCESS_AUD = ""           # Access 애플리케이션의 Application Audience (AUD) Tag
+ADMIN_EMAILS = ""         # 쉼표로 여러 개. Access 정책과 같은 주소 — 이중 확인
+
+# 비밀값은 여기 쓰지 않는다: npx wrangler secret put GITHUB_TOKEN   (읽기 전용 토큰 — 없어도 돌지만 시간당 60회 제한)

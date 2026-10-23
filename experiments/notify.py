@@ -18,6 +18,8 @@ from collections import Counter
 
 import requests
 
+import ops_log  # noqa: F401  — 운영 기록 (experiments/ops_log.py, 2026-10-23): EVENTS 를 실행 끝에 KV 로
+
 EVENTS = Counter()
 
 

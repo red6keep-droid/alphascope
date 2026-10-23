@@ -22,6 +22,7 @@ import render_html
 import state_io
 
 sys.path.append(os.path.join(config.BASE_DIR, ".."))   # 뒤에 붙인다 — 이쪽 모듈 이름을 가리지 않게
+import ops_log  # noqa: E402,F401  — 운영 기록 (experiments/ops_log.py, 2026-10-23)
 import record_store  # noqa: E402  — 신호 누적 (experiments/record_store.py, 2026-10-22). statements.jsonl 은 30일만 남아 신호는 따로 쌓는다
 
 
