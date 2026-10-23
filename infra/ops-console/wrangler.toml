@@ -15,6 +15,7 @@ keep_vars = true   # 대시보드에서 넣은 변수를 배포가 지우지 않
 
 [vars]
 ADMIN_GITHUB_LOGINS = "red6keep-droid"
+GITHUB_CLIENT_ID = "Ov23liGLCeQmPcV89d16"   # GitHub OAuth App alphascope-ops-console (red6keep-droid)
 
 # 운영 기록 (experiments/ops_log.py 가 Cloudflare API 로 쓴다)
 [[kv_namespaces]]
