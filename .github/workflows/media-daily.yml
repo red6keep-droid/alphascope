@@ -23,6 +23,11 @@ on:
         type: boolean
         required: false
         default: false
+      edition:
+        description: '판 날짜 YYYY-MM-DD (비우면 오늘 KST) — 지난 판을 새 렌더러로 다시 올릴 때 (같은 제목 글 갱신, 2026-10-24)'
+        type: string
+        required: false
+        default: ''
       scheduled:
         description: '외부 cron(Cloudflare Worker)용 — 스케줄 실행과 똑같이 동작 (사람은 끄고 쓴다)'
         type: boolean
@@ -88,11 +93,14 @@ jobs:
             # 한국 시각 09:30 전이면 1차, 뒤면 2차 갱신
             if [ "$(TZ=Asia/Seoul date +%H%M)" -lt 0930 ]; then PHASE=1; else PHASE=2; fi
           fi
-          echo "phase=$PHASE publish=$DO_PUBLISH"
+          EDITION="${{ inputs.edition }}"
+          ED_ARG=""
+          if [ -n "$EDITION" ]; then ED_ARG="--edition $EDITION"; fi
+          echo "phase=$PHASE publish=$DO_PUBLISH edition=${EDITION:-today}"
           if [ "$DO_PUBLISH" = "true" ]; then
-            python main.py --phase "$PHASE" --state output/state --publish
+            python main.py --phase "$PHASE" --state output/state --publish $ED_ARG
           else
-            python main.py --phase "$PHASE" --state output/state
+            python main.py --phase "$PHASE" --state output/state $ED_ARG
           fi
 
       - name: Save records (media-state branch)
