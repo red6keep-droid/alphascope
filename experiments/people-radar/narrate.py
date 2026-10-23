@@ -114,9 +114,12 @@ def translate_subtopics(radar, pool):
     need = sorted({k["key"] for kws in (radar.get("keywords") or {}).values() for k in kws if k["key"].lower() not in have and k["key"] not in config.TOPIC_KO})
     if not need:
         return cache
+    def _check(v):   # generate_json 의 validate 는 탈락이면 예외, 통과면 None — bool 을 돌려주면 그 값이 결과가 된다
+        if not isinstance(v, dict) or sum(1 for k in need if isinstance(v.get(k), str) and 0 < len(v[k]) <= 24) < len(need) * 0.7:
+            raise ValueError("세부 주제 번역 70% 미만")
+
     try:
-        got = pool.generate_json(SUBTOPIC_PROMPT + json.dumps(need, ensure_ascii=False), temperature=0.1,
-                                 validate=lambda v: isinstance(v, dict) and sum(1 for k in need if isinstance(v.get(k), str) and 0 < len(v[k]) <= 24) >= len(need) * 0.7)
+        got = pool.generate_json(SUBTOPIC_PROMPT + json.dumps(need, ensure_ascii=False), temperature=0.1, validate=_check)
     except RuntimeError as e:
         print(f"[narrate] 세부 주제 번역 실패 — 영어 그대로: {str(e)[:120]}")
         return cache
