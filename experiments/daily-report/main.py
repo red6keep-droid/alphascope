@@ -5,7 +5,7 @@
     python experiments/daily-report/main.py --publish  # Blogger에 실제 게시
 
 흐름:
-    collect_fred + collect_yahoo + collect_news
+    collect_fred + collect_yahoo + collect_news (+ collect_nowcast → state/records/snapshots)
     → report_input.json (+ prices.json: 분석용 시계열)
     → analyze → analysis.json, state/ (그림자 모드: 실패해도 리포트는 계속)
     → generate_report (Gemini) → report.out.json
@@ -35,6 +35,7 @@ import chart_spx
 import collect_calendar
 import collect_fred
 import collect_news
+import collect_nowcast
 import collect_yahoo
 import generate_image
 import generate_report
@@ -208,6 +209,12 @@ def main():
         record_store.append(os.path.join(OUTPUT_DIR, "state"), "issues", _i)
     except Exception as e:  # noqa: BLE001
         print(f"::warning::기록 저장 실패 (게시는 계속): {e!r}")
+
+    # 발표 전 예상(연준 나우캐스트) 스냅샷 — 하루 1줄, 리포트 본문에는 아직 안 쓴다 (블로그-목적과-방향 6절 3번, 2026-10-22). 실패해도 계속
+    try:
+        record_store.append(os.path.join(OUTPUT_DIR, "state"), "snapshots", [collect_nowcast.collect(input_data["date"])])
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::나우캐스트 스냅샷 저장 실패 (게시는 계속): {e!r}")
 
     chart_ok = bool(make_chart(input_data))
     image_ok, cover_url = make_cover(input_data)
