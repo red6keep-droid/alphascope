@@ -79,6 +79,7 @@
 
   /* rhythm */
   --gutter:  40px;
+  --card-gap: var(--gutter);   /* 홈 카드 사이 = 좌우 여백 (2026-10-24 사용자) */
   --shell:   980px;   /* PC 콘텐츠 폭 980 — 홈 · 목록 · 글 보기 · 헤더 안쪽 모두 (2026-10-15 사용자: 1440 → 1280 → 980) */
 }
 
@@ -344,6 +345,8 @@ body.menu-open { overflow: hidden; }
 .report-chart[hidden] { display: none; }
 /* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
 #radar-card { padding: 0 16px; gap: 0; }
+/* 인물 발언 줄 = 홈 주요 뉴스 기사 모양 (2026-10-24 사용자): 발언은 뉴스 제목 글자(18 · 굵게 · 행간 34), 이름 라벨은 그 아래 뉴스 라벨(.news-tag · .news-labels), 강도는 뺀다 */
+#radar-card .rd-title { display: block; font-size: 18px; line-height: 34px; font-weight: 700; color: #111; word-break: keep-all; }
 /* 홈 트럼프 카드 — 발언 줄: 주제 라벨(영역 라벨 모양) + 세부 주제 · 방향 · 대상 왼쪽, 강도 오른쪽, 줄 사이 구분선 (2026-10-15 사용자) */
 #trump-card { padding: 0 16px; gap: 0; }
 .tr-main { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; font-size: 16px; line-height: 24px; color: #111; }
@@ -682,9 +685,9 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .home-cards {
   display: flex;
   flex-direction: column;
-  gap: 20px;   /* 카드 사이는 모두 리포트 카드 사이와 같은 20 (2026-10-15 사용자) */
+  gap: var(--card-gap);   /* 카드 사이 = 화면 좌우 여백 (2026-10-24 사용자: PC 40 · 중간 24 · 폰 10). 옛 20 (2026-10-15) */
   margin-top: -36px;   /* main-content 위 여백까지 회색으로 — 헤더 바로 아래부터 */
-  padding: 20px 0 40px;   /* 맨 위 카드 위 = 카드 사이 20 (2026-10-15 사용자) */
+  padding: var(--card-gap) 0 40px;   /* 맨 위 카드 위 = 카드 사이 (2026-10-15 사용자) */
   background: #F3F4F6;
   box-shadow: 0 0 0 100vmax #F3F4F6;   /* 화면 전체 폭으로 — 가로 스크롤 없이 */
   clip-path: inset(0 -100vmax);
@@ -727,7 +730,7 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .home-cards .index-card .fold-btn,
 .home-cards .rank-card .fold-btn,
 .home-cards .sector-card .fold-btn { border-radius: 0; padding-top: 13px; }   /* 더 보기 위 +5 (2026-10-15 사용자) */
-.home-cards .briefing-main { gap: 20px; }
+.home-cards .briefing, .home-cards .briefing-body, .home-cards .briefing-main { gap: var(--card-gap); }   /* 리포트 카드 묶음 안쪽도 카드 사이 = 좌우 여백 (2026-10-24 사용자). 옛 20 */
 /* 미국 증시 리포트 카드 내용은 글머리표 없이 (2026-10-15 사용자) */
 #report-card .report-columns li { gap: 0; }
 #report-card .report-columns li::before { content: none; }
@@ -828,6 +831,7 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
   body:not(.item-view) .navbar { padding-left: 10px; padding-right: 10px; }
   /* 홈(대시보드)에서는 카드가 화면 가장자리에서 10px (2026-10-10 사용자). 글 보기는 20px 별도 규칙 */
   body:not(.item-view) .main-content { padding-left: 10px; padding-right: 10px; }
+  :root { --card-gap: 10px; }   /* 폰 홈 카드 사이 = 좌우 10 (2026-10-24 사용자) */
   .sector-card .sector-table { margin: 0 12px; width: calc(100% - 24px); }
   .tabs { overflow-x: auto; }
   .tab { padding: 8px 13px 0; }   /* 폰 탭 사이 24 → 26 (+10%) */
@@ -1342,6 +1346,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .nav-item { font-size: 16px; line-height: 22px; }
   .section-title { font-size: 18.5px; line-height: 23.5px; }
   .report-title { font-size: 18.5px; line-height: 23.5px; }
+  #radar-card .rd-title { font-size: 16px; line-height: 32px; }
   .kv-value { font-size: 16px; line-height: 20px; }
   .kv-stat-value { font-size: 16px; line-height: 22.5px; }
   .kv-row--block li { font-size: 16px; line-height: 32px; }
@@ -1527,7 +1532,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               </a>
               </div>
 
-              <!-- 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 인물마다 가장 강한 발언 한 줄 — 이름 라벨 · 헤드라인 왼쪽, 강도 오른쪽 (트럼프 카드와 같은 줄) -->
+              <!-- 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 인물마다 가장 강한 발언 한 줄 — 발언(뉴스 제목 글자) 아래 이름 라벨, 강도 없음 (2026-10-24 사용자) -->
               <div class='report-col'>
               <h3 class='report-title'><span class='report-icon' style='background:#0F766E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='5.5' r='2.5'/><path d='M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4'/></svg></span>주요 인물 발언<span class='report-card-date' data-date='radar-card'></span></h3>
               <a class='report-card' id='radar-card' href='/search/label/인물%20발언'>
@@ -3056,15 +3061,13 @@ body.no-dashboard .main-content { padding-top: 32px; }
           box.textContent = '';
           var rows = radarRows(sec).slice(0, 4);
           if (!rows.length) { box.appendChild(el('div', 'kv-row is-note', linesOf(sec['(머리)'] || [])[0] || LOAD_FAILED)); return; }
-          rows.forEach(function (r) {
-            var row = el('div', 'kv-row'), main = el('span', 'tr-main');
-            main.appendChild(el('span', 'tr-tag', r.topic));
-            main.appendChild(el('span', null, r.text));
-            row.appendChild(main);
-            if (r.intensity) { var it = el('span', 'tr-int', '강도 : '); it.appendChild(el('b', null, r.intensity)); row.appendChild(it); }
+          rows.forEach(function (r) {   /* 뉴스 기사 모양: 발언(제목 글자) → 아래 이름 라벨. 강도 없음 (2026-10-24 사용자) */
+            var row = el('div', 'kv-row kv-row--block'), labs = el('div', 'news-labels');
+            row.appendChild(el('span', 'rd-title', r.text));
+            labs.appendChild(el('span', 'news-tag', r.topic));
+            row.appendChild(labs);
             box.appendChild(row);
           });
-          evenTags(box);
         }
 
         /* 홈 미디어 데일리 카드 (2026-10-23 사용자 목업) — 이슈 카드(media-daily render_html.sec_issues)를 읽는다.
