@@ -5,14 +5,16 @@ account_id = "a8718df7edc5f8f6ce88e75b6545e5cb"   # alphascope-cron-trigger 와 
 workers_dev = true   # https://alphascope-ops-console.<계정>.workers.dev — 반드시 Cloudflare Access 를 켠다 (README 2단계)
 preview_urls = false # 버전별 미리보기 주소는 Access 밖에 생길 수 있어 끈다
 
-# Access 설정은 대시보드(Settings → Variables and Secrets)에서 넣는다 — keep_vars 로 배포가 덮어쓰지 않는다 (2026-10-23).
-# 비어 있으면 Worker 가 모든 요청을 거부한다:
-#   ACCESS_TEAM_DOMAIN  예: myteam.cloudflareaccess.com
-#   ACCESS_AUD          Access 애플리케이션의 Application Audience (AUD) Tag
-#   ADMIN_EMAILS        쉼표로 여러 개. Access 정책과 같은 주소 — 이중 확인
-keep_vars = true
+# GitHub 로그인 (2026-10-23 — Cloudflare Access 는 카드 등록이 필요해 쓰지 않는다). 하나라도 없으면 모든 요청을 거부한다:
+#   GITHUB_CLIENT_ID      GitHub OAuth App 의 Client ID (비밀 아님 — 아래 [vars] 에)
+#   GITHUB_CLIENT_SECRET  비밀값: npx wrangler secret put GITHUB_CLIENT_SECRET (또는 대시보드 Secret)
+#   SESSION_SECRET        비밀값: 세션 쿠키 서명용 무작위 값
+#   ADMIN_GITHUB_LOGINS   들어올 수 있는 GitHub 계정 (쉼표로 여러 개)
+# 선택 비밀값: GITHUB_TOKEN — 읽기 전용 토큰. 없어도 돌지만 GitHub API 시간당 60회 제한
+keep_vars = true   # 대시보드에서 넣은 변수를 배포가 지우지 않게
 
-# 비밀값은 여기 쓰지 않는다: npx wrangler secret put GITHUB_TOKEN   (읽기 전용 토큰 — 없어도 돌지만 시간당 60회 제한)
+[vars]
+ADMIN_GITHUB_LOGINS = "red6keep-droid"
 
 # 운영 기록 (experiments/ops_log.py 가 Cloudflare API 로 쓴다)
 [[kv_namespaces]]

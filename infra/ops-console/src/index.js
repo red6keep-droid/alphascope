@@ -1,4 +1,4 @@
-// 관리자 전용 운영 페이지 (Cloudflare Worker + Cloudflare Access, 2026-10-23 사용자).
+// 관리자 전용 운영 페이지 (Cloudflare Worker + GitHub 로그인, 2026-10-23 사용자).
 //
 // 보여 주는 것 — 날짜(KST) 하나에 대해:
 //   1) 리포트별 발행 현황: 발행 · 갱신 · 이미 있음 · 미발행(이유) · 에러 중단 · 실행 없음(예약 누락)
@@ -7,8 +7,8 @@
 //   4) 그 밖의 워크플로 실패 (뉴스 · 시세 · 댓글)
 // 자료: Cloudflare KV(OPS_KV) 의 운영 기록(experiments/ops_log.py 가 실행마다 씀) + GitHub Actions 실행 목록(API).
 //
-// 접근: Cloudflare Access 가 앞에서 로그인을 받고, 이 Worker 가 Cf-Access-Jwt-Assertion 을 다시 검증한다(이중 잠금).
-// ACCESS_TEAM_DOMAIN · ACCESS_AUD 가 비어 있으면 아무것도 보여 주지 않는다 — 설정 실수로 열린 채 배포되지 않게.
+// 접근: GitHub OAuth 로그인 → ADMIN_GITHUB_LOGINS 의 계정만 통과 (Cloudflare Access 는 카드 등록이 필요해 쓰지 않는다, 2026-10-23 사용자).
+// GITHUB_CLIENT_ID · GITHUB_CLIENT_SECRET · SESSION_SECRET · ADMIN_GITHUB_LOGINS 중 하나라도 없으면 아무것도 보여 주지 않는다.
 
 const REPO = "red6keep-droid/alphascope";
 
@@ -21,37 +21,96 @@ const REPORTS = [
   { key: "media", name: "미디어 데일리", file: "media-daily.yml", wf: "Media Daily", at: "08:00 · 10:15", days: [1, 2, 3, 4, 5] },
 ];
 
-// ---------------------------------------------------------------- 접근 검증
-const b64urlBytes = (s) => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4)), (c) => c.charCodeAt(0));
-const b64urlJson = (s) => JSON.parse(new TextDecoder().decode(b64urlBytes(s)));
+// ---------------------------------------------------------------- 접근 (GitHub 로그인)
+// /login → GitHub 인증 → /callback 에서 계정 이름을 ADMIN_GITHUB_LOGINS 와 대조 → HMAC 서명 세션 쿠키(12시간).
+// GitHub 액세스 토큰은 계정 이름 확인에만 쓰고 저장하지 않는다. 범위(scope) 없이 요청 — 공개 프로필만 읽힌다.
+const SESSION_COOKIE = "__Host-ops_s";
+const STATE_COOKIE = "__Host-ops_state";
+const SESSION_SECONDS = 12 * 3600;
+const enc = new TextEncoder();
+const b64url = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const b64urlDecode = (s) => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4)), (c) => c.charCodeAt(0)));
 
-async function verifyAccess(req, env) {
-  const team = (env.ACCESS_TEAM_DOMAIN || "").trim();
-  const aud = (env.ACCESS_AUD || "").trim();
-  if (!team || !aud) return { ok: false, why: "접근 설정(ACCESS_TEAM_DOMAIN · ACCESS_AUD)이 없습니다." };
-  const token = req.headers.get("Cf-Access-Jwt-Assertion");
-  if (!token) return { ok: false, why: "로그인 토큰이 없습니다." };
+function config(env) {
+  const c = {
+    clientId: (env.GITHUB_CLIENT_ID || "").trim(),
+    clientSecret: (env.GITHUB_CLIENT_SECRET || "").trim(),
+    sessionSecret: (env.SESSION_SECRET || "").trim(),
+    admins: (env.ADMIN_GITHUB_LOGINS || "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean),
+  };
+  const missing = [!c.clientId && "GITHUB_CLIENT_ID", !c.clientSecret && "GITHUB_CLIENT_SECRET", !c.sessionSecret && "SESSION_SECRET", !c.admins.length && "ADMIN_GITHUB_LOGINS"].filter(Boolean);
+  return { c, missing };
+}
+
+async function hmac(secret, data) {
+  const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return b64url(new Uint8Array(await crypto.subtle.sign("HMAC", key, enc.encode(data))));
+}
+
+function safeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  let d = 0;
+  for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return d === 0;
+}
+
+function cookie(req, name) {
+  const m = (req.headers.get("Cookie") || "").match(new RegExp(`(?:^|;\\s*)${name.replace(/[-$]/g, "\\$&")}=([^;]+)`));
+  return m ? m[1] : "";
+}
+
+const setCookie = (name, value, maxAge) => `${name}=${value}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`;
+
+async function makeSession(c, login) {
+  const payload = b64url(enc.encode(JSON.stringify({ login, exp: Math.floor(Date.now() / 1000) + SESSION_SECONDS })));
+  return `${payload}.${await hmac(c.sessionSecret, payload)}`;
+}
+
+async function readSession(req, c) {
+  const raw = cookie(req, SESSION_COOKIE);
+  const [payload, sig] = raw.split(".");
+  if (!payload || !sig || !safeEqual(sig, await hmac(c.sessionSecret, payload))) return null;
   try {
-    const [h, p, s] = token.split(".");
-    const header = b64urlJson(h);
-    const payload = b64urlJson(p);
-    const certs = await (await fetch(`https://${team}/cdn-cgi/access/certs`, { cf: { cacheTtl: 3600 } })).json();
-    const jwk = (certs.keys || []).find((k) => k.kid === header.kid);
-    if (!jwk) return { ok: false, why: "서명 키를 찾지 못했습니다." };
-    const key = await crypto.subtle.importKey("jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
-    const good = await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, b64urlBytes(s), new TextEncoder().encode(`${h}.${p}`));
-    const auds = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
-    if (!good || !auds.includes(aud) || payload.iss !== `https://${team}` || !(payload.exp * 1000 > Date.now())) {
-      return { ok: false, why: "로그인 토큰이 유효하지 않습니다." };
-    }
-    const admins = (env.ADMIN_EMAILS || "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean);
-    if (admins.length && !admins.includes(String(payload.email || "").toLowerCase())) {
-      return { ok: false, why: "관리자 계정이 아닙니다." };
-    }
-    return { ok: true, email: payload.email };
-  } catch (e) {
-    return { ok: false, why: "로그인 토큰을 확인하지 못했습니다." };
+    const s = JSON.parse(b64urlDecode(payload));
+    if (!(s.exp > Date.now() / 1000) || !c.admins.includes(String(s.login).toLowerCase())) return null;
+    return s;
+  } catch {
+    return null;
   }
+}
+
+const redirect = (to, cookies = []) => {
+  const h = new Headers({ Location: to, "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
+  for (const x of cookies) h.append("Set-Cookie", x);
+  return new Response(null, { status: 302, headers: h });
+};
+
+function startLogin(url, c) {
+  const state = b64url(crypto.getRandomValues(new Uint8Array(24)));
+  const q = new URLSearchParams({ client_id: c.clientId, redirect_uri: `${url.origin}/callback`, state, scope: "", allow_signup: "false" });
+  return redirect(`https://github.com/login/oauth/authorize?${q}`, [setCookie(STATE_COOKIE, state, 600)]);
+}
+
+async function finishLogin(req, url, c) {
+  const state = url.searchParams.get("state") || "";
+  const code = url.searchParams.get("code") || "";
+  if (!code || !safeEqual(state, cookie(req, STATE_COOKIE))) return deny("로그인 요청이 맞지 않습니다. 다시 시도하세요.", 400);
+  const tok = await fetch("https://github.com/login/oauth/access_token", {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json", "User-Agent": "alphascope-ops-console" },
+    body: JSON.stringify({ client_id: c.clientId, client_secret: c.clientSecret, code, redirect_uri: `${url.origin}/callback` }),
+  }).then((r) => r.json()).catch(() => ({}));
+  if (!tok.access_token) return deny("GitHub 인증에 실패했습니다.", 403);
+  const user = await fetch("https://api.github.com/user", {
+    headers: { Authorization: `Bearer ${tok.access_token}`, Accept: "application/vnd.github+json", "User-Agent": "alphascope-ops-console" },
+  }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  const login = String(user.login || "");
+  if (!login || !c.admins.includes(login.toLowerCase())) return deny("관리자 계정이 아닙니다.", 403);
+  return redirect("/", [setCookie(SESSION_COOKIE, await makeSession(c, login), SESSION_SECONDS), setCookie(STATE_COOKIE, "", 0)]);
+}
+
+function deny(why, status = 403) {
+  return new Response(`접근 거부 — ${why}`, { status, headers: { ...HEADERS, "Content-Type": "text/plain; charset=utf-8" } });
 }
 
 // ---------------------------------------------------------------- 자료
@@ -219,7 +278,7 @@ ul.lines,ul.events{margin:6px 0 0;padding-left:18px;font-size:13px}ul.lines li{f
 <form class="nav" method="get"><a href="?date=${shiftDay(day, -1)}">← 전날</a>${day < today ? `<a href="?date=${shiftDay(day, 1)}">다음 날 →</a>` : ""}<a href="?">오늘</a>
 <input type="date" name="date" value="${esc(day)}" max="${today}"><button type="submit">보기</button></form></div>
 ${body}
-<p class="foot">관리자 ${esc(who || "")} · 자료: 운영 기록(Cloudflare KV, 180일) + GitHub Actions 실행 목록 · 새로고침하면 다시 읽는다</p>
+<p class="foot">관리자 ${esc(who || "")} (<a href="/logout">로그아웃</a>) ·자료: 운영 기록(Cloudflare KV, 180일) + GitHub Actions 실행 목록 · 새로고침하면 다시 읽는다</p>
 </main></body></html>`;
 }
 
@@ -234,9 +293,17 @@ const HEADERS = {
 
 export default {
   async fetch(req, env) {
-    const auth = await verifyAccess(req, env);
-    if (!auth.ok) return new Response(`접근 거부 — ${auth.why}`, { status: 403, headers: { ...HEADERS, "Content-Type": "text/plain; charset=utf-8" } });
+    const { c, missing } = config(env);
+    if (missing.length) return deny(`로그인 설정이 없습니다 (${missing.join(" · ")}).`);
     const url = new URL(req.url);
+    if (req.method !== "GET") return deny("허용되지 않는 요청입니다.", 405);
+    if (url.pathname === "/login") return startLogin(url, c);
+    if (url.pathname === "/callback") return finishLogin(req, url, c);
+    if (url.pathname === "/logout") return redirect("/signed-out", [setCookie(SESSION_COOKIE, "", 0)]);
+    if (url.pathname === "/signed-out") return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>로그아웃</title><p style="font:16px system-ui;padding:24px">로그아웃했습니다. <a href="/login">다시 로그인</a></p>`, { headers: HEADERS });
+    const session = await readSession(req, c);
+    if (!session) return redirect("/login");
+    const auth = { email: session.login };
     if (url.pathname !== "/") return new Response("없음", { status: 404, headers: HEADERS });
 
     const today = kstToday();

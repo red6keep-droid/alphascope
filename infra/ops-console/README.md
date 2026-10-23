@@ -7,9 +7,10 @@
 리포트 실행 (GitHub Actions)
   └ experiments/ops_log.py — 실행이 끝날 때 운영 기록 1건 → Cloudflare KV (OPS_KV, 180일 보관)
 운영 페이지 (이 Worker, *.workers.dev)
-  ├ Cloudflare Access — 관리자 이메일 로그인(일회용 코드)만 통과
-  ├ Worker 가 Access 토큰을 다시 검증 (설정이 비어 있으면 전부 거부)
+  ├ GitHub 로그인 — ADMIN_GITHUB_LOGINS 계정만 통과, 서명된 세션 쿠키 12시간 (설정이 비어 있으면 전부 거부)
   └ KV 운영 기록 + GitHub Actions 실행 목록 → 화면
+
+Cloudflare Access 는 Zero Trust 무료 플랜도 카드 등록이 필요해 쓰지 않는다 (2026-10-23 사용자).
 ```
 
 저장소가 공개라 운영 기록은 `*-state` 브랜치 · gh-pages 에 두지 않는다. 기록을 보내기 전에 환경변수의 키 · 토큰 값과 URL 의 `key=` · `token=` 은 `***` 로 지운다.
@@ -27,13 +28,17 @@ npx wrangler secret put GITHUB_TOKEN           # 선택 — Fine-grained 토큰,
 npx wrangler deploy
 ```
 
-배포 직후에는 ACCESS_* 가 비어 있어 모든 요청이 403 이다 (정상).
+배포 직후에는 로그인 설정이 비어 있어 모든 요청이 403 이다 (정상).
 
-### 2. Cloudflare Access (로그인 잠금)
+### 2. GitHub 로그인 (잠금)
 
-1. Cloudflare 대시보드 → Workers & Pages → `alphascope-ops-console` → Settings → Domains & Routes → `workers.dev` 의 **Cloudflare Access 켜기**.
-2. Zero Trust → Access → Applications 에 생긴 애플리케이션의 정책을 **관리자 이메일만 Allow** 로 둔다 (로그인 방식: One-time PIN).
-3. 그 애플리케이션의 **Application Audience (AUD) Tag** 와 팀 도메인(`<팀>.cloudflareaccess.com`)을 `wrangler.toml` 의 `ACCESS_AUD` · `ACCESS_TEAM_DOMAIN` 에, 관리자 이메일을 `ADMIN_EMAILS` 에 넣고 다시 `npx wrangler deploy`.
+1. GitHub(`red6keep-droid`) → Settings → Developer settings → OAuth Apps → **New OAuth App**
+   - Homepage URL: `https://alphascope-ops-console.red6keep.workers.dev`
+   - Authorization callback URL: `https://alphascope-ops-console.red6keep.workers.dev/callback`
+2. 만든 앱의 **Client ID** 를 `wrangler.toml` `[vars]` 의 `GITHUB_CLIENT_ID` 에 (비밀 아님).
+3. **Generate a new client secret** → `npx wrangler secret put GITHUB_CLIENT_SECRET` 입력 창에 붙여 넣는다 (또는 대시보드 Settings → Variables and Secrets → Add → 종류 Secret).
+4. `SESSION_SECRET` 은 무작위 값 — 이미 넣어 두었다 (2026-10-23). 바꾸면 모든 로그인이 풀린다.
+5. `npx wrangler deploy`.
 
 ### 3. 리포트가 기록을 보내게 (GitHub 저장소 Secrets)
 
@@ -57,7 +62,7 @@ GitHub 저장소 → Settings → Secrets and variables → Actions 에 셋:
 | KV 목록 · 읽기 | 페이지를 열 때만 | 하루 1,000 · 100,000 |
 | Worker 요청 | 페이지를 열 때만 | 하루 100,000 |
 | GitHub API | 페이지 1회에 6번 | 토큰 있으면 시간당 5,000 (없으면 60) |
-| Access | 관리자 1명 | 50명까지 무료 |
+| GitHub OAuth App | 로그인할 때만 | 무료 |
 
 AI 호출 · 시세 API 는 쓰지 않는다 (이미 끝난 실행의 결과를 읽기만).
 
