@@ -1,52 +1,54 @@
 {
-  "one_line": "AI 및 반도체 관련 기술주의 하락으로 기술주 중심의 시장 약세가 나타났습니다.",
-  "summary": "기술주(나스닥)와 미국 증시 전체(S&P 500)가 반도체 및 대형 기술주의 하락 여파로 내렸습니다.\n\n반면 전통 대기업(다우)과 소형주(러셀 2000)는 올랐으며 상대적으로 견조한 모습을 보였습니다.\n\n변동성 지수는 오름세를 보였습니다.",
-  "change_comment": "기술주가 미국 증시 전체 대비 약세를 이어가며 20일 저점 부근까지 밀려났습니다.\n\n반면 전통 대기업은 상대적 강세를 보이며 20일 고점 부근에 위치해 지수 간 온도 차가 나타났습니다.\n\n변동성 지수도 상승세를 이어갔습니다.",
-  "sector_comment": "소비 (필수), 유틸리티, 헬스케어 테마가 상승을 이끌며 상위권을 형성했습니다.\n\n반면 AI / 반도체와 기술, 통신 테마는 하락하며 약세를 나타냈습니다.\n\n방어적 성격의 테마로 자금이 이동하는 흐름이 관찰되었습니다.",
+  "one_line": "기술주와 반도체 중심의 조정세가 나타난 하루였습니다",
+  "summary": "미국 증시 전체(S&P 500)는 하락세를 기록했고, 기술주(나스닥) 역시 낙폭을 키웠습니다. 반면 전통 대기업(다우)과 소형주(러셀 2000)는 보합권에서 흐름을 유지했습니다. 변동성 지수는 올랐습니다.",
+  "change_comment": "기술주가 하락 흐름을 보이며 미국 증시 전체를 끌어내렸고, 미국 증시 전체는 20일 저점 부근에 자리했습니다. 소형주와 전통 대기업은 상대적으로 견조한 흐름을 유지했습니다.",
+  "sector_comment": "소비(필수)와 유틸리티, 헬스케어 테마가 상승세를 이끌었습니다. 반면 AI / 반도체와 기술 테마는 약세 테마로 분류되며 하락했습니다.",
   "news": [
     {
+      "index": 1,
+      "title_ko": "데이터 센터 채권 투자 기회",
+      "why": "데이터 센터 채권 투자에 대한 시장 참여자의 시각을 다룬 뉴스입니다.",
+      "theme": "AI/반도체",
+      "issue": "AI_CAPEX",
+      "scope": "sector",
+      "scheduled": false,
+      "surprise": 0,
+      "related": [
+        "SMH",
+        "QQQ"
+      ]
+    },
+    {
+      "index": 13,
+      "title_ko": "신용 거래 부채 급증에 따른 위험",
+      "why": "마진 부채 증가와 관련된 투자 위험을 다룬 뉴스입니다.",
+      "theme": "매크로",
+      "issue": "MARKET_STRUCTURE",
+      "scope": "market",
+      "scheduled": false,
+      "surprise": 0,
+      "related": [
+        "HYG",
+        "SPY"
+      ]
+    },
+    {
       "index": 0,
-      "title_ko": "블랙록 리드 이사, 고품질 채권 투자 기회 강조",
-      "why": "채권 시장에 대한 대형 운용사의 시각을 보여줍니다.",
+      "title_ko": "고품질 채권의 역사적 투자 기회",
+      "why": "채권 시장에 대한 투자 전망을 다룬 뉴스입니다.",
       "theme": "금리",
       "issue": "RATES_FED",
       "scope": "market",
       "scheduled": false,
       "surprise": 0,
       "related": [
-        "TLT"
-      ]
-    },
-    {
-      "index": 5,
-      "title_ko": "코어위브 신용 부도 스와프 우려 수준 진입",
-      "why": "AI 인프라 기업의 부채 우려가 기술주 심리에 영향을 주었습니다.",
-      "theme": "AI/반도체",
-      "issue": "CREDIT_BANKS",
-      "scope": "sector",
-      "scheduled": false,
-      "surprise": 0,
-      "related": [
-        "QQQ",
-        "SMH"
-      ]
-    },
-    {
-      "index": 10,
-      "title_ko": "주요 은행 실적 발표 앞두고 옵션 시장 변동성 반영",
-      "why": "금융 섹터 실적 발표를 앞두고 시장의 위험 대응이 나타나고 있습니다.",
-      "theme": "실적",
-      "issue": "EARNINGS",
-      "scope": "sector",
-      "scheduled": true,
-      "surprise": 0,
-      "related": [
-        "XLF"
+        "TLT",
+        "^TNX"
       ]
     }
   ],
-  "macro_comment": "미국 10년물 국채 금리는 하락했으며 금리와 성장주 관계는 중립을 나타냈습니다.\n\n장단기 금리차와 함께 변동성 지수도 오름세를 보이며 시장 내 시각이 엇갈렸습니다.",
-  "opinion": "최근 수주일간 기술주의 약세가 이어지면서 지수가 저점 부근에 머무르고 있습니다.\n\n섹터 간 차별화 속에 방어적 자산으로의 온기가 이어지는 흐름입니다.",
-  "image_prompt": "A tranquil sailboat floating calmly on sunlit turquoise waters with gentle white clouds in a bright open sky.",
-  "model": "gemini-3.5-flash"
+  "macro_comment": "미국 10년물 금리는 내림세를 보였고, 금리 영향 중립 라벨이 유지되었습니다. 장단기 금리 차와 고용 및 물가 지표가 혼재된 환경 속에서 변동성 지수가 올랐습니다.",
+  "opinion": "최근 며칠 동안 이어지던 지수별 차별화 흐름이 이어졌습니다. 기술주 중심의 조정이 뚜렷해진 가운데 전반적인 시장의 위치 변화를 관찰할 수 있습니다.",
+  "image_prompt": "abstract financial market movement visualized as soft geometric shapes shifting gently under warm daylight",
+  "model": "gemini-3.5-flash-lite"
 }
