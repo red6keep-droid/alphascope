@@ -481,7 +481,7 @@ def sec_narrative(n, key):
 
 def build_body(a, n):
     counts_aside, counts_note = sec_counts(a)
-    return dk.fix_colons(dk.align_titles("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지) · 카드 밖 제목은 좌측 기준선 13px (2026-10-23 사용자)
+    return dk.fix_colons(dk.align_titles("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지) · 카드 밖 제목은 좌측 기준선(ALIGN_PX) (2026-10-23 사용자)
         dk.WRAP_OPEN,
         sec_seo_lead(a, report_title.today_kst()),   # 본문 첫 요소 = 검색 결과 요약 문단 (2026-10-18 검색 노출). 날짜는 글 제목과 같은 today_kst
         dk.section("급상승 주제", sec_trends(a), tab=TAB_TODAY, one_line=True,

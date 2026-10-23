@@ -2003,7 +2003,7 @@ def seo_lead(a):
 
 
 def build_body(a, n):
-    return _dk.formal(_dk.fix_colons(_dk.align_titles("\n".join([   # 카드 밖 제목 · 요약은 좌측 기준선 13px (2026-10-23 사용자) · ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지) · 반말 문장 끝은 합니다체 (2026-10-18 사용자)
+    return _dk.formal(_dk.fix_colons(_dk.align_titles("\n".join([   # 카드 밖 제목 · 요약은 좌측 기준선(ALIGN_PX) (2026-10-23 사용자) · ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지) · 반말 문장 끝은 합니다체 (2026-10-18 사용자)
         # data-design="2": 테마의 옛 글 보정 규칙(div 14px → 17px !important)에서 이 글을 제외한다 (2026-10-11 — 안내 글이 17px로 커지던 원인)
         f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:{_dk.BODY};line-height:{_dk.LH_BODY};color:#333;">',   # 행간 24px (2026-10-12 사용자, 소수점 금지 — 2026-10-12 사용자)
         # 기준 거래일 안내 줄 삭제 (2026-10-12 사용자) — 날짜는 글 제목에 있다

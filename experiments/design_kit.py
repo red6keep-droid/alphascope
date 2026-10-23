@@ -104,7 +104,7 @@ def section(title, html, summary="", line=None, tab=None, aside="", one_line=Fal
     return h2(title, line=line, summary=summary, tab=tab, aside=aside, one_line=one_line) + (html or "")
 
 
-ALIGN_PX = 13   # 좌측 기준선 — 카드 밖 구획 제목 · 글의 왼쪽 시작선 = 카드 안 글자(테두리 1 + 안쪽 12) = 미디어 데일리 기준 (2026-10-23 사용자)
+ALIGN_PX = 6   # 좌측 기준선 — 카드 밖 구획 제목 · 글의 왼쪽 시작선 = 홈 실시간 뉴스 글자 (폰: 화면 가장자리 20 = 본문 영역 14 + 6, 2026-10-24 사용자). 옛 13(카드 안 글자, 2026-10-23)을 대체
 
 
 def align_titles(html, px=ALIGN_PX):

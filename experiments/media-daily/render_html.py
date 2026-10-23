@@ -140,9 +140,9 @@ def _kr_label(k):
 
 
 # 한국장 소식 · 장 초반에 이어 볼 것 = 홈 '주요 뉴스' 기사와 같은 모양 (2026-10-23 사용자: "카드 말고 구분선, 내용 간격 동일, 라벨은 내용 아래,
-# 출처는 라벨이 아니라 주요 뉴스처럼 글자로"). 좌우 13px = 이슈 카드 안 글자의 시작선(테두리 1 + 안쪽 12)에 맞춤 (2026-10-23 사용자). 나머지 값은 alphaflow-home.html .news-item · .news-sum · .news-labels · .news-sub 와 같다
-NEWS_LI = "margin:0;padding:20px 13px 25px;border-top:1px solid #E2E8F0;font-size:18px;line-height:34px;color:#111;word-break:keep-all;"
-NEWS_LI_FIRST = "margin:0;padding:2px 13px 25px;font-size:18px;line-height:34px;color:#111;word-break:keep-all;"
+# 출처는 라벨이 아니라 주요 뉴스처럼 글자로"). 좌우 = 좌측 기준선 dk.ALIGN_PX (홈 실시간 뉴스 글자, 2026-10-24 사용자). 나머지 값은 alphaflow-home.html .news-item · .news-sum · .news-labels · .news-sub 와 같다
+NEWS_LI = f"margin:0;padding:20px {dk.ALIGN_PX}px 25px;border-top:1px solid #E2E8F0;font-size:18px;line-height:34px;color:#111;word-break:keep-all;"
+NEWS_LI_FIRST = f"margin:0;padding:2px {dk.ALIGN_PX}px 25px;font-size:18px;line-height:34px;color:#111;word-break:keep-all;"
 NEWS_SUM = "display:block;margin-top:4px;font-size:16px;line-height:26px;font-weight:400;color:#333;word-break:keep-all;"
 NEWS_LABELS = "display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin-top:8px;line-height:20px;"
 NEWS_SUB = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};margin-left:3px;"   # 라벨 사이 3 + 3 = 홈 뉴스의 라벨 ~ 출처 6px
@@ -177,7 +177,7 @@ def sec_korea(m):
     return _news_list([_news_row(_kr_label(k), k) for k in m["korea"]])
 
 
-ALIGN_PX = 13   # 구획 제목 · 목록 · 종목 글 · 출처의 왼쪽 시작선 = 이슈 카드 안 글자 (테두리 1 + 안쪽 12, 2026-10-23 사용자)
+ALIGN_PX = dk.ALIGN_PX   # 구획 제목 · 목록 · 종목 글 · 출처의 왼쪽 시작선 = 공통 좌측 기준선 (2026-10-24 사용자: 홈 실시간 뉴스에 맞춤)
 
 
 def sec_tickers(m):

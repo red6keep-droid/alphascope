@@ -51,7 +51,7 @@ def updated_line(a):
 
 def wrap(body):
     html = _dk.align_titles(_dk.WRAP_OPEN + body + _dk.WRAP_CLOSE)
-    return _dk.formal(_dk.fix_colons(html))   # 카드 밖 구획 제목은 좌측 기준선 13px (2026-10-23 사용자) · 반말 문장 끝은 합니다체 (2026-10-18 사용자)
+    return _dk.formal(_dk.fix_colons(html))   # 카드 밖 구획 제목은 좌측 기준선(ALIGN_PX) (2026-10-23 사용자) · 반말 문장 끝은 합니다체 (2026-10-18 사용자)
 
 
 def list_marker(url):
@@ -347,9 +347,9 @@ def related(s):
     """함께 보는 리포트 (가이드라인 10-5 4) — HTML 링크라 검색엔진이 따라간다."""
     links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("엔비디아 NVDA 주가", U.NVDA_REPORTS_URL)]
     items = "".join(_dk.dot_li(f'<a href="{_esc(u)}" style="color:#1a73e8;text-decoration:none;">{_esc(t)}</a>', size=3, color="#111", margin="4px 0") for t, u in links)
-    # 제목 · 목록 모두 좌측 기준선 13px — 목록은 점 글머리표(다른 글머리표와 같은 점), 점이 기준선 (2026-10-23 사용자)
+    # 제목 · 목록 모두 좌측 기준선(ALIGN_PX) — 목록은 점 글머리표(다른 글머리표와 같은 점), 점이 기준선 (2026-10-23 사용자, 2026-10-24 홈 뉴스 선으로)
     return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};padding-left:{_dk.ALIGN_PX}px;">함께 보는 페이지</div>'
-            f'<ul style="margin:6px 0 0;padding:0 0 0 14px;list-style:none;font-size:{_dk.NAME};line-height:{R.LH_CARD};">{items}</ul></div>')
+            f'<ul style="margin:6px 0 0;padding:0 0 0 {_dk.ALIGN_PX}px;list-style:none;font-size:{_dk.NAME};line-height:{R.LH_CARD};">{items}</ul></div>')
 
 
 # ---------------------------------------------------------------- 애널리스트 · 탭 셋 (NVDA 리포트 build_body 와 같은 순서 · 같은 카드)

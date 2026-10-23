@@ -908,7 +908,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     parts.append(dk.ai_model_line(report.get("model"), dk.ALIGN_PX))   # "AI 서술 · 모델명" 한 줄 (운영지침 D3-1d, 2026-10-21)
     parts.append(dk.WRAP_CLOSE)   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지, 가이드라인 6절)
     # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지) · 반말 문장 끝은 합니다체 (2026-10-18 사용자: 블로그 기본 문체, 데일리는 재작업 때 일괄 — 지금)
-    return dk.formal(dk.fix_colons(dk.align_titles("\n".join(p for p in parts if p))))   # 카드 밖 제목을 좌측 기준선(13px)으로 (2026-10-23 사용자)
+    return dk.formal(dk.fix_colons(dk.align_titles("\n".join(p for p in parts if p))))   # 카드 밖 제목을 좌측 기준선(ALIGN_PX)으로 (2026-10-23 사용자)
 
 
 def build_tables(input_data, report, cover_url=None, analysis=None):

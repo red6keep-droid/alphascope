@@ -119,11 +119,11 @@ def related_html(labels, self_titles, blog_url=None, creds=None):
         return ""
     li = "".join(f'<li style="margin:0;line-height:34px;"><a href="{_h.escape(p["url"])}" style="color:#111;">{_h.escape(str(p["title"]).strip().replace(" — ", " "))}</a></li>' for p in picks)
     lists = " · ".join(f'<a href="{blog_url}/search/label/{quote(lb)}" style="color:#111;">{_h.escape(name)}</a>' for lb, name in SERIES)
-    # 좌측 기준선 13px — 카드 밖 글은 카드 안 글자 선에 맞춘다 (2026-10-23 사용자, 디자인-가이드라인 5-9). 위 구분선은 전체 폭
+    # 좌측 기준선 6px — 홈 실시간 뉴스 글자 선 (2026-10-24 사용자, 디자인-가이드라인 5-9). 위 구분선은 전체 폭
     return ('<div data-related="1" style="margin:28px 0 0;padding-top:14px;border-top:1px solid #E2E8F0;font-size:16px;line-height:24px;">'
-            '<div style="font-size:14px;line-height:20px;color:#6B7280;margin:0 0 4px;padding-left:13px;">함께 보는 리포트</div>'
-            f'<ul style="list-style:none;margin:0 0 6px;padding:0 0 0 13px;">{li}</ul>'
-            f'<div style="font-size:14px;line-height:20px;color:#6B7280;padding-left:13px;">리포트 목록 : {lists}</div></div>')
+            '<div style="font-size:14px;line-height:20px;color:#6B7280;margin:0 0 4px;padding-left:6px;">함께 보는 리포트</div>'
+            f'<ul style="list-style:none;margin:0 0 6px;padding:0 0 0 6px;">{li}</ul>'
+            f'<div style="font-size:14px;line-height:20px;color:#6B7280;padding-left:6px;">리포트 목록 : {lists}</div></div>')
 
 
 def with_related(content, labels, self_titles, blog_url=None, creds=None):

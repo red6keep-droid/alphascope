@@ -160,7 +160,7 @@ def sec_people(r, cards):
         if not items:
             continue
         shown, more = items[:MAX_SIGNALS_PER_PERSON], items[MAX_SIGNALS_PER_PERSON:]
-        wide = lambda html: html   # 기사 목록 좌우 = 좌측 기준선 13px (item_rules indent, 구분선은 전체 폭) — 옛 +6(화면 가장자리 20) 규칙은 2026-10-23 사용자 기준선 13 으로 대체
+        wide = lambda html: html   # 기사 목록 좌우 = 좌측 기준선(ALIGN_PX) (item_rules indent, 구분선은 전체 폭) — 2026-10-24 사용자: 다시 화면 가장자리 20(홈 실시간 뉴스) = 기준선 6
         page = [dk.sub_label(f"{p['name_ko']} ({p['title_ko']})"), wide(dk.item_rules(shown, sub=True, indent=dk.ALIGN_PX))]
         if more:
             # 펼친 목록의 첫 기사 위에도 구분선 (2026-10-21 사용자: 기사 영역은 더 보기를 펼쳐도 선이 이어져야 한다 — 표 카드와 다름).
@@ -366,7 +366,7 @@ def build_body(r, n, d):
         sec_strips(r),
         dk.WRAP_CLOSE,
     ])
-    return dk.fix_colons(dk.formal(dk.align_titles(body)))   # 카드 밖 구획 제목은 좌측 기준선 13px (2026-10-23 사용자)
+    return dk.fix_colons(dk.formal(dk.align_titles(body)))   # 카드 밖 구획 제목은 좌측 기준선(ALIGN_PX) (2026-10-23 사용자)
 
 
 def render(radar_path=None, narrative_path=None, output_dir=None):
