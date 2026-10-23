@@ -268,7 +268,7 @@ def _text(text):
     if not paras:
         return dk.muted("데이터 없음")
     # data-para · data-sent: 테마 CSS 가 PC 에서는 문장을 블록(한 줄씩), 모바일(≤900px)에서는 인라인(이어 흐름)으로 — 문장 뒤 공백은 인라인일 때의 띄어쓰기
-    return "".join(f'<div data-para="1" style="margin:{PARA_GAP if i else 0}px 0 6px;">' + "".join(f'<span data-sent="1">{dk.tint(_esc(dk.ko(s, TERM_KO)))}</span> ' for s in sents) + "</div>"   # 증감 색 (2026-10-12 사용자: 모든 곳)
+    return "".join(f'<div data-para="1" style="margin:{PARA_GAP if i else 0}px 0 6px;padding-left:{dk.ALIGN_PX}px;">' + "".join(f'<span data-sent="1">{dk.tint(_esc(dk.ko(s, TERM_KO)))}</span> ' for s in sents) + "</div>"   # 증감 색 (2026-10-12 사용자: 모든 곳)
                    for i, sents in enumerate(paras))
 
 
@@ -477,20 +477,20 @@ def sec_seo_lead(input_data, analysis):
     if not sents:
         return ""
     return (f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">'
-            + _esc(" ".join(sents)) + "</p>")
+            + dk._tint_inline(_esc(" ".join(sents))) + "</p>")   # 요약 문장의 증감도 색 (가이드라인 3-3-1, 예외 없음) — 문장이라 숫자(와 앞 지수 이름)만 칠한다. dk.tint 는 가운뎃점 덩어리 통째로 칠해 문장 앞머리까지 파랗게 된다
 
 
 def sec_lead(report, analysis):
     """글 머리(제목 없음, data-lead): 한 줄 결론 + 종합을 한 강조 카드에 (2026-10-12 사용자: 하나의 카드로 통합, 가로 구분선, 16px).
     홈 카드는 '(머리)'로 한 줄 결론을(구분선 아래는 건너뜀), '(종합)'으로 data-insight 문단을 읽는다."""
     one = str(report.get("one_line") or "").strip()
-    inner = f'<div style="color:#111;font-weight:700;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 카드 대신 굵게 (2026-10-13 사용자)
+    inner = f'<div style="color:#111;font-weight:700;padding-left:{dk.ALIGN_PX}px;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 카드 대신 굵게 (2026-10-13 사용자)
     paras = _paragraphs(report.get("opinion"))
     if paras:
         # 문장마다 한 줄, 문단 사이 빈 줄 하나 (2026-10-16 사용자) — 끝 문단 아래 여백은 두지 않아 카드 여백에 더해지지 않게
         body = "".join(f'<div data-para="1" style="margin:{PARA_GAP if i else 0}px 0 0;">' + "".join(f'<span data-sent="1">{_esc(dk.ko(s, TERM_KO))}</span> ' for s in sents) + "</div>" for i, sents in enumerate(paras))   # PC 한 줄씩 · 모바일 이어 흐름 (테마 CSS)
         inner += (f'<div style="margin:{14 - LEAD_VP}px 0 0;padding-top:{14 - LEAD_VP}px;border-top:1px solid #E2E8F0;">'   # 일반 구분선, 위아래 보이는 14 (2026-10-13 사용자: "구분선은 일반 구분선 컬러로 유지")
-                  f'<div data-insight="1" style="font-size:{dk.BODY};color:#111;">{body}</div></div>')   # 구분선 아래 18px (2026-10-13 사용자)   # 구분선 아래 종합 문단만 16px (2026-10-12 사용자: "이것만 16포인트")   # 18px · 행간 33 은 바깥에서 물려받는다
+                  f'<div data-insight="1" style="font-size:{dk.BODY};color:#111;padding-left:{dk.ALIGN_PX}px;">{body}</div></div>')   # 구분선 아래 18px (2026-10-13 사용자)   # 구분선 아래 종합 문단만 16px (2026-10-12 사용자: "이것만 16포인트")   # 18px · 행간 33 은 바깥에서 물려받는다
     return dk.cards(f'<div style="margin:0 0 8px;padding-top:{TAB_TOP}px;line-height:{dk.LH_BODY};">{inner}</div>')   # 오늘 탭 첫 콘텐츠 위 +10 (2026-10-13 사용자)   # 강조 카드 디자인 삭제 — 배경 · 테두리 · 안쪽 여백 없음 (2026-10-13 사용자)
 
 
@@ -806,7 +806,7 @@ def sec_news(input_data, report, analysis):
         src_html = f'<span style="color:{dk.SUB};font-size:{dk.TINY};vertical-align:middle;margin-left:{6 if tag else 0}px;">{_esc(src)}</span>' if src else ""
         lab = f'<span style="display:block;line-height:1;margin:8px 0 0;">{tag}{src_html}</span>' if (tag or src_html) else ""   # 라벨 줄은 기사 맨 아래 (2026-10-13 사용자)
         items.append(f"{head}{sub_html}{lab}")
-    return dk.item_rules(items, sub=True) if items else dk.muted("주요 뉴스 없음")   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
+    return dk.item_rules(items, sub=True, indent=dk.ALIGN_PX) if items else dk.muted("주요 뉴스 없음")   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
 
 
 def _overall_text(overall, items):
@@ -905,10 +905,10 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     parts.append(dk.section("금리·지표", sec_macro(input_data.get("macro", {}), analysis, report), tab=TAB_MARKET))
     if a.get("calendar"):
         parts.append(dk.section(TAB_CAL, cards.cards_grid(sx.macro_cal_card(a) + sx.earnings_cal_card(a)), tab=TAB_CAL))
-    parts.append(dk.ai_model_line(report.get("model")))   # "AI 서술 · 모델명" 한 줄 (운영지침 D3-1d, 2026-10-21)
+    parts.append(dk.ai_model_line(report.get("model"), dk.ALIGN_PX))   # "AI 서술 · 모델명" 한 줄 (운영지침 D3-1d, 2026-10-21)
     parts.append(dk.WRAP_CLOSE)   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지, 가이드라인 6절)
     # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지) · 반말 문장 끝은 합니다체 (2026-10-18 사용자: 블로그 기본 문체, 데일리는 재작업 때 일괄 — 지금)
-    return dk.formal(dk.fix_colons("\n".join(p for p in parts if p)))
+    return dk.formal(dk.fix_colons(dk.align_titles("\n".join(p for p in parts if p))))   # 카드 밖 제목을 좌측 기준선(13px)으로 (2026-10-23 사용자)
 
 
 def build_tables(input_data, report, cover_url=None, analysis=None):

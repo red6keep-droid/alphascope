@@ -50,7 +50,8 @@ def updated_line(a):
 
 
 def wrap(body):
-    return _dk.formal(_dk.fix_colons(_dk.WRAP_OPEN + body + _dk.WRAP_CLOSE))   # 반말 문장 끝은 합니다체 (2026-10-18 사용자)
+    html = _dk.align_titles(_dk.WRAP_OPEN + body + _dk.WRAP_CLOSE)
+    return _dk.formal(_dk.fix_colons(html))   # 카드 밖 구획 제목은 좌측 기준선 13px (2026-10-23 사용자) · 반말 문장 끝은 합니다체 (2026-10-18 사용자)
 
 
 def list_marker(url):
@@ -102,7 +103,7 @@ def price_card(s, today):
     r = s["ret_1d"]
     g = _glance(s)
     pcol = UP if r > 0 else DOWN if r < 0 else "#111"
-    tone = _dk.ROW_UP if r > 0 else _dk.ROW_DOWN if r < 0 else ""
+    tone = R.ROW_UP if r > 0 else R.ROW_DOWN if r < 0 else ""   # 엔비디아 가격 카드와 같은 강조 카드 높이(위아래 여백 · 행간 32) — design_kit 의 ROW_UP 에는 강조 여백이 없다 (2026-10-23 사용자)
     bg, bd = ("#FFF7ED", "#FED7AA") if r > 0 else ("#EFF6FF", "#BFDBFE") if r < 0 else ("#fff", "#E2E8F0")
     price = (f'<span style="display:inline-flex;align-items:center;justify-content:flex-end;">'
              f'<span style="color:{pcol};font-weight:700;">${s["close"]:,.2f}</span>&nbsp;{R._arrow(r)}'
@@ -239,6 +240,7 @@ def sector_lines(sf):
     tail = {"모이는 중": f"차이가 +{pp:.0f}%p를 넘어 돈이 {sf['name']} 쪽으로 모이는 중이다.",
             "빠져나가는 중": f"차이가 −{pp:.0f}%p 아래라 돈이 {sf['name']} 쪽에서 빠지는 중이다."}.get(sf["state"], f"차이가 ±{pp:.0f}%p 안이라 돈의 방향은 뚜렷하지 않다.")
     lines = [(f"최근 {n}거래일 {sf['name']} 업종 ETF({sf['etf']})가 S&P 500보다 {more}. {tail}", "plain"),
+             (R.flow_gauge(sf, sf["name"]), "html"),   # 엔비디아 반도체 자금 카드와 같은 막대 (2026-10-23 사용자: 새 그래프 모든 페이지)
              ("row", f"{sf['name']} vs 시장 ({n}일)", f"{_sgn(rel)}%p", f"+{pp:.0f}%p 넘으면 유입 · −{pp:.0f}%p 아래면 유출"),
              ("row", "업종 순위", f"{sf['n_pool']}개 중 {sf['rank']}위", "같은 기간 수익률 순")]
     secs = sf.get("sectors") or []
@@ -271,9 +273,9 @@ def sec_states(s):
         title = "반도체로 돈이 올까?" if sf["name"] == "반도체" else f"{sf['name']} 업종으로 돈이 올까?"
         out += R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True)
     bb = s.get("bollinger")
-    if bb and bb["state"] in R.BOLL_THEME:
-        th, col = R.BOLL_THEME[bb["state"]]
-        out += R._state_card("한 달간 변화 범위는?", {"하단 도달": "하락 범위에 닿음", "상단 도달": "상승 범위에 닿음"}[bb["state"]], th, col,
+    if bb and bb.get("lower") is not None:   # 매일 — 범위 안이어도 오늘 가격의 위치를 본다 (2026-10-23 사용자)
+        th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
+        out += R._state_card("한 달간 변화 범위는?", R.BOLL_STATE_KO.get(bb["state"], "범위 안"), th, col,
                              R.bollinger_lines(bb), "", tip=R.bollinger_rule(bb), fold=True, inline_notes=True)
     oh = s.get("overheat")
     if oh and oh["active"]:
@@ -344,9 +346,10 @@ def sec_drawdown(s):
 def related(s):
     """함께 보는 리포트 (가이드라인 10-5 4) — HTML 링크라 검색엔진이 따라간다."""
     links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("엔비디아 NVDA 주가", U.NVDA_REPORTS_URL)]
-    items = "".join(f'<li style="margin:4px 0;"><a href="{_esc(u)}" style="color:#1a73e8;text-decoration:none;">{_esc(t)}</a></li>' for t, u in links)
-    return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};">함께 보는 페이지</div>'
-            f'<ul style="margin:6px 0 0;padding-left:20px;font-size:{_dk.NAME};line-height:{R.LH_CARD};">{items}</ul></div>')
+    items = "".join(_dk.dot_li(f'<a href="{_esc(u)}" style="color:#1a73e8;text-decoration:none;">{_esc(t)}</a>', size=3, color="#111", margin="4px 0") for t, u in links)
+    # 제목 · 목록 모두 좌측 기준선 13px — 목록은 점 글머리표(다른 글머리표와 같은 점), 점이 기준선 (2026-10-23 사용자)
+    return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};padding-left:{_dk.ALIGN_PX}px;">함께 보는 페이지</div>'
+            f'<ul style="margin:6px 0 0;padding:0 0 0 14px;list-style:none;font-size:{_dk.NAME};line-height:{R.LH_CARD};">{items}</ul></div>')
 
 
 # ---------------------------------------------------------------- 애널리스트 · 탭 셋 (NVDA 리포트 build_body 와 같은 순서 · 같은 카드)
@@ -413,7 +416,7 @@ def sec_today_tab(s, news):
             dc["today"][sc["direction"]] = dc["today"].get(sc["direction"], 0) + 1
     top = sorted((e for e in events if e["rel"] >= 2 and e["has_fact"]), key=lambda e: e["published_at"], reverse=True)
     top = sorted(top, key=lambda e: -e["rel"])[:MAX_ISSUES]   # 관련도 높은 순, 같으면 최근 순
-    issues = [f"{R.rr.AREA_KO.get(e['area'], e['area'])} {_dk.headline(e['fact'])}" for e in top if e["has_fact"]]   # 명사형 헤드라인체 (데일리 · NVDA 중요 이슈와 같게)
+    issues = [(f"{R.rr.AREA_KO.get(e['area'], e['area'])} {_dk.headline(e['fact'])}", e.get("url")) for e in top if e["has_fact"]]   # (글, 기사 주소) — 줄을 누르면 그 기사가 열린다 (2026-10-23 사용자)   # 명사형 헤드라인체 (데일리 · NVDA 중요 이슈와 같게)
     a = {"events": events[:MAX_EVENTS], "events_overflow": events[MAX_EVENTS:MAX_EVENTS + 12], "direction_counts": dc}
     issue_html = R.sec_narrative(a, {"today": issues}) if issues else _dk.muted("최근 7일 동안 이 종목을 주로 다룬 큰 소식이 없습니다.")
     return _dk.keep_tone(R._section("중요 이슈", issue_html, tab="오늘")   # 뉴스 · 중요 이슈는 합니다체로 바꾸지 않는다 (2026-10-18 사용자)

@@ -2225,10 +2225,10 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 (function () {
   'use strict';
   var title = document.querySelector('.post-outer-container .post-title');
-  var widget = document.querySelector('.post-share-buttons .sharing');
-  if (!title || !widget) return;
+  var widget = document.querySelector('.post-share-buttons .sharing');   /* 고정 페이지 등 블로거 공유 위젯이 없는 글도 공유 버튼은 항상 둔다 (2026-10-23 사용자) */
+  if (!title || !document.body.classList.contains('item-view')) return;
   var KO = { 'Get link': '링크 복사', '링크 가져오기': '링크 복사', 'Email': '이메일', '이메일': '이메일', 'Other Apps': '다른 앱', '기타 앱': '다른 앱' };
-  [].slice.call(widget.querySelectorAll('.platform-sharing-text')).forEach(function (t) { var k = t.textContent.trim(); if (KO[k]) t.textContent = KO[k]; });
+  if (widget) [].slice.call(widget.querySelectorAll('.platform-sharing-text')).forEach(function (t) { var k = t.textContent.trim(); if (KO[k]) t.textContent = KO[k]; });
   var host = title.querySelector('a') || title;
   var date = host.querySelector('.post-title-date');
   var meta = document.createElement('span'); meta.className = 'post-title-meta';
@@ -2238,14 +2238,98 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
     '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.7l6.8-4M8.6 13.3l6.8 4"/></svg>';
   meta.appendChild(btn);
+  /* 제목 글자(+로고)를 한 칸(.post-title-text)으로 묶는다 — 제목이 길어 줄이 바뀌어도 공유 버튼은 오른쪽 끝에 그대로, 글자만 그 안에서 줄바꿈 (2026-10-23 사용자: 종목 페이지 긴 제목) */
+  var txt = document.createElement('span'); txt.className = 'post-title-text';
+  var lab = document.createElement('span'); lab.className = 'post-title-label';   /* 글자 칸 — 로고는 이 칸 왼쪽에 따로 붙어(아래 티커 로고 스크립트) 둘째 줄이 첫 글자 선에 맞는다 */
+  while (title.firstChild) lab.appendChild(title.firstChild);
+  txt.appendChild(lab);
+  var tw = document.createTreeWalker(lab, NodeFilter.SHOW_TEXT, null), tn; while ((tn = tw.nextNode())) tn.nodeValue = tn.nodeValue.replace(/ · /g, '\u00a0· ');   /* 가운뎃점이 줄 맨 앞에 오지 않게 앞 낱말에 붙인다 */
+  title.appendChild(txt);
   title.appendChild(meta);
   var pop = document.createElement('div'); pop.className = 'rt-pop share-pop'; pop.hidden = true;
   pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-label="공유">' +
     '<div class="rt-pop-head"><div class="rt-pop-title">공유</div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div><div class="share-pop-body"></div></div>';
   document.body.appendChild(pop);
-  var list = widget.querySelector('.share-buttons');
-  if (list) { list.classList.remove('hidden'); pop.querySelector('.share-pop-body').appendChild(list); }
-  var bottom = widget.closest('.post-share-buttons-bottom') || widget.closest('.post-share-buttons');
+  var list = widget ? widget.querySelector('.share-buttons') : null;
+  if (!list) { list = document.createElement('ul'); list.className = 'share-buttons'; }
+  {
+    list.classList.remove('hidden');
+    /* 공유 대상 정리 (2026-10-23 사용자): Pinterest · 이메일 · 다른 앱은 뺀다. 페이스북 · 카카오톡을 넣는다 (블로거 목록에 페이스북이 없으면 만든다) */
+    var DROP = /pinterest|이메일|email|다른 앱|other/i;
+    [].slice.call(list.children).forEach(function (li) {
+      var t = (li.textContent || '').trim(), c = (li.innerHTML.match(/sharing-\w+/g) || []).join(' ');
+      if (DROP.test(t) || /pinterest|email|other/i.test(c)) { li.parentNode.removeChild(li); return; }
+    });
+    var shareUrl = (document.querySelector('link[rel="canonical"]') || {}).href || location.href.split('#')[0];
+    var shareTitle = document.title;
+    function mkItem(name, svg, act) {
+      var li = document.createElement('li'), b = document.createElement('span');
+      b.className = 'sharing-platform-button'; b.setAttribute('role', 'button'); b.setAttribute('tabindex', '0');
+      b.innerHTML = svg + '<span class="platform-sharing-text">' + name + '</span>';
+      function go(e) { e.preventDefault(); act(b); }
+      b.addEventListener('click', go);
+      b.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') go(e); });
+      li.appendChild(b); list.appendChild(li);
+    }
+    function flash(b, msg) { var t = b.querySelector('.platform-sharing-text'), o = t.textContent; t.textContent = msg; setTimeout(function () { t.textContent = o; }, 1500); }
+    var order = { link: 0, facebook: 1, x: 2, kakao: 3 };
+    function kindOf(li) {
+      var t = ((li.textContent || '') + ' ' + (li.innerHTML.match(/sharing-\w+/g) || []).join(' ')).toLowerCase();
+      return /카카오|kakao/.test(t) ? 'kakao' : /facebook|페이스북/.test(t) ? 'facebook' : /twitter|(^|\s)x(\s|$)/.test(t) ? 'x' : 'link';
+    }
+    /* 아이콘 네 개를 직접 그린다 — 블로거 기본 아이콘은 이 테마에서 안 그려진다. 링크는 선, 나머지는 채운 로고 (2026-10-23 사용자) */
+    var SV = function (inner, stroke) { return '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" style="flex:none;width:20px;height:20px;' + (stroke ? 'fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;' : 'fill:currentColor;stroke:none;') + '">' + inner + '</svg>'; };
+    var ICONS = {
+      link: SV('<path d="M10 13a5 5 0 0 0 7.100.1l3-3a5 5 0 0 0-7.100-7.100l-1.700 1.700"/><path d="M14 11a5 5 0 0 0-7.100-.1l-3 3a5 5 0 0 0 7.100 7.100l1.700-1.700"/>', true),
+      facebook: SV('<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.990 4.388 10.954 10.125 11.854v-8.385H7.078v-3.470h3.047V9.430c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.830c-1.491 0-1.956.925-1.956 1.874v2.250h3.328l-.532 3.470h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>'),
+      x: SV('<path d="M18.901 1.153h3.680l-8.040 9.190L24 22.846h-7.406l-5.800-7.584-6.638 7.584H.474l8.600-9.830L0 1.154h7.594l5.243 6.932ZM17.610 20.644h2.039L6.486 3.240H4.298Z"/>'),
+      kakao: SV('<path d="M12 3c5.799 0 10.500 3.664 10.500 8.185 0 4.520-4.701 8.184-10.500 8.184a13.500 13.500 0 0 1-1.727-.110l-4.408 2.883c-.501.265-.678.236-.482-.486l.998-3.770C2.682 16.700 1.500 14.536 1.500 11.185 1.500 6.664 6.201 3 12 3Z"/>')
+    };
+    var present = {};
+    [].slice.call(list.children).forEach(function (li) { present[kindOf(li)] = 1; });
+    if (!present.link) {
+      mkItem('링크 복사', ICONS.link, function (b) {
+        if (navigator.clipboard) navigator.clipboard.writeText(shareUrl).then(function () { flash(b, '복사됨'); }, function () { window.prompt('주소를 복사하세요', shareUrl); });
+        else window.prompt('주소를 복사하세요', shareUrl);
+      });
+    }
+    if (!present.x) {
+      mkItem('X', ICONS.x, function () { window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareTitle), '_blank', 'noopener,width=640,height=560'); });
+    }
+    if (!present.facebook) {
+      mkItem('Facebook', ICONS.facebook,
+        function () { window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank', 'noopener,width=640,height=560'); });
+    }
+    /* 카카오톡: 카카오 개발자 앱의 JavaScript 키가 있으면 카카오톡 공유창, 없으면 기기 공유창(모바일에서 카카오톡 선택) → 그것도 없으면 주소 복사.
+       키는 아래 KAKAO_JS_KEY 에 (사이트 도메인도 카카오 개발자 콘솔에 등록) */
+    var KAKAO_JS_KEY = '';
+    mkItem('카카오톡', ICONS.kakao,
+      function (b) {
+        function fallback() {
+          if (navigator.share) { navigator.share({ title: shareTitle, url: shareUrl }).catch(function () {}); return; }
+          if (navigator.clipboard) navigator.clipboard.writeText(shareUrl).then(function () { flash(b, '주소 복사됨'); }, function () { window.prompt('주소를 복사하세요', shareUrl); });
+          else window.prompt('주소를 복사하세요', shareUrl);
+        }
+        if (!KAKAO_JS_KEY) { fallback(); return; }
+        function send() {
+          try {
+            if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY);
+            window.Kakao.Share.sendDefault({ objectType: 'text', text: shareTitle, link: { mobileWebUrl: shareUrl, webUrl: shareUrl } });
+          } catch (err) { fallback(); }
+        }
+        if (window.Kakao) { send(); return; }
+        var sc = document.createElement('script'); sc.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js'; sc.onload = send; sc.onerror = fallback; document.head.appendChild(sc);
+      });
+    /* 모든 버튼의 아이콘을 위 것으로 통일하고 순서는 링크 · 페이스북 · X · 카카오톡 */
+    [].slice.call(list.children).sort(function (a, b) { return order[kindOf(a)] - order[kindOf(b)]; }).forEach(function (li) {
+      var btnEl = li.querySelector('.sharing-platform-button') || li;
+      [].slice.call(btnEl.querySelectorAll('svg')).forEach(function (v) { v.parentNode.removeChild(v); });
+      btnEl.insertAdjacentHTML('afterbegin', ICONS[kindOf(li)]);
+      list.appendChild(li);
+    });
+    pop.querySelector('.share-pop-body').appendChild(list);
+  }
+  var bottom = widget && (widget.closest('.post-share-buttons-bottom') || widget.closest('.post-share-buttons'));
   if (bottom) bottom.style.display = 'none';
   function open() { pop.hidden = false; pop.querySelector('.rt-pop-close').focus(); }
   function close() { pop.hidden = true; btn.focus(); }
@@ -2538,7 +2622,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var m = /(?:\(|\s)([A-Z][A-Z.\-]{0,5})\)?\s+주가/.exec(h.textContent) || /\(([A-Z][A-Z.\-]{0,5})\)\s*주가/.exec(h.textContent);
     var sym = m ? m[1] : (/^\s*엔비디아/.test(h.textContent) ? 'NVDA' : '');
     if (!sym) return;
-    var host = h.querySelector('a') || h;
+    var host = h.querySelector('.post-title-text') || h.querySelector('a') || h;   /* 제목 글자 칸이 있으면 그 안 맨 앞 — 로고가 첫 글자 앞에 붙는다 */
     /* 2026-10-21: 제3자 로고 핫링크(financialmodelingprep) 중단 — 운영지침 4-6. 티커 두 글자 둥근 배지(리포트 design_kit.ticker_logo 와 같은 모양) */
     var b = document.createElement('span'); b.className = 'title-logo title-badge'; b.setAttribute('aria-hidden', 'true');
     b.textContent = sym.replace(/[^A-Z]/g, '').slice(0, 2);   /* 크기 · 여백은 테마 CSS .post-title .title-logo (build_theme.py) */
@@ -2872,19 +2956,19 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var lu = document.querySelector('.post-nav-list'); backBtn.href = (lu && lu.getAttribute('href')) || '/';
     backBtn.innerHTML = ARROW;
     headBox.appendChild(backBtn); headBox.appendChild(title);
-    var nav = document.querySelector('.navbar');
-    function place() { headBox.style.top = (nav ? nav.getBoundingClientRect().height : 0) + 'px'; }
-    place(); window.addEventListener('resize', place);
   }
+  var shareMeta = title ? title.querySelector('.post-title-meta') : null;   /* 공유 버튼 — 제목 글자를 바꿔도 같은 버튼을 다시 붙인다 */
   var saved = [], moved = [];
   function setHead(name, role, photo) {
     if (!title) return;
-    if (name == null) { title.innerHTML = titleText; backBtn.href = backBtn.getAttribute('data-list') || backBtn.href; backBtn.onclick = null; return; }
+    if (name == null) { title.innerHTML = titleText; if (shareMeta) { var m0 = title.querySelector('.post-title-meta'); if (m0) title.replaceChild(shareMeta, m0); else title.appendChild(shareMeta); } backBtn.href = backBtn.getAttribute('data-list') || backBtn.href; backBtn.onclick = null; return; }
     backBtn.setAttribute('data-list', backBtn.href);
+    if (shareMeta && shareMeta.parentNode) shareMeta.parentNode.removeChild(shareMeta);
     title.textContent = '';
     if (photo) { var im = document.createElement('img'); im.className = 'pr-photo'; im.alt = ''; im.src = photo; title.appendChild(im); }   /* 공직자만 얼굴 사진 (2026-10-21 사용자) */
     title.appendChild(document.createTextNode(name));
     if (role) { var r = document.createElement('span'); r.className = 'pr-role'; r.textContent = role; title.appendChild(r); }
+    if (shareMeta) title.appendChild(shareMeta);
     backBtn.onclick = function (e) { e.preventDefault(); back(); };
   }
   function back() {
@@ -2919,25 +3003,24 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   });
 })();
 
-/* ============================================================ 제목 왼쪽 화살표 (2026-10-23 사용자: "주요 인물 발언 상세처럼 홈으로 가는 화살표를 타이틀에")
-   본문에 [data-title-back="주소"] 가 있는 글 — 인물 발언과 같은 고정 제목 줄(.pr-sticky) + 네모 화살표(.pr-back)를 그 주소로.
-   인물 발언 글은 위 IIFE 가 이미 만들었으므로 건너뛴다. 지금 쓰는 글: 미디어 데일리(홈으로) */
+/* ============================================================ 상세 페이지 고정 제목 줄 (2026-10-23 사용자: "모든 상세 페이지 — 로고 영역은 스크롤되어 사라지고 제목 영역만 최상단 고정,
+   제목 왼쪽에 뒤로 가기 버튼, 오른쪽에 공유 버튼")
+   글 보기(.item-view)의 제목을 고정 줄(.pr-sticky)로 감싸고 네모 화살표(.pr-back)를 붙인다. 화살표 주소 = 본문 [data-title-back] → 아래 [목록] 버튼 주소 → 홈.
+   공유 버튼은 위 공유 IIFE 가 제목 오른쪽에 둔다. 인물 발언 글은 그 IIFE 가 이미 줄을 만들었으므로 건너뛴다. 로고 줄은 CSS(body.item-view .navbar)가 고정을 푼다. */
 (function () {
   'use strict';
+  if (!document.body.classList.contains('item-view') || document.querySelector('.pr-sticky')) return;
   var mark = document.querySelector('.post-body [data-title-back]');
-  if (!mark || document.querySelector('.pr-sticky')) return;
   var title = document.querySelector('.post-outer-container .post-title') || document.querySelector('.post-title');
   if (!title) return;
+  var lu = document.querySelector('.post-nav-list');
   var head = document.createElement('div'); head.className = 'pr-sticky';
   title.parentNode.insertBefore(head, title);
   var back = document.createElement('a'); back.className = 'pr-back';
-  back.href = mark.getAttribute('data-title-back') || '/';
-  back.setAttribute('aria-label', mark.getAttribute('data-title-back-label') || '홈');
+  back.href = (mark && mark.getAttribute('data-title-back')) || (lu && lu.getAttribute('href')) || '/';
+  back.setAttribute('aria-label', (mark && mark.getAttribute('data-title-back-label')) || (mark ? '홈' : '목록'));
   back.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8 10 12.5"/></svg>';
   head.appendChild(back); head.appendChild(title);
-  var nav = document.querySelector('.navbar');
-  function place() { head.style.top = (nav ? nav.getBoundingClientRect().height : 0) + 'px'; }
-  place(); window.addEventListener('resize', place);
 })();
 
 /* ============================================================ 전환 버튼 (data-switch) · 오늘·5일 (data-hz-control) — 2026-10-11

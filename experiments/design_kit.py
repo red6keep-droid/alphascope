@@ -49,8 +49,8 @@ INFO_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"
 QUESTION_ICON = ('<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block;" fill="none">'   # 원 선 1.2 × 20/16 = 보이는 1.5px (2026-10-13)
                  '<circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>'
                  '<text x="8" y="11.6" text-anchor="middle" fill="currentColor" stroke="none" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">?</text></svg>')   # ? 는 또렷한 글꼴의 글자 (2026-10-13 사용자: "다른 폰트로 명확하게")
-LINK_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
-             '<path d="M9 3h4v4"/><path d="M13 3 7 9"/><path d="M11 9v4H3V5h4"/></svg>')
+LINK_ICON = ('<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" style="vertical-align:-1px;" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">'
+             '<path d="M4.5 11.5 11.5 4.5"/><path d="M6 4.5h5.5V10"/></svg>')
 NEW_PILL = ('<span style="display:inline-block;background:#B91C1C;color:#fff;border-radius:3px;padding:1px 4px 0;font-size:10px;font-weight:700;'
             'line-height:13px;vertical-align:middle;margin-left:4px;">N</span>')
 WRAP_OPEN = ('<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;'
@@ -102,6 +102,17 @@ def section(title, html, summary="", line=None, tab=None, aside="", one_line=Fal
     if line is None:
         line = not _NO_LINE_START.match(html or "")
     return h2(title, line=line, summary=summary, tab=tab, aside=aside, one_line=one_line) + (html or "")
+
+
+ALIGN_PX = 13   # 좌측 기준선 — 카드 밖 구획 제목 · 글의 왼쪽 시작선 = 카드 안 글자(테두리 1 + 안쪽 12) = 미디어 데일리 기준 (2026-10-23 사용자)
+
+
+def align_titles(html, px=ALIGN_PX):
+    """카드 밖 구획 제목(h2) · 소제목(data-sub) · 카드 제목 · 맨 앞 요약(data-seo-lead)을 기준선까지 들여쓴다. 이미 padding-left 가 있으면 건드리지 않는다 (탭 막대 · 카드 안 글은 이 함수 대상이 아니다)."""
+    def add(mo):
+        st = mo.group(2)
+        return mo.group(0) if "padding-left" in st else f'{mo.group(1)}{st}padding-left:{px}px;"'
+    return re.sub(r'(<h2[^>]*? style="|<div data-sub="1" style="|<p data-seo-lead="1"[^>]*? style="|<div style="(?=font-size:19px;line-height:24px;font-weight:700;color:#111;margin:25px 0 3px;))([^"]*)"', add, html)   # 마지막 = 카드 제목(기간별 수익률 · 1년 가격 범위 …)   # 맨 앞 요약(data-seo-lead)도 같은 선 (2026-10-23 사용자)
 
 
 def ko(text, table):
@@ -163,8 +174,13 @@ def tint(html_text):
     return " · ".join(out)
 
 
+def dot_chunks(parts_html):
+    """덩어리 목록 → 가운뎃점으로 이은 한 줄. 줄바꿈은 점 사이에서만 (점은 앞 덩어리 끝에 붙는다), 한 줄보다 긴 덩어리만 안에서 바뀐다."""
+    return " ".join(f'<span style="display:inline-block;max-width:100%;vertical-align:top;">{x}{"&nbsp;·" if i < len(parts_html) - 1 else ""}</span>' for i, x in enumerate(parts_html))
+
+
 def sub_line(sub_html, lead=""):
-    """C 카드 보조 줄 내용 — 증감 색(tint) + 짧은 덩어리는 줄바꿈 없이 (· 에서만 줄이 바뀐다).
+    """C 카드 보조 줄 내용 — 증감 색(tint) + 모든 덩어리는 통째로 (줄바꿈은 가운뎃점 `·` 사이에서만).
     lead(세로 구분선)는 첫 덩어리에 붙여 줄 끝에 홀로 남지 않게 한다."""
     chunks = tint(sub_html).split(" · ")
     chunks[0] = lead + chunks[0]
@@ -174,7 +190,7 @@ def sub_line(sub_html, lead=""):
         plain = html_mod.unescape(re.sub(r"<[^>]+>", "", c))
         if i == 0 and lead:
             plain = plain.strip()
-        parts.append(f'<span style="white-space:nowrap;">{c}{sep}</span>' if len(plain) < CHUNK_NOWRAP else c + sep)
+        parts.append(f'<span style="display:inline-block;max-width:100%;vertical-align:top;">{c}{sep}</span>')   # 덩어리마다 통째로 — 줄바꿈은 가운뎃점 사이에서만, 한 줄보다 긴 덩어리만 안에서 줄이 바뀐다 (2026-10-23 사용자: 가격 정보 하단 글)
     return paren(" ".join(parts))
 
 
@@ -525,10 +541,15 @@ def write_mock(body, path, title):
     nav = (f'<p class="post-nav"><a class="post-nav-list" href="{lu.group(1) if lu else "#"}">목록</a>'
            '<button aria-label="맨 위로" class="post-nav-top" type="button">TOP<svg aria-hidden="true" fill="none" height="22" stroke="currentColor" stroke-linecap="round" '
            'stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 22 22" width="22"><circle cx="11" cy="11" r="10"/><path d="M11 15.5V7M7.5 10.5 11 7l3.5 3.5"/></svg></button></p>')
+    # 블로거 공유 위젯 흉내 — 실제 블로그 목록(링크 · Facebook · X · Pinterest · 이메일 · 다른 앱)을 그대로 두고 테마 JS 가 정리하는지 본다 (2026-10-23)
+    share = ('<div class="post-share-buttons post-share-buttons-bottom"><div class="byline post-share-buttons goog-inline-block"><div class="sharing">'
+             '<button class="sharing-button touch-icon-button"></button><div class="share-buttons-container"><ul class="share-buttons hidden">'
+             + "".join(f'<li><span class="sharing-platform-button"><span class="platform-sharing-text">{n}</span></span></li>'
+                       for n in ("링크 가져오기", "Facebook", "X", "Pinterest", "이메일", "다른 앱")) + '</ul></div></div></div></div>')
     page = ('<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<title>{esc(title)} — 목업</title><style>{css.group(1)}</style></head>'
             '<body class="item-view no-dashboard"><main class="main-content"><div class="post-shell"><article class="post-outer-container"><div class="post">'
-            f'<h3 class="post-title">{esc(title)}</h3><div class="post-body entry-content">{body}</div></div></article>{nav}</div></main>'
+            f'<h3 class="post-title">{esc(title)}</h3><div class="post-body entry-content">{body}</div>{share}</div></article>{nav}</div></main>'
             f'<script>{js.group(1)}</script></body></html>')
     with open(path, "w", encoding="utf-8") as f:
         f.write(page)
@@ -602,7 +623,7 @@ def link_icon(url, label):
     if not url:
         return ""
     return (f' <a href="{esc(url)}" title="{esc(label)}" aria-label="{esc(label)}" target="_blank" rel="noopener" '
-            f'style="color:#1a73e8;text-decoration:none;white-space:nowrap;">{LINK_ICON}</a>')
+            f'style="color:#9AA4B2;text-decoration:none;white-space:nowrap;">{LINK_ICON}</a>')
 
 
 NEWS_VP = 7   # 18px 글 · 행간 34 의 반쪽
@@ -843,7 +864,7 @@ def state_card(head_html, kind="neutral", right_html="", sub_html="", items=(), 
             + ((("" if right_html else '<span style="margin-left:auto;"></span>') + fold_btn(lighten(bg), bd)) if chev else "") + "</span>")   # chev: 맨 오른쪽 공식 접기 버튼, 바탕은 카드 색 20% 밝게 (2026-10-13 사용자)
     sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#374151;margin-top:2px;{"text-align:center;" if center else ""}">{sub_html}</div>' if sub_html else ""   # center: 종합 상태 카드 가운데 (2026-10-13 사용자)
     lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#374151", margin="8px 0") for k, v in items)
-    body = (f'<div style="margin-top:{14 - VP_EMPH}px;padding-top:{14 - VP}px;border-top:1px solid {bd};font-size:{TINY};line-height:{LH_TINY};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자: 4 → 14)
+    body = (f'<div style="margin-top:{14 - VP_EMPH + 3}px;padding-top:{14 - VP}px;border-top:1px solid {bd};font-size:{TINY};line-height:{LH_TINY};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자: 4 → 14)
             f"<ul style='margin:-8px 0;padding:0;list-style:none;'>{lis}</ul></div>") if lis else ""   # 음수 margin = 첫·끝 li 의 8px 지우기
     # 위아래 24 — 끝 줄이 14px 글(행간 20)이면 반쪽 2, 18px 제목이면 6 (2026-10-12 사용자)
     bottom = EMPH_PAD - (VP if (lis or sub_html) else VP_EMPH)
@@ -909,11 +930,11 @@ SUB_TOP_EXTRA = 15   # 소제목 위 여백 +15 → 29 (2026-10-13 사용자)
 RULE_GAP = SEP_GAP + 5   # 카드 없이 가로 구분선만 둔 목록 — 선 위아래 보이는 27 (2026-10-13 사용자: "기존 구분선 여백 상하 여백에 5픽셀씩 더")
 
 
-def item_rules(items_html, sub=False):
+def item_rules(items_html, sub=False, indent=0):
     """기사 목록 — 카드 없이 기사 사이 가로 구분선 (2026-10-13 사용자: "뉴스는 강조 뉴스 카드를 제외하고 가로 구분선으로 뉴스 영역을 구분").
     18px · 행간 34. 첫 기사 위는 구획 제목 밑줄이 대신한다. 항목은 li — 홈 카드가 글머리표로 읽는다. 구분선은 box-shadow (홈 카드는 border-top 요소를 건너뛴다)."""
     bottom = RULE_GAP - (VP if sub else NEWS_VP)
-    lis = "".join(f'<li style="margin:0;padding:{(RULE_GAP - NEWS_VP) if i else 2}px 0 {bottom}px;line-height:{LH_BODY};{"box-shadow:inset 0 1px 0 #E2E8F0;" if i else ""}">{h}</li>'
+    lis = "".join(f'<li style="margin:0;padding:{(RULE_GAP - NEWS_VP) if i else 2}px {indent}px {bottom}px;line-height:{LH_BODY};{"box-shadow:inset 0 1px 0 #E2E8F0;" if i else ""}">{h}</li>'
                   for i, h in enumerate(items_html))
     return f'<ul style="margin:0 0 8px;padding:0;list-style:none;font-size:{SMALL};">{lis}</ul>' if lis else ""
 
@@ -968,9 +989,10 @@ LEGEND_BAR_H, LEGEND_BAR_NUM, LEGEND_BAR_PAD = 30, "17px", 5   # 막대 높이 3
 LEGEND_CHIP, LEGEND_INDENT = 9, 10   # 범례 색 사각형 9px · 범례 왼쪽 들여쓰기 10px (2026-10-17 사용자)
 
 
-def legend_bar(title, segs, aside=""):
+def legend_bar(title, segs, aside="", legend_top=False):
     """제목(왼쪽, 16px 검정 굵게) · 막대 · 막대 색과 같은 범례 칩 `■ 긍정 47% ■ 부정 37%`. segs = [(이름, 개수, 배경, 글자)], 0건은 뺀다.
-    aside: 제목 줄 오른쪽 글(14px 안내 회색) — 기준 규칙은 비워 두지만, 미디어 데일리는 `영상 n개 · 방송 n곳` (2026-10-23 사용자)."""
+    aside: 제목 줄 오른쪽 글(14px 안내 회색) — 기준 규칙은 비워 두지만, 미디어 데일리는 `영상 n개 · 방송 n곳` (2026-10-23 사용자).
+    legend_top=True: 제목을 쓰지 않고 범례를 막대 위 줄 왼쪽에, aside 를 같은 줄 오른쪽에 둔다 (미디어 데일리, 2026-10-23 사용자)."""
     segs = [x for x in segs if x[1]]
     total = sum(x[1] for x in segs)
     if not total:
@@ -986,6 +1008,11 @@ def legend_bar(title, segs, aside=""):
     legend = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
                      f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{esc(nm)} {c / total * 100:.0f}%</span>'
                      for nm, c, bg, _ in segs)
+    if legend_top:
+        aside_html = (f'<span style="margin-left:auto;font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};white-space:nowrap;">{aside}</span>' if aside else "")
+        top = (f'<span style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0 8px;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;'
+               f'font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 3px;"><span>{legend}</span>{aside_html}</span>')
+        return top + bar_html.replace(f"margin:{LEGEND_BAR_PAD}px 0 {3 + LEGEND_BAR_PAD}px;", f"margin:0 0 {3 + LEGEND_BAR_PAD}px;", 1)
     return head + bar_html + (f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{legend}</span>')
 
 
@@ -1065,18 +1092,19 @@ def as_rules(html):
     return re.sub(r"border:1px solid (#[0-9A-Fa-f]{6});border-radius:10px;", r"border-top:1px solid \1;border-bottom:1px solid \1;", html)
 
 
-def ai_model_line(model):
+def ai_model_line(model, indent=0):
     """AI 가 쓴 문장이 있는 글의 맨 끝 한 줄 — "AI 서술 · gemini-3.5-flash" (운영지침 3-4 · D3-1d, 2026-10-21).
     예비 모델이 답한 날은 그 모델명이 그대로 보인다(pool.last_model). 숫자는 파이썬이 계산한다는 설명은 공통 푸터가 맡는다."""
     if not model:
         return ""
-    return (f'<div data-ai-model="1" style="margin-top:14px;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">'
+    pad = f"padding-left:{indent}px;" if indent else ""
+    return (f'<div data-ai-model="1" style="margin-top:14px;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{pad}">'
             f'AI 서술 · {esc(str(model))}</div>')
 
 
-def with_ai_model(body, model):
+def with_ai_model(body, model, indent=0):
     """본문 맨 끝(WRAP_CLOSE 안쪽)에 ai_model_line 을 넣는다. 모델이 없으면 그대로."""
-    line = ai_model_line(model)
+    line = ai_model_line(model, indent)
     if not line:
         return body
     s = body.rstrip()

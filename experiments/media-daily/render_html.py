@@ -10,6 +10,7 @@
 
 import json
 import os
+import re
 import sys
 
 import config
@@ -46,18 +47,13 @@ KR_NAME = {"SSNLF": "삼성전자", "SSNNF": "삼성전자", "005930": "삼성�
 
 
 PILL_ROW = "display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:3px;line-height:1;margin:4px 0 0;"   # 제목 아래 라벨 줄 — 왼쪽 정렬 · 사이 3px (2026-10-23 사용자)
-# 라벨 안 링크 표시 — 상자 없는 오른쪽 위 화살표 하나, 검정 (2026-10-23 사용자: "위로 올라가는 화살표 아이콘으로 단순하게")
-LINK_ICON_DARK = ('<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true" fill="none" stroke="#111" stroke-width="1.6" '
-                  'stroke-linecap="round" stroke-linejoin="round" style="vertical-align:0;margin-left:3px;"><path d="M3 9 9 3"/><path d="M4 3h5v5"/></svg>')
-
-
 def _link_pill(text, url, label, kind="area"):
-    """링크가 든 라벨 — 라벨 모양 그대로 a 로, 끝에 검정 링크 아이콘 (2026-10-23 사용자: "링크 아이콘은 블랙컬러로 라벨 안으로"). url 이 없으면 보통 라벨."""
+    """링크가 든 라벨 — 라벨 모양 그대로 a 로. 링크 아이콘은 테마 CSS 가 붙인다 (외부 링크 공통). url 이 없으면 보통 라벨."""
     p = dk.pill(text, kind, bare=True)
     if not url:
         return p
     p = p.replace("<span ", f'<a href="{_esc(url)}" target="_blank" rel="noopener" data-trhelp="skip" title="{_esc(label)}" aria-label="{_esc(label)}" ', 1)
-    return p[: -len("</span>")].replace("white-space:nowrap;", "white-space:nowrap;text-decoration:none;", 1) + LINK_ICON_DARK + "</a>"
+    return p[: -len("</span>")].replace("white-space:nowrap;", "white-space:nowrap;text-decoration:none;", 1) + "</a>"
 
 
 def _obj(word):
@@ -88,11 +84,11 @@ def _interest_html(c, n_today):
 
 
 def _stance_bar(c, n_today):
-    """시각 막대 — 블로그 기준 범례 막대(design_kit.legend_bar = 엔비디아 애널리스트 · 뉴스 막대). 제목 `방송의 시각 n건`,
-    오른쪽 `관심도 : n` (2026-10-23 사용자 — 옛 `영상 n개 · 방송 n곳`)."""
+    """시각 막대 — 블로그 기준 범례 막대(design_kit.legend_bar). 제목(`방송의 시각 n건`)은 뺐고 범례가 막대 위 왼쪽,
+    오른쪽 `관심도 : n` (2026-10-23 사용자)."""
     s = c["stances"]
     segs = [(nm, s.get(k, 0), *dk.BAR_PASTEL[kind]) for k, nm, kind in STANCE_BAR]
-    return dk.legend_bar(f"방송의 시각 {sum(n for _, n, _, _ in segs)}건", segs, aside=_interest_html(c, n_today))
+    return dk.legend_bar("", segs, aside=_interest_html(c, n_today), legend_top=True)
 
 
 def _cluster_item(i, c, narrative, n_today):
@@ -102,24 +98,25 @@ def _cluster_item(i, c, narrative, n_today):
     pills = [dk.pill(c["category_ko"], bare=True)] + ([dk.pill("예상 밖", "uncertain", bare=True)] if c["surprise"] else [])
     if c.get("daily"):
         pills.append(_link_pill("데일리 다룸", DAILY_LIST_URL, "데일리 리포트에서 자세히"))
-    head = (f'<span style="display:block;color:#111;font-weight:700;">{_esc(c["topic"])}</span>'
-            f'<span data-pills="1" style="{PILL_ROW}">{"".join(pills)}</span>')
+    head = f'<span style="display:block;color:#111;font-weight:700;">{_esc(c["topic"])}</span>'   # 라벨 줄은 카드 맨 아래 (2026-10-23 사용자)
     syms = [t for t in c["tickers"] if "(비상장)" not in t]
     tick = f'<span style="{SUB_STYLE}">종목 : {_esc(" · ".join(syms[:8]))}</span>' if syms else ""
     return (f'{head}<span style="{DETAIL_STYLE}">{_esc(detail)}</span>'
-            f'<span style="display:block;line-height:{dk.LH_CARD};">{_stance_bar(c, n_today)}</span>{tick}')
+            f'<span style="display:block;line-height:{dk.LH_CARD};">{_stance_bar(c, n_today)}</span>{tick}'
+            f'<span data-pills="1" style="{PILL_ROW.replace("margin:4px 0 0;", "margin:10px 0 0;")}">{"".join(pills)}</span>')
 
 
 def sec_lead(m, narrative, d):
     """맨 앞 요약 한 줄 (검색 결과 설명문 자리 — data-seo-lead). 2026-10-23 사용자: 두 줄 → 한 줄, 영상 수 · 묶음 수 같은 내부 숫자는 뺐다."""
     top = m["clusters"][0] if m["clusters"] else None
+    _, mo, dd = d.split("-")
+    md = f"{int(mo)}월 {int(dd)}일 "   # 날짜는 제목 오른쪽이 아니라 요약 맨 앞 (2026-10-23 사용자: 상세 화면의 제목 날짜 삭제 · 요약에 연도 없이)
     # 머리 한 줄은 파이썬이 센 숫자로 — 모델이 "방송 5곳" 처럼 수를 지어냈다 (2026-10-22 세 번째 CI, 100 미만 정수는 fact_check 가 보지 않는다)
     if top:
         view = "엇갈립니다" if top["split"] else {"bullish": "긍정 쪽입니다", "bearish": "부정 쪽입니다"}.get(max(top["stances"], key=top["stances"].get), "중립입니다")
-        first = f"밤사이 미국 방송 {top['n_channels']}곳이 '{top['topic']}'{_obj(top['topic'])} 가장 많이 다뤘고, 시각은 {view}."
+        first = f"{md}밤사이 미국 방송 {top['n_channels']}곳이 '{top['topic']}'{_obj(top['topic'])} 가장 많이 다뤘고, 시각은 {view}."
     else:
-        _, mo, dd = d.split("-")
-        first = f"{int(mo)}월 {int(dd)}일 밤사이 미국 방송이 다룬 이슈입니다."
+        first = f"{md}밤사이 미국 방송이 다룬 이슈입니다."
     # data-lead: 홈 카드가 이 머리 구획(다음 h2 전까지 — 이슈 카드 포함)을 읽는다. 이슈 구획 제목을 없앴기 때문 (2026-10-23)
     # data-title-back: 테마가 글 제목 왼쪽에 홈으로 가는 네모 화살표를 붙인다 (인물 발언 상세와 같은 모양, 2026-10-23 사용자)
     out = f'<p data-seo-lead="1" data-lead="1" data-title-back="/" data-title-back-label="홈" style="{dk.SEO_LEAD}">{_esc(first)}</p>'
@@ -143,9 +140,9 @@ def _kr_label(k):
 
 
 # 한국장 소식 · 장 초반에 이어 볼 것 = 홈 '주요 뉴스' 기사와 같은 모양 (2026-10-23 사용자: "카드 말고 구분선, 내용 간격 동일, 라벨은 내용 아래,
-# 출처는 라벨이 아니라 주요 뉴스처럼 글자로"). 값은 alphaflow-home.html .news-item · .news-sum · .news-labels · .news-sub 와 같다
-NEWS_LI = "margin:0;padding:20px 0 25px;border-top:1px solid #E2E8F0;font-size:18px;line-height:34px;color:#111;word-break:keep-all;"
-NEWS_LI_FIRST = "margin:0;padding:2px 0 25px;font-size:18px;line-height:34px;color:#111;word-break:keep-all;"
+# 출처는 라벨이 아니라 주요 뉴스처럼 글자로"). 좌우 13px = 이슈 카드 안 글자의 시작선(테두리 1 + 안쪽 12)에 맞춤 (2026-10-23 사용자). 나머지 값은 alphaflow-home.html .news-item · .news-sum · .news-labels · .news-sub 와 같다
+NEWS_LI = "margin:0;padding:20px 13px 25px;border-top:1px solid #E2E8F0;font-size:18px;line-height:34px;color:#111;word-break:keep-all;"
+NEWS_LI_FIRST = "margin:0;padding:2px 13px 25px;font-size:18px;line-height:34px;color:#111;word-break:keep-all;"
 NEWS_SUM = "display:block;margin-top:4px;font-size:16px;line-height:26px;font-weight:400;color:#333;word-break:keep-all;"
 NEWS_LABELS = "display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin-top:8px;line-height:20px;"
 NEWS_SUB = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};margin-left:3px;"   # 라벨 사이 3 + 3 = 홈 뉴스의 라벨 ~ 출처 6px
@@ -162,7 +159,12 @@ def _news_row(label, k):
     pills = ([dk.pill(label, bare=True)] if label else []) + [dk.pill(config.STANCE_KO.get(k["stance"], "중립"), STANCE_PILL.get(k["stance"], "neutral"), bare=True)]
     if k.get("surprise") in (True, "surprise"):
         pills.append(dk.pill("예상 밖", "uncertain", bare=True))
-    src = f'<span style="{NEWS_SUB}">{_esc(_short(k.get("channel", "")))}</span>'
+    ch = _esc(_short(k.get("channel", "")))
+    if url:   # 출처 글자 = 그 영상 링크 (끝 아이콘은 테마 CSS, 2026-10-23 사용자)
+        src = (f'<a href="{_esc(url)}" target="_blank" rel="noopener" data-trhelp="skip" aria-label="{ch} 영상 보기" '
+               f'style="{NEWS_SUB}text-decoration:none;white-space:nowrap;">{ch}</a>')
+    else:
+        src = f'<span style="{NEWS_SUB}">{ch}</span>'
     return f'{title}{note}<span data-pills="1" style="{NEWS_LABELS}">{"".join(pills)}{src}</span>'
 
 
@@ -175,12 +177,15 @@ def sec_korea(m):
     return _news_list([_news_row(_kr_label(k), k) for k in m["korea"]])
 
 
+ALIGN_PX = 13   # 구획 제목 · 목록 · 종목 글 · 출처의 왼쪽 시작선 = 이슈 카드 안 글자 (테두리 1 + 안쪽 12, 2026-10-23 사용자)
+
+
 def sec_tickers(m):
     if not m["tickers"]:
         return ""
     txt = " · ".join(f"{t['sym']}({t['n']})" for t in m["tickers"])
-    return (f'<p style="margin:0 0 8px;color:#333;word-break:keep-all;">{_esc(txt)}</p>'
-            f'<p style="margin:0;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">괄호는 언급한 영상 수. 언급 사실만 적으며 종목 의견이 아닙니다.</p>')
+    return (f'<p style="margin:0 0 8px;padding:0 {ALIGN_PX}px;color:#333;word-break:keep-all;">{_esc(txt)}</p>'
+            f'<p style="margin:0;padding:0 {ALIGN_PX}px;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">괄호는 언급한 영상 수. 언급 사실만 적으며 종목 의견이 아닙니다.</p>')
 
 
 def sec_required(m):
@@ -207,11 +212,11 @@ def sec_sources(m, model=None):
                   for s in m["sources"])
     # 모델 이름은 build_body 의 fix_colons 뒤에 넣는다 — `groq:openai/…` 의 콜론이 띄어지지 않게 (AI_MODEL_SLOT)
     ai = f'<span data-ai-model="1" style="font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:400;color:{dk.NOTE};">AI 서술 · {AI_MODEL_SLOT}</span>' if model else ""
-    summary = (f'<summary aria-label="출처 영상 {len(m["sources"])}개 열고 닫기" style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;margin:28px 0 11px;">'
+    summary = (f'<summary aria-label="출처 영상 {len(m["sources"])}개 열고 닫기" style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;margin:28px 0 11px;padding-left:{ALIGN_PX}px;">'
                f'<span style="color:#111;font-size:{dk.H2_SIZE};line-height:{dk.LH_H2};font-weight:700;">출처</span>'
                f'<span style="{CHEV_BOX}">{dk.ACC_CHEV}</span>{ai}</summary>')
     return (f'<details data-acc="1" data-sources="1">{summary}'
-            f'<ul style="margin:0 0 8px;padding:0 0 0 2px;list-style:none;font-size:{dk.TINY};line-height:{dk.LH_TINY};">{lis}</ul></details>')
+            f'<ul style="margin:0 0 8px;padding:0 0 0 {ALIGN_PX + 2}px;list-style:none;font-size:{dk.TINY};line-height:{dk.LH_TINY};">{lis}</ul></details>')
 
 
 def build_body(m, narrative, d):
@@ -221,16 +226,17 @@ def build_body(m, narrative, d):
         parts.append(issues)   # 구획 제목 · 안내 없이 요약 바로 아래 (2026-10-23 사용자: "방송이 본 이슈 · 방송 · 영상 수가 많은 순" 삭제)
     korea = sec_korea(m)
     if korea:
-        parts.append(dk.section("한국장에 영향을 줄 만한 소식", korea, line=False))   # 옛 제목 "한국 연결" · 제목 아래 구분선 없음 (2026-10-23 사용자)
+        parts.append(dk.section("한국장에 영향을 줄 만한 소식", korea, line=True))   # 옛 제목 "한국 연결" · 제목 아래 구분선 (2026-10-23 사용자)
     tick = sec_tickers(m)
     if tick:
         parts.append(dk.section("방송에서 언급된 종목", tick))
     req = sec_required(m)
     if req and m["phase"] >= 2:
-        parts.append(dk.section("장 초반에 이어 볼 것", req, summary="Mad Money · 증시각도기 · 당잠사"))
+        parts.append(dk.section("장 초반에 이어 볼 것", req))   # 옆 안내(채널 이름) 삭제 (2026-10-23 사용자)
     parts.append(sec_sources(m, (narrative or {}).get("model")))
     parts.append(dk.WRAP_CLOSE)
-    return dk.fix_colons(dk.formal("\n".join(parts))).replace(AI_MODEL_SLOT, _esc((narrative or {}).get("model") or ""))
+    html = dk.align_titles("\n".join(parts), ALIGN_PX)   # 구획 제목도 같은 시작선
+    return dk.fix_colons(dk.formal(html)).replace(AI_MODEL_SLOT, _esc((narrative or {}).get("model") or ""))
 
 
 def render(media_path=None, narrative_path=None, output_dir=None):

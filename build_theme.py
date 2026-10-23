@@ -157,11 +157,12 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   color: var(--ink);
 }
 .post-title a { color: inherit; }
+.post-title, .post-card-title { word-break: keep-all; overflow-wrap: break-word; }   /* 글 제목 · 목록 카드 제목도 낱말 단위 줄바꿈 (2026-10-23 사용자) */
 .post-title .title-logo { width: 32px; height: 32px; border-radius: 50%; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
 .title-badge { display: inline-flex; align-items: center; justify-content: center; background: #E2E8F0; color: #334155; font-weight: 700; font-size: 13px; line-height: 1; }   /* 2026-10-21: 로고 핫링크 대신 티커 두 글자 배지 (운영지침 4-6) */
 .post-card-title .title-logo { width: 24px; height: 24px; border-radius: 50%; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 목록 카드 제목 앞 로고 (2026-10-22) */
 .post-card-title .title-badge { width: 24px; height: 24px; border-radius: 50%; margin-right: 5px; vertical-align: -5px; font-size: 11px; }
-@media (max-width: 680px) { .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } .post-title .title-badge { font-size: 11px; } }
+@media (max-width: 680px) { .post-title { --logo-size: 26px; } .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } .post-title .title-badge { font-size: 11px; } }
 /* 글 제목 끝의 날짜는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다.
    날짜는 오른쪽 정렬 (2026-10-18 사용자: "글 제목에 날짜는 우측 정렬하고 기호는 삭제") — 목록 카드는 제목 줄 오른쪽 끝, 좁으면 다음 줄 오른쪽 */
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
@@ -173,8 +174,11 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title > .post-title-date, .post-title a > .post-title-date { margin-left: auto; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
 /* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
    날짜 · 버튼 둘 다 오른쪽 끝 (2026-10-18 사용자: 날짜 우측 정렬) — 제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄 오른쪽 */
-.post-title:has(.post-title-meta) { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; }
-.post-title-meta { flex: 1 0 auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
+.post-title:has(.post-title-meta) { display: flex; flex-wrap: nowrap; align-items: center; column-gap: 8px; }   /* 한 줄 고정 — 긴 제목은 글자 칸 안에서 줄바꿈, 공유 버튼은 오른쪽 끝 (2026-10-23 사용자) */
+.post-title-text { flex: 1 1 auto; min-width: 0; display: flex; align-items: flex-start; gap: 5px; }   /* 로고(왼쪽 따로) + 글자 칸 — 줄바꿈된 둘째 줄은 로고 아래가 아니라 첫 글자 선에 맞는다 (2026-10-23 사용자) */
+.post-title-label { flex: 1 1 auto; min-width: 0; }
+.post-title-text .title-logo { flex: none; margin-right: 0; vertical-align: top; margin-top: calc((1lh - var(--logo-size, 32px)) / 2); }   /* 로고는 첫 줄 글자 높이의 가운데에 — 가운데 정렬 아님 (2026-10-23 사용자) */
+.post-title-meta { flex: none; margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
 .post-title-meta .title-share { margin-left: 0; }
 .title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
   background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; cursor: pointer; }
@@ -189,7 +193,7 @@ body.item-view .main-content, body.item-view.no-dashboard .main-content { paddin
 body.item-view .post-outer-container { padding-top: 13px; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
-.post-body { font-size: 19px; line-height: 34px; color: #333; overflow-wrap: anywhere; }   /* 행간 px 정수 — 리포트 본문과 같은 34px (2026-10-12 사용자) */
+.post-body { font-size: 19px; line-height: 34px; color: #333; overflow-wrap: anywhere; word-break: keep-all; }   /* 줄바꿈은 낱말(띄어쓰기) 단위 — 한 글자씩 떨어지지 않게. 한 낱말이 줄보다 길 때만 글자 사이에서 끊는다 (2026-10-23 사용자: 모든 기사 제목 · 타이틀) */   /* 행간 px 정수 — 리포트 본문과 같은 34px (2026-10-12 사용자) */
 /* 데일리 문단: PC 는 문장마다 한 줄(data-sent 블록), 모바일은 문장이 이어 흐른다(아래 @media) — 좁은 화면에서 "니다." 만 남는 고아 줄 방지 (2026-10-16 사용자).
    keep-all 로 단어 중간에서 끊지 않고, text-wrap: pretty 로 마지막 줄이 너무 짧지 않게 (지원 브라우저만) */
 .post-body [data-para] { word-break: keep-all; text-wrap: pretty; }
@@ -247,7 +251,16 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .post-body [data-person].is-pressed, .post-body [data-person]:active { background-color: #EEF2F7; }
 /* 인물 발언 고정 머리 (2026-10-21 사용자): 글 제목을 네모 화살표와 함께 헤더 바로 아래 붙인다(top 은 JS 가 헤더 높이로), 아래 구분선, 본문만 스크롤.
    목록 화면 = 글 제목 · 화살표는 글 목록, 인물 화면 = 이름 · 직함 · 화살표는 목록으로. 글자 크기는 글 제목(.post-title) 그대로 */
-.pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 6px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
+/* 외부 링크 표시 (2026-10-23 사용자: 링크가 있으면 블로그 전체에 — 화살표만 있는 연하고 얇은 아이콘). 새 창 링크(target=_blank)의 글자 끝에 자동으로 붙는다.
+   그림 링크(확대) · 이미 아이콘이 든 링크 · 굵은 제목 링크(기사 · 영상 제목 — 제목 자체가 링크, 2026-10-23 사용자)는 제외. 색은 링크 글자색을 따라가되 연하게 */
+.post-body a[target="_blank"]:not([data-zoom]):not([style*="font-weight:700"]):not(:has(img, svg))::after {
+  content: ""; display: inline-block; width: 11px; height: 11px; margin-left: 1px; vertical-align: 0; background: currentColor; opacity: .45;
+  -webkit-mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 11.5 11.5 4.5'/%3E%3Cpath d='M6 4.5h5.5V10'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.500 11.500 11.500 4.500'/%3E%3Cpath d='M6 4.500h5.500V10'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+/* 글 보기: 제목 오른쪽 날짜는 숨긴다 — 날짜는 요약글 맨 앞 (2026-10-23 사용자). 글 제목 자체(검색 결과 · 목록 · 탭 이름)에는 날짜가 그대로 있다 */
+body.item-view .post-title .post-title-date { display: none; }
+body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
+.pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
 .pr-sticky .post-title { margin: 0; min-width: 0; }
 .pr-sticky .post-title .pr-role { margin-left: 10px; font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }
 .pr-back { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111 !important; cursor: pointer; text-decoration: none; }   /* 네모 박스 안 화살표 — 공식 접기 버튼과 같은 상자 */
@@ -256,7 +269,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .pr-sticky .post-title { flex: 1 1 auto; }   /* 날짜가 든 제목(미디어 데일리, 2026-10-23)도 날짜는 오른쪽 끝 — 가이드라인 3-1 */
 .pr-sticky .post-title .post-title-date, .pr-sticky .post-title .post-title-meta { margin-left: auto; }
 .pr-sticky .post-title .pr-photo { flex: none; width: 36px; height: 36px; margin-right: 10px; border-radius: 50%; object-fit: cover; background: #F1F5F9; border: 1px solid #E2E8F0; }   /* 상세 제목 앞 공직자 얼굴 */
-@media (max-width: 680px) { .pr-sticky { background: var(--bg); padding-top: 4px; } .pr-sticky .post-title .pr-role { font-size: 14px; line-height: 20px; margin-left: 8px; } }
+@media (max-width: 680px) { .pr-sticky { background: var(--bg); padding-top: 2px; } .pr-sticky .post-title .pr-role { font-size: 14px; line-height: 20px; margin-left: 8px; } }
 .img-pop[hidden] { display: none; }
 .img-pop-head { position: relative; flex: none; display: flex; align-items: center; min-height: 56px; padding: 12px 60px 12px 16px; color: #fff; }
 .img-pop-title { font-size: 16px; line-height: 24px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

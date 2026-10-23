@@ -55,11 +55,11 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
         if kind == "row":
             _, name, value, note = item
             fits = _est_w(name, 17) + _est_w(f"({note})", 14) + _est_w(value, 17) <= INLINE_W
-            nt = f'<span style="display:block;margin-top:2px;font-size:{dk.TINY};line-height:20px;color:{NOTE};white-space:normal;">{esc(note)}</span>' if note else ""
+            nt = f'<span style="display:block;margin-top:2px;font-size:{dk.TINY};line-height:20px;color:{NOTE};white-space:normal;">{dk.tint(esc(note))}</span>' if note else ""
             if note and fits:
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-                        f'<span style="flex:none;white-space:nowrap;color:#111;">{esc(name)} <span style="font-size:{dk.TINY};color:{NOTE};">({esc(note)})</span></span>'
+                        f'<span style="flex:none;white-space:nowrap;color:#111;">{esc(name)} <span style="font-size:{dk.TINY};color:{NOTE};">({dk.tint(esc(note))})</span></span>'
                         f'<span style="flex:none;text-align:right;font-weight:700;white-space:nowrap;">{dk.tint(esc(value))}</span></span></li>')
             return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};">'
                     f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
@@ -73,11 +73,11 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
         return dk.dot_li(dk.label_text(text), size=3, color=col, lh=dk.LH_EMPH)
 
     lis = "".join(li(t) for t in lines)
-    state_html = (f'<span style="display:inline-flex;align-items:center;">{esc(state)}{_fold_btn(dk.lighten(bg), bd)}</span>' if fold else esc(state))
+    state_html = (f'<span style="display:inline-flex;align-items:center;">{dk.tint(esc(state))}{_fold_btn(dk.lighten(bg), bd)}</span>' if fold else dk.tint(esc(state)))   # 답 글자의 증감도 색 (가이드라인 3-3-1)
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'
             f'<span style="{"flex:1 1 auto;min-width:0;" if fold else dk.COL_L}font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">{_title_with_icon(title, dk.tip_icon(tip) if tip else "")}</span>'
             f'<span style="{"flex:none;white-space:nowrap;" if fold else dk.COL_R}font-weight:700;color:{color};">{state_html}</span></span> ')
-    body = (f'<div style="margin-top:{14 - dk.VP_EMPH}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'
+    body = (f'<div style="margin-top:{14 - dk.VP_EMPH + 3}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div>")
     inner = (f'<details data-acc="1"{" open" if opened else ""}><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{body}</details>' if fold else head + body)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px;margin:0 0 8px;line-height:{dk.LH_EMPH};">'

@@ -160,12 +160,12 @@ def sec_people(r, cards):
         if not items:
             continue
         shown, more = items[:MAX_SIGNALS_PER_PERSON], items[MAX_SIGNALS_PER_PERSON:]
-        wide = lambda html: html.replace('<ul style="margin:0 0 8px;padding:0;', '<ul style="margin:0 0 8px;padding:0 6px;', 1)   # 기사 목록만 좌우 +6 = 화면 가장자리에서 20 (홈 실시간 뉴스 기준선, 2026-10-21 사용자). 나머지는 14 그대로
-        page = [dk.sub_label(f"{p['name_ko']} ({p['title_ko']})"), wide(dk.item_rules(shown, sub=True))]
+        wide = lambda html: html   # 기사 목록 좌우 = 좌측 기준선 13px (item_rules indent, 구분선은 전체 폭) — 옛 +6(화면 가장자리 20) 규칙은 2026-10-23 사용자 기준선 13 으로 대체
+        page = [dk.sub_label(f"{p['name_ko']} ({p['title_ko']})"), wide(dk.item_rules(shown, sub=True, indent=dk.ALIGN_PX))]
         if more:
             # 펼친 목록의 첫 기사 위에도 구분선 (2026-10-21 사용자: 기사 영역은 더 보기를 펼쳐도 선이 이어져야 한다 — 표 카드와 다름).
             # 펼친 목록은 별도 ul 이라 첫 li 에 선이 없고, 펼침 안쪽 위 여백 8 도 선 위에 있으면 안 된다
-            ml = dk.item_rules(more, sub=True).replace(f"padding:2px 0 ", f"padding:{dk.RULE_GAP - dk.NEWS_VP}px 0 ", 1).replace("line-height:" + dk.LH_BODY + ";", "line-height:" + dk.LH_BODY + ";box-shadow:inset 0 1px 0 #E2E8F0;", 1)
+            ml = dk.item_rules(more, sub=True, indent=dk.ALIGN_PX).replace(f"padding:2px {dk.ALIGN_PX}px ", f"padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px ", 1).replace("line-height:" + dk.LH_BODY + ";", "line-height:" + dk.LH_BODY + ";box-shadow:inset 0 1px 0 #E2E8F0;", 1)
             fold = dk.fold(f"{p['name_ko']} 발언 {len(more)}건 더 보기", wide(ml)).replace("margin-top:8px;margin-bottom:8px;", "margin:0 0 8px;", 1)
             page.append(fold)
         out.append(f'<div data-person-page="{p["speaker"]}">{"".join(page)}</div>')
@@ -208,7 +208,7 @@ def sec_people_list(r):
         chev = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
                 '<path d="M6 4l4 4-4 4"/></svg>')
         rows.append(
-            f'<a href="#" data-person="{p["speaker"]}" data-name="{_esc(p["name_ko"])}" data-title="{_esc(p["title_ko"])}"{(' data-photo="' + PHOTO_BASE + _esc(_photos()[p["speaker"]]["file"]) + '"') if p["speaker"] in _photos() else ""} style="display:flex;align-items:center;gap:12px;padding:13px 4px;{"" if i == 0 else "border-top:1px solid #E2E8F0;"}'
+            f'<a href="#" data-person="{p["speaker"]}" data-name="{_esc(p["name_ko"])}" data-title="{_esc(p["title_ko"])}"{(' data-photo="' + PHOTO_BASE + _esc(_photos()[p["speaker"]]["file"]) + '"') if p["speaker"] in _photos() else ""} style="display:flex;align-items:center;gap:12px;padding:13px {dk.ALIGN_PX}px;{"" if i == 0 else "border-top:1px solid #E2E8F0;"}'
             f'color:#111;text-decoration:none;cursor:pointer;">'
             f'{_avatar(p)}'
             f'<span style="flex:1 1 auto;min-width:0;"><span style="display:block;font-size:{dk.SMALL};line-height:{dk.LH_CARD};font-weight:700;">{_esc(p["name_ko"])}</span>'
@@ -366,7 +366,7 @@ def build_body(r, n, d):
         sec_strips(r),
         dk.WRAP_CLOSE,
     ])
-    return dk.fix_colons(dk.formal(body))
+    return dk.fix_colons(dk.formal(dk.align_titles(body)))   # 카드 밖 구획 제목은 좌측 기준선 13px (2026-10-23 사용자)
 
 
 def render(radar_path=None, narrative_path=None, output_dir=None):
@@ -383,7 +383,7 @@ def render(radar_path=None, narrative_path=None, output_dir=None):
         return None
     d = today_kst()
     title = post_title(d)
-    body = dk.with_ai_model(build_body(r, n, d), (n or {}).get("model"))   # 글 끝 "AI 서술 · 모델명" (운영지침 D3-1d)
+    body = dk.with_ai_model(build_body(r, n, d), (n or {}).get("model"), dk.ALIGN_PX)   # 글 끝 "AI 서술 · 모델명" (운영지침 D3-1d)
     body_path = os.path.join(output_dir, "radar_body.html")
     with open(body_path, "w", encoding="utf-8") as f:
         f.write(body)

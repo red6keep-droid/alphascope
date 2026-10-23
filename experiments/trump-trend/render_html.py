@@ -208,7 +208,7 @@ def _flow_card(blk):
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px;margin:8px 0;line-height:{dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">발언 흐름 : <span style="color:{color};">{_esc(state)}</span></span></span> '
-            f'<div style="margin-top:{14 - dk.VP_EMPH}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
+            f'<div style="margin-top:{14 - dk.VP_EMPH + 3}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")
 
 
@@ -314,7 +314,7 @@ def _chart_card(rows, horizon, read=""):   # read = 그래프 읽는 법 — 제
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">시장의 반응 : <span style="color:{color};">{_esc(state)}</span></span>'
             f'{dk.tips_right(read) if read else ""}</span> '   # "시장의 반응: 평소와 같음" (2026-10-11 사용자). 자산 수는 설명 문장에
-            f'<div style="margin-top:{14 - dk.VP_EMPH}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
+            f'<div style="margin-top:{14 - dk.VP_EMPH + 3}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
 
 
@@ -481,7 +481,7 @@ def sec_narrative(n, key):
 
 def build_body(a, n):
     counts_aside, counts_note = sec_counts(a)
-    return dk.fix_colons("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지)
+    return dk.fix_colons(dk.align_titles("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지) · 카드 밖 제목은 좌측 기준선 13px (2026-10-23 사용자)
         dk.WRAP_OPEN,
         sec_seo_lead(a, report_title.today_kst()),   # 본문 첫 요소 = 검색 결과 요약 문단 (2026-10-18 검색 노출). 날짜는 글 제목과 같은 today_kst
         dk.section("급상승 주제", sec_trends(a), tab=TAB_TODAY, one_line=True,
@@ -497,7 +497,7 @@ def build_body(a, n):
         dk.section("관찰 종목", sec_why(a), tab=TAB_REACT),
         # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지)
         dk.WRAP_CLOSE,
-    ]))
+    ])))
 
 
 def render(analysis_path=None, narrative_path=None, output_dir=None):
@@ -512,7 +512,7 @@ def render(analysis_path=None, narrative_path=None, output_dir=None):
             n = json.load(f)
 
     title = report_title.post_title(report_title.today_kst())
-    body = dk.with_ai_model(build_body(a, n), (n or {}).get("model"))   # 글 끝 "AI 서술 · 모델명" (운영지침 D3-1d)
+    body = dk.with_ai_model(build_body(a, n), (n or {}).get("model"), dk.ALIGN_PX)   # 글 끝 "AI 서술 · 모델명" (운영지침 D3-1d)
     body_path = os.path.join(output_dir, "trump_report_body.html")
     preview_path = os.path.join(output_dir, "trump_report.html")
     with open(body_path, "w", encoding="utf-8") as f:
