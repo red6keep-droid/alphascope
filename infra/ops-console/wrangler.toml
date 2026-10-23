@@ -1,12 +1,13 @@
 name = "alphascope-ops-console"
 main = "src/index.js"
 compatibility_date = "2026-10-01"
+account_id = "a8718df7edc5f8f6ce88e75b6545e5cb"   # alphascope-cron-trigger 와 같은 계정
 workers_dev = true   # https://alphascope-ops-console.<계정>.workers.dev — 반드시 Cloudflare Access 를 켠다 (README 2단계)
 
 # 운영 기록 (experiments/ops_log.py 가 Cloudflare API 로 쓴다). id 는 `npx wrangler kv namespace create OPS_KV` 결과로 바꾼다
 [[kv_namespaces]]
 binding = "OPS_KV"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "900371a0791848eeacd9507de1e0e899"
 
 [vars]
 # Access 설정 — 비어 있으면 Worker 가 모든 요청을 거부한다 (README 2단계에서 채운다)
