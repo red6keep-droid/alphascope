@@ -1,11 +1,349 @@
 {
- "generated_at": "2026-10-22T22:17:47Z",
+ "generated_at": "2026-10-23T01:15:45Z",
  "window_hours": 24,
- "event_count": 50,
+ "event_count": 52,
  "people_count": 9,
  "only_reports": false,
  "pending": 0,
  "people": [
+  {
+   "speaker": "musk",
+   "name_ko": "일론 머스크",
+   "title_ko": "테슬라 CEO",
+   "group": "ceo",
+   "signals": [
+    {
+     "speaker": "musk",
+     "topic": "Deal",
+     "subtopic": "Investment",
+     "companies": [
+      "TSLA"
+     ],
+     "sectors": [
+      "Technology"
+     ],
+     "countries": [
+      "US"
+     ],
+     "intensity": 10,
+     "relevance": 3,
+     "issue": "CORP_EVENT",
+     "direction": "positive",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 5,
+     "first_at": "2026-10-22T16:26:00Z",
+     "last_at": "2026-10-22T22:28:07Z",
+     "lead": {
+      "id": "google_news:8ca347c4446576b7",
+      "title": "Exclusive / Elon Musk makes $1 billion investment in Ellison’s Skydance",
+      "quote": "Musk made a one billion dollar investment in Skydance.",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNWERQUl94Y19aQl9zLTU0aUMxUlViRllJbXlJVU5oUk5nLWN4Skpuckd4TURuYk9zWWhJT0ZDVDYxb1hMWFd2ekNpQXRTejB4Qm9vUEhaUk1qYXR5STQ1al80M0prOG9xZmlROE5RRTl5N2kyVEJDblNrVkFMeU5BazlGa3RZYVZKamVkdEFxTG1Gci1qdXRReEhzUVdGNllJQlE?oc=5",
+      "publisher": "Semafor",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [
+      {
+       "title": "Elon Musk reportedly invests $1bn in David Ellison’s Skydance",
+       "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPZC10ckcwMlpXbVRPZ044N3gzSm1fU2dLWFBKMTFQbHZyU3diSUMtRnNsS2xDd0RvNFJ1WG9zS2FEMlo0QWthaDQ3MTNlSi0zdGtvcEFLeGN4c2NlNFZkYkhWYkFQNnFEbDh4akllZ1BKblRmSDdpSV9LZ1NQRHFLOXlMU2FFRFJzWTdoNEsxcmlZOUVKblN3aHBn?oc=5",
+       "publisher": "The Guardian",
+       "kind": "secondary"
+      },
+      {
+       "title": "Elon Musk Reportedly Makes $1 Billion Bet on Skydance",
+       "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxQQXY2T3ZNT3pHbUJ3ajlTdjRCdXlBdXNVTTBoZW0xdV9GQ2c0RnRMdGF0Y0ltUnpTd1FnM3VoaUdrVGgwcGR5OHRmNmI5N2E0Rll2R1BYTXhXWmtkb0VVYTFWOXhJUm5VUVVVRFlhaXkwYU5xc3N0YWpibXF5TjhqMQ?oc=5",
+       "publisher": "boardroom.tv",
+       "kind": "secondary"
+      }
+     ],
+     "score": 45
+    },
+    {
+     "speaker": "musk",
+     "topic": "Product",
+     "subtopic": "Robotaxi",
+     "companies": [
+      "TSLA"
+     ],
+     "sectors": [
+      "Autos"
+     ],
+     "countries": [
+      "US"
+     ],
+     "intensity": 7,
+     "relevance": 3,
+     "issue": "OTHER",
+     "direction": "positive",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-22T17:39:34Z",
+     "last_at": "2026-10-22T17:39:34Z",
+     "lead": {
+      "id": "google_news:a8b78f1876a41188",
+      "title": "Elon Musk Says Tesla Cybercab Fleet in Austin Grows 10-Fold Since Launch: 5 outlets compared",
+      "quote": "Musk says Tesla Cybercab fleet in Austin grows 10-fold since launch.",
+      "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxNYlNDcTFoVUVOWjdpYVdRa1d4V2I0R3dkS0NaYS1CWnVKaGNLdzRKOUROay1WTmh0eFV5UmsyV1hZV0dHakw1cW9hR2dKZ2hhTmwzYnZBbUNRMm5rWTB4clg4dElYT3lMb1hudGFDbkJDbGY3eEpsUGZGMGJCQkd2QzNJSjF1aldXcHFheDRBT1ZkTmlhaE1jckxHcEVRamoxczM5Vk1SbUpVN1FudTdkaV9VVDlNQ1VzNVlqc0luVnpKTk5MNjdlVVM0UWRDZUFEVEZJc29GeG9Ib1dMZzFB?oc=5",
+      "publisher": "NewsCord",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 38
+    },
+    {
+     "speaker": "musk",
+     "topic": "Earnings",
+     "subtopic": "Sales Target",
+     "companies": [
+      "TSLA"
+     ],
+     "sectors": [
+      "Autos"
+     ],
+     "countries": [
+      "US"
+     ],
+     "intensity": 7,
+     "relevance": 3,
+     "issue": "GROWTH_JOBS",
+     "direction": "positive",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-22T17:42:52Z",
+     "last_at": "2026-10-22T17:42:52Z",
+     "lead": {
+      "id": "google_news:b757a52ef17843c1",
+      "title": "Elon Musk says Tesla will sell 5 million cars by 2030 — math says otherwise",
+      "quote": "Musk says Tesla will sell 5 million cars by 2030.",
+      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQa2ZBdU9PdDlrZkhKNDdGU1RPbExfb2RSVFdwM2VwRXhrcjlMcTJHZ0NTaGJfZ3VaR1pqbHpJOFhvTE54ekNSRFJ5aWlfY2c3NFgxVWYzcmFOdUpGMkgzbXd4SkxHeFp3bmM2dGtyUnFFaDJ6ZmFacEJaNkpTTElNY2dfbjlRa0UxQkhsOWxBM1RxaTd6Q2dpcmdIbTdfdw?oc=5",
+      "publisher": "The Verge",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 38
+    },
+    {
+     "speaker": "musk",
+     "topic": "Deal",
+     "subtopic": "Merger",
+     "companies": [
+      "TSLA"
+     ],
+     "sectors": [
+      "Autos"
+     ],
+     "countries": [
+      "US"
+     ],
+     "intensity": 5,
+     "relevance": 3,
+     "issue": "CORP_EVENT",
+     "direction": "positive",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-22T19:47:39Z",
+     "last_at": "2026-10-22T19:47:39Z",
+     "lead": {
+      "id": "google_news:0e2209af145dd666",
+      "title": "Elon Musk’s SpaceX reports a profit and he hints at a possible merger with Tesla",
+      "quote": "Musk’s SpaceX reports a profit and he hints at a possible merger with Tesla.",
+      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNaDAyRGZfWmhRbmtrd1R6MUFXcGdUREdCLUhpLVRTam01X0NGWmQ1MWFvLUN2RlluVUJfbFQ4VlI2YVRJZ1Q5WlJUa0dLQXFtWkhzZjJlRUFPczQ5bXNqMjBYN1k1NUROaU91YnJkWVg4b09zSFBFcXU5VzVfTld2SkV5UFZWeW11UjhoUGFCcUp6Rms5ejBMNHBlV1NVQms5aHlMSVF2WEVxSU9HR2JXWHh6UQ?oc=5",
+      "publisher": "WHEC.com",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 36
+    },
+    {
+     "speaker": "musk",
+     "topic": "Earnings",
+     "subtopic": "Revenue Forecast",
+     "companies": [],
+     "sectors": [
+      "Industrials"
+     ],
+     "countries": [],
+     "intensity": 7,
+     "relevance": 2,
+     "issue": "GROWTH_JOBS",
+     "direction": "positive",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 3,
+     "first_at": "2026-10-22T13:50:00Z",
+     "last_at": "2026-10-22T15:20:00Z",
+     "lead": {
+      "id": "google_news:3e75e41879414be8",
+      "title": "Elon Musk: SpaceX Revenue Could Hit \"Somewhere Between $500 Billion and a Trillion\" by 2027",
+      "quote": "Musk said SpaceX revenue could hit somewhere between $500 billion and a trillion by 2027.",
+      "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQNmFXcDhwY0trY25GbDBHTFVJSTlZa2xmWGtCWUV1a1AxRVdTVWp1WkZzM0szeXBhb3l5YkFUWUR2Xy1PU3N3Y0FxYUUtbnRIQW83dEs3aFoyNXBLTnJqclQzT2VrY2xnVERlell5cEdqNnQ3ajFvdWViQWdBTkZJT3pxTHhrWk5IS204Y1NKTVVJU3VkOHp2eTN3aDB6Uk1yV09FYVZWOUw3SDRaOFYxQS1WcDRyaDFqNDd5R2t1RWVLTTZucE1RTXV5QQ?oc=5",
+      "publisher": "24/7 Wall St.",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [
+      {
+       "title": "Elon Musk Predicts SpaceX Could Reach $1 Trillion in Annual Revenue Run Rate by Year-End 2027. Here's What Needs to Happen.",
+       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQczNLXzR6SVpEMTV6RExwRkdhNXNxWEdtZnFjb2lSa2FTWkNpdHFocHZHdHpSZTI4dEhyME40SkRBX251SGtEZ29QbkxEOGpkTllQNXJ5VTdubUxxbTFRbFEzckxFQlBmYW9xay1wMHFFcnhvTl9MZzJ0Rk05bHlMcWJ1TkZ3U0NGMkcyZGlmSFBpVXNrS1JwNkhHLXE?oc=5",
+       "publisher": "Yahoo Finance",
+       "kind": "secondary"
+      }
+     ],
+     "score": 30
+    },
+    {
+     "speaker": "musk",
+     "topic": "Product",
+     "subtopic": "Optimus",
+     "companies": [
+      "TSLA"
+     ],
+     "sectors": [
+      "Autos"
+     ],
+     "countries": [],
+     "intensity": 3,
+     "relevance": 2,
+     "issue": "OTHER",
+     "direction": "neutral",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 3,
+     "first_at": "2026-10-22T10:33:00Z",
+     "last_at": "2026-10-22T16:56:55Z",
+     "lead": {
+      "id": "google_news:43e197f5aba9944f",
+      "title": "Elon Musk says training Tesla's Optimus robot is like raising a toddler",
+      "quote": "Musk said that training Tesla's Optimus robot is like raising a toddler.",
+      "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNQWl4c2xjeEg3dnhZRDFEYkJVVDVXWTY0S09uTGp2bFVZNnBzRDBzOTJNZmc5TkdIV1RQYXg0cm5EM2hDdGhiV2hQRVRaamE4RkdiZmJSYUhSUTljNnRmaXE5OGd1QWxGaUZsS19RcHhOU2N1aTFtUzVPdDAwUXNrS0s3dm9VbXQzZUFBYmtTanI3MDFq?oc=5",
+      "publisher": "Business Insider",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [
+      {
+       "title": "Elon Musk Hints at Exciting New Capabilities for Tesla’s Optimus Robots",
+       "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNZE1LOWU4cjFfcFZnMGhzbXdselAySTdKVjZXcGQ3VjZGNkFKTWZYaEhLelp4dDZoOUlNaXZJeG5BUlFoLS0yUGtSWjR5Y1BGS3ZDaFU3NlUxVDFTUmpkZXRqV0YwMVVEeGd2TUJMSWRQcTkwVFBIWkxac01CajQxQTdXbk1fWU5LTE5sZjhKdHZ3TGM3Ym5JMThmM004ZHdET3NlcXB2MnVGbjljWHRz?oc=5",
+       "publisher": "Investopedia",
+       "kind": "secondary"
+      }
+     ],
+     "score": 26
+    },
+    {
+     "speaker": "musk",
+     "topic": "Industry View",
+     "subtopic": "Market Share",
+     "companies": [
+      "TSLA"
+     ],
+     "sectors": [
+      "Autos"
+     ],
+     "countries": [],
+     "intensity": 4,
+     "relevance": 2,
+     "issue": "GROWTH_JOBS",
+     "direction": "positive",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 2,
+     "first_at": "2026-10-22T14:33:00Z",
+     "last_at": "2026-10-22T14:33:00Z",
+     "lead": {
+      "id": "google_news:bcef50179068ac83",
+      "title": "Elon Musk: Tesla Will End Up With \"a Majority of All Passenger Miles on Earth\"",
+      "quote": "Musk said Tesla will end up with a majority of all passenger miles on Earth.",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQR2hxVlJ2VWhxei1uMlVvZklTWVZycVdvLUpLdDNjTmd3cGtxWG5JYUhzWnI4QXk0V2FrWk1DYmM1ZVFwcGJBYlVka1FMbFN1dVNQYUg3bW9vaGd1emlQV2pTWHZiQVREemptQ1hkQ2RjOHMyRTJoenNVdDJ2c1BrZW95Y0QzdDNhTllnbTJidlJ2MHFfc1JjZkpCWkttZ2JiUWZuQ2pialBJRWFsa3RUYjNzWUZvdlFuQXpj?oc=5",
+      "publisher": "24/7 Wall St.",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 26
+    },
+    {
+     "speaker": "musk",
+     "topic": "Product",
+     "subtopic": "Algorithm Update",
+     "companies": [
+      "X"
+     ],
+     "sectors": [
+      "Technology"
+     ],
+     "countries": [
+      "US"
+     ],
+     "intensity": 5,
+     "relevance": 2,
+     "issue": "OTHER",
+     "direction": "neutral",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-22T21:20:00Z",
+     "last_at": "2026-10-22T21:20:00Z",
+     "lead": {
+      "id": "google_news:6f22d11160ba5f91",
+      "title": "Elon Musk announces changes to X algorithm",
+      "quote": "Musk announced changes to the X algorithm.",
+      "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQaHBONjRROWVmeXptcEZ1QkVDQkZBa3I4MEQ3T2l2MUdYS2ZPSEcyTkxnblA0ZXJSNnF6aHZZUE1JY0hCMm41SGNZZklGY19JRngtbU1kNlpsOEZmeFhxY0ZoR2dFUzVnMk5ySkxPTDV0ekFSbEZ1cHUtczdreTliXzZUR3puN0tiZ1BYWllpWDdad05BZHJBUHg3Z0pGbk02LXZRMA?oc=5",
+      "publisher": "KVUE",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 26
+    },
+    {
+     "speaker": "musk",
+     "topic": "Product",
+     "subtopic": "Chip",
+     "companies": [],
+     "sectors": [
+      "Semiconductor"
+     ],
+     "countries": [],
+     "intensity": 4,
+     "relevance": 2,
+     "issue": "OTHER",
+     "direction": "positive",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-22T22:30:07Z",
+     "last_at": "2026-10-22T22:30:07Z",
+     "lead": {
+      "id": "google_news:b032d021afdda949",
+      "title": "Elon Musk Hints at SpaceX Chip Breakthroughs, Keeps Details Close: ‘Let’s Not Give Away the Shop’",
+      "quote": "Musk hints at SpaceX chip breakthroughs and keeps details close.",
+      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNMFpOY1VjTmNuaHJKQUszVjU5alBNVkI2NVBZRkR0TE1LYnAxWWJrd1V1TmRQOFFpVTE0dzRQcFNkdmpkVnl5ME5ES2lDMktyVGVZRUJQdVdPektPNHJkMU5oRHlGc3VlYzVYeDIzcWx5UHNXZ0dKN3cxV3M5ZGJvZnBEWE15bVNpdFRuS3V0cUhYQQ?oc=5",
+      "publisher": "Yahoo Finance",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 25
+    }
+   ]
+  },
   {
    "speaker": "huang",
    "name_ko": "젠슨 황",
@@ -81,39 +419,6 @@
     },
     {
      "speaker": "huang",
-     "topic": "Product",
-     "subtopic": "DSX Pod",
-     "companies": [
-      "NVDA"
-     ],
-     "sectors": [
-      "Technology"
-     ],
-     "countries": [],
-     "intensity": 9,
-     "relevance": 3,
-     "issue": "AI_CAPEX",
-     "direction": "positive",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 1,
-     "first_at": "2026-10-22T16:36:56Z",
-     "last_at": "2026-10-22T16:36:56Z",
-     "lead": {
-      "id": "google_news:9ac72381fd3a89da",
-      "title": "Nvidia Unveils DSX Pod as Huang Urges Nscale to Speed Up",
-      "quote": "Huang urged Nscale to speed up as Nvidia unveiled the DSX Pod.",
-      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNNEp0QTMwaktrODVGQjRlSmc4Z3FsbVdIbU9NaTNCMHU1UWpLbmw2MWJGUDI3NnRMSjFnX1otYkNDaFdScGNFaUJudnprTktLc29HdVBqVjloWUZEckFMSlVsZjBMLWt3S055QXhTbVNWdUxpaTMzSHFXYnMteERRRHpfRDBOQTNYMUFZR3N5dzVqQQ?oc=5",
-      "publisher": "Briefs Finance",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [],
-     "score": 40
-    },
-    {
-     "speaker": "huang",
      "topic": "Industry View",
      "subtopic": "Memory Chips",
      "companies": [
@@ -133,7 +438,7 @@
      "source_kind": "secondary",
      "attribution": "report",
      "n_primary": 0,
-     "n_reports": 4,
+     "n_reports": 5,
      "first_at": "2026-10-22T13:12:38Z",
      "last_at": "2026-10-22T19:10:00Z",
      "lead": {
@@ -165,7 +470,40 @@
        "kind": "secondary"
       }
      ],
-     "score": 39
+     "score": 40
+    },
+    {
+     "speaker": "huang",
+     "topic": "Product",
+     "subtopic": "DSX Pod",
+     "companies": [
+      "NVDA"
+     ],
+     "sectors": [
+      "Technology"
+     ],
+     "countries": [],
+     "intensity": 9,
+     "relevance": 3,
+     "issue": "AI_CAPEX",
+     "direction": "positive",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-22T16:36:56Z",
+     "last_at": "2026-10-22T16:36:56Z",
+     "lead": {
+      "id": "google_news:9ac72381fd3a89da",
+      "title": "Nvidia Unveils DSX Pod as Huang Urges Nscale to Speed Up",
+      "quote": "Huang urged Nscale to speed up as Nvidia unveiled the DSX Pod.",
+      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNNEp0QTMwaktrODVGQjRlSmc4Z3FsbVdIbU9NaTNCMHU1UWpLbmw2MWJGUDI3NnRMSjFnX1otYkNDaFdScGNFaUJudnprTktLc29HdVBqVjloWUZEckFMSlVsZjBMLWt3S055QXhTbVNWdUxpaTMzSHFXYnMteERRRHpfRDBOQTNYMUFZR3N5dzVqQQ?oc=5",
+      "publisher": "Briefs Finance",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 40
     },
     {
      "speaker": "huang",
@@ -475,37 +813,6 @@
     },
     {
      "speaker": "huang",
-     "topic": "Industry View",
-     "subtopic": "Physical AI",
-     "companies": [],
-     "sectors": [
-      "Technology"
-     ],
-     "countries": [],
-     "intensity": 4,
-     "relevance": 2,
-     "issue": "AI_CAPEX",
-     "direction": "neutral",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 1,
-     "first_at": "2026-10-21T22:25:32Z",
-     "last_at": "2026-10-21T22:25:32Z",
-     "lead": {
-      "id": "google_news:ea159632e24f17de",
-      "title": "Jensen Huang Says the Next Wave of AI Is Physical. Forget Nvidia and Tesla, I’d Bet on These 2 Mid-Cap Stocks Instead.",
-      "quote": "Huang said that the next wave of AI is physical.",
-      "url": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxNdFotaUFUdXRhWk5JLWRwTWd1WE5YT0M5VTItX2I5TGkzM21LQ2M2SHZjM2lQeVlhd2ZKTENkdlczVUlDZGlxbWdISVZkUXpvZWZCZ01LM1AyX1VFc0pqOUl2LUtpNzFvQk90bFR6cHBpUkFrM2xsUGVrdkowTjVoWWpITmdYZFJrYWF5OWxZV0tmVjZLdElxQ01JRkJwcV9UZ2NXYUdfNVhJazhfcW9HSTRxSFJQbVpaa3pEQ3hfQm1xSU1Ba3hPd0ZQNFdIa1ZVOUlvblYyaWdMeXE5aTBjMncybFVITHE5QWhQQ3NUVQ?oc=5",
-      "publisher": "Barchart.com",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [],
-     "score": 25
-    },
-    {
-     "speaker": "huang",
      "topic": "Regulation",
      "subtopic": "AI Safety",
      "companies": [],
@@ -598,6 +905,39 @@
       "quote": "Huang calls GPU-backed loans the big idea.",
       "url": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxNMDM0bDVmMjNRM2VZZm1CQzhaLWVRRFFXOUI2TXNVNDhFYzNBczBLcU53VnlYTDhjOWZORHBDWDBhOFhXUGlDNS1tOFBRLWs3QTRFdUNyaGd1dGs4emJDTVd6T3ZRSHUtQ1o3X01SY3cyMFBBUVVkZ0NlODFSZmlwLUFNSFZEY0t0WDluREtZdGJHbVFsTzA0OFd1THRTQjVKdlF6aDdoNmt4M1BhYVBXVlBJVl9PTkhwaUl3Q0dKb2J5bzVIVkJ5UU5jNlNzYzRvVzVjZXNOeGhLWnVURlJwOFNNVjVSR0E?oc=5",
       "publisher": "TIKR.com",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 25
+    },
+    {
+     "speaker": "huang",
+     "topic": "Industry View",
+     "subtopic": "AI Infrastructure",
+     "companies": [
+      "NVDA"
+     ],
+     "sectors": [
+      "Semiconductor"
+     ],
+     "countries": [],
+     "intensity": 4,
+     "relevance": 2,
+     "issue": "AI_CAPEX",
+     "direction": "positive",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-23T00:00:42Z",
+     "last_at": "2026-10-23T00:00:42Z",
+     "lead": {
+      "id": "google_news:e85d2ba38b0fe160",
+      "title": "Jensen Huang Says the Chips Are the Easy Part. Here Are 10 Reasons He Is Right (and 3 Where He Is Not)",
+      "quote": "Huang said the chips are the easy part.",
+      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE1SOGxPcldDeW1PbGJsaXNMa3ByMDU0Q3FoSkRXcjJVZUUxTEZaX1lzcFVNa085NmdrcXhqT09PZlpqOWNoSWJPMk9keThfalN2aXN2d1hiLUtrU2ZxTmhnX05rbXFzWG9ST2F2SFJ4eG1DWWhZZ3I4NmcycXBadw?oc=5",
+      "publisher": "Global Data Center Hub",
       "body": "",
       "sub_speaker": null
      },
@@ -738,9 +1078,9 @@
      "source_kind": "primary",
      "attribution": "office",
      "n_primary": 1,
-     "n_reports": 0,
+     "n_reports": 2,
      "first_at": "2026-10-22T19:32:11Z",
-     "last_at": "2026-10-22T19:32:11Z",
+     "last_at": "2026-10-22T22:03:25Z",
      "lead": {
       "id": "rss:eefb36df5a9a79f1",
       "title": "Adjusting Imports of Wind Turbines and Their Parts and Components into the United States",
@@ -750,8 +1090,15 @@
       "body": "Presidential Actions Search Select Category All News Briefings & Statements All Presidential Actions Executive Orders Nominations & Appointments Presidential Memoranda Proclamations Fact Sheets Releases Remarks Research All Briefings & Statements Presidential Actions All Executive Orders Nominations & Appointments Presidential Memoranda Proclamations Fact Sheets Releases Remarks Research BY THE PRESIDENT OF THE UNITED STATES OF AMERICA A PROCLAMATION 1. Within the past 90 days, the Secretary of Commerce (Secretary) transmitted to me a report on his investigation into the effects of imports of ",
       "sub_speaker": null
      },
-     "others": [],
-     "score": 37
+     "others": [
+      {
+       "title": "Trump says wind turbine imports threaten national security",
+       "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQbXBnbGtXTC1kdE85WW5oRjI1dW9WU1d6RGdZLXoyRS12V0l0NXZyT21Rcnk5eERXeDhacVlpSWRDNVc2VlhoOUJyWWFvOVV3ck5oeU45eXZHQVpCaklMLTh4QXJkcXVWX192VUQ3QmNEa2VyMVdWNUtTaGlYdm1qb3pNRGtDazdsdjFQb3lISUNBNDNEWkJjUkFhLXJXcGpjWndUaVJLaDJFaHRIQk9KZQ?oc=5",
+       "publisher": "Reuters",
+       "kind": "secondary"
+      }
+     ],
+     "score": 39
     },
     {
      "speaker": "trump",
@@ -806,7 +1153,7 @@
      "source_kind": "secondary",
      "attribution": "report",
      "n_primary": 0,
-     "n_reports": 3,
+     "n_reports": 4,
      "first_at": "2026-10-22T09:55:00Z",
      "last_at": "2026-10-22T09:55:00Z",
      "lead": {
@@ -819,7 +1166,7 @@
       "sub_speaker": null
      },
      "others": [],
-     "score": 26
+     "score": 27
     },
     {
      "speaker": "trump",
@@ -851,6 +1198,37 @@
      },
      "others": [],
      "score": 26
+    },
+    {
+     "speaker": "trump",
+     "topic": "Regulation",
+     "subtopic": "AI",
+     "companies": [],
+     "sectors": [
+      "Technology"
+     ],
+     "countries": [],
+     "intensity": 4,
+     "relevance": 2,
+     "issue": "REGULATION",
+     "direction": "neutral",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-22T05:56:29Z",
+     "last_at": "2026-10-22T05:56:29Z",
+     "lead": {
+      "id": "google_news:3db63f0d04bdb57e",
+      "title": "Trump says AI leaders signed a 'constitution' to police themselves - ABC News",
+      "quote": "Trump says AI leaders signed a 'constitution' to police themselves.",
+      "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxOanlhb3luTWNPUUpYbzhHV2tQdUF1dEVhN3d5VDJZdGwzRU1fT1Nsb2ZrNjRNeHNiem1HNTZaSzdQcU80MTVwSE44a0pvR1J3eTZIRG0yRjhnSWdVVjJuek1qTDVIOVAwTDZRRXlPR25xUU83NWkyd2swVWFsbE5ELVYyNzFCU1RETWY2S21pVlNBYVEw0gGaAUFVX3lxTE5qYlFleHFIUHFxbnkxTDVvZmx5RmI5SHRCY1Bnc0wxejY5emRkd2RsWDA4WUNndklFbG1qVzBBRkdreUtGZ0VLc3hlNWVHc3d1NHdiUzRKZkhNczhTZTBBSXdzZlZGM2ZTbndUaFlob0R4Q2pQT0t0aXlUTnhfYnJPQkRNWlVGOG80U240NHR1U3hnSVpCN0Y4QVE?oc=5",
+      "publisher": "ABC News - Breaking News, Latest News and Videos",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 25
     },
     {
      "speaker": "trump",
@@ -950,228 +1328,6 @@
    ]
   },
   {
-   "speaker": "musk",
-   "name_ko": "일론 머스크",
-   "title_ko": "테슬라 CEO",
-   "group": "ceo",
-   "signals": [
-    {
-     "speaker": "musk",
-     "topic": "Deal",
-     "subtopic": "Investment",
-     "companies": [
-      "TSLA"
-     ],
-     "sectors": [
-      "Technology"
-     ],
-     "countries": [],
-     "intensity": 10,
-     "relevance": 3,
-     "issue": "CORP_EVENT",
-     "direction": "positive",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 3,
-     "first_at": "2026-10-22T16:26:00Z",
-     "last_at": "2026-10-22T16:26:00Z",
-     "lead": {
-      "id": "google_news:8ca347c4446576b7",
-      "title": "Exclusive / Elon Musk makes $1 billion investment in Ellison’s Skydance",
-      "quote": "Musk made a one billion dollar investment in Skydance.",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNWERQUl94Y19aQl9zLTU0aUMxUlViRllJbXlJVU5oUk5nLWN4Skpuckd4TURuYk9zWWhJT0ZDVDYxb1hMWFd2ekNpQXRTejB4Qm9vUEhaUk1qYXR5STQ1al80M0prOG9xZmlROE5RRTl5N2kyVEJDblNrVkFMeU5BazlGa3RZYVZKamVkdEFxTG1Gci1qdXRReEhzUVdGNllJQlE?oc=5",
-      "publisher": "Semafor",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [],
-     "score": 43
-    },
-    {
-     "speaker": "musk",
-     "topic": "Earnings",
-     "subtopic": "Sales Target",
-     "companies": [
-      "TSLA"
-     ],
-     "sectors": [
-      "Autos"
-     ],
-     "countries": [
-      "US"
-     ],
-     "intensity": 7,
-     "relevance": 3,
-     "issue": "GROWTH_JOBS",
-     "direction": "positive",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 1,
-     "first_at": "2026-10-22T17:42:52Z",
-     "last_at": "2026-10-22T17:42:52Z",
-     "lead": {
-      "id": "google_news:b757a52ef17843c1",
-      "title": "Elon Musk says Tesla will sell 5 million cars by 2030 — math says otherwise",
-      "quote": "Musk says Tesla will sell 5 million cars by 2030.",
-      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQa2ZBdU9PdDlrZkhKNDdGU1RPbExfb2RSVFdwM2VwRXhrcjlMcTJHZ0NTaGJfZ3VaR1pqbHpJOFhvTE54ekNSRFJ5aWlfY2c3NFgxVWYzcmFOdUpGMkgzbXd4SkxHeFp3bmM2dGtyUnFFaDJ6ZmFacEJaNkpTTElNY2dfbjlRa0UxQkhsOWxBM1RxaTd6Q2dpcmdIbTdfdw?oc=5",
-      "publisher": "The Verge",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [],
-     "score": 38
-    },
-    {
-     "speaker": "musk",
-     "topic": "Earnings",
-     "subtopic": "Revenue Forecast",
-     "companies": [],
-     "sectors": [
-      "Industrials"
-     ],
-     "countries": [],
-     "intensity": 7,
-     "relevance": 2,
-     "issue": "GROWTH_JOBS",
-     "direction": "positive",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 3,
-     "first_at": "2026-10-22T13:50:00Z",
-     "last_at": "2026-10-22T15:20:00Z",
-     "lead": {
-      "id": "google_news:3e75e41879414be8",
-      "title": "Elon Musk: SpaceX Revenue Could Hit \"Somewhere Between $500 Billion and a Trillion\" by 2027",
-      "quote": "Musk said SpaceX revenue could hit somewhere between $500 billion and a trillion by 2027.",
-      "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQNmFXcDhwY0trY25GbDBHTFVJSTlZa2xmWGtCWUV1a1AxRVdTVWp1WkZzM0szeXBhb3l5YkFUWUR2Xy1PU3N3Y0FxYUUtbnRIQW83dEs3aFoyNXBLTnJqclQzT2VrY2xnVERlell5cEdqNnQ3ajFvdWViQWdBTkZJT3pxTHhrWk5IS204Y1NKTVVJU3VkOHp2eTN3aDB6Uk1yV09FYVZWOUw3SDRaOFYxQS1WcDRyaDFqNDd5R2t1RWVLTTZucE1RTXV5QQ?oc=5",
-      "publisher": "24/7 Wall St.",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [
-      {
-       "title": "Elon Musk Predicts SpaceX Could Reach $1 Trillion in Annual Revenue Run Rate by Year-End 2027. Here's What Needs to Happen.",
-       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQczNLXzR6SVpEMTV6RExwRkdhNXNxWEdtZnFjb2lSa2FTWkNpdHFocHZHdHpSZTI4dEhyME40SkRBX251SGtEZ29QbkxEOGpkTllQNXJ5VTdubUxxbTFRbFEzckxFQlBmYW9xay1wMHFFcnhvTl9MZzJ0Rk05bHlMcWJ1TkZ3U0NGMkcyZGlmSFBpVXNrS1JwNkhHLXE?oc=5",
-       "publisher": "Yahoo Finance",
-       "kind": "secondary"
-      }
-     ],
-     "score": 30
-    },
-    {
-     "speaker": "musk",
-     "topic": "Product",
-     "subtopic": "Optimus",
-     "companies": [
-      "TSLA"
-     ],
-     "sectors": [
-      "Autos"
-     ],
-     "countries": [],
-     "intensity": 3,
-     "relevance": 2,
-     "issue": "OTHER",
-     "direction": "neutral",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 3,
-     "first_at": "2026-10-22T10:33:00Z",
-     "last_at": "2026-10-22T16:56:55Z",
-     "lead": {
-      "id": "google_news:43e197f5aba9944f",
-      "title": "Elon Musk says training Tesla's Optimus robot is like raising a toddler",
-      "quote": "Musk said that training Tesla's Optimus robot is like raising a toddler.",
-      "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNQWl4c2xjeEg3dnhZRDFEYkJVVDVXWTY0S09uTGp2bFVZNnBzRDBzOTJNZmc5TkdIV1RQYXg0cm5EM2hDdGhiV2hQRVRaamE4RkdiZmJSYUhSUTljNnRmaXE5OGd1QWxGaUZsS19RcHhOU2N1aTFtUzVPdDAwUXNrS0s3dm9VbXQzZUFBYmtTanI3MDFq?oc=5",
-      "publisher": "Business Insider",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [
-      {
-       "title": "Elon Musk Hints at Exciting New Capabilities for Tesla’s Optimus Robots",
-       "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNZE1LOWU4cjFfcFZnMGhzbXdselAySTdKVjZXcGQ3VjZGNkFKTWZYaEhLelp4dDZoOUlNaXZJeG5BUlFoLS0yUGtSWjR5Y1BGS3ZDaFU3NlUxVDFTUmpkZXRqV0YwMVVEeGd2TUJMSWRQcTkwVFBIWkxac01CajQxQTdXbk1fWU5LTE5sZjhKdHZ3TGM3Ym5JMThmM004ZHdET3NlcXB2MnVGbjljWHRz?oc=5",
-       "publisher": "Investopedia",
-       "kind": "secondary"
-      }
-     ],
-     "score": 26
-    },
-    {
-     "speaker": "musk",
-     "topic": "Industry View",
-     "subtopic": "Market Share",
-     "companies": [
-      "TSLA"
-     ],
-     "sectors": [
-      "Autos"
-     ],
-     "countries": [],
-     "intensity": 4,
-     "relevance": 2,
-     "issue": "GROWTH_JOBS",
-     "direction": "positive",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 2,
-     "first_at": "2026-10-22T14:33:00Z",
-     "last_at": "2026-10-22T14:33:00Z",
-     "lead": {
-      "id": "google_news:bcef50179068ac83",
-      "title": "Elon Musk: Tesla Will End Up With \"a Majority of All Passenger Miles on Earth\"",
-      "quote": "Musk said Tesla will end up with a majority of all passenger miles on Earth.",
-      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQR2hxVlJ2VWhxei1uMlVvZklTWVZycVdvLUpLdDNjTmd3cGtxWG5JYUhzWnI4QXk0V2FrWk1DYmM1ZVFwcGJBYlVka1FMbFN1dVNQYUg3bW9vaGd1emlQV2pTWHZiQVREemptQ1hkQ2RjOHMyRTJoenNVdDJ2c1BrZW95Y0QzdDNhTllnbTJidlJ2MHFfc1JjZkpCWkttZ2JiUWZuQ2pialBJRWFsa3RUYjNzWUZvdlFuQXpj?oc=5",
-      "publisher": "24/7 Wall St.",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [],
-     "score": 26
-    },
-    {
-     "speaker": "musk",
-     "topic": "Product",
-     "subtopic": "Algorithm Update",
-     "companies": [
-      "X"
-     ],
-     "sectors": [
-      "Technology"
-     ],
-     "countries": [
-      "US"
-     ],
-     "intensity": 5,
-     "relevance": 2,
-     "issue": "OTHER",
-     "direction": "neutral",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 1,
-     "first_at": "2026-10-22T21:20:00Z",
-     "last_at": "2026-10-22T21:20:00Z",
-     "lead": {
-      "id": "google_news:6f22d11160ba5f91",
-      "title": "Elon Musk announces changes to X algorithm",
-      "quote": "Musk announced changes to the X algorithm.",
-      "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQaHBONjRROWVmeXptcEZ1QkVDQkZBa3I4MEQ3T2l2MUdYS2ZPSEcyTkxnblA0ZXJSNnF6aHZZUE1JY0hCMm41SGNZZklGY19JRngtbU1kNlpsOEZmeFhxY0ZoR2dFUzVnMk5ySkxPTDV0ekFSbEZ1cHUtczdreTliXzZUR3puN0tiZ1BYWllpWDdad05BZHJBUHg3Z0pGbk02LXZRMA?oc=5",
-      "publisher": "KVUE",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [],
-     "score": 26
-    }
-   ]
-  },
-  {
    "speaker": "wood",
    "name_ko": "캐시 우드",
    "title_ko": "ARK 대표",
@@ -1182,22 +1338,11 @@
      "topic": "Position",
      "subtopic": "",
      "companies": [
-      "IAM",
-      "ISRG",
-      "LUNR",
-      "NFLX",
-      "OKLO",
-      "PACB",
-      "SCTX",
-      "XE",
       "ACHR",
       "JOBY"
      ],
      "sectors": [
       "Technology",
-      "Healthcare",
-      "Energy",
-      "Consumer",
       "Autos"
      ],
      "countries": [
@@ -1207,19 +1352,19 @@
      "relevance": 3,
      "issue": "INVESTOR_CALLS",
      "direction": "positive",
-     "source_kind": "primary",
-     "attribution": "trade",
-     "n_primary": 1,
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
      "n_reports": 2,
-     "first_at": "2026-10-21T23:59:00Z",
+     "first_at": "2026-10-22T16:13:00Z",
      "last_at": "2026-10-22T20:00:53Z",
      "lead": {
-      "id": "ark_trades:a34ab7f2da3efc03",
-      "title": "ARK trades 2026-10-21: buy IAM, ISRG, LUNR, NFLX, OKLO, PACB, SCTX, XE / sell AMZN, DKNG, ESLT, PLTR, PSNL, SHOP, TER",
-      "quote": null,
-      "url": "https://ark-funds.com/trade-notifications#2026-10-21",
-      "publisher": "arkfunds.io",
-      "body": "ARKG Buy SCTX 199,698 shares (0.1804% of ETF)\nARKQ Buy ISRG 6,411 shares (0.15% of ETF)\nARKQ Sell ESLT 3,378 shares (0.1402% of ETF)\nARKG Sell PSNL 182,507 shares (0.1348% of ETF)\nARKX Buy XE 66,146 shares (0.1017% of ETF)\nARKQ Sell TER 5,222 shares (0.101% of ETF)\nARKQ Buy XE 134,201 shares (0.0813% of ETF)\nARKX Buy LUNR 43,539 shares (0.0676% of ETF)\nARKW Buy NFLX 18,783 shares (0.0673% of ETF)\nARKQ Buy OKLO 42,230 shares (0.0653% of ETF)\nARKW Sell SHOP 6,416 shares (0.0611% of ETF)\nARKX Sell ESLT 379 shares (0.0399% of ETF)\nARKK Sell SHOP 10,637 shares (0.0299% of ETF)\nARKG Buy IAM 18,936 s",
+      "id": "google_news:b51d9802c6a072e9",
+      "title": "Cathie Wood Buys $16.2M of Archer Aviation and Joby Stocks Today — Here’s What Wall Street Sees Next",
+      "quote": "Cathie Wood buys $16.2M of Archer Aviation and Joby stocks.",
+      "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPX2xWaXJNakZFNUdaTzZLZFBMS19sRVBpWVI0N21Od2h5M1NSenBVbTNLMG14R3dHWWNqX2h4UElyMnpGQkNiaWpiUnFsSEkteUNhcXlYLVo2S3dQbE9fcXlOMHk2Z0M4bVJ2TUw0VERmZS1ZckFJbVVOeUh0Z3dDRGxOeE41MVdaQWMwcTZ5WVFPU3BkeXNmRjl3MnVESnVEcms0R3ZPc2hpWnUzT3hMQl9SQm9RU3NrT056U3B1NEdYMXRw?oc=5",
+      "publisher": "TipRanks",
+      "body": "",
       "sub_speaker": null
      },
      "others": [
@@ -1227,12 +1372,6 @@
        "title": "Cathie Wood sells $16 million of surging tech stock",
        "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNRVFoT1c5dFJGZ0VuQU1TdFR1VFdQdVRRbm9OQ0EwZnRzZ2V5ZDNXY2szYzFMMDRsMERGVkR3MnZsWElBTnNYN05jeDNOOVRLdG4yd3V0VG1YZEVscUU1cnlIQVYzRzJqeExpLVI4WnQ1WEswOWhlaDdfS3RoZzdWSldxaGI5WldPQ19qeWRzYzJXbTlFSkZvQ2staEtqMl9ZOGhQZU5oUW4xSms?oc=5",
        "publisher": "TheStreet",
-       "kind": "secondary"
-      },
-      {
-       "title": "Cathie Wood Buys $16.2M of Archer Aviation and Joby Stocks Today — Here’s What Wall Street Sees Next",
-       "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPX2xWaXJNakZFNUdaTzZLZFBMS19sRVBpWVI0N21Od2h5M1NSenBVbTNLMG14R3dHWWNqX2h4UElyMnpGQkNiaWpiUnFsSEkteUNhcXlYLVo2S3dQbE9fcXlOMHk2Z0M4bVJ2TUw0VERmZS1ZckFJbVVOeUh0Z3dDRGxOeE41MVdaQWMwcTZ5WVFPU3BkeXNmRjl3MnVESnVEcms0R3ZPc2hpWnUzT3hMQl9SQm9RU3NrT056U3B1NEdYMXRw?oc=5",
-       "publisher": "TipRanks",
        "kind": "secondary"
       }
      ],
@@ -1356,88 +1495,26 @@
      "attribution": "report",
      "n_primary": 0,
      "n_reports": 2,
-     "first_at": "2026-10-21T22:34:00Z",
-     "last_at": "2026-10-22T13:21:18Z",
+     "first_at": "2026-10-22T13:21:18Z",
+     "last_at": "2026-10-22T17:41:48Z",
      "lead": {
-      "id": "google_news:dfd87b79c1024451",
-      "title": "U.S. Treasury secretary says energy prices will drop once Iran war ends",
-      "quote": "Bessent said energy prices will drop once the Iran war ends.",
-      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPS1hoSm94Um5sSDk3eFpkaDVMQldKMzJQV090M3hrekNzcGlHeTdHVEpTYXA0TzQ0dFR0VHdIWXZYOEMtZGVfQjhDeWFmRURZQmlaLTNMclJhQXJHMERHYkxnT3BudG5XeTFCekFJX3NPUC0xbDNOV2Zha2pOVjRJQVVmdnNoSXE4NTI1MERYQ3FQalBjbzZINDZqNWVHT3lZbjYyM0tmX3g0VXJLa0dWaHgwdlB4QQ?oc=5",
-      "publisher": "FOX Carolina News",
+      "id": "google_news:48d2f8893d186176",
+      "title": "Bessent Sees Oil as Low as $40 Post-Iran War, Lower Yields",
+      "quote": "Bessent sees oil falling as low as $40 post-Iran war alongside lower yields.",
+      "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPaDA5TDdJSGIyM3lYMDFIWVVTUVNJRmVtREJucEE3SGs5a2x1eTFOc0RSS2dxTXVlX0xBNWlwX09PMGdxeTNobm5jYnpMVUI0cUhVNVZlbEd0a2VQdi0yTGtVYmJoa1ByR2JjZ2dzU3JlZ1hhbXpVMkhxUlNfY0ptaWJyVVE4RldjUWFTRjlMYzc?oc=5",
+      "publisher": "EnergyNow.com",
       "body": "",
       "sub_speaker": null
      },
      "others": [
       {
-       "title": "Bessent Sees Oil as Low as $40 Post-Iran War, Lower Yields",
-       "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPaDA5TDdJSGIyM3lYMDFIWVVTUVNJRmVtREJucEE3SGs5a2x1eTFOc0RSS2dxTXVlX0xBNWlwX09PMGdxeTNobm5jYnpMVUI0cUhVNVZlbEd0a2VQdi0yTGtVYmJoa1ByR2JjZ2dzU3JlZ1hhbXpVMkhxUlNfY0ptaWJyVVE4RldjUWFTRjlMYzc?oc=5",
+       "title": "Bessent Says Hormuz Will Be ‘Worthless’ as Oil Bypasses It",
+       "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQMEpLUElQZzM0aUJWTnk4MUExZ0pPaFJZVUVjTWdOMHBrX0pnamJCNml0VXFsWnQ5bDloMV9nSFF0TkVxZVdlZFdGV1BrSkZES2JHaUVTc3BYTWVscGRNX2w5cERoX2ExRHo1Mi1aUXhXVFZvVkMxb1Izd1NYRl9KLVlZR3BXaU0wWl9ETXNvZGE?oc=5",
        "publisher": "EnergyNow.com",
        "kind": "secondary"
       }
      ],
      "score": 26
-    },
-    {
-     "speaker": "bessent",
-     "topic": "Regulation",
-     "subtopic": "Crypto",
-     "companies": [],
-     "sectors": [
-      "Crypto"
-     ],
-     "countries": [],
-     "intensity": 4,
-     "relevance": 2,
-     "issue": "REGULATION",
-     "direction": "positive",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 1,
-     "first_at": "2026-10-21T23:04:54Z",
-     "last_at": "2026-10-21T23:04:54Z",
-     "lead": {
-      "id": "google_news:b44d10e6d66edcca",
-      "title": "U.S. OCC finalises GENIUS Act rule; Bessent calls it a historic moment",
-      "quote": "Bessent called the rule a historic moment.",
-      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPeVdjMTA1b2lLM2h3OFZfb0RLVlNRMlFhdXpOZWFSSkVISlhFS0dET2NpYkZDa2xETWtfN0owSExLN3k0cUJfaDB2VTJtY2I1Zzl1Y3VHN2J4b2F1OS16WFZhZXJwZTA1ZkRmSTJCb1JZc2k2Y3oyRG5iTFplMGFtRnJFeDZlWVdBTkNvMHFCM2tlLTRIR1E5Z3Vvc0p3QTA2T2JyVVJOcTQ4dlFCM200NGFSWVN0X1J3?oc=5",
-      "publisher": "디지털투데이",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [],
-     "score": 25
-    },
-    {
-     "speaker": "bessent",
-     "topic": "Regulation",
-     "subtopic": "AI",
-     "companies": [],
-     "sectors": [
-      "Technology"
-     ],
-     "countries": [],
-     "intensity": 4,
-     "relevance": 2,
-     "issue": "AI_CAPEX",
-     "direction": "positive",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 1,
-     "first_at": "2026-10-22T01:05:00Z",
-     "last_at": "2026-10-22T01:05:00Z",
-     "lead": {
-      "id": "google_news:2698d2aeb082fe20",
-      "title": "Bessent Dismisses AI Bubble Talk at Closed-Door Event: Says No Systemic Problem, Cites Pets.com",
-      "quote": "Bessent dismissed AI bubble talk and cited Pets.com.",
-      "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTE1WR2xCaGhEYV9HOWNEeC1DS2xqUWVjbkM4czhnM0M3eFBwMng0cFhTT0FmN1dIRFNNTENWQXFpTG5KMTNTMklNb211SWxtVUs3TDVZYk53ZXhPMzhuQTFWTlZvSEFOODMtSWdpeXZBM0YyeUVvX0E?oc=5",
-      "publisher": "BigGo Finance",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [],
-     "score": 25
     }
    ]
   },
@@ -1741,54 +1818,6 @@
    ]
   },
   {
-   "speaker": "burry",
-   "name_ko": "마이클 버리",
-   "title_ko": "투자자",
-   "group": "investor",
-   "signals": [
-    {
-     "speaker": "burry",
-     "topic": "Macro Warning",
-     "subtopic": "AI Bubble",
-     "companies": [],
-     "sectors": [
-      "Technology"
-     ],
-     "countries": [
-      "US"
-     ],
-     "intensity": 6,
-     "relevance": 2,
-     "issue": "AI_CAPEX",
-     "direction": "negative",
-     "source_kind": "secondary",
-     "attribution": "report",
-     "n_primary": 0,
-     "n_reports": 2,
-     "first_at": "2026-10-22T01:11:11Z",
-     "last_at": "2026-10-22T20:12:46Z",
-     "lead": {
-      "id": "google_news:5c3daafa1f967645",
-      "title": "Michael Burry Says His Puts Give Him 'Far More Upside' In A Crash As He Pulls His AI Bubble Timeline Forward",
-      "quote": "Burry said his puts give him far more upside in a crash.",
-      "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNQzJpU19qR21TbDRWb09ZRkowUUxKOFNpLWl0ejBrY0lUUmktdVpOcC1NdnRCa20zamxDR09ZVzJTZ0pJQWhFbVEyZmVtczRlUHRnLWFQM0NWcG5MeGNveEFtUmZNb2hYT2ltLVpJZjEwX0ZrOUFkS2ozMmZoOS1ucG10T1ljTkRwYkVTcWNfZGpKMk82cFhxMmEtaHhoZlgzWUVoUWZmYVlWTC16aWxNN2dqN0RxYko5SjlidDJXWXJyNjFNVmUtdjl3WTVKd0YyRnBj?oc=5",
-      "publisher": "Stocktwits",
-      "body": "",
-      "sub_speaker": null
-     },
-     "others": [
-      {
-       "title": "Michael Burry Shares Chilling Song on AI: 'Watching Trillion-Dollar Monuments Become Obsolete'",
-       "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxQbXVVTEdkaGdoZzVlN3RiNVNoSEh2M2NET05pcFY2NUF2R2M4OFNoZUp5WmUzVEhza1hFQXZNWUNZZXNCTG03RVRQVVEyT0REU2tUNWd1QnRGNUltbWJyYXd2Z09FWWlQZXdhcFNiV3h5M3R0WERtd0hvNTJSYmpxX0VXbUJBVmJoYnp1OEN4LUY0a1VlWm9aREsyUWpHZXNjclJQelZZQmpITDhIRkRwaG1CMDRwZFJEMXFNVTZDQ0h1S01yVjdaa0FQc0tmRTlxRkxvc3VWSXFNX2o2?oc=5",
-       "publisher": "Benzinga",
-       "kind": "secondary"
-      }
-     ],
-     "score": 28
-    }
-   ]
-  },
-  {
    "speaker": "altman",
    "name_ko": "샘 올트먼",
    "title_ko": "OpenAI CEO",
@@ -1873,6 +1902,47 @@
      "score": 27
     }
    ]
+  },
+  {
+   "speaker": "burry",
+   "name_ko": "마이클 버리",
+   "title_ko": "투자자",
+   "group": "investor",
+   "signals": [
+    {
+     "speaker": "burry",
+     "topic": "Macro Warning",
+     "subtopic": "AI Bubble",
+     "companies": [],
+     "sectors": [
+      "Technology"
+     ],
+     "countries": [
+      "US"
+     ],
+     "intensity": 4,
+     "relevance": 2,
+     "issue": "AI_CAPEX",
+     "direction": "negative",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 2,
+     "first_at": "2026-10-22T20:12:46Z",
+     "last_at": "2026-10-22T20:12:46Z",
+     "lead": {
+      "id": "google_news:8e140f6dd51d2d48",
+      "title": "Michael Burry Shares Chilling Song on AI: 'Watching Trillion-Dollar Monuments Become Obsolete'",
+      "quote": "Burry shares a chilling song on AI about watching trillion-dollar monuments become obsolete.",
+      "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxQbXVVTEdkaGdoZzVlN3RiNVNoSEh2M2NET05pcFY2NUF2R2M4OFNoZUp5WmUzVEhza1hFQXZNWUNZZXNCTG03RVRQVVEyT0REU2tUNWd1QnRGNUltbWJyYXd2Z09FWWlQZXdhcFNiV3h5M3R0WERtd0hvNTJSYmpxX0VXbUJBVmJoYnp1OEN4LUY0a1VlWm9aREsyUWpHZXNjclJQelZZQmpITDhIRkRwaG1CMDRwZFJEMXFNVTZDQ0h1S01yVjdaa0FQc0tmRTlxRkxvc3VWSXFNX2o2?oc=5",
+      "publisher": "Benzinga",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 26
+    }
+   ]
   }
  ],
  "trend_changes": [
@@ -1880,7 +1950,7 @@
    "speaker": "huang",
    "name_ko": "젠슨 황",
    "topic": "Industry View",
-   "days7": 14,
+   "days7": 15,
    "prev7": 0
   },
   {
@@ -1891,17 +1961,10 @@
    "prev7": 0
   },
   {
-   "speaker": "bessent",
-   "name_ko": "스콧 베센트",
-   "topic": "Regulation",
-   "days7": 6,
-   "prev7": 0
-  },
-  {
    "speaker": "trump",
    "name_ko": "트럼프",
    "topic": "Regulation",
-   "days7": 5,
+   "days7": 6,
    "prev7": 0
   },
   {
@@ -1912,9 +1975,30 @@
    "prev7": 0
   },
   {
+   "speaker": "wood",
+   "name_ko": "캐시 우드",
+   "topic": "Position",
+   "days7": 4,
+   "prev7": 0
+  },
+  {
+   "speaker": "bessent",
+   "name_ko": "스콧 베센트",
+   "topic": "Regulation",
+   "days7": 4,
+   "prev7": 0
+  },
+  {
    "speaker": "ackman",
    "name_ko": "빌 애크먼",
    "topic": "Stock Call",
+   "days7": 4,
+   "prev7": 0
+  },
+  {
+   "speaker": "musk",
+   "name_ko": "일론 머스크",
+   "topic": "Product",
    "days7": 4,
    "prev7": 0
   },
@@ -1940,9 +2024,9 @@
    "prev7": 0
   },
   {
-   "speaker": "bessent",
-   "name_ko": "스콧 베센트",
-   "topic": "Energy",
+   "speaker": "trump",
+   "name_ko": "트럼프",
+   "topic": "Trade",
    "days7": 3,
    "prev7": 0
   },
@@ -1954,16 +2038,9 @@
    "prev7": 0
   },
   {
-   "speaker": "trump",
-   "name_ko": "트럼프",
-   "topic": "Trade",
-   "days7": 3,
-   "prev7": 0
-  },
-  {
-   "speaker": "wood",
-   "name_ko": "캐시 우드",
-   "topic": "Position",
+   "speaker": "bessent",
+   "name_ko": "스콧 베센트",
+   "topic": "Energy",
    "days7": 3,
    "prev7": 0
   },
@@ -1975,23 +2052,44 @@
    "prev7": 0
   },
   {
-   "speaker": "huang",
-   "name_ko": "젠슨 황",
-   "topic": "Deal",
-   "days7": 2,
-   "prev7": 0
-  },
-  {
    "speaker": "musk",
    "name_ko": "일론 머스크",
-   "topic": "Product",
-   "days7": 2,
+   "topic": "Deal",
+   "days7": 3,
    "prev7": 0
   },
   {
    "speaker": "musk",
    "name_ko": "일론 머스크",
    "topic": "Earnings",
+   "days7": 2,
+   "prev7": 0
+  },
+  {
+   "speaker": "huang",
+   "name_ko": "젠슨 황",
+   "topic": "Regulation",
+   "days7": 2,
+   "prev7": 0
+  },
+  {
+   "speaker": "lutnick",
+   "name_ko": "하워드 러트닉",
+   "topic": "Company",
+   "days7": 2,
+   "prev7": 0
+  },
+  {
+   "speaker": "burry",
+   "name_ko": "마이클 버리",
+   "topic": "Macro Warning",
+   "days7": 2,
+   "prev7": 0
+  },
+  {
+   "speaker": "huang",
+   "name_ko": "젠슨 황",
+   "topic": "Deal",
    "days7": 2,
    "prev7": 0
   },
@@ -2003,17 +2101,10 @@
    "prev7": 0
   },
   {
-   "speaker": "musk",
-   "name_ko": "일론 머스크",
-   "topic": "Deal",
-   "days7": 2,
-   "prev7": 0
-  },
-  {
-   "speaker": "huang",
-   "name_ko": "젠슨 황",
-   "topic": "Regulation",
-   "days7": 2,
+   "speaker": "ackman",
+   "name_ko": "빌 애크먼",
+   "topic": "Policy",
+   "days7": 1,
    "prev7": 0
   },
   {
@@ -2026,6 +2117,20 @@
   {
    "speaker": "bessent",
    "name_ko": "스콧 베센트",
+   "topic": "Trade",
+   "days7": 1,
+   "prev7": 0
+  },
+  {
+   "speaker": "lutnick",
+   "name_ko": "하워드 러트닉",
+   "topic": "Trade",
+   "days7": 1,
+   "prev7": 0
+  },
+  {
+   "speaker": "fed",
+   "name_ko": "연준",
    "topic": "Fed",
    "days7": 1,
    "prev7": 0
@@ -2033,14 +2138,7 @@
   {
    "speaker": "bessent",
    "name_ko": "스콧 베센트",
-   "topic": "Trade",
-   "days7": 1,
-   "prev7": 0
-  },
-  {
-   "speaker": "trump",
-   "name_ko": "트럼프",
-   "topic": "Other",
+   "topic": "Fed",
    "days7": 1,
    "prev7": 0
   },
@@ -2052,8 +2150,36 @@
    "prev7": 0
   },
   {
-   "speaker": "fed",
-   "name_ko": "연준",
+   "speaker": "trump",
+   "name_ko": "트럼프",
+   "topic": "Tax",
+   "days7": 1,
+   "prev7": 0
+  },
+  {
+   "speaker": "musk",
+   "name_ko": "일론 머스크",
+   "topic": "Industry View",
+   "days7": 1,
+   "prev7": 0
+  },
+  {
+   "speaker": "trump",
+   "name_ko": "트럼프",
+   "topic": "Other",
+   "days7": 1,
+   "prev7": 0
+  },
+  {
+   "speaker": "cramer",
+   "name_ko": "짐 크레이머",
+   "topic": "Stock Call",
+   "days7": 1,
+   "prev7": 0
+  },
+  {
+   "speaker": "wood",
+   "name_ko": "캐시 우드",
    "topic": "Fed",
    "days7": 1,
    "prev7": 0
@@ -2066,127 +2192,78 @@
    "prev7": 0
   },
   {
-   "speaker": "wood",
-   "name_ko": "캐시 우드",
-   "topic": "Fed",
-   "days7": 1,
-   "prev7": 0
-  },
-  {
-   "speaker": "burry",
-   "name_ko": "마이클 버리",
-   "topic": "Stock Call",
-   "days7": 1,
-   "prev7": 0
-  },
-  {
-   "speaker": "lutnick",
-   "name_ko": "하워드 러트닉",
-   "topic": "Trade",
-   "days7": 1,
-   "prev7": 0
-  },
-  {
-   "speaker": "trump",
-   "name_ko": "트럼프",
-   "topic": "Tax",
-   "days7": 1,
-   "prev7": 0
-  },
-  {
-   "speaker": "ackman",
-   "name_ko": "빌 애크먼",
-   "topic": "Policy",
-   "days7": 1,
-   "prev7": 0
-  },
-  {
-   "speaker": "lutnick",
-   "name_ko": "하워드 러트닉",
-   "topic": "Company",
-   "days7": 1,
-   "prev7": 0
-  },
-  {
-   "speaker": "cramer",
-   "name_ko": "짐 크레이머",
-   "topic": "Stock Call",
-   "days7": 1,
-   "prev7": 0
-  },
-  {
    "speaker": "musk",
    "name_ko": "일론 머스크",
-   "topic": "Industry View",
+   "topic": "Investment",
    "days7": 1,
    "prev7": 0
   },
   {
    "speaker": "burry",
    "name_ko": "마이클 버리",
-   "topic": "Macro Warning",
+   "topic": "Stock Call",
    "days7": 1,
    "prev7": 0
   }
  ],
  "market": null,
  "people_trend": {
-  "huang": {
-   "days7": 24,
+  "wood": {
+   "days7": 5,
    "prev7": 0
   },
   "bessent": {
-   "days7": 14,
-   "prev7": 0
-  },
-  "altman": {
-   "days7": 2,
-   "prev7": 0
-  },
-  "cramer": {
-   "days7": 4,
-   "prev7": 0
-  },
-  "musk": {
-   "days7": 7,
-   "prev7": 0
-  },
-  "burry": {
-   "days7": 3,
-   "prev7": 0
-  },
-  "ackman": {
-   "days7": 9,
-   "prev7": 0
-  },
-  "lutnick": {
-   "days7": 2,
-   "prev7": 0
-  },
-  "trump": {
-   "days7": 23,
+   "days7": 12,
    "prev7": 0
   },
   "fed": {
    "days7": 1,
    "prev7": 0
   },
-  "wood": {
+  "huang": {
+   "days7": 25,
+   "prev7": 0
+  },
+  "cramer": {
    "days7": 4,
+   "prev7": 0
+  },
+  "altman": {
+   "days7": 2,
+   "prev7": 0
+  },
+  "lutnick": {
+   "days7": 3,
+   "prev7": 0
+  },
+  "musk": {
+   "days7": 11,
+   "prev7": 0
+  },
+  "trump": {
+   "days7": 24,
+   "prev7": 0
+  },
+  "burry": {
+   "days7": 4,
+   "prev7": 0
+  },
+  "ackman": {
+   "days7": 9,
    "prev7": 0
   }
  },
  "topic_trend": [
   {
    "topic": "Industry View",
-   "days7": 17,
+   "days7": 18,
    "prev7": 0,
    "streak": 2,
    "speakers": [
     {
      "speaker": "huang",
      "name_ko": "젠슨 황",
-     "n": 14
+     "n": 15
     },
     {
      "speaker": "altman",
@@ -2202,19 +2279,19 @@
   },
   {
    "topic": "Regulation",
-   "days7": 13,
+   "days7": 12,
    "prev7": 0,
    "streak": 3,
    "speakers": [
     {
-     "speaker": "bessent",
-     "name_ko": "스콧 베센트",
+     "speaker": "trump",
+     "name_ko": "트럼프",
      "n": 6
     },
     {
-     "speaker": "trump",
-     "name_ko": "트럼프",
-     "n": 5
+     "speaker": "bessent",
+     "name_ko": "스콧 베센트",
+     "n": 4
     },
     {
      "speaker": "huang",
@@ -2243,7 +2320,7 @@
   },
   {
    "topic": "Product",
-   "days7": 7,
+   "days7": 9,
    "prev7": 0,
    "streak": 2,
    "speakers": [
@@ -2255,7 +2332,7 @@
     {
      "speaker": "musk",
      "name_ko": "일론 머스크",
-     "n": 2
+     "n": 4
     }
    ]
   },
@@ -2263,7 +2340,7 @@
    "topic": "Stock Call",
    "days7": 6,
    "prev7": 0,
-   "streak": 2,
+   "streak": 3,
    "speakers": [
     {
      "speaker": "ackman",
@@ -2271,13 +2348,13 @@
      "n": 4
     },
     {
-     "speaker": "burry",
-     "name_ko": "마이클 버리",
+     "speaker": "cramer",
+     "name_ko": "짐 크레이머",
      "n": 1
     },
     {
-     "speaker": "cramer",
-     "name_ko": "짐 크레이머",
+     "speaker": "burry",
+     "name_ko": "마이클 버리",
      "n": 1
     }
    ]
@@ -2324,10 +2401,28 @@
    ]
   },
   {
-   "topic": "Company",
-   "days7": 4,
+   "topic": "Deal",
+   "days7": 5,
    "prev7": 0,
-   "streak": 3,
+   "streak": 2,
+   "speakers": [
+    {
+     "speaker": "musk",
+     "name_ko": "일론 머스크",
+     "n": 3
+    },
+    {
+     "speaker": "huang",
+     "name_ko": "젠슨 황",
+     "n": 2
+    }
+   ]
+  },
+  {
+   "topic": "Company",
+   "days7": 5,
+   "prev7": 0,
+   "streak": 4,
    "speakers": [
     {
      "speaker": "trump",
@@ -2337,24 +2432,6 @@
     {
      "speaker": "lutnick",
      "name_ko": "하워드 러트닉",
-     "n": 1
-    }
-   ]
-  },
-  {
-   "topic": "Deal",
-   "days7": 4,
-   "prev7": 0,
-   "streak": 2,
-   "speakers": [
-    {
-     "speaker": "musk",
-     "name_ko": "일론 머스크",
-     "n": 2
-    },
-    {
-     "speaker": "huang",
-     "name_ko": "젠슨 황",
      "n": 2
     }
    ]
@@ -2378,25 +2455,15 @@
    ]
   },
   {
-   "topic": "Fed",
-   "days7": 3,
+   "topic": "Position",
+   "days7": 4,
    "prev7": 0,
-   "streak": 2,
+   "streak": 4,
    "speakers": [
     {
      "speaker": "wood",
      "name_ko": "캐시 우드",
-     "n": 1
-    },
-    {
-     "speaker": "bessent",
-     "name_ko": "스콧 베센트",
-     "n": 1
-    },
-    {
-     "speaker": "fed",
-     "name_ko": "연준",
-     "n": 1
+     "n": 4
     }
    ]
   },
@@ -2414,7 +2481,7 @@
    ]
   },
   {
-   "topic": "Position",
+   "topic": "Fed",
    "days7": 3,
    "prev7": 0,
    "streak": 3,
@@ -2422,24 +2489,16 @@
     {
      "speaker": "wood",
      "name_ko": "캐시 우드",
-     "n": 3
-    }
-   ]
-  },
-  {
-   "topic": "Policy",
-   "days7": 2,
-   "prev7": 0,
-   "streak": 2,
-   "speakers": [
-    {
-     "speaker": "ackman",
-     "name_ko": "빌 애크먼",
      "n": 1
     },
     {
-     "speaker": "burry",
-     "name_ko": "마이클 버리",
+     "speaker": "fed",
+     "name_ko": "연준",
+     "n": 1
+    },
+    {
+     "speaker": "bessent",
+     "name_ko": "스콧 베센트",
      "n": 1
     }
    ]
@@ -2459,26 +2518,49 @@
   },
   {
    "topic": "Macro Warning",
-   "days7": 1,
+   "days7": 2,
    "prev7": 0,
-   "streak": 1,
+   "streak": 2,
    "speakers": [
     {
      "speaker": "burry",
      "name_ko": "마이클 버리",
+     "n": 2
+    }
+   ]
+  },
+  {
+   "topic": "Investment",
+   "days7": 2,
+   "prev7": 0,
+   "streak": 0,
+   "speakers": [
+    {
+     "speaker": "huang",
+     "name_ko": "젠슨 황",
+     "n": 1
+    },
+    {
+     "speaker": "musk",
+     "name_ko": "일론 머스크",
      "n": 1
     }
    ]
   },
   {
-   "topic": "Other",
-   "days7": 1,
+   "topic": "Policy",
+   "days7": 2,
    "prev7": 0,
    "streak": 1,
    "speakers": [
     {
-     "speaker": "trump",
-     "name_ko": "트럼프",
+     "speaker": "ackman",
+     "name_ko": "빌 애크먼",
+     "n": 1
+    },
+    {
+     "speaker": "burry",
+     "name_ko": "마이클 버리",
      "n": 1
     }
    ]
@@ -2497,14 +2579,14 @@
    ]
   },
   {
-   "topic": "Investment",
+   "topic": "Other",
    "days7": 1,
    "prev7": 0,
-   "streak": 0,
+   "streak": 1,
    "speakers": [
     {
-     "speaker": "huang",
-     "name_ko": "젠슨 황",
+     "speaker": "trump",
+     "name_ko": "트럼프",
      "n": 1
     }
    ]
@@ -2514,11 +2596,11 @@
   {
    "kind": "sector",
    "name": "Technology",
-   "n": 38,
+   "n": 41,
    "dirs": {
     "positive": 23,
-    "negative": 6,
-    "neutral": 9
+    "negative": 7,
+    "neutral": 11
    },
    "speakers": [
     {
@@ -2529,7 +2611,7 @@
     {
      "speaker": "trump",
      "name_ko": "트럼프",
-     "n": 5
+     "n": 6
     },
     {
      "speaker": "ackman",
@@ -2539,12 +2621,12 @@
     {
      "speaker": "wood",
      "name_ko": "캐시 우드",
-     "n": 3
+     "n": 4
     },
     {
      "speaker": "musk",
      "name_ko": "일론 머스크",
-     "n": 2
+     "n": 3
     },
     {
      "speaker": "cramer",
@@ -2552,19 +2634,36 @@
      "n": 2
     },
     {
-     "speaker": "bessent",
-     "name_ko": "스콧 베센트",
-     "n": 2
-    },
-    {
      "speaker": "burry",
      "name_ko": "마이클 버리",
-     "n": 1
+     "n": 2
     },
     {
      "speaker": "altman",
      "name_ko": "샘 올트먼",
      "n": 1
+    },
+    {
+     "speaker": "bessent",
+     "name_ko": "스콧 베센트",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "kind": "company",
+   "name": "NVDA",
+   "n": 14,
+   "dirs": {
+    "positive": 11,
+    "negative": 0,
+    "neutral": 3
+   },
+   "speakers": [
+    {
+     "speaker": "huang",
+     "name_ko": "젠슨 황",
+     "n": 14
     }
    ]
   },
@@ -2573,9 +2672,9 @@
    "name": "Energy",
    "n": 14,
    "dirs": {
-    "positive": 6,
+    "positive": 5,
     "negative": 2,
-    "neutral": 6
+    "neutral": 7
    },
    "speakers": [
     {
@@ -2596,28 +2695,11 @@
    ]
   },
   {
-   "kind": "company",
-   "name": "NVDA",
-   "n": 13,
-   "dirs": {
-    "positive": 10,
-    "negative": 0,
-    "neutral": 3
-   },
-   "speakers": [
-    {
-     "speaker": "huang",
-     "name_ko": "젠슨 황",
-     "n": 13
-    }
-   ]
-  },
-  {
    "kind": "sector",
    "name": "Semiconductor",
-   "n": 9,
+   "n": 12,
    "dirs": {
-    "positive": 6,
+    "positive": 9,
     "negative": 1,
     "neutral": 2
    },
@@ -2625,38 +2707,16 @@
     {
      "speaker": "huang",
      "name_ko": "젠슨 황",
-     "n": 7
+     "n": 8
     },
     {
      "speaker": "lutnick",
      "name_ko": "하워드 러트닉",
-     "n": 2
-    }
-   ]
-  },
-  {
-   "kind": "sector",
-   "name": "Healthcare",
-   "n": 6,
-   "dirs": {
-    "positive": 5,
-    "negative": 0,
-    "neutral": 1
-   },
-   "speakers": [
-    {
-     "speaker": "trump",
-     "name_ko": "트럼프",
      "n": 3
     },
     {
-     "speaker": "wood",
-     "name_ko": "캐시 우드",
-     "n": 2
-    },
-    {
-     "speaker": "altman",
-     "name_ko": "샘 올트먼",
+     "speaker": "musk",
+     "name_ko": "일론 머스크",
      "n": 1
     }
    ]
@@ -2664,9 +2724,9 @@
   {
    "kind": "sector",
    "name": "Autos",
-   "n": 6,
+   "n": 8,
    "dirs": {
-    "positive": 4,
+    "positive": 6,
     "negative": 0,
     "neutral": 2
    },
@@ -2674,7 +2734,7 @@
     {
      "speaker": "musk",
      "name_ko": "일론 머스크",
-     "n": 4
+     "n": 6
     },
     {
      "speaker": "wood",
@@ -2691,9 +2751,9 @@
   {
    "kind": "company",
    "name": "TSLA",
-   "n": 5,
+   "n": 7,
    "dirs": {
-    "positive": 3,
+    "positive": 5,
     "negative": 0,
     "neutral": 2
    },
@@ -2701,7 +2761,7 @@
     {
      "speaker": "musk",
      "name_ko": "일론 머스크",
-     "n": 5
+     "n": 7
     }
    ]
   },
@@ -2728,6 +2788,33 @@
     {
      "speaker": "lutnick",
      "name_ko": "하워드 러트닉",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "kind": "sector",
+   "name": "Healthcare",
+   "n": 5,
+   "dirs": {
+    "positive": 4,
+    "negative": 0,
+    "neutral": 1
+   },
+   "speakers": [
+    {
+     "speaker": "trump",
+     "name_ko": "트럼프",
+     "n": 3
+    },
+    {
+     "speaker": "altman",
+     "name_ko": "샘 올트먼",
+     "n": 1
+    },
+    {
+     "speaker": "wood",
+     "name_ko": "캐시 우드",
      "n": 1
     }
    ]
@@ -2777,40 +2864,13 @@
    ]
   },
   {
-   "kind": "sector",
-   "name": "Crypto",
-   "n": 4,
-   "dirs": {
-    "positive": 2,
-    "negative": 0,
-    "neutral": 2
-   },
-   "speakers": [
-    {
-     "speaker": "bessent",
-     "name_ko": "스콧 베센트",
-     "n": 2
-    },
-    {
-     "speaker": "trump",
-     "name_ko": "트럼프",
-     "n": 1
-    },
-    {
-     "speaker": "cramer",
-     "name_ko": "짐 크레이머",
-     "n": 1
-    }
-   ]
-  },
-  {
    "kind": "company",
    "name": "NFLX",
    "n": 3,
    "dirs": {
-    "positive": 2,
+    "positive": 1,
     "negative": 1,
-    "neutral": 0
+    "neutral": 1
    },
    "speakers": [
     {
@@ -2821,33 +2881,6 @@
     {
      "speaker": "wood",
      "name_ko": "캐시 우드",
-     "n": 1
-    }
-   ]
-  },
-  {
-   "kind": "sector",
-   "name": "Consumer",
-   "n": 3,
-   "dirs": {
-    "positive": 3,
-    "negative": 0,
-    "neutral": 0
-   },
-   "speakers": [
-    {
-     "speaker": "wood",
-     "name_ko": "캐시 우드",
-     "n": 1
-    },
-    {
-     "speaker": "burry",
-     "name_ko": "마이클 버리",
-     "n": 1
-    },
-    {
-     "speaker": "cramer",
-     "name_ko": "짐 크레이머",
      "n": 1
     }
    ]
@@ -2870,6 +2903,60 @@
     {
      "speaker": "trump",
      "name_ko": "트럼프",
+     "n": 1
+    },
+    {
+     "speaker": "burry",
+     "name_ko": "마이클 버리",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "kind": "sector",
+   "name": "Crypto",
+   "n": 3,
+   "dirs": {
+    "positive": 1,
+    "negative": 0,
+    "neutral": 2
+   },
+   "speakers": [
+    {
+     "speaker": "trump",
+     "name_ko": "트럼프",
+     "n": 1
+    },
+    {
+     "speaker": "cramer",
+     "name_ko": "짐 크레이머",
+     "n": 1
+    },
+    {
+     "speaker": "bessent",
+     "name_ko": "스콧 베센트",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "kind": "sector",
+   "name": "Consumer",
+   "n": 3,
+   "dirs": {
+    "positive": 2,
+    "negative": 0,
+    "neutral": 1
+   },
+   "speakers": [
+    {
+     "speaker": "wood",
+     "name_ko": "캐시 우드",
+     "n": 1
+    },
+    {
+     "speaker": "cramer",
+     "name_ko": "짐 크레이머",
      "n": 1
     },
     {
@@ -2915,57 +3002,6 @@
      "speaker": "bessent",
      "name_ko": "스콧 베센트",
      "n": 1
-    }
-   ]
-  },
-  {
-   "kind": "company",
-   "name": "ISRG",
-   "n": 2,
-   "dirs": {
-    "positive": 1,
-    "negative": 0,
-    "neutral": 1
-   },
-   "speakers": [
-    {
-     "speaker": "wood",
-     "name_ko": "캐시 우드",
-     "n": 2
-    }
-   ]
-  },
-  {
-   "kind": "company",
-   "name": "OKLO",
-   "n": 2,
-   "dirs": {
-    "positive": 1,
-    "negative": 0,
-    "neutral": 1
-   },
-   "speakers": [
-    {
-     "speaker": "wood",
-     "name_ko": "캐시 우드",
-     "n": 2
-    }
-   ]
-  },
-  {
-   "kind": "company",
-   "name": "XE",
-   "n": 2,
-   "dirs": {
-    "positive": 1,
-    "negative": 0,
-    "neutral": 1
-   },
-   "speakers": [
-    {
-     "speaker": "wood",
-     "name_ko": "캐시 우드",
-     "n": 2
     }
    ]
   },
@@ -3027,41 +3063,41 @@
   },
   {
    "kind": "company",
-   "name": "IAM",
-   "n": 1,
+   "name": "PLTR",
+   "n": 2,
    "dirs": {
-    "positive": 1,
+    "positive": 0,
     "negative": 0,
-    "neutral": 0
+    "neutral": 2
    },
    "speakers": [
     {
      "speaker": "wood",
      "name_ko": "캐시 우드",
-     "n": 1
+     "n": 2
     }
    ]
   },
   {
    "kind": "company",
-   "name": "LUNR",
-   "n": 1,
+   "name": "OKLO",
+   "n": 2,
    "dirs": {
-    "positive": 1,
+    "positive": 0,
     "negative": 0,
-    "neutral": 0
+    "neutral": 2
    },
    "speakers": [
     {
      "speaker": "wood",
      "name_ko": "캐시 우드",
-     "n": 1
+     "n": 2
     }
    ]
   },
   {
    "kind": "company",
-   "name": "PACB",
+   "name": "MU",
    "n": 1,
    "dirs": {
     "positive": 1,
@@ -3070,25 +3106,8 @@
    },
    "speakers": [
     {
-     "speaker": "wood",
-     "name_ko": "캐시 우드",
-     "n": 1
-    }
-   ]
-  },
-  {
-   "kind": "company",
-   "name": "SCTX",
-   "n": 1,
-   "dirs": {
-    "positive": 1,
-    "negative": 0,
-    "neutral": 0
-   },
-   "speakers": [
-    {
-     "speaker": "wood",
-     "name_ko": "캐시 우드",
+     "speaker": "huang",
+     "name_ko": "젠슨 황",
      "n": 1
     }
    ]
@@ -3123,23 +3142,6 @@
     {
      "speaker": "wood",
      "name_ko": "캐시 우드",
-     "n": 1
-    }
-   ]
-  },
-  {
-   "kind": "company",
-   "name": "MU",
-   "n": 1,
-   "dirs": {
-    "positive": 1,
-    "negative": 0,
-    "neutral": 0
-   },
-   "speakers": [
-    {
-     "speaker": "huang",
-     "name_ko": "젠슨 황",
      "n": 1
     }
    ]
@@ -3197,7 +3199,7 @@
   },
   {
    "kind": "company",
-   "name": "PLTR",
+   "name": "XE",
    "n": 1,
    "dirs": {
     "positive": 0,
@@ -3248,17 +3250,85 @@
   },
   {
    "kind": "company",
-   "name": "LULU",
+   "name": "ISRG",
    "n": 1,
    "dirs": {
-    "positive": 1,
+    "positive": 0,
     "negative": 0,
-    "neutral": 0
+    "neutral": 1
    },
    "speakers": [
     {
-     "speaker": "burry",
-     "name_ko": "마이클 버리",
+     "speaker": "wood",
+     "name_ko": "캐시 우드",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "kind": "company",
+   "name": "IAM",
+   "n": 1,
+   "dirs": {
+    "positive": 0,
+    "negative": 0,
+    "neutral": 1
+   },
+   "speakers": [
+    {
+     "speaker": "wood",
+     "name_ko": "캐시 우드",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "kind": "company",
+   "name": "LUNR",
+   "n": 1,
+   "dirs": {
+    "positive": 0,
+    "negative": 0,
+    "neutral": 1
+   },
+   "speakers": [
+    {
+     "speaker": "wood",
+     "name_ko": "캐시 우드",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "kind": "company",
+   "name": "PACB",
+   "n": 1,
+   "dirs": {
+    "positive": 0,
+    "negative": 0,
+    "neutral": 1
+   },
+   "speakers": [
+    {
+     "speaker": "wood",
+     "name_ko": "캐시 우드",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "kind": "company",
+   "name": "SCTX",
+   "n": 1,
+   "dirs": {
+    "positive": 0,
+    "negative": 0,
+    "neutral": 1
+   },
+   "speakers": [
+    {
+     "speaker": "wood",
+     "name_ko": "캐시 우드",
      "n": 1
     }
    ]
@@ -3333,6 +3403,23 @@
   },
   {
    "kind": "company",
+   "name": "LULU",
+   "n": 1,
+   "dirs": {
+    "positive": 1,
+    "negative": 0,
+    "neutral": 0
+   },
+   "speakers": [
+    {
+     "speaker": "burry",
+     "name_ko": "마이클 버리",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "kind": "company",
    "name": "MRK",
    "n": 1,
    "dirs": {
@@ -3384,6 +3471,346 @@
   }
  ],
  "strips": {
+  "musk": [
+   {
+    "n": 9,
+    "topic": "Product",
+    "by_topic": {
+     "Deal": {
+      "n": 2,
+      "positive": 2,
+      "negative": 0,
+      "neutral": 0
+     },
+     "Product": {
+      "n": 4,
+      "positive": 2,
+      "negative": 0,
+      "neutral": 2
+     },
+     "Earnings": {
+      "n": 2,
+      "positive": 2,
+      "negative": 0,
+      "neutral": 0
+     },
+     "Industry View": {
+      "n": 1,
+      "positive": 1,
+      "negative": 0,
+      "neutral": 0
+     }
+    }
+   },
+   {
+    "n": 2,
+    "topic": "Deal",
+    "by_topic": {
+     "Deal": {
+      "n": 1,
+      "positive": 0,
+      "negative": 0,
+      "neutral": 1
+     },
+     "Investment": {
+      "n": 1,
+      "positive": 1,
+      "negative": 0,
+      "neutral": 0
+     }
+    }
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   }
+  ],
   "huang": [
    {
     "n": 17,
@@ -3391,9 +3818,9 @@
     "by_topic": {
      "Industry View": {
       "n": 12,
-      "positive": 8,
+      "positive": 9,
       "negative": 1,
-      "neutral": 3
+      "neutral": 2
      },
      "Product": {
       "n": 3,
@@ -3416,8 +3843,8 @@
     }
    },
    {
-    "n": 7,
-    "topic": "Product",
+    "n": 8,
+    "topic": "Industry View",
     "by_topic": {
      "Investment": {
       "n": 1,
@@ -3438,10 +3865,10 @@
       "neutral": 0
      },
      "Industry View": {
-      "n": 2,
+      "n": 3,
       "positive": 2,
       "negative": 0,
-      "neutral": 0
+      "neutral": 1
      },
      "Regulation": {
       "n": 1,
@@ -3744,7 +4171,7 @@
   ],
   "trump": [
    {
-    "n": 9,
+    "n": 10,
     "topic": "Regulation",
     "by_topic": {
      "Energy": {
@@ -3754,10 +4181,10 @@
       "neutral": 0
      },
      "Regulation": {
-      "n": 2,
+      "n": 3,
       "positive": 2,
       "negative": 0,
-      "neutral": 0
+      "neutral": 1
      },
      "Trade": {
       "n": 2,
@@ -3810,7 +4237,7 @@
     }
    },
    {
-    "n": 7,
+    "n": 6,
     "topic": "Energy",
     "by_topic": {
      "Tax": {
@@ -3822,12 +4249,6 @@
      "Energy": {
       "n": 2,
       "positive": 2,
-      "negative": 0,
-      "neutral": 0
-     },
-     "Company": {
-      "n": 1,
-      "positive": 1,
       "negative": 0,
       "neutral": 0
      },
@@ -3846,343 +4267,16 @@
     }
    },
    {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   }
-  ],
-  "musk": [
-   {
-    "n": 6,
-    "topic": "Earnings",
-    "by_topic": {
-     "Deal": {
-      "n": 1,
-      "positive": 1,
-      "negative": 0,
-      "neutral": 0
-     },
-     "Earnings": {
-      "n": 2,
-      "positive": 2,
-      "negative": 0,
-      "neutral": 0
-     },
-     "Product": {
-      "n": 2,
-      "positive": 0,
-      "negative": 0,
-      "neutral": 2
-     },
-     "Industry View": {
-      "n": 1,
-      "positive": 1,
-      "negative": 0,
-      "neutral": 0
-     }
-    }
-   },
-   {
     "n": 1,
-    "topic": "Deal",
+    "topic": "Company",
     "by_topic": {
-     "Deal": {
+     "Company": {
       "n": 1,
-      "positive": 0,
+      "positive": 1,
       "negative": 0,
-      "neutral": 1
+      "neutral": 0
      }
     }
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
    },
    {
     "n": 0,
@@ -4503,15 +4597,22 @@
      "Position": {
       "n": 1,
       "positive": 0,
-      "negative": 1,
-      "neutral": 0
+      "negative": 0,
+      "neutral": 1
      }
     }
    },
    {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
+    "n": 1,
+    "topic": "Position",
+    "by_topic": {
+     "Position": {
+      "n": 1,
+      "positive": 0,
+      "negative": 1,
+      "neutral": 0
+     }
+    }
    },
    {
     "n": 0,
@@ -4796,12 +4897,12 @@
   ],
   "bessent": [
    {
-    "n": 5,
+    "n": 3,
     "topic": "Regulation",
     "by_topic": {
      "Regulation": {
-      "n": 3,
-      "positive": 2,
+      "n": 1,
+      "positive": 0,
       "negative": 0,
       "neutral": 1
      },
@@ -4820,7 +4921,7 @@
     }
    },
    {
-    "n": 8,
+    "n": 7,
     "topic": "Geopolitics",
     "by_topic": {
      "Geopolitics": {
@@ -4835,12 +4936,6 @@
       "negative": 0,
       "neutral": 1
      },
-     "Fed": {
-      "n": 1,
-      "positive": 0,
-      "negative": 0,
-      "neutral": 1
-     },
      "Energy": {
       "n": 1,
       "positive": 0,
@@ -4850,10 +4945,16 @@
     }
    },
    {
-    "n": 1,
+    "n": 2,
     "topic": "Energy",
     "by_topic": {
      "Energy": {
+      "n": 1,
+      "positive": 0,
+      "negative": 0,
+      "neutral": 1
+     },
+     "Fed": {
       "n": 1,
       "positive": 0,
       "negative": 0,
@@ -5481,328 +5582,6 @@
     "by_topic": {}
    }
   ],
-  "burry": [
-   {
-    "n": 1,
-    "topic": "Macro Warning",
-    "by_topic": {
-     "Macro Warning": {
-      "n": 1,
-      "positive": 0,
-      "negative": 1,
-      "neutral": 0
-     }
-    }
-   },
-   {
-    "n": 2,
-    "topic": "Stock Call",
-    "by_topic": {
-     "Stock Call": {
-      "n": 1,
-      "positive": 1,
-      "negative": 0,
-      "neutral": 0
-     },
-     "Policy": {
-      "n": 1,
-      "positive": 1,
-      "negative": 0,
-      "neutral": 0
-     }
-    }
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   },
-   {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
-   }
-  ],
   "altman": [
    {
     "n": 1,
@@ -6441,6 +6220,335 @@
     "by_topic": {}
    }
   ],
+  "burry": [
+   {
+    "n": 1,
+    "topic": "Macro Warning",
+    "by_topic": {
+     "Macro Warning": {
+      "n": 1,
+      "positive": 0,
+      "negative": 1,
+      "neutral": 0
+     }
+    }
+   },
+   {
+    "n": 1,
+    "topic": "Macro Warning",
+    "by_topic": {
+     "Macro Warning": {
+      "n": 1,
+      "positive": 0,
+      "negative": 1,
+      "neutral": 0
+     }
+    }
+   },
+   {
+    "n": 2,
+    "topic": "Stock Call",
+    "by_topic": {
+     "Stock Call": {
+      "n": 1,
+      "positive": 1,
+      "negative": 0,
+      "neutral": 0
+     },
+     "Policy": {
+      "n": 1,
+      "positive": 1,
+      "negative": 0,
+      "neutral": 0
+     }
+    }
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   },
+   {
+    "n": 0,
+    "topic": null,
+    "by_topic": {}
+   }
+  ],
   "lutnick": [
    {
     "n": 0,
@@ -6466,9 +6574,16 @@
     }
    },
    {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
+    "n": 1,
+    "topic": "Company",
+    "by_topic": {
+     "Company": {
+      "n": 1,
+      "positive": 1,
+      "negative": 0,
+      "neutral": 0
+     }
+    }
    },
    {
     "n": 0,
@@ -7067,6 +7182,50 @@
   ]
  },
  "keywords": {
+  "musk": [
+   {
+    "key": "Merger",
+    "n": 2,
+    "positive": 1,
+    "negative": 0,
+    "neutral": 1
+   },
+   {
+    "key": "Investment",
+    "n": 1,
+    "positive": 1,
+    "negative": 0,
+    "neutral": 0
+   },
+   {
+    "key": "Robotaxi",
+    "n": 1,
+    "positive": 1,
+    "negative": 0,
+    "neutral": 0
+   },
+   {
+    "key": "Sales Target",
+    "n": 1,
+    "positive": 1,
+    "negative": 0,
+    "neutral": 0
+   },
+   {
+    "key": "Revenue Forecast",
+    "n": 1,
+    "positive": 1,
+    "negative": 0,
+    "neutral": 0
+   },
+   {
+    "key": "Optimus",
+    "n": 1,
+    "positive": 0,
+    "negative": 0,
+    "neutral": 1
+   }
+  ],
   "huang": [
    {
     "key": "Neocloud Demand",
@@ -7076,14 +7235,14 @@
     "neutral": 0
    },
    {
-    "key": "DSX Pod",
+    "key": "Memory Chips",
     "n": 1,
     "positive": 1,
     "negative": 0,
     "neutral": 0
    },
    {
-    "key": "Memory Chips",
+    "key": "DSX Pod",
     "n": 1,
     "positive": 1,
     "negative": 0,
@@ -7134,6 +7293,13 @@
     "neutral": 0
    },
    {
+    "key": "AI",
+    "n": 2,
+    "positive": 0,
+    "negative": 0,
+    "neutral": 2
+   },
+   {
     "key": "Drilling",
     "n": 2,
     "positive": 2,
@@ -7146,66 +7312,15 @@
     "positive": 0,
     "negative": 1,
     "neutral": 0
-   },
-   {
-    "key": "Company",
-    "n": 1,
-    "positive": 0,
-    "negative": 0,
-    "neutral": 1
-   }
-  ],
-  "musk": [
-   {
-    "key": "Investment",
-    "n": 1,
-    "positive": 1,
-    "negative": 0,
-    "neutral": 0
-   },
-   {
-    "key": "Sales Target",
-    "n": 1,
-    "positive": 1,
-    "negative": 0,
-    "neutral": 0
-   },
-   {
-    "key": "Revenue Forecast",
-    "n": 1,
-    "positive": 1,
-    "negative": 0,
-    "neutral": 0
-   },
-   {
-    "key": "Optimus",
-    "n": 1,
-    "positive": 0,
-    "negative": 0,
-    "neutral": 1
-   },
-   {
-    "key": "Market Share",
-    "n": 1,
-    "positive": 1,
-    "negative": 0,
-    "neutral": 0
-   },
-   {
-    "key": "Algorithm Update",
-    "n": 1,
-    "positive": 0,
-    "negative": 0,
-    "neutral": 1
    }
   ],
   "wood": [
    {
     "key": "Position",
-    "n": 3,
+    "n": 4,
     "positive": 1,
     "negative": 1,
-    "neutral": 1
+    "neutral": 2
    },
    {
     "key": "Interest Rates",
@@ -7222,20 +7337,6 @@
     "positive": 0,
     "negative": 0,
     "neutral": 3
-   },
-   {
-    "key": "Crypto",
-    "n": 2,
-    "positive": 2,
-    "negative": 0,
-    "neutral": 0
-   },
-   {
-    "key": "AI",
-    "n": 2,
-    "positive": 2,
-    "negative": 0,
-    "neutral": 0
    },
    {
     "key": "Investment",
@@ -7257,6 +7358,20 @@
     "positive": 0,
     "negative": 1,
     "neutral": 0
+   },
+   {
+    "key": "AI",
+    "n": 1,
+    "positive": 1,
+    "negative": 0,
+    "neutral": 0
+   },
+   {
+    "key": "Ceasefire",
+    "n": 1,
+    "positive": 0,
+    "negative": 0,
+    "neutral": 1
    }
   ],
   "ackman": [
@@ -7297,29 +7412,6 @@
    },
    {
     "key": "2027 Market",
-    "n": 1,
-    "positive": 1,
-    "negative": 0,
-    "neutral": 0
-   }
-  ],
-  "burry": [
-   {
-    "key": "AI Bubble",
-    "n": 1,
-    "positive": 0,
-    "negative": 1,
-    "neutral": 0
-   },
-   {
-    "key": "Lululemon",
-    "n": 1,
-    "positive": 1,
-    "negative": 0,
-    "neutral": 0
-   },
-   {
-    "key": "Fannie Freddie Conservatorship",
     "n": 1,
     "positive": 1,
     "negative": 0,
@@ -7372,11 +7464,34 @@
     "neutral": 0
    }
   ],
+  "burry": [
+   {
+    "key": "AI Bubble",
+    "n": 2,
+    "positive": 0,
+    "negative": 2,
+    "neutral": 0
+   },
+   {
+    "key": "Lululemon",
+    "n": 1,
+    "positive": 1,
+    "negative": 0,
+    "neutral": 0
+   },
+   {
+    "key": "Fannie Freddie Conservatorship",
+    "n": 1,
+    "positive": 1,
+    "negative": 0,
+    "neutral": 0
+   }
+  ],
   "lutnick": [
    {
     "key": "Investment",
-    "n": 1,
-    "positive": 1,
+    "n": 2,
+    "positive": 2,
     "negative": 0,
     "neutral": 0
    },
