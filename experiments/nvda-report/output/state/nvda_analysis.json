@@ -1,56 +1,56 @@
 {
- "generated_at": "2026-10-23T15:18:58Z",
- "run_date": "2026-10-24",
+ "generated_at": "2026-10-24T21:33:21Z",
+ "run_date": "2026-10-25",
  "day": "2026-10-23",
  "is_latest_bar_today": true,
  "headline": {
-  "close": 212.74000549316406,
-  "ret_1d": 0.2497520204179038,
-  "ret_vs_spy": 0.43432112601672346,
-  "ret_vs_smh": -0.9297712347532627,
-  "ret_vs_amd": -1.9907151791783484,
-  "ret_vs_avgo": -0.6953733618543234,
-  "vol_ratio_20d": 0.27966971251717815,
-  "gap": -0.5984657802557525,
-  "range_pct": 1.7251167307374649,
-  "ret_sigma_20d": 1.8031108942351786
+  "close": 210.9600067138672,
+  "ret_1d": -0.5890391406873863,
+  "ret_vs_spy": -0.06675379135347992,
+  "ret_vs_smh": -1.3246915340563326,
+  "ret_vs_amd": -2.3333711311823824,
+  "ret_vs_avgo": -0.10642634347048929,
+  "vol_ratio_20d": 0.7560756024559185,
+  "gap": -0.574902776544417,
+  "range_pct": 1.73967259714404,
+  "ret_sigma_20d": 1.8004056192691882
  },
  "macro_today": [],
  "periods": [
   {
    "label": "1주",
    "days": 5,
-   "nvda": -0.6491380740448527,
-   "spy": -0.09171466846135123,
-   "smh": -1.9020300841742221
+   "nvda": -1.4804082084059922,
+   "spy": -0.4297450765640365,
+   "smh": -2.3323822843696385
   },
   {
    "label": "1개월",
    "days": 21,
-   "nvda": -5.2720617336166615,
-   "spy": -0.6035095970977955,
-   "smh": -11.822588251556066
+   "nvda": -6.0646517971949425,
+   "spy": -0.9398083945736158,
+   "smh": -12.209419326511451
   },
   {
    "label": "3개월",
    "days": 63,
-   "nvda": 8.259127494791896,
-   "spy": 3.1741682454183184,
-   "smh": -3.4685950164023316
+   "nvda": 7.353321770373666,
+   "spy": 2.8250880256755817,
+   "smh": -3.8920747536312583
   },
   {
    "label": "6개월",
    "days": 126,
-   "nvda": 2.1462530028354188,
-   "spy": 6.808693333520277,
-   "smh": 4.55789584180224
+   "nvda": 1.291593789899359,
+   "spy": 6.4473160355651205,
+   "smh": 4.099204183229355
   },
   {
    "label": "1년",
    "days": 252,
-   "nvda": 18.005328895972262,
-   "spy": 14.188380013773582,
-   "smh": 56.386001390685834
+   "nvda": 17.01797655996744,
+   "spy": 13.80203423105344,
+   "smh": 55.69994173179591
   }
  ],
  "year_range": {
@@ -58,9 +58,9 @@
   "high_day": "2026-10-06",
   "low": 164.27000427246094,
   "low_day": "2026-03-30",
-  "close": 212.74000549316406,
-  "pos_pct": 61.27687336380333,
-  "pct_from_high": -12.58577073532605
+  "close": 210.9600067138672,
+  "pos_pct": 59.02655859095965,
+  "pct_from_high": -13.317166887279697
  },
  "drawdown": {
   "stats": {
@@ -117,7 +117,7 @@
    "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다."
   },
   "days_since_high": 13,
-  "pct_from_high": -12.58577073532605,
+  "pct_from_high": -13.317166887279697,
   "high_day": "2026-10-06"
  },
  "earnings_moves": {
@@ -160,34 +160,34 @@
   "n_up": 3
  },
  "normal_range": {
-  "ret_log": 0.002494406583736333,
-  "ret_pct": 0.2497520204179038,
+  "ret_log": -0.005907808190463589,
+  "ret_pct": -0.5890391406873863,
   "sigma_pct": 2.0357514411931827,
-  "z": 0.12253001684107005,
+  "z": -0.2902028249087688,
   "outside": false,
-  "n_year": 224,
+  "n_year": 198,
   "n_past": 248,
   "earnings_day": false,
   "market_shock": {
    "active": false,
    "start": null,
-   "vix": 19.079999923706055
+   "vix": 19.450000762939453
   }
  },
  "market_regime": {
   "regime": "상승 추세",
   "prev_regime": "상승 추세",
   "changed": false,
-  "pct_from_high": -2.1229945824436047,
+  "pct_from_high": -2.4541523435379298,
   "above_ma200": true,
-  "ma200": 727.0192495727539,
-  "pct_vs_ma200": 4.887179843050249,
-  "vix": 19.079999923706055,
+  "ma200": 727.0063494873046,
+  "pct_vs_ma200": 4.5341586409894274,
+  "vix": 19.450000762939453,
   "streak": -2,
   "benchmark": "SPY",
   "bar_day": "2026-10-23",
   "fng": {
-   "score": 21.0138528138528,
+   "score": 20.9809523809524,
    "rating": "extreme fear",
    "rating_ko": "극단적 공포"
   }
@@ -196,74 +196,74 @@
   "state": "빠져나가는 중",
   "prev": "빠져나가는 중",
   "changed": false,
-  "rel_pp": -11.559782238339842,
+  "rel_pp": -11.608280604972155,
   "days": 20,
   "shares_5d": 0.0,
   "sectors": [
    {
     "etf": "XLE",
     "name": "에너지",
-    "rel": 12.899395143320792,
+    "rel": 13.225820991847225,
     "rank": 1
-   },
-   {
-    "etf": "XLP",
-    "name": "필수 소비재",
-    "rel": 9.049709507057013,
-    "rank": 2
    },
    {
     "etf": "XLU",
     "name": "유틸리티",
-    "rel": 8.83511265584378,
+    "rel": 9.194908849680628,
+    "rank": 2
+   },
+   {
+    "etf": "XLP",
+    "name": "필수 소비재",
+    "rel": 9.030789167469944,
     "rank": 3
    },
    {
     "etf": "XLV",
     "name": "헬스케어",
-    "rel": 6.383970277426809,
+    "rel": 6.501699331749833,
     "rank": 4
    },
    {
     "etf": "XLB",
     "name": "소재",
-    "rel": 4.634834720245595,
+    "rel": 4.50746898067872,
     "rank": 5
-   },
-   {
-    "etf": "XLY",
-    "name": "경기 소비재",
-    "rel": 4.0352156027998465,
-    "rank": 6
    },
    {
     "etf": "XLRE",
     "name": "부동산",
-    "rel": 3.847785043375973,
+    "rel": 3.9055533782869856,
+    "rank": 6
+   },
+   {
+    "etf": "XLY",
+    "name": "경기 소비재",
+    "rel": 3.7727320889587967,
     "rank": 7
    },
    {
     "etf": "XLF",
     "name": "금융",
-    "rel": 3.511386452942067,
+    "rel": 3.4082343259219328,
     "rank": 8
    },
    {
     "etf": "XLI",
     "name": "산업재",
-    "rel": -2.1273440468472904,
+    "rel": -1.9336868162768805,
     "rank": 9
    },
    {
     "etf": "XLC",
     "name": "통신",
-    "rel": -4.551425376867879,
+    "rel": -5.119916178783269,
     "rank": 10
    },
    {
     "etf": "XLK",
     "name": "기술",
-    "rel": -5.263591058930451,
+    "rel": -5.168576979483186,
     "rank": 11
    }
   ],
@@ -273,13 +273,13 @@
    {
     "etf": "XLE",
     "name": "에너지",
-    "rel": 12.899395143320792,
+    "rel": 13.225820991847225,
     "rank": 1
    },
    {
-    "etf": "XLP",
-    "name": "필수 소비재",
-    "rel": 9.049709507057013,
+    "etf": "XLU",
+    "name": "유틸리티",
+    "rel": 9.194908849680628,
     "rank": 2
    }
   ],
@@ -287,23 +287,23 @@
    {
     "etf": "XLK",
     "name": "기술",
-    "rel": -5.263591058930451,
+    "rel": -5.168576979483186,
     "rank": 11
    },
    {
     "etf": "XLC",
     "name": "통신",
-    "rel": -4.551425376867879,
+    "rel": -5.119916178783269,
     "rank": 10
    }
   ]
  },
  "bollinger": {
-  "pctb": 0.12488243059697153,
-  "lower": 208.4485603269485,
-  "upper": 242.8124427858445,
-  "ma20": 225.6305015563965,
-  "close": 212.74000549316406,
+  "pctb": 0.0828842460928455,
+  "lower": 208.06254671465166,
+  "upper": 243.0204565202116,
+  "ma20": 225.54150161743163,
+  "close": 210.9600067138672,
   "state": "밴드 안",
   "days": 0,
   "entered": false,
@@ -422,9 +422,9 @@
   "active": [],
   "entered": [],
   "values": {
-   "rsi80": 39.71206063508451,
-   "ma200_40": 4.451079694535154,
-   "ret20_25": -5.4782962766305126
+   "rsi80": 38.09031543854369,
+   "ma200_40": 3.581662189727597,
+   "ret20_25": -6.269160772730487
   },
   "stats": {
    "symbol": "NVDA",
@@ -539,6 +539,42 @@
  },
  "events": [
   {
+   "area": "Regulation",
+   "kind": "fedreg",
+   "title": "Outbound Investment Security Program Regulations",
+   "fact": "미 재무부, 해외 투자 안보 프로그램 시행령 안 발표",
+   "url": "https://www.federalregister.gov/documents/2026/10/26/2026-21786/outbound-investment-security-program-regulations",
+   "direction": "uncertain",
+   "emphasis": true,
+   "source": "federalregister",
+   "published_at": "2026-10-26T00:00:00Z",
+   "speaker": "government"
+  },
+  {
+   "area": "Legal",
+   "kind": "news",
+   "title": "Nvidia Investors Ink Class Deal After Brief High Court Run",
+   "fact": "엔비디아 투자자 집단소송 합의 타결",
+   "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQZkNqa0Q1b0VRZ2tjZzBBVVIzWXQxYkZUWU5TeDNpbzJ0djhWSzZsRGpxbjktZ3NLT1FSeWpIRW1GODlSSk5YbElVS0NKQnRLV1o2YnVFV3I1ZlV1dS1mLTJtbGRfVTdRa1JqcDlSMnc4cVhVZzczM3ZiRWhXMzlzUklyc1gybEp2UVhlcDVSbG5vdG9heHFSOTJuZTdvbkJ5bjVUU0U1cjZKT05XbkJ0b3hYRVpDamlPY29LS9IBVkFVX3lxTE1JSVJ0SDY4RXp0LVNobmx5YjRuZkttNVlWTVZMVU5VMVJfSU84YWhqMFJsem9IOFNmSXk2LUJrZi1RNGkzeTVLdW5vaDV3ZFRDaE5PNkJ3?oc=5",
+   "direction": "positive",
+   "emphasis": true,
+   "source": "Law360",
+   "published_at": "2026-10-24T01:27:31Z",
+   "speaker": null
+  },
+  {
+   "area": "Regulation",
+   "kind": "news",
+   "title": "Illegal Nvidia Blackwell Ultra B300 GPUs found inside state-owned China Telecom's network — Nvidia says chip smuggling is 'a drop in the bucket,' insists it remains a non-factor",
+   "fact": "중국텔레콤 네트워크서 엔비디아 블랙웰 울트라 B300 GPU 밀수 적발 및 엔비디아 해명",
+   "url": "https://news.google.com/rss/articles/CBMizwJBVV95cUxOOXl4bHBDVENMOE1PYWJZUEJXeEJfdUlzUjhNTVZoeFE3SERZMktlOHBqUDItMFhWcVdjLXZPOVB1RG9hNzhrMmd3ZWNlYVFDbzhab2V4dVA3aEVqSENLM1ZfQzNiNmx6R0VaTVUwRU9FUUFnMV9kcDluWEJTOE10OWx3N0RhRHNZZ1VZZzJLVTFzdW5ndXpkQjI0SU5TaExsclZaUEM5cnhSQTZhYlhEM3lpTUk5aFZkRFk4bzZPaENrVTRrbnBQMzhUSHMxSzRCNFFGSHhaRi1TMWNNamlQU0Jzc2tXTDBmRUxFQUljMlFGSkJlOTFwQnZXckNibC1zTFVXUm9MTGhuY1RPZHVscE5YUmFzRU9aZ1doSUtuSGF1dEVxNlpjWkl1SWRzOEJBNHAyY0dtZFJxUE41a3JRWURuZE1LUFVacUgyb2UxWQ?oc=5",
+   "direction": "negative",
+   "emphasis": true,
+   "source": "Tom's Hardware",
+   "published_at": "2026-10-23T12:26:23Z",
+   "speaker": "nvidia_exec"
+  },
+  {
    "area": "Legal",
    "kind": "news",
    "title": "GPUs from stolen $470,000 Nvidia RTX 5090 shipment at Brazil airport appear for sale online, identified by serial numbers — three employees identified by police helped steal equipment",
@@ -561,6 +597,68 @@
    "source": "Wccftech",
    "published_at": "2026-10-23T08:40:03Z",
    "speaker": null
+  },
+  {
+   "area": "Corporate",
+   "kind": "news",
+   "title": "Nvidia Backs $164.5 Billion Of AI Data Centers To Keep GPUs Selling",
+   "fact": "엔비디아, GPU 수요 지원 위해 1645억 달러 규모 AI 데이터센터 투자 지원",
+   "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOeFNTWDBDSWZmSDl3dllPanlnLXREYnM3VVM2dVpGaF9WVTlmU1hiWjFybU9HRHZydkNHcFJqZHNQNnZ0Y0ktdDZmOGN2d0M5OHJpRmNUSklkWlJYTGtXd2FOb3A1QmNCUjViZ2N4a1pScEJiWk5uRnpRNFZyTE4zcFRNbXBMSUpPd29OVlpwU2d3a294LTJWNDNWVkxDa3BPTXRqWGloQk9ianhubVUwbk1JY1VfSTNoZFlF?oc=5",
+   "direction": "positive",
+   "emphasis": true,
+   "source": "Forbes",
+   "published_at": "2026-10-21T06:13:22Z",
+   "speaker": null
+  },
+  {
+   "area": "Product",
+   "kind": "news",
+   "title": "NVIDIA GeForce RTX 30 GPUs Get Up To 2X Faster AI Compute Performance With New GPU Unlock Mod, Real-World Gains Of Up To 60%",
+   "fact": "엔비디아 지포스 RTX 30 GPU, 커스텀 모드로 AI 성능 최대 2배 향상",
+   "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxPYzRTYzFubHo4OVJxX2FPbUNIMUtZVUJzc1ptN2pGMGNjdkRkckJ4UlJlcFlzWkYwZGl5RXFiNndvUHJXbDVybk5IbGdKay0wbjJoQlVHZE1xb3BkOEVpeHgzX1REbVlOZXBnaFM4Zy1fUi1aWlZ4UE9zZG5zZE5xdkFEODczR1NRLTd2VFhMSzhTRVhWWi1JMlNMVDJZMzZtaDVoeG5SZ2d2MThNWlZwQzRYS01pVWhMdUo0dV9acDJaUEs0MlU4aE1OczA0YmpUVWxqNUljM3RkTEp00gHiAUFVX3lxTE9FOUoyeEhmcXF0OURtVTFWR2ZtcTE3SzQxeTMxM0tqeGZ4c0RnbVVnYllpbjMwRVhFRm8tbEkxSnNPYlplOVRoanF5Q0pudTJqMTBiOTRLSWhtYjZwZUk4SjBjNGRKbjc1b3Q2V3dSR2ZXMGNRYi0zSjlrMHFBSWVNUkhYLWpQS2JkRHU3aHdzSS1hTm4tZGsxYVZGREVjUFp0Ml8ybWRHcVdqdl9NRndNZnBUR0RSSWNTOGpNcGdDaGE1LXhySkFLeURlWlljQXJFU1lJeDNibzRDSEpaQVhoNEE?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Wccftech",
+   "published_at": "2026-10-24T14:52:16Z",
+   "speaker": null
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
+   "title": "NVIDIA GPUs Are Becoming Appreciating Assets In The Rental Space, With Models As Old As The A100 Reaching Up To A 143% Price Premium Due To AI Token Consumption",
+   "fact": "엔비디아 A100 등 주요 GPU 임대 가격 최대 143퍼센트 프리미엄 기록",
+   "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE4xOHJVYnZDQ2ljUl9UbW9iZ0U5OEt3TVp5TC1ZQ0dWOW5pU1pmT0ZpYklxOHh0R0tmb1J1ZkhDQ2t3RlJwSXc2SFVBTTk2VGNmZVlYQ3hGZVljaGNGTEJZbThLSEhibG0xSE84VzJjeUVmc3J5QWhiV0diREpNd9IBgwFBVV95cUxNSVlBWHphV0plOUxxOUtCMXZvSmV5THdrd191N1FFUEhybWJyWGRXUUt3SUZPMkRWZ25HRjRqTHlwUkN6STRQZ093M0VreHM4aHlrVVVScnpXaG94TW1GVkt5RFlfbVZlakxFRTE3N2p1dHE2Uk9KTU5SYXpybl95UGRRdw?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Wccftech",
+   "published_at": "2026-10-24T12:05:52Z",
+   "speaker": null
+  }
+ ],
+ "events_overflow": [
+  {
+   "area": "Product",
+   "kind": "news",
+   "title": "Hottest toy for Christmas? Nvidia CEO plays with adorable Microduck robots, 20,000 sell",
+   "fact": "엔비디아 CEO 시연 마이크로덕 로봇 2만 대 판매 기록",
+   "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQdG5iRF9HQ0pxeHJ0dUtYWkV4ZXlQVldlcVdmdVZLOHRlRkM2ODZDak1zX1NNOFBpS1hzbGxPSVU1bnVmQXhsRGJ0WlVpWWlBS1ZrNmFXT0wyZnJOc3pUZlBZa2IyVXFQSFVVR0V5bHRDbWlpU0pBTHJ6NGk1S0NqeGFFdWRwNWdvdVpoNXpCanBlZFZ4RnQ4RUphQTZfRFhUMkp3Mzd4c1JlbUxmN3pVMjZrdkNDSE04UFZV?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "TechCrunch",
+   "published_at": "2026-10-23T21:59:19Z",
+   "speaker": null
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
+   "title": "Nor-Tech Announces AI ProServer with NVIDIA H200 and L40S GPUs",
+   "fact": "노스텍, 엔비디아 H200 및 L40S GPU 탑재 AI 프로서버 발표",
+   "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPaGU2YWpWQnNXbTN6Y05kNi0yTlU3Zm1Xck5EcThxYXVhY2JiRUpyai1UZHhkM09GNzBabk9Gd2FtS0VNUUMwNWhvX21JYXFqVXVQLWo2bEc1RUxkUDhqeFM2dkNNdXFDaEZRbXpvUUNjbHNhNWRILU50MVZSM01TMVZ6dlZPVFNyVkw0QVlxMk0yQnFTQzA3M0pyNlJVYmM?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "PRLog",
+   "published_at": "2026-10-23T15:27:49Z",
+   "speaker": "customer_partner"
   },
   {
    "area": "Earnings",
@@ -589,6 +687,18 @@
   {
    "area": "Demand",
    "kind": "news",
+   "title": "HPE Expands Private Cloud AI With Mixed NVIDIA GPU Clusters and a New Vera CPU Rack",
+   "fact": "HPE, 엔비디아 GPU 클러스터 및 베라 CPU 랙 활용 프라이빗 클라우드 AI 확장",
+   "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOWUxXZGZaeHRNVFpNOFFHMXZvZVVtVEpacVdJOTd3U1lHaXJET21GVXlDcGpEdWpUeTlMc3FFNVBkSWhoYXgwTkQzcW9kbVUyRGRyTXRmQ1B1ZEo0dl9vZHFxcV9MUlAwZzlscktiYWFYUjhFbl9PTXJoZ1hMUWNiMXN0aEl0MEZWaEwxTC1rNF9pZWRvWC1JbEgxUmxGOU5nTm5iZkRIQzl3U01fWWpKSDZSZkw5cExndUE?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Konsulteer",
+   "published_at": "2026-10-23T08:31:26Z",
+   "speaker": "customer_partner"
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
    "title": "NVIDIA Details Kazakhstan GPU Deployments and Robotaxi Plans",
    "fact": "엔비디아, 카자흐스탄 GPU 배포 및 로보택시 계획 상세 공개",
    "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQNXNQT0lLRTVQdzM5OUx1RXQ0RU9ZTzc1SVo4aDVVdEFEcVl1WUVqakJmVTBNTFkxVGpIM3NDc1BhM2Jsc1YzZkIzU3gyMDZ5RnREbUFMV1VSUDRqMDQtS05fRUdMdjJMbl9NRnlyTEVjMXFBQjN3YXRHZ19kcnVqV1plM2hyWDNPU1E?oc=5",
@@ -608,6 +718,42 @@
    "emphasis": false,
    "source": "nvidiablog",
    "published_at": "2026-10-23T02:00:13Z",
+   "speaker": "customer_partner"
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
+   "title": "HPE, NVIDIA Advance Secure Agentic AI Across Enterprise Environments",
+   "fact": "HPE 및 엔비디아, 기업 환경용 에이전틱 AI 보안 솔루션 협력 강화",
+   "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPeGZNaHpTUTluZGJvMXVlT01wS0JjUWJaMWlCVmV1NkplelZzNlF2SHd0Ml9wOFJWakFiTm0wOVFGSG1KMVZkdGFta3daUkhWTjhmTVQ2ZUVsM0ZYcC1oeVMtNkczdGxiTUhYbmlkWEc3QzNxcW5Hc3VhZElxQ1g4dmREcFJrZ3VuZm1HQjQzM2prS0Zhc1RmRkhZYnF0UXNWenltb3ZVUHBtMktsUF9HS2tNalhEcWhPbmVMRGQyTQ?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "The Fast Mode",
+   "published_at": "2026-10-22T23:27:24Z",
+   "speaker": "customer_partner"
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
+   "title": "Advancing Agentic AI Security with Palo Alto Networks and NVIDIA",
+   "fact": "팔로알토 네트웍스, 엔비디아와 에이전틱 AI 보안 분야 협력 발표",
+   "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOZHNzak5ERFVtYW1vVkJvdmp4MW5ZdWJydDZmWnBjMXNXZVZsdEFvd09VbXA4NTJDOEJTZUN4SWE2NWF4Qmk3RW5oN1dJdVl5el9zNm1lRmRVeXNCQ2JmNlZOdmk4b3VYSlJfaUFYTERNSUJKNVpGaV9ISDQ1TmhFb0p6UkJpY3lSRHlteVBESm1fM3V6UmtFbEw4MXpGWnVqM3FpRFZaY2xmUGsyWkNqOQ?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Palo Alto Networks",
+   "published_at": "2026-10-21T18:42:11Z",
+   "speaker": "customer_partner"
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
+   "title": "Nokia advances AI-RAN toward commercial deployment and physical AI, launches sovereign agentic AI platform for telco autonomy with NVIDIA",
+   "fact": "노키아, 엔비디아와 통신사용 주권형 에이전틱 AI 플랫폼 출시",
+   "url": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxPZDJJWEg0cHZuQzFHbTdfOHE0X2tGNERvbUZWT1dYNkZGRDhOQ0RTTFhLS2lFZ0ZGekpfRFgxUWY0QnBzeEVaS3FwaWEtYUtvVGJfczk1ZUQzdUV1VWo4ZTVOdTRkckJpZHV0dnZZZGhWMl9salBFTlo1TmRVVVhhdDgtVnc0c3FzVXVUQXlLOWFaZ1ZHRDBZeWF6N1lUM0FULWpaeVhwcDhCT2FxVml2YUxnQTBEXzl6VHZya2NBWXVZQTVJTGs3LU9qbHQ3WXc5VGFMZWhRU2xqZWFRd1NYdVpqcVJuN1ZqMGs4dGQ1ZzItVjNFdmVIQVJHbDM?oc=5",
+   "direction": "positive",
+   "emphasis": false,
+   "source": "Nokia",
+   "published_at": "2026-10-21T11:30:00Z",
    "speaker": "customer_partner"
   },
   {
@@ -633,22 +779,33 @@
    "source": "yfinance options",
    "published_at": null,
    "speaker": null
+  },
+  {
+   "area": "Flows",
+   "kind": "flows",
+   "title": "장외 공매도 비율 29% (20일 평균 44%)",
+   "fact": "FINRA 보고 장외 거래 중 공매도 29.3%, 20일 평균 44.0% (임계 ±10%p)",
+   "url": null,
+   "direction": "positive",
+   "emphasis": false,
+   "source": "finra",
+   "published_at": null,
+   "speaker": null
   }
  ],
- "events_overflow": [],
- "events_total": 8,
+ "events_total": 21,
  "direction_counts": {
   "today": {
-   "positive": 5,
-   "negative": 2,
-   "uncertain": 0,
+   "positive": 16,
+   "negative": 3,
+   "uncertain": 1,
    "neutral": 1
   },
   "week": {
-   "positive": 51,
-   "negative": 11,
-   "uncertain": 4,
-   "neutral": 6
+   "positive": 61,
+   "negative": 12,
+   "uncertain": 5,
+   "neutral": 7
   }
  },
  "analyst_target_only": [],
@@ -723,55 +880,55 @@
   "price": [
    {
     "key": "close",
-    "value": 212.74000549316406,
+    "value": 210.9600067138672,
     "flag": false,
     "fmt": "usd"
    },
    {
     "key": "ret_1d",
-    "value": 0.2497520204179038,
+    "value": -0.5890391406873863,
     "flag": false,
     "fmt": "pct_signed"
    },
    {
     "key": "ret_vs_spy",
-    "value": 0.43432112601672346,
+    "value": -0.06675379135347992,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "ret_vs_smh",
-    "value": -0.9297712347532627,
+    "value": -1.3246915340563326,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "ret_vs_amd",
-    "value": -1.9907151791783484,
+    "value": -2.3333711311823824,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "ret_vs_avgo",
-    "value": -0.6953733618543234,
+    "value": -0.10642634347048929,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "gap",
-    "value": -0.5984657802557525,
+    "value": -0.574902776544417,
     "flag": false,
     "fmt": "pct_signed"
    },
    {
     "key": "range_pct",
-    "value": 1.7251167307374649,
+    "value": 1.73967259714404,
     "flag": false,
     "fmt": "pct"
    },
    {
     "key": "vol_ratio_20d",
-    "value": 0.27966971251717815,
+    "value": 0.7560756024559185,
     "flag": false,
     "fmt": "x"
    }
@@ -779,25 +936,25 @@
   "technical": [
    {
     "key": "ma50",
-    "value": 222.51820068359376,
+    "value": 222.48260070800782,
     "flag": false,
     "fmt": "usd"
    },
    {
     "key": "ma200",
-    "value": 203.6743000793457,
+    "value": 203.66540008544922,
     "flag": false,
     "fmt": "usd"
    },
    {
     "key": "pct_from_52w_high",
-    "value": -12.58577073532605,
+    "value": -13.317166887279697,
     "flag": false,
     "fmt": "pct_signed"
    },
    {
     "key": "rsi14",
-    "value": 39.71206063508451,
+    "value": 38.09031543854369,
     "flag": false,
     "fmt": "num1"
    },
@@ -811,7 +968,7 @@
   "options": [
    {
     "key": "iv_atm_30d",
-    "value": 0.415366850929027,
+    "value": 0.4366698638213519,
     "flag": false,
     "fmt": "iv"
    },
@@ -823,7 +980,7 @@
    },
    {
     "key": "implied_move_next_earnings",
-    "value": 9.506909597522732,
+    "value": 9.717481677844704,
     "flag": false,
     "fmt": "pct"
    },
@@ -835,13 +992,13 @@
    },
    {
     "key": "pc_ratio_vol",
-    "value": 0.5488697179172706,
+    "value": 0.63227333940263,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "gex_approx",
-    "value": 53506258.49611232,
+    "value": -692819.8899278757,
     "flag": false,
     "fmt": "gex"
    },
@@ -973,8 +1130,8 @@
    },
    {
     "key": "finra_short_ratio",
-    "value": null,
-    "flag": false,
+    "value": 29.334709453225287,
+    "flag": true,
     "fmt": "pct"
    },
    {
@@ -987,7 +1144,7 @@
   "valuation": [
    {
     "key": "forward_pe",
-    "value": 13.367599907830801,
+    "value": 13.25575300126093,
     "flag": false,
     "fmt": "num1"
    }
@@ -996,13 +1153,13 @@
   "news": [
    {
     "key": "news_count",
-    "value": 12,
+    "value": 26,
     "flag": false,
     "fmt": "int"
    },
    {
     "key": "news_avg_7d",
-    "value": 37.57142857142857,
+    "value": 39.142857142857146,
     "flag": false,
     "fmt": "num1"
    },
@@ -1188,7 +1345,7 @@
   {
    "metric": "forward_pe",
    "label": "선행 주가수익비율 (주가 ÷ 12개월 예상 주당순이익)",
-   "value": 13.367599907830801,
+   "value": 13.25575300126093,
    "unit": "배",
    "asof": "2026-10-23",
    "source": "yfinance",
@@ -1210,7 +1367,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-23",
-  "state_collected_at": "2026-10-23T15:16:47Z",
+  "state_collected_at": "2026-10-24T21:32:12Z",
   "missing_fields": [],
   "option_snapshot_days": 11,
   "iv_rank_days": 11,
@@ -1220,9 +1377,9 @@
    "analyst": 3,
    "blog": 53,
    "court": 3,
-   "fedreg": 25,
+   "fedreg": 26,
    "form4": 16,
-   "news": 1020,
+   "news": 1079,
    "newsroom": 19
   },
   "option_expiries": [
@@ -1358,26 +1515,26 @@
    "down30": 0
   },
   "move": {
-   "state": "평소 수준",
-   "exp": 2.616565215281532,
+   "state": "평소보다 큼",
+   "exp": 2.7507615826374714,
    "sigma": 2.0357514411931827,
-   "ratio": 1.285306822009629,
+   "ratio": 1.3512266414141458,
    "spy": {
     "exp": 0.9528802403630448,
-    "sigma": 0.6424639463169204
+    "sigma": 0.6535786184874528
    },
    "earn": {
-    "exp": 6.344525304613138,
+    "exp": 6.6559087587386685,
     "past": 3.24902081606282,
     "n": 8
    },
    "next_earnings": "2026-11-17",
    "earn_in_window": true,
    "days_to": 25,
-   "iv": 0.415366850929027,
+   "iv": 0.4366698638213519,
    "rank": null,
-   "imp": 9.506909597522732,
-   "earn_day": 6.344525304613138,
+   "imp": 9.717481677844704,
+   "earn_day": 6.6559087587386685,
    "past": 3.24902081606282
   },
   "short": {
@@ -1449,7 +1606,7 @@
    ],
    "median": 3.24902081606282,
    "normal": 2.0357514411931827,
-   "market_exp": 6.344525304613138
+   "market_exp": 6.6559087587386685
   },
   "peers": {
    "upcoming": [
@@ -1566,7 +1723,7 @@
      "n": 3
     }
    },
-   "normal": 0.48905857364926475
+   "normal": 0.49432701343964935
   },
   "court": {
    "cases": [
