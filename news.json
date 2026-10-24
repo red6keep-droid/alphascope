@@ -1,6 +1,16 @@
 {
-  "updated_at": "2026-10-24 18:46:09 UTC",
+  "updated_at": "2026-10-24 20:46:05 UTC",
   "items": [
+    {
+      "title": "Biotech stocks are surging. How investors can play the new drug innovation boom",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/24/biotech-stocks-drug-innovation-rally.html",
+      "published": "2026-10-24 18:56:29",
+      "title_ko": "바이오텍 주가 급등, 신약 혁신 물결에 투자 전략은",
+      "why_ko": "임상 성공·M&A·신약 기술로 바이오텍 주가가 상승하고 있다.",
+      "summary_ko": "임상 성공·M&A·신약 기술로 바이오텍 주가 급등, 애널리스트가 선정",
+      "summary_v": 2
+    },
     {
       "title": "BlackRock's Rick Rieder sees 'historic' opportunity in high-quality bonds",
       "source": "CNBC",
@@ -109,16 +119,6 @@
       "title_ko": "은행 실적 발표 주간, 옵션 시장이 기대하는 변동성",
       "why_ko": "연간 변동은 없지만 옵션 시장은 금리 상승 영향으로 큰 움직임을 예상한다.",
       "summary_ko": "옵션 시장, 금리 상승 영향에 은행 섹터 큰 변동성 기대",
-      "summary_v": 2
-    },
-    {
-      "title": "Top Wall Street analysts prefer these 3 dividend stocks for stable income",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/11/top-analysts-prefer-these-3-dividend-stocks-for-stable-income.html",
-      "published": "2026-10-11 11:42:31",
-      "title_ko": "월스트리트 최고 애널리스트 3개 배당주, 안정적 수익 선호",
-      "why_ko": "변동성 높은 상황에서 배당주를 통해 포트폴리오 수익을 강화할 수 있다.",
-      "summary_ko": "안정적 수익 추구 투자자를 위한 배당주 3종, 월스트리트 애널리스트가 선정",
       "summary_v": 2
     }
   ]
