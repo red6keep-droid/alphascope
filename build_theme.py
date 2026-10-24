@@ -1322,6 +1322,18 @@ MOCK_PICKS = {
     "sectors": [{"sector": "반도체", "syms": ["NVDA", "AVGO", "TSM"]}, {"sector": "소프트웨어", "syms": ["MSFT"]}, {"sector": "에너지", "syms": ["XOM"]},
                 {"sector": "금융", "syms": ["JPM"]}, {"sector": "헬스케어", "syms": ["JNJ"]}, {"sector": "방산", "syms": ["LMT"]}],
 }
+# 홈 한국 탭 (2026-10-24) — kr.json 은 experiments/kr-stocks/home_feed_kr.py 가 만든다. 로컬 결과가 있으면 그것, 없으면 빈 값(탭을 누르면 "불러올 수 없습니다")
+SAVED_KR_HOME = "experiments/kr-stocks/output/home/kr.json"
+
+
+def preview_kr_home():
+    try:
+        with io.open(SAVED_KR_HOME, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {"day": None, "stocks": [], "watch": [], "sectors": [], "flows": []}
+
+
 MOCK_THEMES = {"day": "2026-09-03", "themes": [
     {"title": "AI 반도체", "state": "강세", "kind": "positive", "sub": "20일 S&P 500 대비 +6.2%p", "url": "#list"},
     {"title": "금리 인하", "state": "관망", "kind": "neutral", "sub": "10년물 4.12% · 전주 −8bp", "url": "#list"},
@@ -1639,6 +1651,7 @@ def preview_mock_js():
         "  var PV_MEDIA_FEED = %s;\n"
         "  var PV_PICKS = %s;\n"
         "  var PV_THEMES = %s;\n"
+        "  var PV_KR = %s;\n"
         "\n"
         "  /* 디자인만 확인하므로 실제 시세를 부르지 않는다. 피드는 라벨로 가른다. */\n"
         "  window.fetch = function (url) {\n"
@@ -1650,6 +1663,7 @@ def preview_mock_js():
         "    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;\n"
         "    else if (u.indexOf('stocks.json') >= 0) body = PV_PICKS;\n"
         "    else if (u.indexOf('themes.json') >= 0) body = PV_THEMES;\n"
+        "    else if (u.indexOf('kr.json') >= 0) body = PV_KR;\n"
         "    else body = PV_DATA;\n"
         "    return Promise.resolve({ json: function () { return Promise.resolve(body); } });\n"
         "  };\n"
@@ -1678,6 +1692,7 @@ def preview_mock_js():
             json.dumps(media_feed, ensure_ascii=False),
             json.dumps(MOCK_PICKS, ensure_ascii=False),
             json.dumps(MOCK_THEMES, ensure_ascii=False),
+            json.dumps(preview_kr_home(), ensure_ascii=False),
             json.dumps([dict(c, photo=_avatar_data_uri(c["avatar"])) for c in PREVIEW_COMMENTS], ensure_ascii=False),
         )
     )

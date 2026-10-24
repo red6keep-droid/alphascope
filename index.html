@@ -345,8 +345,10 @@ body.menu-open { overflow: hidden; }
 .report-chart[hidden] { display: none; }
 /* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
 #radar-card { padding: 0 16px; gap: 0; }
-/* 인물 발언 줄 = 홈 주요 뉴스 기사 모양 (2026-10-24 사용자): 발언은 뉴스 제목 글자(18 · 굵게 · 행간 34), 이름 라벨은 그 아래 뉴스 라벨(.news-tag · .news-labels), 강도는 뺀다 */
-#radar-card .rd-title { display: block; font-size: 18px; line-height: 34px; font-weight: 700; color: #111; word-break: keep-all; }
+/* 인물 발언 · 미디어 데일리 줄 = 글자만 (2026-10-24 사용자: 라벨 · 강도 · 관심도 · 구분선 · 굵게 모두 뺌). 18 · 행간 34 · 보통 굵기, 줄 사이 위아래 4 */
+#radar-card .kv-row.plain-row, #media-card .kv-row.plain-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 7px; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; }
+#radar-card .kv-rows, #media-card .kv-rows { padding: 12px 0 14px; }
+#radar-card .kv-row.plain-row::before, #media-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 /* 홈 트럼프 카드 — 발언 줄: 주제 라벨(영역 라벨 모양) + 세부 주제 · 방향 · 대상 왼쪽, 강도 오른쪽, 줄 사이 구분선 (2026-10-15 사용자) */
 #trump-card { padding: 0 16px; gap: 0; }
 .tr-main { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; font-size: 16px; line-height: 24px; color: #111; }
@@ -608,7 +610,8 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .news-sub .num { margin-left: 6px; }
 .news-item.load-status { color: var(--gray-400); }
 .news-item[hidden] { display: none; }
-.news-section .fold-btn { border: 0; border-top: 1px solid #E2E8F0; border-radius: 0; padding-top: 13px; }   /* 3개까지 보이고 나머지는 더 보기 — 시총 TOP 10 더 보기와 같은 줄 (2026-10-20 사용자) */
+/* 뉴스 더 보기 = 외곽선 있는 버튼(기본 .fold-btn), 버튼 위 구분선 없음 (2026-10-24 사용자). 옛: 윗선만 있는 줄 (2026-10-20) */
+.news-section .fold-btn { margin-top: 6px; }
 
 /* ==========================================================================
    6. breaking ticker + footer
@@ -670,6 +673,13 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   line-height: 1.8;
   color: var(--gray-350);
 }
+.footer-disclaimer summary { list-style: none; cursor: pointer; }   /* 첫 문장 + 화살표 — 눌러서 나머지 (2026-10-24 사용자) */
+.footer-disclaimer summary::-webkit-details-marker { display: none; }
+.footer-more { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 6px; vertical-align: -5px; border: 1px solid #E2E8F0; border-radius: 6px; background: #fff; color: #111; box-sizing: border-box; }   /* 외곽선 있는 화살표 버튼 = 다른 더 보기 버튼(.fold-btn)과 같은 테두리 · 바탕 (2026-10-24 사용자) */
+.footer-more svg { width: 12px; height: 12px; }
+.footer-more svg { transition: transform .15s; }
+.footer-disclaimer[open] .footer-more svg { transform: rotate(180deg); }
+.footer-disclaimer > p { margin: 4px 0 0; }
 .footer-copy {
   margin: 0;
   font-family: var(--num);
@@ -755,6 +765,10 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .seg-row::-webkit-scrollbar { display: none; }
 .seg { flex: none; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 999px; background: #fff; font: inherit; font-size: 14px; line-height: 20px; color: var(--gray-600); white-space: nowrap; cursor: pointer; }
 .seg[aria-selected="true"] { background: #111; border-color: #111; color: #fff; font-weight: 700; }
+/* 미국 · 한국 알약 — 구획 제목 줄 오른쪽 (2026-10-24 사용자). 묶음 알약(.seg-row)보다 작게 */
+.mkt-tabs { padding: 0; gap: 6px; margin-left: auto; align-self: center; }
+.mkt-tabs .seg { padding: 4px 10px; font-size: 13px; line-height: 18px; }
+.home-cards .section-head .mkt-tabs { margin: 0 0 0 auto; }
 /* 테마 목록 — 줄마다 테마 이름(굵게) · 상태 라벨 오른쪽, 아래 줄 핵심 숫자. 줄 전체가 테마 페이지 링크, 줄 사이 구분선 */
 .theme-list { margin: 0 16px; }
 .theme-row { display: block; padding: 14px 0; border-top: 1px solid #E5E7EB; color: inherit; text-decoration: none; }
@@ -1346,7 +1360,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .nav-item { font-size: 16px; line-height: 22px; }
   .section-title { font-size: 18.5px; line-height: 23.5px; }
   .report-title { font-size: 18.5px; line-height: 23.5px; }
-  #radar-card .rd-title { font-size: 16px; line-height: 32px; }
+  #radar-card .kv-row.plain-row, #media-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
   .kv-value { font-size: 16px; line-height: 20px; }
   .kv-stat-value { font-size: 16px; line-height: 22.5px; }
   .kv-row--block li { font-size: 16px; line-height: 32px; }
@@ -1532,7 +1546,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               </a>
               </div>
 
-              <!-- 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 인물마다 가장 강한 발언 한 줄 — 발언(뉴스 제목 글자) 아래 이름 라벨, 강도 없음 (2026-10-24 사용자) -->
+              <!-- 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 인물마다 가장 강한 발언 한 줄 — 발언 글자만 세 줄, 라벨 · 강도 · 구분선 없음 (2026-10-24 사용자) -->
               <div class='report-col'>
               <h3 class='report-title'><span class='report-icon' style='background:#0F766E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='5.5' r='2.5'/><path d='M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4'/></svg></span>주요 인물 발언<span class='report-card-date' data-date='radar-card'></span></h3>
               <a class='report-card' id='radar-card' href='/search/label/인물%20발언'>
@@ -1562,8 +1576,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
             <h2 class='section-title' id='rankings-title'>
               <span class='report-icon' style='background:#6D28D9;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='8' width='3' height='6' rx='.5'/><rect x='6.5' y='3' width='3' height='11' rx='.5'/><rect x='11' y='10' width='3' height='4' rx='.5'/></svg></span>시총 TOP 10
             </h2>
-            <!-- 종가 기준 표시 (2026-10-22 사용자: 블로그는 종가 기준 — 기획/블로그-목적과-방향 5절). data.json 의 trade_date · market 으로 "10.21 종가 기준" / "10.22 장중" -->
-            <span class='section-note' id='rank-basis'></span>
+            <!-- 오른쪽 "10.21 종가 기준" 표시는 뺐다 (2026-10-24 사용자). 그 자리에 미국 · 한국 탭 (2026-10-24 사용자: 홈 카드에 해외 · 국내 탭 → 해외가 미국뿐이라 미국 · 한국) -->
+            <div class='seg-row mkt-tabs' role='tablist' aria-label='시장 고르기' data-mkt-for='rank'><button type='button' class='seg' role='tab' aria-selected='true' data-mkt='us'>미국</button><button type='button' class='seg' role='tab' aria-selected='false' data-mkt='kr'>한국</button></div>
           </div>
 
           <!-- 탭 · 표 · 더 보기 버튼이 카드 하나 (2026-10-13 사용자) -->
@@ -1580,7 +1594,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
                 <tr>
                   <th class='col-rank'>순위</th>
                   <th class='col-name'>종목명</th>
-                  <th>현재가 · 전일 대비</th>
+                  <th id='rank-th-price'>현재가 · 전일 대비</th>
                   <th class='col-sector'>업종</th>
                   <th>거래량</th>
                   <th>거래대금</th>
@@ -1602,14 +1616,20 @@ body.no-dashboard .main-content { padding-top: 32px; }
              테마 = themes.json (experiments/theme-monitor/home_feed.py), 종목 = stocks.json (experiments/stock-radar/home_feed.py), 하루 1회 종가 기준.
              줄 전체가 그 테마 · 종목 페이지 링크. 페이지가 아직 없는 종목(하루 10개씩 만드는 중)은 목록 페이지로.
              ==================================================================== -->
-        <section class='rankings picks-section' aria-label='테마 · 관심 종목 · 섹터 종목'>
+        <section class='rankings picks-section' aria-labelledby='picks-title'>
+          <!-- 묶음 제목 + 나침반 아이콘 · 미국 · 한국 탭 (2026-10-24 사용자: "테마 · 관심 종목 · 섹터 종목 탭 위에 묶는 타이틀과 아이콘"). 탭 이름도 같은 날: 테마 → 시장 흐름 · 관심 종목 → 테마 종목 · 섹터 종목 → 섹터 대표주 -->
+          <div class='section-head'>
+            <h2 class='section-title' id='picks-title'>
+              <span class='report-icon' style='background:#0E7490;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='8' r='6'/><path d='M10.6 5.4 9.2 9.2 5.4 10.6 6.8 6.8z' fill='currentColor' stroke='none'/></svg></span>시장 흐름과 종목
+            </h2>
+            <div class='seg-row mkt-tabs' role='tablist' aria-label='시장 고르기' data-mkt-for='picks'><button type='button' class='seg' role='tab' aria-selected='true' data-mkt='us'>미국</button><button type='button' class='seg' role='tab' aria-selected='false' data-mkt='kr'>한국</button></div>
+          </div>
           <div class='card rank-card'>
             <div class='tabs' role='tablist' id='picks-tabs'>
-              <button class='tab' role='tab' aria-selected='true'  data-pick='theme'>테마</button>
-              <button class='tab' role='tab' aria-selected='false' data-pick='watch'>관심 종목</button>
-              <button class='tab' role='tab' aria-selected='false' data-pick='sector'>섹터 종목</button>
+              <button class='tab' role='tab' aria-selected='true'  data-pick='theme'>시장 흐름</button>
+              <button class='tab' role='tab' aria-selected='false' data-pick='watch'>테마 종목</button>
+              <button class='tab' role='tab' aria-selected='false' data-pick='sector'>섹터 대표주</button>
             </div>
-            <div class='picks-day' data-note='picks-day'></div>
 
             <div class='pick-panel' data-pick-panel='theme'>
               <div class='theme-list' id='theme-list'>
@@ -2216,13 +2236,18 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
     <footer class='site-footer'>
       <!-- 2026-10-18 사용자: "투자 의사 결정 보조" 문구 수정 · 리포트 꼬리말의 출처 · 투자 권유 안내를 이 푸터 하나로 모은다 (Claude 문안).
-           "의사 결정 보조"는 투자 자문처럼 읽히고, "AI 모델의 가공적 연산"은 사실과 다르다(계산은 정해진 규칙). 2026-10-18 밤: AI 해설 문장(데일리 · 엔비디아 · 트럼프 서술)도 있어 "뉴스 분류와 해설 문장"으로 고침, 글마다의 꼬리말은 모두 뺐다 (사용자: 중복 안내 금지) -->
+           "의사 결정 보조"는 투자 자문처럼 읽히고, "AI 모델의 가공적 연산"은 사실과 다르다(계산은 정해진 규칙). 2026-10-18 밤: AI 해설 문장(데일리 · 엔비디아 · 트럼프 서술)도 있어 "뉴스 분류와 해설 문장"으로 고침, 글마다의 꼬리말은 모두 뺐다 (사용자: 중복 안내 금지).
+           2026-10-24 Claude 정리: AI 쓰임을 실제대로(분류 · 번역 · 해설 · 표지 그림 · 댓글), "사실 기록" → "기록"(해설은 해석), 공급처 이름(Yahoo) 빼고 종류로, 데이터 지연 · 오류 문장 추가, 보장 문장 하나로, 개별 상담 없음(운영지침 5절) -->
       <p class='footer-title'>ALPHASCOPE 미국 주식 데이터 리포트</p>
-      <p class='footer-disclaimer'>
-        면책 사항 : ALPHASCOPE 의 리포트는 공개된 시장 데이터(Yahoo Finance · SEC 공시 · FRED · 뉴스 RSS 등)를 정해진 규칙으로 계산해 정리한 사실 기록입니다. 숫자는 모두 코드가 계산하고, AI 는 뉴스 분류와 해설 문장에만 씁니다. 지난 기록은 앞으로의 결과를 보장하지 않습니다.
-        특정 종목의 매수 · 매도를 권유하지 않으며 수익을 보장하지 않습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다. 투자 판단과 책임은 투자자 본인에게 있습니다.
-        종목 로고는 각 회사의 상표로, 종목을 구분하는 용도로만 사용하며 해당 회사와 제휴 관계가 없습니다.
-      </p>
+      <!-- 2026-10-24 사용자: 첫 문장만 보이고 끝의 화살표(더 보기)로 나머지를 연다. "면책 사항 :" 이름표는 뺐다(법적 의무 아님).
+           첫 줄에 "권유하지 않습니다"까지 둔다 — 투자 권유 아님은 접지 않는다(운영지침 5절). 접힌 글도 HTML 에 있어 검색엔진이 읽는다(details, JS 없음).
+           같은 날 사용자: "코드가 계산" 은 첫 문장과 중복이라 뺌, AI 는 목록 대신 한 줄(AI 기본법 생성형 AI 고지), "늦거나 틀릴 수" → 참고용 한 문장. 문구 확정(사용자): "해설 문장 일부는 AI 가 씁니다." · "모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다." -->
+      <details class='footer-disclaimer'>
+        <summary>ALPHASCOPE 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.<span class='footer-more' role='img' aria-label='더 보기'><svg viewBox='0 0 16 16' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></span></summary>
+        <p>해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다.
+        개별 투자 상담을 하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다.
+        종목 로고는 각 회사의 상표이며, 종목을 구분하는 용도로만 쓰고 해당 회사와 제휴 관계가 없습니다.</p>
+      </details>
       <b:section class='attribution' id='footer' name='Footer' showaddelement='false' tag='div'>
         <b:widget id='Attribution1' locked='true' title='' type='Attribution' visible='true'>
           <b:widget-settings>
@@ -2307,6 +2332,11 @@ body.no-dashboard .main-content { padding-top: 32px; }
           return '$' + fmt(usd / 1e8, 2) + '억';
         }
 
+        /* 원화 — 거래대금 · 시총 (한국 탭, 2026-10-24) */
+        function eokWon(w) {
+          if (!w || isNaN(w)) return '—';
+          return w >= 1e12 ? fmt(w / 1e12, 1) + '조 원' : fmt(w / 1e8, 0) + '억 원';
+        }
         function signClass(v) { return v >= 0 ? 'up' : 'down'; }
         function arrow(v) { return v >= 0 ? '▲' : '▼'; }
 
@@ -2386,6 +2416,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
         /* ================================================================ 랭킹 */
 
         var stocks = [];
+        /* 한국 탭 (2026-10-24 사용자) — kr.json (experiments/kr-stocks/home_feed_kr.py, 한국 장 마감 뒤 하루 1회). 두 카드가 각자 미국 · 한국을 고른다 */
+        var krHome = null, rankMarket = 'us', picksMarket = 'us';
+        var KR_URL = GH + 'kr.json';
+        function isKR(r) { return !!(r && r.sym && /\.(KS|KQ)$/.test(r.sym)); }
+        function krAvatar(name, color) { var av = el('span', 'stock-avatar', String(name || '?').charAt(0)); av.style.background = color; return av; }   /* 한글 첫 글자 (영문 머리글자 대신) */
+        function krPage(r) { return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html'); }
         var activeSort = 'cap';   /* 시총 TOP 10 이라 기본은 시가총액 순 (2026-10-18) */
         /* data.json 에 시총(mc)이 없던 때의 순서 — fetch_stocks.TICKERS 와 같은 2026-10-18 장 마감 순위 */
         var CAP_ORDER = ['NVDA', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'AVGO', 'TSLA', 'BRK-B', 'LLY'];
@@ -2402,10 +2438,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var body = document.getElementById('rank-body');
           if (!body) return;
           body.textContent = '';
+          var kr = rankMarket === 'kr';
+          var src = kr ? ((krHome && krHome.stocks) || []).filter(function (s) { return s.top; }) : stocks;   /* 한국 TOP 10 = 유가증권 보통주 가운데 시총 10개 (home_feed_kr 의 top, 기획 11-2) */
+          var th = document.getElementById('rank-th-price');
+          if (th) th.textContent = kr ? '종가 · 전일 대비' : '현재가 · 전일 대비';
 
-          if (!stocks.length) {
+          if (!src.length) {
             var tr = el('tr');
-            var td = el('td', null, '데이터를 불러올 수 없습니다.');
+            var td = el('td', null, kr && !krHome ? '한국 데이터를 불러오는 중…' : '데이터를 불러올 수 없습니다.');
             td.colSpan = 6;
             td.style.cssText = 'text-align:center;padding:32px;color:var(--gray-400)';
             tr.appendChild(td);
@@ -2413,8 +2453,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
             return;
           }
 
-          stocks.slice().sort(SORTERS[activeSort]).forEach(function (s, i) {
-            var meta = metaFor(s.s);
+          src.slice().sort(SORTERS[activeSort]).forEach(function (s, i) {
+            var meta = kr ? { name: s.name, sector: s.sector, color: feedColor(s.s) } : metaFor(s.s);
             var folded = i >= RANK_SHOWN;   /* 3위까지만, 나머지는 더 보기 (2026-10-13 사용자) */
             var turnover = (s.p || 0) * (s.v || 0);
             var tr = el('tr');
@@ -2428,9 +2468,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
             var tdName = el('td', 'col-name');
             /* 종목 이름을 누르면 상세로 (2026-10-18 종목 페이지 첫 발행) — 엔비디아는 홈 엔비디아 카드가 가리키는 최신 리포트, 나머지는 시총 TOP 10 고정 페이지 */
             var cell = el('a', 'stock-cell');
-            cell.href = pageFor(s.s);
-            /* 로고 (우리 gh-pages 사본) — 없으면 머리글자 원 (2026-10-22, 리포트 design_kit.ticker_logo 와 같게) */
-            var av = stockAvatar(s.s, meta.color);
+            cell.href = kr ? krPage(s) : pageFor(s.s);
+            /* 로고 (우리 gh-pages 사본) — 없으면 머리글자 원 (2026-10-22, 리포트 design_kit.ticker_logo 와 같게). 한국 종목은 한글 첫 글자 */
+            var av = kr ? krAvatar(s.name, meta.color) : stockAvatar(s.s, meta.color);
             var label = el('span', 'stock-label');
             label.appendChild(el('span', 'stock-name', meta.name));
             label.appendChild(el('span', 'stock-ticker', s.s));
@@ -2441,8 +2481,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
             /* 현재가 + 전일 대비 한 칸, 증감 색 (2026-10-13 사용자) */
             var tdPrice = el('td');
-            var pr = el('span', 'cell-price ' + signClass(s.cp), '$' + fmt(s.p));
-            pr.appendChild(el('small', null, arrow(s.cp) + fmt(Math.abs(s.c)) + ' (' + (s.cp >= 0 ? '+' : '-') + fmt(Math.abs(s.cp)) + '%)'));
+            var pr = el('span', 'cell-price ' + signClass(s.cp), kr ? fmt(s.p, 0) + '원' : '$' + fmt(s.p));
+            pr.appendChild(el('small', null, kr ? arrow(s.cp) + fmt(Math.abs(s.cp || 0)) + '%' : arrow(s.cp) + fmt(Math.abs(s.c)) + ' (' + (s.cp >= 0 ? '+' : '-') + fmt(Math.abs(s.cp)) + '%)'));
             tdPrice.appendChild(pr);
             tr.appendChild(tdPrice);
 
@@ -2457,7 +2497,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             tr.appendChild(tdVol);
 
             var tdTurn = el('td');
-            tdTurn.appendChild(el('span', 'cell-num', eok(turnover)));
+            tdTurn.appendChild(el('span', 'cell-num', kr ? eokWon(turnover) : eok(turnover)));
             tr.appendChild(tdTurn);
 
 
@@ -2465,7 +2505,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             body.appendChild(tr);
           });
           var tg = document.getElementById('rank-toggle');
-          if (tg) { var n = stocks.length - RANK_SHOWN; tg.hidden = n <= 0; tg.firstChild.textContent = rankOpen ? '접기' : '종목 ' + n + '개 더 보기'; tg.setAttribute('aria-expanded', String(rankOpen)); }
+          if (tg) { var n = src.length - RANK_SHOWN; tg.hidden = n <= 0; tg.firstChild.textContent = rankOpen ? '접기' : '종목 ' + n + '개 더 보기'; tg.setAttribute('aria-expanded', String(rankOpen)); }
         }
         var RANK_SHOWN = 3, rankOpen = false;
         (function () {
@@ -2474,28 +2514,37 @@ body.no-dashboard .main-content { padding-top: 32px; }
           tg.addEventListener('click', function () { rankOpen = !rankOpen; renderRankings(); });
         })();
 
-        Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (tab) {
+        Array.prototype.forEach.call(document.querySelectorAll('.rank-card .tabs [data-sort]'), function (tab) {   /* 순위 카드의 정렬 탭만 — 전체 .tab 에 묶으면 종목 카드 탭을 눌러도 정렬이 풀린다 (2026-10-24 수정) */
           tab.addEventListener('click', function () {
-            Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (t) {
+            Array.prototype.forEach.call(document.querySelectorAll('.rank-card .tabs [data-sort]'), function (t) {
               t.setAttribute('aria-selected', String(t === tab));
             });
             activeSort = tab.dataset.sort;
             renderRankings();
           });
         });
+        /* 미국 · 한국 알약 — 카드마다 따로 (2026-10-24 사용자) */
+        [].slice.call(document.querySelectorAll('.mkt-tabs')).forEach(function (box) {
+          var card = box.getAttribute('data-mkt-for');
+          var btns = [].slice.call(box.querySelectorAll('[data-mkt]'));
+          btns.forEach(function (b) {
+            b.addEventListener('click', function () {
+              var m = b.getAttribute('data-mkt');
+              btns.forEach(function (x) { x.setAttribute('aria-selected', String(x === b)); });
+              if (card === 'rank') { rankMarket = m; rankOpen = false; renderRankings(); }
+              else { picksMarket = m; watchTab = 0; watchOpen = false; sectorOpen = false; renderPicks(); }
+            });
+          });
+        });
+        fetch(KR_URL + '?v=' + Date.now())
+          .then(function (r) { return r.json(); })
+          .then(function (json) { krHome = json; if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); })
+          .catch(function () {});
 
         fetch(DATA_URL + '?v=' + Date.now())
           .then(function (r) { return r.json(); })
           .then(function (json) {
             stocks = json.stocks || [];
-            /* "10.21 종가 기준" — 장이 열려 있는 동안만 "장중" (2026-10-22, 종가 기준 블로그). 옛 data.json(trade_date 없음)은 받은 시각으로 */
-            var basis = document.getElementById('rank-basis');
-            if (basis) {
-              var td = String(json.trade_date || '').split('-');
-              var day = td.length === 3 ? parseInt(td[1], 10) + '.' + parseInt(td[2], 10) : '';
-              if (!day) { var d = kstTime(json.updated_at); if (d) day = (d.getMonth() + 1) + '.' + d.getDate(); }
-              basis.textContent = day ? day + (json.market === '장중' ? ' 장중' : ' 종가 기준') : '';
-            }
             renderRankings();
           })
           .catch(function () { renderRankings(); });
@@ -2510,14 +2559,23 @@ body.no-dashboard .main-content { padding-top: 32px; }
         var COLORS = ['#0E7490', '#7C3AED', '#B45309', '#15803D', '#BE123C', '#1D4ED8', '#4D7C0F', '#9F1239', '#0F766E', '#6D28D9'];
         function feedColor(sym) { var h = 0; for (var i = 0; i < sym.length; i++) h = (h * 31 + sym.charCodeAt(i)) % 997; return COLORS[h % COLORS.length]; }
         /* 종목 줄 링크 — 페이지가 있으면 그 종목 고정 페이지, 아직 없으면(하루 10개씩 만드는 중) 목록 페이지. 엔비디아는 리포트 글 목록 */
+        function curFeed() {   /* 종목 카드가 지금 보여 주는 시장의 데이터 (미국 stocks.json · 한국 kr.json) */
+          if (picksMarket === 'kr') {
+            var m = {};
+            ((krHome && krHome.stocks) || []).forEach(function (r) { m[r.s] = r; });
+            return { kr: true, stocks: m, watch: (krHome && krHome.watch) || [], sectors: (krHome && krHome.sectors) || [] };
+          }
+          return { kr: false, stocks: feedStocks, watch: feedWatch, sectors: feedSectors };
+        }
         function feedPage(r) {
+          if (isKR(r)) return krPage(r);
           if (r.s === 'NVDA') return pageFor('NVDA');
           return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
         }
         function feedCell(r) {
           var cell = el('a', 'stock-cell');
           cell.href = feedPage(r);
-          var av = stockAvatar(r.s, (META[r.s] && META[r.s].color) || feedColor(r.s));
+          var av = isKR(r) ? krAvatar(r.name, feedColor(r.s)) : stockAvatar(r.s, (META[r.s] && META[r.s].color) || feedColor(r.s));   /* 한국 종목은 한글 첫 글자 */
           var label = el('span', 'stock-label');
           label.appendChild(el('span', 'stock-name', r.name));
           label.appendChild(el('span', 'stock-ticker', r.s));
@@ -2527,7 +2585,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         }
         function feedPrice(r) {
           var cp = r.cp == null ? 0 : r.cp;
-          var pr = el('span', 'cell-price ' + signClass(cp), '$' + fmt(r.p));
+          var pr = el('span', 'cell-price ' + signClass(cp), isKR(r) ? fmt(r.p, 0) + '원' : '$' + fmt(r.p));
           if (r.cp != null) pr.appendChild(el('small', null, arrow(cp) + fmt(Math.abs(cp)) + '%'));
           return pr;
         }
@@ -2549,7 +2607,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var box = document.getElementById('watch-tabs');
           if (!box) return;
           box.textContent = '';
-          feedWatch.forEach(function (g, i) {
+          curFeed().watch.forEach(function (g, i) {
             var b = el('button', 'seg', g.group);   /* 묶음은 탭 아래 알약 줄 — 바깥 탭(테마 · 관심 종목 · 섹터 종목)과 구분 (2026-10-21) */
             b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(i === watchTab));
             b.addEventListener('click', function () { watchTab = i; watchOpen = false; renderWatchTabs(); renderWatch(); });
@@ -2559,8 +2617,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
         function renderWatch() {
           var body = document.getElementById('watch-body');
           if (!body) return;
-          var g = feedWatch[watchTab];
-          var rows = g ? g.syms.map(function (s) { return feedStocks[s]; }).filter(Boolean) : [];
+          var F = curFeed(), g = F.watch[watchTab];
+          var rows = g ? g.syms.map(function (s) { return F.stocks[s]; }).filter(Boolean) : [];
           if (!rows.length) { feedEmpty(body, 3, '데이터를 불러올 수 없습니다.'); setFold('watch-toggle', 0, false, '종목'); return; }
           body.textContent = '';
           rows.sort(function (a, b) { return Math.abs(b.cp || 0) - Math.abs(a.cp || 0); });   /* 크게 움직인 순 */
@@ -2577,16 +2635,17 @@ body.no-dashboard .main-content { padding-top: 32px; }
         function renderSectorTop() {
           var body = document.getElementById('sector-top-body');
           if (!body) return;
-          var rows = feedSectors.filter(function (x) { return x.syms && x.syms.length && feedStocks[x.syms[0]]; });
+          var F = curFeed();
+          var rows = F.sectors.filter(function (x) { return x.syms && x.syms.length && F.stocks[x.syms[0]]; });
           if (!rows.length) { feedEmpty(body, 3, '데이터를 불러올 수 없습니다.'); setFold('sector-top-toggle', 0, false, '업종'); return; }
           body.textContent = '';
           rows.forEach(function (x, i) {
-            var top = feedStocks[x.syms[0]];
+            var top = F.stocks[x.syms[0]];
             var tr = el('tr');
             var tdSector = el('td', 'col-sector'); tdSector.appendChild(el('span', 'cell-sector', x.sector)); tr.appendChild(tdSector);
             var tdName = el('td', 'col-name');
             tdName.appendChild(feedCell(top));
-            var others = x.syms.slice(1, 3).map(function (s) { return feedStocks[s]; }).filter(Boolean);
+            var others = x.syms.slice(1, 3).map(function (s) { return F.stocks[s]; }).filter(Boolean);
             if (others.length) {   /* 2위 · 3위는 작은 줄 — 각각 그 종목 페이지로 */
               var sub = el('span', 'sector-sub');
               others.forEach(function (o, j) {
@@ -2619,7 +2678,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         })();
         function setPicksDay(day) {   /* 탭 줄 오른쪽 기준일 — stocks.json · themes.json 둘 다 같은 날(종가 기준). 먼저 온 쪽이 채운다 */
           var note = document.querySelector('[data-note="picks-day"]');
-          if (note && day && !note.textContent) { var p = day.split('-'); note.textContent = p[0] + '.' + Number(p[1]) + '.' + Number(p[2]) + ' 종가 기준'; }
+          if (note && day && !note.textContent) { var p = day.split('-'); note.textContent = p[0] + '.' + Number(p[1]) + '.' + Number(p[2]) + ' 종가 기준'; }   /* 홈에서는 표시 자리를 뺐다 (2026-10-24 사용자) — note 가 없으면 아무것도 하지 않는다 */
         }
         fetch(STOCKS_URL + '?v=' + Date.now())
           .then(function (r) { return r.json(); })
@@ -2644,14 +2703,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
           }
           if (last < text.length) box.appendChild(document.createTextNode(text.slice(last)));
         }
-        fetch(THEMES_URL + '?v=' + Date.now())
-          .then(function (r) { return r.json(); })
-          .then(function (json) {
+        var usThemes = [];
+        function renderThemes(rows) {
             var box = document.getElementById('theme-list');
             if (!box) return;
-            var rows = json.themes || [];
-            if (!rows.length) throw new Error('no themes');
             box.textContent = '';
+            if (!rows.length) { box.appendChild(el('div', 'theme-row load-status', picksMarket === 'kr' && !krHome ? '한국 데이터를 불러오는 중…' : '불러올 수 없습니다.')); return; }
             rows.forEach(function (t) {
               var a = el('a', 'theme-row'); a.href = t.url;
               var head = el('span', 'theme-head');
@@ -2661,11 +2718,21 @@ body.no-dashboard .main-content { padding-top: 32px; }
               var sub = el('span', 'theme-sub'); tintText(sub, t.sub || t.question || ''); a.appendChild(sub);
               box.appendChild(a);
             });
+        }
+        function renderPicks() {   /* 종목 카드 세 탭을 지금 시장으로 다시 그린다 (미국 · 한국 알약) */
+          renderThemes(picksMarket === 'kr' ? ((krHome && krHome.flows) || []) : usThemes);
+          renderWatchTabs(); renderWatch(); renderSectorTop();
+        }
+        fetch(THEMES_URL + '?v=' + Date.now())
+          .then(function (r) { return r.json(); })
+          .then(function (json) {
+            usThemes = json.themes || [];
+            if (!usThemes.length) throw new Error('no themes');
+            if (picksMarket === 'us') renderThemes(usThemes);
             setPicksDay(json.day);
           })
           .catch(function () {
-            var box = document.getElementById('theme-list');
-            if (box) { box.textContent = ''; box.appendChild(el('div', 'theme-row load-status', '테마를 불러올 수 없습니다.')); }
+            if (picksMarket === 'us') renderThemes([]);
           });
 
         /* ================================================================= 뉴스 */
@@ -2710,8 +2777,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               /* 제목 아래 기사 소개 한 줄 — RSS 요약을 한국어로 옮긴 것 (2026-10-19 사용자: 원문이 영어라 내용을 한국어로 조금). fetch_news.py 가 summary_ko 를 채운다.
                  명사형으로 끝낸다 "… 애널리스트가 선정" (2026-10-20 사용자: "전한다" 금지) — 옛 "기사는 … 전한다" 문장은 다음 수집에서 바뀔 때까지 싣지 않는다 */
               if (it.summary_ko && !/^기사는|전한다\.?$|본다\.?$/.test(it.summary_ko)) card.appendChild(el('span', 'news-sum', it.summary_ko));
-              /* 제목 아래 선정 이유 14px 회색 — 증시 리포트 뉴스와 같다 (2026-10-14 사용자). fetch_news.py 가 제목 번역과 함께 why_ko 를 채운다 */
-              if (it.why_ko) card.appendChild(el('span', 'news-why', '선정 이유 : ' + it.why_ko));
+              /* 선정 이유(why_ko)는 홈에 보이지 않는다 (2026-10-24 사용자). 옛: 제목 아래 14px 회색 (2026-10-14) */
               var labs = el('span', 'news-labels');   /* 라벨 줄: 분류 라벨 뒤에 출처 · 시각 (2026-10-14 사용자) */
               labs.appendChild(el('span', 'news-tag', newsCategory(it)));
               var sub = el('span', 'news-sub');
@@ -3059,15 +3125,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var box = document.querySelector('[data-hook="radar-rows"]');
           if (!box) return;
           box.textContent = '';
-          var rows = radarRows(sec).slice(0, 4);
+          var rows = radarRows(sec).slice(0, 3);   /* 세 명까지 (2026-10-24 사용자) */
           if (!rows.length) { box.appendChild(el('div', 'kv-row is-note', linesOf(sec['(머리)'] || [])[0] || LOAD_FAILED)); return; }
-          rows.forEach(function (r) {   /* 뉴스 기사 모양: 발언(제목 글자) → 아래 이름 라벨. 강도 없음 (2026-10-24 사용자) */
-            var row = el('div', 'kv-row kv-row--block'), labs = el('div', 'news-labels');
-            row.appendChild(el('span', 'rd-title', r.text));
-            labs.appendChild(el('span', 'news-tag', r.topic));
-            row.appendChild(labs);
-            box.appendChild(row);
-          });
+          rows.forEach(function (r) { box.appendChild(el('div', 'kv-row plain-row', r.text)); });   /* 발언 글자만 (2026-10-24 사용자) */
         }
 
         /* 홈 미디어 데일리 카드 (2026-10-23 사용자 목업) — 이슈 카드(media-daily render_html.sec_issues)를 읽는다.
@@ -3094,19 +3154,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var box = document.querySelector('[data-hook="media-rows"]');
           if (!box) return;
           box.textContent = '';
-          var rows = mediaRows(sec);
+          var rows = mediaRows(sec).slice(0, 3);   /* 세 개까지 (2026-10-24 사용자) */
           if (!rows.length) { box.appendChild(el('div', 'kv-row is-note', linesOf(sec['(머리)'] || [])[0] || LOAD_FAILED)); return; }
-          rows.forEach(function (r) {
-            var row = el('div', 'kv-row'), main = el('span', 'tr-main');
-            if (r.topic) main.appendChild(el('span', 'tr-tag', r.topic));
-            main.appendChild(el('span', null, r.text));
-            row.appendChild(main);
-            /* 오른쪽 = 관심도 (트럼프 · 인물 발언의 `강도 : 8` 과 같은 모양). 옛 글은 방송 n곳 */
-            if (r.interest) { var iv = el('span', 'tr-int', '관심도 : '); iv.appendChild(el('b', null, r.interest)); row.appendChild(iv); }
-            else if (r.channels) { var it = el('span', 'tr-int', '방송 : '); it.appendChild(el('b', null, r.channels + '곳')); row.appendChild(it); }
-            box.appendChild(row);
-          });
-          evenTags(box);
+          rows.forEach(function (r) { box.appendChild(el('div', 'kv-row plain-row', r.text)); });   /* 이슈 글자만 — 라벨 · 관심도 · 구분선 없음 (2026-10-24 사용자) */
         }
 
         function setDate(id, text) {
@@ -3180,7 +3230,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               if (!tm) { var bm = /(\d{1,2})월\s*(\d{1,2})일\s*기준/.exec(String((entry.content || {}).$t || '').replace(/<[^>]+>/g, ' ').slice(0, 1200)); if (bm) tm = [null, String(new Date().getFullYear()), bm[1], bm[2]]; }
               var day = tm ? [tm[1], String(parseInt(tm[2], 10)), String(parseInt(tm[3], 10))].join('.')
                 : String((entry.published || {}).$t || '').slice(0, 10).split('-').map(function (x, i) { return i ? String(parseInt(x, 10)) : x; }).join('.');
-              setDate(card.id, day);
+              setDate(card.id, day.split('.').slice(-2).join('.'));   /* 홈 카드 날짜는 연도 없이 10.23 (2026-10-24 사용자) */
 
               /* 카드를 누르면 그 글로 간다 */
               var href = '';

@@ -1,0 +1,164 @@
+name: KR Stocks
+
+# 한국 종목 고정 페이지(목록 1 + 종목 35) · 홈 한국 탭 데이터 kr.json (experiments/kr-stocks, doc/기획/종목-레이더-기획.md 11절, 2026-10-24).
+# 미국 종목(nvda-report.yml 안의 stock-radar 단계)과 같은 규칙으로, 시각 · 브랜치 · 상태만 따로:
+#   - 평일 16:10 KST(한국 장 마감 15:30 뒤). GitHub cron 07:10 UTC 월~금. 휴장일은 오늘 봉이 없어 게시하지 않는다(fresh.txt).
+#   - 그래프는 kr-images 브랜치(그날 그림만, 이력 없음) — 미국 radar-images 와 다른 브랜치 (둘 다 force push 라 같은 브랜치면 서로 지운다).
+#   - 이어서 쌓는 파일(순위 교체 상태 · 페이지 해시 · 발행 목록 · 고점 회복 통계)은 kr-state 브랜치.
+#   - 다른 워크플로와 같은 분에 gh-pages · Blogger 에 쓰지 않는다 (운영지침 11절: 리포트 :00 · :15 · :30, 시세 :07 · :22 · :37 · :52, 뉴스 :45) → :10.
+#
+# 게시 게이트: 저장소 변수 KR_PUBLISH 가 'true' 일 때만 스케줄 실행이 실제 게시한다. 수동 실행은 publish 입력으로.
+# 시세는 yfinance(미국과 같은 소스 · 같은 약관 위험, 예비 없음 — 운영지침 D4-7 · D4-15), 자금 흐름은 한국은행 ECOS(ECOS_API_KEY).
+
+on:
+  schedule:
+    - cron: '10 7 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Blogger에 실제 게시 (false면 dry-run)'
+        type: boolean
+        required: false
+        default: false
+      force:
+        description: '오늘 봉이 없어도 게시 (휴장일 · 지난 종가로 디자인만 다시 올릴 때)'
+        type: boolean
+        required: false
+        default: false
+      scheduled:
+        description: '외부 cron(Cloudflare Worker)용 — 스케줄 실행과 똑같이 동작 (사람은 끄고 쓴다)'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kr-stocks
+  cancel-in-progress: false
+
+env:
+  ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
+  OPS_CF_KV_NAMESPACE_ID: ${{ secrets.OPS_CF_KV_NAMESPACE_ID }}
+  OPS_CF_API_TOKEN: ${{ secrets.OPS_CF_API_TOKEN }}
+  BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+  BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+  BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+  KR_DIR: experiments/kr-stocks
+  IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
+  DO_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.KR_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+  FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force == true }}
+
+jobs:
+  kr-stocks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 수집 · 그래프는 nvda-report 의 의존성(yfinance · matplotlib · requests), 게시는 daily-report 의 publish_blogger(google-auth)
+      - name: Install dependencies
+        run: |
+          pip install -r experiments/nvda-report/requirements.txt
+          pip install -r experiments/daily-report/requirements.txt
+
+      # 이어서 쌓는 파일 — 순위 교체 상태 · 페이지 해시 · 발행 목록 · 고점 회복 통계(일주일 캐시)
+      - name: Load state (kr-state branch)
+        run: |
+          mkdir -p "$KR_DIR/data"
+          if git fetch origin kr-state:refs/kr-state 2>/dev/null; then
+            git archive refs/kr-state "$KR_DIR/data" | tar -x && echo "상태 불러옴: $(ls "$KR_DIR/data" | tr '\n' ' ')"
+          else
+            echo "이전 상태 없음 (첫 실행)"
+          fi
+
+      - name: Collect · analyze · render
+        run: python "$KR_DIR/main_kr.py"
+
+      - name: Decide publish
+        id: gate
+        run: |
+          FRESH="$(cat "$KR_DIR/output/fresh.txt" 2>/dev/null || echo 0)"
+          if [ "$DO_PUBLISH" = "true" ] && { [ "$FRESH" = "1" ] || [ "$FORCE" = "true" ]; }; then
+            echo "go=true" >> "$GITHUB_OUTPUT"; echo "게시한다 (fresh=$FRESH force=$FORCE)"
+          else
+            echo "go=false" >> "$GITHUB_OUTPUT"
+            if [ "$DO_PUBLISH" != "true" ]; then echo "그림자 모드 — 게시하지 않는다 (스케줄 게시는 저장소 변수 KR_PUBLISH=true)"; python "$KR_DIR/publish_pages_kr.py" --dry || true
+            else echo "오늘 봉 없음(휴장일 또는 지연) — 게시하지 않는다. 강제하려면 force=true"; fi
+          fi
+
+      # 그래프 — kr-images 브랜치를 그날 그림만으로 새로 만들어 덮어쓴다 (이력 없음, 2026-10-20 사용자: 이미지는 휘발성)
+      - name: Deploy charts (kr-images branch, no history)
+        if: steps.gate.outputs.go == 'true' && hashFiles('experiments/kr-stocks/output/images/radar-*.png') != ''
+        run: |
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          SUB="$(for f in "$KR_DIR"/output/images/radar-*.png; do
+            printf '100644 blob %s\t%s\n' "$(git hash-object -w "$f")" "$(basename "$f")"
+          done | git mktree)"
+          TREE="$(printf '040000 tree %s\timages\n' "$SUB" | git mktree)"
+          COMMIT="$(git commit-tree "$TREE" -m "KR stock charts $(date -u +%F) [skip ci]")"
+          git push --force origin "$COMMIT:refs/heads/kr-images"
+          for f in "$KR_DIR"/output/images/radar-*.png; do
+            curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@kr-images/images/$(basename "$f")" || true
+          done
+          echo "한국 종목 그래프 $(git ls-tree "$SUB" | wc -l)장 → kr-images"
+
+      - name: Publish pages (한국 시총 TOP 10 · 종목 35)
+        if: steps.gate.outputs.go == 'true'
+        continue-on-error: true
+        run: python "$KR_DIR/publish_pages_kr.py"
+
+      # 홈 한국 탭 데이터 — 발행된 페이지만 링크 (pages_live.json)
+      - name: Home kr.json
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          python "$KR_DIR/home_feed_kr.py"
+          mkdir -p deploy-home && cp "$KR_DIR/output/home/kr.json" deploy-home/kr.json
+
+      - name: Deploy kr.json to gh-pages
+        if: steps.gate.outputs.go == 'true' && hashFiles('deploy-home/kr.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-home
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Purge kr.json cache
+        if: steps.gate.outputs.go == 'true' && hashFiles('deploy-home/kr.json') != ''
+        continue-on-error: true
+        run: curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr.json" || true
+
+      # 상태 저장 — snapshot · flows 는 매번 새로 받으므로 빼고, 이어서 쌓는 것만
+      - name: Save state (kr-state branch)
+        if: always()
+        run: |
+          mkdir -p state-out
+          for f in rank_state.json page_hashes.json pages_live.json history.json; do
+            [ -f "$KR_DIR/data/$f" ] && cp "$KR_DIR/data/$f" state-out/ || true
+          done
+          [ -n "$(ls state-out 2>/dev/null)" ] || { echo "저장할 상태 없음"; exit 0; }
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          SUB="$(for f in state-out/*; do printf '100644 blob %s\t%s\n' "$(git hash-object -w "$f")" "$(basename "$f")"; done | git mktree)"
+          T1="$(printf '040000 tree %s\tdata\n' "$SUB" | git mktree)"
+          T2="$(printf '040000 tree %s\tkr-stocks\n' "$T1" | git mktree)"
+          TREE="$(printf '040000 tree %s\texperiments\n' "$T2" | git mktree)"
+          if PARENT="$(git rev-parse --verify -q refs/kr-state)"; then
+            if [ "$TREE" = "$(git rev-parse "$PARENT^{tree}")" ]; then echo "변경 없음"; exit 0; fi
+            COMMIT="$(git commit-tree "$TREE" -p "$PARENT" -m "Update kr-stocks state [skip ci]")"
+          else
+            COMMIT="$(git commit-tree "$TREE" -m "Update kr-stocks state [skip ci]")"
+          fi
+          git push origin "$COMMIT:refs/heads/kr-state"
+          echo "저장: $COMMIT"
