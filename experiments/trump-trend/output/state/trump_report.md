@@ -4,10 +4,10 @@
 > 시장 반응은 **관찰된 값**이며 발언과의 인과를 의미하지 않는다.
 
 ## 데이터 상태
-- 생성 시각: 2026-10-25T00:20:04Z (UTC)
-- 게시물 누적 37,244 · 분류 완료 1,801 · 최근 90일 분류 대기 0 (범위 밖 미분류 17,904건은 의도적)
+- 생성 시각: 2026-10-25T21:17:25Z (UTC)
+- 게시물 누적 37,255 · 분류 완료 1,809 · 최근 90일 분류 대기 0 (범위 밖 미분류 17,904건은 의도적)
 - 이벤트 267 (첫 이벤트 2026-06-17T14:01:23Z) · 가격 마지막 거래일 2026-10-23
-- 지난 24시간: 게시물 17 · 노이즈 7 · 정책 글 0 · 미분류 0
+- 지난 24시간: 게시물 11 · 노이즈 3 · 정책 글 0 · 미분류 0
 
 ## 오늘의 발언 (최근 24시간 이벤트)
 _데이터 없음_
@@ -15,16 +15,16 @@ _데이터 없음_
 ## 🔥 급상승 트렌드 (7D · Trend Score)
 | # | 주제 | 점수 | 7D 이벤트 (직전) | 평균 강도 | 성분 |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Regulation 🆕 | 72.5 | 2 (0) | 9 | F90 I70 R40 N100 |
-| 2 | Company / Investment | 72.0 | 4 (1) | 5.25 | F100 I40 R100 N0 |
-| 3 | Regulation / Energy 🆕 | 68.8 | 1 (0) | 10 | F55 I90 R50 N100 |
-| 4 | Energy / Gasoline Prices | 51.2 | 1 (0) | 10 | F55 I90 R20 N0 |
-| 5 | Tax / Tax Cut | 48.8 | 1 (0) | 10 | F55 I90 R10 N0 |
-| 6 | Regulation / Drug Pricing | 41.8 | 1 (0) | 6 | F55 I50 R30 N0 |
-| 7 | Energy / Oil Prices | 41.8 | 1 (0) | 2 | F55 I0 R90 N0 |
-| 8 | Geopolitics / Sanctions | 40.2 | 1 (0) | 5 | F55 I20 R60 N0 |
-| 9 | Energy / Drilling | 39.0 | 2 (2) | 6.5 | F10 I60 R70 N0 |
-| 10 | Geopolitics / Oil Prices | 29.5 | 1 (1) | 5 | F10 I20 R80 N0 |
+| 1 | Company / Investment | 70.0 | 4 (1) | 5.25 | F100 I33 R100 N0 |
+| 2 | Regulation 🆕 | 69.4 | 2 (0) | 9 | F89 I67 R33 N100 |
+| 3 | Regulation / Energy 🆕 | 65.3 | 1 (0) | 10 | F50 I89 R44 N100 |
+| 4 | Energy / Gasoline Prices | 46.9 | 1 (0) | 10 | F50 I89 R11 N0 |
+| 5 | Tax / Tax Cut | 44.2 | 1 (0) | 10 | F50 I89 R0 N0 |
+| 6 | Energy / Oil Prices | 39.7 | 1 (0) | 2 | F50 I0 R89 N0 |
+| 7 | Regulation / Drug Pricing | 36.4 | 1 (0) | 6 | F50 I44 R22 N0 |
+| 8 | Geopolitics / Sanctions | 36.4 | 1 (0) | 5 | F50 I17 R56 N0 |
+| 9 | Energy / Drilling | 35.3 | 2 (2) | 6.5 | F6 I56 R67 N0 |
+| 10 | Geopolitics / Oil Prices | 26.4 | 1 (1) | 5 | F6 I17 R78 N0 |
 
 ## 무엇이 달라졌나
 _Gemini 서술 없음 (--narrate 로 생성)_
@@ -34,9 +34,7 @@ _Gemini 서술 없음 (--narrate 로 생성)_
 
 | 주제 | 이벤트 | 게시물 | 평균 강도 | 부정 비율 | Δ이벤트 |
 | --- | --- | --- | --- | --- | --- |
-| Company / Investment | 2 | 2 | 5 | 0% | +0 |
-| Geopolitics / Oil Prices | 1 | 1 | 5 | 100% | +1 |
-| Energy / Oil Prices | 1 | 1 | 2 | 0% | +1 |
+| Company / Investment | 1 | 1 | 4 | 0% | -1 |
 
 **7D**
 
@@ -45,24 +43,24 @@ _Gemini 서술 없음 (--narrate 로 생성)_
 | Company / Investment | 4 | 4 | 5.25 | 0% | +3 |
 | Regulation | 2 | 2 | 9 | 0% | +2 |
 | Energy / Drilling | 2 | 2 | 6.5 | 0% | +0 |
-| Energy / Gasoline Prices | 1 | 1 | 10 | 0% | +1 |
-| Tax / Tax Cut | 1 | 2 | 10 | 0% | +1 |
 | Regulation / Energy | 1 | 1 | 10 | 0% | +1 |
+| Tax / Tax Cut | 1 | 2 | 10 | 0% | +1 |
+| Energy / Gasoline Prices | 1 | 1 | 10 | 0% | +1 |
 | Regulation / Drug Pricing | 1 | 1 | 6 | 0% | +1 |
-| Geopolitics / Ceasefire | 1 | 1 | 5 | 100% | +0 |
+| Geopolitics / Sanctions | 1 | 1 | 5 | 100% | +1 |
 
 **30D**
 
 | 주제 | 이벤트 | 게시물 | 평균 강도 | 부정 비율 | Δ이벤트 |
 | --- | --- | --- | --- | --- | --- |
-| Company / Investment | 5 | 5 | 6 | 0% | +2 |
-| Geopolitics / Sanctions | 4 | 4 | 5.25 | 100% | +2 |
+| Company / Investment | 5 | 5 | 6 | 0% | +3 |
 | Energy / Drilling | 4 | 4 | 5.25 | 0% | +4 |
-| Trade / Tariff | 3 | 3 | 6 | 0% | -6 |
+| Geopolitics / Sanctions | 4 | 4 | 5.25 | 100% | +3 |
 | Energy / Gasoline Prices | 3 | 3 | 6 | 67% | +3 |
+| Trade / Tariff | 3 | 3 | 6 | 0% | -6 |
 | Regulation | 2 | 2 | 9 | 0% | +2 |
 | Geopolitics / Ceasefire | 2 | 2 | 7.5 | 50% | +2 |
-| Regulation / AI | 2 | 2 | 6.5 | 0% | -5 |
+| Geopolitics / Oil Prices | 2 | 2 | 5 | 100% | +2 |
 
 **90D** (직전 구간 데이터 없음 — 수준값만)
 
