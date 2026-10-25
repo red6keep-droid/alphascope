@@ -1,6 +1,14 @@
 {
-  "updated_at": "2026-10-25 20:46:14 UTC",
+  "updated_at": "2026-10-25 22:46:11 UTC",
   "items": [
+    {
+      "title": "More pain may be coming for the AI trade. Why I’m not giving up on it",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/10/25/jim-cramer-ai-trade-nvidia-coreweave.html",
+      "published": "2026-10-25 21:13:50",
+      "title_ko": "AI 트레이드에 더 큰 고통이 올 수 있다. 왜 포기하지 않는지",
+      "summary_ko": "인베스팅 클럽 구독자 대상 일요일 칼럼 게재"
+    },
     {
       "title": "Blanche defends Trump-ordered lawsuit over Alaska Senate election certification",
       "source": "CNBC",
@@ -50,14 +58,6 @@
       "n_channels": 1
     },
     {
-      "title": "Here are 4 big things we're watching in the stock market this week",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/25/here-are-4-big-things-were-watching-in-the-stock-market-this-week.html",
-      "published": "2026-10-25 14:58:26",
-      "title_ko": "이번 주 증시에서 주목할 4가지 큰 이슈",
-      "summary_ko": "실적 시즌 피크, 연준 회의, 신규 인플레이션 데이터 포함"
-    },
-    {
       "title": "In pictures: Initially peaceful protests across France over inequality again descend into violence",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/25/france-protests-paris-cost-of-living-inequality.html",
@@ -102,11 +102,11 @@
       "summary_ko": "예산, 숙소, 개인 습관, 혼자 있는 시간 고려 사항 언급"
     },
     {
-      "title": "Marc Lore’s Wonder bets on Texas, automation and user-built restaurants as it mulls IPO",
+      "title": "What Democrats and Republicans fear most about each other: CNBC survey has the answers",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/25/wonder-ipo-texas-automation.html",
+      "link": "https://www.cnbc.com/2026/10/25/cnbc-survey-midterm-election-voter-fears.html",
       "published": "2026-10-25 12:00:01",
-      "title_ko": "마크 로어의 Wonder, 텍사스 자동화와 사용자 맞춤 레스토랑으로 IPO 검토",
+      "title_ko": "민주당과 공화당이 서로 가장 두려워하는 점은? CNBC 설문 조사 결과",
       "summary_ko": ""
     }
   ]
