@@ -1,6 +1,22 @@
 {
-  "updated_at": "2026-10-25 12:47:26 UTC",
+  "updated_at": "2026-10-25 14:47:20 UTC",
   "items": [
+    {
+      "title": "In pictures: Initially peaceful protests across France over inequality again descend into violence",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/25/france-protests-paris-cost-of-living-inequality.html",
+      "published": "2026-10-25 14:14:23",
+      "title_ko": "사진으로 보는 프랑스 불평등 시위, 다시 폭력 사태로",
+      "summary_ko": ""
+    },
+    {
+      "title": "Saudi Arabia says it intercepted missiles and drones from Iran-backed Houthis",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/25/saudi-arabia-houthi-missile-drone-interceptions.html",
+      "published": "2026-10-25 13:41:37",
+      "title_ko": "사우디, 이란 후티의 미사일 및 드론 요격 발표",
+      "summary_ko": "후티, 공항 및 에너지 시설 공격 주장"
+    },
     {
       "title": "What Democrats and Republicans fear most about each other: CNBC survey has the answers",
       "source": "CNBC",
@@ -92,22 +108,6 @@
       "published": "2026-10-24 16:14:00",
       "title_ko": "AI 자금 조달 우려, 월스트리트 흔들다",
       "summary_ko": "AI 주식 방어형 클럽 주식으로 회전"
-    },
-    {
-      "title": "Fewer people are flying as airfare soars. Here's why airlines aren't worried",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/23/airfare-airline-capacity.html",
-      "published": "2026-10-24 15:53:30",
-      "title_ko": "항공료 급등에도 항공사들이 걱정하지 않는 이유",
-      "summary_ko": ""
-    },
-    {
-      "title": "Why popular airplanes are getting scrapped years early",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/24/spirit-airlines-planes-scrapped-engine-shortage.html",
-      "published": "2026-10-24 15:18:30",
-      "title_ko": "인기 항공기가 조기 폐기되는 이유",
-      "summary_ko": ""
     }
   ]
 }
