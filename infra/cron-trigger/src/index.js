@@ -41,6 +41,9 @@ function kstTime(d) {
 // 한국 시각 표 (2026-10-22): 한국 방송 시각에 묶인 작업 — 서머타임을 따르면 안 된다.
 // 미디어 데일리: 08:00 1차 발행(밤사이 클립 + 당잠사) · 10:15 같은 글 갱신(Mad Money · 증시각도기). 평일만.
 const KST_JOBS = {
+  // 홈 주요 뉴스 — 하루 두 번 (2026-10-25 사용자): 미국 장 마감 뒤 아침 · 개장 전 저녁. 매일. 분은 :45 (gh-pages push 겹침 피하기)
+  "06:45": [{ workflow: "news.yml", inputs: null }],
+  "21:45": [{ workflow: "news.yml", inputs: null }],
   "08:00": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "1" }, when: WEEKDAY }],
   "10:15": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "2" }, when: WEEKDAY }],
 };
@@ -71,7 +74,7 @@ const JOBS = {
 // 간격 수집 (2026-10-22 사용자) — GitHub cron 만으로는 2시간 뉴스가 하루 12회 중 4회만 돌았다. UTC 분 · 시로 판단한다.
 // 분을 리포트 · 시세 시각(:00 · :15 · :20 · :30)에서 비켜 둔다 — 모두 gh-pages 에 push 해서, 같은 분에 돌면 한쪽 push 가 거부된다.
 const REPEAT = [
-  { workflow: "news.yml", inputs: null, when: (u) => u.m === 45 && u.h % 2 === 0 },         // 뉴스 2시간마다 (UTC 짝수 시 :45)
+  // 뉴스 2시간마다는 2026-10-25 KST_JOBS 하루 두 번으로 옮겼다 (피드가 며칠에 몇 개라 33번 연속 새 기사 0)
 ];
 
 async function dispatch(workflow, token, inputs = { scheduled: "true" }) {

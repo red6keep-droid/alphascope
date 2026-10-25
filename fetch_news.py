@@ -13,7 +13,11 @@ import requests
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments"))
 from llm_chain import LLMPool, gemini_keys, STEPS, CHAINS  # noqa: E402  — 모든 리포트 공용 LLM 사슬 (2026-10-14)
 
-RSS_URL = "https://www.cnbc.com/id/15839069/device/rss/rss.html"
+# 두 피드를 합친다 (2026-10-25 사용자): Top News 가 먼저 — Investing 피드만으로는 며칠에 몇 개라 홈에 최대 2주 전 기사가 걸려 있었다
+# (10-22 ~ 10-24 2시간 실행 33번 모두 새 기사 0). 합친 뒤 발행 시각 최신 순 12개
+RSS_URLS = ["https://www.cnbc.com/id/100003114/device/rss/rss.html",   # Top News
+            "https://www.cnbc.com/id/15839069/device/rss/rss.html"]    # Investing
+RSS_URL = RSS_URLS[0]   # 옛 이름 — 다른 곳이 읽을 수 있어 남긴다
 # 이전 결과(gh-pages) — 이미 번역한 제목은 다시 번역하지 않는다
 PREV_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/news.json"
 HEADERS = {
@@ -49,11 +53,12 @@ def strip_tags(text):
 
 
 def parse_published(rfc822):
-    try:
-        dt = datetime.datetime.strptime(rfc822.strip(), "%a, %d %b %Y %H:%M:%S %Z")
-        return dt.strftime("%Y-%m-%d %H:%M:%S")
-    except Exception:
-        return rfc822.strip()
+    for fmt in ("%a, %d %b %Y %H:%M:%S %Z", "%a, %d %b %Y %H:%M %Z"):   # CNBC 는 초가 빠진 시각도 섞어 낸다 (2026-10-25 확인)
+        try:
+            return datetime.datetime.strptime(rfc822.strip(), fmt).strftime("%Y-%m-%d %H:%M:%S")
+        except Exception:
+            continue
+    return rfc822.strip()
 
 
 def _translate_prompt(items):
@@ -153,13 +158,20 @@ def add_korean_titles(items):
 
 def main():
     print(f"[{datetime.datetime.now()}] 뉴스 수집 시작...")
-    resp = requests.get(RSS_URL, headers=HEADERS, timeout=30)
-    resp.raise_for_status()
-    root = ET.fromstring(resp.content)
+    roots = []
+    for url in RSS_URLS:
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=30)
+            resp.raise_for_status()
+            roots.append(ET.fromstring(resp.content))
+        except Exception as e:  # noqa: BLE001 — 한 피드가 실패해도 나머지로
+            print(f"[피드] {url} 실패: {str(e)[:80]}")
+    if not roots:
+        raise RuntimeError("CNBC 피드 전부 실패")
 
     items = []
     seen = set()
-    for item in root.iter("item"):
+    for item in (it for root in roots for it in root.iter("item")):
         title = clean(item.findtext("title"))
         link = clean(item.findtext("link"))
         published = clean(item.findtext("pubDate"))
@@ -181,6 +193,7 @@ def main():
             "summary": summary[:300],
         })
 
+    items.sort(key=lambda it: it["published"], reverse=True)   # 두 피드를 섞어 최신 순
     results = items[:MAX_ITEMS]
     add_korean_titles(results)
     # 영문 RSS 요약은 번역 입력으로만 쓰고 공개 파일(gh-pages, PUBLIC 저장소 = 배포)에는 남기지 않는다 (2026-10-21, 운영지침 4-2 · D4-2).

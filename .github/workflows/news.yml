@@ -1,8 +1,8 @@
-name: Update News (2h)
+name: Update News (2x daily)
 
 on:
   schedule:
-    - cron: '45 */2 * * *'   # 예비 — 정시는 Cloudflare Worker. 리포트 · 시세와 gh-pages push 가 겹치지 않게 :45
+    - cron: '45 12,21 * * *'   # 예비 — 정시는 Cloudflare Worker. KST 21:45 · 06:45 (2026-10-25 하루 두 번). gh-pages push 겹침 피하기 :45
   workflow_dispatch:
 
 permissions:
