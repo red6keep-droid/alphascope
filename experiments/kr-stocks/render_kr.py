@@ -496,7 +496,7 @@ def _boll_lines(bb):
         reach = "닿았다" if days <= 1 else f"{days}일째 닿아 있다"
         plain = f"최근 한 달 평소 {won(lo)}~{won(hi)}에서 움직였는데 오늘 {won(c)}으로 {zone_ko} 범위에 {reach}."
         where = f"{zone_ko} 범위"
-    lines = [(plain, "plain"), (gauge, "html"), ("row", "한 달 범위", f"{won(lo)} ~ {won(hi)}", "20일 평균 ± 보통 흔들림 2배"), ("row", "오늘 종가", won(c), where)]
+    lines = [(plain, "plain"), (gauge, "html")]   # 범위 · 종가 줄은 막대가 보여 주니 뺀다 (2026-10-25 사용자)
     if not inside and bb.get("days", 0) > 1:
         lines.append(("row", "연속", f"{bb['days']}일째", f"{where}에 머문 날"))
     return lines
