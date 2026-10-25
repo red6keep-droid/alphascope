@@ -1,6 +1,14 @@
 {
-  "updated_at": "2026-10-25 22:46:11 UTC",
+  "updated_at": "2026-10-25 23:32:18 UTC",
   "items": [
+    {
+      "title": "‘Ticking time bomb’: The world's pension funds face an ageing crisis",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/pension-funds-ageing-crisis-risk-investment.html",
+      "published": "2026-10-25 23:19:12",
+      "title_ko": "‘폭탄 시계’: 세계 연금 기금, 고령화 위기 직면",
+      "summary_ko": "장수 및 낮은 출산율로 은퇴 재정 압박"
+    },
     {
       "title": "More pain may be coming for the AI trade. Why I’m not giving up on it",
       "source": "CNBC",
@@ -100,14 +108,6 @@
       "published": "2026-10-25 13:38:01",
       "title_ko": "함께 여행할까? 예약 전 이 질문을 해보세요: '시간, 돈, 실망을 줄여줍니다'",
       "summary_ko": "예산, 숙소, 개인 습관, 혼자 있는 시간 고려 사항 언급"
-    },
-    {
-      "title": "What Democrats and Republicans fear most about each other: CNBC survey has the answers",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/25/cnbc-survey-midterm-election-voter-fears.html",
-      "published": "2026-10-25 12:00:01",
-      "title_ko": "민주당과 공화당이 서로 가장 두려워하는 점은? CNBC 설문 조사 결과",
-      "summary_ko": ""
     }
   ]
 }
