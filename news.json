@@ -1,6 +1,14 @@
 {
-  "updated_at": "2026-10-25 16:48:45 UTC",
+  "updated_at": "2026-10-25 18:46:24 UTC",
   "items": [
+    {
+      "title": "Ukraine disputes Elon Musk’s claim that its military violated Starlink terms during drone operations",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/25/ukraine-musk-starlink-terms-dispute.html",
+      "published": "2026-10-25 18:18:49",
+      "title_ko": "우크라이나, 머스크의 스타링크 약관 위반 주장 반박",
+      "summary_ko": "상용 스타링크 제한으로 중장거리 타격 사용 불가 주장"
+    },
     {
       "title": "Audi defends plans for a $4 billion Georgia plant amid VW restructuring, tariffs",
       "source": "CNBC",
@@ -99,14 +107,6 @@
       "link": "https://www.cnbc.com/2026/10/25/wonder-ipo-texas-automation.html",
       "published": "2026-10-25 12:00:01",
       "title_ko": "마크 로어의 Wonder, 텍사스 자동화와 사용자 맞춤 레스토랑으로 IPO 검토",
-      "summary_ko": ""
-    },
-    {
-      "title": "What next for France as riots rattle markets? Three questions facing investors ahead of more protests",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/24/france-riots-paris-unrest-debt-budget.html",
-      "published": "2026-10-25 08:06:11",
-      "title_ko": "프랑스 시위가 시장을 뒤흔들 때, 투자자는 무엇을 기대해야 할까",
       "summary_ko": ""
     }
   ]
