@@ -1206,33 +1206,46 @@ def _link_icon(url, label):
             f'style="color:#9AA4B2;text-decoration:none;white-space:nowrap;">{LINK_ICON}</a>')
 
 
+def _when(iso):
+    """뉴스 메타의 시각 — 시각이 있으면 KST `10.24 22:15`, 날짜만이면 `2026.10.17` (목록이 오늘자만이라 시각이 더 쓸모 있다, 2026-10-25)."""
+    iso = str(iso or "")
+    if "T" in iso and iso[11:16] not in ("", "00:00"):
+        try:
+            t = datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(datetime.timezone(datetime.timedelta(hours=9)))
+            return t.strftime("%m.%d %H:%M")
+        except ValueError:
+            pass
+    return _d(iso[:10]) if iso else ""
+
+
 def _event_html(e):
+    """뉴스 한 줄 = 공용 뉴스 카드 (design_kit.news_item, 2026-10-25 사용자: 뉴스 형식 통일) — 헤드라인 / 요약 한 줄 / [영역] [방향] (발언자 · 방송)  시각 · 매체.
+    문서(기사 · 뉴스룸 · 관보 · 법원)는 사실 문장이 헤드라인, 요약 = detail(기사 첫 문단에서 · 방송 주장). 가격 · 옵션 같은 계산 이벤트는 제목 + 사실 줄."""
     tag = _tag(e["area"], e["direction"])
-    if e.get("speaker"):   # 발언자 라벨 — 영역·방향 뒤 세 번째 알약 (2026-10-11 사용자: 대표 발언에 "누가 말했다")
+    if e.get("speaker"):   # 발언자 라벨 — 영역·방향 뒤 세 번째 알약 (2026-10-11 사용자: 대표 발언에 "누가 말했다") · 방송 줄은 `방송`
         tag += " " + _pill(config.SPEAKER_KO.get(e["speaker"], e["speaker"]), "area")
     src = rr.SOURCE_KO.get(e.get("source") or "", e.get("source") or "")
-    if e["kind"] in rr.DOC_KINDS:
-        head = _esc(_dk.headline(e["fact"]))   # 뉴스 = 명사형 헤드라인체 (2026-10-18 사용자: 데일리와 같게, "-했다." 로 끝내지 않는다)
-        fact = ""
+    doc = e["kind"] in rr.DOC_KINDS
+    if doc:
+        head = _esc(e.get("headline") or _dk.headline(e["fact"]))   # 종목 페이지 = 원제 번역(공용 뉴스 처리, 2026-10-25) · 엔비디아 = 사실 문장 명사형 헤드라인체 (2026-10-18)
+        detail, subs = e.get("detail") or "", []
     else:
         head = _esc(e["title"])
-        fact = f" · {_tint(_esc(_dk.headline(e['fact'])))}" if e.get("fact") and e["fact"] != e["title"] else ""   # 증감 숫자는 색 (가이드라인 3-3-1 예외 없음)
-    # 날짜 · 매체는 괄호 없이 한 덩어리 `2026.10.17 · Yahoo Finance` — 줄이 바뀔 때 통째로 내려간다 (2026-10-23 사용자)
-    # 매체명을 보이는 글자로 (2026-10-21, 운영지침 D4-3): 툴팁(title)은 모바일에서 안 뜬다
-    meta_parts = [x for x in (_esc(_d(e["published_at"][:10])) if e.get("published_at") else "",
-                              _esc(src) if (e["kind"] in rr.DOC_KINDS and src and src != "googlenews") else "") if x]
-    when = f' <span style="color:{SUB};font-size:{TINY};white-space:nowrap;">{" · ".join(meta_parts)}</span>' if meta_parts else ""
-    # 라벨 줄: 여백 없이 왼쪽 정렬, 기사 맨 아래 (2026-10-13 사용자) · 라벨 사이 3px (2026-10-14 사용자: 0 → 3, 가이드라인 10-7)
-    lab = f'<span style="display:block;line-height:1;margin:8px 0 0;">{tag.replace(f"margin:0 {_dk.PILL_GAP}px;", "margin:0 3px 0 0;").replace("</span> <span", "</span><span")}</span>'
-    # 일반 기사와 강조 카드 모두: 새 창 아이콘 없이 제목이 원문 링크 → 사실 · 날짜 → 라벨 줄 (2026-10-13 사용자: "강조 카드 내의 정보는 일반 뉴스의 정보 배치로")
-    tip_t = _esc(f"{src}: {e['title'][:90]}" if e["kind"] in rr.DOC_KINDS else f"{src} 원문").replace(chr(34), "&quot;")
-    head_html = (f'<a href="{_esc(e["url"])}" title="{tip_t}" target="_blank" rel="noopener" style="font-weight:700;color:#111;text-decoration:none;">{head}</a>'
-                 if e.get("url") else f'<span style="font-weight:700;color:#111;">{head}</span>')
+        detail = ""
+        subs = ([f'<span style="display:block;color:#111;font-size:{TINY};line-height:{LH_TINY};margin-top:4px;">{_tint(_esc(_dk.headline(e["fact"])))}</span>']
+                if e.get("fact") and e["fact"] != e["title"] else [])   # 증감 숫자는 색 (가이드라인 3-3-1 예외 없음)
+    # 매체명을 보이는 글자로 (2026-10-21, 운영지침 D4-3): 툴팁(title)은 모바일에서 안 뜬다. 메타는 라벨 줄 오른쪽 (공용 카드)
+    meta = [_when(e.get("published_at")), src if (doc and src and src != "googlenews") else ""]
+    # 라벨 사이 3px (2026-10-14 사용자: 0 → 3, 가이드라인 10-7)
+    labels = tag.replace(f"margin:0 {_dk.PILL_GAP}px;", "margin:0 3px 0 0;").replace("</span> <span", "</span><span")
+    tip_t = _esc(f"{src}: {e['title'][:90]}" if doc else f"{src} 원문").replace(chr(34), "&quot;")
+    trhelp = ' data-trhelp="skip"' if e.get("media") else ""   # 방송 줄(media_feed)은 한국어 주제 + 유튜브 영상 — 영문 기사용 `번역 방법` 을 붙이지 않는다
+    inner = _dk.news_item(head, e.get("url"), detail, subs, labels, meta, f' title="{tip_t}"{trhelp}')
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절) — 배경 · 테두리만 방향 색
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
         return (f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px {_dk.SEP_GAP - _dk.VP}px;margin:0 0 8px;line-height:{_dk.LH_BODY};">'   # 폭은 다른 카드와 같게, 대신 일반 기사를 NEWS_INDENT 만큼 들여 제목 왼쪽 선을 맞춘다 (2026-10-16 사용자; 10-14 의 좌우 −13 은 되돌림)   # 끝 줄이 라벨(행간 1)이라 아래는 VP 만 뺀다
-                f"{head_html}{fact}{when}{lab}</div>")
-    return f"{head_html}{fact}{when}{lab}"
+                f"{inner}</div>")
+    return inner
 
 
 # 막대는 파스텔 톤 (2026-10-11 사용자: 너무 빨갛다, 눈의 피로) — (배경, 글자)
@@ -2056,7 +2069,7 @@ def render(analysis_path=None, narrative_path=None, output_dir=None):
         with open(narrative_path, "r", encoding="utf-8") as f:
             n = json.load(f)
     title = report_title.post_title(a.get("run_date") or report_title.today_kst())
-    body = _dk.with_ai_model(build_body(a, n), (n or {}).get("model"), _dk.ALIGN_PX)   # 글 끝 "AI 서술 · 모델명" (운영지침 D3-1d)
+    body = build_body(a, n)   # 글 끝 "AI 서술" 줄 없음 — 공통 푸터의 AI 고지와 중복 (2026-10-25 사용자)
     body_path = os.path.join(output_dir, "nvda_report_body.html")
     preview_path = os.path.join(output_dir, "nvda_report.html")
     with open(body_path, "w", encoding="utf-8") as f:

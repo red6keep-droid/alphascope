@@ -98,6 +98,10 @@ CHAINS = {
     "json-lite": ["gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
     # 새 기능 — 예비 공급자 먼저, Gemini 는 맨 뒤 (2026-10-19, 위 머리말: 키 하나를 모든 리포트가 나눠 쓴다). 인물 발언 레이더 인용 추출
     "json-backup-first": ["nvidia-deepseek", "groq-qwen", "groq", "gemini-lite"],
+    # 공용 뉴스 처리(news_store: 제목 번역 · 사실 문장 · 요약 · 종목 관련도) — Groq 먼저 (2026-10-25 사용자: "Gemini 는 쓸 곳이 많다, Groq 로 할 수 있는 건 Groq").
+    # 두 사슬을 배치마다 번갈아 쓴다 — Groq 는 모델마다 분당 8,000토큰(호출 간격 60초)이라 qwen · gpt-oss 를 엇갈려 기다림을 반으로. Gemini lite 는 맨 뒤 예비
+    "news": ["groq-qwen", "groq", "nvidia-deepseek", "gemini-lite"],
+    "news-alt": ["groq", "groq-qwen", "nvidia-deepseek", "gemini-lite"],
 }
 
 # NVIDIA(build.nvidia.com) 무료 엔드포인트는 공식 FAQ 상 개발 · 테스트 · 연구 · 평가 전용 — "실제 최종 사용자에게 서비스하는 활동" 은

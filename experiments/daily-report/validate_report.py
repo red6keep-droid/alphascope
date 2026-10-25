@@ -11,16 +11,12 @@ import re
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-import issue_codes  # noqa: E402
 
 # 2026-10-18 재설계: 시장 상태 점수 해설(regime_*) · 급등주 · 관심 종목 · 위험요인 칸을 뺐다 (doc/기획/데일리-리포트-기획.md 5절 B5 · B6)
 REQUIRED_LLM_KEYS = ["one_line", "summary", "change_comment", "sector_comment", "news",
                      "macro_comment", "opinion", "image_prompt"]
 
 ONE_LINE_MAX_LEN = 80   # 원인 하나 한 문장 (2026-10-18 재설계 — 지수 등락 · 평소 범위는 맨 앞 요약이 말한다)
-
-# 프롬프트 규칙 10 · render_html.THEME_VOCAB 과 같은 목록
-THEME_VOCAB = {"금리", "AI/반도체", "실적", "매크로", "에너지", "정책/규제", "지정학", "기타"}
 
 IMAGE_PROMPT_MAX_LEN = 300
 
@@ -112,10 +108,6 @@ def validate(input_path, output_path, analysis_path=None):
             f"image_prompt 길이 초과: {len(image_prompt)}자 (최대 {IMAGE_PROMPT_MAX_LEN}자)"
         )
 
-    # 뉴스의 theme·related는 렌더가 같은 규칙으로 걸러내므로 여기서는 경고만 남긴다.
-    # 어휘 밖 테마는 '기타'로, 모르는 심볼은 빠진다 — 게시를 막을 일은 아니다.
-    known_symbols = set(analysis.get("symbols") or [])
-
     news_size = len(input_data.get("news", []))
     for i, item in enumerate(report.get("news", [])):
         idx = item.get("index")
@@ -123,25 +115,7 @@ def validate(input_path, output_path, analysis_path=None):
             errors.append(
                 f"news[{i}] index({idx}) 유효하지 않음 (유효 범위 0~{news_size - 1})"
             )
-        if not str(item.get("title_ko") or "").strip():
-            warnings.append(f"news[{i}] title_ko 없음 — 원문(영어) 제목으로 렌더됩니다.")
-        theme = item.get("theme")
-        if theme is None:
-            warnings.append(f"news[{i}] theme 없음 — 태그 없이 렌더됩니다.")
-        issue = item.get("issue")   # 이슈 코드 (doc/기획/이슈-분류-코드표.md) — 없거나 어휘 밖이면 경고만, 렌더에는 안 쓴다
-        if issue is not None and issue not in issue_codes.ISSUES:
-            warnings.append(f"news[{i}] issue '{issue}' 어휘 밖 — 저장은 OTHER 로")
-            item["issue"] = "OTHER"
-        elif theme not in THEME_VOCAB:
-            warnings.append(f"news[{i}] theme '{theme}' 어휘 밖 — '기타'로 표기됩니다.")
-        related = item.get("related")
-        if related is not None and not isinstance(related, list):
-            warnings.append(f"news[{i}] related가 배열이 아님 — 무시됩니다.")
-        elif related:
-            unknown = [s for s in related if s not in known_symbols]
-            if unknown:
-                warnings.append(f"news[{i}] related에 목록 밖 심볼 {unknown} — 제외됩니다.")
-
+        # 제목 번역 · 테마 · 이슈 · 관련 종목은 공용 뉴스 처리(collect_news.process)가 정한다 (2026-10-25) — 데일리 AI 는 index 만
     if report.get("news"):
         selected = len(report["news"])
         if not (3 <= selected <= 5):

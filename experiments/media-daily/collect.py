@@ -43,6 +43,8 @@ def fetch(edition, cutoff=None):
     """cutoff: (hour, minute) KST — createdAt 이 그 시각까지인 것만 (1차 글). None 이면 전부."""
     from google.cloud.firestore_v1.base_query import FieldFilter
     db = _client()
+    # 한국 증시 채널(limitGroup=kr)은 받지 않는다 — 미디어 데일리 = 밤사이 미국장 방송 순위. 그 채널 이슈는 media_feed 가 데일리 한국장 탭 · 종목 페이지로 (2026-10-25)
+    kr = {d.id for d in db.collection("channels").stream() if (d.to_dict() or {}).get("limitGroup") == "kr"}
     docs = db.collection("summaries").where(filter=FieldFilter("edition", "==", edition)).stream()
     cut = None
     if cutoff:
@@ -51,6 +53,8 @@ def fetch(edition, cutoff=None):
     items = []
     for doc in docs:
         d = doc.to_dict() or {}
+        if d.get("channelId") in kr:
+            continue
         created = d.get("createdAt")
         if cut is not None and created is not None and created > cut:
             continue

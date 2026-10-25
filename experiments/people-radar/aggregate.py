@@ -7,6 +7,7 @@
 오늘 시장 맥락 = 데일리 리포트 이력(report-state)의 시장 상태 점수 · S&P 500 · 나스닥 하루 등락 — 없으면 구획 생략.
 """
 
+import csv
 import datetime
 import json
 import os
@@ -17,14 +18,24 @@ import config
 sys.path.append(os.path.join(config.BASE_DIR, ".."))
 import issue_codes  # noqa: E402
 import db
+import paths
+import prices
 
 RELEVANCE_EVENT_MIN = 2   # trump-trend 와 같다
 WINDOW_HOURS = 24
 TREND_DAYS = 7
 
 
+def _now():
+    """UTC 지금. PEOPLE_NOW(ISO) 가 있으면 그 시각 — 지난 날 radar.json 과 같은 창으로 목업을 다시 만들 때 (2026-10-25)."""
+    v = os.environ.get("PEOPLE_NOW")
+    if v:
+        return datetime.datetime.strptime(v, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+    return datetime.datetime.now(datetime.timezone.utc)
+
+
 def _ago(**kw):
-    return (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(**kw)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return (_now() - datetime.timedelta(**kw)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _labeled(conn, since, until=None):
@@ -192,7 +203,141 @@ def history(conn):
         e["n"] += 1
         e[s["direction"] if s["direction"] in e else "neutral"] += 1
     keywords = {sp: sorted(d.values(), key=lambda x: -x["n"])[:KEYWORDS_MAX] for sp, d in kw.items()}
-    return {"people_trend": people_trend, "topic_trend": topic_trend, "targets7": targets7, "strips": strips, "keywords": keywords}
+    # 새로운가 재료 (기획 9-1 4번): 날짜별 (인물|주제) 집합 — enrich 가 오늘 신호마다 며칠째 · 30일 만에 처음을 센다
+    topic_days = [sorted({f'{x["speaker"]}|{x["topic"]}' for x in day}) for day in days]
+    return {"people_trend": people_trend, "topic_trend": topic_trend, "targets7": targets7, "strips": strips, "keywords": keywords,
+            "profiles": profiles(conn, window(0, STRIP_DAYS)),   # 인물별 발언 특징 (2026-10-25)
+            "topic_days": topic_days}
+
+
+CAL_DIR = os.path.join(config.BASE_DIR, "..", "..", "data", "store", "calendar")   # 30년 저장소 캘린더 (로컬만 — CI 엔 없어 그 줄만 빠진다)
+CEO_TICKER = {"huang": "NVDA", "musk": "TSLA"}   # CEO 군 자사 티커 (올트먼 OpenAI 는 비상장)
+PROFILE_TOP = 6
+
+
+def _next_cal(path, today, **where):
+    """캘린더 csv 에서 today 이후 가장 가까운 줄 (day 열). where = 열:값 조건."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            rows = [r for r in csv.DictReader(f) if r["day"] >= today and all(r.get(k) == v for k, v in where.items())]
+    except OSError:
+        return None
+    if not rows:
+        return None
+    r = min(rows, key=lambda r: r["day"])
+    d = (datetime.date.fromisoformat(r["day"]) - datetime.date.fromisoformat(today)).days
+    return {"day": r["day"], "days_left": d, **{k: r[k] for k in ("eps_est", "decision") if k in r}}
+
+
+def _ark_trades(conn, since):
+    """우드 — ARK 매매 공시 최근 줄 (제목 "ARK trades YYYY-MM-DD: buy A, B / sell C")  → [{day, buy[], sell[]}] 최신 순 3일."""
+    out = []
+    for r in conn.execute("SELECT title FROM statements WHERE speaker='wood' AND attribution='trade' AND published_at >= ? ORDER BY published_at DESC LIMIT 3", (since,)):
+        t = r["title"]
+        if ": " not in t:
+            continue
+        day = t.split(":")[0].split()[-1]
+        buy, sell = [], []
+        for part in t.split(": ", 1)[1].split(" / "):
+            part = part.strip()
+            if part.startswith("buy "):
+                buy = [x.strip() for x in part[4:].split(",") if x.strip()]
+            elif part.startswith("sell "):
+                sell = [x.strip() for x in part[5:].split(",") if x.strip()]
+        out.append({"day": day, "buy": buy, "sell": sell})
+    return out
+
+
+def profiles(conn, sigs30=None):
+    """인물별 '발언 특징' (2026-10-25 사용자: 인물군마다 상세 페이지가 같은 꼴이라 특색 있게) — 최근 30일 신호에서
+    주제 · 대상 국가 · 언급 종목의 건수와 방향, 발언 경로(본인 글 · 기관 발표 · 매매 공시 · 보도), 연준 연설자, ARK 매매, 다음 FOMC · 다음 실적.
+    화면은 인물군별로 다른 줄을 고른다 (render_html._profile_card). 값이 없는 줄은 생략."""
+    if sigs30 is None:
+        sigs30 = build_signals(_labeled(conn, _ago(days=STRIP_DAYS)))
+    today = _now().astimezone(datetime.timezone(datetime.timedelta(hours=9))).strftime("%Y-%m-%d")
+    fomc = _next_cal(os.path.join(CAL_DIR, "fomc.csv"), today, scheduled="True")
+    out = {}
+    for s in sigs30:
+        p = out.setdefault(s["speaker"], {"n": 0, "dirs": {"positive": 0, "negative": 0, "neutral": 0}, "paths": {},
+                                         "topics": {}, "countries": {}, "companies": {}, "sub_speakers": {}})
+        d = s["direction"] if s["direction"] in p["dirs"] else "neutral"
+        p["n"] += 1
+        p["dirs"][d] += 1
+        path = s["attribution"] if s["source_kind"] == "primary" else "report"
+        p["paths"][path] = p["paths"].get(path, 0) + 1
+        for field, names in (("topics", [s["topic"]]), ("countries", [c for c in s["countries"] if c != "US"]), ("companies", s["companies"]),
+                             ("sub_speakers", [s["lead"]["sub_speaker"]] if s["speaker"] == "fed" and s["lead"]["sub_speaker"] not in (None, "", "fomc") else [])):
+            for n in names:
+                e = p[field].setdefault(n, {"name": n, "n": 0, "positive": 0, "negative": 0, "neutral": 0})
+                e["n"] += 1
+                e[d] += 1
+    for sp, p in out.items():
+        for field in ("topics", "countries", "companies", "sub_speakers"):
+            p[field] = sorted(p[field].values(), key=lambda e: -e["n"])[:PROFILE_TOP]
+        g = config.PEOPLE[sp]["group"]
+        if sp == "fed":
+            p["next_fomc"] = fomc
+        if sp == "wood":
+            p["trades"] = _ark_trades(conn, _ago(days=STRIP_DAYS))
+        if g == "ceo" and sp in CEO_TICKER:
+            p["ticker"] = CEO_TICKER[sp]
+            p["next_earnings"] = _next_cal(os.path.join(CAL_DIR, "earnings.csv"), today, symbol=CEO_TICKER[sp])
+    return out
+
+
+def _novelty(key, topic_days):
+    """{"streak": 오늘 포함 며칠째, "first30": 직전 30일에 없던 주제}. 오늘 칸(0)이 비어 있으면(집계 시각 차이) 어제부터 센다."""
+    if not topic_days:
+        return None
+    start = 0 if key in topic_days[0] else (1 if len(topic_days) > 1 and key in topic_days[1] else 0)
+    streak = 0
+    for d in range(start, min(len(topic_days), STRIP_DAYS)):
+        if key in topic_days[d]:
+            streak += 1
+        else:
+            break
+    first30 = not any(key in topic_days[d] for d in range(start + 1, min(len(topic_days), STRIP_DAYS + 1)))
+    return {"streak": streak, "first30": first30}
+
+
+def enrich(people, out):
+    """발언마다 (기획 9-4): path = 경로표(paths.resolve) · reaction = 닿는 자산의 D 일 등락 · novelty · next = 다음 날짜(FOMC · 자사 실적).
+    가격은 prices.ensure 로 한 번에 받는다 (yfinance 가 막히면 캐시, 없으면 그 자산 줄만 빠진다)."""
+    today = _now().astimezone(datetime.timezone(datetime.timedelta(hours=9))).strftime("%Y-%m-%d")
+    fomc = _next_cal(os.path.join(CAL_DIR, "fomc.csv"), today, scheduled="True")
+    earn = {}
+    need = set()
+    for p in people:
+        for s in p["signals"]:
+            s["group"] = p["group"]
+            s["path"] = paths.resolve(s, own_ticker=CEO_TICKER.get(p["speaker"]))
+            if s["path"]:
+                need.update(s["path"]["assets"])
+    try:
+        prices.ensure(sorted(need))
+    except Exception as e:  # noqa: BLE001
+        print(f"[aggregate] 가격 갱신 실패 — 캐시로: {str(e)[:80]}")
+    for p in people:
+        for s in p["signals"]:
+            s["novelty"] = _novelty(f'{s["speaker"]}|{s["topic"]}', out.get("topic_days") or [])
+            s["reaction"] = None
+            if s["path"]:
+                d = prices.effective_day(s["first_at"])
+                rs = [(sym, prices.reaction(sym, d)) for sym in s["path"]["assets"]]
+                rs = [(sym, r) for sym, r in rs if r]
+                mkt = prices.reaction("SPY", d) if "SPY" not in s["path"]["assets"] else None   # 비교 대상 (가이드라인 1-4-1): 시장 전체가 같이 움직인 날인지
+                s["reaction"] = {"day": d, "assets": [{"symbol": sym, **r} for sym, r in rs],
+                                 "market": ({"symbol": "SPY", **mkt} if mkt and not mkt.get("pending") else None)} if rs else None
+            nxt = None
+            if s["topic"] == "Fed" and fomc:
+                nxt = {"kind": "FOMC", **fomc}
+            elif p["group"] == "ceo" and p["speaker"] in CEO_TICKER:
+                t = CEO_TICKER[p["speaker"]]
+                if t not in earn:
+                    earn[t] = _next_cal(os.path.join(CAL_DIR, "earnings.csv"), today, symbol=t)
+                if earn[t]:
+                    nxt = {"kind": f"{t} 실적", **earn[t]}
+            s["next"] = nxt if (nxt and nxt["days_left"] > 0) else None
 
 
 def market_context():
@@ -232,6 +377,7 @@ def build(conn, path=None):
         "market": market_context(),
     }
     out.update(history(conn))   # 추이 탭 — 인물 목록 · 주제 반복 막대 · 언급 대상 · 인물 띠 (2026-10-21 사용자)
+    enrich(people, out)   # 발언 카드의 닿는 곳 · 그날 시장 · 새로운가 · 다음 날짜 (기획 9절, 2026-10-25)
     path = path or os.path.join(config.OUTPUT_DIR, "radar.json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:

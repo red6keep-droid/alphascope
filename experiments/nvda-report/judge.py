@@ -16,6 +16,7 @@ import db
 import indicators
 import normal_range_line
 import trump_bridge
+import media_feed  # experiments/ (main.py 가 경로를 넣는다)
 
 TECH_FIELDS = ["close", "ret_1d", "ret_vs_spy", "ret_vs_smh", "ret_vs_amd", "ret_vs_qqq", "ret_vs_avgo", "gap", "range_pct", "ret_sigma_20d",
                "volume", "vol_ratio_20d", "ma50", "ma200", "pct_from_52w_high", "rsi14", "ma_cross"]
@@ -742,6 +743,16 @@ def drawdown_now(conn, day, yr=None):
     return {"stats": st, "days_since_high": since, "pct_from_high": yr["pct_from_high"], "high_day": yr["high_day"]}
 
 
+MAX_MEDIA = 3   # 방송 줄 최대 수 (2026-10-25 사용자: 미디어 데일리의 엔비디아 이야기를 엔비디아 리포트로)
+
+
+def media_events(day, run_date):
+    """엔비디아가 중심인 방송 이슈 + 반도체 업종 이슈 (media_feed.for_page) — 기준 거래일(UTC 날짜) 이후 올라온 영상만. 못 읽으면 0건."""
+    iss = media_feed.issues(media_feed.rows(media_feed.load(run_date, days=2)), since=f"{day}T00:00")   # 같은 이슈는 한 줄로 정리한 뒤
+    rs = sorted(media_feed.for_page(iss, config.SYMBOL), key=lambda r: str(r["published_at"]), reverse=True)
+    return [media_feed.event(r) for r in rs[:MAX_MEDIA]]
+
+
 def build(conn, day, run_date):
     update_technicals(conn)
     s = _state(conn, day)
@@ -763,10 +774,10 @@ def build(conn, day, run_date):
     oh = overheat(conn, day, s, (bb or {}).get("stats"))
     events = (item_evs + calendar_events(conn, day) + regime_events(mr) + sector_flow_events(sf) + bollinger_events(bb) + overheat_events(oh) + trump_bridge.events(day) + price_events(s) + near_high_event(conn, day, s)
               + option_events(conn, day, s, rank) + estimate_events(conn, day, s) + flow_events(conn, day, s)
-              + news_events(n_news, news_avg))
+              + news_events(n_news, news_avg) + media_events(day, run_date))
     # 강조 → 종류 우선순위 → 같은 종류 안에서는 최신이 위 (안정 정렬 두 번)
     events.sort(key=lambda e: e.get("published_at") or "", reverse=True)
-    events.sort(key=lambda e: (0 if e["area"] in config.PRIORITY_AREAS else 1, 0 if e["emphasis"] else 1, KIND_PRIORITY.get(e["kind"], 9)))
+    events.sort(key=lambda e: (0 if e["area"] in config.PRIORITY_AREAS and not e.get("media") else 1, 0 if e["emphasis"] else 1, KIND_PRIORITY.get(e["kind"], 9)))   # 방송 줄은 규제 영역이어도 맨 위로 올리지 않는다
     body, overflow = events[:config.MAX_EVENTS_IN_BODY], events[config.MAX_EVENTS_IN_BODY:]
     macro_today = [c for c in collect_calendar.on_day(conn, day) if c["kind"] in ("FOMC", "CPI", "NFP", "GDP", "PCE")]
     bars_last = collect_market.last_bar_day(conn)

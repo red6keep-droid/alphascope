@@ -68,7 +68,7 @@ def collect():
 
     macro = collect_fred.collect_fred()
     yahoo = collect_yahoo.collect_yahoo()
-    news = collect_news.collect_news()
+    news = collect_news.process(collect_news.collect_news())   # 공용 뉴스 처리 — 헤드라인 · 요약 줄 (2026-10-25)
     try:   # 일정 탭 (D5) — 실패해도 리포트는 나간다
         calendar = collect_calendar.collect_calendar()
     except Exception as e:  # noqa: BLE001

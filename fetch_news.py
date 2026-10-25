@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import html as html_mod
 import json
 import re
@@ -11,11 +12,12 @@ import sys
 import requests
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments"))
-from llm_chain import LLMPool, gemini_keys, STEPS, CHAINS  # noqa: E402  — 모든 리포트 공용 LLM 사슬 (2026-10-14)
 
-RSS_URL = "https://www.cnbc.com/id/15839069/device/rss/rss.html"
-# 이전 결과(gh-pages) — 이미 번역한 제목은 다시 번역하지 않는다
-PREV_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/news.json"
+# 두 피드를 합친다 (2026-10-25 사용자): Top News 가 먼저 — Investing 피드만으로는 며칠에 몇 개라 홈에 최대 2주 전 기사가 걸려 있었다
+# (10-22 ~ 10-24 2시간 실행 33번 모두 새 기사 0). 합친 뒤 발행 시각 최신 순 12개
+RSS_URLS = ["https://www.cnbc.com/id/100003114/device/rss/rss.html",   # Top News
+            "https://www.cnbc.com/id/15839069/device/rss/rss.html"]    # Investing
+RSS_URL = RSS_URLS[0]   # 옛 이름 — 다른 곳이 읽을 수 있어 남긴다
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -49,117 +51,98 @@ def strip_tags(text):
 
 
 def parse_published(rfc822):
+    for fmt in ("%a, %d %b %Y %H:%M:%S %Z", "%a, %d %b %Y %H:%M %Z"):   # CNBC 는 초가 빠진 시각도 섞어 낸다 (2026-10-25 확인)
+        try:
+            return datetime.datetime.strptime(rfc822.strip(), fmt).strftime("%Y-%m-%d %H:%M:%S")
+        except Exception:
+            continue
+    return rfc822.strip()
+
+
+STORE_FILE = "news_store_home.json"   # 공용 뉴스 처리 결과 (gh-pages 에 같이 배포 — 다음 실행 · 다른 리포트가 다시 읽는다)
+STORE_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/" + STORE_FILE
+STORE_DAYS = 8
+
+
+def _iid(link):
+    return hashlib.sha1(link.encode()).hexdigest()[:12]
+
+
+def process(items):
+    """CNBC 기사 → 공용 뉴스 처리(experiments/news_store.py, 2026-10-25 공용 처리 2단계). 처음 본 기사만 AI 로 —
+    원제 번역(헤드라인) · 요약 줄(RSS 요약을 재료로) · 종목별 관련도 · 이슈 코드. 홈은 헤드라인 · 요약만 쓴다. 사슬은 Groq 먼저(news).
+    옛 자체 번역(translate 사슬: 제목 번역 · 선정 이유 · 소개)은 없앴다 — 선정 이유는 10-24 부터 홈에 보이지 않았다."""
+    import news_store
     try:
-        dt = datetime.datetime.strptime(rfc822.strip(), "%a, %d %b %Y %H:%M:%S %Z")
-        return dt.strftime("%Y-%m-%d %H:%M:%S")
-    except Exception:
-        return rfc822.strip()
-
-
-def _translate_prompt(items):
-    """items: [{"title", "summary"}] — 제목 번역(t) + 선정 이유(why) 한 문장 (2026-10-14 사용자: 홈 뉴스에 선정 이유)
-    + 소개 한 문장(s) (2026-10-19 사용자: 원문이 영어라 기사 내용을 한국어로 조금 — 같은 호출에서 받으므로 AI 호출 수는 그대로)."""
-    src = [{"title": it["title"], "summary": it.get("summary", "")} for it in items]
-    return (
-        "다음은 미국 경제 뉴스(CNBC)의 영문 제목과 요약 목록이다. 항목마다 세 가지를 만들어라.\n"
-        "1) t: 제목을 한국 경제지 헤드라인처럼 자연스러운 한국어로. 의미를 더하거나 빼지 말고, 고유명사(기업·인명·지수)는 통용 표기, 숫자·티커는 그대로.\n"
-        "2) why: 투자자가 이 기사를 볼 만한 이유 한 문장(40자 안팎, '~다'로 끝냄). 요약에 있는 사실만 쓰고, 매수·매도 권유나 전망 단정은 하지 않는다.\n"
-        "3) s: 영문 요약을 옮긴 기사 소개 한 줄(100자 안팎). 뉴스 헤드라인처럼 명사형으로 끝낸다 — '~ 선정' · '~ 전망' · '~ 유입' · '~ 기록'. "
-        "'기사는'으로 시작하지 않고, '~다' · '전한다' · '본다' · '밝혔다'로 끝내지 않는다. 누구의 말·판단인지는 주어로 밝힌다(예: '애널리스트가 선정', '연준 위원, 추가 인하 서두를 필요 없다는 입장'). "
-        "요약에 있는 내용만 쓰고 새 내용·의견을 더하지 않는다. 숫자·비교(무엇보다 높고 낮은지)·시간 순서는 원문 그대로 옮긴다. "
-        "예: 'Analysts picked these 5 stocks to buy in October' → '10월에 살 만한 종목 5개, 애널리스트가 선정' · "
-        "'The odds are higher than before X, but lower than after Y' → '확률이 X 전보다 높지만 Y 직후보다는 낮은 수준'. 요약이 비었거나 제목과 같은 내용뿐이면 빈 문자열.\n"
-        '결과는 입력과 같은 순서·같은 개수의 JSON 배열 [{"t": "...", "why": "...", "s": "..."}] 로만 답하라.\n\n' + json.dumps(src, ensure_ascii=False)
-    )
-
-
-def _valid_translation(out, items):
-    return (isinstance(out, list) and len(out) == len(items)
-            and all(isinstance(x, dict) and isinstance(x.get("t"), str) and x["t"].strip() and isinstance(x.get("why"), str) and isinstance(x.get("s", ""), str) for x in out))
-
-
-def _clean_out(out):
-    return [{"t": x["t"].strip(), "why": x["why"].strip(), "s": _intro(x.get("s"))} for x in out]
-
-
-SUMMARY_STYLE = 2   # 소개 문체 판 — 2: 명사형 "… 애널리스트가 선정" (2026-10-20 사용자: "전한다" 금지). 판이 다른 옛 소개는 다시 만든다
-
-
-def _intro(s):
-    """기사 소개 — 명사형으로 끝나는 한 줄만 싣는다 (2026-10-20 사용자). '기사는 …' 으로 시작하거나 '~다' 로 끝나면 빈 문자열."""
-    s = str(s or "").strip().rstrip(".")
-    return s if s and not s.startswith("기사는") and not s.endswith("다") and len(s) <= 200 else ""
-
-
-def translate_titles(titles):
-    """뉴스 항목 목록 → [{"t": 한국어 제목, "why": 선정 이유, "s": 소개}] (같은 길이, 2026-10-14 선정 이유 · 2026-10-19 소개 추가). 전부 실패하면 None.
-
-    홈 화면 제목용 (2026-10-10 사용자: 최신 뉴스 제목은 한글로). 기사 본문은 가져오지도 옮기지도 않는다 — 소개(s)는 RSS 요약만 옮긴다.
-    공용 사슬 "translate" (experiments/llm_chain.py): Groq gpt-oss-120b → NVIDIA gpt-oss-20b → Gemini(예비). 형식이 어긋나면 다음 단계.
-    """
-    if not titles:
-        return []
-
-    def check(out):
-        if not _valid_translation(out, titles):
-            raise ValueError("응답 형식 불일치")
-        return _clean_out(out)
-
-    try:
-        pool = LLMPool("translate", label="번역")
-        return pool.generate_json(_translate_prompt(titles), temperature=0.2, validate=check)
-    except RuntimeError as e:
-        print(f"  [번역] {str(e)[:200]}")
-        return None
-
-
-def previous_translations():
-    try:
-        j = requests.get(PREV_URL, timeout=20).json()
-        return {it["link"]: it for it in j.get("items", []) if it.get("title_ko") and it.get("why_ko") and it.get("link")}
-    except Exception:  # noqa: BLE001
-        return {}
-
-
-def add_korean_titles(items):
-    prev = previous_translations()
+        store = requests.get(STORE_URL, timeout=20).json()
+    except Exception:  # noqa: BLE001 — 첫 실행 · 네트워크: 빈 저장소에서
+        store = {}
+    cut = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=STORE_DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    store = {k: v for k, v in store.items() if v.get("published_at", "") >= cut}
     for it in items:
-        if prev.get(it["link"]):
-            it["title_ko"] = prev[it["link"]]["title_ko"]
-            it["why_ko"] = prev[it["link"]]["why_ko"]
-            if "summary_ko" in prev[it["link"]] and prev[it["link"]].get("summary_v") == SUMMARY_STYLE:   # 옛 문체("기사는 … 전한다")는 다시 만든다
-                it["summary_ko"] = prev[it["link"]]["summary_ko"]
-                it["summary_v"] = SUMMARY_STYLE
-    # 선정 이유 · 소개가 없는 옛 번역도 다시 만든다. 소개는 빈 문자열("요약이 제목뿐")도 만든 것으로 친다 — 매번 다시 묻지 않게
-    todo = [it for it in items if not (it.get("title_ko") and it.get("why_ko") and "summary_ko" in it)]
-    if not todo:
-        print(f"[번역] 새 제목 없음 (이전 번역 {len(items)}건 재사용)")
-        return
-    if not gemini_keys() and not any(os.environ.get(STEPS[st].get("env", ""), "").strip() for st in CHAINS["translate"]):
-        print("[번역] 번역 키 없음 (GROQ/NVIDIA/GEMINI) — 영문 제목 유지")
-        return
-    ko = translate_titles(todo)
-    if ko is None:
-        print(f"[번역] 실패 — {len(todo)}건 영문 제목 유지 (다음 실행에서 재시도)")
-        return
-    for it, t in zip(todo, ko):
-        it["title_ko"] = t["t"]
-        if t["why"]:
-            it["why_ko"] = t["why"]
-        it["summary_ko"] = t["s"]
-        it["summary_v"] = SUMMARY_STYLE
-    print(f"[번역] 새 제목 {len(todo)}건 번역 · 재사용 {len(items) - len(todo)}건")
+        k = _iid(it["link"])
+        if k not in store:
+            store[k] = {"item_id": k, "title": it["title"], "url": it["link"], "source": it.get("source") or "CNBC",
+                        "published_at": it["published"].replace(" ", "T") + "Z", "queries": ["home"]}
+        store[k]["snippet"] = it.get("summary", "")   # 요약 줄 재료 — 저장 · 공개하지 않는다 (운영지침 4-2)
+    store = news_store.recheck(store)
+    store = news_store.classify(store, lambda _: None, None, label="home-news")
+    for v in store.values():
+        v.pop("snippet", None)
+    with open(STORE_FILE, "w", encoding="utf-8") as f:
+        json.dump(store, f, ensure_ascii=False)
+    for it in items:
+        x = store.get(_iid(it["link"])) or {}
+        if news_store.headline(x):
+            it["title_ko"] = news_store.headline(x)   # 원제 번역 (없으면 사실 문장)
+        it["summary_ko"] = news_store.summary(x)
+    n = sum(1 for it in items if it.get("title_ko"))
+    print(f"[공용 처리] 헤드라인 {n}/{len(items)} · 요약 {sum(1 for it in items if it['summary_ko'])}")
+
+
+MEDIA_MAX = 3   # 홈 주요 뉴스에 섞는 방송 줄 — 방송 여러 곳이 같이 다룬 시장 · 업종 이슈 (2026-10-25 사용자)
+
+
+def media_items():
+    """미디어 데일리 재료의 시장 · 업종 이슈 → news.json 항목 (kind=media). 홈 스크립트가 `방송` 라벨 · 채널로 그린다.
+    제목 = 방송 주제, summary_ko = 방송 주장(뉴스 문체). 키(YTB_FIRESTORE_KEY) · 패키지가 없으면 [] — 기사만 나간다."""
+    try:
+        import design_kit as dk
+        import media_feed
+    except Exception as e:  # noqa: BLE001
+        print(f"[방송] 모듈 없음 — 건너뜀: {e}")
+        return []
+    now = datetime.datetime.now(datetime.timezone.utc)
+    since = (now - datetime.timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M")
+    out = []
+    iss = media_feed.issues(media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=2)), since)   # 같은 이슈는 한 줄로 정리한 뒤
+    for r in media_feed.market_top(iss, MEDIA_MAX):
+        try:
+            pub = datetime.datetime.fromisoformat(str(r["published_at"]).replace("Z", "+00:00")).astimezone(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            continue
+        out.append({"title": r["topic"], "title_ko": r["topic"], "summary_ko": dk.headline(r["note"]) if r["note"] else "", "source": r["channel"],
+                    "link": r["url"], "published": pub, "kind": "media", "tag": r["theme"], "direction": r["direction"], "n_channels": r["n_channels"]})
+    print(f"[방송] 시장 이슈 {len(out)}줄")
+    return out
 
 
 def main():
     print(f"[{datetime.datetime.now()}] 뉴스 수집 시작...")
-    resp = requests.get(RSS_URL, headers=HEADERS, timeout=30)
-    resp.raise_for_status()
-    root = ET.fromstring(resp.content)
+    roots = []
+    for url in RSS_URLS:
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=30)
+            resp.raise_for_status()
+            roots.append(ET.fromstring(resp.content))
+        except Exception as e:  # noqa: BLE001 — 한 피드가 실패해도 나머지로
+            print(f"[피드] {url} 실패: {str(e)[:80]}")
+    if not roots:
+        raise RuntimeError("CNBC 피드 전부 실패")
 
     items = []
     seen = set()
-    for item in root.iter("item"):
+    for item in (it for root in roots for it in root.iter("item")):
         title = clean(item.findtext("title"))
         link = clean(item.findtext("link"))
         published = clean(item.findtext("pubDate"))
@@ -181,8 +164,11 @@ def main():
             "summary": summary[:300],
         })
 
-    results = items[:MAX_ITEMS]
-    add_korean_titles(results)
+    items.sort(key=lambda it: it["published"], reverse=True)   # 두 피드를 섞어 최신 순
+    media = media_items()
+    results = items[:MAX_ITEMS - len(media)]
+    process(results)
+    results = sorted(results + media, key=lambda it: it["published"], reverse=True)   # 방송 줄도 시각 순으로 섞는다
     # 영문 RSS 요약은 번역 입력으로만 쓰고 공개 파일(gh-pages, PUBLIC 저장소 = 배포)에는 남기지 않는다 (2026-10-21, 운영지침 4-2 · D4-2).
     # 홈은 summary_ko(우리 소개 한 줄)만 쓴다
     for it in results:

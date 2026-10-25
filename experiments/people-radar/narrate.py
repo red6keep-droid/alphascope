@@ -17,22 +17,42 @@ import fact_check  # noqa: E402
 from llm_chain import LLMPool, usage_line  # noqa: E402
 
 HEAD_MAX = 48
-DETAIL_MAX = 140
+DETAIL_MAX = 100
+PATH_MAX = 70
+RESTATE = 0.6   # 요약의 낱말 가운데 헤드라인 낱말이 이 비율 이상이면 되풀이로 보고 비운다
+
+
+def _overlap(h, d):
+    """헤드라인 · 요약의 2글자 조각 겹침 비율 (요약 기준). 조사 · 끝말에 덜 흔들리게 낱말이 아니라 조각."""
+    g = lambda t: {t[i:i + 2] for i in range(len(t) - 1)} if t else set()
+    hs, ds = g(re.sub(r"[^가-힣A-Za-z0-9]", "", h)), g(re.sub(r"[^가-힣A-Za-z0-9]", "", re.sub(r"(했습니다|입니다|습니다|밝혔|말했|강조했)", "", d)))
+    return len(hs & ds) / len(ds) if ds else 0
+PATH_TEMPLATE = re.compile(r"(직접 연결되는|닿는 자리입니다|먼저 닿는)")   # 예문 틀을 베낀 문장은 버린다 (10-25 첫 실행에서 전부 같은 틀)
+NARRATE_BATCH = 16   # 한 호출 신호 수 — 52개를 한 번에 보내면 Groq 가 413 (10-25)
 BANNED = re.compile(r"(전망됩니다|예상됩니다|것으로 보입니다|오를 것|내릴 것|매수 추천|매수 권유|매도 추천|투자 기회|주목해야)")   # 매매 공시의 "매수"는 사실이라 막지 않는다
 PROMPT = """너는 시장 리서치 블로그의 편집자다. 아래 JSON 은 미국 정책 결정자 · 투자자 · CEO 의 최근 발언 신호 목록이다.
 신호마다 한국어로 두 가지를 써서 JSON 객체 하나로만 답하라 (설명 · 마크다운 금지):
 
-{"items": [{"id": "<신호 id 그대로>", "headline": "...", "detail": "..."}]}
+{"items": [{"id": "<신호 id 그대로>", "headline": "...", "detail": "...", "path": "..."}]}
 
 headline: 48자 이내 명사형 헤드라인. "인물, 무엇" 형태. 끝은 명사 (예: "베센트, 이란 전쟁 뒤 물가 하락 전망" · "캐시 우드, 아처 에비에이션 1,210만 달러 매수").
           "~했다" · "~이다" 같은 서술형 끝말과 마침표 금지.
-detail: 한 문장, 합니다체("~했습니다" · "~입니다"), 140자 이내. 원문에 있는 사실만 — 무엇을 말했는지 또는 했는지, 대상(국가 · 회사 · 자산)과 숫자.
-        발언 내용을 바로 서술한다. 인물 이름 · 직함을 다시 쓰지 말고(헤드라인에 있다), "~고 말했습니다" · "~고 밝혔습니다" · "~것으로 보도됐습니다" 같은
-        인용 꼬리를 붙이지 말 것 (누가 말했는지 · 보도인지는 카드의 다른 줄이 보여 준다).
-        예: "미국이 러시아산 원유 구매를 이유로 유럽 동맹국에 인도 · 중국 2차 관세를 요청했으나 거부당했습니다."
-            "엔화를 지키기 위한 미국의 개입을 옹호하며 안정적인 엔화가 매우 중요하다고 했습니다." 가 아니라 "엔화를 지키기 위한 미국의 개입을 옹호했고, 안정적인 엔화가 매우 중요하다는 입장입니다."
-        시장 영향 · 앞으로의 방향 · 투자 판단을 쓰지 말 것. 원문에 없는 숫자를 만들지 말 것.
-        "attribution" 이 "office" 면 본인이 아니라 기관 발표다 ("백악관은 ~ 발표했습니다").
+detail: 주요 뉴스 문체 한 줄 — 명사 · 명사구로 끝내고 마침표 없음 ("~했습니다" · "~입니다" · "~했다" 금지), 90자 이내.
+        **헤드라인에 없는 사실**만 — "body"(본문 · 기사 첫 문단)에서 배경 · 이유 · 조건 · 시점 · 함께 나온 숫자 · 관련 회사.
+        헤드라인을 말만 바꿔 되풀이하지 말 것 (헤드라인 "오스틴 사이버캡 플릿 10배 성장" 에 "오스틴 사이버캡 차량 10배 증가" 는 금지).
+        예: "출시 약 한 달 만의 증가, 연말까지 일반 승객용 로보택시 운행 목표"
+            "중동 국부펀드 · 로렌 파월 잡스 등과 같은 시기 투자, 비용 절감 · 주가 부양용 자금"
+            "2년 연속 판매 감소 속 제시된 연간 인도량 목표"
+        body 에 헤드라인 밖의 사실이 없으면 detail 은 빈 문자열 "".
+        인물 이름 · 직함 · 인용 꼬리("~고 말해" · "보도") 금지. 원문에 있는 사실 · 숫자만. 시장 영향 · 앞날 · 투자 판단 금지.
+        "attribution" 이 "office" 면 기관 발표다 ("백악관 발표, ~").
+path: 입력에 "channel"(경로 이름) 과 "assets"(닿는 자산) 가 있는 신호만. 주요 뉴스 문체 한 구절 — 명사 · 명사구로 끝내고 마침표 없음, 60자 이내.
+      화면은 "<자산 이름> : <path>" 로 보인다 — **자산 이름을 path 안에 쓰지 말 것**. 발언 내용이 그 자산에 미치는 작용(수요 · 공급 · 원가 · 금리 기대 · 규제 · 관심)만.
+      방향은 "~ 압력" · "~ 기대 자극" · "~ 재료" 까지, "오를 것 · 내릴 것 · 전망 · 예상" 같은 예측 · 단정 금지. 숫자 금지.
+      반드시 "무엇이(발언의 구체 내용) → 어떤 기대 · 압력" 두 부분을 다 쓴다. "투자 압력" · "판매 압력" 처럼 내용 없는 두세 단어는 금지.
+      예: "정제 · 물류 용량 확대로 공급 쪽 내림 압력" · "장기 인도량 목표 상향, 생산 규모 · 점유율 기대 자극" · "네오클라우드 수요 지속, GPU 주문 기대"
+          "아처 · 조비 매수 공시로 당일 관심 집중" · "사이버캡 운행 대수 급증, 로보택시 매출 기대 자극" · "엔터테인먼트 지분 투자, 본업과 거리 있는 자금 이동"
+      "channel" 이 없는 신호는 path 를 비운다("").
 종목은 회사 이름을 한국어로 쓰고 티커는 괄호 (예: 테슬라(TSLA)). 사람 이름은 한국어 표기.
 
 INPUT:
@@ -51,14 +71,22 @@ def _units(text):
 
 
 def _source(radar):
+    import article
+    import paths
+    sec = [s["lead"]["url"] for p in radar["people"] for s in p["signals"] if s["source_kind"] != "primary" and not s["lead"]["body"]]
+    got = article.leads(sec) if sec else {}   # 보도 발언 — 기사 설명 + 첫 문단 (2026-10-25 사용자: 요약이 제목을 되풀이한다)
     out = []
     for p in radar["people"]:
         for s in p["signals"]:
             ld = s["lead"]
-            out.append({"id": ld["id"], "speaker": f'{p["name_ko"]} ({p["title_ko"]})', "attribution": s["attribution"],
-                        "topic": s["topic"], "subtopic": s["subtopic"],
-                        "text": _units(ld["quote"] or ld["title"]), "body": _units(ld["body"][:500]),
-                        "also_reported": [_units(o["title"]) for o in s["others"]][:3]})
+            row = {"id": ld["id"], "speaker": f'{p["name_ko"]} ({p["title_ko"]})', "attribution": s["attribution"],
+                   "topic": s["topic"], "subtopic": s["subtopic"],
+                   "text": _units(ld["quote"] or ld["title"]), "body": _units((ld["body"] or got.get(ld["url"], ""))[:900]),
+                   "also_reported": [_units(o["title"]) for o in s["others"]][:3]}
+            if s.get("path"):   # 경로표가 정한 자산만 (기획 9-2)
+                row["channel"] = paths.CHANNEL_KO[s["path"]["channel"]]
+                row["assets"] = [paths.asset_label(a) for a in s["path"]["assets"]]
+            out.append(row)
     return out
 
 
@@ -76,9 +104,18 @@ def _validate(v, src, min_ratio=0.7):
         why = []
         if not h or len(h) > HEAD_MAX or re.search(r"(했다|이다|됐다|있다)$", h):
             why.append("헤드라인 형식")
-        if not d or len(d) > DETAIL_MAX or d.count(". ") > 0 or not d.endswith("다."):
-            why.append("설명 형식")
-        if BANNED.search(h + " " + d):
+        d = d.rstrip(".").strip()
+        if d and (len(d) > DETAIL_MAX or re.search(r"(습니다|니다|했다|이다|한다|됐다)$", d)):
+            why.append("설명 형식(뉴스 문체)")
+        if d and _overlap(h, d) >= RESTATE:
+            d = ""   # 헤드라인 되풀이 — 줄을 비운다 (2026-10-25 사용자)
+        pth = str(it.get("path") or "").strip().rstrip(".").strip()
+        pth = re.sub(r"^[^:：]{1,40}\)\s*[:：]\s*", "", pth)   # "테슬라(TSLA) : …" — 자산 이름은 화면이 붙인다
+        if pth and len(re.sub(r"\s", "", pth)) < 10:
+            pth = ""   # 내용 없는 두세 단어 ("투자 압력")
+        if pth and (len(pth) > PATH_MAX or re.search(r"(습니다|니다|했다|이다|한다|닿는다)$", pth) or re.search(r"\d", pth) or PATH_TEMPLATE.search(pth)):
+            pth = ""   # 경로 문장은 선택 — 형식이 틀리거나 틀 문장이면 그 줄만 비운다 (카드는 경로 이름 · 뜻 한 줄로 선다)
+        if BANNED.search(h + " " + d + " " + pth):
             why.append("예측 · 권유 말")
         probs = fact_check.check([h, d], by_id[it["id"]])
         if probs:
@@ -86,7 +123,7 @@ def _validate(v, src, min_ratio=0.7):
         if why:
             bad.append((it["id"], why))
             continue
-        out[it["id"]] = {"headline": h, "detail": d}
+        out[it["id"]] = {"headline": h, "detail": d, "path": pth}
     for i, why in bad:
         print(f"[narrate] 탈락 {i}: {', '.join(why)}")
     if len(out) < max(1, int(len(ids) * min_ratio)):
@@ -144,11 +181,16 @@ def narrate(radar_path=None, out_path=None):
         print("[narrate] 신호 0개 — 서술 생략")
         return None
     pool = LLMPool(config.NARRATE_CHAIN, label="people-narrate")
-    try:
-        got = pool.generate_json(PROMPT + json.dumps(src, ensure_ascii=False, indent=1), temperature=0.2,
-                                 validate=lambda v: _validate(v, src))
-    except RuntimeError as e:
-        print(f"[narrate] 실패 — 카드는 원문 제목으로: {str(e)[:160]}")
+    got = {}
+    for i in range(0, len(src), NARRATE_BATCH):
+        chunk = src[i:i + NARRATE_BATCH]
+        try:
+            got.update(pool.generate_json(PROMPT + json.dumps(chunk, ensure_ascii=False, indent=1), temperature=0.2,
+                                          validate=lambda v, c=chunk: _validate(v, c)))
+        except RuntimeError as e:
+            print(f"[narrate] 묶음 {i // NARRATE_BATCH + 1} 실패: {str(e)[:160]}")
+    if not got:
+        print("[narrate] 실패 — 카드는 원문 제목으로")
         return None
     rest = [x for x in src if x["id"] not in got]
     if rest:   # 검사에 떨어진 카드만 한 번 더 — 영어 원문 카드가 남지 않게

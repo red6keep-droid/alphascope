@@ -57,7 +57,10 @@ def eok(v):
 
 
 def badge(sym, size=20):
-    """종목 이름 앞 둥근 배지 — 한글 첫 글자 (미국은 로고 · 티커 두 글자, design_kit.ticker_logo). 운영지침 4-6: 제3자 로고 핫링크 없음."""
+    """종목 이름 앞 둥근 로고 — 우리 gh-pages 사본(ref/ticker_logos.json 의 005930.KS 등, 운영지침 4-6)이 있으면 로고,
+    없으면 한글 첫 글자 배지 (2026-10-25 사용자: "한국 기업의 티커 로고도 제대로 나오게")."""
+    if sym in _dk._logo_files():
+        return _dk.ticker_logo(sym, size)
     ch = U.name(sym)[:1]
     fs = max(8, int(size * 0.5))
     return (f'<span aria-hidden="true" style="display:inline-block;width:{size}px;height:{size}px;line-height:{size}px;border-radius:50%;'

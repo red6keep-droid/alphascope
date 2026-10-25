@@ -19,6 +19,39 @@ import design_kit as dk  # noqa: E402  — 디자인-가이드라인.md 공통 �
 dk.TIP_SRC = "Yahoo Finance"   # 툴팁 기본 데이터 출처. 금리 · 경제 일정이 들어간 툴팁만 with_src (2026-10-20 사용자)
 import cards  # noqa: E402  — 질문 카드 · 막대 그래프 (2026-10-18 재설계)
 import sections as sx  # noqa: E402  — 독자 질문 D1 ~ D6 · K1 ~ K3 구획 (doc/기획/데일리-리포트-기획.md 6절)
+import datetime  # noqa: E402
+import media_feed  # noqa: E402  — 방송 줄 (미디어 데일리 재료의 시장 · 업종 이슈, 2026-10-25 사용자)
+import kr_news  # noqa: E402  — 한국장 탭 `한국장에 영향을 줄 만한 소식` (미디어 데일리 뒤에 이 칸만 갱신)
+
+MEDIA_MAX = 3      # 뉴스 구획 끝의 방송 줄 수 — 방송 여러 곳이 같이 다룬 시장 이슈 순 (media_feed.market_top)
+MEDIA_HOURS = 24   # 글을 만드는 시각 기준 최근 24시간 영상
+_media_cache = None
+_rows_cache = None
+
+
+def _media_rows():
+    global _rows_cache
+    if _rows_cache is None:
+        now = datetime.datetime.now(datetime.timezone.utc)
+        _rows_cache = media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=2))
+    return _rows_cache
+
+
+def _media_lines():
+    """한 번만 읽는다. 키 · 패키지가 없거나 실패하면 [] — 뉴스는 기사만으로 나간다."""
+    global _media_cache
+    if _media_cache is None:
+        now = datetime.datetime.now(datetime.timezone.utc)
+        since = (now - datetime.timedelta(hours=MEDIA_HOURS)).strftime("%Y-%m-%dT%H:%M")
+        _media_cache = media_feed.market_top(media_feed.issues(_media_rows(), since), MEDIA_MAX)   # 같은 이슈는 한 줄로 정리한 뒤
+    return _media_cache
+
+
+def _kst_hm(iso):
+    try:
+        return datetime.datetime.fromisoformat(str(iso).replace("Z", "+00:00")).astimezone(media_feed.KST).strftime("%H:%M")
+    except ValueError:
+        return ""
 
 TEMPLATE_FILE = os.path.join(os.path.dirname(__file__), "templates", "report.html")
 
@@ -767,7 +800,8 @@ NEWS_REL_SIZE = "15px"   # 뉴스 `관련 자산` 줄 14 → 15 굵게 (2026-10-
 
 
 def sec_news(input_data, report, analysis):
-    """뉴스 — 글 항목 카드(2026-10-12 사용자: 카드 형식으로): 테마 라벨 · 제목(글자) + 링크 아이콘, 보조 줄 관련 자산 반응 · 선정 이유 (14px)."""
+    """뉴스 — 공용 뉴스 카드. 기사 칸(헤드라인 = 원제 번역 · 요약 줄 · 테마 · 관련 종목)은 모두 공용 처리(news_store, collect_news.process)가 정하고,
+    데일리 AI 는 어떤 기사를 실을지(index)만 고른다 (2026-10-25 사용자: 공용 기사에 특별 케이스 없이). 선정 이유 줄은 없앴다 — 요약 줄이 그 몫."""
     series = (analysis or {}).get("series") or {}
     rates = (analysis or {}).get("rates") or {}
     quotes = {q["symbol"]: q for q in input_data.get("gainers", []) + input_data.get("most_active", []) if q.get("symbol")}   # 옛 입력용 (2026-10-18 부터 빈 목록)
@@ -786,26 +820,26 @@ def sec_news(input_data, report, analysis):
             news_item = input_data.get("news", [])[item.get("index")]
         except (IndexError, TypeError):
             continue
-        theme = item.get("theme")
+        theme = news_item.get("theme")
         if theme and theme not in THEME_VOCAB:
             theme = "기타"
-        tag = dk.pill(theme, bare=True) if theme else ""   # 라벨 줄 — 여백 없이 왼쪽 정렬 (2026-10-13 사용자)   # 라벨은 제목 끝 (2026-10-12 사용자: 법무·부정 등 라벨은 타이틀 끝에)
-        title = _esc(item.get("title_ko") or news_item.get("title_ko") or news_item.get("title") or "")   # Gemini 가 옮긴 한국어 제목 먼저 (2026-10-12 사용자)
-        url = news_item.get("link")
-        related = [s for s in (item.get("related") or []) if isinstance(s, str) and s in known][:4]
+        tag = dk.pill(theme, bare=True) if theme else ""
+        title = _esc(news_item.get("headline_ko") or news_item.get("title") or "")   # 원제 번역 (홈과 같은 기사 = 같은 헤드라인) — 처리 실패면 영문 원제
+        related = [s for s in (news_item.get("related") or []) if isinstance(s, str) and s in known][:4]   # 관련도 2 이상 종목 중 오늘 시세가 있는 것
         subs = []
         if related:
             subs.append(f'<span style="font-size:{NEWS_REL_SIZE};font-weight:700;">관련 자산 : ' + " · ".join(_named_reaction(s, reaction(s)) for s in related) + "</span>")   # 15px 굵게 (2026-10-13 사용자) · 종목 이름도 증감 색 (가이드라인 3-3)
-        if item.get("why"):
-            subs.append("선정 이유 : " + _esc(item["why"]))
-        sub_html = "".join(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;">{x}</span>' for x in subs)
-        head = (f'<a href="{_esc(url)}" target="_blank" rel="noopener" style="color:#111;font-weight:700;text-decoration:none;">{title}</a>' if url
-                else f"<span style='color:#111;font-weight:700;'>{title}</span>")   # 제목이 원문 링크 — 새 창 아이콘 삭제 (2026-10-13 사용자)
+        sub_html = [f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;">{x}</span>' for x in subs]
+        # 공용 뉴스 카드 (design_kit.news_item, 2026-10-25 뉴스 형식 통일): 헤드라인(원문 링크) / 요약 줄 / 관련 자산 / [테마]  매체
         # 매체명을 보이는 글자로 — 출처 명시(저작권법 제37조)는 툴팁이 아니라 본문 글자여야 한다 (2026-10-21, 운영지침 D4-3)
-        src = news_item.get("source") or ""
-        src_html = f'<span style="color:{dk.SUB};font-size:{dk.TINY};vertical-align:middle;margin-left:{6 if tag else 0}px;">{_esc(src)}</span>' if src else ""
-        lab = f'<span style="display:block;line-height:1;margin:8px 0 0;">{tag}{src_html}</span>' if (tag or src_html) else ""   # 라벨 줄은 기사 맨 아래 (2026-10-13 사용자)
-        items.append(f"{head}{sub_html}{lab}")
+        items.append(dk.news_item(title, news_item.get("link"), news_item.get("detail_ko") or "", sub_html, tag, [news_item.get("source") or ""]))   # 요약 줄 = 공용 처리 detail
+    # 방송 줄 — 미디어 데일리 재료 중 시장 · 업종 이슈, 방송 여러 곳이 같이 다룬 순 (2026-10-25 사용자). 의견이 섞여 `방송` 라벨 + 채널 · 방송 n곳
+    for r in _media_lines():
+        labels = (dk.pill(r["theme"], bare=True) + " " + dk.pill({"positive": "긍정", "negative": "부정"}.get(r["direction"], "중립"),
+                                                                  r["direction"] if r["direction"] in ("positive", "negative") else "neutral", bare=True)
+                  + " " + dk.pill(media_feed.LABEL, bare=True))
+        meta = [_kst_hm(r["published_at"]), r["channel"], f"방송 {r['n_channels']}곳" if r["n_channels"] > 1 else ""]
+        items.append(dk.news_item(_esc(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"'))
     return dk.item_rules(items, sub=True, indent=dk.ALIGN_PX) if items else dk.muted("주요 뉴스 없음")   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
 
 
@@ -889,6 +923,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     korea = sx.korea_open_card(a) + sx.korea_pairs_card(a) + sx.fx_card(a)
     if korea:
         parts.append(dk.section(TAB_KOREA, cards.cards_grid(korea), tab=TAB_KOREA))   # 탭 이름과 같은 구획 제목은 테마가 탭 화면에서 숨긴다
+    parts.append(kr_news.section(_media_rows()))   # 소식이 없어도 표시 주석은 남긴다 — 미디어 데일리 실행 뒤 kr_news.py 가 이 칸만 채운다 (2026-10-25)
     mega = sx.mega_rows(a)
     if mega:
         parts.append(dk.section("대형주", _folded(mega, "종목"), summary="평소 범위 기준 크게 움직인 순", tab=TAB_MARKET,
@@ -905,7 +940,6 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     parts.append(dk.section("금리·지표", sec_macro(input_data.get("macro", {}), analysis, report), tab=TAB_MARKET))
     if a.get("calendar"):
         parts.append(dk.section(TAB_CAL, cards.cards_grid(sx.macro_cal_card(a) + sx.earnings_cal_card(a)), tab=TAB_CAL))
-    parts.append(dk.ai_model_line(report.get("model"), dk.ALIGN_PX))   # "AI 서술 · 모델명" 한 줄 (운영지침 D3-1d, 2026-10-21)
     parts.append(dk.WRAP_CLOSE)   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지, 가이드라인 6절)
     # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지) · 반말 문장 끝은 합니다체 (2026-10-18 사용자: 블로그 기본 문체, 데일리는 재작업 때 일괄 — 지금)
     return dk.formal(dk.fix_colons(dk.align_titles("\n".join(p for p in parts if p))))   # 카드 밖 제목을 좌측 기준선(ALIGN_PX)으로 (2026-10-23 사용자)

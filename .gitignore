@@ -4,6 +4,7 @@ client_secret*.json
 **/client_secret*.json
 data.json
 news.json
+news_store_home.json
 .env
 experiments/daily-report/.env
 experiments/daily-report/output/

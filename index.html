@@ -20,7 +20,7 @@
     <meta content='yes' name='apple-mobile-web-app-capable'/>
     <meta content='AlphaScope' name='apple-mobile-web-app-title'/>
     <meta content='default' name='apple-mobile-web-app-status-bar-style'/>
-    <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap' rel='stylesheet'/>
+    <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap' rel='stylesheet'/>
 
     <b:skin version='1.0'><![CDATA[/*
 <Variable name="keycolor" description="Main Color" type="color" default="#FF3333" value="#FF3333"/>
@@ -494,7 +494,7 @@ body.menu-open { overflow: hidden; }
 
 .col-rank { width: 40px; text-align: center !important; }
 .col-name { text-align: left !important; }
-.col-sector { text-align: left !important; }
+.col-sector { text-align: right !important; }   /* 업종 우측 정렬 (2026-10-25 사용자) */
 
 .rank-table tbody tr { border-bottom: 1px solid var(--border); }
 .rank-table tbody tr:last-child { border-bottom: 0; }
@@ -661,21 +661,26 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   background: var(--bg);
 }
 .footer-title {
+  display: block;
+  text-align: center;   /* 제목은 가운데 · 그 오른쪽에 접기 버튼 (2026-10-25 사용자, 홈 수정 H19) */
   margin: 0 0 14px;
   font-weight: 700;
   font-size: 17px;
+  line-height: 1.5;
   color: var(--ink-2);
 }
 .footer-disclaimer {
   max-width: 880px;
+  text-align: left;   /* 설명글만 좌측 정렬 — 제목 · 저작권 줄은 가운데 (2026-10-25 사용자, 홈 수정 H14) */
   margin: 0 auto 16px;
   font-size: 13px;
   line-height: 1.8;
   color: var(--gray-350);
 }
-.footer-disclaimer summary { list-style: none; cursor: pointer; }   /* 첫 문장 + 화살표 — 눌러서 나머지 (2026-10-24 사용자) */
+.footer-disclaimer summary { list-style: none; cursor: pointer; }   /* 제목 + 첫 문장 — 눌러서 나머지 (2026-10-24 사용자 · 10-25 버튼을 제목 오른쪽으로) */
+.footer-lead { display: block; }
 .footer-disclaimer summary::-webkit-details-marker { display: none; }
-.footer-more { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 6px; vertical-align: -5px; border: 1px solid #E2E8F0; border-radius: 6px; background: #fff; color: #111; box-sizing: border-box; }   /* 외곽선 있는 화살표 버튼 = 다른 더 보기 버튼(.fold-btn)과 같은 테두리 · 바탕 (2026-10-24 사용자) */
+.footer-more { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 8px; vertical-align: -3px; border: 1px solid #E2E8F0; border-radius: 6px; background: #fff; color: #111; box-sizing: border-box; }   /* 외곽선 있는 화살표 버튼 = 다른 더 보기 버튼(.fold-btn)과 같은 테두리 · 바탕 (2026-10-24 사용자) */
 .footer-more svg { width: 12px; height: 12px; }
 .footer-more svg { transition: transform .15s; }
 .footer-disclaimer[open] .footer-more svg { transform: rotate(180deg); }
@@ -731,6 +736,20 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .home-cards .rank-table th:first-child, .home-cards .rank-table td:first-child { padding-left: 0; }
 .home-cards .rank-table th:last-child, .home-cards .rank-table td:last-child { padding-right: 0; }
 .home-cards .sector-card .sector-table { margin: 0; width: 100%; }
+.home-cards .rank-table td.col-rank { text-align: right !important; width: 20px; padding-left: 2px; padding-right: 0; }   /* 순위 번호 우측 정렬 + 왼쪽 여유 2 (2026-10-25 사용자: 구분선에 딱 붙어 어색 — 이전 좌측 정렬 H13 번복) (2026-10-25 사용자, 홈 수정 H13). 칸 폭 = 두 자리 기준 고정 → 로고가 줄마다 같은 세로선 */
+.home-cards .rank-table td.col-rank + td.col-name { padding-left: 14px; }   /* 순위 숫자 ~ 로고 간격 29 → 14 (50%, 2026-10-25 사용자, 홈 수정 H6) — 숫자는 오른쪽 맞춤이라 두 자리도 같은 간격 */
+.home-cards #sector-top-body td.has-sub { padding-top: 15px; padding-bottom: 15px; }   /* 작은 줄(2 · 3위)이 있는 줄도 작은 줄 없는 줄과 같은 위아래 여백 15 — 작은 줄만큼 줄이 길어진다 (2026-10-25 사용자) */
+.home-cards .theme-list { margin: 0; }   /* 시장 흐름 줄도 탭 · 표와 같은 왼쪽 기준선 (2026-10-25 사용자: "시장 흐름 내용의 세로 기준선이 다른 탭과 안 맞는다") — 옛 좌우 16 */
+.home-cards .seg-row:not(.mkt-tabs) { padding-left: 0; padding-right: 0; }   /* 테마 종목 묶음 알약도 같은 기준선 (2026-10-25) */
+/* 테마 종목 묶음 탭 = 하나로 이은 둥근 박스, 메뉴 사이는 세로 구분선만 (2026-10-25 사용자, 홈 수정 H10). 선택: 글자 굵은 검정 + 진한 외곽선 */
+.home-cards #watch-tabs { gap: 0; padding: 0; margin: 12px 0 4px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; }
+.home-cards #watch-tabs .seg { flex: 1 0 auto; padding: 6px 14px; border: 0; border-radius: 0; background: none; color: var(--gray-600); font-weight: 400; text-align: center; }
+.home-cards #watch-tabs .seg + .seg { box-shadow: inset 1px 0 0 #E2E8F0; }
+.home-cards #watch-tabs .seg:first-child { border-radius: 7px 0 0 7px; }   /* 모서리는 바깥 네 귀퉁이만 둥글고 안쪽은 직선 (2026-10-25 사용자) */
+.home-cards #watch-tabs .seg:last-child { border-radius: 0 7px 7px 0; }
+.home-cards #watch-tabs .seg:only-child { border-radius: 7px; }
+.home-cards #watch-tabs .seg[aria-selected="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: inset 0 0 0 1px #111; }   /* 선택 외곽선 2 → 1px, 높이 −4 (패딩 8 → 6) */
+.home-cards #watch-tabs .seg[aria-selected="true"] + .seg { box-shadow: none; }
 .home-cards .report-card-date,
 .home-cards .section-note { margin-right: 0; }
 /* 안쪽 카드는 테두리 · 모서리를 겉 카드에 맡긴다 */
@@ -761,14 +780,30 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   .picks-section .rank-table th, .picks-section .rank-table td { white-space: normal; }
   .picks-section .cell-price small { display: block; margin-left: 0; }
 }   /* 3칸 표는 폰 폭에 맞춘다 — 시총 TOP 10 의 min-width 760 을 물려받으면 종가 · 업종 칸이 오른쪽으로 밀려 안 보였다 */
+/* 종목명은 늘 한 줄, 업종 글자도 한 줄 — 업종 · 종가 칸 좌우 여백 8 → 4, 업종 글자 13px로 자리를 만든다. 폭 374px 이하 폰에서만 업종이 공백 자리에서 두 줄 (2026-10-25 사용자: "종목명이 두 줄로 가면 안 된다") */
+.picks-section .stock-name { white-space: nowrap; }
+.picks-section #sector-top-body td.col-sector { white-space: nowrap; padding-left: 4px; padding-right: 4px; }
+.picks-section #sector-top-body .cell-sector { font-size: 13px; }
+.picks-section #sector-top-body td:last-child { padding-left: 4px; }
+@media (max-width: 374px) { .picks-section #sector-top-body td.col-sector { white-space: normal; } }
 .seg-row { display: flex; gap: 6px; padding: 12px 16px 4px; overflow-x: auto; scrollbar-width: none; }
 .seg-row::-webkit-scrollbar { display: none; }
 .seg { flex: none; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 999px; background: #fff; font: inherit; font-size: 14px; line-height: 20px; color: var(--gray-600); white-space: nowrap; cursor: pointer; }
 .seg[aria-selected="true"] { background: #111; border-color: #111; color: #fff; font-weight: 700; }
 /* 미국 · 한국 알약 — 구획 제목 줄 오른쪽 (2026-10-24 사용자). 묶음 알약(.seg-row)보다 작게 */
-.mkt-tabs { padding: 0; gap: 6px; margin-left: auto; align-self: center; }
-.mkt-tabs .seg { padding: 4px 10px; font-size: 13px; line-height: 18px; }
+.mkt-tabs { display: inline-flex; padding: 3px; gap: 2px; margin-left: auto; align-self: center; overflow: visible; background: #F1F5F9; border-radius: 8px; }   /* 미국 · 한국 = 트럼프 `오늘 | 5일` 전환 버튼 모양 (2026-10-25 사용자, 홈 수정 H7 · H8): 회색 바탕 둥근 상자, 선택은 흰 바탕 · 검정 굵게 */
+.mkt-tabs .seg { padding: 4px 12px; border: 0; border-radius: 6px; background: none; font-size: 14px; line-height: 20px; font-weight: 400; color: #6B7280; }
+.mkt-tabs .seg[aria-selected="true"] { background: #fff; border: 0; color: #111; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .home-cards .section-head .mkt-tabs { margin: 0 0 0 auto; }
+/* 종목 정렬 텍스트 버튼 — 시장 흐름 탭 오른쪽 끝, 글자 앞 삼각형(글자 크기의 70%). 처음엔 탭 글자와 같은 회색(비활성), 누르면 상승 빨강 · 하락 파랑 (2026-10-25 사용자, 홈 수정 H12) */
+.sort-toggle { display: flex; flex-direction: column; align-items: center; margin-left: auto; padding: 9px 0 0; border: 0; background: none; font: inherit; font-size: 14px; line-height: 20px;   /* 글자 크기 = 묶음 탭(데이터 센터 · 반도체) 14px (2026-10-25 사용자) */ color: var(--gray-400); white-space: nowrap; cursor: pointer; flex: none; }
+.sort-toggle[hidden] { display: none; }
+.sort-toggle::after { content: ''; display: block; height: 2px; margin-top: 10px; background: transparent; }   /* 탭과 같은 높이 자리 */
+.sort-in { display: inline-flex; align-items: center; }
+.sort-tri { flex: none; position: relative; top: .05em; width: .7em; height: .7em; margin-right: 4px; fill: currentColor; }   /* 삼각형은 글자(한글) 세로 가운데 — 실측 0.7px 위라 .05em 내림 (2026-10-25 사용자) */
+.sort-toggle[data-state="up"] { color: #d93025; font-weight: 700; }
+.sort-toggle[data-state="down"] { color: #1a73e8; font-weight: 700; }
+.sort-toggle[data-state="down"] .sort-tri { transform: rotate(180deg); top: calc(.05em + 1px); }   /* 하락순 삼각형은 1px 더 내림 (2026-10-25 사용자) */
 /* 테마 목록 — 줄마다 테마 이름(굵게) · 상태 라벨 오른쪽, 아래 줄 핵심 숫자. 줄 전체가 테마 페이지 링크, 줄 사이 구분선 */
 .theme-list { margin: 0 16px; }
 .theme-row { display: block; padding: 14px 0; border-top: 1px solid #E5E7EB; color: inherit; text-decoration: none; }
@@ -784,6 +819,7 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 a.theme-row:hover .theme-name { text-decoration: underline; }
 /* 섹터 상위 종목 — 2위 · 3위는 1위 아래 작은 줄 */
 .sector-sub { display: block; margin-top: 4px; font-size: 14px; line-height: 20px; color: var(--gray-600); }   /* 줄바꿈 허용 — nowrap 이면 폰에서 종가 칸이 오른쪽으로 밀려 잘렸다 (2026-10-21) */
+.sector-sub-item { display: block; }   /* 종목마다 한 줄, 가운뎃점 없음 (2026-10-25 사용자) */
 .sector-sub a { color: inherit; text-decoration: none; }
 .sector-sub a:hover { text-decoration: underline; }
 
@@ -1024,7 +1060,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 /* 제목 아래 날짜 줄(October 11, 2026) 삭제 (2026-10-12 사용자) */
 .post-timestamp { display: none !important; }
 /* 글 보기: 첫 제목 위 여백 70% 줄임 (2026-10-12 사용자) — 위 32+40 → 10+12 */
-body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 30px; }
+body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 25px; }   /* 상세 제목 줄 위 여백 −5 (2026-10-25 사용자) */
 /* 글 제목 위 보이는 여백 30px (2026-10-12 사용자 20 → 2026-10-13 사용자: "상단 타이틀의 위쪽 여백을 10픽셀 추가"). 행간 반쪽만큼 뺀 값 */
 body.item-view .post-outer-container { padding-top: 13px; }
 
@@ -1342,7 +1378,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px — 인물 발언의 기사 목록만 +6 (렌더러, 2026-10-21 사용자) */
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
-  body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 31px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) */
+  body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 26px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) → −5 (2026-10-25 사용자: 상세 제목 줄 위 여백) */
   .post-title { font-size: 23px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
   .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
   .post-body { font-size: 19px; line-height: 34px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
@@ -1464,35 +1500,11 @@ body.no-dashboard .main-content { padding-top: 32px; }
       <div class='nav-right'>
         <b:section class='search-holder' id='search_top' maxwidgets='1' name='Search' showaddelement='false'>
           <b:widget id='BlogSearch1' locked='true' title='Search This Blog' type='BlogSearch' visible='true'>
-            <b:includable id='main'>
-              <form class='search-bar' id='site-search' expr:action='data:blog.searchUrl' method='get' role='search'>
-                <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='2'>
-                  <circle cx='5.75' cy='5.75' r='4.5'/>
-                  <path d='M9.3 9.3 12.8 12.8' stroke-linecap='round'/>
-                </svg>
-                <input aria-label='검색' autocomplete='off' name='q' placeholder='종목, 뉴스, 매크로 검색...' type='search' expr:value='data:view.search.query'/>
-              </form>
-            </b:includable>
+            <b:includable id='main'><b:comment>검색 버튼 삭제 (2026-10-25 사용자) — 위젯 틀만 남기고 아무것도 그리지 않는다</b:comment></b:includable>
           </b:widget>
         </b:section>
 
-        <button class='icon-btn' type='button'>
-          <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-            <path d='M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9'/>
-            <path d='M13.7 21a2 2 0 0 1-3.4 0'/>
-          </svg>
-          <span class='sr-only'>알림</span>
-        </button>
-
-        <!-- 폰: 알림 · 검색 · 메뉴 순서로 오른쪽 정렬 (2026-10-12 사용자) -->
-        <button class='search-toggle' type='button' aria-controls='site-search' aria-expanded='false'>
-          <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='2'>
-            <circle cx='5.75' cy='5.75' r='4.5'/>
-            <path d='M9.3 9.3 12.8 12.8' stroke-linecap='round'/>
-          </svg>
-          <span class='sr-only'>검색 열기</span>
-        </button>
-
+        <!-- 알림 · 검색 버튼 삭제 (2026-10-25 사용자, 홈 수정 H1 · H2) — 헤더 오른쪽은 메뉴 버튼만 -->
         <button class='nav-toggle' type='button' aria-controls='primary-menu' aria-expanded='false'>
           <svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
             <path d='M3 6h18M3 12h18M3 18h18'/>
@@ -1569,6 +1581,59 @@ body.no-dashboard .main-content { padding-top: 32px; }
         <!-- 주요 지수 · 섹터 현황 카드는 삭제 — 미국 증시 리포트에 나온다 (2026-10-20 사용자) -->
 
         <!-- ====================================================================
+             4. 테마 · 관심 종목 · 섹터 종목 — 카드 하나에 탭 셋, 카드 제목 없음 (2026-10-21 사용자: "홈 카드에 테마, 관심 종목, 섹터 종목 탭으로, 그냥 탭으로")
+             테마 = themes.json (experiments/theme-monitor/home_feed.py), 종목 = stocks.json (experiments/stock-radar/home_feed.py), 하루 1회 종가 기준.
+             줄 전체가 그 테마 · 종목 페이지 링크. 페이지가 아직 없는 종목(하루 10개씩 만드는 중)은 목록 페이지로.
+             ==================================================================== -->
+        <section class='rankings picks-section' aria-labelledby='picks-title'>
+          <!-- 묶음 제목 + 나침반 아이콘 · 미국 · 한국 탭 (2026-10-24 사용자: "테마 · 관심 종목 · 섹터 종목 탭 위에 묶는 타이틀과 아이콘"). 탭 이름도 같은 날: 테마 → 시장 흐름 · 관심 종목 → 테마 종목 · 섹터 종목 → 섹터 대표주 -->
+          <div class='section-head'>
+            <h2 class='section-title' id='picks-title'>
+              <span class='report-icon' style='background:#0E7490;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='8' r='6'/><path d='M10.6 5.4 9.2 9.2 5.4 10.6 6.8 6.8z' fill='currentColor' stroke='none'/></svg></span>시장 흐름과 종목
+            </h2>
+            <div class='seg-row mkt-tabs' role='tablist' aria-label='시장 고르기' data-mkt-for='picks'><button type='button' class='seg' role='tab' aria-selected='true' data-mkt='us'>미국</button><button type='button' class='seg' role='tab' aria-selected='false' data-mkt='kr'>한국</button></div>
+          </div>
+          <div class='card rank-card'>
+            <div class='tabs' role='tablist' id='picks-tabs'>
+              <!-- 탭 순서 테마 종목 · 섹터 대표주 · 시장 흐름 (2026-10-25 사용자). 옛: 시장 흐름이 첫 탭 -->
+              <button class='tab' role='tab' aria-selected='true'  data-pick='watch'>테마 종목</button>
+              <button class='tab' role='tab' aria-selected='false' data-pick='sector'>섹터 대표주</button>
+              <button class='tab' role='tab' aria-selected='false' data-pick='theme'>시장 흐름</button>
+              <!-- 정렬 버튼 하나 — 처음 ▲ 상승순(회색, 비활성), 누르면 빨강 상승순 → 다시 누르면 파랑 ▼ 하락순 → 다시 누르면 상승순. 테마 종목 · 섹터 대표주 탭에서만 보인다 (2026-10-25 사용자, 홈 수정 H12) -->
+              <button type='button' class='sort-toggle' id='sort-toggle' data-state='' aria-label='정렬'><span class='sort-in'><svg class='sort-tri' viewBox='0 0 10 10' aria-hidden='true'><path d='M5 1.5 9.5 8.5H.5z'/></svg><span class='sort-txt'>상승순</span></span></button>
+            </div>
+
+            <div class='pick-panel' data-pick-panel='watch'>
+              <!-- 묶음 = universe.WATCH (반도체 · 데이터 센터 · 우주항공 · 경기 방어주) — 탭 아래 작은 알약 줄 -->
+              <div class='seg-row' role='tablist' id='watch-tabs'></div>
+              <div class='table-wrap'>
+              <table class='rank-table'>
+                          <tbody id='watch-body'>
+                  <tr><td colspan='2' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
+                </tbody>
+              </table>
+              </div>
+            </div>
+
+            <div class='pick-panel' data-pick-panel='sector' hidden='hidden'>
+              <div class='table-wrap'>
+              <table class='rank-table'>
+                          <tbody id='sector-top-body'>
+                  <tr><td colspan='3' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
+                </tbody>
+              </table>
+              </div>
+            </div>
+
+            <div class='pick-panel' data-pick-panel='theme' hidden='hidden'>
+              <div class='theme-list' id='theme-list'>
+                <div class='theme-row load-status'>테마를 불러오는 중…</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
              3. 시총 TOP 10  (data.json 연동) — 옛 이름 실시간 랭킹 (2026-10-18 사용자: 고정 10종목이라 이름이 틀림, 기획 10-10)
              ==================================================================== -->
         <section class='rankings' aria-labelledby='rankings-title'>
@@ -1592,8 +1657,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             <table class='rank-table'>
               <thead>
                 <tr>
-                  <th class='col-rank'>순위</th>
-                  <th class='col-name'>종목명</th>
+                  <th class='col-name' colspan='2'>종목명</th>   <!-- 순위 구분명 삭제 · 종목명이 구분 영역 맨 왼쪽 (2026-10-25 사용자, 홈 수정 H5) -->
                   <th id='rank-th-price'>현재가 · 전일 대비</th>
                   <th class='col-sector'>업종</th>
                   <th>거래량</th>
@@ -1611,73 +1675,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
           </div>
         </section>
 
-        <!-- ====================================================================
-             4. 테마 · 관심 종목 · 섹터 종목 — 카드 하나에 탭 셋, 카드 제목 없음 (2026-10-21 사용자: "홈 카드에 테마, 관심 종목, 섹터 종목 탭으로, 그냥 탭으로")
-             테마 = themes.json (experiments/theme-monitor/home_feed.py), 종목 = stocks.json (experiments/stock-radar/home_feed.py), 하루 1회 종가 기준.
-             줄 전체가 그 테마 · 종목 페이지 링크. 페이지가 아직 없는 종목(하루 10개씩 만드는 중)은 목록 페이지로.
-             ==================================================================== -->
-        <section class='rankings picks-section' aria-labelledby='picks-title'>
-          <!-- 묶음 제목 + 나침반 아이콘 · 미국 · 한국 탭 (2026-10-24 사용자: "테마 · 관심 종목 · 섹터 종목 탭 위에 묶는 타이틀과 아이콘"). 탭 이름도 같은 날: 테마 → 시장 흐름 · 관심 종목 → 테마 종목 · 섹터 종목 → 섹터 대표주 -->
-          <div class='section-head'>
-            <h2 class='section-title' id='picks-title'>
-              <span class='report-icon' style='background:#0E7490;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='8' r='6'/><path d='M10.6 5.4 9.2 9.2 5.4 10.6 6.8 6.8z' fill='currentColor' stroke='none'/></svg></span>시장 흐름과 종목
-            </h2>
-            <div class='seg-row mkt-tabs' role='tablist' aria-label='시장 고르기' data-mkt-for='picks'><button type='button' class='seg' role='tab' aria-selected='true' data-mkt='us'>미국</button><button type='button' class='seg' role='tab' aria-selected='false' data-mkt='kr'>한국</button></div>
-          </div>
-          <div class='card rank-card'>
-            <div class='tabs' role='tablist' id='picks-tabs'>
-              <button class='tab' role='tab' aria-selected='true'  data-pick='theme'>시장 흐름</button>
-              <button class='tab' role='tab' aria-selected='false' data-pick='watch'>테마 종목</button>
-              <button class='tab' role='tab' aria-selected='false' data-pick='sector'>섹터 대표주</button>
-            </div>
-
-            <div class='pick-panel' data-pick-panel='theme'>
-              <div class='theme-list' id='theme-list'>
-                <div class='theme-row load-status'>테마를 불러오는 중…</div>
-              </div>
-            </div>
-
-            <div class='pick-panel' data-pick-panel='watch' hidden='hidden'>
-              <!-- 묶음 = universe.WATCH (반도체 · 데이터 센터 · 우주항공 · 경기 방어주) — 탭 아래 작은 알약 줄 -->
-              <div class='seg-row' role='tablist' id='watch-tabs'></div>
-              <div class='table-wrap'>
-              <table class='rank-table'>
-                <thead>
-                  <tr>
-                    <th class='col-name'>종목명</th>
-                    <th>종가 · 전일 대비</th>
-                    <th class='col-sector'>업종</th>
-                  </tr>
-                </thead>
-                <tbody id='watch-body'>
-                  <tr><td colspan='3' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
-                </tbody>
-              </table>
-              </div>
-              <button type='button' class='fold-btn' id='watch-toggle' aria-expanded='false' hidden='hidden'><span>종목 더 보기</span>
-                <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
-            </div>
-
-            <div class='pick-panel' data-pick-panel='sector' hidden='hidden'>
-              <div class='table-wrap'>
-              <table class='rank-table'>
-                <thead>
-                  <tr>
-                    <th class='col-sector'>업종</th>
-                    <th class='col-name'>1위 종목</th>
-                    <th>종가 · 전일 대비</th>
-                  </tr>
-                </thead>
-                <tbody id='sector-top-body'>
-                  <tr><td colspan='3' style='text-align:center;padding:32px;color:var(--gray-400)'>데이터를 불러오는 중…</td></tr>
-                </tbody>
-              </table>
-              </div>
-              <button type='button' class='fold-btn' id='sector-top-toggle' aria-expanded='false' hidden='hidden'><span>업종 더 보기</span>
-                <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
-            </div>
-          </div>
-        </section>
         </div><!-- /home-cards -->
 
         <!-- ====================================================================
@@ -2238,12 +2235,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
       <!-- 2026-10-18 사용자: "투자 의사 결정 보조" 문구 수정 · 리포트 꼬리말의 출처 · 투자 권유 안내를 이 푸터 하나로 모은다 (Claude 문안).
            "의사 결정 보조"는 투자 자문처럼 읽히고, "AI 모델의 가공적 연산"은 사실과 다르다(계산은 정해진 규칙). 2026-10-18 밤: AI 해설 문장(데일리 · 엔비디아 · 트럼프 서술)도 있어 "뉴스 분류와 해설 문장"으로 고침, 글마다의 꼬리말은 모두 뺐다 (사용자: 중복 안내 금지).
            2026-10-24 Claude 정리: AI 쓰임을 실제대로(분류 · 번역 · 해설 · 표지 그림 · 댓글), "사실 기록" → "기록"(해설은 해석), 공급처 이름(Yahoo) 빼고 종류로, 데이터 지연 · 오류 문장 추가, 보장 문장 하나로, 개별 상담 없음(운영지침 5절) -->
-      <p class='footer-title'>ALPHASCOPE 미국 주식 데이터 리포트</p>
-      <!-- 2026-10-24 사용자: 첫 문장만 보이고 끝의 화살표(더 보기)로 나머지를 연다. "면책 사항 :" 이름표는 뺐다(법적 의무 아님).
+      <!-- 2026-10-25 사용자(홈 수정 H19): 접기 버튼을 제목 "ALPHASCOPE 미국 주식 데이터 리포트" 오른쪽으로 — 제목도 summary 안에 넣어 제목 · 첫 문장은 늘 보이고 JS 없이 접힌다.
+           2026-10-24 사용자: 첫 문장만 보이고 화살표(더 보기)로 나머지를 연다. "면책 사항 :" 이름표는 뺐다(법적 의무 아님).
            첫 줄에 "권유하지 않습니다"까지 둔다 — 투자 권유 아님은 접지 않는다(운영지침 5절). 접힌 글도 HTML 에 있어 검색엔진이 읽는다(details, JS 없음).
            같은 날 사용자: "코드가 계산" 은 첫 문장과 중복이라 뺌, AI 는 목록 대신 한 줄(AI 기본법 생성형 AI 고지), "늦거나 틀릴 수" → 참고용 한 문장. 문구 확정(사용자): "해설 문장 일부는 AI 가 씁니다." · "모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다." -->
       <details class='footer-disclaimer'>
-        <summary>ALPHASCOPE 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.<span class='footer-more' role='img' aria-label='더 보기'><svg viewBox='0 0 16 16' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></span></summary>
+        <summary><span class='footer-title'>ALPHASCOPE 미국 주식 데이터 리포트<span class='footer-more' role='img' aria-label='더 보기'><svg viewBox='0 0 16 16' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></span></span><span class='footer-lead'>ALPHASCOPE 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.</span></summary>
         <p>해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다.
         개별 투자 상담을 하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다.
         종목 로고는 각 회사의 상표이며, 종목을 구분하는 용도로만 쓰고 해당 회사와 제휴 관계가 없습니다.</p>
@@ -2420,7 +2417,18 @@ body.no-dashboard .main-content { padding-top: 32px; }
         var krHome = null, rankMarket = 'us', picksMarket = 'us';
         var KR_URL = GH + 'kr.json';
         function isKR(r) { return !!(r && r.sym && /\.(KS|KQ)$/.test(r.sym)); }
-        function krAvatar(name, color) { var av = el('span', 'stock-avatar', String(name || '?').charAt(0)); av.style.background = color; return av; }   /* 한글 첫 글자 (영문 머리글자 대신) */
+        /* 한글 첫 글자 원 위에 로고 (2026-10-25 사용자: "한국 기업의 티커 로고도 제대로") — 파일 KR_<종목코드>.svg, 없으면 첫 글자 원이 남는다 */
+        function krAvatar(name, color, code) {
+          var av = el('span', 'stock-avatar', String(name || '?').charAt(0)); av.style.background = color;
+          if (!/^\d{6}$/.test(String(code || ''))) return av;
+          var img = document.createElement('img');
+          img.alt = ''; img.loading = 'lazy'; img.width = 26; img.height = 26;
+          img.onload = function () { av.classList.add('has-logo'); };
+          img.onerror = function () { if (img.parentNode) img.parentNode.removeChild(img); };
+          img.src = LOGO_BASE + 'KR_' + code + '.svg';
+          av.appendChild(img);
+          return av;
+        }
         function krPage(r) { return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html'); }
         var activeSort = 'cap';   /* 시총 TOP 10 이라 기본은 시가총액 순 (2026-10-18) */
         /* data.json 에 시총(mc)이 없던 때의 순서 — fetch_stocks.TICKERS 와 같은 2026-10-18 장 마감 순위 */
@@ -2470,7 +2478,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             var cell = el('a', 'stock-cell');
             cell.href = kr ? krPage(s) : pageFor(s.s);
             /* 로고 (우리 gh-pages 사본) — 없으면 머리글자 원 (2026-10-22, 리포트 design_kit.ticker_logo 와 같게). 한국 종목은 한글 첫 글자 */
-            var av = kr ? krAvatar(s.name, meta.color) : stockAvatar(s.s, meta.color);
+            var av = kr ? krAvatar(s.name, meta.color, s.s) : stockAvatar(s.s, meta.color);
             var label = el('span', 'stock-label');
             label.appendChild(el('span', 'stock-name', meta.name));
             label.appendChild(el('span', 'stock-ticker', s.s));
@@ -2531,8 +2539,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
             b.addEventListener('click', function () {
               var m = b.getAttribute('data-mkt');
               btns.forEach(function (x) { x.setAttribute('aria-selected', String(x === b)); });
-              if (card === 'rank') { rankMarket = m; rankOpen = false; renderRankings(); }
-              else { picksMarket = m; watchTab = 0; watchOpen = false; sectorOpen = false; renderPicks(); }
+              /* 펼친 더 보기는 탭을 바꿔도 그대로 (2026-10-25 사용자, 디자인 가이드라인 10-11) — 펼침 상태를 건드리지 않는다 */
+              if (card === 'rank') { rankMarket = m; renderRankings(); }
+              else { picksMarket = m; watchTab = 0; picksSort = ''; syncSortButtons(); renderPicks(); }   /* 미국 · 한국 전환도 정렬 풀림 (2026-10-25 사용자: 다른 탭을 누르면) */
             });
           });
         });
@@ -2554,8 +2563,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
         /* ================================================= 관심 종목 · 섹터 상위 종목 (stocks.json, 2026-10-21 사용자) */
 
         var feedStocks = {}, feedWatch = [], feedSectors = [];
-        var watchTab = 0, watchOpen = false, sectorOpen = false;
-        var WATCH_SHOWN = 3, SECTOR_SHOWN = 3;
+        var watchTab = 0;   /* 시장 흐름과 종목 카드는 더 보기가 없다 (2026-10-25 사용자) */
+        var picksSort = '';   /* '' = 시총순(기본) · 'up' = 상승순 · 'down' = 하락순. 카드 하나에 하나, 위 탭(테마 종목 · 섹터 대표주)을 누르면 '' 로 (2026-10-25 사용자, 홈 수정 H12) */
+  
         var COLORS = ['#0E7490', '#7C3AED', '#B45309', '#15803D', '#BE123C', '#1D4ED8', '#4D7C0F', '#9F1239', '#0F766E', '#6D28D9'];
         function feedColor(sym) { var h = 0; for (var i = 0; i < sym.length; i++) h = (h * 31 + sym.charCodeAt(i)) % 997; return COLORS[h % COLORS.length]; }
         /* 종목 줄 링크 — 페이지가 있으면 그 종목 고정 페이지, 아직 없으면(하루 10개씩 만드는 중) 목록 페이지. 엔비디아는 리포트 글 목록 */
@@ -2575,7 +2585,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         function feedCell(r) {
           var cell = el('a', 'stock-cell');
           cell.href = feedPage(r);
-          var av = isKR(r) ? krAvatar(r.name, feedColor(r.s)) : stockAvatar(r.s, (META[r.s] && META[r.s].color) || feedColor(r.s));   /* 한국 종목은 한글 첫 글자 */
+          var av = isKR(r) ? krAvatar(r.name, feedColor(r.s), r.s) : stockAvatar(r.s, (META[r.s] && META[r.s].color) || feedColor(r.s));   /* 한국 종목은 한글 첫 글자 */
           var label = el('span', 'stock-label');
           label.appendChild(el('span', 'stock-name', r.name));
           label.appendChild(el('span', 'stock-ticker', r.s));
@@ -2603,78 +2613,94 @@ body.no-dashboard .main-content { padding-top: 32px; }
           tg.setAttribute('aria-expanded', String(open));
         }
 
+        /* 종목 리스트는 어디서나 많이 오른 순 (2026-10-25 사용자: "종목 리스트는 전부 옳은 순서로") — 묶음 알약은 묶음 종목 평균 전일 대비가 큰 순 */
+        function byGain(a, b) { return (b.cp || 0) - (a.cp || 0); }
+        function byLoss(a, b) { return (a.cp || 0) - (b.cp || 0); }
+        function byCap(a, b) { return (b.mc || 0) - (a.mc || 0); }
+        function pickCmp() { return picksSort === 'up' ? byGain : picksSort === 'down' ? byLoss : byCap; }   /* 처음 진입 = 시총순 */
+        function syncSortButtons() {   /* 버튼 하나 — 글자 · 색 · 삼각형 방향이 정렬 상태를 따른다 */
+          var b = document.getElementById('sort-toggle');
+          if (!b) return;
+          b.setAttribute('data-state', picksSort);
+          b.querySelector('.sort-txt').textContent = picksSort === 'down' ? '하락순' : '상승순';
+          b.setAttribute('aria-label', picksSort === 'down' ? '정렬: 하락순' : picksSort === 'up' ? '정렬: 상승순' : '정렬');
+        }
+        function watchGroups(F) {
+          function avg(g) { var v = g.syms.map(function (s) { return F.stocks[s]; }).filter(Boolean); return v.length ? v.reduce(function (t, r) { return t + (r.cp || 0); }, 0) / v.length : -Infinity; }
+          return (F.watch || []).map(function (g, i) { return { g: g, a: avg(g), i: i }; })
+            .sort(function (x, y) { return y.a - x.a || x.i - y.i; }).map(function (o) { return o.g; });
+        }
         function renderWatchTabs() {
           var box = document.getElementById('watch-tabs');
           if (!box) return;
           box.textContent = '';
-          curFeed().watch.forEach(function (g, i) {
+          watchGroups(curFeed()).forEach(function (g, i) {
             var b = el('button', 'seg', g.group);   /* 묶음은 탭 아래 알약 줄 — 바깥 탭(테마 · 관심 종목 · 섹터 종목)과 구분 (2026-10-21) */
             b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(i === watchTab));
-            b.addEventListener('click', function () { watchTab = i; watchOpen = false; renderWatchTabs(); renderWatch(); });
+            b.addEventListener('click', function () { watchTab = i; picksSort = ''; syncSortButtons(); renderWatchTabs(); renderWatch(); });   /* 다른 탭을 누르면 정렬이 풀려 시총순 · 회색 상승순으로 (2026-10-25 사용자) */
             box.appendChild(b);
           });
         }
         function renderWatch() {
           var body = document.getElementById('watch-body');
           if (!body) return;
-          var F = curFeed(), g = F.watch[watchTab];
+          var F = curFeed(), g = watchGroups(F)[watchTab];
           var rows = g ? g.syms.map(function (s) { return F.stocks[s]; }).filter(Boolean) : [];
-          if (!rows.length) { feedEmpty(body, 3, '데이터를 불러올 수 없습니다.'); setFold('watch-toggle', 0, false, '종목'); return; }
+          if (!rows.length) { feedEmpty(body, 2, '데이터를 불러올 수 없습니다.'); return; }
           body.textContent = '';
-          rows.sort(function (a, b) { return Math.abs(b.cp || 0) - Math.abs(a.cp || 0); });   /* 크게 움직인 순 */
-          rows.forEach(function (r, i) {
+          rows.sort(pickCmp());   /* 기본 시총순, 상승순 · 하락순 버튼으로 오늘 등락 정렬 (옛: 많이 오른 순) */
+          rows.forEach(function (r) {
             var tr = el('tr');
             var tdName = el('td', 'col-name'); tdName.appendChild(feedCell(r)); tr.appendChild(tdName);
             var tdPrice = el('td'); tdPrice.appendChild(feedPrice(r)); tr.appendChild(tdPrice);
-            var tdSector = el('td', 'col-sector'); tdSector.appendChild(el('span', 'cell-sector', r.sector)); tr.appendChild(tdSector);
-            if (i >= WATCH_SHOWN) { tr.className = 'rank-more'; tr.hidden = !watchOpen; }
-            body.appendChild(tr);
+            body.appendChild(tr);   /* 테마 종목은 더 보기 없이 묶음 종목 전부 (2026-10-25 사용자) */
           });
-          setFold('watch-toggle', rows.length - WATCH_SHOWN, watchOpen, '종목');
         }
         function renderSectorTop() {
           var body = document.getElementById('sector-top-body');
           if (!body) return;
           var F = curFeed();
           var rows = F.sectors.filter(function (x) { return x.syms && x.syms.length && F.stocks[x.syms[0]]; });
-          if (!rows.length) { feedEmpty(body, 3, '데이터를 불러올 수 없습니다.'); setFold('sector-top-toggle', 0, false, '업종'); return; }
+          if (!rows.length) { feedEmpty(body, 3, '데이터를 불러올 수 없습니다.'); return; }
+          /* 업종 줄 순서 = 대표 종목 기준 — 기본 시총순, 상승순 · 하락순이면 대표 종목 오늘 등락 순 (2026-10-25 사용자, 홈 수정 H12) */
+          var cmp = pickCmp();
+          rows = rows.map(function (x, i) { return { x: x, i: i }; }).sort(function (a, b) { return cmp(F.stocks[a.x.syms[0]], F.stocks[b.x.syms[0]]) || a.i - b.i; }).map(function (o) { return o.x; });
           body.textContent = '';
-          rows.forEach(function (x, i) {
+          rows.forEach(function (x) {
             var top = F.stocks[x.syms[0]];
             var tr = el('tr');
-            var tdSector = el('td', 'col-sector'); tdSector.appendChild(el('span', 'cell-sector', x.sector)); tr.appendChild(tdSector);
             var tdName = el('td', 'col-name');
             tdName.appendChild(feedCell(top));
-            var others = x.syms.slice(1, 3).map(function (s) { return F.stocks[s]; }).filter(Boolean);
+            var others = x.syms.slice(1, 3).map(function (s) { return F.stocks[s]; }).filter(Boolean).sort(pickCmp());
             if (others.length) {   /* 2위 · 3위는 작은 줄 — 각각 그 종목 페이지로 */
               var sub = el('span', 'sector-sub');
-              others.forEach(function (o, j) {
-                if (j) sub.appendChild(document.createTextNode(' · '));
-                var a = el('a', null, o.name); a.href = feedPage(o); sub.appendChild(a);
-                sub.appendChild(el('span', signClass(o.cp || 0), ' ' + arrow(o.cp || 0) + fmt(Math.abs(o.cp || 0)) + '%'));
+              others.forEach(function (o, j) {   /* 2위 · 3위는 종목마다 한 줄 — 가운뎃점 없이 줄바꿈 (2026-10-25 사용자) */
+                var chunk = el('span', 'sector-sub-item');
+                var a = el('a', null, o.name); a.href = feedPage(o); chunk.appendChild(a);
+                chunk.appendChild(el('span', signClass(o.cp || 0), ' ' + arrow(o.cp || 0) + fmt(Math.abs(o.cp || 0)) + '%'));
+                sub.appendChild(chunk);
               });
-              tdName.appendChild(sub);
+              tdName.appendChild(sub); tdName.className += ' has-sub';
             }
             tr.appendChild(tdName);
+            var tdSector = el('td', 'col-sector'); tdSector.appendChild(el('span', 'cell-sector', x.sector)); tr.appendChild(tdSector);   /* 종목 → 업종 → 종가 (2026-10-25 사용자) */
             var tdPrice = el('td'); tdPrice.appendChild(feedPrice(top)); tr.appendChild(tdPrice);
-            if (i >= SECTOR_SHOWN) { tr.className = 'rank-more'; tr.hidden = !sectorOpen; }
-            body.appendChild(tr);
+            body.appendChild(tr);   /* 업종 줄은 접기 없이 전부 (2026-10-25 사용자: 시장 흐름과 종목의 더 보기 버튼 전부 삭제) */
           });
-          setFold('sector-top-toggle', rows.length - SECTOR_SHOWN, sectorOpen, '업종');
         }
-        (function () {
-          var a = document.getElementById('watch-toggle'), b = document.getElementById('sector-top-toggle');
-          if (a) a.addEventListener('click', function () { watchOpen = !watchOpen; renderWatch(); });
-          if (b) b.addEventListener('click', function () { sectorOpen = !sectorOpen; renderSectorTop(); });
-          /* 테마 · 관심 종목 · 섹터 종목 탭 (2026-10-21 사용자) */
+        (function () {   /* 시장 흐름과 종목 탭 전환 — 시장 흐름은 세 번째 탭 (2026-10-25 사용자) */
           var tabs = [].slice.call(document.querySelectorAll('#picks-tabs [data-pick]'));
           tabs.forEach(function (t) {
             t.addEventListener('click', function () {
               var k = t.getAttribute('data-pick');
               tabs.forEach(function (x) { x.setAttribute('aria-selected', String(x === t)); });
               [].slice.call(document.querySelectorAll('[data-pick-panel]')).forEach(function (p) { p.hidden = p.getAttribute('data-pick-panel') !== k; });
+              picksSort = ''; syncSortButtons(); renderWatch(); renderSectorTop();   /* 탭을 (다시) 누르면 시총순으로 (2026-10-25 사용자, H12) */
+              var sb = document.getElementById('sort-toggle'); if (sb) sb.hidden = (k === 'theme');   /* 시장 흐름 탭에는 정렬 버튼이 없다 */
             });
           });
+          var sortBtn = document.getElementById('sort-toggle');
+          if (sortBtn) sortBtn.addEventListener('click', function () { picksSort = picksSort === 'up' ? 'down' : 'up'; syncSortButtons(); renderWatch(); renderSectorTop(); });   /* 처음 → 상승순 → 하락순 → 상승순 … */
         })();
         function setPicksDay(day) {   /* 탭 줄 오른쪽 기준일 — stocks.json · themes.json 둘 다 같은 날(종가 기준). 먼저 온 쪽이 채운다 */
           var note = document.querySelector('[data-note="picks-day"]');
@@ -2773,15 +2799,18 @@ body.no-dashboard .main-content { padding-top: 32px; }
               var a = el('a', null, it.title);
               if (it.link) { a.href = it.link; a.target = '_blank'; a.rel = 'noopener'; }
               card.appendChild(a);
-              if (it.link && window.asNewsLink) window.asNewsLink(a);   /* 제목 옆 '번역 방법' — 브라우저 번역 안내 (2026-10-19 사용자) */
+              var media = it.kind === 'media';   /* 방송 줄 — 미디어 데일리 재료의 시장 이슈 (fetch_news.py media_items, 2026-10-25 사용자). 한국어 주제 + 유튜브라 번역 안내 없음 */
+              if (media) a.setAttribute('data-trhelp', 'skip');
+              if (it.link && !media && window.asNewsLink) window.asNewsLink(a);   /* 제목 옆 '번역 방법' — 브라우저 번역 안내 (2026-10-19 사용자) */
               /* 제목 아래 기사 소개 한 줄 — RSS 요약을 한국어로 옮긴 것 (2026-10-19 사용자: 원문이 영어라 내용을 한국어로 조금). fetch_news.py 가 summary_ko 를 채운다.
                  명사형으로 끝낸다 "… 애널리스트가 선정" (2026-10-20 사용자: "전한다" 금지) — 옛 "기사는 … 전한다" 문장은 다음 수집에서 바뀔 때까지 싣지 않는다 */
               if (it.summary_ko && !/^기사는|전한다\.?$|본다\.?$/.test(it.summary_ko)) card.appendChild(el('span', 'news-sum', it.summary_ko));
               /* 선정 이유(why_ko)는 홈에 보이지 않는다 (2026-10-24 사용자). 옛: 제목 아래 14px 회색 (2026-10-14) */
               var labs = el('span', 'news-labels');   /* 라벨 줄: 분류 라벨 뒤에 출처 · 시각 (2026-10-14 사용자) */
-              labs.appendChild(el('span', 'news-tag', newsCategory(it)));
+              labs.appendChild(el('span', 'news-tag', media ? (it.tag || '시장') : newsCategory(it)));
+              if (media) labs.appendChild(el('span', 'news-tag', '방송'));   /* 기사가 아니라 방송 내용(의견 포함) — 채널이 매체 자리 */
               var sub = el('span', 'news-sub');
-              sub.appendChild(el('span', null, it.source || 'CNBC'));
+              sub.appendChild(el('span', null, (it.source || 'CNBC') + (media && it.n_channels > 1 ? ' · 방송 ' + it.n_channels + '곳' : '')));
               sub.appendChild(el('span', 'num', hhmm(kstTime(it.published))));
               labs.appendChild(sub);
               card.appendChild(labs);
@@ -3105,15 +3134,16 @@ body.no-dashboard .main-content { padding-top: 32px; }
         /* 홈 인물 발언 카드 (2026-10-20 사용자) — 레이더 글 '발언' 구획(people-radar render_html.sec_people)을 읽는다.
            구조: 인물 소제목(data-sub, "이름 (직함)") 뒤에 발언 목록(li — 첫 칸 = 헤드라인, 라벨 줄에 `강도 N`). 인물마다 첫 발언(가장 강한 것) 하나씩 4명까지 */
         function radarRows(sec) {
-          var out = [], who = '', used = {};
+          var out = [], who = '', key = '', used = {};
           function walk(n) {
             if (!n || !n.getAttribute) return;
+            if (n.hasAttribute('data-person-page')) key = n.getAttribute('data-person-page') || '';   /* 인물 키 — 글의 인물 화면 주소 #person-<키> (2026-10-25) */
             if (n.hasAttribute('data-sub')) { who = String((n.querySelector('span > span:last-child') || n).textContent || '').replace(/\s*\([^)]*\)\s*$/, '').replace(/\s+/g, ' ').trim(); return; }
             if (n.tagName === 'LI') {
               if (!who || used[who]) return;
               var head = n.children[0], im = /강도\s*(\d+)/.exec(String(n.textContent || ''));
               var text = head ? String(head.textContent || '').replace(/\s+/g, ' ').trim() : '';
-              if (text) { used[who] = 1; out.push({ topic: who, text: clip(text), intensity: im ? im[1] : '' }); }
+              if (text) { used[who] = 1; out.push({ topic: who, key: key, text: clip(text), intensity: im ? im[1] : '' }); }
               return;
             }
             for (var i = 0; i < n.children.length; i++) walk(n.children[i]);
@@ -3127,7 +3157,13 @@ body.no-dashboard .main-content { padding-top: 32px; }
           box.textContent = '';
           var rows = radarRows(sec).slice(0, 3);   /* 세 명까지 (2026-10-24 사용자) */
           if (!rows.length) { box.appendChild(el('div', 'kv-row is-note', linesOf(sec['(머리)'] || [])[0] || LOAD_FAILED)); return; }
-          rows.forEach(function (r) { box.appendChild(el('div', 'kv-row plain-row', r.text)); });   /* 발언 글자만 (2026-10-24 사용자) */
+          var card = document.getElementById('radar-card'), base = card ? String(card.href || '').split('#')[0] : '';
+          rows.forEach(function (r) {
+            var d = el('div', 'kv-row plain-row', r.text);   /* 발언 글자만 (2026-10-24 사용자) */
+            /* 줄을 누르면 그 인물의 발언 화면으로 (2026-10-25 사용자: "베센트 … 를 누르면 베센트가 발언한 페이지로") — 터치 스크립트가 data-href 로 간다 */
+            if (base && r.key && /^[\w-]+$/.test(r.key)) { d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', base + '#person-' + r.key); }
+            box.appendChild(d);
+          });
         }
 
         /* 홈 미디어 데일리 카드 (2026-10-23 사용자 목업) — 이슈 카드(media-daily render_html.sec_issues)를 읽는다.
@@ -3240,6 +3276,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
               var a = document.getElementById(card.id);
               if (a && href) a.href = href;
               if (a && title) a.title = title;
+              /* 카드 제목 줄도 같은 글로 (2026-10-25 사용자: "주요 인물 발언 타이틀 영역 한 줄을 누르면 상세 페이지로") — 홈 리포트 카드 모두 같게 */
+              var head = a && a.parentNode && a.parentNode.querySelector('.report-title');
+              if (head && href) { head.setAttribute('data-row-link', '1'); head.setAttribute('data-href', href); }
 
               var sec = reportSections((entry.content || {}).$t || '');
               if (!sec) throw new Error('unparsable');
@@ -3335,17 +3374,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
         })();
 
         /* ============================================================ 모바일 메뉴 (2026-10-12 사용자: 메뉴를 누르면 오른쪽에서 열리는 서랍) */
-
-        var searchToggle = document.querySelector('.search-toggle');
-        var searchBar = document.querySelector('.search-bar');
-        if (searchToggle && searchBar) {
-          searchToggle.addEventListener('click', function () {
-            var open = searchToggle.getAttribute('aria-expanded') !== 'true';
-            searchToggle.setAttribute('aria-expanded', String(open));
-            searchBar.classList.toggle('is-open', open);
-            if (open) { var input = searchBar.querySelector('input'); if (input) input.focus(); }
-          });
-        }
 
         var toggle = document.querySelector('.nav-toggle');
         var menu = document.getElementById('primary-menu');
@@ -3824,16 +3852,17 @@ body.no-dashboard .main-content { padding-top: 32px; }
           if (h.querySelector('.title-logo')) return;
           var m = /(?:\(|\s)([A-Z][A-Z.\-]{0,5})\)?\s+주가/.exec(h.textContent) || /\(([A-Z][A-Z.\-]{0,5})\)\s*주가/.exec(h.textContent);
           var sym = m ? m[1] : (/^\s*엔비디아/.test(h.textContent) ? 'NVDA' : '');
-          if (!sym) return;
+          var kr = /(?:^|\s)(\d{6})\s+주가/.exec(h.textContent);   /* 한국 종목 "삼성전자 005930 주가" (2026-10-25) — 배지는 한글 첫 글자, 로고는 KR_<코드> */
+          if (!sym && !kr) return;
           var host = h.querySelector('.post-title-text') || h.querySelector('a') || h;   /* 제목 글자 칸이 있으면 그 안 맨 앞 — 로고가 첫 글자 앞에 붙는다 */
           /* 2026-10-21: 제3자 로고 핫링크(financialmodelingprep) 중단 — 운영지침 4-6. 티커 두 글자 둥근 배지(리포트 design_kit.ticker_logo 와 같은 모양) */
           var b = document.createElement('span'); b.className = 'title-logo title-badge'; b.setAttribute('aria-hidden', 'true');
-          b.textContent = sym.replace(/[^A-Z]/g, '').slice(0, 2);   /* 크기 · 여백은 테마 CSS .post-title .title-logo (build_theme.py) */
+          b.textContent = kr ? h.textContent.trim().charAt(0) : sym.replace(/[^A-Z]/g, '').slice(0, 2);   /* 크기 · 여백은 테마 CSS .post-title .title-logo (build_theme.py) */
           host.insertBefore(b, host.firstChild);
           /* 2026-10-22 사용자: 로고는 신뢰도 — 우리 gh-pages 사본이 있으면 배지 자리를 로고로 바꾼다. 없으면 배지 그대로 (운영지침 4-6) */
           var img = document.createElement('img'); img.alt = ''; img.className = 'title-logo';
           img.onload = function () { if (b.parentNode) b.parentNode.replaceChild(img, b); };
-          img.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/' + encodeURIComponent(sym.replace('.', '-')) + '.svg';
+          img.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/' + (kr ? 'KR_' + kr[1] : encodeURIComponent(sym.replace('.', '-'))) + '.svg';
         });
       })();
 
@@ -4180,6 +4209,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           saved.forEach(function (x) { x.n.hidden = x.h; x.n.style.display = x.d; });
           saved = []; detail.hidden = true; detail.innerHTML = '';
           setHead(null);
+          try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
           try { window.scrollTo(0, 0); } catch (e) {}
         }
         function take(n) { moved.push({ n: n, parent: n.parentNode, next: n.nextSibling }); n.hidden = false; n.style.display = ''; detail.appendChild(n); }
@@ -4196,6 +4226,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           take(page);
           var sub = page.querySelector('[data-sub]'); if (sub) sub.style.display = 'none';   /* 소제목(이름 · 직함)은 제목 줄이 대신한다 */
           detail.hidden = false;
+          try { history.replaceState(null, '', location.pathname + location.search + '#person-' + key); } catch (e) {}   /* 인물 화면 주소 — 홈 카드 줄 · 공유가 여기로 온다 (2026-10-25) */
           try { window.scrollTo(0, 0); } catch (e) {}
         }
         [].slice.call(list.querySelectorAll('[data-person]')).forEach(function (a) {
@@ -4204,6 +4235,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
           a.addEventListener('touchend', function () { setTimeout(function () { a.classList.remove('is-pressed'); }, 150); }, { passive: true });
           a.addEventListener('touchcancel', function () { a.classList.remove('is-pressed'); }, { passive: true });
         });
+        var hm = /^#person-([\w-]+)$/.exec(location.hash || '');   /* 홈 인물 발언 카드 줄 → 그 인물 화면 (2026-10-25 사용자) */
+        if (hm) { var pa = list.querySelector('[data-person="' + hm[1] + '"]'); if (pa) openPerson(pa); }
       })();
 
       /* ============================================================ 상세 페이지 고정 제목 줄 (2026-10-23 사용자: "모든 상세 페이지 — 로고 영역은 스크롤되어 사라지고 제목 영역만 최상단 고정,
@@ -4417,6 +4450,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var inner = tgt.closest ? tgt.closest(INNER) : null;
           if (row && (!inner || !row.contains(inner) || inner === row)) {
             var link = row.matches('a[href]') ? row : row.querySelector('a[href]');
+            if (!link && row.getAttribute('data-href')) { link = document.createElement('a'); link.href = row.getAttribute('data-href'); }   /* 링크 안의 줄(홈 카드 줄 · 제목) — 주소는 data-href (2026-10-25) */
             if (!link) return;
             e.preventDefault();
             if (link.target === '_blank') { window.open(link.href, '_blank', 'noopener'); return; }

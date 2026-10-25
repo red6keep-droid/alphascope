@@ -35,7 +35,7 @@ def _slim(a):
         "day": a["day"],
         "headline": a["headline"],
         "events": [{"area": rr.AREA_KO.get(e["area"], e["area"]), "direction": rr.DIR_KO.get(e["direction"], e["direction"]),
-                    "fact": e["fact"], "source": e.get("source")} for e in a["events"][:5]],
+                    "fact": e["fact"], "source": e.get("source")} for e in [x for x in a["events"] if not x.get("media")][:5]],   # 방송 줄(의견 섞임)은 서술 입력에서 뺀다
         "status_flags": [{"key": x["key"], "value": x["value"]} for grp in a["status"].values() if isinstance(grp, list) for x in grp if x.get("flag")],
         "upcoming": upcoming,
         "checklist_down": [{"metric": r["metric"], "label": r["label"], "value": r["value"], "unit": r["unit"], "asof": r["asof"]}
