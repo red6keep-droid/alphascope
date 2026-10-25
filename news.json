@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25 16:46:18 UTC",
+  "updated_at": "2026-10-25 16:48:45 UTC",
   "items": [
     {
       "title": "Audi defends plans for a $4 billion Georgia plant amid VW restructuring, tariffs",
@@ -8,6 +8,30 @@
       "published": "2026-10-25 16:42:42",
       "title_ko": "아우디, 40억 달러 조지아 공장 계획 옹호… VW 재편, 관세 속",
       "summary_ko": "미국 관세 노출 감소 및 매출 확대 목적 사업 결정 강조"
+    },
+    {
+      "title": "빅테크 기업 3분기 실적 발표 및 AI 투자",
+      "title_ko": "빅테크 기업 3분기 실적 발표 및 AI 투자",
+      "summary_ko": "마이크로소프트, 애플, 아마존, 인텔 등 빅테크 실적 발표를 앞두고 AI 투자(CapEx) 규모와 수익성에 대한 시장의 관심과 우려가 공존함",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=0XwQ12XxxRE",
+      "published": "2026-10-25 15:47:54",
+      "kind": "media",
+      "tag": "실적",
+      "direction": "neutral",
+      "n_channels": 2
+    },
+    {
+      "title": "연준 금리 결정 및 통화정책 방향",
+      "title_ko": "연준 금리 결정 및 통화정책 방향",
+      "summary_ko": "연준이 이번 회의에서 금리를 동결할 것으로 예상되는 가운데, 케빈 워시 의장의 향후 물가 및 통화정책 스탠스에 시장의 이목이 집중됨",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=0XwQ12XxxRE",
+      "published": "2026-10-25 15:47:54",
+      "kind": "media",
+      "tag": "금리",
+      "direction": "neutral",
+      "n_channels": 2
     },
     {
       "title": "Here are 4 big things we're watching in the stock market this week",
@@ -46,18 +70,6 @@
       "summary_ko": "여행, 쇼핑, 외식 중 발생한 부채 2년 내 전액 상환"
     },
     {
-      "title": "연준 9월 금리 인상 후 동결 전망",
-      "title_ko": "연준 9월 금리 인상 후 동결 전망",
-      "summary_ko": "시장은 이번 회의에서 연준이 금리를 동결할 것으로 예상하며, 의장의 설명과 성명서 문구가 주목",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=mNCvC9940OA",
-      "published": "2026-10-25 13:47:19",
-      "kind": "media",
-      "tag": "금리",
-      "direction": "neutral",
-      "n_channels": 2
-    },
-    {
       "title": "Saudi Arabia says it intercepted missiles and drones from Iran-backed Houthis",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/25/saudi-arabia-houthi-missile-drone-interceptions.html",
@@ -72,18 +84,6 @@
       "published": "2026-10-25 13:38:01",
       "title_ko": "함께 여행할까? 예약 전 이 질문을 해보세요: '시간, 돈, 실망을 줄여줍니다'",
       "summary_ko": "예산, 숙소, 개인 습관, 혼자 있는 시간 고려 사항 언급"
-    },
-    {
-      "title": "빅테크 3분기 실적 및 가이던스",
-      "title_ko": "빅테크 3분기 실적 및 가이던스",
-      "summary_ko": "마이크로소프트, 알파벳, 아마존, 인텔의 실적 발표와 가이던스가 단기 시장 변동성에 주요한 영향을 미치고 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=OT_EussjmW0",
-      "published": "2026-10-25 12:09:11",
-      "kind": "media",
-      "tag": "실적",
-      "direction": "neutral",
-      "n_channels": 2
     },
     {
       "title": "What Democrats and Republicans fear most about each other: CNBC survey has the answers",
