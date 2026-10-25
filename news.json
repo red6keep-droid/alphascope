@@ -1,6 +1,22 @@
 {
-  "updated_at": "2026-10-25 14:47:20 UTC",
+  "updated_at": "2026-10-25 16:46:18 UTC",
   "items": [
+    {
+      "title": "Audi defends plans for a $4 billion Georgia plant amid VW restructuring, tariffs",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/25/audi-georgia-us-plant-tariffs-volkswagen.html",
+      "published": "2026-10-25 16:42:42",
+      "title_ko": "아우디, 40억 달러 조지아 공장 계획 옹호… VW 재편, 관세 속",
+      "summary_ko": "미국 관세 노출 감소 및 매출 확대 목적 사업 결정 강조"
+    },
+    {
+      "title": "Here are 4 big things we're watching in the stock market this week",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/10/25/here-are-4-big-things-were-watching-in-the-stock-market-this-week.html",
+      "published": "2026-10-25 14:58:26",
+      "title_ko": "이번 주 증시에서 주목할 4가지 큰 이슈",
+      "summary_ko": "실적 시즌 피크, 연준 회의, 신규 인플레이션 데이터 포함"
+    },
     {
       "title": "In pictures: Initially peaceful protests across France over inequality again descend into violence",
       "source": "CNBC",
@@ -10,12 +26,64 @@
       "summary_ko": ""
     },
     {
+      "title": "AI 도입으로 인한 노동 시장 고용 감소 우려",
+      "title_ko": "AI 도입으로 인한 노동 시장 고용 감소 우려",
+      "summary_ko": "AI 기술이 노동을 대체하면서 향후 10년 내 많은 일자리가 사라지고 고용 시장에 부정적 영향을 미칠 수 있음",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=ECcLJUyu188",
+      "published": "2026-10-25 14:00:19",
+      "kind": "media",
+      "tag": "매크로",
+      "direction": "neutral",
+      "n_channels": 2
+    },
+    {
+      "title": "I paid off $11,000 of credit card debt in 18 months while still traveling, shopping and living my life",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/make-it/2026/10/25/pay-off-credit-card-debt.html",
+      "published": "2026-10-25 14:00:01",
+      "title_ko": "여행과 쇼핑을 즐기며 18개월 만에 11,000달러 신용카드 부채 상환",
+      "summary_ko": "여행, 쇼핑, 외식 중 발생한 부채 2년 내 전액 상환"
+    },
+    {
+      "title": "연준 9월 금리 인상 후 동결 전망",
+      "title_ko": "연준 9월 금리 인상 후 동결 전망",
+      "summary_ko": "시장은 이번 회의에서 연준이 금리를 동결할 것으로 예상하며, 의장의 설명과 성명서 문구가 주목",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=mNCvC9940OA",
+      "published": "2026-10-25 13:47:19",
+      "kind": "media",
+      "tag": "금리",
+      "direction": "neutral",
+      "n_channels": 2
+    },
+    {
       "title": "Saudi Arabia says it intercepted missiles and drones from Iran-backed Houthis",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/25/saudi-arabia-houthi-missile-drone-interceptions.html",
       "published": "2026-10-25 13:41:37",
       "title_ko": "사우디, 이란 후티의 미사일 및 드론 요격 발표",
       "summary_ko": "후티, 공항 및 에너지 시설 공격 주장"
+    },
+    {
+      "title": "Should you travel together? Ask these questions before booking: 'It'll save you time, money and disappointment'",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/make-it/2026/10/25/travel-compatibility-questions.html",
+      "published": "2026-10-25 13:38:01",
+      "title_ko": "함께 여행할까? 예약 전 이 질문을 해보세요: '시간, 돈, 실망을 줄여줍니다'",
+      "summary_ko": "예산, 숙소, 개인 습관, 혼자 있는 시간 고려 사항 언급"
+    },
+    {
+      "title": "빅테크 3분기 실적 및 가이던스",
+      "title_ko": "빅테크 3분기 실적 및 가이던스",
+      "summary_ko": "마이크로소프트, 알파벳, 아마존, 인텔의 실적 발표와 가이던스가 단기 시장 변동성에 주요한 영향을 미치고 있음",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=OT_EussjmW0",
+      "published": "2026-10-25 12:09:11",
+      "kind": "media",
+      "tag": "실적",
+      "direction": "neutral",
+      "n_channels": 2
     },
     {
       "title": "What Democrats and Republicans fear most about each other: CNBC survey has the answers",
@@ -40,74 +108,6 @@
       "published": "2026-10-25 08:06:11",
       "title_ko": "프랑스 시위가 시장을 뒤흔들 때, 투자자는 무엇을 기대해야 할까",
       "summary_ko": ""
-    },
-    {
-      "title": "American embassies tighten security as Iran threat warnings intensify ahead of U.S. midterm elections",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/24/iran-threats-us-embassies-middle-east.html",
-      "published": "2026-10-24 21:07:01",
-      "title_ko": "미국 대사관, 이란 위협 경고에 따라 보안 강화",
-      "summary_ko": ""
-    },
-    {
-      "title": "After SpaceX restores high-speed service, Musk claims Ukraine violated Starlink agreement",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/24/ukraine-starlink-starshield-service-restored.html",
-      "published": "2026-10-24 20:38:30",
-      "title_ko": "SpaceX, 고속 서비스 복구 후 머스크, 우크라이나가 스타링크 계약 위반 주장",
-      "summary_ko": "우크라이나, 스타링크 제한 해제"
-    },
-    {
-      "title": "고금리와 모기지 금리 7.5%",
-      "title_ko": "고금리와 모기지 금리 7.5%",
-      "summary_ko": "7.5%에 달하는 높은 모기지 금리가 주택 건설과 중산층의 주택 구매를 가로막고 있음",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=SpMCBI6g1pM",
-      "published": "2026-10-24 20:00:33",
-      "kind": "media",
-      "tag": "금리",
-      "direction": "negative",
-      "n_channels": 1
-    },
-    {
-      "title": "단독주택 건설 감소 및 주택 공급",
-      "title_ko": "단독주택 건설 감소 및 주택 공급",
-      "summary_ko": "단독주택 건설이 올해와 내년에 각각 감소할 것으로 예상되며 주택 공급 확대가 시급하",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=SpMCBI6g1pM",
-      "published": "2026-10-24 20:00:33",
-      "kind": "media",
-      "tag": "매크로",
-      "direction": "negative",
-      "n_channels": 1
-    },
-    {
-      "title": "Biotech stocks are surging. How investors can play the new drug innovation boom",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/24/biotech-stocks-drug-innovation-rally.html",
-      "published": "2026-10-24 18:56:29",
-      "title_ko": "바이오텍 주식 급등, 신약 혁신 붐",
-      "summary_ko": ""
-    },
-    {
-      "title": "FAA 규제 및 플라잉카 인증",
-      "title_ko": "FAA 규제 및 플라잉카 인증",
-      "summary_ko": "플라잉카 상용화를 위해서는 FAA의 엄격한 규제와 수년 간의 안전 인증 절차가 필수적",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=-QCfjnX__ec",
-      "published": "2026-10-24 18:00:31",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "neutral",
-      "n_channels": 1
-    },
-    {
-      "title": "AI funding fears rattle Wall Street. Here's how we're adjusting our portfolio",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/24/ai-funding-fears-rattle-wall-street-heres-how-were-adjusting-our-portfolio.html",
-      "published": "2026-10-24 16:14:00",
-      "title_ko": "AI 자금 조달 우려, 월스트리트 흔들다",
-      "summary_ko": "AI 주식 방어형 클럽 주식으로 회전"
     }
   ]
 }
