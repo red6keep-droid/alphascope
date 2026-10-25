@@ -3852,7 +3852,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
           if (h.querySelector('.title-logo')) return;
           var m = /(?:\(|\s)([A-Z][A-Z.\-]{0,5})\)?\s+주가/.exec(h.textContent) || /\(([A-Z][A-Z.\-]{0,5})\)\s*주가/.exec(h.textContent);
           var sym = m ? m[1] : (/^\s*엔비디아/.test(h.textContent) ? 'NVDA' : '');
-          var kr = /(?:^|\s)(\d{6})\s+주가/.exec(h.textContent);   /* 한국 종목 "삼성전자 005930 주가" (2026-10-25) — 배지는 한글 첫 글자, 로고는 KR_<코드> */
+          var kr = /(?:^|\s)(\d{6})\s+주가/.exec(h.textContent);   /* 한국 종목 옛 제목 "삼성전자 005930 주가" (2026-10-25) — 배지는 한글 첫 글자, 로고는 KR_<코드> */
+          var krMark = h.classList.contains('post-title') && document.querySelector('.post-body [data-kr-code]');   /* 새 제목 "삼성전자 주가" — 코드는 본문 숨은 표시에서 (2026-10-25 사용자: 제목에서 숫자 빼기, 홈 수정 H21) */
+          if (!kr && krMark) kr = [null, krMark.getAttribute('data-kr-code')];
           if (!sym && !kr) return;
           var host = h.querySelector('.post-title-text') || h.querySelector('a') || h;   /* 제목 글자 칸이 있으면 그 안 맨 앞 — 로고가 첫 글자 앞에 붙는다 */
           /* 2026-10-21: 제3자 로고 핫링크(financialmodelingprep) 중단 — 운영지침 4-6. 티커 두 글자 둥근 배지(리포트 design_kit.ticker_logo 와 같은 모양) */

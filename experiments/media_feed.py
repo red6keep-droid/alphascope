@@ -28,6 +28,9 @@ _spec.loader.exec_module(MC)
 _spec = importlib.util.spec_from_file_location("radar_universe", os.path.join(BASE, "stock-radar", "universe.py"))   # 종목 페이지 후보 · 업종 · 테마 묶음
 UNI = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(UNI)
+_spec = importlib.util.spec_from_file_location("radar_universe_kr", os.path.join(BASE, "kr-stocks", "universe_kr.py"))   # 한국 종목 35개 · 업종 · 테마
+UNI_KR = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(UNI_KR)
 
 DIRECTION = {"bullish": "positive", "bearish": "negative", "neutral": "neutral"}
 # 수집기 분류 17개 → 뉴스 목록 영역 라벨 (nvda-report render_report.AREA_KO 의 열 개)
@@ -196,6 +199,59 @@ def kr_label(r):
         if "(KR)" in t and (base in KR_NAME or base.isdigit() or re.search(r"[가-힣]", base)):
             return KR_NAME.get(base, base)
     return MC.CATEGORY_KO.get(r["category"], "한국")
+
+
+# ---------------------------------------------------------------- 한국 종목 페이지 (2026-10-25 사용자: 한국 종목 상세 `오늘` 탭 = 방송 뉴스)
+
+KR_CODE = {c[0].split(".")[0]: c[1] for c in UNI_KR.CANDIDATES}            # 005930 → 삼성전자
+KR_BY_NAME = {c[1].upper(): c[0].split(".")[0] for c in UNI_KR.CANDIDATES}  # 삼성전자 → 005930 (NAVER 처럼 영문 이름은 대문자로 맞춘다)
+KR_ALIAS = {"삼성": "005930", "하이닉스": "000660", "SK하이닉스": "000660", "현대자동차": "005380", "네이버": "035420", "LG엔솔": "373220",
+            "포스코홀딩스": "005490", "한전": "015760", "한국조선해양": "009540", "현대중공업": "329180", "삼성바이오": "207940"}
+
+
+def kr_code(t):
+    """요약이 적는 한국 종목 표기 → 종목 코드(우리 35개 안), 아니면 None.
+    `삼성전자(KR)` · `005930(KR)` · `SSNLF(KR)`(미국 장외 티커, KR_NAME) · `SK하이닉스` 처럼 제각각이다."""
+    base = re.sub(r"\((KR|비상장)\)$", "", str(t)).strip()
+    if base.isdigit() and base.zfill(6) in KR_CODE:
+        return base.zfill(6)
+    name = KR_NAME.get(base.upper(), base)
+    return KR_BY_NAME.get(name.upper()) or KR_ALIAS.get(name)
+
+
+def _kr_members(group):
+    """한국 묶음 — 테마(반도체 · 2차전지 · 바이오 · 방산 · 조선 · 원전) 또는 업종 이름."""
+    return {c[0].split(".")[0] for c in UNI_KR.CANDIDATES if group in c[4] or c[3] == group}
+
+
+KR_SECTOR_WORDS = [("반도체", "반도체"), ("메모리", "반도체"), ("HBM", "반도체"), ("배터리", "2차전지"), ("2차전지", "2차전지"), ("이차전지", "2차전지"),
+                   ("바이오", "바이오"), ("제약", "바이오"), ("방산", "방산 · 조선 · 원전"), ("조선", "방산 · 조선 · 원전"), ("원전", "방산 · 조선 · 원전"),
+                   ("은행", "금융"), ("금융", "금융"), ("보험", "금융"), ("자동차", "경기 소비재")]
+
+
+KR_GLOBAL_GROUPS = {"반도체", "2차전지"}   # 미국 방송의 업종 이야기도 한국 종목에 닿는 묶음 (미국과 연결 — 마이크론 · 엔비디아 ↔ 삼성전자 · SK하이닉스)
+
+
+def kr_stocks_for(r):
+    """이 이슈를 보일 한국 종목 페이지(코드) — 종목 이슈는 중심 종목(첫 종목이거나 주제에 이름), 업종 이슈는 그 묶음 전부 + 적힌 한국 종목.
+    미국 종목 페이지(stocks_for)와 같은 규칙. 시장 이슈는 데일리 한국장 탭(korea)."""
+    codes = [c for c in (kr_code(t) for t in r["tickers"]) if c]
+    if r["scope"] == "stock":
+        leads = {kr_code(t) for t in r.get("leads", r["tickers"][:1])}
+        topics = r.get("topics", [r["topic"]])
+        return {c for c in codes if c in leads or any(KR_CODE[c] in t for t in topics)}
+    if r["scope"] == "sector":
+        groups = {g for w, g in KR_SECTOR_WORDS if any(w in t for t in r.get("topics", [r["topic"]]))}
+        korean = r["country"] == "KR" or bool(codes) or "kr" in (r.get("groups") or [r.get("group")])
+        if not korean:   # 미국 은행 · 바이오 뉴스가 한국 금융 · 바이오 전부에 붙지 않게 — 세계 공통 업종(반도체 · 2차전지)만 미국 이야기도 받는다
+            groups &= KR_GLOBAL_GROUPS
+        return set().union(set(codes), *(_kr_members(g) for g in groups))
+    return set()
+
+
+def for_kr_page(iss, code):
+    """한국 종목 페이지 하나에 보일 방송 이슈."""
+    return [r for r in iss if code in kr_stocks_for(r)]
 
 
 def market(rs):

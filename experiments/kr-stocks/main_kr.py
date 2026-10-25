@@ -8,6 +8,7 @@ import sys
 
 import analyze_kr
 import collect_kr
+import collect_kr_extra
 import render_kr
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
@@ -20,7 +21,12 @@ if __name__ == "__main__":
         print("[kr] 시세 없음 — 이 실행은 자료 지연 (페이지를 만들지 않는다)")
         sys.exit(0)
     a = analyze_kr.run(snap, flows, hist)
-    pages = render_kr.write_all(a, OUT, snap)
+    try:   # 실적과 기대 · 캘린더 재료 — 실패해도 페이지는 만든다 (그 탭은 `판단 유보`)
+        extra = collect_kr_extra.load() if cached else collect_kr_extra.run()
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr] 탭 재료 실패: {str(e)[:120]}")
+        extra = {}
+    pages = render_kr.write_all(a, OUT, snap, extra=extra)
     # 오늘(KST) 봉이 있나 — 휴장일 · 데이터 지연이면 0. 워크플로는 1일 때만 게시한다 (수동 실행은 강제 가능)
     import datetime
     from zoneinfo import ZoneInfo

@@ -108,7 +108,7 @@ def bsi_rows(sym, flow_data):
         allv = [x["v"] for x in xa]
         r = {"item": a_item, "f_item": f_item, "name": name, "month": xa[-1]["month"], "v": xa[-1]["v"], "chg": xa[-1]["v"] - xa[-2]["v"],
              "pos12": (xa[-1]["v"] - min(vals12)) / (max(vals12) - min(vals12)) * 100 if max(vals12) > min(vals12) else 50,
-             "pct_all": _pct_rank(allv, xa[-1]["v"]), "n_all": len(allv), "series": xa[-12:]}
+             "pct_all": _pct_rank(allv, xa[-1]["v"]), "n_all": len(allv), "series": xa[-24:]}   # 24개월 — 그래프 `작년 같은 달` 비교 (2026-10-25)
         if xf:
             r["forecast"] = xf[-1]["v"]
             r["forecast_month"] = xf[-1]["month"]
@@ -168,7 +168,7 @@ def industry_rows(sym, flow_data):
         vals = [x["v"] for x in xs[-12:]]
         pos = (last["v"] - min(vals)) / (max(vals) - min(vals)) * 100 if max(vals) > min(vals) else 50
         out.append({"key": key, "name": name, "kind": kind, "cmp": cmp_, "note": note, "month": last["month"], "v": last["v"], "chg": chg, "pos12": pos,
-                    "series": xs[-12:], "src_stat": stat})
+                    "series": xs[-24:], "src_stat": stat})   # 24개월 — 그래프 `작년 같은 달` 비교 (2026-10-25)
     return out
 
 

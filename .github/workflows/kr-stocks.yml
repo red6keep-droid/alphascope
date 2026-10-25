@@ -40,6 +40,8 @@ concurrency:
 
 env:
   ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+  DART_API_KEY: ${{ secrets.DART_API_KEY }}   # `실적과 기대` 분기 매출 (collect_kr_dart.py, 2026-10-25) — 없으면 Yahoo 매출
+  YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}   # `오늘` 탭 방송 뉴스 (experiments/media_feed.py, 2026-10-25) — 없으면 방송 줄 없이
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
   OPS_CF_KV_NAMESPACE_ID: ${{ secrets.OPS_CF_KV_NAMESPACE_ID }}
@@ -79,6 +81,8 @@ jobs:
           else
             echo "이전 상태 없음 (첫 실행)"
           fi
+          # 캘린더 탭의 미국 경제 일정(FOMC · 물가 · 고용) — 엔비디아 리포트가 쌓는 calendar.jsonl (render_kr.us_calendar, 2026-10-25)
+          git fetch origin nvda-state:refs/remotes/origin/nvda-state 2>/dev/null || echo "nvda-state 없음 — 미국 일정 없이"
 
       - name: Collect · analyze · render
         run: python "$KR_DIR/main_kr.py"
@@ -144,7 +148,7 @@ jobs:
         if: always()
         run: |
           mkdir -p state-out
-          for f in rank_state.json page_hashes.json pages_live.json history.json; do
+          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_corp.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
             [ -f "$KR_DIR/data/$f" ] && cp "$KR_DIR/data/$f" state-out/ || true
           done
           [ -n "$(ls state-out 2>/dev/null)" ] || { echo "저장할 상태 없음"; exit 0; }

@@ -16,6 +16,10 @@ import render_html as R  # noqa: E402
 import universe_kr as U  # noqa: E402
 sys.path.insert(0, os.path.join(_HERE, "..", "stock-radar"))
 import universe as USU  # noqa: E402 — 미국 종목 주소(함께 보는 페이지의 연결 짝 링크)
+import media_feed  # noqa: E402 — 방송 뉴스 (`오늘` 탭)
+import re  # noqa: E402
+from html import unescape as html_unescape  # noqa: E402
+import analyze_tabs as AT  # noqa: E402 — 미국 종목 `실적과 기대` 판정(card_revenue · card_eps)을 그대로 — stock-radar
 
 UP, DOWN, NOTE, TINY = _dk.UP, _dk.DOWN, _dk.NOTE, _dk.TINY
 PAD = _dk.SEP_GAP - _dk.VP - 1
@@ -68,10 +72,6 @@ def badge(sym, size=20):
             f'white-space:nowrap;overflow:hidden;">{_esc(ch)}</span>')
 
 
-def updated_line(a):
-    return _dk.muted(f"마지막 갱신 {_dk.day(a['day'])} 한국 장 마감 기준")
-
-
 def wrap(body):
     html = _dk.align_titles(_dk.WRAP_OPEN + body + _dk.WRAP_CLOSE)
     return _dk.formal(_dk.fix_colons(html))
@@ -116,20 +116,14 @@ def draw_charts(snap, stocks, out_dir):
 # ---------------------------------------------------------------- 상세
 
 def lead(s):
-    """맨 위 요약 (p[data-seo-lead]) — 날짜 · 종가 · 전일 대비 · 평소 범위 · 시총 순위 · 밤사이 짝. 파이썬 값만."""
+    """맨 위 요약 (p[data-seo-lead]) — 날짜 · 종가 · 전일 대비 · 평소 범위만. 파이썬 값만.
+    (2026-10-25 사용자: 종목 코드 숫자 · 매일 같은 `시가총액 1위` · 처음부터 애플 · 엔비디아 이야기는 뺀다 — 이 종목을 보러 온 독자에게 이 종목 가격이 먼저)"""
     r = s["ret_1d"]
     move = f"전날보다 {abs(r):.2f}% {'올랐다' if r > 0 else '내렸다'}" if abs(r) >= 0.005 else "전날과 같았다"
-    first = f"{_md(s['day'])} {s['name']}({s['code']}) 종가는 {won(s['close'])}으로 {move}."
+    text = f"{_md(s['day'])} {s['name']} 종가는 {won(s['close'])}으로 {move}."
     nr = s.get("normal_range")
     if nr:
-        first += " 평소 하루 움직임 안의 변화였다." if abs(nr["z"]) < 2 else f" 평소 하루 움직임의 {abs(nr['z']):.1f}배였다."
-    more = []
-    if s.get("rank"):
-        more.append(f"시가총액은 유가증권시장 {s['rank']}위({cap_text(s['cap'])})")
-    pm = (s.get("pairs") or {}).get("moves") or []
-    if pm:
-        more.append("밤사이 미국 " + " · ".join(f"{m['sym']} {_sgn(m['ret'])}%" for m in pm))
-    text = first + (" " + "이고, ".join(more) + "이다." if more else "")
+        text += " 평소 하루 움직임 안의 변화였다." if abs(nr["z"]) < 2 else f" 평소 하루 움직임의 {abs(nr['z']):.1f}배였다."
     return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_dk.tint(_esc(text))}</p>'
 
 
@@ -147,13 +141,13 @@ def pair_tip(s):
     if rec and p.get("moves"):
         sp, n, ok, y0 = rec
         if ok:
-            lines.append(f"· 기록상 : 짝이 밤사이 많이 오른 날(상위 25%)과 많이 내린 날(하위 25%)의 다음날 {s['name']} 수익 차이는 KOSPI 대비 평균 {_sgn(sp, 2)}%p 였다 ({y0}~2026, {n:,}거래일, 플라시보 · 앞뒤 절반 · 보정 통과). {U.GAP_NOTE}")
+            lines.append(f"· 기록상 : 연결 종목이 밤사이 많이 오른 날(상위 25%)과 많이 내린 날(하위 25%)의 다음날 {s['name']} 수익 차이는 KOSPI 대비 평균 {_sgn(sp, 2)}%p 였다 ({y0}~2026, {n:,}거래일, 플라시보 · 앞뒤 절반 · 보정 통과). {U.GAP_NOTE}")
         else:
-            lines.append(f"· 기록상 : {y0}~2026 {n:,}거래일에서 짝의 밤사이 움직임과 다음날 {s['name']} 사이에 뚜렷한 관계가 없었다 (차이 {_sgn(sp, 2)}%p) — 참고로만 둔다")
+            lines.append(f"· 기록상 : {y0}~2026 {n:,}거래일에서 연결 종목의 밤사이 움직임과 다음날 {s['name']} 사이에 뚜렷한 관계가 없었다 (차이 {_sgn(sp, 2)}%p) — 참고로만 둔다")
     adr = p.get("adr")
     if adr and adr["sym"] in U.ADR_RECORD:
         sp, n, y0 = U.ADR_RECORD[adr["sym"]]
-        lines.append(f"· 기록상 (ADR) : {adr['sym']} 가 밤사이 많이 오른 날과 내린 날의 다음날 {s['name']} 수익 차이 {_sgn(sp, 2)}%p ({y0}~2026, {n:,}거래일, 통과) — 같은 회사라 짝보다 직접적이다. 역시 시가에 반영")
+        lines.append(f"· 기록상 (ADR) : {adr['sym']} 가 밤사이 많이 오른 날과 내린 날의 다음날 {s['name']} 수익 차이 {_sgn(sp, 2)}%p ({y0}~2026, {n:,}거래일, 통과) — 같은 회사라 연결 종목보다 직접적이다. 역시 시가에 반영")
     if p.get("sox"):
         sp, n, tgt = U.OVERNIGHT_RECORD["SOX_SEMI"]
         lines.append(f"· 기록상 (SOX) : 필라델피아 반도체지수가 밤사이 많이 오른 날과 내린 날의 다음날 {tgt} 수익 차이 {_sgn(sp, 2)}%p (2000~2026, {n:,}거래일, 통과)")
@@ -161,36 +155,36 @@ def pair_tip(s):
 
 
 def sec_pairs(s):
-    """맨 위 카드 — 밤사이 미국 짝 · ADR(K24) · SOX(K25) → 오늘 이 종목 (기획 11-1: 종목 페이지의 주인공). 툴팁 `기록상` = 10-25 일별 검증."""
+    """`미국과 연결` 펼침 카드 (2026-10-25 사용자: "짝" 대신 "연결" · 가격 카드 다음 · 펼침 카드로). 접힌 머리 = 밤사이 연결 종목이 어땠나(올랐음 · 내렸음 · 엇갈림),
+    펼치면 연결 종목 · ADR(K24) · SOX(K25) 줄과 오늘 이 종목 · KOSPI 대비, 한국 장 뒤 나온 미국 종가. 툴팁 `기록상` = 10-25 일별 검증."""
     p = s.get("pairs") or {}
     moves = p.get("moves") or []
     adr, sox = p.get("adr"), p.get("sox")
     if not moves and not adr and not sox:
         return ""
-    r = s["ret_1d"]
-    rows = ""
-    first = True
+    rets = [m["ret"] for m in moves] + ([adr["ret"]] if adr else [])
+    ups, downs = sum(1 for x in rets if x >= 0.5), sum(1 for x in rets if x <= -0.5)
+    state, theme, col = (("엇갈림", "uncertain", R.WARN) if ups and downs else ("올랐음", "positive", UP) if ups else ("내렸음", "negative", DOWN) if downs
+                         else ("비슷함", "neutral", R.MUTED))
+    day = (moves or [adr or sox])[0]["day"]
+    lines = [(f"밤사이(미국 {_md(day)} 종가) 연결 종목은 " + " · ".join(f"{USU.name(m['sym']) if m['sym'] in USU.BY_SYM else m['sym']} {_sgn(m['ret'])}%" for m in moves)
+              + f", 오늘 {s['name']}은 {_sgn(s['ret_1d'])}%였다.", "plain")]
     for m in moves:
-        rows += R._row_html(f'{_dk.ticker_logo(m["sym"])}{_esc(m["sym"])}', R._arrow(m["ret"]), f"미국 {_md(m['day'])} 종가", first=first, inline_note=True)
-        first = False
+        lines.append(("row", m["sym"], f"{_sgn(m['ret'], 2)}%", f"미국 {_md(m['day'])} 종가"))
     if adr:
         rec = U.ADR_RECORD.get(adr["sym"])
-        rows += R._row_html(f'{_dk.ticker_logo(adr["sym"])}{_esc(adr["sym"])} {_small("같은 회사 ADR")}', R._arrow(adr["ret"]),
-                            f"미국 {_md(adr['day'])} 종가" + (f" · 기록상 다음날 차이 {_sgn(rec[0], 2)}%p ({rec[2]}~)" if rec else ""), first=first, inline_note=not rec)
-        first = False
+        lines.append(("row", f"{adr['sym']} (같은 회사 ADR)", f"{_sgn(adr['ret'], 2)}%",
+                      f"미국 {_md(adr['day'])} 종가" + (f" · 기록상 다음날 차이 {_sgn(rec[0], 2)}%p ({rec[2]}~)" if rec else "")))
     if sox:
         sp = U.OVERNIGHT_RECORD["SOX_SEMI"][0]
-        rows += R._row_html(f'SOX {_small("필라델피아 반도체")}', R._arrow(sox["ret"]), f"미국 {_md(sox['day'])} 종가 · 기록상 다음날 반도체 묶음 차이 {_sgn(sp, 2)}%p (2000~)", first=first)
-        first = False
-    rows += R._row_html(f'{badge(s["sym"])}{_esc(s["name"])}', R._arrow(r), f"오늘 {_md(s['day'])}", inline_note=True)
+        lines.append(("row", "SOX (필라델피아 반도체)", f"{_sgn(sox['ret'], 2)}%", f"미국 {_md(sox['day'])} 종가 · 기록상 다음날 반도체 묶음 차이 {_sgn(sp, 2)}%p (2000~)"))
+    lines.append(("row", s["name"], f"{_sgn(s['ret_1d'], 2)}%", f"오늘 {_md(s['day'])}"))
     vb = s["tech"].get("vs_bench")
     if vb is not None:
-        rows += R._row_html("KOSPI 대비", R._arrow(vb, 2, "%p"), "오늘 이 종목 − KOSPI", inline_note=True)
-    latest = p.get("latest") or []
-    for m in latest:   # 한국 장 마감 뒤 나온 미국 종가 — 다음 한국장 전 참고. 짝마다 한 줄 (오른쪽 칸은 줄바꿈이 없어 폰에서 넘치지 않게)
-        rows += R._row_html(f'{_dk.ticker_logo(m["sym"])}{_esc(m["sym"])} <span style="font-size:{_dk.MICRO};font-weight:400;color:{NOTE};">그 뒤 미국 종가</span>', R._arrow(m["ret"]),
-                            f"미국 {_md(m['day'])} · 다음 한국장 전 참고", inline_note=False)
-    return R._card_title("밤사이 미국 → 오늘 반응", pair_tip(s)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
+        lines.append(("row", "KOSPI 대비", f"{_sgn(vb, 2)}%p", "오늘 이 종목 − KOSPI"))
+    for m in p.get("latest") or []:   # 한국 장 마감 뒤 나온 미국 종가 — 다음 한국장 전 참고
+        lines.append(("row", f"{m['sym']} 그 뒤 미국 종가", f"{_sgn(m['ret'], 2)}%", f"미국 {_md(m['day'])} · 다음 한국장 전 참고"))
+    return R._state_card("밤사이 미국과 연결 종목은?", state, theme, col, lines, "", tip=pair_tip(s), fold=True)
 
 
 IND_SRC = {"derived": "한국은행 금리 통계", "121Y006": "한국은행 대출금리", "121Y002": "한국은행 수신금리", "151Y002": "한국은행 가계대출", "901Y054": "은행연합회 연체율", "402Y016": "한국은행 수출물가지수", "901Y039": "국가데이터처 광공업 생산", "901Y019": "한국전력공사", "901Y073": "한국석유공사", "901Y072": "에너지경제연구원",
@@ -334,6 +328,114 @@ def sec_fin(s):
            f"· {f0['name']} {f0['v']:.1f}{'%' if f0['unit'] != '조 원' else ''} : {_qlabel(f0['q'])}" + (f", 전년 같은 분기보다 {_sgn(f0['chg'], 1)}{f0['chg_unit']}" if f0.get("chg") is not None else "") + "\n"
            "· 기록상 : 미검증 — 분기 자료가 2015년부터 46개뿐이라 수익 검증은 표본이 부족하고, 대출은 경기에 늦게 따라오는 지표로 알려져 있다. 시설자금이 늘면 투자 · 증설, 운전자금만 늘고 매출이 나쁘면 버티기 차입 쪽으로 읽히곤 한다 — 판정하지 않고 숫자만 둔다")
     return R._card_title("업종 재무 · 대출은? (분기)", _dk.with_src(tip, "한국은행 ECOS (기업경영분석 · 예금은행 산업별 대출)")) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
+
+
+# ---------------------------------------------------------------- `업종` 탭 = 독자 질문 카드 셋 (2026-10-25 사용자: "수치는 펼침 안으로, 이 수치가 무슨 역할인지 재해석")
+# 접힌 머리 = 질문 + 한 단어 답(지난 값과 비교한 사실, 앞날 아님), 펼치면 한 문장 · 그래프(작년 같은 때와 나란히 — 가이드라인 1-4-1 비교 대상) · 수치 줄.
+# 기록상 · 출처는 질문 옆 ? 툴팁 — 옛 sec_industry · sec_bsi · sec_fin 의 툴팁 그대로.
+
+_THIS, _LAST = "#9CC0F2", R._GRAY_BAR   # 올해 막대 · 작년 같은 때 막대
+
+
+def _yoy_groups(series, key, label, n=6):
+    """마지막 n 개 시점마다 (이름, [올해 값, 작년 같은 때 값]) — 작년 값이 없는 시점은 뺀다."""
+    by = {x[key]: x["v"] for x in series}
+    out = []
+    for x in series[-n:]:
+        prev = by.get(f"{int(x[key][:4]) - 1}{x[key][4:]}")
+        if prev is not None:
+            out.append((label(x[key]), [x["v"], prev]))
+    return out
+
+
+def _yoy_chart(title, groups, fmt):
+    if not groups:
+        return []
+    chart = R._chart_card(groups, [lambda v: _THIS, lambda v: _LAST], [lambda v: "#111", lambda v: NOTE], [("올해", _THIS), ("작년 같은 때", _LAST)], fmt=fmt)
+    return [(f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">{_esc(title)}</span>{chart}', "html")]
+
+
+def _tip_of(html):
+    """옛 칸(sec_industry · sec_bsi · sec_fin)의 ? 툴팁 글과 출처를 그대로 가져온다 — 기록상 · 출처 글을 한 곳에서만 쓰게."""
+    t, src = re.search(r'data-tip="([^"]*)"', html), re.search(r'data-src="([^"]*)"', html)
+    return _dk.with_src(html_unescape(t.group(1)), html_unescape(src.group(1))) if t and src else (html_unescape(t.group(1)) if t else "")
+
+
+def _mo(m):
+    return f"{int(m[5:])}월"
+
+
+def _chart_unit(kind):
+    """그래프 숫자는 짧게 — 단위는 그래프 제목에."""
+    return {"won_m": (1e6, "조 원"), "won_b": (1e3, "조 원"), "mwh": (1e4, "만 MWh"), "kbbl": (1e3, "백만 배럴"), "ktoe": (1e3, "백만 TOE"), "ton": (1e4, "만 톤"),
+            "cnt": (1, "호"), "pct": (1, "%"), "idx": (1, "")}.get(kind, (1, ""))
+
+
+def card_industry_mood(s):
+    """이 업종 경기는 좋아지고 있나? — 한국은행 기업경기조사(BSI) 업황 실적. 답 = 석 달 전보다 3p 넘게 오르면 좋아지는 중, 내리면 나빠지는 중."""
+    b = s.get("bsi")
+    if not b or not b.get("rows"):
+        return ""
+    f0 = b["rows"][0]
+    ser = f0.get("series") or []
+    d3 = f0["v"] - ser[-4]["v"] if len(ser) >= 4 else f0.get("chg") or 0
+    state, theme, col = (("좋아지는 중", "positive", UP) if d3 >= 3 else ("나빠지는 중", "negative", DOWN) if d3 <= -3 else ("비슷함", "neutral", R.MUTED))
+    lines = [(f"{b['industry_name']} 회사들이 느끼는 {f0['name']} 경기(BSI)는 {f0['v']:.0f}로 석 달 전보다 {_sgn(d3, 0)}p, "
+              f"2009년 이후 아래에서 {f0['pct_all']:.0f}% 지점이다. 100보다 낮으면 나쁘다고 답한 회사가 더 많다는 뜻이다.", "plain")]
+    lines += _yoy_chart(f"{f0['name']} BSI, 올해와 작년 같은 달", _yoy_groups(ser, "month", _mo), lambda v: f"{v:.0f}")
+    for r in b["rows"]:
+        lines.append(("row", f"{r['name']} BSI", f"{r['v']:.0f}", f"{r['month'][:4]}년 {int(r['month'][5:])}월 실적 · 전달보다 {_sgn(r['chg'], 0)}p · 2009년 이후 아래에서 {r['pct_all']:.0f}% 지점"
+                      + (f" · 다음 달 전망 {r['forecast']:.0f}" if r.get("forecast") is not None else "")))
+    return R._state_card("이 업종 경기는 좋아지고 있나?", state, theme, col, lines, "", tip=_tip_of(sec_bsi(s)), fold=True)
+
+
+def card_industry_work(s):
+    """이 업종에 일감이 늘고 있나? — 업종 실물 지표(수출 · 생산 · 수주 · 판매) 맨 앞 지표. 답 = 1년 전 같은 달보다 5% 넘게 늘면 늘고 있음."""
+    rows_data = s.get("industry") or []
+    if not rows_data:
+        return ""
+    r0 = rows_data[0]
+    by = {x["month"]: x["v"] for x in r0.get("series") or []}
+    prev = by.get(f"{int(r0['month'][:4]) - 1}{r0['month'][4:]}")
+    yoy = None if prev is None else ((r0["v"] - prev) if r0["kind"] == "pct" else (r0["v"] / prev - 1) * 100 if prev else None)
+    lim = 0.5 if r0["kind"] == "pct" else 5
+    state, theme, col = (("판단 유보", "neutral", R.MUTED) if yoy is None else ("늘고 있음", "positive", UP) if yoy >= lim
+                         else ("줄고 있음", "negative", DOWN) if yoy <= -lim else ("비슷함", "neutral", R.MUTED))
+    unit = "%p" if r0["kind"] == "pct" else "%"
+    lines = [(f"{r0['name']}은 {r0['month'][:4]}년 {int(r0['month'][5:])}월 {_ind_value(r0)}"
+              + (f"로 1년 전 같은 달보다 {_sgn(yoy, 1)}{unit}." if yoy is not None else "다.") + " 월별 자료라 1~2달 늦게 나오고, 주가는 이보다 먼저 움직이곤 한다.", "plain")]
+    div, u = _chart_unit(r0["kind"])
+    lines += _yoy_chart(f"{r0['name']}, 올해와 작년 같은 달" + (f" ({u})" if u else ""), _yoy_groups(r0.get("series") or [], "month", _mo),
+                        lambda v: f"{v / div:,.1f}" if v / div < 100 else f"{v / div:,.0f}")
+    for r in rows_data:
+        cmp_txt = "전년 같은 달보다" if r["cmp"] == "yoy" else "전달보다"
+        u2 = "%p" if r["kind"] == "pct" else "%"
+        lines.append(("row", r["name"], _ind_value(r), f"{r['month'][:4]}년 {int(r['month'][5:])}월" + (f" · {cmp_txt} {_sgn(r['chg'], 2 if u2 == '%p' else 1)}{u2}" if r.get("chg") is not None else "")
+                      + (f" · {r['note']}" if r.get("note") else "")))
+    return R._state_card("이 업종에 일감이 늘고 있나?", state, theme, col, lines, "", tip=_tip_of(sec_industry(s)), fold=True)
+
+
+def card_industry_money(s):
+    """업종 회사들의 돈 버는 힘은? — 한국은행 기업경영분석(업종 전체 집계) 이익률. 답 = 1년 전 같은 분기보다 0.5%p 넘게 오르면 나아짐."""
+    xs = [r for r in s.get("fin") or [] if r["unit"] != "조 원"]
+    if not xs:
+        return ""
+    r0 = next((r for r in xs if "이익률" in r["name"]), xs[0])
+    d = r0.get("chg")
+    state, theme, col = (("판단 유보", "neutral", R.MUTED) if d is None else ("나아짐", "positive", UP) if d >= 0.5
+                         else ("나빠짐", "negative", DOWN) if d <= -0.5 else ("비슷함", "neutral", R.MUTED))
+    lines = [(f"{r0['name']}은 {_qlabel(r0['q'])} {r0['v']:.1f}%" + (f"로 1년 전 같은 분기보다 {_sgn(d, 1)}%p." if d is not None else "다.")
+              + " 업종 전체 회사를 모은 실제 집계(설문 아님)이고, 분기 끝 2~3달 뒤에 나온다.", "plain")]
+    lines += _yoy_chart(f"{r0['name']}, 올해와 작년 같은 분기 (%)", _yoy_groups(r0.get("series") or [], "q", lambda q: f"{q[2:4]}.{q[-1]}Q", n=4), lambda v: f"{v:.1f}")
+    for r in s.get("fin") or []:   # 산업별 대출(늦게 따라오는 지표)도 여기 — 질문 카드로 따로 두지 않는다
+        val = f"{r['v'] / 1e3:,.0f}조 원" if r["unit"] == "조 원" else f"{r['v']:.1f}%"
+        lines.append(("row", r["name"], val, f"{_qlabel(r['q'])}" + (f" · 전년 같은 분기보다 {_sgn(r['chg'], 1)}{r['chg_unit']}" if r.get("chg") is not None else "") + f" · {r['note']}"))
+    return R._state_card("업종 회사들의 돈 버는 힘은?", state, theme, col, lines, "", tip=_tip_of(sec_fin(s)), fold=True)
+
+
+def sec_industry_tab(s):
+    out = card_industry_mood(s) + card_industry_work(s) + card_industry_money(s)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else _dk.muted("이 종목은 업종 자료를 아직 연결하지 않았습니다.")
 
 
 def range_tip(s):
@@ -530,14 +632,299 @@ def related(s=None):
         for m in (s.get("pairs") or {}).get("moves") or []:
             if m["sym"] in USU.BY_SYM:
                 url = USU.NVDA_REPORTS_URL if m["sym"] in USU.REPORT_TYPE else USU.page_url(m["sym"])
-                links.append((f"{USU.name(m['sym'])} {m['sym']} 주가 (미국 연결 짝)", url))
+                links.append((f"{USU.name(m['sym'])} {m['sym']} 주가 (미국과 연결)", url))
     items = "".join(_dk.dot_li(f'<a href="{_esc(u)}" style="color:#1a73e8;text-decoration:none;">{_esc(t)}</a>', size=3, color="#111", margin="4px 0") for t, u in links)
     return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};padding-left:{_dk.ALIGN_PX}px;">함께 보는 페이지</div>'
             f'<ul style="margin:6px 0 0;padding:0 0 0 {_dk.ALIGN_PX}px;list-style:none;font-size:{_dk.NAME};line-height:{R.LH_CARD};">{items}</ul></div>')
 
 
+MAX_NEWS = 8        # `오늘` 탭에 펼쳐 두는 방송 줄, 나머지는 `그 외 n건`
+TODAY_HOURS = 24    # 오늘자만 — 미국 종목 페이지와 같다 (2026-10-25 사용자)
+MEDIA = []          # 방송 이슈 (media_feed.issues — 같은 이슈는 이미 한 줄로) — write_all 이 한 번 읽는다
+
+
+def sec_today(s):
+    """`오늘` 탭 — 방송 뉴스 (2026-10-25 사용자: 한국 종목 뉴스는 방송 자막 뉴스로). 이 종목이 중심인 이슈 + 이 종목 묶음(반도체 · 2차전지 …)의 업종 이슈,
+    한국 증시 채널 · 미국 채널 모두. 공용 뉴스 카드(엔비디아 · 미국 종목 페이지와 같은 _event_html): 주제 / 방송 주장 / [영역] [방향] [방송]  시각 · 채널."""
+    ev = [media_feed.event(r) for r in sorted(media_feed.for_kr_page(MEDIA, s["code"]), key=lambda r: str(r["published_at"]), reverse=True)]
+    if not ev:
+        return _dk.muted("오늘은 이 종목을 다룬 방송 소식이 없습니다.")
+    return R.sec_events({"events": ev[:MAX_NEWS], "events_overflow": ev[MAX_NEWS:MAX_NEWS + 12]})
+
+
+KR_PEER_LABEL = "한국 시총 상위 20개"
+
+
+def _krw(x):
+    """미국 카드 글의 달러 표기를 원화로 — `1,714,995억 달러` → `171.5조 원`, `$72,281.41` → `72,281원`. 카드 판정 · 모양은 그대로."""
+    if isinstance(x, str):
+        x = re.sub(r"([\d,]+)억 달러", lambda m: eok(float(m.group(1).replace(",", ""))), x)
+        return re.sub(r"\$([\d,]+(?:\.\d+)?)", lambda m: won(float(m.group(1).replace(",", ""))), x)
+    if isinstance(x, (list, tuple)):
+        return type(x)(_krw(v) for v in x)
+    return x
+
+
+def _rename(x, name):
+    if isinstance(x, str):
+        return _krw(x.replace("엔비디아", name).replace("기술주 15개", KR_PEER_LABEL))
+    if isinstance(x, (list, tuple)):
+        return type(x)(_rename(v, name) for v in x)
+    return x
+
+
+def build_expect(s, extra, group):
+    """`실적과 기대` 재료 — 미국 종목과 같은 판정(stock-radar analyze_tabs). 비교 묶음 = 한국 시총 상위 20개."""
+    s["expect"] = {}
+    for k, f in (("revenue", AT.card_revenue), ("eps", AT.card_eps)):
+        try:
+            s["expect"][k] = f(s["sym"], extra, group)
+        except Exception as e:  # noqa: BLE001
+            print(f"[kr] {s['sym']} {k} 실패: {e}")
+            s["expect"][k] = None
+
+
+def sec_expect(s):
+    """`실적과 기대` 탭 — 미국 종목과 같은 질문 카드 둘 (2026-10-25 사용자). `시장은 큰 움직임을 예상하나?`(옵션) · `하락에 거는 돈은?`(공매도)은
+    한국 자료가 없어 뺐다 — 개별 종목 옵션이 없고, 공매도는 Yahoo 에 없으며 한국거래소 자료는 약관 확인 전."""
+    ex = s.get("expect") or {}
+    out = ""
+    for i, (title, key, fn) in enumerate((("회사는 돈을 더 벌고 있나?", "revenue", R.card_revenue), ("애널리스트 기대는 올라가나?", "eps", R.card_eps))):
+        c = ex.get(key)
+        if c:
+            lines, tip = _rename(fn(c), s["name"])
+            dart = any(r.get("src") == "dart" for r in s.get("_revenue_rows") or [])
+            tip = tip.replace("SEC EDGAR", "금융감독원 전자공시(OpenDART)" if dart else "Yahoo Finance")   # 미국 카드의 출처 글 → 한국 출처
+            state = c["state"]
+        else:
+            lines, tip, state = [("이번 실행에서 재료를 받지 못했다. 다음 실행에서 다시 받는다.", "plain")], "", "판단 유보"
+        theme, col = R.EXPECT_THEME.get(state, ("neutral", R.MUTED))
+        out += R._state_card(title, state, theme, col, list(lines), "", tip=tip, fold=True, opened=i == 0)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>'
+
+
+# ---------------------------------------------------------------- `캘린더` 탭 (2026-10-25 사용자) — 미국 종목 캘린더 탭과 같은 질문 카드 셋.
+# 한국 실적일 · 미국과 연결 종목 실적일 = collect_kr_extra(Yahoo), 시장 일정 = 미국 FOMC · 물가 · 고용(엔비디아 리포트 calendar — origin/nvda-state) + 국내 옵션 만기(둘째 목요일, 계산).
+# 그날 움직임은 이 종목 · KOSPI 의 최근 2년 일봉으로 — 미국 일정은 한국 시간 다음 날 장에 반영되므로 그 다음 거래일.
+
+import statistics  # noqa: E402
+import subprocess  # noqa: E402
+import cal_cards as CC  # noqa: E402 — 미국 종목과 같은 창(30일) · 다가옴(7일) · 일정 이름
+
+US_MACRO = ("FOMC", "CPI", "NFP", "PCE", "GDP")
+KR_OPEX_LABEL = "국내 옵션 만기"
+
+
+def _abs_rets(bars):
+    return {bars[i]["day"]: abs(bars[i]["close"] / bars[i - 1]["close"] - 1) * 100 for i in range(1, len(bars)) if bars[i - 1]["close"]}
+
+
+def _signed_ret(bars, day):
+    i = next((k for k, b in enumerate(bars) if b["day"] == day), None)
+    return (bars[i]["close"] / bars[i - 1]["close"] - 1) * 100 if i and bars[i - 1]["close"] else None
+
+
+def us_calendar():
+    """미국 경제 일정 — 엔비디아 리포트가 쌓는 calendar(origin/nvda-state JSONL). 없으면 로컬 nvda.db. 둘 다 없으면 []."""
+    root = os.path.join(_HERE, "..", "..")
+    try:
+        out = subprocess.run(["git", "show", "origin/nvda-state:experiments/nvda-report/output/state/calendar.jsonl"], capture_output=True, text=True, timeout=30, cwd=root)
+        if out.returncode == 0 and out.stdout.strip():
+            import json
+            return [r for r in (json.loads(x) for x in out.stdout.splitlines() if x.strip()) if r.get("kind") in US_MACRO]
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr] 미국 일정 git 읽기 실패: {str(e)[:80]}")
+    db = os.path.join(_HERE, "..", "nvda-report", "data", "nvda.db")
+    if os.path.exists(db):
+        import sqlite3
+        conn = sqlite3.connect(db)
+        try:
+            q = f"SELECT day, kind, label FROM calendar WHERE kind IN ({','.join('?' * len(US_MACRO))})"
+            return [{"day": r[0], "kind": r[1], "label": r[2]} for r in conn.execute(q, US_MACRO)]
+        finally:
+            conn.close()
+    return []
+
+
+def kr_opex(start, end):
+    """국내 주식 옵션 · 선물 만기 — 매달 둘째 목요일 (휴장이면 앞당겨지는 날은 반영하지 않는다)."""
+    d0, d1 = datetime.date.fromisoformat(start), datetime.date.fromisoformat(end)
+    out, y, m = [], d0.year, d0.month
+    while (y, m) <= (d1.year, d1.month):
+        first = datetime.date(y, m, 1)
+        thu = first + datetime.timedelta(days=(3 - first.weekday()) % 7 + 7)
+        if d0 <= thu <= d1:
+            out.append({"day": thu.isoformat(), "kind": "KR_OPEX", "label": KR_OPEX_LABEL})
+        y, m = (y + 1, 1) if m == 12 else (y, m + 1)
+    return out
+
+
+def build_calendar(s, snap, extra, macro_rows):
+    """s["calendar_cards"] — earnings · peers(미국과 연결 종목) · macro. 미국 종목 analyze_tabs 와 같은 칸."""
+    bars = snap["bars"][s["sym"]]
+    days = [b["day"] for b in bars]
+    two_y = (datetime.date.fromisoformat(s["day"]) - datetime.timedelta(days=730)).isoformat()
+    rets = _abs_rets(bars)
+    normal = statistics.median(list(rets.values())[-252:]) if rets else None
+    day = s["day"]
+    end = (datetime.date.fromisoformat(day) + datetime.timedelta(days=CC.WINDOW)).isoformat()
+    end_all = (datetime.date.fromisoformat(day) + datetime.timedelta(days=CC.LIST_DAYS)).isoformat()
+    cards = {}
+    ev = (extra.get("earnings") or {}).get(s["sym"]) or []
+    nxt = next((x["day"] for x in ev if x["day"] > day), None)
+    past = [x["day"] for x in ev if two_y <= x["day"] <= day]
+    moves = [{"day": d, "ret": _signed_ret(bars, CC._next_trading(days, d, same_day=True))} for d in past]
+    moves = [m for m in moves if m["ret"] is not None][-8:]
+    if nxt:
+        cards["earnings"] = {"day": nxt, "left": (datetime.date.fromisoformat(nxt) - datetime.date.fromisoformat(day)).days, "bars": moves,
+                             "median": statistics.median(abs(m["ret"]) for m in moves) if moves else None, "normal": normal}
+    pairs = (U.PAIRS.get(s["sym"]) or ([], ""))[0]
+    if pairs:
+        up, up_all, effect = [], [], {}
+        for p in pairs:
+            evs = ((extra.get("pair_earnings") or {}).get(p)) or []
+            up += [{"symbol": p, "day": x["day"]} for x in evs if day < x["day"] <= end]
+            up_all += [{"symbol": p, "day": x["day"]} for x in evs if day < x["day"] <= end_all]
+            hits = [rets.get(CC._next_trading(days, x["day"])) for x in evs if two_y <= x["day"] < day]   # 미국 장 마감 뒤 발표 → 한국 다음 거래일
+            hits = [h for h in hits if h is not None]
+            effect[p] = {"median": statistics.median(hits) if hits else None, "n": len(hits)}
+        cards["peers"] = {"upcoming": sorted(up, key=lambda x: x["day"]), "upcoming_all": sorted(up_all, key=lambda x: x["day"]), "effect": effect, "normal": normal}
+    kb = snap["bars"].get(U.BENCH) or []
+    kdays = [b["day"] for b in kb]
+    krets = _abs_rets(kb)
+    rows = [r for r in macro_rows if two_y <= r["day"] <= end_all] + kr_opex(two_y, end_all)
+    meff = {}
+    for kind in US_MACRO + ("KR_OPEX",):
+        hits = [krets.get(CC._next_trading(kdays, r["day"], same_day=kind == "KR_OPEX")) for r in rows if r["kind"] == kind and r["day"] < day]
+        hits = [h for h in hits if h is not None]
+        if hits:
+            meff[kind] = {"median": statistics.median(hits), "n": len(hits)}
+    cards["macro"] = {"upcoming": sorted((r for r in rows if day < r["day"] <= end), key=lambda r: r["day"]), "effect": meff,
+                      "normal": statistics.median(list(krets.values())[-252:]) if krets else None,
+                      "rows": sorted((r for r in rows if r["day"] > day), key=lambda r: r["day"])}
+    s["calendar_cards"] = cards
+
+
+def _macro_name(k, label=""):
+    return KR_OPEX_LABEL if k == "KR_OPEX" else CC.MACRO_KO.get(k, label)
+
+
+def cal_earn_card(s, c):
+    nm = s["name"]
+    r = c["median"] / c["normal"] if c.get("median") and c.get("normal") else None
+    first = f"{nm}의 다음 실적 발표는 {R._md_short(c['day'])}로 {c['left']}일 남았다(Yahoo Finance 일정이라 바뀔 수 있음)."
+    if r:
+        first += f" 지난 {len(c['bars'])}번 발표 날 주가는 보통 ±{c['median']:.1f}% 움직여 평소 하루(±{c['normal']:.1f}%)의 약 {r:.1f}배였다."
+    lines = [(first, "plain")]
+    if c["bars"]:
+        chart = R._col_chart([(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["ret"]]) for b in c["bars"]], [R._sign_bg], [R._sign_fg], height=130)
+        pad = _dk.SEP_GAP - _dk.VP - 1
+        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">최근 {len(c["bars"])}번의 실적 발표 날 (%)</span>'
+                      f'<span style="{R.MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}</span></span>', "html"))
+    lines.append(("row", "발표일", R._md_short(c["day"]), "Yahoo Finance 일정"))
+    if c.get("median"):
+        lines.append(("row", "발표 날 보통", f"±{c['median']:.1f}%", f"지난 {len(c['bars'])}번 중앙값"))
+    if c.get("normal"):
+        lines.append(("row", "평소 하루", f"±{c['normal']:.1f}%", "최근 1년 중앙값"))
+    tip = ("회사가 석 달마다 실적을 발표하는 날 주가가 크게 움직이곤 한다. 한국 회사는 장 전 · 장중 발표가 많아 그날 움직임을 본다. 오른 날 · 내린 날을 가리지 않고 크기만 본다\n"
+           f"· {c['left']}일 남음 : {R._md_short(c['day'])}\n· 나누는 법 : {CC.SOON_DAYS}일 안으로 다가오면 카드가 보라색")
+    return lines, _dk.with_src(tip, "Yahoo Finance"), f"{c['left']}일 남음", c["left"]
+
+
+def cal_pair_card(s, c):
+    nm, up = s["name"], c["upcoming"]
+    usn = lambda x: USU.name(x) if x in USU.BY_SYM else x   # noqa: E731
+    if not up:
+        return [(f"앞으로 30일 안에 실적을 발표하는 {nm}의 미국 연결 종목이 없다.", "plain")], "", "없음", None
+    syms = [x for x in dict.fromkeys(u["symbol"] for u in up) if c["effect"].get(x, {}).get("median")]
+    names = " · ".join(usn(u["symbol"]) + "(" + R._md_short(u["day"]) + ")" for u in up)
+    first = f"앞으로 30일 안에 {names}가 실적을 발표한다. {nm}와 같은 재료로 움직이는 미국 종목이다."
+    if syms and c.get("normal"):
+        eff = [c["effect"][x]["median"] for x in syms]
+        first += f" 최근 2년 이 회사들의 발표 다음 날 {nm} 주가는 보통 ±{min(eff):.1f}~{max(eff):.1f}% 움직였다({nm} 보통 날 ±{c['normal']:.1f}%)."
+    lines = [(first, "plain")]
+    if syms and c.get("normal"):
+        chart = R._chart_card([(usn(x), [c["effect"][x]["median"], c["normal"]]) for x in syms], [lambda v: R._AMBER, R._gray], [R._note_fg, R._note_fg],
+                              [(f"그 회사 발표 다음 날 {nm}", R._AMBER), (f"{nm} 보통 날", R._GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
+        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">발표 다음 날 {_esc(nm)} 움직임 (%)</span>{chart}', "html"))
+    for u in up:
+        e = c["effect"].get(u["symbol"]) or {}
+        lines.append(("row", f"{usn(u['symbol'])} ({u['symbol']})", R._md_short(u["day"]), "미국과 연결" + (f" · 다음 날 {nm} 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else "")))
+    left = (datetime.date.fromisoformat(up[0]["day"]) - datetime.date.fromisoformat(s["day"])).days
+    tip = (f"{nm}와 같은 재료로 움직이는 미국 종목(미국과 연결)의 실적 발표. 미국 장 마감 뒤 나오는 발표는 한국 시간 다음 날 장에 반영된다\n"
+           f"· 30일 안 {len(up)}곳 : 가장 가까운 발표는 {usn(up[0]['symbol'])} {R._md_short(up[0]['day'])}\n· 참고 : 최근 2년, 회사마다 8번 안팎이라 숫자는 대략으로 본다")
+    return lines, _dk.with_src(tip, "Yahoo Finance"), f"{len(up)}곳 · 30일 안", left
+
+
+def cal_macro_card(s, c):
+    up = c["upcoming"]
+    if not up:
+        return [("앞으로 30일 안에 잡힌 큰 일정이 없다.", "plain")], "", "없음", None
+    kinds = list(dict.fromkeys(u["kind"] for u in up))
+    eff = {k: c["effect"][k] for k in kinds if k in c["effect"]}
+    names = " · ".join(_macro_name(u["kind"], u.get("label", "")) + "(" + R._md_short(u["day"]) + ")" for u in up)
+    first = f"앞으로 30일 안에 {names}가 있다."
+    if eff and c.get("normal"):
+        lo, hi = min(e["median"] for e in eff.values()), max(e["median"] for e in eff.values())
+        first += f" 최근 2년 이런 날(미국 일정은 한국 다음 거래일) KOSPI는 보통 ±{lo:.1f}~{hi:.1f}% 움직였고, 보통 날은 ±{c['normal']:.1f}%였다."
+    lines = [(first, "plain")]
+    if eff and c.get("normal"):
+        chart = R._chart_card([(_macro_name(k).split(" (")[-1].rstrip(")"), [eff[k]["median"], c["normal"]]) for k in eff], [lambda v: R._AMBER, R._gray], [R._note_fg, R._note_fg],
+                              [("그 일정 뒤 KOSPI", R._AMBER), ("KOSPI 보통 날", R._GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
+        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">그 일정 뒤 KOSPI 움직임 (%)</span>{chart}', "html"))
+    for u in up:
+        e = c["effect"].get(u["kind"]) or {}
+        lines.append(("row", _macro_name(u["kind"], u.get("label", "")), R._md_short(u["day"]), f"KOSPI 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else ""))
+    tip = ("미국 금리 결정 · 물가 · 고용 발표와 국내 옵션 만기처럼 시장 전체가 함께 보는 일정\n"
+           f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {_macro_name(up[0]['kind'], up[0].get('label', ''))} {R._md_short(up[0]['day'])}\n"
+           "· 참고 : 최근 2년 지난 일정 뒤 KOSPI 움직임을 보통 날과 견줬다. 일정이 있다고 늘 크게 움직이지는 않았다. 한국은행 금리 결정 일정은 출처를 확인한 뒤 넣는다")
+    return lines, _dk.with_src(tip, "FRED · Yahoo Finance"), f"{len(up)}건 · 30일 안", None
+
+
+def _all_list(s):
+    cc = s.get("calendar_cards") or {}
+    end = (datetime.date.fromisoformat(s["day"]) + datetime.timedelta(days=CC.LIST_DAYS)).isoformat()
+    items = []
+    e = cc.get("earnings")
+    if e and e["day"] <= end:
+        items.append((e["day"], f"{s['name']} 실적", f"{s['name']} 실적 발표"))
+    usn = lambda x: USU.name(x) if x in USU.BY_SYM else x   # noqa: E731
+    items += [(u["day"], "미국과 연결 실적", f"{usn(u['symbol'])} 실적 발표") for u in (cc.get("peers") or {}).get("upcoming_all") or []]
+    items += [(r["day"], "시장 일정", _macro_name(r["kind"], r.get("label", ""))) for r in (cc.get("macro") or {}).get("rows") or [] if r["day"] <= end]
+    d0 = datetime.date.fromisoformat(s["day"])
+    rows = [(f'<span style="color:#111;">{_esc(R._d(d))}</span>', R._pill(k, "area"), f'<span style="color:#111;">{_esc(t)}</span>', "", f'<span style="color:#111;">{R._dn(d0, d)}</span>')
+            for d, k, t in sorted(items)]
+    return R._gcard(rows) if rows else _dk.muted("잡힌 일정이 없습니다.")
+
+
+def sec_calendar(s):
+    """`캘린더` 탭 — 다음 실적 발표는? · 미국과 연결 종목 실적은? · 시장 전체를 흔들 일정은? + 전체 일정 보기."""
+    cc = s.get("calendar_cards") or {}
+    out, first = "", True
+    for title, key, fn in (("다음 실적 발표는?", "earnings", cal_earn_card), ("미국과 연결 종목 실적은?", "peers", cal_pair_card), ("시장 전체를 흔들 일정은?", "macro", cal_macro_card)):
+        c = cc.get(key)
+        if not c:
+            continue
+        lines, tip, state, left = fn(s, c)
+        theme, col = R._soon_theme(left)
+        out += R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=first)
+        first = False
+    fold = (f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
+            f'<div style="margin-top:6px;">{_all_list(s)}</div></details>')
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' + fold
+
+
 def detail_body(s, a):
-    body = lead(s) + updated_line(a) + sec_chart(s) + sec_pairs(s) + sec_industry(s) + sec_bsi(s) + sec_fin(s) + price_card(s) + sec_states(s) + related(s) + list_marker(U.LIST_URL)
+    """탭 위 = 요약 · 그래프. `오늘` 탭 = 가격 카드 · 미국과 연결(펼침) · 상태 카드 · 방송 뉴스 (미국 종목 페이지처럼 테마가 첫 카드부터 오늘 탭으로 옮긴다).
+    `업종` 탭 = 업종 재료 · 체감 경기 · 경영 분석
+    (2026-10-25 사용자: 미국 종목 페이지처럼 탭 — 실적과 기대 · 캘린더는 다음 단계)."""
+    body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
+            + lead(s) + sec_chart(s) + price_card(s) + sec_pairs(s) + sec_states(s)
+            + _dk.keep_tone(R._section("뉴스", sec_today(s), tab="오늘"))   # 뉴스는 헤드라인체 그대로
+            + R._section("실적과 기대", sec_expect(s), tab="실적과 기대")
+            + R._section("업종", sec_industry_tab(s), tab="업종")
+            + R._section("캘린더", sec_calendar(s), tab="캘린더")
+            + related(s) + list_marker(U.LIST_URL))
     return wrap(body)
 
 
@@ -925,15 +1312,33 @@ def list_body(a):
     tip = ("한국 유가증권시장 보통주 가운데 회사 전체 값(주가 × 주식 수)이 가장 큰 10개. 우선주 · 코스닥은 뺀다\n"
            f"· 오늘 1위 : {top[0]['name']} {cap_text(top[0]['cap'])}\n"
            f"· 나누는 법 : 11위 밖으로 {U.SWAP_DAYS}거래일 연속 밀리면 후보 중 가장 높았던 종목과 바꾼다")
-    body = (list_lead(a) + updated_line(a) + R._card_title("시가총액 순위", tip) + card(top)
+    body = (list_lead(a) + R._card_title("시가총액 순위", tip) + card(top)
             + (_dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest)) if rest else "")
             + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다.")
             + sec_flows(a.get("market")) + related())
     return wrap(body)
 
 
-def write_all(a, out_dir, snap=None):
+def write_all(a, out_dir, snap=None, media=None, extra=None):
     os.makedirs(out_dir, exist_ok=True)
+    if extra and snap:
+        caps = snap.get("caps") or {}
+        group = set(sorted((c[0] for c in U.CANDIDATES if caps.get(c[0])), key=lambda x: -caps[x])[:U.PEER_GROUP_N])   # 한국 시총 상위 20개
+        for s in a["stocks"]:
+            build_expect(s, extra, group)
+            s["_revenue_rows"] = ((extra.get("revenue") or {}).get("series") or {}).get(s["sym"]) or []   # 매출 출처(DART · Yahoo) 표시용
+        macro_rows = us_calendar()
+        for s in a["stocks"]:
+            try:
+                build_calendar(s, snap, extra, macro_rows)
+            except Exception as e:  # noqa: BLE001 — 캘린더가 실패해도 페이지는 만든다
+                print(f"[kr] {s['sym']} 캘린더 실패: {e}")
+    global MEDIA
+    if media is None:
+        now = datetime.datetime.now(datetime.timezone.utc)
+        since = (now - datetime.timedelta(hours=TODAY_HOURS)).strftime("%Y-%m-%dT%H:%M")
+        media = media_feed.issues(media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=2)), since)
+    MEDIA = media
     if snap:
         draw_charts(snap, a["stocks"], out_dir)
     pages = {"list": (U.LIST_TITLE, list_body(a))}
