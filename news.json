@@ -1,6 +1,16 @@
 {
-  "updated_at": "2026-10-25 06:46:03 UTC",
+  "updated_at": "2026-10-25 08:46:11 UTC",
   "items": [
+    {
+      "title": "What next for France as riots rattle markets? Three questions facing investors ahead of more protests",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/24/france-riots-paris-unrest-debt-budget.html",
+      "published": "2026-10-25 08:06:11",
+      "title_ko": "프랑스 시위가 시장을 뒤흔들며 투자자에게 남은 3가지 과제",
+      "why_ko": "프랑스 시위가 채권 수익률을 24년 최고치로 올려 위험을 재평가한다",
+      "summary_ko": "채권 수익률 24년 최고치 기록, 애널리스트가 전망",
+      "summary_v": 2
+    },
     {
       "title": "American embassies tighten security as Iran threat warnings intensify ahead of U.S. midterm elections",
       "source": "CNBC",
@@ -109,16 +119,6 @@
       "title_ko": "전 회계 담당자, 375달러 투자해 ‘Stitch Lab ATX’ 재봉 사업 시작",
       "why_ko": "Eric Lugo는 기본 재봉 기술을 가르치는 스튜디오와 클래스·행사 제공을 목표로 사업을 시작했기 때문이다.",
       "summary_ko": "Eric Lugo, 375달러 투자로 재봉 스튜디오 ‘Stitch Lab ATX’ 오픈",
-      "summary_v": 2
-    },
-    {
-      "title": "Berkshire shares shake the Buffett blues with new all-time highs",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/24/berkshire-record-high-without-buffett.html",
-      "published": "2026-10-24 12:48:32",
-      "title_ko": "버크셔 주가, 버핏 CEO 퇴임 발표 후 18개월 만에 사상 최고치 회복",
-      "why_ko": "버크셔 Hathaway 주식이 2025 주주총회에서 버핏이 CEO를 물러난 뒤 손실을 모두 회복했기 때문이다.",
-      "summary_ko": "버크셔 Hathaway 주식, 버핏 퇴임 발표 후 사상 최고치 회복",
       "summary_v": 2
     }
   ]
