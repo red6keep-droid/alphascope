@@ -59,6 +59,23 @@ CANDIDATES = [
     ("PLD", "프롤로지스", "prologis-pld-stock", "부동산"),
     ("NEE", "넥스트에라 에너지", "nextera-energy-nee-stock", "유틸리티"),
     ("SO", "서던 컴퍼니", "southern-company-so-stock", "유틸리티"),
+    # 2026-10-25 사용자: 홈 테마 종목에 가상자산 · 에너지 탭 추가 (Claude 가 종목 선정) — 에너지는 XOM · CVX 가 이미 있어 3개만, 가상자산은 5개
+    ("COP", "코노코필립스", "conocophillips-cop-stock", "에너지"),
+    ("SLB", "SLB", "slb-stock", "에너지"),                        # 유전 서비스
+    ("EOG", "EOG 리소시스", "eog-resources-eog-stock", "에너지"),
+    ("COIN", "코인베이스", "coinbase-coin-stock", "금융"),         # 가상자산 거래소
+    ("MSTR", "스트래티지", "strategy-mstr-stock", "기술"),         # 비트코인 보유 기업 (옛 마이크로스트래티지)
+    ("HOOD", "로빈후드", "robinhood-hood-stock", "금융"),
+    ("MARA", "마라 홀딩스", "marathon-digital-mara-stock", "기술"),  # 비트코인 채굴
+    ("CRCL", "서클", "circle-crcl-stock", "금융"),                 # 스테이블코인 USDC 발행
+    ("VST", "비스트라", "vistra-vst-stock", "유틸리티"),           # 전력 발전 (2026-10-25 사용자: 에너지 탭)
+    ("SMR", "뉴스케일 파워", "nuscale-power-smr-stock", "산업재"),   # 소형 모듈 원전 (2026-10-25 사용자)
+    # 2026-10-25 사용자: 양자 컴퓨터 탭 (Claude 가 종목 선정) — 순수 업체 4곳 + 큰 회사 IBM
+    ("IONQ", "아이온큐", "ionq-stock", "기술"),                     # 이온 포획 방식
+    ("RGTI", "리게티 컴퓨팅", "rigetti-computing-rgti-stock", "기술"),   # 초전도 방식
+    ("QBTS", "디웨이브 퀀텀", "d-wave-quantum-qbts-stock", "기술"),     # 양자 어닐링
+    ("QUBT", "퀀텀 컴퓨팅", "quantum-computing-qubt-stock", "기술"),
+    ("IBM", "IBM", "ibm-stock", "기술"),                           # 양자 컴퓨터 로드맵을 가진 대형주
 ]
 
 # 홈 `관심 종목` 카드 묶음 (2026-10-21 사용자: "홈에 관심 종목 카드 · 섹터 상위 종목 카드, 타고 가서 개별 종목을 볼 수 있게").
@@ -68,6 +85,9 @@ WATCH = [
     ("데이터 센터", ["ORCL", "ANET", "VRT", "EQIX", "CEG", "CRWV"]),
     ("우주항공", ["SPCX", "RKLB"]),
     ("경기 방어주", ["KO", "PG", "PM", "COST"]),
+    ("가상자산", ["COIN", "MSTR", "HOOD", "MARA", "CRCL"]),   # 2026-10-25 사용자
+    ("에너지", ["XOM", "CVX", "COP", "SLB", "EOG", "VST", "SMR"]),          # 2026-10-25 사용자
+    ("양자 컴퓨터", ["IONQ", "RGTI", "QBTS", "QUBT", "IBM"]),   # 2026-10-25 사용자
 ]
 
 TOP_N = 10
@@ -177,6 +197,22 @@ PEERS = {
     "PLD": {"EQIX": "동종", "WELL": "동종", "AMZN": "고객"},
     "NEE": {"SO": "경쟁", "CEG": "경쟁", "DUK": "경쟁"},
     "SO": {"NEE": "경쟁", "DUK": "경쟁", "CEG": "경쟁"},
+    # 2026-10-25 추가 8개 — 후보 안 회사끼리 (실적일은 이미 받는다)
+    "COP": {"XOM": "경쟁", "CVX": "경쟁", "SLB": "공급"},
+    "SLB": {"XOM": "고객", "CVX": "고객", "COP": "고객"},
+    "EOG": {"XOM": "경쟁", "CVX": "경쟁", "COP": "경쟁"},
+    "COIN": {"HOOD": "경쟁", "MSTR": "동종", "MARA": "동종", "CRCL": "협력"},
+    "MSTR": {"COIN": "동종", "MARA": "동종", "HOOD": "동종"},
+    "HOOD": {"COIN": "경쟁", "MSTR": "동종", "V": "경쟁"},
+    "MARA": {"MSTR": "동종", "COIN": "동종", "HOOD": "동종"},
+    "CRCL": {"COIN": "협력", "V": "경쟁", "MA": "경쟁"},
+    "VST": {"CEG": "경쟁", "NEE": "경쟁", "SO": "경쟁"},
+    "SMR": {"CEG": "동종", "VRT": "동종", "GE": "동종"},
+    "IONQ": {"RGTI": "경쟁", "QBTS": "경쟁", "QUBT": "경쟁", "IBM": "경쟁"},
+    "RGTI": {"IONQ": "경쟁", "QBTS": "경쟁", "QUBT": "경쟁", "IBM": "경쟁"},
+    "QBTS": {"IONQ": "경쟁", "RGTI": "경쟁", "QUBT": "경쟁", "IBM": "경쟁"},
+    "QUBT": {"IONQ": "경쟁", "RGTI": "경쟁", "QBTS": "경쟁"},
+    "IBM": {"IONQ": "경쟁", "GOOGL": "경쟁", "MSFT": "경쟁", "NVDA": "협력"},
 }
 PEER_KO = {"TSM": "TSMC", "QCOM": "퀄컴", "ORCL": "오라클", "UPS": "UPS", "SNAP": "스냅", "PINS": "핀터레스트", "MRVL": "마벨", "GM": "GM", "F": "포드",
            "RIVN": "리비안", "AXP": "아메리칸 익스프레스", "BAC": "뱅크오브아메리카", "KO": "코카콜라", "NVO": "노보 노디스크", "MRK": "머크", "PFE": "화이자",

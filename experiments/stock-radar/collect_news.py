@@ -47,7 +47,12 @@ EN = {"NVDA": "Nvidia", "AAPL": "Apple", "GOOGL": "Alphabet Google", "MSFT": "Mi
       "VRT": "Vertiv", "EQIX": "Equinix", "CEG": "Constellation Energy", "CRWV": "CoreWeave", "SPCX": "SpaceX", "RKLB": "Rocket Lab",
       "KO": "Coca-Cola", "PG": "Procter & Gamble", "PM": "Philip Morris", "NFLX": "Netflix", "DIS": "Disney", "HD": "Home Depot",
       "MCD": "McDonald's", "CAT": "Caterpillar", "GE": "GE Aerospace", "COST": "Costco", "CVX": "Chevron", "LIN": "Linde",
-      "NEM": "Newmont", "WELL": "Welltower", "PLD": "Prologis", "NEE": "NextEra Energy", "SO": "Southern Company"}
+      "NEM": "Newmont", "WELL": "Welltower", "PLD": "Prologis", "NEE": "NextEra Energy", "SO": "Southern Company",
+      # 2026-10-25 추가 8개
+      "COP": "ConocoPhillips", "SLB": "SLB Schlumberger", "EOG": "EOG Resources", "COIN": "Coinbase", "MSTR": "Strategy MicroStrategy",
+      "HOOD": "Robinhood", "MARA": "Marathon Digital MARA", "CRCL": "Circle Internet",
+      "VST": "Vistra", "SMR": "NuScale Power",
+      "IONQ": "IonQ", "RGTI": "Rigetti Computing", "QBTS": "D-Wave Quantum", "QUBT": "Quantum Computing Inc", "IBM": "IBM"}
 
 
 def _env():
