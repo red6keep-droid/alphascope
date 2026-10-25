@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-10-24T21:33:21Z",
- "run_date": "2026-10-25",
+ "generated_at": "2026-10-25T21:34:03Z",
+ "run_date": "2026-10-26",
  "day": "2026-10-23",
  "is_latest_bar_today": true,
  "headline": {
@@ -589,6 +589,42 @@
   {
    "area": "Product",
    "kind": "news",
+   "title": "Nvidia discusses $2,000-per-GPU annual fee for software that 'runs agents on AI factories' — details unclear about potential overlaps, firm already charges more than twice that amount for its AI Enterprise software platform",
+   "fact": "엔비디아, AI 팩토리용 소프트웨어 GPU당 연 2000달러 요금 논의",
+   "url": "https://news.google.com/rss/articles/CBMizwJBVV95cUxNVEpXZFd5Q2JyNFYyWHpGb1QwWWFZZ3paclJmT0NwTFNpakwwR2l5aDZDNkRyTWVoOUdFanJQd2dWMDJ3QlJxc2NRbllGXy0zU2JiUmJwSkVhaFlES1hXU2hhMFN6S0FLZjJKemtsS1JwWXdZb3QwQUV6QzRhUzZnVUllcHE4Mi0tQ2ZUUHBLc2hHM1ZNbm1xdkJMclUxcTBEcVdrZkZjYnRVRlpFODNNVTBoS0hZaGxwYVktTW85Z2djVWlId2dldzQ2dVVBLXk2dldmdUFGMnJrY19CUXQtbG16NzNiMFJmR3pGb0pOMDFacEJwdGJmYVVUYmVUZGhyeVNDaWNuZVlxZ1VPdlNlMGJGSlc1T3RfOEliZDZ3ZnJFRVZXWHltWFI4SUFsTE41eThnRUJkMU8zVE1mcWQ1N0JvM29BV3Q0MHZDUXdFVQ?oc=5",
+   "direction": "positive",
+   "emphasis": true,
+   "source": "Tom's Hardware",
+   "published_at": "2026-10-25T13:00:00Z",
+   "speaker": null
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
+   "title": "Nvidia H200 Rental Index Rises 20% in a Month to $6.20",
+   "fact": "엔비디아 H200 임대 지수 한 달 간 20퍼센트 상승해 6.20달러 기록",
+   "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9rZU9oYlpqcUhHS3hoM2M0dEx5TFRBSVNfYU5vVC1mdXIxZUtsYU1ETkZqNV9GVW1acWpUNUdFU3FiTWJnTVBpYVkwakMwT0VldmVPeEljQk9GTGM?oc=5",
+   "direction": "positive",
+   "emphasis": true,
+   "source": "TOKENPOST",
+   "published_at": "2026-10-24T23:31:04Z",
+   "speaker": null
+  },
+  {
+   "area": "Product",
+   "kind": "news",
+   "title": "Nvidia DGX Spark 64GB Launches at $4,999: Is It Worth It?",
+   "fact": "엔비디아, 4999달러에 DGX 스파크 64GB 출시",
+   "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxNVWFkT1pMNUVFdG13ODFXeGV4Mk5YQ012ZzUtdVgydzNhOWNCNk9BUzZ5VkRmaE0yREFXYmpJeEhlQjJKcHhQUW1kY2wwZUhic1NmZWF4aVp5LW5FUXBPWjBSbnRnTzNFLVQzcWlpNTVNVi1nUHg1Uk5lbThpUlF1V3RB?oc=5",
+   "direction": "positive",
+   "emphasis": true,
+   "source": "TechRepublic",
+   "published_at": "2026-10-23T09:32:47Z",
+   "speaker": null
+  },
+  {
+   "area": "Product",
+   "kind": "news",
    "title": "NVIDIA GeForce RTX 5080 & RTX 5070 Ti 16 GB Graphics Cards Witness A Huge Price Increase of Up to $300, As Market Prepares For An Even More Expensive 24 GB 5080",
    "fact": "엔비디아 지포스 RTX 5080 및 RTX 5070 Ti 그래픽카드 가격 최대 300달러 인상",
    "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOTmZjdi15OG84TEpoNGFjM25NdDFpTXpLNDhVTG9fZ1hYSkdkX1BfTmNWcEVldVlPV3VMVjdTT2tKVnVMRE1HdkpBNzFGcVVBYW9ENUFXRnNNd1BRTHVyQ0tvVm4tUTFmbEtRQ3plUXdQa2s5VFJxeWE2SGJuRWl3LXRIUzF0NkJuX3dLSEJrc25GV2p5bWVfY2FaNWgzTGx0bWxIU9IBqgFBVV95cUxQd0sxSzdDamFMVWFVTkZoa1ZUb3lsM0poeEJGTTZOdWVRV0ViQ0tiV2VIdTJQNDdWNUVVVXZFb1psQTVrTERoNnBiNU9Mc2tyZGozWGVidGtvVk9yMi1tQ19ZUi1ST1lBcEMwcEdCRzFvdEdDODExenVKYzlEU19SOWlPV0VEWFlDcnhveGEweHg1UGdzcmZJUnpOSWs3TFF6NE5mOE11b2VfUQ?oc=5",
@@ -596,6 +632,32 @@
    "emphasis": true,
    "source": "Wccftech",
    "published_at": "2026-10-23T08:40:03Z",
+   "speaker": null
+  }
+ ],
+ "events_overflow": [
+  {
+   "area": "Corporate",
+   "kind": "news",
+   "title": "Nvidia Acquires HuggingFace for $12.9B",
+   "fact": "엔비디아, 허깅페이스 129억 달러에 인수",
+   "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBRU1ljYmxwdFlTOWpUZFU4T1BtMTY1ejYwN0MyWHZzY1R4OEdfNW1IN1lmcUt5WDNhNUhkMUx3WmVlYUswWFJfdnROMHUzRTFlMk5ISHp4WHIycTJTbWJlVzJqbmhyNlV5YkFKWkRKaw?oc=5",
+   "direction": "positive",
+   "emphasis": true,
+   "source": "EE Times",
+   "published_at": "2026-10-23T07:00:00Z",
+   "speaker": null
+  },
+  {
+   "area": "Product",
+   "kind": "news",
+   "title": "NVIDIA To Connect 576 Rubin Ultra GPUs Using CPO To Create One Giant GPU With The “Highest Performance per Watt” on the Planet Next Year To Drive 10 Trillion-Parameter AI Models",
+   "fact": "엔비디아, 내년 CPO 활용 576개 루빈 울트라 GPU 연결 계획 공개",
+   "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQZlRUVldncGYtYUJsejVHVXJJX0Z0SXZoVlcya1c3ZUQtLWpKY1Rwd0gxUGttVWxTUUFSZlpoUHJUSHJWb0tLRWNmZlExdFdoYjZDZ1gxNE8zSXdLNjB3SjQ5WHJXdjN6OGhmYnRUNHZhSVdsZVJwT0JrbklsN2pmeWdwSno3MDJ1d2hQNm1uX09hUXdKbG1OZUlDUlFvSXVWOVZqZWNwcFU0azRuRjdZbHBDRExYdVVF0gG-AUFVX3lxTE4wT3lUU2pIak9qQU9SYlpocHoyYjBIcFNiSFVUTXM0Nm5uSllYVDYya0Z5dnAxcTNyZ2dFeUFiZVRDZ0p3NlVWWnFnaEp1OUEyRGZ1LWctTTBBRzc4aW9Qd1YtamI4eVFhaEdPYnNVLTFSdTR6TVNmZmJrM1JHY2thaHpscGJDekJGZkVhN2VnY0dscEt2U0QwZ3JtT2REWjkyRDJaLXBXRGQ5eHR5SVVUaE9hT1ZhV1poQ1pSV3c?oc=5",
+   "direction": "positive",
+   "emphasis": true,
+   "source": "Wccftech",
+   "published_at": "2026-10-22T15:35:24Z",
    "speaker": null
   },
   {
@@ -609,6 +671,57 @@
    "source": "Forbes",
    "published_at": "2026-10-21T06:13:22Z",
    "speaker": null
+  },
+  {
+   "area": "Earnings",
+   "kind": "news",
+   "title": "빅테크 기업 3분기 실적 발표 및 AI 투자",
+   "fact": "빅테크 기업 3분기 실적 발표 및 AI 투자",
+   "detail": "마이크로소프트, 애플, 아마존, 인텔 등 빅테크 실적 발표를 앞두고 AI 투자(CapEx) 규모와 수익성에 대한 시장의 관심과 우려가 공존함.",
+   "url": "https://www.youtube.com/watch?v=0XwQ12XxxRE",
+   "direction": "positive",
+   "emphasis": false,
+   "published_at": "2026-10-25T15:47:54Z",
+   "source": "블룸버그 · 방송 3곳",
+   "speaker": "방송",
+   "media": true,
+   "has_fact": false,
+   "rel": 0,
+   "prio": false
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
+   "title": "인간 대체형 AI 개발 방향성과 생산성 향상",
+   "fact": "인간 대체형 AI 개발 방향성과 생산성 향상",
+   "detail": "기업들이 생산성 향상을 위해 인간을 대체하는 초지능형 AI 모델 개발에 집중하고 있으나, 이것이 반드시 일자리 창출로 이어지지는 않는다.",
+   "url": "https://www.youtube.com/watch?v=ECcLJUyu188",
+   "direction": "neutral",
+   "emphasis": false,
+   "published_at": "2026-10-25T14:00:19Z",
+   "source": "폭스",
+   "speaker": "방송",
+   "media": true,
+   "has_fact": false,
+   "rel": 0,
+   "prio": false
+  },
+  {
+   "area": "Demand",
+   "kind": "news",
+   "title": "빅테크 AI 투자와 CapEx 성과",
+   "fact": "빅테크 AI 투자와 CapEx 성과",
+   "detail": "AI 관련 대규모 자본적 지출과 투자가 장기적으로 경제 성장과 노동 생산성을 향상시킬 것이라는 기대감이 존재한다.",
+   "url": "https://www.youtube.com/watch?v=OT_EussjmW0",
+   "direction": "positive",
+   "emphasis": false,
+   "published_at": "2026-10-25T12:09:11Z",
+   "source": "블룸버그 · 방송 2곳",
+   "speaker": "방송",
+   "media": true,
+   "has_fact": false,
+   "rel": 0,
+   "prio": false
   },
   {
    "area": "Product",
@@ -633,9 +746,7 @@
    "source": "Wccftech",
    "published_at": "2026-10-24T12:05:52Z",
    "speaker": null
-  }
- ],
- "events_overflow": [
+  },
   {
    "area": "Product",
    "kind": "news",
@@ -793,16 +904,16 @@
    "speaker": null
   }
  ],
- "events_total": 21,
+ "events_total": 29,
  "direction_counts": {
   "today": {
-   "positive": 16,
+   "positive": 23,
    "negative": 3,
    "uncertain": 1,
-   "neutral": 1
+   "neutral": 2
   },
   "week": {
-   "positive": 61,
+   "positive": 66,
    "negative": 12,
    "uncertain": 5,
    "neutral": 7
@@ -968,7 +1079,7 @@
   "options": [
    {
     "key": "iv_atm_30d",
-    "value": 0.4366698638213519,
+    "value": 0.4441640893302145,
     "flag": false,
     "fmt": "iv"
    },
@@ -986,25 +1097,25 @@
    },
    {
     "key": "pc_ratio_oi",
-    "value": 0.788426280725313,
+    "value": 0.7654208420523445,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "pc_ratio_vol",
-    "value": 0.63227333940263,
+    "value": 0.6500762260852534,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "gex_approx",
-    "value": -692819.8899278757,
+    "value": 29229967.542283166,
     "flag": false,
     "fmt": "gex"
    },
    {
     "key": "gex_flip_strike",
-    "value": 245.0,
+    "value": 250.0,
     "flag": false,
     "fmt": "usd0"
    },
@@ -1153,13 +1264,13 @@
   "news": [
    {
     "key": "news_count",
-    "value": 26,
+    "value": 30,
     "flag": false,
     "fmt": "int"
    },
    {
     "key": "news_avg_7d",
-    "value": 39.142857142857146,
+    "value": 39.57142857142857,
     "flag": false,
     "fmt": "num1"
    },
@@ -1367,7 +1478,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-23",
-  "state_collected_at": "2026-10-24T21:32:12Z",
+  "state_collected_at": "2026-10-25T21:32:29Z",
   "missing_fields": [],
   "option_snapshot_days": 11,
   "iv_rank_days": 11,
@@ -1379,14 +1490,14 @@
    "court": 3,
    "fedreg": 26,
    "form4": 16,
-   "news": 1079,
+   "news": 1107,
    "newsroom": 19
   },
   "option_expiries": [
    "2026-10-26",
    "2026-10-28",
    "2026-10-30",
-   "2026-11-06",
+   "2026-11-02",
    "2026-11-20",
    "2026-11-27"
   ],
@@ -1516,9 +1627,9 @@
   },
   "move": {
    "state": "평소보다 큼",
-   "exp": 2.7507615826374714,
+   "exp": 2.7979707658886306,
    "sigma": 2.0357514411931827,
-   "ratio": 1.3512266414141458,
+   "ratio": 1.374416694136638,
    "spy": {
     "exp": 0.9528802403630448,
     "sigma": 0.6535786184874528
@@ -1531,7 +1642,7 @@
    "next_earnings": "2026-11-17",
    "earn_in_window": true,
    "days_to": 25,
-   "iv": 0.4366698638213519,
+   "iv": 0.4441640893302145,
    "rank": null,
    "imp": 9.717481677844704,
    "earn_day": 6.6559087587386685,
