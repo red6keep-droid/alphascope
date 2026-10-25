@@ -103,6 +103,13 @@ jobs:
             python main.py --phase "$PHASE" --state output/state $ED_ARG
           fi
 
+      # 오늘 데일리 글의 한국장 탭 `한국장에 영향을 줄 만한 소식` 만 갱신 (2026-10-25 사용자) — 한국 아침 방송은 데일리(07:00)보다 늦게 올라온다.
+      # 게시 실행일 때만 · 지난 날짜(edition 입력)는 건너뜀 · 실패해도 미디어 데일리는 그대로 (continue-on-error)
+      - name: Update daily Korea news
+        if: env.DO_PUBLISH == 'true' && inputs.edition == ''
+        continue-on-error: true
+        run: python experiments/daily-report/kr_news.py
+
       - name: Save records (media-state branch)
         if: always()
         run: |

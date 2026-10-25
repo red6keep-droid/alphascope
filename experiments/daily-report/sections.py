@@ -254,7 +254,8 @@ def mega_rows(a):
         price = (se.get(s) or {}).get("last")
         value = (f'<span style="font-weight:400;">${price:,.2f}</span> ' if price else "") + dk.arrow(n["ret_pct"])
         sub = (f"<b>평소의 {_times(n['z'])}</b> · 1년에 {n['n_year']}번" if n["outside"] else f"평소 ±{n['sigma_pct']:.2f}% 안 · {_times(n['z'])}")
-        rows.append(dk.crow(dk.ticker_logo(s) + C.esc(MEGA_KO[s]), value, sub, first=not rows, left=48, nowrap=True, sub_block=True))
+        # 줄 전체를 그 종목 상세 페이지로 — 색은 그대로 (2026-10-25 사용자)
+        rows.append(dk.stock_row_link(dk.crow(dk.ticker_logo(s) + C.esc(MEGA_KO[s]), value, sub, first=not rows, left=48, nowrap=True, sub_block=True), s))
     return rows
 
 

@@ -1,0 +1,28 @@
+{
+ "generated_at": "2026-10-25T02:58:01Z",
+ "symbol": "S&P 500",
+ "trump": {
+  "Trade": {
+   "n": 70,
+   "med_abs": 0.45,
+   "base_abs": 0.43,
+   "up_pct": 54,
+   "base_up": 57,
+   "label": "관세 발언이 있던 날",
+   "period": "2017~2020년 트윗",
+   "base_label": "그 기간 아무 날"
+  }
+ },
+ "fed": {
+  "Fed": {
+   "n": 261,
+   "med_abs": 0.65,
+   "base_abs": 0.54,
+   "up_pct": 56,
+   "base_up": 54,
+   "label": "FOMC 금리 결정일",
+   "period": "1994년부터",
+   "base_label": "아무 날"
+  }
+ }
+}

@@ -188,7 +188,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 /* 제목 아래 날짜 줄(October 11, 2026) 삭제 (2026-10-12 사용자) */
 .post-timestamp { display: none !important; }
 /* 글 보기: 첫 제목 위 여백 70% 줄임 (2026-10-12 사용자) — 위 32+40 → 10+12 */
-body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 30px; }
+body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 25px; }   /* 상세 제목 줄 위 여백 −5 (2026-10-25 사용자) */
 /* 글 제목 위 보이는 여백 30px (2026-10-12 사용자 20 → 2026-10-13 사용자: "상단 타이틀의 위쪽 여백을 10픽셀 추가"). 행간 반쪽만큼 뺀 값 */
 body.item-view .post-outer-container { padding-top: 13px; }
 
@@ -506,7 +506,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px — 인물 발언의 기사 목록만 +6 (렌더러, 2026-10-21 사용자) */
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
-  body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 31px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) */
+  body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 26px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) → −5 (2026-10-25 사용자: 상세 제목 줄 위 여백) */
   .post-title { font-size: 23px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
   .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
   .post-body { font-size: 19px; line-height: 34px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
@@ -540,7 +540,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
     <meta content='yes' name='apple-mobile-web-app-capable'/>
     <meta content='AlphaScope' name='apple-mobile-web-app-title'/>
     <meta content='default' name='apple-mobile-web-app-status-bar-style'/>
-    <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap' rel='stylesheet'/>
+    <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap' rel='stylesheet'/>
 
     <b:skin version='1.0'><![CDATA[/*
 <Variable name="keycolor" description="Main Color" type="color" default="#FF3333" value="#FF3333"/>
@@ -606,35 +606,11 @@ __NAV_ITEMS__
       <div class='nav-right'>
         <b:section class='search-holder' id='search_top' maxwidgets='1' name='Search' showaddelement='false'>
           <b:widget id='BlogSearch1' locked='true' title='Search This Blog' type='BlogSearch' visible='true'>
-            <b:includable id='main'>
-              <form class='search-bar' id='site-search' expr:action='data:blog.searchUrl' method='get' role='search'>
-                <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='2'>
-                  <circle cx='5.75' cy='5.75' r='4.5'/>
-                  <path d='M9.3 9.3 12.8 12.8' stroke-linecap='round'/>
-                </svg>
-                <input aria-label='검색' autocomplete='off' name='q' placeholder='종목, 뉴스, 매크로 검색...' type='search' expr:value='data:view.search.query'/>
-              </form>
-            </b:includable>
+            <b:includable id='main'><b:comment>검색 버튼 삭제 (2026-10-25 사용자) — 위젯 틀만 남기고 아무것도 그리지 않는다</b:comment></b:includable>
           </b:widget>
         </b:section>
 
-        <button class='icon-btn' type='button'>
-          <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-            <path d='M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9'/>
-            <path d='M13.7 21a2 2 0 0 1-3.4 0'/>
-          </svg>
-          <span class='sr-only'>알림</span>
-        </button>
-
-        <!-- 폰: 알림 · 검색 · 메뉴 순서로 오른쪽 정렬 (2026-10-12 사용자) -->
-        <button class='search-toggle' type='button' aria-controls='site-search' aria-expanded='false'>
-          <svg viewBox='0 0 14 14' fill='none' stroke='currentColor' stroke-width='2'>
-            <circle cx='5.75' cy='5.75' r='4.5'/>
-            <path d='M9.3 9.3 12.8 12.8' stroke-linecap='round'/>
-          </svg>
-          <span class='sr-only'>검색 열기</span>
-        </button>
-
+        <!-- 알림 · 검색 버튼 삭제 (2026-10-25 사용자, 홈 수정 H1 · H2) — 헤더 오른쪽은 메뉴 버튼만 -->
         <button class='nav-toggle' type='button' aria-controls='primary-menu' aria-expanded='false'>
           <svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
             <path d='M3 6h18M3 12h18M3 18h18'/>
@@ -1302,26 +1278,59 @@ PREVIEW_MEDIA_TITLE = "미디어 데일리 2026년 10월 23일"
 
 # 홈 테마 · 관심 종목 · 섹터 종목 탭 카드 (2026-10-21) — stocks.json · themes.json 흉내. 실제 파일은 gh-pages 에만 있다
 MOCK_PICK_STOCKS = [
-    {"s": "NVDA", "name": "엔비디아", "sector": "반도체", "p": 183.22, "cp": 1.84, "page": True, "slug": "nvidia-nvda"},
-    {"s": "AVGO", "name": "브로드컴", "sector": "반도체", "p": 346.10, "cp": -0.92, "page": True, "slug": "broadcom-avgo"},
-    {"s": "AMD", "name": "AMD", "sector": "반도체", "p": 232.40, "cp": 3.21, "page": False, "slug": ""},
-    {"s": "TSM", "name": "TSMC", "sector": "반도체", "p": 301.15, "cp": 0.44, "page": True, "slug": "tsmc-tsm"},
-    {"s": "MSFT", "name": "마이크로소프트", "sector": "소프트웨어", "p": 512.30, "cp": -0.31, "page": True, "slug": "microsoft-msft"},
-    {"s": "VRT", "name": "버티브", "sector": "산업재", "p": 162.80, "cp": 2.75, "page": False, "slug": ""},
-    {"s": "RKLB", "name": "로켓랩", "sector": "우주항공", "p": 61.42, "cp": -4.10, "page": False, "slug": ""},
-    {"s": "LMT", "name": "록히드마틴", "sector": "방산", "p": 498.60, "cp": 0.12, "page": True, "slug": "lockheed-lmt"},
-    {"s": "PG", "name": "P&G", "sector": "필수소비재", "p": 151.20, "cp": 0.65, "page": True, "slug": "procter-pg"},
-    {"s": "JNJ", "name": "존슨앤드존슨", "sector": "헬스케어", "p": 188.74, "cp": -0.22, "page": True, "slug": "jnj"},
-    {"s": "XOM", "name": "엑슨모빌", "sector": "에너지", "p": 112.05, "cp": 1.10, "page": True, "slug": "exxon-xom"},
-    {"s": "JPM", "name": "JP모건", "sector": "금융", "p": 309.40, "cp": 0.58, "page": True, "slug": "jpmorgan-jpm"},
+    {"s": "NVDA", "name": "엔비디아", "sector": "반도체", "p": 183.22, "cp": 1.84, "page": True, "slug": "nvidia-nvda", "mc": 5171000000000},
+    {"s": "AVGO", "name": "브로드컴", "sector": "반도체", "p": 346.10, "cp": -0.92, "page": True, "slug": "broadcom-avgo", "mc": 1600000000000},
+    {"s": "AMD", "name": "AMD", "sector": "반도체", "p": 232.40, "cp": 3.21, "page": False, "slug": "", "mc": 380000000000},
+    {"s": "TSM", "name": "TSMC", "sector": "반도체", "p": 301.15, "cp": 0.44, "page": True, "slug": "tsmc-tsm", "mc": 1300000000000},
+    {"s": "MSFT", "name": "마이크로소프트", "sector": "소프트웨어", "p": 512.30, "cp": -0.31, "page": True, "slug": "microsoft-msft", "mc": 3800000000000},
+    {"s": "VRT", "name": "버티브", "sector": "산업재", "p": 162.80, "cp": 2.75, "page": False, "slug": "", "mc": 62000000000},
+    {"s": "RKLB", "name": "로켓랩", "sector": "우주항공", "p": 61.42, "cp": -4.10, "page": False, "slug": "", "mc": 28000000000},
+    {"s": "LMT", "name": "록히드마틴", "sector": "방산", "p": 498.60, "cp": 0.12, "page": True, "slug": "lockheed-lmt", "mc": 115000000000},
+    {"s": "PG", "name": "P&G", "sector": "필수소비재", "p": 151.20, "cp": 0.65, "page": True, "slug": "procter-pg", "mc": 360000000000},
+    {"s": "JNJ", "name": "존슨앤드존슨", "sector": "헬스케어", "p": 188.74, "cp": -0.22, "page": True, "slug": "jnj", "mc": 450000000000},
+    {"s": "XOM", "name": "엑슨모빌", "sector": "에너지", "p": 112.05, "cp": 1.10, "page": True, "slug": "exxon-xom", "mc": 470000000000},
+    {"s": "JPM", "name": "JP모건", "sector": "금융", "p": 309.40, "cp": 0.58, "page": True, "slug": "jpmorgan-jpm", "mc": 850000000000},
+    # 2026-10-25 가상자산 · 에너지 · 양자 컴퓨터 탭 확인용 — 값은 모양 확인용 가짜
+    {"s": "COIN", "name": "코인베이스", "sector": "금융", "p": 312.50, "cp": 4.12, "page": False, "slug": "", "mc": 80000000000},
+    {"s": "MSTR", "name": "스트래티지", "sector": "기술", "p": 341.20, "cp": 5.33, "page": False, "slug": "", "mc": 95000000000},
+    {"s": "HOOD", "name": "로빈후드", "sector": "금융", "p": 118.70, "cp": 2.01, "page": False, "slug": "", "mc": 105000000000},
+    {"s": "MARA", "name": "마라 홀딩스", "sector": "기술", "p": 18.40, "cp": 6.80, "page": False, "slug": "", "mc": 7000000000},
+    {"s": "CRCL", "name": "서클", "sector": "금융", "p": 128.90, "cp": -1.45, "page": False, "slug": "", "mc": 30000000000},
+    {"s": "CVX", "name": "셰브론", "sector": "에너지", "p": 156.30, "cp": 0.84, "page": False, "slug": "", "mc": 270000000000},
+    {"s": "COP", "name": "코노코필립스", "sector": "에너지", "p": 94.10, "cp": 1.32, "page": False, "slug": "", "mc": 118000000000},
+    {"s": "SLB", "name": "SLB", "sector": "에너지", "p": 36.20, "cp": -0.55, "page": False, "slug": "", "mc": 50000000000},
+    {"s": "EOG", "name": "EOG 리소시스", "sector": "에너지", "p": 121.40, "cp": 0.97, "page": False, "slug": "", "mc": 66000000000},
+    {"s": "VST", "name": "비스트라", "sector": "유틸리티", "p": 198.60, "cp": 3.05, "page": False, "slug": "", "mc": 67000000000},
+    {"s": "SMR", "name": "뉴스케일 파워", "sector": "산업재", "p": 38.20, "cp": 7.42, "page": False, "slug": "", "mc": 11000000000},
+    {"s": "IONQ", "name": "아이온큐", "sector": "기술", "p": 62.80, "cp": 8.15, "page": False, "slug": "", "mc": 20000000000},
+    {"s": "RGTI", "name": "리게티 컴퓨팅", "sector": "기술", "p": 31.40, "cp": 9.62, "page": False, "slug": "", "mc": 10000000000},
+    {"s": "QBTS", "name": "디웨이브 퀀텀", "sector": "기술", "p": 27.10, "cp": 7.03, "page": False, "slug": "", "mc": 9000000000},
+    {"s": "QUBT", "name": "퀀텀 컴퓨팅", "sector": "기술", "p": 19.80, "cp": -2.36, "page": False, "slug": "", "mc": 3500000000},
+    {"s": "IBM", "name": "IBM", "sector": "기술", "p": 285.40, "cp": 1.21, "page": False, "slug": "", "mc": 265000000000},
+    {"s": "ANET", "name": "아리스타 네트웍스", "sector": "기술", "p": 141.60, "cp": 2.44, "page": False, "slug": "", "mc": 178000000000},
 ]
 MOCK_PICKS = {
     "day": "2026-09-03", "stocks": MOCK_PICK_STOCKS,
     "watch": [{"group": "반도체", "syms": ["NVDA", "AVGO", "AMD", "TSM"]}, {"group": "데이터 센터", "syms": ["MSFT", "VRT", "NVDA"]},
-              {"group": "우주항공", "syms": ["RKLB", "LMT"]}, {"group": "경기 방어주", "syms": ["PG", "JNJ"]}],
-    "sectors": [{"sector": "반도체", "syms": ["NVDA", "AVGO", "TSM"]}, {"sector": "소프트웨어", "syms": ["MSFT"]}, {"sector": "에너지", "syms": ["XOM"]},
-                {"sector": "금융", "syms": ["JPM"]}, {"sector": "헬스케어", "syms": ["JNJ"]}, {"sector": "방산", "syms": ["LMT"]}],
+              {"group": "우주항공", "syms": ["RKLB", "LMT"]}, {"group": "경기 방어주", "syms": ["PG", "JNJ"]},
+              {"group": "가상자산", "syms": ["COIN", "MSTR", "HOOD", "MARA", "CRCL"]},
+              {"group": "에너지", "syms": ["XOM", "CVX", "COP", "SLB", "EOG", "VST", "SMR"]},
+              {"group": "양자 컴퓨터", "syms": ["IONQ", "RGTI", "QBTS", "QUBT", "IBM"]}],
+    "sectors": [{"sector": "반도체", "syms": ["NVDA", "AVGO", "TSM"]}, {"sector": "소프트웨어", "syms": ["MSFT"]}, {"sector": "기술", "syms": ["IBM", "ANET", "MSTR"]}, {"sector": "에너지", "syms": ["XOM", "CVX", "COP"]},
+                {"sector": "금융", "syms": ["JPM", "HOOD", "COIN"]}, {"sector": "헬스케어", "syms": ["JNJ"]}, {"sector": "방산", "syms": ["LMT"]}],
 }
+# 홈 한국 탭 (2026-10-24) — kr.json 은 experiments/kr-stocks/home_feed_kr.py 가 만든다. 로컬 결과가 있으면 그것, 없으면 빈 값(탭을 누르면 "불러올 수 없습니다")
+SAVED_KR_HOME = "experiments/kr-stocks/output/home/kr.json"
+
+
+def preview_kr_home():
+    try:
+        with io.open(SAVED_KR_HOME, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {"day": None, "stocks": [], "watch": [], "sectors": [], "flows": []}
+
+
 MOCK_THEMES = {"day": "2026-09-03", "themes": [
     {"title": "AI 반도체", "state": "강세", "kind": "positive", "sub": "20일 S&P 500 대비 +6.2%p", "url": "#list"},
     {"title": "금리 인하", "state": "관망", "kind": "neutral", "sub": "10년물 4.12% · 전주 −8bp", "url": "#list"},
@@ -1639,6 +1648,7 @@ def preview_mock_js():
         "  var PV_MEDIA_FEED = %s;\n"
         "  var PV_PICKS = %s;\n"
         "  var PV_THEMES = %s;\n"
+        "  var PV_KR = %s;\n"
         "\n"
         "  /* 디자인만 확인하므로 실제 시세를 부르지 않는다. 피드는 라벨로 가른다. */\n"
         "  window.fetch = function (url) {\n"
@@ -1650,6 +1660,7 @@ def preview_mock_js():
         "    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;\n"
         "    else if (u.indexOf('stocks.json') >= 0) body = PV_PICKS;\n"
         "    else if (u.indexOf('themes.json') >= 0) body = PV_THEMES;\n"
+        "    else if (u.indexOf('kr.json') >= 0) body = PV_KR;\n"
         "    else body = PV_DATA;\n"
         "    return Promise.resolve({ json: function () { return Promise.resolve(body); } });\n"
         "  };\n"
@@ -1678,6 +1689,7 @@ def preview_mock_js():
             json.dumps(media_feed, ensure_ascii=False),
             json.dumps(MOCK_PICKS, ensure_ascii=False),
             json.dumps(MOCK_THEMES, ensure_ascii=False),
+            json.dumps(preview_kr_home(), ensure_ascii=False),
             json.dumps([dict(c, photo=_avatar_data_uri(c["avatar"])) for c in PREVIEW_COMMENTS], ensure_ascii=False),
         )
     )
@@ -1754,7 +1766,7 @@ PREVIEW_TEMPLATE = """<!DOCTYPE html>
 <title>AlphaScope — 디자인 미리보기</title>
 <!-- build_theme.py --preview 가 생성한 파일입니다. 직접 고치지 마십시오.
      디자인은 alphaflow-home.html, 블로거 전용 영역은 build_theme.py 에서 고칩니다. -->
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style>
 __CSS__
 

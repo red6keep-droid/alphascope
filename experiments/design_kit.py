@@ -6,6 +6,7 @@
 """
 
 import html as html_mod
+import json
 import os
 import re
 
@@ -535,7 +536,7 @@ def write_mock(body, path, title):
     js = re.search(r"//<!\[CDATA\[(.*?)//\]\]>", idx, re.S)
     if not (css and js):
         return None
-    body = re.sub(r"https://cdn\.jsdelivr\.net/gh/[^\"]+?@gh-pages/(images/[^\"]+)", r"\1", body)
+    body = re.sub(r"https://cdn\.jsdelivr\.net/gh/[^\"]+?@(?:gh-pages|kr-images)/(images/(?!logos/)[^\"]+)", r"\1", body)   # 로고는 로컬 사본이 없다 — gh-pages 주소 그대로 (2026-10-25)
     # 글 아래 [목록] · TOP 줄 — 블로그 테마의 글 보기와 같은 마크업 (2026-10-18 사용자: 모든 페이지 공통). 목록 주소는 본문 [data-list-url] 이 있으면 그것
     lu = re.search(r'data-list-url="([^"]+)"', body)
     nav = (f'<p class="post-nav"><a class="post-nav-list" href="{lu.group(1) if lu else "#"}">목록</a>'
@@ -1092,29 +1093,76 @@ def as_rules(html):
     return re.sub(r"border:1px solid (#[0-9A-Fa-f]{6});border-radius:10px;", r"border-top:1px solid \1;border-bottom:1px solid \1;", html)
 
 
-def ai_model_line(model, indent=0):
-    """AI 가 쓴 문장이 있는 글의 맨 끝 한 줄 — "AI 서술 · gemini-3.5-flash" (운영지침 3-4 · D3-1d, 2026-10-21).
-    예비 모델이 답한 날은 그 모델명이 그대로 보인다(pool.last_model). 숫자는 파이썬이 계산한다는 설명은 공통 푸터가 맡는다."""
-    if not model:
-        return ""
-    pad = f"padding-left:{indent}px;" if indent else ""
-    return (f'<div data-ai-model="1" style="margin-top:14px;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{pad}">'
-            f'AI 서술 · {esc(str(model))}</div>')
-
-
-def with_ai_model(body, model, indent=0):
-    """본문 맨 끝(WRAP_CLOSE 안쪽)에 ai_model_line 을 넣는다. 모델이 없으면 그대로."""
-    line = ai_model_line(model, indent)
-    if not line:
-        return body
-    s = body.rstrip()
-    if s.endswith(WRAP_CLOSE):
-        i = s.rfind(WRAP_CLOSE)
-        return s[:i] + line + s[i:]
-    return body + line
+def news_item(headline_html, url=None, detail="", subs=(), labels="", meta=(), link_attrs=""):
+    """공용 뉴스 카드 한 줄 (doc/기획/뉴스-형식-통일.md 2절, 기준 = 인물 발언 카드, 2026-10-25 사용자: 뉴스 형식 통일).
+        헤드라인(굵게, 원문 링크) / 요약 한 줄(검정 14px, 없으면 생략) / 보조 줄들(subs) / [라벨] [라벨]  회색 메타(시각 · 매체)
+    headline_html = 이스케이프한 헤드라인(명사형). detail = 요약 글(이스케이프 전 — 뉴스 문체로 바꾼다). labels = 알약 HTML 묶음. meta = 글자 목록.
+    link_attrs = a 태그에 더할 속성(title · data-trhelp 등). 헤드라인 · 요약은 합니다체로 바꾸지 않는다(keep_tone)."""
+    head = (f'<a href="{esc(url)}" target="_blank" rel="noopener"{link_attrs} style="color:#111;font-weight:700;text-decoration:none;">{headline_html}</a>'
+            if url else f'<span style="color:#111;font-weight:700;">{headline_html}</span>')
+    out = keep_tone(head)
+    if detail:
+        out += keep_tone(f'<span style="display:block;color:#111;font-size:{TINY};line-height:{LH_TINY};margin-top:4px;">{esc(headline(detail))}</span>')
+    out += "".join(subs)
+    meta = [m for m in meta if m]
+    return (out + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 0;line-height:1;">'
+            + (f'<span style="white-space:nowrap;">{labels}</span>' if labels else "")
+            + (f'<span style="color:{SUB};font-size:{TINY};line-height:{LH_TINY};">{esc(" · ".join(meta))}</span>' if meta else "") + "</span>")
 
 
 def footer(data_line, disclaimer_line, indent=True):
     """출처 · 면책 줄. indent=False: 들여쓰기 없이 위 목록과 같은 왼쪽 선 (데일리 위험 탭, 2026-10-13 사용자)."""
     return (f'<div data-footer="1" style="margin-top:3px;padding-top:2px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{GUIDE_IND if indent else ""}">'
             f"{INFO_ICON}{data_line}<br>{INFO_ICON}{disclaimer_line}</div>")
+
+
+# ── 종목 링크 (2026-10-25 사용자: "블로그의 모든 종목은 우리 종목 상세 페이지로 — 페이지가 있으면 링크, 없으면 그대로") ──
+# 상세 페이지 목록 = 홈 종목 카드가 쓰는 gh-pages stocks.json 의 page 플래그 (stock-radar/home_feed.py · publish_pages 의 pages_live.json).
+# 없는 페이지로는 링크하지 않는다. 목록을 못 읽으면 링크 없이(안전).
+STOCK_LINK = "#7C3AED"   # 기사 속 종목 링크 — 보라색 · 굵게 아님 (2026-10-25 사용자: 파란색 → 보라색, 하락 파랑과 겹치지 않게)
+STOCK_BLOG = "https://alpha-scope.blogspot.com"
+_STOCKS_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/stocks.json"
+_stock_pages = None
+
+
+def stock_pages():
+    """{티커: 상세 페이지 주소} — 페이지가 발행된 종목만. 환경변수 STOCK_PAGES_JSON(파일)이 있으면 그것, 없으면 gh-pages 의 stocks.json."""
+    global _stock_pages
+    if _stock_pages is not None:
+        return _stock_pages
+    data = None
+    try:
+        path = os.environ.get("STOCK_PAGES_JSON")
+        if path and os.path.exists(path):
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+        else:
+            import urllib.request
+            with urllib.request.urlopen(urllib.request.Request(_STOCKS_URL, headers={"User-Agent": "alphascope"}), timeout=15) as r:
+                data = json.loads(r.read().decode("utf-8"))
+    except Exception as e:  # noqa: BLE001
+        print(f"[design_kit] 종목 페이지 목록 없음 — 링크 없이: {str(e)[:80]}")
+    _stock_pages = {x["s"]: f'{STOCK_BLOG}/p/{x["slug"]}.html' for x in ((data or {}).get("stocks") or []) if x.get("page") and x.get("slug")}
+    return _stock_pages
+
+
+def stock_href(sym):
+    return stock_pages().get(str(sym or "").strip().upper())
+
+
+def stock_link(sym, text_html, color=True):
+    """종목 글자 → 상세 페이지 링크. color=True: 기사 속 종목(파란색 · 보통 굵기), False: 글자 색 그대로(카드 · 목록 줄).
+    페이지가 없으면 text_html 그대로 (기사 속은 검정)."""
+    href = stock_href(sym)
+    if not href:
+        return text_html
+    style = f"color:{STOCK_LINK};font-weight:400;text-decoration:none;" if color else "color:inherit;text-decoration:none;"
+    return f'<a href="{esc(href)}" data-stock="{esc(sym)}" style="{style}">{text_html}</a>'
+
+
+def stock_row_link(row_html, sym):
+    """카드 한 줄(crow 등) 전체를 그 종목 상세 페이지로 — 색은 그대로, 테마의 줄 링크([data-row-link] + data-href, 가이드라인 10-9)."""
+    href = stock_href(sym)
+    if not href or not row_html.lstrip().startswith("<span "):
+        return row_html
+    return row_html.replace("<span ", f'<span data-row-link="1" data-href="{esc(href)}" ', 1)

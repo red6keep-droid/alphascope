@@ -17,13 +17,13 @@
   `rank_change`(5일 순위 대비 오늘 순위 변화, 양수면 올라온 것). `sectors.leaders`가 주도 3개, `laggards`가 약세 3개.
 - `rates` : `us10y`(당일 10년물, %), `us2y`, `spread_10_2`, `fed_funds`, `us10y_change_1d_bp`/`us10y_change_5d_bp`(bp),
   `growth_label`(금리 ↔ 성장주 관계 라벨. 이 라벨을 그대로 따르십시오).
-- `symbols` : 뉴스의 `related`에 쓸 수 있는 **유일한** 심볼 목록. 지수(`^GSPC` 등)·ETF·대형주 10개가 들어 있습니다.
+- `symbols` : 참고용 심볼 목록. 지수(`^GSPC` 등)·ETF·대형주 10개가 들어 있습니다.
 - `normal` : 심볼별 평소 범위 (말투 판단용 — 글에 '평소 범위'라고 쓰지 않는다). `ret_pct`(오늘 %), `sigma_pct`(평소 하루 움직임 ±%), `z`(오늘이 평소의 몇 배, 부호가 방향),
   `outside`(|z| ≥ 2 면 true = 평소 밖), `n_year`(지난 1년 중 오늘만큼 이상 움직인 날 수).
 - `shock` : 시장 충격 국면 여부. `active`가 true 면 VIX 가 35 를 넘은 뒤 아직 25 아래로 내려오지 않은 것.
 - `breadth` : 시장 폭. `ratio`(상승 비율 %). `mode`가 `proxy`면 섹터 ETF 11개 기준.
 - `series` 이하가 없으면 그날 분석이 실패한 것입니다. 그 경우 관련 문구는 "데이터 없음"으로 쓰고,
-  뉴스의 `theme`은 그대로 고르되 `related`는 빈 배열로 두십시오.
+  뉴스는 그대로 고르십시오.
 
 ## 엄격한 규칙
 
@@ -48,30 +48,7 @@
    VIX(변동성 지수)의 오르내림을 "급등 · 폭등 · 공포 확산"처럼 키우지 말고 "올랐습니다 · 내렸습니다"로 쓰십시오.
    "지지선 · 저항선 · 저점 시험 · 돌파 · 반등 신호" 같은 차트 해석 말을 쓰지 마십시오. 그런 해석은 앞날을 가르지 못했습니다.
    (2026-10-18 사용자: 홈 카드 요약이 이상하다 — "위험 회피 단계로 후퇴 · 변동성 지수 급등 · 단기 저점 시험" 같은 문장)
-10. 뉴스마다 `theme`은 아래 여덟 개 중 하나만, `related`는 `symbols` 목록에 있는 심볼만 0~3개 고르십시오.
-    목록에 없는 심볼(예: 목록에 없는 개별 종목)이나 다른 테마 이름을 쓰지 마십시오.
-    테마 어휘: `금리` · `AI/반도체` · `실적` · `매크로` · `에너지` · `정책/규제` · `지정학` · `기타`
-    `issue`는 아래 ISSUE 코드 중 하나(세상에 무슨 일이 났나 — 결과가 아니라 원인), `scope`는 시장 전체 · 업종 · 개별 종목,
-    `scheduled`는 예정된 발표 · 결정 · 실적이면 true, `surprise`는 예정 발표에 한해 예상 대비(-2 훨씬 나쁨 ~ +2 훨씬 좋음, 모르면 0).
-ISSUE (what is happening in the world — ONE code; pick the cause, not the effect):
-      RATES_FED         Fed decisions and officials, policy rates, Treasury yields, QT; also foreign central banks (ECB, BOJ)
-      INFLATION         CPI, PCE, PPI, wages, inflation expectations; oil only when framed as an inflation driver
-      GROWTH_JOBS       GDP, payrolls, unemployment, retail sales, PMI, consumer sentiment, recession debate, labor supply
-      TARIFF_TRADE      tariffs imposed/paused/negotiated, trade deals, trade deficits, supply-chain reshoring (export controls -> REGULATION)
-      GEOPOLITICS       wars, ceasefires, Middle East, Taiwan, sanctions, terrorism, disasters, pandemics, US-China security/diplomacy
-      OIL_ENERGY        crude, natural gas, OPEC, power, nuclear, energy prices (AI data-center power demand -> AI_CAPEX)
-      AI_CAPEX          data-center capex, GPU/accelerator demand, AI bubble debate, hyperscaler spending, AI power demand
-      EARNINGS          earnings results, guidance, consensus, analyst targets/ratings — big tech included (ticker attribute tells)
-      CORP_EVENT        M&A, IPO, buybacks, splits, dividends, executive changes, large contracts, product launches
-      REGULATION        antitrust, export controls, subsidies, safety regulators (FDA, NHTSA), lawsuits, rulings
-      FISCAL_POLITICS   shutdowns, debt ceiling, tax bills, elections, credit rating, appointments
-      CREDIT_BANKS      bank stress, credit crunch, private credit, CRE loans, bailouts, deposit flight
-      MARKET_STRUCTURE  flash crashes, volatility products, options expiry, index inclusion, meme stocks, carry-trade unwinds, capitulation and rebounds
-      INVESTOR_CALLS    a known investor or commentator buys/sells, recommends, or warns about a stock/sector (Cramer, Burry, ARK trades)
-      FX_GLOBAL         dollar, yen, yuan, FX intervention, sharp moves in foreign markets (country attribute carries which)
-      CRYPTO            bitcoin, crypto ETFs, stablecoin rules, exchanges
-      REAL_ESTATE       home prices, mortgage rates, housing starts, REITs
-      OTHER             market-related but none of the above
+10. 뉴스는 오늘 시장을 움직였거나 투자자가 알아야 할 기사 3~5개를 `index` 로만 고르십시오. 제목 번역 · 요약 · 테마 · 관련 종목은 파이썬(공용 뉴스 처리)이 정합니다 (2026-10-25).
 11. 출력하는 글 어디에도 줄표 "—"(em dash)를 쓰지 마십시오. 두 말을 이어 붙일 때는 " : " 나 쉼표를 쓰거나 문장을 둘로 나누십시오.
 
 ## 톤 : 상태를 말하고 행동은 말하지 않습니다
@@ -92,17 +69,7 @@ ISSUE (what is happening in the world — ONE code; pick the cause, not the effe
   "change_comment": "어제와 무엇이 달라졌는지 2~3문장. series의 1D/5D/20D 방향과 연속성, position의 레인지 위치, rs의 상대강도, vix의 5일 변화가 함께 말하는 흐름 변화를 설명. 숫자는 쓰지 말고 방향·관계·라벨만 (예: '기술주(나스닥)가 닷새 연속 미국 증시 전체(S&P 500)를 웃돌았고, 미국 증시 전체는 20일 고점 부근까지 되돌아왔습니다')",
   "sector_comment": "오늘의 주도 섹터와 약세 섹터 해설 2~3문장. sectors.leaders/laggards와 rank_change가 말하는 로테이션(어느 테마로 돈이 옮겨갔는지)을 설명. 숫자는 쓰지 말고 테마 이름과 방향만",
   "news": [
-    {
-      "index": 0,
-      "title_ko": "그 뉴스 제목을 한국어로 옮긴 것 (뜻 그대로, 평가어를 보태지 않는다. 티커·회사 이름은 그대로 둬도 된다). 명사형 헤드라인체, 마침표 없음 (예: '테슬라, 소송 승소')",
-      "why": "선정 이유 1문장",
-      "theme": "테마 어휘 중 하나",
-      "issue": "ISSUE 코드 중 하나 (영어 그대로)",
-      "scope": "market | sector | stock",
-      "scheduled": true,
-      "surprise": 0,
-      "related": ["이 뉴스가 움직인 자산 심볼 0~3개, symbols 목록에 있는 것만"]
-    }
+    {"index": 0}
   ],
   "macro_comment": "금리와 경제지표 해설 2~3문장. rates의 10년물 방향(1D·5D bp)과 growth_label, 10Y−2Y 스프레드, 실업률·CPI·VIX를 함께. 숫자는 쓰지 말고 방향과 관계만",
   "opinion": "오늘을 최근 흐름에 놓는 2문장. series 의 5D/20D · position · rs 로 최근 며칠 · 몇 주와 비교해 오늘 무엇이 달라졌는지(이어졌는지 · 바뀌었는지). one_line 에 쓴 내용과 평소 범위 안/밖 이야기는 다시 쓰지 않는다. 점수 · 등급 · 행동 지시 없이 사실만",
@@ -137,4 +104,3 @@ sector_comment · macro_comment · opinion)는 문장마다 마침표로 끝내�
 넣는다 (예: 지수 흐름 → 변동성 → 시장 폭). 같은 내용의 문장들은 빈 줄 없이 잇는다. 문장 안에서는 줄을 바꾸지 않는다. 문장 단위 줄바꿈은 파이썬이 한다.
 
 문체 (2026-10-18 블로그 기본 규칙): 글 필드는 합니다체로 끝낸다 (-했습니다 · -입니다 · -습니다). "-했다 · -이다" 로 끝내지 않는다.
-뉴스 title_ko 만 명사형 헤드라인체 (마침표 없음).

@@ -1,6 +1,181 @@
 {
  "_note": "종목 로고 — 식별 용도. 각 로고는 해당 회사의 상표. 출처 MrChartist/global-stock-logos (TradingView 로고 서비스)",
  "logos": {
+  "000270.KS": {
+   "file": "KR_000270.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "000660.KS": {
+   "file": "KR_000660.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "000810.KS": {
+   "file": "KR_000810.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "003670.KS": {
+   "file": "KR_003670.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "005380.KS": {
+   "file": "KR_005380.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "005490.KS": {
+   "file": "KR_005490.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "005930.KS": {
+   "file": "KR_005930.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "006400.KS": {
+   "file": "KR_006400.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "009540.KS": {
+   "file": "KR_009540.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "010130.KS": {
+   "file": "KR_010130.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "012450.KS": {
+   "file": "KR_012450.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "015760.KS": {
+   "file": "KR_015760.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "017670.KS": {
+   "file": "KR_017670.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "028260.KS": {
+   "file": "KR_028260.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "032830.KS": {
+   "file": "KR_032830.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "034020.KS": {
+   "file": "KR_034020.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "035420.KS": {
+   "file": "KR_035420.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "035720.KS": {
+   "file": "KR_035720.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "042660.KS": {
+   "file": "KR_042660.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "042700.KS": {
+   "file": "KR_042700.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "051910.KS": {
+   "file": "KR_051910.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "055550.KS": {
+   "file": "KR_055550.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "064350.KS": {
+   "file": "KR_064350.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "066570.KS": {
+   "file": "KR_066570.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "068270.KS": {
+   "file": "KR_068270.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "086520.KQ": {
+   "file": "KR_086520.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "086790.KS": {
+   "file": "KR_086790.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "105560.KS": {
+   "file": "KR_105560.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "196170.KQ": {
+   "file": "KR_196170.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "207940.KS": {
+   "file": "KR_207940.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "247540.KQ": {
+   "file": "KR_247540.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "323410.KS": {
+   "file": "KR_323410.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "329180.KS": {
+   "file": "KR_329180.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "373220.KS": {
+   "file": "KR_373220.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
+  "402340.KS": {
+   "file": "KR_402340.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-10-25"
+  },
   "AAPL": {
    "file": "AAPL.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",

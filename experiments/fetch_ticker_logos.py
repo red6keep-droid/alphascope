@@ -1,5 +1,7 @@
 """종목 로고 받기 — 우리가 다루는 종목만 받아 output/logos 에 두고, gh-pages images/logos 로 올린다.
 
+한국 종목(kr-stocks/universe_kr.py)은 같은 저장소 같은 커밋의 logos/korea/<종목코드> — 키는 005930.KS, 파일은 KR_005930.svg.
+
 출처: MrChartist/global-stock-logos (코드 MIT, 로고 대부분은 TradingView 공개 로고 서비스에서 모은 것).
 고정한 커밋에서만 받는다 — 저장소가 바뀌어도 우리 파일은 그대로. 받은 기록은 ref/ticker_logos.json.
 
@@ -24,6 +26,7 @@ META = os.path.join(BASE, "ref", "ticker_logos.json")
 REPO = "MrChartist/global-stock-logos"
 COMMIT = "0f4bf995d9c90d752461ebb7f7604da3290f97a1"   # 2026-10-22 고정
 RAW = f"https://raw.githubusercontent.com/{REPO}/{COMMIT}/logos/us/{{sym}}.{{ext}}"   # 대부분 svg, 일부(META · JPM …)는 png 만 있다
+RAW_KR = f"https://raw.githubusercontent.com/{REPO}/{COMMIT}/logos/korea/{{sym}}.{{ext}}"   # 한국: 6자리 종목 코드 (2026-10-25)
 
 REMOVED = set()   # 삭제 요청 · 잘못된 로고 — 배지로 돌린다
 
@@ -55,6 +58,12 @@ def tickers():
     return sorted(s for s in syms if re.fullmatch(r"[A-Z][A-Z.\-]{0,6}", s))
 
 
+def kr_tickers():
+    """한국 종목 — yfinance 표기(005930.KS) 그대로 키로 쓴다. 파일 이름은 KR_005930 (미국 숫자 티커와 겹치지 않게)."""
+    u = _load("kr_universe", os.path.join(BASE, "kr-stocks", "universe_kr.py"))
+    return sorted(c[0] for c in u.CANDIDATES)
+
+
 def get(url):
     req = urllib.request.Request(url, headers={"User-Agent": "AlphaScope-logos/0.1"})
     return urllib.request.urlopen(req, timeout=30).read()
@@ -64,14 +73,16 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     meta, missing = {}, []
     today = datetime.date.today().isoformat()
-    for sym in tickers():
+    jobs = [(s, RAW, [s, s.replace("-", "."), s.replace("-", "")], s) for s in tickers()]
+    jobs += [(s, RAW_KR, [s.split(".")[0]], "KR_" + s.split(".")[0]) for s in kr_tickers()]
+    for sym, raw, cands, fname in jobs:
         if sym in REMOVED:
             continue
         data = ext = None
-        for cand in dict.fromkeys([sym, sym.replace("-", "."), sym.replace("-", "")]):
+        for cand in dict.fromkeys(cands):
             for e in ("svg", "png"):
                 try:
-                    data, ext = get(RAW.format(sym=cand, ext=e)), e
+                    data, ext = get(raw.format(sym=cand, ext=e)), e
                     break
                 except Exception:
                     continue
@@ -89,9 +100,9 @@ def main():
         if not data:
             missing.append(sym)
             continue
-        with open(os.path.join(OUT, f"{sym}.{ext}"), "wb") as f:
+        with open(os.path.join(OUT, f"{fname}.{ext}"), "wb") as f:
             f.write(data)
-        meta[sym] = {"file": f"{sym}.{ext}", "source": f"{REPO}@{COMMIT[:7]}", "fetched": today}
+        meta[sym] = {"file": f"{fname}.{ext}", "source": f"{REPO}@{COMMIT[:7]}", "fetched": today}
     os.makedirs(os.path.dirname(META), exist_ok=True)
     with open(META, "w", encoding="utf-8") as f:
         json.dump({"_note": "종목 로고 — 식별 용도. 각 로고는 해당 회사의 상표. 출처 MrChartist/global-stock-logos (TradingView 로고 서비스)",

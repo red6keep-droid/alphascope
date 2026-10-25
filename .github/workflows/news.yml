@@ -35,12 +35,14 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}       # 제목 한글 번역 1순위 gpt-oss-120b (2026-10-11)
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}   # 2순위 gpt-oss-20b
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 제목 한글 번역 예비 (둘 다 없으면 영문 유지)
+          YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}   # 방송 줄 (experiments/media_feed.py, 2026-10-25) — 없으면 기사만
         run: python fetch_news.py
 
       - name: Prepare deployment files
         run: |
           mkdir -p deploy
           cp news.json deploy/news.json
+          [ -f news_store_home.json ] && cp news_store_home.json deploy/news_store_home.json || true   # 공용 뉴스 처리 결과 — 다음 실행이 이미 처리한 기사를 다시 AI 에 보내지 않게 (2026-10-25)
 
       - name: Deploy news.json to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4.1.0

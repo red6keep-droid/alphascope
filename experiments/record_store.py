@@ -118,11 +118,12 @@ def daily_rows(input_data, report, analysis):
     for i, it in enumerate((report or {}).get("news") or []):
         k = it.get("index")
         src = news[k] if isinstance(k, int) and 0 <= k < len(news) else {}
+        g = lambda k: src.get(k) if src.get(k) is not None else it.get(k)   # noqa: E731 — 기사 칸은 공용 뉴스 처리(src, 2026-10-25), 옛 기록은 데일리 AI 답(it)
         issues.append({
-            "date": date, "as_of": verdict["as_of"], "source": "daily", "id": f"news{i}", "issue": it.get("issue") or "OTHER",
-            "subtopic": it.get("subtopic") or "", "scope": it.get("scope"), "symbols": [s for s in (it.get("related") or []) if isinstance(s, str)],
-            "theme": it.get("theme"), "scheduled": bool(it.get("scheduled")), "surprise": it.get("surprise"),
-            "title": src.get("title") or it.get("title_ko"), "title_ko": it.get("title_ko"), "why": it.get("why"),
+            "date": date, "as_of": verdict["as_of"], "source": "daily", "id": f"news{i}", "issue": g("issue") or "OTHER",
+            "subtopic": g("subtopic") or "", "scope": g("scope"), "symbols": [s for s in (g("related") or []) if isinstance(s, str)],
+            "theme": g("theme"), "scheduled": bool(g("scheduled")), "surprise": g("surprise"),
+            "title": src.get("title") or it.get("title_ko"), "title_ko": src.get("headline_ko") or it.get("title_ko"), "why": it.get("why"),
             "publisher": src.get("source"), "url": src.get("link"), "published": src.get("published"),
         })
     return [verdict], issues
@@ -184,6 +185,8 @@ def radar_rows(radar, date):
                 "direction": s.get("direction"), "intensity": s.get("intensity"), "relevance": s.get("relevance"), "score": s.get("score"),
                 "source_kind": s.get("source_kind"), "n_reports": s.get("n_reports"),
                 "title": lead.get("title"), "quote": lead.get("quote"), "publisher": lead.get("publisher"), "url": lead.get("url"), "published": s.get("first_at"),
+                # 닿는 곳 · 그날 반응 (2026-10-25) — 화면에는 안 보이고, 90일 뒤 "같은 종류의 발언이 있던 날" 통계 재료
+                "path": s.get("path"), "reaction": s.get("reaction"), "novelty": s.get("novelty"),
             })
     verdicts = [{
         "date": date, "as_of": date, "source": "radar", "id": "radar", "target": "market",
