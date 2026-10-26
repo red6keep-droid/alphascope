@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-10-26 02:46:20 UTC",
+  "updated_at": "2026-10-26 04:46:11 UTC",
   "items": [
     {
       "title": "Brazil's Lula wins historic presidential election; Bolsonaro reportedly refuses to concede",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/26/brazil-lula-win-presidential-election-runoff-vote.html",
-      "published": "2026-10-26 02:18:09",
+      "published": "2026-10-26 04:09:41",
       "title_ko": "브라질 루라, 결선 투표에서 대통령 선거 승리",
       "summary_ko": ""
     },
@@ -74,18 +74,6 @@
       "summary_ko": "미국 관세 노출 감소 및 매출 확대 목적 사업 결정 강조"
     },
     {
-      "title": "빅테크 기업 3분기 실적 발표 및 AI 투자",
-      "title_ko": "빅테크 기업 3분기 실적 발표 및 AI 투자",
-      "summary_ko": "마이크로소프트, 애플, 아마존, 인텔 등 빅테크 실적 발표를 앞두고 AI 투자(CapEx) 규모와 수익성에 대한 시장의 관심과 우려가 공존함",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=0XwQ12XxxRE",
-      "published": "2026-10-25 15:47:54",
-      "kind": "media",
-      "tag": "실적",
-      "direction": "neutral",
-      "n_channels": 2
-    },
-    {
       "title": "미국 대이란 군사 타격 검토 및 지정학적 리스크",
       "title_ko": "미국 대이란 군사 타격 검토 및 지정학적 리스크",
       "summary_ko": "트럼프 대통령이 이란에 대한 주요 군사 작전 재개를 검토하면서 에너지 가격 상승 및 지정학적 불안이 고조되고 있음",
@@ -95,6 +83,18 @@
       "kind": "media",
       "tag": "지정학",
       "direction": "negative",
+      "n_channels": 1
+    },
+    {
+      "title": "빅테크 기업 3분기 실적 발표 및 AI 투자",
+      "title_ko": "빅테크 기업 3분기 실적 발표 및 AI 투자",
+      "summary_ko": "마이크로소프트, 애플, 아마존, 인텔 등 빅테크 실적 발표를 앞두고 AI 투자(CapEx) 규모와 수익성에 대한 시장의 관심과 우려가 공존함",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=0XwQ12XxxRE",
+      "published": "2026-10-25 15:47:54",
+      "kind": "media",
+      "tag": "실적",
+      "direction": "neutral",
       "n_channels": 1
     },
     {
