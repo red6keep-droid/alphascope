@@ -1,6 +1,38 @@
 {
-  "updated_at": "2026-10-26 04:46:11 UTC",
+  "updated_at": "2026-10-26 06:46:18 UTC",
   "items": [
+    {
+      "title": "Defense tech investment boom sparks bubble warning as private equity pours in",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/defense-tech-private-equity-investment.html",
+      "published": "2026-10-26 06:00:01",
+      "title_ko": "방위산업 투자 붐, 사모펀드 자금 유입 속 버블 경고",
+      "summary_ko": ""
+    },
+    {
+      "title": "‘Ticking time bomb’: The world's pension funds face an ageing crisis",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/pension-funds-ageing-crisis-risk-investment.html",
+      "published": "2026-10-26 05:22:30",
+      "title_ko": "‘폭탄 시계’: 세계 연금 기금, 고령화 위기 직면",
+      "summary_ko": "장수 및 낮은 출산율로 은퇴 재정 압박"
+    },
+    {
+      "title": "Oil slides over 2% as traders weigh Saudi attack risks, demand destruction",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/oil-prices-today-wti-brent.html",
+      "published": "2026-10-26 05:18:01",
+      "title_ko": "사우디 공격 리스크, 수요 파괴 우려 속 유가 2% 이상 하락",
+      "summary_ko": "투자자, 사우디 추가 공격 위협과 가격 상승에 따른 수요 감소 우려 고려"
+    },
+    {
+      "title": "SoftBank reportedly plans $50 billion tech investment in aspiring 'AI nation' Malaysia",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/softbank-masayoshi-son-malaysia-ai-billions.html",
+      "published": "2026-10-26 04:56:16",
+      "title_ko": "소프트뱅크, 'AI 국가' 말레이시아에 500억 달러 기술 투자 계획",
+      "summary_ko": "인공지능 및 데이터센터 포함"
+    },
     {
       "title": "Brazil's Lula wins historic presidential election; Bolsonaro reportedly refuses to concede",
       "source": "CNBC",
@@ -26,14 +58,6 @@
       "summary_ko": "41세 사망"
     },
     {
-      "title": "‘Ticking time bomb’: The world's pension funds face an ageing crisis",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/pension-funds-ageing-crisis-risk-investment.html",
-      "published": "2026-10-26 00:03:20",
-      "title_ko": "‘폭탄 시계’: 세계 연금 기금, 고령화 위기 직면",
-      "summary_ko": "장수 및 낮은 출산율로 은퇴 재정 압박"
-    },
-    {
       "title": "In pictures: Protests over inequality, rising living costs turn violent across France",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/25/france-protests-paris-cost-of-living-inequality.html",
@@ -48,30 +72,6 @@
       "published": "2026-10-25 21:13:50",
       "title_ko": "AI 트레이드에 더 큰 고통이 올 수 있다. 왜 포기하지 않는지",
       "summary_ko": "인베스팅 클럽 구독자 대상 일요일 칼럼 게재"
-    },
-    {
-      "title": "Blanche defends Trump-ordered lawsuit over Alaska Senate election certification",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/25/blanche-doj-alaska-senate-certification-lawsuit.html",
-      "published": "2026-10-25 20:28:55",
-      "title_ko": "블랜치, 알래스카 상원 선거 인증 관련 트럼프 지시 소송 옹호",
-      "summary_ko": "민주당, 댄 J. 설리번과 무관 입장 유지"
-    },
-    {
-      "title": "Ukraine disputes Elon Musk’s claim that its military violated Starlink terms during drone operations",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/25/ukraine-musk-starlink-terms-dispute.html",
-      "published": "2026-10-25 18:18:49",
-      "title_ko": "우크라이나, 머스크의 스타링크 약관 위반 주장 반박",
-      "summary_ko": "상용 스타링크 제한으로 중장거리 타격 사용 불가 주장"
-    },
-    {
-      "title": "Audi defends plans for a $4 billion Georgia plant amid VW restructuring, tariffs",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/25/audi-georgia-us-plant-tariffs-volkswagen.html",
-      "published": "2026-10-25 16:42:42",
-      "title_ko": "아우디, 40억 달러 조지아 공장 계획 옹호… VW 재편, 관세 속",
-      "summary_ko": "미국 관세 노출 감소 및 매출 확대 목적 사업 결정 강조"
     },
     {
       "title": "미국 대이란 군사 타격 검토 및 지정학적 리스크",
