@@ -3870,6 +3870,26 @@ body.no-dashboard .main-content { padding-top: 32px; }
         });
       })();
 
+      /* ============================================================ 가로 스크롤 그래프 `밀어서 보기` (2026-10-26 사용자)
+         세로 막대 그래프가 화면보다 넓을 때만 오른쪽 위 안내를 보인다 — 넓은 화면(안 넘침)에서는 숨긴다. 접힌 카드 · 숨은 탭 안(폭 0)은 건드리지 않고, 펼칠 때 다시 잰다. 디자인 가이드 8절 */
+      (function () {
+        'use strict';
+        function check() {
+          var boxes = document.querySelectorAll('[data-scroll-x]');
+          for (var i = 0; i < boxes.length; i++) {
+            var b = boxes[i], h = b.previousElementSibling;
+            if (!h || !h.hasAttribute('data-scroll-hint') || !b.clientWidth) continue;
+            h.style.display = b.scrollWidth > b.clientWidth + 1 ? 'block' : 'none';   /* '' 로 두면 인라인 display:block 까지 지워져 왼쪽에 붙는다 */
+          }
+        }
+        function later() { setTimeout(check, 30); }
+        document.addEventListener('DOMContentLoaded', check);
+        window.addEventListener('load', check);
+        window.addEventListener('resize', later);
+        document.addEventListener('toggle', later, true);   /* details 펼침 */
+        document.addEventListener('click', later, true);    /* 탭 전환 */
+      })();
+
       /* ============================================================ 그래프 확대 (2026-10-16 사용자: "폰에서 그래프를 확대해도 똑같다 — 손가락으로 좌우로 스크롤하듯")
          리포트의 그래프 링크(a[data-zoom], 옛 글은 aria-label "그래프 확대 보기")를 누르면 새 창 대신 전체 화면 팝업에
          그림을 화면 폭의 2.2배(최소 원본 폭, 최대 원본의 2배)로 띄우고 가로 스크롤 — 처음 위치는 오른쪽 끝(최근 봉). 닫기 × · 바깥 · Esc. 디자인 가이드 8절 */

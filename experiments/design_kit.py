@@ -210,9 +210,18 @@ def col_layout(n, ns, label_px, axis_px):
     return (group - ns * label_px) / 2 / group, int(n * group + 0.999)
 
 
+SCROLL_SHADE = ("background:linear-gradient(to left,#fff 30%,rgba(255,255,255,0)) 100% 0/28px 100% no-repeat local,"
+                "radial-gradient(farthest-side at 100% 50%,rgba(15,23,42,.18),rgba(15,23,42,0)) 100% 0/14px 100% no-repeat scroll;background-color:#fff;")
+
+
 def scroll_x(html, min_w):
-    """화면이 그래프 최소 폭보다 좁으면 가로 스크롤 (넓으면 그대로 꽉 채운다)."""
-    return (f'<span style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;">'
+    """화면이 그래프 최소 폭보다 좁으면 가로 스크롤 (넓으면 그대로 꽉 채운다).
+    더 있다는 표시 (2026-10-26 사용자: "밀어서 보기를 오른쪽 상단에, 오른쪽에 세로로 그림자를 넣어 더 있다는 걸"):
+    ① 오른쪽 세로 그림자 — 오른쪽에 더 있을 때만 보이고 끝까지 밀면 사라진다(CSS 만: 덮개 local · 그림자 scroll 배경) ·
+    ② 그래프 오른쪽 위 `밀어서 보기 ›` — 폰 폭에서 넘칠 때만 넣고, 화면이 넓어 안 넘치면 테마 JS(`data-scroll-hint`)가 숨긴다."""
+    hint = (f'<span data-scroll-hint="1" style="display:block;text-align:right;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};margin:0 0 4px;">밀어서 보기 ›</span>'
+            if min_w > CHART_PHONE_W else "")
+    return (f'{hint}<span data-scroll-x="1" style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;{SCROLL_SHADE}">'
             f'<span style="display:block;min-width:{min_w}px;">{html}</span></span>')
 
 
