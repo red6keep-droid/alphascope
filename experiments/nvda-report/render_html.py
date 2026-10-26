@@ -469,7 +469,8 @@ def _chart_label_px(bars):
 
 def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
     """세로 막대 그래프 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수. 값은 막대 끝에 숫자 (2026-10-17 사용자: 그래프화).
-    숫자 글자는 막대 수에 따라 11~17px (_chart_label_px). 글자 자리(위아래 여백)도 그만큼 넓힌다."""
+    숫자 글자는 막대 수에 따라 11~17px (_chart_label_px). 글자 자리(위아래 여백)도 그만큼 넓힌다.
+    숫자는 자기 막대 폭 안에만 — 막대 · 다른 숫자와 절대 겹치지 않게 막대 폭을 숫자 폭 이상으로 잡고, 화면이 모자라면 가로 스크롤 (2026-10-26 사용자, 가이드라인 8절)."""
     vals = [v for _, vs in groups for v in vs if v is not None]
     if not vals:
         return ""
@@ -479,23 +480,26 @@ def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
     mp, mn = max(0.0, max(vals)), max(0.0, -min(vals))
     scale = (height - 2 * lbl) / ((mp + mn) or 1)
     top = lbl + mp * scale
+    txt = lambda v: fmt(v) if fmt else f"{v:+.1f}".replace("-", "−")   # noqa: E731
+    label_px = max(_dk.text_px(txt(v), fs) for v in vals) + 4
+    axis_px = max(_dk.text_px(g, int(TINY[:-2])) for g, _ in groups) + 8
+    pad, min_w = _dk.col_layout(n, ns, label_px, axis_px)
     parts = [f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>']
     for i, (_, vs) in enumerate(groups):
         for k, v in enumerate(vs):
             if v is None:
                 continue
             h = max(1.0, abs(v) * scale)
-            left = (i + (0.15 + 0.70 * k / ns)) * 100 / n
-            width = 0.70 / ns * 100 / n
+            left = (i + pad + (1 - 2 * pad) * k / ns) * 100 / n
+            width = (1 - 2 * pad) / ns * 100 / n
             y, ly = (top - h, top - h - lbl + 1) if v >= 0 else (top, top + h + 1)
             rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
             parts.append(f'<span style="position:absolute;left:{left:.2f}%;width:{width:.2f}%;top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
-            txt = fmt(v) if fmt else f"{v:+.1f}".replace("-", "−")
-            parts.append(f'<span style="position:absolute;left:{left - 4:.2f}%;width:{width + 8:.2f}%;top:{ly:.1f}px;height:{lbl - 2}px;line-height:{lbl - 2}px;text-align:center;font-size:{fs}px;'
-                         f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt}</span>')
-    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;">{_esc(g)}</span>' for g, _ in groups)
-    return (f'<span style="display:block;position:relative;height:{height}px;">{"".join(parts)}</span>'
-            f'<span style="display:flex;font-size:{TINY};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>')
+            parts.append(f'<span style="position:absolute;left:{left:.2f}%;width:{width:.2f}%;top:{ly:.1f}px;height:{lbl - 2}px;line-height:{lbl - 2}px;text-align:center;font-size:{fs}px;'
+                         f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt(v)}</span>')
+    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:nowrap;">{_esc(g)}</span>' for g, _ in groups)
+    return _dk.scroll_x(f'<span style="display:block;position:relative;height:{height}px;">{"".join(parts)}</span>'
+                        f'<span style="display:flex;font-size:{TINY};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>', min_w)
 
 
 _PASTEL_UP, _PASTEL_DN, _GRAY_BAR = "#ED8E87", "#82B1F0", "#CBD5E1"   # 엔비디아 막대 — 파스텔(#F8C4BF · #BCD3F5)을 포화색(#d93025 · #1a73e8) 쪽으로 20% 진하게 한 번(#F2A6A0 · #9CC0F2), 사용자 요청으로 한 번 더 20% (2026-10-17), S&P 500 회색은 그대로
@@ -546,22 +550,23 @@ def _multi_single(rows):
     return _multi(rows).replace(' data-grid="2"', "", 1)
 
 
-def sec_year_range(a):
-    """1년 가격 범위 막대 (2026-10-17 사용자: 쉬운 정보) — 제목은 카드 밖(공통 제목 스타일), 카드 안: `최고가 대비 ▼ 12.0%` · 막대 · 최저 · 최고."""
-    y = a.get("year_range")
+def year_range_in(y, money, tip, bg, bd):
+    """가격 범위 (1년) — 가격 정보 강조 카드 **안**, 펼치면 머리 줄 바로 아래에 같은 바탕 · 테두리로 이어진다 (2026-10-26 사용자: "가격정보 강조 카드를
+    펼치면 가격 범위를 카드 안에 넣을 수 있어", 제목 `1년 가격 범위` → `가격 범위 (1년)`). 펼친 동안 머리 줄 아래 모서리는 테마 CSS 가 편다
+    (`details[data-acc][open] > summary > span:first-child`). money = 금액 표기 함수(달러 · 원화)."""
     if not y:
         return ""
-    pad = _dk.SEP_GAP - _dk.VP - 1
     pos = max(0.0, min(100.0, y["pos_pct"]))
-    head = (f'<span style="{MULTI_ROW}"><span style="flex:1 1 auto;min-width:0;font-weight:700;color:#111;font-size:{_dk.NAME};">최고가 대비</span>'
-            f'<span style="flex:none;text-align:right;white-space:nowrap;{VAL}font-weight:700;">{_arrow(y["pct_from_high"], 1)}</span></span>')
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
+            f'<span style="flex:1 1 auto;min-width:0;font-weight:700;color:#111;font-size:{_dk.NAME};">{_paren(_esc("가격 범위 (1년)"))}{_tipx(tip)}</span>'
+            f'<span style="flex:none;text-align:right;white-space:nowrap;{VAL}font-weight:700;"><span style="font-weight:400;color:{NOTE};font-size:{TINY};">최고가 대비</span>&nbsp;{_arrow(y["pct_from_high"], 1)}</span></span>')
     track = (f'<span style="display:block;position:relative;height:8px;border-radius:4px;background:#E2E8F0;margin:6px 0 10px;">'
              f'<span style="position:absolute;left:0;top:0;height:8px;width:{pos:.1f}%;border-radius:4px;background:#BFDBFE;"></span>'
              f'<span style="position:absolute;top:-4px;left:{pos:.1f}%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#111;border:2px solid #fff;box-sizing:border-box;"></span></span>')
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
-            f'<span>최저 ${y["low"]:,.2f}</span><span>(오늘 ${y["close"]:,.2f})</span><span>최고 ${y["high"]:,.2f}</span></span>')
-    body = f'<span style="display:block;padding:0 12px {pad}px;">{track}{ends}</span>'
-    return _card_title("1년 가격 범위", year_tip(y)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{head}{body}</span></div>'
+            f'<span>최저 {money(y["low"])}</span><span>(오늘 {money(y["close"])})</span><span>최고 {money(y["high"])}</span></span>')
+    return (f'<span data-in-card="1" style="display:block;background:{bg};border:1px solid {bd};border-top:0;border-radius:0 0 8px 8px;'
+            f'padding:10px 12px 12px;line-height:{LH_CARD};white-space:normal;">{head}{track}{ends}</span>')
 
 
 def dd_tip(d):
@@ -704,7 +709,7 @@ def sec_headline(a, n=None):
         head = head[:k] + sub + head[k:]
     # 펼침 1층 = 초보자도 읽는 정보 (2026-10-17 사용자: 평균선 · 갭 같은 차트 지표는 우리 방향과 다르다) — 기간별 수익률 · 1년 가격 범위 · 거래량.
     # 2층(접힘) = 차트 보는 분을 위한 지표 — 평균선 · 1일 비교 · 시가 갭 · 일중 변동폭 · 과열(RSI) · 교차, 우리 검증은 ? 툴팁
-    rows = glance_rows(a, n) + sec_periods(a) + sec_year_range(a) + sec_drawdown(a) + sec_earnings(a)
+    rows = glance_rows(a, n) + sec_periods(a) + sec_drawdown(a) + sec_earnings(a)   # 가격 범위 (1년)는 강조 카드 안 (year_range_in, 2026-10-26)
     # 거래량 카드는 뺐다 — 가격 카드 머리 작은 글씨에 늘 있다 (2026-10-18 사용자)
     deep = sec_ma(a)
     deep += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p")) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])   # 하루 등락 차이 (2026-10-11 사용자)
@@ -726,6 +731,7 @@ def sec_headline(a, n=None):
     rows += (f'<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{_fold_row("차트 지표 보기")}</summary>'
              f'<div style="margin-top:6px;">{deep}</div></details>')
     out = (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
+           f'{year_range_in(a.get("year_range"), lambda v: f"${v:,.2f}", year_tip(a["year_range"]) if a.get("year_range") else "", bg, bd)}'
            f'<div style="margin-top:8px;">{rows}</div></details></div>')
     out += sec_state_cards(a)   # 시장 국면 · 반도체 자금 — 이유를 담은 별도 카드 둘 (2026-10-11 사용자)
     if not a.get("is_latest_bar_today"):
@@ -1378,9 +1384,9 @@ def _ccard(rows, left=None):
 
 
 def _card_title(t, tip=""):
-    """가격 카드 펼침 안 카드 제목 — 굵게 · 검정 · 위쪽 여백 10px (네 카드 공통, 2026-10-17 사용자: 타이틀 스타일 통일). 설명은 툴팁 안으로.
+    """카드 위 카드 제목 — 굵게 · 검정 · 위쪽 여백 25px · 아래 8px (3 → 8, 2026-10-26 사용자: 카드 위 타이틀 아래 +5px, 모든 페이지). 설명은 툴팁 안으로.
     data-sub 를 붙이지 않는다 — 테마 탭이 서브탭으로 읽는 표시라 오늘 탭에 서브탭이 생길 수 있다."""
-    return (f'<div style="font-size:{_dk.EMPH_NAME};line-height:{LH_CARD};font-weight:700;color:#111;margin:25px 0 3px;">'
+    return (f'<div style="font-size:{_dk.EMPH_NAME};line-height:{LH_CARD};font-weight:700;color:#111;margin:25px 0 8px;">'
             f'{_paren(_esc(t))}{_tipx(tip) if tip else ""}</div>')
 
 

@@ -113,7 +113,7 @@ def align_titles(html, px=ALIGN_PX):
     def add(mo):
         st = mo.group(2)
         return mo.group(0) if "padding-left" in st else f'{mo.group(1)}{st}padding-left:{px}px;"'
-    return re.sub(r'(<h2[^>]*? style="|<div data-sub="1" style="|<p data-seo-lead="1"[^>]*? style="|<div style="(?=font-size:19px;line-height:24px;font-weight:700;color:#111;margin:25px 0 3px;))([^"]*)"', add, html)   # 마지막 = 카드 제목(기간별 수익률 · 1년 가격 범위 …)   # 맨 앞 요약(data-seo-lead)도 같은 선 (2026-10-23 사용자)
+    return re.sub(r'(<h2[^>]*? style="|<div data-sub="1" style="|<p data-seo-lead="1"[^>]*? style="|<div style="(?=font-size:19px;line-height:24px;font-weight:700;color:#111;margin:25px 0 8px;))([^"]*)"', add, html)   # 마지막 = 카드 제목(기간별 수익률 · 1년 가격 범위 …)   # 맨 앞 요약(data-seo-lead)도 같은 선 (2026-10-23 사용자)
 
 
 def ko(text, table):
@@ -175,9 +175,45 @@ def tint(html_text):
     return " · ".join(out)
 
 
+DOT_W = 10   # 가운뎃점 칸 폭 (dot_chunks) — 점 앞 4px, 뒤는 남은 폭 + 덩어리 사이 공백이라 앞뒤가 비슷하다
+
+
 def dot_chunks(parts_html):
-    """덩어리 목록 → 가운뎃점으로 이은 한 줄. 줄바꿈은 점 사이에서만 (점은 앞 덩어리 끝에 붙는다), 한 줄보다 긴 덩어리만 안에서 바뀐다."""
-    return " ".join(f'<span style="display:inline-block;max-width:100%;vertical-align:top;">{x}{"&nbsp;·" if i < len(parts_html) - 1 else ""}</span>' for i, x in enumerate(parts_html))
+    """덩어리 목록 → 가운뎃점으로 이은 한 줄 (**오른쪽 정렬 줄 전용**). 줄바꿈은 점 사이에서만 (점은 앞 덩어리 끝에 붙는다), 한 줄보다 긴 덩어리만 안에서 바뀐다.
+    줄 끝에 남는 점은 보이지 않는다 (2026-10-26 사용자: "줄바꿈을 하고 나면 가운데 점은 삭제") — 모든 덩어리 끝에 같은 폭(DOT_W)의 점 칸을 붙이고,
+    안쪽 상자를 오른쪽으로 DOT_W 만큼 넓혀 overflow 로 자른다. 오른쪽 정렬이라 줄마다 마지막 점 칸이 잘린 자리에 떨어진다."""
+    dot = f'<span style="display:inline-block;width:{DOT_W}px;padding-left:4px;box-sizing:border-box;text-align:left;">·</span>'
+    inner = " ".join(f'<span style="display:inline-block;max-width:100%;vertical-align:top;">{x}{dot}</span>' for x in parts_html)
+    return f'<span style="display:block;overflow:hidden;"><span style="display:block;margin-right:-{DOT_W}px;">{inner}</span></span>'
+
+
+# ── 세로 막대 그래프 — 숫자 겹침 금지 · 모자라면 가로 스크롤 (2026-10-26 사용자, 가이드라인 8절) ──
+CHART_PHONE_W = 290   # 폰에서 그래프가 쓰는 폭 (본문 320 − 카드 안 여백)
+CHART_PAD_PX = 4      # 막대 묶음 양옆 최소 틈 (가로 스크롤로 넘어갈 때)
+
+
+def text_px(text, fs):
+    """글자 폭 어림 (px) — 굵은 숫자 기준, 한글은 1em. 겹침 판정용이라 넉넉하게 잡는다."""
+    w = 0.0
+    for c in re.sub(r"<[^>]+>", "", html_mod.unescape(str(text))):
+        w += 1.0 if ord(c) >= 0x1100 else 0.3 if c in ".,:" else 0.9 if c == "%" else 0.62
+    return w * fs
+
+
+def col_layout(n, ns, label_px, axis_px):
+    """막대 묶음 n개 × 시리즈 ns개 — (묶음 양옆 틈 비율, 그래프 최소 폭 px).
+    막대 폭은 그 위 숫자 폭(label_px) 이상, 묶음 폭은 가로축 이름 폭(axis_px) 이상. 폰 폭에 들어가면 예전 모양(막대 70%), 넘치면 틈을 줄이고 그래도 넘치면 가로 스크롤."""
+    roomy = max(ns * label_px / 0.70, axis_px)
+    if n * roomy <= CHART_PHONE_W:
+        return 0.15, int(n * roomy + 0.999)
+    group = max(ns * label_px + 2 * CHART_PAD_PX, axis_px)
+    return (group - ns * label_px) / 2 / group, int(n * group + 0.999)
+
+
+def scroll_x(html, min_w):
+    """화면이 그래프 최소 폭보다 좁으면 가로 스크롤 (넓으면 그대로 꽉 채운다)."""
+    return (f'<span style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;">'
+            f'<span style="display:block;min-width:{min_w}px;">{html}</span></span>')
 
 
 def sub_line(sub_html, lead=""):

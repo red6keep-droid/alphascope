@@ -96,7 +96,8 @@ def legend_chips(items):
 
 
 def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
-    """세로 막대 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수."""
+    """세로 막대 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수.
+    숫자는 자기 막대 폭 안에만, 화면이 모자라면 가로 스크롤 (2026-10-26 사용자, 가이드라인 8절 — 엔비디아 _col_chart 와 같은 규칙)."""
     vals = [v for _, vs in groups for v in vs if v is not None]
     if not vals:
         return ""
@@ -104,23 +105,26 @@ def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
     scale = (height - 2 * CHART_LBL) / ((mp + mn) or 1)
     top = CHART_LBL + mp * scale
     n, ns = len(groups), len(groups[0][1])
+    txt = lambda v: fmt(v) if fmt else f"{v:+.2f}".replace("-", "−")   # noqa: E731
+    label_px = max(dk.text_px(txt(v), 11) for v in vals) + 4
+    axis_px = max(dk.text_px(g, int(dk.TINY[:-2])) for g, _ in groups) + 8
+    pad, min_w = dk.col_layout(n, ns, label_px, axis_px)
     parts = [f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>']
     for i, (_, vs) in enumerate(groups):
         for k, v in enumerate(vs):
             if v is None:
                 continue
             h = max(1.0, abs(v) * scale)
-            left = (i + (0.15 + 0.70 * k / ns)) * 100 / n
-            width = 0.70 / ns * 100 / n
+            left = (i + pad + (1 - 2 * pad) * k / ns) * 100 / n
+            width = (1 - 2 * pad) / ns * 100 / n
             y, ly = (top - h, top - h - 15) if v >= 0 else (top, top + h + 1)
             rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
             parts.append(f'<span style="position:absolute;left:{left:.2f}%;width:{width:.2f}%;top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
-            txt = fmt(v) if fmt else f"{v:+.2f}".replace("-", "−")
-            parts.append(f'<span style="position:absolute;left:{left - 2:.2f}%;width:{width + 4:.2f}%;top:{ly:.1f}px;height:14px;line-height:14px;text-align:center;font-size:11px;'
-                         f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt}</span>')
-    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;">{esc(g)}</span>' for g, _ in groups)
-    return (f'<span style="display:block;position:relative;height:{height}px;">{"".join(parts)}</span>'
-            f'<span style="display:flex;font-size:{dk.TINY};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>')
+            parts.append(f'<span style="position:absolute;left:{left:.2f}%;width:{width:.2f}%;top:{ly:.1f}px;height:14px;line-height:14px;text-align:center;font-size:11px;'
+                         f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt(v)}</span>')
+    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:nowrap;">{esc(g)}</span>' for g, _ in groups)
+    return dk.scroll_x(f'<span style="display:block;position:relative;height:{height}px;">{"".join(parts)}</span>'
+                       f'<span style="display:flex;font-size:{dk.TINY};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>', min_w)
 
 
 def chart_card(title, groups, colors, label_colors, legend, fmt=None):

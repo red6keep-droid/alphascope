@@ -468,9 +468,9 @@ def price_card(s):
         head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1)
         k = head.rstrip().rfind("</span>")
         head = head[:k] + sub.replace("S&P 500", "KOSPI") + head[k:]
-    rows = sec_periods(s) + sec_year_range(s) + sec_drawdown(s) + sec_chart_indicators(s)
+    rows = sec_periods(s) + sec_drawdown(s) + sec_chart_indicators(s)   # 가격 범위 (1년)는 강조 카드 안 (2026-10-26 사용자)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-            f'<div style="margin-top:8px;">{rows}</div></details></div>')
+            f'{sec_year_range(s, bg, bd)}<div style="margin-top:8px;">{rows}</div></details></div>')
 
 
 def periods_tip(s, ps):
@@ -500,21 +500,10 @@ def year_tip(y):
             f"· 오늘 {won(y['close'])} : {where}, 범위의 {max(0.0, min(100.0, y['pos_pct'])):.0f}% 지점")
 
 
-def sec_year_range(s):
-    """1년 가격 범위 — 엔비디아 sec_year_range 와 같은 모양, 원화."""
+def sec_year_range(s, bg, bd):
+    """가격 범위 (1년) — 가격 정보 강조 카드 안 (R.year_range_in, 2026-10-26 사용자), 원화."""
     y = s.get("year_range")
-    if not y:
-        return ""
-    pos = max(0.0, min(100.0, y["pos_pct"]))
-    head = (f'<span style="{R.MULTI_ROW}"><span style="flex:1 1 auto;min-width:0;font-weight:700;color:#111;font-size:{_dk.NAME};">최고가 대비</span>'
-            f'<span style="flex:none;text-align:right;white-space:nowrap;{R.VAL}font-weight:700;">{R._arrow(y["pct_from_high"], 1)}</span></span>')
-    track = (f'<span style="display:block;position:relative;height:8px;border-radius:4px;background:#E2E8F0;margin:6px 0 10px;">'
-             f'<span style="position:absolute;left:0;top:0;height:8px;width:{pos:.1f}%;border-radius:4px;background:#BFDBFE;"></span>'
-             f'<span style="position:absolute;top:-4px;left:{pos:.1f}%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#111;border:2px solid #fff;box-sizing:border-box;"></span></span>')
-    ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
-            f'<span>최저 {won(y["low"])}</span><span>(오늘 {won(y["close"])})</span><span>최고 {won(y["high"])}</span></span>')
-    body = f'<span style="display:block;padding:0 12px {PAD}px;">{track}{ends}</span>'
-    return R._card_title("1년 가격 범위", year_tip(y)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{head}{body}</span></div>'
+    return R.year_range_in(y, won, year_tip(y), bg, bd) if y else ""
 
 
 def sec_drawdown(s):
