@@ -1,77 +1,77 @@
 {
-  "updated_at": "2026-10-26 10:46:12 UTC",
+  "updated_at": "2026-10-26 12:46:19 UTC",
   "items": [
     {
-      "title": "‘Ticking time bomb’: The world's pension funds face an ageing crisis",
+      "title": "Meta announces $95 billion stock offering to fund AI expansion",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/pension-funds-ageing-crisis-risk-investment.html",
-      "published": "2026-10-26 10:39:00",
-      "title_ko": "‘폭탄 시계’: 세계 연금 기금, 고령화 위기 직면",
-      "summary_ko": "장수 및 낮은 출산율로 은퇴 재정 압박"
-    },
-    {
-      "title": "Neocloud stocks fall as Elon Musk says more than 200 of them face 'guppy-level death'",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/neocloud-stocks-today-coreweave-nebius-iren-elon-musk.html",
-      "published": "2026-10-26 10:13:01",
-      "title_ko": "일론 머스크 \"200개 이상 뉴클라우드, 물고기 수준 죽음\" 발언에 주가 하락",
-      "summary_ko": "투자자, 부채 기반 확장 및 AI 인프라 수익성 의문"
+      "link": "https://www.cnbc.com/2026/10/26/meta-stock-offering-ai.html",
+      "published": "2026-10-26 12:42:41",
+      "title_ko": "메타, AI 확장 위해 950억 달러 주식 공모 발표",
+      "summary_ko": "엔비디아·AMD·브로드컴, 50억 달러 규모 주식 매입 검토"
     },
     {
       "title": "Can GOP Rep. Brian Fitzpatrick, a moderate who's bucked Trump, keep his Pennsylvania swing seat?",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/26/brian-fitzpatrick-bob-harvie-pennsylvania-senate-election.html",
-      "published": "2026-10-26 10:00:01",
+      "published": "2026-10-26 12:33:16",
       "title_ko": "트럼프에 맞선 중도파 공화당 브라이언 핏즈패트릭, 펜실베이니아 경합지 의석 지킬 수 있나",
       "summary_ko": "민주당, 현역 의원 교체 기회 주장"
     },
     {
-      "title": "How war, security and coalition math are shaping the Israeli election",
+      "title": "Caregiving for adult relatives can cost thousands. AARP survey finds support could matter to midterm voters",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/israel-election-netanyahu-iran-gaza-palestine.html",
-      "published": "2026-10-26 09:46:59",
-      "title_ko": "전쟁, 안보, 연대 수식이 이스라엘 선거를 어떻게 형성하는가",
-      "summary_ko": "유권자, 투표소 방문 예정"
+      "link": "https://www.cnbc.com/2026/10/26/family-caregiving-costs-2026-midterm-elections.html",
+      "published": "2026-10-26 12:15:01",
+      "title_ko": "성인 친족 돌봄 비용 수천 달러, AARP 조사 중간선거 유권자 관심 시사",
+      "summary_ko": "경쟁적인 의회 선거에서 유권자 영향력 시사"
     },
     {
-      "title": "Brazil's Lula wins historic presidential election; Bolsonaro reportedly refuses to concede",
+      "title": "Brazilian stocks rocked as Lula wins presidential election, Bolsonaro reportedly refuses to concede",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/26/brazil-lula-win-presidential-election-runoff-vote.html",
-      "published": "2026-10-26 08:05:28",
+      "published": "2026-10-26 12:14:55",
       "title_ko": "브라질 루라, 결선 투표에서 대통령 선거 승리",
       "summary_ko": ""
     },
     {
-      "title": "Defense tech investment boom sparks bubble warning as private equity pours in",
+      "title": "Neocloud stocks fall as Elon Musk says more than 200 of them face 'guppy-level death'",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/defense-tech-private-equity-investment.html",
-      "published": "2026-10-26 06:00:01",
-      "title_ko": "방위산업 투자 붐, 사모펀드 자금 유입 속 버블 경고",
-      "summary_ko": ""
+      "link": "https://www.cnbc.com/2026/10/26/neocloud-stocks-today-coreweave-nebius-iren-elon-musk.html",
+      "published": "2026-10-26 12:10:07",
+      "title_ko": "일론 머스크 \"200개 이상 뉴클라우드, 물고기 수준 죽음\" 발언에 주가 하락",
+      "summary_ko": "투자자, 부채 기반 확장 및 AI 인프라 수익성 의문"
     },
     {
-      "title": "Oil slides over 2% as traders weigh Saudi attack risks, demand destruction",
+      "title": "Cracking AI trade has Wall Street looking for a hedge. An ex-Citadel quant may have the answer",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/oil-prices-today-wti-brent.html",
-      "published": "2026-10-26 05:18:01",
-      "title_ko": "사우디 공격 리스크, 수요 파괴 우려 속 유가 2% 이상 하락",
-      "summary_ko": "투자자, 사우디 추가 공격 위협과 가격 상승에 따른 수요 감소 우려 고려"
+      "link": "https://www.cnbc.com/2026/10/26/gpu-futures-ai-hedge-hyperbolic.html",
+      "published": "2026-10-26 12:08:13",
+      "title_ko": "균열된 AI 거래에 월가 헤지 모색, 전 시타델 퀀트가 해답 제시",
+      "summary_ko": "자스퍼 장, GPU 거래소 운영"
     },
     {
-      "title": "SoftBank reportedly plans $50 billion tech investment in aspiring 'AI nation' Malaysia",
+      "title": "Trump says he'll soon decide whether to ‘make a deal’ with Iran or ‘finish it off'",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/softbank-masayoshi-son-malaysia-ai-billions.html",
-      "published": "2026-10-26 04:56:16",
-      "title_ko": "소프트뱅크, 'AI 국가' 말레이시아에 500억 달러 기술 투자 계획",
-      "summary_ko": "인공지능 및 데이터센터 포함"
+      "link": "https://www.cnbc.com/2026/10/26/us-iran-war-hormuz.html",
+      "published": "2026-10-26 11:49:17",
+      "title_ko": "트럼프, 이란과 '거래' 체결 여부 또는 '종결' 여부 곧 결정할 것",
+      "summary_ko": "중동 긴장 고조 속 협상 및 군사 행동 검토"
     },
     {
-      "title": "Behind ‘Mad Money’ was a brilliant writer viewers never saw. We lost him too soon",
+      "title": "Apollo to buy nearly 10% stake in Abu Dhabi-backed alternative asset manager Mubadala Capital",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/25/jim-cramer-remembers-cliff-mason.html",
-      "published": "2026-10-26 00:28:36",
-      "title_ko": "‘Mad Money’ 뒤에는 시청자들이 보지 못한 뛰어난 작가가 있었다. 우리는 그를 너무 일찍 잃었다",
-      "summary_ko": "41세 사망"
+      "link": "https://www.cnbc.com/2026/10/26/apollo-mubadala-capital-stake.html",
+      "published": "2026-10-26 11:47:00",
+      "title_ko": "아폴로, 아부다비 지원 대체자산 매니저 무바달라 캐피탈 지분 약 10% 인수",
+      "summary_ko": "아부다비 자본 중심 아폴로 글로벌 야심 강화"
+    },
+    {
+      "title": "Blanche defends Trump-ordered lawsuit over Alaska Senate election certification",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/25/blanche-doj-alaska-senate-certification-lawsuit.html",
+      "published": "2026-10-26 11:33:09",
+      "title_ko": "블랜치, 알래스카 상원 선거 인증 관련 트럼프 지시 소송 옹호",
+      "summary_ko": "민주당, 댄 J. 설리번과 무관 입장 유지"
     },
     {
       "title": "미국 대이란 군사 타격 검토 및 지정학적 리스크",
@@ -86,28 +86,28 @@
       "n_channels": 1
     },
     {
-      "title": "빅테크 기업 3분기 실적 발표 및 AI 투자",
-      "title_ko": "빅테크 기업 3분기 실적 발표 및 AI 투자",
-      "summary_ko": "마이크로소프트, 애플, 아마존, 인텔 등 빅테크 실적 발표를 앞두고 AI 투자(CapEx) 규모와 수익성에 대한 시장의 관심과 우려가 공존함",
+      "title": "연준 금리 결정 및 통화정책 방향",
+      "title_ko": "연준 금리 결정 및 통화정책 방향",
+      "summary_ko": "연준이 이번 회의에서 금리를 동결할 것으로 예상되는 가운데, 케빈 워시 의장의 향후 물가 및 통화정책 스탠스에 시장의 이목이 집중됨",
       "source": "블룸버그",
       "link": "https://www.youtube.com/watch?v=0XwQ12XxxRE",
       "published": "2026-10-25 15:47:54",
       "kind": "media",
-      "tag": "실적",
+      "tag": "금리",
       "direction": "neutral",
       "n_channels": 1
     },
     {
-      "title": "AI 도입으로 인한 노동 시장 고용 감소 우려",
-      "title_ko": "AI 도입으로 인한 노동 시장 고용 감소 우려",
-      "summary_ko": "AI 기술이 노동을 대체하면서 향후 10년 내 많은 일자리가 사라지고 고용 시장에 부정적 영향을 미칠 수 있음",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=ECcLJUyu188",
-      "published": "2026-10-25 14:00:19",
+      "title": "코코아 가격 급등과 초콜릿 인플레이션",
+      "title_ko": "코코아 가격 급등과 초콜릿 인플레이션",
+      "summary_ko": "공급 부족과 구조적 요인으로 코코아 가격이 급등하면서 핼러윈을 앞두고 초콜릿 및 제과 제품 가격이 크게 상승함",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=0XwQ12XxxRE",
+      "published": "2026-10-25 15:47:54",
       "kind": "media",
-      "tag": "매크로",
+      "tag": "에너지",
       "direction": "neutral",
-      "n_channels": 2
+      "n_channels": 1
     }
   ]
 }
