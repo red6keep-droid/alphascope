@@ -566,8 +566,10 @@ def year_range_in(y, money, tip, bg, bd):
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
             f'<span style="white-space:nowrap;">최저 {money(y["low"])}</span><span style="white-space:nowrap;">최고 {money(y["high"])}</span></span>')
     # 가운데 `(오늘 …)` 는 뺐다 — 같은 카드 머리 줄에 오늘 가격이 있고, 셋이면 폰에서 두 줄로 꺾인다 (2026-10-26 사용자: 같이 고쳐). 최저 · 최고는 줄바꿈 금지
+    # 막대는 강조 카드 바탕 위에 바로 두지 않고 흰 카드로 감싼다 (가이드라인 5-9: 색깔 있는 카드 · 펼침 안에서도 막대는 흰 카드, 2026-10-26 사용자 재확인)
+    white = f'<span style="display:block;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px 12px;">{head}{track}{ends}</span>'
     return (f'<span data-in-card="1" style="display:block;background:{bg};border:1px solid {bd};border-top:0;border-radius:0 0 8px 8px;'
-            f'padding:10px 12px 12px;line-height:{LH_CARD};white-space:normal;">{head}{track}{ends}</span>')
+            f'padding:12px;line-height:{LH_CARD};white-space:normal;">{white}</span>')
 
 
 def dd_tip(d):
