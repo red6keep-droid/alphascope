@@ -26,20 +26,20 @@ def _live():
 
 
 def _flow_rows(m):
-    """홈 '시장 흐름' 탭 세 줄 — 테마 목록과 같은 모양 {title, question, state, kind, sub, url}. 값은 전부 파이썬 계산."""
+    """홈 '시장 흐름' 탭 세 줄 — 누르면 한국 증시 리포트로 (2026-10-26 M8: 시장 흐름 카드는 목록 페이지에서 리포트로 옮김) — 테마 목록과 같은 모양 {title, question, state, kind, sub, url}. 값은 전부 파이썬 계산."""
     rows = []
     ov = {x["sym"]: x["before"] for x in (m or {}).get("overnight") or []}   # K24 · K25 밤사이 미국 — 다음날 시가를 가장 잘 설명한 변수 (10-25 검증)
     if ov.get("EWY"):
         r = ov["EWY"]["ret"]
         sub = f"한국 ETF(EWY) {r:+.1f}%" + (f" · 반도체(SOX) {ov['^SOX']['ret']:+.1f}%" if ov.get("^SOX") else "") + (f" · VIX {ov['^VIX']['ret']:+.1f}p" if ov.get("^VIX") else "")
         rows.append({"title": "밤사이 미국", "question": "밤사이 미국은?", "state": "한국 ETF 상승" if r > 0.3 else "한국 ETF 하락" if r < -0.3 else "큰 변화 없음",
-                     "kind": "positive" if r > 0.3 else "negative" if r < -0.3 else "neutral", "sub": sub.replace("-", "−"), "url": U.LIST_URL})
+                     "kind": "positive" if r > 0.3 else "negative" if r < -0.3 else "neutral", "sub": sub.replace("-", "−"), "url": U.REPORT_URL})
     f = (m or {}).get("foreign")
     if f:
         buy = f["today"] > 0
         cum = f["cum20"] / 1e4
         rows.append({"title": "외국인 수급", "question": "외국인은 사고 있나?", "state": f"오늘 {'순매수' if buy else '순매도'}", "kind": "positive" if buy else "negative",
-                     "sub": f"오늘 {f['today']:+,.0f}억 · 20일 누적 {cum:+.1f}조".replace("-", "−"), "url": U.LIST_URL})
+                     "sub": f"오늘 {f['today']:+,.0f}억 · 20일 누적 {cum:+.1f}조".replace("-", "−"), "url": U.REPORT_URL})
     rt, fx = (m or {}).get("rates") or {}, (m or {}).get("fx") or {}
     k3, usd = rt.get("ktb3"), fx.get("usdkrw")
     if k3 or usd:
@@ -50,7 +50,7 @@ def _flow_rows(m):
             parts.append(f"원/달러 {usd['v']:,.0f}원" + (f"({usd['chg_1d']:+.1f})" if usd.get("chg_1d") is not None else ""))
         up = (usd or {}).get("chg_1d") or 0
         rows.append({"title": "금리 · 환율", "question": "금리 · 환율은?", "state": "원화 약세" if up > 2 else "원화 강세" if up < -2 else "큰 변화 없음",
-                     "kind": "negative" if up > 2 else "positive" if up < -2 else "neutral", "sub": " · ".join(parts).replace("-", "−"), "url": U.LIST_URL})
+                     "kind": "negative" if up > 2 else "positive" if up < -2 else "neutral", "sub": " · ".join(parts).replace("-", "−"), "url": U.REPORT_URL})
     h, n = (m or {}).get("heat"), (m or {}).get("news")
     if h:
         tr = h.get("turnover_ratio") or 1
@@ -58,7 +58,7 @@ def _flow_rows(m):
         sub = f"거래대금 {h['turnover'] / 1e4:.1f}조(20일 평균의 {tr:.1f}배)"
         if n:
             sub += f" · 뉴스심리 {n['v']:.0f}"
-        rows.append({"title": "시장 열기", "question": "시장은 얼마나 뜨겁나?", "state": st, "kind": "positive" if tr >= 1.5 else "neutral", "sub": sub, "url": U.LIST_URL})
+        rows.append({"title": "시장 열기", "question": "시장은 얼마나 뜨겁나?", "state": st, "kind": "positive" if tr >= 1.5 else "neutral", "sub": sub, "url": U.REPORT_URL})
     return rows
 
 

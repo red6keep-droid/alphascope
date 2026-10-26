@@ -207,6 +207,8 @@ body.item-view .post-outer-container { padding-top: 13px; }
 /* 아코디언 (리포트 details[data-acc]): 기본 삼각형 숨기고 화살표 아이콘을 펼치면 위로 (2026-10-11) */
 .post-body details[data-acc] > summary::-webkit-details-marker { display: none; }
 .post-body details[data-acc][open] > summary .acc-chev { transform: rotate(180deg); }
+/* 가격 정보 강조 카드 펼침 = 가격 범위 (1년)가 카드 안으로 이어진다 — 머리 줄 아래 모서리를 편다 (2026-10-26 사용자, render_html.year_range_in) */
+.post-body details[data-acc][open] > summary:has(+ [data-in-card]) > span:first-child { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
 /* 카드 안 펼침 (details[data-fold], 2026-10-13 사용자): 테마 JS가 펼친 줄을 버튼 위로 옮기고 글자를 '접기'로 — .is-open 이면 화살표 위로 */
 .post-body details[data-fold] > summary::-webkit-details-marker { display: none; }
 .post-body details[data-fold].is-open > summary .acc-chev { transform: rotate(180deg); }

@@ -836,8 +836,7 @@ def sec_news(input_data, report, analysis):
     # 방송 줄 — 미디어 데일리 재료 중 시장 · 업종 이슈, 방송 여러 곳이 같이 다룬 순 (2026-10-25 사용자). 의견이 섞여 `방송` 라벨 + 채널 · 방송 n곳
     for r in _media_lines():
         labels = (dk.pill(r["theme"], bare=True) + " " + dk.pill({"positive": "긍정", "negative": "부정"}.get(r["direction"], "중립"),
-                                                                  r["direction"] if r["direction"] in ("positive", "negative") else "neutral", bare=True)
-                  + " " + dk.pill(media_feed.LABEL, bare=True))
+                                                                  r["direction"] if r["direction"] in ("positive", "negative") else "neutral", bare=True))   # `방송` 라벨은 뺀다 — 메타의 채널 · 방송 n곳과 중복 (2026-10-26 사용자)
         meta = [_kst_hm(r["published_at"]), r["channel"], f"방송 {r['n_channels']}곳" if r["n_channels"] > 1 else ""]
         items.append(dk.news_item(_esc(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"'))
     return dk.item_rules(items, sub=True, indent=dk.ALIGN_PX) if items else dk.muted("주요 뉴스 없음")   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)

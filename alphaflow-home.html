@@ -776,6 +776,8 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .sort-toggle[data-state="up"] { color: #d93025; font-weight: 700; }
 .sort-toggle[data-state="down"] { color: #1a73e8; font-weight: 700; }
 .sort-toggle[data-state="down"] .sort-tri { transform: rotate(180deg); top: calc(.05em + 1px); }   /* 하락순 삼각형은 1px 더 내림 (2026-10-25 사용자) */
+.post-body .sort-toggle { padding: 0; }   /* 글 본문 카드 제목 줄 오른쪽 정렬 버튼 — 탭 줄 높이 맞춤(위 여백 · 아래 막대 자리)은 빼고 (2026-10-26 한국 증시 리포트 M3) */
+.post-body .sort-toggle::after { display: none; }
 /* 테마 목록 — 줄마다 테마 이름(굵게) · 상태 라벨 오른쪽, 아래 줄 핵심 숫자. 줄 전체가 테마 페이지 링크, 줄 사이 구분선 */
 .theme-list { margin: 0 16px; }
 .theme-row { display: block; padding: 14px 0; border-top: 1px solid #E5E7EB; color: inherit; text-decoration: none; }
@@ -2718,6 +2720,29 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   });
 })();
 
+/* ============================================================ 가로 스크롤 그래프 `넘겨 보기` (2026-10-26 사용자, 옛 이름 밀어서 보기)
+   세로 막대 그래프가 화면보다 넓을 때만 오른쪽 위 안내를 보인다 — 넓은 화면(안 넘침)에서는 숨긴다. 접힌 카드 · 숨은 탭 안(폭 0)은 건드리지 않고, 펼칠 때 다시 잰다. 디자인 가이드 8절 */
+(function () {
+  'use strict';
+  function check() {
+    var boxes = document.querySelectorAll('[data-scroll-x]');
+    for (var i = 0; i < boxes.length; i++) {
+      var b = boxes[i], t = b.previousElementSibling;
+      var h = t && (t.hasAttribute('data-scroll-hint') ? t : t.querySelector('[data-scroll-hint]'));   /* 범례와 한 줄(data-chart-top) 안에 있을 수 있다 */
+      if (!h || !b.clientWidth) continue;
+      var over = b.scrollWidth > b.clientWidth + 1, up = over ? (parseInt(b.getAttribute('data-shade-up'), 10) || 0) : 0;
+      h.style.display = over ? 'block' : 'none';   /* '' 로 두면 인라인 display:block 까지 지워져 왼쪽에 붙는다 */
+      b.style.paddingTop = up + 'px'; b.style.marginTop = (-up) + 'px';   /* 그림자를 안내 줄까지 올리던 당김 — 안내가 숨으면 없앤다(그래프가 위로 붙던 것, 2026-10-26) */
+    }
+  }
+  function later() { setTimeout(check, 30); }
+  document.addEventListener('DOMContentLoaded', check);
+  window.addEventListener('load', check);
+  window.addEventListener('resize', later);
+  document.addEventListener('toggle', later, true);   /* details 펼침 */
+  document.addEventListener('click', later, true);    /* 탭 전환 */
+})();
+
 /* ============================================================ 그래프 확대 (2026-10-16 사용자: "폰에서 그래프를 확대해도 똑같다 — 손가락으로 좌우로 스크롤하듯")
    리포트의 그래프 링크(a[data-zoom], 옛 글은 aria-label "그래프 확대 보기")를 누르면 새 창 대신 전체 화면 팝업에
    그림을 화면 폭의 2.2배(최소 원본 폭, 최대 원본의 2배)로 띄우고 가로 스크롤 — 처음 위치는 오른쪽 끝(최근 봉). 닫기 × · 바깥 · Esc. 디자인 가이드 8절 */
@@ -3144,6 +3169,29 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     }
     btns.forEach(function (b) { b.onclick = function () { sel(b.getAttribute('data-hz')); }; });
     sel('close');
+  });
+})();
+
+/* ============================================================ 글 본문 정렬 버튼 (data-sort-for) — 2026-10-26 한국 증시 리포트 M3
+   홈 H12 버튼과 같은 모양 · 같은 순서: 처음 회색(렌더러 순서 그대로) → 상승순(빨강) → 하락순(파랑) → 상승순 …
+   목록 [data-sort-list="이름"] 바로 아래 줄([data-ret] = 오늘 등락 %)을 다시 놓는다. 첫 줄은 위 구분선 없음. JS가 없으면 버튼은 숨은 채(hidden). */
+(function () {
+  'use strict';
+  [].slice.call(document.querySelectorAll('.post-body [data-sort-for]')).forEach(function (b) {
+    var list = document.querySelector('.post-body [data-sort-list="' + b.getAttribute('data-sort-for') + '"]');
+    if (!list) return;
+    var rows = [].slice.call(list.querySelectorAll(':scope > [data-ret]'));
+    if (rows.length < 2) return;
+    var line = rows[1].style.borderTop, state = '';
+    b.hidden = false;
+    b.addEventListener('click', function () {
+      state = state === 'up' ? 'down' : 'up';
+      rows.slice().sort(function (x, y) { var a = +x.getAttribute('data-ret'), c = +y.getAttribute('data-ret'); return state === 'up' ? c - a : a - c; })
+        .forEach(function (r, i) { r.style.borderTop = i ? line : '0'; list.appendChild(r); });
+      b.setAttribute('data-state', state);
+      b.querySelector('.sort-txt').textContent = state === 'down' ? '하락순' : '상승순';
+      b.setAttribute('aria-label', state === 'down' ? '정렬: 하락순' : '정렬: 상승순');
+    });
   });
 })();
 

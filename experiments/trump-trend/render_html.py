@@ -103,7 +103,7 @@ def sec_recent(a):
     """발언 — C 카드: 주제/하위주제 + 방향·세션 라벨, 보조 줄에 시각·대상·연타, 값은 강도."""
     rows = []
     for e in a["recent_events"]:
-        name = f"<b>{_esc(_k(e['topic']))}</b>" + (f" / {_esc(_k(e['subtopic']))}" if e["subtopic"] else "") + " " + _dir_pill(e["direction"]) + " " + dk.pill(SESSION_KO.get(e["session"], e["session"]))
+        name = f"<b>{_esc(_k(e['topic']))}</b>" + (f" / {_esc(_k(e['subtopic']))}" if e["subtopic"] else "") + dk.pill_row(_dir_pill(e["direction"]) + dk.pill(SESSION_KO.get(e["session"], e["session"])), outer=dk.PILL_GAP)
         sub = [report_title.kst_hm(e["first_post_at"]), f"대상 {e['target']}" if e.get("target") else ""]
         if e["post_count"] > 1:
             sub.append(f"연타 {e['post_count']}")

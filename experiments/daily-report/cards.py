@@ -47,7 +47,7 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
     """질문 카드 — 첫 줄 질문 · 오른쪽 답(상태), 펼치면 쉬운 말 · 근거 줄 · 그래프.
     lines 항목: (글, "plain") 쉬운 말 · ("row", 이름, 값, 뜻) 근거 줄 · (html, "html") 그래프 · (글, "note") 안내 · 글 = 점 글머리표."""
     bg, bd = CARD_DIR[theme]
-    bd_row = dk.lighten(dk.lighten(bd), 0.3)
+    bd_row = dk.darken(dk.lighten(dk.lighten(bd), 0.3), 0.02)   # 줄 구분선 2% 진하게 (2026-10-26 사용자: 5% → 2%)
 
     def li(item):
         kind = "row" if isinstance(item, tuple) and item[0] == "row" else ("" if isinstance(item, str) else item[1])
@@ -73,7 +73,8 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
         return dk.dot_li(dk.label_text(text), size=3, color=col, lh=dk.LH_EMPH)
 
     lis = "".join(li(t) for t in lines)
-    state_html = (f'<span style="display:inline-flex;align-items:center;">{dk.tint(esc(state))}{_fold_btn(dk.lighten(bg), bd)}</span>' if fold else dk.tint(esc(state)))   # 답 글자의 증감도 색 (가이드라인 3-3-1)
+    ans = state if str(state).startswith("<span") else dk.tint(esc(state))   # 이미 색을 입힌 답(HTML)은 그대로 — 한국 증시 리포트 결과 단어 색 (2026-10-26)
+    state_html = (f'<span style="display:inline-flex;align-items:center;">{ans}{_fold_btn(dk.lighten(bg), bd)}</span>' if fold else ans)   # 답 글자의 증감도 색 (가이드라인 3-3-1)
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;">'
             f'<span style="{"flex:1 1 auto;min-width:0;" if fold else dk.COL_L}font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">{_title_with_icon(title, dk.tip_icon(tip) if tip else "")}</span>'
             f'<span style="{"flex:none;white-space:nowrap;" if fold else dk.COL_R}font-weight:700;color:{color};">{state_html}</span></span> ')
@@ -96,31 +97,29 @@ def legend_chips(items):
 
 
 def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
-    """세로 막대 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수."""
+    """세로 막대 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수.
+    숫자는 자기 막대 폭 안에만, 화면이 모자라면 가로 스크롤 (2026-10-26 사용자, 가이드라인 8절 — 엔비디아 _col_chart 와 같은 규칙)."""
     vals = [v for _, vs in groups for v in vs if v is not None]
     if not vals:
         return ""
-    mp, mn = max(0.0, max(vals)), max(0.0, -min(vals))
-    scale = (height - 2 * CHART_LBL) / ((mp + mn) or 1)
-    top = CHART_LBL + mp * scale
+    ticks, top, scale = dk.col_axis(vals, height, CHART_LBL)   # 한 칸 바깥 눈금까지 · 아래 여백 통일 (2026-10-26 사용자)
     n, ns = len(groups), len(groups[0][1])
-    parts = [f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>']
+    txt = lambda v: fmt(v) if fmt else f"{v:+.2f}".replace("-", "−")   # noqa: E731
+    label_px = max(dk.text_px(txt(v), 11) for v in vals) + 4
+    axis_px = max(dk.text_px(g, int(dk.TINY[:-2])) for g, _ in groups) + 8
+    bw, lw, min_w = dk.col_layout(n, ns, label_px, axis_px)   # 막대 고정 폭 (2026-10-26 사용자: 모든 막대 그래프 같은 폭)
+    parts = []   # 0 기준선 · 눈금선 · 세로축 숫자는 col_frame 이 (2026-10-26 사용자: 가로 눈금선)
     for i, (_, vs) in enumerate(groups):
         for k, v in enumerate(vs):
             if v is None:
                 continue
             h = max(1.0, abs(v) * scale)
-            left = (i + (0.15 + 0.70 * k / ns)) * 100 / n
-            width = 0.70 / ns * 100 / n
             y, ly = (top - h, top - h - 15) if v >= 0 else (top, top + h + 1)
             rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
-            parts.append(f'<span style="position:absolute;left:{left:.2f}%;width:{width:.2f}%;top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
-            txt = fmt(v) if fmt else f"{v:+.2f}".replace("-", "−")
-            parts.append(f'<span style="position:absolute;left:{left - 2:.2f}%;width:{width + 4:.2f}%;top:{ly:.1f}px;height:14px;line-height:14px;text-align:center;font-size:11px;'
-                         f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt}</span>')
-    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;">{esc(g)}</span>' for g, _ in groups)
-    return (f'<span style="display:block;position:relative;height:{height}px;">{"".join(parts)}</span>'
-            f'<span style="display:flex;font-size:{dk.TINY};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>')
+            parts.append(f'<span style="position:absolute;{dk.bar_x(i, k, n, ns, bw, lw)}top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
+            parts.append(f'<span style="position:absolute;{dk.bar_x(i, k, n, ns, bw, lw, label=True)}top:{ly:.1f}px;height:14px;line-height:14px;text-align:center;font-size:11px;'
+                         f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt(v)}</span>')
+    return dk.col_frame("".join(parts), [g for g, _ in groups], height, top, scale, ticks, min_w)
 
 
 def chart_card(title, groups, colors, label_colors, legend, fmt=None):
@@ -128,8 +127,8 @@ def chart_card(title, groups, colors, label_colors, legend, fmt=None):
     chart = col_chart(groups, colors, label_colors, fmt=fmt)
     if not chart:
         return ""
-    head = f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">{esc(title)}</span>'
-    return head + f'<span style="{dk.MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}{legend_chips(legend)}</span></span>'
+    head = f'{dk.CHART_TITLE_M}{esc(title)}</span>' if title else ""   # 제목 없이 그래프만 — 한국 증시 리포트 머리 그래프 (2026-10-26)
+    return head + f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">{dk.legend_top(chart, legend_chips(legend))}</span></span>'
 
 
 sign_bg = lambda v: PASTEL_UP if v > 0 else PASTEL_DN   # noqa: E731

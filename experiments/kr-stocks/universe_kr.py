@@ -64,6 +64,8 @@ LIST_TITLE = "한국 시가총액 상위 10개 종목 주가"
 LIST_SLUG_TITLE = "kr market cap top10"   # 처음 만들 때 이 제목으로 → 주소 고정, 바로 한글 제목으로 바꾼다
 LIST_URL = f"{BLOG}/p/{LIST_SLUG}.html"
 US_LIST_URL = f"{BLOG}/p/us-market-cap-top10.html"
+REPORT_LABEL = "한국 증시 리포트"   # 장 마감 뒤 리포트 (experiments/kr-market-report, 2026-10-26)
+REPORT_URL = f"{BLOG}/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"   # 임시 링크(라벨 목록) — 발행 때 최신 글 주소로 바꾼다 (엔비디아와 같은 방식)
 
 # 미국 연결 짝 (기획 11-3) — 우리 미국 후보 49개 안에서만. 값 = (미국 티커 목록, 한 줄 이유)
 PAIRS = {
