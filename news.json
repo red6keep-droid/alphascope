@@ -1,13 +1,37 @@
 {
-  "updated_at": "2026-10-25 23:32:18 UTC",
+  "updated_at": "2026-10-26 00:46:16 UTC",
   "items": [
+    {
+      "title": "Brazil's Lula wins presidential election in runoff vote",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/brazil-lula-win-presidential-election-runoff-vote.html",
+      "published": "2026-10-26 00:44:02",
+      "title_ko": "브라질 루라, 결선 투표에서 대통령 선거 승리",
+      "summary_ko": ""
+    },
+    {
+      "title": "SpaceX closes $40 billion debt deal for AI chips, Elon Musk says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/spacex-closes-40-billion-debt-deal-for-ai-chips-elon-musk-.html",
+      "published": "2026-10-26 00:37:51",
+      "title_ko": "스페이스X, AI 칩 400억 달러 부채 거래 성사… 일론 머스크 발표",
+      "summary_ko": "GPU 구매를 위한 부채 조달"
+    },
     {
       "title": "‘Ticking time bomb’: The world's pension funds face an ageing crisis",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/26/pension-funds-ageing-crisis-risk-investment.html",
-      "published": "2026-10-25 23:19:12",
+      "published": "2026-10-26 00:03:20",
       "title_ko": "‘폭탄 시계’: 세계 연금 기금, 고령화 위기 직면",
       "summary_ko": "장수 및 낮은 출산율로 은퇴 재정 압박"
+    },
+    {
+      "title": "In pictures: Protests over inequality, rising living costs turn violent across France",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/25/france-protests-paris-cost-of-living-inequality.html",
+      "published": "2026-10-25 23:55:22",
+      "title_ko": "사진으로 보는 프랑스 불평등 시위, 다시 폭력 사태로",
+      "summary_ko": ""
     },
     {
       "title": "More pain may be coming for the AI trade. Why I’m not giving up on it",
@@ -66,14 +90,6 @@
       "n_channels": 1
     },
     {
-      "title": "In pictures: Initially peaceful protests across France over inequality again descend into violence",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/25/france-protests-paris-cost-of-living-inequality.html",
-      "published": "2026-10-25 14:14:23",
-      "title_ko": "사진으로 보는 프랑스 불평등 시위, 다시 폭력 사태로",
-      "summary_ko": ""
-    },
-    {
       "title": "AI 도입으로 인한 노동 시장 고용 감소 우려",
       "title_ko": "AI 도입으로 인한 노동 시장 고용 감소 우려",
       "summary_ko": "AI 기술이 노동을 대체하면서 향후 10년 내 많은 일자리가 사라지고 고용 시장에 부정적 영향을 미칠 수 있음",
@@ -92,22 +108,6 @@
       "published": "2026-10-25 14:00:01",
       "title_ko": "여행과 쇼핑을 즐기며 18개월 만에 11,000달러 신용카드 부채 상환",
       "summary_ko": "여행, 쇼핑, 외식 중 발생한 부채 2년 내 전액 상환"
-    },
-    {
-      "title": "Saudi Arabia says it intercepted missiles and drones from Iran-backed Houthis",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/25/saudi-arabia-houthi-missile-drone-interceptions.html",
-      "published": "2026-10-25 13:41:37",
-      "title_ko": "사우디, 이란 후티의 미사일 및 드론 요격 발표",
-      "summary_ko": "후티, 공항 및 에너지 시설 공격 주장"
-    },
-    {
-      "title": "Should you travel together? Ask these questions before booking: 'It'll save you time, money and disappointment'",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/10/25/travel-compatibility-questions.html",
-      "published": "2026-10-25 13:38:01",
-      "title_ko": "함께 여행할까? 예약 전 이 질문을 해보세요: '시간, 돈, 실망을 줄여줍니다'",
-      "summary_ko": "예산, 숙소, 개인 습관, 혼자 있는 시간 고려 사항 언급"
     }
   ]
 }
