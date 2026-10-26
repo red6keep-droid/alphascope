@@ -550,10 +550,9 @@ def _multi_single(rows):
     return _multi(rows).replace(' data-grid="2"', "", 1)
 
 
-def year_range_in(y, money, tip, bg, bd):
-    """가격 범위 (1년) — 가격 정보 강조 카드 **안**, 펼치면 머리 줄 바로 아래에 같은 바탕 · 테두리로 이어진다 (2026-10-26 사용자: "가격정보 강조 카드를
-    펼치면 가격 범위를 카드 안에 넣을 수 있어", 제목 `1년 가격 범위` → `가격 범위 (1년)`). 펼친 동안 머리 줄 아래 모서리는 테마 CSS 가 편다
-    (`details[data-acc][open] > summary > span:first-child`). money = 금액 표기 함수(달러 · 원화)."""
+def year_range_in(y, money, tip):
+    """가격 범위 (1년) 흰 카드 — 가격 정보 강조 카드 펼침 안 (2026-10-26 사용자: "가격정보 강조 카드를 펼치면 가격 범위를 카드 안에 넣을 수 있어",
+    제목 `1년 가격 범위` → `가격 범위 (1년)`). 한 줄 = 제목 · 최고가 대비, 아래 막대 · 최저 · 최고. money = 금액 표기 함수(달러 · 원화)."""
     if not y:
         return ""
     pos = max(0.0, min(100.0, y["pos_pct"]))
@@ -566,10 +565,31 @@ def year_range_in(y, money, tip, bg, bd):
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
             f'<span style="white-space:nowrap;">최저 {money(y["low"])}</span><span style="white-space:nowrap;">최고 {money(y["high"])}</span></span>')
     # 가운데 `(오늘 …)` 는 뺐다 — 같은 카드 머리 줄에 오늘 가격이 있고, 셋이면 폰에서 두 줄로 꺾인다 (2026-10-26 사용자: 같이 고쳐). 최저 · 최고는 줄바꿈 금지
-    # 막대는 강조 카드 바탕 위에 바로 두지 않고 흰 카드로 감싼다 (가이드라인 5-9: 색깔 있는 카드 · 펼침 안에서도 막대는 흰 카드, 2026-10-26 사용자 재확인)
-    white = f'<span style="display:block;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px 12px;">{head}{track}{ends}</span>'
+    return f'<span style="display:block;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px 12px;">{head}{track}{ends}</span>'
+
+
+_SEC_RE = re.compile(r'<div style="[^"]*margin:25px 0 8px;">(.*?)</div><div data-cards="1" style="margin:0 0 8px;"><span style="[^"]*">(.*)</span></div>$', re.S)
+
+
+def in_card(sec):
+    """카드 제목 + 흰 카드 한 덩이(`_card_title(...)` + `<div data-cards><span MULTI>…`)를 강조 카드 안 흰 카드로 — 제목은 흰 카드 첫 줄 (2026-10-26 사용자:
+    기간별 수익률 · 고점 하락 후 가격 회복도 가격 정보 카드 안에). 그래프는 강조 바탕에 바로 두지 않고 흰 카드 안 (가이드라인 5-9)."""
+    m = _SEC_RE.match(sec or "")
+    if not m:
+        return sec or ""
+    return (f'<span style="{MULTI}margin:0;"><span style="display:block;padding:10px 12px 0;font-weight:700;color:#111;font-size:{_dk.NAME};">{m.group(1)}</span>'
+            f'{m.group(2)}</span>')
+
+
+def price_in(bg, bd, parts):
+    """가격 정보 강조 카드 펼침 안 — 머리 줄 바로 아래 같은 바탕 · 테두리로 이어지고, 안에 흰 카드들(가격 범위 · 기간별 수익률 · 고점 회복)을 8px 간격으로.
+    펼친 동안 머리 줄 아래 모서리는 테마 CSS 가 편다 (`details[data-acc][open] > summary:has(+ [data-in-card]) > span:first-child`)."""
+    cards = [x for x in parts if x]
+    if not cards:
+        return ""
+    inner = "".join(f'<span style="display:block;{"margin-top:8px;" if k else ""}">{c}</span>' for k, c in enumerate(cards))
     return (f'<span data-in-card="1" style="display:block;background:{bg};border:1px solid {bd};border-top:0;border-radius:0 0 8px 8px;'
-            f'padding:12px;line-height:{LH_CARD};white-space:normal;">{white}</span>')
+            f'padding:12px;line-height:{LH_CARD};white-space:normal;">{inner}</span>')
 
 
 def dd_tip(d):
@@ -712,7 +732,7 @@ def sec_headline(a, n=None):
         head = head[:k] + sub + head[k:]
     # 펼침 1층 = 초보자도 읽는 정보 (2026-10-17 사용자: 평균선 · 갭 같은 차트 지표는 우리 방향과 다르다) — 기간별 수익률 · 1년 가격 범위 · 거래량.
     # 2층(접힘) = 차트 보는 분을 위한 지표 — 평균선 · 1일 비교 · 시가 갭 · 일중 변동폭 · 과열(RSI) · 교차, 우리 검증은 ? 툴팁
-    rows = glance_rows(a, n) + sec_periods(a) + sec_drawdown(a) + sec_earnings(a)   # 가격 범위 (1년)는 강조 카드 안 (year_range_in, 2026-10-26)
+    rows = glance_rows(a, n) + sec_earnings(a)   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복은 강조 카드 안 (price_in, 2026-10-26 사용자)
     # 거래량 카드는 뺐다 — 가격 카드 머리 작은 글씨에 늘 있다 (2026-10-18 사용자)
     deep = sec_ma(a)
     deep += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p")) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])   # 하루 등락 차이 (2026-10-11 사용자)
@@ -734,7 +754,7 @@ def sec_headline(a, n=None):
     rows += (f'<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{_fold_row("차트 지표 보기")}</summary>'
              f'<div style="margin-top:6px;">{deep}</div></details>')
     out = (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-           f'{year_range_in(a.get("year_range"), lambda v: f"${v:,.2f}", year_tip(a["year_range"]) if a.get("year_range") else "", bg, bd)}'
+           f'{price_in(bg, bd, [year_range_in(a.get("year_range"), lambda v: f"${v:,.2f}", year_tip(a["year_range"]) if a.get("year_range") else ""), in_card(sec_periods(a)), in_card(sec_drawdown(a))])}'
            f'<div style="margin-top:8px;">{rows}</div></details></div>')
     out += sec_state_cards(a)   # 시장 국면 · 반도체 자금 — 이유를 담은 별도 카드 둘 (2026-10-11 사용자)
     if not a.get("is_latest_bar_today"):
