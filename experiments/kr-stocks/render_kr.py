@@ -470,7 +470,7 @@ def price_card(s):
         head = head[:k] + sub.replace("S&P 500", "KOSPI") + head[k:]
     rows = ""   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 지표 보기는 모두 강조 카드 안 (2026-10-26 사용자)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-            f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_periods(s), white=True), R.in_card(sec_drawdown(s)), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
+            f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), R.in_card(sec_periods(s), white=True), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
 
 
 def periods_tip(s, ps):
