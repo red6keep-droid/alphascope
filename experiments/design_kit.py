@@ -7,6 +7,7 @@
 
 import html as html_mod
 import json
+import math
 import os
 import re
 
@@ -89,6 +90,13 @@ def dash():
     return f'<span style="color:{MUTED};">—</span>'
 
 
+# 차트 제목 — 앞에 ※ · 한 단계 작게(19 → 16px) · 굵게 (2026-10-26 사용자: "※ 그 일정 뒤 코스피 움직임 (%) 처럼 기호를 앞에, 폰트는 한 단계 작게"). 뒤에 제목 글 + </span>
+CHART_MARK = '<span style="font-weight:400;font-size:.85em;position:relative;top:calc(-.05em - 1px);">※</span> '   # ※ 는 보통 굵기 · 조금 작게 · 위로 보정 — 폰 글꼴에서 굵은 ※ 가 무겁고 가운데가 안 맞았다 (2026-10-26 사용자, 비교 C-1)
+_CHART_TITLE_STYLE = f"display:block;font-weight:700;color:#111;font-size:{NAME};line-height:{LH_CARD};"
+CHART_TITLE = f'<span style="{_CHART_TITLE_STYLE}">' + CHART_MARK
+CHART_TITLE_M = f'<span style="{_CHART_TITLE_STYLE}margin:0 0 6px;">' + CHART_MARK   # 아래 6px 를 두던 질문 카드 안 차트 제목
+
+
 def h2(t, line=True, summary="", tab=None, aside="", one_line=False):
     """구획 제목. tab = 이 구획이 들어갈 탭 이름 (가이드라인 11절) — 테마 JS가 h2[data-tab]을 읽어 탭을 만든다."""
     sm = (f' <span data-summary="1" style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};white-space:normal;flex:1 1 220px;">{INFO_ICON}{summary}</span>'
@@ -131,13 +139,14 @@ def note(t):
     return f'<div style="margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{INFO_ICON}{esc(t)}</div>'
 
 
-_SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")   # 범위(-0.63 ~ +0.63%)는 칠하지 않는다
+_UNITS = r"(%p|%|bp|p(?![A-Za-z])|원|억|조)"   # 원 · 억 · 조 · p(VIX 포인트) 추가, 쉼표 숫자도 (2026-10-26 사용자: "증감 표현에 있는 모든 정보는 증감 컬러")
+_SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d[\d,]*(?:\.\d+)?)" + _UNITS + r"(?!\s*~)")   # 범위(-0.63 ~ +0.63%)는 칠하지 않는다
 _LABEL = re.compile(r"^([^:：]{1,24}?)\s*:\s+(.+)$", re.S)
 
 
 # 증감 값 앞의 종목 이름 — "산업재(XLI)", "나스닥 100(QQQ)", "1위 기술" (2026-10-11 사용자: 종목도 같이 색)
 _NAMED = re.compile(r"((?:\d+위 )?(?:[A-Za-z][A-Za-z&;]* |[가-힣A-Za-z]+ (?=\d))?[가-힣A-Za-z0-9&;]+(?:\([A-Z0-9^.&;\s]{1,12}\))|\d+위 [가-힣A-Za-z&;·]+)\s"
-                    r"(?<![\w.~])([+\-−])(\d+(?:\.\d+)?)(%p|%|bp)(?!\s*~)")
+                    r"(?<![\w.~])([+\-−])(\d[\d,]*(?:\.\d+)?)" + _UNITS + r"(?!\s*~)")
 
 
 _DIR_WORD = re.compile(r"(상승|하락)\s?\d+(?:건|개|일)?$")   # "상승 9" · "하락 11" (끝에 올 때만 — "상승 52% (…)" 같은 확률은 아님)
@@ -200,31 +209,103 @@ def text_px(text, fs):
     return w * fs
 
 
+BAR_W = 28     # 막대 기준 폭 px — 엔비디아 · 한국 `최근 12개월 풋/콜 거래량 비율` 막대(숫자 세 자리 0.86 폭) (2026-10-26 사용자: "막대 가로 사이즈를 맞춰 줘")
+BAR_MAX = 36   # 숫자가 길면(+2.72 · −4.12 같은 네 자리) 이만큼까지만 넓힌다 — 막대가 적어도 화면을 채우려 늘리지 않는다
+GROUP_PAD_MULTI = 1.8   # 시리즈가 둘 이상인 묶음의 양옆 틈 배수 (묶음 사이 8 → 약 14px)
+COL_GAP = 2    # 한 묶음 안 시리즈 막대 사이 (BAR_GAP 은 가로 막대 줄 간격으로 따로 있다)
+
+
 def col_layout(n, ns, label_px, axis_px):
-    """막대 묶음 n개 × 시리즈 ns개 — (묶음 양옆 틈 비율, 그래프 최소 폭 px).
-    막대 폭은 그 위 숫자 폭(label_px) 이상, 묶음 폭은 가로축 이름 폭(axis_px) 이상. 폰 폭에 들어가면 예전 모양(막대 70%), 넘치면 틈을 줄이고 그래도 넘치면 가로 스크롤."""
-    roomy = max(ns * label_px / 0.70, axis_px)
-    if n * roomy <= CHART_PHONE_W:
-        return 0.15, int(n * roomy + 0.999)
-    group = max(ns * label_px + 2 * CHART_PAD_PX, axis_px)
-    return (group - ns * label_px) / 2 / group, int(n * group + 0.999)
+    """막대 묶음 n개 × 시리즈 ns개 — (막대 폭 px, 숫자 칸 폭 px, 그래프 최소 폭 px).
+    막대 폭은 어디서나 BAR_W(숫자가 길면 BAR_MAX 까지) — 막대가 적어도 넓히지 않고 묶음 사이만 벌어진다 (2026-10-26 사용자).
+    숫자 칸은 숫자 폭 이상이라 막대보다 넓을 수 있다(숫자는 절대 겹치지 않게, 가이드라인 8절). 묶음 폭은 가로축 이름 폭 이상, 모자라면 가로 스크롤."""
+    w = max(BAR_W, min(label_px, BAR_MAX))
+    lw = max(w, label_px)
+    group = max(ns * lw + (ns - 1) * COL_GAP + 2 * CHART_PAD_PX * (GROUP_PAD_MULTI if ns > 1 else 1), axis_px)   # 여러 막대 묶음은 묶음 사이를 80% 넓게 (2026-10-26 사용자: "월 월 사이가 너무 붙어 있다")
+    return w, lw, int(n * group + 0.999)
+
+
+def bar_x(i, k, n, ns, w, lw, label=False):
+    """묶음 i 의 시리즈 k 막대(label=True 면 그 위 숫자 칸)의 `left:…;width:…;` — 묶음 가운데에 고정 폭으로 놓는다."""
+    step = lw + COL_GAP
+    off = (k - (ns - 1) / 2) * step - (lw if label else w) / 2
+    return f"left:calc({(i + 0.5) * 100 / n:.3f}% + {off:.1f}px);width:{lw if label else w}px;"
+
+
+GRID_LINE = "#ECF0F5"   # 막대 그래프 가로 눈금선 — 0 기준선(#CBD5E1)보다 연하게. #EEF2F7 에서 1% 진하게 (2026-10-26 사용자: 5% → 2% → 눈금선만 1%)
+GRID_FS = 10            # 왼쪽 세로축 숫자 글자
+
+
+def _nice_step(span):
+    """눈금 간격 — 범위를 4칸 안팎으로 나누는 1 · 2 · 5 × 10ⁿ (3칸이면 눈금이 0 하나뿐인 그래프가 생겼다)."""
+    raw = span / 4 if span > 0 else 1
+    e = 10 ** math.floor(math.log10(raw))
+    return next(m * e for m in (1, 2, 5, 10) if raw <= m * e)
+
+
+CHART_CARD_X = -5   # 그래프 흰 카드를 양쪽 5px 씩 넓게 (가로 +10px: +4 → +2 → +4, 2026-10-26 사용자) — 제목은 카드 밖이라 그대로
+CHART_CARD_PAD = 10   # 그래프 흰 카드 안 위 여백 = 아래 여백 — 아래(가로축 이름 줄 6 + 빈 줄 4 = 10)가 기준 (2026-10-26 사용자: "고용 지표 아래 여백 기준으로 보통 날 위 여백을")
+AXIS_FS = "13px"   # 가로축 이름 — 안내 14px 보다 1px 작게 (2026-10-26 사용자: "아래 숫자 1, 2, 6, 7 … 1포인트 작게")
+AXIS_PAD = 16   # 맨 아래 눈금선 ~ 가로축 이름 위 (2026-10-26 사용자: "막대와 FOMC 같은 이름 사이 위쪽 여백을 이 그래프 기준으로" — 데일리 막대 숫자 자리 16)
+
+
+def col_axis(vals, height, lbl):
+    """세로축 — (눈금 목록, 0 의 y, 1 단위 px). 범위는 막대보다 **한 칸 바깥 눈금까지** (2026-10-26 사용자: "항상 막대 범위 밖 눈금, 1.7 이면 2.0 까지").
+    위 여백 = 막대 위 숫자 자리(lbl), 아래 여백 = AXIS_PAD — 음수 막대 아래 숫자가 가로축 이름에 닿을 때만 늘린다."""
+    mp, mn = max(0.0, max(vals)), max(0.0, -min(vals))
+    step = _nice_step(mp + mn)
+    hi = (math.floor(mp / step + 1e-9) + 1) * step if mp > 0 else 0.0
+    lo = -(math.floor(mn / step + 1e-9) + 1) * step if mn > 0 else 0.0
+    bottom = AXIS_PAD
+    for _ in range(2):
+        scale = (height - lbl - bottom) / ((hi - lo) or 1)
+        need = lbl - (min(vals) - lo) * scale if mn > 0 else 0   # 가장 낮은 막대 아래 숫자가 눈금선 밑으로 나가는 만큼
+        if need <= bottom:
+            break
+        bottom = need
+    ticks = [round(lo + k * step, 10) for k in range(int(round((hi - lo) / step)) + 1)]
+    return ticks, lbl + hi * scale, scale
+
+
+def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w):
+    """세로 막대 그래프 틀 — 왼쪽 세로축 숫자 + 연한 가로 눈금선 + 0 기준선, 막대 · 가로축 이름은 그 오른쪽 (2026-10-26 사용자: "막대 그래프에 가로 눈금선, 좌측에 눈금 기준").
+    bars_html 은 막대 칸(0~100%) 기준으로 놓인 막대 · 숫자. 눈금 · top · scale 은 col_axis 가 정한다."""
+    step = (ticks[1] - ticks[0]) if len(ticks) > 1 else 1
+    dec = max(0, -math.floor(math.log10(step) + 1e-9)) if step < 1 else 0
+    fmt = lambda v: f"{abs(v):.{dec}f}" if abs(v) < 10 ** -(dec + 1) else f"{v:.{dec}f}".replace("-", "−")   # noqa: E731
+    gut = int(max(text_px(fmt(v), GRID_FS) for v in ticks) + 6)
+    grid = []
+    for v in ticks:
+        y = top - v * scale
+        if abs(v) > 1e-12:
+            grid.append(f'<span style="position:absolute;left:{gut}px;right:0;top:{y:.1f}px;height:1px;background:{GRID_LINE};"></span>')
+        grid.append(f'<span style="position:absolute;left:0;width:{gut - 6}px;top:{y - 7:.1f}px;height:14px;line-height:14px;text-align:right;font-size:{GRID_FS}px;color:{NOTE};">{fmt(v)}</span>')
+    plot = (f'<span style="position:absolute;left:{gut}px;right:0;top:0;bottom:0;">'
+            f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>{bars_html}</span>')
+    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:nowrap;">{esc(g)}</span>' for g in axis_names)
+    return scroll_x(f'<span style="display:block;position:relative;height:{height}px;">{"".join(grid)}{plot}</span>'
+                    f'<span style="display:flex;padding-left:{gut}px;font-size:{AXIS_FS};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>', min_w + gut)
 
 
 _HINT_RE = re.compile(r'^(<span data-scroll-hint="1"[^>]*>.*?</span>)', re.S)
 _LEGEND_RE = re.compile(r'^<span style="[^"]*">(.*)</span>$', re.S)
 
 
+LEGEND_TOP = 5   # 그래프 카드 첫 줄(범례 또는 `밀어서 보기`) 위 +5px — 카드 위 테두리 ~ 첫 줄 = 10 + 5 (2026-10-26 사용자: 기준 = `오늘 움직임과 평소 하루 크기` 그래프)
+
+
 def legend_top(chart_html, legend_html):
-    """그래프 위 한 줄 — 왼쪽 `밀어서 보기 ›`(넘칠 때만) · 오른쪽 범례 (2026-10-26 사용자: "밀어서 보기는 좌측 정렬, 범례는 상단 우측 정렬").
-    legend_html = 범례 칩 줄(_legend_chips · legend_chips). 좁으면 범례가 다음 줄 오른쪽으로 내려간다. 그래프 아래에는 범례가 없으니 빈 4px 로 아래 여백을 맞춘다."""
+    """그래프 위 한 줄 — 왼쪽 범례 · 오른쪽 `넘겨 보기 ›`(넘칠 때만) (2026-10-26 사용자: "넘겨 보기는 항상 우측, 범례는 좌측 — 넘겨 보기가 없어도 범례는 좌측").
+    legend_html = 범례 칩 줄(_legend_chips · legend_chips). 좁으면 `넘겨 보기` 가 다음 줄 오른쪽으로 내려간다. 그래프 아래에는 범례가 없으니 빈 4px 로 아래 여백을 맞춘다."""
     hint = ""
     m = _HINT_RE.match(chart_html or "")
     if m:
-        hint, chart_html = m.group(1).replace("margin:0 0 4px;", "margin:0;", 1), chart_html[m.end():]
+        hint, chart_html = m.group(1).replace(f"margin:{LEGEND_TOP}px 0 4px;", "margin:0 0 0 auto;", 1), chart_html[m.end():]   # 위 5px 는 범례 줄이 갖는다 · 오른쪽 끝
+        chart_html = chart_html.replace(f'data-shade-up="{SCROLL_SHADE_UP}"', 'data-shade-up="0"', 1).replace(f"padding-top:{SCROLL_SHADE_UP}px;margin-top:-{SCROLL_SHADE_UP}px;", "padding-top:0px;margin-top:-0px;", 1)
     lm = _LEGEND_RE.match(legend_html or "")
-    chips = (lm.group(1) if lm else legend_html or "").replace("margin:0 12px 0 0;", "margin:0 0 0 12px;")
+    chips = (lm.group(1) if lm else legend_html or "").replace("margin:0 0 0 12px;", "margin:0 12px 0 0;")   # 칩 사이 = 오른쪽 12px (왼쪽 정렬)
     top = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;'
-           f'font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 4px;">{hint}<span style="margin-left:auto;text-align:right;">{chips}</span></span>')
+           f'font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:{LEGEND_TOP}px 0 4px;"><span style="text-align:left;">{chips}</span>{hint}</span>')
     return top + chart_html + '<span style="display:block;height:4px;"></span>'
 
 
@@ -232,14 +313,22 @@ SCROLL_SHADE = ("background:linear-gradient(to left,#fff 30%,rgba(255,255,255,0)
                 "radial-gradient(farthest-side at 100% 50%,rgba(15,23,42,.18),rgba(15,23,42,0)) 100% 0/14px 100% no-repeat scroll;background-color:#fff;")
 
 
+SCROLL_CHEV = ('<svg viewBox="0 0 6 10" width="0.42em" height="0.7em" aria-hidden="true" style="margin-left:4px;vertical-align:-0.02em;position:relative;top:-1px;" '
+               'fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1.2 1.2 4.8 5 1.2 8.8"/></svg>')   # `›` 글자는 폰 글꼴에서 찌그러지고 가운데가 낮았다 — 직접 그림, 1px 위 (2026-10-26 사용자)
+SCROLL_SHADE_UP = 8   # 그림자를 그래프 위로 더 (안내 줄 쪽)
+SCROLL_HINT = "넘겨 보기"   # 옛 `밀어서 보기` (2026-10-26 사용자)
+FAINT = "#9CA3AF"   # 블로그 푸터 설명글의 흐린 글씨(테마 --gray-350) — `넘겨 보기` (같은 날 사용자)
+
+
 def scroll_x(html, min_w):
     """화면이 그래프 최소 폭보다 좁으면 가로 스크롤 (넓으면 그대로 꽉 채운다).
     더 있다는 표시 (2026-10-26 사용자: "밀어서 보기를 오른쪽 상단에, 오른쪽에 세로로 그림자를 넣어 더 있다는 걸"):
     ① 오른쪽 세로 그림자 — 오른쪽에 더 있을 때만 보이고 끝까지 밀면 사라진다(CSS 만: 덮개 local · 그림자 scroll 배경) ·
     ② 그래프 오른쪽 위 `밀어서 보기 ›` — 폰 폭에서 넘칠 때만 넣고, 화면이 넓어 안 넘치면 테마 JS(`data-scroll-hint`)가 숨긴다."""
-    hint = (f'<span data-scroll-hint="1" style="display:block;text-align:left;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};margin:0 0 4px;">밀어서 보기 ›</span>'
-            if min_w > CHART_PHONE_W else "")   # 왼쪽 정렬 (같은 날 사용자 — 처음엔 오른쪽 위, 범례가 오른쪽 위로 가며 왼쪽으로)
-    return (f'{hint}<span data-scroll-x="1" style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;{SCROLL_SHADE}">'
+    hint = (f'<span data-scroll-hint="1" style="display:block;text-align:right;font-size:{TINY};line-height:{LH_TINY};color:{FAINT};margin:{LEGEND_TOP}px 0 4px;">{SCROLL_HINT}{SCROLL_CHEV}</span>'
+            if min_w > CHART_PHONE_W else "")   # 범례 없는 그래프는 오른쪽 위 (2026-10-26 사용자) — 범례가 있으면 legend_top 이 범례 줄 왼쪽으로 옮긴다
+    up = SCROLL_SHADE_UP if hint else 0   # 오른쪽 그림자를 위로 더 길게 — 안내 줄 높이까지 (2026-10-26 사용자)
+    return (f'{hint}<span data-scroll-x="1" data-shade-up="{up}" style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;{SCROLL_SHADE}padding-top:{up}px;margin-top:-{up}px;">'
             f'<span style="display:block;min-width:{min_w}px;">{html}</span></span>')
 
 
@@ -554,10 +643,21 @@ def formal(html):
     return "".join(out)
 
 
+MINUS_W, MINUS_H = 0.38, 0.11   # 숫자 앞 빼기 — 글꼴의 굵은 − 는 길고 무거워 보여(2026-10-26 사용자) 줄을 직접 그린다: 폭 0.38 · 두께 0.11 글자 (비교 E4-c)
+MINUS_BAR = (f'<span style="display:inline-block;width:{MINUS_W}em;height:{MINUS_H}em;background:currentColor;vertical-align:{0.36 - MINUS_H / 2:.3f}em;'
+             'margin-right:.04em;border-radius:.03em;overflow:hidden;text-indent:2em;line-height:0;white-space:nowrap;">−</span>')   # 안의 − 는 밀어내 안 보이게 — 복사 · 화면 읽기에는 남는다
+_MINUS_NUM = re.compile(r"−(?=\d)")
+
+
+def _minus_bar(t):
+    return _MINUS_NUM.sub(MINUS_BAR, t)
+
+
 def fix_colons(html):
     """보이는 글의 ":" · "·" 는 앞뒤를 한 칸씩 띄운다 ("·" 는 2026-10-13 사용자) — "라벨 : 값" (2026-10-11 사용자: 꼭 반드시, 모든 페이지 일괄).
     글자 노드와 툴팁·제목 속성(data-tip · title · aria-label)만 고친다. style · script 안, 시각·비율(숫자:숫자), 주소(://)는 건드리지 않는다.
-    각 리포트의 build_body 마지막에 한 번 건다 — LLM 서술도 같이 고쳐진다. 줄표 ` — ` 도 여기서 쉼표로 (_no_dash)."""
+    각 리포트의 build_body 마지막에 한 번 건다 — LLM 서술도 같이 고쳐진다. 줄표 ` — ` 도 여기서 쉼표로 (_no_dash).
+    숫자 앞 빼기(−3)는 그린 줄(MINUS_BAR)로, 툴팁 속 빼기는 엔 대시(–)로 (2026-10-26 사용자)."""
     out, skip = [], False
     for part in _TAG.split(html):
         if part.startswith("<") and part.endswith(">"):
@@ -566,9 +666,9 @@ def fix_colons(html):
                 skip = True
             elif low.startswith(("</script", "</style")):
                 skip = False
-            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _sign_text(_space_dots(_space_colons(_no_dash(m.group(2)))), False) + m.group(3), part))
+            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _MINUS_NUM.sub("–", _sign_text(_space_dots(_space_colons(_no_dash(m.group(2)))), False)) + m.group(3), part))   # 툴팁 글은 HTML 을 못 넣어 엔 대시로
         else:
-            out.append(part if skip else _sign_text(_space_dots(_space_colons(_no_dash(part))), True))
+            out.append(part if skip else _minus_bar(_sign_text(_space_dots(_space_colons(_no_dash(part))), True)))   # 숫자 앞 − 는 그린 줄로 (MINUS_BAR)
     return "".join(out)
 
 
@@ -644,6 +744,19 @@ def pill(text, kind="area", lead=False, bare=False):
     bg = PILL_BG.get(kind, "#fff")
     return (f'<span style="display:inline-block;background:{bg};color:{fg};border:1px solid {bd};border-radius:4px;padding:3px 5px 2px;margin:0 {0 if bare else PILL_GAP}px;{PILL_MID}'
             f'font-size:{PILL_SIZE};font-weight:400;line-height:1;white-space:nowrap;vertical-align:middle;">{esc(text)}</span>')   # 라벨 14px, 어디서나 (2026-10-12 사용자)
+
+
+PILL_PAIR_GAP = 2   # 라벨끼리 사이 — 어디서나 2px (2026-10-26 사용자: "라벨끼리는 어디서나 2px, 라벨과 글자 사이는 5px"). 옛: 엔비디아 3 · 공용 카드 띄어쓰기(약 5) · 트럼프 약 14
+_PILL_MARGIN = re.compile(r"margin:0(?: [\d.]+(?:px)?){1,3};")   # 끝의 0 은 px 없이 오기도 한다 (엔비디아 margin:0 3px 0 0)
+_PILL_SPACE = re.compile(r">\s+<")
+
+
+def pill_row(labels_html, outer=0):
+    """라벨 여럿을 한 묶음으로 — 라벨끼리 PILL_PAIR_GAP, 묶음 바깥 좌우 outer px(글자 사이에 놓이면 PILL_GAP).
+    라벨마다 붙은 바깥 여백 · 사이 띄어쓰기는 지운다(pill · 엔비디아 _pill · 링크 라벨 모두)."""
+    inner = _PILL_SPACE.sub("><", _PILL_MARGIN.sub("margin:0;", labels_html or ""))
+    return (f'<span style="display:inline-flex;align-items:center;gap:{PILL_PAIR_GAP}px;margin:0 {outer}px;vertical-align:middle;white-space:nowrap;">{inner}</span>'
+            if inner else "")
 
 
 LOGO_BASE = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/"   # 우리 gh-pages 사본 (핫링크 아님)
@@ -951,8 +1064,17 @@ ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" ar
 def lighten(hex_color, amt=0.2):
     """흰색 쪽으로 amt 만큼 섞은 색 — 공식 접기 버튼 바탕 (색 배경 위에서 20% 밝게, 2026-10-13 사용자)."""
     h = hex_color.lstrip("#")
+    h = "".join(c * 2 for c in h) if len(h) == 3 else h   # #fff 같은 3자리도 (등락 0% 종목의 바탕 #fff 에서 죽던 것, 2026-10-26)
     r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
     return "#" + "".join(f"{round(c + (255 - c) * amt):02X}" for c in (r, g, b))
+
+
+def darken(hex_color, amt=0.05):
+    """검정 쪽으로 amt 만큼 섞은 색 (2026-10-26 사용자: 질문 카드 줄 구분선 · 막대 눈금선 2% 진하게 — 처음 5% 는 취소)."""
+    h = hex_color.lstrip("#")
+    h = "".join(c * 2 for c in h) if len(h) == 3 else h   # #fff 같은 3자리도 (등락 0% 종목의 바탕 #fff 에서 죽던 것, 2026-10-26)
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return "#" + "".join(f"{round(c * (1 - amt)):02X}" for c in (r, g, b))
 
 
 FOLD_BOX, FOLD_RADIUS, FOLD_ICON, FOLD_LEFT = 31, 7, 18, 4   # 공식 접기 버튼: 엔비디아 평균 등급 네모 28 → 10% 크게 31, 화살표 16 → 18, 왼쪽 여백 4 (2026-10-13 사용자)
@@ -1156,20 +1278,23 @@ def as_rules(html):
     return re.sub(r"border:1px solid (#[0-9A-Fa-f]{6});border-radius:10px;", r"border-top:1px solid \1;border-bottom:1px solid \1;", html)
 
 
+NEWS_SUM = "display:block;color:#333;font-size:16px;line-height:26px;font-weight:400;margin-top:4px;word-break:keep-all;"   # 뉴스 요약 줄 = 홈 주요 뉴스 기사 소개(.news-sum)와 같게 (2026-10-26 사용자: 14px 로 더 작았다)
+
+
 def news_item(headline_html, url=None, detail="", subs=(), labels="", meta=(), link_attrs=""):
     """공용 뉴스 카드 한 줄 (doc/기획/뉴스-형식-통일.md 2절, 기준 = 인물 발언 카드, 2026-10-25 사용자: 뉴스 형식 통일).
-        헤드라인(굵게, 원문 링크) / 요약 한 줄(검정 14px, 없으면 생략) / 보조 줄들(subs) / [라벨] [라벨]  회색 메타(시각 · 매체)
+        헤드라인(굵게, 원문 링크) / 요약 한 줄(16px #333 = 홈 기사 소개, 없으면 생략) / 보조 줄들(subs) / [라벨] [라벨]  회색 메타(시각 · 매체)
     headline_html = 이스케이프한 헤드라인(명사형). detail = 요약 글(이스케이프 전 — 뉴스 문체로 바꾼다). labels = 알약 HTML 묶음. meta = 글자 목록.
     link_attrs = a 태그에 더할 속성(title · data-trhelp 등). 헤드라인 · 요약은 합니다체로 바꾸지 않는다(keep_tone)."""
     head = (f'<a href="{esc(url)}" target="_blank" rel="noopener"{link_attrs} style="color:#111;font-weight:700;text-decoration:none;">{headline_html}</a>'
             if url else f'<span style="color:#111;font-weight:700;">{headline_html}</span>')
     out = keep_tone(head)
     if detail:
-        out += keep_tone(f'<span style="display:block;color:#111;font-size:{TINY};line-height:{LH_TINY};margin-top:4px;">{esc(headline(detail))}</span>')
+        out += keep_tone(f'<span style="{NEWS_SUM}">{esc(headline(detail))}</span>')
     out += "".join(subs)
     meta = [m for m in meta if m]
     return (out + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 0;line-height:1;">'
-            + (f'<span style="white-space:nowrap;">{labels}</span>' if labels else "")
+            + pill_row(labels)   # 라벨끼리 2px (PILL_PAIR_GAP)
             + (f'<span style="color:{SUB};font-size:{TINY};line-height:{LH_TINY};">{esc(" · ".join(meta))}</span>' if meta else "") + "</span>")
 
 

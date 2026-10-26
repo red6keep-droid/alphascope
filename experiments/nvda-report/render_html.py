@@ -477,29 +477,23 @@ def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
     n, ns = len(groups), len(groups[0][1])
     fs = _chart_label_px(n * ns)
     lbl = max(CHART_LBL, fs + 4)   # 숫자 한 줄 자리
-    mp, mn = max(0.0, max(vals)), max(0.0, -min(vals))
-    scale = (height - 2 * lbl) / ((mp + mn) or 1)
-    top = lbl + mp * scale
+    ticks, top, scale = _dk.col_axis(vals, height, lbl)   # 한 칸 바깥 눈금까지 · 아래 여백 통일 (2026-10-26 사용자)
     txt = lambda v: fmt(v) if fmt else f"{v:+.1f}".replace("-", "−")   # noqa: E731
     label_px = max(_dk.text_px(txt(v), fs) for v in vals) + 4
     axis_px = max(_dk.text_px(g, int(TINY[:-2])) for g, _ in groups) + 8
-    pad, min_w = _dk.col_layout(n, ns, label_px, axis_px)
-    parts = [f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>']
+    bw, lw, min_w = _dk.col_layout(n, ns, label_px, axis_px)   # 막대 고정 폭 (2026-10-26 사용자: 모든 막대 그래프 같은 폭)
+    parts = []   # 0 기준선 · 눈금선 · 세로축 숫자는 col_frame 이 (2026-10-26 사용자: 가로 눈금선)
     for i, (_, vs) in enumerate(groups):
         for k, v in enumerate(vs):
             if v is None:
                 continue
             h = max(1.0, abs(v) * scale)
-            left = (i + pad + (1 - 2 * pad) * k / ns) * 100 / n
-            width = (1 - 2 * pad) / ns * 100 / n
             y, ly = (top - h, top - h - lbl + 1) if v >= 0 else (top, top + h + 1)
             rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
-            parts.append(f'<span style="position:absolute;left:{left:.2f}%;width:{width:.2f}%;top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
-            parts.append(f'<span style="position:absolute;left:{left:.2f}%;width:{width:.2f}%;top:{ly:.1f}px;height:{lbl - 2}px;line-height:{lbl - 2}px;text-align:center;font-size:{fs}px;'
+            parts.append(f'<span style="position:absolute;{_dk.bar_x(i, k, n, ns, bw, lw)}top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
+            parts.append(f'<span style="position:absolute;{_dk.bar_x(i, k, n, ns, bw, lw, label=True)}top:{ly:.1f}px;height:{lbl - 2}px;line-height:{lbl - 2}px;text-align:center;font-size:{fs}px;'
                          f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt(v)}</span>')
-    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:nowrap;">{_esc(g)}</span>' for g, _ in groups)
-    return _dk.scroll_x(f'<span style="display:block;position:relative;height:{height}px;">{"".join(parts)}</span>'
-                        f'<span style="display:flex;font-size:{TINY};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>', min_w)
+    return _dk.col_frame("".join(parts), [g for g, _ in groups], height, top, scale, ticks, min_w)
 
 
 _PASTEL_UP, _PASTEL_DN, _GRAY_BAR = "#ED8E87", "#82B1F0", "#CBD5E1"   # 엔비디아 막대 — 파스텔(#F8C4BF · #BCD3F5)을 포화색(#d93025 · #1a73e8) 쪽으로 20% 진하게 한 번(#F2A6A0 · #9CC0F2), 사용자 요청으로 한 번 더 20% (2026-10-17), S&P 500 회색은 그대로
@@ -541,7 +535,7 @@ def sec_periods(a):
     pad = _dk.SEP_GAP - _dk.VP - 1
     chart = _col_chart([(p["label"], [p["nvda"], p.get("spy")]) for p in ps], [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE])
     legend = _legend_chips([("엔비디아 오름", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), ("S&P 500", _GRAY_BAR)])
-    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}"><span style="display:block;padding:{pad + 6}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
+    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
     return _card_title("기간별 수익률 (%)", periods_tip(ps)) + card
 
 
@@ -584,7 +578,7 @@ def in_card(sec, white=False, join=False):
         return ("flat", sec) if sec else ""
     head = f'font-weight:700;color:#111;font-size:{_dk.NAME};'
     if white:
-        return ("white", f'<span style="display:block;margin:0 0 8px;{head}">{m.group(1)}</span><span style="{MULTI}margin:0;">{m.group(2)}</span>')
+        return ("white", f'<span style="display:block;margin:0 0 8px;{head}">{m.group(1)}</span><span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;">{m.group(2)}</span>')   # 그래프 카드 폭 같게 (2026-10-26)
     return ("join" if join else "flat", f'<span style="display:block;font-size:{SMALL};"><span style="display:block;padding:10px 12px 0;{head}">{m.group(1)}</span>{m.group(2)}</span>')
 
 
@@ -607,7 +601,7 @@ def price_in(bg, bd, parts):
     """가격 정보 강조 카드 펼침 안 — 머리 줄 바로 아래 같은 바탕 · 테두리로 이어진다. parts = (모양, html) 또는 html(접기 등, 강조 모양으로).
     순서 = 가격 범위 + 고점 회복(한 영역) → 기간별 수익률(제목 · 흰 카드) → `차트 지표 보기`. 사이는 상태 카드 펼침과 같은 연한 구분선.
     펼친 동안 머리 줄 아래 모서리는 테마 CSS 가 편다 (`details[data-acc][open] > summary:has(+ [data-in-card]) > span:first-child`)."""
-    bd_row = _dk.lighten(_dk.lighten(bd), 0.3)   # 상태 카드 펼침 안 줄 사이 구분선과 같은 색
+    bd_row = _dk.darken(_dk.lighten(_dk.lighten(bd), 0.3), 0.02)   # 상태 카드 펼침 안 줄 사이 구분선과 같은 색
     items = [x if isinstance(x, tuple) else ("flat", x) for x in parts if x]
     if not items:
         return ""
@@ -734,7 +728,7 @@ def sec_earnings(a):
         rows += _row_html("발표 다음 날 보통 변동", f"±{em['median_abs']:.1f}%", note, first=first)
         chart = _col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in em["moves"]], [_sign_bg], [_sign_fg], height=130)
         rows += (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px 0;">'
-                 f'<span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 {n}번의 실적 발표 다음 날 (%)</span>'
+                 f'{_dk.CHART_TITLE}최근 {n}번의 실적 발표 다음 날 (%)</span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')   # 설명 글(왼쪽이 오래된 것 · 연.월)은 삭제 (2026-10-17 사용자)
     body = _fold_rows(head, rows) if head else rows   # 다음 발표 줄 오른쪽 접기 — 보통 변동 · 최근 8번은 펼쳤을 때만 (2026-10-18 사용자)
     return _card_title("실적 발표 후 가격 변동", EARN_TIP_HEAD + tip_now + "\n" + EARN_TIP_REC) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{body}</span></div>'
@@ -859,7 +853,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
     """상태 카드 (가이드라인 2-1 D, 2026-10-11 사용자: "별도 카드로 분리하고 이유도 카드에 포함" → "안내 아이콘 삭제, 글씨 검정, 블릿으로").
     첫 줄 구분명 좌·상태 우, 아래 얇은 선 뒤에 이유 글머리표(16px, 검정). 이유 묶음은 border-top — 홈 카드는 border-top 요소를 건너뛰므로 홈에는 첫 줄만 간다."""
     bg, bd = CARD_DIR[theme]
-    bd_row = _dk.lighten(_dk.lighten(bd), 0.3)   # 펼친 카드 안 줄 사이 구분선: 첫 구분선보다 20% 연하게, 사용자 요청으로 거기서 30% 더 (합쳐 약 44%) (2026-10-17)
+    bd_row = _dk.darken(_dk.lighten(_dk.lighten(bd), 0.3), 0.02)   # 펼친 카드 안 줄 사이 구분선: 첫 구분선보다 20% 연하게, 사용자 요청으로 거기서 30% 더 (합쳐 약 44%) (2026-10-17) · 거기서 2% 진하게 (2026-10-26 사용자, 데일리 질문 카드와 같게)
     # 글머리표는 3px 점, 글자 14px (2026-10-11 사용자). 규칙 줄은 안내 색(NOTE). lines 항목은 str 또는 (str, "note")
     def li(item):
         # 항목: str · (str, "note") · (str, "plain") · ("row", 이름, 값, 뜻)
@@ -1089,7 +1083,7 @@ def _zone_gauge(x, zone, names, bubble, aria, ends=None):
              f'<span style="position:relative;display:block;height:56px;">{_gauge_ends(ends) if ends else ""}{tip}'
              f'<span style="position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;">{segs}</span></span>'
              f'<span style="display:flex;margin-top:6px;">{labs}</span></span>')
-    return f'<span style="{MULTI}margin:0;"><span style="display:block;padding:{pad}px 12px;">{gauge}</span></span>'   # 세로 막대 그래프처럼 흰색 카드 안에 (2026-10-25 사용자: 일관성)
+    return f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{pad}px 12px;">{gauge}</span></span>'   # 폭은 막대 그래프 카드와 같게 (2026-10-26)   # 세로 막대 그래프처럼 흰색 카드 안에 (2026-10-25 사용자: 일관성)
 
 
 def _gauge_ends(ends):
@@ -1285,7 +1279,7 @@ def _event_html(e):
     문서(기사 · 뉴스룸 · 관보 · 법원)는 사실 문장이 헤드라인, 요약 = detail(기사 첫 문단에서 · 방송 주장). 가격 · 옵션 같은 계산 이벤트는 제목 + 사실 줄."""
     tag = _tag(e["area"], e["direction"])
     if e.get("speaker"):   # 발언자 라벨 — 영역·방향 뒤 세 번째 알약 (2026-10-11 사용자: 대표 발언에 "누가 말했다") · 방송 줄은 `방송`
-        tag += " " + _pill(config.SPEAKER_KO.get(e["speaker"], e["speaker"]), "area")
+        tag += "" if e.get("media") else " " + _pill(config.SPEAKER_KO.get(e["speaker"], e["speaker"]), "area")   # 방송 줄은 `방송` 라벨을 쓰지 않는다 — 메타의 채널 · 방송 n곳과 중복 (2026-10-26 사용자)
     src = rr.SOURCE_KO.get(e.get("source") or "", e.get("source") or "")
     doc = e["kind"] in rr.DOC_KINDS
     if doc:
@@ -1294,11 +1288,11 @@ def _event_html(e):
     else:
         head = _esc(e["title"])
         detail = ""
-        subs = ([f'<span style="display:block;color:#111;font-size:{TINY};line-height:{LH_TINY};margin-top:4px;">{_tint(_esc(_dk.headline(e["fact"])))}</span>']
+        subs = ([f'<span style="{_dk.NEWS_SUM}">{_tint(_esc(_dk.headline(e["fact"])))}</span>']
                 if e.get("fact") and e["fact"] != e["title"] else [])   # 증감 숫자는 색 (가이드라인 3-3-1 예외 없음)
     # 매체명을 보이는 글자로 (2026-10-21, 운영지침 D4-3): 툴팁(title)은 모바일에서 안 뜬다. 메타는 라벨 줄 오른쪽 (공용 카드)
     meta = [_when(e.get("published_at")), src if (doc and src and src != "googlenews") else ""]
-    # 라벨 사이 3px (2026-10-14 사용자: 0 → 3, 가이드라인 10-7)
+    # 라벨 사이는 news_item(pill_row)이 2px 로 맞춘다 (2026-10-14 사용자 0 → 3, 2026-10-26 → 2 어디서나)
     labels = tag.replace(f"margin:0 {_dk.PILL_GAP}px;", "margin:0 3px 0 0;").replace("</span> <span", "</span><span")
     tip_t = _esc(f"{src}: {e['title'][:90]}" if doc else f"{src} 원문").replace(chr(34), "&quot;")
     trhelp = ' data-trhelp="skip"' if e.get("media") else ""   # 방송 줄(media_feed)은 한국어 주제 + 유튜브 영상 — 영문 기사용 `번역 방법` 을 붙이지 않는다
@@ -1747,7 +1741,7 @@ def _status_group(a, group):
 def _chart_card(groups, colors, label_colors, legend, fmt=None):
     pad = _dk.SEP_GAP - _dk.VP - 1
     chart = _col_chart(groups, colors, label_colors, fmt=fmt)
-    return f'<span style="{MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{_dk.legend_top(chart, _legend_chips(legend))}</span></span>'
+    return f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, _legend_chips(legend))}</span></span>'
 
 
 def _gray(v):
@@ -1772,7 +1766,7 @@ def card_revenue(c):
     groups = [(f"{b['cq'][2:4]}.{b['cq'][-1]}Q", [b["stock"], b["peers"]]) for b in c["bars"]]
     chart = _chart_card(groups, [_sign_bg, _gray], [_sign_fg, _note_fg], [("엔비디아 늘어남", _PASTEL_UP), ("엔비디아 줄어듦", _PASTEL_DN), (_PEER_LBL, _GRAY_BAR)],
                         fmt=lambda v: f"{v:+.0f}".replace("-", "−"))
-    lines = [(first, "plain"), (f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">분기 매출, 1년 전 대비 (%)</span>{chart}', "html")]
+    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 매출, 1년 전 대비 (%)</span>{chart}', "html")]
     if p is not None:
         lines.append(("row", "기술주 15개와 차이", _pp(c["yoy"] - p), "같은 달력 분기 중앙값과 비교"))
     if c.get("qoq") is not None:
@@ -1802,7 +1796,7 @@ def card_eps(c):
         first += f" 30일 동안 {c['up30']}명이 올리고 {c['down30']}명이 내렸다."
     groups = [(b["label"], [b["stock"], b["peers"]]) for b in c["bars"]]
     chart = _chart_card(groups, [_sign_bg, _gray], [_sign_fg, _note_fg], [("엔비디아 올림", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), (_PEER_LBL, _GRAY_BAR)])
-    lines = [(first, "plain"), (f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">내년 1주당 이익 예상, ○일 전 대비 (%)</span>{chart}', "html")]
+    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}내년 1주당 이익 예상, ○일 전 대비 (%)</span>{chart}', "html")]
     if p30 is not None:
         lines.append(("row", "기술주 15개와 차이 (30일)", _pp(c["c30"] - p30, 1), "같은 기간 중앙값과 비교"))
     if c.get("up30") is not None:
@@ -1830,7 +1824,7 @@ def card_move(c):
         groups.append(("실적 다음 날", [c["earn"]["exp"], c["earn"]["past"]]))
     chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("시장 예상 (옵션)", _AMBER), ("평소 실제", _GRAY_BAR)],
                         fmt=lambda v: f"±{v:.1f}")
-    lines = [(first, "plain"), (f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">하루 움직임 (%)</span>{chart}', "html"),
+    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}하루 움직임 (%)</span>{chart}', "html"),
              ("row", "시장 예상 하루 움직임", f"±{c['exp']:.1f}%", "옵션 가격에 담긴 앞으로 한 달"),
              ("row", "평소 하루 움직임", f"±{c['sigma']:.1f}%", "가격 카드의 평소 범위와 같은 자"),
              ("row", "평소 대비", f"{c['ratio']:.1f}배", "1.3배 이상 큼 · 0.8배 이하 작음")]
@@ -1850,7 +1844,7 @@ def card_short(c):
     lab = lambda d: f"{int(d[5:7])}월 {int(d[8:10])}일" if d else "—"   # noqa: E731
     groups = [(lab(c.get("prior_asof")), [c.get("prior_pct"), c.get("peers_prior_pct")]), (lab(c.get("asof")), [c.get("pct"), c.get("peers_pct")])]
     chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("엔비디아", _AMBER), (_PEER_LBL, _GRAY_BAR)], fmt=lambda v: f"{v:.2f}")
-    lines = [(first, "plain"), (f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">공매도 비율, 유통 주식 대비 (%)</span>{chart}', "html"),
+    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}공매도 비율, 유통 주식 대비 (%)</span>{chart}', "html"),
              ("row", "공매도 비율", f"{c['pct']:.2f}%", "유통 주식 대비"),
              ("row", "잔고 변화 (한 달)", f"{_sgn(c['chg'])}%", "10% 넘게 늘면 늘어나는 중")]
     if c.get("peers_pct") is not None:
@@ -1918,8 +1912,8 @@ def cal_earnings(c):
     if c["bars"]:   # 오늘 탭 `실적 발표 후 가격 변동` 그래프와 같게 (2026-10-18 사용자)
         chart = _col_chart([(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["ret"]]) for b in c["bars"]], [_sign_bg], [_sign_fg], height=130)
         pad = _dk.SEP_GAP - _dk.VP - 1
-        card = f'<span style="{MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}</span></span>'
-        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">최근 {len(c["bars"])}번의 실적 발표 다음 날 (%)</span>{card}', "html"))
+        card = f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span>'   # 범례 줄이 없어 아래는 이름 줄 6 + 4 — 위아래 10 (2026-10-26)
+        lines.append((f'{_dk.CHART_TITLE_M}최근 {len(c["bars"])}번의 실적 발표 다음 날 (%)</span>{card}', "html"))
     lines.append(("row", "발표일", _md_short(c["day"]), "장 마감 뒤 · " + ("회사 확정" if c["confirmed"] else "추정")))
     if c.get("median"):
         lines.append(("row", "발표 다음 날 보통", f"±{c['median']:.1f}%", f"지난 {len(c['bars'])}번 중앙값"))
@@ -1947,7 +1941,7 @@ def cal_peers(c):
     if syms and c.get("normal"):
         groups = [(s, [c["effect"][s]["median"], c["normal"]]) for s in syms]
         chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("그 회사 발표 다음 날 엔비디아", _AMBER), ("엔비디아 보통 날", _GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
-        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">발표 다음 날 엔비디아 움직임 (%)</span>{chart}', "html"))
+        lines.append((f'{_dk.CHART_TITLE_M}발표 다음 날 엔비디아 움직임 (%)</span>{chart}', "html"))
     d0 = None
     for u in up:
         s = u["symbol"]
@@ -1976,7 +1970,7 @@ def cal_macro(c):
     if eff and c.get("normal"):
         groups = [(cal_cards.MACRO_KO.get(k, k).split(" (")[-1].rstrip(")") if "(" in cal_cards.MACRO_KO.get(k, k) else cal_cards.MACRO_KO.get(k, k), [eff[k]["median"], c["normal"]]) for k in eff]
         chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("그 일정 날 S&P 500", _AMBER), ("S&P 500 보통 날", _GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
-        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">그날 S&P 500 움직임 (%)</span>{chart}', "html"))
+        lines.append((f'{_dk.CHART_TITLE_M}그날 S&P 500 움직임 (%)</span>{chart}', "html"))
     for u in up:
         e = c["effect"].get(u["kind"]) or {}
         lines.append(("row", cal_cards.MACRO_KO.get(u["kind"], u["label"]), _md_short(u["day"]), f"그날 S&P 500 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else ""))

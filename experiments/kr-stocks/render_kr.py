@@ -27,6 +27,11 @@ IMAGE_BRANCH = "kr-images"   # 한국 종목 그래프 전용 휘발성 브랜�
 SRC = "한국은행 ECOS (자료: 한국거래소 · 금융투자협회)"
 
 
+def _row_html(left_html, right_html, note="", **kw):
+    """R._row_html 과 같고 보조 줄(note)의 증감에 색 — 이미 태그가 든 보조 줄은 그대로 (2026-10-26 사용자: "증감 표현에 있는 모든 정보는 증감 컬러", 리포트 M6)."""
+    return R._row_html(left_html, right_html, _dk.tint(note) if note and "<" not in note else note, **kw)
+
+
 def _esc(t):
     return _dk.esc(t)
 
@@ -37,6 +42,8 @@ def _md(d):
 
 
 def _sgn(v, digits=1):
+    if round(v, digits) == 0:   # 0 은 부호 없이 — `−0.0%p` 가 증감 색으로 칠해지지 않게 (2026-10-26 리포트 M9)
+        return f"{0:.{digits}f}"
     return f"{v:+.{digits}f}".replace("-", "−")
 
 
@@ -228,7 +235,7 @@ def sec_industry(s):
         note = f"{mo} · {cmp_txt} {_sgn(r['chg'], 2 if unit == '%p' else 1)}{unit} · 12개월 범위의 {r['pos12']:.0f}% 지점" if r.get("chg") is not None else f"{mo} · 12개월 범위의 {r['pos12']:.0f}% 지점"
         if r.get("note"):
             note += f" · {r['note']}"
-        rows += R._row_html(r["name"], f'<span style="color:#111;">{_ind_value(r)}</span>{chg}', note, first=i == 0)
+        rows += _row_html(r["name"], f'<span style="color:#111;">{_ind_value(r)}</span>{chg}', note, first=i == 0)
     # K14 환율 (수출형 · 수입 원료형 · 일본 경쟁 업종) · K21 WTI (한국전력) — 값만. 검증에서 이후 주가와 관계 없음 / WTI 는 다음날 한전과 관계 있음(시가 반영)
     fx = s.get("fx") or {}
     fx_keys = []
@@ -242,13 +249,13 @@ def sec_industry(s):
             continue
         d1 = x.get("chg_1d")
         right = f'<span style="color:#111;">{x["v"]:,.1f}원</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{UP if d1 > 0 else DOWN if d1 < 0 else NOTE};">{_sgn(d1, 1)}원</span>' if d1 is not None else "")
-        rows += R._row_html(n, right, f"{_md(x['day'])} · {note} · 1년 {x['lo_1y']:,.0f}~{x['hi_1y']:,.0f}원 · 기록상 이후 주가와 관계 없음(값만)")
+        rows += _row_html(n, right, f"{_md(x['day'])} · {note} · 1년 {x['lo_1y']:,.0f}~{x['hi_1y']:,.0f}원 · 기록상 이후 주가와 관계 없음(값만)")
     w = s.get("wti")
     if w:
         d1 = w.get("chg_1d")
         right = f'<span style="color:#111;">{w["v"]:.1f}달러</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{UP if d1 > 0 else DOWN if d1 < 0 else NOTE};">{_sgn(d1, 1)}%</span>' if d1 is not None else "")
         sp, n, y0 = U.WTI_RECORD
-        rows += R._row_html("WTI 유가", right, f"{_md(w['day'])} · 20일 {_sgn(w['chg_n'], 1)}% · 1년 {w['lo_1y']:.0f}~{w['hi_1y']:.0f}달러 · 기록상 많이 오른 날과 내린 날의 다음날 {s['name']} 차이 {_sgn(sp, 2)}%p ({y0}~2026)")
+        rows += _row_html("WTI 유가", right, f"{_md(w['day'])} · 20일 {_sgn(w['chg_n'], 1)}% · 1년 {w['lo_1y']:.0f}~{w['hi_1y']:.0f}달러 · 기록상 많이 오른 날과 내린 날의 다음날 {s['name']} 차이 {_sgn(sp, 2)}%p ({y0}~2026)")
     rec = []
     for r in rows_data:
         v = U.VALIDATED_LEAD.get(r["key"])
@@ -281,7 +288,7 @@ def sec_bsi(s):
         fc = f'<br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">다음 달 전망 {r["forecast"]:.0f}</span>' if r.get("forecast") is not None else ""
         col = UP if r["v"] >= 100 else "#111"
         note = f"{mo} 실적 · 전달보다 {_sgn(r['chg'], 0)}p · 12개월 범위의 {r['pos12']:.0f}% 지점 · 2009년 이후 아래에서 {r['pct_all']:.0f}% 지점"
-        rows += R._row_html(f"{r['name']} BSI", f'<span style="color:{col};">{r["v"]:.0f}</span>{fc}', note, first=i == 0)
+        rows += _row_html(f"{r['name']} BSI", f'<span style="color:{col};">{r["v"]:.0f}</span>{fc}', note, first=i == 0)
     rec = b.get("record") or {}
     lines = []
     if rec.get("lead"):
@@ -322,7 +329,7 @@ def sec_fin(s):
         chg = f'<br><span style="font-size:{TINY};font-weight:400;color:{UP if r["chg"] > 0 else DOWN if r["chg"] < 0 else NOTE};">{_sgn(r["chg"], 1)}{r["chg_unit"]}</span>' if r.get("chg") is not None else ""
         rng = (f"{r['lo4'] / 1e3:,.0f}~{r['hi4'] / 1e3:,.0f}조" if r["unit"] == "조 원" else f"{r['lo4']:.1f}~{r['hi4']:.1f}%").replace("-", "−")
         note = f"{_qlabel(r['q'])}" + (f" · 전년 같은 분기보다 {_sgn(r['chg'], 1)}{r['chg_unit']}" if r.get("chg") is not None else "") + f" · 최근 4분기 {rng} · {r['note']}"
-        rows += R._row_html(r["name"], f'<span style="color:#111;">{val}</span>{chg}', note, first=i == 0)
+        rows += _row_html(r["name"], f'<span style="color:#111;">{val}</span>{chg}', note, first=i == 0)
     f0 = xs[0]
     tip = ("업종 전체 회사들의 재무(한국은행 기업경영분석 — 설문이 아니라 실제 집계)와 그 업종이 은행에서 빌린 돈. 분기 끝 2~3달 뒤에 나와 종목 실적보다 늦다\n"
            f"· {f0['name']} {f0['v']:.1f}{'%' if f0['unit'] != '조 원' else ''} : {_qlabel(f0['q'])}" + (f", 전년 같은 분기보다 {_sgn(f0['chg'], 1)}{f0['chg_unit']}" if f0.get("chg") is not None else "") + "\n"
@@ -352,7 +359,7 @@ def _yoy_chart(title, groups, fmt):
     if not groups:
         return []
     chart = R._chart_card(groups, [lambda v: _THIS, lambda v: _LAST], [lambda v: "#111", lambda v: NOTE], [("올해", _THIS), ("작년 같은 때", _LAST)], fmt=fmt)
-    return [(f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">{_esc(title)}</span>{chart}', "html")]
+    return [(f'{_dk.CHART_TITLE_M}{_esc(title)}</span>{chart}', "html")]
 
 
 def _tip_of(html):
@@ -489,7 +496,7 @@ def sec_periods(s):
         return ""
     chart = R._col_chart([(p["label"], [p["stock"], p.get("spy")]) for p in ps], [R._sign_bg, lambda v: R._GRAY_BAR], [R._sign_fg, lambda v: NOTE])
     legend = R._legend_chips([(f"{s['name']} 오름", R._PASTEL_UP), (f"{s['name']} 내림", R._PASTEL_DN), ("KOSPI", R._GRAY_BAR)])
-    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{PAD + 6}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
+    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
     return R._card_title("기간별 수익률 (%)", periods_tip(s, ps)) + card
 
 
@@ -514,14 +521,14 @@ def sec_drawdown(s):
     st, bn = d["stock"]["dd"], d["stock"].get("bench_dd") or {}
     span = R._span_label(d["stock"])
     sm = f'font-size:{TINY};font-weight:400;color:{NOTE};'
-    head = R._row_html("지금", R._arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True, inline_note=True)
+    head = _row_html("지금", R._arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True, inline_note=True)
     rows, cols = "", []
     for lv in ("10", "20", "30"):
         x, y = st.get(lv) or {}, bn.get(lv) or {}
         if not x.get("n") or x.get("median_days") is None:
             continue
         right = f'<span style="{sm}">보통</span> {x["median_days"]}일' + (f'<br><span style="{sm}">KOSPI 보통 {y["median_days"]}일</span>' if y.get("median_days") is not None else "")
-        rows += R._row_html(f'<span style="color:{DOWN};">−{lv}%</span> 넘게 내려가면', right, f"{span} 동안 {s['name']} {x['n']}번 발생")
+        rows += _row_html(f'<span style="color:{DOWN};">−{lv}%</span> 넘게 내려가면', right, f"{span} 동안 {s['name']} {x['n']}번 발생")
         if x.get("recovered") and y.get("recovered"):
             cols.append((lv, x["over_year"] / x["recovered"] * 100, y["over_year"] / y["recovered"] * 100))
     tail = ""
@@ -615,8 +622,9 @@ def sec_states(s):
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
 
 
-def related(s=None):
-    links = [("한국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("미국 시가총액 상위 10개 종목 주가", U.US_LIST_URL)]
+def related(s=None, links=None):
+    """함께 보는 페이지 — links 를 주면 그 목록으로 (한국 증시 리포트가 자기 자신을 빼고 쓴다)."""
+    links = list(links) if links else [("한국 증시 리포트", U.REPORT_URL), ("한국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("미국 시가총액 상위 10개 종목 주가", U.US_LIST_URL)]
     if s:
         for m in (s.get("pairs") or {}).get("moves") or []:
             if m["sym"] in USU.BY_SYM:
@@ -808,8 +816,8 @@ def cal_earn_card(s, c):
     if c["bars"]:
         chart = R._col_chart([(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["ret"]]) for b in c["bars"]], [R._sign_bg], [R._sign_fg], height=130)
         pad = _dk.SEP_GAP - _dk.VP - 1
-        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">최근 {len(c["bars"])}번의 실적 발표 날 (%)</span>'
-                      f'<span style="{R.MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}</span></span>', "html"))
+        lines.append((f'{_dk.CHART_TITLE_M}최근 {len(c["bars"])}번의 실적 발표 날 (%)</span>'
+                      f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span>', "html"))
     lines.append(("row", "발표일", R._md_short(c["day"]), "Yahoo Finance 일정"))
     if c.get("median"):
         lines.append(("row", "발표 날 보통", f"±{c['median']:.1f}%", f"지난 {len(c['bars'])}번 중앙값"))
@@ -835,7 +843,7 @@ def cal_pair_card(s, c):
     if syms and c.get("normal"):
         chart = R._chart_card([(usn(x), [c["effect"][x]["median"], c["normal"]]) for x in syms], [lambda v: R._AMBER, R._gray], [R._note_fg, R._note_fg],
                               [(f"그 회사 발표 다음 날 {nm}", R._AMBER), (f"{nm} 보통 날", R._GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
-        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">발표 다음 날 {_esc(nm)} 움직임 (%)</span>{chart}', "html"))
+        lines.append((f'{_dk.CHART_TITLE_M}발표 다음 날 {_esc(nm)} 움직임 (%)</span>{chart}', "html"))
     for u in up:
         e = c["effect"].get(u["symbol"]) or {}
         lines.append(("row", f"{usn(u['symbol'])} ({u['symbol']})", R._md_short(u["day"]), "미국과 연결" + (f" · 다음 날 {nm} 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else "")))
@@ -860,7 +868,7 @@ def cal_macro_card(s, c):
     if eff and c.get("normal"):
         chart = R._chart_card([(_macro_name(k).split(" (")[-1].rstrip(")"), [eff[k]["median"], c["normal"]]) for k in eff], [lambda v: R._AMBER, R._gray], [R._note_fg, R._note_fg],
                               [("그 일정 뒤 KOSPI", R._AMBER), ("KOSPI 보통 날", R._GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
-        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">그 일정 뒤 KOSPI 움직임 (%)</span>{chart}', "html"))
+        lines.append((f'{_dk.CHART_TITLE_M}그 일정 뒤 KOSPI 움직임 (%)</span>{chart}', "html"))
     for u in up:
         e = c["effect"].get(u["kind"]) or {}
         lines.append(("row", _macro_name(u["kind"], u.get("label", "")), R._md_short(u["day"]), f"KOSPI 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else ""))
@@ -933,15 +941,15 @@ def sec_foreign(m):
         return ""
     sign_word = "순매수" if f["today"] > 0 else "순매도"
     streak = f"{f['streak']}일 연속 {'순매수' if f['streak_sign'] > 0 else '순매도'}" if f["streak"] > 1 else sign_word
-    rows = R._row_html("오늘", f'<span style="color:{UP if f["today"] > 0 else DOWN};">{_sgn(f["today"], 0)}억</span>', f"{_md(f['day'])} · {streak}", first=True, inline_note=True)
-    rows += R._row_html("20일 누적", f'<span style="color:{UP if f["cum20"] > 0 else DOWN};">{_sgn(f["cum20"] / 1e4, 1)}조</span>',
+    rows = _row_html("오늘", f'<span style="color:{UP if f["today"] > 0 else DOWN};">{_sgn(f["today"], 0)}억</span>', f"{_md(f['day'])} · {streak}", first=True, inline_note=True)
+    rows += _row_html("20일 누적", f'<span style="color:{UP if f["cum20"] > 0 else DOWN};">{_sgn(f["cum20"] / 1e4, 1)}조</span>',
                         f"과거 20일 구간 중 아래에서 {f['cum20_pct_rank']:.0f}% 지점" if f.get("cum20_pct_rank") is not None else "", inline_note=False)
-    rows += R._row_html("올해 누적", f'<span style="color:{UP if f["ytd"] > 0 else DOWN};">{_sgn(f["ytd"] / 1e4, 1)}조</span>', f"{f['day'][:4]}년", inline_note=True)
+    rows += _row_html("올해 누적", f'<span style="color:{UP if f["ytd"] > 0 else DOWN};">{_sgn(f["ytd"] / 1e4, 1)}조</span>', f"{f['day'][:4]}년", inline_note=True)
     if f.get("kosdaq_today") is not None:
-        rows += R._row_html("코스닥 오늘", f'<span style="color:{UP if f["kosdaq_today"] > 0 else DOWN};">{_sgn(f["kosdaq_today"], 0)}억</span>', "", inline_note=True)
+        rows += _row_html("코스닥 오늘", f'<span style="color:{UP if f["kosdaq_today"] > 0 else DOWN};">{_sgn(f["kosdaq_today"], 0)}억</span>', "", inline_note=True)
     ser = f["series"][-FLOW_CHART_N:]
     chart = R._col_chart([(str(int(x["day"][8:])), [x["v"] / 1e4]) for x in ser], [R._sign_bg], [R._sign_fg], height=130, fmt=lambda v: f"{v:+.1f}".replace("-", "−"))   # 라벨 = 일(日)만 — 폰에서 "10.13" 은 두 줄로 끊긴다
-    rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;"><span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 {len(ser)}거래일 외국인 순매수 (조 원) <span style="font-size:{_dk.MICRO};font-weight:400;color:{NOTE};">{_month_span(ser)}</span></span>'
+    rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 {len(ser)}거래일 외국인 순매수 (조 원) <span style="font-size:{_dk.MICRO};font-weight:400;color:{NOTE};">{_month_span(ser)}</span></span>'
              f'<span style="display:block;height:6px;"></span>{chart}</span>')
     return R._card_title("외국인은 사고 있나?", _dk.with_src(foreign_tip(f), SRC)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
 
@@ -967,24 +975,24 @@ def sec_investors(m):
         return None
     groups = [(mo[2:].replace("-", "."), [_v("foreign", mo), _v("inst", mo), _v("indiv", mo)]) for mo in months]
     colors = [lambda v: "#ED8E87" if (v or 0) >= 0 else "#82B1F0"] * 3
-    chart = R._col_chart(groups, [lambda v: R._PASTEL_UP if (v or 0) >= 0 else R._PASTEL_DN, lambda v: "#A7B4C6", lambda v: "#D9DEE7"], [R._sign_fg, lambda v: NOTE, lambda v: NOTE], height=150,
+    chart = R._col_chart(groups, [lambda v: R._PASTEL_UP if (v or 0) >= 0 else R._PASTEL_DN, lambda v: "#A7B4C6", lambda v: "#D9DEE7"], [R._sign_fg, R._sign_fg, R._sign_fg], height=150,   # 순매수 숫자는 모두 증감 색 (M6)
                          fmt=lambda v: f"{v:+.0f}".replace("-", "−"))
     legend = R._legend_chips([("외국인", R._PASTEL_UP), ("기관", "#A7B4C6"), ("개인", "#D9DEE7")])
     last = months[-1]
-    rows = "".join(R._row_html(n, f'<span style="color:{UP if (_v(k, last) or 0) > 0 else DOWN};">{_sgn(_v(k, last) or 0, 1)}조</span>', f"{last[:4]}년 {int(last[5:])}월 순매수", first=i == 0, inline_note=True)
+    rows = "".join(_row_html(n, f'<span style="color:{UP if (_v(k, last) or 0) > 0 else DOWN};">{_sgn(_v(k, last) or 0, 1)}조</span>', f"{last[:4]}년 {int(last[5:])}월 순매수", first=i == 0, inline_note=True)
                    for i, (n, k) in enumerate((("외국인", "foreign"), ("기관", "inst"), ("개인", "indiv"))))
     sh = (m or {}).get("investor_share")
     if sh:
         L = sh["last"]
-        rows += R._row_html("거래 비중", f'<span style="color:#111;">개인 {L["indiv"]:.0f}%</span><br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">외국인 {L["foreign"]:.0f}% · 기관 {L["inst"]:.0f}%</span>',
+        rows += _row_html("거래 비중", f'<span style="color:#111;">개인 {L["indiv"]:.0f}%</span><br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">외국인 {L["foreign"]:.0f}% · 기관 {L["inst"]:.0f}%</span>',
                             f"{L['month'][:4]}년 {int(L['month'][5:])}월 매수+매도 {L['total']:,.0f}조 중 · 개인 비중 12개월 {sh['indiv_lo12']:.0f}~{sh['indiv_hi12']:.0f}% · 개인 비중이 높아지면 과열로 읽히곤 한다")
         sch = R._col_chart([(x["month"][2:].replace("-", "."), [x["indiv"], x["foreign"], x["inst"]]) for x in sh["series"][-6:]],
                            [lambda v: "#D9DEE7", lambda v: R._PASTEL_UP, lambda v: "#A7B4C6"], [lambda v: NOTE] * 3, height=120, fmt=lambda v: f"{v:.0f}")
-        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;"><span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">거래 비중 (%) — 개인 · 외국인 · 기관</span>'
+        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}거래 비중 (%) — 개인 · 외국인 · 기관</span>'
                  f'<span style="display:block;height:6px;"></span>{sch}</span>')
     tip = ("한 달 동안 외국인 · 기관 · 개인이 각각 산 금액에서 판 금액을 뺀 것(유가증권 + 코스닥), 그리고 전체 거래에서 각자가 차지한 비중. 월별 자료라 지난달까지\n"
            f"· {last[:4]}년 {int(last[5:])}월 : 외국인 {_sgn(_v('foreign', last) or 0, 1)}조 · 기관 {_sgn(_v('inst', last) or 0, 1)}조 · 개인 {_sgn(_v('indiv', last) or 0, 1)}조")
-    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
+    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}<span style="display:block;{R.MULTI_SEP}padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.CHART_TITLE}최근 {len(months)}개월 순매수 (조 원)</span><span style="display:block;height:6px;"></span>{_dk.legend_top(chart, legend)}</span></span></div>'   # 제목 없던 그래프에 ※ 제목 (2026-10-26)
     return R._card_title("기관 · 개인은?", _dk.with_src(tip, SRC)) + card
 
 
@@ -1003,7 +1011,7 @@ def sec_funds(m):
         v, pv = x["last"]["v"], (x["prev"] or {}).get("v")
         chg = f" · 전달 대비 {_sgn((v / pv - 1) * 100, 1)}%" if pv else ""
         pos = (v - x["lo12"]) / (x["hi12"] - x["lo12"]) * 100 if x["hi12"] > x["lo12"] else 50
-        rows += R._row_html(n, f"{v / 1e12:.1f}조", f"{x['last']['month'][:4]}년 {int(x['last']['month'][5:])}월{chg} · 12개월 범위의 {pos:.0f}% 지점 · {note}", first=i == 0)
+        rows += _row_html(n, f"{v / 1e12:.1f}조", f"{x['last']['month'][:4]}년 {int(x['last']['month'][5:])}월{chg} · 12개월 범위의 {pos:.0f}% 지점 · {note}", first=i == 0)
     c = fm.get("credit_loan") or {}
     tip = ("빚투 · 대기 자금 — 신용융자가 12개월 범위의 위쪽이면 급락 때 강제 매도가 커질 수 있는 상태, 예탁금이 늘면 살 돈이 쌓인 상태. 월별 자료라 지난달까지\n"
            + (f"· 신용융자 {c['last']['month'][:4]}년 {int(c['last']['month'][5:])}월 : {c['last']['v'] / 1e12:.1f}조 원 (12개월 {c['lo12'] / 1e12:.1f}~{c['hi12'] / 1e12:.1f}조)" if c else ""))
@@ -1018,7 +1026,7 @@ def _rate_row(name, x, note, first=False):
     chg = f" · 20일 {_sgn(x['chg_n'] * 100, 0)}bp" if x.get("chg_n") is not None else ""
     d1 = f"{_sgn(x['chg_1d'] * 100, 0)}bp" if x.get("chg_1d") is not None else ""
     right = f'<span style="color:#111;">{x["v"]:.2f}%</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{UP if x["chg_1d"] > 0 else DOWN if x["chg_1d"] < 0 else NOTE};">{d1}</span>' if d1 else "")
-    return R._row_html(name, right, f"{note}{chg} · 1년 {x['lo_1y']:.2f}~{x['hi_1y']:.2f}%", first=first)
+    return _row_html(name, right, f"{note}{chg} · 1년 {x['lo_1y']:.2f}~{x['hi_1y']:.2f}%", first=first)
 
 
 def sec_rates_fx(m):
@@ -1041,7 +1049,7 @@ def sec_rates_fx(m):
         d1 = x.get("chg_1d")
         right = f'<span style="color:#111;">{x["v"]:,.1f}원</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{UP if d1 > 0 else DOWN if d1 < 0 else NOTE};">{_sgn(d1, 1)}원</span>' if d1 is not None else "")
         chg = f" · 20일 {_sgn(x['chg_n'], 1)}원" if x.get("chg_n") is not None else ""
-        rows += R._row_html(n, right, f"{note}{chg} · 1년 {x['lo_1y']:,.0f}~{x['hi_1y']:,.0f}원", first=first)
+        rows += _row_html(n, right, f"{note}{chg} · 1년 {x['lo_1y']:,.0f}~{x['hi_1y']:,.0f}원", first=first)
         first = False
     k3, usd = rt.get("ktb3"), fx.get("usdkrw")
     tip = ("금리가 오르면 빚투 비용과 성장주 할인율이 오르고, 원/달러가 오르면(원화 약세) 외국인은 환차손을 피해 팔기 쉽다. 외국인 수급과 같이 보는 배경 숫자\n"
@@ -1060,26 +1068,26 @@ def sec_heat(m):
     if h:
         tr = h.get("turnover_ratio")
         how = "평소보다 많이" if tr and tr >= 1.5 else "평소보다 적게" if tr and tr < 0.7 else "평소와 비슷하게"
-        rows += R._row_html("유가증권 거래대금", f'<span style="color:#111;">{eok(h["turnover"])}</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">20일 평균의 {tr:.1f}배</span>' if tr else ""),
+        rows += _row_html("유가증권 거래대금", f'<span style="color:#111;">{eok(h["turnover"])}</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">20일 평균의 {tr:.1f}배</span>' if tr else ""),
                             f"{_md(h['day'])} · {how} 거래됐다 · 1년 중 아래에서 {h['pct_rank_1y']:.0f}% 지점", first=True)
         first = False
         if h.get("volume"):
-            rows += R._row_html("유가증권 거래량", f'<span style="color:#111;">{h["volume"] / 1e4:,.1f}억 주</span>', "", inline_note=True)
+            rows += _row_html("유가증권 거래량", f'<span style="color:#111;">{h["volume"] / 1e4:,.1f}억 주</span>', "", inline_note=True)
         if h.get("kosdaq_turnover"):
-            rows += R._row_html("코스닥 거래대금", f'<span style="color:#111;">{eok(h["kosdaq_turnover"])}</span>',
+            rows += _row_html("코스닥 거래대금", f'<span style="color:#111;">{eok(h["kosdaq_turnover"])}</span>',
                                 f"거래량 {h['kosdaq_volume'] / 1e4:,.1f}억 주" if h.get("kosdaq_volume") else "", inline_note=True)
         mc = (m or {}).get("mcap")
         if mc:
             d1 = mc.get("chg_1d")
-            rows += R._row_html("유가증권 시가총액", f'<span style="color:#111;">{mc["v"] / 1e4:,.0f}조 원</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{UP if d1 > 0 else DOWN if d1 < 0 else NOTE};">{_sgn(d1, 2)}%</span>' if d1 is not None else ""),
+            rows += _row_html("유가증권 시가총액", f'<span style="color:#111;">{mc["v"] / 1e4:,.0f}조 원</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{UP if d1 > 0 else DOWN if d1 < 0 else NOTE};">{_sgn(d1, 2)}%</span>' if d1 is not None else ""),
                                 f"시장 전체 크기 · 1년 {mc['lo_1y'] / 1e4:,.0f}~{mc['hi_1y'] / 1e4:,.0f}조의 위에서 {100 - mc['pct_rank_1y']:.0f}% 지점")
         ser = h["series"][-FLOW_CHART_N:]
         chart = R._col_chart([(str(int(x["day"][8:])), [x["v"] / 1e4]) for x in ser], [lambda v: "#CBD5E1"], [lambda v: NOTE], height=120, fmt=lambda v: f"{v:.1f}")
-        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;"><span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 {len(ser)}거래일 거래대금 (조 원) <span style="font-size:{_dk.MICRO};font-weight:400;color:{NOTE};">{_month_span(ser)}</span></span>'
+        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 {len(ser)}거래일 거래대금 (조 원) <span style="font-size:{_dk.MICRO};font-weight:400;color:{NOTE};">{_month_span(ser)}</span></span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')
     if n:
         d = n["v"] - n["avg_1y"]
-        rows += R._row_html("뉴스심리지수", f'<span style="color:{UP if d > 0 else DOWN};">{n["v"]:.1f}</span>' + f'<br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">20일 평균 {n["avg20"]:.1f}</span>',
+        rows += _row_html("뉴스심리지수", f'<span style="color:{UP if d > 0 else DOWN};">{n["v"]:.1f}</span>' + f'<br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">20일 평균 {n["avg20"]:.1f}</span>',
                             f"{_md(n['day'])} · 100 위면 긍정 기사가 많음 · 1년 평균 {n['avg_1y']:.1f} · 1년 중 아래에서 {n['pct_rank_1y']:.0f}% 지점 · 한국은행 실험적 통계, 약 1주 늦게 나옴", first=first)
     tip = ("돈이 얼마나 활발히 오가는지(거래대금)와 경제 뉴스의 분위기(뉴스심리지수 — 한국은행이 경제 기사 문장을 긍정 · 부정으로 나눠 지수화, 100이 기준). 급등 · 급락 날은 거래대금이 평소의 1.5배를 넘곤 한다\n"
            + (f"· 오늘 거래대금 {eok(h['turnover'])} : 20일 평균의 {h['turnover_ratio']:.1f}배" if h and h.get("turnover_ratio") else "")
@@ -1098,18 +1106,18 @@ def sec_valuation(m):
     rows = ""
     per, dy, tr = v["per"], v.get("div_yield"), v.get("turnover_ratio")
     mo = f"{per['month'][:4]}년 {int(per['month'][5:])}월"
-    rows += R._row_html("KOSPI 주가이익비율 (PER)", f'<span style="color:#111;">{per["v"]:.1f}배</span>', f"{mo} · 12개월 {per['lo12']:.1f}~{per['hi12']:.1f}배의 {_pos(per):.0f}% 지점 · 전체 기간 평균 {per['avg_all']:.1f}배", first=True)
+    rows += _row_html("KOSPI 주가이익비율 (PER)", f'<span style="color:#111;">{per["v"]:.1f}배</span>', f"{mo} · 12개월 {per['lo12']:.1f}~{per['hi12']:.1f}배의 {_pos(per):.0f}% 지점 · 전체 기간 평균 {per['avg_all']:.1f}배", first=True)
     if dy:
-        rows += R._row_html("KOSPI 배당수익률", f'<span style="color:#111;">{dy["v"]:.2f}%</span>', f"12개월 {dy['lo12']:.2f}~{dy['hi12']:.2f}% · 전체 기간 평균 {dy['avg_all']:.2f}%")
+        rows += _row_html("KOSPI 배당수익률", f'<span style="color:#111;">{dy["v"]:.2f}%</span>', f"12개월 {dy['lo12']:.2f}~{dy['hi12']:.2f}% · 전체 기간 평균 {dy['avg_all']:.2f}%")
     if tr:
-        rows += R._row_html("상장주식 회전율", f'<span style="color:#111;">{tr["v"]:.1f}%</span>', f"한 달 동안 손바뀜 비율 · 12개월 {tr['lo12']:.1f}~{tr['hi12']:.1f}%")
+        rows += _row_html("상장주식 회전율", f'<span style="color:#111;">{tr["v"]:.1f}%</span>', f"한 달 동안 손바뀜 비율 · 12개월 {tr['lo12']:.1f}~{tr['hi12']:.1f}%")
     yg = v.get("yield_gap")
     if yg:   # K29 — 값만
-        rows += R._row_html("일드갭 (배당수익률 − 국고채 3년)", f'<span style="color:{UP if yg["v"] > 0 else DOWN};">{_sgn(yg["v"], 2)}%p</span>',
+        rows += _row_html("일드갭 (배당수익률 − 국고채 3년)", f'<span style="color:{UP if yg["v"] > 0 else DOWN};">{_sgn(yg["v"], 2)}%p</span>',
                             f"국고채 3년 {yg['ktb3']:.2f}% · 양수면 배당이 채권 이자보다 높다 · 기록상 이후 KOSPI 와 관계 없음(값만)")
     ser = per["series"][-12:]
     chart = R._col_chart([(x["month"][2:].replace("-", "."), [x["v"]]) for x in ser], [lambda v: "#CBD5E1"], [lambda v: NOTE], height=120, fmt=lambda v: f"{v:.1f}")
-    rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;"><span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 12개월 KOSPI PER (배)</span>'
+    rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 12개월 KOSPI PER (배)</span>'
              f'<span style="display:block;height:6px;"></span>{chart}</span>')
     tip = ("시장 전체가 이익에 견줘 얼마나 비싼지(PER, 높을수록 비쌈)와 배당으로 돌려주는 비율. 월별 자료라 지난달까지\n"
            f"· {mo} PER {per['v']:.1f}배 : 12개월 범위의 {_pos(per):.0f}% 지점" + (f" · 배당수익률 {dy['v']:.2f}%" if dy else "")
@@ -1124,15 +1132,15 @@ def sec_derivatives(m):
         return ""
     mo = f"{d['month'][:4]}년 {int(d['month'][5:])}월"
     pc = d["put_call"]
-    rows = R._row_html("풋/콜 거래량 비율", f'<span style="color:{UP if pc > 1 else "#111"};">{pc:.2f}</span>', f"{mo} · 1 넘으면 풋(하락 대비)이 더 많이 거래됨 · 12개월 {d['pc_lo12']:.2f}~{d['pc_hi12']:.2f}", first=True)
+    rows = _row_html("풋/콜 거래량 비율", f'<span style="color:{UP if pc > 1 else "#111"};">{pc:.2f}</span>', f"{mo} · 1 넘으면 풋(하락 대비)이 더 많이 거래됨 · 12개월 {d['pc_lo12']:.2f}~{d['pc_hi12']:.2f}", first=True)
     fa, oa = d.get("fut_amt_avg"), d.get("opt_amt_avg")
     if fa:
-        rows += R._row_html("주가지수선물 하루 거래금액", f'<span style="color:#111;">{fa["v"] / 1e6:.1f}조</span>', f"{mo} 일평균 · 12개월 {fa['lo12'] / 1e6:.1f}~{fa['hi12'] / 1e6:.1f}조")
+        rows += _row_html("주가지수선물 하루 거래금액", f'<span style="color:#111;">{fa["v"] / 1e6:.1f}조</span>', f"{mo} 일평균 · 12개월 {fa['lo12'] / 1e6:.1f}~{fa['hi12'] / 1e6:.1f}조")
     if oa:
-        rows += R._row_html("주가지수옵션 하루 거래대금", f'<span style="color:#111;">{oa["v"] / 1e6:.2f}조</span>', f"{mo} 일평균 · 12개월 {oa['lo12'] / 1e6:.2f}~{oa['hi12'] / 1e6:.2f}조")
+        rows += _row_html("주가지수옵션 하루 거래대금", f'<span style="color:#111;">{oa["v"] / 1e6:.2f}조</span>', f"{mo} 일평균 · 12개월 {oa['lo12'] / 1e6:.2f}~{oa['hi12'] / 1e6:.2f}조")
     ser = d["pc_series"]
     chart = R._col_chart([(x["month"][2:].replace("-", "."), [x["v"]]) for x in ser], [lambda v: "#ED8E87" if v > 1 else "#CBD5E1"], [lambda v: NOTE], height=120, fmt=lambda v: f"{v:.2f}")
-    rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;"><span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 12개월 풋/콜 거래량 비율</span>'
+    rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 12개월 풋/콜 거래량 비율</span>'
              f'<span style="display:block;height:6px;"></span>{chart}</span>')
     tip = ("선물 · 옵션 시장의 분위기. 풋옵션(내릴 때 이익)이 콜옵션보다 많이 거래되면 하락에 대비하는 투자자가 많다는 뜻. 월별 자료라 지난달까지 — 일별 풋콜비율은 거래소 유료 자료라 두지 않는다\n"
            f"· {mo} 풋/콜 {pc:.2f} : 12개월 {d['pc_lo12']:.2f}~{d['pc_hi12']:.2f}")
@@ -1176,10 +1184,10 @@ def sec_macro(m):
         chg = ""
         if x.get("prev") is not None:
             d = v - x["prev"]
-            chg = (f" · 전년 같은 분기보다 {_sgn(d, 1)}%p" if x.get("quarterly") else f" · 전달보다 {_sgn(d, 1)}{'%p' if kind == 'yoy' else ''}")
+            chg = (f" · 전년 같은 분기보다 {_sgn(d, 1)}%p" if x.get("quarterly") else f" · 전달보다 {_sgn(d, 1)}{'%p' if kind == 'yoy' else 'p'}")
         mo = f"{x['month'][:4]}년 {x['month'][5:]}분기" if x.get("quarterly") else f"{x['month'][:4]}년 {int(x['month'][5:])}월"
         rng = "최근 4분기 범위" if x.get("quarterly") else "12개월 범위"
-        rows += R._row_html(name, f'<span style="color:{col};">{txt}</span>', f"{mo}{chg} · {rng}의 {pos:.0f}% 지점 · {note}", first=first)
+        rows += _row_html(name, f'<span style="color:{col};">{txt}</span>', f"{mo}{chg} · {rng}의 {pos:.0f}% 지점 · {note}", first=first)
         first = False
     if not rows:
         return ""
@@ -1201,7 +1209,7 @@ def sec_household(m):
     rows, first = "", True
     def row(name, right, note):
         nonlocal rows, first
-        rows += R._row_html(name, right, note, first=first)
+        rows += _row_html(name, right, note, first=first)
         first = False
     def yoy_txt(x, unit="%"):
         return f" · 전년 같은 분기보다 {_sgn(x['yoy'], 1)}%" if x and x.get("yoy") is not None else ""
@@ -1221,11 +1229,11 @@ def sec_household(m):
         v = sb["v"] / 1e3   # 십억 → 조
         row("가계의 국내 주식 순취득", f'<span style="color:{UP if v > 0 else DOWN};">{_sgn(v, 1)}조 원</span>', f"{_qlabel(sb['q'])} 한 분기 동안 산 금액 − 판 금액 · 양수면 개인이 주식을 늘림")
         chart = R._col_chart([(x["q"][2:].replace("Q", "."), [x["v"] / 1e3]) for x in sb["series"]], [R._sign_bg], [R._sign_fg], height=120, fmt=lambda v: f"{v:+.1f}".replace("-", "−"))
-        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;"><span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 {len(sb["series"])}분기 가계의 국내 주식 순취득 (조 원)</span>'
+        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 {len(sb["series"])}분기 가계의 국내 주식 순취득 (조 원)</span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')
     c = hh.get("hh_credit")
     if c:
-        rows += R._row_html("가계신용 잔액", f'<span style="color:#111;">{c["v"] / 1e3:,.0f}조 원</span>', f"{_qlabel(c['q'])} · 가계 빚 전체(대출 + 카드){yoy_txt(c)} · 빠르게 늘면 살 여력이 줄어든다")
+        rows += _row_html("가계신용 잔액", f'<span style="color:#111;">{c["v"] / 1e3:,.0f}조 원</span>', f"{_qlabel(c['q'])} · 가계 빚 전체(대출 + 카드){yoy_txt(c)} · 빠르게 늘면 살 여력이 줄어든다")
     tip = ("개인이 주식을 살 여력이 있나를 소득이 아니라 '남는 돈' 과 '실제로 넣은 돈' 으로 본다. 분기 자료라 한 분기 늦게\n"
            + (f"· 흑자액 {s['v'] / 1e4:,.0f}만 원{yoy_txt(s)}" if s else "")
            + (f" · 가계 주식 순취득 {_sgn(sb['v'] / 1e3, 1)}조 원" if sb else ""))
@@ -1242,18 +1250,18 @@ def sec_overnight(m):
         b, rec = x["before"], x.get("record")
         val = (f'<span style="color:{UP if b["ret"] > 0 else DOWN if b["ret"] < 0 else "#111"};">{_sgn(b["ret"], 2)}p</span>' if b["points"] else R._arrow(b["ret"]))
         note = f"미국 {_md(b['day'])} 종가" + (f" · 기록상 다음날 {rec[2]} 차이 {_sgn(rec[0], 2)}%p" if rec else "")
-        rows += R._row_html(x["label"], val, note, first=first)
+        rows += _row_html(x["label"], val, note, first=first)
         first = False
     k = (m or {}).get("kospi")
     if k and k.get("ret_1d") is not None:
-        rows += R._row_html("KOSPI", R._arrow(k["ret_1d"]), f"오늘 {_md(k['day'])} 종가", inline_note=True)
+        rows += _row_html("KOSPI", R._arrow(k["ret_1d"]), f"오늘 {_md(k['day'])} 종가", inline_note=True)
     w = (m or {}).get("wti")
     if w and w.get("chg_1d") is not None:
-        rows += R._row_html("WTI 유가", f'<span style="color:#111;">{w["v"]:.1f}달러</span><br><span style="font-size:{TINY};font-weight:400;color:{UP if w["chg_1d"] > 0 else DOWN};">{_sgn(w["chg_1d"], 1)}%</span>',
+        rows += _row_html("WTI 유가", f'<span style="color:#111;">{w["v"]:.1f}달러</span><br><span style="font-size:{TINY};font-weight:400;color:{UP if w["chg_1d"] > 0 else DOWN};">{_sgn(w["chg_1d"], 1)}%</span>',
                             f"{_md(w['day'])} · 20일 {_sgn(w['chg_n'], 1)}% · 기록상 다음날 한국전력 차이 {_sgn(U.WTI_RECORD[0], 2)}%p (종목 카드)")
     latest = [x["latest"] for x in ov if x.get("latest")]
     for l in latest:
-        rows += R._row_html(f'{_esc(U.US_MARKET.get(l["sym"], l["sym"]))} {_small("그 뒤 미국 종가")}',
+        rows += _row_html(f'{_esc(U.US_MARKET.get(l["sym"], l["sym"]))} {_small("그 뒤 미국 종가")}',
                             (f'<span style="color:{UP if l["ret"] > 0 else DOWN};">{_sgn(l["ret"], 2)}p</span>' if l["points"] else R._arrow(l["ret"])), f"미국 {_md(l['day'])} · 다음 한국장 전 참고")
     by = {x["sym"]: x["before"]["ret"] for x in ov}
     recs = " · ".join(f"{U.US_MARKET[t].split(' ')[0]} {_sgn(U.OVERNIGHT_RECORD[t][0], 2)}" for t in ("EWY", "^SOX", "^VIX", "DX-Y.NYB") if t in U.OVERNIGHT_RECORD)
@@ -1291,7 +1299,7 @@ def list_row(s, first):
             f'<a href="{_esc(U.page_url(s["sym"]))}" style="color:#111;text-decoration:none;">{_esc(s["name"])}</a>'
             f'<span style="display:block;padding-left:52px;font-size:{_dk.MICRO};line-height:20px;font-weight:400;color:{NOTE};">{_esc(s["code"])} · {cap_text(s["cap"])}</span>')
     right = f'<span style="color:{pcol};">{won(s["close"])}</span><br>{R._arrow(r)}'
-    return R._row_html(left, right, first=first).replace("<span", '<span data-row-link="1"', 1)
+    return _row_html(left, right, first=first).replace("<span", '<span data-row-link="1"', 1)
 
 
 def list_body(a):
@@ -1304,7 +1312,7 @@ def list_body(a):
     body = (list_lead(a) + R._card_title("시가총액 순위", tip) + card(top)
             + (_dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest)) if rest else "")
             + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다.")
-            + sec_flows(a.get("market")) + related())
+            + related())   # 시장 흐름 카드는 한국 증시 리포트로 옮김 — 목록은 미국처럼 순위만 (2026-10-26 사용자, 리포트 기획 M8)
     return wrap(body)
 
 

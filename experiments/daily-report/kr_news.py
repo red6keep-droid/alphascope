@@ -39,19 +39,22 @@ def rows_now():
     return media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=2))
 
 
-def section(rows, hours=HOURS):
-    """표시 주석으로 감싼 구획 HTML. 공용 뉴스 카드: 방송 주제(영상 링크) / 방송 주장 / [한국 종목 · 분야] [방향] [예상 밖] [방송]  시각 · 채널.
+def section(rows, hours=HOURS, pick=None, shown=None):
+    """표시 주석으로 감싼 구획 HTML. 공용 뉴스 카드: 방송 주제(영상 링크) / 방송 주장 / [한국 종목 · 분야] [방향] [예상 밖]  시각 · 채널 · 방송 n곳.
     소식이 없으면 표시만 (빈 칸)."""
     since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M")
     items = []
-    for r in media_feed.korea(media_feed.issues(rows, since), MAX):   # 같은 이슈는 한 줄로 정리한 뒤
+    for r in (pick or media_feed.korea)(media_feed.issues(rows, since), MAX):   # 같은 이슈는 한 줄로 정리한 뒤 — pick: 고르는 규칙(한국 증시 리포트는 한국 채널만, 2026-10-26)
         d = r["direction"]
         labels = " ".join([dk.pill(media_feed.kr_label(r), bare=True),
                            dk.pill({"positive": "긍정", "negative": "부정"}.get(d, "중립"), d if d in ("positive", "negative") else "neutral", bare=True)]
-                          + ([dk.pill("예상 밖", "uncertain", bare=True)] if r["surprise"] else []) + [dk.pill(media_feed.LABEL, bare=True)])
+                          + ([dk.pill("예상 밖", "uncertain", bare=True)] if r["surprise"] else []))   # `방송` 라벨은 뺀다 — 메타의 채널 · 방송 n곳과 같은 정보 (2026-10-26 사용자)
         meta = [_kst_hm(r["published_at"]), r["channel"], f"방송 {r['n_channels']}곳" if r["n_channels"] > 1 else ""]
         items.append(dk.news_item(html_mod.escape(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"'))
-    body = dk.keep_tone(dk.section(TITLE, dk.item_rules(items, sub=True, indent=dk.ALIGN_PX), tab=TAB)) if items else ""   # 방송 소식 = 헤드라인체 그대로
+    lst = dk.item_rules(items[:shown] if shown else items, sub=True, indent=dk.ALIGN_PX)
+    if shown and len(items) > shown:   # 앞 shown 건만 펼쳐 두고 나머지는 접기 (한국 증시 리포트 2026-10-26 사용자: "너무 길다")
+        lst += dk.fold(f"방송 {len(items) - shown}건 더 보기", dk.item_rules(items[shown:], sub=True, indent=dk.ALIGN_PX))
+    body = dk.keep_tone(dk.section(TITLE, lst, tab=TAB)) if items else ""   # 방송 소식 = 헤드라인체 그대로
     return MARK_OPEN + body + MARK_CLOSE
 
 

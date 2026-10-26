@@ -83,7 +83,7 @@ def _stock_chart(title, members, key="ret_20d", fmt=None, height=140):
     if not ms:
         return ""
     chart = R._col_chart([(m.get("label") or _short(m["sym"]), [m[key]]) for m in ms], [R._sign_bg], [R._sign_fg], height=height, fmt=fmt)
-    return R._card_title(title) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:12px 12px 4px;">{chart}</span></span></div>'
+    return R._card_title(title) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span></div>'   # 그래프 카드 위아래 10 (2026-10-26)
 
 
 # ── A. AI 투자 ──────────────────────────────────────────────────────────
@@ -104,7 +104,7 @@ def body_ai(t, a, day, guide):
     lines = [("row", b["name"], f"{_pp(b['rel_20d'])}%p", f"{b['state']} · 20일 {_pp(b['ret_20d'])}% (S&P {_pp(a['bench_ret_20d'])}%)") for b in bs]
     chart = R._col_chart([(b["name"], [b["ret_20d"], a["bench_ret_20d"]]) for b in bs], [R._sign_bg, lambda v: R._GRAY_BAR], [R._sign_fg, lambda v: NOTE], height=130)
     legend = R._legend_chips([("갈래 오름", R._PASTEL_UP), ("갈래 내림", R._PASTEL_DN), ("S&P 500", R._GRAY_BAR)])
-    lines.append((f'<span style="display:block;padding:6px 12px 0;">{dk.legend_top(chart, legend)}</span>', "html"))
+    lines.append((f'<span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">{dk.legend_top(chart, legend)}</span></span>', "html"))   # 그래프는 흰 카드 (2026-10-26 가이드라인: 강조 카드 안 흰 카드 = 그래프만)
     tip = (f"갈래마다 동일가중 바스켓의 20거래일 수익률에서 S&P 500 수익률을 뺀 값. +{T.FLOW_PP:.0f}%p 넘으면 유입, −{T.FLOW_PP:.0f}%p 아래면 유출\n"
            "· 세 갈래가 같이 유입이면 AI 테마 자체로 돈이 오는 것, 한 갈래만이면 다른 이유일 수 있다")
     cards = R._state_card("돈이 몰리나?", a["state"], a["theme_kind"], KIND_COLOR[a["theme_kind"]], lines, "", tip=dk.with_src(tip, "Yahoo Finance"), fold=True, opened=True)
@@ -177,7 +177,7 @@ def body_fed(t, a, day, guide):
     if len(gs) >= 20:
         pts = [gs[-1 - k] for k in (60, 40, 20, 10, 5, 0) if k < len(gs)]
         chart = R._col_chart([(f"{p[0][5:7]}.{p[0][8:10]}", [p[1]]) for p in pts], [R._sign_bg], [R._sign_fg], height=120, fmt=lambda v: f"{v:+.0f}".replace("-", "−"))
-        lines.append((f'<span style="display:block;padding:6px 12px 0;"><span style="display:block;font-weight:700;color:#111;font-size:{dk.NAME};">기준금리 − 2년물 (bp)</span>{chart}</span>', "html"))
+        lines.append((f'{dk.CHART_TITLE_M}기준금리 − 2년물 (bp)</span><span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span>', "html"))   # ※ 제목은 카드 밖 · 그래프만 흰 카드 (2026-10-26)
     cards += R._state_card("기대가 커지나, 줄어드나?", a["state"], a["theme_kind"], KIND_COLOR[a["theme_kind"]], lines, "", tip="차이의 20거래일 변화. 커지면 시장이 더 빨리 · 더 많이 내릴 것으로 보는 것", fold=True)
 
     cd = a.get("cpi_days") or []
@@ -187,7 +187,7 @@ def body_fed(t, a, day, guide):
         k3 = "negative" if last["y2_change_bp"] > 0 else "positive" if last["y2_change_bp"] < 0 else "neutral"   # 2년물 오름 = 인하 기대 후퇴 → 파랑
         lines = [("row", f"{_md(x['day'])} CPI 발표", f"{_pp(x['y2_change_bp'], 0)}bp", "발표일 2년물 변화 (전일 대비)") for x in reversed(cd)]
         chart = R._col_chart([(f"{x['day'][5:7]}.{x['day'][8:10]}", [x["y2_change_bp"]]) for x in cd], [R._sign_bg], [R._sign_fg], height=110, fmt=lambda v: f"{v:+.0f}".replace("-", "−"))
-        lines.append((f'<span style="display:block;padding:6px 12px 0;">{chart}</span>', "html"))
+        lines.append((f'<span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span>', "html"))   # 그래프는 흰 카드 (2026-10-26)
         cards += R._state_card("CPI 발표 뒤 2년물은?", st3, k3, KIND_COLOR[k3], lines, "", tip="소비자물가 발표일 2년물 금리의 하루 변화. 오르면 시장이 인하 기대를 줄인 날. 30건이 쌓이기 전에는 통계를 말하지 않는다", fold=True)
     out += _cards(cards)
 

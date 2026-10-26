@@ -174,7 +174,7 @@ def sec_periods(s):
         return ""
     chart = R._col_chart([(p["label"], [p["stock"], p.get("spy")]) for p in ps], [R._sign_bg, lambda v: R._GRAY_BAR], [R._sign_fg, lambda v: NOTE])
     legend = R._legend_chips([(f"{s['name']} 오름", R._PASTEL_UP), (f"{s['name']} 내림", R._PASTEL_DN), ("S&P 500", R._GRAY_BAR)])
-    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{PAD + 6}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
+    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
     return R._card_title("기간별 수익률 (%)", periods_tip(s, ps)) + card
 
 
@@ -218,7 +218,7 @@ def sec_earnings(s, today):
         rows += R._row_html("발표 다음 날 보통 변동", f"±{e['median_abs']:.1f}%", note, first=first)
         chart = R._col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in e["moves"]], [R._sign_bg], [R._sign_fg], height=130)
         rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">'
-                 f'<span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">최근 {n}번의 실적 발표 다음 날 (%)</span>'
+                 f'{_dk.CHART_TITLE}최근 {n}번의 실적 발표 다음 날 (%)</span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')
     if head and rows:   # 다음 발표 줄 오른쪽 접기 버튼 — 보통 변동 · 최근 8번은 펼쳤을 때만 (2026-10-18 사용자)
         k = head.rfind("</span></span>")
@@ -512,7 +512,7 @@ def cal_peers(s, c):
     if syms:
         chart = R._chart_card([(U.peer_name(x), [c["effect"][x]["median"], c["normal"]]) for x in syms], [lambda v: R._AMBER, R._gray], [R._note_fg, R._note_fg],
                               [(f"그 회사 발표 다음 날 {nm}", R._AMBER), (f"{nm} 보통 날", R._GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
-        lines.append((f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">발표 다음 날 {_esc(nm)} 움직임 (%)</span>{chart}', "html"))
+        lines.append((f'{_dk.CHART_TITLE_M}발표 다음 날 {_esc(nm)} 움직임 (%)</span>{chart}', "html"))
     for u in up:
         e = c["effect"].get(u["symbol"]) or {}
         lines.append(("row", f"{U.peer_name(u['symbol'])} ({u['symbol']})", R._md_short(u["day"]),
