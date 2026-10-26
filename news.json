@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-10-26 00:46:16 UTC",
+  "updated_at": "2026-10-26 02:46:20 UTC",
   "items": [
     {
-      "title": "Brazil's Lula wins presidential election in runoff vote",
+      "title": "Brazil's Lula wins historic presidential election; Bolsonaro reportedly refuses to concede",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/26/brazil-lula-win-presidential-election-runoff-vote.html",
-      "published": "2026-10-26 00:44:02",
+      "published": "2026-10-26 02:18:09",
       "title_ko": "브라질 루라, 결선 투표에서 대통령 선거 승리",
       "summary_ko": ""
     },
@@ -16,6 +16,14 @@
       "published": "2026-10-26 00:37:51",
       "title_ko": "스페이스X, AI 칩 400억 달러 부채 거래 성사… 일론 머스크 발표",
       "summary_ko": "GPU 구매를 위한 부채 조달"
+    },
+    {
+      "title": "Behind ‘Mad Money’ was a brilliant writer viewers never saw. We lost him too soon",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/10/25/jim-cramer-remembers-cliff-mason.html",
+      "published": "2026-10-26 00:28:36",
+      "title_ko": "‘Mad Money’ 뒤에는 시청자들이 보지 못한 뛰어난 작가가 있었다. 우리는 그를 너무 일찍 잃었다",
+      "summary_ko": "41세 사망"
     },
     {
       "title": "‘Ticking time bomb’: The world's pension funds face an ageing crisis",
@@ -100,14 +108,6 @@
       "tag": "매크로",
       "direction": "neutral",
       "n_channels": 2
-    },
-    {
-      "title": "I paid off $11,000 of credit card debt in 18 months while still traveling, shopping and living my life",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/10/25/pay-off-credit-card-debt.html",
-      "published": "2026-10-25 14:00:01",
-      "title_ko": "여행과 쇼핑을 즐기며 18개월 만에 11,000달러 신용카드 부채 상환",
-      "summary_ko": "여행, 쇼핑, 외식 중 발생한 부채 2년 내 전액 상환"
     }
   ]
 }
