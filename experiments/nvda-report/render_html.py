@@ -564,7 +564,8 @@ def year_range_in(y, money, tip, bg, bd):
              f'<span style="position:absolute;left:0;top:0;height:8px;width:{pos:.1f}%;border-radius:4px;background:#BFDBFE;"></span>'
              f'<span style="position:absolute;top:-4px;left:{pos:.1f}%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#111;border:2px solid #fff;box-sizing:border-box;"></span></span>')
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
-            f'<span>최저 {money(y["low"])}</span><span>(오늘 {money(y["close"])})</span><span>최고 {money(y["high"])}</span></span>')
+            f'<span style="white-space:nowrap;">최저 {money(y["low"])}</span><span style="white-space:nowrap;">최고 {money(y["high"])}</span></span>')
+    # 가운데 `(오늘 …)` 는 뺐다 — 같은 카드 머리 줄에 오늘 가격이 있고, 셋이면 폰에서 두 줄로 꺾인다 (2026-10-26 사용자: 같이 고쳐). 최저 · 최고는 줄바꿈 금지
     return (f'<span data-in-card="1" style="display:block;background:{bg};border:1px solid {bd};border-top:0;border-radius:0 0 8px 8px;'
             f'padding:10px 12px 12px;line-height:{LH_CARD};white-space:normal;">{head}{track}{ends}</span>')
 
