@@ -551,8 +551,9 @@ def _multi_single(rows):
 
 
 def year_range_in(y, money, tip):
-    """가격 범위 (1년) 흰 카드 — 가격 정보 강조 카드 펼침 안 (2026-10-26 사용자: "가격정보 강조 카드를 펼치면 가격 범위를 카드 안에 넣을 수 있어",
-    제목 `1년 가격 범위` → `가격 범위 (1년)`). 한 줄 = 제목 · 최고가 대비, 아래 막대 · 최저 · 최고. money = 금액 표기 함수(달러 · 원화)."""
+    """가격 범위 (1년) — 가격 정보 강조 카드 펼침 안 (2026-10-26 사용자: "가격정보 강조 카드를 펼치면 가격 범위를 카드 안에 넣을 수 있어",
+    제목 `1년 가격 범위` → `가격 범위 (1년)`). 한 줄 = 제목 · 최고가 대비, 아래 막대 · 최저 · 최고. money = 금액 표기 함수(달러 · 원화).
+    흰 카드 없이 강조 바탕 위 — 같은 날 사용자: "기간별 수익률 빼고 나머지는 강조 카드 안 디자인 스타일대로"."""
     if not y:
         return ""
     pos = max(0.0, min(100.0, y["pos_pct"]))
@@ -565,20 +566,33 @@ def year_range_in(y, money, tip):
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;font-size:{TINY};line-height:20px;color:{NOTE};">'
             f'<span style="white-space:nowrap;">최저 {money(y["low"])}</span><span style="white-space:nowrap;">최고 {money(y["high"])}</span></span>')
     # 가운데 `(오늘 …)` 는 뺐다 — 같은 카드 머리 줄에 오늘 가격이 있고, 셋이면 폰에서 두 줄로 꺾인다 (2026-10-26 사용자: 같이 고쳐). 최저 · 최고는 줄바꿈 금지
-    return f'<span style="display:block;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px 12px;">{head}{track}{ends}</span>'
+    return ("flat", f'<span style="display:block;padding:10px 12px 12px;">{head}{track}{ends}</span>')
 
 
 _SEC_RE = re.compile(r'<div style="[^"]*margin:25px 0 8px;">(.*?)</div><div data-cards="1" style="margin:0 0 8px;"><span style="[^"]*">(.*)</span></div>$', re.S)
+_WHITE_CARD = "margin:0 0 6px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;"   # MULTI · design_kit.MULTI 의 흰 카드 부분
 
 
-def in_card(sec):
-    """카드 제목 + 흰 카드 한 덩이(`_card_title(...)` + `<div data-cards><span MULTI>…`)를 강조 카드 안 흰 카드로 — 제목은 흰 카드 첫 줄 (2026-10-26 사용자:
-    기간별 수익률 · 고점 하락 후 가격 회복도 가격 정보 카드 안에). 그래프는 강조 바탕에 바로 두지 않고 흰 카드 안 (가이드라인 5-9)."""
+def in_card(sec, white=False):
+    """카드 제목 + 흰 카드 한 덩이(`_card_title(...)` + `<div data-cards><span MULTI>…`)를 강조 카드 안으로 — 제목은 첫 줄 (2026-10-26 사용자:
+    기간별 수익률 · 고점 하락 후 가격 회복도 가격 정보 카드 안에). white=True 는 흰 카드 그대로(그래프 — 가이드라인 5-9),
+    아니면 강조 바탕 위 줄(같은 날 사용자: "기간별 수익률 빼고 나머지는 강조 카드 안 디자인 스타일대로")."""
     m = _SEC_RE.match(sec or "")
     if not m:
-        return sec or ""
-    return (f'<span style="{MULTI}margin:0;"><span style="display:block;padding:10px 12px 0;font-weight:700;color:#111;font-size:{_dk.NAME};">{m.group(1)}</span>'
-            f'{m.group(2)}</span>')
+        return ("flat", sec) if sec else ""
+    title = f'<span style="display:block;padding:10px 12px 0;font-weight:700;color:#111;font-size:{_dk.NAME};">{m.group(1)}</span>'
+    if white:
+        return ("white", f'<span style="{MULTI}margin:0;">{title}{m.group(2)}</span>')
+    return ("flat", f'<span style="display:block;font-size:{SMALL};">{title}{m.group(2)}</span>')
+
+
+def _flatten(html, bg, bd, bd_row):
+    """흰 카드 · 회색 구분선 → 강조 카드 안 모양: 카드 바탕 없이 줄 사이 연한 구분선(상태 카드 펼침과 같은 색), 접기 버튼은 강조 카드 버튼 색."""
+    html = html.replace("padding:8px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;",
+                        f"padding:8px 12px;background:{_dk.lighten(bg)};border:1px solid {bd};border-radius:8px;")   # `차트 지표 보기` 버튼 (_fold_row)
+    html = html.replace(ACC_BTN, _fold_btn(_dk.lighten(bg), bd))   # 줄 끝 작은 접기 버튼(고점 회복)도 가격 줄 버튼과 같은 색
+    html = html.replace(_WHITE_CARD, f"margin:0;background:transparent;border:0;border-top:1px solid {bd_row};border-radius:0;")
+    return html.replace("1px solid #E2E8F0", f"1px solid {bd_row}")
 
 
 def rows_after(rows):
@@ -587,15 +601,24 @@ def rows_after(rows):
 
 
 def price_in(bg, bd, parts):
-    """가격 정보 강조 카드 펼침 안 — 머리 줄 바로 아래 같은 바탕 · 테두리로 이어지고, 안에 흰 카드들(가격 범위 · 기간별 수익률 · 고점 회복) · `차트 지표 보기` 를 8px 간격으로.
+    """가격 정보 강조 카드 펼침 안 — 머리 줄 바로 아래 같은 바탕 · 테두리로 이어진다. parts = (모양, html) 또는 html(접기 등, 강조 모양으로).
+    순서 = 가격 범위 → 기간별 수익률(흰 카드) → 고점 회복 → `차트 지표 보기`. 사이는 상태 카드 펼침과 같은 연한 구분선.
     펼친 동안 머리 줄 아래 모서리는 테마 CSS 가 편다 (`details[data-acc][open] > summary:has(+ [data-in-card]) > span:first-child`)."""
-    # `차트 지표 보기` 접기도 카드 안 (같은 날 사용자) — 바깥용 아래 여백(margin:0 0 8px)은 뗀다. 접기 · details 가 들어가므로 상자는 div
-    cards = [x.replace('<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;">', '<details data-fold="1" data-label="차트 지표 보기" style="margin:0;">', 1) for x in parts if x]
-    if not cards:
+    bd_row = _dk.lighten(_dk.lighten(bd), 0.3)   # 상태 카드 펼침 안 줄 사이 구분선과 같은 색
+    items = [x if isinstance(x, tuple) else ("flat", x) for x in parts if x]
+    if not items:
         return ""
-    inner = "".join(f'<div style="{"margin-top:8px;" if k else ""}">{c}</div>' for k, c in enumerate(cards))
+    out = ""
+    for k, (kind, html) in enumerate(items):
+        # `차트 지표 보기` 접기 — 바깥용 아래 여백(margin:0 0 8px)은 떼고 버튼 둘레 12px (같은 날 사용자)
+        html = html.replace('<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;">', '<details data-fold="1" data-label="차트 지표 보기" style="margin:0;padding:12px;">', 1)
+        sep = f"border-top:1px solid {bd_row};" if k else ""
+        if kind == "white":
+            out += f'<div style="{sep}padding:12px;">{html}</div>'
+        else:
+            out += f'<div style="{sep}">{_flatten(html, bg, bd, bd_row)}</div>'
     return (f'<div data-in-card="1" style="background:{bg};border:1px solid {bd};border-top:0;border-radius:0 0 8px 8px;'
-            f'padding:12px;line-height:{LH_CARD};white-space:normal;">{inner}</div>')
+            f'line-height:{LH_CARD};white-space:normal;">{out}</div>')
 
 
 def dd_tip(d):
@@ -761,7 +784,7 @@ def sec_headline(a, n=None):
              f'<div style="margin-top:6px;">{deep}</div></details>')
     rows_html = rows_after(rows)   # 카드 밖에 남는 것 — 평소 범위 밖 설명 · 실적 발표 후 가격 변동
     out = (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-           f'{price_in(bg, bd, [year_range_in(a.get("year_range"), lambda v: f"${v:,.2f}", year_tip(a["year_range"]) if a.get("year_range") else ""), in_card(sec_periods(a)), in_card(sec_drawdown(a)), fold])}'
+           f'{price_in(bg, bd, [year_range_in(a.get("year_range"), lambda v: f"${v:,.2f}", year_tip(a["year_range"]) if a.get("year_range") else ""), in_card(sec_periods(a), white=True), in_card(sec_drawdown(a)), fold])}'
            f'{rows_html}</details></div>')
     out += sec_state_cards(a)   # 시장 국면 · 반도체 자금 — 이유를 담은 별도 카드 둘 (2026-10-11 사용자)
     if not a.get("is_latest_bar_today"):
