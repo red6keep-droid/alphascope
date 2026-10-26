@@ -69,8 +69,11 @@ STEPS = {
              "params": {"reasoning_effort": "low", "max_completion_tokens": 8000}},   # 분당 8,000토큰 → 호출 간격 60초
     "groq-qwen": {"kind": "openai", "env": "GROQ_API_KEY", "url": "https://api.groq.com/openai/v1/chat/completions",
                   "model": "qwen/qwen3.8-27b", "min_interval": 60, "timeout": 120,
-                  "otpm": 1000,   # 분당 출력 1,000토큰이 따로 있다 (2026-10-26 실측 429 OTPM) — 출력 2,000토큰 뒤엔 2분 쉬어야 다음 호출이 받힌다
-                  "params": {"reasoning_effort": "none", "max_completion_tokens": 8000}},   # gpt-oss 와 한도가 따로 (모델마다 분당 8,000토큰)
+                  # 분당 출력 1,000토큰(OTPM)이 따로 있다 (2026-10-26 실측). Groq 는 요청의 예상 출력(= max_completion_tokens 또는 직전 출력량)이
+                  # 1,000을 넘으면 몇 분을 쉬어도 429 로 거절한다 — 출력 상한을 1,000으로 두고 답이 그 안에 들도록 배치를 작게 (뉴스 4건 · 인용 추출 16묶음).
+                  # 같은 조건에서 62초 간격 3연속 성공(출력 817 ~ 905). 답이 1,000을 넘으면 잘려 JSON 이 깨지고 다음 단계로 넘어간다
+                  "otpm": 1000,
+                  "params": {"reasoning_effort": "none", "max_completion_tokens": 1000}},   # gpt-oss 와 한도가 따로 (모델마다 분당 8,000토큰)
     "nvidia-deepseek": {"kind": "openai", "env": "NVIDIA_API_KEY", "url": "https://integrate.api.nvidia.com/v1/chat/completions",
                         "model": "deepseek-ai/deepseek-v4.1-flash", "timeout": 300,
                         "params": {"max_tokens": 8000, "chat_template_kwargs": {"thinking": False}}},   # 사고 끄기 — 켜면 답이 비거나 5분 초과
@@ -153,6 +156,7 @@ atexit.register(_notify_summary)
 _EXHAUSTED_KEYS = set()
 _ready_at = {}   # (주소, 모델) → 다음 호출 가능 시각 (분당 토큰 한도 간격용 — Groq 는 모델마다 한도가 따로)
 RATE_RETRY_MAX_WAIT = 150   # 분당 한도 429 는 이만큼까지 기다렸다 한 번 더 (그보다 길면 다음 단계로)
+_day_out = set()   # 하루 한도(TPD · 하루 요청)를 받은 OpenAI 호환 단계 — 이번 실행 동안 모든 사슬에서 건너뛴다 (Gemini 의 PerDay 와 같은 원칙, 2026-10-26)
 
 
 def _groq_reason(text):
@@ -235,6 +239,11 @@ class LLMPool:
         self._next = 0
         print(f"[{label}] 사슬 {chain}: " + " → ".join(f"{s}({STEPS[s]['model']})" for s in self.chain)
               + (f" · Gemini 키 {len(keys)}개" if "gemini" in self.chain else ""))
+
+    @property
+    def first_step(self):
+        """지금 먼저 시도될 단계 — 하루 한도로 빠진 단계는 건너뛴다. 배치 크기를 첫 모델에 맞추는 데 쓴다(news_store)."""
+        return next((s for s in self.chain if s not in _day_out), None)
 
     # ---------------------------------------------------------------- Gemini
     def _pick_key(self, model):
@@ -328,7 +337,7 @@ class LLMPool:
         if max_tokens:
             for k in ("max_tokens", "max_completion_tokens"):
                 if k in body:
-                    body[k] = max(body[k], max_tokens)
+                    body[k] = min(max(body[k], max_tokens), step.get("otpm") or max_tokens)   # 출력 한도가 있는 모델은 그 위로 올리지 않는다
         for attempt in (1, 2):
             try:
                 r = requests.post(step["url"], json=body, timeout=step["timeout"],
@@ -344,6 +353,8 @@ class LLMPool:
             print(f"[{self.label}] {name} 429 {_groq_reason(r.text)} — {wait:.0f}s 뒤 한 번 더")
             time.sleep(wait)
         if r.status_code != 200:
+            if r.status_code == 429 and "per day" in r.text:
+                _day_out.add(name)
             raise StepFailed(f"{name} {r.status_code}: {_groq_reason(r.text)}")
         data = r.json()
         # 토큰을 실제로 쓴 호출만 간격 계산에 (401 · 413 같은 즉시 거절은 제외). 출력 한도가 있으면 쓴 출력만큼 더 쉰다
@@ -360,6 +371,9 @@ class LLMPool:
         errors = []
         for n, name in enumerate(self.chain):
             step = STEPS[name]
+            if name in _day_out:
+                errors.append(f"{name}: 하루 한도 — 이번 실행은 건너뜀")
+                continue
             if n:
                 kind = "대체" if step["kind"] == "gemini" else "예비"   # 같은 Gemini 의 다른 모델은 '대체' — Slack 에서 다른 공급자(예비)와 구분
                 print(f"[{self.label}] {kind} → {name}({step['model']})")

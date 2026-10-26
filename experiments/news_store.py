@@ -22,6 +22,7 @@ import json
 import os
 import re
 import sys
+import time
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
@@ -42,6 +43,12 @@ THEME = {"RATES_FED": "금리", "INFLATION": "매크로", "GROWTH_JOBS": "매크
          "REAL_ESTATE": "매크로", "OTHER": "기타"}
 
 BATCH = 10   # 한 호출 기사 수 — Groq 분당 8,000토큰(입력 + 답) 안에 (2026-10-25, 옛 lite 25)
+QWEN_BATCH = 4   # Qwen 이 첫 단계인 사슬(news)은 4건 — 답이 기사당 약 210토큰이라 10건이면 Qwen 분당 출력 1,000토큰(OTPM)에 걸려
+                 # 그 몫이 전부 gpt-oss 로 넘어가 gpt-oss 하루 토큰 20만이 찼다 (2026-10-26: 10-25 종목 레이더 Qwen 25번 중 11번 429).
+                 # 5건(출력 약 1,100)은 두 번째 호출부터 거절, 4건(817 ~ 905)은 62초 간격 3연속 성공 (llm_chain groq-qwen 주석)
+MAX_MINUTES = 30   # 한 실행의 분류 시간 예산 — gpt-oss 가 하루 한도로 빠지면 Qwen 4건/분만 남아 느려진다. 남은 기사는 다음 실행 (NVDA 워크플로 제한 60분)
+CLASSIFY_HOURS = 48   # 이보다 오래된 새 기사는 AI 에 보내지 않는다 — 목록은 최근 24시간, 중요 이슈도 최신 5줄이라 거의 안 보인다.
+                      # 10-25 새 기사 406건 중 115건(28%)이 2 ~ 8일 전 기사였다 (구글 뉴스 7일 검색이 매일 새로 섞여 들어옴)
 AREAS = ("Earnings", "Flows", "Regulation", "Legal", "Product", "Demand", "Supply", "Corporate", "Macro", "Other")
 DIRS = ("positive", "negative", "uncertain", "neutral")
 EN = {"NVDA": "Nvidia", "AAPL": "Apple", "GOOGL": "Alphabet Google", "MSFT": "Microsoft", "AMZN": "Amazon", "META": "Meta Platforms",
@@ -256,23 +263,34 @@ def classify(store, save, lead_cache=None, label="radar-news"):
     except RuntimeError as e:
         print(f"[news] {e} — 분류 없이 둔다(판단 유보)")
         return store
+    cut = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=CLASSIFY_HOURS)).strftime("%Y-%m-%dT%H:%M")
+    old = sum(1 for v in store.values() if not v.get("ai_model") and v["published_at"][:16] < cut)
+    if old:
+        print(f"[news] {CLASSIFY_HOURS}시간보다 오래된 미분류 {old}건은 AI 에 보내지 않음")
+    deadline = time.time() + MAX_MINUTES * 60
     for round_ in (1, 2):   # 2회째 = 이번 실행에서 문장 탈락한 기사 한 번 더
-        todo = sorted((v for v in store.values() if not v.get("ai_model")), key=lambda v: v["published_at"])
+        todo = sorted((v for v in store.values() if not v.get("ai_model") and v["published_at"][:16] >= cut), key=lambda v: v["published_at"])
         if not todo:
             break
         ok = bad = 0
         leads = _leads(todo, lead_cache)
-        for n, i in enumerate(range(0, len(todo), BATCH)):
+        i = n = 0
+        while i < len(todo):
+            if time.time() > deadline:
+                print(f"[news] 시간 예산 {MAX_MINUTES}분 — 남은 {len(todo) - i}건은 다음 실행에서")
+                break
             pool = pools[n % 2]
+            size = QWEN_BATCH if pool.first_step == "groq-qwen" else BATCH   # gpt-oss 가 하루 한도로 빠지면 두 사슬 모두 Qwen 크기로
             try:
-                res = _call(pool, head, companies, todo[i:i + BATCH], leads)
+                res = _call(pool, head, companies, todo[i:i + size], leads)
             except RuntimeError as e:
                 print(f"[news] 분류 실패 — 남은 {len(todo) - i}건은 다음 실행에서 : {e}")
                 break
             o, b = _apply(store, res, pool.last_model, "news", leads)
             ok, bad = ok + o, bad + b
+            i, n = i + size, n + 1
             save(store)   # 배치마다 저장 — 중간에 멈춰도 분류한 것은 남는다
-            print(f"[news] {round_}회째 {min(i + BATCH, len(todo))}/{len(todo)} ({pool.last_model})", flush=True)
+            print(f"[news] {round_}회째 {min(i, len(todo))}/{len(todo)} ({pool.last_model})", flush=True)
         print(f"[news] {round_}회째 통과 {ok} · 탈락 {bad}")
     print(f"[news] {usage_line()}")
     return store
