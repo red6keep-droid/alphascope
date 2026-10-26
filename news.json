@@ -1,6 +1,38 @@
 {
-  "updated_at": "2026-10-26 18:51:52 UTC",
+  "updated_at": "2026-10-26 20:46:14 UTC",
   "items": [
+    {
+      "title": "Microsoft offers voluntary buyouts to 60,000 employees as AI leads to efficiency push",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/microsoft-msft-voluntary-buyouts.html",
+      "published": "2026-10-26 20:44:50",
+      "title_ko": "마이크로소프트, 6만 명에게 자발적 퇴직 제안",
+      "summary_ko": "인프라 구축과 자본 효율성 균형 추구"
+    },
+    {
+      "title": "Prediction market traders say an Anthropic IPO is near-certain this year after company filed with SEC",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/prediction-markets-think-anthropic-ipo-near-certain-in-2026.html",
+      "published": "2026-10-26 20:08:57",
+      "title_ko": "예측 시장 트레이더들, 앤트로피 IPO 올해 사실상 확실하다고 전망",
+      "summary_ko": "월요일 제출"
+    },
+    {
+      "title": "Trump DOJ unlawfully fired Epstein prosecutor Maurene Comey, judge rules",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/maurene-comey-firing-unlawful-trump.html",
+      "published": "2026-10-26 20:03:58",
+      "title_ko": "트럼프 DOJ, 에피스타인 검사 모린 코미 불법 해고 판정",
+      "summary_ko": "코미, 부수사관으로 소급 복직 명령"
+    },
+    {
+      "title": "As AI becomes more fractured, one names stands out: AMD",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/-as-ai-becomes-more-fractured-one-names-stands-out-amd.html",
+      "published": "2026-10-26 19:38:17",
+      "title_ko": "AI가 파편화될수록, 눈에 띄는 기업: AMD",
+      "summary_ko": ""
+    },
     {
       "title": "Federal Reserve is likely to hold interest rates steady in October. Here's what that means for consumers",
       "source": "CNBC",
@@ -42,14 +74,6 @@
       "summary_ko": ""
     },
     {
-      "title": "Trump DOJ unlawfully fired Epstein prosecutor Maurene Comey, judge rules",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/maurene-comey-firing-unlawful-trump.html",
-      "published": "2026-10-26 18:21:40",
-      "title_ko": "트럼프 DOJ, 에피스타인 검사 모린 코미 불법 해고 판정",
-      "summary_ko": "코미, 부수사관으로 소급 복직 명령"
-    },
-    {
       "title": "이란 관련 중동 긴장 및 미군 대비태세",
       "title_ko": "이란 관련 중동 긴장 및 미군 대비태세",
       "summary_ko": "미국은 이란의 위협에 대응하여 중동 내 군사 기지의 90일 자립 작전 준비 등 전면전 태세를 강화 중",
@@ -60,30 +84,6 @@
       "tag": "지정학",
       "direction": "negative",
       "n_channels": 3
-    },
-    {
-      "title": "Microsoft offers voluntary buyouts to 60,000 employees as AI leads to efficiency push",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/microsoft-msft-voluntary-buyouts.html",
-      "published": "2026-10-26 17:40:30",
-      "title_ko": "마이크로소프트, 6만 명에게 자발적 퇴직 제안",
-      "summary_ko": "인프라 구축과 자본 효율성 균형 추구"
-    },
-    {
-      "title": "The arc of Trump: How the president lost the coalition that put him in the White House",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/trump-approval-midterms-cnbc-survey.html",
-      "published": "2026-10-26 17:36:55",
-      "title_ko": "트럼프의 궤적: 백악관에 올린 연대를 어떻게 잃었나",
-      "summary_ko": "2024년 집권 연대 기반"
-    },
-    {
-      "title": "Lula wins Brazil runoff after prediction markets favored Bolsonaro",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/lula-brazil-election-prediction-markets.html",
-      "published": "2026-10-26 17:29:37",
-      "title_ko": "예측 시장은 볼소나라 우세 전망했으나 룰라가 브라질 결선 승리",
-      "summary_ko": "예측 시장 볼소나라 우세 전망과 상반"
     },
     {
       "title": "연준 10월 금리 동결 예상과 정책 경로",
