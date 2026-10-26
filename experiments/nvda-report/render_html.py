@@ -761,7 +761,7 @@ def sec_headline(a, n=None):
         head = head[:k] + sub + head[k:]
     # 펼침 1층 = 초보자도 읽는 정보 (2026-10-17 사용자: 평균선 · 갭 같은 차트 지표는 우리 방향과 다르다) — 기간별 수익률 · 1년 가격 범위 · 거래량.
     # 2층(접힘) = 차트 보는 분을 위한 지표 — 평균선 · 1일 비교 · 시가 갭 · 일중 변동폭 · 과열(RSI) · 교차, 우리 검증은 ? 툴팁
-    rows = glance_rows(a, n) + sec_earnings(a)   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복은 강조 카드 안 (price_in, 2026-10-26 사용자)
+    rows = glance_rows(a, n) + sec_periods(a) + sec_earnings(a)   # 가격 범위 (1년) · 고점 회복 · 차트 지표 보기는 강조 카드 안, 기간별 수익률은 카드 밖 제목 + 흰 카드 (price_in, 2026-10-26 사용자)
     # 거래량 카드는 뺐다 — 가격 카드 머리 작은 글씨에 늘 있다 (2026-10-18 사용자)
     deep = sec_ma(a)
     deep += _multi2([(f"{tk} 대비", _arrow(h.get(key), 2, "%p")) for key, tk in (("ret_vs_spy", "SPY"), ("ret_vs_smh", "SMH"), ("ret_vs_amd", "AMD"), ("ret_vs_avgo", "AVGO"))])   # 하루 등락 차이 (2026-10-11 사용자)
@@ -784,7 +784,7 @@ def sec_headline(a, n=None):
              f'<div style="margin-top:6px;">{deep}</div></details>')
     rows_html = rows_after(rows)   # 카드 밖에 남는 것 — 평소 범위 밖 설명 · 실적 발표 후 가격 변동
     out = (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-           f'{price_in(bg, bd, [year_range_in(a.get("year_range"), lambda v: f"${v:,.2f}", year_tip(a["year_range"]) if a.get("year_range") else ""), in_card(sec_periods(a), white=True), in_card(sec_drawdown(a)), fold])}'
+           f'{price_in(bg, bd, [year_range_in(a.get("year_range"), lambda v: f"${v:,.2f}", year_tip(a["year_range"]) if a.get("year_range") else ""), in_card(sec_drawdown(a)), fold])}'
            f'{rows_html}</details></div>')
     out += sec_state_cards(a)   # 시장 국면 · 반도체 자금 — 이유를 담은 별도 카드 둘 (2026-10-11 사용자)
     if not a.get("is_latest_bar_today"):
