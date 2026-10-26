@@ -62,18 +62,39 @@ def _title(series):
     return module.match_titles(module.today_kst())   # 새 · 옛(줄표) · 영문 제목 모두 그날 글 (2026-10-18)
 
 
+def _load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _find_people():
+    """인물 발언 레이더 — 제목에 날짜가 없어 주소의 날짜로 찾는다(people-radar/publish.find_same_day).
+    예비 GitHub cron 이 외부 cron 실행 뒤에 한 번 더 전체를 돌려 LLM 호출이 매일 두 배였다 (2026-10-26)."""
+    people_dir = os.path.join(EXPERIMENTS, "people-radar")
+    sys.path.insert(0, people_dir)   # publish.py 가 같은 폴더의 config · render_html 을 import 한다
+    pp = _load("people_publish", os.path.join(people_dir, "publish.py"))
+    tp = _load("trump_publish", os.path.join(EXPERIMENTS, "trump-trend", "publish.py"))
+    day = pp.render_html.today_kst()
+    print(f"확인할 주소 날짜: {day}")
+    hit = pp.find_same_day(tp, day)
+    return hit and hit.get("url")
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--series", choices=["daily", *SERIES_DIRS], default="daily")
+    parser.add_argument("--series", choices=["daily", *SERIES_DIRS, "people"], default="daily")
     args = parser.parse_args()
 
     load_dotenv()
 
-    title = _title(args.series)
-    print(f"확인할 제목: {' / '.join(title)}")
+    if args.series != "people":
+        title = _title(args.series)
+        print(f"확인할 제목: {' / '.join(title)}")
 
     try:
-        url = publish_blogger.find_post_by_title(title)
+        url = _find_people() if args.series == "people" else publish_blogger.find_post_by_title(title)
     except Exception as e:
         # refresh token 이 무효(만료 · 철회 · 비밀번호 변경 · 50개 초과)면 뒤 단계가 다 돌아도 게시에서 실패한다 —
         # Gemini 를 헛쓰기 전에 여기서 멈추고 알린다 (2026-10-21, 운영지침 D2-6 · 10절). 네트워크 같은 일시 오류는 예전처럼 진행

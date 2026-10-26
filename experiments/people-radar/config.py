@@ -27,7 +27,7 @@ TEST_MODE = True
 # ── 3단계 인용 추출 (extract.py) ─────────────────────────────────────────
 # 새 기능은 예비 공급자 먼저, Gemini 는 맨 뒤 (llm_chain 머리말 2026-10-19: 키 하나를 모든 리포트가 나눠 쓴다)
 EXTRACT_CHAIN = "json-backup-first"
-EXTRACT_BATCH = 30            # 묶음 대표 제목 30개 = 호출 1회
+EXTRACT_BATCH = 18            # 묶음 대표 제목 18개 = 호출 1회 — 묶음당 출력 약 50토큰, Groq Qwen 분당 출력 1,000토큰 안 (2026-10-26, 30이면 1,500)
 EXTRACT_SINCE_HOURS = 48      # 아직 추출하지 않은 2차 항목을 볼 범위
 GROUP_JACCARD = 0.45          # 같은 인물 · 48시간 안 제목 토큰 자카드 ≥ 이 값이면 같은 발언 묶음
 # 말한 형태 — 제목에 이것도 인물 이름도 없으면 LLM 전에 버린다 (해설 · 기사 모음 · 이름만 스친 글)
@@ -51,8 +51,8 @@ def gnews(query):
 
 # ── 4단계 분류 (classify.py) ─────────────────────────────────────────────
 # 출력 칸은 세 인물군 공통(trump-trend 와 같은 8칸) — 묶기 · 반응 통계를 그대로 쓰려고. 주제 목록만 인물군별 (기획 2절)
-CLASSIFY_CHAIN = "json-backup-first"
-NARRATE_CHAIN = "json-backup-first"   # 카드 한국어 요약 (narrate.py)
+CLASSIFY_CHAIN = "json-oss-first"    # 출력이 길어(20건 약 2천 토큰) Qwen 출력 한도에 걸린다 — gpt-oss 먼저 (llm_chain 10-26)
+NARRATE_CHAIN = "json-oss-first"     # 카드 한국어 요약 (narrate.py) — 같은 이유
 CLASSIFY_BATCH = 20
 CLASSIFY_TEXT_MAX = 1500
 TOPICS_BY_GROUP = {

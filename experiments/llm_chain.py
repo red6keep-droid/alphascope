@@ -69,6 +69,7 @@ STEPS = {
              "params": {"reasoning_effort": "low", "max_completion_tokens": 8000}},   # 분당 8,000토큰 → 호출 간격 60초
     "groq-qwen": {"kind": "openai", "env": "GROQ_API_KEY", "url": "https://api.groq.com/openai/v1/chat/completions",
                   "model": "qwen/qwen3.8-27b", "min_interval": 60, "timeout": 120,
+                  "otpm": 1000,   # 분당 출력 1,000토큰이 따로 있다 (2026-10-26 실측 429 OTPM) — 출력 2,000토큰 뒤엔 2분 쉬어야 다음 호출이 받힌다
                   "params": {"reasoning_effort": "none", "max_completion_tokens": 8000}},   # gpt-oss 와 한도가 따로 (모델마다 분당 8,000토큰)
     "nvidia-deepseek": {"kind": "openai", "env": "NVIDIA_API_KEY", "url": "https://integrate.api.nvidia.com/v1/chat/completions",
                         "model": "deepseek-ai/deepseek-v4.1-flash", "timeout": 300,
@@ -98,6 +99,9 @@ CHAINS = {
     "json-lite": ["gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
     # 새 기능 — 예비 공급자 먼저, Gemini 는 맨 뒤 (2026-10-19, 위 머리말: 키 하나를 모든 리포트가 나눠 쓴다). 인물 발언 레이더 인용 추출
     "json-backup-first": ["nvidia-deepseek", "groq-qwen", "groq", "gemini-lite"],
+    # 출력이 긴 일(호출당 출력 1,000토큰 넘게 — 인물 레이더 분류 20건 · 카드 요약 16건)은 gpt-oss 먼저 (2026-10-26).
+    # Qwen 은 분당 출력 1,000토큰(OTPM) 한도라 출력 2천 토큰짜리는 몇 분에 한 번만 받힌다 — 10-25 분류에서 Qwen 12번 중 11번 429
+    "json-oss-first": ["nvidia-deepseek", "groq", "groq-qwen", "gemini-lite"],
     # 공용 뉴스 처리(news_store: 제목 번역 · 사실 문장 · 요약 · 종목 관련도) — Groq 먼저 (2026-10-25 사용자: "Gemini 는 쓸 곳이 많다, Groq 로 할 수 있는 건 Groq").
     # 두 사슬을 배치마다 번갈아 쓴다 — Groq 는 모델마다 분당 8,000토큰(호출 간격 60초)이라 qwen · gpt-oss 를 엇갈려 기다림을 반으로. Gemini lite 는 맨 뒤 예비
     "news": ["groq-qwen", "groq", "nvidia-deepseek", "gemini-lite"],
@@ -147,7 +151,27 @@ atexit.register(_notify_summary)
 # 2026-10-15: 키 1개가 429 를 받고도 60초 휴식 × 5회를 호출마다 반복해 트럼프 1,471초 · NVDA 1,117초가 걸림
 # 2026-10-16: 한도 이름이 …PerDayPerProjectPerModel — 모델마다 따로다. 키 단위로 버리면 같은 키의 다른 모델(대체 모델)까지 건너뛴다
 _EXHAUSTED_KEYS = set()
-_last_call = {}   # (주소, 모델) → 마지막 호출 시각 (분당 토큰 한도 간격용 — Groq 는 모델마다 한도가 따로)
+_ready_at = {}   # (주소, 모델) → 다음 호출 가능 시각 (분당 토큰 한도 간격용 — Groq 는 모델마다 한도가 따로)
+RATE_RETRY_MAX_WAIT = 150   # 분당 한도 429 는 이만큼까지 기다렸다 한 번 더 (그보다 길면 다음 단계로)
+
+
+def _groq_reason(text):
+    """'Request too large … on output tokens per minute (OTPM): Limit 1000, Requested 1089' → 어느 한도인지만.
+    앞 160자로 자르면 조직 · 모델 이름에 묻혀 TPM 인지 OTPM 인지 안 보였다 (2026-10-26)."""
+    m = re.search(r"\bon ([a-z ]+\([A-Z]+\)[^.]*)", text)
+    return m.group(1) if m else re.sub(r"org_[A-Za-z0-9]+", "org", text)[:160]
+
+
+def _rate_wait(r):
+    """분당 한도 429 → 기다릴 초. 하루 한도(TPD · RPD)는 기다려도 소용없으니 긴 값이 나오거나 None."""
+    if "per day" in r.text:
+        return None
+    if r.headers.get("retry-after", "").replace(".", "", 1).isdigit():
+        return float(r.headers["retry-after"]) + 1
+    m = re.search(r"try again in (?:(\d+)m)?([\d.]+)s", r.text)
+    if m:
+        return int(m.group(1) or 0) * 60 + float(m.group(2)) + 1
+    return None   # 출력 한도(OTPM) 429 는 기다려도 잘 안 풀린다 — 10-26 실측: 출력 2천 토큰짜리는 3분 넘게 쉬어도 거절. 바로 다음 단계로
 
 
 class StepFailed(RuntimeError):
@@ -292,7 +316,8 @@ class LLMPool:
     # ---------------------------------------------------------------- OpenAI 호환
     def _openai(self, name, step, prompt, temperature, max_tokens):
         key = os.environ.get(step["env"], "").strip()
-        gap = step.get("min_interval", 0) - (time.time() - _last_call.get((step["url"], step["model"]), 0))
+        slot = (step["url"], step["model"])
+        gap = _ready_at.get(slot, 0) - time.time()
         if gap > 0:
             print(f"[{self.label}] {name} 분당 한도 간격 — {gap:.0f}s 대기")
             time.sleep(gap)
@@ -304,15 +329,27 @@ class LLMPool:
             for k in ("max_tokens", "max_completion_tokens"):
                 if k in body:
                     body[k] = max(body[k], max_tokens)
-        try:
-            r = requests.post(step["url"], json=body, timeout=step["timeout"],
-                              headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json", "Accept": "application/json"})
-        except requests.RequestException as e:
-            raise StepFailed(f"{name} 네트워크: {str(e)[:120]}")
+        for attempt in (1, 2):
+            try:
+                r = requests.post(step["url"], json=body, timeout=step["timeout"],
+                                  headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json", "Accept": "application/json"})
+            except requests.RequestException as e:
+                raise StepFailed(f"{name} 네트워크: {str(e)[:120]}")
+            if r.status_code != 429 or attempt == 2:
+                break
+            # 분당 한도(TPM · OTPM)는 기다리면 풀린다 — 다른 워크플로가 같은 키로 막 쓴 경우 포함 (2026-10-26: 분류 Qwen 12번 중 11번이 이것으로 탈락)
+            wait = _rate_wait(r)
+            if wait is None or wait > RATE_RETRY_MAX_WAIT:
+                break
+            print(f"[{self.label}] {name} 429 {_groq_reason(r.text)} — {wait:.0f}s 뒤 한 번 더")
+            time.sleep(wait)
         if r.status_code != 200:
-            raise StepFailed(f"{name} {r.status_code}: {r.text[:160]}")
-        _last_call[(step["url"], step["model"])] = time.time()   # 토큰을 실제로 쓴 호출만 간격 계산에 (401 · 413 같은 즉시 거절은 제외)
-        text = (r.json()["choices"][0]["message"].get("content") or "").strip()
+            raise StepFailed(f"{name} {r.status_code}: {_groq_reason(r.text)}")
+        data = r.json()
+        # 토큰을 실제로 쓴 호출만 간격 계산에 (401 · 413 같은 즉시 거절은 제외). 출력 한도가 있으면 쓴 출력만큼 더 쉰다
+        out_tokens = (data.get("usage") or {}).get("completion_tokens") or 0
+        _ready_at[slot] = time.time() + max(step.get("min_interval", 0), 60 * out_tokens / step["otpm"] if step.get("otpm") else 0)
+        text = (data["choices"][0]["message"].get("content") or "").strip()
         if not text:
             raise StepFailed(f"{name}: 빈 응답 (사고 토큰이 출력 한도를 다 쓴 경우)")
         return text

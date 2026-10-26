@@ -39,12 +39,13 @@ python main.py --publish             # 실제 게시 — 사용자 확인 뒤에
 
 | 모듈 | 하는 일 | LLM |
 |---|---|---|
-| `extract.py` | 2차 제목 → ① 이름 · 말한 형태 없는 것 버림 ② 같은 발언 묶기(인물 · 48시간 · 자카드 0.45) ③ 묶음 대표만: 직접 발언인가 · 한 문장 인용 · 같은 1차 항목 | `json-backup-first` 30묶음/호출 |
-| `classify.py` | 1차 전부 + 2차 발언(1차와 안 겹친 것) → trump-trend 와 같은 8칸. 인물군별 프롬프트(policy · investor/commentator · ceo). 트럼프 Truth Social 은 trump-state 라벨 그대로 | `json-backup-first` 20건/호출 |
+| `extract.py` | 2차 제목 → ① 이름 · 말한 형태 없는 것 버림 ② 같은 발언 묶기(인물 · 48시간 · 자카드 0.45) ③ 묶음 대표만: 직접 발언인가 · 한 문장 인용 · 같은 1차 항목 | `json-backup-first` 18묶음/호출 (Qwen 분당 출력 1,000토큰 안) |
+| `classify.py` | 1차 전부 + 2차 발언(1차와 안 겹친 것) → trump-trend 와 같은 8칸. 인물군별 프롬프트(policy · investor/commentator · ceo). 트럼프 Truth Social 은 trump-state 라벨 그대로 | `json-oss-first` 20건/호출 |
 | `aggregate.py` | 24시간 · 관련도 ≥ 2 → 인물 × 주제 신호, 인물 순서, 7일 추이 변화, 데일리 시장 맥락 → `output/radar.json` | 없음 |
-| `narrate.py` | 신호마다 한국어 헤드라인(명사형 48자) + 설명 한 문장(합니다체), 숫자 검사(fact_check) · 예측 말 금지 | `json-backup-first` 1회 |
+| `narrate.py` | 신호마다 한국어 헤드라인(명사형 48자) + 설명 한 문장(합니다체), 숫자 검사(fact_check) · 예측 말 금지 | `json-oss-first` 16건/호출 |
 | `render_html.py` | 탭 오늘(요약 · 머리 카드 · 인물별 발언 · 시장 맥락) / 추이 | 없음 |
 | `publish.py` | 신호 0개면 게시 없음, 같은 날 글은 갱신 | — |
 | `state_io.py` | statements 30일 JSONL | — |
 
 `json-backup-first` = DeepSeek → Groq Qwen → Groq gpt-oss → Gemini lite (새 기능은 예비 먼저, llm_chain 머리말 10-19).
+`json-oss-first` = 같은 구성에서 gpt-oss 를 Qwen 앞에 — 출력이 긴 분류 · 요약용 (Qwen 은 분당 출력 1,000토큰 한도, 10-26). DeepSeek(NVIDIA)은 운영에서 빠진다(10-21).

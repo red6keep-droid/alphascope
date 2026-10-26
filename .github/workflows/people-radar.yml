@@ -2,6 +2,7 @@ name: People Radar
 
 # 인물 발언 레이더 (experiments/people-radar). "트럼프 · 연준 · 월가 인물 발언" 글을 하루 한 번 게시한다.
 # 신호 0개면 게시하지 않고, 같은 날 글이 이미 있으면 본문을 갱신한다(publish.py) — 두 번 돌아도 글이 겹치지 않는다.
+# 스케줄 실행은 오늘 글이 이미 있으면 처음부터 건너뛴다(Check 단계, 2026-10-26).
 #
 # 트럼프 Truth Social 라벨(trump-state)과 데일리 시장 맥락(report-state)을 읽으므로 두 실행이 끝난 뒤에 돈다.
 # 발언 이력(statements.jsonl, 30일)은 radar-state 브랜치에 trump-state 와 같은 방식(이전 커밋 위 일반 push)으로 남긴다.
@@ -46,11 +47,12 @@ env:
   BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
   STATE_DIR: experiments/people-radar/output/state
   DO_PUBLISH: ${{ github.event_name == 'schedule' || inputs.scheduled == true || inputs.publish == true }}
+  IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
 
 jobs:
   people-radar:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45   # 10-26: Groq 를 실제로 쓰게 되며 호출 간격(60초+) 대기가 늘었다
     steps:
       - uses: actions/checkout@v5
 
@@ -65,9 +67,18 @@ jobs:
           pip install -r experiments/people-radar/requirements.txt
           pip install -r experiments/daily-report/requirements.txt
 
+      # 오늘(KST) 글이 이미 있으면 이후 단계를 전부 건너뛴다 — 예비 GitHub cron 이 외부 cron 실행 뒤에
+      # 전체를 한 번 더 돌려 Groq · Gemini 호출이 매일 두 배였다 (2026-10-26). 트럼프 · NVDA 와 같은 방식.
+      # 확인이 실패하면 게시 안 된 것으로 보고 진행한다(check_published.py).
+      - name: Check if today's post is already published
+        id: check
+        if: env.IS_SCHEDULED == 'true'
+        run: python experiments/daily-report/check_published.py --series people
+
       # classify.py 는 origin/trump-state, aggregate.py 는 origin/report-state 를 git show 로 읽는다.
       # actions/checkout 은 main 만 받으므로 원격 추적 ref 로 따로 받는다. 없으면 각 단계가 알아서 건너뛴다.
       - name: Fetch trump-state / report-state / radar-state
+        if: steps.check.outputs.already_published != 'true'
         run: |
           for b in trump-state report-state radar-state; do
             git fetch --no-tags origin "$b:refs/remotes/origin/$b" 2>/dev/null && echo "$b 받음" || echo "$b 없음"
@@ -80,6 +91,7 @@ jobs:
           fi
 
       - name: Run pipeline
+        if: steps.check.outputs.already_published != 'true'
         working-directory: experiments/people-radar
         run: |
           if [ "$DO_PUBLISH" = "true" ]; then
@@ -90,7 +102,7 @@ jobs:
 
       # 추출 · 분류 결과는 뒤 단계가 실패해도 남긴다 — LLM 호출을 헛되게 하지 않기 위해.
       - name: Save state (radar-state branch)
-        if: always()
+        if: always() && steps.check.outputs.already_published != 'true'
         run: |
           if [ ! -f "$STATE_DIR/statements.jsonl" ]; then
             echo "저장할 상태 없음 — 건너뜁니다."

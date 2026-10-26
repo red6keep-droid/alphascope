@@ -123,6 +123,18 @@ def _payload(conn, rep):
     }
 
 
+def _batch_input(payload):
+    """1차 목록은 인물마다 한 번만 — 묶음마다 붙이면 같은 목록이 30번 반복돼 Groq 분당 8,000토큰을 넘는다
+    (10-26: 배치 하나 12~17K 토큰, 1차 항목 304개 중 고유 23개 → Groq 413 으로 매번 flash-lite 가 받음)."""
+    primary = {}
+    for p in payload:
+        seen = primary.setdefault(p["speaker"], {})
+        for x in p["primary"]:
+            seen.setdefault(x["id"], x["title"])
+    return {"primary": {s: [{"id": i, "title": t} for i, t in items.items()] for s, items in primary.items() if items},
+            "groups": [{k: p[k] for k in ("group_id", "speaker", "headlines")} for p in payload]}
+
+
 def _validate(result, batch_ids, primary_ids):
     if isinstance(result, dict):
         result = result.get("items") or result.get("groups") or [result]
@@ -147,7 +159,7 @@ def _validate(result, batch_ids, primary_ids):
 def extract(conn, since, max_batches=None):
     reps = conn.execute("""SELECT id, speaker, published_at FROM statements
                            WHERE group_id = id AND extracted_at IS NULL AND prefilter_reason IS NULL AND published_at >= ?
-                           ORDER BY published_at""", (since,)).fetchall()
+                           ORDER BY speaker, published_at""", (since,)).fetchall()   # 같은 인물끼리 한 배치 — 1차 목록이 덜 늘어난다
     if not reps:
         print("[extract] 추출할 묶음 0개")
         return 0
@@ -162,7 +174,7 @@ def extract(conn, since, max_batches=None):
         payload = [_payload(conn, r) for r in batch]
         ids = {p["group_id"] for p in payload}
         prim_ids = {p["group_id"]: {x["id"] for x in p["primary"]} for p in payload}
-        prompt = head + "\n\nINPUT:\n" + json.dumps(payload, ensure_ascii=False, indent=1)
+        prompt = head + "\n\nINPUT:\n" + json.dumps(_batch_input(payload), ensure_ascii=False, separators=(",", ":"))
 
         def check(v):
             got = _validate(v, ids, prim_ids)
