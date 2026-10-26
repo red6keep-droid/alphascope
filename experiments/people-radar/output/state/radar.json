@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-10-26T01:02:00Z",
+ "generated_at": "2026-10-26T01:23:08Z",
  "window_hours": 24,
- "event_count": 31,
+ "event_count": 34,
  "people_count": 9,
  "only_reports": true,
  "pending": 0,
@@ -82,7 +82,7 @@
      "source_kind": "secondary",
      "attribution": "report",
      "n_primary": 0,
-     "n_reports": 2,
+     "n_reports": 3,
      "first_at": "2026-10-25T23:47:00Z",
      "last_at": "2026-10-25T23:47:00Z",
      "lead": {
@@ -95,7 +95,7 @@
       "sub_speaker": null
      },
      "others": [],
-     "score": 40,
+     "score": 41,
      "group": "policy",
      "path": {
       "channel": "cost",
@@ -116,7 +116,7 @@
         "symbol": "CAD=X",
         "day": "2026-10-26",
         "pending": false,
-        "ret": 0.0,
+        "ret": -0.01,
         "rel": 0.0
        },
        {
@@ -329,6 +329,74 @@
       }
      ],
      "score": 29,
+     "group": "policy",
+     "path": {
+      "channel": "risk",
+      "assets": [
+       "^VIX",
+       "CL=F",
+       "SPY"
+      ]
+     },
+     "novelty": {
+      "streak": 5,
+      "first30": false
+     },
+     "reaction": {
+      "day": "2026-10-26",
+      "assets": [
+       {
+        "symbol": "^VIX",
+        "day": "2026-10-26",
+        "pending": true
+       },
+       {
+        "symbol": "CL=F",
+        "day": "2026-10-26",
+        "pending": true
+       },
+       {
+        "symbol": "SPY",
+        "day": "2026-10-26",
+        "pending": true
+       }
+      ],
+      "market": null
+     },
+     "next": null
+    },
+    {
+     "speaker": "trump",
+     "topic": "Geopolitics",
+     "subtopic": "Oil Prices",
+     "companies": [],
+     "sectors": [
+      "Energy"
+     ],
+     "countries": [
+      "Iran"
+     ],
+     "intensity": 5,
+     "relevance": 2,
+     "issue": "GEOPOLITICS",
+     "direction": "negative",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-25T22:34:00Z",
+     "last_at": "2026-10-25T22:34:00Z",
+     "lead": {
+      "id": "google_news:411849699baa7ed8",
+      "title": "Trump Says Oil Rise 'Smaller Price to Pay' to Stop Iran's Nuclear Ambitions",
+      "quote": "Trump said the oil price rise is a smaller price to pay to stop Iran's nuclear ambitions.",
+      "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFBxVFBlWVNxbVloc0E5OWFlelBGUjFOZklGQ3BXUC12NnFjYUZQdnNsWTFHYUVOZmxiM0tQSEhsdTZkdGRZalZFa2NhQlhnaG9mMlFvN1hDSk96OVJubzduTjdxV25rUQ?oc=5",
+      "publisher": "news.sbs.co.kr",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 26,
      "group": "policy",
      "path": {
       "channel": "risk",
@@ -883,6 +951,68 @@
       "market": null
      },
      "next": null
+    },
+    {
+     "speaker": "huang",
+     "topic": "Industry View",
+     "subtopic": "AI Bubble",
+     "companies": [
+      "NVDA"
+     ],
+     "sectors": [
+      "Technology"
+     ],
+     "countries": [],
+     "intensity": 4,
+     "relevance": 2,
+     "issue": "GROWTH_JOBS",
+     "direction": "positive",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-26T01:11:27Z",
+     "last_at": "2026-10-26T01:11:27Z",
+     "lead": {
+      "id": "google_news:33a8ff8b924df7ce",
+      "title": "Jensen Huang says the idea that AI kills jobs is “almost pre",
+      "quote": "Huang says the idea that AI kills jobs is almost preposterous.",
+      "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE1TTEEyOWZ5ZFpJVGQzaC1Qazlfa1YxRi1XTU9EMC1fclV4V0dPUXVOS3J1dDd1MUdwUU9tVW9lMzA2SlJJaDNxV0RwTVNOR1kySXRzcWZrTGRtX3lvVGNwd3pjdlFSbFM2TU12Q2VpZjVOUFE?oc=5",
+      "publisher": "KuCoin",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 25,
+     "group": "ceo",
+     "path": {
+      "channel": "earnings",
+      "assets": [
+       "XLK",
+       "NVDA"
+      ]
+     },
+     "novelty": {
+      "streak": 5,
+      "first30": false
+     },
+     "reaction": {
+      "day": "2026-10-26",
+      "assets": [
+       {
+        "symbol": "XLK",
+        "day": "2026-10-26",
+        "pending": true
+       },
+       {
+        "symbol": "NVDA",
+        "day": "2026-10-26",
+        "pending": true
+       }
+      ],
+      "market": null
+     },
+     "next": null
     }
    ]
   },
@@ -1261,7 +1391,7 @@
      "intensity": 5,
      "relevance": 2,
      "issue": "GEOPOLITICS",
-     "direction": "negative",
+     "direction": "neutral",
      "source_kind": "secondary",
      "attribution": "report",
      "n_primary": 0,
@@ -1455,6 +1585,68 @@
       "market": null
      },
      "next": null
+    },
+    {
+     "speaker": "musk",
+     "topic": "Industry View",
+     "subtopic": "AI Bubble",
+     "companies": [
+      "TSLA"
+     ],
+     "sectors": [
+      "Technology"
+     ],
+     "countries": [],
+     "intensity": 4,
+     "relevance": 2,
+     "issue": "CREDIT_BANKS",
+     "direction": "negative",
+     "source_kind": "secondary",
+     "attribution": "report",
+     "n_primary": 0,
+     "n_reports": 1,
+     "first_at": "2026-10-26T00:28:00Z",
+     "last_at": "2026-10-26T00:28:00Z",
+     "lead": {
+      "id": "google_news:051fecc41397e22a",
+      "title": "Elon Musk predicts neocloud shakeout as credit for AI infrastructure dries up",
+      "quote": "Musk predicts a neocloud shakeout as credit for AI infrastructure dries up.",
+      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNbGRFTkgtMFRDaE5CTk50V3VDM3pJakt2LU9sbk9OMFp3elUzX2dsTDEwX3NLVEd3YUw2LTMwRmZBc3djR3FPelIzdG5kSjMzN09hVFVRRkF3eWdWYTRyQmxFVzRqRWs4d1RpUzRFbnI2M1g3aG53bDUtWXJFQ1N1cng4U2V5dmI5SzlYVkQ5NWdyZVlYZldFQUJDUkstYWtYUnpVaHcyblFYbFhFTmtjMDV6bVY?oc=5",
+      "publisher": "SiliconANGLE",
+      "body": "",
+      "sub_speaker": null
+     },
+     "others": [],
+     "score": 25,
+     "group": "ceo",
+     "path": {
+      "channel": "earnings",
+      "assets": [
+       "XLK",
+       "TSLA"
+      ]
+     },
+     "novelty": {
+      "streak": 2,
+      "first30": false
+     },
+     "reaction": {
+      "day": "2026-10-26",
+      "assets": [
+       {
+        "symbol": "XLK",
+        "day": "2026-10-26",
+        "pending": true
+       },
+       {
+        "symbol": "TSLA",
+        "day": "2026-10-26",
+        "pending": true
+       }
+      ],
+      "market": null
+     },
+     "next": null
     }
    ]
   },
@@ -1553,8 +1745,8 @@
         "symbol": "BTC-USD",
         "day": "2026-10-26",
         "pending": false,
-        "ret": -0.84,
-        "rel": 1.1
+        "ret": -0.98,
+        "rel": 1.3
        }
       ],
       "market": null
@@ -2022,14 +2214,14 @@
    "speaker": "huang",
    "name_ko": "젠슨 황",
    "topic": "Industry View",
-   "days7": 28,
+   "days7": 29,
    "prev7": 0
   },
   {
    "speaker": "trump",
    "name_ko": "트럼프",
    "topic": "Geopolitics",
-   "days7": 12,
+   "days7": 13,
    "prev7": 0
   },
   {
@@ -2049,14 +2241,14 @@
   {
    "speaker": "trump",
    "name_ko": "트럼프",
-   "topic": "Company",
+   "topic": "Trade",
    "days7": 9,
    "prev7": 0
   },
   {
    "speaker": "trump",
    "name_ko": "트럼프",
-   "topic": "Trade",
+   "topic": "Company",
    "days7": 9,
    "prev7": 0
   },
@@ -2065,6 +2257,13 @@
    "name_ko": "젠슨 황",
    "topic": "Product",
    "days7": 9,
+   "prev7": 0
+  },
+  {
+   "speaker": "musk",
+   "name_ko": "일론 머스크",
+   "topic": "Product",
+   "days7": 7,
    "prev7": 0
   },
   {
@@ -2084,8 +2283,8 @@
   {
    "speaker": "musk",
    "name_ko": "일론 머스크",
-   "topic": "Product",
-   "days7": 7,
+   "topic": "Industry View",
+   "days7": 6,
    "prev7": 0
   },
   {
@@ -2103,13 +2302,6 @@
    "prev7": 0
   },
   {
-   "speaker": "bessent",
-   "name_ko": "스콧 베센트",
-   "topic": "Regulation",
-   "days7": 6,
-   "prev7": 0
-  },
-  {
    "speaker": "musk",
    "name_ko": "일론 머스크",
    "topic": "Deal",
@@ -2117,9 +2309,30 @@
    "prev7": 0
   },
   {
-   "speaker": "musk",
-   "name_ko": "일론 머스크",
-   "topic": "Industry View",
+   "speaker": "bessent",
+   "name_ko": "스콧 베센트",
+   "topic": "Regulation",
+   "days7": 5,
+   "prev7": 0
+  },
+  {
+   "speaker": "cramer",
+   "name_ko": "짐 크레이머",
+   "topic": "Sector Call",
+   "days7": 5,
+   "prev7": 0
+  },
+  {
+   "speaker": "huang",
+   "name_ko": "젠슨 황",
+   "topic": "Regulation",
+   "days7": 5,
+   "prev7": 0
+  },
+  {
+   "speaker": "huang",
+   "name_ko": "젠슨 황",
+   "topic": "Deal",
    "days7": 5,
    "prev7": 0
   },
@@ -2131,23 +2344,9 @@
    "prev7": 0
   },
   {
-   "speaker": "huang",
-   "name_ko": "젠슨 황",
-   "topic": "Regulation",
-   "days7": 5,
-   "prev7": 0
-  },
-  {
    "speaker": "bessent",
    "name_ko": "스콧 베센트",
    "topic": "Energy",
-   "days7": 5,
-   "prev7": 0
-  },
-  {
-   "speaker": "huang",
-   "name_ko": "젠슨 황",
-   "topic": "Deal",
    "days7": 5,
    "prev7": 0
   },
@@ -2159,9 +2358,9 @@
    "prev7": 0
   },
   {
-   "speaker": "cramer",
-   "name_ko": "짐 크레이머",
-   "topic": "Sector Call",
+   "speaker": "burry",
+   "name_ko": "마이클 버리",
+   "topic": "Macro Warning",
    "days7": 4,
    "prev7": 0
   },
@@ -2176,13 +2375,6 @@
    "speaker": "wood",
    "name_ko": "캐시 우드",
    "topic": "Sector Call",
-   "days7": 3,
-   "prev7": 0
-  },
-  {
-   "speaker": "burry",
-   "name_ko": "마이클 버리",
-   "topic": "Macro Warning",
    "days7": 3,
    "prev7": 0
   },
@@ -2208,37 +2400,9 @@
    "prev7": 0
   },
   {
-   "speaker": "lutnick",
-   "name_ko": "하워드 러트닉",
-   "topic": "Company",
-   "days7": 2,
-   "prev7": 0
-  },
-  {
-   "speaker": "ackman",
-   "name_ko": "빌 애크먼",
-   "topic": "Sector Call",
-   "days7": 2,
-   "prev7": 0
-  },
-  {
    "speaker": "musk",
    "name_ko": "일론 머스크",
    "topic": "Regulation",
-   "days7": 2,
-   "prev7": 0
-  },
-  {
-   "speaker": "wood",
-   "name_ko": "캐시 우드",
-   "topic": "Stock Call",
-   "days7": 2,
-   "prev7": 0
-  },
-  {
-   "speaker": "cramer",
-   "name_ko": "짐 크레이머",
-   "topic": "Stock Call",
    "days7": 2,
    "prev7": 0
   },
@@ -2250,16 +2414,37 @@
    "prev7": 0
   },
   {
-   "speaker": "bessent",
-   "name_ko": "스콧 베센트",
-   "topic": "Fed",
+   "speaker": "ackman",
+   "name_ko": "빌 애크먼",
+   "topic": "Sector Call",
    "days7": 2,
    "prev7": 0
   },
   {
-   "speaker": "trump",
-   "name_ko": "트럼프",
-   "topic": "Tax",
+   "speaker": "lutnick",
+   "name_ko": "하워드 러트닉",
+   "topic": "Company",
+   "days7": 2,
+   "prev7": 0
+  },
+  {
+   "speaker": "wood",
+   "name_ko": "캐시 우드",
+   "topic": "Stock Call",
+   "days7": 2,
+   "prev7": 0
+  },
+  {
+   "speaker": "cramer",
+   "name_ko": "짐 크레이머",
+   "topic": "Stock Call",
+   "days7": 2,
+   "prev7": 0
+  },
+  {
+   "speaker": "burry",
+   "name_ko": "마이클 버리",
+   "topic": "Stock Call",
    "days7": 1,
    "prev7": 0
   },
@@ -2271,9 +2456,9 @@
    "prev7": 0
   },
   {
-   "speaker": "lutnick",
-   "name_ko": "하워드 러트닉",
-   "topic": "Trade",
+   "speaker": "wood",
+   "name_ko": "캐시 우드",
+   "topic": "Macro Warning",
    "days7": 1,
    "prev7": 0
   },
@@ -2285,23 +2470,30 @@
    "prev7": 0
   },
   {
-   "speaker": "cramer",
-   "name_ko": "짐 크레이머",
-   "topic": "Position",
+   "speaker": "lutnick",
+   "name_ko": "하워드 러트닉",
+   "topic": "Trade",
    "days7": 1,
    "prev7": 0
   },
   {
-   "speaker": "huang",
-   "name_ko": "젠슨 황",
-   "topic": "Earnings",
+   "speaker": "cramer",
+   "name_ko": "짐 크레이머",
+   "topic": "Market Outlook",
+   "days7": 1,
+   "prev7": 0
+  },
+  {
+   "speaker": "bessent",
+   "name_ko": "스콧 베센트",
+   "topic": "Trade",
    "days7": 1,
    "prev7": 0
   },
   {
    "speaker": "wood",
    "name_ko": "캐시 우드",
-   "topic": "Macro Warning",
+   "topic": "Fed",
    "days7": 1,
    "prev7": 0
   },
@@ -2315,7 +2507,7 @@
   {
    "speaker": "cramer",
    "name_ko": "짐 크레이머",
-   "topic": "Market Outlook",
+   "topic": "Position",
    "days7": 1,
    "prev7": 0
   },
@@ -2327,16 +2519,9 @@
    "prev7": 0
   },
   {
-   "speaker": "burry",
-   "name_ko": "마이클 버리",
-   "topic": "Stock Call",
-   "days7": 1,
-   "prev7": 0
-  },
-  {
-   "speaker": "greer",
-   "name_ko": "제이미슨 그리어",
-   "topic": "Trade",
+   "speaker": "trump",
+   "name_ko": "트럼프",
+   "topic": "Tax",
    "days7": 1,
    "prev7": 0
   },
@@ -2348,64 +2533,71 @@
    "prev7": 0
   },
   {
-   "speaker": "bessent",
-   "name_ko": "스콧 베센트",
-   "topic": "Trade",
+   "speaker": "huang",
+   "name_ko": "젠슨 황",
+   "topic": "Earnings",
    "days7": 1,
    "prev7": 0
   },
   {
-   "speaker": "wood",
-   "name_ko": "캐시 우드",
+   "speaker": "bessent",
+   "name_ko": "스콧 베센트",
    "topic": "Fed",
+   "days7": 1,
+   "prev7": 0
+  },
+  {
+   "speaker": "greer",
+   "name_ko": "제이미슨 그리어",
+   "topic": "Trade",
    "days7": 1,
    "prev7": 0
   }
  ],
  "market": null,
  "people_trend": {
-  "trump": {
-   "days7": 50,
+  "musk": {
+   "days7": 26,
    "prev7": 0
   },
   "lutnick": {
    "days7": 3,
    "prev7": 0
   },
-  "musk": {
-   "days7": 25,
-   "prev7": 0
-  },
-  "wood": {
-   "days7": 13,
-   "prev7": 0
-  },
-  "huang": {
-   "days7": 55,
-   "prev7": 0
-  },
-  "ackman": {
-   "days7": 14,
+  "burry": {
+   "days7": 7,
    "prev7": 0
   },
   "greer": {
    "days7": 2,
    "prev7": 0
   },
-  "bessent": {
-   "days7": 21,
+  "ackman": {
+   "days7": 14,
    "prev7": 0
   },
-  "cramer": {
-   "days7": 8,
-   "prev7": 0
-  },
-  "burry": {
-   "days7": 6,
+  "trump": {
+   "days7": 51,
    "prev7": 0
   },
   "fed": {
    "days7": 3,
+   "prev7": 0
+  },
+  "cramer": {
+   "days7": 9,
+   "prev7": 0
+  },
+  "huang": {
+   "days7": 56,
+   "prev7": 0
+  },
+  "wood": {
+   "days7": 13,
+   "prev7": 0
+  },
+  "bessent": {
+   "days7": 19,
    "prev7": 0
   },
   "altman": {
@@ -2416,14 +2608,14 @@
  "topic_trend": [
   {
    "topic": "Industry View",
-   "days7": 44,
+   "days7": 46,
    "prev7": 0,
    "streak": 5,
    "speakers": [
     {
      "speaker": "huang",
      "name_ko": "젠슨 황",
-     "n": 28
+     "n": 29
     },
     {
      "speaker": "altman",
@@ -2433,21 +2625,34 @@
     {
      "speaker": "musk",
      "name_ko": "일론 머스크",
-     "n": 5
+     "n": 6
+    }
+   ]
+  },
+  {
+   "topic": "Geopolitics",
+   "days7": 20,
+   "prev7": 0,
+   "streak": 5,
+   "speakers": [
+    {
+     "speaker": "trump",
+     "name_ko": "트럼프",
+     "n": 13
+    },
+    {
+     "speaker": "bessent",
+     "name_ko": "스콧 베센트",
+     "n": 7
     }
    ]
   },
   {
    "topic": "Regulation",
-   "days7": 21,
+   "days7": 20,
    "prev7": 0,
-   "streak": 6,
+   "streak": 5,
    "speakers": [
-    {
-     "speaker": "bessent",
-     "name_ko": "스콧 베센트",
-     "n": 6
-    },
     {
      "speaker": "trump",
      "name_ko": "트럼프",
@@ -2456,6 +2661,11 @@
     {
      "speaker": "huang",
      "name_ko": "젠슨 황",
+     "n": 5
+    },
+    {
+     "speaker": "bessent",
+     "name_ko": "스콧 베센트",
      "n": 5
     },
     {
@@ -2472,24 +2682,6 @@
      "speaker": "greer",
      "name_ko": "제이미슨 그리어",
      "n": 1
-    }
-   ]
-  },
-  {
-   "topic": "Geopolitics",
-   "days7": 19,
-   "prev7": 0,
-   "streak": 5,
-   "speakers": [
-    {
-     "speaker": "trump",
-     "name_ko": "트럼프",
-     "n": 12
-    },
-    {
-     "speaker": "bessent",
-     "name_ko": "스콧 베센트",
-     "n": 7
     }
    ]
   },
@@ -2515,7 +2707,7 @@
    "topic": "Energy",
    "days7": 15,
    "prev7": 0,
-   "streak": 6,
+   "streak": 7,
    "speakers": [
     {
      "speaker": "trump",
@@ -2576,33 +2768,15 @@
    ]
   },
   {
-   "topic": "Deal",
-   "days7": 10,
-   "prev7": 0,
-   "streak": 0,
-   "speakers": [
-    {
-     "speaker": "musk",
-     "name_ko": "일론 머스크",
-     "n": 5
-    },
-    {
-     "speaker": "huang",
-     "name_ko": "젠슨 황",
-     "n": 5
-    }
-   ]
-  },
-  {
    "topic": "Sector Call",
-   "days7": 10,
+   "days7": 11,
    "prev7": 0,
-   "streak": 5,
+   "streak": 6,
    "speakers": [
     {
      "speaker": "cramer",
      "name_ko": "짐 크레이머",
-     "n": 4
+     "n": 5
     },
     {
      "speaker": "wood",
@@ -2618,6 +2792,24 @@
      "speaker": "burry",
      "name_ko": "마이클 버리",
      "n": 1
+    }
+   ]
+  },
+  {
+   "topic": "Deal",
+   "days7": 10,
+   "prev7": 0,
+   "streak": 0,
+   "speakers": [
+    {
+     "speaker": "musk",
+     "name_ko": "일론 머스크",
+     "n": 5
+    },
+    {
+     "speaker": "huang",
+     "name_ko": "젠슨 황",
+     "n": 5
     }
    ]
   },
@@ -2704,8 +2896,26 @@
    ]
   },
   {
+   "topic": "Macro Warning",
+   "days7": 5,
+   "prev7": 0,
+   "streak": 1,
+   "speakers": [
+    {
+     "speaker": "burry",
+     "name_ko": "마이클 버리",
+     "n": 4
+    },
+    {
+     "speaker": "wood",
+     "name_ko": "캐시 우드",
+     "n": 1
+    }
+   ]
+  },
+  {
    "topic": "Fed",
-   "days7": 6,
+   "days7": 5,
    "prev7": 0,
    "streak": 2,
    "speakers": [
@@ -2715,13 +2925,13 @@
      "n": 3
     },
     {
-     "speaker": "bessent",
-     "name_ko": "스콧 베센트",
-     "n": 2
-    },
-    {
      "speaker": "wood",
      "name_ko": "캐시 우드",
+     "n": 1
+    },
+    {
+     "speaker": "bessent",
+     "name_ko": "스콧 베센트",
      "n": 1
     }
    ]
@@ -2763,24 +2973,6 @@
    ]
   },
   {
-   "topic": "Macro Warning",
-   "days7": 4,
-   "prev7": 0,
-   "streak": 1,
-   "speakers": [
-    {
-     "speaker": "burry",
-     "name_ko": "마이클 버리",
-     "n": 3
-    },
-    {
-     "speaker": "wood",
-     "name_ko": "캐시 우드",
-     "n": 1
-    }
-   ]
-  },
-  {
    "topic": "Other",
    "days7": 2,
    "prev7": 0,
@@ -2794,7 +2986,7 @@
    ]
   },
   {
-   "topic": "Campaign/Politics",
+   "topic": "Tax",
    "days7": 1,
    "prev7": 0,
    "streak": 0,
@@ -2807,7 +2999,7 @@
    ]
   },
   {
-   "topic": "Tax",
+   "topic": "Campaign/Politics",
    "days7": 1,
    "prev7": 0,
    "streak": 0,
@@ -2824,22 +3016,22 @@
   {
    "kind": "sector",
    "name": "Technology",
-   "n": 94,
+   "n": 96,
    "dirs": {
     "positive": 54,
-    "negative": 21,
-    "neutral": 19
+    "negative": 22,
+    "neutral": 20
    },
    "speakers": [
     {
      "speaker": "huang",
      "name_ko": "젠슨 황",
-     "n": 38
+     "n": 39
     },
     {
      "speaker": "musk",
      "name_ko": "일론 머스크",
-     "n": 13
+     "n": 14
     },
     {
      "speaker": "altman",
@@ -2869,21 +3061,21 @@
     {
      "speaker": "burry",
      "name_ko": "마이클 버리",
-     "n": 2
+     "n": 3
     },
     {
      "speaker": "bessent",
      "name_ko": "스콧 베센트",
-     "n": 2
+     "n": 1
     }
    ]
   },
   {
    "kind": "company",
    "name": "NVDA",
-   "n": 32,
+   "n": 33,
    "dirs": {
-    "positive": 25,
+    "positive": 26,
     "negative": 1,
     "neutral": 6
    },
@@ -2891,24 +3083,24 @@
     {
      "speaker": "huang",
      "name_ko": "젠슨 황",
-     "n": 32
+     "n": 33
     }
    ]
   },
   {
    "kind": "sector",
    "name": "Energy",
-   "n": 26,
+   "n": 27,
    "dirs": {
     "positive": 9,
-    "negative": 8,
+    "negative": 9,
     "neutral": 9
    },
    "speakers": [
     {
      "speaker": "trump",
      "name_ko": "트럼프",
-     "n": 12
+     "n": 13
     },
     {
      "speaker": "bessent",
@@ -2967,17 +3159,17 @@
   {
    "kind": "company",
    "name": "TSLA",
-   "n": 16,
+   "n": 17,
    "dirs": {
     "positive": 12,
-    "negative": 1,
+    "negative": 2,
     "neutral": 3
    },
    "speakers": [
     {
      "speaker": "musk",
      "name_ko": "일론 머스크",
-     "n": 13
+     "n": 14
     },
     {
      "speaker": "trump",
@@ -3058,11 +3250,11 @@
   {
    "kind": "sector",
    "name": "Crypto",
-   "n": 7,
+   "n": 8,
    "dirs": {
     "positive": 3,
     "negative": 2,
-    "neutral": 2
+    "neutral": 3
    },
    "speakers": [
     {
@@ -3083,7 +3275,7 @@
     {
      "speaker": "cramer",
      "name_ko": "짐 크레이머",
-     "n": 1
+     "n": 2
     }
    ]
   },
@@ -3240,11 +3432,11 @@
   {
    "kind": "sector",
    "name": "Bonds/Rates",
-   "n": 5,
+   "n": 4,
    "dirs": {
     "positive": 0,
     "negative": 0,
-    "neutral": 5
+    "neutral": 4
    },
    "speakers": [
     {
@@ -3253,13 +3445,13 @@
      "n": 2
     },
     {
-     "speaker": "bessent",
-     "name_ko": "스콧 베센트",
-     "n": 2
-    },
-    {
      "speaker": "wood",
      "name_ko": "캐시 우드",
+     "n": 1
+    },
+    {
+     "speaker": "bessent",
+     "name_ko": "스콧 베센트",
      "n": 1
     }
    ]
@@ -3282,28 +3474,6 @@
     {
      "speaker": "musk",
      "name_ko": "일론 머스크",
-     "n": 1
-    }
-   ]
-  },
-  {
-   "kind": "sector",
-   "name": "Real Estate",
-   "n": 3,
-   "dirs": {
-    "positive": 1,
-    "negative": 1,
-    "neutral": 1
-   },
-   "speakers": [
-    {
-     "speaker": "trump",
-     "name_ko": "트럼프",
-     "n": 2
-    },
-    {
-     "speaker": "bessent",
-     "name_ko": "스콧 베센트",
      "n": 1
     }
    ]
@@ -3339,6 +3509,28 @@
      "speaker": "wood",
      "name_ko": "캐시 우드",
      "n": 3
+    }
+   ]
+  },
+  {
+   "kind": "sector",
+   "name": "Real Estate",
+   "n": 3,
+   "dirs": {
+    "positive": 1,
+    "negative": 1,
+    "neutral": 1
+   },
+   "speakers": [
+    {
+     "speaker": "trump",
+     "name_ko": "트럼프",
+     "n": 2
+    },
+    {
+     "speaker": "bessent",
+     "name_ko": "스콧 베센트",
+     "n": 1
     }
    ]
   },
@@ -3978,8 +4170,8 @@
  "strips": {
   "trump": [
    {
-    "n": 8,
-    "topic": "Company",
+    "n": 9,
+    "topic": "Geopolitics",
     "by_topic": {
      "Company": {
       "n": 2,
@@ -3994,9 +4186,9 @@
       "neutral": 0
      },
      "Geopolitics": {
-      "n": 2,
+      "n": 3,
       "positive": 0,
-      "negative": 2,
+      "negative": 3,
       "neutral": 0
      },
      "Energy": {
@@ -4008,7 +4200,7 @@
     }
    },
    {
-    "n": 6,
+    "n": 5,
     "topic": "Geopolitics",
     "by_topic": {
      "Geopolitics": {
@@ -4023,12 +4215,6 @@
       "negative": 0,
       "neutral": 0
      },
-     "Other": {
-      "n": 1,
-      "positive": 0,
-      "negative": 1,
-      "neutral": 0
-     },
      "Trade": {
       "n": 2,
       "positive": 1,
@@ -4038,7 +4224,7 @@
     }
    },
    {
-    "n": 12,
+    "n": 13,
     "topic": "Geopolitics",
     "by_topic": {
      "Trade": {
@@ -4063,6 +4249,12 @@
       "n": 1,
       "positive": 1,
       "negative": 0,
+      "neutral": 0
+     },
+     "Other": {
+      "n": 1,
+      "positive": 0,
+      "negative": 1,
       "neutral": 0
      },
      "Company": {
@@ -4140,6 +4332,18 @@
     }
    },
    {
+    "n": 1,
+    "topic": "Trade",
+    "by_topic": {
+     "Trade": {
+      "n": 1,
+      "positive": 1,
+      "negative": 0,
+      "neutral": 0
+     }
+    }
+   },
+   {
     "n": 6,
     "topic": "Energy",
     "by_topic": {
@@ -4155,27 +4359,15 @@
       "negative": 0,
       "neutral": 0
      },
-     "Regulation": {
-      "n": 2,
-      "positive": 2,
-      "negative": 0,
-      "neutral": 0
-     },
-     "Trade": {
-      "n": 1,
-      "positive": 1,
-      "negative": 0,
-      "neutral": 0
-     }
-    }
-   },
-   {
-    "n": 1,
-    "topic": "Company",
-    "by_topic": {
      "Company": {
       "n": 1,
       "positive": 1,
+      "negative": 0,
+      "neutral": 0
+     },
+     "Regulation": {
+      "n": 2,
+      "positive": 2,
       "negative": 0,
       "neutral": 0
      }
@@ -4449,7 +4641,7 @@
   ],
   "huang": [
    {
-    "n": 5,
+    "n": 6,
     "topic": "Industry View",
     "by_topic": {
      "Investment": {
@@ -4459,8 +4651,8 @@
       "neutral": 0
      },
      "Industry View": {
-      "n": 2,
-      "positive": 2,
+      "n": 3,
+      "positive": 3,
       "negative": 0,
       "neutral": 0
      },
@@ -4503,7 +4695,7 @@
     }
    },
    {
-    "n": 14,
+    "n": 13,
     "topic": "Industry View",
     "by_topic": {
      "Deal": {
@@ -4525,10 +4717,10 @@
       "neutral": 0
      },
      "Industry View": {
-      "n": 6,
+      "n": 5,
       "positive": 4,
       "negative": 1,
-      "neutral": 1
+      "neutral": 0
      },
      "Product": {
       "n": 2,
@@ -4539,14 +4731,14 @@
     }
    },
    {
-    "n": 19,
+    "n": 20,
     "topic": "Industry View",
     "by_topic": {
      "Industry View": {
-      "n": 13,
+      "n": 14,
       "positive": 10,
       "negative": 1,
-      "neutral": 2
+      "neutral": 3
      },
      "Product": {
       "n": 3,
@@ -4888,7 +5080,7 @@
   ],
   "musk": [
    {
-    "n": 9,
+    "n": 10,
     "topic": "Industry View",
     "by_topic": {
      "Investment": {
@@ -4904,16 +5096,16 @@
       "neutral": 0
      },
      "Industry View": {
-      "n": 3,
+      "n": 4,
       "positive": 0,
-      "negative": 3,
+      "negative": 4,
       "neutral": 0
      },
      "Regulation": {
       "n": 2,
       "positive": 0,
-      "negative": 2,
-      "neutral": 0
+      "negative": 1,
+      "neutral": 1
      }
     }
    },
@@ -6051,9 +6243,16 @@
     }
    },
    {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
+    "n": 1,
+    "topic": "Macro Warning",
+    "by_topic": {
+     "Macro Warning": {
+      "n": 1,
+      "positive": 0,
+      "negative": 1,
+      "neutral": 0
+     }
+    }
    },
    {
     "n": 2,
@@ -6772,9 +6971,16 @@
     }
    },
    {
-    "n": 0,
-    "topic": null,
-    "by_topic": {}
+    "n": 1,
+    "topic": "Sector Call",
+    "by_topic": {
+     "Sector Call": {
+      "n": 1,
+      "positive": 0,
+      "negative": 0,
+      "neutral": 1
+     }
+    }
    },
    {
     "n": 0,
@@ -7419,12 +7625,12 @@
     }
    },
    {
-    "n": 5,
+    "n": 4,
     "topic": "Regulation",
     "by_topic": {
      "Regulation": {
-      "n": 2,
-      "positive": 1,
+      "n": 1,
+      "positive": 0,
       "negative": 0,
       "neutral": 1
      },
@@ -7449,7 +7655,7 @@
     }
    },
    {
-    "n": 8,
+    "n": 7,
     "topic": "Geopolitics",
     "by_topic": {
      "Geopolitics": {
@@ -7461,12 +7667,6 @@
      "Regulation": {
       "n": 3,
       "positive": 2,
-      "negative": 0,
-      "neutral": 1
-     },
-     "Fed": {
-      "n": 1,
-      "positive": 0,
       "negative": 0,
       "neutral": 1
      },
@@ -8415,6 +8615,13 @@
     "neutral": 0
    },
    {
+    "key": "Oil Prices",
+    "n": 5,
+    "positive": 2,
+    "negative": 3,
+    "neutral": 0
+   },
+   {
     "key": "Trade Deal",
     "n": 4,
     "positive": 4,
@@ -8433,13 +8640,6 @@
     "n": 4,
     "positive": 0,
     "negative": 4,
-    "neutral": 0
-   },
-   {
-    "key": "Oil Prices",
-    "n": 4,
-    "positive": 2,
-    "negative": 2,
     "neutral": 0
    },
    {
@@ -8473,6 +8673,13 @@
     "neutral": 1
    },
    {
+    "key": "AI Bubble",
+    "n": 3,
+    "positive": 2,
+    "negative": 1,
+    "neutral": 0
+   },
+   {
     "key": "Investment",
     "n": 2,
     "positive": 2,
@@ -8485,13 +8692,6 @@
     "positive": 0,
     "negative": 0,
     "neutral": 2
-   },
-   {
-    "key": "GPU Lifespan",
-    "n": 2,
-    "positive": 1,
-    "negative": 0,
-    "neutral": 1
    }
   ],
   "musk": [
@@ -8629,9 +8829,9 @@
   "burry": [
    {
     "key": "AI Bubble",
-    "n": 2,
+    "n": 3,
     "positive": 0,
-    "negative": 2,
+    "negative": 3,
     "neutral": 0
    },
    {
@@ -8709,6 +8909,13 @@
   ],
   "cramer": [
    {
+    "key": "Crypto",
+    "n": 2,
+    "positive": 0,
+    "negative": 0,
+    "neutral": 2
+   },
+   {
     "key": "AI Trade",
     "n": 1,
     "positive": 0,
@@ -8741,13 +8948,6 @@
     "n": 1,
     "positive": 0,
     "negative": 1,
-    "neutral": 0
-   },
-   {
-    "key": "Dividend King",
-    "n": 1,
-    "positive": 1,
-    "negative": 0,
     "neutral": 0
    }
   ],
@@ -8790,18 +8990,18 @@
     "neutral": 1
    },
    {
-    "key": "AI",
-    "n": 2,
-    "positive": 2,
-    "negative": 0,
-    "neutral": 0
-   },
-   {
-    "key": "Interest Rates",
-    "n": 2,
+    "key": "Investment",
+    "n": 1,
     "positive": 0,
     "negative": 0,
-    "neutral": 2
+    "neutral": 1
+   },
+   {
+    "key": "Tariff",
+    "n": 1,
+    "positive": 0,
+    "negative": 1,
+    "neutral": 0
    }
   ],
   "greer": [
@@ -8839,23 +9039,23 @@
  },
  "profiles": {
   "trump": {
-   "n": 50,
+   "n": 51,
    "dirs": {
     "positive": 26,
-    "negative": 13,
+    "negative": 14,
     "neutral": 11
    },
    "paths": {
-    "report": 32,
+    "report": 33,
     "office": 6,
     "self": 12
    },
    "topics": [
     {
      "name": "Geopolitics",
-     "n": 12,
+     "n": 13,
      "positive": 1,
-     "negative": 9,
+     "negative": 10,
      "neutral": 2
     },
     {
@@ -8897,9 +9097,9 @@
    "countries": [
     {
      "name": "Iran",
-     "n": 10,
+     "n": 11,
      "positive": 2,
-     "negative": 8,
+     "negative": 9,
      "neutral": 0
     },
     {
@@ -8985,20 +9185,20 @@
    "sub_speakers": []
   },
   "huang": {
-   "n": 55,
+   "n": 56,
    "dirs": {
-    "positive": 41,
+    "positive": 42,
     "negative": 3,
     "neutral": 11
    },
    "paths": {
-    "report": 55
+    "report": 56
    },
    "topics": [
     {
      "name": "Industry View",
-     "n": 28,
-     "positive": 21,
+     "n": 29,
+     "positive": 22,
      "negative": 2,
      "neutral": 5
     },
@@ -9085,8 +9285,8 @@
    "companies": [
     {
      "name": "NVDA",
-     "n": 32,
-     "positive": 25,
+     "n": 33,
+     "positive": 26,
      "negative": 1,
      "neutral": 6
     },
@@ -9124,14 +9324,14 @@
    "next_earnings": null
   },
   "musk": {
-   "n": 25,
+   "n": 26,
    "dirs": {
     "positive": 16,
     "negative": 6,
-    "neutral": 3
+    "neutral": 4
    },
    "paths": {
-    "report": 25
+    "report": 26
    },
    "topics": [
     {
@@ -9143,9 +9343,9 @@
     },
     {
      "name": "Industry View",
-     "n": 5,
+     "n": 6,
      "positive": 1,
-     "negative": 4,
+     "negative": 5,
      "neutral": 0
     },
     {
@@ -9173,8 +9373,8 @@
      "name": "Regulation",
      "n": 2,
      "positive": 0,
-     "negative": 2,
-     "neutral": 0
+     "negative": 1,
+     "neutral": 1
     }
    ],
    "countries": [
@@ -9182,16 +9382,16 @@
      "name": "Ukraine",
      "n": 4,
      "positive": 0,
-     "negative": 4,
-     "neutral": 0
+     "negative": 3,
+     "neutral": 1
     }
    ],
    "companies": [
     {
      "name": "TSLA",
-     "n": 13,
+     "n": 14,
      "positive": 10,
-     "negative": 1,
+     "negative": 2,
      "neutral": 2
     },
     {
@@ -9415,21 +9615,21 @@
    "sub_speakers": []
   },
   "burry": {
-   "n": 6,
+   "n": 7,
    "dirs": {
     "positive": 2,
-    "negative": 3,
+    "negative": 4,
     "neutral": 1
    },
    "paths": {
-    "report": 6
+    "report": 7
    },
    "topics": [
     {
      "name": "Macro Warning",
-     "n": 3,
+     "n": 4,
      "positive": 0,
-     "negative": 3,
+     "negative": 4,
      "neutral": 0
     },
     {
@@ -9542,22 +9742,22 @@
    "sub_speakers": []
   },
   "cramer": {
-   "n": 8,
+   "n": 9,
    "dirs": {
     "positive": 4,
     "negative": 3,
-    "neutral": 1
+    "neutral": 2
    },
    "paths": {
-    "report": 8
+    "report": 9
    },
    "topics": [
     {
      "name": "Sector Call",
-     "n": 4,
+     "n": 5,
      "positive": 0,
      "negative": 3,
-     "neutral": 1
+     "neutral": 2
     },
     {
      "name": "Stock Call",
@@ -9632,14 +9832,14 @@
    "next_fomc": null
   },
   "bessent": {
-   "n": 21,
+   "n": 19,
    "dirs": {
-    "positive": 4,
+    "positive": 3,
     "negative": 6,
-    "neutral": 11
+    "neutral": 10
    },
    "paths": {
-    "report": 20,
+    "report": 18,
     "office": 1
    },
    "topics": [
@@ -9652,8 +9852,8 @@
     },
     {
      "name": "Regulation",
-     "n": 6,
-     "positive": 4,
+     "n": 5,
+     "positive": 3,
      "negative": 0,
      "neutral": 2
     },
@@ -9665,18 +9865,18 @@
      "neutral": 5
     },
     {
-     "name": "Fed",
-     "n": 2,
-     "positive": 0,
-     "negative": 0,
-     "neutral": 2
-    },
-    {
      "name": "Trade",
      "n": 1,
      "positive": 0,
      "negative": 1,
      "neutral": 0
+    },
+    {
+     "name": "Fed",
+     "n": 1,
+     "positive": 0,
+     "negative": 0,
+     "neutral": 1
     }
    ],
    "countries": [
@@ -9689,10 +9889,10 @@
     },
     {
      "name": "France",
-     "n": 2,
+     "n": 1,
      "positive": 0,
      "negative": 0,
-     "neutral": 2
+     "neutral": 1
     }
    ],
    "companies": [
@@ -9824,7 +10024,6 @@
    "musk|Product",
    "trump|Company",
    "trump|Geopolitics",
-   "trump|Other",
    "trump|Trade",
    "wood|Stock Call"
   ],
@@ -9849,6 +10048,7 @@
    "trump|Company",
    "trump|Energy",
    "trump|Geopolitics",
+   "trump|Other",
    "trump|Trade",
    "wood|Macro Warning",
    "wood|Position",
@@ -9888,9 +10088,9 @@
    "ackman|Stock Call",
    "altman|Industry View",
    "bessent|Energy",
-   "bessent|Fed",
    "bessent|Geopolitics",
    "bessent|Regulation",
+   "burry|Macro Warning",
    "cramer|Sector Call",
    "cramer|Stock Call",
    "fed|Fed",
@@ -9913,15 +10113,16 @@
    "bessent|Fed",
    "burry|Policy",
    "burry|Stock Call",
+   "cramer|Sector Call",
    "lutnick|Company",
-   "trump|Energy",
-   "trump|Regulation",
-   "trump|Tax",
    "trump|Trade",
    "wood|Position"
   ],
   [
    "trump|Company",
+   "trump|Energy",
+   "trump|Regulation",
+   "trump|Tax",
    "wood|Position"
   ],
   [],

@@ -1,110 +1,130 @@
 {
- "model": "groq:openai/gpt-oss-120b",
+ "model": "groq:qwen/qwen3.8-27b",
  "cards": {
   "google_news:827ba85d4aaa362f": {
-   "headline": "트럼프, 아우디 조지아 공장 40억 달러 투자 발표",
-   "detail": "연간 20만 대 생산 · 4,500개 일자리 창출, 관세 부담 회피 목적",
-   "path": "미국 내 생산 확대, 수입 의존도 낮춤"
+   "headline": "트럼프, 오디 40억 달러 조지아 SUV 공장 투자",
+   "detail": "연간 20만 대 생산능력, 4,500명 고용 창출",
+   "path": "오디 투자 공급 확대 기대 자극"
   },
   "google_news:2817e43c74ba2a66": {
-   "headline": "트럼프, 캐나다 관세 협상 조만간 타결 언급",
-   "detail": "11월 3일 중간선거 앞두고 미시간 주 유세에서 구체적 내용 없이 발언",
-   "path": "무역 분쟁 완화, 불확실성 해소 기대"
+   "headline": "트럼프, 캐나다 관세 협상 곧 종료 전망",
+   "detail": "미시간 포트 휴런에서 중간선거 앞 언급, 구체적 일정 미제시",
+   "path": "관세 협상 종료 기대 압력"
   },
   "google_news:f24aaf1df4e47113": {
-   "headline": "트럼프, 미국 투자 기업 관세 50% 인상 경고",
-   "detail": "미국 체제 악용 시 적용, 투자 기업 대상 추가 부담 요인",
-   "path": "투자 기업 원가 부담 증가, 비용 상승 압력"
+   "headline": "트럼프, 기업 미국 투자 관세 50% 상향 가능성 언급",
+   "detail": "시스템 악용 시 적용, 기존 관세 정책과 차별화",
+   "path": ""
   },
   "google_news:cc9961bb6ec99dc5": {
-   "headline": "트럼프, 이란 타격 오늘 가능 언급",
+   "headline": "트럼프, 이란 공격 가능성 오늘 발표",
    "detail": "",
-   "path": "지정학적 긴장 고조, 위험 회피 심리 자극"
+   "path": "이란 위협 위험 회피 압력"
   },
   "google_news:6d334d94d06bb76a": {
-   "headline": "트럼프, 이란 협상 또는 타격 결정 시점 임박",
-   "detail": "중간선거 후 재개 가능성, 제3 항공모함 전단 페르시아만 파견",
-   "path": "군사 충돌 우려, 안전자산 선호 심리 자극"
+   "headline": "트럼프, 이란에 대한 최종 결정 시점 임박 언급",
+   "detail": "",
+   "path": "이란 위협 위험 회피 압력"
+  },
+  "google_news:411849699baa7ed8": {
+   "headline": "트럼프, 이란 핵 야망 저지 위해 유가 상승 정당화",
+   "detail": "",
+   "path": "이란 위협 위험 회피 압력"
   },
   "google_news:48449ba49ce44941": {
-   "headline": "트럼프, 데이터센터 지역 보상 · 승인권 주장",
-   "detail": "조지아 주 전기요금 상승 · 전력망 부담, 지역 정부 승인권 요구",
-   "path": "데이터센터 건설 규제 강화, 공급 속도 저하 압력"
+   "headline": "트럼프, 데이터센터 지역사회 보상금 수천 달러 요구",
+   "detail": "에너지 집약형 시설 확대와 전력망 부담 강조",
+   "path": "데이터센터 보상 기대 자극"
   },
   "google_news:4be1b315673637a9": {
-   "headline": "트럼프, 호르무즈 해협 유조선 통과량 전전 수준 초과",
-   "detail": "이란 핵 능력 파괴 주장, 선제 타격 정당화 논리",
-   "path": "원유 공급 원활, 가격 하락 압력"
+   "headline": "트럼프, 호르무즈 석유 통과량 전쟁 전 수준 초과 주장",
+   "detail": "",
+   "path": "석유 통과량 증가 기대 자극"
   },
   "google_news:d41bf802b140c06e": {
-   "headline": "트럼프, 피차이 대서양 개명 요청 거절 언급",
-   "detail": "구글 측 확인 불가, 남부 캐롤라이나 유세 중 에피소드 공개",
-   "path": "기업 이미지 관련, 실질적 영향 미미"
+   "headline": "트럼프, 구글 피차이 대서양 명칭 변경 설득 실패",
+   "detail": "구글 CEO와 통화, 명칭 변경 거부 확인",
+   "path": "GOOGL : 구글 발언 투자 압력"
+  },
+  "google_news:d8cd2b2eaa7f323f": {
+   "headline": "젠슨 황, AI 지출 4조 달러 전망 재확인",
+   "detail": "2030년 데이터센터 CAPEX 3~4조 달러 예상",
+   "path": "NVDA : AI 지출 확대 기대 자극"
   },
   "google_news:d3da9f045d8bdcee": {
-   "headline": "젠슨 황, AI 에이전트 토큰 · GPU 수요 급증",
-   "detail": "개인화 에이전트 확산, 수년 내 컴퓨트 수요 증가 전망",
-   "path": "AI 에이전트 확산, 컴퓨트 자원 수요 자극"
+   "headline": "젠슨 황, AI 에이전트 토큰·GPU 수요 급증 언급",
+   "detail": "에이전트 활용 증가로 연산 수요 급등",
+   "path": "NVDA : GPU 수요 상승 기대 자극"
   },
   "google_news:682ae2d41620913b": {
-   "headline": "젠슨 황, 미국 규제 중국 반도체 발전 촉진",
-   "detail": "수출 제한 · 무역 규제, 중국 국내 역량 강화 촉매제",
-   "path": "중국 자립 가속, 글로벌 시장 경쟁 심화"
+   "headline": "젠슨 황, 미국 규제 중국 반도체 성장 촉진",
+   "detail": "수출 제한이 현지 기술 개발 가속화 역할",
+   "path": ""
   },
   "google_news:069a1a5e9266270d": {
-   "headline": "젠슨 황, 미국 수출 규제 중국 칩 추진 가속",
+   "headline": "젠슨 황, 미국 수출 규제 중국 메모리 과잉 부정",
    "detail": "",
-   "path": "중국 칩 자립, 공급망 다변화 압력"
+   "path": ""
   },
   "google_news:504a9930edd7f708": {
-   "headline": "젠슨 황, AGI 도달 선언",
-   "detail": "오픈AI GPT-6 아스트라, 9월 3일 출시, 인프라 지출 영향",
-   "path": "AGI 실현, AI 인프라 투자 확대 기대"
+   "headline": "젠슨 황, AGI 도래 선언",
+   "detail": "OpenAI GPT‑6 Astra를 AGI 증거로 제시",
+   "path": "NVDA : AGI 도래 기대 자극"
+  },
+  "google_news:33a8ff8b924df7ce": {
+   "headline": "젠슨 황, AI 일자리 파괴 주장 반박",
+   "detail": "소프트웨어·헬스케어 고용 증가 강조",
+   "path": "NVDA : AI 고용 기대 자극"
   },
   "google_news:462e6d9b9fb1e9d8": {
-   "headline": "머스크, 스페이스X AI 칩 400억 달러 채권 발행",
+   "headline": "일론 머스크, 스페이스X 400억 달러 AI 칩 부채 계약 체결",
    "detail": "",
-   "path": "AI 칩 투자 확대, 기술 경쟁 심화"
+   "path": "TSLA : AI 칩 부채 공급 압력"
   },
   "google_news:f36ed1bf02b21357": {
-   "headline": "머스크, 스페이스X GPU용 400억 달러 차입",
-   "detail": "",
-   "path": "GPU 확보, AI 인프라 경쟁 심화"
+   "headline": "일론 머스크, SpaceX GPU 부채 조달",
+   "detail": "$40B 부채 조달, 투자 등급·Starlink·발사 수익 기반",
+   "path": "TSLA : GPU 부채 조달 압력"
   },
   "google_news:8234470694b8ee7b": {
-   "headline": "머스크, 테슬라 메가팩 2027년까지 매진 임박",
-   "detail": "에너지 수요 강세, 생산 확대 · 마진 개선 기대",
-   "path": "에너지 저장 수요, 매출 성장 기대 자극"
+   "headline": "일론 머스크, 메가팩 2027년 매진 전망",
+   "detail": "에너지 사업 수요 급증, 생산 확대·마진 상승 기대",
+   "path": "TSLA : 메가팩 매진 압력"
   },
   "google_news:f4c7686de8914964": {
-   "headline": "일론 머스크, 완전 자율주행 수요 기록",
-   "detail": "FSD 구독 1.74백만, 북미 신차 75% 적용",
-   "path": "FSD 수요 급증 → 공급 압력"
+   "headline": "일론 머스크, 풀셀프드라이빙 사고 방지 효과",
+   "detail": "FSD 구독 급증·북미 신차 적용 비중 확대 기대",
+   "path": "TSLA : FSD 수요 기대 자극"
   },
   "google_news:8ad465ff1feb7b7b": {
-   "headline": "일론 머스크, AI 클라우드 기업 200개 붕괴 전망",
-   "detail": "CoreWeave 부채 금리 사상 최고, SpaceX 400억 차입",
-   "path": "AI 클라우드 기업 위축 → 투자 압력"
+   "headline": "일론 머스크, AI 클라우드 기업 200개 붕괴 예상",
+   "detail": "CoreWeave·채권 금리 기록·GPU 구매·신용 경색 압력",
+   "path": "AI 클라우드 신용 압력"
   },
   "google_news:4eb7c9782d2435ff": {
-   "headline": "일론 머스크, 스타링크 우크라이나 접근 제한",
-   "detail": "Starlink 방어 핵심, 속도 100mph 제한",
-   "path": "Starlink 접근 제한 → 공급 압력"
+   "headline": "일론 머스크, 우크라이나 스타링크 접근 제한",
+   "detail": "Starlink 방어 중요·공격용 사용 금지·제한 조치 압력",
+   "path": "Starlink 제한 압력"
   },
   "google_news:560172a026076034": {
-   "headline": "일론 머스크, 우크라이나 스타링크 서비스 조건 위반 주장",
-   "detail": "Starlink 사용 공격 드론 논란, Starshield 별도",
-   "path": "Starlink 사용 제한 → 공급 압력"
+   "headline": "일론 머스크, 우크라이나 스타링크 서비스 위반 주장",
+   "detail": "서비스 속도 제한·공격용 사용 금지·전선 붕괴 위험 강조",
+   "path": "Starlink 제한 압력"
   },
   "google_news:b1bd48181ff43215": {
-   "headline": "일론 머스크, AI 대출 긴축 경고",
-   "detail": "SpaceX GPU 400억 차입, 금융업 대출 압박",
-   "path": "AI 대출 긴축 → 자금 압력"
+   "headline": "일론 머스크, AI 대출 위축 경고",
+   "detail": "신용 경색·네오클라우드·채무 조달·AI 인프라 압력",
+   "path": ""
   },
   "google_news:392a299e04d21e16": {
-   "headline": "일론 머스크, 우크라이나 스타링크 속도 저하 배경",
-   "detail": "속도 제한 100mph, 서비스 복구 논란",
-   "path": "Starlink 속도 저하 → 공급 압력"
+   "headline": "일론 머스크, 우크라이나 스타링크 감속 배경",
+   "detail": "",
+   "path": ""
+  },
+  "google_news:051fecc41397e22a": {
+   "headline": "일론 머스크, 네오클라우드 신용 건조 예측",
+   "detail": "AI 인프라·채권 비용·통합 압력",
+   "path": "네오클라우드 신용 압력"
   },
   "google_news:f0f4061924b44917": {
    "headline": "캐시 우드, 메가캡 주식 대규모 매입",
@@ -112,49 +132,44 @@
    "path": ""
   },
   "google_news:c7c07f271e05a589": {
-   "headline": "캐시 우드, 비트코인 급성장 단계 진입",
+   "headline": "캐시 우드, 비트코인 급성장 단계 진입 전망",
    "detail": "",
-   "path": "비트코인 성장 단계 진입 → 수요 기대 자극"
+   "path": "비트코인 수요 기대 자극"
   },
   "google_news:5c115c9d3b7cc92c": {
-   "headline": "샘 올트먼, AI 모델 버그 탐지 가속",
-   "detail": "보안 패치 속도 한계, 하드웨어 수준 위험",
-   "path": "AI 버그 탐지 확대 → 보안 압력"
+   "headline": "샘 올트먼, AI 버그 탐지 비정상적 확대 경고",
+   "detail": "정렬 연구 초기·위협 모델 외 버그 탐지 압력",
+   "path": ""
   },
   "google_news:c7132a575f63f1f6": {
-   "headline": "샘 올트먼, 자율 AI 속도 제한 필요",
+   "headline": "샘 올트먼, 자가 개선 AI 속도 제한 필요성 제시",
    "detail": "",
-   "path": "자율 AI 속도 제한 → 규제 압력"
-  },
-  "google_news:0f2d07d0ea6b059d": {
-   "headline": "마이클 버리, S&P 500 2000 수준 근접",
-   "detail": "23% 종목 Busted, 10월 6일 사상 최고",
-   "path": "시장 고평가 우려 → 위험 회피 압력"
-  },
-  "google_news:f8a7a97f98879222": {
-   "headline": "짐 크레이머, AI 주식 추가 압박 전망",
-   "detail": "데이터센터 물·전기 비용 위험, 메타 자본조달",
-   "path": "AI 주식 압박 확대 → 투자 압력"
-  },
-  "google_news:d6945f712b2cd7a2": {
-   "headline": "연준, 데이터 주시 강조",
-   "detail": "",
-   "path": "금리 변동 기대 → 금리 압력"
-  },
-  "google_news:d8cd2b2eaa7f323f": {
-   "headline": "젠슨 황, AI 지출 4조 전망",
-   "detail": "2030년 글로벌 데이터센터 자본지출 4조 달성 목표",
    "path": ""
   },
   "google_news:64634c10f6dc5695": {
-   "headline": "샘 올트먼, AI 보안 패치 한계 경고",
-   "detail": "모델이 하드웨어 수준 취약점 탐지 가능",
-   "path": "기술 업종 : AI 모델 보안 패치 속도 초과 압력"
+   "headline": "샘 올트먼, AI 모델 사이버 보안 패치 속도 초과 경고",
+   "detail": "모델 버그 탐지·패치 한계·보안 팀 압력",
+   "path": ""
+  },
+  "google_news:0f2d07d0ea6b059d": {
+   "headline": "마이클 버리, S&P 500 2000 수준 근접 지적",
+   "detail": "2000년 시장 정점 유사·버스트 종목 비중 상승 경고",
+   "path": ""
   },
   "google_news:e91274e77e6bb31b": {
-   "headline": "빌 애크먼, AI 이스라엘 트릴리온 기업 전망",
-   "detail": "소규모 고숙련 팀 경쟁력 강화 기대",
-   "path": "기술 업종 : AI 이스라엘 트릴리온 기업 기대 자극"
+   "headline": "빌 애크먼, AI 이스라엘 트릴리언 기업 기대",
+   "detail": "소규모 고숙련 팀 경쟁력·의료 혁신·정치 위험 인식",
+   "path": ""
+  },
+  "google_news:f8a7a97f98879222": {
+   "headline": "짐 크레이머, AI 트레이드 추가 하락 경고",
+   "detail": "메타 자금 조달 · 데이터센터 전력 · 물 사용 우려, 빅테크 실적 상방 제한",
+   "path": "데이터센터 리스크 · 매크로 불확실성, 기술주 밸류에이션 부담"
+  },
+  "google_news:d6945f712b2cd7a2": {
+   "headline": "워시, 트레이더 대상 데이터 주시 당부",
+   "detail": "",
+   "path": "데이터 의존적 통화정책 기조, 금리 경로 불확실성 유지"
   }
  }
 }
