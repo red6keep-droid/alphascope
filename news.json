@@ -1,6 +1,14 @@
 {
-  "updated_at": "2026-10-26 06:46:18 UTC",
+  "updated_at": "2026-10-26 08:46:15 UTC",
   "items": [
+    {
+      "title": "Brazil's Lula wins historic presidential election; Bolsonaro reportedly refuses to concede",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/brazil-lula-win-presidential-election-runoff-vote.html",
+      "published": "2026-10-26 08:05:28",
+      "title_ko": "브라질 루라, 결선 투표에서 대통령 선거 승리",
+      "summary_ko": ""
+    },
     {
       "title": "Defense tech investment boom sparks bubble warning as private equity pours in",
       "source": "CNBC",
@@ -32,14 +40,6 @@
       "published": "2026-10-26 04:56:16",
       "title_ko": "소프트뱅크, 'AI 국가' 말레이시아에 500억 달러 기술 투자 계획",
       "summary_ko": "인공지능 및 데이터센터 포함"
-    },
-    {
-      "title": "Brazil's Lula wins historic presidential election; Bolsonaro reportedly refuses to concede",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/brazil-lula-win-presidential-election-runoff-vote.html",
-      "published": "2026-10-26 04:09:41",
-      "title_ko": "브라질 루라, 결선 투표에서 대통령 선거 승리",
-      "summary_ko": ""
     },
     {
       "title": "SpaceX closes $40 billion debt deal for AI chips, Elon Musk says",
