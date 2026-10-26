@@ -174,7 +174,7 @@ def sec_periods(s):
         return ""
     chart = R._col_chart([(p["label"], [p["stock"], p.get("spy")]) for p in ps], [R._sign_bg, lambda v: R._GRAY_BAR], [R._sign_fg, lambda v: NOTE])
     legend = R._legend_chips([(f"{s['name']} 오름", R._PASTEL_UP), (f"{s['name']} 내림", R._PASTEL_DN), ("S&P 500", R._GRAY_BAR)])
-    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{PAD + 6}px 12px 0;">{chart}{legend}</span></span></div>'
+    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{PAD + 6}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
     return R._card_title("기간별 수익률 (%)", periods_tip(s, ps)) + card
 
 

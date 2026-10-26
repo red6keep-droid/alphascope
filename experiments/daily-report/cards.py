@@ -133,7 +133,7 @@ def chart_card(title, groups, colors, label_colors, legend, fmt=None):
     if not chart:
         return ""
     head = f'<span style="display:block;font-weight:700;color:#111;margin:0 0 6px;">{esc(title)}</span>'
-    return head + f'<span style="{dk.MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}{legend_chips(legend)}</span></span>'
+    return head + f'<span style="{dk.MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{dk.legend_top(chart, legend_chips(legend))}</span></span>'
 
 
 sign_bg = lambda v: PASTEL_UP if v > 0 else PASTEL_DN   # noqa: E731

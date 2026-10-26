@@ -489,7 +489,7 @@ def sec_periods(s):
         return ""
     chart = R._col_chart([(p["label"], [p["stock"], p.get("spy")]) for p in ps], [R._sign_bg, lambda v: R._GRAY_BAR], [R._sign_fg, lambda v: NOTE])
     legend = R._legend_chips([(f"{s['name']} 오름", R._PASTEL_UP), (f"{s['name']} 내림", R._PASTEL_DN), ("KOSPI", R._GRAY_BAR)])
-    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{PAD + 6}px 12px 0;">{chart}{legend}</span></span></div>'
+    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{PAD + 6}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
     return R._card_title("기간별 수익률 (%)", periods_tip(s, ps)) + card
 
 
@@ -984,7 +984,7 @@ def sec_investors(m):
                  f'<span style="display:block;height:6px;"></span>{sch}</span>')
     tip = ("한 달 동안 외국인 · 기관 · 개인이 각각 산 금액에서 판 금액을 뺀 것(유가증권 + 코스닥), 그리고 전체 거래에서 각자가 차지한 비중. 월별 자료라 지난달까지\n"
            f"· {last[:4]}년 {int(last[5:])}월 : 외국인 {_sgn(_v('foreign', last) or 0, 1)}조 · 기관 {_sgn(_v('inst', last) or 0, 1)}조 · 개인 {_sgn(_v('indiv', last) or 0, 1)}조")
-    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{chart}{legend}</span></span></div>'
+    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
     return R._card_title("기관 · 개인은?", _dk.with_src(tip, SRC)) + card
 
 

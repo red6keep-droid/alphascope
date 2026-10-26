@@ -2725,8 +2725,9 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   function check() {
     var boxes = document.querySelectorAll('[data-scroll-x]');
     for (var i = 0; i < boxes.length; i++) {
-      var b = boxes[i], h = b.previousElementSibling;
-      if (!h || !h.hasAttribute('data-scroll-hint') || !b.clientWidth) continue;
+      var b = boxes[i], t = b.previousElementSibling;
+      var h = t && (t.hasAttribute('data-scroll-hint') ? t : t.querySelector('[data-scroll-hint]'));   /* 범례와 한 줄(data-chart-top) 안에 있을 수 있다 */
+      if (!h || !b.clientWidth) continue;
       h.style.display = b.scrollWidth > b.clientWidth + 1 ? 'block' : 'none';   /* '' 로 두면 인라인 display:block 까지 지워져 왼쪽에 붙는다 */
     }
   }

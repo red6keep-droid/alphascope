@@ -104,7 +104,7 @@ def body_ai(t, a, day, guide):
     lines = [("row", b["name"], f"{_pp(b['rel_20d'])}%p", f"{b['state']} · 20일 {_pp(b['ret_20d'])}% (S&P {_pp(a['bench_ret_20d'])}%)") for b in bs]
     chart = R._col_chart([(b["name"], [b["ret_20d"], a["bench_ret_20d"]]) for b in bs], [R._sign_bg, lambda v: R._GRAY_BAR], [R._sign_fg, lambda v: NOTE], height=130)
     legend = R._legend_chips([("갈래 오름", R._PASTEL_UP), ("갈래 내림", R._PASTEL_DN), ("S&P 500", R._GRAY_BAR)])
-    lines.append((f'<span style="display:block;padding:6px 12px 0;">{chart}{legend}</span>', "html"))
+    lines.append((f'<span style="display:block;padding:6px 12px 0;">{dk.legend_top(chart, legend)}</span>', "html"))
     tip = (f"갈래마다 동일가중 바스켓의 20거래일 수익률에서 S&P 500 수익률을 뺀 값. +{T.FLOW_PP:.0f}%p 넘으면 유입, −{T.FLOW_PP:.0f}%p 아래면 유출\n"
            "· 세 갈래가 같이 유입이면 AI 테마 자체로 돈이 오는 것, 한 갈래만이면 다른 이유일 수 있다")
     cards = R._state_card("돈이 몰리나?", a["state"], a["theme_kind"], KIND_COLOR[a["theme_kind"]], lines, "", tip=dk.with_src(tip, "Yahoo Finance"), fold=True, opened=True)

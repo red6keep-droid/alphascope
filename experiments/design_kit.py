@@ -210,6 +210,24 @@ def col_layout(n, ns, label_px, axis_px):
     return (group - ns * label_px) / 2 / group, int(n * group + 0.999)
 
 
+_HINT_RE = re.compile(r'^(<span data-scroll-hint="1"[^>]*>.*?</span>)', re.S)
+_LEGEND_RE = re.compile(r'^<span style="[^"]*">(.*)</span>$', re.S)
+
+
+def legend_top(chart_html, legend_html):
+    """그래프 위 한 줄 — 왼쪽 `밀어서 보기 ›`(넘칠 때만) · 오른쪽 범례 (2026-10-26 사용자: "밀어서 보기는 좌측 정렬, 범례는 상단 우측 정렬").
+    legend_html = 범례 칩 줄(_legend_chips · legend_chips). 좁으면 범례가 다음 줄 오른쪽으로 내려간다. 그래프 아래에는 범례가 없으니 빈 4px 로 아래 여백을 맞춘다."""
+    hint = ""
+    m = _HINT_RE.match(chart_html or "")
+    if m:
+        hint, chart_html = m.group(1).replace("margin:0 0 4px;", "margin:0;", 1), chart_html[m.end():]
+    lm = _LEGEND_RE.match(legend_html or "")
+    chips = (lm.group(1) if lm else legend_html or "").replace("margin:0 12px 0 0;", "margin:0 0 0 12px;")
+    top = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;'
+           f'font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 4px;">{hint}<span style="margin-left:auto;text-align:right;">{chips}</span></span>')
+    return top + chart_html + '<span style="display:block;height:4px;"></span>'
+
+
 SCROLL_SHADE = ("background:linear-gradient(to left,#fff 30%,rgba(255,255,255,0)) 100% 0/28px 100% no-repeat local,"
                 "radial-gradient(farthest-side at 100% 50%,rgba(15,23,42,.18),rgba(15,23,42,0)) 100% 0/14px 100% no-repeat scroll;background-color:#fff;")
 
@@ -219,8 +237,8 @@ def scroll_x(html, min_w):
     더 있다는 표시 (2026-10-26 사용자: "밀어서 보기를 오른쪽 상단에, 오른쪽에 세로로 그림자를 넣어 더 있다는 걸"):
     ① 오른쪽 세로 그림자 — 오른쪽에 더 있을 때만 보이고 끝까지 밀면 사라진다(CSS 만: 덮개 local · 그림자 scroll 배경) ·
     ② 그래프 오른쪽 위 `밀어서 보기 ›` — 폰 폭에서 넘칠 때만 넣고, 화면이 넓어 안 넘치면 테마 JS(`data-scroll-hint`)가 숨긴다."""
-    hint = (f'<span data-scroll-hint="1" style="display:block;text-align:right;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};margin:0 0 4px;">밀어서 보기 ›</span>'
-            if min_w > CHART_PHONE_W else "")
+    hint = (f'<span data-scroll-hint="1" style="display:block;text-align:left;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};margin:0 0 4px;">밀어서 보기 ›</span>'
+            if min_w > CHART_PHONE_W else "")   # 왼쪽 정렬 (같은 날 사용자 — 처음엔 오른쪽 위, 범례가 오른쪽 위로 가며 왼쪽으로)
     return (f'{hint}<span data-scroll-x="1" style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;{SCROLL_SHADE}">'
             f'<span style="display:block;min-width:{min_w}px;">{html}</span></span>')
 

@@ -541,7 +541,7 @@ def sec_periods(a):
     pad = _dk.SEP_GAP - _dk.VP - 1
     chart = _col_chart([(p["label"], [p["nvda"], p.get("spy")]) for p in ps], [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE])
     legend = _legend_chips([("엔비디아 오름", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), ("S&P 500", _GRAY_BAR)])
-    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}{legend}</span></span></div>'
+    card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}"><span style="display:block;padding:{pad + 6}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
     return _card_title("기간별 수익률 (%)", periods_tip(ps)) + card
 
 
@@ -1747,7 +1747,7 @@ def _status_group(a, group):
 def _chart_card(groups, colors, label_colors, legend, fmt=None):
     pad = _dk.SEP_GAP - _dk.VP - 1
     chart = _col_chart(groups, colors, label_colors, fmt=fmt)
-    return f'<span style="{MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{chart}{_legend_chips(legend)}</span></span>'
+    return f'<span style="{MULTI}margin:0;"><span style="display:block;padding:{pad + 6}px 12px 0;">{_dk.legend_top(chart, _legend_chips(legend))}</span></span>'
 
 
 def _gray(v):
