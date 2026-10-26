@@ -116,9 +116,9 @@ def price_card(s, today):
         head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1)
         k = head.rstrip().rfind("</span>")
         head = head[:k] + sub + head[k:]
-    rows = R.glance_rows(g) + sec_earnings(s, today) + sec_chart_indicators(s)   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복은 강조 카드 안 (2026-10-26 사용자)
+    rows = R.glance_rows(g) + sec_earnings(s, today)   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 지표 보기는 강조 카드 안 (2026-10-26 사용자)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-            f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_periods(s)), R.in_card(sec_drawdown(s))])}<div style="margin-top:8px;">{rows}</div></details></div>')
+            f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_periods(s)), R.in_card(sec_drawdown(s)), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
 
 
 IMAGE_BRANCH = "radar-images"   # 종목 그래프 전용 브랜치 — 매 실행 그날 그림만 담아 덮어쓴다(이력 없음). 지난 그림은 남지 않는다 (2026-10-20 사용자: 이미지는 휘발성)

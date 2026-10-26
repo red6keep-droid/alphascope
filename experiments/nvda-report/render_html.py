@@ -581,15 +581,21 @@ def in_card(sec):
             f'{m.group(2)}</span>')
 
 
+def rows_after(rows):
+    """강조 카드 펼침에서 카드 밖에 남는 것 — 없으면 빈 여백도 두지 않는다."""
+    return f'<div style="margin-top:8px;">{rows}</div>' if rows else ""
+
+
 def price_in(bg, bd, parts):
-    """가격 정보 강조 카드 펼침 안 — 머리 줄 바로 아래 같은 바탕 · 테두리로 이어지고, 안에 흰 카드들(가격 범위 · 기간별 수익률 · 고점 회복)을 8px 간격으로.
+    """가격 정보 강조 카드 펼침 안 — 머리 줄 바로 아래 같은 바탕 · 테두리로 이어지고, 안에 흰 카드들(가격 범위 · 기간별 수익률 · 고점 회복) · `차트 지표 보기` 를 8px 간격으로.
     펼친 동안 머리 줄 아래 모서리는 테마 CSS 가 편다 (`details[data-acc][open] > summary:has(+ [data-in-card]) > span:first-child`)."""
-    cards = [x for x in parts if x]
+    # `차트 지표 보기` 접기도 카드 안 (같은 날 사용자) — 바깥용 아래 여백(margin:0 0 8px)은 뗀다. 접기 · details 가 들어가므로 상자는 div
+    cards = [x.replace('<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;">', '<details data-fold="1" data-label="차트 지표 보기" style="margin:0;">', 1) for x in parts if x]
     if not cards:
         return ""
-    inner = "".join(f'<span style="display:block;{"margin-top:8px;" if k else ""}">{c}</span>' for k, c in enumerate(cards))
-    return (f'<span data-in-card="1" style="display:block;background:{bg};border:1px solid {bd};border-top:0;border-radius:0 0 8px 8px;'
-            f'padding:12px;line-height:{LH_CARD};white-space:normal;">{inner}</span>')
+    inner = "".join(f'<div style="{"margin-top:8px;" if k else ""}">{c}</div>' for k, c in enumerate(cards))
+    return (f'<div data-in-card="1" style="background:{bg};border:1px solid {bd};border-top:0;border-radius:0 0 8px 8px;'
+            f'padding:12px;line-height:{LH_CARD};white-space:normal;">{inner}</div>')
 
 
 def dd_tip(d):
@@ -751,11 +757,12 @@ def sec_headline(a, n=None):
     if a.get("macro_today"):
         items.append(("거시 일정", _esc(", ".join(a["macro_today"]))))
     deep += _multi(items)
-    rows += (f'<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{_fold_row("차트 지표 보기")}</summary>'
+    fold = (f'<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{_fold_row("차트 지표 보기")}</summary>'
              f'<div style="margin-top:6px;">{deep}</div></details>')
+    rows_html = rows_after(rows)   # 카드 밖에 남는 것 — 평소 범위 밖 설명 · 실적 발표 후 가격 변동
     out = (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-           f'{price_in(bg, bd, [year_range_in(a.get("year_range"), lambda v: f"${v:,.2f}", year_tip(a["year_range"]) if a.get("year_range") else ""), in_card(sec_periods(a)), in_card(sec_drawdown(a))])}'
-           f'<div style="margin-top:8px;">{rows}</div></details></div>')
+           f'{price_in(bg, bd, [year_range_in(a.get("year_range"), lambda v: f"${v:,.2f}", year_tip(a["year_range"]) if a.get("year_range") else ""), in_card(sec_periods(a)), in_card(sec_drawdown(a)), fold])}'
+           f'{rows_html}</details></div>')
     out += sec_state_cards(a)   # 시장 국면 · 반도체 자금 — 이유를 담은 별도 카드 둘 (2026-10-11 사용자)
     if not a.get("is_latest_bar_today"):
         out += _muted("기준 거래일이 최신이 아닐 수 있습니다. 일봉 수집 상태를 확인하세요.")
