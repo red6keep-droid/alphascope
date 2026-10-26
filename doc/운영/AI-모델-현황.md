@@ -52,7 +52,7 @@ NVIDIA 단계는 운영에서 자동으로 빠진다(아래 "실제 순서"가 �
 | `json-gemini` | flash → lite | NVDA · 트럼프 재분류 (예비 모델이 임시로 단 라벨을 Gemini 로 다시) | 정식 라벨은 Gemini 만 |
 | `json-backup-first` | **Qwen → gpt-oss → lite** | 인물 레이더 인용 추출, Media Daily 서술 | 새 기능은 예비 먼저 (10-19). 출력이 짧은 일 |
 | `json-oss-first` | **gpt-oss → Qwen → lite** | 인물 레이더 분류 · 카드 요약 | **10-26 신설** — 출력 2천 토큰이 Qwen 출력 한도에 걸려서 |
-| `news` / `news-alt` | Qwen → gpt-oss → lite / gpt-oss → Qwen → lite | 공용 뉴스 처리(news_store): 홈 뉴스 · 데일리 뉴스 · 종목 레이더 | 배치마다 번갈아 — 모델마다 60초 기다림을 반으로 (10-25). **10-26: Qwen 차례는 4건, gpt-oss 차례는 10건** · 48시간 넘은 새 기사는 AI 안 보냄 · 시간 예산 30분 |
+| `news` / `news-alt` | Qwen → gpt-oss → lite / gpt-oss → Qwen → lite | 공용 뉴스 처리(news_store): 홈 뉴스 · 데일리 뉴스 · 종목 레이더 | 배치마다 번갈아 — 모델마다 60초 기다림을 반으로 (10-25). **10-26: Qwen 차례는 4건, gpt-oss 차례는 10건** · 24시간 넘은 새 기사는 AI 안 보냄(10-26 48 → 24) · 시간 예산 30분 |
 | `comment` | gpt-oss → Qwen → lite → flash | 블로그 댓글 답글 | 댓글 한 건에 Gemini 를 쓰지 않게, flash 는 맨 뒤 |
 | `translate` · `json-lite` | — | **지금 쓰는 곳 없음** (news 사슬로 옮김) | 정리 대상 |
 
@@ -74,7 +74,7 @@ NVIDIA 단계는 운영에서 자동으로 빠진다(아래 "실제 순서"가 �
 | 미국 증시 데일리 (`test-daily-report.yml`) | 1 (화~토) | 리포트 서술 + 커버 이미지 프롬프트 | json-daily | flash |
 | 데일리 뉴스 (`collect_news` → news_store) | 1 | 헤드라인 번역 · 요약 · 종목 관련도 | news / news-alt | Qwen · gpt-oss |
 | 홈 뉴스 (`news.yml`, fetch_news) | 하루 여러 번 (2시간 간격 · 수동) | 같은 공용 처리 | news / news-alt | Qwen · gpt-oss |
-| 종목 레이더 뉴스 (`radar-news`, **NVDA 워크플로 안에서** 돈다) | 1 | 같은 공용 처리 — 새 기사 하루 400 ~ 500건 | news / news-alt | Qwen · gpt-oss — **Groq 하루 토큰의 대부분** (10-25: 새 기사 406건, gpt-oss 26회 · Qwen 14회 답함). 10-26부터 48시간 안 기사만(406 → 약 290건), Qwen 4건 · gpt-oss 10건 번갈아 |
+| 종목 레이더 뉴스 (`radar-news`, **NVDA 워크플로 안에서** 돈다) | 1 | 같은 공용 처리 — 새 기사 하루 400 ~ 500건 | news / news-alt | Qwen · gpt-oss — **Groq 하루 토큰의 대부분** (10-25: 새 기사 406건, gpt-oss 26회 · Qwen 14회 답함). 10-26부터 24시간 안 기사만(406 → 약 290건 → 약 194건), Qwen 4건 · gpt-oss 10건 번갈아 |
 | 인물 발언 레이더 (`people-radar.yml`) | 1 (10-26부터, 이전엔 2) | 인용 추출 / 분류 / 카드 요약 | backup-first / oss-first / oss-first | Qwen / gpt-oss / gpt-oss |
 | Media Daily (`media-daily.yml`) | 1 | 머리 한 줄 + 묶음마다 한 문장 | json-backup-first | Qwen |
 | 댓글 답글 (`comment-reply.yml`) | 하루 여러 번 (댓글 있을 때만 호출) | 답글 | comment | gpt-oss |
@@ -143,7 +143,7 @@ NVIDIA 단계는 운영에서 자동으로 빠진다(아래 "실제 순서"가 �
 | R6 | NVIDIA 제외로 예비 한 칸 감소 | 상시 | 데일리 서술 예비가 lite 뿐 | — | 다른 회사 무료 서술 모델 후보 비교 필요 |
 | R7 | 커버 이미지 | Pollinations 장애 | 커버 없이 게시 · HF 로 대체 | 2단 예비 | Pollinations 는 키 없는 무료 — 예고 없이 바뀔 수 있음 |
 | R8 | 쓰지 않는 사슬 | `translate` · `json-lite` | 혼동 | — | 정리 대상 |
-| R9 | **Groq 하루 토큰(TPD 20만) 소진** | 종목 레이더 뉴스가 새 기사를 많이 받은 날 (NVDA 워크플로, KST 06:30 전후) — 그 뒤에 도는 인물 레이더 · Media Daily · 댓글이 gpt-oss 를 못 씀 | 그날 남은 일은 Qwen(출력 한도) → lite 로 내려감 → **Gemini 사용이 다시 늘어남** | 10-26: 종목 레이더 뉴스를 48시간 안 기사만 · Qwen 몫 정상화(4건)로 gpt-oss 하루 약 165K → 약 135K 토큰 추정. 하루 한도를 받으면 그 실행 동안 건너뜀 · 뉴스 시간 예산 30분 | 인물 레이더 분류 · 요약도 gpt-oss 먼저(`json-oss-first`)라 **gpt-oss 합계는 여전히 20만 근처일 수 있다** — 운영 반영 뒤 며칠 로그로 확인. 더 줄이려면 ① 48 → 24시간 ② 종목당 기사 수(PER_STOCK 15) 축소 ③ `fact_en` 빼기(영어판 준비용 — 사용자 결정) |
+| R9 | **Groq 하루 토큰(TPD 20만) 소진** | 종목 레이더 뉴스가 새 기사를 많이 받은 날 (NVDA 워크플로, KST 06:30 전후) — 그 뒤에 도는 인물 레이더 · Media Daily · 댓글이 gpt-oss 를 못 씀 | 그날 남은 일은 Qwen(출력 한도) → lite 로 내려감 → **Gemini 사용이 다시 늘어남** | 10-26: 종목 레이더 뉴스를 48시간 안 기사만 · Qwen 몫 정상화(4건)로 gpt-oss 하루 약 165K → 약 135K 토큰 추정, 24시간으로 줄여(10-26 사용자) 약 90K 추정. 하루 한도를 받으면 그 실행 동안 건너뜀 · 뉴스 시간 예산 30분 | 인물 레이더 분류 · 요약도 gpt-oss 먼저(`json-oss-first`)라 **gpt-oss 합계는 여전히 20만 근처일 수 있다** — 운영 반영 뒤 며칠 로그로 확인. ① 48 → 24시간은 적용(10-26). 더 줄이려면 ② 종목당 기사 수(PER_STOCK 15) 축소 ③ `fact_en` 빼기(영어판 준비용 — 사용자 결정) |
 
 ---
 

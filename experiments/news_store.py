@@ -47,7 +47,8 @@ QWEN_BATCH = 4   # Qwen 이 첫 단계인 사슬(news)은 4건 — 답이 기사
                  # 그 몫이 전부 gpt-oss 로 넘어가 gpt-oss 하루 토큰 20만이 찼다 (2026-10-26: 10-25 종목 레이더 Qwen 25번 중 11번 429).
                  # 5건(출력 약 1,100)은 두 번째 호출부터 거절, 4건(817 ~ 905)은 62초 간격 3연속 성공 (llm_chain groq-qwen 주석)
 MAX_MINUTES = 30   # 한 실행의 분류 시간 예산 — gpt-oss 가 하루 한도로 빠지면 Qwen 4건/분만 남아 느려진다. 남은 기사는 다음 실행 (NVDA 워크플로 제한 60분)
-CLASSIFY_HOURS = 48   # 이보다 오래된 새 기사는 AI 에 보내지 않는다 — 목록은 최근 24시간, 중요 이슈도 최신 5줄이라 거의 안 보인다.
+CLASSIFY_HOURS = 24   # 이보다 오래된 새 기사는 AI 에 보내지 않는다 — 목록은 최근 24시간, 중요 이슈도 최신 5줄이라 거의 안 보인다.
+                      # 48 → 24 (2026-10-26 사용자): 하루 약 96건 · gpt-oss 약 44K 토큰 절약, 중요 이슈 약 3% 영향 (10-25 데이터)
                       # 10-25 새 기사 406건 중 115건(28%)이 2 ~ 8일 전 기사였다 (구글 뉴스 7일 검색이 매일 새로 섞여 들어옴)
 AREAS = ("Earnings", "Flows", "Regulation", "Legal", "Product", "Demand", "Supply", "Corporate", "Macro", "Other")
 DIRS = ("positive", "negative", "uncertain", "neutral")
