@@ -1,77 +1,101 @@
 {
-  "updated_at": "2026-10-26 12:46:19 UTC",
+  "updated_at": "2026-10-26 14:46:21 UTC",
   "items": [
     {
-      "title": "Meta announces $95 billion stock offering to fund AI expansion",
+      "title": "Trump says he'll soon decide whether to ‘make a deal’ with Iran or ‘finish it off'",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/meta-stock-offering-ai.html",
-      "published": "2026-10-26 12:42:41",
-      "title_ko": "메타, AI 확장 위해 950억 달러 주식 공모 발표",
-      "summary_ko": "엔비디아·AMD·브로드컴, 50억 달러 규모 주식 매입 검토"
+      "link": "https://www.cnbc.com/2026/10/26/us-iran-war-hormuz.html",
+      "published": "2026-10-26 14:36:03",
+      "title_ko": "트럼프, 이란과 '거래' 체결 여부 또는 '종결' 여부 곧 결정할 것",
+      "summary_ko": "중동 긴장 고조 속 협상 및 군사 행동 검토"
     },
     {
-      "title": "Can GOP Rep. Brian Fitzpatrick, a moderate who's bucked Trump, keep his Pennsylvania swing seat?",
+      "title": "Alaska Senate: Peltola seeks quick dismissal of DOJ election lawsuit suit before midterm",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/brian-fitzpatrick-bob-harvie-pennsylvania-senate-election.html",
-      "published": "2026-10-26 12:33:16",
-      "title_ko": "트럼프에 맞선 중도파 공화당 브라이언 핏즈패트릭, 펜실베이니아 경합지 의석 지킬 수 있나",
-      "summary_ko": "민주당, 현역 의원 교체 기회 주장"
-    },
-    {
-      "title": "Caregiving for adult relatives can cost thousands. AARP survey finds support could matter to midterm voters",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/family-caregiving-costs-2026-midterm-elections.html",
-      "published": "2026-10-26 12:15:01",
-      "title_ko": "성인 친족 돌봄 비용 수천 달러, AARP 조사 중간선거 유권자 관심 시사",
-      "summary_ko": "경쟁적인 의회 선거에서 유권자 영향력 시사"
+      "link": "https://www.cnbc.com/2026/10/26/alaska-senate-peltola-doj-lawsuit-election-sullivan.html",
+      "published": "2026-10-26 14:19:30",
+      "title_ko": "알래스카 상원: 펠톨라, 중간선거 전 법무부 선거 소송 조기 기각 요구",
+      "summary_ko": "알래스카 상원 선거 결과, 다음 의회 상원 다수당 결정"
     },
     {
       "title": "Brazilian stocks rocked as Lula wins presidential election, Bolsonaro reportedly refuses to concede",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/26/brazil-lula-win-presidential-election-runoff-vote.html",
-      "published": "2026-10-26 12:14:55",
+      "published": "2026-10-26 14:09:38",
       "title_ko": "브라질 루라, 결선 투표에서 대통령 선거 승리",
       "summary_ko": ""
+    },
+    {
+      "title": "Meta announces $95 billion stock offering to fund AI expansion",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/meta-stock-offering-ai.html",
+      "published": "2026-10-26 14:05:36",
+      "title_ko": "메타, AI 확장 위해 950억 달러 주식 공모 발표",
+      "summary_ko": "엔비디아·AMD·브로드컴, 50억 달러 규모 주식 매입 검토"
+    },
+    {
+      "title": "Mortgage rates above 7% are the 'new normal'—here's why",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/make-it/2026/10/26/mortgage-rates-above-7percent-are-the-new-normalheres-why.html",
+      "published": "2026-10-26 14:00:01",
+      "title_ko": "7%를 상회하는 모기지 금리, '새로운 정상'인 이유",
+      "summary_ko": "경제학자, 장기 금리 상승 원인 설명"
     },
     {
       "title": "Neocloud stocks fall as Elon Musk says more than 200 of them face 'guppy-level death'",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/26/neocloud-stocks-today-coreweave-nebius-iren-elon-musk.html",
-      "published": "2026-10-26 12:10:07",
+      "published": "2026-10-26 13:43:14",
       "title_ko": "일론 머스크 \"200개 이상 뉴클라우드, 물고기 수준 죽음\" 발언에 주가 하락",
       "summary_ko": "투자자, 부채 기반 확장 및 AI 인프라 수익성 의문"
     },
     {
-      "title": "Cracking AI trade has Wall Street looking for a hedge. An ex-Citadel quant may have the answer",
+      "title": "Top Wall Street analysts prefer these 3 dividend stocks for stable income",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/gpu-futures-ai-hedge-hyperbolic.html",
-      "published": "2026-10-26 12:08:13",
-      "title_ko": "균열된 AI 거래에 월가 헤지 모색, 전 시타델 퀀트가 해답 제시",
-      "summary_ko": "자스퍼 장, GPU 거래소 운영"
+      "link": "https://www.cnbc.com/2026/10/26/top-wall-street-analysts-prefer-these-3-dividend-stocks-for-stable-income.html",
+      "published": "2026-10-26 13:41:13",
+      "title_ko": "월가 주요 애널리스트가 선호하는 3개 배당주",
+      "summary_ko": ""
     },
     {
-      "title": "Trump says he'll soon decide whether to ‘make a deal’ with Iran or ‘finish it off'",
+      "title": "Oil prices fall as Saudi defense minister travels to Iran for talks to de-escalate conflict",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/us-iran-war-hormuz.html",
-      "published": "2026-10-26 11:49:17",
-      "title_ko": "트럼프, 이란과 '거래' 체결 여부 또는 '종결' 여부 곧 결정할 것",
-      "summary_ko": "중동 긴장 고조 속 협상 및 군사 행동 검토"
+      "link": "https://www.cnbc.com/2026/10/26/oil-prices-today-wti-brent.html",
+      "published": "2026-10-26 13:28:57",
+      "title_ko": "사우디 공격 리스크, 수요 파괴 우려 속 유가 2% 이상 하락",
+      "summary_ko": "투자자, 사우디 추가 공격 위협과 가격 상승에 따른 수요 감소 우려 고려"
     },
     {
       "title": "Apollo to buy nearly 10% stake in Abu Dhabi-backed alternative asset manager Mubadala Capital",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/26/apollo-mubadala-capital-stake.html",
-      "published": "2026-10-26 11:47:00",
+      "published": "2026-10-26 13:09:26",
       "title_ko": "아폴로, 아부다비 지원 대체자산 매니저 무바달라 캐피탈 지분 약 10% 인수",
       "summary_ko": "아부다비 자본 중심 아폴로 글로벌 야심 강화"
     },
     {
-      "title": "Blanche defends Trump-ordered lawsuit over Alaska Senate election certification",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/25/blanche-doj-alaska-senate-certification-lawsuit.html",
-      "published": "2026-10-26 11:33:09",
-      "title_ko": "블랜치, 알래스카 상원 선거 인증 관련 트럼프 지시 소송 옹호",
-      "summary_ko": "민주당, 댄 J. 설리번과 무관 입장 유지"
+      "title": "제트 연료 비용 급등",
+      "title_ko": "제트 연료 비용 급등",
+      "summary_ko": "제트 연료 비용이 지난 분기 62% 급등하여 항공사들의 비용 부담과 항공료 인상을 유발 중",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=4VPXSpETrfY",
+      "published": "2026-10-25 20:00:39",
+      "kind": "media",
+      "tag": "에너지",
+      "direction": "negative",
+      "n_channels": 1
+    },
+    {
+      "title": "신용카드 대 체크카드 소비 문화",
+      "title_ko": "신용카드 대 체크카드 소비 문화",
+      "summary_ko": "신용카드의 포인트 혜택과 체크카드의 자금 관리 선호도가 세대별로 갈리며 소비 문화에 영향을 준다",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=BxNbAUqxFkI",
+      "published": "2026-10-25 18:00:26",
+      "kind": "media",
+      "tag": "매크로",
+      "direction": "neutral",
+      "n_channels": 1
     },
     {
       "title": "미국 대이란 군사 타격 검토 및 지정학적 리스크",
@@ -83,30 +107,6 @@
       "kind": "media",
       "tag": "지정학",
       "direction": "negative",
-      "n_channels": 1
-    },
-    {
-      "title": "연준 금리 결정 및 통화정책 방향",
-      "title_ko": "연준 금리 결정 및 통화정책 방향",
-      "summary_ko": "연준이 이번 회의에서 금리를 동결할 것으로 예상되는 가운데, 케빈 워시 의장의 향후 물가 및 통화정책 스탠스에 시장의 이목이 집중됨",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=0XwQ12XxxRE",
-      "published": "2026-10-25 15:47:54",
-      "kind": "media",
-      "tag": "금리",
-      "direction": "neutral",
-      "n_channels": 1
-    },
-    {
-      "title": "코코아 가격 급등과 초콜릿 인플레이션",
-      "title_ko": "코코아 가격 급등과 초콜릿 인플레이션",
-      "summary_ko": "공급 부족과 구조적 요인으로 코코아 가격이 급등하면서 핼러윈을 앞두고 초콜릿 및 제과 제품 가격이 크게 상승함",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=0XwQ12XxxRE",
-      "published": "2026-10-25 15:47:54",
-      "kind": "media",
-      "tag": "에너지",
-      "direction": "neutral",
       "n_channels": 1
     }
   ]
