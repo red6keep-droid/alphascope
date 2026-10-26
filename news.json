@@ -1,6 +1,38 @@
 {
-  "updated_at": "2026-10-26 08:46:15 UTC",
+  "updated_at": "2026-10-26 10:46:12 UTC",
   "items": [
+    {
+      "title": "‘Ticking time bomb’: The world's pension funds face an ageing crisis",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/pension-funds-ageing-crisis-risk-investment.html",
+      "published": "2026-10-26 10:39:00",
+      "title_ko": "‘폭탄 시계’: 세계 연금 기금, 고령화 위기 직면",
+      "summary_ko": "장수 및 낮은 출산율로 은퇴 재정 압박"
+    },
+    {
+      "title": "Neocloud stocks fall as Elon Musk says more than 200 of them face 'guppy-level death'",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/neocloud-stocks-today-coreweave-nebius-iren-elon-musk.html",
+      "published": "2026-10-26 10:13:01",
+      "title_ko": "일론 머스크 \"200개 이상 뉴클라우드, 물고기 수준 죽음\" 발언에 주가 하락",
+      "summary_ko": "투자자, 부채 기반 확장 및 AI 인프라 수익성 의문"
+    },
+    {
+      "title": "Can GOP Rep. Brian Fitzpatrick, a moderate who's bucked Trump, keep his Pennsylvania swing seat?",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/brian-fitzpatrick-bob-harvie-pennsylvania-senate-election.html",
+      "published": "2026-10-26 10:00:01",
+      "title_ko": "트럼프에 맞선 중도파 공화당 브라이언 핏즈패트릭, 펜실베이니아 경합지 의석 지킬 수 있나",
+      "summary_ko": "민주당, 현역 의원 교체 기회 주장"
+    },
+    {
+      "title": "How war, security and coalition math are shaping the Israeli election",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/israel-election-netanyahu-iran-gaza-palestine.html",
+      "published": "2026-10-26 09:46:59",
+      "title_ko": "전쟁, 안보, 연대 수식이 이스라엘 선거를 어떻게 형성하는가",
+      "summary_ko": "유권자, 투표소 방문 예정"
+    },
     {
       "title": "Brazil's Lula wins historic presidential election; Bolsonaro reportedly refuses to concede",
       "source": "CNBC",
@@ -16,14 +48,6 @@
       "published": "2026-10-26 06:00:01",
       "title_ko": "방위산업 투자 붐, 사모펀드 자금 유입 속 버블 경고",
       "summary_ko": ""
-    },
-    {
-      "title": "‘Ticking time bomb’: The world's pension funds face an ageing crisis",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/pension-funds-ageing-crisis-risk-investment.html",
-      "published": "2026-10-26 05:22:30",
-      "title_ko": "‘폭탄 시계’: 세계 연금 기금, 고령화 위기 직면",
-      "summary_ko": "장수 및 낮은 출산율로 은퇴 재정 압박"
     },
     {
       "title": "Oil slides over 2% as traders weigh Saudi attack risks, demand destruction",
@@ -42,36 +66,12 @@
       "summary_ko": "인공지능 및 데이터센터 포함"
     },
     {
-      "title": "SpaceX closes $40 billion debt deal for AI chips, Elon Musk says",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/spacex-closes-40-billion-debt-deal-for-ai-chips-elon-musk-.html",
-      "published": "2026-10-26 00:37:51",
-      "title_ko": "스페이스X, AI 칩 400억 달러 부채 거래 성사… 일론 머스크 발표",
-      "summary_ko": "GPU 구매를 위한 부채 조달"
-    },
-    {
       "title": "Behind ‘Mad Money’ was a brilliant writer viewers never saw. We lost him too soon",
       "source": "CNBC",
       "link": "https://www.cnbc.com/investingclub/2026/10/25/jim-cramer-remembers-cliff-mason.html",
       "published": "2026-10-26 00:28:36",
       "title_ko": "‘Mad Money’ 뒤에는 시청자들이 보지 못한 뛰어난 작가가 있었다. 우리는 그를 너무 일찍 잃었다",
       "summary_ko": "41세 사망"
-    },
-    {
-      "title": "In pictures: Protests over inequality, rising living costs turn violent across France",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/25/france-protests-paris-cost-of-living-inequality.html",
-      "published": "2026-10-25 23:55:22",
-      "title_ko": "사진으로 보는 프랑스 불평등 시위, 다시 폭력 사태로",
-      "summary_ko": ""
-    },
-    {
-      "title": "More pain may be coming for the AI trade. Why I’m not giving up on it",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/25/jim-cramer-ai-trade-nvidia-coreweave.html",
-      "published": "2026-10-25 21:13:50",
-      "title_ko": "AI 트레이드에 더 큰 고통이 올 수 있다. 왜 포기하지 않는지",
-      "summary_ko": "인베스팅 클럽 구독자 대상 일요일 칼럼 게재"
     },
     {
       "title": "미국 대이란 군사 타격 검토 및 지정학적 리스크",
