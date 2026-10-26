@@ -94,17 +94,17 @@ CHAINS = {
     "json-daily": ["gemini", "nvidia-deepseek", "gemini-lite", "groq-qwen", "groq"],
     "translate": ["groq", "nvidia-gptoss20", "gemini-lite", "gemini"],          # 홈 뉴스 제목 번역 — 빠른 것부터 (2026-10-11)
     # 댓글 답글 — Gemini 는 맨 뒤 (2026-10-14 사용자: 댓글 한 건에 한도 1회가 나가니 리포트 몫을 남기자). 답글은 짧고 숫자를 쓰지 않아 예비 모델로 충분.
-    # DeepSeek 가 첫째 — 비교에서 답글 품질이 가장 좋았고, 봇은 5분마다 돌아 30초쯤 걸려도 된다
-    "comment": ["nvidia-deepseek", "groq", "groq-qwen", "gemini-lite", "gemini"],
+    # Groq 가 첫째, DeepSeek 은 예비 (2026-10-26 사용자: NVIDIA 는 예비 사슬에만 — 비교에서 답글 품질은 DeepSeek 이 가장 좋았다)
+    "comment": ["groq", "groq-qwen", "nvidia-deepseek", "gemini-lite", "gemini"],
     # 예비 모델이 임시로 분류한 행을 Gemini 로 다시 분류할 때 (2026-10-15) — 예비로 덮어쓰지 않도록 Gemini 만 (lite 도 Gemini, 정식 분류)
     "json-gemini": ["gemini", "gemini-lite"],
     # 시총 TOP 10 뉴스 분류 — lite 먼저 (doc/기획/종목-레이더-기획.md 10-4: flash 하루 약 20회는 NVDA 리포트 몫으로 남긴다, lite 는 버킷이 따로)
     "json-lite": ["gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
     # 새 기능 — 예비 공급자 먼저, Gemini 는 맨 뒤 (2026-10-19, 위 머리말: 키 하나를 모든 리포트가 나눠 쓴다). 인물 발언 레이더 인용 추출
-    "json-backup-first": ["nvidia-deepseek", "groq-qwen", "groq", "gemini-lite"],
+    "json-backup-first": ["groq-qwen", "groq", "nvidia-deepseek", "gemini-lite"],
     # 출력이 긴 일(호출당 출력 1,000토큰 넘게 — 인물 레이더 분류 20건 · 카드 요약 16건)은 gpt-oss 먼저 (2026-10-26).
     # Qwen 은 분당 출력 1,000토큰(OTPM) 한도라 출력 2천 토큰짜리는 몇 분에 한 번만 받힌다 — 10-25 분류에서 Qwen 12번 중 11번 429
-    "json-oss-first": ["nvidia-deepseek", "groq", "groq-qwen", "gemini-lite"],
+    "json-oss-first": ["groq", "groq-qwen", "nvidia-deepseek", "gemini-lite"],
     # 공용 뉴스 처리(news_store: 제목 번역 · 사실 문장 · 요약 · 종목 관련도) — Groq 먼저 (2026-10-25 사용자: "Gemini 는 쓸 곳이 많다, Groq 로 할 수 있는 건 Groq").
     # 두 사슬을 배치마다 번갈아 쓴다 — Groq 는 모델마다 분당 8,000토큰(호출 간격 60초)이라 qwen · gpt-oss 를 엇갈려 기다림을 반으로. Gemini lite 는 맨 뒤 예비
     "news": ["groq-qwen", "groq", "nvidia-deepseek", "gemini-lite"],
@@ -112,10 +112,10 @@ CHAINS = {
 }
 
 # NVIDIA(build.nvidia.com) 무료 엔드포인트는 공식 FAQ 상 개발 · 테스트 · 연구 · 평가 전용 — "실제 최종 사용자에게 서비스하는 활동" 은
-# production 이라 NVIDIA AI Enterprise 라이선스가 필요하다 (doc/운영/블로그-운영-지침.md D3-2, 2026-10-21). 독자에게 나가는 글 · 댓글 답글에
-# 쓰는 것은 그 경계를 넘으므로 운영 사슬에서 뺀다. 로컬 비교 실험(정확도 측정)에만 LLM_ALLOW_NVIDIA=1 로 되살린다.
-# STEPS 정의는 그대로 둔다 — 실험 · 옛 실측 기록의 참조용.
-if os.environ.get("LLM_ALLOW_NVIDIA", "").strip() != "1":
+# production 이라 NVIDIA AI Enterprise 라이선스가 필요하다 (doc/운영/블로그-운영-지침.md D3-2). 2026-10-21 운영 사슬에서 뺐다가
+# 2026-10-26 사용자 결정으로 예비 자리에만 되살렸다: 블로그가 '테스트 중' 단계이고 NVIDIA 계정은 다른 데 쓰지 않아 막혀도 잃을 것이 없다.
+# 1순위로 두지 않는다 — 막히면 다음 단계로 넘어갈 뿐. 끄려면 LLM_ALLOW_NVIDIA=0.
+if os.environ.get("LLM_ALLOW_NVIDIA", "").strip() == "0":
     CHAINS = {name: [s for s in steps if not s.startswith("nvidia")] for name, steps in CHAINS.items()}
 
 # 예비 모델이 남긴 ai_model 은 "공급자:모델" (nvidia:… · groq:…). Gemini("gemini-…") · 규칙("rule") 에는 콜론이 없다

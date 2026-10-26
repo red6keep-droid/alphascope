@@ -16,8 +16,8 @@
 | `gemini-lite` | Google Gemini **3.5-flash-lite** | 같은 키, 재시도 4회 | 버킷이 따로, flash 보다 훨씬 많음 (정확한 수는 AI Studio 할당량 화면 — **미확인**) | flash 가 503 일 때도 대개 200, NVDA 분류 80칸 중 75 | 서술이 두루뭉술(10-16), JSON 깨짐 가끔 |
 | `groq` | Groq **gpt-oss-120b** | 사고 low, 출력 최대 8,000, 호출 간격 60s | 하루 요청 1,000 · **분당 8,000토큰(입력+출력)** · 분당 출력 한도는 실측에서 안 걸림 | 빠름(5~6초), 429 때 기다릴 시간(`retry-after`)을 알려 줌 | **NVDA 서술에서 숫자 방향을 뒤집음**(10-11), 1차 자료 연결 약함(10-26: 0/7) |
 | `groq-qwen` | Groq **Qwen 3.8 27B** | 사고 끔, **출력 상한 1,000**, 호출 간격 60s | 하루 요청 1,000 · 분당 8,000토큰 · **분당 출력 1,000토큰(OTPM)** — 10-26 실측 | 빠름, 분류 80칸 중 56(gpt-oss 51), 1차 자료 연결 잘함 | **호출당 출력 1,000토큰 넘는 일엔 못 씀** — 아래 Qwen 규칙 |
-| `nvidia-deepseek` | NVIDIA DeepSeek V4.1 Flash | 사고 끔 | — | 예비 중 서술 품질 1위(10-14) | **운영에서 뺐다**(10-21, 무료 엔드포인트는 개발 · 시험 전용 약관). `LLM_ALLOW_NVIDIA=1` 로컬 실험만 |
-| `nvidia-gptoss20` | NVIDIA gpt-oss-20b | 번역 전용 | — | 번역 5초 | 같은 이유로 운영 제외 |
+| `nvidia-deepseek` | NVIDIA DeepSeek V4.1 Flash | 사고 끔 | — | 예비 중 서술 품질 1위(10-14) | 응답 느림(10-26 짧은 질문 109초). 무료 엔드포인트는 개발 · 시험 전용 약관 — 10-21 뺐다가 **10-26 사용자 결정으로 예비 자리에만 되살림**(막혀도 잃을 것 없음). 끄기 `LLM_ALLOW_NVIDIA=0` |
+| `nvidia-gptoss20` | NVIDIA gpt-oss-20b | 번역 전용 | — | 번역 5초 | `translate` 사슬에만 — 지금 쓰는 곳 없음 |
 
 - Groq 두 모델은 **같은 키**, 한도는 **모델마다 따로**. **하루 토큰 한도(TPD) 20만** — gpt-oss 는 10-26 01:25 UTC 실행에서 `tokens per day (TPD): Limit 200000, Used 199813` 으로 확인. **하루 요청 1,000회보다 하루 토큰 20만이 먼저 찬다** (호출당 5 ~ 8K 토큰이면 하루 25 ~ 40회).
 - Groq 429 오류 원문 세 종류 (10-26 확인 — 앞 160자만 남기던 로그에서 안 보였다. 지금은 `_groq_reason` 이 이 부분만 남긴다):
@@ -43,17 +43,17 @@
 
 ## 2. 예비 사슬 (CHAINS)
 
-NVIDIA 단계는 운영에서 자동으로 빠진다(아래 "실제 순서"가 운영 기준).
+NVIDIA(DeepSeek)는 10-26부터 다시 예비로 들어간다 — 1순위에는 두지 않는다. `LLM_ALLOW_NVIDIA=0` 이면 빠진다.
 
 | 사슬 | 실제 순서 (운영) | 쓰는 곳 | 왜 이 순서 |
 |---|---|---|---|
-| `json` | flash → lite → Qwen → gpt-oss | NVDA 분류 · 서술, 트럼프 분류 · 서술 | 독자 글 품질 우선. Groq 는 긴 프롬프트면 413 |
-| `json-daily` | flash → lite → Qwen → gpt-oss | 미국 증시 데일리 서술 | (원래 DeepSeek 이 lite 앞 — NVIDIA 제외로 lite 가 2순위) |
+| `json` | flash → lite → DeepSeek → Qwen → gpt-oss | NVDA 분류 · 서술, 트럼프 분류 · 서술 | 독자 글 품질 우선. Groq 는 긴 프롬프트면 413 |
+| `json-daily` | flash → DeepSeek → lite → Qwen → gpt-oss | 미국 증시 데일리 서술 | lite 서술이 두루뭉술해서 DeepSeek 을 앞에 (10-16, 10-26 되살림) |
 | `json-gemini` | flash → lite | NVDA · 트럼프 재분류 (예비 모델이 임시로 단 라벨을 Gemini 로 다시) | 정식 라벨은 Gemini 만 |
-| `json-backup-first` | **Qwen → gpt-oss → lite** | 인물 레이더 인용 추출, Media Daily 서술 | 새 기능은 예비 먼저 (10-19). 출력이 짧은 일 |
-| `json-oss-first` | **gpt-oss → Qwen → lite** | 인물 레이더 분류 · 카드 요약 | **10-26 신설** — 출력 2천 토큰이 Qwen 출력 한도에 걸려서 |
-| `news` / `news-alt` | Qwen → gpt-oss → lite / gpt-oss → Qwen → lite | 공용 뉴스 처리(news_store): 홈 뉴스 · 데일리 뉴스 · 종목 레이더 | 배치마다 번갈아 — 모델마다 60초 기다림을 반으로 (10-25). **10-26: Qwen 차례는 4건, gpt-oss 차례는 10건** · 24시간 넘은 새 기사는 AI 안 보냄(10-26 48 → 24) · 시간 예산 30분 |
-| `comment` | gpt-oss → Qwen → lite → flash | 블로그 댓글 답글 | 댓글 한 건에 Gemini 를 쓰지 않게, flash 는 맨 뒤 |
+| `json-backup-first` | **Qwen → gpt-oss → DeepSeek → lite** | 인물 레이더 인용 추출, Media Daily 서술 | 새 기능은 예비 먼저 (10-19). 출력이 짧은 일 |
+| `json-oss-first` | **gpt-oss → Qwen → DeepSeek → lite** | 인물 레이더 분류 · 카드 요약 | **10-26 신설** — 출력 2천 토큰이 Qwen 출력 한도에 걸려서 |
+| `news` / `news-alt` | Qwen → gpt-oss → DeepSeek → lite / gpt-oss → Qwen → DeepSeek → lite | 공용 뉴스 처리(news_store): 홈 뉴스 · 데일리 뉴스 · 종목 레이더 | 배치마다 번갈아 — 모델마다 60초 기다림을 반으로 (10-25). **10-26: Qwen 차례는 4건, gpt-oss 차례는 10건** · 24시간 넘은 새 기사는 AI 안 보냄(10-26 48 → 24) · 시간 예산 30분 |
+| `comment` | gpt-oss → Qwen → DeepSeek → lite → flash | 블로그 댓글 답글 | 댓글 한 건에 Gemini 를 쓰지 않게, flash 는 맨 뒤 |
 | `translate` · `json-lite` | — | **지금 쓰는 곳 없음** (news 사슬로 옮김) | 정리 대상 |
 
 공통 동작 (`llm_chain.LLMPool`):
