@@ -1,13 +1,13 @@
-# Trump Daily Market Trend — 2026-10-25
+# Trump Daily Market Trend — 2026-10-26
 
 > 그림자 모드 산출물. 게시되지 않는다. 표는 파이썬 계산값, 문장은 Gemini 서술.
 > 시장 반응은 **관찰된 값**이며 발언과의 인과를 의미하지 않는다.
 
 ## 데이터 상태
-- 생성 시각: 2026-10-25T21:17:25Z (UTC)
-- 게시물 누적 37,255 · 분류 완료 1,809 · 최근 90일 분류 대기 0 (범위 밖 미분류 17,904건은 의도적)
+- 생성 시각: 2026-10-26T00:19:51Z (UTC)
+- 게시물 누적 37,260 · 분류 완료 1,811 · 최근 90일 분류 대기 0 (범위 밖 미분류 17,904건은 의도적)
 - 이벤트 267 (첫 이벤트 2026-06-17T14:01:23Z) · 가격 마지막 거래일 2026-10-23
-- 지난 24시간: 게시물 11 · 노이즈 3 · 정책 글 0 · 미분류 0
+- 지난 24시간: 게시물 16 · 노이즈 6 · 정책 글 0 · 미분류 0
 
 ## 오늘의 발언 (최근 24시간 이벤트)
 _데이터 없음_
@@ -44,8 +44,8 @@ _Gemini 서술 없음 (--narrate 로 생성)_
 | Regulation | 2 | 2 | 9 | 0% | +2 |
 | Energy / Drilling | 2 | 2 | 6.5 | 0% | +0 |
 | Regulation / Energy | 1 | 1 | 10 | 0% | +1 |
-| Tax / Tax Cut | 1 | 2 | 10 | 0% | +1 |
 | Energy / Gasoline Prices | 1 | 1 | 10 | 0% | +1 |
+| Tax / Tax Cut | 1 | 2 | 10 | 0% | +1 |
 | Regulation / Drug Pricing | 1 | 1 | 6 | 0% | +1 |
 | Geopolitics / Sanctions | 1 | 1 | 5 | 100% | +1 |
 
@@ -54,10 +54,10 @@ _Gemini 서술 없음 (--narrate 로 생성)_
 | 주제 | 이벤트 | 게시물 | 평균 강도 | 부정 비율 | Δ이벤트 |
 | --- | --- | --- | --- | --- | --- |
 | Company / Investment | 5 | 5 | 6 | 0% | +3 |
-| Energy / Drilling | 4 | 4 | 5.25 | 0% | +4 |
 | Geopolitics / Sanctions | 4 | 4 | 5.25 | 100% | +3 |
-| Energy / Gasoline Prices | 3 | 3 | 6 | 67% | +3 |
+| Energy / Drilling | 4 | 4 | 5.25 | 0% | +4 |
 | Trade / Tariff | 3 | 3 | 6 | 0% | -6 |
+| Energy / Gasoline Prices | 3 | 3 | 6 | 67% | +3 |
 | Regulation | 2 | 2 | 9 | 0% | +2 |
 | Geopolitics / Ceasefire | 2 | 2 | 7.5 | 50% | +2 |
 | Geopolitics / Oil Prices | 2 | 2 | 5 | 100% | +2 |
