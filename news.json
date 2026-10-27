@@ -1,112 +1,112 @@
 {
-  "updated_at": "2026-10-27 14:46:17 UTC",
+  "updated_at": "2026-10-27 16:46:20 UTC",
   "items": [
     {
-      "title": "Oil prices fall amid diplomatic push to de-escalate Saudi-Iran tensions",
+      "title": "Ripple strikes deal with Robinhood to expand its RLUSD digital dollar",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/oil-today-iran-us-crude-wti-brent-trump.html",
-      "published": "2026-10-27 14:35:49",
-      "title_ko": "유가, 중동 갈등 종식 외교 노력으로 하락",
-      "summary_ko": "미국-이스라엘 전쟁 종식 외교 노력"
+      "link": "https://www.cnbc.com/2026/10/27/ripple-strikes-deal-with-robinhood-to-expand-its-rlusd-digital-dollar.html",
+      "published": "2026-10-27 16:35:45",
+      "title_ko": "리플, 로빈후드와 RLUSD 디지털 달러 확장 계약 체결",
+      "summary_ko": "스테이블코인, 24/7 유동성 필수 금융 인프라로 부상"
+    },
+    {
+      "title": "Oracle integrates ChatGPT, Codex into apps and expands cloud chip lineup",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/oracle-openai-chatgpt-codex-google-tpus.html",
+      "published": "2026-10-27 16:28:16",
+      "title_ko": "오라클, 챗GPT·코덱스 통합 및 클라우드 칩 라인업 확대",
+      "summary_ko": ""
+    },
+    {
+      "title": "World Bank's Banga: Availability of capital 'not really an issue' as AI demand drives up borrowing costs",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/world-bank-president-ajay-banga.html",
+      "published": "2026-10-27 16:15:35",
+      "title_ko": "월드뱅크 방가: AI 수요가 차입 비용을 상승시키는 가운데 자본 가용성은 '별 문제 아님'",
+      "summary_ko": ""
+    },
+    {
+      "title": "One week out, prediction markets see Democrats as favored to sweep Congress",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/2026-midterms-prediction-markets-democrats-congress.html",
+      "published": "2026-10-27 16:15:21",
+      "title_ko": "1주일 전, 예측 시장은 민주당이 의회 장악을 선호",
+      "summary_ko": "예측 시장, 3분의 2 확률로 민주당 승리 예상"
+    },
+    {
+      "title": "Cramer says something is missing in Tuesday's market rally and he's not eager to jump in",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/10/27/cramer-says-something-is-missing-in-tuesdays-market-rally-and-hes-not-eager-to-jump-in.html",
+      "published": "2026-10-27 16:13:07",
+      "title_ko": "크레이머, 화요일 시장 랠리에 무언가 빠져 있고 진입에 적극적이지 않다고 발언",
+      "summary_ko": ""
+    },
+    {
+      "title": "Lula’s election win leaves Brazil facing a fiscal tightrope",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/lula-brazil-election-markets-fiscal-policy.html",
+      "published": "2026-10-27 16:12:05",
+      "title_ko": "룰라 당선으로 브라질, 재정 줄타기 직면",
+      "summary_ko": "룰라 당선, 브라질 시장 충격 및 지출 억제 압력 증가"
     },
     {
       "title": "Fed expected to hold rates steady, but Warsh may point way to more hikes",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/federal-reserve-rates-kevin-warsh.html",
-      "published": "2026-10-27 14:33:33",
+      "published": "2026-10-27 15:52:26",
       "title_ko": "연준, 금리 동결 전망… 워시, 추가 인상 가능성 시사",
       "summary_ko": "워시, 추가 금리 인상 가능성 시사"
     },
     {
-      "title": "A rising wealth tide lifts all yachts",
+      "title": "Anthropic's IPO is risky business",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/a-rising-wealth-tide-lifts-all-yachts.html",
-      "published": "2026-10-27 14:29:29",
-      "title_ko": "부유층 증가, 요트 산업 전반 상승세 견인",
-      "summary_ko": "포트로더데일 국제 보트쇼, 이번 주 개최 예정"
+      "link": "https://www.cnbc.com/2026/10/27/anthropic-five-surprising-risks-s1.html",
+      "published": "2026-10-27 15:51:41",
+      "title_ko": "앤트로픽 IPO는 위험한 사업",
+      "summary_ko": ""
     },
     {
-      "title": "Coca-Cola hikes earnings outlook, even as it sees lackluster demand in North America",
+      "title": "Honda warns 50% Canada auto tariffs would be catastrophic for auto industry",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/coca-cola-ko-q3-2026-earnings.html",
-      "published": "2026-10-27 14:25:34",
-      "title_ko": "코카콜라, 실적 발표 앞두고 기대감",
-      "summary_ko": "시가총액 약 3980억 달러"
+      "link": "https://www.cnbc.com/2026/10/27/honda-warns-50percent-canada-auto-tariffs-would-be-catastrophic.html",
+      "published": "2026-10-27 15:48:32",
+      "title_ko": "혼다, 캐나다 자동차 관세 50%가 자동차 산업에 재앙적이라고 경고",
+      "summary_ko": "트럼프, 무역 합의 실패 시 캐나다 자동차 관세 25%에서 50%로 인상 위협"
     },
     {
-      "title": "Nvidia, AMD to invest $4 billion in Meta as tech giants deepen AI partnership",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/nvidia-invest-meta.html",
-      "published": "2026-10-27 14:19:36",
-      "title_ko": "엔비디아, 메타에 30억 달러 투자하며 AI 파트너십 강화",
-      "summary_ko": "메타, AI 인프라 투자 위해 총 950억 달러 조달 계획"
-    },
-    {
-      "title": "Ripple strikes deal with Robinhood to expand its RLUSD digital dollar",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/ripple-strikes-deal-with-robinhood-to-expand-its-rlusd-digital-dollar.html",
-      "published": "2026-10-27 14:18:16",
-      "title_ko": "리플, 로빈후드와 RLUSD 디지털 달러 확장 계약 체결",
-      "summary_ko": "스테이블코인, 24/7 유동성 필수 금융 인프라로 부상"
-    },
-    {
-      "title": "JetBlue stock surges 19% as company outlook calms investors",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/jetblue-jblu-3q-2026-earnings.html",
-      "published": "2026-10-27 14:08:50",
-      "title_ko": "제트블루, 연료비로 손실 확대... CEO \"마진 개선 중\"",
-      "summary_ko": "비용 절감 및 프리미엄 수익 증가 계획 진행"
-    },
-    {
-      "title": "A 'canary in the coal mine': Measles resurgence exposes weaknesses in U.S. public health, experts say",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/us-measles-public-health.html",
-      "published": "2026-10-27 14:07:03",
-      "title_ko": "메스ルス 재유행, 미국 공중보건 취약점 드러내",
-      "summary_ko": "백신 접종률 하락 및 보건 기관에 대한 신뢰 감소 지적"
-    },
-    {
-      "title": "Boeing narrows third-quarter loss as defense sales rise, but focus remains on 737 Max production",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/-boeing-ba-q3-2026-earnings.html",
-      "published": "2026-10-27 13:42:26",
-      "title_ko": "보잉, 방산 매출 증가로 3분기 손실 축소…737맥스 생산에 초점",
-      "summary_ko": "보잉, 화요일 장 개장 전 분기 실적 발표 예정"
-    },
-    {
-      "title": "브라질 대선 룰라 당선 및 재정 우려",
-      "title_ko": "브라질 대선 룰라 당선 및 재정 우려",
-      "summary_ko": "재정 지출을 선호하는 룰라 대통령의 당선으로 브라질 증시와 관련 자산이 폭락",
-      "source": "당잠사",
-      "link": "https://www.youtube.com/watch?v=IdMKvMCmvLs",
-      "published": "2026-10-26 21:16:46",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "negative",
-      "n_channels": 2
-    },
-    {
-      "title": "AI 인프라 투자 및 자본 지출",
-      "title_ko": "AI 인프라 투자 및 자본 지출",
-      "summary_ko": "AI 관련 데이터센터 및 칩 투자가 지속되며 AI 테마가 시장을 견인하고 있음",
+      "title": "연준 10월 금리 결정 및 통화정책 전망",
+      "title_ko": "연준 10월 금리 결정 및 통화정책 전망",
+      "summary_ko": "시장은 연준이 이번 회의에서 금리를 동결할 것으로 예상하고 있으나, 인플레이션 압력과 고금리 환경 속에서 향후 통화정책 방향을 두고 갑론을박이 이어지고 있음",
       "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=KfgWEEiCbLs",
-      "published": "2026-10-26 20:49:29",
-      "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "positive",
-      "n_channels": 3
-    },
-    {
-      "title": "연준 통화정책 및 금리 전망",
-      "title_ko": "연준 통화정책 및 금리 전망",
-      "summary_ko": "새로운 연준 체제 하의 통화정책 방향과 금리 인하 기대감이 시장에 영향을 미치고 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=KfgWEEiCbLs",
-      "published": "2026-10-26 20:49:29",
+      "link": "https://www.youtube.com/watch?v=42SaCJ3fv38",
+      "published": "2026-10-27 15:44:19",
       "kind": "media",
       "tag": "금리",
       "direction": "neutral",
+      "n_channels": 4
+    },
+    {
+      "title": "AI 관련 대규모 자본 조달 및 IPO 러시",
+      "title_ko": "AI 관련 대규모 자본 조달 및 IPO 러시",
+      "summary_ko": "메타, 스페이스X, 앤트로픽 등 빅테크와 AI 기업들이 AI 인프라 확충을 위해 수천억 달러에 달하는 사상 최대 규모의 자금 조달과 IPO를 단행 중",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=42SaCJ3fv38",
+      "published": "2026-10-27 15:44:19",
+      "kind": "media",
+      "tag": "기타",
+      "direction": "positive",
+      "n_channels": 2
+    },
+    {
+      "title": "브라질 대선 룰라 당선과 금융시장 충격",
+      "title_ko": "브라질 대선 룰라 당선과 금융시장 충격",
+      "summary_ko": "브라질 대선에서 룰라의 당선으로 금융 자산과 증시가 큰 폭으로 하락하며 성장에 대한 우려가 커졌",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=imn45SAO5Ec",
+      "published": "2026-10-27 13:15:37",
+      "kind": "media",
+      "tag": "정책/규제",
+      "direction": "negative",
       "n_channels": 3
     }
   ]
