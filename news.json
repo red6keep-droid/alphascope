@@ -1,11 +1,19 @@
 {
-  "updated_at": "2026-10-27 18:16:08 UTC",
+  "updated_at": "2026-10-27 18:46:38 UTC",
   "items": [
+    {
+      "title": "Amazon's anti-tokenmaxxing memo says engineers should be pickier about using AI",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/amazon-ai-coding-tokenmaxxing.html",
+      "published": "2026-10-27 18:41:02",
+      "title_ko": "아마존, 엔지니어에게 AI 사용 시 토큰 남용 방지 메모 발표",
+      "summary_ko": "AI, 전자상거래 전 사업에 급속히 통합"
+    },
     {
       "title": "What's behind the AI trade comeback — plus, our take on Intel's latest deal",
       "source": "CNBC",
       "link": "https://www.cnbc.com/investingclub/2026/10/27/the-ai-trade-comeback-plus-our-take-on-latest-intel-deal.html",
-      "published": "2026-10-27 18:13:51",
+      "published": "2026-10-27 18:35:40",
       "title_ko": "AI 무역 회복 배경과 인텔 최신 거래 분석",
       "summary_ko": ""
     },
@@ -64,14 +72,6 @@
       "published": "2026-10-27 17:26:34",
       "title_ko": "앤트로피 IPO, '추측 소설' 또는 '세대적 순간' 될지 투자자 의견 갈려",
       "summary_ko": "앤트로피 S-1 제출서, 증권거래위원회 월요일 공개"
-    },
-    {
-      "title": "Ripple strikes deal with Robinhood to expand its RLUSD digital dollar",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/ripple-strikes-deal-with-robinhood-to-expand-its-rlusd-digital-dollar.html",
-      "published": "2026-10-27 16:35:45",
-      "title_ko": "리플, 로빈후드와 RLUSD 디지털 달러 확장 계약 체결",
-      "summary_ko": "스테이블코인, 24/7 유동성 필수 금융 인프라로 부상"
     },
     {
       "title": "연준 10월 금리 결정 및 통화정책 전망",
