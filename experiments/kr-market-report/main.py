@@ -9,6 +9,7 @@
 """
 import datetime
 import importlib.util
+import json
 import os
 import re
 import statistics
@@ -221,7 +222,7 @@ def head_chart(r):
     groups = [(INDEX[k], [v["gap"], v["intra"], v["ret"]]) for k, v in r["idx"].items()]
     amber = lambda v: C.AMBER   # noqa: E731
     chart = C.chart_card("", groups, [amber, C.sign_bg, C.gray], [C.sign_fg, C.sign_fg, C.sign_fg],   # 막대 색은 구분용, 숫자는 모두 증감 색 (M6)
-                         [("시가 갭", C.AMBER), ("장중", C.PASTEL_UP), ("하루", C.GRAY_BAR)])
+                         [("시가 갭", C.AMBER), ("장중", C.PASTEL_UP), ("하루", C.GRAY_BAR)], keep_legend=True)   # 하루를 나눈 조각 — 범례 그대로 (2026-10-27)
     return f'<div data-cards="1" style="margin:0 0 8px;">{chart}</div>'
 
 
@@ -765,5 +766,7 @@ if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "report_body.html"), "w", encoding="utf-8") as f:
         f.write(html)
+    with open(os.path.join(OUT, "meta.json"), "w", encoding="utf-8") as f:   # 게시 단계(publish_report.py)가 읽는다
+        json.dump({"day": r["day"], "title": title(r["day"])}, f, ensure_ascii=False)
     mock = _dk.write_mock(html, os.path.join(OUT, "kr_report_mock.html"), title(r["day"]))
     print(f"[kr-report] {r['day']} · {title(r['day'])} → {mock}")

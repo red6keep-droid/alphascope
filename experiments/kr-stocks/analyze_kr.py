@@ -44,8 +44,23 @@ def technical(bars, bench_bars):
     out["ma_cross"] = cross
     r1 = (t["close"] / p["close"] - 1) * 100
     rb = {x["day"]: x["close"] for x in bench_bars or []}
+    bc = [x["close"] for x in bench_bars or [] if x["day"] <= t["day"]]   # 지수도 같은 날까지 — 평균선 대비 비교 막대 (2026-10-27 P37)
+    out["bench_ma_rel"] = {n: (bc[-1] / (sum(bc[-n:]) / n) - 1) * 100 for n in (20, 60, 120, 200) if len(bc) >= n}
+    out["path"], out["bench_path"] = day_path(bars), day_path(bench_bars, t["day"])   # 오늘 하루 흐름 (P41)
     out["vs_bench"] = r1 - (rb[t["day"]] / rb[p["day"]] - 1) * 100 if t["day"] in rb and p["day"] in rb else None
     return out
+
+
+def day_path(bars, day=None):
+    """오늘 하루 흐름 — 전일 종가 대비 시가 · 장중 고점 · 장중 저점 · 종가 % (2026-10-27 사용자 P41). day 를 주면 그날(지수를 종목 날짜에 맞춘다)."""
+    if day is not None:
+        bars = [x for x in bars or [] if x["day"] <= day]
+    if not bars or len(bars) < 2 or bars[-1]["day"] != (day or bars[-1]["day"]):
+        return None
+    t, pc = bars[-1], bars[-2]["close"]
+    if not pc or not t.get("open") or not t.get("high") or not t.get("low"):
+        return None
+    return {k: (t[k] / pc - 1) * 100 for k in ("open", "high", "low", "close")}
 
 
 def drawdown(bars, yr, hist, sym):
@@ -55,11 +70,22 @@ def drawdown(bars, yr, hist, sym):
     return {"stock": h[sym], "pct_from_high": yr["pct_from_high"], "days_since_high": sum(1 for x in bars if x["day"] > yr["high_day"])}
 
 
+def _closed_us(bars):
+    """미국 장중에 받은 오늘 봉(아직 종가 아님)은 뺀다 — GitHub cron 이 몇 시간 늦어 미국 장중(KST 밤)에 돌면 장중 값이 `그 뒤 미국 종가` 로 게시된다
+    (2026-10-28, NVDA 10-24 장중 게시 사고와 같은 종류). 뉴욕 16:30 전이면 뉴욕 오늘 날짜 봉을 뺀다."""
+    import datetime
+    from zoneinfo import ZoneInfo
+    ny = datetime.datetime.now(ZoneInfo("America/New_York"))
+    if bars and ny.time() < datetime.time(16, 30) and bars[-1]["day"] >= ny.strftime("%Y-%m-%d"):
+        return bars[:-1]
+    return bars
+
+
 def us_move(t, snap, kr_day, points=False):
     """미국 티커 하나의 움직임 둘 — `before` = 한국 장이 열리기 전 마지막 미국 거래일(한국 날짜보다 앞선 날, "밤사이") · `latest` = 그 뒤 더 새 미국 종가가 있으면
     (한국 장 마감 뒤 끝난 미국장 — 다음 한국장 전 참고). 미국 10-23 종가는 한국 10-24 새벽에 나오므로 한국 10-23 반응의 짝은 미국 10-22 다.
     points = 수익률 대신 포인트 차이(VIX)."""
-    b = (snap.get("us_bars") or {}).get(t) or []
+    b = _closed_us((snap.get("us_bars") or {}).get(t) or [])
     chg = (lambda i: b[i]["close"] - b[i - 1]["close"]) if points else (lambda i: (b[i]["adj"] / b[i - 1]["adj"] - 1) * 100)
     before = latest = None
     prev = [i for i in range(1, len(b)) if b[i]["day"] < kr_day]

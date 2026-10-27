@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI kit 견본</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ui-kit.css">
+<style>
+  /* 견본 페이지 전용 — 키트에는 들어가지 않는다 */
+  .demo-grid { display: grid; gap: 12px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-cap { margin: 0 0 8px; font-size: 14px; line-height: 20px; color: var(--ui-guide); }
+  .demo-swatch { display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 20px; }
+  .demo-swatch i { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--ui-line); flex: none; }
+  @media (min-width: 681px) { .demo-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .demo-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>
+</head>
+<body class="ui-root">
+
+<header class="ui-header">
+  <a class="ui-logo" href="#">
+    <svg width="36" height="33" viewBox="0 0 313 286" aria-hidden="true"><path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000"/></svg>
+    로고
+  </a>
+  <nav class="ui-nav" id="demo-nav">
+    <a class="ui-nav-item" href="#" aria-current="page">홈</a>
+    <a class="ui-nav-item" href="#">메뉴 하나</a>
+    <a class="ui-nav-item" href="#">메뉴 둘</a>
+  </nav>
+  <button class="ui-icon-btn ui-icon-btn--lg" type="button" id="demo-menu" aria-label="메뉴 열기" aria-expanded="false">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+</header>
+<div class="ui-overlay" id="demo-overlay" hidden></div>
+
+<main class="ui-shell ui-shell--dash">
+
+  <!-- 대시보드 -->
+  <div class="ui-dash" style="margin-top:-36px;">
+    <section class="ui-dash-card">
+      <div class="ui-section-head">
+        <h2 class="ui-section-title"><span class="ui-tile ui-tile--red" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="5" width="3" height="9" rx=".5"/><rect x="11" y="2" width="3" height="12" rx=".5"/></svg></span>대시보드 카드</h2>
+        <span class="ui-meta ui-num">2026.10.19</span>
+      </div>
+      <div class="ui-card-body">
+        <div class="ui-row"><span class="ui-row-name">가격</span><span class="ui-row-value ui-up ui-num"><span class="ui-delta">$182.40 ▲ 1.25%</span></span></div>
+        <div class="ui-stats">
+          <div class="ui-stat"><span class="ui-stat-name">거래량</span><span class="ui-stat-value">1.2배</span></div>
+          <div class="ui-stat"><span class="ui-stat-name">변동폭</span><span class="ui-stat-value">2.4%</span></div>
+          <div class="ui-stat"><span class="ui-stat-name">20일 평균</span><span class="ui-stat-value ui-down">▼ 0.8%</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-dash-card">
+      <div class="ui-section-head">
+        <h2 class="ui-section-title"><span class="ui-tile ui-tile--teal" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></span>줄 카드 + 펼침</h2>
+        <span class="ui-note">오른쪽 안내 글</span>
+      </div>
+      <div class="ui-card-body">
+        <div class="ui-row"><span class="ui-row-name">항목 하나 <span class="ui-paren">(괄호)</span><small>보조 줄 · 2026.10.18</small></span><span class="ui-row-value ui-up ui-num">▲ 2.48%</span></div>
+        <div class="ui-row"><span class="ui-row-name">항목 둘</span><span class="ui-row-value ui-down ui-num">▼ 0.52%</span></div>
+        <div id="demo-more" hidden>
+          <div class="ui-row"><span class="ui-row-name">항목 셋</span><span class="ui-row-value ui-num">— </span></div>
+        </div>
+        <button type="button" class="ui-fold-btn" id="demo-fold" aria-expanded="false" aria-controls="demo-more"><span>항목 1개 더 보기</span>
+          <svg class="ui-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></button>
+      </div>
+    </section>
+
+    <section class="ui-dash-card ui-span-all">
+      <div class="ui-section-head">
+        <h2 class="ui-section-title"><span class="ui-tile ui-tile--violet" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="8" width="3" height="6" rx=".5"/><rect x="6.5" y="3" width="3" height="11" rx=".5"/><rect x="11" y="10" width="3" height="4" rx=".5"/></svg></span>전폭 카드 + 카드 탭</h2>
+      </div>
+      <div class="ui-card-body">
+        <div class="ui-card-tabs" role="tablist">
+          <button class="ui-card-tab" role="tab" aria-selected="true">첫째</button>
+          <button class="ui-card-tab" role="tab" aria-selected="false">둘째</button>
+          <button class="ui-card-tab" role="tab" aria-selected="false">셋째</button>
+        </div>
+        <div class="ui-row"><span class="ui-row-name">탭 내용</span><span class="ui-row-value ui-num">1,234</span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 상세 화면 -->
+  <div style="margin-top:40px;">
+    <h1 class="ui-page-title">페이지 제목<span class="ui-page-title-meta"><span class="ui-page-title-date">2026년 10월 19일</span>
+      <button class="ui-icon-btn" type="button" aria-label="공유"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.7l6.8-4M8.6 13.3l6.8 4"/></svg></button></span></h1>
+
+    <div class="ui-tabs" role="tablist">
+      <button class="ui-tab" role="tab" aria-selected="true">탭</button>
+      <button class="ui-tab" role="tab" aria-selected="false">다른 탭 <span class="ui-paren">(3)</span></button>
+      <button class="ui-tab" role="tab" aria-selected="false">세 번째</button>
+    </div>
+    <div class="ui-subtabs">
+      <button class="ui-subtab" aria-selected="true">서브탭</button>
+      <button class="ui-subtab" aria-selected="false">서브탭 둘</button>
+      <button class="ui-subtab" aria-selected="false">서브탭 셋</button>
+    </div>
+    <div class="ui-dirs">
+      <button class="ui-dir" aria-selected="true">하위탭</button>
+      <button class="ui-dir" aria-selected="false">하위탭 둘</button>
+      <button class="ui-dir" aria-selected="false" data-empty>빈 탭</button>
+    </div>
+    <div class="ui-segs"><button class="ui-seg" aria-pressed="true">오늘</button><button class="ui-seg" aria-pressed="false">5일</button></div>
+
+    <section class="ui-section">
+      <div class="ui-section-head ui-section-head--line"><h2 class="ui-section-title">구획 제목 (아래가 글)</h2></div>
+      <p style="margin:0;">본문은 19px · 행간 34px입니다. 한국어는 어절에서만 줄을 바꿉니다. 강조는 글자를 키우지 않고 카드로 합니다.</p>
+      <ul class="ui-list" style="margin-top:12px;">
+        <li><span><b>라벨</b> : 점과 글은 다른 칸이라 둘째 줄이 점 아래로 들어가지 않습니다. 길게 써서 줄이 바뀌는 모습을 확인합니다.</span></li>
+        <li><span>두 번째 항목 <span class="ui-up">+1.30%</span> · <span class="ui-down">−0.60%</span></span></li>
+      </ul>
+      <div class="ui-info"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.5"/><path d="M8 7v4M8 5h.01" stroke-linecap="round"/></svg><span>카드 밖 안내 줄 · 왼쪽 12px · 위에 얇은 선</span></div>
+    </section>
+
+    <section class="ui-section">
+      <div class="ui-section-head"><h2 class="ui-section-title">카드 종류 (아래가 카드라 밑줄 없음)</h2></div>
+      <div class="demo-grid demo-grid--2">
+        <div class="ui-emph ui-emph--up"><div class="ui-emph-head"><span>강조 카드 · 상승</span><span class="ui-up">모이는 중</span></div><div class="ui-emph-body">구분선 아래 이유 14px</div></div>
+        <div class="ui-emph ui-emph--down"><div class="ui-emph-head"><span>강조 카드 · 하락</span><span class="ui-down">빠지는 중</span></div><div class="ui-emph-body">구분선 아래 이유 14px</div></div>
+        <div class="ui-emph ui-emph--warn"><div class="ui-emph-head"><span>강조 카드 · 경고</span><span style="color:var(--ui-warn)">주의</span></div></div>
+        <div class="ui-emph ui-emph--neutral"><div class="ui-emph-head"><span>강조 카드 · 중립</span><span style="color:var(--ui-neutral)">비슷함</span></div></div>
+        <div class="ui-basic">기본 카드 · 핵심 한 줄</div>
+        <div class="ui-notice">안내 상자 · 시험 운영 중입니다.</div>
+      </div>
+      <div class="ui-card" style="margin-top:12px;">
+        <div class="ui-row"><span class="ui-row-name">콘텐츠 카드 줄</span><span class="ui-row-value ui-num">$329 <small>· 대비</small> <span class="ui-up ui-delta">▲ 43.4%</span></span></div>
+        <div class="ui-row"><span class="ui-row-name">둘째 줄 <span class="ui-new">N</span></span><span class="ui-row-value ui-num">4.75%</span></div>
+      </div>
+      <div class="demo-grid demo-grid--3" style="margin-top:12px;">
+        <a class="ui-click-card" href="#"><div class="ui-click-card-body"><span class="ui-small ui-muted ui-num">2026.10.19</span><h3 class="ui-click-card-title">클릭 카드 · 올리면 그림자</h3></div></a>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <div class="ui-section-head"><h2 class="ui-section-title">버튼</h2></div>
+      <div class="demo-row">
+        <button class="ui-btn" type="button">검은 버튼</button>
+        <button class="ui-btn ui-btn--sm" type="button">작게</button>
+        <button class="ui-btn-outline" type="button">작은 외곽선</button>
+        <button class="ui-btn-outline" type="button" disabled>못 씀</button>
+        <button class="ui-text-btn" type="button">글자 버튼</button>
+        <button class="ui-top-btn" type="button">TOP<svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="10"/><path d="M11 15.5V7M7.5 10.5 11 7l3.5 3.5"/></svg></button>
+        <span class="ui-fold-box"><svg class="ui-chev" viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></span>
+      </div>
+      <div style="margin-top:12px;max-width:520px;"><button class="ui-btn-white" type="button">흰 버튼 (폭 전체)</button></div>
+      <div style="margin-top:12px;max-width:520px;"><button class="ui-btn ui-btn--block" type="button" id="demo-open">팝업 열기</button></div>
+    </section>
+
+    <section class="ui-section">
+      <div class="ui-section-head"><h2 class="ui-section-title">라벨</h2></div>
+      <p style="margin:0;">글 사이<span class="ui-label">분류</span>라벨 · <span class="ui-label ui-label--pos">긍정</span><span class="ui-label ui-label--neg">부정</span><span class="ui-label ui-label--warn">불확실</span><span class="ui-label ui-label--neutral">중립</span><span class="ui-label ui-label--good">정상</span></p>
+      <p style="margin:8px 0 0;"><span class="ui-label ui-label--bare">홀로 놓인 라벨</span> <span class="ui-small ui-sub">출처 · 09:12</span></p>
+    </section>
+
+    <section class="ui-section">
+      <div class="ui-section-head"><h2 class="ui-section-title">입력 · 검색</h2></div>
+      <div class="ui-search" style="max-width:320px;"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.75" cy="5.75" r="4.5"/><path d="M9.3 9.3 12.8 12.8" stroke-linecap="round"/></svg><input type="search" placeholder="검색..."></div>
+      <div style="margin-top:12px;">
+        <textarea class="ui-input" placeholder="내용을 입력하세요"></textarea>
+        <div class="ui-input-foot"><span class="ui-count">0 / 2000</span><button class="ui-btn ui-btn--sm" type="button" disabled>등록</button></div>
+        <div class="ui-error">잠시 문제가 생겼어요. 잠시 뒤에 다시 시도해 주세요.</div>
+      </div>
+      <div class="ui-empty">아직 항목이 없습니다.</div>
+    </section>
+
+    <section class="ui-section">
+      <div class="ui-section-head"><h2 class="ui-section-title">색</h2></div>
+      <div class="demo-grid demo-grid--3">
+        <span class="demo-swatch"><i style="background:#FF3333"></i>액센트 #FF3333</span>
+        <span class="demo-swatch"><i style="background:#E53E3E"></i>상승 #E53E3E</span>
+        <span class="demo-swatch"><i style="background:#1A73E8"></i>하락 #1A73E8</span>
+        <span class="demo-swatch"><i style="background:#E8710A"></i>경고 #E8710A</span>
+        <span class="demo-swatch"><i style="background:#111111"></i>제목 #111</span>
+        <span class="demo-swatch"><i style="background:#333333"></i>본문 #333</span>
+        <span class="demo-swatch"><i style="background:#6B7280"></i>안내 #6B7280</span>
+        <span class="demo-swatch"><i style="background:#7A7A7A"></i>보조 #7A7A7A</span>
+        <span class="demo-swatch"><i style="background:#E2E8F0"></i>선 #E2E8F0</span>
+        <span class="demo-swatch"><i style="background:#F3F4F6"></i>대시보드 #F3F4F6</span>
+        <span class="demo-swatch"><i style="background:#F8FAFC"></i>보조 바탕 #F8FAFC</span>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="ui-pop" id="demo-pop" hidden>
+  <div class="ui-pop-box" role="dialog" aria-modal="true" aria-labelledby="demo-pop-title">
+    <div class="ui-pop-head"><div class="ui-pop-title" id="demo-pop-title">팝업 제목</div><button type="button" class="ui-pop-close" aria-label="닫기">×</button></div>
+    <div class="ui-pop-body">
+      <p style="margin:0;">머리는 고정되고 내용만 스크롤됩니다. 닫기는 × · 바깥 누르기 · Esc.</p>
+      <ol class="ui-steps">
+        <li><span class="ui-step-num">1</span><span><b>첫 단계</b> 누르기</span></li>
+        <li><span class="ui-step-num">2</span><span><b>둘째 단계</b> 누르기</span></li>
+      </ol>
+      <button class="ui-btn ui-btn--block" type="button" style="margin-top:18px;">확인</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    // 펼침 버튼
+    var fold = document.getElementById('demo-fold'), more = document.getElementById('demo-more'), label = fold.firstElementChild.textContent;
+    fold.addEventListener('click', function () {
+      var open = more.hidden; more.hidden = !open; fold.setAttribute('aria-expanded', String(open));
+      fold.firstElementChild.textContent = open ? '접기' : label;
+    });
+    // 탭 묶음마다 하나만 선택
+    [['.ui-tab'], ['.ui-subtab'], ['.ui-dir'], ['.ui-card-tab']].forEach(function (s) {
+      var tabs = [].slice.call(document.querySelectorAll(s[0]));
+      tabs.forEach(function (t) { t.addEventListener('click', function () { tabs.forEach(function (x) { x.setAttribute('aria-selected', String(x === t)); }); }); });
+    });
+    var segs = [].slice.call(document.querySelectorAll('.ui-seg'));
+    segs.forEach(function (t) { t.addEventListener('click', function () { segs.forEach(function (x) { x.setAttribute('aria-pressed', String(x === t)); }); }); });
+    // 팝업
+    var pop = document.getElementById('demo-pop'), opener = document.getElementById('demo-open');
+    function close() { pop.hidden = true; opener.focus(); }
+    opener.addEventListener('click', function () { pop.hidden = false; pop.querySelector('.ui-pop-close').focus(); });
+    pop.querySelector('.ui-pop-close').addEventListener('click', close);
+    pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
+    document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
+    // 서랍 메뉴 (900px 이하)
+    var menu = document.getElementById('demo-nav'), btn = document.getElementById('demo-menu'), ov = document.getElementById('demo-overlay');
+    function setMenu(o) { menu.classList.toggle('is-open', o); ov.hidden = !o; btn.setAttribute('aria-expanded', String(o)); }
+    btn.addEventListener('click', function () { setMenu(!menu.classList.contains('is-open')); });
+    ov.addEventListener('click', function () { setMenu(false); });
+    if (window.matchMedia('(min-width: 901px)').matches) btn.hidden = true;
+    window.addEventListener('resize', function () { btn.hidden = window.matchMedia('(min-width: 901px)').matches; if (btn.hidden) setMenu(false); });
+  })();
+</script>
+</body>
+</html>

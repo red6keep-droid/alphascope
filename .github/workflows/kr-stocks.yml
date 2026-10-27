@@ -8,6 +8,8 @@ name: KR Stocks
 #   - 다른 워크플로와 같은 분에 gh-pages · Blogger 에 쓰지 않는다 (운영지침 11절: 리포트 :00 · :15 · :30, 시세 :07 · :22 · :37 · :52, 뉴스 :45) → :10.
 #
 # 게시 게이트: 저장소 변수 KR_PUBLISH 가 'true' 일 때만 스케줄 실행이 실제 게시한다. 수동 실행은 publish 입력으로.
+# 한국 증시 리포트(글 1편, experiments/kr-market-report, 2026-10-27)는 따로 KR_REPORT_PUBLISH — 종목 페이지 첫 발행을 확인한 뒤 켠다.
+#   꺼져 있으면 매 실행 dry-run 만. 수동 실행은 report 입력으로.
 # 시세는 yfinance(미국과 같은 소스 · 같은 약관 위험, 예비 없음 — 운영지침 D4-7 · D4-15), 자금 흐름은 한국은행 ECOS(ECOS_API_KEY).
 
 on:
@@ -22,6 +24,11 @@ on:
         default: false
       force:
         description: '오늘 봉이 없어도 게시 (휴장일 · 지난 종가로 디자인만 다시 올릴 때)'
+        type: boolean
+        required: false
+        default: false
+      report:
+        description: '한국 증시 리포트 글도 게시 (publish 와 함께)'
         type: boolean
         required: false
         default: false
@@ -52,6 +59,7 @@ env:
   KR_DIR: experiments/kr-stocks
   IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
   DO_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.KR_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+  DO_REPORT: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.KR_REPORT_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.report) }}
   FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force == true }}
 
 jobs:
@@ -87,6 +95,11 @@ jobs:
       - name: Collect · analyze · render
         run: python "$KR_DIR/main_kr.py"
 
+      # 한국 증시 리포트 — 방금 받은 자료(data/*.json)로 그리기만. 코스피 그래프는 아래 kr-images 에 함께 올린다
+      - name: Render KR market report
+        continue-on-error: true
+        run: python experiments/kr-market-report/main.py --cached
+
       - name: Decide publish
         id: gate
         run: |
@@ -105,7 +118,8 @@ jobs:
         run: |
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
-          SUB="$(for f in "$KR_DIR"/output/images/radar-*.png; do
+          SUB="$(for f in "$KR_DIR"/output/images/radar-*.png experiments/kr-market-report/output/images/kospi-price-*.png; do
+            [ -f "$f" ] || continue
             printf '100644 blob %s\t%s\n' "$(git hash-object -w "$f")" "$(basename "$f")"
           done | git mktree)"
           TREE="$(printf '040000 tree %s\timages\n' "$SUB" | git mktree)"
@@ -114,12 +128,21 @@ jobs:
           for f in "$KR_DIR"/output/images/radar-*.png; do
             curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@kr-images/images/$(basename "$f")" || true
           done
-          echo "한국 종목 그래프 $(git ls-tree "$SUB" | wc -l)장 → kr-images"
+          curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@kr-images/images/kospi-price-$(date -u +%F).png" || true
+          echo "한국 종목 · 코스피 그래프 $(git ls-tree "$SUB" | wc -l)장 → kr-images"
 
       - name: Publish pages (한국 시총 TOP 10 · 종목 35)
         if: steps.gate.outputs.go == 'true'
         continue-on-error: true
         run: python "$KR_DIR/publish_pages_kr.py"
+
+      # 한국 증시 리포트 글 — 하루 1편, 이미 있으면 건너뜀 (publish_report.py). 그래프가 kr-images 에 올라간 뒤
+      - name: Publish KR market report
+        if: steps.gate.outputs.go == 'true' && hashFiles('experiments/kr-market-report/output/report_body.html') != ''
+        continue-on-error: true
+        run: |
+          if [ "$DO_REPORT" = "true" ]; then python experiments/kr-market-report/publish_report.py
+          else echo "리포트 그림자 모드 (저장소 변수 KR_REPORT_PUBLISH=true 로 켠다)"; python experiments/kr-market-report/publish_report.py --dry; fi
 
       # 홈 한국 탭 데이터 — 발행된 페이지만 링크 (pages_live.json)
       - name: Home kr.json
@@ -148,7 +171,7 @@ jobs:
         if: always()
         run: |
           mkdir -p state-out
-          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_corp.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
+          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_corp.json report_posts.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
             [ -f "$KR_DIR/data/$f" ] && cp "$KR_DIR/data/$f" state-out/ || true
           done
           [ -n "$(ls state-out 2>/dev/null)" ] || { echo "저장할 상태 없음"; exit 0; }

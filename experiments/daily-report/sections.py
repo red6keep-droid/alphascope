@@ -188,7 +188,7 @@ def korea_open_card(a, opened=True):
         order = [("크게 오른 밤", "up"), ("평범한 밤", "normal"), ("크게 내린 밤", "down")]
         groups = [(nm, [bk[k]["gap"], bk[k]["intra"]]) for nm, k in order if k in bk]
         lines.append((C.chart_card(f"다음 날 코스피 평균 ({first_year}년 이후, %)", groups, [C.amber, C.gray], [C.sign_fg, C.sign_fg],
-                                   [("시작 (전날 종가 대비)", C.AMBER), ("장중 (시작 → 종가)", C.GRAY_BAR)]), "html"))
+                                   [("시작 (전날 종가 대비)", C.AMBER), ("장중 (시작 → 종가)", C.GRAY_BAR)], keep_legend=True), "html"))   # 하루를 나눈 조각 — 범례 그대로
     lines.append(("row", "S&P 500 (밤사이)", _s(ks["us_ret"]), f"평소의 {_times(ks['us_z'])}"))
     tip = ("미국 증시가 밤사이 움직인 만큼이 다음 날 한국 증시 시작 가격에 얼마나 들어가는지\n"
            f"· 오늘 S&P 500 {_s(ks['us_ret'])} : 평소의 {_times(ks['us_z'])}\n"

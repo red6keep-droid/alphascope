@@ -169,6 +169,11 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-card-title a:has(.post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
 .post-card-title .post-title-date { margin-left: auto; }
 .post-title .post-title-date { font-size: 14px; }
+.post-title-sub { font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; margin-left: 9px; }   /* 종목 제목 꼬리 `주가 실적 일정` — 숨기지 않고 작게만 (2026-10-27 사용자 P20) · 14px = `넘겨 보기` 와 같게 (P29) */
+/* 이름 ~ 꼬리 사이 = 띄어쓰기의 1.5배(실측 5.7 · 5.1 · 4.6px → 9 · 8 · 7px), 꼬리는 이름 줄의 세로 가운데 (2026-10-27 사용자 P21). 칸이 flex 라 띄어쓰기는 접히고 여백만 남는다 */
+.post-title-label:has(> .post-title-sub) { display: flex; flex-wrap: wrap; align-items: center; }
+@media (max-width: 900px) { .post-title-sub { margin-left: 8px; } }
+@media (max-width: 680px) { .post-title-sub { margin-left: 7px; } }
 /* 공유 버튼이 없는 화면(초안 미리보기 · 목업)에서도 날짜는 제목 줄 오른쪽 끝 (2026-10-18 사용자) */
 .post-title:has(> .post-title-date), .post-title a:has(> .post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
 .post-title > .post-title-date, .post-title a > .post-title-date { margin-left: auto; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
@@ -208,7 +213,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .post-body details[data-acc] > summary::-webkit-details-marker { display: none; }
 .post-body details[data-acc][open] > summary .acc-chev { transform: rotate(180deg); }
 /* 가격 정보 강조 카드 펼침 = 가격 범위 (1년)가 카드 안으로 이어진다 — 머리 줄 아래 모서리를 편다 (2026-10-26 사용자, render_html.year_range_in) */
-.post-body details[data-acc][open] > summary:has(+ [data-in-card]) > span:first-child { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+.post-body details[data-acc][open] > summary:has(+ [data-in-card]) > span:first-child { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; border-bottom-color: transparent !important; }   /* 머리 아래 선은 펼침 맨 위에 좌우 12px 안쪽으로 그린다 (2026-10-27 P22, render_html.price_in) */
 /* 카드 안 펼침 (details[data-fold], 2026-10-13 사용자): 테마 JS가 펼친 줄을 버튼 위로 옮기고 글자를 '접기'로 — .is-open 이면 화살표 위로 */
 .post-body details[data-fold] > summary::-webkit-details-marker { display: none; }
 .post-body details[data-fold].is-open > summary .acc-chev { transform: rotate(180deg); }

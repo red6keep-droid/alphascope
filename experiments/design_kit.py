@@ -17,6 +17,7 @@ NOTE = "#6B7280"          # 안내 글 회색
 BODY, SMALL, TINY, MICRO = "19px", "19px", "14px", "14px"   # 본문 18 → 19 (2026-10-13 사용자: "모든 리포트의 블로그 전체의 본문 폰트는 19포인트")   # 안내 글(14px)을 빼고 모두 18px (2026-10-12 사용자: "안내 14포인트를 제외하고 본문 폰트는 모두 18")
 NAME = "16px"   # 가로 구분선이 있는 카드의 왼쪽 정보(구분명) — 2026-10-12 사용자: "가로 구분선이 있는 카드의 좌측 정보는 16포인트"
 EMPH_NAME = "19px"   # 본문과 같이 19 (2026-10-13)   # 강조 카드(색 배경: 상태·결론·흐름·강조 C 카드)의 왼쪽 정보는 18px (2026-10-12 사용자)
+EMPH_Q, LH_EMPH_Q = "18px", "30px"   # 강조(상태) 카드 머리 줄 질문 · 대답 — 19 → 18, 행간도 같은 비율 32 → 30 (2026-10-27 사용자). 행간 반쪽은 그대로 6 이라 위아래 보이는 여백은 같다
 PILL_SIZE = "14px"   # 라벨(알약)은 어디서나 14px (2026-10-12 사용자: "라벨 폰트는 14 적용")
 # 카드 위아래 여백은 "보이는 여백"으로 정한다 (2026-10-12 사용자: "카드의 패딩은 상하 여백만 수정, 좌우는 유지").
 # 보이는 여백 = padding + 행간 반쪽(18px 글자 · 행간 24 → 약 2px). 그래서 위아래 padding = 목표 − VP. 카드 안 첫·끝 목록의 margin 은 ul 의 음수 margin 으로 지운다.
@@ -212,14 +213,33 @@ def text_px(text, fs):
 BAR_W = 28     # 막대 기준 폭 px — 엔비디아 · 한국 `최근 12개월 풋/콜 거래량 비율` 막대(숫자 세 자리 0.86 폭) (2026-10-26 사용자: "막대 가로 사이즈를 맞춰 줘")
 BAR_MAX = 36   # 숫자가 길면(+2.72 · −4.12 같은 네 자리) 이만큼까지만 넓힌다 — 막대가 적어도 화면을 채우려 늘리지 않는다
 GROUP_PAD_MULTI = 1.8   # 시리즈가 둘 이상인 묶음의 양옆 틈 배수 (묶음 사이 8 → 약 14px)
+BAR_NUM_PX = 13   # 막대 위 숫자 글자 — 모든 세로 막대 하나로, 가로축 이름(AXIS_FS)과 같은 크기 · 굵게 (2026-10-27 사용자: "그래프 위 숫자 폰트가 다 다르다" → 13 통일. 옛 막대 수별 11~17 · 데일리 11)
+BAR_RATIO = 0.8   # 막대 폭 = 숫자 폭 × 0.8, 최소 BAR_W · 최대 BAR_MAX (2026-10-27 사용자: "막대가 숫자보다 굵다, 숫자의 80% 정도")
 COL_GAP = 2    # 한 묶음 안 시리즈 막대 사이 (BAR_GAP 은 가로 막대 줄 간격으로 따로 있다)
+
+
+LEGEND_SIGN = ("#ED8E87", "#82B1F0")   # 이 종목(대상) 오름 · 내림 막대 색 — 범례에 쓰지 않는다
+LEGEND_GRAY = "#CBD5E1"   # 비교 막대(회색)
+
+
+def legend_items(items):
+    """그래프 범례 정리 (2026-10-27 사용자: "애플 늘어남 · 애플 줄어듦 같은 범례는 전부 삭제, 회색이 있으면 `비교 대상 : 시총 상위 20개` 처럼 짧게").
+    오름 · 내림 색 칩은 뺀다(빨강 · 파랑 뜻은 블로그 공통), 회색 칩은 `비교 대상 : 이름` — 이름 끝 `(중앙값)` · `중앙값` 은 뗀다. 다른 색(주황 · 올해/작년 등)은 그대로."""
+    out = []
+    for nm, c in items:
+        if str(c).upper() in LEGEND_SIGN:
+            continue
+        if str(c).upper() == LEGEND_GRAY and not nm.startswith("비교 대상"):
+            nm = "비교 대상 : " + re.sub(r"\s*\(?중앙값\)?$", "", nm).strip()
+        out.append((nm, c))
+    return out
 
 
 def col_layout(n, ns, label_px, axis_px):
     """막대 묶음 n개 × 시리즈 ns개 — (막대 폭 px, 숫자 칸 폭 px, 그래프 최소 폭 px).
     막대 폭은 어디서나 BAR_W(숫자가 길면 BAR_MAX 까지) — 막대가 적어도 넓히지 않고 묶음 사이만 벌어진다 (2026-10-26 사용자).
     숫자 칸은 숫자 폭 이상이라 막대보다 넓을 수 있다(숫자는 절대 겹치지 않게, 가이드라인 8절). 묶음 폭은 가로축 이름 폭 이상, 모자라면 가로 스크롤."""
-    w = max(BAR_W, min(label_px, BAR_MAX))
+    w = max(BAR_W, min(round(label_px * BAR_RATIO), BAR_MAX))   # 숫자 폭의 80% — 막대가 숫자보다 한 단계 가늘게 (2026-10-27 사용자)
     lw = max(w, label_px)
     group = max(ns * lw + (ns - 1) * COL_GAP + 2 * CHART_PAD_PX * (GROUP_PAD_MULTI if ns > 1 else 1), axis_px)   # 여러 막대 묶음은 묶음 사이를 80% 넓게 (2026-10-26 사용자: "월 월 사이가 너무 붙어 있다")
     return w, lw, int(n * group + 0.999)
@@ -282,7 +302,7 @@ def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w):
         grid.append(f'<span style="position:absolute;left:0;width:{gut - 6}px;top:{y - 7:.1f}px;height:14px;line-height:14px;text-align:right;font-size:{GRID_FS}px;color:{NOTE};">{fmt(v)}</span>')
     plot = (f'<span style="position:absolute;left:{gut}px;right:0;top:0;bottom:0;">'
             f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>{bars_html}</span>')
-    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:nowrap;">{esc(g)}</span>' for g in axis_names)
+    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:nowrap;">{"<br>".join(esc(x) for x in g.split(chr(10)))}</span>' for g in axis_names)   # 이름 아래 줄(연결 이유 · `지금`)은 줄바꿈 (2026-10-27 P31 · P36)
     return scroll_x(f'<span style="display:block;position:relative;height:{height}px;">{"".join(grid)}{plot}</span>'
                     f'<span style="display:flex;padding-left:{gut}px;font-size:{AXIS_FS};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>', min_w + gut)
 
@@ -1036,8 +1056,8 @@ def state_card(head_html, kind="neutral", right_html="", sub_html="", items=(), 
     둘째 줄 sub_html(14px 한 줄 설명), items = [(라벨, 내용)] 은 얇은 선 아래 3px 점 글머리표 14px."""
     bg, bd = STATE_CARD.get(kind, STATE_CARD["neutral"])
     head = (f'<span style="display:flex;justify-content:{"center" if center else "space-between"};align-items:center;gap:12px;{"text-align:center;" if center else ""}">'
-            f'<span style="font-weight:700;color:#111;font-size:{EMPH_NAME};">{head_html}</span>'
-            + (f'<span style="display:inline-flex;align-items:center;font-weight:700;white-space:nowrap;font-size:{SMALL};{"margin-left:auto;" if chev else ""}">{right_html}</span>' if right_html else "")   # 라벨 · 숫자 세로 가운데 (2026-10-13 사용자)
+            f'<span style="font-weight:700;color:#111;font-size:{EMPH_Q};line-height:{LH_EMPH_Q};">{head_html}</span>'
+            + (f'<span style="display:inline-flex;align-items:center;font-weight:700;white-space:nowrap;font-size:{EMPH_Q};line-height:{LH_EMPH_Q};{"margin-left:auto;" if chev else ""}">{right_html}</span>' if right_html else "")   # 라벨 · 숫자 세로 가운데 (2026-10-13 사용자)
             + ((("" if right_html else '<span style="margin-left:auto;"></span>') + fold_btn(lighten(bg), bd)) if chev else "") + "</span>")   # chev: 맨 오른쪽 공식 접기 버튼, 바탕은 카드 색 20% 밝게 (2026-10-13 사용자)
     sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#374151;margin-top:2px;{"text-align:center;" if center else ""}">{sub_html}</div>' if sub_html else ""   # center: 종합 상태 카드 가운데 (2026-10-13 사용자)
     lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#374151", margin="8px 0") for k, v in items)

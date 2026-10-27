@@ -188,7 +188,7 @@ def year_tip(y):
 def sec_year_range(s):
     """가격 범위 (1년) — 가격 정보 강조 카드 안 (R.year_range_in, 2026-10-26 사용자)."""
     y = s.get("year_range")
-    return R.year_range_in(y, lambda v: f"${v:,.2f}", year_tip(y)) if y else ""
+    return R.year_range_in(y, lambda v: f"${v:,.2f}", year_tip(y), (s.get("drawdown") or {}).get("days_since_high")) if y else ""
 
 
 def earn_tip(s, e):
@@ -288,7 +288,7 @@ def sec_chart_indicators(s):
     """2층 · 접힘 `차트 지표 보기` — NVDA 리포트와 같은 칸, 하루 비교는 S&P 500 · 업종 ETF."""
     tc = s["tech"]
     etf = U.sector_etf(s["sym"])[0]
-    deep = R._multi2([(f"{n}일 평균", R._arrow(v, 1)) for n, v in sorted(tc["ma_rel"].items(), key=lambda x: int(x[0]))])
+    deep = R.ma_chart(tc["ma_rel"], tc.get("bench_ma_rel"), s["name"], "S&P 500")   # 평균선 대비 = 세로 막대 + S&P 500 같은 값 (2026-10-27 사용자 P37)
     deep += R._multi2([("S&P 500 대비", R._arrow(tc.get("vs_spy"), 2, "%p")), (f"{etf} 대비", R._arrow(tc.get("vs_sector"), 2, "%p"))])
     rsi, mc = tc.get("rsi14"), tc.get("ma_cross")
     mc_html = {"golden": f'<span style="color:{UP};font-weight:700;">골든크로스</span>', "death": f'<span style="color:{DOWN};font-weight:700;">데드크로스</span>'}.get(
@@ -311,16 +311,11 @@ def sec_drawdown(s):
         return ""
     st, sp = d["stock"]["dd"], d["stock"]["spy_dd"]   # S&P 500 은 이 종목과 같은 기간
     span = R._span_label(d["stock"])
-    sm = f'font-size:{TINY};font-weight:400;color:{NOTE};'
-    head = R._row_html("지금", R._arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True, inline_note=True)   # 오른쪽 접기 버튼, 나머지는 펼쳤을 때 (NVDA 와 같게, 2026-10-18 사용자)
-    rows = ""
     cols = []
     for lv in ("10", "20", "30"):
         x, y = st.get(lv) or {}, sp.get(lv) or {}
         if not x.get("n") or x.get("median_days") is None:
             continue
-        right = f'<span style="{sm}">보통</span> {x["median_days"]}일' + (f'<br><span style="{sm}">S&amp;P 500 보통 {y["median_days"]}일</span>' if y.get("median_days") is not None else "")
-        rows += R._row_html(f'<span style="color:{DOWN};">−{lv}%</span> 넘게 내려가면', right, f"{span} 동안 {s['name']} {x['n']}번 발생")
         if x.get("recovered") and y.get("recovered"):
             cols.append((lv, x["over_year"] / x["recovered"] * 100, y["over_year"] / y["recovered"] * 100))
     tail = ""
@@ -333,15 +328,14 @@ def sec_drawdown(s):
         tbl = "".join(f'<span style="display:flex;align-items:stretch;line-height:24px;">{r}</span>' for r in (tbl_head, r1, r2))
         tip = "크게 떨어진 일 가운데, 최고가를 되찾기까지 1년(250거래일) 넘게 걸린 경우의 비율"
         title = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 4px;">'
-                 f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율{R._tipx(tip)}</span>'
-                 f'<span style="flex:none;font-size:{_dk.MICRO};font-weight:400;color:{NOTE};">({span} 기간 중)</span></span>')
+                 f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율{R._tipx(tip)}</span></span>')   # `(약 30년 기간 중)` 은 뺐다 — 기간은 머리 작은 줄에 (2026-10-27 P17 · P24)
         tail = f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px;font-size:{TINY};color:{NOTE};">{title}{tbl}</span>'
     x = d["pct_from_high"]
     lv = next((l for l in ("30", "20", "10") if -x > int(l) and (st.get(l) or {}).get("median_days") is not None), None)
     now = (f"\n· 지금 {_sgn(x)}% : −{lv}% 넘게 빠졌을 때 절반은 {st[lv]['median_days']}거래일 안에 최고가를 되찾았다" if lv else
            f"\n· 지금 {_sgn(x)}% : 1년 최고가에서 10% 안쪽")
     ttip = (f"주가가 최고가에서 크게 떨어졌을 때 그 최고가를 다시 넘기까지 걸린 거래일. '보통' 은 절반이 이보다 빨리 회복한 값" + now)
-    return R._card_title("고점 하락 후 가격 회복", ttip) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{R._fold_rows(head, rows + tail)}</span></div>'
+    return R.dd_block(s["name"], st, sp, "S&P 500", span, d["pct_from_high"], ttip, tail)   # 영역 제목 없이 한 덩이 · 구간 막대 (2026-10-27 P24 · P28)
 
 
 def related(s):
@@ -453,8 +447,8 @@ def sec_today_tab(s, news):
 def sec_expect(s):
     """실적과 기대 탭 — NVDA 리포트 sec_expect 와 같은 질문 카드 넷. 비교 묶음 = 시총 상위 20개 (중앙값)."""
     ex = s.get("expect") or {}
-    spec = [("회사는 돈을 더 벌고 있나?", "revenue", R.card_revenue), ("애널리스트 기대는 올라가나?", "eps", R.card_eps),
-            ("시장은 큰 움직임을 예상하나?", "move", R.card_move), ("하락에 거는 돈은?", "short", R.card_short)]
+    spec = [("회사는 돈을 더 벌고 있나?", "revenue", R.card_revenue), ("애널리스트 전망은?", "eps", R.card_eps),
+            ("시장 예상 흔들림은?", "move", R.card_move), ("하락에 거는 돈은?", "short", R.card_short)]
     out = ""
     for i, (title, key, fn) in enumerate(spec):
         c = ex.get(key)
@@ -563,7 +557,7 @@ def _josa(t):
 
 def detail_body(s, today, news=None):
     """NVDA 리포트 순서 : 맨 위 요약 → 그래프 → 가격 카드(펼치면 1층 · 2층) → 상태 카드. 갱신 날짜 줄은 뺐다 — 요약 첫 마디에 날짜가 있다 (2026-10-18 사용자)."""
-    return wrap(lead(s) + sec_chart(s) + price_card(s, today) + sec_states(s) + sec_targets(s)
+    return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
                 + R._section("실적과 기대", sec_expect(s), tab="실적과 기대")
                 + R._section("캘린더", sec_calendar(s), tab="캘린더")
