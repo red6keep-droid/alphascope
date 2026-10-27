@@ -2327,6 +2327,17 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   while (title.firstChild) lab.appendChild(title.firstChild);
   txt.appendChild(lab);
   var tw = document.createTreeWalker(lab, NodeFilter.SHOW_TEXT, null), tn; while ((tn = tw.nextNode())) tn.nodeValue = tn.nodeValue.replace(/ · /g, '\u00a0· ');   /* 가운뎃점이 줄 맨 앞에 오지 않게 앞 낱말에 붙인다 */
+  /* 종목 제목 꼬리 `주가 · 실적 일정` 은 작은 회색 · 점 없이 `주가 실적 일정` (2026-10-27 사용자 P20: 검색어는 제목에 그대로 두되 독자 눈에는 이름이 제목).
+     글자는 지우거나 숨기지 않는다 — 크기만 다르게(검색엔진 숨은 글자 정책). 로고 스크립트가 읽는 textContent 도 그대로 */
+  tw = document.createTreeWalker(lab, NodeFilter.SHOW_TEXT, null);
+  while ((tn = tw.nextNode())) {
+    var sm = /\s(주가(?:\u00a0· 실적 일정)?)\s*$/.exec(tn.nodeValue);
+    if (!sm) continue;
+    var sub = document.createElement('span'); sub.className = 'post-title-sub'; sub.textContent = sm[1].replace('\u00a0· ', ' ');   /* 꼬리 안 가운데 점은 뺀다 — 글 제목 · 주소는 그대로 (P21) */
+    var tail = tn.splitText(sm.index + 1); tail.nodeValue = tail.nodeValue.slice(sm[1].length);
+    tn.parentNode.insertBefore(sub, tail);
+    break;
+  }
   title.appendChild(txt);
   title.appendChild(meta);
   var pop = document.createElement('div'); pop.className = 'rt-pop share-pop'; pop.hidden = true;

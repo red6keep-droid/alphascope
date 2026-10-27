@@ -108,11 +108,26 @@ def technical(bars, snap, sym):
     if out["ma50"] and out["ma200"] and pm50 and pm200:
         cross = "golden" if pm50 <= pm200 and out["ma50"] > out["ma200"] else "death" if pm50 >= pm200 and out["ma50"] < out["ma200"] else None
     out["ma_cross"] = cross
+    bc = [x["close"] for x in snap["bars"].get(U.BENCH) or [] if x["day"] <= t["day"]]   # S&P 500 도 같은 날까지 — 평균선 대비 비교 막대 (2026-10-27 P37)
+    out["bench_ma_rel"] = {n: (bc[-1] / (sum(bc[-n:]) / n) - 1) * 100 for n in (20, 60, 120, 200) if len(bc) >= n}
+    out["path"], out["bench_path"] = day_path(bars), day_path(snap["bars"].get(U.BENCH), t["day"])   # 오늘 하루 흐름 (P41)
     r1 = (t["close"] / p["close"] - 1) * 100
     for key, ref in (("vs_spy", U.BENCH), ("vs_sector", U.sector_etf(sym)[0])):
         rb = {x["day"]: x["close"] for x in snap["bars"].get(ref) or []}
         out[key] = r1 - (rb[t["day"]] / rb[p["day"]] - 1) * 100 if t["day"] in rb and p["day"] in rb else None
     return out
+
+
+def day_path(bars, day=None):
+    """오늘 하루 흐름 — 전일 종가 대비 시가 · 장중 고점 · 장중 저점 · 종가 % (2026-10-27 사용자 P41). day 를 주면 그날(지수를 종목 날짜에 맞춘다)."""
+    if day is not None:
+        bars = [x for x in bars or [] if x["day"] <= day]
+    if not bars or len(bars) < 2 or bars[-1]["day"] != (day or bars[-1]["day"]):
+        return None
+    t, pc = bars[-1], bars[-2]["close"]
+    if not pc or not t.get("open") or not t.get("high") or not t.get("low"):
+        return None
+    return {k: (t[k] / pc - 1) * 100 for k in ("open", "high", "low", "close")}
 
 
 def market_regime(snap):

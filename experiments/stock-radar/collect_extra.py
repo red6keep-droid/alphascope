@@ -115,7 +115,7 @@ def _one(args, only=None):
             print(f"[extra] {sym} {key} 실패 : {e}")
             out[key] = None
     o = out.get("options") or {}
-    out["iv"] = o.get("iv_atm_30d")          # 실적과 기대 `시장은 큰 움직임을 예상하나?` 의 재료 = 상태판과 같은 값 (NVDA 와 같다)
+    out["iv"] = o.get("iv_atm_30d")          # 실적과 기대 `시장 예상 흔들림은?` 의 재료 = 상태판과 같은 값 (NVDA 와 같다)
     out["straddle"] = o.get("implied_move_next_earnings")
     if not out["iv"] and (not only or "options" in only):   # 상태판 체인이 비었으면 예전 방식(30일 근처 만기 ATM) 한 번
         try:

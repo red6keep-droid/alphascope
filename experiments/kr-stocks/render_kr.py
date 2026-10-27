@@ -161,6 +161,36 @@ def pair_tip(s):
     return "\n".join(lines)
 
 
+def _us_name(sym):
+    return USU.name(sym) if sym in USU.BY_SYM else sym
+
+
+def _pair_bars(groups, note=""):
+    """밤사이 미국 · 오늘 한국 세로 막대 (2026-10-27 사용자 P31: "세로 막대, 길면 넘겨 보기" — P27 가로 막대를 바꿈). 공용 _col_chart 한 시리즈,
+    막대마다 색 — 미국 연결은 오름 빨강 · 내림 파랑, 이 종목은 진하게, KOSPI 회색. 두 묶음 사이는 빈 칸 하나. 가로축 이름 아래 줄 = 연결 이유.
+    흰 카드 폭은 상태 카드 안 다른 막대(_zone_gauge)와 같다."""
+    cols, kinds = [], []
+    for gi, (_, rows) in enumerate(groups):
+        if gi:
+            cols.append(("", [None]))
+            kinds.append(None)
+        for nm, sub, v, kind in rows:
+            cols.append((nm + (f"\n{sub}" if sub else ""), [v]))
+            kinds.append(kind)
+
+    def color_at(i, k, v):
+        kind = kinds[i]
+        if kind == "bench":
+            return R._GRAY_BAR, NOTE
+        bg = R._PASTEL_UP if v >= 0 else R._PASTEL_DN
+        return (_dk.darken(bg, 0.2) if kind == "me" else bg), (UP if v > 0 else DOWN if v < 0 else "#111")
+    chart = R._col_chart(cols, [R._sign_bg], [R._sign_fg], fmt=lambda v: f"{v:+.1f}".replace("-", "−"), color_at=color_at)
+    title = " → ".join(g for g, _ in groups)
+    tail = f'<span style="display:block;margin:6px 0 0;font-size:{TINY};line-height:20px;color:{NOTE};word-break:keep-all;">{_esc(note)}</span>' if note else ""
+    return (f'<span style="display:block;margin:0 0 8px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{R._paren(_esc(title + " (%)"))}</span>'
+            f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X - 2}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>{tail}')
+
+
 def sec_pairs(s):
     """`미국과 연결` 펼침 카드 (2026-10-25 사용자: "짝" 대신 "연결" · 가격 카드 다음 · 펼침 카드로). 접힌 머리 = 밤사이 연결 종목이 어땠나(올랐음 · 내렸음 · 엇갈림),
     펼치면 연결 종목 · ADR(K24) · SOX(K25) 줄과 오늘 이 종목 · KOSPI 대비, 한국 장 뒤 나온 미국 종가. 툴팁 `기록상` = 10-25 일별 검증."""
@@ -174,23 +204,25 @@ def sec_pairs(s):
     state, theme, col = (("엇갈림", "uncertain", R.WARN) if ups and downs else ("올랐음", "positive", UP) if ups else ("내렸음", "negative", DOWN) if downs
                          else ("비슷함", "neutral", R.MUTED))
     day = (moves or [adr or sox])[0]["day"]
-    lines = [(f"밤사이(미국 {_md(day)} 종가) 연결 종목은 " + " · ".join(f"{USU.name(m['sym']) if m['sym'] in USU.BY_SYM else m['sym']} {_sgn(m['ret'])}%" for m in moves)
+    lines = [(f"밤사이(미국 {_md(day)} 종가) 연결 종목은 " + " · ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)
               + f", 오늘 {s['name']}은 {_sgn(s['ret_1d'])}%였다.", "plain")]
-    for m in moves:
-        lines.append(("row", m["sym"], f"{_sgn(m['ret'], 2)}%", f"미국 {_md(m['day'])} 종가"))
+    # 숫자 줄 목록 → 가운데 0 가로 막대 두 묶음 (2026-10-27 사용자 P27: "퍼센트만 쭉 있어 빨리 안 읽힌다, 삼성전자 · 지수와 비교 그래프")
+    why = [w.strip() for w in (p.get("why") or "").split("·")]
+    role = dict(zip([m["sym"] for m in moves], why)) if len(why) == len(moves) else {}   # 이유가 종목 수와 맞을 때만 나눠 붙인다 — `마이크론 · 메모리`
+    us = [(_us_name(m["sym"]), role.get(m["sym"], ""), m["ret"], "us") for m in moves]
     if adr:
-        rec = U.ADR_RECORD.get(adr["sym"])
-        lines.append(("row", f"{adr['sym']} (같은 회사 ADR)", f"{_sgn(adr['ret'], 2)}%",
-                      f"미국 {_md(adr['day'])} 종가" + (f" · 기록상 다음날 차이 {_sgn(rec[0], 2)}%p ({rec[2]}~)" if rec else "")))
+        us.append((adr["sym"], "같은 회사 ADR", adr["ret"], "us"))
     if sox:
-        sp = U.OVERNIGHT_RECORD["SOX_SEMI"][0]
-        lines.append(("row", "SOX (필라델피아 반도체)", f"{_sgn(sox['ret'], 2)}%", f"미국 {_md(sox['day'])} 종가 · 기록상 다음날 반도체 묶음 차이 {_sgn(sp, 2)}%p (2000~)"))
-    lines.append(("row", s["name"], f"{_sgn(s['ret_1d'], 2)}%", f"오늘 {_md(s['day'])}"))
+        us.append(("SOX", "반도체지수", sox["ret"], "us"))
+    kr = [(s["name"], "", s["ret_1d"], "me")]
     vb = s["tech"].get("vs_bench")
     if vb is not None:
-        lines.append(("row", "KOSPI 대비", f"{_sgn(vb, 2)}%p", "오늘 이 종목 − KOSPI"))
-    for m in p.get("latest") or []:   # 한국 장 마감 뒤 나온 미국 종가 — 다음 한국장 전 참고
-        lines.append(("row", f"{m['sym']} 그 뒤 미국 종가", f"{_sgn(m['ret'], 2)}%", f"미국 {_md(m['day'])} · 다음 한국장 전 참고"))
+        kr.append(("KOSPI", "", s["ret_1d"] - vb, "bench"))
+    note = ""
+    if p.get("latest"):   # 한국 장 마감 뒤 나온 미국 종가 — 다음 한국장 전 참고
+        lt = p["latest"]
+        note = f"그 뒤 미국 종가({_md(lt[0]['day'])}) : " + " · ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in lt) + " — 다음 한국장 전 참고"
+    lines.append((_pair_bars([(f"밤사이 미국 ({_md(day)} 종가)", us), (f"오늘 한국 ({_md(s['day'])})", kr)], note), "html"))
     return R._state_card("밤사이 미국과 연결 종목은?", state, theme, col, lines, "", tip=pair_tip(s), fold=True)
 
 
@@ -510,7 +542,7 @@ def year_tip(y):
 def sec_year_range(s):
     """가격 범위 (1년) — 가격 정보 강조 카드 안 (R.year_range_in, 2026-10-26 사용자), 원화."""
     y = s.get("year_range")
-    return R.year_range_in(y, won, year_tip(y)) if y else ""
+    return R.year_range_in(y, won, year_tip(y), (s.get("drawdown") or {}).get("days_since_high")) if y else ""
 
 
 def sec_drawdown(s):
@@ -520,15 +552,11 @@ def sec_drawdown(s):
         return ""
     st, bn = d["stock"]["dd"], d["stock"].get("bench_dd") or {}
     span = R._span_label(d["stock"])
-    sm = f'font-size:{TINY};font-weight:400;color:{NOTE};'
-    head = _row_html("지금", R._arrow(d["pct_from_high"], 1), f"1년 최고가 이후 {d['days_since_high']}거래일째", first=True, inline_note=True)
-    rows, cols = "", []
+    cols = []
     for lv in ("10", "20", "30"):
         x, y = st.get(lv) or {}, bn.get(lv) or {}
         if not x.get("n") or x.get("median_days") is None:
             continue
-        right = f'<span style="{sm}">보통</span> {x["median_days"]}일' + (f'<br><span style="{sm}">KOSPI 보통 {y["median_days"]}일</span>' if y.get("median_days") is not None else "")
-        rows += _row_html(f'<span style="color:{DOWN};">−{lv}%</span> 넘게 내려가면', right, f"{span} 동안 {s['name']} {x['n']}번 발생")
         if x.get("recovered") and y.get("recovered"):
             cols.append((lv, x["over_year"] / x["recovered"] * 100, y["over_year"] / y["recovered"] * 100))
     tail = ""
@@ -541,14 +569,13 @@ def sec_drawdown(s):
         tbl = "".join(f'<span style="display:flex;align-items:stretch;line-height:24px;">{r}</span>' for r in (th, r1, r2))
         tip = "크게 떨어진 일 가운데, 최고가를 되찾기까지 1년(250거래일) 넘게 걸린 경우의 비율"
         title = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 4px;">'
-                 f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율{R._tipx(tip)}</span>'
-                 f'<span style="flex:none;font-size:{_dk.MICRO};font-weight:400;color:{NOTE};">({span} 기간 중)</span></span>')
+                 f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율{R._tipx(tip)}</span></span>')   # `(약 30년 기간 중)` 은 뺐다 — 기간은 머리 작은 줄에 (2026-10-27 P17 · P24)
         tail = f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px;font-size:{TINY};color:{NOTE};">{title}{tbl}</span>'
     x = d["pct_from_high"]
     lv = next((l for l in ("30", "20", "10") if -x > int(l) and (st.get(l) or {}).get("median_days") is not None), None)
     now = (f"\n· 지금 {_sgn(x)}% : −{lv}% 넘게 빠졌을 때 절반은 {st[lv]['median_days']}거래일 안에 최고가를 되찾았다" if lv else f"\n· 지금 {_sgn(x)}% : 1년 최고가에서 10% 안쪽")
     ttip = "주가가 최고가에서 크게 떨어졌을 때 그 최고가를 다시 넘기까지 걸린 거래일. '보통' 은 절반이 이보다 빨리 회복한 값" + now
-    return R._card_title("고점 하락 후 가격 회복", ttip) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{R._fold_rows(head, rows + tail)}</span></div>'
+    return R.dd_block(s["name"], st, bn, "KOSPI", span, d["pct_from_high"], ttip, tail)   # 영역 제목 없이 한 덩이 · 구간 막대 (2026-10-27 P24 · P28)
 
 
 def _no_record(tip):
@@ -557,8 +584,8 @@ def _no_record(tip):
 
 def sec_chart_indicators(s):
     tc = s["tech"]
-    deep = R._multi2([(f"{n}일 평균", R._arrow(v, 1)) for n, v in sorted(tc["ma_rel"].items(), key=lambda x: int(x[0]))])
-    deep += R._multi2([("KOSPI 대비", R._arrow(tc.get("vs_bench"), 2, "%p"))])
+    # 평균선 대비 = 세로 막대 + KOSPI 같은 값 (2026-10-27 사용자 P37). `KOSPI 대비` 줄은 뺐다 — 밤사이 미국과 연결 그래프의 이 종목 · KOSPI 막대와 같은 값
+    deep = R.ma_chart(tc["ma_rel"], tc.get("bench_ma_rel"), s["name"], "KOSPI")
     rsi, mc = tc.get("rsi14"), tc.get("ma_cross")
     mc_html = {"golden": f'<span style="color:{UP};font-weight:700;">골든크로스</span>', "death": f'<span style="color:{DOWN};font-weight:700;">데드크로스</span>'}.get(
         mc, f'<span style="color:{R.MUTED};">교차 없음</span>')
@@ -637,6 +664,7 @@ def related(s=None, links=None):
 
 MAX_NEWS = 8        # `오늘` 탭에 펼쳐 두는 방송 줄, 나머지는 `그 외 n건`
 TODAY_HOURS = 24    # 오늘자만 — 미국 종목 페이지와 같다 (2026-10-25 사용자)
+MOCK_NEWS = "<!--mock-news-->"   # 목업 전용 자리 — 발행 본문에서는 지운다 (2026-10-27 P26)
 MEDIA = []          # 방송 이슈 (media_feed.issues — 같은 이슈는 이미 한 줄로) — write_all 이 한 번 읽는다
 
 
@@ -645,8 +673,19 @@ def sec_today(s):
     한국 증시 채널 · 미국 채널 모두. 공용 뉴스 카드(엔비디아 · 미국 종목 페이지와 같은 _event_html): 주제 / 방송 주장 / [영역] [방향] [방송]  시각 · 채널."""
     ev = [media_feed.event(r) for r in sorted(media_feed.for_kr_page(MEDIA, s["code"]), key=lambda r: str(r["published_at"]), reverse=True)]
     if not ev:
-        return _dk.muted("오늘은 이 종목을 다룬 방송 소식이 없습니다.")
+        return _dk.muted("오늘은 이 종목을 다룬 방송 소식이 없습니다.") + MOCK_NEWS   # 목업에서만 샘플 카드로 바뀐다 (P26)
     return R.sec_events({"events": ev[:MAX_NEWS], "events_overflow": ev[MAX_NEWS:MAX_NEWS + 12]})
+
+
+def mock_news():
+    """목업 전용 뉴스 샘플 (2026-10-27 사용자 P26: "공용 뉴스 카드로 우선 샘플") — 이 종목 방송이 없을 때 최근 한국 채널 방송 4건을 공용 카드로.
+    발행 본문에는 들어가지 않는다 (write_all 이 MOCK_NEWS 를 지운다)."""
+    ev = [media_feed.event(r) for r in media_feed.korea(MEDIA, 4)]
+    if not ev:
+        return ""
+    return (f'<div style="margin:12px 0 6px;padding:6px 10px;border:1px dashed #F59E0B;border-radius:6px;font-size:{TINY};line-height:20px;color:#92400E;">'
+            f'목업 샘플 — 이 종목 방송이 없어 최근 한국 채널 방송으로 카드 모양만 보여 줍니다 (발행 글에는 없음)</div>'
+            + R.sec_events({"events": ev, "events_overflow": []}))
 
 
 KR_PEER_LABEL = "한국 시총 상위 20개"
@@ -682,11 +721,11 @@ def build_expect(s, extra, group):
 
 
 def sec_expect(s):
-    """`실적과 기대` 탭 — 미국 종목과 같은 질문 카드 둘 (2026-10-25 사용자). `시장은 큰 움직임을 예상하나?`(옵션) · `하락에 거는 돈은?`(공매도)은
+    """`실적과 기대` 탭 — 미국 종목과 같은 질문 카드 둘 (2026-10-25 사용자). `시장 예상 흔들림은?`(옵션) · `하락에 거는 돈은?`(공매도)은
     한국 자료가 없어 뺐다 — 개별 종목 옵션이 없고, 공매도는 Yahoo 에 없으며 한국거래소 자료는 약관 확인 전."""
     ex = s.get("expect") or {}
     out = ""
-    for i, (title, key, fn) in enumerate((("회사는 돈을 더 벌고 있나?", "revenue", R.card_revenue), ("애널리스트 기대는 올라가나?", "eps", R.card_eps))):
+    for i, (title, key, fn) in enumerate((("회사는 돈을 더 벌고 있나?", "revenue", R.card_revenue), ("애널리스트 전망은?", "eps", R.card_eps))):
         c = ex.get(key)
         if c:
             lines, tip = _rename(fn(c), s["name"])
@@ -916,7 +955,7 @@ def detail_body(s, a):
     `업종` 탭 = 업종 재료 · 체감 경기 · 경영 분석
     (2026-10-25 사용자: 미국 종목 페이지처럼 탭 — 실적과 기대 · 캘린더는 다음 단계)."""
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
-            + lead(s) + sec_chart(s) + price_card(s) + sec_pairs(s) + sec_states(s)
+            + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_pairs(s) + sec_states(s)
             + _dk.keep_tone(R._section("뉴스", sec_today(s), tab="오늘"))   # 뉴스는 헤드라인체 그대로
             + R._section("실적과 기대", sec_expect(s), tab="실적과 기대")
             + R._section("업종", sec_industry_tab(s), tab="업종")
@@ -1341,8 +1380,9 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
     pages = {"list": (U.LIST_TITLE, list_body(a))}
     for s in a["stocks"]:
         pages[s["code"]] = (U.page_title(s["sym"]), detail_body(s, a))
+    sample = mock_news()
     for key, (title, body) in pages.items():
         with open(os.path.join(out_dir, f"{key}.html"), "w", encoding="utf-8") as f:
-            f.write(body)
-        _dk.write_mock(body, os.path.join(out_dir, f"mock_{key}.html"), title)
+            f.write(body.replace(MOCK_NEWS, ""))
+        _dk.write_mock(body.replace(MOCK_NEWS, sample), os.path.join(out_dir, f"mock_{key}.html"), title)
     return pages

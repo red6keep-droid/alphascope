@@ -222,7 +222,7 @@ def head_chart(r):
     groups = [(INDEX[k], [v["gap"], v["intra"], v["ret"]]) for k, v in r["idx"].items()]
     amber = lambda v: C.AMBER   # noqa: E731
     chart = C.chart_card("", groups, [amber, C.sign_bg, C.gray], [C.sign_fg, C.sign_fg, C.sign_fg],   # 막대 색은 구분용, 숫자는 모두 증감 색 (M6)
-                         [("시가 갭", C.AMBER), ("장중", C.PASTEL_UP), ("하루", C.GRAY_BAR)])
+                         [("시가 갭", C.AMBER), ("장중", C.PASTEL_UP), ("하루", C.GRAY_BAR)], keep_legend=True)   # 하루를 나눈 조각 — 범례 그대로 (2026-10-27)
     return f'<div data-cards="1" style="margin:0 0 8px;">{chart}</div>'
 
 
