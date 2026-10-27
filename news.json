@@ -1,6 +1,46 @@
 {
-  "updated_at": "2026-10-27 02:46:24 UTC",
+  "updated_at": "2026-10-27 04:46:19 UTC",
   "items": [
+    {
+      "title": "HSBC announces share buyback of up to $1 billion as third-quarter profit meets estimates",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/hsbc-third-quarter-profit-.html",
+      "published": "2026-10-27 04:42:31",
+      "title_ko": "HSBC, 3분기 실적 예상 부합 속 최대 10억 달러 자사주 매입 발표",
+      "summary_ko": ""
+    },
+    {
+      "title": "Judge fast-tracks DOJ's Alaska Senate lawsuit as Peltola seeks dismissal before Election Day",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/alaska-senate-peltola-doj-lawsuit-election-sullivan.html",
+      "published": "2026-10-27 04:40:30",
+      "title_ko": "알래스카 상원: 펠톨라, 중간선거 전 법무부 선거 소송 조기 기각 요구",
+      "summary_ko": "알래스카 상원 선거 결과, 다음 의회 상원 다수당 결정"
+    },
+    {
+      "title": "Trump DOJ unlawfully fired Epstein prosecutor Maurene Comey, judge rules",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/maurene-comey-firing-unlawful-trump.html",
+      "published": "2026-10-27 04:12:50",
+      "title_ko": "트럼프 DOJ, 에피스타인 검사 모린 코미 불법 해고 판정",
+      "summary_ko": "코미, 부수사관으로 소급 복직 명령"
+    },
+    {
+      "title": "China industrial profits post strongest growth in three months as tech boom widens economic divide",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/china-industrial-profits-september-ai-tech-exports-.html",
+      "published": "2026-10-27 03:34:08",
+      "title_ko": "중국 산업 이익, 3개월 만에 최고 성장세 14.4% 기록",
+      "summary_ko": "글로벌 AI 붐과 이란 전쟁발 원자재 가격 상승이 광산·반도체·원자재 공급업체 수익 견인"
+    },
+    {
+      "title": "DOJ charges ex-FBI Director James Comey in new case",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/james-comey-indictment-national-defense-doj-trump.html",
+      "published": "2026-10-27 03:30:04",
+      "title_ko": "DOJ, 전 FBI 국장 제임스 코미 새 사건으로 기소",
+      "summary_ko": "트럼프 전임자 해고 이력 언급"
+    },
     {
       "title": "Bessent dines at Cheesecake Factory, slams Obama over Trump joke",
       "source": "CNBC",
@@ -8,14 +48,6 @@
       "published": "2026-10-27 02:37:31",
       "title_ko": "베센트, 치즈케이크 팩토리서 식사하며 트럼프 농담한 오바마 비판",
       "summary_ko": "치즈케이크 팩토리, 선거 전 캠페인 논쟁 소재 부상"
-    },
-    {
-      "title": "China industrial profits post strongest growth in three months, rising 14.4%",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/china-industrial-profits-september-ai-tech-exports-.html",
-      "published": "2026-10-27 02:23:29",
-      "title_ko": "중국 산업 이익, 3개월 만에 최고 성장세 14.4% 기록",
-      "summary_ko": "글로벌 AI 붐과 이란 전쟁발 원자재 가격 상승이 광산·반도체·원자재 공급업체 수익 견인"
     },
     {
       "title": "China and Russia are redrawing Arctic trade. Can Europe fight back?",
@@ -42,38 +74,6 @@
       "summary_ko": "12월·1월 금리 인상 전망"
     },
     {
-      "title": "CNBC's The China Connection newsletter: The 'cliff' beneath China's cities",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/china-fiscal-debt-gdp-imf-real-estate-.html",
-      "published": "2026-10-26 23:10:16",
-      "title_ko": "CNBC의 The China Connection 뉴스레터: 중국 도시들 아래의 '절벽'",
-      "summary_ko": "베이징 차입 여력 보유, 고부채 지방정부 삭감"
-    },
-    {
-      "title": "From Wall Street to Silicon Valley, Anthropic IPO poised to have massive 'trickle-down effect'",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/anthropic-ipo-might-trigger-tech-reset-if-ipo-underperforms.html",
-      "published": "2026-10-26 22:50:07",
-      "title_ko": "월스트리트부터 실리콘밸리까지, 앤트로픽 IPO 거대한 '트리클다운 효과' 기대",
-      "summary_ko": "AI 거래 부진, 금리 상승 배경"
-    },
-    {
-      "title": "Israeli election draws tens of thousands of citizens flying back to vote",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/israeli-election-citizens-flying-back-vote.html",
-      "published": "2026-10-26 22:46:35",
-      "title_ko": "이스라엘 선거, 투표 위해 귀국하는 수만 명 시민",
-      "summary_ko": "이스라엘, 치열한 선거 진행"
-    },
-    {
-      "title": "DOJ charges ex-FBI Director James Comey in new case",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/james-comey-indictment-national-defense-doj-trump.html",
-      "published": "2026-10-26 22:24:36",
-      "title_ko": "DOJ, 전 FBI 국장 제임스 코미 새 사건으로 기소",
-      "summary_ko": "트럼프 전임자 해고 이력 언급"
-    },
-    {
       "title": "중동 긴장 완화 회담과 유가 하락",
       "title_ko": "중동 긴장 완화 회담과 유가 하락",
       "summary_ko": "사우디 등의 중동 긴장 완화 회담으로 국제유가가 하락하며 증시에 숨통을 틔워줬",
@@ -82,7 +82,7 @@
       "published": "2026-10-26 21:16:46",
       "kind": "media",
       "tag": "지정학",
-      "direction": "negative",
+      "direction": "neutral",
       "n_channels": 4
     },
     {
