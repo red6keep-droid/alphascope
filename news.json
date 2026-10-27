@@ -1,13 +1,21 @@
 {
-  "updated_at": "2026-10-27 04:46:19 UTC",
+  "updated_at": "2026-10-27 06:46:16 UTC",
   "items": [
     {
       "title": "HSBC announces share buyback of up to $1 billion as third-quarter profit meets estimates",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/hsbc-third-quarter-profit-.html",
-      "published": "2026-10-27 04:42:31",
+      "published": "2026-10-27 05:30:10",
       "title_ko": "HSBC, 3분기 실적 예상 부합 속 최대 10억 달러 자사주 매입 발표",
       "summary_ko": ""
+    },
+    {
+      "title": "Oil falls as renewed diplomatic efforts to end Mideast conflict ease supply concerns",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/oil-today-iran-us-crude-wti-brent-trump.html",
+      "published": "2026-10-27 05:09:59",
+      "title_ko": "유가, 중동 갈등 종식 외교 노력으로 하락",
+      "summary_ko": "미국-이스라엘 전쟁 종식 외교 노력"
     },
     {
       "title": "Judge fast-tracks DOJ's Alaska Senate lawsuit as Peltola seeks dismissal before Election Day",
@@ -66,14 +74,6 @@
       "summary_ko": "인프라 구축과 자본 효율성 균형 추구"
     },
     {
-      "title": "Bank of Japan is expected to hold rates this week — but stay hawkish: CNBC survey",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/boj-october-meeting-rate-cnbc-survey.html",
-      "published": "2026-10-27 00:17:44",
-      "title_ko": "일본은행, 이번 주 금리 동결 예상, 매파적 입장 유지: CNBC 설문",
-      "summary_ko": "12월·1월 금리 인상 전망"
-    },
-    {
       "title": "중동 긴장 완화 회담과 유가 하락",
       "title_ko": "중동 긴장 완화 회담과 유가 하락",
       "summary_ko": "사우디 등의 중동 긴장 완화 회담으로 국제유가가 하락하며 증시에 숨통을 틔워줬",
@@ -83,7 +83,7 @@
       "kind": "media",
       "tag": "지정학",
       "direction": "neutral",
-      "n_channels": 4
+      "n_channels": 3
     },
     {
       "title": "연준 통화정책 및 금리 전망",
