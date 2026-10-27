@@ -70,11 +70,22 @@ def drawdown(bars, yr, hist, sym):
     return {"stock": h[sym], "pct_from_high": yr["pct_from_high"], "days_since_high": sum(1 for x in bars if x["day"] > yr["high_day"])}
 
 
+def _closed_us(bars):
+    """미국 장중에 받은 오늘 봉(아직 종가 아님)은 뺀다 — GitHub cron 이 몇 시간 늦어 미국 장중(KST 밤)에 돌면 장중 값이 `그 뒤 미국 종가` 로 게시된다
+    (2026-10-28, NVDA 10-24 장중 게시 사고와 같은 종류). 뉴욕 16:30 전이면 뉴욕 오늘 날짜 봉을 뺀다."""
+    import datetime
+    from zoneinfo import ZoneInfo
+    ny = datetime.datetime.now(ZoneInfo("America/New_York"))
+    if bars and ny.time() < datetime.time(16, 30) and bars[-1]["day"] >= ny.strftime("%Y-%m-%d"):
+        return bars[:-1]
+    return bars
+
+
 def us_move(t, snap, kr_day, points=False):
     """미국 티커 하나의 움직임 둘 — `before` = 한국 장이 열리기 전 마지막 미국 거래일(한국 날짜보다 앞선 날, "밤사이") · `latest` = 그 뒤 더 새 미국 종가가 있으면
     (한국 장 마감 뒤 끝난 미국장 — 다음 한국장 전 참고). 미국 10-23 종가는 한국 10-24 새벽에 나오므로 한국 10-23 반응의 짝은 미국 10-22 다.
     points = 수익률 대신 포인트 차이(VIX)."""
-    b = (snap.get("us_bars") or {}).get(t) or []
+    b = _closed_us((snap.get("us_bars") or {}).get(t) or [])
     chg = (lambda i: b[i]["close"] - b[i - 1]["close"]) if points else (lambda i: (b[i]["adj"] / b[i - 1]["adj"] - 1) * 100)
     before = latest = None
     prev = [i for i in range(1, len(b)) if b[i]["day"] < kr_day]
