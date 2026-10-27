@@ -9,6 +9,7 @@
 """
 import datetime
 import importlib.util
+import json
 import os
 import re
 import statistics
@@ -765,5 +766,7 @@ if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "report_body.html"), "w", encoding="utf-8") as f:
         f.write(html)
+    with open(os.path.join(OUT, "meta.json"), "w", encoding="utf-8") as f:   # 게시 단계(publish_report.py)가 읽는다
+        json.dump({"day": r["day"], "title": title(r["day"])}, f, ensure_ascii=False)
     mock = _dk.write_mock(html, os.path.join(OUT, "kr_report_mock.html"), title(r["day"]))
     print(f"[kr-report] {r['day']} · {title(r['day'])} → {mock}")
