@@ -1,13 +1,37 @@
 {
-  "updated_at": "2026-10-27 00:48:57 UTC",
+  "updated_at": "2026-10-27 02:46:24 UTC",
   "items": [
+    {
+      "title": "Bessent dines at Cheesecake Factory, slams Obama over Trump joke",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/bessent-obama-cheesecake-trump-election.html",
+      "published": "2026-10-27 02:37:31",
+      "title_ko": "베센트, 치즈케이크 팩토리서 식사하며 트럼프 농담한 오바마 비판",
+      "summary_ko": "치즈케이크 팩토리, 선거 전 캠페인 논쟁 소재 부상"
+    },
+    {
+      "title": "China industrial profits post strongest growth in three months, rising 14.4%",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/china-industrial-profits-september-ai-tech-exports-.html",
+      "published": "2026-10-27 02:23:29",
+      "title_ko": "중국 산업 이익, 3개월 만에 최고 성장세 14.4% 기록",
+      "summary_ko": "글로벌 AI 붐과 이란 전쟁발 원자재 가격 상승이 광산·반도체·원자재 공급업체 수익 견인"
+    },
     {
       "title": "China and Russia are redrawing Arctic trade. Can Europe fight back?",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/arctic-shipping-china-and-russia-expand-grip-can-europe-fight-back.html",
-      "published": "2026-10-27 00:41:29",
+      "published": "2026-10-27 01:24:28",
       "title_ko": "중국과 러시아, 북극 무역 재편 – 유럽은 대응 가능할까?",
       "summary_ko": "유럽 새로운 지정학적 전쟁 구도"
+    },
+    {
+      "title": "Microsoft offers voluntary buyouts to 60,000 employees as AI leads to efficiency push",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/26/microsoft-msft-voluntary-buyouts.html",
+      "published": "2026-10-27 01:05:06",
+      "title_ko": "마이크로소프트, 6만 명에게 자발적 퇴직 제안",
+      "summary_ko": "인프라 구축과 자본 효율성 균형 추구"
     },
     {
       "title": "Bank of Japan is expected to hold rates this week — but stay hawkish: CNBC survey",
@@ -48,30 +72,6 @@
       "published": "2026-10-26 22:24:36",
       "title_ko": "DOJ, 전 FBI 국장 제임스 코미 새 사건으로 기소",
       "summary_ko": "트럼프 전임자 해고 이력 언급"
-    },
-    {
-      "title": "Jim Cramer warns this overlooked danger could threaten the market rally",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/jim-cramer-ipos-capital-raises-bull-market.html",
-      "published": "2026-10-26 22:09:35",
-      "title_ko": "짐 크래머, 무시된 위험이 시장 랠리 위협할 수 있다고 경고",
-      "summary_ko": "CNBC 짐 크래머, 소외된 위험 요인 지적"
-    },
-    {
-      "title": "Bessent dines at Cheesecake Factory, slams Obama over Trump joke",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/bessent-obama-cheesecake-trump-election.html",
-      "published": "2026-10-26 21:38:17",
-      "title_ko": "베센트, 치즈케이크 팩토리서 식사하며 트럼프 농담한 오바마 비판",
-      "summary_ko": "치즈케이크 팩토리, 선거 전 캠페인 논쟁 소재 부상"
-    },
-    {
-      "title": "JetBlue posts bigger loss on fuel costs, but CEO says margins improving",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/jetblue-jblu-3q-2026-earnings.html",
-      "published": "2026-10-26 21:18:07",
-      "title_ko": "제트블루, 연료비로 손실 확대... CEO \"마진 개선 중\"",
-      "summary_ko": "비용 절감 및 프리미엄 수익 증가 계획 진행"
     },
     {
       "title": "중동 긴장 완화 회담과 유가 하락",
