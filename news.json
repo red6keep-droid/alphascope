@@ -1,76 +1,88 @@
 {
-  "updated_at": "2026-10-27 20:46:22 UTC",
+  "updated_at": "2026-10-27 22:46:15 UTC",
   "items": [
     {
-      "title": "Early third-quarter earnings show a 'resilient' U.S. consumer, with signs of strain",
+      "title": "Grand jury rejects DOJ bid to indict ex-Trump WH aide Cassidy Hutchinson: Reports",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/q3-earnings-resilient-consumer.html",
-      "published": "2026-10-27 20:42:17",
-      "title_ko": "초기 3분기 실적, 미국 소비자 '탄탄'·긴장 신호",
-      "summary_ko": ""
+      "link": "https://www.cnbc.com/2026/10/27/cassidy-hutchinson-doj-grand-jury-trump.html",
+      "published": "2026-10-27 22:36:13",
+      "title_ko": "대배심, 전 트럼프 백악관 보좌관 캐시디 허친슨 기소 시도 기각",
+      "summary_ko": "2021년 1월 6일 국회 의사당 폭동 증언"
     },
     {
-      "title": "Robinhood shares fall 5% as crypto slump weighs on profits, offsetting gains in new businesses",
+      "title": "Chart: Anthropic's cash pile towers over nearly every U.S. company",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/robinhood-hood-q3-2026-earnings.html",
-      "published": "2026-10-27 20:39:49",
-      "title_ko": "로빈후드 주가 5% 하락, 암호화폐 침체로 이익 압박",
-      "summary_ko": "옵션·예측시장 등 신규 사업 확장, 암호화폐 침체로 이익 감소"
-    },
-    {
-      "title": "Boeing says it won't significantly ramp up 737 Max production until late 2027",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/-boeing-ba-q3-2026-earnings.html",
-      "published": "2026-10-27 20:32:24",
-      "title_ko": "보잉, 방산 매출 증가로 3분기 손실 축소…737맥스 생산에 초점",
-      "summary_ko": "보잉, 화요일 장 개장 전 분기 실적 발표 예정"
-    },
-    {
-      "title": "Walmart says AI training is boosting confidence with the technology among its 2.1 million associates",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/walmart-ai-training-workers.html",
-      "published": "2026-10-27 20:30:01",
-      "title_ko": "월마트, AI 훈련이 210만 명 직원 기술 자신감 높여",
-      "summary_ko": "오픈AI·구글 훈련, 디지털 도구 사용 자신감 향상"
+      "link": "https://www.cnbc.com/2026/10/27/anthropic-cash-investments-ipo.html",
+      "published": "2026-10-27 22:36:00",
+      "title_ko": "Anthropic 현금 보유액, 거의 모든 미국 기업 위에",
+      "summary_ko": "버크셔 해서웨이·알파벳 제외"
     },
     {
       "title": "Speaker Mike Johnson calls election-transfer concerns ‘absurd’",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/speaker-johnson-peaceful-transfer-midterms.html",
-      "published": "2026-10-27 20:28:56",
+      "published": "2026-10-27 22:35:25",
       "title_ko": "마이크 존슨 하원의장, 선거 결과 이양 우려 '부조리' 발언",
       "summary_ko": "민주당, 트럼프와 공화당 선거 결과 도전 가능성 우려"
     },
     {
-      "title": "JetBlue stock surges as company outlook calms investors",
+      "title": "Trump administration may let more Russian diesel onto market, energy secretary tells CNBC",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/jetblue-jblu-3q-2026-earnings.html",
-      "published": "2026-10-27 20:13:21",
-      "title_ko": "제트블루, 연료비로 손실 확대... CEO \"마진 개선 중\"",
-      "summary_ko": "비용 절감 및 프리미엄 수익 증가 계획 진행"
+      "link": "https://www.cnbc.com/2026/10/27/trump-putin-zelenskyy-russia-ukraine-diesel.html",
+      "published": "2026-10-27 22:18:59",
+      "title_ko": "트럼프 행정부, 러시아 디젤 시장 진입 확대 검토",
+      "summary_ko": "배송량 소규모, 전체 수요 대비"
     },
     {
       "title": "AI debt fears ease ahead of Oracle, Alphabet and Amazon updates. Here's what to watch.",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/ai-debt-hyperscaler-earnings.html",
-      "published": "2026-10-27 19:57:35",
+      "published": "2026-10-27 21:58:48",
       "title_ko": "오라클·알파벳·아마존 업데이트 앞두고 AI 부채 우려 완화",
       "summary_ko": "크레딧 시장, 이번 주 하이퍼스케일러 업데이트 주시"
     },
     {
-      "title": "Oracle integrates ChatGPT, Codex into apps and expands cloud chip lineup",
+      "title": "Polymarket faces renewed CFTC probe over U.S. access to offshore platform",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/oracle-openai-chatgpt-codex-google-tpus.html",
-      "published": "2026-10-27 19:51:41",
-      "title_ko": "오라클, 챗GPT·코덱스 통합 및 클라우드 칩 라인업 확대",
+      "link": "https://www.cnbc.com/2026/10/27/cftc-probes-polymarket-over-2022-settlement.html",
+      "published": "2026-10-27 21:24:06",
+      "title_ko": "Polymarket, 미국 오프쇼어 플랫폼 접근 관련 CFTC 조사 재개",
+      "summary_ko": "2024년 조사, 2025년 7월 중단"
+    },
+    {
+      "title": "Anthropic's IPO is risky business",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/anthropic-five-surprising-risks-s1.html",
+      "published": "2026-10-27 21:17:27",
+      "title_ko": "앤트로픽 IPO는 위험한 사업",
       "summary_ko": ""
     },
     {
-      "title": "Neil Young sues Trump committee for $10M for playing 'Rockin' in the Free World' at rally",
+      "title": "Walmart says AI training is boosting confidence with the technology among its 2.1 million associates",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/neil-young-trump-lawsuit-song-copyright-free-world.html",
-      "published": "2026-10-27 19:49:18",
-      "title_ko": "닐 영, 트럼프 위원회 상대 1,000만 달러 소송 제기",
+      "link": "https://www.cnbc.com/2026/10/27/walmart-ai-training-workers.html",
+      "published": "2026-10-27 21:15:35",
+      "title_ko": "월마트, AI 훈련이 210만 명 직원 기술 자신감 높여",
+      "summary_ko": "오픈AI·구글 훈련, 디지털 도구 사용 자신감 향상"
+    },
+    {
+      "title": "10월 FOMC 금리 동결 및 12월 인상 전망",
+      "title_ko": "10월 FOMC 금리 동결 및 12월 인상 전망",
+      "summary_ko": "시장에서는 10월 FOMC의 금리 동결을 예상하면서도 12월 추가 인상 가능성과 매파적 기조를 주시 중",
+      "source": "당잠사",
+      "link": "https://www.youtube.com/watch?v=6Ung4bJmxEE",
+      "published": "2026-10-27 21:14:21",
+      "kind": "media",
+      "tag": "금리",
+      "direction": "neutral",
+      "n_channels": 4
+    },
+    {
+      "title": "Early third-quarter earnings show a 'resilient' U.S. consumer, with signs of strain",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/q3-earnings-resilient-consumer.html",
+      "published": "2026-10-27 21:12:55",
+      "title_ko": "초기 3분기 실적, 미국 소비자 '탄탄'·긴장 신호",
       "summary_ko": ""
     },
     {
@@ -94,18 +106,6 @@
       "published": "2026-10-27 17:15:30",
       "kind": "media",
       "tag": "에너지",
-      "direction": "neutral",
-      "n_channels": 4
-    },
-    {
-      "title": "연준 10월 금리 결정 및 통화정책 전망",
-      "title_ko": "연준 10월 금리 결정 및 통화정책 전망",
-      "summary_ko": "시장은 연준이 이번 회의에서 금리를 동결할 것으로 예상하고 있으나, 인플레이션 압력과 고금리 환경 속에서 향후 통화정책 방향을 두고 갑론을박이 이어지고 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=42SaCJ3fv38",
-      "published": "2026-10-27 15:44:19",
-      "kind": "media",
-      "tag": "금리",
       "direction": "neutral",
       "n_channels": 4
     }
