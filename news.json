@@ -1,21 +1,37 @@
 {
-  "updated_at": "2026-10-27 06:46:16 UTC",
+  "updated_at": "2026-10-27 08:46:15 UTC",
   "items": [
     {
-      "title": "HSBC announces share buyback of up to $1 billion as third-quarter profit meets estimates",
+      "title": "HSBC shares slump on revenue miss, lender announces share buyback of up to $1 billion",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/hsbc-third-quarter-profit-.html",
-      "published": "2026-10-27 05:30:10",
+      "published": "2026-10-27 08:28:01",
       "title_ko": "HSBC, 3분기 실적 예상 부합 속 최대 10억 달러 자사주 매입 발표",
       "summary_ko": ""
     },
     {
-      "title": "Oil falls as renewed diplomatic efforts to end Mideast conflict ease supply concerns",
+      "title": "Oil prices seesaw amid renewed diplomatic efforts to end Mideast conflict",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/oil-today-iran-us-crude-wti-brent-trump.html",
-      "published": "2026-10-27 05:09:59",
+      "published": "2026-10-27 08:08:03",
       "title_ko": "유가, 중동 갈등 종식 외교 노력으로 하락",
       "summary_ko": "미국-이스라엘 전쟁 종식 외교 노력"
+    },
+    {
+      "title": "Opinion: UK bond investors want spending cuts. John Healey’s first Budget may disappoint",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/uk-budget-2026-john-healey-bond-market.html",
+      "published": "2026-10-27 07:34:34",
+      "title_ko": "논평: 영국 채권 투자자들은 지출 삭감 원한다. 존 힐리의 첫 예산은 실망스러울 수 있다",
+      "summary_ko": "채권 투자자, 차입 축소 및 성장 확대 요구"
+    },
+    {
+      "title": "The 'stablecoin sandwich': Why speeding up payments isn't so simple, according to Mastercard",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/mastcard-stablecoin-bvnk-.html",
+      "published": "2026-10-27 07:16:35",
+      "title_ko": "마스터카드, '스테이블코인 샌드위치'로 왜 결제 속도 향상이 단순하지 않은지 설명",
+      "summary_ko": "마스터카드 임원, 지원 인프라 전환 지연으로 혜택 제한 지적"
     },
     {
       "title": "Judge fast-tracks DOJ's Alaska Senate lawsuit as Peltola seeks dismissal before Election Day",
@@ -58,22 +74,6 @@
       "summary_ko": "치즈케이크 팩토리, 선거 전 캠페인 논쟁 소재 부상"
     },
     {
-      "title": "China and Russia are redrawing Arctic trade. Can Europe fight back?",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/arctic-shipping-china-and-russia-expand-grip-can-europe-fight-back.html",
-      "published": "2026-10-27 01:24:28",
-      "title_ko": "중국과 러시아, 북극 무역 재편 – 유럽은 대응 가능할까?",
-      "summary_ko": "유럽 새로운 지정학적 전쟁 구도"
-    },
-    {
-      "title": "Microsoft offers voluntary buyouts to 60,000 employees as AI leads to efficiency push",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/26/microsoft-msft-voluntary-buyouts.html",
-      "published": "2026-10-27 01:05:06",
-      "title_ko": "마이크로소프트, 6만 명에게 자발적 퇴직 제안",
-      "summary_ko": "인프라 구축과 자본 효율성 균형 추구"
-    },
-    {
       "title": "중동 긴장 완화 회담과 유가 하락",
       "title_ko": "중동 긴장 완화 회담과 유가 하락",
       "summary_ko": "사우디 등의 중동 긴장 완화 회담으로 국제유가가 하락하며 증시에 숨통을 틔워줬",
@@ -86,18 +86,6 @@
       "n_channels": 3
     },
     {
-      "title": "연준 통화정책 및 금리 전망",
-      "title_ko": "연준 통화정책 및 금리 전망",
-      "summary_ko": "새로운 연준 체제 하의 통화정책 방향과 금리 인하 기대감이 시장에 영향을 미치고 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=KfgWEEiCbLs",
-      "published": "2026-10-26 20:49:29",
-      "kind": "media",
-      "tag": "금리",
-      "direction": "neutral",
-      "n_channels": 3
-    },
-    {
       "title": "AI 인프라 투자 및 자본 지출",
       "title_ko": "AI 인프라 투자 및 자본 지출",
       "summary_ko": "AI 관련 데이터센터 및 칩 투자가 지속되며 AI 테마가 시장을 견인하고 있음",
@@ -106,6 +94,18 @@
       "published": "2026-10-26 20:49:29",
       "kind": "media",
       "tag": "AI/반도체",
+      "direction": "neutral",
+      "n_channels": 3
+    },
+    {
+      "title": "연준 통화정책 및 금리 전망",
+      "title_ko": "연준 통화정책 및 금리 전망",
+      "summary_ko": "새로운 연준 체제 하의 통화정책 방향과 금리 인하 기대감이 시장에 영향을 미치고 있음",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=KfgWEEiCbLs",
+      "published": "2026-10-26 20:49:29",
+      "kind": "media",
+      "tag": "금리",
       "direction": "neutral",
       "n_channels": 3
     }
