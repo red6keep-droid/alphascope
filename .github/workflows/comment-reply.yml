@@ -31,7 +31,7 @@ env:
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   # 서비스 계정 키 JSON 전체 — Firestore 댓글 읽기 · 답글 쓰기 · 스팸 삭제
   FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-  GEMINI_MODEL: gemini-3.5-flash
+  GEMINI_MODEL: gemini-3.6-flash
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}       # Gemini 키가 모두 실패하면 예비 1순위 (2026-10-14)
   NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}   # 예비 2순위
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
