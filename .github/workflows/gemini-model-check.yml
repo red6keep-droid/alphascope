@@ -1,0 +1,47 @@
+name: Gemini Model Check
+
+# Gemini 모델 이름 확인 + 엔비디아 분류 일치율 비교 (experiments/nvda-report/compare_models.py, 2026-10-28).
+# 수동 실행만. 모델 목록 조회는 할당량을 쓰지 않고, 비교는 모델마다 호출 2회(20건 × 2배치).
+# 기준은 nvda-state 의 주 모델(gemini-3.5-flash) 라벨.
+
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: '비교할 모델 (쉼표로 구분)'
+        type: string
+        required: false
+        default: 'gemini-3-flash,gemini-3.5-flash-lite'
+
+permissions:
+  contents: read
+
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  PYTHONUNBUFFERED: "1"
+  STATE_DIR: experiments/nvda-report/output/state
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r experiments/nvda-report/requirements.txt
+
+      - name: Load state (nvda-state branch)
+        run: |
+          git fetch origin nvda-state:refs/nvda-state
+          mkdir -p "$STATE_DIR"
+          git archive refs/nvda-state "$STATE_DIR" | tar -x
+
+      - name: Compare
+        working-directory: experiments/nvda-report
+        run: python compare_models.py --state output/state --models "${{ inputs.models }}"
