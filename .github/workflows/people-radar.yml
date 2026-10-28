@@ -45,6 +45,7 @@ env:
   BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
   BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
   BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+  PYTHONUNBUFFERED: "1"   # 로그를 바로 찍는다 — 10-28 시간 초과 때 출력이 버퍼에 묶여 어디서 멈췄는지 안 보였다
   STATE_DIR: experiments/people-radar/output/state
   DO_PUBLISH: ${{ github.event_name == 'schedule' || inputs.scheduled == true || inputs.publish == true }}
   IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
@@ -52,7 +53,7 @@ env:
 jobs:
   people-radar:
     runs-on: ubuntu-latest
-    timeout-minutes: 45   # 10-26: Groq 를 실제로 쓰게 되며 호출 간격(60초+) 대기가 늘었다
+    timeout-minutes: 60   # 10-26: Groq 를 실제로 쓰게 되며 호출 간격(60초+) 대기가 늘었다. 10-28: 하루치(추출 11 + 분류 7배치)가 45분을 넘겨 60으로
     steps:
       - uses: actions/checkout@v5
 

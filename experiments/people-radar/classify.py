@@ -147,7 +147,7 @@ def classify(conn, since, max_batches=None):
     for r in rows:
         by_group.setdefault(config.PEOPLE[r["speaker"]]["group"], []).append(r)
     print(f"[classify] 분류 대기 {len(rows)}건 · " + " · ".join(f"{g} {len(v)}" for g, v in by_group.items()))
-    pool = LLMPool(config.CLASSIFY_CHAIN, label="people-classify")
+    pool = LLMPool(config.CLASSIFY_CHAIN, label="people-classify", skip_when_day_out=config.SKIP_WHEN_DAY_OUT)
     batches = [(g, v[i:i + config.CLASSIFY_BATCH]) for g, v in by_group.items() for i in range(0, len(v), config.CLASSIFY_BATCH)]
     if max_batches:
         batches = batches[:max_batches]

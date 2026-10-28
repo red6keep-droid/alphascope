@@ -165,7 +165,7 @@ def extract(conn, since, max_batches=None):
         return 0
     with open(os.path.join(config.BASE_DIR, "prompts", "extract_quotes.txt"), encoding="utf-8") as f:
         head = f.read()
-    pool = LLMPool(config.EXTRACT_CHAIN, label="people-extract")
+    pool = LLMPool(config.EXTRACT_CHAIN, label="people-extract", skip_when_day_out=config.SKIP_WHEN_DAY_OUT)
     batches = [reps[i:i + config.EXTRACT_BATCH] for i in range(0, len(reps), config.EXTRACT_BATCH)]
     if max_batches:
         batches = batches[:max_batches]

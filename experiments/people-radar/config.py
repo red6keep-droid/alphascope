@@ -53,6 +53,9 @@ def gnews(query):
 # 출력 칸은 세 인물군 공통(trump-trend 와 같은 8칸) — 묶기 · 반응 통계를 그대로 쓰려고. 주제 목록만 인물군별 (기획 2절)
 CLASSIFY_CHAIN = "json-oss-first"    # 출력이 길어(20건 약 2천 토큰) Qwen 출력 한도에 걸린다 — gpt-oss 먼저 (llm_chain 10-26)
 NARRATE_CHAIN = "json-oss-first"     # 카드 한국어 요약 (narrate.py) — 같은 이유
+# gpt-oss 하루 토큰(20만)이 바닥나면 NVIDIA 를 건너뛰고 바로 gemini-lite 로 (2026-10-28: NVIDIA 5/5 연결 끊김으로 45분 초과.
+# lite 하루 500회 중 최대 50회 사용 → 이 몫 최대 약 20회를 더해도 약 430회 여유)
+SKIP_WHEN_DAY_OUT = {"groq": ["nvidia-deepseek"]}
 CLASSIFY_BATCH = 20
 CLASSIFY_TEXT_MAX = 1500
 TOPICS_BY_GROUP = {

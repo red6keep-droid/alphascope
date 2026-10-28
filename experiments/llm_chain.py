@@ -223,8 +223,11 @@ def _available(name):
 
 
 class LLMPool:
-    def __init__(self, chain="json", label="llm"):
+    def __init__(self, chain="json", label="llm", skip_when_day_out=None):
         self.chain = [s for s in CHAINS[chain] if _available(s)]
+        # {하루 한도 단계: [건너뛸 단계]} — 그 단계가 하루 한도(_day_out)에 걸리면 같이 건너뛴다 (2026-10-28 인물 레이더:
+        # gpt-oss TPD 소진 뒤 NVIDIA 가 연결 끊김으로 5/5 실패하며 45분 초과 → 바로 gemini-lite 로)
+        self.skip_when_day_out = skip_when_day_out or {}
         if not self.chain:
             raise RuntimeError(f"[{label}] 사슬 '{chain}' 에 쓸 키가 하나도 없습니다 (GEMINI_API_KEY / GROQ_API_KEY / NVIDIA_API_KEY).")
         self.label = label
@@ -373,6 +376,10 @@ class LLMPool:
             step = STEPS[name]
             if name in _day_out:
                 errors.append(f"{name}: 하루 한도 — 이번 실행은 건너뜀")
+                continue
+            tripped = next((t for t, skips in self.skip_when_day_out.items() if name in skips and t in _day_out), None)
+            if tripped:
+                errors.append(f"{name}: {tripped} 하루 한도 — 건너뜀")
                 continue
             if n:
                 kind = "대체" if step["kind"] == "gemini" else "예비"   # 같은 Gemini 의 다른 모델은 '대체' — Slack 에서 다른 공급자(예비)와 구분

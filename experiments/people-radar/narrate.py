@@ -180,7 +180,7 @@ def narrate(radar_path=None, out_path=None):
     if not src:
         print("[narrate] 신호 0개 — 서술 생략")
         return None
-    pool = LLMPool(config.NARRATE_CHAIN, label="people-narrate")
+    pool = LLMPool(config.NARRATE_CHAIN, label="people-narrate", skip_when_day_out=config.SKIP_WHEN_DAY_OUT)
     got = {}
     for i in range(0, len(src), NARRATE_BATCH):
         chunk = src[i:i + NARRATE_BATCH]
