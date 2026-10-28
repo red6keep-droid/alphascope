@@ -10,11 +10,13 @@ import sys
 
 import analyze_kr
 import collect_kr
+import collect_kr_extra
 import universe_kr as U
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(BASE, "output", "home", "kr.json")
 PAGES_LIVE = os.path.join(BASE, "data", "pages_live.json")   # publish_pages_kr 가 쓴다 — 블로거에 있는 페이지 키 목록
+EVENT_DAYS = 30   # 홈 맨 위 일정 배너 — 미국 stock-radar/home_feed.py 와 같다
 
 
 def _live():
@@ -62,7 +64,20 @@ def _flow_rows(m):
     return rows
 
 
-def build(a):
+def _events(a, extra, live):
+    """홈 맨 위 일정 배너 (2026-10-28 사용자) — 미국 home_feed.events 와 같은 모양. 고정 페이지가 있는 종목만, 가까운 날 · 큰 시총 순."""
+    end = (datetime.date.fromisoformat(a["day"]) + datetime.timedelta(days=EVENT_DAYS)).isoformat()
+    out = []
+    for s in a["stocks"]:
+        ev = next((x for x in (extra.get("earnings") or {}).get(s["sym"]) or [] if x["day"] > a["day"]), None)
+        if not ev or ev["day"] > end or s["code"] not in live:
+            continue
+        out.append({"kind": "earnings", "day": ev["day"], "when": ev.get("when"), "s": s["code"], "sym": s["sym"], "name": s["name"],
+                    "slug": U.BY_SYM[s["sym"]][2], "mc": int(s["cap"]) if s.get("cap") else None})
+    return sorted(out, key=lambda e: (e["day"], -(e["mc"] or 0)))
+
+
+def build(a, extra=None):
     live = _live()
     stocks = []
     for s in a["stocks"]:
@@ -80,6 +95,7 @@ def build(a):
     sector_rows = [{"sector": k, "syms": v[:3]} for k, v in sectors.items()]
     return {"updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"), "day": a["day"], "currency": "KRW",
             "list_url": U.LIST_URL, "stocks": stocks, "watch": watch, "sectors": sector_rows, "flows": _flow_rows(a.get("market")),
+            "events": _events(a, extra if extra is not None else collect_kr_extra.load(), live),
             "source": "시세 Yahoo Finance · 자금 흐름 한국은행 ECOS"}
 
 
@@ -91,7 +107,7 @@ def write(a=None):
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False)
-    print(f"[kr-home] 종목 {len(data['stocks'])} · 묶음 {len(data['watch'])} · 섹터 {len(data['sectors'])} · 시장 흐름 {len(data['flows'])}줄 → {OUT}")
+    print(f"[kr-home] 종목 {len(data['stocks'])} · 묶음 {len(data['watch'])} · 섹터 {len(data['sectors'])} · 시장 흐름 {len(data['flows'])}줄 · 일정 {len(data['events'])} → {OUT}")
     return data
 
 
