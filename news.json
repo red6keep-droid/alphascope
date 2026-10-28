@@ -1,6 +1,22 @@
 {
-  "updated_at": "2026-10-28 00:46:16 UTC",
+  "updated_at": "2026-10-28 02:46:14 UTC",
   "items": [
+    {
+      "title": "Israel election appears to have no clear winner with Netanyahu, opponent Eisenkot far short of majorities",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/israel-election-netanyahu-trump-gaza-.html",
+      "published": "2026-10-28 02:15:55",
+      "title_ko": "이스라엘 선거, 네타냐후와 아이젠코트 모두 다수 확보 실패",
+      "summary_ko": "네타냐후 연합·아이젠코트 야당 블록 모두 과반수 미달"
+    },
+    {
+      "title": "SK Hynix shares soar over 8% as profit beats, chipmaker to return $25 billion to investors",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/sk-hynix-third-quarter-profit.html",
+      "published": "2026-10-28 01:56:59",
+      "title_ko": "SK하이닉스, AI 메모리 호조로 3분기 이익 예상치 대폭 상회",
+      "summary_ko": "SK하이닉스, 수요일 3분기 실적 발표"
+    },
     {
       "title": "Anthropic's IPO is risky business",
       "source": "CNBC",
@@ -16,26 +32,6 @@
       "published": "2026-10-28 00:14:24",
       "title_ko": "인도 투자자들, 현지 거래 앱 출시로 엔비디아·스페이스X·애플 등 미 주식 매입 급증",
       "summary_ko": "인도 주요 증권사, 현지 시장 부진 속 미국 주식 거래 서비스 제공"
-    },
-    {
-      "title": "SK Hynix third-quarter profit sharply beats estimates on AI memory boost",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/sk-hynix-third-quarter-profit.html",
-      "published": "2026-10-28 00:09:17",
-      "title_ko": "SK하이닉스, AI 메모리 호조로 3분기 이익 예상치 대폭 상회",
-      "summary_ko": "SK하이닉스, 수요일 3분기 실적 발표"
-    },
-    {
-      "title": "브로드컴 앤트로픽 자금 조달 및 AI 데이터 센터 투자",
-      "title_ko": "브로드컴 앤트로픽 자금 조달 및 AI 데이터 센터 투자",
-      "summary_ko": "브로드컴이 앤트로픽과의 인프라 판매를 위한 63억 달러 규모의 자금 조달을 성사시키며 AI 데이터 센터 트레이드가 다시 주목받고 있음",
-      "source": "Mad Money",
-      "link": "https://www.youtube.com/watch?v=hlyf2p7-t2k",
-      "published": "2026-10-28 00:02:53",
-      "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "positive",
-      "n_channels": 3
     },
     {
       "title": "Grand jury rejects DOJ bid to indict ex-Trump WH aide Cassidy Hutchinson: Reports",
@@ -90,12 +86,16 @@
       "n_channels": 5
     },
     {
-      "title": "AI debt fears ease ahead of Oracle, Alphabet and Amazon updates. Here's what to watch.",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/ai-debt-hyperscaler-earnings.html",
-      "published": "2026-10-27 21:58:48",
-      "title_ko": "오라클·알파벳·아마존 업데이트 앞두고 AI 부채 우려 완화",
-      "summary_ko": "크레딧 시장, 이번 주 하이퍼스케일러 업데이트 주시"
+      "title": "앤트로픽 나스닥 상장",
+      "title_ko": "앤트로픽 나스닥 상장",
+      "summary_ko": "앤트로픽이 나스닥에 티커 ANT로 상장을 추진하며 인류 역사상 최대 규모의 IPO를 노리고 있음",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=le6z5D756gQ",
+      "published": "2026-10-27 21:22:47",
+      "kind": "media",
+      "tag": "기타",
+      "direction": "positive",
+      "n_channels": 3
     },
     {
       "title": "미국의 베네수엘라산 원유 수입 및 에너지 가격",
