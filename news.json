@@ -1,19 +1,59 @@
 {
-  "updated_at": "2026-10-28 06:46:18 UTC",
+  "updated_at": "2026-10-28 08:46:20 UTC",
   "items": [
     {
-      "title": "UBS pre-tax profits jump 27% to $3.59 billion in the third quarter",
+      "title": "Robinhood shares fall as crypto slump weighs on profits, offsetting gains in new businesses",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/robinhood-hood-q3-2026-earnings.html",
+      "published": "2026-10-28 08:23:01",
+      "title_ko": "로빈후드 주가 5% 하락, 암호화폐 침체로 이익 압박",
+      "summary_ko": "옵션·예측시장 등 신규 사업 확장, 암호화폐 침체로 이익 감소"
+    },
+    {
+      "title": "Israel election appears to have no clear winner with Netanyahu, opponent Eisenkot far short of majorities",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/israel-election-netanyahu-trump-gaza-.html",
+      "published": "2026-10-28 08:07:22",
+      "title_ko": "이스라엘 선거, 네타냐후와 아이젠코트 모두 다수 확보 실패",
+      "summary_ko": "네타냐후 연합·아이젠코트 야당 블록 모두 과반수 미달"
+    },
+    {
+      "title": "Flavor Flav, Hillary Clinton weigh in as WNBA takes flak for weekday lunchtime finals game",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/wnba-atlanta-dream-golden-state-valkyries-flavor-flav-hillary-clinton-.html",
+      "published": "2026-10-28 07:58:09",
+      "title_ko": "플라버 플레브, 힐러리 클린턴, WNBA 평일 점심시간 결승전 편성에 의견",
+      "summary_ko": "애틀랜타 드림, WNBA 편성 비판"
+    },
+    {
+      "title": "Meta- and Google-backed Jio Platforms’ shares soar over 21% on trading debut after record IPO",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/jio-ipo-india-listing-.html",
+      "published": "2026-10-28 07:48:35",
+      "title_ko": "메타·구글 지원 지오 플랫폼, 상장 첫날 주가 21% 급등",
+      "summary_ko": "메타와 구글, 투자사 참여"
+    },
+    {
+      "title": "China and Russia are redrawing Arctic trade. Can Europe fight back?",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/arctic-shipping-china-and-russia-expand-grip-can-europe-fight-back.html",
+      "published": "2026-10-28 07:46:39",
+      "title_ko": "중국과 러시아, 북극 무역 재편 – 유럽은 대응 가능할까?",
+      "summary_ko": "유럽 새로운 지정학적 전쟁 구도"
+    },
+    {
+      "title": "UBS pre-tax profits jump 27% in third quarter to $3.59 billion as wealth inflows surge",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/ubs-earnings-third-quarter.html",
-      "published": "2026-10-28 06:43:19",
+      "published": "2026-10-28 07:41:35",
       "title_ko": "UBS 3분기 세전 이익 27% 급증, 35억 9천만 달러 기록",
       "summary_ko": "UBS, 3분기 세전 이익 약 36억 달러 보고"
     },
     {
-      "title": "SK Hynix shares soar over 10 % as profit beats, chipmaker to return $25 billion to investors",
+      "title": "SK Hynix shares jump 11% after record quarterly profit, outperforming broader market",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/sk-hynix-third-quarter-profit.html",
-      "published": "2026-10-28 05:54:33",
+      "published": "2026-10-28 06:56:49",
       "title_ko": "SK하이닉스, AI 메모리 호조로 3분기 이익 예상치 대폭 상회",
       "summary_ko": "SK하이닉스, 수요일 3분기 실적 발표"
     },
@@ -26,52 +66,12 @@
       "summary_ko": "투자자들, 중동 장기 분쟁 가능성 고려"
     },
     {
-      "title": "Meta- and Google-backed Jio Platforms’ shares soar over 21% on trading debut after record IPO",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/jio-ipo-india-listing-.html",
-      "published": "2026-10-28 05:16:41",
-      "title_ko": "메타·구글 지원 지오 플랫폼, 상장 첫날 주가 21% 급등",
-      "summary_ko": "메타와 구글, 투자사 참여"
-    },
-    {
       "title": "Trump jokes $5,000 would buy 'a hamburger and maybe a small dessert' at Mar-a-Lago as cost of living looms over midterms",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/trump-jokes-5000-cash-would-buy-hamburger-and-dessert-at-mar-a-lago.html",
       "published": "2026-10-28 04:29:20",
       "title_ko": "트럼프, 마라라고에서 5,000달러는 '햄버거와 작은 디저트' 살 뿐이라며 생활비 부담 언급",
       "summary_ko": "5,000달러 지급액, 햄버거와 디저트 수준 언급"
-    },
-    {
-      "title": "Kylian Mbappé faces China backlash as sponsors cut ties over viral meme",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/china-mbappe-football-sponsor-meme-controversy.html",
-      "published": "2026-10-28 03:33:53",
-      "title_ko": "킬리안 음바페, 바이럴 밈으로 스폰서 계약 해지 속 중국 반발 직면",
-      "summary_ko": "중국 국영매체, 마오쩌둥 발언 사과 행동으로 판단 경고"
-    },
-    {
-      "title": "Trump says Iran war will end 'when I want it to' as costs reportedly balloon to $47 billion",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/us-iran-war-trump-hormuz-costs-centcom.html",
-      "published": "2026-10-28 03:02:44",
-      "title_ko": "트럼프, 이란 전쟁 '내가 원할 때' 끝난다며 비용 470억 달러로 급증 보도",
-      "summary_ko": "힐 보도, 분쟁 비용 470억 달러 기록"
-    },
-    {
-      "title": "Labubu-maker Pop Mart's shares extend declines as third-quarter sales plunge",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/labubu-pop-mart-third-quarter-earnings.html",
-      "published": "2026-10-28 02:57:36",
-      "title_ko": "팝마트, 3분기 매출 급락으로 주가 하락 지속",
-      "summary_ko": "전년 대비 45%~50% 매출 감소"
-    },
-    {
-      "title": "Israel election appears to have no clear winner with Netanyahu, opponent Eisenkot far short of majorities",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/israel-election-netanyahu-trump-gaza-.html",
-      "published": "2026-10-28 02:15:55",
-      "title_ko": "이스라엘 선거, 네타냐후와 아이젠코트 모두 다수 확보 실패",
-      "summary_ko": "네타냐후 연합·아이젠코트 야당 블록 모두 과반수 미달"
     },
     {
       "title": "브로드컴 앤트로픽 자금 조달 및 AI 데이터 센터 투자",
@@ -95,7 +95,7 @@
       "kind": "media",
       "tag": "금리",
       "direction": "negative",
-      "n_channels": 5
+      "n_channels": 4
     },
     {
       "title": "미국의 베네수엘라산 원유 수입 및 에너지 가격",
@@ -107,7 +107,7 @@
       "kind": "media",
       "tag": "에너지",
       "direction": "positive",
-      "n_channels": 3
+      "n_channels": 2
     }
   ]
 }
