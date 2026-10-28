@@ -1,21 +1,41 @@
 {
-  "updated_at": "2026-10-28 18:30:19 UTC",
+  "updated_at": "2026-10-28 18:46:19 UTC",
   "items": [
     {
-      "title": "Fed holds rates steady despite concerns over inflation",
+      "title": "Apple brings touch to the Mac, reversing years-old stance on touchscreen laptop",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/fed-interest-rate-decision-october-2026.html",
-      "published": "2026-10-28 18:29:26",
-      "title_ko": "연준, 인플레이션 우려에도 금리 동결",
+      "link": "https://www.cnbc.com/2026/10/28/apple-mac-touchscreen-launch.html",
+      "published": "2026-10-28 18:44:40",
+      "title_ko": "애플, 터치스크린 노트북 출시하며 기존 기조 변경",
+      "summary_ko": ""
+    },
+    {
+      "title": "We're adding a new, high-profile AI play to our Bullpen stocks to watch list",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/10/28/were-adding-a-new-high-profile-ai-stock-to-our-bullpen.html",
+      "published": "2026-10-28 18:33:53",
+      "title_ko": "우리는 볼펜 주시 목록에 새로운, 주목받는 AI 플레이를 추가하고 있습니다",
       "summary_ko": ""
     },
     {
       "title": "Anthropic IPO filing warns some risks may be uninsurable. AI coverage will be issue for every company",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/anthropic-ipo-ai-risks-insurance.html",
-      "published": "2026-10-28 18:07:11",
+      "published": "2026-10-28 18:32:45",
       "title_ko": "앤트로픽 IPO 신청서, 일부 리스크는 보험 가입 불가 경고. AI 보장은 모든 기업의 과제",
       "summary_ko": "모든 기업이 직면한 문제라고 설명"
+    },
+    {
+      "title": "연준 금리 동결 및 위원들의 인상 주장",
+      "title_ko": "연준 금리 동결 및 위원들의 인상 주장",
+      "summary_ko": "연준이 금리를 동결했으나 일부 위원들이 금리 인상을 주장하며 매파적 입장을 보임",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=HYfRjqMJQT8",
+      "published": "2026-10-28 18:29:46",
+      "kind": "media",
+      "tag": "금리",
+      "direction": "neutral",
+      "n_channels": 4
     },
     {
       "title": "Looking for yield? This could be one of the best times in recent market history to buy corporate bonds",
@@ -34,28 +54,12 @@
       "summary_ko": "마이크로소프트와 함께 기술주 실적 발표 예정"
     },
     {
-      "title": "GE Vernova shares slip despite a beat-and-raise. What the sellers are getting wrong",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/28/ge-vernova-shares-slip-despite-a-beat-and-raise-what-the-sellers-are-getting-wrong.html",
-      "published": "2026-10-28 17:50:44",
-      "title_ko": "GE 베르노바, 실적 호조에도 주가 하락… 매도세 오해",
-      "summary_ko": "애널리스트, 매수 등급 유지 및 강력한 실적 재확인"
-    },
-    {
       "title": "Trump is using tariffs as a 'tool for grift,' Raskin says in demand for donor records",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/trump-tariffs-corruption-raskin.html",
       "published": "2026-10-28 17:39:43",
       "title_ko": "트럼프, 관세를 '그리프트 도구'라며 라스킨 비판, 기부자 기록 요구",
       "summary_ko": "라스킨, 트럼프에 기부자 기록 요구"
-    },
-    {
-      "title": "Apple brings touch to the Mac, reversing years-old stance on touchscreen laptop",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/apple-mac-touchscreen-launch.html",
-      "published": "2026-10-28 17:29:21",
-      "title_ko": "애플, 터치스크린 노트북 출시하며 기존 기조 변경",
-      "summary_ko": ""
     },
     {
       "title": "AI 인프라 투자와 경제 영향",
@@ -68,18 +72,6 @@
       "tag": "AI/반도체",
       "direction": "positive",
       "n_channels": 4
-    },
-    {
-      "title": "연준 금리 정책과 인하 기대",
-      "title_ko": "연준 금리 정책과 인하 기대",
-      "summary_ko": "연준이 금리 정책과 관련해 명확한 신호를 주어야 하며 향후 금리 인상 가능성도 열려 있다는 우려가 제기됨",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=IVRmol2c_zQ",
-      "published": "2026-10-28 17:15:07",
-      "kind": "media",
-      "tag": "금리",
-      "direction": "neutral",
-      "n_channels": 3
     },
     {
       "title": "A Democratic win in midterms could put prediction markets and the CFTC in the hot seat",
@@ -96,6 +88,14 @@
       "published": "2026-10-28 16:33:22",
       "title_ko": "알파벳, 불안한 AI 거래 속 실적 발표 앞두고",
       "summary_ko": "월가, 알파벳 실적에 회의적"
+    },
+    {
+      "title": "America's largest budget airline reports 71% jump in airfare",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/frontier-airlines-airfare-plane-tickets.html",
+      "published": "2026-10-28 16:29:09",
+      "title_ko": "미국 최대 저비용 항공사, 항공권 가격 71% 급등 보고",
+      "summary_ko": "고객들의 예약 지속 언급"
     },
     {
       "title": "이스라엘 총선 결과와 향후 정국",
