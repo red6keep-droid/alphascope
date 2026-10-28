@@ -1,69 +1,89 @@
 {
-  "updated_at": "2026-10-28 20:46:33 UTC",
+  "updated_at": "2026-10-28 22:46:22 UTC",
   "items": [
-    {
-      "title": "Alphabet's free cash flow sinks further, Q3 capex expectations miss in worrying sign for AI trade",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/alphabet-googl-earnings-q3-2026.html",
-      "published": "2026-10-28 20:45:36",
-      "title_ko": "알파벳, 불안한 AI 거래 속 실적 발표 앞두고",
-      "summary_ko": "월가, 알파벳 실적에 회의적"
-    },
     {
       "title": "Microsoft stock jumps 4% as cloud growth drives earnings and revenue beat",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/microsoft-msft-q1-earnings-report-2027.html",
-      "published": "2026-10-28 20:45:09",
+      "published": "2026-10-28 22:34:56",
       "title_ko": "마이크로소프트 실적, 장 마감 후 발표 예정",
       "summary_ko": "마이크로소프트, AI 인프라 확충에 대규모 지출하며 애저 매출 달러 기준 최초 보고"
     },
     {
-      "title": "Bessent says 'not necessarily' a mistake if the Fed hikes again",
+      "title": "FedEx beats expectations, raises outlook in first report since calendar adjustment",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/scott-bessent-interview.html",
-      "published": "2026-10-28 20:40:33",
-      "title_ko": "베센트, 연준 추가 금리 인상 '반드시 실수는 아냐'",
-      "summary_ko": "스콧 베센트, 2026년 10월 28일 CNBC 인터뷰 출연"
+      "link": "https://www.cnbc.com/2026/10/28/fedex-fdx-sept-2026-earnings.html",
+      "published": "2026-10-28 22:27:00",
+      "title_ko": "페덱스, 예상 상회 및 전망 상향, 캘린더 조정 후 첫 실적",
+      "summary_ko": "3분기 매출 및 순이익 모두 월가 예상 상회"
+    },
+    {
+      "title": "Chipotle shares rise 7% after CEO says same-store sales growth will continue",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/chipotle-mexican-grill-cmg-q3-2026-earnings.html",
+      "published": "2026-10-28 22:12:28",
+      "title_ko": "치폴레 주가 7% 상승, CEO 동일점포 매출 성장 지속 전망",
+      "summary_ko": "CEO 스콧 보이트라이트, 저소득 소비자 매출 고소득층 상회 첫 기록"
+    },
+    {
+      "title": "Alphabet sinks 10% as it holds 2026 capex unchanged, expects significant increase in 2027",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/alphabet-googl-earnings-q3-2026.html",
+      "published": "2026-10-28 22:07:17",
+      "title_ko": "알파벳, 불안한 AI 거래 속 실적 발표 앞두고",
+      "summary_ko": "월가, 알파벳 실적에 회의적"
     },
     {
       "title": "Apple brings touch to the Mac, reversing years-old stance on touchscreen laptop",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/apple-mac-touchscreen-launch.html",
-      "published": "2026-10-28 20:26:06",
+      "published": "2026-10-28 22:04:19",
       "title_ko": "애플, 터치스크린 노트북 출시하며 기존 기조 변경",
       "summary_ko": ""
-    },
-    {
-      "title": "Stellantis stock rises 13% as automaker's turnaround plan, cost cuts gain traction",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/stellantis-45-billion-cash-drain-turnaround.html",
-      "published": "2026-10-28 20:23:48",
-      "title_ko": "스텔란티스, 대규모 전환 계획 지속 속 45억 달러 현금 유출 보고",
-      "summary_ko": "유럽 자동차 대기업 3분기 실적 발표"
     },
     {
       "title": "Nvidia's $12.9 billion Hugging Face deal draws DOJ scrutiny",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/doj-questions-nvidias-12point9-billion-hugging-face-deal.html",
-      "published": "2026-10-28 20:23:00",
+      "published": "2026-10-28 21:58:51",
       "title_ko": "엔비디아 129억 달러 휴매인페이스 인수, DOJ 조사 대상",
       "summary_ko": "엔비디아, 129억 달러 휴매인페이스 인수 건 관련 DOJ 조사"
     },
     {
-      "title": "Three media outlets seek full White House access in amended lawsuit",
+      "title": "DoorDash's deal to buy Instacart coming as early as Thursday morning, sources tell CNBC",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/trump-white-house-media-ban-cnn-msnow-politico.html",
-      "published": "2026-10-28 20:21:03",
-      "title_ko": "3개 언론사, 수정 소송으로 백악관 전면 출입 요구",
-      "summary_ko": ""
+      "link": "https://www.cnbc.com/2026/10/28/doordash-instacart-maplebear.html",
+      "published": "2026-10-28 21:47:47",
+      "title_ko": "도어대시, 인스타카트 인수 협상 목요일 오전 발표 전망",
+      "summary_ko": "인스타카트 기업가치 약 170억 달러로 평가 보도"
     },
     {
-      "title": "10-year Treasury yield creeps higher even as Fed keeps rates the same",
+      "title": "연준 금리 동결과 통화정책",
+      "title_ko": "연준 금리 동결과 통화정책",
+      "summary_ko": "연준의 금리 동결 속에서 고금리가 실물 경제의 일부 부문에 부담을 주고 있음",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=eA9QPIJcmfA",
+      "published": "2026-10-28 21:45:17",
+      "kind": "media",
+      "tag": "금리",
+      "direction": "neutral",
+      "n_channels": 3
+    },
+    {
+      "title": "Ford reports mixed third-quarter results, says 2027 earnings will be in line with this year",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/us-treasurys-bonds-yields-federal-reserve.html",
-      "published": "2026-10-28 20:17:19",
-      "title_ko": "연준 금리 결정 앞두고 미 국채 금리 소폭 상승",
-      "summary_ko": "트레이더들이 연준의 최신 통화정책 결정 대기"
+      "link": "https://www.cnbc.com/2026/10/28/ford-motor-f-earnings-q3-2026.html",
+      "published": "2026-10-28 21:42:24",
+      "title_ko": "포드, 종가 후 실적 발표 예정. 월스트리트 기대치는?",
+      "summary_ko": "포드, 수요일 장 마감 후 3분기 실적 발표"
+    },
+    {
+      "title": "Here are five key takeaways from the Fed rate decision and Warsh news conference",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/fed-rate-decision-warsh-takeaways.html",
+      "published": "2026-10-28 21:31:46",
+      "title_ko": "연준 금리 결정과 워시 기자회견의 5가지 핵심",
+      "summary_ko": "금리 투표는 예상대로 진행, 이번 주 FOMC 회의서 몇 가지 예상 밖 결과"
     },
     {
       "title": "이란 관련 군사 행동 가능성",
@@ -75,39 +95,19 @@
       "kind": "media",
       "tag": "지정학",
       "direction": "neutral",
-      "n_channels": 3
+      "n_channels": 2
     },
     {
-      "title": "Options traders break down a massive Alphabet trade into earnings",
+      "title": "이스라엘 총선 결과와 향후 정국",
+      "title_ko": "이스라엘 총선 결과와 향후 정국",
+      "summary_ko": "이스라엘 총선에서 어느 블록도 과반을 차지하지 못해 정부 구성에 난항을 겪고 있음",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/alphabet-microsoft-report-after-the-bell-what-options-trader-see.html",
-      "published": "2026-10-28 20:13:59",
-      "title_ko": "실적 발표 앞둔 알파벳 대규모 옵션 거래 분석",
-      "summary_ko": "마이크로소프트와 함께 기술주 실적 발표 예정"
-    },
-    {
-      "title": "연준 금리 동결 및 위원들의 인상 주장",
-      "title_ko": "연준 금리 동결 및 위원들의 인상 주장",
-      "summary_ko": "연준이 금리를 동결했으나 일부 위원들이 금리 인상을 주장하며 매파적 입장을 보임",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=HYfRjqMJQT8",
-      "published": "2026-10-28 18:29:46",
+      "link": "https://www.youtube.com/watch?v=YYkZdvfi5rk",
+      "published": "2026-10-28 12:12:52",
       "kind": "media",
-      "tag": "금리",
+      "tag": "지정학",
       "direction": "neutral",
-      "n_channels": 4
-    },
-    {
-      "title": "AI 인프라 투자와 경제 영향",
-      "title_ko": "AI 인프라 투자와 경제 영향",
-      "summary_ko": "AI 구축과 기술 발전이 경제 성장을 견인하고 장기적으로는 디플레이션 압력으로 작용함",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=IVRmol2c_zQ",
-      "published": "2026-10-28 17:15:07",
-      "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "positive",
-      "n_channels": 4
+      "n_channels": 3
     }
   ]
 }
