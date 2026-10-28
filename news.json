@@ -1,11 +1,47 @@
 {
-  "updated_at": "2026-10-27 22:46:15 UTC",
+  "updated_at": "2026-10-28 00:44:44 UTC",
   "items": [
+    {
+      "title": "Anthropic's IPO is risky business",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/anthropic-five-surprising-risks-s1.html",
+      "published": "2026-10-28 00:43:59",
+      "title_ko": "앤트로픽 IPO는 위험한 사업",
+      "summary_ko": ""
+    },
+    {
+      "title": "Indian investors rush to Nvidia, SpaceX, Apple as local trading apps roll out access to U.S. stocks",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/india-us-stocks-retail-access.html",
+      "published": "2026-10-28 00:14:24",
+      "title_ko": "인도 투자자들, 현지 거래 앱 출시로 엔비디아·스페이스X·애플 등 미 주식 매입 급증",
+      "summary_ko": "인도 주요 증권사, 현지 시장 부진 속 미국 주식 거래 서비스 제공"
+    },
+    {
+      "title": "SK Hynix third-quarter profit sharply beats estimates on AI memory boost",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/sk-hynix-third-quarter-profit.html",
+      "published": "2026-10-28 00:09:17",
+      "title_ko": "SK하이닉스, AI 메모리 호조로 3분기 이익 예상치 대폭 상회",
+      "summary_ko": "SK하이닉스, 수요일 3분기 실적 발표"
+    },
+    {
+      "title": "브로드컴 앤트로픽 자금 조달 및 AI 데이터 센터 투자",
+      "title_ko": "브로드컴 앤트로픽 자금 조달 및 AI 데이터 센터 투자",
+      "summary_ko": "브로드컴이 앤트로픽과의 인프라 판매를 위한 63억 달러 규모의 자금 조달을 성사시키며 AI 데이터 센터 트레이드가 다시 주목받고 있음",
+      "source": "Mad Money",
+      "link": "https://www.youtube.com/watch?v=hlyf2p7-t2k",
+      "published": "2026-10-28 00:02:53",
+      "kind": "media",
+      "tag": "AI/반도체",
+      "direction": "positive",
+      "n_channels": 3
+    },
     {
       "title": "Grand jury rejects DOJ bid to indict ex-Trump WH aide Cassidy Hutchinson: Reports",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/cassidy-hutchinson-doj-grand-jury-trump.html",
-      "published": "2026-10-27 22:36:13",
+      "published": "2026-10-27 23:50:03",
       "title_ko": "대배심, 전 트럼프 백악관 보좌관 캐시디 허친슨 기소 시도 기각",
       "summary_ko": "2021년 1월 6일 국회 의사당 폭동 증언"
     },
@@ -13,7 +49,7 @@
       "title": "Chart: Anthropic's cash pile towers over nearly every U.S. company",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/anthropic-cash-investments-ipo.html",
-      "published": "2026-10-27 22:36:00",
+      "published": "2026-10-27 23:03:09",
       "title_ko": "Anthropic 현금 보유액, 거의 모든 미국 기업 위에",
       "summary_ko": "버크셔 해서웨이·알파벳 제외"
     },
@@ -26,6 +62,14 @@
       "summary_ko": "민주당, 트럼프와 공화당 선거 결과 도전 가능성 우려"
     },
     {
+      "title": "Jim Cramer warns investors not to get fooled by the latest AI stock rally",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/27/jim-cramer-ai-trade-financing-risks.html",
+      "published": "2026-10-27 22:24:19",
+      "title_ko": "짐 크레이머, AI 주식 랠리에 속지 말라고 경고",
+      "summary_ko": ""
+    },
+    {
       "title": "Trump administration may let more Russian diesel onto market, energy secretary tells CNBC",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/trump-putin-zelenskyy-russia-ukraine-diesel.html",
@@ -34,56 +78,24 @@
       "summary_ko": "배송량 소규모, 전체 수요 대비"
     },
     {
+      "title": "연준 추가 금리 인상 필요성",
+      "title_ko": "연준 추가 금리 인상 필요성",
+      "summary_ko": "최근 높은 인플레이션 수치로 인해 연준이 금리 인상을 단행해야 한다는 주장",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=_dCKQePDyyM",
+      "published": "2026-10-27 22:00:03",
+      "kind": "media",
+      "tag": "금리",
+      "direction": "negative",
+      "n_channels": 5
+    },
+    {
       "title": "AI debt fears ease ahead of Oracle, Alphabet and Amazon updates. Here's what to watch.",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/27/ai-debt-hyperscaler-earnings.html",
       "published": "2026-10-27 21:58:48",
       "title_ko": "오라클·알파벳·아마존 업데이트 앞두고 AI 부채 우려 완화",
       "summary_ko": "크레딧 시장, 이번 주 하이퍼스케일러 업데이트 주시"
-    },
-    {
-      "title": "Polymarket faces renewed CFTC probe over U.S. access to offshore platform",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/cftc-probes-polymarket-over-2022-settlement.html",
-      "published": "2026-10-27 21:24:06",
-      "title_ko": "Polymarket, 미국 오프쇼어 플랫폼 접근 관련 CFTC 조사 재개",
-      "summary_ko": "2024년 조사, 2025년 7월 중단"
-    },
-    {
-      "title": "Anthropic's IPO is risky business",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/anthropic-five-surprising-risks-s1.html",
-      "published": "2026-10-27 21:17:27",
-      "title_ko": "앤트로픽 IPO는 위험한 사업",
-      "summary_ko": ""
-    },
-    {
-      "title": "Walmart says AI training is boosting confidence with the technology among its 2.1 million associates",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/walmart-ai-training-workers.html",
-      "published": "2026-10-27 21:15:35",
-      "title_ko": "월마트, AI 훈련이 210만 명 직원 기술 자신감 높여",
-      "summary_ko": "오픈AI·구글 훈련, 디지털 도구 사용 자신감 향상"
-    },
-    {
-      "title": "10월 FOMC 금리 동결 및 12월 인상 전망",
-      "title_ko": "10월 FOMC 금리 동결 및 12월 인상 전망",
-      "summary_ko": "시장에서는 10월 FOMC의 금리 동결을 예상하면서도 12월 추가 인상 가능성과 매파적 기조를 주시 중",
-      "source": "당잠사",
-      "link": "https://www.youtube.com/watch?v=6Ung4bJmxEE",
-      "published": "2026-10-27 21:14:21",
-      "kind": "media",
-      "tag": "금리",
-      "direction": "neutral",
-      "n_channels": 4
-    },
-    {
-      "title": "Early third-quarter earnings show a 'resilient' U.S. consumer, with signs of strain",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/q3-earnings-resilient-consumer.html",
-      "published": "2026-10-27 21:12:55",
-      "title_ko": "초기 3분기 실적, 미국 소비자 '탄탄'·긴장 신호",
-      "summary_ko": ""
     },
     {
       "title": "미국의 베네수엘라산 원유 수입 및 에너지 가격",
@@ -96,18 +108,6 @@
       "tag": "에너지",
       "direction": "positive",
       "n_channels": 3
-    },
-    {
-      "title": "유가 상승과 경제적 불안",
-      "title_ko": "유가 상승과 경제적 불안",
-      "summary_ko": "가스 가격(유가)과 지정학적 불안이 소비자들의 경제적 불만과 정서에 큰 영향을 미치고 있음",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=BCDR60arQcc",
-      "published": "2026-10-27 17:15:30",
-      "kind": "media",
-      "tag": "에너지",
-      "direction": "neutral",
-      "n_channels": 4
     }
   ]
 }
