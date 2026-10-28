@@ -1,6 +1,94 @@
 {
-  "updated_at": "2026-10-28 16:46:31 UTC",
+  "updated_at": "2026-10-28 18:30:19 UTC",
   "items": [
+    {
+      "title": "Fed holds rates steady despite concerns over inflation",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/fed-interest-rate-decision-october-2026.html",
+      "published": "2026-10-28 18:29:26",
+      "title_ko": "연준, 인플레이션 우려에도 금리 동결",
+      "summary_ko": ""
+    },
+    {
+      "title": "Anthropic IPO filing warns some risks may be uninsurable. AI coverage will be issue for every company",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/anthropic-ipo-ai-risks-insurance.html",
+      "published": "2026-10-28 18:07:11",
+      "title_ko": "앤트로픽 IPO 신청서, 일부 리스크는 보험 가입 불가 경고. AI 보장은 모든 기업의 과제",
+      "summary_ko": "모든 기업이 직면한 문제라고 설명"
+    },
+    {
+      "title": "Looking for yield? This could be one of the best times in recent market history to buy corporate bonds",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/buy-bonds-yields.html",
+      "published": "2026-10-28 18:01:20",
+      "title_ko": "수익률을 찾고 있나요? 최근 시장 역사상 기업채 매수 최적기일 수 있다",
+      "summary_ko": "국채 수익률 5%"
+    },
+    {
+      "title": "Watch Live: Options traders break down a massive Alphabet trade into earnings",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/alphabet-microsoft-report-after-the-bell-what-options-trader-see.html",
+      "published": "2026-10-28 17:56:10",
+      "title_ko": "실적 발표 앞둔 알파벳 대규모 옵션 거래 분석",
+      "summary_ko": "마이크로소프트와 함께 기술주 실적 발표 예정"
+    },
+    {
+      "title": "GE Vernova shares slip despite a beat-and-raise. What the sellers are getting wrong",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/10/28/ge-vernova-shares-slip-despite-a-beat-and-raise-what-the-sellers-are-getting-wrong.html",
+      "published": "2026-10-28 17:50:44",
+      "title_ko": "GE 베르노바, 실적 호조에도 주가 하락… 매도세 오해",
+      "summary_ko": "애널리스트, 매수 등급 유지 및 강력한 실적 재확인"
+    },
+    {
+      "title": "Trump is using tariffs as a 'tool for grift,' Raskin says in demand for donor records",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/trump-tariffs-corruption-raskin.html",
+      "published": "2026-10-28 17:39:43",
+      "title_ko": "트럼프, 관세를 '그리프트 도구'라며 라스킨 비판, 기부자 기록 요구",
+      "summary_ko": "라스킨, 트럼프에 기부자 기록 요구"
+    },
+    {
+      "title": "Apple brings touch to the Mac, reversing years-old stance on touchscreen laptop",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/apple-mac-touchscreen-launch.html",
+      "published": "2026-10-28 17:29:21",
+      "title_ko": "애플, 터치스크린 노트북 출시하며 기존 기조 변경",
+      "summary_ko": ""
+    },
+    {
+      "title": "AI 인프라 투자와 경제 영향",
+      "title_ko": "AI 인프라 투자와 경제 영향",
+      "summary_ko": "AI 구축과 기술 발전이 경제 성장을 견인하고 장기적으로는 디플레이션 압력으로 작용함",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=IVRmol2c_zQ",
+      "published": "2026-10-28 17:15:07",
+      "kind": "media",
+      "tag": "AI/반도체",
+      "direction": "positive",
+      "n_channels": 4
+    },
+    {
+      "title": "연준 금리 정책과 인하 기대",
+      "title_ko": "연준 금리 정책과 인하 기대",
+      "summary_ko": "연준이 금리 정책과 관련해 명확한 신호를 주어야 하며 향후 금리 인상 가능성도 열려 있다는 우려가 제기됨",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=IVRmol2c_zQ",
+      "published": "2026-10-28 17:15:07",
+      "kind": "media",
+      "tag": "금리",
+      "direction": "neutral",
+      "n_channels": 3
+    },
+    {
+      "title": "A Democratic win in midterms could put prediction markets and the CFTC in the hot seat",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/democrats-prediction-markets-cftc-midterms.html",
+      "published": "2026-10-28 17:05:23",
+      "title_ko": "중간선거 민주당 승리 시 예측시장과 CFTC에 조준",
+      "summary_ko": "트럼프 가족과의 업계 관계에 대한 감시 확대 가능성"
+    },
     {
       "title": "Alphabet set to report Q3 earnings after the bell as shaky AI trade looks for signs of strength",
       "source": "CNBC",
@@ -10,102 +98,14 @@
       "summary_ko": "월가, 알파벳 실적에 회의적"
     },
     {
-      "title": "America's largest budget airline reports 71% jump in airfare",
+      "title": "이스라엘 총선 결과와 향후 정국",
+      "title_ko": "이스라엘 총선 결과와 향후 정국",
+      "summary_ko": "이스라엘 총선에서 어느 블록도 과반을 차지하지 못해 정부 구성에 난항을 겪고 있음",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/frontier-airlines-airfare-plane-tickets.html",
-      "published": "2026-10-28 16:29:09",
-      "title_ko": "미국 최대 저비용 항공사, 항공권 가격 71% 급등 보고",
-      "summary_ko": "고객들의 예약 지속 언급"
-    },
-    {
-      "title": "Looking for yield? This could be one of the best times in recent market history to buy corporate bonds",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/buy-bonds-yields.html",
-      "published": "2026-10-28 16:19:29",
-      "title_ko": "수익률을 찾고 있나요? 최근 시장 역사상 기업채 매수 최적기일 수 있다",
-      "summary_ko": "국채 수익률 5%"
-    },
-    {
-      "title": "Israeli bonds, shekel fall as election leaves Netanyahu and others short of majorities",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/israel-election-netanyahu-trump-gaza-.html",
-      "published": "2026-10-28 16:14:29",
-      "title_ko": "이스라엘 선거, 네타냐후와 아이젠코트 모두 다수 확보 실패",
-      "summary_ko": "네타냐후 연합·아이젠코트 야당 블록 모두 과반수 미달"
-    },
-    {
-      "title": "Trump is using tariffs as a 'tool for grift,' Raskin says in demand for donor records",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/trump-tariffs-corruption-raskin.html",
-      "published": "2026-10-28 16:07:17",
-      "title_ko": "트럼프, 관세를 '그리프트 도구'라며 라스킨 비판, 기부자 기록 요구",
-      "summary_ko": "라스킨, 트럼프에 기부자 기록 요구"
-    },
-    {
-      "title": "Microsoft earnings will land after the close",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/microsoft-msft-q1-earnings-report-2027.html",
-      "published": "2026-10-28 16:00:01",
-      "title_ko": "마이크로소프트 실적, 장 마감 후 발표 예정",
-      "summary_ko": "마이크로소프트, AI 인프라 확충에 대규모 지출하며 애저 매출 달러 기준 최초 보고"
-    },
-    {
-      "title": "Ford Motor is set to report earnings after the bell. Here's what Wall Street expects",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/ford-motor-f-earnings-q3-2026.html",
-      "published": "2026-10-28 16:00:01",
-      "title_ko": "포드, 종가 후 실적 발표 예정. 월스트리트 기대치는?",
-      "summary_ko": "포드, 수요일 장 마감 후 3분기 실적 발표"
-    },
-    {
-      "title": "Jim Cramer sees buying opportunities in these 2 beaten-down stocks",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/28/jim-cramer-sees-buying-opportunities-in-these-2-beaten-down-stocks.html",
-      "published": "2026-10-28 15:56:23",
-      "title_ko": "짐 크레이머, 이 두 낙폭과대 종목에 매수 기회 포착",
-      "summary_ko": "인베스팅 클럽, 평일 오전 10시 20분 모닝 미팅 개최"
-    },
-    {
-      "title": "UK brings forward defense spending target, pledging billions to Ukraine",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/uk-defense-spending-ukraine-aid.html",
-      "published": "2026-10-28 15:53:19",
-      "title_ko": "영국, 방위비 지출 목표 앞당기고 우크라이나에 수십억 달러 지원 약속",
-      "summary_ko": "헤일리, 재무장관 첫 예산안 발표하며 우크라이나 지원 재확인"
-    },
-    {
-      "title": "디젤 및 휘발유 가격 상승",
-      "title_ko": "디젤 및 휘발유 가격 상승",
-      "summary_ko": "정제 능력 차질과 호르무즈 해협 이슈로 인해 디젤과 휘발유 가격이 상승하여 가계 부담이 커지고 있음",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=DIazXxBAask",
-      "published": "2026-10-28 15:45:08",
+      "link": "https://www.youtube.com/watch?v=YYkZdvfi5rk",
+      "published": "2026-10-28 12:12:52",
       "kind": "media",
-      "tag": "에너지",
-      "direction": "neutral",
-      "n_channels": 3
-    },
-    {
-      "title": "빅테크 AI 인프라 투자 및 자본 조달",
-      "title_ko": "빅테크 AI 인프라 투자 및 자본 조달",
-      "summary_ko": "막대한 AI 인프라 투자 비용을 충당하기 위한 대규모 자본 조달이 채권 및 주식 시장에 부담을 주고 있습니",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=KVyBp7SFrxg",
-      "published": "2026-10-28 15:36:58",
-      "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "positive",
-      "n_channels": 4
-    },
-    {
-      "title": "연준 10월 금리 동결 예상",
-      "title_ko": "연준 10월 금리 동결 예상",
-      "summary_ko": "시장에서는 연준이 이번 회의에서 금리를 동결하고 향후 경로에 대한 힌트를 줄 것으로 예상하고 있습니",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=KVyBp7SFrxg",
-      "published": "2026-10-28 15:36:58",
-      "kind": "media",
-      "tag": "금리",
+      "tag": "지정학",
       "direction": "neutral",
       "n_channels": 3
     }
