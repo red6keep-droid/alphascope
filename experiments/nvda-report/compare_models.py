@@ -4,7 +4,7 @@
 주 모델 다음 순서에 넣을지 정하려고, 엔비디아 분류 프롬프트로 일치율을 잰다. lite 는 대조군(10-16: 80칸 중 75).
 
 1. 모델 목록 조회(할당량 안 씀) — 이름이 실제로 있는지
-2. 주 모델(ai_model = gemini-3.5-flash)이 붙인 최근 기사 BATCHES × 20건을 후보 모델로 다시 분류 — 모델마다 호출 BATCHES 회
+2. 주 모델(ai_model = gemini-3.5-flash · gemini-3.6-flash)이 붙인 최근 기사 BATCHES × 20건을 후보 모델로 다시 분류 — 모델마다 호출 BATCHES 회
 3. 4칸(area · direction · novelty · relevance) 일치 + relevance ±1 + is_event 일치
 
     python compare_models.py --state output/state --models gemini-3-flash,gemini-3.5-flash-lite
@@ -23,7 +23,7 @@ import state_io
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import llm_chain  # noqa: E402
 
-REFERENCE_MODEL = "gemini-3.5-flash"
+REFERENCE_MODELS = ("gemini-3.5-flash", "gemini-3.6-flash")   # 10-28 이름 변경 전 · 후 라벨 모두 주 모델
 FIELDS = ["ai_area", "ai_direction", "ai_novelty", "ai_relevance"]
 BATCHES = 2
 
@@ -60,10 +60,10 @@ def main():
     conn = db.connect(args.db)
     state_io.import_state(conn, args.state)
     rows = [dict(r) for r in conn.execute(
-        """SELECT * FROM items WHERE ai_model = ? AND prefilter_reason IS NULL AND analyzed_at IS NOT NULL
-           ORDER BY published_at DESC LIMIT ?""", (REFERENCE_MODEL, BATCHES * 20)).fetchall()][::-1]
+        """SELECT * FROM items WHERE ai_model IN (?, ?) AND prefilter_reason IS NULL AND analyzed_at IS NOT NULL
+           ORDER BY published_at DESC LIMIT ?""", (*REFERENCE_MODELS, BATCHES * 20)).fetchall()][::-1]
     batches = [rows[i:i + 20] for i in range(0, len(rows), 20)]
-    print(f"[compare] 기준 {REFERENCE_MODEL} 라벨 {len(rows)}건 · {len(batches)}배치 ({rows[0]['published_at'][:10]} ~ {rows[-1]['published_at'][:10]})")
+    print(f"[compare] 기준 주 모델 라벨 {len(rows)}건 · {len(batches)}배치 ({rows[0]['published_at'][:10]} ~ {rows[-1]['published_at'][:10]})")
     head = classify_items._load_prompt()
 
     report = []

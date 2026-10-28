@@ -7,7 +7,7 @@
     from llm_chain import LLMPool
     pool = LLMPool("json")                       # 사슬 이름은 CHAINS
     value = pool.generate_json(prompt, temperature=0.2, validate=None)
-    pool.last_model                              # 답한 모델 (예: "gemini-3.5-flash", "groq:openai/gpt-oss-120b")
+    pool.last_model                              # 답한 모델 (예: "gemini-3.6-flash", "groq:openai/gpt-oss-120b")
 
 사슬은 단계를 차례로 시도한다. 키가 없는 단계는 건너뛰고, 한 단계가 끝까지 실패하면(한도 · 서버 과부하 · 형식 오류 ·
 validate 탈락 모두) 다음 단계로. 전부 실패하면 RuntimeError.
@@ -51,7 +51,7 @@ import requests
 
 import ops_log  # noqa: F401  — 운영 기록 (experiments/ops_log.py, 2026-10-23): USAGE · EVENTS 를 실행 끝에 KV 로
 
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "").strip() or "gemini-3.5-flash"
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "").strip() or "gemini-3.6-flash"   # 10-28: 3.5-flash 이름 호출은 할당량 화면에서 3.6 Flash 로 집계 — 이름이 없어지기 전에 바꿈
 GEMINI_LITE_MODEL = os.environ.get("GEMINI_LITE_MODEL", "").strip() or "gemini-3.5-flash-lite"   # 대체 모델 (2026-10-16) — 과부하 · 하루 한도 버킷이 따로
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 KEY_COOLDOWN_SECONDS = 60

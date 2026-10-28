@@ -2,7 +2,7 @@ name: Gemini Model Check
 
 # Gemini 모델 이름 확인 + 엔비디아 분류 일치율 비교 (experiments/nvda-report/compare_models.py, 2026-10-28).
 # 수동 실행만. 모델 목록 조회는 할당량을 쓰지 않고, 비교는 모델마다 호출 2회(20건 × 2배치).
-# 기준은 nvda-state 의 주 모델(gemini-3.5-flash) 라벨.
+# 기준은 nvda-state 의 주 모델(gemini-3.5-flash · 3.6-flash) 라벨.
 
 on:
   workflow_dispatch:

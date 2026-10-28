@@ -82,7 +82,7 @@ import classify_items  # noqa: E402
 
 os.environ["GEMINI_API_KEY"] = ENV[f"GEMINI_API_KEY_{FORCE_KEY or 'NVDA'}"].strip().strip('"')
 rows = [json.loads(l) for l in open(os.path.join(HERE, "nvda/experiments/nvda-report/output/state/items.jsonl"), encoding="utf-8") if l.strip()]
-truth = sorted((r for r in rows if r.get("ai_model") == "gemini-3.5-flash" and r["kind"] in config.CLASSIFY_KINDS), key=lambda r: r["published_at"])
+truth = sorted((r for r in rows if r.get("ai_model") in ("gemini-3.5-flash", "gemini-3.6-flash") and r["kind"] in config.CLASSIFY_KINDS), key=lambda r: r["published_at"])
 sample = truth[-N_NVDA:]
 batches = [sample[i:i + config.CLASSIFY_BATCH_SIZE] for i in range(0, len(sample), config.CLASSIFY_BATCH_SIZE)]
 head = classify_items._load_prompt()
@@ -131,7 +131,7 @@ import collect_posts  # noqa: E402
 
 os.environ["GEMINI_API_KEY"] = ENV[f"GEMINI_API_KEY_{FORCE_KEY or 'TRUMP'}"].strip().strip('"')
 cls = [json.loads(l) for l in open(os.path.join(HERE, "trump/experiments/trump-trend/output/state/classifications.jsonl"), encoding="utf-8") if l.strip()]
-gem = {r["id"]: r for r in cls if r.get("ai_model") == "gemini-3.5-flash"}
+gem = {r["id"]: r for r in cls if r.get("ai_model") in ("gemini-3.5-flash", "gemini-3.6-flash")}
 recs = [collect_posts.normalize(x) for x in collect_posts.fetch_archive()]
 cand = sorted((r for r in recs if r["id"] in gem and r["noise_reason"] is None), key=lambda r: r["published_at"], reverse=True)[:N_TRUMP]
 tbatches = [cand[i:i + config.CLASSIFY_BATCH_SIZE] for i in range(0, len(cand), config.CLASSIFY_BATCH_SIZE)]
