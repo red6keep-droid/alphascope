@@ -1,29 +1,89 @@
 {
-  "updated_at": "2026-10-28 18:46:19 UTC",
+  "updated_at": "2026-10-28 20:46:33 UTC",
   "items": [
+    {
+      "title": "Alphabet's free cash flow sinks further, Q3 capex expectations miss in worrying sign for AI trade",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/alphabet-googl-earnings-q3-2026.html",
+      "published": "2026-10-28 20:45:36",
+      "title_ko": "알파벳, 불안한 AI 거래 속 실적 발표 앞두고",
+      "summary_ko": "월가, 알파벳 실적에 회의적"
+    },
+    {
+      "title": "Microsoft stock jumps 4% as cloud growth drives earnings and revenue beat",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/microsoft-msft-q1-earnings-report-2027.html",
+      "published": "2026-10-28 20:45:09",
+      "title_ko": "마이크로소프트 실적, 장 마감 후 발표 예정",
+      "summary_ko": "마이크로소프트, AI 인프라 확충에 대규모 지출하며 애저 매출 달러 기준 최초 보고"
+    },
+    {
+      "title": "Bessent says 'not necessarily' a mistake if the Fed hikes again",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/scott-bessent-interview.html",
+      "published": "2026-10-28 20:40:33",
+      "title_ko": "베센트, 연준 추가 금리 인상 '반드시 실수는 아냐'",
+      "summary_ko": "스콧 베센트, 2026년 10월 28일 CNBC 인터뷰 출연"
+    },
     {
       "title": "Apple brings touch to the Mac, reversing years-old stance on touchscreen laptop",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/apple-mac-touchscreen-launch.html",
-      "published": "2026-10-28 18:44:40",
+      "published": "2026-10-28 20:26:06",
       "title_ko": "애플, 터치스크린 노트북 출시하며 기존 기조 변경",
       "summary_ko": ""
     },
     {
-      "title": "We're adding a new, high-profile AI play to our Bullpen stocks to watch list",
+      "title": "Stellantis stock rises 13% as automaker's turnaround plan, cost cuts gain traction",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/28/were-adding-a-new-high-profile-ai-stock-to-our-bullpen.html",
-      "published": "2026-10-28 18:33:53",
-      "title_ko": "우리는 볼펜 주시 목록에 새로운, 주목받는 AI 플레이를 추가하고 있습니다",
+      "link": "https://www.cnbc.com/2026/10/28/stellantis-45-billion-cash-drain-turnaround.html",
+      "published": "2026-10-28 20:23:48",
+      "title_ko": "스텔란티스, 대규모 전환 계획 지속 속 45억 달러 현금 유출 보고",
+      "summary_ko": "유럽 자동차 대기업 3분기 실적 발표"
+    },
+    {
+      "title": "Nvidia's $12.9 billion Hugging Face deal draws DOJ scrutiny",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/doj-questions-nvidias-12point9-billion-hugging-face-deal.html",
+      "published": "2026-10-28 20:23:00",
+      "title_ko": "엔비디아 129억 달러 휴매인페이스 인수, DOJ 조사 대상",
+      "summary_ko": "엔비디아, 129억 달러 휴매인페이스 인수 건 관련 DOJ 조사"
+    },
+    {
+      "title": "Three media outlets seek full White House access in amended lawsuit",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/trump-white-house-media-ban-cnn-msnow-politico.html",
+      "published": "2026-10-28 20:21:03",
+      "title_ko": "3개 언론사, 수정 소송으로 백악관 전면 출입 요구",
       "summary_ko": ""
     },
     {
-      "title": "Anthropic IPO filing warns some risks may be uninsurable. AI coverage will be issue for every company",
+      "title": "10-year Treasury yield creeps higher even as Fed keeps rates the same",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/anthropic-ipo-ai-risks-insurance.html",
-      "published": "2026-10-28 18:32:45",
-      "title_ko": "앤트로픽 IPO 신청서, 일부 리스크는 보험 가입 불가 경고. AI 보장은 모든 기업의 과제",
-      "summary_ko": "모든 기업이 직면한 문제라고 설명"
+      "link": "https://www.cnbc.com/2026/10/28/us-treasurys-bonds-yields-federal-reserve.html",
+      "published": "2026-10-28 20:17:19",
+      "title_ko": "연준 금리 결정 앞두고 미 국채 금리 소폭 상승",
+      "summary_ko": "트레이더들이 연준의 최신 통화정책 결정 대기"
+    },
+    {
+      "title": "이란 관련 군사 행동 가능성",
+      "title_ko": "이란 관련 군사 행동 가능성",
+      "summary_ko": "트럼프 대통령이 이란의 핵 시설 및 미사일 기지에 대해 강경한 조치를 취할 가능성이 제기됨",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=hhsi7M65oA0",
+      "published": "2026-10-28 20:15:20",
+      "kind": "media",
+      "tag": "지정학",
+      "direction": "neutral",
+      "n_channels": 3
+    },
+    {
+      "title": "Options traders break down a massive Alphabet trade into earnings",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/alphabet-microsoft-report-after-the-bell-what-options-trader-see.html",
+      "published": "2026-10-28 20:13:59",
+      "title_ko": "실적 발표 앞둔 알파벳 대규모 옵션 거래 분석",
+      "summary_ko": "마이크로소프트와 함께 기술주 실적 발표 예정"
     },
     {
       "title": "연준 금리 동결 및 위원들의 인상 주장",
@@ -38,30 +98,6 @@
       "n_channels": 4
     },
     {
-      "title": "Looking for yield? This could be one of the best times in recent market history to buy corporate bonds",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/buy-bonds-yields.html",
-      "published": "2026-10-28 18:01:20",
-      "title_ko": "수익률을 찾고 있나요? 최근 시장 역사상 기업채 매수 최적기일 수 있다",
-      "summary_ko": "국채 수익률 5%"
-    },
-    {
-      "title": "Watch Live: Options traders break down a massive Alphabet trade into earnings",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/alphabet-microsoft-report-after-the-bell-what-options-trader-see.html",
-      "published": "2026-10-28 17:56:10",
-      "title_ko": "실적 발표 앞둔 알파벳 대규모 옵션 거래 분석",
-      "summary_ko": "마이크로소프트와 함께 기술주 실적 발표 예정"
-    },
-    {
-      "title": "Trump is using tariffs as a 'tool for grift,' Raskin says in demand for donor records",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/trump-tariffs-corruption-raskin.html",
-      "published": "2026-10-28 17:39:43",
-      "title_ko": "트럼프, 관세를 '그리프트 도구'라며 라스킨 비판, 기부자 기록 요구",
-      "summary_ko": "라스킨, 트럼프에 기부자 기록 요구"
-    },
-    {
       "title": "AI 인프라 투자와 경제 영향",
       "title_ko": "AI 인프라 투자와 경제 영향",
       "summary_ko": "AI 구축과 기술 발전이 경제 성장을 견인하고 장기적으로는 디플레이션 압력으로 작용함",
@@ -72,42 +108,6 @@
       "tag": "AI/반도체",
       "direction": "positive",
       "n_channels": 4
-    },
-    {
-      "title": "A Democratic win in midterms could put prediction markets and the CFTC in the hot seat",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/democrats-prediction-markets-cftc-midterms.html",
-      "published": "2026-10-28 17:05:23",
-      "title_ko": "중간선거 민주당 승리 시 예측시장과 CFTC에 조준",
-      "summary_ko": "트럼프 가족과의 업계 관계에 대한 감시 확대 가능성"
-    },
-    {
-      "title": "Alphabet set to report Q3 earnings after the bell as shaky AI trade looks for signs of strength",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/alphabet-googl-earnings-q3-2026.html",
-      "published": "2026-10-28 16:33:22",
-      "title_ko": "알파벳, 불안한 AI 거래 속 실적 발표 앞두고",
-      "summary_ko": "월가, 알파벳 실적에 회의적"
-    },
-    {
-      "title": "America's largest budget airline reports 71% jump in airfare",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/frontier-airlines-airfare-plane-tickets.html",
-      "published": "2026-10-28 16:29:09",
-      "title_ko": "미국 최대 저비용 항공사, 항공권 가격 71% 급등 보고",
-      "summary_ko": "고객들의 예약 지속 언급"
-    },
-    {
-      "title": "이스라엘 총선 결과와 향후 정국",
-      "title_ko": "이스라엘 총선 결과와 향후 정국",
-      "summary_ko": "이스라엘 총선에서 어느 블록도 과반을 차지하지 못해 정부 구성에 난항을 겪고 있음",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=YYkZdvfi5rk",
-      "published": "2026-10-28 12:12:52",
-      "kind": "media",
-      "tag": "지정학",
-      "direction": "neutral",
-      "n_channels": 3
     }
   ]
 }
