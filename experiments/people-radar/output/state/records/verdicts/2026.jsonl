@@ -4,3 +4,4 @@
 {"date": "2026-10-26", "as_of": "2026-10-26", "source": "radar", "id": "radar", "target": "market", "event_count": 34, "people_count": 9, "lead_speaker": "trump", "only_reports": true, "market": null}
 {"date": "2026-10-27", "as_of": "2026-10-27", "source": "radar", "id": "radar", "target": "market", "event_count": 46, "people_count": 10, "lead_speaker": "burry", "only_reports": false, "market": null}
 {"date": "2026-10-28", "as_of": "2026-10-28", "source": "radar", "id": "radar", "target": "market", "event_count": 35, "people_count": 10, "lead_speaker": "cramer", "only_reports": false, "market": null}
+{"date": "2026-10-29", "as_of": "2026-10-29", "source": "radar", "id": "radar", "target": "market", "event_count": 43, "people_count": 11, "lead_speaker": "fed", "only_reports": false, "market": null}
