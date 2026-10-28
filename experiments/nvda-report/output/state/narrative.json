@@ -1,7 +1,7 @@
 {
   "today": [
-    "규제 · 트럼프 AI 및 기술 규제·반독점 관련 발언",
-    "10월 28일 GOOGL·MSFT 실적 및 FOMC 결정 예정"
+    "규제 · 미 법무부, 엔비디아의 허깅페이스 인수 건 반독점 조사 착수",
+    "10월 28일 GOOGL 실적 발표 예정"
   ],
-  "model": "gemini-3.5-flash"
+  "model": "gemini-3.6-flash"
 }
