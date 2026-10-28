@@ -67,11 +67,13 @@ def lead(s):
     """맨 위 요약 1~2문장 (p[data-seo-lead], 가이드라인 10-5) — 날마다 달라지는 글. 파이썬 값만, 평가 · 예측 없음."""
     r = s["ret_1d"]
     move = f"전날보다 {abs(r):.2f}% {'올랐다' if r > 0 else '내렸다'}" if abs(r) >= 0.005 else "전날과 같았다"
-    first = f"{_md(s['day'])} {s['name']}({s['sym']}) 종가는 ${s['close']:,.2f}로 {move}."
+    close = f"${s['close']:,.2f}"
+    first = f"{_md(s['day'])} {s['name']}({s['sym']}) 종가는 {_dk.josa(close, '로')} {move}."   # `$347.73로` → `으로` (P69)
     nr = s.get("normal_range")
     if nr:
         first += (" 실적 발표에 처음 반응한 날이었다." if nr["earnings_day"] else
                   " 평소 하루 움직임 안의 변화였다." if abs(nr["z"]) < 2 else f" 평소 하루 움직임의 {abs(nr['z']):.1f}배였다.")
+    first += R.gap_sentence((s.get("tech") or {}).get("gap"))   # 시가 갭은 평소 범위 바로 뒤 (P80)
     more = []
     if s.get("rank"):
         more.append(f"시가총액은 미국 {s['rank']}위({cap_text(s['cap'])})")
@@ -100,23 +102,22 @@ def _glance(s):
 
 def price_card(s, today):
     """가격 카드 — NVDA 리포트 sec_headline 과 같은 틀 (2026-10-18 리포트 개편 구조).
-    머리 = 가격 줄 + 작은 글씨 한 줄(평소 범위 · 거래량), 오른쪽 접기 버튼. 펼치면 1층(기간별 수익률 · 1년 범위 · 고점 회복 · 실적)과 2층 `차트 지표 보기`.
+    머리 = 가격 줄 + 작은 글씨 한 줄(평소 범위 · 거래량), 오른쪽 접기 버튼. 펼치면 1층(기간별 수익률 · 1년 범위 · 고점 회복 · 실적)과 2층 `차트 정보 보기`.
     거래량 카드는 따로 두지 않는다 — 머리 작은 글씨에 늘 있다 (NVDA 2026-10-18 사용자)."""
     r = s["ret_1d"]
     g = _glance(s)
     pcol = UP if r > 0 else DOWN if r < 0 else "#111"
     tone = R.ROW_UP if r > 0 else R.ROW_DOWN if r < 0 else ""   # 엔비디아 가격 카드와 같은 강조 카드 높이(위아래 여백 · 행간 32) — design_kit 의 ROW_UP 에는 강조 여백이 없다 (2026-10-23 사용자)
     bg, bd = ("#FFF7ED", "#FED7AA") if r > 0 else ("#EFF6FF", "#BFDBFE") if r < 0 else ("#fff", "#E2E8F0")
-    price = (f'<span style="display:inline-flex;align-items:center;justify-content:flex-end;">'
-             f'<span style="color:{pcol};font-weight:700;">${s["close"]:,.2f}</span>&nbsp;{R._arrow(r)}'
-             f'{R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN}</span>')
-    head = R._row(s["sym"], price, tone).replace("margin:0 0 6px;", "margin:0;", 1)
+    price = R.price_value(f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">${s["close"]:,.2f}</span>', R._arrow(r),
+                          R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN)   # 길면 등락이 아래 줄로 (P61)
+    head = R.price_row(R._row(s["sym"], price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)
     sub = R.glance_sub(g)   # 엔비디아와 같은 함수 · 같은 짧은 문구
     if sub:
         head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1)
         k = head.rstrip().rfind("</span>")
         head = head[:k] + sub + head[k:]
-    rows = R.glance_rows(g) + sec_earnings(s, today)   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 지표 보기는 강조 카드 안 (2026-10-26 사용자)
+    rows = R.glance_rows(g) + sec_earnings(s, today)   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 정보 보기는 강조 카드 안 (2026-10-26 사용자)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
             f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), R.in_card(sec_periods(s), white=True), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
 
@@ -216,7 +217,7 @@ def sec_earnings(s, today):
         times = e["median_abs"] / e["normal_abs"] if e.get("normal_abs") else None
         note = f"최근 {n}번 기준" + (f" · 보통 날 하루 ±{e['normal_abs']:.1f}%의 약 {times:.0f}배" if times and times >= 1.5 else "")
         rows += R._row_html("발표 다음 날 보통 변동", f"±{e['median_abs']:.1f}%", note, first=first)
-        chart = R._col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in e["moves"]], [R._sign_bg], [R._sign_fg], height=130)
+        chart = R._col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in e["moves"][::-1]], [R._sign_bg], [R._sign_fg], height=130)   # 최신이 왼쪽 (2026-10-28 사용자 P79)
         rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">'
                  f'{_dk.CHART_TITLE}최근 {n}번의 실적 발표 다음 날 (%)</span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')
@@ -278,6 +279,7 @@ def sec_states(s):
         th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
         out += R._state_card("한 달간 변화 범위는?", R.BOLL_STATE_KO.get(bb["state"], "범위 안"), th, col,
                              R.bollinger_lines(bb), "", tip=R.bollinger_rule(bb), fold=True, inline_notes=True)
+    out += card_opinions(s)   # 애널리스트 · 방송 의견 한 카드 — 한 달 범위 아래 (2026-10-29 P89 · P90)
     oh = s.get("overheat")
     if oh and oh["active"]:
         out += R._state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", R.MUTED, R.overheat_lines(oh), "", tip=_no_record(R.overheat_rule(oh)))
@@ -285,22 +287,22 @@ def sec_states(s):
 
 
 def sec_chart_indicators(s):
-    """2층 · 접힘 `차트 지표 보기` — NVDA 리포트와 같은 칸, 하루 비교는 S&P 500 · 업종 ETF."""
+    """2층 · 접힘 `차트 정보 보기` — NVDA 리포트와 같은 칸, 하루 비교는 S&P 500 · 업종 ETF."""
     tc = s["tech"]
     etf = U.sector_etf(s["sym"])[0]
-    deep = R.ma_chart(tc["ma_rel"], tc.get("bench_ma_rel"), s["name"], "S&P 500")   # 평균선 대비 = 세로 막대 + S&P 500 같은 값 (2026-10-27 사용자 P37)
+    ma = R.ma_chart(tc["ma_rel"], tc.get("bench_ma_rel"), s["name"], "S&P 500")   # `지금 가격이 평균보다` 그래프는 접기 밖 — 그 아래 `차트 정보 보기` 버튼 (2026-10-29 사용자 P83)
+    deep = ""   # 평균선 대비 = 세로 막대 + S&P 500 같은 값 (2026-10-27 사용자 P37)
     deep += R._multi2([("S&P 500 대비", R._arrow(tc.get("vs_spy"), 2, "%p")), (f"{etf} 대비", R._arrow(tc.get("vs_sector"), 2, "%p"))])
     rsi, mc = tc.get("rsi14"), tc.get("ma_cross")
     mc_html = {"golden": f'<span style="color:{UP};font-weight:700;">골든크로스</span>', "death": f'<span style="color:{DOWN};font-weight:700;">데드크로스</span>'}.get(
         mc, f'<span style="color:{R.MUTED};">교차 없음</span>')
-    items = [("시가 갭", R._arrow(tc.get("gap"), 2), R.gap_tip(tc.get("gap"))),
-             (f"일중 변동폭 (고가−저가 · 흔히 {R.config.RANGE_PCT_EVENT:.0f}% 넘으면 큰 흔들림으로 봄)",
+    items = [(f"일중 변동폭 (고가−저가 · 흔히 {R.config.RANGE_PCT_EVENT:.0f}% 넘으면 큰 흔들림으로 봄)",
               f'<span style="color:#111;font-weight:700;">{tc["range_pct"]:.2f}%</span>' if tc.get("range_pct") is not None else "—"),
              ("단기 과열 온도 (RSI 14 · 흔히 70 넘으면 과열 · 30 아래면 침체로 읽음)",
               f'<span style="color:#111;font-weight:700;">{rsi:.1f}</span>' if rsi is not None else "—", _no_record(R.rsi_tip(rsi))),
              ("평균선 교차 (50일선이 200일선 위로 = 골든크로스)", mc_html, _no_record(R.cross_tip(mc)))]
     deep += R._multi(items)
-    return (f'<details data-fold="1" data-label="차트 지표 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{R._fold_row("차트 지표 보기")}</summary>'
+    return ma + (f'<details data-fold="1" data-label="차트 정보 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{R._fold_row("차트 정보 보기")}</summary>'
             f'<div style="margin-top:6px;">{deep}</div></details>')
 
 
@@ -353,6 +355,7 @@ PEER_LABEL = "시총 상위 20개"
 MAX_EVENTS = 8      # 뉴스 목록에 펼쳐 두는 수, 나머지는 `그 외 n건`
 MAX_ISSUES = 5      # 중요 이슈 줄 수 (10-3 : 7일, 관련도 높은 순 최대 5줄)
 MAX_MEDIA = 5       # 방송 줄 최대 수 — 실적 주간엔 한 종목에 하루 십여 줄이라 최근 것만 (2026-10-25)
+PICKS = []          # 방송에서 나온 종목 의견 (media_feed.picks, 최근 R.PICK_DAYS 일) — `방송에서 나온 의견은?` 카드 (2026-10-29 P89)
 MEDIA = []          # 방송 이슈 (media_feed.issues — 같은 이슈는 이미 한 줄로, 최근 24시간) — write_all 이 한 번 읽는다
 TODAY_HOURS = 24    # 뉴스 목록 = 오늘자만 (2026-10-25 사용자). 아침 실행이라 KST 날짜로 자르면 미국 밤사이 뉴스가 빠진다 → 최근 24시간
 NOW = None          # 페이지를 만드는 시각 (UTC) — write_all 이 정한다. 목업은 환경 변수 RADAR_NOW(ISO)
@@ -377,11 +380,43 @@ def _rename(x, name):
     return x
 
 
-def sec_targets(s):
-    """애널리스트 의견 · 목표가 — NVDA 리포트 sec_targets 그대로 (남의 의견이라 출처는 꼬리말에)."""
-    if not s.get("analysts"):
+def _sub_head(t):
+    return f'<span style="display:block;margin:10px 0 6px;font-weight:700;color:#111;font-size:{_dk.NAME};">{R._esc(t)}</span>'
+
+
+def card_opinions(s):
+    """`애널리스트 · 방송 의견은?` (2026-10-29 사용자 P90) — 애널리스트 의견 · 목표가(옛 sec_targets 흰 카드)와 방송 의견(picks)을 한 상태 카드에, 묶음 둘로.
+    머릿수는 합치지 않는다(44명 + 1건 X). 답 = 애널리스트 다수(R.analysts_verdict) — 방송은 건수가 적어 답을 좌우하지 않는다. 애널리스트가 없으면 방송만으로 `매수` 등.
+    색은 회색(남의 의견 — 블로그 추천 아님, 매수 추천 금지 원칙). 둘 다 없으면 카드 없음."""
+    a = {"status": {"analysts": s.get("analysts") or []}, "headline": {"close": s.get("close")}}
+    verdict = R.analysts_verdict(a) if s.get("analysts") else None
+    ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
+    if not verdict and not ps:
         return ""
-    return R.sec_targets({"status": {"analysts": s["analysts"]}, "headline": {"close": s["close"]}})
+    money = lambda v: f"${v:,.2f}"   # noqa: E731
+    cnt = R.picks_count(ps) if ps else ""
+    if verdict:
+        state, text = verdict
+        text += f" 방송에서는 {R.picks_sentence(ps)} 나왔다." if ps else ""
+    else:
+        state = " · ".join(dict.fromkeys(p["action"] for p in ps))
+        text = f"{s['name']}에 대한 {R.picks_sentence(ps)} 방송에서 나왔다. 애널리스트 집계는 없다."
+    lines = [(text, "plain")]   # `블로그 의견 아님` 안내는 뺐다 (P92)
+    if verdict:
+        lines.append((R.analysts_block(a), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
+    if ps:
+        lines.append((R.picks_rows(ps, s.get("close"), money), "html"))   # 방송 묶음은 `매수 의견` 제목 · 구분선 (P92)
+    tip = ("애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 나온 이 종목 의견을 한 카드에 모은 것\n"
+           f"· 지금 : {state}" + (f" · 방송 {cnt}" if ps else "") + "\n"
+           "· 나누는 법 : 애널리스트 중 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림. 방송 건수는 답에 넣지 않는다\n"
+           "· 읽는 법 : 누가 어떤 이유로 말했는지 보는 칸이다. 적중률은 검증하지 않았고, 이 블로그의 추천이 아니다")
+    theme, col = R.pick_theme(state)   # 매수면 오름 색 강조 카드 (P92)
+    return R._state_card("애널리스트 · 방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance · 유튜브 방송 요약"), fold=True)
+
+
+def sec_targets(s):
+    """옛 애널리스트 흰 카드 — card_opinions 로 합쳐 비운다 (P90)."""
+    return ""
 
 
 def _news_for(s, news):
@@ -559,7 +594,7 @@ def detail_body(s, today, news=None):
     """NVDA 리포트 순서 : 맨 위 요약 → 그래프 → 가격 카드(펼치면 1층 · 2층) → 상태 카드. 갱신 날짜 줄은 뺐다 — 요약 첫 마디에 날짜가 있다 (2026-10-18 사용자)."""
     return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
-                + R._section("실적과 기대", sec_expect(s), tab="실적과 기대")
+                + R._section("실적", sec_expect(s), tab="실적")
                 + R._section("캘린더", sec_calendar(s), tab="캘린더")
                 + related(s) + list_marker(U.LIST_URL))   # 출처 · 투자 권유 꼬리말은 뺐다 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자)
 
@@ -608,7 +643,12 @@ def write_all(a, out_dir, snap=None, news=None, media=None):
     global MEDIA, NOW
     NOW = (datetime.datetime.fromisoformat(os.environ["RADAR_NOW"].replace("Z", "+00:00")) if os.environ.get("RADAR_NOW")
            else datetime.datetime.now(datetime.timezone.utc))
-    MEDIA = media if media is not None else media_feed.issues(media_feed.rows(media_feed.load(NOW.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=2)), _since())
+    global PICKS
+    if media is None:   # 영상은 한 번(30일) 읽어 뉴스(24시간) · 방송 의견(30일)에 나눠 쓴다 — Firestore `in` 30개 한도
+        vids = media_feed.load(NOW.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=R.PICK_DAYS - 1)
+        media = media_feed.issues(media_feed.rows(vids), _since())
+        PICKS = media_feed.picks(vids, (NOW - datetime.timedelta(days=R.PICK_DAYS)).strftime("%Y-%m-%d"))
+    MEDIA = media
     if snap:
         draw_charts(snap, [s for s in a["stocks"] if s["sym"] not in U.REPORT_TYPE], out_dir)
     pages = {"list": (U.LIST_TITLE, list_body(a))}

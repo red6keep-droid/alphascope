@@ -308,6 +308,36 @@ def issues(rs, since=""):
     return out
 
 
+PICK_ACTION = {"buy": "매수", "hold": "보유", "watch": "관망", "sell": "매도"}
+
+
+def picks(items, since=""):
+    """방송에서 나온 종목 의견 (2026-10-29 사용자 P85: "당잠사에서 톰 리가 추천했다 · 목표가") — 수집기 요약의 `picks` 칸을 그대로 옮긴다.
+    한 줄 = {market · ticker · name · action(매수 · 보유 · 관망 · 매도) · speaker · own(본인 의견) / report(증권사 보고서를 방송이 전함) · target · currency ·
+    reason · quote · channel · url(그 장면 시각) · published_at}. 같은 영상 · 같은 사람 · 같은 종목은 한 줄. since = 'YYYY-MM-DD' 이후 영상만."""
+    out, seen = [], set()
+    for it in sorted(items, key=lambda r: str(r.get("publishedAt") or ""), reverse=True):
+        pub = it.get("publishedAt")
+        pub = pub.isoformat() if hasattr(pub, "isoformat") else str(pub or "")
+        if pub[:10] < since:
+            continue
+        ch = it.get("channelName") or ""
+        for p in it.get("picks") or []:
+            t = str(p.get("ticker") or "").strip().upper()
+            key = (it.get("id"), p.get("speaker"), t)
+            if not t or key in seen or p.get("action") not in PICK_ACTION:
+                continue
+            seen.add(key)
+            url = it.get("url") or ""
+            if url and p.get("atSec"):
+                url += ("&" if "?" in url else "?") + f"t={int(p['atSec'])}"
+            out.append({"market": p.get("market") or "", "ticker": t, "name": p.get("name") or "", "action": PICK_ACTION[p["action"]],
+                        "speaker": (p.get("speaker") or "").strip(), "own": p.get("source") != "report", "target": p.get("targetPrice"),
+                        "currency": p.get("currency") or "", "reason": (p.get("reason") or "").strip(), "quote": (p.get("quote") or "").strip(),
+                        "channel": MC.CHANNEL_SHORT.get(ch, ch), "url": url, "published_at": pub})
+    return out
+
+
 def market_top(iss, n):
     """시장 · 업종 이슈 중 방송 여러 곳이 같이 다룬 순으로 n 개 — 미국 데일리 뉴스 · 홈 주요 뉴스 (2026-10-25 사용자). iss = issues() 결과."""
     out = [r for r in market(iss) if r["category"] != "OTHER"]
