@@ -1,77 +1,77 @@
 {
-  "updated_at": "2026-10-28 10:46:20 UTC",
+  "updated_at": "2026-10-28 12:46:22 UTC",
   "items": [
     {
-      "title": "At least 30 people reported dead in high-speed Spain train crash",
+      "title": "FEC campaign finance system offline days before midterms after hackers reportedly target site",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/spain-high-speed-train-crash.html",
-      "published": "2026-10-28 10:44:01",
-      "title_ko": "스페인 고속열차 추돌 사고 최소 30명 사망 보고",
-      "summary_ko": "올해 스페인 두 번째 치명적 고속열차 충돌"
+      "link": "https://www.cnbc.com/2026/10/28/fec-hack-outage-campaign-finance-filings.html",
+      "published": "2026-10-28 12:44:05",
+      "title_ko": "FEC 캠페인 자금 시스템, 중간선거 전 해킹으로 다운",
+      "summary_ko": "해커, 사이트 표적"
     },
     {
-      "title": "Stellantis reports $4.5 billion cash drain as massive turnaround plan continues",
+      "title": "Google alters its cloud playbook, enlisting partners to sell more AI chips",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/stellantis-45-billion-cash-drain-turnaround.html",
-      "published": "2026-10-28 10:18:19",
-      "title_ko": "스텔란티스, 대규모 전환 계획 지속 속 45억 달러 현금 유출 보고",
-      "summary_ko": "유럽 자동차 대기업 3분기 실적 발표"
+      "link": "https://www.cnbc.com/2026/10/28/google-alters-cloud-playbook-turning-to-partners-to-sell-more-ai-chips.html",
+      "published": "2026-10-28 12:37:51",
+      "title_ko": "구글, 클라우드 전략 수정·파트너 통해 AI 칩 판매 확대",
+      "summary_ko": "TPU 사업 파트너에 개방"
     },
     {
-      "title": "Musk's PAC lawyer runs in Texas House district that is home to billionaire's business interests",
+      "title": "New Zealand dollar tanks after central bank defies markets' near-certainty it would hike rates",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/elon-musk-chris-gober-rourk-texas-10th-congress-election.html",
-      "published": "2026-10-28 10:00:01",
-      "title_ko": "머스크 PAC 변호사, 테슬라·스페이스X 사업권 있는 텍사스 하원 선거구 출마",
-      "summary_ko": "테슬라와 스페이스X 칩 공장 건설 예정지 해당 선거구"
+      "link": "https://www.cnbc.com/2026/10/28/new-zealand-dollar-rbnz-rates.html",
+      "published": "2026-10-28 12:36:06",
+      "title_ko": "중앙은행 금리 인상 기정사실화에도 뉴질랜드 달러 급락",
+      "summary_ko": "6개월간 미국 달러 대비 약 5% 하락"
     },
     {
-      "title": "UBS pretax profits jump 27% in third quarter to $3.59 billion as wealth inflows surge",
+      "title": "Trump jokes $5,000 would buy 'a hamburger and maybe a small dessert' at Mar-a-Lago as cost of living looms over midterms",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/ubs-earnings-third-quarter.html",
-      "published": "2026-10-28 09:42:03",
-      "title_ko": "UBS 3분기 세전 이익 27% 급증, 35억 9천만 달러 기록",
-      "summary_ko": "UBS, 3분기 세전 이익 약 36억 달러 보고"
+      "link": "https://www.cnbc.com/2026/10/28/trump-jokes-5000-cash-would-buy-hamburger-and-dessert-at-mar-a-lago.html",
+      "published": "2026-10-28 12:32:36",
+      "title_ko": "트럼프, 마라라고에서 5,000달러는 '햄버거와 작은 디저트' 살 뿐이라며 생활비 부담 언급",
+      "summary_ko": "5,000달러 지급액, 햄버거와 디저트 수준 언급"
     },
     {
-      "title": "Robinhood shares fall as crypto slump weighs on profits, offsetting gains in new businesses",
+      "title": "Why China is desperate to ship cars outside of the country",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/27/robinhood-hood-q3-2026-earnings.html",
-      "published": "2026-10-28 09:29:26",
-      "title_ko": "로빈후드 주가 5% 하락, 암호화폐 침체로 이익 압박",
-      "summary_ko": "옵션·예측시장 등 신규 사업 확장, 암호화폐 침체로 이익 감소"
-    },
-    {
-      "title": "Treasury yields tick higher ahead of Federal Reserve interest rate decision",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/us-treasurys-bonds-yields-federal-reserve.html",
-      "published": "2026-10-28 09:22:26",
-      "title_ko": "연준 금리 결정 앞두고 미 국채 금리 소폭 상승",
-      "summary_ko": "트레이더들이 연준의 최신 통화정책 결정 대기"
+      "link": "https://www.cnbc.com/2026/10/28/china-car-exports.html",
+      "published": "2026-10-28 12:30:02",
+      "title_ko": "중국, 자국 외 자동차 수출에 절박한 이유",
+      "summary_ko": "전통적 구매 성수기인 가을에도 쇼룸 공실 또는 폐업 증가"
     },
     {
       "title": "Israeli bonds, shekel fall as election leaves Netanyahu and others far short of majorities",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/israel-election-netanyahu-trump-gaza-.html",
-      "published": "2026-10-28 09:12:02",
+      "published": "2026-10-28 12:27:07",
       "title_ko": "이스라엘 선거, 네타냐후와 아이젠코트 모두 다수 확보 실패",
       "summary_ko": "네타냐후 연합·아이젠코트 야당 블록 모두 과반수 미달"
     },
     {
-      "title": "Flavor Flav, Hillary Clinton weigh in as WNBA takes flak for weekday lunchtime finals game",
+      "title": "Trump says Iran war will end 'when I want it to' as costs reportedly balloon to $47 billion",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/wnba-atlanta-dream-golden-state-valkyries-flavor-flav-hillary-clinton-.html",
-      "published": "2026-10-28 07:58:09",
-      "title_ko": "플라버 플레브, 힐러리 클린턴, WNBA 평일 점심시간 결승전 편성에 의견",
-      "summary_ko": "애틀랜타 드림, WNBA 편성 비판"
+      "link": "https://www.cnbc.com/2026/10/28/us-iran-war-trump-hormuz-costs-centcom.html",
+      "published": "2026-10-28 12:25:49",
+      "title_ko": "트럼프, 이란 전쟁 '내가 원할 때' 끝난다며 비용 470억 달러로 급증 보도",
+      "summary_ko": "힐 보도, 분쟁 비용 470억 달러 기록"
     },
     {
-      "title": "Meta- and Google-backed Jio Platforms’ shares soar over 21% on trading debut after record IPO",
+      "title": "Traders are betting big against this restaurant giant into earnings",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/jio-ipo-india-listing-.html",
-      "published": "2026-10-28 07:48:35",
-      "title_ko": "메타·구글 지원 지오 플랫폼, 상장 첫날 주가 21% 급등",
-      "summary_ko": "메타와 구글, 투자사 참여"
+      "link": "https://www.cnbc.com/2026/10/28/traders-are-betting-big-against-chipotle-into-earnings.html",
+      "published": "2026-10-28 12:04:47",
+      "title_ko": "트레이더들, 실적 발표 앞두고 치폴레에 대규모 베팅",
+      "summary_ko": "실적 발표 시즌 중 트레이더들이 가장 우려하는 기업으로 지목"
+    },
+    {
+      "title": "DraftKings CEO Jason Robins says parents should talk with kids about gambling addiction",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/draftkings-ceo-jason-robins-parents-kids-should-talk-about-gambling.html",
+      "published": "2026-10-28 12:00:01",
+      "title_ko": "드래프트킹스 CEO 제이슨 로빈스, 자녀와 도박 중독 대화 권고",
+      "summary_ko": "자신 가족에게 해당 주제를 다루는 방식 설명"
     },
     {
       "title": "브로드컴 앤트로픽 자금 조달 및 AI 데이터 센터 투자",
@@ -83,7 +83,7 @@
       "kind": "media",
       "tag": "AI/반도체",
       "direction": "positive",
-      "n_channels": 3
+      "n_channels": 2
     },
     {
       "title": "연준 추가 금리 인상 필요성",
@@ -95,7 +95,7 @@
       "kind": "media",
       "tag": "금리",
       "direction": "negative",
-      "n_channels": 4
+      "n_channels": 3
     },
     {
       "title": "미국의 베네수엘라산 원유 수입 및 에너지 가격",
