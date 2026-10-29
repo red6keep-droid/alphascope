@@ -319,7 +319,8 @@ def flows(flow_data, bench_bars):
         out["funds_m"] = {k: _rng(v) for k, v in fm.items() if v}
     k = d.get("kospi") or []
     if k:
-        out["kospi"] = {"day": k[-1]["day"], "close": k[-1]["v"], "ret_1d": (k[-1]["v"] / k[-2]["v"] - 1) * 100 if len(k) > 1 else None}
+        out["kospi"] = {"day": k[-1]["day"], "close": k[-1]["v"], "ret_1d": (k[-1]["v"] / k[-2]["v"] - 1) * 100 if len(k) > 1 else None,
+                        "series": k[-40:]}   # 외국인 순매수 그래프 아래 같은 날 코스피 등락 (2026-10-29 사용자, 한국 증시 리포트 M47)
     # 시장 열기 — 거래대금(억원) 오늘 vs 20일 평균, 거래량(만주)
     tv, vo = d.get("turnover_kospi") or [], d.get("volume_kospi") or []
     if len(tv) > 21:

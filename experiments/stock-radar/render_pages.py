@@ -58,7 +58,12 @@ def wrap(body):
 
 def list_marker(url):
     """글 아래 테마 [목록] 버튼이 갈 곳 (테마 JS 가 읽는다, 2026-10-18 사용자: 하단 목록 · TOP 은 엔비디아 글과 공통). 화면에는 안 보인다."""
-    return f'<span data-list-url="{_esc(url)}" hidden></span>'
+    return f'<span data-list-url="{_esc(url)}" data-nav="back" hidden></span>'   # data-nav=back : 홈에서 왔으면 `홈으로`, 아니면 `목록으로` (2026-10-29 사용자 P94)
+
+
+def home_marker():
+    """글 아래 버튼을 늘 `홈으로` (목록 · 읽는 법 페이지, 2026-10-29 사용자 P94). 화면에는 안 보인다."""
+    return '<span data-nav="home" hidden></span>'
 
 
 # ---------------------------------------------------------------- 상세 (간단형)
@@ -622,20 +627,20 @@ def list_row(s, first):
             f'<span style="display:block;padding-left:52px;font-size:{_dk.MICRO};line-height:20px;font-weight:400;color:{NOTE};">{_esc(s["sym"])} · {cap_text(s["cap"])}</span>')   # 순위 26 + 로고 26 만큼 들여 이름 글자에 맞춘다
     right = f'<span style="color:{pcol};">${s["close"]:,.2f}</span><br>{R._arrow(r)}'
     # 줄 전체가 상세로 가는 터치 영역 — 테마 터치 장치가 [data-row-link] 를 읽는다 (2026-10-19 사용자: 이름만이 아니라 한 행을 터치)
-    return R._row_html(left, right, first=first).replace("<span", '<span data-row-link="1"', 1)
+    return R._row_html(left, right, first=first).replace("<span", f'<span data-row-link="1" data-ret="{r:.4f}"', 1)
 
 
 def list_body(a):
     top = [s for s in a["stocks"] if s["in_top"]]
     rest = [s for s in a["stocks"] if not s["in_top"] and s.get("rank") and s["rank"] <= U.PEER_GROUP_N]   # 목록은 시총 상위 20위까지 — 48개 확대 뒤에도 같은 목록 (2026-10-20)
-    card = lambda xs: f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{"".join(list_row(s, i == 0) for i, s in enumerate(xs))}</span></div>'   # noqa: E731
+    card = lambda xs, key="": f'<div data-cards="1" style="margin:0 0 8px;"><span{f" data-sort-list={chr(34)}{key}{chr(34)}" if key else ""} style="{R.MULTI}">{"".join(list_row(s, i == 0) for i, s in enumerate(xs))}</span></div>'   # noqa: E731   key = 정렬 버튼이 다시 놓는 목록 (P93)
     tip = ("미국 S&P 500 종목 가운데 회사 전체 값(주가 × 주식 수)이 가장 큰 10개\n"
            f"· 오늘 1위 : {top[0]['name']} {cap_text(top[0]['cap'])}\n"
            f"· 나누는 법 : 11위 밖으로 {U.SWAP_DAYS}거래일 연속 밀리면 후보 중 가장 높았던 종목과 바꾼다")
-    body = (list_lead(a) + updated_line(a) + R._card_title("시가총액 순위", tip) + card(top)
+    body = (list_lead(a) + updated_line(a) + R.title_with_sort("시가총액 순위", tip, "us-cap10") + card(top, "us-cap10")
             + _dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest))
             + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다. 엔비디아는 매일 나오는 리포트로 갑니다."))
-    return wrap(body)
+    return wrap(body + home_marker())
 
 
 def write_all(a, out_dir, snap=None, news=None, media=None):

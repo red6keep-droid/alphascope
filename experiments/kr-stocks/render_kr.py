@@ -86,7 +86,12 @@ def wrap(body):
 
 
 def list_marker(url):
-    return f'<span data-list-url="{_esc(url)}" hidden></span>'
+    return f'<span data-list-url="{_esc(url)}" data-nav="back" hidden></span>'   # data-nav=back : 홈에서 왔으면 `홈으로`, 아니면 `목록으로` (2026-10-29 사용자 P94)
+
+
+def home_marker():
+    """글 아래 버튼을 늘 `홈으로` (목록 · 읽는 법 페이지, 2026-10-29 사용자 P94). 화면에는 안 보인다."""
+    return '<span data-nav="home" hidden></span>'
 
 
 # ---------------------------------------------------------------- 그래프
@@ -974,9 +979,10 @@ def _ymd(d):
     return f"{d[:4]}년 {int(d[4:6])}월 {int(d[6:8])}일" if len(d or "") == 8 and d.isdigit() else ""
 
 
-def _info_rows(rows):
-    """이름 · 값 줄 묶음(흰 카드) — 구분선 없이, 이름 · 값 모두 14px (2026-10-29 사용자 P87). 값이 길어(주소 · 영문 이름) 이름 칸은 좁게."""
-    out = "".join(f'<span style="display:flex;gap:12px;padding:3px 12px;font-size:{TINY};line-height:22px;">'
+def _info_rows(rows, px=None, lh=22):
+    """이름 · 값 줄 묶음(흰 카드) — 구분선 없이, 이름 · 값 모두 14px (2026-10-29 사용자 P87). 값이 길어(주소 · 영문 이름) 이름 칸은 좁게.
+    px · lh = 글자 크기 · 행간 (`함께 움직이는 종목` 은 한 단계 작게 13 · 20, 같은 날 P96)."""
+    out = "".join(f'<span style="display:flex;gap:12px;padding:3px 12px;font-size:{px or TINY};line-height:{lh}px;">'
                   f'<span style="flex:0 0 68px;color:{NOTE};">{_esc(k)}</span>'
                   f'<span style="flex:1 1 auto;min-width:0;color:#111;word-break:keep-all;overflow-wrap:anywhere;">{v}</span></span>' for k, v in rows)
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}padding:{PAD - 3}px 0;display:block;">{out}</span></div>'
@@ -1005,9 +1011,9 @@ def sec_company(s):
     if mates:
         link_rows.append(("같은 묶음", " · ".join(f'<a href="{_esc(U.page_url(x[0]))}" style="color:#1a73e8;text-decoration:none;">{_esc(x[1])}</a>' for x in mates[:8])))
     if us[0]:
-        link_rows.append(("미국과 연결", _esc(" · ".join(_us_name(t) for t in us[0])) + (f'<br><span style="font-size:{TINY};color:{NOTE};">{_esc(us[1])}</span>' if us[1] else "")))
+        link_rows.append(("미국과 연결", _esc(" · ".join(_us_name(t) for t in us[0])) + (f'<br><span style="color:{NOTE};">{_esc(us[1])}</span>' if us[1] else "")))
     if link_rows:
-        out += R._card_title("함께 움직이는 종목", "같은 테마(없으면 같은 업종)의 한국 종목과, 밤사이 움직임을 같이 보는 미국 종목") + _info_rows(link_rows)
+        out += R._card_title("함께 움직이는 종목", "같은 테마(없으면 같은 업종)의 한국 종목과, 밤사이 움직임을 같이 보는 미국 종목") + _info_rows(link_rows, "13px", 20)   # 한 단계 작게 (P96)
     return out
 
 
@@ -1064,6 +1070,39 @@ def _month_span(ser):
 FLOW_CHART_N = 15
 
 
+WHO_NAMES = ("외국인", "기관", "개인")
+WHO_COLORS = ("#F5B971", "#A7B4C6", "#D9DEE7")   # 주황 · 청회색 · 연회색 — 증감 색 · 비교 회색(#CBD5E1)과 다른 고정 색 (M50)
+
+
+def share_sentence(sh):
+    """`9월에 사고판 돈 854조 원 가운데 개인 31% · 외국인 36% · 기관 27%였습니다. 8월보다 개인 · 외국인 · 기관 모두 낮아졌습니다(−1 · −2 · −1%p).` (2026-10-29 사용자 M56: 달마다 누가 높아지고 낮아졌는지)."""
+    ser = sh.get("series") or []
+    if not ser:
+        return ""
+    L = ser[-1]
+    mo = int(L["month"][5:])
+    out = f"{mo}월에 사고판 돈 {sh['last']['total']:,.0f}조 원 가운데 개인 {L['indiv']:.0f}% · 외국인 {L['foreign']:.0f}% · 기관 {L['inst']:.0f}%였습니다."
+    if len(ser) >= 2:
+        P = ser[-2]
+        pm = int(P["month"][5:])
+        d = {k: round(L[k]) - round(P[k]) for k in ("indiv", "foreign", "inst")}
+        names = {"indiv": "개인", "foreign": "외국인", "inst": "기관"}
+        up = [names[k] for k in d if d[k] > 0]
+        dn = [names[k] for k in d if d[k] < 0]
+        same = [names[k] for k in d if d[k] == 0]
+        bits = []
+        if up:
+            bits.append(" · ".join(up) + "은 높아지고")
+        if dn:
+            bits.append(" · ".join(dn) + "은 낮아졌")
+        if same:
+            bits.append(" · ".join(same) + "은 그대로")
+        chg = " · ".join(f"{names[k]} {'+' if d[k] > 0 else '−' if d[k] < 0 else ''}{abs(d[k])}%p" for k in ("indiv", "foreign", "inst"))
+        out += f" {pm}월보다 " + ", ".join(bits).replace("낮아졌,", "낮아졌고,") + ("습니다" if bits and bits[-1].endswith("낮아졌") else "입니다") + f"({chg})."
+    out += f" 개인 비중은 12개월 {sh['indiv_lo12']:.0f}~{sh['indiv_hi12']:.0f}%였고, 높아지면 과열로 읽히곤 합니다."
+    return out
+
+
 def sec_investors(m):
     inv = (m or {}).get("investor_m")
     if not inv or not inv.get("foreign"):
@@ -1074,23 +1113,24 @@ def sec_investors(m):
             if x["month"] == mo:
                 return x["v"] / 1e6   # 백만원 → 조원
         return None
+    # 세 주체는 고정 색 (증감 색이 아님 — 증감 색이면 범례 규칙이 외국인 칩을 지워 `기관 · 개인` 만 남았다, 2026-10-29 사용자 M50 · M56)
     groups = [(mo[2:].replace("-", "."), [_v("foreign", mo), _v("inst", mo), _v("indiv", mo)]) for mo in months[::-1]]   # 최신이 왼쪽 (P79)
-    colors = [lambda v: "#ED8E87" if (v or 0) >= 0 else "#82B1F0"] * 3
-    chart = R._col_chart(groups, [lambda v: R._PASTEL_UP if (v or 0) >= 0 else R._PASTEL_DN, lambda v: "#A7B4C6", lambda v: "#D9DEE7"], [R._sign_fg, R._sign_fg, R._sign_fg], height=150,   # 순매수 숫자는 모두 증감 색 (M6)
+    chart = R._col_chart(groups, [lambda v: c for c in WHO_COLORS], [R._sign_fg, R._sign_fg, R._sign_fg], height=150,   # 순매수 숫자는 모두 증감 색 (M6)
                          fmt=lambda v: f"{v:+.0f}".replace("-", "−"))
-    legend = R._legend_chips([("외국인", R._PASTEL_UP), ("기관", "#A7B4C6"), ("개인", "#D9DEE7")])
+    legend = R._legend_chips(list(zip(WHO_NAMES, WHO_COLORS)))
     last = months[-1]
     rows = "".join(_row_html(n, f'<span style="color:{UP if (_v(k, last) or 0) > 0 else DOWN};">{_sgn(_v(k, last) or 0, 1)}조</span>', f"{last[:4]}년 {int(last[5:])}월 순매수", first=i == 0, inline_note=True)
                    for i, (n, k) in enumerate((("외국인", "foreign"), ("기관", "inst"), ("개인", "indiv"))))
     sh = (m or {}).get("investor_share")
     if sh:
         L = sh["last"]
+        # 날짜는 위 줄처럼 괄호 안에 짧게, 설명(사고판 돈 · 12개월 범위 · 과열)은 카드 문장으로 (2026-10-29 사용자 M56)
         rows += _row_html("거래 비중", f'<span style="color:#111;">개인 {L["indiv"]:.0f}%</span><br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">외국인 {L["foreign"]:.0f}% · 기관 {L["inst"]:.0f}%</span>',
-                            f"{L['month'][:4]}년 {int(L['month'][5:])}월 매수+매도 {L['total']:,.0f}조 중 · 개인 비중 12개월 {sh['indiv_lo12']:.0f}~{sh['indiv_hi12']:.0f}% · 개인 비중이 높아지면 과열로 읽히곤 한다")
-        sch = R._col_chart([(x["month"][2:].replace("-", "."), [x["indiv"], x["foreign"], x["inst"]]) for x in sh["series"][-6:][::-1]],
-                           [lambda v: "#D9DEE7", lambda v: R._PASTEL_UP, lambda v: "#A7B4C6"], [lambda v: NOTE] * 3, height=120, fmt=lambda v: f"{v:.0f}")
-        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}거래 비중 (%) — 개인 · 외국인 · 기관</span>'
-                 f'<span style="display:block;height:6px;"></span>{sch}</span>')
+                            f"{L['month'][:4]}년 {int(L['month'][5:])}월", inline_note=True)
+        sch = R._col_chart([(x["month"][2:].replace("-", "."), [x["foreign"], x["inst"], x["indiv"]]) for x in sh["series"][-6:][::-1]],   # 순매수 그래프와 같은 순서 · 같은 색
+                           [lambda v: c for c in WHO_COLORS], [lambda v: NOTE] * 3, height=120, fmt=lambda v: f"{v:.0f}")
+        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}거래 비중 (%) — 그달 사고판 돈 중 각자의 몫</span>'
+                 f'<span style="display:block;height:6px;"></span>{_dk.legend_top(sch, R._legend_chips(list(zip(WHO_NAMES, WHO_COLORS))))}</span>')
     tip = ("한 달 동안 외국인 · 기관 · 개인이 각각 산 금액에서 판 금액을 뺀 것(유가증권 + 코스닥), 그리고 전체 거래에서 각자가 차지한 비중. 월별 자료라 지난달까지\n"
            f"· {last[:4]}년 {int(last[5:])}월 : 외국인 {_sgn(_v('foreign', last) or 0, 1)}조 · 기관 {_sgn(_v('inst', last) or 0, 1)}조 · 개인 {_sgn(_v('indiv', last) or 0, 1)}조")
     card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}<span style="display:block;{R.MULTI_SEP}padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.CHART_TITLE}최근 {len(months)}개월 순매수 (조 원)</span><span style="display:block;height:6px;"></span>{_dk.legend_top(chart, legend)}</span></span></div>'   # 제목 없던 그래프에 ※ 제목 (2026-10-26)
@@ -1400,21 +1440,21 @@ def list_row(s, first):
             f'<a href="{_esc(U.page_url(s["sym"]))}" style="color:#111;text-decoration:none;">{_esc(s["name"])}</a>'
             f'<span style="display:block;padding-left:52px;font-size:{_dk.MICRO};line-height:20px;font-weight:400;color:{NOTE};">{_esc(s["code"])} · {cap_text(s["cap"])}</span>')
     right = f'<span style="color:{pcol};">{won(s["close"])}</span><br>{R._arrow(r)}'
-    return _row_html(left, right, first=first).replace("<span", '<span data-row-link="1"', 1)
+    return _row_html(left, right, first=first).replace("<span", f'<span data-row-link="1" data-ret="{r:.4f}"', 1)
 
 
 def list_body(a):
     top = [s for s in a["stocks"] if s["in_top"]]
     rest = [s for s in a["stocks"] if not s["in_top"] and s.get("rank") and s["rank"] <= U.PEER_GROUP_N]
-    card = lambda xs: f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{"".join(list_row(s, i == 0) for i, s in enumerate(xs))}</span></div>'   # noqa: E731
+    card = lambda xs, key="": f'<div data-cards="1" style="margin:0 0 8px;"><span{f" data-sort-list={chr(34)}{key}{chr(34)}" if key else ""} style="{R.MULTI}">{"".join(list_row(s, i == 0) for i, s in enumerate(xs))}</span></div>'   # noqa: E731   key = 정렬 버튼이 다시 놓는 목록 (P93)
     tip = ("한국 유가증권시장 보통주 가운데 회사 전체 값(주가 × 주식 수)이 가장 큰 10개. 우선주 · 코스닥은 뺀다\n"
            f"· 오늘 1위 : {top[0]['name']} {cap_text(top[0]['cap'])}\n"
            f"· 나누는 법 : 11위 밖으로 {U.SWAP_DAYS}거래일 연속 밀리면 후보 중 가장 높았던 종목과 바꾼다")
-    body = (list_lead(a) + R._card_title("시가총액 순위", tip) + card(top)
+    body = (list_lead(a) + R.title_with_sort("시가총액 순위", tip, "kr-cap10") + card(top, "kr-cap10")
             + (_dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest)) if rest else "")
             + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다.")
             + related())   # 시장 흐름 카드는 한국 증시 리포트로 옮김 — 목록은 미국처럼 순위만 (2026-10-26 사용자, 리포트 기획 M8)
-    return wrap(body)
+    return wrap(body + home_marker())
 
 
 def write_all(a, out_dir, snap=None, media=None, extra=None):

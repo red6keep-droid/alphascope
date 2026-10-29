@@ -1772,12 +1772,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
                     <b:include data='post' name='post'/>
                   </article>
                   <p class='post-nav'>
-                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 아니면 데일리 리포트 목록.
+                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 고정 페이지는 홈으로(종목 상세는 테마 JS 가 온 곳 따라 목록으로 · 홈으로, 2026-10-29 P94), 아니면 데일리 리포트 목록.
                       오른쪽 끝 TOP 은 맨 위로 (2026-10-13 사용자). 이전 글 · 다음 글은 같은 날 삭제.</b:comment>
                     <b:if cond='data:post.labels any (l =&gt; l.name == &quot;트럼프 트렌드&quot;)'>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C&quot;'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;엔비디아&quot;)'/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84&quot;'>목록</a>
+                    <b:elseif cond='data:view.isPage'/>
+                      <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
                     <b:else/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91&quot;'>목록</a>
                     </b:if>
@@ -4483,8 +4485,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
       })();
 
       /* ============================================================ 글 본문 정렬 버튼 (data-sort-for) — 2026-10-26 한국 증시 리포트 M3
-         홈 H12 버튼과 같은 모양 · 같은 순서: 처음 회색(렌더러 순서 그대로) → 상승순(빨강) → 하락순(파랑) → 상승순 …
-         목록 [data-sort-list="이름"] 바로 아래 줄([data-ret] = 오늘 등락 %)을 다시 놓는다. 첫 줄은 위 구분선 없음. JS가 없으면 버튼은 숨은 채(hidden). */
+         홈 H12 버튼과 같은 모양. 순환 (2026-10-29 사용자 P93): 처음 회색(렌더러 순서 그대로) → 상승순(빨강) → 하락순(파랑) → 회색(처음 순서로) → 상승순 …
+         목록 [data-sort-list="이름"] 바로 아래 줄([data-ret] = 오늘 등락 %)을 다시 놓는다. 첫 줄은 위 구분선 없음. JS가 없으면 버튼은 숨은 채(hidden).
+         쓰는 곳: 한국 증시 리포트 시총 상위 10 · 한국 · 미국 시가총액 순위 목록 페이지 */
       (function () {
         'use strict';
         [].slice.call(document.querySelectorAll('.post-body [data-sort-for]')).forEach(function (b) {
@@ -4495,12 +4498,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var line = rows[1].style.borderTop, state = '';
           b.hidden = false;
           b.addEventListener('click', function () {
-            state = state === 'up' ? 'down' : 'up';
-            rows.slice().sort(function (x, y) { var a = +x.getAttribute('data-ret'), c = +y.getAttribute('data-ret'); return state === 'up' ? c - a : a - c; })
+            state = state === '' ? 'up' : state === 'up' ? 'down' : '';
+            (state ? rows.slice().sort(function (x, y) { var a = +x.getAttribute('data-ret'), c = +y.getAttribute('data-ret'); return state === 'up' ? c - a : a - c; }) : rows)
               .forEach(function (r, i) { r.style.borderTop = i ? line : '0'; list.appendChild(r); });
             b.setAttribute('data-state', state);
             b.querySelector('.sort-txt').textContent = state === 'down' ? '하락순' : '상승순';
-            b.setAttribute('aria-label', state === 'down' ? '정렬: 하락순' : '정렬: 상승순');
+            b.setAttribute('aria-label', state === 'down' ? '정렬: 하락순' : state === 'up' ? '정렬: 상승순' : '정렬');
           });
         });
       })();
@@ -4514,7 +4517,19 @@ body.no-dashboard .main-content { padding-top: 32px; }
         /* 목록 버튼이 갈 곳을 본문이 정할 때 (2026-10-18 사용자: 종목 고정 페이지 하단에도 엔비디아 글과 같은 목록 · TOP) —
            본문의 [data-list-url] 이 있으면 그 주소로. 고정 페이지는 라벨이 없어 테마 기본값(데일리 목록)으로 가던 것을 바로잡는다 */
         var lu = document.querySelector('.post-body [data-list-url]');
-        if (lu) [].slice.call(document.querySelectorAll('.post-nav-list')).forEach(function (a) { a.href = lu.getAttribute('data-list-url'); });
+        var navs = [].slice.call(document.querySelectorAll('.post-nav-list'));
+        var setNav = function (text, href) { navs.forEach(function (a) { a.textContent = text; a.href = href; }); };
+        /* 고정 페이지 버튼은 갈 곳 이름으로 (2026-10-29 사용자 P94): 본문 [data-nav] —
+           home = 늘 `홈으로`(시총 목록 · 읽는 법) · back = 종목 상세: 홈에서 왔으면 `홈으로`, 시총 목록 · 검색 · 외부 · 직접 입력이면 `목록으로`(그 시장 시총 목록).
+           표시가 없는 고정 페이지(/p/)도 `홈으로`. 연재 글(데일리 · 엔비디아 · 트럼프)은 그대로 `목록` */
+        var nv = document.querySelector('.post-body [data-nav]');
+        var kind = nv ? nv.getAttribute('data-nav') : (/\/p\/[^/]+\.html$/.test(location.pathname) ? 'home' : '');
+        var homeUrl = location.protocol + '//' + location.host + '/';
+        var fromHome = false;
+        try { var ref = document.referrer ? new URL(document.referrer) : null; fromHome = !!ref && ref.host === location.host && /^\/(index\.html|preview\.html)?$/.test(ref.pathname); } catch (e) {}
+        if (kind === 'home' || (kind === 'back' && (fromHome || !lu))) setNav('홈으로', homeUrl);
+        else if (kind === 'back') setNav('목록으로', lu.getAttribute('data-list-url'));
+        else if (lu) navs.forEach(function (a) { a.href = lu.getAttribute('data-list-url'); });
         [].slice.call(document.querySelectorAll('.post-nav-top')).forEach(function (b) {
           b.addEventListener('click', function () {
             try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
