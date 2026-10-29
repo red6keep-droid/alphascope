@@ -1,4 +1,5 @@
 name = "alphascope-cron-trigger"
+account_id = "a8718df7edc5f8f6ce88e75b6545e5cb"   # red6keep (블로그 계정). 다른 계정으로 로그인된 채 배포하면 복사본 대신 오류 (2026-10-29 사고 뒤)
 main = "src/index.js"
 compatibility_date = "2026-10-01"
 workers_dev = false   # HTTP 엔드포인트 없음 — cron으로만 돈다

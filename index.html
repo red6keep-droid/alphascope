@@ -802,8 +802,8 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .home-cards .sector-card .fold-btn { border-radius: 0; padding-top: 13px; }   /* 더 보기 위 +5 (2026-10-15 사용자) */
 .home-cards .briefing, .home-cards .briefing-body, .home-cards .briefing-main { gap: var(--card-gap); }   /* 리포트 카드 묶음 안쪽도 카드 사이 = 좌우 여백 (2026-10-24 사용자). 옛 20 */
 /* 미국 증시 리포트 카드 내용은 글머리표 없이 (2026-10-15 사용자) */
-#report-card .report-columns li { gap: 0; }
-#report-card .report-columns li::before { content: none; }
+#report-card .report-columns li, #kr-report-card .report-columns li { gap: 0; }
+#report-card .report-columns li::before, #kr-report-card .report-columns li::before { content: none; }   /* 한국 증시 카드도 같게 (H24) */
 /* 첫 탭(거래상위)은 왼쪽 여백 없이 구분선 시작점에서 (2026-10-15 사용자) */
 .home-cards .rank-card .tab:first-child { padding-left: 0; }   /* 제목이 카드 안으로 들어가 쌓일 때 위 여백 +15 는 필요 없음 */
 /* 카드 순서: 리포트 → 시총 TOP 10 (주요 지수 · 섹터 현황은 2026-10-20 삭제). PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭 (2026-10-15 사용자) */
@@ -1606,6 +1606,19 @@ body.no-dashboard .main-content { padding-top: 32px; }
               </a>
               </div>
 
+              <!-- 한국 증시 리포트 카드 — 미국 증시 카드와 같은 모양, 코스피 봉차트 복제 + 요약 한 줄 (2026-10-29 사용자, 홈 수정 H24). 글이 없으면 라벨 목록으로 -->
+              <div class='report-col'>
+              <h3 class='report-title'><span class='report-icon' style='background:#1D4ED8;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='5' width='3' height='9' rx='.5'/><rect x='11' y='2' width='3' height='12' rx='.5'/></svg></span>한국 증시<span class='report-card-date' data-date='kr-report-card'></span></h3>
+              <a class='report-card' id='kr-report-card' href='/search/label/한국%20증시%20리포트'>
+                <img class='report-chart' data-hook='kr-report-chart' data-zoom='1' alt='' hidden='hidden'/>
+                <div class='report-block' data-hook='summary'>
+                  <div class='report-columns'>
+                    <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
+                  </div>
+                </div>
+              </a>
+              </div>
+
               <!-- 엔비디아 리포트 카드는 삭제 (2026-10-20 사용자). 메뉴 · 시총 TOP 10 의 NVDA 줄은 엔비디아 글 목록으로 간다 -->
 
               <!-- 트럼프 트렌드 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
@@ -1772,12 +1785,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
                     <b:include data='post' name='post'/>
                   </article>
                   <p class='post-nav'>
-                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 아니면 데일리 리포트 목록.
+                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 고정 페이지는 홈으로(종목 상세는 테마 JS 가 온 곳 따라 목록으로 · 홈으로, 2026-10-29 P94), 아니면 데일리 리포트 목록.
                       오른쪽 끝 TOP 은 맨 위로 (2026-10-13 사용자). 이전 글 · 다음 글은 같은 날 삭제.</b:comment>
                     <b:if cond='data:post.labels any (l =&gt; l.name == &quot;트럼프 트렌드&quot;)'>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C&quot;'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;엔비디아&quot;)'/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84&quot;'>목록</a>
+                    <b:elseif cond='data:view.isPage'/>
+                      <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
                     <b:else/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91&quot;'>목록</a>
                     </b:if>
@@ -3019,6 +3034,15 @@ body.no-dashboard .main-content { padding-top: 32px; }
             map: { summary: ['(머리)', '오늘 한 줄'] },   /* 주요 지수 수치는 홈에 싣지 않는다 — 한 줄 결론만 (2026-10-12 사용자: 요약 짧게) */   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용 */
             lines: { summary: 1 },   /* 머리 첫 줄(오늘 결론)만 — 핵심 인사이트 구획은 삭제 (2026-10-20 사용자: "너무 길다, 상세는 페이지에서") */
             picks: true,
+            empty: '아직 발행된 리포트가 없습니다.'
+          },
+          {
+            id: 'kr-report-card',
+            label: '한국 증시 리포트',   /* 홈 수정 H24 (2026-10-29 사용자) — 미국 카드와 같은 틀: 글 맨 위 코스피 봉차트 + 머리 첫 줄 */
+            chart: 'kr-report-chart',
+            map: { summary: ['(머리)'] },
+            lines: { summary: 1 },
+            picks: false,
             empty: '아직 발행된 리포트가 없습니다.'
           },
           {
@@ -4483,8 +4507,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
       })();
 
       /* ============================================================ 글 본문 정렬 버튼 (data-sort-for) — 2026-10-26 한국 증시 리포트 M3
-         홈 H12 버튼과 같은 모양 · 같은 순서: 처음 회색(렌더러 순서 그대로) → 상승순(빨강) → 하락순(파랑) → 상승순 …
-         목록 [data-sort-list="이름"] 바로 아래 줄([data-ret] = 오늘 등락 %)을 다시 놓는다. 첫 줄은 위 구분선 없음. JS가 없으면 버튼은 숨은 채(hidden). */
+         홈 H12 버튼과 같은 모양. 순환 (2026-10-29 사용자 P93): 처음 회색(렌더러 순서 그대로) → 상승순(빨강) → 하락순(파랑) → 회색(처음 순서로) → 상승순 …
+         목록 [data-sort-list="이름"] 바로 아래 줄([data-ret] = 오늘 등락 %)을 다시 놓는다. 첫 줄은 위 구분선 없음. JS가 없으면 버튼은 숨은 채(hidden).
+         쓰는 곳: 한국 증시 리포트 시총 상위 10 · 한국 · 미국 시가총액 순위 목록 페이지 */
       (function () {
         'use strict';
         [].slice.call(document.querySelectorAll('.post-body [data-sort-for]')).forEach(function (b) {
@@ -4495,12 +4520,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var line = rows[1].style.borderTop, state = '';
           b.hidden = false;
           b.addEventListener('click', function () {
-            state = state === 'up' ? 'down' : 'up';
-            rows.slice().sort(function (x, y) { var a = +x.getAttribute('data-ret'), c = +y.getAttribute('data-ret'); return state === 'up' ? c - a : a - c; })
+            state = state === '' ? 'up' : state === 'up' ? 'down' : '';
+            (state ? rows.slice().sort(function (x, y) { var a = +x.getAttribute('data-ret'), c = +y.getAttribute('data-ret'); return state === 'up' ? c - a : a - c; }) : rows)
               .forEach(function (r, i) { r.style.borderTop = i ? line : '0'; list.appendChild(r); });
             b.setAttribute('data-state', state);
             b.querySelector('.sort-txt').textContent = state === 'down' ? '하락순' : '상승순';
-            b.setAttribute('aria-label', state === 'down' ? '정렬: 하락순' : '정렬: 상승순');
+            b.setAttribute('aria-label', state === 'down' ? '정렬: 하락순' : state === 'up' ? '정렬: 상승순' : '정렬');
           });
         });
       })();
@@ -4514,7 +4539,19 @@ body.no-dashboard .main-content { padding-top: 32px; }
         /* 목록 버튼이 갈 곳을 본문이 정할 때 (2026-10-18 사용자: 종목 고정 페이지 하단에도 엔비디아 글과 같은 목록 · TOP) —
            본문의 [data-list-url] 이 있으면 그 주소로. 고정 페이지는 라벨이 없어 테마 기본값(데일리 목록)으로 가던 것을 바로잡는다 */
         var lu = document.querySelector('.post-body [data-list-url]');
-        if (lu) [].slice.call(document.querySelectorAll('.post-nav-list')).forEach(function (a) { a.href = lu.getAttribute('data-list-url'); });
+        var navs = [].slice.call(document.querySelectorAll('.post-nav-list'));
+        var setNav = function (text, href) { navs.forEach(function (a) { a.textContent = text; a.href = href; }); };
+        /* 고정 페이지 버튼은 갈 곳 이름으로 (2026-10-29 사용자 P94): 본문 [data-nav] —
+           home = 늘 `홈으로`(시총 목록 · 읽는 법) · back = 종목 상세: 홈에서 왔으면 `홈으로`, 시총 목록 · 검색 · 외부 · 직접 입력이면 `목록으로`(그 시장 시총 목록).
+           표시가 없는 고정 페이지(/p/)도 `홈으로`. 연재 글(데일리 · 엔비디아 · 트럼프)은 그대로 `목록` */
+        var nv = document.querySelector('.post-body [data-nav]');
+        var kind = nv ? nv.getAttribute('data-nav') : (/\/p\/[^/]+\.html$/.test(location.pathname) ? 'home' : '');
+        var homeUrl = location.protocol + '//' + location.host + '/';
+        var fromHome = false;
+        try { var ref = document.referrer ? new URL(document.referrer) : null; fromHome = !!ref && ref.host === location.host && /^\/(index\.html|preview\.html)?$/.test(ref.pathname); } catch (e) {}
+        if (kind === 'home' || (kind === 'back' && (fromHome || !lu))) setNav('홈으로', homeUrl);
+        else if (kind === 'back') setNav('목록으로', lu.getAttribute('data-list-url'));
+        else if (lu) navs.forEach(function (a) { a.href = lu.getAttribute('data-list-url'); });
         [].slice.call(document.querySelectorAll('.post-nav-top')).forEach(function (b) {
           b.addEventListener('click', function () {
             try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }

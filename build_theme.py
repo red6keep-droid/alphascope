@@ -651,12 +651,14 @@ __DASHBOARD__
                     <b:include data='post' name='post'/>
                   </article>
                   <p class='post-nav'>
-                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 아니면 데일리 리포트 목록.
+                    <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 고정 페이지는 홈으로(종목 상세는 테마 JS 가 온 곳 따라 목록으로 · 홈으로, 2026-10-29 P94), 아니면 데일리 리포트 목록.
                       오른쪽 끝 TOP 은 맨 위로 (2026-10-13 사용자). 이전 글 · 다음 글은 같은 날 삭제.</b:comment>
                     <b:if cond='data:post.labels any (l =&gt; l.name == &quot;__TRUMP_LABEL__&quot;)'>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__TRUMP_LIST_PATH__&quot;'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;__NVDA_LABEL__&quot;)'/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__NVDA_LIST_PATH__&quot;'>목록</a>
+                    <b:elseif cond='data:view.isPage'/>
+                      <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
                     <b:else/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__LIST_PATH__&quot;'>목록</a>
                     </b:if>

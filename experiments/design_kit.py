@@ -164,6 +164,8 @@ def _chunk_dir(plain):
     m = _DIR_WORD.search(plain.strip())
     if m:
         dirs.add("+" if m.group(1) == "상승" else "-")
+    if plain.rstrip().endswith(("순매수", "순매도")):   # `9,778억 순매도` — 부호 대신 말로 적은 수급 값 (2026-10-29 사용자, 한국 증시 리포트 M42)
+        dirs.add("+" if plain.rstrip().endswith("순매수") else "-")
     return dirs.pop() if len(dirs) == 1 else None
 
 
@@ -381,7 +383,8 @@ def legend_top(chart_html, legend_html):
         rest = "".join(c for c in items if c not in cmp_)
         tail = (f'<span style="flex:1 1 auto;display:flex;justify-content:space-between;align-items:center;column-gap:12px;">{cmp_[0]}{hint}</span>'
                 if cmp_ else hint)
-        body = rest + tail
+        # 비교 대상 · 넘겨 보기가 없으면 바깥 space-between 이 칩들을 줄 전체에 벌려 놓는다(시가 갭 · 장중 · 하루) → 칩 묶음은 왼쪽에 모아 둔다 (2026-10-29 사용자 M57)
+        body = (f'<span style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;">{rest}</span>' if rest else "") + tail
     else:
         body = f'<span style="text-align:left;">{chips}</span>{hint}'
     top = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;'

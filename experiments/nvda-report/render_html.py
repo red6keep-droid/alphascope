@@ -722,18 +722,23 @@ def picks_card(name, ps, close, money, days=PICK_DAYS):
         return ""
     state = " · ".join(k for k in PICK_ORDER if any(p["action"] == k for p in ps))
     theme, col = pick_theme(state)
-    lines = [(f"{name}에 대한 {picks_sentence(ps)} 나왔다.", "plain"), (picks_rows(ps, close, money), "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에
+    lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 나왔다.", "rich"), (picks_rows(ps, close, money), "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에
     tip = (f"방송(유튜브 경제 채널) 요약에서 이 종목에 대한 매수 · 보유 · 관망 · 매도 의견을 모은 것. 최근 {days}일, 같은 영상 · 같은 사람은 한 번\n"
            f"· 지금 : {picks_count(ps)}\n· 읽는 법 : 누가 어떤 이유로 말했는지 보는 칸이다. 의견의 적중률은 검증하지 않았고, 이 블로그의 추천이 아니다")
     return _state_card("방송에서 나온 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True)
 
 
-def picks_sentence(ps):
-    """`매수 의견이 2건` (한 가지) · `매수 의견 2건 · 보유 의견 1건이` (여럿) — 뒤에 `나왔다` (2026-10-29 사용자 P92: "삼성전자에 대한 매수 의견이 1건 나왔습니다")."""
+def picks_sentence(ps, rich=False):
+    """`매수 의견이 2건` (한 가지) · `매수 의견 2건 · 보유 의견 1건이` (여럿) — 뒤에 `나왔다` (2026-10-29 사용자 P92: "삼성전자에 대한 매수 의견이 1건 나왔습니다").
+    rich=True 는 HTML — `매수 의견` 굵게 · 답 색(매수 빨강 · 매도 파랑 · 그 밖 검정), 건수 굵게 (같은 날 사용자 P95)."""
     ks = [k for k in PICK_ORDER if any(p["action"] == k for p in ps)]
+    if not rich:
+        return f"{ks[0]} 의견이 {len(ps)}건" if len(ks) == 1 else picks_count(ps) + "이"
+    kind = lambda k: f'<b style="font-weight:700;color:{PICK_THEME.get(k, ("", "#111"))[1]};">{k} 의견</b>'
+    num = lambda n: f'<b style="font-weight:700;">{n}건</b>'
     if len(ks) == 1:
-        return f"{ks[0]} 의견이 {len(ps)}건"
-    return picks_count(ps) + "이"
+        return f"{kind(ks[0])}이 {num(len(ps))}"
+    return " · ".join(f"{kind(k)} {num(sum(1 for p in ps if p['action'] == k))}" for k in ks) + "이"
 
 
 def picks_count(ps):
@@ -745,24 +750,31 @@ PICK_LINE = "border-top:1px solid rgba(15,23,42,.10);"   # 강조 카드 색 위
 
 
 def picks_rows(ps, close, money):
-    """방송 의견 줄 — 의견별 제목(`매수 의견`) 아래 줄마다 말한 사람(소속) 굵게 / 이유 / 작은 글씨 채널 · 게시 시각 · (목표가) · 영상에서 보기.
-    흰 카드 · 라벨 뱃지 없이 구분선만 (2026-10-29 사용자 P92)."""
-    out = ""
-    for k in PICK_ORDER:
+    """방송 의견 줄 — 줄마다 말한 사람 굵게(소속 괄호는 보통) / 이유 / 작은 글씨 채널 · 게시 시각 · (목표가) · 영상에서 보기.
+    흰 카드 · 라벨 뱃지 없이 구분선만 (2026-10-29 사용자 P92). 의견별 굵은 제목(`매수 의견`)은 뺐다 — 위 문장이 말한다 (같은 날 P95).
+    의견이 여러 종류일 때만 묶음 머리에 보통 굵기 회색 작은 제목을 둔다(어느 의견인지 줄만으로는 안 보여서).
+    간격은 뉴스 기사(design_kit.news_item)와 같다: 이름 줄 행간 34 · 이유 위 4 · 작은 줄 위 8 · 줄 위아래 20(첫 줄 위 2) — 글자 크기는 그대로 (P95)."""
+    ks = [k for k in PICK_ORDER if any(p["action"] == k for p in ps)]
+    out, first = "", True
+    for k in ks:
         grp = [p for p in ps if p["action"] == k][:6]
-        if not grp:
-            continue
-        out += f'<span style="display:block;{PICK_LINE if out else ""}padding:{12 if out else 4}px 0 6px;font-weight:700;color:#111;">{k} 의견</span>'
+        if len(ks) > 1:
+            out += f'<span style="display:block;{"" if first else PICK_LINE}padding:{2 if first else 20}px 0 0;font-size:{TINY};line-height:20px;color:{NOTE};">{k} 의견</span>'
         for p in grp:
-            who = re.sub(r"\s+\(", "(", p["speaker"] or p["channel"]) + ("" if p["own"] else " 보고서")   # `톰 리 (펀드스트랫)` → `톰 리(펀드스트랫)`
+            who = re.sub(r"\s+\(", "(", p["speaker"] or p["channel"])   # `톰 리 (펀드스트랫)` → `톰 리(펀드스트랫)`
+            nm, par, org = who.partition("(")
+            who_html = _esc(nm) + (f'<span style="font-weight:400;">({_esc(org)}</span>' if par else "") + ("" if p["own"] else '<span style="font-weight:400;"> 보고서</span>')
             tgt = _pick_target(p, close, money)
             meta = f"{p['channel']} · {_pick_when(p['published_at'])}" + (f" · {tgt}" if tgt else "")
             if p["url"]:
                 meta += f' · <a href="{_esc(p["url"])}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">영상에서 보기</a>'
-            out += (f'<span style="display:block;{PICK_LINE}padding:10px 0;line-height:{LH_CARD};">'
-                    f'<span style="display:block;color:#111;font-weight:700;">{_esc(who)}</span>'
-                    + (f'<span style="display:block;margin-top:2px;color:#111;font-weight:400;word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")
-                    + f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
+            top = 2 if first and len(ks) == 1 else (8 if len(ks) > 1 and p is grp[0] else 20)
+            line = "" if (first or p is grp[0] and len(ks) > 1) else PICK_LINE
+            out += (f'<span style="display:block;{line}padding:{top}px 0 20px;">'
+                    f'<span style="display:block;color:#111;font-weight:700;line-height:34px;">{who_html}</span>'
+                    + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;line-height:{LH_CARD};word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")
+                    + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
+            first = False
     return f'<span data-picks="1" style="display:block;">{out}</span>'
 
 
@@ -1093,6 +1105,8 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
                     f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{_esc(name)}</span>{nt}</span><span style="flex:none;text-align:right;font-weight:700;word-break:keep-all;">{vhtml.replace(chr(10), "<br>")}</span></span></li>')
         if kind == "html":   # 그래프 · 자세한 지표 보기 같은 HTML 조각 (실적과 기대 탭, 2026-10-18)
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
+        if kind == "rich":   # plain 과 같은 줄인데 글 안에 굵게 · 색 HTML 이 들어 있다 (방송 의견 문장, 2026-10-29 사용자 P95)
+            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{text}</li>'
         if kind == "plain":   # 쉬운 말 한 줄 — 점 없이 굵게, 아래 8px (2026-10-16 사용자: 강조 카드 펼침 맨 위에 쉬운 설명)
             return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{_plain_note(text)}</li>'   # 범위 숫자는 물결 뒤에서만 줄바꿈 (P60) · 늘 같은 안내는 끝에 작은 글씨 (P67)   # 상세 설명 2~3문장이라 보통 굵기 (2026-10-17)
         col = NOTE if kind == "note" else "#111"
@@ -1676,6 +1690,19 @@ def _card_title(t, tip=""):
     data-sub 를 붙이지 않는다 — 테마 탭이 서브탭으로 읽는 표시라 오늘 탭에 서브탭이 생길 수 있다."""
     return (f'<div style="font-size:{_dk.EMPH_NAME};line-height:{LH_CARD};font-weight:700;color:#111;margin:25px 0 8px;">'
             f'{_paren(_esc(t))}{_tipx(tip) if tip else ""}</div>')
+
+
+SORT_BTN = ('<button type="button" class="sort-toggle" data-sort-for="{key}" data-state="" aria-label="정렬" hidden="hidden">'
+            '<span class="sort-in"><svg class="sort-tri" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1.5 9.5 8.5H.5z"/></svg>'
+            '<span class="sort-txt">상승순</span></span></button>')   # 홈 H12 버튼과 같은 마크업 — 테마 JS(data-sort-for)가 보이게 하고 정렬한다. JS 가 없으면 숨은 채
+
+
+def title_with_sort(title, tip, key):
+    """카드 제목 줄 + 오른쪽 정렬 버튼 — 한국 증시 리포트 M3 에서 옮김, 한국 · 미국 시총 목록 `시가총액 순위` 도 (2026-10-29 사용자 P93).
+    버튼은 순환: 회색(처음 순서) → 상승순 → 하락순 → 회색 … (테마 JS). 목록은 [data-sort-list=key] 아래 [data-ret] 줄."""
+    t = _card_title(title, tip)
+    t = t.replace('<div style="', '<div style="display:flex;align-items:center;gap:8px;', 1)
+    return t[:-len("</div>")] + SORT_BTN.format(key=key) + "</div>"
 
 
 def _sub_label(t, tip=""):
