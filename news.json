@@ -1,6 +1,30 @@
 {
-  "updated_at": "2026-10-29 02:46:17 UTC",
+  "updated_at": "2026-10-29 04:46:26 UTC",
   "items": [
+    {
+      "title": "Over 41,000 U.S. Homeland Security officials' details apparently exposed after massive data breach",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/dhs-data-breach-ice-cdp-deportations.html",
+      "published": "2026-10-29 04:29:32",
+      "title_ko": "미국 국토안보부 직원 4만 1천여 명 정보 대규모 데이터 유출로 노출",
+      "summary_ko": "CNBC, 웹사이트 데이터베이스 접근해 이름 · 직책 · 기관 확인"
+    },
+    {
+      "title": "Trump methane policy rollback may have minimal impact on crude prices, EPA says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/trump-methane-rollback-oil-prices-epa.html",
+      "published": "2026-10-29 04:00:51",
+      "title_ko": "트럼프 메탄 정책 철회, 원유 가격에 미미한 영향 미칠 듯",
+      "summary_ko": "EPA, 국내 원유 생산량 0.09% 증가 전망"
+    },
+    {
+      "title": "Samsung Electronics shares slid despite record profit in the third-quarter",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/samsung-electronics-third-quarter-earnings.html",
+      "published": "2026-10-29 02:49:39",
+      "title_ko": "삼성전자 3분기 이익, AI 메모리 칩 수요 증가 속 추정치와 일치",
+      "summary_ko": "AI 메모리 칩 수요 증가"
+    },
     {
       "title": "China’s tech darlings are losing their shine. Here’s what’s behind the sell-off",
       "source": "CNBC",
@@ -8,14 +32,6 @@
       "published": "2026-10-29 02:14:14",
       "title_ko": "중국 기술 기업, 빛을 잃다 매도 배경은",
       "summary_ko": "투자자, AI 수익 정당성 의문 제기"
-    },
-    {
-      "title": "Samsung Electronics shares slid despite record profit in the third-quarter",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/samsung-electronics-third-quarter-earnings.html",
-      "published": "2026-10-29 02:06:04",
-      "title_ko": "삼성전자 3분기 이익, AI 메모리 칩 수요 증가 속 추정치와 일치",
-      "summary_ko": "AI 메모리 칩 수요 증가"
     },
     {
       "title": "Microsoft’s strong quarter backs up its stock rebound. Here's our new price target",
@@ -42,20 +58,20 @@
       "summary_ko": "미국·이스라엘·러시아 방산업체 기회 확대"
     },
     {
+      "title": "As Waymo expands overseas, it remains a niche cash-burning business",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/as-waymo-expands-overseas-it-remains-a-niche-cash-burning-business.html",
+      "published": "2026-10-28 23:53:58",
+      "title_ko": "웨이모 해외 확장에도 틈새 현금 소진 사업 유지",
+      "summary_ko": "알파벳, 기타 베팅 부문 분기 총매출 0.3% 차지"
+    },
+    {
       "title": "One passport isn’t enough for some wealthy Chinese. Here’s where they’re looking next",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/29/where-chinas-wealthy-are-turning-for-second-passports.html",
       "published": "2026-10-28 23:38:00",
       "title_ko": "부유한 중국인, 하나의 여권으로는 부족…다음 목표는?",
       "summary_ko": "시민권 포기"
-    },
-    {
-      "title": "The 'Magnificent Seven' is no more. Time to pick winners and losers as group's correlation breaks down",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/magnificent-seven-stocks-correlation-breakdown.html",
-      "published": "2026-10-28 23:24:37",
-      "title_ko": "‘매그니피센트 세븐’ 해체, 상관관계 붕괴로 승자·패자 구분 시점",
-      "summary_ko": "60일 롤링 상관계수 계산"
     },
     {
       "title": "연준 FOMC 금리 동결",
@@ -68,22 +84,6 @@
       "tag": "금리",
       "direction": "neutral",
       "n_channels": 5
-    },
-    {
-      "title": "DoorDash's deal to buy Instacart coming as early as Thursday morning, sources tell CNBC",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/doordash-instacart-maplebear.html",
-      "published": "2026-10-28 23:17:17",
-      "title_ko": "도어대시, 인스타카트 인수 협상 목요일 오전 발표 전망",
-      "summary_ko": "인스타카트 기업가치 약 170억 달러로 평가 보도"
-    },
-    {
-      "title": "Hands-on with Apple's first touchscreen laptop: Touch is totally optional",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/apple-touchscreen-macbook-pro-hands-on.html",
-      "published": "2026-10-28 22:38:41",
-      "title_ko": "애플, 첫 터치스크린 노트북 직접 체험: 터치는 선택 사항",
-      "summary_ko": "버튼 클릭 시 터치 가능"
     },
     {
       "title": "중동 정세 불안에 따른 유가 상승",
