@@ -1,6 +1,22 @@
 {
-  "updated_at": "2026-10-29 04:46:26 UTC",
+  "updated_at": "2026-10-29 06:46:18 UTC",
   "items": [
+    {
+      "title": "Microsoft stock jumps 4% as cloud growth drives earnings and revenue beat",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/microsoft-msft-q1-earnings-report-2027.html",
+      "published": "2026-10-29 06:03:35",
+      "title_ko": "마이크로소프트 실적, 장 마감 후 발표 예정",
+      "summary_ko": "마이크로소프트, AI 인프라 확충에 대규모 지출하며 애저 매출 달러 기준 최초 보고"
+    },
+    {
+      "title": "Billionaire Ambani cries tears of joy as Jio Platforms becomes the second most valued Indian firm",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/ambani-billionaire-jio-ipo-india.html",
+      "published": "2026-10-29 04:55:17",
+      "title_ko": "무케시 앰바니, 지오 플랫폼 인도 2위 기업 등극에 기쁨의 눈물",
+      "summary_ko": "무케시 앰바니, 상장 앞두고 자녀와 함께 50년 투자 가치 창출 약속"
+    },
     {
       "title": "Over 41,000 U.S. Homeland Security officials' details apparently exposed after massive data breach",
       "source": "CNBC",
@@ -58,22 +74,6 @@
       "summary_ko": "미국·이스라엘·러시아 방산업체 기회 확대"
     },
     {
-      "title": "As Waymo expands overseas, it remains a niche cash-burning business",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/as-waymo-expands-overseas-it-remains-a-niche-cash-burning-business.html",
-      "published": "2026-10-28 23:53:58",
-      "title_ko": "웨이모 해외 확장에도 틈새 현금 소진 사업 유지",
-      "summary_ko": "알파벳, 기타 베팅 부문 분기 총매출 0.3% 차지"
-    },
-    {
-      "title": "One passport isn’t enough for some wealthy Chinese. Here’s where they’re looking next",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/where-chinas-wealthy-are-turning-for-second-passports.html",
-      "published": "2026-10-28 23:38:00",
-      "title_ko": "부유한 중국인, 하나의 여권으로는 부족…다음 목표는?",
-      "summary_ko": "시민권 포기"
-    },
-    {
       "title": "연준 FOMC 금리 동결",
       "title_ko": "연준 FOMC 금리 동결",
       "summary_ko": "연준이 금리를 동결하고 비둘기파적 발언을 내놓았으나, 강한 경제 성장과 높은 물가 속에서 2% 물가 목표의 정당성에 대한 의문이 제기",
@@ -98,15 +98,15 @@
       "n_channels": 2
     },
     {
-      "title": "반도체 및 AI 인프라 수요",
-      "title_ko": "반도체 및 AI 인프라 수요",
-      "summary_ko": "SK하이닉스 등 메모리 반도체의 실적 호조와 AI 인프라 수요가 이어졌",
-      "source": "당잠사",
-      "link": "https://www.youtube.com/watch?v=6TeOB8Kiv20",
-      "published": "2026-10-28 21:14:17",
+      "title": "이란 관련 군사 행동 가능성",
+      "title_ko": "이란 관련 군사 행동 가능성",
+      "summary_ko": "트럼프 대통령이 이란의 핵 시설 및 미사일 기지에 대해 강경한 조치를 취할 가능성이 제기됨",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=hhsi7M65oA0",
+      "published": "2026-10-28 20:15:20",
       "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "positive",
+      "tag": "지정학",
+      "direction": "negative",
       "n_channels": 2
     }
   ]
