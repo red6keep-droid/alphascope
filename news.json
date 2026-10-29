@@ -1,6 +1,62 @@
 {
-  "updated_at": "2026-10-28 22:46:22 UTC",
+  "updated_at": "2026-10-29 00:47:26 UTC",
   "items": [
+    {
+      "title": "Microsoft’s strong quarter backs up its stock rebound. Here's our new price target",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/10/28/microsofts-quarter-validates-stock-rebound-heres-our-new-price-target.html",
+      "published": "2026-10-29 00:32:02",
+      "title_ko": "마이크로소프트, 강력한 분기 실적으로 주가 반등",
+      "summary_ko": "주가 사후시간 3% 상승"
+    },
+    {
+      "title": "CoreWeave and other neocloud stocks drop after Microsoft capex comes in below expectations",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/neocloud-stocks-drop-after-microsoft-revises-capex-down.html",
+      "published": "2026-10-29 00:16:39",
+      "title_ko": "마이크로소프트, 기대 이하 캡엑스로 네오클라우드 주식 하락",
+      "summary_ko": ""
+    },
+    {
+      "title": "Inside India newsletter: New Delhi approves $22 billion in military spending amid China border tensions",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/india-china-us-israel-military-spending.html",
+      "published": "2026-10-29 00:11:14",
+      "title_ko": "인도, 중국 국경 긴장 속 220억 달러 군비 확대 승인",
+      "summary_ko": "미국·이스라엘·러시아 방산업체 기회 확대"
+    },
+    {
+      "title": "One passport isn’t enough for some wealthy Chinese. Here’s where they’re looking next",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/where-chinas-wealthy-are-turning-for-second-passports.html",
+      "published": "2026-10-28 23:38:00",
+      "title_ko": "부유한 중국인, 하나의 여권으로는 부족…다음 목표는?",
+      "summary_ko": "시민권 포기"
+    },
+    {
+      "title": "The 'Magnificent Seven' is no more. Time to pick winners and losers as group's correlation breaks down",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/magnificent-seven-stocks-correlation-breakdown.html",
+      "published": "2026-10-28 23:24:37",
+      "title_ko": "‘매그니피센트 세븐’ 해체, 상관관계 붕괴로 승자·패자 구분 시점",
+      "summary_ko": "60일 롤링 상관계수 계산"
+    },
+    {
+      "title": "DoorDash's deal to buy Instacart coming as early as Thursday morning, sources tell CNBC",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/doordash-instacart-maplebear.html",
+      "published": "2026-10-28 23:17:17",
+      "title_ko": "도어대시, 인스타카트 인수 협상 목요일 오전 발표 전망",
+      "summary_ko": "인스타카트 기업가치 약 170억 달러로 평가 보도"
+    },
+    {
+      "title": "Hands-on with Apple's first touchscreen laptop: Touch is totally optional",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/28/apple-touchscreen-macbook-pro-hands-on.html",
+      "published": "2026-10-28 22:38:41",
+      "title_ko": "애플, 첫 터치스크린 노트북 직접 체험: 터치는 선택 사항",
+      "summary_ko": "버튼 클릭 시 터치 가능"
+    },
     {
       "title": "Microsoft stock jumps 4% as cloud growth drives earnings and revenue beat",
       "source": "CNBC",
@@ -18,46 +74,6 @@
       "summary_ko": "3분기 매출 및 순이익 모두 월가 예상 상회"
     },
     {
-      "title": "Chipotle shares rise 7% after CEO says same-store sales growth will continue",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/chipotle-mexican-grill-cmg-q3-2026-earnings.html",
-      "published": "2026-10-28 22:12:28",
-      "title_ko": "치폴레 주가 7% 상승, CEO 동일점포 매출 성장 지속 전망",
-      "summary_ko": "CEO 스콧 보이트라이트, 저소득 소비자 매출 고소득층 상회 첫 기록"
-    },
-    {
-      "title": "Alphabet sinks 10% as it holds 2026 capex unchanged, expects significant increase in 2027",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/alphabet-googl-earnings-q3-2026.html",
-      "published": "2026-10-28 22:07:17",
-      "title_ko": "알파벳, 불안한 AI 거래 속 실적 발표 앞두고",
-      "summary_ko": "월가, 알파벳 실적에 회의적"
-    },
-    {
-      "title": "Apple brings touch to the Mac, reversing years-old stance on touchscreen laptop",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/apple-mac-touchscreen-launch.html",
-      "published": "2026-10-28 22:04:19",
-      "title_ko": "애플, 터치스크린 노트북 출시하며 기존 기조 변경",
-      "summary_ko": ""
-    },
-    {
-      "title": "Nvidia's $12.9 billion Hugging Face deal draws DOJ scrutiny",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/doj-questions-nvidias-12point9-billion-hugging-face-deal.html",
-      "published": "2026-10-28 21:58:51",
-      "title_ko": "엔비디아 129억 달러 휴매인페이스 인수, DOJ 조사 대상",
-      "summary_ko": "엔비디아, 129억 달러 휴매인페이스 인수 건 관련 DOJ 조사"
-    },
-    {
-      "title": "DoorDash's deal to buy Instacart coming as early as Thursday morning, sources tell CNBC",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/doordash-instacart-maplebear.html",
-      "published": "2026-10-28 21:47:47",
-      "title_ko": "도어대시, 인스타카트 인수 협상 목요일 오전 발표 전망",
-      "summary_ko": "인스타카트 기업가치 약 170억 달러로 평가 보도"
-    },
-    {
       "title": "연준 금리 동결과 통화정책",
       "title_ko": "연준 금리 동결과 통화정책",
       "summary_ko": "연준의 금리 동결 속에서 고금리가 실물 경제의 일부 부문에 부담을 주고 있음",
@@ -70,44 +86,28 @@
       "n_channels": 3
     },
     {
-      "title": "Ford reports mixed third-quarter results, says 2027 earnings will be in line with this year",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/ford-motor-f-earnings-q3-2026.html",
-      "published": "2026-10-28 21:42:24",
-      "title_ko": "포드, 종가 후 실적 발표 예정. 월스트리트 기대치는?",
-      "summary_ko": "포드, 수요일 장 마감 후 3분기 실적 발표"
-    },
-    {
-      "title": "Here are five key takeaways from the Fed rate decision and Warsh news conference",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/fed-rate-decision-warsh-takeaways.html",
-      "published": "2026-10-28 21:31:46",
-      "title_ko": "연준 금리 결정과 워시 기자회견의 5가지 핵심",
-      "summary_ko": "금리 투표는 예상대로 진행, 이번 주 FOMC 회의서 몇 가지 예상 밖 결과"
-    },
-    {
-      "title": "이란 관련 군사 행동 가능성",
-      "title_ko": "이란 관련 군사 행동 가능성",
-      "summary_ko": "트럼프 대통령이 이란의 핵 시설 및 미사일 기지에 대해 강경한 조치를 취할 가능성이 제기됨",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=hhsi7M65oA0",
-      "published": "2026-10-28 20:15:20",
+      "title": "중동 정세 불안에 따른 유가 상승",
+      "title_ko": "중동 정세 불안에 따른 유가 상승",
+      "summary_ko": "중동 지역 군사 충돌 우려로 국제유가가 상승세를 보임",
+      "source": "당잠사",
+      "link": "https://www.youtube.com/watch?v=6TeOB8Kiv20",
+      "published": "2026-10-28 21:14:17",
       "kind": "media",
-      "tag": "지정학",
+      "tag": "에너지",
       "direction": "neutral",
       "n_channels": 2
     },
     {
-      "title": "이스라엘 총선 결과와 향후 정국",
-      "title_ko": "이스라엘 총선 결과와 향후 정국",
-      "summary_ko": "이스라엘 총선에서 어느 블록도 과반을 차지하지 못해 정부 구성에 난항을 겪고 있음",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=YYkZdvfi5rk",
-      "published": "2026-10-28 12:12:52",
+      "title": "반도체 및 AI 인프라 수요",
+      "title_ko": "반도체 및 AI 인프라 수요",
+      "summary_ko": "SK하이닉스 등 메모리 반도체의 실적 호조와 AI 인프라 수요가 이어졌",
+      "source": "당잠사",
+      "link": "https://www.youtube.com/watch?v=6TeOB8Kiv20",
+      "published": "2026-10-28 21:14:17",
       "kind": "media",
-      "tag": "지정학",
-      "direction": "neutral",
-      "n_channels": 3
+      "tag": "AI/반도체",
+      "direction": "positive",
+      "n_channels": 2
     }
   ]
 }
