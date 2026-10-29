@@ -1,6 +1,38 @@
 {
-  "updated_at": "2026-10-29 06:46:18 UTC",
+  "updated_at": "2026-10-29 08:47:27 UTC",
   "items": [
+    {
+      "title": "Shell nearly doubles quarterly profit year-on-year as refining margins soar to record high",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/shell-earnings-oil-q3.html",
+      "published": "2026-10-29 08:00:15",
+      "title_ko": "쉘, 분기 순이익 전년 대비 거의 두 배, 정유 마진 사상 최고치",
+      "summary_ko": ""
+    },
+    {
+      "title": "Hegseth reportedly fires U.S. top military planner as Trump downplays Iran peace talks",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/us-iran-war-trump-hormuz.html",
+      "published": "2026-10-29 07:35:45",
+      "title_ko": "헤그세스, 트럼프 이란 평화협상 축소 언급 속 미군 최고 전략기획관 해임 보도",
+      "summary_ko": "트럼프, 이란 평화협상 축소 언급"
+    },
+    {
+      "title": "Tencent, Visa deepen payments push in China after regulatory green light",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/tencent-visa-citi-mastercard-.html",
+      "published": "2026-10-29 07:01:50",
+      "title_ko": "중국 규제 승인 후 텐센트·비자, 결제 협력 강화",
+      "summary_ko": "중국 내 외국 금융회사 규제 승인 이후 조치"
+    },
+    {
+      "title": "Samsung Electronics shares slid despite record profit in the third-quarter",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/samsung-electronics-third-quarter-earnings.html",
+      "published": "2026-10-29 06:53:19",
+      "title_ko": "삼성전자 3분기 이익, AI 메모리 칩 수요 증가 속 추정치와 일치",
+      "summary_ko": "AI 메모리 칩 수요 증가"
+    },
     {
       "title": "Microsoft stock jumps 4% as cloud growth drives earnings and revenue beat",
       "source": "CNBC",
@@ -34,44 +66,12 @@
       "summary_ko": "EPA, 국내 원유 생산량 0.09% 증가 전망"
     },
     {
-      "title": "Samsung Electronics shares slid despite record profit in the third-quarter",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/samsung-electronics-third-quarter-earnings.html",
-      "published": "2026-10-29 02:49:39",
-      "title_ko": "삼성전자 3분기 이익, AI 메모리 칩 수요 증가 속 추정치와 일치",
-      "summary_ko": "AI 메모리 칩 수요 증가"
-    },
-    {
       "title": "China’s tech darlings are losing their shine. Here’s what’s behind the sell-off",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/29/china-tech-stocks-selloff.html",
       "published": "2026-10-29 02:14:14",
       "title_ko": "중국 기술 기업, 빛을 잃다 매도 배경은",
       "summary_ko": "투자자, AI 수익 정당성 의문 제기"
-    },
-    {
-      "title": "Microsoft’s strong quarter backs up its stock rebound. Here's our new price target",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/28/microsofts-quarter-validates-stock-rebound-heres-our-new-price-target.html",
-      "published": "2026-10-29 00:32:02",
-      "title_ko": "마이크로소프트, 강력한 분기 실적으로 주가 반등",
-      "summary_ko": "주가 사후시간 3% 상승"
-    },
-    {
-      "title": "CoreWeave and other neocloud stocks drop after Microsoft capex comes in below expectations",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/neocloud-stocks-drop-after-microsoft-revises-capex-down.html",
-      "published": "2026-10-29 00:16:39",
-      "title_ko": "마이크로소프트, 기대 이하 캡엑스로 네오클라우드 주식 하락",
-      "summary_ko": ""
-    },
-    {
-      "title": "Inside India newsletter: New Delhi approves $22 billion in military spending amid China border tensions",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/india-china-us-israel-military-spending.html",
-      "published": "2026-10-29 00:11:14",
-      "title_ko": "인도, 중국 국경 긴장 속 220억 달러 군비 확대 승인",
-      "summary_ko": "미국·이스라엘·러시아 방산업체 기회 확대"
     },
     {
       "title": "연준 FOMC 금리 동결",
