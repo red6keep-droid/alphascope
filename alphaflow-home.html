@@ -774,8 +774,8 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .home-cards .sector-card .fold-btn { border-radius: 0; padding-top: 13px; }   /* 더 보기 위 +5 (2026-10-15 사용자) */
 .home-cards .briefing, .home-cards .briefing-body, .home-cards .briefing-main { gap: var(--card-gap); }   /* 리포트 카드 묶음 안쪽도 카드 사이 = 좌우 여백 (2026-10-24 사용자). 옛 20 */
 /* 미국 증시 리포트 카드 내용은 글머리표 없이 (2026-10-15 사용자) */
-#report-card .report-columns li { gap: 0; }
-#report-card .report-columns li::before { content: none; }
+#report-card .report-columns li, #kr-report-card .report-columns li { gap: 0; }
+#report-card .report-columns li::before, #kr-report-card .report-columns li::before { content: none; }   /* 한국 증시 카드도 같게 (H24) */
 /* 첫 탭(거래상위)은 왼쪽 여백 없이 구분선 시작점에서 (2026-10-15 사용자) */
 .home-cards .rank-card .tab:first-child { padding-left: 0; }   /* 제목이 카드 안으로 들어가 쌓일 때 위 여백 +15 는 필요 없음 */
 /* 카드 순서: 리포트 → 시총 TOP 10 (주요 지수 · 섹터 현황은 2026-10-20 삭제). PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭 (2026-10-15 사용자) */
@@ -1016,6 +1016,19 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
           <!-- 요약은 한 줄만 — 자세한 것은 글에서 (2026-10-20 사용자: "너무 길다"). 핵심 인사이트 구획은 삭제 -->
           <div class="report-block" data-hook="summary">
             <!-- 첫 구획 라벨은 두지 않는다 (2026-10-13 사용자) -->
+            <div class="report-columns">
+              <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
+            </div>
+          </div>
+        </a>
+        </div>
+
+        <!-- 한국 증시 리포트 카드 — 미국 증시 카드와 같은 모양, 코스피 봉차트 복제 + 요약 한 줄 (2026-10-29 사용자, 홈 수정 H24). 글이 없으면 라벨 목록으로 -->
+        <div class="report-col">
+        <h3 class="report-title"><span class="report-icon" style="background:#1D4ED8;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="5" width="3" height="9" rx=".5"/><rect x="11" y="2" width="3" height="12" rx=".5"/></svg></span>한국 증시<span class="report-card-date" data-date="kr-report-card"></span></h3>
+        <a class="report-card" id="kr-report-card" href="/search/label/한국%20증시%20리포트">
+          <img class="report-chart" data-hook="kr-report-chart" data-zoom="1" alt="" hidden="hidden"/>
+          <div class="report-block" data-hook="summary">
             <div class="report-columns">
               <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
             </div>
@@ -1859,6 +1872,15 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       map: { summary: ['(머리)', '오늘 한 줄'] },   /* 주요 지수 수치는 홈에 싣지 않는다 — 한 줄 결론만 (2026-10-12 사용자: 요약 짧게) */   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용 */
       lines: { summary: 1 },   /* 머리 첫 줄(오늘 결론)만 — 핵심 인사이트 구획은 삭제 (2026-10-20 사용자: "너무 길다, 상세는 페이지에서") */
       picks: true,
+      empty: '아직 발행된 리포트가 없습니다.'
+    },
+    {
+      id: 'kr-report-card',
+      label: '한국 증시 리포트',   /* 홈 수정 H24 (2026-10-29 사용자) — 미국 카드와 같은 틀: 글 맨 위 코스피 봉차트 + 머리 첫 줄 */
+      chart: 'kr-report-chart',
+      map: { summary: ['(머리)'] },
+      lines: { summary: 1 },
+      picks: false,
       empty: '아직 발행된 리포트가 없습니다.'
     },
     {
