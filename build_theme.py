@@ -1329,12 +1329,14 @@ MOCK_PICKS = {
     "events": [],
 }
 # 미리보기 일정 배너: (시장, 며칠 뒤, 종목, 이름, slug, 발표 시점). 누르면 로컬 종목 목업(output/mock_*.html)의 캘린더 탭
-PREVIEW_EVENTS = [
+PREVIEW_EVENTS = [   # 배너 6장 — D-DAY · D-1 · D-3 · 4일 이상(회색 표시)이 모두 보이게 (2026-10-29)
     ("us", 0, "MSFT", "마이크로소프트", "microsoft-msft-stock", "amc"),
     ("us", 1, "AMZN", "아마존", "amazon-amzn-stock", "amc"),
+    ("us", 3, "XOM", "엑슨모빌", "exxon-mobil-xom-stock", "bmo"),
     ("us", 5, "AAPL", "애플", "apple-aapl-stock", "amc"),
     ("kr", 0, "005930", "삼성전자", "samsung-electronics-005930-stock", None),
     ("kr", 1, "005380", "현대차", "hyundai-motor-005380-stock", None),
+    ("kr", 3, "000270", "기아", "kia-000270-stock", None),
 ]
 
 
