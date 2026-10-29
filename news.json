@@ -1,11 +1,19 @@
 {
-  "updated_at": "2026-10-29 01:13:49 UTC",
+  "updated_at": "2026-10-29 02:46:17 UTC",
   "items": [
     {
-      "title": "Samsung Electronics third-quarter profit in line with estimates amid rising demand for AI memory chips",
+      "title": "China’s tech darlings are losing their shine. Here’s what’s behind the sell-off",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/china-tech-stocks-selloff.html",
+      "published": "2026-10-29 02:14:14",
+      "title_ko": "중국 기술 기업, 빛을 잃다 매도 배경은",
+      "summary_ko": "투자자, AI 수익 정당성 의문 제기"
+    },
+    {
+      "title": "Samsung Electronics shares slid despite record profit in the third-quarter",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/29/samsung-electronics-third-quarter-earnings.html",
-      "published": "2026-10-29 01:02:10",
+      "published": "2026-10-29 02:06:04",
       "title_ko": "삼성전자 3분기 이익, AI 메모리 칩 수요 증가 속 추정치와 일치",
       "summary_ko": "AI 메모리 칩 수요 증가"
     },
@@ -76,14 +84,6 @@
       "published": "2026-10-28 22:38:41",
       "title_ko": "애플, 첫 터치스크린 노트북 직접 체험: 터치는 선택 사항",
       "summary_ko": "버튼 클릭 시 터치 가능"
-    },
-    {
-      "title": "Microsoft stock jumps 4% as cloud growth drives earnings and revenue beat",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/microsoft-msft-q1-earnings-report-2027.html",
-      "published": "2026-10-28 22:34:56",
-      "title_ko": "마이크로소프트 실적, 장 마감 후 발표 예정",
-      "summary_ko": "마이크로소프트, AI 인프라 확충에 대규모 지출하며 애저 매출 달러 기준 최초 보고"
     },
     {
       "title": "중동 정세 불안에 따른 유가 상승",
