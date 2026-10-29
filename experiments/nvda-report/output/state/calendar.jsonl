@@ -433,9 +433,11 @@
 {"day": "2027-06-01", "kind": "EVENT", "label": "Computex 2027 (타이베이, 6월 초 추정)", "symbol": null, "source": "static", "confirmed": 0}
 {"day": "2026-10-15", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 0}
 {"day": "2026-10-21", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 0}
-{"day": "2026-11-17", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 0}
 {"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 0}
 {"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 0}
+{"day": "2026-11-17", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 0}
+{"day": "2027-01-27", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 0}
+{"day": "2027-02-03", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 0}
 {"day": "2026-10-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 0}
 {"day": "2027-01-27", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 0}
 {"day": "2026-12-14", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 0}
@@ -444,7 +446,7 @@
 {"day": "2026-12-09", "kind": "EARNINGS_PEER", "label": "AVGO 실적", "symbol": "AVGO", "source": "yfinance", "confirmed": 0}
 {"day": "2026-12-23", "kind": "EARNINGS_PEER", "label": "MU 실적", "symbol": "MU", "source": "yfinance", "confirmed": 0}
 {"day": "2026-11-03", "kind": "EARNINGS_PEER", "label": "SMCI 실적", "symbol": "SMCI", "source": "yfinance", "confirmed": 0}
-{"day": "2026-11-27", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 0}
+{"day": "2026-11-24", "kind": "EARNINGS_PEER", "label": "DELL 실적", "symbol": "DELL", "source": "yfinance", "confirmed": 0}
 {"day": "2026-11-19", "kind": "COURT", "label": "Hu v. NVIDIA · 본안 신청 심리", "symbol": null, "source": "courtlistener #39", "confirmed": 1}
 {"day": "2026-11-19", "kind": "COURT", "label": "Hu v. NVIDIA · 기각 신청 심리", "symbol": null, "source": "courtlistener #32", "confirmed": 1}
 {"day": "2027-05-20", "kind": "COURT", "label": "증권 집단소송 (In re NVIDIA) · 본안 신청 심리", "symbol": null, "source": "courtlistener #296", "confirmed": 1}
