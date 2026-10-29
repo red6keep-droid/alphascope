@@ -1,6 +1,14 @@
 {
-  "updated_at": "2026-10-29 00:47:26 UTC",
+  "updated_at": "2026-10-29 01:13:49 UTC",
   "items": [
+    {
+      "title": "Samsung Electronics third-quarter profit in line with estimates amid rising demand for AI memory chips",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/samsung-electronics-third-quarter-earnings.html",
+      "published": "2026-10-29 01:02:10",
+      "title_ko": "삼성전자 3분기 이익, AI 메모리 칩 수요 증가 속 추정치와 일치",
+      "summary_ko": "AI 메모리 칩 수요 증가"
+    },
     {
       "title": "Microsoft’s strong quarter backs up its stock rebound. Here's our new price target",
       "source": "CNBC",
@@ -42,6 +50,18 @@
       "summary_ko": "60일 롤링 상관계수 계산"
     },
     {
+      "title": "연준 FOMC 금리 동결",
+      "title_ko": "연준 FOMC 금리 동결",
+      "summary_ko": "연준이 금리를 동결하고 비둘기파적 발언을 내놓았으나, 강한 경제 성장과 높은 물가 속에서 2% 물가 목표의 정당성에 대한 의문이 제기",
+      "source": "증시각도기",
+      "link": "https://www.youtube.com/watch?v=VPLRqmgvgGI",
+      "published": "2026-10-28 23:20:14",
+      "kind": "media",
+      "tag": "금리",
+      "direction": "neutral",
+      "n_channels": 5
+    },
+    {
       "title": "DoorDash's deal to buy Instacart coming as early as Thursday morning, sources tell CNBC",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/28/doordash-instacart-maplebear.html",
@@ -64,26 +84,6 @@
       "published": "2026-10-28 22:34:56",
       "title_ko": "마이크로소프트 실적, 장 마감 후 발표 예정",
       "summary_ko": "마이크로소프트, AI 인프라 확충에 대규모 지출하며 애저 매출 달러 기준 최초 보고"
-    },
-    {
-      "title": "FedEx beats expectations, raises outlook in first report since calendar adjustment",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/28/fedex-fdx-sept-2026-earnings.html",
-      "published": "2026-10-28 22:27:00",
-      "title_ko": "페덱스, 예상 상회 및 전망 상향, 캘린더 조정 후 첫 실적",
-      "summary_ko": "3분기 매출 및 순이익 모두 월가 예상 상회"
-    },
-    {
-      "title": "연준 금리 동결과 통화정책",
-      "title_ko": "연준 금리 동결과 통화정책",
-      "summary_ko": "연준의 금리 동결 속에서 고금리가 실물 경제의 일부 부문에 부담을 주고 있음",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=eA9QPIJcmfA",
-      "published": "2026-10-28 21:45:17",
-      "kind": "media",
-      "tag": "금리",
-      "direction": "neutral",
-      "n_channels": 3
     },
     {
       "title": "중동 정세 불안에 따른 유가 상승",
