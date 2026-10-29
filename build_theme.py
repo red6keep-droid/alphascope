@@ -1325,7 +1325,24 @@ MOCK_PICKS = {
               {"group": "양자 컴퓨터", "syms": ["IONQ", "RGTI", "QBTS", "QUBT", "IBM"]}],
     "sectors": [{"sector": "반도체", "syms": ["NVDA", "AVGO", "TSM"]}, {"sector": "소프트웨어", "syms": ["MSFT"]}, {"sector": "기술", "syms": ["IBM", "ANET", "MSTR"]}, {"sector": "에너지", "syms": ["XOM", "CVX", "COP"]},
                 {"sector": "금융", "syms": ["JPM", "HOOD", "COIN"]}, {"sector": "헬스케어", "syms": ["JNJ"]}, {"sector": "방산", "syms": ["LMT"]}],
+    # 홈 일정 배너 (2026-10-28) — 날짜는 미리보기를 만든 날 기준으로 채운다 (preview_events). 지난 날은 홈 JS 가 거른다
+    "events": [],
 }
+# 미리보기 일정 배너: (시장, 며칠 뒤, 종목, 이름, slug, 발표 시점). 누르면 로컬 종목 목업(output/mock_*.html)의 캘린더 탭
+PREVIEW_EVENTS = [
+    ("us", 0, "MSFT", "마이크로소프트", "microsoft-msft-stock", "amc"),
+    ("us", 1, "AMZN", "아마존", "amazon-amzn-stock", "amc"),
+    ("us", 5, "AAPL", "애플", "apple-aapl-stock", "amc"),
+    ("kr", 0, "005930", "삼성전자", "samsung-electronics-005930-stock", None),
+    ("kr", 1, "005380", "현대차", "hyundai-motor-005380-stock", None),
+]
+
+
+def preview_events(market):
+    import datetime
+    today = (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9)).date()
+    return [{"kind": "earnings", "day": (today + datetime.timedelta(days=d)).isoformat(), "when": w, "s": sym, "name": name, "slug": slug}
+            for m, d, sym, name, slug, w in PREVIEW_EVENTS if m == market]
 # 홈 한국 탭 (2026-10-24) — kr.json 은 experiments/kr-stocks/home_feed_kr.py 가 만든다. 로컬 결과가 있으면 그것, 없으면 빈 값(탭을 누르면 "불러올 수 없습니다")
 SAVED_KR_HOME = "experiments/kr-stocks/output/home/kr.json"
 
@@ -1333,9 +1350,11 @@ SAVED_KR_HOME = "experiments/kr-stocks/output/home/kr.json"
 def preview_kr_home():
     try:
         with io.open(SAVED_KR_HOME, encoding="utf-8") as f:
-            return json.load(f)
+            kr = json.load(f)
     except (OSError, ValueError):
-        return {"day": None, "stocks": [], "watch": [], "sectors": [], "flows": []}
+        kr = {"day": None, "stocks": [], "watch": [], "sectors": [], "flows": []}
+    kr["events"] = preview_events("kr")   # 로컬에는 발행 페이지 목록이 없어 실제 events 가 비므로 미리보기 일정으로
+    return kr
 
 
 MOCK_THEMES = {"day": "2026-09-03", "themes": [
@@ -1657,6 +1676,11 @@ def preview_mock_js():
         "  var PV_THEMES = %s;\n"
         "  var PV_KR = %s;\n"
         "\n"
+        "  /* 일정 배너를 누르면 로컬 종목 목업의 캘린더 탭으로 (블로그에서는 고정 페이지 주소) */\n"
+        "  window.PV_EVENT_HREF = function (e, m) {\n"
+        "    return (m === 'kr' ? 'experiments/kr-stocks/output/mock_' : 'experiments/stock-radar/output/mock_') + e.s + '.html#tab-' + encodeURIComponent('캘린더');\n"
+        "  };\n"
+        "\n"
         "  /* 디자인만 확인하므로 실제 시세를 부르지 않는다. 피드는 라벨로 가른다. */\n"
         "  window.fetch = function (url) {\n"
         "    var u = String(url), body;\n"
@@ -1694,7 +1718,7 @@ def preview_mock_js():
             json.dumps(nvda_feed, ensure_ascii=False),
             json.dumps(radar_feed, ensure_ascii=False),
             json.dumps(media_feed, ensure_ascii=False),
-            json.dumps(MOCK_PICKS, ensure_ascii=False),
+            json.dumps(dict(MOCK_PICKS, events=preview_events("us")), ensure_ascii=False),
             json.dumps(MOCK_THEMES, ensure_ascii=False),
             json.dumps(preview_kr_home(), ensure_ascii=False),
             json.dumps([dict(c, photo=_avatar_data_uri(c["avatar"])) for c in PREVIEW_COMMENTS], ensure_ascii=False),

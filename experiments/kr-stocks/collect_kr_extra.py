@@ -74,6 +74,11 @@ def run():
                 out["revenue"]["series"][sym] = rows
     except Exception as e:  # noqa: BLE001 — DART 가 막혀도 Yahoo 매출로 간다
         print(f"[kr-extra] DART 실패 — Yahoo 매출로: {str(e)[:120]}")
+    try:   # 기업 정보 탭 — DART 기업개황 (2026-10-29 P84)
+        import collect_kr_dart
+        out["company"] = collect_kr_dart.company()
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr-extra] 기업개황 실패: {str(e)[:120]}")
     for us in sorted({u for v in U.PAIRS.values() for u in v[0]}):   # 미국과 연결 종목 실적일 (캘린더)
         try:
             out["pair_earnings"][us] = [{"day": x["day"]} for x in _earn_dates(yf.Ticker(us))]
@@ -91,9 +96,13 @@ def run():
 def load():
     try:
         with open(EXTRA, encoding="utf-8") as f:
-            return json.load(f)
+            out = json.load(f)
     except (OSError, ValueError):
-        return {}
+        out = {}
+    if not out.get("company"):   # 기업개황은 따로 캐시(dart_company.json) — --cached 그리기에서도 쓴다
+        import collect_kr_dart
+        out["company"] = (collect_kr_dart._load(collect_kr_dart.COMPANY) or {}).get("map") or {}
+    return out
 
 
 if __name__ == "__main__":

@@ -171,7 +171,7 @@ jobs:
         if: always()
         run: |
           mkdir -p state-out
-          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_corp.json report_posts.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
+          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_corp.json dart_company.json report_posts.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
             [ -f "$KR_DIR/data/$f" ] && cp "$KR_DIR/data/$f" state-out/ || true
           done
           [ -n "$(ls state-out 2>/dev/null)" ] || { echo "저장할 상태 없음"; exit 0; }

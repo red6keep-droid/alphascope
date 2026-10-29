@@ -679,6 +679,35 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   box-shadow: 0 0 0 100vmax #F3F4F6;   /* 화면 전체 폭으로 — 가로 스크롤 없이 */
   clip-path: inset(0 -100vmax);
 }
+/* 일정 배너 (2026-10-28 사용자) — 홈 카드와 같은 흰 카드. 한 장씩 옆으로 넘어가고(4초) 오른쪽 아래 점으로 고른다 */
+.event-banner { position: relative; overflow: hidden; background: var(--surface); border: 1px solid #f3f4f6; border-radius: 12px;
+  box-shadow: 0 10px 22.5px -5px rgba(0, 0, 0, .029), 0 8px 9px -6px rgba(0, 0, 0, .029); }
+.event-banner[hidden] { display: none; }
+.eb-viewport { overflow: hidden; }
+.eb-track { display: flex; transition: transform .45s ease; }
+.eb-slide { flex: 0 0 100%; min-width: 0; display: flex; align-items: center; gap: 14px; padding: 18px 26px 30px; color: inherit; text-decoration: none; }
+.eb-slide:hover .eb-title { text-decoration: underline; text-underline-offset: 3px; }
+.eb-dday { flex: none; min-width: 52px; padding: 0 10px; border-radius: 8px; background: #FEF2F2; color: var(--up); font-family: var(--num); font-size: 16px; font-weight: 700; line-height: 32px; text-align: center; white-space: nowrap; }
+.eb-dday.is-later { background: #F1F5F9; color: #475569; }
+.eb-slide .stock-avatar { flex: none; }
+.eb-text { display: flex; flex-direction: column; min-width: 0; }
+.eb-kicker { font-size: 14px; line-height: 20px; color: #6B7280; }
+.eb-title { font-size: 19px; font-weight: 700; line-height: 28px; color: #111; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eb-sub { font-size: 15px; line-height: 22px; color: #374151; }
+.eb-more { margin-left: auto; flex: none; font-size: 14px; line-height: 20px; color: #6B7280; white-space: nowrap; }
+.eb-dots { position: absolute; right: 14px; bottom: 6px; display: flex; gap: 2px; }
+.eb-dots[hidden] { display: none; }
+.eb-dot { width: 20px; height: 20px; padding: 0; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.eb-dot::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #D1D5DB; transition: background .2s; }
+.eb-dot[aria-selected="true"]::before { background: #111; }
+@media (max-width: 680px) {
+  .eb-slide { gap: 10px; padding: 14px 16px 28px; }
+  .eb-dday { min-width: 46px; padding: 0 8px; font-size: 15px; }
+  .eb-title { font-size: 17px; line-height: 26px; }
+  .eb-sub { font-size: 14px; line-height: 20px; }
+  .eb-more { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .eb-track { transition: none; } }
 .home-cards .report-col,
 .home-cards .index-section,
 .home-cards .rankings,
@@ -740,7 +769,7 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 /* 카드 순서: 리포트 → 시총 TOP 10 (주요 지수 · 섹터 현황은 2026-10-20 삭제). PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭 (2026-10-15 사용자) */
 @media (min-width: 901px) {
   .home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .home-cards > .briefing, .home-cards > .rankings { grid-column: 1 / -1; }
+  .home-cards > .briefing, .home-cards > .rankings, .home-cards > .event-banner { grid-column: 1 / -1; }   /* 일정 배너도 전폭 (2026-10-28) */
 }
 /* 테마 · 관심 종목 · 섹터 종목 탭 카드 (2026-10-21 사용자) — 탭 줄 오른쪽 끝 기준일, 관심 종목 묶음은 탭 아래 작은 알약 줄 */
 .picks-section .tabs { align-items: flex-end; }
@@ -955,6 +984,12 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
        ==================================================================== -->
   <!-- 카드 구역 = 회색 바탕 #F3F4F6 (헤더 · 뉴스 구역 제외, 2026-10-15 사용자) -->
   <div class="home-cards">
+  <!-- 일정 배너 (2026-10-28 사용자: 홈 맨 위 실적 발표 등 롤링 배너 3개, 오른쪽 아래 점 3개, 누르면 그 종목 상세 화면 캘린더 탭).
+       stocks.json · kr.json 의 events (고정 페이지가 있는 종목만) 중 오늘 이후 가까운 3개. 일정이 없으면 배너를 숨긴다 -->
+  <section class="event-banner" id="event-banner" aria-roledescription="carousel" aria-label="다가오는 실적 발표" hidden="hidden">
+    <div class="eb-viewport"><div class="eb-track" data-hook="event-slides"></div></div>
+    <div class="eb-dots" data-hook="event-dots"></div>
+  </section>
   <section class="briefing" aria-labelledby="briefing-title">
     <!-- 홈 맨 위 '미국 증시 데일리 브리핑 — 날짜' 줄은 두지 않는다 — 리포트 제목마다 발행 날짜 (2026-10-13 사용자) -->
     <div class="briefing-body">
@@ -1397,9 +1432,88 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       });
     });
   });
+  /* ================================================= 일정 배너 (2026-10-28 사용자)
+     stocks.json · kr.json 의 events 를 합쳐 오늘(KST) 이후 가까운 3개 — 같은 날은 각 파일 순서(큰 시총 먼저)대로 미국 · 한국을 번갈아.
+     4초마다 다음 장, 마우스를 올리거나 초점이 있으면 멈춘다. 점을 누르면 그 장으로. 누르면 그 종목 페이지 캘린더 탭(#tab-캘린더) */
+  var EVENT_COUNT = 3, EVENT_MS = 4000, CAL_TAB = '캘린더';
+  var eventFeeds = { us: [], kr: [] };
+  var ebIndex = 0, ebTimer = null;
+  function kstToday() { return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); }
+  function eventHref(e, market) {
+    if (window.PV_EVENT_HREF) return window.PV_EVENT_HREF(e, market);   /* 미리보기: 로컬 종목 목업으로 */
+    return BLOG_HOME + 'p/' + e.slug + '.html#tab-' + encodeURIComponent(CAL_TAB);
+  }
+  function eventDate(day) {
+    var d = new Date(day + 'T00:00:00Z');
+    return (d.getUTCMonth() + 1) + '월 ' + d.getUTCDate() + '일(' + '일월화수목금토'.charAt(d.getUTCDay()) + ')';
+  }
+  function pickEvents() {
+    var today = kstToday();
+    var lists = ['us', 'kr'].map(function (m) {
+      return (eventFeeds[m] || []).filter(function (e) { return e && e.slug && e.day >= today; })
+        .map(function (e, i) { return { e: e, m: m, i: i }; });
+    });
+    return lists[0].concat(lists[1]).sort(function (a, b) {
+      return a.e.day < b.e.day ? -1 : a.e.day > b.e.day ? 1 : (a.i - b.i) || (a.m === 'us' ? -1 : 1);
+    }).slice(0, EVENT_COUNT);
+  }
+  function eventSlide(x, today) {
+    var e = x.e, kr = x.m === 'kr';
+    var a = el('a', 'eb-slide'); a.href = eventHref(e, x.m);
+    var left = Math.round((Date.parse(e.day) - Date.parse(today)) / 864e5);
+    a.appendChild(el('span', 'eb-dday' + (left > 3 ? ' is-later' : ''), left === 0 ? '오늘' : 'D-' + left));
+    a.appendChild(kr ? krAvatar(e.name, '#94A3B8', e.s) : stockAvatar(e.s, metaFor(e.s).color));
+    var t = el('span', 'eb-text');
+    t.appendChild(el('span', 'eb-kicker', (kr ? '한국' : '미국') + ' · 실적 발표'));
+    t.appendChild(el('span', 'eb-title', e.name + ' 실적 발표'));
+    var when = kr ? '' : e.when === 'amc' ? ' · 장 마감 뒤 (미국 시간)' : e.when === 'bmo' ? ' · 장 시작 전 (미국 시간)' : '';
+    t.appendChild(el('span', 'eb-sub', eventDate(e.day) + when));
+    a.appendChild(t);
+    a.appendChild(el('span', 'eb-more', '일정 보기 ›'));
+    return a;
+  }
+  function ebGo(i) {
+    var track = document.querySelector('[data-hook="event-slides"]');
+    var dots = document.querySelectorAll('#event-banner .eb-dot');
+    if (!track || !dots.length) return;
+    ebIndex = (i + dots.length) % dots.length;
+    track.style.transform = 'translateX(' + (-100 * ebIndex) + '%)';
+    [].forEach.call(dots, function (d, j) { d.setAttribute('aria-selected', String(j === ebIndex)); });
+    [].forEach.call(track.children, function (s, j) { s.setAttribute('aria-hidden', String(j !== ebIndex)); s.tabIndex = j === ebIndex ? 0 : -1; });
+  }
+  function ebStop() { if (ebTimer) { clearInterval(ebTimer); ebTimer = null; } }
+  function ebStart() {
+    ebStop();
+    if (document.querySelectorAll('#event-banner .eb-dot').length > 1) ebTimer = setInterval(function () { ebGo(ebIndex + 1); }, EVENT_MS);
+  }
+  function setEvents(market, list) {
+    eventFeeds[market] = list || [];
+    var box = document.getElementById('event-banner');
+    var track = box && box.querySelector('[data-hook="event-slides"]');
+    var dotBox = box && box.querySelector('[data-hook="event-dots"]');
+    if (!track || !dotBox) return;
+    var picks = pickEvents(), today = kstToday();
+    track.textContent = ''; dotBox.textContent = '';
+    box.hidden = !picks.length;
+    if (!picks.length) { ebStop(); return; }
+    picks.forEach(function (x, i) {
+      track.appendChild(eventSlide(x, today));
+      var d = el('button', 'eb-dot'); d.type = 'button'; d.setAttribute('aria-label', (i + 1) + '번째 일정');
+      d.addEventListener('click', function () { ebGo(i); ebStart(); });
+      dotBox.appendChild(d);
+    });
+    dotBox.hidden = picks.length < 2;
+    if (!box.dataset.wired) {   /* 올려 둔 동안 · 키보드 초점 동안은 멈춘다 */
+      box.dataset.wired = '1';
+      box.addEventListener('mouseenter', ebStop); box.addEventListener('mouseleave', ebStart);
+      box.addEventListener('focusin', ebStop); box.addEventListener('focusout', ebStart);
+    }
+    ebGo(0); ebStart();
+  }
+
   fetch(KR_URL + '?v=' + Date.now())
     .then(function (r) { return r.json(); })
-    .then(function (json) { krHome = json; if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); })
+    .then(function (json) { krHome = json; setEvents('kr', json.events); if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); })
     .catch(function () {});
 
   fetch(DATA_URL + '?v=' + Date.now())
@@ -1564,6 +1678,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       (json.stocks || []).forEach(function (r) { feedStocks[r.s] = r; });
       feedWatch = json.watch || [];
       feedSectors = json.sectors || [];
+      setEvents('us', json.events);
       setPicksDay(json.day);
       renderWatchTabs(); renderWatch(); renderSectorTop();
     })
@@ -3031,8 +3146,11 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     panels.forEach(function (x, j) { x.b.setAttribute('aria-selected', String(i === j)); x.p.hidden = i !== j; });
     if (!keepHash) { try { history.replaceState(null, '', location.pathname + location.search + '#tab-' + i); } catch (e) {} }
   }
-  var hm = /^#tab-(\d)$/.exec(location.hash || '');
-  select(hm ? Math.min(parseInt(hm[1], 10), panels.length - 1) : 0, true);
+  var hm = /^#tab-(\d)$/.exec(location.hash || ''), hn = /^#tab-(.+)$/.exec(location.hash || ''), byName = -1;
+  /* #tab-캘린더 처럼 탭 이름으로도 연다 — 홈 일정 배너 → 종목 페이지 캘린더 탭 (2026-10-28 사용자). 탭 순서가 종목마다 달라 번호 대신 이름 */
+  if (!hm && hn) { try { var want = decodeURIComponent(hn[1]); panels.forEach(function (x, j) { if (byName < 0 && x.b.textContent === want) byName = j; }); } catch (e) {} }
+  select(hm ? Math.min(parseInt(hm[1], 10), panels.length - 1) : byName >= 0 ? byName : 0, true);
+  if (byName >= 0) { var toBar = function () { window.scrollTo(0, Math.max(0, bar.getBoundingClientRect().top + window.pageYOffset - 70)); }; setTimeout(toBar, 0); window.addEventListener('load', toBar); }   /* 이름으로 열면 탭 줄까지 내려 준다 (위 그래프가 늦게 그려져도 load 때 한 번 더) — 고정 헤더 높이만큼 위 여유 */
   /* 서브탭 — 패널 안 소제목(data-sub)이 셋 이상일 때. 알약과 겹치는 소제목은 숨긴다 */
   panels.forEach(function (st) {
     var subs = [], cur = null;

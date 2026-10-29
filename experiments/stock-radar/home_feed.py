@@ -22,6 +22,7 @@ import universe as U
 BASE = os.path.dirname(os.path.abspath(__file__))
 PAGES_LIVE = os.path.join(BASE, "data", "pages_live.json")
 OUT = os.path.join(BASE, "output", "home", "stocks.json")
+EVENT_DAYS = 30   # 홈 맨 위 일정 배너 — 이 기간 안 실적 발표 (홈 JS 가 오늘 이후 가까운 3개를 고른다)
 
 
 def _live():
@@ -32,7 +33,21 @@ def _live():
         return set()
 
 
-def build(a, live):
+def events(a, snap, live):
+    """홈 맨 위 일정 배너 (2026-10-28 사용자: 실적 발표 등 롤링 배너 3개, 누르면 그 종목 상세 화면 캘린더 탭).
+    고정 페이지가 있는 종목만 — 링크가 404 가 되지 않게. 가까운 날 · 큰 시총 순."""
+    end = (datetime.date.fromisoformat(a["day"]) + datetime.timedelta(days=EVENT_DAYS)).isoformat()
+    out = []
+    for s in a["stocks"]:
+        nxt = (s.get("earnings") or {}).get("next")
+        if not nxt or nxt > end or s["sym"] in U.REPORT_TYPE or s["sym"] not in live:
+            continue
+        when = next((x.get("when") for x in (snap.get("earnings") or {}).get(s["sym"]) or [] if x["day"] == nxt), None)
+        out.append({"kind": "earnings", "day": nxt, "when": when, "s": s["sym"], "name": U.BY_SYM[s["sym"]][1], "slug": U.BY_SYM[s["sym"]][2], "mc": int(s["cap"]) if s.get("cap") else None})
+    return sorted(out, key=lambda e: (e["day"], -(e["mc"] or 0)))
+
+
+def build(a, live, snap=None):
     by = {s["sym"]: s for s in a["stocks"]}
     rows = []
     for sym, name, slug, sector in U.CANDIDATES:
@@ -58,16 +73,18 @@ def build(a, live):
     return {
         "updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         "day": a["day"], "stocks": rows, "watch": watch, "sectors": [{"sector": x["sector"], "syms": x["syms"]} for x in sector_rows],
+        "events": events(a, snap or {}, live),
     }
 
 
 def write(a=None):
-    a = a or analyze.run(collect.load())
-    data = build(a, _live())
+    snap = collect.load()
+    a = a or analyze.run(snap)
+    data = build(a, _live(), snap)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False)
-    print(f"[home] 종목 {len(data['stocks'])} · 페이지 있음 {sum(1 for r in data['stocks'] if r['page'])} · 관심 묶음 {len(data['watch'])} · 섹터 {len(data['sectors'])} → {OUT}")
+    print(f"[home] 종목 {len(data['stocks'])} · 페이지 있음 {sum(1 for r in data['stocks'] if r['page'])} · 관심 묶음 {len(data['watch'])} · 섹터 {len(data['sectors'])} · 일정 {len(data['events'])} → {OUT}")
     return OUT
 
 

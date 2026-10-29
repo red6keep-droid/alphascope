@@ -28,6 +28,8 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 API = "https://opendart.fss.or.kr/api"
 CORP = os.path.join(BASE, "data", "dart_corp.json")
 CACHE = os.path.join(BASE, "data", "dart_fin.json")
+COMPANY = os.path.join(BASE, "data", "dart_company.json")   # 기업개황 (기업 정보 탭, 2026-10-29 P84) — 한 달에 한 번
+COMPANY_KEYS = ("corp_name", "corp_name_eng", "ceo_nm", "corp_cls", "adres", "hm_url", "ir_url", "induty_code", "est_dt", "acc_mt")
 YEARS = 4   # 1년 전 대비 8분기 (미국 카드와 같은 막대 수) — 4년치 보고서
 REPORTS = [("11013", "03-31"), ("11012", "06-30"), ("11014", "09-30"), ("11011", "12-31")]   # 1분기 · 반기 · 3분기 · 사업보고서
 REV_NAMES = ("매출액", "수익(매출액)", "매출")
@@ -77,6 +79,35 @@ def corp_codes(key):
             m[sc] = el.findtext("corp_code")
     _save(CORP, {"built": datetime.date.today().isoformat(), "map": m})
     return m
+
+
+def company():
+    """종목 코드 → OpenDART 기업개황(company.json) 일부 칸. 한 달 안에 받은 것은 캐시 그대로. 키가 없으면 캐시만."""
+    c = _load(COMPANY)
+    fresh = (datetime.date.today() - datetime.timedelta(days=30)).isoformat()
+    if c.get("built", "") >= fresh and c.get("map"):
+        return c["map"]
+    key = _key()
+    if not key:
+        return c.get("map") or {}
+    codes = corp_codes(key)
+    m = {}
+    for sym, *_ in U.CANDIDATES:
+        code = sym.split(".")[0]
+        corp = codes.get(code)
+        if not corp:
+            continue
+        try:
+            r = requests.get(f"{API}/company.json", params={"crtfc_key": key, "corp_code": corp}, timeout=30).json()
+        except (requests.RequestException, ValueError) as e:
+            print(f"[dart] {code} 기업개황 실패: {str(e)[:80]}")
+            continue
+        if r.get("status") == "000":
+            m[code] = {k: (r.get(k) or "").strip() for k in COMPANY_KEYS}
+        time.sleep(0.2)
+    if m:
+        _save(COMPANY, {"built": datetime.date.today().isoformat(), "map": m})
+    return m or c.get("map") or {}
 
 
 def _amount(v):

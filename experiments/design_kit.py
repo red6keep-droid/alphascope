@@ -309,9 +309,59 @@ def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w):
 
 _HINT_RE = re.compile(r'^(<span data-scroll-hint="1"[^>]*>.*?</span>)', re.S)
 _LEGEND_RE = re.compile(r'^<span style="[^"]*">(.*)</span>$', re.S)
+_CHIP_RE = re.compile(r'<span style="display:inline-flex[^"]*"><span [^>]*></span>[^<]*(?:<span data-unit="1"[^>]*>[^<]*</span>)?</span>')   # 범례 칩 하나 (색 네모 + 이름 [+ 단위])
+LEGEND_LEFT = 5   # 범례 왼쪽 여백 (2026-10-28 사용자 P50: 모든 그래프)
 
 
 LEGEND_TOP = 5   # 그래프 카드 첫 줄(범례 또는 `밀어서 보기`) 위 +5px — 카드 위 테두리 ~ 첫 줄 = 10 + 5 (2026-10-26 사용자: 기준 = `오늘 움직임과 평소 하루 크기` 그래프)
+
+
+_JOSA = {"은": ("은", "는"), "는": ("은", "는"), "이": ("이", "가"), "가": ("이", "가"), "을": ("을", "를"), "를": ("을", "를"),
+         "과": ("과", "와"), "와": ("과", "와"), "으로": ("으로", "로"), "로": ("으로", "로")}
+_DIGIT_TAIL = {"0": 21, "1": 8, "2": 0, "3": 16, "4": 0, "5": 0, "6": 1, "7": 8, "8": 8, "9": 0}   # 숫자 읽는 소리의 받침 (0 은 아래에서 자리로)
+_ZERO_TAIL = {1: 17, 2: 1, 3: 4, 4: 4}   # 끝 0 개수 → 십(ㅂ) · 백(ㄱ) · 천(ㄴ) · 만(ㄴ)
+
+
+def _tail(word):
+    """마지막 글자 소리의 받침 번호 (0 = 받침 없음, 8 = ㄹ) — 한글은 글자, 숫자는 읽는 소리(96 → 육, 10 → 십), % 는 퍼센트."""
+    w = re.sub(r"<[^>]+>", "", str(word)).rstrip()
+    if not w:
+        return 0
+    c = w[-1]
+    if "가" <= c <= "힣":
+        return (ord(c) - 0xAC00) % 28
+    if c.isdigit():
+        digits = re.sub(r"[^\d.]", "", w).split(".")
+        tail = digits[-1] if len(digits) > 1 else digits[0]
+        if len(digits) > 1 or tail[-1] != "0":
+            return _DIGIT_TAIL[tail[-1]]
+        z = len(tail) - len(tail.rstrip("0"))
+        return 21 if z == len(tail) else _ZERO_TAIL.get(min(z, 4), 4)
+    return 0   # % (퍼센트) · p (포인트) · 영문 등 — 받침 없음으로 본다
+
+
+def josa(word, p):
+    """word 뒤에 맞는 조사 — josa("삼성전자", "은") → "삼성전자는", josa("96", "로") → "96으로" (2026-10-28 P69: 자동 문장의 `96로` · `삼성전자은`)."""
+    yes, no = _JOSA[p]
+    t = _tail(word)
+    if yes == "으로":
+        return f"{word}{'로' if t in (0, 8) else '으로'}"
+    return f"{word}{yes if t else no}"
+
+
+def q_axis(q):
+    """분기 가로축 이름 `2025Q3` · `2025-Q3` → `25년\n3분기` (2026-10-28 사용자 P63 · P66: `Q` 약어 대신 한글, 두 줄)."""
+    q = str(q)
+    return f"{q[2:4]}년\n{q[-1]}분기"
+
+
+def legend_unit(legend_html, unit):
+    """범례 `비교 대상 : …` 바로 오른쪽에 단위 (2026-10-28 사용자 P54: `비교 대상 : KOSPI` 우측에 `회복일`). 비교 칩이 없으면 마지막 칩 뒤."""
+    i = legend_html.rfind("비교 대상")
+    j = legend_html.find("</span>", i if i >= 0 else 0) if i >= 0 else legend_html.rfind("</span>", 0, legend_html.rfind("</span>"))
+    if j < 0:
+        return legend_html
+    return legend_html[:j] + f'<span data-unit="1" style="margin-left:7px;">단위 : {unit}</span>' + legend_html[j:]
 
 
 def legend_top(chart_html, legend_html):
@@ -323,9 +373,19 @@ def legend_top(chart_html, legend_html):
         hint, chart_html = m.group(1).replace(f"margin:{LEGEND_TOP}px 0 4px;", "margin:0 0 0 auto;", 1), chart_html[m.end():]   # 위 5px 는 범례 줄이 갖는다 · 오른쪽 끝
         chart_html = chart_html.replace(f'data-shade-up="{SCROLL_SHADE_UP}"', 'data-shade-up="0"', 1).replace(f"padding-top:{SCROLL_SHADE_UP}px;margin-top:-{SCROLL_SHADE_UP}px;", "padding-top:0px;margin-top:-0px;", 1)
     lm = _LEGEND_RE.match(legend_html or "")
-    chips = (lm.group(1) if lm else legend_html or "").replace("margin:0 0 0 12px;", "margin:0 12px 0 0;")   # 칩 사이 = 오른쪽 12px (왼쪽 정렬)
+    chips = (lm.group(1) if lm else legend_html or "").replace("margin:0 0 0 12px;", "margin:0;").replace("margin:0 12px 0 0;", "margin:0;")   # 칩 사이는 줄의 column-gap 12px
+    # 칩마다 따로 줄바꿈 — 길면 `비교 대상 : …` 이 아랫줄로 내려가고 `넘겨 보기` 는 그 같은 줄 오른쪽 (2026-10-28 사용자 P73). 범례 왼쪽 5px (P50)
+    items = _CHIP_RE.findall(chips)
+    if items and "".join(items) == chips:
+        cmp_ = [c for c in items if "비교 대상" in c][-1:]
+        rest = "".join(c for c in items if c not in cmp_)
+        tail = (f'<span style="flex:1 1 auto;display:flex;justify-content:space-between;align-items:center;column-gap:12px;">{cmp_[0]}{hint}</span>'
+                if cmp_ else hint)
+        body = rest + tail
+    else:
+        body = f'<span style="text-align:left;">{chips}</span>{hint}'
     top = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;'
-           f'font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:{LEGEND_TOP}px 0 4px;"><span style="text-align:left;">{chips}</span>{hint}</span>')
+           f'font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:{LEGEND_TOP}px 0 4px;padding-left:{LEGEND_LEFT}px;">{body}</span>')
     return top + chart_html + '<span style="display:block;height:4px;"></span>'
 
 
