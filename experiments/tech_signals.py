@@ -1,8 +1,9 @@
 """기술 지표는 어느 쪽을 가리키나 — 인베스팅닷컴 '기술적 분석' 화면의 지표 12 · 이동평균 6×2 · 피벗 5가지를 우리 일봉으로 계산 (2026-10-30 사용자). AI 없음.
 
-라벨은 매수 · 매도가 아니라 **사실 말**(운영지침 규칙 10 · 법적 경계 선 4 — 블로그가 매수 · 매도라고 답하지 않는다):
-  오실레이터 = 과매수 · 중립 · 과매도, 추세 지표 = 오름 쪽 · 내림 쪽, 이동평균 = 종가가 선 위 · 아래. 요약 = 개수(오름 쪽 n · 중립 n · 내림 쪽 n)와 반원 게이지.
-흔히 읽는 법(과매수 = 내림 쪽으로 읽음)은 개수에 반영하고 툴팁에 적는다. 임계값은 널리 쓰는 기본값(RSI 70/30, 스토캐스틱 80/20, CCI ±100, Williams −20/−80, ADX 25).
+용어 = 상승 · 하락 · 중립 하나로 (2026-10-30 사용자 P99: "오름 쪽 · 내림 쪽은 돌려 말하기 — 상승 · 하락, 화살표, 강한 상승 · 강한 하락").
+  블로그는 매수 · 매도라고 쓰지 않는다 — 지표가 가리키는 가격 방향을 그대로 적고 판단은 독자가 한다 (법적 경계 선 4).
+  오실레이터는 과매수 = 하락 · 과매도 = 상승으로 세고 줄에 (과매수) · (과매도)를 작게 붙인다. 이동평균은 종가가 선 위 ▲ · 아래 ▼.
+  요약 = 강한 상승 · 상승 · 중립 · 하락 · 강한 하락, 색 = 상승 빨강 · 하락 파랑의 연한 상태 카드 톤(theme). 임계값은 널리 쓰는 기본값(RSI 70/30, 스토캐스틱 80/20, CCI ±100, Williams −20/−80, ADX 25).
 인베스팅닷컴과 값이 다를 수 있다 — 그 표는 시간봉 기준으로 보이고(10-30 점검: 5일 이동평균이 최근 5일 종가 평균과 안 맞음), 우리는 일봉 · 주봉 · 월봉.
 
     compute(bars) → {"as_of", "close", "rows": [...], "counts", "net", "word", "ma": [...], "ma_counts", "pivot": {...}, "weekly": counts, "monthly": counts}
@@ -12,7 +13,9 @@
 import datetime
 import math
 
-OVER, UNDER, MID, UPW, DNW = "과매수", "과매도", "중립", "오름 쪽", "내림 쪽"
+OVER, UNDER, MID, UPW, DNW = "과매수", "과매도", "중립", "상승", "하락"
+WEAK = "추세 약함"
+GAUGE_UP, GAUGE_DN = "#ED8E87", "#82B1F0"   # 게이지는 그래프 파스텔(cards.PASTEL_UP · PASTEL_DN) — 새빨간 · 새파란 면 금지 (P99)
 
 
 def _ema(xs, n):
@@ -94,7 +97,7 @@ def indicators(bars):
     e12, e26 = _ema(c, 12), _ema(c, 26)
     macd = [a - b for a, b in zip(e12, e26)]
     sig = _ema(macd, 9)
-    add("macd", "MACD(12,26)", macd[-1], UPW if macd[-1] > sig[-1] else DNW, "12일 · 26일 지수 평균의 차 — 신호선(9일) 위면 오름 쪽, 아래면 내림 쪽", "{:,.0f}" if abs(macd[-1]) >= 100 else "{:,.2f}")
+    add("macd", "MACD(12,26)", macd[-1], UPW if macd[-1] > sig[-1] else DNW, "12일 · 26일 지수 평균의 차 — 신호선(9일) 위면 상승, 아래면 하락", "{:,.0f}" if abs(macd[-1]) >= 100 else "{:,.2f}")
     # ADX(14) + DI
     tr, pdm, mdm = [], [], []
     for i in range(1, n):
@@ -110,7 +113,7 @@ def indicators(bars):
         pdi, mdi = 100 * p / a, 100 * m / a
         dx.append(0.0 if pdi + mdi == 0 else 100 * abs(pdi - mdi) / (pdi + mdi))
     adx = _wilder(dx, 14)[-1] if len(dx) >= 14 else None
-    adx_label = None if adx is None else ("추세 약함" if adx < 25 else (UPW if pdi > mdi else DNW))
+    adx_label = None if adx is None else (WEAK if adx < 25 else (UPW if pdi > mdi else DNW))
     add("adx", "ADX(14)", adx, adx_label, "추세의 세기 — 25 아래면 뚜렷한 추세 없음, 그 위면 +DI · −DI 가운데 큰 쪽")
     hh, ll = max(h[-14:]), min(l[-14:])
     wr = None if hh == ll else (hh - c[-1]) / (hh - ll) * -100
@@ -129,7 +132,7 @@ def indicators(bars):
     rows.append({"key": "atr", "name": "ATR(14)", "value": a14, "text": "—" if a14 is None else f"{a14:,.0f} ({atr_pct:.1f}%)", "label": atr_label or "—", "dir": 0,
                  "hint": "하루 평균 진폭 — 최근 1년 평소(중앙값)보다 30% 넘게 크면 큼, 30% 넘게 작으면 낮음. 방향 개수에는 안 넣는다"})
     hl = c[-1] - (hh + ll) / 2
-    add("hl", "Highs/Lows(14)", hl, UPW if hl > 0 else DNW if hl < 0 else MID, "14일 고가 · 저가의 가운데보다 종가가 위(오름 쪽) · 아래(내림 쪽)", "{:,.0f}")
+    add("hl", "Highs/Lows(14)", hl, UPW if hl > 0 else DNW if hl < 0 else MID, "14일 고가 · 저가의 가운데보다 종가가 위면 상승 · 아래면 하락", "{:,.0f}")
     # Ultimate Oscillator (7 · 14 · 28)
     bp, trr = [], []
     for i in range(1, n):
@@ -143,10 +146,10 @@ def indicators(bars):
     uo = None if None in (a7, a14_, a28) else 100 * (4 * a7 + 2 * a14_ + a28) / 7
     add("uo", "Ultimate Oscillator", uo, _level(uo, 70, 30), "7 · 14 · 28일 매수 압력의 가중 평균 · 70 위 과매수 · 30 아래 과매도")
     roc = (c[-1] / c[-13] - 1) * 100 if n > 13 else None
-    add("roc", "ROC(12)", roc, None if roc is None else (UPW if roc > 0 else DNW if roc < 0 else MID), "12일 전보다 몇 % 올랐나 · 0 위 오름 쪽 · 아래 내림 쪽", "{:+.2f}%")
+    add("roc", "ROC(12)", roc, None if roc is None else (UPW if roc > 0 else DNW if roc < 0 else MID), "12일 전보다 몇 % 올랐나 · 0 위 상승 · 아래 하락", "{:+.2f}%")
     e13 = _ema(c, 13)[-1]
     bb = (h[-1] - e13) + (l[-1] - e13)
-    add("bb", "Bull/Bear Power(13)", bb, UPW if bb > 0 else DNW if bb < 0 else MID, "오늘 고가 · 저가가 13일 지수 평균보다 위(오름 쪽) · 아래(내림 쪽)", "{:,.0f}")
+    add("bb", "Bull/Bear Power(13)", bb, UPW if bb > 0 else DNW if bb < 0 else MID, "오늘 고가 · 저가가 13일 지수 평균보다 위면 상승 · 아래면 하락", "{:,.0f}")
     return rows
 
 
@@ -159,8 +162,29 @@ def counts(rows):
 
 
 def word(net):
-    """게이지 아래 한 마디 — 개수 비율의 사실 말 (매수 · 매도 아님)."""
-    return "대부분 오름 쪽" if net >= 0.5 else "오름 쪽이 많음" if net >= 0.15 else "대부분 내림 쪽" if net <= -0.5 else "내림 쪽이 많음" if net <= -0.15 else "엇갈림"
+    """카드 답 — 개수 비율 (상승 − 하락) ÷ 11: ±0.5 넘으면 강한, ±0.15 넘으면 상승 · 하락, 그 사이 중립 (P99)."""
+    return "▲ 강한 상승" if net >= 0.5 else "▲ 상승" if net >= 0.15 else "▼ 강한 하락" if net <= -0.5 else "▼ 하락" if net <= -0.15 else "중립"
+
+
+def theme(net, up_color, down_color, muted):
+    """(상태 카드 theme, 답 글자 색) — 상승 = positive(연한 주황 바탕 · 빨강 글자), 하락 = negative(연한 파랑 바탕 · 파랑 글자), 중립 = 회색. 바탕을 진하게 채우지 않는다 (P99)."""
+    return ("positive", up_color) if net >= 0.15 else ("negative", down_color) if net <= -0.15 else ("neutral", muted)
+
+
+def label_html(label, up_color, down_color, muted, esc):
+    """지표 줄 라벨 — 화살표 + 상승 · 하락(굵게, 증감 색), 오실레이터 까닭은 작은 회색 (과매수) · (과매도)."""
+    if label in (OVER, UNDER):
+        main, why = (DNW, OVER) if label == OVER else (UPW, UNDER)
+    elif label == WEAK:
+        main, why = MID, WEAK
+    else:
+        main, why = label, ""
+    arrow = "▲ " if main == UPW else "▼ " if main == DNW else ""
+    col = up_color if main == UPW else down_color if main == DNW else muted
+    out = f'<span style="color:{col};font-weight:700;white-space:nowrap;">{arrow}{esc(main)}</span>'
+    if why:
+        out += f' <span style="font-size:14px;font-weight:400;color:{muted};white-space:nowrap;">({esc(why)})</span>'
+    return out
 
 
 def moving_averages(bars):
@@ -228,8 +252,8 @@ def compute(bars):
 
 # ---------------------------------------------------------------- 그리기 (nvda-report render_html._state_card 의 lines)
 
-def gauge_svg(net, up_color, down_color, gray="#CBD5E1", width=200):
-    """반원 게이지 — 왼쪽(파랑) 내림 쪽, 가운데 회색 중립, 오른쪽(빨강) 오름 쪽. 바늘 = net (−1 … +1)."""
+def gauge_svg(net, up_color=GAUGE_UP, down_color=GAUGE_DN, gray="#CBD5E1", width=200):
+    """반원 게이지 — 왼쪽(연파랑) 하락, 가운데 회색 중립, 오른쪽(연빨강) 상승. 바늘 = net (−1 … +1). 색은 파스텔 고정 (P99)."""
     cx, cy, r = width / 2, width / 2 - 10, width / 2 - 16
 
     def pt(a):   # a: 0(왼쪽) … 180(오른쪽) 도
@@ -244,9 +268,9 @@ def gauge_svg(net, up_color, down_color, gray="#CBD5E1", width=200):
     a = 90 + max(-1.0, min(1.0, net)) * 80
     x, y = pt(a)
     needle = f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{x:.1f}" y2="{y:.1f}" stroke="#111" stroke-width="2"/><circle cx="{cx:.1f}" cy="{cy:.1f}" r="4" fill="#111"/>'
-    lab = (f'<text x="{pt(8)[0]:.0f}" y="{cy + 18:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">내림 쪽</text>'
+    lab = (f'<text x="{pt(8)[0]:.0f}" y="{cy + 18:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">하락</text>'
            f'<text x="{cx:.0f}" y="{cy - r - 14:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">중립</text>'
-           f'<text x="{pt(172)[0]:.0f}" y="{cy + 18:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">오름 쪽</text>')
+           f'<text x="{pt(172)[0]:.0f}" y="{cy + 18:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">상승</text>')
     return (f'<svg viewBox="0 0 {width} {cy + 26:.0f}" width="{width}" height="{cy + 26:.0f}" aria-hidden="true" style="display:block;margin:4px auto 0;">'
             f'{arcs}{needle}{lab}</svg>')
 
@@ -255,32 +279,31 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     """(lines, tip) — _state_card 줄. 사실만: 개수 · 게이지 · 지표 줄(값 | 라벨) · 이동평균 줄 · 주봉 · 월봉 개수 · 피벗(접기 대신 줄)."""
     import html as _h
     cnt = sig["counts"]
-    first = (f"{sig['as_of'][5:7].lstrip('0')}월 {sig['as_of'][8:10].lstrip('0')}일 종가 기준 지표 11개 가운데 오름 쪽 {cnt['up']}개, 중립 {cnt['neutral']}개, 내림 쪽 {cnt['down']}개다. "
-             f"이동평균 12개(단순 · 지수 각 6개) 가운데 종가가 선 위인 것 {sig['ma_counts']['above']}개, 아래 {sig['ma_counts']['below']}개다.")
+    first = (f"{sig['as_of'][5:7].lstrip('0')}월 {sig['as_of'][8:10].lstrip('0')}일 종가 기준 지표 11개 가운데 상승 {cnt['up']}개, 중립 {cnt['neutral']}개, 하락 {cnt['down']}개다. "
+             f"이동평균 12개(단순 · 지수 각 6개) 가운데 종가가 선 위(상승)인 것 {sig['ma_counts']['above']}개, 아래(하락) {sig['ma_counts']['below']}개다.")
     for key, lab in (("weekly", "주봉"), ("monthly", "월봉")):
         w = sig.get(key)
         if w:
-            first += f" {lab}으로는 오름 쪽 {w['up']} · 중립 {w['neutral']} · 내림 쪽 {w['down']}."
-    color = {1: up_color, -1: down_color, 0: muted}
-
+            first += f" {lab}으로는 상승 {w['up']} · 중립 {w['neutral']} · 하락 {w['down']}."
     def lab_html(label, d):
-        return f'<span style="color:{color[d]};font-weight:700;">{_h.escape(label)}</span>'
-    lines = [(first, "plain"), (gauge_svg(sig["net"], up_color, down_color), "html")]
+        return label_html(label, up_color, down_color, muted, _h.escape)
+    lines = [(first, "plain"), (gauge_svg(sig["net"]), "html")]
     for r in sig["rows"]:
         lines.append(("row", r["name"], f'<span style="font-weight:700;color:#111;">{_h.escape(r["text"])}</span>&nbsp;&nbsp;{lab_html(r["label"], r["dir"])}', r["hint"], True))
     for m in sig["ma"]:
         def one(v, above):
             if v is None:
                 return "—"
-            return f'<span style="font-weight:700;color:#111;">{v:,.0f}</span> {lab_html("위" if above else "아래", 1 if above else -1)}'
-        lines.append(("row", f"이동평균 {m['n']}일", f'{one(m["sma"], m["sma_above"])}&nbsp;·&nbsp;{one(m["ema"], m["ema_above"])}', "단순 · 지수 — 종가가 선 위면 위, 아래면 아래", True))
+            arrow = f'<span style="color:{up_color if above else down_color};font-weight:700;">{"▲" if above else "▼"}</span>'   # 두 값이 한 줄이라 화살표만 (폭, P99)
+            return f'<span style="font-weight:700;color:#111;">{v:,.0f}</span> {arrow}'
+        lines.append(("row", f"이동평균 {m['n']}일", f'{one(m["sma"], m["sma_above"])}&nbsp;·&nbsp;{one(m["ema"], m["ema_above"])}', "단순 · 지수 — 종가가 선 위면 ▲ 상승, 아래면 ▼ 하락", True))
     pv = sig.get("pivot")
     if pv:
         for nm, d in pv.items():
             vals = " · ".join(f"{k} {d[k]:,.0f}" for k in ("S3", "S2", "S1", "P", "R1", "R2", "R3") if d.get(k) is not None)
             lines.append(("row", f"피벗 {nm}", vals, "전날 고가 · 저가 · 종가로 계산한 오늘의 기준선 (S = 아래 · R = 위)"))
-    tip = ("널리 쓰는 기술 지표 12개와 이동평균이 지금 어느 쪽을 가리키는지 — 우리 일봉으로 계산한 값과, 흔히 읽는 법대로 붙인 말\n"
-           "· 오름 쪽 · 내림 쪽 · 과매수 · 과매도 : 지표를 보통 읽는 방식일 뿐, 이 블로그의 매수 · 매도 의견이 아니다. 과매수는 내림 쪽, 과매도는 오름 쪽으로 센다\n"
-           "· 게이지 : (오름 쪽 − 내림 쪽) ÷ 11. ATR 은 방향이 없어 개수에서 뺀다\n"
-           "· 참고 : 같은 지표라도 일봉 · 주봉 · 월봉에서 반대로 나오곤 한다. 다른 사이트와는 봉 단위 · 임계값이 달라 값이 다를 수 있다")
+    tip = ("널리 쓰는 기술 지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
+           "· 상승 · 하락 · 중립 : 지표마다 흔히 쓰는 기준으로 나눴다. 과매수는 하락, 과매도는 상승으로 센다\n"
+           "· 강한 상승 · 강한 하락 : (상승 개수 − 하락 개수) ÷ 11 이 ±0.5 를 넘을 때. ±0.15 안은 중립. ATR 은 방향이 없어 개수에서 뺀다\n"
+           "· 참고 : 같은 지표라도 일봉 · 주봉 · 월봉에서 반대로 나오곤 한다. 다른 사이트와는 봉 단위 · 기준값이 달라 값이 다를 수 있다")
     return lines, tip

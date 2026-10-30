@@ -271,7 +271,8 @@ def sec_tech(s):
         return ""
     import tech_signals
     lines, tip = tech_signals.card(sig, s["name"], UP, DOWN, R.MUTED)
-    card = R._state_card("기술 지표는 어느 쪽을 가리키나?", sig["word"], "neutral", R.MUTED, lines, "", tip=tip, fold=True)
+    th, col = tech_signals.theme(sig["net"], UP, DOWN, R.MUTED)   # 상승 빨강 · 하락 파랑의 연한 카드 (P99)
+    card = R._state_card("기술 지표는 어느 쪽을 가리키나?", sig["word"], th, col, lines, "", tip=tip, fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
