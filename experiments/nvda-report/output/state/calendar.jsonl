@@ -435,10 +435,11 @@
 {"day": "2026-10-21", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 0}
 {"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 0}
 {"day": "2026-10-28", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 0}
+{"day": "2026-10-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 0}
 {"day": "2026-11-17", "kind": "EARNINGS", "label": "NVDA 실적", "symbol": "NVDA", "source": "yfinance", "confirmed": 0}
 {"day": "2027-01-27", "kind": "EARNINGS_PEER", "label": "MSFT 실적", "symbol": "MSFT", "source": "yfinance", "confirmed": 0}
 {"day": "2027-02-03", "kind": "EARNINGS_PEER", "label": "GOOGL 실적", "symbol": "GOOGL", "source": "yfinance", "confirmed": 0}
-{"day": "2026-10-29", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 0}
+{"day": "2027-02-04", "kind": "EARNINGS_PEER", "label": "AMZN 실적", "symbol": "AMZN", "source": "yfinance", "confirmed": 0}
 {"day": "2027-01-27", "kind": "EARNINGS_PEER", "label": "META 실적", "symbol": "META", "source": "yfinance", "confirmed": 0}
 {"day": "2026-12-14", "kind": "EARNINGS_PEER", "label": "ORCL 실적", "symbol": "ORCL", "source": "yfinance", "confirmed": 0}
 {"day": "2027-01-14", "kind": "EARNINGS_PEER", "label": "TSM 실적", "symbol": "TSM", "source": "yfinance", "confirmed": 0}
