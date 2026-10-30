@@ -2,6 +2,7 @@
 
 - 한 종목이 중심인 이슈(scope=stock) → 그 종목 상세 페이지 · 엔비디아 리포트의 뉴스 목록
 - 시장 · 업종 이슈(scope=market · sector) → 미국 데일리 뉴스 · 홈 주요 뉴스 (market())
+- 한국 증시 내용(is_korea — 채널이 아니라 이슈의 국가 · 중심 종목으로, 2026-10-30) → 데일리 한국장 탭 · 한국 증시 리포트 (korea()) · 한국 종목 페이지 (kr_stocks_for)
 사실 · 의견을 거르지 않는다(사용자: 전망 · 의견도 받는다). 의견이 섞이므로 채널 이름(그 영상 링크)과 `방송` 라벨을 늘 붙인다.
 재료 = 수집기(red9keep/yutb-sub)의 Firestore `summaries` — media-daily/collect.py 와 같은 읽기 전용 키(YTB_FIRESTORE_KEY, 없으면 gcloud 기본 인증).
 못 읽으면 빈 목록 — 받는 리포트는 방송 줄 없이 그대로 돈다. 시험용 = 환경 변수 MEDIA_FEED_JSON(수집기 모양 영상 목록 JSON 파일).
@@ -43,11 +44,26 @@ ALIAS = {"SPACEX(비상장)": "SPCX", "스페이스X(비상장)": "SPCX", "SPACE
 # 업종 이슈 → 묶음 (2026-10-25 사용자: "반도체 이슈면 반도체 종목 전부에"). 묶음 = 종목 업종 칸(universe.CANDIDATES) ∪ 테마 묶음(universe.WATCH)
 # 1) 주제 낱말 2) 없으면 이슈 종목 둘 이상이 같이 속한 업종 · 묶음 3) 그것도 없으면 분류(에너지 · 가상자산 · 금융 · 부동산만 — AI 투자는 너무 넓다)
 # 4) 다 없으면 이슈에 적힌 종목들의 페이지에만
-SECTOR_WORDS = [("반도체", "반도체"), ("메모리", "반도체"), ("칩", "반도체"), ("데이터센터", "데이터 센터"), ("데이터 센터", "데이터 센터"),
-                ("AI 인프라", "데이터 센터"), ("전력", "데이터 센터"), ("우주", "우주항공"), ("위성", "우주항공"), ("가상자산", "가상자산"),
-                ("암호화폐", "가상자산"), ("비트코인", "가상자산"), ("코인", "가상자산"), ("유가", "에너지"), ("원유", "에너지"),
-                ("석유", "에너지"), ("에너지", "에너지"), ("양자", "양자 컴퓨터"), ("은행", "금융"), ("빅테크", "빅테크"), ("제약", "헬스케어"),
-                ("바이오", "헬스케어"), ("리츠", "부동산"), ("소비재", "필수 소비재")]
+SECTOR_WORDS = [("반도체", "반도체"), ("메모리", "반도체"), ("칩", "반도체"), ("HBM", "반도체"), ("GPU", "반도체"), ("파운드리", "반도체"),
+                ("데이터센터", "데이터 센터"), ("데이터 센터", "데이터 센터"), ("AI 인프라", "데이터 센터"), ("전력", "데이터 센터"),
+                ("클라우드", "데이터 센터"), ("네오클라우드", "데이터 센터"),   # 클라우드 수요 · 네오클라우드(CRWV 등)는 데이터 센터 묶음
+                ("우주", "우주항공"), ("위성", "우주항공"), ("스타링크", "우주항공"),
+                ("가상자산", "가상자산"), ("암호화폐", "가상자산"), ("비트코인", "가상자산"), ("코인", "가상자산"), ("토큰화", "가상자산"),
+                ("유가", "에너지"), ("원유", "에너지"), ("석유", "에너지"), ("에너지", "에너지"), ("유전", "에너지"), ("정제", "에너지"),
+                ("휘발유", "에너지"), ("호르무즈", "에너지"), ("원자력", "에너지"),
+                ("양자", "양자 컴퓨터"), ("은행", "금융"), ("결제", "결제"), ("카드", "결제"),
+                ("빅테크", "빅테크"), ("매그니피센트", "빅테크"), ("소프트웨어", "빅테크"),
+                ("제약", "헬스케어"), ("바이오", "헬스케어"), ("백신", "헬스케어"), ("치료제", "헬스케어"), ("메디케어", "헬스케어"),
+                ("건강보험", "헬스케어"), ("의료", "헬스케어"),
+                ("리츠", "부동산"), ("부동산", "부동산"), ("소비재", "필수 소비재"), ("소매", "필수 소비재"), ("유통", "필수 소비재"),
+                ("레스토랑", "경기 소비재"), ("외식", "경기 소비재"), ("전자상거래", "소비 · 플랫폼"), ("전기차", "소비 · 플랫폼"),
+                ("스트리밍", "커뮤니케이션"), ("정전", "유틸리티"), ("전력망", "유틸리티"), ("유틸리티", "유틸리티"),
+                ("금값", "소재"), ("구리", "소재")]
+# AI 설비투자 이야기(2026-10-30 보강 — 그 전엔 업종 낱말 없는 이슈의 1/3): 돈 쓰는 쪽(빅테크) + 받는 쪽(데이터 센터) 두 묶음 ≈ 11 페이지.
+# 반도체 묶음까지는 안 넓힌다('빅테크 3분기 실적' 이 MU · LRCX 페이지에까지 가는 건 과함 — 반도체 · HBM · GPU 낱말이 있으면 그때).
+# 분류(AI_CAPEX) 통째로도 아직 안 넓힌다 — '할리우드 AI 제작' · 'AI 와 비판적 사고' 같은 것도 그 분류에 들어온다.
+SECTOR_WORDS += [(w, g) for w in ("AI 지출", "AI 투자", "AI 설비투자", "설비투자", "CAPEX", "자본 지출", "자본지출", "하이퍼스케일러", "하이퍼스케러")
+                 for g in ("빅테크", "데이터 센터")]
 SECTOR_CATEGORY = {"ENERGY_COMMODITY": ("에너지",), "CRYPTO": ("가상자산",),
                    "CREDIT_BANKS": ("금융",), "REAL_ESTATE": ("부동산",)}
 LABEL = "방송"   # 뉴스 줄의 세 번째 라벨 — 기사가 아니라 방송 내용(의견 포함)이라는 표시
@@ -183,11 +199,23 @@ def for_ticker(rs, sym, name=""):
 KR_NAME = {"SSNLF": "삼성전자", "SSNNF": "삼성전자", "005930": "삼성전자", "000660": "SK하이닉스", "HXSCL": "SK하이닉스", "HYMTF": "현대차", "005380": "현대차", "LGEAF": "LG전자"}
 
 
+def is_korea(r):
+    """한국 증시 내용인가 — **채널이 아니라 이슈 내용으로** (2026-10-30 사용자: "어느 채널이든 한국 증시 · 미국 증시 내용으로 분리"). 수집기가 이슈마다 적는 주된 국가(country)로:
+    KR 이면 한국, 다른 나라면 미국 쪽(단, 종목 이슈의 중심 종목이 한국 종목이면 한국), 비어 있으면(10-22~30 기록 3%) 채널 묶음(한국 증시 채널 = kr)으로 보조.
+    10-22~30 기록: 혼합 채널 증시각도기 34건이 US 22 · KR 9 로 갈리고 KR 9건은 실제 한국 시황(국내 증시 급락 · 원달러 환율 · 증안펀드). 한국 종목이 붙었지만 국가가 미국인 11건
+    (애플 폴더블 아이폰에 삼성전자)은 미국 시장 이야기로 — 그 종목 페이지에는 kr_stocks_for 가 따로 싣는다."""
+    if r["country"] == "KR":
+        return True
+    if r["country"]:
+        leads = r.get("leads", r["tickers"][:1])   # 중심 종목이 모두 한국 종목일 때만 — '3분기 실적 호조' 처럼 여러 회사가 한 이슈로 묶이면(낱말 비교 한계) SK하이닉스 하나로 전체를 한국으로 보내지 않게
+        return r["scope"] == "stock" and bool(leads) and all(kr_code(t) for t in leads)
+    return "kr" in (r.get("groups") or [r.get("group")])
+
+
 def korea(iss, n=6):
     """한국장에 영향을 줄 만한 소식 — country=KR 이거나 한국 종목('(KR)')이 붙은 이슈, 최근 순 n 개 (media-daily cluster.korea_links 와 같은 기준).
     2026-10-25 사용자: 미국 데일리 `한국장` 탭으로. iss = issues() 결과."""
-    out = [r for r in iss if r["category"] != "OTHER"
-           and (r["country"] == "KR" or any("(KR)" in t for t in r["tickers"]) or "kr" in (r.get("groups") or [r.get("group")]))]   # 한국 증시 채널 이슈는 모두
+    out = [r for r in iss if r["category"] != "OTHER" and is_korea(r)]   # 채널이 아니라 내용으로 (2026-10-30 사용자) — 옛: (KR) 종목이 붙으면 전부 · 한국 채널 이슈는 전부
     return sorted(out, key=lambda r: str(r["published_at"]), reverse=True)[:n]
 
 
@@ -258,7 +286,7 @@ def kr_stocks_for(r):
         return {c for c in codes if c in leads or any(KR_CODE[c] in t for t in topics)}
     if r["scope"] == "sector":
         groups = {g for w, g in KR_SECTOR_WORDS if any(w in t for t in r.get("topics", [r["topic"]]))}
-        korean = r["country"] == "KR" or bool(codes) or "kr" in (r.get("groups") or [r.get("group")])
+        korean = is_korea(r) or bool(codes)
         if not korean:   # 미국 은행 · 바이오 뉴스가 한국 금융 · 바이오 전부에 붙지 않게 — 세계 공통 업종(반도체 · 2차전지)만 미국 이야기도 받는다
             groups &= KR_GLOBAL_GROUPS
         return set().union(set(codes), *(_kr_members(g) for g in groups))
@@ -271,8 +299,9 @@ def for_kr_page(iss, code):
 
 
 def market(rs):
-    """시장 전체 · 업종 이슈 (미국 데일리 뉴스 · 홈 주요 뉴스로). 한국 증시 채널만 다룬 이슈는 빼고 한국장 탭(korea)으로."""
-    return [r for r in rs if r["scope"] in ("market", "sector") and set(r.get("groups") or [r.get("group", "main")]) != {"kr"}]
+    """시장 전체 · 업종 이슈 (미국 데일리 뉴스 · 홈 주요 뉴스로). 한국 증시 내용(is_korea)은 빼고 한국장 탭(korea) · 한국 증시 리포트로 — 채널이 아니라 내용으로 가른다.
+    (2026-10-30 사용자: 옛 규칙은 한국 채널만 다룬 이슈를 뺐다 → 삼성증권 모닝브리핑의 미국장 정리가 버려지고, 증시각도기의 한국 시황은 미국 데일리로 갔다)"""
+    return [r for r in rs if r["scope"] in ("market", "sector") and not is_korea(r)]
 
 
 # 같은 이슈 묶기 — media-daily/cluster.py _similar 와 같은 규칙(분류가 같고 주제 낱말이 겹치면). 그 파일은 media-daily 의 config 를 읽어 여기서 부르지 않는다
@@ -363,15 +392,16 @@ def diag(vids, iss, tag="[media_feed 진단]"):
     print(f"{tag} 영상 {len(vids)}개 — 채널 묶음별 {dict(vg)} · 채널 {dict(Counter(MC.CHANNEL_SHORT.get(v.get('channelName'), v.get('channelName')) for v in vids).most_common(12))}")
     for g in sorted({x for r in iss for x in r["groups"]}):
         sub = [r for r in iss if g in r["groups"]]
-        print(f"{tag} 묶음 {g}: 이슈 {len(sub)} · 범위 {dict(Counter(r['scope'] or '-' for r in sub))} · 한국 종목 페이지에 닿는 이슈 {sum(1 for r in sub if kr_stocks_for(r))} · 미국 종목 페이지 {sum(1 for r in sub if stocks_for(r))}")
+        print(f"{tag} 묶음 {g}: 이슈 {len(sub)} · 범위 {dict(Counter(r['scope'] or '-' for r in sub))} · 한국 증시 내용 {sum(1 for r in sub if is_korea(r))} (국가 KR {sum(1 for r in sub if r['country'] == 'KR')} · 국가 비어 있음 {sum(1 for r in sub if not r['country'])})"
+              f" · 한국 종목 페이지에 닿는 이슈 {sum(1 for r in sub if kr_stocks_for(r))} · 미국 종목 페이지 {sum(1 for r in sub if stocks_for(r))}")
     per = Counter(KR_CODE.get(c, c) for r in iss for c in kr_stocks_for(r))
     print(f"{tag} 한국 종목별 배정: " + (" · ".join(f"{k} {v}" for k, v in per.most_common()) or "없음"))
     bad = Counter(t for r in iss for t in r["tickers"] if ("(KR)" in t or re.search(r"[가-힣]", t)) and not kr_code(t))
     if bad:
         print(f"{tag} 코드로 못 바꾼 한국 표기: {dict(bad.most_common(15))}")
-    kr_only = [r for r in iss if "kr" in r["groups"] and not kr_stocks_for(r)]
-    for r in kr_only[:12]:   # 한국 채널 이슈인데 종목 페이지로 안 가는 것 — 범위 · 종목 · 주제
-        print(f"{tag}   kr 미배정: {r['scope'] or '-'} {r['category']} {r['tickers'][:4]} | {r['topic'][:50]}")
+    kr_only = [r for r in iss if is_korea(r) and not kr_stocks_for(r)]
+    for r in kr_only[:12]:   # 한국 증시 내용인데 종목 페이지로 안 가는 것(시장 이슈는 정상 — 한국장 탭 · 한국 증시 리포트 몫) — 범위 · 종목 · 주제
+        print(f"{tag}   한국 내용 · 종목 페이지 미배정: {r['scope'] or '-'} {r['category']} {r['country'] or '-'} {r['tickers'][:4]} | {r['topic'][:50]}")
 
 
 def market_top(iss, n):

@@ -308,9 +308,11 @@ NEWS_SHOWN = 5   # 방송은 5건만 펼쳐 두고 나머지는 `방송 n건 더
 NEWS_HOURS = 48   # 최근 48시간 전부 (2026-10-30 사용자, 옛 24 = 그날만). 지난 날 목업에서 샘플을 보려면 --news-hours 120
 
 
-def _kr_channels(iss, n):
-    """한국 증시 채널(수집기 limitGroup=kr — 매경TV · MTN · 미래에셋 · 삼성증권 …) 방송 이슈만, 최근 순. 미국 방송의 한국 이야기는 미국 데일리 한국장 탭 몫."""
-    out = [r for r in iss if r["category"] != "OTHER" and "kr" in (r.get("groups") or [r.get("group")])]
+def _kr_content(iss, n):
+    """한국 증시 내용(media_feed.is_korea — 이슈의 국가 · 중심 종목)인 방송 이슈만, 최근 순. 어느 채널이든(매경TV · 삼성증권 · 증시각도기 · 블룸버그 …) 내용이 한국 증시면 싣는다.
+    (2026-10-30 사용자. 옛 `_kr_channels` 는 한국 증시 채널 limitGroup=kr 만 — 증시각도기의 한국 시황이 빠지고, 삼성증권의 미국장 정리가 들어왔다)"""
+    import media_feed   # noqa: E402 — kr_news 를 들여올 때 experiments 가 sys.path 에 더해진다 (news_section 에서만 불린다)
+    out = [r for r in iss if r["category"] != "OTHER" and media_feed.is_korea(r)]
     return sorted(out, key=lambda r: str(r["published_at"]), reverse=True)[:n]
 
 
@@ -320,8 +322,8 @@ def news_section():
     try:
         sys.path.insert(0, os.path.join(_HERE, "..", "daily-report"))
         import kr_news
-        rows = [x for x in kr_news.rows_now() if x.get("group") == "kr"]   # 묶기 전에 한국 채널만 — 미국 방송과 한 이슈로 묶이면 대표 채널이 미국이 된다
-        html = kr_news.section(rows, hours=NEWS_HOURS, pick=_kr_channels, shown=NEWS_SHOWN).replace(kr_news.TITLE, "오늘 한국 증시 방송").replace(f'data-tab="{kr_news.TAB}"', f'data-tab="{TAB_TODAY}"')
+        rows = [x for x in kr_news.rows_now() if kr_news.media_feed.is_korea(x)]   # 묶기 전에 한국 증시 내용만 — 미국 내용 줄과 한 이슈로 묶이지 않게
+        html = kr_news.section(rows, hours=NEWS_HOURS, pick=_kr_content, shown=NEWS_SHOWN).replace(kr_news.TITLE, "오늘 한국 증시 방송").replace(f'data-tab="{kr_news.TAB}"', f'data-tab="{TAB_TODAY}"')
         if "<h2" in html:
             return html
     except Exception as e:  # noqa: BLE001

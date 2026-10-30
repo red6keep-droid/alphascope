@@ -44,7 +44,7 @@ def section(rows, hours=HOURS, pick=None, shown=SHOWN):
     소식이 없으면 표시만 (빈 칸)."""
     since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M")
     items = []
-    for r in (pick or media_feed.korea)(media_feed.issues(rows, since), None):   # 같은 이슈는 한 줄로 정리한 뒤 — 전부(상한 없음, 2026-10-30). pick: 고르는 규칙(한국 증시 리포트는 한국 채널만, 2026-10-26)
+    for r in (pick or media_feed.korea)(media_feed.issues(rows, since), None):   # 같은 이슈는 한 줄로 정리한 뒤 — 전부(상한 없음, 2026-10-30). pick: 고르는 규칙(기본 media_feed.korea = 한국 증시 내용, 채널 무관 — 2026-10-30)
         d = r["direction"]
         labels = " ".join([dk.pill(media_feed.kr_label(r), bare=True),
                            dk.pill({"positive": "긍정", "negative": "부정"}.get(d, "중립"), d if d in ("positive", "negative") else "neutral", bare=True)]
