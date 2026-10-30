@@ -62,6 +62,30 @@ def card_revenue(sym, extra, group):
             "qoq": (last["rev"] / prev[-1]["rev"] - 1) * 100 if prev else None, "bars": bars, "peers_last": bars[-1]["peers"]}
 
 
+CAPEX_PCT = 10   # 최근 4분기 설비 투자 합이 그 전 4분기보다 이만큼 넘게 다르면 늘리는 중 · 줄이는 중 (분기 값은 들쭉날쭉해 4분기 합으로)
+
+
+def card_capex(sym, extra):
+    """돈을 어디에 쓰나 (2026-10-30 사용자) — collect_capex 분기 표 → 카드 재료. 판단 없이 사실만: 최근 분기 · 최근 4분기 합 · 1년 전 대비 · 영업으로 번 돈 대비."""
+    import collect_capex as CX
+    rows = (extra.get("capex") or {}).get(sym) or []
+    rows = [r for r in rows if r.get("capex") is not None or r.get("ocf") is not None]
+    if not rows:
+        return None
+    last = rows[-1]
+    sm = CX.summary(rows)
+    bars = [{"cq": r["cq"], "end": r["end"], "capex": r.get("capex"), "ocf": r.get("ocf")} for r in rows[-8:]]
+    c4, p4 = sm.get("capex"), sm.get("capex_prev")
+    chg4 = (c4 / p4 - 1) * 100 if c4 is not None and p4 else None
+    if last.get("capex") is None and not any(r.get("capex") is not None for r in rows[-4:]):
+        state = "설비 투자 줄 없음"   # 은행 · 보험 — 현금흐름표에 설비 투자 항목이 따로 없다
+    else:
+        state = "늘리는 중" if chg4 is not None and chg4 >= CAPEX_PCT else "줄이는 중" if chg4 is not None and chg4 <= -CAPEX_PCT else "비슷함" if chg4 is not None else "4분기 안 됨"
+    return {"state": state, "end": last["end"], "form": last.get("form"), "src": last.get("src"), "capex": last.get("capex"), "capex_yoy": last.get("capex_yoy"),
+            "ocf": last.get("ocf"), "rnd": last.get("rnd"), "cash": last.get("cash"), "debt": last.get("debt"), "bars": bars, "chg4": chg4,
+            "sum4": {k: sm.get(k) for k in CX.TAGS}, "n4": min(4, len(rows))}
+
+
 def card_eps(sym, extra, group):
     allx = {s: (v or {}).get("eps") or {} for s, v in (extra.get("stocks") or {}).items()}
     me = allx.get(sym) or {}
@@ -230,7 +254,8 @@ def build(s, snap, extra):
     s["expect"] = {}
     group = peer_group(snap)
     for k, f in (("revenue", lambda: card_revenue(s["sym"], extra, group)), ("eps", lambda: card_eps(s["sym"], extra, group)),
-                 ("move", lambda: card_move(s, snap, extra)), ("short", lambda: card_short(s["sym"], extra, group))):
+                 ("move", lambda: card_move(s, snap, extra)), ("short", lambda: card_short(s["sym"], extra, group)),
+                 ("capex", lambda: card_capex(s["sym"], extra))):
         try:
             s["expect"][k] = f()
         except Exception as e:   # noqa: BLE001
