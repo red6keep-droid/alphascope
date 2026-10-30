@@ -327,9 +327,10 @@ def gauge_svg(net, width=260, labels=True):
         x, y = pt((lo + hi) / 2, r + 18)
         anchor = "end" if x < cx - 8 else "start" if x > cx + 8 else "middle"
         labs += f'<text x="{x:.0f}" y="{y + 4:.0f}" font-size="12" fill="#6B7280" text-anchor="{anchor}">{name}</text>'
-    x, y = pt(net, r - 12)
-    needle = (f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{x:.1f}" y2="{y:.1f}" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>'
-              f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5" fill="#111"/>')
+    k = r / 90   # 큰 게이지(반지름 90) 기준 비율 — 작은 게이지는 바늘 · 가운데 원도 같이 작게 (P110, 사용자: "그래프 비율에 따라 같이 작아져야지")
+    x, y = pt(net, r - 12 * k)
+    needle = (f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{x:.1f}" y2="{y:.1f}" stroke="#111" stroke-width="{2.5 * k:.2f}" stroke-linecap="round"/>'
+              f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{5 * k:.2f}" fill="#111"/>')
     h = cy + (28 if labels else 8)
     return (f'<svg viewBox="0 0 {width} {h:.0f}" width="{width}" height="{h:.0f}" aria-hidden="true" style="display:block;max-width:100%;height:auto;margin:0 auto;">'
             f'{arcs}{labs}{needle}</svg>')
