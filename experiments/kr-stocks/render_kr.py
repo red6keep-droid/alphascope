@@ -579,7 +579,7 @@ def price_card(s):
         head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1)
         k = head.rstrip().rfind("</span>")
         sub_html = sub.replace("S&P 500", "KOSPI")
-        if long_name:   # 증감 줄 ~ 작은 글씨 6 → 8px (+40%, 8.4 → 8, P135)
+        if long_name:   # 증감 줄 아래 ~ 작은 글씨 6 → 8px (+30%, 7.8 → 8, P135 · 사용자 10-31 정정: 40% 아니고 30%). 증감 위(가격 ~ 증감 9px)는 그대로
             sub_html = f'<span style="display:block;flex-basis:100%;margin-top:2px;">{sub_html}</span>'
         head = head[:k] + sub_html + head[k:]
     rows = ""   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 정보 보기는 모두 강조 카드 안 (2026-10-26 사용자)
