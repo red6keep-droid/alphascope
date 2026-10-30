@@ -249,7 +249,7 @@ ZONES = [(-1.0, -0.5, "강한 하락", "#82B1F0"), (-0.5, -0.15, "하락", "#BCD
 BOX = {"up": ("#FDE8E8", "#F6CACA", "#B91C1C"), "down": ("#DCE9FC", "#C3D7F5", "#1D4ED8"), "flat": ("#E8EDF3", "#D6DEE8", "#475569")}
 BOX_W = 50
 PAIR_GAP = 8   # 작은 게이지 카드 둘 사이 = 전체요약 카드와의 위 여백 (P108)
-TABLE_FS, TABLE_LH, WHY_FS = "15px", "22px", "13px"   # P104: 표 줄만 16 → 15 (사용자 "구분선으로 나눠 있는 정보만 한 포인트")   # 표 글자 18 → 16 (사용자 "두 단계 작게", 한 단계 = 1px · P96 과 같은 셈) · 괄호 글 14 → 13
+TABLE_FS, TABLE_LH, WHY_FS = "15px", "23px", "13px"   # P113: 줄 높이 − 글자 = 짝수(위아래 여백 정수) — 15/23 · 13/19 · 14/22   # P104: 표 줄만 16 → 15 (사용자 "구분선으로 나눠 있는 정보만 한 포인트")   # 표 글자 18 → 16 (사용자 "두 단계 작게", 한 단계 = 1px · P96 과 같은 셈) · 괄호 글 14 → 13
 
 
 # 이동평균 기간 옆 설명 (P109) — 거래일 기준 대략의 달력 길이 (20거래일 ≈ 1달)
@@ -289,7 +289,7 @@ def label_box(label, esc):
         main = label
     kind = "up" if main == UPW else "down" if main == DNW else "flat"
     b = box(kind, main, esc, sym=main in (UPW, DNW, MID))
-    w = f'<span style="font-size:{WHY_FS};line-height:18px;color:#6B7280;white-space:nowrap;">({esc(why)})</span>' if why else ""
+    w = f'<span style="font-size:{WHY_FS};line-height:19px;color:#6B7280;white-space:nowrap;">({esc(why)})</span>' if why else ""
     return w, b
 
 
@@ -301,11 +301,20 @@ def _table(rows_html, line, keep=(0,)):
                    for i, r in enumerate(rows_html))
 
 
-def gauge_svg(net, width=260, labels=True):
-    """반원 게이지 다섯 칸 + 바늘 + 칸 이름. 바늘 = net (−1 … +1), 왼쪽 끝 = −1.
+# 게이지 치수 — 모두 정수 px (P113, 사용자: "간격은 모두 정수로, 소수점 찍지 마").
+# 작은 게이지는 폰(360px) 칸 안쪽 폭 134 그대로 그려 축소(옛 150 → 0.89배, 간격이 소수가 되던 원인)를 없앤다.
+#   폭 · 반지름 · 위 여백 · 호 두께 · 바늘 두께 · 가운데 원 반지름 · 바늘 끝 ~ 호 안쪽 · 아래 여백(가운데 원 아래 ~ 그림 끝)
+GAUGE_BIG = dict(width=260, r=90, top=30, arc=14, needle=3, hub=5, tip_gap=15, bottom=23)
+GAUGE_SMALL = dict(width=134, r=55, top=10, arc=10, needle=2, hub=3, tip_gap=10, bottom=6)
+
+
+def gauge_svg(net, size="big"):
+    """반원 게이지 다섯 칸 + 바늘 + (큰 것만) 칸 이름. 바늘 = net (−1 … +1), 왼쪽 끝 = −1.
     양 끝(강한 하락 · 강한 상승)은 호 끝 아래, 가운데 셋은 호 바깥 위 — 옆에 두면 폭 안에서 잘렸다 (10-30 목업)."""
-    r = width / 2 - (40 if labels else 12)
-    cx, cy = width / 2, r + (30 if labels else 10)
+    g = GAUGE_BIG if size == "big" else GAUGE_SMALL
+    labels = size == "big"
+    width, r = g["width"], g["r"]
+    cx, cy = width // 2, r + g["top"]
 
     def ang(v):   # −1 → 180° (왼쪽), +1 → 0° (오른쪽)
         return math.radians(90 - max(-1.0, min(1.0, v)) * 90)
@@ -317,24 +326,21 @@ def gauge_svg(net, width=260, labels=True):
     for lo, hi, _, col in ZONES:
         x0, y0 = pt(lo + 0.012, r)
         x1, y1 = pt(hi - 0.012, r)
-        arcs += f'<path d="M{x0:.1f},{y0:.1f} A{r:.1f},{r:.1f} 0 0 1 {x1:.1f},{y1:.1f}" stroke="{col}" stroke-width="{14 if labels else 10}" fill="none"/>'
+        arcs += f'<path d="M{x0:.1f},{y0:.1f} A{r},{r} 0 0 1 {x1:.1f},{y1:.1f}" stroke="{col}" stroke-width="{g["arc"]}" fill="none"/>'
     labs = ""
     for i, (lo, hi, name, _) in enumerate(ZONES if labels else []):
         if i in (0, 4):   # 양 끝: 호 끝 바로 아래 가운데
             x, y = pt(-1.0 if i == 0 else 1.0, r)
-            labs += f'<text x="{x:.0f}" y="{cy + 22:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">{name}</text>'
+            labs += f'<text x="{x:.0f}" y="{cy + 22}" font-size="12" fill="#6B7280" text-anchor="middle">{name}</text>'
             continue
         x, y = pt((lo + hi) / 2, r + 18)
         anchor = "end" if x < cx - 8 else "start" if x > cx + 8 else "middle"
         labs += f'<text x="{x:.0f}" y="{y + 4:.0f}" font-size="12" fill="#6B7280" text-anchor="{anchor}">{name}</text>'
-    k = r / 90   # 큰 게이지(반지름 90) 기준 비율 — 작은 게이지는 바늘 · 가운데 원도 같이 작게 (P110, 사용자: "그래프 비율에 따라 같이 작아져야지")
-    sw = 14 if labels else 10   # 호 두께
-    gap = 3 * (12 * k - sw / 2)   # 바늘 끝 ~ 호 안쪽 간격: 옛 간격(큰 5 · 작은 3.4px)의 3배 (P111, 사용자 "너무 붙어 있다")
-    x, y = pt(net, r - sw / 2 - gap)
-    needle = (f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{x:.1f}" y2="{y:.1f}" stroke="#111" stroke-width="{2.5 * k:.2f}" stroke-linecap="round"/>'
-              f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{5 * k:.2f}" fill="#111"/>')
-    h = cy + (28 if labels else 8)
-    return (f'<svg viewBox="0 0 {width} {h:.0f}" width="{width}" height="{h:.0f}" aria-hidden="true" style="display:block;max-width:100%;height:auto;margin:0 auto;">'
+    x, y = pt(net, r - g["arc"] // 2 - g["tip_gap"])   # 바늘 끝 ~ 호 안쪽 = tip_gap (P111: 옛 5 · 3.4 의 3배 → 15 · 10)
+    needle = (f'<line x1="{cx}" y1="{cy}" x2="{x:.1f}" y2="{y:.1f}" stroke="#111" stroke-width="{g["needle"]}" stroke-linecap="round"/>'
+              f'<circle cx="{cx}" cy="{cy}" r="{g["hub"]}" fill="#111"/>')
+    h = cy + g["hub"] + g["bottom"]
+    return (f'<svg viewBox="0 0 {width} {h}" width="{width}" height="{h}" aria-hidden="true" style="display:block;max-width:100%;height:auto;margin:0 auto;">'
             f'{arcs}{labs}{needle}</svg>')
 
 
@@ -343,10 +349,10 @@ def _sub(title):
     return f'<span style="display:block;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;">{title}</span>'   # 19 → 18 (P105)
 
 
-def _tri_small(w):
-    """답 앞 ▲ · ▼ 를 글자의 80% 크기로 (P112, 사용자: "삼각형 20% 더 작게")."""
+def _tri_small(w, px):
+    """답 앞 ▲ · ▼ 를 글자의 약 80% 크기로 (P112, 사용자: "삼각형 20% 더 작게") — 정수 px (P113: 19 → 15 · 18 → 14)."""
     if w[:1] in "▲▼":
-        return f'<span style="font-size:80%;vertical-align:1px;">{w[0]}</span>{w[1:]}'
+        return f'<span style="font-size:{px}px;vertical-align:1px;">{w[0]}</span>{w[1:]}'
     return w
 
 
@@ -360,9 +366,9 @@ def _gauge_block(title, c, extra, up_color, down_color, muted, small=False, corn
     mx = 0 if small else _dk.CHART_CARD_X
     top = f'<span style="display:block;text-align:right;font-size:14px;line-height:20px;color:{muted};margin:0 0 2px;">{corner}</span>' if corner else ""
     return (f'<span style="{_dk.MULTI}margin:{"0" if small else f"6px {mx}px 0"};text-align:center;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px {8 if small else 12}px;">'
-            f'{top}<span style="display:block;font-weight:700;color:#111;margin:0 0 4px;font-size:{"15px" if small else "16px"};">{title}</span>'   # 17 → 16 · 작은 게이지 16 → 15 (P108)
-            f'{gauge_svg(c["net"], 150, False) if small else gauge_svg(c["net"])}'
-            f'<span style="display:block;font-weight:700;color:{col};{"font-size:18px;" if small else ""}">{_tri_small(w)}</span>'   # 작은 게이지 답 19 → 18 (P112)
+            f'{top}<span style="display:block;font-weight:700;color:#111;margin:0 0 4px;font-size:{"15px" if small else "16px"};line-height:{"23px" if small else "24px"};">{title}</span>'   # 17 → 16 · 작은 게이지 16 → 15 (P108)
+            f'{gauge_svg(c["net"], "small" if small else "big")}'
+            f'<span style="display:block;font-weight:700;color:{col};{"font-size:18px;line-height:24px;" if small else "font-size:19px;line-height:25px;"}">{_tri_small(w, 14 if small else 15)}</span>'   # 작은 게이지 답 19 → 18 (P112)
             f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}</span>{extra}</span></span>')
 
 
@@ -397,7 +403,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         w, bx = label_box(r["label"], _h.escape)
         what = WHAT.get(r["key"], "")
         trs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{_h.escape(r["name"])}'   # 폭이 모자라는 날(긴 이름 + 괄호 글)은 설명 끝이 … 로 — 줄바꿈 없음 (P108)
-                   + (f'<span style="margin-left:4px;font-size:{WHY_FS};line-height:18px;color:#6B7280;">{what}</span>' if what else "") + '</span>'   # 괄호 글(과매도)과 같은 13px 회색 (P109)
+                   + (f'<span style="margin-left:4px;font-size:{WHY_FS};line-height:19px;color:#6B7280;">{what}</span>' if what else "") + '</span>'   # 괄호 글(과매도)과 같은 13px 회색 (P109)
                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<b style="font-weight:700;">{_h.escape(r["text"])}</b>{bx}</span>')   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
     lines.append((_sub("기술지표") + _table(trs, line), "html"))
     COLW = f"display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;min-width:{BOX_W + 58}px;"   # 숫자 + 라벨 한 칸 — 인베스팅닷컴처럼 값마다 상승 · 하락 (P103, 옛 ▲ · ▼)
@@ -406,9 +412,9 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         if v is None:
             return f'<span style="{COLW}">—</span>'
         return f'<span style="{COLW}"><span>{v:,.0f}</span>{box("up" if above else "down", UPW if above else DNW, _h.escape)}</span>'
-    mrs = [f'<span>기간</span><span style="display:inline-flex;gap:6px;font-size:14px;color:{muted};"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
+    mrs = [f'<span>기간</span><span style="display:inline-flex;gap:6px;font-size:14px;line-height:22px;color:{muted};"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
     for m in sig["ma"]:
-        mrs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{m["n"]}일<span style="margin-left:4px;font-size:{WHY_FS};line-height:18px;color:#6B7280;">{MA_WHAT.get(m["n"], "")}</span></span>'
+        mrs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{m["n"]}일<span style="margin-left:4px;font-size:{WHY_FS};line-height:19px;color:#6B7280;">{MA_WHAT.get(m["n"], "")}</span></span>'
                    f'<span style="display:inline-flex;gap:6px;flex:none;">{one(m["sma"], m["sma_above"])}{one(m["ema"], m["ema_above"])}</span>')
     lines.append((_sub("이동평균") + _table(mrs, line, keep=(0, 1)), "html"))
     tip = ("널리 쓰는 기술지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
