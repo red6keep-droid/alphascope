@@ -248,6 +248,7 @@ ZONES = [(-1.0, -0.5, "강한 하락", "#82B1F0"), (-0.5, -0.15, "하락", "#BCD
 # 10-30 사용자 P103: 버튼 말고 라벨 느낌 — 외곽선 연하게, 셋 다 연한 바탕(하락 바탕이 하락 카드 바탕과 같아 색이 없어 보였다), 가로 짧게 · 높이 그대로
 BOX = {"up": ("#FDE8E8", "#F6CACA", "#B91C1C"), "down": ("#DCE9FC", "#C3D7F5", "#1D4ED8"), "flat": ("#E8EDF3", "#D6DEE8", "#475569")}
 BOX_W = 50
+DIVIDER = '<span aria-hidden="true" style="display:inline-block;width:1px;height:11px;margin:0 6px;background:#CBD5E1;vertical-align:-1px;"></span>'   # 세로 구분선: 글자 14px 의 80% = 11.2 → 11px, 양옆 6 (P116, 정수 규칙)
 PAIR_GAP = 5   # 작은 게이지 카드 둘 사이 = 전체요약 카드와의 위 여백 (P108 · P114: 8 → 5, −40%)
 TABLE_FS, TABLE_LH, WHY_FS = "15px", "23px", "13px"   # P113: 줄 높이 − 글자 = 짝수(위아래 여백 정수) — 15/23 · 13/19 · 14/22   # P104: 표 줄만 16 → 15 (사용자 "구분선으로 나눠 있는 정보만 한 포인트")   # 표 글자 18 → 16 (사용자 "두 단계 작게", 한 단계 = 1px · P96 과 같은 셈) · 괄호 글 14 → 13
 
@@ -365,12 +366,13 @@ def _gauge_block(title, c, extra, up_color, down_color, muted, small=False, corn
     cnt = f'상승 {c["up"]} · 중립 {c["neutral"]} · 하락 {c["down"]}' if c.get("neutral") else f'상승 {c["up"]} · 하락 {c["down"]}'
     mx = 0 if small else _dk.CHART_CARD_X
     # 기준일 = 카드 안 오른쪽 위, 제목과 같은 높이 (두 줄이라 좁아 가운데 제목과 겹치지 않는다, P114)
-    top = f'<span style="position:absolute;top:{_dk.CHART_CARD_PAD}px;right:12px;text-align:right;font-size:14px;line-height:20px;color:{muted};">{corner}</span>' if corner else ""
-    return (f'<span style="{_dk.MULTI}position:relative;margin:{"0" if small else f"6px {mx}px 0"};text-align:center;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px {8 if small else 12}px;">'
+    top = f'<span style="position:absolute;top:{_dk.CHART_CARD_PAD}px;right:8px;text-align:right;font-size:14px;line-height:20px;color:{muted};">{corner}</span>' if corner else ""
+    return (f'<span style="{_dk.MULTI}position:relative;margin:{"0" if small else f"6px {mx}px 0"};text-align:center;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 8px;">'   # 좌우 8 — 세 카드 같게 (P116: 개수 · 주봉 · 월봉 한 줄 자리)
             f'{top}<span style="display:block;font-weight:700;color:#111;margin:0 0 4px;font-size:{"14px" if small else "16px"};line-height:{"22px" if small else "24px"};">{title}</span>'   # 작은 게이지 제목 15 → 14 (P115)   # 17 → 16 · 작은 게이지 16 → 15 (P108)
             f'{gauge_svg(c["net"], "small" if small else "big")}'
             f'<span style="display:block;font-weight:700;color:{col};{"font-size:17px;line-height:23px;" if small else "font-size:19px;line-height:25px;"}">{_tri_small(w, 13 if small else 15)}</span>'   # 작은 게이지 답 18 → 17 · 삼각형 14 → 13 (P115)   # 작은 게이지 답 19 → 18 (P112)
-            f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}</span>{extra}</span></span>')
+            f'<span style="display:flex;flex-wrap:wrap;justify-content:center;font-size:14px;line-height:20px;color:{muted};"><span style="white-space:nowrap;">{cnt}</span>'
+            + (f'<span style="white-space:nowrap;">{extra}</span>' if extra else "") + '</span></span></span>')   # extra = 같은 줄 구분선 뒤 · 폭이 모자라면 그 묶음만 다음 줄 (P116)   # extra = 같은 줄 뒤 (P116)
 
 
 def card(sig, name, up_color, down_color, muted="#6B7280"):
@@ -385,14 +387,14 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         w = sig.get(key)
         if w:
             col = up_color if w["net"] >= 0.15 else down_color if w["net"] <= -0.15 else muted
-            frames.append(f'{lab} <b style="color:{col};">{word(w["net"])}</b>')
+            frames.append(f'{lab} <b style="color:{col};">{_tri_small(word(w["net"]), 11)}</b>')   # 삼각형 14 의 80% = 11px (P116, 게이지 답과 같은 규칙)
     import design_kit as _dk
     # 게이지는 게이지끼리 맨 위 (10-30 사용자): 전체 요약 크게(칸 이름) → 기술 지표 · 이동평균 작게 나란히(색만 같게)
     pair = (f'<span style="display:flex;gap:{PAIR_GAP}px;margin:{PAIR_GAP}px {_dk.CHART_CARD_X}px 4px;">'   # 위 여백 = 두 카드 사이 (P108)   # 두 카드 바깥 선 = 전체 요약 카드 바깥 선 (P106)
             f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("기술지표", sig["counts"], "", up_color, down_color, muted, small=True)}</span>'
             f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("이동평균", mc, "", up_color, down_color, muted, small=True)}</span></span>')
     lines = [('<span style="display:block;height:6px;"></span>' + _gauge_block("전체요약", al,
-                           f'<span style="display:block;text-align:center;font-size:14px;line-height:20px;color:{muted};margin-top:2px;">{" · ".join(frames)}</span>' if frames else "",
+                           (DIVIDER + " · ".join(frames)) if frames else "",   # 주봉 · 월봉 = 개수 줄 오른쪽, 세로 구분선 뒤 (P116)
                            up_color, down_color, muted, corner=f"{day} 종가<br>일봉 기준")   # 두 줄 · 가운뎃점 없이 (P114)   # 기준일 = 전체 요약 카드 안 오른쪽 위 (P107)
               + pair, "html"),
              ]
