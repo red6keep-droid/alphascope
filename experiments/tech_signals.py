@@ -367,9 +367,9 @@ def _gauge_block(title, c, extra, up_color, down_color, muted, small=False, corn
     # 기준일 = 카드 안 오른쪽 위, 제목과 같은 높이 (두 줄이라 좁아 가운데 제목과 겹치지 않는다, P114)
     top = f'<span style="position:absolute;top:{_dk.CHART_CARD_PAD}px;right:12px;text-align:right;font-size:14px;line-height:20px;color:{muted};">{corner}</span>' if corner else ""
     return (f'<span style="{_dk.MULTI}position:relative;margin:{"0" if small else f"6px {mx}px 0"};text-align:center;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px {8 if small else 12}px;">'
-            f'{top}<span style="display:block;font-weight:700;color:#111;margin:0 0 4px;font-size:{"15px" if small else "16px"};line-height:{"23px" if small else "24px"};">{title}</span>'   # 17 → 16 · 작은 게이지 16 → 15 (P108)
+            f'{top}<span style="display:block;font-weight:700;color:#111;margin:0 0 4px;font-size:{"14px" if small else "16px"};line-height:{"22px" if small else "24px"};">{title}</span>'   # 작은 게이지 제목 15 → 14 (P115)   # 17 → 16 · 작은 게이지 16 → 15 (P108)
             f'{gauge_svg(c["net"], "small" if small else "big")}'
-            f'<span style="display:block;font-weight:700;color:{col};{"font-size:18px;line-height:24px;" if small else "font-size:19px;line-height:25px;"}">{_tri_small(w, 14 if small else 15)}</span>'   # 작은 게이지 답 19 → 18 (P112)
+            f'<span style="display:block;font-weight:700;color:{col};{"font-size:17px;line-height:23px;" if small else "font-size:19px;line-height:25px;"}">{_tri_small(w, 13 if small else 15)}</span>'   # 작은 게이지 답 18 → 17 · 삼각형 14 → 13 (P115)   # 작은 게이지 답 19 → 18 (P112)
             f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}</span>{extra}</span></span>')
 
 
