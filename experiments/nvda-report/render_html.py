@@ -38,8 +38,8 @@ MICRO = "14px"   # 카드 구분명 안 괄호 부분 — 카드 글자(16px)보
 CARD = f"background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:{14 - _dk.VP}px 14px;line-height:{LH_CARD};"   # 보이는 위아래 14 (2026-10-12)           # 기본 카드 (오늘 한 줄)
 CARD_EMPH = f"background:#FFF7ED;border:1px solid #FFEDD5;border-radius:10px;padding:{12 - _dk.VP}px 14px;line-height:{LH_CARD};"       # (옛) 강조 카드
 # 강조 이벤트 카드는 방향 테마 (2026-10-11 사용자): 긍정 오렌지 · 부정 파랑 · 중립 회색 · 불확실 노랑
-CARD_DIR = {"positive": ("#FFF7ED", "#FEDBB2"), "negative": ("#EFF6FF", "#C5DFFE"),
-            "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#FFFBEB", "#FDEA9C"),
+CARD_DIR = {"positive": ("#FFF7ED", "#FEE2C1"), "negative": ("#EFF6FF", "#D1E5FE"),
+            "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#FFFBEB", "#FDEEB0"),
             "soon": ("#F5F3FF", "#DDD6FE")}   # 보라 = 다가오는 일정 (캘린더 탭, 2026-10-18 사용자)
 SOON = "#6D28D9"   # 보라 카드 상태 글자
 # 라벨 (가이드라인 5절, 2026-10-11 사용자): 외곽선 박스, 모서리 4px, 볼드 없음, 14px. (테두리색, 글자색)
@@ -238,8 +238,8 @@ ROW = (f"display:flex;justify-content:space-between;align-items:center;gap:12px;
 ROW_SMALL = f"font-size:{SMALL};padding:{7 - _dk.VP}px 12px;"       # B타입 (비교 카드)
 # A타입 색 배경(상승 오렌지 · 하락 파랑)은 강조 카드 — 행간 32 · 위아래 보이는 24 (2026-10-12 사용자: "NVDA 강조 카드는 왜 공통 여백 적용이 안 된 거지")
 _EMPH_ROW = f"padding:{_dk.EMPH_PAD - _dk.VP_EMPH}px 12px;line-height:{_dk.LH_EMPH};"
-ROW_UP = "background:#FFF7ED;border-color:#FEDBB2;" + _EMPH_ROW     # A타입 상승: 연한 오렌지
-ROW_DOWN = "background:#EFF6FF;border-color:#C5DFFE;" + _EMPH_ROW   # A타입 하락: 연한 파랑
+ROW_UP = "background:#FFF7ED;border-color:#FEE2C1;" + _EMPH_ROW     # A타입 상승: 연한 오렌지
+ROW_DOWN = "background:#EFF6FF;border-color:#D1E5FE;" + _EMPH_ROW   # A타입 하락: 연한 파랑
 MULTI = f"display:block;margin:0 0 6px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font-size:{SMALL};line-height:{LH_CARD};"   # C타입 (멀티 카드, 16px — 2026-10-11 사용자: 안내 글 빼고 14 → 16)
 MULTI_ROW = f"display:flex;justify-content:space-between;align-items:center;gap:12px;padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;white-space:nowrap;line-height:{LH_CARD};"   # 가로 구분선 기준 위아래 14px, 카드 가장자리도 같게 (2026-10-12 사용자)
 MULTI_SEP = "border-top:1px solid #E2E8F0;"            # C타입 줄 사이 가로 구분선
@@ -963,7 +963,7 @@ def sec_headline(a, n=None):
     r = h.get("ret_1d") or 0
     pcol = UP if r > 0 else DOWN if r < 0 else "#111"
     tone = ROW_UP if r > 0 else ROW_DOWN if r < 0 else ""
-    bg, bd = ("#FFF7ED", "#FEDBB2") if r > 0 else ("#EFF6FF", "#C5DFFE") if r < 0 else ("#fff", "#E2E8F0")
+    bg, bd = ("#FFF7ED", "#FEE2C1") if r > 0 else ("#EFF6FF", "#D1E5FE") if r < 0 else ("#fff", "#E2E8F0")
     # 가격 줄 맨 오른쪽 공식 접기 버튼, 기본 닫힘 — 펼치면 평균 대비 · 비교 · 시가 갭 등 (2026-10-13 사용자, 가이드라인 10-7). 버튼은 값 칸 안 — 홈 카드가 값 칸 글자를 읽는다
     price = price_value(f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">${h["close"]:,.2f}</span>', _arrow(h.get("ret_1d")),
                         _fold_btn(_dk.lighten(bg), bd) if r else ACC_BTN)
