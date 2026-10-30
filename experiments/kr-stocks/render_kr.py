@@ -549,7 +549,9 @@ def _glance(s):
             "normal_range": s.get("normal_range")}
 
 
-LONG_NAME_W = 109   # 가격 줄 이름 칸 = 360px 폰 카드 안쪽 304 의 36% (nvda-report PRICE_ROW_L)
+LONG_NAME_W = 109   # 가격 줄 이름 칸 = 360px 폰 카드 안쪽의 36% (nvda-report PRICE_ROW_L)
+PRICE_INNER_W = 302   # 360px 폰 가격 카드 안쪽 폭 (332 − 테두리 2 − 좌우 14 × 2, P137)
+PRICE_BTN_GAP = 12   # 가격 · % 오른쪽 끝 ~ 접기 버튼 = 상태 카드 답 ~ 버튼 (P137)
 
 
 def price_card(s):
@@ -561,26 +563,35 @@ def price_card(s):
     bg, bd = ("#FFF7EE", "#FEE6CA") if r > 0 else ("#EFF6FF", "#D6E8FE") if r < 0 else ("#fff", "#E2E8F0")
     close_html = f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">{won(s["close"])}</span>'
     btn = R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN
-    long_name = R._est_w(s["name"], 18) + 26 > LONG_NAME_W   # 이름(+ 로고)이 이름 칸(최대 36%)을 넘는다 — 한화에어로스페이스 · 삼성바이오로직스 …
+    long_name = True   # P137: 모든 한국 종목 = 가격 위 · 증감 아래 두 줄 — 짧은 이름(삼성전자)도 한 줄엔 안 들어가 꺾이며 가격(331) · %(288) 끝선이 어긋났다. 옛 기준: 이름 > LONG_NAME_W
+    name_fs = 18
+    if long_name:   # 한 줄 = 로고 26 + 이름 + 8 + 가격 + 12 + 버튼 31 ≤ 카드 안쪽 302 (360px 폰) — 넘치면 이름을 17 → 16px (P137: 옛 줄이 16px 넘쳐 버튼이 카드 밖)
+        pw = R._est_w(won(s["close"]), 18)
+        for fs in (18, 17, 16):
+            name_fs = fs
+            if 26 + R._est_w(s["name"], fs) + 8 + pw + 12 + 31 <= PRICE_INNER_W:
+                break
     if long_name:   # 가격 위 · 증감 아래 두 줄로 쌓고 이름은 한 줄 (2026-10-31 사용자: "이름이 길어 로고랑 틀어진다, 가격 밑에 증감")
         # 가격 · 증감 두 줄을 한 묶음으로 오른쪽 끝선을 맞추고, 접기 버튼은 그 묶음 오른쪽 (P135: 가격 오른쪽 끝 = % 오른쪽 끝)
-        price = (f'<span style="display:inline-flex;align-items:center;column-gap:4px;">'
+        price = (f'<span style="display:inline-flex;align-items:center;column-gap:{PRICE_BTN_GAP}px;">'   # 가격 · % 오른쪽 끝 ~ 버튼 12 = 상태 카드 답 ~ 버튼
                  f'<span style="display:inline-flex;flex-direction:column;align-items:flex-end;">{close_html} '
-                 f'<span style="white-space:nowrap;margin-top:-2px;">{R._arrow(r)}</span></span>{btn}</span>')   # 가격 ~ 증감 9 → 7px (P136, 사용자 10-31)
+                 f'<span style="white-space:nowrap;margin-top:{-2 if r else 6}px;">{R._arrow(r)}</span></span>{btn}</span>')   # 가격 ~ 증감 7px (P136) — 등락 0 인 날은 흰 카드 · 줄 높이 24 라 당김 대신 +6 (P137, 카카오뱅크 −1px 이던 것)
     else:
         price = R.price_value(close_html, R._arrow(r), btn)   # 길면 등락이 아래 줄로 (P61)
     head = R.price_row(R._row("@@", price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)
     if long_name:
         head = head.replace(R.PRICE_ROW_L, "flex:0 0 auto;min-width:0;white-space:nowrap;", 1)
-        head = head.replace("align-items:center;", "align-items:flex-start;", 1)   # 이름 = 가격과 같은 줄 (P135 — 가운데 맞춤이면 두 줄 사이에 떴다)   # "@@" 는 ticker_logo 가 배지를 만들지 않는 자리표시 — 한글 이름도 isalnum 이라 "SK" 배지가 붙는다
-    head = head.replace("@@", badge(s["sym"]) + _esc(s["name"]), 1)   # 한글 첫 글자 배지 + 종목 이름
+        head = head.replace("align-items:center;", "align-items:flex-start;", 1)   # 이름 = 가격과 같은 줄 (P135 — 가운데 맞춤이면 두 줄 사이에 떴다)
+        head = head.replace("gap:12px;", "gap:8px;", 1)   # 이름 ~ 가격 8 (P137)   # "@@" 는 ticker_logo 가 배지를 만들지 않는 자리표시 — 한글 이름도 isalnum 이라 "SK" 배지가 붙는다
+    nm = _esc(s["name"]) if name_fs == 18 else f'<span style="font-size:{name_fs}px;">{_esc(s["name"])}</span>'
+    head = head.replace("@@", badge(s["sym"]) + nm, 1)   # 한글 첫 글자 배지 + 종목 이름
     sub = R.glance_sub(g)
     if sub:
-        head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1)
+        head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1).replace("gap:8px;", "column-gap:8px;row-gap:2px;", 1)
         k = head.rstrip().rfind("</span>")
         sub_html = sub.replace("S&P 500", "KOSPI")
         if long_name:   # 증감 줄 아래 ~ 작은 글씨 6 → 8px (+30%, 7.8 → 8, P135 · 사용자 10-31 정정: 40% 아니고 30%). 증감 위(가격 ~ 증감 9px)는 그대로
-            sub_html = f'<span style="display:block;flex-basis:100%;margin-top:2px;">{sub_html}</span>'
+            sub_html = f'<span style="display:block;flex-basis:100%;margin-top:2px;">{sub_html}</span>'   # 작은 글씨는 스스로 % 끝선(288)에 맞춰져 있다 — 오른쪽 여백을 더하면 이중으로 들어간다 (P137)
         head = head[:k] + sub_html + head[k:]
     rows = ""   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 정보 보기는 모두 강조 카드 안 (2026-10-26 사용자)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'

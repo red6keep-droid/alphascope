@@ -260,9 +260,14 @@ EPS_CHART_TITLE = "내년 1주당 이익 예상, 그때보다 바뀐 폭 (%)"   
 PRICE_ROW_L = "flex:0 1 auto;max-width:36%;min-width:0;white-space:normal;"   # 가격 줄 이름 칸은 이름 길이만큼(최대 36% — 긴 이름이어도 보통 가격은 412px 폰에서 한 줄) — 남는 폭은 값 칸이 써서 보통 가격은 한 줄 (P61)
 
 
+PRICE_ROW_PAD_X = 14   # 가격 카드 머리 줄 좌우 안쪽 — 상태 카드(_state_card 14px)와 같은 세로 기준선 (2026-10-31 사용자 P137: "2px 왼쪽으로 밀려 있다", 옛 12)
+
+
 def price_row(row_html):
-    """가격 줄(_row) 의 이름 칸을 이름 길이만큼으로 — 옛 40% 고정은 폰 폭에서 값 칸이 몇 px 넘쳤다."""
-    return row_html.replace(_dk.ROW_L, PRICE_ROW_L, 1)
+    """가격 줄(_row) 의 이름 칸을 이름 길이만큼으로 — 옛 40% 고정은 폰 폭에서 값 칸이 몇 px 넘쳤다. 좌우 안쪽 = PRICE_ROW_PAD_X."""
+    out = row_html.replace(_dk.ROW_L, PRICE_ROW_L, 1)
+    k = out.index(">")   # 줄 상자 style 안의 좌우 12 를 모두 — 색 바탕(ROW_UP · ROW_DOWN)이 padding 을 한 번 더 적어 덮었다 (P137)
+    return out[:k].replace("px 12px;", f"px {PRICE_ROW_PAD_X}px;") + out[k:]
 
 
 def gap_sentence(g):
