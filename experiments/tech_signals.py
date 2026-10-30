@@ -343,6 +343,13 @@ def _sub(title):
     return f'<span style="display:block;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;">{title}</span>'   # 19 → 18 (P105)
 
 
+def _tri_small(w):
+    """답 앞 ▲ · ▼ 를 글자의 80% 크기로 (P112, 사용자: "삼각형 20% 더 작게")."""
+    if w[:1] in "▲▼":
+        return f'<span style="font-size:80%;vertical-align:1px;">{w[0]}</span>{w[1:]}'
+    return w
+
+
 def _gauge_block(title, c, extra, up_color, down_color, muted, small=False, corner=""):
     """흰 카드(design_kit.MULTI) 안에 [오른쪽 위 corner] · 제목(가운데) · 게이지 · 답 · 개수 · extra (P107: 제목 · 기준일을 카드 안으로).
     small = 나란히 놓는 작은 게이지(칸 이름 없음). 큰 게이지 카드는 다른 그래프처럼 양쪽 5px 넓게(CHART_CARD_X)."""
@@ -355,7 +362,7 @@ def _gauge_block(title, c, extra, up_color, down_color, muted, small=False, corn
     return (f'<span style="{_dk.MULTI}margin:{"0" if small else f"6px {mx}px 0"};text-align:center;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px {8 if small else 12}px;">'
             f'{top}<span style="display:block;font-weight:700;color:#111;margin:0 0 4px;font-size:{"15px" if small else "16px"};">{title}</span>'   # 17 → 16 · 작은 게이지 16 → 15 (P108)
             f'{gauge_svg(c["net"], 150, False) if small else gauge_svg(c["net"])}'
-            f'<span style="display:block;font-weight:700;color:{col};">{w}</span>'
+            f'<span style="display:block;font-weight:700;color:{col};{"font-size:18px;" if small else ""}">{_tri_small(w)}</span>'   # 작은 게이지 답 19 → 18 (P112)
             f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}</span>{extra}</span></span>')
 
 
