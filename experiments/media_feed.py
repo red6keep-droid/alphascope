@@ -319,6 +319,7 @@ def issues(rs, since=""):
                         tickers=[t for t, _ in Counter(t for r in g for t in r["tickers"]).most_common()],
                         scope=sc[0][0] if sc else rep["scope"], surprise=any(r["surprise"] for r in g),
                         direction=st[0][0] if len(st) == 1 or st[0][1] > st[1][1] else "neutral",   # 방송끼리 엇갈리면 중립
+                        split=len({r["direction"] for r in g} - {"neutral"}) > 1,   # 긍정 · 부정이 같이 있음 → `엇갈림` 라벨 (미디어 데일리 순위 글에서 옮겨 옴, 2026-10-30)
                         n_channels=len({r["channel"] for r in g}), n_videos=len(g), groups=sorted({r.get("group", "main") for r in g}),
                         channels=[c for c, _ in Counter(r["channel"] for r in g).most_common()], theme=THEME.get(rep["category"], "기타")))
     return out

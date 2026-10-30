@@ -23,7 +23,7 @@ import media_feed  # noqa: E402
 
 TITLE = "한국장에 영향을 줄 만한 소식"
 TAB = "한국장"   # render_html.TAB_KOREA 와 같다
-MAX, HOURS = 6, 12   # 최근 12시간 — 어제 아침 한국 방송(전날 장 이야기)은 넣지 않는다
+HOURS, SHOWN = 48, 5   # 최근 48시간 전부, 앞 5건만 펼치고 나머지는 접기 (2026-10-30 사용자). 옛: 6건 · 12시간(어제 아침 한국 방송은 뺌)
 MARK_OPEN, MARK_CLOSE = "<!--kr-news-->", "<!--/kr-news-->"
 
 
@@ -36,18 +36,19 @@ def _kst_hm(iso):
 
 def rows_now():
     now = datetime.datetime.now(datetime.timezone.utc)
-    return media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=2))
+    return media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=3))   # 48시간이 edition 사흘에 걸친다
 
 
-def section(rows, hours=HOURS, pick=None, shown=None):
+def section(rows, hours=HOURS, pick=None, shown=SHOWN):
     """표시 주석으로 감싼 구획 HTML. 공용 뉴스 카드: 방송 주제(영상 링크) / 방송 주장 / [한국 종목 · 분야] [방향] [예상 밖]  시각 · 채널 · 방송 n곳.
     소식이 없으면 표시만 (빈 칸)."""
     since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M")
     items = []
-    for r in (pick or media_feed.korea)(media_feed.issues(rows, since), MAX):   # 같은 이슈는 한 줄로 정리한 뒤 — pick: 고르는 규칙(한국 증시 리포트는 한국 채널만, 2026-10-26)
+    for r in (pick or media_feed.korea)(media_feed.issues(rows, since), None):   # 같은 이슈는 한 줄로 정리한 뒤 — 전부(상한 없음, 2026-10-30). pick: 고르는 규칙(한국 증시 리포트는 한국 채널만, 2026-10-26)
         d = r["direction"]
         labels = " ".join([dk.pill(media_feed.kr_label(r), bare=True),
                            dk.pill({"positive": "긍정", "negative": "부정"}.get(d, "중립"), d if d in ("positive", "negative") else "neutral", bare=True)]
+                          + ([dk.pill("엇갈림", "uncertain", bare=True)] if r.get("split") else [])
                           + ([dk.pill("예상 밖", "uncertain", bare=True)] if r["surprise"] else []))   # `방송` 라벨은 뺀다 — 메타의 채널 · 방송 n곳과 같은 정보 (2026-10-26 사용자)
         meta = [_kst_hm(r["published_at"]), r["channel"], f"방송 {r['n_channels']}곳" if r["n_channels"] > 1 else ""]
         items.append(dk.news_item(html_mod.escape(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"'))

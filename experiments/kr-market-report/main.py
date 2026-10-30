@@ -304,8 +304,8 @@ def normal_card(r):
     return _qc("움직임은 평소와 달랐나?", state, "neutral", "#111", lines, tip=_dk.with_src(tip, "Yahoo Finance"), opened=True)
 
 
-NEWS_SHOWN = 3   # 방송은 3건만 펼쳐 두고 나머지는 `방송 n건 더 보기` (2026-10-26 사용자)
-NEWS_HOURS = 24   # 그날 방송만. 지난 날 목업에서 샘플을 보려면 --news-hours 120 (2026-10-26 사용자: "공통 기사 룰로 샘플 몇 개")
+NEWS_SHOWN = 5   # 방송은 5건만 펼쳐 두고 나머지는 `방송 n건 더 보기` (2026-10-30 사용자, 옛 3)
+NEWS_HOURS = 48   # 최근 48시간 전부 (2026-10-30 사용자, 옛 24 = 그날만). 지난 날 목업에서 샘플을 보려면 --news-hours 120
 
 
 def _kr_channels(iss, n):

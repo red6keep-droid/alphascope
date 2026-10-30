@@ -23,8 +23,8 @@ import datetime  # noqa: E402
 import media_feed  # noqa: E402  — 방송 줄 (미디어 데일리 재료의 시장 · 업종 이슈, 2026-10-25 사용자)
 import kr_news  # noqa: E402  — 한국장 탭 `한국장에 영향을 줄 만한 소식` (미디어 데일리 뒤에 이 칸만 갱신)
 
-MEDIA_MAX = 3      # 뉴스 구획 끝의 방송 줄 수 — 방송 여러 곳이 같이 다룬 시장 이슈 순 (media_feed.market_top)
-MEDIA_HOURS = 24   # 글을 만드는 시각 기준 최근 24시간 영상
+MEDIA_SHOWN = 5    # 뉴스 구획 끝의 방송 줄 — 앞 5건만 펼쳐 두고 나머지는 `방송 n건 더 보기` 접기 (2026-10-30 사용자: 상한 없이 다 싣는다. 옛 MEDIA_MAX=3 은 미디어 데일리가 나머지를 들던 때 숫자)
+MEDIA_HOURS = 48   # 글을 만드는 시각 기준 최근 48시간 영상 (2026-10-30 사용자, 옛 24)
 _media_cache = None
 _rows_cache = None
 
@@ -33,7 +33,7 @@ def _media_rows():
     global _rows_cache
     if _rows_cache is None:
         now = datetime.datetime.now(datetime.timezone.utc)
-        _rows_cache = media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=2))
+        _rows_cache = media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=3))   # 48시간이 edition 사흘에 걸친다
     return _rows_cache
 
 
@@ -43,7 +43,7 @@ def _media_lines():
     if _media_cache is None:
         now = datetime.datetime.now(datetime.timezone.utc)
         since = (now - datetime.timedelta(hours=MEDIA_HOURS)).strftime("%Y-%m-%dT%H:%M")
-        _media_cache = media_feed.market_top(media_feed.issues(_media_rows(), since), MEDIA_MAX)   # 같은 이슈는 한 줄로 정리한 뒤
+        _media_cache = media_feed.market_top(media_feed.issues(_media_rows(), since), None)   # 같은 이슈는 한 줄로 정리한 뒤 — 전부 (방송 수 → 영상 수 → 최근 순)
     return _media_cache
 
 
@@ -834,12 +834,21 @@ def sec_news(input_data, report, analysis):
         # 매체명을 보이는 글자로 — 출처 명시(저작권법 제37조)는 툴팁이 아니라 본문 글자여야 한다 (2026-10-21, 운영지침 D4-3)
         items.append(dk.news_item(title, news_item.get("link"), news_item.get("detail_ko") or "", sub_html, tag, [news_item.get("source") or ""]))   # 요약 줄 = 공용 처리 detail
     # 방송 줄 — 미디어 데일리 재료 중 시장 · 업종 이슈, 방송 여러 곳이 같이 다룬 순 (2026-10-25 사용자). 의견이 섞여 `방송` 라벨 + 채널 · 방송 n곳
+    # 시장 이야기의 집은 데일리 (2026-10-30 사용자: 미디어 데일리 글을 접으며) — 상한 없이 전부, 앞 MEDIA_SHOWN 건만 펼치고 나머지는 접기
+    media = []
     for r in _media_lines():
         labels = (dk.pill(r["theme"], bare=True) + " " + dk.pill({"positive": "긍정", "negative": "부정"}.get(r["direction"], "중립"),
-                                                                  r["direction"] if r["direction"] in ("positive", "negative") else "neutral", bare=True))   # `방송` 라벨은 뺀다 — 메타의 채널 · 방송 n곳과 중복 (2026-10-26 사용자)
+                                                                  r["direction"] if r["direction"] in ("positive", "negative") else "neutral", bare=True)
+                  + (" " + dk.pill("엇갈림", "uncertain", bare=True) if r.get("split") else "")
+                  + (" " + dk.pill("예상 밖", "uncertain", bare=True) if r.get("surprise") else ""))   # `방송` 라벨은 뺀다 — 메타의 채널 · 방송 n곳과 중복 (2026-10-26 사용자). 엇갈림 · 예상 밖은 미디어 데일리 순위 글에서 옮겨 옴
         meta = [_kst_hm(r["published_at"]), r["channel"], f"방송 {r['n_channels']}곳" if r["n_channels"] > 1 else ""]
-        items.append(dk.news_item(_esc(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"'))
-    return dk.item_rules(items, sub=True, indent=dk.ALIGN_PX) if items else dk.muted("주요 뉴스 없음")   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
+        media.append(dk.news_item(_esc(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"'))
+    if not items and not media:
+        return dk.muted("주요 뉴스 없음")
+    out = dk.item_rules(items + media[:MEDIA_SHOWN], sub=True, indent=dk.ALIGN_PX)   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
+    if len(media) > MEDIA_SHOWN:
+        out += dk.fold(f"방송 {len(media) - MEDIA_SHOWN}건 더 보기", dk.item_rules(media[MEDIA_SHOWN:], sub=True, indent=dk.ALIGN_PX))
+    return out
 
 
 def _overall_text(overall, items):
