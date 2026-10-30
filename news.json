@@ -1,77 +1,77 @@
 {
-  "updated_at": "2026-10-30 01:21:21 UTC",
+  "updated_at": "2026-10-30 12:46:28 UTC",
   "items": [
     {
-      "title": "Intel plunges on a major guidance miss. What went wrong — and how to proceed",
+      "title": "Gamble on democracy: Inside suspicious election-contracts trading on prediction markets",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/29/intel-plunges-on-a-major-guidance-miss-what-went-wrong-how-to-proceed.html",
-      "published": "2026-10-30 01:06:07",
-      "title_ko": "인텔, 주요 가이던스 미스로 급락. 무엇이 잘못됐고 어떻게 진행할 것인가",
-      "summary_ko": "추가 하락 가능성 존재, 현재 매도해도 손실 소멸 불가"
+      "link": "https://www.cnbc.com/2026/10/30/gamble-on-democracy-inside-suspicious-election-contracts-trading-on-prediction-markets-.html",
+      "published": "2026-10-30 12:45:16",
+      "title_ko": "민주주의에 대한 도박: 예측 시장에서 의심스러운 선거 계약 거래 내부 살펴보기",
+      "summary_ko": "LA 프라이머리 결과 오판"
     },
     {
-      "title": "Intel stock plunges 21% as chipmaker blames PC slowdown for weak guidance",
+      "title": "Binance's $6.3 billion hack: What we know and what comes next",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/intel-intc-q3-earnings-report-2026-.html",
-      "published": "2026-10-30 00:39:52",
-      "title_ko": "인텔 주가 16% 급락, PC 둔화로 약한 가이던스",
-      "summary_ko": ""
+      "link": "https://www.cnbc.com/2026/10/30/billions-in-crypto-frozen-in-binance-hack-heres-what-happens-next-.html",
+      "published": "2026-10-30 12:38:53",
+      "title_ko": "바이낸스, 63억 달러 해킹 사건: 현황과 향후 전망",
+      "summary_ko": "잠긴 암호자산 수십억 달러"
     },
     {
-      "title": "Microsoft plans to raise $25 billion in debt as it pursues AI buildout",
+      "title": "Swiss central bank posts bumper $23bn profit as gold, foreign assets soar",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/microsoft-25-billion-debt-offering.html",
-      "published": "2026-10-30 00:38:13",
-      "title_ko": "마이크로소프트, AI 구축 위해 250억 달러 채권 발행 계획",
-      "summary_ko": "메타·알파벳·아마존과 달리 양의 자유현금흐름 유지"
+      "link": "https://www.cnbc.com/2026/10/30/swiss-national-bank-q3-profit-gold-foreign-asset.html",
+      "published": "2026-10-30 12:31:40",
+      "title_ko": "스위스 중앙은행, 금과 해외 자산 급등으로 230억 달러 이익 기록",
+      "summary_ko": "금과 해외 자산 가치 급등"
     },
     {
-      "title": "Reddit shares sink on weak sales guidance and plans login requirement test as Google search traffic shrinks",
+      "title": "The big questions remaining after Anthropic’s blockbuster IPO prospectus",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/reddit-rddt-q3-2026.html",
-      "published": "2026-10-30 00:28:45",
-      "title_ko": "레딧, 부진한 매출 가이던스와 로그인 의무화 테스트 계획으로 주가 급락, 구글 검색 트래픽 감소",
-      "summary_ko": "구글 검색 트래픽 감소 배경"
+      "link": "https://www.cnbc.com/2026/10/30/anthropic-ipo-s1-revenue-compute.html",
+      "published": "2026-10-30 12:27:36",
+      "title_ko": "앤트로픽 블록버스터 IPO 공시 이후 남은 주요 질문들",
+      "summary_ko": "역사상 가장 주목받는 IPO 중 하나"
     },
     {
-      "title": "How elections worldwide are testing Trump’s influence abroad",
+      "title": "Chevron and Exxon beat earnings expectations as refining profits soar on high diesel fuel prices",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/election-trump-brazil-serbia-hungary.html",
-      "published": "2026-10-30 00:13:22",
-      "title_ko": "전 세계 선거, 트럼프의 해외 영향력 시험대",
-      "summary_ko": "최근 선거 결과, 트럼프의 해외 영향력 지속 가능성 의문 제기"
-    },
-    {
-      "title": "Binance 'potential security issue' sees $2.54 billion frozen by the likes of Circle, Tether",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/circle-tether-freeze-funds-impacted-by-potential-binance-security-issue.html",
-      "published": "2026-10-29 23:56:02",
-      "title_ko": "바이낸스 '잠재적 보안 문제'로 서클·테더 등 25억 4천만 달러 동결",
-      "summary_ko": "세계 최대 암호화폐 거래소 바이낸스, 자금 완전 안전 주장하며 조사 진행"
-    },
-    {
-      "title": "DOJ escalates Alaska Senate lawsuit over dueling Sullivan candidacies",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/alaska-senate-governor-investigation-sullivan-peltola-doj.html",
-      "published": "2026-10-29 23:55:09",
-      "title_ko": "알래스카 주지사, 펠톨라 상원의원 캠페인 2차 설리번 모집 의혹 조사 명령",
-      "summary_ko": "선거 결과 상원 다수당 구도 결정 가능"
+      "link": "https://www.cnbc.com/2026/10/30/chevron-exxon-cvx-xom-earnings-q3-2026.html",
+      "published": "2026-10-30 11:35:51",
+      "title_ko": "셰브론·엑슨모빌, 디젤 가격 급등에 정제 이익 폭증하며 실적 기대치 상회",
+      "summary_ko": "우크라이나·이란 정유소 공격으로 글로벌 디젤 가격 급등"
     },
     {
       "title": "Some Polymarket user funds stolen by hackers; exchange referring matter to U.K. authorities",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/29/polymarket-reports-outage-on-international-exchange-halts-trading.html",
-      "published": "2026-10-29 23:16:11",
+      "published": "2026-10-30 11:33:34",
       "title_ko": "폴리마켓 일부 사용자 자금 해커에 의해 도난, 거래소 영국 당국에 사건 이첩",
       "summary_ko": "미국 중간선거 전후 거래량 급증 예상"
     },
     {
-      "title": "Amazon posts negative free cash flow of $42.4 billion, holds 2026 capex unchanged",
+      "title": "Musk and Zuckerberg echo Trump's push to rebrand AI as 'super intelligence' on earnings calls. Others did not",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/amazon-amzn-q3-earnings-report-2026.html",
-      "published": "2026-10-29 22:24:49",
-      "title_ko": "아마존, 424억 달러 마이너스 자유 현금 흐름 발표, 2026년 CAPEX 변동 없음",
-      "summary_ko": ""
+      "link": "https://www.cnbc.com/2026/10/30/trump-tech-allies-swap-ai-for-super-intelligence-in-earnings-calls.html",
+      "published": "2026-10-30 11:30:01",
+      "title_ko": "머스크·扎克伯格, 실적발표서 트럼프식 '초지능' 표현 사용",
+      "summary_ko": "트럼프 대통령 선호 용어 채택"
+    },
+    {
+      "title": "Russian strikes plunge Ukrainian city into blackout as Zelenskyy warns of more missile attacks",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/russia-ukraine-putin-zelenskyy-energy-strikes.html",
+      "published": "2026-10-30 11:29:59",
+      "title_ko": "러시아 공격에 우크라이나 도시 정전, 젤렌스키 추가 미사일 공격 경고",
+      "summary_ko": "우크라이나 드론 공격으로 러시아 정유소 화재"
+    },
+    {
+      "title": "Biggest-ever crypto hack impacts $6.3 billion as Binance works to contain fallout",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/29/circle-tether-freeze-funds-impacted-by-potential-binance-security-issue.html",
+      "published": "2026-10-30 11:24:42",
+      "title_ko": "바이낸스 '잠재적 보안 문제'로 서클·테더 등 25억 4천만 달러 동결",
+      "summary_ko": "세계 최대 암호화폐 거래소 바이낸스, 자금 완전 안전 주장하며 조사 진행"
     },
     {
       "title": "연준 금리 정책 및 국채 금리 안정",
@@ -82,8 +82,8 @@
       "published": "2026-10-29 22:01:46",
       "kind": "media",
       "tag": "금리",
-      "direction": "negative",
-      "n_channels": 4
+      "direction": "neutral",
+      "n_channels": 3
     },
     {
       "title": "미국 3분기 GDP 성장률",
@@ -98,16 +98,16 @@
       "n_channels": 3
     },
     {
-      "title": "AI 데이터 센터 및 반도체 전력 인프라",
-      "title_ko": "AI 데이터 센터 및 반도체 전력 인프라",
-      "summary_ko": "배터리 저장 장치와 태양광 기술이 AI 데이터 센터와 반도체 공장의 전력망 연결을 빠르게 돕고 있음",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=rdNbroPCW58",
-      "published": "2026-10-29 18:44:24",
+      "title": "미국 9월 PCE 물가 및 GDP 성장률",
+      "title_ko": "미국 9월 PCE 물가 및 GDP 성장률",
+      "summary_ko": "PCE 물가와 3분기 GDP 성장이 여전히 높은 수준을 유지하며 인플레이션 압박을 지속",
+      "source": "당잠사",
+      "link": "https://www.youtube.com/watch?v=JnAMGLw_JkQ",
+      "published": "2026-10-29 21:14:25",
       "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "positive",
-      "n_channels": 3
+      "tag": "매크로",
+      "direction": "negative",
+      "n_channels": 2
     }
   ]
 }
