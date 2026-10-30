@@ -32,7 +32,7 @@ H2 = f"position:relative;color:#111;font-size:{H2_SIZE};font-weight:700;line-hei
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"
 _NO_LINE_START = re.compile(r'^\s*(<(?:div|ul) style="(?:overflow-x:auto;|background:)|<div data-cards|<div data-lead|<img\b|<details\b)')
 CARD = f"background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:{14 - VP}px 14px;line-height:{LH_CARD};"   # 보이는 위아래 14px (2026-10-12 사용자)
-CARD_DIR = {"positive": ("#FFF7ED", "#FEE5C7"), "negative": ("#EFF6FF", "#D6E8FE"), "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#F5F3FF", "#E8E4FE")}   # 테두리 positive · negative 10% · uncertain 15% 밝게 (2026-10-30 사용자 P125: 옛 #FED7AA · #BFDBFE · #FDE68A)
+CARD_DIR = {"positive": ("#FFF7ED", "#FEE6CA"), "negative": ("#EFF6FF", "#D6E8FE"), "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#F5F3FF", "#E8E4FE")}   # 테두리 positive · negative 10% · uncertain 15% 밝게 (2026-10-30 사용자 P125: 옛 #FED7AA · #BFDBFE · #FDE68A)
 PILL = {"area": ("#CBD5E1", "#334155"), "positive": ("#FCA5A5", "#B91C1C"), "negative": ("#93C5FD", "#1D4ED8"),
         "uncertain": ("#FDBA74", "#C2410C"), "neutral": ("#CBD5E1", "#64748B"),
         "good": ("#86EFAC", "#15803D")}   # 신호등 🟢 정상·양호 (2026-10-12 사용자: 정상 라벨은 녹색)
@@ -43,7 +43,7 @@ COL_L75 = "flex:0 0 80%;max-width:80%;min-width:0;white-space:normal;"   # 이�
 COL_R = "flex:1 1 0;min-width:0;text-align:right;white-space:normal;word-break:keep-all;"   # 카드 오른쪽 35%
 ROW = (f"display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 6px;padding:{10 - VP}px 12px;"   # A 기준 카드 보이는 10px
        f"background:#fff;border:1px solid #E2E8F0;border-radius:8px;white-space:nowrap;line-height:{LH_CARD};")
-ROW_UP, ROW_DOWN = "background:#FFF7ED;border-color:#FEE5C7;", "background:#EFF6FF;border-color:#D6E8FE;"
+ROW_UP, ROW_DOWN = "background:#FFF7ED;border-color:#FEE6CA;", "background:#EFF6FF;border-color:#D6E8FE;"
 MULTI = f"display:block;margin:0 0 6px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font-size:{SMALL};line-height:{LH_CARD};"
 MULTI_ROW = f"display:flex;justify-content:space-between;align-items:center;gap:12px;padding:{SEP_GAP - VP - 1}px 12px;white-space:nowrap;line-height:{LH_CARD};"   # 가로 구분선 기준 위아래 14px, 카드 가장자리도 같게 (2026-10-12 사용자)
 MULTI_SEP = "border-top:1px solid #E2E8F0;"
@@ -1073,7 +1073,7 @@ def crow(name_html, value_html, sub="", first=False, left=None, short=False, now
             f'<span style="{col_r}font-weight:700;">{value_html}</span>{below}</span> ')   # 왼쪽 65% · 오른쪽 35%, 값이 모두 짧으면 80 · 20, left 가 있으면 그 값
 
 
-EMPH_BG, EMPH_BD = "#FFF7ED", "#FEE5C7"   # 강조 카드 배경·테두리 (오렌지)
+EMPH_BG, EMPH_BD = "#FFF7ED", "#FEE6CA"   # 강조 카드 배경·테두리 (오렌지)
 
 
 def ccard(rows, left=None, attrs="", emph=False, pad=None, fold_at=None, noun=""):

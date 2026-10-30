@@ -507,7 +507,7 @@ def price_card(s):
     g = _glance(s)
     pcol = UP if r > 0 else DOWN if r < 0 else "#111"
     tone = R.ROW_UP if r > 0 else R.ROW_DOWN if r < 0 else ""
-    bg, bd = ("#FFF7ED", "#FEE5C7") if r > 0 else ("#EFF6FF", "#D6E8FE") if r < 0 else ("#fff", "#E2E8F0")
+    bg, bd = ("#FFF7ED", "#FEE6CA") if r > 0 else ("#EFF6FF", "#D6E8FE") if r < 0 else ("#fff", "#E2E8F0")
     price = R.price_value(f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">{won(s["close"])}</span>', R._arrow(r),
                           R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN)   # 길면 등락이 아래 줄로 (P61)
     head = R.price_row(R._row("@@", price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)   # "@@" 는 ticker_logo 가 배지를 만들지 않는 자리표시 — 한글 이름도 isalnum 이라 "SK" 배지가 붙는다
