@@ -1066,6 +1066,7 @@ def _est_w(text, px):
 INLINE_W = 316   # 상태 카드 줄 안쪽 폭 어림 (390px 폰 − 여백 · 카드 안쪽) − 이름과 값 사이 간격
 
 
+STATE_SENT_FS = "18px"   # 상태 카드 제목 아래 설명 문장 19 → 18 (2026-10-30 사용자 P132) — 줄 높이 32 와 위아래 7 로 정수
 STATE_TITLE_W = 500   # 상태 카드 제목 = 보통보다 한 단계 굵게 (2026-10-30 사용자 P131, 옛 700). PC 나눔바른고딕 · 윈도 맑은 고딕은 500 이 없어 보통으로 보인다
 
 
@@ -1109,9 +1110,9 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
         if kind == "html":   # 그래프 · 자세한 지표 보기 같은 HTML 조각 (실적과 기대 탭, 2026-10-18)
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
         if kind == "rich":   # plain 과 같은 줄인데 글 안에 굵게 · 색 HTML 이 들어 있다 (방송 의견 문장, 2026-10-29 사용자 P95)
-            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{text}</li>'
+            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;font-size:{STATE_SENT_FS};line-height:{_dk.LH_EMPH};word-break:keep-all;">{text}</li>'
         if kind == "plain":   # 쉬운 말 한 줄 — 점 없이 굵게, 아래 8px (2026-10-16 사용자: 강조 카드 펼침 맨 위에 쉬운 설명)
-            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{_plain_note(text)}</li>'   # 범위 숫자는 물결 뒤에서만 줄바꿈 (P60) · 늘 같은 안내는 끝에 작은 글씨 (P67)   # 상세 설명 2~3문장이라 보통 굵기 (2026-10-17)
+            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;font-size:{STATE_SENT_FS};line-height:{_dk.LH_EMPH};word-break:keep-all;">{_plain_note(text)}</li>'   # 범위 숫자는 물결 뒤에서만 줄바꿈 (P60) · 늘 같은 안내는 끝에 작은 글씨 (P67)   # 상세 설명 2~3문장이라 보통 굵기 (2026-10-17)
         col = NOTE if kind == "note" else "#111"
         return _dot_li(_label_text(text), size=3, color=col, lh=_dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32 (2026-10-12 사용자)   # 16px → 3px 점, "**라벨** : 내용", 증감 색 (2026-10-11 사용자)
     lis = "".join(li(t) for t in lines)
