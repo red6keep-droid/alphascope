@@ -248,7 +248,7 @@ ZONES = [(-1.0, -0.5, "강한 하락", "#82B1F0"), (-0.5, -0.15, "하락", "#BCD
 # 10-30 사용자 P103: 버튼 말고 라벨 느낌 — 외곽선 연하게, 셋 다 연한 바탕(하락 바탕이 하락 카드 바탕과 같아 색이 없어 보였다), 가로 짧게 · 높이 그대로
 BOX = {"up": ("#FDE8E8", "#F6CACA", "#B91C1C"), "down": ("#DCE9FC", "#C3D7F5", "#1D4ED8"), "flat": ("#E8EDF3", "#D6DEE8", "#475569")}
 BOX_W = 50
-PAIR_GAP = 8   # 작은 게이지 카드 둘 사이 = 전체요약 카드와의 위 여백 (P108)
+PAIR_GAP = 5   # 작은 게이지 카드 둘 사이 = 전체요약 카드와의 위 여백 (P108 · P114: 8 → 5, −40%)
 TABLE_FS, TABLE_LH, WHY_FS = "15px", "23px", "13px"   # P113: 줄 높이 − 글자 = 짝수(위아래 여백 정수) — 15/23 · 13/19 · 14/22   # P104: 표 줄만 16 → 15 (사용자 "구분선으로 나눠 있는 정보만 한 포인트")   # 표 글자 18 → 16 (사용자 "두 단계 작게", 한 단계 = 1px · P96 과 같은 셈) · 괄호 글 14 → 13
 
 
@@ -305,7 +305,7 @@ def _table(rows_html, line, keep=(0,)):
 # 작은 게이지는 폰(360px) 칸 안쪽 폭 134 그대로 그려 축소(옛 150 → 0.89배, 간격이 소수가 되던 원인)를 없앤다.
 #   폭 · 반지름 · 위 여백 · 호 두께 · 바늘 두께 · 가운데 원 반지름 · 바늘 끝 ~ 호 안쪽 · 아래 여백(가운데 원 아래 ~ 그림 끝)
 GAUGE_BIG = dict(width=260, r=90, top=30, arc=14, needle=3, hub=5, tip_gap=15, bottom=23)
-GAUGE_SMALL = dict(width=134, r=55, top=10, arc=10, needle=2, hub=3, tip_gap=10, bottom=6)
+GAUGE_SMALL = dict(width=134, r=55, top=10, arc=10, needle=2, hub=3, tip_gap=10, bottom=11)   # bottom 6 → 11: 가운데 원 ~ 답 글자 9 → 14px (+50%, P114)
 
 
 def gauge_svg(net, size="big"):
@@ -364,8 +364,9 @@ def _gauge_block(title, c, extra, up_color, down_color, muted, small=False, corn
     col = up_color if c["net"] >= 0.15 else down_color if c["net"] <= -0.15 else muted
     cnt = f'상승 {c["up"]} · 중립 {c["neutral"]} · 하락 {c["down"]}' if c.get("neutral") else f'상승 {c["up"]} · 하락 {c["down"]}'
     mx = 0 if small else _dk.CHART_CARD_X
-    top = f'<span style="display:block;text-align:right;font-size:14px;line-height:20px;color:{muted};margin:0 0 2px;">{corner}</span>' if corner else ""
-    return (f'<span style="{_dk.MULTI}margin:{"0" if small else f"6px {mx}px 0"};text-align:center;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px {8 if small else 12}px;">'
+    # 기준일 = 카드 안 오른쪽 위, 제목과 같은 높이 (두 줄이라 좁아 가운데 제목과 겹치지 않는다, P114)
+    top = f'<span style="position:absolute;top:{_dk.CHART_CARD_PAD}px;right:12px;text-align:right;font-size:14px;line-height:20px;color:{muted};">{corner}</span>' if corner else ""
+    return (f'<span style="{_dk.MULTI}position:relative;margin:{"0" if small else f"6px {mx}px 0"};text-align:center;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px {8 if small else 12}px;">'
             f'{top}<span style="display:block;font-weight:700;color:#111;margin:0 0 4px;font-size:{"15px" if small else "16px"};line-height:{"23px" if small else "24px"};">{title}</span>'   # 17 → 16 · 작은 게이지 16 → 15 (P108)
             f'{gauge_svg(c["net"], "small" if small else "big")}'
             f'<span style="display:block;font-weight:700;color:{col};{"font-size:18px;line-height:24px;" if small else "font-size:19px;line-height:25px;"}">{_tri_small(w, 14 if small else 15)}</span>'   # 작은 게이지 답 19 → 18 (P112)
@@ -392,7 +393,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
             f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("이동평균", mc, "", up_color, down_color, muted, small=True)}</span></span>')
     lines = [('<span style="display:block;height:6px;"></span>' + _gauge_block("전체요약", al,
                            f'<span style="display:block;text-align:center;font-size:14px;line-height:20px;color:{muted};margin-top:2px;">{" · ".join(frames)}</span>' if frames else "",
-                           up_color, down_color, muted, corner=f"{day} 종가 · 일봉 기준")   # 기준일 = 전체 요약 카드 안 오른쪽 위 (P107)
+                           up_color, down_color, muted, corner=f"{day} 종가<br>일봉 기준")   # 두 줄 · 가운뎃점 없이 (P114)   # 기준일 = 전체 요약 카드 안 오른쪽 위 (P107)
               + pair, "html"),
              ]
     import design_kit as _dk
@@ -412,7 +413,8 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         if v is None:
             return f'<span style="{COLW}">—</span>'
         return f'<span style="{COLW}"><span>{v:,.0f}</span>{box("up" if above else "down", UPW if above else DNW, _h.escape)}</span>'
-    mrs = [f'<span>기간</span><span style="display:inline-flex;gap:6px;font-size:14px;line-height:22px;color:{muted};"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
+    HEAD = f"font-size:{WHY_FS};line-height:19px;color:#6B7280;"   # 머리 줄 = 기간 옆 설명(1주 · 2주)과 같은 글씨 (P114)
+    mrs = [f'<span style="{HEAD}">기간</span><span style="display:inline-flex;gap:6px;{HEAD}"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
     for m in sig["ma"]:
         mrs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{m["n"]}일<span style="margin-left:4px;font-size:{WHY_FS};line-height:19px;color:#6B7280;">{MA_WHAT.get(m["n"], "")}</span></span>'
                    f'<span style="display:inline-flex;gap:6px;flex:none;">{one(m["sma"], m["sma_above"])}{one(m["ema"], m["ema_above"])}</span>')
