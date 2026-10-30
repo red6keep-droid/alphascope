@@ -388,8 +388,10 @@ def gauge_svg(net, size="big"):
             f'{arcs}{labs}{needle}</svg>')
 
 
-POPULAR = "#6D28D9"   # 많이 보는 지표 이름 = 보라 (P119, 테마 --badge-violet) — RSI · 스토캐스틱 · MACD · 배열 · 크로스
+POPULAR = "#6D28D9"   # 많이 보는 지표 = 이름 앞 보라 점 (P120: 옛 P119 이름 글자 보라 · 범례는 뺌), 테마 --badge-violet — RSI · 스토캐스틱 · MACD · 배열 · 크로스
 POPULAR_KEYS = ("rsi", "stoch", "macd")
+# 점 = 3px 원, 글머리표가 아니라 글자 윗선에서 1px 아래 (줄 높이 23 · 글자 15 → 줄 위 4 + 1 = 5px), 글자와 3px — 모두 정수
+POP_DOT = f'<span aria-hidden="true" style="display:inline-block;width:3px;height:3px;border-radius:50%;background:{POPULAR};vertical-align:top;margin:5px 3px 0 0;"></span>'
 
 
 def _sub(title, note=""):
@@ -456,11 +458,11 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     for r in sig["rows"]:
         w, bx = label_box(r["label"], _h.escape)
         what = WHAT.get(r["key"], "")
-        nm = f'<span style="color:{POPULAR};">{_h.escape(r["name"])}</span>' if r["key"] in POPULAR_KEYS else _h.escape(r["name"])
+        nm = (POP_DOT if r["key"] in POPULAR_KEYS else "") + _h.escape(r["name"])
         trs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{nm}'   # 폭이 모자라는 날(긴 이름 + 괄호 글)은 설명 끝이 … 로 — 줄바꿈 없음 (P108)
                    + (f'<span style="margin-left:4px;font-size:{WHY_FS};line-height:19px;color:#6B7280;">{what}</span>' if what else "") + '</span>'   # 괄호 글(과매도)과 같은 13px 회색 (P109)
                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<b style="font-weight:700;">{_h.escape(r["text"])}</b>{bx}</span>')   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
-    lines.append((_sub("기술지표", "보라색 = 많이 보는 지표") + _table(trs, line), "html"))
+    lines.append((_sub("기술지표") + _table(trs, line), "html"))
     COLW = f"display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;min-width:{BOX_W + 58}px;"   # 숫자 + 라벨 한 칸 — 인베스팅닷컴처럼 값마다 상승 · 하락 (P103, 옛 ▲ · ▼)
 
     def one(v, above):
@@ -473,12 +475,12 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     ar, cr = sig.get("array"), sig.get("cross")
     if ar:
         kind = "up" if ar["dir"] > 0 else "down" if ar["dir"] < 0 else "flat"
-        top_rows.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:{POPULAR};">{ar["state"]}</span>'
+        top_rows.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{POP_DOT}{ar["state"]}'
                         f'<span style="margin-left:4px;{note}">{" · ".join(str(n) for n in ar["periods"])}일</span></span>'
                         f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{box(kind, UPW if kind == "up" else DNW if kind == "down" else MID, _h.escape)}</span>')
     if cr:
         kind = "up" if cr["dir"] > 0 else "down"
-        top_rows.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:{POPULAR};">{cr["kind"]}</span>'
+        top_rows.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{POP_DOT}{cr["kind"]}'
                         f'<span style="margin-left:4px;{note}">{cr["pair"][0]} · {cr["pair"][1]}일선</span></span>'
                         f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;"><b style="font-weight:700;">{cr["days_ago"]}일 전</b>{box(kind, UPW if kind == "up" else DNW, _h.escape)}</span>')
     mrs = top_rows + [f'<span style="{HEAD}">기간</span><span style="display:inline-flex;gap:6px;{HEAD}"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
@@ -493,6 +495,6 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
            "· 이동평균 : 5 ~ 200일 단순 · 지수 평균(한국 종목은 60 · 120일, 미국은 50 · 100일). 종가가 선 위면 상승, 아래면 하락\n"
            "· 정배열 · 역배열 : 짧은 평균선이 긴 선보다 차례로 위면 정배열, 차례로 아래면 역배열, 섞이면 혼조(한국 5 · 20 · 60 · 120일, 미국 20 · 50 · 200일)\n"
            "· 골든크로스 · 데드크로스 : 짧은 평균선이 긴 선을 위로 뚫으면 골든, 아래로 뚫으면 데드. 가장 최근 것과 며칠(거래일) 전인지(한국 20 · 60일선, 미국 50 · 200일선)\n"
-           "· 보라색 이름 : 개인 투자자가 많이 보는 지표(RSI · 스토캐스틱 · MACD · 배열 · 크로스)\n"
+           "· 이름 앞 보라 점 : 개인 투자자가 많이 보는 지표(RSI · 스토캐스틱 · MACD · 배열 · 크로스)\n"
            "· 참고 : 같은 지표라도 일봉 · 주봉 · 월봉에서 반대로 나오곤 한다. 다른 사이트와는 봉 단위 · 기준값이 달라 값이 다를 수 있다")
     return lines, tip
