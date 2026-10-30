@@ -424,7 +424,7 @@ def _gauge_block(title, c, extra, up_color, down_color, muted, small=False, corn
             f'{top}<span style="display:block;font-weight:700;color:#111;margin:6px 0 4px;font-size:{"14px" if small else "16px"};line-height:{"22px" if small else "24px"};">{title}</span>'   # 작은 게이지 제목 15 → 14 (P115)   # 17 → 16 · 작은 게이지 16 → 15 (P108)
             f'{gauge_svg(c["net"], "small" if small else "big")}'
             f'<span style="display:block;font-weight:700;color:{col};{"font-size:17px;line-height:23px;" if small else "font-size:19px;line-height:25px;margin-bottom:4px;"}">{_tri_small(w, 13 if small else 15)}</span>'   # 작은 게이지 답 18 → 17 · 삼각형 14 → 13 (P115)   # 작은 게이지 답 19 → 18 (P112)
-            f'<span style="display:flex;flex-wrap:wrap;justify-content:center;font-size:14px;line-height:20px;color:{muted};"><span style="white-space:nowrap;">{cnt}</span>'
+            f'<span style="display:flex;flex-wrap:wrap;justify-content:center;margin-bottom:4px;font-size:14px;line-height:20px;color:{muted};"><span style="white-space:nowrap;">{cnt}</span>'   # 맨 아래 줄 ~ 카드 아래 13 → 17px (+30%, 16.9 → 17, P122)
             + (f'<span style="white-space:nowrap;">{extra}</span>' if extra else "") + '</span></span></span>')   # extra = 같은 줄 구분선 뒤 · 폭이 모자라면 그 묶음만 다음 줄 (P116)   # extra = 같은 줄 뒤 (P116)
 
 
