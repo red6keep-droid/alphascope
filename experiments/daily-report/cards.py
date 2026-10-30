@@ -15,7 +15,7 @@ import design_kit as dk  # noqa: E402
 UP, DOWN = "#d93025", "#1a73e8"
 NOTE = dk.NOTE
 SOON = "#6D28D9"
-CARD_DIR = dict(dk.CARD_DIR, soon=("#F5F3FF", "#E6E1FE"))   # 보라 테두리 10% · 20% 밝게 (P127, 불확실 카드와 같은 보라)
+CARD_DIR = dict(dk.CARD_DIR, soon=("#F5F3FF", "#E8E4FE"))   # 보라 테두리 10% · 20% 밝게 (P127, 불확실 카드와 같은 보라)
 FOLD_LEFT = dk.FOLD_LEFT + 8
 INLINE_W = 316
 CHART_H, CHART_LBL = 150, 16
