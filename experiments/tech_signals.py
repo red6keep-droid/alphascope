@@ -252,6 +252,8 @@ PAIR_GAP = 8   # 작은 게이지 카드 둘 사이 = 전체요약 카드와의 
 TABLE_FS, TABLE_LH, WHY_FS = "15px", "22px", "13px"   # P104: 표 줄만 16 → 15 (사용자 "구분선으로 나눠 있는 정보만 한 포인트")   # 표 글자 18 → 16 (사용자 "두 단계 작게", 한 단계 = 1px · P96 과 같은 셈) · 괄호 글 14 → 13
 
 
+# 이동평균 기간 옆 설명 (P109) — 거래일 기준 대략의 달력 길이 (20거래일 ≈ 1달)
+MA_WHAT = {5: "1주", 10: "2주", 20: "1달", 50: "2.5달", 100: "5달", 200: "10달"}
 # 지표 이름 옆 아주 작은 설명 (P108, 사용자: "구분명이 무엇인지 짧게, 줄바꿈 되면 안 돼") — 2~5자
 WHAT = {"rsi": "상대강도", "stoch": "9일 위치", "stochrsi": "RSI 위치", "macd": "추세 전환", "adx": "추세 세기", "wr": "14일 위치",
         "cci": "평균 이탈", "atr": "하루 진폭", "hl": "고저 중간", "uo": "3기간 종합", "roc": "변화율", "bb": "13일선 대비"}
@@ -385,10 +387,10 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         w, bx = label_box(r["label"], _h.escape)
         what = WHAT.get(r["key"], "")
         trs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{_h.escape(r["name"])}'   # 폭이 모자라는 날(긴 이름 + 괄호 글)은 설명 끝이 … 로 — 줄바꿈 없음 (P108)
-                   + (f'<span style="margin-left:4px;font-size:11px;line-height:16px;color:#94A3B8;">{what}</span>' if what else "") + '</span>'
+                   + (f'<span style="margin-left:4px;font-size:{WHY_FS};line-height:18px;color:#6B7280;">{what}</span>' if what else "") + '</span>'   # 괄호 글(과매도)과 같은 13px 회색 (P109)
                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<b style="font-weight:700;">{_h.escape(r["text"])}</b>{bx}</span>')   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
     lines.append((_sub("기술지표") + _table(trs, line), "html"))
-    COLW = f"display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;min-width:{BOX_W + 72}px;"   # 숫자 + 라벨 한 칸 — 인베스팅닷컴처럼 값마다 상승 · 하락 (P103, 옛 ▲ · ▼)
+    COLW = f"display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;min-width:{BOX_W + 58}px;"   # 숫자 + 라벨 한 칸 — 인베스팅닷컴처럼 값마다 상승 · 하락 (P103, 옛 ▲ · ▼)
 
     def one(v, above):
         if v is None:
@@ -396,7 +398,8 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         return f'<span style="{COLW}"><span>{v:,.0f}</span>{box("up" if above else "down", UPW if above else DNW, _h.escape)}</span>'
     mrs = [f'<span>기간</span><span style="display:inline-flex;gap:6px;font-size:14px;color:{muted};"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
     for m in sig["ma"]:
-        mrs.append(f'<span>{m["n"]}일</span><span style="display:inline-flex;gap:6px;flex:none;">{one(m["sma"], m["sma_above"])}{one(m["ema"], m["ema_above"])}</span>')
+        mrs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{m["n"]}일<span style="margin-left:4px;font-size:{WHY_FS};line-height:18px;color:#6B7280;">{MA_WHAT.get(m["n"], "")}</span></span>'
+                   f'<span style="display:inline-flex;gap:6px;flex:none;">{one(m["sma"], m["sma_above"])}{one(m["ema"], m["ema_above"])}</span>')
     lines.append((_sub("이동평균") + _table(mrs, line, keep=(0, 1)), "html"))
     tip = ("널리 쓰는 기술지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
            "· 전체요약 : 기술지표와 이동평균을 한데 센 것. (상승 − 하락) ÷ 전체 가 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
