@@ -130,7 +130,7 @@ def indicators(bars):
     med = sorted(hist)[len(hist) // 2] if hist else None
     atr_label = None if atr_pct is None or med is None else ("변동성 큼" if atr_pct > med * 1.3 else "변동성 낮음" if atr_pct < med * 0.7 else "변동성 보통")
     rows.append({"key": "atr", "name": "ATR(14)", "value": a14, "text": "—" if a14 is None else f"{a14:,.0f} ({atr_pct:.1f}%)", "label": atr_label or "—", "dir": 0,
-                 "hint": "하루 평균 진폭 — 최근 1년 평소(중앙값)보다 30% 넘게 크면 큼, 30% 넘게 작으면 낮음. 방향 개수에는 안 넣는다"})
+                 "hint": "하루 평균 진폭 · 1년 평소보다 30% 넘게 크면 큼, 작으면 낮음"})
     hl = c[-1] - (hh + ll) / 2
     add("hl", "Highs/Lows(14)", hl, UPW if hl > 0 else DNW if hl < 0 else MID, "14일 고가 · 저가의 가운데보다 종가가 위면 상승 · 아래면 하락", "{:,.0f}")
     # Ultimate Oscillator (7 · 14 · 28)
@@ -284,7 +284,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     for key, lab in (("weekly", "주봉"), ("monthly", "월봉")):
         w = sig.get(key)
         if w:
-            first += f" {lab}으로는 상승 {w['up']} · 중립 {w['neutral']} · 하락 {w['down']}."
+            first += f" {lab}으로는 상승 {w['up']}개, 중립 {w['neutral']}개, 하락 {w['down']}개다."   # 가운뎃점이면 증감 색 덩어리가 문장을 건너 칠해졌다 (10-30 목업)
     def lab_html(label, d):
         return label_html(label, up_color, down_color, muted, _h.escape)
     lines = [(first, "plain"), (gauge_svg(sig["net"]), "html")]
@@ -296,14 +296,21 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
                 return "—"
             arrow = f'<span style="color:{up_color if above else down_color};font-weight:700;">{"▲" if above else "▼"}</span>'   # 두 값이 한 줄이라 화살표만 (폭, P99)
             return f'<span style="font-weight:700;color:#111;">{v:,.0f}</span> {arrow}'
-        lines.append(("row", f"이동평균 {m['n']}일", f'{one(m["sma"], m["sma_above"])}&nbsp;·&nbsp;{one(m["ema"], m["ema_above"])}', "단순 · 지수 — 종가가 선 위면 ▲ 상승, 아래면 ▼ 하락", True))
+        lines.append(("row", f"이동평균 {m['n']}일", f'{one(m["sma"], m["sma_above"])}&nbsp;·&nbsp;{one(m["ema"], m["ema_above"])}', "", True))   # 뜻은 툴팁 한 줄 — 여섯 줄 같은 문장 (10-30)
     pv = sig.get("pivot")
     if pv:
         for nm, d in pv.items():
-            vals = " · ".join(f"{k} {d[k]:,.0f}" for k in ("S3", "S2", "S1", "P", "R1", "R2", "R3") if d.get(k) is not None)
-            lines.append(("row", f"피벗 {nm}", vals, "전날 고가 · 저가 · 종가로 계산한 오늘의 기준선 (S = 아래 · R = 위)"))
+            # 한 줄에 일곱 숫자면 폰 폭을 넘어 페이지 전체가 옆으로 밀렸다 (10-30 목업: 화면 726px, 카드 답 글자 잘림) — P 한 줄 + S·R 짝 세 줄
+            ln = [f"P {d['P']:,.0f}"] if d.get("P") is not None else []
+            for i in ("1", "2", "3"):
+                pair = [f"{k} {d[k]:,.0f}" for k in ("S" + i, "R" + i) if d.get(k) is not None]
+                if pair:
+                    ln.append(" · ".join(pair))
+            lines.append(("row", f"피벗 {nm}", "\n".join(ln), ""))   # 뜻 줄은 툴팁으로 — 다섯 줄 같은 문장 · 값이 여러 줄이면 뜻 칸이 줄바꿈 없이 폭을 넘었다 (10-30)
     tip = ("널리 쓰는 기술 지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
            "· 상승 · 하락 · 중립 : 지표마다 흔히 쓰는 기준으로 나눴다. 과매수는 하락, 과매도는 상승으로 센다\n"
            "· 강한 상승 · 강한 하락 : (상승 개수 − 하락 개수) ÷ 11 이 ±0.5 를 넘을 때. ±0.15 안은 중립. ATR 은 방향이 없어 개수에서 뺀다\n"
+           "· 이동평균 : 단순 · 지수 값 옆 ▲ 는 종가가 선 위(상승), ▼ 는 아래(하락)\n"
+           "· 피벗 : 전날 고가 · 저가 · 종가로 계산한 오늘의 기준선. P 가 가운데, S 는 아래 · R 은 위\n"
            "· 참고 : 같은 지표라도 일봉 · 주봉 · 월봉에서 반대로 나오곤 한다. 다른 사이트와는 봉 단위 · 기준값이 달라 값이 다를 수 있다")
     return lines, tip
