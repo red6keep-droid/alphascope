@@ -1478,6 +1478,7 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
         since = (now - datetime.timedelta(hours=TODAY_HOURS)).strftime("%Y-%m-%dT%H:%M")
         vids = media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=PICK_DAYS - 1)   # Firestore `in` 은 30개까지 — 오늘 포함 30일. 한 번 읽어 뉴스(24시간) · 방송 의견(30일)에 나눠 쓴다
         media = media_feed.issues(media_feed.rows(vids), since)
+        media_feed.diag(vids, media)   # 재료 진단 로그 — 채널 묶음 · 범위 · 종목별 배정 (2026-10-30 사용자: 분배 점검)
         global PICKS
         PICKS = media_feed.picks(vids, (now - datetime.timedelta(days=PICK_DAYS)).strftime("%Y-%m-%d"))
     MEDIA = media
