@@ -39,8 +39,8 @@ CARD = f"background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:
 CARD_EMPH = f"background:#FFF7ED;border:1px solid #FFEDD5;border-radius:10px;padding:{12 - _dk.VP}px 14px;line-height:{LH_CARD};"       # (옛) 강조 카드
 # 강조 이벤트 카드는 방향 테마 (2026-10-11 사용자): 긍정 오렌지 · 부정 파랑 · 중립 회색 · 불확실 노랑
 CARD_DIR = {"positive": ("#FFF7ED", "#FEE2C1"), "negative": ("#EFF6FF", "#D1E5FE"),
-            "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#FFFBEB", "#FDEEB0"),
-            "soon": ("#F5F3FF", "#DDD6FE")}   # 보라 = 다가오는 일정 (캘린더 탭, 2026-10-18 사용자)
+            "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#F5F3FF", "#E6E1FE"),   # 노랑 → 보라 (P127, PC 에서 눈이 아프다)
+            "soon": ("#F5F3FF", "#E6E1FE")}   # 보라 = 다가오는 일정 (캘린더 탭, 2026-10-18 사용자)
 SOON = "#6D28D9"   # 보라 카드 상태 글자
 # 라벨 (가이드라인 5절, 2026-10-11 사용자): 외곽선 박스, 모서리 4px, 볼드 없음, 14px. (테두리색, 글자색)
 PILL = {"area": ("#CBD5E1", "#334155"), "positive": ("#FCA5A5", "#B91C1C"), "negative": ("#93C5FD", "#1D4ED8"),
@@ -1450,7 +1450,7 @@ def sec_state_cards(a):
     out = ""
     ms = (a.get("normal_range") or {}).get("market_shock") or {}
     if ms.get("active"):   # 시장 충격 국면 (4단계 W2 · 적용 기준 A3) — 강조를 쓰는 유일한 경우, 그날만 맨 앞
-        out += _state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", WARN, shock_lines(ms), "", tip=shock_tip(ms), fold=True)
+        out += _state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", SOON, shock_lines(ms), "", tip=shock_tip(ms), fold=True)
     mr = a.get("market_regime")
     if mr:
         theme, col = REGIME_THEME.get(mr["regime"], ("neutral", MUTED))

@@ -32,7 +32,7 @@ H2 = f"position:relative;color:#111;font-size:{H2_SIZE};font-weight:700;line-hei
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"
 _NO_LINE_START = re.compile(r'^\s*(<(?:div|ul) style="(?:overflow-x:auto;|background:)|<div data-cards|<div data-lead|<img\b|<details\b)')
 CARD = f"background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:{14 - VP}px 14px;line-height:{LH_CARD};"   # 보이는 위아래 14px (2026-10-12 사용자)
-CARD_DIR = {"positive": ("#FFF7ED", "#FEE2C1"), "negative": ("#EFF6FF", "#D1E5FE"), "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#FFFBEB", "#FDEEB0")}   # 테두리 positive · negative 10% · uncertain 15% 밝게 (2026-10-30 사용자 P125: 옛 #FED7AA · #BFDBFE · #FDE68A)
+CARD_DIR = {"positive": ("#FFF7ED", "#FEE2C1"), "negative": ("#EFF6FF", "#D1E5FE"), "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#F5F3FF", "#E6E1FE")}   # 테두리 positive · negative 10% · uncertain 15% 밝게 (2026-10-30 사용자 P125: 옛 #FED7AA · #BFDBFE · #FDE68A)
 PILL = {"area": ("#CBD5E1", "#334155"), "positive": ("#FCA5A5", "#B91C1C"), "negative": ("#93C5FD", "#1D4ED8"),
         "uncertain": ("#FDBA74", "#C2410C"), "neutral": ("#CBD5E1", "#64748B"),
         "good": ("#86EFAC", "#15803D")}   # 신호등 🟢 정상·양호 (2026-10-12 사용자: 정상 라벨은 녹색)
@@ -1111,7 +1111,7 @@ def dcard(html, theme="neutral"):
     return f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{EMPH_PAD - VP_EMPH}px 14px;margin:0 0 8px;line-height:{LH_EMPH};">{html}</div>'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
 
 
-STATE_CARD = {"good": ("#F0FDF4", "#BBF7D0"), "uncertain": ("#FFFBEB", "#FDEEB0"), "negative": ("#EFF6FF", "#D1E5FE"), "neutral": ("#F8FAFC", "#CBD5E1")}   # 신호 라벨 색의 카드판
+STATE_CARD = {"good": ("#F0FDF4", "#BBF7D0"), "uncertain": ("#F5F3FF", "#E6E1FE"), "negative": ("#EFF6FF", "#D1E5FE"), "neutral": ("#F8FAFC", "#CBD5E1")}   # 신호 라벨 색의 카드판
 
 
 def state_card(head_html, kind="neutral", right_html="", sub_html="", items=(), chev=False, center=False):

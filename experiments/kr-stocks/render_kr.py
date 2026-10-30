@@ -205,7 +205,7 @@ def sec_pairs(s):
         return ""
     rets = [m["ret"] for m in moves] + ([adr["ret"]] if adr else [])
     ups, downs = sum(1 for x in rets if x >= 0.5), sum(1 for x in rets if x <= -0.5)
-    state, theme, col = (("엇갈림", "uncertain", R.WARN) if ups and downs else ("올랐음", "positive", UP) if ups else ("내렸음", "negative", DOWN) if downs
+    state, theme, col = (("엇갈림", "uncertain", R.SOON) if ups and downs else ("올랐음", "positive", UP) if ups else ("내렸음", "negative", DOWN) if downs
                          else ("비슷함", "neutral", R.MUTED))
     day = (moves or [adr or sox])[0]["day"]
     lines = [(f"밤사이(미국 {_md(day)} 종가) 연결 종목은 " + " · ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)

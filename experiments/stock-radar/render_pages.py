@@ -281,7 +281,7 @@ def sec_states(s):
     out = ""
     ms = s.get("market_shock") or {}
     if ms.get("active"):
-        out += R._state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", R.WARN, R.shock_lines(ms), "", tip=_no_record(R.shock_tip(ms)), fold=True)
+        out += R._state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", R.SOON, R.shock_lines(ms), "", tip=_no_record(R.shock_tip(ms)), fold=True)
     mr = s.get("market_regime")
     if mr:
         th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
