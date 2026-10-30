@@ -683,7 +683,8 @@ def dd_table(title, head, lvs, rows, tip=""):
     return f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};color:{NOTE};">{ttl}{tbl}</span>'
 
 
-PICK_DAYS = 30   # 방송 의견을 모으는 기간 — Firestore `in` 30개 한도 안 (한국 · 미국 종목 같게)
+PICK_HOURS = 48   # 방송 의견을 싣는 기간 — 영상이 올라온 뒤 48시간 (2026-10-31 사용자, 옛 30일)
+PICK_DAYS = 30   # 영상을 읽어 오는 기간(뉴스 · 진단용) — Firestore `in` 30개 한도 안 (한국 · 미국 종목 같게)
 
 
 def _pick_when(iso):
@@ -714,16 +715,16 @@ def pick_theme(state):
     return PICK_THEME.get(state, ("neutral", MUTED))
 
 
-def picks_card(name, ps, close, money, days=PICK_DAYS):
+def picks_card(name, ps, close, money, hours=PICK_HOURS):
     """`방송에서 나온 의견은?` (2026-10-29 사용자 P85 → P88 · P89 · P92: 한국 · 미국 종목, `한 달간 변화 범위는?` 아래, 답은 `매수`).
-    ps = media_feed.picks 줄(이 종목 것만, 최근 days 일). 답 = 의견이 한 가지면 그 말(색 = PICK_THEME), 갈리면 `매수 · 보유`(회색).
+    ps = media_feed.picks 줄(이 종목 것만, 최근 hours 시간). 답 = 의견이 한 가지면 그 말(색 = PICK_THEME), 갈리면 `매수 · 보유`(회색).
     문장 = `삼성전자에 대한 매수 의견이 1건 나왔다.` 펼치면 의견별 제목(`매수 의견`) 아래 줄마다 말한 사람(소속) / 이유 / 채널 · 게시 시각 · (목표가) · 영상에서 보기, 줄 사이 구분선. 없으면 빈 문자열."""
     if not ps:
         return ""
     state = " · ".join(k for k in PICK_ORDER if any(p["action"] == k for p in ps))
     theme, col = pick_theme(state)
     lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 나왔다.", "rich"), (picks_rows(ps, close, money), "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에
-    tip = (f"방송(유튜브 경제 채널) 요약에서 이 종목에 대한 매수 · 보유 · 관망 · 매도 의견을 모은 것. 최근 {days}일, 같은 영상 · 같은 사람은 한 번\n"
+    tip = (f"방송(유튜브 경제 채널) 요약에서 이 종목에 대한 매수 · 보유 · 관망 · 매도 의견을 모은 것. 최근 {hours}시간, 같은 영상 · 같은 사람은 한 번\n"
            f"· 지금 : {picks_count(ps)}\n· 읽는 법 : 누가 어떤 이유로 말했는지 보는 칸이다. 의견의 적중률은 검증하지 않았고, 이 블로그의 추천이 아니다")
     return _state_card("방송에서 나온 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True)
 

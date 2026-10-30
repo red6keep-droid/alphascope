@@ -435,7 +435,8 @@ def card_industry_mood(s):
     for r in b["rows"]:
         lines.append(("row", f"{r['name']} 경기(BSI)", f"{r['v']:.0f}", f"{r['month'][:4]}년 {int(r['month'][5:])}월 실적 · 전달보다 {_sgn(r['chg'], 0)}p · 2009년 이후 아래에서 {r['pct_all']:.0f}% 지점"
                       + (f" · 다음 달 전망 {r['forecast']:.0f}" if r.get("forecast") is not None else "")))
-    return R._state_card("이 업종 경기는 좋아지고 있나?", state, theme, col, lines, "", tip=_tip_of(sec_bsi(s)), fold=True)
+    return R._state_card("업종 경기는?", state,   # 짧게 (2026-10-31 사용자, 옛 이 업종 경기는 좋아지고 있나?)
+                          theme, col, lines, "", tip=_tip_of(sec_bsi(s)), fold=True)
 
 
 # 답 낱말 — 사업 묶음 질문에 맞춘다 (2026-10-31 사용자: "메모리 반도체 값은? · 이자 마진은? 처럼 짧게, 방향은 답이")
@@ -525,7 +526,8 @@ def card_industry_money(s):
     for r in s.get("fin") or []:   # 산업별 대출(늦게 따라오는 지표)도 여기 — 질문 카드로 따로 두지 않는다
         val = f"{r['v'] / 1e3:,.0f}조 원" if r["unit"] == "조 원" else f"{r['v']:.1f}%"
         lines.append(("row", _fin_short(s, r["name"]), val, f"{_qlabel(r['q'])}" + (f" · 전년 같은 분기보다 {_sgn(r['chg'], 1)}{r['chg_unit']}" if r.get("chg") is not None else "") + f" · {r['note']}"))
-    return R._state_card("이 업종 회사들의 돈 버는 힘은?", state, theme, col, lines, "", tip=_tip_of(sec_fin(s)), fold=True)
+    return R._state_card("회사들의 돈 버는 힘은?",   # 짧게 (2026-10-31 사용자, 옛 이 업종 회사들의 돈 버는 힘은?)
+                          state, theme, col, lines, "", tip=_tip_of(sec_fin(s)), fold=True)
 
 
 def sec_industry_tab(s):
@@ -546,6 +548,9 @@ def _glance(s):
             "normal_range": s.get("normal_range")}
 
 
+LONG_NAME_W = 109   # 가격 줄 이름 칸 = 360px 폰 카드 안쪽 304 의 36% (nvda-report PRICE_ROW_L)
+
+
 def price_card(s):
     """가격 카드 — 미국 종목 · 엔비디아와 같은 틀. 머리 = 가격 줄 + 작은 글씨, 펼치면 기간별 수익률 · 1년 범위 · 고점 회복 · 차트 지표."""
     r = s["ret_1d"]
@@ -553,9 +558,17 @@ def price_card(s):
     pcol = UP if r > 0 else DOWN if r < 0 else "#111"
     tone = R.ROW_UP if r > 0 else R.ROW_DOWN if r < 0 else ""
     bg, bd = ("#FFF7EE", "#FEE6CA") if r > 0 else ("#EFF6FF", "#D6E8FE") if r < 0 else ("#fff", "#E2E8F0")
-    price = R.price_value(f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">{won(s["close"])}</span>', R._arrow(r),
-                          R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN)   # 길면 등락이 아래 줄로 (P61)
-    head = R.price_row(R._row("@@", price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)   # "@@" 는 ticker_logo 가 배지를 만들지 않는 자리표시 — 한글 이름도 isalnum 이라 "SK" 배지가 붙는다
+    close_html = f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">{won(s["close"])}</span>'
+    btn = R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN
+    long_name = R._est_w(s["name"], 18) + 26 > LONG_NAME_W   # 이름(+ 로고)이 이름 칸(최대 36%)을 넘는다 — 한화에어로스페이스 · 삼성바이오로직스 …
+    if long_name:   # 가격 위 · 증감 아래 두 줄로 쌓고 이름은 한 줄 (2026-10-31 사용자: "이름이 길어 로고랑 틀어진다, 가격 밑에 증감")
+        price = (f'<span style="display:inline-flex;flex-direction:column;align-items:flex-end;">{close_html} '
+                 f'<span style="display:inline-flex;align-items:center;white-space:nowrap;">{R._arrow(r)}{btn}</span></span>')
+    else:
+        price = R.price_value(close_html, R._arrow(r), btn)   # 길면 등락이 아래 줄로 (P61)
+    head = R.price_row(R._row("@@", price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)
+    if long_name:
+        head = head.replace(R.PRICE_ROW_L, "flex:0 0 auto;min-width:0;white-space:nowrap;", 1)   # "@@" 는 ticker_logo 가 배지를 만들지 않는 자리표시 — 한글 이름도 isalnum 이라 "SK" 배지가 붙는다
     head = head.replace("@@", badge(s["sym"]) + _esc(s["name"]), 1)   # 한글 첫 글자 배지 + 종목 이름
     sub = R.glance_sub(g)
     if sub:
@@ -818,7 +831,7 @@ def sec_expect(s):
 def card_picks(s):
     """방송 의견 카드 — 공용 R.picks_card (한국 · 미국 종목 같은 카드, 2026-10-29 P88 · P89). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
-    return R.picks_card(s["name"], ps, s.get("close"), won, PICK_DAYS)
+    return R.picks_card(s["name"], ps, s.get("close"), won, R.PICK_HOURS)
 
 
 # ---------------------------------------------------------------- `캘린더` 탭 (2026-10-25 사용자) — 미국 종목 캘린더 탭과 같은 질문 카드 셋.
@@ -1537,7 +1550,7 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
         media = media_feed.issues(media_feed.rows(vids), since)
         media_feed.diag(vids, media)   # 재료 진단 로그 — 채널 묶음 · 범위 · 종목별 배정 (2026-10-30 사용자: 분배 점검)
         global PICKS
-        PICKS = media_feed.picks(vids, (now - datetime.timedelta(days=PICK_DAYS)).strftime("%Y-%m-%d"))
+        PICKS = media_feed.picks(vids, (now - datetime.timedelta(hours=R.PICK_HOURS)).isoformat())   # 48시간 (2026-10-31)
     MEDIA = media
     if snap:
         draw_charts(snap, a["stocks"], out_dir)

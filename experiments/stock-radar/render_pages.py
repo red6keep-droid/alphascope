@@ -423,7 +423,7 @@ def card_opinions(s):
         lines.append((R.analysts_block(a), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
     if ps:
         lines.append((R.picks_rows(ps, s.get("close"), money), "html"))   # 방송 묶음은 `매수 의견` 제목 · 구분선 (P92)
-    tip = ("애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 나온 이 종목 의견을 한 카드에 모은 것\n"
+    tip = (f"애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 최근 {R.PICK_HOURS}시간에 나온 이 종목 의견을 한 카드에 모은 것\n"
            f"· 지금 : {state}" + (f" · 방송 {cnt}" if ps else "") + "\n"
            "· 나누는 법 : 애널리스트 중 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림. 방송 건수는 답에 넣지 않는다\n"
            "· 읽는 법 : 누가 어떤 이유로 말했는지 보는 칸이다. 적중률은 검증하지 않았고, 이 블로그의 추천이 아니다")
@@ -723,7 +723,7 @@ def write_all(a, out_dir, snap=None, news=None, media=None):
     if media is None:   # 영상은 한 번(30일) 읽어 뉴스(24시간) · 방송 의견(30일)에 나눠 쓴다 — Firestore `in` 30개 한도
         vids = media_feed.load(NOW.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=R.PICK_DAYS - 1)
         media = media_feed.issues(media_feed.rows(vids), _since())
-        PICKS = media_feed.picks(vids, (NOW - datetime.timedelta(days=R.PICK_DAYS)).strftime("%Y-%m-%d"))
+        PICKS = media_feed.picks(vids, (NOW - datetime.timedelta(hours=R.PICK_HOURS)).isoformat())   # 48시간 (2026-10-31)
     MEDIA = media
     if snap:
         draw_charts(snap, [s for s in a["stocks"] if s["sym"] not in U.REPORT_TYPE], out_dir)
