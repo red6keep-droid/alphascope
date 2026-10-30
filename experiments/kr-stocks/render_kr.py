@@ -647,14 +647,14 @@ def _boll_rule(bb):
 
 
 def sec_tech(s):
-    """기술 지표는 어느 쪽을 가리키나? (2026-10-30 사용자: 인베스팅닷컴 기술적 분석 화면처럼 — 용어 상승 · 하락 · 중립, P99) — experiments/tech_signals."""
+    """기술지표의 방향은? (옛 제목 기술 지표는 어느 쪽을 가리키나?, P121) (2026-10-30 사용자: 인베스팅닷컴 기술적 분석 화면처럼 — 용어 상승 · 하락 · 중립, P99) — experiments/tech_signals."""
     sig = (s.get("tech") or {}).get("signals")
     if not sig:
         return ""
     import tech_signals
     lines, tip = tech_signals.card(sig, s["name"], UP, DOWN, R.MUTED)
     th, col = tech_signals.theme(sig["net"], UP, DOWN, R.MUTED)   # 상승 빨강 · 하락 파랑의 연한 카드 (P99)
-    card = R._state_card("기술지표는 어느 쪽을 가리키나?", sig["word"], th, col, lines, "", tip=tip, fold=True)
+    card = R._state_card("기술지표의 방향은?", sig["word"], th, col, lines, "", tip=tip, fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
