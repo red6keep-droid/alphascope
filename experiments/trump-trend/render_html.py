@@ -280,7 +280,7 @@ ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" ar
 def _chart_card(rows, horizon, read=""):   # read = 그래프 읽는 법 — 제목 줄 오른쪽 `읽는 법 ?` (2026-10-12 사용자)
     """결론 카드 — 엔비디아 상태 카드(시장 국면) 형식 (2026-10-11 사용자: "배치·컬러·스타일 참고, 회색 배경 / 강조 컬러 배경").
     첫 줄 왼쪽 `자산 n개`(굵게) · 오른쪽 상태(굵게: 모두 범위 안 = 회색 / k개 범위 밖 = 주황), 얇은 선 아래 3px 점 글머리표 16px 검정,
-    맨 아래 ⓘ 주의(5일). 배경: 남은 반응 없음 = 회색 #F8FAFC, 있음 = 강조 오렌지 #FFF7ED."""
+    맨 아래 ⓘ 주의(5일). 배경: 남은 반응 없음 = 회색 #F8FAFC, 있음 = 강조 오렌지 #FFF7EE."""
     span = "당일" if horizon == "close" else "5거래일 동안"
     robust = [r for r in rows if r["robust"]]
     loose = [r for r in rows if not r["robust"] and r["lo"] is not None and not (r["lo"] <= r["mean"] <= r["hi"])]

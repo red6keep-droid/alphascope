@@ -113,7 +113,7 @@ def price_card(s, today):
     g = _glance(s)
     pcol = UP if r > 0 else DOWN if r < 0 else "#111"
     tone = R.ROW_UP if r > 0 else R.ROW_DOWN if r < 0 else ""   # 엔비디아 가격 카드와 같은 강조 카드 높이(위아래 여백 · 행간 32) — design_kit 의 ROW_UP 에는 강조 여백이 없다 (2026-10-23 사용자)
-    bg, bd = ("#FFF7ED", "#FEE6CA") if r > 0 else ("#EFF6FF", "#D6E8FE") if r < 0 else ("#fff", "#E2E8F0")
+    bg, bd = ("#FFF7EE", "#FEE6CA") if r > 0 else ("#EFF6FF", "#D6E8FE") if r < 0 else ("#fff", "#E2E8F0")
     price = R.price_value(f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">${s["close"]:,.2f}</span>', R._arrow(r),
                           R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN)   # 길면 등락이 아래 줄로 (P61)
     head = R.price_row(R._row(s["sym"], price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)
