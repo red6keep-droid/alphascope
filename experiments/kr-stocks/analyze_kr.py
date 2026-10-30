@@ -50,7 +50,7 @@ def technical(bars, bench_bars):
     out["path"], out["bench_path"] = day_path(bars), day_path(bench_bars, t["day"])   # 오늘 하루 흐름 (P41)
     try:
         import tech_signals   # experiments/ — 기술 지표 12 · 이동평균 · 피벗 (2026-10-30 사용자, 인베스팅닷컴 화면을 사실 말로)
-        out["signals"] = tech_signals.compute(bars)
+        out["signals"] = tech_signals.compute(bars, market="kr")   # 이동평균 60 · 120일 · 배열 · 크로스 한국 관행 (P119)
     except Exception as e:   # noqa: BLE001
         print(f"[kr] 기술 지표 계산 실패 : {e}")
         out["signals"] = None

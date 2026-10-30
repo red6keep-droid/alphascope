@@ -172,10 +172,49 @@ def theme(net, up_color, down_color, muted):
     return ("positive", up_color) if net >= 0.15 else ("negative", down_color) if net <= -0.15 else ("neutral", muted)
 
 
-def moving_averages(bars):
+# 이동평균 기간 · 배열 · 크로스 — 시장 관행대로 (P119, 사용자: "한국 종목만 60일 · 120일")
+#   한국 증권사 앱 = 5 · 20 · 60 · 120일(배열), 20 · 60일선(크로스) / 미국 = 20 · 50 · 200일(배열), 50 · 200일선(크로스)
+MA_PERIODS = {"us": (5, 10, 20, 50, 100, 200), "kr": (5, 10, 20, 60, 120, 200)}
+ARRAY_PERIODS = {"us": (20, 50, 200), "kr": (5, 20, 60, 120)}
+CROSS_PAIR = {"us": (50, 200), "kr": (20, 60)}
+
+
+def _sma_series(c, n):
+    out, acc = [], 0.0
+    for i, x in enumerate(c):
+        acc += x
+        if i >= n:
+            acc -= c[i - n]
+        out.append(acc / n if i >= n - 1 else None)
+    return out
+
+
+def ma_array(c, periods):
+    """정배열(짧은 선 > 긴 선 순서) · 역배열(거꾸로) · 혼조 — 종가 단순 평균 기준."""
+    vals = [_sma(c, n) for n in periods]
+    if None in vals:
+        return None
+    if all(a > b for a, b in zip(vals, vals[1:])):
+        return {"periods": periods, "state": "정배열", "dir": 1}
+    if all(a < b for a, b in zip(vals, vals[1:])):
+        return {"periods": periods, "state": "역배열", "dir": -1}
+    return {"periods": periods, "state": "혼조", "dir": 0}
+
+
+def ma_cross(c, pair):
+    """가장 최근 골든크로스(짧은 선이 긴 선 위로) · 데드크로스(아래로)와 며칠 전인지 (거래일)."""
+    s, l = _sma_series(c, pair[0]), _sma_series(c, pair[1])
+    d = [None if a is None or b is None else a - b for a, b in zip(s, l)]
+    for i in range(len(d) - 1, 0, -1):
+        if d[i] is not None and d[i - 1] is not None and (d[i] > 0) != (d[i - 1] > 0):
+            return {"pair": pair, "kind": "골든크로스" if d[i] > 0 else "데드크로스", "dir": 1 if d[i] > 0 else -1, "days_ago": len(d) - 1 - i}
+    return None
+
+
+def moving_averages(bars, periods=MA_PERIODS["us"]):
     c = [b["close"] for b in bars]
     out = []
-    for n in (5, 10, 20, 50, 100, 200):
+    for n in periods:
         s = _sma(c, n)
         e = _ema(c, n)[-1] if len(c) >= n else None
         out.append({"n": n, "sma": s, "ema": e, "sma_above": None if s is None else c[-1] > s, "ema_above": None if e is None else c[-1] > e})
@@ -215,25 +254,29 @@ def overall(ic, mc):
     return {"up": up, "down": dn, "neutral": ic["neutral"], "net": (up - dn) / tot if tot else 0.0}
 
 
-def _frame(bars):
-    rows, ma = indicators(bars), moving_averages(bars)
+def _frame(bars, market="us"):
+    rows, ma = indicators(bars), moving_averages(bars, MA_PERIODS[market])
     ic, mc = counts(rows), ma_counts(ma)
     return rows, ma, ic, mc, overall(ic, mc)
 
 
-def compute(bars):
-    """일봉 → 전체 요약 · 기술 지표 · 이동평균 세 묶음 (인베스팅닷컴 기술적 분석과 같은 구성, 피벗 제외 · P100 · P101). 주봉 · 월봉은 전체 요약만."""
+def compute(bars, market="us"):
+    """일봉 → 전체 요약 · 기술 지표 · 이동평균 세 묶음 (인베스팅닷컴 기술적 분석과 같은 구성, 피벗 제외 · P100 · P101). 주봉 · 월봉은 전체 요약만.
+    market = "kr" 이면 이동평균 5 · 10 · 20 · 60 · 120 · 200일, 배열 5 · 20 · 60 · 120, 크로스 20 · 60 (P119)."""
+    market = market if market in MA_PERIODS else "us"
     bars = [b for b in bars if b.get("close")]
     if len(bars) < 30:
         return None
-    rows, ma, ic, mc, al = _frame(bars)
+    rows, ma, ic, mc, al = _frame(bars, market)
+    closes = [b["close"] for b in bars]
     out = {"as_of": bars[-1]["day"], "close": bars[-1]["close"],
            "net": al["net"], "word": word(al["net"]), "all": al,   # 카드 답 = 전체 요약
            "rows": rows, "counts": ic, "ind_net": ic["net"],
-           "ma": ma, "ma_counts": {"above": mc["up"], "below": mc["down"]}, "ma_net": mc["net"]}
+           "ma": ma, "ma_counts": {"above": mc["up"], "below": mc["down"]}, "ma_net": mc["net"],
+           "market": market, "array": ma_array(closes, ARRAY_PERIODS[market]), "cross": ma_cross(closes, CROSS_PAIR[market])}
     for kind, key in (("W", "weekly"), ("M", "monthly")):
         rb = resample(bars, kind)
-        out[key] = _frame(rb)[4] if len(rb) >= 30 else None
+        out[key] = _frame(rb, market)[4] if len(rb) >= 30 else None
     return out
 
 
@@ -254,7 +297,7 @@ TABLE_FS, TABLE_LH, WHY_FS = "15px", "23px", "13px"   # P113: 줄 높이 − 글
 
 
 # 이동평균 기간 옆 설명 (P109) — 거래일 기준 대략의 달력 길이 (20거래일 ≈ 1달)
-MA_WHAT = {5: "1주", 10: "2주", 20: "1달", 50: "2.5달", 100: "5달", 200: "10달"}
+MA_WHAT = {5: "1주", 10: "2주", 20: "1달", 50: "2.5달", 60: "3달", 100: "5달", 120: "6달", 200: "10달"}
 # 지표 이름 옆 아주 작은 설명 (P108, 사용자: "구분명이 무엇인지 짧게, 줄바꿈 되면 안 돼") — 2~5자
 WHAT = {"rsi": "상대강도", "stoch": "9일 위치", "stochrsi": "RSI 위치", "macd": "추세 전환", "adx": "추세 세기", "wr": "14일 위치",
         "cci": "평균 이탈", "atr": "하루 진폭", "hl": "고저 중간", "uo": "3기간 종합", "roc": "변화율", "bb": "13일선 대비"}
@@ -345,9 +388,15 @@ def gauge_svg(net, size="big"):
             f'{arcs}{labs}{needle}</svg>')
 
 
-def _sub(title):
-    """카드 안 묶음 제목 — 인베스팅닷컴 '기술적 지표' · '이동평균' 구획 자리. 굵게, 아래 줄 구분선은 첫 줄이 맡는다."""
-    return f'<span style="display:block;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;">{title}</span>'   # 19 → 18 (P105)
+POPULAR = "#6D28D9"   # 많이 보는 지표 이름 = 보라 (P119, 테마 --badge-violet) — RSI · 스토캐스틱 · MACD · 배열 · 크로스
+POPULAR_KEYS = ("rsi", "stoch", "macd")
+
+
+def _sub(title, note=""):
+    """카드 안 묶음 제목 — 인베스팅닷컴 '기술적 지표' · '이동평균' 구획 자리. 굵게, 아래 줄 구분선은 첫 줄이 맡는다. note = 오른쪽 작은 글(보라 범례)."""
+    n = f'<span style="font-size:{WHY_FS};line-height:19px;font-weight:400;color:{POPULAR};">{note}</span>' if note else ""
+    return (f'<span style="display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;">'
+            f'<span>{title}</span>{n}</span>')   # 19 → 18 (P105)
 
 
 # 전체요약 답 아래 ~ 개수 줄 6 → 8 (P118) → 10px (+20%, 9.6 → 10, P119: margin-bottom 4)
@@ -407,10 +456,11 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     for r in sig["rows"]:
         w, bx = label_box(r["label"], _h.escape)
         what = WHAT.get(r["key"], "")
-        trs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{_h.escape(r["name"])}'   # 폭이 모자라는 날(긴 이름 + 괄호 글)은 설명 끝이 … 로 — 줄바꿈 없음 (P108)
+        nm = f'<span style="color:{POPULAR};">{_h.escape(r["name"])}</span>' if r["key"] in POPULAR_KEYS else _h.escape(r["name"])
+        trs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{nm}'   # 폭이 모자라는 날(긴 이름 + 괄호 글)은 설명 끝이 … 로 — 줄바꿈 없음 (P108)
                    + (f'<span style="margin-left:4px;font-size:{WHY_FS};line-height:19px;color:#6B7280;">{what}</span>' if what else "") + '</span>'   # 괄호 글(과매도)과 같은 13px 회색 (P109)
                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<b style="font-weight:700;">{_h.escape(r["text"])}</b>{bx}</span>')   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
-    lines.append((_sub("기술지표") + _table(trs, line), "html"))
+    lines.append((_sub("기술지표", "보라색 = 많이 보는 지표") + _table(trs, line), "html"))
     COLW = f"display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;min-width:{BOX_W + 58}px;"   # 숫자 + 라벨 한 칸 — 인베스팅닷컴처럼 값마다 상승 · 하락 (P103, 옛 ▲ · ▼)
 
     def one(v, above):
@@ -418,14 +468,31 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
             return f'<span style="{COLW}">—</span>'
         return f'<span style="{COLW}"><span>{v:,.0f}</span>{box("up" if above else "down", UPW if above else DNW, _h.escape)}</span>'
     HEAD = f"font-size:{WHY_FS};line-height:19px;color:#6B7280;"   # 머리 줄 = 기간 옆 설명(1주 · 2주)과 같은 글씨 (P114)
-    mrs = [f'<span style="{HEAD}">기간</span><span style="display:inline-flex;gap:6px;{HEAD}"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
+    note = f"font-size:{WHY_FS};line-height:19px;color:#6B7280;"
+    top_rows = []
+    ar, cr = sig.get("array"), sig.get("cross")
+    if ar:
+        kind = "up" if ar["dir"] > 0 else "down" if ar["dir"] < 0 else "flat"
+        top_rows.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:{POPULAR};">{ar["state"]}</span>'
+                        f'<span style="margin-left:4px;{note}">{" · ".join(str(n) for n in ar["periods"])}일</span></span>'
+                        f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{box(kind, UPW if kind == "up" else DNW if kind == "down" else MID, _h.escape)}</span>')
+    if cr:
+        kind = "up" if cr["dir"] > 0 else "down"
+        top_rows.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:{POPULAR};">{cr["kind"]}</span>'
+                        f'<span style="margin-left:4px;{note}">{cr["pair"][0]} · {cr["pair"][1]}일선</span></span>'
+                        f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;"><b style="font-weight:700;">{cr["days_ago"]}일 전</b>{box(kind, UPW if kind == "up" else DNW, _h.escape)}</span>')
+    mrs = top_rows + [f'<span style="{HEAD}">기간</span><span style="display:inline-flex;gap:6px;{HEAD}"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
     for m in sig["ma"]:
         mrs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{m["n"]}일<span style="margin-left:4px;font-size:{WHY_FS};line-height:19px;color:#6B7280;">{MA_WHAT.get(m["n"], "")}</span></span>'
                    f'<span style="display:inline-flex;gap:6px;flex:none;">{one(m["sma"], m["sma_above"])}{one(m["ema"], m["ema_above"])}</span>')
-    lines.append((_sub("이동평균") + _table(mrs, line, keep=(0, 1)), "html"))
+    nt = len(top_rows)   # 선 = 제목 아래 · 기간 머리 줄 위 · 머리 줄 아래 (배열 · 크로스 줄이 있으면 그 아래에 머리 줄)
+    lines.append((_sub("이동평균") + _table(mrs, line, keep=tuple(sorted({0, nt, nt + 1}))), "html"))
     tip = ("널리 쓰는 기술지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
            "· 전체요약 : 기술지표와 이동평균을 한데 센 것. (상승 − 하락) ÷ 전체 가 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
            "· 기술지표 : RSI · 스토캐스틱 · CCI · Williams %R · Ultimate 는 과매수면 하락, 과매도면 상승으로 센다. MACD · ROC · Highs/Lows · Bull/Bear 는 0 이나 기준선 위면 상승. ADX 는 25 아래면 중립. ATR 은 방향이 없어 개수에서 뺀다\n"
-           "· 이동평균 : 5 ~ 200일 단순 · 지수 평균. 종가가 선 위면 상승, 아래면 하락\n"
+           "· 이동평균 : 5 ~ 200일 단순 · 지수 평균(한국 종목은 60 · 120일, 미국은 50 · 100일). 종가가 선 위면 상승, 아래면 하락\n"
+           "· 정배열 · 역배열 : 짧은 평균선이 긴 선보다 차례로 위면 정배열, 차례로 아래면 역배열, 섞이면 혼조(한국 5 · 20 · 60 · 120일, 미국 20 · 50 · 200일)\n"
+           "· 골든크로스 · 데드크로스 : 짧은 평균선이 긴 선을 위로 뚫으면 골든, 아래로 뚫으면 데드. 가장 최근 것과 며칠(거래일) 전인지(한국 20 · 60일선, 미국 50 · 200일선)\n"
+           "· 보라색 이름 : 개인 투자자가 많이 보는 지표(RSI · 스토캐스틱 · MACD · 배열 · 크로스)\n"
            "· 참고 : 같은 지표라도 일봉 · 주봉 · 월봉에서 반대로 나오곤 한다. 다른 사이트와는 봉 단위 · 기준값이 달라 값이 다를 수 있다")
     return lines, tip
