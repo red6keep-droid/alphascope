@@ -285,9 +285,12 @@ def label_box(label, esc):
     return w, b
 
 
-def _table(rows_html, line):
-    """줄 묶음 — 줄 사이 카드 색 구분선, 글자 16px."""
-    return "".join(f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-top:1px solid {line};font-size:{TABLE_FS};line-height:{TABLE_LH};color:#111;">{r}</span>' for r in rows_html)
+def _table(rows_html, line, keep=(0,)):
+    """줄 묶음 — 구분선은 keep 번째 줄 위에만(제목 아래 · 머리 줄 아래), 나머지 줄 사이 선은 없다 (P105).
+    줄 위아래 9 → 5px: 줄 한 칸 높이(라벨 25 + 여백)가 약 20% 줄어든다."""
+    return "".join(f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:{9 if i in keep else 5}px 0 5px;'
+                   f'border-top:1px solid {line if i in keep else "transparent"};font-size:{TABLE_FS};line-height:{TABLE_LH};color:#111;">{r}</span>'
+                   for i, r in enumerate(rows_html))
 
 
 def gauge_svg(net, width=260, labels=True):
@@ -326,7 +329,7 @@ def gauge_svg(net, width=260, labels=True):
 
 def _sub(title):
     """카드 안 묶음 제목 — 인베스팅닷컴 '기술적 지표' · '이동평균' 구획 자리. 굵게, 아래 줄 구분선은 첫 줄이 맡는다."""
-    return f'<span style="display:block;margin:18px 0 2px;font-weight:700;color:#111;">{title}</span>'
+    return f'<span style="display:block;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;">{title}</span>'   # 19 → 18 (P105)
 
 
 def _gauge_block(title, c, total_note, up_color, down_color, muted, small=False):
@@ -335,7 +338,7 @@ def _gauge_block(title, c, total_note, up_color, down_color, muted, small=False)
     col = up_color if c["net"] >= 0.15 else down_color if c["net"] <= -0.15 else muted
     cnt = f'상승 {c["up"]} · 중립 {c["neutral"]} · 하락 {c["down"]}' if c.get("neutral") else f'상승 {c["up"]} · 하락 {c["down"]}'
     return (f'<span style="display:block;text-align:center;margin:6px 0 4px;">'
-            f'<span style="display:block;font-weight:700;color:#111;text-align:{"center" if small else "left"};">{title}</span>'
+            f'<span style="display:block;font-weight:700;color:#111;text-align:{"center" if small else "left"};font-size:{"17px" if small else "18px"};">{title}</span>'   # 전체 요약 19 → 18 · 작은 게이지 제목 19 → 17 (P105)
             f'{gauge_svg(c["net"], 150, False) if small else gauge_svg(c["net"])}'
             f'<span style="display:block;font-weight:700;color:{col};">{w}</span>'
             f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}{total_note}</span></span>')
@@ -369,7 +372,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     trs = []
     for r in sig["rows"]:
         w, bx = label_box(r["label"], _h.escape)
-        trs.append(f'<span style="min-width:0;font-weight:700;">{_h.escape(r["name"])}</span>'
+        trs.append(f'<span style="min-width:0;">{_h.escape(r["name"])}</span>'
                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<b style="font-weight:700;">{_h.escape(r["text"])}</b>{bx}</span>')   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
     lines.append((_sub("기술 지표") + _table(trs, line), "html"))
     COLW = f"display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;min-width:{BOX_W + 72}px;"   # 숫자 + 라벨 한 칸 — 인베스팅닷컴처럼 값마다 상승 · 하락 (P103, 옛 ▲ · ▼)
@@ -377,11 +380,11 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     def one(v, above):
         if v is None:
             return f'<span style="{COLW}">—</span>'
-        return f'<span style="{COLW}"><b style="font-weight:700;">{v:,.0f}</b>{box("up" if above else "down", UPW if above else DNW, _h.escape)}</span>'
-    mrs = [f'<span style="font-weight:700;">기간</span><span style="display:inline-flex;gap:6px;font-size:14px;color:{muted};"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
+        return f'<span style="{COLW}"><span>{v:,.0f}</span>{box("up" if above else "down", UPW if above else DNW, _h.escape)}</span>'
+    mrs = [f'<span>기간</span><span style="display:inline-flex;gap:6px;font-size:14px;color:{muted};"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
     for m in sig["ma"]:
-        mrs.append(f'<span style="font-weight:700;">{m["n"]}일</span><span style="display:inline-flex;gap:6px;flex:none;">{one(m["sma"], m["sma_above"])}{one(m["ema"], m["ema_above"])}</span>')
-    lines.append((_sub("이동평균") + _table(mrs, line), "html"))
+        mrs.append(f'<span>{m["n"]}일</span><span style="display:inline-flex;gap:6px;flex:none;">{one(m["sma"], m["sma_above"])}{one(m["ema"], m["ema_above"])}</span>')
+    lines.append((_sub("이동평균") + _table(mrs, line, keep=(0, 1)), "html"))
     tip = ("널리 쓰는 기술 지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
            "· 전체 요약 : 기술 지표와 이동평균을 한데 센 것. (상승 − 하락) ÷ 전체 가 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
            "· 기술 지표 : RSI · 스토캐스틱 · CCI · Williams %R · Ultimate 는 과매수면 하락, 과매도면 상승으로 센다. MACD · ROC · Highs/Lows · Bull/Bear 는 0 이나 기준선 위면 상승. ADX 는 25 아래면 중립. ATR 은 방향이 없어 개수에서 뺀다\n"
