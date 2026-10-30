@@ -12,6 +12,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "nvda-report"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))   # tech_signals (experiments/)
 import config as NC  # noqa: E402  — NVDA 리포트 기준값(국면 · 섹터 흐름 · 볼린저 · 과열)을 그대로 쓴다
 import indicators  # noqa: E402
 
@@ -115,6 +116,12 @@ def technical(bars, snap, sym):
     for key, ref in (("vs_spy", U.BENCH), ("vs_sector", U.sector_etf(sym)[0])):
         rb = {x["day"]: x["close"] for x in snap["bars"].get(ref) or []}
         out[key] = r1 - (rb[t["day"]] / rb[p["day"]] - 1) * 100 if t["day"] in rb and p["day"] in rb else None
+    try:
+        import tech_signals   # experiments/ — 기술 지표 12 · 이동평균 · 피벗 (2026-10-30 사용자)
+        out["signals"] = tech_signals.compute(bars)
+    except Exception as e:   # noqa: BLE001
+        print(f"[radar] {sym} 기술 지표 계산 실패 : {e}")
+        out["signals"] = None
     return out
 
 

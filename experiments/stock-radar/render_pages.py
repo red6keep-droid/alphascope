@@ -264,6 +264,17 @@ def sector_rule(sf):
             f"· 나누는 법 : 시장보다 {pp:.0f}%p 넘게 앞서면 모이는 중, {pp:.0f}%p 넘게 뒤지면 빠져나가는 중, 그 사이는 뚜렷하지 않음")
 
 
+def sec_tech(s):
+    """기술 지표는 어느 쪽을 가리키나? (2026-10-30 사용자) — 한국 종목 페이지와 같은 카드 (experiments/tech_signals)."""
+    sig = (s.get("tech") or {}).get("signals")
+    if not sig:
+        return ""
+    import tech_signals
+    lines, tip = tech_signals.card(sig, s["name"], UP, DOWN, R.MUTED)
+    card = R._state_card("기술 지표는 어느 쪽을 가리키나?", sig["word"], "neutral", R.MUTED, lines, "", tip=tip, fold=True)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
+
+
 def sec_states(s):
     """상태 카드 — NVDA 리포트와 같은 카드 · 규칙. 업종 카드만 종목의 업종 ETF 로. 시장 충격 · 한 달 범위 · 과열은 해당하는 날만."""
     out = ""
@@ -656,7 +667,7 @@ def _josa(t):
 
 def detail_body(s, today, news=None):
     """NVDA 리포트 순서 : 맨 위 요약 → 그래프 → 가격 카드(펼치면 1층 · 2층) → 상태 카드. 갱신 날짜 줄은 뺐다 — 요약 첫 마디에 날짜가 있다 (2026-10-18 사용자)."""
-    return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_states(s) + sec_targets(s)
+    return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_tech(s) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
                 + R._section("실적", sec_expect(s), tab="실적")
                 + R._section("캘린더", sec_calendar(s), tab="캘린더")
