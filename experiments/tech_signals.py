@@ -1,4 +1,5 @@
-"""기술 지표는 어느 쪽을 가리키나 — 인베스팅닷컴 '기술적 분석' 화면의 지표 12 · 이동평균 6×2 · 피벗 5가지를 우리 일봉으로 계산 (2026-10-30 사용자). AI 없음.
+"""기술 지표는 어느 쪽을 가리키나 — 인베스팅닷컴 '기술적 분석' 화면의 지표 12 · 이동평균 6×2 를 우리 일봉으로 계산 (2026-10-30 사용자). AI 없음.
+피벗 5가지는 뺐다 (10-30 사용자 P100: 장중 단타용 기준선이라 종가 블로그 독자에게 쓸모가 적고, 검증한 적 없고, 숫자 스무 개가 초보에게 어렵다).
 
 용어 = 상승 · 하락 · 중립 하나로 (2026-10-30 사용자 P99: "오름 쪽 · 내림 쪽은 돌려 말하기 — 상승 · 하락, 화살표, 강한 상승 · 강한 하락").
   블로그는 매수 · 매도라고 쓰지 않는다 — 지표가 가리키는 가격 방향을 그대로 적고 판단은 독자가 한다 (법적 경계 선 4).
@@ -6,7 +7,7 @@
   요약 = 강한 상승 · 상승 · 중립 · 하락 · 강한 하락, 색 = 상승 빨강 · 하락 파랑의 연한 상태 카드 톤(theme). 임계값은 널리 쓰는 기본값(RSI 70/30, 스토캐스틱 80/20, CCI ±100, Williams −20/−80, ADX 25).
 인베스팅닷컴과 값이 다를 수 있다 — 그 표는 시간봉 기준으로 보이고(10-30 점검: 5일 이동평균이 최근 5일 종가 평균과 안 맞음), 우리는 일봉 · 주봉 · 월봉.
 
-    compute(bars) → {"as_of", "close", "rows": [...], "counts", "net", "word", "ma": [...], "ma_counts", "pivot": {...}, "weekly": counts, "monthly": counts}
+    compute(bars) → {"as_of", "close", "rows": [...], "counts", "net", "word", "ma": [...], "ma_counts", "weekly": counts, "monthly": counts}
     card(sig, name) → (lines, tip)  — nvda-report render_html._state_card 에 넣는 줄
 """
 
@@ -197,22 +198,6 @@ def moving_averages(bars):
     return out
 
 
-def pivots(prev, today_open=None):
-    """전날 고가 · 저가 · 종가로 오늘의 피벗 — 클래식 · 피보나치 · 카마릴라 · 우디 · 디마크 (인베스팅닷컴과 같은 공식)."""
-    h, l, c = prev["high"], prev["low"], prev["close"]
-    o = prev.get("open") or c
-    p = (h + l + c) / 3
-    rng = h - l
-    classic = {"S3": l - 2 * (h - p), "S2": p - rng, "S1": 2 * p - h, "P": p, "R1": 2 * p - l, "R2": p + rng, "R3": h + 2 * (p - l)}
-    fib = {"S3": p - rng, "S2": p - 0.618 * rng, "S1": p - 0.382 * rng, "P": p, "R1": p + 0.382 * rng, "R2": p + 0.618 * rng, "R3": p + rng}
-    cam = {"S3": c - rng * 1.1 / 4, "S2": c - rng * 1.1 / 6, "S1": c - rng * 1.1 / 12, "P": p, "R1": c + rng * 1.1 / 12, "R2": c + rng * 1.1 / 6, "R3": c + rng * 1.1 / 4}
-    pw = (h + l + 2 * (today_open or c)) / 4
-    woodie = {"S3": None, "S2": pw - rng, "S1": 2 * pw - h, "P": pw, "R1": 2 * pw - l, "R2": pw + rng, "R3": None}
-    x = h + 2 * l + c if c < o else 2 * h + l + c if c > o else h + l + 2 * c
-    demark = {"S3": None, "S2": None, "S1": x / 2 - h, "P": x / 4, "R1": x / 2 - l, "R2": None, "R3": None}
-    return {"클래식": classic, "피보나치": fib, "카마릴라": cam, "우디": woodie, "디마크": demark}
-
-
 def resample(bars, kind):
     """일봉 → 주봉(월~금) · 월봉. 마지막 묶음은 진행 중인 주 · 달."""
     out, cur, key = [], None, None
@@ -243,7 +228,7 @@ def compute(bars):
     mac = {"above": sum(1 for m in ma for k in ("sma_above", "ema_above") if m[k] is True),
            "below": sum(1 for m in ma for k in ("sma_above", "ema_above") if m[k] is False)}
     out = {"as_of": bars[-1]["day"], "close": bars[-1]["close"], "rows": rows, "counts": cnt, "net": cnt["net"], "word": word(cnt["net"]),
-           "ma": ma, "ma_counts": mac, "pivot": pivots(bars[-1]) if bars[-1].get("high") is not None else None}
+           "ma": ma, "ma_counts": mac}
     for kind, key in (("W", "weekly"), ("M", "monthly")):
         rb = resample(bars, kind)
         out[key] = counts(indicators(rb)) if len(rb) >= 30 else None
@@ -276,7 +261,7 @@ def gauge_svg(net, up_color=GAUGE_UP, down_color=GAUGE_DN, gray="#CBD5E1", width
 
 
 def card(sig, name, up_color, down_color, muted="#6B7280"):
-    """(lines, tip) — _state_card 줄. 사실만: 개수 · 게이지 · 지표 줄(값 | 라벨) · 이동평균 줄 · 주봉 · 월봉 개수 · 피벗(접기 대신 줄)."""
+    """(lines, tip) — _state_card 줄. 사실만: 개수 · 게이지 · 지표 줄(값 | 라벨) · 이동평균 줄 · 주봉 · 월봉 개수."""
     import html as _h
     cnt = sig["counts"]
     first = (f"{sig['as_of'][5:7].lstrip('0')}월 {sig['as_of'][8:10].lstrip('0')}일 종가 기준 지표 11개 가운데 상승 {cnt['up']}개, 중립 {cnt['neutral']}개, 하락 {cnt['down']}개다. "
@@ -297,20 +282,9 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
             arrow = f'<span style="color:{up_color if above else down_color};font-weight:700;">{"▲" if above else "▼"}</span>'   # 두 값이 한 줄이라 화살표만 (폭, P99)
             return f'<span style="font-weight:700;color:#111;">{v:,.0f}</span> {arrow}'
         lines.append(("row", f"이동평균 {m['n']}일", f'{one(m["sma"], m["sma_above"])}&nbsp;·&nbsp;{one(m["ema"], m["ema_above"])}', "", True))   # 뜻은 툴팁 한 줄 — 여섯 줄 같은 문장 (10-30)
-    pv = sig.get("pivot")
-    if pv:
-        for nm, d in pv.items():
-            # 한 줄에 일곱 숫자면 폰 폭을 넘어 페이지 전체가 옆으로 밀렸다 (10-30 목업: 화면 726px, 카드 답 글자 잘림) — P 한 줄 + S·R 짝 세 줄
-            ln = [f"P {d['P']:,.0f}"] if d.get("P") is not None else []
-            for i in ("1", "2", "3"):
-                pair = [f"{k} {d[k]:,.0f}" for k in ("S" + i, "R" + i) if d.get(k) is not None]
-                if pair:
-                    ln.append(" · ".join(pair))
-            lines.append(("row", f"피벗 {nm}", "\n".join(ln), ""))   # 뜻 줄은 툴팁으로 — 다섯 줄 같은 문장 · 값이 여러 줄이면 뜻 칸이 줄바꿈 없이 폭을 넘었다 (10-30)
     tip = ("널리 쓰는 기술 지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
            "· 상승 · 하락 · 중립 : 지표마다 흔히 쓰는 기준으로 나눴다. 과매수는 하락, 과매도는 상승으로 센다\n"
            "· 강한 상승 · 강한 하락 : (상승 개수 − 하락 개수) ÷ 11 이 ±0.5 를 넘을 때. ±0.15 안은 중립. ATR 은 방향이 없어 개수에서 뺀다\n"
            "· 이동평균 : 단순 · 지수 값 옆 ▲ 는 종가가 선 위(상승), ▼ 는 아래(하락)\n"
-           "· 피벗 : 전날 고가 · 저가 · 종가로 계산한 오늘의 기준선. P 가 가운데, S 는 아래 · R 은 위\n"
            "· 참고 : 같은 지표라도 일봉 · 주봉 · 월봉에서 반대로 나오곤 한다. 다른 사이트와는 봉 단위 · 기준값이 달라 값이 다를 수 있다")
     return lines, tip
