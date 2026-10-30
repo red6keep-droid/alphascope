@@ -348,7 +348,7 @@ def _table(rows_html, line, keep=(0,)):
 # 게이지 치수 — 모두 정수 px (P113, 사용자: "간격은 모두 정수로, 소수점 찍지 마").
 # 작은 게이지는 폰(360px) 칸 안쪽 폭 134 그대로 그려 축소(옛 150 → 0.89배, 간격이 소수가 되던 원인)를 없앤다.
 #   폭 · 반지름 · 위 여백 · 호 두께 · 바늘 두께 · 가운데 원 반지름 · 바늘 끝 ~ 호 안쪽 · 아래 여백(가운데 원 아래 ~ 그림 끝)
-GAUGE_BIG = dict(width=260, r=90, top=30, arc=14, needle=3, hub=5, tip_gap=15, bottom=23)
+GAUGE_BIG = dict(width=260, r=90, top=30, arc=14, needle=3, hub=5, tip_gap=15, bottom=25)   # bottom 23 → 25: 칸 이름(강한 하락 · 강한 상승) ~ 답 글자 5 → 7px (+30%, 6.5 → 7, P123)
 GAUGE_SMALL = dict(width=134, r=55, top=10, arc=10, needle=2, hub=3, tip_gap=10, bottom=11)   # bottom 6 → 11: 가운데 원 ~ 답 글자 9 → 14px (+50%, P114)
 
 
