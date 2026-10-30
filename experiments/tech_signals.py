@@ -248,7 +248,7 @@ ZONES = [(-1.0, -0.5, "강한 하락", "#82B1F0"), (-0.5, -0.15, "하락", "#BCD
 # 10-30 사용자 P103: 버튼 말고 라벨 느낌 — 외곽선 연하게, 셋 다 연한 바탕(하락 바탕이 하락 카드 바탕과 같아 색이 없어 보였다), 가로 짧게 · 높이 그대로
 BOX = {"up": ("#FDE8E8", "#F6CACA", "#B91C1C"), "down": ("#DCE9FC", "#C3D7F5", "#1D4ED8"), "flat": ("#E8EDF3", "#D6DEE8", "#475569")}
 BOX_W = 50
-TABLE_FS, TABLE_LH, WHY_FS = "16px", "24px", "13px"   # 표 글자 18 → 16 (사용자 "두 단계 작게", 한 단계 = 1px · P96 과 같은 셈) · 괄호 글 14 → 13
+TABLE_FS, TABLE_LH, WHY_FS = "15px", "22px", "13px"   # P104: 표 줄만 16 → 15 (사용자 "구분선으로 나눠 있는 정보만 한 포인트")   # 표 글자 18 → 16 (사용자 "두 단계 작게", 한 단계 = 1px · P96 과 같은 셈) · 괄호 글 14 → 13
 
 
 def _mark(kind):
@@ -264,7 +264,7 @@ def box(kind, text, esc, sym=True):
     """라벨 하나 — 기호(▲ · ▼ · 가로 막대) + 글자, 고정 폭이라 열이 맞는다."""
     bg, bd, fg = BOX[kind]
     return (f'<span style="display:inline-flex;align-items:center;justify-content:center;gap:3px;width:{BOX_W}px;box-sizing:border-box;flex:none;'
-            f'padding:3px 0 2px;background:{bg};border:1px solid {bd};border-radius:4px;color:{fg};font-size:14px;line-height:18px;font-weight:400;white-space:nowrap;">'
+            f'padding:3px 0 2px;background:{bg};border:1px solid {bd};border-radius:4px;color:{fg};font-size:14px;line-height:18px;font-weight:700;white-space:nowrap;">'
             f'{_mark(kind) if sym else ""}{esc(text)}</span>')
 
 
@@ -369,7 +369,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     trs = []
     for r in sig["rows"]:
         w, bx = label_box(r["label"], _h.escape)
-        trs.append(f'<span style="min-width:0;">{_h.escape(r["name"])}</span>'
+        trs.append(f'<span style="min-width:0;font-weight:700;">{_h.escape(r["name"])}</span>'
                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<b style="font-weight:700;">{_h.escape(r["text"])}</b>{bx}</span>')   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
     lines.append((_sub("기술 지표") + _table(trs, line), "html"))
     COLW = f"display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;min-width:{BOX_W + 72}px;"   # 숫자 + 라벨 한 칸 — 인베스팅닷컴처럼 값마다 상승 · 하락 (P103, 옛 ▲ · ▼)
@@ -378,9 +378,9 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         if v is None:
             return f'<span style="{COLW}">—</span>'
         return f'<span style="{COLW}"><b style="font-weight:700;">{v:,.0f}</b>{box("up" if above else "down", UPW if above else DNW, _h.escape)}</span>'
-    mrs = [f'<span>기간</span><span style="display:inline-flex;gap:6px;font-size:14px;color:{muted};"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
+    mrs = [f'<span style="font-weight:700;">기간</span><span style="display:inline-flex;gap:6px;font-size:14px;color:{muted};"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
     for m in sig["ma"]:
-        mrs.append(f'<span>{m["n"]}일</span><span style="display:inline-flex;gap:6px;flex:none;">{one(m["sma"], m["sma_above"])}{one(m["ema"], m["ema_above"])}</span>')
+        mrs.append(f'<span style="font-weight:700;">{m["n"]}일</span><span style="display:inline-flex;gap:6px;flex:none;">{one(m["sma"], m["sma_above"])}{one(m["ema"], m["ema_above"])}</span>')
     lines.append((_sub("이동평균") + _table(mrs, line), "html"))
     tip = ("널리 쓰는 기술 지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
            "· 전체 요약 : 기술 지표와 이동평균을 한데 센 것. (상승 − 하락) ÷ 전체 가 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
