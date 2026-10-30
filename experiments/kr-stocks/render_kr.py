@@ -500,7 +500,8 @@ def card_industry_work(s):
     lines = [(head + R.small_note(note), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
     div, u = _chart_unit(r0["kind"])
     scaled = [dict(x, v=x["v"] / div) for x in r0.get("series") or []]   # 단위를 먼저 나눠 그린다 — 막대 숫자만 나누면 세로 눈금이 5000000 처럼 원래 숫자로 나왔다 (2026-10-31)
-    lines += _yoy_chart(f"{r0['name']}, 올해와 작년 같은 달" + (f" ({u})" if u else ""), _yoy_groups(scaled, "month", _mo),
+    chart_name = r0["name"].replace(" (전차 · 무기 · 탄약)", "")   # 그래프 제목엔 품목 괄호를 빼고 (2026-10-31 사용자 P135) — 근거 줄 · 툴팁에는 그대로
+    lines += _yoy_chart(f"{chart_name}, 올해와 작년 같은 달" + (f" ({u})" if u else ""), _yoy_groups(scaled, "month", _mo),
                         lambda v: f"{v:,.1f}" if v < 100 else f"{v:,.0f}")
     for r in rows_data:
         cmp_txt = "전년 같은 달보다" if r["cmp"] == "yoy" else "전달보다"
@@ -562,19 +563,25 @@ def price_card(s):
     btn = R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN
     long_name = R._est_w(s["name"], 18) + 26 > LONG_NAME_W   # 이름(+ 로고)이 이름 칸(최대 36%)을 넘는다 — 한화에어로스페이스 · 삼성바이오로직스 …
     if long_name:   # 가격 위 · 증감 아래 두 줄로 쌓고 이름은 한 줄 (2026-10-31 사용자: "이름이 길어 로고랑 틀어진다, 가격 밑에 증감")
-        price = (f'<span style="display:inline-flex;flex-direction:column;align-items:flex-end;">{close_html} '
-                 f'<span style="display:inline-flex;align-items:center;white-space:nowrap;">{R._arrow(r)}{btn}</span></span>')
+        # 가격 · 증감 두 줄을 한 묶음으로 오른쪽 끝선을 맞추고, 접기 버튼은 그 묶음 오른쪽 (P135: 가격 오른쪽 끝 = % 오른쪽 끝)
+        price = (f'<span style="display:inline-flex;align-items:center;column-gap:4px;">'
+                 f'<span style="display:inline-flex;flex-direction:column;align-items:flex-end;">{close_html} '
+                 f'<span style="white-space:nowrap;">{R._arrow(r)}</span></span>{btn}</span>')
     else:
         price = R.price_value(close_html, R._arrow(r), btn)   # 길면 등락이 아래 줄로 (P61)
     head = R.price_row(R._row("@@", price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)
     if long_name:
-        head = head.replace(R.PRICE_ROW_L, "flex:0 0 auto;min-width:0;white-space:nowrap;", 1)   # "@@" 는 ticker_logo 가 배지를 만들지 않는 자리표시 — 한글 이름도 isalnum 이라 "SK" 배지가 붙는다
+        head = head.replace(R.PRICE_ROW_L, "flex:0 0 auto;min-width:0;white-space:nowrap;", 1)
+        head = head.replace("align-items:center;", "align-items:flex-start;", 1)   # 이름 = 가격과 같은 줄 (P135 — 가운데 맞춤이면 두 줄 사이에 떴다)   # "@@" 는 ticker_logo 가 배지를 만들지 않는 자리표시 — 한글 이름도 isalnum 이라 "SK" 배지가 붙는다
     head = head.replace("@@", badge(s["sym"]) + _esc(s["name"]), 1)   # 한글 첫 글자 배지 + 종목 이름
     sub = R.glance_sub(g)
     if sub:
         head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1)
         k = head.rstrip().rfind("</span>")
-        head = head[:k] + sub.replace("S&P 500", "KOSPI") + head[k:]
+        sub_html = sub.replace("S&P 500", "KOSPI")
+        if long_name:   # 증감 줄 ~ 작은 글씨 6 → 8px (+40%, 8.4 → 8, P135)
+            sub_html = f'<span style="display:block;flex-basis:100%;margin-top:2px;">{sub_html}</span>'
+        head = head[:k] + sub_html + head[k:]
     rows = ""   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 정보 보기는 모두 강조 카드 안 (2026-10-26 사용자)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
             f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), R.in_card(sec_periods(s), white=True), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
