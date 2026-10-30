@@ -566,7 +566,7 @@ def price_card(s):
         # 가격 · 증감 두 줄을 한 묶음으로 오른쪽 끝선을 맞추고, 접기 버튼은 그 묶음 오른쪽 (P135: 가격 오른쪽 끝 = % 오른쪽 끝)
         price = (f'<span style="display:inline-flex;align-items:center;column-gap:4px;">'
                  f'<span style="display:inline-flex;flex-direction:column;align-items:flex-end;">{close_html} '
-                 f'<span style="white-space:nowrap;">{R._arrow(r)}</span></span>{btn}</span>')
+                 f'<span style="white-space:nowrap;margin-top:-2px;">{R._arrow(r)}</span></span>{btn}</span>')   # 가격 ~ 증감 9 → 7px (P136, 사용자 10-31)
     else:
         price = R.price_value(close_html, R._arrow(r), btn)   # 길면 등락이 아래 줄로 (P61)
     head = R.price_row(R._row("@@", price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)
