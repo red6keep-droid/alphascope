@@ -646,6 +646,17 @@ def _boll_rule(bb):
             f"· 오늘 {won(c)} : 범위 {won(lo)}~{won(hi)}" + (" 안" if bb["state"] not in R.BOLL_THEME else f" 밖({R.BOLL_STATE_KO.get(bb['state'], '')})"))
 
 
+def sec_tech(s):
+    """기술 지표는 어느 쪽을 가리키나? (2026-10-30 사용자: 인베스팅닷컴 기술적 분석 화면처럼 — 라벨은 매수 · 매도 대신 사실 말, 색은 회색) — experiments/tech_signals."""
+    sig = (s.get("tech") or {}).get("signals")
+    if not sig:
+        return ""
+    import tech_signals
+    lines, tip = tech_signals.card(sig, s["name"], UP, DOWN, R.MUTED)
+    card = R._state_card("기술 지표는 어느 쪽을 가리키나?", sig["word"], "neutral", R.MUTED, lines, "", tip=tip, fold=True)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
+
+
 def sec_states(s):
     """상태 카드 — 한 달 범위(매일) · 과열(해당하는 날만). 시장 충격 · 시장 분위기 · 업종 자금은 미국 지표(VIX · 섹터 ETF)라 두지 않는다."""
     out = ""
@@ -1022,7 +1033,7 @@ def detail_body(s, a):
     `업종` 탭 = 업종 재료 · 체감 경기 · 경영 분석
     (2026-10-25 사용자: 미국 종목 페이지처럼 탭 — 실적과 기대 · 캘린더는 다음 단계)."""
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
-            + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_pairs(s) + sec_states(s)
+            + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_tech(s) + sec_pairs(s) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
             + _dk.keep_tone(R._section("뉴스", sec_today(s), tab="오늘"))   # 뉴스는 헤드라인체 그대로
             + R._section("실적", sec_expect(s), tab="실적")
             + R._section("업종", sec_industry_tab(s), tab="업종")

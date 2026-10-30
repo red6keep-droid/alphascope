@@ -14,6 +14,7 @@ import universe_kr as U
 BASE = os.path.dirname(os.path.abspath(__file__))
 for p in ("stock-radar", "nvda-report", "."):
     sys.path.insert(0, os.path.join(BASE, "..", p))
+sys.path.insert(0, os.path.join(BASE, ".."))   # tech_signals (experiments/)
 import analyze as A  # noqa: E402 — stock-radar (normal_range · period_returns · year_range · bollinger · overheat)
 import indicators  # noqa: E402 — nvda-report
 import config as NC  # noqa: E402 — nvda-report (RSI_PERIOD 등)
@@ -47,6 +48,12 @@ def technical(bars, bench_bars):
     bc = [x["close"] for x in bench_bars or [] if x["day"] <= t["day"]]   # 지수도 같은 날까지 — 평균선 대비 비교 막대 (2026-10-27 P37)
     out["bench_ma_rel"] = {n: (bc[-1] / (sum(bc[-n:]) / n) - 1) * 100 for n in (20, 60, 120, 200) if len(bc) >= n}
     out["path"], out["bench_path"] = day_path(bars), day_path(bench_bars, t["day"])   # 오늘 하루 흐름 (P41)
+    try:
+        import tech_signals   # experiments/ — 기술 지표 12 · 이동평균 · 피벗 (2026-10-30 사용자, 인베스팅닷컴 화면을 사실 말로)
+        out["signals"] = tech_signals.compute(bars)
+    except Exception as e:   # noqa: BLE001
+        print(f"[kr] 기술 지표 계산 실패 : {e}")
+        out["signals"] = None
     out["vs_bench"] = r1 - (rb[t["day"]] / rb[p["day"]] - 1) * 100 if t["day"] in rb and p["day"] in rb else None
     return out
 
