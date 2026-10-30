@@ -260,11 +260,11 @@ ZONES = [(-1.0, -0.5, "강한 하락", "#82B1F0"), (-0.5, -0.15, "하락", "#BCD
          (0.15, 0.5, "상승", "#F8C4BF"), (0.5, 1.0, "강한 상승", "#ED8E87")]
 
 
-def gauge_svg(net, width=260):
+def gauge_svg(net, width=260, labels=True):
     """반원 게이지 다섯 칸 + 바늘 + 칸 이름. 바늘 = net (−1 … +1), 왼쪽 끝 = −1.
     양 끝(강한 하락 · 강한 상승)은 호 끝 아래, 가운데 셋은 호 바깥 위 — 옆에 두면 폭 안에서 잘렸다 (10-30 목업)."""
-    r = width / 2 - 40
-    cx, cy = width / 2, r + 30
+    r = width / 2 - (40 if labels else 12)
+    cx, cy = width / 2, r + (30 if labels else 10)
 
     def ang(v):   # −1 → 180° (왼쪽), +1 → 0° (오른쪽)
         return math.radians(90 - max(-1.0, min(1.0, v)) * 90)
@@ -276,9 +276,9 @@ def gauge_svg(net, width=260):
     for lo, hi, _, col in ZONES:
         x0, y0 = pt(lo + 0.012, r)
         x1, y1 = pt(hi - 0.012, r)
-        arcs += f'<path d="M{x0:.1f},{y0:.1f} A{r:.1f},{r:.1f} 0 0 1 {x1:.1f},{y1:.1f}" stroke="{col}" stroke-width="14" fill="none"/>'
+        arcs += f'<path d="M{x0:.1f},{y0:.1f} A{r:.1f},{r:.1f} 0 0 1 {x1:.1f},{y1:.1f}" stroke="{col}" stroke-width="{14 if labels else 10}" fill="none"/>'
     labs = ""
-    for i, (lo, hi, name, _) in enumerate(ZONES):
+    for i, (lo, hi, name, _) in enumerate(ZONES if labels else []):
         if i in (0, 4):   # 양 끝: 호 끝 바로 아래 가운데
             x, y = pt(-1.0 if i == 0 else 1.0, r)
             labs += f'<text x="{x:.0f}" y="{cy + 22:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">{name}</text>'
@@ -289,7 +289,7 @@ def gauge_svg(net, width=260):
     x, y = pt(net, r - 12)
     needle = (f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{x:.1f}" y2="{y:.1f}" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>'
               f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5" fill="#111"/>')
-    h = cy + 28
+    h = cy + (28 if labels else 8)
     return (f'<svg viewBox="0 0 {width} {h:.0f}" width="{width}" height="{h:.0f}" aria-hidden="true" style="display:block;max-width:100%;height:auto;margin:0 auto;">'
             f'{arcs}{labs}{needle}</svg>')
 
@@ -299,14 +299,14 @@ def _sub(title):
     return f'<span style="display:block;margin:18px 0 2px;font-weight:700;color:#111;">{title}</span>'
 
 
-def _gauge_block(title, c, total_note, up_color, down_color, muted):
-    """묶음 제목 + 게이지 + 답(굵게, 증감 색) + 개수 한 줄."""
+def _gauge_block(title, c, total_note, up_color, down_color, muted, small=False):
+    """묶음 제목 + 게이지 + 답(굵게, 증감 색) + 개수 한 줄. small = 나란히 놓는 작은 게이지(칸 이름 없음, 제목 가운데)."""
     w = word(c["net"])
     col = up_color if c["net"] >= 0.15 else down_color if c["net"] <= -0.15 else muted
     cnt = f'상승 {c["up"]} · 중립 {c["neutral"]} · 하락 {c["down"]}' if c.get("neutral") else f'상승 {c["up"]} · 하락 {c["down"]}'
     return (f'<span style="display:block;text-align:center;margin:6px 0 4px;">'
-            f'<span style="display:block;font-weight:700;color:#111;text-align:left;">{title}</span>'
-            f'{gauge_svg(c["net"])}'
+            f'<span style="display:block;font-weight:700;color:#111;text-align:{"center" if small else "left"};">{title}</span>'
+            f'{gauge_svg(c["net"], 150, False) if small else gauge_svg(c["net"])}'
             f'<span style="display:block;font-weight:700;color:{col};">{w}</span>'
             f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}{total_note}</span></span>')
 
@@ -324,13 +324,18 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         if w:
             col = up_color if w["net"] >= 0.15 else down_color if w["net"] <= -0.15 else muted
             frames.append(f'{lab} <b style="color:{col};">{word(w["net"])}</b>')
+    # 게이지는 게이지끼리 맨 위 (10-30 사용자): 전체 요약 크게(칸 이름) → 기술 지표 · 이동평균 작게 나란히(색만 같게)
+    pair = ('<span style="display:flex;gap:8px;margin:14px 0 4px;">'
+            f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("기술 지표", sig["counts"], "", up_color, down_color, muted, small=True)}</span>'
+            f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("이동평균", mc, "", up_color, down_color, muted, small=True)}</span></span>')
     lines = [(f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};margin:12px 0 0;">{day} 종가 · 일봉 기준</span>', "html"),
              (_gauge_block("전체 요약", al, "", up_color, down_color, muted)
-              + (f'<span style="display:block;text-align:center;font-size:14px;line-height:20px;color:{muted};margin-top:2px;">{" · ".join(frames)}</span>' if frames else ""), "html"),
-             (_sub("기술 지표") + _gauge_block("", sig["counts"], "", up_color, down_color, muted), "html")]
+              + (f'<span style="display:block;text-align:center;font-size:14px;line-height:20px;color:{muted};margin-top:2px;">{" · ".join(frames)}</span>' if frames else "")
+              + pair, "html"),
+             (_sub("기술 지표"), "html")]
     for r in sig["rows"]:
         lines.append(("row", r["name"], f'<span style="font-weight:700;color:#111;">{_h.escape(r["text"])}</span>&nbsp;&nbsp;{label_html(r["label"], up_color, down_color, muted, _h.escape)}', "", True))
-    lines.append((_sub("이동평균") + _gauge_block("", mc, "", up_color, down_color, muted), "html"))
+    lines.append((_sub("이동평균"), "html"))
     COLW = "display:inline-block;min-width:92px;text-align:right;"
     lines.append(("row", "기간", f'<span style="font-size:14px;font-weight:400;color:{muted};"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>', "", True))
 
