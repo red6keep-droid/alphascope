@@ -172,7 +172,79 @@ def theme(net, up_color, down_color, muted):
     return ("positive", up_color) if net >= 0.15 else ("negative", down_color) if net <= -0.15 else ("neutral", muted)
 
 
-# 지표 줄 라벨 박스 (10-30 사용자): 바탕이 칠해진 사각 박스 안에 기호 + 글자, 같은 폭이라 세로 열이 맞는다. 색 = 공용 라벨(design_kit.PILL) 톤
+def moving_averages(bars):
+    c = [b["close"] for b in bars]
+    out = []
+    for n in (5, 10, 20, 50, 100, 200):
+        s = _sma(c, n)
+        e = _ema(c, n)[-1] if len(c) >= n else None
+        out.append({"n": n, "sma": s, "ema": e, "sma_above": None if s is None else c[-1] > s, "ema_above": None if e is None else c[-1] > e})
+    return out
+
+
+def resample(bars, kind):
+    """일봉 → 주봉(월~금) · 월봉. 마지막 묶음은 진행 중인 주 · 달."""
+    out, cur, key = [], None, None
+    for b in bars:
+        d = datetime.date.fromisoformat(b["day"])
+        k = d.isocalendar()[:2] if kind == "W" else (d.year, d.month)
+        if k != key:
+            if cur:
+                out.append(cur)
+            cur, key = {"day": b["day"], "open": b.get("open") or b["close"], "high": b.get("high") or b["close"], "low": b.get("low") or b["close"], "close": b["close"]}, k
+        else:
+            cur["high"] = max(cur["high"], b.get("high") or b["close"])
+            cur["low"] = min(cur["low"], b.get("low") or b["close"])
+            cur["close"] = b["close"]
+            cur["day"] = b["day"]
+    if cur:
+        out.append(cur)
+    return out
+
+
+def ma_counts(ma):
+    up = sum(1 for m in ma for k in ("sma_above", "ema_above") if m[k] is True)
+    dn = sum(1 for m in ma for k in ("sma_above", "ema_above") if m[k] is False)
+    return {"up": up, "down": dn, "neutral": 0, "net": (up - dn) / (up + dn) if up + dn else 0.0}
+
+
+def overall(ic, mc):
+    """전체 요약 = 기술 지표(방향 있는 11개) + 이동평균(12개)을 한데 센 비율 — 인베스팅닷컴 '요약' 게이지 자리 (P101)."""
+    up, dn = ic["up"] + mc["up"], ic["down"] + mc["down"]
+    tot = up + dn + ic["neutral"]
+    return {"up": up, "down": dn, "neutral": ic["neutral"], "net": (up - dn) / tot if tot else 0.0}
+
+
+def _frame(bars):
+    rows, ma = indicators(bars), moving_averages(bars)
+    ic, mc = counts(rows), ma_counts(ma)
+    return rows, ma, ic, mc, overall(ic, mc)
+
+
+def compute(bars):
+    """일봉 → 전체 요약 · 기술 지표 · 이동평균 세 묶음 (인베스팅닷컴 기술적 분석과 같은 구성, 피벗 제외 · P100 · P101). 주봉 · 월봉은 전체 요약만."""
+    bars = [b for b in bars if b.get("close")]
+    if len(bars) < 30:
+        return None
+    rows, ma, ic, mc, al = _frame(bars)
+    out = {"as_of": bars[-1]["day"], "close": bars[-1]["close"],
+           "net": al["net"], "word": word(al["net"]), "all": al,   # 카드 답 = 전체 요약
+           "rows": rows, "counts": ic, "ind_net": ic["net"],
+           "ma": ma, "ma_counts": {"above": mc["up"], "below": mc["down"]}, "ma_net": mc["net"]}
+    for kind, key in (("W", "weekly"), ("M", "monthly")):
+        rb = resample(bars, kind)
+        out[key] = _frame(rb)[4] if len(rb) >= 30 else None
+    return out
+
+
+# ---------------------------------------------------------------- 그리기 (nvda-report render_html._state_card 의 lines)
+
+# 게이지 다섯 칸 — 강한 하락 · 하락 · 중립 · 상승 · 강한 상승 (인베스팅닷컴 적극 매도 ~ 적극 매수 자리, P101). 색은 연한 톤(BAR_PASTEL 계열), 바깥 둘이 조금 진하다
+ZONES = [(-1.0, -0.5, "강한 하락", "#82B1F0"), (-0.5, -0.15, "하락", "#BCD3F5"), (-0.15, 0.15, "중립", "#E2E8F0"),
+         (0.15, 0.5, "상승", "#F8C4BF"), (0.5, 1.0, "강한 상승", "#ED8E87")]
+
+
+# 지표 줄 라벨 박스 (10-30 사용자 P102): 바탕이 칠해진 사각 박스 안에 기호 + 글자, 같은 폭이라 세로 열이 맞는다. 색 = 공용 라벨(design_kit.PILL) 톤
 BOX = {"up": ("#FEF2F2", "#FCA5A5", "#B91C1C"), "down": ("#EFF6FF", "#93C5FD", "#1D4ED8"), "flat": ("#F1F5F9", "#CBD5E1", "#475569")}
 BOX_W = 64
 TABLE_FS, TABLE_LH, WHY_FS = "16px", "24px", "13px"   # 표 글자 18 → 16 (사용자 "두 단계 작게", 한 단계 = 1px · P96 과 같은 셈) · 괄호 글 14 → 13
