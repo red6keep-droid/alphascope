@@ -332,20 +332,20 @@ def _sub(title):
     return f'<span style="display:block;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;">{title}</span>'   # 19 → 18 (P105)
 
 
-def _gauge_block(title, c, extra, up_color, down_color, muted, small=False):
-    """제목(가운데, 흰 카드 밖) + 흰 카드(게이지 · 답 · 개수 · extra) — 그래프는 흰 카드 규칙(design_kit.MULTI, 제목은 카드 밖, P106).
+def _gauge_block(title, c, extra, up_color, down_color, muted, small=False, corner=""):
+    """흰 카드(design_kit.MULTI) 안에 [오른쪽 위 corner] · 제목(가운데) · 게이지 · 답 · 개수 · extra (P107: 제목 · 기준일을 카드 안으로).
     small = 나란히 놓는 작은 게이지(칸 이름 없음). 큰 게이지 카드는 다른 그래프처럼 양쪽 5px 넓게(CHART_CARD_X)."""
     import design_kit as _dk
     w = word(c["net"])
     col = up_color if c["net"] >= 0.15 else down_color if c["net"] <= -0.15 else muted
     cnt = f'상승 {c["up"]} · 중립 {c["neutral"]} · 하락 {c["down"]}' if c.get("neutral") else f'상승 {c["up"]} · 하락 {c["down"]}'
     mx = 0 if small else _dk.CHART_CARD_X
-    return (f'<span style="display:block;text-align:center;margin:6px 0 4px;">'
-            f'<span style="display:block;font-weight:700;color:#111;text-align:center;margin:0 0 6px;font-size:{"17px" if small else "18px"};">{title}</span>'   # 전체 요약 18 · 작은 게이지 17 (P105), 모두 가운데 (P106)
-            f'<span style="{_dk.MULTI}margin:0 {mx}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px {8 if small else 12}px;">'
+    top = f'<span style="display:block;text-align:right;font-size:14px;line-height:20px;color:{muted};margin:0 0 2px;">{corner}</span>' if corner else ""
+    return (f'<span style="{_dk.MULTI}margin:6px {mx}px 4px;text-align:center;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px {8 if small else 12}px;">'
+            f'{top}<span style="display:block;font-weight:700;color:#111;margin:0 0 4px;font-size:{"16px" if small else "17px"};">{title}</span>'   # 18 → 17 · 작은 게이지 17 → 16 (P107)
             f'{gauge_svg(c["net"], 150, False) if small else gauge_svg(c["net"])}'
             f'<span style="display:block;font-weight:700;color:{col};">{w}</span>'
-            f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}</span>{extra}</span></span></span>')
+            f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}</span>{extra}</span></span>')
 
 
 def card(sig, name, up_color, down_color, muted="#6B7280"):
@@ -363,13 +363,12 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
             frames.append(f'{lab} <b style="color:{col};">{word(w["net"])}</b>')
     import design_kit as _dk
     # 게이지는 게이지끼리 맨 위 (10-30 사용자): 전체 요약 크게(칸 이름) → 기술 지표 · 이동평균 작게 나란히(색만 같게)
-    pair = (f'<span style="display:flex;gap:8px;margin:14px {_dk.CHART_CARD_X}px 4px;">'   # 두 카드 바깥 선 = 전체 요약 카드 바깥 선 (P106)
-            f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("기술 지표", sig["counts"], "", up_color, down_color, muted, small=True)}</span>'
+    pair = (f'<span style="display:flex;gap:8px;margin:10px {_dk.CHART_CARD_X}px 4px;">'   # 두 카드 바깥 선 = 전체 요약 카드 바깥 선 (P106)
+            f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("기술지표", sig["counts"], "", up_color, down_color, muted, small=True)}</span>'
             f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("이동평균", mc, "", up_color, down_color, muted, small=True)}</span></span>')
-    lines = [(f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};margin:12px 0 0;text-align:right;">{day} 종가 · 일봉 기준</span>', "html"),
-             (_gauge_block("전체 요약", al,
+    lines = [('<span style="display:block;height:6px;"></span>' + _gauge_block("전체 요약", al,
                            f'<span style="display:block;text-align:center;font-size:14px;line-height:20px;color:{muted};margin-top:2px;">{" · ".join(frames)}</span>' if frames else "",
-                           up_color, down_color, muted)
+                           up_color, down_color, muted, corner=f"{day} 종가 · 일봉 기준")   # 기준일 = 전체 요약 카드 안 오른쪽 위 (P107)
               + pair, "html"),
              ]
     import design_kit as _dk
@@ -380,7 +379,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         w, bx = label_box(r["label"], _h.escape)
         trs.append(f'<span style="min-width:0;">{_h.escape(r["name"])}</span>'
                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<b style="font-weight:700;">{_h.escape(r["text"])}</b>{bx}</span>')   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
-    lines.append((_sub("기술 지표") + _table(trs, line), "html"))
+    lines.append((_sub("기술지표") + _table(trs, line), "html"))
     COLW = f"display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;min-width:{BOX_W + 72}px;"   # 숫자 + 라벨 한 칸 — 인베스팅닷컴처럼 값마다 상승 · 하락 (P103, 옛 ▲ · ▼)
 
     def one(v, above):
@@ -391,9 +390,9 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     for m in sig["ma"]:
         mrs.append(f'<span>{m["n"]}일</span><span style="display:inline-flex;gap:6px;flex:none;">{one(m["sma"], m["sma_above"])}{one(m["ema"], m["ema_above"])}</span>')
     lines.append((_sub("이동평균") + _table(mrs, line, keep=(0, 1)), "html"))
-    tip = ("널리 쓰는 기술 지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
-           "· 전체 요약 : 기술 지표와 이동평균을 한데 센 것. (상승 − 하락) ÷ 전체 가 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
-           "· 기술 지표 : RSI · 스토캐스틱 · CCI · Williams %R · Ultimate 는 과매수면 하락, 과매도면 상승으로 센다. MACD · ROC · Highs/Lows · Bull/Bear 는 0 이나 기준선 위면 상승. ADX 는 25 아래면 중립. ATR 은 방향이 없어 개수에서 뺀다\n"
+    tip = ("널리 쓰는 기술지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
+           "· 전체 요약 : 기술지표와 이동평균을 한데 센 것. (상승 − 하락) ÷ 전체 가 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
+           "· 기술지표 : RSI · 스토캐스틱 · CCI · Williams %R · Ultimate 는 과매수면 하락, 과매도면 상승으로 센다. MACD · ROC · Highs/Lows · Bull/Bear 는 0 이나 기준선 위면 상승. ADX 는 25 아래면 중립. ATR 은 방향이 없어 개수에서 뺀다\n"
            "· 이동평균 : 5 ~ 200일 단순 · 지수 평균. 종가가 선 위면 상승, 아래면 하락\n"
            "· 참고 : 같은 지표라도 일봉 · 주봉 · 월봉에서 반대로 나오곤 한다. 다른 사이트와는 봉 단위 · 기준값이 달라 값이 다를 수 있다")
     return lines, tip
