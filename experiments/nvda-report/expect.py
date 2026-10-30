@@ -80,8 +80,17 @@ def _cq(start, end):
     return f"{m.year}Q{(m.month - 1) // 3 + 1}"
 
 
+def company_facts(cik):
+    """companyfacts JSON 통째로 — 분기 매출(revenue_rows) 과 돈을 어디에 쓰나(stock-radar collect_capex) 가 같은 JSON 을 나눠 쓴다 (호출 한 번, 2026-10-30)."""
+    return _sec(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json")
+
+
 def revenue_series(cik):
-    facts = _sec(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json").get("facts", {}).get("us-gaap", {})
+    return revenue_rows(company_facts(cik))
+
+
+def revenue_rows(facts_json):
+    facts = (facts_json or {}).get("facts", {}).get("us-gaap", {})
     cutoff = (datetime.date.today() - datetime.timedelta(days=4 * 365)).isoformat()
     best = {}
     for c in REV_CONCEPTS:   # 최근 4년 분기가 가장 많은 항목 하나를 쓴다 (회사마다 매출 항목 이름이 다르다)

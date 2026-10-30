@@ -141,7 +141,7 @@ jobs:
           if [ -d "$STATE_DIR/radar" ]; then cp "$STATE_DIR"/radar/*.json experiments/stock-radar/data/ 2>/dev/null || true; fi
           python experiments/stock-radar/main.py
           mkdir -p "$STATE_DIR/radar"
-          for f in news.json iv_history.json history.json rank_state.json; do
+          for f in news.json iv_history.json history.json rank_state.json capex.json; do   # capex.json = 돈을 어디에 쓰나 분기 표 (기록 보존, 2026-10-30)
             [ -f "experiments/stock-radar/data/$f" ] && cp "experiments/stock-radar/data/$f" "$STATE_DIR/radar/$f"
           done
 

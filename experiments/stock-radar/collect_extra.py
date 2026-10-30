@@ -4,6 +4,7 @@
 - 매일 (yfinance 옵션 체인) : 옵션 상태판 — 30일 내재변동성 · 실적 직후 만기 스트래들 · 풋/콜 비율 · 최다 미결제 행사가 (NVDA collect_options 와 같은 정의, 감마 근사는 뺀다)
 - 매일 (SEC submissions) : 임원 거래(Form 4) · 수시 공시(8-K) — 구조화된 공시라 AI 없이 읽는다 (NVDA collect_edgar 의 파서 재사용)
 - 주 1회 (SEC XBRL companyfacts) : 분기 매출 — 후보 20개 전부. 비교 묶음 = 후보 20개 중앙값 (NVDA 리포트의 기술주 15개 자리)
+- 같은 JSON 에서 (SEC XBRL companyfacts) : 돈을 어디에 쓰나 — 설비 투자 · 연구개발 · 영업현금흐름 · 부채 발행 · 상환 · 자사주 · 배당 (collect_capex, 2026-10-30) → data/capex.json
 - 주 1회 (yfinance) : 함께 보는 회사(universe.PEERS) 가운데 후보 밖 종목의 실적 일정
 결과는 data/extra.json (snapshot.json 과 따로 — 같은 날 다시 그릴 때 다시 받지 않게) · data/iv_history.json (변동성 순위용, 날마다 쌓는다).
 """
@@ -22,6 +23,7 @@ import universe as U  # noqa: E402
 
 EXTRA = os.path.join(BASE, "data", "extra.json")
 IV_HIST = os.path.join(BASE, "data", "iv_history.json")
+CAPEX = os.path.join(BASE, "data", "capex.json")   # 돈을 어디에 쓰나 — 분기 표 (collect_capex), nvda-state/radar 에 보존
 EDGAR_DAYS = 30   # 공시는 최근 30일만 받아 둔다 (화면은 7일)
 REV_MAX_AGE_DAYS = 7
 EARN_LOOKAHEAD = 45   # 실적 발표가 이 안이면 실적 직후 만기 스트래들을 잰다 (NVDA config.OPTION_EARNINGS_LOOKAHEAD_DAYS)
@@ -204,18 +206,42 @@ def edgar(have, cik):
 
 
 def revenue(have):
+    """분기 매출 + 돈을 어디에 쓰나(설비 투자 · 연구개발 · 현금흐름 · 자금 조달, collect_capex) — companyfacts JSON 한 번으로 둘 다 (2026-10-30).
+    돈 표는 data/capex.json 에도 따로 남긴다(nvda-state 에 보존 — 기록). 한 회사가 실패하면 그 회사는 지난 표를 그대로 둔다."""
     if have and (datetime.date.today() - datetime.date.fromisoformat(have["built"])).days < REV_MAX_AGE_DAYS:
         return have
+    import collect_capex as CX
     tickers = EX._sec("https://www.sec.gov/files/company_tickers.json")
     cik = {v["ticker"]: str(v["cik_str"]).zfill(10) for v in tickers.values()}
-    series = {}
+    series, cash = {}, dict((load_capex() or {}).get("series") or {})
     for sym, *_ in U.CANDIDATES:
         try:
-            series[sym] = EX.revenue_series(cik[sym])
+            facts = EX.company_facts(cik[sym.replace("-", "")] if sym not in cik else cik[sym])   # BRK-B 는 SEC 표에 BRK-B 로 있다
+        except Exception as e:   # noqa: BLE001
+            print(f"[extra] {sym} companyfacts 실패 : {e}")
+            continue
+        try:
+            series[sym] = EX.revenue_rows(facts)
         except Exception as e:   # noqa: BLE001
             print(f"[extra] {sym} 매출 실패 : {e}")
-    print(f"[extra] 분기 매출 {len(series)}/{len(U.CANDIDATES)}종목 (SEC XBRL)")
+        try:
+            rows = CX.rows_from_facts(facts, cik.get(sym) or cik[sym.replace("-", "")])
+            if rows:
+                cash[sym] = rows
+        except Exception as e:   # noqa: BLE001
+            print(f"[extra] {sym} 돈 표 실패 : {e}")
+    print(f"[extra] 분기 매출 {len(series)}/{len(U.CANDIDATES)}종목 · 돈 표 {sum(1 for k in cash if k in U.BY_SYM)}종목 (SEC XBRL)")
+    with open(CAPEX, "w", encoding="utf-8") as f:
+        json.dump({"built": datetime.date.today().isoformat(), "series": cash}, f, ensure_ascii=False)
     return {"built": datetime.date.today().isoformat(), "series": series}
+
+
+def load_capex():
+    try:
+        with open(CAPEX, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return None
 
 
 def run(snap):
@@ -240,6 +266,7 @@ def run(snap):
         out["revenue"] = revenue(have.get("revenue"))
     except Exception as e:   # noqa: BLE001
         print(f"[extra] 매출 수집 실패 — 지난 값으로 계속 : {e}")
+    out["capex"] = (load_capex() or {}).get("series") or {}   # 돈을 어디에 쓰나 — revenue() 가 방금 쓴 표 (실패했으면 지난 표)
     try:
         out["peer_earnings"] = peer_earnings(have.get("peer_earnings"))
     except Exception as e:   # noqa: BLE001
@@ -262,6 +289,8 @@ def run(snap):
 def load():
     try:
         with open(EXTRA, encoding="utf-8") as f:
-            return json.load(f)
+            d = json.load(f)
     except (OSError, ValueError):
         return None
+    d.setdefault("capex", (load_capex() or {}).get("series") or {})
+    return d
