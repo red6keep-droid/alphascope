@@ -1781,6 +1781,13 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       /* 번역된 제목이 있으면 그것을 쓴다 (fetch_news.py 가 Gemini 로 채운 title_ko). 분류는 영문 원제로 한다. */
       items.forEach(function (i) { i.title_en = i.title; if (i.title_ko) i.title = i.title_ko; });
       if (!items.length) throw new Error('no items');
+      /* 보이는 3줄 중 한 자리는 방송 줄 (2026-10-30 사용자 H25: "중요뉴스에도 미디어 뉴스 같이 노출") — 시각 순이면 방송이 기사보다 늦어 더 보기 안으로만 밀린다.
+         위 3줄에 방송이 없으면 방송 여러 곳이 다룬(같으면 최근) 줄 하나를 3번째 자리로 옮긴다 */
+      if (!items.slice(0, NEWS_SHOWN).some(function (i) { return i.kind === 'media'; })) {
+        var best = -1;
+        items.forEach(function (i, k) { if (i.kind === 'media' && (best < 0 || (i.n_channels || 1) > (items[best].n_channels || 1))) best = k; });
+        if (best >= 0) items.splice(NEWS_SHOWN - 1, 0, items.splice(best, 1)[0]);
+      }
 
       /* BREAKING 티커 — 애니메이션이 -50% 로 감기므로 내용을 2회 반복 */
       var line = items.slice(0, 6).map(function (i) { return i.title; }).join('  ·  ');

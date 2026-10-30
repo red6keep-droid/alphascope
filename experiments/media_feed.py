@@ -206,17 +206,33 @@ def kr_label(r):
 KR_CODE = {c[0].split(".")[0]: c[1] for c in UNI_KR.CANDIDATES}            # 005930 → 삼성전자
 KR_BY_NAME = {c[1].upper(): c[0].split(".")[0] for c in UNI_KR.CANDIDATES}  # 삼성전자 → 005930 (NAVER 처럼 영문 이름은 대문자로 맞춘다)
 KR_ALIAS = {"삼성": "005930", "하이닉스": "000660", "SK하이닉스": "000660", "현대자동차": "005380", "네이버": "035420", "LG엔솔": "373220",
-            "포스코홀딩스": "005490", "한전": "015760", "한국조선해양": "009540", "현대중공업": "329180", "삼성바이오": "207940"}
+            "포스코홀딩스": "005490", "한전": "015760", "한국조선해양": "009540", "현대중공업": "329180", "삼성바이오": "207940",
+            # 영문 표기 — 미국 방송 요약이 `SK HYNIX(KR)` · `SKHYNIX(KR)` · `SAMSUNG ELECTRONICS(KR)` 처럼 적는다 (2026-10-30 점검: 10-22~30 기록에서 4건이 코드로 안 바뀜)
+            "SKHYNIX": "000660", "HYNIX": "000660", "SAMSUNG": "005930", "SAMSUNGELECTRONICS": "005930", "SAMSUNGELEC": "005930",
+            "HYUNDAI": "005380", "HYUNDAIMOTOR": "005380", "KIA": "000270", "LGENERGYSOLUTION": "373220", "LGES": "373220", "SAMSUNGSDI": "006400",
+            "LGCHEM": "051910", "LGELECTRONICS": "066570", "CELLTRION": "068270", "SAMSUNGBIOLOGICS": "207940", "KAKAO": "035720", "POSCO": "005490",
+            "POSCOHOLDINGS": "005490", "HANWHAAEROSPACE": "012450", "SKTELECOM": "017670", "KBFINANCIAL": "105560", "SHINHAN": "055550", "KEPCO": "015760",
+            "DOOSANENERBILITY": "034020", "SKSQUARE": "402340", "HANMISEMICONDUCTOR": "042700", "ECOPROBM": "247540", "ECOPRO": "086520"}
+
+
+def _kr_norm(s):
+    """비교용 — 띄어쓰기 · 점 · 가운뎃점 · 하이픈을 빼고 대문자 (`SK HYNIX` = `SKHYNIX` = `SK하이닉스` 의 영문)."""
+    return re.sub(r"[\s.·_\-]", "", s).upper()
+
+
+_KR_BY_NAME_N = {_kr_norm(k): v for k, v in KR_BY_NAME.items()}
+_KR_ALIAS_N = {_kr_norm(k): v for k, v in KR_ALIAS.items()}
 
 
 def kr_code(t):
     """요약이 적는 한국 종목 표기 → 종목 코드(우리 35개 안), 아니면 None.
-    `삼성전자(KR)` · `005930(KR)` · `SSNLF(KR)`(미국 장외 티커, KR_NAME) · `SK하이닉스` 처럼 제각각이다."""
+    `삼성전자(KR)` · `005930(KR)` · `SSNLF(KR)`(미국 장외 티커, KR_NAME) · `SK하이닉스` · `SK HYNIX(KR)` 처럼 제각각이다. 띄어쓰기 · 대소문자는 무시."""
     base = re.sub(r"\((KR|비상장)\)$", "", str(t)).strip()
     if base.isdigit() and base.zfill(6) in KR_CODE:
         return base.zfill(6)
     name = KR_NAME.get(base.upper(), base)
-    return KR_BY_NAME.get(name.upper()) or KR_ALIAS.get(name)
+    k = _kr_norm(name)
+    return _KR_BY_NAME_N.get(k) or _KR_ALIAS_N.get(k)
 
 
 def _kr_members(group):
@@ -336,6 +352,25 @@ def picks(items, since=""):
                         "currency": p.get("currency") or "", "reason": (p.get("reason") or "").strip(), "quote": (p.get("quote") or "").strip(),
                         "channel": MC.CHANNEL_SHORT.get(ch, ch), "url": url, "published_at": pub})
     return out
+
+
+def diag(vids, iss, tag="[media_feed 진단]"):
+    """재료가 어디로 가는지 로그 한 묶음 (2026-10-30 사용자: 한국 종목 페이지 35개 중 31개가 방송 0건 — 재료 문제인지 나누기 문제인지 CI 로그로 가린다).
+    영상의 채널 묶음(kr · main · required) · 묶음별 이슈 범위(시장 · 업종 · 종목) · 한국 종목별 배정 수 · 코드로 못 바꾼 한국 표기. 출력만 하고 아무것도 바꾸지 않는다."""
+    gmap = channel_groups()
+    vg = Counter(gmap.get(v.get("channelId"), "main") for v in vids)
+    print(f"{tag} 영상 {len(vids)}개 — 채널 묶음별 {dict(vg)} · 채널 {dict(Counter(MC.CHANNEL_SHORT.get(v.get('channelName'), v.get('channelName')) for v in vids).most_common(12))}")
+    for g in sorted({x for r in iss for x in r["groups"]}):
+        sub = [r for r in iss if g in r["groups"]]
+        print(f"{tag} 묶음 {g}: 이슈 {len(sub)} · 범위 {dict(Counter(r['scope'] or '-' for r in sub))} · 한국 종목 페이지에 닿는 이슈 {sum(1 for r in sub if kr_stocks_for(r))} · 미국 종목 페이지 {sum(1 for r in sub if stocks_for(r))}")
+    per = Counter(KR_CODE.get(c, c) for r in iss for c in kr_stocks_for(r))
+    print(f"{tag} 한국 종목별 배정: " + (" · ".join(f"{k} {v}" for k, v in per.most_common()) or "없음"))
+    bad = Counter(t for r in iss for t in r["tickers"] if ("(KR)" in t or re.search(r"[가-힣]", t)) and not kr_code(t))
+    if bad:
+        print(f"{tag} 코드로 못 바꾼 한국 표기: {dict(bad.most_common(15))}")
+    kr_only = [r for r in iss if "kr" in r["groups"] and not kr_stocks_for(r)]
+    for r in kr_only[:12]:   # 한국 채널 이슈인데 종목 페이지로 안 가는 것 — 범위 · 종목 · 주제
+        print(f"{tag}   kr 미배정: {r['scope'] or '-'} {r['category']} {r['tickers'][:4]} | {r['topic'][:50]}")
 
 
 def market_top(iss, n):
