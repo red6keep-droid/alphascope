@@ -1609,7 +1609,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               <h3 class='report-title'><span class='report-icon' style='background:#1D4ED8;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='5' width='3' height='9' rx='.5'/><rect x='11' y='2' width='3' height='12' rx='.5'/></svg></span>한국 증시<span class='report-card-date' data-date='kr-report-card'></span></h3>
               <a class='report-card' id='kr-report-card' href='/search/label/한국%20증시%20리포트'>
                 <img class='report-chart' data-hook='kr-report-chart' data-zoom='1' alt='' hidden='hidden'/>
-                <div class='report-block' data-hook='summary'>
+                <div class='report-block' data-hook='kr-summary'>   <!-- 미국 카드와 다른 이름 — 같은 이름이면 JS 가 첫 칸(미국)만 채운다 (H27, 2026-10-30) -->
                   <div class='report-columns'>
                     <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
                   </div>
@@ -3039,8 +3039,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
             id: 'kr-report-card',
             label: '한국 증시 리포트',   /* 홈 수정 H24 (2026-10-29 사용자) — 미국 카드와 같은 틀: 글 맨 위 코스피 봉차트 + 머리 첫 줄 */
             chart: 'kr-report-chart',
-            map: { summary: ['(머리)'] },
-            lines: { summary: 1 },
+            map: { 'kr-summary': ['(요약)'] },   /* H27 (2026-10-30): 한국 글은 data-lead 가 없고 data-cards 는 그래프라 범례가 뽑혔다 → 검색용 요약(data-seo-lead) 첫 문장. 훅 이름도 미국 카드와 분리 */
+            lines: { 'kr-summary': 1 },
             picks: false,
             empty: '아직 발행된 리포트가 없습니다.'
           },
@@ -3114,6 +3114,16 @@ body.no-dashboard .main-content { padding-top: 32px; }
           /* 데일리 종합은 2026-10-12부터 머리 카드 구분선 아래 data-insight 문단 — 구획 제목이 없다 */
           var ins = doc.querySelector('[data-insight]');
           if (ins) out['(종합)'] = [ins];
+          /* 검색용 요약 문단(data-seo-lead, 글의 보이는 첫 요소)의 첫 문장 — 한국 증시 카드용 (H27, 2026-10-30).
+             문단 통째로는 코스피 · 코스닥 · 외국인까지 세 문장이라 "…했습니다." 첫 문장에서 자른다 */
+          var seo = doc.querySelector('[data-seo-lead]');
+          if (seo) {
+            var st = String(seo.textContent || '').replace(/\s+/g, ' ').trim();
+            var se = st.indexOf('다. ');
+            var sp = doc.createElement('p');
+            sp.textContent = se > 0 ? st.slice(0, se + 2) : st;
+            out['(요약)'] = [sp];
+          }
           return out;
         }
 
