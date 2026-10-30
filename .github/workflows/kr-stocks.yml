@@ -47,6 +47,7 @@ concurrency:
 
 env:
   ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+  DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}   # 관세청 품목별 수출 (방산, 2026-10-31)
   DART_API_KEY: ${{ secrets.DART_API_KEY }}   # `실적과 기대` 분기 매출 (collect_kr_dart.py, 2026-10-25) — 없으면 Yahoo 매출
   YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}   # `오늘` 탭 방송 뉴스 (experiments/media_feed.py, 2026-10-25) — 없으면 방송 줄 없이
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

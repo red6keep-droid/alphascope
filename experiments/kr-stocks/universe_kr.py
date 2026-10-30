@@ -147,8 +147,25 @@ INDICATORS = {
     "imp_lng": ("401Y015", "201122AA", "수입물가 천연가스 LNG (원화)", "idx", "yoy", "발전 원가"),
     "imp_coal": ("401Y015", "20111AA", "수입물가 석탄 (원화)", "idx", "yoy", "발전 원가"),
     "imp_iron": ("401Y015", "201211AA", "수입물가 철광석 (원화)", "idx", "yoy", "철강 원가"),
+    # 사업 묶음별 지표 (2026-10-31 사용자: "업종을 구분하자, 일반화하면 안 맞는다" — doc/검증/한국-업종지표-재선정.md)
+    "home_exp_vol": ("403Y002", "31015AA", "가정용 전기기기 수출물량지수", "idx", "yoy", "가전 수출 물량"),
+    "fridge_px": ("402Y016", "31015101AA", "가정용 냉장고 수출물가", "idx", "yoy", ""),
+    "washer_px": ("402Y016", "31015301AA", "가정용 세탁기 수출물가", "idx", "yoy", ""),
+    "ins_prod": ("901Y038", "I51AFBA/2", "보험업 생산지수 (불변)", "idx", "yoy", "서비스업생산지수 · 물가 뺀 실질"),
+    "portal_prod": ("901Y038", "I51AEEA/2", "포털 · 인터넷 정보매개 서비스업 생산지수 (불변)", "idx", "yoy", "서비스업생산지수 · 물가 뺀 실질"),
+    "telecom_prod": ("901Y038", "I51AECB/2", "전기통신업 생산지수 (불변)", "idx", "yoy", "서비스업생산지수 · 물가 뺀 실질"),
+    "mach_orders": ("901Y018", "I351", "기계수주 총액", "won_m", "yoy", ""),
+    "mach_orders_xship": ("901Y018", "I35A", "기계수주 총액 (선박 제외)", "won_m", "yoy", ""),
+    "powergen_orders": ("901Y018", "I351BA", "원동기 · 발전기 수주액", "won_m", "yoy", "기계수주 통계 · 발전설비"),
+    "turbine_exp_amt": ("403Y001", "311111AA", "내연기관 · 터빈 수출금액지수", "idx", "yoy", ""),
+    "zinc_px": ("402Y016", "30721302AA", "아연 정련품 수출물가", "idx", "yoy", "아연 값"),
+    "zinc_exp_vol": ("403Y002", "307213AA", "연 · 아연 수출물량지수", "idx", "yoy", ""),
+    # 관세청 품목별 수출 (공공데이터포털 15100475, 이용허락범위 제한 없음 — 사용자 10-31 확인) · collect_kr._customs 가 받는다
+    "defense_exp": ("customs", "8710+9301+9306", "방산 3품목 수출액 (전차 · 무기 · 탄약)", "usd", "yoy", "관세청 HS 8710 · 9301 · 9306"),
 }
+CUSTOMS = {"defense_exp": ("8710", "9301", "9306")}   # 관세청 HS 품목 — 월 수출금액(달러)의 합
 DERIVED = {   # 두 지표의 차 — 예대금리차(신규취급액 기준) = 대출 평균금리 − 저축성 수신금리 (은행 이자이익의 바탕)
+    "ship_orders": ("mach_orders", "mach_orders_xship", "선박 수주액 (기계수주 기준)", "won_m", "yoy", "기계수주 총액 − 선박 제외"),
     "nim_spread": ("loan_rate", "dep_rate", "예대금리차 (신규 기준)", "pct", "yoy", "대출 금리 − 수신 금리 · 넓을수록 은행 이익"),
 }
 THEME_INDICATORS = {
@@ -296,8 +313,46 @@ def loan_industry(sym):
 SECTOR_SKIP_IF_THEMED = {"산업재"}
 
 
+# 사업 묶음 16개 (2026-10-31 사용자 · doc/검증/한국-업종지표-재선정.md) — 지표 · 질문을 회사 사업마다. 테마 · 큰 업종에 기대지 않는다.
+#   inds = 카드 지표(맨 앞 = 답), q = 짧은 질문(방향은 답이 말한다), mode = 답 낱말, months = 비교 기간(달마다 크게 출렁이는 수주 · 방산 인도는 3개월 합)
+BIZ = {
+    "반도체": {"inds": ["dram_px", "flash_px", "semi_exp_amt", "sys_semi_px", "semi_equip_px"], "q": "메모리 반도체 값은?", "mode": "price", "months": 1},
+    "가전": {"inds": ["home_exp_vol", "fridge_px", "washer_px"], "q": "가전 수출은?", "mode": "qty", "months": 1},
+    "2차전지": {"inds": ["batt_exp_vol", "batt_exp_amt"], "q": "배터리 수출은?", "mode": "qty", "months": 1},
+    "자동차": {"inds": ["car_exp_vol", "rv_px", "car_engine_px"], "q": "자동차 수출은?", "mode": "qty", "months": 1},
+    "바이오": {"inds": ["pharma_exp_amt", "pharma_px", "pharma_raw_px"], "q": "의약품 수출은?", "mode": "qty", "months": 1},
+    "은행": {"inds": ["nim_spread", "loan_rate", "hh_loans_bank", "delinq_hh"], "q": "이자 마진은?", "mode": "margin", "months": 1},
+    "보험": {"inds": ["ins_prod", "loan_rate"], "q": "보험 영업은?", "mode": "qty", "months": 1},
+    "플랫폼": {"inds": ["portal_prod", "card_spend"], "q": "인터넷 서비스는?", "mode": "size", "months": 1},
+    "통신": {"inds": ["telecom_prod"], "q": "통신 서비스는?", "mode": "size", "months": 1},
+    "조선": {"inds": ["ship_orders", "ship_engine_px"], "q": "선박 수주는?", "mode": "qty", "months": 3},
+    "방산": {"inds": ["defense_exp"], "q": "방산 수출은?", "mode": "qty", "months": 3},
+    "원전 · 발전설비": {"inds": ["powergen_orders", "turbine_exp_amt", "power_use"], "q": "발전설비 수주는?", "mode": "qty", "months": 3},
+    "건설": {"inds": ["constr_orders", "housing_permits", "unsold_homes", "house_px"], "q": "건설 수주는?", "mode": "qty", "months": 3},
+    "철강": {"inds": ["steel_px", "steel_prod", "steel_exp_vol", "imp_iron"], "q": "철강 값은?", "mode": "price", "months": 1},
+    "비철금속": {"inds": ["zinc_px", "zinc_exp_vol"], "q": "아연 값은?", "mode": "price", "months": 1},
+    "전력": {"inds": ["power_use", "imp_lng", "imp_coal", "imp_oil"], "q": "전기 사용량은?", "mode": "qty", "months": 1},
+}
+BIZ_OF = {}
+for _g, _syms in (("반도체", "005930 000660 402340 042700"), ("가전", "066570"), ("2차전지", "373220 006400 003670 051910 247540 086520"),
+                  ("자동차", "005380 000270"), ("바이오", "207940 068270 196170"), ("은행", "105560 055550 086790 323410"), ("보험", "032830 000810"),
+                  ("플랫폼", "035420 035720"), ("통신", "017670"), ("조선", "329180 042660 009540"), ("방산", "012450 064350"), ("원전 · 발전설비", "034020"),
+                  ("건설", "028260"), ("철강", "005490"), ("비철금속", "010130"), ("전력", "015760")):
+    for _c in _syms.split():
+        BIZ_OF[_c] = _g
+
+
+def biz(sym):
+    """종목의 사업 묶음 설정 (BIZ 한 칸 + "group") — 없으면 None."""
+    g = BIZ_OF.get(sym.split(".")[0])
+    return dict(BIZ[g], group=g) if g else None
+
+
 def indicators_for(sym):
-    """종목의 재료 지표 키 — 테마 지표 먼저, 그다음 업종 지표. 겹침 제거, 최대 MAX_INDICATORS 개."""
+    """종목의 재료 지표 키 — 사업 묶음(BIZ)이 있으면 그 목록(2026-10-31). 없으면 옛 규칙: 테마 지표 먼저, 그다음 업종 지표. 최대 MAX_INDICATORS 개."""
+    b = biz(sym)
+    if b:
+        return b["inds"][:MAX_INDICATORS]
     out = []
     for g in groups(sym):
         out += THEME_INDICATORS.get(g, [])
