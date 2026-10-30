@@ -5,6 +5,7 @@ name: Media Daily
 #
 # 정시 실행은 Cloudflare Worker 가 KST 표로 건다 (infra/cron-trigger, 한국 방송 시각에 묶여 있어 서머타임을 따르지 않는다). 아래 cron 은 예비.
 # 게시 게이트: 저장소 변수 MEDIA_PUBLISH 가 'true' 일 때만 스케줄 실행이 실제 게시한다 — 그 전까지 그림자 모드(본문만 만들어 artifact 로).
+# 2026-10-30 부터 미디어 데일리 글 자체는 내지 않는다 (Run pipeline 에 --publish 없음). 이 워크플로가 남아 있는 이유 = 데일리 글 '한국장' 칸 갱신(kr_news.py) + 방송 이슈 기록(media-state).
 # 재료(Firestore)는 Secret YTB_FIRESTORE_KEY(읽기 전용 서비스 계정) 로 읽는다. 우리 기록(records/)은 media-state 브랜치에 쌓는다.
 
 on:
@@ -97,11 +98,9 @@ jobs:
           ED_ARG=""
           if [ -n "$EDITION" ]; then ED_ARG="--edition $EDITION"; fi
           echo "phase=$PHASE publish=$DO_PUBLISH edition=${EDITION:-today}"
-          if [ "$DO_PUBLISH" = "true" ]; then
-            python main.py --phase "$PHASE" --state output/state --publish $ED_ARG
-          else
-            python main.py --phase "$PHASE" --state output/state $ED_ARG
-          fi
+          # 미디어 데일리 글은 2026-10-30 부터 내지 않는다 (사용자: 방송 이슈는 종목 페이지 · 미국 데일리 · 한국 증시 리포트로 전부 나눈다 — 상한 없이 48시간 · 5건 펼침 + 접기).
+          # 파이프라인은 그림자로 계속 돌린다 — 기록(records/issues · verdicts, media-state)과 artifact 는 남긴다. 아래 '한국장 칸 갱신' 은 그대로 DO_PUBLISH 를 따른다.
+          python main.py --phase "$PHASE" --state output/state $ED_ARG
 
       # 오늘 데일리 글의 한국장 탭 `한국장에 영향을 줄 만한 소식` 만 갱신 (2026-10-25 사용자) — 한국 아침 방송은 데일리(07:00)보다 늦게 올라온다.
       # 게시 실행일 때만 · 지난 날짜(edition 입력)는 건너뜀 · 실패해도 미디어 데일리는 그대로 (continue-on-error)

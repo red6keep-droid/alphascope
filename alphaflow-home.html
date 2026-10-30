@@ -289,9 +289,7 @@ body.menu-open { overflow: hidden; }
   flex: 1;
   min-width: 0;
 }
-/* 카드 넷(미디어 데일리 추가, 2026-10-23 사용자 목업)은 2 × 2 — 셋일 때의 "셋째 전폭" 규칙은 뺐다 */
-/* 홈 미디어 데일리 카드 — 인물 발언 카드와 같은 줄 모양: 분야 라벨 · 이슈 이름 왼쪽, 방송 수 오른쪽 */
-#media-card { padding: 0 16px; gap: 0; }
+/* 카드 넷(미국 · 한국 · 트럼프 · 인물)은 2 × 2 — 셋일 때의 "셋째 전폭" 규칙은 뺐다 (10-23 넷이 된 뒤). 미디어 데일리 카드는 10-30 뺌(H26) */
 
 /* 리포트 이름은 카드 밖 제목(21px 굵게 · 행간 27 = 구획 제목 글자) + 앞에 컬러 아이콘 (2026-10-13 사용자) */
 .report-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -318,9 +316,9 @@ body.menu-open { overflow: hidden; }
 /* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
 #radar-card { padding: 0 16px; gap: 0; }
 /* 인물 발언 · 미디어 데일리 줄 = 글자만 (2026-10-24 사용자: 라벨 · 강도 · 관심도 · 구분선 · 굵게 모두 뺌). 18 · 행간 34 · 보통 굵기, 줄 사이 위아래 4 */
-#radar-card .kv-row.plain-row, #media-card .kv-row.plain-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 7px; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; }
-#radar-card .kv-rows, #media-card .kv-rows { padding: 12px 0 14px; }
-#radar-card .kv-row.plain-row::before, #media-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
+#radar-card .kv-row.plain-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 7px; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; }
+#radar-card .kv-rows { padding: 12px 0 14px; }
+#radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 /* 홈 트럼프 카드 — 발언 줄: 주제 라벨(영역 라벨 모양) + 세부 주제 · 방향 · 대상 왼쪽, 강도 오른쪽, 줄 사이 구분선 (2026-10-15 사용자) */
 #trump-card { padding: 0 16px; gap: 0; }
 .tr-main { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; font-size: 16px; line-height: 24px; color: #111; }
@@ -1055,13 +1053,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         </a>
         </div>
 
-        <!-- 미디어 데일리 (2026-10-23 사용자 목업). '방송이 본 이슈' 상위 4개 — 분야 라벨 · 이슈 이름 왼쪽, 방송 수 오른쪽 (인물 발언 카드와 같은 줄) -->
-        <div class="report-col">
-        <h3 class="report-title"><span class="report-icon" style="background:#7C3AED;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3.5" width="12" height="8.5" rx="1.5"/><path d="M6 14h4"/><path d="M7 6.2v3.6L10 8z" fill="currentColor"/></svg></span>미디어 데일리<span class="report-card-date" data-date="media-card"></span></h3>
-        <a class="report-card" id="media-card" href="/search/label/미디어%20데일리">
-          <div class="kv-rows" data-hook="media-rows"><div class="kv-row"><span class="kv-name">리포트를 불러오는 중…</span></div></div>
-        </a>
-        </div>
+        <!-- 미디어 데일리 카드는 뺐다 (2026-10-30 사용자 H26): 방송 이슈는 종목 페이지 · 미국 데일리 · 한국 증시 리포트로 전부 나뉘고 글도 더 내지 않는다. 카드 넷 = 미국 · 한국 · 트럼프 · 인물 -->
       </div>
 
     </div>
@@ -1906,15 +1898,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       fill: fillRadar, rows: 'radar-rows',   /* 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 엔비디아 카드는 삭제 (같은 날) */
       picks: false,
       empty: '아직 발행된 인물 발언 리포트가 없습니다.'
-    },
-    {
-      id: 'media-card',
-      label: '미디어 데일리',
-      map: { lead: ['(머리)'] },   /* 목록 화면 요약용 — 머리 첫 줄. 홈 카드는 fill 이 그린다 */
-      fill: fillMedia, rows: 'media-rows',   /* 미디어 데일리 (2026-10-23 사용자 목업) */
-      picks: false,
-      empty: '아직 발행된 미디어 데일리가 없습니다.'
     }
+    /* 미디어 데일리 카드(2026-10-23 ~ 10-30)는 뺐다 — 방송 이슈는 종목 페이지 · 데일리 · 한국 증시 리포트로 (H26) */
   ];
   var PICKS_HEADS = ['급등주', '오늘의 급등주 TOP 5'];   /* 새 디자인 제목 · 옛 글 제목 */
   /* 구획 하나에 싣는 최대 줄 수 — 카드는 요약이고 전체는 글에서 읽는다 (2026-10-12 사용자: 요약이 너무 길다 → 2줄, 한 줄 120자) */
@@ -2181,35 +2166,6 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       if (base && r.key && /^[\w-]+$/.test(r.key)) { d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', base + '#person-' + r.key); }
       box.appendChild(d);
     });
-  }
-
-  /* 홈 미디어 데일리 카드 (2026-10-23 사용자 목업) — 이슈 카드(media-daily render_html.sec_issues)를 읽는다.
-     항목(li): 첫 칸 = 이슈 이름, 둘째 칸 = 라벨 줄(첫 알약 = 분야), 어딘가에 `방송 n곳`. 옛 글은 마지막 줄이 라벨 · `채널 n곳`. 많이 다룬 순으로 4개까지 */
-  function mediaRows(sec) {
-    var out = [];
-    function walk(n) {
-      if (!n || !n.getAttribute || out.length >= 4) return;
-      if (n.tagName === 'LI') {
-        var head = n.children[0], pills = n.querySelector('[data-pills]') || n.children[n.children.length - 1];
-        var tag = pills && pills.children[0] ? String(pills.children[0].textContent || '').trim() : '';
-        var cm = /(?:방송|채널)\s*(\d+)\s*곳/.exec(String(n.textContent || ''));
-        var iv = n.querySelector('[data-interest]');   /* 관심도 1~10 (2026-10-23 사용자) — 옛 글은 방송 n곳 */
-        var text = head ? String(head.textContent || '').replace(/\s+/g, ' ').trim() : '';
-        if (text) out.push({ topic: tag, text: clip(text), interest: iv ? iv.getAttribute('data-interest') : '', channels: cm ? cm[1] : '' });
-        return;
-      }
-      for (var i = 0; i < n.children.length; i++) walk(n.children[i]);
-    }
-    (sec['방송이 본 이슈'] || sec['(머리)'] || []).forEach(walk);   /* 2026-10-23부터 이슈 카드는 제목 없이 머리(data-lead) 구획 안 — 옛 글은 '방송이 본 이슈' 제목 아래 */
-    return out;
-  }
-  function fillMedia(sec) {
-    var box = document.querySelector('[data-hook="media-rows"]');
-    if (!box) return;
-    box.textContent = '';
-    var rows = mediaRows(sec).slice(0, 3);   /* 세 개까지 (2026-10-24 사용자) */
-    if (!rows.length) { box.appendChild(el('div', 'kv-row is-note', linesOf(sec['(머리)'] || [])[0] || LOAD_FAILED)); return; }
-    rows.forEach(function (r) { box.appendChild(el('div', 'kv-row plain-row', r.text)); });   /* 이슈 글자만 — 라벨 · 관심도 · 구분선 없음 (2026-10-24 사용자) */
   }
 
   function setDate(id, text) {
