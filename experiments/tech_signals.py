@@ -332,16 +332,20 @@ def _sub(title):
     return f'<span style="display:block;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;">{title}</span>'   # 19 → 18 (P105)
 
 
-def _gauge_block(title, c, total_note, up_color, down_color, muted, small=False):
-    """묶음 제목 + 게이지 + 답(굵게, 증감 색) + 개수 한 줄. small = 나란히 놓는 작은 게이지(칸 이름 없음, 제목 가운데)."""
+def _gauge_block(title, c, extra, up_color, down_color, muted, small=False):
+    """제목(가운데, 흰 카드 밖) + 흰 카드(게이지 · 답 · 개수 · extra) — 그래프는 흰 카드 규칙(design_kit.MULTI, 제목은 카드 밖, P106).
+    small = 나란히 놓는 작은 게이지(칸 이름 없음). 큰 게이지 카드는 다른 그래프처럼 양쪽 5px 넓게(CHART_CARD_X)."""
+    import design_kit as _dk
     w = word(c["net"])
     col = up_color if c["net"] >= 0.15 else down_color if c["net"] <= -0.15 else muted
     cnt = f'상승 {c["up"]} · 중립 {c["neutral"]} · 하락 {c["down"]}' if c.get("neutral") else f'상승 {c["up"]} · 하락 {c["down"]}'
+    mx = 0 if small else _dk.CHART_CARD_X
     return (f'<span style="display:block;text-align:center;margin:6px 0 4px;">'
-            f'<span style="display:block;font-weight:700;color:#111;text-align:{"center" if small else "left"};font-size:{"17px" if small else "18px"};">{title}</span>'   # 전체 요약 19 → 18 · 작은 게이지 제목 19 → 17 (P105)
+            f'<span style="display:block;font-weight:700;color:#111;text-align:center;margin:0 0 6px;font-size:{"17px" if small else "18px"};">{title}</span>'   # 전체 요약 18 · 작은 게이지 17 (P105), 모두 가운데 (P106)
+            f'<span style="{_dk.MULTI}margin:0 {mx}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px {8 if small else 12}px;">'
             f'{gauge_svg(c["net"], 150, False) if small else gauge_svg(c["net"])}'
             f'<span style="display:block;font-weight:700;color:{col};">{w}</span>'
-            f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}{total_note}</span></span>')
+            f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}</span>{extra}</span></span></span>')
 
 
 def card(sig, name, up_color, down_color, muted="#6B7280"):
@@ -357,13 +361,15 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         if w:
             col = up_color if w["net"] >= 0.15 else down_color if w["net"] <= -0.15 else muted
             frames.append(f'{lab} <b style="color:{col};">{word(w["net"])}</b>')
+    import design_kit as _dk
     # 게이지는 게이지끼리 맨 위 (10-30 사용자): 전체 요약 크게(칸 이름) → 기술 지표 · 이동평균 작게 나란히(색만 같게)
-    pair = ('<span style="display:flex;gap:8px;margin:14px 0 4px;">'
+    pair = (f'<span style="display:flex;gap:8px;margin:14px {_dk.CHART_CARD_X}px 4px;">'   # 두 카드 바깥 선 = 전체 요약 카드 바깥 선 (P106)
             f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("기술 지표", sig["counts"], "", up_color, down_color, muted, small=True)}</span>'
             f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("이동평균", mc, "", up_color, down_color, muted, small=True)}</span></span>')
     lines = [(f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};margin:12px 0 0;text-align:right;">{day} 종가 · 일봉 기준</span>', "html"),
-             (_gauge_block("전체 요약", al, "", up_color, down_color, muted)
-              + (f'<span style="display:block;text-align:center;font-size:14px;line-height:20px;color:{muted};margin-top:2px;">{" · ".join(frames)}</span>' if frames else "")
+             (_gauge_block("전체 요약", al,
+                           f'<span style="display:block;text-align:center;font-size:14px;line-height:20px;color:{muted};margin-top:2px;">{" · ".join(frames)}</span>' if frames else "",
+                           up_color, down_color, muted)
               + pair, "html"),
              ]
     import design_kit as _dk
