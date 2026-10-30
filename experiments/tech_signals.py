@@ -218,73 +218,132 @@ def resample(bars, kind):
     return out
 
 
+def ma_counts(ma):
+    up = sum(1 for m in ma for k in ("sma_above", "ema_above") if m[k] is True)
+    dn = sum(1 for m in ma for k in ("sma_above", "ema_above") if m[k] is False)
+    return {"up": up, "down": dn, "neutral": 0, "net": (up - dn) / (up + dn) if up + dn else 0.0}
+
+
+def overall(ic, mc):
+    """전체 요약 = 기술 지표(방향 있는 11개) + 이동평균(12개)을 한데 센 비율 — 인베스팅닷컴 '요약' 게이지 자리 (P101)."""
+    up, dn = ic["up"] + mc["up"], ic["down"] + mc["down"]
+    tot = up + dn + ic["neutral"]
+    return {"up": up, "down": dn, "neutral": ic["neutral"], "net": (up - dn) / tot if tot else 0.0}
+
+
+def _frame(bars):
+    rows, ma = indicators(bars), moving_averages(bars)
+    ic, mc = counts(rows), ma_counts(ma)
+    return rows, ma, ic, mc, overall(ic, mc)
+
+
 def compute(bars):
+    """일봉 → 전체 요약 · 기술 지표 · 이동평균 세 묶음 (인베스팅닷컴 기술적 분석과 같은 구성, 피벗 제외 · P100 · P101). 주봉 · 월봉은 전체 요약만."""
     bars = [b for b in bars if b.get("close")]
     if len(bars) < 30:
         return None
-    rows = indicators(bars)
-    cnt = counts(rows)
-    ma = moving_averages(bars)
-    mac = {"above": sum(1 for m in ma for k in ("sma_above", "ema_above") if m[k] is True),
-           "below": sum(1 for m in ma for k in ("sma_above", "ema_above") if m[k] is False)}
-    out = {"as_of": bars[-1]["day"], "close": bars[-1]["close"], "rows": rows, "counts": cnt, "net": cnt["net"], "word": word(cnt["net"]),
-           "ma": ma, "ma_counts": mac}
+    rows, ma, ic, mc, al = _frame(bars)
+    out = {"as_of": bars[-1]["day"], "close": bars[-1]["close"],
+           "net": al["net"], "word": word(al["net"]), "all": al,   # 카드 답 = 전체 요약
+           "rows": rows, "counts": ic, "ind_net": ic["net"],
+           "ma": ma, "ma_counts": {"above": mc["up"], "below": mc["down"]}, "ma_net": mc["net"]}
     for kind, key in (("W", "weekly"), ("M", "monthly")):
         rb = resample(bars, kind)
-        out[key] = counts(indicators(rb)) if len(rb) >= 30 else None
+        out[key] = _frame(rb)[4] if len(rb) >= 30 else None
     return out
 
 
 # ---------------------------------------------------------------- 그리기 (nvda-report render_html._state_card 의 lines)
 
-def gauge_svg(net, up_color=GAUGE_UP, down_color=GAUGE_DN, gray="#CBD5E1", width=200):
-    """반원 게이지 — 왼쪽(연파랑) 하락, 가운데 회색 중립, 오른쪽(연빨강) 상승. 바늘 = net (−1 … +1). 색은 파스텔 고정 (P99)."""
-    cx, cy, r = width / 2, width / 2 - 10, width / 2 - 16
+# 게이지 다섯 칸 — 강한 하락 · 하락 · 중립 · 상승 · 강한 상승 (인베스팅닷컴 적극 매도 ~ 적극 매수 자리, P101). 색은 연한 톤(BAR_PASTEL 계열), 바깥 둘이 조금 진하다
+ZONES = [(-1.0, -0.5, "강한 하락", "#82B1F0"), (-0.5, -0.15, "하락", "#BCD3F5"), (-0.15, 0.15, "중립", "#E2E8F0"),
+         (0.15, 0.5, "상승", "#F8C4BF"), (0.5, 1.0, "강한 상승", "#ED8E87")]
 
-    def pt(a):   # a: 0(왼쪽) … 180(오른쪽) 도
-        rad = math.radians(180 - a)
-        return cx + r * math.cos(rad), cy - r * math.sin(rad)
 
-    def arc(a0, a1, color, w=10):
-        x0, y0 = pt(a0)
-        x1, y1 = pt(a1)
-        return f'<path d="M{x0:.1f},{y0:.1f} A{r},{r} 0 0 1 {x1:.1f},{y1:.1f}" stroke="{color}" stroke-width="{w}" fill="none" stroke-linecap="butt"/>'
-    arcs = arc(2, 60, down_color) + arc(60, 120, gray) + arc(120, 178, up_color)
-    a = 90 + max(-1.0, min(1.0, net)) * 80
-    x, y = pt(a)
-    needle = f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{x:.1f}" y2="{y:.1f}" stroke="#111" stroke-width="2"/><circle cx="{cx:.1f}" cy="{cy:.1f}" r="4" fill="#111"/>'
-    lab = (f'<text x="{pt(8)[0]:.0f}" y="{cy + 18:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">하락</text>'
-           f'<text x="{cx:.0f}" y="{cy - r - 14:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">중립</text>'
-           f'<text x="{pt(172)[0]:.0f}" y="{cy + 18:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">상승</text>')
-    return (f'<svg viewBox="0 0 {width} {cy + 26:.0f}" width="{width}" height="{cy + 26:.0f}" aria-hidden="true" style="display:block;margin:4px auto 0;">'
-            f'{arcs}{needle}{lab}</svg>')
+def gauge_svg(net, width=260):
+    """반원 게이지 다섯 칸 + 바늘 + 칸 이름. 바늘 = net (−1 … +1), 왼쪽 끝 = −1.
+    양 끝(강한 하락 · 강한 상승)은 호 끝 아래, 가운데 셋은 호 바깥 위 — 옆에 두면 폭 안에서 잘렸다 (10-30 목업)."""
+    r = width / 2 - 40
+    cx, cy = width / 2, r + 30
+
+    def ang(v):   # −1 → 180° (왼쪽), +1 → 0° (오른쪽)
+        return math.radians(90 - max(-1.0, min(1.0, v)) * 90)
+
+    def pt(v, rr):
+        a = ang(v)
+        return cx + rr * math.cos(a), cy - rr * math.sin(a)
+    arcs = ""
+    for lo, hi, _, col in ZONES:
+        x0, y0 = pt(lo + 0.012, r)
+        x1, y1 = pt(hi - 0.012, r)
+        arcs += f'<path d="M{x0:.1f},{y0:.1f} A{r:.1f},{r:.1f} 0 0 1 {x1:.1f},{y1:.1f}" stroke="{col}" stroke-width="14" fill="none"/>'
+    labs = ""
+    for i, (lo, hi, name, _) in enumerate(ZONES):
+        if i in (0, 4):   # 양 끝: 호 끝 바로 아래 가운데
+            x, y = pt(-1.0 if i == 0 else 1.0, r)
+            labs += f'<text x="{x:.0f}" y="{cy + 22:.0f}" font-size="12" fill="#6B7280" text-anchor="middle">{name}</text>'
+            continue
+        x, y = pt((lo + hi) / 2, r + 18)
+        anchor = "end" if x < cx - 8 else "start" if x > cx + 8 else "middle"
+        labs += f'<text x="{x:.0f}" y="{y + 4:.0f}" font-size="12" fill="#6B7280" text-anchor="{anchor}">{name}</text>'
+    x, y = pt(net, r - 12)
+    needle = (f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{x:.1f}" y2="{y:.1f}" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>'
+              f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5" fill="#111"/>')
+    h = cy + 28
+    return (f'<svg viewBox="0 0 {width} {h:.0f}" width="{width}" height="{h:.0f}" aria-hidden="true" style="display:block;max-width:100%;height:auto;margin:0 auto;">'
+            f'{arcs}{labs}{needle}</svg>')
+
+
+def _sub(title):
+    """카드 안 묶음 제목 — 인베스팅닷컴 '기술적 지표' · '이동평균' 구획 자리. 굵게, 아래 줄 구분선은 첫 줄이 맡는다."""
+    return f'<span style="display:block;margin:18px 0 2px;font-weight:700;color:#111;">{title}</span>'
+
+
+def _gauge_block(title, c, total_note, up_color, down_color, muted):
+    """묶음 제목 + 게이지 + 답(굵게, 증감 색) + 개수 한 줄."""
+    w = word(c["net"])
+    col = up_color if c["net"] >= 0.15 else down_color if c["net"] <= -0.15 else muted
+    cnt = f'상승 {c["up"]} · 중립 {c["neutral"]} · 하락 {c["down"]}' if c.get("neutral") else f'상승 {c["up"]} · 하락 {c["down"]}'
+    return (f'<span style="display:block;text-align:center;margin:6px 0 4px;">'
+            f'<span style="display:block;font-weight:700;color:#111;text-align:left;">{title}</span>'
+            f'{gauge_svg(c["net"])}'
+            f'<span style="display:block;font-weight:700;color:{col};">{w}</span>'
+            f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};">{cnt}{total_note}</span></span>')
 
 
 def card(sig, name, up_color, down_color, muted="#6B7280"):
-    """(lines, tip) — _state_card 줄. 사실만: 개수 · 게이지 · 지표 줄(값 | 라벨) · 이동평균 줄 · 주봉 · 월봉 개수."""
+    """(lines, tip) — _state_card 줄 (P101: 인베스팅닷컴처럼 세 묶음).
+    ① 전체 요약 게이지(+ 주봉 · 월봉 답) ② 기술 지표 게이지 + 지표 줄(이름 | 값 · 라벨, 뜻 줄 없음) ③ 이동평균 게이지 + 기간 줄(단순 | 지수)."""
     import html as _h
-    cnt = sig["counts"]
-    first = (f"{sig['as_of'][5:7].lstrip('0')}월 {sig['as_of'][8:10].lstrip('0')}일 종가 기준 지표 11개 가운데 상승 {cnt['up']}개, 중립 {cnt['neutral']}개, 하락 {cnt['down']}개다. "
-             f"이동평균 12개(단순 · 지수 각 6개) 가운데 종가가 선 위(상승)인 것 {sig['ma_counts']['above']}개, 아래(하락) {sig['ma_counts']['below']}개다.")
+    day = f"{sig['as_of'][5:7].lstrip('0')}월 {sig['as_of'][8:10].lstrip('0')}일"
+    al = sig.get("all") or {"up": 0, "down": 0, "neutral": 0, "net": sig["net"]}
+    mc = {"up": sig["ma_counts"]["above"], "down": sig["ma_counts"]["below"], "neutral": 0, "net": sig.get("ma_net", 0.0)}
+    frames = []
     for key, lab in (("weekly", "주봉"), ("monthly", "월봉")):
         w = sig.get(key)
         if w:
-            first += f" {lab}으로는 상승 {w['up']}개, 중립 {w['neutral']}개, 하락 {w['down']}개다."   # 가운뎃점이면 증감 색 덩어리가 문장을 건너 칠해졌다 (10-30 목업)
-    def lab_html(label, d):
-        return label_html(label, up_color, down_color, muted, _h.escape)
-    lines = [(first, "plain"), (gauge_svg(sig["net"]), "html")]
+            col = up_color if w["net"] >= 0.15 else down_color if w["net"] <= -0.15 else muted
+            frames.append(f'{lab} <b style="color:{col};">{word(w["net"])}</b>')
+    lines = [(f'<span style="display:block;font-size:14px;line-height:20px;color:{muted};margin:12px 0 0;">{day} 종가 · 일봉 기준</span>', "html"),
+             (_gauge_block("전체 요약", al, "", up_color, down_color, muted)
+              + (f'<span style="display:block;text-align:center;font-size:14px;line-height:20px;color:{muted};margin-top:2px;">{" · ".join(frames)}</span>' if frames else ""), "html"),
+             (_sub("기술 지표") + _gauge_block("", sig["counts"], "", up_color, down_color, muted), "html")]
     for r in sig["rows"]:
-        lines.append(("row", r["name"], f'<span style="font-weight:700;color:#111;">{_h.escape(r["text"])}</span>&nbsp;&nbsp;{lab_html(r["label"], r["dir"])}', r["hint"], True))
+        lines.append(("row", r["name"], f'<span style="font-weight:700;color:#111;">{_h.escape(r["text"])}</span>&nbsp;&nbsp;{label_html(r["label"], up_color, down_color, muted, _h.escape)}', "", True))
+    lines.append((_sub("이동평균") + _gauge_block("", mc, "", up_color, down_color, muted), "html"))
+    COLW = "display:inline-block;min-width:92px;text-align:right;"
+    lines.append(("row", "기간", f'<span style="font-size:14px;font-weight:400;color:{muted};"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>', "", True))
+
+    def one(v, above):
+        if v is None:
+            return f'<span style="{COLW}">—</span>'
+        arrow = f'<span style="color:{up_color if above else down_color};">{"▲" if above else "▼"}</span>'
+        return f'<span style="{COLW}font-weight:700;color:#111;">{v:,.0f} {arrow}</span>'
     for m in sig["ma"]:
-        def one(v, above):
-            if v is None:
-                return "—"
-            arrow = f'<span style="color:{up_color if above else down_color};font-weight:700;">{"▲" if above else "▼"}</span>'   # 두 값이 한 줄이라 화살표만 (폭, P99)
-            return f'<span style="font-weight:700;color:#111;">{v:,.0f}</span> {arrow}'
-        lines.append(("row", f"이동평균 {m['n']}일", f'{one(m["sma"], m["sma_above"])}&nbsp;·&nbsp;{one(m["ema"], m["ema_above"])}', "", True))   # 뜻은 툴팁 한 줄 — 여섯 줄 같은 문장 (10-30)
+        lines.append(("row", f"{m['n']}일", one(m["sma"], m["sma_above"]) + one(m["ema"], m["ema_above"]), "", True))
     tip = ("널리 쓰는 기술 지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
-           "· 상승 · 하락 · 중립 : 지표마다 흔히 쓰는 기준으로 나눴다. 과매수는 하락, 과매도는 상승으로 센다\n"
-           "· 강한 상승 · 강한 하락 : (상승 개수 − 하락 개수) ÷ 11 이 ±0.5 를 넘을 때. ±0.15 안은 중립. ATR 은 방향이 없어 개수에서 뺀다\n"
-           "· 이동평균 : 단순 · 지수 값 옆 ▲ 는 종가가 선 위(상승), ▼ 는 아래(하락)\n"
+           "· 전체 요약 : 기술 지표와 이동평균을 한데 센 것. (상승 − 하락) ÷ 전체 가 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
+           "· 기술 지표 : RSI · 스토캐스틱 · CCI · Williams %R · Ultimate 는 과매수면 하락, 과매도면 상승으로 센다. MACD · ROC · Highs/Lows · Bull/Bear 는 0 이나 기준선 위면 상승. ADX 는 25 아래면 중립. ATR 은 방향이 없어 개수에서 뺀다\n"
+           "· 이동평균 : 5 ~ 200일 단순 · 지수 평균. 종가가 선 위면 ▲ 상승, 아래면 ▼ 하락\n"
            "· 참고 : 같은 지표라도 일봉 · 주봉 · 월봉에서 반대로 나오곤 한다. 다른 사이트와는 봉 단위 · 기준값이 달라 값이 다를 수 있다")
     return lines, tip
