@@ -382,15 +382,29 @@ def issues(rs, since=""):
 PICK_ACTION = {"buy": "매수", "hold": "보유", "watch": "관망", "sell": "매도"}
 
 
+def _as_utc(s):
+    """ISO 문자열 → UTC 시각 (끝의 Z · 시간대 없음은 UTC 로). 못 읽으면 None."""
+    try:
+        t = datetime.datetime.fromisoformat(str(s).strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return t.replace(tzinfo=datetime.timezone.utc) if t.tzinfo is None else t.astimezone(datetime.timezone.utc)
+
+
 def picks(items, since=""):
     """방송에서 나온 종목 의견 (2026-10-29 사용자 P85: "당잠사에서 톰 리가 추천했다 · 목표가") — 수집기 요약의 `picks` 칸을 그대로 옮긴다.
     한 줄 = {market · ticker · name · action(매수 · 보유 · 관망 · 매도) · speaker · own(본인 의견) / report(증권사 보고서를 방송이 전함) · target · currency ·
     reason · quote · channel · url(그 장면 시각) · published_at}. 같은 영상 · 같은 사람 · 같은 종목은 한 줄. since = 'YYYY-MM-DD' 이후 영상만."""
     out, seen = [], set()
+    cut = _as_utc(since) if since and len(since) > 10 else None   # 시각까지 주면 시각으로 자른다 — 방송 의견 48시간 (2026-10-31 사용자: "48시간이 지난 정보는 게시하지 말아줘")
     for it in sorted(items, key=lambda r: str(r.get("publishedAt") or ""), reverse=True):
         pub = it.get("publishedAt")
         pub = pub.isoformat() if hasattr(pub, "isoformat") else str(pub or "")
-        if pub[:10] < since:
+        if cut is not None:
+            t = _as_utc(pub)
+            if t is None or t < cut:
+                continue
+        elif pub[:10] < since:
             continue
         ch = it.get("channelName") or ""
         for p in it.get("picks") or []:

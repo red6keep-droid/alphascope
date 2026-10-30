@@ -205,7 +205,7 @@ def sec_pairs(s):
         return ""
     rets = [m["ret"] for m in moves] + ([adr["ret"]] if adr else [])
     ups, downs = sum(1 for x in rets if x >= 0.5), sum(1 for x in rets if x <= -0.5)
-    state, theme, col = (("엇갈림", "uncertain", R.WARN) if ups and downs else ("올랐음", "positive", UP) if ups else ("내렸음", "negative", DOWN) if downs
+    state, theme, col = (("엇갈림", "uncertain", R.SOON) if ups and downs else ("올랐음", "positive", UP) if ups else ("내렸음", "negative", DOWN) if downs
                          else ("비슷함", "neutral", R.MUTED))
     day = (moves or [adr or sox])[0]["day"]
     lines = [(f"밤사이(미국 {_md(day)} 종가) 연결 종목은 " + " · ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)
@@ -238,7 +238,9 @@ def _ind_value(r):
     if kind == "cnt":
         return f"{v:,.0f}호"
     if kind == "won_m":
-        return f"{v / 1e6:,.1f}조 원"
+        return f"{v / 1e6:,.1f}조 원" if abs(v) >= 1e6 else f"{v / 1e2:,.0f}억 원"   # 1조 아래는 억 원 (발전설비 수주, 2026-10-31)
+    if kind == "usd":
+        return f"{v / 1e8:,.1f}억 달러"   # 관세청 수출금액 (방산, 2026-10-31)
     if kind == "won_b":
         return f"{v / 1e3:,.0f}조 원"
     if kind == "pct":
@@ -408,7 +410,7 @@ def _mo(m):
 def _chart_unit(kind):
     """그래프 숫자는 짧게 — 단위는 그래프 제목에."""
     return {"won_m": (1e6, "조 원"), "won_b": (1e3, "조 원"), "mwh": (1e4, "만 MWh"), "kbbl": (1e3, "백만 배럴"), "ktoe": (1e3, "백만 TOE"), "ton": (1e4, "만 톤"),
-            "cnt": (1, "호"), "pct": (1, "%"), "idx": (1, "")}.get(kind, (1, ""))
+            "cnt": (1, "호"), "pct": (1, "%"), "idx": (1, ""), "usd": (1e8, "억 달러")}.get(kind, (1, ""))
 
 
 def _fin_short(s, name):
@@ -433,35 +435,80 @@ def card_industry_mood(s):
     for r in b["rows"]:
         lines.append(("row", f"{r['name']} 경기(BSI)", f"{r['v']:.0f}", f"{r['month'][:4]}년 {int(r['month'][5:])}월 실적 · 전달보다 {_sgn(r['chg'], 0)}p · 2009년 이후 아래에서 {r['pct_all']:.0f}% 지점"
                       + (f" · 다음 달 전망 {r['forecast']:.0f}" if r.get("forecast") is not None else "")))
-    return R._state_card("이 업종 경기는 좋아지고 있나?", state, theme, col, lines, "", tip=_tip_of(sec_bsi(s)), fold=True)
+    return R._state_card("업종 경기는?", state,   # 짧게 (2026-10-31 사용자, 옛 이 업종 경기는 좋아지고 있나?)
+                          theme, col, lines, "", tip=_tip_of(sec_bsi(s)), fold=True)
+
+
+# 답 낱말 — 사업 묶음 질문에 맞춘다 (2026-10-31 사용자: "메모리 반도체 값은? · 이자 마진은? 처럼 짧게, 방향은 답이")
+BIZ_WORDS = {"price": ("오르는 중", "내리는 중"), "qty": ("늘고 있음", "줄고 있음"), "margin": ("넓어지는 중", "좁아지는 중"), "size": ("커지는 중", "줄어드는 중")}
+
+
+def _window_change(r0, months):
+    """(바뀐 정도, 문장 앞부분) — months = 1 이면 1년 전 같은 달, 3 이면 최근 3개월 합 vs 1년 전 같은 3개월 합 (수주 · 방산 인도처럼 달마다 출렁이는 것)."""
+    by = {x["month"]: x["v"] for x in r0.get("series") or []}
+    last = r0["month"]
+
+    def back(m, n):   # 'YYYY-MM' 에서 n 달 전
+        y, mo = int(m[:4]), int(m[5:]) - n
+        while mo <= 0:
+            y, mo = y - 1, mo + 12
+        return f"{y}-{mo:02d}"
+    span = [back(last, i) for i in range(months)]
+    prev = [f"{int(m[:4]) - 1}{m[4:]}" for m in span]
+    if any(m not in by for m in span + prev):
+        return None, ""
+    now, old = sum(by[m] for m in span), sum(by[m] for m in prev)
+    if r0["kind"] == "pct":
+        return (now - old) / months, ""
+    if not old:
+        return None, ""
+    return (now / old - 1) * 100, (f"{int(span[-1][5:])}~{int(last[5:])}월" if months > 1 else "")
+
+
+def _name_josa(name, j):
+    """이름 뒤 조사 — 끝의 괄호(`(전차 · 무기 · 탄약)`)는 보지 않고 앞말로 정한다 (2026-10-31: `수출액 (…)는` → `수출액 (…)은`)."""
+    base = re.sub(r"\s*\([^)]*\)\s*$", "", name)
+    return name + _dk.josa(base, j)[len(base):]
 
 
 def card_industry_work(s):
-    """이 업종에 일감이 늘고 있나? — 업종 실물 지표(수출 · 생산 · 수주 · 판매) 맨 앞 지표. 답 = 1년 전 같은 달보다 5% 넘게 늘면 늘고 있음."""
+    """업종 실물 지표 카드 — 2026-10-31 부터 사업 묶음(U.BIZ)마다 질문 · 지표 · 답 낱말 · 비교 기간 (doc/검증/한국-업종지표-재선정.md).
+    옛 제목 `이 업종에 일감이 늘고 있나?` 는 묶음이 없는 종목에만. 답 = 1년 전보다 5% 넘게(금리는 0.5%p) 늘면 늘고 있음 · 줄면 줄고 있음."""
     rows_data = s.get("industry") or []
     if not rows_data:
         return ""
+    b = U.biz(s["sym"]) or {"q": "이 업종에 일감이 늘고 있나?", "mode": "qty", "months": 1}
     r0 = rows_data[0]
-    by = {x["month"]: x["v"] for x in r0.get("series") or []}
-    prev = by.get(f"{int(r0['month'][:4]) - 1}{r0['month'][4:]}")
-    yoy = None if prev is None else ((r0["v"] - prev) if r0["kind"] == "pct" else (r0["v"] / prev - 1) * 100 if prev else None)
+    months = b["months"]
+    chg, span_txt = _window_change(r0, months)
     lim = 0.5 if r0["kind"] == "pct" else 5
-    state, theme, col = (("판단 유보", "neutral", R.MUTED) if yoy is None else ("늘고 있음", "positive", UP) if yoy >= lim
-                         else ("줄고 있음", "negative", DOWN) if yoy <= -lim else ("비슷함", "neutral", R.MUTED))
+    up_w, dn_w = BIZ_WORDS[b["mode"]]
+    state, theme, col = (("판단 유보", "neutral", R.MUTED) if chg is None else (up_w, "positive", UP) if chg >= lim
+                         else (dn_w, "negative", DOWN) if chg <= -lim else ("비슷함", "neutral", R.MUTED))
     unit = "%p" if r0["kind"] == "pct" else "%"
     v0 = _ind_value(r0)
-    lines = [(f"{_dk.josa(r0['name'], '은')} {r0['month'][:4]}년 {int(r0['month'][5:])}월 "
-              + (f"{_dk.josa(v0, '로')} 1년 전 같은 달보다 {_sgn(yoy, 1)}{unit}." if yoy is not None else f"{v0}다.")
-              + R.small_note("월별 자료라 1~2달 늦게 나오고, 주가는 이보다 먼저 움직이곤 합니다."), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
+    if months > 1 and chg is not None:
+        by = {x["month"]: x["v"] for x in r0.get("series") or []}
+        tot = dict(r0, v=sum(v for m, v in sorted(by.items())[-months:]))
+        head = (f"{_name_josa(r0['name'], '은')} 최근 3개월({r0['month'][:4]}년 {span_txt}) 합이 {_dk.josa(_ind_value(tot), '로')} "
+                f"1년 전 같은 3개월보다 {_sgn(chg, 1)}{unit}.")
+        note = "월별 자료라 1~2달 늦게 나오고, 큰 계약이 들어온 달에 크게 튑니다. 그래서 3개월을 묶어 봅니다."
+    else:
+        head = (f"{_name_josa(r0['name'], '은')} {r0['month'][:4]}년 {int(r0['month'][5:])}월 "
+                + (f"{_dk.josa(v0, '로')} 1년 전 같은 달보다 {_sgn(chg, 1)}{unit}." if chg is not None else f"{v0}다."))
+        note = "월별 자료라 1~2달 늦게 나오고, 주가는 이보다 먼저 움직이곤 합니다."
+    lines = [(head + R.small_note(note), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
     div, u = _chart_unit(r0["kind"])
-    lines += _yoy_chart(f"{r0['name']}, 올해와 작년 같은 달" + (f" ({u})" if u else ""), _yoy_groups(r0.get("series") or [], "month", _mo),
-                        lambda v: f"{v / div:,.1f}" if v / div < 100 else f"{v / div:,.0f}")
+    scaled = [dict(x, v=x["v"] / div) for x in r0.get("series") or []]   # 단위를 먼저 나눠 그린다 — 막대 숫자만 나누면 세로 눈금이 5000000 처럼 원래 숫자로 나왔다 (2026-10-31)
+    chart_name = r0["name"].replace(" (전차 · 무기 · 탄약)", "")   # 그래프 제목엔 품목 괄호를 빼고 (2026-10-31 사용자 P135) — 근거 줄 · 툴팁에는 그대로
+    lines += _yoy_chart(f"{chart_name}, 올해와 작년 같은 달" + (f" ({u})" if u else ""), _yoy_groups(scaled, "month", _mo),
+                        lambda v: f"{v:,.1f}" if v < 100 else f"{v:,.0f}")
     for r in rows_data:
         cmp_txt = "전년 같은 달보다" if r["cmp"] == "yoy" else "전달보다"
         u2 = "%p" if r["kind"] == "pct" else "%"
         lines.append(("row", r["name"], _ind_value(r), f"{r['month'][:4]}년 {int(r['month'][5:])}월" + (f" · {cmp_txt} {_sgn(r['chg'], 2 if u2 == '%p' else 1)}{u2}" if r.get("chg") is not None else "")
                       + (f" · {r['note']}" if r.get("note") else "")))
-    return R._state_card("이 업종에 일감이 늘고 있나?", state, theme, col, lines, "", tip=_tip_of(sec_industry(s)), fold=True)
+    return R._state_card(b["q"], state, theme, col, lines, "", tip=_tip_of(sec_industry(s)), fold=True)
 
 
 def card_industry_money(s):
@@ -480,7 +527,8 @@ def card_industry_money(s):
     for r in s.get("fin") or []:   # 산업별 대출(늦게 따라오는 지표)도 여기 — 질문 카드로 따로 두지 않는다
         val = f"{r['v'] / 1e3:,.0f}조 원" if r["unit"] == "조 원" else f"{r['v']:.1f}%"
         lines.append(("row", _fin_short(s, r["name"]), val, f"{_qlabel(r['q'])}" + (f" · 전년 같은 분기보다 {_sgn(r['chg'], 1)}{r['chg_unit']}" if r.get("chg") is not None else "") + f" · {r['note']}"))
-    return R._state_card("이 업종 회사들의 돈 버는 힘은?", state, theme, col, lines, "", tip=_tip_of(sec_fin(s)), fold=True)
+    return R._state_card("회사들의 돈 버는 힘은?",   # 짧게 (2026-10-31 사용자, 옛 이 업종 회사들의 돈 버는 힘은?)
+                          state, theme, col, lines, "", tip=_tip_of(sec_fin(s)), fold=True)
 
 
 def sec_industry_tab(s):
@@ -501,22 +549,50 @@ def _glance(s):
             "normal_range": s.get("normal_range")}
 
 
+LONG_NAME_W = 109   # 가격 줄 이름 칸 = 360px 폰 카드 안쪽의 36% (nvda-report PRICE_ROW_L)
+PRICE_INNER_W = 302   # 360px 폰 가격 카드 안쪽 폭 (332 − 테두리 2 − 좌우 14 × 2, P137)
+PRICE_BTN_GAP = 12   # 가격 · % 오른쪽 끝 ~ 접기 버튼 = 상태 카드 답 ~ 버튼 (P137)
+
+
 def price_card(s):
     """가격 카드 — 미국 종목 · 엔비디아와 같은 틀. 머리 = 가격 줄 + 작은 글씨, 펼치면 기간별 수익률 · 1년 범위 · 고점 회복 · 차트 지표."""
     r = s["ret_1d"]
     g = _glance(s)
     pcol = UP if r > 0 else DOWN if r < 0 else "#111"
     tone = R.ROW_UP if r > 0 else R.ROW_DOWN if r < 0 else ""
-    bg, bd = ("#FFF7ED", "#FED7AA") if r > 0 else ("#EFF6FF", "#BFDBFE") if r < 0 else ("#fff", "#E2E8F0")
-    price = R.price_value(f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">{won(s["close"])}</span>', R._arrow(r),
-                          R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN)   # 길면 등락이 아래 줄로 (P61)
-    head = R.price_row(R._row("@@", price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)   # "@@" 는 ticker_logo 가 배지를 만들지 않는 자리표시 — 한글 이름도 isalnum 이라 "SK" 배지가 붙는다
-    head = head.replace("@@", badge(s["sym"]) + _esc(s["name"]), 1)   # 한글 첫 글자 배지 + 종목 이름
+    bg, bd = ("#FFF7EE", "#FEE6CA") if r > 0 else ("#EFF6FF", "#D6E8FE") if r < 0 else ("#fff", "#E2E8F0")
+    close_html = f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">{won(s["close"])}</span>'
+    btn = R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN
+    long_name = True   # P137: 모든 한국 종목 = 가격 위 · 증감 아래 두 줄 — 짧은 이름(삼성전자)도 한 줄엔 안 들어가 꺾이며 가격(331) · %(288) 끝선이 어긋났다. 옛 기준: 이름 > LONG_NAME_W
+    name_fs = 18
+    if long_name:   # 한 줄 = 로고 26 + 이름 + 8 + 가격 + 12 + 버튼 31 ≤ 카드 안쪽 302 (360px 폰) — 넘치면 이름을 17 → 16px (P137: 옛 줄이 16px 넘쳐 버튼이 카드 밖)
+        pw = R._est_w(won(s["close"]), 18)
+        for fs in (18, 17, 16):
+            name_fs = fs
+            if 26 + R._est_w(s["name"], fs) + 8 + pw + 12 + 31 <= PRICE_INNER_W:
+                break
+    if long_name:   # 가격 위 · 증감 아래 두 줄로 쌓고 이름은 한 줄 (2026-10-31 사용자: "이름이 길어 로고랑 틀어진다, 가격 밑에 증감")
+        # 가격 · 증감 두 줄을 한 묶음으로 오른쪽 끝선을 맞추고, 접기 버튼은 그 묶음 오른쪽 (P135: 가격 오른쪽 끝 = % 오른쪽 끝)
+        price = (f'<span style="display:inline-flex;align-items:center;column-gap:{PRICE_BTN_GAP}px;">'   # 가격 · % 오른쪽 끝 ~ 버튼 12 = 상태 카드 답 ~ 버튼
+                 f'<span style="display:inline-flex;flex-direction:column;align-items:flex-end;">{close_html} '
+                 f'<span style="white-space:nowrap;margin-top:{-2 if r else 6}px;">{R._arrow(r)}</span></span>{btn}</span>')   # 가격 ~ 증감 7px (P136) — 등락 0 인 날은 흰 카드 · 줄 높이 24 라 당김 대신 +6 (P137, 카카오뱅크 −1px 이던 것)
+    else:
+        price = R.price_value(close_html, R._arrow(r), btn)   # 길면 등락이 아래 줄로 (P61)
+    head = R.price_row(R._row("@@", price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)
+    if long_name:
+        head = head.replace(R.PRICE_ROW_L, "flex:0 0 auto;min-width:0;white-space:nowrap;", 1)
+        head = head.replace("align-items:center;", "align-items:flex-start;", 1)   # 이름 = 가격과 같은 줄 (P135 — 가운데 맞춤이면 두 줄 사이에 떴다)
+        head = head.replace("gap:12px;", "gap:8px;", 1)   # 이름 ~ 가격 8 (P137)   # "@@" 는 ticker_logo 가 배지를 만들지 않는 자리표시 — 한글 이름도 isalnum 이라 "SK" 배지가 붙는다
+    nm = _esc(s["name"]) if name_fs == 18 else f'<span style="font-size:{name_fs}px;">{_esc(s["name"])}</span>'
+    head = head.replace("@@", badge(s["sym"]) + nm, 1)   # 한글 첫 글자 배지 + 종목 이름
     sub = R.glance_sub(g)
     if sub:
-        head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1)
+        head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1).replace("gap:8px;", "column-gap:8px;row-gap:2px;", 1)
         k = head.rstrip().rfind("</span>")
-        head = head[:k] + sub.replace("S&P 500", "KOSPI") + head[k:]
+        sub_html = sub.replace("S&P 500", "KOSPI")
+        if long_name:   # 증감 줄 아래 ~ 작은 글씨 6 → 8px (+30%, 7.8 → 8, P135 · 사용자 10-31 정정: 40% 아니고 30%). 증감 위(가격 ~ 증감 9px)는 그대로
+            sub_html = f'<span style="display:block;flex-basis:100%;margin-top:2px;">{sub_html}</span>'   # 작은 글씨는 스스로 % 끝선(288)에 맞춰져 있다 — 오른쪽 여백을 더하면 이중으로 들어간다 (P137)
+        head = head[:k] + sub_html + head[k:]
     rows = ""   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 정보 보기는 모두 강조 카드 안 (2026-10-26 사용자)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
             f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), R.in_card(sec_periods(s), white=True), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
@@ -773,7 +849,7 @@ def sec_expect(s):
 def card_picks(s):
     """방송 의견 카드 — 공용 R.picks_card (한국 · 미국 종목 같은 카드, 2026-10-29 P88 · P89). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
-    return R.picks_card(s["name"], ps, s.get("close"), won, PICK_DAYS)
+    return R.picks_card(s["name"], ps, s.get("close"), won, R.PICK_HOURS)
 
 
 # ---------------------------------------------------------------- `캘린더` 탭 (2026-10-25 사용자) — 미국 종목 캘린더 탭과 같은 질문 카드 셋.
@@ -1492,7 +1568,7 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
         media = media_feed.issues(media_feed.rows(vids), since)
         media_feed.diag(vids, media)   # 재료 진단 로그 — 채널 묶음 · 범위 · 종목별 배정 (2026-10-30 사용자: 분배 점검)
         global PICKS
-        PICKS = media_feed.picks(vids, (now - datetime.timedelta(days=PICK_DAYS)).strftime("%Y-%m-%d"))
+        PICKS = media_feed.picks(vids, (now - datetime.timedelta(hours=R.PICK_HOURS)).isoformat())   # 48시간 (2026-10-31)
     MEDIA = media
     if snap:
         draw_charts(snap, a["stocks"], out_dir)

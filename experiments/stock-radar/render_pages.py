@@ -113,7 +113,7 @@ def price_card(s, today):
     g = _glance(s)
     pcol = UP if r > 0 else DOWN if r < 0 else "#111"
     tone = R.ROW_UP if r > 0 else R.ROW_DOWN if r < 0 else ""   # 엔비디아 가격 카드와 같은 강조 카드 높이(위아래 여백 · 행간 32) — design_kit 의 ROW_UP 에는 강조 여백이 없다 (2026-10-23 사용자)
-    bg, bd = ("#FFF7ED", "#FED7AA") if r > 0 else ("#EFF6FF", "#BFDBFE") if r < 0 else ("#fff", "#E2E8F0")
+    bg, bd = ("#FFF7EE", "#FEE6CA") if r > 0 else ("#EFF6FF", "#D6E8FE") if r < 0 else ("#fff", "#E2E8F0")
     price = R.price_value(f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">${s["close"]:,.2f}</span>', R._arrow(r),
                           R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN)   # 길면 등락이 아래 줄로 (P61)
     head = R.price_row(R._row(s["sym"], price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)
@@ -281,7 +281,7 @@ def sec_states(s):
     out = ""
     ms = s.get("market_shock") or {}
     if ms.get("active"):
-        out += R._state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", R.WARN, R.shock_lines(ms), "", tip=_no_record(R.shock_tip(ms)), fold=True)
+        out += R._state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", R.SOON, R.shock_lines(ms), "", tip=_no_record(R.shock_tip(ms)), fold=True)
     mr = s.get("market_regime")
     if mr:
         th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
@@ -423,7 +423,7 @@ def card_opinions(s):
         lines.append((R.analysts_block(a), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
     if ps:
         lines.append((R.picks_rows(ps, s.get("close"), money), "html"))   # 방송 묶음은 `매수 의견` 제목 · 구분선 (P92)
-    tip = ("애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 나온 이 종목 의견을 한 카드에 모은 것\n"
+    tip = (f"애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 최근 {R.PICK_HOURS}시간에 나온 이 종목 의견을 한 카드에 모은 것\n"
            f"· 지금 : {state}" + (f" · 방송 {cnt}" if ps else "") + "\n"
            "· 나누는 법 : 애널리스트 중 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림. 방송 건수는 답에 넣지 않는다\n"
            "· 읽는 법 : 누가 어떤 이유로 말했는지 보는 칸이다. 적중률은 검증하지 않았고, 이 블로그의 추천이 아니다")
@@ -723,7 +723,7 @@ def write_all(a, out_dir, snap=None, news=None, media=None):
     if media is None:   # 영상은 한 번(30일) 읽어 뉴스(24시간) · 방송 의견(30일)에 나눠 쓴다 — Firestore `in` 30개 한도
         vids = media_feed.load(NOW.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=R.PICK_DAYS - 1)
         media = media_feed.issues(media_feed.rows(vids), _since())
-        PICKS = media_feed.picks(vids, (NOW - datetime.timedelta(days=R.PICK_DAYS)).strftime("%Y-%m-%d"))
+        PICKS = media_feed.picks(vids, (NOW - datetime.timedelta(hours=R.PICK_HOURS)).isoformat())   # 48시간 (2026-10-31)
     MEDIA = media
     if snap:
         draw_charts(snap, [s for s in a["stocks"] if s["sym"] not in U.REPORT_TYPE], out_dir)

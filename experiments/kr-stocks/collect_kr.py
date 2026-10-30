@@ -182,6 +182,42 @@ def history():
 
 # ── 자금 흐름 (ECOS) ──────────────────────────────────────────────────
 
+def _customs(hs_list, years=3):
+    """관세청 품목별 수출 (공공데이터포털 15100475 · 이용허락범위 제한 없음, 2026-10-31) — HS 품목들의 월 수출금액(달러) 합, 최근 years 해.
+    국가 코드 없이 부르면 나라별 · 월별 줄 + 총계가 온다 → 월마다 나라별 줄을 더한다. 한 번에 1년만. 키 DATA_GO_KR_API_KEY 가 없으면 빈 목록."""
+    import xml.etree.ElementTree as ET
+    k = os.environ.get("DATA_GO_KR_API_KEY", "").strip()
+    if not k:
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(os.path.join(BASE, "..", "..", ".env"))
+            k = os.environ.get("DATA_GO_KR_API_KEY", "").strip()
+        except ImportError:
+            pass
+    if not k:
+        print("[kr] 관세청 키(DATA_GO_KR_API_KEY) 없음 — 방산 수출 건너뜀")
+        return []
+    y1 = datetime.date.today().year
+    mon = {}
+    for hs in hs_list:
+        for y in range(y1 - years + 1, y1 + 1):
+            try:
+                r = requests.get("https://apis.data.go.kr/1220000/nitemtrade/getNitemtradeList",
+                                 params={"serviceKey": k, "strtYymm": f"{y}01", "endYymm": f"{y}12", "hsSgn": hs}, timeout=60)
+                root = ET.fromstring(r.content)
+                if root.findtext("header/resultCode") != "00":
+                    print(f"[kr] 관세청 {hs}/{y}: {(root.findtext('header/resultMsg') or '')[:60]}")
+                    continue
+                for it in root.findall("body/items/item"):
+                    ym = it.findtext("year") or ""
+                    if len(ym) == 7 and ym[4] == ".":
+                        mon[f"{ym[:4]}-{ym[5:]}"] = mon.get(f"{ym[:4]}-{ym[5:]}", 0.0) + float(it.findtext("expDlr") or 0)
+            except Exception as e:   # noqa: BLE001
+                print(f"[kr] 관세청 {hs}/{y} 실패: {str(e)[:80]}")
+            time.sleep(0.3)
+    return [{"month": m, "v": v} for m, v in sorted(mon.items())]
+
+
 def _ecos(key, stat, cycle, start, end, item, n=2000):
     """item 은 항목 코드 하나, 또는 항목이 둘인 표는 "ITEM1/ITEM2" (예: 기업경기조사 전산업/업황실적)."""
     url = f"{ECOS}/StatisticSearch/{key}/json/kr/1/{n}/{stat}/{cycle}/{start}/{end}/{item}"
@@ -263,6 +299,8 @@ def run_flows():
     # 업종 재료 지표 (기획 11-4, 2026-10-24) — 표 · 항목이 겹치면 한 번만 받는다. 수출물가지수는 원화 · 계약통화 두 줄이 오므로 원화 기준만
     out["industry"] = {}
     for key_name, (stat, item, *_rest) in U.INDICATORS.items():   # DERIVED 는 analyze 에서 두 시계열의 차로 만든다
+        if stat == "customs":   # 관세청 품목 수출 — 아래 _customs 가 받는다 (2026-10-31)
+            continue
         try:
             rows = _ecos(key, stat, "M", m0, m1, item)
             codes2 = {x.get("ITEM_CODE2") for x in rows}
@@ -281,6 +319,10 @@ def run_flows():
         except Exception as e:   # noqa: BLE001
             print(f"[kr] ECOS 업종 지표 {key_name} 실패: {str(e)[:80]}")
         time.sleep(0.3)
+    for key_name, hs_list in U.CUSTOMS.items():
+        got = _customs(hs_list)
+        if got:
+            out["industry"][key_name] = got
     # K1~K6 업종별 BSI — 표마다 "?/업종" 한 번에 항목 전부 (ITEM_CODE1 = 항목, ITEM_CODE2 = 업종)
     out["bsi"] = {}
     for ind in U.BSI_INDUSTRY:
