@@ -350,6 +350,7 @@ def _sub(title):
     return f'<span style="display:block;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;">{title}</span>'   # 19 → 18 (P105)
 
 
+# 전체요약 답 아래 ~ 개수 줄 6 → 8px (+40%, 8.4 → 8, P118: margin-bottom 2)
 # 제목 위 보이는 여백 14 → 20px (+40%, 19.6 → 20, P117) = 카드 위 여백 10 + 제목 margin-top 6 + 줄 높이 반쪽 4. 기준일(absolute top 10)은 그대로
 def _tri_small(w, px):
     """답 앞 ▲ · ▼ 를 글자의 약 80% 크기로 (P112, 사용자: "삼각형 20% 더 작게") — 정수 px (P113: 19 → 15 · 18 → 14)."""
@@ -371,7 +372,7 @@ def _gauge_block(title, c, extra, up_color, down_color, muted, small=False, corn
     return (f'<span style="{_dk.MULTI}position:relative;margin:{"0" if small else f"6px {mx}px 0"};text-align:center;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 8px;">'   # 좌우 8 — 세 카드 같게 (P116: 개수 · 주봉 · 월봉 한 줄 자리)
             f'{top}<span style="display:block;font-weight:700;color:#111;margin:6px 0 4px;font-size:{"14px" if small else "16px"};line-height:{"22px" if small else "24px"};">{title}</span>'   # 작은 게이지 제목 15 → 14 (P115)   # 17 → 16 · 작은 게이지 16 → 15 (P108)
             f'{gauge_svg(c["net"], "small" if small else "big")}'
-            f'<span style="display:block;font-weight:700;color:{col};{"font-size:17px;line-height:23px;" if small else "font-size:19px;line-height:25px;"}">{_tri_small(w, 13 if small else 15)}</span>'   # 작은 게이지 답 18 → 17 · 삼각형 14 → 13 (P115)   # 작은 게이지 답 19 → 18 (P112)
+            f'<span style="display:block;font-weight:700;color:{col};{"font-size:17px;line-height:23px;" if small else "font-size:19px;line-height:25px;margin-bottom:2px;"}">{_tri_small(w, 13 if small else 15)}</span>'   # 작은 게이지 답 18 → 17 · 삼각형 14 → 13 (P115)   # 작은 게이지 답 19 → 18 (P112)
             f'<span style="display:flex;flex-wrap:wrap;justify-content:center;font-size:14px;line-height:20px;color:{muted};"><span style="white-space:nowrap;">{cnt}</span>'
             + (f'<span style="white-space:nowrap;">{extra}</span>' if extra else "") + '</span></span></span>')   # extra = 같은 줄 구분선 뒤 · 폭이 모자라면 그 묶음만 다음 줄 (P116)   # extra = 같은 줄 뒤 (P116)
 
