@@ -1,37 +1,89 @@
 {
-  "updated_at": "2026-10-30 18:12:47 UTC",
+  "updated_at": "2026-10-30 21:48:12 UTC",
   "items": [
     {
-      "title": "Why bitcoin held up better after the record Binance hack",
+      "title": "Binance loses $6.3 billion in crypto heist—what happens to your money when an exchange gets hacked",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/binance-hack-bitcoin-price.html",
-      "published": "2026-10-30 18:07:00",
-      "title_ko": "비트코인, 사상 최대 바이낸스 해킹 이후 상대적으로 견조",
-      "summary_ko": "가격 하락 약 4%"
+      "link": "https://www.cnbc.com/make-it/2026/10/30/binance-crypto-hack-customer-funds.html",
+      "published": "2026-10-30 21:45:52",
+      "title_ko": "바이낸스, 63억 달러 암호화폐 해킹 손실",
+      "summary_ko": "디지털 자산 보관 위험"
     },
     {
-      "title": "Fed officials are already saying they’ll need to get back to hiking rates",
+      "title": "$6.3 billion Binance hack is largest crypto theft on record",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/musalem-fed-monetary-policy-tightening.html",
-      "published": "2026-10-30 17:48:34",
-      "title_ko": "연준 관계자, 금리 인상 필요성 언급",
-      "summary_ko": "알베르토 무살렘·로리 로건 발언"
+      "link": "https://www.cnbc.com/2026/10/29/circle-tether-freeze-funds-impacted-by-potential-binance-security-issue.html",
+      "published": "2026-10-30 21:21:17",
+      "title_ko": "바이낸스 '잠재적 보안 문제'로 서클·테더 등 25억 4천만 달러 동결",
+      "summary_ko": "세계 최대 암호화폐 거래소 바이낸스, 자금 완전 안전 주장하며 조사 진행"
     },
     {
-      "title": "Class action lawsuit blames Trump officials for student loan forgiveness delays",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/lawsuit-blames-trump-officials-for-student-loan-forgiveness-delays.html",
-      "published": "2026-10-30 17:40:00",
-      "title_ko": "트럼프 관료, 학자금 대출 탕감 지연에 대한 집단소송 제기",
-      "summary_ko": "미국 교사 연합, 수만 명 차용자 차단 주장"
-    },
-    {
-      "title": "Alaska Senate: Judge fast tracks new bids to dismiss DOJ lawsuit over 2nd Sullivan candidacy",
+      "title": "Criminal investigation of Alaska Senate race is 'ongoing,' U.S. Attorney says",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/30/alaska-senate-election-doj-lawsuit-sullivan-peltola.html",
-      "published": "2026-10-30 17:31:46",
+      "published": "2026-10-30 20:46:04",
       "title_ko": "알래스카 상원: 법원이 DOJ 소송 2차 설리번 후보 기각 신규 입찰 신속 진행",
       "summary_ko": ""
+    },
+    {
+      "title": "Intel stock has worst day since 1970s, wiping about $12 billion off government's stake",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/amazon-intel-earnings-big-tech-ai-spending-concerns.html",
+      "published": "2026-10-30 20:30:57",
+      "title_ko": "인텔 주식, 1970년대 이후 최악의 하루 기록, 정부 보유주식 120억 달러 감소",
+      "summary_ko": "AI 지출 확대에 투자자 우려"
+    },
+    {
+      "title": "'Bad time to troll': Binance co-founder Zhao asks Musk for support after hack",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/binance-hack-elon-musk-tesla-spacex.html",
+      "published": "2026-10-30 20:02:45",
+      "title_ko": "바이낸스 공동창업자, 비트코인 해킹 관련 게시글에 머스크에 '존중' 요구",
+      "summary_ko": "바이낸스, 스페이스X 지분 10억 달러 이상 보유"
+    },
+    {
+      "title": "Binance hack: Investigators in a 'cat and mouse game' to recover $6.3 billion in stolen funds",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/binance-hack-stolen-crypto-recovery.html",
+      "published": "2026-10-30 19:27:03",
+      "title_ko": "바이낸스 해킹: 수사팀, 탈취된 63억 달러 회수 위해 '쥐와 고양이 게임'",
+      "summary_ko": "북한 연계 해커 자금 세탁 전 회수 경쟁"
+    },
+    {
+      "title": "Wall Street braces for Democratic gains as 2026 midterm election nears",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/2026-midterm-election-wall-street-prepares-for-democratic-gains.html",
+      "published": "2026-10-30 19:11:32",
+      "title_ko": "2026년 중간선거 앞두고 월가, 민주당 약진 대비",
+      "summary_ko": "화요일 중간선거에서 의회 통제권 결정"
+    },
+    {
+      "title": "Tech gets crushed, defensive stocks shine. How we're making sense of it all",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/10/30/tech-gets-crushed-defensive-stocks-shine-how-were-making-sense-of-it-all.html",
+      "published": "2026-10-30 18:55:44",
+      "title_ko": "기술주 급락, 방어주 강세. 이 상황을 어떻게 해석할까",
+      "summary_ko": "투자 클럽, 매일 장 마감 전 오후 업데이트 공개"
+    },
+    {
+      "title": "Cheaper cars are selling considerably faster than at the beginning of the year",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/cheap-cars-selling-fast.html",
+      "published": "2026-10-30 18:45:35",
+      "title_ko": "저렴한 차량, 연초보다 훨씬 빠르게 판매되고 있어",
+      "summary_ko": "3분기 일부 저가 차량 세그먼트는 판매 감소 기록"
+    },
+    {
+      "title": "AI 에이전트 인프라 수요 증가",
+      "title_ko": "AI 에이전트 인프라 수요 증가",
+      "summary_ko": "음성 AI 및 소비자 AI 에이전트의 확산이 인프라 제공업체인 트윌리오에 장기적인 성장 동력이 될 것",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=V7-IBadT2R8",
+      "published": "2026-10-30 17:58:45",
+      "kind": "media",
+      "tag": "AI/반도체",
+      "direction": "neutral",
+      "n_channels": 3
     },
     {
       "title": "바이낸스 사상 최대 암호화폐 해킹",
@@ -46,58 +98,6 @@
       "n_channels": 3
     },
     {
-      "title": "Tankers defy sharp escalation of Iranian attacks to keep crude oil flowing through Strait of Hormuz",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/tanker-attack-strait-hormuz-iran-war-oil.html",
-      "published": "2026-10-30 17:21:47",
-      "title_ko": "호르무즈 해협 이란 공격 격화에도 유조선, 원유 수송 지속",
-      "summary_ko": "이란 공격 격화에도 유조선 운행 지속"
-    },
-    {
-      "title": "Treasury Department announces new Series I bond rate of 5.51% for the next six months",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/treasury-i-bond-rate-through-april-2027.html",
-      "published": "2026-10-30 17:15:53",
-      "title_ko": "재무부, 향후 6개월 세리 I 채권 금리 5.51% 발표",
-      "summary_ko": "금리, 향후 6개월 적용"
-    },
-    {
-      "title": "'Bad time to troll': Binance cofounder Changpeng Zhao asks Elon Musk for 'respect' after post about bitcoin hack",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/binance-hack-elon-musk-tesla-spacex.html",
-      "published": "2026-10-30 17:12:59",
-      "title_ko": "바이낸스 공동창업자, 비트코인 해킹 관련 게시글에 머스크에 '존중' 요구",
-      "summary_ko": "바이낸스, 스페이스X 지분 10억 달러 이상 보유"
-    },
-    {
-      "title": "Halloween gets pricier as chocolate costs climb — Hershey may feel the pinch",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/halloween-gets-pricier-as-chocolate-costs-rise-hershey-could-feel-it.html",
-      "published": "2026-10-30 16:55:41",
-      "title_ko": "초콜릿 비용 상승으로 할로윈 물가 상승, 허시 영향 우려",
-      "summary_ko": "허시, 원가 압박 가능성"
-    },
-    {
-      "title": "Chevron and Exxon hit all-time highs as refining profits soar in reaction to Iran and Ukraine wars",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/chevron-exxon-cvx-xom-earnings-q3-2026.html",
-      "published": "2026-10-30 16:44:31",
-      "title_ko": "셰브론·엑슨모빌, 디젤 가격 급등에 정제 이익 폭증하며 실적 기대치 상회",
-      "summary_ko": "우크라이나·이란 정유소 공격으로 글로벌 디젤 가격 급등"
-    },
-    {
-      "title": "연준·ECB·BOJ 매파적 동결 기조",
-      "title_ko": "연준·ECB·BOJ 매파적 동결 기조",
-      "summary_ko": "주요국 중앙은행들이 금리를 동결했으나 추가 인상 가능성을 열어두는 매파적 입장을 유지",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=LWsMaaY0Mi4",
-      "published": "2026-10-30 11:57:27",
-      "kind": "media",
-      "tag": "금리",
-      "direction": "neutral",
-      "n_channels": 3
-    },
-    {
       "title": "빅테크 실적 부진과 AI 투자 우려",
       "title_ko": "빅테크 실적 부진과 AI 투자 우려",
       "summary_ko": "아마존과 인텔 등 빅테크 기업의 실적 실망과 AI 투자 대비 수익 창출 우려로 기술주 중심의 하락세가 나타났",
@@ -107,7 +107,7 @@
       "kind": "media",
       "tag": "실적",
       "direction": "negative",
-      "n_channels": 5
+      "n_channels": 4
     }
   ]
 }
