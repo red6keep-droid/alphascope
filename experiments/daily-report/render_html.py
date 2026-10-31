@@ -33,7 +33,7 @@ def _media_rows():
     global _rows_cache
     if _rows_cache is None:
         now = datetime.datetime.now(datetime.timezone.utc)
-        _rows_cache = media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=3))   # 48시간이 edition 사흘에 걸친다
+        _rows_cache = media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=8))   # 목록 48시간 + 한국장 방향 막대 `최근 7일` (P143) — edition 여드레
     return _rows_cache
 
 
@@ -814,12 +814,14 @@ def sec_news(input_data, report, analysis):
             return dk.arrow(series[sym].get("ret_1d"))
         return dk.arrow(quotes[sym].get("change_pct"))
 
-    items = []
+    items, dirs = [], {}
     for item in report.get("news", []):
         try:
             news_item = input_data.get("news", [])[item.get("index")]
         except (IndexError, TypeError):
             continue
+        if news_item.get("market_dir"):   # 공용 처리의 시장 전체 방향 — 없으면(옛 분류) 막대에 넣지 않는다 (P143)
+            dirs[news_item["market_dir"]] = dirs.get(news_item["market_dir"], 0) + 1
         theme = news_item.get("theme")
         if theme and theme not in THEME_VOCAB:
             theme = "기타"
@@ -845,7 +847,10 @@ def sec_news(input_data, report, analysis):
         media.append(dk.news_item(_esc(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"'))
     if not items and not media:
         return dk.muted("주요 뉴스 없음")
-    out = dk.item_rules(items + media[:MEDIA_SHOWN], sub=True, indent=dk.ALIGN_PX)   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
+    for k, v in media_feed.direction_counts(_media_lines()).items():   # 방송 줄도 같은 막대에 (엇갈림 = 불확실)
+        dirs[k] = dirs.get(k, 0) + v
+    out = dk.direction_bars(dirs, {})   # 엔비디아처럼 뉴스 방향 막대 — 데일리는 그날 글이라 `오늘` 만 (2026-10-31 사용자 P143)
+    out += dk.item_rules(items + media[:MEDIA_SHOWN], sub=True, indent=dk.ALIGN_PX)   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
     if len(media) > MEDIA_SHOWN:
         out += dk.fold(f"방송 {len(media) - MEDIA_SHOWN}건 더 보기", dk.item_rules(media[MEDIA_SHOWN:], sub=True, indent=dk.ALIGN_PX))
     return out

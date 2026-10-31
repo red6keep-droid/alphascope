@@ -310,15 +310,7 @@ def sec_chart_indicators(s):
     ma = R.ma_chart(tc["ma_rel"], tc.get("bench_ma_rel"), s["name"], "S&P 500")   # `지금 가격이 평균보다` 그래프는 접기 밖 — 그 아래 `차트 정보 보기` 버튼 (2026-10-29 사용자 P83)
     deep = ""   # 평균선 대비 = 세로 막대 + S&P 500 같은 값 (2026-10-27 사용자 P37)
     deep += R._multi2([("S&P 500 대비", R._arrow(tc.get("vs_spy"), 2, "%p")), (f"{etf} 대비", R._arrow(tc.get("vs_sector"), 2, "%p"))])
-    rsi, mc = tc.get("rsi14"), tc.get("ma_cross")
-    mc_html = {"golden": f'<span style="color:{UP};font-weight:700;">골든크로스</span>', "death": f'<span style="color:{DOWN};font-weight:700;">데드크로스</span>'}.get(
-        mc, f'<span style="color:{R.MUTED};">교차 없음</span>')
-    items = [(f"일중 변동폭 (고가−저가 · 흔히 {R.config.RANGE_PCT_EVENT:.0f}% 넘으면 큰 흔들림으로 봄)",
-              f'<span style="color:#111;font-weight:700;">{tc["range_pct"]:.2f}%</span>' if tc.get("range_pct") is not None else "—"),
-             ("단기 과열 온도 (RSI 14 · 흔히 70 넘으면 과열 · 30 아래면 침체로 읽음)",
-              f'<span style="color:#111;font-weight:700;">{rsi:.1f}</span>' if rsi is not None else "—", _no_record(R.rsi_tip(rsi))),
-             ("평균선 교차 (50일선이 200일선 위로 = 골든크로스)", mc_html, _no_record(R.cross_tip(mc)))]
-    deep += R._multi(items)
+    # 일중 변동폭 · 단기 과열 온도(RSI) · 평균선 교차는 뺐다 — `기술지표의 방향은?` 카드의 ATR · RSI · 이동평균 크로스와 겹친다 (2026-10-31 사용자, P139)
     return ma + (f'<details data-fold="1" data-label="차트 정보 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{R._fold_row("차트 정보 보기")}</summary>'
             f'<div style="margin-top:6px;">{deep}</div></details>')
 
@@ -422,13 +414,32 @@ def card_opinions(s):
     if verdict:
         lines.append((R.analysts_block(a), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
     if ps:
-        lines.append((R.picks_rows(ps, s.get("close"), money), "html"))   # 방송 묶음은 `매수 의견` 제목 · 구분선 (P92)
+        lines.append((R.picks_rows(ps, s.get("close"), money) + R.together_block(together_items(s)), "html"))   # 방송 묶음은 `매수 의견` 제목 · 구분선 (P92) · 함께 보기 (P142)
     tip = (f"애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 최근 {R.PICK_HOURS}시간에 나온 이 종목 의견을 한 카드에 모은 것\n"
            f"· 지금 : {state}" + (f" · 방송 {cnt}" if ps else "") + "\n"
            "· 나누는 법 : 애널리스트 중 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림. 방송 건수는 답에 넣지 않는다\n"
            "· 읽는 법 : 누가 어떤 이유로 말했는지 보는 칸이다. 적중률은 검증하지 않았고, 이 블로그의 추천이 아니다")
     theme, col = R.pick_theme(state)   # 매수면 오름 색 강조 카드 (P92)
     return R._state_card("애널리스트 · 방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance · 유튜브 방송 요약"), fold=True)
+
+
+EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
+
+
+def together_items(s):
+    """`Alpha Scope 데이터로 함께 보기` 줄 (P142) — 주가에 가까운 것부터: 내년 이익 예상 · 기술지표 방향 · 업종 자금. 방향 = 기록 계획 A5-3 분류표."""
+    out = []
+    eps = (s.get("expect") or {}).get("eps")
+    if eps:
+        out.append(("내년 이익 예상", eps["state"], EPS_DIR.get(eps["state"], 0), "실적", R.EPS_TITLE))
+    sig = (s.get("tech") or {}).get("signals")
+    if sig:
+        out.append(("기술지표 방향", sig["word"], (sig["net"] > 0) - (sig["net"] < 0), "오늘", "기술지표의 방향은?"))
+    sf = s.get("sector_flow")
+    if sf:
+        title = "반도체로 돈이 올까?" if sf["name"] == "반도체" else f"{sf['name']} 업종으로 돈이 올까?"
+        out.append((f"{sf['name']} 업종 자금", sf["state"], {"모이는 중": 1, "빠져나가는 중": -1}.get(sf["state"], 0), "오늘", title))
+    return out
 
 
 def sec_targets(s):
@@ -556,7 +567,7 @@ def card_capex(c):
 def sec_expect(s):
     """실적과 기대 탭 — NVDA 리포트 sec_expect 와 같은 질문 카드 넷 + 돈을 어디에 쓰나(2026-10-30). 비교 묶음 = 시총 상위 20개 (중앙값)."""
     ex = s.get("expect") or {}
-    spec = [("회사는 돈을 더 벌고 있나?", "revenue", R.card_revenue), ("애널리스트 전망은?", "eps", R.card_eps),
+    spec = [("회사는 돈을 더 벌고 있나?", "revenue", R.card_revenue), (R.EPS_TITLE, "eps", R.card_eps),
             ("시장 예상 흔들림은?", "move", R.card_move), ("하락에 거는 돈은?", "short", R.card_short), ("돈을 어디에 쓰나?", "capex", card_capex)]
     out = ""
     for i, (title, key, fn) in enumerate(spec):
@@ -630,7 +641,27 @@ def cal_peers(s, c):
     return lines, tip, f"{len(up)}곳 · 30일 안", left
 
 
+def cal_macro(c):
+    """시장 전체 일정 — 가장 가까운 1~2개만 한 줄로, 전체는 미국 증시 리포트 `일정` 탭으로 (2026-10-31 사용자 P144: 모든 종목에 같은 공통 정보는
+    공통 정보 보는 곳으로). 엔비디아 리포트는 R.cal_macro(전체 카드) 그대로. 링크는 발행 때 최신 글로 바뀐다(publish_pages.DAILY_LATEST)."""
+    up = c["upcoming"]
+    link = (f'<a href="{U.DAILY_REPORTS_URL}#tab-일정" data-row-link="1" style="display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:44px;'
+            f'color:#1a73e8;text-decoration:none;font-size:{_dk.EMPH_Q};">미국 증시 리포트 일정에서 전체 보기<span aria-hidden="true">›</span></a>')
+    if not up:
+        return [("앞으로 30일 안에 잡힌 큰 경제 일정이 없다.", "plain"), (link, "html")], "", "없음", None
+    name = lambda u: R.cal_cards.MACRO_KO.get(u["kind"], u["label"])   # noqa: E731
+    near = " · ".join(f"{name(u)}({R._md_short(u['day'])})" for u in up[:2])
+    first = f"가장 가까운 큰 일정은 {near}이다." + (f" 30일 안에 모두 {len(up)}건이 있다." if len(up) > 2 else "")
+    tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정. 모든 종목에 같은 내용이라 전체 일정과 지난 일정 날 S&P 500 움직임은 미국 증시 리포트 `일정` 탭에 모았다\n"
+           f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {name(up[0])} {R._md_short(up[0]['day'])}")
+    return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED"), f"{len(up)}건 · 30일 안", None
+
+
+STOCK_KINDS = ("EARNINGS", "EARNINGS_PEER")   # `전체 일정 보기` 는 이 종목 일정만 — 시장 공통 일정은 미국 증시 리포트로 (P144)
+
+
 def _all_list(s, items):
+    items = [c for c in items if c.get("kind") in STOCK_KINDS]
     kinds = dict(R.rr.KIND_KO, EARNINGS=f"{s['name']} 실적", EARNINGS_PEER="함께 보는 회사 실적")
     d0 = datetime.date.fromisoformat(s["day"])
     rows = [(f'<span style="color:#111;">{_esc(R._d(c["day"]))}</span>', R._pill(kinds.get(c["kind"], c["kind"]), "area"),
@@ -642,7 +673,7 @@ def sec_calendar(s):
     """캘린더 탭 — NVDA 리포트 sec_calendar 와 같은 질문 카드(실적 · 같은 업종 실적 · 시장 일정). 소송 카드는 없다(추적하는 사건이 없다)."""
     cc = s.get("calendar_cards") or {}
     specs = [("다음 실적 발표는?", "earnings", lambda c: cal_earnings(s, c)), ("함께 보는 회사 실적은?", "peers", lambda c: cal_peers(s, c)),
-             ("시장 전체를 흔들 일정은?", "macro", R.cal_macro)]
+             ("시장 전체를 흔들 일정은?", "macro", cal_macro)]
     out, first = "", True
     for title, key, fn in specs:
         c = cc.get(key)
@@ -671,7 +702,7 @@ def detail_body(s, today, news=None):
     return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_tech(s) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
                 + R._section("실적", sec_expect(s), tab="실적")
-                + R._section("캘린더", sec_calendar(s), tab="캘린더")
+                + R._section("일정", sec_calendar(s), tab="일정")   # 캘린더 → 일정 (P145)
                 + related(s) + list_marker(U.LIST_URL))   # 출처 · 투자 권유 꼬리말은 뺐다 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자)
 
 

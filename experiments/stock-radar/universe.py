@@ -115,6 +115,7 @@ BLOG = "https://alpha-scope.blogspot.com"
 LIST_SLUG = "us-market-cap-top10"
 LIST_TITLE = "미국 시가총액 상위 10개 종목 주가"
 LIST_SLUG_TITLE = "us market cap top10"   # 처음 만들 때 이 제목으로 → 주소 고정, 바로 한글 제목으로 바꾼다
+DAILY_REPORTS_URL = BLOG + "/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91"   # 미국 증시 리포트(라벨 데일리 브리핑) 목록 — 종목 `일정` 탭 링크의 임시 주소, 발행 때 최신 글로 바꾼다 (P144)
 NVDA_REPORTS_URL = BLOG + "/search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84"   # 리포트형 상세의 임시 링크(라벨 목록). 발행 때 최신 글 주소로 바꾼다
 
 BY_SYM = {c[0]: c for c in CANDIDATES}

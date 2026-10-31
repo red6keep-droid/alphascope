@@ -100,7 +100,7 @@ def card_eps(sym, extra, group):
     c30 = bars[1]["stock"]
     if c30 is None:
         return None
-    state = "더 좋게 봄" if c30 >= EX.EPS_PCT else "더 나쁘게 봄" if c30 <= -EX.EPS_PCT else "그대로"   # 전망 말로 (2026-10-27 사용자 B안)
+    state = "높아지는 중" if c30 >= EX.EPS_PCT else "낮아지는 중" if c30 <= -EX.EPS_PCT else "그대로"   # 재는 것 그대로 (2026-10-31 사용자 P141: `더 나쁘게 봄` 이 종목 의견처럼 읽혀 방송 매수 의견과 상충해 보였다. 옛 B안 10-27)
     return {"state": state, "c30": c30, "bars": bars, "current": me["current"], "up30": me.get("up30"), "down30": me.get("down30")}
 
 

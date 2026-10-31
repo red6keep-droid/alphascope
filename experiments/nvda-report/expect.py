@@ -2,7 +2,7 @@
 
 비교 대상 (가이드라인 1-4-1 : 그래프에는 반드시 비교 대상)
   1. 회사는 돈을 더 벌고 있나?      분기 매출 1년 전 대비 · 기술주 15개 중앙값 (SEC XBRL companyfacts, 주 1회)
-  2. 애널리스트 전망은?    내년 1주당 이익 예상치 7 · 30 · 60 · 90일 변화 · 기술주 15개 중앙값 (yfinance eps_trend, 매일)
+  2. 내년 이익 예상은?    내년 1주당 이익 예상치 7 · 30 · 60 · 90일 변화 · 기술주 15개 중앙값 (yfinance eps_trend, 매일)
   3. 시장 예상 흔들림은?   옵션 30일 내재변동성 ÷ √252 vs 평소 하루(EWMA) · S&P 500 한 쌍 (매일)
   4. 하락에 거는 돈은?              공매도 비율(유통 주식 대비) 지난달 · 이번 달 · 기술주 15개 중앙값 (yfinance info, 매일 — 값은 격주로 바뀐다)
 수집 결과는 meta 에 JSON 으로 둔다 (state_io 가 meta 를 통째로 내보내므로 Actions 에서도 이어진다).
@@ -239,7 +239,7 @@ def card_eps(conn):
     wins = (("7일", "7daysAgo"), ("30일", "30daysAgo"), ("60일", "60daysAgo"), ("90일", "90daysAgo"))
     bars = [{"label": lb, "stock": chg(me, k), "peers": _med([chg(e, k) for s, e in dd["eps"].items() if "current" in e])} for lb, k in wins]
     c30 = bars[1]["stock"]
-    state = "더 좋게 봄" if c30 is not None and c30 >= EPS_PCT else "더 나쁘게 봄" if c30 is not None and c30 <= -EPS_PCT else "그대로"   # 전망 말로 (2026-10-27 사용자 B안, 옛 올라가는 중 · 내려가는 중 · 큰 변화 없음)
+    state = "높아지는 중" if c30 is not None and c30 >= EPS_PCT else "낮아지는 중" if c30 is not None and c30 <= -EPS_PCT else "그대로"   # 전망 말로 (2026-10-27 사용자 B안, 옛 올라가는 중 · 내려가는 중 · 큰 변화 없음)
     return {"state": state, "c30": c30, "bars": bars, "current": me["current"], "up30": me.get("up30"), "down30": me.get("down30")}
 
 

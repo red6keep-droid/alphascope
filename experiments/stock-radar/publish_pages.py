@@ -70,9 +70,26 @@ def targets(only=None):
     return out
 
 
+DAILY_LATEST = ""   # 미국 증시 리포트 최신 글 주소 — publish 가 한 번 찾는다 (P144)
+
+
+def _latest_daily(requests, blog_id, headers):
+    """라벨 `데일리 브리핑` 최신 글 주소. 못 찾으면 "" (링크는 라벨 목록 그대로)."""
+    try:
+        r = requests.get(f"{publish_blogger.BLOGGER_API}/blogs/{blog_id}/posts", params={"labels": "데일리 브리핑", "maxResults": 1, "fetchBodies": "false",
+                                                                                         "fetchImages": "false", "orderBy": "published"}, headers=headers, timeout=60)
+        r.raise_for_status()
+        return ((r.json().get("items") or [{}])[0]).get("url") or ""
+    except Exception as e:  # noqa: BLE001
+        print(f"[pages] 미국 증시 리포트 최신 글 못 찾음 — 라벨 목록 링크로: {str(e)[:80]}")
+        return ""
+
+
 def _body(path):
     with open(path, encoding="utf-8") as f:
         body = f.read()
+    if DAILY_LATEST:   # 일정 탭 `미국 증시 리포트 일정에서 전체 보기` → 최신 글의 일정 탭 (P144)
+        body = body.replace(U.DAILY_REPORTS_URL, DAILY_LATEST)
     if os.path.exists(NVDA_POST_URL):
         url = open(NVDA_POST_URL, encoding="utf-8").read().strip()
         if url:
@@ -102,6 +119,8 @@ def publish(only=None, dry=False):
     blog_id = publish_blogger._blog_id(creds, blog_url)
     headers = {"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"}
     base = f"{publish_blogger.BLOGGER_API}/blogs/{blog_id}/pages"
+    global DAILY_LATEST
+    DAILY_LATEST = _latest_daily(requests, blog_id, headers)
     # 페이지 목록은 한 번에 10개씩 온다 — 다음 쪽(nextPageToken)까지 다 읽는다.
     # 첫 쪽만 읽어 이미 있는 10개를 "없다"고 보고 _숫자 주소의 중복 페이지 10개를 만든 적이 있다 (2026-10-18 CI 첫 실행)
     items, token = [], None

@@ -661,8 +661,12 @@ def _formal_word(w):
     return w + "입니다"                        # 받침 없는 이름씨 + 다 : 회사다 · 날짜다 → 회사입니다 · 날짜입니다
 
 
+_FINAL_DA_SYM = re.compile(r"(?<=[0-9%)A-Za-z])다(?=(?:\.|\n|$|<))")   # 숫자 · % · 괄호 · 영문 바로 뒤 서술격 `다` — `5%다.` · `6위(점유율 6.4%)다.` → `…입니다.` (2026-10-31 P146: 기업 소개에서 바뀌지 않던 것)
+
+
 def _formal_text(s):
-    return _FINAL_DA.sub(lambda m: (_formal_word(m.group(1)) or m.group(1) + "다"), s)
+    s = _FINAL_DA.sub(lambda m: (_formal_word(m.group(1)) or m.group(1) + "다"), s)
+    return _FINAL_DA_SYM.sub("입니다", s)
 
 
 # ---------------------------------------------------------------- 뉴스 · 중요 이슈 = 명사형 헤드라인체 (2026-10-18 사용자: "원래 이슈와 뉴스 문체는 다 로 끝나지 않았다 — 데일리 확인")
@@ -1437,3 +1441,42 @@ def stock_row_link(row_html, sym):
     if not href or not row_html.lstrip().startswith("<span "):
         return row_html
     return row_html.replace("<span ", f'<span data-row-link="1" data-href="{esc(href)}" ', 1)
+
+
+# ---------------------------------------------------------------- 막대 + 범례 (애널리스트 등급 · 뉴스 방향 공통)
+# 엔비디아 리포트(render_html)에서 옮겨 왔다 — 데일리 · 한국 증시 리포트도 같은 막대를 쓰도록 (2026-10-31 사용자 P143). 엔비디아 render_html 은 이 함수를 가리킨다.
+BAR_PASTEL = {"positive": ("#F8C4BF", "#7F1D1D"), "negative": ("#BCD3F5", "#1E3A8A"),
+              "uncertain": ("#FADDB0", "#7C2D12"), "neutral": ("#E2E8F0", "#475569")}
+BAR_H, BAR_NUM, BAR_PAD = 30, "17px", 5   # 막대 안 숫자 18 → 17 (2026-10-14 사용자)   # 높이 26 → 30 (+15%, 2026-10-14 사용자) · 막대 위아래 +5   # 막대 높이 24 → 26 (+10%, 정수) · 막대 안 숫자 19 → 18 (2026-10-13 사용자, 가이드라인 10-7)
+LEGEND_CHIP = 9      # 범례 색 사각형 11 → 9px (20% 줄임, 2026-10-17 사용자)
+LEGEND_INDENT = 10   # 범례 왼쪽 들여쓰기 (2026-10-17 사용자)
+BAR_GROUP_GAP = 24   # 뉴스 막대 묶음(오늘 · 최근 7일) 사이 보이는 여백 (2026-10-12 사용자)
+DIR_KO = {"positive": "긍정", "negative": "부정", "uncertain": "불확실", "neutral": "중립"}
+MICRO = "14px"
+
+
+def legend_bar(title, segs):
+    """막대 + 색 범례 — 제목(왼쪽, 검정 굵게) · 막대 · 막대 색과 같은 범례 칩 (애널리스트 · 뉴스 공통, 2026-10-17 사용자: 뉴스도 같은 모양).
+    segs = [(이름, 개수, 배경, 글자)], 0건은 뺀다. 범례는 왼쪽에서 10px 들여쓴다."""
+    segs = [x for x in segs if x[1]]
+    total = sum(x[1] for x in segs)
+    if not total:
+        return ""
+    head = f'<span style="display:block;font-size:{BAR_LABEL};line-height:{LH_CARD};margin:0 0 3px;color:#111;font-weight:700;">{esc(title)}</span>'
+    body = "".join(f'<span style="display:block;width:{c / total * 100:.1f}%;background:{bg};color:{fg};font-size:{BAR_NUM};font-weight:700;'
+                   f'text-align:center;line-height:{BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{c / total * 100:.0f}%" if c / total >= 0.08 else ""}</span>' for _, c, bg, fg in segs)
+    bar_html = f'<span style="display:flex;width:100%;height:{BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:{BAR_PAD}px 0 {3 + BAR_PAD}px;">{body}</span>'
+    legend = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
+                     f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{nm} {c / total * 100:.0f}%</span>' for nm, c, bg, _ in segs)
+    return head + bar_html + (f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{legend}</span>')
+
+
+def direction_bars(today, week):
+    """뉴스 방향 막대 두 개 (오늘 · 최근 7일) 를 흰 카드 하나에 — today · week = {positive · negative · uncertain · neutral: 건수}. 둘 다 0건이면 빈 문자열."""
+    if not sum((today or {}).values()) and not sum((week or {}).values()):
+        return ""
+    bar = lambda label, c: legend_bar(f"{label} {sum(c.values())}건", [(DIR_KO[d], c.get(d, 0), *BAR_PASTEL[d]) for d in ("positive", "negative", "uncertain", "neutral")])   # noqa: E731
+    # 두 막대 묶음 사이 보이는 24px (2026-10-12 사용자) — 앞 묶음 비율 글자 → 다음 라벨 글자, 행간 반쪽 3 + 3 을 뺀 값
+    gap = f'<span style="display:block;height:{BAR_GROUP_GAP - 5}px;"></span>' if sum((today or {}).values()) and sum((week or {}).values()) else ""   # 한쪽이 비면 그 막대 · 사이 여백 없이 (데일리 = 오늘만)
+    return (f'<div data-cards="1" style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{SEP_GAP - 3}px 12px {SEP_GAP - 3 - 10}px;">{bar("오늘", today or {})}'   # 두 막대를 카드 하나에 (2026-10-13 사용자)
+            f'{gap}{bar("최근 7일", week or {})}</div>')
