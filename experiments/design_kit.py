@@ -1477,5 +1477,6 @@ def direction_bars(today, week):
         return ""
     bar = lambda label, c: legend_bar(f"{label} {sum(c.values())}건", [(DIR_KO[d], c.get(d, 0), *BAR_PASTEL[d]) for d in ("positive", "negative", "uncertain", "neutral")])   # noqa: E731
     # 두 막대 묶음 사이 보이는 24px (2026-10-12 사용자) — 앞 묶음 비율 글자 → 다음 라벨 글자, 행간 반쪽 3 + 3 을 뺀 값
+    gap = f'<span style="display:block;height:{BAR_GROUP_GAP - 5}px;"></span>' if sum((today or {}).values()) and sum((week or {}).values()) else ""   # 한쪽이 비면 그 막대 · 사이 여백 없이 (데일리 = 오늘만)
     return (f'<div data-cards="1" style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{SEP_GAP - 3}px 12px {SEP_GAP - 3 - 10}px;">{bar("오늘", today or {})}'   # 두 막대를 카드 하나에 (2026-10-13 사용자)
-            f'<span style="display:block;height:{BAR_GROUP_GAP - 5}px;"></span>{bar("최근 7일", week or {})}</div>')
+            f'{gap}{bar("최근 7일", week or {})}</div>')

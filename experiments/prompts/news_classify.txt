@@ -18,6 +18,7 @@ For each item return:
   "issue": string,              // ONE code from ISSUE below
   "subtopic": string,           // SHORTEST canonical noun phrase, 2-4 words, reused across items ("Tariff", "Oil Prices", "Memory Chips"). "" if none
   "scope": "market" | "sector" | "stock",   // what the item is about: the whole market, one sector, or one company
+  "market_dir": "positive" | "negative" | "uncertain" | "neutral",   // tone of the item for US stocks as a whole, as written: positive = good news for the broad market, negative = bad news, uncertain = mixed or unclear consequences, neutral = no bearing on the overall market. Label the news, do not predict prices
   "countries": string[],        // countries/regions involved, English short names ("China", "EU", "Japan"). [] if none
   "scheduled": boolean,         // true if a pre-announced release/decision/report (CPI, FOMC, earnings date), false if unexpected
   "surprise": integer -2..2     // for scheduled items: vs expectations (-2 much worse ... +2 much better); 0 if unknown or unscheduled

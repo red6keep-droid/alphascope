@@ -216,6 +216,7 @@ def _apply(store, res, model, label, leads=None):
         x["detail"] = (r.get("detail") or "").replace(" — ", ", ").replace("—", ", ").strip() or None
         if x["detail"] and (x["detail"] == x["fact"] or detail_style_bad(x["detail"]) or fact_problem(x, "detail", src)):
             x["detail"] = None
+        x["market_dir"] = r.get("market_dir") if r.get("market_dir") in DIRS else None   # 시장 전체에 대한 뉴스 방향 — 데일리 뉴스 방향 막대 (2026-10-31 사용자 P143). 빠져도 분류는 살린다
         x.update(issue_codes.coerce(r))   # 이슈 코드 · 세부 주제 · 범위 · 국가 · 예정 · 놀람 (doc/기획/이슈-분류-코드표.md, 2026-10-21) — 어휘 밖이면 OTHER
         _cap(x)
         why = fact_problem(x, "fact", src)

@@ -641,7 +641,27 @@ def cal_peers(s, c):
     return lines, tip, f"{len(up)}곳 · 30일 안", left
 
 
+def cal_macro(c):
+    """시장 전체 일정 — 가장 가까운 1~2개만 한 줄로, 전체는 미국 증시 리포트 `일정` 탭으로 (2026-10-31 사용자 P144: 모든 종목에 같은 공통 정보는
+    공통 정보 보는 곳으로). 엔비디아 리포트는 R.cal_macro(전체 카드) 그대로. 링크는 발행 때 최신 글로 바뀐다(publish_pages.DAILY_LATEST)."""
+    up = c["upcoming"]
+    link = (f'<a href="{U.DAILY_REPORTS_URL}#tab-일정" data-row-link="1" style="display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:44px;'
+            f'color:#1a73e8;text-decoration:none;font-size:{_dk.EMPH_Q};">미국 증시 리포트 일정에서 전체 보기<span aria-hidden="true">›</span></a>')
+    if not up:
+        return [("앞으로 30일 안에 잡힌 큰 경제 일정이 없다.", "plain"), (link, "html")], "", "없음", None
+    name = lambda u: R.cal_cards.MACRO_KO.get(u["kind"], u["label"])   # noqa: E731
+    near = " · ".join(f"{name(u)}({R._md_short(u['day'])})" for u in up[:2])
+    first = f"가장 가까운 큰 일정은 {near}이다." + (f" 30일 안에 모두 {len(up)}건이 있다." if len(up) > 2 else "")
+    tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정. 모든 종목에 같은 내용이라 전체 일정과 지난 일정 날 S&P 500 움직임은 미국 증시 리포트 `일정` 탭에 모았다\n"
+           f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {name(up[0])} {R._md_short(up[0]['day'])}")
+    return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED"), f"{len(up)}건 · 30일 안", None
+
+
+STOCK_KINDS = ("EARNINGS", "EARNINGS_PEER")   # `전체 일정 보기` 는 이 종목 일정만 — 시장 공통 일정은 미국 증시 리포트로 (P144)
+
+
 def _all_list(s, items):
+    items = [c for c in items if c.get("kind") in STOCK_KINDS]
     kinds = dict(R.rr.KIND_KO, EARNINGS=f"{s['name']} 실적", EARNINGS_PEER="함께 보는 회사 실적")
     d0 = datetime.date.fromisoformat(s["day"])
     rows = [(f'<span style="color:#111;">{_esc(R._d(c["day"]))}</span>', R._pill(kinds.get(c["kind"], c["kind"]), "area"),
@@ -653,7 +673,7 @@ def sec_calendar(s):
     """캘린더 탭 — NVDA 리포트 sec_calendar 와 같은 질문 카드(실적 · 같은 업종 실적 · 시장 일정). 소송 카드는 없다(추적하는 사건이 없다)."""
     cc = s.get("calendar_cards") or {}
     specs = [("다음 실적 발표는?", "earnings", lambda c: cal_earnings(s, c)), ("함께 보는 회사 실적은?", "peers", lambda c: cal_peers(s, c)),
-             ("시장 전체를 흔들 일정은?", "macro", R.cal_macro)]
+             ("시장 전체를 흔들 일정은?", "macro", cal_macro)]
     out, first = "", True
     for title, key, fn in specs:
         c = cc.get(key)

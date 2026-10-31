@@ -117,7 +117,8 @@ def process(items):
             if not x.get("ai_model"):
                 continue
             it.update(headline_ko=news_store.headline(x), detail_ko=news_store.summary(x), theme=news_store.theme(x), related=news_store.related(x),
-                      issue=x.get("issue"), subtopic=x.get("subtopic"), scope=x.get("scope"), scheduled=x.get("scheduled"), surprise=x.get("surprise"))
+                      issue=x.get("issue"), subtopic=x.get("subtopic"), scope=x.get("scope"), scheduled=x.get("scheduled"), surprise=x.get("surprise"),
+                      market_dir=x.get("market_dir"))   # 뉴스 방향 막대 (P143)
         print(f"[공용 처리] 헤드라인 {sum(1 for it in items if it.get('headline_ko'))}/{len(items)} (홈이 처리해 둔 것 {sum(1 for k in mine if k in store)})")
     except Exception as e:  # noqa: BLE001
         print(f"::warning::공용 뉴스 처리 실패 — 데일리 AI 제목으로: {str(e)[:120]}")
