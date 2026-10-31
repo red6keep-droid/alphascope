@@ -904,8 +904,8 @@ def together_block(items, outer=None):
                     f'<span style="min-width:0;color:#111;">{_esc(nm)}{hz}</span>'
                     f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;font-weight:{400 if d == 0 else 700};color:{col};">{_esc(st.lstrip("▲▼ "))}'
                     f'{TS.box(kind, word, _esc)}{OUT_ICON}</span></span>')   # 대답 → 라벨 → 나가는 아이콘(대답 색). 중립 대답은 보통 굵기 · 조금 빠진 검정 (P173)
-    title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 8px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')   # 16 → 18 (P169) · 가운데 (P170)
-    return (f'<span data-together="1" style="{MULTI}margin:19px {_dk.CHART_CARD_X}px 0;padding:{_dk.CHART_CARD_PAD + 4}px 12px 12px;">{title}{out}</span>{TOGETHER_END}')   # 그래프와 같은 흰 카드로 감싼다 (2026-10-31 사용자 P171, 옛 구분선 + 위 19)
+    title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 16px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')   # 16 → 18 (P169) · 가운데 (P170) · 위 14 → 22 · 아래 8 → 16 (P174)
+    return (f'<span data-together="1" style="{MULTI}margin:19px {_dk.CHART_CARD_X}px 0;padding:{_dk.CHART_CARD_PAD + 12}px 12px 12px;">{title}{out}</span>{TOGETHER_END}')   # 그래프와 같은 흰 카드로 감싼다 (2026-10-31 사용자 P171, 옛 구분선 + 위 19)
 
 
 PICK_REASON_LH = "26px"   # 방송 의견 이유 문장 행간 — 24 × 1.1 → 정수 26 (2026-10-31 사용자 P169)
