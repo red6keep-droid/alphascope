@@ -10,6 +10,7 @@
 import datetime
 import html as html_mod
 import json
+import math
 import os
 import re
 import sys
@@ -631,6 +632,90 @@ def year_range_in(y, money, tip, high_days=None):
     # 최저 · 최고는 줄바꿈 금지 — 가운데 `(오늘 …)` 는 뺐다(머리 줄에 오늘 가격, 2026-10-26). 카드 안 아래 = 좌우 12 보이는 거리(P32 와 같게)
     card = f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px {12 - 3}px;">{gauge}{ends}</span></span>'
     return ("white", f'<span style="display:block;margin:0 0 8px;">{head}</span>{card}')
+
+
+# ---------------------------------------------------------------- 선 그래프 (2026-10-31 사용자 — 그래프 비교 목업에서 정한 모양, P161)
+# 최신 = 오른쪽 · 세로 눈금 = 오른쪽 · 처음엔 오른쪽 끝(최신)이 보이고 왼쪽으로 넘겨 과거 · 왼쪽 그림자(넘길 것이 남았을 때만, 테마 JS data-lscroll) ·
+# `‹ 넘겨 보기` 왼쪽 · 범례 오른쪽 · 단위는 그 아래 오른쪽. 이 종목 선 2px · 비교 선 1.25px 회색 점선 · 속 빈 동그라미, 최신 점만 굵은 테두리.
+# 최신 값 13px 굵게 · 나머지 12px 보통(세로 눈금 숫자와 같게) · 두 선 중 위에 있는 쪽 숫자는 위, 아래 쪽은 아래 · 비교 선을 먼저 그려 이 종목 선이 위.
+# 최신 가로축 이름 = 이 종목 색 + 글자 위 3px 강조점.
+LINE_W, LINE_W2, DOT_R, DOT_SW, LAST_R, LAST_SW = 2, 1.25, 3, 1.5, 4.5, 4
+LINE_H, LINE_STEP, LINE_GRAY = 230, 46, "#9CA3AF"
+
+
+def _nice_ticks(lo, hi, n=4):
+    if hi == lo:
+        hi = lo + 1
+    raw = (hi - lo) / n
+    mag = 10 ** math.floor(math.log10(raw))
+    step = min((s * mag for s in (1, 2, 2.5, 5, 10) if s * mag >= raw), default=raw)
+    a, b = math.floor(lo / step) * step, math.ceil(hi / step) * step
+    out, v = [], a
+    while v <= b + step / 2:
+        out.append(round(v, 10))
+        v += step
+    return out
+
+
+def line_chart(labels, series, fmt, unit=""):
+    """선 그래프 흰 카드 — labels 오래된 것 → 최신, series = [(이름, 값 목록(None 허용), 색, 점선?)] 첫째 = 이 종목, 둘째 = 비교(회색 점선)."""
+    n = len(labels)
+    vals = [v for _, xs, _, _ in series for v in xs if v is not None]
+    if not vals or n < 2:
+        return ""
+    ticks = _nice_ticks(min(vals), max(vals))
+    lo, hi = ticks[0], ticks[-1]
+    est = lambda t, px=12: sum(px if ord(c) > 0x2E80 else px * 0.6 for c in str(t))   # noqa: E731
+    step = max(LINE_STEP, max(est(x) for lb in labels for x in lb.split("\n")) + 12, max(est(fmt(v), 13) for v in vals) + 14)
+    axis_w = int(max(est(f"{t:,.0f}" if float(t).is_integer() else fmt(t)) for t in ticks) + 8)
+    top, bot = 30, 52 if any("\n" in lb for lb in labels) is False else 66
+    w = int(max(n * step, 260))
+    y = lambda v: top + (hi - v) / (hi - lo) * (LINE_H - top - bot)   # noqa: E731
+    x = lambda i: step / 2 + i * step   # noqa: E731
+    g = "".join(f'<line x1="0" x2="{w}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
+    if lo < 0 < hi:
+        g += f'<line x1="0" x2="{w}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#CBD5E1" stroke-width="1"/>'
+    main, comp = series[0][1], (series[1][1] if len(series) > 1 else [None] * n)
+    lines = dots = labs = ""
+    for k, (nm, xs, col, dash) in reversed(list(enumerate(series))):   # 비교 선 먼저 — 이 종목 선이 위에 덮는다
+        pts = [(i, x(i), y(v)) for i, v in enumerate(xs) if v is not None]
+        d = " ".join(f"{px:.1f},{py:.1f}" for _, px, py in pts)
+        lines += (f'<polyline points="{d}" fill="none" stroke="{col}" stroke-width="{LINE_W if k == 0 else LINE_W2}" stroke-linejoin="round" stroke-linecap="round"'
+                  + (' stroke-dasharray="6 5"' if dash else "") + "/>")
+        for j, (i, px, py) in enumerate(pts):
+            last = j == len(pts) - 1
+            big = k == 0 and last
+            dots += f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{LAST_R if big else DOT_R}" fill="#fff" stroke="{col}" stroke-width="{LAST_SW if big else DOT_SW}"/>'
+            other = comp[i] if k == 0 else main[i]
+            up = (xs[i] >= other) if other is not None else (k == 0)
+            labs += (f'<text x="{px:.1f}" y="{py - 10 if up else py + 20:.1f}" text-anchor="middle" font-size="{13 if big else 12}" font-weight="{700 if big else 400}" '
+                     f'fill="{col}">{_esc(fmt(xs[i]))}</text>')
+    c0 = series[0][2]
+
+    def xl_text(i, lb):
+        parts = lb.split("\n")
+        col = c0 if i == n - 1 else NOTE
+        base = LINE_H - 8 - 16 * (len(parts) - 1)
+        return "".join(f'<text x="{x(i):.1f}" y="{base + 16 * j}" text-anchor="middle" font-size="12" fill="{col}">{_esc(t)}</text>' for j, t in enumerate(parts))
+    xl = "".join(xl_text(i, lb) for i, lb in enumerate(labels))
+    nl = len(labels[-1].split("\n"))
+    xl += f'<circle cx="{x(n - 1):.1f}" cy="{LINE_H - 25 - 16 * (nl - 1)}" r="1.5" fill="{c0}"/>'   # 최신 이름 위 강조점
+    svg = f'<svg width="{w}" height="{LINE_H}" viewBox="0 0 {w} {LINE_H}" style="display:block;direction:ltr;">{g}{lines}{dots}{labs}{xl}</svg>'
+    tf = (lambda t: f"{t:,.0f}".replace("-", "−")) if all(float(t).is_integer() for t in ticks) else fmt   # 눈금이 모두 정수면 소수점 없이 (80.0 · 100 섞임 방지)
+    axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{NOTE};">{_esc(tf(t))}</span>' for t in ticks)
+    shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
+             'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>')   # 왼쪽 그림자 — 테마 JS 가 맨 왼쪽에서 끈다
+    scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{axis_w}px;">'
+              f'<span style="display:inline-block;direction:ltr;">{svg}</span></span>')
+    chips = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin-left:12px;white-space:nowrap;">'
+                    f'<svg width="22" height="10" aria-hidden="true"><line x1="1" x2="21" y1="5" y2="5" stroke="{col}" stroke-width="{LINE_W if i == 0 else LINE_W2}"'
+                    + (' stroke-dasharray="4 3"' if dash else "") + f'/><circle cx="11" cy="5" r="3" fill="#fff" stroke="{col}" stroke-width="{DOT_SW}"/></svg>{_esc(nm)}</span>'
+                    for i, (nm, _, col, dash) in enumerate(series))
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 2px;font-size:{TINY};line-height:20px;color:{NOTE};">'
+            f'<span style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span><span style="display:flex;flex-wrap:wrap;justify-content:flex-end;">{chips}</span></span>'
+            + (f'<span style="display:block;text-align:right;margin:0 0 6px;font-size:12px;line-height:18px;color:{NOTE};">(단위: {_esc(unit)})</span>' if unit else ""))
+    return (f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 8px;">{head}'
+            f'<span style="display:block;position:relative;">{scroll}{shade}<span style="position:absolute;top:0;right:0;width:{axis_w - 4}px;height:{LINE_H}px;text-align:right;">{axis}</span></span></span></span>')
 
 
 def month_range_in(bb, money, tip, state, color, title="한 달간 변화 범위", top=16):

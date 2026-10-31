@@ -401,10 +401,15 @@ def _yoy_groups(series, key, label, n=6):
     return out[::-1]   # 최신이 왼쪽 — 넘겨 보기는 오른쪽(과거)으로 (2026-10-28 사용자 P79, 위 봉차트는 그대로)
 
 
-def _yoy_chart(title, groups, fmt):
+LINE_THIS = "#5B8DEF"   # 선 그래프 이 종목(올해) 선 — 그래프 비교 목업에서 정한 파랑 (P161)
+
+
+def _yoy_chart(title, groups, fmt, unit="", now="올해", then="작년 같은 때"):
+    """올해 vs 작년 같은 때 — 선 그래프 (2026-10-31 사용자 P161: 업계 상황 탭부터, 옛 막대 최신 왼쪽). groups = _yoy_groups(최신이 앞) 그대로 받아 뒤집는다."""
     if not groups:
         return []
-    chart = R._chart_card(groups, [lambda v: _THIS, lambda v: _LAST], [lambda v: "#111", lambda v: NOTE], [("올해", _THIS), ("작년 같은 때", _LAST)], fmt=fmt)
+    gs = groups[::-1]   # 오래된 것 → 최신
+    chart = R.line_chart([g for g, _ in gs], [(now, [v[0] for _, v in gs], LINE_THIS, False), (then, [v[1] for _, v in gs], R.LINE_GRAY, True)], fmt, unit)
     return [(f'{_dk.CHART_TITLE_M}{_esc(title)}</span>{chart}', "html")]
 
 
@@ -442,7 +447,7 @@ def card_industry_mood(s):
     v0 = f"{f0['v']:.0f}"
     lines = [(f"{b['industry_name']} 회사들이 느끼는 {f0['name']} 경기(BSI)는 {_dk.josa(v0, '로')} 석 달 전보다 {_sgn(d3, 0)}p, "
               f"2009년 이후 아래에서 {f0['pct_all']:.0f}% 지점이다." + R.small_note("100보다 낮으면 나쁘다고 답한 회사가 더 많다는 뜻입니다."), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
-    lines += _yoy_chart(f"{f0['name']} 경기(BSI), 올해와 작년 같은 달", _yoy_groups(ser, "month", _mo), lambda v: f"{v:.0f}")   # `업황 BSI` → `업황 경기(BSI)` (P66)
+    lines += _yoy_chart(f"{f0['name']} 경기(BSI), 올해와 작년 같은 달", _yoy_groups(ser, "month", _mo, n=12), lambda v: f"{v:.0f}")   # `업황 BSI` → `업황 경기(BSI)` (P66) · 선 그래프 12개월 (P161)
     for r in b["rows"]:
         lines.append(("row", f"{r['name']} 경기(BSI)", f"{r['v']:.0f}", f"{r['month'][:4]}년 {int(r['month'][5:])}월 실적 · 전달보다 {_sgn(r['chg'], 0)}p · 2009년 이후 아래에서 {r['pct_all']:.0f}% 지점"
                       + (f" · 다음 달 전망 {r['forecast']:.0f}" if r.get("forecast") is not None else "")))
@@ -512,8 +517,8 @@ def card_industry_work(s):
     div, u = _chart_unit(r0["kind"])
     scaled = [dict(x, v=x["v"] / div) for x in r0.get("series") or []]   # 단위를 먼저 나눠 그린다 — 막대 숫자만 나누면 세로 눈금이 5000000 처럼 원래 숫자로 나왔다 (2026-10-31)
     chart_name = r0["name"].replace(" (전차 · 무기 · 탄약)", "")   # 그래프 제목엔 품목 괄호를 빼고 (2026-10-31 사용자 P135) — 근거 줄 · 툴팁에는 그대로
-    lines += _yoy_chart(f"{chart_name}, 올해와 작년 같은 달" + (f" ({u})" if u else ""), _yoy_groups(scaled, "month", _mo),
-                        lambda v: f"{v:,.1f}" if v < 100 else f"{v:,.0f}")
+    lines += _yoy_chart(f"{chart_name}, 올해와 작년 같은 달", _yoy_groups(scaled, "month", _mo, n=12),
+                        lambda v: f"{v:,.1f}" if abs(v) < 100 else f"{v:,.0f}", unit=u)   # 단위는 그래프 오른쪽 위 (P161)
     for r in rows_data:
         cmp_txt = "전년 같은 달보다" if r["cmp"] == "yoy" else "전달보다"
         u2 = "%p" if r["kind"] == "pct" else "%"
@@ -535,7 +540,7 @@ def card_industry_money(s):
     lines = [(f"{_dk.josa(r0['name'], '은')} {_qlabel(r0['q'])} {r0['v']:.1f}%" + (f"로 1년 전 같은 분기보다 {_sgn(d, 1)}%p." if d is not None else "다.")
               + R.small_note("설문이 아니라 업종 전체 회사를 모은 실제 집계이고, 분기 끝 2~3달 뒤에 나옵니다."), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
     # 업종 이름은 위 문장에서 한 번만 — 그래프 제목 · 근거 줄은 `매출액 영업이익률` 처럼 (2026-10-28 사용자 P68)
-    lines += _yoy_chart(f"{_fin_short(s, r0['name'])}, 올해와 작년 같은 분기 (%)", _yoy_groups(r0.get("series") or [], "q", _dk.q_axis, n=4), lambda v: f"{v:.1f}")
+    lines += _yoy_chart(f"{_fin_short(s, r0['name'])}, 올해와 작년 같은 분기 (%)", _yoy_groups(r0.get("series") or [], "q", _dk.q_axis, n=8), lambda v: f"{v:.1f}", now="이번 분기", then="작년 같은 분기")
     for r in s.get("fin") or []:   # 산업별 대출(늦게 따라오는 지표)도 여기 — 질문 카드로 따로 두지 않는다
         val = f"{r['v'] / 1e3:,.0f}조 원" if r["unit"] == "조 원" else f"{r['v']:.1f}%"
         lines.append(("row", _fin_short(s, r["name"]), val, f"{_qlabel(r['q'])}" + (f" · 전년 같은 분기보다 {_sgn(r['chg'], 1)}{r['chg_unit']}" if r.get("chg") is not None else "") + f" · {r['note']}"))

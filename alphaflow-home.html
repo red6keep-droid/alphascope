@@ -2885,6 +2885,32 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   document.addEventListener('click', later, true);    /* 탭 전환 */
 })();
 
+/* ============================================================ 선 그래프 넘겨 보기 그림자 (2026-10-31 사용자, P161)
+   선 그래프([data-lscroll])는 최신이 오른쪽이라 처음엔 오른쪽 끝이 보이고 왼쪽으로 넘긴다. 왼쪽에 넘길 것이 남아 있으면 왼쪽 그림자([data-sh=l]),
+   맨 왼쪽(가장 오래된 것)에 닿으면 끈다. 오른쪽 그림자는 두지 않는다. 디자인 가이드 8절 */
+(function () {
+  'use strict';
+  function upd(b) {
+    var sh = b.parentNode && b.parentNode.querySelector('[data-sh=l]');
+    if (!sh || !b.clientWidth) return;
+    var max = b.scrollWidth - b.clientWidth, x = Math.abs(b.scrollLeft);   /* direction:rtl — 오른쪽 끝 0, 왼쪽으로 갈수록 음수 */
+    sh.style.opacity = (max - x > 1) ? '1' : '0';
+  }
+  function all() {
+    var bs = document.querySelectorAll('[data-lscroll]');
+    for (var i = 0; i < bs.length; i++) {
+      var b = bs[i]; upd(b);
+      if (!b._lsc) { b._lsc = 1; b.addEventListener('scroll', (function (el) { return function () { upd(el); }; })(b), { passive: true }); }
+    }
+  }
+  function later() { setTimeout(all, 30); }
+  document.addEventListener('DOMContentLoaded', all);
+  window.addEventListener('load', all);
+  window.addEventListener('resize', later);
+  document.addEventListener('toggle', later, true);   /* details 펼침 — 접힌 카드 안은 폭 0 이라 펼칠 때 다시 잰다 */
+  document.addEventListener('click', later, true);    /* 탭 전환 */
+})();
+
 /* ============================================================ 그래프 확대 (2026-10-16 사용자: "폰에서 그래프를 확대해도 똑같다 — 손가락으로 좌우로 스크롤하듯")
    리포트의 그래프 링크(a[data-zoom], 옛 글은 aria-label "그래프 확대 보기")를 누르면 새 창 대신 전체 화면 팝업에
    그림을 화면 폭의 2.2배(최소 원본 폭, 최대 원본의 2배)로 띄우고 가로 스크롤 — 처음 위치는 오른쪽 끝(최근 봉). 닫기 × · 바깥 · Esc. 디자인 가이드 8절 */
