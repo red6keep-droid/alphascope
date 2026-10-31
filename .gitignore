@@ -51,3 +51,4 @@ experiments/kr-market-report/output/
 # 한국 종목 (experiments/kr-stocks, 2026-10-24)
 experiments/kr-stocks/data/
 experiments/kr-stocks/output/
+experiments/.mock_prefs.json
