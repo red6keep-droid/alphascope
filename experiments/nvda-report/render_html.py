@@ -536,6 +536,14 @@ _sign_bg = lambda v: _PASTEL_UP if v > 0 else _PASTEL_DN   # noqa: E731
 _sign_fg = lambda v: UP if v > 0 else DOWN   # noqa: E731
 
 
+def axis_dot(chart, label, color):
+    """막대 그래프에서 하나를 강조 — 막대 색은 그대로 두고 그 가로축 이름 위에 3px 점 (2026-10-31 사용자 P175 · P176: 모든 그래프 규칙,
+    선 그래프 최신 축 이름 강조점과 같은 모양). 이름 줄 높이는 다른 축 이름과 같게(위 −5). 이름이 없으면 그대로."""
+    inner = "<br>".join(_dk.esc(x) for x in label.split("\n"))
+    dot = f'<span aria-hidden="true" style="display:block;width:3px;height:3px;margin:0 auto 2px;border-radius:50%;background:{color};"></span>'
+    return chart.replace(f'overflow-wrap:anywhere;">{inner}</span>', f'overflow-wrap:anywhere;margin-top:-5px;">{dot}{inner}</span>', 1)
+
+
 def ma_chart(mr, bmr, name, bench, last=False):
     """평균선 대비 세로 막대 (2026-10-27 사용자 P37) — 20 · 60 · 120 · 200일 평균마다 지금 가격이 몇 % 위 · 아래, 비교 = 지수의 같은 값(회색).
     `차트 정보 보기` 펼침 맨 위. 흰 카드 테두리는 rgb() — 강조 카드 _flatten 이 흰 카드로 보지 않게."""
@@ -547,7 +555,7 @@ def ma_chart(mr, bmr, name, bench, last=False):
     legend = _legend_chips([(f"{name} 위", _PASTEL_UP), (f"{name} 아래", _PASTEL_DN), (bench, _GRAY_BAR)])
     tip = (f"n일 평균 = 최근 n거래일 종가의 평균. 막대 = 지금 가격이 그 평균보다 몇 % 위(+) · 아래(−)인지. 회색 = 같은 날 {bench}\n"
            + " · ".join(f"{g} {_sgn(v[0])}%" for g, v in groups))
-    return (f'<div style="padding:10px 12px {7 if last else 12}px;"><span style="display:block;margin:0 0 8px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{_paren(_esc("지금 가격이 평균보다 (%)"))}{_tipx(tip)}</span>'
+    return (f'<div style="padding:10px 12px {7 if last else 12}px;"><span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{_paren(_esc("지금 가격이 평균보다 (%)"))}{_tipx(tip)}</span>'
             f'<span style="display:block;background:#fff;border:1px solid rgb(226,232,240);border-radius:8px;margin:0 {_dk.CHART_CARD_X}px;font-size:{SMALL};line-height:{LH_CARD};">'
             f'<span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>')
 
@@ -631,7 +639,7 @@ def year_range_in(y, money, tip, high_days=None):
             f'<span style="white-space:nowrap;">최저 {money(y["low"])}</span><span style="white-space:nowrap;">최고 {money(y["high"])}{_high_ago(high_days)}</span></span>')
     # 최저 · 최고는 줄바꿈 금지 — 가운데 `(오늘 …)` 는 뺐다(머리 줄에 오늘 가격, 2026-10-26). 카드 안 아래 = 좌우 12 보이는 거리(P32 와 같게)
     card = f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px {12 - 3}px;">{gauge}{ends}</span></span>'
-    return ("white", f'<span style="display:block;margin:0 0 8px;">{head}</span>{card}')
+    return ("white", f'<span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;">{head}</span>{card}')
 
 
 # ---------------------------------------------------------------- 선 그래프 (2026-10-31 사용자 — 그래프 비교 목업에서 정한 모양, P161)
@@ -799,16 +807,16 @@ def dd_block(name, st, bn, bench, span, x, tip, tail):
             f'</span>{ACC_BTN}</span>')
     # 구간별 세로 막대 (2026-10-27 P36, 넘겨 보기) — 이 종목 · 비교 두 막대, 숫자 = 보통 회복 거래일, 지금 구간의 이 종목 막대는 진하게.
     # 비교 쪽은 횟수가 적어(KOSPI 5~10번) 횟수를 그래프 아래 작은 글씨로 (P28)
-    dark = _dk.darken(_PASTEL_DN, 0.2)
     groups = [(f"−{lv}% 넘게 하락 시" + ("\n지금" if lv == cur else ""), [st[lv]["median_days"], (bn.get(lv) or {}).get("median_days")]) for lv in lvs]
-    chart_html = _col_chart(groups, [lambda v: _PASTEL_DN, lambda v: _GRAY_BAR], [lambda v: DOWN, lambda v: NOTE], fmt=lambda v: f"{v:,.0f}",
-                            color_at=lambda i, k, v: (dark, DOWN) if k == 0 and lvs[i] == cur else None)
+    chart_html = _col_chart(groups, [lambda v: _PASTEL_DN, lambda v: _GRAY_BAR], [lambda v: DOWN, lambda v: NOTE], fmt=lambda v: f"{v:,.0f}")
+    if cur in lvs:   # 지금 구간 = 막대 색 대신 축 이름 위 점 (P176, 옛 20% 진하게)
+        chart_html = axis_dot(chart_html, f"−{cur}% 넘게 하락 시\n지금", DOWN)
     legend = _dk.legend_unit(_legend_chips([(name, _PASTEL_DN), (bench, _GRAY_BAR)]), "회복일")   # 단위는 비교 대상 오른쪽 (P54)
     # 구간별 횟수 = `회복에 1년 넘게 걸린 비율` 과 같은 표 · 위 구분선 (2026-10-28 사용자 P56 → P74: "구분선으로 정리"). 제목 = Claude 결정 `약 30년 동안 있었던 횟수`
     bl = [lv for lv in lvs if (bn.get(lv) or {}).get("n")]
     cnt = dd_table(f"{span} 동안 있었던 횟수", "하락", lvs,
                    [(name, [f"{st[lv]['n']}번" for lv in lvs])] + ([(bench, [f"{(bn.get(lv) or {}).get('n', 0)}번" if lv in bl else "—" for lv in lvs])] if bl else []))
-    chart = (f'<span style="display:block;padding:4px 12px 12px;"><span style="display:block;margin:0 0 8px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}최고가를 되찾기까지 보통 걸리는 일수</span>'
+    chart = (f'<span style="display:block;padding:4px 12px 12px;"><span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}최고가를 되찾기까지 보통 걸리는 일수</span>'
              f'<span style="display:block;background:#fff;border:1px solid rgb(226,232,240);border-radius:8px;margin:0 {_dk.CHART_CARD_X}px;font-size:{SMALL};line-height:{LH_CARD};">'   # rgb() — 강조 카드 _flatten 이 흰 카드로 보지 않게
              f'<span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart_html, legend)}</span></span></span>')
     return f'<details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{chart}{cnt}{tail}</details>'
@@ -1005,7 +1013,7 @@ def in_card(sec, white=False, join=False):
         return (("join" if join else "flat"), sec) if sec else ""   # 제목 없는 덩이(고점 회복 P24)도 앞 영역에 붙인다
     head = f'font-weight:700;color:#111;font-size:{_dk.NAME};'
     if white:
-        return ("white", f'<span style="display:block;margin:0 0 8px;{head}">{_dk.CHART_MARK}{m.group(1)}</span><span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;">{m.group(2)}</span>')   # 그래프 카드 폭 같게 (2026-10-26)
+        return ("white", f'<span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;{head}">{_dk.CHART_MARK}{m.group(1)}</span><span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;">{m.group(2)}</span>')   # 그래프 카드 폭 같게 (2026-10-26)
     return ("join" if join else "flat", f'<span style="display:block;font-size:{SMALL};"><span style="display:block;padding:10px 12px 0;{head}">{m.group(1)}</span>{m.group(2)}</span>')
 
 
@@ -1359,7 +1367,14 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
         return _dot_li(_label_text(text), size=3, color=col, lh=_dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32 (2026-10-12 사용자)   # 16px → 3px 점, "**라벨** : 내용", 증감 색 (2026-10-11 사용자)
     if lines and isinstance(lines[-1], tuple) and len(lines[-1]) == 2 and lines[-1][1] == "html":   # 카드가 그래프로 끝나면 흰 카드 아래 = 좌우 8px (P59 범위 막대와 같은 당김, 2026-10-31 사용자 P140: 모든 강조 카드 공통)
         lines = list(lines[:-1]) + [(_pull_end_chart(lines[-1][0]), "html")]
-    lis = "".join(li(t) for t in lines)
+    lis = ""
+    for k, t in enumerate(lines):   # 그래프 바로 아래 그래프 — 아래 그래프 제목 위 +5 (2026-10-31 사용자 P176, 모든 강조 카드)
+        h = li(t)
+        prev = lines[k - 1] if k else None
+        if (isinstance(t, tuple) and len(t) == 2 and t[1] == "html" and _dk.CHART_MARK in t[0][:600]
+                and isinstance(prev, tuple) and len(prev) == 2 and prev[1] == "html" and _dk.CHART_MARK in prev[0][:600]):
+            h = h.replace('<li style="list-style:none;margin:6px 0 12px;">', f'<li style="list-style:none;margin:{12 + _dk.CHART_STACK_GAP}px 0 12px;">', 1)
+        lis += h
     # fold: 첫 줄 맨 오른쪽 공식 접기 버튼(카드 색 20% 밝은 바탕), 기본 닫힘 — 펼치면 이유 글머리표 (2026-10-13 사용자: 시장 국면 · 반도체 자금, 가이드라인 10-7)
     state_html = (f'<span style="display:inline-flex;align-items:center;">{_esc(state)}{_fold_btn(_dk.lighten(bg), bd)}</span>' if fold else _esc(state))
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;line-height:{_dk.LH_EMPH_Q};">'   # 질문 · 대답 18px · 행간 30 (2026-10-27 사용자)   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다

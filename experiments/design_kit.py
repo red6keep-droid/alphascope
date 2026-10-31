@@ -95,7 +95,9 @@ def dash():
 CHART_MARK = '<span style="font-weight:400;font-size:.85em;position:relative;top:calc(-.05em - 1px);">※</span> '   # ※ 는 보통 굵기 · 조금 작게 · 위로 보정 — 폰 글꼴에서 굵은 ※ 가 무겁고 가운데가 안 맞았다 (2026-10-26 사용자, 비교 C-1)
 _CHART_TITLE_STYLE = f"display:block;font-weight:700;color:#111;font-size:{NAME};line-height:{LH_CARD};"
 CHART_TITLE = f'<span style="{_CHART_TITLE_STYLE}">' + CHART_MARK
-CHART_TITLE_M = f'<span style="{_CHART_TITLE_STYLE}margin:0 0 6px;">' + CHART_MARK   # 아래 6px 를 두던 질문 카드 안 차트 제목
+CHART_TITLE_GAP = 6   # 강조 카드 안 그래프 제목 ~ 그래프(흰 카드) — 모든 그래프 같게 (2026-10-31 사용자 P176: 밤사이 · 가격 카드 그래프가 8 로 넓었다)
+CHART_STACK_GAP = 5   # 그래프 바로 아래 또 그래프가 오면 아래 그래프 제목 위를 이만큼 더 (P176)
+CHART_TITLE_M = f'<span style="{_CHART_TITLE_STYLE}margin:0 0 {CHART_TITLE_GAP}px;">' + CHART_MARK   # 아래 6px 를 두던 질문 카드 안 차트 제목
 
 
 def h2(t, line=True, summary="", tab=None, aside="", one_line=False):

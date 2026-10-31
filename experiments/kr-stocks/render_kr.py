@@ -188,11 +188,15 @@ def _pair_bars(groups, note=""):
         if kind == "bench":
             return R._GRAY_BAR, NOTE
         bg = R._PASTEL_UP if v >= 0 else R._PASTEL_DN
-        return (_dk.darken(bg, 0.2) if kind == "me" else bg), (UP if v > 0 else DOWN if v < 0 else "#111")
+        return bg, (UP if v > 0 else DOWN if v < 0 else "#111")   # 이 종목도 보통 색 (P176, 옛 20% 진하게)
     chart = R._col_chart(cols, [R._sign_bg], [R._sign_fg], fmt=lambda v: f"{v:+.1f}".replace("-", "−"), color_at=color_at)
+    for (nm, _), kind in zip(cols, kinds):   # 이 종목 = 축 이름 위 점 (P176)
+        if kind == "me":
+            v = next(r[2] for _, rows in groups for r in rows if r[3] == "me")
+            chart = R.axis_dot(chart, nm, UP if v > 0 else DOWN if v < 0 else "#111")
     title = " → ".join(g for g, _ in groups)
     tail = f'<span style="display:block;margin:6px 0 0;font-size:{TINY};line-height:20px;color:{NOTE};word-break:keep-all;">{_esc(note)}</span>' if note else ""
-    return (f'<span style="display:block;margin:0 0 8px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{R._paren(_esc(title + " (%)"))}</span>'
+    return (f'<span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{R._paren(_esc(title + " (%)"))}</span>'
             f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X - 2}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>{tail}')
 
 
@@ -762,7 +766,7 @@ def sec_momentum(s):
     gauge = R._zone_gauge(x, zone, names, f"{mom:+.1f}%".replace("-", "−"), f"12개월 모멘텀 {mom:+.1f}%, {total}종목 중 {rank}위", last=False)
     gauge = gauge.replace(f"margin:0 {_dk.CHART_CARD_X - 2}px 0px;", f"margin:0 {_dk.CHART_CARD_X}px;", 1)
     col = UP if zone == 2 else DOWN if zone == 0 else "#111"
-    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 8px;">'
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 {_dk.CHART_TITLE_GAP}px;">'
             f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{R._paren(_esc("12개월 모멘텀 (최근 1개월 제외)"))}{R._tipx(tip)}</span>'
             f'<span style="flex:none;font-weight:700;color:{col};font-size:{_dk.NAME};white-space:nowrap;">{total}종목 중 {rank}위</span></span>')
     out = head + gauge
@@ -771,10 +775,7 @@ def sec_momentum(s):
         groups = [(s["name"], [mom]), (f"우리 {total}종목 중앙값", [med])] + ([("KOSPI", [bench])] if bench is not None else [])
         chart = R._col_chart(groups, [R._sign_bg], [R._sign_fg], fmt=lambda v: f"{v:+.1f}".replace("-", "−"),
                              color_at=lambda i, k, v: (((R._PASTEL_UP if v >= 0 else R._PASTEL_DN) if i == 0 else R._GRAY_BAR), (UP if v > 0 else DOWN if v < 0 else "#111") if i == 0 else NOTE))   # 이 종목도 보통 막대 색 (2026-10-31 사용자 P175, 옛 20% 진하게)
-        # 이 종목 = 축 이름 위 3px 강조점(막대 숫자 색) — 선 그래프 최신 축 이름 강조점과 같은 모양 (P175)
-        nm_cell = f'overflow-wrap:anywhere;">{_esc(s["name"])}</span>'
-        dot = f'<span aria-hidden="true" style="display:block;width:3px;height:3px;margin:0 auto 2px;border-radius:50%;background:{UP if mom > 0 else DOWN if mom < 0 else "#111"};"></span>'
-        chart = chart.replace(nm_cell, f'overflow-wrap:anywhere;margin-top:-5px;">{dot}{_esc(s["name"])}</span>', 1)
+        chart = R.axis_dot(chart, s["name"], UP if mom > 0 else DOWN if mom < 0 else "#111")   # 이 종목 = 축 이름 위 3px 강조점 (P175)
         # B = 중앙값 · KOSPI 와 비교 (2026-10-31 사용자: A 순위 막대와 뜻이 달라 둘 다 둔다, P163)
         # 한 제목 아래 그래프 둘 — 순위 카드와 3px 띄워 붙이고, 따로 있던 제목은 카드 안 오른쪽 범례로 (P168)
         legend = (f'<span style="display:block;font-size:{_dk.MICRO};line-height:{_dk.LH_CARD};color:{NOTE};">'
