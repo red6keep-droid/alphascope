@@ -758,11 +758,11 @@ OUT_ICON = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" 
             'style="flex:none;"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>')
 
 
-def out_btn(label, href):
+def out_btn(label, href, fs=TINY, lh=LH_TINY):
     """다른 페이지로 나가는 버튼 (2026-10-31 사용자 P148, 가이드라인 6절) — `전체 일정 보기` 와 같은 흰 외곽선 버튼 · 14px 굵게, 제목 앞 '나가는' 아이콘.
     같은 창에서 연다(같은 블로그 안). 블로그 안 다른 페이지로 보내는 링크는 모두 이 모양."""
     return (f'<a href="{_esc(href)}" data-row-link="1" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;background:#fff;border:1px solid #E2E8F0;'
-            f'border-radius:8px;font-size:{TINY};line-height:20px;font-weight:700;color:#111;text-decoration:none;"><span>{_esc(label)}</span>{OUT_ICON}</a>')   # 글자 왼쪽 · 아이콘 오른쪽 끝 (2026-10-31 사용자 P163)
+            f'border-radius:8px;font-size:{fs};line-height:{lh};font-weight:700;color:#111;text-decoration:none;"><span>{_esc(label)}</span>{OUT_ICON}</a>')   # 글자 왼쪽 · 아이콘 오른쪽 끝 (2026-10-31 사용자 P163)
 
 
 LIST_SHOWN = 3   # 목록이 이보다 많을 때만 접기 버튼 — 3개 이하는 바로 보여 준다 (2026-10-31 사용자 P157)
@@ -770,7 +770,7 @@ LIST_SHOWN = 3   # 목록이 이보다 많을 때만 접기 버튼 — 3개 이�
 
 def related_buttons(links):
     """글 맨 아래 `함께 보는 페이지` — 링크마다 나가는 버튼, 세로로 8px 간격 (2026-10-31 사용자 P160: "일단 전부 버튼으로")."""
-    btns = "".join(f'<div style="margin:0 0 8px;">{out_btn(t, u)}</div>' for t, u in links)
+    btns = "".join(f'<div style="margin:0 0 8px;">{out_btn(t, u, "16px", "26px")}</div>' for t, u in links)   # 페이지 이름 14 → 16 = 기사 요약 줄(NEWS_SUM) 크기 (2026-10-31 사용자 P185)
     return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};padding-left:{_dk.ALIGN_PX}px;margin:0 0 8px;">함께 보는 페이지</div>'
             f'{btns}</div>')
 
@@ -1530,7 +1530,7 @@ GAUGE_INSET = 14   # 점 · 꼬리가 막대 끝 · 말풍선 가장자리에서
 
 BUBBLE_FONT = 14   # 말풍선 숫자 = 막대 아래 칸 이름 · 최저 · 최고 글자(TINY 14px)와 같은 크기 · 보통 굵기 (2026-10-31 사용자 P183, 앞서 P18 17 → 15)
 BUBBLE_H = 24   # 말풍선 높이 30 → 24 — 글자가 줄어든 만큼 (P183)
-BUBBLE_W_STRONG = 700   # 가격 범위(1년) · 12개월 모멘텀 말풍선 숫자는 한 단계 굵게 — 한 달간 변화 범위는 보통 400 그대로 (2026-10-31 사용자 P184). 블로그 글꼴(AS Barun = 나눔바른고딕)은 400 · 700 둘뿐이라 500 은 400 과 똑같이 보인다
+BUBBLE_W_STRONG = 600   # 가격 범위(1년) · 12개월 모멘텀 말풍선 숫자는 한 단계 굵게 — 한 달간 변화 범위는 보통 400 그대로 (2026-10-31 사용자 P184 · P185 700 → 600)
 GAUGE_H = 50   # 말풍선 막대 칸 높이 56 → 50 — 말풍선 위 여백 10 그대로 (P183)
 
 
