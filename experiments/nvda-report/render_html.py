@@ -876,6 +876,8 @@ TOGETHER_TITLE = "Alpha Scope 데이터로 함께 보기"   # 방송 의견 아�
 
 
 # 함께 보기 안쪽 카드 (2026-10-31 사용자 P168): 상승 쪽 · 하락 쪽 · 중립을 각자 카드로 감싼다. 바깥 강조 카드와 같은 색이면 한 단계 진하게
+TOGETHER_HEAD_FS, TOGETHER_ROW_H = "15px", 57   # `▲ 상승 쪽` 14 → 15 · 줄 높이 44 → 57 (×1.3) (2026-10-31 사용자 P169)
+TOGETHER_END = "<!--together-end-->"   # 강조 카드가 함께 보기로 끝나면 아래 = 좌우 15 로 당긴다 (_pull_end_chart, P169)
 TOGETHER_DEEP = {"positive": ("#FFEDD8", "#FCD9AD"), "negative": ("#E1EDFE", "#C3DBFB"), "neutral": ("#FFFFFF", "#E2E8F0")}
 BLOG_LOGO = ('<svg viewBox="0 0 313 286" width="18" height="16" aria-hidden="true" style="flex:none;display:block;">'
              '<path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000000"/></svg>')   # 블로그 로고 (alphaflow-home .logo-mark)
@@ -896,17 +898,17 @@ def together_block(items, outer=None):
         if not rows:
             continue
         bg, bd = TOGETHER_DEEP[th] if th == (outer or "neutral") else CARD_DIR[th]
-        body = f'<span style="display:block;padding:10px 0 2px;font-size:{TINY};line-height:20px;font-weight:700;color:{col};">{_esc(head)}</span>'
+        body = f'<span style="display:block;padding:13px 0 3px;font-size:{TOGETHER_HEAD_FS};line-height:20px;font-weight:700;color:{col};">{_esc(head)}</span>'   # 14 → 15 · 위아래 ×1.3 (P169)
         for nm, st, _, tab, card in rows:
             body += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;'
-                     f'min-height:44px;cursor:pointer;border-top:1px solid {bd};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
-                     f'<span style="color:#111;">{_esc(nm)}</span><span style="white-space:nowrap;font-weight:700;color:{col};">{_esc(st)}'
-                     f'<span aria-hidden="true" style="margin-left:6px;color:{NOTE};font-weight:400;">›</span></span></span>')
-        out += f'<span data-together-group="{th}" style="display:block;margin-top:8px;padding:0 12px;background:{bg};border:1px solid {bd};border-radius:8px;">{body}</span>'
-    title = (f'<span style="display:flex;align-items:center;gap:6px;font-weight:700;color:#111;font-size:{_dk.NAME};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')
-    return f'<span data-together="1" style="display:block;margin-top:8px;padding-top:14px;border-top:1px solid #E2E8F0;">{title}{out}</span>'
+                     f'min-height:{TOGETHER_ROW_H}px;cursor:pointer;border-top:1px solid {bd};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
+                     f'<span style="color:#111;">{_esc(nm)}</span><span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-weight:700;color:{col};">{_esc(st)}{OUT_ICON}</span></span>')   # › → 나가는 아이콘, 대답과 같은 색 (P169)
+        out += f'<span data-together-group="{th}" style="display:block;margin-top:8px;padding:0 12px 6px;background:{bg};border:1px solid {bd};border-radius:8px;">{body}</span>'   # 아래 6 — 카드 높이 ×1.3 (P169)
+    title = (f'<span style="display:flex;align-items:center;gap:6px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')   # 16 → 18 (P169)
+    return f'<span data-together="1" style="display:block;margin-top:8px;padding-top:19px;border-top:1px solid #E2E8F0;">{title}{out}</span>{TOGETHER_END}'   # 위 14 → 19 (P169)
 
 
+PICK_REASON_LH = "26px"   # 방송 의견 이유 문장 행간 — 24 × 1.1 → 정수 26 (2026-10-31 사용자 P169)
 PICKS_SHOWN = 3   # 방송 의견은 3건까지 펼쳐 두고 나머지는 접기 (2026-10-31 사용자 P158)
 
 
@@ -977,7 +979,7 @@ def picks_rows(ps, close, money):
             line = "" if (first or p is grp[0] and len(ks) > 1) else PICK_LINE
             out += (f'<span style="display:block;{line}padding:{top}px 0 20px;">'
                     f'<span style="display:block;color:#111;font-weight:700;line-height:34px;">{who_html}</span>'
-                    + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;line-height:{LH_CARD};word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")
+                    + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;line-height:{PICK_REASON_LH};word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")   # 행간 24 → 26 (+10%, P169)
                     + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
             first = False
     return f'<span data-picks="1" style="display:block;">{out}</span>'
@@ -1282,6 +1284,8 @@ def _pull_end_chart(html):
     """html 조각의 맨 끝 최상위 요소가 흰 그래프 카드(MULTI, 아래 여백 0)면 아래로 GAUGE_PULL 만큼 당긴다 — 강조 카드 끝 흰 카드 아래 = 좌우 8px (P140).
     끝에 다른 글(주석 줄 등)이 있거나 이미 당긴 카드(범위 막대 last)는 그대로."""
     if html.rstrip().endswith("</a>") and OUT_ICON in html and html.count("</a>") == 1:   # 카드 끝 나가는 버튼 — 좌우 15 = 아래 15 (P156)
+        return f'<span style="display:block;margin:0 0 {-BOX_END_PULL}px;">{html}</span>'
+    if html.rstrip().endswith(TOGETHER_END):   # 카드 끝 함께 보기 묶음 카드 — 좌우 15 = 아래 15 (P169, 옛 아래 22)
         return f'<span style="display:block;margin:0 0 {-BOX_END_PULL}px;">{html}</span>'
     box = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">'   # 폭 가득 흰 카드(애널리스트 의견 등) — 좌우 15 와 같게 아래를 당긴다
     b = html.rfind(box)
