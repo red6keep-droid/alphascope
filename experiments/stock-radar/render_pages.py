@@ -125,7 +125,7 @@ def price_card(s, today):
         head = head[:k] + sub + head[k:]
     rows = R.glance_rows(g) + sec_earnings(s, today)   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 정보 보기는 강조 카드 안 (2026-10-26 사용자)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-            f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), sec_month_range(s), R.in_card(sec_periods(s), white=True), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
+            f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), sec_month_range(s), R.in_card(sec_periods(s), white=True), sec_momentum(s), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
 
 
 IMAGE_BRANCH = "radar-images"   # 종목 그래프 전용 브랜치 — 매 실행 그날 그림만 담아 덮어쓴다(이력 없음). 지난 그림은 남지 않는다 (2026-10-20 사용자: 이미지는 휘발성)
@@ -254,26 +254,11 @@ def _no_record(tip):
 
 
 def sector_lines(sf):
-    pp, rel, n = R.config.SECTOR_FLOW_PP, sf["rel_pp"], sf["days"]
-    more = f"{abs(rel):.1f}%p 앞섰다" if rel > 0.05 else (f"{abs(rel):.1f}%p 뒤처졌다" if rel < -0.05 else "비슷하게 움직였다")
-    tail = {"모이는 중": f"차이가 +{pp:.0f}%p를 넘어 돈이 {sf['name']} 쪽으로 모이는 중이다.",
-            "빠져나가는 중": f"차이가 −{pp:.0f}%p 아래라 돈이 {sf['name']} 쪽에서 빠지는 중이다."}.get(sf["state"], f"차이가 ±{pp:.0f}%p 안이라 돈의 방향은 뚜렷하지 않다.")
-    lines = [(f"최근 {n}거래일 {sf['name']} 업종 ETF({sf['etf']})가 S&P 500보다 {more}. {tail}", "plain"),
-             (R.flow_gauge(sf, sf["name"]), "html"),   # 엔비디아 반도체 자금 카드와 같은 막대 (2026-10-23 사용자: 새 그래프 모든 페이지)
-             ("row", f"{sf['name']} vs 시장 ({n}일)", f"{_sgn(rel)}%p", f"+{pp:.0f}%p 넘으면 유입 · −{pp:.0f}%p 아래면 유출", False, True),
-             ("row", "업종 순위", f"{sf['n_pool']}개 중 {sf['rank']}위", "같은 기간 수익률 순")]
-    secs = sf.get("sectors") or []
-    if secs:
-        lines.append(("row", "앞선 업종", "\n".join(f"{x['name']} {_sgn(x['rel'])}%p" for x in secs[:2]), "시장보다 많이 오른 업종"))
-        lines.append(("row", "뒤처진 업종", "\n".join(f"{x['name']} {_sgn(x['rel'])}%p" for x in secs[-2:][::-1]), "시장보다 내린 업종"))
-    return lines
+    return R.sector_lines(sf, "S&P 500")
 
 
 def sector_rule(sf):
-    pp, rel = R.config.SECTOR_FLOW_PP, sf["rel_pp"]
-    return (f"투자자 돈이 {sf['name']} 업종으로 들어오는지 빠지는지, 최근 한 달 수익률을 시장과 견줘 본다\n"
-            f"· 오늘 {_sgn(rel)}%p : {sf['name']} 업종이 시장보다 {abs(rel):.1f}%p {'앞섰다' if rel > 0 else '뒤처졌다'}, {sf['n_pool']}개 업종 중 {sf['rank']}위\n"
-            f"· 나누는 법 : 시장보다 {pp:.0f}%p 넘게 앞서면 모이는 중, {pp:.0f}%p 넘게 뒤지면 빠져나가는 중, 그 사이는 뚜렷하지 않음")
+    return R.sector_rule(sf)
 
 
 def sec_tech(s):
@@ -298,11 +283,7 @@ def sec_states(s):
     if mr:
         th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
         out += R._state_card("시장 분위기는?", mr["regime"], th, col, R.regime_lines(mr), "", tip=_dk.with_src(R.regime_rule(mr), "Yahoo Finance · CNN"), fold=True)
-    sf = s.get("sector_flow")
-    if sf:
-        th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
-        title = "반도체로 돈이 올까?" if sf["name"] == "반도체" else f"{sf['name']} 업종으로 돈이 올까?"
-        out += R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True)
+    # 업종 자금 카드는 `업계상황` 탭으로 옮겼다 (2026-10-31 사용자: 업종 전체 이야기 — 한국처럼 다른 탭)
     # `한 달간 변화 범위는?` 상태 카드는 가격 카드 펼침(가격 범위 (1년) 아래)으로 옮겼다 (2026-10-31 사용자 P150)
     out += card_opinions(s)   # 애널리스트 · 방송 의견 한 카드 — 한 달 범위 아래 (2026-10-29 P89 · P90)
     oh = s.get("overheat")
@@ -311,16 +292,64 @@ def sec_states(s):
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
 
 
+def sec_momentum(s):
+    """12개월 모멘텀 — 한국과 같은 카드(R.momentum_in). 미국은 검증을 통과하지 못해(64종목 −0.30%p/월 p .51, doc/검증/미국-모멘텀-검증.md)
+    툴팁에 `기록상` 줄이 없고 함께 보기 방향 분류에도 넣지 않는다 (2026-10-31 사용자)."""
+    mom, mr = s.get("mom_12_1"), s.get("mom_rank")
+    if mom is None or not mr:
+        return ""
+    rank, total = mr
+    tip = ("12개월 전 가격 대비 1개월 전 가격의 변화. 최근 1개월은 단기 되돌림이 섞여 빼는 것이 표준(12-1 모멘텀)\n"
+           f"· 오늘 {_sgn(mom)}% : 우리 {total}종목 가운데 {rank}위")
+    return ("white", R.momentum_in(s["name"], mom, rank, total, s.get("mom_peers_median"), s.get("mom_bench"), "S&P 500", tip))
+
+
+def sec_industry_tab(s):
+    """`업계상황` 탭 (2026-10-31 사용자: 한국처럼 업종 이야기는 따로) — 지금은 업종 자금 카드 하나. 업종 실물 지표는 나중에."""
+    sf = s.get("sector_flow")
+    if not sf:
+        return _dk.muted("이 종목은 업계 자료를 아직 연결하지 않았습니다.")
+    th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
+    title = "반도체로 돈이 올까?" if sf["name"] == "반도체" else f"{sf['name']} 업종으로 돈이 올까?"
+    card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
+
+
+STATE_KO = {"CA": "캘리포니아", "WA": "워싱턴", "TX": "텍사스", "NY": "뉴욕", "MA": "매사추세츠", "IL": "일리노이", "NJ": "뉴저지", "GA": "조지아", "NC": "노스캐롤라이나",
+            "VA": "버지니아", "OH": "오하이오", "MN": "미네소타", "CO": "콜로라도", "FL": "플로리다", "PA": "펜실베이니아", "MI": "미시간", "NV": "네바다", "AZ": "애리조나",
+            "IN": "인디애나", "CT": "코네티컷", "MD": "메릴랜드", "TN": "테네시", "DE": "델라웨어", "WI": "위스콘신", "OR": "오리건"}
+
+
+def _person(n):
+    return re.sub(r"\s+", " ", re.sub(r"^(Mr|Ms|Mrs|Dr)\.\s*", "", n or "")).strip()
+
+
+def sec_company(s):
+    """`기업` 탭 (2026-10-31 사용자: 한국처럼 미국에도) — 기본 정보(야후 회사 개요). 평가 · 전망 · 추천 없음. 칸이 없으면 그 줄만 뺀다.
+    한 줄 소개는 아직 없다(한국은 사업보고서로 직접 쓴 문구, universe_kr.ABOUT — 미국 64종목 소개는 따로 쓴다)."""
+    c = s.get("company") or {}
+    if not c.get("name"):
+        return _dk.muted("기업 정보를 아직 받지 못했습니다.")
+    url = c.get("website") or ""
+    place = " · ".join(x for x in (c.get("city"), STATE_KO.get(c.get("state"), c.get("state")) if c.get("country") == "United States" else c.get("country")) if x)
+    rows = [("정식 이름", _esc(c["name"])), ("대표", _esc(_person(c.get("ceo")))), ("본사", _esc(place)),
+            ("홈페이지", f'<a href="{_esc(url)}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">{_esc(re.sub(r"^https?://(www\.)?", "", url).rstrip("/"))}</a>' if url else ""),
+            ("직원", f"{c['employees']:,}명" if c.get("employees") else ""), ("결산", f"{c['fy_month']}월" if c.get("fy_month") else ""),
+            ("상장", " · ".join(x for x in (_esc(c.get("exchange") or ""), f"티커 {s['sym']}", f"{c['listed']}년부터" if c.get("listed") else "") if x)),
+            ("업종", _esc(U.BY_SYM[s["sym"]][3]) if s["sym"] in U.BY_SYM and len(U.BY_SYM[s["sym"]]) > 3 else "")]
+    if s.get("rank"):
+        rows.append(("시가총액", f"미국 {s['rank']}위 ({cap_text(s.get('cap'))})"))
+    out = "".join(f'<span style="display:flex;gap:12px;padding:3px 12px;font-size:{_dk.TINY};line-height:22px;">'
+                  f'<span style="flex:0 0 68px;color:{R.NOTE};white-space:nowrap;">{_esc(k)}</span>'
+                  f'<span style="flex:1 1 auto;min-width:0;color:#111;word-break:keep-all;overflow-wrap:anywhere;">{v}</span></span>' for k, v in rows if v)   # 한국 _info_rows 와 같은 모양
+    return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}padding:{PAD - 3}px 0;display:block;">{out}</span></div>'
+
+
 def sec_chart_indicators(s):
-    """2층 · 접힘 `차트 정보 보기` — NVDA 리포트와 같은 칸, 하루 비교는 S&P 500 · 업종 ETF."""
+    """`지금 가격이 평균보다` 그래프 — 가격 카드 끝. `차트 정보 보기` 접기(S&P 500 대비 · 업종 ETF 대비 하루치)는 뺐다 (2026-10-31 사용자, 한국 P139 와 같게):
+    S&P 500 대비는 하루 흐름 그래프 종가 막대와 같은 값, 업종 ETF 대비는 `업종으로 돈이 올까?` 카드가 한 달 기준으로 같은 질문."""
     tc = s["tech"]
-    etf = U.sector_etf(s["sym"])[0]
-    ma = R.ma_chart(tc["ma_rel"], tc.get("bench_ma_rel"), s["name"], "S&P 500")   # `지금 가격이 평균보다` 그래프는 접기 밖 — 그 아래 `차트 정보 보기` 버튼 (2026-10-29 사용자 P83)
-    deep = ""   # 평균선 대비 = 세로 막대 + S&P 500 같은 값 (2026-10-27 사용자 P37)
-    deep += R._multi2([("S&P 500 대비", R._arrow(tc.get("vs_spy"), 2, "%p")), (f"{etf} 대비", R._arrow(tc.get("vs_sector"), 2, "%p"))])
-    # 일중 변동폭 · 단기 과열 온도(RSI) · 평균선 교차는 뺐다 — `기술지표의 방향은?` 카드의 ATR · RSI · 이동평균 크로스와 겹친다 (2026-10-31 사용자, P139)
-    return ma + (f'<details data-fold="1" data-label="차트 정보 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">{R._fold_row("차트 정보 보기")}</summary>'
-            f'<div style="margin-top:6px;">{deep}</div></details>')
+    return R.ma_chart(tc["ma_rel"], tc.get("bench_ma_rel"), s["name"], "S&P 500", last=True)   # 가격 카드 끝 — 흰 카드 아래 = 좌우 8px (한국 P140 과 같게)
 
 
 def sec_drawdown(s):
@@ -399,33 +428,9 @@ def _sub_head(t):
 
 
 def card_opinions(s):
-    """`애널리스트 · 방송 의견은?` (2026-10-29 사용자 P90) — 애널리스트 의견 · 목표가(옛 sec_targets 흰 카드)와 방송 의견(picks)을 한 상태 카드에, 묶음 둘로.
-    머릿수는 합치지 않는다(44명 + 1건 X). 답 = 애널리스트 다수(R.analysts_verdict) — 방송은 건수가 적어 답을 좌우하지 않는다. 애널리스트가 없으면 방송만으로 `매수` 등.
-    색은 회색(남의 의견 — 블로그 추천 아님, 매수 추천 금지 원칙). 둘 다 없으면 카드 없음."""
-    a = {"status": {"analysts": s.get("analysts") or []}, "headline": {"close": s.get("close")}}
-    verdict = R.analysts_verdict(a) if s.get("analysts") else None
+    """`애널리스트 · 방송 의견은?` — 공용 R.opinions_card (한국 · 미국 같은 카드, 2026-10-31)."""
     ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
-    if not verdict and not ps:
-        return ""
-    money = lambda v: f"${v:,.2f}"   # noqa: E731
-    cnt = R.picks_count(ps) if ps else ""
-    if verdict:
-        state, text = verdict
-        text += f" 방송에서는 {R.picks_sentence(ps)} 나왔다." if ps else ""
-    else:
-        state = R.picks_state(ps)   # `매수 4 · 보유 1` (P163)
-        text = f"{s['name']}에 대한 {R.picks_sentence(ps)} 방송에서 나왔다. 애널리스트 집계는 없다."
-    lines = [(text, "plain")]   # `블로그 의견 아님` 안내는 뺐다 (P92)
-    if verdict:
-        lines.append((R.analysts_block(a), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
-    if ps:
-        lines.append((R.picks_rows_folded(ps, s.get("close"), money) + R.together_block(together_items(s), R.pick_theme(state)[0]), "html"))   # 4건 이상은 3건 + 접기 (P158)   # 방송 묶음은 `매수 의견` 제목 · 구분선 (P92) · 함께 보기 (P142)
-    tip = (f"애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 최근 {R.PICK_HOURS}시간에 나온 이 종목 의견을 한 카드에 모은 것\n"
-           f"· 지금 : {state}" + (f" · 방송 {cnt}" if ps else "") + "\n"
-           "· 나누는 법 : 애널리스트 중 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림. 방송 건수는 답에 넣지 않는다\n"
-           "· 읽는 법 : 누가 어떤 이유로 말했는지 보는 칸이다. 적중률은 검증하지 않았고, 이 블로그의 추천이 아니다")
-    theme, col = R.pick_theme(state)   # 매수면 오름 색 강조 카드 (P92)
-    return R._state_card("애널리스트 · 방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance · 유튜브 방송 요약"), fold=True)
+    return R.opinions_card(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s))
 
 
 EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
@@ -566,8 +571,7 @@ def card_capex(c):
         lines.append(("row", "출처", f'<a href="{_esc(c["src"])}" target="_blank" rel="noopener" style="color:inherit;">SEC {_esc(c.get("form") or "10-Q")} ›</a>', "회사가 SEC 에 낸 분기 · 연간 보고서", True))
     tip = ("회사가 번 돈을 어디에 쓰고, 모자란 돈을 어떻게 끌어오는지 — 회사가 SEC 에 낸 현금흐름표 그대로\n"
            "· 설비 투자 : 데이터 센터 · 공장 · 장비처럼 오래 쓰는 자산을 사는 데 쓴 돈(자본 지출). 리스로 들여온 설비는 여기에 안 들어가 `금융리스 상환` 줄을 따로 둔다\n"
-           "· 늘리는 중 · 줄이는 중 : 최근 4분기 합이 그 전 4분기 합보다 10% 넘게 많으면 늘리는 중, 10% 넘게 적으면 줄이는 중 — 분기 값은 들쭉날쭉해 합으로 본다\n"
-           "· 참고 : 회사마다 회계 분기가 달라 다른 회사와 같은 달력 분기가 아닐 수 있다. 항목 이름이 달라 못 읽은 것은 `미수집`으로 두고 0 으로 적지 않는다")
+           "· 늘리는 중 · 줄이는 중 : 최근 4분기 합이 그 전 4분기 합보다 10% 넘게 많으면 늘리는 중, 10% 넘게 적으면 줄이는 중 — 분기 값은 들쭉날쭉해 합으로 본다")
     return lines, _dk.with_src(tip, "SEC EDGAR")
 
 
@@ -643,8 +647,7 @@ def cal_peers(s, c):
     left = (datetime.date.fromisoformat(up[0]["day"]) - datetime.date.fromisoformat(s["day"])).days
     listed = " · ".join(f"{U.peer_name(x)}({r})" for x, r in roles.items())
     tip = (f"{nm}와(과) 사업으로 이어진 회사({listed})의 실적 발표. 이 회사들의 실적 소식에 {nm} 주가도 함께 움직이곤 한다\n"
-           f"· 30일 안 {len(up)}곳 : 가장 가까운 발표는 {U.peer_name(up[0]['symbol'])} {R._md_short(up[0]['day'])}\n"
-           "· 참고 : 최근 2년, 회사마다 8번 안팎이라 숫자는 대략으로 본다")
+           f"· 30일 안 {len(up)}곳 : 가장 가까운 발표는 {U.peer_name(up[0]['symbol'])} {R._md_short(up[0]['day'])}")   # 참고 줄은 뺐다 (batch 7 g)
     return lines, tip, f"{len(up)}곳", left
 
 
@@ -658,7 +661,7 @@ def cal_macro(c):
     name = lambda u: R.cal_cards.MACRO_KO.get(u["kind"], u["label"])   # noqa: E731
     near = " · ".join(f"{name(u)}({R._md_short(u['day'])})" for u in up[:2])
     first = f"가장 가까운 큰 일정은 {near}이다." + (f" 30일 안에 모두 {len(up)}건이 있다." if len(up) > 2 else "")
-    tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정. 모든 종목에 같은 내용이라 전체 일정과 지난 일정 날 S&P 500 움직임은 미국 증시 리포트 `일정` 탭에 모았다\n"
+    tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정\n"
            f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {name(up[0])} {R._md_short(up[0]['day'])}")
     return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED"), f"{len(up)}건", None
 
@@ -714,7 +717,9 @@ def detail_body(s, today, news=None):
     return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_tech(s) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
                 + R._section("실적", sec_expect(s), tab="실적")
+                + R._section("업계상황", sec_industry_tab(s), tab="업계상황")   # 한국과 같은 탭 (2026-10-31 사용자)
                 + R._section("일정", sec_calendar(s), tab="일정")   # 캘린더 → 일정 (P145)
+                + R._section("기업", sec_company(s), tab="기업")   # 한국과 같은 탭 (2026-10-31 사용자)
                 + related(s) + list_marker(U.LIST_URL))   # 출처 · 투자 권유 꼬리말은 뺐다 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자)
 
 

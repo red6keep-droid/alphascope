@@ -299,6 +299,16 @@ def run(snap):
         s["bollinger"] = bollinger(bars)
         s["overheat"] = overheat(bars, s["tech"])
         s["drawdown"] = drawdown(bars, s["year_range"], snap, s["sym"])
+        c = [x["close"] for x in bars]
+        s["mom_12_1"] = (c[-21] / c[-252] - 1) * 100 if len(c) >= 252 and c[-252] else None   # 12-1 모멘텀 — 한국 K18 과 같은 식. 미국은 검증 통과 못 함 → 숫자만 (2026-10-31)
+    ranked = sorted((s for s in stocks if s.get("mom_12_1") is not None), key=lambda s: -s["mom_12_1"])
+    moms = sorted(s["mom_12_1"] for s in ranked)
+    kb = _closes(snap, "SPY")
+    bench = (kb[-21] / kb[-252] - 1) * 100 if len(kb) >= 252 else None
+    for i, s in enumerate(ranked, 1):
+        s["mom_rank"] = (i, len(ranked))
+    for s in stocks:
+        s["mom_peers_median"], s["mom_bench"] = (moms[len(moms) // 2] if moms else None), bench
     day = max(s["day"] for s in stocks)
     return {"day": day, "fetched_at": snap["fetched_at"], "stocks": update_ranks(stocks, day)}
 

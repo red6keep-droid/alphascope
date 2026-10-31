@@ -42,6 +42,17 @@ def _analysts(t):
     return out
 
 
+def _company(t):
+    """`기업` 탭 기본 정보 — 야후 회사 개요 (2026-10-31 사용자: 한국처럼 미국에도 기업 탭). 대표 = 직함에 CEO 가 든 사람."""
+    i = t.info or {}
+    ceo = next((o.get("name") for o in i.get("companyOfficers") or [] if "CEO" in (o.get("title") or "") or "Chief Executive" in (o.get("title") or "")), None)
+    fy = i.get("lastFiscalYearEnd")
+    return {"name": i.get("longName"), "ceo": ceo, "city": i.get("city"), "state": i.get("state"), "country": i.get("country"), "website": i.get("website"),
+            "employees": i.get("fullTimeEmployees"), "exchange": i.get("fullExchangeName") or i.get("exchange"),
+            "fy_month": datetime.datetime.utcfromtimestamp(fy).month if fy else None,
+            "listed": datetime.datetime.utcfromtimestamp(i["firstTradeDateMilliseconds"] / 1000).year if i.get("firstTradeDateMilliseconds") else None}
+
+
 def _mid(row):
     bid, ask, last = row.get("bid") or 0, row.get("ask") or 0, row.get("lastPrice") or 0
     return (bid + ask) / 2 if bid and ask else (last or None)
@@ -108,7 +119,7 @@ def _one(args, only=None):
     t = yf.Ticker(sym)
     out = {}
     for key, f in (("analysts", lambda: _analysts(t)), ("eps", lambda: EX._eps(t)), ("short", lambda: EX._short(t)),
-                   ("options", lambda: _options(t, spot, day, next_earn))):
+                   ("options", lambda: _options(t, spot, day, next_earn)), ("company", lambda: _company(t))):
         if only and key not in only:
             continue
         try:
@@ -262,6 +273,12 @@ def run(snap):
         _, spy = _one((U.BENCH, snap["bars"][U.BENCH][-1]["close"], day, None), only=("options",))   # S&P 500 은 옵션만 (ETF 라 재무 값이 없다)
         out["spy_iv"] = spy.get("iv")
     iv_history(out["stocks"], day)
+    try:   # 추정치 · 등급 · 목표가 · 공매도 날짜별 기록 (K16, 2026-10-31 — 야후는 오늘 값만 준다)
+        sys.path.insert(0, os.path.join(BASE, ".."))
+        import est_history
+        est_history.append(os.path.join(BASE, "data", "est_history.json"), day, out["stocks"])
+    except Exception as e:   # noqa: BLE001
+        print(f"[extra] 추정치 기록 실패 : {e}")
     try:
         out["revenue"] = revenue(have.get("revenue"))
     except Exception as e:   # noqa: BLE001

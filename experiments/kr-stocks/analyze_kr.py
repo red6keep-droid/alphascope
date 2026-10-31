@@ -179,6 +179,25 @@ def momentum(bars):
     return (c[-21] / c[-252] - 1) * 100 if len(c) >= 252 and c[-252] else None
 
 
+def _rel(snap, sym, n):
+    a, b = _closes(snap["bars"].get(sym) or []), _closes(snap["bars"].get(U.BENCH) or [])
+    if len(a) <= n or len(b) <= n:
+        return None
+    return ((a[-1] / a[-1 - n]) - (b[-1] / b[-1 - n])) * 100
+
+
+def sector_flow(snap, sym):
+    """'○○ 업종으로 돈이 올까?' — 미국 sector_flow 와 같은 규칙(20거래일 업종 ETF − KOSPI, ±2%p), 순위는 한국 업종 ETF 끼리 (2026-10-31)."""
+    etf = U.SECTOR_ETF.get(sym)
+    n, pp = NC.SECTOR_FLOW_DAYS, NC.SECTOR_FLOW_PP
+    rel = _rel(snap, etf, n) if etf else None
+    if rel is None:
+        return None
+    sectors = sorted(({"etf": e, "name": nm, "rel": r} for e, nm in U.SECTOR_ETF_LIST.items() if (r := _rel(snap, e, n)) is not None), key=lambda x: -x["rel"])
+    return {"etf": etf, "etf_label": U.SECTOR_ETF_LABEL.get(etf, etf), "name": U.SECTOR_ETF_LIST[etf], "state": "모이는 중" if rel >= pp else "빠져나가는 중" if rel <= -pp else "뚜렷하지 않음",
+            "rel_pp": rel, "days": n, "sectors": sectors, "rank": 1 + sum(1 for x in sectors if x["rel"] > rel), "n_pool": len(sectors)}
+
+
 def industry_rows(sym, flow_data):
     """종목의 업종 재료 지표 — 마지막 값 · 비교(전년 동월 또는 전월) · 12개월 범위 위치."""
     ind = dict((flow_data or {}).get("industry") or {})
@@ -451,6 +470,10 @@ def run(snap, flow_data=None, hist=None):
     stocks = update_ranks(stocks, day)
     market = flows(flow_data, snap["bars"].get(U.BENCH)) or {}
     market["overnight"] = overnight(snap, day)
+    mr = A.market_regime({"bars": {NC.REGIME_BENCHMARK: snap["bars"].get(U.BENCH) or []}})   # 시장 분위기 — 미국과 같은 규칙, KOSPI (VIX 없음 → 불안 국면 판정 없음, 2026-10-31)
+    for s in stocks:
+        s["market_regime"] = mr
+        s["sector_flow"] = sector_flow(snap, s["sym"])
     # K18 모멘텀 순위(우리 종목 안) · K14 환율 · K21 WTI 를 종목에 붙인다 (카드에서 값만 보여 준다)
     ranked = sorted((s for s in stocks if s.get("mom_12_1") is not None), key=lambda s: -s["mom_12_1"])
     for i, s in enumerate(ranked, 1):
