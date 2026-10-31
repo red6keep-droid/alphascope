@@ -1,6 +1,69 @@
 {
-  "updated_at": "2026-10-31 01:02:41 UTC",
+  "updated_at": "2026-10-31 12:48:35 UTC",
   "items": [
+    {
+      "title": "Berkshire ekes out some new highs, but October rally stalls",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/berkshire-ekes-out-some-new-highs-but-october-rally-stalls.html",
+      "published": "2026-10-31 12:26:00",
+      "title_ko": "버크셔, 새로운 사상 최고치 기록했지만 10월 상승세 멈춤",
+      "summary_ko": ""
+    },
+    {
+      "title": "Qatari mediators held talks in Tehran aimed at restarting direct U.S.-Iran negotiations, source says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/qatar-iran-us-talks-mediation.html",
+      "published": "2026-10-31 12:11:12",
+      "title_ko": "카타르 중재자, 테헤란서 미-이란 직접 협상 재개 논의",
+      "summary_ko": ""
+    },
+    {
+      "title": "‘Pop-up’ super PACs pour $637 million into 2026 midterm races",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/2026-midterm-election-super-pacs-donor-disclosure.html",
+      "published": "2026-10-31 12:00:01",
+      "summary_ko": ""
+    },
+    {
+      "title": "Automakers like Rivian and Ford are ‘democratizing 3D printing’ to reduce costs and increase speed",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/automakers-3d-printing-ford-rivian-gm.html",
+      "published": "2026-10-31 12:00:01",
+      "title_ko": "리비안·포드 등 자동차업체, 3D 프린팅 확대해 비용·속도 절감",
+      "summary_ko": ""
+    },
+    {
+      "title": "Anthropic's path to the Nasdaq just got a lot bumpier",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/anthropic-ipo-ai-spending.html",
+      "published": "2026-10-31 11:00:01",
+      "title_ko": "Anthropic 나스닥 상장 길, 급격히 어려워져",
+      "summary_ko": "하이퍼스케일러 전망 하락"
+    },
+    {
+      "title": "The rise of the 15-foot skeleton—how a viral novelty became a Halloween staple",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/make-it/2026/10/23/giant-halloween-skeleton-decorations.html",
+      "published": "2026-10-31 10:27:19",
+      "title_ko": "15피트 해골, 바이럴에서 할로윈 필수품으로",
+      "summary_ko": "소매 경쟁 확대"
+    },
+    {
+      "title": "Trump called out Big Oil profits. Here’s how much their refining earnings have surged since",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/trump-big-oil-refining-profits.html",
+      "published": "2026-10-31 06:00:02",
+      "title_ko": "트럼프, 빅오일 이익 비판…정제 수익 급증 규모는?",
+      "summary_ko": "연료 공급 긴축"
+    },
+    {
+      "title": "AI is coming to construction sites. But does it make workers safer?",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/ai-construction-worker-safety.html",
+      "published": "2026-10-31 06:00:02",
+      "title_ko": "AI, 건설 현장에 도입…작업자 안전은?",
+      "summary_ko": "부상 예방 효과 제한"
+    },
     {
       "title": "Alaska Senate election: DOJ wants to 'segregate' all ballots for 2nd Sullivan candidate",
       "source": "CNBC",
@@ -8,22 +71,6 @@
       "published": "2026-10-30 22:57:55",
       "title_ko": "알래스카 상원: 법원이 DOJ 소송 2차 설리번 후보 기각 신규 입찰 신속 진행",
       "summary_ko": ""
-    },
-    {
-      "title": "Jim Cramer says it's time to look beyond tech. Here are 4 consumer stocks he likes",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/jim-cramer-consumer-staples-stocks.html",
-      "published": "2026-10-30 22:52:04",
-      "title_ko": "짐 크레이머, 기술주 넘어 소비재 주식 4종목 추천",
-      "summary_ko": "AI 트레이드 다각화 목적"
-    },
-    {
-      "title": "Meta outlook revised downward by S&P on cash flow and capex concerns",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/meta-outlook-to-revised-to-negative-by-sp-after-cash-flow-negative.html",
-      "published": "2026-10-30 22:42:26",
-      "title_ko": "S&P, 메타 전망 하향 조정…현금흐름·자본지출 우려",
-      "summary_ko": "대규모 자본지출 및 자유현금흐름 우려 반영"
     },
     {
       "title": "바이낸스 63억 달러 해킹 사태",
@@ -47,67 +94,19 @@
       "kind": "media",
       "tag": "AI/반도체",
       "direction": "negative",
-      "n_channels": 4
+      "n_channels": 2
     },
     {
-      "title": "Cramer’s week ahead: Expect more volatility as tech earnings, midterms loom",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/jim-cramer-week-ahead-apple-amd-jobs-report.html",
-      "published": "2026-10-30 22:17:13",
-      "title_ko": "크레이머, 기술주 실적과 중간선거 앞두고 변동성 확대 전망",
-      "summary_ko": "투자자, AI 트레이드 다각화 위해 소비재 주식 관심"
-    },
-    {
-      "title": "Gamble on democracy: Inside suspicious election-contracts trading on prediction markets",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/gamble-on-democracy-inside-suspicious-election-contracts-trading-on-prediction-markets-.html",
-      "published": "2026-10-30 22:00:53",
-      "title_ko": "민주주의에 대한 도박: 예측 시장에서 의심스러운 선거 계약 거래 내부 살펴보기",
-      "summary_ko": "LA 프라이머리 결과 오판"
-    },
-    {
-      "title": "Fed officials are already saying they’ll need to get back to hiking rates",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/musalem-fed-monetary-policy-tightening.html",
-      "published": "2026-10-30 21:53:10",
-      "title_ko": "연준 관계자, 금리 인상 필요성 언급",
-      "summary_ko": "알베르토 무살렘·로리 로건 발언"
-    },
-    {
-      "title": "빅테크 AI 자본 지출과 현금 흐름 우려",
-      "title_ko": "빅테크 AI 자본 지출과 현금 흐름 우려",
-      "summary_ko": "아마존 등 빅테크 기업들의 막대한 AI 인프라 투자와 마이너스  vrije 현금 흐름에 대한 우려가 기술주 전반의 조정을 불러일으켰",
+      "title": "기술주 중심의 월말 급락세",
+      "title_ko": "기술주 중심의 월말 급락세",
+      "summary_ko": "나스닥 100과 반도체 지수가 주요 이동평균선 아래로 내려앉으며 10월을 부진하게 마감했습니",
       "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=rajmYyeyYrM",
-      "published": "2026-10-30 21:48:58",
+      "link": "https://www.youtube.com/watch?v=KSuMdi7WtNk",
+      "published": "2026-10-30 21:55:51",
       "kind": "media",
-      "tag": "AI/반도체",
+      "tag": "매크로",
       "direction": "negative",
-      "n_channels": 3
-    },
-    {
-      "title": "Binance loses $6.3 billion in crypto heist—what happens to your money when an exchange gets hacked",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/10/30/binance-crypto-hack-customer-funds.html",
-      "published": "2026-10-30 21:45:52",
-      "title_ko": "바이낸스, 63억 달러 암호화폐 해킹 손실",
-      "summary_ko": "디지털 자산 보관 위험"
-    },
-    {
-      "title": "$6.3 billion Binance hack is largest crypto theft on record",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/29/circle-tether-freeze-funds-impacted-by-potential-binance-security-issue.html",
-      "published": "2026-10-30 21:21:17",
-      "title_ko": "바이낸스 '잠재적 보안 문제'로 서클·테더 등 25억 4천만 달러 동결",
-      "summary_ko": "세계 최대 암호화폐 거래소 바이낸스, 자금 완전 안전 주장하며 조사 진행"
-    },
-    {
-      "title": "Intel stock has worst day since 1970s, wiping about $12 billion off government's stake",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/amazon-intel-earnings-big-tech-ai-spending-concerns.html",
-      "published": "2026-10-30 20:30:57",
-      "title_ko": "인텔 주식, 1970년대 이후 최악의 하루 기록, 정부 보유주식 120억 달러 감소",
-      "summary_ko": "AI 지출 확대에 투자자 우려"
+      "n_channels": 2
     }
   ]
 }
