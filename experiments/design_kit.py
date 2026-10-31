@@ -203,7 +203,7 @@ def dot_chunks(parts_html):
 
 # ── 세로 막대 그래프 — 숫자 겹침 금지 · 모자라면 가로 스크롤 (2026-10-26 사용자, 가이드라인 8절) ──
 CHART_PHONE_W = 290   # 폰에서 그래프가 쓰는 폭 (본문 320 − 카드 안 여백)
-CHART_PAD_PX = 4      # 막대 묶음 양옆 최소 틈 (가로 스크롤로 넘어갈 때)
+CHART_PAD_PX = 2      # 막대 묶음 양옆 최소 틈 (가로 스크롤로 넘어갈 때) — 4 → 2 (2026-10-31 사용자 P181: 막대 샘플 C2)
 
 
 def text_px(text, fs):
@@ -214,12 +214,15 @@ def text_px(text, fs):
     return w * fs
 
 
-BAR_W = 28     # 막대 기준 폭 px — 엔비디아 · 한국 `최근 12개월 풋/콜 거래량 비율` 막대(숫자 세 자리 0.86 폭) (2026-10-26 사용자: "막대 가로 사이즈를 맞춰 줘")
-BAR_MAX = 36   # 숫자가 길면(+2.72 · −4.12 같은 네 자리) 이만큼까지만 넓힌다 — 막대가 적어도 화면을 채우려 늘리지 않는다
-GROUP_PAD_MULTI = 1.8   # 시리즈가 둘 이상인 묶음의 양옆 틈 배수 (묶음 사이 8 → 약 14px)
+BAR_W = 14     # 28 → 14 (2026-10-31 사용자 P181: 막대 샘플 C2 — 더 얇게)   # 막대 기준 폭 px — 엔비디아 · 한국 `최근 12개월 풋/콜 거래량 비율` 막대(숫자 세 자리 0.86 폭) (2026-10-26 사용자: "막대 가로 사이즈를 맞춰 줘")
+BAR_MAX = 20   # 36 → 20 (P181)   # 숫자가 길면(+2.72 · −4.12 같은 네 자리) 이만큼까지만 넓힌다 — 막대가 적어도 화면을 채우려 늘리지 않는다
+GROUP_PAD_MULTI = 1.5   # 1.8 → 1.5 (P181)   # 시리즈가 둘 이상인 묶음의 양옆 틈 배수 (묶음 사이 8 → 약 14px)
 BAR_NUM_PX = 13   # 막대 위 숫자 글자 — 모든 세로 막대 하나로, 가로축 이름(AXIS_FS)과 같은 크기 · 굵게 (2026-10-27 사용자: "그래프 위 숫자 폰트가 다 다르다" → 13 통일. 옛 막대 수별 11~17 · 데일리 11)
-BAR_RATIO = 0.8   # 막대 폭 = 숫자 폭 × 0.8, 최소 BAR_W · 최대 BAR_MAX (2026-10-27 사용자: "막대가 숫자보다 굵다, 숫자의 80% 정도")
-COL_GAP = 2    # 한 묶음 안 시리즈 막대 사이 (BAR_GAP 은 가로 막대 줄 간격으로 따로 있다)
+BAR_RATIO = 0.45   # 0.8 → 0.45 (P181)   # 막대 폭 = 숫자 폭 × 0.8, 최소 BAR_W · 최대 BAR_MAX (2026-10-27 사용자: "막대가 숫자보다 굵다, 숫자의 80% 정도")
+COL_GAP = 1    # 2 → 1 (P181)   # 한 묶음 안 시리즈 막대 사이 (BAR_GAP 은 가로 막대 줄 간격으로 따로 있다)
+COL_TIGHT = 0.7   # 막대와 막대 사이 빈 폭 배수 — 숫자 · 가로축 이름 폭 아래로는 줄이지 않는다 (2026-10-31 사용자 P181: 30% 줄이기)
+LBL_LIFT, LBL_LIFT_DN = 3, 4   # 막대 끝 ~ 막대 숫자 사이에 더 띄울 px — 오름 막대 위 · 내림 막대 아래 (보이는 틈 3.3 · 4.1 → 6.3 · 8.1px, 2026-10-31 사용자 P181: 2배)
+COL_SPREAD = 6   # 묶음마다 최소 폭에 더해 줄 수 있는 최대 px — 막대가 적어도 칸을 꽉 채워 벌리지 않고 가운데로 모은다(None = 옛 꽉 채움, 2026-10-31 사용자 P181)
 
 
 LEGEND_SIGN = ("#ED8E87", "#82B1F0")   # 이 종목(대상) 오름 · 내림 막대 색 — 범례에 쓰지 않는다
@@ -246,6 +249,9 @@ def col_layout(n, ns, label_px, axis_px):
     w = max(BAR_W, min(round(label_px * BAR_RATIO), BAR_MAX))   # 숫자 폭의 80% — 막대가 숫자보다 한 단계 가늘게 (2026-10-27 사용자)
     lw = max(w, label_px)
     group = max(ns * lw + (ns - 1) * COL_GAP + 2 * CHART_PAD_PX * (GROUP_PAD_MULTI if ns > 1 else 1), axis_px)   # 여러 막대 묶음은 묶음 사이를 80% 넓게 (2026-10-26 사용자: "월 월 사이가 너무 붙어 있다")
+    if COL_TIGHT != 1.0:   # 막대 사이 빈 폭만 줄인다 — 여유(COL_SPREAD)까지 합친 간격 기준, 숫자 · 이름 실제 폭(어림의 여백 뺀 값) 아래로는 안 줄인다
+        floor = max(ns * lw + (ns - 1) * COL_GAP + 6 if ns > 1 else lw - 4, axis_px - 8)   # 여러 막대 묶음은 옆 묶음 숫자와 붙지 않게 숫자 칸 여백(4) + 6
+        group = max(w + (group + (COL_SPREAD or 0) - w) * COL_TIGHT, floor) - (COL_SPREAD or 0) * COL_TIGHT
     return w, lw, int(n * group + 0.999)
 
 
@@ -284,7 +290,7 @@ def col_axis(vals, height, lbl):
     bottom = AXIS_PAD
     for _ in range(2):
         scale = (height - lbl - bottom) / ((hi - lo) or 1)
-        need = lbl - (min(vals) - lo) * scale if mn > 0 else 0   # 가장 낮은 막대 아래 숫자가 눈금선 밑으로 나가는 만큼
+        need = lbl - (min(vals) - lo) * scale + 8 if mn > 0 else 0   # 가장 낮은 막대 아래 숫자가 눈금선 밑으로 나가는 만큼 + 강조점 자리 8(axis_dot 이 이름을 5 올린다 — 숫자 ~ 점이 숫자 ~ 막대만큼, P181)
         if need <= bottom:
             break
         bottom = need
@@ -327,7 +333,12 @@ def _col_frame_right(bars_html, axis_names, height, top, scale, ticks, min_w, fm
     plot = (f'<span style="display:block;position:relative;height:{height}px;">{"".join(lines)}'
             f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>{bars_html}</span>')
     xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;">{"<br>".join(esc(x) for x in g.split(chr(10)))}</span>' for g in axis_names)
-    inner = f'{plot}<span style="display:flex;font-size:{AXIS_FS};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>'
+    xm = "2px 0 6px"
+    if COL_SPREAD is not None:   # 묶음을 가운데로 모은다 — 눈금선은 그대로 꽉 차게
+        cap = min_w + len(axis_names) * COL_SPREAD * COL_TIGHT
+        plot = plot.replace(bars_html, f'<span style="position:absolute;top:0;bottom:0;left:0;right:0;margin:0 auto;max-width:{cap}px;">{bars_html}</span>', 1)
+        xm = f"2px auto 6px;max-width:{cap}px"
+    inner = f'{plot}<span style="display:flex;font-size:{AXIS_FS};line-height:20px;color:{NOTE};margin:{xm};">{xl}</span>'
     hint = (f'<span data-scroll-hint="1" data-lhint="1" style="display:block;text-align:left;font-size:{TINY};line-height:{LH_TINY};color:{FAINT};margin:{LEGEND_TOP}px 0 4px;">‹ {SCROLL_HINT}</span>'
             if min_w > CHART_PHONE_W else "")
     shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'

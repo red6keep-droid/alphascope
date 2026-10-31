@@ -105,7 +105,7 @@ def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, right=True
         return ""
     fs = dk.BAR_NUM_PX   # 막대 위 숫자 13px — 모든 그래프 같게 (2026-10-27 사용자, 옛 11)
     lbl = max(CHART_LBL, fs + 4)
-    ticks, top, scale = dk.col_axis(vals, height, lbl)   # 한 칸 바깥 눈금까지 · 아래 여백 통일 (2026-10-26 사용자)
+    ticks, top, scale = dk.col_axis(vals, height, lbl + max(dk.LBL_LIFT, dk.LBL_LIFT_DN))   # 한 칸 바깥 눈금까지 · 아래 여백 통일 (2026-10-26 사용자) · 숫자 띄우기 자리 (P181)
     n, ns = len(groups), len(groups[0][1])
     txt = lambda v: fmt(v) if fmt else f"{v:+.2f}".replace("-", "−")   # noqa: E731
     label_px = max(dk.text_px(txt(v), fs) for v in vals) + 4
@@ -117,7 +117,7 @@ def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, right=True
             if v is None:
                 continue
             h = max(1.0, abs(v) * scale)
-            y, ly = (top - h, top - h - lbl + 1) if v >= 0 else (top, top + h + 1)
+            y, ly = (top - h, top - h - lbl + 1 - dk.LBL_LIFT) if v >= 0 else (top, top + h + 1 + dk.LBL_LIFT_DN)   # 막대 ~ 숫자 2배 (P181)
             rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
             parts.append(f'<span style="position:absolute;{dk.bar_x(i, k, n, ns, bw, lw)}top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
             parts.append(f'<span style="position:absolute;{dk.bar_x(i, k, n, ns, bw, lw, label=True)}top:{ly:.1f}px;height:{lbl - 2}px;line-height:{lbl - 2}px;text-align:center;font-size:{fs}px;'
