@@ -267,6 +267,7 @@ def _nice_step(span):
 
 CHART_CARD_X = -5   # 그래프 흰 카드를 양쪽 5px 씩 넓게 (가로 +10px: +4 → +2 → +4, 2026-10-26 사용자) — 제목은 카드 밖이라 그대로
 CHART_CARD_PAD = 10   # 그래프 흰 카드 안 위 여백 = 아래 여백 — 아래(가로축 이름 줄 6 + 빈 줄 4 = 10)가 기준 (2026-10-26 사용자: "고용 지표 아래 여백 기준으로 보통 날 위 여백을")
+AXIS_MAX = 84   # 가로축 이름이 이보다 길면 묶음을 넓히지 않고 이름을 두 줄로 꺾는다 (2026-10-31 사용자 P155: 함께 움직이는 종목 막대 사이가 긴 이름 탓에 벌어짐)
 AXIS_FS = "13px"   # 가로축 이름 — 안내 14px 보다 1px 작게 (2026-10-26 사용자: "아래 숫자 1, 2, 6, 7 … 1포인트 작게")
 AXIS_PAD = 16   # 맨 아래 눈금선 ~ 가로축 이름 위 (2026-10-26 사용자: "막대와 FOMC 같은 이름 사이 위쪽 여백을 이 그래프 기준으로" — 데일리 막대 숫자 자리 16)
 
@@ -304,7 +305,7 @@ def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w):
         grid.append(f'<span style="position:absolute;left:0;width:{gut - 6}px;top:{y - 7:.1f}px;height:14px;line-height:14px;text-align:right;font-size:{GRID_FS}px;color:{NOTE};">{fmt(v)}</span>')
     plot = (f'<span style="position:absolute;left:{gut}px;right:0;top:0;bottom:0;">'
             f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>{bars_html}</span>')
-    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:nowrap;">{"<br>".join(esc(x) for x in g.split(chr(10)))}</span>' for g in axis_names)   # 이름 아래 줄(연결 이유 · `지금`)은 줄바꿈 (2026-10-27 P31 · P36)
+    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;">{"<br>".join(esc(x) for x in g.split(chr(10)))}</span>' for g in axis_names)   # 긴 이름은 두 줄로 — 묶음 폭 상한(AXIS_MAX) 때문 (P155)   # 이름 아래 줄(연결 이유 · `지금`)은 줄바꿈 (2026-10-27 P31 · P36)
     return scroll_x(f'<span style="display:block;position:relative;height:{height}px;">{"".join(grid)}{plot}</span>'
                     f'<span style="display:flex;padding-left:{gut}px;font-size:{AXIS_FS};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>', min_w + gut)
 
@@ -1365,6 +1366,7 @@ def as_rules(html):
     return re.sub(r"border:1px solid (#[0-9A-Fa-f]{6});border-radius:10px;", r"border-top:1px solid \1;border-bottom:1px solid \1;", html)
 
 
+NEWS_TITLE_FS, NEWS_TITLE_LH = "17px", "30px"   # 뉴스 기사 제목 — 본문 19 보다 한 단계 작게 (P159)
 NEWS_SUM = "display:block;color:#333;font-size:16px;line-height:26px;font-weight:400;margin-top:4px;word-break:keep-all;"   # 뉴스 요약 줄 = 홈 주요 뉴스 기사 소개(.news-sum)와 같게 (2026-10-26 사용자: 14px 로 더 작았다)
 
 
@@ -1373,8 +1375,8 @@ def news_item(headline_html, url=None, detail="", subs=(), labels="", meta=(), l
         헤드라인(굵게, 원문 링크) / 요약 한 줄(16px #333 = 홈 기사 소개, 없으면 생략) / 보조 줄들(subs) / [라벨] [라벨]  회색 메타(시각 · 매체)
     headline_html = 이스케이프한 헤드라인(명사형). detail = 요약 글(이스케이프 전 — 뉴스 문체로 바꾼다). labels = 알약 HTML 묶음. meta = 글자 목록.
     link_attrs = a 태그에 더할 속성(title · data-trhelp 등). 헤드라인 · 요약은 합니다체로 바꾸지 않는다(keep_tone)."""
-    head = (f'<a href="{esc(url)}" target="_blank" rel="noopener"{link_attrs} style="color:#111;font-weight:700;text-decoration:none;">{headline_html}</a>'
-            if url else f'<span style="color:#111;font-weight:700;">{headline_html}</span>')
+    head = (f'<a href="{esc(url)}" target="_blank" rel="noopener"{link_attrs} style="color:#111;font-weight:700;text-decoration:none;font-size:{NEWS_TITLE_FS};line-height:{NEWS_TITLE_LH};">{headline_html}</a>'
+            if url else f'<span style="color:#111;font-weight:700;font-size:{NEWS_TITLE_FS};line-height:{NEWS_TITLE_LH};">{headline_html}</span>')   # 기사 제목 19 → 17 · 행간 34 → 30, 굵게 유지 (2026-10-31 사용자 P159)
     out = keep_tone(head)
     if detail:
         out += keep_tone(f'<span style="{NEWS_SUM}">{esc(headline(detail))}</span>')
@@ -1447,7 +1449,7 @@ def stock_row_link(row_html, sym):
 # 엔비디아 리포트(render_html)에서 옮겨 왔다 — 데일리 · 한국 증시 리포트도 같은 막대를 쓰도록 (2026-10-31 사용자 P143). 엔비디아 render_html 은 이 함수를 가리킨다.
 BAR_PASTEL = {"positive": ("#F8C4BF", "#7F1D1D"), "negative": ("#BCD3F5", "#1E3A8A"),
               "uncertain": ("#FADDB0", "#7C2D12"), "neutral": ("#E2E8F0", "#475569")}
-BAR_H, BAR_NUM, BAR_PAD = 27, "16px", 5   # 막대 10% 줄임 30 → 27 · 안 숫자 17 → 16 (2026-10-31 사용자 P149)   # 막대 안 숫자 18 → 17 (2026-10-14 사용자)   # 높이 26 → 30 (+15%, 2026-10-14 사용자) · 막대 위아래 +5   # 막대 높이 24 → 26 (+10%, 정수) · 막대 안 숫자 19 → 18 (2026-10-13 사용자, 가이드라인 10-7)
+BAR_H, BAR_NUM, BAR_PAD = 24, "14px", 5   # 높이 27 → 24 · 안 숫자 16 → 14 보통 굵기 = 범례 숫자 (2026-10-31 사용자 P159, 앞서 P149 30 → 27 · 17 → 16)   # 막대 안 숫자 18 → 17 (2026-10-14 사용자)   # 높이 26 → 30 (+15%, 2026-10-14 사용자) · 막대 위아래 +5   # 막대 높이 24 → 26 (+10%, 정수) · 막대 안 숫자 19 → 18 (2026-10-13 사용자, 가이드라인 10-7)
 LEGEND_CHIP = 9      # 범례 색 사각형 11 → 9px (20% 줄임, 2026-10-17 사용자)
 LEGEND_INDENT = 10   # 범례 왼쪽 들여쓰기 (2026-10-17 사용자)
 BAR_GROUP_GAP = 24   # 뉴스 막대 묶음(오늘 · 최근 7일) 사이 보이는 여백 (2026-10-12 사용자)
@@ -1464,7 +1466,7 @@ def legend_bar(title, segs):
         return ""
     head = f'<span style="display:block;font-size:{TINY};line-height:{LH_TINY};margin:0 0 3px;color:#111;font-weight:700;">{esc(title)}</span>'   # 제목 16 → 14 굵게 = 한 달 범위 막대의 작은 굵은 글씨 (2026-10-31 사용자 P149)
     body = "".join(f'<span style="display:block;width:{c / total * 100:.1f}%;background:{bg};color:{fg};font-size:{BAR_NUM};font-weight:700;'
-                   f'text-align:center;line-height:{BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{c / total * 100:.0f}%" if c / total >= 0.08 else ""}</span>' for _, c, bg, fg in segs)
+                   f'text-align:center;line-height:{BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{c / total * 100:.0f}%" if c / total >= 0.08 else ""}</span>' for _, c, bg, fg in segs).replace("font-weight:700;text-align:center", "font-weight:400;text-align:center")   # 막대 안 숫자 보통 굵기 (P159)
     bar_html = f'<span style="display:flex;width:100%;height:{BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:{BAR_PAD}px 0 {3 + BAR_PAD}px;">{body}</span>'
     legend = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
                      f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{nm} {c / total * 100:.0f}%</span>' for nm, c, bg, _ in segs)

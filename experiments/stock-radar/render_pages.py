@@ -124,7 +124,7 @@ def price_card(s, today):
         head = head[:k] + sub + head[k:]
     rows = R.glance_rows(g) + sec_earnings(s, today)   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 정보 보기는 강조 카드 안 (2026-10-26 사용자)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-            f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), R.in_card(sec_periods(s), white=True), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
+            f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), sec_month_range(s), R.in_card(sec_periods(s), white=True), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
 
 
 IMAGE_BRANCH = "radar-images"   # 종목 그래프 전용 브랜치 — 매 실행 그날 그림만 담아 덮어쓴다(이력 없음). 지난 그림은 남지 않는다 (2026-10-20 사용자: 이미지는 휘발성)
@@ -196,12 +196,16 @@ def sec_year_range(s):
     y = s.get("year_range")
     if not y:
         return ""
-    kind, html = R.year_range_in(y, lambda v: f"${v:,.2f}", year_tip(y), (s.get("drawdown") or {}).get("days_since_high"))
+    return R.year_range_in(y, lambda v: f"${v:,.2f}", year_tip(y), (s.get("drawdown") or {}).get("days_since_high"))
+
+
+def sec_month_range(s):
+    """한 달간 변화 범위 — 고점 회복 문장 아래 (2026-10-31 사용자 P155: 1년 범위 → 회복 문장 → 한 달 범위), 옛 오늘 탭 상태 카드 (P150)."""
     bb = s.get("bollinger")
-    if bb and bb.get("lower") is not None:   # 한 달간 변화 범위 — 1년 범위 바로 아래 같은 틀 (2026-10-31 사용자 P150, 옛 오늘 탭 상태 카드)
-        th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
-        html += R.month_range_in(bb, lambda v: f"${v:,.0f}", R.bollinger_rule(bb), R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col)
-    return kind, html
+    if not bb or bb.get("lower") is None:
+        return ""
+    th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
+    return ("white", R.month_range_in(bb, lambda v: f"${v:,.0f}", R.bollinger_rule(bb), R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col, top=0))
 
 
 def earn_tip(s, e):
@@ -355,10 +359,7 @@ def sec_drawdown(s):
 def related(s):
     """함께 보는 리포트 (가이드라인 10-5 4) — HTML 링크라 검색엔진이 따라간다."""
     links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("엔비디아 NVDA 주가", U.NVDA_REPORTS_URL)]
-    items = "".join(_dk.dot_li(f'<a href="{_esc(u)}" style="color:#1a73e8;text-decoration:none;">{_esc(t)}</a>', size=3, color="#111", margin="4px 0") for t, u in links)
-    # 제목 · 목록 모두 좌측 기준선(ALIGN_PX) — 목록은 점 글머리표(다른 글머리표와 같은 점), 점이 기준선 (2026-10-23 사용자, 2026-10-24 홈 뉴스 선으로)
-    return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};padding-left:{_dk.ALIGN_PX}px;">함께 보는 페이지</div>'
-            f'<ul style="margin:6px 0 0;padding:0 0 0 {_dk.ALIGN_PX}px;list-style:none;font-size:{_dk.NAME};line-height:{R.LH_CARD};">{items}</ul></div>')
+    return R.related_buttons(links)   # 전부 나가는 버튼 (2026-10-31 사용자 P160, 옛 점 글머리표 링크)
 
 
 # ---------------------------------------------------------------- 애널리스트 · 탭 셋 (NVDA 리포트 build_body 와 같은 순서 · 같은 카드)
@@ -417,7 +418,7 @@ def card_opinions(s):
     if verdict:
         lines.append((R.analysts_block(a), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
     if ps:
-        lines.append((R.picks_rows(ps, s.get("close"), money) + R.together_block(together_items(s)), "html"))   # 방송 묶음은 `매수 의견` 제목 · 구분선 (P92) · 함께 보기 (P142)
+        lines.append((R.picks_rows_folded(ps, s.get("close"), money) + R.together_block(together_items(s)), "html"))   # 4건 이상은 3건 + 접기 (P158)   # 방송 묶음은 `매수 의견` 제목 · 구분선 (P92) · 함께 보기 (P142)
     tip = (f"애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 최근 {R.PICK_HOURS}시간에 나온 이 종목 의견을 한 카드에 모은 것\n"
            f"· 지금 : {state}" + (f" · 방송 {cnt}" if ps else "") + "\n"
            "· 나누는 법 : 애널리스트 중 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림. 방송 건수는 답에 넣지 않는다\n"
@@ -676,7 +677,7 @@ def _all_list(s, items):
 def sec_calendar(s):
     """캘린더 탭 — NVDA 리포트 sec_calendar 와 같은 질문 카드(실적 · 같은 업종 실적 · 시장 일정). 소송 카드는 없다(추적하는 사건이 없다)."""
     cc = s.get("calendar_cards") or {}
-    specs = [("다음 실적 발표는?", "earnings", lambda c: cal_earnings(s, c)), ("함께 보는 회사 실적은?", "peers", lambda c: cal_peers(s, c)),
+    specs = [("다음 실적 발표는?", "earnings", lambda c: cal_earnings(s, c)), ("함께 보는 회사 실적 일정은?", "peers", lambda c: cal_peers(s, c)),   # 일정 탭 질문엔 `일정` (P156)
              ("시장 전체를 흔들 일정은?", "macro", cal_macro)]
     out, first = "", True
     for title, key, fn in specs:
@@ -687,9 +688,12 @@ def sec_calendar(s):
         theme, col = R._soon_theme(extra)
         out += R._state_card(_josa(title), state, theme, col, lines, "", tip=_josa(tip), fold=True, opened=first)
         first = False
-    lst = _all_list(s, cc.get("all") or [])
-    fold = ((f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
-             f'<div style="margin-top:6px;">{lst}</div></details>') if lst else R.empty_card("잡힌 일정이 없습니다."))   # 일정이 없으면 버튼 대신 안내 카드 (P148)
+    items = [c for c in (cc.get("all") or []) if c.get("kind") in STOCK_KINDS]
+    lst = _all_list(s, items)
+    fold = (R.empty_card("잡힌 일정이 없습니다.") if not lst   # 일정이 없으면 버튼 대신 안내 카드 (P148)
+            else lst if len(items) <= R.LIST_SHOWN   # 3개 이하는 접기 없이 바로 (P157)
+            else (f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
+                  f'<div style="margin-top:6px;">{lst}</div></details>'))
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' + fold
 
 

@@ -603,7 +603,7 @@ def price_card(s):
         head = head[:k] + sub_html + head[k:]
     rows = ""   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 정보 보기는 모두 강조 카드 안 (2026-10-26 사용자)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-            f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), R.in_card(sec_periods(s), white=True), sec_momentum(s), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
+            f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), sec_month_range(s), R.in_card(sec_periods(s), white=True), sec_momentum(s), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
 
 
 def periods_tip(s, ps):
@@ -638,12 +638,16 @@ def sec_year_range(s):
     y = s.get("year_range")
     if not y:
         return ""
-    kind, html = R.year_range_in(y, won, year_tip(y), (s.get("drawdown") or {}).get("days_since_high"))
+    return R.year_range_in(y, won, year_tip(y), (s.get("drawdown") or {}).get("days_since_high"))
+
+
+def sec_month_range(s):
+    """한 달간 변화 범위 — 고점 회복 문장 아래 (2026-10-31 사용자 P155: 1년 범위 → 회복 문장 → 한 달 범위), 옛 오늘 탭 상태 카드 (P150)."""
     bb = s.get("bollinger")
-    if bb and bb.get("lower") is not None:   # 한 달간 변화 범위 — 1년 범위 바로 아래 같은 틀 (2026-10-31 사용자 P150, 옛 오늘 탭 상태 카드)
-        th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
-        html += R.month_range_in(bb, won, _boll_rule(bb), R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col)
-    return kind, html
+    if not bb or bb.get("lower") is None:
+        return ""
+    th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
+    return ("white", R.month_range_in(bb, won, _boll_rule(bb), R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col, top=0))
 
 
 def sec_drawdown(s):
@@ -692,15 +696,35 @@ def sec_chart_indicators(s):
 
 
 def sec_momentum(s):
-    """12개월 모멘텀 줄 — 기간별 수익률 바로 아래 (P139). 1년 흐름 · 우리 종목 안 순위라 기술지표 카드(ROC 12일)와 다르다."""
+    """12개월 모멘텀 — 기간별 수익률 아래 (P139). 그래프로 (2026-10-31 사용자 P155): A안 = 순위 위치 막대(왼쪽 하위 25% · 오른쪽 상위 25%, 점 = 이 종목, 말풍선 = 값),
+    B안(목업에서만) = 세로 막대 셋(이 종목 · 35종목 중앙값 · KOSPI). 사용자가 고르면 하나만 남긴다. 1년 흐름 · 우리 종목 안 순위라 기술지표 카드(ROC 12일)와 다르다."""
     mom, mr = s.get("mom_12_1"), s.get("mom_rank")
     if mom is None or not mr:   # K18 — 우리 검증에서 유일하게 '다음 달' 과 이어진 가격 신호 (좁은 표본)
         return ""
     sp, n, period = U.MOMENTUM_RECORD
-    return R._multi([(f"12개월 모멘텀 (최근 1개월 제외 · 우리 {mr[1]}종목 중 {mr[0]}위)", R._arrow(mom, 1),
-                      "12개월 전 가격 대비 1개월 전 가격의 변화. 최근 1개월은 단기 되돌림이 섞여 빼는 것이 표준(12-1 모멘텀)\n"
-                      f"· 오늘 {_sgn(mom, 1)}% : 우리 {mr[1]}종목 가운데 {mr[0]}위\n"
-                      f"· 기록상 : 우리 종목 안에서 모멘텀 상위 25% − 하위 25% 의 다음 달 KOSPI 대비 수익 차이 {_sgn(sp, 2)}%p/월 ({period}, {n}개월, 플라시보 · 앞뒤 절반 통과) — 종목 35개 안의 좁은 표본이며 예고가 아니다")])
+    rank, total = mr
+    tip = ("12개월 전 가격 대비 1개월 전 가격의 변화. 최근 1개월은 단기 되돌림이 섞여 빼는 것이 표준(12-1 모멘텀)\n"
+           f"· 오늘 {_sgn(mom, 1)}% : 우리 {total}종목 가운데 {rank}위\n"
+           f"· 기록상 : 우리 종목 안에서 모멘텀 상위 25% − 하위 25% 의 다음 달 KOSPI 대비 수익 차이 {_sgn(sp, 2)}%p/월 ({period}, {n}개월, 플라시보 · 앞뒤 절반 통과) — 종목 35개 안의 좁은 표본이며 예고가 아니다")
+    x = (total - rank) / max(total - 1, 1) * 100   # 오른쪽 = 1위
+    zone = 2 if rank <= total / 4 else 0 if rank > total * 3 / 4 else 1
+    names = [("하위 25%", 25), (f"우리 {total}종목 순위", 50), ("상위 25%", 25)]
+    gauge = R._zone_gauge(x, zone, names, f"{mom:+.1f}%".replace("-", "−"), f"12개월 모멘텀 {mom:+.1f}%, {total}종목 중 {rank}위", last=False)
+    gauge = gauge.replace(f"margin:0 {_dk.CHART_CARD_X - 2}px 0px;", f"margin:0 {_dk.CHART_CARD_X}px;", 1)
+    col = UP if zone == 2 else DOWN if zone == 0 else "#111"
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 8px;">'
+            f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{R._paren(_esc("12개월 모멘텀 (최근 1개월 제외)"))}{R._tipx(tip)}</span>'
+            f'<span style="flex:none;font-weight:700;color:{col};font-size:{_dk.NAME};white-space:nowrap;">{total}종목 중 {rank}위</span></span>')
+    out = head + gauge
+    med, bench = s.get("mom_peers_median"), s.get("mom_bench")
+    if med is not None:   # B안 — 목업에서만 (MOCK_ONLY)
+        groups = [(s["name"], [mom]), (f"우리 {total}종목 중앙값", [med])] + ([("KOSPI", [bench])] if bench is not None else [])
+        chart = R._col_chart(groups, [R._sign_bg], [R._sign_fg], fmt=lambda v: f"{v:+.1f}".replace("-", "−"),
+                             color_at=lambda i, k, v: ((_dk.darken(R._PASTEL_UP if v >= 0 else R._PASTEL_DN, 0.2) if i == 0 else R._GRAY_BAR if i > 0 else None), (UP if v > 0 else DOWN if v < 0 else "#111") if i == 0 else NOTE))
+        b = (f'<div style="margin:12px 0 6px;padding:6px 10px;border:1px dashed #F59E0B;border-radius:6px;font-size:{TINY};line-height:20px;color:#92400E;">목업 B안 — 세로 막대(이 종목 · 중앙값 · KOSPI). 위 A안(순위 막대)과 하나 고르기</div>'
+             f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>')
+        out += MOCK_ONLY_OPEN + b + MOCK_ONLY_CLOSE
+    return ("white", out)
 
 
 def _boll_lines(bb):
@@ -762,13 +786,13 @@ def related(s=None, links=None):
             if m["sym"] in USU.BY_SYM:
                 url = USU.NVDA_REPORTS_URL if m["sym"] in USU.REPORT_TYPE else USU.page_url(m["sym"])
                 links.append((f"{USU.name(m['sym'])} {m['sym']} 주가 (미국과 연결)", url))
-    items = "".join(_dk.dot_li(f'<a href="{_esc(u)}" style="color:#1a73e8;text-decoration:none;">{_esc(t)}</a>', size=3, color="#111", margin="4px 0") for t, u in links)
-    return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};padding-left:{_dk.ALIGN_PX}px;">함께 보는 페이지</div>'
-            f'<ul style="margin:6px 0 0;padding:0 0 0 {_dk.ALIGN_PX}px;list-style:none;font-size:{_dk.NAME};line-height:{R.LH_CARD};">{items}</ul></div>')
+    return R.related_buttons(links)   # 전부 나가는 버튼 (2026-10-31 사용자 P160, 옛 점 글머리표 링크)
 
 
 MAX_NEWS = 8        # `오늘` 탭에 펼쳐 두는 방송 줄, 나머지는 `그 외 n건`
 TODAY_HOURS = 24    # 오늘자만 — 미국 종목 페이지와 같다 (2026-10-25 사용자)
+MOCK_ONLY_OPEN, MOCK_ONLY_CLOSE = "<!--mock-only-->", "<!--/mock-only-->"   # 이 사이는 목업에만 (발행 본문에서 지운다, P155 · P158)
+REAL_ONLY_OPEN, REAL_ONLY_CLOSE = "<!--real-only-->", "<!--/real-only-->"   # 이 사이는 발행 본문에만 (목업에서 지운다)
 MOCK_NEWS = "<!--mock-news-->"   # 목업 전용 자리 — 발행 본문에서는 지운다 (2026-10-27 P26)
 PICKS = []          # 방송에서 나온 종목 의견 (media_feed.picks, 최근 PICK_DAYS 일) — 실적과 기대 탭 `방송 의견` 카드 (P85)
 PICK_DAYS = R.PICK_DAYS
@@ -858,7 +882,19 @@ def sec_expect(s):
 def card_picks(s):
     """방송 의견 카드 — 공용 R.picks_card (한국 · 미국 종목 같은 카드, 2026-10-29 P88 · P89). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
-    return R.picks_card(s["name"], ps, s.get("close"), won, R.PICK_HOURS, together=R.together_block(together_items(s)) if ps else "")
+    together = R.together_block(together_items(s)) if ps else ""
+    real = R.picks_card(s["name"], ps, s.get("close"), won, R.PICK_HOURS, together=together)
+    if s["code"] != MOCK_PICKS_CODE or len(ps) >= 5:
+        return real
+    # 목업 샘플 — 다른 종목의 최근 의견을 빌려 5건 (2026-10-31 사용자 P158: 의견이 여럿일 때 접기 UX 보기). 발행 본문엔 real 만
+    extra = [dict(p, ticker=s["sym"]) for p in sorted((p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] != s["code"]), key=lambda p: str(p["published_at"]), reverse=True)]
+    sample = R.picks_card(s["name"], (ps + extra)[:5], s.get("close"), won, R.PICK_HOURS, together=R.together_block(together_items(s)))
+    note = (f'<div style="margin:12px 0 6px;padding:6px 10px;border:1px dashed #F59E0B;border-radius:6px;font-size:{TINY};line-height:20px;color:#92400E;">'
+            f'목업 샘플 — 다른 종목 의견을 빌려 5건으로 채움 (발행 글에는 실제 {len(ps)}건)</div>')
+    return MOCK_ONLY_OPEN + note + sample + MOCK_ONLY_CLOSE + REAL_ONLY_OPEN + real + REAL_ONLY_CLOSE
+
+
+MOCK_PICKS_CODE = "247540"   # 에코프로비엠 — 방송 의견 5건 샘플 (P158)
 
 
 EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
@@ -1054,7 +1090,7 @@ def cal_macro_card(s, c):
 CAL_TAB = "일정"   # 한국 증시 리포트 일정 탭 이름 (kr-market-report TAB_CAL) — 테마가 #tab-일정 으로 연다
 
 
-def _all_list(s):
+def _all_items(s):
     cc = s.get("calendar_cards") or {}
     end = (datetime.date.fromisoformat(s["day"]) + datetime.timedelta(days=CC.LIST_DAYS)).isoformat()
     items = []
@@ -1064,9 +1100,13 @@ def _all_list(s):
     usn = lambda x: USU.name(x) if x in USU.BY_SYM else x   # noqa: E731
     items += [(u["day"], "미국과 연결 실적", f"{usn(u['symbol'])} 실적 발표") for u in (cc.get("peers") or {}).get("upcoming_all") or []]
     # 시장 공통 일정은 뺐다 — 한국 증시 리포트 `일정` 탭에 (P144). 여기는 이 종목 일정만
+    return sorted(items)
+
+
+def _all_list(s, items):
     d0 = datetime.date.fromisoformat(s["day"])
     rows = [(f'<span style="color:#111;">{_esc(R._d(d))}</span>', R._pill(k, "area"), f'<span style="color:#111;">{_esc(t)}</span>', "", f'<span style="color:#111;">{R._dn(d0, d)}</span>')
-            for d, k, t in sorted(items)]
+            for d, k, t in items]
     return R._gcard(rows) if rows else ""
 
 
@@ -1074,7 +1114,7 @@ def sec_calendar(s):
     """`일정` 탭 — 다음 실적 발표는? · 미국과 연결 종목 실적은? · 시장 전체를 흔들 일정은?(요약 + 리포트 링크) + 전체 일정 보기(이 종목 일정만)."""
     cc = s.get("calendar_cards") or {}
     out, first = "", True
-    for title, key, fn in (("다음 실적 발표는?", "earnings", cal_earn_card), ("미국과 연결 종목 실적은?", "peers", cal_pair_card), ("시장 전체를 흔들 일정은?", "macro", cal_macro_card)):
+    for title, key, fn in (("다음 실적 발표는?", "earnings", cal_earn_card), ("미국과 연결 종목 실적 일정은?", "peers", cal_pair_card), ("시장 전체를 흔들 일정은?", "macro", cal_macro_card)):   # 일정 탭 질문엔 `일정` (P156)
         c = cc.get(key)
         if not c:
             continue
@@ -1082,9 +1122,12 @@ def sec_calendar(s):
         theme, col = R._soon_theme(left)
         out += R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=first)
         first = False
-    lst = _all_list(s)
-    fold = ((f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
-             f'<div style="margin-top:6px;">{lst}</div></details>') if lst else R.empty_card("잡힌 일정이 없습니다."))   # 일정이 없으면 버튼 대신 안내 카드 (P148)
+    items = _all_items(s)
+    lst = _all_list(s, items)
+    fold = (R.empty_card("잡힌 일정이 없습니다.") if not lst   # 일정이 없으면 버튼 대신 안내 카드 (P148)
+            else lst if len(items) <= R.LIST_SHOWN   # 3개 이하는 접기 없이 바로 (P157)
+            else (f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
+                  f'<div style="margin-top:6px;">{lst}</div></details>'))
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' + fold
 
 
@@ -1589,6 +1632,12 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
         global PICKS
         PICKS = media_feed.picks(vids, (now - datetime.timedelta(hours=R.PICK_HOURS)).isoformat())   # 48시간 (2026-10-31)
     MEDIA = media
+    moms = sorted(x["mom_12_1"] for x in a["stocks"] if x.get("mom_12_1") is not None)
+    kb = [b["close"] for b in (snap or {}).get("bars", {}).get(U.BENCH) or []] if snap else []
+    bench_mom = (kb[-21] / kb[-252] - 1) * 100 if len(kb) >= 252 else None   # KOSPI 12-1 모멘텀 (B안 목업)
+    for s in a["stocks"]:
+        s["mom_peers_median"] = moms[len(moms) // 2] if moms else None
+        s["mom_bench"] = bench_mom
     if snap:
         draw_charts(snap, a["stocks"], out_dir)
     pages = {"list": (U.LIST_TITLE, list_body(a))}
@@ -1596,7 +1645,9 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
         pages[s["code"]] = (U.page_title(s["sym"]), detail_body(s, a))
     sample = mock_news()
     for key, (title, body) in pages.items():
+        real = re.sub(f"{MOCK_ONLY_OPEN}.*?{MOCK_ONLY_CLOSE}", "", body, flags=re.S).replace(REAL_ONLY_OPEN, "").replace(REAL_ONLY_CLOSE, "")
+        mock = re.sub(f"{REAL_ONLY_OPEN}.*?{REAL_ONLY_CLOSE}", "", body, flags=re.S).replace(MOCK_ONLY_OPEN, "").replace(MOCK_ONLY_CLOSE, "")
         with open(os.path.join(out_dir, f"{key}.html"), "w", encoding="utf-8") as f:
-            f.write(body.replace(MOCK_NEWS, ""))
-        _dk.write_mock(body.replace(MOCK_NEWS, sample), os.path.join(out_dir, f"mock_{key}.html"), title)
+            f.write(real.replace(MOCK_NEWS, ""))
+        _dk.write_mock(mock.replace(MOCK_NEWS, sample), os.path.join(out_dir, f"mock_{key}.html"), title)
     return pages

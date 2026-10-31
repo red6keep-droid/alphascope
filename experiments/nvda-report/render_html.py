@@ -513,7 +513,7 @@ def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, color_at=
     ticks, top, scale = _dk.col_axis(vals, height, lbl)   # 한 칸 바깥 눈금까지 · 아래 여백 통일 (2026-10-26 사용자)
     txt = lambda v: fmt(v) if fmt else f"{v:+.1f}".replace("-", "−")   # noqa: E731
     label_px = max(_dk.text_px(txt(v), fs) for v in vals) + 4
-    axis_px = max(_dk.text_px(x, int(TINY[:-2])) for g, _ in groups for x in g.split("\n")) + 8
+    axis_px = min(max(_dk.text_px(x, int(TINY[:-2])) for g, _ in groups for x in g.split("\n")) + 8, _dk.AXIS_MAX)   # 긴 이름은 묶음을 넓히는 대신 두 줄로 (P155)
     bw, lw, min_w = _dk.col_layout(n, ns, label_px, axis_px)   # 막대 고정 폭 (2026-10-26 사용자: 모든 막대 그래프 같은 폭)
     parts = []   # 0 기준선 · 눈금선 · 세로축 숫자는 col_frame 이 (2026-10-26 사용자: 가로 눈금선)
     for i, (_, vs) in enumerate(groups):
@@ -633,7 +633,7 @@ def year_range_in(y, money, tip, high_days=None):
     return ("white", f'<span style="display:block;margin:0 0 8px;">{head}</span>{card}')
 
 
-def month_range_in(bb, money, tip, state, color, title="한 달간 변화 범위"):
+def month_range_in(bb, money, tip, state, color, title="한 달간 변화 범위", top=16):
     """한 달 범위(볼린저) 블록 — 가격 카드 펼침의 `가격 범위 (1년)` 바로 아래, 같은 흰 카드 틀 (2026-10-31 사용자 P150: 오늘 탭 상태 카드를 가격 카드 안으로).
     제목 줄 왼쪽 `※ 한 달간 변화 범위` + 툴팁, 오른쪽 = 답(범위 안 · 하락 범위 · 상승 범위, 상태 카드 답 색). 범위 막대 + 오늘 종가 말풍선은 range 막대 그대로."""
     if not bb or bb.get("lower") is None:
@@ -643,7 +643,7 @@ def month_range_in(bb, money, tip, state, color, title="한 달간 변화 범위
     names = [("하락 범위", RANGE_SIDE), (f"한 달 범위 {money(lo)}~{money(hi)}", 100 - 2 * RANGE_SIDE), ("상승 범위", RANGE_SIDE)]
     gauge = _zone_gauge(x, zone, names, money(c), f"오늘 종가 {money(c)}, 한 달 범위 {money(lo)}~{money(hi)}", last=False)
     gauge = gauge.replace(f"margin:0 {_dk.CHART_CARD_X - 2}px 0px;", f"margin:0 {_dk.CHART_CARD_X}px;", 1)   # 상태 카드 안(14) → 가격 펼침(12) 폭 = 1년 범위 카드와 같게
-    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:16px 0 8px;">'
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:{top}px 0 8px;">'
             f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{_paren(_esc(title))}{_tipx(tip)}</span>'
             f'<span style="flex:none;font-weight:700;color:{color};font-size:{_dk.NAME};white-space:nowrap;">{_esc(state)}</span></span>')
     return head + gauge
@@ -658,6 +658,16 @@ def out_btn(label, href):
     같은 창에서 연다(같은 블로그 안). 블로그 안 다른 페이지로 보내는 링크는 모두 이 모양."""
     return (f'<a href="{_esc(href)}" data-row-link="1" style="display:flex;justify-content:center;align-items:center;gap:6px;padding:8px 12px;background:#fff;border:1px solid #E2E8F0;'
             f'border-radius:8px;font-size:{TINY};line-height:20px;font-weight:700;color:#111;text-decoration:none;">{OUT_ICON}<span>{_esc(label)}</span></a>')
+
+
+LIST_SHOWN = 3   # 목록이 이보다 많을 때만 접기 버튼 — 3개 이하는 바로 보여 준다 (2026-10-31 사용자 P157)
+
+
+def related_buttons(links):
+    """글 맨 아래 `함께 보는 페이지` — 링크마다 나가는 버튼, 세로로 8px 간격 (2026-10-31 사용자 P160: "일단 전부 버튼으로")."""
+    btns = "".join(f'<div style="margin:0 0 8px;">{out_btn(t, u)}</div>' for t, u in links)
+    return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};padding-left:{_dk.ALIGN_PX}px;margin:0 0 8px;">함께 보는 페이지</div>'
+            f'{btns}</div>')
 
 
 def empty_card(text):
@@ -779,6 +789,16 @@ def together_block(items):
     return f'<span data-together="1" style="display:block;margin-top:8px;padding-top:14px;border-top:1px solid #E2E8F0;">{title}{out}</span>'
 
 
+PICKS_SHOWN = 3   # 방송 의견은 3건까지 펼쳐 두고 나머지는 접기 (2026-10-31 사용자 P158)
+
+
+def picks_rows_folded(ps, close, money):
+    """의견 줄 — 4건 이상이면 3건 + `의견 n건 더 보기` 접기 (P158)."""
+    if len(ps) <= PICKS_SHOWN:
+        return picks_rows(ps, close, money)
+    return picks_rows(ps[:PICKS_SHOWN], close, money) + _dk.fold(f"의견 {len(ps) - PICKS_SHOWN}건 더 보기", picks_rows(ps[PICKS_SHOWN:], close, money))
+
+
 def picks_card(name, ps, close, money, hours=PICK_HOURS, together=""):
     """`방송에서 나온 의견은?` (2026-10-29 사용자 P85 → P88 · P89 · P92: 한국 · 미국 종목, `한 달간 변화 범위는?` 아래, 답은 `매수`).
     ps = media_feed.picks 줄(이 종목 것만, 최근 hours 시간). 답 = 의견이 한 가지면 그 말(색 = PICK_THEME), 갈리면 `매수 · 보유`(회색).
@@ -787,7 +807,7 @@ def picks_card(name, ps, close, money, hours=PICK_HOURS, together=""):
         return ""
     state = " · ".join(k for k in PICK_ORDER if any(p["action"] == k for p in ps))
     theme, col = pick_theme(state)
-    lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 나왔다.", "rich"), (picks_rows(ps, close, money) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
+    lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 나왔다.", "rich"), (picks_rows_folded(ps, close, money) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
     tip = (f"방송(유튜브 경제 채널) 요약에서 이 종목에 대한 매수 · 보유 · 관망 · 매도 의견을 모은 것. 최근 {hours}시간, 같은 영상 · 같은 사람은 한 번\n"
            f"· 지금 : {picks_count(ps)}\n· 읽는 법 : 누가 어떤 이유로 말했는지 보는 칸이다. 의견의 적중률은 검증하지 않았고, 이 블로그의 추천이 아니다")
     return _state_card("방송에서 나온 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True)
@@ -1141,6 +1161,8 @@ BOX_END_PULL = 16   # 폭 가득 흰 카드로 끝나는 강조 카드 — 아�
 def _pull_end_chart(html):
     """html 조각의 맨 끝 최상위 요소가 흰 그래프 카드(MULTI, 아래 여백 0)면 아래로 GAUGE_PULL 만큼 당긴다 — 강조 카드 끝 흰 카드 아래 = 좌우 8px (P140).
     끝에 다른 글(주석 줄 등)이 있거나 이미 당긴 카드(범위 막대 last)는 그대로."""
+    if html.rstrip().endswith("</a>") and OUT_ICON in html and html.count("</a>") == 1:   # 카드 끝 나가는 버튼 — 좌우 15 = 아래 15 (P156)
+        return f'<span style="display:block;margin:0 0 {-BOX_END_PULL}px;">{html}</span>'
     box = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">'   # 폭 가득 흰 카드(애널리스트 의견 등) — 좌우 15 와 같게 아래를 당긴다
     b = html.rfind(box)
     if b >= 0 and html.rstrip().endswith("</div>") and html.rstrip().count("</div>", b) == 1:
