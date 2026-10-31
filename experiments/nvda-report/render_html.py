@@ -769,10 +769,14 @@ LIST_SHOWN = 3   # 목록이 이보다 많을 때만 접기 버튼 — 3개 이�
 
 
 def related_buttons(links):
-    """글 맨 아래 `함께 보는 페이지` — 링크마다 나가는 버튼, 세로로 8px 간격 (2026-10-31 사용자 P160: "일단 전부 버튼으로")."""
-    btns = "".join(f'<div style="margin:0 0 8px;">{out_btn(t, u, "16px", "26px")}</div>' for t, u in links)   # 페이지 이름 14 → 16 = 기사 요약 줄(NEWS_SUM) 크기 (2026-10-31 사용자 P185)
-    return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};padding-left:{_dk.ALIGN_PX}px;margin:0 0 8px;">함께 보는 페이지</div>'
-            f'{btns}</div>')
+    """글 맨 아래 `함께 보는 페이지` — 버튼 대신 구분선 목록 (2026-10-31 사용자 P187, 옛 P160 버튼): 제목 아래 · 줄 사이 · 맨 끝에 가로 구분선,
+    줄 = 3px 점 + 페이지 이름(16px 보통 = 기사 요약 줄 크기, P185) + 오른쪽 나가는 아이콘(회색). 줄 전체가 링크(data-row-link, 가이드라인 10-9)."""
+    dot = '<span aria-hidden="true" style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-right:8px;"></span>'
+    rows = "".join(f'<a href="{_esc(u)}" data-row-link="1" style="display:flex;align-items:center;gap:0;padding:12px {_dk.ALIGN_PX}px;border-bottom:1px solid #E2E8F0;'
+                   f'font-size:16px;line-height:26px;font-weight:400;color:#111;text-decoration:none;">{dot}<span style="flex:1 1 auto;min-width:0;">{_esc(t)}</span>'
+                   f'<span style="flex:none;display:inline-flex;margin-left:8px;color:{NOTE};">{OUT_ICON}</span></a>' for t, u in links)
+    return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{_dk.EMPH_NAME};padding:0 {_dk.ALIGN_PX}px 10px;border-bottom:1px solid #E2E8F0;">함께 보는 페이지</div>'
+            f'{rows}</div>')
 
 
 def empty_card(text):
@@ -1033,6 +1037,15 @@ def rows_after(rows):
     return f'<div style="margin-top:8px;">{rows}</div>' if rows else ""
 
 
+_EMPH_WHITE_RE = re.compile(r"(margin:0 0 6px;background:#fff;)border:1px solid #[0-9A-Fa-f]{6};(border-radius:8px;)")
+
+
+def emph_white(html):
+    """강조 카드(색 바탕) 안 흰 카드(그래프 · 범위 막대 · 함께 보기)의 외곽선을 지운다 — 1px 투명이라 크기 · 위치는 그대로 (2026-10-31 사용자 P187).
+    흰 버튼(`차트 정보 보기` 등, padding 으로 시작)은 그대로. 바깥(흰 바탕) 그래프 카드는 외곽선이 있어야 보이므로 손대지 않는다."""
+    return _EMPH_WHITE_RE.sub(r"\1border:1px solid transparent;\2", html)
+
+
 def price_in(bg, bd, parts):
     """가격 정보 강조 카드 펼침 안 — 머리 줄 바로 아래 같은 바탕 · 테두리로 이어진다. parts = (모양, html) 또는 html(접기 등, 강조 모양으로).
     순서 = 가격 범위 + 고점 회복(한 영역) → 기간별 수익률(제목 · 흰 카드) → `차트 정보 보기`. 사이는 상태 카드 펼침과 같은 연한 구분선.
@@ -1057,6 +1070,7 @@ def price_in(bg, bd, parts):
             out += f'<div style="{sep}">{_flatten(html, bg, bd, bd_row)}</div>'
     # 가로 구분선은 글자 폭(좌우 12px 안쪽)만 — 상태 카드처럼 카드 끝까지 가지 않는다 (2026-10-27 P16). 줄 높이 · 글자 위치는 그대로 (투명 테두리 + 배경 선)
     out = out.replace(f"border-top:1px solid {bd_row};", f"border-top:1px solid transparent;background:linear-gradient({bd_row},{bd_row}) 12px 0/calc(100% - 24px) 1px no-repeat border-box;")
+    out = emph_white(out)   # 강조 카드 안 흰 카드는 외곽선 없이 (P187)
     return (f'<div data-in-card="1" style="background:linear-gradient({bd},{bd}) 12px 0/calc(100% - 24px) 1px no-repeat,{bg};border:1px solid {bd};border-top:0;border-radius:0 0 8px 8px;'
             f'line-height:{LH_CARD};white-space:normal;">{out}</div>')
 
@@ -1383,6 +1397,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
     body = (f'<div style="margin-top:{14 - _dk.VP_EMPH + 3}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
     inner = (f'<details data-acc="1"{" open" if opened else ""}><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{body}</details>' if fold else head + body)
+    inner = emph_white(inner)   # 강조 카드 안 흰 카드는 외곽선 없이 (P187)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{_dk.EMPH_PAD - _dk.VP_EMPH}px 14px;margin:0 0 8px;line-height:{_dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
             f'{inner}</div>')
 
@@ -1859,8 +1874,13 @@ ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" ar
 FOLD_LEFT = _dk.FOLD_LEFT + 8   # 접기 버튼 왼쪽 여백 4 → 12 (2026-10-14 사용자: "접기 버튼 좌측 여백 8픽셀 추가", 엔비디아)
 
 
+FOLD_HUE = {"#FEE6CA": "#F97316", "#D6E8FE": "#2563EB", "#E8E4FE": "#7C3AED"}   # 강조 카드 테두리 → 테마 색(주황 · 파랑 · 보라). 회색(중립)은 없음 = 검정 그대로
+
+
 def _fold_btn(bg="#fff", bd="#E2E8F0"):
-    return _dk.fold_btn(bg, bd).replace(f"margin-left:{_dk.FOLD_LEFT}px;", f"margin-left:{FOLD_LEFT}px;")
+    """강조 카드 접기 버튼 — 화살표 색 = 검정에 카드 테마 색 20% (2026-10-31 사용자 P187: 거의 검정, 색감만 살짝). 중립 · 흰 카드는 검정 그대로."""
+    hue = FOLD_HUE.get(bd.upper())
+    return _dk.fold_btn(bg, bd, _dk.mix("#111111", hue, 0.2) if hue else "#111").replace(f"margin-left:{_dk.FOLD_LEFT}px;", f"margin-left:{FOLD_LEFT}px;")
 
 
 ACC_BTN = _fold_btn()   # 네모 박스 안 화살표 버튼 (2026-10-11 사용자) = 공식 접기 버튼, 28 → 31px (2026-10-13 사용자, 가이드라인 10-6)

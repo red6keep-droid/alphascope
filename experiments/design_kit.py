@@ -1207,6 +1207,13 @@ def lighten(hex_color, amt=0.2):
     return "#" + "".join(f"{round(c + (255 - c) * amt):02X}" for c in (r, g, b))
 
 
+def mix(a, b, amt):
+    """a 에 b 를 amt 만큼 섞은 색 (#RRGGBB)."""
+    ha, hb = (h.lstrip("#") for h in (a, b))
+    ca, cb = ([int(h[i:i + 2], 16) for i in (0, 2, 4)] for h in (ha, hb))
+    return "#" + "".join(f"{round(x + (y - x) * amt):02X}" for x, y in zip(ca, cb))
+
+
 def darken(hex_color, amt=0.05):
     """검정 쪽으로 amt 만큼 섞은 색 (2026-10-26 사용자: 질문 카드 줄 구분선 · 막대 눈금선 2% 진하게 — 처음 5% 는 취소)."""
     h = hex_color.lstrip("#")
@@ -1218,12 +1225,12 @@ def darken(hex_color, amt=0.05):
 FOLD_BOX, FOLD_RADIUS, FOLD_ICON, FOLD_LEFT = 31, 7, 18, 4   # 공식 접기 버튼: 엔비디아 평균 등급 네모 28 → 10% 크게 31, 화살표 16 → 18, 왼쪽 여백 4 (2026-10-13 사용자)
 
 
-def fold_btn(bg="#fff", bd="#E2E8F0"):
+def fold_btn(bg="#fff", bd="#E2E8F0", ink="#111"):
     """공식 접기 버튼 — 줄 오른쪽 끝 네모 안 화살표 (가이드라인 10-6). 흰 카드 위에선 흰 바탕, 색 배경 카드 위에선 bg = 그 배경을 20% 밝게(lighten), bd = 카드 테두리.
     바깥 details[data-acc][open] 이면 테마 CSS가 화살표를 위로 돌린다."""
     chev = ACC_CHEV.replace('width="16" height="16"', f'width="{FOLD_ICON}" height="{FOLD_ICON}"')
     return (f'<span style="display:inline-flex;flex:none;align-items:center;justify-content:center;width:{FOLD_BOX}px;height:{FOLD_BOX}px;box-sizing:border-box;'
-            f'border:1px solid {bd};border-radius:{FOLD_RADIUS}px;background:{bg};color:#111;margin-left:{FOLD_LEFT}px;vertical-align:middle;">{chev}</span>')
+            f'border:1px solid {bd};border-radius:{FOLD_RADIUS}px;background:{bg};color:{ink};margin-left:{FOLD_LEFT}px;vertical-align:middle;">{chev}</span>')
 
 
 # 펼침 · 접기 카드 버튼 (`○○ n개 더 보기` · `그 외 n건` · `표 보기`) — 글자 14px (2026-10-12 사용자: "더 보기 버튼의 폰트 사이즈는 14, 블로그 모두 일괄")
@@ -1425,14 +1432,14 @@ def news_item(headline_html, url=None, detail="", subs=(), labels="", meta=(), l
         헤드라인(굵게, 원문 링크) / 요약 한 줄(16px #333 = 홈 기사 소개, 없으면 생략) / 보조 줄들(subs) / [라벨] [라벨]  회색 메타(시각 · 매체)
     headline_html = 이스케이프한 헤드라인(명사형). detail = 요약 글(이스케이프 전 — 뉴스 문체로 바꾼다). labels = 알약 HTML 묶음. meta = 글자 목록.
     link_attrs = a 태그에 더할 속성(title · data-trhelp 등). 헤드라인 · 요약은 합니다체로 바꾸지 않는다(keep_tone)."""
-    head = (f'<a href="{esc(url)}" target="_blank" rel="noopener"{link_attrs} style="color:#111;font-weight:700;text-decoration:none;font-size:{NEWS_TITLE_FS};line-height:{NEWS_TITLE_LH};">{headline_html}</a>'
-            if url else f'<span style="color:#111;font-weight:700;font-size:{NEWS_TITLE_FS};line-height:{NEWS_TITLE_LH};">{headline_html}</span>')   # 기사 제목 19 → 17 · 행간 34 → 30, 굵게 유지 (2026-10-31 사용자 P159)
+    head = (f'<a href="{esc(url)}" target="_blank" rel="noopener"{link_attrs} style="color:#111;font-weight:700;text-decoration:none;font-size:{NEWS_TITLE_FS};line-height:{NEWS_TITLE_LH};display:block;">{headline_html}</a>'
+            if url else f'<span style="color:#111;font-weight:700;font-size:{NEWS_TITLE_FS};line-height:{NEWS_TITLE_LH};display:block;">{headline_html}</span>')   # 제목 줄 = 블록 — 바깥 행간 34 가 끼어 위 여백만 3px 더 컸다 (2026-10-31 사용자 P187: 위 · 아래 여백 맞추기)   # 기사 제목 19 → 17 · 행간 34 → 30, 굵게 유지 (2026-10-31 사용자 P159)
     out = keep_tone(head)
     if detail:
         out += keep_tone(f'<span style="{NEWS_SUM}">{esc(headline(detail))}</span>')
     out += "".join(subs)
     meta = [m for m in meta if m]
-    return (out + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 0;line-height:1;">'
+    return (out + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;">'   # 아래 +1 — 구분선 ~ 제목 26 · 메타 ~ 구분선 26 (P187)
             + pill_row(labels)   # 라벨끼리 2px (PILL_PAIR_GAP)
             + (f'<span style="color:{SUB};font-size:{TINY};line-height:{LH_TINY};">{esc(" · ".join(meta))}</span>' if meta else "") + "</span>")
 
@@ -1520,7 +1527,7 @@ def legend_bar(title, segs):
     bar_html = f'<span style="display:flex;width:100%;height:{BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:{BAR_PAD}px 0 {3 + BAR_PAD}px;">{body}</span>'
     legend = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
                      f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{nm} {c / total * 100:.0f}%</span>' for nm, c, bg, _ in segs)
-    return head + bar_html + (f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{legend}</span>')
+    return head + bar_html + (f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 5px;">{legend}</span>')   # 범례 아래 10 → 5 (2026-10-31 사용자 P187: 뉴스 `최근 N건` 범례)
 
 
 def direction_bars(today, week):
