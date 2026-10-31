@@ -18,6 +18,7 @@ import media_feed  # noqa: E402
 import news_store  # noqa: E402  — 공용 뉴스 처리 (헤드라인 · 요약 줄 고르기)
 import chart_price as CP  # noqa: E402
 import render_html as R  # noqa: E402
+import signal_groups as SG  # noqa: E402 — 판정 묶음 분류표 (함께 보기, A5)
 
 import universe as U  # noqa: E402
 
@@ -431,19 +432,21 @@ EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
 
 
 def together_items(s):
-    """`Alpha Scope 데이터로 함께 보기` 줄 (P142) — 주가에 가까운 것부터: 내년 이익 예상 · 기술지표 방향 · 업종 자금. 방향 = 기록 계획 A5-3 분류표."""
-    out = []
-    eps = (s.get("expect") or {}).get("eps")
-    if eps:
-        out.append(("내년 이익 예상", eps["state"], EPS_DIR.get(eps["state"], 0), "실적", R.EPS_TITLE))
-    sig = (s.get("tech") or {}).get("signals")
-    if sig:
-        out.append(("기술지표 방향", sig["word"], (sig["net"] > 0) - (sig["net"] < 0), "오늘", "기술지표의 방향은?"))
-    sf = s.get("sector_flow")
-    if sf:
-        title = "반도체로 돈이 올까?" if sf["name"] == "반도체" else f"{sf['name']} 업종으로 돈이 올까?"
-        out.append((f"{sf['name']} 업종 자금", sf["state"], {"모이는 중": 1, "빠져나가는 중": -1}.get(sf["state"], 0), "오늘", title))
-    return out
+    """`Alpha Scope 데이터로 함께 보기` 줄 (P142 → P172: 분류표 signal_groups 로 페이지의 모든 방향 판정). 순서 = SG.ORDER."""
+    ex, tc = s.get("expect") or {}, s.get("tech") or {}
+    sig, sf, mr, ms = tc.get("signals"), s.get("sector_flow"), s.get("market_regime"), s.get("market_shock") or {}
+    got = {
+        "ma": SG.ma_item(tc.get("ma_rel"), s["name"]),
+        "tech": SG.item("tech", sig["word"]) if sig else None,
+        "overheat": SG.overheat_item(s.get("overheat")),
+        "revenue": SG.item("revenue", (ex.get("revenue") or {}).get("state")),
+        "eps": SG.item("eps", (ex.get("eps") or {}).get("state")),
+        "short": SG.item("short", (ex.get("short") or {}).get("state")),
+        "sector_flow": SG.item("sector_flow", sf["state"], sector=sf["name"]) if sf else None,
+        "regime": SG.item("regime", mr["regime"]) if mr else None,
+        "shock": SG.item("shock", "충격 국면 중") if ms.get("active") else None,
+    }
+    return [got[k] for k in SG.ORDER if got.get(k)]
 
 
 def sec_targets(s):

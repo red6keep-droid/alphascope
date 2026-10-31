@@ -17,6 +17,7 @@ import universe_kr as U  # noqa: E402
 sys.path.insert(0, os.path.join(_HERE, "..", "stock-radar"))
 import universe as USU  # noqa: E402 — 미국 종목 주소(함께 보는 페이지의 연결 짝 링크)
 import media_feed  # noqa: E402 — 방송 뉴스 (`오늘` 탭)
+import signal_groups as SG  # noqa: E402 — 판정 묶음 분류표 (함께 보기 · 기록, A5)
 import re  # noqa: E402
 from collections import Counter  # noqa: E402
 from html import unescape as html_unescape  # noqa: E402
@@ -201,6 +202,17 @@ def _mates(s, n=6):
     return mates[:n]
 
 
+def pairs_state(s):
+    """밤사이 미국과 연결 종목 판정 말 — 자료 없으면 None (P172)."""
+    p = s.get("pairs") or {}
+    moves, adr = p.get("moves") or [], p.get("adr")
+    if not moves and not adr and not p.get("sox"):
+        return None
+    rets = [m["ret"] for m in moves] + ([adr["ret"]] if adr else [])
+    ups, downs = sum(1 for x in rets if x >= 0.5), sum(1 for x in rets if x <= -0.5)
+    return "엇갈림" if ups and downs else "올랐음" if ups else "내렸음" if downs else "비슷함"
+
+
 def sec_pairs(s, a=None):
     """`미국과 연결` 펼침 카드 (2026-10-25 사용자: "짝" 대신 "연결" · 가격 카드 다음 · 펼침 카드로). 접힌 머리 = 밤사이 연결 종목이 어땠나(올랐음 · 내렸음 · 엇갈림),
     펼치면 연결 종목 · ADR(K24) · SOX(K25) 줄과 오늘 이 종목 · KOSPI 대비, 한국 장 뒤 나온 미국 종가. 툴팁 `기록상` = 10-25 일별 검증."""
@@ -209,10 +221,8 @@ def sec_pairs(s, a=None):
     adr, sox = p.get("adr"), p.get("sox")
     if not moves and not adr and not sox:
         return ""
-    rets = [m["ret"] for m in moves] + ([adr["ret"]] if adr else [])
-    ups, downs = sum(1 for x in rets if x >= 0.5), sum(1 for x in rets if x <= -0.5)
-    state, theme, col = (("엇갈림", "uncertain", R.SOON) if ups and downs else ("올랐음", "positive", UP) if ups else ("내렸음", "negative", DOWN) if downs
-                         else ("비슷함", "neutral", R.MUTED))
+    state = pairs_state(s)
+    theme, col = {"엇갈림": ("uncertain", R.SOON), "올랐음": ("positive", UP), "내렸음": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
     day = (moves or [adr or sox])[0]["day"]
     lines = [(f"밤사이(미국 {_md(day)} 종가) 연결 종목은 " + " · ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)
               + f", 오늘 {_dk.josa(s['name'], '은')} {_sgn(s['ret_1d'])}%였다.", "plain")]
@@ -435,6 +445,17 @@ def _fin_short(s, name):
     return name[len(ind) + 1:] if ind and name.startswith(ind + " ") else name
 
 
+def bsi_state(s):
+    """업계 경기(BSI) 판정 — (석 달 전 대비 p, 말). 카드와 함께 보기(signal_groups)가 같은 값을 읽는다 (P172)."""
+    b = s.get("bsi")
+    if not b or not b.get("rows"):
+        return None, None
+    f0 = b["rows"][0]
+    ser = f0.get("series") or []
+    d3 = f0["v"] - ser[-4]["v"] if len(ser) >= 4 else f0.get("chg") or 0
+    return d3, ("좋아지는 중" if d3 >= 3 else "나빠지는 중" if d3 <= -3 else "비슷함")
+
+
 def card_industry_mood(s):
     """이 업종 경기는 좋아지고 있나? — 한국은행 기업경기조사(BSI) 업황 실적. 답 = 석 달 전보다 3p 넘게 오르면 좋아지는 중, 내리면 나빠지는 중."""
     b = s.get("bsi")
@@ -442,8 +463,8 @@ def card_industry_mood(s):
         return ""
     f0 = b["rows"][0]
     ser = f0.get("series") or []
-    d3 = f0["v"] - ser[-4]["v"] if len(ser) >= 4 else f0.get("chg") or 0
-    state, theme, col = (("좋아지는 중", "positive", UP) if d3 >= 3 else ("나빠지는 중", "negative", DOWN) if d3 <= -3 else ("비슷함", "neutral", R.MUTED))
+    d3, state = bsi_state(s)
+    theme, col = {"좋아지는 중": ("positive", UP), "나빠지는 중": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
     v0 = f"{f0['v']:.0f}"
     lines = [(f"{b['industry_name']} 회사들이 느끼는 {f0['name']} 경기(BSI)는 {_dk.josa(v0, '로')} 석 달 전보다 {_sgn(d3, 0)}p, "
               f"2009년 이후 아래에서 {f0['pct_all']:.0f}% 지점이다." + R.small_note("100보다 낮으면 나쁘다고 답한 회사가 더 많다는 뜻입니다."), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
@@ -487,6 +508,20 @@ def _name_josa(name, j):
     return name + _dk.josa(base, j)[len(base):]
 
 
+def biz_work_state(s):
+    """업계 일감 · 값 카드 판정 — (말, 질문 꼬리 `메모리 값은?`). 자료 없으면 (None, None). 카드와 함께 보기가 같은 값을 읽는다 (P172)."""
+    rows_data = s.get("industry") or []
+    if not rows_data:
+        return None, None
+    b = U.biz(s["sym"]) or {"q": "이 업종에 일감이 늘고 있나?", "mode": "qty", "months": 1}
+    r0 = rows_data[0]
+    chg, _ = _window_change(r0, b["months"])
+    lim = 0.5 if r0["kind"] == "pct" else 5
+    up_w, dn_w = BIZ_WORDS[b["mode"]]
+    state = "판단 유보" if chg is None else up_w if chg >= lim else dn_w if chg <= -lim else "비슷함"
+    return state, (U.BIZ_Q[b["group"]] if b.get("group") else None)
+
+
 def card_industry_work(s):
     """업종 실물 지표 카드 — 2026-10-31 부터 사업 묶음(U.BIZ)마다 질문 · 지표 · 답 낱말 · 비교 기간 (doc/검증/한국-업종지표-재선정.md).
     옛 제목 `이 업종에 일감이 늘고 있나?` 는 묶음이 없는 종목에만. 답 = 1년 전보다 5% 넘게(금리는 0.5%p) 늘면 늘고 있음 · 줄면 줄고 있음."""
@@ -497,10 +532,8 @@ def card_industry_work(s):
     r0 = rows_data[0]
     months = b["months"]
     chg, span_txt = _window_change(r0, months)
-    lim = 0.5 if r0["kind"] == "pct" else 5
-    up_w, dn_w = BIZ_WORDS[b["mode"]]
-    state, theme, col = (("판단 유보", "neutral", R.MUTED) if chg is None else (up_w, "positive", UP) if chg >= lim
-                         else (dn_w, "negative", DOWN) if chg <= -lim else ("비슷함", "neutral", R.MUTED))
+    state = biz_work_state(s)[0]
+    theme, col = ("neutral", R.MUTED) if state in ("판단 유보", "비슷함") else ("positive", UP) if state == BIZ_WORDS[b["mode"]][0] else ("negative", DOWN)
     unit = "%p" if r0["kind"] == "pct" else "%"
     v0 = _ind_value(r0)
     if months > 1 and chg is not None:
@@ -528,6 +561,15 @@ def card_industry_work(s):
     return R._state_card(title, state, theme, col, lines, "", tip=_tip_of(sec_industry(s)), fold=True)
 
 
+def biz_money_state(s):
+    """업계 수익성 판정 말 — 자료 없으면 None (P172)."""
+    xs = [r for r in s.get("fin") or [] if r["unit"] != "조 원"]
+    if not xs:
+        return None
+    d = next((r for r in xs if "이익률" in r["name"]), xs[0]).get("chg")
+    return "판단 유보" if d is None else "나아짐" if d >= 0.5 else "나빠짐" if d <= -0.5 else "비슷함"
+
+
 def card_industry_money(s):
     """업종 회사들의 돈 버는 힘은? — 한국은행 기업경영분석(업종 전체 집계) 이익률. 답 = 1년 전 같은 분기보다 0.5%p 넘게 오르면 나아짐."""
     xs = [r for r in s.get("fin") or [] if r["unit"] != "조 원"]
@@ -535,8 +577,8 @@ def card_industry_money(s):
         return ""
     r0 = next((r for r in xs if "이익률" in r["name"]), xs[0])
     d = r0.get("chg")
-    state, theme, col = (("판단 유보", "neutral", R.MUTED) if d is None else ("나아짐", "positive", UP) if d >= 0.5
-                         else ("나빠짐", "negative", DOWN) if d <= -0.5 else ("비슷함", "neutral", R.MUTED))
+    state = biz_money_state(s)
+    theme, col = {"나아짐": ("positive", UP), "나빠짐": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
     lines = [(f"{_dk.josa(r0['name'], '은')} {_qlabel(r0['q'])} {r0['v']:.1f}%" + (f"로 1년 전 같은 분기보다 {_sgn(d, 1)}%p." if d is not None else "다.")
               + R.small_note("설문이 아니라 업종 전체 회사를 모은 실제 집계이고, 분기 끝 2~3달 뒤에 나옵니다."), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
     # 업종 이름은 위 문장에서 한 번만 — 그래프 제목 · 근거 줄은 `매출액 영업이익률` 처럼 (2026-10-28 사용자 P68)
@@ -911,23 +953,25 @@ EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
 
 
 def together_items(s):
-    """`Alpha Scope 데이터로 함께 보기` 줄 (P142) — 주가에 가까운 것부터: 내년 이익 예상 · 기술지표 방향 · 업종 경기. 방향 = 기록 계획 A5-3 분류표."""
-    out = []
-    eps = (s.get("expect") or {}).get("eps")
-    if eps:
-        out.append(("내년 이익 예상", eps["state"], EPS_DIR.get(eps["state"], 0), "실적", R.EPS_TITLE))
-    sig = (s.get("tech") or {}).get("signals")
-    if sig:
-        out.append(("기술지표 방향", sig["word"], (sig["net"] > 0) - (sig["net"] < 0), "오늘", "기술지표의 방향은?"))
-    b = s.get("bsi")
-    if b and b.get("rows"):
-        f0 = b["rows"][0]
-        ser = f0.get("series") or []
-        d3 = f0["v"] - ser[-4]["v"] if len(ser) >= 4 else f0.get("chg") or 0
-        st = "좋아지는 중" if d3 >= 3 else "나빠지는 중" if d3 <= -3 else "비슷함"   # card_industry_mood 와 같은 기준
-        bn = U.biz_name(s["sym"])
-        out.append((f"{bn} 업계 경기", st, {"좋아지는 중": 1, "나빠지는 중": -1}.get(st, 0), "업계상황", f"{bn} 업계 경기는?"))
-    return out
+    """`Alpha Scope 데이터로 함께 보기` 줄 (P142 → P172: 손으로 고른 셋 대신 분류표 signal_groups 로 페이지의 모든 방향 판정).
+    순서 = SG.ORDER(주가에 가까운 것부터). 방향 · 기간 꼬리표는 표에서, 판정 말은 각 카드와 같은 helper 에서."""
+    ex, tc = s.get("expect") or {}, s.get("tech") or {}
+    bn = U.biz_name(s["sym"])
+    mr = s.get("mom_rank") or (None, None)
+    sig = tc.get("signals")
+    work, q = biz_work_state(s)
+    got = {
+        "momentum": SG.momentum_item(mr[0], mr[1], s["name"]) if s.get("mom_12_1") is not None else None,
+        "ma": SG.ma_item(tc.get("ma_rel"), s["name"]),
+        "tech": SG.item("tech", sig["word"]) if sig else None,
+        "pairs": SG.item("pairs", pairs_state(s)),
+        "revenue": SG.item("revenue", (ex.get("revenue") or {}).get("state")),
+        "eps": SG.item("eps", (ex.get("eps") or {}).get("state")),
+        "bsi": SG.item("bsi", bsi_state(s)[1], biz=bn),
+        "biz_work": SG.item("biz_work", work, biz=bn, q=q[:-2]) if work and q else None,   # `메모리 값은?` → 이름 `반도체 업계 메모리 값` · 카드 `반도체 업계 메모리 값은?`
+        "biz_money": SG.item("biz_money", biz_money_state(s), biz=bn),
+    }
+    return [got[k] for k in SG.ORDER if got.get(k)]
 
 
 # ---------------------------------------------------------------- `캘린더` 탭 (2026-10-25 사용자) — 미국 종목 캘린더 탭과 같은 질문 카드 셋.
