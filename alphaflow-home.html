@@ -2895,6 +2895,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     if (!sh || !b.clientWidth) return;
     var max = b.scrollWidth - b.clientWidth, x = Math.abs(b.scrollLeft);   /* direction:rtl — 오른쪽 끝 0, 왼쪽으로 갈수록 음수 */
     sh.style.opacity = (max - x > 1) ? '1' : '0';
+    var card = b.closest('span[style*="border-radius:8px"]'), hint = card && card.querySelector('[data-lhint]');
+    if (hint) hint.style.visibility = max > 1 ? 'visible' : 'hidden';   /* 넓은 폰에서 넘길 것이 없으면 `넘겨 보기` 숨김 (범례 자리는 그대로) */
   }
   function all() {
     var bs = document.querySelectorAll('[data-lscroll]');

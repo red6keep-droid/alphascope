@@ -641,6 +641,7 @@ def year_range_in(y, money, tip, high_days=None):
 # 최신 가로축 이름 = 이 종목 색 + 글자 위 3px 강조점.
 LINE_W, LINE_W2, DOT_R, DOT_SW, LAST_R, LAST_SW = 2, 1.25, 3, 1.5, 4.5, 4
 LINE_H, LINE_STEP, LINE_GRAY = 230, 46, "#9CA3AF"
+LINE_FIT_W = 250   # 360px 폰에서 그래프 칸 폭(실측 250~257) — 점들이 이 안에 들어가면 넘겨 보기 없이 카드 폭에 고르게 편다 (2026-10-31 사용자: 짧으면 한쪽으로 몰렸다)
 
 
 def _nice_ticks(lo, hi, n=4):
@@ -669,26 +670,30 @@ def line_chart(labels, series, fmt, unit=""):
     step = max(LINE_STEP, max(est(x) for lb in labels for x in lb.split("\n")) + 12, max(est(fmt(v), 13) for v in vals) + 14)
     axis_w = int(max(est(f"{t:,.0f}" if float(t).is_integer() else fmt(t)) for t in ticks) + 8)
     top, bot = 30, 52 if any("\n" in lb for lb in labels) is False else 66
+    fit = n * step <= LINE_FIT_W   # 들어가면 가로는 % — 카드 폭에 고르게, 넘겨 보기 · 그림자 없음
     w = int(max(n * step, 260))
     y = lambda v: top + (hi - v) / (hi - lo) * (LINE_H - top - bot)   # noqa: E731
-    x = lambda i: step / 2 + i * step   # noqa: E731
-    g = "".join(f'<line x1="0" x2="{w}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
+    x = (lambda i: f"{(i + 0.5) / n * 100:.2f}%") if fit else (lambda i: f"{step / 2 + i * step:.1f}")   # noqa: E731
+    W = "100%" if fit else str(w)
+    g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
     if lo < 0 < hi:
-        g += f'<line x1="0" x2="{w}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#CBD5E1" stroke-width="1"/>'
+        g += f'<line x1="0" x2="{W}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#CBD5E1" stroke-width="1"/>'
     main, comp = series[0][1], (series[1][1] if len(series) > 1 else [None] * n)
     lines = dots = labs = ""
     for k, (nm, xs, col, dash) in reversed(list(enumerate(series))):   # 비교 선 먼저 — 이 종목 선이 위에 덮는다
         pts = [(i, x(i), y(v)) for i, v in enumerate(xs) if v is not None]
-        d = " ".join(f"{px:.1f},{py:.1f}" for _, px, py in pts)
-        lines += (f'<polyline points="{d}" fill="none" stroke="{col}" stroke-width="{LINE_W if k == 0 else LINE_W2}" stroke-linejoin="round" stroke-linecap="round"'
-                  + (' stroke-dasharray="6 5"' if dash else "") + "/>")
+        sw = f'stroke="{col}" stroke-width="{LINE_W if k == 0 else LINE_W2}" stroke-linecap="round"' + (' stroke-dasharray="6 5"' if dash else "")
+        if fit:   # % 좌표는 polyline 이 못 받는다 — 구간마다 선
+            lines += "".join(f'<line x1="{a[1]}" y1="{a[2]:.1f}" x2="{b[1]}" y2="{b[2]:.1f}" {sw}/>' for a, b in zip(pts, pts[1:]))
+        else:
+            lines += f'<polyline points="{" ".join(f"{px},{py:.1f}" for _, px, py in pts)}" fill="none" stroke-linejoin="round" {sw}/>'
         for j, (i, px, py) in enumerate(pts):
             last = j == len(pts) - 1
             big = k == 0 and last
-            dots += f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{LAST_R if big else DOT_R}" fill="#fff" stroke="{col}" stroke-width="{LAST_SW if big else DOT_SW}"/>'
+            dots += f'<circle cx="{px}" cy="{py:.1f}" r="{LAST_R if big else DOT_R}" fill="#fff" stroke="{col}" stroke-width="{LAST_SW if big else DOT_SW}"/>'
             other = comp[i] if k == 0 else main[i]
             up = (xs[i] >= other) if other is not None else (k == 0)
-            labs += (f'<text x="{px:.1f}" y="{py - 10 if up else py + 20:.1f}" text-anchor="middle" font-size="{13 if big else 12}" font-weight="{700 if big else 400}" '
+            labs += (f'<text x="{px}" y="{py - 10 if up else py + 20:.1f}" text-anchor="middle" font-size="{13 if big else 12}" font-weight="{700 if big else 400}" '
                      f'fill="{col}">{_esc(fmt(xs[i]))}</text>')
     c0 = series[0][2]
 
@@ -696,25 +701,30 @@ def line_chart(labels, series, fmt, unit=""):
         parts = lb.split("\n")
         col = c0 if i == n - 1 else NOTE
         base = LINE_H - 8 - 16 * (len(parts) - 1)
-        return "".join(f'<text x="{x(i):.1f}" y="{base + 16 * j}" text-anchor="middle" font-size="12" fill="{col}">{_esc(t)}</text>' for j, t in enumerate(parts))
+        return "".join(f'<text x="{x(i)}" y="{base + 16 * j}" text-anchor="middle" font-size="12" fill="{col}">{_esc(t)}</text>' for j, t in enumerate(parts))
     xl = "".join(xl_text(i, lb) for i, lb in enumerate(labels))
     nl = len(labels[-1].split("\n"))
-    xl += f'<circle cx="{x(n - 1):.1f}" cy="{LINE_H - 25 - 16 * (nl - 1)}" r="1.5" fill="{c0}"/>'   # 최신 이름 위 강조점
-    svg = f'<svg width="{w}" height="{LINE_H}" viewBox="0 0 {w} {LINE_H}" style="display:block;direction:ltr;">{g}{lines}{dots}{labs}{xl}</svg>'
+    xl += f'<circle cx="{x(n - 1)}" cy="{LINE_H - 25 - 16 * (nl - 1)}" r="1.5" fill="{c0}"/>'   # 최신 이름 위 강조점
+    svg = (f'<svg width="100%" height="{LINE_H}" style="display:block;overflow:visible;">{g}{lines}{dots}{labs}{xl}</svg>' if fit
+           else f'<svg width="{w}" height="{LINE_H}" viewBox="0 0 {w} {LINE_H}" style="display:block;direction:ltr;">{g}{lines}{dots}{labs}{xl}</svg>')
     tf = (lambda t: f"{t:,.0f}".replace("-", "−")) if all(float(t).is_integer() for t in ticks) else fmt   # 눈금이 모두 정수면 소수점 없이 (80.0 · 100 섞임 방지)
     axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{NOTE};">{_esc(tf(t))}</span>' for t in ticks)
     shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
              'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>')   # 왼쪽 그림자 — 테마 JS 가 맨 왼쪽에서 끈다
-    scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{axis_w}px;">'
-              f'<span style="display:inline-block;direction:ltr;">{svg}</span></span>')
+    if fit:
+        scroll, shade = f'<span style="display:block;margin-right:{axis_w}px;">{svg}</span>', ""
+    else:
+        scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{axis_w}px;">'
+                  f'<span style="display:inline-block;vertical-align:top;direction:ltr;">{svg}</span></span>')   # vertical-align — 줄 아래 빈틈(약 7px) 없이
     chips = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin-left:12px;white-space:nowrap;">'
                     f'<svg width="22" height="10" aria-hidden="true"><line x1="1" x2="21" y1="5" y2="5" stroke="{col}" stroke-width="{LINE_W if i == 0 else LINE_W2}"'
                     + (' stroke-dasharray="4 3"' if dash else "") + f'/><circle cx="11" cy="5" r="3" fill="#fff" stroke="{col}" stroke-width="{DOT_SW}"/></svg>{_esc(nm)}</span>'
                     for i, (nm, _, col, dash) in enumerate(series))
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 2px;font-size:{TINY};line-height:20px;color:{NOTE};">'
-            f'<span style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span><span style="display:flex;flex-wrap:wrap;justify-content:flex-end;">{chips}</span></span>'
+            + ("" if fit else f'<span data-lhint="1" style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span>')   # 넘길 것이 없으면 안내 없음 (넓은 폰은 테마 JS 가 숨김)
+            + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;margin-left:auto;">{chips}</span></span>'
             + (f'<span style="display:block;text-align:right;margin:0 0 6px;font-size:12px;line-height:18px;color:{NOTE};">(단위: {_esc(unit)})</span>' if unit else ""))
-    return (f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 8px;">{head}'
+    return (f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD + 3}px 12px 10px;">{head}'   # 범례 위 +3 · 아래 10 — 범례 위 = 가로축 이름 밑 14 (사용자, 실측)
             f'<span style="display:block;position:relative;">{scroll}{shade}<span style="position:absolute;top:0;right:0;width:{axis_w - 4}px;height:{LINE_H}px;text-align:right;">{axis}</span></span></span></span>')
 
 
