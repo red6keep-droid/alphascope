@@ -634,7 +634,7 @@ def year_range_in(y, money, tip, high_days=None):
     bar = (f'<span style="position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:3px;background:#E2E8F0;">'
            f'<span style="position:absolute;left:0;top:0;bottom:0;width:{at};border-radius:3px;background:#BFDBFE;"></span></span>')
     aria = _esc(f"1년 범위 {money(y['low'])}~{money(y['high'])}, {text}")
-    gauge = (f'<span data-range-gauge="1" aria-label="{aria}" style="position:relative;display:block;height:56px;">'
+    gauge = (f'<span data-range-gauge="1" aria-label="{aria}" style="position:relative;display:block;height:{GAUGE_H}px;">'
              f'{_gauge_tip(pos, text, col, dot)}{bar}</span>')
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:{TINY};line-height:20px;color:{NOTE};">'
             f'<span style="white-space:nowrap;">최저 {money(y["low"])}</span><span style="white-space:nowrap;">최고 {money(y["high"])}{_high_ago(high_days)}</span></span>')
@@ -1528,12 +1528,14 @@ def _note_tint(note):
 GAUGE_INSET = 14   # 점 · 꼬리가 막대 끝 · 말풍선 가장자리에서 떨어지는 최소 px = 말풍선 모서리 8 + 꼬리 반폭 6 (2026-10-25 사용자: "삼각형이 말풍선 밖으로 빠지면 안 돼")
 
 
-BUBBLE_FONT = 15   # 말풍선 숫자 = 막대 아래 칸 이름 굵은 글자(14px)보다 1px 크게 (2026-10-27 P18, 17 → 15)
+BUBBLE_FONT = 14   # 말풍선 숫자 = 막대 아래 칸 이름 · 최저 · 최고 글자(TINY 14px)와 같은 크기 · 보통 굵기 (2026-10-31 사용자 P183, 앞서 P18 17 → 15)
+BUBBLE_H = 24   # 말풍선 높이 30 → 24 — 글자가 줄어든 만큼 (P183)
+GAUGE_H = 50   # 말풍선 막대 칸 높이 56 → 50 — 말풍선 위 여백 10 그대로 (P183)
 
 
 def _bubble_w(text):
     """말풍선 폭 px (BUBBLE_FONT 굵게 기준 글자 폭 어림 + 좌우 10px). 폭을 정해 두어야 CSS 만으로 카드 안에 가둘 수 있다."""
-    return round(20 + sum(5 if ch in ",. " else 17 if "가" <= ch <= "힣" else 10.5 for ch in text) * BUBBLE_FONT / 17) + 2   # 한글은 글자 크기만큼 (가격 범위 말풍선 `최고가 대비`, P34)
+    return round(16 + sum(5 if ch in ",. " else 17 if "가" <= ch <= "힣" else 10 for ch in text) * BUBBLE_FONT / 17) + 2   # 보통 굵기 · 좌우 8 (P183)   # 한글은 글자 크기만큼 (가격 범위 말풍선 `최고가 대비`, P34)
 
 
 def _gauge_tip(x, text, col, dot_col):
@@ -1542,8 +1544,8 @@ def _gauge_tip(x, text, col, dot_col):
     x = max(0.0, min(100.0, x))
     w = _bubble_w(text)
     at = f"clamp({GAUGE_INSET}px, {x:.1f}%, calc(100% - {GAUGE_INSET}px))"
-    return (f'<span style="position:absolute;left:clamp(0px, calc({at} - {w / 2:g}px), calc(100% - {w}px));width:{w}px;bottom:16px;z-index:1;background:{col};color:#fff;font-weight:700;'
-            f'font-size:{BUBBLE_FONT}px;display:flex;align-items:center;justify-content:center;height:30px;line-height:1;padding:0;box-sizing:border-box;border-radius:8px;white-space:nowrap;"><span>{_esc(text)}</span></span>'
+    return (f'<span style="position:absolute;left:clamp(0px, calc({at} - {w / 2:g}px), calc(100% - {w}px));width:{w}px;bottom:16px;z-index:1;background:{col};color:#fff;font-weight:400;'
+            f'font-size:{BUBBLE_FONT}px;display:flex;align-items:center;justify-content:center;height:{BUBBLE_H}px;line-height:1;padding:0;box-sizing:border-box;border-radius:8px;white-space:nowrap;"><span>{_esc(text)}</span></span>'
             f'<span style="position:absolute;left:{at};bottom:10px;z-index:1;transform:translateX(-50%);width:0;height:0;'
             f'border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid {col};"></span>'
             f'<span style="position:absolute;left:{at};bottom:-3px;transform:translateX(-50%);z-index:3;box-sizing:border-box;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid {dot_col};"></span>')
@@ -1571,7 +1573,7 @@ def _zone_gauge(x, zone, names, bubble, aria, ends=None, last=False):
         ends = ("" if x < 20 else ends[0], "" if x > 80 else ends[1])
     pad = _dk.SEP_GAP - _dk.VP - 1
     gauge = (f'<span data-range-gauge="1" aria-label="{_esc(aria)}" style="display:block;">'
-             f'<span style="position:relative;display:block;height:56px;">{_gauge_ends(ends) if ends else ""}{tip}'
+             f'<span style="position:relative;display:block;height:{GAUGE_H}px;">{_gauge_ends(ends) if ends else ""}{tip}'
              f'<span style="position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;">{segs}</span></span>'
              f'<span style="display:flex;margin-top:6px;">{labs}</span></span>')
     # last = 카드 맨 끝(한 달 범위). 그 흰 카드 아래 = 좌우와 같은 8px (2026-10-28 사용자 P59: 좌우는 좁은데 아래만 22px)
@@ -2221,7 +2223,7 @@ def target_gauge(cells, close):
     below = "".join(f'<span style="{lab}{at(t, pos(v))}color:#111;">{_esc(t)}</span>' for t, v in marks)
     pad = _dk.SEP_GAP - _dk.VP - 1
     gauge = (f'<span data-range-gauge="1" aria-label="오늘 종가 ${close:,.2f}, 애널리스트 목표가 최저 ${lo_t:,.0f} · 최고 ${hi_t:,.0f}" style="display:block;">'
-             f'<span style="position:relative;display:block;height:56px;">{bubble}'
+             f'<span style="position:relative;display:block;height:{GAUGE_H}px;">{bubble}'
              f'<span style="position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:3px;"><span style="position:absolute;inset:0;border-radius:3px;overflow:hidden;">{bar}</span>{ticks}</span></span>'
              f'<span style="position:relative;display:block;height:20px;margin-top:8px;">{ends}{below}</span></span>')
     return f'<span style="{MULTI}margin:{pad}px 0;"><span style="display:block;padding:{pad}px 12px;">{gauge}</span></span>'   # 다른 막대 그래프처럼 흰색 카드 안에 (2026-10-25 사용자: 평균 등급 아래 막대도)
