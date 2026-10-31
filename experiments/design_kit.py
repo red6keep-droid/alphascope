@@ -252,6 +252,8 @@ def col_layout(n, ns, label_px, axis_px):
     if COL_TIGHT != 1.0:   # 막대 사이 빈 폭만 줄인다 — 여유(COL_SPREAD)까지 합친 간격 기준, 숫자 · 이름 실제 폭(어림의 여백 뺀 값) 아래로는 안 줄인다
         floor = max(ns * lw + (ns - 1) * COL_GAP + 6 if ns > 1 else lw - 4, axis_px - 8)   # 여러 막대 묶음은 옆 묶음 숫자와 붙지 않게 숫자 칸 여백(4) + 6
         group = max(w + (group + (COL_SPREAD or 0) - w) * COL_TIGHT, floor) - (COL_SPREAD or 0) * COL_TIGHT
+    if ns > 1:   # 여러 막대 묶음은 묶음과 묶음 사이 빈 폭을 2배로 — 막대 하나짜리는 그대로 (2026-10-31 사용자 P182)
+        group += group + (COL_SPREAD or 0) * COL_TIGHT - (ns - 1) * (lw + COL_GAP) - w
     return w, lw, int(n * group + 0.999)
 
 
