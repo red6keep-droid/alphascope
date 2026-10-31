@@ -418,7 +418,7 @@ def card_opinions(s):
     if verdict:
         lines.append((R.analysts_block(a), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
     if ps:
-        lines.append((R.picks_rows_folded(ps, s.get("close"), money) + R.together_block(together_items(s)), "html"))   # 4건 이상은 3건 + 접기 (P158)   # 방송 묶음은 `매수 의견` 제목 · 구분선 (P92) · 함께 보기 (P142)
+        lines.append((R.picks_rows_folded(ps, s.get("close"), money) + R.together_block(together_items(s), R.pick_theme(state)[0]), "html"))   # 4건 이상은 3건 + 접기 (P158)   # 방송 묶음은 `매수 의견` 제목 · 구분선 (P92) · 함께 보기 (P142)
     tip = (f"애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 최근 {R.PICK_HOURS}시간에 나온 이 종목 의견을 한 카드에 모은 것\n"
            f"· 지금 : {state}" + (f" · 방송 {cnt}" if ps else "") + "\n"
            "· 나누는 법 : 애널리스트 중 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림. 방송 건수는 답에 넣지 않는다\n"

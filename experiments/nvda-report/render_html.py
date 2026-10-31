@@ -641,6 +641,7 @@ def year_range_in(y, money, tip, high_days=None):
 # 최신 가로축 이름 = 이 종목 색 + 글자 위 3px 강조점.
 LINE_W, LINE_W2, DOT_R, DOT_SW, LAST_R, LAST_SW = 2, 1.25, 3, 1.5, 4.5, 4
 LINE_H, LINE_STEP, LINE_GRAY = 230, 46, "#9CA3AF"
+LINE_THIS = "#5B8DEF"   # 선 그래프 이 종목 선 — 그래프 비교 목업에서 정한 파랑 (P161, 2026-10-31 P168 공용으로)
 LINE_FIT_W = 250   # 360px 폰에서 그래프 칸 폭(실측 250~257) — 점들이 이 안에 들어가면 넘겨 보기 없이 카드 폭에 고르게 편다 (2026-10-31 사용자: 짧으면 한쪽으로 몰렸다)
 
 
@@ -874,26 +875,35 @@ def picks_state(ps):
 TOGETHER_TITLE = "Alpha Scope 데이터로 함께 보기"   # 방송 의견 아래 — 같은 종목의 우리 판정을 방향별로 (2026-10-31 사용자 P142, 기록 계획 A5-5)
 
 
-def together_block(items):
+# 함께 보기 안쪽 카드 (2026-10-31 사용자 P168): 상승 쪽 · 하락 쪽 · 중립을 각자 카드로 감싼다. 바깥 강조 카드와 같은 색이면 한 단계 진하게
+TOGETHER_DEEP = {"positive": ("#FFEDD8", "#FCD9AD"), "negative": ("#E1EDFE", "#C3DBFB"), "neutral": ("#FFFFFF", "#E2E8F0")}
+BLOG_LOGO = ('<svg viewBox="0 0 313 286" width="18" height="16" aria-hidden="true" style="flex:none;display:block;">'
+             '<path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000000"/></svg>')   # 블로그 로고 (alphaflow-home .logo-mark)
+
+
+def together_block(items, outer=None):
     """방송 의견 아래 `Alpha Scope 데이터로 함께 보기` — items = [(이름, 판정 말, 방향 +1 · −1 · 0, 탭 이름, 카드 제목)].
     ▲ 상승 쪽 · ▼ 하락 쪽 · 중립 묶음으로 나눠 놓기만 한다 — 의견이 맞다 · 상충한다 같은 평가 말 · 종합 점수는 쓰지 않는다(매수 추천 금지).
+    묶음마다 방향 색 카드(상승 = 주황 · 하락 = 파랑 · 중립 = 회색), outer = 바깥 강조 카드 theme — 같은 색이면 TOGETHER_DEEP (P168). 제목 앞 블로그 로고.
     줄을 누르면 그 탭의 그 카드로 이동해 펼친다 (테마 JS `data-goto-tab` · `data-goto-card`)."""
     items = [x for x in items if x and x[1]]
     if not items:
         return ""
-    groups = [(1, "▲ 상승 쪽", UP), (-1, "▼ 하락 쪽", DOWN), (0, "중립", MUTED)]
+    groups = [(1, "▲ 상승 쪽", UP, "positive"), (-1, "▼ 하락 쪽", DOWN, "negative"), (0, "중립", MUTED, "neutral")]
     out = ""
-    for d, head, col in groups:
+    for d, head, col, th in groups:
         rows = [x for x in items if x[2] == d]
         if not rows:
             continue
-        out += f'<span style="display:block;margin:12px 0 2px;font-size:{TINY};line-height:20px;font-weight:700;color:{col};">{_esc(head)}</span>'
+        bg, bd = TOGETHER_DEEP[th] if th == (outer or "neutral") else CARD_DIR[th]
+        body = f'<span style="display:block;padding:10px 0 2px;font-size:{TINY};line-height:20px;font-weight:700;color:{col};">{_esc(head)}</span>'
         for nm, st, _, tab, card in rows:
-            out += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;'
-                    f'min-height:44px;cursor:pointer;border-top:1px solid #EEF0F3;font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
-                    f'<span style="color:#111;">{_esc(nm)}</span><span style="white-space:nowrap;font-weight:700;color:{col};">{_esc(st)}'
-                    f'<span aria-hidden="true" style="margin-left:6px;color:{NOTE};font-weight:400;">›</span></span></span>')
-    title = f'<span style="display:block;font-weight:700;color:#111;font-size:{_dk.NAME};">{_esc(TOGETHER_TITLE)}</span>'
+            body += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;'
+                     f'min-height:44px;cursor:pointer;border-top:1px solid {bd};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
+                     f'<span style="color:#111;">{_esc(nm)}</span><span style="white-space:nowrap;font-weight:700;color:{col};">{_esc(st)}'
+                     f'<span aria-hidden="true" style="margin-left:6px;color:{NOTE};font-weight:400;">›</span></span></span>')
+        out += f'<span data-together-group="{th}" style="display:block;margin-top:8px;padding:0 12px;background:{bg};border:1px solid {bd};border-radius:8px;">{body}</span>'
+    title = (f'<span style="display:flex;align-items:center;gap:6px;font-weight:700;color:#111;font-size:{_dk.NAME};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')
     return f'<span data-together="1" style="display:block;margin-top:8px;padding-top:14px;border-top:1px solid #E2E8F0;">{title}{out}</span>'
 
 
@@ -915,6 +925,8 @@ def picks_card(name, ps, close, money, hours=PICK_HOURS, together=""):
         return ""
     state = picks_state(ps)   # `매수 4 · 보유 1` (P163)
     theme, col = pick_theme(state)
+    if isinstance(together, list):   # 함께 보기 줄 — 이 카드 색을 알아야 안쪽 카드 색을 정한다 (P168)
+        together = together_block(together, theme)
     lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 나왔다.", "rich"), (picks_rows_folded(ps, close, money) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
     tip = (f"방송(유튜브 경제 채널) 요약에서 이 종목에 대한 매수 · 보유 · 관망 · 매도 의견을 모은 것. 최근 {hours}시간, 같은 영상 · 같은 사람은 한 번\n"
            f"· 지금 : {picks_count(ps)}\n· 읽는 법 : 누가 어떤 이유로 말했는지 보는 칸이다. 의견의 적중률은 검증하지 않았고, 이 블로그의 추천이 아니다")
@@ -2281,10 +2293,10 @@ def card_revenue(c):
         first += f" 같은 때 기술주 15개는 보통 {_sgn(p, 0)}%였다."
     if c.get("beat") is not None and c.get("guide_next"):
         first += f" 회사가 미리 내놓은 전망보다 {abs(c['beat']):.1f}% {'많았고' if c['beat'] >= 0 else '적었고'}, 다음 분기는 {_ok(c['guide_next'])}를 내다봤다."
-    groups = [(_dk.q_axis(b["cq"]), [b["stock"], b["peers"]]) for b in c["bars"]]   # 최신 오른쪽 (2026-10-31, 옛 P79 최신 왼쪽) · `25.3Q` → `25년 3분기` (P63)
-    chart = _chart_card(groups, [_sign_bg, _gray], [_sign_fg, _note_fg], [("엔비디아 늘어남", _PASTEL_UP), ("엔비디아 줄어듦", _PASTEL_DN), (_PEER_LBL, _GRAY_BAR)],
-                        fmt=lambda v: f"{v:+.0f}".replace("-", "−"), right=True)
-    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 매출, 1년 전 대비 (%)</span>{chart}', "html")]
+    bars = c["bars"]   # 최신 오른쪽 (2026-10-31, 옛 P79 최신 왼쪽) · `25.3Q` → `25년 3분기` (P63)
+    chart = line_chart([_dk.q_axis(b["cq"]) for b in bars], [("엔비디아", [b["stock"] for b in bars], LINE_THIS, False), (_PEER_LBL, [b["peers"] for b in bars], LINE_GRAY, True)],
+                       lambda v: f"{v:+.0f}".replace("-", "−"), "%")   # 막대 → 선 그래프 (2026-10-31 사용자 P168)
+    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 매출, 1년 전 대비</span>{chart}', "html")]
     if p is not None:
         lines.append(("row", "기술주 15개와 차이", _pp(c["yoy"] - p), "같은 달력 분기 중앙값과 비교"))
     if c.get("qoq") is not None:
@@ -2362,9 +2374,10 @@ def card_short(c):
     if c.get("peers_pct") is not None:
         first += f" 기술주 15개는 보통 {c['peers_pct']:.2f}%다."
     lab = lambda d: f"{int(d[5:7])}월 {int(d[8:10])}일" if d else "—"   # noqa: E731
-    groups = [(lab(c.get("prior_asof")), [c.get("prior_pct"), c.get("peers_prior_pct")]), (lab(c.get("asof")), [c.get("pct"), c.get("peers_pct")])]
-    chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("엔비디아", _AMBER), (_PEER_LBL, _GRAY_BAR)], fmt=lambda v: f"{v:.2f}", right=True)   # 두 날짜 — 최신 오른쪽 (P165)
-    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}공매도 비율, 유통 주식 대비 (%)</span>{chart}', "html"),
+    chart = line_chart([lab(c.get("prior_asof")), lab(c.get("asof"))], [("엔비디아", [c.get("prior_pct"), c.get("pct")], LINE_THIS, False),
+                                                                        (_PEER_LBL, [c.get("peers_prior_pct"), c.get("peers_pct")], LINE_GRAY, True)],
+                       lambda v: f"{v:.2f}", "%")   # 두 날짜 — 최신 오른쪽 (P165) · 막대 → 선 그래프 (2026-10-31 사용자 P168)
+    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}공매도 비율, 유통 주식 대비</span>{chart}', "html"),
              ("row", "공매도 비율", f"{c['pct']:.2f}%", "유통 주식 대비"),
              ("row", "잔고 변화 (한 달)", f"{_sgn(c['chg'])}%", "10% 넘게 늘면 늘어나는 중")]
     if c.get("peers_pct") is not None:

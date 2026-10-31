@@ -401,7 +401,7 @@ def _yoy_groups(series, key, label, n=6):
     return out   # 오래된 것 → 최신 (2026-10-31 최신 오른쪽, 옛 P79 최신 왼쪽)
 
 
-LINE_THIS = "#5B8DEF"   # 선 그래프 이 종목(올해) 선 — 그래프 비교 목업에서 정한 파랑 (P161)
+LINE_THIS = R.LINE_THIS   # 선 그래프 이 종목(올해) 선 (P161, 공용 상수)
 
 
 def _yoy_chart(title, groups, fmt, unit="", now="올해", then="작년 같은 때"):
@@ -700,6 +700,9 @@ def sec_chart_indicators(s):
     return R.ma_chart(tc["ma_rel"], tc.get("bench_ma_rel"), s["name"], "KOSPI", last=True)   # 가격 카드 끝 — 흰 카드 아래 = 좌우 8px (P140)
 
 
+MOM_GAP = 3   # 모멘텀 순위 카드와 비교 막대 카드 사이 — 한 제목의 그래프 둘로 읽히게 (2026-10-31 사용자 P168)
+
+
 def sec_momentum(s):
     """12개월 모멘텀 — 기간별 수익률 아래 (P139). 그래프 둘 (2026-10-31 사용자 P155 · P163): 순위 위치 막대(왼쪽 하위 25% · 오른쪽 상위 25%, 점 = 이 종목, 말풍선 = 값)
     + 세로 막대 셋(이 종목 · 35종목 중앙값 · KOSPI) — 순위와 크기 비교는 뜻이 달라 둘 다. 1년 흐름 · 우리 종목 안 순위라 기술지표 카드(ROC 12일)와 다르다."""
@@ -727,8 +730,10 @@ def sec_momentum(s):
         chart = R._col_chart(groups, [R._sign_bg], [R._sign_fg], fmt=lambda v: f"{v:+.1f}".replace("-", "−"),
                              color_at=lambda i, k, v: ((_dk.darken(R._PASTEL_UP if v >= 0 else R._PASTEL_DN, 0.2) if i == 0 else R._GRAY_BAR if i > 0 else None), (UP if v > 0 else DOWN if v < 0 else "#111") if i == 0 else NOTE))
         # B = 중앙값 · KOSPI 와 비교 (2026-10-31 사용자: A 순위 막대와 뜻이 달라 둘 다 둔다, P163)
-        out += (f'<span style="display:block;margin:16px 0 8px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{R._paren(_esc("중앙값 · KOSPI와 비교 (%)"))}</span>'
-                f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>')
+        # 한 제목 아래 그래프 둘 — 순위 카드와 3px 띄워 붙이고, 따로 있던 제목은 카드 안 오른쪽 범례로 (P168)
+        legend = (f'<span style="display:block;font-size:{_dk.MICRO};line-height:{_dk.LH_CARD};color:{NOTE};">'
+                  f'<span style="white-space:nowrap;">중앙값 · KOSPI와 비교</span><span data-unit="1" style="margin-left:7px;white-space:nowrap;">단위 : %</span></span>')
+        out += (f'<span style="{R.MULTI}margin:{MOM_GAP}px {_dk.CHART_CARD_X}px 0;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span>')
     return ("white", out)
 
 
@@ -887,13 +892,13 @@ def sec_expect(s):
 def card_picks(s):
     """방송 의견 카드 — 공용 R.picks_card (한국 · 미국 종목 같은 카드, 2026-10-29 P88 · P89). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
-    together = R.together_block(together_items(s)) if ps else ""
+    together = together_items(s) if ps else ""   # 줄 목록 — 카드 색은 picks_card 가 정한다 (P168)
     real = R.picks_card(s["name"], ps, s.get("close"), won, R.PICK_HOURS, together=together)
     if s["code"] != MOCK_PICKS_CODE or len(ps) >= 5:
         return real
     # 목업 샘플 — 다른 종목의 최근 의견을 빌려 5건 (2026-10-31 사용자 P158: 의견이 여럿일 때 접기 UX 보기). 발행 본문엔 real 만
     extra = [dict(p, ticker=s["sym"]) for p in sorted((p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] != s["code"]), key=lambda p: str(p["published_at"]), reverse=True)]
-    sample = R.picks_card(s["name"], (ps + extra)[:5], s.get("close"), won, R.PICK_HOURS, together=R.together_block(together_items(s)))
+    sample = R.picks_card(s["name"], (ps + extra)[:5], s.get("close"), won, R.PICK_HOURS, together=together_items(s))
     note = (f'<div style="margin:12px 0 6px;padding:6px 10px;border:1px dashed #F59E0B;border-radius:6px;font-size:{TINY};line-height:20px;color:#92400E;">'
             f'목업 샘플 — 다른 종목 의견을 빌려 5건으로 채움 (발행 글에는 실제 {len(ps)}건)</div>')
     return MOCK_ONLY_OPEN + note + sample + MOCK_ONLY_CLOSE + REAL_ONLY_OPEN + real + REAL_ONLY_CLOSE
