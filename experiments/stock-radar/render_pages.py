@@ -412,7 +412,7 @@ def card_opinions(s):
         state, text = verdict
         text += f" 방송에서는 {R.picks_sentence(ps)} 나왔다." if ps else ""
     else:
-        state = " · ".join(dict.fromkeys(p["action"] for p in ps))
+        state = R.picks_state(ps)   # `매수 4 · 보유 1` (P163)
         text = f"{s['name']}에 대한 {R.picks_sentence(ps)} 방송에서 나왔다. 애널리스트 집계는 없다."
     lines = [(text, "plain")]   # `블로그 의견 아님` 안내는 뺐다 (P92)
     if verdict:
@@ -622,7 +622,7 @@ def cal_peers(s, c):
     names = [f"{U.peer_name(u['symbol'])}({R._md_short(u['day'])})" for u in up]
     syms = [x for x in dict.fromkeys(u["symbol"] for u in up) if c["effect"].get(x, {}).get("median")]
     soon = " · ".join(r for r in ROLE_ORDER if r in {roles.get(u["symbol"]) for u in up})   # 30일 안에 발표하는 회사의 관계만
-    first = f"앞으로 30일 안에 {' · '.join(names)}가 실적을 발표한다. {nm}의 {'큰 보유 종목' if soon == '보유' else soon + ' 회사'}다."
+    first = f"앞으로 30일 안에 {_dk.josa(' · '.join(names), '가')} 실적을 발표한다. {nm}의 {'큰 보유 종목' if soon == '보유' else soon + ' 회사'}다."
     if syms:
         eff = [c["effect"][x]["median"] for x in syms]
         rng = f"±{min(eff):.1f}%" if f"{min(eff):.1f}" == f"{max(eff):.1f}" else f"±{min(eff):.1f}~{max(eff):.1f}%"
@@ -642,7 +642,7 @@ def cal_peers(s, c):
     tip = (f"{nm}와(과) 사업으로 이어진 회사({listed})의 실적 발표. 이 회사들의 실적 소식에 {nm} 주가도 함께 움직이곤 한다\n"
            f"· 30일 안 {len(up)}곳 : 가장 가까운 발표는 {U.peer_name(up[0]['symbol'])} {R._md_short(up[0]['day'])}\n"
            "· 참고 : 최근 2년, 회사마다 8번 안팎이라 숫자는 대략으로 본다")
-    return lines, tip, f"{len(up)}곳 · 30일 안", left
+    return lines, tip, f"{len(up)}곳", left
 
 
 def cal_macro(c):
@@ -657,7 +657,7 @@ def cal_macro(c):
     first = f"가장 가까운 큰 일정은 {near}이다." + (f" 30일 안에 모두 {len(up)}건이 있다." if len(up) > 2 else "")
     tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정. 모든 종목에 같은 내용이라 전체 일정과 지난 일정 날 S&P 500 움직임은 미국 증시 리포트 `일정` 탭에 모았다\n"
            f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {name(up[0])} {R._md_short(up[0]['day'])}")
-    return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED"), f"{len(up)}건 · 30일 안", None
+    return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED"), f"{len(up)}건", None
 
 
 STOCK_KINDS = ("EARNINGS", "EARNINGS_PEER")   # `전체 일정 보기` 는 이 종목 일정만 — 시장 공통 일정은 미국 증시 리포트로 (P144)
@@ -677,7 +677,7 @@ def _all_list(s, items):
 def sec_calendar(s):
     """캘린더 탭 — NVDA 리포트 sec_calendar 와 같은 질문 카드(실적 · 같은 업종 실적 · 시장 일정). 소송 카드는 없다(추적하는 사건이 없다)."""
     cc = s.get("calendar_cards") or {}
-    specs = [("다음 실적 발표는?", "earnings", lambda c: cal_earnings(s, c)), ("함께 보는 회사 실적 일정은?", "peers", lambda c: cal_peers(s, c)),   # 일정 탭 질문엔 `일정` (P156)
+    specs = [("다음 실적 발표는?", "earnings", lambda c: cal_earnings(s, c)), ("함께 보는 회사 일정은?", "peers", lambda c: cal_peers(s, c)),   # 360px 한 줄 (P163, 옛 P156 실적 일정은?)
              ("시장 전체를 흔들 일정은?", "macro", cal_macro)]
     out, first = "", True
     for title, key, fn in specs:

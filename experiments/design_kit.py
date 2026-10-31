@@ -328,6 +328,7 @@ _ZERO_TAIL = {1: 17, 2: 1, 3: 4, 4: 4}   # 끝 0 개수 → 십(ㅂ) · 백(ㄱ)
 def _tail(word):
     """마지막 글자 소리의 받침 번호 (0 = 받침 없음, 8 = ㄹ) — 한글은 글자, 숫자는 읽는 소리(96 → 육, 10 → 십), % 는 퍼센트."""
     w = re.sub(r"<[^>]+>", "", str(word)).rstrip()
+    w = re.sub(r"\([^()]*\)$", "", w).rstrip() or w   # 끝 괄호는 읽지 않는다 — `애플(11월 2일)` 은 `애플` 로 (2026-10-31 P163)
     if not w:
         return 0
     c = w[-1]
@@ -1466,7 +1467,7 @@ def legend_bar(title, segs):
         return ""
     head = f'<span style="display:block;font-size:{TINY};line-height:{LH_TINY};margin:0 0 3px;color:#111;font-weight:700;">{esc(title)}</span>'   # 제목 16 → 14 굵게 = 한 달 범위 막대의 작은 굵은 글씨 (2026-10-31 사용자 P149)
     body = "".join(f'<span style="display:block;width:{c / total * 100:.1f}%;background:{bg};color:{fg};font-size:{BAR_NUM};font-weight:700;'
-                   f'text-align:center;line-height:{BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{c / total * 100:.0f}%" if c / total >= 0.08 else ""}</span>' for _, c, bg, fg in segs).replace("font-weight:700;text-align:center", "font-weight:400;text-align:center")   # 막대 안 숫자 보통 굵기 (P159)
+                   f'text-align:center;line-height:{BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{c / total * 100:.0f}%" if c / total >= 0.08 else ""}</span>' for _, c, bg, fg in segs)   # 막대 안 숫자 굵게 (P163 — P159 보통 굵기를 되돌림, 크기 14 · 높이 24 그대로)
     bar_html = f'<span style="display:flex;width:100%;height:{BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:{BAR_PAD}px 0 {3 + BAR_PAD}px;">{body}</span>'
     legend = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
                      f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{nm} {c / total * 100:.0f}%</span>' for nm, c, bg, _ in segs)

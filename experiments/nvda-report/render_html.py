@@ -751,8 +751,8 @@ OUT_ICON = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" 
 def out_btn(label, href):
     """다른 페이지로 나가는 버튼 (2026-10-31 사용자 P148, 가이드라인 6절) — `전체 일정 보기` 와 같은 흰 외곽선 버튼 · 14px 굵게, 제목 앞 '나가는' 아이콘.
     같은 창에서 연다(같은 블로그 안). 블로그 안 다른 페이지로 보내는 링크는 모두 이 모양."""
-    return (f'<a href="{_esc(href)}" data-row-link="1" style="display:flex;justify-content:center;align-items:center;gap:6px;padding:8px 12px;background:#fff;border:1px solid #E2E8F0;'
-            f'border-radius:8px;font-size:{TINY};line-height:20px;font-weight:700;color:#111;text-decoration:none;">{OUT_ICON}<span>{_esc(label)}</span></a>')
+    return (f'<a href="{_esc(href)}" data-row-link="1" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;background:#fff;border:1px solid #E2E8F0;'
+            f'border-radius:8px;font-size:{TINY};line-height:20px;font-weight:700;color:#111;text-decoration:none;"><span>{_esc(label)}</span>{OUT_ICON}</a>')   # 글자 왼쪽 · 아이콘 오른쪽 끝 (2026-10-31 사용자 P163)
 
 
 LIST_SHOWN = 3   # 목록이 이보다 많을 때만 접기 버튼 — 3개 이하는 바로 보여 준다 (2026-10-31 사용자 P157)
@@ -855,7 +855,20 @@ PICK_THEME = {"매수": ("positive", UP), "매도": ("negative", DOWN)}   # 답�
 
 
 def pick_theme(state):
+    """답 `매수 4 · 보유 1` 이면 가장 많은 의견으로 색 — 매수가 가장 많으면 매수 주황, 매도면 파랑, 같으면 회색 (2026-10-31 사용자 P163)."""
+    parts = [(m.group(1), int(m.group(2) or 1)) for m in re.finditer(r"(매수|보유|관망|매도)\s*(\d+)?", state)]
+    if parts:
+        top = max(c for _, c in parts)
+        lead = [k for k, c in parts if c == top]
+        if len(lead) == 1:
+            return PICK_THEME.get(lead[0], ("neutral", MUTED))
+        return ("neutral", MUTED)
     return PICK_THEME.get(state, ("neutral", MUTED))
+
+
+def picks_state(ps):
+    """방송 의견 카드 답 — `매수 4 · 보유 1` (건수, PICK_ORDER 순). 한 가지면 `매수 2` (P163)."""
+    return " · ".join(f"{k} {sum(1 for p in ps if p['action'] == k)}" for k in PICK_ORDER if any(p["action"] == k for p in ps))
 
 
 TOGETHER_TITLE = "Alpha Scope 데이터로 함께 보기"   # 방송 의견 아래 — 같은 종목의 우리 판정을 방향별로 (2026-10-31 사용자 P142, 기록 계획 A5-5)
@@ -900,7 +913,7 @@ def picks_card(name, ps, close, money, hours=PICK_HOURS, together=""):
     문장 = `삼성전자에 대한 매수 의견이 1건 나왔다.` 펼치면 의견별 제목(`매수 의견`) 아래 줄마다 말한 사람(소속) / 이유 / 채널 · 게시 시각 · (목표가) · 영상에서 보기, 줄 사이 구분선. 없으면 빈 문자열."""
     if not ps:
         return ""
-    state = " · ".join(k for k in PICK_ORDER if any(p["action"] == k for p in ps))
+    state = picks_state(ps)   # `매수 4 · 보유 1` (P163)
     theme, col = pick_theme(state)
     lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 나왔다.", "rich"), (picks_rows_folded(ps, close, money) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
     tip = (f"방송(유튜브 경제 채널) 요약에서 이 종목에 대한 매수 · 보유 · 관망 · 매도 의견을 모은 것. 최근 {hours}시간, 같은 영상 · 같은 사람은 한 번\n"
@@ -2464,7 +2477,7 @@ def cal_peers(c):
     tip = ("엔비디아 칩을 사는 큰 고객(클라우드 회사 등), 경쟁사, 부품 공급사의 실적 발표. 이 회사들이 내놓는 투자 계획 · 주문 소식에 엔비디아 주가도 함께 움직이곤 한다\n"
            f"· 30일 안 {len(up)}곳 : 가장 가까운 발표는 {cal_cards.PEER_KO.get(up[0]['symbol'], up[0]['symbol'])} {_md_short(up[0]['day'])}\n"
            "· 참고 : 같은 날 발표한 회사들은 같은 날 움직임으로 셌다. 최근 2년, 회사마다 8번 안팎이라 숫자는 대략으로 본다")
-    return lines, tip, f"{len(up)}곳 · 30일 안", first_left
+    return lines, tip, f"{len(up)}곳", first_left
 
 
 def cal_macro(c):
@@ -2489,7 +2502,7 @@ def cal_macro(c):
     tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정\n"
            f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {cal_cards.MACRO_KO.get(up[0]['kind'], up[0]['label'])} {_md_short(up[0]['day'])}\n"
            "· 참고 : 2025년 이후 지난 일정 날의 S&P 500 움직임을 보통 날과 견줬다. 일정이 있다고 늘 크게 움직이지는 않았다")
-    return lines, _dk.with_src(tip, "FRED"), f"{len(up)}건 · 30일 안", None
+    return lines, _dk.with_src(tip, "FRED"), f"{len(up)}건", None
 
 
 def cal_court(c):

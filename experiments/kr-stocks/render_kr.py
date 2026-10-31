@@ -701,8 +701,8 @@ def sec_chart_indicators(s):
 
 
 def sec_momentum(s):
-    """12개월 모멘텀 — 기간별 수익률 아래 (P139). 그래프로 (2026-10-31 사용자 P155): A안 = 순위 위치 막대(왼쪽 하위 25% · 오른쪽 상위 25%, 점 = 이 종목, 말풍선 = 값),
-    B안(목업에서만) = 세로 막대 셋(이 종목 · 35종목 중앙값 · KOSPI). 사용자가 고르면 하나만 남긴다. 1년 흐름 · 우리 종목 안 순위라 기술지표 카드(ROC 12일)와 다르다."""
+    """12개월 모멘텀 — 기간별 수익률 아래 (P139). 그래프 둘 (2026-10-31 사용자 P155 · P163): 순위 위치 막대(왼쪽 하위 25% · 오른쪽 상위 25%, 점 = 이 종목, 말풍선 = 값)
+    + 세로 막대 셋(이 종목 · 35종목 중앙값 · KOSPI) — 순위와 크기 비교는 뜻이 달라 둘 다. 1년 흐름 · 우리 종목 안 순위라 기술지표 카드(ROC 12일)와 다르다."""
     mom, mr = s.get("mom_12_1"), s.get("mom_rank")
     if mom is None or not mr:   # K18 — 우리 검증에서 유일하게 '다음 달' 과 이어진 가격 신호 (좁은 표본)
         return ""
@@ -722,13 +722,13 @@ def sec_momentum(s):
             f'<span style="flex:none;font-weight:700;color:{col};font-size:{_dk.NAME};white-space:nowrap;">{total}종목 중 {rank}위</span></span>')
     out = head + gauge
     med, bench = s.get("mom_peers_median"), s.get("mom_bench")
-    if med is not None:   # B안 — 목업에서만 (MOCK_ONLY)
+    if med is not None:   # B — 세로 막대 셋
         groups = [(s["name"], [mom]), (f"우리 {total}종목 중앙값", [med])] + ([("KOSPI", [bench])] if bench is not None else [])
         chart = R._col_chart(groups, [R._sign_bg], [R._sign_fg], fmt=lambda v: f"{v:+.1f}".replace("-", "−"),
                              color_at=lambda i, k, v: ((_dk.darken(R._PASTEL_UP if v >= 0 else R._PASTEL_DN, 0.2) if i == 0 else R._GRAY_BAR if i > 0 else None), (UP if v > 0 else DOWN if v < 0 else "#111") if i == 0 else NOTE))
-        b = (f'<div style="margin:12px 0 6px;padding:6px 10px;border:1px dashed #F59E0B;border-radius:6px;font-size:{TINY};line-height:20px;color:#92400E;">목업 B안 — 세로 막대(이 종목 · 중앙값 · KOSPI). 위 A안(순위 막대)과 하나 고르기</div>'
-             f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>')
-        out += MOCK_ONLY_OPEN + b + MOCK_ONLY_CLOSE
+        # B = 중앙값 · KOSPI 와 비교 (2026-10-31 사용자: A 순위 막대와 뜻이 달라 둘 다 둔다, P163)
+        out += (f'<span style="display:block;margin:16px 0 8px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{R._paren(_esc("중앙값 · KOSPI와 비교 (%)"))}</span>'
+                f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>')
     return ("white", out)
 
 
@@ -1060,7 +1060,7 @@ def cal_pair_card(s, c):
         return [(f"앞으로 30일 안에 실적을 발표하는 {nm}의 미국 연결 종목이 없다.", "plain")], "", "없음", None
     syms = [x for x in dict.fromkeys(u["symbol"] for u in up) if c["effect"].get(x, {}).get("median")]
     names = " · ".join(usn(u["symbol"]) + "(" + R._md_short(u["day"]) + ")" for u in up)
-    first = f"앞으로 30일 안에 {names}가 실적을 발표한다. {_dk.josa(nm, '와')} 같은 재료로 움직이는 미국 종목이다."
+    first = f"앞으로 30일 안에 {_dk.josa(names, '가')} 실적을 발표한다. {_dk.josa(nm, '와')} 같은 재료로 움직이는 미국 종목이다."
     if syms and c.get("normal"):
         eff = [c["effect"][x]["median"] for x in syms]
         first += f" 최근 2년 이 회사들의 발표 다음 날 {nm} 주가는 보통 ±{min(eff):.1f}~{max(eff):.1f}% 움직였다({nm} 보통 날 ±{c['normal']:.1f}%)."
@@ -1075,10 +1075,10 @@ def cal_pair_card(s, c):
     left = (datetime.date.fromisoformat(up[0]["day"]) - datetime.date.fromisoformat(s["day"])).days
     tip = (f"{_dk.josa(nm, '와')} 같은 재료로 움직이는 미국 종목(미국과 연결)의 실적 발표. 미국 장 마감 뒤 나오는 발표는 한국 시간 다음 날 장에 반영된다\n"
            f"· 30일 안 {len(up)}곳 : 가장 가까운 발표는 {usn(up[0]['symbol'])} {R._md_short(up[0]['day'])}\n· 참고 : 최근 2년, 회사마다 8번 안팎이라 숫자는 대략으로 본다")
-    return lines, _dk.with_src(tip, "Yahoo Finance"), f"{len(up)}곳 · 30일 안", left
+    return lines, _dk.with_src(tip, "Yahoo Finance"), f"{len(up)}곳", left
 
 
-def cal_macro_card(s, c):
+def cal_macro_card(s, c):   # 답 `5건` — 옛 `5건 · 30일 안` 이 제목을 두 줄로 밀었다(30일은 문장 · 툴팁에, P163)
     """시장 전체 일정 — 가장 가까운 1~2개만 한 줄로 요약하고, 전체는 한국 증시 리포트 `일정` 탭으로 (2026-10-31 사용자 P144: 모든 종목에 같은 공통 정보는
     공통 정보 보는 곳으로). 옛 그래프 · 일정별 줄은 리포트 쪽에 있다."""
     up = c["upcoming"]
@@ -1089,7 +1089,7 @@ def cal_macro_card(s, c):
     first = f"가장 가까운 큰 일정은 {near}이다." + (f" 30일 안에 모두 {len(up)}건이 있다." if len(up) > 2 else "")
     tip = ("미국 금리 결정 · 물가 · 고용 발표와 국내 옵션 만기처럼 시장 전체가 함께 보는 일정. 모든 종목에 같은 내용이라 전체 일정과 지난 일정 뒤 KOSPI 움직임은 한국 증시 리포트 `일정` 탭에 모았다\n"
            f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {_macro_name(up[0]['kind'], up[0].get('label', ''))} {R._md_short(up[0]['day'])}")
-    return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED · Yahoo Finance"), f"{len(up)}건 · 30일 안", None
+    return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED · Yahoo Finance"), f"{len(up)}건", None
 
 
 CAL_TAB = "일정"   # 한국 증시 리포트 일정 탭 이름 (kr-market-report TAB_CAL) — 테마가 #tab-일정 으로 연다
@@ -1119,7 +1119,7 @@ def sec_calendar(s):
     """`일정` 탭 — 다음 실적 발표는? · 미국과 연결 종목 실적은? · 시장 전체를 흔들 일정은?(요약 + 리포트 링크) + 전체 일정 보기(이 종목 일정만)."""
     cc = s.get("calendar_cards") or {}
     out, first = "", True
-    for title, key, fn in (("다음 실적 발표는?", "earnings", cal_earn_card), ("미국과 연결 종목 실적 일정은?", "peers", cal_pair_card), ("시장 전체를 흔들 일정은?", "macro", cal_macro_card)):   # 일정 탭 질문엔 `일정` (P156)
+    for title, key, fn in (("다음 실적 발표는?", "earnings", cal_earn_card), ("미국 연결 종목 일정은?", "peers", cal_pair_card), ("시장 전체를 흔들 일정은?", "macro", cal_macro_card)):   # 일정 탭 질문엔 `일정` (P156)
         c = cc.get(key)
         if not c:
             continue
@@ -1639,7 +1639,7 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
     MEDIA = media
     moms = sorted(x["mom_12_1"] for x in a["stocks"] if x.get("mom_12_1") is not None)
     kb = [b["close"] for b in (snap or {}).get("bars", {}).get(U.BENCH) or []] if snap else []
-    bench_mom = (kb[-21] / kb[-252] - 1) * 100 if len(kb) >= 252 else None   # KOSPI 12-1 모멘텀 (B안 목업)
+    bench_mom = (kb[-21] / kb[-252] - 1) * 100 if len(kb) >= 252 else None   # KOSPI 12-1 모멘텀 (모멘텀 비교 막대)
     for s in a["stocks"]:
         s["mom_peers_median"] = moms[len(moms) // 2] if moms else None
         s["mom_bench"] = bench_mom
