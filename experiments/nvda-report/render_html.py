@@ -750,7 +750,7 @@ def month_range_in(bb, money, tip, state, color, title="한 달간 변화 범위
     gauge = gauge.replace(f"margin:0 {_dk.CHART_CARD_X - 2}px 0px;", f"margin:0 {_dk.CHART_CARD_X}px;", 1)   # 상태 카드 안(14) → 가격 펼침(12) 폭 = 1년 범위 카드와 같게
     head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:{top}px 0 {_dk.CHART_TITLE_GAP}px;line-height:{LH_CARD};">'   # 8 → 6 · 행간 24 고정 (P177)
             f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{_paren(_esc(title))}{_tipx(tip)}</span>'
-            f'<span style="flex:none;font-weight:700;color:{color};font-size:{_dk.NAME};white-space:nowrap;">{_esc(state)}</span></span>')
+            '</span>')   # 오른쪽 답(범위 안 · 하락 범위 · 상승 범위)은 뺐다 — 막대 아래 칸 이름이 같은 말 (2026-10-31 사용자 P188)
     return head + gauge
 
 
@@ -1037,13 +1037,15 @@ def rows_after(rows):
     return f'<div style="margin-top:8px;">{rows}</div>' if rows else ""
 
 
-_EMPH_WHITE_RE = re.compile(r"(margin:0 0 6px;background:#fff;)border:1px solid #[0-9A-Fa-f]{6};(border-radius:8px;)")
+_EMPH_WHITE_RE = re.compile(r"((?:margin:0 0 6px;|display:block;)background:#fff;)border:1px solid (?:#[0-9A-Fa-f]{6}|rgb\(226,232,240\));(border-radius:8px;)")
+EMPH_WHITE_BD = "rgba(226,232,240,0.5)"   # 강조 카드 안 흰 카드 외곽선 = 보통 흰 카드 외곽선(#E2E8F0) 투명도 50% (2026-10-31 사용자 P188, P187 의 지우기 대신)
 
 
 def emph_white(html):
-    """강조 카드(색 바탕) 안 흰 카드(그래프 · 범위 막대 · 함께 보기)의 외곽선을 지운다 — 1px 투명이라 크기 · 위치는 그대로 (2026-10-31 사용자 P187).
-    흰 버튼(`차트 정보 보기` 등, padding 으로 시작)은 그대로. 바깥(흰 바탕) 그래프 카드는 외곽선이 있어야 보이므로 손대지 않는다."""
-    return _EMPH_WHITE_RE.sub(r"\1border:1px solid transparent;\2", html)
+    """강조 카드(색 바탕) 안 흰 카드(그래프 · 범위 막대 · 함께 보기)의 외곽선을 반투명(50%)으로 (2026-10-31 사용자 P187 → P188).
+    MULTI 흰 카드와 rgb() 로 적은 그래프 카드(평균선 · 고점 회복) 모두. 흰 버튼(`차트 정보 보기` 등, padding 으로 시작)은 그대로.
+    바깥(흰 바탕) 그래프 카드는 손대지 않는다."""
+    return _EMPH_WHITE_RE.sub(rf"\1border:1px solid {EMPH_WHITE_BD};\2", html)
 
 
 def price_in(bg, bd, parts):
@@ -1397,7 +1399,7 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
     body = (f'<div style="margin-top:{14 - _dk.VP_EMPH + 3}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
     inner = (f'<details data-acc="1"{" open" if opened else ""}><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{body}</details>' if fold else head + body)
-    inner = emph_white(inner)   # 강조 카드 안 흰 카드는 외곽선 없이 (P187)
+    inner = emph_white(inner).replace(PICK_LINE, f"border-top:1px solid {bd_row};")   # 흰 카드 외곽선 50% (P188) · 방송 의견 줄 구분선 = 다른 카드 펼침 안 줄 구분선과 같은 색 (P188, 옛 검정 10% 반투명)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{_dk.EMPH_PAD - _dk.VP_EMPH}px 14px;margin:0 0 8px;line-height:{_dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
             f'{inner}</div>')
 
@@ -1925,7 +1927,7 @@ def sec_events(a):
     cards = [e for e in a["events"] if e.get("emphasis")]
     plain = [e for e in a["events"] if not e.get("emphasis")]
     # 강조 카드만 카드, 나머지는 가로 구분선 목록 (2026-10-13 사용자). 일반 기사는 카드 안쪽만큼(테두리 1 + 안쪽 12) 들여 제목 왼쪽 선을 강조 카드 제목에 맞춘다 (2026-10-16 사용자)
-    out = "".join(_event_html(e) for e in cards) + _dk.item_rules([_event_html(e) for e in plain], indent=_dk.ALIGN_PX)   # 좌우 = 좌측 기준선 6px(홈 실시간 뉴스 글자 선) — 옛 13px 이 남아 있었다 (2026-10-27 사용자 P38)
+    out = "".join(_event_html(e) for e in cards) + _dk.item_rules([_event_html(e) for e in plain], indent=_dk.ALIGN_PX, first_top=NEWS_FIRST_TOP)   # 좌우 = 좌측 기준선 6px(홈 실시간 뉴스 글자 선) — 옛 13px 이 남아 있었다 (2026-10-27 사용자 P38)
     if a["events_overflow"]:
         # 카드 버튼 (가운데, 검정) — 2026-10-11 사용자
         out += (f'<details data-acc="1" style="margin:8px 0;"><summary style="{_dk.FOLD_BTN}">그 외 {len(a["events_overflow"])}건 {ACC_CHEV}</summary>'
@@ -2114,6 +2116,9 @@ def news_stat_tip(a):
             f"· 7일 평균{f('news_avg_7d', 1)} : 지난 7일 하루 평균. 오늘 기사가 평소보다 많은지 견줘 보는 기준\n"
             f"· 대기 문서{f('news_pending', 0)} : 모았지만 아직 분류하지 못한 문서. 다음 실행에서 이어서 분류한다",
             "NVIDIA 뉴스룸 · CNBC · Google News")
+
+
+NEWS_FIRST_TOP = 18   # 첫 기사 위 2 → 18 — 위 카드 ~ 첫 제목 보이는 여백 16 → 32, 2배 (2026-10-31 사용자 P188)
 
 
 def sec_news_counts(a):
