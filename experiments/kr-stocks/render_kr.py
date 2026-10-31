@@ -770,7 +770,11 @@ def sec_momentum(s):
     if med is not None:   # B — 세로 막대 셋
         groups = [(s["name"], [mom]), (f"우리 {total}종목 중앙값", [med])] + ([("KOSPI", [bench])] if bench is not None else [])
         chart = R._col_chart(groups, [R._sign_bg], [R._sign_fg], fmt=lambda v: f"{v:+.1f}".replace("-", "−"),
-                             color_at=lambda i, k, v: ((_dk.darken(R._PASTEL_UP if v >= 0 else R._PASTEL_DN, 0.2) if i == 0 else R._GRAY_BAR if i > 0 else None), (UP if v > 0 else DOWN if v < 0 else "#111") if i == 0 else NOTE))
+                             color_at=lambda i, k, v: (((R._PASTEL_UP if v >= 0 else R._PASTEL_DN) if i == 0 else R._GRAY_BAR), (UP if v > 0 else DOWN if v < 0 else "#111") if i == 0 else NOTE))   # 이 종목도 보통 막대 색 (2026-10-31 사용자 P175, 옛 20% 진하게)
+        # 이 종목 = 축 이름 위 3px 강조점(막대 숫자 색) — 선 그래프 최신 축 이름 강조점과 같은 모양 (P175)
+        nm_cell = f'overflow-wrap:anywhere;">{_esc(s["name"])}</span>'
+        dot = f'<span aria-hidden="true" style="display:block;width:3px;height:3px;margin:0 auto 2px;border-radius:50%;background:{UP if mom > 0 else DOWN if mom < 0 else "#111"};"></span>'
+        chart = chart.replace(nm_cell, f'overflow-wrap:anywhere;margin-top:-5px;">{dot}{_esc(s["name"])}</span>', 1)
         # B = 중앙값 · KOSPI 와 비교 (2026-10-31 사용자: A 순위 막대와 뜻이 달라 둘 다 둔다, P163)
         # 한 제목 아래 그래프 둘 — 순위 카드와 3px 띄워 붙이고, 따로 있던 제목은 카드 안 오른쪽 범례로 (P168)
         legend = (f'<span style="display:block;font-size:{_dk.MICRO};line-height:{_dk.LH_CARD};color:{NOTE};">'
