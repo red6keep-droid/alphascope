@@ -96,7 +96,7 @@ CHART_MARK = '<span style="font-weight:400;font-size:.85em;position:relative;top
 _CHART_TITLE_STYLE = f"display:block;font-weight:700;color:#111;font-size:{NAME};line-height:{LH_CARD};"
 CHART_TITLE = f'<span style="{_CHART_TITLE_STYLE}">' + CHART_MARK
 CHART_TITLE_GAP = 4   # 강조 카드 안 그래프 제목 칸 ~ 그래프(흰 카드) — 모든 그래프 같게 (P176). 눈에 보이는 간격(굵은 글자 아래 → 테두리) = 이 값 + 행간 여유 3 = 7 (2026-10-31 사용자 P178: 9 → 7)
-CHART_STACK_GAP = 5   # 그래프 바로 아래 또 그래프가 오면 아래 그래프 제목 위를 이만큼 더 (P176)
+CHART_STACK_GAP = 10   # 상태 카드에서 그래프 바로 아래 또 그래프 — 아래 그래프 제목 위를 이만큼 더 (P176 5 → P179 10). 보이는 간격(위 흰 카드 아래 → 아래 제목 글자 위) = 24, 가격 카드 안 구분선 없는 영역 사이와 같다 (구분선 있으면 +1 = 25)
 CHART_TITLE_M = f'<span style="{_CHART_TITLE_STYLE}margin:0 0 {CHART_TITLE_GAP}px;">' + CHART_MARK   # 아래 6px 를 두던 질문 카드 안 차트 제목
 
 
