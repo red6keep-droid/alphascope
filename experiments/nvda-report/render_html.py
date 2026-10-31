@@ -876,6 +876,7 @@ TOGETHER_TITLE = "Alpha Scope 데이터로 함께 보기"   # 방송 의견 아�
 
 
 # 함께 보기 안쪽 카드 (2026-10-31 사용자 P168): 상승 쪽 · 하락 쪽 · 중립을 각자 카드로 감싼다. 바깥 강조 카드와 같은 색이면 한 단계 진하게
+TOGETHER_FLAT = "#4B5563"   # 함께 보기 중립 대답 — 흐린 회색 대신 조금 빠진 검정 (2026-10-31 사용자 P173)
 TOGETHER_HEAD_FS, TOGETHER_ROW_H = "15px", 57   # `▲ 상승 쪽` 14 → 15 · 줄 높이 44 → 57 (×1.3) (2026-10-31 사용자 P169)
 TOGETHER_END = "<!--together-end-->"   # 강조 카드가 함께 보기로 끝나면 아래 = 좌우 15 로 당긴다 (_pull_end_chart, P169)
 TOGETHER_DEEP = {"positive": ("#FFEDD8", "#FCD9AD"), "negative": ("#E1EDFE", "#C3DBFB"), "neutral": ("#FFFFFF", "#E2E8F0")}
@@ -888,25 +889,22 @@ def together_block(items, outer=None):
     ▲ 상승 쪽 · ▼ 하락 쪽 · 중립 묶음으로 나눠 놓기만 한다 — 의견이 맞다 · 상충한다 같은 평가 말 · 종합 점수는 쓰지 않는다(매수 추천 금지).
     묶음마다 방향 색 카드(상승 = 주황 · 하락 = 파랑 · 중립 = 회색), outer = 바깥 강조 카드 theme — 같은 색이면 TOGETHER_DEEP (P168). 제목 앞 블로그 로고.
     줄을 누르면 그 탭의 그 카드로 이동해 펼친다 (테마 JS `data-goto-tab` · `data-goto-card`)."""
+    import tech_signals as TS   # 라벨 박스 — 기술지표 카드와 같은 [▲ 상승] · [▼ 하락] · [— 중립] (P173)
     items = [x for x in items if x and x[1]]
     if not items:
         return ""
-    groups = [(1, "▲ 상승 쪽", UP, "positive"), (-1, "▼ 하락 쪽", DOWN, "negative"), (0, "중립", MUTED, "neutral")]
+    # 묶음 카드 · 묶음 제목은 없앴다 — 한 흰 카드 안에 상승 → 하락 → 중립 순서로 줄만 놓고, 방향은 줄 끝 라벨로 (2026-10-31 사용자 P173, 옛 P168 방향별 색 카드)
     out = ""
-    for d, head, col, th in groups:
-        rows = [x for x in items if x[2] == d]
-        if not rows:
-            continue
-        bg, bd = TOGETHER_DEEP[th] if th == (outer or "neutral") else CARD_DIR[th]
-        body = f'<span style="display:block;padding:13px 0 3px;font-size:{TOGETHER_HEAD_FS};line-height:20px;font-weight:700;color:{col};">{_esc(head)}</span>'   # 14 → 15 · 위아래 ×1.3 (P169)
-        for it in rows:
+    for d, kind, word, col in ((1, "up", "상승", UP), (-1, "down", "하락", DOWN), (0, "flat", "중립", TOGETHER_FLAT)):
+        for it in (x for x in items if x[2] == d):
             nm, st, _, tab, card = it[:5]
-            hz = f'<span style="display:block;margin-top:-6px;font-size:{MICRO};line-height:20px;font-weight:400;color:{NOTE};">{_esc(it[5])}</span>' if len(it) > 5 and it[5] else ""   # 기간 꼬리표 — 기간이 다른 신호를 같은 줄로 읽지 않게 (A5-2)
-            body += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;'
-                     f'min-height:{TOGETHER_ROW_H}px;padding:6px 0;box-sizing:border-box;cursor:pointer;border-top:1px solid {bd};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
-                     f'<span style="color:#111;">{_esc(nm)}{hz}</span><span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-weight:700;color:{col};">{_esc(st)}{OUT_ICON}</span></span>')   # › → 나가는 아이콘, 대답과 같은 색 (P169)
-        out += f'<span data-together-group="{th}" style="display:block;margin-top:8px;padding:0 12px 6px;background:{bg};border:1px solid {bd};border-radius:8px;">{body}</span>'   # 아래 6 — 카드 높이 ×1.3 (P169)
-    title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')   # 16 → 18 (P169) · 가운데 (P170)
+            hz = f'<span style="display:block;font-size:{MICRO};line-height:20px;font-weight:400;color:{NOTE};">{_esc(it[5])}</span>' if len(it) > 5 and it[5] else ""   # 기간 꼬리표 (A5-2)
+            out += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;'
+                    f'min-height:{TOGETHER_ROW_H}px;padding:6px 0;box-sizing:border-box;cursor:pointer;border-top:1px solid #EEF0F3;font-size:{_dk.NAME};line-height:{LH_CARD};">'   # 18 → 16 — 대답 · 라벨 · 아이콘이 한 줄에 들어가게 (360px 줄 폭 286, P173)
+                    f'<span style="min-width:0;color:#111;">{_esc(nm)}{hz}</span>'
+                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;font-weight:{400 if d == 0 else 700};color:{col};">{_esc(st.lstrip("▲▼ "))}'
+                    f'{TS.box(kind, word, _esc)}{OUT_ICON}</span></span>')   # 대답 → 라벨 → 나가는 아이콘(대답 색). 중립 대답은 보통 굵기 · 조금 빠진 검정 (P173)
+    title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 8px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')   # 16 → 18 (P169) · 가운데 (P170)
     return (f'<span data-together="1" style="{MULTI}margin:19px {_dk.CHART_CARD_X}px 0;padding:{_dk.CHART_CARD_PAD + 4}px 12px 12px;">{title}{out}</span>{TOGETHER_END}')   # 그래프와 같은 흰 카드로 감싼다 (2026-10-31 사용자 P171, 옛 구분선 + 위 19)
 
 
