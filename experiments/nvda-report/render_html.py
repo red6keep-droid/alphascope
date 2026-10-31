@@ -540,10 +540,10 @@ def ma_chart(mr, bmr, name, bench, last=False):
     """평균선 대비 세로 막대 (2026-10-27 사용자 P37) — 20 · 60 · 120 · 200일 평균마다 지금 가격이 몇 % 위 · 아래, 비교 = 지수의 같은 값(회색).
     `차트 정보 보기` 펼침 맨 위. 흰 카드 테두리는 rgb() — 강조 카드 _flatten 이 흰 카드로 보지 않게."""
     get = lambda d, n: (d or {}).get(n, (d or {}).get(str(n)))   # noqa: E731 — 키가 숫자 · 글자 둘 다
-    groups = [(f"{n}일 평균", [get(mr, n), get(bmr, n)]) for n in (20, 60, 120, 200) if get(mr, n) is not None]
+    groups = [(f"{n}일 평균", [get(mr, n), get(bmr, n)]) for n in (200, 120, 60, 20) if get(mr, n) is not None]   # 긴 기간 → 짧은 기간, 가까운 쪽 오른쪽 (2026-10-31 사용자 P165)
     if not groups:
         return ""
-    chart = _col_chart(groups, [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE])
+    chart = _col_chart(groups, [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE], right=True)
     legend = _legend_chips([(f"{name} 위", _PASTEL_UP), (f"{name} 아래", _PASTEL_DN), (bench, _GRAY_BAR)])
     tip = (f"n일 평균 = 최근 n거래일 종가의 평균. 막대 = 지금 가격이 그 평균보다 몇 % 위(+) · 아래(−)인지. 회색 = 같은 날 {bench}\n"
            + " · ".join(f"{g} {_sgn(v[0])}%" for g, v in groups))
@@ -559,7 +559,7 @@ def day_path_chart(path, bpath, name, bench):
         return ""
     names = [("open", "시가"), ("high", "장중 고점"), ("low", "장중 저점"), ("close", "종가")]
     groups = [(lb, [path[k], (bpath or {}).get(k)]) for k, lb in names]
-    chart = _col_chart(groups, [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE], fmt=lambda v: f"{v:+.2f}".replace("-", "−"))
+    chart = _col_chart(groups, [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE], fmt=lambda v: f"{v:+.2f}".replace("-", "−"), right=True)   # 하루 시간 순서 — 축 오른쪽 (P165)
     legend = _legend_chips([(f"비교 대상 : {bench}", _GRAY_BAR)])   # 제목 · 이 종목 오름/내림 범례는 뺐다 — 바로 아래 가격 카드에 종목 이름, 색은 다른 그래프와 같다. 회색(비교)만 (2026-10-27 사용자)
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
 
@@ -596,7 +596,7 @@ def sec_periods(a):
     if not ps:
         return ""
     pad = _dk.SEP_GAP - _dk.VP - 1
-    chart = _col_chart([(p["label"], [p["nvda"], p.get("spy")]) for p in ps], [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE])
+    chart = _col_chart([(p["label"], [p["nvda"], p.get("spy")]) for p in ps[::-1]], [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE], right=True)   # 1년 → 1주, 가까운 쪽 오른쪽 (P165)
     legend = _legend_chips([("엔비디아 오름", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), ("S&P 500", _GRAY_BAR)])
     card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
     return _card_title("기간별 수익률 (%)", periods_tip(ps)) + card
@@ -2313,8 +2313,8 @@ def card_eps(c):
     if c.get("up30") is not None:
         first += f" 30일 동안 {c['up30']}명이 올리고 {c['down30']}명이 내렸다."
     first += SMALL_NOTE + EPS_NOT_OPINION   # 문장 아래 작은 회색 (P141)
-    groups = [(f'{b["label"]} 전', [b["stock"], b["peers"]]) for b in c["bars"]]   # `7일` → `7일 전` (P64)
-    chart = _chart_card(groups, [_sign_bg, _gray], [_sign_fg, _note_fg], [("엔비디아 올림", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), (_PEER_LBL, _GRAY_BAR)])
+    groups = [(f'{b["label"]} 전', [b["stock"], b["peers"]]) for b in c["bars"][::-1]]   # `7일` → `7일 전` (P64) · 90일 전 → 7일 전, 가까운 쪽 오른쪽 (P165)
+    chart = _chart_card(groups, [_sign_bg, _gray], [_sign_fg, _note_fg], [("엔비디아 올림", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), (_PEER_LBL, _GRAY_BAR)], right=True)
     lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}{EPS_CHART_TITLE}</span>{chart}', "html")]
     if p30 is not None:
         lines.append(("row", "기술주 15개와 차이 (30일)", _pp(c["c30"] - p30, 1), "같은 기간 중앙값과 비교"))
@@ -2363,7 +2363,7 @@ def card_short(c):
         first += f" 기술주 15개는 보통 {c['peers_pct']:.2f}%다."
     lab = lambda d: f"{int(d[5:7])}월 {int(d[8:10])}일" if d else "—"   # noqa: E731
     groups = [(lab(c.get("prior_asof")), [c.get("prior_pct"), c.get("peers_prior_pct")]), (lab(c.get("asof")), [c.get("pct"), c.get("peers_pct")])]
-    chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("엔비디아", _AMBER), (_PEER_LBL, _GRAY_BAR)], fmt=lambda v: f"{v:.2f}")
+    chart = _chart_card(groups, [lambda v: _AMBER, _gray], [_note_fg, _note_fg], [("엔비디아", _AMBER), (_PEER_LBL, _GRAY_BAR)], fmt=lambda v: f"{v:.2f}", right=True)   # 두 날짜 — 최신 오른쪽 (P165)
     lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}공매도 비율, 유통 주식 대비 (%)</span>{chart}', "html"),
              ("row", "공매도 비율", f"{c['pct']:.2f}%", "유통 주식 대비"),
              ("row", "잔고 변화 (한 달)", f"{_sgn(c['chg'])}%", "10% 넘게 늘면 늘어나는 중")]

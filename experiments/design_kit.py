@@ -402,7 +402,7 @@ def legend_top(chart_html, legend_html):
     if m:
         hint, chart_html = m.group(1).replace(f"margin:{LEGEND_TOP}px 0 4px;", "margin:0 0 0 auto;", 1), chart_html[m.end():]   # 위 5px 는 범례 줄이 갖는다 · 오른쪽 끝
         chart_html = chart_html.replace(f'data-shade-up="{SCROLL_SHADE_UP}"', 'data-shade-up="0"', 1).replace(f"padding-top:{SCROLL_SHADE_UP}px;margin-top:-{SCROLL_SHADE_UP}px;", "padding-top:0px;margin-top:-0px;", 1)
-    if 'data-lhint="1"' in hint:   # 최신 오른쪽 그래프 — `‹ 넘겨 보기` 왼쪽 · 범례 오른쪽 (선 그래프와 같게, 2026-10-31)
+    if 'data-lhint="1"' in hint or 'data-lscroll="1"' in (chart_html or ""):   # 최신 오른쪽 그래프(안 넘쳐 안내가 없어도) — `‹ 넘겨 보기` 왼쪽 · 범례 오른쪽 (선 그래프와 같게, 2026-10-31)
         hint = hint.replace("margin:0 0 0 auto;", "margin:0;", 1)
         lm = _LEGEND_RE.match(legend_html or "")
         chips = (lm.group(1) if lm else legend_html or "").replace("margin:0 0 0 12px;", "margin:0;").replace("margin:0 12px 0 0;", "margin:0;")
