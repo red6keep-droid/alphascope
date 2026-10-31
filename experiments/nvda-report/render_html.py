@@ -808,7 +808,7 @@ def dd_block(name, st, bn, bench, span, x, tip, tail):
     # 툴팁은 문장 끝 (P51), 펼침 단추는 가격 범위 아래 오른쪽 끝 · 문장 마지막 줄 높이 (P52)
     head = (f'<span style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:0 12px {_dk.SEP_GAP - _dk.VP - 1}px;line-height:{LH_CARD};">'   # 위는 가격 범위 흰 카드에 붙여 — 위 여백은 price_in 이 (2026-10-27)
             f'<span style="flex:1 1 auto;min-width:0;">'
-            f'<span style="display:block;color:#111;font-size:{_dk.NAME};font-weight:400;word-break:keep-all;">{lead} 회복까지 보통 <span style="white-space:nowrap;">{md:,}거래일({_months(md)})</span> <span style="white-space:nowrap;">걸렸다{_tipx(tip)}</span></span>'
+            f'<span style="display:block;color:#111;font-size:{_dk.NAME};font-weight:400;word-break:keep-all;">{lead} 회복까지 보통 <span style="white-space:nowrap;">{md:,}거래일({_months(md)})</span> <span style="white-space:nowrap;">걸렸다</span></span>'   # 문장 끝 툴팁은 뺐다 — 펼침과 겹침, 뜻(보통 = 절반 값)은 펼친 그래프 제목 툴팁으로 (2026-10-31 사용자 P189)
             f'</span>{ACC_BTN}</span>')
     # 구간별 세로 막대 (2026-10-27 P36, 넘겨 보기) — 이 종목 · 비교 두 막대, 숫자 = 보통 회복 거래일, 지금 구간의 이 종목 막대는 진하게.
     # 비교 쪽은 횟수가 적어(KOSPI 5~10번) 횟수를 그래프 아래 작은 글씨로 (P28)
@@ -821,7 +821,7 @@ def dd_block(name, st, bn, bench, span, x, tip, tail):
     bl = [lv for lv in lvs if (bn.get(lv) or {}).get("n")]
     cnt = dd_table(f"{span} 동안 있었던 횟수", "하락", lvs,
                    [(name, [f"{st[lv]['n']}번" for lv in lvs])] + ([(bench, [f"{(bn.get(lv) or {}).get('n', 0)}번" if lv in bl else "—" for lv in lvs])] if bl else []))
-    chart = (f'<span style="display:block;padding:4px 12px 12px;"><span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}최고가를 되찾기까지 보통 걸리는 일수</span>'
+    chart = (f'<span style="display:block;padding:4px 12px 12px;"><span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}최고가를 되찾기까지 보통 걸리는 일수{_tipx(tip)}</span>'
              f'<span style="display:block;background:#fff;border:1px solid rgb(226,232,240);border-radius:8px;margin:0 {_dk.CHART_CARD_X}px;font-size:{SMALL};line-height:{LH_CARD};">'   # rgb() — 강조 카드 _flatten 이 흰 카드로 보지 않게
              f'<span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart_html, legend)}</span></span></span>')
     return f'<details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{chart}{cnt}{tail}</details>'
