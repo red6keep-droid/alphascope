@@ -196,7 +196,7 @@ def _pair_bars(groups, note=""):
             chart = R.axis_dot(chart, nm, UP if v > 0 else DOWN if v < 0 else "#111")
     title = " → ".join(g for g, _ in groups)
     tail = f'<span style="display:block;margin:6px 0 0;font-size:{TINY};line-height:20px;color:{NOTE};word-break:keep-all;">{_esc(note)}</span>' if note else ""
-    return (f'<span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{R._paren(_esc(title + " (%)"))}</span>'
+    return (f'{_dk.CHART_TITLE_M}{R._paren(_esc(title + " (%)"))}</span>'   # 표준 그래프 제목(행간 24) — 옛 상태 카드 행간 32 를 물려받아 제목 ~ 그래프가 넓었다 (P177)
             f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X - 2}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>{tail}')
 
 
@@ -766,8 +766,8 @@ def sec_momentum(s):
     gauge = R._zone_gauge(x, zone, names, f"{mom:+.1f}%".replace("-", "−"), f"12개월 모멘텀 {mom:+.1f}%, {total}종목 중 {rank}위", last=False)
     gauge = gauge.replace(f"margin:0 {_dk.CHART_CARD_X - 2}px 0px;", f"margin:0 {_dk.CHART_CARD_X}px;", 1)
     col = UP if zone == 2 else DOWN if zone == 0 else "#111"
-    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 {_dk.CHART_TITLE_GAP}px;">'
-            f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{R._paren(_esc("12개월 모멘텀 (최근 1개월 제외)"))}{R._tipx(tip)}</span>'
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 {_dk.CHART_TITLE_GAP}px;line-height:{_dk.LH_CARD};">'
+            f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}12개월 모멘텀 <span style="white-space:nowrap;">{R._paren(_esc("(최근 1개월 제외)"))}{R._tipx(tip)}</span></span>'   # 괄호 · ? 는 함께 줄바꿈 — ? 만 홀로 떨어지지 않게 (P177)
             f'<span style="flex:none;font-weight:700;color:{col};font-size:{_dk.NAME};white-space:nowrap;">{total}종목 중 {rank}위</span></span>')
     out = head + gauge
     med, bench = s.get("mom_peers_median"), s.get("mom_bench")

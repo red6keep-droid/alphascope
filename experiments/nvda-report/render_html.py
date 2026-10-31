@@ -747,7 +747,7 @@ def month_range_in(bb, money, tip, state, color, title="한 달간 변화 범위
     names = [("하락 범위", RANGE_SIDE), (f"한 달 범위 {money(lo)}~{money(hi)}", 100 - 2 * RANGE_SIDE), ("상승 범위", RANGE_SIDE)]
     gauge = _zone_gauge(x, zone, names, money(c), f"오늘 종가 {money(c)}, 한 달 범위 {money(lo)}~{money(hi)}", last=False)
     gauge = gauge.replace(f"margin:0 {_dk.CHART_CARD_X - 2}px 0px;", f"margin:0 {_dk.CHART_CARD_X}px;", 1)   # 상태 카드 안(14) → 가격 펼침(12) 폭 = 1년 범위 카드와 같게
-    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:{top}px 0 8px;">'
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:{top}px 0 {_dk.CHART_TITLE_GAP}px;line-height:{LH_CARD};">'   # 8 → 6 · 행간 24 고정 (P177)
             f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{_paren(_esc(title))}{_tipx(tip)}</span>'
             f'<span style="flex:none;font-weight:700;color:{color};font-size:{_dk.NAME};white-space:nowrap;">{_esc(state)}</span></span>')
     return head + gauge
