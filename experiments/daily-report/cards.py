@@ -97,7 +97,7 @@ def legend_chips(items, keep=False):
     return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{dk.MICRO};line-height:{dk.LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
 
 
-def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, right=False):
+def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, right=True):   # 기본 = 오른쪽 모양 (P166)
     """세로 막대 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수.
     숫자는 자기 막대 폭 안에만, 화면이 모자라면 가로 스크롤 (2026-10-26 사용자, 가이드라인 8절 — 엔비디아 _col_chart 와 같은 규칙)."""
     vals = [v for _, vs in groups for v in vs if v is not None]
@@ -125,7 +125,7 @@ def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, right=Fals
     return dk.col_frame("".join(parts), [g for g, _ in groups], height, top, scale, ticks, min_w, right=right)
 
 
-def chart_card(title, groups, colors, label_colors, legend, fmt=None, keep_legend=False, right=False):
+def chart_card(title, groups, colors, label_colors, legend, fmt=None, keep_legend=False, right=True):
     pad = dk.SEP_GAP - dk.VP - 1
     chart = col_chart(groups, colors, label_colors, fmt=fmt, right=right)
     if not chart:

@@ -500,7 +500,7 @@ def _chart_label_px(bars):
     return _dk.BAR_NUM_PX   # 2026-10-27 사용자: 모든 그래프 13px 하나로 — 숫자는 자기 칸 · 모자라면 가로 스크롤(10-26)이라 막대 수로 줄일 까닭이 없어졌다
 
 
-def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, color_at=None, right=False):
+def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, color_at=None, right=True):   # 기본 = 오른쪽 모양 (P166)
     """세로 막대 그래프 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수. 값은 막대 끝에 숫자 (2026-10-17 사용자: 그래프화).
     숫자 글자는 막대 수에 따라 11~17px (_chart_label_px). 글자 자리(위아래 여백)도 그만큼 넓힌다.
     숫자는 자기 막대 폭 안에만 — 막대 · 다른 숫자와 절대 겹치지 않게 막대 폭을 숫자 폭 이상으로 잡고, 화면이 모자라면 가로 스크롤 (2026-10-26 사용자, 가이드라인 8절).
@@ -2256,7 +2256,7 @@ def _status_group(a, group):
     return _sub_label(rr.GROUP_KO[group]) + _ccard(rows) + (_guide(*GROUP_NOTE[group]) if GROUP_NOTE.get(group) else "")
 
 
-def _chart_card(groups, colors, label_colors, legend, fmt=None, right=False):
+def _chart_card(groups, colors, label_colors, legend, fmt=None, right=True):
     pad = _dk.SEP_GAP - _dk.VP - 1
     chart = _col_chart(groups, colors, label_colors, fmt=fmt, right=right)
     return f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, _legend_chips(legend))}</span></span>'

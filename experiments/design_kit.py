@@ -290,7 +290,7 @@ def col_axis(vals, height, lbl):
     return ticks, lbl + hi * scale, scale
 
 
-def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w, right=False):
+def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w, right=True):   # 모든 세로 막대 = 축 오른쪽 · 넘겨 보기 왼쪽 (2026-10-31 사용자 P166: 통일)
     """세로 막대 그래프 틀 — 왼쪽 세로축 숫자 + 연한 가로 눈금선 + 0 기준선, 막대 · 가로축 이름은 그 오른쪽 (2026-10-26 사용자: "막대 그래프에 가로 눈금선, 좌측에 눈금 기준").
     bars_html 은 막대 칸(0~100%) 기준으로 놓인 막대 · 숫자. 눈금 · top · scale 은 col_axis 가 정한다."""
     step = (ticks[1] - ticks[0]) if len(ticks) > 1 else 1
