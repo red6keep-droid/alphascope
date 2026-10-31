@@ -325,11 +325,13 @@ def _person(n):
 
 
 def sec_company(s):
-    """`기업` 탭 (2026-10-31 사용자: 한국처럼 미국에도) — 기본 정보(야후 회사 개요). 평가 · 전망 · 추천 없음. 칸이 없으면 그 줄만 뺀다.
-    한 줄 소개는 아직 없다(한국은 사업보고서로 직접 쓴 문구, universe_kr.ABOUT — 미국 64종목 소개는 따로 쓴다)."""
+    """`기업` 탭 (2026-10-31 사용자: 한국처럼 미국에도) — 소개(연차보고서로 직접 쓴 고정 문구, universe.ABOUT — 한국 universe_kr.ABOUT 와 같은 틀, 2026-11-01)
+    + 기본 정보(야후 회사 개요). 평가 · 전망 · 추천 없음. 칸이 없으면 그 줄만 뺀다."""
     c = s.get("company") or {}
+    about = U.ABOUT.get(s["sym"], "")
+    intro = f'<p style="margin:0 0 12px;padding:0 {_dk.ALIGN_PX}px;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{_esc(about)}</p>' if about else ""   # 한국 sec_company 와 같은 모양
     if not c.get("name"):
-        return _dk.muted("기업 정보를 아직 받지 못했습니다.")
+        return intro or _dk.muted("기업 정보를 아직 받지 못했습니다.")
     url = c.get("website") or ""
     place = " · ".join(x for x in (c.get("city"), STATE_KO.get(c.get("state"), c.get("state")) if c.get("country") == "United States" else c.get("country")) if x)
     rows = [("정식 이름", _esc(c["name"])), ("대표", _esc(_person(c.get("ceo")))), ("본사", _esc(place)),
@@ -342,7 +344,7 @@ def sec_company(s):
     out = "".join(f'<span style="display:flex;gap:12px;padding:3px 12px;font-size:{_dk.TINY};line-height:22px;">'
                   f'<span style="flex:0 0 68px;color:{R.NOTE};white-space:nowrap;">{_esc(k)}</span>'
                   f'<span style="flex:1 1 auto;min-width:0;color:#111;word-break:keep-all;overflow-wrap:anywhere;">{v}</span></span>' for k, v in rows if v)   # 한국 _info_rows 와 같은 모양
-    return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}padding:{PAD - 3}px 0;display:block;">{out}</span></div>'
+    return intro + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}padding:{PAD - 3}px 0;display:block;">{out}</span></div>'
 
 
 def sec_chart_indicators(s):
