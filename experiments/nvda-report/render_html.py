@@ -537,11 +537,11 @@ _sign_fg = lambda v: UP if v > 0 else DOWN   # noqa: E731
 
 
 def axis_dot(chart, label, color):
-    """막대 그래프에서 하나를 강조 — 막대 색은 그대로 두고 그 가로축 이름 위에 3px 점 (2026-10-31 사용자 P175 · P176: 모든 그래프 규칙,
+    """막대 그래프에서 하나를 강조 — 막대 색은 그대로 두고 그 가로축 이름 위에 3px 점 + 이름 글자도 같은 색 (2026-10-31 사용자 P175 · P176 · P180: 모든 그래프 규칙,
     선 그래프 최신 축 이름 강조점과 같은 모양). 이름 줄 높이는 다른 축 이름과 같게(위 −5). 이름이 없으면 그대로."""
     inner = "<br>".join(_dk.esc(x) for x in label.split("\n"))
     dot = f'<span aria-hidden="true" style="display:block;width:3px;height:3px;margin:0 auto 2px;border-radius:50%;background:{color};"></span>'
-    return chart.replace(f'overflow-wrap:anywhere;">{inner}</span>', f'overflow-wrap:anywhere;margin-top:-5px;">{dot}{inner}</span>', 1)
+    return chart.replace(f'overflow-wrap:anywhere;">{inner}</span>', f'overflow-wrap:anywhere;margin-top:-5px;color:{color};">{dot}{inner}</span>', 1)   # 이름 글자도 점과 같은 색 (2026-10-31 사용자 P180)
 
 
 def ma_chart(mr, bmr, name, bench, last=False):
