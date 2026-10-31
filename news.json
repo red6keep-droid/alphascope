@@ -1,6 +1,90 @@
 {
-  "updated_at": "2026-10-30 21:48:12 UTC",
+  "updated_at": "2026-10-31 01:02:41 UTC",
   "items": [
+    {
+      "title": "Alaska Senate election: DOJ wants to 'segregate' all ballots for 2nd Sullivan candidate",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/alaska-senate-election-doj-lawsuit-sullivan-peltola.html",
+      "published": "2026-10-30 22:57:55",
+      "title_ko": "알래스카 상원: 법원이 DOJ 소송 2차 설리번 후보 기각 신규 입찰 신속 진행",
+      "summary_ko": ""
+    },
+    {
+      "title": "Jim Cramer says it's time to look beyond tech. Here are 4 consumer stocks he likes",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/jim-cramer-consumer-staples-stocks.html",
+      "published": "2026-10-30 22:52:04",
+      "title_ko": "짐 크레이머, 기술주 넘어 소비재 주식 4종목 추천",
+      "summary_ko": "AI 트레이드 다각화 목적"
+    },
+    {
+      "title": "Meta outlook revised downward by S&P on cash flow and capex concerns",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/meta-outlook-to-revised-to-negative-by-sp-after-cash-flow-negative.html",
+      "published": "2026-10-30 22:42:26",
+      "title_ko": "S&P, 메타 전망 하향 조정…현금흐름·자본지출 우려",
+      "summary_ko": "대규모 자본지출 및 자유현금흐름 우려 반영"
+    },
+    {
+      "title": "바이낸스 63억 달러 해킹 사태",
+      "title_ko": "바이낸스 63억 달러 해킹 사태",
+      "summary_ko": "바이낸스의 손실 보전 능력과 산업의 성숙도로 인해 이번 해킹이 비트코인의 장기적 방향성에 악영향을 주지 않을 것",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=QykWuUwcKpo",
+      "published": "2026-10-30 22:30:25",
+      "kind": "media",
+      "tag": "기타",
+      "direction": "negative",
+      "n_channels": 3
+    },
+    {
+      "title": "AI 인프라 투자와 수익성 우려",
+      "title_ko": "AI 인프라 투자와 수익성 우려",
+      "summary_ko": "AI 인프라 투자의 과잉 레버리지와 수익 배분에 대해 시장이 계속 씨름할 것이라고 보았",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=9hltUhE6XMs",
+      "published": "2026-10-30 22:25:13",
+      "kind": "media",
+      "tag": "AI/반도체",
+      "direction": "negative",
+      "n_channels": 4
+    },
+    {
+      "title": "Cramer’s week ahead: Expect more volatility as tech earnings, midterms loom",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/jim-cramer-week-ahead-apple-amd-jobs-report.html",
+      "published": "2026-10-30 22:17:13",
+      "title_ko": "크레이머, 기술주 실적과 중간선거 앞두고 변동성 확대 전망",
+      "summary_ko": "투자자, AI 트레이드 다각화 위해 소비재 주식 관심"
+    },
+    {
+      "title": "Gamble on democracy: Inside suspicious election-contracts trading on prediction markets",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/gamble-on-democracy-inside-suspicious-election-contracts-trading-on-prediction-markets-.html",
+      "published": "2026-10-30 22:00:53",
+      "title_ko": "민주주의에 대한 도박: 예측 시장에서 의심스러운 선거 계약 거래 내부 살펴보기",
+      "summary_ko": "LA 프라이머리 결과 오판"
+    },
+    {
+      "title": "Fed officials are already saying they’ll need to get back to hiking rates",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/30/musalem-fed-monetary-policy-tightening.html",
+      "published": "2026-10-30 21:53:10",
+      "title_ko": "연준 관계자, 금리 인상 필요성 언급",
+      "summary_ko": "알베르토 무살렘·로리 로건 발언"
+    },
+    {
+      "title": "빅테크 AI 자본 지출과 현금 흐름 우려",
+      "title_ko": "빅테크 AI 자본 지출과 현금 흐름 우려",
+      "summary_ko": "아마존 등 빅테크 기업들의 막대한 AI 인프라 투자와 마이너스  vrije 현금 흐름에 대한 우려가 기술주 전반의 조정을 불러일으켰",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=rajmYyeyYrM",
+      "published": "2026-10-30 21:48:58",
+      "kind": "media",
+      "tag": "AI/반도체",
+      "direction": "negative",
+      "n_channels": 3
+    },
     {
       "title": "Binance loses $6.3 billion in crypto heist—what happens to your money when an exchange gets hacked",
       "source": "CNBC",
@@ -18,96 +102,12 @@
       "summary_ko": "세계 최대 암호화폐 거래소 바이낸스, 자금 완전 안전 주장하며 조사 진행"
     },
     {
-      "title": "Criminal investigation of Alaska Senate race is 'ongoing,' U.S. Attorney says",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/alaska-senate-election-doj-lawsuit-sullivan-peltola.html",
-      "published": "2026-10-30 20:46:04",
-      "title_ko": "알래스카 상원: 법원이 DOJ 소송 2차 설리번 후보 기각 신규 입찰 신속 진행",
-      "summary_ko": ""
-    },
-    {
       "title": "Intel stock has worst day since 1970s, wiping about $12 billion off government's stake",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/30/amazon-intel-earnings-big-tech-ai-spending-concerns.html",
       "published": "2026-10-30 20:30:57",
       "title_ko": "인텔 주식, 1970년대 이후 최악의 하루 기록, 정부 보유주식 120억 달러 감소",
       "summary_ko": "AI 지출 확대에 투자자 우려"
-    },
-    {
-      "title": "'Bad time to troll': Binance co-founder Zhao asks Musk for support after hack",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/binance-hack-elon-musk-tesla-spacex.html",
-      "published": "2026-10-30 20:02:45",
-      "title_ko": "바이낸스 공동창업자, 비트코인 해킹 관련 게시글에 머스크에 '존중' 요구",
-      "summary_ko": "바이낸스, 스페이스X 지분 10억 달러 이상 보유"
-    },
-    {
-      "title": "Binance hack: Investigators in a 'cat and mouse game' to recover $6.3 billion in stolen funds",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/binance-hack-stolen-crypto-recovery.html",
-      "published": "2026-10-30 19:27:03",
-      "title_ko": "바이낸스 해킹: 수사팀, 탈취된 63억 달러 회수 위해 '쥐와 고양이 게임'",
-      "summary_ko": "북한 연계 해커 자금 세탁 전 회수 경쟁"
-    },
-    {
-      "title": "Wall Street braces for Democratic gains as 2026 midterm election nears",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/2026-midterm-election-wall-street-prepares-for-democratic-gains.html",
-      "published": "2026-10-30 19:11:32",
-      "title_ko": "2026년 중간선거 앞두고 월가, 민주당 약진 대비",
-      "summary_ko": "화요일 중간선거에서 의회 통제권 결정"
-    },
-    {
-      "title": "Tech gets crushed, defensive stocks shine. How we're making sense of it all",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/30/tech-gets-crushed-defensive-stocks-shine-how-were-making-sense-of-it-all.html",
-      "published": "2026-10-30 18:55:44",
-      "title_ko": "기술주 급락, 방어주 강세. 이 상황을 어떻게 해석할까",
-      "summary_ko": "투자 클럽, 매일 장 마감 전 오후 업데이트 공개"
-    },
-    {
-      "title": "Cheaper cars are selling considerably faster than at the beginning of the year",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/30/cheap-cars-selling-fast.html",
-      "published": "2026-10-30 18:45:35",
-      "title_ko": "저렴한 차량, 연초보다 훨씬 빠르게 판매되고 있어",
-      "summary_ko": "3분기 일부 저가 차량 세그먼트는 판매 감소 기록"
-    },
-    {
-      "title": "AI 에이전트 인프라 수요 증가",
-      "title_ko": "AI 에이전트 인프라 수요 증가",
-      "summary_ko": "음성 AI 및 소비자 AI 에이전트의 확산이 인프라 제공업체인 트윌리오에 장기적인 성장 동력이 될 것",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=V7-IBadT2R8",
-      "published": "2026-10-30 17:58:45",
-      "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "neutral",
-      "n_channels": 3
-    },
-    {
-      "title": "바이낸스 사상 최대 암호화폐 해킹",
-      "title_ko": "바이낸스 사상 최대 암호화폐 해킹",
-      "summary_ko": "바이낸스에서 60억 달러 규모의 역대 최대 암호화폐 해킹이 발생하여 비트코인 등 가상자산 가격에 하락 압력을 가",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=VrDLlh-R6dc",
-      "published": "2026-10-30 17:25:37",
-      "kind": "media",
-      "tag": "기타",
-      "direction": "negative",
-      "n_channels": 3
-    },
-    {
-      "title": "빅테크 실적 부진과 AI 투자 우려",
-      "title_ko": "빅테크 실적 부진과 AI 투자 우려",
-      "summary_ko": "아마존과 인텔 등 빅테크 기업의 실적 실망과 AI 투자 대비 수익 창출 우려로 기술주 중심의 하락세가 나타났",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=n1wpqN-8a_k",
-      "published": "2026-10-30 10:37:51",
-      "kind": "media",
-      "tag": "실적",
-      "direction": "negative",
-      "n_channels": 4
     }
   ]
 }
