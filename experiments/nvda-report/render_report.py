@@ -119,7 +119,7 @@ def section_headline(a):
     return line + note + "\n"
 
 
-SOURCE_KO = {"edgar": "EDGAR", "yfinance": "yfinance", "finra": "FINRA", "calendar": "캘린더", "nvidianews": "NVIDIA 뉴스룸", "nvidiablog": "NVIDIA 블로그",
+SOURCE_KO = {"edgar": "EDGAR", "yfinance": "yfinance", "finra": "FINRA", "calendar": "일정", "nvidianews": "NVIDIA 뉴스룸", "nvidiablog": "NVIDIA 블로그",
              "cnbc": "CNBC", "federalregister": "연방관보", "courtlistener": "CourtListener", "rss": "RSS"}
 DOC_KINDS = ("news", "newsroom", "blog", "fedreg", "court")
 

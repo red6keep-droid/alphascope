@@ -33,7 +33,7 @@ def _media_rows():
     global _rows_cache
     if _rows_cache is None:
         now = datetime.datetime.now(datetime.timezone.utc)
-        _rows_cache = media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=3))   # 48시간이 edition 사흘에 걸친다
+        _rows_cache = media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=8))   # 목록 48시간 + 한국장 방향 막대 `최근 7일` (P143) — edition 여드레
     return _rows_cache
 
 

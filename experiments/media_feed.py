@@ -451,6 +451,15 @@ def market_top(iss, n):
     return out[:n]
 
 
+def direction_counts(iss):
+    """뉴스 방향 막대 재료 {positive · negative · uncertain · neutral: 건수} — 방송 이슈 한 줄 = 1건, 긍정 · 부정이 섞인 `엇갈림` 은 불확실로 (P143)."""
+    out = {}
+    for r in iss:
+        d = "uncertain" if r.get("split") else r.get("direction") if r.get("direction") in ("positive", "negative") else "neutral"
+        out[d] = out.get(d, 0) + 1
+    return out
+
+
 def event(r):
     """종목 페이지 · 엔비디아 리포트 뉴스 목록 한 줄 (nvda-report judge._ev 모양). 헤드라인 = 방송 주제, 요약 줄 = 방송 주장(note), 매체 자리 = 채널, 라벨 = 영역 · 방향 · 방송.
     has_fact=False · media=True — 중요 이슈(사실 문장) · AI 서술 입력에는 넣지 않는다 (의견이 섞여 있다)."""

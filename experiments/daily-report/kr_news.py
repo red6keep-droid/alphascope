@@ -36,7 +36,7 @@ def _kst_hm(iso):
 
 def rows_now():
     now = datetime.datetime.now(datetime.timezone.utc)
-    return media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=3))   # 48시간이 edition 사흘에 걸친다
+    return media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=8))   # 목록 48시간 + 방향 막대 `최근 7일` (P143) — edition 여드레
 
 
 def section(rows, hours=HOURS, pick=None, shown=SHOWN):
@@ -53,6 +53,9 @@ def section(rows, hours=HOURS, pick=None, shown=SHOWN):
         meta = [_kst_hm(r["published_at"]), r["channel"], f"방송 {r['n_channels']}곳" if r["n_channels"] > 1 else ""]
         items.append(dk.news_item(html_mod.escape(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"'))
     lst = dk.item_rules(items[:shown] if shown else items, sub=True, indent=dk.ALIGN_PX)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    within = lambda h: (pick or media_feed.korea)(media_feed.issues(rows, (now - datetime.timedelta(hours=h)).strftime("%Y-%m-%dT%H:%M")), None)   # noqa: E731
+    lst = dk.direction_bars(media_feed.direction_counts(within(24)), media_feed.direction_counts(within(24 * 7))) + lst   # 엔비디아처럼 오늘 · 최근 7일 방향 막대 (2026-10-31 사용자 P143)
     if shown and len(items) > shown:   # 앞 shown 건만 펼쳐 두고 나머지는 접기 (한국 증시 리포트 2026-10-26 사용자: "너무 길다")
         lst += dk.fold(f"방송 {len(items) - shown}건 더 보기", dk.item_rules(items[shown:], sub=True, indent=dk.ALIGN_PX))
     body = dk.keep_tone(dk.section(TITLE, lst, tab=TAB)) if items else ""   # 방송 소식 = 헤드라인체 그대로

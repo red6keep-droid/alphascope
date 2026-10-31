@@ -2614,7 +2614,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         /* ================================================= 일정 배너 (2026-10-28 사용자)
            stocks.json · kr.json 의 events 를 합쳐 오늘(KST) 이후 가까운 6개(2026-10-29 사용자: 3개 → 6개) — 같은 날은 각 파일 순서(큰 시총 먼저)대로 미국 · 한국을 번갈아.
            4초마다 다음 장, 마우스를 올리거나 초점이 있으면 멈춘다. 점을 누르면 그 장으로. 누르면 그 종목 페이지 캘린더 탭(#tab-캘린더) */
-        var EVENT_COUNT = 6, EVENT_MS = 4000, CAL_TAB = '캘린더';
+        var EVENT_COUNT = 6, EVENT_MS = 4000, CAL_TAB = '일정';   /* 캘린더 → 일정 (2026-10-31 P145) */
         var EVENT_BGS = ['#111827', '#1E3A8A', '#4C1D95', '#065F46', '#155E75', '#312E81'];   /* 장마다 바탕색 — 남색 · 파랑 · 보라 · 초록 · 청록 · 남보라 */
         var eventFeeds = { us: [], kr: [] };
         var ebIndex = 0, ebTimer = null;
@@ -4285,7 +4285,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           /* 옛 엔비디아 글 (data-tab 이전) */
           var legacy = [
             { name: '오늘',     match: ['중요 이슈', '목표가', '기술', '뉴스', '오늘 한 줄', '오늘 바뀐 것', '오늘의 해석'] },
-            { name: '캘린더',   match: ['캘린더', '예정', '진행 중 사안'] },
+            { name: '일정',     match: ['캘린더', '일정', '예정', '진행 중 사안'] },   /* 탭 이름 캘린더 → 일정 (2026-10-31 사용자 P145) */
             { name: '기술지표', match: ['기술지표', '상태판'] },
             { name: '재무',     match: ['재무', '보유 논리 점검표'] }
           ];
@@ -4326,9 +4326,24 @@ body.no-dashboard .main-content { padding-top: 32px; }
         }
         var hm = /^#tab-(\d)$/.exec(location.hash || ''), hn = /^#tab-(.+)$/.exec(location.hash || ''), byName = -1;
         /* #tab-캘린더 처럼 탭 이름으로도 연다 — 홈 일정 배너 → 종목 페이지 캘린더 탭 (2026-10-28 사용자). 탭 순서가 종목마다 달라 번호 대신 이름 */
-        if (!hm && hn) { try { var want = decodeURIComponent(hn[1]); panels.forEach(function (x, j) { if (byName < 0 && x.b.textContent === want) byName = j; }); } catch (e) {} }
+        if (!hm && hn) { try { var want = decodeURIComponent(hn[1]); var alias = { '일정': '캘린더', '캘린더': '일정' }[want];   /* 탭 이름을 바꾼 뒤에도 옛 글 · 옛 링크가 열리게 (P145) */
+          panels.forEach(function (x, j) { if (byName < 0 && x.b.textContent === want) byName = j; });
+          if (byName < 0 && alias) panels.forEach(function (x, j) { if (byName < 0 && x.b.textContent === alias) byName = j; }); } catch (e) {} }
         select(hm ? Math.min(parseInt(hm[1], 10), panels.length - 1) : byName >= 0 ? byName : 0, true);
         if (byName >= 0) { var toBar = function () { window.scrollTo(0, Math.max(0, bar.getBoundingClientRect().top + window.pageYOffset - 70)); }; setTimeout(toBar, 0); window.addEventListener('load', toBar); }   /* 이름으로 열면 탭 줄까지 내려 준다 (위 그래프가 늦게 그려져도 load 때 한 번 더) — 고정 헤더 높이만큼 위 여유 */
+        /* 같은 글 안 다른 카드로 — `Alpha Scope 데이터로 함께 보기` 줄 (2026-10-31 P142): data-goto-tab 탭을 열고, 제목이 data-goto-card 로 시작하는 카드를 펼쳐 그 자리로 */
+        function goTo(t) {
+          var name = t.getAttribute('data-goto-tab'), card = t.getAttribute('data-goto-card'), idx = -1, hit = null;
+          panels.forEach(function (x, j) { if (idx < 0 && x.b.textContent === name) idx = j; });
+          if (idx < 0) return;
+          select(idx);
+          [].slice.call(panels[idx].p.querySelectorAll('summary')).some(function (sm) { if (sm.textContent.trim().indexOf(card) === 0) { hit = sm; return true; } return false; });
+          if (!hit) { window.scrollTo(0, Math.max(0, bar.getBoundingClientRect().top + window.pageYOffset - 70)); return; }
+          if (hit.parentNode.tagName === 'DETAILS') hit.parentNode.open = true;
+          window.scrollTo(0, Math.max(0, hit.getBoundingClientRect().top + window.pageYOffset - 80));
+        }
+        root.addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('[data-goto-tab]'); if (t) { e.preventDefault(); goTo(t); } });
+        root.addEventListener('keydown', function (e) { var t = (e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('[data-goto-tab]'); if (t) { e.preventDefault(); goTo(t); } });
         /* 서브탭 — 패널 안 소제목(data-sub)이 셋 이상일 때. 알약과 겹치는 소제목은 숨긴다 */
         panels.forEach(function (st) {
           var subs = [], cur = null;
