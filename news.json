@@ -1,6 +1,50 @@
 {
-  "updated_at": "2026-10-31 17:23:43 UTC",
+  "updated_at": "2026-10-31 21:46:22 UTC",
   "items": [
+    {
+      "title": "Trump defamation suit against Murdoch, WSJ over Epstein letter dismissed with prejudice",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/trump-murdoch-wsj-epstein-defamation-lawsuit-dismissed.html",
+      "published": "2026-10-31 21:05:53",
+      "title_ko": "트럼프, 머독·WSJ 에피스타인 서한 관련 명예훼손 소송 기각",
+      "summary_ko": "트럼프, 항소 계획 발표"
+    },
+    {
+      "title": "SpaceX loses bid to toss NAACP lawsuit over Memphis data center air pollution",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/xai-naacp-clean-air-act-lawsuit-dismissal.html",
+      "published": "2026-10-31 20:12:37",
+      "title_ko": "스페이스X, 멤피스 데이터센터 대기오염 관련 NAACP 소송 기각 요청 패소",
+      "summary_ko": "사우스아번 데이터센터 및 발전소, 지역사회 반발 지속"
+    },
+    {
+      "title": "OpenAI pares fundraising goal, now seeking up to $20 billion in latest round",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/openai-fundraising-20-billion-valuation.html",
+      "published": "2026-10-31 19:56:23",
+      "title_ko": "오픈AI, 자금 조달 목표 축소…최신 라운드에서 최대 200억 달러 유치 추진",
+      "summary_ko": "자금 조달 라운드 진행 중이며 미확정 상태"
+    },
+    {
+      "title": "Binance says 90% of $6.3 billion hack losses are now covered, plans to resume withdrawals Sunday",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/binance-hack-asset-coverage-withdrawals.html",
+      "published": "2026-10-31 19:16:25",
+      "title_ko": "바이낸스, 63억 달러 해킹 손실 90% 복구·출금 재개 계획",
+      "summary_ko": "출금 재개, 일요일 예정"
+    },
+    {
+      "title": "바이낸스 사상 최대 암호화폐 해킹",
+      "title_ko": "바이낸스 사상 최대 암호화폐 해킹",
+      "summary_ko": "바이낸스 해킹 사건으로 비트코인 가격이 5% 하락하고 암호화폐 보안 우려가 커졌",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=F9_gU2w5t-U",
+      "published": "2026-10-31 18:00:15",
+      "kind": "media",
+      "tag": "기타",
+      "direction": "negative",
+      "n_channels": 3
+    },
     {
       "title": "Binance, crypto and hacks: What to know about keeping coin safe as cyber criminals advance",
       "source": "CNBC",
@@ -10,24 +54,16 @@
       "summary_ko": ""
     },
     {
-      "title": "바이낸스 대규모 암호화폐 해킹 사건",
-      "title_ko": "바이낸스 대규모 암호화폐 해킹 사건",
-      "summary_ko": "바이낸스에서 역사상 최대 규모인 63억 달러 상당의 암호화폐 해킹 사건이 발생해 북한 해커 소행 여부가 조사 중이며 업계 신뢰에 타격을 주고 있음",
+      "title": "미국 중간선거 임박과 의회 통제권",
+      "title_ko": "미국 중간선거 임박과 의회 통제권",
+      "summary_ko": "미국 중간선거를 사흘 앞두고 상하원 통제권을 쟁탈하기 위한 마지막 유세와 사전 투표 열기가 최고조에 달 중",
       "source": "블룸버그",
       "link": "https://www.youtube.com/watch?v=tRcFJBbWoxI",
       "published": "2026-10-31 16:11:21",
       "kind": "media",
-      "tag": "기타",
-      "direction": "negative",
+      "tag": "정책/규제",
+      "direction": "neutral",
       "n_channels": 2
-    },
-    {
-      "title": "Binance says 90% of $6.3 billion hack losses are now covered, plans to resume withdrawals Sunday",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/binance-hack-asset-coverage-withdrawals.html",
-      "published": "2026-10-31 16:06:44",
-      "title_ko": "바이낸스, 63억 달러 해킹 손실 90% 복구·출금 재개 계획",
-      "summary_ko": "출금 재개, 일요일 예정"
     },
     {
       "title": "Stocks started the week with promise but ended in despair. Our take on the big reversal",
@@ -35,6 +71,26 @@
       "link": "https://www.cnbc.com/investingclub/2026/10/31/stocks-started-the-week-with-promise-but-ended-in-despair.html",
       "published": "2026-10-31 15:37:11",
       "title_ko": "주식, 주 초 기대감 있었지만 주말엔 실망 마감",
+      "summary_ko": ""
+    },
+    {
+      "title": "이스라엘-미국의 대(對)이란 군사 행동 가능성",
+      "title_ko": "이스라엘-미국의 대(對)이란 군사 행동 가능성",
+      "summary_ko": "네타냐후 총리와 트럼프 대통령 간의 관계를 바탕으로 이란과의 군사적 충돌 가능성이 제기",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=DiGeEGD7Xr0",
+      "published": "2026-10-31 15:00:40",
+      "kind": "media",
+      "tag": "지정학",
+      "direction": "neutral",
+      "n_channels": 2
+    },
+    {
+      "title": "Qatari mediators held talks in Tehran aimed at restarting direct U.S.-Iran negotiations, source says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/qatar-iran-us-talks-mediation.html",
+      "published": "2026-10-31 13:47:03",
+      "title_ko": "카타르 중재자, 테헤란서 미-이란 직접 협상 재개 논의",
       "summary_ko": ""
     },
     {
@@ -52,62 +108,6 @@
       "published": "2026-10-31 13:07:01",
       "title_ko": "위얼, 기업 청산 조언 제공을 위한 법률 리크루터 조언",
       "summary_ko": ""
-    },
-    {
-      "title": "35-year-old took on $20K in debt to launch a business from her dining room—now it brings in 8 figures a year",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/10/31/set-active-lindsey-carter-entrepreneurship.html",
-      "published": "2026-10-31 13:05:01",
-      "title_ko": "35세 여성이 2만 달러 부채로 식당에서 사업 시작…연 매출 8자리 달성",
-      "summary_ko": "설립자 린지 카터, 2만 달러 부채로 시작"
-    },
-    {
-      "title": "Crypto industry pours more than $200 million into 2026 midterms to pressure Congress on favorable rules",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/crypto-industry-spends-more-than-200-million-to-sway-the-midterms.html",
-      "published": "2026-10-31 13:04:29",
-      "title_ko": "암호화폐 산업, 2026년 중간선거에 2억 달러 이상 투입해 의회에 규제 우호적 입법 압박",
-      "summary_ko": "2024년 혼합된 성공 기록"
-    },
-    {
-      "title": "How to start an art collection on any budget",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/how-to-invest-in-art-collecting.html",
-      "published": "2026-10-31 12:58:43",
-      "title_ko": "예산에 구애받지 않는 예술 컬렉션 시작 방법",
-      "summary_ko": ""
-    },
-    {
-      "title": "Trump promised to slash energy costs  — but gasoline, diesel and jet fuel all soared instead",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/trump-gas-diesel-price-midterm-election.html",
-      "published": "2026-10-31 12:49:58",
-      "title_ko": "트럼프, 에너지 비용 삭감 약속…하지만 휘발유·디젤·제트연료는 오히려 급등",
-      "summary_ko": "인플레이션에 분노한 유권자에게 가격 삭감 약속"
-    },
-    {
-      "title": "중간선거와 경제 정책 변화 전망",
-      "title_ko": "중간선거와 경제 정책 변화 전망",
-      "summary_ko": "중간선거 결과에 따라 민주당이 의회를 장악할 경우 트럼프 행정부의 관세 및 전쟁 정책에 제동을 걸 가능성이 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=8xaPW8lQUaw",
-      "published": "2026-10-31 11:55:50",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "neutral",
-      "n_channels": 2
-    },
-    {
-      "title": "AI 투자 수익성 우려와 빅테크 실적",
-      "title_ko": "AI 투자 수익성 우려와 빅테크 실적",
-      "summary_ko": "AI에 대한 막대한 투자에도 불구하고 전통적인 핵심 사업의 성장 둔화로 인해 투자자들의 신뢰가 흔들리고 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=r2GrYx31AnU",
-      "published": "2026-10-31 11:42:50",
-      "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "negative",
-      "n_channels": 2
     }
   ]
 }
