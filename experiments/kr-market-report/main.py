@@ -21,6 +21,7 @@ sys.path.insert(0, _KR)
 import analyze_kr  # noqa: E402
 import collect_kr  # noqa: E402
 import collect_kr_extra  # noqa: E402
+import collect_kr_earn_dart as ED  # noqa: E402 — 실적 발표일 = DART 잠정실적 (2026-10-31)
 import render_kr as RK  # noqa: E402 — sys.path 에 nvda-report · stock-radar 를 더한다
 import universe_kr as U  # noqa: E402
 
@@ -121,14 +122,15 @@ def earnings(day, top, snap, extra):
     out = []
     for s in top:
         ev = (extra.get("earnings") or {}).get(s["sym"]) or []
-        nxt = next((e for e in ev if day < e["day"] <= end), None)
-        if not nxt:
+        nd, _ = ED.next_date(s["code"], next((e["day"] for e in ev if e["day"] > day), None), day)   # 잠정실적 기준 (종목 페이지와 같은 날, 2026-10-31)
+        if not nd or nd > end:
             continue
         bars = snap["bars"][s["sym"]]
         days = [b["day"] for b in bars]
         rets = RK._abs_rets(bars)
-        past = [rets[k] for k in (_next_kr_day(days, e["day"], same_day=e.get("when") != "amc") for e in ev if e["day"] < day) if k in rets]
-        out.append({"s": s, "day": nxt["day"], "median": statistics.median(past) if len(past) >= 3 else None, "n": len(past),
+        two_y = (datetime.date.fromisoformat(day) - datetime.timedelta(days=730)).isoformat()
+        past = [rets[k] for k in (ED.reaction_day(s["code"], days, d) for d in ED.past(s["code"]) if two_y <= d < day) if k in rets]
+        out.append({"s": s, "day": nd, "median": statistics.median(past) if len(past) >= 3 else None, "n": len(past),
                     "normal": statistics.median(list(rets.values())[-252:])})
     return sorted(out, key=lambda x: x["day"])
 

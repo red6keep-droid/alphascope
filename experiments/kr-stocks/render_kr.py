@@ -18,6 +18,7 @@ sys.path.insert(0, os.path.join(_HERE, "..", "stock-radar"))
 import universe as USU  # noqa: E402 — 미국 종목 주소(함께 보는 페이지의 연결 짝 링크)
 import media_feed  # noqa: E402 — 방송 뉴스 (`오늘` 탭)
 import signal_groups as SG  # noqa: E402 — 판정 묶음 분류표 (함께 보기 · 기록, A5)
+import collect_kr_earn_dart  # noqa: E402 — 실적 발표일(DART 잠정실적, 2026-10-31)
 import re  # noqa: E402
 from collections import Counter  # noqa: E402
 from html import unescape as html_unescape  # noqa: E402
@@ -1047,13 +1048,15 @@ def build_calendar(s, snap, extra, macro_rows):
     end_all = (datetime.date.fromisoformat(day) + datetime.timedelta(days=CC.LIST_DAYS)).isoformat()
     cards = {}
     ev = (extra.get("earnings") or {}).get(s["sym"]) or []
-    nxt = next((x["day"] for x in ev if x["day"] > day), None)
-    past = [x["day"] for x in ev if two_y <= x["day"] <= day]
-    moves = [{"day": d, "ret": _signed_ret(bars, CC._next_trading(days, d, same_day=True))} for d in past]
+    ynext = next((x["day"] for x in ev if x["day"] > day), None)   # 야후 다음 발표 = 대개 확정실적 · 컨퍼런스콜 날
+    nxt, est = collect_kr_earn_dart.next_date(s["code"], ynext, day)   # 잠정실적 공시 = 주가가 움직이는 날 (2026-10-31)
+    nxt_day = s["code"] in U.EARN_NEXT_DAY   # 장 마감 뒤 공시 회사 → 다음 거래일에 반영
+    past = [d for d in collect_kr_earn_dart.past(s["code"]) if two_y <= d <= day]
+    moves = [{"day": d, "ret": _signed_ret(bars, collect_kr_earn_dart.reaction_day(s["code"], days, d))} for d in past]
     moves = [m for m in moves if m["ret"] is not None][-8:]
     if nxt:
-        cards["earnings"] = {"day": nxt, "left": (datetime.date.fromisoformat(nxt) - datetime.date.fromisoformat(day)).days, "bars": moves,
-                             "median": statistics.median(abs(m["ret"]) for m in moves) if moves else None, "normal": normal}
+        cards["earnings"] = {"day": nxt, "est": est, "left": (datetime.date.fromisoformat(nxt) - datetime.date.fromisoformat(day)).days, "bars": moves,
+                             "next_day": bool(nxt_day), "median": statistics.median(abs(m["ret"]) for m in moves) if moves else None, "normal": normal}
     pairs = (U.PAIRS.get(s["sym"]) or ([], ""))[0]
     if pairs:
         up, up_all, effect = [], [], {}
@@ -1086,25 +1089,27 @@ def _macro_name(k, label=""):
 
 
 def cal_earn_card(s, c):
+    """다음 실적 발표 — 날짜 = DART 잠정실적 공시(지난 것) · 야후 또는 1년 전 같은 분기 + 52주(다음 것, earn_next). 움직임 = 실적이 반영된 날:
+    장 마감 뒤 공시 회사(U.EARN_NEXT_DAY)는 다음 거래일, 장 전 · 장중이면 그날 (2026-10-31 사용자: 실적 발표는 중요, 야후 날짜는 반응과 안 맞았다 K26)."""
     nm = s["name"]
     r = c["median"] / c["normal"] if c.get("median") and c.get("normal") else None
-    first = f"{nm}의 다음 실적 발표는 {R._md_short(c['day'])}로 {c['left']}일 남았다."   # `(Yahoo Finance 일정이라 바뀔 수 있음)` → 문장 끝 작은 글씨 (P70)
+    when = f"{R._md_short(c['day'])} 무렵" if c.get("est") else R._md_short(c["day"])
+    first = f"{nm}의 다음 실적 발표는 {_dk.josa(when, '로')} {c['left']}일 남았다."
     if r:
-        first += f" 지난 {len(c['bars'])}번 발표 날 주가는 보통 ±{c['median']:.1f}% 움직여 평소 하루(±{c['normal']:.1f}%)의 약 {r:.1f}배였다."
+        first += f" 지난 {len(c['bars'])}번 실적이 반영된 날 주가는 보통 ±{c['median']:.1f}% 움직여 평소 하루(±{c['normal']:.1f}%)의 약 {r:.1f}배였다."
     lines = [(first + R.small_note("일정이 변동될 수 있습니다."), "plain")]   # 옛 `(Yahoo Finance 일정이라 바뀔 수 있음)` (P70)
     if c["bars"]:
         chart = R._col_chart([(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["ret"]]) for b in c["bars"]], [R._sign_bg], [R._sign_fg], height=130, right=True)   # 최신이 왼쪽 (2026-10-28 사용자 P71 · P79)
-        pad = _dk.SEP_GAP - _dk.VP - 1
-        lines.append((f'{_dk.CHART_TITLE_M}최근 {len(c["bars"])}번의 실적 발표 날 (%)</span>'
+        lines.append((f'{_dk.CHART_TITLE_M}최근 {len(c["bars"])}번 실적이 반영된 날 (%)</span>'   # 옛 `실적 발표 날` — 미국과 같은 이름 (2026-10-31)
                       f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span>', "html"))
-    lines.append(("row", "발표일", R._md_short(c["day"]), "Yahoo Finance 일정"))
+    lines.append(("row", "발표일", when, "작년 같은 분기 공시일로 어림" if c.get("est") else "회사 발표 일정"))
     if c.get("median"):
-        lines.append(("row", "발표 날 보통", f"±{c['median']:.1f}%", f"지난 {len(c['bars'])}번 중앙값"))
+        lines.append(("row", "반영된 날 보통", f"±{c['median']:.1f}%", f"지난 {len(c['bars'])}번 중앙값"))
     if c.get("normal"):
         lines.append(("row", "평소 하루", f"±{c['normal']:.1f}%", "최근 1년 중앙값"))
-    tip = ("회사가 석 달마다 실적을 발표하는 날 주가가 크게 움직이곤 한다. 한국 회사는 장 전 · 장중 발표가 많아 그날 움직임을 본다. 오른 날 · 내린 날을 가리지 않고 크기만 본다\n"
-           f"· {c['left']}일 남음 : {R._md_short(c['day'])}\n· 나누는 법 : {CC.SOON_DAYS}일 안으로 다가오면 카드가 보라색")
-    return lines, _dk.with_src(tip, "Yahoo Finance"), f"{c['left']}일 남음", c["left"]
+    tip = ("회사가 석 달마다 잠정실적을 공시하면 주가가 크게 움직이곤 한다. 장 마감 뒤 공시는 다음 날, 장 전 · 장중 공시는 그날을 본다\n"
+           f"· {c['left']}일 남음 : {when}\n· 나누는 법 : {CC.SOON_DAYS}일 안으로 다가오면 카드가 보라색")
+    return lines, _dk.with_src(tip, "금융감독원 DART · Yahoo Finance"), f"{c['left']}일 남음", c["left"]
 
 
 def cal_pair_card(s, c):
@@ -1117,7 +1122,8 @@ def cal_pair_card(s, c):
     first = f"앞으로 30일 안에 {_dk.josa(names, '가')} 실적을 발표한다. {_dk.josa(nm, '와')} 같은 재료로 움직이는 미국 종목이다."
     if syms and c.get("normal"):
         eff = [c["effect"][x]["median"] for x in syms]
-        first += f" 최근 2년 이 회사들의 발표 다음 날 {nm} 주가는 보통 ±{min(eff):.1f}~{max(eff):.1f}% 움직였다({nm} 보통 날 ±{c['normal']:.1f}%)."
+        span = f"±{min(eff):.1f}%" if f"{min(eff):.1f}" == f"{max(eff):.1f}" else f"±{min(eff):.1f}~{max(eff):.1f}%"   # 한 곳이면 `±4.2~4.2%` 가 되던 것
+        first += f" 최근 2년 이 회사들의 발표 다음 날 {nm} 주가는 보통 {span} 움직였다({nm} 보통 날 ±{c['normal']:.1f}%)."
     lines = [(first, "plain")]
     if syms and c.get("normal"):
         chart = R._chart_card([(usn(x), [c["effect"][x]["median"], c["normal"]]) for x in syms], [lambda v: R._AMBER, R._gray], [R._note_fg, R._note_fg],

@@ -26,6 +26,12 @@ if __name__ == "__main__":
     except Exception as e:  # noqa: BLE001
         print(f"[kr] 탭 재료 실패: {str(e)[:120]}")
         extra = {}
+    if not cached:   # 실적 발표일 = DART 잠정실적 공시 (2026-10-31) — 실패하면 지난 캐시
+        try:
+            import collect_kr_earn_dart
+            collect_kr_earn_dart.run()
+        except (Exception, SystemExit) as e:  # noqa: BLE001
+            print(f"[kr] DART 실적일 실패: {str(e)[:120]}")
     pages = render_kr.write_all(a, OUT, snap, extra=extra)
     # 오늘(KST) 봉이 있나 — 휴장일 · 데이터 지연이면 0. 워크플로는 1일 때만 게시한다 (수동 실행은 강제 가능)
     import datetime

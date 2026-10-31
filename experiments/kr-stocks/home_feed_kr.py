@@ -11,6 +11,7 @@ import sys
 import analyze_kr
 import collect_kr
 import collect_kr_extra
+import collect_kr_earn_dart
 import universe_kr as U
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -69,10 +70,11 @@ def _events(a, extra, live):
     end = (datetime.date.fromisoformat(a["day"]) + datetime.timedelta(days=EVENT_DAYS)).isoformat()
     out = []
     for s in a["stocks"]:
-        ev = next((x for x in (extra.get("earnings") or {}).get(s["sym"]) or [] if x["day"] > a["day"]), None)
-        if not ev or ev["day"] > end or s["code"] not in live:
+        y = next((x["day"] for x in (extra.get("earnings") or {}).get(s["sym"]) or [] if x["day"] > a["day"]), None)
+        nd, _ = collect_kr_earn_dart.next_date(s["code"], y, a["day"])   # 잠정실적 기준 (종목 페이지 일정 탭과 같은 날, 2026-10-31)
+        if not nd or nd > end or s["code"] not in live:
             continue
-        out.append({"kind": "earnings", "day": ev["day"], "when": ev.get("when"), "s": s["code"], "sym": s["sym"], "name": s["name"],
+        out.append({"kind": "earnings", "day": nd, "when": "amc" if s["code"] in U.EARN_NEXT_DAY else "bmo", "s": s["code"], "sym": s["sym"], "name": s["name"],
                     "slug": U.BY_SYM[s["sym"]][2], "mc": int(s["cap"]) if s.get("cap") else None})
     return sorted(out, key=lambda e: (e["day"], -(e["mc"] or 0)))
 
