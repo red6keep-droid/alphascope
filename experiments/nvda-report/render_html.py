@@ -554,7 +554,7 @@ def ma_chart(mr, bmr, name, bench, last=False):
 
 def day_path_chart(path, bpath, name, bench):
     """오늘 하루 흐름 세로 막대 (2026-10-27 사용자 P41: 한국 증시 리포트 `시가 갭 · 장중 · 하루` 처럼, `하루` 대신 `종가`) — 시가 · 장중 고점 · 장중 저점 · 종가,
-    모두 전일 종가 대비 % 라 같은 눈금. 비교 = 지수의 같은 네 값(회색). 저점까지 넣어 가격 줄 `흔들림 n%`(고점 − 저점)가 그림으로 보인다. 가격 정보 카드 바로 아래(2026-10-31 사용자 P170, 옛 위) — data-cards 라 테마가 `오늘` 탭으로 함께 옮긴다."""
+    모두 전일 종가 대비 % 라 같은 눈금. 비교 = 지수의 같은 네 값(회색). 저점까지 넣어 가격 줄 `흔들림 n%`(고점 − 저점)가 그림으로 보인다. 가격 정보 카드 바로 위(P170 에서 아래로 옮겼다가 같은 날 되돌림, P171) — data-cards 라 테마가 `오늘` 탭으로 함께 옮긴다."""
     if not path:
         return ""
     names = [("open", "시가"), ("high", "장중 고점"), ("low", "장중 저점"), ("close", "종가")]
@@ -905,7 +905,7 @@ def together_block(items, outer=None):
                      f'<span style="color:#111;">{_esc(nm)}</span><span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-weight:700;color:{col};">{_esc(st)}{OUT_ICON}</span></span>')   # › → 나가는 아이콘, 대답과 같은 색 (P169)
         out += f'<span data-together-group="{th}" style="display:block;margin-top:8px;padding:0 12px 6px;background:{bg};border:1px solid {bd};border-radius:8px;">{body}</span>'   # 아래 6 — 카드 높이 ×1.3 (P169)
     title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')   # 16 → 18 (P169) · 가운데 (P170)
-    return f'<span data-together="1" style="display:block;margin-top:8px;padding-top:19px;border-top:1px solid #E2E8F0;">{title}{out}</span>{TOGETHER_END}'   # 위 14 → 19 (P169)
+    return (f'<span data-together="1" style="{MULTI}margin:19px {_dk.CHART_CARD_X}px 0;padding:{_dk.CHART_CARD_PAD + 4}px 12px 12px;">{title}{out}</span>{TOGETHER_END}')   # 그래프와 같은 흰 카드로 감싼다 (2026-10-31 사용자 P171, 옛 구분선 + 위 19)
 
 
 PICK_REASON_LH = "26px"   # 방송 의견 이유 문장 행간 — 24 × 1.1 → 정수 26 (2026-10-31 사용자 P169)
@@ -1285,8 +1285,8 @@ def _pull_end_chart(html):
     끝에 다른 글(주석 줄 등)이 있거나 이미 당긴 카드(범위 막대 last)는 그대로."""
     if html.rstrip().endswith("</a>") and OUT_ICON in html and html.count("</a>") == 1:   # 카드 끝 나가는 버튼 — 좌우 15 = 아래 15 (P156)
         return f'<span style="display:block;margin:0 0 {-BOX_END_PULL}px;">{html}</span>'
-    if html.rstrip().endswith(TOGETHER_END):   # 카드 끝 함께 보기 묶음 카드 — 좌우 15 = 아래 15 (P169, 옛 아래 22)
-        return f'<span style="display:block;margin:0 0 {-BOX_END_PULL}px;">{html}</span>'
+    if html.rstrip().endswith(TOGETHER_END):   # 카드 끝 함께 보기 흰 카드 — 좌우 10(그래프 카드처럼 양쪽 5 넓음) = 아래 10 (P169 · P171)
+        return f'<span style="display:block;margin:0 0 {-BOX_END_PULL + _dk.CHART_CARD_X}px;">{html}</span>'
     box = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">'   # 폭 가득 흰 카드(애널리스트 의견 등) — 좌우 15 와 같게 아래를 당긴다
     b = html.rfind(box)
     if b >= 0 and html.rstrip().endswith("</div>") and html.rstrip().count("</div>", b) == 1:
