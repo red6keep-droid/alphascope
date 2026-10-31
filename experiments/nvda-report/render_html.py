@@ -1050,6 +1050,10 @@ def emph_white(html):
     return _EMPH_WHITE_RE.sub(rf"\1border:1px solid {EMPH_WHITE_BD};\2", html)
 
 
+PRICE_IN_EXTRA = 10   # 가격 카드 펼침(오늘 탭) 안 아래 영역들의 위 여백 +10 — 이 카드에서만 (2026-10-31 사용자 P191)
+PRICE_IN_EXTRA_AT = ("한 달간 변화 범위", "기간별 수익률", "12개월 모멘텀", "지금 가격이 평균보다")
+
+
 def price_in(bg, bd, parts):
     """가격 정보 강조 카드 펼침 안 — 머리 줄 바로 아래 같은 바탕 · 테두리로 이어진다. parts = (모양, html) 또는 html(접기 등, 강조 모양으로).
     순서 = 가격 범위 + 고점 회복(한 영역) → 기간별 수익률(제목 · 흰 카드) → `차트 정보 보기`. 사이는 상태 카드 펼침과 같은 연한 구분선.
@@ -1067,11 +1071,12 @@ def price_in(bg, bd, parts):
         html = html.replace('<details data-fold="1" data-label="차트 정보 보기" style="margin:0 0 8px;"><summary style="list-style:none;cursor:pointer;">',
                             f'<details data-fold="1" data-label="차트 정보 보기" style="margin:0;padding:0 0 12px;"><summary style="list-style:none;cursor:pointer;margin:0 {12 + _dk.CHART_CARD_X}px;">', 1)
         sep = f"border-top:1px solid {bd_row};" if k and kind != "join" and not chart_btn else ""
+        extra = PRICE_IN_EXTRA if any(t in html for t in PRICE_IN_EXTRA_AT) else 0   # 이 영역들만 위 +10 (P191)
         if kind == "white":
             nxt_join = k + 1 < len(items) and items[k + 1][0] == "join"
-            out += f'<div style="{sep}padding:{16 if k == 0 else 10}px 12px {9 if nxt_join else 12}px;">{html}</div>'   # 흰 카드 ~ 이어지는 글 = 제목 ~ 흰 카드 11 (실측, 2026-10-27 사용자)   # 첫 영역(가격 범위) 위 = 상태 카드 구분선 ~ 본문 첫 글자 18(실측)과 같게: 12 → 18 (2026-10-27 P33)
+            out += f'<div style="{sep}padding:{(16 if k == 0 else 10) + extra}px 12px {9 if nxt_join else 12}px;">{html}</div>'   # 흰 카드 ~ 이어지는 글 = 제목 ~ 흰 카드 11 (실측, 2026-10-27 사용자)   # 첫 영역(가격 범위) 위 = 상태 카드 구분선 ~ 본문 첫 글자 18(실측)과 같게: 12 → 18 (2026-10-27 P33)
         else:
-            out += f'<div style="{sep}">{_flatten(html, bg, bd, bd_row)}</div>'
+            out += f'<div style="{sep}{f"padding-top:{extra}px;" if extra else ""}">{_flatten(html, bg, bd, bd_row)}</div>'
     # 가로 구분선은 글자 폭(좌우 12px 안쪽)만 — 상태 카드처럼 카드 끝까지 가지 않는다 (2026-10-27 P16). 줄 높이 · 글자 위치는 그대로 (투명 테두리 + 배경 선)
     out = out.replace(f"border-top:1px solid {bd_row};", f"border-top:1px solid transparent;background:linear-gradient({bd_row},{bd_row}) 12px 0/calc(100% - 24px) 1px no-repeat border-box;")
     out = emph_white(out)   # 강조 카드 안 흰 카드는 외곽선 없이 (P187)
