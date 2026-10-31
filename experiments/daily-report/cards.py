@@ -106,6 +106,8 @@ def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, right=True
     fs = dk.BAR_NUM_PX   # 막대 위 숫자 13px — 모든 그래프 같게 (2026-10-27 사용자, 옛 11)
     lbl = max(CHART_LBL, fs + 4)
     ticks, top, scale = dk.col_axis(vals, height, lbl + max(dk.LBL_LIFT, dk.LBL_LIFT_DN))   # 한 칸 바깥 눈금까지 · 아래 여백 통일 (2026-10-26 사용자) · 숫자 띄우기 자리 (P181)
+    cut = dk.col_top_cut(vals, ticks, scale, lbl + max(dk.LBL_LIFT, dk.LBL_LIFT_DN))   # 쓰지 않는 위 숫자 자리만큼 세로를 줄인다 (P190)
+    top, height = top - cut, height - cut
     n, ns = len(groups), len(groups[0][1])
     txt = lambda v: fmt(v) if fmt else f"{v:+.2f}".replace("-", "−")   # noqa: E731
     label_px = max(dk.text_px(txt(v), fs) for v in vals) + 4

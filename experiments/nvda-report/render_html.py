@@ -513,6 +513,8 @@ def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, color_at=
     lbl = max(CHART_LBL, fs + 4)   # 숫자 한 줄 자리
     lift = _dk.LBL_LIFT   # 막대 끝 ~ 숫자 사이 더 띄우기 (막대 샘플)
     ticks, top, scale = _dk.col_axis(vals, height, lbl + max(lift, _dk.LBL_LIFT_DN))   # 한 칸 바깥 눈금까지 · 아래 여백 통일 (2026-10-26 사용자)
+    cut = _dk.col_top_cut(vals, ticks, scale, lbl + max(lift, _dk.LBL_LIFT_DN))   # 쓰지 않는 위 숫자 자리만큼 세로를 줄인다 (P190)
+    top, height = top - cut, height - cut
     txt = lambda v: fmt(v) if fmt else f"{v:+.1f}".replace("-", "−")   # noqa: E731
     label_px = max(_dk.text_px(txt(v), fs) for v in vals) + 4
     axis_px = min(max(_dk.text_px(x, int(TINY[:-2])) for g, _ in groups for x in g.split("\n")) + 8, _dk.AXIS_MAX)   # 긴 이름은 묶음을 넓히는 대신 두 줄로 (P155)

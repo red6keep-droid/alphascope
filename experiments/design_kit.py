@@ -300,6 +300,14 @@ def col_axis(vals, height, lbl):
     return ticks, lbl + hi * scale, scale
 
 
+def col_top_cut(vals, ticks, scale, lbl):
+    """맨 위 눈금선 위에 비워 둔 막대 숫자 자리(lbl) 가운데 쓰지 않는 만큼 (정수 px) — 가장 높은 막대의 숫자가 맨 위 눈금 아래에 들어가면
+    그만큼 그래프 위를 잘라 세로를 줄인다. 눈금 숫자(14px 상자의 위 절반 7)는 남긴다 (2026-10-31 사용자 P190: 범례 · 넘겨 보기 없는 그래프 위가 휑하다)."""
+    hi, mp = ticks[-1], max(0.0, max(vals))
+    need = max(7.0, lbl - (hi - mp) * scale) if mp > 0 else 7.0
+    return max(0, int(lbl - need))
+
+
 def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w, right=True):   # 모든 세로 막대 = 축 오른쪽 · 넘겨 보기 왼쪽 (2026-10-31 사용자 P166: 통일)
     """세로 막대 그래프 틀 — 왼쪽 세로축 숫자 + 연한 가로 눈금선 + 0 기준선, 막대 · 가로축 이름은 그 오른쪽 (2026-10-26 사용자: "막대 그래프에 가로 눈금선, 좌측에 눈금 기준").
     bars_html 은 막대 칸(0~100%) 기준으로 놓인 막대 · 숫자. 눈금 · top · scale 은 col_axis 가 정한다."""

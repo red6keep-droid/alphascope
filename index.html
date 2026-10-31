@@ -4064,8 +4064,13 @@ body.no-dashboard .main-content { padding-top: 32px; }
           if (!sh || !b.clientWidth) return;
           var max = b.scrollWidth - b.clientWidth, x = Math.abs(b.scrollLeft);   /* direction:rtl — 오른쪽 끝 0, 왼쪽으로 갈수록 음수 */
           sh.style.opacity = (max - x > 1) ? '1' : '0';
-          var card = b.closest('span[style*="border-radius:8px"]'), hint = card && card.querySelector('[data-lhint]');
-          if (hint) hint.style.visibility = max > 1 ? 'visible' : 'hidden';   /* 넓은 폰에서 넘길 것이 없으면 `넘겨 보기` 숨김 (범례 자리는 그대로) */
+          /* 이 그래프의 안내 = 그래프 틀 바로 앞(혼자 한 줄) 또는 그 앞 범례 줄 안 — 카드 안 첫 안내를 찾으면 다른 그래프 것을 건드렸다 */
+          var p = b.parentNode.previousElementSibling, hint = p && (p.hasAttribute('data-lhint') ? p : p.querySelector('[data-lhint]'));
+          if (!hint) { var card = b.closest('span[style*="border-radius:8px"]'); hint = card && card.querySelector('[data-lhint]'); }
+          if (hint) {
+            if (hint.closest('[data-chart-top]')) hint.style.visibility = max > 1 ? 'visible' : 'hidden';   /* 범례와 한 줄 — 범례 자리는 그대로 두고 글자만 숨김 */
+            else hint.style.display = max > 1 ? 'block' : 'none';   /* 혼자 한 줄(범례 없는 그래프) — 줄째 없앤다, 그래프 위가 휑하던 것 (2026-10-31 사용자 P190) */
+          }
         }
         function all() {
           var bs = document.querySelectorAll('[data-lscroll]');
