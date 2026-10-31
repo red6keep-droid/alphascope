@@ -554,7 +554,7 @@ def ma_chart(mr, bmr, name, bench, last=False):
 
 def day_path_chart(path, bpath, name, bench):
     """오늘 하루 흐름 세로 막대 (2026-10-27 사용자 P41: 한국 증시 리포트 `시가 갭 · 장중 · 하루` 처럼, `하루` 대신 `종가`) — 시가 · 장중 고점 · 장중 저점 · 종가,
-    모두 전일 종가 대비 % 라 같은 눈금. 비교 = 지수의 같은 네 값(회색). 저점까지 넣어 가격 줄 `흔들림 n%`(고점 − 저점)가 그림으로 보인다. 가격 정보 카드 바로 위 — data-cards 라 테마가 `오늘` 탭으로 함께 옮긴다."""
+    모두 전일 종가 대비 % 라 같은 눈금. 비교 = 지수의 같은 네 값(회색). 저점까지 넣어 가격 줄 `흔들림 n%`(고점 − 저점)가 그림으로 보인다. 가격 정보 카드 바로 아래(2026-10-31 사용자 P170, 옛 위) — data-cards 라 테마가 `오늘` 탭으로 함께 옮긴다."""
     if not path:
         return ""
     names = [("open", "시가"), ("high", "장중 고점"), ("low", "장중 저점"), ("close", "종가")]
@@ -904,7 +904,7 @@ def together_block(items, outer=None):
                      f'min-height:{TOGETHER_ROW_H}px;cursor:pointer;border-top:1px solid {bd};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
                      f'<span style="color:#111;">{_esc(nm)}</span><span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-weight:700;color:{col};">{_esc(st)}{OUT_ICON}</span></span>')   # › → 나가는 아이콘, 대답과 같은 색 (P169)
         out += f'<span data-together-group="{th}" style="display:block;margin-top:8px;padding:0 12px 6px;background:{bg};border:1px solid {bd};border-radius:8px;">{body}</span>'   # 아래 6 — 카드 높이 ×1.3 (P169)
-    title = (f'<span style="display:flex;align-items:center;gap:6px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')   # 16 → 18 (P169)
+    title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')   # 16 → 18 (P169) · 가운데 (P170)
     return f'<span data-together="1" style="display:block;margin-top:8px;padding-top:19px;border-top:1px solid #E2E8F0;">{title}{out}</span>{TOGETHER_END}'   # 위 14 → 19 (P169)
 
 
