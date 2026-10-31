@@ -633,6 +633,39 @@ def year_range_in(y, money, tip, high_days=None):
     return ("white", f'<span style="display:block;margin:0 0 8px;">{head}</span>{card}')
 
 
+def month_range_in(bb, money, tip, state, color, title="한 달간 변화 범위"):
+    """한 달 범위(볼린저) 블록 — 가격 카드 펼침의 `가격 범위 (1년)` 바로 아래, 같은 흰 카드 틀 (2026-10-31 사용자 P150: 오늘 탭 상태 카드를 가격 카드 안으로).
+    제목 줄 왼쪽 `※ 한 달간 변화 범위` + 툴팁, 오른쪽 = 답(범위 안 · 하락 범위 · 상승 범위, 상태 카드 답 색). 범위 막대 + 오늘 종가 말풍선은 range 막대 그대로."""
+    if not bb or bb.get("lower") is None:
+        return ""
+    lo, hi, c = bb["lower"], bb["upper"], bb["close"]
+    x, zone = _gauge_x(c, lo, hi, max(hi - lo, 1e-9) / 2)
+    names = [("하락 범위", RANGE_SIDE), (f"한 달 범위 {money(lo)}~{money(hi)}", 100 - 2 * RANGE_SIDE), ("상승 범위", RANGE_SIDE)]
+    gauge = _zone_gauge(x, zone, names, money(c), f"오늘 종가 {money(c)}, 한 달 범위 {money(lo)}~{money(hi)}", last=False)
+    gauge = gauge.replace(f"margin:0 {_dk.CHART_CARD_X - 2}px 0px;", f"margin:0 {_dk.CHART_CARD_X}px;", 1)   # 상태 카드 안(14) → 가격 펼침(12) 폭 = 1년 범위 카드와 같게
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:16px 0 8px;">'
+            f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{_paren(_esc(title))}{_tipx(tip)}</span>'
+            f'<span style="flex:none;font-weight:700;color:{color};font-size:{_dk.NAME};white-space:nowrap;">{_esc(state)}</span></span>')
+    return head + gauge
+
+
+OUT_ICON = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" '
+            'style="flex:none;"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>')
+
+
+def out_btn(label, href):
+    """다른 페이지로 나가는 버튼 (2026-10-31 사용자 P148, 가이드라인 6절) — `전체 일정 보기` 와 같은 흰 외곽선 버튼 · 14px 굵게, 제목 앞 '나가는' 아이콘.
+    같은 창에서 연다(같은 블로그 안). 블로그 안 다른 페이지로 보내는 링크는 모두 이 모양."""
+    return (f'<a href="{_esc(href)}" data-row-link="1" style="display:flex;justify-content:center;align-items:center;gap:6px;padding:8px 12px;background:#fff;border:1px solid #E2E8F0;'
+            f'border-radius:8px;font-size:{TINY};line-height:20px;font-weight:700;color:#111;text-decoration:none;">{OUT_ICON}<span>{_esc(label)}</span></a>')
+
+
+def empty_card(text):
+    """내용이 없을 때의 안내 — 버튼 자리에 같은 모양의 흰 카드, 글은 가운데 회색 (2026-10-31 사용자 P148: 일정이 없으면 `전체 일정 보기` 버튼 대신)."""
+    return (f'<span style="display:flex;justify-content:center;align-items:center;padding:8px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;'
+            f'font-size:{TINY};line-height:20px;color:{NOTE};">{_esc(text)}</span>')
+
+
 def _high_ago(days):
     """최고가 옆 `(N거래일 전)` — 고점 회복 머리 줄의 `1년 최고가 이후 N거래일째` 를 옮겨 왔다 (2026-10-27 P15: –x% 중복 정리)."""
     if days is None:
@@ -1124,8 +1157,11 @@ def _pull_end_chart(html):
     if html[j:].strip():   # 그래프 카드 뒤에 다른 요소가 있다
         return html
     k = html.index(";", html.index("margin:0 ", i + len(MULTI)))
-    seg = html[html.index("margin:0 ", i + len(MULTI)):k]   # `margin:0 12px` · `margin:0 12px -23px`
-    if len(seg.split()) != 2:
+    seg = html[html.index("margin:0 ", i + len(MULTI)):k]   # `margin:0 12px` · `margin:0 12px 0px`(범위 막대 last=False) · `margin:0 12px -23px`(이미 당김)
+    parts = seg.split()
+    if len(parts) == 3 and parts[2] == "0px":
+        return html[:k - 3] + f"{-GAUGE_PULL}px" + html[k:]
+    if len(parts) != 2:
         return html
     return html[:k] + f" {-GAUGE_PULL}px" + html[k:]
 
@@ -1364,9 +1400,9 @@ def _zone_gauge(x, zone, names, bubble, aria, ends=None, last=False):
     w = _bubble_w(bubble)
     at = f"clamp({GAUGE_INSET}px, {x:.1f}%, calc(100% - {GAUGE_INSET}px))"   # 점 · 꼬리 위치
     segs = "".join(f'<span style="flex:0 0 calc({wd}% - 2px);height:6px;border-radius:3px;background:{colors[i]};"></span>' for i, (_, wd) in enumerate(names))
-    last = len(names) - 1   # 양 끝 칸 글자는 막대 끝에 맞춰 왼쪽 · 오른쪽 정렬, 가운데 칸만 가운데 (2026-10-25 사용자)
+    end_i = len(names) - 1   # 양 끝 칸 글자는 막대 끝에 맞춰 왼쪽 · 오른쪽 정렬, 가운데 칸만 가운데 (2026-10-25 사용자). 옛 이름 `last` 가 last 인자를 덮어 늘 카드 끝 당김(−23)이 걸렸다 (2026-10-31 고침)
     # 범위 글자가 길면(SK하이닉스 190만 원대) 물결 뒤에서만 줄바꿈 — 빈칸은 붙여 둔다 (2026-10-28 사용자 P60)
-    labs = "".join(f'<span style="flex:0 0 {wd}%;text-align:{"left" if i == 0 else "right" if i == last else "center"};font-size:{TINY};line-height:20px;white-space:normal;word-break:keep-all;'
+    labs = "".join(f'<span style="flex:0 0 {wd}%;text-align:{"left" if i == 0 else "right" if i == end_i else "center"};font-size:{TINY};line-height:20px;white-space:normal;word-break:keep-all;'
                    f'color:{colors[i] if i == zone else NOTE};font-weight:{700 if i == zone else 400};">{_wave_break(_esc(nm).replace(" ", "&nbsp;"))}</span>' for i, (nm, wd) in enumerate(names))
     tip = _gauge_tip(x, bubble, col, RANGE_BASE[zone])
     if ends:   # 말풍선이 끝 쪽에 오면 그쪽 끝 눈금은 숨긴다 — 말풍선 밑으로 글자 조각이 삐져나온다

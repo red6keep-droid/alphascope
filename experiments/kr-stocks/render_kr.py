@@ -195,7 +195,13 @@ def _pair_bars(groups, note=""):
             f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X - 2}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>{tail}')
 
 
-def sec_pairs(s):
+def _mates(s, n=6):
+    """같은 테마(없으면 같은 업종)의 한국 종목 — 기업 탭 `같은 묶음` 과 같은 규칙 (P153: 오늘 탭 함께 움직이는 종목 카드로)."""
+    mates = [x for x in U.CANDIDATES if x[0] != s["sym"] and set(x[4]) & set(U.groups(s["sym"]))] or [x for x in U.CANDIDATES if x[0] != s["sym"] and x[3] == U.sector(s["sym"])]
+    return mates[:n]
+
+
+def sec_pairs(s, a=None):
     """`미국과 연결` 펼침 카드 (2026-10-25 사용자: "짝" 대신 "연결" · 가격 카드 다음 · 펼침 카드로). 접힌 머리 = 밤사이 연결 종목이 어땠나(올랐음 · 내렸음 · 엇갈림),
     펼치면 연결 종목 · ADR(K24) · SOX(K25) 줄과 오늘 이 종목 · KOSPI 대비, 한국 장 뒤 나온 미국 종가. 툴팁 `기록상` = 10-25 일별 검증."""
     p = s.get("pairs") or {}
@@ -224,7 +230,12 @@ def sec_pairs(s):
         kr.append(("KOSPI", "", s["ret_1d"] - vb, "bench"))
     # `그 뒤 미국 종가 … 다음 한국장 전 참고` 줄은 뺐다 — 정기 실행(16:10 KST)엔 그 미국장이 아직 안 끝나 늦게 돌 때만 나오고, 무슨 값인지 읽히지 않았다 (2026-10-28 사용자 P58)
     lines.append((_pair_bars([(f"밤사이 미국 ({_md(day)} 종가)", us), (f"오늘 한국 ({_md(s['day'])})", kr)]), "html"))
-    return R._state_card("밤사이 미국과 연결 종목은?", state, theme, col, lines, "", tip=pair_tip(s), fold=True)
+    # 같은 묶음 한국 종목의 오늘 등락 — 미국 부분과 같은 막대 (2026-10-31 사용자 P153: 제목 `함께 움직이는 종목은?`, 기업 탭의 `함께 움직이는 종목` 을 여기로)
+    by = {x["sym"]: x for x in (a or {}).get("stocks") or []}
+    group = [(x[1], "", by[x[0]]["ret_1d"], "us") for x in _mates(s) if x[0] in by and by[x[0]].get("ret_1d") is not None]
+    if group:
+        lines.append((_pair_bars([(f"같은 묶음 한국 종목 ({_md(s['day'])})", group)]), "html"))
+    return R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=pair_tip(s), fold=True)   # 답은 밤사이 미국 기준 그대로(검증 통과한 신호)
 
 
 IND_SRC = {"derived": "한국은행 금리 통계", "121Y006": "한국은행 대출금리", "121Y002": "한국은행 수신금리", "151Y002": "한국은행 가계대출", "901Y054": "은행연합회 연체율", "402Y016": "한국은행 수출물가지수", "901Y039": "국가데이터처 광공업 생산", "901Y019": "한국전력공사", "901Y073": "한국석유공사", "901Y072": "에너지경제연구원",
@@ -309,7 +320,7 @@ def sec_industry(s):
            f"· {first['name']} {_ind_value(first)} : " + (f"{'전년 같은 달' if first['cmp'] == 'yoy' else '전달'}보다 {_sgn(first['chg'], 2 if first['kind'] == 'pct' else 1)}{'%p' if first['kind'] == 'pct' else '%'}" if first.get("chg") is not None else "비교값 없음")
            + (f"\n· 분류 : {tag} — 환율 · 교역조건 · 수출입물가 · 수출 물량은 값만 둔다 ({U.NO_RECORD['fx_stock']})" if tag and (fx_keys or w) else "")
            + ("\n" + "\n".join(rec) if rec else "\n· 기록상 : 1996~2026 우리 검증에서 이 업종 지표는 발표 뒤 주가와 뚜렷한 관계를 보이지 않았다 — 참고 숫자"))
-    return R._card_title("업종 재료는?", _dk.with_src(tip, "한국은행 ECOS (자료: " + " · ".join(srcs) + ")" + (" · FRED" if w else ""))) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
+    return R._card_title("업계 재료는?", _dk.with_src(tip, "한국은행 ECOS (자료: " + " · ".join(srcs) + ")" + (" · FRED" if w else ""))) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
 
 
 def sec_bsi(s):
@@ -435,7 +446,7 @@ def card_industry_mood(s):
     for r in b["rows"]:
         lines.append(("row", f"{r['name']} 경기(BSI)", f"{r['v']:.0f}", f"{r['month'][:4]}년 {int(r['month'][5:])}월 실적 · 전달보다 {_sgn(r['chg'], 0)}p · 2009년 이후 아래에서 {r['pct_all']:.0f}% 지점"
                       + (f" · 다음 달 전망 {r['forecast']:.0f}" if r.get("forecast") is not None else "")))
-    return R._state_card("업종 경기는?", state,   # 짧게 (2026-10-31 사용자, 옛 이 업종 경기는 좋아지고 있나?)
+    return R._state_card(f"{U.biz_name(s['sym'])} 업계 경기는?", state,   # `[업계] 업계 경기는?` — 한 회사 얘기로 읽히지 않게 (2026-10-31 사용자 P151, 옛 업종 경기는?)
                           theme, col, lines, "", tip=_tip_of(sec_bsi(s)), fold=True)
 
 
@@ -508,7 +519,8 @@ def card_industry_work(s):
         u2 = "%p" if r["kind"] == "pct" else "%"
         lines.append(("row", r["name"], _ind_value(r), f"{r['month'][:4]}년 {int(r['month'][5:])}월" + (f" · {cmp_txt} {_sgn(r['chg'], 2 if u2 == '%p' else 1)}{u2}" if r.get("chg") is not None else "")
                       + (f" · {r['note']}" if r.get("note") else "")))
-    return R._state_card(b["q"], state, theme, col, lines, "", tip=_tip_of(sec_industry(s)), fold=True)
+    title = f"{U.biz_name(s['sym'])} 업계 {U.BIZ_Q[b['group']]}" if b.get("group") else b["q"]   # `가전 업계 수출은?` (P151)
+    return R._state_card(title, state, theme, col, lines, "", tip=_tip_of(sec_industry(s)), fold=True)
 
 
 def card_industry_money(s):
@@ -527,13 +539,13 @@ def card_industry_money(s):
     for r in s.get("fin") or []:   # 산업별 대출(늦게 따라오는 지표)도 여기 — 질문 카드로 따로 두지 않는다
         val = f"{r['v'] / 1e3:,.0f}조 원" if r["unit"] == "조 원" else f"{r['v']:.1f}%"
         lines.append(("row", _fin_short(s, r["name"]), val, f"{_qlabel(r['q'])}" + (f" · 전년 같은 분기보다 {_sgn(r['chg'], 1)}{r['chg_unit']}" if r.get("chg") is not None else "") + f" · {r['note']}"))
-    return R._state_card("회사들의 돈 버는 힘은?",   # 짧게 (2026-10-31 사용자, 옛 이 업종 회사들의 돈 버는 힘은?)
+    return R._state_card(f"{U.biz_name(s['sym'])} 업계 수익성은?",   # `[업계] 업계 수익성은?` (P151, 옛 회사들의 돈 버는 힘은?)
                           state, theme, col, lines, "", tip=_tip_of(sec_fin(s)), fold=True)
 
 
 def sec_industry_tab(s):
     out = card_industry_mood(s) + card_industry_work(s) + card_industry_money(s)
-    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else _dk.muted("이 종목은 업종 자료를 아직 연결하지 않았습니다.")
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else _dk.muted("이 종목은 업계 자료를 아직 연결하지 않았습니다.")
 
 
 def range_tip(s):
@@ -624,7 +636,14 @@ def year_tip(y):
 def sec_year_range(s):
     """가격 범위 (1년) — 가격 정보 강조 카드 안 (R.year_range_in, 2026-10-26 사용자), 원화."""
     y = s.get("year_range")
-    return R.year_range_in(y, won, year_tip(y), (s.get("drawdown") or {}).get("days_since_high")) if y else ""
+    if not y:
+        return ""
+    kind, html = R.year_range_in(y, won, year_tip(y), (s.get("drawdown") or {}).get("days_since_high"))
+    bb = s.get("bollinger")
+    if bb and bb.get("lower") is not None:   # 한 달간 변화 범위 — 1년 범위 바로 아래 같은 틀 (2026-10-31 사용자 P150, 옛 오늘 탭 상태 카드)
+        th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
+        html += R.month_range_in(bb, won, _boll_rule(bb), R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col)
+    return kind, html
 
 
 def sec_drawdown(s):
@@ -727,10 +746,7 @@ def sec_tech(s):
 def sec_states(s):
     """상태 카드 — 한 달 범위(매일) · 과열(해당하는 날만). 시장 충격 · 시장 분위기 · 업종 자금은 미국 지표(VIX · 섹터 ETF)라 두지 않는다."""
     out = ""
-    bb = s.get("bollinger")
-    if bb and bb.get("lower") is not None:
-        th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
-        out += R._state_card("한 달간 변화 범위는?", R.BOLL_STATE_KO.get(bb["state"], "범위 안"), th, col, _boll_lines(bb), "", tip=_boll_rule(bb), fold=True, inline_notes=True)
+    # `한 달간 변화 범위는?` 상태 카드는 가격 카드 펼침(가격 범위 (1년) 아래)으로 옮겼다 (2026-10-31 사용자 P150)
     out += card_picks(s)   # 방송 의견 — 한 달 범위 바로 아래 (2026-10-29 사용자 P88)
     oh = s.get("overheat")
     if oh and oh["active"]:
@@ -863,7 +879,8 @@ def together_items(s):
         ser = f0.get("series") or []
         d3 = f0["v"] - ser[-4]["v"] if len(ser) >= 4 else f0.get("chg") or 0
         st = "좋아지는 중" if d3 >= 3 else "나빠지는 중" if d3 <= -3 else "비슷함"   # card_industry_mood 와 같은 기준
-        out.append(("업종 경기", st, {"좋아지는 중": 1, "나빠지는 중": -1}.get(st, 0), "업종", "업종 경기는?"))
+        bn = U.biz_name(s["sym"])
+        out.append((f"{bn} 업계 경기", st, {"좋아지는 중": 1, "나빠지는 중": -1}.get(st, 0), "업계 상황", f"{bn} 업계 경기는?"))
     return out
 
 
@@ -1024,8 +1041,7 @@ def cal_macro_card(s, c):
     """시장 전체 일정 — 가장 가까운 1~2개만 한 줄로 요약하고, 전체는 한국 증시 리포트 `일정` 탭으로 (2026-10-31 사용자 P144: 모든 종목에 같은 공통 정보는
     공통 정보 보는 곳으로). 옛 그래프 · 일정별 줄은 리포트 쪽에 있다."""
     up = c["upcoming"]
-    link = (f'<a href="{_esc(U.latest_report_url())}#tab-{_esc(CAL_TAB)}" data-row-link="1" style="display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:44px;'
-            f'color:#1a73e8;text-decoration:none;font-size:{_dk.EMPH_Q};">한국 증시 리포트 일정에서 전체 보기<span aria-hidden="true">›</span></a>')
+    link = R.out_btn("한국 증시 리포트 일정에서 전체 보기", f"{U.latest_report_url()}#tab-{CAL_TAB}")   # 나가는 버튼 (P148)
     if not up:
         return [("앞으로 30일 안에 잡힌 큰 일정이 없다.", "plain"), (link, "html")], "", "없음", None
     near = " · ".join(_macro_name(u["kind"], u.get("label", "")) + "(" + R._md_short(u["day"]) + ")" for u in up[:2])
@@ -1051,7 +1067,7 @@ def _all_list(s):
     d0 = datetime.date.fromisoformat(s["day"])
     rows = [(f'<span style="color:#111;">{_esc(R._d(d))}</span>', R._pill(k, "area"), f'<span style="color:#111;">{_esc(t)}</span>', "", f'<span style="color:#111;">{R._dn(d0, d)}</span>')
             for d, k, t in sorted(items)]
-    return R._gcard(rows) if rows else _dk.muted("잡힌 일정이 없습니다.")
+    return R._gcard(rows) if rows else ""
 
 
 def sec_calendar(s):
@@ -1066,8 +1082,9 @@ def sec_calendar(s):
         theme, col = R._soon_theme(left)
         out += R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=first)
         first = False
-    fold = (f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
-            f'<div style="margin-top:6px;">{_all_list(s)}</div></details>')
+    lst = _all_list(s)
+    fold = ((f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
+             f'<div style="margin-top:6px;">{lst}</div></details>') if lst else R.empty_card("잡힌 일정이 없습니다."))   # 일정이 없으면 버튼 대신 안내 카드 (P148)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' + fold
 
 
@@ -1082,17 +1099,6 @@ def _info_rows(rows, px=None, lh=22, name_w=68):
                   f'<span style="flex:0 0 {name_w}px;color:{NOTE};white-space:nowrap;">{_esc(k)}</span>'
                   f'<span style="flex:1 1 auto;min-width:0;color:#111;word-break:keep-all;overflow-wrap:anywhere;">{v}</span></span>' for k, v in rows)
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}padding:{PAD - 3}px 0;display:block;">{out}</span></div>'
-
-
-def _info_fold(title, rows):
-    """`기본 정보` 접기 카드 (2026-10-31 사용자 P146) — 흰 카드 머리 = 제목(왼쪽) + 공식 접기 버튼(오른쪽), 펼치면 이름 · 값 줄. 처음엔 접혀 있다."""
-    out = "".join(f'<span style="display:flex;gap:12px;padding:3px 12px;font-size:{TINY};line-height:22px;">'
-                  f'<span style="flex:0 0 68px;color:{NOTE};">{_esc(k)}</span>'
-                  f'<span style="flex:1 1 auto;min-width:0;color:#111;word-break:keep-all;overflow-wrap:anywhere;">{v}</span></span>' for k, v in rows)
-    head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:{PAD - 3}px 12px;">'
-            f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};line-height:24px;">{_esc(title)}</span>{R.ACC_BTN}</span>')
-    return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1" style="{R.MULTI}"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
-            f'<span style="display:block;padding:0 0 {PAD - 3}px;">{out}</span></details></div>')
 
 
 def sec_company(s):
@@ -1111,16 +1117,8 @@ def sec_company(s):
             ("업종", _esc(" · ".join([U.sector(s["sym"])] + list(U.groups(s["sym"])))))]
     if s.get("rank"):
         rows.append(("시가총액", f"한국 {s['rank']}위 ({cap_text(s.get('cap'))})"))
-    out += _info_fold("기본 정보", [(k, v) for k, v in rows if v])   # 접기 카드 + 제목 `기본 정보` (P146 — P87 에서 뺀 제목을 접기 제목으로) — 출처(OpenDART)는 공통 푸터
-    mates = [x for x in U.CANDIDATES if x[0] != s["sym"] and set(x[4]) & set(U.groups(s["sym"]))] or [x for x in U.CANDIDATES if x[0] != s["sym"] and x[3] == U.sector(s["sym"])]
-    us = (U.PAIRS.get(s["sym"]) or ([], ""))
-    link_rows = []
-    if mates:
-        link_rows.append(("같은 묶음", " · ".join(f'<a href="{_esc(U.page_url(x[0]))}" style="color:#1a73e8;text-decoration:none;">{_esc(x[1])}</a>' for x in mates[:8])))
-    if us[0]:
-        link_rows.append(("미국과 연결", _esc(" · ".join(_us_name(t) for t in us[0])) + (f'<br><span style="color:{NOTE};">{_esc(us[1])}</span>' if us[1] else "")))
-    if link_rows:
-        out += R._card_title("함께 움직이는 종목", "같은 테마(없으면 같은 업종)의 한국 종목과, 밤사이 움직임을 같이 보는 미국 종목") + _info_rows(link_rows, _dk.NAME, 24, 88)   # 중간 글씨 16 · 행간 24 (2026-10-31 사용자 P146: "너무 작다", 옛 P96 13 · 20)
+    out += _info_rows([(k, v) for k, v in rows if v])   # 흰 카드 하나, 제목 · 접기 없이 (P154 — P146 의 접기를 되돌림). 출처(OpenDART)는 공통 푸터
+    # `함께 움직이는 종목` 은 오늘 탭 `함께 움직이는 종목은?` 카드로 옮겼다 (P153)
     return out
 
 
@@ -1129,10 +1127,10 @@ def detail_body(s, a):
     `업종` 탭 = 업종 재료 · 체감 경기 · 경영 분석
     (2026-10-25 사용자: 미국 종목 페이지처럼 탭 — 실적과 기대 · 캘린더는 다음 단계)."""
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
-            + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_tech(s) + sec_pairs(s) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
+            + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
             + _dk.keep_tone(R._section("뉴스", sec_today(s), tab="오늘"))   # 뉴스는 헤드라인체 그대로
             + R._section("실적", sec_expect(s), tab="실적")
-            + R._section("업종", sec_industry_tab(s), tab="업종")
+            + R._section("업계 상황", sec_industry_tab(s), tab="업계 상황")   # 업종 → 업계 상황 (2026-10-31 사용자 P151)
             + R._section("일정", sec_calendar(s), tab="일정")   # 캘린더 → 일정 (P145)
             + R._section("기업", sec_company(s), tab="기업")   # 기업정보 → 기업 (2026-10-31 P145: 탭은 짧게 — 360px 폰에서 다섯째 탭이 잘렸다)
             + related(s) + list_marker(U.LIST_URL))

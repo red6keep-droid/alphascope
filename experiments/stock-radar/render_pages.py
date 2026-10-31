@@ -194,7 +194,14 @@ def year_tip(y):
 def sec_year_range(s):
     """가격 범위 (1년) — 가격 정보 강조 카드 안 (R.year_range_in, 2026-10-26 사용자)."""
     y = s.get("year_range")
-    return R.year_range_in(y, lambda v: f"${v:,.2f}", year_tip(y), (s.get("drawdown") or {}).get("days_since_high")) if y else ""
+    if not y:
+        return ""
+    kind, html = R.year_range_in(y, lambda v: f"${v:,.2f}", year_tip(y), (s.get("drawdown") or {}).get("days_since_high"))
+    bb = s.get("bollinger")
+    if bb and bb.get("lower") is not None:   # 한 달간 변화 범위 — 1년 범위 바로 아래 같은 틀 (2026-10-31 사용자 P150, 옛 오늘 탭 상태 카드)
+        th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
+        html += R.month_range_in(bb, lambda v: f"${v:,.0f}", R.bollinger_rule(bb), R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col)
+    return kind, html
 
 
 def earn_tip(s, e):
@@ -291,11 +298,7 @@ def sec_states(s):
         th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
         title = "반도체로 돈이 올까?" if sf["name"] == "반도체" else f"{sf['name']} 업종으로 돈이 올까?"
         out += R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True)
-    bb = s.get("bollinger")
-    if bb and bb.get("lower") is not None:   # 매일 — 범위 안이어도 오늘 가격의 위치를 본다 (2026-10-23 사용자)
-        th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
-        out += R._state_card("한 달간 변화 범위는?", R.BOLL_STATE_KO.get(bb["state"], "범위 안"), th, col,
-                             R.bollinger_lines(bb), "", tip=R.bollinger_rule(bb), fold=True, inline_notes=True)
+    # `한 달간 변화 범위는?` 상태 카드는 가격 카드 펼침(가격 범위 (1년) 아래)으로 옮겼다 (2026-10-31 사용자 P150)
     out += card_opinions(s)   # 애널리스트 · 방송 의견 한 카드 — 한 달 범위 아래 (2026-10-29 P89 · P90)
     oh = s.get("overheat")
     if oh and oh["active"]:
@@ -645,8 +648,7 @@ def cal_macro(c):
     """시장 전체 일정 — 가장 가까운 1~2개만 한 줄로, 전체는 미국 증시 리포트 `일정` 탭으로 (2026-10-31 사용자 P144: 모든 종목에 같은 공통 정보는
     공통 정보 보는 곳으로). 엔비디아 리포트는 R.cal_macro(전체 카드) 그대로. 링크는 발행 때 최신 글로 바뀐다(publish_pages.DAILY_LATEST)."""
     up = c["upcoming"]
-    link = (f'<a href="{U.DAILY_REPORTS_URL}#tab-일정" data-row-link="1" style="display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:44px;'
-            f'color:#1a73e8;text-decoration:none;font-size:{_dk.EMPH_Q};">미국 증시 리포트 일정에서 전체 보기<span aria-hidden="true">›</span></a>')
+    link = R.out_btn("미국 증시 리포트 일정에서 전체 보기", f"{U.DAILY_REPORTS_URL}#tab-일정")   # 나가는 버튼 (P148)
     if not up:
         return [("앞으로 30일 안에 잡힌 큰 경제 일정이 없다.", "plain"), (link, "html")], "", "없음", None
     name = lambda u: R.cal_cards.MACRO_KO.get(u["kind"], u["label"])   # noqa: E731
@@ -662,11 +664,13 @@ STOCK_KINDS = ("EARNINGS", "EARNINGS_PEER")   # `전체 일정 보기` 는 이 �
 
 def _all_list(s, items):
     items = [c for c in items if c.get("kind") in STOCK_KINDS]
+    if not items:
+        return ""
     kinds = dict(R.rr.KIND_KO, EARNINGS=f"{s['name']} 실적", EARNINGS_PEER="함께 보는 회사 실적")
     d0 = datetime.date.fromisoformat(s["day"])
     rows = [(f'<span style="color:#111;">{_esc(R._d(c["day"]))}</span>', R._pill(kinds.get(c["kind"], c["kind"]), "area"),
              f'<span style="color:#111;">{_esc(c["label"])}</span>', "", f'<span style="color:#111;">{R._dn(d0, c["day"])}</span>') for c in items]
-    return R._gcard(rows) if rows else _dk.muted("잡힌 일정이 없습니다.")
+    return R._gcard(rows)
 
 
 def sec_calendar(s):
@@ -683,8 +687,9 @@ def sec_calendar(s):
         theme, col = R._soon_theme(extra)
         out += R._state_card(_josa(title), state, theme, col, lines, "", tip=_josa(tip), fold=True, opened=first)
         first = False
-    fold = (f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
-            f'<div style="margin-top:6px;">{_all_list(s, cc.get("all") or [])}</div></details>')
+    lst = _all_list(s, cc.get("all") or [])
+    fold = ((f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
+             f'<div style="margin-top:6px;">{lst}</div></details>') if lst else R.empty_card("잡힌 일정이 없습니다."))   # 일정이 없으면 버튼 대신 안내 카드 (P148)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' + fold
 
 
