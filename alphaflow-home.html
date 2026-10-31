@@ -3165,7 +3165,11 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   var leadStart = root.querySelector('[data-cards], [data-lead]'), lead = [];
   if (leadStart) { var q = leadStart; while (q && q.tagName !== 'H2') { lead.push(q); q = q.nextElementSibling; } }
   var host = first.parentNode;     /* 본문은 바깥 div 로 한 번 감싸여 있어 h2 의 부모는 .post-body 가 아니다 */
-  host.insertBefore(bar, first);   /* 구획을 패널로 옮기기 전에 탭 막대를 첫 h2 자리에 꽂는다 */
+  /* 탭이 폭을 넘으면 가로로 넘겨 본다 — 넘길 것이 남은 쪽에 흐린 그림자(data-more l · r) (2026-10-31 사용자 P167) */
+  var wrap = document.createElement('div'); wrap.className = 'rt-tabs-wrap'; wrap.appendChild(bar);
+  function more() { var max = bar.scrollWidth - bar.clientWidth, x = bar.scrollLeft, m = ''; if (x > 1) m += 'l'; if (max - x > 1) m += 'r'; wrap.setAttribute('data-more', m); }
+  bar.addEventListener('scroll', more, { passive: true }); window.addEventListener('resize', more); window.addEventListener('load', more);
+  host.insertBefore(wrap, first);   /* 구획을 패널로 옮기기 전에 탭 막대를 첫 h2 자리에 꽂는다 */
   var panels = [];
   groups.forEach(function (g, i) {
     var p = document.createElement('div'); p.className = 'rt-panel'; p.setAttribute('role', 'tabpanel');
@@ -3184,10 +3188,13 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     b.onclick = function () { select(panels.indexOf(entry)); };
     bar.appendChild(b); panels.push(entry);
   });
-  if (panels.length < 2) { bar.parentNode.removeChild(bar); panels.forEach(function (x) { while (x.p.firstChild) host.appendChild(x.p.firstChild); }); return; }
-  var anchor = bar; panels.forEach(function (x) { anchor.insertAdjacentElement('afterend', x.p); anchor = x.p; });
+  if (panels.length < 2) { wrap.parentNode.removeChild(wrap); panels.forEach(function (x) { while (x.p.firstChild) host.appendChild(x.p.firstChild); }); return; }
+  var anchor = wrap; panels.forEach(function (x) { anchor.insertAdjacentElement('afterend', x.p); anchor = x.p; });
   function select(i, keepHash) {
     panels.forEach(function (x, j) { x.b.setAttribute('aria-selected', String(i === j)); x.p.hidden = i !== j; });
+    var sb = panels[i].b, l = sb.offsetLeft - bar.offsetLeft;   /* 가려진 탭을 고르면 탭 줄을 그 탭이 보이게 넘긴다 */
+    if (l < bar.scrollLeft) bar.scrollLeft = l; else if (l + sb.offsetWidth > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = l + sb.offsetWidth - bar.clientWidth;
+    more();
     if (!keepHash) { try { history.replaceState(null, '', location.pathname + location.search + '#tab-' + i); } catch (e) {} }
   }
   var hm = /^#tab-(\d)$/.exec(location.hash || ''), hn = /^#tab-(.+)$/.exec(location.hash || ''), byName = -1;

@@ -1201,6 +1201,12 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
+/* 탭이 폭을 넘으면 가로로 넘겨 본다 — 넘길 것이 남은 쪽에 흐린 그림자 32px (2026-10-31 사용자 P167, JS 가 data-more 에 l · r) */
+.post-body .rt-tabs-wrap { position: relative; }
+.post-body .rt-tabs-wrap::before, .post-body .rt-tabs-wrap::after { content: ""; position: absolute; top: 0; bottom: 2px; width: 32px; pointer-events: none; opacity: 0; transition: opacity .15s; }
+.post-body .rt-tabs-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), rgba(255,255,255,0)); }
+.post-body .rt-tabs-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), rgba(255,255,255,0)); }
+.post-body .rt-tabs-wrap[data-more*="l"]::before, .post-body .rt-tabs-wrap[data-more*="r"]::after { opacity: 1; }
 /* 탭 이름 사이 간격 +10% (2026-10-13 사용자: "모든 탭메뉴명과 메뉴명 사이 여백을 10% 늘려") — 탭 30 → 33, 서브탭 22 → 24, 전환 30 → 32, 하위탭 20 → 22 */
 .post-body .rt-tab { flex: none; padding: 8px 13px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) */
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
@@ -4327,7 +4333,11 @@ body.no-dashboard .main-content { padding-top: 32px; }
         var leadStart = root.querySelector('[data-cards], [data-lead]'), lead = [];
         if (leadStart) { var q = leadStart; while (q && q.tagName !== 'H2') { lead.push(q); q = q.nextElementSibling; } }
         var host = first.parentNode;     /* 본문은 바깥 div 로 한 번 감싸여 있어 h2 의 부모는 .post-body 가 아니다 */
-        host.insertBefore(bar, first);   /* 구획을 패널로 옮기기 전에 탭 막대를 첫 h2 자리에 꽂는다 */
+        /* 탭이 폭을 넘으면 가로로 넘겨 본다 — 넘길 것이 남은 쪽에 흐린 그림자(data-more l · r) (2026-10-31 사용자 P167) */
+        var wrap = document.createElement('div'); wrap.className = 'rt-tabs-wrap'; wrap.appendChild(bar);
+        function more() { var max = bar.scrollWidth - bar.clientWidth, x = bar.scrollLeft, m = ''; if (x > 1) m += 'l'; if (max - x > 1) m += 'r'; wrap.setAttribute('data-more', m); }
+        bar.addEventListener('scroll', more, { passive: true }); window.addEventListener('resize', more); window.addEventListener('load', more);
+        host.insertBefore(wrap, first);   /* 구획을 패널로 옮기기 전에 탭 막대를 첫 h2 자리에 꽂는다 */
         var panels = [];
         groups.forEach(function (g, i) {
           var p = document.createElement('div'); p.className = 'rt-panel'; p.setAttribute('role', 'tabpanel');
@@ -4346,10 +4356,13 @@ body.no-dashboard .main-content { padding-top: 32px; }
           b.onclick = function () { select(panels.indexOf(entry)); };
           bar.appendChild(b); panels.push(entry);
         });
-        if (panels.length < 2) { bar.parentNode.removeChild(bar); panels.forEach(function (x) { while (x.p.firstChild) host.appendChild(x.p.firstChild); }); return; }
-        var anchor = bar; panels.forEach(function (x) { anchor.insertAdjacentElement('afterend', x.p); anchor = x.p; });
+        if (panels.length < 2) { wrap.parentNode.removeChild(wrap); panels.forEach(function (x) { while (x.p.firstChild) host.appendChild(x.p.firstChild); }); return; }
+        var anchor = wrap; panels.forEach(function (x) { anchor.insertAdjacentElement('afterend', x.p); anchor = x.p; });
         function select(i, keepHash) {
           panels.forEach(function (x, j) { x.b.setAttribute('aria-selected', String(i === j)); x.p.hidden = i !== j; });
+          var sb = panels[i].b, l = sb.offsetLeft - bar.offsetLeft;   /* 가려진 탭을 고르면 탭 줄을 그 탭이 보이게 넘긴다 */
+          if (l < bar.scrollLeft) bar.scrollLeft = l; else if (l + sb.offsetWidth > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = l + sb.offsetWidth - bar.clientWidth;
+          more();
           if (!keepHash) { try { history.replaceState(null, '', location.pathname + location.search + '#tab-' + i); } catch (e) {} }
         }
         var hm = /^#tab-(\d)$/.exec(location.hash || ''), hn = /^#tab-(.+)$/.exec(location.hash || ''), byName = -1;
