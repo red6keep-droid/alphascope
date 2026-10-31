@@ -763,7 +763,7 @@ def sec_momentum(s):
     x = (total - rank) / max(total - 1, 1) * 100   # 오른쪽 = 1위
     zone = 2 if rank <= total / 4 else 0 if rank > total * 3 / 4 else 1
     names = [("하위 25%", 25), (f"우리 {total}종목 순위", 50), ("상위 25%", 25)]
-    gauge = R._zone_gauge(x, zone, names, f"{mom:+.1f}%".replace("-", "−"), f"12개월 모멘텀 {mom:+.1f}%, {total}종목 중 {rank}위", last=False)
+    gauge = R._zone_gauge(x, zone, names, f"{mom:+.1f}%".replace("-", "−"), f"12개월 모멘텀 {mom:+.1f}%, {total}종목 중 {rank}위", last=False, weight=R.BUBBLE_W_STRONG)   # 말풍선 숫자 한 단계 굵게 (P184)
     gauge = gauge.replace(f"margin:0 {_dk.CHART_CARD_X - 2}px 0px;", f"margin:0 {_dk.CHART_CARD_X}px;", 1)
     col = UP if zone == 2 else DOWN if zone == 0 else "#111"
     head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 {_dk.CHART_TITLE_GAP}px;line-height:{_dk.LH_CARD};">'

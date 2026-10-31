@@ -635,7 +635,7 @@ def year_range_in(y, money, tip, high_days=None):
            f'<span style="position:absolute;left:0;top:0;bottom:0;width:{at};border-radius:3px;background:#BFDBFE;"></span></span>')
     aria = _esc(f"1년 범위 {money(y['low'])}~{money(y['high'])}, {text}")
     gauge = (f'<span data-range-gauge="1" aria-label="{aria}" style="position:relative;display:block;height:{GAUGE_H}px;">'
-             f'{_gauge_tip(pos, text, col, dot)}{bar}</span>')
+             f'{_gauge_tip(pos, text, col, dot, BUBBLE_W_STRONG)}{bar}</span>')   # 한 단계 굵게 (P184)
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:{TINY};line-height:20px;color:{NOTE};">'
             f'<span style="white-space:nowrap;">최저 {money(y["low"])}</span><span style="white-space:nowrap;">최고 {money(y["high"])}{_high_ago(high_days)}</span></span>')
     # 최저 · 최고는 줄바꿈 금지 — 가운데 `(오늘 …)` 는 뺐다(머리 줄에 오늘 가격, 2026-10-26). 카드 안 아래 = 좌우 12 보이는 거리(P32 와 같게)
@@ -1530,6 +1530,7 @@ GAUGE_INSET = 14   # 점 · 꼬리가 막대 끝 · 말풍선 가장자리에서
 
 BUBBLE_FONT = 14   # 말풍선 숫자 = 막대 아래 칸 이름 · 최저 · 최고 글자(TINY 14px)와 같은 크기 · 보통 굵기 (2026-10-31 사용자 P183, 앞서 P18 17 → 15)
 BUBBLE_H = 24   # 말풍선 높이 30 → 24 — 글자가 줄어든 만큼 (P183)
+BUBBLE_W_STRONG = 700   # 가격 범위(1년) · 12개월 모멘텀 말풍선 숫자는 한 단계 굵게 — 한 달간 변화 범위는 보통 400 그대로 (2026-10-31 사용자 P184). 블로그 글꼴(AS Barun = 나눔바른고딕)은 400 · 700 둘뿐이라 500 은 400 과 똑같이 보인다
 GAUGE_H = 50   # 말풍선 막대 칸 높이 56 → 50 — 말풍선 위 여백 10 그대로 (P183)
 
 
@@ -1538,13 +1539,13 @@ def _bubble_w(text):
     return round(16 + sum(5 if ch in ",. " else 17 if "가" <= ch <= "힣" else 10 for ch in text) * BUBBLE_FONT / 17) + 2   # 보통 굵기 · 좌우 8 (P183)   # 한글은 글자 크기만큼 (가격 범위 말풍선 `최고가 대비`, P34)
 
 
-def _gauge_tip(x, text, col, dot_col):
+def _gauge_tip(x, text, col, dot_col, weight=400):
     """말풍선 + 꼬리 + 원형 점 (2026-10-25 사용자). x = 위치 %. 점 · 꼬리는 막대 끝에서 GAUGE_INSET 안쪽까지, 말풍선은 카드 안에 멈추고 꼬리만 그 안에서 움직인다.
     점 = 막대 위 레이어 12px · 가운데 흰색 · 3px 외곽선(dot_col), 말풍선 숫자 17px 가운데 정렬."""
     x = max(0.0, min(100.0, x))
     w = _bubble_w(text)
     at = f"clamp({GAUGE_INSET}px, {x:.1f}%, calc(100% - {GAUGE_INSET}px))"
-    return (f'<span style="position:absolute;left:clamp(0px, calc({at} - {w / 2:g}px), calc(100% - {w}px));width:{w}px;bottom:16px;z-index:1;background:{col};color:#fff;font-weight:400;'
+    return (f'<span style="position:absolute;left:clamp(0px, calc({at} - {w / 2:g}px), calc(100% - {w}px));width:{w}px;bottom:16px;z-index:1;background:{col};color:#fff;font-weight:{weight};'
             f'font-size:{BUBBLE_FONT}px;display:flex;align-items:center;justify-content:center;height:{BUBBLE_H}px;line-height:1;padding:0;box-sizing:border-box;border-radius:8px;white-space:nowrap;"><span>{_esc(text)}</span></span>'
             f'<span style="position:absolute;left:{at};bottom:10px;z-index:1;transform:translateX(-50%);width:0;height:0;'
             f'border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid {col};"></span>'
@@ -1554,7 +1555,7 @@ def _gauge_tip(x, text, col, dot_col):
 GAUGE_PULL = 23   # 상태 카드 끝 범위 막대 흰 카드 아래 여백 17 → 8 (P59) — 줄(li) · 목록(ul) 여백과 겹쳐(collapse) 줄어드는 만큼 더 당긴다 (크롬 실측)
 
 
-def _zone_gauge(x, zone, names, bubble, aria, ends=None, last=False):
+def _zone_gauge(x, zone, names, bubble, aria, ends=None, last=False, weight=400):
     """세 칸 막대 + 말풍선 (2026-10-23 사용자 첨부 그림). x = 말풍선 위치 %(0~100), zone = 색을 진하게 할 칸(0 · 1 · 2),
     names = [(칸 이름, 폭 %)] 셋. 칸 바탕색은 파랑 · 검정 · 빨강 — zone 칸은 20% 밝게, 나머지 60% 밝게. 말풍선 · zone 칸 이름은 zone 칸 색.
     점 · 꼬리 = 막대 끝에서 GAUGE_INSET 안쪽까지, 말풍선 = 카드 안에 멈추고 꼬리만 그 안에서 움직인다 (2026-10-25 사용자)."""
@@ -1568,7 +1569,7 @@ def _zone_gauge(x, zone, names, bubble, aria, ends=None, last=False):
     # 범위 글자가 길면(SK하이닉스 190만 원대) 물결 뒤에서만 줄바꿈 — 빈칸은 붙여 둔다 (2026-10-28 사용자 P60)
     labs = "".join(f'<span style="flex:0 0 {wd}%;text-align:{"left" if i == 0 else "right" if i == end_i else "center"};font-size:{TINY};line-height:20px;white-space:normal;word-break:keep-all;'
                    f'color:{colors[i] if i == zone else NOTE};font-weight:{700 if i == zone else 400};">{_wave_break(_esc(nm).replace(" ", "&nbsp;"))}</span>' for i, (nm, wd) in enumerate(names))
-    tip = _gauge_tip(x, bubble, col, RANGE_BASE[zone])
+    tip = _gauge_tip(x, bubble, col, RANGE_BASE[zone], weight)
     if ends:   # 말풍선이 끝 쪽에 오면 그쪽 끝 눈금은 숨긴다 — 말풍선 밑으로 글자 조각이 삐져나온다
         ends = ("" if x < 20 else ends[0], "" if x > 80 else ends[1])
     pad = _dk.SEP_GAP - _dk.VP - 1
