@@ -407,7 +407,7 @@ def _pos_word(v, lo, hi):
 
 
 def _bars(title, groups, fg, bg, fmt, legend_text=""):
-    chart = C.col_chart(groups, [bg], [fg], fmt=fmt)
+    chart = C.col_chart(groups, [bg], [fg], fmt=fmt, right=True)   # 일별 막대 — 최신 오른쪽 (2026-10-31)
     if legend_text:   # 범례 자리 글(`날짜 : 10월 1일 ~ 23일`) — 왼쪽 5px · 넘겨 보기 오른쪽은 legend_top 이 (M40)
         chart = _dk.legend_top(chart, f'<span style="display:block;">{_dk.esc(legend_text)}</span>')
     return (f'{_dk.CHART_TITLE_M}{_dk.esc(title)}</span>'
@@ -415,10 +415,10 @@ def _bars(title, groups, fg, bg, fmt, legend_text=""):
 
 
 def _day_groups(ser, scale=1e4):
-    """일별 막대 — 최신이 왼쪽(P79), 가로축은 날짜만, 달이 처음 나오는 막대에만 `10.23` 처럼 달을 붙인다 (2026-10-29 사용자 M40: `1 2 6 7 …` 이 무슨 숫자인지 몰랐다).
+    """일별 막대 — 최신 오른쪽(2026-10-31, 옛 P79 최신 왼쪽), 가로축은 날짜만, 달이 처음 나오는 막대에만 `10.23` 처럼 달을 붙인다 (2026-10-29 사용자 M40: `1 2 6 7 …` 이 무슨 숫자인지 몰랐다).
     돌려주는 것 = (groups, 범례 글 `날짜 : 10월 1일 ~ 23일`)."""
     groups, seen = [], set()
-    for x in reversed(ser):
+    for x in ser:
         m, d = int(x["day"][5:7]), int(x["day"][8:])
         groups.append((f"{m}.{d}" if m not in seen else str(d), [x["v"] / scale]))
         seen.add(m)
@@ -615,12 +615,12 @@ LEVEL_BAR = "#A7B4C6"   # 수준 값(PER · 배당수익률 · 풋/콜 · 거래
 
 def _cmp_chart(title, items, cmp_name, fmt, level=True):
     """달마다(또는 분기마다) 값 막대 + 회색 비교 대상 막대 (2026-10-29 사용자 M54 · M55 · M52: 월 · 분기 단위 비교 그래프).
-    items = [(가로축 이름, 값, 비교 값)] 최신이 왼쪽(P79). level=True 면 값 막대는 LEVEL_BAR(수준), False 면 증감 색(전년 대비 % 같은 ±값)."""
+    items = [(가로축 이름, 값, 비교 값)] 오래된 것 → 최신(최신 오른쪽, 2026-10-31). level=True 면 값 막대는 LEVEL_BAR(수준), False 면 증감 색(전년 대비 % 같은 ±값)."""
     groups = [(n, [v, c]) for n, v, c in items]
     main = (lambda v: LEVEL_BAR) if level else C.sign_bg
     lab = (lambda v: "#111") if level else C.sign_fg
     legend = ([(title.split(" (")[0].replace("최근 12개월 ", "").replace("최근 8분기 ", ""), LEVEL_BAR)] if level else []) + [(f"비교 대상 : {cmp_name}", C.GRAY_BAR)]
-    return C.chart_card(title, groups, [main, C.gray], [lab, C.note_fg], legend, fmt=fmt)
+    return C.chart_card(title, groups, [main, C.gray], [lab, C.note_fg], legend, fmt=fmt, right=True)
 
 
 def _monthly_card(title, state, color, lines, sec_html, opened=False, charts_arg=(), drop_sec_charts=False):
@@ -697,10 +697,10 @@ def funds_card(m):
             ser = x["series"]
             return {ser[i]["month"]: (ser[i]["v"] - ser[i - 1]["v"]) / 1e12 for i in range(1, len(ser))}
         dc, dd = diffs(cl), diffs(dp)
-        months = [mo_ for mo_ in sorted(dc) if mo_ in dd][-6:][::-1]
+        months = [mo_ for mo_ in sorted(dc) if mo_ in dd][-6:]
         groups = [(mo_[2:].replace("-", "."), [dc[mo_], dd[mo_]]) for mo_ in months]
         charts.append(C.chart_card("최근 6개월 전달 대비 증감 (조 원)", groups, [lambda v: "#F5B971", lambda v: "#A7B4C6"], [C.sign_fg, C.sign_fg],
-                                   [("신용융자 (빚투)", "#F5B971"), ("투자자 예탁금 (대기 자금)", "#A7B4C6")], fmt=lambda v: _s(v, 1, "")))
+                                   [("신용융자 (빚투)", "#F5B971"), ("투자자 예탁금 (대기 자금)", "#A7B4C6")], fmt=lambda v: _s(v, 1, ""), right=True))
     return _monthly_card("빚투 · 대기 자금은?", f"{_mo(mo)} " + " · ".join(st), "#111", lines, RK.sec_funds(m), charts_arg=charts)   # 답에 달 이름 (M53)
 
 
@@ -720,11 +720,11 @@ def valuation_card(m):
         lines.append((f"배당수익률은 {dy['v']:.2f}%로 " + (f"{_prev_mo(mo)}보다 {dw}습니다." if dw else f"{_prev_mo(mo)}과 같은 수준입니다."), "plain"))
     lines.append(_note(f"기록상 : {_rec(U.NO_RECORD['valuation'])}. 비싼지 싼지의 지금 상태를 보는 칸입니다."))
     state = f"{_mo(mo)} · {_prev_mo(mo)}보다 " + ("비싸짐" if w == "높아졌" else "싸짐" if w == "낮아졌" else "비슷")   # 답에 달 이름 (M53)
-    charts = [_cmp_chart("최근 12개월 KOSPI PER (배)", [(x["month"][2:].replace("-", "."), x["v"], per["avg_all"]) for x in per["series"][-12:][::-1]],
+    charts = [_cmp_chart("최근 12개월 KOSPI PER (배)", [(x["month"][2:].replace("-", "."), x["v"], per["avg_all"]) for x in per["series"][-12:]],
                          f"전체 기간 평균 {per['avg_all']:.1f}배", lambda v: f"{v:.1f}")]   # 비교 = 전체 평균 (M54)
     gap = v.get("yield_gap")
     if dy and gap:
-        charts.append(_cmp_chart("최근 12개월 KOSPI 배당수익률 (%)", [(x["month"][2:].replace("-", "."), x["v"], gap["ktb3"]) for x in dy["series"][-12:][::-1]],
+        charts.append(_cmp_chart("최근 12개월 KOSPI 배당수익률 (%)", [(x["month"][2:].replace("-", "."), x["v"], gap["ktb3"]) for x in dy["series"][-12:]],
                                  f"국고채 3년 {gap['ktb3']:.2f}%", lambda v: f"{v:.2f}"))   # 배당 vs 채권 이자 = 일드갭을 그림으로
     return _monthly_card("코스피는 비싼가?", state, "#111", lines, RK.sec_valuation(m), charts_arg=charts, drop_sec_charts=True)
 
@@ -739,13 +739,13 @@ def derivatives_card(m):
               + ("하락에 대비하는 거래가 늘었다는 뜻입니다." if w == "올랐" else "하락에 대비하는 거래가 줄었다는 뜻입니다." if w == "내렸" else "")
               + (" 1보다 작아 오를 때 이익인 콜옵션이 더 많이 거래됐습니다." if pc < 1 else " 1보다 커서 내릴 때 이익인 풋옵션이 더 많이 거래됐습니다."), "plain")]
     state = f"{_mo(mo)} 하락 대비 " + ("늘어남" if w == "올랐" else "줄어듦" if w == "내렸" else "비슷")   # 답에 달 이름 (M53)
-    charts = [_cmp_chart("최근 12개월 풋/콜 거래량 비율", [(x["month"][2:].replace("-", "."), x["v"], 1.0) for x in d["pc_series"][-12:][::-1]],
+    charts = [_cmp_chart("최근 12개월 풋/콜 거래량 비율", [(x["month"][2:].replace("-", "."), x["v"], 1.0) for x in d["pc_series"][-12:]],
                          "1.0 (풋 = 콜, 넘으면 하락 대비가 더 많음)", lambda v: f"{v:.2f}")]   # M54
     fa = d.get("fut_amt_avg")
     if fa and len(fa.get("series") or []) >= 2:
         ser = fa["series"][-12:]
         avg = sum(x["v"] for x in ser) / len(ser)
-        charts.append(_cmp_chart("최근 12개월 주가지수선물 하루 거래금액 (조 원)", [(x["month"][2:].replace("-", "."), x["v"] / 1e6, avg / 1e6) for x in ser[::-1]],
+        charts.append(_cmp_chart("최근 12개월 주가지수선물 하루 거래금액 (조 원)", [(x["month"][2:].replace("-", "."), x["v"] / 1e6, avg / 1e6) for x in ser],
                                  f"12개월 평균 {avg / 1e6:.1f}조", lambda v: f"{v:.1f}"))
     return _monthly_card("파생 시장 분위기는?", state, "#111", lines, RK.sec_derivatives(m), charts_arg=charts, drop_sec_charts=True)
 
@@ -772,10 +772,10 @@ def macro_card(m):
     charts = []
     ex, cpi = mac.get("exports"), mac.get("cpi")
     if ex and len(ex.get("series") or []) >= 2:   # 월별 지표라 분기 대신 12개월 (M55)
-        charts.append(_cmp_chart("최근 12개월 수출 전년 동월 대비 (%)", [(x["month"][2:].replace("-", "."), x["v"], ex["avg12"]) for x in ex["series"][-12:][::-1]],
+        charts.append(_cmp_chart("최근 12개월 수출 전년 동월 대비 (%)", [(x["month"][2:].replace("-", "."), x["v"], ex["avg12"]) for x in ex["series"][-12:]],
                                  f"12개월 평균 {_s(ex['avg12'], 1)}", lambda v: _s(v, 1, ""), level=False))
     if cpi and len(cpi.get("series") or []) >= 2:
-        charts.append(_cmp_chart("최근 12개월 소비자물가 전년 동월 대비 (%)", [(x["month"][2:].replace("-", "."), x["v"], 2.0) for x in cpi["series"][-12:][::-1]],
+        charts.append(_cmp_chart("최근 12개월 소비자물가 전년 동월 대비 (%)", [(x["month"][2:].replace("-", "."), x["v"], 2.0) for x in cpi["series"][-12:]],
                                  "한국은행 물가 목표 2%", lambda v: _s(v, 1, ""), level=False))
     return _monthly_card("경제 바탕은 어떤가?", f"좋아짐 {len(better)} · 나빠짐 {len(worse)}", "#111", lines, RK.sec_macro(m), charts_arg=charts)
 
@@ -793,7 +793,7 @@ def household_card(m):
         lines.append((f"가계 금융자산 가운데 주식 비중은 {share['v']:.1f}%입니다.", "plain"))
     state = f"{_qtr(q)} 남는 돈 " + ("늘어남" if sur["yoy"] > 0 else "줄어듦")   # 답에 분기 (M53)
     byq = {x["q"]: x["v"] for x in sur["series"]}
-    items = [(_dk.q_axis(x["q"]), x["v"] / 1e4, (byq.get(f"{int(x['q'][:4]) - 1}{x['q'][4:]}") or 0) / 1e4 or None) for x in sur["series"][-8:][::-1]]   # 비교 = 1년 전 같은 분기 (M52)
+    items = [(_dk.q_axis(x["q"]), x["v"] / 1e4, (byq.get(f"{int(x['q'][:4]) - 1}{x['q'][4:]}") or 0) / 1e4 or None) for x in sur["series"][-8:]]   # 비교 = 1년 전 같은 분기 (M52)
     charts = [_cmp_chart("최근 8분기 가구당 월평균 흑자액 (만 원)", items, "1년 전 같은 분기", lambda v: f"{v:,.0f}")]
     return _monthly_card("개인은 살 돈이 있나?", state, "#111", lines, RK.sec_household(m), charts_arg=charts)
 

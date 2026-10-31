@@ -290,7 +290,7 @@ def col_axis(vals, height, lbl):
     return ticks, lbl + hi * scale, scale
 
 
-def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w):
+def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w, right=False):
     """세로 막대 그래프 틀 — 왼쪽 세로축 숫자 + 연한 가로 눈금선 + 0 기준선, 막대 · 가로축 이름은 그 오른쪽 (2026-10-26 사용자: "막대 그래프에 가로 눈금선, 좌측에 눈금 기준").
     bars_html 은 막대 칸(0~100%) 기준으로 놓인 막대 · 숫자. 눈금 · top · scale 은 col_axis 가 정한다."""
     step = (ticks[1] - ticks[0]) if len(ticks) > 1 else 1
@@ -306,8 +306,34 @@ def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w):
     plot = (f'<span style="position:absolute;left:{gut}px;right:0;top:0;bottom:0;">'
             f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>{bars_html}</span>')
     xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;">{"<br>".join(esc(x) for x in g.split(chr(10)))}</span>' for g in axis_names)   # 긴 이름은 두 줄로 — 묶음 폭 상한(AXIS_MAX) 때문 (P155)   # 이름 아래 줄(연결 이유 · `지금`)은 줄바꿈 (2026-10-27 P31 · P36)
+    if right:
+        return _col_frame_right(bars_html, axis_names, height, top, scale, ticks, min_w, fmt, gut)
     return scroll_x(f'<span style="display:block;position:relative;height:{height}px;">{"".join(grid)}{plot}</span>'
                     f'<span style="display:flex;padding-left:{gut}px;font-size:{AXIS_FS};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>', min_w + gut)
+
+
+def _col_frame_right(bars_html, axis_names, height, top, scale, ticks, min_w, fmt, gut):
+    """시간 순서 막대 — 최신 = 오른쪽 (2026-10-31 사용자: 선 그래프와 같은 방향으로 뒤집기, 옛 P79 최신 왼쪽).
+    세로축 숫자 = 오른쪽(넘겨도 그대로) · 처음엔 오른쪽 끝(최신) · `‹ 넘겨 보기` 왼쪽(넘칠 때만) · 왼쪽 그림자(넘길 것이 남았을 때, 테마 JS data-lscroll).
+    화면이 넓어 안 넘치면 그래프 칸을 꽉 채운다(min-width 블록)."""
+    lines, labels = [], []
+    for v in ticks:
+        y = top - v * scale
+        if abs(v) > 1e-12:
+            lines.append(f'<span style="position:absolute;left:0;right:0;top:{y:.1f}px;height:1px;background:{GRID_LINE};"></span>')
+        labels.append(f'<span style="position:absolute;right:0;width:{gut - 6}px;top:{y - 7:.1f}px;height:14px;line-height:14px;text-align:right;font-size:{GRID_FS}px;color:{NOTE};">{fmt(v)}</span>')
+    plot = (f'<span style="display:block;position:relative;height:{height}px;">{"".join(lines)}'
+            f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>{bars_html}</span>')
+    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;">{"<br>".join(esc(x) for x in g.split(chr(10)))}</span>' for g in axis_names)
+    inner = f'{plot}<span style="display:flex;font-size:{AXIS_FS};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>'
+    hint = (f'<span data-scroll-hint="1" data-lhint="1" style="display:block;text-align:left;font-size:{TINY};line-height:{LH_TINY};color:{FAINT};margin:{LEGEND_TOP}px 0 4px;">‹ {SCROLL_HINT}</span>'
+            if min_w > CHART_PHONE_W else "")
+    shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
+             'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>') if hint else ""
+    scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{gut}px;">'
+              f'<span style="display:block;direction:ltr;min-width:{min_w}px;">{inner}</span></span>')
+    axis = f'<span style="position:absolute;top:0;right:0;width:{gut}px;height:{height}px;">{"".join(labels)}</span>'
+    return f'{hint}<span style="display:block;position:relative;">{scroll}{shade}{axis}</span>'
 
 
 _HINT_RE = re.compile(r'^(<span data-scroll-hint="1"[^>]*>.*?</span>)', re.S)
@@ -376,6 +402,14 @@ def legend_top(chart_html, legend_html):
     if m:
         hint, chart_html = m.group(1).replace(f"margin:{LEGEND_TOP}px 0 4px;", "margin:0 0 0 auto;", 1), chart_html[m.end():]   # 위 5px 는 범례 줄이 갖는다 · 오른쪽 끝
         chart_html = chart_html.replace(f'data-shade-up="{SCROLL_SHADE_UP}"', 'data-shade-up="0"', 1).replace(f"padding-top:{SCROLL_SHADE_UP}px;margin-top:-{SCROLL_SHADE_UP}px;", "padding-top:0px;margin-top:-0px;", 1)
+    if 'data-lhint="1"' in hint:   # 최신 오른쪽 그래프 — `‹ 넘겨 보기` 왼쪽 · 범례 오른쪽 (선 그래프와 같게, 2026-10-31)
+        hint = hint.replace("margin:0 0 0 auto;", "margin:0;", 1)
+        lm = _LEGEND_RE.match(legend_html or "")
+        chips = (lm.group(1) if lm else legend_html or "").replace("margin:0 0 0 12px;", "margin:0;").replace("margin:0 12px 0 0;", "margin:0;")
+        top = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;'
+               f'font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:{LEGEND_TOP}px 0 4px;padding-left:{LEGEND_LEFT}px;">'
+               f'{hint}<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;column-gap:12px;margin-left:auto;">{chips}</span></span>')
+        return top + chart_html + '<span style="display:block;height:4px;"></span>'
     lm = _LEGEND_RE.match(legend_html or "")
     chips = (lm.group(1) if lm else legend_html or "").replace("margin:0 0 0 12px;", "margin:0;").replace("margin:0 12px 0 0;", "margin:0;")   # 칩 사이는 줄의 column-gap 12px
     # 칩마다 따로 줄바꿈 — 길면 `비교 대상 : …` 이 아랫줄로 내려가고 `넘겨 보기` 는 그 같은 줄 오른쪽 (2026-10-28 사용자 P73). 범례 왼쪽 5px (P50)

@@ -500,7 +500,7 @@ def _chart_label_px(bars):
     return _dk.BAR_NUM_PX   # 2026-10-27 사용자: 모든 그래프 13px 하나로 — 숫자는 자기 칸 · 모자라면 가로 스크롤(10-26)이라 막대 수로 줄일 까닭이 없어졌다
 
 
-def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, color_at=None):
+def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, color_at=None, right=False):
     """세로 막대 그래프 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수. 값은 막대 끝에 숫자 (2026-10-17 사용자: 그래프화).
     숫자 글자는 막대 수에 따라 11~17px (_chart_label_px). 글자 자리(위아래 여백)도 그만큼 넓힌다.
     숫자는 자기 막대 폭 안에만 — 막대 · 다른 숫자와 절대 겹치지 않게 막대 폭을 숫자 폭 이상으로 잡고, 화면이 모자라면 가로 스크롤 (2026-10-26 사용자, 가이드라인 8절).
@@ -528,7 +528,7 @@ def _col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, color_at=
             parts.append(f'<span style="position:absolute;{_dk.bar_x(i, k, n, ns, bw, lw)}top:{y:.1f}px;height:{h:.1f}px;background:{bg};border-radius:{rad};"></span>')
             parts.append(f'<span style="position:absolute;{_dk.bar_x(i, k, n, ns, bw, lw, label=True)}top:{ly:.1f}px;height:{lbl - 2}px;line-height:{lbl - 2}px;text-align:center;font-size:{fs}px;'
                          f'font-weight:700;white-space:nowrap;color:{fg};">{txt(v)}</span>')
-    return _dk.col_frame("".join(parts), [g for g, _ in groups], height, top, scale, ticks, min_w)
+    return _dk.col_frame("".join(parts), [g for g, _ in groups], height, top, scale, ticks, min_w, right=right)   # right = 시간 순서 막대, 최신 오른쪽 (2026-10-31)
 
 
 _PASTEL_UP, _PASTEL_DN, _GRAY_BAR = "#ED8E87", "#82B1F0", "#CBD5E1"   # 엔비디아 막대 — 파스텔(#F8C4BF · #BCD3F5)을 포화색(#d93025 · #1a73e8) 쪽으로 20% 진하게 한 번(#F2A6A0 · #9CC0F2), 사용자 요청으로 한 번 더 20% (2026-10-17), S&P 500 회색은 그대로
@@ -1137,7 +1137,7 @@ def sec_earnings(a):
         tip_now = (f"\n· 보통 ±{em['median_abs']:.1f}% : 최근 {n}번 중 절반은 이보다 작게, 절반은 크게 움직였다"
                    + (f". 보통 날의 약 {times:.0f}배" if times else ""))
         rows += _row_html("발표 다음 날 보통 변동", f"±{em['median_abs']:.1f}%", note, first=first)
-        chart = _col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in em["moves"][::-1]], [_sign_bg], [_sign_fg], height=130)   # 최신이 왼쪽 (P79)
+        chart = _col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in em["moves"]], [_sign_bg], [_sign_fg], height=130, right=True)   # 최신이 왼쪽 (P79)
         rows += (f'<span style="display:block;{MULTI_SEP}padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px 0;">'
                  f'{_dk.CHART_TITLE}최근 {n}번의 실적 발표 다음 날 (%)</span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')   # 설명 글(왼쪽이 오래된 것 · 연.월)은 삭제 (2026-10-17 사용자)
@@ -2256,9 +2256,9 @@ def _status_group(a, group):
     return _sub_label(rr.GROUP_KO[group]) + _ccard(rows) + (_guide(*GROUP_NOTE[group]) if GROUP_NOTE.get(group) else "")
 
 
-def _chart_card(groups, colors, label_colors, legend, fmt=None):
+def _chart_card(groups, colors, label_colors, legend, fmt=None, right=False):
     pad = _dk.SEP_GAP - _dk.VP - 1
-    chart = _col_chart(groups, colors, label_colors, fmt=fmt)
+    chart = _col_chart(groups, colors, label_colors, fmt=fmt, right=right)
     return f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, _legend_chips(legend))}</span></span>'
 
 
@@ -2281,9 +2281,9 @@ def card_revenue(c):
         first += f" 같은 때 기술주 15개는 보통 {_sgn(p, 0)}%였다."
     if c.get("beat") is not None and c.get("guide_next"):
         first += f" 회사가 미리 내놓은 전망보다 {abs(c['beat']):.1f}% {'많았고' if c['beat'] >= 0 else '적었고'}, 다음 분기는 {_ok(c['guide_next'])}를 내다봤다."
-    groups = [(_dk.q_axis(b["cq"]), [b["stock"], b["peers"]]) for b in c["bars"][::-1]]   # `25.3Q` → `25년 3분기` (P63) · 최신이 왼쪽 (P79)
+    groups = [(_dk.q_axis(b["cq"]), [b["stock"], b["peers"]]) for b in c["bars"]]   # 최신 오른쪽 (2026-10-31, 옛 P79 최신 왼쪽) · `25.3Q` → `25년 3분기` (P63)
     chart = _chart_card(groups, [_sign_bg, _gray], [_sign_fg, _note_fg], [("엔비디아 늘어남", _PASTEL_UP), ("엔비디아 줄어듦", _PASTEL_DN), (_PEER_LBL, _GRAY_BAR)],
-                        fmt=lambda v: f"{v:+.0f}".replace("-", "−"))
+                        fmt=lambda v: f"{v:+.0f}".replace("-", "−"), right=True)
     lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 매출, 1년 전 대비 (%)</span>{chart}', "html")]
     if p is not None:
         lines.append(("row", "기술주 15개와 차이", _pp(c["yoy"] - p), "같은 달력 분기 중앙값과 비교"))
@@ -2435,7 +2435,7 @@ def cal_earnings(c):
         first += f" 옵션 시장은 이번 발표 하루에 약 ±{c['market_exp']:.1f}%를 예상한다(추정)."
     lines = [(first, "plain")]
     if c["bars"]:   # 오늘 탭 `실적 발표 후 가격 변동` 그래프와 같게 (2026-10-18 사용자)
-        chart = _col_chart([(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["ret"]]) for b in c["bars"][::-1]], [_sign_bg], [_sign_fg], height=130)   # 최신이 왼쪽 (2026-10-28 사용자 P71 · P79)
+        chart = _col_chart([(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["ret"]]) for b in c["bars"]], [_sign_bg], [_sign_fg], height=130, right=True)   # 최신이 왼쪽 (2026-10-28 사용자 P71 · P79)
         pad = _dk.SEP_GAP - _dk.VP - 1
         card = f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span>'   # 범례 줄이 없어 아래는 이름 줄 6 + 4 — 위아래 10 (2026-10-26)
         lines.append((f'{_dk.CHART_TITLE_M}최근 {len(c["bars"])}번의 실적 발표 다음 날 (%)</span>{card}', "html"))

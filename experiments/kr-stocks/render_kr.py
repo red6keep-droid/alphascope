@@ -398,7 +398,7 @@ def _yoy_groups(series, key, label, n=6):
         prev = by.get(f"{int(x[key][:4]) - 1}{x[key][4:]}")
         if prev is not None:
             out.append((label(x[key]), [x["v"], prev]))
-    return out[::-1]   # 최신이 왼쪽 — 넘겨 보기는 오른쪽(과거)으로 (2026-10-28 사용자 P79, 위 봉차트는 그대로)
+    return out   # 오래된 것 → 최신 (2026-10-31 최신 오른쪽, 옛 P79 최신 왼쪽)
 
 
 LINE_THIS = "#5B8DEF"   # 선 그래프 이 종목(올해) 선 — 그래프 비교 목업에서 정한 파랑 (P161)
@@ -408,7 +408,7 @@ def _yoy_chart(title, groups, fmt, unit="", now="올해", then="작년 같은 �
     """올해 vs 작년 같은 때 — 선 그래프 (2026-10-31 사용자 P161: 업계 상황 탭부터, 옛 막대 최신 왼쪽). groups = _yoy_groups(최신이 앞) 그대로 받아 뒤집는다."""
     if not groups:
         return []
-    gs = groups[::-1]   # 오래된 것 → 최신
+    gs = groups   # 오래된 것 → 최신 (_yoy_groups)
     chart = R.line_chart([g for g, _ in gs], [(now, [v[0] for _, v in gs], LINE_THIS, False), (then, [v[1] for _, v in gs], R.LINE_GRAY, True)], fmt, unit)
     return [(f'{_dk.CHART_TITLE_M}{_esc(title)}</span>{chart}', "html")]
 
@@ -1039,7 +1039,7 @@ def cal_earn_card(s, c):
         first += f" 지난 {len(c['bars'])}번 발표 날 주가는 보통 ±{c['median']:.1f}% 움직여 평소 하루(±{c['normal']:.1f}%)의 약 {r:.1f}배였다."
     lines = [(first + R.small_note("일정이 변동될 수 있습니다."), "plain")]   # 옛 `(Yahoo Finance 일정이라 바뀔 수 있음)` (P70)
     if c["bars"]:
-        chart = R._col_chart([(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["ret"]]) for b in c["bars"][::-1]], [R._sign_bg], [R._sign_fg], height=130)   # 최신이 왼쪽 (2026-10-28 사용자 P71 · P79)
+        chart = R._col_chart([(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["ret"]]) for b in c["bars"]], [R._sign_bg], [R._sign_fg], height=130, right=True)   # 최신이 왼쪽 (2026-10-28 사용자 P71 · P79)
         pad = _dk.SEP_GAP - _dk.VP - 1
         lines.append((f'{_dk.CHART_TITLE_M}최근 {len(c["bars"])}번의 실적 발표 날 (%)</span>'
                       f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span>', "html"))
@@ -1208,7 +1208,7 @@ def sec_foreign(m):
     if f.get("kosdaq_today") is not None:
         rows += _row_html("코스닥 오늘", f'<span style="color:{UP if f["kosdaq_today"] > 0 else DOWN};">{_sgn(f["kosdaq_today"], 0)}억</span>', "", inline_note=True)
     ser = f["series"][-FLOW_CHART_N:]
-    chart = R._col_chart([(str(int(x["day"][8:])), [x["v"] / 1e4]) for x in ser[::-1]], [R._sign_bg], [R._sign_fg], height=130, fmt=lambda v: f"{v:+.1f}".replace("-", "−"))   # 라벨 = 일(日)만 — 폰에서 "10.13" 은 두 줄로 끊긴다
+    chart = R._col_chart([(str(int(x["day"][8:])), [x["v"] / 1e4]) for x in ser], [R._sign_bg], [R._sign_fg], height=130, fmt=lambda v: f"{v:+.1f}".replace("-", "−"), right=True)   # 라벨 = 일(日)만 — 폰에서 "10.13" 은 두 줄로 끊긴다
     rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 {len(ser)}거래일 외국인 순매수 (조 원) <span style="font-size:{_dk.MICRO};font-weight:400;color:{NOTE};">{_month_span(ser)}</span></span>'
              f'<span style="display:block;height:6px;"></span>{chart}</span>')
     return R._card_title("외국인은 사고 있나?", _dk.with_src(foreign_tip(f), SRC)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
@@ -1267,9 +1267,9 @@ def sec_investors(m):
                 return x["v"] / 1e6   # 백만원 → 조원
         return None
     # 세 주체는 고정 색 (증감 색이 아님 — 증감 색이면 범례 규칙이 외국인 칩을 지워 `기관 · 개인` 만 남았다, 2026-10-29 사용자 M50 · M56)
-    groups = [(mo[2:].replace("-", "."), [_v("foreign", mo), _v("inst", mo), _v("indiv", mo)]) for mo in months[::-1]]   # 최신이 왼쪽 (P79)
+    groups = [(mo[2:].replace("-", "."), [_v("foreign", mo), _v("inst", mo), _v("indiv", mo)]) for mo in months]   # 최신 오른쪽 (2026-10-31, 옛 P79)
     chart = R._col_chart(groups, [lambda v: c for c in WHO_COLORS], [R._sign_fg, R._sign_fg, R._sign_fg], height=150,   # 순매수 숫자는 모두 증감 색 (M6)
-                         fmt=lambda v: f"{v:+.0f}".replace("-", "−"))
+                         fmt=lambda v: f"{v:+.0f}".replace("-", "−"), right=True)
     legend = R._legend_chips(list(zip(WHO_NAMES, WHO_COLORS)))
     last = months[-1]
     rows = "".join(_row_html(n, f'<span style="color:{UP if (_v(k, last) or 0) > 0 else DOWN};">{_sgn(_v(k, last) or 0, 1)}조</span>', f"{last[:4]}년 {int(last[5:])}월 순매수", first=i == 0, inline_note=True)
@@ -1280,8 +1280,8 @@ def sec_investors(m):
         # 날짜는 위 줄처럼 괄호 안에 짧게, 설명(사고판 돈 · 12개월 범위 · 과열)은 카드 문장으로 (2026-10-29 사용자 M56)
         rows += _row_html("거래 비중", f'<span style="color:#111;">개인 {L["indiv"]:.0f}%</span><br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">외국인 {L["foreign"]:.0f}% · 기관 {L["inst"]:.0f}%</span>',
                             f"{L['month'][:4]}년 {int(L['month'][5:])}월", inline_note=True)
-        sch = R._col_chart([(x["month"][2:].replace("-", "."), [x["foreign"], x["inst"], x["indiv"]]) for x in sh["series"][-6:][::-1]],   # 순매수 그래프와 같은 순서 · 같은 색
-                           [lambda v: c for c in WHO_COLORS], [lambda v: NOTE] * 3, height=120, fmt=lambda v: f"{v:.0f}")
+        sch = R._col_chart([(x["month"][2:].replace("-", "."), [x["foreign"], x["inst"], x["indiv"]]) for x in sh["series"][-6:]],   # 순매수 그래프와 같은 순서 · 같은 색
+                           [lambda v: c for c in WHO_COLORS], [lambda v: NOTE] * 3, height=120, fmt=lambda v: f"{v:.0f}", right=True)
         rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}거래 비중 (%) — 그달 사고판 돈 중 각자의 몫</span>'
                  f'<span style="display:block;height:6px;"></span>{_dk.legend_top(sch, R._legend_chips(list(zip(WHO_NAMES, WHO_COLORS))))}</span>')
     tip = ("한 달 동안 외국인 · 기관 · 개인이 각각 산 금액에서 판 금액을 뺀 것(유가증권 + 코스닥), 그리고 전체 거래에서 각자가 차지한 비중. 월별 자료라 지난달까지\n"
@@ -1376,7 +1376,7 @@ def sec_heat(m):
             rows += _row_html("유가증권 시가총액", f'<span style="color:#111;">{mc["v"] / 1e4:,.0f}조 원</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{UP if d1 > 0 else DOWN if d1 < 0 else NOTE};">{_sgn(d1, 2)}%</span>' if d1 is not None else ""),
                                 f"시장 전체 크기 · 1년 {mc['lo_1y'] / 1e4:,.0f}~{mc['hi_1y'] / 1e4:,.0f}조의 위에서 {100 - mc['pct_rank_1y']:.0f}% 지점")
         ser = h["series"][-FLOW_CHART_N:]
-        chart = R._col_chart([(str(int(x["day"][8:])), [x["v"] / 1e4]) for x in ser[::-1]], [lambda v: "#CBD5E1"], [lambda v: NOTE], height=120, fmt=lambda v: f"{v:.1f}")
+        chart = R._col_chart([(str(int(x["day"][8:])), [x["v"] / 1e4]) for x in ser], [lambda v: "#CBD5E1"], [lambda v: NOTE], height=120, fmt=lambda v: f"{v:.1f}", right=True)
         rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 {len(ser)}거래일 거래대금 (조 원) <span style="font-size:{_dk.MICRO};font-weight:400;color:{NOTE};">{_month_span(ser)}</span></span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')
     if n:
@@ -1410,7 +1410,7 @@ def sec_valuation(m):
         rows += _row_html("일드갭 (배당수익률 − 국고채 3년)", f'<span style="color:{UP if yg["v"] > 0 else DOWN};">{_sgn(yg["v"], 2)}%p</span>',
                             f"국고채 3년 {yg['ktb3']:.2f}% · 양수면 배당이 채권 이자보다 높다 · 기록상 이후 KOSPI 와 관계 없음(값만)")
     ser = per["series"][-12:]
-    chart = R._col_chart([(x["month"][2:].replace("-", "."), [x["v"]]) for x in ser[::-1]], [lambda v: "#CBD5E1"], [lambda v: NOTE], height=120, fmt=lambda v: f"{v:.1f}")
+    chart = R._col_chart([(x["month"][2:].replace("-", "."), [x["v"]]) for x in ser], [lambda v: "#CBD5E1"], [lambda v: NOTE], height=120, fmt=lambda v: f"{v:.1f}", right=True)
     rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 12개월 KOSPI PER (배)</span>'
              f'<span style="display:block;height:6px;"></span>{chart}</span>')
     tip = ("시장 전체가 이익에 견줘 얼마나 비싼지(PER, 높을수록 비쌈)와 배당으로 돌려주는 비율. 월별 자료라 지난달까지\n"
@@ -1433,7 +1433,7 @@ def sec_derivatives(m):
     if oa:
         rows += _row_html("주가지수옵션 하루 거래대금", f'<span style="color:#111;">{oa["v"] / 1e6:.2f}조</span>', f"{mo} 일평균 · 12개월 {oa['lo12'] / 1e6:.2f}~{oa['hi12'] / 1e6:.2f}조")
     ser = d["pc_series"]
-    chart = R._col_chart([(x["month"][2:].replace("-", "."), [x["v"]]) for x in ser[::-1]], [lambda v: "#ED8E87" if v > 1 else "#CBD5E1"], [lambda v: NOTE], height=120, fmt=lambda v: f"{v:.2f}")
+    chart = R._col_chart([(x["month"][2:].replace("-", "."), [x["v"]]) for x in ser], [lambda v: "#ED8E87" if v > 1 else "#CBD5E1"], [lambda v: NOTE], height=120, fmt=lambda v: f"{v:.2f}", right=True)
     rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 12개월 풋/콜 거래량 비율</span>'
              f'<span style="display:block;height:6px;"></span>{chart}</span>')
     tip = ("선물 · 옵션 시장의 분위기. 풋옵션(내릴 때 이익)이 콜옵션보다 많이 거래되면 하락에 대비하는 투자자가 많다는 뜻. 월별 자료라 지난달까지 — 일별 풋콜비율은 거래소 유료 자료라 두지 않는다\n"
@@ -1522,7 +1522,7 @@ def sec_household(m):
     if sb:
         v = sb["v"] / 1e3   # 십억 → 조
         row("가계의 국내 주식 순취득", f'<span style="color:{UP if v > 0 else DOWN};">{_sgn(v, 1)}조 원</span>', f"{_qlabel(sb['q'])} 한 분기 동안 산 금액 − 판 금액 · 양수면 개인이 주식을 늘림")
-        chart = R._col_chart([(_dk.q_axis(x["q"]), [x["v"] / 1e3]) for x in sb["series"][::-1]], [R._sign_bg], [R._sign_fg], height=120, fmt=lambda v: f"{v:+.1f}".replace("-", "−"))
+        chart = R._col_chart([(_dk.q_axis(x["q"]), [x["v"] / 1e3]) for x in sb["series"]], [R._sign_bg], [R._sign_fg], height=120, fmt=lambda v: f"{v:+.1f}".replace("-", "−"), right=True)
         rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 {len(sb["series"])}분기 가계의 국내 주식 순취득 (조 원)</span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')
     c = hh.get("hh_credit")

@@ -233,7 +233,7 @@ def sec_earnings(s, today):
         times = e["median_abs"] / e["normal_abs"] if e.get("normal_abs") else None
         note = f"최근 {n}번 기준" + (f" · 보통 날 하루 ±{e['normal_abs']:.1f}%의 약 {times:.0f}배" if times and times >= 1.5 else "")
         rows += R._row_html("발표 다음 날 보통 변동", f"±{e['median_abs']:.1f}%", note, first=first)
-        chart = R._col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in e["moves"][::-1]], [R._sign_bg], [R._sign_fg], height=130)   # 최신이 왼쪽 (2026-10-28 사용자 P79)
+        chart = R._col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in e["moves"]], [R._sign_bg], [R._sign_fg], height=130, right=True)   # 최신이 왼쪽 (2026-10-28 사용자 P79)
         rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">'
                  f'{_dk.CHART_TITLE}최근 {n}번의 실적 발표 다음 날 (%)</span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')
@@ -531,9 +531,9 @@ def card_capex(c):
         first += f" 같은 석 달 영업으로 번 돈 {_bil(ocf)}의 {cap / ocf * 100:.0f}%였다." if ocf > 0 else f" 같은 석 달 영업으로 번 돈은 {_bil(ocf)}였다."
     if rnd is not None:
         first += f" 연구개발비는 {_bil(rnd)}다."
-    groups = [(_dk.q_axis(b["cq"]), [None if b["capex"] is None else b["capex"] / 1e8, None if b["ocf"] is None else b["ocf"] / 1e8]) for b in c["bars"][::-1]]   # 최신이 왼쪽 (P79)
+    groups = [(_dk.q_axis(b["cq"]), [None if b["capex"] is None else b["capex"] / 1e8, None if b["ocf"] is None else b["ocf"] / 1e8]) for b in c["bars"]]   # 최신 오른쪽 (2026-10-31, 옛 P79)
     chart = R._chart_card(groups, [lambda v: R._AMBER, R._gray], [R._note_fg, R._note_fg], [("설비 투자", R._AMBER), ("영업으로 번 돈", R._GRAY_BAR)],
-                          fmt=lambda v: f"{v:,.0f}".replace("-", "−"))
+                          fmt=lambda v: f"{v:,.0f}".replace("-", "−"), right=True)
     lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 설비 투자와 영업으로 번 돈 (억 달러)</span>{chart}', "html")]
     sm, n4 = c["sum4"], c["n4"]
     tag = f"최근 {n4}분기 합" if n4 == 4 else "최근 4분기 없음"
