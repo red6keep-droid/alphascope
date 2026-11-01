@@ -1137,7 +1137,7 @@ def together_block(items, outer=None, title=True):
             out += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;'
                     f'min-height:{TOGETHER_ROW_H + add}px;padding:{6 + add}px 0 6px;box-sizing:border-box;cursor:pointer;border-top:1px solid {line};font-size:{_dk.NAME};line-height:{LH_CARD};">'   # 18 → 16 — 대답 · 라벨이 한 줄에 들어가게 (360px 줄 폭 286, P173)
                     f'<span style="min-width:0;color:#111;">{_esc(nm)}{hz}</span>'
-                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;font-weight:{400 if d == 0 else 700};color:{col};">{_esc(st.lstrip("▲▼ "))}'
+                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;font-weight:{400 if d == 0 else STATE_VAL_W};color:{col};">{_esc(st.lstrip("▲▼ "))}'
                     f'{TS.box(kind, word, _esc)}</span></span>')   # 대답 → 라벨. 나가는 아이콘은 뺐다 (2026-11-01 사용자 P204). 중립 대답은 보통 굵기 · 조금 빠진 검정 (P173)
     head = title
     title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 16px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>') if head else ""   # title=False = 강조 카드 안 줄 목록만 (P206)
@@ -1594,6 +1594,9 @@ def _dir_state(title, state):
     return f"▲ {state}" if d == SG.UP else f"▼ {state}" if d == SG.DOWN else state
 
 
+STATE_VAL_W = 600   # 강조 카드 근거 줄 오른쪽 값 굵기 700 → 600 (2026-11-01 사용자 P260) — PC 글꼴(나눔바른고딕 400 · 700)에선 700 으로 보인다
+
+
 def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False, opened=False, below_notes=False, state_rich=""):
     """상태 카드 (가이드라인 2-1 D, 2026-10-11 사용자: "별도 카드로 분리하고 이유도 카드에 포함" → "안내 아이콘 삭제, 글씨 검정, 블릿으로").
     첫 줄 구분명 좌·상태 우, 아래 얇은 선 뒤에 이유 글머리표(16px, 검정). 이유 묶음은 border-top — 홈 카드는 border-top 요소를 건너뛰므로 홈에는 첫 줄만 간다."""
@@ -1620,17 +1623,17 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'   # 오른쪽 값은 세로 가운데 (2026-10-18 사용자, 2-4 C-6)
                         f'<span style="flex:none;color:#111;">{_esc(name)}<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_note_tint(note)}</span></span>'
-                        f'<span style="min-width:0;text-align:right;font-weight:700;font-size:{_dk.NAME};word-break:keep-all;">{vals}</span></span></li>')   # 섹터 목록 값은 한 단계 작게 16px (2026-10-17 사용자)
+                        f'<span style="min-width:0;text-align:right;font-weight:{STATE_VAL_W};font-size:{_dk.NAME};word-break:keep-all;">{vals}</span></span></li>')   # 섹터 목록 값은 한 단계 작게 16px (2026-10-17 사용자)
             if inline:
                 lw = "flex:1 1 auto;min-width:0;word-break:keep-all;" if not fits else "flex:none;white-space:nowrap;"   # 안 들어가면 왼쪽 칸 안에서 줄바꿈
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
                         f'<span style="{lw}color:#111;">{_esc(name)} <span style="font-size:{TINY};color:{NOTE};">({_note_tint(note)})</span></span>'
-                        f'<span style="flex:none;text-align:right;font-weight:700;white-space:nowrap;">{vhtml}</span></span></li>')
+                        f'<span style="flex:none;text-align:right;font-weight:{STATE_VAL_W};white-space:nowrap;">{vhtml}</span></span></li>')
             nt = f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};white-space:normal;">{_note_tint(note)}</span>' if note else ""
             return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'   # 뜻 줄을 이름 칸 안에 두어 오른쪽 값이 두 줄의 세로 가운데 (2026-10-18 사용자)
                     f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-                    f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{_esc(name)}</span>{nt}</span><span style="flex:none;text-align:right;font-weight:700;word-break:keep-all;">{vhtml.replace(chr(10), "<br>")}</span></span></li>')
+                    f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{_esc(name)}</span>{nt}</span><span style="flex:none;text-align:right;font-weight:{STATE_VAL_W};word-break:keep-all;">{vhtml.replace(chr(10), "<br>")}</span></span></li>')
         if kind == "html":   # 그래프 · 자세한 지표 보기 같은 HTML 조각 (실적과 기대 탭, 2026-10-18)
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
         if kind == "rich":   # plain 과 같은 줄인데 글 안에 굵게 · 색 HTML 이 들어 있다 (방송 의견 문장, 2026-10-29 사용자 P95)
