@@ -929,7 +929,7 @@ def together_card(t):
         if top_g:
             where.append(f'<b style="font-weight:700;color:{c};">{w}</b>은 {" · ".join(_esc(g) for g in top_g)} 쪽')
     more = (f" {', '.join(where)}에 많다." if where else "")
-    more += note_span("줄을 누르면 자세한 내용으로 이동합니다.")   # 옛 `아래에서 분류별 판정과 … 볼 수 있다` 문장 대신 늘 같은 안내 (2026-11-01 사용자 P253)
+    more += note_span("라벨을 클릭하면 자세한 내용으로 이동합니다.", mark=True)   # 문구 · 앞 ※ (2026-11-01 사용자 P258)   # 옛 `아래에서 분류별 판정과 … 볼 수 있다` 문장 대신 늘 같은 안내 (2026-11-01 사용자 P253)
     lines = [(f"{dist}로 나뉜다.{more}", "rich"),   # 옛 `이 페이지 카드 n개의 판정이` (P209)
              (together_block(items, theme, title=False) + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or [], theme), "html")]
     tip = ("이 페이지 여러 카드의 판정을 분류별로 상승 · 하락 · 중립으로 다시 놓은 것. 줄마다 판정이 통하는 기간을 괄호에 적었다\n"
@@ -1900,10 +1900,11 @@ def small_note(text):
     return SMALL_NOTE + text
 
 
-def note_span(note):
-    """작은 회색 안내 한 줄 (괄호) — plain 줄은 SMALL_NOTE 로, rich 줄은 이것을 직접 붙인다."""
+def note_span(note, mark=False):
+    """작은 회색 안내 한 줄 (괄호) — plain 줄은 SMALL_NOTE 로, rich 줄은 이것을 직접 붙인다. mark=True 는 괄호 대신 앞에 ※ (P258)."""
     # 다음 줄 · 괄호 · 작은 글씨 행간 20 (2026-10-28 사용자 P76 · P77 · P78: 문장 끝에 이어 붙이니 본문 행간 32 를 따라 너무 벌어졌다)
-    return f'<span data-note="1" style="display:block;margin-top:4px;font-size:{TINY};line-height:20px;color:{NOTE};">({_esc(note)})</span>'
+    text = f"{_dk.CHART_MARK}{_esc(note)}" if mark else f"({_esc(note)})"
+    return f'<span data-note="1" style="display:block;margin-top:4px;font-size:{TINY};line-height:20px;color:{NOTE};">{text}</span>'
 
 
 def _plain_note(text):

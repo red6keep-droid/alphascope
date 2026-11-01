@@ -298,7 +298,7 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
 .post-body .rt-tabs-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), rgba(255,255,255,0)); }
 .post-body .rt-tabs-wrap[data-more*="l"]::before, .post-body .rt-tabs-wrap[data-more*="r"]::after { opacity: 1; }
 /* 탭 이름 사이 간격 +10% (2026-10-13 사용자: "모든 탭메뉴명과 메뉴명 사이 여백을 10% 늘려") — 탭 30 → 33, 서브탭 22 → 24, 전환 30 → 32, 하위탭 20 → 22 */
-.post-body .rt-tab { flex: none; padding: 8px 13px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) */
+.post-body .rt-tab { flex: none; padding: 8px 13px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) → 19 → 18 한 단계 작게 (2026-11-01 사용자 P259) */
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
