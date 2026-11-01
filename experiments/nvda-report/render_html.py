@@ -1080,7 +1080,7 @@ TOGETHER_TITLE = "Alpha Scope 데이터로 함께 보기"   # 방송 의견 아�
 
 # 함께 보기 안쪽 카드 (2026-10-31 사용자 P168): 상승 쪽 · 하락 쪽 · 중립을 각자 카드로 감싼다. 바깥 강조 카드와 같은 색이면 한 단계 진하게
 TOGETHER_FLAT = "#4B5563"   # 함께 보기 중립 대답 — 흐린 회색 대신 조금 빠진 검정 (2026-10-31 사용자 P173)
-TOGETHER_HEAD_FS, TOGETHER_ROW_H = "15px", 57   # `▲ 상승 쪽` 14 → 15 · 줄 높이 44 → 57 (×1.3) (2026-10-31 사용자 P169)
+TOGETHER_HEAD_FS, TOGETHER_ROW_H = "15px", 38   # `▲ 상승 쪽` 14 → 15 · 줄 높이 44 → 57 (×1.3) (2026-10-31 사용자 P169) → 38: 라벨(25) 사이 위아래 여백 32 → 13 (60% 줄임, 정수, 2026-11-01 사용자 P239)
 TOGETHER_END = "<!--together-end-->"   # 강조 카드가 함께 보기로 끝나면 아래 = 좌우 15 로 당긴다 (_pull_end_chart, P169)
 TOGETHER_DEEP = {"positive": ("#FFEDD8", "#FCD9AD"), "negative": ("#E1EDFE", "#C3DBFB"), "neutral": ("#FFFFFF", "#E2E8F0")}
 BLOG_LOGO = ('<svg viewBox="0 0 313 286" width="18" height="16" aria-hidden="true" style="flex:none;display:block;">'
