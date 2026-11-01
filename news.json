@@ -1,21 +1,61 @@
 {
-  "updated_at": "2026-11-01 18:06:32 UTC",
+  "updated_at": "2026-11-01 21:46:28 UTC",
   "items": [
     {
-      "title": "Democratic Rep. Stevens endorses Rogers over El-Sayed in Michigan Senate election",
+      "title": "Judge dismisses Alaska Senate election lawsuit; DOJ vows appeal",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/alaska-senate-doj-lawsuit-dismissed-sullivan-peltola.html",
+      "published": "2026-11-01 21:25:03",
+      "title_ko": "판사, 알래스카 상원 선거 소송 기각; 법무부 항소 의지",
+      "summary_ko": "민주당 후보 메리 펠톨라, 공화당 현역 댄 설리번 등 2명과 대결"
+    },
+    {
+      "title": "Democratic Rep. Stevens endorses Republican Rogers over rival El-Sayed in Michigan Senate election",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/01/michigan-senate-stevens-rogers-endorsement-el-sayed.html",
-      "published": "2026-11-01 17:59:38",
+      "published": "2026-11-01 21:06:42",
       "title_ko": "민주당 의원 스티븐스, 미시간 상원 선거에서 로저스 지지",
       "summary_ko": "스티븐스, 엘-사이드 후보 패배"
     },
     {
-      "title": "Alaska Sen. Sullivan says he'll accept election results, slams Peltola campaign’s reported recruitment of 2nd Sullivan",
+      "title": "Here are 3 big things we're watching in the stock market in the week ahead",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/01/alaska-senate-election-dan-sullivan-peltola.html",
-      "published": "2026-11-01 17:12:59",
-      "title_ko": "알래스카 상원 의원 설리번, 선거 결과 수용 선언·펠톨라 캠페인 2차 모집 비판",
-      "summary_ko": "트럼프 DOJ, 알래스카에 인증 거부 소송 제기"
+      "link": "https://www.cnbc.com/investingclub/2026/11/01/3-big-things-were-watching-in-the-stock-market-this-week.html",
+      "published": "2026-11-01 18:12:05",
+      "title_ko": "다음 주 증시에서 주목할 3가지 큰 이슈",
+      "summary_ko": "시장, 며칠간의 승리가 필요하다는 평가"
+    },
+    {
+      "title": "미국 중간선거 최종 국면",
+      "title_ko": "미국 중간선거 최종 국면",
+      "summary_ko": "중간선거를 앞두고 의회 권력 교체 여부와 경제 이슈가 최대 쟁점으로 부각 중",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=_dyvftxRfjs",
+      "published": "2026-11-01 16:44:02",
+      "kind": "media",
+      "tag": "정책/규제",
+      "direction": "neutral",
+      "n_channels": 1
+    },
+    {
+      "title": "이란 전쟁 및 호르무즈 해협 리스크",
+      "title_ko": "이란 전쟁 및 호르무즈 해협 리스크",
+      "summary_ko": "이란과의 갈등과 해협 봉쇄로 인해 에너지 가격과 물가 압력이 지속 중",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=_dyvftxRfjs",
+      "published": "2026-11-01 16:44:02",
+      "kind": "media",
+      "tag": "지정학",
+      "direction": "negative",
+      "n_channels": 1
+    },
+    {
+      "title": "For JPMorgan, Amazon, fighting AI bots like Meta Muse may not be a winning long-term strategy",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/jpmorgan-amazon-ai-agents-meta-muse.html",
+      "published": "2026-11-01 16:34:43",
+      "title_ko": "JP모건, 아마존, 메타 뮤즈 같은 AI 봇과의 싸움은 장기적으로 승산 없는 전략일 수 있다",
+      "summary_ko": "소매 전문가, 고객 마찰 제거 기술이 통상 우세하다고 경고"
     },
     {
       "title": "Everything changed for the oil, AI and bond trades over the past month",
@@ -24,18 +64,6 @@
       "published": "2026-11-01 15:58:24",
       "title_ko": "지난 한 달, 유가 · AI · 채권 트레이드 모두 변했다",
       "summary_ko": "트레이더, AI 붕괴 우려 인플레이션보다 높음"
-    },
-    {
-      "title": "중간선거 결과와 의회 통제권 변화",
-      "title_ko": "중간선거 결과와 의회 통제권 변화",
-      "summary_ko": "중간선거 이후 의회 통제권에 따라 향후 입법 방향과 lame duck 세션의 정책 처리가 달라질 수 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=jyM31IJL8N8",
-      "published": "2026-11-01 15:55:03",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "neutral",
-      "n_channels": 1
     },
     {
       "title": "이란 전쟁과 휘발유 가격 급등",
@@ -66,18 +94,6 @@
       "summary_ko": "의회 개입 없으면 급여 삭감 발생 가능성"
     },
     {
-      "title": "물가 상승과 경제적 부담",
-      "title_ko": "물가 상승과 경제적 부담",
-      "summary_ko": "주거비, 보육료, 헬스케어 등 생활비 부담이 유권자들의 불만을 키우고 대안적 경제 체제에 대한 관심을 높이고 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=7Kfe-dEEPO4",
-      "published": "2026-11-01 15:03:41",
-      "kind": "media",
-      "tag": "매크로",
-      "direction": "negative",
-      "n_channels": 1
-    },
-    {
       "title": "I'm a psychologist who studies couples: People in the happiest relationships do 1 thing differently after time apart—whether it's hours, days or weeks",
       "source": "CNBC",
       "link": "https://www.cnbc.com/make-it/2026/11/01/reconnect-partner-after-time-apart.html",
@@ -92,22 +108,6 @@
       "published": "2026-11-01 14:31:29",
       "title_ko": "AI가 메타 광고 사업을 부양하고 구글 검색을 해치는 이유",
       "summary_ko": "최근 분기 기준 양사 간 성장 격차 최대치 기록"
-    },
-    {
-      "title": "Binance, crypto and hacks: What to know about keeping coin safe as cyber criminals advance",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/binance-crypto-hack-safety.html",
-      "published": "2026-11-01 14:29:06",
-      "title_ko": "바이낸스 해킹, 코인 보안 위험과 대비책 안내",
-      "summary_ko": ""
-    },
-    {
-      "title": "Companies promised AI gains — here's how the payoff showed up in earnings",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/01/ai-investments-company-earnings.html",
-      "published": "2026-11-01 12:34:06",
-      "title_ko": "기업들이 약속한 AI 수익, 실적에서 어떻게 나타났나",
-      "summary_ko": "투자자들이 수익을 추구하는 가운데 AI가 실적에 기여"
     }
   ]
 }
