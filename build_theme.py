@@ -289,8 +289,11 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
 .post-body .rt-tabs { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
 /* 탭이 폭을 넘으면 가로로 넘겨 본다 — 넘길 것이 남은 쪽에 흐린 그림자 32px (2026-10-31 사용자 P167, JS 가 data-more 에 l · r) */
-.post-body .rt-tabs-wrap { position: relative; }
-.post-body .rt-tabs-wrap::before, .post-body .rt-tabs-wrap::after { content: ""; position: absolute; top: 0; bottom: 2px; width: 32px; pointer-events: none; opacity: 0; transition: opacity .15s; }
+/* 탭 줄 위 고정 (2026-11-01 사용자 P257: 스크롤하면 탭 · 밑줄까지 제목 줄 아래에 붙는다) — top = 제목 줄(.pr-sticky) 높이, JS 가 정수 px 로 넣는다.
+   위 여백 12 는 고정 띠 안(padding)으로 옮겨 붙었을 때 제목 줄과 띄우고, 아래 14 는 밑줄 밖(margin)이라 고정 띠는 밑줄에서 끝난다 */
+.post-body .rt-tabs-wrap { position: sticky; top: 0; z-index: 30; padding-top: 12px; margin-bottom: 14px; background: var(--bg, #fff); }
+.post-body .rt-tabs-wrap > .rt-tabs { margin: 0; }
+.post-body .rt-tabs-wrap::before, .post-body .rt-tabs-wrap::after { content: ""; position: absolute; top: 12px; bottom: 2px; width: 32px; pointer-events: none; opacity: 0; transition: opacity .15s; }
 .post-body .rt-tabs-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), rgba(255,255,255,0)); }
 .post-body .rt-tabs-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), rgba(255,255,255,0)); }
 .post-body .rt-tabs-wrap[data-more*="l"]::before, .post-body .rt-tabs-wrap[data-more*="r"]::after { opacity: 1; }
