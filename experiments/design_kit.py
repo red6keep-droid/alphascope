@@ -804,7 +804,7 @@ def fix_colons(html):
     글자 노드와 툴팁·제목 속성(data-tip · title · aria-label)만 고친다. style · script 안, 시각·비율(숫자:숫자), 주소(://)는 건드리지 않는다.
     각 리포트의 build_body 마지막에 한 번 건다 — LLM 서술도 같이 고쳐진다. 줄표 ` — ` 도 여기서 쉼표로 (_no_dash).
     숫자 앞 빼기(−3)는 그린 줄(MINUS_BAR)로, 툴팁 속 빼기는 엔 대시(–)로 (2026-10-26 사용자)."""
-    out, skip = [], False
+    out, skip, svg = [], False, False
     for part in _TAG.split(html):
         if part.startswith("<") and part.endswith(">"):
             low = part[:8].lower()
@@ -812,9 +812,16 @@ def fix_colons(html):
                 skip = True
             elif low.startswith(("</script", "</style")):
                 skip = False
+            elif low.startswith("<svg"):
+                svg = True
+            elif low.startswith("</svg"):
+                svg = False
             out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _MINUS_NUM.sub("–", _sign_text(_space_dots(_space_colons(_no_dash(m.group(2)))), False)) + m.group(3), part))   # 툴팁 글은 HTML 을 못 넣어 엔 대시로
+        elif skip:
+            out.append(part)
         else:
-            out.append(part if skip else _minus_bar(_sign_text(_space_dots(_space_colons(_no_dash(part))), True)))   # 숫자 앞 − 는 그린 줄로 (MINUS_BAR)
+            t = _sign_text(_space_dots(_space_colons(_no_dash(part))), not svg)
+            out.append(t if svg else _minus_bar(t))   # 숫자 앞 − 는 그린 줄로 (MINUS_BAR) — SVG <text> 안은 HTML 을 못 넣어 글자 그대로 (2026-11-01: 매출 선 그래프 음수 값이 그림을 깼다, P233)
     return "".join(out)
 
 
