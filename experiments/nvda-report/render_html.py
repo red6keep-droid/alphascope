@@ -827,7 +827,7 @@ def analysts_card(cells, close, m0=None, m2=None, opened=False):
     return _state_card("애널리스트 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance"), fold=True, opened=opened)
 
 
-TOGETHER_Q = "Alpha Scope 전망은?"   # 옛 흰 카드 `Alpha Scope 데이터로 함께 보기` → 강조 카드 (P206) → 로고 + `Alpha Scope 전망은?` (2026-11-01 사용자 P208)
+TOGETHER_Q = "Alpha Scope 신호는?"   # 옛 흰 카드 `Alpha Scope 데이터로 함께 보기` → 강조 카드 (P206) → 로고 + `Alpha Scope 전망은?` (P208) → `신호는?` (2026-11-01 사용자 P267: 앞날 예측으로 읽혀서 — 판정을 모은 카드)
 TOGETHER_WORDS = ((1, "상승", UP), (-1, "하락", DOWN), (0, "중립", "#111"))
 TOGETHER_LINE = "rgba(15,23,42,.08)"   # 강조 카드 색 위 줄 구분선 (흰 바탕을 뺀 뒤, P207)
 HOT_KIND = {"호재": "up", "리스크": "down"}   # 엇갈림 · 불확실 = 회색 라벨 (P218)
