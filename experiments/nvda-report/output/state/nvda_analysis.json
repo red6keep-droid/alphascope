@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-31T21:33:52Z",
+ "generated_at": "2026-11-01T14:52:45Z",
  "run_date": "2026-11-01",
  "day": "2026-10-30",
  "is_latest_bar_today": true,
@@ -923,7 +923,7 @@
   "options": [
    {
     "key": "iv_atm_30d",
-    "value": 0.4508340569041238,
+    "value": 0.4585742303842556,
     "flag": false,
     "fmt": "iv"
    },
@@ -953,7 +953,7 @@
    },
    {
     "key": "gex_approx",
-    "value": -128840053.3147615,
+    "value": -114155582.49236625,
     "flag": false,
     "fmt": "gex"
    },
@@ -1322,7 +1322,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-30",
-  "state_collected_at": "2026-10-31T21:32:26Z",
+  "state_collected_at": "2026-11-01T14:52:36Z",
   "missing_fields": [
    "gex_flip_strike"
   ],
@@ -1474,9 +1474,9 @@
   },
   "move": {
    "state": "평소보다 큼",
-   "exp": 2.8399876122063183,
+   "exp": 2.888746122046619,
    "sigma": 1.869585519316666,
-   "ratio": 1.5190466458278595,
+   "ratio": 1.5451264957927446,
    "spy": {
     "exp": 0.9687881624088988,
     "sigma": 0.7477073570725715
@@ -1489,7 +1489,7 @@
    "next_earnings": "2026-11-17",
    "earn_in_window": true,
    "days_to": 18,
-   "iv": 0.4508340569041238,
+   "iv": 0.4585742303842556,
    "rank": null,
    "imp": 9.284597369365073,
    "earn_day": 7.419624201215938,
