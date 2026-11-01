@@ -1,13 +1,21 @@
 {
-  "updated_at": "2026-10-31 21:46:22 UTC",
+  "updated_at": "2026-11-01 00:26:22 UTC",
   "items": [
     {
       "title": "Trump defamation suit against Murdoch, WSJ over Epstein letter dismissed with prejudice",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/10/31/trump-murdoch-wsj-epstein-defamation-lawsuit-dismissed.html",
-      "published": "2026-10-31 21:05:53",
+      "published": "2026-10-31 23:56:40",
       "title_ko": "트럼프, 머독·WSJ 에피스타인 서한 관련 명예훼손 소송 기각",
       "summary_ko": "트럼프, 항소 계획 발표"
+    },
+    {
+      "title": "Binance says 90% of $6.3 billion hack losses are now covered, plans to resume withdrawals Sunday",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/binance-hack-asset-coverage-withdrawals.html",
+      "published": "2026-10-31 22:27:56",
+      "title_ko": "바이낸스, 63억 달러 해킹 손실 90% 복구·출금 재개 계획",
+      "summary_ko": "출금 재개, 일요일 예정"
     },
     {
       "title": "SpaceX loses bid to toss NAACP lawsuit over Memphis data center air pollution",
@@ -26,14 +34,6 @@
       "summary_ko": "자금 조달 라운드 진행 중이며 미확정 상태"
     },
     {
-      "title": "Binance says 90% of $6.3 billion hack losses are now covered, plans to resume withdrawals Sunday",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/binance-hack-asset-coverage-withdrawals.html",
-      "published": "2026-10-31 19:16:25",
-      "title_ko": "바이낸스, 63억 달러 해킹 손실 90% 복구·출금 재개 계획",
-      "summary_ko": "출금 재개, 일요일 예정"
-    },
-    {
       "title": "바이낸스 사상 최대 암호화폐 해킹",
       "title_ko": "바이낸스 사상 최대 암호화폐 해킹",
       "summary_ko": "바이낸스 해킹 사건으로 비트코인 가격이 5% 하락하고 암호화폐 보안 우려가 커졌",
@@ -43,7 +43,7 @@
       "kind": "media",
       "tag": "기타",
       "direction": "negative",
-      "n_channels": 3
+      "n_channels": 2
     },
     {
       "title": "Binance, crypto and hacks: What to know about keeping coin safe as cyber criminals advance",
@@ -54,16 +54,16 @@
       "summary_ko": ""
     },
     {
-      "title": "미국 중간선거 임박과 의회 통제권",
-      "title_ko": "미국 중간선거 임박과 의회 통제권",
-      "summary_ko": "미국 중간선거를 사흘 앞두고 상하원 통제권을 쟁탈하기 위한 마지막 유세와 사전 투표 열기가 최고조에 달 중",
+      "title": "이란과의 지정학적 갈등과 중동 긴장",
+      "title_ko": "이란과의 지정학적 갈등과 중동 긴장",
+      "summary_ko": "미국과 이란 간의 갈등 및 잠재적 군사 충돌 가능성으로 인해 에너지 가격 변동성이 커지고 시장에 부담을 주고 있음",
       "source": "블룸버그",
       "link": "https://www.youtube.com/watch?v=tRcFJBbWoxI",
       "published": "2026-10-31 16:11:21",
       "kind": "media",
-      "tag": "정책/규제",
-      "direction": "neutral",
-      "n_channels": 2
+      "tag": "지정학",
+      "direction": "negative",
+      "n_channels": 1
     },
     {
       "title": "Stocks started the week with promise but ended in despair. Our take on the big reversal",
