@@ -430,20 +430,21 @@ def _sub_head(t):
 
 
 def card_opinions(s):
-    """`애널리스트 · 방송 의견은?` — 공용 R.opinions_card (한국 · 미국 같은 카드, 2026-10-31)."""
+    """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 공용 R.opinions_cards (한국 · 미국 같은 카드, 2026-11-01 사용자 P197)."""
     ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
-    return R.opinions_card(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s), opened=True)
+    return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s))
 
 
 def sec_opinions(s):
-    """`의견` 탭 (2026-11-01 사용자 P196, 한국과 같게) — `애널리스트 · 방송 의견은?` 한 장, 펼친 채로."""
+    """`의견` 탭 (2026-11-01 사용자 P196 · P197, 한국과 같게) — `애널리스트 의견은?` · `방송 의견은?` 강조 카드 둘(접힌 채) + 함께 보기 흰 카드."""
     card = card_opinions(s)
-    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>' if card else _dk.muted("애널리스트 · 방송 의견이 아직 없습니다.")
+    return card or _dk.muted("애널리스트 · 방송 의견이 아직 없습니다.")   # 두 카드 격자 + 함께 보기는 R.opinions_cards 가 감싼다
 
 
 def sec_earnings_tab(s):
-    """`실적` 탭 (P196, 한국 sec_earnings_tab 과 같게) — 다음 실적 발표는?(펼침) → 실적 · 기대 카드 → 함께 보는 회사 일정 · 시장 일정 → 전체 일정 보기."""
-    return sec_calendar(s, ("earnings",), with_list=False) + sec_expect(s, open_first=False) + sec_calendar(s, ("peers", "macro"), open_first=False)
+    """`실적` 탭 (P196 · P197, 한국 sec_earnings_tab 과 같게) — 다음 실적 발표는?(펼침) → 실적 · 기대 카드 → `주요 일정` 제목 → 함께 보는 회사 일정 · 시장 일정."""
+    return (sec_calendar(s, ("earnings",)) + sec_expect(s, open_first=False)
+            + R.group_title("주요 일정") + sec_calendar(s, ("peers", "macro"), open_first=False))
 
 
 EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
@@ -633,16 +634,18 @@ ROLE_ORDER = ("고객", "공급", "협력", "경쟁", "동종", "유통", "보�
 
 
 def cal_peers(s, c):
-    """함께 보는 회사 실적 — NVDA cal_peers 와 같은 비교(그 회사 발표 다음 날 이 종목 vs 이 종목 보통 날), 회사 목록은 종목마다 정한 것(universe.PEERS)."""
-    up, nm, roles = c["upcoming"], s["name"], c["roles"]
+    """함께 보는 회사 실적 — NVDA cal_peers 와 같은 비교(그 회사 발표 다음 날 이 종목 vs 이 종목 보통 날), 회사 목록은 종목마다 정한 것(universe.PEERS).
+    옛 카드 밖 `전체 일정 보기` 범위(LIST_DAYS 60일)까지 카드 안에 (2026-11-01 사용자 P197, 한국과 같게)."""
+    up, nm, roles = c.get("upcoming_all") or c["upcoming"], s["name"], c["roles"]
+    days = R.cal_cards.LIST_DAYS
     kinds = " · ".join(r for r in ROLE_ORDER if r in roles.values())
     what = "큰 보유 종목" if kinds == "보유" else f"{kinds} 회사"
     if not up:
-        return [(f"앞으로 30일 안에 실적을 발표하는 {nm}의 {what}가 없다.", "plain")], "", "없음", None
+        return [(f"앞으로 {days}일 안에 실적을 발표하는 {nm}의 {what}가 없다.", "plain")], "", "없음", None
     names = [f"{U.peer_name(u['symbol'])}({R._md_short(u['day'])})" for u in up]
     syms = [x for x in dict.fromkeys(u["symbol"] for u in up) if c["effect"].get(x, {}).get("median")]
-    soon = " · ".join(r for r in ROLE_ORDER if r in {roles.get(u["symbol"]) for u in up})   # 30일 안에 발표하는 회사의 관계만
-    first = f"앞으로 30일 안에 {_dk.josa(' · '.join(names), '가')} 실적을 발표한다. {nm}의 {'큰 보유 종목' if soon == '보유' else soon + ' 회사'}다."
+    soon = " · ".join(r for r in ROLE_ORDER if r in {roles.get(u["symbol"]) for u in up})   # 기간 안에 발표하는 회사의 관계만
+    first = f"앞으로 {days}일 안에 {_dk.josa(' · '.join(names), '가')} 실적을 발표한다. {nm}의 {'큰 보유 종목' if soon == '보유' else soon + ' 회사'}다."
     if syms:
         eff = [c["effect"][x]["median"] for x in syms]
         rng = f"±{min(eff):.1f}%" if f"{min(eff):.1f}" == f"{max(eff):.1f}" else f"±{min(eff):.1f}~{max(eff):.1f}%"
@@ -660,7 +663,7 @@ def cal_peers(s, c):
     left = (datetime.date.fromisoformat(up[0]["day"]) - datetime.date.fromisoformat(s["day"])).days
     listed = " · ".join(f"{U.peer_name(x)}({r})" for x, r in roles.items())
     tip = (f"{nm}와(과) 사업으로 이어진 회사({listed})의 실적 발표. 이 회사들의 실적 소식에 {nm} 주가도 함께 움직이곤 한다\n"
-           f"· 30일 안 {len(up)}곳 : 가장 가까운 발표는 {U.peer_name(up[0]['symbol'])} {R._md_short(up[0]['day'])}")   # 참고 줄은 뺐다 (batch 7 g)
+           f"· {days}일 안 {len(up)}곳 : 가장 가까운 발표는 {U.peer_name(up[0]['symbol'])} {R._md_short(up[0]['day'])}")   # 참고 줄은 뺐다 (batch 7 g)
     return lines, tip, f"{len(up)}곳", left
 
 
@@ -679,23 +682,9 @@ def cal_macro(c):
     return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED"), f"{len(up)}건", None
 
 
-STOCK_KINDS = ("EARNINGS", "EARNINGS_PEER")   # `전체 일정 보기` 는 이 종목 일정만 — 시장 공통 일정은 미국 증시 리포트로 (P144)
-
-
-def _all_list(s, items):
-    items = [c for c in items if c.get("kind") in STOCK_KINDS]
-    if not items:
-        return ""
-    kinds = dict(R.rr.KIND_KO, EARNINGS=f"{s['name']} 실적", EARNINGS_PEER="함께 보는 회사 실적")
-    d0 = datetime.date.fromisoformat(s["day"])
-    rows = [(f'<span style="color:#111;">{_esc(R._d(c["day"]))}</span>', R._pill(kinds.get(c["kind"], c["kind"]), "area"),
-             f'<span style="color:#111;">{_esc(c["label"])}</span>', "", f'<span style="color:#111;">{R._dn(d0, c["day"])}</span>') for c in items]
-    return R._gcard(rows)
-
-
-def sec_calendar(s, keys=("earnings", "peers", "macro"), with_list=True, open_first=True):
+def sec_calendar(s, keys=("earnings", "peers", "macro"), open_first=True):
     """일정 카드 — NVDA 리포트 sec_calendar 와 같은 질문 카드(실적 · 같은 업종 실적 · 시장 일정). 소송 카드는 없다(추적하는 사건이 없다).
-    옛 `일정` 탭, 지금은 `실적` 탭 안(sec_earnings_tab, P196) — keys 로 고른 카드만, with_list = 끝에 전체 일정 보기."""
+    옛 `일정` 탭, 지금은 `실적` 탭 안(sec_earnings_tab, P196) — keys 로 고른 카드만. 카드 밖 `전체 일정 보기` 는 없앴다(P197, 함께 보는 회사 카드 안으로)."""
     cc = s.get("calendar_cards") or {}
     specs = [("다음 실적 발표는?", "earnings", lambda c: cal_earnings(s, c)), ("함께 보는 회사 일정은?", "peers", lambda c: cal_peers(s, c)),   # 360px 한 줄 (P163, 옛 P156 실적 일정은?)
              ("시장 전체를 흔들 일정은?", "macro", cal_macro)]
@@ -708,15 +697,7 @@ def sec_calendar(s, keys=("earnings", "peers", "macro"), with_list=True, open_fi
         theme, col = R._soon_theme(extra)
         out += R._state_card(_josa(title), state, theme, col, lines, "", tip=_josa(tip), fold=True, opened=first)
         first = False
-    if not with_list:
-        return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
-    items = [c for c in (cc.get("all") or []) if c.get("kind") in STOCK_KINDS]
-    lst = _all_list(s, items)
-    fold = (R.empty_card("잡힌 일정이 없습니다.") if not lst   # 일정이 없으면 버튼 대신 안내 카드 (P148)
-            else lst if len(items) <= R.LIST_SHOWN   # 3개 이하는 접기 없이 바로 (P157)
-            else (f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
-                  f'<div style="margin-top:6px;">{lst}</div></details>'))
-    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' + fold
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
 
 
 def _josa(t):

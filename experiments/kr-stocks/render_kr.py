@@ -938,14 +938,15 @@ def sec_expect(s, open_first=True):
 
 def sec_earnings_tab(s):
     """`실적` 탭 (2026-11-01 사용자 P196: 일정 탭을 실적 탭에 합쳐 의견 탭 자리를 만든다) — 다음 실적 발표는?(펼침) → 돈을 더 버나 · 이익 예상
-    → 미국 연결 종목 일정 · 시장 전체를 흔들 일정 → 전체 일정 보기. 일정 대부분이 실적 발표일이라 실적 탭 첫 질문으로."""
-    return sec_calendar(s, ("earnings",), with_list=False) + sec_expect(s, open_first=False) + sec_calendar(s, ("peers", "macro"), open_first=False)
+    → `주요 일정` 제목 → 미국 연결 종목 일정 · 시장 전체를 흔들 일정 (P197: 실적과 일정을 제목으로 나누고, 카드 밖 전체 일정 목록은 연결 종목 카드 안으로)."""
+    return (sec_calendar(s, ("earnings",)) + sec_expect(s, open_first=False)
+            + R.group_title("주요 일정") + sec_calendar(s, ("peers", "macro"), open_first=False))
 
 
 def sec_opinions(s):
-    """`의견` 탭 (2026-11-01 사용자 P196) — `애널리스트 · 방송 의견은?` 한 장, 펼친 채로."""
+    """`의견` 탭 (2026-11-01 사용자 P196 · P197) — `애널리스트 의견은?` · `방송 의견은?` 강조 카드 둘(접힌 채) + 함께 보기 흰 카드."""
     card = card_picks(s)
-    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>' if card else _dk.muted("애널리스트 · 방송 의견이 아직 없습니다.")
+    return card or _dk.muted("애널리스트 · 방송 의견이 아직 없습니다.")   # 두 카드 격자 + 함께 보기는 R.opinions_cards 가 감싼다
 
 
 def man_won(v):
@@ -954,9 +955,9 @@ def man_won(v):
 
 
 def card_picks(s):
-    """`애널리스트 · 방송 의견은?` — 미국과 같은 공용 카드 R.opinions_card (2026-10-31 사용자, 옛 `방송에서 나온 의견은?`). 원화 · 지금 가격 대비."""
+    """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 미국과 같은 공용 R.opinions_cards (2026-11-01 사용자 P197, 옛 한 장 `애널리스트 · 방송 의견은?`). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
-    card = lambda ps_: R.opinions_card(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won, opened=True)   # noqa: E731 — 의견 탭에서 펼친 채로 (P196)
+    card = lambda ps_: R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won)   # noqa: E731 — 애널리스트 · 방송 두 카드 + 함께 보기 (P197)
     real = card(ps)
     if s["code"] != MOCK_PICKS_CODE or len(ps) >= 5:
         return real
@@ -1131,13 +1132,15 @@ def cal_earn_card(s, c):
 
 
 def cal_pair_card(s, c):
-    nm, up = s["name"], c["upcoming"]
+    """미국 연결 종목 일정 — 옛 카드 밖 `전체 일정 보기` 범위(LIST_DAYS 60일)까지 카드 안에 (2026-11-01 사용자 P197: 마이크론 12월 발표가 카드에 없고 밖 목록에만 있었다)."""
+    nm, up = s["name"], c.get("upcoming_all") or c["upcoming"]
+    days = CC.LIST_DAYS
     usn = lambda x: USU.name(x) if x in USU.BY_SYM else x   # noqa: E731
     if not up:
-        return [(f"앞으로 30일 안에 실적을 발표하는 {nm}의 미국 연결 종목이 없다.", "plain")], "", "없음", None
+        return [(f"앞으로 {days}일 안에 실적을 발표하는 {nm}의 미국 연결 종목이 없다.", "plain")], "", "없음", None
     syms = [x for x in dict.fromkeys(u["symbol"] for u in up) if c["effect"].get(x, {}).get("median")]
     names = " · ".join(usn(u["symbol"]) + "(" + R._md_short(u["day"]) + ")" for u in up)
-    first = f"앞으로 30일 안에 {_dk.josa(names, '가')} 실적을 발표한다. {_dk.josa(nm, '와')} 같은 재료로 움직이는 미국 종목이다."
+    first = f"앞으로 {days}일 안에 {_dk.josa(names, '가')} 실적을 발표한다. {_dk.josa(nm, '와')} 같은 재료로 움직이는 미국 종목이다."
     if syms and c.get("normal"):
         eff = [c["effect"][x]["median"] for x in syms]
         span = f"±{min(eff):.1f}%" if f"{min(eff):.1f}" == f"{max(eff):.1f}" else f"±{min(eff):.1f}~{max(eff):.1f}%"   # 한 곳이면 `±4.2~4.2%` 가 되던 것
@@ -1152,7 +1155,7 @@ def cal_pair_card(s, c):
         lines.append(("row", f"{usn(u['symbol'])} ({u['symbol']})", R._md_short(u["day"]), "미국과 연결" + (f" · 다음 날 {nm} 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else "")))
     left = (datetime.date.fromisoformat(up[0]["day"]) - datetime.date.fromisoformat(s["day"])).days
     tip = (f"{_dk.josa(nm, '와')} 같은 재료로 움직이는 미국 종목(미국과 연결)의 실적 발표. 미국 장 마감 뒤 나오는 발표는 한국 시간 다음 날 장에 반영된다\n"
-           f"· 30일 안 {len(up)}곳 : 가장 가까운 발표는 {usn(up[0]['symbol'])} {R._md_short(up[0]['day'])}")   # 참고 줄은 뺐다 (batch 7 g)
+           f"· {days}일 안 {len(up)}곳 : 가장 가까운 발표는 {usn(up[0]['symbol'])} {R._md_short(up[0]['day'])}")   # 참고 줄은 뺐다 (batch 7 g)
     return lines, _dk.with_src(tip, "Yahoo Finance"), f"{len(up)}곳", left
 
 
@@ -1173,29 +1176,9 @@ def cal_macro_card(s, c):   # 답 `5건` — 옛 `5건 · 30일 안` 이 제목�
 CAL_TAB = "일정"   # 한국 증시 리포트 일정 탭 이름 (kr-market-report TAB_CAL) — 테마가 #tab-일정 으로 연다
 
 
-def _all_items(s):
-    cc = s.get("calendar_cards") or {}
-    end = (datetime.date.fromisoformat(s["day"]) + datetime.timedelta(days=CC.LIST_DAYS)).isoformat()
-    items = []
-    e = cc.get("earnings")
-    if e and e["day"] <= end:
-        items.append((e["day"], f"{s['name']} 실적", f"{s['name']} 실적 발표"))
-    usn = lambda x: USU.name(x) if x in USU.BY_SYM else x   # noqa: E731
-    items += [(u["day"], "미국과 연결 실적", f"{usn(u['symbol'])} 실적 발표") for u in (cc.get("peers") or {}).get("upcoming_all") or []]
-    # 시장 공통 일정은 뺐다 — 한국 증시 리포트 `일정` 탭에 (P144). 여기는 이 종목 일정만
-    return sorted(items)
-
-
-def _all_list(s, items):
-    d0 = datetime.date.fromisoformat(s["day"])
-    rows = [(f'<span style="color:#111;">{_esc(R._d(d))}</span>', R._pill(k, "area"), f'<span style="color:#111;">{_esc(t)}</span>', "", f'<span style="color:#111;">{R._dn(d0, d)}</span>')
-            for d, k, t in items]
-    return R._gcard(rows) if rows else ""
-
-
-def sec_calendar(s, keys=("earnings", "peers", "macro"), with_list=True, open_first=True):
-    """일정 카드 — 다음 실적 발표는? · 미국과 연결 종목 실적은? · 시장 전체를 흔들 일정은?(요약 + 리포트 링크) + 전체 일정 보기(이 종목 일정만).
-    옛 `일정` 탭, 지금은 `실적` 탭 안(sec_earnings_tab, P196) — keys 로 고른 카드만, with_list = 끝에 전체 일정 보기."""
+def sec_calendar(s, keys=("earnings", "peers", "macro"), open_first=True):
+    """일정 카드 — 다음 실적 발표는? · 미국 연결 종목 일정은? · 시장 전체를 흔들 일정은?(요약 + 리포트 링크).
+    옛 `일정` 탭, 지금은 `실적` 탭 안(sec_earnings_tab, P196) — keys 로 고른 카드만. 카드 밖 `전체 일정 보기` 는 없앴다(P197, 연결 종목 카드 안으로)."""
     cc = s.get("calendar_cards") or {}
     out, first = "", open_first
     for title, key, fn in (("다음 실적 발표는?", "earnings", cal_earn_card), ("미국 연결 종목 일정은?", "peers", cal_pair_card), ("시장 전체를 흔들 일정은?", "macro", cal_macro_card)):   # 일정 탭 질문엔 `일정` (P156)
@@ -1206,15 +1189,7 @@ def sec_calendar(s, keys=("earnings", "peers", "macro"), with_list=True, open_fi
         theme, col = R._soon_theme(left)
         out += R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=first)
         first = False
-    if not with_list:
-        return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
-    items = _all_items(s)
-    lst = _all_list(s, items)
-    fold = (R.empty_card("잡힌 일정이 없습니다.") if not lst   # 일정이 없으면 버튼 대신 안내 카드 (P148)
-            else lst if len(items) <= R.LIST_SHOWN   # 3개 이하는 접기 없이 바로 (P157)
-            else (f'<details data-fold="1" data-label="전체 일정 보기"><summary style="list-style:none;cursor:pointer;">{R._fold_row("전체 일정 보기")}</summary>'
-                  f'<div style="margin-top:6px;">{lst}</div></details>'))
-    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' + fold
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
 
 
 def _ymd(d):

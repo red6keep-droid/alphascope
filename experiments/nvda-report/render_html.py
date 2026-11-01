@@ -798,36 +798,46 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
     return out
 
 
-def opinions_card(name, cells, close, ps, money, together, m0=None, m2=None, opened=False):
-    """`애널리스트 · 방송 의견은?` (2026-10-29 사용자 P90, 한국 · 미국 공용 2026-10-31) — 애널리스트 의견 · 목표가와 방송 의견(picks)을 한 상태 카드에.
-    머릿수는 합치지 않는다(44명 + 1건 X). 답 = 애널리스트 다수(analysts_verdict) — 방송은 건수가 적어 답을 좌우하지 않는다. 애널리스트가 없으면 방송만으로 `매수` 등.
+def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None):
+    """`의견` 탭 (2026-11-01 사용자 P197) — 옛 한 장 `애널리스트 · 방송 의견은?`(P90)을 강조 카드 둘로 나눈다: `애널리스트 의견은?` · `방송 의견은?`.
+    접힌 머리에서 두 답(예: 매수 · 매도)을 따로 보고, 누르면 그쪽 내용만 펼친다 — 둘 다 접힌 채로. 함께 보기는 두 카드 아래 따로 흰 카드.
     cells = 애널리스트 칸(analyze_tabs.analysts 모양), money = 방송 목표가 표기, m0 · m2 = 애널리스트 목표가 표기(없으면 달러), together = 함께 보기 줄을 만드는 함수."""
+    cards = analysts_card(cells, close, m0, m2) + picks_card(name, ps, close, money)
+    if not cards:
+        return ""
+    tg = together_card(together())   # 격자(data-grid) 밖 — 넓은 화면에서 두 카드 옆 칸에 끼지 않게
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>' + (f'<div data-cards="1" style="margin:0 0 8px;">{tg}</div>' if tg else "")
+
+
+def analysts_card(cells, close, m0=None, m2=None):
+    """`애널리스트 의견은?` (P197) — 답 = 애널리스트 다수(analysts_verdict), 펼치면 등급 막대 · 목표가 막대 · 목표가 줄(analysts_block). 없으면 빈 문자열."""
     a = {"status": {"analysts": cells}, "headline": {"close": close}}
     verdict = analysts_verdict(a, rich=True) if cells else None
-    if not verdict and not ps:
+    if not verdict:
         return ""
-    cnt = picks_count(ps) if ps else ""
-    if verdict:
-        state, text = verdict
-        text += f" 방송에서는 {picks_sentence(ps, rich=True)} 나왔다." if ps else ""
-    else:
-        state = picks_state(ps)   # `매수 4 · 보유 1` (P163)
-        text = f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 방송에서 나왔다. 애널리스트 집계는 없다."
+    state, text = verdict
     theme, col = pick_theme(state)   # 매수면 오름 색 강조 카드 (P92)
     sep = _dk.darken(_dk.lighten(_dk.lighten(CARD_DIR[theme][1]), 0.3), 0.02)   # 카드 안 줄 사이 구분선과 같은 색 (_state_card bd_row)
-    lines = [(text, "rich")]   # 인원 · 퍼센트 굵게, 방송 `매수 의견이 4건` 의견 색 굵게 (2026-11-01 사용자 P194)
-    if verdict:
-        lines.append((analysts_block(a, m0, m2, sep), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
-    if ps:
-        pad = _dk.SEP_GAP - _dk.VP - 1
-        head = (f'<span style="display:block;margin:{pad}px 0 10px;padding:{pad}px 0 0;border-top:1px solid {sep};font-weight:700;color:#111;font-size:{_dk.NAME};line-height:{LH_CARD};">'
-                f'방송 의견 <span style="font-weight:400;color:{NOTE};font-size:{TINY};">{len(ps)}건</span></span>') if verdict else ""   # 애널리스트 아래 방송 의견 구분 · 전체 건수 (2026-11-01 사용자 P195)
-        lines.append((head + picks_rows_folded(ps, close, money) + together_block(together(), theme), "html"))   # 4건 이상은 3건 + 접기 (P158)
-    tip = (f"애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 최근 {PICK_HOURS}시간에 나온 이 종목 의견을 한 카드에 모은 것\n"
-           f"· 지금 : {state}" + (f" · 방송 {cnt}" if ps else "") + "\n"
-           "· 나누는 법 : 애널리스트 중 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림. 방송 건수는 답에 넣지 않는다\n"
-           "· 이 블로그의 추천이 아니다")   # 옛 `읽는 법 : 누가 어떤 이유로 … 적중률은 검증하지 않았고` 는 줄였다 (2026-10-31 batch 7 h)
-    return _state_card("애널리스트 · 방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance · 유튜브 방송 요약"), fold=True, opened=opened)   # 의견 탭에서는 펼친 채로 (P196)
+    lines = [(text, "rich"), (analysts_block(a, m0, m2, sep), "html")]   # 인원 · 퍼센트 굵게 (P194)
+    tip = ("애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가\n"
+           f"· 지금 : {state}\n"
+           "· 나누는 법 : 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림\n"
+           "· 이 블로그의 추천이 아니다")
+    return _state_card("애널리스트 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance"), fold=True)
+
+
+def together_card(items):
+    """`Alpha Scope 데이터로 함께 보기` 따로 흰 카드 — 의견 탭 두 강조 카드 아래 (P197, 옛 방송 의견 펼침 끝)."""
+    blk = together_block(items).replace(TOGETHER_END, "")
+    if not blk:
+        return ""
+    return blk.replace(f"margin:19px {_dk.CHART_CARD_X}px 0;", "margin:0;", 1)
+
+
+def group_title(text):
+    """탭 안 구획 제목 — 카드 묶음 사이 (2026-11-01 사용자 P197: 실적 탭의 실적 카드와 일정 카드를 `주요 일정` 으로 나눈다). 크기 · 굵기 = `함께 보는 페이지` 제목."""
+    return (f'<div data-group-title="1" style="margin:24px 0 10px;padding:0 {_dk.ALIGN_PX}px;font-weight:700;color:#111;'
+            f'font-size:{_dk.EMPH_NAME};line-height:28px;">{_esc(text)}</div>')
 
 
 def related_buttons(links):
@@ -995,7 +1005,7 @@ def picks_rows_folded(ps, close, money):
 
 
 def picks_card(name, ps, close, money, hours=PICK_HOURS, together=""):
-    """`방송에서 나온 의견은?` (2026-10-29 사용자 P85 → P88 · P89 · P92: 한국 · 미국 종목, `한 달간 변화 범위는?` 아래, 답은 `매수`).
+    """`방송 의견은?` (2026-10-29 사용자 P85 → P88 · P89 · P92 → 2026-11-01 P197: 의견 탭에서 `애널리스트 의견은?` 아래, 옛 `방송에서 나온 의견은?`).
     ps = media_feed.picks 줄(이 종목 것만, 최근 hours 시간). 답 = 의견이 한 가지면 그 말(색 = PICK_THEME), 갈리면 `매수 · 보유`(회색).
     문장 = `삼성전자에 대한 매수 의견이 1건 나왔다.` 펼치면 의견별 제목(`매수 의견`) 아래 줄마다 말한 사람(소속) / 이유 / 채널 · 게시 시각 · (목표가) · 영상에서 보기, 줄 사이 구분선. 없으면 빈 문자열."""
     if not ps:
@@ -1004,10 +1014,10 @@ def picks_card(name, ps, close, money, hours=PICK_HOURS, together=""):
     theme, col = pick_theme(state)
     if isinstance(together, list):   # 함께 보기 줄 — 이 카드 색을 알아야 안쪽 카드 색을 정한다 (P168)
         together = together_block(together, theme)
-    lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 나왔다.", "rich"), (picks_rows_folded(ps, close, money) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
+    lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 방송에서 나왔다.", "rich"), (picks_rows_folded(ps, close, money) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
     tip = (f"방송(유튜브 경제 채널) 요약에서 이 종목에 대한 매수 · 보유 · 관망 · 매도 의견을 모은 것. 최근 {hours}시간, 같은 영상 · 같은 사람은 한 번\n"
            f"· 지금 : {picks_count(ps)}\n· 이 블로그의 추천이 아니다")   # batch 7 h
-    return _state_card("방송에서 나온 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True)
+    return _state_card("방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True)
 
 
 def picks_sentence(ps, rich=False):
