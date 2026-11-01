@@ -2665,6 +2665,34 @@ def _status_group(a, group):
     return _sub_label(rr.GROUP_KO[group]) + _ccard(rows) + (_guide(*GROUP_NOTE[group]) if GROUP_NOTE.get(group) else "")
 
 
+def pair_bars(groups, note=""):
+    """`함께 움직이는 종목은?` 세로 막대 — 한국(밤사이 미국 · 오늘 한국) · 미국(함께 보는 회사, 2026-11-01 P263) 공용. 옛 render_kr._pair_bars.
+    밤사이 미국 · 오늘 한국 세로 막대 (2026-10-27 사용자 P31: "세로 막대, 길면 넘겨 보기" — P27 가로 막대를 바꿈). 공용 _col_chart 한 시리즈,
+    막대마다 색 — 미국 연결은 오름 빨강 · 내림 파랑, 이 종목은 진하게, KOSPI 회색. 두 묶음은 같은 간격으로 이어 그린다(P57). 가로축 이름 아래 줄 = 연결 이유.
+    흰 카드 폭은 상태 카드 안 다른 막대(_zone_gauge)와 같다."""
+    cols, kinds = [], []
+    for _, rows in groups:   # 두 묶음 사이 빈 칸은 뺐다 — 모든 막대 같은 간격 (2026-10-28 사용자 P57)
+        for nm, sub, v, kind in rows:
+            cols.append((nm + (f"\n{sub}" if sub else ""), [v]))
+            kinds.append(kind)
+
+    def color_at(i, k, v):
+        kind = kinds[i]
+        if kind == "bench":
+            return _GRAY_BAR, NOTE
+        bg = _PASTEL_UP if v >= 0 else _PASTEL_DN
+        return bg, (UP if v > 0 else DOWN if v < 0 else "#111")   # 이 종목도 보통 색 (P176, 옛 20% 진하게)
+    chart = _col_chart(cols, [_sign_bg], [_sign_fg], fmt=lambda v: f"{v:+.1f}".replace("-", "−"), color_at=color_at)
+    for (nm, _), kind in zip(cols, kinds):   # 이 종목 = 축 이름 위 점 (P176)
+        if kind == "me":
+            v = next(r[2] for _, rows in groups for r in rows if r[3] == "me")
+            chart = axis_dot(chart, nm, UP if v > 0 else DOWN if v < 0 else "#111")
+    title = " → ".join(g for g, _ in groups)
+    tail = f'<span style="display:block;margin:6px 0 0;font-size:{TINY};line-height:20px;color:{NOTE};word-break:keep-all;">{_esc(note)}</span>' if note else ""
+    return (f'{_dk.CHART_TITLE_M}{_paren(_esc(title + " (%)"))}</span>'   # 표준 그래프 제목(행간 24) — 옛 상태 카드 행간 32 를 물려받아 제목 ~ 그래프가 넓었다 (P177)
+            f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X - 2}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>{tail}')
+
+
 def status_block(a, group, title):
     """`_status_group` 을 접기 없이 강조 카드 펼침 안에 — ※ 그래프 제목 + 흰 C 카드 + 안내 (2026-11-01 사용자 P262: 미국 종목 `자세한 지표 보기` 접기를 한국처럼 펼친 안으로)."""
     body = _status_group(a, group)

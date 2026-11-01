@@ -240,6 +240,55 @@ def sec_tech(s):
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
+def _kr_links(sym):
+    """한국 페이지의 `밤사이 미국 연결 짝`(universe_kr.PAIRS)을 거꾸로 — 이 미국 종목을 짝으로 둔 한국 종목 [(이름, 기록 %p, 통과?)], 통과 · 차이 큰 순 (P263)."""
+    import importlib.util
+    path = os.path.join(_HERE, "..", "kr-stocks", "universe_kr.py")
+    spec = importlib.util.spec_from_file_location("universe_kr", path)
+    UK = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(UK)
+    out = []
+    for ksym, (us, _why) in UK.PAIRS.items():
+        if sym in us and ksym in UK.BY_SYM and ksym in UK.PAIR_RECORD:
+            sp, _n, ok, _y0 = UK.PAIR_RECORD[ksym]
+            out.append((UK.name(ksym), sp, ok, [U.peer_name(x) for x in us]))
+    return sorted(out, key=lambda x: (not x[2], -x[1]))
+
+
+def sec_pairs(s):
+    """`함께 움직이는 종목은?` — 한국 페이지와 같은 자리 · 같은 막대 (2026-11-01 사용자 P263: 한국과 비슷한 포맷).
+    ① 함께 보는 회사(경쟁 · 공급 · 고객, universe.PEERS)의 오늘 등락 + 이 종목 · S&P 500 ② 한국 연결 종목 = 한국 페이지 `밤사이 미국` 짝을 거꾸로, 검증 기록(다음 날 시가).
+    답 = 함께 보는 회사가 같이 올랐나 · 내렸나. 같은 날 함께 움직인 것은 앞날 신호가 아니라 전망 카드 개수에는 넣지 않는다 (verdict_items 에 없음)."""
+    moves = s.get("peer_moves") or []
+    links = _kr_links(s["sym"])
+    if not moves and not links:
+        return ""
+    rets = [r for _, _, r in moves]
+    ups, downs = sum(1 for x in rets if x >= 0.5), sum(1 for x in rets if x <= -0.5)
+    state = "판단 유보" if not rets else "엇갈림" if ups and downs else "같이 올랐음" if ups else "같이 내렸음" if downs else "비슷함"
+    theme, col = {"엇갈림": ("uncertain", R.SOON), "같이 올랐음": ("positive", R.UP), "같이 내렸음": ("negative", R.DOWN)}.get(state, ("neutral", R.MUTED))
+    lines = []
+    if moves:
+        day = _md(s["day"])
+        lines.append((f"오늘({day}) 함께 보는 회사는 " + ", ".join(f"{U.peer_name(p)} {_sgn(r)}%" for p, _, r in moves)   # 쉼표 — ` · ` 로 이으면 짧은 덩어리를 이름까지 통째로 칠한다(_dk.tint)
+                      + f"였고, {_dk.josa(s['name'], '은')} {_sgn(s['ret_1d'])}%였다.", "plain"))
+        rows = [(U.peer_name(p), role, r, "us") for p, role, r in moves] + [(s["name"], "", s["ret_1d"], "me")]
+        vs = s["tech"].get("vs_spy")
+        if vs is not None:
+            rows.append(("S&P 500", "", s["ret_1d"] - vs, "bench"))
+        lines.append((R.pair_bars([(f"함께 보는 회사 ({day})", rows)]), "html"))
+    ok = [x for x in links if x[2]][:4]
+    if ok:   # 한국 연결 종목 — 검증 통과한 것만, 다음 날 시가 차이
+        lines.append((f'{_dk.CHART_TITLE_M}한국 연결 종목 <span style="font-weight:400;font-size:{R.TINY};color:{R.NOTE};">(다음 날 시가)</span></span>', "html"))
+        for k, (nm, sp, _ok, us) in enumerate(ok):
+            lines.append(("row", nm, f"{_sgn(sp)}%p", f"{_dk.josa(' · '.join(us), '이')} 많이 오른 밤과 내린 밤의 차이", False, k == 0))
+    tip = ("이 종목과 경쟁 · 공급 · 고객으로 이어진 미국 회사의 오늘 등락, 그리고 이 종목을 따라 다음 날 아침 움직이는 한국 종목\n"
+           f"· 오늘 {state} : 함께 보는 회사 {len(moves)}곳 중 오른 곳 {ups} · 내린 곳 {downs} (±0.5% 기준)"
+           + ("\n· 기록상 : 한국 연결 종목은 미국 연결 종목이 많이 오른 밤과 많이 내린 밤, 다음 날 시가 차이가 컸다. 같은 날 미국 회사끼리의 움직임은 검증하지 않았다" if ok else ""))
+    card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance"), fold=True)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
+
+
 def sec_regime(s):
     """`미국 증시 분위기는?` (2026-11-01 사용자 P214: 옛 `시장 분위기는?` · 기술지표 카드 위로). 펼치면 첫 문장 아래 S&P 500 봉차트(P215) → 고점 대비 줄."""
     mr = s.get("market_regime")
@@ -733,7 +782,7 @@ def _josa(t):
 
 def detail_body(s, today, news=None):
     """NVDA 리포트 순서 : 맨 위 요약 → 그래프 → 가격 카드(펼치면 1층 · 2층) → 상태 카드. 갱신 날짜 줄은 뺐다 — 요약 첫 마디에 날짜가 있다 (2026-10-18 사용자)."""
-    return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_regime(s) + sec_tech(s) + sec_states(s) + sec_targets(s)
+    return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_regime(s) + sec_tech(s) + sec_pairs(s) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
                 + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
                 + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)

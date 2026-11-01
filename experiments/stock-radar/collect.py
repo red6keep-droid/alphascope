@@ -76,7 +76,8 @@ def _earnings(s):
 def run():
     syms = [c[0] for c in U.CANDIDATES]
     extra = sorted({U.BENCH, "^VIX", "SMH", *SECTOR_ETFS})
-    bars = _bars(syms + extra)
+    peers = sorted({p for v in U.PEERS.values() for p in v} - set(syms))   # 함께 보는 회사 중 64종목 밖 — `함께 움직이는 종목은?` 오늘 등락 (2026-11-01 사용자 P263). 페이지는 만들지 않는다
+    bars = _bars(syms + extra + peers)
     # 스레드 8 → 3: 49종목 × 2 호출을 한꺼번에 쏘면 러너 IP 가 Yahoo 에 막힐 때 전부 같이 죽는다 (운영지침 D6-1, 2026-10-21)
     with ThreadPoolExecutor(3) as ex:
         caps = dict(ex.map(_cap, syms))

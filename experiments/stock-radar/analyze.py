@@ -288,6 +288,16 @@ def update_ranks(stocks, day, path=STATE):
     return sorted(stocks, key=lambda s: (not s["in_top"], s["rank"] or 99))
 
 
+def peer_moves(snap, sym, day):
+    """함께 보는 회사(universe.PEERS)의 같은 날 등락 — [(티커, 관계, 등락 %)]. 그날 봉이 없는 회사는 뺀다 (2026-11-01 사용자 P263)."""
+    out = []
+    for p, role in (U.PEERS.get(sym) or {}).items():
+        bars = [b for b in snap["bars"].get(p) or [] if b["day"] <= day]
+        if len(bars) >= 2 and bars[-1]["day"] == day and bars[-2].get("adj"):
+            out.append((p, role, (bars[-1]["adj"] / bars[-2]["adj"] - 1) * 100))
+    return out
+
+
 def run(snap):
     stocks = [x for x in (stock(c[0], snap) for c in U.CANDIDATES) if x]
     mr, ms = market_regime(snap), market_shock(snap)
@@ -299,6 +309,7 @@ def run(snap):
         s["bollinger"] = bollinger(bars)
         s["overheat"] = overheat(bars, s["tech"])
         s["drawdown"] = drawdown(bars, s["year_range"], snap, s["sym"])
+        s["peer_moves"] = peer_moves(snap, s["sym"], s["day"])
         c = [x["close"] for x in bars]
         s["mom_12_1"] = (c[-21] / c[-252] - 1) * 100 if len(c) >= 252 and c[-252] else None   # 12-1 모멘텀 — 한국 K18 과 같은 식. 미국은 검증 통과 못 함 → 숫자만 (2026-10-31)
     ranked = sorted((s for s in stocks if s.get("mom_12_1") is not None), key=lambda s: -s["mom_12_1"])

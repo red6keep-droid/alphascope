@@ -180,33 +180,6 @@ def _us_name(sym):
     return USU.name(sym) if sym in USU.BY_SYM else sym
 
 
-def _pair_bars(groups, note=""):
-    """밤사이 미국 · 오늘 한국 세로 막대 (2026-10-27 사용자 P31: "세로 막대, 길면 넘겨 보기" — P27 가로 막대를 바꿈). 공용 _col_chart 한 시리즈,
-    막대마다 색 — 미국 연결은 오름 빨강 · 내림 파랑, 이 종목은 진하게, KOSPI 회색. 두 묶음은 같은 간격으로 이어 그린다(P57). 가로축 이름 아래 줄 = 연결 이유.
-    흰 카드 폭은 상태 카드 안 다른 막대(_zone_gauge)와 같다."""
-    cols, kinds = [], []
-    for _, rows in groups:   # 두 묶음 사이 빈 칸은 뺐다 — 모든 막대 같은 간격 (2026-10-28 사용자 P57)
-        for nm, sub, v, kind in rows:
-            cols.append((nm + (f"\n{sub}" if sub else ""), [v]))
-            kinds.append(kind)
-
-    def color_at(i, k, v):
-        kind = kinds[i]
-        if kind == "bench":
-            return R._GRAY_BAR, NOTE
-        bg = R._PASTEL_UP if v >= 0 else R._PASTEL_DN
-        return bg, (UP if v > 0 else DOWN if v < 0 else "#111")   # 이 종목도 보통 색 (P176, 옛 20% 진하게)
-    chart = R._col_chart(cols, [R._sign_bg], [R._sign_fg], fmt=lambda v: f"{v:+.1f}".replace("-", "−"), color_at=color_at)
-    for (nm, _), kind in zip(cols, kinds):   # 이 종목 = 축 이름 위 점 (P176)
-        if kind == "me":
-            v = next(r[2] for _, rows in groups for r in rows if r[3] == "me")
-            chart = R.axis_dot(chart, nm, UP if v > 0 else DOWN if v < 0 else "#111")
-    title = " → ".join(g for g, _ in groups)
-    tail = f'<span style="display:block;margin:6px 0 0;font-size:{TINY};line-height:20px;color:{NOTE};word-break:keep-all;">{_esc(note)}</span>' if note else ""
-    return (f'{_dk.CHART_TITLE_M}{R._paren(_esc(title + " (%)"))}</span>'   # 표준 그래프 제목(행간 24) — 옛 상태 카드 행간 32 를 물려받아 제목 ~ 그래프가 넓었다 (P177)
-            f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X - 2}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>{tail}')
-
-
 def _mates(s, n=6):
     """같은 테마(없으면 같은 업종)의 한국 종목 — 기업 탭 `같은 묶음` 과 같은 규칙 (P153: 오늘 탭 함께 움직이는 종목 카드로)."""
     mates = [x for x in U.CANDIDATES if x[0] != s["sym"] and set(x[4]) & set(U.groups(s["sym"]))] or [x for x in U.CANDIDATES if x[0] != s["sym"] and x[3] == U.sector(s["sym"])]
@@ -250,12 +223,12 @@ def sec_pairs(s, a=None):
     if vb is not None:
         kr.append(("KOSPI", "", s["ret_1d"] - vb, "bench"))
     # `그 뒤 미국 종가 … 다음 한국장 전 참고` 줄은 뺐다 — 정기 실행(16:10 KST)엔 그 미국장이 아직 안 끝나 늦게 돌 때만 나오고, 무슨 값인지 읽히지 않았다 (2026-10-28 사용자 P58)
-    lines.append((_pair_bars([(f"밤사이 미국 ({_md(day)} 종가)", us), (f"오늘 한국 ({_md(s['day'])})", kr)]), "html"))
+    lines.append((R.pair_bars([(f"밤사이 미국 ({_md(day)} 종가)", us), (f"오늘 한국 ({_md(s['day'])})", kr)]), "html"))
     # 같은 묶음 한국 종목의 오늘 등락 — 미국 부분과 같은 막대 (2026-10-31 사용자 P153: 제목 `함께 움직이는 종목은?`, 기업 탭의 `함께 움직이는 종목` 을 여기로)
     by = {x["sym"]: x for x in (a or {}).get("stocks") or []}
     group = [(x[1], "", by[x[0]]["ret_1d"], "us") for x in _mates(s) if x[0] in by and by[x[0]].get("ret_1d") is not None]
     if group:
-        lines.append((_pair_bars([(f"같은 묶음 한국 종목 ({_md(s['day'])})", group)]), "html"))
+        lines.append((R.pair_bars([(f"같은 묶음 한국 종목 ({_md(s['day'])})", group)]), "html"))
     return R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=pair_tip(s), fold=True)   # 답은 밤사이 미국 기준 그대로(검증 통과한 신호)
 
 
