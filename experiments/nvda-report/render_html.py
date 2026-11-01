@@ -804,8 +804,8 @@ def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None):
     두 카드는 의견이 없어도 늘 둔다 — 답 `없음` (2026-11-01 사용자 P199: 방송 의견이 없다고 카드가 사라지면 안 된다).
     cells = 애널리스트 칸(analyze_tabs.analysts 모양), money = 방송 목표가 표기, m0 · m2 = 애널리스트 목표가 표기(없으면 달러), together = 함께 보기 줄을 만드는 함수."""
     cards = analysts_card(cells, close, m0, m2) + picks_card(name, ps, close, money)
-    tg = together_card(together())   # 격자(data-grid) 밖 — 넓은 화면에서 두 카드 옆 칸에 끼지 않게
-    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>' + (f'<div data-cards="1" style="margin:0 0 8px;">{tg}</div>' if tg else "")
+    cards += together_card(together())   # 데이터 전망 = 셋째 강조 카드 (P206)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>'
 
 
 def analysts_card(cells, close, m0=None, m2=None):
@@ -826,12 +826,27 @@ def analysts_card(cells, close, m0=None, m2=None):
     return _state_card("애널리스트 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance"), fold=True)
 
 
+TOGETHER_Q = "Alpha Scope의 데이터 전망은?"   # 옛 흰 카드 `Alpha Scope 데이터로 함께 보기` → 강조 카드 (2026-11-01 사용자 P206)
+TOGETHER_WORDS = ((1, "상승", UP), (-1, "하락", DOWN), (0, "중립", "#111"))
+
+
 def together_card(items):
-    """`Alpha Scope 데이터로 함께 보기` 따로 흰 카드 — 의견 탭 두 강조 카드 아래 (P197, 옛 방송 의견 펼침 끝)."""
-    blk = together_block(items).replace(TOGETHER_END, "")
-    if not blk:
+    """`Alpha Scope의 데이터 전망은?` 강조 카드 — 의견 탭 두 카드 아래, 접기 버튼 · 펼침은 다른 강조 카드와 같다 (2026-11-01 사용자 P206, 옛 P197 흰 카드).
+    답 = 방향별 개수 `상승 5 · 하락 4 · 중립 2`(낱말마다 색, 방송 의견 답과 같은 모양) · 카드는 회색 — 판정을 합쳐 한 방향(`하락`)을 내지 않는다:
+    대부분 검증 전 지표라 개수 다수결은 근거가 없고, 한 단어 결론은 이 블로그의 매수 · 매도 의견으로 읽힌다(매수 추천 금지 · A5-1 원칙 3). 사용자 확인 대기."""
+    items = [x for x in items if x and x[1]]
+    if not items:
         return ""
-    return blk.replace(f"margin:19px {_dk.CHART_CARD_X}px 0;", "margin:0;", 1)
+    cnt = [(w, c, sum(1 for x in items if x[2] == d)) for d, w, c in TOGETHER_WORDS]
+    cnt = [x for x in cnt if x[2]]
+    state = " · ".join(f"{w} {n}" for w, _, n in cnt)
+    rich = '<span style="color:#111;">&nbsp;·&nbsp;</span>'.join(f'<span style="color:{c};">{w} {n}</span>' for w, c, n in cnt)
+    lines = [(f"이 페이지 카드 {len(items)}개의 판정을 상승 · 하락 · 중립으로 나눠 모았다. 줄을 누르면 그 카드로 간다.", "plain"),
+             (together_block(items, "neutral", title=False), "html")]
+    tip = ("이 페이지 여러 카드의 판정을 방향별로 다시 놓은 것. 주가에 가까운 것부터, 줄마다 판정이 통하는 기간\n"
+           f"· 지금 : {state}\n"
+           "· 합쳐서 한 방향을 내지 않는다. 대부분 검증 전 지표다\n· 이 블로그의 추천이 아니다")
+    return _state_card(TOGETHER_Q, state, "neutral", MUTED, lines, "", tip=tip, fold=True, state_rich=rich)
 
 
 def group_title(text):
@@ -990,7 +1005,7 @@ BLOG_LOGO = ('<svg viewBox="0 0 313 286" width="18" height="16" aria-hidden="tru
              '<path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000000"/></svg>')   # 블로그 로고 (alphaflow-home .logo-mark)
 
 
-def together_block(items, outer=None):
+def together_block(items, outer=None, title=True):
     """방송 의견 아래 `Alpha Scope 데이터로 함께 보기` — items = [(이름, 판정 말, 방향 +1 · −1 · 0, 탭 이름, 카드 제목[, 기간])] (signal_groups, P172).
     ▲ 상승 쪽 · ▼ 하락 쪽 · 중립 묶음으로 나눠 놓기만 한다 — 의견이 맞다 · 상충한다 같은 평가 말 · 종합 점수는 쓰지 않는다(매수 추천 금지).
     묶음마다 방향 색 카드(상승 = 주황 · 하락 = 파랑 · 중립 = 회색), outer = 바깥 강조 카드 theme — 같은 색이면 TOGETHER_DEEP (P168). 제목 앞 블로그 로고.
@@ -1010,8 +1025,10 @@ def together_block(items, outer=None):
                     f'<span style="min-width:0;color:#111;">{_esc(nm)}{hz}</span>'
                     f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;font-weight:{400 if d == 0 else 700};color:{col};">{_esc(st.lstrip("▲▼ "))}'
                     f'{TS.box(kind, word, _esc)}{OUT_ICON}</span></span>')   # 대답 → 라벨 → 나가는 아이콘(대답 색). 중립 대답은 보통 굵기 · 조금 빠진 검정 (P173)
-    title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 16px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>')   # 16 → 18 (P169) · 가운데 (P170) · 위 14 → 22 · 아래 8 → 16 (P174)
-    return (f'<span data-together="1" style="{MULTI}margin:19px {_dk.CHART_CARD_X}px 0;padding:{_dk.CHART_CARD_PAD + 12}px 12px 12px;">{title}{out}</span>{TOGETHER_END}')   # 그래프와 같은 흰 카드로 감싼다 (2026-10-31 사용자 P171, 옛 구분선 + 위 19)
+    head = title
+    title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 16px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>') if head else ""   # title=False = 강조 카드 안 줄 목록만 (P206)
+    pad_top = _dk.CHART_CARD_PAD + (12 if head else 0)
+    return (f'<span data-together="1" style="{MULTI}margin:{19 if head else 6}px {_dk.CHART_CARD_X}px 0;padding:{pad_top}px 12px {12 if head else 0}px;">{title}{out}</span>{TOGETHER_END}')   # 그래프와 같은 흰 카드로 감싼다 (2026-10-31 사용자 P171, 옛 구분선 + 위 19)
 
 
 PICK_REASON_LH = "26px"   # 방송 의견 이유 문장 행간 — 24 × 1.1 → 정수 26 (2026-10-31 사용자 P169)
