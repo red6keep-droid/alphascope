@@ -813,16 +813,20 @@ def opinions_card(name, cells, close, ps, money, together, m0=None, m2=None):
     else:
         state = picks_state(ps)   # `매수 4 · 보유 1` (P163)
         text = f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 방송에서 나왔다. 애널리스트 집계는 없다."
+    theme, col = pick_theme(state)   # 매수면 오름 색 강조 카드 (P92)
+    sep = _dk.darken(_dk.lighten(_dk.lighten(CARD_DIR[theme][1]), 0.3), 0.02)   # 카드 안 줄 사이 구분선과 같은 색 (_state_card bd_row)
     lines = [(text, "rich")]   # 인원 · 퍼센트 굵게, 방송 `매수 의견이 4건` 의견 색 굵게 (2026-11-01 사용자 P194)
     if verdict:
-        lines.append((analysts_block(a, m0, m2), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
+        lines.append((analysts_block(a, m0, m2, sep), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
     if ps:
-        lines.append((picks_rows_folded(ps, close, money) + together_block(together(), pick_theme(state)[0]), "html"))   # 4건 이상은 3건 + 접기 (P158)
+        pad = _dk.SEP_GAP - _dk.VP - 1
+        head = (f'<span style="display:block;margin:{pad}px 0 10px;padding:{pad}px 0 0;border-top:1px solid {sep};font-weight:700;color:#111;font-size:{_dk.NAME};line-height:{LH_CARD};">'
+                f'방송 의견 <span style="font-weight:400;color:{NOTE};font-size:{TINY};">{len(ps)}건</span></span>') if verdict else ""   # 애널리스트 아래 방송 의견 구분 · 전체 건수 (2026-11-01 사용자 P195)
+        lines.append((head + picks_rows_folded(ps, close, money) + together_block(together(), theme), "html"))   # 4건 이상은 3건 + 접기 (P158)
     tip = (f"애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가와, 방송(유튜브 경제 채널) 요약에서 최근 {PICK_HOURS}시간에 나온 이 종목 의견을 한 카드에 모은 것\n"
            f"· 지금 : {state}" + (f" · 방송 {cnt}" if ps else "") + "\n"
            "· 나누는 법 : 애널리스트 중 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림. 방송 건수는 답에 넣지 않는다\n"
            "· 이 블로그의 추천이 아니다")   # 옛 `읽는 법 : 누가 어떤 이유로 … 적중률은 검증하지 않았고` 는 줄였다 (2026-10-31 batch 7 h)
-    theme, col = pick_theme(state)   # 매수면 오름 색 강조 카드 (P92)
     return _state_card("애널리스트 · 방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance · 유튜브 방송 요약"), fold=True)
 
 
@@ -2259,7 +2263,7 @@ def analysts_verdict(a, rich=False):
     return "엇갈림", f"{who}의 의견이 매수 {b(f'{buy:.0f}%')} · 보유 {b(f'{hold:.0f}%')} · 매도 {b(f'{sell:.0f}%')}로 갈린다."
 
 
-def analysts_block(a, m0=None, m2=None):
+def analysts_block(a, m0=None, m2=None, sep="#E2E8F0"):
     """상태 카드 펼침 안에 넣는 애널리스트 묶음 (P90) — 2026-11-01 사용자 P194: 흰 카드 하나에 몰아 두던 것을 그래프 규칙대로 나눈다.
     ① `※ 애널리스트 N명의 의견` 그래프 제목 + 흰 카드(등급 막대 · 범례) ② `※ 평균 등급 4.3 / 5` 그래프 제목 + 흰 카드(목표가 막대)
     ③ 목표가 평균 · 중앙 · 최고 · 최저와 현재가 대비 = 그래프와 떨어진 표(고점 회복 `약 30년 동안 있었던 횟수` 표와 같은 글씨 · 구성)."""
@@ -2281,30 +2285,24 @@ def analysts_block(a, m0=None, m2=None):
                      f'<span style="font-weight:400;font-size:{TINY};color:{NOTE};">(강매수 5 · 강매도 1)</span>')
         top = _dk.CHART_STACK_GAP if out else 0   # 그래프 아래 또 그래프 — 보이는 24 (P179)
         out += f'<span style="{_dk._CHART_TITLE_STYLE}margin:{top}px 0 {_dk.CHART_TITLE_GAP}px;">{_dk.CHART_MARK}{title}</span>' + card(gauge)
-    out += target_table(cells, close, m0)
+    out += target_table(cells, close, m0, sep)
     return f'<div data-cards="1" style="margin:0 0 8px;">{out}</div>' if out else ""
 
 
-def target_table(cells, close, m0=None):
-    """목표가 평균 · 중앙 · 최고 · 최저와 현재가 대비 — 흰 카드 안 작은 표 (2026-11-01 사용자 P194: 고점 회복 `회복에 1년 넘게 걸린 비율` 표와 같은 글씨 · 구성)."""
+def target_table(cells, close, m0=None, sep="#E2E8F0"):
+    """목표가 평균 · 중앙 · 최고 · 최저와 현재가 대비 (2026-11-01 사용자 P194 · P195) — 흰 카드 없이 구분선 아래 작은 제목 + 줄 목록
+    (고점 회복 `약 30년 동안 있었던 횟수` 처럼 14px 회색). 열을 나눈 표는 금액이 길면 틀이 깨져서 줄마다 `48만 원 · 현재가 대비 +106.9%` 로 푼다. sep = 카드 안 구분선 색."""
     items = [(nm, (cells.get(k) or {}).get("value")) for k, nm in (("pt_mean", "평균"), ("pt_median", "중앙"), ("pt_high", "최고"), ("pt_low", "최저"))]
     items = [(nm, v) for nm, v in items if v is not None]
     if not items:
         return ""
     m0 = m0 or (lambda v: f"${v:,.0f}")   # noqa: E731
-    vb = "border-left:1px solid #E2E8F0;"
-    cell = lambda txt, first=False: f'<span style="flex:1 1 0;min-width:0;box-sizing:border-box;padding:0 6px;white-space:nowrap;text-align:{"left" if first else "center"};{"" if first else vb}">{txt}</span>'   # noqa: E731
-    gap = lambda v: (f'<span style="color:{UP if v > close else DOWN if v < close else NOTE};">{_sgn((v / close - 1) * 100)}%</span>' if close else "")   # noqa: E731
-    head = cell("", True) + "".join(cell(f'<span style="color:#111;font-weight:700;">{nm}</span>') for nm, _ in items)   # 표 제목 `애널리스트 목표가` 가 있어 머리 첫 칸은 비운다
-    r1 = cell("목표가", True) + "".join(cell(_esc(m0(v))) for _, v in items)
-    rows = [head, r1]
-    if close:
-        rows.append(cell("현재가 대비", True) + "".join(cell(gap(v)) for _, v in items))
-    tbl = "".join(f'<span style="display:flex;align-items:stretch;line-height:24px;">{r}</span>' for r in rows)
-    title = f'<span style="display:block;color:#111;font-weight:700;margin:0 0 4px;">애널리스트 목표가</span>'
-    return (f'<span style="{MULTI}margin:{_dk.CHART_STACK_GAP + 14}px {_dk.CHART_CARD_X}px 0;"><span style="display:block;padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};color:{NOTE};">'
-            f'{title}{tbl}</span></span>')
-
+    gap = lambda v: (f' · 현재가 대비 <span style="color:{UP if v > close else DOWN if v < close else NOTE};">{_sgn((v / close - 1) * 100)}%</span>' if close else "")   # noqa: E731
+    rows = "".join(f'<span style="display:flex;gap:12px;line-height:24px;"><span style="flex:0 0 32px;">{nm}</span>'
+                   f'<span style="flex:1 1 auto;min-width:0;overflow-wrap:anywhere;"><span style="color:#111;">{_esc(m0(v))}</span>{gap(v)}</span></span>' for nm, v in items)
+    pad = _dk.SEP_GAP - _dk.VP - 1
+    return (f'<span style="display:block;margin:{pad}px 0 0;padding:{pad}px 0 0;border-top:1px solid {sep};font-size:{TINY};color:{NOTE};">'
+            f'<span style="display:block;color:#111;font-weight:700;margin:0 0 4px;">애널리스트 목표가</span>{rows}</span>')
 
 def targets_parts(a, m0=None, m2=None):
     """(요약 = 등급 막대 + 평균 등급 줄, 펼침 = 목표가 막대 + 평균 · 중앙 · 최고 · 최저) — 없으면 None.
