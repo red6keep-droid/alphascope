@@ -976,6 +976,12 @@ EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
 
 
 def together_items(s):
+    """`Alpha Scope 데이터로 함께 보기` 줄 — verdict_items 를 SG.ORDER(주가에 가까운 것부터) 순서로."""
+    got = verdict_items(s)
+    return [got[k] for k in SG.ORDER if got.get(k)]
+
+
+def verdict_items(s):
     """`Alpha Scope 데이터로 함께 보기` 줄 (P142 → P172: 손으로 고른 셋 대신 분류표 signal_groups 로 페이지의 모든 방향 판정).
     순서 = SG.ORDER(주가에 가까운 것부터). 방향 · 기간 꼬리표는 표에서, 판정 말은 각 카드와 같은 helper 에서."""
     ex, tc = s.get("expect") or {}, s.get("tech") or {}
@@ -996,7 +1002,7 @@ def together_items(s):
         "sector_flow": SG.item("sector_flow", s["sector_flow"]["state"], sector=s["sector_flow"]["name"]) if s.get("sector_flow") else None,   # 2026-10-31
         "regime": SG.item("regime", s["market_regime"]["regime"]) if s.get("market_regime") else None,
     }
-    return [got[k] for k in SG.ORDER if got.get(k)]
+    return got
 
 
 # ---------------------------------------------------------------- `캘린더` 탭 (2026-10-25 사용자) — 미국 종목 캘린더 탭과 같은 질문 카드 셋.

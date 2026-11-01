@@ -171,17 +171,17 @@ jobs:
       - name: Save state (kr-state branch)
         if: always()
         run: |
-          mkdir -p state-out
-          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_corp.json dart_company.json dart_earn.json est_history.json report_posts.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
-            [ -f "$KR_DIR/data/$f" ] && cp "$KR_DIR/data/$f" state-out/ || true
-          done
-          [ -n "$(ls state-out 2>/dev/null)" ] || { echo "저장할 상태 없음"; exit 0; }
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
-          SUB="$(for f in state-out/*; do printf '100644 blob %s\t%s\n' "$(git hash-object -w "$f")" "$(basename "$f")"; done | git mktree)"
-          T1="$(printf '040000 tree %s\tdata\n' "$SUB" | git mktree)"
-          T2="$(printf '040000 tree %s\tkr-stocks\n' "$T1" | git mktree)"
-          TREE="$(printf '040000 tree %s\texperiments\n' "$T2" | git mktree)"
+          # 임시 인덱스로 실제 경로(experiments/kr-stocks/data/…)를 그대로 올린다 — records/ 하위 폴더(매일 기록, 2026-11-01)까지 (옛: 파일만 mktree)
+          export GIT_INDEX_FILE="$(mktemp -u)"
+          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_corp.json dart_company.json dart_earn.json est_history.json report_posts.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
+            [ -f "$KR_DIR/data/$f" ] && git add -f "$KR_DIR/data/$f" || true
+          done
+          [ -d "$KR_DIR/data/records" ] && git add -f "$KR_DIR/data/records" || true   # 카드 판정 · 애널리스트 · 방송 의견 (stock_records, 데이터-기록-계획 A5-4)
+          if [ -z "$(git ls-files)" ]; then unset GIT_INDEX_FILE; echo "저장할 상태 없음"; exit 0; fi
+          TREE="$(git write-tree)"
+          unset GIT_INDEX_FILE
           if PARENT="$(git rev-parse --verify -q refs/kr-state)"; then
             if [ "$TREE" = "$(git rev-parse "$PARENT^{tree}")" ]; then echo "변경 없음"; exit 0; fi
             COMMIT="$(git commit-tree "$TREE" -p "$PARENT" -m "Update kr-stocks state [skip ci]")"

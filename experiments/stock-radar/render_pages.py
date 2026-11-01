@@ -451,6 +451,12 @@ EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
 
 
 def together_items(s):
+    """`Alpha Scope 데이터로 함께 보기` 줄 — verdict_items 를 SG.ORDER(주가에 가까운 것부터) 순서로."""
+    got = verdict_items(s)
+    return [got[k] for k in SG.ORDER if got.get(k)]
+
+
+def verdict_items(s):
     """`Alpha Scope 데이터로 함께 보기` 줄 (P142 → P172: 분류표 signal_groups 로 페이지의 모든 방향 판정). 순서 = SG.ORDER."""
     ex, tc = s.get("expect") or {}, s.get("tech") or {}
     sig, sf, mr, ms = tc.get("signals"), s.get("sector_flow"), s.get("market_regime"), s.get("market_shock") or {}
@@ -465,7 +471,7 @@ def together_items(s):
         "regime": SG.item("regime", mr["regime"]) if mr else None,
         "shock": SG.item("shock", "충격 국면 중") if ms.get("active") else None,
     }
-    return [got[k] for k in SG.ORDER if got.get(k)]
+    return got
 
 
 def sec_targets(s):
