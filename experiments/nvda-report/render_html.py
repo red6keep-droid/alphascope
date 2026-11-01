@@ -816,7 +816,8 @@ def analysts_card(cells, close, m0=None, m2=None):
         return _state_card("애널리스트 의견은?", "없음", "neutral", MUTED, [("이 종목의 애널리스트 의견 집계가 아직 없다.", "plain")], "",
                            tip=_dk.with_src("애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가\n· 지금 : 집계 없음\n· 이 블로그의 추천이 아니다", "Yahoo Finance"), fold=True)
     state, text = verdict
-    theme, col = pick_theme(state)   # 매수면 오름 색 강조 카드 (P92)
+    theme = pick_theme(state)[0]   # 매수면 오름 색 강조 카드 (P92)
+    col = PICK_THEME.get(state, ("", "#111"))[1]   # 보유 · 엇갈림 = 검정 글씨 (P201 · P207)
     sep = _dk.darken(_dk.lighten(_dk.lighten(CARD_DIR[theme][1]), 0.3), 0.02)   # 카드 안 줄 사이 구분선과 같은 색 (_state_card bd_row)
     lines = [(text, "rich"), (analysts_block(a, m0, m2, sep), "html")]   # 인원 · 퍼센트 굵게 (P194)
     tip = ("애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가\n"
@@ -831,22 +832,24 @@ TOGETHER_WORDS = ((1, "상승", UP), (-1, "하락", DOWN), (0, "중립", "#111")
 
 
 def together_card(items):
-    """`Alpha Scope의 데이터 전망은?` 강조 카드 — 의견 탭 두 카드 아래, 접기 버튼 · 펼침은 다른 강조 카드와 같다 (2026-11-01 사용자 P206, 옛 P197 흰 카드).
-    답 = 방향별 개수 `상승 5 · 하락 4 · 중립 2`(낱말마다 색, 방송 의견 답과 같은 모양) · 카드는 회색 — 판정을 합쳐 한 방향(`하락`)을 내지 않는다:
-    대부분 검증 전 지표라 개수 다수결은 근거가 없고, 한 단어 결론은 이 블로그의 매수 · 매도 의견으로 읽힌다(매수 추천 금지 · A5-1 원칙 3). 사용자 확인 대기."""
+    """`Alpha Scope의 데이터 전망은?` 강조 카드 — 의견 탭 셋째, 접기 버튼 · 펼침은 다른 강조 카드와 같다 (2026-11-01 사용자 P206 · P207).
+    답 = 가장 많은 방향 하나(상승 · 하락 · 중립, 같으면 엇갈림), 카드 색 = 그 방향(상승 주황 · 하락 파랑 · 그 밖 회색). 펼치면 분포 문장 + 줄 목록(흰 바탕 없이).
+    Claude 는 개수 다수결 한 단어가 검증 전 지표를 합친 결론 · 블로그 의견으로 읽힌다고 반대했으나 사용자 결정(P207). 툴팁에 `추천이 아니다`."""
     items = [x for x in items if x and x[1]]
     if not items:
         return ""
-    cnt = [(w, c, sum(1 for x in items if x[2] == d)) for d, w, c in TOGETHER_WORDS]
-    cnt = [x for x in cnt if x[2]]
-    state = " · ".join(f"{w} {n}" for w, _, n in cnt)
-    rich = '<span style="color:#111;">&nbsp;·&nbsp;</span>'.join(f'<span style="color:{c};">{w} {n}</span>' for w, c, n in cnt)
-    lines = [(f"이 페이지 카드 {len(items)}개의 판정을 상승 · 하락 · 중립으로 나눠 모았다. 줄을 누르면 그 카드로 간다.", "plain"),
-             (together_block(items, "neutral", title=False), "html")]
-    tip = ("이 페이지 여러 카드의 판정을 방향별로 다시 놓은 것. 주가에 가까운 것부터, 줄마다 판정이 통하는 기간\n"
-           f"· 지금 : {state}\n"
-           "· 합쳐서 한 방향을 내지 않는다. 대부분 검증 전 지표다\n· 이 블로그의 추천이 아니다")
-    return _state_card(TOGETHER_Q, state, "neutral", MUTED, lines, "", tip=tip, fold=True, state_rich=rich)
+    cnt = [(d, w, c, sum(1 for x in items if x[2] == d)) for d, w, c in TOGETHER_WORDS]
+    top = max(n for *_, n in cnt)
+    lead = [x for x in cnt if x[3] == top]
+    d, word = (lead[0][0], lead[0][1]) if len(lead) == 1 else (None, "엇갈림")
+    theme, col = {1: ("positive", UP), -1: ("negative", DOWN)}.get(d, ("neutral", "#111"))
+    dist = " · ".join(f'<b style="font-weight:700;color:{c};">{w} {n}개</b>' for _, w, c, n in cnt if n)
+    lines = [(f"이 페이지 카드 {len(items)}개의 판정이 {dist}로 나뉜다.", "rich"),
+             (together_block(items, theme, title=False), "html")]
+    tip = ("이 페이지 여러 카드의 판정을 상승 · 하락 · 중립으로 다시 놓은 것. 줄마다 판정이 통하는 기간을 적었다\n"
+           f"· 지금 : {word} (" + " · ".join(f"{w} {n}" for _, w, _c, n in cnt if n) + ")\n"
+           "· 나누는 법 : 가장 많은 쪽, 같으면 엇갈림. 대부분 검증 전 지표다\n· 이 블로그의 추천이 아니다")
+    return _state_card(TOGETHER_Q, word, theme, col, lines, "", tip=tip, fold=True)
 
 
 def group_title(text):
@@ -934,15 +937,6 @@ PICK_DAYS = 30   # 영상을 읽어 오는 기간(뉴스 · 진단용) — Fires
 PICK_VBAR = '<span aria-hidden="true" style="display:inline-block;width:1px;height:13px;background:#CBD5E1;margin:0 9px;vertical-align:-1px;"></span>'   # 방송 이름 | 말한 사람 (P200)
 
 
-def _pick_at(sec):
-    """영상 속 발언 시각 → `9분 지점` (1분 안은 `처음`). 없으면 빈 문자열 (P200)."""
-    try:
-        m = int(float(sec)) // 60
-    except (TypeError, ValueError):
-        return ""
-    return f"{m}분 지점" if m else "처음"
-
-
 def _pick_when(iso):
     """게시 시각 → `10.28 20:18 게시` (KST)."""
     import media_feed
@@ -984,10 +978,12 @@ def picks_state(ps):
     return " · ".join(f"{k} {sum(1 for p in ps if p['action'] == k)}" for k in PICK_ORDER if any(p["action"] == k for p in ps))
 
 
-def picks_state_rich(ps):
-    """답 `매수 3 · 관망 2` 를 의견마다 색으로 — 매수 빨강 · 매도 파랑 · 보유 · 관망은 검정 (2026-11-01 사용자 P201: 관망까지 빨갛게 보였다)."""
-    return f'<span style="color:#111;">&nbsp;·&nbsp;</span>'.join(
-        f'<span style="color:{PICK_THEME.get(k, ("", "#111"))[1]};">{k} {sum(1 for p in ps if p["action"] == k)}</span>' for k in PICK_ORDER if any(p["action"] == k for p in ps))
+def picks_word(ps):
+    """방송 의견 답 — 가장 많은 의견 하나(`매수`), 같으면 `엇갈림` (2026-11-01 사용자 P207: 답에 숫자를 쓰지 않는다). 색 = PICK_THEME(매수 빨강 · 매도 파랑 · 그 밖 검정 계열)."""
+    n = {k: sum(1 for p in ps if p["action"] == k) for k in PICK_ORDER}
+    top = max(n.values())
+    lead = [k for k in PICK_ORDER if n[k] == top]
+    return lead[0] if len(lead) == 1 else "엇갈림"
 
 
 PICK_BOX = {"매수": "up", "매도": "down"}   # 줄 머리 의견 라벨 — 기술지표 라벨 모양, 보유 · 관망은 회색(flat) (P201)
@@ -1024,11 +1020,13 @@ def together_block(items, outer=None, title=True):
                     f'min-height:{TOGETHER_ROW_H}px;padding:6px 0;box-sizing:border-box;cursor:pointer;border-top:1px solid #EEF0F3;font-size:{_dk.NAME};line-height:{LH_CARD};">'   # 18 → 16 — 대답 · 라벨 · 아이콘이 한 줄에 들어가게 (360px 줄 폭 286, P173)
                     f'<span style="min-width:0;color:#111;">{_esc(nm)}{hz}</span>'
                     f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;font-weight:{400 if d == 0 else 700};color:{col};">{_esc(st.lstrip("▲▼ "))}'
-                    f'{TS.box(kind, word, _esc)}{OUT_ICON}</span></span>')   # 대답 → 라벨 → 나가는 아이콘(대답 색). 중립 대답은 보통 굵기 · 조금 빠진 검정 (P173)
+                    f'{TS.box(kind, word, _esc)}</span></span>')   # 대답 → 라벨. 나가는 아이콘은 뺐다 (2026-11-01 사용자 P204). 중립 대답은 보통 굵기 · 조금 빠진 검정 (P173)
     head = title
     title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 16px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>') if head else ""   # title=False = 강조 카드 안 줄 목록만 (P206)
     pad_top = _dk.CHART_CARD_PAD + (12 if head else 0)
-    return (f'<span data-together="1" style="{MULTI}margin:{19 if head else 6}px {_dk.CHART_CARD_X}px 0;padding:{pad_top}px 12px {12 if head else 0}px;">{title}{out}</span>{TOGETHER_END}')   # 그래프와 같은 흰 카드로 감싼다 (2026-10-31 사용자 P171, 옛 구분선 + 위 19)
+    if not head:   # 강조 카드 안 — 흰 바탕 · 테두리 없이 줄만 (2026-11-01 사용자 P207)
+        return f'<span data-together="1" style="display:block;margin:6px 0 0;">{out}</span>'
+    return (f'<span data-together="1" style="{MULTI}margin:19px {_dk.CHART_CARD_X}px 0;padding:{pad_top}px 12px 12px;">{title}{out}</span>{TOGETHER_END}')   # 그래프와 같은 흰 카드로 감싼다 (2026-10-31 사용자 P171, 옛 구분선 + 위 19)
 
 
 PICK_REASON_LH = "26px"   # 방송 의견 이유 문장 행간 — 24 × 1.1 → 정수 26 (2026-10-31 사용자 P169)
@@ -1058,7 +1056,8 @@ def picks_card(name, ps, close, money, hours=PICK_HOURS, together=""):
     lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 방송에서 나왔다.", "rich"), (picks_rows_folded(ps, close, money) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
     tip = (f"방송(유튜브 경제 채널) 요약에서 이 종목에 대한 매수 · 보유 · 관망 · 매도 의견을 모은 것. 최근 {hours}시간, 같은 영상 · 같은 사람은 한 번\n"
            f"· 지금 : {picks_count(ps)}\n· 이 블로그의 추천이 아니다")   # batch 7 h
-    return _state_card("방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True, state_rich=picks_state_rich(ps))
+    word = picks_word(ps)   # 숫자 없이 가장 많은 의견 하나 (2026-11-01 사용자 P207, 옛 `매수 3 · 관망 2`)
+    return _state_card("방송 의견은?", word, pick_theme(word)[0], PICK_THEME.get(word, ("", "#111"))[1], lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True)   # 보유 · 관망 · 엇갈림 = 검정 글씨 (P201)
 
 
 def picks_sentence(ps, rich=False):
@@ -1094,11 +1093,9 @@ def picks_rows(ps, close, money):
         who = re.sub(r"\s+\(", "(", p["speaker"] or p["channel"])   # `톰 리 (펀드스트랫)` → `톰 리(펀드스트랫)`
         nm, par, org = who.partition("(")
         who_html = _esc(nm) + (f'({_esc(org)}' if par else "") + ("" if p["own"] else " 보고서")
-        at = _pick_at(p.get("at_sec"))
         head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(PICK_BOX.get(p["action"], "flat"), p["action"], _esc, sym=False)}</span>'
                 f'<b style="font-weight:700;">{_esc(p["channel"])}</b>'
-                + (f'<span style="color:{NOTE};font-size:{TINY};margin-left:4px;">({at})</span>' if at else "")
-                + (f'{PICK_VBAR}<span style="font-weight:400;">{who_html}</span>' if p["speaker"] else ""))   # 의견 라벨 → 방송 이름 → (장면 시각) → 세로 구분선 → 말한 사람 (P200 · P201)
+                + (f'{PICK_VBAR}<span style="font-weight:400;">{who_html}</span>' if p["speaker"] else ""))   # 의견 라벨 → 방송 이름 → 세로 구분선 → 말한 사람 (P200 · P201, 장면 시각 괄호는 뺐다 P202)
         tgt = _pick_target(p, close, money)
         meta = _pick_when(p["published_at"]) + (f" · {tgt}" if tgt else "")   # 채널은 제목 줄로 올렸다 (P200)
         if p["url"]:
@@ -1454,6 +1451,9 @@ def _pull_end_chart(html):
     return html[:k] + f" {-GAUGE_PULL}px" + html[k:]
 
 
+STATE_ANS_W = 500   # 강조 카드 답(접기 버튼 앞 값) 굵기 700 → 500 (2026-11-01 사용자 P205). 블로그 글꼴(AS Barun)은 400 · 700 뿐이라 블로그에선 보통 굵기로 보인다
+
+
 def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False, opened=False, below_notes=False, state_rich=""):
     """상태 카드 (가이드라인 2-1 D, 2026-10-11 사용자: "별도 카드로 분리하고 이유도 카드에 포함" → "안내 아이콘 삭제, 글씨 검정, 블릿으로").
     첫 줄 구분명 좌·상태 우, 아래 얇은 선 뒤에 이유 글머리표(16px, 검정). 이유 묶음은 border-top — 홈 카드는 border-top 요소를 건너뛰므로 홈에는 첫 줄만 간다."""
@@ -1510,10 +1510,10 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
             h = h.replace('<li style="list-style:none;margin:6px 0 12px;">', f'<li style="list-style:none;margin:{12 + _dk.CHART_STACK_GAP}px 0 12px;">', 1)
         lis += h
     # fold: 첫 줄 맨 오른쪽 공식 접기 버튼(카드 색 20% 밝은 바탕), 기본 닫힘 — 펼치면 이유 글머리표 (2026-10-13 사용자: 시장 국면 · 반도체 자금, 가이드라인 10-7)
-    st = state_rich or _esc(state)   # state_rich = 낱말마다 색이 다른 답 (방송 의견 `매수 3 · 관망 2`, P201)
+    st = state_rich or _esc(state)   # state_rich = 낱말마다 색이 다른 답 (P201 — 지금은 쓰는 곳 없음, P207 답 한 단어)
     state_html = (f'<span style="display:inline-flex;align-items:center;">{st}{_fold_btn(_dk.lighten(bg), bd)}</span>' if fold else st)
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;line-height:{_dk.LH_EMPH_Q};">'   # 질문 · 대답 18px · 행간 30 (2026-10-27 사용자)   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다
-            f'<span style="{"flex:1 1 auto;min-width:0;" if fold else COL_L}font-weight:{STATE_TITLE_W};color:#111;font-size:{_dk.EMPH_Q};">{_title_with_icon(title, _tipx(tip) + new_html)}</span><span style="{"flex:none;white-space:nowrap;" if fold else COL_R}font-weight:700;color:{color};font-size:{_dk.EMPH_Q};">{state_html}</span></span> ')   # fold: 상태 + 버튼은 한 줄, 이름 칸이 남은 폭
+            f'<span style="{"flex:1 1 auto;min-width:0;" if fold else COL_L}font-weight:{STATE_TITLE_W};color:#111;font-size:{_dk.EMPH_Q};">{_title_with_icon(title, _tipx(tip) + new_html)}</span><span style="{"flex:none;white-space:nowrap;" if fold else COL_R}font-weight:{STATE_ANS_W};color:{color};font-size:{_dk.EMPH_Q};">{state_html}</span></span> ')   # fold: 상태 + 버튼은 한 줄, 이름 칸이 남은 폭
     body = (f'<div style="margin-top:{14 - _dk.VP_EMPH + 3}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div>")   # 음수 margin = 첫·끝 li 의 9px 지우기
     inner = (f'<details data-acc="1"{" open" if opened else ""}><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{body}</details>' if fold else head + body)
