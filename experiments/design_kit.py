@@ -1529,7 +1529,7 @@ def legend_bar(title, segs):
     total = sum(x[1] for x in segs)
     if not total:
         return ""
-    head = f'<span style="display:block;font-size:{TINY};line-height:{LH_TINY};margin:0 0 3px;color:#111;font-weight:700;">{esc(title)}</span>'   # 제목 16 → 14 굵게 = 한 달 범위 막대의 작은 굵은 글씨 (2026-10-31 사용자 P149)
+    head = f'<span style="display:block;font-size:{TINY};line-height:{LH_TINY};margin:0 0 3px;color:#111;font-weight:700;">{esc(title)}</span>' if title else ""   # 제목 없음 = 바깥 그래프 제목이 대신 (P194) · 제목 16 → 14 굵게 = 한 달 범위 막대의 작은 굵은 글씨 (2026-10-31 사용자 P149)
     body = "".join(f'<span style="display:block;width:{c / total * 100:.1f}%;background:{bg};color:{fg};font-size:{BAR_NUM};font-weight:700;'
                    f'text-align:center;line-height:{BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{c / total * 100:.0f}%" if c / total >= 0.08 else ""}</span>' for _, c, bg, fg in segs)   # 막대 안 숫자 굵게 (P163 — P159 보통 굵기를 되돌림, 크기 14 · 높이 24 그대로)
     bar_html = f'<span style="display:flex;width:100%;height:{BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:{BAR_PAD}px 0 {3 + BAR_PAD}px;">{body}</span>'

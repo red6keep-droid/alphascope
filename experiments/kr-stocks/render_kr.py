@@ -1693,7 +1693,8 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
                 print(f"[kr] {s['sym']} 캘린더 실패: {e}")
     global MEDIA
     if media is None:
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = (datetime.datetime.fromisoformat(os.environ["RADAR_NOW"].replace("Z", "+00:00")) if os.environ.get("RADAR_NOW")
+               else datetime.datetime.now(datetime.timezone.utc))   # 목업은 RADAR_NOW(ISO)로 시각을 고정 — 미국 종목 페이지와 같은 변수 (2026-11-01, 방송 의견 48시간이 지나 목업에서 사라지지 않게)
         since = (now - datetime.timedelta(hours=TODAY_HOURS)).strftime("%Y-%m-%dT%H:%M")
         vids = media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=PICK_DAYS - 1)   # Firestore `in` 은 30개까지 — 오늘 포함 30일. 한 번 읽어 뉴스(24시간) · 방송 의견(30일)에 나눠 쓴다
         media = media_feed.issues(media_feed.rows(vids), since)

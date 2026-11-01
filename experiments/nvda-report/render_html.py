@@ -803,17 +803,17 @@ def opinions_card(name, cells, close, ps, money, together, m0=None, m2=None):
     머릿수는 합치지 않는다(44명 + 1건 X). 답 = 애널리스트 다수(analysts_verdict) — 방송은 건수가 적어 답을 좌우하지 않는다. 애널리스트가 없으면 방송만으로 `매수` 등.
     cells = 애널리스트 칸(analyze_tabs.analysts 모양), money = 방송 목표가 표기, m0 · m2 = 애널리스트 목표가 표기(없으면 달러), together = 함께 보기 줄을 만드는 함수."""
     a = {"status": {"analysts": cells}, "headline": {"close": close}}
-    verdict = analysts_verdict(a) if cells else None
+    verdict = analysts_verdict(a, rich=True) if cells else None
     if not verdict and not ps:
         return ""
     cnt = picks_count(ps) if ps else ""
     if verdict:
         state, text = verdict
-        text += f" 방송에서는 {picks_sentence(ps)} 나왔다." if ps else ""
+        text += f" 방송에서는 {picks_sentence(ps, rich=True)} 나왔다." if ps else ""
     else:
         state = picks_state(ps)   # `매수 4 · 보유 1` (P163)
-        text = f"{name}에 대한 {picks_sentence(ps)} 방송에서 나왔다. 애널리스트 집계는 없다."
-    lines = [(text, "plain")]
+        text = f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 방송에서 나왔다. 애널리스트 집계는 없다."
+    lines = [(text, "rich")]   # 인원 · 퍼센트 굵게, 방송 `매수 의견이 4건` 의견 색 굵게 (2026-11-01 사용자 P194)
     if verdict:
         lines.append((analysts_block(a, m0, m2), "html"))   # 묶음 제목은 안쪽 `애널리스트 N명 의견` 막대 제목이 대신한다
     if ps:
@@ -1013,10 +1013,10 @@ def picks_sentence(ps, rich=False):
     if not rich:
         return f"{ks[0]} 의견이 {len(ps)}건" if len(ks) == 1 else picks_count(ps) + "이"
     kind = lambda k: f'<b style="font-weight:700;color:{PICK_THEME.get(k, ("", "#111"))[1]};">{k} 의견</b>'
-    num = lambda n: f'<b style="font-weight:700;">{n}건</b>'
+    num = lambda n, k: f'<b style="font-weight:700;color:{PICK_THEME.get(k, ("", "#111"))[1]};">{n}건</b>'   # 건수도 의견 색 (2026-11-01 사용자 P194: `매수 4건` 빨강 굵게)
     if len(ks) == 1:
-        return f"{kind(ks[0])}이 {num(len(ps))}"
-    return " · ".join(f"{kind(k)} {num(sum(1 for p in ps if p['action'] == k))}" for k in ks) + "이"
+        return f"{kind(ks[0])}이 {num(len(ps), ks[0])}"
+    return " · ".join(f"{kind(k)} {num(sum(1 for p in ps if p['action'] == k), k)}" for k in ks) + "이"
 
 
 def picks_count(ps):
@@ -2237,8 +2237,9 @@ def sec_targets(a):
     return _accordion(summary, f'<span style="display:block;">{inner}</span>', block=True)   # 펼침 맨 위 = 목표가 막대 (2026-10-23 사용자)
 
 
-def analysts_verdict(a):
-    """애널리스트 다수 의견 → (답, 문장) — 강매수+매수 > 50% `매수` · 보유 > 50% `보유` · 매도 쪽 > 50% `매도` · 아니면 `엇갈림` (2026-10-29 P90). 없으면 None."""
+def analysts_verdict(a, rich=False):
+    """애널리스트 다수 의견 → (답, 문장) — 강매수+매수 > 50% `매수` · 보유 > 50% `보유` · 매도 쪽 > 50% `매도` · 아니면 `엇갈림` (2026-10-29 P90). 없으면 None.
+    rich=True 는 HTML — 인원 · 퍼센트 굵게 (2026-11-01 사용자 P194)."""
     cells = {c["key"]: c for c in (a["status"].get("analysts") or [])}
     rc = (cells.get("rating_counts") or {}).get("value") or {}
     n = sum(rc.values()) if rc else 0
@@ -2247,23 +2248,62 @@ def analysts_verdict(a):
     buy = (rc.get("strongBuy", 0) + rc.get("buy", 0)) / n * 100
     hold = rc.get("hold", 0) / n * 100
     sell = (rc.get("sell", 0) + rc.get("strongSell", 0)) / n * 100
+    b = (lambda s: f'<b style="font-weight:700;">{s}</b>') if rich else (lambda s: s)   # noqa: E731
+    who = f"애널리스트 {b(f'{n}명')}"
     if buy > 50:
-        return "매수", f"애널리스트 {n}명 중 {buy:.0f}%가 매수(강매수 포함) 의견이다."
+        return "매수", f"{who} 중 {b(f'{buy:.0f}%')}가 매수(강매수 포함) 의견이다."
     if hold > 50:
-        return "보유", f"애널리스트 {n}명 중 {hold:.0f}%가 보유 의견이다."
+        return "보유", f"{who} 중 {b(f'{hold:.0f}%')}가 보유 의견이다."
     if sell > 50:
-        return "매도", f"애널리스트 {n}명 중 {sell:.0f}%가 매도(강매도 포함) 의견이다."
-    return "엇갈림", f"애널리스트 {n}명의 의견이 매수 {buy:.0f}% · 보유 {hold:.0f}% · 매도 {sell:.0f}%로 갈린다."
+        return "매도", f"{who} 중 {b(f'{sell:.0f}%')}가 매도(강매도 포함) 의견이다."
+    return "엇갈림", f"{who}의 의견이 매수 {b(f'{buy:.0f}%')} · 보유 {b(f'{hold:.0f}%')} · 매도 {b(f'{sell:.0f}%')}로 갈린다."
 
 
 def analysts_block(a, m0=None, m2=None):
-    """상태 카드 펼침 안에 넣는 애널리스트 묶음 — sec_targets 의 내용(등급 막대 · 평균 등급 · 목표가 막대 · 평균/중앙/최고/최저)을 흰 카드 하나로, 접기 버튼 없이 (P90)."""
-    parts = targets_parts(a, m0, m2)
-    if not parts:
+    """상태 카드 펼침 안에 넣는 애널리스트 묶음 (P90) — 2026-11-01 사용자 P194: 흰 카드 하나에 몰아 두던 것을 그래프 규칙대로 나눈다.
+    ① `※ 애널리스트 N명의 의견` 그래프 제목 + 흰 카드(등급 막대 · 범례) ② `※ 평균 등급 4.3 / 5` 그래프 제목 + 흰 카드(목표가 막대)
+    ③ 목표가 평균 · 중앙 · 최고 · 최저와 현재가 대비 = 그래프와 떨어진 표(고점 회복 `약 30년 동안 있었던 횟수` 표와 같은 글씨 · 구성)."""
+    cells = {c["key"]: c for c in (a["status"].get("analysts") or [])}
+    close = (a.get("headline") or {}).get("close")
+    rc = (cells.get("rating_counts") or {}).get("value") or {}
+    n = sum(rc.values()) if rc else 0
+    out = ""
+    card = lambda body: (f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px;">{body}</span></span>')   # noqa: E731 — 다른 그래프 흰 카드와 같게
+    if n:
+        bar = _dk.legend_bar("", [(nm, rc.get(k, 0), bg, fg) for k, nm, bg, fg in RATING_PASTEL])
+        out += f'{_dk.CHART_TITLE_M}애널리스트 {n}명의 의견</span>' + card(bar)
+    gauge = target_gauge(cells, close, m0, m2, wrap=False)
+    if gauge:
+        title = "목표가 범위"
+        if n:
+            mean_r = sum(w * rc.get(k, 0) for k, w in (("strongBuy", 5), ("buy", 4), ("hold", 3), ("sell", 2), ("strongSell", 1))) / n
+            title = (f'평균 등급 {mean_r:.1f} <span style="color:{MUTED};font-weight:400;">/ 5</span> '
+                     f'<span style="font-weight:400;font-size:{TINY};color:{NOTE};">(강매수 5 · 강매도 1)</span>')
+        top = _dk.CHART_STACK_GAP if out else 0   # 그래프 아래 또 그래프 — 보이는 24 (P179)
+        out += f'<span style="{_dk._CHART_TITLE_STYLE}margin:{top}px 0 {_dk.CHART_TITLE_GAP}px;">{_dk.CHART_MARK}{title}</span>' + card(gauge)
+    out += target_table(cells, close, m0)
+    return f'<div data-cards="1" style="margin:0 0 8px;">{out}</div>' if out else ""
+
+
+def target_table(cells, close, m0=None):
+    """목표가 평균 · 중앙 · 최고 · 최저와 현재가 대비 — 흰 카드 안 작은 표 (2026-11-01 사용자 P194: 고점 회복 `회복에 1년 넘게 걸린 비율` 표와 같은 글씨 · 구성)."""
+    items = [(nm, (cells.get(k) or {}).get("value")) for k, nm in (("pt_mean", "평균"), ("pt_median", "중앙"), ("pt_high", "최고"), ("pt_low", "최저"))]
+    items = [(nm, v) for nm, v in items if v is not None]
+    if not items:
         return ""
-    summary, inner = parts
-    summary = summary.replace(ACC_BTN, "")
-    return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}"><span style="display:block;padding:0 12px;">{summary}{inner}</span></span></div>'
+    m0 = m0 or (lambda v: f"${v:,.0f}")   # noqa: E731
+    vb = "border-left:1px solid #E2E8F0;"
+    cell = lambda txt, first=False: f'<span style="flex:1 1 0;min-width:0;box-sizing:border-box;padding:0 6px;white-space:nowrap;text-align:{"left" if first else "center"};{"" if first else vb}">{txt}</span>'   # noqa: E731
+    gap = lambda v: (f'<span style="color:{UP if v > close else DOWN if v < close else NOTE};">{_sgn((v / close - 1) * 100)}%</span>' if close else "")   # noqa: E731
+    head = cell("", True) + "".join(cell(f'<span style="color:#111;font-weight:700;">{nm}</span>') for nm, _ in items)   # 표 제목 `애널리스트 목표가` 가 있어 머리 첫 칸은 비운다
+    r1 = cell("목표가", True) + "".join(cell(_esc(m0(v))) for _, v in items)
+    rows = [head, r1]
+    if close:
+        rows.append(cell("현재가 대비", True) + "".join(cell(gap(v)) for _, v in items))
+    tbl = "".join(f'<span style="display:flex;align-items:stretch;line-height:24px;">{r}</span>' for r in rows)
+    title = f'<span style="display:block;color:#111;font-weight:700;margin:0 0 4px;">애널리스트 목표가</span>'
+    return (f'<span style="{MULTI}margin:{_dk.CHART_STACK_GAP + 14}px {_dk.CHART_CARD_X}px 0;"><span style="display:block;padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px;font-size:{TINY};color:{NOTE};">'
+            f'{title}{tbl}</span></span>')
 
 
 def targets_parts(a, m0=None, m2=None):
@@ -2307,7 +2347,7 @@ def targets_parts(a, m0=None, m2=None):
     return summary, target_gauge(cells, close, m0, m2) + rows
 
 
-def target_gauge(cells, close, m0=None, m2=None):
+def target_gauge(cells, close, m0=None, m2=None, wrap=True):
     """애널리스트 목표가 막대 (2026-10-23 사용자: 한 달 범위 막대처럼). 막대 = 목표가 최저 ~ 최고(실제 가격 비율), 양 끝 아래에 그 금액,
     오늘 종가 말풍선 + 원형 점, 중앙 · 평균은 막대 위 파란 세로 눈금 + 아래 글자(가까우면 한 덩어리). 최저 쪽 블랙이 종가까지 채워 가고 종가 ~ 최고는 회색 (2026-10-25 사용자).
     종가가 목표가 범위 밖이면 막대를 종가까지 늘린다."""
@@ -2346,6 +2386,8 @@ def target_gauge(cells, close, m0=None, m2=None):
              f'<span style="position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:3px;"><span style="position:absolute;inset:0;border-radius:3px;overflow:hidden;">{bar}</span>{ticks}</span></span>'
              f'<span style="position:relative;display:block;height:20px;margin-top:8px;">{ends}</span>'
              + (f'<span style="position:relative;display:block;height:20px;margin-top:2px;">{below}</span>' if below else '') + '</span>')   # 중앙 · 평균은 최저 · 최고 아래 줄 — 한 줄에 두면 끝 글자와 겹쳤다 (한국 원화, 2026-10-31)
+    if not wrap:   # 흰 카드는 부르는 쪽이 (analysts_block, P194)
+        return gauge
     return f'<span style="{MULTI}margin:{pad}px 0;"><span style="display:block;padding:{pad}px 12px;">{gauge}</span></span>'   # 다른 막대 그래프처럼 흰색 카드 안에 (2026-10-25 사용자: 평균 등급 아래 막대도)
 
 
