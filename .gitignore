@@ -52,3 +52,4 @@ experiments/kr-market-report/output/
 experiments/kr-stocks/data/
 experiments/kr-stocks/output/
 experiments/.mock_prefs.json
+experiments/competitiveness/output/
