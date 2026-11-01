@@ -123,7 +123,7 @@ def price_card(s, today):
         head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1)
         k = head.rstrip().rfind("</span>")
         head = head[:k] + sub + head[k:]
-    rows = R.glance_rows(g) + sec_earnings(s, today)   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 정보 보기는 강조 카드 안 (2026-10-26 사용자)
+    rows = R.glance_rows(g)   # 가격 범위 (1년) · 기간별 수익률 · 고점 회복 · 차트 정보 보기는 강조 카드 안 (2026-10-26 사용자). 옛 `다음 실적 발표` 접기 줄은 뺐다 — 실적 탭 `주요 일정` 의 `다음 실적 발표는?` 와 같은 내용, 한국 가격 카드와 같게 (2026-11-01 사용자 P261)
     return (f'<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>'
             f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), sec_month_range(s), R.in_card(sec_periods(s), white=True), sec_momentum(s), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
 
@@ -213,45 +213,6 @@ def sec_month_range(s):
         return ""
     th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
     return ("white", R.month_range_in(bb, lambda v: f"${v:,.0f}", R.bollinger_rule(bb), R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col, top=0))
-
-
-def earn_tip(s, e):
-    when = {"bmo": "장 시작 전", "amc": "장 마감 뒤"}
-    now = ""
-    if e.get("median_abs") is not None:
-        times = e["median_abs"] / e["normal_abs"] if e.get("normal_abs") else None
-        now = (f"\n· 보통 ±{e['median_abs']:.1f}% : 최근 {len(e['moves'])}번 중 절반은 이보다 작게, 절반은 크게 움직였다"
-               + (f". 보통 날의 약 {times:.0f}배" if times and times >= 1.5 else ""))
-    return ("회사가 석 달마다 실적을 발표하면 그 뒤 첫 거래일에 가격이 크게 움직이곤 한다. 오른 날 · 내린 날을 가리지 않고 크기만 본다" + now +
-            "\n· 참고 : 발표 시각이 장 시작 전이면 그날, 장 마감 뒤면 다음 거래일을 반응일로 센다")
-
-
-def sec_earnings(s, today):
-    e = s.get("earnings") or {}
-    if not e.get("next") and not e.get("moves"):
-        return ""
-    head, rows, first = "", "", True
-    if e.get("next"):
-        left = (datetime.date.fromisoformat(e["next"]) - datetime.date.fromisoformat(today)).days
-        head = R._row_html("다음 실적 발표", f"{left}일 뒤" if left > 0 else "오늘", f"{_md(e['next'])} 예정", first=True, inline_note=True)
-        first = False
-    if e.get("median_abs") is not None:
-        n = len(e["moves"])
-        times = e["median_abs"] / e["normal_abs"] if e.get("normal_abs") else None
-        note = f"최근 {n}번 기준" + (f" · 보통 날 하루 ±{e['normal_abs']:.1f}%의 약 {times:.0f}배" if times and times >= 1.5 else "")
-        rows += R._row_html("발표 다음 날 보통 변동", f"±{e['median_abs']:.1f}%", note, first=first)
-        chart = R._col_chart([(f"{m['day'][2:4]}.{m['day'][5:7]}", [m["ret"]]) for m in e["moves"]], [R._sign_bg], [R._sign_fg], height=130, right=True)   # 최신이 왼쪽 (2026-10-28 사용자 P79)
-        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">'
-                 f'{_dk.CHART_TITLE}최근 {n}번 실적이 반영된 날 (%)</span>'
-                 f'<span style="display:block;height:6px;"></span>{chart}</span>')
-    if head and rows:   # 다음 발표 줄 오른쪽 접기 버튼 — 보통 변동 · 최근 8번은 펼쳤을 때만 (2026-10-18 사용자)
-        k = head.rfind("</span></span>")
-        head = head[:k] + R.ACC_BTN + head[k:]
-        head = head.replace("align-items:flex-start;", "align-items:center;", 1)
-        inner = f'<details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{rows}</details>'
-    else:
-        inner = head + rows
-    return R._card_title("실적 발표 후 가격 변동", earn_tip(s, e)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{inner}</span></div>'
 
 
 def _no_record(tip):
@@ -664,9 +625,11 @@ def sec_expect(s, open_first=True):
         else:
             lines, tip, state = [("이번 실행에서 재료를 받지 못했다. 다음 실행에서 다시 받는다.", "plain")], "", "판단 유보"
         lines = list(lines)
-        if key == "move" and s.get("options_status"):   # 옛 시장 지표 탭의 옵션 칸 — NVDA sec_expect 와 같은 `자세한 지표 보기`
+        if key == "move" and s.get("options_status"):   # 옛 시장 지표 탭의 옵션 칸 — 접기(`자세한 지표 보기`) 없이 펼친 안에 (2026-11-01 사용자 P262, 한국 카드처럼)
             a = {"status": s["options_status"]}
-            lines.append((R._detail_fold(R._status_group(a, "options")), "html"))
+            blk = R.status_block(a, "options", "옵션 지표")
+            if blk:
+                lines.append((blk, "html"))
         theme, col = R.EXPECT_THEME.get(state, ("neutral", R.MUTED))
         out += R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=open_first and i == 0)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>'

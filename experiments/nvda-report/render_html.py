@@ -2665,6 +2665,15 @@ def _status_group(a, group):
     return _sub_label(rr.GROUP_KO[group]) + _ccard(rows) + (_guide(*GROUP_NOTE[group]) if GROUP_NOTE.get(group) else "")
 
 
+def status_block(a, group, title):
+    """`_status_group` 을 접기 없이 강조 카드 펼침 안에 — ※ 그래프 제목 + 흰 C 카드 + 안내 (2026-11-01 사용자 P262: 미국 종목 `자세한 지표 보기` 접기를 한국처럼 펼친 안으로)."""
+    body = _status_group(a, group)
+    if not body:
+        return ""
+    body = body.split("</div>", 1)[1]   # 옛 소제목(_sub_label) 대신 ※ 제목
+    return f'{_dk.CHART_TITLE_M}{_esc(title)}</span>' + body.replace("margin:0 0 8px;", f"margin:0 {_dk.CHART_CARD_X}px 8px;", 1)
+
+
 def _chart_card(groups, colors, label_colors, legend, fmt=None, right=True):
     pad = _dk.SEP_GAP - _dk.VP - 1
     chart = _col_chart(groups, colors, label_colors, fmt=fmt, right=right)
