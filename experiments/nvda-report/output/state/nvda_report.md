@@ -1,4 +1,4 @@
-# 엔비디아 NVDA 주가 2026년 11월 1일
+# 엔비디아 NVDA 주가 2026년 11월 2일
 _기준 거래일(뉴욕) 2026-10-30_
 
 > 🧪 **테스트 운영 중** — 이 리포트는 테스트 운영 중입니다. 수집·판정 규칙과 문구가 바뀔 수 있고, 일부 칸은 데이터가 쌓이는 중이라 비어 있습니다. 빈 칸에는 이유와 채워질 시점을 적어 두었습니다.
@@ -14,13 +14,13 @@ _기준 거래일(뉴욕) 2026-10-30_
 - `수요` 긍정 · **엔비디아, 클라우드 기업의 450억 달러 규모 앤트로픽 프로젝트 신용 보증 추진** [The Information: Nvidia Moves to Backstop a Cloud Provider’s $45 Billion Anthropic Proj](https://news.google.com/rss/articles/CBMixAFBVV95cUxOdmhuRzVaOG9xaEQ5U1VOcWNNLVN4YUZ0NUpfVnM3Qy1KakJVMWxDbW1heDFWNkxOR2dJbnR5NnJNb1dSb1RaTnUxTkZlQzU3b0l4SGFuR1RMVXY1dmlhTzJTVzd2VmstYWhyX0pyeGEwUTdKM1FtVGZQenBCdE5fSE9zZm8wOGNxUEQ3WmVrSi1ZSlZyX3A3cWRlTkRhMThMSjVEYnhuTGt6RE5janN1NkFUVjgxV3dVVklCcm1JUWlkRVpf?oc=5) (2026-10-29)
 - `제품` 부정 · **지포스 RTX 5080 가격 2000달러 돌파 및 공급 부족** [Tom's Hardware: Nvidia GeForce RTX 5080 prices hit $2,000, costing more than the RTX 5](https://news.google.com/rss/articles/CBMi0wJBVV95cUxQeWtTSnRRNFJDby1vdEpCR21SUUNCeVJiZGJiMXdheFNpeTlnYThsX3JsVUlBcmVvT09pS3BNNkdoaE1keHZMWTcxM04tZDRPOGxZYTRPZ0pKM2tIaDg5aGFEaERNOVV4bFFocmQ2cFdQTm02TE54WkJVTWRWb2gxSHpsZW1Ic0FTUTZ1VUtuTlQtbzVJaVEybHNDXzE3cDJOY0FpQlREYm1Xd0VyUkt0YjhsNW05dXlCTXhoeDJFTk85SlVnRzE5bWxJZEVmSHZWLXBhS1ZORGxoYUZXeDU1dVZWN2l4VTR0X3I5YXFqVUhrVjRVekhOLWdSWUtRZkNTQlNMQUdNcFhEeXJYLU9TNll2X2Q0SmpBMzQ5VHgyZkQ4QUFPRTFHVXd6MmpFXzN1Mjc3ajd1ZUlwRjdnTW0xOEJjajZNZWJLcDJNY0NoOHF5eTg?oc=5) (2026-10-29)
 - `기업` 긍정 `엔비디아 임원` · **엔비디아, 스페이스엑스 지분 180억 달러 인수 공시** [Yahoo Finance: Nvidia Just Disclosed an $18 Billion Stake in SpaceX. Here's What Jens](https://news.google.com/rss/articles/CBMingFBVV95cUxOTjVjYXFGQ2w3cUZOekZNN0huRGFrSjE2NTBjbVdzcThoX0I0ODJDdlhzSXRYZEdHb0xFUXpQWWFGMktTNndKZWpMYkdSNXVOTUJsWnhKNkhTZi1mUy1zUGVUVXFoYTJQaFhhYlEwbVVUR0dhbVNzeS1KVmNTclpndlJYRFNKTzhHeXRPY1VWV2pVb1ZlQnRxZjM4ZVl6UQ?oc=5) (2026-10-29)
-- `실적` 부정 `방송` · 대형 테크주 부진한 실적과 AI 투자 우려 [블룸버그 · 방송 2곳: 대형 테크주 부진한 실적과 AI 투자 우려](https://www.youtube.com/watch?v=tRcFJBbWoxI) (2026-10-31)
+- `수요` 긍정 `방송` · AI 인프라 투자와 데이터센터 수요 [블룸버그 · 방송 3곳: AI 인프라 투자와 데이터센터 수요](https://www.youtube.com/watch?v=k2EzesocrbY) (2026-11-01)
 
 <details><summary>그 외 10건</summary>
 
+- `실적` 부정 `방송` · 대형 테크주 부진한 실적과 AI 투자 우려 [블룸버그 · 방송 2곳: 대형 테크주 부진한 실적과 AI 투자 우려](https://www.youtube.com/watch?v=tRcFJBbWoxI) (2026-10-31)
 - `제품` 부정 `고객·협력사` · 중국 일루바타 코어엑스의 천개 300 시연 및 외부 평가에서 엔비디아 H200 대비 5% 우위 기록 [Wccftech: China’s Iluvatar CoreX Claims Its Tiangai 300 GPU Beats NVIDIA’s H200 ](https://news.google.com/rss/articles/CBMipwFBVV95cUxQc181NnBrZGc0cXg0OHhVTTl1Ump1N3lGN3lNNTVJZzdOaG1Dbk1FOFo0LTNxYTREa1VsVVQxUVNMYlI5cnBEaGRZUnB3TlE4NVNtaUpoTDVaVXVxT3JHUGRXTXhvQ3ViOHpuUWtUR01odHB3cVlBdjA4UjZnWHowdjRjZS0wb3I3RU94c3NjY0FEOGIyd2pEZ1lJaGhlSTQ1SDZMTGlQd9IBrAFBVV95cUxOT185eGcySXBtV01GaEl2d0MyN3hURnJManZYZVM2cTRpRzNCZDhINENveXFCT3FZekxPWDA1RXlCWFpEcEFYM3dqM3ZVWjByXzNIX05PREFOTVh3QXZGNW9NNkVKOS1HcUlaeWk5b0kxWTdqMGgzb054dno2WVZyZFBqZnFJRXQ5bmExbVQwQUdrV2RTMEF3OE1qUS13bmUwbnNOMnNEVnNzWGJL?oc=5) (2026-10-31)
 - `수요` 부정 `방송` · AI 투자 수익성 우려와 빅테크 실적 [블룸버그 · 방송 5곳: AI 투자 수익성 우려와 빅테크 실적](https://www.youtube.com/watch?v=r2GrYx31AnU) (2026-10-31)
-- `수요` 긍정 `방송` · 반도체 소재 및 첨단 공정 수요 급증 [폭스 · 방송 3곳: 반도체 소재 및 첨단 공정 수요 급증](https://www.youtube.com/watch?v=bnjI5TD_RPs) (2026-10-31)
 - `수요` 불확실 · 엔비디아의 웨스트버지니아주 엔스케일 AI 데이터센터 보증 검토 [TechCrunch: Nvidia weighs playing the cosigner for Nscale’s AI data center in West](https://news.google.com/rss/articles/CBMiswFBVV95cUxNZGNhWVNJR0JZTnVKVlM5RUZFeGdQZDdMMk9yODB0ZTlGSXRnYzNZU2hVbXBLdVdWbGstX3RPYkphd190d0R5N0VKN0RabTd3aW5OSUI1cHVsME9vVno4Nm1LY0lTV25qZE5EejNqNm91c1dvbVk5YnctUUowaUJoYTJwSEhCY3BIYV9kbVZ1U1RKNTk5Y3NqVDR3YTlrdXZDOWd5ekVvaDdGSzV0aVA5OUFxcw?oc=5) (2026-10-31)
 - `수급` 긍정 · 엔비디아, 10월 28일 ETF 순매수액 6억 8,230만 달러 기록 [Yahoo Finance: NVIDIA (NVDA) Sees $682.3 Million in Net ETF Buying on Oct. 28](https://news.google.com/rss/articles/CBMikAFBVV95cUxQVlhEOHRxZkx2cnFrYnpkajdBQjhSYXBTMWhwb2JoLTF2V3Q0XzJpUnlMaFpaX2NlWTVsTk5kUW9mbGNxb21hVDRsVGNlYllsaWMtZllTYVFXMVgtSE9DcFc4U0JjVDE0bnJPaVZ1dW8yOWVHV1pQMTduamJ5cF9jV25KZ1V2LVVnQlFBNWNkclU?oc=5) (2026-10-30)
 - `기업` 중립 `정부·규제 당국` · 중국 정부, 엔비디아 젠슨 황 최고경영자 대상 간첩 활동 의혹 부인 [Free Malaysia Today: China denies spying on Nvidia’s Jensen Huang](https://news.google.com/rss/articles/CBMipwFBVV95cUxPQm5xXzB1RUY1cDdLaHRYalpka21pMmtJNUQtM0Z1dDZJWWZrV3FCdXhUM1lodzBSbFE4V3VhejFrc2tZNU11bks1d2ZibnBlR0U1M2lWTVFiYjNrNXZMeGRjV2RIWXhsb2RYMHMwdmc4V0wyMkVSWGg3VC1QTlhTVTZIUnQ3Vk52LW1LMXpIV1g4TlRhcUZXdGZJaVV1ckQ1dU95WkhqNA?oc=5) (2026-10-30)
@@ -72,9 +72,9 @@ _기준 거래일(뉴욕) 2026-10-30_
 | 내재변동성 30일 (옵션 가격이 보는 변동 폭 · 연율) | 45.9% |
 | 변동성 순위 (최근 60일 중 · 0~100) | 60거래일 스냅샷이 쌓인 뒤 표시 (현재 16/60일) |
 | 실적 발표 예상 변동폭 | 9.3% |
-| 풋/콜 비율 (미결제약정) | 0.86 |
-| 풋/콜 비율 (거래량) | 0.59 |
-| 감마 노출 (부호만 · 근사) | 음(−) · $0.11B/1% |
+| 풋/콜 비율 (미결제약정) | 0.82 |
+| 풋/콜 비율 (거래량) | 0.57 |
+| 감마 노출 (부호만 · 근사) | 음(−) · $0.09B/1% |
 | 감마 전환 가격 | 옵션 체인 수집 후 계산 |
 | 콜 최다 미결제 행사가 | $230 |
 | 풋 최다 미결제 행사가 | $190 |
@@ -126,7 +126,7 @@ _기준 거래일(뉴욕) 2026-10-30_
 | 직전 7일 하루 평균 | 44.1 |
 | 분류 대기 문서 | 1 |
 
-_옵션 스냅샷 만기: 2026-11-02, 2026-11-04, 2026-11-06, 2026-11-13, 2026-11-27, 2026-12-04, 2026-11-20 · 스냅샷 누적 16일_
+_옵션 스냅샷 만기: 2026-11-02, 2026-11-04, 2026-11-06, 2026-11-09, 2026-11-27, 2026-12-04, 2026-11-20 · 스냅샷 누적 16일_
 
 ## ⑤ 진행 중 사안
 | 사건 | 상태 | 다음 일정 |
@@ -157,7 +157,7 @@ _오늘은 이벤트가 없어 해석을 생략한다._
 
 ## ⑧ 출처·면책
 - 데이터: yfinance(일봉·옵션·추정치·애널리스트·기관·공매도) · SEC EDGAR(Form 4·8-K·10-Q) · FRED(거시 일정) · 정적 캘린더
-- 생성 2026-11-01T14:52:45Z (UTC) · 기준 거래일 2026-10-30 · 일봉 마지막 2026-10-30 · 수집 항목 {'10q': 1, '8k': 3, 'analyst': 3, 'blog': 57, 'court': 3, 'fedreg': 36, 'form4': 16, 'news': 1659, 'newsroom': 22}
+- 생성 2026-11-01T22:32:09Z (UTC) · 기준 거래일 2026-10-30 · 일봉 마지막 2026-10-30 · 수집 항목 {'10q': 1, '8k': 3, 'analyst': 3, 'blog': 57, 'court': 3, 'fedreg': 36, 'form4': 16, 'news': 1659, 'newsroom': 22}
 - 이 글은 한 종목의 사실 기록이다. 매수·매도 판단을 담지 않으며, 사건과 가격 변화 사이의 인과를 단정하지 않는다.
 - 옵션 지표는 장 마감 후 1회 스냅샷이며 GEX는 딜러 포지션 가정이 조잡한 근사다. 부호만 참고.
 - 임계값은 초안이다. 30일 그림자 운영 뒤 '오늘 바뀐 것'이 하루 1~3건이 되도록 조정한다.

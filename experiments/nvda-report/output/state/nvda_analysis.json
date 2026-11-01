@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-11-01T14:52:45Z",
- "run_date": "2026-11-01",
+ "generated_at": "2026-11-01T22:32:09Z",
+ "run_date": "2026-11-02",
  "day": "2026-10-30",
  "is_latest_bar_today": true,
  "headline": {
@@ -623,6 +623,25 @@
    "speaker": "nvidia_exec"
   },
   {
+   "area": "Demand",
+   "kind": "news",
+   "title": "AI 인프라 투자와 데이터센터 수요",
+   "fact": "AI 인프라 투자와 데이터센터 수요",
+   "detail": "AI 관련 데이터센터 수요와 자금 조달이 금리와 인플레이션 압력에 영향을 미치고 있다",
+   "url": "https://www.youtube.com/watch?v=k2EzesocrbY",
+   "direction": "positive",
+   "emphasis": false,
+   "published_at": "2026-11-01T13:32:30Z",
+   "source": "블룸버그 · 방송 3곳",
+   "speaker": "방송",
+   "media": true,
+   "has_fact": false,
+   "rel": 0,
+   "prio": false
+  }
+ ],
+ "events_overflow": [
+  {
    "area": "Earnings",
    "kind": "news",
    "title": "대형 테크주 부진한 실적과 AI 투자 우려",
@@ -638,9 +657,7 @@
    "has_fact": false,
    "rel": 0,
    "prio": false
-  }
- ],
- "events_overflow": [
+  },
   {
    "area": "Product",
    "kind": "news",
@@ -664,23 +681,6 @@
    "emphasis": false,
    "published_at": "2026-10-31T11:42:50Z",
    "source": "블룸버그 · 방송 5곳",
-   "speaker": "방송",
-   "media": true,
-   "has_fact": false,
-   "rel": 0,
-   "prio": false
-  },
-  {
-   "area": "Demand",
-   "kind": "news",
-   "title": "반도체 소재 및 첨단 공정 수요 급증",
-   "fact": "반도체 소재 및 첨단 공정 수요 급증",
-   "detail": "반도체 미세 공정이 고도화되면서 인테그리스와 같은 특수 소재 및 오염 제어 기업의 역할이 커지고 있다.",
-   "url": "https://www.youtube.com/watch?v=bnjI5TD_RPs",
-   "direction": "positive",
-   "emphasis": false,
-   "published_at": "2026-10-31T01:30:38Z",
-   "source": "폭스 · 방송 3곳",
    "speaker": "방송",
    "media": true,
    "has_fact": false,
@@ -941,19 +941,19 @@
    },
    {
     "key": "pc_ratio_oi",
-    "value": 0.856653813945356,
+    "value": 0.8203144390407513,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "pc_ratio_vol",
-    "value": 0.593941704226249,
+    "value": 0.5686414753135862,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "gex_approx",
-    "value": -114155582.49236625,
+    "value": -88009364.94061466,
     "flag": false,
     "fmt": "gex"
    },
@@ -1322,7 +1322,7 @@
  ],
  "data_status": {
   "bars_last_day": "2026-10-30",
-  "state_collected_at": "2026-11-01T14:52:36Z",
+  "state_collected_at": "2026-11-01T22:32:05Z",
   "missing_fields": [
    "gex_flip_strike"
   ],
@@ -1343,7 +1343,7 @@
    "2026-11-02",
    "2026-11-04",
    "2026-11-06",
-   "2026-11-13",
+   "2026-11-09",
    "2026-11-27",
    "2026-12-04",
    "2026-11-20"
