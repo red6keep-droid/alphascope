@@ -847,7 +847,7 @@ GROUP_ICON = {   # 분류 제목 앞 작은 선 아이콘 — 제목 뜻에 맞�
 }
 
 
-GROUP_TILE = {"positive": "rgba(194,65,12,.4)", "negative": "rgba(26,115,232,.4)", "uncertain": "rgba(109,40,217,.4)", "soon": "rgba(109,40,217,.4)"}   # 아이콘 면 = 카드 색의 진한 색 — 주황 · 파랑 · 보라 카드 (2026-11-01 사용자 P254), 회색 카드는 검정. 투명도 50 → 60% (불투명 .4, P255)
+GROUP_TILE = {"positive": "rgba(194,65,12,.3)", "negative": "rgba(26,115,232,.3)", "uncertain": "rgba(109,40,217,.3)", "soon": "rgba(109,40,217,.3)"}   # 아이콘 면 = 카드 색의 진한 색 — 주황 · 파랑 · 보라 카드 (2026-11-01 사용자 P254), 회색 카드는 검정. 투명도 50 → 60 → 70% (불투명 .3, P255 · P256)
 
 
 def group_head(text, first=False, theme=None):
@@ -855,7 +855,7 @@ def group_head(text, first=False, theme=None):
     ic = GROUP_ICON.get(text)
     # 검은 면(투명도 50%, P252) · 20px 둥근 네모 안 흰 선 12px 아이콘 (2026-11-01 사용자 P246 흰 면 → P249 반대로)
     icon = (f'<span style="display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;margin-right:6px;'
-            f'background:{GROUP_TILE.get(theme, "rgba(17,17,17,.4)")};border-radius:5px;color:#fff;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
+            f'background:{GROUP_TILE.get(theme, "rgba(17,17,17,.3)")};border-radius:5px;color:#fff;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
     # 위 18 → 29 (+60%, P248). 아래는 6 그대로 — P247 은 첫 줄 위 여백으로 (TOGETHER_FIRST_PAD)
     return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
 
