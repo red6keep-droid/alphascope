@@ -847,12 +847,15 @@ GROUP_ICON = {   # 분류 제목 앞 작은 선 아이콘 — 제목 뜻에 맞�
 }
 
 
-def group_head(text, first=False):
+GROUP_TILE = {"positive": "rgba(194,65,12,.5)", "negative": "rgba(26,115,232,.5)", "uncertain": "rgba(109,40,217,.5)", "soon": "rgba(109,40,217,.5)"}   # 아이콘 면 = 카드 색의 진한 색 50% — 주황 · 파랑 · 보라 카드 (2026-11-01 사용자 P254), 회색 카드는 검정 50%
+
+
+def group_head(text, first=False, theme=None):
     """전망 카드 안 분류 제목 (P210) — 굵은 15px, 위 여백으로 묶음을 가른다. 아래 줄의 구분선이 제목 밑줄 역할. 앞에 뜻 아이콘(P241)."""
     ic = GROUP_ICON.get(text)
     # 검은 면(투명도 50%, P252) · 20px 둥근 네모 안 흰 선 12px 아이콘 (2026-11-01 사용자 P246 흰 면 → P249 반대로)
     icon = (f'<span style="display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;margin-right:6px;'
-            f'background:rgba(17,17,17,.5);border-radius:5px;color:#fff;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
+            f'background:{GROUP_TILE.get(theme, "rgba(17,17,17,.5)")};border-radius:5px;color:#fff;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
     # 위 18 → 29 (+60%, P248). 아래는 6 그대로 — P247 은 첫 줄 위 여백으로 (TOGETHER_FIRST_PAD)
     return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
 
@@ -876,12 +879,12 @@ def hot_rows(news):
     return out
 
 
-def outlook_extra_html(hot, sched):
+def outlook_extra_html(hot, sched, theme=None):
     """전망 카드 아래 두 구획 — 호재 · 리스크(키워드 줄, 누르면 오늘 탭 뉴스) · 앞둔 일정(누르면 실적 탭 그 카드). 둘 다 답 개수에 넣지 않는다 (P218)."""
     import tech_signals as TS
     out = ""
     if hot:
-        out += group_head("호재 · 리스크")
+        out += group_head("호재 · 리스크", theme=theme)
         for i, (label, kw, n, head, url) in enumerate(hot):   # 기사 링크로 두면 테마가 `번역 방법` · 바깥 링크 아이콘을 붙인다 → 오늘 탭 뉴스로 이동 (P204 이동 아이콘 없음)
             out += (f'<span role="link" tabindex="0" data-goto-tab="오늘" data-goto-card="뉴스" style="display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:{TOGETHER_ROW_H + (TOGETHER_FIRST_PAD if i == 0 else 0)}px;padding:{6 + (TOGETHER_FIRST_PAD if i == 0 else 0)}px 0 6px;box-sizing:border-box;'
                     f'cursor:pointer;border-top:1px solid {TOGETHER_LINE if i == 0 else "transparent"};font-size:{_dk.NAME};line-height:{LH_CARD};color:#111;">'   # 구분선은 구획 제목 아래만 (P232)
@@ -889,7 +892,7 @@ def outlook_extra_html(hot, sched):
                     + (f'<span style="display:block;font-size:{MICRO};line-height:20px;color:{NOTE};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{_esc(head)}</span>' if head else "")
                     + f'</span>{TS.box(HOT_KIND.get(label, "flat"), label, _esc, sym=False)}</span>')
     if sched:
-        out += group_head("앞둔 일정", not hot)
+        out += group_head("앞둔 일정", not hot, theme)
         for i, (text, when, tab, card) in enumerate(sched):
             out += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;'
                     f'min-height:{TOGETHER_ROW_H + (TOGETHER_FIRST_PAD if i == 0 else 0)}px;padding:{6 + (TOGETHER_FIRST_PAD if i == 0 else 0)}px 0 6px;box-sizing:border-box;cursor:pointer;border-top:1px solid {TOGETHER_LINE if i == 0 else "transparent"};font-size:{_dk.NAME};line-height:{LH_CARD};">'
@@ -928,7 +931,7 @@ def together_card(t):
     more = (f" {', '.join(where)}에 많다." if where else "")
     more += note_span("줄을 누르면 자세한 내용으로 이동합니다.")   # 옛 `아래에서 분류별 판정과 … 볼 수 있다` 문장 대신 늘 같은 안내 (2026-11-01 사용자 P253)
     lines = [(f"{dist}로 나뉜다.{more}", "rich"),   # 옛 `이 페이지 카드 n개의 판정이` (P209)
-             (together_block(items, theme, title=False) + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or []), "html")]
+             (together_block(items, theme, title=False) + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or [], theme), "html")]
     tip = ("이 페이지 여러 카드의 판정을 분류별로 상승 · 하락 · 중립으로 다시 놓은 것. 줄마다 판정이 통하는 기간을 괄호에 적었다\n"
            f"· 지금 : {word} (" + " · ".join(f"{w} {n}" for _, w, _c, n in cnt if n) + ")\n"
            "· 나누는 법 : 가장 많은 쪽, 같으면 엇갈림. 호재 · 리스크와 일정은 세지 않는다. 대부분 검증 전 지표다\n· 이 블로그의 추천이 아니다")
@@ -1124,7 +1127,7 @@ def together_block(items, outer=None, title=True):
     out = ""
     for gi, (g, rows) in enumerate(groups):
         if g:
-            out += group_head(g, gi == 0)
+            out += group_head(g, gi == 0, outer)
         for ri, it in enumerate(rows):
             nm, st, d, tab, card = it[:5]
             line = TOGETHER_LINE if not g or ri == 0 else "transparent"   # 분류 제목 아래(첫 줄 위)에만 구분선, 같은 분류 줄 사이는 없음 (2026-11-01 사용자 P232) — 높이는 그대로
