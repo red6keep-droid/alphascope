@@ -1,6 +1,46 @@
 {
-  "updated_at": "2026-11-01 00:26:22 UTC",
+  "updated_at": "2026-11-01 12:46:27 UTC",
   "items": [
+    {
+      "title": "Companies promised AI gains — here's how the payoff showed up in earnings",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/ai-investments-company-earnings.html",
+      "published": "2026-11-01 12:34:06",
+      "title_ko": "기업들이 약속한 AI 수익, 실적에서 어떻게 나타났나",
+      "summary_ko": "투자자들이 수익을 추구하는 가운데 AI가 실적에 기여"
+    },
+    {
+      "title": "Top Wall Street analysts are bullish on these 3 stocks for the long haul",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/top-analysts-are-bullish-on-these-3-stocks-for-the-long-haul.html",
+      "published": "2026-11-01 12:33:53",
+      "title_ko": "월가 주요 애널리스트가 장기적으로 낙관하는 3개 종목",
+      "summary_ko": "단기 노이즈를 넘어 장기 수익에 초점을 맞춘 종목 선정"
+    },
+    {
+      "title": "The midterm election could reshape the muni bond market. Here’s what investors need to know",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/election-municipal-bonds.html",
+      "published": "2026-11-01 12:30:48",
+      "title_ko": "중간 선거가 지방채 시장을 재편할 수 있다. 투자자가 알아야 할 것들",
+      "summary_ko": "주 세금 조치, 신규 채권 공급, 의회 구성이 지방채에 영향"
+    },
+    {
+      "title": "Binance resumes withdrawals following $6.3 billion hack, says 90% of stolen user assets are covered",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/binance-hack-asset-coverage-withdrawals.html",
+      "published": "2026-11-01 12:19:33",
+      "title_ko": "바이낸스, 63억 달러 해킹 손실 90% 복구·출금 재개 계획",
+      "summary_ko": "출금 재개, 일요일 예정"
+    },
+    {
+      "title": "Why AI is boosting Meta's ad business while hurting Google search",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/ai-meta-ads-google-search.html",
+      "published": "2026-11-01 12:00:01",
+      "title_ko": "AI가 메타 광고 사업을 부양하고 구글 검색을 해치는 이유",
+      "summary_ko": "최근 분기 기준 양사 간 성장 격차 최대치 기록"
+    },
     {
       "title": "Trump defamation suit against Murdoch, WSJ over Epstein letter dismissed with prejudice",
       "source": "CNBC",
@@ -10,12 +50,16 @@
       "summary_ko": "트럼프, 항소 계획 발표"
     },
     {
-      "title": "Binance says 90% of $6.3 billion hack losses are now covered, plans to resume withdrawals Sunday",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/binance-hack-asset-coverage-withdrawals.html",
-      "published": "2026-10-31 22:27:56",
-      "title_ko": "바이낸스, 63억 달러 해킹 손실 90% 복구·출금 재개 계획",
-      "summary_ko": "출금 재개, 일요일 예정"
+      "title": "사회보장국 사기 척결 및 데이터 정비",
+      "title_ko": "사회보장국 사기 척결 및 데이터 정비",
+      "summary_ko": "사회보장국이 대규모 데이터 정비와 사기 척결을 단행하며 행정 효율화를 추진 중",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=ZXBlGqvNisI",
+      "published": "2026-10-31 22:00:38",
+      "kind": "media",
+      "tag": "정책/규제",
+      "direction": "neutral",
+      "n_channels": 1
     },
     {
       "title": "SpaceX loses bid to toss NAACP lawsuit over Memphis data center air pollution",
@@ -54,26 +98,6 @@
       "summary_ko": ""
     },
     {
-      "title": "이란과의 지정학적 갈등과 중동 긴장",
-      "title_ko": "이란과의 지정학적 갈등과 중동 긴장",
-      "summary_ko": "미국과 이란 간의 갈등 및 잠재적 군사 충돌 가능성으로 인해 에너지 가격 변동성이 커지고 시장에 부담을 주고 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=tRcFJBbWoxI",
-      "published": "2026-10-31 16:11:21",
-      "kind": "media",
-      "tag": "지정학",
-      "direction": "negative",
-      "n_channels": 1
-    },
-    {
-      "title": "Stocks started the week with promise but ended in despair. Our take on the big reversal",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/10/31/stocks-started-the-week-with-promise-but-ended-in-despair.html",
-      "published": "2026-10-31 15:37:11",
-      "title_ko": "주식, 주 초 기대감 있었지만 주말엔 실망 마감",
-      "summary_ko": ""
-    },
-    {
       "title": "이스라엘-미국의 대(對)이란 군사 행동 가능성",
       "title_ko": "이스라엘-미국의 대(對)이란 군사 행동 가능성",
       "summary_ko": "네타냐후 총리와 트럼프 대통령 간의 관계를 바탕으로 이란과의 군사적 충돌 가능성이 제기",
@@ -84,30 +108,6 @@
       "tag": "지정학",
       "direction": "neutral",
       "n_channels": 2
-    },
-    {
-      "title": "Qatari mediators held talks in Tehran aimed at restarting direct U.S.-Iran negotiations, source says",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/qatar-iran-us-talks-mediation.html",
-      "published": "2026-10-31 13:47:03",
-      "title_ko": "카타르 중재자, 테헤란서 미-이란 직접 협상 재개 논의",
-      "summary_ko": ""
-    },
-    {
-      "title": "Automatic 401(k) rollovers reduce cash-outs, research finds — but few accounts reach new employer plans",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/401k-cash-outs-automatic-rollovers.html",
-      "published": "2026-10-31 13:30:01",
-      "title_ko": "자동 401(k) 롤오버, 현금 인출 감소 연구 결과",
-      "summary_ko": "소규모 잔액 계좌, 임시 IRA에 남아 있음"
-    },
-    {
-      "title": "In the wake of Weil, a legal recruiter's advice for surviving a company wind-down",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/10/31/weil-wind-down-career-advice.html",
-      "published": "2026-10-31 13:07:01",
-      "title_ko": "위얼, 기업 청산 조언 제공을 위한 법률 리크루터 조언",
-      "summary_ko": ""
     }
   ]
 }
