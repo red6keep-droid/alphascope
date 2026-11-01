@@ -969,6 +969,15 @@ def picks_state(ps):
     return " · ".join(f"{k} {sum(1 for p in ps if p['action'] == k)}" for k in PICK_ORDER if any(p["action"] == k for p in ps))
 
 
+def picks_state_rich(ps):
+    """답 `매수 3 · 관망 2` 를 의견마다 색으로 — 매수 빨강 · 매도 파랑 · 보유 · 관망은 검정 (2026-11-01 사용자 P201: 관망까지 빨갛게 보였다)."""
+    return f'<span style="color:#111;">&nbsp;·&nbsp;</span>'.join(
+        f'<span style="color:{PICK_THEME.get(k, ("", "#111"))[1]};">{k} {sum(1 for p in ps if p["action"] == k)}</span>' for k in PICK_ORDER if any(p["action"] == k for p in ps))
+
+
+PICK_BOX = {"매수": "up", "매도": "down"}   # 줄 머리 의견 라벨 — 기술지표 라벨 모양, 보유 · 관망은 회색(flat) (P201)
+
+
 TOGETHER_TITLE = "Alpha Scope 데이터로 함께 보기"   # 방송 의견 아래 — 같은 종목의 우리 판정을 방향별로 (2026-10-31 사용자 P142, 기록 계획 A5-5)
 
 
@@ -1011,6 +1020,7 @@ PICKS_SHOWN = 3   # 방송 의견은 3건까지 펼쳐 두고 나머지는 접�
 
 def picks_rows_folded(ps, close, money):
     """의견 줄 — 4건 이상이면 3건 + `의견 n건 더 보기` 접기 (P158)."""
+    ps = sorted(ps, key=lambda p: PICK_ORDER.index(p["action"]))   # 매수 → 보유 → 관망 → 매도 — 접힌 쪽까지 같은 순서 (P201)
     if len(ps) <= PICKS_SHOWN:
         return picks_rows(ps, close, money)
     return picks_rows(ps[:PICKS_SHOWN], close, money) + _dk.fold(f"의견 {len(ps) - PICKS_SHOWN}건 더 보기", picks_rows(ps[PICKS_SHOWN:], close, money))
@@ -1031,7 +1041,7 @@ def picks_card(name, ps, close, money, hours=PICK_HOURS, together=""):
     lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 방송에서 나왔다.", "rich"), (picks_rows_folded(ps, close, money) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
     tip = (f"방송(유튜브 경제 채널) 요약에서 이 종목에 대한 매수 · 보유 · 관망 · 매도 의견을 모은 것. 최근 {hours}시간, 같은 영상 · 같은 사람은 한 번\n"
            f"· 지금 : {picks_count(ps)}\n· 이 블로그의 추천이 아니다")   # batch 7 h
-    return _state_card("방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True)
+    return _state_card("방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True, state_rich=picks_state_rich(ps))
 
 
 def picks_sentence(ps, rich=False):
@@ -1056,36 +1066,30 @@ PICK_LINE = "border-top:1px solid rgba(15,23,42,.10);"   # 강조 카드 색 위
 
 
 def picks_rows(ps, close, money):
-    """방송 의견 줄 — 줄마다 제목 줄 `방송 이름(굵게) (9분 지점) | 말한 사람(소속)` / 이유 / 작은 글씨 게시 시각 · (목표가) · 영상에서 보기.
-    (2026-11-01 사용자 P200: 방송 이름을 제목으로 먼저, 세로 구분선 뒤 말한 사람. 옛 P92 = 말한 사람 굵게 · 채널은 작은 줄)
-    흰 카드 · 라벨 뱃지 없이 구분선만 (2026-10-29 사용자 P92). 의견별 굵은 제목(`매수 의견`)은 뺐다 — 위 문장이 말한다 (같은 날 P95).
-    의견이 여러 종류일 때만 묶음 머리에 보통 굵기 회색 작은 제목을 둔다(어느 의견인지 줄만으로는 안 보여서).
+    """방송 의견 줄 — 줄마다 제목 줄 `[매수] 방송 이름(굵게) (9분 지점) | 말한 사람(소속)` / 이유 / 작은 글씨 게시 시각 · (목표가) · 영상에서 보기.
+    (2026-11-01 사용자 P200: 방송 이름을 제목으로 먼저, 세로 구분선 뒤 말한 사람 · P201: 맨 앞 의견 라벨 — 옛 의견별 묶음 머리 `매수 의견` 은 뺐다)
+    흰 카드 없이 줄 사이 구분선만 (P92).
     간격은 뉴스 기사(design_kit.news_item)와 같다: 이름 줄 행간 34 · 이유 위 4 · 작은 줄 위 8 · 줄 위아래 20(첫 줄 위 2) — 글자 크기는 그대로 (P95)."""
-    ks = [k for k in PICK_ORDER if any(p["action"] == k for p in ps)]
-    out, first = "", True
-    for k in ks:
-        grp = [p for p in ps if p["action"] == k][:6]
-        if len(ks) > 1:
-            out += f'<span style="display:block;{"" if first else PICK_LINE}padding:{2 if first else 20}px 0 0;font-size:{TINY};line-height:20px;color:{NOTE};">{k} 의견</span>'
-        for p in grp:
-            who = re.sub(r"\s+\(", "(", p["speaker"] or p["channel"])   # `톰 리 (펀드스트랫)` → `톰 리(펀드스트랫)`
-            nm, par, org = who.partition("(")
-            who_html = _esc(nm) + (f'({_esc(org)}' if par else "") + ("" if p["own"] else " 보고서")
-            at = _pick_at(p.get("at_sec"))
-            head = (f'<b style="font-weight:700;">{_esc(p["channel"])}</b>'
-                    + (f'<span style="color:{NOTE};font-size:{TINY};margin-left:4px;">({at})</span>' if at else "")
-                    + (f'{PICK_VBAR}<span style="font-weight:400;">{who_html}</span>' if p["speaker"] else ""))   # 방송 이름 → (장면 시각) → 세로 구분선 → 말한 사람 (P200)
-            tgt = _pick_target(p, close, money)
-            meta = _pick_when(p["published_at"]) + (f" · {tgt}" if tgt else "")   # 채널은 제목 줄로 올렸다 (P200)
-            if p["url"]:
-                meta += f' · <a href="{_esc(p["url"])}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">영상에서 보기</a>'
-            top = 2 if first and len(ks) == 1 else (8 if len(ks) > 1 and p is grp[0] else 20)
-            line = "" if (first or p is grp[0] and len(ks) > 1) else PICK_LINE
-            out += (f'<span style="display:block;{line}padding:{top}px 0 20px;">'
-                    f'<span style="display:block;color:#111;line-height:34px;">{head}</span>'
-                    + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;line-height:{PICK_REASON_LH};word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")   # 행간 24 → 26 (+10%, P169)
-                    + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
-            first = False
+    import tech_signals as TS   # 의견 라벨 = 기술지표 라벨 모양 (P201)
+    rows = [p for k in PICK_ORDER for p in [x for x in ps if x["action"] == k][:6]]   # 매수 → 보유 → 관망 → 매도 순. 의견별 묶음 머리(`매수 의견`)는 줄마다 라벨이 대신한다 (P201)
+    out = ""
+    for i, p in enumerate(rows):
+        who = re.sub(r"\s+\(", "(", p["speaker"] or p["channel"])   # `톰 리 (펀드스트랫)` → `톰 리(펀드스트랫)`
+        nm, par, org = who.partition("(")
+        who_html = _esc(nm) + (f'({_esc(org)}' if par else "") + ("" if p["own"] else " 보고서")
+        at = _pick_at(p.get("at_sec"))
+        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(PICK_BOX.get(p["action"], "flat"), p["action"], _esc, sym=False)}</span>'
+                f'<b style="font-weight:700;">{_esc(p["channel"])}</b>'
+                + (f'<span style="color:{NOTE};font-size:{TINY};margin-left:4px;">({at})</span>' if at else "")
+                + (f'{PICK_VBAR}<span style="font-weight:400;">{who_html}</span>' if p["speaker"] else ""))   # 의견 라벨 → 방송 이름 → (장면 시각) → 세로 구분선 → 말한 사람 (P200 · P201)
+        tgt = _pick_target(p, close, money)
+        meta = _pick_when(p["published_at"]) + (f" · {tgt}" if tgt else "")   # 채널은 제목 줄로 올렸다 (P200)
+        if p["url"]:
+            meta += f' · <a href="{_esc(p["url"])}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">영상에서 보기</a>'
+        out += (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
+                f'<span style="display:block;color:#111;line-height:34px;">{head}</span>'
+                + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;line-height:{PICK_REASON_LH};word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")   # 행간 24 → 26 (+10%, P169)
+                + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
     return f'<span data-picks="1" style="display:block;">{out}</span>'
 
 
@@ -1433,7 +1437,7 @@ def _pull_end_chart(html):
     return html[:k] + f" {-GAUGE_PULL}px" + html[k:]
 
 
-def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False, opened=False, below_notes=False):
+def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False, opened=False, below_notes=False, state_rich=""):
     """상태 카드 (가이드라인 2-1 D, 2026-10-11 사용자: "별도 카드로 분리하고 이유도 카드에 포함" → "안내 아이콘 삭제, 글씨 검정, 블릿으로").
     첫 줄 구분명 좌·상태 우, 아래 얇은 선 뒤에 이유 글머리표(16px, 검정). 이유 묶음은 border-top — 홈 카드는 border-top 요소를 건너뛰므로 홈에는 첫 줄만 간다."""
     bg, bd = CARD_DIR[theme]
@@ -1489,7 +1493,8 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
             h = h.replace('<li style="list-style:none;margin:6px 0 12px;">', f'<li style="list-style:none;margin:{12 + _dk.CHART_STACK_GAP}px 0 12px;">', 1)
         lis += h
     # fold: 첫 줄 맨 오른쪽 공식 접기 버튼(카드 색 20% 밝은 바탕), 기본 닫힘 — 펼치면 이유 글머리표 (2026-10-13 사용자: 시장 국면 · 반도체 자금, 가이드라인 10-7)
-    state_html = (f'<span style="display:inline-flex;align-items:center;">{_esc(state)}{_fold_btn(_dk.lighten(bg), bd)}</span>' if fold else _esc(state))
+    st = state_rich or _esc(state)   # state_rich = 낱말마다 색이 다른 답 (방송 의견 `매수 3 · 관망 2`, P201)
+    state_html = (f'<span style="display:inline-flex;align-items:center;">{st}{_fold_btn(_dk.lighten(bg), bd)}</span>' if fold else st)
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;line-height:{_dk.LH_EMPH_Q};">'   # 질문 · 대답 18px · 행간 30 (2026-10-27 사용자)   # position:relative — 툴팁 상자가 이 줄(카드 폭) 기준으로 놓인다
             f'<span style="{"flex:1 1 auto;min-width:0;" if fold else COL_L}font-weight:{STATE_TITLE_W};color:#111;font-size:{_dk.EMPH_Q};">{_title_with_icon(title, _tipx(tip) + new_html)}</span><span style="{"flex:none;white-space:nowrap;" if fold else COL_R}font-weight:700;color:{color};font-size:{_dk.EMPH_Q};">{state_html}</span></span> ')   # fold: 상태 + 버튼은 한 줄, 이름 칸이 남은 폭
     body = (f'<div style="margin-top:{14 - _dk.VP_EMPH + 3}px;padding-top:{14 - _dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{SMALL};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자)
