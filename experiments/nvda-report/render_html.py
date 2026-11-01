@@ -801,20 +801,20 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
 def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None):
     """`의견` 탭 (2026-11-01 사용자 P197) — 옛 한 장 `애널리스트 · 방송 의견은?`(P90)을 강조 카드 둘로 나눈다: `애널리스트 의견은?` · `방송 의견은?`.
     접힌 머리에서 두 답(예: 매수 · 매도)을 따로 보고, 누르면 그쪽 내용만 펼친다 — 둘 다 접힌 채로. 함께 보기는 두 카드 아래 따로 흰 카드.
+    두 카드는 의견이 없어도 늘 둔다 — 답 `없음` (2026-11-01 사용자 P199: 방송 의견이 없다고 카드가 사라지면 안 된다).
     cells = 애널리스트 칸(analyze_tabs.analysts 모양), money = 방송 목표가 표기, m0 · m2 = 애널리스트 목표가 표기(없으면 달러), together = 함께 보기 줄을 만드는 함수."""
     cards = analysts_card(cells, close, m0, m2) + picks_card(name, ps, close, money)
-    if not cards:
-        return ""
     tg = together_card(together())   # 격자(data-grid) 밖 — 넓은 화면에서 두 카드 옆 칸에 끼지 않게
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>' + (f'<div data-cards="1" style="margin:0 0 8px;">{tg}</div>' if tg else "")
 
 
 def analysts_card(cells, close, m0=None, m2=None):
-    """`애널리스트 의견은?` (P197) — 답 = 애널리스트 다수(analysts_verdict), 펼치면 등급 막대 · 목표가 막대 · 목표가 줄(analysts_block). 없으면 빈 문자열."""
+    """`애널리스트 의견은?` (P197) — 답 = 애널리스트 다수(analysts_verdict), 펼치면 등급 막대 · 목표가 막대 · 목표가 줄(analysts_block). 집계가 없으면 답 `없음` (P199)."""
     a = {"status": {"analysts": cells}, "headline": {"close": close}}
     verdict = analysts_verdict(a, rich=True) if cells else None
     if not verdict:
-        return ""
+        return _state_card("애널리스트 의견은?", "없음", "neutral", MUTED, [("이 종목의 애널리스트 의견 집계가 아직 없다.", "plain")], "",
+                           tip=_dk.with_src("애널리스트(Yahoo Finance 집계)의 등급 분포 · 평균 등급 · 목표가\n· 지금 : 집계 없음\n· 이 블로그의 추천이 아니다", "Yahoo Finance"), fold=True)
     state, text = verdict
     theme, col = pick_theme(state)   # 매수면 오름 색 강조 카드 (P92)
     sep = _dk.darken(_dk.lighten(_dk.lighten(CARD_DIR[theme][1]), 0.3), 0.02)   # 카드 안 줄 사이 구분선과 같은 색 (_state_card bd_row)
@@ -1007,9 +1007,11 @@ def picks_rows_folded(ps, close, money):
 def picks_card(name, ps, close, money, hours=PICK_HOURS, together=""):
     """`방송 의견은?` (2026-10-29 사용자 P85 → P88 · P89 · P92 → 2026-11-01 P197: 의견 탭에서 `애널리스트 의견은?` 아래, 옛 `방송에서 나온 의견은?`).
     ps = media_feed.picks 줄(이 종목 것만, 최근 hours 시간). 답 = 의견이 한 가지면 그 말(색 = PICK_THEME), 갈리면 `매수 · 보유`(회색).
-    문장 = `삼성전자에 대한 매수 의견이 1건 나왔다.` 펼치면 의견별 제목(`매수 의견`) 아래 줄마다 말한 사람(소속) / 이유 / 채널 · 게시 시각 · (목표가) · 영상에서 보기, 줄 사이 구분선. 없으면 빈 문자열."""
+    문장 = `삼성전자에 대한 매수 의견이 1건 나왔다.` 펼치면 의견별 제목(`매수 의견`) 아래 줄마다 말한 사람(소속) / 이유 / 채널 · 게시 시각 · (목표가) · 영상에서 보기, 줄 사이 구분선. 의견이 없어도 카드는 둔다 — 답 `없음` (2026-11-01 사용자 P199)."""
     if not ps:
-        return ""
+        tip = f"방송(유튜브 경제 채널) 요약에서 이 종목에 대한 매수 · 보유 · 관망 · 매도 의견을 모은 것. 최근 {hours}시간, 같은 영상 · 같은 사람은 한 번\n· 지금 : 의견 없음\n· 이 블로그의 추천이 아니다"
+        return _state_card("방송 의견은?", "없음", "neutral", MUTED, [(f"최근 {hours}시간 방송에서 나온 {_esc(name)} 의견이 없다.", "plain")], "",
+                           tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True)
     state = picks_state(ps)   # `매수 4 · 보유 1` (P163)
     theme, col = pick_theme(state)
     if isinstance(together, list):   # 함께 보기 줄 — 이 카드 색을 알아야 안쪽 카드 색을 정한다 (P168)
