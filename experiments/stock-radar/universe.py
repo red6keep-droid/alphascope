@@ -109,7 +109,7 @@ def sector_etf(sym):
     return SECTOR_OVERRIDE.get(sym) or SECTOR_ETF[BY_SYM[sym][3]]
 
 
-REPORT_TYPE = {"NVDA"}   # 매일 리포트가 나가는 종목 = 상세가 리포트형 (최신 리포트 글로 링크)
+REPORT_TYPE = set()   # 매일 리포트가 나가는 종목 = 상세가 리포트형. 2026-11-01 사용자: 엔비디아도 고정 페이지 → 비움 (옛 값 {"NVDA"})
 
 BLOG = "https://alpha-scope.blogspot.com"
 LIST_SLUG = "us-market-cap-top10"
@@ -149,6 +149,8 @@ LIST_URL = f"{BLOG}/p/{LIST_SLUG}.html"
 # 함께 보는 회사 (캘린더 `함께 보는 회사 실적은?`) — 종목마다 한 번 정한다 (2026-10-18 Claude 설계, 사용자 "AI 없이 올릴 수 있는 것까지").
 # NVDA 리포트 cal_cards.PEER_ROLE 과 같은 뜻 : 고객 · 공급 · 경쟁 (+ 버크셔는 큰 보유 종목). 실적 일정을 받을 수 있는 미국 상장 종목만 (TSMC 는 ADR).
 PEERS = {
+    "NVDA": {"MSFT": "고객", "GOOGL": "고객", "AMZN": "고객", "META": "고객", "ORCL": "고객", "DELL": "고객", "SMCI": "고객",
+             "TSM": "공급", "MU": "공급", "AMD": "경쟁", "AVGO": "경쟁"},   # 엔비디아 고정 페이지 (2026-11-01) — NVDA cal_cards.PEER_ROLE 그대로
     "AAPL": {"TSM": "공급", "QCOM": "공급", "AVGO": "공급", "GOOGL": "협력"},
     "GOOGL": {"MSFT": "경쟁", "META": "경쟁", "AMZN": "경쟁", "NVDA": "공급"},
     "MSFT": {"GOOGL": "경쟁", "AMZN": "경쟁", "ORCL": "경쟁", "NVDA": "공급"},

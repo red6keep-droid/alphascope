@@ -21,6 +21,7 @@ import render_html as R  # noqa: E402
 import signal_groups as SG  # noqa: E402 — 판정 묶음 분류표 (함께 보기, A5)
 
 import universe as U  # noqa: E402
+import court  # noqa: E402 — 소송 일정 (P270)
 
 UP, DOWN, NOTE, TINY = _dk.UP, _dk.DOWN, _dk.NOTE, _dk.TINY
 PAD = _dk.SEP_GAP - _dk.VP - 1
@@ -508,7 +509,7 @@ def sec_drawdown(s):
 
 def related(s):
     """함께 보는 리포트 (가이드라인 10-5 4) — HTML 링크라 검색엔진이 따라간다."""
-    links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("엔비디아 NVDA 주가", U.NVDA_REPORTS_URL)]
+    links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL)] + ([] if s["sym"] == "NVDA" else [("엔비디아 NVDA 주가", U.page_url("NVDA"))])   # 엔비디아도 고정 페이지 (2026-11-01 사용자)
     return R.related_buttons(links)   # 전부 나가는 버튼 (2026-10-31 사용자 P160, 옛 점 글머리표 링크)
 
 
@@ -567,7 +568,7 @@ def sec_opinions(s):
 def sec_earnings_tab(s):
     """`실적` 탭 (P196 · P197, 한국 sec_earnings_tab 과 같게) — 다음 실적 발표는?(펼침) → 실적 · 기대 카드 → `주요 일정` 제목 → 함께 보는 회사 일정 · 시장 일정."""
     # `다음 실적 발표는?` 도 `주요 일정` 제목 아래 첫 카드로 (2026-11-01 사용자 P251) — 탭 첫 카드 = 돈을 더 버나(펼침, P216)
-    return (sec_expect(s) + R.group_title("주요 일정") + sec_calendar(s, ("earnings", "peers", "macro"), open_first=False))
+    return (sec_expect(s) + R.group_title("주요 일정") + sec_calendar(s, ("earnings", "peers", "macro"), open_first=False, extra_cards=court_card(s)))
 
 
 EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
@@ -857,8 +858,8 @@ def cal_macro(c):
     return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED"), f"{len(up)}건", None
 
 
-def sec_calendar(s, keys=("earnings", "peers", "macro"), open_first=True):
-    """일정 카드 — NVDA 리포트 sec_calendar 와 같은 질문 카드(실적 · 같은 업종 실적 · 시장 일정). 소송 카드는 없다(추적하는 사건이 없다).
+def sec_calendar(s, keys=("earnings", "peers", "macro"), open_first=True, extra_cards=""):
+    """일정 카드 — NVDA 리포트 sec_calendar 와 같은 질문 카드(실적 · 같은 업종 실적 · 시장 일정). 소송 카드는 extra_cards (court_card, P270).
     옛 `일정` 탭, 지금은 `실적` 탭 안(sec_earnings_tab, P196) — keys 로 고른 카드만. 카드 밖 `전체 일정 보기` 는 없앴다(P197, 함께 보는 회사 카드 안으로)."""
     cc = s.get("calendar_cards") or {}
     specs = [("다음 실적 발표는?", "earnings", lambda c: cal_earnings(s, c)), ("함께 보는 회사 일정은?", "peers", lambda c: cal_peers(s, c)),   # 360px 한 줄 (P163, 옛 P156 실적 일정은?)
@@ -872,6 +873,7 @@ def sec_calendar(s, keys=("earnings", "peers", "macro"), open_first=True):
         theme, col = R._soon_theme(extra)
         out += R._state_card(_josa(title), state, theme, col, lines, "", tip=_josa(tip), fold=True, opened=first)
         first = False
+    out += extra_cards
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
 
 
@@ -893,6 +895,20 @@ def detail_body(s, today, news=None):
                 + R._section("업계상황", sec_industry_tab(s), tab="업계상황")   # 한국과 같은 탭 (2026-10-31 사용자)
                 + R._section("기업", sec_company(s), tab="기업")   # 한국과 같은 탭 (2026-10-31 사용자)
                 + related(s) + list_marker(U.LIST_URL))   # 출처 · 투자 권유 꼬리말은 뺐다 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자)
+
+
+# ---------------------------------------------------------------- 소송 일정 (P270)
+
+COURT = {}   # court.json — 추적 사건의 법원 일정 (write_all 이 채운다)
+
+
+def court_card(s):
+    """진행 중 소송 일정은? — 추적하는 증권 소송(court_watch.json)이 있고 잡힌 법원 일정이 있는 종목만. 엔비디아 리포트 cal_court 그대로 (2026-11-01 사용자 P270)."""
+    c = court.card(s["sym"], s["day"], COURT)
+    if not c:
+        return ""
+    lines, tip, state, (theme, col) = R.cal_court(c)
+    return R._state_card("진행 중 소송 일정은?", state, theme, col, _rename(lines, s["name"]), "", tip=_rename(tip, s["name"]), fold=True)
 
 
 # ---------------------------------------------------------------- 목록
@@ -930,13 +946,14 @@ def list_body(a):
            f"· 나누는 법 : 11위 밖으로 {U.SWAP_DAYS}거래일 연속 밀리면 후보 중 가장 높았던 종목과 바꾼다")
     body = (list_lead(a) + updated_line(a) + R.title_with_sort("시가총액 순위", tip, "us-cap10") + card(top, "us-cap10")
             + _dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest))
-            + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다. 엔비디아는 매일 나오는 리포트로 갑니다."))
+            + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다."))
     return wrap(body + home_marker())
 
 
 def write_all(a, out_dir, snap=None, news=None, media=None):
     os.makedirs(out_dir, exist_ok=True)
-    global MEDIA, NOW, NEWS
+    global MEDIA, NOW, NEWS, COURT
+    COURT = court.load()   # 그날 court.fetch() 가 쓴 것 (main) — 없으면 소송 카드 없이
     NEWS = news or {}   # 전망 카드 뉴스 · 방송 분위기 · 호재 · 리스크 (P218)
     NOW = (datetime.datetime.fromisoformat(os.environ["RADAR_NOW"].replace("Z", "+00:00")) if os.environ.get("RADAR_NOW")
            else datetime.datetime.now(datetime.timezone.utc))

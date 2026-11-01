@@ -70,6 +70,18 @@ def _earnings(s):
         t = pd.Timestamp(ts)
         t = t.tz_convert(NY) if t.tzinfo else t.tz_localize(NY)
         out.append({"day": t.strftime("%Y-%m-%d"), "when": "bmo" if t.hour < 12 else "amc"})
+    # 회사 캘린더(Ticker.calendar) 날짜를 먼저 믿는다 — earnings_dates 의 미래 추정일은 하루씩 어긋난다(엔비디아 11-17 vs 11-18).
+    # 엔비디아 리포트 collect_calendar 와 같은 규칙, 모든 종목으로 (2026-11-01 사용자)
+    try:
+        ds = (yf.Ticker(s).calendar or {}).get("Earnings Date") or []
+        cal = min(str(d)[:10] for d in ds) if ds else None
+    except Exception as e:   # noqa: BLE001
+        print(f"[collect] {s} 회사 캘린더 실패: {e}")
+        cal = None
+    today = datetime.datetime.now(NY).strftime("%Y-%m-%d")
+    if cal and cal >= today:
+        near = [x for x in out if x["day"] >= today and abs((datetime.date.fromisoformat(x["day"]) - datetime.date.fromisoformat(cal)).days) <= 3]
+        out = [x for x in out if x not in near] + [{"day": cal, "when": near[0]["when"] if near else None}]
     return s, sorted({x["day"]: x for x in out}.values(), key=lambda x: x["day"])
 
 

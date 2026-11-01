@@ -47,6 +47,12 @@ if __name__ == "__main__":
     for s in a["stocks"]:
         analyze_tabs.build(s, snap, extra)
         s["industry_us"] = industry_us.build(s["sym"], fred)
+    if not cached:   # 소송 일정 — 추적 사건 법원 문서 (P270, 실패해도 페이지는 만든다)
+        import court
+        try:
+            court.fetch(a["day"])
+        except Exception as e:  # noqa: BLE001
+            print(f"[radar] 소송 일정 실패: {str(e)[:120]}")
     pages = render_pages.write_all(a, OUT, snap, news)
     if not cached and os.environ.get("STATE_DIR"):   # 매일 기록 — 카드 판정 · 애널리스트 · 방송 의견 · 뉴스 분류 → nvda-state radar/records (데이터-기록-계획 A5-4 · 2026-11-01)
         record(a, news)
