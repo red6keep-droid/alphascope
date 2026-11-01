@@ -1206,8 +1206,8 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
    위 여백 12 는 고정 띠 안(padding)으로 옮겨 붙었을 때 제목 줄과 띄우고, 아래 14 는 밑줄 밖(margin)이라 고정 띠는 밑줄에서 끝난다 */
 .post-body .rt-tabs-wrap { position: sticky; top: 0; z-index: 30; padding-top: 12px; margin-bottom: 14px; background: var(--bg, #fff); }
 .post-body .rt-tabs-wrap > .rt-tabs { margin: 0; }
-/* 전망 카드 호재 · 리스크 줄로 찾아간 기사 줄 — 연한 노랑이 1.6초에 걸쳐 빠진다 (2026-11-01 사용자 P264) */
-.post-body .goto-flash { animation: goto-flash 1.6s ease-out; border-radius: 6px; }
+/* 전망 카드 호재 · 리스크 줄로 찾아간 기사 줄 — 연한 노랑 강조 3초 (2026-11-01 사용자 P264 1.6초 → P266 3초) */
+.post-body .goto-flash { animation: goto-flash 3s ease-out; border-radius: 6px; }
 @keyframes goto-flash { 0%, 30% { background: #FEF3C7; } 100% { background: transparent; } }
 .post-body .rt-tabs-wrap::before, .post-body .rt-tabs-wrap::after { content: ""; position: absolute; top: 12px; bottom: 2px; width: 32px; pointer-events: none; opacity: 0; transition: opacity .15s; }
 .post-body .rt-tabs-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), rgba(255,255,255,0)); }
