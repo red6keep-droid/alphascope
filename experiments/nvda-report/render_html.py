@@ -916,6 +916,18 @@ PICK_HOURS = 48   # 방송 의견을 싣는 기간 — 영상이 올라온 뒤 4
 PICK_DAYS = 30   # 영상을 읽어 오는 기간(뉴스 · 진단용) — Firestore `in` 30개 한도 안 (한국 · 미국 종목 같게)
 
 
+PICK_VBAR = '<span aria-hidden="true" style="display:inline-block;width:1px;height:13px;background:#CBD5E1;margin:0 9px;vertical-align:-1px;"></span>'   # 방송 이름 | 말한 사람 (P200)
+
+
+def _pick_at(sec):
+    """영상 속 발언 시각 → `9분 지점` (1분 안은 `처음`). 없으면 빈 문자열 (P200)."""
+    try:
+        m = int(float(sec)) // 60
+    except (TypeError, ValueError):
+        return ""
+    return f"{m}분 지점" if m else "처음"
+
+
 def _pick_when(iso):
     """게시 시각 → `10.28 20:18 게시` (KST)."""
     import media_feed
@@ -1044,7 +1056,8 @@ PICK_LINE = "border-top:1px solid rgba(15,23,42,.10);"   # 강조 카드 색 위
 
 
 def picks_rows(ps, close, money):
-    """방송 의견 줄 — 줄마다 말한 사람 굵게(소속 괄호는 보통) / 이유 / 작은 글씨 채널 · 게시 시각 · (목표가) · 영상에서 보기.
+    """방송 의견 줄 — 줄마다 제목 줄 `방송 이름(굵게) (9분 지점) | 말한 사람(소속)` / 이유 / 작은 글씨 게시 시각 · (목표가) · 영상에서 보기.
+    (2026-11-01 사용자 P200: 방송 이름을 제목으로 먼저, 세로 구분선 뒤 말한 사람. 옛 P92 = 말한 사람 굵게 · 채널은 작은 줄)
     흰 카드 · 라벨 뱃지 없이 구분선만 (2026-10-29 사용자 P92). 의견별 굵은 제목(`매수 의견`)은 뺐다 — 위 문장이 말한다 (같은 날 P95).
     의견이 여러 종류일 때만 묶음 머리에 보통 굵기 회색 작은 제목을 둔다(어느 의견인지 줄만으로는 안 보여서).
     간격은 뉴스 기사(design_kit.news_item)와 같다: 이름 줄 행간 34 · 이유 위 4 · 작은 줄 위 8 · 줄 위아래 20(첫 줄 위 2) — 글자 크기는 그대로 (P95)."""
@@ -1057,15 +1070,19 @@ def picks_rows(ps, close, money):
         for p in grp:
             who = re.sub(r"\s+\(", "(", p["speaker"] or p["channel"])   # `톰 리 (펀드스트랫)` → `톰 리(펀드스트랫)`
             nm, par, org = who.partition("(")
-            who_html = _esc(nm) + (f'<span style="font-weight:400;">({_esc(org)}</span>' if par else "") + ("" if p["own"] else '<span style="font-weight:400;"> 보고서</span>')
+            who_html = _esc(nm) + (f'({_esc(org)}' if par else "") + ("" if p["own"] else " 보고서")
+            at = _pick_at(p.get("at_sec"))
+            head = (f'<b style="font-weight:700;">{_esc(p["channel"])}</b>'
+                    + (f'<span style="color:{NOTE};font-size:{TINY};margin-left:4px;">({at})</span>' if at else "")
+                    + (f'{PICK_VBAR}<span style="font-weight:400;">{who_html}</span>' if p["speaker"] else ""))   # 방송 이름 → (장면 시각) → 세로 구분선 → 말한 사람 (P200)
             tgt = _pick_target(p, close, money)
-            meta = f"{p['channel']} · {_pick_when(p['published_at'])}" + (f" · {tgt}" if tgt else "")
+            meta = _pick_when(p["published_at"]) + (f" · {tgt}" if tgt else "")   # 채널은 제목 줄로 올렸다 (P200)
             if p["url"]:
                 meta += f' · <a href="{_esc(p["url"])}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">영상에서 보기</a>'
             top = 2 if first and len(ks) == 1 else (8 if len(ks) > 1 and p is grp[0] else 20)
             line = "" if (first or p is grp[0] and len(ks) > 1) else PICK_LINE
             out += (f'<span style="display:block;{line}padding:{top}px 0 20px;">'
-                    f'<span style="display:block;color:#111;font-weight:700;line-height:34px;">{who_html}</span>'
+                    f'<span style="display:block;color:#111;line-height:34px;">{head}</span>'
                     + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;line-height:{PICK_REASON_LH};word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")   # 행간 24 → 26 (+10%, P169)
                     + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
             first = False
