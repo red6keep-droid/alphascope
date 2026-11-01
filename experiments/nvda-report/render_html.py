@@ -839,7 +839,7 @@ GROUP_ICON = {   # 분류 제목 앞 작은 선 아이콘 — 제목 뜻에 맞�
     "실적 전망": '<path d="M3 13.5V9M8 13.5V5.5M13 13.5V2.5M1.5 13.5h13"/>',                                   # 막대 (매출 · 이익)
     "업계 현황": '<path d="M1.5 14V7l4 2.5V7l4 2.5V3.5h5V14z"/><path d="M1.5 14h13"/>',                       # 공장
     "자금 흐름": '<path d="M2 5.5h10M9.5 3l2.5 2.5L9.5 8M14 10.5H4M6.5 8L4 10.5 6.5 13"/>',                    # 오가는 화살표
-    "증시": '<path d="M4 2.5v11M12 2.5v11"/><rect x="2.5" y="5" width="3" height="5" rx=".5"/><rect x="10.5" y="4" width="3" height="6" rx=".5"/><path d="M8 4v8"/><rect x="6.5" y="6" width="3" height="3.5" rx=".5"/>',   # 봉차트
+    "증시": '<path d="M5 2v12M11 2v12"/><rect x="3" y="4.5" width="4" height="6" rx=".5"/><rect x="9" y="6" width="4" height="5" rx=".5"/>',   # 봉 둘 (2026-11-01 사용자 P252, 옛 셋)
     "뉴스 · 방송": '<rect x="1.5" y="3" width="13" height="9" rx="1.5"/><path d="M6.5 5.5v4l3.5-2z"/><path d="M5 14.5h6"/>',   # 화면 + 재생
     "의견": '<path d="M2.5 3.5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7l-3 2.5v-2.5H2.5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z"/>',   # 말풍선
     "호재 · 리스크": '<path d="M8 2l6.5 11.5h-13z"/><path d="M8 6.5v3M8 11.6v.1"/>',                           # 주의 삼각형
@@ -850,9 +850,9 @@ GROUP_ICON = {   # 분류 제목 앞 작은 선 아이콘 — 제목 뜻에 맞�
 def group_head(text, first=False):
     """전망 카드 안 분류 제목 (P210) — 굵은 15px, 위 여백으로 묶음을 가른다. 아래 줄의 구분선이 제목 밑줄 역할. 앞에 뜻 아이콘(P241)."""
     ic = GROUP_ICON.get(text)
-    # 검은 면(20px 둥근 네모) 안 흰 선 12px 아이콘 (2026-11-01 사용자 P246 흰 면 → P249 반대로)
+    # 검은 면(투명도 50%, P252) · 20px 둥근 네모 안 흰 선 12px 아이콘 (2026-11-01 사용자 P246 흰 면 → P249 반대로)
     icon = (f'<span style="display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;margin-right:6px;'
-            f'background:#111;border-radius:5px;color:#fff;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
+            f'background:rgba(17,17,17,.5);border-radius:5px;color:#fff;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
     # 위 18 → 29 (+60%, P248). 아래는 6 그대로 — P247 은 첫 줄 위 여백으로 (TOGETHER_FIRST_PAD)
     return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
 
@@ -926,7 +926,7 @@ def together_card(t):
         if top_g:
             where.append(f'<b style="font-weight:700;color:{c};">{w}</b>은 {" · ".join(_esc(g) for g in top_g)} 쪽')
     more = (f" {', '.join(where)}에 많다." if where else "")
-    more += " 아래에서 분류별 판정과 최근 호재 · 리스크, 앞둔 일정을 함께 볼 수 있다." if (t.get("news") or t.get("sched")) else " 아래에서 분류별 판정을 볼 수 있다."
+    more += note_span("줄을 누르면 자세한 내용으로 이동합니다.")   # 옛 `아래에서 분류별 판정과 … 볼 수 있다` 문장 대신 늘 같은 안내 (2026-11-01 사용자 P253)
     lines = [(f"{dist}로 나뉜다.{more}", "rich"),   # 옛 `이 페이지 카드 n개의 판정이` (P209)
              (together_block(items, theme, title=False) + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or []), "html")]
     tip = ("이 페이지 여러 카드의 판정을 분류별로 상승 · 하락 · 중립으로 다시 놓은 것. 줄마다 판정이 통하는 기간을 괄호에 적었다\n"
@@ -1897,12 +1897,17 @@ def small_note(text):
     return SMALL_NOTE + text
 
 
+def note_span(note):
+    """작은 회색 안내 한 줄 (괄호) — plain 줄은 SMALL_NOTE 로, rich 줄은 이것을 직접 붙인다."""
+    # 다음 줄 · 괄호 · 작은 글씨 행간 20 (2026-10-28 사용자 P76 · P77 · P78: 문장 끝에 이어 붙이니 본문 행간 32 를 따라 너무 벌어졌다)
+    return f'<span data-note="1" style="display:block;margin-top:4px;font-size:{TINY};line-height:20px;color:{NOTE};">({_esc(note)})</span>'
+
+
 def _plain_note(text):
     main, _, note = str(text).partition(SMALL_NOTE)
     out = _wave_break(_tint(_esc(main)))
     if note:
-        # 다음 줄 · 괄호 · 작은 글씨 행간 20 (2026-10-28 사용자 P76 · P77 · P78: 문장 끝에 이어 붙이니 본문 행간 32 를 따라 너무 벌어졌다)
-        out += f'<span data-note="1" style="display:block;margin-top:4px;font-size:{TINY};line-height:20px;color:{NOTE};">({_esc(note)})</span>'
+        out += note_span(note)
     return out
 
 
