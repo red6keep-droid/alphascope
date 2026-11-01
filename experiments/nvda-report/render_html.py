@@ -850,8 +850,11 @@ GROUP_ICON = {   # 분류 제목 앞 작은 선 아이콘 — 제목 뜻에 맞�
 def group_head(text, first=False):
     """전망 카드 안 분류 제목 (P210) — 굵은 15px, 위 여백으로 묶음을 가른다. 아래 줄의 구분선이 제목 밑줄 역할. 앞에 뜻 아이콘(P241)."""
     ic = GROUP_ICON.get(text)
-    icon = f'<span style="display:inline-flex;margin-right:6px;color:#475569;">{_GI.format(ic)}</span>' if ic else ""
-    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 18}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
+    # 흰 면(20px 둥근 네모) 안 12px 아이콘 (2026-11-01 사용자 P246: 흰 면 안 아이콘, 너무 크지 않게)
+    icon = (f'<span style="display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;margin-right:6px;'
+            f'background:#fff;border-radius:5px;color:#475569;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
+    # 위 18 → 29 (+60%, P248) · 아래(첫 줄 구분선까지) 6 → 15 (2.5배, P247)
+    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 15px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
 
 
 def hot_rows(news):
@@ -910,7 +913,21 @@ def together_card(t):
     d, word = (lead[0][0], lead[0][1]) if len(lead) == 1 else (None, "엇갈림")
     theme, col = {1: ("positive", UP), -1: ("negative", DOWN)}.get(d, ("neutral", "#111"))
     dist = " · ".join(f'<b style="font-weight:700;color:{c};">{w} {n}개</b>' for _, w, c, n in cnt if n)
-    lines = [(f"{dist}로 나뉜다.", "rich"),   # 옛 `이 페이지 카드 n개의 판정이` (P209)
+    # 부가 설명 (2026-11-01 사용자 P245: 문장을 조금 더 길게) — 상승 · 하락이 어느 분류에 많이 모였나(많은 순 3개까지) + 아래에 무엇이 있나
+    where = []
+    for dd, w, c, n in cnt:
+        if dd == 0 or not n:
+            continue
+        gs = {}
+        for x in items:
+            if x[2] == dd and len(x) > 6 and x[6]:
+                gs[x[6]] = gs.get(x[6], 0) + 1
+        top_g = sorted(gs, key=lambda g: -gs[g])[:3]
+        if top_g:
+            where.append(f'<b style="font-weight:700;color:{c};">{w}</b>은 {" · ".join(_esc(g) for g in top_g)} 쪽')
+    more = (f" {', '.join(where)}에 많다." if where else "")
+    more += " 아래에서 분류별 판정과 최근 호재 · 리스크, 앞둔 일정을 함께 볼 수 있다." if (t.get("news") or t.get("sched")) else " 아래에서 분류별 판정을 볼 수 있다."
+    lines = [(f"{dist}로 나뉜다.{more}", "rich"),   # 옛 `이 페이지 카드 n개의 판정이` (P209)
              (together_block(items, theme, title=False) + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or []), "html")]
     tip = ("이 페이지 여러 카드의 판정을 분류별로 상승 · 하락 · 중립으로 다시 놓은 것. 줄마다 판정이 통하는 기간을 괄호에 적었다\n"
            f"· 지금 : {word} (" + " · ".join(f"{w} {n}" for _, w, _c, n in cnt if n) + ")\n"
@@ -1191,7 +1208,7 @@ def picks_rows(ps, close, money):
         who_html = _esc(nm) + (f'({_esc(org)}' if par else "") + ("" if p["own"] else " 보고서")
         head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(PICK_BOX.get(p["action"], "flat"), p["action"], _esc, sym=False, fit=True)}</span>'
                 f'<b style="font-weight:700;">{_esc(p["channel"])}</b>'
-                + (f'{PICK_VBAR}<span style="font-weight:400;font-size:18px;">{who_html}</span>' if p["speaker"] else ""))   # 말한 사람 = 방송 이름(19)보다 1px 작게 (2026-11-01 사용자 P230)   # 의견 라벨 → 방송 이름 → 세로 구분선 → 말한 사람 (P200 · P201, 장면 시각 괄호는 뺐다 P202)
+                + (f'{PICK_VBAR}<span style="font-weight:400;font-size:17px;">{who_html}</span>' if p["speaker"] else ""))   # 말한 사람 = 방송 이름(19)보다 2px 작게 (2026-11-01 사용자 P230 → P242)   # 의견 라벨 → 방송 이름 → 세로 구분선 → 말한 사람 (P200 · P201, 장면 시각 괄호는 뺐다 P202)
         tgt = _pick_target(p, close, money)
         meta = _pick_when(p["published_at"]) + (f" · {tgt}" if tgt else "")   # 채널은 제목 줄로 올렸다 (P200)
         if p["url"]:
@@ -2451,8 +2468,10 @@ def analysts_block(a, m0=None, m2=None, sep="#E2E8F0"):
         title = "목표가 범위"
         if n:
             mean_r = sum(w * rc.get(k, 0) for k, w in (("strongBuy", 5), ("buy", 4), ("hold", 3), ("sell", 2), ("strongSell", 1))) / n
+            rtip = _dk.with_src("애널리스트 등급을 강매수 5 · 매수 4 · 보유 3 · 매도 2 · 강매도 1로 놓고 낸 평균과, 그 아래 목표가 범위 막대\n"
+                                f"· 오늘 {mean_r:.1f} : {'매수 쪽' if mean_r >= 3.5 else '매도 쪽' if mean_r <= 2.5 else '보유 근처'}", "Yahoo Finance")   # 안내 기호 — `애널리스트 목표가` 와 같이 (2026-11-01 사용자 P243)
             title = (f'평균 등급 {mean_r:.1f} <span style="color:{MUTED};font-weight:400;">/ 5</span> '
-                     f'<span style="font-weight:400;font-size:{TINY};color:{NOTE};">(강매수 5 · 강매도 1)</span>')
+                     f'<span style="white-space:nowrap;"><span style="font-weight:400;font-size:{TINY};color:{NOTE};">(강매수 5 · 강매도 1)</span>{_tipx(rtip)}</span>')
         top = 12 + _dk.CHART_STACK_GAP if out else 0   # 그래프 아래 또 그래프 — 강조 카드 li 쌓임(아래 12 + 위 10 = 22)과 같게 (2026-11-01 사용자 P224, 옛 10 만이라 좁았다)
         out += f'<span style="{_dk._CHART_TITLE_STYLE}margin:{top}px 0 {_dk.CHART_TITLE_GAP}px;">{_dk.CHART_MARK}{title}</span>' + card(gauge)
     out += target_table(cells, close, m0, sep)
@@ -2467,11 +2486,11 @@ def target_table(cells, close, m0=None, sep="#E2E8F0"):
     if not items:
         return ""
     m0 = m0 or (lambda v: f"${v:,.0f}")   # noqa: E731
-    # 네 칸 가로 배치 · 칸 사이 세로 구분선 (2026-11-01 사용자 P235, 옛 줄 목록 P195): 칸 = 이름(14 회색) / 금액(16 굵게) / 현재가 대비(14, 오름 · 내림 색).
+    # 네 칸 가로 배치 · 칸 사이 세로 구분선 (2026-11-01 사용자 P235, 옛 줄 목록 P195): 칸 = 이름(14 회색) / 금액(14 굵게, P244) / 현재가 대비(14, 오름 · 내림 색).
     # `현재가 대비` 글자는 칸이 좁아 툴팁으로 옮겼다 — 360px 에서 한 칸 약 70px
     cols = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;padding:0 4px;{"" if k == 0 else f"border-left:1px solid {sep};"}">'
                    f'<span style="display:block;line-height:20px;">{nm}</span>'
-                   f'<span style="display:block;margin-top:2px;font-size:{_dk.NAME};line-height:{LH_CARD};font-weight:700;color:#111;overflow-wrap:anywhere;">{_esc(m0(v))}</span>'
+                   f'<span style="display:block;margin-top:2px;line-height:20px;font-weight:700;color:#111;overflow-wrap:anywhere;">{_esc(m0(v))}</span>'   # 금액 = 아래 % 와 같은 14px (P244, 옛 16)
                    + (f'<span style="display:block;line-height:20px;color:{UP if v > close else DOWN if v < close else NOTE};">{_sgn((v / close - 1) * 100)}%</span>' if close else "")
                    + '</span>' for k, (nm, v) in enumerate(items))
     mean = dict(items).get("평균")
