@@ -105,7 +105,7 @@ SECTOR_OVERRIDE = {"GOOGL": ("XLC", "커뮤니케이션"), "META": ("XLC", "커�
 
 
 def sector_etf(sym):
-    """종목이 속한 업종 ETF · 이름 — '○○ 업종으로 돈이 올까?' 카드와 업종 대비 하루 등락에 쓴다."""
+    """종목이 속한 업종 ETF · 이름 — '○○ 업계 자금 흐름은?' 카드와 업종 대비 하루 등락에 쓴다."""
     return SECTOR_OVERRIDE.get(sym) or SECTOR_ETF[BY_SYM[sym][3]]
 
 

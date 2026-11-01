@@ -47,7 +47,7 @@ TABLE = {
                       direction={"오르는 중": UP, "내리는 중": DOWN, "늘고 있음": UP, "줄고 있음": DOWN, "넓어지는 중": UP, "좁아지는 중": DOWN, "커지는 중": UP, "줄어드는 중": DOWN}),
     "biz_money": dict(name="{biz} 업계 수익성", tab="업계상황", card="{biz} 업계 수익성은?", horizon=QUARTER, family=INDUSTRY,
                       direction={"나아짐": UP, "나빠짐": DOWN}),
-    "sector_flow": dict(name="{sector} 업종 자금", tab="업계상황", card="{sector}", horizon=DAYS, family=FLOW,   # 카드 제목 `반도체로 돈이 올까?` · `{sector} 업종으로 돈이 올까?` — 앞부분으로 찾는다
+    "sector_flow": dict(name="{sector} 업계 자금", tab="업계상황", card="{sector} 업계 자금 흐름은?", horizon=DAYS, family=FLOW,   # 옛 `○○ 업종으로 돈이 올까?` (2026-11-01 사용자 P198) — 한국은 `반도체 업계 경기는?` 도 `반도체` 로 시작해 제목 전체로 찾는다
                         direction={"모이는 중": UP, "빠져나가는 중": DOWN}),
     "regime":    dict(name="시장 분위기", tab="오늘", card="시장 분위기는?", horizon=DAYS, family=MARKET,   # 종목이 아닌 시장
                       direction={"상승 추세": UP, "조정장": DOWN}),

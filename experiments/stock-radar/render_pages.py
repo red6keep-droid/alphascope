@@ -310,7 +310,7 @@ def sec_industry_tab(s):
     if not sf:
         return _dk.muted("이 종목은 업계 자료를 아직 연결하지 않았습니다.")
     th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
-    title = "반도체로 돈이 올까?" if sf["name"] == "반도체" else f"{sf['name']} 업종으로 돈이 올까?"
+    title = f"{sf['name']} 업계 자금 흐름은?"   # 옛 `○○ 업계 자금 흐름은?` — 앞날이 아니라 지난 20거래일, 회사 매출이 아니라 주식 쪽 돈 (2026-11-01 사용자 P198)
     card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
@@ -349,7 +349,7 @@ def sec_company(s):
 
 def sec_chart_indicators(s):
     """`지금 가격이 평균보다` 그래프 — 가격 카드 끝. `차트 정보 보기` 접기(S&P 500 대비 · 업종 ETF 대비 하루치)는 뺐다 (2026-10-31 사용자, 한국 P139 와 같게):
-    S&P 500 대비는 하루 흐름 그래프 종가 막대와 같은 값, 업종 ETF 대비는 `업종으로 돈이 올까?` 카드가 한 달 기준으로 같은 질문."""
+    S&P 500 대비는 하루 흐름 그래프 종가 막대와 같은 값, 업종 ETF 대비는 `업계 자금 흐름은?` 카드가 한 달 기준으로 같은 질문."""
     tc = s["tech"]
     return R.ma_chart(tc["ma_rel"], tc.get("bench_ma_rel"), s["name"], "S&P 500", last=True)   # 가격 카드 끝 — 흰 카드 아래 = 좌우 8px (한국 P140 과 같게)
 

@@ -187,7 +187,7 @@ def _rel(snap, sym, n):
 
 
 def sector_flow(snap, sym):
-    """'○○ 업종으로 돈이 올까?' — 미국 sector_flow 와 같은 규칙(20거래일 업종 ETF − KOSPI, ±2%p), 순위는 한국 업종 ETF 끼리 (2026-10-31)."""
+    """'○○ 업계 자금 흐름은?' — 미국 sector_flow 와 같은 규칙(20거래일 업종 ETF − KOSPI, ±2%p), 순위는 한국 업종 ETF 끼리 (2026-10-31)."""
     etf = U.SECTOR_ETF.get(sym)
     n, pp = NC.SECTOR_FLOW_DAYS, NC.SECTOR_FLOW_PP
     rel = _rel(snap, etf, n) if etf else None

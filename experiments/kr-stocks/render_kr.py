@@ -595,7 +595,7 @@ def card_sector_flow(s):
     if not sf:
         return ""
     th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
-    return R._state_card(f"{sf['name']} 업종으로 돈이 올까?", sf["state"], th, col, _kospi(R.sector_lines(sf, "KOSPI")), "", tip=_kospi(R.sector_rule(sf)), fold=True)
+    return R._state_card(f"{sf['name']} 업계 자금 흐름은?", sf["state"], th, col, _kospi(R.sector_lines(sf, "KOSPI")), "", tip=_kospi(R.sector_rule(sf)), fold=True)
 
 
 def sec_industry_tab(s):

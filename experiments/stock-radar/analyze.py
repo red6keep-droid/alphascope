@@ -180,7 +180,7 @@ def _rel(snap, etf, n):
 
 
 def sector_flow(snap, sym):
-    """'○○ 업종으로 돈이 올까?' — NVDA 리포트 sector_flow 와 같은 규칙(20거래일 · ±2%p), 기준 ETF 만 종목의 업종으로. ETF 주식 수 확인은 없다."""
+    """'○○ 업계 자금 흐름은?' — NVDA 리포트 sector_flow 와 같은 규칙(20거래일 · ±2%p), 기준 ETF 만 종목의 업종으로. ETF 주식 수 확인은 없다."""
     etf, name = U.sector_etf(sym)
     n, pp = NC.SECTOR_FLOW_DAYS, NC.SECTOR_FLOW_PP
     rel = _rel(snap, etf, n)

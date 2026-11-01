@@ -1499,21 +1499,21 @@ def sector_lines(sf, bench):
     more = f"{abs(rel):.1f}%p 앞섰다" if rel > 0.05 else (f"{abs(rel):.1f}%p 뒤처졌다" if rel < -0.05 else "비슷하게 움직였다")
     tail = {"모이는 중": f"차이가 +{pp:.0f}%p를 넘어 돈이 {sf['name']} 쪽으로 모이는 중이다.",
             "빠져나가는 중": f"차이가 −{pp:.0f}%p 아래라 돈이 {sf['name']} 쪽에서 빠지는 중이다."}.get(sf["state"], f"차이가 ±{pp:.0f}%p 안이라 돈의 방향은 뚜렷하지 않다.")
-    lines = [(f"최근 {n}거래일 {sf['name']} 업종 ETF({sf.get('etf_label') or sf['etf']})가 {bench}보다 {more}. {tail}", "plain"),
+    lines = [(f"최근 {n}거래일 {sf['name']} ETF({sf.get('etf_label') or sf['etf']})가 {bench}보다 {more}. {tail}", "plain"),
              (flow_gauge(sf, sf["name"]), "html"),   # 엔비디아 반도체 자금 카드와 같은 막대 (2026-10-23 사용자: 새 그래프 모든 페이지)
              ("row", f"{sf['name']} vs 시장 ({n}일)", f"{_sgn1(rel)}%p", f"+{pp:.0f}%p 넘으면 유입 · −{pp:.0f}%p 아래면 유출", False, True),
-             ("row", "업종 순위", f"{sf['n_pool']}개 중 {sf['rank']}위", "같은 기간 수익률 순")]
+             ("row", "업계 순위", f"{sf['n_pool']}개 중 {sf['rank']}위", "같은 기간 수익률 순")]   # 업종 → 업계 (2026-11-01 사용자 P198)
     secs = sf.get("sectors") or []
     if secs:
-        lines.append(("row", "앞선 업종", "\n".join(f"{x['name']} {_sgn1(x['rel'])}%p" for x in secs[:2]), "시장보다 많이 오른 업종"))
-        lines.append(("row", "뒤처진 업종", "\n".join(f"{x['name']} {_sgn1(x['rel'])}%p" for x in secs[-2:][::-1]), "시장보다 내린 업종"))
+        lines.append(("row", "앞선 업계", "\n".join(f"{x['name']} {_sgn1(x['rel'])}%p" for x in secs[:2]), "시장보다 많이 오른 업계"))
+        lines.append(("row", "뒤처진 업계", "\n".join(f"{x['name']} {_sgn1(x['rel'])}%p" for x in secs[-2:][::-1]), "시장보다 내린 업계"))
     return lines
 
 
 def sector_rule(sf):
     pp, rel = config.SECTOR_FLOW_PP, sf["rel_pp"]
-    return (f"투자자 돈이 {sf['name']} 업종으로 들어오는지 빠지는지, 최근 한 달 수익률을 시장과 견줘 본다\n"
-            f"· 오늘 {_sgn1(rel)}%p : {sf['n_pool']}개 업종 중 {sf['rank']}위, 시장보다 {abs(rel):.1f}%p {'앞섰다' if rel > 0 else '뒤처졌다'}\n"
+    return (f"투자자 돈이 {sf['name']} 업계 주식으로 들어오는지 빠지는지, 최근 한 달 수익률을 시장과 견줘 본다\n"
+            f"· 오늘 {_sgn1(rel)}%p : {sf['n_pool']}개 업계 중 {sf['rank']}위, 시장보다 {abs(rel):.1f}%p {'앞섰다' if rel > 0 else '뒤처졌다'}\n"
             f"· 나누는 법 : 시장보다 {pp:.0f}%p 넘게 앞서면 모이는 중, {pp:.0f}%p 넘게 뒤지면 빠져나가는 중, 그 사이는 뚜렷하지 않음")
 
 
@@ -1847,7 +1847,7 @@ def sec_state_cards(a):
     sf = a.get("sector_flow")
     if sf:
         theme, col = FLOW_THEME.get(sf["state"], ("neutral", MUTED))
-        out += _state_card("반도체로 돈이 올까?", sf["state"], theme, col, sector_flow_lines(sf), _new(a, "sector_flow"), tip=sector_flow_rule(sf), fold=True)
+        out += _state_card("반도체 업계 자금 흐름은?", sf["state"], theme, col, sector_flow_lines(sf), _new(a, "sector_flow"), tip=sector_flow_rule(sf), fold=True)
     bb = a.get("bollinger")
     if bb and bb.get("lower") is not None:   # 매일 (2026-10-23 사용자 — 옛 규칙: 하단·상단에 닿은 날만, 2026-10-11)
         theme, col = BOLL_THEME.get(bb["state"], ("neutral", MUTED))
