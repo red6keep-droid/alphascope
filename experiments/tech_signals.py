@@ -312,11 +312,12 @@ def _mark(kind):
     return '<svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true" style="flex:none;"><rect x=".6" y="4" width="8.8" height="2" rx="1" fill="currentColor"/></svg>'
 
 
-def box(kind, text, esc, sym=True):
-    """라벨 하나 — 기호(▲ · ▼ · 가로 막대) + 글자, 고정 폭이라 열이 맞는다."""
+def box(kind, text, esc, sym=True, fit=False):
+    """라벨 하나 — 기호(▲ · ▼ · 가로 막대) + 글자, 고정 폭이라 열이 맞는다. fit=True 는 폭 = 글자 + 좌우 7 (방송 의견 줄 머리, 2026-11-01 사용자 P237)."""
     bg, bd, fg = BOX[kind]
-    return (f'<span style="display:inline-flex;align-items:center;justify-content:center;gap:3px;width:{BOX_W}px;box-sizing:border-box;flex:none;'
-            f'padding:3px 0 2px;background:{bg};border:1px solid {bd};border-radius:4px;color:{fg};font-size:14px;line-height:18px;font-weight:700;white-space:nowrap;">'
+    width = "padding-left:7px;padding-right:7px;" if fit else f"width:{BOX_W}px;"
+    return (f'<span style="display:inline-flex;align-items:center;justify-content:center;gap:3px;{width}box-sizing:border-box;flex:none;'
+            f'padding-top:3px;padding-bottom:2px;background:{bg};border:1px solid {bd};border-radius:4px;color:{fg};font-size:14px;line-height:18px;font-weight:700;white-space:nowrap;">'
             f'{_mark(kind) if sym else ""}{esc(text)}</span>')
 
 
@@ -492,11 +493,6 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     nt = len(top_rows)   # 선 = 제목 아래 · 기간 머리 줄 위 · 머리 줄 아래 (배열 · 크로스 줄이 있으면 그 아래에 머리 줄)
     lines.append((_sub("이동평균") + _table(mrs, line, keep=tuple(sorted({0, nt, nt + 1}))), "html"))
     tip = ("널리 쓰는 기술지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
-           "· 전체요약 : 기술지표와 이동평균을 한데 센 것. (상승 − 하락) ÷ 전체 가 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
-           "· 기술지표 : RSI · 스토캐스틱 · CCI · Williams %R · Ultimate 는 과매수면 하락, 과매도면 상승으로 센다. MACD · ROC · Highs/Lows · Bull/Bear 는 0 이나 기준선 위면 상승. ADX 는 25 아래면 중립. ATR 은 방향이 없어 개수에서 뺀다\n"
-           "· 이동평균 : 5 ~ 200일 단순 · 지수 평균(한국 종목은 60 · 120일, 미국은 50 · 100일). 종가가 선 위면 상승, 아래면 하락\n"
-           "· 정배열 · 역배열 : 짧은 평균선이 긴 선보다 차례로 위면 정배열, 차례로 아래면 역배열, 섞이면 혼조(한국 5 · 20 · 60 · 120일, 미국 20 · 50 · 200일)\n"
-           "· 골든크로스 · 데드크로스 : 짧은 평균선이 긴 선을 위로 뚫으면 골든, 아래로 뚫으면 데드. 가장 최근 것과 며칠(거래일) 전인지(한국 20 · 60일선, 미국 50 · 200일선)\n"
-           "· 이름 앞 보라 점 : 개인 투자자가 많이 보는 지표(RSI · 스토캐스틱 · MACD · 배열 · 크로스)\n"
-           "· 참고 : 같은 지표라도 일봉 · 주봉 · 월봉에서 반대로 나오곤 한다. 다른 사이트와는 봉 단위 · 기준값이 달라 값이 다를 수 있다")
+           f"· 오늘 {sig['word']} : 상승 − 하락을 전체로 나눈 값이 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
+           "· 이름 앞 보라 점 : 개인 투자자가 많이 보는 지표")   # 지표별 규칙 · 이동평균 목록 · 배열 · 크로스 설명은 뺐다 — 읽는 법 페이지로 (2026-10-31 사용자 batch 7 a)
     return lines, tip

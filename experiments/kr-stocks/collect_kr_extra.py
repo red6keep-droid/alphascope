@@ -49,12 +49,26 @@ def _earn_dates(t):
     return [{"day": d, "when": "bmo"} for d in sorted({x.strftime("%Y-%m-%d") for x in e.index})]
 
 
+def _analysts(t):
+    """애널리스트 등급 분포 · 목표가 — 미국 collect_extra._analysts 와 같은 칸 (2026-10-31 사용자: 한국도 `애널리스트 · 방송 의견은?`). 원화."""
+    out = {}
+    rec = t.recommendations
+    if rec is not None and not rec.empty:
+        r0 = rec.iloc[0]
+        out["rating_counts"] = {k: int(r0[k]) for k in ("strongBuy", "buy", "hold", "sell", "strongSell")}
+    pt = t.analyst_price_targets or {}
+    for k in ("mean", "median", "high", "low"):
+        if pt.get(k):
+            out["pt_" + k] = float(pt[k])
+    return out
+
+
 def run():
     import yfinance as yf
     out = {"day": datetime.date.today().isoformat(), "stocks": {}, "revenue": {"series": {}}, "earnings": {}, "pair_earnings": {}}
     for sym, *_ in U.CANDIDATES:
         t = yf.Ticker(sym)
-        for key, f in (("revenue", lambda: _revenue(t)), ("eps", lambda: EX._eps(t)), ("earnings", lambda: _earn_dates(t))):
+        for key, f in (("revenue", lambda: _revenue(t)), ("eps", lambda: EX._eps(t)), ("earnings", lambda: _earn_dates(t)), ("analysts", lambda: _analysts(t))):
             try:
                 v = f()
             except Exception as e:  # noqa: BLE001 — 한 칸이 실패해도 나머지는 받는다
@@ -63,7 +77,9 @@ def run():
             if key == "revenue":
                 out["revenue"]["series"][sym] = v
             elif key == "eps":
-                out["stocks"][sym] = {"eps": v}
+                out["stocks"].setdefault(sym, {})["eps"] = v
+            elif key == "analysts":
+                out["stocks"].setdefault(sym, {})["analysts"] = v
             else:
                 out["earnings"][sym] = v
         time.sleep(0.5)
@@ -85,11 +101,17 @@ def run():
         except Exception as e:  # noqa: BLE001
             print(f"[kr-extra] {us} 실적일 실패: {str(e)[:80]}")
         time.sleep(0.5)
+    try:   # 추정치 · 등급 · 목표가 날짜별 기록 (K16, 2026-10-31 — 옛 extra.json 은 매일 덮어써 이력이 안 남았다)
+        sys.path.insert(0, os.path.join(BASE, ".."))
+        import est_history
+        est_history.append(os.path.join(BASE, "data", "est_history.json"), out["day"], out["stocks"])
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr-extra] 추정치 기록 실패: {str(e)[:120]}")
     os.makedirs(os.path.dirname(EXTRA), exist_ok=True)
     with open(EXTRA, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False)
     n_rev = sum(1 for v in out["revenue"]["series"].values() if any(r.get("yoy") is not None for r in v))
-    print(f"[kr-extra] 매출 {n_rev} · 이익 예상 {sum(1 for v in out['stocks'].values() if v['eps'].get('current'))} · 실적일 {len(out['earnings'])} · 연결 미국 {len(out['pair_earnings'])}")
+    print(f"[kr-extra] 매출 {n_rev} · 이익 예상 {sum(1 for v in out['stocks'].values() if (v.get('eps') or {}).get('current'))} · 실적일 {len(out['earnings'])} · 연결 미국 {len(out['pair_earnings'])}")
     return out
 
 

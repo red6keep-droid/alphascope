@@ -125,7 +125,7 @@ def _caps(symbols):
 
 def run_prices():
     syms = [c[0] for c in U.CANDIDATES]
-    bars = _bars(syms + [U.BENCH, U.KOSDAQ])
+    bars = _bars(syms + [U.BENCH, U.KOSDAQ] + sorted(U.SECTOR_ETF_LIST))   # 업종 ETF — 업종 자금 카드 (2026-10-31)
     got = [s for s in syms if s in bars]
     if len(got) < len(syms) // 2:
         notify.event("수집 실패", f"한국 종목 일봉 {len(got)}/{len(syms)} — yfinance 응답 부족, 이 실행은 자료 지연")

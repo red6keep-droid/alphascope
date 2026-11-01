@@ -97,7 +97,7 @@ def legend_chips(items, keep=False):
     return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{dk.MICRO};line-height:{dk.LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
 
 
-def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
+def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, right=True):   # 기본 = 오른쪽 모양 (P166)
     """세로 막대 (0 기준선, 위 = 오름 · 아래 = 내림) — groups = [(가로축 이름, [값, ...])], 시리즈마다 색 함수.
     숫자는 자기 막대 폭 안에만, 화면이 모자라면 가로 스크롤 (2026-10-26 사용자, 가이드라인 8절 — 엔비디아 _col_chart 와 같은 규칙)."""
     vals = [v for _, vs in groups for v in vs if v is not None]
@@ -105,7 +105,9 @@ def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
         return ""
     fs = dk.BAR_NUM_PX   # 막대 위 숫자 13px — 모든 그래프 같게 (2026-10-27 사용자, 옛 11)
     lbl = max(CHART_LBL, fs + 4)
-    ticks, top, scale = dk.col_axis(vals, height, lbl)   # 한 칸 바깥 눈금까지 · 아래 여백 통일 (2026-10-26 사용자)
+    ticks, top, scale = dk.col_axis(vals, height, lbl + max(dk.LBL_LIFT, dk.LBL_LIFT_DN))   # 한 칸 바깥 눈금까지 · 아래 여백 통일 (2026-10-26 사용자) · 숫자 띄우기 자리 (P181)
+    cut = dk.col_top_cut(vals, ticks, scale, lbl + max(dk.LBL_LIFT, dk.LBL_LIFT_DN))   # 쓰지 않는 위 숫자 자리만큼 세로를 줄인다 (P190)
+    top, height = top - cut, height - cut
     n, ns = len(groups), len(groups[0][1])
     txt = lambda v: fmt(v) if fmt else f"{v:+.2f}".replace("-", "−")   # noqa: E731
     label_px = max(dk.text_px(txt(v), fs) for v in vals) + 4
@@ -117,17 +119,17 @@ def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None):
             if v is None:
                 continue
             h = max(1.0, abs(v) * scale)
-            y, ly = (top - h, top - h - lbl + 1) if v >= 0 else (top, top + h + 1)
+            y, ly = (top - h, top - h - lbl + 1 - dk.LBL_LIFT) if v >= 0 else (top, top + h + 1 + dk.LBL_LIFT_DN)   # 막대 ~ 숫자 2배 (P181)
             rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
             parts.append(f'<span style="position:absolute;{dk.bar_x(i, k, n, ns, bw, lw)}top:{y:.1f}px;height:{h:.1f}px;background:{colors[k](v)};border-radius:{rad};"></span>')
             parts.append(f'<span style="position:absolute;{dk.bar_x(i, k, n, ns, bw, lw, label=True)}top:{ly:.1f}px;height:{lbl - 2}px;line-height:{lbl - 2}px;text-align:center;font-size:{fs}px;'
                          f'font-weight:700;white-space:nowrap;color:{label_colors[k](v)};">{txt(v)}</span>')
-    return dk.col_frame("".join(parts), [g for g, _ in groups], height, top, scale, ticks, min_w)
+    return dk.col_frame("".join(parts), [g for g, _ in groups], height, top, scale, ticks, min_w, right=right)
 
 
-def chart_card(title, groups, colors, label_colors, legend, fmt=None, keep_legend=False):
+def chart_card(title, groups, colors, label_colors, legend, fmt=None, keep_legend=False, right=True):
     pad = dk.SEP_GAP - dk.VP - 1
-    chart = col_chart(groups, colors, label_colors, fmt=fmt)
+    chart = col_chart(groups, colors, label_colors, fmt=fmt, right=right)
     if not chart:
         return ""
     head = f'{dk.CHART_TITLE_M}{esc(title)}</span>' if title else ""   # 제목 없이 그래프만 — 한국 증시 리포트 머리 그래프 (2026-10-26)

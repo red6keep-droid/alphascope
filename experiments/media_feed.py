@@ -419,7 +419,7 @@ def picks(items, since=""):
             out.append({"market": p.get("market") or "", "ticker": t, "name": p.get("name") or "", "action": PICK_ACTION[p["action"]],
                         "speaker": (p.get("speaker") or "").strip(), "own": p.get("source") != "report", "target": p.get("targetPrice"),
                         "currency": p.get("currency") or "", "reason": (p.get("reason") or "").strip(), "quote": (p.get("quote") or "").strip(),
-                        "channel": MC.CHANNEL_SHORT.get(ch, ch), "url": url, "published_at": pub})
+                        "channel": MC.CHANNEL_SHORT.get(ch, ch), "url": url, "published_at": pub, "at_sec": p.get("atSec")})   # at_sec = 영상 속 발언 시각 (P200)
     return out
 
 

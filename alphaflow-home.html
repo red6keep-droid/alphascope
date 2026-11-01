@@ -2565,7 +2565,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 })();
 
 /* ============================================================ 목록 버튼 위 구분선 (2026-10-12 사용자: "콘텐츠 영역에서 하단이 텍스트로 끝날 때만 구분선, 목록 버튼과 콘텐츠 사이 40픽셀")
-   본문의 마지막 글자가 카드(테두리 · 배경 있는 상자) 안이면 구분선 없이 40px, 카드 밖 글이면 20px · 구분선 · 20px. 모양은 테마 CSS(.post-shell.ends-text) */
+   본문의 마지막 글자가 카드(테두리 · 배경 있는 상자) 안이거나 구분선으로 끝나면 구분선 없이 40px, 카드 밖 글이면 20px · 구분선 · 20px. 모양은 테마 CSS(.post-shell.ends-text) */
 (function () {
   'use strict';
   var body = document.querySelector('.post-outer-container .post-body'), shell = document.querySelector('.post-shell');
@@ -2578,7 +2578,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var inCard = false;
     for (var e = last && last.parentElement; e && e !== body; e = e.parentElement) {
       var cs = getComputedStyle(e), bg = cs.backgroundColor;
-      if ((parseFloat(cs.borderBottomWidth) > 0 && parseFloat(cs.borderBottomLeftRadius) > 0) || (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)')) { inCard = true; break; }
+      /* 아래 테두리만 있어도(구분선 목록 끝 — `함께 보는 페이지`) 구분선으로 끝난 것 — 목록 버튼 위 구분선을 또 긋지 않는다 (2026-10-31 사용자 P189) */
+      if (parseFloat(cs.borderBottomWidth) > 0 || (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)')) { inCard = true; break; }
     }
     shell.classList.toggle('ends-text', !!last && !inCard);
   }
@@ -2885,6 +2886,39 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   document.addEventListener('click', later, true);    /* 탭 전환 */
 })();
 
+/* ============================================================ 선 그래프 넘겨 보기 그림자 (2026-10-31 사용자, P161)
+   선 그래프([data-lscroll])는 최신이 오른쪽이라 처음엔 오른쪽 끝이 보이고 왼쪽으로 넘긴다. 왼쪽에 넘길 것이 남아 있으면 왼쪽 그림자([data-sh=l]),
+   맨 왼쪽(가장 오래된 것)에 닿으면 끈다. 오른쪽 그림자는 두지 않는다. 디자인 가이드 8절 */
+(function () {
+  'use strict';
+  function upd(b) {
+    var sh = b.parentNode && b.parentNode.querySelector('[data-sh=l]');
+    if (!sh || !b.clientWidth) return;
+    var max = b.scrollWidth - b.clientWidth, x = Math.abs(b.scrollLeft);   /* direction:rtl — 오른쪽 끝 0, 왼쪽으로 갈수록 음수 */
+    sh.style.opacity = (max - x > 1) ? '1' : '0';
+    /* 이 그래프의 안내 = 그래프 틀 바로 앞(혼자 한 줄) 또는 그 앞 범례 줄 안 — 카드 안 첫 안내를 찾으면 다른 그래프 것을 건드렸다 */
+    var p = b.parentNode.previousElementSibling, hint = p && (p.hasAttribute('data-lhint') ? p : p.querySelector('[data-lhint]'));
+    if (!hint) { var card = b.closest('span[style*="border-radius:8px"]'); hint = card && card.querySelector('[data-lhint]'); }
+    if (hint) {
+      if (hint.closest('[data-chart-top]')) hint.style.visibility = max > 1 ? 'visible' : 'hidden';   /* 범례와 한 줄 — 범례 자리는 그대로 두고 글자만 숨김 */
+      else hint.style.display = max > 1 ? 'block' : 'none';   /* 혼자 한 줄(범례 없는 그래프) — 줄째 없앤다, 그래프 위가 휑하던 것 (2026-10-31 사용자 P190) */
+    }
+  }
+  function all() {
+    var bs = document.querySelectorAll('[data-lscroll]');
+    for (var i = 0; i < bs.length; i++) {
+      var b = bs[i]; upd(b);
+      if (!b._lsc) { b._lsc = 1; b.addEventListener('scroll', (function (el) { return function () { upd(el); }; })(b), { passive: true }); }
+    }
+  }
+  function later() { setTimeout(all, 30); }
+  document.addEventListener('DOMContentLoaded', all);
+  window.addEventListener('load', all);
+  window.addEventListener('resize', later);
+  document.addEventListener('toggle', later, true);   /* details 펼침 — 접힌 카드 안은 폭 0 이라 펼칠 때 다시 잰다 */
+  document.addEventListener('click', later, true);    /* 탭 전환 */
+})();
+
 /* ============================================================ 그래프 확대 (2026-10-16 사용자: "폰에서 그래프를 확대해도 똑같다 — 손가락으로 좌우로 스크롤하듯")
    리포트의 그래프 링크(a[data-zoom], 옛 글은 aria-label "그래프 확대 보기")를 누르면 새 창 대신 전체 화면 팝업에
    그림을 화면 폭의 2.2배(최소 원본 폭, 최대 원본의 2배)로 띄우고 가로 스크롤 — 처음 위치는 오른쪽 끝(최근 봉). 닫기 × · 바깥 · Esc. 디자인 가이드 8절 */
@@ -3137,7 +3171,15 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   var leadStart = root.querySelector('[data-cards], [data-lead]'), lead = [];
   if (leadStart) { var q = leadStart; while (q && q.tagName !== 'H2') { lead.push(q); q = q.nextElementSibling; } }
   var host = first.parentNode;     /* 본문은 바깥 div 로 한 번 감싸여 있어 h2 의 부모는 .post-body 가 아니다 */
-  host.insertBefore(bar, first);   /* 구획을 패널로 옮기기 전에 탭 막대를 첫 h2 자리에 꽂는다 */
+  /* 탭이 폭을 넘으면 가로로 넘겨 본다 — 넘길 것이 남은 쪽에 흐린 그림자(data-more l · r) (2026-10-31 사용자 P167) */
+  var wrap = document.createElement('div'); wrap.className = 'rt-tabs-wrap'; wrap.appendChild(bar);
+  function more() { var max = bar.scrollWidth - bar.clientWidth, x = bar.scrollLeft, m = ''; if (x > 1) m += 'l'; if (max - x > 1) m += 'r'; wrap.setAttribute('data-more', m); }
+  bar.addEventListener('scroll', more, { passive: true }); window.addEventListener('resize', more); window.addEventListener('load', more);
+  host.insertBefore(wrap, first);   /* 구획을 패널로 옮기기 전에 탭 막대를 첫 h2 자리에 꽂는다 */
+  /* 탭 줄 고정 (P257): 붙는 자리 = 제목 줄(.pr-sticky, 아래 글 보기 블록이 만든다) 바로 밑 — 정수 px. stickH = 화면 위에서 가려지는 높이(제목 줄 + 탭 줄) */
+  function stickTop() { var h = document.querySelector('.pr-sticky'); var t = h ? Math.round(h.getBoundingClientRect().height) : 0; wrap.style.top = t + 'px'; return t; }
+  function stickH() { return stickTop() + Math.round(wrap.getBoundingClientRect().height); }
+  setTimeout(stickTop, 0); window.addEventListener('load', stickTop); window.addEventListener('resize', stickTop);
   var panels = [];
   groups.forEach(function (g, i) {
     var p = document.createElement('div'); p.className = 'rt-panel'; p.setAttribute('role', 'tabpanel');
@@ -3156,11 +3198,16 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     b.onclick = function () { select(panels.indexOf(entry)); };
     bar.appendChild(b); panels.push(entry);
   });
-  if (panels.length < 2) { bar.parentNode.removeChild(bar); panels.forEach(function (x) { while (x.p.firstChild) host.appendChild(x.p.firstChild); }); return; }
-  var anchor = bar; panels.forEach(function (x) { anchor.insertAdjacentElement('afterend', x.p); anchor = x.p; });
+  if (panels.length < 2) { wrap.parentNode.removeChild(wrap); panels.forEach(function (x) { while (x.p.firstChild) host.appendChild(x.p.firstChild); }); return; }
+  var anchor = wrap; panels.forEach(function (x) { anchor.insertAdjacentElement('afterend', x.p); anchor = x.p; });
   function select(i, keepHash) {
     panels.forEach(function (x, j) { x.b.setAttribute('aria-selected', String(i === j)); x.p.hidden = i !== j; });
+    var sb = panels[i].b, l = sb.offsetLeft - bar.offsetLeft;   /* 가려진 탭을 고르면 탭 줄을 그 탭이 보이게 넘긴다 */
+    if (l < bar.scrollLeft) bar.scrollLeft = l; else if (l + sb.offsetWidth > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = l + sb.offsetWidth - bar.clientWidth;
+    more();
     if (!keepHash) { try { history.replaceState(null, '', location.pathname + location.search + '#tab-' + i); } catch (e) {} }
+    /* 아래로 내려온 채 탭을 바꾸면 새 탭 맨 위가 탭 줄 바로 밑에 오게 (P257) — 탭 줄이 붙어 있을 때만 */
+    if (!keepHash && wrap.getBoundingClientRect().top <= stickTop() + 1) window.scrollTo(0, Math.max(0, panels[i].p.getBoundingClientRect().top + window.pageYOffset - stickH() - 14));
   }
   var hm = /^#tab-(\d)$/.exec(location.hash || ''), hn = /^#tab-(.+)$/.exec(location.hash || ''), byName = -1;
   /* #tab-캘린더 처럼 탭 이름으로도 연다 — 홈 일정 배너 → 종목 페이지 캘린더 탭 (2026-10-28 사용자). 탭 순서가 종목마다 달라 번호 대신 이름 */
@@ -3168,7 +3215,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     panels.forEach(function (x, j) { if (byName < 0 && x.b.textContent === want) byName = j; });
     if (byName < 0 && alias) panels.forEach(function (x, j) { if (byName < 0 && x.b.textContent === alias) byName = j; }); } catch (e) {} }
   select(hm ? Math.min(parseInt(hm[1], 10), panels.length - 1) : byName >= 0 ? byName : 0, true);
-  if (byName >= 0) { var toBar = function () { window.scrollTo(0, Math.max(0, bar.getBoundingClientRect().top + window.pageYOffset - 70)); }; setTimeout(toBar, 0); window.addEventListener('load', toBar); }   /* 이름으로 열면 탭 줄까지 내려 준다 (위 그래프가 늦게 그려져도 load 때 한 번 더) — 고정 헤더 높이만큼 위 여유 */
+  if (byName >= 0) { var toBar = function () { window.scrollTo(0, Math.max(0, panels[byName].p.getBoundingClientRect().top + window.pageYOffset - stickH() - 14)); }; setTimeout(toBar, 0); window.addEventListener('load', toBar); }   /* 이름으로 열면 탭 줄까지 내려 준다 (위 그래프가 늦게 그려져도 load 때 한 번 더) — 고정 헤더 높이만큼 위 여유 */
   /* 같은 글 안 다른 카드로 — `Alpha Scope 데이터로 함께 보기` 줄 (2026-10-31 P142): data-goto-tab 탭을 열고, 제목이 data-goto-card 로 시작하는 카드를 펼쳐 그 자리로 */
   function goTo(t) {
     var name = t.getAttribute('data-goto-tab'), card = t.getAttribute('data-goto-card'), idx = -1, hit = null;
@@ -3176,9 +3223,24 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     if (idx < 0) return;
     select(idx);
     [].slice.call(panels[idx].p.querySelectorAll('summary')).some(function (sm) { if (sm.textContent.trim().indexOf(card) === 0) { hit = sm; return true; } return false; });
-    if (!hit) { window.scrollTo(0, Math.max(0, bar.getBoundingClientRect().top + window.pageYOffset - 70)); return; }
+    /* 호재 · 리스크 줄 (P264): data-goto-urls 의 기사 가운데 이 탭에 보이는 첫 기사 줄로 내려가 잠깐 강조. 접힌 `더 보기` 안이면 펼친다 */
+    var urls = (t.getAttribute('data-goto-urls') || '').split(' ').filter(Boolean), art = null;
+    urls.some(function (u) { art = [].slice.call(panels[idx].p.querySelectorAll('a[href]')).filter(function (a) { return a.getAttribute('href') === u; })[0] || null; return !!art; });
+    if (art) {
+      var row = art.closest('li') || art.closest('[data-row-link]') || art.parentNode;
+      for (var d = row.parentNode; d && d !== panels[idx].p; d = d.parentNode) if (d.tagName === 'DETAILS') d.open = true;
+      window.scrollTo(0, Math.max(0, row.getBoundingClientRect().top + window.pageYOffset - stickH() - 12));
+      row.classList.remove('goto-flash'); void row.offsetWidth; row.classList.add('goto-flash');
+      return;
+    }
+    if (!hit) {   /* 접기 카드가 아니면 같은 이름의 구획 제목(h2 — 오늘 탭 `뉴스`)으로 (P264, 옛: 탭 맨 위에서 멈췄다) */
+      var h = [].slice.call(panels[idx].p.querySelectorAll('h2')).filter(function (x) { return x.textContent.trim().indexOf(card) === 0 && x.offsetParent; })[0];
+      if (h) window.scrollTo(0, Math.max(0, h.getBoundingClientRect().top + window.pageYOffset - stickH() - 12));
+      return;
+    }
     if (hit.parentNode.tagName === 'DETAILS') hit.parentNode.open = true;
-    window.scrollTo(0, Math.max(0, hit.getBoundingClientRect().top + window.pageYOffset - 80));
+    var box = hit.closest('[data-cards] > div, details') || hit;   /* 도착한 카드 위가 고정된 탭 줄에 가리지 않게 (P257) */
+    window.scrollTo(0, Math.max(0, box.getBoundingClientRect().top + window.pageYOffset - stickH() - 12));
   }
   root.addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('[data-goto-tab]'); if (t) { e.preventDefault(); goTo(t); } });
   root.addEventListener('keydown', function (e) { var t = (e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('[data-goto-tab]'); if (t) { e.preventDefault(); goTo(t); } });

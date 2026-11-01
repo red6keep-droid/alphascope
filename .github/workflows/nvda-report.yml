@@ -84,12 +84,19 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Check if today's report is already published
+      # 2026-11-01 엔비디아 매일 글을 그만두고 고정 페이지로 — 오늘 글이 있나 대신 `오늘(KST 05:00 뒤) 상태 저장이 있나` 로 하루 두 번 실행을 막는다
+      - name: Check if today's run already finished
         id: check
         if: env.IS_SCHEDULED == 'true'
         run: |
-          pip install -r experiments/daily-report/requirements.txt
-          python experiments/daily-report/check_published.py --series nvda
+          DONE=false
+          if git fetch -q origin nvda-state 2>/dev/null; then
+            LAST=$(git log -1 --format=%ct FETCH_HEAD)
+            SINCE=$(TZ=Asia/Seoul date -d "$(TZ=Asia/Seoul date +%F) 05:00" +%s)
+            [ "$LAST" -ge "$SINCE" ] && DONE=true
+          fi
+          echo "오늘 실행 끝남: $DONE"
+          echo "already_published=$DONE" >> "$GITHUB_OUTPUT"
 
   nvda-report:
     needs: check
@@ -124,10 +131,9 @@ jobs:
 
       - name: Run pipeline
         run: |
-          ARGS="--import-state $STATE_DIR --export-state $STATE_DIR"
-          if [ "$IS_SCHEDULED" = "true" ] || [ "${{ inputs.narrate }}" = "true" ]; then
-            ARGS="$ARGS --narrate"
-          fi
+          # 2026-11-01 사용자: 엔비디아도 고정 페이지 · 뉴스는 공용 처리 — 엔비디아 전용 뉴스 수집 · AI 분류 · Gemini 서술은 끈다.
+          # 남는 일 = 일봉 · 캘린더(시장 일정 — 종목 페이지가 이 DB 를 읽는다) · 상태판. 소송 일정은 stock-radar/court.py 가 맡는다
+          ARGS="--import-state $STATE_DIR --export-state $STATE_DIR --skip-feeds --skip-classify"
           # 게시는 아래 별도 단계에서 — 가격 그래프 PNG가 gh-pages에 먼저 올라가 있어야 글의 <img>가 깨지지 않는다 (2026-10-11)
           python experiments/nvda-report/main.py $ARGS
 
@@ -141,7 +147,7 @@ jobs:
           if [ -d "$STATE_DIR/radar" ]; then cp "$STATE_DIR"/radar/*.json experiments/stock-radar/data/ 2>/dev/null || true; fi
           python experiments/stock-radar/main.py
           mkdir -p "$STATE_DIR/radar"
-          for f in news.json iv_history.json history.json rank_state.json capex.json; do   # capex.json = 돈을 어디에 쓰나 분기 표 (기록 보존, 2026-10-30)
+          for f in news.json iv_history.json history.json rank_state.json capex.json est_history.json court.json; do   # court.json = 소송 일정 (P270)   # capex.json = 돈을 어디에 쓰나 분기 표 (기록 보존, 2026-10-30)
             [ -f "experiments/stock-radar/data/$f" ] && cp "experiments/stock-radar/data/$f" "$STATE_DIR/radar/$f"
           done
 
@@ -192,17 +198,9 @@ jobs:
           curl -sS -f -o /dev/null "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}" \
             && echo "그래프 CDN 확인: ${IMAGE_REF}" || echo "::warning::CDN에서 아직 안 보임: ${IMAGE_REF}"
 
-      - name: Publish to Blogger
-        run: |
-          if [ "$DO_PUBLISH" = "true" ]; then
-            echo "게시 모드 — Blogger에 올린다."
-            python experiments/nvda-report/publish.py --publish
-          else
-            echo "그림자 모드 — 게시하지 않는다. (스케줄 게시는 저장소 변수 NVDA_PUBLISH=true 로 켠다)"
-            python experiments/nvda-report/publish.py
-          fi
+      # 엔비디아 날짜별 글 게시(publish.py)는 2026-11-01 그만뒀다 — 엔비디아는 아래 종목 고정 페이지(nvidia-nvda-stock)로. 지난 글은 블로그에 그대로
 
-      # 시총 TOP 10 페이지 갱신 — 엔비디아 글 뒤(목록의 엔비디아 링크 = 오늘 글 post_url.txt). 그래프는 이름이 고정이라 jsDelivr 캐시를 먼저 비운다.
+      # 시총 TOP 10 · 종목 고정 페이지 갱신 (엔비디아 포함, 2026-11-01). 그래프는 이름이 고정이라 jsDelivr 캐시를 먼저 비운다.
       - name: Publish stock pages (시총 TOP 10)
         if: env.DO_PUBLISH == 'true'
         continue-on-error: true

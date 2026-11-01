@@ -288,8 +288,20 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
+/* 탭이 폭을 넘으면 가로로 넘겨 본다 — 넘길 것이 남은 쪽에 흐린 그림자 32px (2026-10-31 사용자 P167, JS 가 data-more 에 l · r) */
+/* 탭 줄 위 고정 (2026-11-01 사용자 P257: 스크롤하면 탭 · 밑줄까지 제목 줄 아래에 붙는다) — top = 제목 줄(.pr-sticky) 높이, JS 가 정수 px 로 넣는다.
+   위 여백 12 는 고정 띠 안(padding)으로 옮겨 붙었을 때 제목 줄과 띄우고, 아래 14 는 밑줄 밖(margin)이라 고정 띠는 밑줄에서 끝난다 */
+.post-body .rt-tabs-wrap { position: sticky; top: 0; z-index: 30; padding-top: 12px; margin-bottom: 14px; background: var(--bg, #fff); }
+.post-body .rt-tabs-wrap > .rt-tabs { margin: 0; }
+/* 전망 카드 호재 · 리스크 줄로 찾아간 기사 줄 — 연한 노랑 강조 3초 (2026-11-01 사용자 P264 1.6초 → P266 3초) */
+.post-body .goto-flash { animation: goto-flash 3s ease-out; border-radius: 6px; }
+@keyframes goto-flash { 0%, 30% { background: #FEF3C7; } 100% { background: transparent; } }
+.post-body .rt-tabs-wrap::before, .post-body .rt-tabs-wrap::after { content: ""; position: absolute; top: 12px; bottom: 2px; width: 32px; pointer-events: none; opacity: 0; transition: opacity .15s; }
+.post-body .rt-tabs-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), rgba(255,255,255,0)); }
+.post-body .rt-tabs-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), rgba(255,255,255,0)); }
+.post-body .rt-tabs-wrap[data-more*="l"]::before, .post-body .rt-tabs-wrap[data-more*="r"]::after { opacity: 1; }
 /* 탭 이름 사이 간격 +10% (2026-10-13 사용자: "모든 탭메뉴명과 메뉴명 사이 여백을 10% 늘려") — 탭 30 → 33, 서브탭 22 → 24, 전환 30 → 32, 하위탭 20 → 22 */
-.post-body .rt-tab { flex: none; padding: 8px 13px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) */
+.post-body .rt-tab { flex: none; padding: 8px 13px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) → 19 → 18 한 단계 작게 (2026-11-01 사용자 P259) */
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
@@ -360,11 +372,11 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 42px;   /* 가로 30% 넓게 — 하단 버튼 공통 (2026-10-13 사용자) */
+  padding: 9px 42px;   /* 가로 30% 넓게 — 하단 버튼 공통 (2026-10-13 사용자) · 높이 −6(위아래 3씩, 홀수면 글자가 반 px 치우침) (2026-11-01 사용자 P213) */
   background: #111;
   border: 1px solid #111;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 14px;   /* 16 → 14 한 단계 작게 (P213) */
   font-weight: 700;
   color: #fff;
 }

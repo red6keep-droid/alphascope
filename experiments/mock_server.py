@@ -6,8 +6,11 @@
 - `/` 인덱스는 열 때마다 experiments/*/output/*.html 을 새로 읽는다 — 목업이 늘거나 바뀌어도 새로고침만 하면 된다.
 - 주소가 바뀌지 않게 포트를 고정하고, IP 대신 맥 이름(.local) 주소도 함께 찍는다.
 - 같은 와이파이에 열리므로 output 폴더 밖(.env 등)은 내주지 않는다.
+- 즐겨찾기(☆ 누르기) · 자주 연 목업(연 횟수)은 맨 위에 (2026-11-01 사용자). 기록은 맥의 experiments/.mock_prefs.json 하나 — 태블릿 · 맥이 같은 목록을 본다.
 """
 import html
+import json
+import threading
 import os
 import socket
 import subprocess
@@ -32,6 +35,24 @@ LABELS = {
     "media-daily": "미디어 데일리",
 }
 RECENT_N = 12
+FREQ_N, FREQ_MIN = 6, 2   # 자주 연 목업 = 2번 이상 연 것 중 많이 연 순서로 6개
+PREFS = os.path.join(BASE, ".mock_prefs.json")   # {"star": ["폴더/파일"], "opens": {"폴더/파일": 횟수}} — output 밖이라 서버가 내주지 않는다
+_lock = threading.Lock()
+
+
+def load_prefs():
+    try:
+        with open(PREFS, encoding="utf-8") as fh:
+            p = json.load(fh)
+    except (OSError, ValueError):
+        p = {}
+    return {"star": p.get("star", []), "opens": p.get("opens", {})}
+
+
+def save_prefs(p):
+    with open(PREFS + ".tmp", "w", encoding="utf-8") as fh:
+        json.dump(p, fh, ensure_ascii=False)
+    os.replace(PREFS + ".tmp", PREFS)
 
 
 _themed = {}   # 경로 → (수정 시각, 테마 있음)
@@ -62,24 +83,40 @@ def mockups():
     return sorted(out, key=lambda x: -x[2])
 
 
-def row(d, f, t, show_dir=False):
+def row(d, f, t, show_dir=False, stars=(), opens=None):
     href = f"/{quote(d)}/output/{quote(f)}"
     when = datetime.fromtimestamp(t).strftime("%m-%d %H:%M")
     sub = f"{LABELS.get(d, d)} · {when}" if show_dir else when
+    if opens:
+        sub += f" · {opens}번"
     name = html.escape(f[:-5])
-    return (f'<a class="row" href="{href}" data-q="{html.escape(d + " " + f).lower()}">'
-            f'<span class="name">{name}</span><span class="sub">{html.escape(sub)}</span></a>')
+    key = html.escape(f"{d}/{f}")
+    on = f"{d}/{f}" in stars
+    return (f'<div class="row" data-q="{html.escape(d + " " + f).lower()}"><a class="go" href="{href}">'
+            f'<span class="name">{name}</span><span class="sub">{html.escape(sub)}</span></a>'
+            f'<button class="star{" on" if on else ""}" data-k="{key}" aria-label="즐겨찾기">{"★" if on else "☆"}</button></div>')
 
 
 def index_page():
     items = mockups()
+    with _lock:
+        prefs = load_prefs()
+    stars, opens = prefs["star"], prefs["opens"]
+    by_key = {f"{d}/{f}": (d, f, t) for d, f, t in items}
     groups = {}
     for d, f, t in items:
         groups.setdefault(d, []).append((d, f, t))
-    parts = ['<section><h2>최근 바뀐 목업</h2>', *(row(*x, show_dir=True) for x in items[:RECENT_N]), "</section>"]
+    parts = []
+    fav = [by_key[k] for k in stars if k in by_key]   # 누른 순서대로
+    if fav:
+        parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars) for x in fav), "</section>"]
+    freq = sorted((k for k, n in opens.items() if n >= FREQ_MIN and k in by_key and k not in stars), key=lambda k: -opens[k])[:FREQ_N]
+    if freq:
+        parts += ['<section><h2>자주 연 목업</h2>', *(row(*by_key[k], show_dir=True, stars=stars, opens=opens[k]) for k in freq), "</section>"]
+    parts += ['<section><h2>최근 바뀐 목업</h2>', *(row(*x, show_dir=True, stars=stars) for x in items[:RECENT_N]), "</section>"]
     for d in sorted(groups, key=lambda k: -groups[k][0][2]):   # 최근에 손댄 폴더가 위
         parts.append(f'<details><summary>{html.escape(LABELS.get(d, d))} <span class="n">{len(groups[d])}</span></summary>')
-        parts += [row(*x) for x in groups[d]]
+        parts += [row(*x, stars=stars) for x in groups[d]]
         parts.append("</details>")
     now = datetime.now().strftime("%m-%d %H:%M:%S")
     return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8">
@@ -92,9 +129,10 @@ h2{{font-size:15px;color:#5b6370;margin:0 0 8px}} section{{margin-bottom:20px}}
 details{{background:#fff;border:1px solid #e3e6eb;border-radius:10px;margin-bottom:10px}}
 summary{{padding:14px;font-weight:600;cursor:pointer}} .n{{color:#8a919c;font-weight:400;font-size:14px}}
 details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
-.row{{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:10px 14px;background:#fff;
-border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px;color:inherit;text-decoration:none}}
-.row:active{{background:#eef2f8}} .name{{word-break:break-all}} .sub{{color:#8a919c;font-size:13px;white-space:nowrap}}
+.row{{display:flex;align-items:stretch;min-height:48px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}}
+.go{{flex:1 1 auto;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 4px 10px 14px;color:inherit;text-decoration:none}}
+.go:active{{background:#eef2f8}} .name{{word-break:break-all}} .sub{{color:#8a919c;font-size:13px;white-space:nowrap}}
+.star{{flex:0 0 48px;border:0;background:none;font-size:22px;color:#c3c8d0;cursor:pointer;padding:0}} .star.on{{color:#f5a623}}
 </style></head><body>
 <h1>목업 목록</h1><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록</div>
 <input id="q" type="search" placeholder="이름으로 찾기 (예: 005930, mock_)">
@@ -107,6 +145,13 @@ function filter() {{
   if (v) ds.forEach(d => d.open = true);
 }}
 q.addEventListener('input', filter);
+// ☆ 누르면 즐겨찾기 넣기 · 빼기 → 목록을 다시 받아 맨 위 즐겨찾기에 반영
+document.querySelectorAll('.star').forEach(b => b.addEventListener('click', async () => {{
+  await fetch('/star?k=' + encodeURIComponent(b.dataset.k), {{method: 'POST'}});
+  try {{ sessionStorage.setItem('mockIndex', JSON.stringify({{
+    open: ds.filter(d => d.open).map(d => d.querySelector('summary').textContent), q: q.value, y: scrollY }})); }} catch (e) {{}}
+  location.reload();
+}}));
 // 목업에서 '목록으로' 눌러 돌아오면 펼친 접기 · 검색어 · 스크롤을 그대로 (같은 창 전환)
 try {{
   const s = JSON.parse(sessionStorage.getItem('mockIndex') || 'null');
@@ -133,6 +178,19 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")   # 목업을 고친 뒤 새로고침하면 바로 보이게
         super().end_headers()
 
+    def do_POST(self):
+        u = urlparse(self.path)
+        if u.path != "/star":
+            self.send_error(404)
+            return
+        k = unquote(dict(x.split("=", 1) for x in u.query.split("&") if "=" in x).get("k", ""))
+        with _lock:
+            p = load_prefs()
+            p["star"] = [x for x in p["star"] if x != k] if k in p["star"] else p["star"] + [k]
+            save_prefs(p)
+        self.send_response(204)
+        self.end_headers()
+
     def do_GET(self):
         path = unquote(urlparse(self.path).path)
         if path in ("/", "/index.html"):
@@ -153,6 +211,11 @@ class Handler(SimpleHTTPRequestHandler):
                 page = fh.read()
             i = page.lower().rfind("</body>")
             page = page[:i] + BACK_BAR + page[i:] if i >= 0 else page + BACK_BAR
+            with _lock:   # 자주 연 목업 — 연 횟수
+                p = load_prefs()
+                k = f"{seg[0]}/{seg[2]}"
+                p["opens"][k] = p["opens"].get(k, 0) + 1
+                save_prefs(p)
             body = page.encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")

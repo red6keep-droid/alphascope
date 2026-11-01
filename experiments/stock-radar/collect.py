@@ -70,13 +70,26 @@ def _earnings(s):
         t = pd.Timestamp(ts)
         t = t.tz_convert(NY) if t.tzinfo else t.tz_localize(NY)
         out.append({"day": t.strftime("%Y-%m-%d"), "when": "bmo" if t.hour < 12 else "amc"})
+    # 회사 캘린더(Ticker.calendar) 날짜를 먼저 믿는다 — earnings_dates 의 미래 추정일은 하루씩 어긋난다(엔비디아 11-17 vs 11-18).
+    # 엔비디아 리포트 collect_calendar 와 같은 규칙, 모든 종목으로 (2026-11-01 사용자)
+    try:
+        ds = (yf.Ticker(s).calendar or {}).get("Earnings Date") or []
+        cal = min(str(d)[:10] for d in ds) if ds else None
+    except Exception as e:   # noqa: BLE001
+        print(f"[collect] {s} 회사 캘린더 실패: {e}")
+        cal = None
+    today = datetime.datetime.now(NY).strftime("%Y-%m-%d")
+    if cal and cal >= today:
+        near = [x for x in out if x["day"] >= today and abs((datetime.date.fromisoformat(x["day"]) - datetime.date.fromisoformat(cal)).days) <= 3]
+        out = [x for x in out if x not in near] + [{"day": cal, "when": near[0]["when"] if near else None}]
     return s, sorted({x["day"]: x for x in out}.values(), key=lambda x: x["day"])
 
 
 def run():
     syms = [c[0] for c in U.CANDIDATES]
     extra = sorted({U.BENCH, "^VIX", "SMH", *SECTOR_ETFS})
-    bars = _bars(syms + extra)
+    peers = sorted({p for v in U.PEERS.values() for p in v} - set(syms))   # 함께 보는 회사 중 64종목 밖 — `함께 움직이는 종목은?` 오늘 등락 (2026-11-01 사용자 P263). 페이지는 만들지 않는다
+    bars = _bars(syms + extra + peers)
     # 스레드 8 → 3: 49종목 × 2 호출을 한꺼번에 쏘면 러너 IP 가 Yahoo 에 막힐 때 전부 같이 죽는다 (운영지침 D6-1, 2026-10-21)
     with ThreadPoolExecutor(3) as ex:
         caps = dict(ex.map(_cap, syms))
