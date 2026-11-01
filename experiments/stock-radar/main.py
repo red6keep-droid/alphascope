@@ -38,8 +38,15 @@ if __name__ == "__main__":
     extra = (collect_extra.load() if cached else collect_extra.run(snap)) or {}
     news = collect_news.load() if cached else collect_news.run()
     a = analyze.run(snap)
+    import industry_us   # 업계 카드 — FRED (2026-11-01 사용자 P268, 실패해도 페이지는 만든다)
+    try:
+        fred = industry_us.load() if cached else industry_us.fetch()
+    except Exception as e:  # noqa: BLE001
+        print(f"[radar] 업계 자료 실패: {str(e)[:120]}")
+        fred = {}
     for s in a["stocks"]:
         analyze_tabs.build(s, snap, extra)
+        s["industry_us"] = industry_us.build(s["sym"], fred)
     pages = render_pages.write_all(a, OUT, snap, news)
     if not cached and os.environ.get("STATE_DIR"):   # 매일 기록 — 카드 판정 · 애널리스트 · 방송 의견 · 뉴스 분류 → nvda-state radar/records (데이터-기록-계획 A5-4 · 2026-11-01)
         record(a, news)

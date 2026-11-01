@@ -45,6 +45,8 @@ TABLE = {
                       direction={"좋아지는 중": UP, "나빠지는 중": DOWN}),
     "biz_work":  dict(name="{biz} 업계 {q}", tab="업계상황", card="{biz} 업계 {q}은?", horizon=QUARTER, family=INDUSTRY,   # 값 · 일감 · 수출 … (universe_kr.BIZ_Q)
                       direction={"오르는 중": UP, "내리는 중": DOWN, "늘고 있음": UP, "줄고 있음": DOWN, "넓어지는 중": UP, "좁아지는 중": DOWN, "커지는 중": UP, "줄어드는 중": DOWN}),
+    "biz_work2": dict(name="{biz} 업계 {q}", tab="업계상황", card="{biz} 업계 {q}은?", horizon=QUARTER, family=INDUSTRY,   # 미국 업계 카드 둘째 (생산 · 값, 2026-11-01 P268)
+                      direction={"오르는 중": UP, "내리는 중": DOWN, "늘고 있음": UP, "줄고 있음": DOWN}),
     "biz_money": dict(name="{biz} 업계 수익성", tab="업계상황", card="{biz} 업계 수익성은?", horizon=QUARTER, family=INDUSTRY,
                       direction={"나아짐": UP, "나빠짐": DOWN}),
     "sector_flow": dict(name="{sector} 업계 자금", tab="업계상황", card="{sector} 업계 자금 흐름은?", horizon=DAYS, family=FLOW,   # 옛 `○○ 업종으로 돈이 올까?` (2026-11-01 사용자 P198) — 한국은 `반도체 업계 경기는?` 도 `반도체` 로 시작해 제목 전체로 찾는다
@@ -65,7 +67,7 @@ TABLE = {
 # 전망 카드 분류 제목 — 줄을 이 묶음으로 나눠 놓는다 (2026-11-01 사용자 P210 · P218: "알파스코프가 체계적으로 보이게"). 이름 · 순서는 Claude
 GROUPS = [("주가 흐름", ("momentum", "ma", "tech", "overheat")),
           ("실적 전망", ("revenue", "eps")),
-          ("업계 현황", ("bsi", "biz_work", "biz_money")),
+          ("업계 현황", ("bsi", "biz_work", "biz_work2", "biz_money")),
           ("자금 흐름", ("sector_flow", "short")),
           ("증시", ("regime", "shock", "pairs")),
           ("뉴스 · 방송", ("news",)),
@@ -76,10 +78,18 @@ GROUP_OF = {k: g for g, ks in GROUPS for k in ks}
 ORDER = [k for _, ks in GROUPS for k in ks]   # 분류 순서 그대로 (P210, 옛 주가에 가까운 것부터)
 
 
+def _card_josa(card):
+    """`{q}은?` 을 채운 뒤 받침에 맞춰 은 · 는 — `수주은?` → `수주는?`. 테마 JS 가 카드 제목 앞부분으로 찾아가서 실제 제목과 같아야 한다 (2026-11-01, 옛 버그)."""
+    if card.endswith("은?") and len(card) > 2:
+        import design_kit
+        return design_kit.josa(card[:-2], "은") + "?"
+    return card
+
+
 def _row(key, state, direction, **names):
     t = TABLE[key]
     fill = lambda x: x.format(**names) if names else x   # noqa: E731
-    return (fill(t["name"]), state, direction, t["tab"], fill(t["card"]), t["horizon"], GROUP_OF.get(key, ""))   # 마지막 = 분류 제목 (P210)
+    return (fill(t["name"]), state, direction, t["tab"], _card_josa(fill(t["card"])), t["horizon"], GROUP_OF.get(key, ""))   # 마지막 = 분류 제목 (P210)
 
 
 def item(key, state, **names):

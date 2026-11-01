@@ -330,14 +330,106 @@ def sec_momentum(s):
     return ("white", R.momentum_in(s["name"], mom, rank, total, s.get("mom_peers_median"), s.get("mom_bench"), "S&P 500", tip))
 
 
+def _fred_value(sid, v):
+    """FRED 값 → 읽기 쉬운 글. 소매 · 주문 · 건설 = 백만 달러, 은행 대출 = 십억 달러, 신차 = 백만 대(연율), 기업이익 = 십억 달러(연율)."""
+    if sid.startswith(("RS", "NEWORDER", "PNRES", "A34")):
+        return f"{v / 100:,.0f}억 달러"
+    if sid == "TOTLL":
+        return f"{v / 1000:,.1f}조 달러"
+    if sid == "TOTALSA":
+        return f"{v * 100:,.0f}만 대"
+    if sid == "MCOILWTICO":
+        return f"{v:,.1f}달러"
+    if sid.startswith("N") and sid.endswith("SBEA"):
+        return f"{v * 10:,.0f}억 달러"
+    return f"{v:,.1f}"   # 지수
+
+
+def _fred_scale(sid):
+    """그래프 숫자 나누기 · 단위 — 단위는 그래프 오른쪽 위."""
+    if sid.startswith(("RS", "NEWORDER", "PNRES", "A34")):
+        return 100, "억 달러"
+    if sid == "TOTLL":
+        return 1000, "조 달러"
+    if sid == "TOTALSA":
+        return 0.01, "만 대"
+    if sid == "MCOILWTICO":
+        return 1, "달러"
+    if sid.startswith("N") and sid.endswith("SBEA"):
+        return 0.1, "억 달러"
+    return 1, ""
+
+
+def _when(m, q=False):
+    y, mo = int(m[:4]), int(m[5:])
+    return f"{y}년 {(mo - 1) // 3 + 1}분기" if q else f"{y}년 {mo}월"
+
+
+def _fred_chart(x, title, q=False):
+    """올해 vs 작년 같은 때 선 그래프 — 한국 업계 카드(_yoy_chart)와 같은 모양. 월 자료 12개월 · 분기 자료 4분기."""
+    div, unit = _fred_scale(x["fred"])
+    by = {r["month"]: r["v"] / div for r in x["series"]}
+    pts = []
+    for r in x["series"][-(4 if q else 12):]:
+        prev = by.get(f"{int(r['month'][:4]) - 1}{r['month'][4:]}")
+        if prev is not None:
+            lab = f"{(int(r['month'][5:]) - 1) // 3 + 1}분기" if q else f"{int(r['month'][5:])}월"
+            pts.append((lab, r["v"] / div, prev))
+    if len(pts) < 2:
+        return []
+    fmt = lambda v: f"{v:,.1f}" if abs(v) < 100 else f"{v:,.0f}"   # noqa: E731
+    chart = R.line_chart([p[0] for p in pts], [("올해", [p[1] for p in pts], R.LINE_THIS, False), ("작년 같은 때", [p[2] for p in pts], R.LINE_GRAY, True)], fmt, unit)
+    return [(f'{_dk.CHART_TITLE_M}{_esc(title)}</span>{chart}', "html")]
+
+
+def _fred_tip(x, members_name, state, q=False):
+    """툴팁 — 뜻 · 오늘 · 기록상 (가이드라인 툴팁 형식). 기록상 = 미국 업종 지표 검증(2026-11-01)."""
+    import industry_us as IU
+    ok, sp = IU.RECORD.get(x["vkey"], (False, None))
+    rec = (f"\n· 기록상 : 이 지표가 크게 늘어난 달과 적게 늘어난 달, 그 뒤 6개월 {members_name} 차이 {_sgn(sp)}%p" if ok
+           else f"\n· 기록상 : 그 뒤 {members_name} 주가와 뚜렷한 관계가 없었다")
+    lim = 10 if q else 5
+    return _dk.with_src(f"업계 전체의 일감 · 값 · 이익을 미국 정부 통계({x['name']})로 본다. 1년 전 같은 {'분기' if q else '달'}과 비교\n"
+                        f"· {state} : {_when(x['month'], q)} 1년 전보다 {_sgn(x['chg'])}% (±{lim}% 넘으면 방향)" + rec, f"FRED · {x['src']}")
+
+
+def industry_cards(s):
+    """미국 업계 카드 — `○○ 업계 생산은?` · `제품 값은?` · `수익성은?` (2026-11-01 사용자 P268: 한국처럼 방향까지). 재료 = industry_us.build."""
+    d = s.get("industry_us")
+    if not d:
+        return ""
+    who = f"{d['biz']} 업계 종목"
+    out = ""
+    for x in d["works"]:
+        up = x["state"] in ("늘고 있음", "오르는 중")
+        theme, col = ("neutral", R.MUTED) if x["state"] in ("판단 유보", "비슷함") else ("positive", R.UP) if up else ("negative", R.DOWN)
+        head = f"{_dk.josa(x['name'], '은')} {_when(x['month'])} {_dk.josa(_fred_value(x['fred'], x['v']), '로')} 1년 전 같은 달보다 {_sgn(x['chg'])}%였다."
+        lines = [(head + R.small_note("월별 자료라 1~2달 늦게 나오고, 주가는 이보다 먼저 움직이곤 합니다."), "plain")]
+        lines += _fred_chart(x, f"{x['name']}, 올해와 작년 같은 달")
+        lines.append(("row", x["name"], _fred_value(x["fred"], x["v"]), f"{_when(x['month'])} · 1년 전보다 {_sgn(x['chg'])}%"))
+        out += R._state_card(f"{d['biz']} 업계 {x['q']}", x["state"], theme, col, lines, "", tip=_fred_tip(x, who, x["state"]), fold=True)
+    m = d.get("money")
+    if m:
+        theme, col = {"나아짐": ("positive", R.UP), "나빠짐": ("negative", R.DOWN)}.get(m["state"], ("neutral", R.MUTED))
+        head = f"{_dk.josa(m['name'], '은')} {_when(m['month'], True)} {_dk.josa(_fred_value(m['fred'], m['v']), '로')} 1년 전 같은 분기보다 {_sgn(m['chg'])}%였다."
+        lines = [(head + R.small_note("분기 자료라 2~3달 늦게 나오고, 1년치로 환산한 금액입니다."), "plain")]
+        lines += _fred_chart(m, f"{m['name']}, 올해와 작년 같은 분기", q=True)
+        lines.append(("row", "업종 기업이익", _fred_value(m["fred"], m["v"]), f"{_when(m['month'], True)} · 1년 전보다 {_sgn(m['chg'])}%"))
+        out += R._state_card(f"{d['biz']} 업계 수익성은?", m["state"], theme, col, lines, "", tip=_fred_tip(m, who, m["state"], q=True), fold=True)
+    return out
+
+
 def sec_industry_tab(s):
-    """`업계상황` 탭 (2026-10-31 사용자: 한국처럼 업종 이야기는 따로) — 지금은 업종 자금 카드 하나. 업종 실물 지표는 나중에."""
+    """`업계상황` 탭 (2026-10-31 사용자: 한국처럼 업종 이야기는 따로) — 업종 자금 카드(펼침) + 업계 카드(FRED, 2026-11-01 P268)."""
     sf = s.get("sector_flow")
-    if not sf:
+    card = ""
+    if sf:
+        th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
+        title = f"{sf['name']} 업계 자금 흐름은?"   # 옛 `○○ 업계 자금 흐름은?` — 앞날이 아니라 지난 20거래일, 회사 매출이 아니라 주식 쪽 돈 (2026-11-01 사용자 P198)
+        card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True, opened=True)   # 탭 첫 강조 카드는 펼침 (P216)
+    card += industry_cards(s)
+    if not card:
         return _dk.muted("이 종목은 업계 자료를 아직 연결하지 않았습니다.")
-    th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
-    title = f"{sf['name']} 업계 자금 흐름은?"   # 옛 `○○ 업계 자금 흐름은?` — 앞날이 아니라 지난 20거래일, 회사 매출이 아니라 주식 쪽 돈 (2026-11-01 사용자 P198)
-    card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True, opened=True)   # 탭 첫 강조 카드는 펼침 (P216)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
@@ -516,6 +608,17 @@ def _sched(s):
     return out
 
 
+def _industry_items(s):
+    """업계 카드 판정 → 신호 카드 줄 (P268) — 일감 · 값 둘까지 + 수익성. 카드 제목과 같은 이름(`반도체 업계 생산`)."""
+    d = s.get("industry_us") or {}
+    out = {}
+    for k, x in zip(("biz_work", "biz_work2"), d.get("works") or []):
+        out[k] = SG.item(k, x["state"], biz=d["biz"], q=x["q"][:-2])
+    if d.get("money"):
+        out["biz_money"] = SG.item("biz_money", d["money"]["state"], biz=d["biz"])
+    return out
+
+
 def verdict_items(s):
     """`Alpha Scope 데이터로 함께 보기` 줄 (P142 → P172: 분류표 signal_groups 로 페이지의 모든 방향 판정). 순서 = SG.ORDER."""
     ex, tc = s.get("expect") or {}, s.get("tech") or {}
@@ -528,6 +631,7 @@ def verdict_items(s):
         "eps": SG.item("eps", (ex.get("eps") or {}).get("state")),
         "short": SG.item("short", (ex.get("short") or {}).get("state")),
         "sector_flow": SG.item("sector_flow", sf["state"], sector=sf["name"]) if sf else None,
+        **_industry_items(s),
         "regime": SG.item("regime", mr["regime"], mkt="미국") if mr else None,
         "shock": SG.item("shock", "충격 국면 중") if ms.get("active") else None,
         "news": SG.news_item(_week_news(s)),   # 뉴스 · 방송 분위기 (P218)
