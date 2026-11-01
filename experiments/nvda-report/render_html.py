@@ -874,29 +874,46 @@ def hot_rows(news):
     for code, rs in sorted(recent, key=lambda kv: -len(kv[1]))[:5]:   # 건수 많은 순, 같으면 최근 순
         dirs = {r.get("direction") for r in rs}
         label = ("엇갈림" if {"positive", "negative"} <= dirs else "호재" if "positive" in dirs else "리스크" if "negative" in dirs else "불확실")
-        last = max(rs, key=lambda r: str(r.get("published_at")))
-        out.append((label, issue_codes.ISSUE_KO.get(code, code), len(rs), last.get("title") or "", last.get("url") or ""))
+        rs = sorted(rs, key=lambda r: str(r.get("published_at")), reverse=True)
+        last = rs[0]
+        urls = [r["url"] for r in rs if r.get("url")]   # 누르면 오늘 탭에서 이 중 처음 보이는 기사로 (P264 — 오늘 탭 목록은 24시간이라 7일 묶음의 최신 기사가 없을 수 있다)
+        out.append((label, issue_codes.ISSUE_KO.get(code, code), len(rs), last.get("title") or "", urls))
     return out
 
 
-def outlook_extra_html(hot, sched, theme=None):
+SCHED_ISSUES = {"earn": ("EARNINGS",), "FOMC": ("RATES_FED",), "CPI": ("INFLATION",), "PCE": ("INFLATION",), "NFP": ("GROWTH_JOBS",), "GDP": ("GROWTH_JOBS",),
+                "OPEX": ("MARKET_STRUCTURE",), "INDEX": ("MARKET_STRUCTURE",)}   # 앞둔 일정 → 관련 기사 이슈 코드 (P265)
+
+
+def sched_counts(news, kind):
+    """앞둔 일정 줄 아래 `관련 기사 긍정 n · 부정 n` — 최근 7일 이 종목 기사 · 방송 중 그 일정의 이슈 코드(SCHED_ISSUES). 건수만, 방향 판정 없음 (2026-11-01 사용자 P265)."""
+    codes = SCHED_ISSUES.get(kind) or ()
+    rs = [r for r in news or [] if r.get("issue") in codes]
+    return sum(1 for r in rs if r.get("direction") == "positive"), sum(1 for r in rs if r.get("direction") == "negative"), len(rs)
+
+
+def outlook_extra_html(hot, sched, theme=None, news=None):
     """전망 카드 아래 두 구획 — 호재 · 리스크(키워드 줄, 누르면 오늘 탭 뉴스) · 앞둔 일정(누르면 실적 탭 그 카드). 둘 다 답 개수에 넣지 않는다 (P218)."""
     import tech_signals as TS
     out = ""
     if hot:
         out += group_head("호재 · 리스크", theme=theme)
-        for i, (label, kw, n, head, url) in enumerate(hot):   # 기사 링크로 두면 테마가 `번역 방법` · 바깥 링크 아이콘을 붙인다 → 오늘 탭 뉴스로 이동 (P204 이동 아이콘 없음)
-            out += (f'<span role="link" tabindex="0" data-goto-tab="오늘" data-goto-card="뉴스" style="display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:{TOGETHER_ROW_H + (TOGETHER_FIRST_PAD if i == 0 else 0)}px;padding:{6 + (TOGETHER_FIRST_PAD if i == 0 else 0)}px 0 6px;box-sizing:border-box;'
+        for i, (label, kw, n, head, urls) in enumerate(hot):   # 기사 링크로 두면 테마가 `번역 방법` · 바깥 링크 아이콘을 붙인다 → 오늘 탭 뉴스로 이동 (P204 이동 아이콘 없음)
+            gu = f' data-goto-urls="{_esc(" ".join(urls))}"' if urls else ""   # 테마 JS: 오늘 탭에서 이 주소의 기사 줄로 내려가 잠깐 강조, 없으면 뉴스 구획 제목으로 (P264)
+            out += (f'<span role="link" tabindex="0" data-goto-tab="오늘" data-goto-card="뉴스"{gu} style="display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:{TOGETHER_ROW_H + (TOGETHER_FIRST_PAD if i == 0 else 0)}px;padding:{6 + (TOGETHER_FIRST_PAD if i == 0 else 0)}px 0 6px;box-sizing:border-box;'
                     f'cursor:pointer;border-top:1px solid {TOGETHER_LINE if i == 0 else "transparent"};font-size:{_dk.NAME};line-height:{LH_CARD};color:#111;">'   # 구분선은 구획 제목 아래만 (P232)
                     f'<span style="min-width:0;flex:1 1 auto;">{_esc(kw)}<span style="font-size:{MICRO};color:{NOTE};margin-left:4px;">({n}건)</span>'
                     + (f'<span style="display:block;font-size:{MICRO};line-height:20px;color:{NOTE};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{_esc(head)}</span>' if head else "")
                     + f'</span>{TS.box(HOT_KIND.get(label, "flat"), label, _esc, sym=False)}</span>')
     if sched:
         out += group_head("앞둔 일정", not hot, theme)
-        for i, (text, when, tab, card) in enumerate(sched):
+        for i, (text, when, tab, card, *kind) in enumerate(sched):
+            pos, neg, tot = sched_counts(news, kind[0] if kind else "")
+            parts = [p for p in ((f'<span style="color:{UP};">긍정 {pos}</span>' if pos else ""), (f'<span style="color:{DOWN};">부정 {neg}</span>' if neg else "")) if p]   # 0 인 쪽 · 중립은 쓰지 않는다 — 360px 한 줄
+            sub = (f'<span style="display:block;font-size:{MICRO};line-height:20px;color:{NOTE};white-space:nowrap;">관련 기사 ' + " · ".join(parts) + ' (7일)</span>') if parts else ""   # 없으면 줄 생략 (빈 답 노출 규칙)
             out += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;'
                     f'min-height:{TOGETHER_ROW_H + (TOGETHER_FIRST_PAD if i == 0 else 0)}px;padding:{6 + (TOGETHER_FIRST_PAD if i == 0 else 0)}px 0 6px;box-sizing:border-box;cursor:pointer;border-top:1px solid {TOGETHER_LINE if i == 0 else "transparent"};font-size:{_dk.NAME};line-height:{LH_CARD};">'
-                    f'<span style="min-width:0;color:#111;">{_esc(text)}</span>'
+                    f'<span style="min-width:0;color:#111;">{_esc(text)}{sub}</span>'
                     f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;color:{TOGETHER_FLAT};">{_esc(when)}{TS.box("flat", "불확실", _esc, sym=False)}</span></span>')
     return f'<span style="display:block;margin:{_dk.CHART_STACK_GAP}px 0 0;">{out}</span>' if out else ""
 
@@ -931,7 +948,7 @@ def together_card(t):
     more = (f" {', '.join(where)}에 많다." if where else "")
     more += note_span("라벨을 클릭하면 자세한 내용으로 이동합니다.", mark=True)   # 문구 · 앞 ※ (2026-11-01 사용자 P258)   # 옛 `아래에서 분류별 판정과 … 볼 수 있다` 문장 대신 늘 같은 안내 (2026-11-01 사용자 P253)
     lines = [(f"{dist}로 나뉜다.{more}", "rich"),   # 옛 `이 페이지 카드 n개의 판정이` (P209)
-             (together_block(items, theme, title=False) + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or [], theme), "html")]
+             (together_block(items, theme, title=False) + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or [], theme, t.get("news") or []), "html")]
     tip = ("이 페이지 여러 카드의 판정을 분류별로 상승 · 하락 · 중립으로 다시 놓은 것. 줄마다 판정이 통하는 기간을 괄호에 적었다\n"
            f"· 지금 : {word} (" + " · ".join(f"{w} {n}" for _, w, _c, n in cnt if n) + ")\n"
            "· 나누는 법 : 가장 많은 쪽, 같으면 엇갈림. 호재 · 리스크와 일정은 세지 않는다. 대부분 검증 전 지표다\n· 이 블로그의 추천이 아니다")

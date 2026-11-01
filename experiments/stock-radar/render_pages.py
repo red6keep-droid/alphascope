@@ -505,14 +505,14 @@ def _sched(s):
     out = []
     e = cc.get("earnings")
     if e and 0 <= e["left"] <= SCHED_DAYS:
-        out.append((f"실적 발표 ({R._md_short(e['day'])})", f"{e['left']}일 뒤", "실적", "다음 실적 발표는?"))
+        out.append((f"실적 발표 ({R._md_short(e['day'])})", f"{e['left']}일 뒤", "실적", "다음 실적 발표는?", "earn"))   # 다섯째 = 관련 기사 종류 (P265)
     up = [u for u in (cc.get("peers") or {}).get("upcoming_all") or (cc.get("peers") or {}).get("upcoming") or [] if left(u["day"]) <= SCHED_DAYS]
     if up:
         out.append((f"{U.peer_name(up[0]['symbol'])} 실적 발표 ({R._md_short(up[0]['day'])})", f"{left(up[0]['day'])}일 뒤", "실적", "함께 보는 회사 일정은?"))
     mu = (cc.get("macro") or {}).get("upcoming") or []
     if mu:
         nm = R.cal_cards.MACRO_KO.get(mu[0]["kind"], mu[0].get("label", ""))
-        out.append((f"{nm} ({R._md_short(mu[0]['day'])})", f"{left(mu[0]['day'])}일 뒤", "실적", "시장 전체를 흔들 일정은?"))
+        out.append((f"{nm} ({R._md_short(mu[0]['day'])})", f"{left(mu[0]['day'])}일 뒤", "실적", "시장 전체를 흔들 일정은?", mu[0]["kind"]))
     return out
 
 

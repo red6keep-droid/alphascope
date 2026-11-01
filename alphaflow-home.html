@@ -3223,7 +3223,21 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     if (idx < 0) return;
     select(idx);
     [].slice.call(panels[idx].p.querySelectorAll('summary')).some(function (sm) { if (sm.textContent.trim().indexOf(card) === 0) { hit = sm; return true; } return false; });
-    if (!hit) return;   /* 탭만 연다 — select 가 탭 맨 위로 올려 준다 */
+    /* 호재 · 리스크 줄 (P264): data-goto-urls 의 기사 가운데 이 탭에 보이는 첫 기사 줄로 내려가 잠깐 강조. 접힌 `더 보기` 안이면 펼친다 */
+    var urls = (t.getAttribute('data-goto-urls') || '').split(' ').filter(Boolean), art = null;
+    urls.some(function (u) { art = [].slice.call(panels[idx].p.querySelectorAll('a[href]')).filter(function (a) { return a.getAttribute('href') === u; })[0] || null; return !!art; });
+    if (art) {
+      var row = art.closest('li') || art.closest('[data-row-link]') || art.parentNode;
+      for (var d = row.parentNode; d && d !== panels[idx].p; d = d.parentNode) if (d.tagName === 'DETAILS') d.open = true;
+      window.scrollTo(0, Math.max(0, row.getBoundingClientRect().top + window.pageYOffset - stickH() - 12));
+      row.classList.remove('goto-flash'); void row.offsetWidth; row.classList.add('goto-flash');
+      return;
+    }
+    if (!hit) {   /* 접기 카드가 아니면 같은 이름의 구획 제목(h2 — 오늘 탭 `뉴스`)으로 (P264, 옛: 탭 맨 위에서 멈췄다) */
+      var h = [].slice.call(panels[idx].p.querySelectorAll('h2')).filter(function (x) { return x.textContent.trim().indexOf(card) === 0 && x.offsetParent; })[0];
+      if (h) window.scrollTo(0, Math.max(0, h.getBoundingClientRect().top + window.pageYOffset - stickH() - 12));
+      return;
+    }
     if (hit.parentNode.tagName === 'DETAILS') hit.parentNode.open = true;
     var box = hit.closest('[data-cards] > div, details') || hit;   /* 도착한 카드 위가 고정된 탭 줄에 가리지 않게 (P257) */
     window.scrollTo(0, Math.max(0, box.getBoundingClientRect().top + window.pageYOffset - stickH() - 12));
