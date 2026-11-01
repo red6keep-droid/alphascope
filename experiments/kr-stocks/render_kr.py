@@ -827,7 +827,7 @@ def sec_states(s):
         th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
         out += R._state_card("시장 분위기는?", mr["regime"], th, col, _kospi(R.regime_lines(mr)), "", tip=_dk.with_src(_kospi(R.regime_rule(mr)), "Yahoo Finance"), fold=True)
     # `한 달간 변화 범위는?` 상태 카드는 가격 카드 펼침(가격 범위 (1년) 아래)으로 옮겼다 (2026-10-31 사용자 P150)
-    out += card_picks(s)   # 방송 의견 — 한 달 범위 바로 아래 (2026-10-29 사용자 P88)
+    # `애널리스트 · 방송 의견은?` 은 `의견` 탭으로 옮겼다 (2026-11-01 사용자 P196: 오늘 탭이 너무 길다)
     oh = s.get("overheat")
     if oh and oh["active"]:
         out += R._state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", R.MUTED, R.overheat_lines(oh), "", tip=_no_record(R.overheat_rule(oh)))
@@ -917,7 +917,7 @@ def build_expect(s, extra, group):
             s["expect"][k] = None
 
 
-def sec_expect(s):
+def sec_expect(s, open_first=True):
     """`실적과 기대` 탭 — 미국 종목과 같은 질문 카드 둘 (2026-10-25 사용자). `시장 예상 흔들림은?`(옵션) · `하락에 거는 돈은?`(공매도)은
     한국 자료가 없어 뺐다 — 개별 종목 옵션이 없고, 공매도는 Yahoo 에 없으며 한국거래소 자료는 약관 확인 전."""
     ex = s.get("expect") or {}
@@ -932,8 +932,20 @@ def sec_expect(s):
         else:
             lines, tip, state = [("이번 실행에서 재료를 받지 못했다. 다음 실행에서 다시 받는다.", "plain")], "", "판단 유보"
         theme, col = R.EXPECT_THEME.get(state, ("neutral", R.MUTED))
-        out += R._state_card(title, state, theme, col, list(lines), "", tip=tip, fold=True, opened=i == 0)
+        out += R._state_card(title, state, theme, col, list(lines), "", tip=tip, fold=True, opened=open_first and i == 0)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>'
+
+
+def sec_earnings_tab(s):
+    """`실적` 탭 (2026-11-01 사용자 P196: 일정 탭을 실적 탭에 합쳐 의견 탭 자리를 만든다) — 다음 실적 발표는?(펼침) → 돈을 더 버나 · 이익 예상
+    → 미국 연결 종목 일정 · 시장 전체를 흔들 일정 → 전체 일정 보기. 일정 대부분이 실적 발표일이라 실적 탭 첫 질문으로."""
+    return sec_calendar(s, ("earnings",), with_list=False) + sec_expect(s, open_first=False) + sec_calendar(s, ("peers", "macro"), open_first=False)
+
+
+def sec_opinions(s):
+    """`의견` 탭 (2026-11-01 사용자 P196) — `애널리스트 · 방송 의견은?` 한 장, 펼친 채로."""
+    card = card_picks(s)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>' if card else _dk.muted("애널리스트 · 방송 의견이 아직 없습니다.")
 
 
 def man_won(v):
@@ -944,7 +956,7 @@ def man_won(v):
 def card_picks(s):
     """`애널리스트 · 방송 의견은?` — 미국과 같은 공용 카드 R.opinions_card (2026-10-31 사용자, 옛 `방송에서 나온 의견은?`). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
-    card = lambda ps_: R.opinions_card(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won)   # noqa: E731
+    card = lambda ps_: R.opinions_card(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won, opened=True)   # noqa: E731 — 의견 탭에서 펼친 채로 (P196)
     real = card(ps)
     if s["code"] != MOCK_PICKS_CODE or len(ps) >= 5:
         return real
@@ -1181,18 +1193,21 @@ def _all_list(s, items):
     return R._gcard(rows) if rows else ""
 
 
-def sec_calendar(s):
-    """`일정` 탭 — 다음 실적 발표는? · 미국과 연결 종목 실적은? · 시장 전체를 흔들 일정은?(요약 + 리포트 링크) + 전체 일정 보기(이 종목 일정만)."""
+def sec_calendar(s, keys=("earnings", "peers", "macro"), with_list=True, open_first=True):
+    """일정 카드 — 다음 실적 발표는? · 미국과 연결 종목 실적은? · 시장 전체를 흔들 일정은?(요약 + 리포트 링크) + 전체 일정 보기(이 종목 일정만).
+    옛 `일정` 탭, 지금은 `실적` 탭 안(sec_earnings_tab, P196) — keys 로 고른 카드만, with_list = 끝에 전체 일정 보기."""
     cc = s.get("calendar_cards") or {}
-    out, first = "", True
+    out, first = "", open_first
     for title, key, fn in (("다음 실적 발표는?", "earnings", cal_earn_card), ("미국 연결 종목 일정은?", "peers", cal_pair_card), ("시장 전체를 흔들 일정은?", "macro", cal_macro_card)):   # 일정 탭 질문엔 `일정` (P156)
         c = cc.get(key)
-        if not c:
+        if key not in keys or not c:
             continue
         lines, tip, state, left = fn(s, c)
         theme, col = R._soon_theme(left)
         out += R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=first)
         first = False
+    if not with_list:
+        return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
     items = _all_items(s)
     lst = _all_list(s, items)
     fold = (R.empty_card("잡힌 일정이 없습니다.") if not lst   # 일정이 없으면 버튼 대신 안내 카드 (P148)
@@ -1243,9 +1258,9 @@ def detail_body(s, a):
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
             + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
             + _dk.keep_tone(R._section("뉴스", sec_today(s), tab="오늘"))   # 뉴스는 헤드라인체 그대로
-            + R._section("실적", sec_expect(s), tab="실적")
+            + R._section("의견", sec_opinions(s), tab="의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196)
+            + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
             + R._section("업계상황", sec_industry_tab(s), tab="업계상황")   # 업종 → 업계 상황 (P151) → 붙여 쓴 업계상황 (2026-10-31 사용자 P167)
-            + R._section("일정", sec_calendar(s), tab="일정")   # 캘린더 → 일정 (P145)
             + R._section("기업", sec_company(s), tab="기업")   # 기업정보 → 기업 (2026-10-31 P145: 탭은 짧게 — 360px 폰에서 다섯째 탭이 잘렸다)
             + related(s) + list_marker(U.LIST_URL))
     return wrap(body)

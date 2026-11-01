@@ -285,7 +285,7 @@ def sec_states(s):
         out += R._state_card("시장 분위기는?", mr["regime"], th, col, R.regime_lines(mr), "", tip=_dk.with_src(R.regime_rule(mr), "Yahoo Finance · CNN"), fold=True)
     # 업종 자금 카드는 `업계상황` 탭으로 옮겼다 (2026-10-31 사용자: 업종 전체 이야기 — 한국처럼 다른 탭)
     # `한 달간 변화 범위는?` 상태 카드는 가격 카드 펼침(가격 범위 (1년) 아래)으로 옮겼다 (2026-10-31 사용자 P150)
-    out += card_opinions(s)   # 애널리스트 · 방송 의견 한 카드 — 한 달 범위 아래 (2026-10-29 P89 · P90)
+    # `애널리스트 · 방송 의견은?` 은 `의견` 탭으로 옮겼다 (2026-11-01 사용자 P196: 오늘 탭이 너무 길다)
     oh = s.get("overheat")
     if oh and oh["active"]:
         out += R._state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", R.MUTED, R.overheat_lines(oh), "", tip=_no_record(R.overheat_rule(oh)))
@@ -432,7 +432,18 @@ def _sub_head(t):
 def card_opinions(s):
     """`애널리스트 · 방송 의견은?` — 공용 R.opinions_card (한국 · 미국 같은 카드, 2026-10-31)."""
     ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
-    return R.opinions_card(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s))
+    return R.opinions_card(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s), opened=True)
+
+
+def sec_opinions(s):
+    """`의견` 탭 (2026-11-01 사용자 P196, 한국과 같게) — `애널리스트 · 방송 의견은?` 한 장, 펼친 채로."""
+    card = card_opinions(s)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>' if card else _dk.muted("애널리스트 · 방송 의견이 아직 없습니다.")
+
+
+def sec_earnings_tab(s):
+    """`실적` 탭 (P196, 한국 sec_earnings_tab 과 같게) — 다음 실적 발표는?(펼침) → 실적 · 기대 카드 → 함께 보는 회사 일정 · 시장 일정 → 전체 일정 보기."""
+    return sec_calendar(s, ("earnings",), with_list=False) + sec_expect(s, open_first=False) + sec_calendar(s, ("peers", "macro"), open_first=False)
 
 
 EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
@@ -577,7 +588,7 @@ def card_capex(c):
     return lines, _dk.with_src(tip, "SEC EDGAR")
 
 
-def sec_expect(s):
+def sec_expect(s, open_first=True):
     """실적과 기대 탭 — NVDA 리포트 sec_expect 와 같은 질문 카드 넷 + 돈을 어디에 쓰나(2026-10-30). 비교 묶음 = 시총 상위 20개 (중앙값)."""
     ex = s.get("expect") or {}
     spec = [("회사는 돈을 더 벌고 있나?", "revenue", R.card_revenue), (R.EPS_TITLE, "eps", R.card_eps),
@@ -597,7 +608,7 @@ def sec_expect(s):
             a = {"status": s["options_status"]}
             lines.append((R._detail_fold(R._status_group(a, "options")), "html"))
         theme, col = R.EXPECT_THEME.get(state, ("neutral", R.MUTED))
-        out += R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=i == 0)
+        out += R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=open_first and i == 0)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>'
 
 
@@ -682,20 +693,23 @@ def _all_list(s, items):
     return R._gcard(rows)
 
 
-def sec_calendar(s):
-    """캘린더 탭 — NVDA 리포트 sec_calendar 와 같은 질문 카드(실적 · 같은 업종 실적 · 시장 일정). 소송 카드는 없다(추적하는 사건이 없다)."""
+def sec_calendar(s, keys=("earnings", "peers", "macro"), with_list=True, open_first=True):
+    """일정 카드 — NVDA 리포트 sec_calendar 와 같은 질문 카드(실적 · 같은 업종 실적 · 시장 일정). 소송 카드는 없다(추적하는 사건이 없다).
+    옛 `일정` 탭, 지금은 `실적` 탭 안(sec_earnings_tab, P196) — keys 로 고른 카드만, with_list = 끝에 전체 일정 보기."""
     cc = s.get("calendar_cards") or {}
     specs = [("다음 실적 발표는?", "earnings", lambda c: cal_earnings(s, c)), ("함께 보는 회사 일정은?", "peers", lambda c: cal_peers(s, c)),   # 360px 한 줄 (P163, 옛 P156 실적 일정은?)
              ("시장 전체를 흔들 일정은?", "macro", cal_macro)]
-    out, first = "", True
+    out, first = "", open_first
     for title, key, fn in specs:
         c = cc.get(key)
-        if not c:
+        if key not in keys or not c:
             continue
         lines, tip, state, extra = fn(c)
         theme, col = R._soon_theme(extra)
         out += R._state_card(_josa(title), state, theme, col, lines, "", tip=_josa(tip), fold=True, opened=first)
         first = False
+    if not with_list:
+        return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
     items = [c for c in (cc.get("all") or []) if c.get("kind") in STOCK_KINDS]
     lst = _all_list(s, items)
     fold = (R.empty_card("잡힌 일정이 없습니다.") if not lst   # 일정이 없으면 버튼 대신 안내 카드 (P148)
@@ -718,9 +732,9 @@ def detail_body(s, today, news=None):
     """NVDA 리포트 순서 : 맨 위 요약 → 그래프 → 가격 카드(펼치면 1층 · 2층) → 상태 카드. 갱신 날짜 줄은 뺐다 — 요약 첫 마디에 날짜가 있다 (2026-10-18 사용자)."""
     return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_tech(s) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
-                + R._section("실적", sec_expect(s), tab="실적")
+                + R._section("의견", sec_opinions(s), tab="의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196)
+                + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
                 + R._section("업계상황", sec_industry_tab(s), tab="업계상황")   # 한국과 같은 탭 (2026-10-31 사용자)
-                + R._section("일정", sec_calendar(s), tab="일정")   # 캘린더 → 일정 (P145)
                 + R._section("기업", sec_company(s), tab="기업")   # 한국과 같은 탭 (2026-10-31 사용자)
                 + related(s) + list_marker(U.LIST_URL))   # 출처 · 투자 권유 꼬리말은 뺐다 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자)
 

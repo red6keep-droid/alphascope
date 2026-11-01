@@ -798,7 +798,7 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
     return out
 
 
-def opinions_card(name, cells, close, ps, money, together, m0=None, m2=None):
+def opinions_card(name, cells, close, ps, money, together, m0=None, m2=None, opened=False):
     """`애널리스트 · 방송 의견은?` (2026-10-29 사용자 P90, 한국 · 미국 공용 2026-10-31) — 애널리스트 의견 · 목표가와 방송 의견(picks)을 한 상태 카드에.
     머릿수는 합치지 않는다(44명 + 1건 X). 답 = 애널리스트 다수(analysts_verdict) — 방송은 건수가 적어 답을 좌우하지 않는다. 애널리스트가 없으면 방송만으로 `매수` 등.
     cells = 애널리스트 칸(analyze_tabs.analysts 모양), money = 방송 목표가 표기, m0 · m2 = 애널리스트 목표가 표기(없으면 달러), together = 함께 보기 줄을 만드는 함수."""
@@ -827,7 +827,7 @@ def opinions_card(name, cells, close, ps, money, together, m0=None, m2=None):
            f"· 지금 : {state}" + (f" · 방송 {cnt}" if ps else "") + "\n"
            "· 나누는 법 : 애널리스트 중 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림. 방송 건수는 답에 넣지 않는다\n"
            "· 이 블로그의 추천이 아니다")   # 옛 `읽는 법 : 누가 어떤 이유로 … 적중률은 검증하지 않았고` 는 줄였다 (2026-10-31 batch 7 h)
-    return _state_card("애널리스트 · 방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance · 유튜브 방송 요약"), fold=True)
+    return _state_card("애널리스트 · 방송 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance · 유튜브 방송 요약"), fold=True, opened=opened)   # 의견 탭에서는 펼친 채로 (P196)
 
 
 def related_buttons(links):
