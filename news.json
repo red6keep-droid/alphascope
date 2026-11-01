@@ -1,6 +1,106 @@
 {
-  "updated_at": "2026-11-01 12:46:27 UTC",
+  "updated_at": "2026-11-01 18:06:32 UTC",
   "items": [
+    {
+      "title": "Democratic Rep. Stevens endorses Rogers over El-Sayed in Michigan Senate election",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/michigan-senate-stevens-rogers-endorsement-el-sayed.html",
+      "published": "2026-11-01 17:59:38",
+      "title_ko": "민주당 의원 스티븐스, 미시간 상원 선거에서 로저스 지지",
+      "summary_ko": "스티븐스, 엘-사이드 후보 패배"
+    },
+    {
+      "title": "Alaska Sen. Sullivan says he'll accept election results, slams Peltola campaign’s reported recruitment of 2nd Sullivan",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/alaska-senate-election-dan-sullivan-peltola.html",
+      "published": "2026-11-01 17:12:59",
+      "title_ko": "알래스카 상원 의원 설리번, 선거 결과 수용 선언·펠톨라 캠페인 2차 모집 비판",
+      "summary_ko": "트럼프 DOJ, 알래스카에 인증 거부 소송 제기"
+    },
+    {
+      "title": "Everything changed for the oil, AI and bond trades over the past month",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/oil-bond-yields-ai-market.html",
+      "published": "2026-11-01 15:58:24",
+      "title_ko": "지난 한 달, 유가 · AI · 채권 트레이드 모두 변했다",
+      "summary_ko": "트레이더, AI 붕괴 우려 인플레이션보다 높음"
+    },
+    {
+      "title": "중간선거 결과와 의회 통제권 변화",
+      "title_ko": "중간선거 결과와 의회 통제권 변화",
+      "summary_ko": "중간선거 이후 의회 통제권에 따라 향후 입법 방향과 lame duck 세션의 정책 처리가 달라질 수 있음",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=jyM31IJL8N8",
+      "published": "2026-11-01 15:55:03",
+      "kind": "media",
+      "tag": "정책/규제",
+      "direction": "neutral",
+      "n_channels": 1
+    },
+    {
+      "title": "이란 전쟁과 휘발유 가격 급등",
+      "title_ko": "이란 전쟁과 휘발유 가격 급등",
+      "summary_ko": "이란과의 전쟁으로 인해 휘발유 가격이 39% 상승하며 유권자들의 불만과 경제적 부담을 가중시키고 있음",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=TH3ajuWSqF4",
+      "published": "2026-11-01 15:38:44",
+      "kind": "media",
+      "tag": "에너지",
+      "direction": "neutral",
+      "n_channels": 1
+    },
+    {
+      "title": "These Senate races may help determine the fate of Social Security",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/social-security-senate-races.html",
+      "published": "2026-11-01 15:20:06",
+      "title_ko": "이번 상원 선거, 사회보장 운명 결정할 수 있다",
+      "summary_ko": "11월 당선 상원의원, 기금 고갈 시점 재직 예정"
+    },
+    {
+      "title": "Social Security may have to cut retirement benefits in six years. Here's how much money is at stake for beneficiaries",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/social-security-benefit-cuts-2032.html",
+      "published": "2026-11-01 15:18:38",
+      "title_ko": "사회보장, 6년 내 은퇴 급여 삭감 필요할 수 있다. 수혜자별 위험 금액은",
+      "summary_ko": "의회 개입 없으면 급여 삭감 발생 가능성"
+    },
+    {
+      "title": "물가 상승과 경제적 부담",
+      "title_ko": "물가 상승과 경제적 부담",
+      "summary_ko": "주거비, 보육료, 헬스케어 등 생활비 부담이 유권자들의 불만을 키우고 대안적 경제 체제에 대한 관심을 높이고 있음",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=7Kfe-dEEPO4",
+      "published": "2026-11-01 15:03:41",
+      "kind": "media",
+      "tag": "매크로",
+      "direction": "negative",
+      "n_channels": 1
+    },
+    {
+      "title": "I'm a psychologist who studies couples: People in the happiest relationships do 1 thing differently after time apart—whether it's hours, days or weeks",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/make-it/2026/11/01/reconnect-partner-after-time-apart.html",
+      "published": "2026-11-01 14:36:01",
+      "title_ko": "심리학자, 가장 행복한 커플은 이별 후 이 한 가지를 다르게 한다",
+      "summary_ko": "마크 트래버스, 행복한 관계 위한 5가지 팁 공유"
+    },
+    {
+      "title": "Why AI is boosting Meta's ad business while hurting Google search",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/01/ai-meta-ads-google-search.html",
+      "published": "2026-11-01 14:31:29",
+      "title_ko": "AI가 메타 광고 사업을 부양하고 구글 검색을 해치는 이유",
+      "summary_ko": "최근 분기 기준 양사 간 성장 격차 최대치 기록"
+    },
+    {
+      "title": "Binance, crypto and hacks: What to know about keeping coin safe as cyber criminals advance",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/10/31/binance-crypto-hack-safety.html",
+      "published": "2026-11-01 14:29:06",
+      "title_ko": "바이낸스 해킹, 코인 보안 위험과 대비책 안내",
+      "summary_ko": ""
+    },
     {
       "title": "Companies promised AI gains — here's how the payoff showed up in earnings",
       "source": "CNBC",
@@ -8,106 +108,6 @@
       "published": "2026-11-01 12:34:06",
       "title_ko": "기업들이 약속한 AI 수익, 실적에서 어떻게 나타났나",
       "summary_ko": "투자자들이 수익을 추구하는 가운데 AI가 실적에 기여"
-    },
-    {
-      "title": "Top Wall Street analysts are bullish on these 3 stocks for the long haul",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/01/top-analysts-are-bullish-on-these-3-stocks-for-the-long-haul.html",
-      "published": "2026-11-01 12:33:53",
-      "title_ko": "월가 주요 애널리스트가 장기적으로 낙관하는 3개 종목",
-      "summary_ko": "단기 노이즈를 넘어 장기 수익에 초점을 맞춘 종목 선정"
-    },
-    {
-      "title": "The midterm election could reshape the muni bond market. Here’s what investors need to know",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/01/election-municipal-bonds.html",
-      "published": "2026-11-01 12:30:48",
-      "title_ko": "중간 선거가 지방채 시장을 재편할 수 있다. 투자자가 알아야 할 것들",
-      "summary_ko": "주 세금 조치, 신규 채권 공급, 의회 구성이 지방채에 영향"
-    },
-    {
-      "title": "Binance resumes withdrawals following $6.3 billion hack, says 90% of stolen user assets are covered",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/binance-hack-asset-coverage-withdrawals.html",
-      "published": "2026-11-01 12:19:33",
-      "title_ko": "바이낸스, 63억 달러 해킹 손실 90% 복구·출금 재개 계획",
-      "summary_ko": "출금 재개, 일요일 예정"
-    },
-    {
-      "title": "Why AI is boosting Meta's ad business while hurting Google search",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/01/ai-meta-ads-google-search.html",
-      "published": "2026-11-01 12:00:01",
-      "title_ko": "AI가 메타 광고 사업을 부양하고 구글 검색을 해치는 이유",
-      "summary_ko": "최근 분기 기준 양사 간 성장 격차 최대치 기록"
-    },
-    {
-      "title": "Trump defamation suit against Murdoch, WSJ over Epstein letter dismissed with prejudice",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/trump-murdoch-wsj-epstein-defamation-lawsuit-dismissed.html",
-      "published": "2026-10-31 23:56:40",
-      "title_ko": "트럼프, 머독·WSJ 에피스타인 서한 관련 명예훼손 소송 기각",
-      "summary_ko": "트럼프, 항소 계획 발표"
-    },
-    {
-      "title": "사회보장국 사기 척결 및 데이터 정비",
-      "title_ko": "사회보장국 사기 척결 및 데이터 정비",
-      "summary_ko": "사회보장국이 대규모 데이터 정비와 사기 척결을 단행하며 행정 효율화를 추진 중",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=ZXBlGqvNisI",
-      "published": "2026-10-31 22:00:38",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "neutral",
-      "n_channels": 1
-    },
-    {
-      "title": "SpaceX loses bid to toss NAACP lawsuit over Memphis data center air pollution",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/xai-naacp-clean-air-act-lawsuit-dismissal.html",
-      "published": "2026-10-31 20:12:37",
-      "title_ko": "스페이스X, 멤피스 데이터센터 대기오염 관련 NAACP 소송 기각 요청 패소",
-      "summary_ko": "사우스아번 데이터센터 및 발전소, 지역사회 반발 지속"
-    },
-    {
-      "title": "OpenAI pares fundraising goal, now seeking up to $20 billion in latest round",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/openai-fundraising-20-billion-valuation.html",
-      "published": "2026-10-31 19:56:23",
-      "title_ko": "오픈AI, 자금 조달 목표 축소…최신 라운드에서 최대 200억 달러 유치 추진",
-      "summary_ko": "자금 조달 라운드 진행 중이며 미확정 상태"
-    },
-    {
-      "title": "바이낸스 사상 최대 암호화폐 해킹",
-      "title_ko": "바이낸스 사상 최대 암호화폐 해킹",
-      "summary_ko": "바이낸스 해킹 사건으로 비트코인 가격이 5% 하락하고 암호화폐 보안 우려가 커졌",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=F9_gU2w5t-U",
-      "published": "2026-10-31 18:00:15",
-      "kind": "media",
-      "tag": "기타",
-      "direction": "negative",
-      "n_channels": 2
-    },
-    {
-      "title": "Binance, crypto and hacks: What to know about keeping coin safe as cyber criminals advance",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/10/31/binance-crypto-hack-safety.html",
-      "published": "2026-10-31 16:13:06",
-      "title_ko": "바이낸스 해킹, 코인 보안 위험과 대비책 안내",
-      "summary_ko": ""
-    },
-    {
-      "title": "이스라엘-미국의 대(對)이란 군사 행동 가능성",
-      "title_ko": "이스라엘-미국의 대(對)이란 군사 행동 가능성",
-      "summary_ko": "네타냐후 총리와 트럼프 대통령 간의 관계를 바탕으로 이란과의 군사적 충돌 가능성이 제기",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=DiGeEGD7Xr0",
-      "published": "2026-10-31 15:00:40",
-      "kind": "media",
-      "tag": "지정학",
-      "direction": "neutral",
-      "n_channels": 2
     }
   ]
 }
