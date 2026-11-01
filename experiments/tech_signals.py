@@ -312,11 +312,12 @@ def _mark(kind):
     return '<svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true" style="flex:none;"><rect x=".6" y="4" width="8.8" height="2" rx="1" fill="currentColor"/></svg>'
 
 
-def box(kind, text, esc, sym=True):
-    """라벨 하나 — 기호(▲ · ▼ · 가로 막대) + 글자, 고정 폭이라 열이 맞는다."""
+def box(kind, text, esc, sym=True, fit=False):
+    """라벨 하나 — 기호(▲ · ▼ · 가로 막대) + 글자, 고정 폭이라 열이 맞는다. fit=True 는 폭 = 글자 + 좌우 7 (방송 의견 줄 머리, 2026-11-01 사용자 P237)."""
     bg, bd, fg = BOX[kind]
-    return (f'<span style="display:inline-flex;align-items:center;justify-content:center;gap:3px;width:{BOX_W}px;box-sizing:border-box;flex:none;'
-            f'padding:3px 0 2px;background:{bg};border:1px solid {bd};border-radius:4px;color:{fg};font-size:14px;line-height:18px;font-weight:700;white-space:nowrap;">'
+    width = "padding-left:7px;padding-right:7px;" if fit else f"width:{BOX_W}px;"
+    return (f'<span style="display:inline-flex;align-items:center;justify-content:center;gap:3px;{width}box-sizing:border-box;flex:none;'
+            f'padding-top:3px;padding-bottom:2px;background:{bg};border:1px solid {bd};border-radius:4px;color:{fg};font-size:14px;line-height:18px;font-weight:700;white-space:nowrap;">'
             f'{_mark(kind) if sym else ""}{esc(text)}</span>')
 
 

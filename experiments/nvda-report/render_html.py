@@ -833,9 +833,25 @@ TOGETHER_LINE = "rgba(15,23,42,.08)"   # 강조 카드 색 위 줄 구분선 (�
 HOT_KIND = {"호재": "up", "리스크": "down"}   # 엇갈림 · 불확실 = 회색 라벨 (P218)
 
 
+_GI = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none;">{}</svg>'
+GROUP_ICON = {   # 분류 제목 앞 작은 선 아이콘 — 제목 뜻에 맞춰 Claude (2026-11-01 사용자 P241)
+    "주가 흐름": '<path d="M2 12l4-4 3 3 5-6"/><path d="M10.5 5H14v3.5"/>',                                     # 오르내리는 선
+    "실적 전망": '<path d="M3 13.5V9M8 13.5V5.5M13 13.5V2.5M1.5 13.5h13"/>',                                   # 막대 (매출 · 이익)
+    "업계 현황": '<path d="M1.5 14V7l4 2.5V7l4 2.5V3.5h5V14z"/><path d="M1.5 14h13"/>',                       # 공장
+    "자금 흐름": '<path d="M2 5.5h10M9.5 3l2.5 2.5L9.5 8M14 10.5H4M6.5 8L4 10.5 6.5 13"/>',                    # 오가는 화살표
+    "증시": '<path d="M4 2.5v11M12 2.5v11"/><rect x="2.5" y="5" width="3" height="5" rx=".5"/><rect x="10.5" y="4" width="3" height="6" rx=".5"/><path d="M8 4v8"/><rect x="6.5" y="6" width="3" height="3.5" rx=".5"/>',   # 봉차트
+    "뉴스 · 방송": '<rect x="1.5" y="3" width="13" height="9" rx="1.5"/><path d="M6.5 5.5v4l3.5-2z"/><path d="M5 14.5h6"/>',   # 화면 + 재생
+    "의견": '<path d="M2.5 3.5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7l-3 2.5v-2.5H2.5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z"/>',   # 말풍선
+    "호재 · 리스크": '<path d="M8 2l6.5 11.5h-13z"/><path d="M8 6.5v3M8 11.6v.1"/>',                           # 주의 삼각형
+    "앞둔 일정": '<rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/>',   # 달력
+}
+
+
 def group_head(text, first=False):
-    """전망 카드 안 분류 제목 (P210) — 굵은 15px, 위 여백으로 묶음을 가른다. 아래 줄의 구분선이 제목 밑줄 역할."""
-    return (f'<span data-group="1" style="display:block;padding:{4 if first else 18}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{_esc(text)}</span>')
+    """전망 카드 안 분류 제목 (P210) — 굵은 15px, 위 여백으로 묶음을 가른다. 아래 줄의 구분선이 제목 밑줄 역할. 앞에 뜻 아이콘(P241)."""
+    ic = GROUP_ICON.get(text)
+    icon = f'<span style="display:inline-flex;margin-right:6px;color:#475569;">{_GI.format(ic)}</span>' if ic else ""
+    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 18}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
 
 
 def hot_rows(news):
@@ -900,7 +916,7 @@ def together_card(t):
            f"· 지금 : {word} (" + " · ".join(f"{w} {n}" for _, w, _c, n in cnt if n) + ")\n"
            "· 나누는 법 : 가장 많은 쪽, 같으면 엇갈림. 호재 · 리스크와 일정은 세지 않는다. 대부분 검증 전 지표다\n· 이 블로그의 추천이 아니다")
     card = _state_card(TOGETHER_Q, word, theme, col, lines, "", tip=tip, fold=True)
-    logo = BLOG_LOGO.replace("display:block;", "display:inline-block;vertical-align:-2px;margin-right:6px;", 1)
+    logo = BLOG_LOGO.replace("display:block;", "display:inline-block;vertical-align:-3px;margin-right:6px;", 1).replace('width="18" height="16"', 'width="21" height="19"', 1)   # 로고 20% 크게 = 18 × 16 → 21 × 19 (정수, 비율 313:286 유지, 2026-11-01 사용자 P240)
     brand = TOGETHER_Q.rsplit(" ", 1)[0]   # `Alpha Scope` 영문 = 질문 글자(18)보다 1px 작게 · 굵게 (2026-11-01 사용자 P231)
     return card.replace(_esc(brand), logo + f'<span style="font-size:17px;font-weight:700;">{_esc(brand)}</span>', 1)   # 제목 앞 블로그 로고 (P208)
 
@@ -1173,7 +1189,7 @@ def picks_rows(ps, close, money):
         who = re.sub(r"\s+\(", "(", p["speaker"] or p["channel"])   # `톰 리 (펀드스트랫)` → `톰 리(펀드스트랫)`
         nm, par, org = who.partition("(")
         who_html = _esc(nm) + (f'({_esc(org)}' if par else "") + ("" if p["own"] else " 보고서")
-        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(PICK_BOX.get(p["action"], "flat"), p["action"], _esc, sym=False)}</span>'
+        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(PICK_BOX.get(p["action"], "flat"), p["action"], _esc, sym=False, fit=True)}</span>'
                 f'<b style="font-weight:700;">{_esc(p["channel"])}</b>'
                 + (f'{PICK_VBAR}<span style="font-weight:400;font-size:18px;">{who_html}</span>' if p["speaker"] else ""))   # 말한 사람 = 방송 이름(19)보다 1px 작게 (2026-11-01 사용자 P230)   # 의견 라벨 → 방송 이름 → 세로 구분선 → 말한 사람 (P200 · P201, 장면 시각 괄호는 뺐다 P202)
         tgt = _pick_target(p, close, money)
@@ -1182,7 +1198,7 @@ def picks_rows(ps, close, money):
             meta += f' · <a href="{_esc(p["url"])}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">영상에서 보기</a>'
         out += (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
                 f'<span style="display:block;color:#111;line-height:34px;">{head}</span>'
-                + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;line-height:{PICK_REASON_LH};word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")   # 행간 24 → 26 (+10%, P169)
+                + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")   # 의견 내용 19 → 18 (2026-11-01 사용자 P238)   # 행간 24 → 26 (+10%, P169)
                 + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
     return f'<span data-picks="1" style="display:block;">{out}</span>'
 
@@ -2444,19 +2460,27 @@ def analysts_block(a, m0=None, m2=None, sep="#E2E8F0"):
 
 
 def target_table(cells, close, m0=None, sep="#E2E8F0"):
-    """목표가 평균 · 중앙 · 최고 · 최저와 현재가 대비 (2026-11-01 사용자 P194 · P195) — 흰 카드 없이 구분선 아래 작은 제목 + 줄 목록
-    (고점 회복 `약 30년 동안 있었던 횟수` 처럼 14px 회색). 열을 나눈 표는 금액이 길면 틀이 깨져서 줄마다 `48만 원 · 현재가 대비 +106.9%` 로 푼다. sep = 카드 안 구분선 색."""
+    """목표가 평균 · 중앙 · 최고 · 최저와 현재가 대비 (P194 · P195 줄 목록 → 2026-11-01 사용자 P235 네 칸 가로 · 세로 구분선) — 흰 카드 없이 작은 제목 + 툴팁.
+    sep = 카드 안 구분선 색(세로 구분선)."""
     items = [(nm, (cells.get(k) or {}).get("value")) for k, nm in (("pt_mean", "평균"), ("pt_median", "중앙"), ("pt_high", "최고"), ("pt_low", "최저"))]
     items = [(nm, v) for nm, v in items if v is not None]
     if not items:
         return ""
     m0 = m0 or (lambda v: f"${v:,.0f}")   # noqa: E731
-    gap = lambda v: (f' · 현재가 대비 <span style="color:{UP if v > close else DOWN if v < close else NOTE};">{_sgn((v / close - 1) * 100)}%</span>' if close else "")   # noqa: E731
-    rows = "".join(f'<span style="display:flex;gap:12px;line-height:24px;"><span style="flex:0 0 32px;">{nm}</span>'
-                   f'<span style="flex:1 1 auto;min-width:0;overflow-wrap:anywhere;"><span style="color:#111;">{_esc(m0(v))}</span>{gap(v)}</span></span>' for nm, v in items)
-    # 위 구분선 없이 · 위 간격 = `평균 등급` 제목 위와 같은 22 (P224 · P226), 제목 = `평균 등급` 과 같은 16px 굵게 · 행간 (P225), 줄 글자 = 범례와 같은 14px (P227)
+    # 네 칸 가로 배치 · 칸 사이 세로 구분선 (2026-11-01 사용자 P235, 옛 줄 목록 P195): 칸 = 이름(14 회색) / 금액(16 굵게) / 현재가 대비(14, 오름 · 내림 색).
+    # `현재가 대비` 글자는 칸이 좁아 툴팁으로 옮겼다 — 360px 에서 한 칸 약 70px
+    cols = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;padding:0 4px;{"" if k == 0 else f"border-left:1px solid {sep};"}">'
+                   f'<span style="display:block;line-height:20px;">{nm}</span>'
+                   f'<span style="display:block;margin-top:2px;font-size:{_dk.NAME};line-height:{LH_CARD};font-weight:700;color:#111;overflow-wrap:anywhere;">{_esc(m0(v))}</span>'
+                   + (f'<span style="display:block;line-height:20px;color:{UP if v > close else DOWN if v < close else NOTE};">{_sgn((v / close - 1) * 100)}%</span>' if close else "")
+                   + '</span>' for k, (nm, v) in enumerate(items))
+    mean = dict(items).get("평균")
+    now = (f"\n· 평균 {m0(mean)} : 현재가보다 {abs(mean / close - 1) * 100:.1f}% {'위' if mean >= close else '아래'}" if mean is not None and close else "")
+    tip = _dk.with_src("애널리스트들이 내다본 1년 뒤 목표 주가의 평균 · 중앙 · 최고 · 최저와 현재가 대비 차이" + now, "Yahoo Finance")   # 안내 기호 (P236)
+    # 위 구분선 없이 · 위 간격 = `평균 등급` 제목 위와 같은 22 (P224 · P226), 제목 = `평균 등급` 과 같은 16px 굵게 · 행간 (P225), 글자 = 범례와 같은 14px (P227)
     return (f'<span style="display:block;margin:{12 + _dk.CHART_STACK_GAP}px 0 0;font-size:{_dk.MICRO};color:{NOTE};">'
-            f'<span style="{_dk._CHART_TITLE_STYLE}margin:0 0 4px;">애널리스트 목표가</span>{rows}</span>')
+            f'<span style="{_dk._CHART_TITLE_STYLE}margin:0 0 {_dk.CHART_TITLE_GAP + 4}px;">애널리스트 목표가{_tipx(tip)}</span>'
+            f'<span style="display:flex;align-items:stretch;">{cols}</span></span>')
 
 def targets_parts(a, m0=None, m2=None):
     """(요약 = 등급 막대 + 평균 등급 줄, 펼침 = 목표가 막대 + 평균 · 중앙 · 최고 · 최저) — 없으면 None.
@@ -2514,7 +2538,8 @@ def target_gauge(cells, close, m0=None, m2=None, wrap=True):
     fill, rest = _dk.lighten("#000000", 0.2), _dk.lighten("#000000", 0.6)   # 최저 쪽 블랙이 종가까지 채워 가고, 나머지(~최고)는 회색 (2026-10-25 사용자)
     tip_col = "#000000"
     if mean is not None and close != mean:   # 종가가 목표가 평균보다 아래면 말풍선 · 채운 막대 = 파랑, 위면 빨강 (2026-11-01 사용자 P223)
-        fill = tip_col = DOWN if close < mean else UP
+        tip_col = DOWN if close < mean else UP
+        fill = _dk.lighten(tip_col, 0.2)   # 12개월 모멘텀 `하위 25%` · `상위 25%` 칸과 같은 색 — 말풍선 · 채운 막대 20% 밝게, 점 테두리는 원색 (_zone_gauge, P234)
     pieces = [(lo, close, fill), (close, hi, rest)]
     bar = "".join(f'<span style="position:absolute;top:0;bottom:0;left:{pos(a):.2f}%;width:{pos(b) - pos(a):.2f}%;background:{c};"></span>'
                   for a, b, c in pieces if b - a > 1e-9)
