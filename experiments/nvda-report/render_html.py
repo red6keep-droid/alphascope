@@ -803,12 +803,12 @@ def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None):
     접힌 머리에서 두 답(예: 매수 · 매도)을 따로 보고, 누르면 그쪽 내용만 펼친다 — 둘 다 접힌 채로. 함께 보기는 두 카드 아래 따로 흰 카드.
     두 카드는 의견이 없어도 늘 둔다 — 답 `없음` (2026-11-01 사용자 P199: 방송 의견이 없다고 카드가 사라지면 안 된다).
     cells = 애널리스트 칸(analyze_tabs.analysts 모양), money = 방송 목표가 표기, m0 · m2 = 애널리스트 목표가 표기(없으면 달러), together = 함께 보기 줄을 만드는 함수."""
-    cards = analysts_card(cells, close, m0, m2) + picks_card(name, ps, close, money)
+    cards = analysts_card(cells, close, m0, m2, opened=True) + picks_card(name, ps, close, money)   # 탭 첫 강조 카드는 펼침 (2026-11-01 사용자 P216)
     cards += together_card(together())   # 데이터 전망 = 셋째 강조 카드 (P206)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>'
 
 
-def analysts_card(cells, close, m0=None, m2=None):
+def analysts_card(cells, close, m0=None, m2=None, opened=False):
     """`애널리스트 의견은?` (P197) — 답 = 애널리스트 다수(analysts_verdict), 펼치면 등급 막대 · 목표가 막대 · 목표가 줄(analysts_block). 집계가 없으면 답 `없음` (P199)."""
     a = {"status": {"analysts": cells}, "headline": {"close": close}}
     verdict = analysts_verdict(a, rich=True) if cells else None
@@ -824,18 +824,68 @@ def analysts_card(cells, close, m0=None, m2=None):
            f"· 지금 : {state}\n"
            "· 나누는 법 : 매수(강매수 포함)가 절반 넘으면 매수, 보유가 절반 넘으면 보유, 매도 쪽이 절반 넘으면 매도, 아니면 엇갈림\n"
            "· 이 블로그의 추천이 아니다")
-    return _state_card("애널리스트 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance"), fold=True)
+    return _state_card("애널리스트 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance"), fold=True, opened=opened)
 
 
-TOGETHER_Q = "Alpha Scope의 데이터 전망은?"   # 옛 흰 카드 `Alpha Scope 데이터로 함께 보기` → 강조 카드 (2026-11-01 사용자 P206)
+TOGETHER_Q = "Alpha Scope 전망은?"   # 옛 흰 카드 `Alpha Scope 데이터로 함께 보기` → 강조 카드 (P206) → 로고 + `Alpha Scope 전망은?` (2026-11-01 사용자 P208)
 TOGETHER_WORDS = ((1, "상승", UP), (-1, "하락", DOWN), (0, "중립", "#111"))
+TOGETHER_LINE = "rgba(15,23,42,.08)"   # 강조 카드 색 위 줄 구분선 (흰 바탕을 뺀 뒤, P207)
+HOT_KIND = {"호재": "up", "리스크": "down"}   # 엇갈림 · 불확실 = 회색 라벨 (P218)
 
 
-def together_card(items):
-    """`Alpha Scope의 데이터 전망은?` 강조 카드 — 의견 탭 셋째, 접기 버튼 · 펼침은 다른 강조 카드와 같다 (2026-11-01 사용자 P206 · P207).
-    답 = 가장 많은 방향 하나(상승 · 하락 · 중립, 같으면 엇갈림), 카드 색 = 그 방향(상승 주황 · 하락 파랑 · 그 밖 회색). 펼치면 분포 문장 + 줄 목록(흰 바탕 없이).
+def group_head(text, first=False):
+    """전망 카드 안 분류 제목 (P210) — 굵은 15px, 위 여백으로 묶음을 가른다. 아래 줄의 구분선이 제목 밑줄 역할."""
+    return (f'<span data-group="1" style="display:block;padding:{4 if first else 18}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{_esc(text)}</span>')
+
+
+def hot_rows(news):
+    """호재 · 리스크 구획 (2026-11-01 사용자 P218: "어떤 리스크 · 어떤 호재가 있는지") — news = 최근 7일 이 종목 기사 · 방송 [{issue, direction, title, url, published_at}].
+    이슈 코드(키워드)별로 묶어 라벨: 긍정만 = 호재 · 부정만 = 리스크 · 둘 다 = 엇갈림 · 그 밖(중립 · 불확실) = 불확실. 건수 많은 순 5개, 줄 = 키워드 (n건) / 가장 최근 제목. 답 개수에는 넣지 않는다."""
+    import issue_codes
+    by = {}
+    for r in news:
+        code = r.get("issue")
+        if code in issue_codes.ISSUE_KO and code != "OTHER":   # 이름 없는 코드는 영어가 그대로 보여 뺀다
+            by.setdefault(code, []).append(r)
+    out = []
+    recent = sorted(by.items(), key=lambda kv: max(str(r.get("published_at")) for r in kv[1]), reverse=True)
+    for code, rs in sorted(recent, key=lambda kv: -len(kv[1]))[:5]:   # 건수 많은 순, 같으면 최근 순
+        dirs = {r.get("direction") for r in rs}
+        label = ("엇갈림" if {"positive", "negative"} <= dirs else "호재" if "positive" in dirs else "리스크" if "negative" in dirs else "불확실")
+        last = max(rs, key=lambda r: str(r.get("published_at")))
+        out.append((label, issue_codes.ISSUE_KO.get(code, code), len(rs), last.get("title") or "", last.get("url") or ""))
+    return out
+
+
+def outlook_extra_html(hot, sched):
+    """전망 카드 아래 두 구획 — 호재 · 리스크(키워드 줄, 누르면 오늘 탭 뉴스) · 앞둔 일정(누르면 실적 탭 그 카드). 둘 다 답 개수에 넣지 않는다 (P218)."""
+    import tech_signals as TS
+    out = ""
+    if hot:
+        out += group_head("호재 · 리스크")
+        for label, kw, n, head, url in hot:   # 기사 링크로 두면 테마가 `번역 방법` · 바깥 링크 아이콘을 붙인다 → 오늘 탭 뉴스로 이동 (P204 이동 아이콘 없음)
+            out += (f'<span role="link" tabindex="0" data-goto-tab="오늘" data-goto-card="뉴스" style="display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:{TOGETHER_ROW_H}px;padding:6px 0;box-sizing:border-box;'
+                    f'cursor:pointer;border-top:1px solid {TOGETHER_LINE};font-size:{_dk.NAME};line-height:{LH_CARD};color:#111;">'
+                    f'<span style="min-width:0;flex:1 1 auto;">{_esc(kw)}<span style="font-size:{MICRO};color:{NOTE};margin-left:4px;">({n}건)</span>'
+                    + (f'<span style="display:block;font-size:{MICRO};line-height:20px;color:{NOTE};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{_esc(head)}</span>' if head else "")
+                    + f'</span>{TS.box(HOT_KIND.get(label, "flat"), label, _esc, sym=False)}</span>')
+    if sched:
+        out += group_head("앞둔 일정", not hot)
+        for text, when, tab, card in sched:
+            out += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;'
+                    f'min-height:{TOGETHER_ROW_H}px;padding:6px 0;box-sizing:border-box;cursor:pointer;border-top:1px solid {TOGETHER_LINE};font-size:{_dk.NAME};line-height:{LH_CARD};">'
+                    f'<span style="min-width:0;color:#111;">{_esc(text)}</span>'
+                    f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;color:{TOGETHER_FLAT};">{_esc(when)}{TS.box("flat", "불확실", _esc, sym=False)}</span></span>')
+    return f'<span style="display:block;margin:{_dk.CHART_STACK_GAP}px 0 0;">{out}</span>' if out else ""
+
+
+def together_card(t):
+    """`Alpha Scope 전망은?`(로고 + 글자, P208) 강조 카드 — 매수의견 탭 셋째, 접기 버튼 · 펼침은 다른 강조 카드와 같다 (2026-11-01 사용자 P206 · P207).
+    t = 함께 보기 줄 목록, 또는 {"items": 줄, "news": 최근 7일 기사 · 방송, "sched": 앞둔 일정 [(글, 언제, 탭, 카드)]} (P218).
+    답 = 가장 많은 방향 하나(상승 · 하락 · 중립, 같으면 엇갈림), 카드 색 = 그 방향. 펼치면 분포 문장 → 분류별 줄(P210) → 호재 · 리스크 → 앞둔 일정.
     Claude 는 개수 다수결 한 단어가 검증 전 지표를 합친 결론 · 블로그 의견으로 읽힌다고 반대했으나 사용자 결정(P207). 툴팁에 `추천이 아니다`."""
-    items = [x for x in items if x and x[1]]
+    t = t if isinstance(t, dict) else {"items": t}
+    items = [x for x in t.get("items") or [] if x and x[1]]
     if not items:
         return ""
     cnt = [(d, w, c, sum(1 for x in items if x[2] == d)) for d, w, c in TOGETHER_WORDS]
@@ -844,12 +894,23 @@ def together_card(items):
     d, word = (lead[0][0], lead[0][1]) if len(lead) == 1 else (None, "엇갈림")
     theme, col = {1: ("positive", UP), -1: ("negative", DOWN)}.get(d, ("neutral", "#111"))
     dist = " · ".join(f'<b style="font-weight:700;color:{c};">{w} {n}개</b>' for _, w, c, n in cnt if n)
-    lines = [(f"이 페이지 카드 {len(items)}개의 판정이 {dist}로 나뉜다.", "rich"),
-             (together_block(items, theme, title=False), "html")]
-    tip = ("이 페이지 여러 카드의 판정을 상승 · 하락 · 중립으로 다시 놓은 것. 줄마다 판정이 통하는 기간을 적었다\n"
+    lines = [(f"{dist}로 나뉜다.", "rich"),   # 옛 `이 페이지 카드 n개의 판정이` (P209)
+             (together_block(items, theme, title=False) + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or []), "html")]
+    tip = ("이 페이지 여러 카드의 판정을 분류별로 상승 · 하락 · 중립으로 다시 놓은 것. 줄마다 판정이 통하는 기간을 괄호에 적었다\n"
            f"· 지금 : {word} (" + " · ".join(f"{w} {n}" for _, w, _c, n in cnt if n) + ")\n"
-           "· 나누는 법 : 가장 많은 쪽, 같으면 엇갈림. 대부분 검증 전 지표다\n· 이 블로그의 추천이 아니다")
-    return _state_card(TOGETHER_Q, word, theme, col, lines, "", tip=tip, fold=True)
+           "· 나누는 법 : 가장 많은 쪽, 같으면 엇갈림. 호재 · 리스크와 일정은 세지 않는다. 대부분 검증 전 지표다\n· 이 블로그의 추천이 아니다")
+    card = _state_card(TOGETHER_Q, word, theme, col, lines, "", tip=tip, fold=True)
+    logo = BLOG_LOGO.replace("display:block;", "display:inline-block;vertical-align:-2px;margin-right:6px;", 1)
+    return card.replace(_esc(TOGETHER_Q.rsplit(" ", 1)[0]), logo + _esc(TOGETHER_Q.rsplit(" ", 1)[0]), 1)   # 제목 앞 블로그 로고 (P208)
+
+
+def index_chart_line(url, local, name):
+    """증시 분위기 카드 펼침 안 지수 그래프 (2026-11-01 사용자 P215: 리포트의 지수 봉차트를 고점 대비 줄 위에, 그래프 흰 카드로).
+    url = CDN 주소, local = 목업에서 CDN 에 아직 없을 때 볼 상대 경로(output/images/…) — 블로그에선 CDN 이 먼저라 쓰이지 않는다."""
+    img = (f'<img src="{_esc(url)}" onerror="this.onerror=null;this.src=\'{_esc(local)}\'" alt="{_esc(name)} 최근 30거래일 봉차트" '
+           f'style="width:100%;display:block;border-radius:6px;"/>')
+    return (f'{_dk.CHART_TITLE_M}{_esc(name)} 최근 30거래일</span>'
+            f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 8px 8px;">{img}</span></span>', "html")
 
 
 def group_title(text):
@@ -1010,14 +1071,23 @@ def together_block(items, outer=None, title=True):
     items = [x for x in items if x and x[1]]
     if not items:
         return ""
-    # 묶음 카드 · 묶음 제목은 없앴다 — 한 흰 카드 안에 상승 → 하락 → 중립 순서로 줄만 놓고, 방향은 줄 끝 라벨로 (2026-10-31 사용자 P173, 옛 P168 방향별 색 카드)
+    # 강조 카드 안(title=False)은 분류 제목(P210)으로 묶고 안에서 상승 → 하락 → 중립, 흰 카드(title=True)는 옛 순서 (P173)
+    order = {1: 0, -1: 1, 0: 2}
+    if title:
+        groups = [("", sorted(items, key=lambda x: order[x[2]]))]
+    else:
+        names = list(dict.fromkeys(x[6] if len(x) > 6 else "" for x in items))
+        groups = [(g, sorted((x for x in items if (x[6] if len(x) > 6 else "") == g), key=lambda x: order[x[2]])) for g in names]
     out = ""
-    for d, kind, word, col in ((1, "up", "상승", UP), (-1, "down", "하락", DOWN), (0, "flat", "중립", TOGETHER_FLAT)):
-        for it in (x for x in items if x[2] == d):
-            nm, st, _, tab, card = it[:5]
-            hz = f'<span style="display:block;font-size:{MICRO};line-height:20px;font-weight:400;color:{NOTE};">{_esc(it[5])}</span>' if len(it) > 5 and it[5] else ""   # 기간 꼬리표 (A5-2)
+    for gi, (g, rows) in enumerate(groups):
+        if g:
+            out += group_head(g, gi == 0)
+        for it in rows:
+            nm, st, d, tab, card = it[:5]
+            kind, word, col = {1: ("up", "상승", UP), -1: ("down", "하락", DOWN)}.get(d, ("flat", "중립", TOGETHER_FLAT))
+            hz = f'<span style="font-size:{MICRO};font-weight:400;color:{NOTE};margin-left:4px;white-space:nowrap;">({_esc(it[5])})</span>' if len(it) > 5 and it[5] else ""   # 기간 = 이름 뒤 괄호 한 줄 (2026-11-01 사용자 P211, 옛 이름 아래 줄)
             out += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;'
-                    f'min-height:{TOGETHER_ROW_H}px;padding:6px 0;box-sizing:border-box;cursor:pointer;border-top:1px solid #EEF0F3;font-size:{_dk.NAME};line-height:{LH_CARD};">'   # 18 → 16 — 대답 · 라벨 · 아이콘이 한 줄에 들어가게 (360px 줄 폭 286, P173)
+                    f'min-height:{TOGETHER_ROW_H}px;padding:6px 0;box-sizing:border-box;cursor:pointer;border-top:1px solid {TOGETHER_LINE};font-size:{_dk.NAME};line-height:{LH_CARD};">'   # 18 → 16 — 대답 · 라벨이 한 줄에 들어가게 (360px 줄 폭 286, P173)
                     f'<span style="min-width:0;color:#111;">{_esc(nm)}{hz}</span>'
                     f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;font-weight:{400 if d == 0 else 700};color:{col};">{_esc(st.lstrip("▲▼ "))}'
                     f'{TS.box(kind, word, _esc)}</span></span>')   # 대답 → 라벨. 나가는 아이콘은 뺐다 (2026-11-01 사용자 P204). 중립 대답은 보통 굵기 · 조금 빠진 검정 (P173)

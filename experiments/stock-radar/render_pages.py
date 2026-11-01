@@ -163,6 +163,12 @@ def draw_charts(snap, stocks, out_dir):
             continue
         CP.draw(bars, os.path.join(out_dir, "images", chart_ref(s["sym"])), s["sym"])
         s["chart"] = True
+    sb = [dict(b, open=b["open"] if b.get("open") else b["close"]) for b in (snap["bars"].get(U.BENCH) or [])][-(CP.WINDOW + CP.LOOKBACK):]
+    if len(sb) >= 2:   # 미국 증시 분위기 카드 펼침의 S&P 500 그래프 (P215) — S&P 500 ETF(SPY) 일봉, 종목 그래프와 같은 그림 · 고정 이름(radar-*.png 라 배포 · 캐시 비우기에 함께)
+        CP.draw(sb, os.path.join(out_dir, "images", SPX_REF), "S&P 500")
+
+
+SPX_REF = "radar-sp500-price.png"
 
 
 def periods_tip(s, ps):
@@ -273,16 +279,26 @@ def sec_tech(s):
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
+def sec_regime(s):
+    """`미국 증시 분위기는?` (2026-11-01 사용자 P214: 옛 `시장 분위기는?` · 기술지표 카드 위로). 펼치면 첫 문장 아래 S&P 500 봉차트(P215) → 고점 대비 줄."""
+    mr = s.get("market_regime")
+    if not mr:
+        return ""
+    th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
+    lines = R.regime_lines(mr)
+    if s.get("chart"):
+        lines.insert(1, R.index_chart_line(f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{SPX_REF}", f"images/{SPX_REF}", "S&P 500"))
+    card = R._state_card("미국 증시 분위기는?", mr["regime"], th, col, lines, "", tip=_dk.with_src(R.regime_rule(mr), "Yahoo Finance · CNN"), fold=True)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
+
+
 def sec_states(s):
     """상태 카드 — NVDA 리포트와 같은 카드 · 규칙. 업종 카드만 종목의 업종 ETF 로. 시장 충격 · 한 달 범위 · 과열은 해당하는 날만."""
     out = ""
     ms = s.get("market_shock") or {}
     if ms.get("active"):
         out += R._state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", R.SOON, R.shock_lines(ms), "", tip=_no_record(R.shock_tip(ms)), fold=True)
-    mr = s.get("market_regime")
-    if mr:
-        th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
-        out += R._state_card("시장 분위기는?", mr["regime"], th, col, R.regime_lines(mr), "", tip=_dk.with_src(R.regime_rule(mr), "Yahoo Finance · CNN"), fold=True)
+    # `미국 증시 분위기는?` 은 기술지표 카드 위로 옮겼다 (sec_regime, 2026-11-01 사용자 P214)
     # 업종 자금 카드는 `업계상황` 탭으로 옮겼다 (2026-10-31 사용자: 업종 전체 이야기 — 한국처럼 다른 탭)
     # `한 달간 변화 범위는?` 상태 카드는 가격 카드 펼침(가격 범위 (1년) 아래)으로 옮겼다 (2026-10-31 사용자 P150)
     # `애널리스트 · 방송 의견은?` 은 `의견` 탭으로 옮겼다 (2026-11-01 사용자 P196: 오늘 탭이 너무 길다)
@@ -311,7 +327,7 @@ def sec_industry_tab(s):
         return _dk.muted("이 종목은 업계 자료를 아직 연결하지 않았습니다.")
     th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
     title = f"{sf['name']} 업계 자금 흐름은?"   # 옛 `○○ 업계 자금 흐름은?` — 앞날이 아니라 지난 20거래일, 회사 매출이 아니라 주식 쪽 돈 (2026-11-01 사용자 P198)
-    card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True)
+    card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True, opened=True)   # 탭 첫 강조 카드는 펼침 (P216)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
@@ -400,6 +416,7 @@ PEER_LABEL = "시총 상위 20개"
 MAX_EVENTS = 8      # 뉴스 목록에 펼쳐 두는 수, 나머지는 `그 외 n건`
 MAX_ISSUES = 5      # 중요 이슈 줄 수 (10-3 : 7일, 관련도 높은 순 최대 5줄)
 MAX_MEDIA = 5       # 방송 줄 최대 수 — 실적 주간엔 한 종목에 하루 십여 줄이라 최근 것만 (2026-10-25)
+NEWS = {}           # 이 실행의 분류된 기사 (write_all 이 채운다)
 PICKS = []          # 방송에서 나온 종목 의견 (media_feed.picks, 최근 R.PICK_DAYS 일) — `방송에서 나온 의견은?` 카드 (2026-10-29 P89)
 MEDIA = []          # 방송 이슈 (media_feed.issues — 같은 이슈는 이미 한 줄로, 최근 24시간) — write_all 이 한 번 읽는다
 TODAY_HOURS = 24    # 뉴스 목록 = 오늘자만 (2026-10-25 사용자). 아침 실행이라 KST 날짜로 자르면 미국 밤사이 뉴스가 빠진다 → 최근 24시간
@@ -429,6 +446,10 @@ def _sub_head(t):
     return f'<span style="display:block;margin:10px 0 6px;font-weight:700;color:#111;font-size:{_dk.NAME};">{R._esc(t)}</span>'
 
 
+def _picks(s):
+    return [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
+
+
 def card_opinions(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 공용 R.opinions_cards (한국 · 미국 같은 카드, 2026-11-01 사용자 P197)."""
     ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
@@ -453,7 +474,36 @@ EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
 def together_items(s):
     """`Alpha Scope 데이터로 함께 보기` 줄 — verdict_items 를 SG.ORDER(주가에 가까운 것부터) 순서로."""
     got = verdict_items(s)
-    return [got[k] for k in SG.ORDER if got.get(k)]
+    return {"items": [got[k] for k in SG.ORDER if got.get(k)], "news": _week_news(s), "sched": _sched(s)}   # 호재 · 리스크 · 앞둔 일정 (P218)
+
+
+def _week_news(s):
+    """최근 7일 이 종목 기사(관련도 1 이상) → 전망 카드 재료 (뉴스 · 방송 분위기 줄 · 호재 · 리스크). 오늘 탭 뉴스 방향 막대와 같은 기사."""
+    if not NEWS:
+        return []
+    return [{"issue": x.get("issue"), "direction": sc["direction"], "title": news_store.headline(x) or x.get("fact") or x.get("title"), "url": x.get("url"),
+             "published_at": x.get("published_at")} for x, sc in _news_for(s, NEWS)[1] if sc["relevance"] >= 1]
+
+
+SCHED_DAYS = 30   # 앞둔 일정 = 30일 안 (P218)
+
+
+def _sched(s):
+    """앞둔 일정 — 이 종목 실적 · 가장 가까운 함께 보는 회사 실적 · 가장 가까운 시장 일정, 30일 안만. 줄 = (글, `n일 뒤`, 탭, 카드)."""
+    cc, d0 = s.get("calendar_cards") or {}, datetime.date.fromisoformat(s["day"])
+    left = lambda d: (datetime.date.fromisoformat(d) - d0).days   # noqa: E731
+    out = []
+    e = cc.get("earnings")
+    if e and 0 <= e["left"] <= SCHED_DAYS:
+        out.append((f"실적 발표 ({R._md_short(e['day'])})", f"{e['left']}일 뒤", "실적", "다음 실적 발표는?"))
+    up = [u for u in (cc.get("peers") or {}).get("upcoming_all") or (cc.get("peers") or {}).get("upcoming") or [] if left(u["day"]) <= SCHED_DAYS]
+    if up:
+        out.append((f"{U.peer_name(up[0]['symbol'])} 실적 발표 ({R._md_short(up[0]['day'])})", f"{left(up[0]['day'])}일 뒤", "실적", "함께 보는 회사 일정은?"))
+    mu = (cc.get("macro") or {}).get("upcoming") or []
+    if mu:
+        nm = R.cal_cards.MACRO_KO.get(mu[0]["kind"], mu[0].get("label", ""))
+        out.append((f"{nm} ({R._md_short(mu[0]['day'])})", f"{left(mu[0]['day'])}일 뒤", "실적", "시장 전체를 흔들 일정은?"))
+    return out
 
 
 def verdict_items(s):
@@ -468,8 +518,11 @@ def verdict_items(s):
         "eps": SG.item("eps", (ex.get("eps") or {}).get("state")),
         "short": SG.item("short", (ex.get("short") or {}).get("state")),
         "sector_flow": SG.item("sector_flow", sf["state"], sector=sf["name"]) if sf else None,
-        "regime": SG.item("regime", mr["regime"]) if mr else None,
+        "regime": SG.item("regime", mr["regime"], mkt="미국") if mr else None,
         "shock": SG.item("shock", "충격 국면 중") if ms.get("active") else None,
+        "news": SG.news_item(_week_news(s)),   # 뉴스 · 방송 분위기 (P218)
+        "analysts": SG.item("analysts", (R.analysts_verdict({"status": {"analysts": s.get("analysts") or []}, "headline": {"close": s.get("close")}}) or (None,))[0]),
+        "picks": SG.item("picks", R.picks_word(_picks(s))) if _picks(s) else None,
     }
     return got
 
@@ -717,7 +770,7 @@ def _josa(t):
 
 def detail_body(s, today, news=None):
     """NVDA 리포트 순서 : 맨 위 요약 → 그래프 → 가격 카드(펼치면 1층 · 2층) → 상태 카드. 갱신 날짜 줄은 뺐다 — 요약 첫 마디에 날짜가 있다 (2026-10-18 사용자)."""
-    return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_tech(s) + sec_states(s) + sec_targets(s)
+    return wrap(lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_regime(s) + sec_tech(s) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
                 + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
                 + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
@@ -767,7 +820,8 @@ def list_body(a):
 
 def write_all(a, out_dir, snap=None, news=None, media=None):
     os.makedirs(out_dir, exist_ok=True)
-    global MEDIA, NOW
+    global MEDIA, NOW, NEWS
+    NEWS = news or {}   # 전망 카드 뉴스 · 방송 분위기 · 호재 · 리스크 (P218)
     NOW = (datetime.datetime.fromisoformat(os.environ["RADAR_NOW"].replace("Z", "+00:00")) if os.environ.get("RADAR_NOW")
            else datetime.datetime.now(datetime.timezone.utc))
     global PICKS

@@ -126,6 +126,12 @@ def draw_charts(snap, stocks, out_dir):
             continue
         CP.draw(bars, os.path.join(out_dir, "images", chart_ref(s["sym"])), s["code"])
         s["chart"] = True
+    kb = [dict(b, open=b["open"] if b.get("open") else b["close"]) for b in (snap["bars"].get(U.BENCH) or [])][-(CP.WINDOW + CP.LOOKBACK):]
+    if len(kb) >= 2:   # 한국 증시 분위기 카드 펼침의 KOSPI 그래프 (P215) — 종목 그래프와 같은 그림 · 고정 이름(radar-*.png 라 kr-images 배포 · 캐시 비우기에 함께 들어간다)
+        CP.draw(kb, os.path.join(out_dir, "images", KOSPI_REF), "KOSPI")
+
+
+KOSPI_REF = "radar-kospi-price.png"
 
 
 # ---------------------------------------------------------------- 상세
@@ -595,7 +601,7 @@ def card_sector_flow(s):
     if not sf:
         return ""
     th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
-    return R._state_card(f"{sf['name']} 업계 자금 흐름은?", sf["state"], th, col, _kospi(R.sector_lines(sf, "KOSPI")), "", tip=_kospi(R.sector_rule(sf)), fold=True)
+    return R._state_card(f"{sf['name']} 업계 자금 흐름은?", sf["state"], th, col, _kospi(R.sector_lines(sf, "KOSPI")), "", tip=_kospi(R.sector_rule(sf)), fold=True, opened=True)   # 탭 첫 강조 카드는 펼침 (P216)
 
 
 def sec_industry_tab(s):
@@ -819,13 +825,23 @@ def _kospi(x):
     return x
 
 
+def sec_regime(s):
+    """`한국 증시 분위기는?` (2026-11-01 사용자 P214: 옛 `시장 분위기는?` 은 무슨 시장인지 헷갈린다 · 기술지표 카드 위로) — 미국과 같은 규칙 · KOSPI.
+    펼치면 첫 문장 아래 KOSPI 봉차트(P215) → 고점 대비 · 200일 평균선 줄."""
+    mr = s.get("market_regime")
+    if not mr:
+        return ""
+    th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
+    lines = _kospi(R.regime_lines(mr))
+    if s.get("chart"):
+        lines.insert(1, R.index_chart_line(f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{KOSPI_REF}", f"images/{KOSPI_REF}", "KOSPI"))
+    card = R._state_card("한국 증시 분위기는?", mr["regime"], th, col, lines, "", tip=_dk.with_src(_kospi(R.regime_rule(mr)), "Yahoo Finance"), fold=True)
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
+
+
 def sec_states(s):
     """상태 카드 — 시장 분위기(KOSPI) · 업종 자금(한국 업종 ETF) · 애널리스트 · 방송 의견 · 과열(해당하는 날만). 시장 충격은 VIX 기준이라 두지 않는다."""
-    out = ""
-    mr = s.get("market_regime")
-    if mr:   # 시장 분위기 — 미국과 같은 규칙 · KOSPI (2026-10-31 사용자)
-        th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
-        out += R._state_card("시장 분위기는?", mr["regime"], th, col, _kospi(R.regime_lines(mr)), "", tip=_dk.with_src(_kospi(R.regime_rule(mr)), "Yahoo Finance"), fold=True)
+    out = ""   # `한국 증시 분위기는?` 은 기술지표 카드 위로 옮겼다 (sec_regime, 2026-11-01 사용자 P214)
     # `한 달간 변화 범위는?` 상태 카드는 가격 카드 펼침(가격 범위 (1년) 아래)으로 옮겼다 (2026-10-31 사용자 P150)
     # `애널리스트 · 방송 의견은?` 은 `의견` 탭으로 옮겼다 (2026-11-01 사용자 P196: 오늘 탭이 너무 길다)
     oh = s.get("overheat")
@@ -954,6 +970,10 @@ def man_won(v):
     return f"{v / 1e4:,.0f}만 원"
 
 
+def _picks(s):
+    return [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
+
+
 def card_picks(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 미국과 같은 공용 R.opinions_cards (2026-11-01 사용자 P197, 옛 한 장 `애널리스트 · 방송 의견은?`). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
@@ -978,7 +998,35 @@ EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}
 def together_items(s):
     """`Alpha Scope 데이터로 함께 보기` 줄 — verdict_items 를 SG.ORDER(주가에 가까운 것부터) 순서로."""
     got = verdict_items(s)
-    return [got[k] for k in SG.ORDER if got.get(k)]
+    return {"items": [got[k] for k in SG.ORDER if got.get(k)], "news": _week_news(s), "sched": _sched(s)}   # 호재 · 리스크 · 앞둔 일정 (P218)
+
+
+def _week_news(s):
+    """최근 7일 이 종목 방송 이슈 → 전망 카드 재료 (뉴스 · 방송 분위기 줄 · 호재 · 리스크). 한국 종목 뉴스는 방송뿐."""
+    import issue_codes   # 방송 분류(RATES_CB · ENERGY_COMMODITY …) → 공용 이슈 코드 (기사와 같은 키워드 이름)
+    return [{"issue": issue_codes.FROM_YTB_CATEGORY.get(r.get("category"), r.get("category")), "direction": "uncertain" if r.get("split") else r.get("direction"), "title": r.get("topic"), "url": r.get("url"),
+             "published_at": r.get("published_at")} for r in media_feed.for_kr_page(MEDIA_WEEK, s["code"])]
+
+
+SCHED_DAYS = 30   # 앞둔 일정 = 30일 안 (P218)
+
+
+def _sched(s):
+    """앞둔 일정 — 이 종목 실적 · 가장 가까운 미국 연결 종목 실적 · 가장 가까운 시장 일정, 30일 안만. 줄 = (글, `n일 뒤`, 탭, 카드)."""
+    cc, d0 = s.get("calendar_cards") or {}, datetime.date.fromisoformat(s["day"])
+    left = lambda d: (datetime.date.fromisoformat(d) - d0).days   # noqa: E731
+    out = []
+    e = cc.get("earnings")
+    if e and 0 <= e["left"] <= SCHED_DAYS:
+        out.append((f"실적 발표 ({R._md_short(e['day'])}{' 무렵' if e.get('est') else ''})", f"{e['left']}일 뒤", "실적", "다음 실적 발표는?"))
+    usn = lambda x: USU.name(x) if x in USU.BY_SYM else x   # noqa: E731
+    up = [u for u in (cc.get("peers") or {}).get("upcoming_all") or [] if left(u["day"]) <= SCHED_DAYS]
+    if up:
+        out.append((f"{usn(up[0]['symbol'])} 실적 발표 ({R._md_short(up[0]['day'])})", f"{left(up[0]['day'])}일 뒤", "실적", "미국 연결 종목 일정은?"))
+    mu = (cc.get("macro") or {}).get("upcoming") or []
+    if mu:
+        out.append((f"{_macro_name(mu[0]['kind'], mu[0].get('label', ''))} ({R._md_short(mu[0]['day'])})", f"{left(mu[0]['day'])}일 뒤", "실적", "시장 전체를 흔들 일정은?"))
+    return out
 
 
 def verdict_items(s):
@@ -1000,7 +1048,10 @@ def verdict_items(s):
         "biz_work": SG.item("biz_work", work, biz=bn, q=q[:-2]) if work and q else None,   # `메모리 값은?` → 이름 `반도체 업계 메모리 값` · 카드 `반도체 업계 메모리 값은?`
         "biz_money": SG.item("biz_money", biz_money_state(s), biz=bn),
         "sector_flow": SG.item("sector_flow", s["sector_flow"]["state"], sector=s["sector_flow"]["name"]) if s.get("sector_flow") else None,   # 2026-10-31
-        "regime": SG.item("regime", s["market_regime"]["regime"]) if s.get("market_regime") else None,
+        "regime": SG.item("regime", s["market_regime"]["regime"], mkt="한국") if s.get("market_regime") else None,
+        "news": SG.news_item(_week_news(s)),   # 뉴스 · 방송 분위기 (P218)
+        "analysts": SG.item("analysts", (R.analysts_verdict({"status": {"analysts": s.get("analysts") or []}, "headline": {"close": s.get("close")}}) or (None,))[0]),
+        "picks": SG.item("picks", R.picks_word(_picks(s))) if _picks(s) else None,
     }
     return got
 
@@ -1237,7 +1288,7 @@ def detail_body(s, a):
     `업종` 탭 = 업종 재료 · 체감 경기 · 경영 분석
     (2026-10-25 사용자: 미국 종목 페이지처럼 탭 — 실적과 기대 · 캘린더는 다음 단계)."""
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
-            + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
+            + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
             + _dk.keep_tone(R._section("뉴스", sec_today(s), tab="오늘"))   # 뉴스는 헤드라인체 그대로
             + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
             + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)

@@ -366,11 +366,11 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 42px;   /* 가로 30% 넓게 — 하단 버튼 공통 (2026-10-13 사용자) */
+  padding: 9px 42px;   /* 가로 30% 넓게 — 하단 버튼 공통 (2026-10-13 사용자) · 높이 −6(위아래 3씩, 홀수면 글자가 반 px 치우침) (2026-11-01 사용자 P213) */
   background: #111;
   border: 1px solid #111;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 14px;   /* 16 → 14 한 단계 작게 (P213) */
   font-weight: 700;
   color: #fff;
 }

@@ -35,7 +35,7 @@ def verdict_rows(date, source, s, got, picks=(), name=None):
     sym, nm = s["sym"], name or s.get("name")
     base = {"date": date, "as_of": s.get("day") or date, "source": source, "target": sym, "sym": sym, "name": nm}
     rows = [dict(base, id=f"{sym}/{k}", card=it[4], label=it[0], state=it[1], direction=it[2], **SG.tags(k))
-            for k, it in got.items() if it]
+            for k, it in got.items() if it and k not in ("analysts", "picks")]   # 애널리스트 · 방송 의견은 아래에서 더 자세히 (P218 에서 전망 줄로도 들어옴)
     cells = {c.get("key"): c.get("value") for c in s.get("analysts") or [] if c.get("key")}
     if cells:
         rows.append(dict(base, id=f"{sym}/analysts", card="애널리스트 의견은?", family=SG.OUTSIDE, scheme=SG.SCHEME, close=s.get("close"), value=cells))

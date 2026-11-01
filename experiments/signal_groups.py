@@ -13,12 +13,12 @@
 함께 보기 줄 = (이름, 판정 말, 방향 +1 · −1 · 0, 탭, 카드 제목 앞부분, 기간) — render_html.together_block 이 읽는다.
 """
 
-SCHEME = "2026-10-31a"   # 분류표 버전 — 방향 해석을 바꾸면 올린다
+SCHEME = "2026-11-01a"   # 11-01: 증시 분위기 이름 · 뉴스 · 의견 분류 · 모멘텀 / 평균선 말 (방향 해석은 그대로)   # 분류표 버전 — 방향 해석을 바꾸면 올린다
 
 # 기간 꼬리표 (A5-2) — 기간이 다른 신호를 한 표로 세면 뜻이 없다. 함께 보기 줄마다 작은 글씨로 보인다
 OPEN, DAYS, MONTH, QUARTER = "다음 날 시가", "며칠", "한 달", "분기"
 # 계열 꼬리표 (A5-2)
-PRICE, EARN, INDUSTRY, FLOW, MARKET, OUTSIDE = "가격", "실적과 예상", "업종과 경기", "수급", "시장", "바깥 의견"
+PRICE, EARN, INDUSTRY, FLOW, MARKET, OUTSIDE, NEWS = "가격", "실적과 예상", "업종과 경기", "수급", "시장", "바깥 의견", "뉴스와 방송"
 
 UP, DOWN, FLAT = 1, -1, 0
 
@@ -49,20 +49,37 @@ TABLE = {
                       direction={"나아짐": UP, "나빠짐": DOWN}),
     "sector_flow": dict(name="{sector} 업계 자금", tab="업계상황", card="{sector} 업계 자금 흐름은?", horizon=DAYS, family=FLOW,   # 옛 `○○ 업종으로 돈이 올까?` (2026-11-01 사용자 P198) — 한국은 `반도체 업계 경기는?` 도 `반도체` 로 시작해 제목 전체로 찾는다
                         direction={"모이는 중": UP, "빠져나가는 중": DOWN}),
-    "regime":    dict(name="시장 분위기", tab="오늘", card="시장 분위기는?", horizon=DAYS, family=MARKET,   # 종목이 아닌 시장
+    "regime":    dict(name="{mkt} 증시 분위기", tab="오늘", card="{mkt} 증시 분위기는?", horizon=DAYS, family=MARKET,   # 종목이 아닌 시장 — 옛 `시장 분위기는?` (2026-11-01 사용자 P214: 한국 · 미국)
                       direction={"상승 추세": UP, "조정장": DOWN}),
     "shock":     dict(name="시장 충격 국면", tab="오늘", card="시장 충격 국면은?", horizon=DAYS, family=MARKET,
                       direction={"충격 국면 중": DOWN}),
+    # 전망 카드에 더한 분류 (2026-11-01 사용자 P218) — 뉴스 · 방송 = 최근 7일 이 종목 기사 · 방송의 긍정 / 부정 건수, 의견 = 바깥 의견 그대로
+    "news":      dict(name="뉴스 · 방송 분위기", tab="오늘", card="뉴스", horizon=DAYS, family=NEWS,
+                      direction={"긍정 많음": UP, "부정 많음": DOWN}),
+    "analysts":  dict(name="애널리스트 의견", tab="매수의견", card="애널리스트 의견은?", horizon=MONTH, family=OUTSIDE,
+                      direction={"매수": UP, "매도": DOWN}),
+    "picks":     dict(name="방송 의견", tab="매수의견", card="방송 의견은?", horizon=DAYS, family=OUTSIDE,
+                      direction={"매수": UP, "매도": DOWN}),
 }
 
+# 전망 카드 분류 제목 — 줄을 이 묶음으로 나눠 놓는다 (2026-11-01 사용자 P210 · P218: "알파스코프가 체계적으로 보이게"). 이름 · 순서는 Claude
+GROUPS = [("주가 흐름", ("momentum", "ma", "tech", "overheat")),
+          ("실적 전망", ("revenue", "eps")),
+          ("업계 현황", ("bsi", "biz_work", "biz_money")),
+          ("자금 흐름", ("sector_flow", "short")),
+          ("증시", ("regime", "shock", "pairs")),
+          ("뉴스 · 방송", ("news",)),
+          ("의견", ("analysts", "picks"))]
+GROUP_OF = {k: g for g, ks in GROUPS for k in ks}
+
 # 함께 보기에 놓는 순서 — 주가에 가까운 것부터 (P142): 가격 → 실적과 예상 → 수급 → 업종과 경기 → 시장
-ORDER = ["momentum", "ma", "tech", "overheat", "pairs", "revenue", "eps", "short", "sector_flow", "bsi", "biz_work", "biz_money", "regime", "shock"]
+ORDER = [k for _, ks in GROUPS for k in ks]   # 분류 순서 그대로 (P210, 옛 주가에 가까운 것부터)
 
 
 def _row(key, state, direction, **names):
     t = TABLE[key]
     fill = lambda x: x.format(**names) if names else x   # noqa: E731
-    return (fill(t["name"]), state, direction, t["tab"], fill(t["card"]), t["horizon"])
+    return (fill(t["name"]), state, direction, t["tab"], fill(t["card"]), t["horizon"], GROUP_OF.get(key, ""))   # 마지막 = 분류 제목 (P210)
 
 
 def item(key, state, **names):
@@ -78,8 +95,8 @@ def momentum_item(rank, total, name):
     if not rank or not total:
         return None
     d = UP if rank <= total / 4 else DOWN if rank > total * 3 / 4 else FLAT
-    nm, _, _, tab, _, hz = _row("momentum", "", d)
-    return (nm, f"{total}종목 중 {rank}위", d, tab, name, hz)
+    nm, _, _, tab, _, hz, grp = _row("momentum", "", d)
+    return (nm, {UP: "상위권", DOWN: "하위권"}.get(d, "중간"), d, tab, name, hz, grp)   # 옛 `35종목 중 33위` — 무엇과 견준 순위인지 몰라서 (P212). 순위는 가격 카드에
 
 
 def ma_item(ma_rel, name):
@@ -92,13 +109,13 @@ def ma_item(ma_rel, name):
     above, below = sum(1 for v in vals if v > 0), sum(1 for v in vals if v < 0)
     n = len(vals)
     if above == n:
-        st, d = f"{n}개 평균 모두 위", UP
+        st, d = "평균 위", UP
     elif below == n:
-        st, d = f"{n}개 평균 모두 아래", DOWN
+        st, d = "평균 아래", DOWN
     else:
-        st, d = f"{above}개 위 · {below}개 아래", FLAT
-    nm, _, _, tab, _, hz = _row("ma", "", d)
-    return (nm, st, d, tab, name, hz)
+        st, d = "엇갈림", FLAT   # 옛 `4개 평균 모두 아래` · `1개 위 · 3개 아래` (P212)
+    nm, _, _, tab, _, hz, grp = _row("ma", "", d)
+    return (nm, st, d, tab, name, hz, grp)
 
 
 def overheat_item(oh):
@@ -112,3 +129,12 @@ def tags(key):
     """기록용 꼬리표 (A5-4) — direction 은 state 로 따로, 여기서는 기간 · 계열 · 분류표 버전."""
     t = TABLE[key]
     return {"horizon": t["horizon"], "family": t["family"], "scheme": SCHEME}
+
+
+def news_item(rows):
+    """뉴스 · 방송 분위기 — rows = [{direction: positive · negative · …}] 최근 7일 이 종목 기사 · 방송. 긍정이 많으면 상승 쪽 · 부정이 많으면 하락 쪽 (P218)."""
+    pos = sum(1 for r in rows if r.get("direction") == "positive")
+    neg = sum(1 for r in rows if r.get("direction") == "negative")
+    if not pos and not neg:
+        return None
+    return item("news", "긍정 많음" if pos > neg else "부정 많음" if neg > pos else "엇갈림")
