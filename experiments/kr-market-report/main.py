@@ -5,7 +5,7 @@
 
 새로 모으는 자료 없음 — kr-stocks 수집 · 분석(analyze_kr.run) 결과를 받는다. AI 0회.
 카드는 미국 데일리(질문 카드 · 막대, daily-report/cards.py)와 한국 목록 페이지(외국인 · 거래 · 금리 카드, render_kr)의 것을 그대로 쓴다.
-`기록상` 은 2026-10-25 검증 통과한 것만 (밤사이 미국 → 다음날 시가) — 관계 없던 것은 universe_kr.NO_RECORD 문구 그대로 (기획 3절).
+툴팁은 뜻 · 오늘 두 줄 — 검증 결과(`기록상` 줄 · 관계 없음 안내)는 쓰지 않는다 (2026-11-01 가이드라인 1절 4-2).
 """
 import datetime
 import importlib.util
@@ -51,11 +51,6 @@ def _s(v, d=2, unit="%"):
 def _md(day):
     d = datetime.date.fromisoformat(day)
     return f"{d.month}월 {d.day}일"
-
-
-def _rec(text):
-    """기록상 문구(universe_kr.NO_RECORD, 반말)를 합니다체로 — "없었다 (2004~2026)" 처럼 괄호가 붙으면 design_kit.formal 이 못 바꾼다."""
-    return re.sub(r"([었았])다 \(", r"\1습니다 (", text)
 
 
 def _times(z):
@@ -270,10 +265,8 @@ def open_card(r):
     lines.append((chart, "html"))
     lines.append(("row", "코스피 시가 갭", _s(k["gap"]), _often(k["gap_n"], k["n_past"])))
     lines.append(("row", "코스피 장중", _s(k["intra"]), "시가 → 종가 · " + _often(k["intra_n"], k["n_past"])))
-    recs = " · ".join(f"{U.US_MARKET[t].split(' ')[0]} {_s(U.OVERNIGHT_RECORD[t][0], 2, '')}" for t in ("EWY", "^SOX", "^VIX", "DX-Y.NYB"))
     tip = ("하루 움직임을 시가 갭(전일 종가 → 오늘 시가)과 장중(시가 → 종가)으로 나눈 것. 한국 장이 닫힌 사이 열린 미국 장의 결과는 시가에 먼저 반영됩니다\n"
-           f"· 오늘 : 시가 갭 {_s(k['gap'])} · 장중 {_s(k['intra'])}" + (f" · 밤사이 EWY {_s(ewy['ret'])} · SOX {_s(sox['ret'])}" if ewy and sox else "") + "\n"
-           f"· 기록상 : 밤사이 많이 오른 날(상위 25%)과 많이 내린 날(하위 25%)의 다음날 KOSPI 차이 {recs} %p (2000~2026). 이 차이는 시가에 다 반영됐고 장중엔 더 가지 않았습니다")
+           f"· 오늘 : 시가 갭 {_s(k['gap'])} · 장중 {_s(k['intra'])}" + (f" · 밤사이 EWY {_s(ewy['ret'])} · SOX {_s(sox['ret'])}" if ewy and sox else ""))
     state = f"시가 {_s(k['gap'])}"   # `장중` 답은 뺌 (2026-10-29 사용자 M33)
     return _qc("왜 이렇게 시작했나?", state, "neutral", "#111", lines, tip=_dk.with_src(tip, "Yahoo Finance"), opened=True)
 
@@ -301,8 +294,7 @@ def normal_card(r):
         lines.append(("row", INDEX[k], _s(r["idx"][k]["ret"]), f"평소 ±{n['sigma_pct']:.2f}% · {_times(n['z'])}"))
     k = r["idx"][U.BENCH]
     tip = ("하루 움직임이 그 지수의 평소 크기 안이었는지. 평소 크기는 최근 움직임에 무게를 더 둔 표준편차이고, 2배를 넘으면 평소 밖으로 봅니다\n"
-           f"· 오늘 코스피 {_s(k['ret'])} : 평소의 {_times(k['normal']['z'])}, 지난 1년 중 이만큼 이상 움직인 날 {k['normal']['n_year']}번\n"
-           "· 기록상 : 한국 지수에서는 평소 밖 움직임 다음 날을 검증하지 않았습니다 — 크기만 봅니다")
+           f"· 오늘 코스피 {_s(k['ret'])} : 평소의 {_times(k['normal']['z'])}, 지난 1년 중 이만큼 이상 움직인 날 {k['normal']['n_year']}번")
     return _qc("움직임은 평소와 달랐나?", state, "neutral", "#111", lines, tip=_dk.with_src(tip, "Yahoo Finance"), opened=True)
 
 
@@ -364,8 +356,7 @@ def top_section(r):
     rows = "".join(_top_row(s, r, i == 0) for i, s in enumerate(outs))
     rest_rows = "".join(_top_row(s, r, i == 0) for i, s in enumerate(rest))
     now = ("· 오늘 평소 밖 : " + " · ".join(f"{s['name']} {_s(s['ret_1d'])}" for s in outs)) if outs else "· 오늘 : 10개 모두 평소 범위 안"
-    tip = ("한국 유가증권시장 시가총액 상위 10개 가운데 오늘 그 종목의 평소 크기 밖으로 움직인 종목. 나머지는 접어 두었고, 종가 · 등락은 홈 시총 TOP 10 에도 있습니다\n" + now + "\n"
-           "· 기록상 : 밤사이 연결 미국 종목이 많이 오른 날과 내린 날의 다음날 차이는 35종목 중 20개에서 확인됐고, 시가에서 끝났습니다 (그 종목만 `밤사이` 를 적습니다)")
+    tip = ("한국 유가증권시장 시가총액 상위 10개 가운데 오늘 그 종목의 평소 크기 밖으로 움직인 종목. 나머지는 접어 두었고, 종가 · 등락은 홈 시총 TOP 10 에도 있습니다\n" + now)
     body = _title_with_sort("시총 상위 10개 중 평소와 다르게 움직인 종목은?", _dk.with_src(tip, "Yahoo Finance"), "kr-top10")
     if outs:
         body += f'<div style="margin:0 0 8px;font-size:{_dk.SMALL};"><span data-sort-list="kr-top10" style="display:block;">{rows}</span></div>'
@@ -396,8 +387,7 @@ def group_section(r):
     lines = [(first, "plain"), (chart, "html")]
     lines += [("row", g["name"], _s(g["avg"]), f"코스피 대비 {_s(g['vs'], 2, '%p')} · 가장 크게 {g['best']['name']} {_s(g['best']['ret_1d'], 1)}") for g in gs]
     tip = ("테마(홈 · 목록의 테마 종목 묶음)마다 오늘 등락의 단순 평균을 코스피와 견준 것. 답은 코스피와 차이가 가장 큰 테마\n"
-           "· 오늘 : " + " · ".join(f"{g['short']} {_s(g['avg'], 1)}" for g in gs) + "\n"
-           "· 기록상 : 테마 하루 움직임으로 이후를 말하지 않습니다 — 오늘 어디가 움직였나만 봅니다")
+           "· 오늘 : " + " · ".join(f"{g['short']} {_s(g['avg'], 1)}" for g in gs))
     return _qc("어느 테마가 움직였나?", state, "neutral", "#111", lines, tip=_dk.with_src(tip, "Yahoo Finance"))
 
 
@@ -426,12 +416,6 @@ def _day_groups(ser, scale=1e4):
         seen.add(m)
     a, b = ser[0]["day"], ser[-1]["day"]
     return groups, f"날짜 : {_md(a)} ~ {int(b[8:])}일" if a[:7] == b[:7] else f"날짜 : {_md(a)} ~ {_md(b)}"   # 같은 달이면 `10월 1일 ~ 23일`
-
-
-def _note(text):
-    """`기록상 : …` 안내 줄 — 본문보다 작은 16px 회색(그래프 제목과 같은 단계), 점 2px (2026-10-29 사용자 M39: "너무 작은 거 말고 ※ 최근 15거래일 … 크기")."""
-    return (f'<span style="display:block;margin:4px 0 8px;"><ul style="margin:0;padding:0;list-style:none;">'
-            f'{_dk.dot_li(f"<span style=\"font-size:{_dk.NAME};\">{_dk.esc(text)}</span>", size=2, color=NOTE, lh=24, margin="0")}</ul></span>', "html")
 
 
 def _flow(v, d, unit):
@@ -463,7 +447,6 @@ def foreign_card(m):
     if rk is not None:
         second += f" 과거 모든 20일 구간과 견주면 아래에서 {rk:.0f}% 지점으로, " + ("파는 쪽이 큰 편입니다." if rk <= 25 else "사는 쪽이 큰 편입니다." if rk >= 75 else "보통 범위입니다.")
     lines.append((second, "plain"))
-    lines.append(_note(f"기록상 : {_rec(U.NO_RECORD['foreign'])}. 아래 두 그래프는 같은 날의 방향을 견주는 것이고, 앞으로를 말하지 않습니다."))
     ser = f["series"][-15:]
     groups, when = _day_groups(ser)
     lines.append((_bars(f"최근 {len(ser)}거래일 외국인 순매수 (조 원)", groups, C.sign_fg, C.sign_bg, lambda v: _s(v, 1, ""), when), "html"))
@@ -482,8 +465,7 @@ def foreign_card(m):
     if f.get("kosdaq_today") is not None:
         lines.append(("row", "코스닥 오늘", _flow(f["kosdaq_today"], 0, "억"), ""))
     tip = ("외국인 투자자가 유가증권시장에서 하루에 산 금액에서 판 금액을 뺀 것. 순매수 = 산 금액이 더 큼, 순매도 = 판 금액이 더 큼. 20일 합계 = 날마다의 순매수를 20일 더한 것(평균 아님)\n"
-           f"· 오늘 {_flow(f['today'], 0, '억')} : 20일 합계 {_flow(f['cum20'] / 1e4, 1, '조')}\n"
-           f"· 기록상 : {_rec(U.NO_RECORD['foreign'])}")
+           f"· 오늘 {_flow(f['today'], 0, '억')} : 20일 합계 {_flow(f['cum20'] / 1e4, 1, '조')}")
     return _qc("외국인은 사고 있나?", f"오늘 {word}", "neutral", UP if buy else DOWN, lines, tip=_dk.with_src(tip, RK.SRC), opened=True)
 
 
@@ -498,7 +480,6 @@ def heat_card(m):
     if n:
         lines.append((f"뉴스심리지수는 {n['v']:.0f}로 1년 평균({n['avg_1y']:.0f})보다 {'높습니다' if n['v'] > n['avg_1y'] else '낮습니다'}. "
                       "100보다 크면 긍정적인 경제 기사가 더 많다는 뜻이고, 약 1주 늦게 나오는 실험적 통계입니다.", "plain"))
-    lines.append(_note(f"기록상 : {_rec(U.NO_RECORD['heat'])}. 오늘 시장 분위기를 보는 칸입니다."))
     ser = h["series"][-15:]
     groups, when = _day_groups(ser)
     lines.append((_bars(f"최근 {len(ser)}거래일 거래대금 (조 원)", groups, C.note_fg, C.gray, lambda v: f"{v:.1f}", when), "html"))
@@ -510,8 +491,7 @@ def heat_card(m):
     if n:
         lines.append(("row", "뉴스심리지수", f"{n['v']:.1f}", f"{_md(n['day'])} · 1년 평균 {n['avg_1y']:.1f}"))
     tip = ("하루에 사고판 돈의 크기(거래대금)로 본 시장의 열기. 20일 평균보다 1.5배 이상이면 활발, 0.7배 아래면 한산으로 봅니다\n"
-           f"· 오늘 {h['turnover'] / 1e4:.1f}조 원 : 20일 평균의 {tr:.1f}배\n"
-           f"· 기록상 : {_rec(U.NO_RECORD['heat'])}")
+           f"· 오늘 {h['turnover'] / 1e4:.1f}조 원 : 20일 평균의 {tr:.1f}배")
     return _qc("시장은 얼마나 뜨겁나?", state, "neutral", "#111", lines, tip=_dk.with_src(tip, RK.SRC))
 
 
@@ -539,7 +519,6 @@ def rates_card(m):
         sp, d = bbb["v"] - k3["v"], bbb["chg_n"] - k3["chg_n"]
         lines.append((f"신용이 낮은 기업의 회사채(BBB−)와 국고채 3년의 금리 차이는 {sp:.2f}%p로 20일 전보다 {abs(d):.2f}%p {'넓어졌' if d > 0 else '좁아졌'}습니다. "
                       "차이가 넓어지면 기업이 돈을 빌리기 더 어려워졌다는 뜻입니다.", "plain"))
-    lines.append(_note(f"기록상 : {_rec(U.NO_RECORD['rates_fx'])}. 오늘 상태를 보는 칸입니다."))
     for key, name in RATE_ROWS:
         x = rt.get(key)
         if x:
@@ -551,8 +530,7 @@ def rates_card(m):
             lines.append(("row", name, f"{x['v']:,.1f}원", " · ".join(p for p in (f"오늘 {_s(x['chg_1d'], 1, '원')}" if x.get("chg_1d") is not None else "",
                                                                              f"20일 {_s(x['chg_n'], 1, '원')}" if x.get("chg_n") is not None else "", f"1년 {x['lo_1y']:,.0f}~{x['hi_1y']:,.0f}원") if p)))
     tip = ("시장 금리(국고채 · 회사채)와 원화 값(환율)의 지금 위치. 20일 동안 국고채 3년이 0.1%p 넘게 움직이면 내림 · 오름, 원/달러가 1% 넘게 움직이면 원화 강세 · 약세로 봅니다\n"
-           "· 오늘 : " + " · ".join(st) + "\n"
-           f"· 기록상 : {_rec(U.NO_RECORD['rates_fx'])}")
+           "· 오늘 : " + " · ".join(st))
     return _qc("금리 · 환율은?", " · ".join(st), "neutral", "#111", lines, tip=_dk.with_src(tip, RK.SRC))
 
 
@@ -720,7 +698,6 @@ def valuation_card(m):
     if dy:
         dw = _cmp_word(dy["v"], dy.get("prev"), 0.02, "높아졌", "낮아졌")
         lines.append((f"배당수익률은 {dy['v']:.2f}%로 " + (f"{_prev_mo(mo)}보다 {dw}습니다." if dw else f"{_prev_mo(mo)}과 같은 수준입니다."), "plain"))
-    lines.append(_note(f"기록상 : {_rec(U.NO_RECORD['valuation'])}. 비싼지 싼지의 지금 상태를 보는 칸입니다."))
     state = f"{_mo(mo)} · {_prev_mo(mo)}보다 " + ("비싸짐" if w == "높아졌" else "싸짐" if w == "낮아졌" else "비슷")   # 답에 달 이름 (M53)
     charts = [_cmp_chart("최근 12개월 KOSPI PER (배)", [(x["month"][2:].replace("-", "."), x["v"], per["avg_all"]) for x in per["series"][-12:]],
                          f"전체 기간 평균 {per['avg_all']:.1f}배", lambda v: f"{v:.1f}")]   # 비교 = 전체 평균 (M54)

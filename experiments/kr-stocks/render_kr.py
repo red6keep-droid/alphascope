@@ -1,7 +1,7 @@
 """한국 종목 페이지 · 목록 페이지 HTML (기획 11-4). 미국 간단형 상세(stock-radar/render_pages.py)의 틀을 따르되
 원화 · KOSPI 비교 · 미국 연결 짝 카드(맨 위) · 자금 흐름(목록 페이지) 로 바꾸고, 옵션 · 공시 · 애널리스트 · 뉴스 · 실적 칸은 두지 않는다.
-카드 조각(_row_html · _col_chart · _state_card …)은 엔비디아 리포트 렌더러(R)를 그대로 쓴다. 툴팁은 뜻 · 오늘 · 기록상 세 줄 — `기록상` 은 2026-10-24~25 검증(doc/검증/한국-*.md) 결과만,
-관계가 없던 것은 "관계 없음" 을 그대로 적는다. 2026-10-25 밤: 기획 11-8 후보(K1~K30 중 자료 있는 것)를 전부 넣은 상태 — 사용자가 보고 뺀다.
+카드 조각(_row_html · _col_chart · _state_card …)은 엔비디아 리포트 렌더러(R)를 그대로 쓴다. 툴팁은 뜻 · 오늘 두 줄 — 검증 결과(doc/검증/한국-*.md)는
+독자에게 쓰지 않는다(`기록상` 줄 · "관계 없음" 폐지, 2026-11-01 가이드라인 1절 4-2). 2026-10-25 밤: 기획 11-8 후보(K1~K30 중 자료 있는 것)를 전부 넣은 상태 — 사용자가 보고 뺀다.
 """
 import datetime
 import os
@@ -159,21 +159,7 @@ def pair_tip(s):
     lines = ["이 종목과 같은 재료로 움직이는 미국 종목(과 같은 회사의 미국 상장 ADR). 미국 종가는 한국 장이 열리기 전(한국 시간 새벽)에 나오므로 '밤사이' 미국 움직임 뒤 오늘 한국장의 반응을 나란히 둔다"]
     if why and p.get("moves"):
         lines.append(f"· 연결 이유 : {why}")
-    rec = U.PAIR_RECORD.get(s["sym"])
-    if rec and p.get("moves"):
-        sp, n, ok, y0 = rec
-        if ok:
-            lines.append(f"· 기록상 : 연결 종목이 많이 오른 밤과 많이 내린 밤, 다음 날 {s['name']} 차이 {_sgn(sp, 2)}%p. 차이는 아침 시가에서 끝났다")   # 기간 · n · 플라시보 · 긴 시가 설명은 뺐다 (batch 7 b)
-        else:
-            lines.append(f"· 기록상 : 연결 종목의 밤사이 움직임과 다음 날 {s['name']} 사이에 뚜렷한 관계가 없었다")
-    adr = p.get("adr")
-    if adr and adr["sym"] in U.ADR_RECORD:
-        sp, n, y0 = U.ADR_RECORD[adr["sym"]]
-        lines.append(f"· 기록상 (ADR) : {adr['sym']}가 많이 오른 밤과 내린 밤, 다음 날 {s['name']} 차이 {_sgn(sp, 2)}%p")
-    if p.get("sox"):
-        sp, n, tgt = U.OVERNIGHT_RECORD["SOX_SEMI"]
-        lines.append(f"· 기록상 (SOX) : 필라델피아 반도체지수가 많이 오른 밤과 내린 밤, 다음 날 {tgt} 차이 {_sgn(sp, 2)}%p")
-    return "\n".join(lines)
+    return "\n".join(lines)   # `기록상` 연결 · ADR · SOX 줄은 뺐다 (2026-11-01 가이드라인 1절 4-2)
 
 
 def _us_name(sym):
@@ -199,7 +185,7 @@ def pairs_state(s):
 
 def sec_pairs(s, a=None):
     """`미국과 연결` 펼침 카드 (2026-10-25 사용자: "짝" 대신 "연결" · 가격 카드 다음 · 펼침 카드로). 접힌 머리 = 밤사이 연결 종목이 어땠나(올랐음 · 내렸음 · 엇갈림),
-    펼치면 연결 종목 · ADR(K24) · SOX(K25) 줄과 오늘 이 종목 · KOSPI 대비, 한국 장 뒤 나온 미국 종가. 툴팁 `기록상` = 10-25 일별 검증."""
+    펼치면 연결 종목 · ADR(K24) · SOX(K25) 줄과 오늘 이 종목 · KOSPI 대비, 한국 장 뒤 나온 미국 종가. """
     p = s.get("pairs") or {}
     moves = p.get("moves") or []
     adr, sox = p.get("adr"), p.get("sox")
@@ -289,32 +275,23 @@ def sec_industry(s):
             continue
         d1 = x.get("chg_1d")
         right = f'<span style="color:#111;">{x["v"]:,.1f}원</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{UP if d1 > 0 else DOWN if d1 < 0 else NOTE};">{_sgn(d1, 1)}원</span>' if d1 is not None else "")
-        rows += _row_html(n, right, f"{_md(x['day'])} · {note} · 1년 {x['lo_1y']:,.0f}~{x['hi_1y']:,.0f}원 · 기록상 이후 주가와 관계 없음(값만)")
+        rows += _row_html(n, right, f"{_md(x['day'])} · {note} · 1년 {x['lo_1y']:,.0f}~{x['hi_1y']:,.0f}원")
     w = s.get("wti")
     if w:
         d1 = w.get("chg_1d")
         right = f'<span style="color:#111;">{w["v"]:.1f}달러</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{UP if d1 > 0 else DOWN if d1 < 0 else NOTE};">{_sgn(d1, 1)}%</span>' if d1 is not None else "")
-        sp, n, y0 = U.WTI_RECORD
-        rows += _row_html("WTI 유가", right, f"{_md(w['day'])} · 20일 {_sgn(w['chg_n'], 1)}% · 1년 {w['lo_1y']:.0f}~{w['hi_1y']:.0f}달러 · 기록상 많이 오른 날과 내린 날의 다음날 {s['name']} 차이 {_sgn(sp, 2)}%p ({y0}~2026)")
-    rec = []
-    for r in rows_data:
-        v = U.VALIDATED_LEAD.get(r["key"])
-        if v:
-            if v["months"] == 0:
-                rec.append(f"· 기록상 : {v['basket']} 주가와 {r['name']}은 같은 달에 움직였다")
-            else:
-                rec.append(f"· 기록상 : {v['basket']} 주가가 {r['name']}보다 약 {v['months']}개월 먼저 움직였다")
+        rows += _row_html("WTI 유가", right, f"{_md(w['day'])} · 20일 {_sgn(w['chg_n'], 1)}% · 1년 {w['lo_1y']:.0f}~{w['hi_1y']:.0f}달러")
     srcs = sorted({IND_SRC.get(r["src_stat"], "한국은행 ECOS") for r in rows_data})
     first = rows_data[0]
     tag = s.get("trade_tag")
-    tip = ("이 종목이 속한 업종의 실물 숫자 — 단가 · 수요 · 물량이 쌓이는지 본다. 월별 자료라 1~2달 늦게 나오고, 주가는 이보다 먼저 움직이곤 한다\n"
+    tip = ("이 종목이 속한 업종의 실물 숫자 — 단가 · 수요 · 물량이 쌓이는지 본다. 월별 자료라 1~2달 늦게 나온다\n"
            f"· {first['name']} {_ind_value(first)} : " + (f"{'전년 같은 달' if first['cmp'] == 'yoy' else '전달'}보다 {_sgn(first['chg'], 2 if first['kind'] == 'pct' else 1)}{'%p' if first['kind'] == 'pct' else '%'}" if first.get("chg") is not None else "비교값 없음")
-           + ("\n" + rec[0] if rec else ""))   # 기록상 한 줄만(첫 지표) · `분류 :` 줄 · 관계 없음 줄은 뺐다 (batch 7 c)
+           )   # `기록상` 줄은 뺐다 (2026-11-01 가이드라인 1절 4-2)
     return R._card_title("업계 재료는?", _dk.with_src(tip, "한국은행 ECOS (자료: " + " · ".join(srcs) + ")" + (" · FRED" if w else ""))) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
 
 
 def sec_bsi(s):
-    """K1~K6 업종 체감 경기 — 업종별 BSI 실적(값) · 전망(작은 글씨), 역대 백분위. 툴팁 `기록상` = 시차(K3) · 약한 후보(K4) · 바닥권 사후 검증(K5) · 역행(K6)."""
+    """K1~K6 업종 체감 경기 — 업종별 BSI 실적(값) · 전망(작은 글씨), 역대 백분위. 툴팁 = 뜻 · 오늘(검증 줄은 2026-11-01 폐지)."""
     b = s.get("bsi")
     if not b or not b.get("rows"):
         return ""
@@ -325,29 +302,10 @@ def sec_bsi(s):
         col = UP if r["v"] >= 100 else "#111"
         note = f"{mo} 실적 · 전달보다 {_sgn(r['chg'], 0)}p · 12개월 범위의 {r['pos12']:.0f}% 지점 · 2009년 이후 아래에서 {r['pct_all']:.0f}% 지점"
         rows += _row_html(f"{r['name']} BSI", f'<span style="color:{col};">{r["v"]:.0f}</span>{fc}', note, first=i == 0)
-    rec = b.get("record") or {}
-    lines = []
-    if rec.get("lead"):
-        lead = re.sub(r" \([^)]*\)$", "", rec["lead"])   # 기간 괄호 · `확인용이지 예고가 아니다` · 역행(유의하지 않음) 줄은 뺐다 (batch 7 b · d)
-        lines.append(f"· 기록상 : {lead}")
-    if rec.get("weak"):
-        lines.append(f"· 참고 : {rec['weak']}")
-    bt = rec.get("bottom")
-    bottom_now = False
-    if bt:
-        row = next((r for r in b["rows"] if bt["item"] in (r["item"], r.get("f_item"))), None)
-        cur = (row.get("forecast_pct_all") if bt["kind"] == "전망" else row.get("pct_all")) if row else None
-        bottom_now = cur is not None and cur <= 25
-        state = f"지금 {row['name']} {bt['kind']}은 역대 아래에서 {cur:.0f}% 지점 — " + ("하위 25% 안" if bottom_now else "하위 25% 밖") if cur is not None else ""
-        lines.append(f"· 기록상 (사후 검증) : {b['industry_name']} {row['name'] if row else ''} {bt['kind']} BSI 가 역대 하위 25% 였던 달 뒤 {bt['h']}개월, 이 업종 묶음은 KOSPI 보다 평균 {_sgn(bt['spread'], 1)}%p 였다 "
-                     f"(2009~2026, 다중 검정 보정 뒤 q {bt['q']:.3f}, 앞뒤 절반 같은 방향). 결과를 보고 세운 가설이라 새 자료로 다시 확인해야 한다. {state}")
-    if not lines:
-        lines.append("· 기록상 : 2009~2026 우리 검증에서 이 업종 BSI 는 발표 뒤 주가와 뚜렷한 관계를 보이지 않았다 — 참고 숫자")
-    f0 = b["rows"][0]
+    f0 = b["rows"][0]   # 검증 줄(시차 · 약한 후보 · 바닥권 사후 검증 · 관계 없음)은 뺐다 (2026-11-01 가이드라인 1절 4-2)
     tip = ("한국은행이 매달 기업에 업황 · 매출 · 신규수주 · 채산성이 좋은지 나쁜지 물어 만든 지수(100 기준, 보통 100 아래). 실적은 이달 답, 전망은 다음 달 답. 실물 지표보다 1~2달 빠르다\n"
-           f"· {b['industry_name']} {f0['name']} {f0['v']:.0f} : 전달보다 {_sgn(f0['chg'], 0)}p, 2009년 이후 아래에서 {f0['pct_all']:.0f}% 지점\n" + "\n".join(lines))
-    head = _dk.muted(f"{b['industry_name']} 업종 · 역대 하위 25% 안 (사후 검증 기록은 설명 참고)") if bottom_now else ""
-    return R._card_title("업종 체감 경기는? (BSI)", _dk.with_src(tip, "한국은행 ECOS 기업경기조사")) + head + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
+           f"· {b['industry_name']} {f0['name']} {f0['v']:.0f} : 전달보다 {_sgn(f0['chg'], 0)}p, 2009년 이후 아래에서 {f0['pct_all']:.0f}% 지점")
+    return R._card_title("업종 체감 경기는? (BSI)", _dk.with_src(tip, "한국은행 ECOS 기업경기조사")) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
 
 
 def sec_fin(s):
@@ -373,7 +331,7 @@ def sec_fin(s):
 
 # ---------------------------------------------------------------- `업종` 탭 = 독자 질문 카드 셋 (2026-10-25 사용자: "수치는 펼침 안으로, 이 수치가 무슨 역할인지 재해석")
 # 접힌 머리 = 질문 + 한 단어 답(지난 값과 비교한 사실, 앞날 아님), 펼치면 한 문장 · 그래프(작년 같은 때와 나란히 — 가이드라인 1-4-1 비교 대상) · 수치 줄.
-# 기록상 · 출처는 질문 옆 ? 툴팁 — 옛 sec_industry · sec_bsi · sec_fin 의 툴팁 그대로.
+# 뜻 · 출처는 질문 옆 ? 툴팁 — 옛 sec_industry · sec_bsi · sec_fin 의 툴팁 그대로.
 
 _THIS, _LAST = "#9CC0F2", R._GRAY_BAR   # 올해 막대 · 작년 같은 때 막대
 
@@ -402,7 +360,7 @@ def _yoy_chart(title, groups, fmt, unit="", now="올해", then="작년 같은 �
 
 
 def _tip_of(html):
-    """옛 칸(sec_industry · sec_bsi · sec_fin)의 ? 툴팁 글과 출처를 그대로 가져온다 — 기록상 · 출처 글을 한 곳에서만 쓰게."""
+    """옛 칸(sec_industry · sec_bsi · sec_fin)의 ? 툴팁 글과 출처를 그대로 가져온다 — 뜻 · 출처 글을 한 곳에서만 쓰게."""
     t, src = re.search(r'data-tip="([^"]*)"', html), re.search(r'data-src="([^"]*)"', html)
     return _dk.with_src(html_unescape(t.group(1)), html_unescape(src.group(1))) if t and src else (html_unescape(t.group(1)) if t else "")
 
@@ -717,10 +675,6 @@ def sec_drawdown(s):
     return R.dd_block(s["name"], st, bn, "KOSPI", span, d["pct_from_high"], ttip, tail)   # 영역 제목 없이 한 덩이 · 구간 막대 (2026-10-27 P24 · P28)
 
 
-def _no_record(tip):
-    return "\n".join(x for x in tip.split("\n") if not x.startswith("· 기록상"))
-
-
 def sec_chart_indicators(s):
     """`지금 가격이 평균보다` 그래프 — `차트 정보 보기` 접기는 없앴다 (P139: 일중 변동폭 · 단기 과열 온도 · 평균선 교차는 `기술지표의 방향은?` 의
     ATR · RSI · 이동평균 크로스와 겹쳐 빼고, 남은 12개월 모멘텀은 기간별 수익률 아래로)."""
@@ -738,11 +692,9 @@ def sec_momentum(s):
     mom, mr = s.get("mom_12_1"), s.get("mom_rank")
     if mom is None or not mr:   # K18 — 우리 검증에서 유일하게 '다음 달' 과 이어진 가격 신호 (좁은 표본)
         return ""
-    sp, n, period = U.MOMENTUM_RECORD
     rank, total = mr
     tip = ("12개월 전 가격 대비 1개월 전 가격의 변화. 최근 1개월은 단기 되돌림이 섞여 빼는 것이 표준(12-1 모멘텀)\n"
-           f"· 오늘 {_sgn(mom, 1)}% : 우리 {total}종목 가운데 {rank}위\n"
-           f"· 기록상 : 우리 {total}종목 안 상위 20%가 하위 20%보다 다음 달 평균 {_sgn(sp, 2)}%p 더 올랐다")   # 검증은 5분위(20%) — 옛 `25%` 바로잡음 · 기간 · n · 플라시보 · `예고 아님` 은 뺐다 (2026-10-31 사용자 batch 6 · 7)
+           f"· 오늘 {_sgn(mom, 1)}% : 우리 {total}종목 가운데 {rank}위")   # `기록상` 줄은 뺐다 (2026-11-01 가이드라인 1절 4-2)
     return ("white", R.momentum_in(s["name"], mom, rank, total, s.get("mom_peers_median"), s.get("mom_bench"), "KOSPI", tip))
 
 
@@ -819,7 +771,7 @@ def sec_states(s):
     # `애널리스트 · 방송 의견은?` 은 `의견` 탭으로 옮겼다 (2026-11-01 사용자 P196: 오늘 탭이 너무 길다)
     oh = s.get("overheat")
     if oh and oh["active"]:
-        out += R._state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", R.MUTED, R.overheat_lines(oh), "", tip=_no_record(R.overheat_rule(oh)))
+        out += R._state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", R.MUTED, R.overheat_lines(oh), "", tip=R.overheat_rule(oh))
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
 
 
@@ -1277,8 +1229,7 @@ def foreign_tip(f):
     k = abs(f["z"]) if f.get("z") is not None else None
     now = f"· 오늘 {_sgn(f['today'], 0)}억 원 : " + (f"평소 하루 순매수 크기의 {k:.1f}배" if k is not None else "") + f", 20일 누적 {_sgn(f['cum20'] / 1e4, 1)}조 원"
     return ("외국인 투자자가 유가증권시장에서 하루에 산 금액에서 판 금액을 뺀 것. 양수면 사는 쪽, 음수면 파는 쪽\n" + now +
-            (f"\n· 참고 : 20일 누적은 과거 모든 20일 구간과 견줘 아래에서 {f['cum20_pct_rank']:.0f}% 지점" if f.get("cum20_pct_rank") is not None else "")
-            + f"\n· 기록상 : {U.NO_RECORD['foreign']} — 지금 상태를 보는 칸이지 앞을 말하지 않는다")
+            (f"\n· 참고 : 20일 누적은 과거 모든 20일 구간과 견줘 아래에서 {f['cum20_pct_rank']:.0f}% 지점" if f.get("cum20_pct_rank") is not None else ""))
 
 
 def sec_foreign(m):
@@ -1434,8 +1385,7 @@ def sec_rates_fx(m):
     k3, usd = rt.get("ktb3"), fx.get("usdkrw")
     tip = ("금리가 오르면 빚투 비용과 성장주 할인율이 오르고, 원/달러가 오르면(원화 약세) 외국인은 환차손을 피해 팔기 쉽다. 외국인 수급과 같이 보는 배경 숫자\n"
            + (f"· 오늘 국고채 3년 {k3['v']:.2f}% ({_sgn(k3['chg_1d'] * 100, 0)}bp)" if k3 and k3.get("chg_1d") is not None else "")
-           + (f" · 원/달러 {usd['v']:,.1f}원 ({_sgn(usd['chg_1d'], 1)}원)" if usd and usd.get("chg_1d") is not None else "")
-           + f"\n· 기록상 : {U.NO_RECORD['rates_fx']} — 배경 숫자로만 둔다")
+           + (f" · 원/달러 {usd['v']:,.1f}원 ({_sgn(usd['chg_1d'], 1)}원)" if usd and usd.get("chg_1d") is not None else ""))
     return R._card_title("금리 · 환율은?", _dk.with_src(tip, "한국은행 ECOS (자료: 한국은행 · 서울외국환중개)")) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
 
 
@@ -1471,8 +1421,7 @@ def sec_heat(m):
                             f"{_md(n['day'])} · 100 위면 긍정 기사가 많음 · 1년 평균 {n['avg_1y']:.1f} · 1년 중 아래에서 {n['pct_rank_1y']:.0f}% 지점 · 한국은행 실험적 통계, 약 1주 늦게 나옴", first=first)
     tip = ("돈이 얼마나 활발히 오가는지(거래대금)와 경제 뉴스의 분위기(뉴스심리지수 — 한국은행이 경제 기사 문장을 긍정 · 부정으로 나눠 지수화, 100이 기준). 급등 · 급락 날은 거래대금이 평소의 1.5배를 넘곤 한다\n"
            + (f"· 오늘 거래대금 {eok(h['turnover'])} : 20일 평균의 {h['turnover_ratio']:.1f}배" if h and h.get("turnover_ratio") else "")
-           + (f"\n· 뉴스심리 {n['v']:.1f} ({_md(n['day'])}) : 1년 평균 {n['avg_1y']:.1f}" if n else "")
-           + f"\n· 기록상 : {U.NO_RECORD['heat']} — 열기는 그날의 상태이지 신호가 아니었다")
+           + (f"\n· 뉴스심리 {n['v']:.1f} ({_md(n['day'])}) : 1년 평균 {n['avg_1y']:.1f}" if n else ""))
     return R._card_title("시장은 얼마나 뜨겁나?", _dk.with_src(tip, SRC)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
 
 
@@ -1494,14 +1443,13 @@ def sec_valuation(m):
     yg = v.get("yield_gap")
     if yg:   # K29 — 값만
         rows += _row_html("일드갭 (배당수익률 − 국고채 3년)", f'<span style="color:{UP if yg["v"] > 0 else DOWN};">{_sgn(yg["v"], 2)}%p</span>',
-                            f"국고채 3년 {yg['ktb3']:.2f}% · 양수면 배당이 채권 이자보다 높다 · 기록상 이후 KOSPI 와 관계 없음(값만)")
+                            f"국고채 3년 {yg['ktb3']:.2f}% · 양수면 배당이 채권 이자보다 높다")
     ser = per["series"][-12:]
     chart = R._col_chart([(x["month"][2:].replace("-", "."), [x["v"]]) for x in ser], [lambda v: "#CBD5E1"], [lambda v: NOTE], height=120, fmt=lambda v: f"{v:.1f}", right=True)
     rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 12개월 KOSPI PER (배)</span>'
              f'<span style="display:block;height:6px;"></span>{chart}</span>')
     tip = ("시장 전체가 이익에 견줘 얼마나 비싼지(PER, 높을수록 비쌈)와 배당으로 돌려주는 비율. 월별 자료라 지난달까지\n"
-           f"· {mo} PER {per['v']:.1f}배 : 12개월 범위의 {_pos(per):.0f}% 지점" + (f" · 배당수익률 {dy['v']:.2f}%" if dy else "")
-           + f"\n· 기록상 : {U.NO_RECORD['valuation']} — 비싼가 싼가의 상태 설명용")
+           f"· {mo} PER {per['v']:.1f}배 : 12개월 범위의 {_pos(per):.0f}% 지점" + (f" · 배당수익률 {dy['v']:.2f}%" if dy else ""))
     return R._card_title("KOSPI는 비싼가?", _dk.with_src(tip, SRC)) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
 
 
@@ -1538,7 +1486,7 @@ MACRO_ROWS = [   # (키, 이름, 표기, 해석 방향: +1 높을수록 좋음 �
     ("csi", "소비자심리지수", "lvl", +1, "100 위면 낙관이 많음"),
     ("bsi", "기업 업황 BSI (전산업)", "lvl", +1, "100 위면 좋다는 기업이 많음 — 보통 100 아래"),
     ("op_margin", "기업 매출액영업이익률 (전산업 · 분기)", "pct", +1, "한국은행 기업경영분석 · 분기 자료라 한 분기 늦게 · 비교는 전년 같은 분기"),
-    ("tot", "순상품 교역조건지수", "lvl", 0, "수출 단가 ÷ 수입 단가 (2020=100) · 기록상 높았던 달 뒤 수출형 묶음은 오히려 부진했다(1991~2026, 사후 관찰) — 값만 (K12)"),
+    ("tot", "순상품 교역조건지수", "lvl", 0, "수출 단가 ÷ 수입 단가 (2020=100)"),
 ]
 
 
@@ -1627,9 +1575,9 @@ def sec_overnight(m):
         return ""
     rows, first = "", True
     for x in ov:
-        b, rec = x["before"], x.get("record")
+        b = x["before"]
         val = (f'<span style="color:{UP if b["ret"] > 0 else DOWN if b["ret"] < 0 else "#111"};">{_sgn(b["ret"], 2)}p</span>' if b["points"] else R._arrow(b["ret"]))
-        note = f"미국 {_md(b['day'])} 종가" + (f" · 기록상 다음날 {rec[2]} 차이 {_sgn(rec[0], 2)}%p" if rec else "")
+        note = f"미국 {_md(b['day'])} 종가"
         rows += _row_html(x["label"], val, note, first=first)
         first = False
     k = (m or {}).get("kospi")
@@ -1638,16 +1586,14 @@ def sec_overnight(m):
     w = (m or {}).get("wti")
     if w and w.get("chg_1d") is not None:
         rows += _row_html("WTI 유가", f'<span style="color:#111;">{w["v"]:.1f}달러</span><br><span style="font-size:{TINY};font-weight:400;color:{UP if w["chg_1d"] > 0 else DOWN};">{_sgn(w["chg_1d"], 1)}%</span>',
-                            f"{_md(w['day'])} · 20일 {_sgn(w['chg_n'], 1)}% · 기록상 다음날 한국전력 차이 {_sgn(U.WTI_RECORD[0], 2)}%p (종목 카드)")
+                            f"{_md(w['day'])} · 20일 {_sgn(w['chg_n'], 1)}%")
     latest = [x["latest"] for x in ov if x.get("latest")]
     for l in latest:
         rows += _row_html(f'{_esc(U.US_MARKET.get(l["sym"], l["sym"]))} {_small("그 뒤 미국 종가")}',
                             (f'<span style="color:{UP if l["ret"] > 0 else DOWN};">{_sgn(l["ret"], 2)}p</span>' if l["points"] else R._arrow(l["ret"])), f"미국 {_md(l['day'])} · 다음 한국장 전 참고")
     by = {x["sym"]: x["before"]["ret"] for x in ov}
-    recs = " · ".join(f"{U.US_MARKET[t].split(' ')[0]} {_sgn(U.OVERNIGHT_RECORD[t][0], 2)}" for t in ("EWY", "^SOX", "^VIX", "DX-Y.NYB") if t in U.OVERNIGHT_RECORD)
     tip = ("한국 장이 닫힌 뒤 열리는 미국 장의 결과 — 미국에서 거래되는 한국 ETF(EWY) · 반도체 지수(SOX) · 변동성(VIX) · 달러. 다음날 한국 시가에 가장 먼저 반영되는 정보\n"
-           + "· 밤사이 : " + " · ".join(f"{U.US_MARKET[t].split(' ')[0]} {_sgn(by[t], 2)}{'p' if t in U.US_MARKET_POINTS else '%'}" for t in by) + "\n"
-           f"· 기록상 : 각 변수가 밤사이 많이 오른 날(상위 25%)과 많이 내린 날(하위 25%)의 다음날 KOSPI 수익 차이 — {recs} %p (2000~2026, 약 5,900거래일, 모두 플라시보 · 앞뒤 절반 · 보정 통과). {U.GAP_NOTE}")
+           + "· 밤사이 : " + " · ".join(f"{U.US_MARKET[t].split(' ')[0]} {_sgn(by[t], 2)}{'p' if t in U.US_MARKET_POINTS else '%'}" for t in by))
     return R._card_title("밤사이 미국은?", _dk.with_src(tip, "Yahoo Finance · FRED")) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
 
 

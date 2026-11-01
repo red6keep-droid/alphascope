@@ -1,7 +1,7 @@
 """시총 TOP 10 목록 페이지 · 간단형 상세 페이지 HTML (doc/기획/종목-레이더-기획.md 10-3 · 10-10, 1단계 = 숫자와 실적일만).
 
 카드 모양은 엔비디아 리포트 가격 카드 펼침(가이드라인 2-4 11-1)과 같게 — 그 렌더러의 작은 조각(_row · _row_html · _col_chart …)을 그대로 쓴다.
-툴팁은 뜻 · 오늘 · 참고 세 줄(2-6). 이 종목들은 우리 검증을 하지 않았으므로 `기록상` 줄을 두지 않는다(지표 검증 대원칙: 종목마다 따로).
+툴팁은 뜻 · 오늘 (+ 참고) (2-6). `기록상` 줄은 두지 않는다(가이드라인 1절 4-2, 2026-11-01).
 """
 
 import datetime
@@ -216,11 +216,6 @@ def sec_month_range(s):
     return ("white", R.month_range_in(bb, lambda v: f"${v:,.0f}", R.bollinger_rule(bb), R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col, top=0))
 
 
-def _no_record(tip):
-    """NVDA 리포트 툴팁에서 `· 기록상 : …` 줄을 뺀다 — 우리 검증은 엔비디아 · 기술주 기준이라 다른 종목에 옮기지 않는다 (지표 검증 대원칙)."""
-    return "\n".join(x for x in tip.split("\n") if not x.startswith("· 기록상"))
-
-
 def sector_lines(sf):
     return R.sector_lines(sf, "S&P 500")
 
@@ -284,8 +279,7 @@ def sec_pairs(s):
         for k, (nm, sp, _ok, us) in enumerate(ok):
             lines.append(("row", nm, f"{_sgn(sp)}%p", f"{_dk.josa(' · '.join(us), '이')} 많이 오른 밤과 내린 밤의 차이", False, k == 0))
     tip = ("이 종목과 경쟁 · 공급 · 고객으로 이어진 미국 회사의 오늘 등락, 그리고 이 종목을 따라 다음 날 아침 움직이는 한국 종목\n"
-           f"· 오늘 {state} : 함께 보는 회사 {len(moves)}곳 중 오른 곳 {ups} · 내린 곳 {downs} (±0.5% 기준)"
-           + ("\n· 기록상 : 한국 연결 종목은 미국 연결 종목이 많이 오른 밤과 많이 내린 밤, 다음 날 시가 차이가 컸다. 같은 날 미국 회사끼리의 움직임은 검증하지 않았다" if ok else ""))
+           f"· 오늘 {state} : 함께 보는 회사 {len(moves)}곳 중 오른 곳 {ups} · 내린 곳 {downs} (±0.5% 기준)")
     card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance"), fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
@@ -308,20 +302,20 @@ def sec_states(s):
     out = ""
     ms = s.get("market_shock") or {}
     if ms.get("active"):
-        out += R._state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", R.SOON, R.shock_lines(ms), "", tip=_no_record(R.shock_tip(ms)), fold=True)
+        out += R._state_card("시장 충격 국면은?", "충격 국면 중", "uncertain", R.SOON, R.shock_lines(ms), "", tip=R.shock_tip(ms), fold=True)
     # `미국 증시 분위기는?` 은 기술지표 카드 위로 옮겼다 (sec_regime, 2026-11-01 사용자 P214)
     # 업종 자금 카드는 `업계상황` 탭으로 옮겼다 (2026-10-31 사용자: 업종 전체 이야기 — 한국처럼 다른 탭)
     # `한 달간 변화 범위는?` 상태 카드는 가격 카드 펼침(가격 범위 (1년) 아래)으로 옮겼다 (2026-10-31 사용자 P150)
     # `애널리스트 · 방송 의견은?` 은 `의견` 탭으로 옮겼다 (2026-11-01 사용자 P196: 오늘 탭이 너무 길다)
     oh = s.get("overheat")
     if oh and oh["active"]:
-        out += R._state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", R.MUTED, R.overheat_lines(oh), "", tip=_no_record(R.overheat_rule(oh)))
+        out += R._state_card("과열 신호는?", f"{len(oh['active'])}개 조건 해당", "neutral", R.MUTED, R.overheat_lines(oh), "", tip=R.overheat_rule(oh))
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
 
 
 def sec_momentum(s):
     """12개월 모멘텀 — 한국과 같은 카드(R.momentum_in). 미국은 검증을 통과하지 못해(64종목 −0.30%p/월 p .51, doc/검증/미국-모멘텀-검증.md)
-    툴팁에 `기록상` 줄이 없고 함께 보기 방향 분류에도 넣지 않는다 (2026-10-31 사용자)."""
+    함께 보기 방향 분류에 넣지 않는다 (2026-10-31 사용자)."""
     mom, mr = s.get("mom_12_1"), s.get("mom_rank")
     if mom is None or not mr:
         return ""
@@ -341,8 +335,10 @@ def _fred_value(sid, v):
         return f"{v * 100:,.0f}만 대"
     if sid == "MCOILWTICO":
         return f"{v:,.1f}달러"
-    if sid.startswith("N") and sid.endswith("SBEA"):
+    if sid.endswith("SBEA"):
         return f"{v * 10:,.0f}억 달러"
+    if sid.startswith(("QREV", "REV")):   # 서비스 업종 분기 매출 — 백만 달러
+        return f"{v / 100:,.0f}억 달러"
     return f"{v:,.1f}"   # 지수
 
 
@@ -356,8 +352,10 @@ def _fred_scale(sid):
         return 0.01, "만 대"
     if sid == "MCOILWTICO":
         return 1, "달러"
-    if sid.startswith("N") and sid.endswith("SBEA"):
+    if sid.endswith("SBEA"):
         return 0.1, "억 달러"
+    if sid.startswith(("QREV", "REV")):
+        return 100, "억 달러"
     return 1, ""
 
 
@@ -383,15 +381,11 @@ def _fred_chart(x, title, q=False):
     return [(f'{_dk.CHART_TITLE_M}{_esc(title)}</span>{chart}', "html")]
 
 
-def _fred_tip(x, members_name, state, q=False):
-    """툴팁 — 뜻 · 오늘 · 기록상 (가이드라인 툴팁 형식). 기록상 = 미국 업종 지표 검증(2026-11-01)."""
-    import industry_us as IU
-    ok, sp = IU.RECORD.get(x["vkey"], (False, None))
-    rec = (f"\n· 기록상 : 이 지표가 크게 늘어난 달과 적게 늘어난 달, 그 뒤 6개월 {members_name} 차이 {_sgn(sp)}%p" if ok
-           else f"\n· 기록상 : 그 뒤 {members_name} 주가와 뚜렷한 관계가 없었다")
-    lim = 10 if q else 5
-    return _dk.with_src(f"업계 전체의 일감 · 값 · 이익을 미국 정부 통계({x['name']})로 본다. 1년 전 같은 {'분기' if q else '달'}과 비교\n"
-                        f"· {state} : {_when(x['month'], q)} 1년 전보다 {_sgn(x['chg'])}% (±{lim}% 넘으면 방향)" + rec, f"FRED · {x['src']}")
+def _fred_tip(x, state, q=False, money=False):
+    """툴팁 — 뜻 · 오늘 (가이드라인 2-6, `기록상` 줄 없음 — 1절 4-2)."""
+    lim = 10 if money else 5
+    return _dk.with_src(f"업계 전체의 일감 · 값 · 이익을 미국 정부 통계({x['name']})로 본다. 1년 전 같은 {'분기와' if q else '달과'} 비교\n"
+                        f"· {state} : {_when(x['month'], q)} 1년 전보다 {_sgn(x['chg'])}% (±{lim}% 넘으면 방향)", f"FRED · {x['src']}")
 
 
 def industry_cards(s):
@@ -399,16 +393,18 @@ def industry_cards(s):
     d = s.get("industry_us")
     if not d:
         return ""
-    who = f"{d['biz']} 업계 종목"
     out = ""
     for x in d["works"]:
         up = x["state"] in ("늘고 있음", "오르는 중")
         theme, col = ("neutral", R.MUTED) if x["state"] in ("판단 유보", "비슷함") else ("positive", R.UP) if up else ("negative", R.DOWN)
-        head = f"{_dk.josa(x['name'], '은')} {_when(x['month'])} {_dk.josa(_fred_value(x['fred'], x['v']), '로')} 1년 전 같은 달보다 {_sgn(x['chg'])}%였다."
-        lines = [(head + R.small_note("월별 자료라 1~2달 늦게 나오고, 주가는 이보다 먼저 움직이곤 합니다."), "plain")]
-        lines += _fred_chart(x, f"{x['name']}, 올해와 작년 같은 달")
-        lines.append(("row", x["name"], _fred_value(x["fred"], x["v"]), f"{_when(x['month'])} · 1년 전보다 {_sgn(x['chg'])}%"))
-        out += R._state_card(f"{d['biz']} 업계 {x['q']}", x["state"], theme, col, lines, "", tip=_fred_tip(x, who, x["state"]), fold=True)
+        q = x.get("quarterly", False)
+        unit = "분기" if q else "달"
+        head = f"{_dk.josa(x['name'], '은')} {_when(x['month'], q)} {_dk.josa(_fred_value(x['fred'], x['v']), '로')} 1년 전 같은 {unit}보다 {_sgn(x['chg'])}%였다."
+        note = "분기 자료라 2~3달 늦게 나옵니다." if q else "월별 자료라 1~2달 늦게 나옵니다."
+        lines = [(head + R.small_note(note), "plain")]
+        lines += _fred_chart(x, f"{x['name']}, 올해와 작년 같은 {unit}", q=q)
+        lines.append(("row", x["name"], _fred_value(x["fred"], x["v"]), f"{_when(x['month'], q)} · 1년 전보다 {_sgn(x['chg'])}%"))
+        out += R._state_card(f"{x.get('biz', d['biz'])} 업계 {x['q']}", x["state"], theme, col, lines, "", tip=_fred_tip(x, x["state"], q=q), fold=True)
     m = d.get("money")
     if m:
         theme, col = {"나아짐": ("positive", R.UP), "나빠짐": ("negative", R.DOWN)}.get(m["state"], ("neutral", R.MUTED))
@@ -416,7 +412,7 @@ def industry_cards(s):
         lines = [(head + R.small_note("분기 자료라 2~3달 늦게 나오고, 1년치로 환산한 금액입니다."), "plain")]
         lines += _fred_chart(m, f"{m['name']}, 올해와 작년 같은 분기", q=True)
         lines.append(("row", "업종 기업이익", _fred_value(m["fred"], m["v"]), f"{_when(m['month'], True)} · 1년 전보다 {_sgn(m['chg'])}%"))
-        out += R._state_card(f"{d['biz']} 업계 수익성은?", m["state"], theme, col, lines, "", tip=_fred_tip(m, who, m["state"], q=True), fold=True)
+        out += R._state_card(f"{d['biz']} 업계 수익성은?", m["state"], theme, col, lines, "", tip=_fred_tip(m, m["state"], q=True, money=True), fold=True)
     return out
 
 
@@ -614,7 +610,7 @@ def _industry_items(s):
     d = s.get("industry_us") or {}
     out = {}
     for k, x in zip(("biz_work", "biz_work2"), d.get("works") or []):
-        out[k] = SG.item(k, x["state"], biz=d["biz"], q=x["q"][:-2])
+        out[k] = SG.item(k, x["state"], biz=x.get("biz", d["biz"]), q=x["q"][:-2])
     if d.get("money"):
         out["biz_money"] = SG.item("biz_money", d["money"]["state"], biz=d["biz"])
     return out

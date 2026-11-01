@@ -65,17 +65,14 @@ def normal_card(a, opened=True):
     for k in outs:
         n = nr[k]
         lines.append((f"{INDEX_NAME[k]} {_s(n['ret_pct'])}는 평소 하루 움직임(±{n['sigma_pct']:.2f}%)의 {_times(n['z'])}로, 지난 1년에 {n['n_year']}번 있던 크기였습니다.", "plain"))
-    if outs:
-        lines.append(("S&P 500 종목 기준, 평소 국면에 평소 범위 밖으로 움직인 다음 날 사고판 결과는 아무 날과 구분되지 않았습니다.", "plain"))
     groups = [(INDEX_SHORT[k], [nr[k]["ret_pct"], nr[k]["sigma_pct"] if nr[k]["ret_pct"] >= 0 else -nr[k]["sigma_pct"]]) for k in keys]
     lines.append((C.chart_card("오늘 움직임과 평소 하루 크기 (%)", groups, [C.sign_bg, C.gray], [C.sign_fg, C.note_fg],
                                [("오늘", C.sign_bg(sp["ret_pct"] if sp else 1)), ("평소 하루 크기", C.GRAY_BAR)]), "html"))
     for k in keys:
         n = nr[k]
         lines.append(("row", INDEX_NAME[k], _s(n["ret_pct"]), f"평소 ±{n['sigma_pct']:.2f}% · {_times(n['z'])}"))
-    tip = ("하루 움직임이 그 지수의 평소 크기 안이었는지. 평소 크기는 최근 움직임에 무게를 더 둔 표준편차이고, 2배를 넘으면 평소 밖으로 봅니다\n"
-           + (f"· 오늘 S&P 500 {_s(sp['ret_pct'])} : 평소의 {_times(sp['z'])}, 지난 1년 중 이만큼 이상 움직인 날 {sp['n_year']}번\n" if sp else "")
-           + "· 기록상 : 평소 밖으로 움직인 다음 날 사고판 결과는 평소 국면에서 아무 날과 다르지 않았습니다 (S&P 500 종목, 약 30년)")
+    tip = ("하루 움직임이 그 지수의 평소 크기 안이었는지. 평소 크기는 최근 움직임에 무게를 더 둔 표준편차이고, 2배를 넘으면 평소 밖으로 봅니다"
+           + (f"\n· 오늘 S&P 500 {_s(sp['ret_pct'])} : 평소의 {_times(sp['z'])}, 지난 1년 중 이만큼 이상 움직인 날 {sp['n_year']}번" if sp else ""))
     return C.question_card("오늘 움직임은 평소와 달랐나?", state, "neutral", "#111", lines, tip=tip, opened=opened)
 
 
@@ -85,11 +82,9 @@ def shock_card(a):
     if not sh.get("active"):
         return ""
     lines = [("VIX가 35를 넘은 뒤 아직 25 아래로 내려오지 않았습니다. 이런 충격 국면에는 평소 범위의 자가 잘 맞지 않습니다.", "plain"),
-             ("기록상 충격 국면에 크게 내린 날 판 경우는 그냥 들고 있던 경우보다 특히 나빴습니다 (S&P 500 종목, 서로 다른 충격 9번이라 대략으로 봅니다).", "plain"),
              ("row", "VIX", f"{sh['vix']:.2f}", "35 이상에서 시작 · 25 아래에서 끝")]
     tip = ("시장 전체가 크게 흔들리는 기간인지. VIX가 35 이상이 되면 시작, 25 아래로 내려오면 끝으로 봅니다\n"
-           f"· 오늘 VIX {sh['vix']:.2f} : 충격 국면 {sh.get('days_in') or 1}거래일째\n"
-           "· 기록상 : 이 기간의 급락 날 매도는 들고 있기보다 특히 나빴습니다")
+           f"· 오늘 VIX {sh['vix']:.2f} : 충격 국면 {sh.get('days_in') or 1}거래일째")
     return C.question_card("시장 충격 국면인가?", f"{sh.get('days_in') or 1}거래일째", "uncertain", "#92400E", lines, tip=tip, opened=True)
 
 
@@ -100,12 +95,11 @@ def market_now_card(a):
     pos = (a.get("position") or {}).get("sp500") or {}
     vix = a.get("vix") or {}
     rates = a.get("rates") or {}
-    rc = a.get("regime_check") or {}
     a20, a50 = spy.get("above_ma20"), spy.get("above_ma50")
     if a20 is None or a50 is None:
         return ""
     state = "평균선 위" if a20 and a50 else "평균선 아래" if not a20 and not a50 else ("20일선 아래" if not a20 else "50일선 아래")
-    lines = [("점수나 신호등으로 묶지 않고 사실만 보여 드립니다. 이런 사실을 묶은 시장 상태 점수는 기록상 앞날을 가르지 못했습니다.", "plain"),
+    lines = [("점수나 신호등으로 묶지 않고 사실만 보여 드립니다.", "plain"),
              ("row", "S&P 500 추세", f"20일선 {'위' if a20 else '아래'} · 50일선 {'위' if a50 else '아래'}", "최근 20 · 50거래일 평균 가격과 비교")]
     if pos.get("from_high_pct") is not None:
         lines.append(("row", "20일 고점 대비", _s(pos["from_high_pct"]), "최근 20거래일 가장 높던 종가와 비교"))
@@ -113,11 +107,8 @@ def market_now_card(a):
         lines.append(("row", "VIX", f"{vix['now']:.2f}", f"5거래일 전 {vix['prev_5d']:.2f}" if vix.get("prev_5d") is not None else "시장이 예상하는 흔들림"))
     if rates.get("us10y_change_5d_bp") is not None:
         lines.append(("row", "10년물 금리 (5일)", f"{int(rates['us10y_change_5d_bp']):+d}bp".replace("-", "−"), f"지금 {rates['us10y']:.2f}%" if rates.get("us10y") else ""))
-    up = rc.get("up20") or {}
     tip = ("시장 흐름을 이루는 사실들 (추세 · 흔들림 · 금리)\n"
-           f"· 오늘 {state} : S&P 500(SPY)이 20일선 {'위' if a20 else '아래'}, 50일선 {'위' if a50 else '아래'}\n"
-           + (f"· 기록상 : 2008년 이후 이 사실들을 묶은 점수가 높던 날 · 중간 날 · 낮던 날, 20거래일 뒤 S&P 500이 오른 비율은 {up.get('Risk-On')}% · {up.get('Neutral')}% · {up.get('Risk-Off')}%로 같았습니다"
-              if up else "· 기록상 : 이 사실들을 묶은 점수는 앞날을 가르지 못했습니다"))
+           f"· 오늘 {state} : S&P 500(SPY)이 20일선 {'위' if a20 else '아래'}, 50일선 {'위' if a50 else '아래'}")
     return C.question_card("지금 시장 흐름은?", state, "neutral", "#111", lines, tip=tip)
 
 
@@ -191,8 +182,7 @@ def korea_open_card(a, opened=True):
                                    [("시작 (전날 종가 대비)", C.AMBER), ("장중 (시작 → 종가)", C.GRAY_BAR)], keep_legend=True), "html"))   # 하루를 나눈 조각 — 범례 그대로
     lines.append(("row", "S&P 500 (밤사이)", _s(ks["us_ret"]), f"평소의 {_times(ks['us_z'])}"))
     tip = ("미국 증시가 밤사이 움직인 만큼이 다음 날 한국 증시 시작 가격에 얼마나 들어가는지\n"
-           f"· 오늘 S&P 500 {_s(ks['us_ret'])} : 평소의 {_times(ks['us_z'])}\n"
-           "· 기록상 : 크게 움직인 밤 다음 날 시작 가격을 따라가면 장중에 되돌린 날이 더 많았습니다. 코스피 지수는 2019년까지 뚜렷했습니다")
+           f"· 오늘 S&P 500 {_s(ks['us_ret'])} : 평소의 {_times(ks['us_z'])}")
     state = f"S&P 500 {_s(ks['us_ret'])}"
     return C.question_card("오늘 한국장에 얼마나 닿나?", state, "neutral", "#111", lines, tip=tip, opened=opened)
 
@@ -214,8 +204,7 @@ def korea_pairs_card(a):
     for p in ps:
         lines.append(("row", p["kr_name"], _s(p["us_ret"]), f"짝 : {p['us_name']} · 상관 {p['corr']:.2f}"))
     tip = ("한국 종목과 흔히 같이 보는 미국 지수 · 종목의 지난밤 움직임\n"
-           f"· 오늘 {lead['us_name']} {_s(lead['us_ret'])} : 평소의 {_times(lead['us_z'])}\n"
-           "· 기록상 : 반도체 짝(삼성전자 · SK하이닉스)은 시작 가격 상관 0.6 안팎, 테슬라와 2차전지는 0.4 안팎이었습니다 (2000년 이후)")
+           f"· 오늘 {lead['us_name']} {_s(lead['us_ret'])} : 평소의 {_times(lead['us_z'])}")
     return C.question_card("이어진 국내 종목은?", f"{lead['us_name']} {_s(lead['us_ret'])}", "neutral", "#111", lines, tip=tip)
 
 
@@ -225,7 +214,6 @@ def fx_card(a):
     if fx.get("krw") is None:
         return ""
     spx = ((a.get("series") or {}).get("^GSPC") or {}).get("ret_1d")
-    kc = (a.get("krw_check") or {}).get("big_down") or {}
     lines = []
     if fx.get("spx_won") is not None and spx is not None:
         lines.append((f"원화로 보면 오늘 S&P 500은 {_s(fx['spx_won'])}였습니다 (달러 기준 {_s(spx)}, 원/달러 {_s(fx['ret_1d'])}).", "plain"))
@@ -234,9 +222,7 @@ def fx_card(a):
     if fx.get("spx_won") is not None:
         lines.append(("row", "원화로 본 S&P 500", _s(fx["spx_won"]), f"달러 기준 {_s(spx)}" if spx is not None else ""))
     tip = ("1달러가 몇 원인지와, 미국 주식을 원화로 들고 있을 때의 하루 등락\n"
-           f"· 오늘 {fx['krw']:,.2f}원 : 하루 {_s(fx['ret_1d'])}\n"
-           + (f"· 기록상 : S&P 500이 크게 내린 날({kc['n']}번, 2003년 이후) 원화 약세가 덜어 준 몫은 평균 {abs(kc['spx'] - kc['won']):.1f}%p였고, 그런 날의 {kc['cushion_share']}%에서만 덜어 줬습니다"
-              if kc else ""))
+           f"· 오늘 {fx['krw']:,.2f}원 : 하루 {_s(fx['ret_1d'])}")
     return C.question_card("환율은?", f"{fx['krw']:,.2f}원", "neutral", "#111", lines, tip=tip)
 
 
@@ -263,8 +249,7 @@ def mega_tip(a):
     nr = a.get("normal") or {}
     outs = [s for s in MEGA_KO if s in nr and nr[s]["outside"]]
     now = ("· 오늘 평소 밖 " + " · ".join(f"{MEGA_KO[s]} {_s(nr[s]['ret_pct'])}" for s in outs)) if outs else "· 오늘 : 10개 모두 평소 범위 안"
-    return ("미국 시가총액 상위 10개 회사의 하루 움직임을 그 종목의 평소 크기와 비교한 것. 크게 움직인 순서로 놓았습니다\n" + now
-            + "\n· 기록상 : 평소 밖으로 오른 다음 날 산 결과는 평소 국면에서 아무 날과 다르지 않았습니다 (S&P 500 종목, 약 30년)")
+    return ("미국 시가총액 상위 10개 회사의 하루 움직임을 그 종목의 평소 크기와 비교한 것. 크게 움직인 순서로 놓았습니다\n" + now)
 
 
 # ── 일정 탭 ─────────────────────────────────────────────────────────────
@@ -306,8 +291,7 @@ def macro_cal_card(a, opened=True):
         lines.append(("row", MACRO_KO[x["kind"]], _md(x["day"]), f"그날 S&P 500 보통 ±{e['median']:.2f}% ({e['n']}번)" if e else ""))
     theme, col = _theme_for(items[0]["day"], cal.get("from") or items[0]["day"])
     tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정\n"
-           f"· {days}일 안 {len(items)}건 : 가장 가까운 일정은 {MACRO_KO[items[0]['kind']]} {_md(items[0]['day'])}\n"
-           "· 기록상 : 1996년 이후 일정 날의 S&P 500 움직임을 일정 없는 날과 견줬습니다. 일정이 있다고 늘 크게 움직이지는 않았습니다")
+           f"· {days}일 안 {len(items)}건 : 가장 가까운 일정은 {MACRO_KO[items[0]['kind']]} {_md(items[0]['day'])}")
     return C.question_card("다가오는 경제 일정은?", f"{len(items)}건 · {days}일 안", theme, col, lines, tip=dk.with_src(tip, "FRED · Yahoo Finance"), opened=opened)   # 일정 = FRED 발표일, 움직임 = 가격 (2026-10-20 툴팁 출처)
 
 
@@ -333,6 +317,5 @@ def earnings_cal_card(a):
     lines.append(("발표일은 회사가 확정하기 전 추정일일 수 있습니다.", "note"))
     theme, col = _theme_for(items[0]["day"], cal.get("from") or items[0]["day"])
     tip = ("미국 시가총액 상위 10개 회사의 실적 발표일\n"
-           f"· {days}일 안 {len(items)}곳 : 가장 가까운 발표는 {MEGA_KO[items[0]['symbol']]} {_md(items[0]['day'])}\n"
-           "· 기록상 : 2010년 이후 회사마다 60번 안팎의 발표 다음 날 움직임을 그 종목 보통 날과 견줬습니다")
+           f"· {days}일 안 {len(items)}곳 : 가장 가까운 발표는 {MEGA_KO[items[0]['symbol']]} {_md(items[0]['day'])}")
     return C.question_card("대형주 실적 발표는?", f"{len(items)}곳 · {days}일 안", theme, col, lines, tip=tip)

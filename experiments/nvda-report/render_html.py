@@ -344,8 +344,8 @@ def _multi2(items):
 
 # ── 오늘 한눈에 (2026-10-16 사용자: "주식 초보자도 알기 쉽게" — 가이드 2-4 · 기획 9절) ─────────────────────────────
 # 가격 카드 머리 작은 글씨 한 줄(glance_sub) + 평소 범위 밖일 때 펼침 맨 위 설명(glance_rows). 신호등 라벨은 2026-10-17 없앴다(사용자: 조용함 은 뜻을 모른다). 숫자는 전부 파이썬 값, 글은 고정 틀 — 모델이 쓰지 않는다.
-# 툴팁 글 = 뜻 · 오늘 · 기록상 세 줄 (가이드라인 2-6, 2026-10-18 사용자: "숫자만 나열 말고 그 숫자가 무슨 뜻인지, 적당한 길이로 쉽게").
-# 첫 줄 = 뜻(` : ` 없이), `· 오늘 값 : 뜻` (값은 테마 팝업이 굵게), `· 기록상 : 우리 검증 결론`. 숫자는 파이썬 값, ` — ` 는 쓰지 않는다.
+# 툴팁 글 = 뜻 · 오늘 두 줄 (가이드라인 2-6, 2026-10-18 사용자: "숫자만 나열 말고 그 숫자가 무슨 뜻인지, 적당한 길이로 쉽게").
+# 첫 줄 = 뜻(` : ` 없이), `· 오늘 값 : 뜻` (값은 테마 팝업이 굵게). `기록상` 줄은 2026-11-01 폐지(가이드라인 1절 4-2). 숫자는 파이썬 값, ` — ` 는 쓰지 않는다.
 def _sgn(v, d=1):
     return f"{v:+.{d}f}".replace("-", "−")
 
@@ -439,34 +439,24 @@ def glance_sub(a):
 
 
 def glance_rows(a, n=None):
-    """가격 카드 펼침 맨 위 — 평소 범위 **밖**인 날(충격 국면 아님)의 추가 설명 둘: 지난 1년 횟수 · 우리 검증. 평소 범위 안이면 없다
+    """가격 카드 펼침 맨 위 — 평소 범위 **밖**인 날의 추가 설명: 지난 1년 횟수. 평소 범위 안이면 없다
     (평소 범위 한 줄은 카드 머리 glance_sub 로 옮겼다 — 2026-10-17 사용자)."""
     nr = a.get("normal_range")
     if not nr or nr.get("earnings_day") or abs(nr["z"]) < 2:
         return ""
-    extra = [f"지난 1년 이만큼 움직인 날은 {nr['n_year']}번이었다."]
-    if not (nr.get("market_shock") or {}).get("active"):   # 충격 국면은 시장 충격 카드가 말한다 (A3)
-        extra.append("S&P 500 종목 기준, 평소 국면에서 이렇게 크게 움직인 다음 날 사고판 것은 아무 날에 사고판 것과 다르지 않았다."
-                     + _tipx(NORMAL_DAY_TIP))
+    extra = [f"지난 1년 이만큼 움직인 날은 {nr['n_year']}번이었다."]   # 우리 검증 문장 · 툴팁은 뺐다 (2026-11-01 사용자: 지표 하나로 단언 X, 가이드라인 1절 4-2)
     return _plain_rows([("", x) for x in extra])
-
-
-NORMAL_DAY_TIP = ("평소의 2배 넘게 움직인 다음 날 사고판 결과를 아무 날과 견준 우리 검증\n"
-                  "· 기록상 : 시장 충격이 아닌 때에는 크게 움직인 다음 날 사고판 결과가 아무 날과 비슷했다. 크게 움직인 하루만으로는 사고팔 이유가 되지 않았다")
 
 
 def shock_tip(ms):
     vix = ms.get("vix")
     now = f"· 오늘 {ms.get('days_in') or 1}거래일째 : " + (f"VIX {vix:.1f}" + (", 아직 25 위라 국면이 이어진다" if vix >= 25 else "") if vix is not None else "국면이 이어지는 중")
-    return ("시장 전체가 갑자기 크게 흔들리는 시기. 시장 흔들림 지수(VIX)가 35를 넘으면 시작, 25 아래로 내려오면 끝\n" + now + "\n"
-            "· 기록상 : 이 시기에 급락 다음 날 판 경우는 계속 들고 있던 경우보다 대체로 나빴다")
+    return "시장 전체가 갑자기 크게 흔들리는 시기. 시장 흔들림 지수(VIX)가 35를 넘으면 시작, 25 아래로 내려오면 끝\n" + now
 
 
 def shock_lines(ms):
     lines = [("지금은 시장 충격 국면이다. 시장 흔들림 지수(VIX)가 35를 넘은 " + _fd(ms["start"]) + "에 시작해 오늘로 " + f"{ms.get('days_in') or 1}거래일째이고, "
-              "25 아래로 내려오면 끝난 것으로 본다.", "plain"),
-             ("과거 S&P 500 종목 기준, 이런 국면에서 급락 다음 날 판 경우는 20거래일 뒤 아무 날에 판 경우보다 약 2~3%p, 60거래일 뒤 약 3~7%p 더 손해였다. "
-              "판 것이 나았던 경우도 있었다. 중앙값 기준이다.", "plain")]
+              "25 아래로 내려오면 끝난 것으로 본다.", "plain")]   # 급락 다음 날 매도 검증 문장은 뺐다 (2026-11-01 가이드라인 1절 4-2)
     rec = ms.get("recovery")
     if ms.get("early_complete") and rec:
         lines.append(("row", "충격 첫 5일 흔들림", f"평소의 {ms['early_x']:.1f}배", "1.5배 아래 작음 · 1.8배 넘으면 큼"))
@@ -588,8 +578,7 @@ def year_tip(y):
     pct = y["pct_from_high"]
     where = "1년 최고가 근처" if pct > -0.5 else f"1년 최고가보다 {abs(pct):.1f}% 아래"
     return ("지난 1년 동안 가장 쌌던 값과 가장 비쌌던 값 사이에서 지금 어디쯤인지\n"
-            f"· 오늘 ${y['close']:,.2f} : {where}, 범위의 {max(0.0, min(100.0, y['pos_pct'])):.0f}% 지점\n"
-            "· 기록상 : 고점 근처에서 사든 많이 빠졌을 때 사든, 1년 뒤 손해 볼 확률은 아무 날에 산 것과 비슷했다")
+            f"· 오늘 ${y['close']:,.2f} : {where}, 범위의 {max(0.0, min(100.0, y['pos_pct'])):.0f}% 지점")
 
 
 def vol_tip(vr):
@@ -774,7 +763,7 @@ MOM_GAP = 3   # 순위 막대 카드 ~ 비교 막대 카드 (P168)
 
 def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
     """12개월 모멘텀 — 순위 위치 막대(하위 25% · 상위 25%) + 세로 막대(이 종목 · 우리 종목 중앙값 · 시장). 한국(KOSPI) · 미국(S&P 500) 같은 모양 (2026-10-31).
-    tip 은 부르는 쪽이 — 한국은 `기록상` 줄(K18 통과), 미국은 검증을 통과하지 못해 뜻 · 오늘만."""
+    tip 은 부르는 쪽이 — 뜻 · 오늘 두 줄."""
     x = (total - rank) / max(total - 1, 1) * 100   # 오른쪽 = 1위
     zone = 2 if rank <= total / 4 else 0 if rank > total * 3 / 4 else 1
     names = [("하위 25%", 25), (f"우리 {total}종목 순위", 50), ("상위 25%", 25)]
@@ -1341,7 +1330,6 @@ def dd_tip(d):
 
 
 EARN_TIP_HEAD = "실적 발표 다음 날 주가가 움직인 크기. 오르내림 방향은 보지 않는다"
-EARN_TIP_REC = "· 기록상 : 실적이 예상보다 좋았든 나빴든, 발표 뒤 몇 달 동안 주가는 아무 날과 비슷하게 움직였다"
 
 
 def _row_html(left_html, right_html, note="", first=False, inline_note=False):
@@ -1430,7 +1418,7 @@ def sec_earnings(a):
                  f'{_dk.CHART_TITLE}최근 {n}번 실적이 반영된 날 (%)</span>'
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')   # 설명 글(왼쪽이 오래된 것 · 연.월)은 삭제 (2026-10-17 사용자)
     body = _fold_rows(head, rows) if head else rows   # 다음 발표 줄 오른쪽 접기 — 보통 변동 · 최근 8번은 펼쳤을 때만 (2026-10-18 사용자)
-    return _card_title("실적 발표 후 가격 변동", EARN_TIP_HEAD + tip_now + "\n" + EARN_TIP_REC) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{body}</span></div>'
+    return _card_title("실적 발표 후 가격 변동", EARN_TIP_HEAD + tip_now) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}">{body}</span></div>'
 
 
 def sec_headline(a, n=None):
@@ -1503,16 +1491,14 @@ def rsi_tip(v):
         how = ("많이 오른 쪽" if v >= 70 else "많이 빠진 쪽" if v <= 30 else "중간쯤" if 45 <= v <= 55
                else "중간보다 아래" if v < 45 else "중간보다 위")
         now = f"\n· 오늘 {v:.1f} : {how}. 70을 넘으면 많이 올랐다, 30 아래면 많이 빠졌다고들 한다"
-    return ("최근 2주 동안 오르는 힘이 얼마나 셌는지를 0~100 점수로 나타낸 것" + now +
-            "\n· 기록상 : 이 점수가 70을 넘거나 30 아래로 내려간 뒤에도 1~3개월 주가는 아무 날과 비슷했다")
+    return "최근 2주 동안 오르는 힘이 얼마나 셌는지를 0~100 점수로 나타낸 것" + now
 
 
 def cross_tip(mc):
     now = {"golden": "· 오늘 골든크로스 : 50일선이 200일선 위로 올라섰다",
            "death": "· 오늘 데드크로스 : 50일선이 200일선 아래로 내려갔다"}.get(
         mc, "· 오늘 교차 없음 : 오늘은 두 선이 엇갈리지 않았다. 50일선이 위로 올라서면 골든크로스, 아래로 내려가면 데드크로스")
-    return ("50일 평균 가격선과 200일 평균 가격선이 서로 엇갈렸는지\n" + now +
-            "\n· 기록상 : 두 선이 엇갈린 뒤 1~3개월 주가는 아무 날과 비슷했고, 시기마다 방향도 반대였다")
+    return "50일 평균 가격선과 200일 평균 가격선이 서로 엇갈렸는지\n" + now
 
 
 REGIME_THEME = {"상승 추세": ("positive", UP), "단기 조정": ("neutral", MUTED), "조정장": ("negative", DOWN), "불안 국면": ("neutral", MUTED)}   # 불안 국면 노랑 → 회색 (2026-10-17 W7: 노랑 강조는 시장 충격 국면만)
@@ -1816,15 +1802,7 @@ def bollinger_rule(bb):
                 f"· 오늘 ${bb['close']:,.2f} : 한 달 범위(${bb['lower']:,.0f}~${bb['upper']:,.0f}) 안")
     low = bb["state"] == "하단 도달"
     now = (f"· 오늘 ${bb['close']:,.2f} : 한 달 범위(${bb['lower']:,.0f}~${bb['upper']:,.0f})의 {'아래' if low else '위'} 끝 밖, {bb.get('days') or 1}일째")
-    st = (bb.get("stats") or {})
-    s, base = st.get("boll_lower" if low else "boll_upper") or {}, st.get("base") or {}
-    rec = ""
-    if s.get("n") and base.get("up20") is not None:
-        d = s["up20"] - base["up20"]
-        same = abs(d) <= 5
-        rec = (f"\n· 기록상 : 엔비디아가 {'아래' if low else '위'} 끝에 처음 닿은 {s['n']}번, 20일 뒤 오른 비율({s['up20']}%)이 아무 날({base['up20']}%)"
-               + ("과 비슷했다. " + ("바닥 신호는 아니었다" if low else "꼭대기 신호는 아니었다") if same else ("보다 높았다" if d > 0 else "보다 낮았다")))
-    return "최근 한 달 동안 가격이 보통 움직인 범위\n" + now + rec
+    return "최근 한 달 동안 가격이 보통 움직인 범위\n" + now
 
 
 def _span_label(stats):
@@ -2011,8 +1989,7 @@ def overheat_rule(oh):
     names = ", ".join(OVERHEAT_TIP_NAME[k].format(v=oh["values"].get(k) or 0) for k in oh["active"])
     return (f"최근 너무 빨리 올랐는지 세 가지로 본다. 2주 오르는 힘 {config.OVERHEAT_RSI:.0f}점 이상, 200일 평균보다 {config.OVERHEAT_MA200_PCT:.0f}% 넘게 위, "
             f"한 달에 {config.OVERHEAT_RET20_PCT:.0f}% 넘게 오름\n"
-            f"· 오늘 {len(oh['active'])}개 해당 : {names}\n"
-            "· 기록상 : 이 조건에 들어간 뒤 1~3개월 주가는 아무 날과 비슷했다. 과열이라고 더 떨어지지 않았다")
+            f"· 오늘 {len(oh['active'])}개 해당 : {names}")
 
 
 OVERHEAT_SHORT = {"rsi80": ("단기 과열 온도 (RSI 14)", "80 이상", "", "14일 오른 힘 비율 0~100"),
