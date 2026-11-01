@@ -955,8 +955,8 @@ def sec_expect(s, open_first=True):
 def sec_earnings_tab(s):
     """`실적` 탭 (2026-11-01 사용자 P196: 일정 탭을 실적 탭에 합쳐 의견 탭 자리를 만든다) — 다음 실적 발표는?(펼침) → 돈을 더 버나 · 이익 예상
     → `주요 일정` 제목 → 미국 연결 종목 일정 · 시장 전체를 흔들 일정 (P197: 실적과 일정을 제목으로 나누고, 카드 밖 전체 일정 목록은 연결 종목 카드 안으로)."""
-    return (sec_calendar(s, ("earnings",)) + sec_expect(s, open_first=False)
-            + R.group_title("주요 일정") + sec_calendar(s, ("peers", "macro"), open_first=False))
+    # `다음 실적 발표는?` 도 `주요 일정` 제목 아래 첫 카드로 (2026-11-01 사용자 P251) — 탭 첫 카드 = 돈을 더 버나(펼침, P216)
+    return (sec_expect(s) + R.group_title("주요 일정") + sec_calendar(s, ("earnings", "peers", "macro"), open_first=False))
 
 
 def sec_opinions(s):

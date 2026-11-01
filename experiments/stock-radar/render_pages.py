@@ -464,8 +464,8 @@ def sec_opinions(s):
 
 def sec_earnings_tab(s):
     """`실적` 탭 (P196 · P197, 한국 sec_earnings_tab 과 같게) — 다음 실적 발표는?(펼침) → 실적 · 기대 카드 → `주요 일정` 제목 → 함께 보는 회사 일정 · 시장 일정."""
-    return (sec_calendar(s, ("earnings",)) + sec_expect(s, open_first=False)
-            + R.group_title("주요 일정") + sec_calendar(s, ("peers", "macro"), open_first=False))
+    # `다음 실적 발표는?` 도 `주요 일정` 제목 아래 첫 카드로 (2026-11-01 사용자 P251) — 탭 첫 카드 = 돈을 더 버나(펼침, P216)
+    return (sec_expect(s) + R.group_title("주요 일정") + sec_calendar(s, ("earnings", "peers", "macro"), open_first=False))
 
 
 EPS_DIR = {"높아지는 중": 1, "낮아지는 중": -1, "그대로": 0}

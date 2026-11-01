@@ -850,11 +850,11 @@ GROUP_ICON = {   # 분류 제목 앞 작은 선 아이콘 — 제목 뜻에 맞�
 def group_head(text, first=False):
     """전망 카드 안 분류 제목 (P210) — 굵은 15px, 위 여백으로 묶음을 가른다. 아래 줄의 구분선이 제목 밑줄 역할. 앞에 뜻 아이콘(P241)."""
     ic = GROUP_ICON.get(text)
-    # 흰 면(20px 둥근 네모) 안 12px 아이콘 (2026-11-01 사용자 P246: 흰 면 안 아이콘, 너무 크지 않게)
+    # 검은 면(20px 둥근 네모) 안 흰 선 12px 아이콘 (2026-11-01 사용자 P246 흰 면 → P249 반대로)
     icon = (f'<span style="display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;margin-right:6px;'
-            f'background:#fff;border-radius:5px;color:#475569;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
-    # 위 18 → 29 (+60%, P248) · 아래(첫 줄 구분선까지) 6 → 15 (2.5배, P247)
-    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 15px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
+            f'background:#111;border-radius:5px;color:#fff;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
+    # 위 18 → 29 (+60%, P248). 아래는 6 그대로 — P247 은 첫 줄 위 여백으로 (TOGETHER_FIRST_PAD)
+    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
 
 
 def hot_rows(news):
@@ -883,7 +883,7 @@ def outlook_extra_html(hot, sched):
     if hot:
         out += group_head("호재 · 리스크")
         for i, (label, kw, n, head, url) in enumerate(hot):   # 기사 링크로 두면 테마가 `번역 방법` · 바깥 링크 아이콘을 붙인다 → 오늘 탭 뉴스로 이동 (P204 이동 아이콘 없음)
-            out += (f'<span role="link" tabindex="0" data-goto-tab="오늘" data-goto-card="뉴스" style="display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:{TOGETHER_ROW_H}px;padding:6px 0;box-sizing:border-box;'
+            out += (f'<span role="link" tabindex="0" data-goto-tab="오늘" data-goto-card="뉴스" style="display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:{TOGETHER_ROW_H + (TOGETHER_FIRST_PAD if i == 0 else 0)}px;padding:{6 + (TOGETHER_FIRST_PAD if i == 0 else 0)}px 0 6px;box-sizing:border-box;'
                     f'cursor:pointer;border-top:1px solid {TOGETHER_LINE if i == 0 else "transparent"};font-size:{_dk.NAME};line-height:{LH_CARD};color:#111;">'   # 구분선은 구획 제목 아래만 (P232)
                     f'<span style="min-width:0;flex:1 1 auto;">{_esc(kw)}<span style="font-size:{MICRO};color:{NOTE};margin-left:4px;">({n}건)</span>'
                     + (f'<span style="display:block;font-size:{MICRO};line-height:20px;color:{NOTE};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{_esc(head)}</span>' if head else "")
@@ -892,7 +892,7 @@ def outlook_extra_html(hot, sched):
         out += group_head("앞둔 일정", not hot)
         for i, (text, when, tab, card) in enumerate(sched):
             out += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;'
-                    f'min-height:{TOGETHER_ROW_H}px;padding:6px 0;box-sizing:border-box;cursor:pointer;border-top:1px solid {TOGETHER_LINE if i == 0 else "transparent"};font-size:{_dk.NAME};line-height:{LH_CARD};">'
+                    f'min-height:{TOGETHER_ROW_H + (TOGETHER_FIRST_PAD if i == 0 else 0)}px;padding:{6 + (TOGETHER_FIRST_PAD if i == 0 else 0)}px 0 6px;box-sizing:border-box;cursor:pointer;border-top:1px solid {TOGETHER_LINE if i == 0 else "transparent"};font-size:{_dk.NAME};line-height:{LH_CARD};">'
                     f'<span style="min-width:0;color:#111;">{_esc(text)}</span>'
                     f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;color:{TOGETHER_FLAT};">{_esc(when)}{TS.box("flat", "불확실", _esc, sym=False)}</span></span>')
     return f'<span style="display:block;margin:{_dk.CHART_STACK_GAP}px 0 0;">{out}</span>' if out else ""
@@ -1097,6 +1097,7 @@ TOGETHER_TITLE = "Alpha Scope 데이터로 함께 보기"   # 방송 의견 아�
 
 # 함께 보기 안쪽 카드 (2026-10-31 사용자 P168): 상승 쪽 · 하락 쪽 · 중립을 각자 카드로 감싼다. 바깥 강조 카드와 같은 색이면 한 단계 진하게
 TOGETHER_FLAT = "#4B5563"   # 함께 보기 중립 대답 — 흐린 회색 대신 조금 빠진 검정 (2026-10-31 사용자 P173)
+TOGETHER_FIRST_PAD = 10   # 분류 첫 줄(`12개월 모멘텀` · `회사 매출` …) 위 = 구분선 ~ 글자 보이는 7 → 17 (2.5배, 2026-11-01 사용자 P247) — 줄 높이 · 위 padding 에 더한다
 TOGETHER_HEAD_FS, TOGETHER_ROW_H = "15px", 38   # `▲ 상승 쪽` 14 → 15 · 줄 높이 44 → 57 (×1.3) (2026-10-31 사용자 P169) → 38: 라벨(25) 사이 위아래 여백 32 → 13 (60% 줄임, 정수, 2026-11-01 사용자 P239)
 TOGETHER_END = "<!--together-end-->"   # 강조 카드가 함께 보기로 끝나면 아래 = 좌우 15 로 당긴다 (_pull_end_chart, P169)
 TOGETHER_DEEP = {"positive": ("#FFEDD8", "#FCD9AD"), "negative": ("#E1EDFE", "#C3DBFB"), "neutral": ("#FFFFFF", "#E2E8F0")}
@@ -1127,10 +1128,11 @@ def together_block(items, outer=None, title=True):
         for ri, it in enumerate(rows):
             nm, st, d, tab, card = it[:5]
             line = TOGETHER_LINE if not g or ri == 0 else "transparent"   # 분류 제목 아래(첫 줄 위)에만 구분선, 같은 분류 줄 사이는 없음 (2026-11-01 사용자 P232) — 높이는 그대로
+            add = TOGETHER_FIRST_PAD if g and ri == 0 else 0
             kind, word, col = {1: ("up", "상승", UP), -1: ("down", "하락", DOWN)}.get(d, ("flat", "중립", TOGETHER_FLAT))
             hz = f'<span style="font-size:{MICRO};font-weight:400;color:{NOTE};margin-left:4px;white-space:nowrap;">({_esc(it[5])})</span>' if len(it) > 5 and it[5] else ""   # 기간 = 이름 뒤 괄호 한 줄 (2026-11-01 사용자 P211, 옛 이름 아래 줄)
             out += (f'<span role="link" tabindex="0" data-goto-tab="{_esc(tab)}" data-goto-card="{_esc(card)}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;'
-                    f'min-height:{TOGETHER_ROW_H}px;padding:6px 0;box-sizing:border-box;cursor:pointer;border-top:1px solid {line};font-size:{_dk.NAME};line-height:{LH_CARD};">'   # 18 → 16 — 대답 · 라벨이 한 줄에 들어가게 (360px 줄 폭 286, P173)
+                    f'min-height:{TOGETHER_ROW_H + add}px;padding:{6 + add}px 0 6px;box-sizing:border-box;cursor:pointer;border-top:1px solid {line};font-size:{_dk.NAME};line-height:{LH_CARD};">'   # 18 → 16 — 대답 · 라벨이 한 줄에 들어가게 (360px 줄 폭 286, P173)
                     f'<span style="min-width:0;color:#111;">{_esc(nm)}{hz}</span>'
                     f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;font-weight:{400 if d == 0 else 700};color:{col};">{_esc(st.lstrip("▲▼ "))}'
                     f'{TS.box(kind, word, _esc)}</span></span>')   # 대답 → 라벨. 나가는 아이콘은 뺐다 (2026-11-01 사용자 P204). 중립 대답은 보통 굵기 · 조금 빠진 검정 (P173)
@@ -2498,7 +2500,7 @@ def target_table(cells, close, m0=None, sep="#E2E8F0"):
     tip = _dk.with_src("애널리스트들이 내다본 1년 뒤 목표 주가의 평균 · 중앙 · 최고 · 최저와 현재가 대비 차이" + now, "Yahoo Finance")   # 안내 기호 (P236)
     # 위 구분선 없이 · 위 간격 = `평균 등급` 제목 위와 같은 22 (P224 · P226), 제목 = `평균 등급` 과 같은 16px 굵게 · 행간 (P225), 글자 = 범례와 같은 14px (P227)
     return (f'<span style="display:block;margin:{12 + _dk.CHART_STACK_GAP}px 0 0;font-size:{_dk.MICRO};color:{NOTE};">'
-            f'<span style="{_dk._CHART_TITLE_STYLE}margin:0 0 {_dk.CHART_TITLE_GAP + 4}px;">애널리스트 목표가{_tipx(tip)}</span>'
+            f'<span style="{_dk._CHART_TITLE_STYLE}margin:0 0 {_dk.CHART_TITLE_GAP + 4}px;">{_dk.CHART_MARK}애널리스트 목표가{_tipx(tip)}</span>'   # 앞 ※ = `※ 평균 등급` 과 같게 (2026-11-01 사용자 P250)
             f'<span style="display:flex;align-items:stretch;">{cols}</span></span>')
 
 def targets_parts(a, m0=None, m2=None):
