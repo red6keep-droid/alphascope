@@ -833,6 +833,9 @@ GROUP_ICON = {   # 분류 제목 앞 작은 선 아이콘 — 제목 뜻에 맞�
     "자금 흐름": '<path d="M2 5.5h10M9.5 3l2.5 2.5L9.5 8M14 10.5H4M6.5 8L4 10.5 6.5 13"/>',                    # 오가는 화살표
     "증시": '<path d="M5 2v12M11 2v12"/><rect x="3" y="4.5" width="4" height="6" rx=".5"/><rect x="9" y="6" width="4" height="5" rx=".5"/>',   # 봉 둘 (2026-11-01 사용자 P252, 옛 셋)
     "뉴스 · 방송": '<rect x="1.5" y="3" width="13" height="9" rx="1.5"/><path d="M6.5 5.5v4l3.5-2z"/><path d="M5 14.5h6"/>',   # 화면 + 재생
+    "주가 추세": '<path d="M2 12l4-4 3 3 5-6"/><path d="M10.5 5H14v3.5"/>',   # 2026-11-03 중기 분류 — 주가 흐름과 같은 그림
+    "공매도": '<path d="M2 4l5 5 3-3 4 4"/><path d="M10.5 10H14V6.5"/>',
+    "전문가 의견": '<path d="M2.5 3.5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7l-3 2.5v-2.5H2.5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z"/>',   # 의견과 같은 말풍선
     "의견": '<path d="M2.5 3.5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7l-3 2.5v-2.5H2.5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z"/>',   # 말풍선
     "호재 · 리스크": '<path d="M8 2l6.5 11.5h-13z"/><path d="M8 6.5v3M8 11.6v.1"/>',                           # 주의 삼각형
     "앞둔 일정": '<rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/>',   # 달력
@@ -842,14 +845,18 @@ GROUP_ICON = {   # 분류 제목 앞 작은 선 아이콘 — 제목 뜻에 맞�
 GROUP_TILE = {"positive": "rgba(194,65,12,.3)", "negative": "rgba(26,115,232,.3)", "uncertain": "rgba(109,40,217,.3)", "soon": "rgba(109,40,217,.3)"}   # 아이콘 면 = 카드 색의 진한 색 — 주황 · 파랑 · 보라 카드 (2026-11-01 사용자 P254), 회색 카드는 검정. 투명도 50 → 60 → 70% (불투명 .3, P255 · P256)
 
 
-def group_head(text, first=False, theme=None):
+def group_head(text, first=False, theme=None, vote=None):
     """전망 카드 안 분류 제목 (P210) — 굵은 15px, 위 여백으로 묶음을 가른다. 아래 줄의 구분선이 제목 밑줄 역할. 앞에 뜻 아이콘(P241)."""
     ic = GROUP_ICON.get(text)
     # 검은 면(투명도 50%, P252) · 20px 둥근 네모 안 흰 선 12px 아이콘 (2026-11-01 사용자 P246 흰 면 → P249 반대로)
     icon = (f'<span style="display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;margin-right:6px;'
             f'background:{GROUP_TILE.get(theme, "rgba(17,17,17,.3)")};border-radius:5px;color:#fff;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
     # 위 18 → 29 (+60%, P248). 아래는 6 그대로 — P247 은 첫 줄 위 여백으로 (TOGETHER_FIRST_PAD)
-    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
+    v = ""
+    if vote is not None:   # 분류 한 표 (2026-11-03 재설계 3-2) — 오른쪽 작은 글자
+        v = (f'<span style="margin-left:auto;font-size:{TINY};font-weight:700;color:{ {1: UP, -1: DOWN}.get(vote, NOTE) };white-space:nowrap;">'
+             f'분류 {"▲ 상승" if vote == 1 else "▼ 하락" if vote == -1 else "중립"}</span>')
+    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}{v}</span>')
 
 
 def hot_rows(news):
@@ -911,43 +918,60 @@ def outlook_extra_html(hot, sched, theme=None, news=None):
 
 
 def together_card(t):
-    """`Alpha Scope 전망은?`(로고 + 글자, P208) 강조 카드 — 매수의견 탭 셋째, 접기 버튼 · 펼침은 다른 강조 카드와 같다 (2026-11-01 사용자 P206 · P207).
-    t = 함께 보기 줄 목록, 또는 {"items": 줄, "news": 최근 7일 기사 · 방송, "sched": 앞둔 일정 [(글, 언제, 탭, 카드)]} (P218).
-    답 = 가장 많은 방향 하나(상승 · 하락 · 중립, 같으면 엇갈림), 카드 색 = 그 방향. 펼치면 분포 문장 → 분류별 줄(P210) → 호재 · 리스크 → 앞둔 일정.
-    Claude 는 개수 다수결 한 단어가 검증 전 지표를 합친 결론 · 블로그 의견으로 읽힌다고 반대했으나 사용자 결정(P207). 툴팁에 `추천이 아니다`."""
+    """`Alpha Scope 신호는?`(로고 + 글자, P208) 강조 카드 — 매수의견 탭, 접기 · 펼침은 다른 강조 카드와 같다.
+    2026-11-03 재설계 (doc/기획/알파스코프-신호-재설계.md, 사용자 "그렇게 할게"): 옛 라벨 개수 다수결(P207)을 버리고 지금 상태 요약으로 —
+    답 둘 = 단기(며칠) · 중기(한 달~분기). 분류 안 판정은 평균으로 분류마다 한 표, 표의 평균 ±0.5 로 답 (signal_groups.horizon_votes).
+    업계 현황은 배경 줄(세지 않음), 과열은 검증에서 거꾸로라 세지 않는다. 검증을 통과한 신호가 생기면 그 신호로 예측 답을 붙인다.
+    t = 함께 보기 줄 목록, 또는 {"items": 줄, "news": 최근 7일 기사 · 방송, "sched": 앞둔 일정} (P218)."""
+    import signal_groups as SG
     t = t if isinstance(t, dict) else {"items": t}
     items = [x for x in t.get("items") or [] if x and x[1]]
     if not items:
         return ""
-    cnt = [(d, w, c, sum(1 for x in items if x[2] == d)) for d, w, c in TOGETHER_WORDS]
-    top = max(n for *_, n in cnt)
-    lead = [x for x in cnt if x[3] == top]
-    d, word = (lead[0][0], lead[0][1]) if len(lead) == 1 else (None, "엇갈림")
-    theme, col = {1: ("positive", UP), -1: ("negative", DOWN)}.get(d, ("neutral", "#111"))
-    dist = " · ".join(f'<b style="font-weight:700;color:{c};">{w} {n}개</b>' for _, w, c, n in cnt if n)
-    # 부가 설명 (2026-11-01 사용자 P245: 문장을 조금 더 길게) — 상승 · 하락이 어느 분류에 많이 모였나(많은 순 3개까지) + 아래에 무엇이 있나
-    where = []
-    for dd, w, c, n in cnt:
-        if dd == 0 or not n:
+    hv = SG.horizon_votes(items)
+    word = {1: "상승 쪽", -1: "하락 쪽", 0: "중립", None: "판단 유보"}
+    wcol = {1: UP, -1: DOWN}
+    arrow = {1: "▲ ", -1: "▼ "}
+    (s_d, s_per), (m_d, m_per) = hv["단기"], hv["중기"]
+    ds = {d for d in (s_d, m_d) if d in (1, -1)}
+    lead = ds.pop() if len(ds) == 1 else None   # 두 답이 같은 쪽이거나 하나만 방향 → 그 색, 서로 반대 · 둘 다 중립 → 회색
+    theme, col = {1: ("positive", UP), -1: ("negative", DOWN)}.get(lead, ("neutral", "#111"))
+    plain = f"단기 {word[s_d]} · 중기 {word[m_d]}"
+    rich = ('<span style="display:inline-flex;flex-direction:column;align-items:flex-end;line-height:24px;">'   # 두 답을 두 줄로 — 한 줄이면 폰 폭을 넘는다
+            + "".join(f'<span style="color:{wcol.get(d, "#111")};">{hz} {arrow.get(d, "")}{word[d]}</span>' for hz, d in (("단기", s_d), ("중기", m_d))) + "</span>")
+    sent = (f"지금 단기(며칠) 흐름은 <b style=\"font-weight:700;color:{wcol.get(s_d, '#111')};\">{word[s_d]}</b>, "
+            f"중기(한 달~분기) 흐름은 <b style=\"font-weight:700;color:{wcol.get(m_d, '#111')};\">{word[m_d]}</b>이다. 분류마다 한 표씩 셌다."
+            + note_span("라벨을 클릭하면 자세한 내용으로 이동합니다.", mark=True))
+    body = ""
+    for hz, span, cats in SG.HORIZONS:
+        d, per = hv[hz]
+        rows = [x for x in items if len(x) > 6 and x[6] in dict(cats)]
+        if not rows:
             continue
-        gs = {}
-        for x in items:
-            if x[2] == dd and len(x) > 6 and x[6]:
-                gs[x[6]] = gs.get(x[6], 0) + 1
-        top_g = sorted(gs, key=lambda g: -gs[g])[:3]
-        if top_g:
-            where.append(f'<b style="font-weight:700;color:{c};">{w}</b>은 {" · ".join(_esc(g) for g in top_g)} 쪽')
-    more = (f" {', '.join(where)}에 많다." if where else "")
-    more += note_span("라벨을 클릭하면 자세한 내용으로 이동합니다.", mark=True)   # 문구 · 앞 ※ (2026-11-01 사용자 P258)   # 옛 `아래에서 분류별 판정과 … 볼 수 있다` 문장 대신 늘 같은 안내 (2026-11-01 사용자 P253)
-    lines = [(f"{dist}로 나뉜다.{more}", "rich"),   # 옛 `이 페이지 카드 n개의 판정이` (P209)
-             (together_block(items, theme, title=False) + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or [], theme, t.get("news") or []), "html")]
-    tip = ("이 페이지 여러 카드의 판정을 분류별로 상승 · 하락 · 중립으로 다시 놓은 것. 줄마다 판정이 통하는 기간을 괄호에 적었다\n"
-           f"· 지금 : {word} (" + " · ".join(f"{w} {n}" for _, w, _c, n in cnt if n) + ")\n"
-           "· 나누는 법 : 가장 많은 쪽, 같으면 엇갈림. 호재 · 리스크와 일정은 세지 않는다. 대부분 검증 전 지표다\n· 이 블로그의 추천이 아니다")
-    card = _state_card(TOGETHER_Q, word, theme, col, lines, "", tip=tip, fold=True)
-    logo = BLOG_LOGO.replace("display:block;", "display:inline-block;vertical-align:-3px;margin-right:6px;", 1).replace('width="18" height="16"', 'width="21" height="19"', 1)   # 로고 20% 크게 = 18 × 16 → 21 × 19 (정수, 비율 313:286 유지, 2026-11-01 사용자 P240)
+        body += horizon_head(f"{hz} ({span})", d, first=not body)
+        body += together_block(rows, theme, title=False, votes=per)
+    bg = [x for x in items if len(x) > 6 and x[6] in dict(SG.BACKGROUND)]
+    if bg:
+        body += horizon_head("배경 (세지 않음)", None)
+        body += together_block(bg, theme, title=False)
+    lines = [(sent, "rich"), (body + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or [], theme, t.get("news") or []), "html")]
+    tip = ("이 페이지 카드들의 지금 판정을 단기(며칠) · 중기(한 달~분기)로 나눠 정리한 것\n"
+           f"· 지금 : {plain}\n"
+           "· 나누는 법 : 분류 안 판정을 상승 +1 · 하락 −1 · 중립 0 으로 평균 내 분류마다 한 표, 표의 평균이 +0.5 이상이면 상승 쪽 · −0.5 이하면 하락 쪽, 그 사이 중립\n"
+           "· 세지 않는 것 : 업계 현황(배경) · 과열 신호 · 호재 · 리스크 · 일정\n· 이 블로그의 추천이 아니다")
+    card = _state_card(TOGETHER_Q, plain, theme, col, lines, "", tip=tip, fold=True, state_rich=rich)
+    logo = BLOG_LOGO.replace("display:block;", "display:inline-block;vertical-align:-3px;margin-right:6px;", 1).replace('width="18" height="16"', 'width="21" height="19"', 1)   # 로고 20% 크게 = 18 × 16 → 21 × 19 (정수, 비율 313:286 유지)
     brand = TOGETHER_Q.rsplit(" ", 1)[0]   # `Alpha Scope` 영문 = 질문 글자(18)보다 1px 작게 · 굵게 (2026-11-01 사용자 P231)
     return card.replace(_esc(brand), logo + f'<span style="font-size:17px;font-weight:700;">{_esc(brand)}</span>', 1)   # 제목 앞 블로그 로고 (P208)
+
+
+def horizon_head(text, d, first=False):
+    """신호 카드 안 기간 제목 — `단기 (며칠)` 왼쪽 · 그 기간 답 라벨 오른쪽, 아래 굵은 구분선 (2026-11-03 재설계). d = None 이면 라벨 없음(배경)."""
+    import tech_signals as TS
+    box = "" if d is None else TS.box({1: "up", -1: "down"}.get(d, "flat"), {1: "상승 쪽", -1: "하락 쪽"}.get(d, "중립"), _esc, fit=True)
+    return (f'<span data-horizon="1" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin:{4 if first else 26}px 0 0;'
+            f'padding:0 0 8px;border-bottom:2px solid rgba(15,23,42,.18);font-weight:700;color:#111;font-size:{_dk.NAME};line-height:24px;">'
+            f'<span>{_esc(text)}</span>{box}</span>')
 
 
 ZOOM_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'
@@ -1117,7 +1141,7 @@ BLOG_LOGO = ('<svg viewBox="0 0 313 286" width="18" height="16" aria-hidden="tru
              '<path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000000"/></svg>')   # 블로그 로고 (alphaflow-home .logo-mark)
 
 
-def together_block(items, outer=None, title=True):
+def together_block(items, outer=None, title=True, votes=None):
     """방송 의견 아래 `Alpha Scope 데이터로 함께 보기` — items = [(이름, 판정 말, 방향 +1 · −1 · 0, 탭 이름, 카드 제목[, 기간])] (signal_groups, P172).
     ▲ 상승 쪽 · ▼ 하락 쪽 · 중립 묶음으로 나눠 놓기만 한다 — 의견이 맞다 · 상충한다 같은 평가 말 · 종합 점수는 쓰지 않는다(매수 추천 금지).
     묶음마다 방향 색 카드(상승 = 주황 · 하락 = 파랑 · 중립 = 회색), outer = 바깥 강조 카드 theme — 같은 색이면 TOGETHER_DEEP (P168). 제목 앞 블로그 로고.
@@ -1136,7 +1160,7 @@ def together_block(items, outer=None, title=True):
     out = ""
     for gi, (g, rows) in enumerate(groups):
         if g:
-            out += group_head(g, gi == 0, outer)
+            out += group_head(g, gi == 0, outer, (votes or {}).get(g))
         for ri, it in enumerate(rows):
             nm, st, d, tab, card = it[:5]
             line = TOGETHER_LINE if not g or ri == 0 else "transparent"   # 분류 제목 아래(첫 줄 위)에만 구분선, 같은 분류 줄 사이는 없음 (2026-11-01 사용자 P232) — 높이는 그대로
@@ -1289,6 +1313,20 @@ def _move_word(n, order):
     """가장 많은 쪽 하나 — 상향 · 하향(또는 긍정 · 부정)이 같으면 `엇갈림`, 둘 다 없으면 셋째(유지 · 중립)."""
     a, b, c = order
     return a if n[a] > n[b] else b if n[b] > n[a] else (c if not n[a] else "엇갈림")
+
+
+def broker_word(cs):
+    """증권사 목표가 변경 답(신호 카드 줄) — 상향 · 하향 · 유지 · 엇갈림, 없으면 None (2026-11-03)."""
+    if not cs:
+        return None
+    return _move_word({k: sum(1 for c in cs if broker_move(c) == k) for k in MOVE_ORDER}, MOVE_ORDER)
+
+
+def news_op_word(ns):
+    """뉴스 의견 답(신호 카드 줄) — 긍정 · 부정 · 중립 · 엇갈림, 없으면 None (2026-11-03)."""
+    if not ns:
+        return None
+    return _move_word({k: sum(1 for x in ns if TONE_OF.get(x["direction"], "중립") == k) for k in TONE_ORDER}, TONE_ORDER)
 
 
 def broker_card(name, cs, close, money, days=BROKER_DAYS):

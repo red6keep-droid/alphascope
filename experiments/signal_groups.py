@@ -13,7 +13,8 @@
 함께 보기 줄 = (이름, 판정 말, 방향 +1 · −1 · 0, 탭, 카드 제목 앞부분, 기간) — render_html.together_block 이 읽는다.
 """
 
-SCHEME = "2026-11-01a"   # 11-01: 증시 분위기 이름 · 뉴스 · 의견 분류 · 모멘텀 / 평균선 말 (방향 해석은 그대로)   # 분류표 버전 — 방향 해석을 바꾸면 올린다
+SCHEME = "2026-11-03a"   # 11-03: 단기 · 중기 · 배경 분류, 과열 = 세지 않음(검증 거꾸로), 증권사 목표가 · 뉴스 의견 추가 (알파스코프-신호-재설계.md)
+# 옛 SCHEME = "2026-11-01a"   # 11-01: 증시 분위기 이름 · 뉴스 · 의견 분류 · 모멘텀 / 평균선 말 (방향 해석은 그대로)   # 분류표 버전 — 방향 해석을 바꾸면 올린다
 
 # 기간 꼬리표 (A5-2) — 기간이 다른 신호를 한 표로 세면 뜻이 없다. 함께 보기 줄마다 작은 글씨로 보인다
 OPEN, DAYS, MONTH, QUARTER = "다음 날 시가", "며칠", "한 달", "분기"
@@ -62,16 +63,26 @@ TABLE = {
                       direction={"매수": UP, "매도": DOWN}),
     "picks":     dict(name="방송 의견", tab="매수의견", card="방송 의견은?", horizon=DAYS, family=OUTSIDE,
                       direction={"매수": UP, "매도": DOWN}),
+    "broker":    dict(name="증권사 목표가 변경", tab="매수의견", card="증권사 목표가 변경은?", horizon=MONTH, family=OUTSIDE,   # P275 · 2026-11-03 신호에 넣음
+                      direction={"상향": UP, "하향": DOWN}),
+    "news_ops":  dict(name="뉴스 의견", tab="매수의견", card="뉴스 의견은?", horizon=DAYS, family=NEWS,
+                      direction={"긍정": UP, "부정": DOWN}),
 }
 
 # 전망 카드 분류 제목 — 줄을 이 묶음으로 나눠 놓는다 (2026-11-01 사용자 P210 · P218: "알파스코프가 체계적으로 보이게"). 이름 · 순서는 Claude
-GROUPS = [("주가 흐름", ("momentum", "ma", "tech", "overheat")),
-          ("실적 전망", ("revenue", "eps")),
-          ("업계 현황", ("bsi", "biz_work", "biz_work2", "biz_money")),
-          ("자금 흐름", ("sector_flow", "short")),
-          ("증시", ("regime", "shock", "pairs")),
-          ("뉴스 · 방송", ("news",)),
-          ("의견", ("analysts", "picks"))]
+# 2026-11-03 사용자 결정 (알파스코프-신호-재설계.md 3-1 · 3-3): 단기(며칠) · 중기(한 달~분기) 두 답, 업계 현황은 세지 않는 배경
+SHORT = [("주가 흐름", ("tech", "overheat")),
+         ("자금 흐름", ("sector_flow",)),
+         ("증시", ("regime", "shock", "pairs")),
+         ("뉴스 · 방송", ("news", "picks", "news_ops"))]
+MID = [("주가 추세", ("momentum", "ma")),
+       ("실적 전망", ("revenue", "eps")),
+       ("전문가 의견", ("analysts", "broker")),
+       ("공매도", ("short",))]
+BACKGROUND = [("업계 현황", ("bsi", "biz_work", "biz_work2", "biz_money"))]
+HORIZONS = [("단기", "며칠", SHORT), ("중기", "한 달~분기", MID)]
+NOT_COUNTED = {"overheat"}   # 과열 = 하락 쪽 가설이 검증에서 거꾸로 (doc/검증/알파스코프-신호-검증.md) — 줄은 두고 세지 않는다
+GROUPS = SHORT + MID + BACKGROUND
 GROUP_OF = {k: g for g, ks in GROUPS for k in ks}
 
 # 함께 보기에 놓는 순서 — 주가에 가까운 것부터 (P142): 가격 → 실적과 예상 → 수급 → 업종과 경기 → 시장
@@ -128,11 +139,48 @@ def ma_item(ma_rel, name):
     return (nm, st, d, tab, name, hz, grp)
 
 
+def vote(dirs):
+    """분류 한 표 / 기간 답 — 방향(+1 · −1 · 0)의 평균이 +0.5 이상이면 상승 쪽, −0.5 이하면 하락 쪽, 사이 중립 (재설계 3-2). 없으면 None."""
+    if not dirs:
+        return None
+    m = sum(dirs) / len(dirs)
+    return UP if m >= 0.5 else DOWN if m <= -0.5 else FLAT
+
+
+def horizon_votes(items):
+    """함께 보기 줄 → {기간: (답, {분류: 표})}. 줄의 분류 = 줄[6]. 세지 않는 줄(과열 · 업계 현황)은 뺀다."""
+    out = {}
+    counted = {k for _, ks in SHORT + MID for k in ks} - NOT_COUNTED
+    for hz, _, cats in HORIZONS:
+        per = {}
+        for g, ks in cats:
+            ds = [x[2] for x in items if len(x) > 6 and x[6] == g and _key_of(x) in counted]
+            v = vote(ds)
+            if v is not None:
+                per[g] = v
+        out[hz] = (vote(list(per.values())), per)
+    return out
+
+
+def _key_of(row):
+    """줄 → 분류표 키. 이름 칸의 {biz} · {sector} 는 채워져 있어 고정 글자로 맞추고, 여럿 맞으면 고정 글자가 긴 쪽
+    (`반도체 업계 자금` 은 `{biz} 업계 {q}` 와 `{sector} 업계 자금` 둘 다 맞는다 → 업계 자금)."""
+    import re
+    best = None
+    for k, t in TABLE.items():
+        pat = "^" + re.sub(r"\\\{\w+\\\}", ".+", re.escape(t["name"])) + "$"
+        if re.match(pat, row[0]):
+            fixed = len(re.sub(r"\{\w+\}", "", t["name"]))
+            if best is None or fixed > best[0]:
+                best = (fixed, k)
+    return best[1] if best else None
+
+
 def overheat_item(oh):
     """과열 신호 — 해당 조건이 하나라도 있으면 하락 쪽(관행 해석: 과열 = 되돌림). 없는 날은 카드도 없으니 줄도 없다."""
     if not oh or not oh.get("active"):
         return None
-    return _row("overheat", f"{len(oh['active'])}개 조건 해당", DOWN)
+    return _row("overheat", f"{len(oh['active'])}개 조건 해당", FLAT)   # 옛 하락 쪽 — 검증에서 거꾸로(과열 뒤 5일 시장보다 더 오름), 2026-11-03 중립 · 세지 않음
 
 
 def tags(key):

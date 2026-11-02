@@ -656,6 +656,8 @@ def verdict_items(s):
         "news": SG.news_item(_week_news(s)),   # 뉴스 · 방송 분위기 (P218)
         "analysts": SG.item("analysts", (R.analysts_verdict({"status": {"analysts": s.get("analysts") or []}, "headline": {"close": s.get("close")}}) or (None,))[0]),
         "picks": SG.item("picks", R.picks_word(_picks(s))) if _picks(s) else None,
+        "broker": SG.item("broker", R.broker_word(s.get("broker") or [])),   # 증권사 목표가 변경 (2026-11-03 신호에 넣음)
+        "news_ops": SG.item("news_ops", R.news_op_word(_news_opinions(s)) if NOW else None),   # 뉴스 의견
     }
     return got
 
