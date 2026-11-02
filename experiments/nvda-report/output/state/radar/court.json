@@ -1,1 +1,50 @@
-{}
+{
+ "73459129": {
+  "sym": "NVDA",
+  "name": "Hu v. NVIDIA Corporation",
+  "dates": [
+   {
+    "label": "본안 신청 심리",
+    "day": "2026-11-19"
+   },
+   {
+    "label": "기각 신청 심리",
+    "day": "2026-11-19"
+   }
+  ]
+ },
+ "8490233": {
+  "sym": "NVDA",
+  "name": "In re NVIDIA Corporation Securities Litigation",
+  "dates": [
+   {
+    "label": "본안 신청 심리",
+    "day": "2027-05-20"
+   },
+   {
+    "label": "재판",
+    "day": "2027-08-17"
+   }
+  ]
+ },
+ "70919237": {
+  "sym": "AAPL",
+  "name": "City of Coral Springs Police Officers Pension Plan v. Apple Inc.",
+  "dates": []
+ },
+ "74910343": {
+  "sym": "GOOGL",
+  "name": "Stewart v. Alphabet Inc.",
+  "dates": []
+ },
+ "67021509": {
+  "sym": "GOOGL",
+  "name": "AMI - Government Employees Provident Fund v. Alphabet Inc.",
+  "dates": [
+   {
+    "label": "재판",
+    "day": "2028-04-18"
+   }
+  ]
+ }
+}
