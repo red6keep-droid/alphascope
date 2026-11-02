@@ -255,7 +255,7 @@ def _arrow(v, digits=2, unit="%"):
     return f'<span style="color:{col};font-weight:700;white-space:nowrap;">{tri}&nbsp;{abs(v):.{digits}f}{unit}</span>'
 
 
-EPS_CHART_TITLE = "내년 1주당 이익 예상, 그때보다 바뀐 폭 (%)"   # 옛 `○일 전 대비` 가 `0일` 로 읽혔다 (2026-10-28 사용자 P64)
+EPS_CHART_TITLE = "다음 회계연도 1주당 이익 예상, 그때보다 바뀐 폭 (%)"   # 옛 `○일 전 대비` 가 `0일` 로 읽혔다 (2026-10-28 사용자 P64)
 
 
 PRICE_ROW_L = "flex:0 1 auto;max-width:36%;min-width:0;white-space:normal;"   # 가격 줄 이름 칸은 이름 길이만큼(최대 36% — 긴 이름이어도 보통 가격은 412px 폰에서 한 줄) — 남는 폭은 값 칸이 써서 보통 가격은 한 줄 (P61)
@@ -2872,7 +2872,8 @@ def card_revenue(c):
 def card_eps(c):
     p30 = c["bars"][1]["peers"]
     move = "올렸다" if c["c30"] > 0 else "내렸다" if c["c30"] < 0 else "그대로 두었다"
-    first = f"애널리스트들이 내다본 엔비디아의 내년 1주당 이익은 ${c['current']:.2f}로, 30일 전보다 {abs(c['c30']):.1f}% {move}."
+    fy = f"{int(c['fy_end'][:4])}년 {int(c['fy_end'][5:7])}월 결산" if c.get("fy_end") else ""   # 다음 회계연도가 끝나는 달 (P277 — 옛 `내년`, 회사마다 결산월이 다르다)
+    first = f"애널리스트들이 내다본 엔비디아의 다음 회계연도{f'({fy})' if fy else ''} 1주당 이익은 ${c['current']:.2f}로, 30일 전보다 {abs(c['c30']):.1f}% {move}."
     if p30 is not None:
         first += f" 같은 기간 기술주 15개는 보통 {_sgn(p30)}% 바뀌었다."
     if c.get("up30") is not None:
@@ -2886,8 +2887,8 @@ def card_eps(c):
     if c.get("up30") is not None:
         lines.append(("row", "30일간 올린 애널리스트", f"{c['up30']}명", "예상치를 올린 사람 수"))
         lines.append(("row", "30일간 내린 애널리스트", f"{c['down30']}명", "예상치를 내린 사람 수"))
-    lines.append(("row", "내년 1주당 이익 예상", f"${c['current']:.2f}", "애널리스트 평균"))
-    tip = ("애널리스트들이 내놓은 내년 이익 예상치가 요즘 얼마나 바뀌었는지. 1주당 이익(EPS)은 회사 이익을 주식 수로 나눈 값\n"
+    lines.append(("row", "1주당 이익 예상", f"${c['current']:.2f}", "애널리스트 평균" + (f" · {fy}" if fy else "")))
+    tip = ("애널리스트들이 내놓은 다음 회계연도 이익 예상치가 요즘 얼마나 바뀌었는지. 1주당 이익(EPS)은 회사 이익을 주식 수로 나눈 값. 회계연도는 회사마다 끝나는 달이 다르다\n"
            f"· 30일 {_sgn(c['c30'])}% : " + (f"기술주 15개 보통 {_sgn(p30)}%와 견준 값" if p30 is not None else "비교 묶음 값 없음") + "\n"
            "· 나누는 법 : 예상치가 30일 전보다 1% 넘게 오르면 높아지는 중, 1% 넘게 내리면 낮아지는 중, 그 사이는 그대로\n"
            f"· 읽는 법 : {EPS_NOT_OPINION}다. 애널리스트의 매수 · 매도 의견과는 따로 본다\n"
@@ -2949,7 +2950,7 @@ EXPECT_THEME = {"늘고 있음": ("positive", UP), "줄고 있음": ("negative",
 
 
 EPS_OLD = {"올라가는 중": "높아지는 중", "내려가는 중": "낮아지는 중", "큰 변화 없음": "그대로", "더 좋게 봄": "높아지는 중", "더 나쁘게 봄": "낮아지는 중"}   # 내년 이익 예상 옛 말(10-27 B안 포함) → 새 말 (P141)
-EPS_TITLE = "내년 이익 예상은?"   # 옛 `애널리스트 전망은?` — 사람(특정인)이 아니라 데이터로 말하는 제목 (2026-10-31 사용자 P141)
+EPS_TITLE = "이익 예상 변화는?"   # 옛 `애널리스트 전망은?` — 사람(특정인)이 아니라 데이터로 말하는 제목 (2026-10-31 사용자 P141)
 EPS_NOT_OPINION = "주가에 대한 의견이 아니라 이익 예상치의 변화"   # 방송 매수 의견과 상충해 보이지 않게 (P141)
 
 

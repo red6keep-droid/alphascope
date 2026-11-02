@@ -37,7 +37,7 @@ TABLE = {
                       direction={"올랐음": UP, "내렸음": DOWN}),
     "revenue":   dict(name="회사 매출", tab="실적", card="회사는 돈을 더 벌고 있나?", horizon=QUARTER, family=EARN,
                       direction={"늘고 있음": UP, "줄고 있음": DOWN}),
-    "eps":       dict(name="내년 이익 예상", tab="실적", card="내년 이익 예상은?", horizon=MONTH, family=EARN,
+    "eps":       dict(name="이익 예상 변화", tab="실적", card="이익 예상 변화는?", horizon=MONTH, family=EARN,
                       direction={"높아지는 중": UP, "낮아지는 중": DOWN}),
     "short":     dict(name="공매도 잔고", tab="실적", card="하락에 거는 돈은?", horizon=MONTH, family=FLOW,
                       direction={"늘어나는 중": DOWN, "줄어드는 중": UP}),
