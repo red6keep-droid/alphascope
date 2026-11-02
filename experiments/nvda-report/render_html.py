@@ -1220,7 +1220,7 @@ def picks_rows(ps, close, money):
         who = re.sub(r"\s+\(", "(", p["speaker"] or p["channel"])   # `톰 리 (펀드스트랫)` → `톰 리(펀드스트랫)`
         nm, par, org = who.partition("(")
         who_html = _esc(nm) + (f'({_esc(org)}' if par else "") + ("" if p["own"] else " 보고서")
-        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(PICK_BOX.get(p["action"], "flat"), p["action"], _esc, sym=False, fit=True)}</span>'
+        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(PICK_BOX.get(p["action"], "flat"), p["action"], _esc, sym=p["action"] in PICK_BOX, fit=True)}</span>'
                 f'<b style="font-weight:700;">{_esc(p["channel"])}</b>'
                 + (f'{PICK_VBAR}<span style="font-weight:400;font-size:17px;">{who_html}</span>' if p["speaker"] else ""))   # 말한 사람 = 방송 이름(19)보다 2px 작게 (2026-11-01 사용자 P230 → P242)   # 의견 라벨 → 방송 이름 → 세로 구분선 → 말한 사람 (P200 · P201, 장면 시각 괄호는 뺐다 P202)
         tgt = _pick_target(p, close, money)
@@ -1701,7 +1701,7 @@ def _pull_end_chart(html):
 STATE_ANS_W = 500   # 강조 카드 답(접기 버튼 앞 값) 굵기 700 → 500 (2026-11-01 사용자 P205). 블로그 글꼴(AS Barun)은 400 · 700 뿐이라 블로그에선 보통 굵기로 보인다
 
 
-_DIR_SKIP = ("tech", "analysts", "picks", "news")   # 기술지표는 말에 이미 ▲▼, 의견(매수 · 매도) · 뉴스는 기호를 붙이지 않는다
+_DIR_SKIP = ("tech", "news")   # 기술지표는 말에 이미 ▲▼, 뉴스는 기호를 붙이지 않는다. 의견 매수 · 매도는 ▲ · ▼ (2026-11-02 사용자 P278: 인베스팅닷컴처럼)
 
 
 def _dir_state(title, state):
@@ -1719,7 +1719,7 @@ def _dir_state(title, state):
             fixed = len(re.sub(r"\{\w+\}", "", t["card"]))
             if best is None or fixed > best[0]:
                 best = (fixed, t["direction"])
-    d = best[1].get(state) if best else {"상승": SG.UP, "하락": SG.DOWN}.get(state)   # 표에 없는 카드라도 답이 상승 · 하락이면 (`Alpha Scope 전망은?`)
+    d = best[1].get(state) if best else {"상승": SG.UP, "하락": SG.DOWN, "상향": SG.UP, "하향": SG.DOWN}.get(state)   # 상향 · 하향 = 증권사 목표가 변경 (P278)   # 표에 없는 카드라도 답이 상승 · 하락이면 (`Alpha Scope 전망은?`)
     return f"▲ {state}" if d == SG.UP else f"▼ {state}" if d == SG.DOWN else state
 
 
