@@ -1,0 +1,91 @@
+name: Court Survey
+
+# 미국 종목 소송 추적 후보 조사 (experiments/stock-radar/court.py --survey, P270).
+# 처음 한 번 하는 일 — 사람이 손으로 돌린다. 컴퓨터마다 토큰을 설정하지 않도록 Actions 비밀 값을 쓴다 (2026-11-02 사용자).
+# 결과(court_survey.json · .md)는 court-survey 브랜치에 남긴다. 다시 돌리면 끝난 종목은 건너뛰고 남은 종목부터 이어 간다.
+# CourtListener 무료 한도에 걸리면 최대 65분까지 기다렸다 이어 간다(COURT_MAX_WAIT). 그보다 길면 저장하고 멈춘다 → 다시 실행.
+# 사람이 후보를 확인해 experiments/stock-radar/court_watch.json 에 옮기면, 매일 NVDA Report 실행이 그 사건의 일정을 읽는다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      syms:
+        description: '조사할 종목 (공백 구분, 비우면 64종목 전체 중 남은 것)'
+        type: string
+        required: false
+        default: ''
+      redo:
+        description: '이미 끝난 종목도 다시 조사 (syms 와 함께)'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: court-survey
+  cancel-in-progress: false
+
+jobs:
+  survey:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      COURTLISTENER_TOKEN: ${{ secrets.COURTLISTENER_TOKEN }}
+      COURT_MAX_WAIT: '3900'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests python-dotenv
+
+      - name: Load previous survey (court-survey branch)
+        run: |
+          if git fetch -q origin court-survey 2>/dev/null; then
+            git show FETCH_HEAD:court_survey.json > experiments/stock-radar/court_survey.json 2>/dev/null || true
+            echo "이전 조사 불러옴"
+          else
+            echo "court-survey 브랜치 없음 — 처음부터"
+          fi
+
+      - name: Run survey
+        working-directory: experiments/stock-radar
+        env:
+          SYMS: ${{ inputs.syms }}
+          REDO: ${{ inputs.redo && '--redo' || '' }}
+        run: python court.py --survey $REDO $SYMS
+
+      # 중간에 실패해도 끝난 종목은 남긴다
+      - name: Save survey (court-survey branch)
+        if: always()
+        run: |
+          D=experiments/stock-radar
+          [ -f "$D/court_survey.json" ] || { echo "저장할 결과 없음"; exit 0; }
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          J="$(git hash-object -w "$D/court_survey.json")"
+          M="$(git hash-object -w "$D/court_survey.md")"
+          TREE="$(printf '100644 blob %s\tcourt_survey.json\n100644 blob %s\tcourt_survey.md\n' "$J" "$M" | git mktree)"
+          if PARENT="$(git rev-parse --verify -q FETCH_HEAD)" && git cat-file -e "$PARENT:court_survey.json" 2>/dev/null; then
+            [ "$TREE" = "$(git rev-parse "$PARENT^{tree}")" ] && { echo "변경 없음"; exit 0; }
+            COMMIT="$(git commit-tree "$TREE" -p "$PARENT" -m "Court survey [skip ci]")"
+          else
+            COMMIT="$(git commit-tree "$TREE" -m "Court survey [skip ci]")"
+          fi
+          git push origin "$COMMIT:refs/heads/court-survey"
+          echo "저장: $COMMIT"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: court-survey
+          path: |
+            experiments/stock-radar/court_survey.json
+            experiments/stock-radar/court_survey.md
+          if-no-files-found: ignore

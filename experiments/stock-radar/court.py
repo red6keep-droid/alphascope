@@ -61,7 +61,7 @@ def _search(q, headers, max_pages=5):
         r = requests.get(url, params=params if url == SEARCH_URL else None, headers=headers, timeout=NC.COURTLISTENER_TIMEOUT)
         if r.status_code == 429:
             wait = int(r.headers.get("retry-after") or 5)
-            if wait > 60:   # 무료 한도 — 몇십 분 기다리라면 여기서 멈춘다. 끝난 종목은 저장돼 있어 다시 돌리면 이어 간다 (2026-11-01 33분 대기로 멈춘 것처럼 보였다)
+            if wait > int(os.environ.get("COURT_MAX_WAIT", "60")):   # 무료 한도 (Actions 조사는 COURT_MAX_WAIT=3900 으로 기다렸다 이어 간다, 2026-11-02) — 몇십 분 기다리라면 여기서 멈춘다. 끝난 종목은 저장돼 있어 다시 돌리면 이어 간다 (2026-11-01 33분 대기로 멈춘 것처럼 보였다)
                 raise Limited(wait)
             time.sleep(wait)
             continue
@@ -107,7 +107,7 @@ def survey(syms=None, redo=False):
         try:
             found = [d for name in PARTY[sym] for d in _search(f'party:"{name}" AND suitNature:securities', headers)]
         except Limited as e:
-            print(f"[court] 요청 한도 — {e.args[0] // 60 + 1}분 뒤 다시 돌리면 {sym} 부터 이어 간다 ({len(out)}/{len(PARTY)} 끝)", flush=True)
+            print(f"[court] 요청 한도 ({e.args[0]}초 대기 요구) — {e.args[0] // 60 + 1}분 뒤 다시 돌리면 {sym} 부터 이어 간다 ({len(out)}/{len(PARTY)} 끝)", flush=True)
             _survey_md(out)
             return out
         for name in [None]:
