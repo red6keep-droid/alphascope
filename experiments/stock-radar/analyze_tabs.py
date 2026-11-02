@@ -262,6 +262,7 @@ def build(s, snap, extra):
             print(f"[tabs] {s['sym']} {k} 실패 : {e}")
             s["expect"][k] = None
     s["analysts"] = analysts(s["sym"], extra)
+    s["broker"] = (((extra.get("stocks") or {}).get(s["sym"]) or {}).get("analysts") or {}).get("changes") or []   # 증권사 등급 · 목표가 변경 (P275)
     s["company"] = ((extra.get("stocks") or {}).get(s["sym"]) or {}).get("company") or {}   # 기업 탭 (2026-10-31)
     peers = cal_peers(s, snap, extra)
     s["options_status"] = options_status(s["sym"], extra)

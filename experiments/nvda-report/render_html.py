@@ -787,12 +787,15 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
     return out
 
 
-def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None):
+def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, broker=None, news_ops=None):
     """`의견` 탭 (2026-11-01 사용자 P197) — 옛 한 장 `애널리스트 · 방송 의견은?`(P90)을 강조 카드 둘로 나눈다: `애널리스트 의견은?` · `방송 의견은?`.
     접힌 머리에서 두 답(예: 매수 · 매도)을 따로 보고, 누르면 그쪽 내용만 펼친다 — 둘 다 접힌 채로. 함께 보기는 두 카드 아래 따로 흰 카드.
     두 카드는 의견이 없어도 늘 둔다 — 답 `없음` (2026-11-01 사용자 P199: 방송 의견이 없다고 카드가 사라지면 안 된다).
     cells = 애널리스트 칸(analyze_tabs.analysts 모양), money = 방송 목표가 표기, m0 · m2 = 애널리스트 목표가 표기(없으면 달러), together = 함께 보기 줄을 만드는 함수."""
-    cards = analysts_card(cells, close, m0, m2, opened=True) + picks_card(name, ps, close, money)   # 탭 첫 강조 카드는 펼침 (2026-11-01 사용자 P216)
+    # 애널리스트 → 증권사 → 방송 → 뉴스 (P275). broker · news_ops 가 None 이면(한국 — 아직 자료 없음) 그 카드는 없다
+    cards = analysts_card(cells, close, m0, m2, opened=True)   # 탭 첫 강조 카드는 펼침 (2026-11-01 사용자 P216)
+    cards += (broker_card(name, broker, close, money) if broker is not None else "") + picks_card(name, ps, close, money)
+    cards += news_opinion_card(name, news_ops) if news_ops is not None else ""
     cards += together_card(together())   # 데이터 전망 = 셋째 강조 카드 (P206)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>'
 
@@ -1229,6 +1232,128 @@ def picks_rows(ps, close, money):
                 + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")   # 의견 내용 19 → 18 (2026-11-01 사용자 P238)   # 행간 24 → 26 (+10%, P169)
                 + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
     return f'<span data-picks="1" style="display:block;">{out}</span>'
+
+
+# ---------------------------------------------------------------- 증권사 · 뉴스 의견 (2026-11-02 사용자 P275: 매수의견 탭에 애널리스트 · 증권사 · 방송 · 뉴스를 모은다)
+
+BROKER_DAYS = 30   # 증권사 변경을 싣는 기간 — collect_extra.BROKER_DAYS 와 같게
+GRADE_BUY = ("strong buy", "buy", "outperform", "overweight", "accumulate", "positive", "sector outperform", "market outperform", "top pick", "add")
+GRADE_SELL = ("sell", "strong sell", "underperform", "underweight", "reduce", "negative", "sector underperform", "market underperform")
+MOVE_ORDER = ("상향", "하향", "유지")
+MOVE_THEME = {"상향": ("positive", UP), "하향": ("negative", DOWN)}
+MOVE_BOX = {"상향": "up", "하향": "down"}
+
+
+def _grade_ko(g):
+    """증권사 등급 → 매수 · 보유 · 매도 (증권사마다 말이 달라 세 가지로 묶는다)."""
+    g = (g or "").strip().lower()
+    return "" if not g else "매수" if g in GRADE_BUY else "매도" if g in GRADE_SELL else "보유"
+
+
+def broker_move(c):
+    """변경 한 줄 → 상향 · 하향 · 유지 — 등급을 올리거나 목표가를 올리면 상향 (NVDA collect_market 방향과 같은 규칙)."""
+    if c.get("action") == "up" or c.get("pt_action") == "Raises":
+        return "상향"
+    if c.get("action") == "down" or c.get("pt_action") == "Lowers":
+        return "하향"
+    return "유지"
+
+
+def _broker_rows(cs, close, money):
+    import tech_signals as TS
+    out = ""
+    for i, c in enumerate(cs):
+        mv = broker_move(c)
+        g0, g1 = _grade_ko(c.get("from")), _grade_ko(c.get("to"))
+        grade = (f"{g1} 의견 새로 냄" if c.get("action") == "init" and g1 else f"{g0} → {g1}" if g0 and g1 and g0 != g1 else f"{g1} 유지" if g1 else "")
+        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(MOVE_BOX.get(mv, "flat"), mv, _esc, sym=False, fit=True)}</span>'
+                f'<b style="font-weight:700;">{_esc(c.get("firm") or "증권사")}</b>'
+                + (f'{PICK_VBAR}<span style="font-weight:400;font-size:17px;">{_esc(grade)}</span>' if grade else ""))
+        pt, pp = c.get("pt"), c.get("pt_prior")
+        money0 = lambda v: re.sub(r"\.00\b", "", money(v))   # noqa: E731 — 목표가는 대개 정수 ($420.00 → $420)
+        tgt = ""
+        if pt:
+            tgt = f"목표가 {money0(pp)} → {money0(pt)}" if pp and pp != pt else f"목표가 {money0(pt)}"
+            if close:
+                tgt += f" (오늘 종가 대비 {(pt / close - 1) * 100:+.1f}%)".replace("-", "−")
+        d = c["at"][:10]
+        out += (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
+                f'<span style="display:block;color:#111;line-height:34px;">{head}</span>'
+                + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};">{_esc(tgt)}</span>' if tgt else "")
+                + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{int(d[5:7]):02d}.{int(d[8:]):02d} 발표</span></span>')
+    return f'<span data-broker="1" style="display:block;">{out}</span>'
+
+
+def _move_word(n, order):
+    """가장 많은 쪽 하나 — 상향 · 하향(또는 긍정 · 부정)이 같으면 `엇갈림`, 둘 다 없으면 셋째(유지 · 중립)."""
+    a, b, c = order
+    return a if n[a] > n[b] else b if n[b] > n[a] else (c if not n[a] else "엇갈림")
+
+
+def broker_card(name, cs, close, money, days=BROKER_DAYS):
+    """`증권사 의견은?` (P275) — 증권사가 등급 · 목표가를 바꾸거나 다시 낸 기록(Yahoo Finance). 답 = 상향 · 하향 중 많은 쪽.
+    펼치면 줄마다 [상향] 증권사 | 등급 / 목표가 이전 → 새 (종가 대비) / 발표일. 없어도 카드는 둔다 — 답 `없음` (P199)."""
+    src = "Yahoo Finance"
+    if not cs:
+        tip = f"증권사가 이 종목의 투자 등급이나 목표가를 바꾸거나 다시 낸 기록. 최근 {days}일\n· 지금 : 기록 없음\n· 이 블로그의 추천이 아니다"
+        return _state_card("증권사 의견은?", "없음", "neutral", MUTED, [(f"최근 {days}일 {_esc(name)} 등급 · 목표가를 낸 증권사가 없다.", "plain")], "",
+                           tip=_dk.with_src(tip, src), fold=True)
+    n = {k: sum(1 for c in cs if broker_move(c) == k) for k in MOVE_ORDER}
+    word = _move_word(n, MOVE_ORDER)
+    theme, col = MOVE_THEME.get(word, ("neutral", "#111"))
+    cnt = " · ".join(f'<b style="font-weight:700;color:{MOVE_THEME.get(k, ("", "#111"))[1]};">{k} {n[k]}건</b>' for k in MOVE_ORDER if n[k])
+    body = _broker_rows(cs[:PICKS_SHOWN], close, money)
+    if len(cs) > PICKS_SHOWN:
+        body += _dk.fold(f"의견 {len(cs) - PICKS_SHOWN}건 더 보기", _broker_rows(cs[PICKS_SHOWN:], close, money))
+    lines = [(f"최근 {days}일 증권사가 {_esc(name)} 의견을 {len(cs)}건 냈다. 목표가 {cnt}.", "rich"), (body, "html")]
+    tip = (f"증권사가 이 종목의 투자 등급이나 목표가를 바꾸거나 다시 낸 기록. 최근 {days}일, 최신 먼저\n"
+           "· 나누는 법 : 등급이나 목표가를 올리면 상향, 내리면 하향, 그대로 다시 내면 유지\n"
+           f"· 지금 : 상향 {n['상향']}건 · 하향 {n['하향']}건 · 유지 {n['유지']}건\n· 이 블로그의 추천이 아니다")
+    return _state_card("증권사 의견은?", word, theme, col, lines, "", tip=_dk.with_src(tip, src), fold=True)
+
+
+TONE_ORDER = ("긍정", "부정", "중립")
+TONE_THEME = {"긍정": ("positive", UP), "부정": ("negative", DOWN)}
+TONE_OF = {"positive": "긍정", "negative": "부정"}
+
+
+def _news_op_rows(ns):
+    import tech_signals as TS
+    out = ""
+    for i, x in enumerate(ns):
+        tone = TONE_OF.get(x["direction"], "중립")
+        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box({"긍정": "up", "부정": "down"}.get(tone, "flat"), tone, _esc, sym=False, fit=True)}</span>'
+                f'<b style="font-weight:700;">{_esc(x["source"])}</b>')
+        meta = _pick_when(x["published_at"])
+        if x.get("url"):
+            meta += f' · <a href="{_esc(x["url"])}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">기사 보기</a>'
+        out += (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
+                f'<span style="display:block;color:#111;line-height:34px;">{head}</span>'
+                f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};word-break:keep-all;">{_esc(x["title"])}</span>'
+                f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
+    return f'<span data-newsop="1" style="display:block;">{out}</span>'
+
+
+def news_opinion_card(name, ns, hours=PICK_HOURS):
+    """`뉴스 의견은?` (P275) — 해설 · 투자 의견 기사(공용 뉴스 처리의 의견 매체 · 의견형 제목) 중 이 종목을 다룬 것. 답 = 긍정 · 부정 중 많은 쪽.
+    ns = [{source · title(헤드라인) · direction · url · published_at}], 최신 먼저. 없어도 카드는 둔다 — 답 `없음` (P199)."""
+    src = "Google 뉴스"
+    if not ns:
+        tip = f"해설 · 투자 의견 기사 가운데 이 종목을 다룬 것. 최근 {hours}시간\n· 지금 : 기사 없음\n· 이 블로그의 추천이 아니다"
+        return _state_card("뉴스 의견은?", "없음", "neutral", MUTED, [(f"최근 {hours}시간 {_esc(_dk.josa(name, '을'))} 다룬 의견 기사가 없다.", "plain")], "",
+                           tip=_dk.with_src(tip, src), fold=True)
+    n = {k: sum(1 for x in ns if TONE_OF.get(x["direction"], "중립") == k) for k in TONE_ORDER}
+    word = _move_word(n, TONE_ORDER)
+    theme, col = TONE_THEME.get(word, ("neutral", "#111"))
+    cnt = " · ".join(f'<b style="font-weight:700;color:{TONE_THEME.get(k, ("", "#111"))[1]};">{k} {n[k]}건</b>' for k in TONE_ORDER if n[k])
+    body = _news_op_rows(ns[:PICKS_SHOWN])
+    if len(ns) > PICKS_SHOWN:
+        body += _dk.fold(f"기사 {len(ns) - PICKS_SHOWN}건 더 보기", _news_op_rows(ns[PICKS_SHOWN:]))
+    lines = [(f"최근 {hours}시간 {_esc(_dk.josa(name, '을'))} 다룬 의견 기사가 {len(ns)}건 나왔다. {cnt}.", "rich"), (body, "html")]
+    tip = (f"해설 · 투자 의견 기사(모틀리 풀 · 시킹 알파 같은 매체, `왜 지금 사야 하나` 같은 제목) 가운데 이 종목을 다룬 것. 최근 {hours}시간\n"
+           "· 나누는 법 : 기사가 이 종목에 좋게 쓰면 긍정, 나쁘게 쓰면 부정 (AI 분류)\n"
+           f"· 지금 : 긍정 {n['긍정']}건 · 부정 {n['부정']}건 · 중립 {n['중립']}건\n· 이 블로그의 추천이 아니다")
+    return _state_card("뉴스 의견은?", word, theme, col, lines, "", tip=_dk.with_src(tip, src), fold=True)
 
 
 def dd_cur(x, st):

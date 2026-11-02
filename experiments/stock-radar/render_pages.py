@@ -552,13 +552,35 @@ def _picks(s):
 def card_opinions(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 공용 R.opinions_cards (한국 · 미국 같은 카드, 2026-11-01 사용자 P197)."""
     ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
-    return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s))
+    return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s),
+                            broker=s.get("broker") or [], news_ops=_news_opinions(s))   # 증권사 · 뉴스 의견 (P275)
+
+
+BROKER_TITLE_RE = re.compile(r"upgrade|downgrade|price target|target (cut|raised|lowered|bump)|initiat|reiterat|\brating\b", re.I)   # 증권사 등급 기사 = 증권사 카드와 같은 일
+
+
+def _news_opinions(s):
+    """`뉴스 의견은?` 재료 — 해설 · 투자 의견 기사(NVDA labels 의 의견 매체 · 의견형 제목) 중 이 종목 관련도 1 이상, 최근 R.PICK_HOURS 시간, 최신 먼저.
+    주가 움직임만 다룬 기사 · 2차 출처(news_store._cap 의 나머지 조건)와 증권사 등급 기사는 뺀다."""
+    import labels
+    cut = (NOW - datetime.timedelta(hours=R.PICK_HOURS)).strftime("%Y-%m-%dT%H:%M")
+    out = []
+    for x in (NEWS or {}).values():
+        sc = next((c for c in x.get("scores") or [] if c["ticker"] == s["sym"]), None)
+        if not sc or sc["relevance"] < 1 or _ts(x["published_at"]) < cut or BROKER_TITLE_RE.search(x["title"]):
+            continue
+        src = (x.get("source") or "").lower()
+        if not (any(p in src for p in labels.OPINION_PUBLISHERS) or labels.OPINION_TITLE_RE.search(x["title"])):
+            continue
+        out.append({"source": x.get("source") or "", "title": news_store.headline(x) or x.get("title_ko") or x["title"], "direction": sc["direction"],
+                    "url": x.get("url"), "published_at": x["published_at"]})
+    return sorted(out, key=lambda r: r["published_at"], reverse=True)
 
 
 def sec_opinions(s):
     """`의견` 탭 (2026-11-01 사용자 P196 · P197, 한국과 같게) — `애널리스트 의견은?` · `방송 의견은?` 강조 카드 둘(접힌 채) + 함께 보기 흰 카드."""
     card = card_opinions(s)
-    return card or _dk.muted("애널리스트 · 방송 의견이 아직 없습니다.")   # 두 카드 격자 + 함께 보기는 R.opinions_cards 가 감싼다
+    return card or _dk.muted("의견이 아직 없습니다.")   # 두 카드 격자 + 함께 보기는 R.opinions_cards 가 감싼다
 
 
 def sec_earnings_tab(s):
