@@ -2,5 +2,34 @@
  "NVDA": [
   {"docket_id": 73459129, "name": "Hu v. NVIDIA Corporation"},
   {"docket_id": 8490233, "name": "In re NVIDIA Corporation Securities Litigation"}
+ ],
+ "AAPL": [
+  {"docket_id": 70919237, "name": "City of Coral Springs Police Officers Pension Plan v. Apple Inc."}
+ ],
+ "GOOGL": [
+  {"docket_id": 74910343, "name": "Stewart v. Alphabet Inc."},
+  {"docket_id": 67021509, "name": "AMI - Government Employees Provident Fund v. Alphabet Inc."}
+ ],
+ "MSFT": [
+  {"docket_id": 73481059, "name": "In re Microsoft Corporation Securities Litigation"}
+ ],
+ "META": [
+  {"docket_id": 60991960, "name": "In re Meta Platforms, Inc., Securities Litigation"}
+ ],
+ "XOM": [
+  {"docket_id": 71978760, "name": "Boca Raton Police and Fire Fighters' Retirement System v. Exxon Mobil Corporation"},
+  {"docket_id": 50862211, "name": "Yoshikawa v. Exxon Mobil Corporation"}
+ ],
+ "ASML": [
+  {"docket_id": 69376436, "name": "In re ASML Holding N.V. Securities Litigation"}
+ ],
+ "ORCL": [
+  {"docket_id": 72230302, "name": "Barrows v. Oracle Corporation"}
+ ],
+ "VRT": [
+  {"docket_id": 63284393, "name": "In re Vertiv Holdings Co Securities Litigation"}
+ ],
+ "CRWV": [
+  {"docket_id": 72134362, "name": "Masaitis v. CoreWeave, Inc."}
  ]
 }
