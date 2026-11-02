@@ -1766,9 +1766,9 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
         if kind == "html":   # 그래프 · 자세한 지표 보기 같은 HTML 조각 (실적과 기대 탭, 2026-10-18)
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
         if kind == "rich":   # plain 과 같은 줄인데 글 안에 굵게 · 색 HTML 이 들어 있다 (방송 의견 문장, 2026-10-29 사용자 P95)
-            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;font-size:{STATE_SENT_FS};line-height:{_dk.LH_EMPH};word-break:keep-all;">{text}</li>'
+            return f'<li {_dk.SENT_ATTR} style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;font-size:{STATE_SENT_FS};line-height:{_dk.LH_EMPH};word-break:keep-all;">{_bold_pct(text)}</li>'
         if kind == "plain":   # 쉬운 말 한 줄 — 점 없이 굵게, 아래 8px (2026-10-16 사용자: 강조 카드 펼침 맨 위에 쉬운 설명)
-            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;font-size:{STATE_SENT_FS};line-height:{_dk.LH_EMPH};word-break:keep-all;">{_plain_note(text)}</li>'   # 범위 숫자는 물결 뒤에서만 줄바꿈 (P60) · 늘 같은 안내는 끝에 작은 글씨 (P67)   # 상세 설명 2~3문장이라 보통 굵기 (2026-10-17)
+            return f'<li {_dk.SENT_ATTR} style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;font-size:{STATE_SENT_FS};line-height:{_dk.LH_EMPH};word-break:keep-all;">{_bold_pct(_plain_note(text))}</li>'   # 범위 숫자는 물결 뒤에서만 줄바꿈 (P60) · 늘 같은 안내는 끝에 작은 글씨 (P67)   # 상세 설명 2~3문장이라 보통 굵기 (2026-10-17)
         col = NOTE if kind == "note" else "#111"
         return _dot_li(_label_text(text), size=3, color=col, lh=_dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32 (2026-10-12 사용자)   # 16px → 3px 점, "**라벨** : 내용", 증감 색 (2026-10-11 사용자)
     if lines and isinstance(lines[-1], tuple) and len(lines[-1]) == 2 and lines[-1][1] == "html":   # 카드가 그래프로 끝나면 흰 카드 아래 = 좌우 8px (P59 범위 막대와 같은 당김, 2026-10-31 사용자 P140: 모든 강조 카드 공통)
@@ -2029,6 +2029,14 @@ def note_span(note, mark=False):
     # 다음 줄 · 괄호 · 작은 글씨 행간 20 (2026-10-28 사용자 P76 · P77 · P78: 문장 끝에 이어 붙이니 본문 행간 32 를 따라 너무 벌어졌다)
     text = f"{_dk.CHART_MARK}{_esc(note)}" if mark else f"({_esc(note)})"
     return f'<span data-note="1" style="display:block;margin-top:4px;font-size:{TINY};line-height:20px;color:{NOTE};">{text}</span>'
+
+
+_PCT_SPAN = re.compile(r'<span style="color:(%s|%s);([^"]*)">([^<]*%%[^<]*)</span>' % (UP, DOWN))
+
+
+def _bold_pct(html):
+    """강조 카드 문장 안 증감 색 `+1.5%` · `−0.5%` · `+0.7%p` 를 굵게 (2026-11-02 사용자 P279: 색만 있고 보통 굵기라 눈에 덜 띈다)."""
+    return _PCT_SPAN.sub(lambda m: f'<span style="color:{m.group(1)};font-weight:700;{m.group(2)}">{m.group(3)}</span>', html)
 
 
 def _plain_note(text):
