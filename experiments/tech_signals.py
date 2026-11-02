@@ -3,7 +3,8 @@
 
 용어 = 상승 · 하락 · 중립 하나로 (2026-10-30 사용자 P99: "오름 쪽 · 내림 쪽은 돌려 말하기 — 상승 · 하락, 화살표, 강한 상승 · 강한 하락").
   블로그는 매수 · 매도라고 쓰지 않는다 — 지표가 가리키는 가격 방향을 그대로 적고 판단은 독자가 한다 (법적 경계 선 4).
-  오실레이터는 과매수 = 하락 · 과매도 = 상승으로 세고 줄에 (과매수) · (과매도)를 작게 붙인다. 이동평균은 종가가 선 위 ▲ · 아래 ▼.
+  오실레이터의 과매수 · 과매도는 방향이 아니라 '평소 범위를 벗어난 상태'라 라벨 `주의`(노랑, ▲▼ 없음)로 적고 상승 · 하락 · 중립 집계에서 뺀다 — 줄에 (과매수) · (과매도)를 작게 붙인다
+  (2026-11-02 사용자 P273: "과매도인데 라벨이 상승이면 뜻이 잘못 전달될 위험" → 옛 과매수 = 하락 · 과매도 = 상승 반등 가정은 검증된 적 없어 버림). 이동평균은 종가가 선 위 ▲ · 아래 ▼.
   요약 = 강한 상승 · 상승 · 중립 · 하락 · 강한 하락, 색 = 상승 빨강 · 하락 파랑의 연한 상태 카드 톤(theme). 임계값은 널리 쓰는 기본값(RSI 70/30, 스토캐스틱 80/20, CCI ±100, Williams −20/−80, ADX 25).
 인베스팅닷컴과 값이 다를 수 있다 — 그 표는 시간봉 기준으로 보이고(10-30 점검: 5일 이동평균이 최근 5일 종가 평균과 안 맞음), 우리는 일봉 · 주봉 · 월봉.
 
@@ -15,6 +16,7 @@ import datetime
 import math
 
 OVER, UNDER, MID, UPW, DNW = "과매수", "과매도", "중립", "상승", "하락"
+CAUTION = "주의"   # 과매수 · 과매도 줄의 라벨 — 방향 집계 밖 (P273)
 WEAK = "추세 약함"
 GAUGE_UP, GAUGE_DN = "#ED8E87", "#82B1F0"   # 게이지는 그래프 파스텔(cards.PASTEL_UP · PASTEL_DN) — 새빨간 · 새파란 면 금지 (P99)
 
@@ -62,7 +64,7 @@ def _level(v, hi, lo):
 
 
 def _dir_of(label):
-    return {OVER: -1, UNDER: 1, UPW: 1, DNW: -1}.get(label, 0)
+    return {UPW: 1, DNW: -1}.get(label, 0)   # 과매수 · 과매도는 0 — 집계에서도 뺀다 (P273, 옛 과매수 −1 · 과매도 +1)
 
 
 def indicators(bars):
@@ -156,7 +158,8 @@ def indicators(bars):
 
 def counts(rows):
     cnt = {"up": sum(1 for r in rows if r["dir"] > 0), "down": sum(1 for r in rows if r["dir"] < 0),
-           "neutral": sum(1 for r in rows if r["dir"] == 0 and r["key"] != "atr")}
+           "neutral": sum(1 for r in rows if r["dir"] == 0 and r["key"] != "atr" and r["label"] not in (OVER, UNDER)),
+           "caution": sum(1 for r in rows if r["label"] in (OVER, UNDER))}   # 과매수 · 과매도 = 주의, 비율에서 뺀다 (P273)
     tot = cnt["up"] + cnt["down"] + cnt["neutral"]
     cnt["net"] = (cnt["up"] - cnt["down"]) / tot if tot else 0.0
     return cnt
@@ -289,7 +292,8 @@ ZONES = [(-1.0, -0.5, "강한 하락", "#82B1F0"), (-0.5, -0.15, "하락", "#BCD
 
 # 지표 줄 라벨 박스 (10-30 사용자 P102): 바탕이 칠해진 사각 박스 안에 기호 + 글자, 같은 폭이라 세로 열이 맞는다. 색 = 공용 라벨(design_kit.PILL) 톤
 # 10-30 사용자 P103: 버튼 말고 라벨 느낌 — 외곽선 연하게, 셋 다 연한 바탕(하락 바탕이 하락 카드 바탕과 같아 색이 없어 보였다), 가로 짧게 · 높이 그대로
-BOX = {"up": ("#FDE8E8", "#F6CACA", "#B91C1C"), "down": ("#DCE9FC", "#C3D7F5", "#1D4ED8"), "flat": ("#E8EDF3", "#D6DEE8", "#475569")}
+BOX = {"up": ("#FDE8E8", "#F6CACA", "#B91C1C"), "down": ("#DCE9FC", "#C3D7F5", "#1D4ED8"), "flat": ("#E8EDF3", "#D6DEE8", "#475569"),
+       "caution": ("#FDF3D3", "#F0DDA0", "#92400E")}   # 주의 = 노랑 연한 상자(안내 상자 #fff8e1 계열) · 기호 없음 — 상승 · 하락 · 중립 셋과 다른 것으로 읽히게 (P273)
 BOX_W = 50
 DIVIDER = '<span aria-hidden="true" style="display:inline-block;width:1px;height:11px;margin:0 6px;background:#CBD5E1;vertical-align:-1px;"></span>'   # 세로 구분선: 글자 14px 의 80% = 11.2 → 11px, 양옆 6 (P116, 정수 규칙)
 PAIR_GAP = 5   # 작은 게이지 카드 둘 사이 = 전체요약 카드와의 위 여백 (P108 · P114: 8 → 5, −40%)
@@ -322,17 +326,17 @@ def box(kind, text, esc, sym=True, fit=False):
 
 
 def label_box(label, esc):
-    """(괄호 글 HTML, 박스 HTML) — 과매수 → (과매수) + [▼ 하락], 추세 약함 → (추세 약함) + [— 중립], ATR → (변동성) + [보통]."""
+    """(괄호 글 HTML, 박스 HTML) — 과매수 · 과매도 → (과매수) + [주의] (P273, 옛 ▼ 하락 · ▲ 상승), 추세 약함 → (추세 약함) + [— 중립], ATR → (변동성) + [보통]."""
     why = ""
     if label in (OVER, UNDER):
-        main, why = (DNW, OVER) if label == OVER else (UPW, UNDER)
+        main, why = CAUTION, label
     elif label == WEAK:
         main, why = MID, WEAK
     elif label.startswith("변동성 "):
         main, why = label.split(" ", 1)[1], "변동성"
     else:
         main = label
-    kind = "up" if main == UPW else "down" if main == DNW else "flat"
+    kind = "up" if main == UPW else "down" if main == DNW else "caution" if main == CAUTION else "flat"
     b = box(kind, main, esc, sym=main in (UPW, DNW, MID))
     w = f'<span style="font-size:{WHY_FS};line-height:19px;color:#6B7280;white-space:nowrap;">({esc(why)})</span>' if why else ""
     return w, b
@@ -494,5 +498,6 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     lines.append((_sub("이동평균") + _table(mrs, line, keep=tuple(sorted({0, nt, nt + 1}))), "html"))
     tip = ("널리 쓰는 기술지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
            f"· 오늘 {sig['word']} : 상승 − 하락을 전체로 나눈 값이 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
+           "· 괄호 안 과매수 · 과매도 : 평소 범위를 벗어난 상태라 주의로 적고, 상승 · 하락 집계에서 뺐다\n"   # P273
            "· 이름 앞 보라 점 : 개인 투자자가 많이 보는 지표")   # 지표별 규칙 · 이동평균 목록 · 배열 · 크로스 설명은 뺐다 — 읽는 법 페이지로 (2026-10-31 사용자 batch 7 a)
     return lines, tip
