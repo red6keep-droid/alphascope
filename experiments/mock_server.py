@@ -33,6 +33,7 @@ LABELS = {
     "people-radar": "주요 인물 발언",
     "theme-monitor": "테마",
     "media-daily": "미디어 데일리",
+    "competitiveness": "국가 경쟁력",
 }
 RECENT_N = 12
 FREQ_N, FREQ_MIN = 6, 2   # 자주 연 목업 = 2번 이상 연 것 중 많이 연 순서로 6개

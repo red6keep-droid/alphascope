@@ -50,7 +50,8 @@ def _company(t):
     return {"name": i.get("longName"), "ceo": ceo, "city": i.get("city"), "state": i.get("state"), "country": i.get("country"), "website": i.get("website"),
             "employees": i.get("fullTimeEmployees"), "exchange": i.get("fullExchangeName") or i.get("exchange"),
             "fy_month": datetime.datetime.utcfromtimestamp(fy).month if fy else None,
-            "listed": datetime.datetime.utcfromtimestamp(i["firstTradeDateMilliseconds"] / 1000).year if i.get("firstTradeDateMilliseconds") else None}
+            # 1970년 이전 상장(음수 타임스탬프)은 Windows utcfromtimestamp 가 Errno 22 — 기준일 + timedelta 로 (2026-11-02)
+            "listed": (datetime.datetime(1970, 1, 1) + datetime.timedelta(milliseconds=i["firstTradeDateMilliseconds"])).year if i.get("firstTradeDateMilliseconds") else None}
 
 
 def _mid(row):
