@@ -4,7 +4,8 @@
 용어 = 상승 · 하락 · 중립 하나로 (2026-10-30 사용자 P99: "오름 쪽 · 내림 쪽은 돌려 말하기 — 상승 · 하락, 화살표, 강한 상승 · 강한 하락").
   블로그는 매수 · 매도라고 쓰지 않는다 — 지표가 가리키는 가격 방향을 그대로 적고 판단은 독자가 한다 (법적 경계 선 4).
   오실레이터의 과매수 · 과매도는 방향이 아니라 '평소 범위를 벗어난 상태'라 라벨 `주의`(노랑, ▲▼ 없음)로 적고 상승 · 하락 · 중립 집계에서 뺀다 — 줄에 (과매수) · (과매도)를 작게 붙인다
-  (2026-11-02 사용자 P273: "과매도인데 라벨이 상승이면 뜻이 잘못 전달될 위험" → 옛 과매수 = 하락 · 과매도 = 상승 반등 가정은 검증된 적 없어 버림). 이동평균은 종가가 선 위 ▲ · 아래 ▼.
+  (2026-11-02 사용자 P273: "과매도인데 라벨이 상승이면 뜻이 잘못 전달될 위험" → 옛 과매수 = 하락 · 과매도 = 상승 반등 가정은 검증된 적 없어 버림).
+  극단 사이 구간은 가운데 선(RSI · STOCH · STOCHRSI · Ultimate 50, Williams −50, CCI 0) 위 ▲ 상승 · 아래 ▼ 하락, 괄호에 `(50 위)` · `(50 아래)` (2026-11-02 사용자 P274 — 옛 전부 중립). 이동평균은 종가가 선 위 ▲ · 아래 ▼.
   요약 = 강한 상승 · 상승 · 중립 · 하락 · 강한 하락, 색 = 상승 빨강 · 하락 파랑의 연한 상태 카드 톤(theme). 임계값은 널리 쓰는 기본값(RSI 70/30, 스토캐스틱 80/20, CCI ±100, Williams −20/−80, ADX 25).
 인베스팅닷컴과 값이 다를 수 있다 — 그 표는 시간봉 기준으로 보이고(10-30 점검: 5일 이동평균이 최근 5일 종가 평균과 안 맞음), 우리는 일봉 · 주봉 · 월봉.
 
@@ -59,8 +60,19 @@ def _rsi(c, n=14):
     return out
 
 
-def _level(v, hi, lo):
-    return None if v is None else OVER if v > hi else UNDER if v < lo else MID
+def _level(v, hi, lo, mid=None):
+    """오실레이터 라벨 — hi 위 과매수 · lo 아래 과매도, 그 사이는 가운데 선(mid) 위 상승 · 아래 하락 (2026-11-02 사용자 P274: "50 기준선으로, 괄호에 까닭").
+    mid=None 이면 옛 규칙(그 사이 전부 중립). 반환 = (라벨, 괄호 글)."""
+    if v is None:
+        return None, ""
+    if v > hi:
+        return OVER, ""
+    if v < lo:
+        return UNDER, ""
+    if mid is None or v == mid:
+        return MID, ""
+    m = f"{mid:g}".replace("-", "−")
+    return (UPW, f"{m} 위") if v > mid else (DNW, f"{m} 아래")
 
 
 def _dir_of(label):
@@ -77,26 +89,28 @@ def indicators(bars):
     if n < 30:
         return rows
 
-    def add(key, name, value, label, hint, fmt="{:,.1f}"):
+    def add(key, name, value, label, hint, fmt="{:,.1f}", why=""):
+        if isinstance(label, tuple):   # _level → (라벨, 괄호 글)
+            label, why = label
         rows.append({"key": key, "name": name, "value": value, "text": "—" if value is None else fmt.format(value).replace("-", "−"),
-                     "label": label or "—", "dir": _dir_of(label), "hint": hint})
+                     "label": label or "—", "dir": _dir_of(label), "hint": hint, "why": why})
     rsi = _rsi(c)
     r = rsi[-1]
-    add("rsi", "RSI(14)", r, _level(r, 70, 30), "흔히 70 넘으면 과매수 · 30 아래면 과매도로 읽음")
+    add("rsi", "RSI(14)", r, _level(r, 70, 30, 50), "흔히 70 넘으면 과매수 · 30 아래면 과매도로 읽음 · 그 사이는 50 위 상승 · 아래 하락")
     # STOCH(9,6): %K 9일, %D 6일 단순 평균
     k = []
     for i in range(8, n):
         hh, ll = max(h[i - 8:i + 1]), min(l[i - 8:i + 1])
         k.append(50.0 if hh == ll else (c[i] - ll) / (hh - ll) * 100)
     st = _sma(k, 6)
-    add("stoch", "STOCH(9,6)", st, _level(st, 80, 20), "9일 고가 · 저가 사이에서 종가의 위치(6일 평균) · 80 위 과매수 · 20 아래 과매도")
+    add("stoch", "STOCH(9,6)", st, _level(st, 80, 20, 50), "9일 고가 · 저가 사이에서 종가의 위치(6일 평균) · 80 위 과매수 · 20 아래 과매도 · 그 사이는 50 위 상승 · 아래 하락")
     rr = [x for x in rsi if x is not None]
     if len(rr) >= 14:
         w = rr[-14:]
         sr = 50.0 if max(w) == min(w) else (rr[-1] - min(w)) / (max(w) - min(w)) * 100
     else:
         sr = None
-    add("stochrsi", "STOCHRSI(14)", sr, _level(sr, 80, 20), "RSI 를 다시 14일 범위에서 본 값 · 80 위 과매수 · 20 아래 과매도")
+    add("stochrsi", "STOCHRSI(14)", sr, _level(sr, 80, 20, 50), "RSI 를 다시 14일 범위에서 본 값 · 80 위 과매수 · 20 아래 과매도 · 그 사이는 50 위 상승 · 아래 하락")
     e12, e26 = _ema(c, 12), _ema(c, 26)
     macd = [a - b for a, b in zip(e12, e26)]
     sig = _ema(macd, 9)
@@ -120,13 +134,13 @@ def indicators(bars):
     add("adx", "ADX(14)", adx, adx_label, "추세의 세기 — 25 아래면 뚜렷한 추세 없음, 그 위면 +DI · −DI 가운데 큰 쪽")
     hh, ll = max(h[-14:]), min(l[-14:])
     wr = None if hh == ll else (hh - c[-1]) / (hh - ll) * -100
-    add("wr", "Williams %R", wr, None if wr is None else (OVER if wr > -20 else UNDER if wr < -80 else MID), "14일 고가 · 저가 사이 종가 위치 · −20 위 과매수 · −80 아래 과매도")
+    add("wr", "Williams %R", wr, _level(wr, -20, -80, -50), "14일 고가 · 저가 사이 종가 위치 · −20 위 과매수 · −80 아래 과매도 · 그 사이는 −50 위 상승 · 아래 하락")
     tp = [(a + b + d) / 3 for a, b, d in zip(h, l, c)]
     w = tp[-14:]
     m = sum(w) / 14
     md = sum(abs(x - m) for x in w) / 14
     cci = None if md == 0 else (tp[-1] - m) / (0.015 * md)
-    add("cci", "CCI(14)", cci, _level(cci, 100, -100), "평균 가격에서 얼마나 벗어났나 · +100 위 과매수 · −100 아래 과매도")
+    add("cci", "CCI(14)", cci, _level(cci, 100, -100, 0), "평균 가격에서 얼마나 벗어났나 · +100 위 과매수 · −100 아래 과매도 · 그 사이는 0 위 상승 · 아래 하락")
     a14 = atr[-1]
     atr_pct = a14 / c[-1] * 100 if a14 else None
     hist = [x / y * 100 for x, y in zip(atr[-250:], c[-250:]) if x]
@@ -147,7 +161,7 @@ def indicators(bars):
         return sum(bp[-k:]) / s if s else None
     a7, a14_, a28 = avg(7), avg(14), avg(28)
     uo = None if None in (a7, a14_, a28) else 100 * (4 * a7 + 2 * a14_ + a28) / 7
-    add("uo", "Ultimate Oscillator", uo, _level(uo, 70, 30), "7 · 14 · 28일 매수 압력의 가중 평균 · 70 위 과매수 · 30 아래 과매도")
+    add("uo", "Ultimate Oscillator", uo, _level(uo, 70, 30, 50), "7 · 14 · 28일 매수 압력의 가중 평균 · 70 위 과매수 · 30 아래 과매도 · 그 사이는 50 위 상승 · 아래 하락")
     roc = (c[-1] / c[-13] - 1) * 100 if n > 13 else None
     add("roc", "ROC(12)", roc, None if roc is None else (UPW if roc > 0 else DNW if roc < 0 else MID), "12일 전보다 몇 % 올랐나 · 0 위 상승 · 아래 하락", "{:+.2f}%")
     e13 = _ema(c, 13)[-1]
@@ -325,9 +339,9 @@ def box(kind, text, esc, sym=True, fit=False):
             f'{_mark(kind) if sym else ""}{esc(text)}</span>')
 
 
-def label_box(label, esc):
-    """(괄호 글 HTML, 박스 HTML) — 과매수 · 과매도 → (과매수) + [주의] (P273, 옛 ▼ 하락 · ▲ 상승), 추세 약함 → (추세 약함) + [— 중립], ATR → (변동성) + [보통]."""
-    why = ""
+def label_box(label, esc, why=""):
+    """(괄호 글 HTML, 박스 HTML) — 과매수 · 과매도 → (과매수) + [주의] (P273, 옛 ▼ 하락 · ▲ 상승), 추세 약함 → (추세 약함) + [— 중립], ATR → (변동성) + [보통].
+    why = 줄이 가져온 괄호 글 — 오실레이터 가운데 구간의 `50 위` · `50 아래` (P274)."""
     if label in (OVER, UNDER):
         main, why = CAUTION, label
     elif label == WEAK:
@@ -463,7 +477,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     line = _dk.darken(_dk.lighten(_dk.lighten(_dk.CARD_DIR[th][1]), 0.3), 0.02)   # _state_card 의 줄 구분선과 같은 색
     trs = []
     for r in sig["rows"]:
-        w, bx = label_box(r["label"], _h.escape)
+        w, bx = label_box(r["label"], _h.escape, r.get("why", ""))
         what = WHAT.get(r["key"], "")
         nm = (POP_DOT if r["key"] in POPULAR_KEYS else "") + _h.escape(r["name"])
         trs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{nm}'   # 폭이 모자라는 날(긴 이름 + 괄호 글)은 설명 끝이 … 로 — 줄바꿈 없음 (P108)
@@ -498,6 +512,6 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     lines.append((_sub("이동평균") + _table(mrs, line, keep=tuple(sorted({0, nt, nt + 1}))), "html"))
     tip = ("널리 쓰는 기술지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
            f"· 오늘 {sig['word']} : 상승 − 하락을 전체로 나눈 값이 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
-           "· 괄호 안 과매수 · 과매도 : 평소 범위를 벗어난 상태라 주의로 적고, 상승 · 하락 집계에서 뺐다\n"   # P273
+           "· 괄호 안 과매수 · 과매도 : 평소 범위를 벗어난 상태라 주의로 적고, 상승 · 하락 집계에서 뺐다 · 괄호 안 50 위 · 아래 : 그 사이 구간은 가운데 선으로 상승 · 하락\n"   # P273 · P274
            "· 이름 앞 보라 점 : 개인 투자자가 많이 보는 지표")   # 지표별 규칙 · 이동평균 목록 · 배열 · 크로스 설명은 뺐다 — 읽는 법 페이지로 (2026-10-31 사용자 batch 7 a)
     return lines, tip
