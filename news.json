@@ -1,13 +1,33 @@
 {
-  "updated_at": "2026-11-01 21:46:28 UTC",
+  "updated_at": "2026-11-02 01:02:05 UTC",
   "items": [
+    {
+      "title": "Binance sees $3.64 billion in net outflows as withdrawals resume after massive hack",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/02/binance-outflow-hack-bitcoin.html",
+      "published": "2026-11-02 00:11:37",
+      "title_ko": "바이낸스, 대규모 해킹 후 출금 재개에 36억 4천만 달러 순유출",
+      "summary_ko": "총 자산의 2.1% 규모, 63억 달러 해킹 발생"
+    },
     {
       "title": "Judge dismisses Alaska Senate election lawsuit; DOJ vows appeal",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/01/alaska-senate-doj-lawsuit-dismissed-sullivan-peltola.html",
-      "published": "2026-11-01 21:25:03",
+      "published": "2026-11-01 23:17:57",
       "title_ko": "판사, 알래스카 상원 선거 소송 기각; 법무부 항소 의지",
       "summary_ko": "민주당 후보 메리 펠톨라, 공화당 현역 댄 설리번 등 2명과 대결"
+    },
+    {
+      "title": "연준 매파적 발언 및 금리 인상 기대",
+      "title_ko": "연준 매파적 발언 및 금리 인상 기대",
+      "summary_ko": "연준 인사들의 잇따른 매파적 발언으로 추가 금리 인상 가능성이 제기되며 시장에 부담을 주었",
+      "source": "당잠사",
+      "link": "https://www.youtube.com/watch?v=bIAXjjkKGR4",
+      "published": "2026-11-01 21:50:42",
+      "kind": "media",
+      "tag": "금리",
+      "direction": "neutral",
+      "n_channels": 2
     },
     {
       "title": "Democratic Rep. Stevens endorses Republican Rogers over rival El-Sayed in Michigan Senate election",
@@ -18,12 +38,12 @@
       "summary_ko": "스티븐스, 엘-사이드 후보 패배"
     },
     {
-      "title": "Here are 3 big things we're watching in the stock market in the week ahead",
+      "title": "Connecticut Sen. Chris Murphy has stroke and is in the hospital, office says",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/11/01/3-big-things-were-watching-in-the-stock-market-this-week.html",
-      "published": "2026-11-01 18:12:05",
-      "title_ko": "다음 주 증시에서 주목할 3가지 큰 이슈",
-      "summary_ko": "시장, 며칠간의 승리가 필요하다는 평가"
+      "link": "https://www.cnbc.com/2026/11/01/chris-murphy-stroke-senate-hospital.html",
+      "published": "2026-11-01 19:10:12",
+      "title_ko": "코네티컷주 크리스 머피 상원의원 뇌졸중으로 입원, 사무실 발표",
+      "summary_ko": "의식 회복 상태, '깨어 있고 경계력 있음' 확인"
     },
     {
       "title": "미국 중간선거 최종 국면",
@@ -56,26 +76,6 @@
       "published": "2026-11-01 16:34:43",
       "title_ko": "JP모건, 아마존, 메타 뮤즈 같은 AI 봇과의 싸움은 장기적으로 승산 없는 전략일 수 있다",
       "summary_ko": "소매 전문가, 고객 마찰 제거 기술이 통상 우세하다고 경고"
-    },
-    {
-      "title": "Everything changed for the oil, AI and bond trades over the past month",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/01/oil-bond-yields-ai-market.html",
-      "published": "2026-11-01 15:58:24",
-      "title_ko": "지난 한 달, 유가 · AI · 채권 트레이드 모두 변했다",
-      "summary_ko": "트레이더, AI 붕괴 우려 인플레이션보다 높음"
-    },
-    {
-      "title": "이란 전쟁과 휘발유 가격 급등",
-      "title_ko": "이란 전쟁과 휘발유 가격 급등",
-      "summary_ko": "이란과의 전쟁으로 인해 휘발유 가격이 39% 상승하며 유권자들의 불만과 경제적 부담을 가중시키고 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=TH3ajuWSqF4",
-      "published": "2026-11-01 15:38:44",
-      "kind": "media",
-      "tag": "에너지",
-      "direction": "neutral",
-      "n_channels": 1
     },
     {
       "title": "These Senate races may help determine the fate of Social Security",
