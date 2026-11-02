@@ -1323,7 +1323,7 @@ def _news_op_rows(ns):
     out = ""
     for i, x in enumerate(ns):
         tone = TONE_OF.get(x["direction"], "중립")
-        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box({"긍정": "up", "부정": "down"}.get(tone, "flat"), tone, _esc, sym=False, fit=True)}</span>'
+        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box({"긍정": "up", "부정": "down"}.get(tone, "flat"), tone, _esc, sym=tone in TONE_THEME, fit=True)}</span>'
                 f'<b style="font-weight:700;">{_esc(x["source"])}</b>')
         meta = _pick_when(x["published_at"])
         if x.get("url"):
@@ -1354,6 +1354,7 @@ def news_opinion_card(name, ns, hours=PICK_HOURS):
     tip = (f"해설 · 투자 의견 기사(모틀리 풀 · 시킹 알파 같은 매체, `왜 지금 사야 하나` 같은 제목) 가운데 이 종목을 다룬 것. 최근 {hours}시간\n"
            "· 나누는 법 : 기사가 이 종목에 좋게 쓰면 긍정, 나쁘게 쓰면 부정 (AI 분류)\n"
            f"· 지금 : 긍정 {n['긍정']}건 · 부정 {n['부정']}건 · 중립 {n['중립']}건\n· 이 블로그의 추천이 아니다")
+    word = {"긍정": "▲ 긍정", "부정": "▼ 부정"}.get(word, word)   # 이 카드에서만 ▲ · ▼ (2026-11-02 사용자 P282 — 다른 뉴스 긍정 · 부정은 그대로)
     return _state_card("뉴스 의견은?", word, theme, col, lines, "", tip=_dk.with_src(tip, src), fold=True)
 
 
