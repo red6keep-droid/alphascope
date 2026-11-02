@@ -2033,7 +2033,7 @@ def note_span(note, mark=False):
     return f'<span data-note="1" style="display:block;margin-top:4px;font-size:{TINY};line-height:20px;color:{NOTE};">{text}</span>'
 
 
-SENT_TOP = 8   # 강조 카드 펼친 문장 위 margin — 구분선 ~ 글자 보이는 14px (가이드라인 강조 카드 구분선 아래 14). 옛 14 = 보이는 20px (2026-11-02 사용자 P283)
+SENT_TOP = 14   # 강조 카드 펼친 문장 위 margin — 구분선 ~ 글자 보이는 20px (2026-11-02 사용자 P284: "원래 맞아, 20으로" — P283 의 14 는 되돌림)
 
 
 _PCT_SPAN = re.compile(r'<span style="color:(%s|%s);([^"]*)">([^<]*%%[^<]*)</span>' % (UP, DOWN))
