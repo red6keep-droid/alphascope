@@ -1,6 +1,14 @@
 {
-  "updated_at": "2026-11-02 21:46:29 UTC",
+  "updated_at": "2026-11-02 21:56:06 UTC",
   "items": [
+    {
+      "title": "Palantir reports booming U.S. commercial revenue growth, topping government for first time",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/02/palantir-pltr-earnings-q3-2026.html",
+      "published": "2026-11-02 21:46:56",
+      "title_ko": "팔란티어, 미국 상업 매출 급증·정부 매출 처음으로 추월",
+      "summary_ko": "정부 매출 953백만 달러"
+    },
     {
       "title": "Kimberly-Clark closes its acquisition of Tylenol maker Kenvue. What to expect next",
       "source": "CNBC",
@@ -8,14 +16,6 @@
       "published": "2026-11-02 21:35:06",
       "title_ko": "키멜리-클라크, 타이레놀 제조사 켄뷰 인수 완료·향후 전망",
       "summary_ko": "성장·수익성 개선 기대"
-    },
-    {
-      "title": "Palantir reports booming U.S. commercial revenue growth, topping government for first time",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/02/palantir-pltr-earnings-q3-2026.html",
-      "published": "2026-11-02 21:30:36",
-      "title_ko": "팔란티어, 미국 상업 매출 급증·정부 매출 처음으로 추월",
-      "summary_ko": "정부 매출 953백만 달러"
     },
     {
       "title": "Trump focuses on Reflecting Pool in final public speech before midterms",
@@ -66,12 +66,12 @@
       "summary_ko": "중간선거 하루 전 칼시 트레이더, 민주당 상원 장악 확률 74% 부여"
     },
     {
-      "title": "Intel foundry push faces critical test after stock's 45% plunge in October",
+      "title": "Crude oil prices sell off more than 7% on Iran peace talk hopes ahead of U.S. midterms",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/02/intel-foundry-faces-critical-test-after-stocks-45percent-plunge-in-october.html",
-      "published": "2026-11-02 20:20:34",
-      "title_ko": "10월 주가 45% 급락 후 인텔 파운드리 추진, 중대한 시험대 직면",
-      "summary_ko": "고객사, TSMC 추격 위한 인텔 팹 증설 신호 탐색"
+      "link": "https://www.cnbc.com/2026/11/02/oil-prices-fall-as-iran-us-pursue-diplomacy.html",
+      "published": "2026-11-02 20:19:25",
+      "title_ko": "미국 원유 가격, 미국·이란 외교 노력 소식에 100달러 이하 하락",
+      "summary_ko": "미국과 이란 외교 노력 보도"
     },
     {
       "title": "중간선거 및 대선 정치적 불확실성",
