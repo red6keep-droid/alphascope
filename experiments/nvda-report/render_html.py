@@ -1266,20 +1266,21 @@ def _broker_rows(cs, close, money):
         mv = broker_move(c)
         g0, g1 = _grade_ko(c.get("from")), _grade_ko(c.get("to"))
         grade = (f"{g1} 의견 새로 냄" if c.get("action") == "init" and g1 else f"{g0} → {g1}" if g0 and g1 and g0 != g1 else f"{g1} 유지" if g1 else "")
-        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(MOVE_BOX.get(mv, "flat"), mv, _esc, sym=False, fit=True)}</span>'
+        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(MOVE_BOX.get(mv, "flat"), mv, _esc, fit=True)}</span>'
                 f'<b style="font-weight:700;">{_esc(c.get("firm") or "증권사")}</b>'
                 + (f'{PICK_VBAR}<span style="font-weight:400;font-size:17px;">{_esc(grade)}</span>' if grade else ""))
         pt, pp = c.get("pt"), c.get("pt_prior")
         money0 = lambda v: re.sub(r"\.00\b", "", money(v))   # noqa: E731 — 목표가는 대개 정수 ($420.00 → $420)
         tgt = ""
-        if pt:
-            tgt = f"목표가 {money0(pp)} → {money0(pt)}" if pp and pp != pt else f"목표가 {money0(pt)}"
+        if pt:   # 새 목표가 = 올리면 굵게 상승 색, 내리면 굵게 하락 색 (2026-11-02 사용자 P276)
+            new = _esc(money0(pt)) if not pp or pp == pt else f'<b style="font-weight:700;color:{UP if pt > pp else DOWN};">{_esc(money0(pt))}</b>'
+            tgt = f"목표가 {_esc(money0(pp))} → {new}" if pp and pp != pt else f"목표가 {new}"
             if close:
                 tgt += f" (오늘 종가 대비 {(pt / close - 1) * 100:+.1f}%)".replace("-", "−")
         d = c["at"][:10]
         out += (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
                 f'<span style="display:block;color:#111;line-height:34px;">{head}</span>'
-                + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};">{_esc(tgt)}</span>' if tgt else "")
+                + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};">{tgt}</span>' if tgt else "")
                 + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{int(d[5:7]):02d}.{int(d[8:]):02d} 발표</span></span>')
     return f'<span data-broker="1" style="display:block;">{out}</span>'
 
@@ -1291,12 +1292,12 @@ def _move_word(n, order):
 
 
 def broker_card(name, cs, close, money, days=BROKER_DAYS):
-    """`증권사 의견은?` (P275) — 증권사가 등급 · 목표가를 바꾸거나 다시 낸 기록(Yahoo Finance). 답 = 상향 · 하향 중 많은 쪽.
+    """`증권사 목표가 변경은?` (P275 · P276 옛 `증권사 의견은?`) — 증권사가 등급 · 목표가를 바꾸거나 다시 낸 기록(Yahoo Finance). 답 = 상향 · 하향 중 많은 쪽.
     펼치면 줄마다 [상향] 증권사 | 등급 / 목표가 이전 → 새 (종가 대비) / 발표일. 없어도 카드는 둔다 — 답 `없음` (P199)."""
     src = "Yahoo Finance"
     if not cs:
         tip = f"증권사가 이 종목의 투자 등급이나 목표가를 바꾸거나 다시 낸 기록. 최근 {days}일\n· 지금 : 기록 없음\n· 이 블로그의 추천이 아니다"
-        return _state_card("증권사 의견은?", "없음", "neutral", MUTED, [(f"최근 {days}일 {_esc(name)} 등급 · 목표가를 낸 증권사가 없다.", "plain")], "",
+        return _state_card("증권사 목표가 변경은?", "없음", "neutral", MUTED, [(f"최근 {days}일 증권사가 낸 {_esc(name)} 목표가가 없다.", "plain")], "",
                            tip=_dk.with_src(tip, src), fold=True)
     n = {k: sum(1 for c in cs if broker_move(c) == k) for k in MOVE_ORDER}
     word = _move_word(n, MOVE_ORDER)
@@ -1304,12 +1305,12 @@ def broker_card(name, cs, close, money, days=BROKER_DAYS):
     cnt = " · ".join(f'<b style="font-weight:700;color:{MOVE_THEME.get(k, ("", "#111"))[1]};">{k} {n[k]}건</b>' for k in MOVE_ORDER if n[k])
     body = _broker_rows(cs[:PICKS_SHOWN], close, money)
     if len(cs) > PICKS_SHOWN:
-        body += _dk.fold(f"의견 {len(cs) - PICKS_SHOWN}건 더 보기", _broker_rows(cs[PICKS_SHOWN:], close, money))
-    lines = [(f"최근 {days}일 증권사가 {_esc(name)} 의견을 {len(cs)}건 냈다. 목표가 {cnt}.", "rich"), (body, "html")]
+        body += _dk.fold(f"목표가 {len(cs) - PICKS_SHOWN}건 더 보기", _broker_rows(cs[PICKS_SHOWN:], close, money))
+    lines = [(f"최근 {days}일 증권사가 {_esc(name)} 목표가를 {len(cs)}건 냈다. {cnt}.", "rich"), (body, "html")]
     tip = (f"증권사가 이 종목의 투자 등급이나 목표가를 바꾸거나 다시 낸 기록. 최근 {days}일, 최신 먼저\n"
            "· 나누는 법 : 등급이나 목표가를 올리면 상향, 내리면 하향, 그대로 다시 내면 유지\n"
            f"· 지금 : 상향 {n['상향']}건 · 하향 {n['하향']}건 · 유지 {n['유지']}건\n· 이 블로그의 추천이 아니다")
-    return _state_card("증권사 의견은?", word, theme, col, lines, "", tip=_dk.with_src(tip, src), fold=True)
+    return _state_card("증권사 목표가 변경은?", word, theme, col, lines, "", tip=_dk.with_src(tip, src), fold=True)
 
 
 TONE_ORDER = ("긍정", "부정", "중립")
