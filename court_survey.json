@@ -1,0 +1,305 @@
+{
+ "NVDA": {
+  "at": "2026-11-02 02:23",
+  "rows": [
+   {
+    "docket_id": 73459129,
+    "title": "Hu v. NVIDIA Corporation",
+    "court": "CAND",
+    "filed": "2026-06-08",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/73459129/hu-v-nvidia-corporation/"
+   }
+  ]
+ },
+ "AAPL": {
+  "at": "2026-11-02 02:23",
+  "rows": [
+   {
+    "docket_id": 70919237,
+    "title": "City of Coral Springs Police Officers Pension Plan v. Apple Inc.",
+    "court": "CAND",
+    "filed": "2025-07-25",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/70919237/city-of-coral-springs-police-officers-pension-plan-v-apple-inc/"
+   }
+  ]
+ },
+ "GOOGL": {
+  "at": "2026-11-02 02:24",
+  "rows": [
+   {
+    "docket_id": 74910343,
+    "title": "Stewart v. Alphabet Inc.",
+    "court": "CAND",
+    "filed": "2026-10-02",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/74910343/stewart-v-alphabet-inc/"
+   },
+   {
+    "docket_id": 67021509,
+    "title": "AMI - Government Employees Provident Fund Management Company Ltd. v. Alphabet Inc.",
+    "court": "CAND",
+    "filed": "2023-03-16",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/67021509/ami-government-employees-provident-fund-management-company-ltd-v/"
+   }
+  ]
+ },
+ "MSFT": {
+  "at": "2026-11-02 02:24",
+  "rows": [
+   {
+    "docket_id": 73558235,
+    "title": "In Re Microsoft Corporation Stockholder Derivative Litigation",
+    "court": "WAWD",
+    "filed": "2026-06-30",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/73558235/in-re-microsoft-corporation-stockholder-derivative-litigation/"
+   },
+   {
+    "docket_id": 73481059,
+    "title": "In Re: Microsoft Corporation Securities Litigation",
+    "court": "WAWD",
+    "filed": "2026-06-12",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/73481059/in-re-microsoft-corporation-securities-litigation/"
+   }
+  ]
+ },
+ "AMZN": {
+  "at": "2026-11-02 02:24",
+  "rows": []
+ },
+ "META": {
+  "at": "2026-11-02 02:25",
+  "rows": [
+   {
+    "docket_id": 60991960,
+    "title": "In re Meta Platforms, Inc., Securities Litigation",
+    "court": "CAND",
+    "filed": "2021-11-12",
+    "nature": "Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/60991960/in-re-meta-platforms-inc-securities-litigation/"
+   }
+  ]
+ },
+ "AVGO": {
+  "at": "2026-11-02 02:25",
+  "rows": []
+ },
+ "TSLA": {
+  "at": "2026-11-02 02:26",
+  "rows": []
+ },
+ "BRK-B": {
+  "at": "2026-11-02 02:26",
+  "rows": []
+ },
+ "LLY": {
+  "at": "2026-11-02 02:26",
+  "rows": []
+ },
+ "MU": {
+  "at": "2026-11-02 02:27",
+  "rows": []
+ },
+ "WMT": {
+  "at": "2026-11-02 02:27",
+  "rows": []
+ },
+ "JPM": {
+  "at": "2026-11-02 02:28",
+  "rows": []
+ },
+ "AMD": {
+  "at": "2026-11-02 02:28",
+  "rows": []
+ },
+ "V": {
+  "at": "2026-11-02 02:28",
+  "rows": []
+ },
+ "XOM": {
+  "at": "2026-11-02 02:29",
+  "rows": [
+   {
+    "docket_id": 71978760,
+    "title": "BOCA RATON POLICE AND FIRE FIGHTERS' RETIREMENT SYSTEM v. EXXON MOBIL CORPORATION",
+    "court": "NJD",
+    "filed": "2025-12-01",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/71978760/boca-raton-police-and-fire-fighters-retirement-system-v-exxon-mobil/"
+   },
+   {
+    "docket_id": 50862211,
+    "title": "Yoshikawa v. Exxon Mobil Corporation",
+    "court": "TXND",
+    "filed": "2021-01-28",
+    "nature": "850 Other Statutes: Securities/Commodities/Exchange",
+    "url": "https://www.courtlistener.com/docket/50862211/yoshikawa-v-exxon-mobil-corporation/"
+   }
+  ]
+ },
+ "JNJ": {
+  "at": "2026-11-02 02:29",
+  "rows": []
+ },
+ "MA": {
+  "at": "2026-11-02 02:29",
+  "rows": []
+ },
+ "ABBV": {
+  "at": "2026-11-02 02:29",
+  "rows": []
+ },
+ "INTC": {
+  "at": "2026-11-02 02:30",
+  "rows": [
+   {
+    "docket_id": 68821489,
+    "title": "IN RE: INTEL CORPORATION STOCKHOLDER DERIVATIVE LITIGATION",
+    "court": "DED",
+    "filed": "2024-05-31",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/68821489/in-re-intel-corporation-stockholder-derivative-litigation/"
+   }
+  ]
+ },
+ "TSM": {
+  "at": "2026-11-02 02:30",
+  "rows": []
+ },
+ "ASML": {
+  "at": "2026-11-02 02:31",
+  "rows": [
+   {
+    "docket_id": 69494928,
+    "title": "Matar v. ASML Holding N.V.",
+    "court": "NYSD",
+    "filed": "2024-12-23",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/69494928/matar-v-asml-holding-nv/"
+   },
+   {
+    "docket_id": 69376436,
+    "title": "In re ASML Holding N.V. Securities Litigation",
+    "court": "NYSD",
+    "filed": "2024-11-14",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/69376436/in-re-asml-holding-nv-securities-litigation/"
+   }
+  ]
+ },
+ "LRCX": {
+  "at": "2026-11-02 02:31",
+  "rows": []
+ },
+ "AMAT": {
+  "at": "2026-11-02 02:31",
+  "rows": []
+ },
+ "ORCL": {
+  "at": "2026-11-02 02:32",
+  "rows": [
+   {
+    "docket_id": 72230302,
+    "title": "Barrows v. Oracle Corporation",
+    "court": "DED",
+    "filed": "2026-02-03",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/72230302/barrows-v-oracle-corporation/"
+   }
+  ]
+ },
+ "ANET": {
+  "at": "2026-11-02 02:32",
+  "rows": []
+ },
+ "VRT": {
+  "at": "2026-11-02 02:32",
+  "rows": [
+   {
+    "docket_id": 63284393,
+    "title": "In re Vertiv Holdings Co Securities Litigation",
+    "court": "NYSD",
+    "filed": "2022-05-03",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/63284393/in-re-vertiv-holdings-co-securities-litigation/"
+   }
+  ]
+ },
+ "EQIX": {
+  "at": "2026-11-02 02:32",
+  "rows": []
+ },
+ "CEG": {
+  "at": "2026-11-02 02:32",
+  "rows": []
+ },
+ "CRWV": {
+  "at": "2026-11-02 03:23",
+  "rows": [
+   {
+    "docket_id": 72134362,
+    "title": "MASAITIS v. COREWEAVE, INC.",
+    "court": "NJD",
+    "filed": "2026-01-12",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/72134362/masaitis-v-coreweave-inc/"
+   }
+  ]
+ },
+ "SPCX": {
+  "at": "2026-11-02 03:23",
+  "rows": []
+ },
+ "RKLB": {
+  "at": "2026-11-02 03:23",
+  "rows": []
+ },
+ "KO": {
+  "at": "2026-11-02 03:23",
+  "rows": []
+ },
+ "PG": {
+  "at": "2026-11-02 03:24",
+  "rows": []
+ },
+ "PM": {
+  "at": "2026-11-02 03:24",
+  "rows": []
+ },
+ "NFLX": {
+  "at": "2026-11-02 03:24",
+  "rows": []
+ },
+ "DIS": {
+  "at": "2026-11-02 03:24",
+  "rows": []
+ },
+ "HD": {
+  "at": "2026-11-02 03:25",
+  "rows": []
+ },
+ "MCD": {
+  "at": "2026-11-02 03:25",
+  "rows": []
+ },
+ "CAT": {
+  "at": "2026-11-02 03:26",
+  "rows": []
+ },
+ "GE": {
+  "at": "2026-11-02 03:27",
+  "rows": []
+ },
+ "COST": {
+  "at": "2026-11-02 03:27",
+  "rows": []
+ },
+ "CVX": {
+  "at": "2026-11-02 03:27",
+  "rows": []
+ }
+}
