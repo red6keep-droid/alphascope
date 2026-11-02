@@ -152,8 +152,9 @@ def market_regime(snap):
         if d == 0 or (streak and (d > 0) != (streak > 0)):
             break
         streak += 1 if d > 0 else -1
+    phr = round(ph, 1)   # 판정은 독자에게 보이는 소수 한 자리 값으로 — −2.9997% 가 "−3.0%" 로 찍히는데 상승 추세면 설명과 어긋난다 (2026-11-02 사용자 P275: 경계는 낮은 단계로)
     regime = ("불안 국면" if vix is not None and vix >= NC.REGIME_VIX_HIGH else
-              "조정장" if ph <= NC.REGIME_CORRECTION_PCT or c[-1] < ma else "단기 조정" if ph <= NC.REGIME_PULLBACK_PCT else "상승 추세")
+              "조정장" if phr <= NC.REGIME_CORRECTION_PCT or c[-1] < ma else "단기 조정" if phr <= NC.REGIME_PULLBACK_PCT else "상승 추세")
     return {"regime": regime, "prev_regime": None, "changed": False, "pct_from_high": ph, "above_ma200": c[-1] >= ma, "ma200": ma,
             "pct_vs_ma200": (c[-1] / ma - 1) * 100, "vix": vix, "streak": streak}
 

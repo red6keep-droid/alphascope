@@ -445,11 +445,12 @@ def market_regime(conn, day):
         if d == 0 or (streak and (d > 0) != (streak > 0)):
             break
         streak += 1 if d > 0 else -1
+    phr = round(pct_from_high, 1)   # 보이는 값(소수 한 자리)으로 판정 — stock-radar analyze.market_regime 과 같게 (2026-11-02 P275)
     if vix is not None and vix >= config.REGIME_VIX_HIGH:
         regime = "불안 국면"
-    elif pct_from_high <= config.REGIME_CORRECTION_PCT or not above_ma:
+    elif phr <= config.REGIME_CORRECTION_PCT or not above_ma:
         regime = "조정장"
-    elif pct_from_high <= config.REGIME_PULLBACK_PCT:
+    elif phr <= config.REGIME_PULLBACK_PCT:
         regime = "단기 조정"
     else:
         regime = "상승 추세"
