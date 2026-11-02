@@ -799,7 +799,7 @@ def _minus_bar(t):
     return _MINUS_NUM.sub(MINUS_BAR, t)
 
 
-SENT_ATTR = 'data-sent="1"'   # 강조 카드 문장 줄 표시 (render_html _state_card) — 문장 안 증감 숫자 굵게 (P279)
+SENT_ATTR = 'data-emph-sent="1"'   # 강조 카드 문장 줄 표시 (render_html _state_card) — 문장 안 증감 숫자 굵게 (P279)
 
 
 def fix_colons(html):
