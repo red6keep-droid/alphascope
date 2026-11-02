@@ -1719,7 +1719,8 @@ def _dir_state(title, state):
             fixed = len(re.sub(r"\{\w+\}", "", t["card"]))
             if best is None or fixed > best[0]:
                 best = (fixed, t["direction"])
-    d = best[1].get(state) if best else {"상승": SG.UP, "하락": SG.DOWN, "상향": SG.UP, "하향": SG.DOWN}.get(state)   # 상향 · 하향 = 증권사 목표가 변경 (P278)   # 표에 없는 카드라도 답이 상승 · 하락이면 (`Alpha Scope 전망은?`)
+    d = (best[1].get(state) if best else None) or {"상승": SG.UP, "하락": SG.DOWN, "상향": SG.UP, "하향": SG.DOWN,
+                                              "같이 올랐음": SG.UP, "같이 내렸음": SG.DOWN, "올랐음": SG.UP, "내렸음": SG.DOWN}.get(state)   # 상향 · 하향 = 증권사 목표가 변경 (P278), 올랐음 · 내렸음 = 함께 움직이는 종목 (P281)   # 표에 없는 카드라도 답이 상승 · 하락이면 (`Alpha Scope 전망은?`)
     return f"▲ {state}" if d == SG.UP else f"▼ {state}" if d == SG.DOWN else state
 
 
