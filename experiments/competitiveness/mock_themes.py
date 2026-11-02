@@ -2,7 +2,9 @@
 
 기획 doc/기획/국가-경쟁력-기획.md 9절 가설(H1~H5)을 테마 카드로 옮긴 것. 발행 전 목업이라 로컬 HTML만.
 점유율 숫자는 data/store/competitiveness/(fetch_atlas.py)에서 계산, 회사 점유율은 기획 7절.
+값을 정할 힘 · 몫은 관세청 수출 단가 · 한국은행 수출물가 · 전자공시 영업이익률(fetch_kr_measures.py, 4차 2026-11-02).
 
+    python experiments/competitiveness/fetch_kr_measures.py   # 관세청 · ECOS · DART 키 필요, 한 번이면 됨
     python experiments/competitiveness/mock_themes.py && open experiments/competitiveness/output/mock_themes.html
 """
 import html
@@ -27,14 +29,88 @@ PILL = {  # 테두리, 글자, 배경
     "area": ("#CBD5E1", "#334155", "#fff"),
 }
 
-# 테마 — codes: HS92 4자리(세계 수출 점유율)
+# ---------- 측정값 (관세청 · 한국은행 · 전자공시) ----------
+# 테마 문구가 숫자를 부르므로 THEMES 앞에 둔다. 캐시가 없으면 빈 값 → 숫자 칸은 "—".
+try:
+    M = json.loads((STORE / "kr_measures.json").read_text(encoding="utf-8"))
+except (OSError, ValueError):
+    M = {}
+CY = int(M.get("built", "2026")[:4])
+
+
+def cus(codes, key):
+    """관세청 HS 묶음 합 — key 는 "2026" · "2025ytd" · "2019"."""
+    rows = [(M.get("customs") or {}).get(c, {}).get(key) for c in codes]
+    rows = [r for r in rows if r]
+    if not rows:
+        return None
+    by = defaultdict(float)
+    for r in rows:
+        for k, v in r["by"].items():
+            by[k] += v
+    return {"usd": sum(r["usd"] for r in rows), "kg": sum(r["kg"] for r in rows), "by": by,
+            "months": max((r["months"] for r in rows), key=len)}
+
+
+def ytd(codes):
+    """(작년 같은 달까지, 올해, 마지막 달)."""
+    cur, prev = cus(codes, str(CY)), cus(codes, f"{CY - 1}ytd")
+    return (prev, cur, cur["months"][-1]) if cur and prev else (None, None, 0)
+
+
+def unit(r):
+    return r["usd"] / r["kg"] if r and r["kg"] else None
+
+
+def cshare(r, cc):
+    return r["by"].get(cc, 0) / r["usd"] * 100 if r and r["usd"] else None
+
+
+def ecos(name):
+    """(1년 전 값, 최근 값, 최근 달, 2019 같은 달 값) — 달러 기준 수출물가지수."""
+    rows = (M.get("ecos") or {}).get(name) or []
+    if not rows:
+        return None, None, "", None
+    m = {r["month"]: r["v"] for r in rows}
+    last = rows[-1]["month"]
+    return m.get(f"{int(last[:4]) - 1}{last[4:]}"), m[last], last, m.get(f"2019{last[4:]}")
+
+
+def margin(code, label):
+    r = (M.get("dart") or {}).get(code, {}).get(label)
+    return r["op"] / r["rev"] * 100 if r and r["rev"] and r["op"] is not None else None
+
+
+def pct(a, b):
+    return (b / a - 1) * 100 if a and b is not None else None
+
+
+def f_pct(v):
+    return "—" if v is None else f"{'+' if v >= 0 else '−'}{abs(v):.0f}%"
+
+
+def f_eok(usd):
+    return f"{usd / 1e8:,.0f}억 달러"
+
+
+# 테마 — codes: HS92 4자리(세계 수출 점유율). measures: 자세한 숫자 보기 줄
+#   ("val", 이름, HS들) 수출금액 · ("unit", 이름, HS들) 금액 ÷ 무게 · ("cty", 이름, HS들, 나라코드) 그 나라로 간 비중 · ("ecos", 이름, 한국은행 품목)
+_M8542, _M3304, _M8504, _M8901, _M8507, _M2841 = (ytd(c) for c in (["8542", "8523"], ["3304"], ["8504"], ["8901"], ["8507"], ["2841"]))
+_E = {n: ecos(n) for n in ("집적회로", "화장품", "LCD 디스플레이", "변압기", "전지", "열연강판", "합성수지")}
+_DEF = ytd(["9301", "8710"])
+_STEEL = ytd(["7208", "7210"])
+
 THEMES = [
     {
         "group": "중국이 아직 못 따라오는 곳",
         "name": "메모리 · 고대역폭 메모리(HBM)", "hyp": "H1 · H3", "codes": ["8542", "8523"],
         "share": ("pos", "▲ 커지는 중"), "share_note": "집적회로 · 저장장치 세계 수출 점유율 5년 사이 13.6 → 14.7%",
-        "price": ("pos", "있음"), "price_note": "2025년 하반기부터 D램 값이 크게 올랐다는 보도(트렌드포스 4분기 D램 매출 +29.4%)",
-        "who": ("mix", "1등이 바뀜"), "who_note": "고대역폭 메모리 1등이 삼성전자 → SK하이닉스(2022년 50%, 최근 분기 50~69%)",
+        "price": ("pos", "있음 · 측정"),
+        "price_note": lambda: f"반도체 수출물가(달러 기준)가 1년 사이 {f_pct(pct(_E['집적회로'][0], _E['집적회로'][1]))}, "
+                              f"수출금액은 {f_pct(pct(_M8542[0]['usd'], _M8542[1]['usd']))} — 물량보다 값이 끌어올렸다",
+        "who": ("mix", "1등이 바뀜"),
+        "who_note": lambda: f"고대역폭 메모리 1등이 삼성전자 → SK하이닉스(보도). 올해 상반기 영업이익률 SK하이닉스 {margin('000660', f'{CY}H1'):.0f}% · 삼성전자 {margin('005930', f'{CY}H1'):.0f}%(삼성은 휴대폰 · 가전 포함)",
+        "measures": [("val", "반도체 · 저장장치 수출금액", ["8542", "8523"]), ("ecos", "반도체(집적회로) 수출물가", "집적회로")],
         "stocks": [
             ("SK하이닉스", "000660", "고대역폭 메모리 1등, 지금 몫을 가져가는 쪽"),
             ("삼성전자", "005930", "D램 매출 1위권 · 고대역폭 메모리는 뒤쫓는 쪽, 몫을 되찾는지"),
@@ -52,8 +128,14 @@ THEMES = [
         "group": "중국이 아직 못 따라오는 곳",
         "name": "화장품", "hyp": "H3", "codes": ["3304"],
         "share": ("pos", "▲ 커지는 중"), "share_note": "세계 수출 점유율 30년 꾸준히 증가 · 5년 사이 9.5 → 12.9%",
-        "price": ("neu", "판단 유보"), "price_note": "수출 단가(금액 ÷ 무게)를 아직 모으지 않았다",
-        "who": ("mix", "새 회사로 이동"), "who_note": "나라 점유율은 커졌지만 옛 대표(아모레퍼시픽)는 2016~2023 주가 하락, 몫은 새 브랜드 · 위탁생산 · 유통으로",
+        "price": ("pos", "있음 · 측정"),
+        "price_note": lambda: f"수출금액 {f_pct(pct(_M3304[0]['usd'], _M3304[1]['usd']))}에 1kg당 단가도 {f_pct(pct(unit(_M3304[0]), unit(_M3304[1])))} — "
+                              f"물량만 늘지 않았다. 미국 비중 {cshare(_M3304[0], 'US'):.0f} → {cshare(_M3304[1], 'US'):.0f}% · 중국 {cshare(_M3304[0], 'CN'):.0f} → {cshare(_M3304[1], 'CN'):.0f}%",
+        "who": ("mix", "새 회사로 이동"),
+        "who_note": lambda: f"옛 대표(아모레퍼시픽)는 2016~2023 주가 하락. 올해 상반기 영업이익률 에이피알 {margin('278470', f'{CY}H1'):.0f}% · 실리콘투 {margin('257720', f'{CY}H1'):.0f}% · "
+                            f"아모레퍼시픽 {margin('090430', f'{CY}H1'):.0f}% · LG생활건강 {margin('051900', f'{CY}H1'):.0f}%",
+        "measures": [("val", "화장품 수출금액", ["3304"]), ("unit", "1kg당 수출 단가", ["3304"]), ("ecos", "화장품 수출물가", "화장품"),
+                     ("cty", "미국으로 간 비중", ["3304"], "US"), ("cty", "일본으로 간 비중", ["3304"], "JP"), ("cty", "중국으로 간 비중", ["3304"], "CN")],
         "stocks": [
             ("코스맥스", "192820", "위탁생산, 새 브랜드가 많아질수록 일감이 늘어나는 쪽"),
             ("한국콜마", "161890", "위탁생산, 코스맥스와 같은 자리"),
@@ -73,8 +155,12 @@ THEMES = [
         "group": "중국이 아직 못 따라오는 곳",
         "name": "유기발광 디스플레이(OLED)", "hyp": "H1", "codes": None,
         "share": ("pos", "한국 81%"), "share_note": "디스플레이 전체는 중국 53 · 한국 32%(2025)지만 유기발광은 한국 81 · 중국 18%",
-        "price": ("neu", "판단 유보"), "price_note": "패널 값 자료를 아직 모으지 않았다",
+        "price": ("neg", "약함 · 측정"),
+        "price_note": lambda: f"평판 디스플레이 수출물가(달러 기준) 1년 {f_pct(pct(_E['LCD 디스플레이'][0], _E['LCD 디스플레이'][1]))}, "
+                              f"2019년 대비 {f_pct(pct(_E['LCD 디스플레이'][3], _E['LCD 디스플레이'][1]))}. "
+                              f"LG디스플레이 올해 상반기 영업이익률 {margin('034220', f'{CY}H1'):.1f}%",
         "who": ("mix", "엇갈림"), "who_note": "액정(LCD)은 중국이 가져감(한국 10%), 유기발광은 삼성디스플레이(비상장 · 삼성전자 자회사) · LG디스플레이",
+        "measures": [("ecos", "평판 디스플레이 수출물가", "LCD 디스플레이")],
         "stocks": [
             ("LG디스플레이", "034220", "액정을 접고 유기발광으로 옮기는 중, 적자에서 벗어나는지"),
         ],
@@ -88,8 +174,11 @@ THEMES = [
         "group": "안보가 만든 곳",
         "name": "방산", "hyp": "H1 · H5", "codes": ["9301", "8710"],
         "share": ("pos", "▲ 커지는 중"), "share_note": "무기 · 전차 세계 수출 점유율 2.8 → 24.7%(2024 인도가 몰린 해) · 무기 수출 전체(SIPRI)는 3.0%로 세계 9위",
-        "price": ("pos", "있음"), "price_note": "수주 잔고가 쌓여 있다는 보도, 우리 자료로는 아직 확인 전",
+        "price": ("pos", "있음 · 측정"),
+        "price_note": lambda: f"4곳 가운데 3곳이 올해 상반기 영업이익률 두 자릿수(한국항공우주산업만 {margin('047810', f'{CY}H1'):.0f}%). "
+                              f"무기 · 전차 수출금액은 1~{_DEF[2]}월 {f_pct(pct(_DEF[0]['usd'], _DEF[1]['usd']))} — 인도 시점에 따라 튄다. 수주 잔고는 아직 못 모았다",
         "who": ("neu", "대표 회사"), "who_note": "정부 간 계약이라 몫은 기존 대형사에",
+        "measures": [("val", "무기 · 전차 수출금액", ["9301", "8710"])],
         "stocks": [
             ("한화에어로스페이스", "012450", "자주포(K9) · 다연장 로켓(천무) · 장갑차(레드백)"),
             ("현대로템", "064350", "전차(K2), 폴란드 계약"),
@@ -107,8 +196,12 @@ THEMES = [
         "group": "안보가 만든 곳",
         "name": "원전", "hyp": "H5", "codes": ["8401"],
         "share": ("pos", "▲ 커지는 중"), "share_note": "원자로 · 핵연료 세계 수출 점유율 5년 사이 0.8 → 7.1%, 금액은 아직 작다(3억 달러)",
-        "price": ("neu", "판단 유보"), "price_note": "계약 단위가 커서 해마다 튄다, 수주로 본다",
-        "who": ("neu", "대표 회사"), "who_note": "정부(한국수력원자력)가 따고 기기 · 설계 회사가 나눈다",
+        "price": ("neu", "판단 유보"),
+        "price_note": lambda: f"수출금액이 아직 작고(올해 1~{cus(['8401'], str(CY))['months'][-1]}월 {f_eok(cus(['8401'], str(CY))['usd'])}) 계약 단위가 커서 해마다 튄다. "
+                              f"수주 잔고를 모으면 바꾼다",
+        "who": ("neu", "대표 회사"),
+        "who_note": lambda: f"정부(한국수력원자력)가 따고 기기 · 설계 회사가 나눈다. 올해 상반기 영업이익률 두산에너빌리티 {margin('034020', f'{CY}H1'):.0f}% · 한전기술 {margin('052690', f'{CY}H1'):.0f}%",
+        "measures": [("val", "원자로 · 핵연료 수출금액", ["8401"])],
         "stocks": [
             ("두산에너빌리티", "034020", "원자로 주기기 · 가스터빈"),
             ("한전기술", "052690", "원전 설계"),
@@ -123,9 +216,14 @@ THEMES = [
     {
         "group": "안보가 만든 곳",
         "name": "전력기기(변압기)", "hyp": "H2", "codes": ["8504"],
-        "share": ("neu", "작음 · 비슷함"), "share_note": "변압기 세계 수출 점유율 3.0 → 3.4% · 중국 31%",
-        "price": ("pos", "있음"), "price_note": "미국 전력망 · 데이터센터 수요로 변압기가 모자라 값이 올랐다는 보도",
-        "who": ("neu", "대표 회사"), "who_note": "미국에 공장 · 납품 기록이 있는 몇 곳",
+        "share": ("neu", "작음 · 비슷함"),
+        "share_note": lambda: f"변압기 세계 수출 점유율 3.0 → 3.4% · 중국 31%. 대신 미국으로 간 비중이 2019년 {cshare(cus(['8504'], '2019'), 'US'):.0f}% → 올해 {cshare(_M8504[1], 'US'):.0f}%",
+        "price": ("pos", "있음 · 측정"),
+        "price_note": lambda: f"변압기 수출물가(달러 기준)가 2019년보다 {f_pct(pct(_E['변압기'][3], _E['변압기'][1]))}, 1년 사이엔 {f_pct(pct(_E['변압기'][0], _E['변압기'][1]))} — 오른 값이 버티는 중",
+        "who": ("neu", "대표 회사"),
+        "who_note": lambda: f"미국에 공장 · 납품 기록이 있는 몇 곳. 올해 상반기 영업이익률 HD현대일렉트릭 {margin('267260', f'{CY}H1'):.0f}% · 효성중공업 {margin('298040', f'{CY}H1'):.0f}%",
+        "measures": [("val", "변압기 수출금액", ["8504"]), ("unit", "1kg당 수출 단가", ["8504"]), ("ecos", "변압기 수출물가", "변압기"),
+                     ("cty", "미국으로 간 비중", ["8504"], "US")],
         "stocks": [
             ("HD현대일렉트릭", "267260", "초고압 변압기, 미국 비중이 큼"),
             ("효성중공업", "298040", "초고압 변압기, 미국 공장"),
@@ -142,8 +240,10 @@ THEMES = [
         "group": "중국과 겹치는 곳",
         "name": "조선", "hyp": "H2", "codes": ["8901"],
         "share": ("neg", "▼ 꺾이는 중"), "share_note": "신규 수주 점유율 44%(2018) → 17%(2024) → 21%(2025) · 중국 63~70%",
-        "price": ("pos", "있음"), "price_note": "골라 받기 · 배값 상승으로 이익이 늘었다, 점유율과 주가가 엇갈린 대표 예",
+        "price": ("pos", "있음 · 측정"),
+        "price_note": lambda: f"수주 점유율은 줄었는데 1kg당 수출 단가 {f_pct(pct(unit(_M8901[0]), unit(_M8901[1])))}, 4곳 모두 영업이익률이 1년 전보다 올랐다 — 점유율과 이익이 엇갈린 대표 예",
         "who": ("neu", "대표 회사"), "who_note": "대형 3사가 액화천연가스선 · 고부가선에 집중",
+        "measures": [("val", "선박 수출금액(인도 기준)", ["8901"]), ("unit", "1kg당 수출 단가", ["8901"])],
         "stocks": [
             ("HD한국조선해양", "009540", "HD현대 조선 계열 지주"),
             ("HD현대중공업", "329180", "대형선 · 군함"),
@@ -161,8 +261,12 @@ THEMES = [
         "group": "중국과 겹치는 곳",
         "name": "배터리 · 양극재", "hyp": "H4", "codes": ["8507"],
         "share": ("neg", "▼ 꺾이는 중"), "share_note": "한국 3사 세계 점유율 34.7%(2020) → 15.4%(2025) · CATL 39%",
-        "price": ("neg", "약함"), "price_note": "중국 저가 배터리(리튬인산철) · 리튬 값 하락",
-        "who": ("neg", "고객을 따라감"), "who_note": "양극재 수출 점유율은 65%로 1위지만 고객(한국 3사)이 꺾이자 함께 꺾였다",
+        "price": ("neg", "약함 · 측정"),
+        "price_note": lambda: f"전지 수출물가(달러 기준) 1년 {f_pct(pct(_E['전지'][0], _E['전지'][1]))}. 올해 상반기 영업이익률 LG에너지솔루션 {margin('373220', f'{CY}H1'):.1f}% · 삼성SDI {margin('006400', f'{CY}H1'):.1f}%",
+        "who": ("neg", "고객을 따라감"),
+        "who_note": lambda: f"양극재 수출 점유율은 65%로 1위지만 고객(한국 3사)이 꺾이자 함께 꺾였다. 양극재 1kg당 수출 단가는 2023년 {unit(cus(['2841'], '2023')):.0f}달러 → 올해 {unit(_M2841[1]):.0f}달러",
+        "measures": [("val", "배터리 수출금액", ["8507"]), ("ecos", "전지 수출물가", "전지"),
+                     ("val", "양극재 등 수출금액", ["2841"]), ("unit", "양극재 등 1kg당 단가", ["2841"])],
         "stocks": [
             ("LG에너지솔루션", "373220", "배터리 셀, 미국 공장 · 에너지 저장 장치로 되찾는지"),
             ("삼성SDI", "006400", "배터리 셀, 같은 질문"),
@@ -182,8 +286,12 @@ THEMES = [
         "group": "중국과 겹치는 곳",
         "name": "철강 · 석유화학 (견줄 쪽)", "hyp": "H1 · H2", "codes": ["7208", "7210"],
         "share": ("neg", "▼ 꺾이는 중"), "share_note": "열연 · 도금 강판 세계 수출 점유율 11.8 → 10.3% · 중국 14 → 30%",
-        "price": ("neg", "약함"), "price_note": "석유화학은 점유율이 그대로인데도 중국 과잉 공급으로 적자 · 구조조정",
-        "who": ("neu", "판단 유보"), "who_note": "업계 전체가 밀리는 쪽, 위 테마와 견주어 보는 기준",
+        "price": ("mix", "바닥에서 오름 · 측정"),
+        "price_note": lambda: f"열연강판 수출물가 1년 {f_pct(pct(_E['열연강판'][0], _E['열연강판'][1]))} · 합성수지 {f_pct(pct(_E['합성수지'][0], _E['합성수지'][1]))}. "
+                              f"그래도 영업이익률은 POSCO홀딩스 {margin('005490', f'{CY}H1'):.0f}% · 롯데케미칼 {margin('011170', f'{CY}H1'):.0f}%로 얇다",
+        "who": ("neu", "기준 묶음"), "who_note": "업계 전체가 밀리는 쪽, 위 테마와 견주어 보는 기준",
+        "measures": [("val", "열연 · 도금 강판 수출금액", ["7208", "7210"]), ("unit", "1kg당 수출 단가", ["7208", "7210"]),
+                     ("ecos", "열연강판 수출물가", "열연강판"), ("ecos", "합성수지 수출물가", "합성수지")],
         "stocks": [
             ("POSCO홀딩스", "005490", "철강, 이차전지 소재로 옮기는 중"),
             ("LG화학", "051910", "석유화학, LG에너지솔루션 모회사"),
@@ -251,18 +359,66 @@ def chart(vals, rival):
 
 def q_row(label, verdict, note):
     kind, text = verdict
+    if callable(note):
+        try:
+            note = note()
+        except (TypeError, KeyError, IndexError):   # 캐시 없음 · 칸 빠짐
+            note = "숫자를 아직 받지 못했다(fetch_kr_measures.py)"
     return (f'<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid #F1F5F9">'
             f'<div style="flex:none;width:96px;font-size:{NAME}px;font-weight:700;color:{C_TITLE}">{label}</div>'
             f'<div style="flex:1;min-width:0">{pill(kind, text)}'
             f'<div style="font-size:{TINY}px;line-height:{LH_TINY}px;color:{C_SUB};margin-top:4px">{html.escape(note)}</div></div></div>')
 
 
+def updown(a, b, fmt="{:.1f}", unit=""):
+    """a → b, 오르면 빨강 ▲ · 내리면 파랑 ▼ (4절)."""
+    if a is None or b is None:
+        return f'<span style="color:{C_GUIDE}">—</span>'
+    color, sign = ("#d93025", "▲") if b > a else ("#1a73e8", "▼") if b < a else (C_TEXT, "")
+    return (f'<span style="color:{C_SUB}">{fmt.format(a)}{unit} → </span>'
+            f'<span style="color:{color};font-weight:700">{fmt.format(b)}{unit} {sign}</span>')
+
+
 def stock_row(name, code, role):
+    m = (f'<div style="flex:none;font-size:15px;white-space:nowrap;text-align:right">'
+         f'{updown(margin(code, f"{CY - 1}H1"), margin(code, f"{CY}H1"), unit="%")}</div>')
     return (f'<div data-row-link style="display:flex;gap:10px;align-items:baseline;padding:8px 12px;border:1px solid #E2E8F0;'
             f'border-radius:8px;margin-bottom:6px;background:#fff">'
-            f'<div style="flex:none;font-size:{NAME}px;font-weight:700;color:{C_TITLE};white-space:nowrap">{html.escape(name)}'
+            f'<div style="flex:1;min-width:0"><div style="font-size:{NAME}px;font-weight:700;color:{C_TITLE};white-space:nowrap">{html.escape(name)}'
             f'<span style="font-size:12px;font-weight:400;color:{C_SUB};margin-left:4px">{code}</span></div>'
-            f'<div style="flex:1;min-width:0;font-size:{TINY}px;line-height:{LH_TINY}px;color:{C_TEXT}">{html.escape(role)}</div></div>')
+            f'<div style="font-size:{TINY}px;line-height:{LH_TINY}px;color:{C_TEXT}">{html.escape(role)}</div></div>{m}</div>')
+
+
+def measure_rows(measures):
+    """자세한 숫자 보기 — 관세청은 작년 · 올해 같은 달까지, 한국은행은 1년 전 같은 달, 2019년 값은 회색 아래 줄."""
+    out = []
+    for kind, label, *arg in measures:
+        sub = ""
+        if kind == "ecos":
+            a, b, last, base = ecos(arg[0])
+            cell, src = updown(a, b, "{:.0f}"), f"한국은행 수출물가지수(달러 기준, 2020=100) · {last[:4]}.{last[5:]} 와 1년 전"
+            if base:
+                sub = f"2019년 같은 달 {base:.0f}"
+        else:
+            a, b, mo = ytd(arg[0])
+            src = f"관세청 품목별 수출 · {CY - 1} · {CY}년 1~{mo}월"
+            if kind == "val":
+                cell = updown(a and a["usd"] / 1e8, b and b["usd"] / 1e8, "{:,.0f}", "억 달러")
+            elif kind == "unit":
+                cell = updown(unit(a), unit(b), "{:,.1f}", "달러")
+                base = unit(cus(arg[0], "2019"))
+                sub = f"2019년 {base:,.1f}달러" if base else ""
+                src += " · 금액 ÷ 무게(kg)"
+            else:
+                cell = updown(cshare(a, arg[1]), cshare(b, arg[1]), "{:.0f}", "%")
+                base = cshare(cus(arg[0], "2019"), arg[1])
+                sub = f"2019년 {base:.0f}%" if base is not None else ""
+        out.append(f'<div style="display:flex;gap:10px;align-items:baseline;padding:8px 0;border-top:1px solid #F1F5F9">'
+                   f'<div style="flex:1;min-width:0"><div style="font-weight:700;color:{C_TITLE};font-size:{NAME}px">{html.escape(label)}</div>'
+                   f'<div style="font-size:{TINY}px;line-height:{LH_TINY}px;color:{C_SUB}">{html.escape(src)}</div></div>'
+                   f'<div style="flex:none;text-align:right;font-size:15px;white-space:nowrap">{cell}'
+                   f'<div style="font-size:{TINY}px;line-height:{LH_TINY}px;color:{C_GUIDE}">{sub}</div></div></div>')
+    return "".join(out)
 
 
 def watch_block(watch, turn):
@@ -289,7 +445,10 @@ def theme_card(t, c2p, data):
             f'{chart(vals, rival) if vals else ""}'
             f'<div style="margin-top:6px">{q_row("경쟁력", t["share"], t["share_note"])}'
             f'{q_row("값을 정할 힘", t["price"], t["price_note"])}{q_row("몫", t["who"], t["who_note"])}</div>'
-            f'<div style="font-size:{NAME}px;font-weight:700;color:{C_TITLE};margin:12px 0 6px">지켜볼 종목</div>'
+            f'{details("자세한 숫자 보기", measure_rows(t["measures"])) if M and t.get("measures") else ""}'
+            f'<div style="display:flex;justify-content:space-between;align-items:baseline;margin:12px 0 6px">'
+            f'<div style="font-size:{NAME}px;font-weight:700;color:{C_TITLE}">지켜볼 종목</div>'
+            f'<div style="font-size:{TINY}px;line-height:{LH_TINY}px;color:{C_GUIDE}">영업이익률 · {CY - 1} → {CY} 상반기</div></div>'
             f'{"".join(stock_row(*s) for s in t["stocks"])}'
             f'{watch_block(t["watch"], t["turn"])}</section>')
 
@@ -476,11 +635,11 @@ def main():
 <p data-seo-lead style="margin:0 0 12px">한국이 세계에서 경쟁력 있는 산업과 그 테마 종목을 숫자로 봅니다. "경쟁력 있는 산업의 주식을 사 두면 시간이 지나면 오르지 않을까"라는 물음에서 시작해, 한국이 무엇을 잘하는지 · 그 힘이 커지는지 · 누가 그 몫을 가져가는지 · 정말 주가로 이어졌는지 · 그럼 무엇을 지켜봐야 하는지 순서로 답합니다.</p>
 {intro(c2p, data)}
 <h2 style="{H2};margin-top:36px">테마별로 보기</h2>
-<div style="{GUIDE}">ⓘ 세 묶음 · 9개 테마 · 종목은 테마 안 역할로 나눴습니다. 카드 아래 `지켜볼 것 보기`에 지표 · 출처 · 꺾임 신호가 있습니다.</div>
+<div style="{GUIDE}">ⓘ 세 묶음 · 9개 테마 · 종목은 테마 안 역할로 나눴습니다. `측정` 이 붙은 판정은 관세청 수출 단가 · 한국은행 수출물가 · 전자공시 영업이익률로 잰 것이고, 나머지는 보도를 옮긴 것입니다. 카드의 `자세한 숫자 보기`에 그 숫자가, `지켜볼 것 보기`에 지표 · 출처 · 꺾임 신호가 있습니다.</div>
 {"".join(body)}
 </div></body></html>"""
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(page)
+    OUT.write_text(page, encoding="utf-8")
     print(OUT)
 
 

@@ -552,13 +552,35 @@ def _picks(s):
 def card_opinions(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 공용 R.opinions_cards (한국 · 미국 같은 카드, 2026-11-01 사용자 P197)."""
     ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
-    return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s))
+    return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s),
+                            broker=s.get("broker") or [], news_ops=_news_opinions(s))   # 증권사 · 뉴스 의견 (P275)
+
+
+BROKER_TITLE_RE = re.compile(r"upgrade|downgrade|price target|target (cut|raised|lowered|bump)|initiat|reiterat|\brating\b", re.I)   # 증권사 등급 기사 = 증권사 카드와 같은 일
+
+
+def _news_opinions(s):
+    """`뉴스 의견은?` 재료 — 해설 · 투자 의견 기사(NVDA labels 의 의견 매체 · 의견형 제목) 중 이 종목 관련도 1 이상, 최근 R.PICK_HOURS 시간, 최신 먼저.
+    주가 움직임만 다룬 기사 · 2차 출처(news_store._cap 의 나머지 조건)와 증권사 등급 기사는 뺀다."""
+    import labels
+    cut = (NOW - datetime.timedelta(hours=R.PICK_HOURS)).strftime("%Y-%m-%dT%H:%M")
+    out = []
+    for x in (NEWS or {}).values():
+        sc = next((c for c in x.get("scores") or [] if c["ticker"] == s["sym"]), None)
+        if not sc or sc["relevance"] < 1 or _ts(x["published_at"]) < cut or BROKER_TITLE_RE.search(x["title"]):
+            continue
+        src = (x.get("source") or "").lower()
+        if not (any(p in src for p in labels.OPINION_PUBLISHERS) or labels.OPINION_TITLE_RE.search(x["title"])):
+            continue
+        out.append({"source": x.get("source") or "", "title": news_store.headline(x) or x.get("title_ko") or x["title"], "direction": sc["direction"],
+                    "url": x.get("url"), "published_at": x["published_at"]})
+    return sorted(out, key=lambda r: r["published_at"], reverse=True)
 
 
 def sec_opinions(s):
     """`의견` 탭 (2026-11-01 사용자 P196 · P197, 한국과 같게) — `애널리스트 의견은?` · `방송 의견은?` 강조 카드 둘(접힌 채) + 함께 보기 흰 카드."""
     card = card_opinions(s)
-    return card or _dk.muted("애널리스트 · 방송 의견이 아직 없습니다.")   # 두 카드 격자 + 함께 보기는 R.opinions_cards 가 감싼다
+    return card or _dk.muted("의견이 아직 없습니다.")   # 두 카드 격자 + 함께 보기는 R.opinions_cards 가 감싼다
 
 
 def sec_earnings_tab(s):
@@ -634,6 +656,8 @@ def verdict_items(s):
         "news": SG.news_item(_week_news(s)),   # 뉴스 · 방송 분위기 (P218)
         "analysts": SG.item("analysts", (R.analysts_verdict({"status": {"analysts": s.get("analysts") or []}, "headline": {"close": s.get("close")}}) or (None,))[0]),
         "picks": SG.item("picks", R.picks_word(_picks(s))) if _picks(s) else None,
+        "broker": SG.item("broker", R.broker_word(s.get("broker") or [])),   # 증권사 목표가 변경 (2026-11-03 신호에 넣음)
+        "news_ops": SG.item("news_ops", R.news_op_word(_news_opinions(s)) if NOW else None),   # 뉴스 의견
     }
     return got
 
@@ -707,6 +731,8 @@ def _bil(v):
     """달러 → `1,234억 달러` (음수는 −). None 이면 `미수집` — 0 으로 적지 않는다 (운영지침, 2026-10-30)."""
     if v is None:
         return "미수집"
+    if 0 < abs(v) < 0.5e8:   # 5천만 달러 아래는 `0억 달러` 로 보이지 않게 만 달러로 (ANET · HOOD 설비 투자, 2026-11-02 P280)
+        return f"{round(v / 1e6) * 100:,}만 달러".replace("-", "−")
     return f"{v / 1e8:,.0f}억 달러".replace("-", "−")
 
 
@@ -729,6 +755,7 @@ def card_capex(c):
     lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 설비 투자와 영업으로 번 돈 (억 달러)</span>{chart}', "html")]
     sm, n4 = c["sum4"], c["n4"]
     tag = f"최근 {n4}분기 합" if n4 == 4 else "최근 4분기 없음"
+    nil = "최근 분기 SEC 자료가 아직 없다" if c.get("partial") else None   # Yahoo 로 더한 분기는 설비 투자 · 영업으로 번 돈뿐 (P280)
     if sm.get("capex") is not None:
         note = tag + (f" · 그 전 4분기보다 {R._sgn(c['chg4'], 0)}%" if c.get("chg4") is not None else "")
         if sm.get("ocf"):
@@ -736,15 +763,15 @@ def card_capex(c):
         lines.append(("row", "설비 투자", _bil(sm["capex"]), note))
     else:
         lines.append(("row", "설비 투자", "미수집", "회사가 이 항목을 따로 적지 않았다"))
-    lines.append(("row", "연구개발비", _bil(sm.get("rnd")), tag if sm.get("rnd") is not None else "회사가 이 항목을 따로 적지 않았다"))
+    lines.append(("row", "연구개발비", _bil(sm.get("rnd")), tag if sm.get("rnd") is not None else nil or "회사가 이 항목을 따로 적지 않았다"))
     if sm.get("debt_in") is not None or sm.get("debt_out") is not None:
         lines.append(("row", "빌린 돈 (채권 · 차입)", _bil(sm.get("debt_in")), tag + (f" · 갚은 돈 {_bil(sm['debt_out'])}" if sm.get("debt_out") is not None else "")))
     else:
-        lines.append(("row", "빌린 돈 (채권 · 차입)", "미수집", "이 기간 발행 · 상환을 따로 적지 않았다"))
+        lines.append(("row", "빌린 돈 (채권 · 차입)", "미수집", nil or "이 기간 발행 · 상환을 따로 적지 않았다"))
     if sm.get("stock_in") and sm["stock_in"] > 0:   # 음수(세금 원천징수 차감 등)는 안 보인다
         lines.append(("row", "주식 발행으로 들어온 돈", _bil(sm["stock_in"]), tag))
-    lines.append(("row", "자사주 매입", _bil(sm.get("buyback")), tag if sm.get("buyback") is not None else "이 기간 매입을 따로 적지 않았다"))
-    lines.append(("row", "배당", _bil(sm.get("div")), tag if sm.get("div") is not None else "이 기간 배당을 따로 적지 않았다"))
+    lines.append(("row", "자사주 매입", _bil(sm.get("buyback")), tag if sm.get("buyback") is not None else nil or "이 기간 매입을 따로 적지 않았다"))
+    lines.append(("row", "배당", _bil(sm.get("div")), tag if sm.get("div") is not None else nil or "이 기간 배당을 따로 적지 않았다"))
     if sm.get("lease"):
         lines.append(("row", "금융리스 상환", _bil(sm["lease"]), tag + " · 리스로 들여온 설비의 원금"))
     if c.get("cash") is not None:
@@ -755,8 +782,9 @@ def card_capex(c):
         lines.append(("row", "출처", f'<a href="{_esc(c["src"])}" target="_blank" rel="noopener" style="color:inherit;">SEC {_esc(c.get("form") or "10-Q")} ›</a>', "회사가 SEC 에 낸 분기 · 연간 보고서", True))
     tip = ("회사가 번 돈을 어디에 쓰고, 모자란 돈을 어떻게 끌어오는지 — 회사가 SEC 에 낸 현금흐름표 그대로\n"
            "· 설비 투자 : 데이터 센터 · 공장 · 장비처럼 오래 쓰는 자산을 사는 데 쓴 돈(자본 지출). 리스로 들여온 설비는 여기에 안 들어가 `금융리스 상환` 줄을 따로 둔다\n"
-           "· 늘리는 중 · 줄이는 중 : 최근 4분기 합이 그 전 4분기 합보다 10% 넘게 많으면 늘리는 중, 10% 넘게 적으면 줄이는 중 — 분기 값은 들쭉날쭉해 합으로 본다")
-    return lines, _dk.with_src(tip, "SEC EDGAR")
+           "· 늘리는 중 · 줄이는 중 : 최근 4분기 합이 그 전 4분기 합보다 10% 넘게 많으면 늘리는 중, 10% 넘게 적으면 줄이는 중 — 분기 값은 들쭉날쭉해 합으로 본다"
+           + ("\n· 이 회사는 SEC 공용 자료에 빈 분기가 있어 설비 투자 · 영업으로 번 돈 일부를 Yahoo Finance 분기 현금흐름으로 채웠다. 4분기 합을 견줄 수 없으면 최근 분기를 1년 전 같은 분기와 비교한다" if c.get("yahoo") else ""))
+    return lines, _dk.with_src(tip, "SEC EDGAR · Yahoo Finance" if c.get("yahoo") else "SEC EDGAR")   # P280
 
 
 def sec_expect(s, open_first=True):

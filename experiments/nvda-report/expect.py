@@ -2,7 +2,7 @@
 
 비교 대상 (가이드라인 1-4-1 : 그래프에는 반드시 비교 대상)
   1. 회사는 돈을 더 벌고 있나?      분기 매출 1년 전 대비 · 기술주 15개 중앙값 (SEC XBRL companyfacts, 주 1회)
-  2. 내년 이익 예상은?    내년 1주당 이익 예상치 7 · 30 · 60 · 90일 변화 · 기술주 15개 중앙값 (yfinance eps_trend, 매일)
+  2. 이익 예상 변화는?  다음 회계연도 1주당 이익 예상치 7 · 30 · 60 · 90일 변화 · 기술주 15개 중앙값 (yfinance eps_trend, 매일)
   3. 시장 예상 흔들림은?   옵션 30일 내재변동성 ÷ √252 vs 평소 하루(EWMA) · S&P 500 한 쌍 (매일)
   4. 하락에 거는 돈은?              공매도 비율(유통 주식 대비) 지난달 · 이번 달 · 기술주 15개 중앙값 (yfinance info, 매일 — 값은 격주로 바뀐다)
 수집 결과는 meta 에 JSON 으로 둔다 (state_io 가 meta 를 통째로 내보내므로 Actions 에서도 이어진다).
@@ -132,6 +132,13 @@ def _eps(t):
     out = {k: float(row[k]) for k in ("current", "7daysAgo", "30daysAgo", "60daysAgo", "90daysAgo") if row.get(k) == row.get(k)}
     if rv is not None and "+1y" in rv.index:
         out["up30"], out["down30"] = int(rv.loc["+1y"].get("upLast30days") or 0), int(rv.loc["+1y"].get("downLast30days") or 0)
+    try:   # +1y 가 끝나는 날 = Yahoo 다음 결산일(0y 끝) + 1년 — 화면에 `2028년 1월 결산` (2026-11-02 사용자 P277: `내년` 이 달력 내년으로 읽힌다)
+        nxt = (t.info or {}).get("nextFiscalYearEnd")
+        if nxt:
+            d = datetime.datetime.fromtimestamp(nxt, datetime.timezone.utc).date()
+            out["fy_end"] = f"{d.year + 1}-{d.month:02d}"
+    except Exception:  # noqa: BLE001 — 기간 표기만 빠진다
+        pass
     return out
 
 

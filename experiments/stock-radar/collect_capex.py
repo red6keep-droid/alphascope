@@ -16,7 +16,8 @@ import datetime
 TAGS = {
     "capex": ("PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets", "PaymentsForCapitalImprovements",
               "PaymentsToAcquireOtherPropertyPlantAndEquipment",
-              "PaymentsToAcquireOilAndGasPropertyAndEquipment", "PaymentsToExploreAndDevelopOilAndGasProperties", "PaymentsToAcquireOilAndGasProperty"),   # 석유 · 가스(COP 류)
+              "PaymentsToAcquireOilAndGasPropertyAndEquipment", "PaymentsToExploreAndDevelopOilAndGasProperties", "PaymentsToAcquireOilAndGasProperty",   # 석유 · 가스(COP 류)
+              "PaymentsToDevelopRealEstateAssets"),   # 물류 · 부동산 리츠의 개발 투자 (PLD, 2026-11-02 P280)
     "rnd": ("ResearchAndDevelopmentExpense", "ResearchAndDevelopmentExpenseExcludingAcquiredInProcessCost"),
     "ocf": ("NetCashProvidedByUsedInOperatingActivities", "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"),
     "debt_in": ("ProceedsFromIssuanceOfLongTermDebt", "ProceedsFromIssuanceOfSeniorLongTermDebt", "ProceedsFromIssuanceOfDebt",
@@ -80,12 +81,17 @@ def _quarters_cf(facts):
 
 
 def _best(facts_all, tags, cutoff):
-    best, used = {}, None
+    """분기가 가장 많은 항목 하나 + 그 항목에 없는 분기는 다른 후보로 채운다 — 회사가 중간에 항목 이름을 바꾼 경우(ANET 2025Q4, 2026-11-02 P280)."""
+    qs = []
     for t in tags:
         q = _quarters_cf((facts_all.get(t) or {}).get("units", {}).get("USD", []))
-        q = {k: v for k, v in q.items() if k[1] >= cutoff}
-        if len(q) > len(best):
-            best, used = q, t
+        qs.append(({k: v for k, v in q.items() if k[1] >= cutoff}, t))
+    best, used = max(qs, key=lambda x: len(x[0]), default=({}, None))
+    best = dict(best)
+    for q, _ in qs:
+        for k, v in q.items():
+            if k not in best and not any(e == k[1] for _, e in best):
+                best[k] = v
     return best, used
 
 
@@ -139,10 +145,50 @@ def rows_from_facts(facts, cik):
         row["form"] = src[2] if src else None
         row["src"] = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{src[1].replace('-', '')}/" if src and src[1] else None
         rows.append(row)
+    return _yoy(rows)
+
+
+def _yoy(rows):
     for r in rows:   # 1년 전 같은 분기 대비 (설비 투자)
         prev = [x for x in rows if abs((_d(r["end"]) - _d(x["end"])).days - 364) <= 20]
         r["capex_yoy"] = (r["capex"] / prev[0]["capex"] - 1) * 100 if prev and r["capex"] and prev[0].get("capex") else None
     return rows
+
+
+def fill_yahoo(rows, t):
+    """SEC 공용 항목에 설비 투자 · 영업현금흐름이 없거나 모자란 회사 → Yahoo 분기 현금흐름(최근 5분기 안팎)으로 빈 칸만 채운다 (2026-11-02 사용자 P280).
+    NEE · COP 는 설비 투자를 회사 고유 항목으로 적어 companyfacts 에 없고, XOM 은 분기 값이 둘뿐이다. SEC 값이 있는 칸은 건드리지 않는다.
+    SEC 표보다 새 분기(NEE — SEC 공용 자료가 2026년 1분기에서 멈춤)는 Yahoo 분기로 줄을 더하고, SEC 표가 4분기도 안 되면(XOM) Yahoo 분기로만 만든다 — 그 줄은 yahoo_only,
+    다른 항목(배당 · 발행 …)은 미수집이라 summary 가 0 으로 더하지 않는다. 달러로 적지 않는 회사(TSM · ASML)는 하지 않는다."""
+    if ((t.info or {}).get("financialCurrency") or "USD") != "USD":
+        return rows
+    q = t.quarterly_cashflow
+    if q is None or q.empty:
+        return rows
+    yv = {}
+    for name, k, sign in (("Capital Expenditure", "capex", -1), ("Operating Cash Flow", "ocf", 1)):
+        if name in q.index:
+            for d, v in q.loc[name].dropna().items():
+                yv.setdefault(d.date().isoformat(), {})[k] = sign * float(v)
+    if not yv:
+        return rows
+    # SEC 분기가 4개도 안 되면 그 값은 버린다 — XOM 은 반기 누적 둘뿐이라 분기 값으로 읽으면 두 배가 된다 (P280)
+    rows = [dict(r) for r in rows] if len(rows) >= 4 else []
+    last = rows[-1]["end"] if rows else ""
+    for e in sorted(yv):
+        if yv[e].get("capex") is None:   # Yahoo 에도 설비 투자가 없는 분기는 줄을 더하지 않는다 (PLD)
+            continue
+        if (not last or e > last) and not any(abs((_d(r["end"]) - _d(e)).days) <= 10 for r in rows):
+            s = (_d(e) - datetime.timedelta(days=90)).isoformat()
+            rows.append({"start": s, "end": e, "cq": _cq(s, e), **{k: None for k in TAGS}, **{k: None for k in INSTANT_TAGS}, "form": None, "src": None, "yahoo_only": True})
+    rows.sort(key=lambda r: r["end"])
+    for r in rows:
+        y = next((v for e, v in yv.items() if abs((_d(r["end"]) - _d(e)).days) <= 10), None)
+        for k in ("capex", "ocf"):
+            if y and r.get(k) is None and y.get(k) is not None:
+                r[k] = y[k]
+                r["yahoo"] = True   # 이 줄의 값 일부가 Yahoo — 카드 출처에 함께 적는다
+    return _yoy(rows)
 
 
 def summary(rows, n=4):
@@ -158,6 +204,7 @@ def summary(rows, n=4):
         # 발행 · 상환 · 자사주 · 배당 · 증자 · 리스는 그 해에 없으면 줄 자체를 안 적는 회사가 많다 → 표 어딘가에 값이 있는 항목이면 빈 분기를 0 으로 더한다.
         # 설비 투자 · 연구개발 · 영업현금흐름은 빈 분기가 있으면 합을 내지 않는다(미수집)
         zero_ok = k in ZERO_WHEN_ABSENT and any(r.get(k) is not None for r in rows)
-        out[k] = tot(last, k, zero_ok) if len(last) == n else None
-        out[k + "_prev"] = tot(before, k, zero_ok) if len(before) == n else None
+        sec_only = lambda part: k in ("capex", "ocf") or not any(r.get("yahoo_only") for r in part)   # noqa: E731 — Yahoo 줄은 설비 투자 · 영업현금흐름만 (P280)
+        out[k] = tot(last, k, zero_ok) if len(last) == n and sec_only(last) else None
+        out[k + "_prev"] = tot(before, k, zero_ok) if len(before) == n and sec_only(before) else None
     return out

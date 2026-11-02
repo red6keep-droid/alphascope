@@ -968,7 +968,6 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       <a class="nav-item" href="/" aria-current="page">홈</a>
       <a class="nav-item" href="/search/label/데일리%20브리핑">미국 증시</a>
       <a class="nav-item" href="/search/label/트럼프%20트렌드">트럼프 SNS</a>
-      <a class="nav-item" href="/search/label/엔비디아">엔비디아 리포트</a>
     </nav>
   </div>
 
@@ -1034,7 +1033,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         </a>
         </div>
 
-        <!-- 엔비디아 리포트 카드는 삭제 (2026-10-20 사용자). 메뉴 · 시총 TOP 10 의 NVDA 줄은 엔비디아 글 목록으로 간다 -->
+        <!-- 엔비디아 리포트 카드는 삭제 (2026-10-20 사용자). 2026-11-01 부터 엔비디아도 종목 고정 페이지(nvidia-nvda-stock) -->
 
         <!-- 트럼프 트렌드 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
         <div class="report-col">
@@ -1280,13 +1279,12 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   };
 
   /* 종목 상세 주소 — experiments/stock-radar/universe.py CANDIDATES 의 slug (한 번 정하면 바꾸지 않는 주소) */
-  var PAGE_SLUG = { AAPL: 'apple-aapl-stock', GOOGL: 'alphabet-googl-stock', MSFT: 'microsoft-msft-stock', AMZN: 'amazon-amzn-stock',
+  var PAGE_SLUG = { NVDA: 'nvidia-nvda-stock', AAPL: 'apple-aapl-stock', GOOGL: 'alphabet-googl-stock', MSFT: 'microsoft-msft-stock', AMZN: 'amazon-amzn-stock',
     META: 'meta-stock', AVGO: 'broadcom-avgo-stock', TSLA: 'tesla-tsla-stock', 'BRK-B': 'berkshire-hathaway-brk-b-stock', LLY: 'eli-lilly-lly-stock',
     MU: 'micron-mu-stock', WMT: 'walmart-wmt-stock', JPM: 'jpmorgan-jpm-stock', AMD: 'amd-stock', V: 'visa-v-stock', XOM: 'exxonmobil-xom-stock',
     JNJ: 'johnson-johnson-jnj-stock', MA: 'mastercard-ma-stock', ABBV: 'abbvie-abbv-stock', INTC: 'intel-intc-stock' };
   var BLOG_HOME = 'https://alpha-scope.blogspot.com/';
   function pageFor(ticker) {
-    if (ticker === 'NVDA') return BLOG_HOME + 'search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84';   /* 엔비디아 글 목록 — 홈 엔비디아 카드(최신 글 주소)는 2026-10-20 삭제 */
     return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
   }
 

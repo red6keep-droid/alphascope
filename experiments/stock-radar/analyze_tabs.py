@@ -80,10 +80,13 @@ def card_capex(sym, extra):
     if last.get("capex") is None and not any(r.get("capex") is not None for r in rows[-4:]):
         state = "설비 투자 줄 없음"   # 은행 · 보험 — 현금흐름표에 설비 투자 항목이 따로 없다
     else:
-        state = "늘리는 중" if chg4 is not None and chg4 >= CAPEX_PCT else "줄이는 중" if chg4 is not None and chg4 <= -CAPEX_PCT else "비슷함" if chg4 is not None else "4분기 안 됨"
+        # 4분기 합 비교가 안 되면(Yahoo 로 채운 회사 — 최근 5분기뿐) 최근 분기와 1년 전 같은 분기로 (2026-11-02 사용자 P280)
+        cmp = chg4 if chg4 is not None else last.get("capex_yoy")
+        state = "늘리는 중" if cmp is not None and cmp >= CAPEX_PCT else "줄이는 중" if cmp is not None and cmp <= -CAPEX_PCT else "비슷함" if cmp is not None else "4분기 안 됨"
     return {"state": state, "end": last["end"], "form": last.get("form"), "src": last.get("src"), "capex": last.get("capex"), "capex_yoy": last.get("capex_yoy"),
             "ocf": last.get("ocf"), "rnd": last.get("rnd"), "cash": last.get("cash"), "debt": last.get("debt"), "bars": bars, "chg4": chg4,
-            "sum4": {k: sm.get(k) for k in CX.TAGS}, "n4": min(4, len(rows))}
+            "sum4": {k: sm.get(k) for k in CX.TAGS}, "n4": min(4, len(rows)),
+            "yahoo": any(r.get("yahoo") or r.get("yahoo_only") for r in rows[-8:]), "partial": any(r.get("yahoo_only") for r in rows[-4:])}   # Yahoo 로 채운 칸 (P280)
 
 
 def card_eps(sym, extra, group):
@@ -101,7 +104,7 @@ def card_eps(sym, extra, group):
     if c30 is None:
         return None
     state = "높아지는 중" if c30 >= EX.EPS_PCT else "낮아지는 중" if c30 <= -EX.EPS_PCT else "그대로"   # 재는 것 그대로 (2026-10-31 사용자 P141: `더 나쁘게 봄` 이 종목 의견처럼 읽혀 방송 매수 의견과 상충해 보였다. 옛 B안 10-27)
-    return {"state": state, "c30": c30, "bars": bars, "current": me["current"], "up30": me.get("up30"), "down30": me.get("down30")}
+    return {"state": state, "c30": c30, "bars": bars, "current": me["current"], "up30": me.get("up30"), "down30": me.get("down30"), "fy_end": me.get("fy_end")}
 
 
 def card_move(s, snap, extra):
@@ -262,6 +265,7 @@ def build(s, snap, extra):
             print(f"[tabs] {s['sym']} {k} 실패 : {e}")
             s["expect"][k] = None
     s["analysts"] = analysts(s["sym"], extra)
+    s["broker"] = (((extra.get("stocks") or {}).get(s["sym"]) or {}).get("analysts") or {}).get("changes") or []   # 증권사 등급 · 목표가 변경 (P275)
     s["company"] = ((extra.get("stocks") or {}).get(s["sym"]) or {}).get("company") or {}   # 기업 탭 (2026-10-31)
     peers = cal_peers(s, snap, extra)
     s["options_status"] = options_status(s["sym"], extra)

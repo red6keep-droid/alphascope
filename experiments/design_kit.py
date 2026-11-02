@@ -674,12 +674,12 @@ _CHANGE = re.compile(_NUM + r"(\s*)(?=(" + _UP_V + r")|(" + _DN_V + r"))")   # "
 _WHERE = re.compile(r"보다 " + _NUM + r" ?(위|아래)(?=로|에|인|이고|이다|였|,|\.|\s|\)|$)")   # "고점보다 2.0% 아래" → "고점 대비 −2.0%"
 
 
-def _sign_text(t, color):
+def _sign_text(t, color, bold=False):
     """변화를 말하는 숫자에 + · − 를 붙이고(이미 있으면 그대로), 글자 노드면 증감 색. 크기(±) · 수준(공매도 비율 1.35%) · 범위(3~10%)는 건드리지 않는다.
     위치를 말하는 `보다 n% 위 · 아래` 는 이중 부정이 되지 않게 `대비 +n% · −n%` 로 바꾼다."""
     def paint(sign, num, unit):
         s = f"{sign}{num}{unit}"
-        return f'<span style="color:{UP if sign == "+" else DOWN};white-space:nowrap;">{s}</span>' if color else s
+        return f'<span style="color:{UP if sign == "+" else DOWN};{"font-weight:700;" if bold else ""}white-space:nowrap;">{s}</span>' if color else s   # bold = 강조 카드 문장 (P279)
     t = _WHERE.sub(lambda m: " 대비 " + paint("+" if m.group(3) == "위" else "−", m.group(1), m.group(2)), t)
     return _CHANGE.sub(lambda m: paint("+" if m.group(4) else "−", m.group(1), m.group(2)) + m.group(3), t)
 
@@ -799,15 +799,22 @@ def _minus_bar(t):
     return _MINUS_NUM.sub(MINUS_BAR, t)
 
 
+SENT_ATTR = 'data-emph-sent="1"'   # 강조 카드 문장 줄 표시 (render_html _state_card) — 문장 안 증감 숫자 굵게 (P279)
+
+
 def fix_colons(html):
     """보이는 글의 ":" · "·" 는 앞뒤를 한 칸씩 띄운다 ("·" 는 2026-10-13 사용자) — "라벨 : 값" (2026-10-11 사용자: 꼭 반드시, 모든 페이지 일괄).
     글자 노드와 툴팁·제목 속성(data-tip · title · aria-label)만 고친다. style · script 안, 시각·비율(숫자:숫자), 주소(://)는 건드리지 않는다.
     각 리포트의 build_body 마지막에 한 번 건다 — LLM 서술도 같이 고쳐진다. 줄표 ` — ` 도 여기서 쉼표로 (_no_dash).
     숫자 앞 빼기(−3)는 그린 줄(MINUS_BAR)로, 툴팁 속 빼기는 엔 대시(–)로 (2026-10-26 사용자)."""
-    out, skip, svg = [], False, False
+    out, skip, svg, sent = [], False, False, False
     for part in _TAG.split(html):
         if part.startswith("<") and part.endswith(">"):
             low = part[:8].lower()
+            if low.startswith("<li") and SENT_ATTR in part:
+                sent = True   # 강조 카드 문장 — 여기서 붙이는 증감 숫자는 굵게 (2026-11-02 사용자 P279)
+            elif low.startswith("</li"):
+                sent = False
             if low.startswith(("<script", "<style")):
                 skip = True
             elif low.startswith(("</script", "</style")):
@@ -820,7 +827,7 @@ def fix_colons(html):
         elif skip:
             out.append(part)
         else:
-            t = _sign_text(_space_dots(_space_colons(_no_dash(part))), not svg)
+            t = _sign_text(_space_dots(_space_colons(_no_dash(part))), not svg, sent)
             out.append(t if svg else _minus_bar(t))   # 숫자 앞 − 는 그린 줄로 (MINUS_BAR) — SVG <text> 안은 HTML 을 못 넣어 글자 그대로 (2026-11-01: 매출 선 그래프 음수 값이 그림을 깼다, P233)
     return "".join(out)
 

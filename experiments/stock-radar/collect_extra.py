@@ -39,6 +39,31 @@ def _analysts(t):
     for k in ("mean", "median", "high", "low"):
         if pt.get(k):
             out["pt_" + k] = float(pt[k])
+    try:
+        out["changes"] = _changes(t)
+    except Exception as e:  # noqa: BLE001 — 변경 기록이 없어도 집계는 쓴다
+        print(f"[extra] 증권사 변경 실패: {str(e)[:80]}")
+    return out
+
+
+BROKER_DAYS = 30   # 증권사 등급 · 목표가 변경은 최근 30일 (2026-11-02 사용자 P275: 매수의견 탭에 증권사 의견)
+
+
+def _changes(t):
+    """증권사별 등급 · 목표가 변경 (yfinance upgrades_downgrades, NVDA collect_market 과 같은 칸) — 최근 BROKER_DAYS 일, 최신 먼저."""
+    ud = t.upgrades_downgrades
+    if ud is None or ud.empty:
+        return []
+    num = lambda v: float(v) if v is not None and v == v and float(v) > 0 else None   # noqa: E731 — NaN · 0 = 없음
+    cut = (datetime.datetime.utcnow() - datetime.timedelta(days=BROKER_DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    out = []
+    for ts, r in ud.sort_index(ascending=False).iterrows():
+        at = ts.strftime("%Y-%m-%dT%H:%M:%SZ")
+        if at < cut:
+            break
+        out.append({"at": at, "firm": str(r.get("Firm") or "").strip(), "to": str(r.get("ToGrade") or "").strip(), "from": str(r.get("FromGrade") or "").strip(),
+                    "action": str(r.get("Action") or "").strip(), "pt_action": str(r.get("priceTargetAction") or "").strip(),
+                    "pt": num(r.get("currentPriceTarget")), "pt_prior": num(r.get("priorPriceTarget"))})
     return out
 
 
@@ -238,6 +263,13 @@ def revenue(have):
             print(f"[extra] {sym} 매출 실패 : {e}")
         try:
             rows = CX.rows_from_facts(facts, cik.get(sym) or cik[sym.replace("-", "")])
+            stale = rows and (datetime.date.today() - datetime.date.fromisoformat(rows[-1]["end"])).days > 120   # SEC 공용 자료가 멈춘 회사 (NEE)
+            if rows and (len(rows) < 4 or stale or any(r.get("capex") is None for r in rows[-4:])):   # 빈 칸만 Yahoo 로 (P280)
+                try:
+                    import yfinance as yf
+                    rows = CX.fill_yahoo(rows, yf.Ticker(sym))
+                except Exception as e:   # noqa: BLE001 — SEC 표 그대로
+                    print(f"[extra] {sym} Yahoo 현금흐름 실패 : {str(e)[:80]}")
             if rows:
                 cash[sym] = rows
         except Exception as e:   # noqa: BLE001

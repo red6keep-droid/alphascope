@@ -1554,8 +1554,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
             <b:attr cond='data:view.search.label == &quot;데일리 브리핑&quot;' name='aria-current' value='page'/>미국 증시 리포트</a>
           <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C&quot;'>
             <b:attr cond='data:view.search.label == &quot;트럼프 트렌드&quot;' name='aria-current' value='page'/>트럼프 SNS 트렌드</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84&quot;'>
-            <b:attr cond='data:view.search.label == &quot;엔비디아&quot;' name='aria-current' value='page'/>엔비디아 리포트</a>
           <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;p/us-market-cap-top10.html&quot;'>시총 TOP 10</a>
         </nav>
       </div>
@@ -1629,7 +1627,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               </a>
               </div>
 
-              <!-- 엔비디아 리포트 카드는 삭제 (2026-10-20 사용자). 메뉴 · 시총 TOP 10 의 NVDA 줄은 엔비디아 글 목록으로 간다 -->
+              <!-- 엔비디아 리포트 카드는 삭제 (2026-10-20 사용자). 2026-11-01 부터 엔비디아도 종목 고정 페이지(nvidia-nvda-stock) -->
 
               <!-- 트럼프 트렌드 글이 아직 없으면 카드는 라벨 목록으로 간다. -->
               <div class='report-col'>
@@ -2454,13 +2452,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
         };
 
         /* 종목 상세 주소 — experiments/stock-radar/universe.py CANDIDATES 의 slug (한 번 정하면 바꾸지 않는 주소) */
-        var PAGE_SLUG = { AAPL: 'apple-aapl-stock', GOOGL: 'alphabet-googl-stock', MSFT: 'microsoft-msft-stock', AMZN: 'amazon-amzn-stock',
+        var PAGE_SLUG = { NVDA: 'nvidia-nvda-stock', AAPL: 'apple-aapl-stock', GOOGL: 'alphabet-googl-stock', MSFT: 'microsoft-msft-stock', AMZN: 'amazon-amzn-stock',
           META: 'meta-stock', AVGO: 'broadcom-avgo-stock', TSLA: 'tesla-tsla-stock', 'BRK-B': 'berkshire-hathaway-brk-b-stock', LLY: 'eli-lilly-lly-stock',
           MU: 'micron-mu-stock', WMT: 'walmart-wmt-stock', JPM: 'jpmorgan-jpm-stock', AMD: 'amd-stock', V: 'visa-v-stock', XOM: 'exxonmobil-xom-stock',
           JNJ: 'johnson-johnson-jnj-stock', MA: 'mastercard-ma-stock', ABBV: 'abbvie-abbv-stock', INTC: 'intel-intc-stock' };
         var BLOG_HOME = 'https://alpha-scope.blogspot.com/';
         function pageFor(ticker) {
-          if (ticker === 'NVDA') return BLOG_HOME + 'search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84';   /* 엔비디아 글 목록 — 홈 엔비디아 카드(최신 글 주소)는 2026-10-20 삭제 */
           return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
         }
 
