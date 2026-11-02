@@ -729,6 +729,8 @@ def _bil(v):
     """달러 → `1,234억 달러` (음수는 −). None 이면 `미수집` — 0 으로 적지 않는다 (운영지침, 2026-10-30)."""
     if v is None:
         return "미수집"
+    if 0 < abs(v) < 0.5e8:   # 5천만 달러 아래는 `0억 달러` 로 보이지 않게 만 달러로 (ANET · HOOD 설비 투자, 2026-11-02 P280)
+        return f"{round(v / 1e6) * 100:,}만 달러".replace("-", "−")
     return f"{v / 1e8:,.0f}억 달러".replace("-", "−")
 
 
@@ -751,6 +753,7 @@ def card_capex(c):
     lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 설비 투자와 영업으로 번 돈 (억 달러)</span>{chart}', "html")]
     sm, n4 = c["sum4"], c["n4"]
     tag = f"최근 {n4}분기 합" if n4 == 4 else "최근 4분기 없음"
+    nil = "최근 분기 SEC 자료가 아직 없다" if c.get("partial") else None   # Yahoo 로 더한 분기는 설비 투자 · 영업으로 번 돈뿐 (P280)
     if sm.get("capex") is not None:
         note = tag + (f" · 그 전 4분기보다 {R._sgn(c['chg4'], 0)}%" if c.get("chg4") is not None else "")
         if sm.get("ocf"):
@@ -758,15 +761,15 @@ def card_capex(c):
         lines.append(("row", "설비 투자", _bil(sm["capex"]), note))
     else:
         lines.append(("row", "설비 투자", "미수집", "회사가 이 항목을 따로 적지 않았다"))
-    lines.append(("row", "연구개발비", _bil(sm.get("rnd")), tag if sm.get("rnd") is not None else "회사가 이 항목을 따로 적지 않았다"))
+    lines.append(("row", "연구개발비", _bil(sm.get("rnd")), tag if sm.get("rnd") is not None else nil or "회사가 이 항목을 따로 적지 않았다"))
     if sm.get("debt_in") is not None or sm.get("debt_out") is not None:
         lines.append(("row", "빌린 돈 (채권 · 차입)", _bil(sm.get("debt_in")), tag + (f" · 갚은 돈 {_bil(sm['debt_out'])}" if sm.get("debt_out") is not None else "")))
     else:
-        lines.append(("row", "빌린 돈 (채권 · 차입)", "미수집", "이 기간 발행 · 상환을 따로 적지 않았다"))
+        lines.append(("row", "빌린 돈 (채권 · 차입)", "미수집", nil or "이 기간 발행 · 상환을 따로 적지 않았다"))
     if sm.get("stock_in") and sm["stock_in"] > 0:   # 음수(세금 원천징수 차감 등)는 안 보인다
         lines.append(("row", "주식 발행으로 들어온 돈", _bil(sm["stock_in"]), tag))
-    lines.append(("row", "자사주 매입", _bil(sm.get("buyback")), tag if sm.get("buyback") is not None else "이 기간 매입을 따로 적지 않았다"))
-    lines.append(("row", "배당", _bil(sm.get("div")), tag if sm.get("div") is not None else "이 기간 배당을 따로 적지 않았다"))
+    lines.append(("row", "자사주 매입", _bil(sm.get("buyback")), tag if sm.get("buyback") is not None else nil or "이 기간 매입을 따로 적지 않았다"))
+    lines.append(("row", "배당", _bil(sm.get("div")), tag if sm.get("div") is not None else nil or "이 기간 배당을 따로 적지 않았다"))
     if sm.get("lease"):
         lines.append(("row", "금융리스 상환", _bil(sm["lease"]), tag + " · 리스로 들여온 설비의 원금"))
     if c.get("cash") is not None:
@@ -777,8 +780,9 @@ def card_capex(c):
         lines.append(("row", "출처", f'<a href="{_esc(c["src"])}" target="_blank" rel="noopener" style="color:inherit;">SEC {_esc(c.get("form") or "10-Q")} ›</a>', "회사가 SEC 에 낸 분기 · 연간 보고서", True))
     tip = ("회사가 번 돈을 어디에 쓰고, 모자란 돈을 어떻게 끌어오는지 — 회사가 SEC 에 낸 현금흐름표 그대로\n"
            "· 설비 투자 : 데이터 센터 · 공장 · 장비처럼 오래 쓰는 자산을 사는 데 쓴 돈(자본 지출). 리스로 들여온 설비는 여기에 안 들어가 `금융리스 상환` 줄을 따로 둔다\n"
-           "· 늘리는 중 · 줄이는 중 : 최근 4분기 합이 그 전 4분기 합보다 10% 넘게 많으면 늘리는 중, 10% 넘게 적으면 줄이는 중 — 분기 값은 들쭉날쭉해 합으로 본다")
-    return lines, _dk.with_src(tip, "SEC EDGAR")
+           "· 늘리는 중 · 줄이는 중 : 최근 4분기 합이 그 전 4분기 합보다 10% 넘게 많으면 늘리는 중, 10% 넘게 적으면 줄이는 중 — 분기 값은 들쭉날쭉해 합으로 본다"
+           + ("\n· 이 회사는 SEC 공용 자료에 빈 분기가 있어 설비 투자 · 영업으로 번 돈 일부를 Yahoo Finance 분기 현금흐름으로 채웠다. 4분기 합을 견줄 수 없으면 최근 분기를 1년 전 같은 분기와 비교한다" if c.get("yahoo") else ""))
+    return lines, _dk.with_src(tip, "SEC EDGAR · Yahoo Finance" if c.get("yahoo") else "SEC EDGAR")   # P280
 
 
 def sec_expect(s, open_first=True):

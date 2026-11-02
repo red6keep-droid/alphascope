@@ -263,6 +263,13 @@ def revenue(have):
             print(f"[extra] {sym} 매출 실패 : {e}")
         try:
             rows = CX.rows_from_facts(facts, cik.get(sym) or cik[sym.replace("-", "")])
+            stale = rows and (datetime.date.today() - datetime.date.fromisoformat(rows[-1]["end"])).days > 120   # SEC 공용 자료가 멈춘 회사 (NEE)
+            if rows and (len(rows) < 4 or stale or any(r.get("capex") is None for r in rows[-4:])):   # 빈 칸만 Yahoo 로 (P280)
+                try:
+                    import yfinance as yf
+                    rows = CX.fill_yahoo(rows, yf.Ticker(sym))
+                except Exception as e:   # noqa: BLE001 — SEC 표 그대로
+                    print(f"[extra] {sym} Yahoo 현금흐름 실패 : {str(e)[:80]}")
             if rows:
                 cash[sym] = rows
         except Exception as e:   # noqa: BLE001
