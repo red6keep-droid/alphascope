@@ -4,10 +4,11 @@
 재료 = collect_extra.revenue() 가 분기 매출 때 이미 받는 companyfacts JSON 하나 — 같은 JSON 에서 아래 항목을 더 뽑는다 (SEC 호출 수 그대로).
 
 현금흐름표 값은 10-Q 에 누적(연초부터)으로 적히는 회사가 많다 → 같은 회계연도 시작일끼리 이어 붙여 차분해 분기 값으로 만든다(_quarters_cf).
-손익 항목(연구개발비)은 3개월 값이 있으면 그대로, 누적만 있으면 같은 차분. 잔액(현금 · 장기 부채)은 분기 말 값 그대로.
+손익 항목(연구개발비 · 매출총이익 · 영업이익 · 순이익)은 3개월 값이 있으면 그대로, 누적만 있으면 같은 차분. 잔액(현금 · 장기 부채)은 분기 말 값 그대로.
 회사마다 항목 이름이 다르다(설비 투자 = PaymentsToAcquirePropertyPlantAndEquipment 또는 PaymentsToAcquireProductiveAssets(리츠)) → 후보 가운데 최근 4년 분기가 가장 많은 것 하나.
 없는 항목은 None(화면에 '미수집', 0 아님). 외국 회사(TSM · ASML, 20-F · IFRS)는 us-gaap 이 없어 표 자체가 없다.
-결과 한 줄 = {start, end, cq, capex, rnd, ocf, debt_in, debt_out, buyback, div, stock_in, lease, cash, debt, src(그 분기 공시 색인 URL), form}.
+잉여현금흐름(fcf) = 영업현금흐름 − 설비 투자 — 둘 다 있는 분기만 (2026-11-03 사용자: 매출 흐름과 현금 창출력을 따로 보자).
+결과 한 줄 = {start, end, cq, capex, rnd, ocf, gp, opinc, ni, debt_in, debt_out, buyback, div, stock_in, lease, fcf, cash, debt, src(그 분기 공시 색인 URL), form}.
 """
 
 import datetime
@@ -20,6 +21,10 @@ TAGS = {
               "PaymentsToDevelopRealEstateAssets"),   # 물류 · 부동산 리츠의 개발 투자 (PLD, 2026-11-02 P280)
     "rnd": ("ResearchAndDevelopmentExpense", "ResearchAndDevelopmentExpenseExcludingAcquiredInProcessCost"),
     "ocf": ("NetCashProvidedByUsedInOperatingActivities", "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"),
+    # 이익 흐름 (2026-11-03 사용자) — 매출총이익은 안 적는 회사가 많다(AMZN · 은행 · 보험). 순이익은 지배주주 몫(NetIncomeLoss) 먼저, 없으면 전체(ProfitLoss)
+    "gp": ("GrossProfit",),
+    "opinc": ("OperatingIncomeLoss",),
+    "ni": ("NetIncomeLoss", "ProfitLoss", "NetIncomeLossAvailableToCommonStockholdersBasic"),
     "debt_in": ("ProceedsFromIssuanceOfLongTermDebt", "ProceedsFromIssuanceOfSeniorLongTermDebt", "ProceedsFromIssuanceOfDebt",
                 "ProceedsFromDebtNetOfIssuanceCosts", "ProceedsFromIssuanceOfUnsecuredDebt"),
     "debt_out": ("RepaymentsOfLongTermDebt", "RepaymentsOfDebt", "RepaymentsOfSeniorDebt", "RepaymentsOfLongTermDebtAndCapitalSecurities",
@@ -35,6 +40,7 @@ INSTANT_TAGS = {
 }
 FORMS = ("10-Q", "10-K", "10-Q/A", "10-K/A")
 ZERO_WHEN_ABSENT = {"debt_in", "debt_out", "buyback", "div", "stock_in", "lease"}
+DERIVED = ("fcf",)   # 표에서 계산해 더하는 열 — summary 도 같이 합한다
 YEARS = 4
 
 
@@ -149,9 +155,12 @@ def rows_from_facts(facts, cik):
 
 
 def _yoy(rows):
-    for r in rows:   # 1년 전 같은 분기 대비 (설비 투자)
+    for r in rows:   # 1년 전 같은 분기 대비 (설비 투자 · 이익) — 1년 전이 0 이거나 적자면 비율이 뜻이 없어 None
+        r["fcf"] = r["ocf"] - r["capex"] if r.get("ocf") is not None and r.get("capex") is not None else None
         prev = [x for x in rows if abs((_d(r["end"]) - _d(x["end"])).days - 364) <= 20]
-        r["capex_yoy"] = (r["capex"] / prev[0]["capex"] - 1) * 100 if prev and r["capex"] and prev[0].get("capex") else None
+        for k in ("capex", "gp", "opinc", "ni"):
+            p = prev[0].get(k) if prev else None
+            r[k + "_yoy"] = (r[k] / p - 1) * 100 if r.get(k) and p and p > 0 else None
     return rows
 
 
@@ -200,11 +209,11 @@ def summary(rows, n=4):
         return sum(v or 0 for v in vs)
     last, before = rows[-n:], rows[-2 * n:-n]
     out = {}
-    for k in TAGS:
+    for k in (*TAGS, *DERIVED):
         # 발행 · 상환 · 자사주 · 배당 · 증자 · 리스는 그 해에 없으면 줄 자체를 안 적는 회사가 많다 → 표 어딘가에 값이 있는 항목이면 빈 분기를 0 으로 더한다.
         # 설비 투자 · 연구개발 · 영업현금흐름은 빈 분기가 있으면 합을 내지 않는다(미수집)
         zero_ok = k in ZERO_WHEN_ABSENT and any(r.get(k) is not None for r in rows)
-        sec_only = lambda part: k in ("capex", "ocf") or not any(r.get("yahoo_only") for r in part)   # noqa: E731 — Yahoo 줄은 설비 투자 · 영업현금흐름만 (P280)
+        sec_only = lambda part: k in ("capex", "ocf", "fcf") or not any(r.get("yahoo_only") for r in part)   # noqa: E731 — Yahoo 줄은 설비 투자 · 영업현금흐름(· 그 차이인 잉여현금흐름)만 (P280)
         out[k] = tot(last, k, zero_ok) if len(last) == n and sec_only(last) else None
         out[k + "_prev"] = tot(before, k, zero_ok) if len(before) == n and sec_only(before) else None
     return out
