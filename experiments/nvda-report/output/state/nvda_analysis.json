@@ -1,56 +1,56 @@
 {
- "generated_at": "2026-11-02T22:32:09Z",
- "run_date": "2026-11-03",
- "day": "2026-11-02",
+ "generated_at": "2026-11-03T22:32:11Z",
+ "run_date": "2026-11-04",
+ "day": "2026-11-03",
  "is_latest_bar_today": true,
  "headline": {
-  "close": 202.05999755859375,
-  "ret_1d": -1.2607514849246049,
-  "ret_vs_spy": -0.781738721265679,
-  "ret_vs_smh": 1.4531747032920261,
-  "ret_vs_amd": 6.259056829858178,
-  "ret_vs_avgo": -0.08006706868420865,
-  "vol_ratio_20d": 1.1631080902753501,
-  "gap": 1.441554416067592,
-  "range_pct": 4.116051980470925,
-  "ret_sigma_20d": 1.8743745077233913
+  "close": 206.69000244140625,
+  "ret_1d": 2.291401038679064,
+  "ret_vs_spy": 1.992238683535108,
+  "ret_vs_smh": 0.2827799173761525,
+  "ret_vs_amd": -1.3629554201548544,
+  "ret_vs_avgo": -0.7809365956030545,
+  "vol_ratio_20d": 0.8969872128711824,
+  "gap": 2.9199293410673954,
+  "range_pct": 1.5530536919787303,
+  "ret_sigma_20d": 1.9846021694128408
  },
  "macro_today": [],
  "periods": [
   {
    "label": "1주",
    "days": 5,
-   "nvda": -6.453704833984375,
-   "spy": -1.7338045149285164,
-   "smh": -6.150067918261892
+   "nvda": -5.161971126904341,
+   "spy": -1.9891897841644357,
+   "smh": -7.071931309139501
   },
   {
    "label": "1개월",
    "days": 21,
-   "nvda": -13.631117677126369,
-   "spy": -2.278992610657349,
-   "smh": -19.392639194715322
+   "nvda": -13.482625482625487,
+   "spy": -2.6431657334116343,
+   "smh": -18.20160915587006
   },
   {
    "label": "3개월",
    "days": 63,
-   "nvda": -4.661698956780924,
-   "spy": -2.4931016656734584,
-   "smh": -11.707286974633158
+   "nvda": -5.715718780004064,
+   "spy": -2.005742200096272,
+   "smh": -8.98367414062513
   },
   {
    "label": "6개월",
    "days": 126,
-   "nvda": 1.8037091435497032,
-   "spy": 4.747839912627438,
-   "smh": 0.29992481857248343
+   "nvda": 5.1857518785782375,
+   "spy": 4.225092947963316,
+   "smh": -0.7977927434385412
   },
   {
    "label": "1년",
    "days": 252,
-   "nvda": -0.4090895724538246,
-   "spy": 10.63059245389908,
-   "smh": 39.749259672086865
+   "nvda": 2.0741749391596453,
+   "spy": 10.598771117805295,
+   "smh": 42.835115206761174
   }
  ],
  "year_range": {
@@ -58,9 +58,9 @@
   "high_day": "2026-10-06",
   "low": 164.27000427246094,
   "low_day": "2026-03-30",
-  "close": 202.05999755859375,
-  "pos_pct": 47.77496543623456,
-  "pct_from_high": -16.974153916838496
+  "close": 206.69000244140625,
+  "pos_pct": 53.628322476314636,
+  "pct_from_high": -15.07169881731686
  },
  "drawdown": {
   "stats": {
@@ -116,8 +116,8 @@
    "peers_span": "1999~",
    "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다."
   },
-  "days_since_high": 19,
-  "pct_from_high": -16.974153916838496,
+  "days_since_high": 20,
+  "pct_from_high": -15.07169881731686,
   "high_day": "2026-10-06"
  },
  "earnings_moves": {
@@ -156,38 +156,38 @@
    }
   ],
   "median_abs": 3.24902081606282,
-  "normal_abs": 1.5310549053903832,
+  "normal_abs": 1.5507705530775517,
   "n_up": 3
  },
  "normal_range": {
-  "ret_log": -0.012687663930964769,
-  "ret_pct": -1.2607514849246049,
-  "sigma_pct": 2.0980791236217655,
-  "z": -0.6047276190929802,
+  "ret_log": 0.022655427118661448,
+  "ret_pct": 2.291401038679064,
+  "sigma_pct": 2.057767221542293,
+  "z": 1.1009713286073846,
   "outside": false,
-  "n_year": 139,
+  "n_year": 61,
   "n_past": 248,
   "earnings_day": false,
   "market_shock": {
    "active": false,
    "start": null,
-   "vix": 21.149999618530273
+   "vix": 20.829999923706055
   }
  },
  "market_regime": {
   "regime": "단기 조정",
-  "prev_regime": "상승 추세",
-  "changed": true,
-  "pct_from_high": -3.4643045526416727,
+  "prev_regime": "단기 조정",
+  "changed": false,
+  "pct_from_high": -3.175506092586766,
   "above_ma200": true,
-  "ma200": 729.1533990478515,
-  "pct_vs_ma200": 3.1470163299039955,
-  "vix": 21.149999618530273,
-  "streak": -3,
+  "ma200": 729.4668490600586,
+  "pct_vs_ma200": 3.4111387731932785,
+  "vix": 20.829999923706055,
+  "streak": 1,
   "benchmark": "SPY",
-  "bar_day": "2026-11-02",
+  "bar_day": "2026-11-03",
   "fng": {
-   "score": 22.7285714285714,
+   "score": 19.0915113871636,
    "rating": "extreme fear",
    "rating_ko": "극단적 공포"
   }
@@ -196,74 +196,74 @@
   "state": "빠져나가는 중",
   "prev": "빠져나가는 중",
   "changed": false,
-  "rel_pp": -16.878724697424133,
+  "rel_pp": -14.845044179152367,
   "days": 20,
-  "shares_5d": 0.0,
+  "shares_5d": null,
   "sectors": [
-   {
-    "etf": "XLP",
-    "name": "필수 소비재",
-    "rel": 15.014007095276671,
-    "rank": 1
-   },
    {
     "etf": "XLV",
     "name": "헬스케어",
-    "rel": 13.228115839303078,
+    "rel": 13.307775112650866,
+    "rank": 1
+   },
+   {
+    "etf": "XLP",
+    "name": "필수 소비재",
+    "rel": 11.916329600821008,
     "rank": 2
-   },
-   {
-    "etf": "XLU",
-    "name": "유틸리티",
-    "rel": 12.190486794485333,
-    "rank": 3
-   },
-   {
-    "etf": "XLB",
-    "name": "소재",
-    "rel": 11.35779073042924,
-    "rank": 4
    },
    {
     "etf": "XLRE",
     "name": "부동산",
-    "rel": 10.236235443741215,
-    "rank": 5
-   },
-   {
-    "etf": "XLY",
-    "name": "경기 소비재",
-    "rel": 9.943156806513208,
-    "rank": 6
+    "rel": 9.428546944747463,
+    "rank": 3
    },
    {
     "etf": "XLF",
     "name": "금융",
-    "rel": 9.763545012383679,
+    "rel": 9.063305396420397,
+    "rank": 4
+   },
+   {
+    "etf": "XLB",
+    "name": "소재",
+    "rel": 8.926563073640082,
+    "rank": 5
+   },
+   {
+    "etf": "XLU",
+    "name": "유틸리티",
+    "rel": 8.666269770700087,
+    "rank": 6
+   },
+   {
+    "etf": "XLY",
+    "name": "경기 소비재",
+    "rel": 8.196988861163712,
     "rank": 7
    },
    {
     "etf": "XLE",
     "name": "에너지",
-    "rel": 8.922518421943405,
+    "rel": 7.771585002666415,
     "rank": 8
    },
    {
     "etf": "XLI",
     "name": "산업재",
-    "rel": 2.7042754763897836,
+    "rel": 3.0239764830394145,
     "rank": 9
    },
    {
     "etf": "XLC",
     "name": "통신",
-    "rel": -7.2357862368527375,
+    "rel": -5.96914141743241,
     "rank": 10
    },
    {
     "etf": "XLK",
     "name": "기술",
-    "rel": -10.359630908513584,
+    "rel": -9.4433085079895,
     "rank": 11
    }
   ],
@@ -271,15 +271,15 @@
   "n_sectors": 11,
   "leaders": [
    {
-    "etf": "XLP",
-    "name": "필수 소비재",
-    "rel": 15.014007095276671,
+    "etf": "XLV",
+    "name": "헬스케어",
+    "rel": 13.307775112650866,
     "rank": 1
    },
    {
-    "etf": "XLV",
-    "name": "헬스케어",
-    "rel": 13.228115839303078,
+    "etf": "XLP",
+    "name": "필수 소비재",
+    "rel": 11.916329600821008,
     "rank": 2
    }
   ],
@@ -287,23 +287,23 @@
    {
     "etf": "XLK",
     "name": "기술",
-    "rel": -10.359630908513584,
+    "rel": -9.4433085079895,
     "rank": 11
    },
    {
     "etf": "XLC",
     "name": "통신",
-    "rel": -7.2357862368527375,
+    "rel": -5.96914141743241,
     "rank": 10
    }
   ]
  },
  "bollinger": {
-  "pctb": 0.052932587534414974,
-  "lower": 199.98119667560735,
-  "upper": 239.253806986502,
-  "ma20": 219.61750183105468,
-  "close": 202.05999755859375,
+  "pctb": 0.1882938122882256,
+  "lower": 199.86395913819274,
+  "upper": 236.11604421874085,
+  "ma20": 217.9900016784668,
+  "close": 206.69000244140625,
   "state": "밴드 안",
   "days": 0,
   "entered": false,
@@ -422,9 +422,9 @@
   "active": [],
   "entered": [],
   "values": {
-   "rsi80": 33.30507848385986,
-   "ma200_40": -1.173631652979612,
-   "ret20_25": -15.420676969064061
+   "rsi80": 39.17558182608333,
+   "ma200_40": 1.0403219087048443,
+   "ret20_25": -13.605585313651847
   },
   "stats": {
    "symbol": "NVDA",
@@ -539,10 +539,22 @@
  },
  "events": [
   {
-   "area": "Macro",
-   "kind": "regime",
-   "title": "시장 국면 전환 : 상승 추세 → 단기 조정",
-   "fact": "S&P 500 고점 대비 -3.5% · 200일 평균 위 · VIX 21.1",
+   "area": "Earnings",
+   "kind": "calendar",
+   "title": "AMD 실적 발표일",
+   "fact": "AMD 실적 발표일",
+   "url": null,
+   "direction": "neutral",
+   "emphasis": false,
+   "source": "calendar",
+   "published_at": null,
+   "speaker": null
+  },
+  {
+   "area": "Earnings",
+   "kind": "calendar",
+   "title": "SMCI 실적 발표일",
+   "fact": "SMCI 실적 발표일",
    "url": null,
    "direction": "neutral",
    "emphasis": false,
@@ -553,14 +565,14 @@
   {
    "area": "Demand",
    "kind": "news",
-   "title": "데이터센터 AI 반도체 및 광학 연결 수요 급증",
-   "fact": "데이터센터 AI 반도체 및 광학 연결 수요 급증",
-   "detail": "AI 데이터센터 내에서 칩 간 연결을 위한 광학 네트워킹과 맞춤형 칩 수요가 폭발적으로 증가하고 있다.",
-   "url": "https://www.youtube.com/watch?v=KJ0c7f8lQdA",
+   "title": "반도체주 강세와 AI 투자",
+   "fact": "반도체주 강세와 AI 투자",
+   "detail": "공화당이 의회를 통제할 경우 AI 센티먼트에 긍정적일 것으로 전망된다.",
+   "url": "https://www.youtube.com/watch?v=lZYG1UWhm0M",
    "direction": "positive",
    "emphasis": false,
-   "published_at": "2026-11-02T21:30:30Z",
-   "source": "폭스 · 방송 2곳",
+   "published_at": "2026-11-03T17:35:44Z",
+   "source": "CNBC",
    "speaker": "방송",
    "media": true,
    "has_fact": false,
@@ -570,14 +582,14 @@
   {
    "area": "Demand",
    "kind": "news",
-   "title": "AI 테마 지속 가능성과 자금 조달",
-   "fact": "AI 테마 지속 가능성과 자금 조달",
-   "detail": "막대한 자금 조달과 증권 발행 물량이 AI 테마의 주요 리스크로 작용하고 있다",
-   "url": "https://www.youtube.com/watch?v=D0HLWSB4qbc",
-   "direction": "negative",
+   "title": "AI 인프라 투자 및 자금 조달",
+   "fact": "AI 인프라 투자 및 자금 조달",
+   "detail": "빅테크 기업들의 지속적인 AI 인프라 투자와 채권 발행 등 자금 조달이 반도체 수요를 견인하고 있다.",
+   "url": "https://www.youtube.com/watch?v=GHpbNLWaC2w",
+   "direction": "positive",
    "emphasis": false,
-   "published_at": "2026-11-02T18:19:08Z",
-   "source": "CNBC · 방송 2곳",
+   "published_at": "2026-11-03T17:14:51Z",
+   "source": "CNBC",
    "speaker": "방송",
    "media": true,
    "has_fact": false,
@@ -585,15 +597,15 @@
    "prio": false
   },
   {
-   "area": "Demand",
+   "area": "Macro",
    "kind": "news",
-   "title": "앤트로픽 IPO 및 대규모 AI 투자",
-   "fact": "앤트로픽 IPO 및 대규모 AI 투자",
-   "detail": "앤트로픽의 대규모 IPO 수정신고서와 천문학적인 컴퓨팅 인프라 투자 부담으로 인해 AI 생태계 전반의 자금 수요와 지속 가능성에 대한 의구심이 커지고 있다.",
-   "url": "https://www.youtube.com/watch?v=tXL3NFLCh_A",
+   "title": "엔비디아 중국 클라우드 고객사 제한 강화",
+   "fact": "엔비디아 중국 클라우드 고객사 제한 강화",
+   "detail": "엔비디아는 중국 고객사에 대한 매출 비중을 제한하고 비중국 고객사 비중을 높이도록 요구하고 있다.",
+   "url": "https://www.youtube.com/watch?v=q1bXLkfVg7Y",
    "direction": "negative",
    "emphasis": false,
-   "published_at": "2026-11-02T17:25:48Z",
+   "published_at": "2026-11-03T13:42:38Z",
    "source": "블룸버그",
    "speaker": "방송",
    "media": true,
@@ -603,21 +615,9 @@
   },
   {
    "area": "Flows",
-   "kind": "price",
-   "title": "일중 변동폭 4.1%",
-   "fact": "고가−저가가 종가의 4.1% (임계 4.0%)",
-   "url": null,
-   "direction": "neutral",
-   "emphasis": false,
-   "source": "yfinance",
-   "published_at": null,
-   "speaker": null
-  },
-  {
-   "area": "Flows",
    "kind": "options",
-   "title": "2026-11-06 $208 콜 미결제약정 73.6배",
-   "fact": "미결제약정 327 → 24,072 (임계 2.0배 · 미결제약정 ≥ 10,000)",
+   "title": "2026-11-04 $210 콜 미결제약정 3.8배",
+   "fact": "미결제약정 3,179 → 12,227 (임계 2.0배 · 미결제약정 ≥ 10,000)",
    "url": null,
    "direction": "positive",
    "emphasis": false,
@@ -625,37 +625,11 @@
    "published_at": null,
    "speaker": null
   },
-  {
-   "area": "Flows",
-   "kind": "options",
-   "title": "2026-11-06 $210 콜 미결제약정 22.8배",
-   "fact": "미결제약정 997 → 22,751 (임계 2.0배 · 미결제약정 ≥ 10,000)",
-   "url": null,
-   "direction": "positive",
-   "emphasis": false,
-   "source": "yfinance options",
-   "published_at": null,
-   "speaker": null
-  },
-  {
-   "area": "Flows",
-   "kind": "options",
-   "title": "2026-11-20 $238 콜 미결제약정 17.4배",
-   "fact": "미결제약정 2,139 → 37,199 (임계 2.0배 · 미결제약정 ≥ 10,000)",
-   "url": null,
-   "direction": "positive",
-   "emphasis": false,
-   "source": "yfinance options",
-   "published_at": null,
-   "speaker": null
-  }
- ],
- "events_overflow": [
   {
    "area": "Flows",
    "kind": "flows",
-   "title": "장외 공매도 비율 30% (20일 평균 40%)",
-   "fact": "FINRA 보고 장외 거래 중 공매도 29.5%, 20일 평균 40.3% (임계 ±10%p)",
+   "title": "장외 공매도 비율 27% (20일 평균 39%)",
+   "fact": "FINRA 보고 장외 거래 중 공매도 27.3%, 20일 평균 38.9% (임계 ±10%p)",
    "url": null,
    "direction": "positive",
    "emphasis": false,
@@ -664,28 +638,23 @@
    "speaker": null
   }
  ],
- "events_total": 9,
+ "events_overflow": [],
+ "events_total": 7,
  "direction_counts": {
   "today": {
-   "positive": 5,
-   "negative": 2,
+   "positive": 4,
+   "negative": 1,
    "uncertain": 0,
    "neutral": 2
   },
   "week": {
-   "positive": 19,
-   "negative": 6,
-   "uncertain": 5,
+   "positive": 11,
+   "negative": 4,
+   "uncertain": 4,
    "neutral": 6
   }
  },
- "analyst_target_only": [
-  {
-   "title": "Melius Research · Buy 유지 · 목표가 $420 → $315 (하향)",
-   "published_at": "2026-11-02T12:29:14Z",
-   "direction": "negative"
-  }
- ],
+ "analyst_target_only": [],
  "upcoming": [
   {
    "day": "2026-11-03",
@@ -712,6 +681,14 @@
    "confirmed": 1
   },
   {
+   "day": "2026-11-10",
+   "kind": "CPI",
+   "label": "CPI",
+   "symbol": null,
+   "source": "fred",
+   "confirmed": 1
+  },
+  {
    "day": "2026-11-19",
    "kind": "COURT",
    "label": "Hu v. NVIDIA · 기각 신청 심리",
@@ -733,55 +710,55 @@
   "price": [
    {
     "key": "close",
-    "value": 202.05999755859375,
+    "value": 206.69000244140625,
     "flag": false,
     "fmt": "usd"
    },
    {
     "key": "ret_1d",
-    "value": -1.2607514849246049,
+    "value": 2.291401038679064,
     "flag": false,
     "fmt": "pct_signed"
    },
    {
     "key": "ret_vs_spy",
-    "value": -0.781738721265679,
+    "value": 1.992238683535108,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "ret_vs_smh",
-    "value": 1.4531747032920261,
+    "value": 0.2827799173761525,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "ret_vs_amd",
-    "value": 6.259056829858178,
+    "value": -1.3629554201548544,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "ret_vs_avgo",
-    "value": -0.08006706868420865,
+    "value": -0.7809365956030545,
     "flag": false,
     "fmt": "pp_signed"
    },
    {
     "key": "gap",
-    "value": 1.441554416067592,
+    "value": 2.9199293410673954,
     "flag": false,
     "fmt": "pct_signed"
    },
    {
     "key": "range_pct",
-    "value": 4.116051980470925,
-    "flag": true,
+    "value": 1.5530536919787303,
+    "flag": false,
     "fmt": "pct"
    },
    {
     "key": "vol_ratio_20d",
-    "value": 1.1631080902753501,
+    "value": 0.8969872128711824,
     "flag": false,
     "fmt": "x"
    }
@@ -789,25 +766,25 @@
   "technical": [
    {
     "key": "ma50",
-    "value": 221.49540069580078,
+    "value": 221.45960083007813,
     "flag": false,
     "fmt": "usd"
    },
    {
     "key": "ma200",
-    "value": 204.45960014343262,
+    "value": 204.56190017700195,
     "flag": false,
     "fmt": "usd"
    },
    {
     "key": "pct_from_52w_high",
-    "value": -16.974153916838496,
+    "value": -15.07169881731686,
     "flag": false,
     "fmt": "pct_signed"
    },
    {
     "key": "rsi14",
-    "value": 33.30507848385986,
+    "value": 39.17558182608333,
     "flag": false,
     "fmt": "num1"
    },
@@ -821,7 +798,7 @@
   "options": [
    {
     "key": "iv_atm_30d",
-    "value": 0.4866490577959539,
+    "value": 0.4698094180914511,
     "flag": false,
     "fmt": "iv"
    },
@@ -833,31 +810,31 @@
    },
    {
     "key": "implied_move_next_earnings",
-    "value": 9.774324576180824,
+    "value": 9.313464498824565,
     "flag": false,
     "fmt": "pct"
    },
    {
     "key": "pc_ratio_oi",
-    "value": 0.7414304817893053,
+    "value": 0.7493135189875417,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "pc_ratio_vol",
-    "value": 0.737159786058479,
+    "value": 0.6708847118730764,
     "flag": false,
     "fmt": "num2"
    },
    {
     "key": "gex_approx",
-    "value": 8516160.133457584,
+    "value": 255818452.2692753,
     "flag": false,
     "fmt": "gex"
    },
    {
     "key": "gex_flip_strike",
-    "value": 250.0,
+    "value": 215.0,
     "flag": false,
     "fmt": "usd0"
    },
@@ -927,7 +904,7 @@
    },
    {
     "key": "pt_mean",
-    "value": 328.95346,
+    "value": 327.1431,
     "flag": false,
     "fmt": "usd0"
    },
@@ -953,7 +930,7 @@
   "flows": [
    {
     "key": "smh_shares_out",
-    "value": 11670900.0,
+    "value": null,
     "flag": false,
     "fmt": "int"
    },
@@ -983,13 +960,13 @@
    },
    {
     "key": "finra_short_ratio",
-    "value": 29.541967940596347,
+    "value": 27.264860285746252,
     "flag": true,
     "fmt": "pct"
    },
    {
     "key": "finra_short_ratio_avg20",
-    "value": 40.269649852457285,
+    "value": 38.87827382803286,
     "flag": false,
     "fmt": "pct"
    }
@@ -997,12 +974,12 @@
   "valuation": [
    {
     "key": "forward_pe",
-    "value": 12.696517509619705,
+    "value": 12.9874456437112,
     "flag": false,
     "fmt": "num1"
    }
   ],
-  "iv_rank_n": 17,
+  "iv_rank_n": 18,
   "news": [
    {
     "key": "news_count",
@@ -1012,7 +989,7 @@
    },
    {
     "key": "news_avg_7d",
-    "value": 47.714285714285715,
+    "value": 42.57142857142857,
     "flag": false,
     "fmt": "num1"
    },
@@ -1178,7 +1155,7 @@
    "label": "90일 임원·내부자 순매도",
    "value": 967599313.4595,
    "unit": "USD",
-   "asof": "2026-11-02",
+   "asof": "2026-11-03",
    "source": "SEC 임원 거래 공시 (Form 4)",
    "note": null,
    "arrow": null,
@@ -1198,9 +1175,9 @@
   {
    "metric": "forward_pe",
    "label": "선행 주가수익비율 (주가 ÷ 12개월 예상 주당순이익)",
-   "value": 12.696517509619705,
+   "value": 12.9874456437112,
    "unit": "배",
-   "asof": "2026-11-02",
+   "asof": "2026-11-03",
    "source": "yfinance",
    "note": null,
    "arrow": null,
@@ -1213,17 +1190,19 @@
    "unit": "분위",
    "asof": null,
    "source": null,
-   "note": "집계 중 (17/252일)",
+   "note": "집계 중 (18/252일)",
    "arrow": null,
    "detail": null
   }
  ],
  "data_status": {
-  "bars_last_day": "2026-11-02",
-  "state_collected_at": "2026-11-02T22:31:59Z",
-  "missing_fields": [],
-  "option_snapshot_days": 17,
-  "iv_rank_days": 17,
+  "bars_last_day": "2026-11-03",
+  "state_collected_at": "2026-11-03T22:32:04Z",
+  "missing_fields": [
+   "smh_shares_out"
+  ],
+  "option_snapshot_days": 18,
+  "iv_rank_days": 18,
   "items_by_kind": {
    "10q": 1,
    "8k": 3,
@@ -1263,9 +1242,11 @@
   "VOL_RATIO_EVENT": 2.0
  },
  "new_flags": [
+  "calendar:CPI:2026-11-10:CPI",
   "checklist:forward_pe",
   "checklist:insider_net_sold_90d",
-  "regime"
+  "status:pt_mean",
+  "status:smh_shares_out"
  ],
  "expect": {
   "revenue": {
@@ -1350,12 +1331,12 @@
     {
      "label": "30일",
      "stock": 1.4791524125736588,
-     "peers": 0.5682446422183407
+     "peers": 0.5251493674534258
     },
     {
      "label": "60일",
      "stock": 4.443505242322909,
-     "peers": 1.4388379699484144
+     "peers": 1.467664200105423
     },
     {
      "label": "90일",
@@ -1369,25 +1350,25 @@
   },
   "move": {
    "state": "평소보다 큼",
-   "exp": 3.065600911171411,
-   "sigma": 2.0980791236217655,
-   "ratio": 1.4611464728172316,
+   "exp": 2.9595211520617837,
+   "sigma": 2.057767221542293,
+   "ratio": 1.4382196008757626,
    "spy": {
-    "exp": 1.0452038604539362,
-    "sigma": 0.7344084525825998
+    "exp": 1.0509470528541764,
+    "sigma": 0.7157850958148861
    },
    "earn": {
-    "exp": 7.688091272895877,
+    "exp": 7.375102876442869,
     "past": 3.24902081606282,
     "n": 8
    },
    "next_earnings": "2026-11-17",
    "earn_in_window": true,
-   "days_to": 15,
-   "iv": 0.4866490577959539,
+   "days_to": 14,
+   "iv": 0.4698094180914511,
    "rank": null,
-   "imp": 9.774324576180824,
-   "earn_day": 7.688091272895877,
+   "imp": 9.313464498824565,
+   "earn_day": 7.375102876442869,
    "past": 3.24902081606282
   },
   "short": {
@@ -1405,7 +1386,7 @@
  "calendar_cards": {
   "earnings": {
    "day": "2026-11-17",
-   "left": 15,
+   "left": 14,
    "confirmed": false,
    "bars": [
     {
@@ -1458,21 +1439,11 @@
     }
    ],
    "median": 3.24902081606282,
-   "normal": 2.0980791236217655,
-   "market_exp": 7.688091272895877
+   "normal": 2.057767221542293,
+   "market_exp": 7.375102876442869
   },
   "peers": {
    "upcoming": [
-    {
-     "day": "2026-11-03",
-     "symbol": "AMD",
-     "confirmed": 0
-    },
-    {
-     "day": "2026-11-03",
-     "symbol": "SMCI",
-     "confirmed": 0
-    },
     {
      "day": "2026-11-24",
      "symbol": "DELL",
@@ -1480,20 +1451,12 @@
     }
    ],
    "effect": {
-    "AMD": {
-     "median": 3.2552239138451347,
-     "n": 8
-    },
     "DELL": {
      "median": 3.0611784523222276,
      "n": 8
-    },
-    "SMCI": {
-     "median": 3.1002260125796877,
-     "n": 7
     }
    },
-   "normal": 1.5219357225469965
+   "normal": 1.5409127292339675
   },
   "macro": {
    "upcoming": [
@@ -1561,31 +1524,17 @@
      "name": "Hu v. NVIDIA",
      "day": "2026-11-19",
      "label": "기각 신청 심리",
-     "left": 17
+     "left": 16
     },
     {
      "name": "증권 집단소송 (In re NVIDIA)",
      "day": "2027-05-20",
      "label": "본안 신청 심리",
-     "left": 199
+     "left": 198
     }
    ]
   },
   "all": [
-   {
-    "day": "2026-11-03",
-    "kind": "EARNINGS_PEER",
-    "label": "AMD 실적",
-    "symbol": "AMD",
-    "confirmed": 0
-   },
-   {
-    "day": "2026-11-03",
-    "kind": "EARNINGS_PEER",
-    "label": "SMCI 실적",
-    "symbol": "SMCI",
-    "confirmed": 0
-   },
    {
     "day": "2026-11-06",
     "kind": "NFP",
