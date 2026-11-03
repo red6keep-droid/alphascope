@@ -245,9 +245,10 @@ def edgar(have, cik):
 def revenue(have):
     """분기 매출 + 돈을 어디에 쓰나(설비 투자 · 연구개발 · 현금흐름 · 자금 조달, collect_capex) — companyfacts JSON 한 번으로 둘 다 (2026-10-30).
     돈 표는 data/capex.json 에도 따로 남긴다(nvda-state 에 보존 — 기록). 한 회사가 실패하면 그 회사는 지난 표를 그대로 둔다."""
-    if have and (datetime.date.today() - datetime.date.fromisoformat(have["built"])).days < REV_MAX_AGE_DAYS:
-        return have
     import collect_capex as CX
+    old_cols = any("ni" not in r for rows in ((load_capex() or {}).get("series") or {}).values() for r in rows)   # 이익 열이 없는 옛 표 → 한 번 다시 받는다 (2026-11-03)
+    if have and not old_cols and (datetime.date.today() - datetime.date.fromisoformat(have["built"])).days < REV_MAX_AGE_DAYS:
+        return have
     tickers = EX._sec("https://www.sec.gov/files/company_tickers.json")
     cik = {v["ticker"]: str(v["cik_str"]).zfill(10) for v in tickers.values()}
     series, cash = {}, dict((load_capex() or {}).get("series") or {})

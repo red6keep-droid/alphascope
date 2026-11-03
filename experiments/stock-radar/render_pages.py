@@ -749,10 +749,10 @@ def card_capex(c):
         first += f" 같은 석 달 영업으로 번 돈 {_bil(ocf)}의 {cap / ocf * 100:.0f}%였다." if ocf > 0 else f" 같은 석 달 영업으로 번 돈은 {_bil(ocf)}였다."
     if rnd is not None:
         first += f" 연구개발비는 {_bil(rnd)}다."
-    groups = [(_dk.q_axis(b["cq"]), [None if b["capex"] is None else b["capex"] / 1e8, None if b["ocf"] is None else b["ocf"] / 1e8]) for b in c["bars"]]   # 최신 오른쪽 (2026-10-31, 옛 P79)
-    chart = R._chart_card(groups, [lambda v: R._AMBER, R._gray], [R._note_fg, R._note_fg], [("설비 투자", R._AMBER), ("영업으로 번 돈", R._GRAY_BAR)],
-                          fmt=lambda v: f"{v:,.0f}".replace("-", "−"), right=True)
-    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 설비 투자와 영업으로 번 돈 (억 달러)</span>{chart}', "html")]
+    # 버튼으로 하나씩 보는 선 그래프 (2026-11-03 사용자) — 영업으로 번 돈 · 설비 투자 · 잉여 현금(= 잉여현금흐름, 음수는 0 선 아래). 설비 투자 줄 없는 회사(JPM)는 둘
+    ser = [(nm, [None if b.get(k) is None else b[k] / 1e8 for b in c["bars"]], col) for k, nm, col in CASH_SERIES if any(b.get(k) is not None for b in c["bars"])]
+    chart = line_tabs(f"lt-{c['sym']}-cash", [_dk.q_axis(b["cq"]) for b in c["bars"]], ser, lambda v: f"{v:,.0f}".replace("-", "−"), "억 달러")
+    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 {" · ".join(nm for nm, _, _ in ser)} (억 달러)</span>{chart}', "html")]
     sm, n4 = c["sum4"], c["n4"]
     tag = f"최근 {n4}분기 합" if n4 == 4 else "최근 4분기 없음"
     nil = "최근 분기 SEC 자료가 아직 없다" if c.get("partial") else None   # Yahoo 로 더한 분기는 설비 투자 · 영업으로 번 돈뿐 (P280)
@@ -763,6 +763,22 @@ def card_capex(c):
         lines.append(("row", "설비 투자", _bil(sm["capex"]), note))
     else:
         lines.append(("row", "설비 투자", "미수집", "회사가 이 항목을 따로 적지 않았다"))
+    # 현금 창출력 (2026-11-03 사용자: 매출 흐름 · 이익 흐름 · 현금 흐름 · 잉여현금흐름을 따로) — 영업으로 번 돈은 순이익과, 잉여현금흐름은 매출 성장과 나란히
+    if sm.get("ocf") is not None:
+        note = tag + (f" · 순이익 {_bil(sm['ni'])}의 {sm['ocf'] / sm['ni'] * 100:.0f}%" if sm.get("ni") and sm["ni"] > 0 and sm["ocf"] > 0 else "")   # 은행(JPM)은 영업현금흐름이 음수로 나오기도 — 비율 생략
+        lines.append(("row", "영업으로 번 돈", _bil(sm["ocf"]), note))
+    if sm.get("fcf") is not None:
+        if c.get("fcf_chg4") is not None and sm["fcf"] > 0:
+            note = tag + f" · 그 전 4분기보다 {R._sgn(c['fcf_chg4'], 0)}%"
+        elif sm.get("fcf_prev") is not None:   # 부호가 바뀌면(AMZN 2026) 비율 대신 값으로
+            note = tag + f" · 그 전 4분기는 {_bil(sm['fcf_prev'])}"
+        else:
+            note = tag
+        if c.get("rev_chg4") is not None:
+            note += f" (같은 기간 매출 {R._sgn(c['rev_chg4'], 0)}%)"
+        lines.append(("row", "잉여현금흐름", _bil(sm["fcf"]), note))
+    elif sm.get("capex") is None:
+        lines.append(("row", "잉여현금흐름", "미수집", "설비 투자 줄이 없어 계산하지 않았다"))
     lines.append(("row", "연구개발비", _bil(sm.get("rnd")), tag if sm.get("rnd") is not None else nil or "회사가 이 항목을 따로 적지 않았다"))
     if sm.get("debt_in") is not None or sm.get("debt_out") is not None:
         lines.append(("row", "빌린 돈 (채권 · 차입)", _bil(sm.get("debt_in")), tag + (f" · 갚은 돈 {_bil(sm['debt_out'])}" if sm.get("debt_out") is not None else "")))
@@ -780,17 +796,142 @@ def card_capex(c):
         lines.append(("row", "장기 부채", _bil(c["debt"]), f"{R._fd(c['end'])} 기준"))
     if c.get("src"):
         lines.append(("row", "출처", f'<a href="{_esc(c["src"])}" target="_blank" rel="noopener" style="color:inherit;">SEC {_esc(c.get("form") or "10-Q")} ›</a>', "회사가 SEC 에 낸 분기 · 연간 보고서", True))
-    tip = ("회사가 번 돈을 어디에 쓰고, 모자란 돈을 어떻게 끌어오는지 — 회사가 SEC 에 낸 현금흐름표 그대로\n"
-           "· 설비 투자 : 데이터 센터 · 공장 · 장비처럼 오래 쓰는 자산을 사는 데 쓴 돈(자본 지출). 리스로 들여온 설비는 여기에 안 들어가 `금융리스 상환` 줄을 따로 둔다\n"
-           "· 늘리는 중 · 줄이는 중 : 최근 4분기 합이 그 전 4분기 합보다 10% 넘게 많으면 늘리는 중, 10% 넘게 적으면 줄이는 중 — 분기 값은 들쭉날쭉해 합으로 본다"
+    # 긴 용어 풀이 툴팁 (2026-11-03 사용자: "너무 헷갈리니 매출 · 순이익 · 영업으로 번 돈 · 잉여 현금 · 설비 투자 · 배당 · 현금을 예를 들어 아주 자세히") — 가이드라인 2-6 길이 규칙의 예외.
+    # 예는 한 회사의 한 분기(억 달러)로 숫자를 이어 간다 : 매출 100 → 순이익 20 → 영업으로 번 돈 30 → 설비 투자 12 → 잉여 현금 18 → 배당 · 자사주 10 → 현금 잔액 58. 매출 카드 툴팁의 예와 같은 숫자
+    tip = ("회사가 번 돈을 어디에 쓰고, 모자란 돈을 어떻게 끌어오는지, 회사가 SEC 에 낸 현금흐름표 그대로. 용어가 헷갈리기 쉬워 한 회사의 한 분기를 예로 든다(억 달러)\n"
+           "· 매출 : 석 달 동안 물건 · 서비스를 판 금액. 장부 기준이라 외상으로 팔아 아직 못 받은 돈도 들어간다. 예 100\n"
+           "· 순이익 : 매출에서 원가 · 인건비 · 이자 · 세금 등 모든 비용을 뺀 장부상 이익. 예 매출 100에서 비용 80을 빼 20\n"
+           "· 영업으로 번 돈 : 본업을 돌리며 실제로 통장에 들어온 현금에서 나간 현금을 뺀 것(영업현금흐름). 순이익과 다른 까닭은 장부와 현금이 다르기 때문. 공장 · 장비 값을 해마다 나눠 적는 감가상각은 장부 비용이지만 현금이 나가지 않아 다시 더하고, 외상 매출은 장부에는 있지만 현금이 안 들어와 뺀다. 예 순이익 20에 감가상각 10을 더해 30\n"
+           "· 설비 투자 : 데이터 센터 · 공장 · 장비처럼 오래 쓰는 자산을 사는 데 쓴 돈(자본 지출). 사업을 이어 가려면 꼭 써야 하는 돈이라 영업으로 번 돈에서 먼저 뺀다. 리스로 들여온 설비는 여기에 안 들어가 `금융리스 상환` 줄을 따로 둔다. 예 12\n"
+           "· 잉여 현금 : 영업으로 번 돈에서 설비 투자를 뺀 것(잉여현금흐름). 빚 갚기 · 배당 · 자사주 매입 · 새 사업에 자유롭게 쓸 수 있어 '남는 돈' 이라 부른다. 설비 투자가 번 돈보다 크면 마이너스가 되고 그래프에서 0 선 아래로 내려간다. 매출 성장률과 나란히 두면 외형만 크는지 현금 창출까지 느는지 보인다. 예 30에서 12를 빼 18\n"
+           "· 배당 : 잉여 현금 가운데 주주에게 현금으로 나눠 준 돈. 자사주 매입은 회사가 자기 주식을 사들여 주식 수를 줄이는 것으로, 배당과 함께 주주에게 돌려주는 두 가지 방법. 예 배당 5 · 자사주 5\n"
+           "· 현금 : 분기 말 회사 통장에 남아 있는 돈(잔액). 위 줄들은 석 달 동안 움직인 돈이고, 현금과 장기 부채는 그날의 잔액이라 서로 더하거나 빼지 않는다. 예 지난 분기 말 50에 잉여 현금 18을 더하고 배당 · 자사주 10을 빼 58\n"
+           "· 빌린 돈 · 갚은 돈 : 채권을 찍거나 은행에서 빌린 돈과 갚은 돈. 잉여 현금이 모자라면 여기서 메우고, 남으면 갚는 데 쓴다\n"
+           "· 순이익 대비 % : 영업으로 번 돈 줄의 비율. 100% 언저리면 장부 이익이 현금으로 잘 바뀌는 것, 훨씬 낮으면 외상이 쌓이거나 재고에 돈이 묶인 것\n"
+           "· 그래프 : 왼쪽 위 버튼을 누르면 그 선만 색과 숫자가 보이고 나머지는 회색 선으로 남는다\n"
+           "· 늘리는 중 · 줄이는 중 : 최근 4분기 설비 투자 합이 그 전 4분기 합보다 10% 넘게 많으면 늘리는 중, 10% 넘게 적으면 줄이는 중. 분기 값은 들쭉날쭉해 합으로 본다"
            + ("\n· 이 회사는 SEC 공용 자료에 빈 분기가 있어 설비 투자 · 영업으로 번 돈 일부를 Yahoo Finance 분기 현금흐름으로 채웠다. 4분기 합을 견줄 수 없으면 최근 분기를 1년 전 같은 분기와 비교한다" if c.get("yahoo") else ""))
     return lines, _dk.with_src(tip, "SEC EDGAR · Yahoo Finance" if c.get("yahoo") else "SEC EDGAR")   # P280
+
+
+PROFIT_ROWS = (("gp", "매출총이익", "매출에서 만드는 데 든 돈을 뺀 몫"), ("opinc", "영업이익", "본업에서 남긴 돈"), ("ni", "순이익", "세금 · 이자까지 다 뺀 최종 이익"))
+_GREEN, _ORANGE, _VIOLET = "#3FA874", "#E8923A", "#8B6FD6"   # 칩 선 그래프 선 색 — 선은 막대 파스텔보다 진하게. 회색은 `비교 대상` · 안 누른 선 뜻이라 안 쓴다
+LT_GRAY = "#CBD5E1"   # 안 누른 선
+MARGIN_SERIES = (("gp", "매출총이익률", _GREEN), ("opinc", "영업이익률", _ORANGE), ("ni", "순이익률", _VIOLET))
+CASH_SERIES = (("ocf", "영업으로 번 돈", R.LINE_THIS), ("capex", "설비 투자", _ORANGE), ("fcf", "잉여 현금", _GREEN))
+
+
+def line_tabs(cid, labels, series, fmt, unit=""):
+    """버튼으로 하나씩 보는 선 그래프 (2026-11-03 사용자: "처음엔 모두 색 선 · 숫자 없음, 왼쪽 위 버튼을 누르면 그 선만 색 · 숫자, 나머지는 회색") — JS 없이 라디오 + 라벨 + CSS(:checked ~).
+    series = [(이름, 값 목록(None 허용), 색)]. 눈금은 모든 선의 범위로 고정(버튼을 바꿔도 안 출렁임). 모양 · 넘겨 보기 · 그림자는 R.line_chart 와 같다.
+    cid = 페이지 안에서 하나뿐인 id (종목 · 그래프). 디자인 가이드 8절 `버튼 선 그래프`."""
+    n = len(labels)
+    vals = [v for _, xs, _ in series for v in xs if v is not None]
+    if not vals or n < 2:
+        return ""
+    ticks = R._nice_ticks(min(vals + [0]) if min(vals) < 0 else min(vals), max(vals))
+    lo, hi = ticks[0], ticks[-1]
+    est = lambda t, px=12: sum(px if ord(c) > 0x2E80 else px * 0.6 for c in str(t))   # noqa: E731
+    step = max(R.LINE_STEP, max(est(x) for lb in labels for x in lb.split("\n")) + 12, max(est(fmt(v), 13) for v in vals) + 14)
+    axis_w = int(max(est(f"{t:,.0f}" if float(t).is_integer() else fmt(t)) for t in ticks) + 8)
+    top, bot = 30, 66 if any("\n" in lb for lb in labels) else 52
+    fit = n * step <= R.LINE_FIT_W
+    w, H = int(max(n * step, 260)), R.LINE_H
+    y = lambda v: top + (hi - v) / (hi - lo) * (H - top - bot)   # noqa: E731
+    x = (lambda i: f"{(i + 0.5) / n * 100:.2f}%") if fit else (lambda i: f"{step / 2 + i * step:.1f}")   # noqa: E731
+    W = "100%" if fit else str(w)
+    g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
+    if lo < 0 < hi:
+        g += f'<line x1="0" x2="{W}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#CBD5E1" stroke-width="1"/>'
+    # 처음 = 모든 선 제 색 · 점 있음 · 숫자 없음. 버튼을 누르면 그 선만 색 · 점 · 숫자, 나머지는 회색 가는 선(점 없음). 버튼 = 흰 작은 외곽선 버튼(가이드 2-3), 누르면 선 색 테두리 · 글자 · 연한 바탕
+    body, css = "", (f"#{cid} .t{{display:none}} #{cid} .h label{{border:1px solid #B5BAC0;color:#111;background:#fff}} "
+                     f"#{cid} .h label:hover{{border-color:#111}} ")
+    for k, (nm, xs, col) in enumerate(series):
+        css += f"#{cid} .l{k}{{stroke:{col};stroke-width:{R.LINE_W}}} "
+        pts = [(i, x(i), y(v)) for i, v in enumerate(xs) if v is not None]
+        sw = f'class="l l{k}" fill="none" stroke-linecap="round" stroke-linejoin="round"'
+        if fit:   # % 좌표는 polyline 이 못 받는다 — 구간마다 선
+            body += "".join(f'<line x1="{a[1]}" y1="{a[2]:.1f}" x2="{b[1]}" y2="{b[2]:.1f}" {sw}/>' for a, b in zip(pts, pts[1:]))
+        else:
+            body += f'<polyline points="{" ".join(f"{px},{py:.1f}" for _, px, py in pts)}" {sw}/>'
+        for j, (i, px, py) in enumerate(pts):
+            last = j == len(pts) - 1
+            body += f'<circle class="d d{k}" cx="{px}" cy="{py:.1f}" r="{R.LAST_R if last else R.DOT_R}" fill="#fff" stroke="{col}" stroke-width="{R.LAST_SW if last else R.DOT_SW}"/>'
+            body += (f'<text class="t t{k}" x="{px}" y="{py - 10 if py > top + 16 else py + 20:.1f}" text-anchor="middle" font-size="{13 if last else 12}" '
+                     f'font-weight="{700 if last else 400}" fill="{col}">{R._esc(fmt(xs[i]))}</text>')   # 한 선만 보이니 숫자는 위에, 맨 위에 닿으면 아래
+        css += (f"#{cid}-{k}:checked~.g .l{{stroke:{LT_GRAY};stroke-width:{R.LINE_W2}}} #{cid}-{k}:checked~.g .d{{display:none}} "   # 누르면 다른 선은 회색 · 점 없음 (뒤 규칙이 덮는다)
+                f"#{cid}-{k}:checked~.g .l{k}{{stroke:{col};stroke-width:{R.LINE_W}}} #{cid}-{k}:checked~.g .d{k},#{cid}-{k}:checked~.g .t{k}{{display:inline}} "
+                f"#{cid}-{k}:checked~.g .xl,#{cid}-{k}:checked~.g .xd{{fill:{col}}} #{cid}-{k}:checked~.h .c{k}{{border-color:{col};color:{col};background:{col}1A}} ")
+    xl = ""
+    for i, lb in enumerate(labels):
+        parts = lb.split("\n")
+        base = H - 8 - 16 * (len(parts) - 1)
+        xl += "".join(f'<text class="{"xl" if i == n - 1 else ""}" x="{x(i)}" y="{base + 16 * j}" text-anchor="middle" font-size="12" fill="{R.NOTE}">{R._esc(t)}</text>' for j, t in enumerate(parts))
+    xl += f'<circle class="xd" cx="{x(n - 1)}" cy="{H - 25 - 16 * (len(labels[-1].split(chr(10))) - 1)}" r="1.5" fill="{R.NOTE}"/>'   # 최신 이름 위 강조점 — 누른 선 색
+    svg = (f'<svg width="100%" height="{H}" style="display:block;overflow:visible;">{g}{body}{xl}</svg>' if fit
+           else f'<svg width="{w}" height="{H}" viewBox="0 0 {w} {H}" style="display:block;direction:ltr;">{g}{body}{xl}</svg>')
+    tf = (lambda t: f"{t:,.0f}".replace("-", "−")) if all(float(t).is_integer() for t in ticks) else fmt
+    axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{R.NOTE};">{R._esc(tf(t))}</span>' for t in ticks)
+    if fit:
+        scroll, shade = f'<span style="display:block;margin-right:{axis_w}px;">{svg}</span>', ""
+    else:
+        scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{axis_w}px;">'
+                  f'<span style="display:inline-block;vertical-align:top;direction:ltr;">{svg}</span></span>')
+        shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
+                 'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>')
+    radios = "".join(f'<input type="radio" name="{cid}" id="{cid}-{k}" style="display:none;">' for k in range(len(series)))   # 처음엔 아무것도 안 눌림
+    btns = "".join(f'<label for="{cid}-{k}" class="c{k}" style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:13px;line-height:18px;font-weight:700;white-space:nowrap;cursor:pointer;">'
+                   f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{col};"></span>{R._esc(nm)}</label>' for k, (nm, _, col) in enumerate(series))   # 색 점 = 선 색
+    head = (f'<span class="h" style="display:block;padding:{_dk.CHART_CARD_PAD + 3}px 12px 0;">'
+            f'<span style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin:0 0 4px;font-size:{R.TINY};line-height:20px;color:{R.NOTE};">'
+            f'<span style="display:flex;flex-wrap:wrap;gap:6px;">{btns}</span>'   # 버튼은 왼쪽 위 (2026-11-03 사용자)
+            + ("" if fit else f'<span data-lhint="1" style="white-space:nowrap;margin-left:auto;line-height:24px;">{_dk.SCROLL_HINT} ›</span>') + "</span>"
+            + (f'<span style="display:block;text-align:right;margin:0 0 6px;font-size:12px;line-height:18px;color:{R.NOTE};">(단위: {R._esc(unit)})</span>' if unit else "") + "</span>")
+    graph = (f'<span class="g" style="display:block;position:relative;padding:0 12px 10px;">{scroll}{shade}'
+             f'<span style="position:absolute;top:0;right:12px;width:{axis_w - 4}px;height:{H}px;text-align:right;">{axis}</span></span>')
+    return f'<span id="{cid}" style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><style>{css}</style>{radios}{head}{graph}</span>'
+
+
+def margin_chart(ms, sym):
+    """분기 이익률 버튼 선 그래프 (2026-11-03 사용자) — 매출총이익률 · 영업이익률 · 순이익률 (매출 대비 %), 회사가 안 적는 항목은 버튼 자체를 뺀다.
+    금액이 아니라 % 인 까닭 = 매출 1,800억 옆에 순이익 200억을 두면 이익 선이 바닥에 붙는다."""
+    ser = [(nm, [m.get(k) for m in ms], col) for k, nm, col in MARGIN_SERIES if any(m.get(k) is not None for m in ms)]
+    chart = line_tabs(f"lt-{sym}-margin", [_dk.q_axis(m["cq"]) for m in ms], ser, lambda v: f"{v:,.0f}".replace("-", "−"), "%")
+    return f'{_dk.CHART_TITLE_M}분기 이익률 (매출 대비 %)</span>{chart}' if chart else ""
+
+
+def card_revenue(c):
+    """NVDA 매출 카드 + 이익률 그래프 + 이익 줄 셋 (2026-11-03 사용자: 매출이 실제 이익으로 이어지나). 값 = 같은 분기 · 1년 전 대비 · 매출 대비 %. 안 적는 항목은 `미수집`."""
+    lines, tip = R.card_revenue(c)
+    p = c.get("profit")
+    if not p:
+        return lines, tip
+    lines = list(lines)
+    if c.get("margins"):
+        html = margin_chart(c["margins"], c["sym"])
+        if html:
+            lines.insert(2, (html, "html"))   # 매출 그래프 바로 아래
+    for k, name, mean in PROFIT_ROWS:
+        x = p[k]
+        if x["v"] is None:
+            lines.append(("row", name, "미수집", "회사가 이 항목을 따로 적지 않았다"))
+            continue
+        note = f"매출의 {x['pct']:.0f}%" if x["pct"] is not None else mean
+        note += f" · 1년 전보다 {R._sgn(x['yoy'], 0)}%" if x["yoy"] is not None else (" · 1년 전은 적자" if x["v"] > 0 else "")
+        lines.append(("row", name, _bil(x["v"]), note))
+    # 이익 줄 용어 풀이 — 돈 카드 툴팁과 같은 예(매출 100 → 순이익 20)로 이어진다 (2026-11-03 사용자: 예를 들어 자세히)
+    tip = tip.replace("\n· 나누는 법", "\n· 매출 : 석 달 동안 물건 · 서비스를 판 금액. 장부 기준이라 외상으로 팔아 아직 못 받은 돈도 들어간다. 예 한 회사의 한 분기 100(억 달러)\n"
+                      "· 매출총이익 : 매출에서 그 물건을 만드는 데 든 돈(원가)을 뺀 것. 제품 자체로 얼마나 남기는지. 예 100에서 원가 60을 빼 40, 매출의 40%\n"
+                      "· 영업이익 : 매출총이익에서 인건비 · 광고 · 연구개발 같은 영업비를 뺀 것, 본업에서 남긴 돈. 예 40에서 15를 빼 25\n"
+                      "· 순이익 : 영업이익에서 이자 · 세금까지 뺀 최종 이익. 예 25에서 5를 빼 20. 매출이 늘어도 이 줄들이 따라 늘지 않으면 외형만 커진 것. 실제 현금과는 다른데, 그 차이는 `돈을 어디에 쓰나?` 툴팁에\n"
+                      "· 이익률 그래프 : 각 이익을 그 분기 매출로 나눈 %. 왼쪽 위 버튼을 누르면 그 선만 색과 숫자\n· 나누는 법", 1)
+    return lines, tip
 
 
 def sec_expect(s, open_first=True):
     """실적과 기대 탭 — NVDA 리포트 sec_expect 와 같은 질문 카드 넷 + 돈을 어디에 쓰나(2026-10-30). 비교 묶음 = 시총 상위 20개 (중앙값)."""
     ex = s.get("expect") or {}
-    spec = [("회사는 돈을 더 벌고 있나?", "revenue", R.card_revenue), (R.EPS_TITLE, "eps", R.card_eps),
+    spec = [("회사는 돈을 더 벌고 있나?", "revenue", card_revenue), (R.EPS_TITLE, "eps", R.card_eps),
             ("시장 예상 흔들림은?", "move", R.card_move), ("하락에 거는 돈은?", "short", R.card_short), ("돈을 어디에 쓰나?", "capex", card_capex)]
     out = ""
     for i, (title, key, fn) in enumerate(spec):

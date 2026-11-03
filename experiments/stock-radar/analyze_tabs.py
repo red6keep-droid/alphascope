@@ -58,8 +58,34 @@ def card_revenue(sym, extra, group):
     last = me[-1]
     prev = [r for r in series[sym] if r["end"] < last["end"]]
     yoy = last["yoy"]
-    return {"state": "늘고 있음" if yoy >= EX.REV_PCT else "줄고 있음" if yoy <= -EX.REV_PCT else "비슷함", "yoy": yoy, "rev": last["rev"], "end": last["end"],
-            "qoq": (last["rev"] / prev[-1]["rev"] - 1) * 100 if prev else None, "bars": bars, "peers_last": bars[-1]["peers"]}
+    return {"sym": sym, "state": "늘고 있음" if yoy >= EX.REV_PCT else "줄고 있음" if yoy <= -EX.REV_PCT else "비슷함", "yoy": yoy, "rev": last["rev"], "end": last["end"],
+            "qoq": (last["rev"] / prev[-1]["rev"] - 1) * 100 if prev else None, "bars": bars, "peers_last": bars[-1]["peers"], "profit": _profit(sym, extra, last),
+            "margins": _margins(sym, extra, me)}
+
+
+def _capex_row(extra, sym, end):
+    """돈 표에서 끝날이 같은(±10일) 분기 줄."""
+    return next((x for x in (extra.get("capex") or {}).get(sym) or [] if abs((_d(x["end"]) - _d(end)).days) <= 10), None)
+
+
+def _margins(sym, extra, rows):
+    """이익률 그래프 재료 (2026-11-03 사용자) — 매출 줄(최근 8분기)마다 매출총이익 · 영업이익 · 순이익 ÷ 매출 %. 이익 줄이 하나도 없으면 None."""
+    out = []
+    for r in rows:
+        c = _capex_row(extra, sym, r["end"]) or {}
+        out.append({"cq": r["cq"], "end": r["end"], **{k: c[k] / r["rev"] * 100 if c.get(k) is not None and r.get("rev") else None for k in ("gp", "opinc", "ni")}})
+    return out if any(m[k] is not None for m in out for k in ("gp", "opinc", "ni")) else None
+
+
+def _profit(sym, extra, last):
+    """매출 카드의 이익 줄 재료 (2026-11-03 사용자: 매출이 이익으로 이어지나) — 돈 표(collect_capex)의 같은 분기 매출총이익 · 영업이익 · 순이익.
+    값 · 1년 전 대비 · 매출 대비 %. 그 분기 줄이 없거나(끝날 10일 넘게 어긋남) 세 값이 다 없으면 None."""
+    r = _capex_row(extra, sym, last["end"])
+    if not r or all(r.get(k) is None for k in ("gp", "opinc", "ni")):
+        return None
+    out = {k: {"v": r.get(k), "yoy": r.get(k + "_yoy"), "pct": r[k] / last["rev"] * 100 if r.get(k) is not None and last.get("rev") else None} for k in ("gp", "opinc", "ni")}
+    out["end"] = r["end"]
+    return out
 
 
 CAPEX_PCT = 10   # 최근 4분기 설비 투자 합이 그 전 4분기보다 이만큼 넘게 다르면 늘리는 중 · 줄이는 중 (분기 값은 들쭉날쭉해 4분기 합으로)
@@ -74,7 +100,7 @@ def card_capex(sym, extra):
         return None
     last = rows[-1]
     sm = CX.summary(rows)
-    bars = [{"cq": r["cq"], "end": r["end"], "capex": r.get("capex"), "ocf": r.get("ocf")} for r in rows[-8:]]
+    bars = [{"cq": r["cq"], "end": r["end"], "capex": r.get("capex"), "ocf": r.get("ocf"), "fcf": r.get("fcf")} for r in rows[-8:]]   # fcf = 그래프 셋째 막대 (2026-11-03)
     c4, p4 = sm.get("capex"), sm.get("capex_prev")
     chg4 = (c4 / p4 - 1) * 100 if c4 is not None and p4 else None
     if last.get("capex") is None and not any(r.get("capex") is not None for r in rows[-4:]):
@@ -83,9 +109,15 @@ def card_capex(sym, extra):
         # 4분기 합 비교가 안 되면(Yahoo 로 채운 회사 — 최근 5분기뿐) 최근 분기와 1년 전 같은 분기로 (2026-11-02 사용자 P280)
         cmp = chg4 if chg4 is not None else last.get("capex_yoy")
         state = "늘리는 중" if cmp is not None and cmp >= CAPEX_PCT else "줄이는 중" if cmp is not None and cmp <= -CAPEX_PCT else "비슷함" if cmp is not None else "4분기 안 됨"
-    return {"state": state, "end": last["end"], "form": last.get("form"), "src": last.get("src"), "capex": last.get("capex"), "capex_yoy": last.get("capex_yoy"),
+    f4, fp4 = sm.get("fcf"), sm.get("fcf_prev")
+    fcf_chg4 = (f4 / fp4 - 1) * 100 if f4 is not None and fp4 and fp4 > 0 else None   # 그 전 4분기가 마이너스면 비율이 뜻이 없다
+    rv = [x for x in ((extra.get("revenue") or {}).get("series") or {}).get(sym) or []]   # 같은 4분기 매출 합 — 매출 성장과 현금 창출을 나란히 (2026-11-03 사용자)
+    r4, rp4 = [x["rev"] for x in rv[-4:]], [x["rev"] for x in rv[-8:-4]]
+    rev_chg4 = (sum(r4) / sum(rp4) - 1) * 100 if len(r4) == 4 and len(rp4) == 4 and sum(rp4) > 0 and abs((_d(rv[-1]["end"]) - _d(last["end"])).days) <= 10 else None
+    return {"sym": sym, "state": state, "end": last["end"], "form": last.get("form"), "src": last.get("src"), "capex": last.get("capex"), "capex_yoy": last.get("capex_yoy"),
             "ocf": last.get("ocf"), "rnd": last.get("rnd"), "cash": last.get("cash"), "debt": last.get("debt"), "bars": bars, "chg4": chg4,
-            "sum4": {k: sm.get(k) for k in CX.TAGS}, "n4": min(4, len(rows)),
+            "fcf": last.get("fcf"), "fcf_chg4": fcf_chg4, "rev_chg4": rev_chg4,
+            "sum4": {k: sm.get(k) for k in (*CX.TAGS, *CX.DERIVED, "fcf_prev")}, "n4": min(4, len(rows)),
             "yahoo": any(r.get("yahoo") or r.get("yahoo_only") for r in rows[-8:]), "partial": any(r.get("yahoo_only") for r in rows[-4:])}   # Yahoo 로 채운 칸 (P280)
 
 
