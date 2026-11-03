@@ -852,11 +852,8 @@ def group_head(text, first=False, theme=None, vote=None):
     icon = (f'<span style="display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;margin-right:6px;'
             f'background:{GROUP_TILE.get(theme, "rgba(17,17,17,.3)")};border-radius:5px;color:#fff;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
     # 위 18 → 29 (+60%, P248). 아래는 6 그대로 — P247 은 첫 줄 위 여백으로 (TOGETHER_FIRST_PAD)
-    v = ""
-    if vote is not None:   # 분류 한 표 (2026-11-03 재설계 3-2) — 오른쪽 작은 글자
-        v = (f'<span style="margin-left:auto;font-size:{TINY};font-weight:700;color:{ {1: UP, -1: DOWN}.get(vote, NOTE) };white-space:nowrap;">'
-             f'분류 {"▲ 상승" if vote == 1 else "▼ 하락" if vote == -1 else "중립"}</span>')
-    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}{v}</span>')
+    # 오른쪽 분류 한 표 라벨(2026-11-03 재설계 3-2)은 뺐다 — 표는 펼침 맨 위 요약 문장이 말한다 (2026-11-03 사용자). vote 는 받기만
+    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
 
 
 def hot_rows(news):
@@ -921,7 +918,7 @@ def together_card(t):
     """`Alpha Scope 신호는?`(로고 + 글자, P208) 강조 카드 — 매수의견 탭, 접기 · 펼침은 다른 강조 카드와 같다.
     2026-11-03 재설계 (doc/기획/알파스코프-신호-재설계.md, 사용자 "그렇게 할게"): 옛 라벨 개수 다수결(P207)을 버리고 지금 상태 요약으로 —
     답 둘 = 단기(며칠) · 중기(한 달~분기). 분류 안 판정은 평균으로 분류마다 한 표, 표의 평균 ±0.5 로 답 (signal_groups.horizon_votes).
-    업계 현황은 배경 줄(세지 않음), 과열은 검증에서 거꾸로라 세지 않는다. 검증을 통과한 신호가 생기면 그 신호로 예측 답을 붙인다.
+    접힌 답은 단기 답 하나, 중기는 펼친 요약 · 목록에만 (2026-11-03 사용자 P287). 업계 현황은 세지 않는 줄, 과열은 검증에서 거꾸로라 세지 않는다. 검증을 통과한 신호가 생기면 그 신호로 예측 답을 붙인다.
     t = 함께 보기 줄 목록, 또는 {"items": 줄, "news": 최근 7일 기사 · 방송, "sched": 앞둔 일정} (P218)."""
     import signal_groups as SG
     t = t if isinstance(t, dict) else {"items": t}
@@ -933,30 +930,26 @@ def together_card(t):
     wcol = {1: UP, -1: DOWN}
     arrow = {1: "▲ ", -1: "▼ "}
     (s_d, s_per), (m_d, m_per) = hv["단기"], hv["중기"]
-    ds = {d for d in (s_d, m_d) if d in (1, -1)}
-    lead = ds.pop() if len(ds) == 1 else None   # 두 답이 같은 쪽이거나 하나만 방향 → 그 색, 서로 반대 · 둘 다 중립 → 회색
-    theme, col = {1: ("positive", UP), -1: ("negative", DOWN)}.get(lead, ("neutral", "#111"))
-    plain = f"단기 {word[s_d]} · 중기 {word[m_d]}"
-    rich = ('<span style="display:inline-flex;flex-direction:column;align-items:flex-end;line-height:24px;">'   # 두 답을 두 줄로 — 한 줄이면 폰 폭을 넘는다
-            + "".join(f'<span style="color:{wcol.get(d, "#111")};">{hz} {arrow.get(d, "")}{word[d]}</span>' for hz, d in (("단기", s_d), ("중기", m_d))) + "</span>")
-    sent = (f"지금 단기(며칠) 흐름은 <b style=\"font-weight:700;color:{wcol.get(s_d, '#111')};\">{word[s_d]}</b>, "
-            f"중기(한 달~분기) 흐름은 <b style=\"font-weight:700;color:{wcol.get(m_d, '#111')};\">{word[m_d]}</b>이다. 분류마다 한 표씩 셌다."
-            + note_span("라벨을 클릭하면 자세한 내용으로 이동합니다.", mark=True))
+    # 접힌 머리 답 = 단기 답 하나, `단기` 말 없이 (2026-11-03 사용자: "접었을 때는 단기만, 중기라는 표현은 하지 마") — 카드 색도 단기 답
+    theme, col = {1: ("positive", UP), -1: ("negative", DOWN)}.get(s_d, ("neutral", "#111"))
+    plain = word[s_d]
+    rich = f'<span style="color:{wcol.get(s_d, "#111")};">{arrow.get(s_d, "")}{word[s_d]}</span>'
+    # 펼침 맨 위 요약 — 단기 · 중기 흐름을 분류 표까지 풀어 쓴다 (2026-11-03 사용자: "요약을 조금 더 자세하게")
+    sent = (horizon_sentence("단기", "며칠", s_d, s_per, word, wcol) + " " + horizon_sentence("중기", "한 달~분기", m_d, m_per, word, wcol)
+            + " 분류마다 안의 판정을 평균 내 한 표씩 셌다." + note_span("라벨을 클릭하면 자세한 내용으로 이동합니다.", mark=True))
     body = ""
     for hz, span, cats in SG.HORIZONS:
-        d, per = hv[hz]
         rows = [x for x in items if len(x) > 6 and x[6] in dict(cats)]
         if not rows:
             continue
-        body += horizon_head(f"{hz} ({span})", d, first=not body)
-        body += together_block(rows, theme, title=False, votes=per)
+        body += horizon_head(f"{hz} 흐름", first=not body)   # 라벨만 — `(며칠)` · `(한 달~분기)` · 오른쪽 답 라벨은 뺐다 (2026-11-03 사용자)
+        body += together_block(rows, theme, title=False)
     bg = [x for x in items if len(x) > 6 and x[6] in dict(SG.BACKGROUND)]
-    if bg:
-        body += horizon_head("배경 (세지 않음)", None)
+    if bg:   # 업계 현황(세지 않음) — `배경 (세지 않음)` 제목 · 구분선은 뺐다 (2026-11-03 사용자), 분류 제목만 이어서
         body += together_block(bg, theme, title=False)
     lines = [(sent, "rich"), (body + outlook_extra_html(hot_rows(t.get("news") or []), t.get("sched") or [], theme, t.get("news") or []), "html")]
-    tip = ("이 페이지 카드들의 지금 판정을 단기(며칠) · 중기(한 달~분기)로 나눠 정리한 것\n"
-           f"· 지금 : {plain}\n"
+    tip = ("이 페이지 카드들의 지금 판정을 단기(며칠) · 중기(한 달~분기)로 나눠 정리한 것. 접힌 답은 단기 흐름\n"
+           f"· 지금 : 단기 {word[s_d]} · 중기 {word[m_d]}\n"
            "· 나누는 법 : 분류 안 판정을 상승 +1 · 하락 −1 · 중립 0 으로 평균 내 분류마다 한 표, 표의 평균이 +0.5 이상이면 상승 쪽 · −0.5 이하면 하락 쪽, 그 사이 중립\n"
            "· 세지 않는 것 : 업계 현황(배경) · 과열 신호 · 호재 · 리스크 · 일정\n· 이 블로그의 추천이 아니다")
     card = _state_card(TOGETHER_Q, plain, theme, col, lines, "", tip=tip, fold=True, state_rich=rich)
@@ -965,13 +958,24 @@ def together_card(t):
     return card.replace(_esc(brand), logo + f'<span style="font-size:17px;font-weight:700;">{_esc(brand)}</span>', 1)   # 제목 앞 블로그 로고 (P208)
 
 
-def horizon_head(text, d, first=False):
-    """신호 카드 안 기간 제목 — `단기 (며칠)` 왼쪽 · 그 기간 답 라벨 오른쪽, 아래 굵은 구분선 (2026-11-03 재설계). d = None 이면 라벨 없음(배경)."""
-    import tech_signals as TS
-    box = "" if d is None else TS.box({1: "up", -1: "down"}.get(d, "flat"), {1: "상승 쪽", -1: "하락 쪽"}.get(d, "중립"), _esc, fit=True)
-    return (f'<span data-horizon="1" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin:{4 if first else 26}px 0 0;'
+def horizon_head(text, first=False):
+    """신호 카드 안 기간 제목 — `단기 흐름` · `중기 흐름` 라벨만, 아래 굵은 구분선 (2026-11-03 재설계 → 같은 날 사용자: 기간 괄호 · 오른쪽 답 라벨 삭제)."""
+    return (f'<span data-horizon="1" style="display:flex;align-items:center;margin:{4 if first else 26}px 0 0;'
             f'padding:0 0 8px;border-bottom:2px solid rgba(15,23,42,.18);font-weight:700;color:#111;font-size:{_dk.NAME};line-height:24px;">'
-            f'<span>{_esc(text)}</span>{box}</span>')
+            f'<span>{_esc(text)}</span></span>')
+
+
+def horizon_sentence(hz, span, d, per, word, wcol):
+    """요약 문장 한 기간 — `단기 흐름(며칠)은 상승 쪽이다. 주가 흐름 · 증시는 상승, 뉴스 · 방송은 중립이다.` 분류 표가 없으면 앞 문장만."""
+    head = f'{hz} 흐름({span})은 <b style="font-weight:700;color:{wcol.get(d, "#111")};">{word[d]}</b>이다.'
+    if d is None:
+        return f'{hz} 흐름({span})은 판정할 신호가 없다.'
+    parts = []
+    for v, w in ((1, "상승"), (0, "중립"), (-1, "하락")):
+        gs = [g for g, x in per.items() if x == v]
+        if gs:
+            parts.append(f'{_dk.josa(" · ".join(gs), "은")} <span style="color:{wcol.get(v, "#111")};">{w}</span>')
+    return head + (" " + ", ".join(parts) + "이다." if parts else "")
 
 
 ZOOM_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'
