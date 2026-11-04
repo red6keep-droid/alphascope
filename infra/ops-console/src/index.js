@@ -15,7 +15,6 @@ const REPO = "red6keep-droid/alphascope";
 // days: KST 요일(0=일) 가운데 실행이 예정된 날. 데일리는 뉴욕 월~금 장 마감 뒤 → KST 화~토 아침.
 const REPORTS = [
   { key: "daily", name: "미국 증시 데일리", file: "test-daily-report.yml", wf: "Test Daily Report", at: "06:00", days: [2, 3, 4, 5, 6] },
-  { key: "trump", name: "트럼프 트렌드", file: "trump-trend.yml", wf: "Trump Trend", at: "06:15", days: [0, 1, 2, 3, 4, 5, 6] },
   { key: "nvda", name: "NVDA 리포트", file: "nvda-report.yml", wf: "NVDA Report", at: "06:30", days: [0, 1, 2, 3, 4, 5, 6] },
   { key: "radar", name: "인물 발언 레이더", file: "people-radar.yml", wf: "People Radar", at: "07:00", days: [0, 1, 2, 3, 4, 5, 6] },
   { key: "media", name: "미디어 데일리", file: "media-daily.yml", wf: "Media Daily", at: "08:00 · 10:15", days: [1, 2, 3, 4, 5] },

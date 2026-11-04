@@ -55,11 +55,10 @@ const KST_JOBS = {
 const JOBS = {
   // 데일리 리포트 (뉴욕 월~금) — 장 마감 1시간 뒤. KST 06:00 (EDT) / 07:00 (EST).
   "17:00": [{ workflow: "test-daily-report.yml", when: WEEKDAY }],
-  // 트럼프 트렌드(매일). KST 06:15 / 07:15.
-  "17:15": [{ workflow: "trump-trend.yml" }],
-  // NVDA 리포트(매일) — 트럼프가 trump-state에 올린 결과를 읽으므로 15분 뒤. KST 06:30 / 07:30.
+  // 트럼프 트렌드(17:15)는 2026-11-04 중단 — 발언 → 주가 반응이 3개월 동안 확인되지 않음. 워크플로는 수동 실행만 남김.
+  // NVDA 리포트(매일). KST 06:30 / 07:30. (trump_bridge 는 trump-state 가 멈춘 뒤 0건으로 조용히 지나간다)
   "17:30": [{ workflow: "nvda-report.yml" }],
-  // 인물 발언 레이더(매일) — trump-state · report-state 를 읽으므로 데일리 · 트럼프 뒤. KST 07:00 / 08:00 (2026-10-22).
+  // 인물 발언 레이더(매일) — report-state 를 읽으므로 데일리 뒤. KST 07:00 / 08:00 (2026-10-22). 트럼프 게시물은 스스로 분류한다 (11-04).
   // 같은 날 글이 있으면 갱신만 하므로 두 번 돌아도 겹치지 않는다.
   "18:00": [{ workflow: "people-radar.yml" }],
   // 데일리 재시도(이미 게시됐으면 스스로 건너뜀). KST 07:30 / 08:30.

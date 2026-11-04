@@ -13,11 +13,9 @@ name: Trump Trend
 # 방금 만든 output/state 가 옛 버전으로 덮어써지기 때문이다 (gitignore 파일은 git이 보호하지 않는다).
 
 on:
-  schedule:
-    # 정시 실행은 Cloudflare Worker가 뉴욕 17:15(KST 06:15 서머타임 / 07:15 표준시)에 건다 (infra/cron-trigger).
-    # 미국 정규장 마감 종가가 yfinance에 확정된 뒤, 그 사이 올라온 게시물까지 한 번에 잡는다.
-    # 주말도 돈다 — 게시물은 주말에도 올라온다. GitHub cron은 예비 — 22:15 UTC = 07:15 KST, 계절과 상관없이 장 마감 뒤.
-    - cron: '15 22 * * *'
+  # 2026-11-04 중단 (사용자 결정): 3개월 운영 결과 발언 → 주가 반응이 확인되지 않았고(616 검정 중 보정 뒤 남은 25개가 주제와 무관하게 산업재 ETF 하락 — 시기 효과),
+  # 하루 정책 글 0~2건이라 보여 줄 것이 없었다. 트럼프 게시물은 인물 발언 레이더가 같은 CNN 아카이브에서 계속 받고 스스로 분류한다.
+  # 정기 실행(Worker 17:15 · GitHub cron 22:15 UTC)을 뺐다. 수동 실행만 남긴다 — 큰 사건 때 다시 검정할 용도. 아카이브 스냅샷은 state 저장소 trump-archive 브랜치.
   workflow_dispatch:
     inputs:
       max_batches:

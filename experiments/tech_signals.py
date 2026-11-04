@@ -194,6 +194,7 @@ def theme(net, up_color, down_color, muted):
 MA_PERIODS = {"us": (5, 10, 20, 50, 100, 200), "kr": (5, 10, 20, 60, 120, 200)}
 ARRAY_PERIODS = {"us": (20, 50, 200), "kr": (5, 20, 60, 120)}
 CROSS_PAIR = {"us": (50, 200), "kr": (20, 60)}
+CROSS_FRESH = 20   # 크로스 줄 상승 · 하락 라벨은 이 거래일 수 안에서만, 넘으면 중립 (20일선 한 바퀴 = 한 달)
 
 
 def _sma_series(c, n):
@@ -500,10 +501,11 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
                         f'<span style="margin-left:4px;{note}">{" · ".join(str(n) for n in ar["periods"])}일</span></span>'
                         f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{box(kind, UPW if kind == "up" else DNW if kind == "down" else MID, _h.escape)}</span>')
     if cr:
-        kind = "up" if cr["dir"] > 0 else "down"
+        # 한 달(20거래일)이 지난 크로스는 중립 — 옛 사건의 방향이 지금 가격과 엇갈려 보였다 (2026-11-04 사용자: LG에너지솔루션 42일 전 골든크로스 · 주가는 두 선 아래)
+        kind = "flat" if cr["days_ago"] > CROSS_FRESH else "up" if cr["dir"] > 0 else "down"
         top_rows.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{POP_DOT}{cr["kind"]}'
                         f'<span style="margin-left:4px;{note}">{cr["pair"][0]} · {cr["pair"][1]}일선</span></span>'
-                        f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;"><b style="font-weight:700;">{cr["days_ago"]}일 전</b>{box(kind, UPW if kind == "up" else DNW, _h.escape)}</span>')
+                        f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;"><b style="font-weight:700;">{cr["days_ago"]}일 전</b>{box(kind, UPW if kind == "up" else DNW if kind == "down" else MID, _h.escape)}</span>')
     mrs = top_rows + [f'<span style="{HEAD}">기간</span><span style="display:inline-flex;gap:6px;{HEAD}"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
     for m in sig["ma"]:
         mrs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{m["n"]}일<span style="margin-left:4px;font-size:{WHY_FS};line-height:19px;color:#6B7280;">{MA_WHAT.get(m["n"], "")}</span></span>'
