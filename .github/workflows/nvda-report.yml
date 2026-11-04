@@ -16,6 +16,9 @@ on:
     # 옵션 체인은 미국 장 마감 후~뉴욕 자정에만 유효하므로 이 시각이 창 안이다. 주말도 돈다(공시·뉴스만).
     # GitHub cron은 예비 — 22:30 UTC = 07:30 KST, 계절과 상관없이 장 마감 뒤이고 트럼프 예비(22:15)보다 15분 뒤.
     - cron: '30 22 * * *'
+    # 낮 갱신 — 종목 페이지만 다시 그린다 (2026-11-04 사용자 P290: 아침 실행 뒤 들어온 방송 의견이 다음 날까지 안 보였다).
+    # 04:00 UTC = 13:00 KST, 미국 장 밖. check 가 `오늘 본 실행 끝남` 이면 mode=refresh (13:00 UTC 넘으면 skip — 장중 값 게시 금지)
+    - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
       narrate:
@@ -68,12 +71,15 @@ env:
   DO_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.NVDA_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
 
 jobs:
-  # 스케줄(외부 cron 포함)은 GitHub cron과 외부 cron이 하루 두 번 걸 수 있다. 오늘 글이 이미 있으면
-  # 본 작업을 통째로 건너뛴다. 수동 실행은 확인하지 않는다 — 같은 제목 글을 덮어써 다시 만드는 용도.
+  # 스케줄(외부 cron 포함)은 GitHub cron과 외부 cron이 하루 두 번 넘게 걸 수 있다. 실행 모드(check.mode):
+  #   full    = 오늘 첫 실행 — 엔비디아 파이프라인 · 종목 페이지 · 그래프 · 테마 페이지 전부
+  #   refresh = 오늘 본 실행이 끝난 뒤(13:00 UTC 전) — 종목 페이지만 다시 그려 올린다 (방송 · 뉴스 의견 갱신, 2026-11-04 P290). 상태 저장은 같이(기록은 날짜 · id 로 덮어써 두 줄이 안 된다)
+  #   skip    = 오늘 끝났고 미국 장중 · 장 뒤 — 아무것도 안 한다 (장중 값 게시 금지, 운영 기록 10-24)
+  # 수동 실행은 확인하지 않는다(mode 비어 있음 = full) — 같은 제목 글을 덮어써 다시 만드는 용도.
   check:
     runs-on: ubuntu-latest
     outputs:
-      already_published: ${{ steps.check.outputs.already_published }}
+      mode: ${{ steps.check.outputs.mode }}
     steps:
       - uses: actions/checkout@v5
         if: env.IS_SCHEDULED == 'true'
@@ -89,18 +95,20 @@ jobs:
         id: check
         if: env.IS_SCHEDULED == 'true'
         run: |
-          DONE=false
+          MODE=full
           if git fetch -q origin nvda-state 2>/dev/null; then
             LAST=$(git log -1 --format=%ct FETCH_HEAD)
             SINCE=$(TZ=Asia/Seoul date -d "$(TZ=Asia/Seoul date +%F) 05:00" +%s)
-            [ "$LAST" -ge "$SINCE" ] && DONE=true
+            if [ "$LAST" -ge "$SINCE" ]; then
+              if [ "$(date -u +%H)" -lt 13 ]; then MODE=refresh; else MODE=skip; fi   # 13:00 UTC 전 = 미국 장 전(프리마켓 포함)만 갱신
+            fi
           fi
-          echo "오늘 실행 끝남: $DONE"
-          echo "already_published=$DONE" >> "$GITHUB_OUTPUT"
+          echo "실행 모드: $MODE"
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
 
   nvda-report:
     needs: check
-    if: needs.check.outputs.already_published != 'true'
+    if: needs.check.outputs.mode != 'skip'
     runs-on: ubuntu-latest
     timeout-minutes: 60   # 2026-10-20 실측 994초. 고정 페이지가 늘수록 길어짐 — 바뀐 것만 쓰기로 줄인다 (운영지침 D2-2)
     steps:
@@ -130,6 +138,7 @@ jobs:
           fi
 
       - name: Run pipeline
+        if: needs.check.outputs.mode != 'refresh'
         run: |
           # 2026-11-01 사용자: 엔비디아도 고정 페이지 · 뉴스는 공용 처리 — 엔비디아 전용 뉴스 수집 · AI 분류 · Gemini 서술은 끈다.
           # 남는 일 = 일봉 · 캘린더(시장 일정 — 종목 페이지가 이 DB 를 읽는다) · 상태판. 소송 일정은 stock-radar/court.py 가 맡는다
@@ -153,6 +162,7 @@ jobs:
 
       # ① 아래 가격 그래프 (chart_price.py → output/images/nvda-price-{day}.png). daily-report 커버 이미지와 같은 경로
       - name: Prepare chart image for deploy
+        if: needs.check.outputs.mode != 'refresh'
         run: |
           mkdir -p deploy/images
           if compgen -G "experiments/nvda-report/output/images/*.png" > /dev/null; then
@@ -164,7 +174,7 @@ jobs:
           # 종목 그래프(radar-*.png)는 여기 넣지 않는다 — 아래 radar-images 단계 (2026-10-20 휘발성)
 
       - name: Deploy chart image to gh-pages branch
-        if: hashFiles('deploy/images/*.png') != ''
+        if: needs.check.outputs.mode != 'refresh' && hashFiles('deploy/images/*.png') != ''
         uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -175,7 +185,7 @@ jobs:
       # 종목 그래프 — radar-images 브랜치를 그날 그림만으로 새로 만들어 덮어쓴다(부모 커밋 없음 = 이력 없음, 2026-10-20 사용자: 이미지는 휘발성).
       # gh-pages(keep_files)에 두면 매일 수십 장이 커밋 이력에 쌓인다. 페이지 <img> 주소는 render_pages.chart_url (@radar-images).
       - name: Deploy stock charts (radar-images branch, no history)
-        if: hashFiles('experiments/stock-radar/output/images/radar-*.png') != ''
+        if: needs.check.outputs.mode != 'refresh' && hashFiles('experiments/stock-radar/output/images/radar-*.png') != ''   # 갱신 실행은 같은 날 봉 — 그래프는 아침 것 그대로
         run: |
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
@@ -189,7 +199,7 @@ jobs:
           echo "종목 그래프 $(git ls-tree "$SUB" | wc -l)장 → radar-images (이력 없이 덮어씀)"
 
       - name: Purge and verify jsDelivr cache
-        if: hashFiles('experiments/nvda-report/output/image_ref.txt') != ''
+        if: needs.check.outputs.mode != 'refresh' && hashFiles('experiments/nvda-report/output/image_ref.txt') != ''
         run: |
           IMAGE_REF=$(cat experiments/nvda-report/output/image_ref.txt)
           [ -z "$IMAGE_REF" ] && { echo "::warning::그래프 ref 없음"; exit 0; }
@@ -218,7 +228,7 @@ jobs:
 
       # 테마 페이지 3개 (doc/테마-모니터-기획.md, 2026-10-21) — 레이더 자료(snapshot · extra)를 그대로 쓴다. 게시 · 홈 카드(themes.json)
       - name: Theme pages (AI 투자 · 연준 기대 · 임원 매매)
-        if: env.DO_PUBLISH == 'true'
+        if: env.DO_PUBLISH == 'true' && needs.check.outputs.mode != 'refresh'
         continue-on-error: true
         run: |
           mkdir -p experiments/theme-monitor/data
@@ -279,7 +289,7 @@ jobs:
           echo "저장: $COMMIT"
 
       - name: Upload report artifact
-        if: always()
+        if: always() && needs.check.outputs.mode != 'refresh'
         uses: actions/upload-artifact@v4
         with:
           name: nvda-report

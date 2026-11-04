@@ -396,7 +396,7 @@ def picks(items, since=""):
     한 줄 = {market · ticker · name · action(매수 · 보유 · 관망 · 매도) · speaker · own(본인 의견) / report(증권사 보고서를 방송이 전함) · target · currency ·
     reason · quote · channel · url(그 장면 시각) · published_at}. 같은 영상 · 같은 사람 · 같은 종목은 한 줄. since = 'YYYY-MM-DD' 이후 영상만."""
     out, seen = [], set()
-    cut = _as_utc(since) if since and len(since) > 10 else None   # 시각까지 주면 시각으로 자른다 — 방송 의견 48시간 (2026-10-31 사용자: "48시간이 지난 정보는 게시하지 말아줘")
+    cut = _as_utc(since) if since and len(since) > 10 else None   # 시각까지 주면 시각으로 자른다 — 방송 의견 5일 (2026-11-04 P290, 옛 48시간 10-31 사용자: "48시간이 지난 정보는 게시하지 말아줘")
     for it in sorted(items, key=lambda r: str(r.get("publishedAt") or ""), reverse=True):
         pub = it.get("publishedAt")
         pub = pub.isoformat() if hasattr(pub, "isoformat") else str(pub or "")

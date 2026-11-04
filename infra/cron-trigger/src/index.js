@@ -49,6 +49,7 @@ const KST_JOBS = {
   // 한국 종목 페이지 · 한국 증시 리포트 (2026-10-27) — 한국장 마감 15:30 뒤. GitHub cron(07:10 UTC)이 10-26 에 7시간 늦었다.
   // 둘 다 도는 날은 concurrency 로 줄 서고, 뒤 실행은 페이지 해시 같음 · 리포트 이미 게시됨으로 쓰지 않는다. 휴장일은 fresh.txt 가 막는다.
   "16:10": [{ workflow: "kr-stocks.yml", when: WEEKDAY }],
+  "13:00": [{ workflow: "nvda-report.yml" }], // 낮 갱신 — 종목 페이지만 다시 그린다 (check.mode=refresh, 2026-11-04 P290). GitHub cron 04:00 UTC 는 예비
 };
 
 const JOBS = {
