@@ -163,6 +163,46 @@ jobs:
           && (env.IS_SCHEDULED == 'true' || inputs.publish)
         run: python experiments/daily-report/publish_saved.py
 
+      # 홈 카드 재료 cards/report.json (H31, 2026-11-05) — 게시된 날만(post_meta.json 은 게시 스크립트가 남긴다).
+      # 실패해도 글은 이미 게시돼 있고 홈은 피드 경로로 돌아간다(테마 JS cardJson → cardFeed). 재시도 1회 뒤에도 실패하면 Slack.
+      - name: Home card report.json
+        if: hashFiles('experiments/daily-report/output/post_meta.json') != ''
+        continue-on-error: true
+        run: python experiments/daily-report/home_card.py --card report --body experiments/daily-report/output/published_body.html --meta experiments/daily-report/output/post_meta.json --out deploy-cards/cards/report.json
+
+      - name: Deploy report.json to gh-pages
+        id: cards_deploy
+        if: hashFiles('deploy-cards/cards/report.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-cards
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Deploy report.json to gh-pages (retry)
+        id: cards_deploy_retry
+        if: steps.cards_deploy.outcome == 'failure'
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-cards
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Purge report.json cache
+        if: hashFiles('deploy-cards/cards/report.json') != '' && steps.cards_deploy_retry.outcome != 'failure'
+        continue-on-error: true
+        run: curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/cards/report.json" || true
+
+      - name: Notify card deploy failure
+        if: steps.cards_deploy_retry.outcome == 'failure'
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"⚠️ 홈 카드 cards/report.json 배포 실패(재시도 포함) — ${{ github.workflow }}. 홈은 피드로 돈다\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
+
       # 게시 성패와 무관하게 그날 분석은 남긴다. 게시가 skip된 날(already_published)은
       # 분석도 안 돌았으니 저장할 게 없다.
       # trump-state · nvda-state 와 같은 방식: 이전 커밋을 부모로 잇는 일반 push. force 없음 —

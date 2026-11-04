@@ -17,6 +17,7 @@ import config as NC  # noqa: E402  — NVDA 리포트 기준값(국면 · 섹터
 import indicators  # noqa: E402
 
 import universe as U  # noqa: E402
+import crash_watch as CW  # noqa: E402 — 급락장에서 버틴 종목 (experiments/, 홈 `주목할 종목` · 오늘 탭 카드, 2026-11-04)
 
 LAM, Z_OUT = 0.94, 2.0
 PERIODS = (("1주", 5), ("1개월", 21), ("3개월", 63), ("6개월", 126), ("1년", 252))
@@ -322,7 +323,10 @@ def run(snap):
     for s in stocks:
         s["mom_peers_median"], s["mom_bench"] = (moms[len(moms) // 2] if moms else None), bench
     day = max(s["day"] for s in stocks)
-    return {"day": day, "fetched_at": snap["fetched_at"], "stocks": update_ranks(stocks, day)}
+    crash = CW.compute(snap["bars"], "us", [c[0] for c in U.CANDIDATES])   # 급락장에서 버틴 종목 — S&P 500 이 2% 넘게 내린 날 (2026-11-04 사용자)
+    for s in stocks:
+        s["crash"] = CW.for_stock(crash, s["sym"])
+    return {"day": day, "fetched_at": snap["fetched_at"], "stocks": update_ranks(stocks, day), "crash": crash}
 
 
 if __name__ == "__main__":

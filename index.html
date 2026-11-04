@@ -346,6 +346,23 @@ body.menu-open { overflow: hidden; }
 /* 인물 발언 · 미디어 데일리 줄 = 글자만 (2026-10-24 사용자: 라벨 · 강도 · 관심도 · 구분선 · 굵게 모두 뺌). 18 · 행간 34 · 보통 굵기, 줄 사이 위아래 4 */
 #radar-card .kv-row.plain-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 7px; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; }
 #radar-card .kv-rows { padding: 12px 0 14px; }
+/* 홈 주목할 종목 카드 (2026-11-04 사용자 H28: 한국 증시 · 주요 인물 발언처럼 독립 카드, 종목 이름 뒤 `주목` 라벨) — 다섯째 카드라 전폭, 안에서 미국 · 한국 두 칸 */
+#notable-col { grid-column: 1 / -1; }
+#notable-card { padding: 0 16px; gap: 0; }
+.nt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; padding: 4px 0 14px; }
+.nt-mkt { min-width: 0; }
+.nt-head { display: flex; align-items: baseline; gap: 8px; padding: 12px 0 6px; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; }
+.nt-head .nt-sub { font-weight: 400; font-size: 14px; color: #6B7280; }
+.nt-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-top: 1px solid #EEF2F7; font-size: 16px; line-height: 24px; color: #111; }
+.nt-row:first-child { border-top: 0; }
+.nt-row[hidden] { display: none; }
+.nt-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nt-tag { flex: none; display: inline-block; padding: 2px 6px 1px; border: 1px solid #F59E0B; border-radius: 4px; background: #FFFBEB; font-size: 12px; line-height: 16px; font-weight: 700; color: #92400E; }
+.nt-chg { margin-left: auto; flex: none; font-family: var(--num); font-size: 15px; white-space: nowrap; }
+.nt-chg .nt-ex { margin-left: 6px; font-size: 13px; color: #6B7280; }
+.nt-more { padding: 8px 0 4px; font-size: 14px; line-height: 20px; color: #2563EB; cursor: pointer; }
+.nt-note { padding: 8px 0; font-size: 15px; line-height: 22px; color: var(--gray-400); }
+@media (max-width: 900px) { .nt-grid { grid-template-columns: minmax(0, 1fr); } }
 #radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 /* 홈 트럼프 카드 — 발언 줄: 주제 라벨(영역 라벨 모양) + 세부 주제 · 방향 · 대상 왼쪽, 강도 오른쪽, 줄 사이 구분선 (2026-10-15 사용자) */
 #trump-card { padding: 0 16px; gap: 0; }
@@ -1646,7 +1663,20 @@ body.no-dashboard .main-content { padding-top: 32px; }
               </a>
               </div>
 
-              <!-- 미디어 데일리 카드는 뺐다 (2026-10-30 사용자 H26): 방송 이슈는 종목 페이지 · 미국 데일리 · 한국 증시 리포트로 전부 나뉘고 글도 더 내지 않는다. 카드 넷 = 미국 · 한국 · 트럼프 · 인물 -->
+              <!-- 주목할 종목 (2026-11-04 사용자 H28: 한국 증시 · 주요 인물 발언처럼 독립 카드) — 지수(S&P 500 · 코스피)가 2% 넘게 내린 날 올랐거나 2%p 넘게 덜 내린 종목, 이름 뒤 `주목` 라벨.
+                   stocks.json · kr.json 의 notable (experiments/stock-radar/home_feed.py · kr-stocks/home_feed_kr.py, 하루 1회 종가 기준, 급락일이 아닌 날은 마지막 급락일).
+                   줄을 누르면 그 종목 `오늘` 탭(#tab-오늘)의 `급락장에서 어땠나?` 카드. 5개 펼침 + 나머지 접기. 다섯째 카드라 전폭(미국 · 한국 두 칸) -->
+              <div class='report-col' id='notable-col'>
+              <h3 class='report-title'><span class='report-icon' style='background:#B45309;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M2 11.5l4-4 3 3 5-6'/><path d='M10.5 4.5H14v3.5'/></svg></span>주목할 종목<span class='report-card-date' data-date='notable-card'></span></h3>
+              <a class='report-card' id='notable-card' href='/p/us-market-cap-top10.html'>
+                <div class='nt-grid'>
+                  <div class='nt-mkt' data-hook='notable-us'><div class='nt-note'>불러오는 중…</div></div>
+                  <div class='nt-mkt' data-hook='notable-kr'><div class='nt-note'>불러오는 중…</div></div>
+                </div>
+              </a>
+              </div>
+
+              <!-- 미디어 데일리 카드는 뺐다 (2026-10-30 사용자 H26): 방송 이슈는 종목 페이지 · 미국 데일리 · 한국 증시 리포트로 전부 나뉘고 글도 더 내지 않는다. 카드 다섯 = 미국 · 한국 · 트럼프 · 인물 · 주목할 종목(11-04 H28) -->
             </div>
 
           </div>
@@ -2708,10 +2738,59 @@ body.no-dashboard .main-content { padding-top: 32px; }
           ebGo(0); ebStart();
         }
 
+        /* ================================================= 주목할 종목 (stocks.json · kr.json 의 notable, 2026-11-04 사용자 H28) — 급락일에 버틴 종목, 이름 뒤 `주목` 라벨.
+           n = { day, index, index_ret, pct, hold_pp, recent, stocks: [{ s, name, slug, page, cp, ex, held_n, held_total }] }. null = 불러오기 실패. 5개 펼침 + 접기 (조용히 버리지 않는다) */
+        var NT_SHOW = 5, ntDays = {};
+        function ntMd(day) { var d = new Date(day + 'T00:00:00'); return isNaN(d) ? day : (d.getMonth() + 1) + '월 ' + d.getDate() + '일'; }
+        function ntPct(v, unit) { if (v === null || v === undefined) return ''; return ((v > 0 ? '+' : '') + Number(v).toFixed(1) + (unit || '%')).replace('-', '−'); }
+        function renderNotable(market, n) {
+          var box = document.querySelector('[data-hook="notable-' + market + '"]');
+          if (!box) return;
+          box.textContent = '';
+          var label = market === 'kr' ? '한국' : '미국';
+          if (!n) { box.appendChild(el('div', 'nt-head', label)); box.appendChild(el('div', 'nt-note', LOAD_FAILED)); return; }
+          if (!n.day) { box.appendChild(el('div', 'nt-head', label)); box.appendChild(el('div', 'nt-note', '최근 2년 동안 지수가 ' + (n.pct || 2) + '% 넘게 내린 날이 없습니다.')); return; }
+          var head = el('div', 'nt-head', label + ' · ' + n.index + ' ' + ntPct(n.index_ret));
+          head.appendChild(el('span', 'nt-sub', (n.recent ? '' : '마지막 급락일 ') + ntMd(n.day)));
+          box.appendChild(head);
+          var rows = n.stocks || [];
+          if (!rows.length) { box.appendChild(el('div', 'nt-note', '그날 올랐거나 지수보다 ' + (n.hold_pp || 2) + '%p 넘게 덜 내린 종목이 없습니다.')); return; }
+          var list = el('div', 'nt-list');
+          rows.forEach(function (r, i) {
+            var d = el('div', 'nt-row');
+            if (i >= NT_SHOW) d.hidden = true;
+            d.appendChild(el('span', 'nt-name', r.name));
+            d.appendChild(el('span', 'nt-tag', '주목'));
+            var c = el('span', 'nt-chg', ntPct(r.cp));
+            c.style.color = r.cp >= 0 ? '#d93025' : '#1a73e8';   /* 종목 페이지 가격 색(오름 빨강 · 내림 파랑)과 같게 */
+            c.appendChild(el('span', 'nt-ex', '지수보다 ' + ntPct(r.ex, '%p')));
+            d.appendChild(c);
+            var href = r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html#tab-' + encodeURIComponent('오늘')
+              : (market === 'kr' ? ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html') : BLOG_HOME + 'p/us-market-cap-top10.html');
+            d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', href);
+            list.appendChild(d);
+          });
+          box.appendChild(list);
+          if (rows.length > NT_SHOW) {
+            var more = el('div', 'nt-more', '+ ' + (rows.length - NT_SHOW) + '개 더 보기');
+            more.addEventListener('click', function (e) {
+              e.preventDefault(); e.stopPropagation();   /* 카드 전체 링크(<a>) · 줄 클릭 스크립트보다 먼저 — 접고 펴기만 */
+              var open = more.getAttribute('data-open') === '1';
+              [].slice.call(list.children).forEach(function (x, i) { if (i >= NT_SHOW) x.hidden = open; });
+              more.setAttribute('data-open', open ? '0' : '1');
+              more.textContent = open ? '+ ' + (rows.length - NT_SHOW) + '개 더 보기' : '접기';
+            });
+            box.appendChild(more);
+          }
+          ntDays[market] = n.day;
+          var days = Object.keys(ntDays).map(function (k) { return ntDays[k]; }).filter(Boolean).sort();
+          if (days.length) setDate('notable-card', ntMd(days[days.length - 1]) + ' 기준');
+        }
+
         fetch(KR_URL + '?v=' + Date.now())
           .then(function (r) { return r.json(); })
-          .then(function (json) { krHome = json; setEvents('kr', json.events); if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); })
-          .catch(function () {});
+          .then(function (json) { krHome = json; setEvents('kr', json.events); renderNotable('kr', json.notable); if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); })
+          .catch(function () { renderNotable('kr', null); });
 
         fetch(DATA_URL + '?v=' + Date.now())
           .then(function (r) { return r.json(); })
@@ -2877,9 +2956,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
             feedSectors = json.sectors || [];
             setEvents('us', json.events);
             setPicksDay(json.day);
+            renderNotable('us', json.notable);   /* 주목할 종목 (H28) */
             renderWatchTabs(); renderWatch(); renderSectorTop();
           })
-          .catch(function () { renderWatch(); renderSectorTop(); });
+          .catch(function () { renderWatch(); renderSectorTop(); renderNotable('us', null); });
 
         /* ================================================= 테마 (themes.json, 2026-10-21 사용자) */
 
@@ -3022,6 +3102,28 @@ body.no-dashboard .main-content { padding-top: 32px; }
           return '/feeds/posts/default/-/' + encodeURIComponent(label) + '?alt=json&max-results=1';
         }
 
+        /* 글 본문 HTML (2026-11-04 사용자 H29: 사이트 피드를 "짧게"로 — 뉴스 매체 관행, 전문 복제 방지). 짧은 피드에는 content 가 없고 요약(summary)뿐이라
+           글 주소(alternate)를 같은 도메인에서 받아 본문 칸(.post-body)만 쓴다 — 피드 content 와 같은 HTML. 피드가 전체면 그대로 content. 같은 글은 한 번만 받는다 */
+        var bodyCache = {};
+        function postBody(entry) {
+          var c = (entry.content || {}).$t;
+          if (c) return Promise.resolve(c);
+          var href = '';
+          (entry.link || []).forEach(function (l) { if (l.rel === 'alternate' && l.href) href = l.href; });
+          if (!href) return Promise.resolve('');
+          if (!bodyCache[href]) {
+            bodyCache[href] = fetch(href, { credentials: 'omit' })
+              .then(function (r) { return r.ok ? r.text() : ''; })
+              .then(function (html) {
+                if (!html) return '';
+                var b = new DOMParser().parseFromString(html, 'text/html').querySelector('.post-outer-container .post-body, .post-body');
+                return b ? b.innerHTML : '';
+              })
+              .catch(function () { return ''; });
+          }
+          return bodyCache[href];
+        }
+
         /* 홈에는 리포트의 일부만 발췌해 싣는다. 게시된 글은 손대지 않는다 —
            읽어와 보여주기만 하므로 상세 글에는 모든 구간이 그대로 남는다.
            카드마다 라벨 · 구획(h2 제목 → 카드 훅) · 빈 피드 안내문을 둔다.
@@ -3037,6 +3139,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         var CARDS = [
           {
             id: 'report-card',
+            file: 'report.json',   /* 카드 재료 JSON gh-pages cards/ (H31) */
             label: '데일리 브리핑',
             chart: 'report-chart',   /* 본문 맨 위 그래프(a[data-zoom] img)를 카드에 복제 (2026-10-21 사용자) */
             map: { summary: ['(머리)', '오늘 한 줄'] },   /* 주요 지수 수치는 홈에 싣지 않는다 — 한 줄 결론만 (2026-10-12 사용자: 요약 짧게) */   /* 2026-10-11 새 디자인: 머리는 제목 없음(data-lead), 구획은 짧은 명사. 옛 이름은 옛 글용 */
@@ -3046,6 +3149,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           },
           {
             id: 'kr-report-card',
+            file: 'kr-report.json',   /* 카드 재료 JSON gh-pages cards/ (H31) */
             label: '한국 증시 리포트',   /* 홈 수정 H24 (2026-10-29 사용자) — 미국 카드와 같은 틀: 글 맨 위 코스피 봉차트 + 머리 첫 줄 */
             chart: 'kr-report-chart',
             map: { 'kr-summary': ['(요약)'] },   /* H27 (2026-10-30): 한국 글은 data-lead 가 없고 data-cards 는 그래프라 범례가 뽑혔다 → 검색용 요약(data-seo-lead) 첫 문장. 훅 이름도 미국 카드와 분리 */
@@ -3055,6 +3159,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           },
           {
             id: 'trump-card',
+            file: 'trump.json',   /* 카드 재료 JSON gh-pages cards/ (H31) */
             label: '트럼프 트렌드',
             map: { speech: ['발언', '오늘 한 줄', '달라진 것', '무엇이 달라졌나'], watch: ['내일 볼 것'] },   /* 트럼프는 머리 구획이 없다 — 발언 집계 줄부터 (2026-10-12) */
             pick: { speech: speechLines },   /* map · pick 은 목록 화면 요약용 — 홈 카드는 fill 이 그린다 (2026-10-15) */
@@ -3064,6 +3169,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           },
           {
             id: 'radar-card',
+            file: 'radar.json',   /* 카드 재료 JSON gh-pages cards/ (H31) */
             label: '인물 발언',
             map: { lead: ['(머리)'] },   /* 목록 화면 요약용 — `발언 N건 · M명` · 가장 강한 발언. 홈 카드는 fill 이 그린다 */
             fill: fillRadar, rows: 'radar-rows',   /* 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 엔비디아 카드는 삭제 (같은 날) */
@@ -3394,7 +3500,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
           try { doc = new DOMParser().parseFromString(html, 'text/html'); } catch (e) { return; }
           var src = doc.querySelector('a[data-zoom] img, a[aria-label="그래프 확대 보기"] img');
           if (!src || !src.getAttribute('src')) return;
-          im.src = src.getAttribute('src'); im.alt = src.getAttribute('alt') || 'S&P 500 그래프';
+          fillChartSrc(hook, src.getAttribute('src'), src.getAttribute('alt'));
+        }
+        function fillChartSrc(hook, src, alt) {   /* 카드 재료 JSON 의 chart {src, alt} (H31) */
+          var im = document.querySelector('[data-hook="' + hook + '"]');
+          if (!im || !src) return;
+          im.src = src; im.alt = alt || 'S&P 500 그래프';
           im.hidden = false;
         }
 
@@ -3404,64 +3515,103 @@ body.no-dashboard .main-content { padding-top: 32px; }
           if (card.picks) fillPicks(null);
         }
 
-        function loadCard(card) {
-          fetch(feedUrl(card.label))
+        /* ---- 카드 재료 JSON 먼저 (H31, 2026-11-05 사용자) ----
+           gh-pages cards/<파일>.json — 글 게시 직후 experiments/daily-report/home_card.py 가 카드가 쓰는 구획만 써 둔다(2~5KB).
+           전에는 방문자마다 라벨 피드 + 글 페이지 HTML(각 600KB)을 받아 몇 줄만 썼다(홈 1회 = Blogger 요청 8건 · 약 2MB).
+           JSON 이 없거나(404) 깨졌거나 생성 4일 넘게 오래됐으면(푸시 실패 뒤 옛 파일) 전처럼 피드로 — 피드 경로는 예비로 남긴다.
+           구획 HTML 은 DOMParser 로 다시 요소 배열로 만들어 reportSections 결과와 같은 모양 → linesOf · trumpRows · radarRows · fillPicks 는 그대로 */
+        var CARD_MAX_AGE = 4 * 86400000;
+        function cardJson(card) {
+          if (!card.file) return Promise.reject(new Error('no file'));
+          return fetch(GH + 'cards/' + card.file + '?v=' + Date.now())
+            .then(function (r) { if (!r || !r.ok) throw new Error('http'); return r.json(); })
+            .then(function (j) {
+              if (!j || !j.url || !j.title || !j.sections) throw new Error('bad json');
+              var t = Date.parse(j.generated || '');
+              if (!(t > 0) || Date.now() - t > CARD_MAX_AGE) throw new Error('stale');
+              var sec = {};
+              Object.keys(j.sections).forEach(function (k) {
+                var d = new DOMParser().parseFromString('<body>' + j.sections[k], 'text/html');
+                sec[k] = [].slice.call(d.body.children);
+              });
+              return { title: j.title, href: j.url, day: j.date || '', sec: sec, chart: j.chart || null, body: '' };
+            });
+        }
+
+        /* 예비 경로(전 방식): 라벨 피드 → 글 본문 → 구획. 피드는 왔는데 글이 없으면 "아직 발행 전" 으로 알리고 null */
+        function cardFeed(card) {
+          return fetch(feedUrl(card.label))
             .then(function (r) { return r.json(); })
             .then(function (json) {
               var entry = ((json.feed || {}).entry || [])[0];
-              /* 피드는 왔는데 글이 없다 = 아직 발행 전. 실패와 다르게 알린다. */
-              if (!entry) { failCard(card, card.empty); return; }
-
-              var title = (entry.title || {}).$t || '';
-              /* 날짜 표기 2026.10.9 (점, 앞자리 0 없음 — 디자인-가이드라인 3-3) */
-              /* 글 제목의 날짜(한국 날짜)를 먼저 — 피드 published 는 블로그 시간대(미국 태평양)라 제목보다 하루 이르게 나왔다 (2026-10-18 사용자: 홈 카드 이상). 제목에 날짜가 없으면 published */
-              var tm = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/.exec(title);
-              /* 제목에 날짜가 없는 글(주요 인물 발언, 2026-10-21)은 본문 첫 줄의 "M월 D일 기준"을 읽는다 — 발행일(블로그 시간대, 하루 이름)보다 먼저 */
-              if (!tm) { var bm = /(\d{1,2})월\s*(\d{1,2})일\s*기준/.exec(String((entry.content || {}).$t || '').replace(/<[^>]+>/g, ' ').slice(0, 1200)); if (bm) tm = [null, String(new Date().getFullYear()), bm[1], bm[2]]; }
-              var day = tm ? [tm[1], String(parseInt(tm[2], 10)), String(parseInt(tm[3], 10))].join('.')
-                : String((entry.published || {}).$t || '').slice(0, 10).split('-').map(function (x, i) { return i ? String(parseInt(x, 10)) : x; }).join('.');
-              setDate(card.id, day.split('.').slice(-2).join('.'));   /* 홈 카드 날짜는 연도 없이 10.23 (2026-10-24 사용자) */
-
-              /* 카드를 누르면 그 글로 간다 */
-              var href = '';
-              (entry.link || []).forEach(function (l) {
-                if (l.rel === 'alternate' && l.href) href = l.href;
+              if (!entry) { failCard(card, card.empty); return null; }
+              return postBody(entry).then(function (body) {   /* 본문 = 피드 content 또는 글 페이지 .post-body (H29) */
+                if (!body) throw new Error('no body');
+                var title = (entry.title || {}).$t || '';
+                var href = '';
+                (entry.link || []).forEach(function (l) { if (l.rel === 'alternate' && l.href) href = l.href; });
+                return { title: title, href: href, day: dayOf(title, body, (entry.published || {}).$t), sec: reportSections(body), chart: null, body: body };
               });
-              var a = document.getElementById(card.id);
-              if (a && href) a.href = href;
-              if (a && title) a.title = title;
-              /* 카드 제목 줄도 같은 글로 (2026-10-25 사용자: "주요 인물 발언 타이틀 영역 한 줄을 누르면 상세 페이지로") — 홈 리포트 카드 모두 같게 */
-              var head = a && a.parentNode && a.parentNode.querySelector('.report-title');
-              if (head && href) { head.setAttribute('data-row-link', '1'); head.setAttribute('data-href', href); }
+            });
+        }
 
-              var sec = reportSections((entry.content || {}).$t || '');
-              if (!sec) throw new Error('unparsable');
-              if (card.chart) fillChart(card.chart, (entry.content || {}).$t || '');
+        /* 날짜 표기 2026.10.9 (점, 앞자리 0 없음 — 디자인-가이드라인 3-3)
+           글 제목의 날짜(한국 날짜)를 먼저 — 피드 published 는 블로그 시간대(미국 태평양)라 제목보다 하루 이르게 나왔다 (2026-10-18 사용자: 홈 카드 이상). 제목에 날짜가 없으면 published
+           제목에 날짜가 없는 글(주요 인물 발언, 2026-10-21)은 본문 첫 줄의 "M월 D일 기준"을 읽는다 — 발행일(블로그 시간대, 하루 이름)보다 먼저.
+           JSON 경로는 home_card.py 가 같은 순서로 정한 date 를 쓴다 */
+        function dayOf(title, body, published) {
+          var tm = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/.exec(title);
+          if (!tm) { var bm = /(\d{1,2})월\s*(\d{1,2})일\s*기준/.exec(String(body).replace(/<[^>]+>/g, ' ').slice(0, 1200)); if (bm) tm = [null, String(new Date().getFullYear()), bm[1], bm[2]]; }
+          return tm ? [tm[1], String(parseInt(tm[2], 10)), String(parseInt(tm[3], 10))].join('.')
+            : String(published || '').slice(0, 10).split('-').map(function (x, i) { return i ? String(parseInt(x, 10)) : x; }).join('.');
+        }
 
-              if (card.fill) card.fill(sec);
-              Object.keys(card.map).forEach(function (hook) {
-                var lines = [], used = null;
-                if (card.pick && card.pick[hook]) { lines = card.pick[hook](sec); used = card.map[hook][0]; }
-                else card.map[hook].forEach(function (k) {
-                  if (card.any && lines.length) return;
-                  if (sec[k]) { lines = lines.concat(linesOf(sec[k])); if (lines.length && !used) used = k; }
-                });
-                fillCard(hook, lines.slice(0, (card.lines && card.lines[hook]) || MAX_LINES));
-                /* any 카드가 후순위 구획으로 채워졌으면 배지도 그 구획 이름으로 — "오늘의 해석" 아래 이벤트 목록이 붙지 않게 */
-                if (card.any && used && used !== card.map[hook][0]) {
-                  var block = document.querySelector('.report-block[data-hook="' + hook + '"]');
-                  var badge = block && block.querySelector('.badge');
-                  if (badge) badge.textContent = used;
-                }
-              });
+        /* 카드 그리기 — p = { title, href, day, sec, chart, body } (JSON 경로 · 피드 경로 공통) */
+        function renderCard(card, p) {
+          var title = p.title, href = p.href, sec = p.sec, body = p.body;
+          setDate(card.id, String(p.day || '').split('.').slice(-2).join('.'));   /* 홈 카드 날짜는 연도 없이 10.23 (2026-10-24 사용자) */
 
-              if (card.picks) {
-                fillPicks(sec[PICKS_HEADS[0]] || sec[PICKS_HEADS[1]]);
-                var stamp = document.getElementById('briefing-date');   /* 제목 옆 날짜 (2026-10-12 사용자) */
-                var tm = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/.exec(title);   /* 리포트 기준일은 글 제목의 날짜 (발행일은 다음 날일 수 있다) */
-                /* 리포트 제목의 날짜와 같은 표기 "2026년 10월 11일" (2026-10-12 사용자, 줄표는 2026-10-18 삭제) */
-                if (stamp && tm) stamp.textContent = tm[1] + '년 ' + parseInt(tm[2], 10) + '월 ' + parseInt(tm[3], 10) + '일';
-              }
+          /* 카드를 누르면 그 글로 간다 */
+          var a = document.getElementById(card.id);
+          if (a && href) a.href = href;
+          if (a && title) a.title = title;
+          /* 카드 제목 줄도 같은 글로 (2026-10-25 사용자: "주요 인물 발언 타이틀 영역 한 줄을 누르면 상세 페이지로") — 홈 리포트 카드 모두 같게 */
+          var head = a && a.parentNode && a.parentNode.querySelector('.report-title');
+          if (head && href) { head.setAttribute('data-row-link', '1'); head.setAttribute('data-href', href); }
+
+          if (!sec) throw new Error('unparsable');
+          if (card.chart) { if (p.chart) fillChartSrc(card.chart, p.chart.src, p.chart.alt); else fillChart(card.chart, body); }
+
+          if (card.fill) card.fill(sec);
+          Object.keys(card.map).forEach(function (hook) {
+            var lines = [], used = null;
+            if (card.pick && card.pick[hook]) { lines = card.pick[hook](sec); used = card.map[hook][0]; }
+            else card.map[hook].forEach(function (k) {
+              if (card.any && lines.length) return;
+              if (sec[k]) { lines = lines.concat(linesOf(sec[k])); if (lines.length && !used) used = k; }
+            });
+            fillCard(hook, lines.slice(0, (card.lines && card.lines[hook]) || MAX_LINES));
+            /* any 카드가 후순위 구획으로 채워졌으면 배지도 그 구획 이름으로 — "오늘의 해석" 아래 이벤트 목록이 붙지 않게 */
+            if (card.any && used && used !== card.map[hook][0]) {
+              var block = document.querySelector('.report-block[data-hook="' + hook + '"]');
+              var badge = block && block.querySelector('.badge');
+              if (badge) badge.textContent = used;
+            }
+          });
+
+          if (card.picks) {
+            fillPicks(sec[PICKS_HEADS[0]] || sec[PICKS_HEADS[1]]);
+            var stamp = document.getElementById('briefing-date');   /* 제목 옆 날짜 (2026-10-12 사용자) */
+            var tm = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/.exec(title);   /* 리포트 기준일은 글 제목의 날짜 (발행일은 다음 날일 수 있다) */
+            /* 리포트 제목의 날짜와 같은 표기 "2026년 10월 11일" (2026-10-12 사용자, 줄표는 2026-10-18 삭제) */
+            if (stamp && tm) stamp.textContent = tm[1] + '년 ' + parseInt(tm[2], 10) + '월 ' + parseInt(tm[3], 10) + '일';
+          }
+        }
+
+        function loadCard(card) {
+          cardJson(card).then(function (p) { renderCard(card, p); })
+            .catch(function () {   /* JSON 없음 · 깨짐 · 오래됨 · 그리기 실패 → 피드 */
+              return cardFeed(card).then(function (p) { if (p) renderCard(card, p); });
             })
             .catch(function () { failCard(card); });
         }
@@ -3470,7 +3620,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
         /* ====================================================== 목록 카드 요약 = 홈 카드 요약 (2026-10-13 사용자: "홈카드 요약글을 재활용")
            블로거 기본 요약(postSnippet)은 본문 앞 약 860자를 통째로 자른 것이라 카드 숫자가 한 덩어리로 이어진다.
-           목록 화면의 글들을 피드로 한 번에 받아, 홈 카드와 같은 함수로 글마다 2줄을 뽑아 바꿔 단다. 못 받으면 원래 요약을 2줄로 자른 채 둔다(테마 CSS). */
+           목록 화면의 글들을 피드로 한 번에 받아, 홈 카드와 같은 함수로 글마다 2줄을 뽑아 바꿔 단다. 못 받으면 원래 요약을 2줄로 자른 채 둔다(테마 CSS).
+           피드가 "짧게"(2026-11-04 H29)면 content 가 없어 늘 원래 요약 — 목록 글마다 페이지를 받는 것은 무거워 하지 않는다. */
         function summaryLines(labels, sec) {
           if (labels.indexOf('엔비디아') >= 0) {
             var out = [];
@@ -3887,6 +4038,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         function setCount() { toggle.firstChild.textContent = '댓글' + (loaded ? ' ' + items.length : ''); }
         function setOpen(open) {
           box.classList.toggle('is-open', open); panel.hidden = !open; toggle.setAttribute('aria-expanded', String(open));
+          if (open) loadOnce();   /* 열면 그때 읽는다 (H30) */
           if (open && !api) auth().then(function (a) { api = a; a.onAuth(function (u) { me = u; renderWrite(); renderList(); }); }, function (e) { showErr(write, errText(e)); });
         }
         toggle.addEventListener('click', function () { setOpen(panel.hidden); });
@@ -3986,8 +4138,18 @@ body.no-dashboard .main-content { padding-top: 32px; }
             .catch(function (e) { b.disabled = false; window.alert(errText(e, 'del')); });
         }
 
-        load();
+        /* 댓글은 늦게 읽는다 (H30, 2026-11-04 사용자). 전에는 글을 열면 바로 Firestore 를 읽어 페이지뷰 1 = 읽기 1회 이상이었다(빈 질의도 1회) —
+           무료 한도(하루 5만 읽기)가 방문자 수에 그대로 묶인다. 이제 댓글 칸이 화면 가까이 오거나(IntersectionObserver, 200px 앞) 열 때 한 번만 읽는다.
+           닫힌 버튼의 `댓글 n` 숫자는 읽은 뒤에 붙는다. 주소가 #comments · #c… 면 바로 열고 읽는다. 옛 브라우저(IO 없음)는 전처럼 바로 읽는다 */
+        var loadDone = false;
+        function loadOnce() { if (loadDone) return; loadDone = true; load(); }
         setOpen(/^#(comments|comment-form|c[A-Za-z0-9]+)$/.test(location.hash));
+        if (!loadDone) {
+          if ('IntersectionObserver' in window) {
+            var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); loadOnce(); } }, { rootMargin: '200px 0px' });
+            io.observe(box);
+          } else loadOnce();
+        }
       })();
 
       /* ============================================================ 카드 안 펼침 (2026-10-13 사용자: "더 보기 버튼은 지수 더 보기처럼 카드에 포함, 닫는 버튼도")

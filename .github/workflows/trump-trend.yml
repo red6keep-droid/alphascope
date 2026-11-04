@@ -179,6 +179,46 @@ jobs:
             python experiments/trump-trend/publish.py
           fi
 
+      # 홈 카드 재료 cards/trump.json (H31, 2026-11-05) — 게시된 날만(post_meta.json 은 게시 스크립트가 남긴다).
+      # 실패해도 글은 이미 게시돼 있고 홈은 피드 경로로 돌아간다(테마 JS cardJson → cardFeed). 재시도 1회 뒤에도 실패하면 Slack.
+      - name: Home card trump.json
+        if: hashFiles('experiments/trump-trend/output/post_meta.json') != ''
+        continue-on-error: true
+        run: python experiments/daily-report/home_card.py --card trump --body experiments/trump-trend/output/trump_report_body.html --meta experiments/trump-trend/output/post_meta.json --out deploy-cards/cards/trump.json
+
+      - name: Deploy trump.json to gh-pages
+        id: cards_deploy
+        if: hashFiles('deploy-cards/cards/trump.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-cards
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Deploy trump.json to gh-pages (retry)
+        id: cards_deploy_retry
+        if: steps.cards_deploy.outcome == 'failure'
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-cards
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Purge trump.json cache
+        if: hashFiles('deploy-cards/cards/trump.json') != '' && steps.cards_deploy_retry.outcome != 'failure'
+        continue-on-error: true
+        run: curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/cards/trump.json" || true
+
+      - name: Notify card deploy failure
+        if: steps.cards_deploy_retry.outcome == 'failure'
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"⚠️ 홈 카드 cards/trump.json 배포 실패(재시도 포함) — ${{ github.workflow }}. 홈은 피드로 돈다\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
+
       # 분류 결과가 있으면 뒤 단계가 실패했어도 저장한다 — Gemini 호출을 헛되게 하지 않기 위해.
       - name: Save state + report (trump-state branch)
         if: always()

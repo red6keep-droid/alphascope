@@ -19,6 +19,9 @@ import analyze
 import collect
 import universe as U
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import crash_watch as CW  # noqa: E402 — 홈 `주목할 종목` 카드 (2026-11-04)
+
 BASE = os.path.dirname(os.path.abspath(__file__))
 PAGES_LIVE = os.path.join(BASE, "data", "pages_live.json")
 OUT = os.path.join(BASE, "output", "home", "stocks.json")
@@ -45,6 +48,20 @@ def events(a, snap, live):
         when = next((x.get("when") for x in (snap.get("earnings") or {}).get(s["sym"]) or [] if x["day"] == nxt), None)
         out.append({"kind": "earnings", "day": nxt, "when": when, "s": s["sym"], "name": U.BY_SYM[s["sym"]][1], "slug": U.BY_SYM[s["sym"]][2], "mc": int(s["cap"]) if s.get("cap") else None})
     return sorted(out, key=lambda e: (e["day"], -(e["mc"] or 0)))
+
+
+def notable(a, live, by_sym, page_ok):
+    """홈 `주목할 종목` 카드 (2026-11-04 사용자: 한국 증시 · 주요 인물 발언처럼 독립 카드, 종목 이름 뒤 `주목` 라벨) — 최근 급락일에 버틴 종목, 지수와 차이 큰 순.
+    급락일이 아닌 날도 마지막 급락일 그대로(빈 카드 대신). 줄을 누르면 그 종목 `오늘` 탭의 `급락장에서 어땠나?` 카드 — 고정 페이지가 없으면 목록으로.
+    by_sym = {티커: (홈 키, 이름, slug)}, page_ok(티커) = 고정 페이지가 있나. 한국(home_feed_kr)도 같은 함수."""
+    c = a.get("crash") or {}
+    rows = []
+    for sym in CW.notable(c):
+        x = c["stocks"][sym]
+        rows.append({"s": by_sym[sym][0], "name": by_sym[sym][1], "slug": by_sym[sym][2], "page": page_ok(sym),
+                     "cp": round(x["ret"], 2), "ex": round(x["excess"], 1), "held_n": x["held_n"], "held_total": x["held_total"]})
+    return {"day": c.get("day"), "index": c.get("index"), "index_ret": round(c["index_ret"], 2) if c.get("index_ret") is not None else None,
+            "pct": c.get("pct"), "hold_pp": c.get("hold_pp"), "n_days": len(c.get("days") or []), "recent": bool(c.get("recent")), "stocks": rows}
 
 
 def build(a, live, snap=None):
@@ -74,6 +91,7 @@ def build(a, live, snap=None):
         "updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         "day": a["day"], "stocks": rows, "watch": watch, "sectors": [{"sector": x["sector"], "syms": x["syms"]} for x in sector_rows],
         "events": events(a, snap or {}, live),
+        "notable": notable(a, live, {s: (s, U.BY_SYM[s][1], U.BY_SYM[s][2]) for s in U.BY_SYM}, lambda s: s in live or s in U.REPORT_TYPE),
     }
 
 
@@ -84,7 +102,7 @@ def write(a=None):
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False)
-    print(f"[home] 종목 {len(data['stocks'])} · 페이지 있음 {sum(1 for r in data['stocks'] if r['page'])} · 관심 묶음 {len(data['watch'])} · 섹터 {len(data['sectors'])} · 일정 {len(data['events'])} → {OUT}")
+    print(f"[home] 종목 {len(data['stocks'])} · 페이지 있음 {sum(1 for r in data['stocks'] if r['page'])} · 관심 묶음 {len(data['watch'])} · 섹터 {len(data['sectors'])} · 일정 {len(data['events'])} · 주목 {len(data['notable']['stocks'])}({data['notable']['day']}) → {OUT}")
     return OUT
 
 

@@ -15,6 +15,8 @@ import collect_kr_earn_dart
 import universe_kr as U
 
 BASE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(BASE, "..", "stock-radar"))
+import home_feed as HF  # noqa: E402 — 홈 `주목할 종목` 줄(notable)은 미국과 같은 함수 (2026-11-04)
 OUT = os.path.join(BASE, "output", "home", "kr.json")
 PAGES_LIVE = os.path.join(BASE, "data", "pages_live.json")   # publish_pages_kr 가 쓴다 — 블로거에 있는 페이지 키 목록
 EVENT_DAYS = 30   # 홈 맨 위 일정 배너 — 미국 stock-radar/home_feed.py 와 같다
@@ -98,6 +100,7 @@ def build(a, extra=None):
     return {"updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"), "day": a["day"], "currency": "KRW",
             "list_url": U.LIST_URL, "stocks": stocks, "watch": watch, "sectors": sector_rows, "flows": _flow_rows(a.get("market")),
             "events": _events(a, extra if extra is not None else collect_kr_extra.load(), live),
+            "notable": HF.notable(a, live, {s: (U.code(s), U.BY_SYM[s][1], U.BY_SYM[s][2]) for s in U.BY_SYM}, lambda s: U.code(s) in live),   # 주목할 종목 — 코스피가 2% 넘게 내린 날 (2026-11-04)
             "source": "시세 Yahoo Finance · 자금 흐름 한국은행 ECOS"}
 
 
@@ -109,7 +112,7 @@ def write(a=None):
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False)
-    print(f"[kr-home] 종목 {len(data['stocks'])} · 묶음 {len(data['watch'])} · 섹터 {len(data['sectors'])} · 시장 흐름 {len(data['flows'])}줄 · 일정 {len(data['events'])} → {OUT}")
+    print(f"[kr-home] 종목 {len(data['stocks'])} · 묶음 {len(data['watch'])} · 섹터 {len(data['sectors'])} · 시장 흐름 {len(data['flows'])}줄 · 일정 {len(data['events'])} · 주목 {len(data['notable']['stocks'])}({data['notable']['day']}) → {OUT}")
     return data
 
 

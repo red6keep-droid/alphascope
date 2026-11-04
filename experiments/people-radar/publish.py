@@ -72,6 +72,9 @@ def publish(output_dir=None, do_publish=False):
         url = publish_blogger.publish(title, body, labels=labels(), slug_title=f"{render_html.SLUG_NAME} {day}")
     with open(os.path.join(output_dir, "post_url.txt"), "w", encoding="utf-8") as f:
         f.write(url or "")
+    if url:   # 홈 카드 재료용 (daily-report/home_card.py, H31 2026-11-05)
+        with open(os.path.join(output_dir, "post_meta.json"), "w", encoding="utf-8") as f:
+            json.dump({"title": title, "url": url, "day": day}, f, ensure_ascii=False)
     return url
 
 

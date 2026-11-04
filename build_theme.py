@@ -1709,6 +1709,7 @@ def preview_mock_js():
         "    else if (u.indexOf('stocks.json') >= 0) body = PV_PICKS;\n"
         "    else if (u.indexOf('themes.json') >= 0) body = PV_THEMES;\n"
         "    else if (u.indexOf('kr.json') >= 0) body = PV_KR;\n"
+        "    else if (u.indexOf('/cards/') >= 0) return Promise.resolve({ ok: false, status: 404, json: function () { return Promise.reject(new Error('404')); } });   /* 카드 재료 JSON 은 미리보기에 없다 → 피드 목업으로 (H31) */\n"
         "    else body = PV_DATA;\n"
         "    return Promise.resolve({ json: function () { return Promise.resolve(body); } });\n"
         "  };\n"

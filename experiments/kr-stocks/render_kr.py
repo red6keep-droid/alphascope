@@ -22,7 +22,8 @@ import collect_kr_earn_dart  # noqa: E402 — 실적 발표일(DART 잠정실적
 import re  # noqa: E402
 from collections import Counter  # noqa: E402
 from html import unescape as html_unescape  # noqa: E402
-import analyze_tabs as AT  # noqa: E402 — 미국 종목 `실적과 기대` 판정(card_revenue · card_eps)을 그대로 — stock-radar
+import analyze_tabs as AT  # noqa: E402 — 미국 종목 `실적과 기대` 판정(card_revenue · card_eps · card_capex)을 그대로 — stock-radar
+import render_pages as RP  # noqa: E402 — 미국 종목 카드 그리기(이익 줄 · 이익률 그래프 · 돈을 어디에 쓰나, 2026-11-04) — 통화 · 출처 글만 KR_MONEY 로
 
 UP, DOWN, NOTE, TINY = _dk.UP, _dk.DOWN, _dk.NOTE, _dk.TINY
 PAD = _dk.SEP_GAP - _dk.VP - 1
@@ -850,7 +851,8 @@ def build_expect(s, extra, group):
     """`실적과 기대` 재료 — 미국 종목과 같은 판정(stock-radar analyze_tabs). 비교 묶음 = 한국 시총 상위 20개."""
     s["expect"] = {}
     s["analysts"] = AT.analysts(s["sym"], extra)   # 애널리스트 등급 · 목표가 — 미국과 같은 칸 (2026-10-31 사용자: `애널리스트 · 방송 의견은?`)
-    for k, f in (("revenue", AT.card_revenue), ("eps", AT.card_eps)):
+    # 돈을 어디에 쓰나 = OpenDART 손익 · 현금흐름 표(collect_kr_fin → extra["capex"], 2026-11-04) — 매출 카드의 이익 줄 · 이익률 그래프도 같은 표에서
+    for k, f in (("revenue", AT.card_revenue), ("eps", AT.card_eps), ("capex", lambda sym, extra, group: AT.card_capex(sym, extra))):
         try:
             s["expect"][k] = f(s["sym"], extra, group)
         except Exception as e:  # noqa: BLE001
@@ -858,17 +860,38 @@ def build_expect(s, extra, group):
             s["expect"][k] = None
 
 
+def _won(v):
+    """원 → `12.3조 원` · 1조 아래는 `1,234억 원` (음수는 −). None 이면 `미수집` — 미국 _bil 과 같은 규칙."""
+    if v is None:
+        return "미수집"
+    s = f"{v / 1e12:,.1f}조 원" if abs(v) >= 1e12 else f"{v / 1e8:,.0f}억 원"
+    return s.replace("-", "−")
+
+
+def _won_chart(vals):
+    """돈 카드 선 그래프 눈금 — 값이 2조 넘으면 조 원(소수 한 자리), 아니면 억 원 (삼성전자 영업현금흐름 85조 · 작은 회사 수천억이 한 자로 안 맞는다)."""
+    big = max((abs(v) for v in vals), default=0) >= 2e12
+    return (1e12, lambda v: f"{v:,.1f}".replace("-", "−"), "조 원") if big else (1e8, lambda v: f"{v:,.0f}".replace("-", "−"), "억 원")
+
+
+KR_MONEY = {**RP.US_MONEY, "money": _won, "unit": "억 원", "chart": _won_chart, "src": "DART", "form": "분기보고서", "src_note": "회사가 금융감독원 전자공시(DART)에 낸 분기 · 반기 · 사업보고서",
+            "stmt": "금융감독원 전자공시(DART)에 낸 현금흐름표", "data": "금융감독원 전자공시(OpenDART)", "partial": "최근 분기 DART 보고서가 아직 없다", "rnd": False}   # 연구개발비는 주요 재무제표 줄이 아니다
+
+
 def sec_expect(s, open_first=True):
-    """`실적과 기대` 탭 — 미국 종목과 같은 질문 카드 둘 (2026-10-25 사용자). `시장 예상 흔들림은?`(옵션) · `하락에 거는 돈은?`(공매도)은
-    한국 자료가 없어 뺐다 — 개별 종목 옵션이 없고, 공매도는 Yahoo 에 없으며 한국거래소 자료는 약관 확인 전."""
+    """`실적과 기대` 탭 — 미국 종목과 같은 질문 카드 (2026-10-25 사용자): 돈을 더 버나(이익 줄 · 이익률 그래프 포함) · 이익 예상 · 돈을 어디에 쓰나(2026-11-04, OpenDART).
+    `시장 예상 흔들림은?`(옵션) · `하락에 거는 돈은?`(공매도)은 한국 자료가 없어 뺐다 — 개별 종목 옵션이 없고, 공매도는 Yahoo 에 없으며 한국거래소 자료는 약관 확인 전."""
     ex = s.get("expect") or {}
     out = ""
-    for i, (title, key, fn) in enumerate((("회사는 돈을 더 벌고 있나?", "revenue", R.card_revenue), (R.EPS_TITLE, "eps", R.card_eps))):
+    spec = (("회사는 돈을 더 벌고 있나?", "revenue", RP.card_revenue), (R.EPS_TITLE, "eps", R.card_eps), ("돈을 어디에 쓰나?", "capex", lambda c: RP.card_capex(c, KR_MONEY)))
+    for i, (title, key, fn) in enumerate(spec):
         c = ex.get(key)
+        if key == "capex" and not c:   # 은행 · 보험(영업현금흐름만) 도 카드는 두되, 표 자체가 없는 회사는 미국처럼 카드를 안 둔다
+            continue
         if c:
             lines, tip = _rename(fn(c), s["name"])
             dart = any(r.get("src") == "dart" for r in s.get("_revenue_rows") or [])
-            tip = tip.replace("SEC EDGAR", "금융감독원 전자공시(OpenDART)" if dart else "Yahoo Finance")   # 미국 카드의 출처 글 → 한국 출처
+            tip = tip.replace("SEC EDGAR", "금융감독원 전자공시(OpenDART)" if dart else "Yahoo Finance").replace("(억 달러)", "(억 원)")   # 미국 카드의 출처 · 통화 글 → 한국
             state = c["state"]
         else:
             lines, tip, state = [("이번 실행에서 재료를 받지 못했다. 다음 실행에서 다시 받는다.", "plain")], "", "판단 유보"
@@ -1214,6 +1237,7 @@ def detail_body(s, a):
     (2026-10-25 사용자: 미국 종목 페이지처럼 탭 — 실적과 기대 · 캘린더는 다음 단계)."""
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
             + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
+            + RP.sec_crash(s, media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])) if MEDIA else None)   # 급락장에서 어땠나? — 코스피가 2% 넘게 내린 날 버틴 종목 (2026-11-04)
             + _dk.keep_tone(R._section("뉴스", sec_today(s), tab="오늘"))   # 뉴스는 헤드라인체 그대로
             + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
             + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
