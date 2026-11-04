@@ -1,69 +1,77 @@
 {
-  "updated_at": "2026-11-04 01:39:19 UTC",
+  "updated_at": "2026-11-04 12:46:31 UTC",
   "items": [
     {
-      "title": "Google responds to political backlash over removing search from schools that ban AI",
+      "title": "Mortgage rates drop for the third straight week, but homebuyers are still leaving the market",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/google-responds-to-outrage-over-removing-search-in-schools-that-ban-ai.html",
-      "published": "2026-11-04 01:07:01",
-      "title_ko": "구글, AI 금지 학교 검색 차단에 대한 정치적 반발에 대응",
-      "summary_ko": "검색, AI 개요와 함께 재개"
+      "link": "https://www.cnbc.com/2026/11/04/mortgage-rates-dropped-homebuyers-still-leaving.html",
+      "published": "2026-11-04 12:44:50",
+      "title_ko": "주택담보대출 금리 하락",
+      "summary_ko": "주택 구매자 수요 감소"
     },
     {
-      "title": "Jim Cramer sees signs of life in tech stocks — but not from the usual winners",
+      "title": "CVS to split off drugstore business in major breakup of healthcare giant",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/jim-cramer-sees-signs-of-life-in-tech-stocks-but-not-from-the-usual-winners.html",
-      "published": "2026-11-03 23:58:09",
-      "title_ko": "짐 크레이머, 테크주에 활기 신호, 하지만 통상적 승자에서 아님",
-      "summary_ko": "새로운 테크주 그룹 시장 주도 가능성 지적"
-    },
-    {
-      "title": "CrowdStrike's new kill switch can stop rogue AI agents in their tracks, CEO says",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/crowdstrikes-new-kill-switch-can-stop-rogue-ai-agents-in-their-tracks-ceo-says.html",
-      "published": "2026-11-03 23:37:07",
-      "title_ko": "크라우드스트라이크 CEO, 새로운 킬 스위치가 무법 AI 에이전트 차단 가능",
-      "summary_ko": "CEO, 에이전트 안전 작업 시장 기회 언급"
-    },
-    {
-      "title": "Strand bookstore to pay nearly $1.5 million over Covid loan tied to Sen. Wyden's wife",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/strand-bookstore-ppp-loan-ron-wyden-wife-settlement.html",
-      "published": "2026-11-03 23:28:01",
-      "title_ko": "스트랜드 서점, 와이든 상원의원 부인 관련 코로나 대출로 약 150만 달러 지급",
-      "summary_ko": "나신시 바스 와이든, 상원의원 부인 자격으로 PPP 승인"
-    },
-    {
-      "title": "Trump DOJ sends target letters to Democrats in Alaska Senate criminal probe: Reports",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/trump-doj-election-lawsuits-monitors-2026-midterms.html",
-      "published": "2026-11-03 23:26:39",
-      "title_ko": "트럼프 DOJ, 알래스카 상원 선거 형사 수사 관련 민주당에 대상 통지서 발송: 보도",
-      "summary_ko": "법률방어기금 존 쿠식 변호사, 민주주의 위협 발언"
-    },
-    {
-      "title": "AMD stock jumps 8% on earnings as data center revenue nearly doubles",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/amd-amd-q3-earnings-report-2026-.html",
-      "published": "2026-11-03 23:04:37",
-      "title_ko": "AMD 주가, 데이터센터 매출 거의 두 배로 늘면서 7% 급등",
-      "summary_ko": "3분기 실적 발표, 주가 7% 상승"
-    },
-    {
-      "title": "Apple stock sinks as global memory crisis hurts profits, giving Ternus his first big test",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/apple-earnings-john-ternus-faces-first-test-amid-high-memory-costs.html",
-      "published": "2026-11-03 22:35:24",
-      "title_ko": "애플 존 터너스, 글로벌 메모리 위기로 이익 초반 시험",
-      "summary_ko": "존 터너스, CEO 첫 실적 보고서에서 총 마진 전망 하향"
-    },
-    {
-      "title": "JetBlue raises bag fees for third time in a year as fuel costs bite",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/jetblue-checked-bag-fee.html",
-      "published": "2026-11-03 22:26:20",
-      "title_ko": "연료비 부담에 제트블루, 1년 새 세 번째 수하물 요금 인상",
+      "link": "https://www.cnbc.com/2026/11/04/cvs-to-split-off-drugstore-business.html",
+      "published": "2026-11-04 12:35:05",
+      "title_ko": "CVS, 약국 사업 분할 발표",
       "summary_ko": ""
+    },
+    {
+      "title": "Treasury yields fall after Democrats win House and Senate majorities",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/03/treasury-yields-fall-as-democrats-win-big-in-us-midterm-elections.html",
+      "published": "2026-11-04 12:25:25",
+      "title_ko": "민주당, 하원·상원 다수 확보 후 국채 수익률 하락",
+      "summary_ko": "민주당, 하원·상원 다수 확보"
+    },
+    {
+      "title": "McDonald's earnings beat, but traffic to its U.S. restaurants falls",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/04/mcdonalds-is-about-to-report-earnings-heres-what-to-expect.html",
+      "published": "2026-11-04 12:24:23",
+      "title_ko": "맥도날드 실적 호조, 미국 매장 방문객 감소",
+      "summary_ko": "미국 매장 방문객 감소"
+    },
+    {
+      "title": "Wayfair sales jump 10% as furniture retailer says it's winning share of sluggish market",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/04/wayfair-w-q3-2026-earnings.html",
+      "published": "2026-11-04 12:08:15",
+      "title_ko": "Wayfair 매출 10% 상승, 가구 소매업체가 침체 시장에서 점유율 확대",
+      "summary_ko": "3분기 팬데믹 이후 최고 실적"
+    },
+    {
+      "title": "SpaceX, Tesla fall over 4% on Democrats' big win; AI stocks mixed",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/04/ai-stocks-texas-governor-data-centers.html",
+      "published": "2026-11-04 11:35:52",
+      "title_ko": "스페이스X, 테슬라 민주당 대승에 4% 이상 하락, AI주 혼조",
+      "summary_ko": "AI주 프리마켓 거래 혼조세"
+    },
+    {
+      "title": "Euro zone inflation hits 4% for first time in three years as interest rate hike looms",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/04/euro-zone-cpi-inflation-october-ecb-rate-hike.html",
+      "published": "2026-11-04 10:47:30",
+      "title_ko": "유로존 인플레 3년 만에 4% 기록, 금리 인상 임박",
+      "summary_ko": "10월 에너지 인플레이션 20% 이상 급등"
+    },
+    {
+      "title": "U.S. midterm elections in pictures: Democrats' sweeping victories deliver rebuke to Trump",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/04/us-midterm-elections-in-pictures-democrats-republicans-trump.html",
+      "published": "2026-11-04 10:47:19",
+      "title_ko": "미국 중간선거 사진: 민주당 압승, 트럼프에 대한 경고",
+      "summary_ko": "의회 주요 공화당 의석 민주당으로 교체"
+    },
+    {
+      "title": "Novo shares jump as Wegovy pill sales impress, drugmaker hikes outlook",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/04/novo-q3-earnings-wegovy-sales.html",
+      "published": "2026-11-04 10:40:51",
+      "title_ko": "노보 노르디스크 주가, 웨고비 정제 판매 호조와 전망 상향에 급등",
+      "summary_ko": "분기 실적 발표, 웨고비 정제 매출 추정치 대폭 상회"
     },
     {
       "title": "미국 중간선거 및 의회 통제권",
@@ -86,16 +94,8 @@
       "published": "2026-11-03 21:28:48",
       "kind": "media",
       "tag": "에너지",
-      "direction": "negative",
-      "n_channels": 4
-    },
-    {
-      "title": "Fannie Mae, Freddie Mac rally as Ackman presses for conservatorship exit",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/ackman-fannie-mae-freddie-mac-conservatorship.html",
-      "published": "2026-11-03 20:52:14",
-      "title_ko": "패니 메이·프레디 맥, 애크맨 보수관리 종료 촉구에 상승",
-      "summary_ko": "중간선거, 보수관리 종료 전환점 가능성"
+      "direction": "positive",
+      "n_channels": 3
     },
     {
       "title": "미국의 대이란 군사 작전 및 지정학적 리스크",
