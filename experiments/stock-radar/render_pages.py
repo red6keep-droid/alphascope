@@ -560,7 +560,9 @@ def card_opinions(s):
     nops = _news_opinions(s)
     money = lambda v: f"${v:,.2f}"   # noqa: E731
     bars = BARS.get(s["sym"]) or []
-    chart = R.opinions_chart(R.pick_window(bars, NY, now=NOW)[0], {b["day"]: b["close"] for b in bars[-10:]}, ps, nops, money, NY)   # 탭 맨 위 그림 (P290)
+    days = R.pick_window(bars, NY, now=NOW)[0]
+    items = R.opinion_items(ps, s.get("broker") or [], nops, s.get("analysts") or [], s.get("close"), NY, days, money)   # 네 출처 한 자 (P291)
+    chart = R.opinions_chart(days, {b["day"]: b["close"] for b in bars[-10:]}, items, money)   # 탭 맨 위 그림 (P290)
     return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, money, lambda: together_items(s),
                             broker=s.get("broker") or [], news_ops=nops, chart=chart)   # 증권사 · 뉴스 의견 (P275)
 

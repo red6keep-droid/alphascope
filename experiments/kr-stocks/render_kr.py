@@ -935,8 +935,10 @@ def card_picks(s):
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
     bars = BARS.get(s["sym"]) or []
     closes = {b["day"]: b["close"] for b in bars[-10:]}
+    days = R.pick_window(bars, media_feed.KST, now=NOW)[0]
+    items = lambda ps_: R.opinion_items(ps_, [], None, s.get("analysts") or [], s.get("close"), media_feed.KST, days, chart_won)   # noqa: E731 — 네 출처 한 자, 한국은 증권사 · 뉴스 자료 없음 (P291)
     card = lambda ps_: R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won,   # noqa: E731 — 애널리스트 · 방송 두 카드 + 함께 보기 (P197)
-                                        chart=R.opinions_chart(R.pick_window(bars, media_feed.KST, now=NOW)[0], closes, ps_, None, chart_won, media_feed.KST))   # 탭 맨 위 그림 — 한국은 뉴스 의견 자료 없음 (P290)
+                                        chart=R.opinions_chart(days, closes, items(ps_), chart_won))   # 탭 맨 위 그림 — 한국은 뉴스 의견 자료 없음 (P290)
     real = card(ps)
     if s["code"] != MOCK_PICKS_CODE or len(ps) >= 5:
         return real
