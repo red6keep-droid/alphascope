@@ -49,6 +49,12 @@ def find_today(day, creds):
     return None
 
 
+def _write_meta(day, title, url):
+    """홈 카드 재료용(daily-report/home_card.py, H31 2026-11-05) — 그날 글 주소가 있을 때만 output/post_meta.json"""
+    with open(os.path.join(OUT, "post_meta.json"), "w", encoding="utf-8") as f:
+        json.dump({"title": title, "url": url, "day": day}, f, ensure_ascii=False)
+
+
 def main(dry):
     with open(os.path.join(OUT, "meta.json"), encoding="utf-8") as f:
         meta = json.load(f)
@@ -58,6 +64,7 @@ def main(dry):
     posts = _load_posts()
     if day in posts:
         print(f"[kr-report] {day} 이미 게시됨 (기록) — 건너뜀: {posts[day]}")
+        _write_meta(day, title, posts[day])   # 카드 JSON 은 다시 만든다 (전 실행에서 푸시가 실패했을 수 있다)
         return
     if dry:
         print(f"[kr-report] dry-run — {day} · {title} · 본문 {len(body):,}자 · 라벨 {LABELS}")
@@ -72,6 +79,7 @@ def main(dry):
         os.makedirs(os.path.dirname(POSTS), exist_ok=True)
         with open(POSTS, "w", encoding="utf-8") as f:
             json.dump(posts, f, ensure_ascii=False, indent=0, sort_keys=True)
+        _write_meta(day, title, url)
 
 
 if __name__ == "__main__":

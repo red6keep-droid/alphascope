@@ -15,6 +15,7 @@ report_body.html / title.txt / image_ref.txt를 남긴다.
     python experiments/daily-report/publish_saved.py --force  # 중복 확인 무시
 """
 
+import json
 import os
 import sys
 
@@ -58,6 +59,14 @@ def _chart_or_cover(body, repo_slug, cover_url):
         print("그래프 CDN 확인 실패 + 커버 없음 — 이미지 없이는 게시하지 않습니다.")
         sys.exit(1)
     return body[:start] + render_html._cover_image(cover_url) + body[end + 4:]
+
+
+def _write_meta(title, url, day, body):
+    """홈 카드 재료용(home_card.py, H31 2026-11-05): output/post_meta.json + 실제 올린 본문 published_body.html"""
+    with open(os.path.join(OUTPUT_DIR, "post_meta.json"), "w", encoding="utf-8") as f:
+        json.dump({"title": title, "url": url, "day": str(day) if day else None}, f, ensure_ascii=False)
+    with open(os.path.join(OUTPUT_DIR, "published_body.html"), "w", encoding="utf-8") as f:
+        f.write(body)
 
 
 def main():
@@ -109,12 +118,15 @@ def main():
         if existing:
             print(f"같은 제목의 글이 이미 있습니다: {existing}")
             print("중복 게시를 건너뜁니다. (다시 올리려면 --force)")
+            if str(existing).startswith("http"):
+                _write_meta(title, existing, d, body)   # 카드 JSON 은 다시 만든다
             return
 
     d = report_title.date_of(title)
     url = publish_blogger.publish(title, body, dry_run=False, slug_title=report_title.slug_title(d) if d else None)   # 영문 주소 (2026-10-18)
     if url:
         print(f"게시글 URL: {url}")
+        _write_meta(title, url, d, body)
 
 
 if __name__ == "__main__":

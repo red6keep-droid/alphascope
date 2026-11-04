@@ -152,6 +152,13 @@ jobs:
           python "$KR_DIR/home_feed_kr.py"
           mkdir -p deploy-home && cp "$KR_DIR/output/home/kr.json" deploy-home/kr.json
 
+      # 홈 한국 증시 카드 재료 cards/kr-report.json (H31, 2026-11-05) — 아래 kr.json 푸시에 같이 얹는다(푸시 추가 없음).
+      # 글 주소는 publish_report.py 가 output/post_meta.json 에 남긴다(게시한 날 · 이미 게시된 날 모두). 실패해도 홈은 피드로 돈다
+      - name: Home card kr-report.json
+        if: steps.gate.outputs.go == 'true' && hashFiles('experiments/kr-market-report/output/post_meta.json') != ''
+        continue-on-error: true
+        run: python experiments/daily-report/home_card.py --card kr-report --body experiments/kr-market-report/output/report_body.html --meta experiments/kr-market-report/output/post_meta.json --out deploy-home/cards/kr-report.json
+
       - name: Deploy kr.json to gh-pages
         if: steps.gate.outputs.go == 'true' && hashFiles('deploy-home/kr.json') != ''
         continue-on-error: true
@@ -165,7 +172,9 @@ jobs:
       - name: Purge kr.json cache
         if: steps.gate.outputs.go == 'true' && hashFiles('deploy-home/kr.json') != ''
         continue-on-error: true
-        run: curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr.json" || true
+        run: |
+          curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr.json" || true
+          [ -f deploy-home/cards/kr-report.json ] && curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/cards/kr-report.json" || true
 
       # 상태 저장 — snapshot · flows 는 매번 새로 받으므로 빼고, 이어서 쌓는 것만
       - name: Save state (kr-state branch)
@@ -175,7 +184,7 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           # 임시 인덱스로 실제 경로(experiments/kr-stocks/data/…)를 그대로 올린다 — records/ 하위 폴더(매일 기록, 2026-11-01)까지 (옛: 파일만 mktree)
           export GIT_INDEX_FILE="$(mktemp -u)"
-          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_corp.json dart_company.json dart_earn.json est_history.json report_posts.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
+          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_fin_all.json dart_corp.json dart_company.json dart_earn.json est_history.json report_posts.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
             [ -f "$KR_DIR/data/$f" ] && git add -f "$KR_DIR/data/$f" || true
           done
           [ -d "$KR_DIR/data/records" ] && git add -f "$KR_DIR/data/records" || true   # 카드 판정 · 애널리스트 · 방송 의견 (stock_records, 데이터-기록-계획 A5-4)
