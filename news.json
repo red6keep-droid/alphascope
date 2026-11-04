@@ -1,77 +1,89 @@
 {
-  "updated_at": "2026-11-04 20:02:30 UTC",
+  "updated_at": "2026-11-04 21:46:29 UTC",
   "items": [
     {
-      "title": "CVS Health plans to split itself up. Here's why a breakup could make sense now",
+      "title": "Qualcomm stock drops 6% on weak earnings forecast as memory shortage weighs on smartphone sales",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/cvs-health-pharmacy-aetna-split.html",
-      "published": "2026-11-04 19:58:41",
-      "title_ko": "CVS 헬스, 분할 계획 발표 – 분할 이유 분석",
-      "summary_ko": "소매 약국 사업 등 독립 가능성"
+      "link": "https://www.cnbc.com/2026/11/04/qualcomm-qcom-earnings-report-q4-2026.html",
+      "published": "2026-11-04 21:36:59",
+      "title_ko": "퀄컴 주가 6% 하락, 메모리 부족이 스마트폰 판매에 영향",
+      "summary_ko": "예상보다 좋은 실적 발표· 약한 실적 전망"
     },
     {
-      "title": "New Flutter CEO bets on FanDuel promotions to win customers as profits suffer",
+      "title": "Snap shares fall over 10% on third-quarter revenue miss",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/flutter-fanduel-promotions-q3-2026.html",
-      "published": "2026-11-04 19:53:32",
-      "title_ko": "플러터 새 CEO, 팬듀얼 프로모션으로 고객 확보 시도, 수익 악화",
-      "summary_ko": "수익 악화 상황"
+      "link": "https://www.cnbc.com/2026/11/04/snap-q3-earnings-report-2026.html",
+      "published": "2026-11-04 21:36:58",
+      "title_ko": "Snap, 3분기 매출 부진에 주가 10% 이상 하락",
+      "summary_ko": "수요일 발표된 3분기 실적에서 매출과 일일 활성 사용자 수 모두 부진"
     },
     {
-      "title": "Voters rebuff data centers in every ballot measure except one during the 2026 midterms",
+      "title": "What was really behind Wednesday's monster rally? Trump quickly making peace",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/data-center-ballot-measures-2026-midterm.html",
-      "published": "2026-11-04 19:51:18",
-      "title_ko": "2026년 중간선거에서 데이터센터 반대 투표, 단 하나만 통과",
-      "summary_ko": "AI 데이터센터 붐, 선거 밤 투표 결과"
+      "link": "https://www.cnbc.com/2026/11/04/stock-market-rally-trump-midterms.html",
+      "published": "2026-11-04 21:32:01",
+      "title_ko": "수요일 폭등 랠리 뒤의 진짜 원인은? 트럼프의 신속한 화해",
+      "summary_ko": "트럼프의 반응이 랠리 추가 요인으로 작용"
+    },
+    {
+      "title": "플로리다 등 선거 결과와 정계 동향",
+      "title_ko": "플로리다 등 선거 결과와 정계 동향",
+      "summary_ko": "플로리다 등에서 공화당 후보들이 근소한 차이로 승리하며 2028년 선거를 향한 정치적 공방이 이어지고 있음",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=wiru5XNVaJM",
+      "published": "2026-11-04 21:15:01",
+      "kind": "media",
+      "tag": "정책/규제",
+      "direction": "neutral",
+      "n_channels": 3
+    },
+    {
+      "title": "E.l.f. Beauty posts 51% sales increase, raises full-year guidance",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/04/elf-beauty-elf-q2-2027-earnings.html",
+      "published": "2026-11-04 21:06:02",
+      "title_ko": "E.l.f. Beauty, 매출 51% 증가에 연간 가이던스 상향",
+      "summary_ko": "포트폴리오 전반의 광범위한 성장 지속"
+    },
+    {
+      "title": "CVS to split off drugstore business in major breakup of healthcare giant; shares fall 10%",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/04/cvs-to-split-off-drugstore-business.html",
+      "published": "2026-11-04 21:04:13",
+      "title_ko": "CVS, 약국 사업 분할 발표",
+      "summary_ko": ""
     },
     {
       "title": "McDonald's stock rises as earnings beat, U.S. restaurants show improvement",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/04/mcdonalds-is-about-to-report-earnings-heres-what-to-expect.html",
-      "published": "2026-11-04 19:47:32",
+      "published": "2026-11-04 21:02:53",
       "title_ko": "맥도날드 실적 호조, 미국 매장 방문객 감소",
       "summary_ko": "미국 매장 방문객 감소"
-    },
-    {
-      "title": "What Republicans' huge loss means for Trump",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/trump-midterm-election-results-congress.html",
-      "published": "2026-11-04 19:46:27",
-      "title_ko": "공화당 대패가 트럼프에게 의미하는 바는?",
-      "summary_ko": "관세·이란 전쟁·워싱턴 건설 프로젝트"
-    },
-    {
-      "title": "Hyperscalers and Apple surge after election results remove investor uncertainty",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/apple-and-other-big-tech-stocks-surge-after-2026-midterm-elections.html",
-      "published": "2026-11-04 19:37:43",
-      "title_ko": "선거 결과로 투자자 불확실성 해소되며 하이퍼스케일러 및 애플 급등",
-      "summary_ko": "애플, 아마존, 구글, 메타, 마이크로소프트 주가 상승"
-    },
-    {
-      "title": "The post-election rally masks a sharp split in the AI trade. Who stands to win?",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/11/04/post-election-rally-masks-a-sharp-split-in-the-ai-trade-who-wins.html",
-      "published": "2026-11-04 19:21:20",
-      "title_ko": "선거 후 랠리 속 AI 트레이드 내 급격한 분열: 누가 이득을 볼 것인가?",
-      "summary_ko": "수요일 AI 주식에 대한 투자자 베팅 상이"
-    },
-    {
-      "title": "A massive trade just happened in a leading mortgage lender: Watch Options Action Live",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/a-massive-trade-just-happened-in-a-leading-mortgage-lender-watch-options-action-live.html",
-      "published": "2026-11-04 19:08:15",
-      "title_ko": "주요 모기지 대출사 대규모 트레이드 발생: 옵션 움직임 실시간 확인",
-      "summary_ko": "선거 후 옵션 트레이더들 일련의 거래 체결"
     },
     {
       "title": "Democrats map out an agenda to address affordability and corruption after midterm sweep",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/04/congressional-democrats-affordability-oversight.html",
-      "published": "2026-11-04 19:00:52",
+      "published": "2026-11-04 20:53:19",
       "title_ko": "민주당, 중선거구제 승리 후 물가 안정 및 부패 대응 의제 마련",
       "summary_ko": "도널드 트럼프 대통령 견제 시도 포함"
+    },
+    {
+      "title": "Analysis: The Democrats have one chance to extract concessions from Trump. Markets will hate it",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/04/democrats-trump-debt-ceiling-fight.html",
+      "published": "2026-11-04 20:28:17",
+      "title_ko": "분석: 트럼프에게 양보를 받아내는 민주당의 유일한 기회. 시장은 이를 싫어할 것",
+      "summary_ko": "정치적 역할 역전, 시장 변동성 및 디폴트 위험 언급"
+    },
+    {
+      "title": "What Republicans' huge loss means for Trump",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/04/trump-midterm-election-results-congress.html",
+      "published": "2026-11-04 20:23:18",
+      "title_ko": "공화당 대패가 트럼프에게 의미하는 바는?",
+      "summary_ko": "관세·이란 전쟁·워싱턴 건설 프로젝트"
     },
     {
       "title": "데이터 센터 건설 규제 및 제한",
@@ -95,18 +107,6 @@
       "kind": "media",
       "tag": "정책/규제",
       "direction": "neutral",
-      "n_channels": 4
-    },
-    {
-      "title": "미국 중간선거 블루 웨이브",
-      "title_ko": "미국 중간선거 블루 웨이브",
-      "summary_ko": "중간선거 블루 웨이브로 인해 빅테크와 친정부 합병 및 데이터 센터 프로젝트가 타격을 입을 것",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=b-IwOJF1-ow",
-      "published": "2026-11-04 10:47:45",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "positive",
       "n_channels": 4
     }
   ]
