@@ -787,7 +787,7 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
     return out
 
 
-def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, broker=None, news_ops=None, chart=""):
+def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, broker=None, news_ops=None, closes=None):
     """`의견` 탭 (2026-11-01 사용자 P197) — 옛 한 장 `애널리스트 · 방송 의견은?`(P90)을 강조 카드 둘로 나눈다: `애널리스트 의견은?` · `방송 의견은?`.
     접힌 머리에서 두 답(예: 매수 · 매도)을 따로 보고, 누르면 그쪽 내용만 펼친다 — 둘 다 접힌 채로. 함께 보기는 두 카드 아래 따로 흰 카드.
     두 카드는 의견이 없어도 늘 둔다 — 답 `없음` (2026-11-01 사용자 P199: 방송 의견이 없다고 카드가 사라지면 안 된다).
@@ -796,8 +796,10 @@ def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, br
     cards = analysts_card(cells, close, m0, m2, opened=True)   # 탭 첫 강조 카드는 펼침 (2026-11-01 사용자 P216)
     cards += (broker_card(name, broker, close, money) if broker is not None else "") + picks_card(name, ps, close, money)
     cards += news_opinion_card(name, news_ops) if news_ops is not None else ""
-    cards += together_card(together())   # 데이터 전망 = 셋째 강조 카드 (P206)
-    return chart + f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>'   # chart = 탭 맨 위 `최근 5거래일 의견과 주가` (opinions_chart, P290)'
+    t = together()
+    cards += together_card(t)   # 데이터 전망 = 셋째 강조 카드 (P206)
+    summary = opinions_summary(name, cells, close, ps, broker, news_ops, (t if isinstance(t, dict) else {"items": t}).get("items"), money, closes=closes)   # 탭 맨 위 요약 문단 (P295 · P296 상황별 멘트)
+    return summary + f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>'
 
 
 def analysts_card(cells, close, m0=None, m2=None, opened=False):
@@ -1227,156 +1229,202 @@ def picks_card(name, ps, close, money, span=PICK_SPAN, together=""):
     return _state_card("방송 의견은?", word, pick_theme(word)[0], PICK_THEME.get(word, ("", "#111"))[1], lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True)   # 보유 · 관망 · 엇갈림 = 검정 글씨 (P201)
 
 
-# ---------------------------------------------------------------- 의견 탭 맨 위 그림 — 최근 5일 종가 위에 의견 점 (2026-11-04 사용자 P290: "종합적인 의견 그래프 · 시각적인 게 상단에")
-
-OPC_TOP, OPC_PRICE_H, OPC_GAP, OPC_BAR_H, OPC_BAR_W, OPC_BOT = 24, 56, 34, 110, 28, 30   # 위 여백 · 종가 선 칸 높이 · 종가 칸 ~ 막대 칸 · 막대 칸 높이 · 막대 폭(가이드라인 8절 28px) · 아래 날짜 줄 (정수 px, P293)
-OPC_SEP = "#EEF0F3"   # 눈금선 — 선 그래프와 같은 색
 
 
-def _local_day(iso, tz):
-    try:
-        t = datetime.datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
-    except ValueError:
-        return str(iso)[:10]
-    return (t.astimezone(tz) if t.tzinfo else t.replace(tzinfo=datetime.timezone.utc).astimezone(tz)).date().isoformat()
+# ---------------------------------------------------------------- 의견 탭 맨 위 요약 문장 (2026-11-04 사용자 P295: 그래프는 포기, 애널리스트 · 증권사 · 방송 · 뉴스 · 신호를 문장으로)
+
+DIR_WORD = {1: "▲ 상승 쪽", -1: "▼ 하락 쪽", 0: "중립"}
+DIR_COL = {1: UP, -1: DOWN}
 
 
-OPC_DIR_COLOR = {1: UP, -1: DOWN, 0: MUTED}   # 한 자 — ▲ 상승 쪽 빨강 · ▼ 하락 쪽 파랑 · 중립 회색 (신호 카드와 같은 자, P291)
-OPC_DIR_WORD = {1: "▲ 상승 쪽", -1: "▼ 하락 쪽", 0: "중립"}
-MOVE_DIR = {"상향": 1, "하향": -1, "유지": 0}
+def _dir_html(d):
+    """방향 말 — ▲ 상승 쪽 빨강 굵게 · ▼ 하락 쪽 파랑 굵게 · 중립 검정 굵게 (가이드라인 3-3 증감 색 · 신호 용어 ▲ · ▼ · 중립)."""
+    return f'<b style="font-weight:700;color:{DIR_COL.get(d, "#111")};">{DIR_WORD[d]}</b>'
 
 
-def opinion_items(ps, broker, news_ops, cells, close, tz, days, money):
-    """네 출처를 한 자로 (2026-11-04 사용자 P291: "4가지 매체를 통일된 규격으로 재해석") — 신호 카드의 ▲ 상승 쪽 · ▼ 하락 쪽 · 중립.
-    events  = 날짜 있는 의견(사건) [(날짜, 방향 +1 · −1 · 0, 설명)] — 증권사 변경(창 안) · 방송 · 뉴스 의견
-    targets = 목표가(상태) [(가격, 종류 mean · broker · pick, 설명)] — 애널리스트 평균 · 증권사 최신(회사마다 하나) · 방송(목표가 말한 것)
-    analyst = (답 말, 방향) — 애널리스트 지금 다수 의견(상태, 날짜 없음). 없으면 None."""
-    money0 = lambda v: re.sub(r"\.00\b", "", money(v))   # noqa: E731
-    events, targets = [], []
-    for p in ps or []:
-        who = p.get("speaker") or p.get("channel") or ""
-        d = PICK_DIR_NUM.get(p["action"], 0)
-        events.append((_local_day(p["published_at"], tz), d, f"방송 {who} {p['action']}" + (f" · 목표가 {money0(p['target'])}" if p.get("target") else "")))
-        if _sane_target(p.get("target"), close) and p.get("currency") in ("", "KRW", "USD"):
-            targets.append((p["target"], "pick", f"방송 {who} 목표가 {money0(p['target'])}"))
-    seen = set()
-    for c in sorted(broker or [], key=lambda c: str(c.get("at") or ""), reverse=True):   # 최신 먼저 — 회사마다 최신 목표가 하나
-        mv = broker_move(c)
-        d = _local_day(c.get("at"), tz)
-        firm = c.get("firm") or "증권사"
-        if days and d >= days[0]:
-            events.append((d, MOVE_DIR[mv], f"증권사 {firm} {mv}" + (f" · 목표가 {money0(c['pt'])}" if c.get("pt") else "")))
-        if _sane_target(c.get("pt"), close) and firm not in seen:
-            seen.add(firm)
-            targets.append((c["pt"], "broker", f"{firm} 목표가 {money0(c['pt'])} ({_pick_when(c.get('at'))[:5]})"))
-    for x in news_ops or []:
-        k = x.get("direction") or "neutral"
-        events.append((_local_day(x["published_at"], tz), {"positive": 1, "negative": -1}.get(k, 0), f"뉴스 {x.get('source') or ''} {TONE_OF.get(k, '중립')}"))
-    a = {"status": {"analysts": cells or []}, "headline": {"close": close}}
-    v = analysts_verdict(a) if cells else None
-    analyst = (v[0], PICK_DIR_NUM.get(v[0], 0)) if v else None
-    pm = next((c["value"] for c in cells or [] if c.get("key") == "pt_mean"), None)
-    if _sane_target(pm, close):
-        targets.insert(0, (pm, "mean", f"애널리스트 평균 목표가 {money0(pm)}"))
-    return {"events": events, "targets": targets, "analyst": analyst, "close": close}
+def _b(s):
+    return f'<b style="font-weight:700;">{s}</b>'
 
 
-def _sane_target(t, close):
-    """목표가가 종가의 1/3 ~ 3배 안에 있을 때만 그린다 — 수집기가 단위를 빠뜨린 값(SK하이닉스 `350원`)이 세로축을 망가뜨리지 않게."""
-    return bool(t) and (not close or close / 3 <= t <= close * 3)
-
-
-PICK_DIR_NUM = {"매수": 1, "매도": -1}   # 방송 · 애널리스트 답 말 → 방향 (보유 · 관망 · 엇갈림 = 0)
-
-
-def opinions_chart(days, closes, items, fmt):
-    """`최근 5거래일 의견과 주가` — 의견 탭 맨 위 그림 한 장 (P290 → P293 날짜별 건수 막대).
-    보고 싶은 것 = 어느 날 의견이 쏟아졌나, 그중 매수가 몇이었나 (2026-11-04 사용자: "막 떨어졌을 때 매수하라는 게 열 몇 개 쏟아질 수 있잖아, 그런 걸 보고 싶었다").
-    아래 = 날짜마다 그날 나온 의견(증권사 변경 · 방송 · 뉴스)을 한 자로 쌓은 막대 — 빨강 ▲ 상승 쪽(매수 · 상향 · 긍정) 아래, 회색 중립 가운데, 파랑 ▼ 하락 쪽(매도 · 하향 · 부정) 위, 막대 위 숫자 = 그날 건수.
-    위 = 종가 선 얇게(비교 대상, 가이드라인 1-4-1) — 떨어진 날 의견이 몰렸나를 같은 칸에서 본다. 목표가 · 평균 등급은 애널리스트 카드가 이미 말한다(여기서 뺌, 옛 P291 · P292).
-    제목 줄 오른쪽 = 애널리스트 지금 다수 의견(상태라 날짜에 못 찍는다). 의견이 하나도 없으면 "" (빈 그림을 두지 않는다)."""
-    n = len(days)
-    ev, analyst = items["events"], items["analyst"]
-    if not n or not ev:
+def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, closes=None, span=PICK_SPAN, broker_days=None):
+    """의견 탭 맨 위 요약 문단 (P295 → P296 → P297 쉬운 말, 숫자 없이).
+    2026-11-04 사용자: "눈높이가 뭔지 모르겠다, 너무 복잡하다, 일반인 관점에서 쉽게 · 수치보다 밝다 · 어둡다 · 나아졌다 같은 말로 방향만" —
+    숫자는 아래 카드에 있으니 여기는 방향 말만. 상황 → 정해진 문장(AI 없음). 문장 셋 안팎 =
+    ① 전문가(애널리스트 다수 의견 · 평균 목표가 자리 · 증권사가 목표가를 올리는 중인지) ② 방송 · 뉴스 분위기 ③ 정리 = 주가 흐름 + 주변 분위기 vs 가격 흐름(Alpha Scope 신호).
+    증감 · 방향 말은 ▲ ▼ 색 · 굵게(공통 규칙). 예측 · 추천이 아니라 지금 분위기의 정리."""
+    import signal_groups as SG
+    nm = _esc(name)
+    sents, dirs = [], {}
+    up_w = lambda w: f'<b style="font-weight:700;color:{UP};">▲ {w}</b>'   # noqa: E731
+    dn_w = lambda w: f'<b style="font-weight:700;color:{DOWN};">▼ {w}</b>'   # noqa: E731
+    # ① 전문가 — 애널리스트 다수 의견 → 밝다 · 어둡다 · 지켜보자 · 갈린다
+    cells = cells or []
+    rc = next((c["value"] for c in cells if c.get("key") == "rating_counts"), None) or {}
+    n_a = sum(rc.values())
+    pm = next((c["value"] for c in cells if c.get("key") == "pt_mean"), None)
+    if n_a:
+        buy = (rc.get("strongBuy", 0) + rc.get("buy", 0)) / n_a * 100
+        sell = (rc.get("sell", 0) + rc.get("strongSell", 0)) / n_a * 100
+        hold = 100 - buy - sell
+        # 말은 블로그 신호 용어 한 자로만 — ▲ 상승 · ▼ 하락 · 중립 · 반반, 없음은 조용하다 (2026-11-04 사용자 P298 "일관성" → P299 "밝게 본다 말고 상승 추세로 보인다")
+        if buy >= 70:
+            dirs["애널리스트"], first = 1, f"전문가들은 {nm}을 {up_w('상승 추세')}로 보고 있다."
+        elif buy > 50:
+            dirs["애널리스트"], first = 1, f"전문가들은 {nm}을 {up_w('상승 추세')}로 보지만 한목소리는 아니다."
+        elif sell > 50:
+            dirs["애널리스트"], first = -1, f"전문가들은 {nm}을 {dn_w('하락 추세')}로 보고 있다."
+        else:
+            dirs["애널리스트"], first = 0, f"전문가들은 {nm}을 상승으로 보는 쪽과 하락으로 보는 쪽이 반반이다."
+        first = first.replace(f"{nm}을", _esc(_dk.josa(name, "을")))
+        gap = (pm / close - 1) * 100 if pm and close else None
+        if gap is not None:
+            where = ("보다 한참 위에" if gap >= 15 else "보다 조금 위에" if gap >= 5 else "와 거의 같은 자리에" if gap > -5 else "보다 아래에")
+            first += f" 전문가들이 보는 적정 가격(평균 목표가)은 지금 주가{where} 있다."
+        sents.append(first)
+    # 증권사 — 목표가를 올리는 중인지 (30일)
+    if broker:
+        n = {k: sum(1 for c in broker if broker_move(c) == k) for k in MOVE_ORDER}
+        dirs["증권사"] = SG.vote([{"상향": 1, "하향": -1}.get(broker_move(c), 0) for c in broker])
+        if n["상향"] > n["하향"]:
+            sents.append(f"최근 증권사들은 목표가를 올리며 {up_w('상승 추세')}로 보는 곳이 더 많다.")
+        elif n["하향"] > n["상향"]:
+            sents.append(f"최근 증권사들은 목표가를 내리며 {dn_w('하락 추세')}로 보는 곳이 더 많다.")
+        else:
+            sents.append("최근 증권사들은 목표가를 올리는 곳과 내리는 곳이 반반이다.")
+    # ② 방송 · 뉴스 분위기 (5거래일)
+    ev = [{"매수": 1, "매도": -1}.get(p["action"], 0) for p in ps or []] + [{"positive": 1, "negative": -1}.get(x.get("direction"), 0) for x in news_ops or []]
+    where = "방송과 뉴스" if news_ops is not None else "방송"
+    if not ev:
+        sents.append(f"{where}에서는 요즘 {nm} 이야기가 조용하다.")
+    else:
+        up, dn, mid = ev.count(1), ev.count(-1), ev.count(0)
+        dirs["방송 · 뉴스"] = SG.vote(ev)
+        many = len(ev) >= 5
+        if up > dn and up >= mid:
+            sents.append(f"{where}에서도 {up_w('상승')} 쪽 의견이 {'많다' if many else '간간이 나온다'}.")
+        elif dn > up and dn >= mid:
+            sents.append(f"{where}에서는 {dn_w('하락')} 쪽 의견이 {'많다' if many else '간간이 나온다'}.")
+        elif mid > up and mid > dn:
+            sents.append(f"{where}에서는 {'말은 많지만' if many else '이야기가 조금 있지만'} 상승도 하락도 아닌 '지켜보자'가 대부분이다.")
+        else:
+            sents.append(f"{where}에서는 상승 쪽 의견과 하락 쪽 의견이 반반이다.")
+    # ③ 정리 — 주가 흐름 + 주변 분위기 vs 가격 흐름(Alpha Scope 신호)
+    cs = [c for c in (closes or []) if c is not None]
+    r5 = (cs[-1] / cs[0] - 1) * 100 if len(cs) >= 2 and cs[0] else None
+    price = (f"주가는 최근 며칠 {up_w('올랐고')}" if r5 is not None and r5 > 1 else f"주가는 최근 며칠 {dn_w('내렸고')}" if r5 is not None and r5 < -1
+             else "주가는 최근 며칠 크게 움직이지 않았고" if r5 is not None else "")
+    rows = [x for x in items or [] if x and x[1]]
+    sg = SG.horizon_votes(rows)["단기"][0] if rows else None
+    outside = [d for d in dirs.values() if d is not None]
+    o = SG.vote(outside) if outside else None
+    split = o == 0 and 1 in outside and -1 in outside
+    mood = ({1: f"주변 의견은 {up_w('상승')} 쪽", -1: f"주변 의견은 {dn_w('하락')} 쪽"}.get(o, "주변 의견은 상승 쪽과 하락 쪽이 반반") if o is not None else "")
+    flow = ({1: f"가격 흐름(Alpha Scope 신호)도 {up_w('상승')}이다", -1: f"가격 흐름(Alpha Scope 신호)은 아직 {dn_w('하락')}이다", 0: "가격 흐름(Alpha Scope 신호)은 중립이다"}.get(sg, "") if sg is not None else "")
+    if mood or flow:
+        if o == 1 and sg == 1:
+            tail = f"{mood}이며, {flow}. 의견과 가격이 같은 쪽을 보는 구간이다."
+        elif o == 1 and sg == -1:
+            tail = f"{mood}이지만, {flow}. 의견이 가격보다 앞서 있는 구간이다."
+        elif o == -1 and sg == 1:
+            tail = f"{mood}이지만, {flow.replace('신호)도', '신호)는')}. 의견과 가격이 엇갈리는 구간이다."
+        elif o == -1 and sg == -1:
+            tail = f"{mood}이며, {flow.replace('신호)은 아직', '신호)도')}. 의견도 가격도 하락 쪽인 구간이다."
+        elif mood and flow:
+            tail = f"{mood}이며, {flow.replace('신호)도 ', '신호)은 ')}."
+        else:
+            tail = (mood + "이다." if mood else flow + ".")
+        sents.append("정리하면, " + (price + ", " if price else "") + tail)
+    if not sents:
         return ""
+    return f'<p data-op-summary="1" style="{_dk.SEO_LEAD}">{" ".join(sents)}</p>'
 
-    def col(d):   # 날짜 → 칸. 창보다 앞이면 첫 칸, 뒤면 끝 칸, 장 없는 날은 다음 거래일 칸
-        return 0 if d <= days[0] else n - 1 if d >= days[-1] else next(i for i, x in enumerate(days) if x >= d)
-    cnt = [{1: 0, 0: 0, -1: 0} for _ in days]
-    who = [[] for _ in days]
-    for d, dr, label in ev:
-        cnt[col(d)][dr] += 1
-        who[col(d)].append(f"{OPC_DIR_WORD[dr]} · {label}")
-    tot = [c[1] + c[0] + c[-1] for c in cnt]
-    top = max(tot)
-    step = 1 if top <= 4 else 2 if top <= 8 else 5 if top <= 20 else 10   # 건수 눈금 — 정수만
-    cap = ((top // step) + 1) * step   # 막대보다 한 칸 바깥 눈금까지 (가이드라인 8절)
-    x = lambda i: f"{(i + 0.5) / n * 100:.2f}%"   # noqa: E731 — 5칸은 늘 카드 폭 안 (넘겨 보기 없음)
-    # 위 종가 선 (얇은 칸)
-    pts = [(i, closes[d]) for i, d in enumerate(days) if closes.get(d) is not None]
-    vs = [v for _, v in pts]
-    plo, phi = (min(vs), max(vs)) if vs else (0, 1)
-    py = lambda v: OPC_TOP + (phi - v) / ((phi - plo) or 1) * OPC_PRICE_H   # noqa: E731
-    sw = f'stroke="{LINE_THIS}" stroke-width="{LINE_W}" stroke-linecap="round"'
-    plines = "".join(f'<line x1="{x(a[0])}" y1="{py(a[1]):.1f}" x2="{x(b[0])}" y2="{py(b[1]):.1f}" {sw}/>' for a, b in zip(pts, pts[1:]))
-    pdots = plabs = ""
-    for j, (i, v) in enumerate(pts):   # 가격 글자는 첫 점 · 마지막 점만, 나머지는 점에 마우스
-        big = j == len(pts) - 1
-        pdots += (f'<circle cx="{x(i)}" cy="{py(v):.1f}" r="{LAST_R if big else DOT_R}" fill="#fff" stroke="{LINE_THIS}" stroke-width="{LAST_SW if big else DOT_SW}">'
-                  f'<title>{_esc(days[i][5:].replace("-", "."))} 종가 {_esc(fmt(v))}</title></circle>')
-        if j == 0 or big:
-            anchor, dx = ("end", 8) if big else ("start", -8)
-            plabs += (f'<text x="{x(i)}" dx="{dx}" y="{py(v) - 10:.1f}" text-anchor="{anchor}" font-size="{13 if big else 12}" font-weight="{700 if big else 400}" '
-                      f'fill="{LINE_THIS}">{_esc(fmt(v))}</text>')
-    # 아래 건수 막대
-    b0 = OPC_TOP + OPC_PRICE_H + OPC_GAP   # 막대 칸 위
-    base = b0 + OPC_BAR_H               # 0 기준선
-    by = lambda c: base - c / cap * OPC_BAR_H   # noqa: E731
-    H = base + OPC_BOT
-    ticks = list(range(0, cap + 1, step))
-    g = "".join(f'<line x1="0" x2="100%" y1="{by(t):.1f}" y2="{by(t):.1f}" stroke="{"#CBD5E1" if t == 0 else OPC_SEP}" stroke-width="1"/>' for t in ticks)
-    bars = ""
-    for i, c in enumerate(cnt):
-        if not tot[i]:
-            continue
-        yy = base
-        seg = ""
-        for dr in (1, 0, -1):   # ▲ 아래 → 중립 → ▼ 위
-            if c[dr]:
-                h = c[dr] / cap * OPC_BAR_H
-                seg += f'<rect x="{-OPC_BAR_W // 2}" y="{yy - h:.1f}" width="{OPC_BAR_W}" height="{h:.1f}" fill="{OPC_DIR_COLOR[dr]}"/>'
-                yy -= h
-        title = f"{days[i][5:].replace('-', '.')} 의견 {tot[i]}건 — ▲ {c[1]} · 중립 {c[0]} · ▼ {c[-1]}\n" + "\n".join(who[i])
-        bars += (f'<svg x="{x(i)}" y="0" width="1" height="1" style="overflow:visible;"><title>{_esc(title)}</title>{seg}'
-                 f'<text x="0" y="{yy - 5:.1f}" text-anchor="middle" font-size="{_dk.BAR_NUM_PX}" font-weight="700" fill="#111">{tot[i]}</text></svg>')   # 막대 위 숫자 = 건수 (13px 굵게, 가이드라인 8절)
-    xl = "".join(f'<text x="{x(i)}" y="{H - 8}" text-anchor="middle" font-size="12" fill="{LINE_THIS if i == n - 1 else NOTE}">{d[5:].replace("-", ".")}</text>' for i, d in enumerate(days))
-    xl += f'<circle cx="{x(n - 1)}" cy="{H - 25}" r="1.5" fill="{LINE_THIS}"/>'   # 최신 이름 위 강조점 (선 그래프와 같게)
-    svg = f'<svg width="100%" height="{H}" style="display:block;overflow:visible;">{g}{plines}{pdots}{plabs}{bars}{xl}</svg>'
-    axis_w = int(max(len(str(t)) for t in ticks) * 7 + 8)
-    axis = "".join(f'<span style="position:absolute;right:0;top:{by(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{NOTE};">{t}</span>' for t in ticks)
-    axis += f'<span style="position:absolute;right:0;top:{b0 - 22}px;white-space:nowrap;font-size:11px;line-height:16px;color:{NOTE};">건</span>'
 
-    def chip(nm, inner):
-        return f'<span style="display:inline-flex;align-items:center;gap:5px;margin-left:12px;white-space:nowrap;"><svg width="22" height="12" aria-hidden="true">{inner}</svg>{_esc(nm)}</span>'
-    chips = chip("종가", f'<line x1="1" x2="21" y1="6" y2="6" stroke="{LINE_THIS}" stroke-width="{LINE_W}"/><circle cx="11" cy="6" r="3" fill="#fff" stroke="{LINE_THIS}" stroke-width="{DOT_SW}"/>')
-    chips += chip("그날 의견 건수", f'<rect x="6" y="1" width="9" height="10" fill="{NOTE}"/>')   # 모양만 — 빨강 ▲ · 파랑 ▼ · 회색 중립 뜻은 블로그 공통 (범례 규칙)
-    head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 2px;font-size:{TINY};line-height:20px;color:{NOTE};">'
-            f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;margin-left:auto;">{chips}</span></span>')
-    card = (f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD + 3}px 12px 10px;">{head}'
-            f'<span style="display:block;position:relative;"><span style="display:block;margin-right:{axis_w}px;">{svg}</span>'
-            f'<span style="position:absolute;top:0;right:0;width:{axis_w - 4}px;height:{H}px;text-align:right;">{axis}</span></span></span></span>')
-    n_up, n_dn, n_mid = (sum(c[v] for c in cnt) for v in (1, -1, 0))
-    tip = (f"최근 {PICK_SPAN} 동안 날마다 나온 바깥 의견(증권사 등급 · 목표가 변경, 방송, 뉴스 의견 기사)을 한 자로 세어 쌓은 막대 — 빨강 ▲ 상승 쪽 = 매수 · 상향 · 긍정, 파랑 ▼ 하락 쪽 = 매도 · 하향 · 부정, 회색 = 보유 · 관망 · 유지 · 중립. "
-           f"막대 위 숫자 = 그날 건수, 위 선 = 종가(떨어진 날 의견이 몰렸나 비교). 주말 · 휴장일 의견은 다음 거래일. 제목 오른쪽 = 애널리스트 지금 다수 의견\n"
-           f"· 지금 : {sum(tot)}건 — ▲ {n_up} · 중립 {n_mid} · ▼ {n_dn}\n· 이 블로그의 추천이 아니다")
-    right = ""
-    if analyst:
-        w, dr = analyst
-        word = {1: f"▲ {w}", -1: f"▼ {w}"}.get(dr, w)
-        right = f'<span style="flex:none;font-weight:700;font-size:{TINY};line-height:20px;color:{OPC_DIR_COLOR[dr] if dr else "#111"};"><span style="font-weight:400;color:{NOTE};">애널리스트 </span>{_esc(word)}</span>'
-    title = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 {_dk.CHART_TITLE_GAP}px;">'
-             f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}최근 {PICK_SPAN} 의견과 주가{_tipx(_dk.with_src(tip, "Yahoo Finance · 유튜브 방송 요약 · Google 뉴스"))}</span>{right}</span>')
-    return f'<div data-cards="1" data-opchart="1" style="margin:0 0 14px;">{title}{card}</div>'
+
+LT_GRAY = "#CBD5E1"   # 버튼 선 그래프에서 안 누른 선
+
+def line_tabs(cid, labels, series, fmt, unit="", overlay=None, int_ticks=False):
+    """버튼으로 하나씩 보는 선 그래프 (2026-11-03 사용자: "처음엔 모두 색 선 · 숫자 없음, 왼쪽 위 버튼을 누르면 그 선만 색 · 숫자, 나머지는 회색") — JS 없이 라디오 + 라벨 + CSS(:checked ~).
+    series = [(이름, 값 목록(None 허용), 색)]. 눈금은 모든 선의 범위로 고정(버튼을 바꿔도 안 출렁임). 모양 · 넘겨 보기 · 그림자는 line_chart 와 같다.
+    cid = 페이지 안에서 하나뿐인 id (종목 · 그래프). 디자인 가이드 8절 `버튼 선 그래프`.
+    overlay = (이름, 값 목록, 색, fmt) — 단위가 다른 선 하나를 제 범위(최저~최고)로 같은 칸에 겹친다(의견 건수 위의 종가, P294). 눈금은 series 것만, 숫자는 버튼을 눌렀을 때 제 fmt 로."""
+    n = len(labels)
+    vals = [v for _, xs, _ in series for v in xs if v is not None]
+    if not vals or n < 2:
+        return ""
+    if int_ticks:   # 건수 — 0 부터 정수 눈금(1 · 2 · 5 · 10 간격), 가장 큰 값보다 한 칸 바깥까지 (P294)
+        top_v = max(vals + [1])
+        st = 1 if top_v <= 4 else 2 if top_v <= 8 else 5 if top_v <= 20 else 10
+        ticks = list(range(0, (int(top_v) // st + 1) * st + 1, st))
+    else:
+        ticks = _nice_ticks(min(vals + [0]) if min(vals) < 0 else min(vals), max(vals))
+    lo, hi = ticks[0], ticks[-1]
+    est = lambda t, px=12: sum(px if ord(c) > 0x2E80 else px * 0.6 for c in str(t))   # noqa: E731
+    step = max(LINE_STEP, max(est(x) for lb in labels for x in lb.split("\n")) + 12, max(est(fmt(v), 13) for v in vals) + 14)
+    axis_w = int(max(est(f"{t:,.0f}" if float(t).is_integer() else fmt(t)) for t in ticks) + 8)
+    top, bot = 30, 66 if any("\n" in lb for lb in labels) else 52
+    fit = n * step <= LINE_FIT_W
+    w, H = int(max(n * step, 260)), LINE_H
+    y = lambda v: top + (hi - v) / (hi - lo) * (H - top - bot)   # noqa: E731
+    allser = [(nm, xs, col, fmt, y) for nm, xs, col in series]
+    if overlay:
+        onm, oxs, ocol, ofmt = overlay
+        ov = [v for v in oxs if v is not None]
+        olo, ohi = (min(ov), max(ov)) if ov else (0, 1)
+        oy = (lambda v: top + 16 + (ohi - v) / (ohi - olo) * (H - top - bot - 32)) if ohi > olo else (lambda v: (top + H - bot) / 2)   # noqa: E731 — 제 범위, 위아래 16px 안쪽
+        allser.append((onm, oxs, ocol, ofmt, oy))
+    x = (lambda i: f"{(i + 0.5) / n * 100:.2f}%") if fit else (lambda i: f"{step / 2 + i * step:.1f}")   # noqa: E731
+    W = "100%" if fit else str(w)
+    g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
+    if lo < 0 < hi:
+        g += f'<line x1="0" x2="{W}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#CBD5E1" stroke-width="1"/>'
+    # 처음 = 모든 선 제 색 · 점 있음 · 숫자 없음. 버튼을 누르면 그 선만 색 · 점 · 숫자, 나머지는 회색 가는 선(점 없음). 버튼 = 흰 작은 외곽선 버튼(가이드 2-3), 누르면 선 색 테두리 · 글자 · 연한 바탕
+    body, css = "", (f"#{cid} .t{{display:none}} #{cid} .h label{{border:1px solid #B5BAC0;color:#111;background:#fff}} "
+                     f"#{cid} .h label:hover{{border-color:#111}} ")
+    for k, (nm, xs, col, kf, ky) in enumerate(allser):
+        css += f"#{cid} .l{k}{{stroke:{col};stroke-width:{LINE_W}}} "
+        pts = [(i, x(i), ky(v)) for i, v in enumerate(xs) if v is not None]
+        sw = f'class="l l{k}" fill="none" stroke-linecap="round" stroke-linejoin="round"'
+        if fit:   # % 좌표는 polyline 이 못 받는다 — 구간마다 선
+            body += "".join(f'<line x1="{a[1]}" y1="{a[2]:.1f}" x2="{b[1]}" y2="{b[2]:.1f}" {sw}/>' for a, b in zip(pts, pts[1:]))
+        else:
+            body += f'<polyline points="{" ".join(f"{px},{py:.1f}" for _, px, py in pts)}" {sw}/>'
+        for j, (i, px, py) in enumerate(pts):
+            last = j == len(pts) - 1
+            body += f'<circle class="d d{k}" cx="{px}" cy="{py:.1f}" r="{LAST_R if last else DOT_R}" fill="#fff" stroke="{col}" stroke-width="{LAST_SW if last else DOT_SW}"/>'
+            body += (f'<text class="t t{k}" x="{px}" y="{py - 10 if py > top + 16 else py + 20:.1f}" text-anchor="middle" font-size="{13 if last else 12}" '
+                     f'font-weight="{700 if last else 400}" fill="{col}">{_esc(kf(xs[i]))}</text>')   # 한 선만 보이니 숫자는 위에, 맨 위에 닿으면 아래
+        css += (f"#{cid}-{k}:checked~.g .l{{stroke:{LT_GRAY};stroke-width:{LINE_W2}}} #{cid}-{k}:checked~.g .d{{display:none}} "   # 누르면 다른 선은 회색 · 점 없음 (뒤 규칙이 덮는다)
+                f"#{cid}-{k}:checked~.g .l{k}{{stroke:{col};stroke-width:{LINE_W}}} #{cid}-{k}:checked~.g .d{k},#{cid}-{k}:checked~.g .t{k}{{display:inline}} "
+                f"#{cid}-{k}:checked~.g .xl,#{cid}-{k}:checked~.g .xd{{fill:{col}}} #{cid}-{k}:checked~.h .c{k}{{border-color:{col};color:{col};background:{col}1A}} ")
+    xl = ""
+    for i, lb in enumerate(labels):
+        parts = lb.split("\n")
+        base = H - 8 - 16 * (len(parts) - 1)
+        xl += "".join(f'<text class="{"xl" if i == n - 1 else ""}" x="{x(i)}" y="{base + 16 * j}" text-anchor="middle" font-size="12" fill="{NOTE}">{_esc(t)}</text>' for j, t in enumerate(parts))
+    xl += f'<circle class="xd" cx="{x(n - 1)}" cy="{H - 25 - 16 * (len(labels[-1].split(chr(10))) - 1)}" r="1.5" fill="{NOTE}"/>'   # 최신 이름 위 강조점 — 누른 선 색
+    svg = (f'<svg width="100%" height="{H}" style="display:block;overflow:visible;">{g}{body}{xl}</svg>' if fit
+           else f'<svg width="{w}" height="{H}" viewBox="0 0 {w} {H}" style="display:block;direction:ltr;">{g}{body}{xl}</svg>')
+    tf = (lambda t: f"{t:,.0f}".replace("-", "−")) if all(float(t).is_integer() for t in ticks) else fmt
+    axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{NOTE};">{_esc(tf(t))}</span>' for t in ticks)
+    if fit:
+        scroll, shade = f'<span style="display:block;margin-right:{axis_w}px;">{svg}</span>', ""
+    else:
+        scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{axis_w}px;">'
+                  f'<span style="display:inline-block;vertical-align:top;direction:ltr;">{svg}</span></span>')
+        shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
+                 'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>')
+    radios = "".join(f'<input type="radio" name="{cid}" id="{cid}-{k}" style="display:none;">' for k in range(len(allser)))   # 처음엔 아무것도 안 눌림
+    btns = "".join(f'<label for="{cid}-{k}" class="c{k}" style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:13px;line-height:18px;font-weight:700;white-space:nowrap;cursor:pointer;">'
+                   f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{col};"></span>{_esc(nm)}</label>' for k, (nm, _, col, _, _) in enumerate(allser))   # 색 점 = 선 색
+    # 첫 줄 = `‹ 넘겨 보기` 왼쪽(공통 선 그래프와 같게) · 단위 오른쪽, 둘째 줄 = 버튼 오른쪽 정렬 — 폰에서 넘겨 보기 / 버튼 / 단위 세 줄이던 것을 두 줄로 (2026-11-04 사용자)
+    row1 = (("" if fit else f'<span data-lhint="1" style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span>')
+            + (f'<span style="white-space:nowrap;margin-left:auto;font-size:12px;line-height:18px;">(단위: {_esc(unit)})</span>' if unit else ""))
+    head = (f'<span class="h" style="display:block;padding:{_dk.CHART_CARD_PAD + 3}px 12px 0;">'
+            + (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px;font-size:{TINY};line-height:20px;color:{NOTE};">{row1}</span>' if row1 else "")
+            + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;margin:0 0 6px;">{btns}</span></span>')
+    graph = (f'<span class="g" style="display:block;position:relative;padding:0 12px 10px;">{scroll}{shade}'
+             f'<span style="position:absolute;top:0;right:12px;width:{axis_w - 4}px;height:{H}px;text-align:right;">{axis}</span></span>')
+    return f'<span id="{cid}" style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><style>{css}</style>{radios}{head}{graph}</span>'
 
 
 def picks_sentence(ps, rich=False):
