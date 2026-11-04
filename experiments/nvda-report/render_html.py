@@ -1277,10 +1277,10 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
                "낮아 눈높이가 주가 아래로 내려와 있다." if gap <= -5 else "위라, 눈높이를 주가가 거의 따라잡은 모습이다." if gap >= 0 else "아래라, 주가가 눈높이를 살짝 넘어선 모습이다."))
         if buy >= 70:
             dirs["애널리스트"] = 1
-            lead = (f"{price}전문가들의 눈은 {'아직 ' if r5 is not None and r5 < -1 else ''}위를 보고 있다. 애널리스트 {ten}이 매수 쪽이다." if price or True else "")
+            lead = (f"{price}전문가들의 눈은 {'아직 ' if r5 is not None and r5 < -1 else ''}위를 보고 있다. 애널리스트 {ten}{'가' if ten.endswith(')') else '이'} 매수 쪽이다." if price or True else "")
         elif buy > 50:
             dirs["애널리스트"] = 1
-            lead = f"{price}전문가 다수는 매수 쪽이지만 만장일치는 아니다. 애널리스트 {ten}이 매수, 나머지는 보유 · 매도다."
+            lead = f"{price}전문가 다수는 매수 쪽이지만 만장일치는 아니다. 애널리스트 {ten}{'가' if ten.endswith(')') else '이'} 매수, 나머지는 보유 · 매도다."
         elif sell > 50:
             dirs["애널리스트"] = -1
             lead = f"{price}전문가들은 조심스러운 쪽이다. 애널리스트 {n_a}명 중 {_b(f'{sell:.0f}%')}가 매도 쪽이다."
