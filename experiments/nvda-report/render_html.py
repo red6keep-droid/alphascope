@@ -1229,8 +1229,6 @@ def picks_card(name, ps, close, money, span=PICK_SPAN, together=""):
 
 # ---------------------------------------------------------------- 의견 탭 맨 위 그림 — 최근 5일 종가 위에 의견 점 (2026-11-04 사용자 P290: "종합적인 의견 그래프 · 시각적인 게 상단에")
 
-OPC_TOP, OPC_PRICE_H, OPC_GAP, OPC_BAR_H, OPC_BAR_W, OPC_BOT = 24, 56, 34, 110, 28, 30   # 위 여백 · 종가 선 칸 높이 · 종가 칸 ~ 막대 칸 · 막대 칸 높이 · 막대 폭(가이드라인 8절 28px) · 아래 날짜 줄 (정수 px, P293)
-OPC_SEP = "#EEF0F3"   # 눈금선 — 선 그래프와 같은 색
 
 
 def _local_day(iso, tz):
@@ -1241,6 +1239,7 @@ def _local_day(iso, tz):
     return (t.astimezone(tz) if t.tzinfo else t.replace(tzinfo=datetime.timezone.utc).astimezone(tz)).date().isoformat()
 
 
+OPC_CLOSE = "#111"   # 의견 그림의 종가 선 — 방향 색(빨강 · 파랑 · 회색)과 겹치지 않는 검정 (P294)
 OPC_DIR_COLOR = {1: UP, -1: DOWN, 0: MUTED}   # 한 자 — ▲ 상승 쪽 빨강 · ▼ 하락 쪽 파랑 · 중립 회색 (신호 카드와 같은 자, P291)
 OPC_DIR_WORD = {1: "▲ 상승 쪽", -1: "▼ 하락 쪽", 0: "중립"}
 MOVE_DIR = {"상향": 1, "하향": -1, "유지": 0}
@@ -1289,12 +1288,11 @@ def _sane_target(t, close):
 PICK_DIR_NUM = {"매수": 1, "매도": -1}   # 방송 · 애널리스트 답 말 → 방향 (보유 · 관망 · 엇갈림 = 0)
 
 
-def opinions_chart(days, closes, items, fmt):
-    """`최근 5거래일 의견과 주가` — 의견 탭 맨 위 그림 한 장 (P290 → P293 날짜별 건수 막대).
-    보고 싶은 것 = 어느 날 의견이 쏟아졌나, 그중 매수가 몇이었나 (2026-11-04 사용자: "막 떨어졌을 때 매수하라는 게 열 몇 개 쏟아질 수 있잖아, 그런 걸 보고 싶었다").
-    아래 = 날짜마다 그날 나온 의견(증권사 변경 · 방송 · 뉴스)을 한 자로 쌓은 막대 — 빨강 ▲ 상승 쪽(매수 · 상향 · 긍정) 아래, 회색 중립 가운데, 파랑 ▼ 하락 쪽(매도 · 하향 · 부정) 위, 막대 위 숫자 = 그날 건수.
-    위 = 종가 선 얇게(비교 대상, 가이드라인 1-4-1) — 떨어진 날 의견이 몰렸나를 같은 칸에서 본다. 목표가 · 평균 등급은 애널리스트 카드가 이미 말한다(여기서 뺌, 옛 P291 · P292).
-    제목 줄 오른쪽 = 애널리스트 지금 다수 의견(상태라 날짜에 못 찍는다). 의견이 하나도 없으면 "" (빈 그림을 두지 않는다)."""
+def opinions_chart(days, closes, items, fmt, cid="lt-op"):
+    """`최근 5거래일 의견과 주가` — 의견 탭 맨 위 그림 한 장 (P290 → P294 버튼 선 그래프).
+    `돈을 어디에 쓰나` 와 같은 버튼 선 그래프(line_tabs)에 날짜별 의견 건수 세 선 — ▲ 상승 쪽(매수 · 상향 · 긍정) 빨강 · 중립(보유 · 관망 · 유지) 회색 · ▼ 하락 쪽(매도 · 하향 · 부정) 파랑 —
+    과 종가 선(제 범위로 겹침, overlay)을 한 칸에 겹친다 (2026-11-04 사용자: "매수 · 보유 · 매도 선 그래프와 종가가 다 겹쳐 있으면 날짜별 개수가 바로 보인다").
+    눈금은 건수(정수), 종가는 눈금 없이 — 버튼을 누르면 그 선만 색 · 숫자(종가는 가격). 제목 줄 오른쪽 = 애널리스트 지금 다수 의견(상태라 날짜에 못 찍는다). 의견이 하나도 없으면 ""."""
     n = len(days)
     ev, analyst = items["events"], items["analyst"]
     if not n or not ev:
@@ -1303,72 +1301,17 @@ def opinions_chart(days, closes, items, fmt):
     def col(d):   # 날짜 → 칸. 창보다 앞이면 첫 칸, 뒤면 끝 칸, 장 없는 날은 다음 거래일 칸
         return 0 if d <= days[0] else n - 1 if d >= days[-1] else next(i for i, x in enumerate(days) if x >= d)
     cnt = [{1: 0, 0: 0, -1: 0} for _ in days]
-    who = [[] for _ in days]
     for d, dr, label in ev:
         cnt[col(d)][dr] += 1
-        who[col(d)].append(f"{OPC_DIR_WORD[dr]} · {label}")
-    tot = [c[1] + c[0] + c[-1] for c in cnt]
-    top = max(tot)
-    step = 1 if top <= 4 else 2 if top <= 8 else 5 if top <= 20 else 10   # 건수 눈금 — 정수만
-    cap = ((top // step) + 1) * step   # 막대보다 한 칸 바깥 눈금까지 (가이드라인 8절)
-    x = lambda i: f"{(i + 0.5) / n * 100:.2f}%"   # noqa: E731 — 5칸은 늘 카드 폭 안 (넘겨 보기 없음)
-    # 위 종가 선 (얇은 칸)
-    pts = [(i, closes[d]) for i, d in enumerate(days) if closes.get(d) is not None]
-    vs = [v for _, v in pts]
-    plo, phi = (min(vs), max(vs)) if vs else (0, 1)
-    py = lambda v: OPC_TOP + (phi - v) / ((phi - plo) or 1) * OPC_PRICE_H   # noqa: E731
-    sw = f'stroke="{LINE_THIS}" stroke-width="{LINE_W}" stroke-linecap="round"'
-    plines = "".join(f'<line x1="{x(a[0])}" y1="{py(a[1]):.1f}" x2="{x(b[0])}" y2="{py(b[1]):.1f}" {sw}/>' for a, b in zip(pts, pts[1:]))
-    pdots = plabs = ""
-    for j, (i, v) in enumerate(pts):   # 가격 글자는 첫 점 · 마지막 점만, 나머지는 점에 마우스
-        big = j == len(pts) - 1
-        pdots += (f'<circle cx="{x(i)}" cy="{py(v):.1f}" r="{LAST_R if big else DOT_R}" fill="#fff" stroke="{LINE_THIS}" stroke-width="{LAST_SW if big else DOT_SW}">'
-                  f'<title>{_esc(days[i][5:].replace("-", "."))} 종가 {_esc(fmt(v))}</title></circle>')
-        if j == 0 or big:
-            anchor, dx = ("end", 8) if big else ("start", -8)
-            plabs += (f'<text x="{x(i)}" dx="{dx}" y="{py(v) - 10:.1f}" text-anchor="{anchor}" font-size="{13 if big else 12}" font-weight="{700 if big else 400}" '
-                      f'fill="{LINE_THIS}">{_esc(fmt(v))}</text>')
-    # 아래 건수 막대
-    b0 = OPC_TOP + OPC_PRICE_H + OPC_GAP   # 막대 칸 위
-    base = b0 + OPC_BAR_H               # 0 기준선
-    by = lambda c: base - c / cap * OPC_BAR_H   # noqa: E731
-    H = base + OPC_BOT
-    ticks = list(range(0, cap + 1, step))
-    g = "".join(f'<line x1="0" x2="100%" y1="{by(t):.1f}" y2="{by(t):.1f}" stroke="{"#CBD5E1" if t == 0 else OPC_SEP}" stroke-width="1"/>' for t in ticks)
-    bars = ""
-    for i, c in enumerate(cnt):
-        if not tot[i]:
-            continue
-        yy = base
-        seg = ""
-        for dr in (1, 0, -1):   # ▲ 아래 → 중립 → ▼ 위
-            if c[dr]:
-                h = c[dr] / cap * OPC_BAR_H
-                seg += f'<rect x="{-OPC_BAR_W // 2}" y="{yy - h:.1f}" width="{OPC_BAR_W}" height="{h:.1f}" fill="{OPC_DIR_COLOR[dr]}"/>'
-                yy -= h
-        title = f"{days[i][5:].replace('-', '.')} 의견 {tot[i]}건 — ▲ {c[1]} · 중립 {c[0]} · ▼ {c[-1]}\n" + "\n".join(who[i])
-        bars += (f'<svg x="{x(i)}" y="0" width="1" height="1" style="overflow:visible;"><title>{_esc(title)}</title>{seg}'
-                 f'<text x="0" y="{yy - 5:.1f}" text-anchor="middle" font-size="{_dk.BAR_NUM_PX}" font-weight="700" fill="#111">{tot[i]}</text></svg>')   # 막대 위 숫자 = 건수 (13px 굵게, 가이드라인 8절)
-    xl = "".join(f'<text x="{x(i)}" y="{H - 8}" text-anchor="middle" font-size="12" fill="{LINE_THIS if i == n - 1 else NOTE}">{d[5:].replace("-", ".")}</text>' for i, d in enumerate(days))
-    xl += f'<circle cx="{x(n - 1)}" cy="{H - 25}" r="1.5" fill="{LINE_THIS}"/>'   # 최신 이름 위 강조점 (선 그래프와 같게)
-    svg = f'<svg width="100%" height="{H}" style="display:block;overflow:visible;">{g}{plines}{pdots}{plabs}{bars}{xl}</svg>'
-    axis_w = int(max(len(str(t)) for t in ticks) * 7 + 8)
-    axis = "".join(f'<span style="position:absolute;right:0;top:{by(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{NOTE};">{t}</span>' for t in ticks)
-    axis += f'<span style="position:absolute;right:0;top:{b0 - 22}px;white-space:nowrap;font-size:11px;line-height:16px;color:{NOTE};">건</span>'
-
-    def chip(nm, inner):
-        return f'<span style="display:inline-flex;align-items:center;gap:5px;margin-left:12px;white-space:nowrap;"><svg width="22" height="12" aria-hidden="true">{inner}</svg>{_esc(nm)}</span>'
-    chips = chip("종가", f'<line x1="1" x2="21" y1="6" y2="6" stroke="{LINE_THIS}" stroke-width="{LINE_W}"/><circle cx="11" cy="6" r="3" fill="#fff" stroke="{LINE_THIS}" stroke-width="{DOT_SW}"/>')
-    chips += chip("그날 의견 건수", f'<rect x="6" y="1" width="9" height="10" fill="{NOTE}"/>')   # 모양만 — 빨강 ▲ · 파랑 ▼ · 회색 중립 뜻은 블로그 공통 (범례 규칙)
-    head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 2px;font-size:{TINY};line-height:20px;color:{NOTE};">'
-            f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;margin-left:auto;">{chips}</span></span>')
-    card = (f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD + 3}px 12px 10px;">{head}'
-            f'<span style="display:block;position:relative;"><span style="display:block;margin-right:{axis_w}px;">{svg}</span>'
-            f'<span style="position:absolute;top:0;right:0;width:{axis_w - 4}px;height:{H}px;text-align:right;">{axis}</span></span></span></span>')
+    series = [("▲ 상승 쪽", [c[1] for c in cnt], UP), ("중립", [c[0] for c in cnt], MUTED), ("▼ 하락 쪽", [c[-1] for c in cnt], DOWN)]   # 신호 카드와 같은 자 · 색
+    chart = line_tabs(cid, [d[5:].replace("-", ".") for d in days], series, lambda v: f"{v:,.0f}", "건",
+                      overlay=("종가", [closes.get(d) for d in days], OPC_CLOSE, fmt), int_ticks=True)   # 종가는 검정 — ▼ 파랑 · 공용 파랑(LINE_THIS)과 헷갈리지 않게
+    if not chart:
+        return ""
     n_up, n_dn, n_mid = (sum(c[v] for c in cnt) for v in (1, -1, 0))
-    tip = (f"최근 {PICK_SPAN} 동안 날마다 나온 바깥 의견(증권사 등급 · 목표가 변경, 방송, 뉴스 의견 기사)을 한 자로 세어 쌓은 막대 — 빨강 ▲ 상승 쪽 = 매수 · 상향 · 긍정, 파랑 ▼ 하락 쪽 = 매도 · 하향 · 부정, 회색 = 보유 · 관망 · 유지 · 중립. "
-           f"막대 위 숫자 = 그날 건수, 위 선 = 종가(떨어진 날 의견이 몰렸나 비교). 주말 · 휴장일 의견은 다음 거래일. 제목 오른쪽 = 애널리스트 지금 다수 의견\n"
-           f"· 지금 : {sum(tot)}건 — ▲ {n_up} · 중립 {n_mid} · ▼ {n_dn}\n· 이 블로그의 추천이 아니다")
+    tip = (f"최근 {PICK_SPAN} 동안 날마다 나온 바깥 의견(증권사 등급 · 목표가 변경, 방송, 뉴스 의견 기사)을 한 자로 센 선 — ▲ 상승 쪽 = 매수 · 상향 · 긍정, ▼ 하락 쪽 = 매도 · 하향 · 부정, 중립 = 보유 · 관망 · 유지. "
+           f"종가 선은 제 범위로 겹쳐 놓은 비교용(눈금은 건수만). 버튼을 누르면 그 선만 숫자. 주말 · 휴장일 의견은 다음 거래일. 제목 오른쪽 = 애널리스트 지금 다수 의견\n"
+           f"· 지금 : {n_up + n_mid + n_dn}건 — ▲ {n_up} · 중립 {n_mid} · ▼ {n_dn}\n· 이 블로그의 추천이 아니다")
     right = ""
     if analyst:
         w, dr = analyst
@@ -1376,7 +1319,94 @@ def opinions_chart(days, closes, items, fmt):
         right = f'<span style="flex:none;font-weight:700;font-size:{TINY};line-height:20px;color:{OPC_DIR_COLOR[dr] if dr else "#111"};"><span style="font-weight:400;color:{NOTE};">애널리스트 </span>{_esc(word)}</span>'
     title = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 {_dk.CHART_TITLE_GAP}px;">'
              f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}최근 {PICK_SPAN} 의견과 주가{_tipx(_dk.with_src(tip, "Yahoo Finance · 유튜브 방송 요약 · Google 뉴스"))}</span>{right}</span>')
-    return f'<div data-cards="1" data-opchart="1" style="margin:0 0 14px;">{title}{card}</div>'
+    return f'<div data-cards="1" data-opchart="1" style="margin:0 0 14px;">{title}{chart}</div>'
+
+
+LT_GRAY = "#CBD5E1"   # 버튼 선 그래프에서 안 누른 선
+
+def line_tabs(cid, labels, series, fmt, unit="", overlay=None, int_ticks=False):
+    """버튼으로 하나씩 보는 선 그래프 (2026-11-03 사용자: "처음엔 모두 색 선 · 숫자 없음, 왼쪽 위 버튼을 누르면 그 선만 색 · 숫자, 나머지는 회색") — JS 없이 라디오 + 라벨 + CSS(:checked ~).
+    series = [(이름, 값 목록(None 허용), 색)]. 눈금은 모든 선의 범위로 고정(버튼을 바꿔도 안 출렁임). 모양 · 넘겨 보기 · 그림자는 line_chart 와 같다.
+    cid = 페이지 안에서 하나뿐인 id (종목 · 그래프). 디자인 가이드 8절 `버튼 선 그래프`.
+    overlay = (이름, 값 목록, 색, fmt) — 단위가 다른 선 하나를 제 범위(최저~최고)로 같은 칸에 겹친다(의견 건수 위의 종가, P294). 눈금은 series 것만, 숫자는 버튼을 눌렀을 때 제 fmt 로."""
+    n = len(labels)
+    vals = [v for _, xs, _ in series for v in xs if v is not None]
+    if not vals or n < 2:
+        return ""
+    if int_ticks:   # 건수 — 0 부터 정수 눈금(1 · 2 · 5 · 10 간격), 가장 큰 값보다 한 칸 바깥까지 (P294)
+        top_v = max(vals + [1])
+        st = 1 if top_v <= 4 else 2 if top_v <= 8 else 5 if top_v <= 20 else 10
+        ticks = list(range(0, (int(top_v) // st + 1) * st + 1, st))
+    else:
+        ticks = _nice_ticks(min(vals + [0]) if min(vals) < 0 else min(vals), max(vals))
+    lo, hi = ticks[0], ticks[-1]
+    est = lambda t, px=12: sum(px if ord(c) > 0x2E80 else px * 0.6 for c in str(t))   # noqa: E731
+    step = max(LINE_STEP, max(est(x) for lb in labels for x in lb.split("\n")) + 12, max(est(fmt(v), 13) for v in vals) + 14)
+    axis_w = int(max(est(f"{t:,.0f}" if float(t).is_integer() else fmt(t)) for t in ticks) + 8)
+    top, bot = 30, 66 if any("\n" in lb for lb in labels) else 52
+    fit = n * step <= LINE_FIT_W
+    w, H = int(max(n * step, 260)), LINE_H
+    y = lambda v: top + (hi - v) / (hi - lo) * (H - top - bot)   # noqa: E731
+    allser = [(nm, xs, col, fmt, y) for nm, xs, col in series]
+    if overlay:
+        onm, oxs, ocol, ofmt = overlay
+        ov = [v for v in oxs if v is not None]
+        olo, ohi = (min(ov), max(ov)) if ov else (0, 1)
+        oy = (lambda v: top + 16 + (ohi - v) / (ohi - olo) * (H - top - bot - 32)) if ohi > olo else (lambda v: (top + H - bot) / 2)   # noqa: E731 — 제 범위, 위아래 16px 안쪽
+        allser.append((onm, oxs, ocol, ofmt, oy))
+    x = (lambda i: f"{(i + 0.5) / n * 100:.2f}%") if fit else (lambda i: f"{step / 2 + i * step:.1f}")   # noqa: E731
+    W = "100%" if fit else str(w)
+    g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
+    if lo < 0 < hi:
+        g += f'<line x1="0" x2="{W}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#CBD5E1" stroke-width="1"/>'
+    # 처음 = 모든 선 제 색 · 점 있음 · 숫자 없음. 버튼을 누르면 그 선만 색 · 점 · 숫자, 나머지는 회색 가는 선(점 없음). 버튼 = 흰 작은 외곽선 버튼(가이드 2-3), 누르면 선 색 테두리 · 글자 · 연한 바탕
+    body, css = "", (f"#{cid} .t{{display:none}} #{cid} .h label{{border:1px solid #B5BAC0;color:#111;background:#fff}} "
+                     f"#{cid} .h label:hover{{border-color:#111}} ")
+    for k, (nm, xs, col, kf, ky) in enumerate(allser):
+        css += f"#{cid} .l{k}{{stroke:{col};stroke-width:{LINE_W}}} "
+        pts = [(i, x(i), ky(v)) for i, v in enumerate(xs) if v is not None]
+        sw = f'class="l l{k}" fill="none" stroke-linecap="round" stroke-linejoin="round"'
+        if fit:   # % 좌표는 polyline 이 못 받는다 — 구간마다 선
+            body += "".join(f'<line x1="{a[1]}" y1="{a[2]:.1f}" x2="{b[1]}" y2="{b[2]:.1f}" {sw}/>' for a, b in zip(pts, pts[1:]))
+        else:
+            body += f'<polyline points="{" ".join(f"{px},{py:.1f}" for _, px, py in pts)}" {sw}/>'
+        for j, (i, px, py) in enumerate(pts):
+            last = j == len(pts) - 1
+            body += f'<circle class="d d{k}" cx="{px}" cy="{py:.1f}" r="{LAST_R if last else DOT_R}" fill="#fff" stroke="{col}" stroke-width="{LAST_SW if last else DOT_SW}"/>'
+            body += (f'<text class="t t{k}" x="{px}" y="{py - 10 if py > top + 16 else py + 20:.1f}" text-anchor="middle" font-size="{13 if last else 12}" '
+                     f'font-weight="{700 if last else 400}" fill="{col}">{_esc(kf(xs[i]))}</text>')   # 한 선만 보이니 숫자는 위에, 맨 위에 닿으면 아래
+        css += (f"#{cid}-{k}:checked~.g .l{{stroke:{LT_GRAY};stroke-width:{LINE_W2}}} #{cid}-{k}:checked~.g .d{{display:none}} "   # 누르면 다른 선은 회색 · 점 없음 (뒤 규칙이 덮는다)
+                f"#{cid}-{k}:checked~.g .l{k}{{stroke:{col};stroke-width:{LINE_W}}} #{cid}-{k}:checked~.g .d{k},#{cid}-{k}:checked~.g .t{k}{{display:inline}} "
+                f"#{cid}-{k}:checked~.g .xl,#{cid}-{k}:checked~.g .xd{{fill:{col}}} #{cid}-{k}:checked~.h .c{k}{{border-color:{col};color:{col};background:{col}1A}} ")
+    xl = ""
+    for i, lb in enumerate(labels):
+        parts = lb.split("\n")
+        base = H - 8 - 16 * (len(parts) - 1)
+        xl += "".join(f'<text class="{"xl" if i == n - 1 else ""}" x="{x(i)}" y="{base + 16 * j}" text-anchor="middle" font-size="12" fill="{NOTE}">{_esc(t)}</text>' for j, t in enumerate(parts))
+    xl += f'<circle class="xd" cx="{x(n - 1)}" cy="{H - 25 - 16 * (len(labels[-1].split(chr(10))) - 1)}" r="1.5" fill="{NOTE}"/>'   # 최신 이름 위 강조점 — 누른 선 색
+    svg = (f'<svg width="100%" height="{H}" style="display:block;overflow:visible;">{g}{body}{xl}</svg>' if fit
+           else f'<svg width="{w}" height="{H}" viewBox="0 0 {w} {H}" style="display:block;direction:ltr;">{g}{body}{xl}</svg>')
+    tf = (lambda t: f"{t:,.0f}".replace("-", "−")) if all(float(t).is_integer() for t in ticks) else fmt
+    axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{NOTE};">{_esc(tf(t))}</span>' for t in ticks)
+    if fit:
+        scroll, shade = f'<span style="display:block;margin-right:{axis_w}px;">{svg}</span>', ""
+    else:
+        scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{axis_w}px;">'
+                  f'<span style="display:inline-block;vertical-align:top;direction:ltr;">{svg}</span></span>')
+        shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
+                 'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>')
+    radios = "".join(f'<input type="radio" name="{cid}" id="{cid}-{k}" style="display:none;">' for k in range(len(allser)))   # 처음엔 아무것도 안 눌림
+    btns = "".join(f'<label for="{cid}-{k}" class="c{k}" style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:13px;line-height:18px;font-weight:700;white-space:nowrap;cursor:pointer;">'
+                   f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{col};"></span>{_esc(nm)}</label>' for k, (nm, _, col, _, _) in enumerate(allser))   # 색 점 = 선 색
+    # 첫 줄 = `‹ 넘겨 보기` 왼쪽(공통 선 그래프와 같게) · 단위 오른쪽, 둘째 줄 = 버튼 오른쪽 정렬 — 폰에서 넘겨 보기 / 버튼 / 단위 세 줄이던 것을 두 줄로 (2026-11-04 사용자)
+    row1 = (("" if fit else f'<span data-lhint="1" style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span>')
+            + (f'<span style="white-space:nowrap;margin-left:auto;font-size:12px;line-height:18px;">(단위: {_esc(unit)})</span>' if unit else ""))
+    head = (f'<span class="h" style="display:block;padding:{_dk.CHART_CARD_PAD + 3}px 12px 0;">'
+            + (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px;font-size:{TINY};line-height:20px;color:{NOTE};">{row1}</span>' if row1 else "")
+            + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;margin:0 0 6px;">{btns}</span></span>')
+    graph = (f'<span class="g" style="display:block;position:relative;padding:0 12px 10px;">{scroll}{shade}'
+             f'<span style="position:absolute;top:0;right:12px;width:{axis_w - 4}px;height:{H}px;text-align:right;">{axis}</span></span>')
+    return f'<span id="{cid}" style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><style>{css}</style>{radios}{head}{graph}</span>'
 
 
 def picks_sentence(ps, rich=False):

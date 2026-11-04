@@ -562,7 +562,7 @@ def card_opinions(s):
     bars = BARS.get(s["sym"]) or []
     days = R.pick_window(bars, NY, now=NOW)[0]
     items = R.opinion_items(ps, s.get("broker") or [], nops, s.get("analysts") or [], s.get("close"), NY, days, money)   # 네 출처 한 자 (P291)
-    chart = R.opinions_chart(days, {b["day"]: b["close"] for b in bars[-10:]}, items, money)   # 탭 맨 위 그림 (P290)
+    chart = R.opinions_chart(days, {b["day"]: b["close"] for b in bars[-10:]}, items, money, cid=f"lt-{s['sym']}-op")   # 탭 맨 위 그림 (P290 · P294)
     return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, money, lambda: together_items(s),
                             broker=s.get("broker") or [], news_ops=nops, chart=chart)   # 증권사 · 뉴스 의견 (P275)
 
@@ -868,81 +868,12 @@ def card_capex(c, L=US_MONEY):
 
 PROFIT_ROWS = (("gp", "매출총이익", "매출에서 만드는 데 든 돈을 뺀 몫"), ("opinc", "영업이익", "본업에서 남긴 돈"), ("ni", "순이익", "세금 · 이자까지 다 뺀 최종 이익"))
 _GREEN, _ORANGE, _VIOLET = "#3FA874", "#E8923A", "#8B6FD6"   # 칩 선 그래프 선 색 — 선은 막대 파스텔보다 진하게. 회색은 `비교 대상` · 안 누른 선 뜻이라 안 쓴다
-LT_GRAY = "#CBD5E1"   # 안 누른 선
+LT_GRAY = R.LT_GRAY   # 안 누른 선 (공용)
 MARGIN_SERIES = (("gp", "매출총이익률", _GREEN), ("opinc", "영업이익률", _ORANGE), ("ni", "순이익률", _VIOLET))
 CASH_SERIES = (("ocf", "영업으로 번 돈", R.LINE_THIS), ("capex", "설비 투자", _ORANGE), ("fcf", "잉여 현금", _GREEN))
 
 
-def line_tabs(cid, labels, series, fmt, unit=""):
-    """버튼으로 하나씩 보는 선 그래프 (2026-11-03 사용자: "처음엔 모두 색 선 · 숫자 없음, 왼쪽 위 버튼을 누르면 그 선만 색 · 숫자, 나머지는 회색") — JS 없이 라디오 + 라벨 + CSS(:checked ~).
-    series = [(이름, 값 목록(None 허용), 색)]. 눈금은 모든 선의 범위로 고정(버튼을 바꿔도 안 출렁임). 모양 · 넘겨 보기 · 그림자는 R.line_chart 와 같다.
-    cid = 페이지 안에서 하나뿐인 id (종목 · 그래프). 디자인 가이드 8절 `버튼 선 그래프`."""
-    n = len(labels)
-    vals = [v for _, xs, _ in series for v in xs if v is not None]
-    if not vals or n < 2:
-        return ""
-    ticks = R._nice_ticks(min(vals + [0]) if min(vals) < 0 else min(vals), max(vals))
-    lo, hi = ticks[0], ticks[-1]
-    est = lambda t, px=12: sum(px if ord(c) > 0x2E80 else px * 0.6 for c in str(t))   # noqa: E731
-    step = max(R.LINE_STEP, max(est(x) for lb in labels for x in lb.split("\n")) + 12, max(est(fmt(v), 13) for v in vals) + 14)
-    axis_w = int(max(est(f"{t:,.0f}" if float(t).is_integer() else fmt(t)) for t in ticks) + 8)
-    top, bot = 30, 66 if any("\n" in lb for lb in labels) else 52
-    fit = n * step <= R.LINE_FIT_W
-    w, H = int(max(n * step, 260)), R.LINE_H
-    y = lambda v: top + (hi - v) / (hi - lo) * (H - top - bot)   # noqa: E731
-    x = (lambda i: f"{(i + 0.5) / n * 100:.2f}%") if fit else (lambda i: f"{step / 2 + i * step:.1f}")   # noqa: E731
-    W = "100%" if fit else str(w)
-    g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
-    if lo < 0 < hi:
-        g += f'<line x1="0" x2="{W}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#CBD5E1" stroke-width="1"/>'
-    # 처음 = 모든 선 제 색 · 점 있음 · 숫자 없음. 버튼을 누르면 그 선만 색 · 점 · 숫자, 나머지는 회색 가는 선(점 없음). 버튼 = 흰 작은 외곽선 버튼(가이드 2-3), 누르면 선 색 테두리 · 글자 · 연한 바탕
-    body, css = "", (f"#{cid} .t{{display:none}} #{cid} .h label{{border:1px solid #B5BAC0;color:#111;background:#fff}} "
-                     f"#{cid} .h label:hover{{border-color:#111}} ")
-    for k, (nm, xs, col) in enumerate(series):
-        css += f"#{cid} .l{k}{{stroke:{col};stroke-width:{R.LINE_W}}} "
-        pts = [(i, x(i), y(v)) for i, v in enumerate(xs) if v is not None]
-        sw = f'class="l l{k}" fill="none" stroke-linecap="round" stroke-linejoin="round"'
-        if fit:   # % 좌표는 polyline 이 못 받는다 — 구간마다 선
-            body += "".join(f'<line x1="{a[1]}" y1="{a[2]:.1f}" x2="{b[1]}" y2="{b[2]:.1f}" {sw}/>' for a, b in zip(pts, pts[1:]))
-        else:
-            body += f'<polyline points="{" ".join(f"{px},{py:.1f}" for _, px, py in pts)}" {sw}/>'
-        for j, (i, px, py) in enumerate(pts):
-            last = j == len(pts) - 1
-            body += f'<circle class="d d{k}" cx="{px}" cy="{py:.1f}" r="{R.LAST_R if last else R.DOT_R}" fill="#fff" stroke="{col}" stroke-width="{R.LAST_SW if last else R.DOT_SW}"/>'
-            body += (f'<text class="t t{k}" x="{px}" y="{py - 10 if py > top + 16 else py + 20:.1f}" text-anchor="middle" font-size="{13 if last else 12}" '
-                     f'font-weight="{700 if last else 400}" fill="{col}">{R._esc(fmt(xs[i]))}</text>')   # 한 선만 보이니 숫자는 위에, 맨 위에 닿으면 아래
-        css += (f"#{cid}-{k}:checked~.g .l{{stroke:{LT_GRAY};stroke-width:{R.LINE_W2}}} #{cid}-{k}:checked~.g .d{{display:none}} "   # 누르면 다른 선은 회색 · 점 없음 (뒤 규칙이 덮는다)
-                f"#{cid}-{k}:checked~.g .l{k}{{stroke:{col};stroke-width:{R.LINE_W}}} #{cid}-{k}:checked~.g .d{k},#{cid}-{k}:checked~.g .t{k}{{display:inline}} "
-                f"#{cid}-{k}:checked~.g .xl,#{cid}-{k}:checked~.g .xd{{fill:{col}}} #{cid}-{k}:checked~.h .c{k}{{border-color:{col};color:{col};background:{col}1A}} ")
-    xl = ""
-    for i, lb in enumerate(labels):
-        parts = lb.split("\n")
-        base = H - 8 - 16 * (len(parts) - 1)
-        xl += "".join(f'<text class="{"xl" if i == n - 1 else ""}" x="{x(i)}" y="{base + 16 * j}" text-anchor="middle" font-size="12" fill="{R.NOTE}">{R._esc(t)}</text>' for j, t in enumerate(parts))
-    xl += f'<circle class="xd" cx="{x(n - 1)}" cy="{H - 25 - 16 * (len(labels[-1].split(chr(10))) - 1)}" r="1.5" fill="{R.NOTE}"/>'   # 최신 이름 위 강조점 — 누른 선 색
-    svg = (f'<svg width="100%" height="{H}" style="display:block;overflow:visible;">{g}{body}{xl}</svg>' if fit
-           else f'<svg width="{w}" height="{H}" viewBox="0 0 {w} {H}" style="display:block;direction:ltr;">{g}{body}{xl}</svg>')
-    tf = (lambda t: f"{t:,.0f}".replace("-", "−")) if all(float(t).is_integer() for t in ticks) else fmt
-    axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{R.NOTE};">{R._esc(tf(t))}</span>' for t in ticks)
-    if fit:
-        scroll, shade = f'<span style="display:block;margin-right:{axis_w}px;">{svg}</span>', ""
-    else:
-        scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{axis_w}px;">'
-                  f'<span style="display:inline-block;vertical-align:top;direction:ltr;">{svg}</span></span>')
-        shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
-                 'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>')
-    radios = "".join(f'<input type="radio" name="{cid}" id="{cid}-{k}" style="display:none;">' for k in range(len(series)))   # 처음엔 아무것도 안 눌림
-    btns = "".join(f'<label for="{cid}-{k}" class="c{k}" style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:13px;line-height:18px;font-weight:700;white-space:nowrap;cursor:pointer;">'
-                   f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{col};"></span>{R._esc(nm)}</label>' for k, (nm, _, col) in enumerate(series))   # 색 점 = 선 색
-    # 첫 줄 = `‹ 넘겨 보기` 왼쪽(공통 선 그래프와 같게) · 단위 오른쪽, 둘째 줄 = 버튼 오른쪽 정렬 — 폰에서 넘겨 보기 / 버튼 / 단위 세 줄이던 것을 두 줄로 (2026-11-04 사용자)
-    row1 = (("" if fit else f'<span data-lhint="1" style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span>')
-            + (f'<span style="white-space:nowrap;margin-left:auto;font-size:12px;line-height:18px;">(단위: {R._esc(unit)})</span>' if unit else ""))
-    head = (f'<span class="h" style="display:block;padding:{_dk.CHART_CARD_PAD + 3}px 12px 0;">'
-            + (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px;font-size:{R.TINY};line-height:20px;color:{R.NOTE};">{row1}</span>' if row1 else "")
-            + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;margin:0 0 6px;">{btns}</span></span>')
-    graph = (f'<span class="g" style="display:block;position:relative;padding:0 12px 10px;">{scroll}{shade}'
-             f'<span style="position:absolute;top:0;right:12px;width:{axis_w - 4}px;height:{H}px;text-align:right;">{axis}</span></span>')
-    return f'<span id="{cid}" style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><style>{css}</style>{radios}{head}{graph}</span>'
+line_tabs = R.line_tabs   # 공용으로 옮김 (render_html, 2026-11-04 P294 — 의견 그림 · 한국 종목도 쓴다)
 
 
 def margin_chart(ms, sym):
