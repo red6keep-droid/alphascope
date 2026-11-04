@@ -12,6 +12,8 @@
 | `data/macro.pkl` | TLT · IEF · ^TNX · ^IRX · HYG · LQD · CL=F (WTI) · GC=F (금) · HG=F (구리) · DX-Y.NYB (달러 인덱스) · ^GSPC · ^IXIC · ^DJI · ^RUT 일봉 · SPY_long (2014-06~, 200일선용) · 1.8 MB | yfinance (2026-09-24 수집) |
 | `data/fred_*.csv` | UNRATE · CPIAUCSL · FEDFUNDS (월간) · DGS10 · DGS2 (일간) | FRED CSV, 키 불필요 |
 
+> **데이터 파일은 로컬에만** (2026-11-04): `bars.pkl` · `macro.pkl` · `earnings.csv` · `removed.pkl` 은 yfinance 에서 받은 자료라 공개 저장소에 올리지 않는다(`.gitignore`). 새 컴퓨터에서는 위 표의 수집 명령으로 다시 받는다. FRED csv · `removed.csv` · `universe.csv` 는 공개 자료라 그대로 둔다.
+
 읽는 코드: `experiments/signal-study/config.py`의 `DATA_DIR`이 이 폴더를 가리킨다.
 
 ## results/ — 회차별 결과 (커밋함)
