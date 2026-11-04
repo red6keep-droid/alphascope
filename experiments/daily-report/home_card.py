@@ -36,8 +36,6 @@ CARDS = {
                "sections": ["(머리)", "오늘 한 줄", "급등주", "오늘의 급등주 TOP 5"]},
     "kr-report": {"id": "kr-report-card", "label": "한국 증시 리포트", "chart": True,
                   "sections": ["(요약)"]},
-    "trump": {"id": "trump-card", "label": "트럼프 트렌드", "chart": False,
-              "sections": ["발언", "오늘 한 줄", "달라진 것", "무엇이 달라졌나", "내일 볼 것"]},
     "radar": {"id": "radar-card", "label": "인물 발언", "chart": False,
               "sections": ["(머리)", "발언"]},
 }

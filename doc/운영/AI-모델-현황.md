@@ -70,7 +70,7 @@ NVIDIA(DeepSeek)는 10-26부터 다시 예비로 들어간다 — 1순위에는 
 | 파이프라인 (워크플로) | 하루 실행 | 일 | 사슬 | 1순위 모델 |
 |---|---|---|---|---|
 | NVDA 리포트 (`nvda-report.yml`) | 1 | 기사 분류 · 서술 · 재분류 | json · json-gemini | flash |
-| 트럼프 SNS (`trump-trend.yml`) | 1 | 게시물 분류 · 서술 · 재분류 | json · json-gemini | flash |
+| 트럼프 SNS (`trump-trend.yml`) | **0 (2026-11-04 중단)** | 하루 184건 전부 분류 → 13회 호출(flash 7 · lite 6)이 빠짐. 트럼프 게시물은 인물 레이더가 자체 분류(약 60건) | — | — |
 | 미국 증시 데일리 (`test-daily-report.yml`) | 1 (화~토) | 리포트 서술 + 커버 이미지 프롬프트 | json-daily | flash |
 | 데일리 뉴스 (`collect_news` → news_store) | 1 | 헤드라인 번역 · 요약 · 종목 관련도 | news / news-alt | Qwen · gpt-oss |
 | 홈 뉴스 (`news.yml`, fetch_news) | 하루 여러 번 (2시간 간격 · 수동) | 같은 공용 처리 | news / news-alt | Qwen · gpt-oss |
