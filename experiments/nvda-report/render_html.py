@@ -1266,16 +1266,15 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
         buy = (rc.get("strongBuy", 0) + rc.get("buy", 0)) / n_a * 100
         sell = (rc.get("sell", 0) + rc.get("strongSell", 0)) / n_a * 100
         hold = 100 - buy - sell
+        # 말은 한 자로만 — 밝다(▲) · 어둡다(▼) · 반반, 변화는 더 밝아지는 중 · 더 어두워지는 중, 없음은 조용하다 (2026-11-04 사용자 P298: "혼용하면 헷갈린다, 일관성")
         if buy >= 70:
             dirs["애널리스트"], first = 1, f"전문가들은 {nm}을 {up_w('밝게')} 보고 있다."
         elif buy > 50:
             dirs["애널리스트"], first = 1, f"전문가들은 {nm}을 대체로 {up_w('밝게')} 보지만 한목소리는 아니다."
         elif sell > 50:
             dirs["애널리스트"], first = -1, f"전문가들은 {nm}을 {dn_w('어둡게')} 보고 있다."
-        elif hold > 50:
-            dirs["애널리스트"], first = 0, "전문가들은 일단 지켜보자는 쪽이다."
         else:
-            dirs["애널리스트"], first = 0, "전문가들 사이에서도 의견이 갈린다."
+            dirs["애널리스트"], first = 0, f"전문가들은 {nm}을 밝게 보는 쪽과 어둡게 보는 쪽이 반반이다."
         first = first.replace(f"{nm}을", _esc(_dk.josa(name, "을")))
         gap = (pm / close - 1) * 100 if pm and close else None
         if gap is not None:
@@ -1287,9 +1286,9 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
         n = {k: sum(1 for c in broker if broker_move(c) == k) for k in MOVE_ORDER}
         dirs["증권사"] = SG.vote([{"상향": 1, "하향": -1}.get(broker_move(c), 0) for c in broker])
         if n["상향"] > n["하향"]:
-            sents.append(f"최근에는 목표가를 올려 잡는 증권사가 더 많아 분위기가 {up_w('나아지는 중')}이다.")
+            sents.append(f"목표가를 올리는 증권사가 더 많아, 최근 증권사들은 점점 {up_w('더 밝게')} 보는 중이다.")
         elif n["하향"] > n["상향"]:
-            sents.append(f"최근에는 목표가를 내려 잡는 증권사가 더 많아 분위기가 {dn_w('식는 중')}이다.")
+            sents.append(f"목표가를 내리는 증권사가 더 많아, 최근 증권사들은 점점 {dn_w('더 어둡게')} 보는 중이다.")
         else:
             sents.append("최근 증권사들은 목표가를 올리는 곳과 내리는 곳이 반반이다.")
     # ② 방송 · 뉴스 분위기 (5거래일)
@@ -1302,13 +1301,13 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
         dirs["방송 · 뉴스"] = SG.vote(ev)
         many = len(ev) >= 5
         if up > dn and up >= mid:
-            sents.append(f"{where}에서는 {'사라는 말이 많이 나오고 있다' if many else '사라는 말이 간간이 나온다'}.")
+            sents.append(f"{where}에서도 {up_w('밝은')} 말이 {'많다' if many else '간간이 나온다'}.")
         elif dn > up and dn >= mid:
-            sents.append(f"{where}에서는 {'조심하라는 말이 많이 나오고 있다' if many else '조심하라는 말이 간간이 나온다'}.")
+            sents.append(f"{where}에서는 {dn_w('어두운')} 말이 {'많다' if many else '간간이 나온다'}.")
         elif mid > up and mid > dn:
-            sents.append(f"{where}에서는 {'말은 많지만' if many else '이야기가 조금 있지만'} 대부분 '지켜보자'는 쪽이다.")
+            sents.append(f"{where}에서는 {'말은 많지만' if many else '이야기가 조금 있지만'} 밝지도 어둡지도 않은 '지켜보자'가 대부분이다.")
         else:
-            sents.append(f"{where}에서는 사라는 말과 조심하라는 말이 엇갈린다.")
+            sents.append(f"{where}에서는 밝은 말과 어두운 말이 반반이다.")
     # ③ 정리 — 주가 흐름 + 주변 분위기 vs 가격 흐름(Alpha Scope 신호)
     cs = [c for c in (closes or []) if c is not None]
     r5 = (cs[-1] / cs[0] - 1) * 100 if len(cs) >= 2 and cs[0] else None
@@ -1319,19 +1318,19 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
     outside = [d for d in dirs.values() if d is not None]
     o = SG.vote(outside) if outside else None
     split = o == 0 and 1 in outside and -1 in outside
-    mood = ({1: f"주변 분위기는 {up_w('밝은')} 편", -1: f"주변 분위기는 {dn_w('어두운')} 편"}.get(o, "주변 의견은 밝은 쪽과 어두운 쪽으로 갈리는 편" if split else "주변 분위기는 어느 쪽으로도 기울지 않은 편") if o is not None else "")
-    flow = ({1: f"가격 흐름(Alpha Scope 신호)은 {up_w('위')}를 향한다", -1: f"가격 흐름(Alpha Scope 신호)은 아직 {dn_w('무겁다')}", 0: "가격 흐름(Alpha Scope 신호)은 아직 뚜렷하지 않다"}.get(sg, "") if sg is not None else "")
+    mood = ({1: f"주변 분위기는 {up_w('밝은')} 편", -1: f"주변 분위기는 {dn_w('어두운')} 편"}.get(o, "주변 분위기는 밝은 쪽과 어두운 쪽이 반반") if o is not None else "")
+    flow = ({1: f"가격 흐름(Alpha Scope 신호)도 {up_w('밝다')}", -1: f"가격 흐름(Alpha Scope 신호)은 아직 {dn_w('어둡다')}", 0: "가격 흐름(Alpha Scope 신호)은 밝지도 어둡지도 않다"}.get(sg, "") if sg is not None else "")
     if mood or flow:
         if o == 1 and sg == 1:
-            tail = f"{mood}이며, {flow}. 기대와 가격이 같은 방향으로 가는 구간이다."
+            tail = f"{mood}이며, {flow}. 분위기와 가격이 같은 쪽을 보는 구간이다."
         elif o == 1 and sg == -1:
-            tail = f"{mood}이지만, {flow}. 기대가 가격보다 앞서 있는 구간이다."
+            tail = f"{mood}이지만, {flow.replace('(Alpha Scope 신호)은', '(Alpha Scope 신호)은')}. 분위기가 가격보다 앞서 있는 구간이다."
         elif o == -1 and sg == 1:
-            tail = f"{mood}이지만, {flow}. 걱정과 가격이 엇갈리는 구간이다."
+            tail = f"{mood}이지만, {flow.replace('신호)도', '신호)는')}. 분위기와 가격이 엇갈리는 구간이다."
         elif o == -1 and sg == -1:
-            tail = f"{mood}이며, {flow}. 기대도 가격도 가라앉은 구간이다."
+            tail = f"{mood}이며, {flow.replace('신호)은 아직', '신호)도')}. 분위기도 가격도 어두운 구간이다."
         elif mood and flow:
-            tail = f"{mood}이며, {flow}."
+            tail = f"{mood}이며, {flow.replace('신호)도 ', '신호)은 ')}."
         else:
             tail = (mood + "이다." if mood else flow + ".")
         sents.append("정리하면, " + (price + ", " if price else "") + tail)
