@@ -1,21 +1,93 @@
 {
-  "updated_at": "2026-11-03 21:47:44 UTC",
+  "updated_at": "2026-11-04 01:39:19 UTC",
   "items": [
     {
-      "title": "AMD stock jumps 7% on earnings as data center revenue nearly doubles",
+      "title": "Google responds to political backlash over removing search from schools that ban AI",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/03/google-responds-to-outrage-over-removing-search-in-schools-that-ban-ai.html",
+      "published": "2026-11-04 01:07:01",
+      "title_ko": "구글, AI 금지 학교 검색 차단에 대한 정치적 반발에 대응",
+      "summary_ko": "검색, AI 개요와 함께 재개"
+    },
+    {
+      "title": "Jim Cramer sees signs of life in tech stocks — but not from the usual winners",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/03/jim-cramer-sees-signs-of-life-in-tech-stocks-but-not-from-the-usual-winners.html",
+      "published": "2026-11-03 23:58:09",
+      "title_ko": "짐 크레이머, 테크주에 활기 신호, 하지만 통상적 승자에서 아님",
+      "summary_ko": "새로운 테크주 그룹 시장 주도 가능성 지적"
+    },
+    {
+      "title": "CrowdStrike's new kill switch can stop rogue AI agents in their tracks, CEO says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/03/crowdstrikes-new-kill-switch-can-stop-rogue-ai-agents-in-their-tracks-ceo-says.html",
+      "published": "2026-11-03 23:37:07",
+      "title_ko": "크라우드스트라이크 CEO, 새로운 킬 스위치가 무법 AI 에이전트 차단 가능",
+      "summary_ko": "CEO, 에이전트 안전 작업 시장 기회 언급"
+    },
+    {
+      "title": "Strand bookstore to pay nearly $1.5 million over Covid loan tied to Sen. Wyden's wife",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/03/strand-bookstore-ppp-loan-ron-wyden-wife-settlement.html",
+      "published": "2026-11-03 23:28:01",
+      "title_ko": "스트랜드 서점, 와이든 상원의원 부인 관련 코로나 대출로 약 150만 달러 지급",
+      "summary_ko": "나신시 바스 와이든, 상원의원 부인 자격으로 PPP 승인"
+    },
+    {
+      "title": "Trump DOJ sends target letters to Democrats in Alaska Senate criminal probe: Reports",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/03/trump-doj-election-lawsuits-monitors-2026-midterms.html",
+      "published": "2026-11-03 23:26:39",
+      "title_ko": "트럼프 DOJ, 알래스카 상원 선거 형사 수사 관련 민주당에 대상 통지서 발송: 보도",
+      "summary_ko": "법률방어기금 존 쿠식 변호사, 민주주의 위협 발언"
+    },
+    {
+      "title": "AMD stock jumps 8% on earnings as data center revenue nearly doubles",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/03/amd-amd-q3-earnings-report-2026-.html",
-      "published": "2026-11-03 21:20:14",
+      "published": "2026-11-03 23:04:37",
       "title_ko": "AMD 주가, 데이터센터 매출 거의 두 배로 늘면서 7% 급등",
       "summary_ko": "3분기 실적 발표, 주가 7% 상승"
     },
     {
-      "title": "Ferrari raises 2026 guidance after Q3 earnings beat",
+      "title": "Apple stock sinks as global memory crisis hurts profits, giving Ternus his first big test",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/ferrari-race-earnings-q3-2026.html",
-      "published": "2026-11-03 21:11:34",
-      "title_ko": "페라리, 3분기 실적 호조로 2026년 가이던스 상향",
-      "summary_ko": "3분기 매출 및 조정 EPS, 월가 예상 상회"
+      "link": "https://www.cnbc.com/2026/11/03/apple-earnings-john-ternus-faces-first-test-amid-high-memory-costs.html",
+      "published": "2026-11-03 22:35:24",
+      "title_ko": "애플 존 터너스, 글로벌 메모리 위기로 이익 초반 시험",
+      "summary_ko": "존 터너스, CEO 첫 실적 보고서에서 총 마진 전망 하향"
+    },
+    {
+      "title": "JetBlue raises bag fees for third time in a year as fuel costs bite",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/03/jetblue-checked-bag-fee.html",
+      "published": "2026-11-03 22:26:20",
+      "title_ko": "연료비 부담에 제트블루, 1년 새 세 번째 수하물 요금 인상",
+      "summary_ko": ""
+    },
+    {
+      "title": "미국 중간선거 및 의회 통제권",
+      "title_ko": "미국 중간선거 및 의회 통제권",
+      "summary_ko": "미국 중간선거에서 의회 통제권을 두고 투표가 진행 중이며 결과에 따라 향후 정책과 규제 환경에 큰 영향이 예상",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=gRTvqL2JL9g",
+      "published": "2026-11-03 22:11:19",
+      "kind": "media",
+      "tag": "정책/규제",
+      "direction": "neutral",
+      "n_channels": 3
+    },
+    {
+      "title": "미국-이란 지정학적 긴장과 유가 변동",
+      "title_ko": "미국-이란 지정학적 긴장과 유가 변동",
+      "summary_ko": "종전 협상 기대와 군사적 충돌 우려가 엇갈리며 국제유가와 에너지 관련주에 혼조세를 유발 중",
+      "source": "당잠사",
+      "link": "https://www.youtube.com/watch?v=A86HETRrAFg",
+      "published": "2026-11-03 21:28:48",
+      "kind": "media",
+      "tag": "에너지",
+      "direction": "negative",
+      "n_channels": 4
     },
     {
       "title": "Fannie Mae, Freddie Mac rally as Ackman presses for conservatorship exit",
@@ -24,66 +96,6 @@
       "published": "2026-11-03 20:52:14",
       "title_ko": "패니 메이·프레디 맥, 애크맨 보수관리 종료 촉구에 상승",
       "summary_ko": "중간선거, 보수관리 종료 전환점 가능성"
-    },
-    {
-      "title": "Options traders are betting heavily on these stocks ahead of election results",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/options-traders-are-betting-heavily-on-these-stocks-ahead-of-election-results.html",
-      "published": "2026-11-03 20:51:21",
-      "title_ko": "옵션 트레이더, 선거 결과 앞서 이 주식에 대규모 베팅",
-      "summary_ko": "태양광 주식 콜 매수 급증"
-    },
-    {
-      "title": "Eaton's strong quarter should mark a bottom for shares of the AI buildout winner",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/11/03/eatons-strong-quarter-should-mark-a-bottom-for-shares-of-the-ai-buildout-winner.html",
-      "published": "2026-11-03 20:46:59",
-      "title_ko": "이튼의 강력한 분기, AI 구축 승자 주가 바닥 표시 예상",
-      "summary_ko": "주가 최근 몇 달간 하락"
-    },
-    {
-      "title": "The next wave of luxury real estate: marina developments with yacht parking",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/the-next-wave-of-luxury-real-estate-marinas-with-yacht-parking.html",
-      "published": "2026-11-03 20:41:27",
-      "title_ko": "다음 럭셔리 부동산 파도: 요트 주차 시설 갖춘 마리나 개발",
-      "summary_ko": "글로벌 부유층, 대형 요트 주차용 주거지 탐색"
-    },
-    {
-      "title": "AMD has been crushed into earnings. Here’s one way to trade it",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/amd-has-been-crushed-into-earnings-heres-one-way-to-trade-it.html",
-      "published": "2026-11-03 20:40:51",
-      "title_ko": "실적 발표로 주가 급락한 AMD, 거래 전략 한 가지",
-      "summary_ko": ""
-    },
-    {
-      "title": "Sullivan: What the 2026 midterms could mean for energy investors",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/2026-midterms-energy-investors.html",
-      "published": "2026-11-03 20:36:08",
-      "title_ko": "설리번, 2026년 중간선거가 에너지 투자자에게 의미하는 것",
-      "summary_ko": "민주당 의회, 해상풍력 및 태양광 에너지에 유리"
-    },
-    {
-      "title": "Trump DOJ sends target letters to Democrats in Alaska Senate criminal probe: Reports",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/03/trump-doj-election-lawsuits-monitors-2026-midterms.html",
-      "published": "2026-11-03 20:33:31",
-      "title_ko": "트럼프 DOJ, 알래스카 상원 선거 형사 수사 관련 민주당에 대상 통지서 발송: 보도",
-      "summary_ko": "법률방어기금 존 쿠식 변호사, 민주주의 위협 발언"
-    },
-    {
-      "title": "중동 긴장에 따른 유가 변동",
-      "title_ko": "중동 긴장에 따른 유가 변동",
-      "summary_ko": "이란 관련 리스크와 리스크 프리미엄으로 인해 유가 변동성이 확대 중",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=KVF_NEpYNxM",
-      "published": "2026-11-03 20:31:35",
-      "kind": "media",
-      "tag": "에너지",
-      "direction": "negative",
-      "n_channels": 6
     },
     {
       "title": "미국의 대이란 군사 작전 및 지정학적 리스크",
@@ -95,18 +107,6 @@
       "kind": "media",
       "tag": "지정학",
       "direction": "neutral",
-      "n_channels": 3
-    },
-    {
-      "title": "AI 인프라 투자 및 자금 조달",
-      "title_ko": "AI 인프라 투자 및 자금 조달",
-      "summary_ko": "빅테크 기업들의 지속적인 AI 인프라 투자와 채권 발행 등 자금 조달이 반도체 수요를 견인 중",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=GHpbNLWaC2w",
-      "published": "2026-11-03 17:14:51",
-      "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "positive",
       "n_channels": 3
     }
   ]
