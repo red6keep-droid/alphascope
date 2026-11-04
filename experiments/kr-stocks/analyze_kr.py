@@ -16,6 +16,7 @@ for p in ("stock-radar", "nvda-report", "."):
     sys.path.insert(0, os.path.join(BASE, "..", p))
 sys.path.insert(0, os.path.join(BASE, ".."))   # tech_signals (experiments/)
 import analyze as A  # noqa: E402 — stock-radar (normal_range · period_returns · year_range · bollinger · overheat)
+import crash_watch as CW  # noqa: E402 — 급락장에서 버틴 종목 (experiments/, 코스피가 2% 넘게 내린 날, 2026-11-04)
 import indicators  # noqa: E402 — nvda-report
 import config as NC  # noqa: E402 — nvda-report (RSI_PERIOD 등)
 
@@ -470,6 +471,7 @@ def run(snap, flow_data=None, hist=None):
     stocks = update_ranks(stocks, day)
     market = flows(flow_data, snap["bars"].get(U.BENCH)) or {}
     market["overnight"] = overnight(snap, day)
+    crash = CW.compute(snap["bars"], "kr", [c[0] for c in U.CANDIDATES])   # 급락장에서 버틴 종목 — 홈 `주목할 종목` · 오늘 탭 카드 (2026-11-04 사용자)
     mr = A.market_regime({"bars": {NC.REGIME_BENCHMARK: snap["bars"].get(U.BENCH) or []}})   # 시장 분위기 — 미국과 같은 규칙, KOSPI (VIX 없음 → 불안 국면 판정 없음, 2026-10-31)
     for s in stocks:
         s["market_regime"] = mr
@@ -482,7 +484,9 @@ def run(snap, flow_data=None, hist=None):
         s["fx"] = market.get("fx")
         if s["sym"] == "015760.KS":
             s["wti"] = market.get("wti")
-    return {"day": day, "fetched_at": snap["fetched_at"], "stocks": stocks, "market": market}
+    for s in stocks:
+        s["crash"] = CW.for_stock(crash, s["sym"])
+    return {"day": day, "fetched_at": snap["fetched_at"], "stocks": stocks, "market": market, "crash": crash}
 
 
 if __name__ == "__main__":

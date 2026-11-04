@@ -22,6 +22,7 @@ import signal_groups as SG  # noqa: E402 — 판정 묶음 분류표 (함께 보
 
 import universe as U  # noqa: E402
 import court  # noqa: E402 — 소송 일정 (P270)
+import crash_watch as CW  # noqa: E402 — 급락장에서 어땠나? (오늘 탭, 2026-11-04)
 
 UP, DOWN, NOTE, TINY = _dk.UP, _dk.DOWN, _dk.NOTE, _dk.TINY
 PAD = _dk.SEP_GAP - _dk.VP - 1
@@ -703,11 +704,34 @@ def _today_list(s, events):
     return today
 
 
+def sec_crash(s, dc=None, src="Yahoo Finance"):
+    """`주목할 종목` 구획 — `급락장에서 어땠나?` 카드 (2026-11-04 사용자: 홈 `주목할 종목` 줄을 누르면 이유 카드). 최근 두 거래일 안 급락일에 버틴 종목만, 사실만 —
+    그날 등락 · 지수와 차이 · 최근 2년 급락일 n번 중 m번 · 그날 뉴스 방향 · 업종 자금 · 실적 일정. 왜 버텼는지는 단정하지 않는다(crash_watch). 한국(render_kr)도 같은 함수."""
+    x = s.get("crash")
+    if not x or not x.get("recent") or not x.get("held"):
+        return ""
+    first, lines = CW.card_lines(x, s["name"])
+    lines = [(first, "plain")] + lines
+    if dc is not None and x["day"] == x["latest_bar"]:   # 급락일이 최근 거래일이면 오늘 뉴스 방향(최근 24시간) — 아래 `뉴스` 막대와 같은 수
+        parts = [f"{R.rr.DIR_KO[d]} {dc[d]}건" for d in ("positive", "negative", "uncertain", "neutral") if dc.get(d)]
+        lines.append(("row", "그날 뉴스 방향", " · ".join(parts) if parts else "기사 없음", "최근 24시간 기사 · 공시 · 방송"))
+    sf = s.get("sector_flow")
+    if sf:
+        lines.append(("row", "업종 자금 흐름", sf["state"], f"{sf['name']} 업종 ETF 최근 20거래일, 시장 대비"))
+    nxt = (s.get("earnings") or {}).get("next")
+    if nxt:
+        gap = (datetime.date.fromisoformat(nxt) - datetime.date.fromisoformat(x["day"])).days
+        if 0 <= gap <= 30:
+            lines.append(("row", "실적 발표", f"{_md(nxt)} ({gap}일 뒤)", "급락일 기준"))
+    card = R._state_card("급락장에서 어땠나?", "주목", "positive", R.UP, lines, "", tip=_dk.with_src(CW.tip(x), src), fold=True, opened=True)
+    return R._section("주목할 종목", f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>', tab="오늘")
+
+
 def sec_today_tab(s, news):
-    """오늘 탭 — 중요 이슈(파이썬 틀 : 관련도 높은 사실 문장 최대 5줄) · 뉴스(방향 막대 + 기사). AI 는 분류에만 쓴다."""
+    """오늘 탭 — (급락일이면 `주목할 종목` 카드) · 중요 이슈(파이썬 틀 : 관련도 높은 사실 문장 최대 5줄) · 뉴스(방향 막대 + 기사). AI 는 분류에만 쓴다."""
     if not news:   # 오늘 탭은 늘 둔다 — 없으면 가격 카드 · 상태 카드가 다음 탭(실적과 기대)으로 들어간다
         note = _dk.muted("뉴스를 아직 받지 못했습니다. 다음 갱신 때 채웁니다.")
-        return R._section("중요 이슈", note, tab="오늘") + R._section("뉴스", "", line=False, tab="오늘")
+        return sec_crash(s) + R._section("중요 이슈", note, tab="오늘") + R._section("뉴스", "", line=False, tab="오늘")
     events, counted = _news_for(s, news)
     since = _since()
     dc = {"today": {}, "week": {}}
@@ -723,7 +747,7 @@ def sec_today_tab(s, news):
     today = _today_list(s, events)
     a = {"events": today[:MAX_EVENTS], "events_overflow": today[MAX_EVENTS:MAX_EVENTS + 12], "direction_counts": dc}
     issue_html = R.sec_narrative(a, {"today": issues}) if issues else _dk.muted("최근 7일 동안 이 종목을 주로 다룬 큰 소식이 없습니다.")
-    return _dk.keep_tone(R._section("중요 이슈", issue_html, tab="오늘")   # 뉴스 · 중요 이슈는 합니다체로 바꾸지 않는다 (2026-10-18 사용자)
+    return sec_crash(s, dc["today"]) + _dk.keep_tone(R._section("중요 이슈", issue_html, tab="오늘")   # 뉴스 · 중요 이슈는 합니다체로 바꾸지 않는다 (2026-10-18 사용자)
                          + R._section("뉴스", R.sec_direction_bars(a) + (R.sec_events(a) if today else _dk.muted("오늘은 새 뉴스가 없습니다.")), line=False, tab="오늘"))
 
 
@@ -736,82 +760,100 @@ def _bil(v):
     return f"{v / 1e8:,.0f}억 달러".replace("-", "−")
 
 
-def card_capex(c):
+US_MONEY = {   # 돈 카드의 나라별 글 — 한국 종목(render_kr)은 원 · DART 로 바꿔 넣는다 (2026-11-04)
+    "money": _bil, "scale": 1e8, "unit": "억 달러", "fmt": lambda v: f"{v:,.0f}".replace("-", "−"),
+    "src": "SEC", "form": "10-Q", "src_note": "회사가 SEC 에 낸 분기 · 연간 보고서", "stmt": "SEC 에 낸 현금흐름표", "data": "SEC EDGAR",
+    "partial": "최근 분기 SEC 자료가 아직 없다", "rnd": True,   # rnd = 연구개발비 줄을 두나 (한국 주요 재무제표에는 없다)
+}
+
+
+def card_capex(c, L=US_MONEY):
     """돈을 어디에 쓰나? (2026-10-30 사용자: 기업별 자본 지출 · 자금 조달 현황) — 사실만, 판단 문장 없음. 출처 = 그 분기 10-Q · 10-K 색인 링크.
-    첫 문장 = 최근 분기 설비 투자 · 1년 전 대비 · 영업으로 번 돈 대비 · 연구개발비. 그래프 = 8분기 설비 투자 vs 영업으로 번 돈(억 달러). 줄 = 최근 4분기 합."""
+    첫 문장 = 최근 분기 설비 투자 · 1년 전 대비 · 영업으로 번 돈 대비 · 연구개발비. 그래프 = 8분기 설비 투자 vs 영업으로 번 돈(억 달러). 줄 = 최근 4분기 합.
+    L = 통화 · 출처 글(US_MONEY, 한국은 render_kr.KR_MONEY) — 카드 모양 · 줄 · 툴팁은 두 나라가 같다."""
+    M = L["money"]
     cap, ocf, rnd = c.get("capex"), c.get("ocf"), c.get("rnd")
     if cap is None:   # 은행 · 보험처럼 설비 투자 줄이 따로 없는 회사
-        first = f"최근 분기({R._fd(c['end'])}까지 석 달) 현금흐름표에 설비 투자 항목이 따로 없다(은행 · 보험처럼 영업 자산이 다른 회사). 영업으로 번 돈은 {_bil(ocf)}였다."
+        first = f"최근 분기({R._fd(c['end'])}까지 석 달) 현금흐름표에 설비 투자 항목이 따로 없다(은행 · 보험처럼 영업 자산이 다른 회사). 영업으로 번 돈은 {M(ocf)}였다."
     else:
-        first = f"최근 분기({R._fd(c['end'])}까지 석 달) 설비 투자는 {_bil(cap)}"
+        first = f"최근 분기({R._fd(c['end'])}까지 석 달) 설비 투자는 {M(cap)}"
         first += f"로 1년 전보다 {abs(c['capex_yoy']):.0f}% {'늘었다' if c['capex_yoy'] >= 0 else '줄었다'}." if c.get("capex_yoy") is not None else "다."
     if cap is not None and ocf:
-        first += f" 같은 석 달 영업으로 번 돈 {_bil(ocf)}의 {cap / ocf * 100:.0f}%였다." if ocf > 0 else f" 같은 석 달 영업으로 번 돈은 {_bil(ocf)}였다."
+        first += f" 같은 석 달 영업으로 번 돈 {M(ocf)}의 {cap / ocf * 100:.0f}%였다." if ocf > 0 else f" 같은 석 달 영업으로 번 돈은 {M(ocf)}였다."
     if rnd is not None:
-        first += f" 연구개발비는 {_bil(rnd)}다."
+        first += f" 연구개발비는 {M(rnd)}다."
     # 버튼으로 하나씩 보는 선 그래프 (2026-11-03 사용자) — 영업으로 번 돈 · 설비 투자 · 잉여 현금(= 잉여현금흐름, 음수는 0 선 아래). 설비 투자 줄 없는 회사(JPM)는 둘
-    ser = [(nm, [None if b.get(k) is None else b[k] / 1e8 for b in c["bars"]], col) for k, nm, col in CASH_SERIES if any(b.get(k) is not None for b in c["bars"])]
-    chart = line_tabs(f"lt-{c['sym']}-cash", [_dk.q_axis(b["cq"]) for b in c["bars"]], ser, lambda v: f"{v:,.0f}".replace("-", "−"), "억 달러")
-    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 {" · ".join(nm for nm, _, _ in ser)} (억 달러)</span>{chart}', "html")]
+    scale, fmt, unit = L["chart"]([b[k] for b in c["bars"] for k, _, _ in CASH_SERIES if b.get(k) is not None]) if L.get("chart") else (L["scale"], L["fmt"], L["unit"])
+    ser = [(nm, [None if b.get(k) is None else b[k] / scale for b in c["bars"]], col) for k, nm, col in CASH_SERIES if any(b.get(k) is not None for b in c["bars"])]
+    chart = line_tabs(f"lt-{c['sym']}-cash", [_dk.q_axis(b["cq"]) for b in c["bars"]], ser, fmt, unit)
+    lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}분기 {" · ".join(nm for nm, _, _ in ser)} ({unit})</span>{chart}', "html")]
     sm, n4 = c["sum4"], c["n4"]
     tag = f"최근 {n4}분기 합" if n4 == 4 else "최근 4분기 없음"
-    nil = "최근 분기 SEC 자료가 아직 없다" if c.get("partial") else None   # Yahoo 로 더한 분기는 설비 투자 · 영업으로 번 돈뿐 (P280)
+    nil = L["partial"] if c.get("partial") else None   # Yahoo 로 더한 분기는 설비 투자 · 영업으로 번 돈뿐 (P280)
     if sm.get("capex") is not None:
         note = tag + (f" · 그 전 4분기보다 {R._sgn(c['chg4'], 0)}%" if c.get("chg4") is not None else "")
         if sm.get("ocf"):
             note += f" · 영업으로 번 돈의 {sm['capex'] / sm['ocf'] * 100:.0f}%"
-        lines.append(("row", "설비 투자", _bil(sm["capex"]), note))
+        lines.append(("row", "설비 투자", M(sm["capex"]), note))
     else:
         lines.append(("row", "설비 투자", "미수집", "회사가 이 항목을 따로 적지 않았다"))
     # 현금 창출력 (2026-11-03 사용자: 매출 흐름 · 이익 흐름 · 현금 흐름 · 잉여현금흐름을 따로) — 영업으로 번 돈은 순이익과, 잉여현금흐름은 매출 성장과 나란히
     if sm.get("ocf") is not None:
-        note = tag + (f" · 순이익 {_bil(sm['ni'])}의 {sm['ocf'] / sm['ni'] * 100:.0f}%" if sm.get("ni") and sm["ni"] > 0 and sm["ocf"] > 0 else "")   # 은행(JPM)은 영업현금흐름이 음수로 나오기도 — 비율 생략
-        lines.append(("row", "영업으로 번 돈", _bil(sm["ocf"]), note))
+        note = tag + (f" · 순이익 {M(sm['ni'])}의 {sm['ocf'] / sm['ni'] * 100:.0f}%" if sm.get("ni") and sm["ni"] > 0 and sm["ocf"] > 0 else "")   # 은행(JPM)은 영업현금흐름이 음수로 나오기도 — 비율 생략
+        lines.append(("row", "영업으로 번 돈", M(sm["ocf"]), note))
     if sm.get("fcf") is not None:
         if c.get("fcf_chg4") is not None and sm["fcf"] > 0:
             note = tag + f" · 그 전 4분기보다 {R._sgn(c['fcf_chg4'], 0)}%"
         elif sm.get("fcf_prev") is not None:   # 부호가 바뀌면(AMZN 2026) 비율 대신 값으로
-            note = tag + f" · 그 전 4분기는 {_bil(sm['fcf_prev'])}"
+            note = tag + f" · 그 전 4분기는 {M(sm['fcf_prev'])}"
         else:
             note = tag
         if c.get("rev_chg4") is not None:
             note += f" (같은 기간 매출 {R._sgn(c['rev_chg4'], 0)}%)"
-        lines.append(("row", "잉여현금흐름", _bil(sm["fcf"]), note))
+        lines.append(("row", "잉여현금흐름", M(sm["fcf"]), note))
     elif sm.get("capex") is None:
         lines.append(("row", "잉여현금흐름", "미수집", "설비 투자 줄이 없어 계산하지 않았다"))
-    lines.append(("row", "연구개발비", _bil(sm.get("rnd")), tag if sm.get("rnd") is not None else nil or "회사가 이 항목을 따로 적지 않았다"))
+    if L.get("rnd", True):
+        lines.append(("row", "연구개발비", M(sm.get("rnd")), tag if sm.get("rnd") is not None else nil or "회사가 이 항목을 따로 적지 않았다"))
     if sm.get("debt_in") is not None or sm.get("debt_out") is not None:
-        lines.append(("row", "빌린 돈 (채권 · 차입)", _bil(sm.get("debt_in")), tag + (f" · 갚은 돈 {_bil(sm['debt_out'])}" if sm.get("debt_out") is not None else "")))
+        lines.append(("row", "빌린 돈 (채권 · 차입)", M(sm.get("debt_in")), tag + (f" · 갚은 돈 {M(sm['debt_out'])}" if sm.get("debt_out") is not None else "")))
     else:
         lines.append(("row", "빌린 돈 (채권 · 차입)", "미수집", nil or "이 기간 발행 · 상환을 따로 적지 않았다"))
     if sm.get("stock_in") and sm["stock_in"] > 0:   # 음수(세금 원천징수 차감 등)는 안 보인다
-        lines.append(("row", "주식 발행으로 들어온 돈", _bil(sm["stock_in"]), tag))
-    lines.append(("row", "자사주 매입", _bil(sm.get("buyback")), tag if sm.get("buyback") is not None else nil or "이 기간 매입을 따로 적지 않았다"))
-    lines.append(("row", "배당", _bil(sm.get("div")), tag if sm.get("div") is not None else nil or "이 기간 배당을 따로 적지 않았다"))
+        lines.append(("row", "주식 발행으로 들어온 돈", M(sm["stock_in"]), tag))
+    lines.append(("row", "자사주 매입", M(sm.get("buyback")), tag if sm.get("buyback") is not None else nil or "이 기간 매입을 따로 적지 않았다"))
+    lines.append(("row", "배당", M(sm.get("div")), tag if sm.get("div") is not None else nil or "이 기간 배당을 따로 적지 않았다"))
+    # 주주환원 여력 (2026-11-04 사용자: "배당과 자사주 매입 여력이 있는가") — 배당 + 자사주를 잉여현금흐름과 견준다. 사실만, 많다 · 적다 말 없음
+    ret = [sm.get("div"), sm.get("buyback")]
+    if any(v is not None for v in ret):
+        tot, f4 = sum(v or 0 for v in ret), sm.get("fcf")
+        note = tag + (f" · 잉여현금흐름의 {tot / f4 * 100:.0f}%" if f4 and f4 > 0 else " · 잉여현금흐름이 마이너스" if f4 is not None and f4 <= 0 else "")
+        lines.append(("row", "주주에게 돌려준 돈 (배당 + 자사주)", M(tot), note))
     if sm.get("lease"):
-        lines.append(("row", "금융리스 상환", _bil(sm["lease"]), tag + " · 리스로 들여온 설비의 원금"))
+        lines.append(("row", "금융리스 상환", M(sm["lease"]), tag + " · 리스로 들여온 설비의 원금"))
     if c.get("cash") is not None:
-        lines.append(("row", "현금", _bil(c["cash"]), f"{R._fd(c['end'])} 기준"))
+        lines.append(("row", "현금", M(c["cash"]), f"{R._fd(c['end'])} 기준"))
     if c.get("debt") is not None:
-        lines.append(("row", "장기 부채", _bil(c["debt"]), f"{R._fd(c['end'])} 기준"))
+        lines.append(("row", "장기 부채", M(c["debt"]), f"{R._fd(c['end'])} 기준"))
     if c.get("src"):
-        lines.append(("row", "출처", f'<a href="{_esc(c["src"])}" target="_blank" rel="noopener" style="color:inherit;">SEC {_esc(c.get("form") or "10-Q")} ›</a>', "회사가 SEC 에 낸 분기 · 연간 보고서", True))
+        lines.append(("row", "출처", f'<a href="{_esc(c["src"])}" target="_blank" rel="noopener" style="color:inherit;">{L["src"]} {_esc(c.get("form") or L["form"])} ›</a>', L["src_note"], True))
     # 긴 용어 풀이 툴팁 (2026-11-03 사용자: "너무 헷갈리니 매출 · 순이익 · 영업으로 번 돈 · 잉여 현금 · 설비 투자 · 배당 · 현금을 예를 들어 아주 자세히") — 가이드라인 2-6 길이 규칙의 예외.
     # 예는 한 회사의 한 분기(억 달러)로 숫자를 이어 간다 : 매출 100 → 순이익 20 → 영업으로 번 돈 30 → 설비 투자 12 → 잉여 현금 18 → 배당 · 자사주 10 → 현금 잔액 58. 매출 카드 툴팁의 예와 같은 숫자
-    tip = ("회사가 번 돈을 어디에 쓰고, 모자란 돈을 어떻게 끌어오는지, 회사가 SEC 에 낸 현금흐름표 그대로. 용어가 헷갈리기 쉬워 한 회사의 한 분기를 예로 든다(억 달러)\n"
+    tip = (f"회사가 번 돈을 어디에 쓰고, 모자란 돈을 어떻게 끌어오는지, 회사가 {L['stmt']} 그대로. 용어가 헷갈리기 쉬워 한 회사의 한 분기를 예로 든다({L['unit']})\n"
            "· 매출 : 석 달 동안 물건 · 서비스를 판 금액. 장부 기준이라 외상으로 팔아 아직 못 받은 돈도 들어간다. 예 100\n"
            "· 순이익 : 매출에서 원가 · 인건비 · 이자 · 세금 등 모든 비용을 뺀 장부상 이익. 예 매출 100에서 비용 80을 빼 20\n"
            "· 영업으로 번 돈 : 본업을 돌리며 실제로 통장에 들어온 현금에서 나간 현금을 뺀 것(영업현금흐름). 순이익과 다른 까닭은 장부와 현금이 다르기 때문. 공장 · 장비 값을 해마다 나눠 적는 감가상각은 장부 비용이지만 현금이 나가지 않아 다시 더하고, 외상 매출은 장부에는 있지만 현금이 안 들어와 뺀다. 예 순이익 20에 감가상각 10을 더해 30\n"
            "· 설비 투자 : 데이터 센터 · 공장 · 장비처럼 오래 쓰는 자산을 사는 데 쓴 돈(자본 지출). 사업을 이어 가려면 꼭 써야 하는 돈이라 영업으로 번 돈에서 먼저 뺀다. 리스로 들여온 설비는 여기에 안 들어가 `금융리스 상환` 줄을 따로 둔다. 예 12\n"
            "· 잉여 현금 : 영업으로 번 돈에서 설비 투자를 뺀 것(잉여현금흐름). 빚 갚기 · 배당 · 자사주 매입 · 새 사업에 자유롭게 쓸 수 있어 '남는 돈' 이라 부른다. 설비 투자가 번 돈보다 크면 마이너스가 되고 그래프에서 0 선 아래로 내려간다. 매출 성장률과 나란히 두면 외형만 크는지 현금 창출까지 느는지 보인다. 예 30에서 12를 빼 18\n"
            "· 배당 : 잉여 현금 가운데 주주에게 현금으로 나눠 준 돈. 자사주 매입은 회사가 자기 주식을 사들여 주식 수를 줄이는 것으로, 배당과 함께 주주에게 돌려주는 두 가지 방법. 예 배당 5 · 자사주 5\n"
+           "· 주주에게 돌려준 돈 : 배당과 자사주 매입을 더한 것. 잉여 현금의 몇 % 인지가 돌려줄 여력. 100% 를 넘으면 그 기간 남은 돈보다 많이 돌려준 것이라, 모자란 만큼 현금 잔액이 줄거나 빌린 돈으로 메운다. 예 10, 잉여 현금 18의 56%\n"
            "· 현금 : 분기 말 회사 통장에 남아 있는 돈(잔액). 위 줄들은 석 달 동안 움직인 돈이고, 현금과 장기 부채는 그날의 잔액이라 서로 더하거나 빼지 않는다. 예 지난 분기 말 50에 잉여 현금 18을 더하고 배당 · 자사주 10을 빼 58\n"
            "· 빌린 돈 · 갚은 돈 : 채권을 찍거나 은행에서 빌린 돈과 갚은 돈. 잉여 현금이 모자라면 여기서 메우고, 남으면 갚는 데 쓴다\n"
            "· 순이익 대비 % : 영업으로 번 돈 줄의 비율. 100% 언저리면 장부 이익이 현금으로 잘 바뀌는 것, 훨씬 낮으면 외상이 쌓이거나 재고에 돈이 묶인 것\n"
            "· 그래프 : 왼쪽 위 버튼을 누르면 그 선만 색과 숫자가 보이고 나머지는 회색 선으로 남는다\n"
            "· 늘리는 중 · 줄이는 중 : 최근 4분기 설비 투자 합이 그 전 4분기 합보다 10% 넘게 많으면 늘리는 중, 10% 넘게 적으면 줄이는 중. 분기 값은 들쭉날쭉해 합으로 본다"
            + ("\n· 이 회사는 SEC 공용 자료에 빈 분기가 있어 설비 투자 · 영업으로 번 돈 일부를 Yahoo Finance 분기 현금흐름으로 채웠다. 4분기 합을 견줄 수 없으면 최근 분기를 1년 전 같은 분기와 비교한다" if c.get("yahoo") else ""))
-    return lines, _dk.with_src(tip, "SEC EDGAR · Yahoo Finance" if c.get("yahoo") else "SEC EDGAR")   # P280
+    return lines, _dk.with_src(tip, f"{L['data']} · Yahoo Finance" if c.get("yahoo") else L["data"])   # P280
 
 
 PROFIT_ROWS = (("gp", "매출총이익", "매출에서 만드는 데 든 돈을 뺀 몫"), ("opinc", "영업이익", "본업에서 남긴 돈"), ("ni", "순이익", "세금 · 이자까지 다 뺀 최종 이익"))

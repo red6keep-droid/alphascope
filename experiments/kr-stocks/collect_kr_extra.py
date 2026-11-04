@@ -2,6 +2,7 @@
 
 미국 종목(stock-radar collect_extra)과 같은 칸 모양으로 둔다 — 카드 판정 · 그림은 미국 카드 함수(analyze_tabs · nvda render_html)를 그대로 쓴다.
 - 매출 : OpenDART 분기 매출(collect_kr_dart — 4년치, 1년 전 대비 8분기). DART 에 없는 종목(은행 · 보험 — 매출액 계정 없음)은 Yahoo quarterly_income_stmt(최근 5~6분기).
+- 이익 · 현금흐름 : OpenDART 전체 재무제표 분기 표(collect_kr_fin — 매출총이익 · 영업이익 · 순이익 · 영업현금흐름 · 설비 투자 · 배당 · 자사주 · 차입, 2026-11-04) → extra["capex"].
 - 1주당 이익 예상 : eps_trend · eps_revisions 의 +1y (nvda-report expect._eps 그대로).
 - 실적 발표일 : earnings_dates (지난 · 앞으로). 한국 회사는 장 전 · 장중 발표가 많아 그날 반응으로 본다(when=bmo).
 옵션(개별 종목 옵션 없음) · 공매도(Yahoo 에 없음, 한국거래소 자료는 약관 확인 전)는 받지 않는다.
@@ -90,6 +91,11 @@ def run():
                 out["revenue"]["series"][sym] = rows
     except Exception as e:  # noqa: BLE001 — DART 가 막혀도 Yahoo 매출로 간다
         print(f"[kr-extra] DART 실패 — Yahoo 매출로: {str(e)[:120]}")
+    try:   # 돈을 어디에 쓰나 · 이익 줄 — DART 손익 · 현금흐름 분기 표 (2026-11-04 사용자, 미국 extra["capex"] 와 같은 모양). 실패하면 그 카드만 없다
+        import collect_kr_fin
+        out["capex"] = collect_kr_fin.run()
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr-extra] DART 손익 · 현금흐름 실패: {str(e)[:120]}")
     try:   # 기업 정보 탭 — DART 기업개황 (2026-10-29 P84)
         import collect_kr_dart
         out["company"] = collect_kr_dart.company()
