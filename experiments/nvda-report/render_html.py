@@ -787,7 +787,7 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
     return out
 
 
-def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, broker=None, news_ops=None, chart=""):
+def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, broker=None, news_ops=None):
     """`의견` 탭 (2026-11-01 사용자 P197) — 옛 한 장 `애널리스트 · 방송 의견은?`(P90)을 강조 카드 둘로 나눈다: `애널리스트 의견은?` · `방송 의견은?`.
     접힌 머리에서 두 답(예: 매수 · 매도)을 따로 보고, 누르면 그쪽 내용만 펼친다 — 둘 다 접힌 채로. 함께 보기는 두 카드 아래 따로 흰 카드.
     두 카드는 의견이 없어도 늘 둔다 — 답 `없음` (2026-11-01 사용자 P199: 방송 의견이 없다고 카드가 사라지면 안 된다).
@@ -796,8 +796,10 @@ def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, br
     cards = analysts_card(cells, close, m0, m2, opened=True)   # 탭 첫 강조 카드는 펼침 (2026-11-01 사용자 P216)
     cards += (broker_card(name, broker, close, money) if broker is not None else "") + picks_card(name, ps, close, money)
     cards += news_opinion_card(name, news_ops) if news_ops is not None else ""
-    cards += together_card(together())   # 데이터 전망 = 셋째 강조 카드 (P206)
-    return chart + f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>'   # chart = 탭 맨 위 `최근 5거래일 의견과 주가` (opinions_chart, P290)'
+    t = together()
+    cards += together_card(t)   # 데이터 전망 = 셋째 강조 카드 (P206)
+    summary = opinions_summary(name, cells, close, ps, broker, news_ops, (t if isinstance(t, dict) else {"items": t}).get("items"), money)   # 탭 맨 위 요약 문단 (P295)
+    return summary + f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>'
 
 
 def analysts_card(cells, close, m0=None, m2=None, opened=False):
@@ -1227,100 +1229,104 @@ def picks_card(name, ps, close, money, span=PICK_SPAN, together=""):
     return _state_card("방송 의견은?", word, pick_theme(word)[0], PICK_THEME.get(word, ("", "#111"))[1], lines, "", tip=_dk.with_src(tip, "유튜브 방송 요약"), fold=True)   # 보유 · 관망 · 엇갈림 = 검정 글씨 (P201)
 
 
-# ---------------------------------------------------------------- 의견 탭 맨 위 그림 — 최근 5일 종가 위에 의견 점 (2026-11-04 사용자 P290: "종합적인 의견 그래프 · 시각적인 게 상단에")
 
 
+# ---------------------------------------------------------------- 의견 탭 맨 위 요약 문장 (2026-11-04 사용자 P295: 그래프는 포기, 애널리스트 · 증권사 · 방송 · 뉴스 · 신호를 문장으로)
 
-def _local_day(iso, tz):
-    try:
-        t = datetime.datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
-    except ValueError:
-        return str(iso)[:10]
-    return (t.astimezone(tz) if t.tzinfo else t.replace(tzinfo=datetime.timezone.utc).astimezone(tz)).date().isoformat()
+DIR_WORD = {1: "▲ 상승 쪽", -1: "▼ 하락 쪽", 0: "중립"}
+DIR_COL = {1: UP, -1: DOWN}
 
 
-OPC_CLOSE = "#111"   # 의견 그림의 종가 선 — 방향 색(빨강 · 파랑 · 회색)과 겹치지 않는 검정 (P294)
-OPC_DIR_COLOR = {1: UP, -1: DOWN, 0: MUTED}   # 한 자 — ▲ 상승 쪽 빨강 · ▼ 하락 쪽 파랑 · 중립 회색 (신호 카드와 같은 자, P291)
-OPC_DIR_WORD = {1: "▲ 상승 쪽", -1: "▼ 하락 쪽", 0: "중립"}
-MOVE_DIR = {"상향": 1, "하향": -1, "유지": 0}
+def _dir_html(d):
+    """방향 말 — ▲ 상승 쪽 빨강 굵게 · ▼ 하락 쪽 파랑 굵게 · 중립 검정 굵게 (가이드라인 3-3 증감 색 · 신호 용어 ▲ · ▼ · 중립)."""
+    return f'<b style="font-weight:700;color:{DIR_COL.get(d, "#111")};">{DIR_WORD[d]}</b>'
 
 
-def opinion_items(ps, broker, news_ops, cells, close, tz, days, money):
-    """네 출처를 한 자로 (2026-11-04 사용자 P291: "4가지 매체를 통일된 규격으로 재해석") — 신호 카드의 ▲ 상승 쪽 · ▼ 하락 쪽 · 중립.
-    events  = 날짜 있는 의견(사건) [(날짜, 방향 +1 · −1 · 0, 설명)] — 증권사 변경(창 안) · 방송 · 뉴스 의견
-    targets = 목표가(상태) [(가격, 종류 mean · broker · pick, 설명)] — 애널리스트 평균 · 증권사 최신(회사마다 하나) · 방송(목표가 말한 것)
-    analyst = (답 말, 방향) — 애널리스트 지금 다수 의견(상태, 날짜 없음). 없으면 None."""
+def _b(s):
+    return f'<b style="font-weight:700;">{s}</b>'
+
+
+def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, span=PICK_SPAN, broker_days=None):
+    """의견 탭 맨 위 요약 문단 (P295) — 애널리스트 · 증권사 목표가 변경 · 방송 의견 · 뉴스 의견 · Alpha Scope 신호를 한 문단으로, 끝에 `대체로 …` 한 문장.
+    증감 숫자 · 방향 말은 ▲ · ▼ 와 색 · 굵게(공통 규칙). 자료가 없는 출처는 짧게 `없다` 로 모은다. 예측이 아니라 지금 의견의 정리 — 이 블로그의 추천이 아니다.
+    cells = 애널리스트 칸, broker = 증권사 변경(30일, 최신 먼저), ps = 방송 의견(5거래일), news_ops = 뉴스 의견(없는 시장은 None), items = 함께 보기 줄(신호)."""
+    import signal_groups as SG
+    broker_days = broker_days or BROKER_DAYS   # 아래에서 정의되는 상수
+    nm = _esc(name)
     money0 = lambda v: re.sub(r"\.00\b", "", money(v))   # noqa: E731
-    events, targets = [], []
-    for p in ps or []:
-        who = p.get("speaker") or p.get("channel") or ""
-        d = PICK_DIR_NUM.get(p["action"], 0)
-        events.append((_local_day(p["published_at"], tz), d, f"방송 {who} {p['action']}" + (f" · 목표가 {money0(p['target'])}" if p.get("target") else "")))
-        if _sane_target(p.get("target"), close) and p.get("currency") in ("", "KRW", "USD"):
-            targets.append((p["target"], "pick", f"방송 {who} 목표가 {money0(p['target'])}"))
-    seen = set()
-    for c in sorted(broker or [], key=lambda c: str(c.get("at") or ""), reverse=True):   # 최신 먼저 — 회사마다 최신 목표가 하나
+    sents, dirs = [], {}   # dirs = 출처별 방향 (대체로 문장용)
+    # 1. 애널리스트 — 다수 의견 + 평균 목표가 (종가 대비 ▲ · ▼)
+    v = analysts_verdict({"status": {"analysts": cells or []}, "headline": {"close": close}}, rich=True) if cells else None
+    if v:
+        state, text = v
+        dirs["애널리스트"] = {"매수": 1, "매도": -1}.get(state, 0)
+        pm = next((c["value"] for c in cells if c.get("key") == "pt_mean"), None)
+        if pm and close:
+            text += f" 평균 목표가({_b(money0(pm))})는 지금 종가보다 {_dk.arrow((pm / close - 1) * 100, 1)} {'위' if pm >= close else '아래'}다."   # 괄호 뒤 `는` — 통화 · 원 뒤 조사 문제 없이
+        sents.append(text)
+    # 2. 증권사 — 건수 · 상향 / 하향 / 유지 · 가장 최근 변경
+    none = []
+    if broker:
+        n = {k: sum(1 for c in broker if broker_move(c) == k) for k in MOVE_ORDER}
+        dirs["증권사"] = SG.vote([{"상향": 1, "하향": -1}.get(broker_move(c), 0) for c in broker])
+        cnt = " · ".join(f'{_b(f"{k} {n[k]}건")}' for k in MOVE_ORDER if n[k])
+        c = broker[0]
         mv = broker_move(c)
-        d = _local_day(c.get("at"), tz)
-        firm = c.get("firm") or "증권사"
-        if days and d >= days[0]:
-            events.append((d, MOVE_DIR[mv], f"증권사 {firm} {mv}" + (f" · 목표가 {money0(c['pt'])}" if c.get("pt") else "")))
-        if _sane_target(c.get("pt"), close) and firm not in seen:
-            seen.add(firm)
-            targets.append((c["pt"], "broker", f"{firm} 목표가 {money0(c['pt'])} ({_pick_when(c.get('at'))[:5]})"))
-    for x in news_ops or []:
-        k = x.get("direction") or "neutral"
-        events.append((_local_day(x["published_at"], tz), {"positive": 1, "negative": -1}.get(k, 0), f"뉴스 {x.get('source') or ''} {TONE_OF.get(k, '중립')}"))
-    a = {"status": {"analysts": cells or []}, "headline": {"close": close}}
-    v = analysts_verdict(a) if cells else None
-    analyst = (v[0], PICK_DIR_NUM.get(v[0], 0)) if v else None
-    pm = next((c["value"] for c in cells or [] if c.get("key") == "pt_mean"), None)
-    if _sane_target(pm, close):
-        targets.insert(0, (pm, "mean", f"애널리스트 평균 목표가 {money0(pm)}"))
-    return {"events": events, "targets": targets, "analyst": analyst, "close": close}
-
-
-def _sane_target(t, close):
-    """목표가가 종가의 1/3 ~ 3배 안에 있을 때만 그린다 — 수집기가 단위를 빠뜨린 값(SK하이닉스 `350원`)이 세로축을 망가뜨리지 않게."""
-    return bool(t) and (not close or close / 3 <= t <= close * 3)
-
-
-PICK_DIR_NUM = {"매수": 1, "매도": -1}   # 방송 · 애널리스트 답 말 → 방향 (보유 · 관망 · 엇갈림 = 0)
-
-
-def opinions_chart(days, closes, items, fmt, cid="lt-op"):
-    """`최근 5거래일 의견과 주가` — 의견 탭 맨 위 그림 한 장 (P290 → P294 버튼 선 그래프).
-    `돈을 어디에 쓰나` 와 같은 버튼 선 그래프(line_tabs)에 날짜별 의견 건수 세 선 — ▲ 상승 쪽(매수 · 상향 · 긍정) 빨강 · 중립(보유 · 관망 · 유지) 회색 · ▼ 하락 쪽(매도 · 하향 · 부정) 파랑 —
-    과 종가 선(제 범위로 겹침, overlay)을 한 칸에 겹친다 (2026-11-04 사용자: "매수 · 보유 · 매도 선 그래프와 종가가 다 겹쳐 있으면 날짜별 개수가 바로 보인다").
-    눈금은 건수(정수), 종가는 눈금 없이 — 버튼을 누르면 그 선만 색 · 숫자(종가는 가격). 제목 줄 오른쪽 = 애널리스트 지금 다수 의견(상태라 날짜에 못 찍는다). 의견이 하나도 없으면 ""."""
-    n = len(days)
-    ev, analyst = items["events"], items["analyst"]
-    if not n or not ev:
+        firm = _esc(c.get("firm") or "증권사")
+        pt, pp = c.get("pt"), c.get("pt_prior")
+        if pt and pp and pp != pt:   # 회사 이름 뒤 조사(이 · 가)를 피해 `{회사}의 목표가 하향(…)` 꼴
+            last = f" 가장 최근은 {firm}의 목표가 {'상향' if pt > pp else '하향'}({money0(pp)} → {_b(money0(pt))}, {_dk.arrow((pt / pp - 1) * 100, 1)})이다."
+        elif pt:
+            last = f" 가장 최근은 {firm}의 목표가 {_b(money0(pt))}({mv})이다."
+        else:
+            last = f" 가장 최근은 {firm}의 {_esc(_grade_ko(c.get('to')) or mv)} 의견이다."
+        sents.append(f"최근 {broker_days}일 증권사 목표가 변경은 {len(broker)}건으로 {cnt}이다." + last)
+    elif broker is not None:
+        none.append(f"최근 {broker_days}일 증권사 목표가 변경")
+    # 3. 방송 — 건수 · 의견별 · 가장 최근
+    if ps:
+        n = {k: sum(1 for p in ps if p["action"] == k) for k in PICK_ORDER}
+        dirs["방송"] = SG.vote([{"매수": 1, "매도": -1}.get(p["action"], 0) for p in ps])
+        cnt = " · ".join(f'<b style="font-weight:700;color:{PICK_THEME.get(k, ("", "#111"))[1]};">{k} {n[k]}건</b>' for k in PICK_ORDER if n[k])
+        p = max(ps, key=lambda p: str(p.get("published_at") or ""))
+        who = _esc(re.sub(r"\s+\(", "(", p.get("speaker") or p.get("channel") or ""))
+        sents.append(f"방송에서는 최근 {span} {nm} 의견이 {len(ps)}건({cnt}) 나왔고, 가장 최근은 {who}의 {_b(p['action'])} 의견이다.")
+    else:
+        none.append(f"최근 {span} 방송 의견")
+    # 4. 뉴스 의견 기사
+    if news_ops:
+        n = {k: sum(1 for x in news_ops if TONE_OF.get(x.get("direction"), "중립") == k) for k in TONE_ORDER}
+        dirs["뉴스"] = SG.vote([{"positive": 1, "negative": -1}.get(x.get("direction"), 0) for x in news_ops])
+        cnt = " · ".join(f'<b style="font-weight:700;color:{TONE_THEME.get(k, ("", "#111"))[1]};">{k} {n[k]}건</b>' for k in TONE_ORDER if n[k])
+        sents.append(f"{nm}을 다룬 의견 기사는 {len(news_ops)}건({cnt})이다.".replace(f"{nm}을", _esc(_dk.josa(name, "을"))))
+    elif news_ops is not None:
+        none.append("의견 기사")
+    if none:
+        sents.append(" · ".join(none[:-1] + [_dk.josa(none[-1], "은")]) + " 없다.")   # `의견 기사는 없다` · `방송 의견은 없다` (조사)
+    # 5. Alpha Scope 신호 — 단기 · 중기
+    rows = [x for x in items or [] if x and x[1]]
+    if rows:
+        hv = SG.horizon_votes(rows)
+        s_d, m_d = hv["단기"][0], hv["중기"][0]
+        if s_d is not None:
+            dirs["신호"] = s_d
+            sents.append(f"Alpha Scope 신호는 단기 {_dir_html(s_d)}" + (f", 중기 {_dir_html(m_d)}이다." if m_d is not None else "이다."))
+    # 6. 대체로 — 바깥 의견(애널리스트 · 증권사 · 방송 · 뉴스)이 어느 쪽으로 모이나, 우리 신호와 같은 방향인가
+    outside = [d for k, d in dirs.items() if k != "신호" and d is not None]
+    if outside:
+        o = SG.vote(outside)
+        ups, dns = sum(1 for d in outside if d == 1), sum(1 for d in outside if d == -1)
+        if o == 0 and ups and dns:
+            tail = f"대체로 바깥 의견은 {_dir_html(1)}과 {_dir_html(-1)}으로 엇갈린다."
+        else:
+            tail = f"대체로 바깥 의견은 {_dir_html(o)}으로 모인다." if o else "대체로 바깥 의견은 중립에 가깝다."
+        if "신호" in dirs:
+            sg = dirs["신호"]
+            tail += (" Alpha Scope 신호도 같은 방향이다." if sg == o and o != 0 else f" Alpha Scope 신호는 {_dir_html(sg)}이라 다르다." if sg != o else " Alpha Scope 신호도 중립이다.")
+        sents.append(tail)
+    if not sents:
         return ""
-
-    def col(d):   # 날짜 → 칸. 창보다 앞이면 첫 칸, 뒤면 끝 칸, 장 없는 날은 다음 거래일 칸
-        return 0 if d <= days[0] else n - 1 if d >= days[-1] else next(i for i, x in enumerate(days) if x >= d)
-    cnt = [{1: 0, 0: 0, -1: 0} for _ in days]
-    for d, dr, label in ev:
-        cnt[col(d)][dr] += 1
-    series = [("▲ 상승 쪽", [c[1] for c in cnt], UP), ("중립", [c[0] for c in cnt], MUTED), ("▼ 하락 쪽", [c[-1] for c in cnt], DOWN)]   # 신호 카드와 같은 자 · 색
-    chart = line_tabs(cid, [d[5:].replace("-", ".") for d in days], series, lambda v: f"{v:,.0f}", "건",
-                      overlay=("종가", [closes.get(d) for d in days], OPC_CLOSE, fmt), int_ticks=True)   # 종가는 검정 — ▼ 파랑 · 공용 파랑(LINE_THIS)과 헷갈리지 않게
-    if not chart:
-        return ""
-    n_up, n_dn, n_mid = (sum(c[v] for c in cnt) for v in (1, -1, 0))
-    tip = (f"최근 {PICK_SPAN} 동안 날마다 나온 바깥 의견(증권사 등급 · 목표가 변경, 방송, 뉴스 의견 기사)을 한 자로 센 선 — ▲ 상승 쪽 = 매수 · 상향 · 긍정, ▼ 하락 쪽 = 매도 · 하향 · 부정, 중립 = 보유 · 관망 · 유지. "
-           f"종가 선은 제 범위로 겹쳐 놓은 비교용(눈금은 건수만). 버튼을 누르면 그 선만 숫자. 주말 · 휴장일 의견은 다음 거래일. 제목 오른쪽 = 애널리스트 지금 다수 의견\n"
-           f"· 지금 : {n_up + n_mid + n_dn}건 — ▲ {n_up} · 중립 {n_mid} · ▼ {n_dn}\n· 이 블로그의 추천이 아니다")
-    right = ""
-    if analyst:
-        w, dr = analyst
-        word = {1: f"▲ {w}", -1: f"▼ {w}"}.get(dr, w)
-        right = f'<span style="flex:none;font-weight:700;font-size:{TINY};line-height:20px;color:{OPC_DIR_COLOR[dr] if dr else "#111"};"><span style="font-weight:400;color:{NOTE};">애널리스트 </span>{_esc(word)}</span>'
-    title = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 {_dk.CHART_TITLE_GAP}px;">'
-             f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}최근 {PICK_SPAN} 의견과 주가{_tipx(_dk.with_src(tip, "Yahoo Finance · 유튜브 방송 요약 · Google 뉴스"))}</span>{right}</span>')
-    return f'<div data-cards="1" data-opchart="1" style="margin:0 0 14px;">{title}{chart}</div>'
-
+    return f'<p data-op-summary="1" style="{_dk.SEO_LEAD}">{" ".join(sents)}</p>'
 
 LT_GRAY = "#CBD5E1"   # 버튼 선 그래프에서 안 누른 선
 

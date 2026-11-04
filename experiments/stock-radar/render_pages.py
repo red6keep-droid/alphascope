@@ -557,14 +557,8 @@ def _picks(s):
 def card_opinions(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 공용 R.opinions_cards (한국 · 미국 같은 카드, 2026-11-01 사용자 P197)."""
     ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
-    nops = _news_opinions(s)
-    money = lambda v: f"${v:,.2f}"   # noqa: E731
-    bars = BARS.get(s["sym"]) or []
-    days = R.pick_window(bars, NY, now=NOW)[0]
-    items = R.opinion_items(ps, s.get("broker") or [], nops, s.get("analysts") or [], s.get("close"), NY, days, money)   # 네 출처 한 자 (P291)
-    chart = R.opinions_chart(days, {b["day"]: b["close"] for b in bars[-10:]}, items, money, cid=f"lt-{s['sym']}-op")   # 탭 맨 위 그림 (P290 · P294)
-    return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, money, lambda: together_items(s),
-                            broker=s.get("broker") or [], news_ops=nops, chart=chart)   # 증권사 · 뉴스 의견 (P275)
+    return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s),
+                            broker=s.get("broker") or [], news_ops=_news_opinions(s))   # 증권사 · 뉴스 의견 (P275) · 맨 위 요약 문단은 opinions_cards 안 (P295, 그래프 P290~P294 는 포기)
 
 
 BROKER_TITLE_RE = re.compile(r"upgrade|downgrade|price target|target (cut|raised|lowered|bump)|initiat|reiterat|\brating\b", re.I)   # 증권사 등급 기사 = 증권사 카드와 같은 일

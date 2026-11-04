@@ -916,11 +916,6 @@ def sec_opinions(s):
     return card or _dk.muted("애널리스트 · 방송 의견이 아직 없습니다.")   # 두 카드 격자 + 함께 보기는 R.opinions_cards 가 감싼다
 
 
-def chart_won(v):
-    """의견 그래프 가격 글자 — 10만 원 넘으면 `152.6만 원`(1,526,000원 은 다섯 칸에 안 들어간다), 아니면 `85,000원` (P290)."""
-    return (f"{v / 1e4:,.0f}만 원" if float(v / 1e4).is_integer() else f"{v / 1e4:,.1f}만 원") if v >= 1e5 else won(v)   # 눈금 160만 원 · 종가 148.7만 원
-
-
 def man_won(v):
     """목표가 표기 — `48만 원` (원 단위 여섯 자리는 360px 한 줄에 `목표가 평균 · 현재가 대비 ▲ n%` 와 함께 안 들어간다, 2026-10-31)."""
     return f"{v / 1e4:,.0f}만 원"
@@ -933,12 +928,7 @@ def _picks(s):
 def card_picks(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 미국과 같은 공용 R.opinions_cards (2026-11-01 사용자 P197, 옛 한 장 `애널리스트 · 방송 의견은?`). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
-    bars = BARS.get(s["sym"]) or []
-    closes = {b["day"]: b["close"] for b in bars[-10:]}
-    days = R.pick_window(bars, media_feed.KST, now=NOW)[0]
-    items = lambda ps_: R.opinion_items(ps_, [], None, s.get("analysts") or [], s.get("close"), media_feed.KST, days, chart_won)   # noqa: E731 — 네 출처 한 자, 한국은 증권사 · 뉴스 자료 없음 (P291)
-    card = lambda ps_: R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won,   # noqa: E731 — 애널리스트 · 방송 두 카드 + 함께 보기 (P197)
-                                        chart=R.opinions_chart(days, closes, items(ps_), chart_won, cid=f"lt-{s['code']}-op"))   # 탭 맨 위 그림 — 한국은 뉴스 의견 자료 없음 (P290)
+    card = lambda ps_: R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won)   # noqa: E731 — 애널리스트 · 방송 두 카드 + 함께 보기 (P197) · 맨 위 요약 문단 (P295)
     real = card(ps)
     if s["code"] != MOCK_PICKS_CODE or len(ps) >= 5:
         return real
