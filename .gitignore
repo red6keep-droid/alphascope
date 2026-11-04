@@ -53,3 +53,12 @@ experiments/kr-stocks/data/
 experiments/kr-stocks/output/
 experiments/.mock_prefs.json
 experiments/competitiveness/output/
+
+# 남의 자료 · 재배포 금지 (2026-11-04, 공개 저장소 점검)
+#  - yfinance 로 받은 일봉 · 실적 · 거시 데이터는 로컬에만 (야후 약관 · robots 전면 거부 — 운영지침 D4-7)
+#  - 방송 녹취록은 전부 로컬에만
+backtest/data/bars.pkl
+backtest/data/macro.pkl
+backtest/data/earnings.csv
+backtest/data/removed.pkl
+reference2/doc/ytb/

@@ -1,0 +1,39 @@
+# alpha-scope.blogspot.com 맞춤 robots.txt (2026-11-04 제안)
+# 원칙: 검색 · AI 검색(답변에 출처 링크) = 허용, 모델 학습용 수집 = 차단.
+# Blogger 맞춤 robots.txt 는 기본 규칙을 통째로 대체하므로 /search 차단과 Sitemap 줄을 직접 둔다.
+
+# --- 모델 학습용 수집 차단 ---
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+# --- 검색 · AI 검색은 허용 (Googlebot · Bingbot · OAI-SearchBot · Claude-SearchBot · PerplexityBot 등은 아래 * 규칙) ---
+User-agent: *
+Disallow: /search
+Allow: /
+
+Sitemap: https://alpha-scope.blogspot.com/sitemap.xml
+Sitemap: https://alpha-scope.blogspot.com/sitemap-pages.xml
