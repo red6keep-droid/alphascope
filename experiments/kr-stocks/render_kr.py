@@ -928,7 +928,8 @@ def _picks(s):
 def card_picks(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 미국과 같은 공용 R.opinions_cards (2026-11-01 사용자 P197, 옛 한 장 `애널리스트 · 방송 의견은?`). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
-    card = lambda ps_: R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won)   # noqa: E731 — 애널리스트 · 방송 두 카드 + 함께 보기 (P197) · 맨 위 요약 문단 (P295)
+    closes = [b["close"] for b in (BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]]   # 요약 문단 주가 배경 (P296)
+    card = lambda ps_: R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won, closes=closes)   # noqa: E731 — 애널리스트 · 방송 두 카드 + 함께 보기 (P197) · 맨 위 요약 문단 (P295 · P296)
     real = card(ps)
     if s["code"] != MOCK_PICKS_CODE or len(ps) >= 5:
         return real

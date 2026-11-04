@@ -787,7 +787,7 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
     return out
 
 
-def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, broker=None, news_ops=None):
+def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, broker=None, news_ops=None, closes=None):
     """`의견` 탭 (2026-11-01 사용자 P197) — 옛 한 장 `애널리스트 · 방송 의견은?`(P90)을 강조 카드 둘로 나눈다: `애널리스트 의견은?` · `방송 의견은?`.
     접힌 머리에서 두 답(예: 매수 · 매도)을 따로 보고, 누르면 그쪽 내용만 펼친다 — 둘 다 접힌 채로. 함께 보기는 두 카드 아래 따로 흰 카드.
     두 카드는 의견이 없어도 늘 둔다 — 답 `없음` (2026-11-01 사용자 P199: 방송 의견이 없다고 카드가 사라지면 안 된다).
@@ -798,7 +798,7 @@ def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, br
     cards += news_opinion_card(name, news_ops) if news_ops is not None else ""
     t = together()
     cards += together_card(t)   # 데이터 전망 = 셋째 강조 카드 (P206)
-    summary = opinions_summary(name, cells, close, ps, broker, news_ops, (t if isinstance(t, dict) else {"items": t}).get("items"), money)   # 탭 맨 위 요약 문단 (P295)
+    summary = opinions_summary(name, cells, close, ps, broker, news_ops, (t if isinstance(t, dict) else {"items": t}).get("items"), money, closes=closes)   # 탭 맨 위 요약 문단 (P295 · P296 상황별 멘트)
     return summary + f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>'
 
 
@@ -1246,87 +1246,126 @@ def _b(s):
     return f'<b style="font-weight:700;">{s}</b>'
 
 
-def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, span=PICK_SPAN, broker_days=None):
-    """의견 탭 맨 위 요약 문단 (P295) — 애널리스트 · 증권사 목표가 변경 · 방송 의견 · 뉴스 의견 · Alpha Scope 신호를 한 문단으로, 끝에 `대체로 …` 한 문장.
-    증감 숫자 · 방향 말은 ▲ · ▼ 와 색 · 굵게(공통 규칙). 자료가 없는 출처는 짧게 `없다` 로 모은다. 예측이 아니라 지금 의견의 정리 — 이 블로그의 추천이 아니다.
-    cells = 애널리스트 칸, broker = 증권사 변경(30일, 최신 먼저), ps = 방송 의견(5거래일), news_ops = 뉴스 의견(없는 시장은 None), items = 함께 보기 줄(신호)."""
+def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, closes=None, span=PICK_SPAN, broker_days=None):
+    """의견 탭 맨 위 요약 문단 (P295 → P296 상황별 멘트). 수치를 문장으로 옮기는 게 아니라 상황을 읽어 주는 글 —
+    (2026-11-04 사용자: "데이터 수치를 문장으로 바꾸는 수준 말고 정말 요약하듯이, 비유도 좋다, AI 말고 경우의 수마다 정해진 멘트").
+    상황 = ① 전문가 쏠림(애널리스트 매수 비중 · 평균 목표가 눈높이) ② 증권사 눈높이 방향(30일 상향 · 하향) ③ 방송 · 뉴스 분위기(5거래일 건수 · 쏠림)
+    ④ 바깥 의견이 모이는 쪽 vs Alpha Scope 신호(단기). 주가 흐름(5거래일)은 첫 문장의 배경. 증감 · 방향은 ▲ ▼ 색 · 굵게(공통 규칙). 예측 · 추천이 아니라 지금 의견의 정리."""
     import signal_groups as SG
-    broker_days = broker_days or BROKER_DAYS   # 아래에서 정의되는 상수
+    broker_days = broker_days or BROKER_DAYS
     nm = _esc(name)
     money0 = lambda v: re.sub(r"\.00\b", "", money(v))   # noqa: E731
-    sents, dirs = [], {}   # dirs = 출처별 방향 (대체로 문장용)
-    # 1. 애널리스트 — 다수 의견 + 평균 목표가 (종가 대비 ▲ · ▼)
-    v = analysts_verdict({"status": {"analysts": cells or []}, "headline": {"close": close}}, rich=True) if cells else None
-    if v:
-        state, text = v
-        dirs["애널리스트"] = {"매수": 1, "매도": -1}.get(state, 0)
-        pm = next((c["value"] for c in cells if c.get("key") == "pt_mean"), None)
-        if pm and close:
-            text += f" 평균 목표가({_b(money0(pm))})는 지금 종가보다 {_dk.arrow((pm / close - 1) * 100, 1)} {'위' if pm >= close else '아래'}다."   # 괄호 뒤 `는` — 통화 · 원 뒤 조사 문제 없이
-        sents.append(text)
-    # 2. 증권사 — 건수 · 상향 / 하향 / 유지 · 가장 최근 변경
-    none = []
+    sents, dirs = [], {}
+    # 배경 — 최근 5거래일 주가
+    cs = [c for c in (closes or []) if c is not None]
+    r5 = (cs[-1] / cs[0] - 1) * 100 if len(cs) >= 2 and cs[0] else None
+    price = ("" if r5 is None or abs(r5) < 1 else
+             f"주가는 최근 {span} {_dk.arrow(r5, 1)} {'올랐' if r5 > 0 else '내렸'}는데, ")
+    # ① 전문가 쏠림
+    cells = cells or []
+    rc = next((c["value"] for c in cells if c.get("key") == "rating_counts"), None) or {}
+    n_a = sum(rc.values())
+    pm = next((c["value"] for c in cells if c.get("key") == "pt_mean"), None)
+    if n_a:
+        buy = (rc.get("strongBuy", 0) + rc.get("buy", 0)) / n_a * 100
+        sell = (rc.get("sell", 0) + rc.get("strongSell", 0)) / n_a * 100
+        hold = 100 - buy - sell
+        ten = (f"거의 전부({_b(f'{buy:.0f}%')})" if buy >= 90 else f"10명 중 {_b(f'{round(buy / 10)}명')}" if n_a >= 10 else f"{n_a}명 중 {_b(f'{round(buy / 100 * n_a)}명')}")
+        gap = (pm / close - 1) * 100 if pm and close else None
+        eye = ("" if gap is None else
+               f" 평균 목표가({money0(pm)})는 지금보다 {_dk.arrow(gap, 1 if abs(gap) < 10 else 0)} " + ("높아 눈높이가 한참 위에 있다." if gap >= 15 else "높다." if gap >= 5 else
+               "낮아 눈높이가 주가 아래로 내려와 있다." if gap <= -5 else "위라, 눈높이를 주가가 거의 따라잡은 모습이다." if gap >= 0 else "아래라, 주가가 눈높이를 살짝 넘어선 모습이다."))
+        if buy >= 70:
+            dirs["애널리스트"] = 1
+            lead = (f"{price}전문가들의 눈은 {'아직 ' if r5 is not None and r5 < -1 else ''}위를 보고 있다. 애널리스트 {ten}이 매수 쪽이다." if price or True else "")
+        elif buy > 50:
+            dirs["애널리스트"] = 1
+            lead = f"{price}전문가 다수는 매수 쪽이지만 만장일치는 아니다. 애널리스트 {ten}이 매수, 나머지는 보유 · 매도다."
+        elif sell > 50:
+            dirs["애널리스트"] = -1
+            lead = f"{price}전문가들은 조심스러운 쪽이다. 애널리스트 {n_a}명 중 {_b(f'{sell:.0f}%')}가 매도 쪽이다."
+        elif hold > 50:
+            dirs["애널리스트"] = 0
+            lead = f"{price}전문가들은 '지켜보자'는 쪽이 많다. 애널리스트 {n_a}명 중 {_b(f'{hold:.0f}%')}가 보유 의견이다."
+        else:
+            dirs["애널리스트"] = 0
+            lead = f"{price}전문가 사이에서도 의견이 갈린다. 애널리스트 {n_a}명이 매수 {_b(f'{buy:.0f}%')} · 보유 {_b(f'{hold:.0f}%')} · 매도 {_b(f'{sell:.0f}%')}로 나뉜다."
+        sents.append(lead + eye)
+    elif price:
+        sents.append(price.rstrip(", ") + "다.")
+    # ② 증권사 눈높이
     if broker:
         n = {k: sum(1 for c in broker if broker_move(c) == k) for k in MOVE_ORDER}
         dirs["증권사"] = SG.vote([{"상향": 1, "하향": -1}.get(broker_move(c), 0) for c in broker])
-        cnt = " · ".join(f'{_b(f"{k} {n[k]}건")}' for k in MOVE_ORDER if n[k])
         c = broker[0]
-        mv = broker_move(c)
-        firm = _esc(c.get("firm") or "증권사")
-        pt, pp = c.get("pt"), c.get("pt_prior")
-        if pt and pp and pp != pt:   # 회사 이름 뒤 조사(이 · 가)를 피해 `{회사}의 목표가 하향(…)` 꼴
-            last = f" 가장 최근은 {firm}의 목표가 {'상향' if pt > pp else '하향'}({money0(pp)} → {_b(money0(pt))}, {_dk.arrow((pt / pp - 1) * 100, 1)})이다."
-        elif pt:
-            last = f" 가장 최근은 {firm}의 목표가 {_b(money0(pt))}({mv})이다."
+        firm, pt, pp = _esc(c.get("firm") or "증권사"), c.get("pt"), c.get("pt_prior")
+        last = (f" 가장 최근 변경은 {firm}의 {money0(pp)} → {_b(money0(pt))}({_dk.arrow((pt / pp - 1) * 100, 1)}) {'상향' if pt > pp else '하향'}이다." if pt and pp and pp != pt
+                else f" 가장 최근 변경은 {firm}의 목표가 {_b(money0(pt))}이다." if pt else "")   # 회사 이름 뒤 조사(이 · 가)를 피한 꼴
+        cnt = f"(최근 {broker_days}일 상향 {_b(str(n['상향']))} · 하향 {_b(str(n['하향']))}" + (f" · 유지 {n['유지']}" if n['유지'] else "") + ")"
+        if n["상향"] > n["하향"]:   # 괄호를 `이다` 앞에 — 문장 끝이 `다.` 여야 합니다체 변환이 된다
+            sents.append(f"증권사들은 눈높이를 올려 잡는 중{cnt}이다.{last}")
+        elif n["하향"] > n["상향"]:
+            sents.append(f"증권사들은 눈높이를 조금씩 내려 잡는 중{cnt}이다.{last}")
         else:
-            last = f" 가장 최근은 {firm}의 {_esc(_grade_ko(c.get('to')) or mv)} 의견이다."
-        sents.append(f"최근 {broker_days}일 증권사 목표가 변경은 {len(broker)}건으로 {cnt}이다." + last)
+            sents.append(f"증권사 목표가는 올리는 곳과 내리는 곳이 반반{cnt}이다.{last}")
     elif broker is not None:
-        none.append(f"최근 {broker_days}일 증권사 목표가 변경")
-    # 3. 방송 — 건수 · 의견별 · 가장 최근
-    if ps:
-        n = {k: sum(1 for p in ps if p["action"] == k) for k in PICK_ORDER}
-        dirs["방송"] = SG.vote([{"매수": 1, "매도": -1}.get(p["action"], 0) for p in ps])
-        cnt = " · ".join(f'<b style="font-weight:700;color:{PICK_THEME.get(k, ("", "#111"))[1]};">{k} {n[k]}건</b>' for k in PICK_ORDER if n[k])
-        p = max(ps, key=lambda p: str(p.get("published_at") or ""))
-        who = _esc(re.sub(r"\s+\(", "(", p.get("speaker") or p.get("channel") or ""))
-        sents.append(f"방송에서는 최근 {span} {nm} 의견이 {len(ps)}건({cnt}) 나왔고, 가장 최근은 {who}의 {_b(p['action'])} 의견이다.")
+        sents.append(f"증권사 목표가 변경은 최근 {broker_days}일 동안 없어 잠잠하다.")
+    # ③ 방송 · 뉴스 분위기 (5거래일)
+    ev = [{"매수": 1, "매도": -1}.get(p["action"], 0) for p in ps or []] + [{"positive": 1, "negative": -1}.get(x.get("direction"), 0) for x in news_ops or []]
+    where = "방송과 뉴스" if news_ops is not None else "방송"
+    if not ev:
+        sents.append(f"{where}에서는 최근 {span} 동안 {nm} 이야기가 거의 없었다.")
     else:
-        none.append(f"최근 {span} 방송 의견")
-    # 4. 뉴스 의견 기사
-    if news_ops:
-        n = {k: sum(1 for x in news_ops if TONE_OF.get(x.get("direction"), "중립") == k) for k in TONE_ORDER}
-        dirs["뉴스"] = SG.vote([{"positive": 1, "negative": -1}.get(x.get("direction"), 0) for x in news_ops])
-        cnt = " · ".join(f'<b style="font-weight:700;color:{TONE_THEME.get(k, ("", "#111"))[1]};">{k} {n[k]}건</b>' for k in TONE_ORDER if n[k])
-        sents.append(f"{nm}을 다룬 의견 기사는 {len(news_ops)}건({cnt})이다.".replace(f"{nm}을", _esc(_dk.josa(name, "을"))))
-    elif news_ops is not None:
-        none.append("의견 기사")
-    if none:
-        sents.append(" · ".join(none[:-1] + [_dk.josa(none[-1], "은")]) + " 없다.")   # `의견 기사는 없다` · `방송 의견은 없다` (조사)
-    # 5. Alpha Scope 신호 — 단기 · 중기
-    rows = [x for x in items or [] if x and x[1]]
-    if rows:
-        hv = SG.horizon_votes(rows)
-        s_d, m_d = hv["단기"][0], hv["중기"][0]
-        if s_d is not None:
-            dirs["신호"] = s_d
-            sents.append(f"Alpha Scope 신호는 단기 {_dir_html(s_d)}" + (f", 중기 {_dir_html(m_d)}이다." if m_d is not None else "이다."))
-    # 6. 대체로 — 바깥 의견(애널리스트 · 증권사 · 방송 · 뉴스)이 어느 쪽으로 모이나, 우리 신호와 같은 방향인가
-    outside = [d for k, d in dirs.items() if k != "신호" and d is not None]
-    if outside:
-        o = SG.vote(outside)
-        ups, dns = sum(1 for d in outside if d == 1), sum(1 for d in outside if d == -1)
-        if o == 0 and ups and dns:
-            tail = f"대체로 바깥 의견은 {_dir_html(1)}과 {_dir_html(-1)}으로 엇갈린다."
+        up, dn, mid = ev.count(1), ev.count(-1), ev.count(0)
+        dirs["방송 · 뉴스"] = SG.vote(ev)
+        tot = len(ev)
+        vol = "말이 많았고" if tot >= 5 else "이야기가 몇 건 있었고"
+        if tot == 1:
+            tone = {1: "사자는 쪽이다", -1: "조심하라는 쪽이다", 0: "'지켜보자'는 쪽이다"}[ev[0]]
+        elif up > dn and up >= mid:
+            tone = f"그중 사자는 쪽이 {_b(f'{up}건')}으로 가장 많다"
+        elif dn > up and dn >= mid:
+            tone = f"그중 조심하라는 쪽이 {_b(f'{dn}건')}으로 가장 많다"
+        elif mid > up and mid > dn:
+            tone = f"그중 '지켜보자'가 {_b(f'{mid}건')}으로 다수다"
         else:
-            tail = f"대체로 바깥 의견은 {_dir_html(o)}으로 모인다." if o else "대체로 바깥 의견은 중립에 가깝다."
-        if "신호" in dirs:
-            sg = dirs["신호"]
-            tail += (" Alpha Scope 신호도 같은 방향이다." if sg == o and o != 0 else f" Alpha Scope 신호는 {_dir_html(sg)}이라 다르다." if sg != o else " Alpha Scope 신호도 중립이다.")
-        sents.append(tail)
+            tone = f"사자는 쪽 {_b(f'{up}건')}과 조심하라는 쪽 {_b(f'{dn}건')}으로 갈린다"
+        p = max(ps, key=lambda p: str(p.get("published_at") or "")) if ps else None
+        who = (f" 가장 최근은 {_esc(re.sub(r'\s+\(', '(', p.get('speaker') or p.get('channel') or ''))}의 {_b(p['action'])} 의견이다." if p else "")
+        sents.append(f"{where}에서는 {vol} {tot}건 중 {tone}.".replace(f"{tot}건 중 그중", f"{tot}건 중").replace(" 1건 중 ", " ") + who)
+    # ④ 바깥 의견 vs Alpha Scope 신호
+    rows = [x for x in items or [] if x and x[1]]
+    sg = SG.horizon_votes(rows)["단기"][0] if rows else None
+    outside = [d for d in dirs.values() if d is not None]
+    o = SG.vote(outside) if outside else None
+    split = o == 0 and 1 in outside and -1 in outside
+    if o is not None:
+        if sg is None:
+            end = {1: "정리하면, 바깥 의견은 위쪽으로 모여 있다.", -1: "정리하면, 바깥 의견은 아래쪽으로 모여 있다."}.get(o, "정리하면, 바깥 의견은 한쪽으로 모이지 않는다.")
+        elif o == 1 and sg == 1:
+            end = f"정리하면, 바깥 의견과 Alpha Scope 신호(단기 {_dir_html(1)})가 같이 위를 보고 있어 방향이 맞아떨어지는 구간이다."
+        elif o == 1 and sg == -1:
+            end = f"정리하면, 전문가들의 눈높이는 높지만 가격 흐름을 보는 Alpha Scope 신호는 단기 {_dir_html(-1)}이라 '기대는 높고 발걸음은 무거운' 구간이다."
+        elif o == 1:
+            end = f"정리하면, 바깥 의견은 위를 보지만 Alpha Scope 신호는 단기 {_dir_html(0)}이라 가격은 아직 그 기대를 따라가지 않는 구간이다."
+        elif o == -1 and sg == -1:
+            end = f"정리하면, 바깥 의견과 Alpha Scope 신호(단기 {_dir_html(-1)})가 같이 아래를 보고 있어 분위기가 무거운 구간이다."
+        elif o == -1 and sg == 1:
+            end = f"정리하면, 전문가들은 조심스럽지만 가격 흐름을 보는 Alpha Scope 신호는 단기 {_dir_html(1)}이라 엇갈리는 구간이다."
+        elif o == -1:
+            end = f"정리하면, 바깥 의견은 조심스럽고 Alpha Scope 신호는 단기 {_dir_html(0)}이라 뚜렷한 쪽이 없는 구간이다."
+        elif split:
+            end = f"정리하면, 바깥 의견이 위아래로 갈리고 Alpha Scope 신호는 단기 {_dir_html(sg)}이다. 의견이 한쪽으로 모일 때까지 지켜볼 구간이다."
+        else:
+            end = {1: f"정리하면, 바깥 의견은 한쪽으로 쏠리지 않았지만 Alpha Scope 신호는 단기 {_dir_html(1)}이라 가격이 먼저 움직이는 구간이다.",
+                   -1: f"정리하면, 바깥 의견은 한쪽으로 쏠리지 않았고 Alpha Scope 신호는 단기 {_dir_html(-1)}이라 분위기가 가라앉은 구간이다."}.get(
+                sg, "정리하면, 바깥 의견도 Alpha Scope 신호도 한쪽으로 기울지 않은, 방향을 고르는 구간이다.")
+        sents.append(end)
     if not sents:
         return ""
     return f'<p data-op-summary="1" style="{_dk.SEO_LEAD}">{" ".join(sents)}</p>'
+
+
 
 LT_GRAY = "#CBD5E1"   # 버튼 선 그래프에서 안 누른 선
 

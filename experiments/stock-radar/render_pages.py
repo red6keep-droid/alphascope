@@ -558,7 +558,8 @@ def card_opinions(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 공용 R.opinions_cards (한국 · 미국 같은 카드, 2026-11-01 사용자 P197)."""
     ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
     return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s),
-                            broker=s.get("broker") or [], news_ops=_news_opinions(s))   # 증권사 · 뉴스 의견 (P275) · 맨 위 요약 문단은 opinions_cards 안 (P295, 그래프 P290~P294 는 포기)
+                            broker=s.get("broker") or [], news_ops=_news_opinions(s),
+                            closes=[b["close"] for b in (BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]])   # 증권사 · 뉴스 의견 (P275) · 맨 위 요약 문단은 opinions_cards 안 (P295 · P296 주가 배경)
 
 
 BROKER_TITLE_RE = re.compile(r"upgrade|downgrade|price target|target (cut|raised|lowered|bump)|initiat|reiterat|\brating\b", re.I)   # 증권사 등급 기사 = 증권사 카드와 같은 일
