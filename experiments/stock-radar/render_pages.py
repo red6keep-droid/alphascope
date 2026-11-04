@@ -924,11 +924,12 @@ def line_tabs(cid, labels, series, fmt, unit=""):
     radios = "".join(f'<input type="radio" name="{cid}" id="{cid}-{k}" style="display:none;">' for k in range(len(series)))   # 처음엔 아무것도 안 눌림
     btns = "".join(f'<label for="{cid}-{k}" class="c{k}" style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:13px;line-height:18px;font-weight:700;white-space:nowrap;cursor:pointer;">'
                    f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{col};"></span>{R._esc(nm)}</label>' for k, (nm, _, col) in enumerate(series))   # 색 점 = 선 색
+    # 첫 줄 = `‹ 넘겨 보기` 왼쪽(공통 선 그래프와 같게) · 단위 오른쪽, 둘째 줄 = 버튼 오른쪽 정렬 — 폰에서 넘겨 보기 / 버튼 / 단위 세 줄이던 것을 두 줄로 (2026-11-04 사용자)
+    row1 = (("" if fit else f'<span data-lhint="1" style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span>')
+            + (f'<span style="white-space:nowrap;margin-left:auto;font-size:12px;line-height:18px;">(단위: {R._esc(unit)})</span>' if unit else ""))
     head = (f'<span class="h" style="display:block;padding:{_dk.CHART_CARD_PAD + 3}px 12px 0;">'
-            f'<span style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin:0 0 4px;font-size:{R.TINY};line-height:20px;color:{R.NOTE};">'
-            f'<span style="display:flex;flex-wrap:wrap;gap:6px;">{btns}</span>'   # 버튼은 왼쪽 위 (2026-11-03 사용자)
-            + ("" if fit else f'<span data-lhint="1" style="white-space:nowrap;margin-left:auto;line-height:24px;">{_dk.SCROLL_HINT} ›</span>') + "</span>"
-            + (f'<span style="display:block;text-align:right;margin:0 0 6px;font-size:12px;line-height:18px;color:{R.NOTE};">(단위: {R._esc(unit)})</span>' if unit else "") + "</span>")
+            + (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px;font-size:{R.TINY};line-height:20px;color:{R.NOTE};">{row1}</span>' if row1 else "")
+            + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;margin:0 0 6px;">{btns}</span></span>')
     graph = (f'<span class="g" style="display:block;position:relative;padding:0 12px 10px;">{scroll}{shade}'
              f'<span style="position:absolute;top:0;right:12px;width:{axis_w - 4}px;height:{H}px;text-align:right;">{axis}</span></span>')
     return f'<span id="{cid}" style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><style>{css}</style>{radios}{head}{graph}</span>'
