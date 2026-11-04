@@ -6,7 +6,7 @@
 
     verdicts  {sym}/{key}         카드 판정 — signal_groups 꼬리표(방향 · 기간 · 계열 · 분류표 버전) 그대로
               {sym}/analysts      애널리스트 등급 분포 · 목표가 (계열 = 바깥 의견)
-              {sym}/pick/{해시}    방송 의견 한 건 — 인물별 (A5-7 2: 인물별로 남긴다). date = 영상 게시일(KST) — 48시간 동안 매일 다시 보여도 한 줄
+              {sym}/pick/{해시}    방송 의견 한 건 — 인물별 (A5-7 2: 인물별로 남긴다). date = 영상 게시일(KST) — 5일 동안 매일 다시 보여도 한 줄
     issues    news/{item_id}      미국 종목 뉴스 분류 한 건(news_store) — 이슈 코드 · 종목별 관련도 · 방향. date = 기사 게시일(KST)
 한국 종목의 방송 이슈는 미디어 데일리가 이미 media-state 에 쌓는다 — 여기서는 다시 쓰지 않는다.
 나중 결과(1 · 5 · 20일)는 쓰지 않는다 — 읽는 쪽이 일봉으로 계산한다(record_store 원칙). 실패해도 게시는 계속(record_store.append 가 삼킨다).

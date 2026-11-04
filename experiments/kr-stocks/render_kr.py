@@ -792,8 +792,11 @@ TODAY_HOURS = 24    # 오늘자만 — 미국 종목 페이지와 같다 (2026-1
 MOCK_ONLY_OPEN, MOCK_ONLY_CLOSE = "<!--mock-only-->", "<!--/mock-only-->"   # 이 사이는 목업에만 (발행 본문에서 지운다, P155 · P158)
 REAL_ONLY_OPEN, REAL_ONLY_CLOSE = "<!--real-only-->", "<!--/real-only-->"   # 이 사이는 발행 본문에만 (목업에서 지운다)
 MOCK_NEWS = "<!--mock-news-->"   # 목업 전용 자리 — 발행 본문에서는 지운다 (2026-10-27 P26)
-PICKS = []          # 방송에서 나온 종목 의견 (media_feed.picks, 최근 PICK_DAYS 일) — 실적과 기대 탭 `방송 의견` 카드 (P85)
+PICKS = []          # 방송에서 나온 종목 의견 (media_feed.picks, 최근 5거래일 PICK_SINCE) — 의견 탭 `방송 의견은?` 카드 (P85 · 11-04 P290)
 PICK_DAYS = R.PICK_DAYS
+BARS = {}           # 종목별 일봉 (snap["bars"]) — 의견 탭 맨 위 `최근 5거래일 의견과 주가` 종가 선 · 의견 창 (P290). write_all 이 채운다
+PICK_SINCE = ""     # 방송 의견 컷 (ISO UTC) = 코스피 일봉 기준 최근 5거래일의 첫날 0시 KST (R.pick_window, P290)
+NOW = None          # 페이지를 만드는 시각 (UTC) — write_all 이 정한다. 목업은 RADAR_NOW(ISO)
 MEDIA = []          # 방송 이슈 (media_feed.issues — 같은 이슈는 이미 한 줄로) — write_all 이 한 번 읽는다
 MEDIA_WEEK = []     # 최근 7일 방송 이슈 — 뉴스 방향 막대 `최근 7일` (P143)
 
@@ -913,6 +916,11 @@ def sec_opinions(s):
     return card or _dk.muted("애널리스트 · 방송 의견이 아직 없습니다.")   # 두 카드 격자 + 함께 보기는 R.opinions_cards 가 감싼다
 
 
+def chart_won(v):
+    """의견 그래프 가격 글자 — 10만 원 넘으면 `152.6만 원`(1,526,000원 은 다섯 칸에 안 들어간다), 아니면 `85,000원` (P290)."""
+    return (f"{v / 1e4:,.0f}만 원" if float(v / 1e4).is_integer() else f"{v / 1e4:,.1f}만 원") if v >= 1e5 else won(v)   # 눈금 160만 원 · 종가 148.7만 원
+
+
 def man_won(v):
     """목표가 표기 — `48만 원` (원 단위 여섯 자리는 360px 한 줄에 `목표가 평균 · 현재가 대비 ▲ n%` 와 함께 안 들어간다, 2026-10-31)."""
     return f"{v / 1e4:,.0f}만 원"
@@ -925,7 +933,12 @@ def _picks(s):
 def card_picks(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 미국과 같은 공용 R.opinions_cards (2026-11-01 사용자 P197, 옛 한 장 `애널리스트 · 방송 의견은?`). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
-    card = lambda ps_: R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won)   # noqa: E731 — 애널리스트 · 방송 두 카드 + 함께 보기 (P197)
+    bars = BARS.get(s["sym"]) or []
+    closes = {b["day"]: b["close"] for b in bars[-10:]}
+    days = R.pick_window(bars, media_feed.KST, now=NOW)[0]
+    items = lambda ps_: R.opinion_items(ps_, [], None, s.get("analysts") or [], s.get("close"), media_feed.KST, days, chart_won)   # noqa: E731 — 네 출처 한 자, 한국은 증권사 · 뉴스 자료 없음 (P291)
+    card = lambda ps_: R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won,   # noqa: E731 — 애널리스트 · 방송 두 카드 + 함께 보기 (P197)
+                                        chart=R.opinions_chart(days, closes, items(ps_), chart_won))   # 탭 맨 위 그림 — 한국은 뉴스 의견 자료 없음 (P290)
     real = card(ps)
     if s["code"] != MOCK_PICKS_CODE or len(ps) >= 5:
         return real
@@ -1681,10 +1694,13 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
                 build_calendar(s, snap, extra, macro_rows)
             except Exception as e:  # noqa: BLE001 — 캘린더가 실패해도 페이지는 만든다
                 print(f"[kr] {s['sym']} 캘린더 실패: {e}")
-    global MEDIA
+    global MEDIA, NOW, BARS, PICK_SINCE
+    NOW = (datetime.datetime.fromisoformat(os.environ["RADAR_NOW"].replace("Z", "+00:00")) if os.environ.get("RADAR_NOW")
+           else datetime.datetime.now(datetime.timezone.utc))   # 목업은 RADAR_NOW(ISO)로 시각을 고정 — 미국 종목 페이지와 같은 변수 (2026-11-01, 방송 의견이 목업에서 사라지지 않게)
+    BARS = (snap or {}).get("bars") or {}
+    PICK_SINCE = R.pick_window(BARS.get(U.BENCH) or [], media_feed.KST, now=NOW)[1]   # 의견 창 = 코스피 최근 5거래일 (P290)
     if media is None:
-        now = (datetime.datetime.fromisoformat(os.environ["RADAR_NOW"].replace("Z", "+00:00")) if os.environ.get("RADAR_NOW")
-               else datetime.datetime.now(datetime.timezone.utc))   # 목업은 RADAR_NOW(ISO)로 시각을 고정 — 미국 종목 페이지와 같은 변수 (2026-11-01, 방송 의견 48시간이 지나 목업에서 사라지지 않게)
+        now = NOW
         since = (now - datetime.timedelta(hours=TODAY_HOURS)).strftime("%Y-%m-%dT%H:%M")
         vids = media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=PICK_DAYS - 1)   # Firestore `in` 은 30개까지 — 오늘 포함 30일. 한 번 읽어 뉴스(24시간) · 방송 의견(30일)에 나눠 쓴다
         media = media_feed.issues(media_feed.rows(vids), since)
@@ -1692,7 +1708,7 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
         MEDIA_WEEK = media_feed.issues(media_feed.rows(vids), (now - datetime.timedelta(days=7)).strftime("%Y-%m-%dT%H:%M"))   # 뉴스 방향 막대 `최근 7일` (P143)
         media_feed.diag(vids, media)   # 재료 진단 로그 — 채널 묶음 · 범위 · 종목별 배정 (2026-10-30 사용자: 분배 점검)
         global PICKS
-        PICKS = media_feed.picks(vids, (now - datetime.timedelta(hours=R.PICK_HOURS)).isoformat())   # 48시간 (2026-10-31)
+        PICKS = media_feed.picks(vids, PICK_SINCE)   # 최근 5거래일 (2026-11-04 P290, 옛 48시간 10-31)
     MEDIA = media
     moms = sorted(x["mom_12_1"] for x in a["stocks"] if x.get("mom_12_1") is not None)
     kb = [b["close"] for b in (snap or {}).get("bars", {}).get(U.BENCH) or []] if snap else []

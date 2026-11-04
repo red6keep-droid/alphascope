@@ -5,6 +5,7 @@
 """
 
 import datetime
+from zoneinfo import ZoneInfo
 import os
 import re
 import sys
@@ -517,7 +518,10 @@ MAX_EVENTS = 8      # 뉴스 목록에 펼쳐 두는 수, 나머지는 `그 외 
 MAX_ISSUES = 5      # 중요 이슈 줄 수 (10-3 : 7일, 관련도 높은 순 최대 5줄)
 MAX_MEDIA = 5       # 방송 줄 최대 수 — 실적 주간엔 한 종목에 하루 십여 줄이라 최근 것만 (2026-10-25)
 NEWS = {}           # 이 실행의 분류된 기사 (write_all 이 채운다)
-PICKS = []          # 방송에서 나온 종목 의견 (media_feed.picks, 최근 R.PICK_DAYS 일) — `방송에서 나온 의견은?` 카드 (2026-10-29 P89)
+PICKS = []          # 방송에서 나온 종목 의견 (media_feed.picks, 최근 5거래일 PICK_SINCE) — `방송 의견은?` 카드 (2026-10-29 P89 · 11-04 P290)
+BARS = {}           # 종목별 일봉 (snap["bars"]) — 의견 탭 맨 위 `최근 5거래일 의견과 주가` 종가 선 · 의견 창 (P290). write_all 이 채운다
+PICK_SINCE = ""     # 방송 · 뉴스 의견 컷 (ISO UTC) = S&P 500 일봉 기준 최근 5거래일의 첫날 0시 뉴욕 (R.pick_window, P290)
+NY = ZoneInfo("America/New_York")   # 의견 시각 → 미국 날짜 (종가 날짜와 같은 기준, P290)
 MEDIA = []          # 방송 이슈 (media_feed.issues — 같은 이슈는 이미 한 줄로, 최근 24시간) — write_all 이 한 번 읽는다
 TODAY_HOURS = 24    # 뉴스 목록 = 오늘자만 (2026-10-25 사용자). 아침 실행이라 KST 날짜로 자르면 미국 밤사이 뉴스가 빠진다 → 최근 24시간
 NOW = None          # 페이지를 만드는 시각 (UTC) — write_all 이 정한다. 목업은 환경 변수 RADAR_NOW(ISO)
@@ -553,18 +557,24 @@ def _picks(s):
 def card_opinions(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 공용 R.opinions_cards (한국 · 미국 같은 카드, 2026-11-01 사용자 P197)."""
     ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
-    return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s),
-                            broker=s.get("broker") or [], news_ops=_news_opinions(s))   # 증권사 · 뉴스 의견 (P275)
+    nops = _news_opinions(s)
+    money = lambda v: f"${v:,.2f}"   # noqa: E731
+    bars = BARS.get(s["sym"]) or []
+    days = R.pick_window(bars, NY, now=NOW)[0]
+    items = R.opinion_items(ps, s.get("broker") or [], nops, s.get("analysts") or [], s.get("close"), NY, days, money)   # 네 출처 한 자 (P291)
+    chart = R.opinions_chart(days, {b["day"]: b["close"] for b in bars[-10:]}, items, money)   # 탭 맨 위 그림 (P290)
+    return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, money, lambda: together_items(s),
+                            broker=s.get("broker") or [], news_ops=nops, chart=chart)   # 증권사 · 뉴스 의견 (P275)
 
 
 BROKER_TITLE_RE = re.compile(r"upgrade|downgrade|price target|target (cut|raised|lowered|bump)|initiat|reiterat|\brating\b", re.I)   # 증권사 등급 기사 = 증권사 카드와 같은 일
 
 
 def _news_opinions(s):
-    """`뉴스 의견은?` 재료 — 해설 · 투자 의견 기사(NVDA labels 의 의견 매체 · 의견형 제목) 중 이 종목 관련도 1 이상, 최근 R.PICK_HOURS 시간, 최신 먼저.
+    """`뉴스 의견은?` 재료 — 해설 · 투자 의견 기사(NVDA labels 의 의견 매체 · 의견형 제목) 중 이 종목 관련도 1 이상, 최근 5거래일(PICK_SINCE), 최신 먼저.
     주가 움직임만 다룬 기사 · 2차 출처(news_store._cap 의 나머지 조건)와 증권사 등급 기사는 뺀다."""
     import labels
-    cut = (NOW - datetime.timedelta(hours=R.PICK_HOURS)).strftime("%Y-%m-%dT%H:%M")
+    cut = _ts(PICK_SINCE)
     out = []
     for x in (NEWS or {}).values():
         sc = next((c for c in x.get("scores") or [] if c["ticker"] == s["sym"]), None)
@@ -924,11 +934,12 @@ def line_tabs(cid, labels, series, fmt, unit=""):
     radios = "".join(f'<input type="radio" name="{cid}" id="{cid}-{k}" style="display:none;">' for k in range(len(series)))   # 처음엔 아무것도 안 눌림
     btns = "".join(f'<label for="{cid}-{k}" class="c{k}" style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:13px;line-height:18px;font-weight:700;white-space:nowrap;cursor:pointer;">'
                    f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{col};"></span>{R._esc(nm)}</label>' for k, (nm, _, col) in enumerate(series))   # 색 점 = 선 색
+    # 첫 줄 = `‹ 넘겨 보기` 왼쪽(공통 선 그래프와 같게) · 단위 오른쪽, 둘째 줄 = 버튼 오른쪽 정렬 — 폰에서 넘겨 보기 / 버튼 / 단위 세 줄이던 것을 두 줄로 (2026-11-04 사용자)
+    row1 = (("" if fit else f'<span data-lhint="1" style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span>')
+            + (f'<span style="white-space:nowrap;margin-left:auto;font-size:12px;line-height:18px;">(단위: {R._esc(unit)})</span>' if unit else ""))
     head = (f'<span class="h" style="display:block;padding:{_dk.CHART_CARD_PAD + 3}px 12px 0;">'
-            f'<span style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin:0 0 4px;font-size:{R.TINY};line-height:20px;color:{R.NOTE};">'
-            f'<span style="display:flex;flex-wrap:wrap;gap:6px;">{btns}</span>'   # 버튼은 왼쪽 위 (2026-11-03 사용자)
-            + ("" if fit else f'<span data-lhint="1" style="white-space:nowrap;margin-left:auto;line-height:24px;">{_dk.SCROLL_HINT} ›</span>') + "</span>"
-            + (f'<span style="display:block;text-align:right;margin:0 0 6px;font-size:12px;line-height:18px;color:{R.NOTE};">(단위: {R._esc(unit)})</span>' if unit else "") + "</span>")
+            + (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px;font-size:{R.TINY};line-height:20px;color:{R.NOTE};">{row1}</span>' if row1 else "")
+            + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;margin:0 0 6px;">{btns}</span></span>')
     graph = (f'<span class="g" style="display:block;position:relative;padding:0 12px 10px;">{scroll}{shade}'
              f'<span style="position:absolute;top:0;right:12px;width:{axis_w - 4}px;height:{H}px;text-align:right;">{axis}</span></span>')
     return f'<span id="{cid}" style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><style>{css}</style>{radios}{head}{graph}</span>'
@@ -1164,11 +1175,13 @@ def write_all(a, out_dir, snap=None, news=None, media=None):
     NEWS = news or {}   # 전망 카드 뉴스 · 방송 분위기 · 호재 · 리스크 (P218)
     NOW = (datetime.datetime.fromisoformat(os.environ["RADAR_NOW"].replace("Z", "+00:00")) if os.environ.get("RADAR_NOW")
            else datetime.datetime.now(datetime.timezone.utc))
-    global PICKS
-    if media is None:   # 영상은 한 번(30일) 읽어 뉴스(24시간) · 방송 의견(30일)에 나눠 쓴다 — Firestore `in` 30개 한도
+    global PICKS, BARS, PICK_SINCE
+    BARS = (snap or {}).get("bars") or {}
+    PICK_SINCE = R.pick_window(BARS.get(U.BENCH) or [], NY, now=NOW)[1]   # 의견 창 = S&P 500 최근 5거래일 (P290)
+    if media is None:   # 영상은 한 번(30일) 읽어 뉴스(24시간) · 방송 의견(5일)에 나눠 쓴다 — Firestore `in` 30개 한도
         vids = media_feed.load(NOW.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=R.PICK_DAYS - 1)
         media = media_feed.issues(media_feed.rows(vids), _since())
-        PICKS = media_feed.picks(vids, (NOW - datetime.timedelta(hours=R.PICK_HOURS)).isoformat())   # 48시간 (2026-10-31)
+        PICKS = media_feed.picks(vids, PICK_SINCE)   # 최근 5거래일 (2026-11-04 P290, 옛 48시간 10-31)
     MEDIA = media
     if snap:
         draw_charts(snap, [s for s in a["stocks"] if s["sym"] not in U.REPORT_TYPE], out_dir)
