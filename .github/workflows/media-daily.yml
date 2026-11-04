@@ -66,6 +66,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
+      - name: State repo (private alphascope-state)
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -76,14 +85,14 @@ jobs:
           pip install -r experiments/media-daily/requirements.txt
           pip install -r experiments/daily-report/requirements.txt
 
-      # cluster.py 가 데일리 기록(origin/report-state records/issues)으로 중복을 표시한다. 우리 기록은 media-state 에
+      # cluster.py 가 데일리 기록(state/report-state records/issues)으로 중복을 표시한다. 우리 기록은 media-state 에
       - name: Fetch report-state / media-state
         run: |
           for b in report-state media-state; do
-            git fetch --no-tags origin "$b:refs/remotes/origin/$b" 2>/dev/null && echo "$b 받음" || echo "$b 없음"
+            git fetch --no-tags state "$b:refs/remotes/state/$b" 2>/dev/null && echo "$b 받음" || echo "$b 없음"
           done
-          if git rev-parse --verify -q refs/remotes/origin/media-state > /dev/null; then
-            git archive refs/remotes/origin/media-state "$STATE_DIR" | tar -x && echo "기록 불러옴"
+          if git rev-parse --verify -q refs/remotes/state/media-state > /dev/null; then
+            git archive refs/remotes/state/media-state "$STATE_DIR" | tar -x && echo "기록 불러옴"
           fi
 
       - name: Run pipeline
@@ -119,13 +128,13 @@ jobs:
           git add -f "$STATE_DIR"
           TREE="$(git write-tree)"
           unset GIT_INDEX_FILE
-          if PARENT="$(git rev-parse --verify -q refs/remotes/origin/media-state)"; then
+          if PARENT="$(git rev-parse --verify -q refs/remotes/state/media-state)"; then
             if [ "$TREE" = "$(git rev-parse "$PARENT^{tree}")" ]; then echo "변경 없음"; exit 0; fi
             COMMIT="$(git commit-tree "$TREE" -p "$PARENT" -m "Update media-daily records [skip ci]")"
           else
             COMMIT="$(git commit-tree "$TREE" -m "Update media-daily records [skip ci]")"
           fi
-          git push origin "$COMMIT:refs/heads/media-state"   # force 없음
+          git push state "$COMMIT:refs/heads/media-state"   # force 없음
 
       - name: Upload report artifact
         if: always()

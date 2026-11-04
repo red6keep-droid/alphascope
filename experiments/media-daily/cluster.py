@@ -145,13 +145,13 @@ def required_channel_items(rows, korea):
 
 
 def _daily_issues(edition):
-    """그날 데일리가 기록한 이슈 (report-state records/issues, source=daily). 로컬 상태 폴더 → 없으면 origin/report-state."""
+    """그날 데일리가 기록한 이슈 (report-state records/issues, source=daily). 로컬 상태 폴더 → 없으면 state/report-state."""
     year = edition[:4]
     local = os.path.join(config.BASE_DIR, "..", "daily-report", "output", "state")
     rows = record_store.read(local, "issues", year)
     if not rows:
         try:
-            txt = subprocess.run(["git", "show", f"origin/report-state:experiments/daily-report/output/state/records/issues/{year}.jsonl"],
+            txt = subprocess.run(["git", "show", f"state/report-state:experiments/daily-report/output/state/records/issues/{year}.jsonl"],
                                  capture_output=True, text=True, check=True, cwd=config.BASE_DIR).stdout
             rows = [json.loads(l) for l in txt.splitlines() if l.strip()]
         except Exception as e:  # noqa: BLE001

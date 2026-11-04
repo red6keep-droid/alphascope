@@ -1005,7 +1005,7 @@ def verdict_items(s):
 
 
 # ---------------------------------------------------------------- `캘린더` 탭 (2026-10-25 사용자) — 미국 종목 캘린더 탭과 같은 질문 카드 셋.
-# 한국 실적일 · 미국과 연결 종목 실적일 = collect_kr_extra(Yahoo), 시장 일정 = 미국 FOMC · 물가 · 고용(엔비디아 리포트 calendar — origin/nvda-state) + 국내 옵션 만기(둘째 목요일, 계산).
+# 한국 실적일 · 미국과 연결 종목 실적일 = collect_kr_extra(Yahoo), 시장 일정 = 미국 FOMC · 물가 · 고용(엔비디아 리포트 calendar — state/nvda-state) + 국내 옵션 만기(둘째 목요일, 계산).
 # 그날 움직임은 이 종목 · KOSPI 의 최근 2년 일봉으로 — 미국 일정은 한국 시간 다음 날 장에 반영되므로 그 다음 거래일.
 
 import statistics  # noqa: E402
@@ -1026,10 +1026,10 @@ def _signed_ret(bars, day):
 
 
 def us_calendar():
-    """미국 경제 일정 — 엔비디아 리포트가 쌓는 calendar(origin/nvda-state JSONL). 없으면 로컬 nvda.db. 둘 다 없으면 []."""
+    """미국 경제 일정 — 엔비디아 리포트가 쌓는 calendar(state/nvda-state JSONL). 없으면 로컬 nvda.db. 둘 다 없으면 []."""
     root = os.path.join(_HERE, "..", "..")
     try:
-        out = subprocess.run(["git", "show", "origin/nvda-state:experiments/nvda-report/output/state/calendar.jsonl"], capture_output=True, text=True, timeout=30, cwd=root)
+        out = subprocess.run(["git", "show", "state/nvda-state:experiments/nvda-report/output/state/calendar.jsonl"], capture_output=True, text=True, timeout=30, cwd=root)
         if out.returncode == 0 and out.stdout.strip():
             import json
             return [r for r in (json.loads(x) for x in out.stdout.splitlines() if x.strip()) if r.get("kind") in US_MACRO]

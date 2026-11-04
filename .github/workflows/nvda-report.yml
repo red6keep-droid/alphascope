@@ -78,6 +78,15 @@ jobs:
       - uses: actions/checkout@v5
         if: env.IS_SCHEDULED == 'true'
 
+      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
+      - name: State repo (private alphascope-state)
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
       - name: Set up Python
         if: env.IS_SCHEDULED == 'true'
         uses: actions/setup-python@v6
@@ -90,7 +99,7 @@ jobs:
         if: env.IS_SCHEDULED == 'true'
         run: |
           DONE=false
-          if git fetch -q origin nvda-state 2>/dev/null; then
+          if git fetch -q state nvda-state 2>/dev/null; then
             LAST=$(git log -1 --format=%ct FETCH_HEAD)
             SINCE=$(TZ=Asia/Seoul date -d "$(TZ=Asia/Seoul date +%F) 05:00" +%s)
             [ "$LAST" -ge "$SINCE" ] && DONE=true
@@ -106,6 +115,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
+      - name: State repo (private alphascope-state)
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -120,7 +138,7 @@ jobs:
       # 이전 실행의 DB 상태(모든 테이블 JSONL). 없으면 첫 실행 — 일봉 2년·EDGAR 90일·문서 30일·점검표 5분기 백필.
       - name: Load state (nvda-state branch)
         run: |
-          if git fetch origin nvda-state:refs/nvda-state 2>/dev/null; then
+          if git fetch state nvda-state:refs/nvda-state 2>/dev/null; then
             mkdir -p "$STATE_DIR"
             if git archive refs/nvda-state "$STATE_DIR" | tar -x; then
               echo "상태 불러옴: items $(wc -l < "$STATE_DIR/items.jsonl" 2>/dev/null || echo 0)행 · 일봉 $(wc -l < "$STATE_DIR/daily_bars.jsonl" 2>/dev/null || echo 0)행"
@@ -128,6 +146,8 @@ jobs:
           else
             echo "이전 상태 없음 (첫 실행)"
           fi
+          # 트럼프 반응 통계 — trump_bridge 가 state/trump-state 를 git show 로 읽는다 (2026-11-04: 공개 raw URL 대신)
+          git fetch --no-tags state trump-state:refs/remotes/state/trump-state 2>/dev/null || echo "trump-state 없음 — 트럼프 구획 없이"
 
       - name: Run pipeline
         run: |
@@ -275,7 +295,7 @@ jobs:
             echo "nvda-state 브랜치 없음 — 첫 커밋을 만든다."
             COMMIT="$(git commit-tree "$TREE" -m "Update nvda-report state [skip ci]")"
           fi
-          git push origin "$COMMIT:refs/heads/nvda-state"
+          git push state "$COMMIT:refs/heads/nvda-state"
           echo "저장: $COMMIT"
 
       - name: Upload report artifact

@@ -348,10 +348,10 @@ def market_context():
             with open(os.path.join(hist_dir, sorted(os.listdir(hist_dir))[-1]), encoding="utf-8") as f:
                 d = json.load(f)
         else:
-            names = subprocess.run(["git", "ls-tree", "--name-only", "origin/report-state",
+            names = subprocess.run(["git", "ls-tree", "--name-only", "state/report-state",
                                     "experiments/daily-report/output/state/history/"], capture_output=True, text=True,
                                    check=True, cwd=config.BASE_DIR).stdout.split()
-            d = json.loads(subprocess.run(["git", "show", f"origin/report-state:{sorted(names)[-1]}"], capture_output=True,
+            d = json.loads(subprocess.run(["git", "show", f"state/report-state:{sorted(names)[-1]}"], capture_output=True,
                                           text=True, check=True, cwd=config.BASE_DIR).stdout)
     except Exception as e:  # noqa: BLE001
         print(f"[aggregate] 시장 맥락 없음: {str(e)[:80]}")

@@ -106,7 +106,6 @@ INDEX_REBALANCE_MONTHS = (3, 6, 9, 12)
 CALENDAR_LOOKAHEAD_DAYS = 7       # "다가오는 것"에 보이는 범위
 # 트럼프 브리지 (기획서 9절, 2026-10-10 "한 줄만") — trump-trend 상태 브랜치의 분석 JSON
 TRUMP_STATE_PATH = "experiments/trump-trend/output/state/trump_analysis.json"
-TRUMP_STATE_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/trump-state/" + TRUMP_STATE_PATH
 TRUMP_POST_URL = ""                 # 비우면 링크 없음. 블로그 글 주소는 매일 바뀌어 고정하지 않는다
 TRUMP_SEMI_RULES = ("trade_china_semis", "trade_semis_sector")
 TRUMP_MIN_INTENSITY = 5

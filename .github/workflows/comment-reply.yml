@@ -45,6 +45,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
+      - name: State repo (private alphascope-state)
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -59,7 +68,7 @@ jobs:
       - name: Load previous state
         run: |
           STATE=experiments/comment-reply/output/state.json
-          if git fetch origin comment-state:refs/comment-state 2>/dev/null; then
+          if git fetch state comment-state:refs/comment-state 2>/dev/null; then
             if git show "refs/comment-state:$STATE" > state.json.tmp 2>/dev/null; then
               mkdir -p experiments/comment-reply/output
               mv state.json.tmp "$STATE"
@@ -97,7 +106,7 @@ jobs:
           # output/ 은 .gitignore 대상이라 -f 없이는 git add가 종료코드 1로 죽는다.
           git add -f "$STATE"
           git commit -m "Update comment state [skip ci]" || echo "상태 변경 없음"
-          git push --force origin comment-state:comment-state
+          git push --force state comment-state:comment-state
 
       - name: Upload logs
         if: always()

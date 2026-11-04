@@ -105,6 +105,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
+      - name: State repo (private alphascope-state)
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -120,7 +129,7 @@ jobs:
       # actions/checkout은 fetch refspec을 main으로 좁혀두므로 목적지 ref를 명시한다.
       - name: Load state (trump-state branch)
         run: |
-          if git fetch origin trump-state:refs/trump-state 2>/dev/null; then
+          if git fetch state trump-state:refs/trump-state 2>/dev/null; then
             mkdir -p "$STATE_DIR"
             if git archive refs/trump-state "$STATE_DIR" | tar -x; then
               echo "분류 결과 불러옴: $(wc -l < "$STATE_DIR/classifications.jsonl" 2>/dev/null || echo 0)행"
@@ -251,7 +260,7 @@ jobs:
             COMMIT="$(git commit-tree "$TREE" -m "Update trump-trend state [skip ci]")"
           fi
           # force 없음: 원격이 앞서 있으면 거부된다 (concurrency 그룹이 겹침을 막지만, 거부되는 쪽이 안전하다).
-          git push origin "$COMMIT:refs/heads/trump-state"
+          git push state "$COMMIT:refs/heads/trump-state"
           echo "저장: $COMMIT"
 
       - name: Upload report artifact
