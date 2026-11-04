@@ -84,7 +84,7 @@ SECTOR_KO = {"Semiconductor": "반도체", "Technology": "기술", "Financials":
 DIR_KO = {"positive": "긍정", "negative": "부정", "neutral": "중립"}
 # 트럼프 Truth Social 은 trump-trend 가 매일 분류한 라벨을 그대로 쓴다 (trump-state 브랜치). 없으면 정책군 프롬프트로
 TRUMP_LABELS_PATH = os.path.join(BASE_DIR, "..", "trump-trend", "output", "state", "classifications.jsonl")
-TRUMP_LABELS_GIT = "origin/trump-state:experiments/trump-trend/output/state/classifications.jsonl"
+TRUMP_LABELS_GIT = "state/trump-state:experiments/trump-trend/output/state/classifications.jsonl"
 
 
 # ── 인물 ─────────────────────────────────────────────────────────────────

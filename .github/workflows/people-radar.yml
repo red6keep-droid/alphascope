@@ -57,6 +57,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
+      - name: State repo (private alphascope-state)
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -76,16 +85,16 @@ jobs:
         if: env.IS_SCHEDULED == 'true'
         run: python experiments/daily-report/check_published.py --series people
 
-      # classify.py 는 origin/trump-state, aggregate.py 는 origin/report-state 를 git show 로 읽는다.
+      # classify.py 는 state/trump-state, aggregate.py 는 state/report-state 를 git show 로 읽는다.
       # actions/checkout 은 main 만 받으므로 원격 추적 ref 로 따로 받는다. 없으면 각 단계가 알아서 건너뛴다.
       - name: Fetch trump-state / report-state / radar-state
         if: steps.check.outputs.already_published != 'true'
         run: |
           for b in trump-state report-state radar-state; do
-            git fetch --no-tags origin "$b:refs/remotes/origin/$b" 2>/dev/null && echo "$b 받음" || echo "$b 없음"
+            git fetch --no-tags state "$b:refs/remotes/state/$b" 2>/dev/null && echo "$b 받음" || echo "$b 없음"
           done
-          if git rev-parse --verify -q refs/remotes/origin/radar-state > /dev/null; then
-            git archive refs/remotes/origin/radar-state "$STATE_DIR" | tar -x
+          if git rev-parse --verify -q refs/remotes/state/radar-state > /dev/null; then
+            git archive refs/remotes/state/radar-state "$STATE_DIR" | tar -x
             echo "발언 이력 불러옴: $(wc -l < "$STATE_DIR/statements.jsonl" 2>/dev/null || echo 0)행"
           else
             echo "radar-state 없음 (첫 실행)"
@@ -159,7 +168,7 @@ jobs:
           git add -f "$STATE_DIR"
           TREE="$(git write-tree)"
           unset GIT_INDEX_FILE
-          if PARENT="$(git rev-parse --verify -q refs/remotes/origin/radar-state)"; then
+          if PARENT="$(git rev-parse --verify -q refs/remotes/state/radar-state)"; then
             if [ "$TREE" = "$(git rev-parse "$PARENT^{tree}")" ]; then
               echo "변경 없음 — 커밋하지 않는다."
               exit 0
@@ -170,7 +179,7 @@ jobs:
             COMMIT="$(git commit-tree "$TREE" -m "Update people-radar state [skip ci]")"
           fi
           # force 없음: 원격이 앞서 있으면 거부된다
-          git push origin "$COMMIT:refs/heads/radar-state"
+          git push state "$COMMIT:refs/heads/radar-state"
           echo "저장: $COMMIT"
 
       - name: Notify failure

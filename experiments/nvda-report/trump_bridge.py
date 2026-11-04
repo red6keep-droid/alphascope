@@ -15,7 +15,6 @@ import os
 import subprocess
 import sys
 
-import requests
 
 import config
 
@@ -24,15 +23,9 @@ HORIZON_KO = {"next_close": "다음 날 종가", "close": "당일 종가", "d3":
 
 
 def fetch_state():
-    """raw URL → 실패하면 로컬 git(origin/trump-state). 둘 다 안 되면 None."""
+    """비공개 상태 저장소(원격 state = alphascope-state)의 trump-state 브랜치를 git show 로 읽는다 (2026-11-04: 공개 raw URL 은 비공개 전환으로 없어짐). 없으면 None."""
     try:
-        r = requests.get(config.TRUMP_STATE_URL, headers={"User-Agent": config.USER_AGENT}, timeout=30)
-        if r.status_code == 200:
-            return r.json()
-    except Exception as e:  # noqa: BLE001
-        print(f"[trump] raw 읽기 실패: {str(e)[:80]}")
-    try:
-        out = subprocess.run(["git", "show", f"origin/trump-state:{config.TRUMP_STATE_PATH}"],
+        out = subprocess.run(["git", "show", f"state/trump-state:{config.TRUMP_STATE_PATH}"],
                              capture_output=True, text=True, timeout=30, cwd=os.path.join(config.BASE_DIR, "..", ".."))
         if out.returncode == 0 and out.stdout.strip():
             return json.loads(out.stdout)
