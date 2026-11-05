@@ -190,6 +190,23 @@ def main():
     print("[2/6] Gemini 리포트 생성")
     print("=" * 50)
     generate_report.generate_report(INPUT_PATH, REPORT_PATH, analysis_path=analysis_path)
+    # 선정 뉴스 = 규칙 점수(news_pick) — 데일리 AI 가 고른 index 는 쓰지 않는다 (2026-11-05 사용자 batch 8 ⑬: 고른 기준이 보이게). 기록 · 검증 · 렌더가 같은 것을 본다
+    try:
+        import news_pick
+        _analysis = None
+        if analysis_path and os.path.exists(analysis_path):
+            with open(analysis_path, encoding="utf-8") as f:
+                _analysis = json.load(f)
+        _picks = news_pick.as_report_news(news_pick.build(input_data, _analysis, render_html._media_lines(), summarize=False))
+        if _picks:
+            with open(REPORT_PATH, encoding="utf-8") as f:
+                _r = json.load(f)
+            _r["news"] = _picks
+            with open(REPORT_PATH, "w", encoding="utf-8") as f:
+                json.dump(_r, f, ensure_ascii=False, indent=2)
+            print(f"[news_pick] 꼭 볼 뉴스 {len(_picks)}건으로 news 칸 교체")
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::규칙 선정 실패 — AI 가 고른 뉴스 그대로: {e!r}")
 
     print("=" * 50)
     print("[3/6] 검증")

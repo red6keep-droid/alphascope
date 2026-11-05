@@ -22,9 +22,13 @@ import sections as sx  # noqa: E402  — 독자 질문 D1 ~ D6 · K1 ~ K3 구획
 import datetime  # noqa: E402
 import media_feed  # noqa: E402  — 방송 줄 (미디어 데일리 재료의 시장 · 업종 이슈, 2026-10-25 사용자)
 import kr_news  # noqa: E402  — 한국장 탭 `한국장에 영향을 줄 만한 소식` (미디어 데일리 뒤에 이 칸만 갱신)
+import news_pick  # noqa: E402  — 뉴스 묶기 · 꼭 볼 뉴스 · 팝업 재료 (2026-11-05 batch 8)
 
 MEDIA_SHOWN = 5    # 뉴스 구획 끝의 방송 줄 — 앞 5건만 펼쳐 두고 나머지는 `방송 n건 더 보기` 접기 (2026-10-30 사용자: 상한 없이 다 싣는다. 옛 MEDIA_MAX=3 은 미디어 데일리가 나머지를 들던 때 숫자)
 MEDIA_HOURS = 48   # 글을 만드는 시각 기준 최근 48시간 영상 (2026-10-30 사용자, 옛 24)
+STORY_SHOWN = 5    # `여러 방송이 같이 다룬 뉴스는?` 카드에 보이는 묶음 수 (2026-11-05 batch 8 ③)
+CHART_MAIN = getattr(dk, "CHART_MAIN", "#F5B971")   # 우리 그래프 기본색(주황 · 사용자가 노랑이라 부르는 색) · 비교 대상 회색 — 가이드라인 8-0 (⑨)
+CHART_CMP = getattr(dk, "CHART_CMP", "#CBD5E1")
 _media_cache = None
 _rows_cache = None
 
@@ -799,12 +803,161 @@ def _named_reaction(sym, value_html):
 NEWS_REL_SIZE = "15px"   # 뉴스 `관련 자산` 줄 14 → 15 굵게 (2026-10-13 사용자)
 
 
+def _share(rows):
+    c = {}
+    for r in rows:
+        k = media_feed.THEME.get(r["category"], "기타")
+        c[k] = c.get(k, 0) + 1
+    t = sum(c.values())
+    return ({k: v / t * 100 for k, v in c.items()}, t) if t else ({}, 0)
+
+
+def _meter(n, total):
+    """방송 n곳 / 전체 — 작은 네모 칸 (2026-11-05 batch 8 ③: "13곳 중 8곳"이 한눈에)."""
+    on, off = CHART_MAIN, "#E2E8F0"
+    cells = "".join(f'<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:{on if i < n else off};"></span>' for i in range(max(total, n)))
+    return f'<span style="display:inline-flex;gap:2px;vertical-align:middle;position:relative;top:-1px;">{cells}</span>'
+
+
+def _kst(iso):
+    try:
+        t = datetime.datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+        t = t if t.tzinfo else t.replace(tzinfo=datetime.timezone.utc)
+        return t.astimezone(media_feed.KST).strftime("%m.%d %H:%M").lstrip("0")
+    except ValueError:
+        return ""
+
+
+def _theme_card(built):
+    """질문 카드 ① `유튜브 방송이 많이 다룬 분야는?` — 최근 48시간 vs 그 전 7일 (batch 8 ③ ⓐ · ⑧ ⑨ ⑩ ⑪)."""
+    rows = [r for r in media_feed.market(_media_rows()) if r["category"] != "OTHER"]
+    now = datetime.datetime.now(datetime.timezone.utc)
+    cut = (now - datetime.timedelta(hours=MEDIA_HOURS)).strftime("%Y-%m-%dT%H:%M")
+    cur, t_cur = _share([r for r in rows if str(r["published_at"])[:16] >= cut])
+    old, _ = _share([r for r in rows if str(r["published_at"])[:16] < cut])
+    if not cur:
+        return ""
+    themes = sorted(cur, key=lambda k: -cur[k])
+    top = max(list(cur.values()) + list(old.values()))
+    n_ch = built["n_channels_all"]
+    k0 = themes[0]
+    ratio = cur[k0] / old[k0] if old.get(k0) else None
+
+    def row(k):
+        a, b = cur.get(k, 0), old.get(k, 0)
+        hot = bool(b) and a / b >= 1.5 and a >= 10
+        right = (f'<span style="color:#B45309;font-weight:700;">평소의 {a / b:.1f}배</span>' if hot else f"평소 {b:.0f}%")
+        return (f'<div style="display:flex;align-items:center;gap:10px;padding:5px 0;">'
+                f'<span style="flex:0 0 72px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{"#111" if hot else "#374151"};font-weight:{700 if hot else 400};white-space:nowrap;">{_esc(k)}</span>'
+                f'<span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px;">'
+                f'<span style="display:block;height:7px;width:{max(round(a / top * 100), 1)}%;background:{CHART_MAIN};border-radius:2px;"></span>'
+                f'<span style="display:block;height:3px;width:{max(round(b / top * 100), 1)}%;background:{CHART_CMP};border-radius:2px;"></span></span>'
+                f'<span style="flex:0 0 92px;text-align:right;font-size:13px;line-height:18px;color:{dk.NOTE};white-space:nowrap;">'
+                f'<b style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;">{a:.0f}%</b>{right}</span></div>')
+
+    chip = lambda bg, text: (f'<span style="display:inline-flex;align-items:center;gap:5px;margin-right:12px;">'  # noqa: E731 — 범례 칩은 둘 다 9×9 (⑩: 평소 칩만 납작해 글자가 처져 보였다)
+                             f'<span style="display:inline-block;width:{dk.LEGEND_CHIP}px;height:{dk.LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{text}</span>')
+    legend = (f'<span style="display:flex;flex-wrap:wrap;align-items:center;padding-left:{dk.LEGEND_INDENT}px;font-size:{dk.MICRO};line-height:{dk.LH_CARD};color:{dk.NOTE};margin:0 0 4px;">'
+              + chip(CHART_MAIN, "최근 48시간") + chip(CHART_CMP, "평소 (그 전 7일)") + "</span>")
+    chart = (f'<div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{dk.CHART_CARD_PAD}px 12px 6px;margin:0 {dk.CHART_CARD_X}px;">{legend}'
+             + "".join(row(k) for k in themes) + "</div>")   # 그래프 제목 없음 (⑧) — 질문 · 답이 제목 몫
+    sent = (f"유튜브 경제 방송 {n_ch}곳이 최근 48시간에 다룬 주제 {t_cur}건 가운데 {k0}가 {cur[k0]:.0f}%입니다."
+            + (f" 평소(그 전 7일 {old[k0]:.0f}%)의 {ratio:.1f}배입니다." if ratio else ""))
+    tip = ("유튜브 경제 방송이 다룬 주제를 분야별로 센 비중입니다.\n같은 주제를 여러 방송이 다루면 그만큼 많이 셉니다.\n"
+           "평소 = 그 전 7일의 비중. 평소의 1.5배를 넘으면 주황 글씨로 표시합니다.")
+    return cards.question_card("유튜브 방송이 많이 다룬 분야는?", f"{k0} {cur[k0]:.0f}%", "neutral", "#111", [(sent, "plain"), (chart, "html")], tip=tip)
+
+
+def _story_card(built):
+    """질문 카드 ② `여러 방송이 같이 다룬 뉴스는?` — 같은 뉴스로 묶인 것 가운데 두 곳 이상이 다룬 순 (batch 8 ③ ⓑ · ⑪). 줄을 누르면 대표 기사 · 방송 팝업."""
+    multi = [g for g in built["stories"] if g["n_channels"] >= 2]
+    if not multi:
+        return ""
+    n_ch = built["n_channels_all"]
+    g0 = multi[0]
+    rows = []
+    for i, g in enumerate(multi[:STORY_SHOWN]):
+        rep = g["rep"]
+        rows.append(f'<li style="margin:0;padding:11px 0;{"box-shadow:inset 0 1px 0 #E2E8F0;" if i else ""}">'
+                    f'<a href="{_esc(rep.get("url") or "#")}" target="_blank" rel="noopener" data-news-pop="{_esc(g["id"])}" data-trhelp="skip" style="display:flex;align-items:flex-start;gap:8px;color:#111;text-decoration:none;">'
+                    f'<span style="flex:0 0 18px;font-size:{dk.TINY};line-height:26px;font-weight:700;color:{dk.NOTE};">{i + 1}</span>'
+                    f'<span style="flex:1 1 auto;min-width:0;">'
+                    f'<span style="display:block;font-size:{dk.NEWS_TITLE_FS};line-height:26px;font-weight:700;word-break:keep-all;">{_esc(g["name"])}{dk.NEW_PILL if g.get("new") else ""}</span>'
+                    f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:3px;">{_meter(g["n_channels"], n_ch)}'
+                    f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;"><b style="color:#111;">{g["n_channels"]}곳</b> / {n_ch}곳</span></span>'
+                    f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};margin-top:4px;word-break:keep-all;">'
+                    f'{"대표 기사" if rep["kind"] == "article" else "대표 방송"} · {_esc(rep["text"])}</span></span></a></li>')
+    lst = f'<ul style="margin:0 {dk.CHART_CARD_X}px;padding:0 12px;list-style:none;background:#fff;border:1px solid #E2E8F0;border-radius:8px;">{"".join(rows)}</ul>'
+    sent = f"방송 {n_ch}곳 가운데 두 곳 이상이 같이 다룬 뉴스는 {len(multi)}개입니다. 많이 다룬 순으로 {min(len(multi), STORY_SHOWN)}개입니다. 줄을 누르면 대표 기사가 열립니다."
+    tip = ("같은 사건을 다룬 방송 주제와 기사를 하나로 묶고, 몇 곳이 다뤘는지 셌습니다.\n줄을 누르면 대표 기사(없으면 대표 방송)의 요약이 뜹니다.\n"
+           "묶기는 AI 가 사건 단위로 합니다. 분야가 같아도 사건이 다르면 따로 셉니다.")
+    return cards.question_card("여러 방송이 같이 다룬 뉴스는?", f"{g0['short']} {g0['n_channels']}곳", "neutral", "#111", [(sent, "plain"), (lst, "html")], tip=tip)
+
+
+def _news_pop_body(g, built, reaction):
+    """팝업 글 (숨긴 div, 테마 JS 가 화면 가운데 창에 옮긴다 — batch 8 ⑤ ⑥ ⑦): 시각 · 매체 / 헤드라인 / 요약 다섯 줄 / 관련 종목 오늘 · 같은 뉴스 n곳 / 작은 `원문 보기`."""
+    rep = g["rep"]
+    n_ch = built["n_channels_all"]
+    lines = built["lines"].get(rep["id"]) if rep["kind"] == "article" else None
+    if not lines:
+        lines = [rep["detail"]] if rep.get("detail") else []
+    li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:5px 0;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
+                 f'<span style="min-width:0;font-size:16px;line-height:26px;color:#333;word-break:keep-all;">{_esc(ln)}</span></span>' for ln in lines)
+    sx = built["stocks"]
+    data = []
+    seen = []
+    for s in [t for x in g["items"] for t in (x.get("related") or [])]:
+        if s in seen or len(seen) >= 4:
+            continue
+        v = (built["series"].get(s) or {}).get("ret_1d")
+        name = SYMBOL_NAMES.get(s) or (sx.get(s) or {}).get("name") or s
+        if v is None and s in sx and sx[s].get("cp") is not None:
+            v = sx[s]["cp"]
+        if v is None:
+            continue
+        seen.append(s)
+        data.append(f'<span style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;"><span style="color:#111;">{_esc(name)}{"" if name == s else f" <span style=\"color:{dk.SUB};font-size:13px;\">{_esc(s)}</span>"}</span>'
+                    f'<span style="font-weight:700;">{dk.arrow(v)}</span></span>')
+    box = ""
+    if data or g["n_channels"] >= 2:
+        box = f'<div style="margin:12px 0 0;padding:8px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;font-size:15px;line-height:22px;">'
+        if data:
+            box += f'<span style="display:block;font-size:13px;line-height:18px;font-weight:700;color:{dk.NOTE};margin:2px 0;">관련 종목 · 오늘</span>' + "".join(data)
+        if g["n_channels"] >= 2:
+            box += (f'<span style="display:block;font-size:13px;line-height:18px;font-weight:700;color:{dk.NOTE};margin:{8 if data else 2}px 0 4px;">같은 뉴스</span>'
+                    f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;color:#111;">{_meter(g["n_channels"], n_ch)}<span><b>{_esc(g["short"])}</b> · 방송 {g["n_channels"]}곳 / {n_ch}곳</span></span>')
+        box += "</div>"
+    kind = "기사" if rep["kind"] == "article" else "방송"
+    link_text = f'{"원문 보기" if rep["kind"] == "article" else "영상 보기"} ({_esc(rep["source"])}{" · 영어" if rep["kind"] == "article" else ""})'
+    link = (f'<span style="display:block;text-align:right;margin:14px 0 0;"><a href="{_esc(rep["url"])}" target="_blank" rel="noopener" data-trhelp="skip" '
+            f'style="font-size:13px;line-height:18px;color:{dk.SUB};text-decoration:underline;text-underline-offset:3px;">{link_text} {dk.LINK_ICON}</a></span>')   # 작은 글자 링크 — 원문으로 내보내도록 유도하지 않는다 (⑦)
+    meta = f'<span style="display:block;font-size:13px;line-height:18px;color:{dk.SUB};margin:0 0 8px;">{_kst(rep["published_at"])} · {_esc(rep["source"])} {kind}{" · 새 뉴스" if g.get("new") else ""}</span>'
+    return (f'<div data-news-pop-body="{_esc(g["id"])}" data-news-pop-title="{_esc(rep["text"])}" hidden>{meta}'
+            + (li or f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">{dk.INFO_ICON}요약할 재료가 없는 {kind}입니다.</span>')
+            + box + link + "</div>")
+
+
+def _story_item(g, built, reaction, known, compact=False):
+    """목록 한 줄 = 묶음의 대표 (공용 뉴스 카드 모양) — 누르면 팝업. 라벨 = 분야 · `n곳`(두 곳 이상) · 새 뉴스 N. 메타 = 시각 · 매체 기사/방송."""
+    rep = g["rep"]
+    related = [s for x in g["items"] for s in (x.get("related") or []) if s in known][:4]
+    subs = []
+    if related and not compact:
+        subs.append(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;"><span style="font-size:{NEWS_REL_SIZE};font-weight:700;">관련 자산 : '
+                    + " · ".join(_named_reaction(s, reaction(s)) for s in dict.fromkeys(related)) + "</span></span>")
+    labels = dk.pill(g["theme"], bare=True) + (" " + dk.pill(f"{g['n_channels']}곳", "uncertain", bare=True) if g["n_channels"] >= 2 else "")
+    meta = [_kst(rep["published_at"]), f'{rep["source"]} {"기사" if rep["kind"] == "article" else "방송"}']
+    head = _esc(rep["text"]) + (dk.NEW_PILL if g.get("new") else "")
+    return dk.news_item(head, rep.get("url") or "#", "" if compact else (rep.get("detail") or ""), subs, labels, meta, f' data-news-pop="{_esc(g["id"])}" data-trhelp="skip"')   # 테마 JS 가 팝업으로 가로챈다, JS 없는 곳(RSS)은 원문
+
+
 def sec_news(input_data, report, analysis):
-    """뉴스 — 공용 뉴스 카드. 기사 칸(헤드라인 = 원제 번역 · 요약 줄 · 테마 · 관련 종목)은 모두 공용 처리(news_store, collect_news.process)가 정하고,
-    데일리 AI 는 어떤 기사를 실을지(index)만 고른다 (2026-10-25 사용자: 공용 기사에 특별 케이스 없이). 선정 이유 줄은 없앴다 — 요약 줄이 그 몫."""
+    """뉴스 (2026-11-05 batch 8 ③ · ⑤ · ⑬ 재설계) — 방향 막대 / 질문 카드 둘(분야 비중 · 여러 방송이 같이 다룬 뉴스) / 꼭 볼 뉴스 5(규칙 점수) / 전체 뉴스(분야 칩 · 최신 순).
+    기사(CNBC 48시간) · 유튜브 방송 주제(48시간)를 news_stories 가 같은 사건끼리 묶고(news_pick.build), 같은 뉴스는 한 줄 + `n곳`. 줄을 누르면 팝업(요약 다섯 줄 · 원문 작은 링크).
+    옛 `방송 n건 더 보기`(111건, 2026-10-30 '상한 없이 전부') 는 없앴다 — 독자가 볼 수 없는 목록이었다 (사용자)."""
     series = (analysis or {}).get("series") or {}
     rates = (analysis or {}).get("rates") or {}
-    quotes = {q["symbol"]: q for q in input_data.get("gainers", []) + input_data.get("most_active", []) if q.get("symbol")}   # 옛 입력용 (2026-10-18 부터 빈 목록)
+    quotes = {q["symbol"]: q for q in input_data.get("gainers", []) + input_data.get("most_active", []) if q.get("symbol")}
     known = set(series) | set(quotes)
 
     def reaction(sym):
@@ -814,45 +967,47 @@ def sec_news(input_data, report, analysis):
             return dk.arrow(series[sym].get("ret_1d"))
         return dk.arrow(quotes[sym].get("change_pct"))
 
-    items, dirs = [], {}
-    for item in report.get("news", []):
-        try:
-            news_item = input_data.get("news", [])[item.get("index")]
-        except (IndexError, TypeError):
-            continue
-        if news_item.get("market_dir"):   # 공용 처리의 시장 전체 방향 — 없으면(옛 분류) 막대에 넣지 않는다 (P143)
-            dirs[news_item["market_dir"]] = dirs.get(news_item["market_dir"], 0) + 1
-        theme = news_item.get("theme")
-        if theme and theme not in THEME_VOCAB:
-            theme = "기타"
-        tag = dk.pill(theme, bare=True) if theme else ""
-        title = _esc(news_item.get("headline_ko") or news_item.get("title") or "")   # 원제 번역 (홈과 같은 기사 = 같은 헤드라인) — 처리 실패면 영문 원제
-        related = [s for s in (news_item.get("related") or []) if isinstance(s, str) and s in known][:4]   # 관련도 2 이상 종목 중 오늘 시세가 있는 것
-        subs = []
-        if related:
-            subs.append(f'<span style="font-size:{NEWS_REL_SIZE};font-weight:700;">관련 자산 : ' + " · ".join(_named_reaction(s, reaction(s)) for s in related) + "</span>")   # 15px 굵게 (2026-10-13 사용자) · 종목 이름도 증감 색 (가이드라인 3-3)
-        sub_html = [f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;">{x}</span>' for x in subs]
-        # 공용 뉴스 카드 (design_kit.news_item, 2026-10-25 뉴스 형식 통일): 헤드라인(원문 링크) / 요약 줄 / 관련 자산 / [테마]  매체
-        # 매체명을 보이는 글자로 — 출처 명시(저작권법 제37조)는 툴팁이 아니라 본문 글자여야 한다 (2026-10-21, 운영지침 D4-3)
-        items.append(dk.news_item(title, news_item.get("link"), news_item.get("detail_ko") or "", sub_html, tag, [news_item.get("source") or ""]))   # 요약 줄 = 공용 처리 detail
-    # 방송 줄 — 미디어 데일리 재료 중 시장 · 업종 이슈, 방송 여러 곳이 같이 다룬 순 (2026-10-25 사용자). 의견이 섞여 `방송` 라벨 + 채널 · 방송 n곳
-    # 시장 이야기의 집은 데일리 (2026-10-30 사용자: 미디어 데일리 글을 접으며) — 상한 없이 전부, 앞 MEDIA_SHOWN 건만 펼치고 나머지는 접기
-    media = []
-    for r in _media_lines():
-        labels = (dk.pill(r["theme"], bare=True) + " " + dk.pill({"positive": "긍정", "negative": "부정"}.get(r["direction"], "중립"),
-                                                                  r["direction"] if r["direction"] in ("positive", "negative") else "neutral", bare=True)
-                  + (" " + dk.pill("엇갈림", "uncertain", bare=True) if r.get("split") else "")
-                  + (" " + dk.pill("예상 밖", "uncertain", bare=True) if r.get("surprise") else ""))   # `방송` 라벨은 뺀다 — 메타의 채널 · 방송 n곳과 중복 (2026-10-26 사용자). 엇갈림 · 예상 밖은 미디어 데일리 순위 글에서 옮겨 옴
-        meta = [_kst_hm(r["published_at"]), r["channel"], f"방송 {r['n_channels']}곳" if r["n_channels"] > 1 else ""]
-        media.append(dk.news_item(_esc(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"'))
-    if not items and not media:
+    media = _media_lines()
+    cut = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=MEDIA_HOURS)).strftime("%Y-%m-%dT%H:%M")
+    built = news_pick.build(input_data, analysis, media, all_channels={r["channel"] for r in _media_rows() if str(r["published_at"])[:16] >= cut})
+    if not built["stories"]:
         return dk.muted("주요 뉴스 없음")
-    for k, v in media_feed.direction_counts(_media_lines()).items():   # 방송 줄도 같은 막대에 (엇갈림 = 불확실)
+    dirs = {}
+    for n in input_data.get("news") or []:
+        if n.get("market_dir"):
+            dirs[n["market_dir"]] = dirs.get(n["market_dir"], 0) + 1
+    for k, v in media_feed.direction_counts(media).items():
         dirs[k] = dirs.get(k, 0) + v
-    out = dk.direction_bars(dirs, {})   # 엔비디아처럼 뉴스 방향 막대 — 데일리는 그날 글이라 `오늘` 만 (2026-10-31 사용자 P143)
-    out += dk.item_rules(items + media[:MEDIA_SHOWN], sub=True, indent=dk.ALIGN_PX)   # 카드 대신 기사 사이 가로 구분선, 위아래 27 (2026-10-13 사용자)
-    if len(media) > MEDIA_SHOWN:
-        out += dk.fold(f"방송 {len(media) - MEDIA_SHOWN}건 더 보기", dk.item_rules(media[MEDIA_SHOWN:], sub=True, indent=dk.ALIGN_PX))
+    out = dk.direction_bars(dirs, {})   # 뉴스 방향 막대 — 데일리는 `오늘` 만 (P143)
+    out += cards.cards_grid(_theme_card(built) + _story_card(built))
+    sub = lambda t, note, tip_html="": (f'<h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:2px 6px;font-size:{dk.NEWS_TITLE_FS};line-height:26px;font-weight:700;color:#111;margin:24px 0 2px;padding-left:{dk.ALIGN_PX}px;position:relative;">'  # noqa: E731
+                                        f'{_esc(t)}{tip_html}<span style="font-weight:400;color:{dk.SUB};font-size:{dk.TINY};">{_esc(note)}</span></h3>')
+    pops = []
+    if built["picks"]:
+        tip = dk.tip("우리 데이터로 매긴 점수 순입니다. AI 가 고르지 않습니다.\n· 다룬 방송 수 = 두 곳 이상이면 한 곳마다 2점\n· 관련 자산의 그날 움직임 = 1% 마다 1점 (4점까지)\n"
+                     "· 예상 밖 표시 = 2점\n· 시장에 좋거나 나쁜 방향이 있는 뉴스 = 1점\n· 최근 12시간 안 = 1점")
+        out += sub("꼭 볼 뉴스", f"{len(built['picks'])}건 · 점수 순", tip)
+        out += dk.item_rules([_story_item(g, built, reaction, known) for g in built["picks"]], sub=True, indent=dk.ALIGN_PX)
+        pops += [_news_pop_body(g, built, reaction) for g in built["picks"]]
+    rest = built["rest"]
+    if rest:
+        out += sub("전체 뉴스", f"최근 48시간 · {len(rest)}건 · 최신 순 · 같은 뉴스는 한 줄")
+        chips = [("전체", len(rest))] + sorted(built["chips"].items(), key=lambda kv: -kv[1])
+        chip_css = f"flex:none;padding:5px 10px;border:1px solid #E2E8F0;border-radius:999px;background:#fff;color:#374151;font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;"
+        out += (f'<div data-news-chips="1" style="display:flex;gap:6px;overflow-x:auto;padding:6px {dk.ALIGN_PX}px 8px;margin:0 0 2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
+                + "".join(f'<button type="button" data-chip="{_esc(k)}" aria-pressed="{"true" if i == 0 else "false"}" style="{chip_css}">{_esc(k)} <span style="color:{dk.SUB};">{n}</span></button>'
+                          for i, (k, n) in enumerate(chips)) + "</div>")
+        lis = []
+        for i, g in enumerate(rest):
+            item = _story_item(g, built, reaction, known, compact=True)
+            lis.append(f'<li data-theme="{_esc(g["theme"])}"{" data-more=\"1\" hidden" if i >= news_pick.LIST_SHOWN else ""} style="margin:0;padding:{dk.RULE_GAP - dk.NEWS_VP if i else 2}px {dk.ALIGN_PX}px {dk.RULE_GAP - dk.VP}px;'
+                       f'line-height:{dk.LH_BODY};{"box-shadow:inset 0 1px 0 #E2E8F0;" if i else ""}">{item}</li>')
+            pops.append(_news_pop_body(g, built, reaction))
+        out += f'<ul data-news-list="1" style="margin:0 0 8px;padding:0;list-style:none;font-size:{dk.SMALL};">{"".join(lis)}</ul>'
+        if len(rest) > news_pick.LIST_SHOWN:
+            out += (f'<button type="button" data-news-more="1" data-label="뉴스 {len(rest) - news_pick.LIST_SHOWN}건 더 보기" style="{dk.FOLD_BTN}width:100%;margin:0 0 8px;">'
+                    f'<span>뉴스 {len(rest) - news_pick.LIST_SHOWN}건 더 보기</span> {dk.ACC_CHEV}</button>')
+    out += "".join(pops)
     return out
 
 
@@ -928,7 +1083,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     ]
     today_cards = sx.normal_card(a) + sx.shock_card(a) + sx.market_now_card(a)
     if today_cards:
-        parts.append(dk.section("핵심 질문", cards.cards_grid(today_cards), tab=TAB_TODAY))
+        parts.append(dk.section(TAB_TODAY, cards.cards_grid(today_cards), tab=TAB_TODAY))   # 제목 `핵심 질문` 삭제 (2026-11-05 사용자 batch 8 ①) — 탭 이름과 같은 제목은 테마가 숨긴다, 탭 나누기 h2 는 남아야 한다
     parts += [
         dk.section("주요 지수", sec_indices(indices, analysis, report), tab=TAB_TODAY),
         dk.keep_tone(dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_TODAY)),   # 뉴스는 헤드라인체 그대로 (2026-10-18 사용자)

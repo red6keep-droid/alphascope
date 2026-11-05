@@ -1,10 +1,11 @@
 """시장 뉴스 수집 (CNBC RSS)
 
-루트의 fetch_news.py 로직을 재사용하되, Gemini가 3~5개를 선정할 수 있도록
-더 많은 후보(20건)를 수집한다.
+루트의 fetch_news.py 로직을 재사용한다. 후보는 **최근 NEWS_HOURS(48)시간** 기사만 (2026-11-05 사용자 batch 8 ②: CNBC 목록에는 며칠 ~ 2주 지난 기사가
+섞여 들어와 요약 줄 · 한글 헤드라인이 비었다 — 공용 처리가 오래된 기사를 AI 에 보내지 않는다). 시차 때문에 24 가 아니라 48 (사용자). 최신이 위.
 """
 
 import datetime
+import email.utils
 import html as html_mod
 import re
 import xml.etree.ElementTree as ET
@@ -19,7 +20,8 @@ HEADERS = {
         "Chrome/120.0 Safari/537.36"
     )
 }
-MAX_ITEMS = 20
+MAX_ITEMS = 40   # 20 → 40: 48시간 안 기사만 남기므로 넉넉히 (데일리 AI 프롬프트에는 처리된 기사만 간다)
+NEWS_HOURS = 48
 TIMEOUT = 30
 
 SECTION_TITLES = {
@@ -45,8 +47,11 @@ def strip_tags(text):
 
 
 def parse_published(rfc822):
+    """RSS pubDate → UTC 'YYYY-MM-DD HH:MM:SS' (옛 형식 그대로). 못 읽으면 원문."""
     try:
-        dt = datetime.datetime.strptime(rfc822.strip(), "%a, %d %b %Y %H:%M:%S %Z")
+        dt = email.utils.parsedate_to_datetime(rfc822.strip())
+        if dt.tzinfo is not None:
+            dt = dt.astimezone(datetime.timezone.utc)
         return dt.strftime("%Y-%m-%d %H:%M:%S")
     except Exception:
         return rfc822.strip()
@@ -82,8 +87,11 @@ def collect_news():
             "summary": summary[:300],
         })
 
-    results = items[:MAX_ITEMS]
-    print(f"뉴스 수집 완료: {len(results)}건")
+    cut = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=NEWS_HOURS)).strftime("%Y-%m-%d %H:%M:%S")
+    fresh = [it for it in items if it["published"] >= cut]   # 48시간 밖 기사는 후보에서 뺀다 (batch 8 ②)
+    fresh.sort(key=lambda it: it["published"], reverse=True)   # 최신이 위
+    results = fresh[:MAX_ITEMS]
+    print(f"뉴스 수집 완료: {len(results)}건 (목록 {len(items)}건 중 {NEWS_HOURS}시간 안)")
     return results
 
 
@@ -111,7 +119,7 @@ def process(items):
             mine[k] = dict(store.get(k) or {"item_id": k, "title": it["title"], "url": it["link"], "source": it.get("source") or "CNBC",
                                               "published_at": it["published"].replace(" ", "T") + "Z", "queries": ["daily"]},
                            snippet=it.get("summary", ""))
-        mine = news_store.classify(news_store.recheck(mine), lambda _: None, None, label="daily-news")
+        mine = news_store.classify(news_store.recheck(mine), lambda _: None, None, label="daily-news", hours=NEWS_HOURS)   # 데일리는 48시간 (batch 8 ②)
         for it in items:
             x = mine.get(hashlib.sha1(it["link"].encode()).hexdigest()[:12]) or {}
             if not x.get("ai_model"):
@@ -120,6 +128,12 @@ def process(items):
                       issue=x.get("issue"), subtopic=x.get("subtopic"), scope=x.get("scope"), scheduled=x.get("scheduled"), surprise=x.get("surprise"),
                       market_dir=x.get("market_dir"))   # 뉴스 방향 막대 (P143)
         print(f"[공용 처리] 헤드라인 {sum(1 for it in items if it.get('headline_ko'))}/{len(items)} (홈이 처리해 둔 것 {sum(1 for k in mine if k in store)})")
+        done = [it for it in items if it.get("headline_ko")]
+        if len(done) >= 3:   # 처리 안 된 기사(영문 원제 · 요약 없음)는 후보에서 뺀다 — AI 가 거의 다 막힌 날만 그대로 (batch 8 ②)
+            dropped = len(items) - len(done)
+            if dropped:
+                print(f"[공용 처리] 미처리 {dropped}건은 후보에서 뺌")
+            items = done
     except Exception as e:  # noqa: BLE001
         print(f"::warning::공용 뉴스 처리 실패 — 데일리 AI 제목으로: {str(e)[:120]}")
     return items
