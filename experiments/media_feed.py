@@ -156,6 +156,7 @@ def rows(items):
             seen.add(key)
             pub = it.get("publishedAt")
             out.append({"id": f"{it.get('id')}/{i}", "topic": iss["topic"], "note": iss.get("note") or "",
+                        "lines": [str(x) for x in (iss.get("lines") or []) if x][:5],   # 수집기 요약 다섯 줄 — 데일리 뉴스 팝업 (2026-11-05 요청, yutb-sub doc/요청-이슈-요약-다섯-줄.md)
                         "category": iss.get("category") or "OTHER", "scope": iss.get("scope") or "",
                         "direction": DIRECTION.get(iss.get("stance"), "neutral"), "surprise": iss.get("surprise") == "surprise",
                         "tickers": [_ticker(t) for t in iss.get("tickers") or []], "country": iss.get("country") or "",

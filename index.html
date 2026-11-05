@@ -4433,24 +4433,26 @@ body.no-dashboard .main-content { padding-top: 32px; }
         }, true);
         [].slice.call(root.querySelectorAll('[data-news-pop]')).forEach(function (a) { a.setAttribute('aria-haspopup', 'dialog'); });
 
-        /* 분야 칩 · 더 보기 */
+        /* 분야 칩 · 더 보기 (batch 9 ①): `전체` 칩 없음 — 첫 칩 `주요 뉴스` = li[data-pick], 분야 칩 = li[data-theme]. 분야마다 data-shown 건 보이고 `뉴스 n건 더 보기` 가 나머지를 편다 */
         var chips = root.querySelector('[data-news-chips]'), list = root.querySelector('[data-news-list]'), more = root.querySelector('[data-news-more]');
         if (!chips || !list) return;
-        var items = [].slice.call(list.querySelectorAll('li[data-theme]')), opened = false, current = '전체';
+        var items = [].slice.call(list.querySelectorAll('li[data-theme]')), shown = parseInt(list.getAttribute('data-shown') || '10', 10), opened = false, current = '주요 뉴스';
         function apply() {
-          var shown = 0;
+          var n = 0, hidden = 0;
           items.forEach(function (li) {
-            var hit = current === '전체' || li.getAttribute('data-theme') === current;
-            var hide = !hit || (current === '전체' && !opened && li.hasAttribute('data-more'));
-            li.hidden = hide; if (!hide) shown++;
+            var hit = current === '주요 뉴스' ? li.hasAttribute('data-pick') : li.getAttribute('data-theme') === current;
+            var hide = !hit || (!opened && n >= shown);
+            if (hit) n++;
+            if (hit && hide) hidden++;
+            li.hidden = hide;
           });
-          if (more) more.style.display = (current === '전체' && !opened) ? '' : 'none';   /* 버튼은 인라인 display:flex 라 hidden 속성이 지지 않는다 */
+          if (more) { more.style.display = hidden ? '' : 'none'; var t = more.querySelector('span'); if (t) t.textContent = '뉴스 ' + hidden + '건 더 보기'; }
           var first = true;
           items.forEach(function (li) { if (li.hidden) return; li.style.boxShadow = first ? 'none' : 'inset 0 1px 0 #E2E8F0'; first = false; });
         }
         [].slice.call(chips.querySelectorAll('[data-chip]')).forEach(function (b) {
           b.addEventListener('click', function () {
-            current = b.getAttribute('data-chip');
+            current = b.getAttribute('data-chip'); opened = false;
             [].slice.call(chips.querySelectorAll('[data-chip]')).forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
             apply();
           });

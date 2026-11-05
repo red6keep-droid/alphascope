@@ -90,7 +90,8 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
         it = {"id": "m" + str(r["id"]), "kind": "media", "text": r["topic"], "theme": r.get("theme") or "기타", "published_at": _iso(r["published_at"]),
               "url": r.get("url"), "source": r.get("channel") or "", "detail": r.get("note") or "", "related": list(r.get("tickers") or [])[:4],
               "surprise": r.get("surprise"), "market_dir": "uncertain" if r.get("split") else r.get("direction"), "channels": list(r.get("channels") or []),
-              "n_videos": r.get("n_videos") or 1, "title": r["topic"], "new": _iso(r["published_at"]) > prev["at"] if prev["at"] else False}
+              "n_videos": r.get("n_videos") or 1, "title": r["topic"],   # lines = 수집기 요약 다섯 줄 (batch 9 ⑧)
+              "lines": [str(x) for x in (r.get("lines") or []) if x][:5], "new": _iso(r["published_at"]) > prev["at"] if prev["at"] else False}
         items.append(it)
         src[it["id"]] = it
     stories = news_stories.group(items, cache_path=os.path.join(STATE_DIR, "news_stories.json"), label="daily-stories")
