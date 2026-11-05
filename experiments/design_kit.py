@@ -1561,3 +1561,27 @@ def direction_bars(today, week):
     gap = f'<span style="display:block;height:{BAR_GROUP_GAP - 5}px;"></span>' if sum((today or {}).values()) and sum((week or {}).values()) else ""   # 한쪽이 비면 그 막대 · 사이 여백 없이 (데일리 = 오늘만)
     return (f'<div data-cards="1" style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{SEP_GAP - 3}px 12px {SEP_GAP - 3 - 10}px;">{bar("오늘", today or {})}'   # 두 막대를 카드 하나에 (2026-10-13 사용자)
             f'{gap}{bar("최근 7일", week or {})}</div>')
+
+
+def tv_chart_fold(symbol, tz, key):
+    """종목 페이지 봉차트 PNG 아래 `장중 차트 보기` 접힘 줄 (2026-11-05 사용자) — 펼칠 때만 TradingView 15분봉 위젯을 불러온다(그 전엔 통신 없음).
+    위젯은 표시 전용(TradingView 약관) — 숫자를 꺼내 쓰지 않는다. 우리 봉차트 PNG 가 그날 기록이고, 위젯은 독자가 원할 때 보는 참고.
+    한국 종목은 거래소 규정상 TradingView 무료도 지연이라 `실시간` 이라 부르지 않는다. RSS · 검색 미리보기처럼 스크립트가 안 도는 곳에서는 접힌 줄만 남는다.
+    symbol: TradingView 표기(KRX:005930 · AAPL · BRK.B) · tz: 차트 시간대 · key: 페이지 안 고유 id 조각(종목 코드)."""
+    sid = "tv-" + re.sub(r"[^A-Za-z0-9]", "", str(key))
+    ico = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+           '<path d="M2 12l3.5-4 3 2.5L14 4"/><path d="M10.5 4H14v3.5"/></svg>')
+    cfg = json.dumps({"autosize": True, "symbol": symbol, "interval": "15", "range": "1D", "timezone": tz, "theme": "light", "style": "1", "locale": "kr",
+                      "hide_top_toolbar": True, "hide_legend": False, "allow_symbol_change": False, "save_image": False, "withdateranges": False,
+                      "calendar": False, "support_host": "https://www.tradingview.com"}, ensure_ascii=False)
+    return (f'<details id="{sid}" data-tv="1" style="margin:-8px 0 16px;max-width:1024px;">'
+            f'<summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #E2E8F0;border-radius:8px;'
+            f'font-size:13px;font-weight:600;color:#4B5563;background:#fff;">{ico}장중 차트 보기<span style="font-weight:400;color:#9CA3AF;">· TradingView 15분봉</span></summary>'
+            f'<div data-tv-box="1" style="margin-top:8px;min-height:360px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff;">'
+            f'<div style="display:flex;align-items:center;justify-content:center;height:360px;color:#9CA3AF;font-size:13px;">TradingView 차트를 불러오는 중…</div></div></details>'
+            f'<script>(function(){{var d=document.getElementById("{sid}");if(!d||d.__tv)return;d.__tv=1;'
+            f'd.addEventListener("toggle",function(){{if(!d.open||d.__done)return;d.__done=1;var b=d.querySelector("[data-tv-box]");'
+            f'var c=document.createElement("div");c.className="tradingview-widget-container";c.style.height="360px";'
+            f'var w=document.createElement("div");w.className="tradingview-widget-container__widget";c.appendChild(w);'
+            f'var s=document.createElement("script");s.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";s.async=true;'
+            f's.text={json.dumps(cfg)};c.appendChild(s);b.textContent="";b.appendChild(c);}});}})();</script>')
