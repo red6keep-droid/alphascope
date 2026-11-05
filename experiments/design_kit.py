@@ -1563,6 +1563,15 @@ def direction_bars(today, week):
             f'{gap}{bar("최근 7일", week or {})}</div>')
 
 
+def report_stamp(day_text, when_text):
+    """종목 페이지 제목 바로 아래 한 줄 — 이 페이지가 어느 날 종가 기준인지 · 매 거래일 장 마감 뒤 새로 나온다는 것 · 장중 가격은 어디서 보는지 (2026-11-05 사용자:
+    장중 가격을 볼 수 있게 되니 종가 리포트라는 점을 제목에서 알리자). 제목 글자(검색어)는 건드리지 않고 본문 첫 줄에 둔다. 날짜는 `어제` 같은 상대어 대신 실제 날짜."""
+    ico = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" '
+           'style="flex:none;margin-top:2px;"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.4 1.6"/></svg>')
+    return (f'<p data-report-stamp="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 10px;font-size:13px;line-height:18px;color:#6B7280;word-break:keep-all;">{ico}'
+            f'<span>{day_text} 종가 기준 리포트입니다. 매 거래일 장을 마친 뒤 새로 나오고({when_text}), 장중 가격은 아래 <b style="font-weight:600;color:#4B5563;">장중 차트 보기</b>에서 볼 수 있습니다.</span></p>')
+
+
 def intraday_chart_fold(code, bars_url):
     """한국 종목 페이지 봉차트 PNG 아래 `장중 차트 보기` 접힘 줄 — 우리 5분봉(live_bars.json, collect_kr_live.py 가 장중 10분마다) 을 Lightweight Charts(Apache 2.0) 로 그린다 (2026-11-05 사용자).
     TradingView 무료 위젯은 KRX 종목을 막아("TradingView 에서만 제공되는 심볼", 목업 스크린샷) 미국(tv_chart_fold)과 달리 우리가 그린다. 펼칠 때만 라이브러리 · 자료를 받는다.
