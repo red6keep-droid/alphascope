@@ -37,10 +37,10 @@ PROMPT = os.path.join(BASE, "prompts", "news_classify.txt")
 LEAD_HOURS = 36   # 첫 문단은 이 시간 안의 기사만 받는다 — 목록은 오늘자만 보인다 (2026-10-25 사용자)
 SNIPPET = 500     # 모델에 넣는 첫 문단 길이 — Groq 분당 8,000토큰 안에 한 배치가 들어가게
 # 이슈 코드 → 데일리 뉴스 테마 (daily-report THEME_VOCAB) — 테마도 공용 처리에서 (2026-10-25 사용자: 데일리 AI 가 따로 정하지 않는다)
-THEME = {"RATES_FED": "금리", "INFLATION": "매크로", "GROWTH_JOBS": "매크로", "TARIFF_TRADE": "정책/규제", "GEOPOLITICS": "지정학", "OIL_ENERGY": "에너지",
+THEME = {"RATES_FED": "금리", "INFLATION": "거시경제", "GROWTH_JOBS": "거시경제", "TARIFF_TRADE": "정책/규제", "GEOPOLITICS": "지정학", "OIL_ENERGY": "에너지",
          "AI_CAPEX": "AI/반도체", "EARNINGS": "실적", "CORP_EVENT": "실적", "REGULATION": "정책/규제", "FISCAL_POLITICS": "정책/규제",
-         "CREDIT_BANKS": "매크로", "MARKET_STRUCTURE": "매크로", "INVESTOR_CALLS": "기타", "FX_GLOBAL": "매크로", "CRYPTO": "기타",
-         "REAL_ESTATE": "매크로", "OTHER": "기타"}
+         "CREDIT_BANKS": "거시경제", "MARKET_STRUCTURE": "거시경제", "INVESTOR_CALLS": "기타", "FX_GLOBAL": "거시경제", "CRYPTO": "기타",
+         "REAL_ESTATE": "거시경제", "OTHER": "기타"}
 
 BATCH = 10   # 한 호출 기사 수 — Groq 분당 8,000토큰(입력 + 답) 안에 (2026-10-25, 옛 lite 25)
 QWEN_BATCH = 4   # Qwen 이 첫 단계인 사슬(news)은 4건 — 답이 기사당 약 210토큰이라 10건이면 Qwen 분당 출력 1,000토큰(OTPM)에 걸려
@@ -253,9 +253,10 @@ def _leads(items, cache_path):
         return out
 
 
-def classify(store, save, lead_cache=None, label="radar-news"):
+def classify(store, save, lead_cache=None, label="radar-news", hours=CLASSIFY_HOURS):
     """새 기사 · 문장 탈락 기사만 분류 (ai_model 이 없는 것). Groq 두 사슬(news · news-alt)을 배치마다 번갈아 쓴다.
-    save(store) = 부르는 쪽의 저장 함수 (배치마다 부른다). lead_cache = 첫 문단 캐시 파일 (깃에 넣지 않는 곳, None 이면 기사를 열지 않는다)."""
+    save(store) = 부르는 쪽의 저장 함수 (배치마다 부른다). lead_cache = 첫 문단 캐시 파일 (깃에 넣지 않는 곳, None 이면 기사를 열지 않는다).
+    hours = 이보다 오래된 미분류 기사는 보내지 않는다 — 기본 CLASSIFY_HOURS(24), 미국 데일리는 48 (2026-11-05 사용자: 뉴스 기사는 48시간, 시차 때문에 안전하게)."""
     _env()
     from llm_chain import LLMPool, usage_line
     head = open(PROMPT, encoding="utf-8").read()
@@ -265,10 +266,10 @@ def classify(store, save, lead_cache=None, label="radar-news"):
     except RuntimeError as e:
         print(f"[news] {e} — 분류 없이 둔다(판단 유보)")
         return store
-    cut = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=CLASSIFY_HOURS)).strftime("%Y-%m-%dT%H:%M")
+    cut = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M")
     old = sum(1 for v in store.values() if not v.get("ai_model") and v["published_at"][:16] < cut)
     if old:
-        print(f"[news] {CLASSIFY_HOURS}시간보다 오래된 미분류 {old}건은 AI 에 보내지 않음")
+        print(f"[news] {hours}시간보다 오래된 미분류 {old}건은 AI 에 보내지 않음")
     deadline = time.time() + MAX_MINUTES * 60
     for round_ in (1, 2):   # 2회째 = 이번 실행에서 문장 탈락한 기사 한 번 더
         todo = sorted((v for v in store.values() if not v.get("ai_model") and v["published_at"][:16] >= cut), key=lambda v: v["published_at"])

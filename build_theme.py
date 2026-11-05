@@ -240,17 +240,13 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 14px; line-height: 20px; color: #7A7A7A; }   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 (2026-10-20 사용자) */
 /* 기사 번역 안내 (2026-10-19 사용자) — 기사 제목은 원문, 옆 '번역 방법' 14px 회색 밑줄 글자 버튼. 누르면 브라우저 번역법 팝업(툴팁 팝업과 같은 상자).
    구글 번역 주소로 여는 방식은 한국에서 막혀 있어 뺐다 (같은 날) */
-.news-orig { margin: 0 0 0 6px; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; cursor: pointer; vertical-align: baseline; -webkit-tap-highlight-color: transparent; }
-.news-orig:hover { color: #111; }
-.news-pop-lead { margin: 0; }
-.news-pop-steps { margin: 12px 0 0; padding: 0; list-style: none; }
-.news-pop-steps li { display: flex; align-items: flex-start; gap: 8px; }
-.news-pop-steps li + li { margin-top: 4px; }
-.news-pop-steps b, .news-pop-tip b { color: #111; }
-.news-pop-num { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-top: 6px; border-radius: 50%; background: #111; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 1; }
-.news-pop-tip { margin: 14px 0 0; padding: 10px 12px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 16px; line-height: 26px; }
-.news-pop-go { display: block; margin-top: 18px; padding: 10px 12px; background: #111; border: 1px solid #111; border-radius: 8px; color: #fff !important; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; text-decoration: none; }   /* 검은 테마 버튼 */
-.news-pop-go:hover { background: #000; }
+/* 뉴스 팝업 (2026-11-05 batch 8 ⑤ ⑥ ⑦) — 툴팁 팝업 상자 그대로, 글만 16px · 행간 26. 분야 칩은 눌린 것만 검정 */
+.news-pop-body { font-size: 16px; line-height: 26px; }
+.post-body [data-news-chips] { scrollbar-width: none; }
+.post-body [data-news-chips]::-webkit-scrollbar { display: none; }
+.post-body [data-chip][aria-pressed="true"] { background: #111 !important; border-color: #111 !important; color: #fff !important; }
+.post-body [data-chip][aria-pressed="true"] span { color: #CBD5E1 !important; }
+.post-body [data-news-more] .acc-chev { transition: transform .2s; }
 /* 그래프 확대 팝업 (2026-10-16 사용자) — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
 .img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); cursor: pointer; }   /* cursor:pointer — 아이폰은 누를 수 있는 모양이 없는 요소의 탭을 click 으로 올리지 않아 바깥 탭이 두 번째에야 닫혔다 (2026-10-21 사용자) */
 .img-pop-scroll img { cursor: default; }

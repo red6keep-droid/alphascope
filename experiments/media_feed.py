@@ -156,6 +156,7 @@ def rows(items):
             seen.add(key)
             pub = it.get("publishedAt")
             out.append({"id": f"{it.get('id')}/{i}", "topic": iss["topic"], "note": iss.get("note") or "",
+                        "lines": [str(x) for x in (iss.get("lines") or []) if x][:5],   # 수집기 요약 다섯 줄 — 데일리 뉴스 팝업 (2026-11-05 요청, yutb-sub doc/요청-이슈-요약-다섯-줄.md)
                         "category": iss.get("category") or "OTHER", "scope": iss.get("scope") or "",
                         "direction": DIRECTION.get(iss.get("stance"), "neutral"), "surprise": iss.get("surprise") == "surprise",
                         "tickers": [_ticker(t) for t in iss.get("tickers") or []], "country": iss.get("country") or "",
@@ -334,8 +335,8 @@ _WORD = re.compile(r"[가-힣A-Za-z0-9]{2,}")
 _STOP = {"기대", "전망", "우려", "논쟁", "강세", "약세", "상승", "하락", "증가", "감소", "영향", "관련", "지속", "확대", "축소", "가능성", "발표", "소식", "실적", "분기", "1분기", "2분기", "3분기", "4분기", "주가", "시장", "및", "AI", "ai", "성장", "투자", "급증", "흑자", "적자"}
 # 데일리 뉴스 라벨(daily-report THEME_VOCAB) — 홈도 같은 이름
 THEME = {"RATES_CB": "금리", "AI_CAPEX": "AI/반도체", "EARNINGS": "실적", "ENERGY_COMMODITY": "에너지", "TARIFF_TRADE": "정책/규제", "REGULATION": "정책/규제",
-         "FISCAL_POLITICS": "정책/규제", "GEOPOLITICS": "지정학", "INFLATION": "매크로", "GROWTH_JOBS": "매크로", "FX": "매크로", "CREDIT_BANKS": "매크로",
-         "REAL_ESTATE": "매크로", "MARKET_STRUCTURE": "매크로", "CRYPTO": "기타", "OTHER": "기타"}
+         "FISCAL_POLITICS": "정책/규제", "GEOPOLITICS": "지정학", "INFLATION": "거시경제", "GROWTH_JOBS": "거시경제", "FX": "거시경제", "CREDIT_BANKS": "거시경제",
+         "REAL_ESTATE": "거시경제", "MARKET_STRUCTURE": "거시경제", "CRYPTO": "기타", "OTHER": "기타"}
 
 
 def _words(t):

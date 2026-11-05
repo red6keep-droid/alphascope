@@ -84,15 +84,53 @@ def korea(normal, stats):
     return out
 
 
-def fx(closes, series):
+FX_DAYS = 60   # 한국장 탭 `환율은?` 그래프 = 최근 60거래일 (2026-11-05 사용자 batch 8 ⑭: 숫자 줄을 가로 선 그래프로)
+
+
+def fx(closes, series, dates=None):
     c = closes.get("KRW=X") or []
     spx = (series.get("^GSPC") or {}).get("ret_1d")
     if len(c) < 6:
         return None
     r1 = (c[-1] / c[-2] - 1) * 100
     won = ((1 + spx / 100) * (1 + r1 / 100) - 1) * 100 if spx is not None else None
-    return {"krw": round(c[-1], 2), "ret_1d": round(r1, 2), "ret_5d": round((c[-1] / c[-6] - 1) * 100, 2),
-            "spx_won": round(won, 2) if won is not None else None}
+    out = {"krw": round(c[-1], 2), "ret_1d": round(r1, 2), "ret_5d": round((c[-1] / c[-6] - 1) * 100, 2),
+           "spx_won": round(won, 2) if won is not None else None}
+    hist = _fx_hist(closes, dates or {})
+    if hist:
+        out["hist"] = hist
+    return out
+
+
+def _fx_hist(closes, dates):
+    """최근 FX_DAYS 거래일 원/달러 · 원화로 본 S&P 500 (처음 = 100) — S&P 500 거래일 기준, 환율은 그날 또는 그 전 마지막 값.
+    야후 환율의 튀는 값(자릿수 오류)은 build_daily_stats 와 같이 하루 10% 넘게 뛴 값을 뺀다."""
+    kd, kc = dates.get("KRW=X") or [], closes.get("KRW=X") or []
+    sd, sc = dates.get("^GSPC") or [], closes.get("^GSPC") or []
+    if len(kd) != len(kc) or len(sd) != len(sc) or len(sd) < 2:
+        return None
+    k, prev = {}, None
+    for d, v in zip(kd, kc):
+        if v is None or (prev is not None and abs(v / prev - 1) > 0.1):
+            continue
+        k[d] = v
+        prev = v
+    kdays = sorted(k)
+    if not kdays:
+        return None
+    days, spx = sd[-FX_DAYS:], sc[-FX_DAYS:]
+    krw, j = [], 0
+    for d in days:
+        while j + 1 < len(kdays) and kdays[j + 1] <= d:
+            j += 1
+        krw.append(k[kdays[j]] if kdays[j] <= d else None)
+    if sum(v is not None for v in krw) < 2:
+        return None
+    base_k, base_s = next(v for v in krw if v is not None), spx[0]
+    return {"days": days,
+            "krw": [round(v, 2) if v is not None else None for v in krw],
+            "spx_usd": [round(s / base_s * 100, 2) for s in spx],
+            "spx_won": [round(s / base_s * (v / base_k) * 100, 2) if v is not None else None for s, v in zip(spx, krw)]}
 
 
 def calendar(raw_cal, stats):
@@ -117,7 +155,7 @@ def calendar(raw_cal, stats):
     return {"from": raw_cal.get("from"), "to": raw_cal.get("to"), "days": raw_cal.get("days"), "items": items}
 
 
-def build(raw, closes, series):
+def build(raw, closes, series, dates=None):
     stats = load_stats()
     normal = {}
     for s in NORMAL_SYMBOLS:
@@ -128,7 +166,7 @@ def build(raw, closes, series):
         "normal": normal,
         "shock": market_shock(closes.get("^VIX")),
         "korea": korea(normal, stats),
-        "fx": fx(closes, series),
+        "fx": fx(closes, series, dates or {}),
         "calendar": calendar(raw.get("calendar"), stats),
         "regime_check": stats.get("regime"),
         "krw_check": stats.get("krw"),

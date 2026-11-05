@@ -221,6 +221,17 @@ def fx_card(a):
               ("row", "원/달러 (5일)", _s(fx["ret_5d"]), "")]
     if fx.get("spx_won") is not None:
         lines.append(("row", "원화로 본 S&P 500", _s(fx["spx_won"]), f"달러 기준 {_s(spx)}" if spx is not None else ""))
+    h = fx.get("hist") or {}
+    if h.get("days"):   # 가로 선 그래프 둘 — 원/달러 흐름(비교 = 기간 평균) · 원화로 본 S&P 500(비교 = 달러 기준) (2026-11-05 사용자 batch 8 ⑭, 가이드라인 1-4-1 비교 대상)
+        n, lab = len(h["days"]), dk.month_ticks(h["days"], every=1)
+        vs = [v for v in h["krw"] if v is not None]
+        avg = sum(vs) / len(vs)
+        lines.append((dk.trend_card(f"최근 {n}거래일 원/달러 환율 (원)", lab,
+                                    [("원/달러", h["krw"], dk.CHART_MAIN, "solid"), (f"{n}거래일 평균 {avg:,.0f}원", [avg] * n, dk.CHART_CMP, "dash")],
+                                    lambda v: f"{v:,.0f}"), "html"))
+        lines.append((dk.trend_card(f"원화로 본 S&P 500 ({n}거래일 전 = 100)", lab,
+                                    [("원화로 본 S&P 500", h["spx_won"], dk.CHART_MAIN, "solid"), ("달러 기준", h["spx_usd"], dk.CHART_CMP, "dash")],
+                                    lambda v: f"{v:,.1f}"), "html"))
     tip = ("1달러가 몇 원인지와, 미국 주식을 원화로 들고 있을 때의 하루 등락\n"
            f"· 오늘 {fx['krw']:,.2f}원 : 하루 {_s(fx['ret_1d'])}")
     return C.question_card("환율은?", f"{fx['krw']:,.2f}원", "neutral", "#111", lines, tip=tip)
