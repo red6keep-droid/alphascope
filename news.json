@@ -1,61 +1,72 @@
 {
-  "updated_at": "2026-11-05 01:47:41 UTC",
+  "updated_at": "2026-11-05 12:58:19 UTC",
   "items": [
     {
-      "title": "White House panel delays hearing on Fed's Lisa Cook to Dec. 14",
+      "title": "Bank of England hikes interest rate for the first time since Iran war, warns inflation will near 5%",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/trump-federal-reserve-lisa-cook-hearing.html",
-      "published": "2026-11-05 01:11:26",
-      "title_ko": "백악관 패널, 리사 쿡 연준 청문회 12월 14일로 연기",
-      "summary_ko": "트럼프 대통령, 2025년 8월 쿡 해임 시도, 2026년 6월 대법원 차단"
-    },
-    {
-      "title": "NextDC shares surge 43% after Goodman, Digital Realty stake purchases",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/nextdc-goodman-group-digital-realty-data-centers-.html",
-      "published": "2026-11-05 00:24:57",
-      "title_ko": "NextDC 주가 43% 급등, 굿맨·디지털리얼티 지분 매입",
-      "summary_ko": "주가 목요일 아침 40% 이상 상승"
-    },
-    {
-      "title": "Snap shares fall over 10% on third-quarter revenue miss",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/snap-q3-earnings-report-2026.html",
-      "published": "2026-11-05 00:14:47",
-      "title_ko": "Snap, 3분기 매출 부진에 주가 10% 이상 하락",
-      "summary_ko": "수요일 발표된 3분기 실적에서 매출과 일일 활성 사용자 수 모두 부진"
-    },
-    {
-      "title": "Inside India newsletter: India weighs a tax cut to win over foreign investors. Will it work?",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/india-tax-foreign-investors-nifty.html",
-      "published": "2026-11-05 00:04:36",
-      "title_ko": "인도 뉴스레터: 외국인 투자 유치를 위한 세금 감면 검토, 효과는?",
+      "link": "https://www.cnbc.com/2026/11/05/interest-rates-inflation-uk.html",
+      "published": "2026-11-05 12:37:57",
       "summary_ko": ""
     },
     {
-      "title": "Democrats flip dozens of GOP seats. Republicans haven't flipped a single one",
+      "title": "Wendy's rejects takeover proposal from Nelson Peltz’s Trian",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/democrats-2026-midterm-election-results.html",
-      "published": "2026-11-04 23:44:18",
-      "title_ko": "민주당, 공화당 수십 개 의석 탈환. 공화당은 단 한 곳도 못 뺏어",
-      "summary_ko": "민주당, 주 의회 12곳까지 탈환하며 역사적 승리 기록"
+      "link": "https://www.cnbc.com/2026/11/05/wendys-rejects-takeover-proposal.html",
+      "published": "2026-11-05 12:34:08",
+      "summary_ko": ""
     },
     {
-      "title": "Qualcomm stock drops 7% on weak earnings forecast as memory shortage weighs on smartphone sales",
+      "title": "Here's what the Democratic election rout could mean for the U.S. economy",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/qualcomm-qcom-earnings-report-q4-2026.html",
-      "published": "2026-11-04 23:38:11",
-      "title_ko": "퀄컴 주가 6% 하락, 메모리 부족이 스마트폰 판매에 영향",
-      "summary_ko": "예상보다 좋은 실적 발표· 약한 실적 전망"
+      "link": "https://www.cnbc.com/2026/11/05/emocratic-midterm-economy.html",
+      "published": "2026-11-05 12:11:05",
+      "summary_ko": ""
     },
     {
-      "title": "A 'demand decade' ahead for energy? BP, Baker Hughes CEOs weigh the investment outlook",
+      "title": "World's largest olive oil company plummets 18% after rivals agree to takeover deal",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/energy-leaders-investment-outlook.html",
-      "published": "2026-11-04 23:23:03",
-      "title_ko": "에너지 '수요의 10년'이 올 것인가? BP, 베이커 휴스 CEO들이 투자 전망을 논하다",
-      "summary_ko": "에너지 수요 증가, 투자 기회 제공, 지정학적 리스크와 유가 불확실성 존재"
+      "link": "https://www.cnbc.com/2026/11/05/deoleo-olive-oil-takeover-dcoop-acesur.html",
+      "published": "2026-11-05 11:42:28",
+      "summary_ko": ""
+    },
+    {
+      "title": "How the midterms could fuel the K-shaped AI trade",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/ai-data-centers-midterms-capacity.html",
+      "published": "2026-11-05 11:01:39",
+      "summary_ko": ""
+    },
+    {
+      "title": "Consumers are spending on physical gifts even as travel tops wish lists, Visa survey finds",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/visa-holiday-shopping-physical-gifts-travel.html",
+      "published": "2026-11-05 11:00:01",
+      "title_ko": "비자 조사, 소비자 휴가 시즌 물리적 선물 지출 우선",
+      "summary_ko": "여행·경험보다 선물 지출 우선"
+    },
+    {
+      "title": "OpenAI pledges to pay for data center power after election highlights AI concerns",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/openai-to-pay-for-data-center-power-after-election-shows-ai-concern.html",
+      "published": "2026-11-05 10:00:01",
+      "title_ko": "오픈AI, 선거 후 AI 우려에 데이터센터 전력 비용 부담 약속",
+      "summary_ko": "커뮤니티 의견 수렴 및 건설 계획 공개"
+    },
+    {
+      "title": "Rheinmetall shares plunge 17% after outlook cut as military contracts stall",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/rheinmetall-stock-outlook-sales-germany.html",
+      "published": "2026-11-05 09:06:40",
+      "title_ko": "라인메탈 주가 17% 급락, 군수 계약 지연으로 전망 하향",
+      "summary_ko": "주가 17% 급락"
+    },
+    {
+      "title": "From tanks to drones: South Korea’s defense firms face a new battlefield test",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/south-korea-defense-weapon-war-stocks-fall.html",
+      "published": "2026-11-05 08:07:43",
+      "title_ko": "전차에서 드론까지: 한국 방산 기업, 새로운 전장 시험 직면",
+      "summary_ko": "2026년 주가 급락"
     },
     {
       "title": "미국 선거 블루웨이브와 트럼프 정책 비토",
@@ -82,22 +93,6 @@
       "n_channels": 4
     },
     {
-      "title": "Jim Cramer warns investors may be reading too much into Wall Street's post-election rally",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/cramer-midterms-ai-stocks.html",
-      "published": "2026-11-04 23:18:56",
-      "title_ko": "짐 크래머, 투자자들이 월스트리트 선거 후 랠리를 과도하게 해석할 수 있다고 경고",
-      "summary_ko": "크래머, 중선거 이후 월스트리트가 앞서 나가고 있다고 경고"
-    },
-    {
-      "title": "What Wall Street billionaires are saying about Democrats' midterm sweep",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/04/billionaires-musk-branson-democrats-midterms-ai-wall-street.html",
-      "published": "2026-11-04 23:17:56",
-      "title_ko": "월스트리트 억만장자들, 민주당 중선거 압승에 대해 뭐라고 말하고 있는가",
-      "summary_ko": "억만장자 정치 지출, 화요일 블루 웨이브 선거 이후 비판"
-    },
-    {
       "title": "민주당 의회 장악 및 트럼프 견제",
       "title_ko": "민주당 의회 장악 및 트럼프 견제",
       "summary_ko": "민주당의 의회 장악으로 트럼프 대통령의 임기 후반 2년 동안 강력한 정치적 조사와 입법 공방이 예상",
@@ -107,7 +102,7 @@
       "kind": "media",
       "tag": "정책/규제",
       "direction": "neutral",
-      "n_channels": 4
+      "n_channels": 3
     }
   ]
 }
