@@ -23,6 +23,7 @@ import universe_kr as U  # noqa: E402
 
 KST = ZoneInfo("Asia/Seoul")
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "home", "live.json")
+OUT_BARS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "home", "live_bars.json")   # 오늘 5분봉 — 홈 · 종목 페이지 `장중 차트`(우리가 그린다)
 DELAY_MIN = 20   # 거래소 규정상 야후 한국 시세 지연 — 표시용
 
 
@@ -48,6 +49,28 @@ def fetch(syms):
         last, prev = t.iloc[-1], t.iloc[-2]
         out[sym] = {"day": t.index[-1].strftime("%Y-%m-%d"), "p": float(last["Close"]), "prev": float(prev["Close"]),
                     "v": int(last["Volume"]) if pd.notna(last.get("Volume")) else None}
+    return out
+
+
+def fetch_bars(syms, today):
+    """오늘 5분봉 — 종목을 묶어 요청 1회. 종목코드 → [[epoch초, 시, 고, 저, 종, 거래량], …]. TradingView 무료 위젯이 KRX 를 막아(2026-11-05 목업) 우리가 그린다."""
+    df = yf.download(syms, period="1d", interval="5m", auto_adjust=False, group_by="ticker", progress=False, threads=False)
+    out = {}
+    for sym in syms:
+        try:
+            t = df[sym] if isinstance(df.columns, pd.MultiIndex) else df
+            t = t.dropna(subset=["Close"])
+        except KeyError:
+            continue
+        rows = []
+        for ts, r in t.iterrows():
+            ts = ts.tz_localize(KST) if ts.tzinfo is None else ts.tz_convert(KST)
+            if ts.strftime("%Y-%m-%d") != today:
+                continue
+            rows.append([int(ts.timestamp()), round(float(r["Open"])), round(float(r["High"])), round(float(r["Low"])), round(float(r["Close"])),
+                         int(r["Volume"]) if pd.notna(r.get("Volume")) else 0])
+        if rows:
+            out[sym.split(".")[0]] = rows
     return out
 
 
@@ -79,3 +102,13 @@ if __name__ == "__main__":
     with open(OUT, "w", encoding="utf-8") as fh:
         json.dump(data, fh, ensure_ascii=False, separators=(",", ":"))
     print(f"[kr-live] {data['day']} {data['at']} KST · {data['session']} · {len(data['stocks'])}/{len(U.CANDIDATES)}종목 → {OUT}")
+    try:   # 5분봉은 실패해도 가격 파일은 그대로 — 차트만 "자료 없음"
+        bars = fetch_bars([c[0] for c in U.CANDIDATES], data["day"])
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr-live] 5분봉 실패 — 차트 없이: {e!r}")
+        bars = {}
+    if bars:
+        with open(OUT_BARS, "w", encoding="utf-8") as fh:
+            json.dump({"updated_at": data["updated_at"], "day": data["day"], "at": data["at"], "session": data["session"], "interval": "5m",
+                       "delay_min": DELAY_MIN, "bars": bars}, fh, ensure_ascii=False, separators=(",", ":"))
+        print(f"[kr-live] 5분봉 {len(bars)}종목 · 종목당 최대 {max(len(v) for v in bars.values())}개 → {OUT_BARS}")
