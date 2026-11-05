@@ -803,15 +803,6 @@ def _named_reaction(sym, value_html):
 NEWS_REL_SIZE = "15px"   # 뉴스 `관련 자산` 줄 14 → 15 굵게 (2026-10-13 사용자)
 
 
-def _share(rows):
-    c = {}
-    for r in rows:
-        k = media_feed.THEME.get(r["category"], "기타")
-        c[k] = c.get(k, 0) + 1
-    t = sum(c.values())
-    return ({k: v / t * 100 for k, v in c.items()}, t) if t else ({}, 0)
-
-
 def _meter(n, total):
     """방송 n곳 / 전체 — 작은 네모 칸 (2026-11-05 batch 8 ③: "13곳 중 8곳"이 한눈에)."""
     on, off = CHART_MAIN, "#E2E8F0"
@@ -826,46 +817,6 @@ def _kst(iso):
         return t.astimezone(media_feed.KST).strftime("%m.%d %H:%M").lstrip("0")
     except ValueError:
         return ""
-
-
-def _theme_card(built):
-    """질문 카드 ① `유튜브 방송이 많이 다룬 분야는?` — 최근 48시간 vs 그 전 7일 (batch 8 ③ ⓐ · ⑧ ⑨ ⑩ ⑪)."""
-    rows = [r for r in media_feed.market(_media_rows()) if r["category"] != "OTHER"]
-    now = datetime.datetime.now(datetime.timezone.utc)
-    cut = (now - datetime.timedelta(hours=MEDIA_HOURS)).strftime("%Y-%m-%dT%H:%M")
-    cur, t_cur = _share([r for r in rows if str(r["published_at"])[:16] >= cut])
-    old, _ = _share([r for r in rows if str(r["published_at"])[:16] < cut])
-    if not cur:
-        return ""
-    themes = sorted(cur, key=lambda k: -cur[k])
-    top = max(list(cur.values()) + list(old.values()))
-    n_ch = built["n_channels_all"]
-    k0 = themes[0]
-    ratio = cur[k0] / old[k0] if old.get(k0) else None
-
-    def row(k):
-        a, b = cur.get(k, 0), old.get(k, 0)
-        hot = bool(b) and a / b >= 1.5 and a >= 10
-        right = (f'<span style="color:#B45309;font-weight:700;">평소의 {a / b:.1f}배</span>' if hot else f"평소 {b:.0f}%")
-        return (f'<div style="display:flex;align-items:center;gap:10px;padding:5px 0;">'
-                f'<span style="flex:0 0 72px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{"#111" if hot else "#374151"};font-weight:{700 if hot else 400};white-space:nowrap;">{_esc(k)}</span>'
-                f'<span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px;">'
-                f'<span style="display:block;height:7px;width:{max(round(a / top * 100), 1)}%;background:{CHART_MAIN};border-radius:2px;"></span>'
-                f'<span style="display:block;height:3px;width:{max(round(b / top * 100), 1)}%;background:{CHART_CMP};border-radius:2px;"></span></span>'
-                f'<span style="flex:0 0 92px;text-align:right;font-size:13px;line-height:18px;color:{dk.NOTE};white-space:nowrap;">'
-                f'<b style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;">{a:.0f}%</b>{right}</span></div>')
-
-    chip = lambda bg, text: (f'<span style="display:inline-flex;align-items:center;gap:5px;margin-right:12px;">'  # noqa: E731 — 범례 칩은 둘 다 9×9 (⑩: 평소 칩만 납작해 글자가 처져 보였다)
-                             f'<span style="display:inline-block;width:{dk.LEGEND_CHIP}px;height:{dk.LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{text}</span>')
-    legend = (f'<span style="display:flex;flex-wrap:wrap;align-items:center;padding-left:{dk.LEGEND_INDENT}px;font-size:{dk.MICRO};line-height:{dk.LH_CARD};color:{dk.NOTE};margin:0 0 4px;">'
-              + chip(CHART_MAIN, "최근 48시간") + chip(CHART_CMP, "평소 (그 전 7일)") + "</span>")
-    chart = (f'<div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{dk.CHART_CARD_PAD}px 12px 6px;margin:0 {dk.CHART_CARD_X}px;">{legend}'
-             + "".join(row(k) for k in themes) + "</div>")   # 그래프 제목 없음 (⑧) — 질문 · 답이 제목 몫
-    sent = (f"유튜브 경제 방송 {n_ch}곳이 최근 48시간에 다룬 주제 {t_cur}건 가운데 {k0}가 {cur[k0]:.0f}%입니다."
-            + (f" 평소(그 전 7일 {old[k0]:.0f}%)의 {ratio:.1f}배입니다." if ratio else ""))
-    tip = ("유튜브 경제 방송이 다룬 주제를 분야별로 센 비중입니다.\n같은 주제를 여러 방송이 다루면 그만큼 많이 셉니다.\n"
-           "평소 = 그 전 7일의 비중. 평소의 1.5배를 넘으면 주황 글씨로 표시합니다.")
-    return cards.question_card("유튜브 방송이 많이 다룬 분야는?", f"{k0} {cur[k0]:.0f}%", "neutral", "#111", [(sent, "plain"), (chart, "html")], tip=tip)
 
 
 def _pop_lines(g, built):
@@ -968,7 +919,7 @@ def _story_item(g, built, reaction, known, compact=False):
 
 
 def sec_news(input_data, report, analysis):
-    """뉴스 (2026-11-05 batch 8 · 9 재설계) — 방향 막대 / `유튜브 방송이 많이 다룬 분야는?` 카드 / `여러 방송이 같이 다룬 뉴스` 5줄 / `뉴스`(칩: 주요 뉴스 먼저 · 분야).
+    """뉴스 (2026-11-05 batch 8 · 9 재설계) — 방향 막대 / `여러 방송이 같이 다룬 뉴스` 5줄 / `뉴스`(칩: 주요 뉴스 먼저 · 분야).
     기사(CNBC 48시간) · 유튜브 방송 주제(48시간)를 news_stories 가 같은 사건끼리 묶고(news_pick.build), 같은 뉴스는 한 줄 + `n곳`. 두 줄 이상 있는 줄은 팝업(요약 · 원문 작은 링크).
     옛 `방송 n건 더 보기`(111건) 는 없앴다 — 독자가 볼 수 없는 목록이었다 (사용자)."""
     series = (analysis or {}).get("series") or {}
@@ -995,9 +946,7 @@ def sec_news(input_data, report, analysis):
     for k, v in media_feed.direction_counts(media).items():
         dirs[k] = dirs.get(k, 0) + v
     out = dk.direction_bars(dirs, {})   # 뉴스 방향 막대 — 데일리는 `오늘` 만 (P143)
-    theme_card = _theme_card(built)
-    if theme_card:
-        out += cards.cards_grid(theme_card)
+    # `유튜브 방송이 많이 다룬 분야는?` 카드는 뺐다 — 분야 칩이 이미 많은 순이라 같은 정보 (2026-11-05 사용자)
     out += _story_block(built)
     picks, rest = built["picks"], built["rest"]
     pops = []
