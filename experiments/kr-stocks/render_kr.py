@@ -118,7 +118,7 @@ def sec_chart(s):
             f'<img src="{_esc(url)}" alt="{_esc(s["name"])} {CP.WINDOW}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'
             f'<span style="position:absolute;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
             f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{zoom}</span></a>'
-            + _dk.tv_chart_fold("KRX:" + s["code"], "Asia/Seoul", s["code"]))   # 장중 차트 접힘 줄 — 펼칠 때만 TradingView (2026-11-05). 코스닥도 KRX: 표기
+            + _dk.intraday_chart_fold(s["code"], f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@gh-pages/live_bars.json"))   # 장중 차트 접힘 줄 — 펼칠 때만 우리 5분봉 (2026-11-05). TradingView 위젯은 KRX 를 막는다
 
 
 def draw_charts(snap, stocks, out_dir):

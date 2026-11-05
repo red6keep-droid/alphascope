@@ -1003,7 +1003,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 .live-switch input:checked + .live-knob::after { left: 19px; }
 .live-switch input:focus-visible + .live-knob { outline: 2px solid #0E7490; outline-offset: 2px; }
 .cell-price.live small::after { content: " 지연"; font-size: 10px; color: var(--gray-500); font-weight: 500; }   /* 장중 값임을 숫자 옆에 작게 */
-/* 장중 차트 — 줄 끝 작은 버튼, 누르면 그 줄 아래에 TradingView 15분봉(누르기 전엔 아무것도 불러오지 않는다). 카드마다 하나만 열림 */
+/* 장중 차트 — 줄 끝 작은 버튼, 누르면 그 줄 아래에 우리 5분봉(누르기 전엔 아무것도 불러오지 않는다). 카드마다 하나만 열림 */
 .chart-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: #fff; font: inherit; font-size: 12px; font-weight: 600; color: var(--gray-600); cursor: pointer; white-space: nowrap; }
 .chart-btn:hover { border-color: #0E7490; color: #0E7490; }
 .chart-btn[aria-expanded="true"] { background: #0E7490; border-color: #0E7490; color: #fff; }
@@ -1013,8 +1013,9 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 .chart-box { padding: 12px 16px 14px; }
 .chart-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--gray-500); margin-bottom: 8px; }
 .chart-head b { color: var(--ink); font-weight: 600; }
-.chart-frame { min-height: 360px; border: 1px solid var(--border-strong); border-radius: 8px; overflow: hidden; background: #fff; }
-.chart-loading { display: flex; align-items: center; justify-content: center; height: 360px; color: var(--gray-400); font-size: 13px; }
+.chart-frame { min-height: 200px; border: 1px solid var(--border-strong); border-radius: 8px; overflow: hidden; background: #fff; }
+.chart-loading { display: flex; align-items: center; justify-content: center; height: 200px; color: var(--gray-400); font-size: 13px; }
+.chart-stamp { font-size: 12px; line-height: 16px; color: var(--gray-500); padding: 10px 12px 4px; }
 @media (max-width: 640px) { .live-note { display: none; } .live-switch .t { display: none; } .chart-btn span { display: none; } .chart-btn { padding: 6px; } }   /* 폰: 제목 줄 한 줄 유지 — 스위치 · 아이콘만 */
 
 /* ==========================================================================
@@ -2541,8 +2542,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
         /* ===== 장중 가격 (2026-11-05 사용자) — 한국 종목 live.json (experiments/kr-stocks/collect_kr_live.py, 장중 10분마다, 야후 약 20분 지연).
            토글은 카드마다 미국 · 한국 옆에 있지만 상태는 하나(브라우저가 기억) — 어느 카드에서 켜도 한국 종목 가격 · 등락률 · 거래량이 전부 바뀐다.
            신호 · 의견 · 주목할 종목은 전날 종가 기준 그대로. 미국 종목은 종가만(한국 독자 기준, 새벽 장중 시세 불필요).
-           TradingView 숫자는 옮기지 않는다 — `장중 차트` 버튼은 누를 때만 위젯을 그 줄 아래에 그린다. */
-        var LIVE_URL = GH + 'live.json', LIVE_KEY = 'as_live_kr';
+           `장중 차트` 버튼은 누를 때만 우리 5분봉(live_bars.json)을 그 줄 아래에 그린다 — TradingView 무료 위젯은 KRX 종목을 막아 쓰지 않는다. */
+        var LIVE_URL = GH + 'live.json', LIVE_BARS_URL = GH + 'live_bars.json', LIVE_KEY = 'as_live_kr';
         var liveOn = false, liveData = null, liveTimer = null;
         try { liveOn = localStorage.getItem(LIVE_KEY) === '1'; } catch (e) {}
         function liveRow(r) { return (liveOn && liveData && liveData.stocks && isKR(r) && liveData.stocks[r.s]) || null; }
@@ -2591,7 +2592,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         [].slice.call(document.querySelectorAll('[data-live-switch] input')).forEach(function (inp) { inp.addEventListener('change', function () { setLive(inp.checked); }); });
         if (liveOn) setLive(true);
 
-        /* 장중 차트 — 카드(rank · watch · sector)마다 열린 종목 하나. TradingView 위젯은 표시 전용(약관) — 숫자를 꺼내 쓰지 않는다 */
+        /* 장중 차트 — 카드(rank · watch · sector)마다 열린 종목 하나. 우리 5분봉(live_bars.json)을 그린다 — TradingView 무료 위젯은 KRX 종목을 막는다 (2026-11-05) */
         var openChart = { rank: null, watch: null, sector: null };
         function chartTd(card, r) {
           var td = el('td', 'col-chart'), b = el('button', 'chart-btn'); b.type = 'button';
@@ -2600,24 +2601,40 @@ body.no-dashboard .main-content { padding-top: 32px; }
           b.addEventListener('click', function () { openChart[card] = openChart[card] === r.s ? null : r.s; renderKR(); });
           td.appendChild(b); return td;
         }
-        function chartRow(card, r, cols) {
+        function chartRow(card, r, cols) {   /* 우리 5분봉 — live_bars.json (collect_kr_live.py) 을 Lightweight Charts(Apache 2.0) 로. TradingView 무료 위젯은 KRX 종목을 막는다 (2026-11-05 목업) */
           var tr = el('tr', 'chart-row'), td = el('td'); td.colSpan = cols;
           var box = el('div', 'chart-box'), head = el('div', 'chart-head');
-          var l = el('span'); l.appendChild(el('b', null, r.name + ' ' + r.s)); l.appendChild(document.createTextNode(' · 장중 15분봉 · TradingView'));
+          var l = el('span'); l.appendChild(el('b', null, r.name + ' ' + r.s)); l.appendChild(document.createTextNode(' · 장중 5분봉 · 약 20분 지연 시세'));
           head.appendChild(l);
           var close = el('button', 'chart-btn', '접기'); close.type = 'button'; close.addEventListener('click', function () { openChart[card] = null; renderKR(); });
           head.appendChild(close); box.appendChild(head);
-          var frame = el('div', 'chart-frame'); frame.appendChild(el('div', 'chart-loading', 'TradingView 차트를 불러오는 중…'));
+          var frame = el('div', 'chart-frame'); frame.appendChild(el('div', 'chart-loading', '장중 차트를 불러오는 중…'));
           box.appendChild(frame); td.appendChild(box); tr.appendChild(td);
-          setTimeout(function () {   /* 줄이 표에 붙은 뒤에 위젯 스크립트를 넣는다 */
+          function fail(t) { frame.textContent = ''; frame.appendChild(el('div', 'chart-loading', t)); }
+          function draw(J) {
+            var bars = (J.bars || {})[r.s];
+            if (!bars || !bars.length) { fail('오늘 장중 자료가 아직 없습니다'); return; }
             frame.textContent = '';
-            var c = el('div', 'tradingview-widget-container'); c.style.height = '360px';
-            c.appendChild(el('div', 'tradingview-widget-container__widget'));
-            var sc = document.createElement('script'); sc.type = 'text/javascript'; sc.async = true;
-            sc.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-            sc.textContent = JSON.stringify({ autosize: true, symbol: 'KRX:' + r.s, interval: '15', range: '1D', timezone: 'Asia/Seoul', theme: 'light', style: '1', locale: 'kr',
-              hide_top_toolbar: true, hide_legend: false, allow_symbol_change: false, save_image: false, withdateranges: false, calendar: false, support_host: 'https://www.tradingview.com' });
-            c.appendChild(sc); frame.appendChild(c);
+            var h = el('div', 'chart-stamp', J.day.slice(5).replace('-', '.') + ' ' + J.at + ' 기준'); frame.appendChild(h);
+            var c = el('div'); c.style.height = '320px'; frame.appendChild(c);
+            var ch = LightweightCharts.createChart(c, { autoSize: true, layout: { textColor: '#4B5563', background: { type: 'solid', color: '#ffffff' }, fontFamily: 'inherit' },
+              grid: { vertLines: { color: '#F1F5F9' }, horzLines: { color: '#F1F5F9' } }, rightPriceScale: { borderColor: '#E2E8F0' },
+              timeScale: { borderColor: '#E2E8F0', timeVisible: true, secondsVisible: false }, localization: { locale: 'ko-KR' }, handleScroll: false, handleScale: false });
+            var cs = ch.addCandlestickSeries({ upColor: '#d93025', downColor: '#1a73e8', borderUpColor: '#d93025', borderDownColor: '#1a73e8', wickUpColor: '#d93025', wickDownColor: '#1a73e8', priceFormat: { type: 'price', precision: 0, minMove: 1 } });
+            var vs = ch.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: '', lastValueVisible: false, priceLineVisible: false });   /* 진행 중 봉의 거래량 0 라벨을 숨긴다 */ vs.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+            var T = 9 * 3600;   /* 라이브러리는 UTC 로 표시 — KST 로 보이게 9시간을 더한다 */
+            cs.setData(bars.map(function (b) { return { time: b[0] + T, open: b[1], high: b[2], low: b[3], close: b[4] }; }));
+            vs.setData(bars.map(function (b) { return { time: b[0] + T, value: b[5], color: b[4] >= b[1] ? 'rgba(217,48,37,.3)' : 'rgba(26,115,232,.3)' }; }));
+            ch.timeScale().fitContent();
+          }
+          function load() {
+            fetch(LIVE_BARS_URL + '?v=' + Math.floor(Date.now() / 60000)).then(function (x) { return x.ok ? x.json() : null; })
+              .then(function (J) { if (!J) fail('장중 자료를 불러오지 못했습니다'); else draw(J); }).catch(function () { fail('장중 자료를 불러오지 못했습니다'); });
+          }
+          setTimeout(function () {   /* 줄이 표에 붙은 뒤에 — 라이브러리는 처음 한 번만 받는다 */
+            if (window.LightweightCharts) { load(); return; }
+            var sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js';
+            sc.onload = load; sc.onerror = function () { fail('차트 라이브러리를 불러오지 못했습니다'); }; document.head.appendChild(sc);
           }, 0);
           return tr;
         }
