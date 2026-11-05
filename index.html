@@ -1003,7 +1003,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 .live-switch input:checked + .live-knob::after { left: 19px; }
 .live-switch input:focus-visible + .live-knob { outline: 2px solid #0E7490; outline-offset: 2px; }
 .cell-price.live small::after { content: " 지연"; font-size: 10px; color: var(--gray-500); font-weight: 500; }   /* 장중 값임을 숫자 옆에 작게 */
-/* 장중 차트 — 줄 끝 작은 버튼, 누르면 그 줄 아래에 우리 5분봉(누르기 전엔 아무것도 불러오지 않는다). 카드마다 하나만 열림 */
+/* 장중 차트 — 줄 끝 작은 버튼, 누르면 그 줄 아래에 우리 15분봉(누르기 전엔 아무것도 불러오지 않는다). 카드마다 하나만 열림 */
 .chart-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: #fff; font: inherit; font-size: 12px; font-weight: 600; color: var(--gray-600); cursor: pointer; white-space: nowrap; }
 .chart-btn:hover { border-color: #0E7490; color: #0E7490; }
 .chart-btn[aria-expanded="true"] { background: #0E7490; border-color: #0E7490; color: #fff; }
@@ -2542,7 +2542,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         /* ===== 장중 가격 (2026-11-05 사용자) — 한국 종목 live.json (experiments/kr-stocks/collect_kr_live.py, 장중 10분마다, 야후 약 20분 지연).
            토글은 카드마다 미국 · 한국 옆에 있지만 상태는 하나(브라우저가 기억) — 어느 카드에서 켜도 한국 종목 가격 · 등락률 · 거래량이 전부 바뀐다.
            신호 · 의견 · 주목할 종목은 전날 종가 기준 그대로. 미국 종목은 종가만(한국 독자 기준, 새벽 장중 시세 불필요).
-           `장중 차트` 버튼은 누를 때만 우리 5분봉(live_bars.json)을 그 줄 아래에 그린다 — TradingView 무료 위젯은 KRX 종목을 막아 쓰지 않는다. */
+           `장중 차트` 버튼은 누를 때만 우리 15분봉(live_bars.json)을 그 줄 아래에 그린다 — TradingView 무료 위젯은 KRX 종목을 막아 쓰지 않는다. */
         var LIVE_URL = GH + 'live.json', LIVE_BARS_URL = GH + 'live_bars.json', LIVE_KEY = 'as_live_kr';
         var liveOn = false, liveData = null, liveTimer = null;
         try { liveOn = localStorage.getItem(LIVE_KEY) === '1'; } catch (e) {}
@@ -2601,10 +2601,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
           b.addEventListener('click', function () { openChart[card] = openChart[card] === r.s ? null : r.s; renderKR(); });
           td.appendChild(b); return td;
         }
-        function chartRow(card, r, cols) {   /* 우리 5분봉 — live_bars.json (collect_kr_live.py) 을 Lightweight Charts(Apache 2.0) 로. TradingView 무료 위젯은 KRX 종목을 막는다 (2026-11-05 목업) */
+        function chartRow(card, r, cols) {   /* 우리 15분봉 — live_bars.json (collect_kr_live.py) 을 Lightweight Charts(Apache 2.0) 로. TradingView 무료 위젯은 KRX 종목을 막는다 (2026-11-05 목업) */
           var tr = el('tr', 'chart-row'), td = el('td'); td.colSpan = cols;
           var box = el('div', 'chart-box'), head = el('div', 'chart-head');
-          var l = el('span'); l.appendChild(el('b', null, r.name + ' ' + r.s)); l.appendChild(document.createTextNode(' · 장중 5분봉 · 약 20분 지연 시세'));
+          var l = el('span'); l.appendChild(el('b', null, r.name + ' ' + r.s)); l.appendChild(document.createTextNode(' · 장중 15분봉 · 약 20분 지연 시세'));
           head.appendChild(l);
           var close = el('button', 'chart-btn', '접기'); close.type = 'button'; close.addEventListener('click', function () { openChart[card] = null; renderKR(); });
           head.appendChild(close); box.appendChild(head);
