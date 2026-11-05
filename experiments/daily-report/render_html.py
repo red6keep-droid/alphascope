@@ -26,6 +26,7 @@ import news_pick  # noqa: E402  — 뉴스 묶기 · 꼭 볼 뉴스 · 팝업 �
 
 MEDIA_SHOWN = 5    # 뉴스 구획 끝의 방송 줄 — 앞 5건만 펼쳐 두고 나머지는 `방송 n건 더 보기` 접기 (2026-10-30 사용자: 상한 없이 다 싣는다. 옛 MEDIA_MAX=3 은 미디어 데일리가 나머지를 들던 때 숫자)
 MEDIA_HOURS = 48   # 글을 만드는 시각 기준 최근 48시간 영상 (2026-10-30 사용자, 옛 24)
+NEW_LEAD = dk.NEW_PILL.replace("margin-left:4px;", "margin-right:5px;")   # 새 뉴스 N 은 제목 앞에 (2026-11-05 사용자)
 STORY_SHOWN = 5    # `여러 방송이 같이 다룬 뉴스는?` 카드에 보이는 묶음 수 (2026-11-05 batch 8 ③)
 CHART_MAIN = getattr(dk, "CHART_MAIN", "#F5B971")   # 우리 그래프 기본색(주황 · 사용자가 노랑이라 부르는 색) · 비교 대상 회색 — 가이드라인 8-0 (⑨)
 CHART_CMP = getattr(dk, "CHART_CMP", "#CBD5E1")
@@ -839,7 +840,7 @@ def _story_row(g, built, first):
     sub = lines[0] if lines else ""
     attrs = (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else "") + ' data-trhelp="skip"'
     head = dk.keep_tone(f'<a href="{_esc(rep.get("url") or "#")}" target="_blank" rel="noopener"{attrs} style="color:#111;font-weight:700;text-decoration:none;font-size:{dk.NEWS_TITLE_FS};line-height:{dk.NEWS_TITLE_LH};display:block;">'
-                        f'{_esc(rep["text"])}{dk.NEW_PILL if g.get("new") else ""}</a>')   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
+                        f'{NEW_LEAD if g.get("new") else ""}{_esc(rep["text"])}</a>')   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
     return (head + (dk.keep_tone(f'<span style="{dk.NEWS_SUM}">{_esc(dk.headline(sub))}</span>') if sub else "")
             + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:8px 0 1px;line-height:1;">'
             f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;">{_esc(g["name"])}</span>{_meter(g["n_channels"], n_ch)}'
@@ -904,12 +905,20 @@ def _story_item(g, built, reaction, known, compact=False):
                     + " · ".join(_named_reaction(s, reaction(s)) for s in dict.fromkeys(related)) + "</span></span>")
     labels = dk.pill(g["theme"], bare=True) + (" " + dk.pill(f"{g['n_channels']}곳", "uncertain", bare=True) if g["n_channels"] >= 2 else "")
     meta = [_kst(rep["published_at"]), f'{rep["source"]} {"기사" if rep["kind"] == "article" else "방송"}']
-    head = _esc(rep["text"]) + (dk.NEW_PILL if g.get("new") else "")
+    head = (NEW_LEAD if g.get("new") else "") + _esc(rep["text"])
     pop = _has_pop(g, built)
     lines = _pop_lines(g, built)
     detail = "" if (compact and pop) else (lines[0] if lines else "")   # 팝업 없는 줄은 보조 글씨 한 줄 (④), 주요 뉴스는 늘 보조 줄
     attrs = (f' data-news-pop="{_esc(g["id"])}"' if pop else "") + ' data-trhelp="skip"'
     return dk.news_item(head, rep.get("url") or "#", detail, subs, labels, meta, attrs)
+
+
+def news_tip():
+    """구획 제목 `뉴스` 옆 읽는 법 ? (2026-11-05 사용자: 툴팁은 뉴스 타이틀 옆에)."""
+    return ("주요 뉴스 = 우리 데이터로 매긴 점수 순 5건입니다. AI 가 고르지 않습니다.\n· 다룬 방송 수 = 두 곳 이상이면 한 곳마다 2점\n· 관련 자산의 그날 움직임 = 1% 마다 1점 (4점까지)\n"
+            "· 예상 밖 표시 = 2점\n· 시장에 좋거나 나쁜 방향이 있는 뉴스 = 1점\n· 최근 12시간 안 = 1점\n"
+            "분야 칩을 누르면 그 분야 뉴스가 최신 순으로 나옵니다. 같은 사건을 다룬 기사 · 방송은 한 줄로 묶고 몇 곳이 다뤘는지(n곳) 적습니다.\n"
+            "줄을 누르면 요약 다섯 줄이 뜹니다. 요약이 한 줄뿐인 줄은 바로 원문 · 영상으로 갑니다. N = 지난 글 뒤에 새로 나온 뉴스.")
 
 
 def sec_news(input_data, report, analysis):
@@ -944,19 +953,18 @@ def sec_news(input_data, report, analysis):
     picks, rest = built["picks"], built["rest"]
     pops = []
     if picks or rest:
-        tip = dk.tip("주요 뉴스 = 우리 데이터로 매긴 점수 순 5건입니다. AI 가 고르지 않습니다.\n· 다룬 방송 수 = 두 곳 이상이면 한 곳마다 2점\n· 관련 자산의 그날 움직임 = 1% 마다 1점 (4점까지)\n"
-                     "· 예상 밖 표시 = 2점\n· 시장에 좋거나 나쁜 방향이 있는 뉴스 = 1점\n· 최근 12시간 안 = 1점\n분야 칩을 누르면 그 분야 뉴스가 최신 순으로 나옵니다. 같은 뉴스는 한 줄입니다.")
         chips = [("주요 뉴스", len(picks))] + sorted(built["chips"].items(), key=lambda kv: -kv[1])   # `전체` 없음 — 주요 뉴스가 첫 칩 · 기본 (batch 9 ①)
         chip_css = f"flex:none;padding:5px 10px;border:1px solid #E2E8F0;border-radius:999px;background:#fff;color:#374151;font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;"
         out += (f'<div style="display:flex;align-items:center;gap:4px;margin:4px 0 2px;position:relative;">'
                 f'<div data-news-chips="1" style="flex:1 1 auto;min-width:0;display:flex;gap:6px;overflow-x:auto;padding:6px {dk.ALIGN_PX}px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
                 + "".join(f'<button type="button" data-chip="{_esc(k)}" aria-pressed="{"true" if i == 0 else "false"}" style="{chip_css}">{_esc(k)} <span style="color:{dk.SUB};">{n}</span></button>'
-                          for i, (k, n) in enumerate(chips)) + f"</div><span style=\"flex:none;\">{tip}</span></div>")   # ? = 주요 뉴스 점수 규칙 · 칩 설명, 칩 줄 끝에 고정
+                          for i, (k, n) in enumerate(chips)) + "</div></div>")   # 읽는 법 ? 는 구획 제목 `뉴스` 옆 (news_tip, 2026-11-05 사용자)
         lis = []
         for i, g in enumerate(picks + rest):
             is_pick = i < len(picks)
             item = _story_row(g, built, i == 0) if is_pick else _story_item(g, built, reaction, known, compact=True)   # 주요 뉴스 = 사건 이름 + n곳 막대 줄
             pick_attr = ' data-pick="1"' if is_pick else " hidden"
+            pick_attr += (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else f' data-row-link="1" data-href="{_esc(g["rep"].get("url") or "#")}"')   # 구분선 안 아무 데나 눌러도 팝업 · 원문 (2026-11-05 사용자, 가이드라인 10-9 줄 전체 링크)
             lis.append(f'<li data-theme="{_esc(g["theme"])}"{pick_attr} style="margin:0;padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px {dk.RULE_GAP - dk.VP}px;'
                        f'line-height:{dk.LH_BODY};box-shadow:inset 0 1px 0 #E2E8F0;">{item}</li>')   # 첫 줄 구분선은 테마 JS 가 지운다. 주요 뉴스 외는 숨김 — 칩이 켠다
             if _has_pop(g, built):
@@ -1043,7 +1051,8 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
         parts.append(dk.section(TAB_TODAY, cards.cards_grid(today_cards), tab=TAB_TODAY))   # 제목 `핵심 질문` 삭제 (2026-11-05 사용자 batch 8 ①) — 탭 이름과 같은 제목은 테마가 숨긴다, 탭 나누기 h2 는 남아야 한다
     parts += [
         dk.section("주요 지수", sec_indices(indices, analysis, report), tab=TAB_TODAY),
-        dk.keep_tone(dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_TODAY)),   # 뉴스는 헤드라인체 그대로 (2026-10-18 사용자)
+        dk.keep_tone(dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_TODAY,
+                                aside=dk.tip_line([("읽는 법", news_tip())], in_title=True))),   # 뉴스는 헤드라인체 그대로 (2026-10-18 사용자) · 읽는 법 ? 는 제목 옆 (2026-11-05 사용자)
     ]
     korea = sx.korea_open_card(a) + sx.korea_pairs_card(a) + sx.fx_card(a)
     if korea:
