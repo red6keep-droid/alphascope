@@ -3274,7 +3274,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       var hide = !hit || (current === '전체' && !opened && li.hasAttribute('data-more'));
       li.hidden = hide; if (!hide) shown++;
     });
-    if (more) more.hidden = !(current === '전체' && !opened);
+    if (more) more.style.display = (current === '전체' && !opened) ? '' : 'none';   /* 버튼은 인라인 display:flex 라 hidden 속성이 지지 않는다 */
     var first = true;
     items.forEach(function (li) { if (li.hidden) return; li.style.boxShadow = first ? 'none' : 'inset 0 1px 0 #E2E8F0'; first = false; });
   }
