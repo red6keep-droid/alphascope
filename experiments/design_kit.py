@@ -1573,17 +1573,17 @@ def report_stamp(day_text, when_text):
 
 
 def intraday_chart_fold(code, bars_url):
-    """한국 종목 페이지 봉차트 PNG 아래 `장중 차트 보기` 접힘 줄 — 우리 5분봉(live_bars.json, collect_kr_live.py 가 장중 10분마다) 을 Lightweight Charts(Apache 2.0) 로 그린다 (2026-11-05 사용자).
+    """한국 종목 페이지 봉차트 PNG 아래 `장중 차트 보기` 접힘 줄 — 우리 15분봉(live_bars.json, collect_kr_live.py 가 장중 10분마다) 을 Lightweight Charts(Apache 2.0) 로 그린다 (2026-11-05 사용자).
     TradingView 무료 위젯은 KRX 종목을 막아("TradingView 에서만 제공되는 심볼", 목업 스크린샷) 미국(tv_chart_fold)과 달리 우리가 그린다. 펼칠 때만 라이브러리 · 자료를 받는다.
     시각은 KST 로 보이게 epoch 에 9시간을 더해 넣는다(라이브러리는 UTC 표시). 한국 관례대로 오름 빨강 · 내림 파랑(우리 PNG 와 같게)."""
     sid = "ic-" + re.sub(r"[^A-Za-z0-9]", "", str(code))
     ico = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
            '<path d="M2 12l3.5-4 3 2.5L14 4"/><path d="M10.5 4H14v3.5"/></svg>')
     js = _IC_JS.replace("__ID__", sid).replace("__CODE__", str(code)).replace("__URL__", bars_url)
-    return (f'<details id="{sid}" data-ichart="1" style="margin:-8px 0 16px;max-width:1024px;">'
+    return (f'<details id="{sid}" data-ichart="1" style="margin:-8px 0 16px;max-width:1024px;text-align:right;">'   # 버튼은 오른쪽 (2026-11-05 사용자)
             f'<summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #E2E8F0;border-radius:8px;'
-            f'font-size:13px;font-weight:600;color:#4B5563;background:#fff;">{ico}장중 차트 보기<span style="font-weight:400;color:#9CA3AF;">· 5분봉 · 약 20분 지연</span></summary>'
-            f'<div data-ic-box="1" style="margin-top:8px;min-height:200px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff;">'
+            f'font-size:13px;font-weight:600;color:#4B5563;background:#fff;">{ico}장중 차트 보기 (15분봉)</summary>'
+            f'<div data-ic-box="1" style="margin-top:8px;min-height:200px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff;text-align:left;">'
             f'<div style="display:flex;align-items:center;justify-content:center;height:200px;color:#9CA3AF;font-size:13px;">장중 차트를 불러오는 중…</div></div></details>'
             f'<script>{js}</script>')
 
@@ -1592,7 +1592,7 @@ _IC_JS = r"""(function(){var d=document.getElementById("__ID__");if(!d||d.__ic)r
 d.addEventListener("toggle",function(){if(!d.open||d.__done)return;d.__done=1;var b=d.querySelector("[data-ic-box]");
 function fail(t){b.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:200px;color:#9CA3AF;font-size:13px;">'+t+'</div>';}
 function draw(J){var bars=(J.bars||{})["__CODE__"];if(!bars||!bars.length){fail("오늘 장중 자료가 아직 없습니다");return;}
-b.textContent="";var h=document.createElement("div");h.style.cssText="font-size:12px;line-height:16px;color:#6B7280;padding:10px 12px 4px;";h.textContent=J.day.slice(5).replace("-",".")+" "+J.at+" 기준 · 5분봉 · 약 "+(J.delay_min||20)+"분 지연 시세";b.appendChild(h);
+b.textContent="";var h=document.createElement("div");h.style.cssText="font-size:12px;line-height:16px;color:#6B7280;padding:10px 12px 4px;";h.textContent=J.day.slice(5).replace("-",".")+" "+J.at+" 기준 · 15분봉 · 약 "+(J.delay_min||20)+"분 지연 시세";b.appendChild(h);
 var c=document.createElement("div");c.style.height="320px";b.appendChild(c);
 var ch=LightweightCharts.createChart(c,{autoSize:true,layout:{textColor:"#4B5563",background:{type:"solid",color:"#ffffff"},fontFamily:"inherit"},grid:{vertLines:{color:"#F1F5F9"},horzLines:{color:"#F1F5F9"}},rightPriceScale:{borderColor:"#E2E8F0"},timeScale:{borderColor:"#E2E8F0",timeVisible:true,secondsVisible:false},localization:{locale:"ko-KR"},handleScroll:false,handleScale:false});
 var cs=ch.addCandlestickSeries({upColor:"#d93025",downColor:"#1a73e8",borderUpColor:"#d93025",borderDownColor:"#1a73e8",wickUpColor:"#d93025",wickDownColor:"#1a73e8",priceFormat:{type:"price",precision:0,minMove:1}});
@@ -1614,10 +1614,10 @@ def tv_chart_fold(symbol, tz, key):
     cfg = json.dumps({"width": "100%", "height": 360, "symbol": symbol, "interval": "15", "range": "1D", "timezone": tz, "theme": "light", "style": "1", "locale": "kr",
                       "hide_top_toolbar": True, "hide_legend": False, "allow_symbol_change": False, "save_image": False, "withdateranges": False,
                       "calendar": False, "support_host": "https://www.tradingview.com"}, ensure_ascii=False)
-    return (f'<details id="{sid}" data-tv="1" style="margin:-8px 0 16px;max-width:1024px;">'
+    return (f'<details id="{sid}" data-tv="1" style="margin:-8px 0 16px;max-width:1024px;text-align:right;">'   # 버튼은 오른쪽 (2026-11-05 사용자)
             f'<summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #E2E8F0;border-radius:8px;'
-            f'font-size:13px;font-weight:600;color:#4B5563;background:#fff;">{ico}장중 차트 보기<span style="font-weight:400;color:#9CA3AF;">· TradingView 15분봉</span></summary>'
-            f'<div data-tv-box="1" style="margin-top:8px;min-height:360px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff;">'
+            f'font-size:13px;font-weight:600;color:#4B5563;background:#fff;">{ico}장중 차트 보기 (15분봉)</summary>'
+            f'<div data-tv-box="1" style="margin-top:8px;min-height:360px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff;text-align:left;">'
             f'<div style="display:flex;align-items:center;justify-content:center;height:360px;color:#9CA3AF;font-size:13px;">TradingView 차트를 불러오는 중…</div></div></details>'
             f'<script>(function(){{var d=document.getElementById("{sid}");if(!d||d.__tv)return;d.__tv=1;'
             f'd.addEventListener("toggle",function(){{if(!d.open||d.__done)return;d.__done=1;var b=d.querySelector("[data-tv-box]");'

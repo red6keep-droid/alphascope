@@ -23,7 +23,7 @@ import universe_kr as U  # noqa: E402
 
 KST = ZoneInfo("Asia/Seoul")
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "home", "live.json")
-OUT_BARS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "home", "live_bars.json")   # 오늘 5분봉 — 홈 · 종목 페이지 `장중 차트`(우리가 그린다)
+OUT_BARS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "home", "live_bars.json")   # 오늘 15분봉 — 홈 · 종목 페이지 `장중 차트`(우리가 그린다)
 DELAY_MIN = 20   # 거래소 규정상 야후 한국 시세 지연 — 표시용
 
 
@@ -53,8 +53,8 @@ def fetch(syms):
 
 
 def fetch_bars(syms, today):
-    """오늘 5분봉 — 종목을 묶어 요청 1회. 종목코드 → [[epoch초, 시, 고, 저, 종, 거래량], …]. TradingView 무료 위젯이 KRX 를 막아(2026-11-05 목업) 우리가 그린다."""
-    df = yf.download(syms, period="1d", interval="5m", auto_adjust=False, group_by="ticker", progress=False, threads=False)
+    """오늘 15분봉(미국 TradingView 위젯과 같은 간격) — 종목을 묶어 요청 1회. 종목코드 → [[epoch초, 시, 고, 저, 종, 거래량], …]. TradingView 무료 위젯이 KRX 를 막아(2026-11-05 목업) 우리가 그린다."""
+    df = yf.download(syms, period="1d", interval="15m", auto_adjust=False, group_by="ticker", progress=False, threads=False)
     out = {}
     for sym in syms:
         try:
@@ -109,6 +109,6 @@ if __name__ == "__main__":
         bars = {}
     if bars:
         with open(OUT_BARS, "w", encoding="utf-8") as fh:
-            json.dump({"updated_at": data["updated_at"], "day": data["day"], "at": data["at"], "session": data["session"], "interval": "5m",
+            json.dump({"updated_at": data["updated_at"], "day": data["day"], "at": data["at"], "session": data["session"], "interval": "15m",
                        "delay_min": DELAY_MIN, "bars": bars}, fh, ensure_ascii=False, separators=(",", ":"))
-        print(f"[kr-live] 5분봉 {len(bars)}종목 · 종목당 최대 {max(len(v) for v in bars.values())}개 → {OUT_BARS}")
+        print(f"[kr-live] 15분봉 {len(bars)}종목 · 종목당 최대 {max(len(v) for v in bars.values())}개 → {OUT_BARS}")
