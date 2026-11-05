@@ -37,10 +37,10 @@ PROMPT = os.path.join(BASE, "prompts", "news_classify.txt")
 LEAD_HOURS = 36   # 첫 문단은 이 시간 안의 기사만 받는다 — 목록은 오늘자만 보인다 (2026-10-25 사용자)
 SNIPPET = 500     # 모델에 넣는 첫 문단 길이 — Groq 분당 8,000토큰 안에 한 배치가 들어가게
 # 이슈 코드 → 데일리 뉴스 테마 (daily-report THEME_VOCAB) — 테마도 공용 처리에서 (2026-10-25 사용자: 데일리 AI 가 따로 정하지 않는다)
-THEME = {"RATES_FED": "금리", "INFLATION": "매크로", "GROWTH_JOBS": "매크로", "TARIFF_TRADE": "정책/규제", "GEOPOLITICS": "지정학", "OIL_ENERGY": "에너지",
+THEME = {"RATES_FED": "금리", "INFLATION": "거시경제", "GROWTH_JOBS": "거시경제", "TARIFF_TRADE": "정책/규제", "GEOPOLITICS": "지정학", "OIL_ENERGY": "에너지",
          "AI_CAPEX": "AI/반도체", "EARNINGS": "실적", "CORP_EVENT": "실적", "REGULATION": "정책/규제", "FISCAL_POLITICS": "정책/규제",
-         "CREDIT_BANKS": "매크로", "MARKET_STRUCTURE": "매크로", "INVESTOR_CALLS": "기타", "FX_GLOBAL": "매크로", "CRYPTO": "기타",
-         "REAL_ESTATE": "매크로", "OTHER": "기타"}
+         "CREDIT_BANKS": "거시경제", "MARKET_STRUCTURE": "거시경제", "INVESTOR_CALLS": "기타", "FX_GLOBAL": "거시경제", "CRYPTO": "기타",
+         "REAL_ESTATE": "거시경제", "OTHER": "기타"}
 
 BATCH = 10   # 한 호출 기사 수 — Groq 분당 8,000토큰(입력 + 답) 안에 (2026-10-25, 옛 lite 25)
 QWEN_BATCH = 4   # Qwen 이 첫 단계인 사슬(news)은 4건 — 답이 기사당 약 210토큰이라 10건이면 Qwen 분당 출력 1,000토큰(OTPM)에 걸려

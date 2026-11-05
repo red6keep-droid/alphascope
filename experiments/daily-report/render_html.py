@@ -79,7 +79,7 @@ REGIME_COMPONENT_LABELS = {
 }
 
 # 뉴스 테마 어휘. 프롬프트·validate_report와 같은 목록이어야 한다. 밖의 값은 '기타'로 접는다.
-THEME_VOCAB = ["금리", "AI/반도체", "실적", "매크로", "에너지", "정책/규제", "지정학", "기타"]
+THEME_VOCAB = ["금리", "AI/반도체", "실적", "거시경제", "에너지", "정책/규제", "지정학", "기타"]   # `매크로` → `거시경제` (2026-11-05 사용자 batch 9 ⑦: 영어 그대로는 어렵다 — 공용 어휘 news_store.THEME · media_feed.THEME 도 같이)
 
 # 뉴스 '관련 자산' 줄에서 심볼 대신 보여줄 이름
 SYMBOL_NAMES = {
