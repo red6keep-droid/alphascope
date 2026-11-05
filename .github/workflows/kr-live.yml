@@ -1,0 +1,60 @@
+name: KR Live Prices (10m)
+
+# 한국 종목 장중 지연 시세 live.json — 홈 한국 카드 `장중 가격` 토글 재료 (experiments/kr-stocks/collect_kr_live.py, 2026-11-05 사용자).
+#   - 평일 09:04~16:54 KST 10분마다 (UTC 0~7시, 분 4·14·24·34·44·54 — 다른 워크플로가 gh-pages 에 쓰는 분(:00 :07 :10 :15 :22 :30 :37 :45 :52)을 피한다, 운영지침 11절).
+#     16시대까지 도는 이유: 수능일 마감 16:30 · 늦게 확정되는 종가. 마감 뒤 값은 종가와 같고 session=closed 로 표시된다.
+#   - 종목 35개를 야후에 묶어 요청 1회 — 하루 48회, 요청 48번. 일일 수집(종목당 5~10번)보다 가볍다.
+#   - 휴장일은 오늘 봉이 없어 파일을 쓰지 않고 배포도 건너뛴다. 정각 몰림으로 예약이 밀려도 다음 10분 실행이 받아 준다.
+#   - gh-pages 의 다른 파일(stocks.json · kr.json)은 건드리지 않는다(keep_files). 같은 분에 nvda-report(11:40 KST 시작) 가 푸시하면 이번 배포가 실패할 수 있어 continue-on-error — 10분 뒤 실행이 덮는다.
+#   - 증권사 API · TradingView 데이터는 쓰지 않는다(약관).
+
+on:
+  schedule:
+    - cron: '4,14,24,34,44,54 0-7 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kr-live
+  cancel-in-progress: true
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install "yfinance>=1.3.0,<2" "pandas>=2.0"
+
+      - name: Collect
+        run: python experiments/kr-stocks/collect_kr_live.py
+
+      - name: Prepare deployment files
+        if: hashFiles('experiments/kr-stocks/output/home/live.json') != ''
+        run: mkdir -p deploy-home && cp experiments/kr-stocks/output/home/live.json deploy-home/live.json
+
+      - name: Deploy live.json to gh-pages
+        if: hashFiles('deploy-home/live.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-home
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Purge live.json cache
+        if: hashFiles('deploy-home/live.json') != ''
+        continue-on-error: true
+        run: |
+          sleep 10   # 푸시 직후 퍼지는 jsDelivr 가 옛 커밋을 다시 붙잡는다 (11-05 stocks.json)
+          curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/live.json" || true
