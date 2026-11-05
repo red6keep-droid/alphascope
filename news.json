@@ -1,37 +1,61 @@
 {
-  "updated_at": "2026-11-05 20:16:36 UTC",
+  "updated_at": "2026-11-05 21:46:24 UTC",
   "items": [
     {
-      "title": "AI meltdown: Chip stocks and neoclouds plunge, pushing Nasdaq to worst day since April 2025",
+      "title": "The October jobs report is out Friday. Here's everything to expect",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/october-jobs-report-preview.html",
+      "published": "2026-11-05 21:32:52",
+      "title_ko": "10월 고용보고서 금요일 발표. 기대할 수 있는 모든 것",
+      "summary_ko": "노동통계국, 동부시간 오전 8시 30분 발표"
+    },
+    {
+      "title": "AI meltdown: Nvidia and Qualcomm drop more than 9%, pushing Nasdaq to worst day since April 2025",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/05/qualcomm-earnings-chip-stocks-election.html",
-      "published": "2026-11-05 20:08:49",
+      "published": "2026-11-05 21:16:39",
       "title_ko": "AI 붕괴: 칩 주식과 네오클라우드 급락, 나스닥 2025년 4월 이후 최악의 하루",
       "summary_ko": "나스닥, 2025년 4월 이후 최악의 하루 기록"
     },
     {
-      "title": "How Wall Street's postelection rally got obliterated — and what's next",
+      "title": "Nvidia's Huang is asked to brief Congress on reported Chinese spy relationship",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/11/05/how-wall-streets-postelection-rally-got-obliterated-and-whats-next.html",
-      "published": "2026-11-05 20:06:31",
-      "title_ko": "선거 후 월스트리트 랠리 붕괴, 향후 전망은?",
-      "summary_ko": ""
+      "link": "https://www.cnbc.com/2026/11/05/nvidia-jensen-huang-china-spy-congress.html",
+      "published": "2026-11-05 21:09:56",
+      "title_ko": "엔비디아 황, 중국 스파이 관계 보도 관련 의회 브리핑 요청",
+      "summary_ko": "트럼프 대통령, 1년 전 해당 정보 발견 건 브리핑 받아"
     },
     {
       "title": "IRS announces bigger estate and gift tax exemption for 2027",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/05/2027-estate-and-gift-tax-exemption-irs-raises-limit.html",
-      "published": "2026-11-05 19:54:26",
+      "published": "2026-11-05 20:51:57",
       "title_ko": "IRS, 2027년 상속·증여세 면제 한도 확대 발표",
       "summary_ko": ""
+    },
+    {
+      "title": "Here's where we stand on Kimberly-Clark shares after a better-than-feared quarter",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/11/05/heres-where-we-stand-on-kimberly-clark-shares-after-a-better-than-feared-quarter.html",
+      "published": "2026-11-05 20:44:10",
+      "title_ko": "예상보다 나은 분기 실적 이후 Kimberly-Clark 주가 현황",
+      "summary_ko": "주목, 목요일 월스트리트 매도세 속 1% 이상 상승"
     },
     {
       "title": "IRS announces new federal income tax brackets for 2027",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/05/2027-federal-tax-brackets.html",
-      "published": "2026-11-05 19:53:13",
+      "published": "2026-11-05 20:37:22",
       "title_ko": "IRS, 2027년 연방 소득세 구간 및 표준 공제액 인상 발표",
       "summary_ko": "표준 공제액 인상"
+    },
+    {
+      "title": "Top Democrats call to rein in AI buildout after midterms sweep: 'National data center moratorium now'",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/democrats-data-center-restrictions-midterms.html",
+      "published": "2026-11-05 20:17:16",
+      "title_ko": "상원 민주당, 중간선거 승리 후 AI 확장 억제 촉구: '국가 데이터센터 모라토리엄 즉시 시행'",
+      "summary_ko": "진보 성향 의원들, 데이터센터 건설 일시 중단 촉구"
     },
     {
       "title": "Wall Street's fear gauge surges the most since April. Why traders think it should be even higher",
@@ -50,28 +74,16 @@
       "summary_ko": "대선 결과 기술 투자 수학 변화"
     },
     {
-      "title": "Trump's energy deals are about to face a wave of investigations by Democrats",
+      "title": "중간선거 후 빅테크 및 AI 규제 강화",
+      "title_ko": "중간선거 후 빅테크 및 AI 규제 강화",
+      "summary_ko": "민주당의 중간선거 승리로 빅테크와 AI 데이터센터에 대한 정치적 스크루티니와 규제 압박이 거세질 것",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/trump-election-energy-venezuela-critical-mineral-renewable-iran.html",
-      "published": "2026-11-05 19:13:06",
-      "title_ko": "트럼프의 에너지 거래, 민주당 조사 물결 직면",
-      "summary_ko": "민주당, 베네수엘라 개입 및 광물 거래 조사"
-    },
-    {
-      "title": "Blue Origin pushes launch to January 2027 as it races to rebuild damaged launch pad",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/blue-origin-launch-new-glenn.html",
-      "published": "2026-11-05 19:02:32",
-      "title_ko": "블루오리진, 손상된 발사패드 복구 후 2027년 1월 발사로 일정 앞당겨",
-      "summary_ko": "CEO, 발사패드 복구 작업 진행"
-    },
-    {
-      "title": "HSA-eligible health plans in 2027: What to know about tax savings vs. higher deductibles",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/hsa-health-plan-2027.html",
-      "published": "2026-11-05 18:57:08",
-      "title_ko": "2027년 HSA 대상 고액공제 건강 플랜: 세금 절감과 높은 공제액 비교",
-      "summary_ko": ""
+      "link": "https://www.youtube.com/watch?v=ud9w40nBaBA",
+      "published": "2026-11-05 12:55:35",
+      "kind": "media",
+      "tag": "정책/규제",
+      "direction": "negative",
+      "n_channels": 3
     },
     {
       "title": "미국 민주당 의회 압승",
@@ -83,7 +95,7 @@
       "kind": "media",
       "tag": "정책/규제",
       "direction": "positive",
-      "n_channels": 5
+      "n_channels": 4
     },
     {
       "title": "이란 전쟁 해결 기대와 유가 하락",
@@ -95,18 +107,6 @@
       "kind": "media",
       "tag": "에너지",
       "direction": "negative",
-      "n_channels": 3
-    },
-    {
-      "title": "미국 중간선거 결과 및 정책 불확실성",
-      "title_ko": "미국 중간선거 결과 및 정책 불확실성",
-      "summary_ko": "미국 중간선거에서 민주당이 상하원 다수당 지위를 확보하면서 정책 불확실성이 소화되는 과정에 있습니",
-      "source": "삼성증권",
-      "link": "https://www.youtube.com/watch?v=Qa4Vdmb68AU",
-      "published": "2026-11-05 09:09:51",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "positive",
       "n_channels": 3
     }
   ]
