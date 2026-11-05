@@ -610,7 +610,8 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "raw": raw,
     }
     # 재설계 계산 (2026-10-18, doc/기획/데일리-리포트-기획.md 6절) — 평소 범위 · 충격 · 한국 연결 · 환율 · 일정
-    analysis.update(daily_view.build(raw, closes, series))
+    dates = {sym: rec["dates"] for sym, rec in (prices.get("series") or {}).items() if rec.get("close") and rec.get("dates")}   # 환율 그래프 가로축 (batch 8 ⑭)
+    analysis.update(daily_view.build(raw, closes, series, dates))
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
