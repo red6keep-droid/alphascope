@@ -1,107 +1,112 @@
 {
-  "updated_at": "2026-11-05 12:58:19 UTC",
+  "updated_at": "2026-11-05 20:16:36 UTC",
   "items": [
     {
-      "title": "Bank of England hikes interest rate for the first time since Iran war, warns inflation will near 5%",
+      "title": "AI meltdown: Chip stocks and neoclouds plunge, pushing Nasdaq to worst day since April 2025",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/interest-rates-inflation-uk.html",
-      "published": "2026-11-05 12:37:57",
+      "link": "https://www.cnbc.com/2026/11/05/qualcomm-earnings-chip-stocks-election.html",
+      "published": "2026-11-05 20:08:49",
+      "title_ko": "AI 붕괴: 칩 주식과 네오클라우드 급락, 나스닥 2025년 4월 이후 최악의 하루",
+      "summary_ko": "나스닥, 2025년 4월 이후 최악의 하루 기록"
+    },
+    {
+      "title": "How Wall Street's postelection rally got obliterated — and what's next",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/11/05/how-wall-streets-postelection-rally-got-obliterated-and-whats-next.html",
+      "published": "2026-11-05 20:06:31",
+      "title_ko": "선거 후 월스트리트 랠리 붕괴, 향후 전망은?",
       "summary_ko": ""
     },
     {
-      "title": "Wendy's rejects takeover proposal from Nelson Peltz’s Trian",
+      "title": "IRS announces bigger estate and gift tax exemption for 2027",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/wendys-rejects-takeover-proposal.html",
-      "published": "2026-11-05 12:34:08",
+      "link": "https://www.cnbc.com/2026/11/05/2027-estate-and-gift-tax-exemption-irs-raises-limit.html",
+      "published": "2026-11-05 19:54:26",
+      "title_ko": "IRS, 2027년 상속·증여세 면제 한도 확대 발표",
       "summary_ko": ""
     },
     {
-      "title": "Here's what the Democratic election rout could mean for the U.S. economy",
+      "title": "IRS announces new federal income tax brackets for 2027",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/emocratic-midterm-economy.html",
-      "published": "2026-11-05 12:11:05",
+      "link": "https://www.cnbc.com/2026/11/05/2027-federal-tax-brackets.html",
+      "published": "2026-11-05 19:53:13",
+      "title_ko": "IRS, 2027년 연방 소득세 구간 및 표준 공제액 인상 발표",
+      "summary_ko": "표준 공제액 인상"
+    },
+    {
+      "title": "Wall Street's fear gauge surges the most since April. Why traders think it should be even higher",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/wall-streets-fear-gauge-surges-the-most-since-april-why-traders-think-it-should-be-even-higher.html",
+      "published": "2026-11-05 19:20:21",
+      "title_ko": "월스트리트 공포지수 VIX, 4월 이후 최대 상승 기록",
+      "summary_ko": "목요일 하루 11포인트 상승"
+    },
+    {
+      "title": "CNBC's experts on whether the AI trade is ending and what investors should do next",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/cnbcs-experts-on-whether-the-ai-trade-is-ending-and-what-investors-should-do-next.html",
+      "published": "2026-11-05 19:19:31",
+      "title_ko": "CNBC 전문가, AI 무역 종말 논의와 투자자 행동 전망",
+      "summary_ko": "대선 결과 기술 투자 수학 변화"
+    },
+    {
+      "title": "Trump's energy deals are about to face a wave of investigations by Democrats",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/trump-election-energy-venezuela-critical-mineral-renewable-iran.html",
+      "published": "2026-11-05 19:13:06",
+      "title_ko": "트럼프의 에너지 거래, 민주당 조사 물결 직면",
+      "summary_ko": "민주당, 베네수엘라 개입 및 광물 거래 조사"
+    },
+    {
+      "title": "Blue Origin pushes launch to January 2027 as it races to rebuild damaged launch pad",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/blue-origin-launch-new-glenn.html",
+      "published": "2026-11-05 19:02:32",
+      "title_ko": "블루오리진, 손상된 발사패드 복구 후 2027년 1월 발사로 일정 앞당겨",
+      "summary_ko": "CEO, 발사패드 복구 작업 진행"
+    },
+    {
+      "title": "HSA-eligible health plans in 2027: What to know about tax savings vs. higher deductibles",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/05/hsa-health-plan-2027.html",
+      "published": "2026-11-05 18:57:08",
+      "title_ko": "2027년 HSA 대상 고액공제 건강 플랜: 세금 절감과 높은 공제액 비교",
       "summary_ko": ""
     },
     {
-      "title": "World's largest olive oil company plummets 18% after rivals agree to takeover deal",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/deoleo-olive-oil-takeover-dcoop-acesur.html",
-      "published": "2026-11-05 11:42:28",
-      "summary_ko": ""
-    },
-    {
-      "title": "How the midterms could fuel the K-shaped AI trade",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/ai-data-centers-midterms-capacity.html",
-      "published": "2026-11-05 11:01:39",
-      "summary_ko": ""
-    },
-    {
-      "title": "Consumers are spending on physical gifts even as travel tops wish lists, Visa survey finds",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/visa-holiday-shopping-physical-gifts-travel.html",
-      "published": "2026-11-05 11:00:01",
-      "title_ko": "비자 조사, 소비자 휴가 시즌 물리적 선물 지출 우선",
-      "summary_ko": "여행·경험보다 선물 지출 우선"
-    },
-    {
-      "title": "OpenAI pledges to pay for data center power after election highlights AI concerns",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/openai-to-pay-for-data-center-power-after-election-shows-ai-concern.html",
-      "published": "2026-11-05 10:00:01",
-      "title_ko": "오픈AI, 선거 후 AI 우려에 데이터센터 전력 비용 부담 약속",
-      "summary_ko": "커뮤니티 의견 수렴 및 건설 계획 공개"
-    },
-    {
-      "title": "Rheinmetall shares plunge 17% after outlook cut as military contracts stall",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/rheinmetall-stock-outlook-sales-germany.html",
-      "published": "2026-11-05 09:06:40",
-      "title_ko": "라인메탈 주가 17% 급락, 군수 계약 지연으로 전망 하향",
-      "summary_ko": "주가 17% 급락"
-    },
-    {
-      "title": "From tanks to drones: South Korea’s defense firms face a new battlefield test",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/south-korea-defense-weapon-war-stocks-fall.html",
-      "published": "2026-11-05 08:07:43",
-      "title_ko": "전차에서 드론까지: 한국 방산 기업, 새로운 전장 시험 직면",
-      "summary_ko": "2026년 주가 급락"
-    },
-    {
-      "title": "미국 선거 블루웨이브와 트럼프 정책 비토",
-      "title_ko": "미국 선거 블루웨이브와 트럼프 정책 비토",
-      "summary_ko": "미국 선거 결과 민주당이 압승을 거두며 트럼프의 주요 정책에 대한 비토와 정치적 교착 상태가 예상되어 전통주와 시장 전반에 호재로 작용",
-      "source": "증시각도기",
-      "link": "https://www.youtube.com/watch?v=hwQdle-P0IM",
-      "published": "2026-11-04 23:20:58",
+      "title": "미국 민주당 의회 압승",
+      "title_ko": "미국 민주당 의회 압승",
+      "summary_ko": "민주당의 의회 장악으로 트럼프 행정부의 정책에 제동이 걸리고 재정 지출 및 관세 정책에 변화가 예상",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=VdckdqADp48",
+      "published": "2026-11-05 11:23:28",
       "kind": "media",
       "tag": "정책/규제",
-      "direction": "neutral",
-      "n_channels": 4
+      "direction": "positive",
+      "n_channels": 5
     },
     {
-      "title": "AI 데이터 센터 규제 강화 우려",
-      "title_ko": "AI 데이터 센터 규제 강화 우려",
-      "summary_ko": "민주당 주도의 AI 데이터 센터 규제 강화 및 속도 조절 전망으로 네오클라우드와 관련 반도체 주가가 급락",
-      "source": "증시각도기",
-      "link": "https://www.youtube.com/watch?v=hwQdle-P0IM",
-      "published": "2026-11-04 23:20:58",
+      "title": "이란 전쟁 해결 기대와 유가 하락",
+      "title_ko": "이란 전쟁 해결 기대와 유가 하락",
+      "summary_ko": "정치적 변화로 이란 전쟁의 외교적 해결 가능성이 높아지면서 유가가 급락하고 인플레이션 압력이 줄어들고 있음",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=VdckdqADp48",
+      "published": "2026-11-05 11:23:28",
       "kind": "media",
-      "tag": "정책/규제",
+      "tag": "에너지",
       "direction": "negative",
-      "n_channels": 4
+      "n_channels": 3
     },
     {
-      "title": "민주당 의회 장악 및 트럼프 견제",
-      "title_ko": "민주당 의회 장악 및 트럼프 견제",
-      "summary_ko": "민주당의 의회 장악으로 트럼프 대통령의 임기 후반 2년 동안 강력한 정치적 조사와 입법 공방이 예상",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=BniwzPBx48c",
-      "published": "2026-11-04 22:06:41",
+      "title": "미국 중간선거 결과 및 정책 불확실성",
+      "title_ko": "미국 중간선거 결과 및 정책 불확실성",
+      "summary_ko": "미국 중간선거에서 민주당이 상하원 다수당 지위를 확보하면서 정책 불확실성이 소화되는 과정에 있습니",
+      "source": "삼성증권",
+      "link": "https://www.youtube.com/watch?v=Qa4Vdmb68AU",
+      "published": "2026-11-05 09:09:51",
       "kind": "media",
       "tag": "정책/규제",
-      "direction": "neutral",
+      "direction": "positive",
       "n_channels": 3
     }
   ]
