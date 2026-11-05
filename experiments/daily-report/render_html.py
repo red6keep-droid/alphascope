@@ -831,33 +831,27 @@ def _has_pop(g, built):
     return len(_pop_lines(g, built)) >= 2
 
 
-def _story_block(built):
-    """`여러 방송이 같이 다룬 뉴스` — 펼침 없이 바로 5줄 (batch 9 ⑤): 대표 기사 제목 · 보조 한 줄 · 그 아래 사건 이름 + `n곳 / 전체` 칸 막대."""
-    multi = [g for g in built["stories"] if g["n_channels"] >= 2][:STORY_SHOWN]
-    if not multi:
-        return ""
+def _story_row(g, built, first):
+    """주요 뉴스 한 줄 (2026-11-05 사용자: `여러 방송이 같이 다룬 뉴스` 5줄과 주요 뉴스 5건이 같아 하나로) — 대표 기사 제목 · 보조 한 줄 · 사건 이름 + `n곳 / 전체` 칸 막대 · 시각 · 매체."""
     n_ch = built["n_channels_all"]
-    rows = []
-    for i, g in enumerate(multi):
-        rep = g["rep"]
-        lines = _pop_lines(g, built)
-        sub = lines[0] if lines else ""
-        attrs = (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else "") + ' data-trhelp="skip"'
-        head = dk.keep_tone(f'<a href="{_esc(rep.get("url") or "#")}" target="_blank" rel="noopener"{attrs} style="color:#111;font-weight:700;text-decoration:none;font-size:{dk.NEWS_TITLE_FS};line-height:{dk.NEWS_TITLE_LH};display:block;">'
-                            f'{_esc(rep["text"])}{dk.NEW_PILL if g.get("new") else ""}</a>')   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
-        rows.append(f'<li style="margin:0;padding:{(dk.RULE_GAP - dk.NEWS_VP) if i else 2}px {dk.ALIGN_PX}px {dk.RULE_GAP - dk.VP}px;line-height:{dk.LH_BODY};{"box-shadow:inset 0 1px 0 #E2E8F0;" if i else ""}">'
-                    + head + (dk.keep_tone(f'<span style="{dk.NEWS_SUM}">{_esc(dk.headline(sub))}</span>') if sub else "")   # 보조 줄 = 뉴스 문체(명사형), 공용 카드와 같게
-                    + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:8px 0 1px;line-height:1;">'
-                    f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;">{_esc(g["name"])}</span>{_meter(g["n_channels"], n_ch)}'
-                    f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;"><b style="color:#111;">{g["n_channels"]}곳</b> / {n_ch}곳</span>'
-                    f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{_kst(rep["published_at"])} · {_esc(rep["source"])} {"기사" if rep["kind"] == "article" else "방송"}</span></span></li>')
-    tip = dk.tip("같은 사건을 다룬 방송 주제와 기사를 하나로 묶고, 몇 곳이 다뤘는지 셌습니다.\n줄마다 대표 기사(없으면 대표 방송) 하나와 그 아래 사건 이름 · 다룬 방송 수입니다.\n묶기는 AI 가 사건 단위로 합니다. 분야가 같아도 사건이 다르면 따로 셉니다.")
-    return _sub_title("여러 방송이 같이 다룬 뉴스", f"방송 {n_ch}곳 중 두 곳 이상 · 많이 다룬 순", tip) + f'<ul style="margin:0 0 8px;padding:0;list-style:none;font-size:{dk.SMALL};">{"".join(rows)}</ul>'
+    rep = g["rep"]
+    lines = _pop_lines(g, built)
+    sub = lines[0] if lines else ""
+    attrs = (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else "") + ' data-trhelp="skip"'
+    head = dk.keep_tone(f'<a href="{_esc(rep.get("url") or "#")}" target="_blank" rel="noopener"{attrs} style="color:#111;font-weight:700;text-decoration:none;font-size:{dk.NEWS_TITLE_FS};line-height:{dk.NEWS_TITLE_LH};display:block;">'
+                        f'{_esc(rep["text"])}{dk.NEW_PILL if g.get("new") else ""}</a>')   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
+    return (head + (dk.keep_tone(f'<span style="{dk.NEWS_SUM}">{_esc(dk.headline(sub))}</span>') if sub else "")
+            + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:8px 0 1px;line-height:1;">'
+            f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;">{_esc(g["name"])}</span>{_meter(g["n_channels"], n_ch)}'
+            f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;"><b style="color:#111;">{g["n_channels"]}곳</b> / {n_ch}곳</span>'
+            f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{_kst(rep["published_at"])} · {_esc(rep["source"])} {"기사" if rep["kind"] == "article" else "방송"}</span></span>')
 
 
-def _sub_title(t, note, tip_html=""):
-    return (f'<h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:2px 6px;font-size:{dk.NEWS_TITLE_FS};line-height:26px;font-weight:700;color:#111;margin:24px 0 2px;padding-left:{dk.ALIGN_PX}px;position:relative;">'
-            f'{_esc(t)}{tip_html}<span style="font-weight:400;color:{dk.SUB};font-size:{dk.TINY};">{_esc(note)}</span></h3>')
+def _sub_title(t, note, tip_html="", line=False):
+    """뉴스 안 소제목. line=True: 안내 글 대신 아래 가로 구분선 (2026-11-05 사용자: `여러 방송이 같이 다룬 뉴스`) — 첫 줄 위 구분선은 이 선이 대신한다."""
+    rule = f"padding-bottom:8px;border-bottom:1px solid #E2E8F0;margin:24px 0 0;" if line else "margin:24px 0 2px;"
+    return (f'<h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:2px 6px;font-size:{dk.NEWS_TITLE_FS};line-height:26px;font-weight:700;color:#111;{rule}padding-left:{dk.ALIGN_PX}px;position:relative;">'
+            f'{_esc(t)}{tip_html}' + (f'<span style="font-weight:400;color:{dk.SUB};font-size:{dk.TINY};">{_esc(note)}</span>' if note else "") + "</h3>")
 
 
 def _news_pop_body(g, built):
@@ -946,23 +940,22 @@ def sec_news(input_data, report, analysis):
     for k, v in media_feed.direction_counts(media).items():
         dirs[k] = dirs.get(k, 0) + v
     out = dk.direction_bars(dirs, {})   # 뉴스 방향 막대 — 데일리는 `오늘` 만 (P143)
-    # `유튜브 방송이 많이 다룬 분야는?` 카드는 뺐다 — 분야 칩이 이미 많은 순이라 같은 정보 (2026-11-05 사용자)
-    out += _story_block(built)
+    # `유튜브 방송이 많이 다룬 분야는?` 카드 · `여러 방송이 같이 다룬 뉴스` 5줄은 뺐다 — 분야 칩이 많은 순이고 주요 뉴스 5건과 같았다 (2026-11-05 사용자). 막대 바로 아래 칩
     picks, rest = built["picks"], built["rest"]
     pops = []
     if picks or rest:
         tip = dk.tip("주요 뉴스 = 우리 데이터로 매긴 점수 순 5건입니다. AI 가 고르지 않습니다.\n· 다룬 방송 수 = 두 곳 이상이면 한 곳마다 2점\n· 관련 자산의 그날 움직임 = 1% 마다 1점 (4점까지)\n"
                      "· 예상 밖 표시 = 2점\n· 시장에 좋거나 나쁜 방향이 있는 뉴스 = 1점\n· 최근 12시간 안 = 1점\n분야 칩을 누르면 그 분야 뉴스가 최신 순으로 나옵니다. 같은 뉴스는 한 줄입니다.")
-        out += _sub_title("뉴스", f"최근 48시간 · {len(picks) + len(rest)}건", tip)
         chips = [("주요 뉴스", len(picks))] + sorted(built["chips"].items(), key=lambda kv: -kv[1])   # `전체` 없음 — 주요 뉴스가 첫 칩 · 기본 (batch 9 ①)
         chip_css = f"flex:none;padding:5px 10px;border:1px solid #E2E8F0;border-radius:999px;background:#fff;color:#374151;font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;"
-        out += (f'<div data-news-chips="1" style="display:flex;gap:6px;overflow-x:auto;padding:6px {dk.ALIGN_PX}px 8px;margin:0 0 2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
+        out += (f'<div style="display:flex;align-items:center;gap:4px;margin:4px 0 2px;position:relative;">'
+                f'<div data-news-chips="1" style="flex:1 1 auto;min-width:0;display:flex;gap:6px;overflow-x:auto;padding:6px {dk.ALIGN_PX}px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
                 + "".join(f'<button type="button" data-chip="{_esc(k)}" aria-pressed="{"true" if i == 0 else "false"}" style="{chip_css}">{_esc(k)} <span style="color:{dk.SUB};">{n}</span></button>'
-                          for i, (k, n) in enumerate(chips)) + "</div>")
+                          for i, (k, n) in enumerate(chips)) + f"</div><span style=\"flex:none;\">{tip}</span></div>")   # ? = 주요 뉴스 점수 규칙 · 칩 설명, 칩 줄 끝에 고정
         lis = []
         for i, g in enumerate(picks + rest):
             is_pick = i < len(picks)
-            item = _story_item(g, built, reaction, known, compact=not is_pick)
+            item = _story_row(g, built, i == 0) if is_pick else _story_item(g, built, reaction, known, compact=True)   # 주요 뉴스 = 사건 이름 + n곳 막대 줄
             pick_attr = ' data-pick="1"' if is_pick else " hidden"
             lis.append(f'<li data-theme="{_esc(g["theme"])}"{pick_attr} style="margin:0;padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px {dk.RULE_GAP - dk.VP}px;'
                        f'line-height:{dk.LH_BODY};box-shadow:inset 0 1px 0 #E2E8F0;">{item}</li>')   # 첫 줄 구분선은 테마 JS 가 지운다. 주요 뉴스 외는 숨김 — 칩이 켠다
