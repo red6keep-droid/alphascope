@@ -1563,13 +1563,17 @@ def direction_bars(today, week):
             f'{gap}{bar("최근 7일", week or {})}</div>')
 
 
-def report_stamp(day_text, when_text):
+def report_stamp(day_text, when_text, us_hours=False):
     """종목 페이지 제목 바로 아래 한 줄 — 이 페이지가 어느 날 종가 기준인지 · 매 거래일 장 마감 뒤 새로 나온다는 것 · 장중 가격은 어디서 보는지 (2026-11-05 사용자:
     장중 가격을 볼 수 있게 되니 종가 리포트라는 점을 제목에서 알리자). 제목 글자(검색어)는 건드리지 않고 본문 첫 줄에 둔다. 날짜는 `어제` 같은 상대어 대신 실제 날짜."""
     ico = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" '
            'style="flex:none;margin-top:2px;"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.4 1.6"/></svg>')
     return (f'<p data-report-stamp="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 10px;font-size:13px;line-height:18px;color:#6B7280;word-break:keep-all;">{ico}'
-            f'<span>{day_text} 종가 기준 리포트입니다. 매 거래일 장을 마친 뒤 새로 나오고({when_text}), 장중 가격은 아래 <b style="font-weight:600;color:#4B5563;">장중 차트 보기</b>에서 볼 수 있습니다.</span></p>')
+            + (f'<span>{day_text} 종가 기준 리포트입니다. 매 거래일 장을 마친 뒤 새로 나옵니다({when_text}). '   # 미국 = 장중 차트가 정규장에만 보여 문구도 시간 따라 (2026-11-06 사용자 P314)
+               f'<span data-us-live="0">장중 차트는 미국 정규장 시간에만 열립니다.</span>'
+               f'<span data-us-live="1" style="display:none;">장중 가격은 아래 <b style="font-weight:600;color:#4B5563;">장중 차트 보기</b>에서 볼 수 있습니다.</span></span></p>'
+               if us_hours else
+               f'<span>{day_text} 종가 기준 리포트입니다. 매 거래일 장을 마친 뒤 새로 나오고({when_text}), 장중 가격은 아래 <b style="font-weight:600;color:#4B5563;">장중 차트 보기</b>에서 볼 수 있습니다.</span></p>'))
 
 
 def intraday_chart_fold(code, bars_url):
@@ -1603,6 +1607,20 @@ function load(){fetch("__URL__?v="+Math.floor(Date.now()/60000)).then(function(r
 if(window.LightweightCharts)load();else{var s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js";s.onload=load;s.onerror=function(){fail("차트 라이브러리를 불러오지 못했습니다");};document.head.appendChild(s);}});})();"""
 
 
+# 미국 정규장(뉴욕 평일 09:30~16:00, 단축일 13:00) 판정 — 장중 차트 버튼 · 안내 문구를 그 시간에만 보인다 (2026-11-06 사용자 P314: "정규장이 끝났으니 이런 위젯은 필요없다").
+# 페이지는 하루 한 번 만들어지므로 보는 사람 브라우저에서 1분마다 다시 판정한다. 휴장일 · 단축일은 NYSE 공지 기준 — 해마다 다음 해 날짜를 더한다.
+US_HOLIDAYS = ["2026-11-26", "2026-12-25", "2027-01-01", "2027-01-18", "2027-02-15", "2027-03-26", "2027-05-31", "2027-06-18", "2027-07-05",
+               "2027-09-06", "2027-11-25", "2027-12-24"]
+US_HALF_DAYS = ["2026-11-27", "2026-12-24", "2027-11-26"]
+_US_LIVE_JS = ('function o(){var p={};try{new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",'
+               'weekday:"short",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date()).forEach(function(x){p[x.type]=x.value;});}catch(e){return false;}'
+               'var k=p.year+"-"+p.month+"-"+p.day;if(p.weekday=="Sat"||p.weekday=="Sun"||' + json.dumps(US_HOLIDAYS) + '.indexOf(k)>=0)return false;'
+               'var m=+p.hour*60+ +p.minute;return m>=570&&m<(' + json.dumps(US_HALF_DAYS) + '.indexOf(k)>=0?780:960);}'
+               'function u(){var on=o();d.style.display=on?"":"none";if(!on)d.open=false;'
+               'document.querySelectorAll("[data-us-live]").forEach(function(e){e.style.display=(e.getAttribute("data-us-live")=="1")==on?"":"none";});}'
+               'u();setInterval(u,60000);')
+
+
 def tv_chart_fold(symbol, tz, key):
     """종목 페이지 봉차트 PNG 아래 `장중 차트 보기` 접힘 줄 (2026-11-05 사용자) — 펼칠 때만 TradingView 15분봉 위젯을 불러온다(그 전엔 통신 없음).
     위젯은 표시 전용(TradingView 약관) — 숫자를 꺼내 쓰지 않는다. 우리 봉차트 PNG 가 그날 기록이고, 위젯은 독자가 원할 때 보는 참고.
@@ -1614,12 +1632,13 @@ def tv_chart_fold(symbol, tz, key):
     cfg = json.dumps({"width": "100%", "height": 360, "symbol": symbol, "interval": "15", "range": "1D", "timezone": tz, "theme": "light", "style": "1", "locale": "kr",
                       "hide_top_toolbar": True, "hide_legend": False, "allow_symbol_change": False, "save_image": False, "withdateranges": False,
                       "calendar": False, "support_host": "https://www.tradingview.com"}, ensure_ascii=False)
-    return (f'<details id="{sid}" data-tv="1" style="margin:-8px 0 16px;max-width:1024px;text-align:right;">'   # 버튼은 오른쪽 (2026-11-05 사용자)
+    return (f'<details id="{sid}" data-tv="1" style="display:none;margin:-8px 0 16px;max-width:1024px;text-align:right;">'   # 처음엔 숨김 — 정규장이면 스크립트가 보인다 (P314)   # 버튼은 오른쪽 (2026-11-05 사용자)
             f'<summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #E2E8F0;border-radius:8px;'
             f'font-size:13px;font-weight:600;color:#4B5563;background:#fff;">{ico}장중 차트 보기 (15분봉)</summary>'
             f'<div data-tv-box="1" style="margin-top:8px;min-height:360px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff;text-align:left;">'
             f'<div style="display:flex;align-items:center;justify-content:center;height:360px;color:#9CA3AF;font-size:13px;">TradingView 차트를 불러오는 중…</div></div></details>'
             f'<script>(function(){{var d=document.getElementById("{sid}");if(!d||d.__tv)return;d.__tv=1;'
+            f'{_US_LIVE_JS}'
             f'd.addEventListener("toggle",function(){{if(!d.open||d.__done)return;d.__done=1;var b=d.querySelector("[data-tv-box]");'
             f'var c=document.createElement("div");c.className="tradingview-widget-container";c.style.height="360px";'
             f'var w=document.createElement("div");w.className="tradingview-widget-container__widget";w.style.height="100%";c.appendChild(w);'
