@@ -300,9 +300,16 @@ def _day_entry(e, first, bd, phases=PHASES):
 def _top_card(fc, log, theme):
     """상단 강조 카드 (2026-11-06 사용자): 오늘(가장 최근 날) → `지난 경과 보기` 카드 안 펼침 줄(공용 fold_card 버튼과 같은 모양:
     카드 폭 · 위 구분선 · 14px 굵게 · 화살표, 누르면 버튼 위로 펼치고 `접기`). 지난 날도 같은 모양으로 날짜 내림차순 — 오늘 줄은 내일이 되면 지난 경과로 내려간다.
-    맨 위 게시 · 선거 · 결과 날짜 줄은 뺐다(2026-11-06 사용자 P319 ①) — 구획 제목 `전망 결과` 가 공통 제목."""
+    게시 · 선거 · 결과 날짜 줄은 카드 안이 아니라 **카드 위**(구획 제목 `전망 결과` 와 카드 사이, 카드 밖 안내 줄 — 왼쪽 12px 들여쓰기 · 14px 회색, 가이드 1절 6)
+    (2026-11-06 사용자 P320: "카드 영역에서 빼고 그 카드 위에 배치"). 결과는 오른쪽 끝. 전망마다 fc["dates"] = [[이름, 값], …], 없으면 게시 · 선거 · 결과."""
     bg, bd = dk.CARD_DIR.get(theme, dk.CARD_DIR["neutral"])
     ph = labels_for(fc)
+    items = fc.get("dates") or [["게시", fc["posted"]], ["선거", fc["event"][:5]], ["결과", f'{fc["outcome"]["date"]} {fc["outcome"]["text"]}']]
+    dates = (f'<span style="display:flex;flex-wrap:wrap;gap:4px 16px;margin:0 0 8px;{dk.GUIDE_IND}'
+             f'font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};">'
+             + "".join(f'<span style="white-space:nowrap;{"margin-left:auto;" if i == len(items) - 1 else ""}">{dk.esc(k)} : <b style="color:#111;">{dk.esc(v)}</b></span>'
+                       for i, (k, v) in enumerate(items))
+             + "</span>")
     days = list(reversed(log))   # 최신이 위
     body = _day_entry(days[0], True, bd, ph)
     if len(days) > 1:
@@ -312,7 +319,7 @@ def _top_card(fc, log, theme):
         body += (f'<details data-acc="1" data-fold="1" data-label="지난 경과 보기" style="margin:0;">'
                  f'<summary style="{btn}margin:0 -14px -{dk.EMPH_PAD - dk.VP_EMPH}px;"><span>지난 경과 보기</span> {dk.ACC_CHEV}</summary>'
                  f'<div>{more}</div></details>')
-    return dk.dcard(body, theme=theme)
+    return dates + dk.dcard(body, theme=theme)
 
 
 def forecasts(reg):
