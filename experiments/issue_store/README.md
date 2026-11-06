@@ -9,6 +9,9 @@
 | `fetch_fomc.py` | FOMC 회의 (연준 홈페이지) + 결정 (DFEDTAR · DFEDTARU) | `data/store/calendar/fomc.csv` |
 | `build_calendar_misc.py` | 실적(9월 백테스트 earnings.csv) · 옵션 만기 · 분기 말 | `earnings.csv`, `market_structure.csv` |
 | `events_curated.csv` | **큰 사건표 — 사람이 고친다** (시작일 · 기간 · 종류 · 대상) | 깃에 올림 |
+| `policy_windows.csv` | **반쯤 계획된 창 — 사람이 적는다** (2026-11-06, 데이터-기록-계획 A3-3-2 의 9): 날짜는 있고 결과만 모르는 것 — 관세 시한 · 협상 마감 · 판결일 · OPEC 회의 · 해외 중앙은행. 칸 = day · kind(사건표 대분류) · subkind(event_vocab 21개) · scope(시장/섹터/종목) · symbols · title · source(출처 링크) · confidence · note. 전쟁 · 사고 같은 돌발은 넣지 않는다 | 깃에 올림 (빈 틀) |
+| `detect_sector_shocks.py` | 섹터 ETF · 한국 지수가 **시장 대비** 크게 움직인 날 → 사건표 섹터 · 종목 칸을 채울 후보 (A3-3-2 의 7). 원인은 사람이 기사로 채운다 | `results/sector_shocks_candidates.csv` |
+| `fragility_check.py` | 취약 상태 경고 검증 (FRAG_SYMS · FRAG_H · FRAG_TAG) — 비공개 doc/검증/취약-상태-경고-검증.md | `results/fragility_check*.md` |
 | `event_vocab.py` | 사건표 세부 종류 **고정 어휘 21개** + 세부 종류별 대분류 (2026-10-17 확정). 원래 표현은 `detail` 칸. 사건표를 고친 뒤 한 번 돌리면 정리 · 검사 | `events_curated.csv` 덮어씀 |
 
 다른 PC에서: `.venv/bin/pip install pyarrow` 뒤 위 네 스크립트를 순서대로 (FRED_API_KEY 필요).

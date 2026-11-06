@@ -79,7 +79,7 @@ def episodes(sig):
         if i - last > GAP:
             out.append(i)
         last = i
-    return np.array(out)
+    return np.array(out, dtype=int)
 
 
 def spaced_random(n_days, k, valid):
@@ -160,15 +160,17 @@ if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     vix = load_close("^VIX")
     all_rows, all_pre, notes = [], [], []
-    for sym in ("^GSPC", "^IXIC", "^SOX"):
+    syms = os.environ.get("FRAG_SYMS", "^GSPC,^IXIC,^SOX").split(",")   # 한국 = ^KS11,^KQ11 (VIX 는 세계 변동성 국면의 대리 — 한국 VKOSPI 는 야후에 없음)
+    tag = os.environ.get("FRAG_TAG", "")
+    for sym in syms:
         rows, pre, base, n = run(sym, vix)
         all_rows += rows
         all_pre += pre
         notes.append(f"{sym}: 날 {n} · 아무 날 MDD20≤−5% {base['p5']:.1%} · ≤−10% {base['p10']:.1%} · 중앙값 {base['med']:+.1%} · 흔들림 중앙값 {base['big']:.1%}")
     df = pd.DataFrame(all_rows)
     pf = pd.DataFrame(all_pre)
-    df.to_csv(os.path.join(OUT, f"fragility_check_h{H}.csv"), index=False)
-    pf.to_csv(os.path.join(OUT, f"fragility_precursor_h{H}.csv"), index=False)
+    df.to_csv(os.path.join(OUT, f"fragility_check{tag}_h{H}.csv"), index=False)
+    pf.to_csv(os.path.join(OUT, f"fragility_precursor{tag}_h{H}.csv"), index=False)
     pct = lambda v: "—" if pd.isna(v) else f"{v:.1%}"   # noqa: E731
     pp = lambda v: "—" if pd.isna(v) else f"{v:+.1%}"   # noqa: E731
     lines = [f"# 취약 상태 경고 검증 — 결과, 창 {H}거래일 (자동 생성, fragility_check.py)", "", *notes, "",
@@ -182,5 +184,5 @@ if __name__ == "__main__":
               "| 자 | 상태 | 급락 창 | 급락 전 켜짐 | 아무 날 켜짐 |", "|---|---|---|---|---|"]
     for _, r in pf.iterrows():
         lines.append(f"| {r['자']} | {r['상태']} | {r['급락 창 수']} | {pct(r['급락 전 10일 안 켜짐'])} | {pct(r['아무 날 10일 안 켜짐'])} |")
-    open(os.path.join(OUT, f"fragility_check_h{H}.md"), "w", encoding="utf-8").write("\n".join(lines) + "\n")
+    open(os.path.join(OUT, f"fragility_check{tag}_h{H}.md"), "w", encoding="utf-8").write("\n".join(lines) + "\n")
     print("\n".join(lines))
