@@ -196,8 +196,8 @@ def sec_pairs(s, a=None):
     state = pairs_state(s)
     theme, col = {"엇갈림": ("uncertain", R.SOON), "올랐음": ("positive", UP), "내렸음": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
     day = (moves or [adr or sox])[0]["day"]
-    lines = [(f"밤사이(미국 {_md(day)} 종가) 연결 종목은 " + " · ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)
-              + f", 오늘 {_dk.josa(s['name'], '은')} {_sgn(s['ret_1d'])}%였다.", "plain")]
+    lines = [(f"밤사이(미국 {_md(day)} 종가) 연결 종목은 " + ", ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)   # 쉼표 — ` · ` 로 이으면 짧은 덩어리를 이름까지 통째로 칠한다(_dk.tint), 미국 페이지와 같게 (2026-11-06 사용자)
+              + f"였고, 오늘 {_dk.josa(s['name'], '은')} {_sgn(s['ret_1d'])}%였다.", "plain")]
     # 숫자 줄 목록 → 가운데 0 가로 막대 두 묶음 (2026-10-27 사용자 P27: "퍼센트만 쭉 있어 빨리 안 읽힌다, 삼성전자 · 지수와 비교 그래프")
     why = [w.strip() for w in (p.get("why") or "").split("·")]
     role = dict(zip([m["sym"] for m in moves], why)) if len(why) == len(moves) else {}   # 이유가 종목 수와 맞을 때만 나눠 붙인다 — `마이크론 · 메모리`
@@ -567,17 +567,19 @@ def price_card(s):
     pcol = UP if r > 0 else DOWN if r < 0 else "#111"
     tone = R.ROW_UP if r > 0 else R.ROW_DOWN if r < 0 else ""
     bg, bd = ("#FFF7EE", "#FEE6CA") if r > 0 else ("#EFF6FF", "#D6E8FE") if r < 0 else ("#fff", "#E2E8F0")
-    close_html = f'<span style="color:{pcol};font-weight:700;white-space:nowrap;">{won(s["close"])}</span>'
+    # 이름은 늘 같은 크기(19, 미국 · 엔비디아와 같게) — 넘치면 이름 대신 가격 글자를 1px 줄인다 (2026-11-06 사용자: "이름이 19 → 17 로 두 단계 줄어든다,
+    # 가격은 100만 원대까지 여덟 자리라 가격을 1포인트 줄이면 된다"). 18px 은 행간 32 로 홀짝 맞춤(가격 줄 19/33, 0절).
+    price_fs = 19
+    for fs in (19, 18):
+        price_fs = fs
+        if 26 + R._est_w(s["name"], 19) + 8 + R._est_w(won(s["close"]), fs) + 12 + 31 <= PRICE_INNER_W:
+            break
+    small = "" if price_fs == 19 else f"font-size:{price_fs}px;line-height:32px;"
+    close_html = f'<span style="color:{pcol};font-weight:700;white-space:nowrap;{small}">{won(s["close"])}</span>'
     btn = R._fold_btn(_dk.lighten(bg), bd) if r else R.ACC_BTN
     # 한 줄에 들어가면 `가격 ▲ %` 한 줄, 넘치면 가격 위 · 증감 아래 두 줄 — 판단은 브라우저가 한다(그 폰의 글꼴 · 폭 · 그날 값으로).
     # 가격 · 증감 묶음 = 오른쪽 맞춤 flex-wrap: 두 줄이 되면 줄마다 오른쪽 끝이 같다(P135 끝선), 접기 버튼은 묶음 오른쪽(P137 288 · 300~331).
     # (2026-10-31 사용자: "에코프로처럼 이름이 짧으면 줄 바꿈이 되면 안 된다", P138. P137 은 모두 두 줄이었다 — 서버 글자 폭 어림은 경계에서 틀려 에코프로를 놓쳤다)
-    name_fs = 18
-    pw = R._est_w(won(s["close"]), 18)   # 두 줄로도 넘치면 이름을 17 → 16px (P137: 옛 줄이 16px 넘쳐 버튼이 카드 밖)
-    for fs in (18, 17, 16):
-        name_fs = fs
-        if 26 + R._est_w(s["name"], fs) + 8 + pw + 12 + 31 <= PRICE_INNER_W:
-            break
     price = (f'<span style="display:flex;justify-content:flex-end;align-items:center;column-gap:{PRICE_BTN_GAP}px;">'   # 가격 · % 오른쪽 끝 ~ 버튼 12 = 상태 카드 답 ~ 버튼
              f'<span style="display:flex;flex:0 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end;align-items:baseline;column-gap:6px;">{close_html} '
              f'<span style="white-space:nowrap;margin-top:{-2 if r else 6}px;">{R._arrow(r)}</span></span>{btn}</span>')   # 두 줄일 때 가격 ~ 증감 7px (P136) — 등락 0 인 날은 흰 카드 · 줄 높이 24 라 +6 (P137). 한 줄일 땐 기준선 맞춤이라 영향 없음
@@ -585,8 +587,7 @@ def price_card(s):
     head = head.replace(R.PRICE_ROW_L, "flex:0 0 auto;min-width:0;white-space:nowrap;", 1)
     head = head.replace("align-items:center;", "align-items:flex-start;", 1)   # 이름 = 가격과 같은 줄 (P135 — 가운데 맞춤이면 두 줄 사이에 떴다)
     head = head.replace("gap:12px;", "gap:8px;", 1)   # 이름 ~ 가격 8 (P137)   # "@@" 는 ticker_logo 가 배지를 만들지 않는 자리표시 — 한글 이름도 isalnum 이라 "SK" 배지가 붙는다
-    nm = _esc(s["name"]) if name_fs == 18 else f'<span style="font-size:{name_fs}px;">{_esc(s["name"])}</span>'
-    head = head.replace("@@", badge(s["sym"]) + nm, 1)   # 한글 첫 글자 배지 + 종목 이름
+    head = head.replace("@@", badge(s["sym"]) + _esc(s["name"]), 1)   # 한글 첫 글자 배지 + 종목 이름
     sub = R.glance_sub(g)
     if sub:
         head = head.replace("display:flex;", "display:flex;flex-wrap:wrap;", 1).replace("gap:12px;", "column-gap:12px;row-gap:2px;", 1).replace("gap:8px;", "column-gap:8px;row-gap:2px;", 1)
@@ -1220,12 +1221,12 @@ def sec_company(s):
     평가 · 전망 · 추천은 없다. DART 칸이 없으면 그 줄만 뺀다."""
     c = s.get("company") or {}
     about = U.ABOUT.get(s["code"], "")
-    out = f'<p style="margin:0 0 12px;padding:0 {_dk.ALIGN_PX}px;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{_esc(about)}</p>' if about else ""
+    out = f'<p style="margin:0 0 12px;padding:0 {_dk.ALIGN_PX}px;color:#111;line-height:33px;word-break:keep-all;">{_esc(about)}</p>' if about else ""
     url = c.get("hm_url") or ""
     href = url if url.startswith("http") else f"https://{url}" if url else ""
     rows = [("정식 이름", _esc(c.get("corp_name", ""))), ("영문 이름", _esc(c.get("corp_name_eng", ""))), ("대표", _esc(c.get("ceo_nm", ""))),
             ("설립", _esc(_ymd(c.get("est_dt", "")))), ("본사", _esc(re.sub(r"\s+", " ", c.get("adres", "")))),
-            ("홈페이지", f'<a href="{_esc(href)}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">{_esc(url)}</a>' if url else ""),
+            ("홈페이지", f'<a href="{_esc(href)}" style="color:inherit;text-decoration:none;" target="_blank" rel="nofollow noopener">{_esc(url)}</a>' if url else ""),
             ("결산", f"{int(c['acc_mt'])}월" if (c.get("acc_mt") or "").isdigit() else ""),
             ("상장", f"{U.market(s['sym'])} · 종목 코드 {s['code']}"),
             ("업종", _esc(" · ".join([U.sector(s["sym"])] + list(U.groups(s["sym"])))))]

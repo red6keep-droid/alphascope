@@ -447,13 +447,13 @@ def sec_company(s):
     + 기본 정보(야후 회사 개요). 평가 · 전망 · 추천 없음. 칸이 없으면 그 줄만 뺀다."""
     c = s.get("company") or {}
     about = U.ABOUT.get(s["sym"], "")
-    intro = f'<p style="margin:0 0 12px;padding:0 {_dk.ALIGN_PX}px;color:#111;line-height:{_dk.LH_EMPH};word-break:keep-all;">{_esc(about)}</p>' if about else ""   # 한국 sec_company 와 같은 모양
+    intro = f'<p style="margin:0 0 12px;padding:0 {_dk.ALIGN_PX}px;color:#111;line-height:33px;word-break:keep-all;">{_esc(about)}</p>' if about else ""   # 한국 sec_company 와 같은 모양
     if not c.get("name"):
         return intro or _dk.muted("기업 정보를 아직 받지 못했습니다.")
     url = c.get("website") or ""
     place = " · ".join(x for x in (c.get("city"), STATE_KO.get(c.get("state"), c.get("state")) if c.get("country") == "United States" else c.get("country")) if x)
     rows = [("정식 이름", _esc(c["name"])), ("대표", _esc(_person(c.get("ceo")))), ("본사", _esc(place)),
-            ("홈페이지", f'<a href="{_esc(url)}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">{_esc(re.sub(r"^https?://(www\.)?", "", url).rstrip("/"))}</a>' if url else ""),
+            ("홈페이지", f'<a href="{_esc(url)}" style="color:inherit;text-decoration:none;" target="_blank" rel="nofollow noopener">{_esc(re.sub(r"^https?://(www\.)?", "", url).rstrip("/"))}</a>' if url else ""),
             ("직원", f"{c['employees']:,}명" if c.get("employees") else ""), ("결산", f"{c['fy_month']}월" if c.get("fy_month") else ""),
             ("상장", " · ".join(x for x in (_esc(c.get("exchange") or ""), f"티커 {s['sym']}", f"{c['listed']}년부터" if c.get("listed") else "") if x)),
             ("업종", _esc(U.BY_SYM[s["sym"]][3]) if s["sym"] in U.BY_SYM and len(U.BY_SYM[s["sym"]]) > 3 else "")]
@@ -863,10 +863,10 @@ def card_capex(c, L=US_MONEY):
 
 
 PROFIT_ROWS = (("gp", "매출총이익", "매출에서 만드는 데 든 돈을 뺀 몫"), ("opinc", "영업이익", "본업에서 남긴 돈"), ("ni", "순이익", "세금 · 이자까지 다 뺀 최종 이익"))
-_GREEN, _ORANGE, _VIOLET = "#3FA874", "#E8923A", "#8B6FD6"   # 칩 선 그래프 선 색 — 선은 막대 파스텔보다 진하게. 회색은 `비교 대상` · 안 누른 선 뜻이라 안 쓴다
 LT_GRAY = R.LT_GRAY   # 안 누른 선 (공용)
-MARGIN_SERIES = (("gp", "매출총이익률", _GREEN), ("opinc", "영업이익률", _ORANGE), ("ni", "순이익률", _VIOLET))
-CASH_SERIES = (("ocf", "영업으로 번 돈", R.LINE_THIS), ("capex", "설비 투자", _ORANGE), ("fcf", "잉여 현금", _GREEN))
+_S1, _S2, _S3 = _dk.CHART_SERIES   # 여러 계열 = 그래프 색 표 ⑤ 주황 · 청록 · 연보라 (가이드라인 8-0 · 0-5, 2026-11-06 사용자)
+MARGIN_SERIES = (("gp", "매출총이익률", _S1), ("opinc", "영업이익률", _S2), ("ni", "순이익률", _S3))
+CASH_SERIES = (("ocf", "영업으로 번 돈", _S1), ("capex", "설비 투자", _S2), ("fcf", "잉여 현금", _S3))
 
 
 line_tabs = R.line_tabs   # 공용으로 옮김 (render_html, 2026-11-04 P294 — 의견 그림 · 한국 종목도 쓴다)

@@ -117,7 +117,7 @@ def related_html(labels, self_titles, blog_url=None, creds=None):
             picks.append(p)
     if not picks:
         return ""
-    li = "".join(f'<li style="margin:0;line-height:34px;"><a href="{_h.escape(p["url"])}" style="color:#111;">{_h.escape(str(p["title"]).strip().replace(" — ", " "))}</a></li>' for p in picks)
+    li = "".join(f'<li style="margin:0;line-height:35px;"><a href="{_h.escape(p["url"])}" style="color:#111;">{_h.escape(str(p["title"]).strip().replace(" — ", " "))}</a></li>' for p in picks)
     lists = " · ".join(f'<a href="{blog_url}/search/label/{quote(lb)}" style="color:#111;">{_h.escape(name)}</a>' for lb, name in SERIES)
     # 좌측 기준선 6px — 홈 실시간 뉴스 글자 선 (2026-10-24 사용자, 디자인-가이드라인 5-9). 위 구분선은 전체 폭
     return ('<div data-related="1" style="margin:28px 0 0;padding-top:14px;border-top:1px solid #E2E8F0;font-size:16px;line-height:24px;">'

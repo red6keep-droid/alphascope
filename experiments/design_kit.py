@@ -27,7 +27,7 @@ SEP_GAP = 22   # 줄 padding = 22 − VP − 1(보조 줄 · 괄호 글자 상�
 # 행간 32 · 18px 글자의 반쪽 ≈ 6px = VP_EMPH → padding = 24 − 6 (끝 줄이 14px 글이면 − 2). 가로 구분선이 여러 개인 강조 C 카드만 위아래 14 그대로("구분선이 여러 개 있는 건 기존 유지")
 LH_EMPH, VP_EMPH, EMPH_PAD = "32px", 6, 24
 H2_SIZE = "22px"   # 구획 제목 21 → 22 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게")
-LH_BODY, LH_CARD, LH_TINY, LH_H2 = "34px", "24px", "20px", "28px"   # 구획 제목 22px → 행간 28 (2026-10-13)   # 행간은 px 정수만. 본문(카드 밖 문단·글머리표)·툴팁 34 (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게, 34픽셀") · 카드 안 18·16px 24 (2026-10-12 사용자: "24픽셀만") · 16px 카드 이름도 24 · 14px 안내 20 · 21px 구획 제목 27. 행간 숫자를 직접 적지 말고 이 상수만
+LH_BODY, LH_CARD, LH_TINY, LH_H2 = "35px", "24px", "20px", "28px"   # 구획 제목 22px → 행간 28 (2026-10-13)   # 행간은 px 정수만. 본문(카드 밖 문단·글머리표)·툴팁 34 (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게, 34픽셀") · 카드 안 18·16px 24 (2026-10-12 사용자: "24픽셀만") · 16px 카드 이름도 24 · 14px 안내 20 · 21px 구획 제목 27. 행간 숫자를 직접 적지 말고 이 상수만
 H2 = f"position:relative;color:#111;font-size:{H2_SIZE};font-weight:700;line-height:{LH_H2};margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"
 _NO_LINE_START = re.compile(r'^\s*(<(?:div|ul) style="(?:overflow-x:auto;|background:)|<div data-cards|<div data-lead|<img\b|<details\b)')
@@ -180,7 +180,7 @@ def tint(html_text):
         if "<" not in c:
             plain = html_mod.unescape(c).strip()
             d = _chunk_dir(plain)
-            if d and len(plain) < CHUNK_TINT:
+            if d and len(plain) < CHUNK_TINT and "," not in plain and not plain.rstrip(".").endswith("다"):   # 문장(쉼표 · `다.` 끝)은 통째로 칠하지 않는다 — 숫자만 (2026-11-06 사용자: 함께 움직이는 종목 문장 이름까지 칠해짐)
                 out.append(f'<span style="color:{UP if d == "+" else DOWN};">{c}</span>')
                 continue
             out.append(_tint_inline(c))
@@ -327,7 +327,7 @@ def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w, right=Tru
     if right:
         return _col_frame_right(bars_html, axis_names, height, top, scale, ticks, min_w, fmt, gut)
     return scroll_x(f'<span style="display:block;position:relative;height:{height}px;">{"".join(grid)}{plot}</span>'
-                    f'<span style="display:flex;padding-left:{gut}px;font-size:{AXIS_FS};line-height:20px;color:{NOTE};margin:2px 0 6px;">{xl}</span>', min_w + gut)
+                    f'<span style="display:flex;padding-left:{gut}px;font-size:{AXIS_FS};line-height:21px;color:{NOTE};margin:2px 0 6px;">{xl}</span>', min_w + gut)
 
 
 def _col_frame_right(bars_html, axis_names, height, top, scale, ticks, min_w, fmt, gut):
@@ -348,7 +348,7 @@ def _col_frame_right(bars_html, axis_names, height, top, scale, ticks, min_w, fm
         cap = min_w + len(axis_names) * COL_SPREAD * COL_TIGHT
         plot = plot.replace(bars_html, f'<span style="position:absolute;top:0;bottom:0;left:0;right:0;margin:0 auto;max-width:{cap}px;">{bars_html}</span>', 1)
         xm = f"2px auto 6px;max-width:{cap}px"
-    inner = f'{plot}<span style="display:flex;font-size:{AXIS_FS};line-height:20px;color:{NOTE};margin:{xm};">{xl}</span>'
+    inner = f'{plot}<span style="display:flex;font-size:{AXIS_FS};line-height:21px;color:{NOTE};margin:{xm};">{xl}</span>'
     hint = (f'<span data-scroll-hint="1" data-lhint="1" style="display:block;text-align:left;font-size:{TINY};line-height:{LH_TINY};color:{FAINT};margin:{LEGEND_TOP}px 0 4px;">‹ {SCROLL_HINT}</span>'
             if min_w > CHART_PHONE_W else "")
     shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
@@ -963,7 +963,7 @@ def link_icon(url, label):
             f'style="color:#9AA4B2;text-decoration:none;white-space:nowrap;">{LINK_ICON}</a>')
 
 
-NEWS_VP = 7   # 18px 글 · 행간 34 의 반쪽
+NEWS_VP = 8   # 19px 글 · 행간 35 의 반쪽 (2026-11-06 34 → 35, 옛 7)
 
 
 def item_cards(items_html, sub=False):   # sub=True: 카드 끝 줄이 14px 보조 줄
@@ -1128,7 +1128,7 @@ _ARROW_SPAN = re.compile(r'(<span style="color:#[0-9A-Fa-f]{3,6};font-weight:700
 
 def small_chg(value_html):
     """값 칸의 증감(arrow) 글자만 CHG_SIZE 로."""
-    return _ARROW_SPAN.sub(lambda m: f"{m.group(1)}font-size:{CHG_SIZE};{m.group(2)}", value_html)
+    return _ARROW_SPAN.sub(lambda m: f"{m.group(1)}font-size:{CHG_SIZE};line-height:25px;{m.group(2)}", value_html)
 
 
 def crow(name_html, value_html, sub="", first=False, left=None, short=False, nowrap=False, sub_below=False, sub_block=False, name_size=None, tip_text=None):
@@ -1445,7 +1445,7 @@ def as_rules(html):
     return re.sub(r"border:1px solid (#[0-9A-Fa-f]{6});border-radius:10px;", r"border-top:1px solid \1;border-bottom:1px solid \1;", html)
 
 
-NEWS_TITLE_FS, NEWS_TITLE_LH = "17px", "30px"   # 뉴스 기사 제목 — 본문 19 보다 한 단계 작게 (P159)
+NEWS_TITLE_FS, NEWS_TITLE_LH = "17px", "31px"   # 뉴스 기사 제목 — 본문 19 보다 한 단계 작게 (P159)
 NEWS_SUM = "display:block;color:#333;font-size:16px;line-height:26px;font-weight:400;margin-top:4px;word-break:keep-all;"   # 뉴스 요약 줄 = 홈 주요 뉴스 기사 소개(.news-sum)와 같게 (2026-10-26 사용자: 14px 로 더 작았다)
 
 
@@ -1569,7 +1569,7 @@ def report_stamp(day_text, when_text):
     ico = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" '
            'style="flex:none;margin-top:2px;"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.4 1.6"/></svg>')
     return (f'<p data-report-stamp="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 14px;padding:10px 12px;background:#F3F4F6;border-radius:8px;'
-            f'font-size:13px;line-height:18px;color:#6B7280;word-break:keep-all;">{ico}'
+            f'font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">{ico}'
             f'<span>{day_text} 종가 기준 · 매 거래일 장을 마감한 뒤 발행되는 리포트입니다. ({when_text})</span></p>')
 
 
@@ -1581,8 +1581,8 @@ def intraday_chart_fold(code, bars_url, precision=0):
     ico = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
            '<path d="M2 12l3.5-4 3 2.5L14 4"/><path d="M10.5 4H14v3.5"/></svg>')
     js = (_IC_JS.replace("__ID__", sid).replace("__CODE__", str(code)).replace("__URL__", bars_url)
-          .replace("__PREC__", str(int(precision))).replace("__MOVE__", str(10 ** -int(precision))))   # 지수(코스피) = 소수 둘째 자리 (P315)
-    return (f'<details id="{sid}" data-ichart="1" style="margin:-8px 0 16px;max-width:1024px;text-align:right;">'   # 버튼은 오른쪽 (2026-11-05 사용자)
+          .replace("__PREC__", str(int(precision))).replace("__MOVE__", str(10 ** -int(precision))).replace("__LIVE__", _KR_LIVE_JS))   # 지수(코스피) = 소수 둘째 자리 (P315)
+    return (f'<details id="{sid}" data-ichart="1" style="display:none;margin:-8px 0 16px;max-width:1024px;text-align:right;">'   # 처음엔 숨김 — 한국 정규장이면 스크립트가 보인다 (2026-11-06 사용자: "장중에만 보이도록", 미국 P314 와 같게)   # 버튼은 오른쪽 (2026-11-05 사용자)
             f'<summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #E2E8F0;border-radius:8px;'
             f'font-size:13px;font-weight:600;color:#4B5563;background:#fff;">{ico}장중 차트 보기 (15분봉)</summary>'
             f'<div data-ic-box="1" style="margin-top:8px;min-height:200px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff;text-align:left;">'
@@ -1590,7 +1590,18 @@ def intraday_chart_fold(code, bars_url, precision=0):
             f'<script>{js}</script>')
 
 
-_IC_JS = r"""(function(){var d=document.getElementById("__ID__");if(!d||d.__ic)return;d.__ic=1;
+# 한국 정규장(서울 평일 09:00~15:30) 판정 — 장중 차트 버튼을 그 시간에만 보인다 (2026-11-06 사용자: "장중에만 보이도록", 미국 _US_LIVE_JS 와 같은 방식).
+# 보는 사람 브라우저에서 1분마다 다시 판정. 휴장일은 KRX 공지 기준(연말 폐장일 포함) — 해마다 다음 해 날짜를 더한다. 수능 · 새해 첫날처럼 늦게 여는 날은 따로 두지 않았다.
+KR_HOLIDAYS = ["2026-12-25", "2026-12-31", "2027-01-01", "2027-02-08", "2027-02-09", "2027-03-01", "2027-05-05", "2027-05-13", "2027-08-16",
+               "2027-09-14", "2027-09-15", "2027-09-16", "2027-10-04", "2027-10-11", "2027-12-27", "2027-12-31"]
+_KR_LIVE_JS = ('function o(){var p={};try{new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit",'
+               'weekday:"short",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date()).forEach(function(x){p[x.type]=x.value;});}catch(e){return false;}'
+               'var k=p.year+"-"+p.month+"-"+p.day;if(p.weekday=="Sat"||p.weekday=="Sun"||' + json.dumps(KR_HOLIDAYS) + '.indexOf(k)>=0)return false;'
+               'var m=+p.hour*60+ +p.minute;return m>=540&&m<930;}'
+               'function u(){var on=o();d.style.display=on?"":"none";if(!on)d.open=false;}'
+               'u();setInterval(u,60000);')
+
+_IC_JS = r"""(function(){var d=document.getElementById("__ID__");if(!d||d.__ic)return;d.__ic=1;__LIVE__
 d.addEventListener("toggle",function(){if(!d.open||d.__done)return;d.__done=1;var b=d.querySelector("[data-ic-box]");
 function fail(t){b.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:200px;color:#9CA3AF;font-size:13px;">'+t+'</div>';}
 function draw(J){var bars=(J.bars||{})["__CODE__"];if(!bars||!bars.length){fail("오늘 장중 자료가 아직 없습니다");return;}
