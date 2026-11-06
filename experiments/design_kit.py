@@ -1563,17 +1563,14 @@ def direction_bars(today, week):
             f'{gap}{bar("최근 7일", week or {})}</div>')
 
 
-def report_stamp(day_text, when_text, us_hours=False):
-    """종목 페이지 제목 바로 아래 한 줄 — 이 페이지가 어느 날 종가 기준인지 · 매 거래일 장 마감 뒤 새로 나온다는 것 · 장중 가격은 어디서 보는지 (2026-11-05 사용자:
-    장중 가격을 볼 수 있게 되니 종가 리포트라는 점을 제목에서 알리자). 제목 글자(검색어)는 건드리지 않고 본문 첫 줄에 둔다. 날짜는 `어제` 같은 상대어 대신 실제 날짜."""
+def report_stamp(day_text, when_text):
+    """종목 페이지 제목 바로 아래 안내 — 어느 날 종가 기준인지 · 매 거래일 장 마감 뒤 발행된다는 것 (2026-11-05 사용자: 장중 가격을 볼 수 있게 되니 종가 리포트라는 점을 알리자).
+    연한 회색 박스 안 · 장중 차트 안내 문구는 뺐다 (2026-11-06 사용자 P316). 제목 글자(검색어)는 건드리지 않고 본문 첫 줄에 둔다. 날짜는 `어제` 같은 상대어 대신 실제 날짜."""
     ico = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" '
            'style="flex:none;margin-top:2px;"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.4 1.6"/></svg>')
-    return (f'<p data-report-stamp="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 10px;font-size:13px;line-height:18px;color:#6B7280;word-break:keep-all;">{ico}'
-            + (f'<span>{day_text} 종가 기준 리포트입니다. 매 거래일 장을 마친 뒤 새로 나옵니다({when_text}). '   # 미국 = 장중 차트가 정규장에만 보여 문구도 시간 따라 (2026-11-06 사용자 P314)
-               f'<span data-us-live="0">장중 차트는 미국 정규장 시간에만 열립니다.</span>'
-               f'<span data-us-live="1" style="display:none;">장중 가격은 아래 <b style="font-weight:600;color:#4B5563;">장중 차트 보기</b>에서 볼 수 있습니다.</span></span></p>'
-               if us_hours else
-               f'<span>{day_text} 종가 기준 리포트입니다. 매 거래일 장을 마친 뒤 새로 나오고({when_text}), 장중 가격은 아래 <b style="font-weight:600;color:#4B5563;">장중 차트 보기</b>에서 볼 수 있습니다.</span></p>'))
+    return (f'<p data-report-stamp="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 14px;padding:10px 12px;background:#F3F4F6;border-radius:8px;'
+            f'font-size:13px;line-height:18px;color:#6B7280;word-break:keep-all;">{ico}'
+            f'<span>{day_text} 종가 기준 · 매 거래일 장을 마감한 뒤 발행되는 리포트입니다. ({when_text})</span></p>')
 
 
 def intraday_chart_fold(code, bars_url, precision=0):
