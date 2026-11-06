@@ -1644,89 +1644,160 @@ def tv_chart_fold(symbol, tz, key):
             f's.text={json.dumps(cfg)};c.appendChild(s);b.textContent="";b.appendChild(c);}});}})();</script>')
 
 
-# ── 가로 선 그래프 (긴 기간 흐름) — 데일리 `환율은?` 카드 (2026-11-06 P313: P306 이 부르던 함수가 빠져 데일리 리포트가 멈췄다) ──
-CHART_MAIN = "#F5B971"   # 우리 그래프 기본색(주황) — 가이드라인 8-0
-CHART_CMP = "#CBD5E1"    # 비교 대상 회색
-TREND_H = 150            # 선 그래프 그림 높이 px (가로축 이름 줄 빼고)
-TREND_AXIS_H = 22        # 가로축 이름 줄
+# ── 그래프 색 (2026-11-05 사용자 M75 — 디자인 가이드라인 8-0 그래프 색) ──
+CHART_UP, CHART_DN = "#ED8E87", "#82B1F0"   # ① 증감 값(부호가 뜻: 등락률 · 순매수 · 전달 대비 증감) — 오름 빨강 · 내림 파랑
+CHART_MAIN = "#F5B971"   # ② 주인공 수준 값(부호 없는 크기: PER · 금리 · 환율 · 거래대금 · 비중) — 주황
+CHART_CMP = "#CBD5E1"   # ③ 비교 대상 · ④ 기준선 — 회색 (선이면 점선)
+CHART_SERIES = ("#F5B971", "#5FBFAF", "#BFA2E8")   # ⑤ 여러 계열(외국인 · 기관 · 개인처럼 나란히) — 주황 · 청록 · 연보라. 회색 · 빨강 · 파랑과 헷갈리지 않게
+TREND_H = 150   # 선 그래프 그림 높이 (막대 그래프 CHART_H 와 같게)
 
 
-def month_ticks(days, every=1):
-    """가로축 이름 — days("YYYY-MM-DD") 와 같은 길이, 달이 바뀌는 첫 거래일에만 `n월`(every 달마다), 나머지는 "".
-    첫 날은 달 중간일 수 있어 비운다."""
-    out, k = [], 0
-    for i, d in enumerate(days):
-        lab = ""
-        if i > 0 and str(d)[:7] != str(days[i - 1])[:7]:
-            if k % max(1, every) == 0:
-                lab = f"{int(str(d)[5:7])}월"
-            k += 1
-        out.append(lab)
+def _trend_ticks(lo, hi, n=4):
+    if hi <= lo:
+        lo, hi = lo - 1, hi + 1
+    raw = (hi - lo) / n
+    mag = 10 ** math.floor(math.log10(raw))
+    step = next(m * mag for m in (1, 2, 2.5, 5, 10) if raw <= m * mag)
+    t, out = math.floor(lo / step) * step, []
+    while t <= hi + step * 0.999:
+        out.append(round(t, 10))
+        t += step
+    if out[-1] < hi:
+        out.append(round(out[-1] + step, 10))
     return out
 
 
-def _trend_ticks(lo, hi):
-    if hi <= lo:
-        hi = lo + 1
-    step = _nice_step(hi - lo)
-    a, b = math.floor(lo / step + 1e-9) * step, math.ceil(hi / step - 1e-9) * step
-    return [round(a + k * step, 10) for k in range(int(round((b - a) / step)) + 1)]
-
-
-def trend_card(title, labels, series, fmt):
-    """긴 기간 선 그래프 흰 카드 — labels = month_ticks 결과(점마다, 빈 글 = 이름 없음),
-    series = [(이름, 값 목록(None 허용), 색, "solid"|"dash")] 첫째 = 주인공 선(굵게 · 끝 점 · 끝 값), 나머지 = 비교 선.
-    점이 많아 점마다 숫자는 달지 않는다. 가로는 카드 폭에 맞춰 늘고(넘겨 보기 없음), 세로축 숫자는 오른쪽."""
+def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False):
+    """흐름을 보는 선 그래프 흰 카드 (2026-11-05 사용자 M67 · M70 · M71 · M72 · M76).
+    labels = 가로축 이름(오래된 것 → 최신, 최신 오른쪽 P164). series = [(이름, 값 목록(None 허용), 색, 모양)] 모양 = "solid" · "dash"(비교 대상 · 기준선) · "step" · "stepdash"(계단 점선 — 기준금리).
+    첫 계열이 주인공. 점선 계열은 범례에서 `비교 대상 : 이름`.
+    · 점이 24개 이하(월별 · 분기) = **점마다 동그라미 · 숫자 · 이름**, 한 칸 46px 로 넓게 그리고 넘치면 넘겨 보기(처음엔 최신 쪽) — 엔비디아 line_chart 와 같은 읽기 (M76: "해당 월에 동그라미 · 12개월이 다 보여야").
+    · 그보다 많으면(60거래일 · 1년 일별) 카드 폭에 다 넣고 숫자는 끝 값만, 가로축은 달 바뀌는 자리만."""
     n = len(labels)
     vals = [v for _, xs, _, _ in series for v in xs if v is not None]
     if n < 2 or not vals:
         return ""
     ticks = _trend_ticks(min(vals), max(vals))
-    lo, hi = ticks[0], ticks[-1]
-    top = 14   # 끝 값 글자 자리
-    y = lambda v: top + (hi - v) / ((hi - lo) or 1) * (TREND_H - top - 6)   # noqa: E731
-    xp = lambda i: i / (n - 1) * 100   # noqa: E731
-    tf = (lambda t: f"{t:,.0f}") if all(float(t).is_integer() for t in ticks) else fmt
+    t0, t1 = ticks[0], ticks[-1]
+    sparse = n <= 24
+    top, bot = (26, 8) if sparse else (14, 6)
+    H = height + (12 if sparse else 0)
+    y = lambda v: top + (t1 - v) / (t1 - t0) * (H - top - bot)   # noqa: E731
+    tf = (lambda t: f"{t:,.0f}") if all(float(t).is_integer() for t in ticks) else (lambda t: fmt(t).lstrip("+"))   # 축 숫자엔 + 부호 없이 (M78)
     axis_w = int(max(text_px(tf(t), 12) for t in ticks) + 10)
-    grid = "".join(f'<line x1="0" x2="1000" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="{GRID_LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>' for t in ticks)
-    lines = ""
-    for k, (nm, xs, col, style) in reversed(list(enumerate(series))):   # 비교 선 먼저 — 주인공 선이 위에 덮는다
-        segs, cur = [], []
-        for i, v in enumerate(xs):
-            if v is None:
-                if cur:
-                    segs.append(cur)
-                cur = []
-            else:
-                cur.append(f"{xp(i) * 10:.1f},{y(v):.1f}")
-        if cur:
-            segs.append(cur)
-        attr = (f'fill="none" stroke="{col}" stroke-width="{2 if k == 0 else 1.25}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"'
-                + (' stroke-dasharray="5 4"' if style == "dash" else ""))
-        lines += "".join(f'<polyline points="{" ".join(s)}" {attr}/>' for s in segs if len(s) > 1)
-    svg = (f'<svg viewBox="0 0 1000 {TREND_H}" preserveAspectRatio="none" width="100%" height="{TREND_H}" aria-hidden="true" '
-           f'style="display:block;overflow:visible;">{grid}{lines}</svg>')
-    main, c0 = series[0][1], series[0][2]
-    last = next((i for i in range(n - 1, -1, -1) if main[i] is not None), None)
-    over = ""
-    if last is not None:   # 끝 점 · 끝 값 — 원은 늘어나지 않게 HTML 로
-        lx, ly = xp(last), y(main[last])
-        over += (f'<span style="position:absolute;left:calc({lx:.2f}% - 4px);top:{ly - 4:.1f}px;width:8px;height:8px;box-sizing:border-box;'
-                 f'border-radius:50%;background:#fff;border:2px solid {c0};"></span>'
-                 f'<span style="position:absolute;right:{100 - lx:.2f}%;top:{max(ly - 22, -6):.1f}px;font-size:13px;line-height:16px;font-weight:700;'
-                 f'white-space:nowrap;color:#111;">{esc(fmt(main[last]))}</span>')
-    xl = "".join(f'<span style="position:absolute;left:{xp(i):.2f}%;top:{TREND_H + 4}px;transform:translateX(-50%);font-size:{AXIS_FS};line-height:16px;'
-                 f'white-space:nowrap;color:{NOTE};">{esc(lb)}</span>' for i, lb in enumerate(labels) if lb)
-    axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;font-size:12px;line-height:18px;white-space:nowrap;color:{NOTE};">{esc(tf(t))}</span>'
-                   for t in ticks)
-    chips = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">'
-                    f'<svg width="22" height="10" aria-hidden="true"><line x1="1" x2="21" y1="5" y2="5" stroke="{col}" stroke-width="{2 if i == 0 else 1.25}"'
-                    + (' stroke-dasharray="4 3"' if style == "dash" else "") + f'/></svg>{esc(nm)}</span>'
-                    for i, (nm, _, col, style) in enumerate(series))
-    legend = (f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;column-gap:12px;margin:0 0 6px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};">'
-              f'{chips}</span>')
-    plot = (f'<span style="display:block;position:relative;height:{TREND_H + TREND_AXIS_H}px;">'
-            f'<span style="position:absolute;left:0;top:0;right:{axis_w}px;height:{TREND_H}px;">{svg}{over}{xl}</span>'
-            f'<span style="position:absolute;top:0;right:0;width:{axis_w - 4}px;height:{TREND_H}px;text-align:right;">{axis}</span></span>')
-    return (f'{CHART_TITLE_M}{esc(title)}</span>'
-            f'<span style="{MULTI}margin:0 {CHART_CARD_X}px;"><span style="display:block;padding:{CHART_CARD_PAD}px 12px {CHART_CARD_PAD - 6}px;">{legend}{plot}</span></span>')
+    axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{NOTE};">{esc(tf(t))}</span>' for t in ticks)
+    dashed = lambda kind: kind in ("dash", "stepdash")   # noqa: E731
+
+    def path_d(pts, X, kind):
+        d = f"M{X(pts[0][0]):.1f},{y(pts[0][1]):.1f}"
+        for (_, _), (i, v) in zip(pts, pts[1:]):
+            d += f"H{X(i):.1f}V{y(v):.1f}" if kind in ("step", "stepdash") else f"L{X(i):.1f},{y(v):.1f}"
+        return d
+
+    hint = ""
+    if sparse:
+        step = 46
+        W = n * step + 14   # 끝 점 숫자 ~ 세로축 숫자 사이 14px (2026-11-05 사용자 M77: 너무 붙었다)
+        X = lambda i: step / 2 + i * step   # noqa: E731
+        g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
+        lines_, dots, labs = "", "", ""
+        cols = {}
+        for k, (nm, xs, col, kind) in reversed(list(enumerate(series))):
+            pts = [(i, v) for i, v in enumerate(xs) if v is not None]
+            if len(pts) < 2:
+                continue
+            dash = ' stroke-dasharray="5 4"' if dashed(kind) else ""
+            lines_ += f'<path d="{path_d(pts, X, kind)}" fill="none" stroke="{col}" stroke-width="{2.5 if k == 0 else 2 if not dashed(kind) else 1.5}" stroke-linejoin="round" stroke-linecap="round"{dash}/>'
+            if dashed(kind):
+                continue
+            for i, v in pts:
+                last = i == n - 1
+                dots += f'<circle cx="{X(i):.1f}" cy="{y(v):.1f}" r="{4 if last else 3}" fill="#fff" stroke="{col}" stroke-width="{2.5 if last else 1.75}"/>'
+                cols.setdefault(i, []).append((y(v), fmt(v), col, k, last))
+        for i, items in cols.items():   # 한 칸 안 숫자 — 위에서부터 15px 씩 겹치지 않게, 점 바로 위
+            used = []
+            for yy, txt, col, k, last in sorted(items):
+                ly = yy - 8
+                while any(abs(ly - u) < 15 for u in used):
+                    ly += 15
+                used.append(ly)
+                labs += (f'<text x="{X(i):.1f}" y="{ly:.1f}" text-anchor="middle" font-size="{13 if last else 12}" font-weight="{700 if last else 400}" '
+                         f'fill="{"#111" if last and k == 0 else NOTE}">{esc(txt)}</text>')
+        nl = max(len(lb.split("\n")) for lb in labels)   # 분기 이름 `25년` / `3분기` 두 줄
+        xl = "".join(f'<text x="{X(i):.1f}" y="{H + 18 + 16 * j}" text-anchor="middle" font-size="12" fill="{"#111" if i == n - 1 else NOTE}">{esc(t)}</text>'
+                     for i, lb in enumerate(labels) if lb for j, t in enumerate(lb.split("\n")))
+        SH = H + 10 + 16 * nl
+        svg = f'<svg width="{W}" height="{SH}" viewBox="0 0 {W} {SH}" style="display:block;direction:ltr;">{g}{lines_}{dots}{labs}{xl}</svg>'
+        scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{axis_w}px;">'
+                  f'<span style="display:inline-block;vertical-align:top;direction:ltr;">{svg}</span></span>')   # 처음엔 오른쪽 끝(최신)
+        shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
+                 'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>')
+        plot = f'<span style="display:block;position:relative;">{scroll}{shade}{axis}</span>'
+        hint = f'<span data-lhint="1" style="white-space:nowrap;margin-right:auto;">‹ {SCROLL_HINT}</span>'
+    else:
+        X = lambda i: i / (n - 1) * 1000   # noqa: E731
+        P = lambda i: i / (n - 1) * 100   # noqa: E731
+        grid = "".join(f'<line x1="0" x2="1000" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1" vector-effect="non-scaling-stroke"/>' for t in ticks)
+        paths, ends = "", []
+        for k, (nm, xs, col, kind) in reversed(list(enumerate(series))):   # 주인공 선이 맨 위에
+            pts = [(i, v) for i, v in enumerate(xs) if v is not None]
+            if len(pts) < 2:
+                continue
+            dash = ' stroke-dasharray="5 4"' if dashed(kind) else ""
+            paths += (f'<path d="{path_d(pts, X, kind)}" fill="none" stroke="{col}" stroke-width="{2.5 if k == 0 else 1.75}" stroke-linejoin="round" stroke-linecap="round"{dash} '
+                      f'vector-effect="non-scaling-stroke"/>')
+            if not dashed(kind):
+                ends.append((k, pts[-1][0], pts[-1][1], col))
+        dots, labs, used = "", "", []
+        for k, i, v, col in sorted(ends, key=lambda e: y(e[2])):   # 끝 값 숫자 — 위에서부터, 겹치면 아래로
+            yy = y(v)
+            ly = yy - 22
+            while any(abs(ly - u) < 17 for u in used):
+                ly += 17
+            used.append(ly)
+            dots += (f'<span style="position:absolute;left:calc({P(i):.2f}% - 4px);top:{yy - 4:.1f}px;width:8px;height:8px;box-sizing:border-box;border-radius:50%;'
+                     f'background:#fff;border:2px solid {col};"></span>')
+            labs += (f'<span style="position:absolute;right:calc({100 - P(i):.2f}% + 6px);top:{ly:.1f}px;font-size:13px;line-height:16px;font-weight:700;white-space:nowrap;'
+                     f'color:{"#111" if k == 0 else NOTE};">{esc(fmt(v))}</span>')
+        xl = ""
+        for i, lb in enumerate(labels):
+            if not lb:
+                continue
+            tr = "translateX(0)" if P(i) < 6 else "translateX(-100%)" if P(i) > 94 else "translateX(-50%)"
+            xl += f'<span style="position:absolute;left:{P(i):.2f}%;top:0;transform:{tr};white-space:nowrap;font-size:{TINY};line-height:20px;color:{NOTE};">{esc(lb)}</span>'
+        plot = (f'<span style="display:block;position:relative;padding-right:{axis_w + 10}px;">'   # 끝 점 ~ 세로축 숫자 10px (M76: 너무 붙었다)
+                f'<span style="display:block;position:relative;height:{H}px;">'
+                f'<svg viewBox="0 0 1000 {H}" preserveAspectRatio="none" width="100%" height="{H}" aria-hidden="true" style="display:block;overflow:visible;">{grid}{paths}</svg>'
+                f'{dots}{labs}</span>{axis}'
+                f'<span style="display:block;position:relative;height:26px;margin-top:2px;">{xl}</span></span>')
+    chips = ""
+    for nm, _, col, kind in series:
+        name = f"비교 대상 : {nm}" if dashed(kind) else nm
+        dot = "" if dashed(kind) or not sparse else f'<circle cx="9" cy="5" r="3" fill="#fff" stroke="{col}" stroke-width="1.75"/>'
+        line = (f'<svg width="18" height="10" aria-hidden="true"><line x1="1" x2="17" y1="5" y2="5" stroke="{col}" stroke-width="{1.75 if dashed(kind) else 2.5}"'
+                + (' stroke-dasharray="4 3"' if dashed(kind) else "") + f' stroke-linecap="round"/>{dot}</svg>')
+        chips += f'<span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">{line}{esc(name)}</span>'
+    if legend_note:
+        chips += f'<span style="white-space:nowrap;">{esc(legend_note)}</span>'
+    top_row = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};'
+               f'margin:{LEGEND_TOP}px 0 4px;padding-left:{LEGEND_LEFT}px;">{hint}'
+               f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;column-gap:12px;margin-left:auto;">{chips}</span></span>')   # `‹ 넘겨 보기` 왼쪽 · 범례 오른쪽 (P164)
+    if bare:   # 흰 카드 없이 범례 + 그림만 — 다른 카드 안 그래프 덩어리에 넣을 때
+        return top_row + plot
+    head = f'{CHART_TITLE_M}{esc(title)}</span>' if title else ""
+    return head + f'<span style="{MULTI}margin:0 {CHART_CARD_X}px;"><span style="display:block;padding:{CHART_CARD_PAD}px 12px 0;">{top_row}{plot}</span></span>'
+
+
+def month_ticks(days, every=3):
+    """일별 · 월별 날짜 목록 → 가로축 이름. 달이 바뀌는 첫 점에만 `25.11` (every 달마다 하나), 나머지는 빈 글자."""
+    out, seen = [], 0
+    prev = None
+    for d in days:
+        ym = d[:7]
+        if ym != prev and prev is not None:
+            seen += 1
+            out.append(f"{ym[2:4]}.{int(ym[5:7])}" if seen % every == 0 else "")
+        else:
+            out.append("")
+        prev = ym
+    return out

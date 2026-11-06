@@ -355,7 +355,9 @@ def flows(flow_data, bench_bars):
         out["heat"] = {"day": tv[-1]["day"], "turnover": tv[-1]["v"], "turnover_ratio": tv[-1]["v"] / avg20 if avg20 else None,
                        "volume": vo[-1]["v"] if vo and vo[-1]["day"] == tv[-1]["day"] else None, "series": tv[-FLOW_WINDOW:],
                        "pct_rank_1y": sum(1 for x in tv[-252:] if x["v"] <= tv[-1]["v"]) / min(252, len(tv)) * 100,
-                       "kosdaq_turnover": (d.get("turnover_kosdaq") or [{}])[-1].get("v"), "kosdaq_volume": (d.get("volume_kosdaq") or [{}])[-1].get("v")}
+                       "kosdaq_turnover": (d.get("turnover_kosdaq") or [{}])[-1].get("v"), "kosdaq_volume": (d.get("volume_kosdaq") or [{}])[-1].get("v"),
+                       "avg20": avg20, "avg_1y": sum(x["v"] for x in tv[-252:]) / min(252, len(tv)), "series60": tv[-60:],   # 60거래일 선 + 1년 평균 (2026-11-05 M72)
+                       "kosdaq_avg20": (lambda kq: sum(x["v"] for x in kq[-21:-1]) / 20 if len(kq) > 21 else None)(d.get("turnover_kosdaq") or [])}   # 오늘 vs 20일 평균 가로 막대 (M73)
     mc = d.get("mcap_kospi") or []
     if mc:
         vals = [x["v"] for x in mc[-252:]]
@@ -372,7 +374,8 @@ def flows(flow_data, bench_bars):
         if not xs:
             return None
         return {"day": xs[-1]["day"], "v": xs[-1]["v"], "chg_1d": xs[-1]["v"] - xs[-2]["v"] if len(xs) > 1 else None,
-                "chg_n": xs[-1]["v"] - xs[-1 - n_chg]["v"] if len(xs) > n_chg else None, "hi_1y": max(x["v"] for x in xs[-252:]), "lo_1y": min(x["v"] for x in xs[-252:])}
+                "chg_n": xs[-1]["v"] - xs[-1 - n_chg]["v"] if len(xs) > n_chg else None, "hi_1y": max(x["v"] for x in xs[-252:]), "lo_1y": min(x["v"] for x in xs[-252:]),
+                "series": xs[-400:]}   # 1년 선 그래프 (2026-11-05 M70) — 기준금리는 주말도 있어 넉넉히
     rates = {k2: _last(k2) for k2 in ("ktb3", "ktb10", "corp_aa", "corp_bbb", "base_rate")}
     if any(rates.values()):
         out["rates"] = rates
@@ -411,7 +414,7 @@ def flows(flow_data, bench_bars):
         if not ser:
             return None
         vals = [s_["v"] for s_ in ser[-12:]]
-        return {"month": ser[-1]["month"], "v": ser[-1]["v"], "prev": ser[-2]["v"] if len(ser) > 1 else None, "hi12": max(vals), "lo12": min(vals), "avg12": sum(vals) / len(vals), "series": ser[-12:], "level": xs[-1]["v"]}
+        return {"month": ser[-1]["month"], "v": ser[-1]["v"], "prev": ser[-2]["v"] if len(ser) > 1 else None, "hi12": max(vals), "lo12": min(vals), "avg12": sum(vals) / len(vals), "series": ser[-12:], "level": xs[-1]["v"], "index_series": xs[-37:]}   # 지수 수준 3년 선 (2026-11-05 M71)
     def _lvl(key):
         xs = mm.get(key) or []
         if not xs:
@@ -437,12 +440,12 @@ def flows(flow_data, bench_bars):
         last = xs[-1]
         same = byq.get(f"{int(last['q'][:4]) - 1}{last['q'][4:]}")
         vals = [x["v"] for x in xs[-4:]]
-        return {"q": last["q"], "v": last["v"], "same": same, "yoy": (last["v"] / same - 1) * 100 if same else None, "hi4": max(vals), "lo4": min(vals), "series": xs[-8:]}
+        return {"q": last["q"], "v": last["v"], "same": same, "yoy": (last["v"] / same - 1) * 100 if same else None, "hi4": max(vals), "lo4": min(vals), "series": xs[-8:],
+                "series_all": xs}   # 8분기 그래프의 1년 전 같은 분기 비교까지 (2026-11-05 M77)
     hh = {k2: _q(k2) for k2 in ("hh_surplus", "hh_surplus_rate", "hh_disp_income", "hh_credit", "hh_stock", "hh_stock_buy", "hh_fin_total")}
     if hh.get("hh_stock") and hh.get("hh_fin_total"):
-        st, ft = hh["hh_stock"], hh["hh_fin_total"]
-        byq = {x["q"]: x["v"] for x in ft["series"]}
-        share = [{"q": x["q"], "v": x["v"] / byq[x["q"]] * 100} for x in st["series"] if byq.get(x["q"])]
+        byq = {x["q"]: x["v"] for x in mq.get("hh_fin_total") or []}
+        share = [{"q": x["q"], "v": x["v"] / byq[x["q"]] * 100} for x in mq.get("hh_stock") or [] if byq.get(x["q"])]   # 받은 분기 전부 — 8분기 그래프의 1년 전 비교까지 (2026-11-05 M69)
         hh["hh_stock_share"] = {"q": share[-1]["q"], "v": share[-1]["v"], "series": share, "hi4": max(s_["v"] for s_ in share[-4:]), "lo4": min(s_["v"] for s_ in share[-4:])} if share else None
     if any(hh.values()):
         out["household"] = hh

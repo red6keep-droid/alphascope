@@ -67,12 +67,21 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
                     f'<span style="flex:none;text-align:right;font-weight:700;word-break:keep-all;">{dk.tint(esc(value))}</span></span></li>')
         if kind == "html":
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
+        if kind == "rich":   # plain 과 같은 모양, 글은 이미 만든 HTML (강조 숫자 — 한국 증시 리포트 주식 비중, 2026-11-05 M69)
+            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;line-height:{dk.LH_EMPH};word-break:keep-all;">{text}</li>'
         if kind == "plain":
             return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;line-height:{dk.LH_EMPH};word-break:keep-all;">{dk.tint(esc(text))}</li>'
         col = NOTE if kind == "note" else "#111"
         return dk.dot_li(dk.label_text(text), size=3, color=col, lh=dk.LH_EMPH)
 
-    lis = "".join(li(t) for t in lines)
+    lis = ""
+    for k, t in enumerate(lines):   # 그래프 바로 아래 또 그래프 — 아래 그래프 제목 위 12 + CHART_STACK_GAP(10) = 22, 보이는 간격 24 (가이드라인 P176 · P179, 엔비디아 _state_card 와 같게 — 2026-11-05 사용자 M79: 한국 증시 리포트에 빠져 있었다)
+        h = li(t)
+        prev = lines[k - 1] if k else None
+        if (isinstance(t, tuple) and len(t) == 2 and t[1] == "html" and dk.CHART_MARK in t[0][:600]
+                and isinstance(prev, tuple) and len(prev) == 2 and prev[1] == "html" and dk.CHART_MARK in prev[0][:600]):
+            h = h.replace('<li style="list-style:none;margin:6px 0 12px;">', f'<li style="list-style:none;margin:{12 + dk.CHART_STACK_GAP}px 0 12px;">', 1)
+        lis += h
     ans = state if str(state).startswith("<span") else dk.tint(esc(state))   # 이미 색을 입힌 답(HTML)은 그대로 — 한국 증시 리포트 결과 단어 색 (2026-10-26)
     state_html = (f'<span style="display:inline-flex;align-items:center;">{ans}{_fold_btn(dk.lighten(bg), bd)}</span>' if fold else ans)   # 답 글자의 증감도 색 (가이드라인 3-3-1)
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;line-height:{dk.LH_EMPH_Q};">'   # 질문 · 대답 18px · 행간 30 (2026-10-27 사용자)

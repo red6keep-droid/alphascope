@@ -91,8 +91,8 @@ def build(card):
              + report_col(ICON_PERSON, "주요 인물 발언", "11.6", "#", radar, col_id="radar-col")
              + report_col(ICON_SCALE, "증시 전망", "11.6", LIST_URL, hypo_card(card), col_id="hypo-col")
              + report_col(ICON_NOTABLE, "주목할 종목", "11.5", "#", notable, col_id="notable-col"))
-    note = ('<div class="mock-note"><b>목업 · 2026-11-06 (4판 — 사전 등록 흐름 샘플. 등록일 10.27 은 예시, 실제 첫 등록은 11.06)</b> — 홈에 <b>증시 전망</b> 카드를 네 번째로. 카드 넷이 되어 2×2, 주목할 종목은 전폭. 메뉴에 <b>증시 전망</b>. '
-            '줄 = 전망 내용 · 분류 라벨(선거 · 반도체) · 게시일. 국면 · 오늘 문장은 페이지에서. 줄을 누르면 전망 페이지(mock_forecast-1), 제목 줄 · 카드 바탕은 목록(mock_forecast-list). 다른 카드는 자리만.</div>')
+    note = ('<div class="mock-note"><b>목업 · 2026-11-06 (5판 — 전망 2 반등 추가 · 사전 등록 흐름 샘플. 전망 1 등록일 10.27 은 예시, 실제 첫 등록은 11.06)</b> — 홈에 <b>증시 전망</b> 카드를 네 번째로. 카드 넷이 되어 2×2, 주목할 종목은 전폭. 메뉴에 <b>증시 전망</b>. '
+            '줄 = 전망 내용 · 분류 라벨(선거 · 반도체) · 게시일. 국면 · 오늘 문장은 페이지에서. 줄을 누르면 그 전망 페이지(mock_forecast-1 · mock_forecast-2), 제목 줄 · 카드 바탕은 목록(mock_forecast-list). 다른 카드는 자리만.</div>')
     body = (f'{note}{nav}<main class="main-content"><div class="home-cards"><section class="briefing" aria-label="리포트 카드"><div class="briefing-body"><div class="briefing-main">'
             f'{cards}</div></div></section></div></main>{footer}')
     js = ("<script>document.addEventListener('click',function(e){var r=e.target.closest('[data-row-link]');if(!r)return;var a=e.target.closest('a');"
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     card = json.load(open(os.path.join(out, "hypo.json"), encoding="utf-8"))
     # 목업 안 링크는 같은 폴더의 목업으로
     for q in card["open"]:
-        q["url"] = "mock_forecast-1.html"
+        q["url"] = "mock_" + q["url"].rsplit("/", 1)[1]   # p/forecast-2.html → mock_forecast-2.html
     p = os.path.join(out, "mock_home_hypo.html")
     with open(p, "w", encoding="utf-8") as f:
         f.write(build(card).replace(LIST_URL, "mock_forecast-list.html"))
