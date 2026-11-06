@@ -62,3 +62,4 @@ backtest/data/macro.pkl
 backtest/data/earnings.csv
 backtest/data/removed.pkl
 reference2/doc/ytb/
+experiments/issue_store/output/

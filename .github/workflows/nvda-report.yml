@@ -158,6 +158,7 @@ jobs:
           git fetch --no-tags state trump-state:refs/remotes/state/trump-state 2>/dev/null || echo "trump-state 없음 — 트럼프 구획 없이"
 
       - name: Run pipeline
+        id: run_nvda
         if: needs.check.outputs.mode != 'refresh'
         run: |
           # 2026-11-01 사용자: 엔비디아도 고정 페이지 · 뉴스는 공용 처리 — 엔비디아 전용 뉴스 수집 · AI 분류 · Gemini 서술은 끈다.
@@ -170,6 +171,7 @@ jobs:
       # 이어서 쌓는 파일(뉴스 분류 · 변동성 이력 · 순위 교체 상태)만 nvda-state 의 radar/ 에 둔다. 일봉 snapshot 은 매번 새로 받는다.
       # 실패해도 엔비디아 글은 나간다 (continue-on-error).
       - name: Run stock radar (시총 TOP 10 pages)
+        id: run_radar
         continue-on-error: true
         run: |
           mkdir -p experiments/stock-radar/data
@@ -291,6 +293,10 @@ jobs:
           for f in nvda_report.md nvda_report.html nvda_analysis.json narrative.json title.txt post_url.txt; do
             [ -f "$OUT/$f" ] && cp "$OUT/$f" "$STATE_DIR/$f"
           done
+          # 실행 한 줄 — records/runs (2026-11-07, A3-3-2 의 1). 갱신(refresh) 실행은 skipped 로 남는다
+          python experiments/record_store.py run-log "$STATE_DIR" nvda "${{ steps.run_nvda.outcome }}" "mode=${{ needs.check.outputs.mode }} job=${{ job.status }}"
+          mkdir -p "$STATE_DIR/radar"
+          python experiments/record_store.py run-log "$STATE_DIR/radar" radar "${{ steps.run_radar.outcome }}" "mode=${{ needs.check.outputs.mode }}"
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
           export GIT_INDEX_FILE="$(mktemp -u)"

@@ -1290,7 +1290,7 @@ FLOW_CHART_N = 15
 
 
 WHO_NAMES = ("외국인", "기관", "개인")
-WHO_COLORS = ("#F5B971", "#A7B4C6", "#D9DEE7")   # 주황 · 청회색 · 연회색 — 증감 색 · 비교 회색(#CBD5E1)과 다른 고정 색 (M50)
+WHO_COLORS = _dk.CHART_SERIES   # 주황 · 청록 · 연보라 — 여러 계열 색 (2026-11-05 M75, 옛 청회색 · 연회색은 비교 회색과 헷갈림)   # 주황 · 청회색 · 연회색 — 증감 색 · 비교 회색(#CBD5E1)과 다른 고정 색 (M50)
 
 
 def share_sentence(sh):
@@ -1334,7 +1334,8 @@ def sec_investors(m):
         return None
     # 세 주체는 고정 색 (증감 색이 아님 — 증감 색이면 범례 규칙이 외국인 칩을 지워 `기관 · 개인` 만 남았다, 2026-10-29 사용자 M50 · M56)
     groups = [(mo[2:].replace("-", "."), [_v("foreign", mo), _v("inst", mo), _v("indiv", mo)]) for mo in months]   # 최신 오른쪽 (2026-10-31, 옛 P79)
-    chart = R._col_chart(groups, [lambda v: c for c in WHO_COLORS], [R._sign_fg, R._sign_fg, R._sign_fg], height=150,   # 순매수 숫자는 모두 증감 색 (M6)
+    chart = R._col_chart(groups, [lambda v, c=c: c for c in WHO_COLORS], [R._sign_fg, R._sign_fg, R._sign_fg], height=150,   # c=c — 늦은 바인딩으로 세 막대가 모두 마지막 색이던 버그 (2026-11-05 M66)
+   # 순매수 숫자는 모두 증감 색 (M6)
                          fmt=lambda v: f"{v:+.0f}".replace("-", "−"), right=True)
     legend = R._legend_chips(list(zip(WHO_NAMES, WHO_COLORS)))
     last = months[-1]
@@ -1346,10 +1347,11 @@ def sec_investors(m):
         # 날짜는 위 줄처럼 괄호 안에 짧게, 설명(사고판 돈 · 12개월 범위 · 과열)은 카드 문장으로 (2026-10-29 사용자 M56)
         rows += _row_html("거래 비중", f'<span style="color:#111;">개인 {L["indiv"]:.0f}%</span><br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">외국인 {L["foreign"]:.0f}% · 기관 {L["inst"]:.0f}%</span>',
                             f"{L['month'][:4]}년 {int(L['month'][5:])}월", inline_note=True)
-        sch = R._col_chart([(x["month"][2:].replace("-", "."), [x["foreign"], x["inst"], x["indiv"]]) for x in sh["series"][-6:]],   # 순매수 그래프와 같은 순서 · 같은 색
-                           [lambda v: c for c in WHO_COLORS], [lambda v: NOTE] * 3, height=120, fmt=lambda v: f"{v:.0f}", right=True)
-        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}거래 비중 (%) — 그달 사고판 돈 중 각자의 몫</span>'
-                 f'<span style="display:block;height:6px;"></span>{_dk.legend_top(sch, R._legend_chips(list(zip(WHO_NAMES, WHO_COLORS))))}</span>')
+        ser = sh["series"][-12:]   # 선 그래프 12개월 — 비중이 오르내리는 흐름 (2026-11-05 사용자 M67, 옛 6개월 막대)
+        tc = _dk.trend_card("", [x["month"][2:].replace("-", ".") for x in ser],   # 달마다 이름 · 점 — 넘겨 보기 (2026-11-05 사용자 M77)
+                            [(nm, [x[k] for x in ser], c, "solid") for nm, k, c in zip(WHO_NAMES, ("foreign", "inst", "indiv"), WHO_COLORS)], lambda v: f"{v:.0f}%", height=130, bare=True)   # 흰 카드 껍데기는 이 카드의 그래프 덩어리가 대신
+        rows += (f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px 0;">{_dk.CHART_TITLE}최근 {len(ser)}개월 거래 비중 (%) — 그달 사고판 돈 중 각자의 몫</span>'
+                 f'{tc}</span>')
     tip = ("한 달 동안 외국인 · 기관 · 개인이 각각 산 금액에서 판 금액을 뺀 것(유가증권 + 코스닥), 그리고 전체 거래에서 각자가 차지한 비중. 월별 자료라 지난달까지\n"
            f"· {last[:4]}년 {int(last[5:])}월 : 외국인 {_sgn(_v('foreign', last) or 0, 1)}조 · 기관 {_sgn(_v('inst', last) or 0, 1)}조 · 개인 {_sgn(_v('indiv', last) or 0, 1)}조")
     card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}<span style="display:block;{R.MULTI_SEP}padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.CHART_TITLE}최근 {len(months)}개월 순매수 (조 원)</span><span style="display:block;height:6px;"></span>{_dk.legend_top(chart, legend)}</span></span></div>'   # 제목 없던 그래프에 ※ 제목 (2026-10-26)

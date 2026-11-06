@@ -17,6 +17,11 @@
 
     record_store.append(state_dir, "verdicts", rows)
     record_store.read(state_dir, "issues", year=2026)
+    record_store.run_log(state_dir, "daily", "success")          # 실행 한 줄 — records/runs/{YYYY}.jsonl (아래)
+    python experiments/record_store.py run-log <state_dir> <source> <status> [note]   # 워크플로 Save 단계에서
+
+    runs      실행 기록 (2026-11-07, 데이터-기록-계획 A3-3-2 의 1): 날짜 · 출처 · 상태(success · failure · cancelled) · 실행 번호.
+              워크플로가 실패한 날이 "신호 없던 날" 로 읽히지 않게 — 그날 줄이 없으면 "안 돌았음", status 가 failure 면 "돌다 죽음".
 """
 
 import json
@@ -73,6 +78,25 @@ def append(state_dir, kind, rows):
     except Exception as e:  # noqa: BLE001
         print(f"::warning::[records] {kind} 저장 실패 (게시는 계속): {e!r}")
         return 0
+
+
+def run_log(state_dir, source, status, note=""):
+    """실행 한 줄을 records/runs/{YYYY}.jsonl 에 덧붙인다 — 같은 날 여러 번 돌면 줄이 여럿(실행 번호로 구분). 실패해도 예외 없음."""
+    try:
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        now = datetime.now(ZoneInfo("Asia/Seoul"))
+        run_id = os.environ.get("GITHUB_RUN_ID", "")
+        row = {"date": now.strftime("%Y-%m-%d"), "at": now.strftime("%H:%M"), "source": source, "status": status, "note": note,
+               "run_id": run_id, "run_url": f"{os.environ.get('GITHUB_SERVER_URL', '')}/{os.environ.get('GITHUB_REPOSITORY', '')}/actions/runs/{run_id}" if run_id else "",
+               "id": f"run/{run_id or now.strftime('%H%M%S')}"}
+        path = _path(state_dir, "runs", row["date"][:4])
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+        print(f"[records] runs {source} {status} → {path}")
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::[records] runs 저장 실패: {e!r}")
 
 
 def _issue_from_topic(topic):
@@ -195,3 +219,12 @@ def radar_rows(radar, date):
         "market": radar.get("market"),
     }]
     return verdicts, issues
+
+
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) >= 5 and sys.argv[1] == "run-log":
+        run_log(sys.argv[2], sys.argv[3], sys.argv[4], " ".join(sys.argv[5:]))
+    else:
+        print("usage: record_store.py run-log <state_dir> <source> <status> [note]")

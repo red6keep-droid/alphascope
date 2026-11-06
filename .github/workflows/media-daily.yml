@@ -96,6 +96,7 @@ jobs:
           fi
 
       - name: Run pipeline
+        id: run_media
         working-directory: experiments/media-daily
         run: |
           PHASE="${{ inputs.phase || 'auto' }}"
@@ -122,6 +123,7 @@ jobs:
         if: always()
         run: |
           if [ ! -d "$STATE_DIR/records" ]; then echo "기록 없음 — 건너뜀"; exit 0; fi
+          python experiments/record_store.py run-log "$STATE_DIR" media "${{ steps.run_media.outcome }}" "job=${{ job.status }}"   # 실행 한 줄 — records/runs (2026-11-07, A3-3-2 의 1)
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
           export GIT_INDEX_FILE="$(mktemp -u)"
