@@ -215,7 +215,8 @@ def price_chart(day, bars):
             f'style="position:relative;display:block;margin:0 0 16px;max-width:1024px;">'
             f'<img src="{url}" alt="코스피 {CS.WINDOW}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'
             f'<span style="position:absolute;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
-            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{ZOOM_ICON}</span></a>')
+            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{ZOOM_ICON}</span></a>'
+            + _dk.intraday_chart_fold("KS11", f"https://cdn.jsdelivr.net/gh/{CS._repo_slug()}@gh-pages/live_bars.json", precision=2))   # 종목 페이지와 같은 자리 · 같은 버튼 — 코스피 15분봉 (2026-11-06 사용자 P315)
 
 
 def head_chart(r):
