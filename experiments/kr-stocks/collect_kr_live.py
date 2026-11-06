@@ -25,6 +25,7 @@ KST = ZoneInfo("Asia/Seoul")
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "home", "live.json")
 OUT_BARS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "home", "live_bars.json")   # 오늘 15분봉 — 홈 · 종목 페이지 `장중 차트`(우리가 그린다)
 DELAY_MIN = 20   # 거래소 규정상 야후 한국 시세 지연 — 표시용
+INDEX_SYMS = ["^KS11"]   # 한국 증시 리포트 코스피 봉차트 아래 `장중 차트 보기` (2026-11-06 사용자 P315) — 15분봉만, live.json 가격 표에는 넣지 않는다
 
 
 def session(now):
@@ -67,10 +68,11 @@ def fetch_bars(syms, today):
             ts = ts.tz_localize(KST) if ts.tzinfo is None else ts.tz_convert(KST)
             if ts.strftime("%Y-%m-%d") != today:
                 continue
-            rows.append([int(ts.timestamp()), round(float(r["Open"])), round(float(r["High"])), round(float(r["Low"])), round(float(r["Close"])),
+            nd = 2 if sym.startswith("^") else None   # 지수는 소수 둘째 자리 (코스피 2,xxx.xx), 종목은 원 단위
+            rows.append([int(ts.timestamp()), round(float(r["Open"]), nd), round(float(r["High"]), nd), round(float(r["Low"]), nd), round(float(r["Close"]), nd),
                          int(r["Volume"]) if pd.notna(r.get("Volume")) else 0])
         if rows:
-            out[sym.split(".")[0]] = rows
+            out[sym.lstrip("^").split(".")[0]] = rows   # ^KS11 → KS11
     return out
 
 
@@ -103,7 +105,7 @@ if __name__ == "__main__":
         json.dump(data, fh, ensure_ascii=False, separators=(",", ":"))
     print(f"[kr-live] {data['day']} {data['at']} KST · {data['session']} · {len(data['stocks'])}/{len(U.CANDIDATES)}종목 → {OUT}")
     try:   # 5분봉은 실패해도 가격 파일은 그대로 — 차트만 "자료 없음"
-        bars = fetch_bars([c[0] for c in U.CANDIDATES], data["day"])
+        bars = fetch_bars([c[0] for c in U.CANDIDATES] + INDEX_SYMS, data["day"])
     except Exception as e:  # noqa: BLE001
         print(f"[kr-live] 5분봉 실패 — 차트 없이: {e!r}")
         bars = {}
