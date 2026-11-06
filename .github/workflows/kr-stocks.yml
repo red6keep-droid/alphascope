@@ -132,6 +132,7 @@ jobs:
           git fetch state nvda-state:refs/remotes/state/nvda-state 2>/dev/null || echo "nvda-state 없음 — 미국 일정 없이"
 
       - name: Collect · analyze · render
+        id: run_kr
         run: python "$KR_DIR/main_kr.py"
 
       # 한국 증시 리포트 — 방금 받은 자료(data/*.json)로 그리기만. 코스피 그래프는 아래 kr-images 에 함께 올린다
@@ -222,6 +223,7 @@ jobs:
         run: |
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
+          python experiments/record_store.py run-log "$KR_DIR/data" kr "${{ steps.run_kr.outcome }}" "job=${{ job.status }}"   # 실행 한 줄 — data/records/runs (2026-11-07, A3-3-2 의 1)
           # 임시 인덱스로 실제 경로(experiments/kr-stocks/data/…)를 그대로 올린다 — records/ 하위 폴더(매일 기록, 2026-11-01)까지 (옛: 파일만 mktree)
           export GIT_INDEX_FILE="$(mktemp -u)"
           for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_fin_all.json dart_corp.json dart_company.json dart_earn.json est_history.json report_posts.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)

@@ -117,6 +117,7 @@ jobs:
       # images/{date}.webp 를 남긴다. 분석(analysis.json, state/)은 그림자 모드라
       # 실패해도 여기서 멈추지 않는다.
       - name: Run daily report (dry-run + cover image)
+        id: run_daily
         if: steps.check.outputs.already_published != 'true'
         run: python experiments/daily-report/main.py
 
@@ -249,6 +250,8 @@ jobs:
               it.pop("summary", None)
           json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False)
           PY
+          # 실행 한 줄 — records/runs (2026-11-07, 데이터-기록-계획 A3-3-2 의 1: 실패한 날이 "신호 없던 날" 로 읽히지 않게)
+          python experiments/record_store.py run-log "$STATE" daily "${{ steps.run_daily.outcome }}" "job=${{ job.status }}"
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
           # 임시 인덱스에 state 디렉터리만 담아 트리를 만든다. 작업 트리와 main 인덱스는 건드리지 않는다.

@@ -53,7 +53,10 @@ if __name__ == "__main__":
             court.fetch(a["day"])
         except Exception as e:  # noqa: BLE001
             print(f"[radar] 소송 일정 실패: {str(e)[:120]}")
+    if not cached and os.environ.get("STATE_DIR"):   # 기록 먼저, 렌더링 나중 (2026-11-07, 데이터-기록-계획 3부 10-1 의 5 — 렌더가 죽어도 그날 기록은 남게)
+        try:
+            record(a, news)
+        except Exception as e:  # noqa: BLE001
+            print(f"::warning::[radar] 기록 저장 실패 (페이지는 계속): {e!r}")
     pages = render_pages.write_all(a, OUT, snap, news)
-    if not cached and os.environ.get("STATE_DIR"):   # 매일 기록 — 카드 판정 · 애널리스트 · 방송 의견 · 뉴스 분류 → nvda-state radar/records (데이터-기록-계획 A5-4 · 2026-11-01)
-        record(a, news)
     print(f"[radar] {a['day']} · 페이지 {len(pages)}개 → {OUT}")

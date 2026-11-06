@@ -101,6 +101,7 @@ jobs:
           fi
 
       - name: Run pipeline
+        id: run_people
         if: steps.check.outputs.already_published != 'true'
         working-directory: experiments/people-radar
         run: |
@@ -162,6 +163,7 @@ jobs:
           for f in radar.json narrative.json; do
             [ -f "$OUT/$f" ] && cp "$OUT/$f" "$STATE_DIR/$f"
           done
+          python experiments/record_store.py run-log "$STATE_DIR" people "${{ steps.run_people.outcome }}" "job=${{ job.status }}"   # 실행 한 줄 — records/runs (2026-11-07, A3-3-2 의 1)
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
           export GIT_INDEX_FILE="$(mktemp -u)"
