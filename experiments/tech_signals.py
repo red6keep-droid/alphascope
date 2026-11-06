@@ -462,7 +462,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         w = sig.get(key)
         if w:
             col = up_color if w["net"] >= 0.15 else down_color if w["net"] <= -0.15 else muted
-            frames.append(f'{lab} <b style="color:{col};">{_tri_small(word(w["net"]), 11)}</b>')   # 삼각형 14 의 80% = 11px (P116, 게이지 답과 같은 규칙)
+            frames.append(f'{lab} <b style="color:{col};">{_tri_small(word(w["net"]), 12)}</b>')   # 삼각형 14 의 80% = 11 → 12px (P116 · 2026-11-06 행간 20 과 홀짝 맞춤)
     import design_kit as _dk
     # 게이지는 게이지끼리 맨 위 (10-30 사용자): 전체 요약 크게(칸 이름) → 기술 지표 · 이동평균 작게 나란히(색만 같게)
     pair = (f'<span style="display:flex;gap:{PAIR_GAP}px;margin:{PAIR_GAP}px {_dk.CHART_CARD_X}px 4px;">'   # 위 여백 = 두 카드 사이 (P108)   # 두 카드 바깥 선 = 전체 요약 카드 바깥 선 (P106)

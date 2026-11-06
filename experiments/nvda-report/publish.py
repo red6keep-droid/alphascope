@@ -135,7 +135,7 @@ def publish_guide_page(blog_url=None):
     old = next((p for p in pages if norm(p.get("url")) == norm(GUIDE_OLD_URL)), None)
     if old and norm(page.get("url")) != norm(GUIDE_OLD_URL):
         new_url = _h.escape(page.get("url") or config.GUIDE_URL)
-        moved = (f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:19px;line-height:34px;color:#333;">'
+        moved = (f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:19px;line-height:35px;color:#333;">'
                  f'<p>리포트 읽는 법 페이지는 새 주소로 옮겼습니다.</p><p><a href="{new_url}" style="color:#1a73e8;">리포트 읽는 법 바로 가기</a></p></div>')
         r = requests.put(f"{base}/{old['id']}", headers=headers, json={"kind": "blogger#page", "id": old["id"], "title": "리포트 읽는 법 (옮김)", "content": moved}, timeout=30)
         r.raise_for_status()

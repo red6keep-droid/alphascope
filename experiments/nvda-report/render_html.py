@@ -29,7 +29,7 @@ H2 = f"color:#111;font-size:{_dk.H2_SIZE};font-weight:700;line-height:{_dk.LH_H2
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"   # 구분선 위 여백 8 → 6 (20% 줄임, 2026-10-11)
 _NO_LINE_START = re.compile(r'^\s*(<div style="(?:overflow-x:auto;|background:)|<div data-cards|<img\b)')   # 표 래퍼 · 카드 · 카드 묶음 · 그림
 UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
-VAL = f"font-size:{_dk.CHG_SIZE};"   # 흰 카드 오른쪽 정보 17px — 강조(색 배경) 카드 제외 (2026-10-13 사용자, 가이드라인 10-7)
+VAL = f"font-size:{_dk.CHG_SIZE};line-height:25px;"   # 17px → 행간 25 홀짝 맞춤 (2026-11-06 사용자: 소수점 없어)   # 흰 카드 오른쪽 정보 17px — 강조(색 배경) 카드 제외 (2026-10-13 사용자, 가이드라인 10-7)
 SUB = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
 # 글자 크기 체계 (디자인-가이드라인.md 3절): 본문은 바깥 div의 18px 하나 — 강조한다고 키우지 않는다. 라벨·날짜는 한 단계 작게(16px), 안내 글·범례·면책은 두 단계 작게(14px)
 SMALL, TINY = "19px", "14px"   # 본문 19 (2026-10-13 사용자)   # 안내 글(14px)을 빼고 모두 18px (2026-10-12 사용자)
@@ -268,7 +268,7 @@ def price_row(row_html):
     """가격 줄(_row) 의 이름 칸을 이름 길이만큼으로 — 옛 40% 고정은 폰 폭에서 값 칸이 몇 px 넘쳤다. 좌우 안쪽 = PRICE_ROW_PAD_X."""
     out = row_html.replace(_dk.ROW_L, PRICE_ROW_L, 1)
     k = out.index(">")   # 줄 상자 style 안의 좌우 12 를 모두 — 색 바탕(ROW_UP · ROW_DOWN)이 padding 을 한 번 더 적어 덮었다 (P137)
-    return out[:k].replace("px 12px;", f"px {PRICE_ROW_PAD_X}px;") + out[k:]
+    return out[:k].replace("px 12px;", f"px {PRICE_ROW_PAD_X}px;").replace(f"line-height:{_dk.LH_EMPH};", "line-height:33px;").replace(f"line-height:{_dk.LH_CARD};", "line-height:25px;") + out[k:]   # 등락 0 인 날(흰 카드 24) → 25   # 가격 19px → 행간 33 홀짝 맞춤 (2026-11-06 사용자: 소수점 없어)
 
 
 def gap_sentence(g):
@@ -639,8 +639,8 @@ def year_range_in(y, money, tip, high_days=None):
 # 최신 값 13px 굵게 · 나머지 12px 보통(세로 눈금 숫자와 같게) · 두 선 중 위에 있는 쪽 숫자는 위, 아래 쪽은 아래 · 비교 선을 먼저 그려 이 종목 선이 위.
 # 최신 가로축 이름 = 이 종목 색 + 글자 위 3px 강조점.
 LINE_W, LINE_W2, DOT_R, DOT_SW, LAST_R, LAST_SW = 2, 1.25, 3, 1.5, 4.5, 4
-LINE_H, LINE_STEP, LINE_GRAY = 230, 46, "#9CA3AF"
-LINE_THIS = "#5B8DEF"   # 선 그래프 이 종목 선 — 그래프 비교 목업에서 정한 파랑 (P161, 2026-10-31 P168 공용으로)
+LINE_H, LINE_STEP, LINE_GRAY = 230, 46, _dk.CHART_CMP   # 비교 선 = 그래프 색 표 ③ 회색 점선 (가이드라인 8-0 · 0-5, 2026-11-06 사용자, 옛 #9CA3AF)
+LINE_THIS = _dk.CHART_MAIN   # 선 그래프 이 종목 선 = 그래프 색 표 ② 주황 (2026-11-06 사용자: "주황으로 해" — 옛 파랑 #5B8DEF 는 하락 색과 헷갈림, P161)
 LINE_FIT_W = 250   # 360px 폰에서 그래프 칸 폭(실측 250~257) — 점들이 이 안에 들어가면 넘겨 보기 없이 카드 폭에 고르게 편다 (2026-10-31 사용자: 짧으면 한쪽으로 몰렸다)
 
 
@@ -855,7 +855,7 @@ def group_head(text, first=False, theme=None, vote=None):
             f'background:{GROUP_TILE.get(theme, "rgba(17,17,17,.3)")};border-radius:5px;color:#fff;">{_GI.format(ic).replace(chr(34) + "16" + chr(34), chr(34) + "12" + chr(34))}</span>') if ic else ""
     # 위 18 → 29 (+60%, P248). 아래는 6 그대로 — P247 은 첫 줄 위 여백으로 (TOGETHER_FIRST_PAD)
     # 오른쪽 분류 한 표 라벨(2026-11-03 재설계 3-2)은 뺐다 — 표는 펼침 맨 위 요약 문장이 말한다 (2026-11-03 사용자). vote 는 받기만
-    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:22px;">{icon}{_esc(text)}</span>')
+    return (f'<span data-group="1" style="display:flex;align-items:center;padding:{4 if first else 29}px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:23px;">{icon}{_esc(text)}</span>')
 
 
 def hot_rows(news):
@@ -957,7 +957,7 @@ def together_card(t):
     card = _state_card(TOGETHER_Q, plain, theme, col, lines, "", tip=tip, fold=True, state_rich=rich)
     logo = BLOG_LOGO.replace("display:block;", "display:inline-block;vertical-align:-3px;margin-right:6px;", 1).replace('width="18" height="16"', 'width="21" height="19"', 1)   # 로고 20% 크게 = 18 × 16 → 21 × 19 (정수, 비율 313:286 유지)
     brand = TOGETHER_Q.rsplit(" ", 1)[0]   # `Alpha Scope` 영문 = 질문 글자(18)보다 1px 작게 · 굵게 (2026-11-01 사용자 P231)
-    return card.replace(_esc(brand), logo + f'<span style="font-size:17px;font-weight:700;">{_esc(brand)}</span>', 1)   # 제목 앞 블로그 로고 (P208)
+    return card.replace(_esc(brand), logo + f'<span style="font-size:17px;line-height:31px;font-weight:700;">{_esc(brand)}</span>', 1)   # 제목 앞 블로그 로고 (P208)
 
 
 def horizon_head(text, first=False):
@@ -1000,7 +1000,7 @@ def index_chart_line(url, local, name):
 def group_title(text):
     """탭 안 구획 제목 — 카드 묶음 사이 (2026-11-01 사용자 P197: 실적 탭의 실적 카드와 일정 카드를 `주요 일정` 으로 나눈다). 크기 · 굵기 = `함께 보는 페이지` 제목."""
     return (f'<div data-group-title="1" style="margin:24px 0 10px;padding:0 {_dk.ALIGN_PX}px;font-weight:700;color:#111;'
-            f'font-size:{_dk.EMPH_NAME};line-height:28px;">{_esc(text)}</div>')
+            f'font-size:{_dk.EMPH_NAME};line-height:29px;">{_esc(text)}</div>')
 
 
 def related_buttons(links):
@@ -1414,7 +1414,7 @@ def line_tabs(cid, labels, series, fmt, unit="", overlay=None, int_ticks=False):
         shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
                  'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>')
     radios = "".join(f'<input type="radio" name="{cid}" id="{cid}-{k}" style="display:none;">' for k in range(len(allser)))   # 처음엔 아무것도 안 눌림
-    btns = "".join(f'<label for="{cid}-{k}" class="c{k}" style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:13px;line-height:18px;font-weight:700;white-space:nowrap;cursor:pointer;">'
+    btns = "".join(f'<label for="{cid}-{k}" class="c{k}" style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:13px;line-height:19px;font-weight:700;white-space:nowrap;cursor:pointer;">'
                    f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{col};"></span>{_esc(nm)}</label>' for k, (nm, _, col, _, _) in enumerate(allser))   # 색 점 = 선 색
     # 첫 줄 = `‹ 넘겨 보기` 왼쪽(공통 선 그래프와 같게) · 단위 오른쪽, 둘째 줄 = 버튼 오른쪽 정렬 — 폰에서 넘겨 보기 / 버튼 / 단위 세 줄이던 것을 두 줄로 (2026-11-04 사용자)
     row1 = (("" if fit else f'<span data-lhint="1" style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span>')
@@ -1466,9 +1466,9 @@ def picks_rows(ps, close, money):
         tgt = _pick_target(p, close, money)
         meta = _pick_when(p["published_at"]) + (f" · {tgt}" if tgt else "")   # 채널은 제목 줄로 올렸다 (P200)
         if p["url"]:
-            meta += f' · <a href="{_esc(p["url"])}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">영상에서 보기</a>'
+            meta += f' · <a href="{_esc(p["url"])}" style="color:inherit;text-decoration:none;" target="_blank" rel="nofollow noopener">영상에서 보기</a>'
         out += (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
-                f'<span style="display:block;color:#111;line-height:34px;">{head}</span>'
+                f'<span style="display:block;color:#111;line-height:35px;">{head}</span>'
                 + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};word-break:keep-all;">{_esc(p["reason"])}</span>' if p["reason"] else "")   # 의견 내용 19 → 18 (2026-11-01 사용자 P238)   # 행간 24 → 26 (+10%, P169)
                 + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
     return f'<span data-picks="1" style="display:block;">{out}</span>'
@@ -1519,7 +1519,7 @@ def _broker_rows(cs, close, money):
                 tgt += f" (오늘 종가 대비 {(pt / close - 1) * 100:+.1f}%)".replace("-", "−")
         d = c["at"][:10]
         out += (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
-                f'<span style="display:block;color:#111;line-height:34px;">{head}</span>'
+                f'<span style="display:block;color:#111;line-height:35px;">{head}</span>'
                 + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};">{tgt}</span>' if tgt else "")
                 + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{int(d[5:7]):02d}.{int(d[8:]):02d} 발표</span></span>')
     return f'<span data-broker="1" style="display:block;">{out}</span>'
@@ -1581,9 +1581,9 @@ def _news_op_rows(ns):
                 f'<b style="font-weight:700;">{_esc(x["source"])}</b>')
         meta = _pick_when(x["published_at"])
         if x.get("url"):
-            meta += f' · <a href="{_esc(x["url"])}" style="color:#1a73e8;text-decoration:none;" rel="nofollow noopener">기사 보기</a>'
+            meta += f' · <a href="{_esc(x["url"])}" style="color:inherit;text-decoration:none;" target="_blank" rel="nofollow noopener">기사 보기</a>'
         out += (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
-                f'<span style="display:block;color:#111;line-height:34px;">{head}</span>'
+                f'<span style="display:block;color:#111;line-height:35px;">{head}</span>'
                 f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};word-break:keep-all;">{_esc(x["title"])}</span>'
                 f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{meta}</span></span>')
     return f'<span data-newsop="1" style="display:block;">{out}</span>'
