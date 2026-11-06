@@ -1625,3 +1625,91 @@ def tv_chart_fold(symbol, tz, key):
             f'var w=document.createElement("div");w.className="tradingview-widget-container__widget";w.style.height="100%";c.appendChild(w);'
             f'var s=document.createElement("script");s.src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";s.async=true;'
             f's.text={json.dumps(cfg)};c.appendChild(s);b.textContent="";b.appendChild(c);}});}})();</script>')
+
+
+# ── 가로 선 그래프 (긴 기간 흐름) — 데일리 `환율은?` 카드 (2026-11-06 P313: P306 이 부르던 함수가 빠져 데일리 리포트가 멈췄다) ──
+CHART_MAIN = "#F5B971"   # 우리 그래프 기본색(주황) — 가이드라인 8-0
+CHART_CMP = "#CBD5E1"    # 비교 대상 회색
+TREND_H = 150            # 선 그래프 그림 높이 px (가로축 이름 줄 빼고)
+TREND_AXIS_H = 22        # 가로축 이름 줄
+
+
+def month_ticks(days, every=1):
+    """가로축 이름 — days("YYYY-MM-DD") 와 같은 길이, 달이 바뀌는 첫 거래일에만 `n월`(every 달마다), 나머지는 "".
+    첫 날은 달 중간일 수 있어 비운다."""
+    out, k = [], 0
+    for i, d in enumerate(days):
+        lab = ""
+        if i > 0 and str(d)[:7] != str(days[i - 1])[:7]:
+            if k % max(1, every) == 0:
+                lab = f"{int(str(d)[5:7])}월"
+            k += 1
+        out.append(lab)
+    return out
+
+
+def _trend_ticks(lo, hi):
+    if hi <= lo:
+        hi = lo + 1
+    step = _nice_step(hi - lo)
+    a, b = math.floor(lo / step + 1e-9) * step, math.ceil(hi / step - 1e-9) * step
+    return [round(a + k * step, 10) for k in range(int(round((b - a) / step)) + 1)]
+
+
+def trend_card(title, labels, series, fmt):
+    """긴 기간 선 그래프 흰 카드 — labels = month_ticks 결과(점마다, 빈 글 = 이름 없음),
+    series = [(이름, 값 목록(None 허용), 색, "solid"|"dash")] 첫째 = 주인공 선(굵게 · 끝 점 · 끝 값), 나머지 = 비교 선.
+    점이 많아 점마다 숫자는 달지 않는다. 가로는 카드 폭에 맞춰 늘고(넘겨 보기 없음), 세로축 숫자는 오른쪽."""
+    n = len(labels)
+    vals = [v for _, xs, _, _ in series for v in xs if v is not None]
+    if n < 2 or not vals:
+        return ""
+    ticks = _trend_ticks(min(vals), max(vals))
+    lo, hi = ticks[0], ticks[-1]
+    top = 14   # 끝 값 글자 자리
+    y = lambda v: top + (hi - v) / ((hi - lo) or 1) * (TREND_H - top - 6)   # noqa: E731
+    xp = lambda i: i / (n - 1) * 100   # noqa: E731
+    tf = (lambda t: f"{t:,.0f}") if all(float(t).is_integer() for t in ticks) else fmt
+    axis_w = int(max(text_px(tf(t), 12) for t in ticks) + 10)
+    grid = "".join(f'<line x1="0" x2="1000" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="{GRID_LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>' for t in ticks)
+    lines = ""
+    for k, (nm, xs, col, style) in reversed(list(enumerate(series))):   # 비교 선 먼저 — 주인공 선이 위에 덮는다
+        segs, cur = [], []
+        for i, v in enumerate(xs):
+            if v is None:
+                if cur:
+                    segs.append(cur)
+                cur = []
+            else:
+                cur.append(f"{xp(i) * 10:.1f},{y(v):.1f}")
+        if cur:
+            segs.append(cur)
+        attr = (f'fill="none" stroke="{col}" stroke-width="{2 if k == 0 else 1.25}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"'
+                + (' stroke-dasharray="5 4"' if style == "dash" else ""))
+        lines += "".join(f'<polyline points="{" ".join(s)}" {attr}/>' for s in segs if len(s) > 1)
+    svg = (f'<svg viewBox="0 0 1000 {TREND_H}" preserveAspectRatio="none" width="100%" height="{TREND_H}" aria-hidden="true" '
+           f'style="display:block;overflow:visible;">{grid}{lines}</svg>')
+    main, c0 = series[0][1], series[0][2]
+    last = next((i for i in range(n - 1, -1, -1) if main[i] is not None), None)
+    over = ""
+    if last is not None:   # 끝 점 · 끝 값 — 원은 늘어나지 않게 HTML 로
+        lx, ly = xp(last), y(main[last])
+        over += (f'<span style="position:absolute;left:calc({lx:.2f}% - 4px);top:{ly - 4:.1f}px;width:8px;height:8px;box-sizing:border-box;'
+                 f'border-radius:50%;background:#fff;border:2px solid {c0};"></span>'
+                 f'<span style="position:absolute;right:{100 - lx:.2f}%;top:{max(ly - 22, -6):.1f}px;font-size:13px;line-height:16px;font-weight:700;'
+                 f'white-space:nowrap;color:#111;">{esc(fmt(main[last]))}</span>')
+    xl = "".join(f'<span style="position:absolute;left:{xp(i):.2f}%;top:{TREND_H + 4}px;transform:translateX(-50%);font-size:{AXIS_FS};line-height:16px;'
+                 f'white-space:nowrap;color:{NOTE};">{esc(lb)}</span>' for i, lb in enumerate(labels) if lb)
+    axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;font-size:12px;line-height:18px;white-space:nowrap;color:{NOTE};">{esc(tf(t))}</span>'
+                   for t in ticks)
+    chips = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">'
+                    f'<svg width="22" height="10" aria-hidden="true"><line x1="1" x2="21" y1="5" y2="5" stroke="{col}" stroke-width="{2 if i == 0 else 1.25}"'
+                    + (' stroke-dasharray="4 3"' if style == "dash" else "") + f'/></svg>{esc(nm)}</span>'
+                    for i, (nm, _, col, style) in enumerate(series))
+    legend = (f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;column-gap:12px;margin:0 0 6px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};">'
+              f'{chips}</span>')
+    plot = (f'<span style="display:block;position:relative;height:{TREND_H + TREND_AXIS_H}px;">'
+            f'<span style="position:absolute;left:0;top:0;right:{axis_w}px;height:{TREND_H}px;">{svg}{over}{xl}</span>'
+            f'<span style="position:absolute;top:0;right:0;width:{axis_w - 4}px;height:{TREND_H}px;text-align:right;">{axis}</span></span>')
+    return (f'{CHART_TITLE_M}{esc(title)}</span>'
+            f'<span style="{MULTI}margin:0 {CHART_CARD_X}px;"><span style="display:block;padding:{CHART_CARD_PAD}px 12px {CHART_CARD_PAD - 6}px;">{legend}{plot}</span></span>')
