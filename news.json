@@ -1,6 +1,42 @@
 {
-  "updated_at": "2026-11-07 17:52:21 UTC",
+  "updated_at": "2026-11-07 21:46:24 UTC",
   "items": [
+    {
+      "title": "Trump offers UFC chief Dana White press secretary job",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/07/trump-ufc-dana-white-press-secretary-offer.html",
+      "published": "2026-11-07 21:17:54",
+      "title_ko": "트럼프, UFC 회장 데이나 화이트에 대변인직 제안",
+      "summary_ko": ""
+    },
+    {
+      "title": "Trump targets Slotkin in call for DOJ probe of alleged Democratic threats to Republicans",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/07/trump-doj-democrats-alleged-threats-slotkin.html",
+      "published": "2026-11-07 20:28:17",
+      "title_ko": "트럼프, 민주당의 공화당 위협 의혹 DOJ 수사 촉구하며 슬로킨 지목",
+      "summary_ko": ""
+    },
+    {
+      "title": "10월 호조의 고용보고서 발표",
+      "title_ko": "10월 호조의 고용보고서 발표",
+      "summary_ko": "실업률이 4.1%로 하락하고 고용 증가세가 화이트칼라 및 제조업 등으로 광범위하게 확산되는 강력한 고용보고서가 발표",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=CMOo74j2Lzo",
+      "published": "2026-11-07 17:15:41",
+      "kind": "media",
+      "tag": "거시경제",
+      "direction": "positive",
+      "n_channels": 2
+    },
+    {
+      "title": "Decisive election. Dramatic stock swings. How we handled the market last week",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/11/07/decisive-election-dramatic-stock-swings-how-we-handled-the-market-last-week.html",
+      "published": "2026-11-07 16:31:00",
+      "title_ko": "결정적 선거. 극적인 주가 변동. 지난주 시장 대응 방식",
+      "summary_ko": "금요일 발표"
+    },
     {
       "title": "Why the prognosis for healthcare stocks is uncertain ahead of Congress’ new makeup",
       "source": "CNBC",
@@ -15,18 +51,6 @@
       "link": "https://www.cnbc.com/2026/11/07/berkshire-hathaway-q3-2026-earnings-buybacks.html",
       "published": "2026-11-07 15:23:46",
       "summary_ko": ""
-    },
-    {
-      "title": "미국 10월 고용보고서 호조",
-      "title_ko": "미국 10월 고용보고서 호조",
-      "summary_ko": "견조한 일자리 증가와 임금 상승세는 경제가 여전히 강하다는 것을 보여준",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=c7OM8A7SM-A",
-      "published": "2026-11-07 15:00:05",
-      "kind": "media",
-      "tag": "거시경제",
-      "direction": "positive",
-      "n_channels": 3
     },
     {
       "title": "미국 중간선거 민주당 압승",
@@ -73,36 +97,12 @@
       "summary_ko": "테네시주 내슈빌, 2024년 3월 폐품 재판매 시작"
     },
     {
-      "title": "Mark Cuban says he doesn’t ‘give a f---' about growing his net worth—a healthy mindset for non-billionaires too, a financial therapist says",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/11/07/mark-cuban-net-worth-money-mindset.html",
-      "published": "2026-11-07 14:05:01",
-      "title_ko": "마크 큐번, 순자산 증가에 '관심 없다' 발언, 금융 치료사도 건강한 마인드셋 평가",
-      "summary_ko": "금융 치료사, 비억만장자에도 건강한 마인드셋 평가"
-    },
-    {
-      "title": "Will this week's blue wave election usher in a Democratic president in 2028?",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/2026-midterm-election-blue-wave-2028-president.html",
-      "published": "2026-11-07 14:00:01",
-      "title_ko": "이번 주 블루 웨이브 선거, 2028년 민주당 대통령 당선 이끌까",
-      "summary_ko": "웨이브 선거, 집권당에 반드시 불리하지 않다는 분석"
-    },
-    {
-      "title": "World’s No. 1 restaurant crowned as contest comes under increasing scrutiny",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/worlds-50-best-restaurants-2026-asador-etxebarri.html",
-      "published": "2026-11-07 13:38:44",
-      "title_ko": "세계 1위 레스토랑 선정, 대회에 대한 우려 증가",
-      "summary_ko": ""
-    },
-    {
-      "title": "미국 고용 보고서 호조와 광범위한 일자리 증가",
-      "title_ko": "미국 고용 보고서 호조와 광범위한 일자리 증가",
-      "summary_ko": "최근 고용 보고서는 지난 2년 내 최고 수준으로 평가되며, 고용 성장이 교육 및 보건을 넘어 여러 부문으로 확대되는 모습을 보임",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=YAgunCIdM3Q",
-      "published": "2026-11-07 13:15:20",
+      "title": "미국 제조업 지표와 공장 생산 반등",
+      "title_ko": "미국 제조업 지표와 공장 생산 반등",
+      "summary_ko": "미국 제조업 생산과 고용이 회복세를 보이며 경제에 긍정적인 모멘텀을 제공 중",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=igSUxfQCdPQ",
+      "published": "2026-11-07 13:00:29",
       "kind": "media",
       "tag": "거시경제",
       "direction": "positive",
