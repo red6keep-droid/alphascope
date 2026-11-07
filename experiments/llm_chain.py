@@ -131,9 +131,21 @@ def event(kind, detail):
     EVENTS[f"{kind} {detail}"] += 1
 
 
+def _slack_worthy(k):
+    """Slack 에 보낼 줄 — Gemini 문제만 (2026-11-07 사용자: "예비 키가 다 에러 나도 상관없다, Gemini 까지 왔는데 Gemini 도 에러 나면 심각하니 그때만").
+    보냄: Gemini 단계 실패 · Gemini 하루 한도(PerDay) · 사슬 전부 실패(맨 뒤 Gemini 까지 실패). 안 보냄: 예비 · 대체 전환, Groq · NVIDIA 실패 · 검사 탈락,
+    Gemini 분당 한도(기다렸다 다시 해서 대부분 성공). 로그 · 사용량 줄에는 전부 남는다."""
+    if k.startswith(("Gemini 실패", "전부 실패")):
+        return True
+    return k.startswith("한도") and "PerDay" in k
+
+
 def _notify_summary():
     url = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
     if not EVENTS or not url:
+        return
+    worthy = [(k, n) for k, n in EVENTS.most_common() if _slack_worthy(k)]
+    if not worthy:
         return
     try:   # 알림 문구만 한국어 (2026-11-07) — 없어도 알림은 간다
         import alert_ko
@@ -143,8 +155,8 @@ def _notify_summary():
     link = ""
     if os.environ.get("GITHUB_RUN_ID"):
         link = f"\n🔗 https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
-    lines = [f"⚠️ AI 호출 알림 — {run}", ""]
-    for k, n in EVENTS.most_common():
+    lines = [f"⚠️ Gemini 알림 — {run}", ""]
+    for k, n in worthy:
         lines.append(f"• {_ko(k)}" + (f" ×{n}" if n > 1 else ""))
     lines += ["", f"단계별 성공/시도: {usage_line()}", link]
     try:
@@ -405,6 +417,8 @@ class LLMPool:
             except Exception as e:  # noqa: BLE001
                 USAGE[name]["fail"] += 1
                 errors.append(f"{name}: {str(e)[:160]}")
+                if step["kind"] == "gemini":   # Slack 은 Gemini 실패만 (2026-11-07 사용자)
+                    event("Gemini 실패", f"{self.label} {name}: {str(e)[:120]}")
                 print(f"[{self.label}] {name} 실패 — {str(e)[:160]}")
                 continue
             USAGE[name]["ok"] += 1
