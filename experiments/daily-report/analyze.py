@@ -148,6 +148,28 @@ def _nvda_config():
     return m
 
 
+def index_rs(closes, n=5):
+    """지수 기준 상대강도 — 나스닥 종합 · 러셀 2000 의 5거래일 등락 − S&P 500(%p) + 나스닥이 S&P 500 을 웃돈 연속 일수 (2026-11-07 사용자: 상장지수펀드 대신 지수로 맞춤 —
+    `지수 기술지표의 방향은?` 의 S&P 500 대비와 같은 값). 옛 rs(QQQ · IWM · SPY)는 다른 곳이 쓰므로 그대로 둔다."""
+    g, q, r = closes.get("^GSPC") or [], closes.get("^IXIC") or [], closes.get("^RUT") or []
+    if len(g) <= n:
+        return {}
+    ret = lambda c: (c[-1] / c[-1 - n] - 1) * 100 if len(c) > n else None  # noqa: E731
+    out = {"nasdaq_5d": None, "russell_5d": None, "nasdaq_streak": None}
+    if ret(q) is not None:
+        out["nasdaq_5d"] = round(ret(q) - ret(g), 2)
+        k = 0
+        for i in range(1, min(len(q), len(g))):
+            if q[-i] / q[-i - 1] > g[-i] / g[-i - 1]:
+                k += 1
+            else:
+                break
+        out["nasdaq_streak"] = k
+    if ret(r) is not None:
+        out["russell_5d"] = round(ret(r) - ret(g), 2)
+    return out
+
+
 def market_mood(closes):
     """미국 증시 분위기 — 종목 페이지 `미국 증시 분위기는?`(stock-radar analyze.market_regime)과 같은 규칙 · 같은 기준값 · 같은 SPY (2026-11-07 사용자: 데일리 세 카드를 한 카드로).
     VIX ≥ 30 → 불안 국면, 1년 고점 대비 −10% 이하 또는 200일 평균 아래 → 조정장, −3% 이하 → 단기 조정, 그 밖 상승 추세. 판정은 보이는 소수 한 자리 값(P275)."""
@@ -591,7 +613,8 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
     series = {sym: series_stats(c) for sym, c in closes.items()}
     split = day_split(prices.get("series") or {})
     tech_idx = index_tech(prices.get("series") or {})
-    mood = market_mood(closes)   # 미국 증시 분위기 (종목 페이지와 같은 규칙, 2026-11-07)   # 지수 4개 기술지표 — 종목 페이지 `기술지표의 방향은?` 과 같은 계산 (2026-11-07 사용자 P392)   # 지수 4개 하루 = 시가 갭 + 장중 (2026-11-07 사용자: 한국 증시 리포트처럼)
+    mood = market_mood(closes)
+    rs_idx = index_rs(closes)   # 지수 기준 상대강도 (2026-11-07)   # 미국 증시 분위기 (종목 페이지와 같은 규칙, 2026-11-07)   # 지수 4개 기술지표 — 종목 페이지 `기술지표의 방향은?` 과 같은 계산 (2026-11-07 사용자 P392)   # 지수 4개 하루 = 시가 갭 + 장중 (2026-11-07 사용자: 한국 증시 리포트처럼)
 
     position = {}
     for key, sym in INDEX_SYMBOL.items():
@@ -669,6 +692,7 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "split": split,
         "tech_idx": tech_idx,
         "mood": mood,
+        "rs_idx": rs_idx,
     }
     # 재설계 계산 (2026-10-18, doc/기획/데일리-리포트-기획.md 6절) — 평소 범위 · 충격 · 한국 연결 · 환율 · 일정
     dates = {sym: rec["dates"] for sym, rec in (prices.get("series") or {}).items() if rec.get("close") and rec.get("dates")}   # 환율 그래프 가로축 (batch 8 ⑭)

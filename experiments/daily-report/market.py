@@ -236,15 +236,19 @@ def breadth_card(a, prev):
 # ── 4 ~ 6 시장의 결 ───────────────────────────────────────────────────
 
 def rs_card(a, prev, parts=False):
-    """4. 기술주 · 소형주는 시장보다 셌나? — 답 `기술주 ▲ · 소형주 ▼`. 5거래일 상대강도(나스닥 100 · 러셀 2000 vs S&P 500, 상장지수펀드 QQQ · IWM · SPY — 2026-11-07 P384: 나스닥 종합과 다르다) + 연속 일수."""
-    rs = a.get("rs") or {}
-    prs = (prev or {}).get("rs") or {}
-    q, i = rs.get("qqq_spy_5d"), rs.get("iwm_spy_5d")
+    """4. 기술주 · 소형주는 시장보다 셌나? — 최근 5거래일 나스닥 종합 · 러셀 2000 등락 − S&P 500(%p, 지수 기준 analyze.index_rs) + 나스닥이 웃돈 연속 일수.
+    2026-11-07 사용자: 상장지수펀드(QQQ · IWM · SPY) 대신 지수로 — `지수 기술지표의 방향은?` 의 S&P 500 대비와 같은 값. 지수 값이 없는 옛 analysis 는 상장지수펀드 값."""
+    ri = a.get("rs_idx") or {}
+    if ri.get("nasdaq_5d") is not None or ri.get("russell_5d") is not None:
+        q, i, streak, nq = ri.get("nasdaq_5d"), ri.get("russell_5d"), ri.get("nasdaq_streak"), "나스닥"
+    else:
+        rs = a.get("rs") or {}
+        q, i, streak, nq = rs.get("qqq_spy_5d"), rs.get("iwm_spy_5d"), rs.get("qqq_streak"), "나스닥 100"
     if q is None and i is None:
         return ""
     sent = []
     if q is not None:
-        sent.append(f"나스닥 100(기술주)은 S&P 500보다 {abs(q):.2f}%p {'앞섰' if q > 0 else '뒤졌' if q < 0 else '같았'}")
+        sent.append(f"{nq}(기술주)은 S&P 500보다 {abs(q):.2f}%p {'앞섰' if q > 0 else '뒤졌' if q < 0 else '같았'}")
     if i is not None:
         sent.append(f"러셀 2000(소형주)은 {abs(i):.2f}%p {'앞섰' if i > 0 else '뒤졌' if i < 0 else '같았'}")
     strong = [w for v, w in ((q, "기술주"), (i, "소형주")) if v is not None and v > 0]
@@ -253,17 +257,16 @@ def rs_card(a, prev, parts=False):
     state = ("둘 다 강함" if len(strong) == 2 else "둘 다 약함" if not strong and len(known) == 2 else f"{strong[0]}만 강함" if strong and len(known) == 2
              else f"{known[0]} {'강함' if strong else '약함'}")   # 명사형 — 문장형은 dk.formal 이 `~습니다` 로 바꾼다
     first = "최근 5거래일 동안 " + "고, ".join(sent) + "습니다."
-    streak = rs.get("qqq_streak")
     if streak:
-        first += f" 나스닥 100이 S&P 500을 웃돈 날이 {int(streak)}일째 이어졌습니다."
+        first += f" {nq}이 S&P 500을 웃돈 날이 {int(streak)}일째 이어졌습니다."
     elif streak == 0:
-        first += " 오늘은 나스닥 100이 S&P 500을 웃돌지 못했습니다."
+        first += f" 오늘은 {nq}이 S&P 500을 웃돌지 못했습니다."
     lines = [(first, "plain")]
-    # 나스닥 100 · 러셀 2000 − S&P 500 줄은 뺐다 — 지수별 5거래일 S&P 500 대비는 `지수 기술지표의 방향은?` 카드 라벨 안 (2026-11-07 사용자 P392). 문장에 같은 숫자가 있다
-    if streak:   # 0일이면 줄을 뺀다 — 문장이 `웃돌지 못했습니다` 로 말한다 (2026-11-07)
-        lines.append(("row", "나스닥 100이 앞선 날", f"{int(streak)}일 연속", ""))
-    won = [w for k, w in (("qqq_spy_5d", "기술주"), ("iwm_spy_5d", "소형주")) if (rs.get(k) or 0) > 0]
-    tip = ("최근 5거래일 동안 나스닥 100(기술주) · 러셀 2000(소형주)이 S&P 500(시장 전체)보다 더 강했는지 견준 것\n"
+    # 지수별 5거래일 S&P 500 대비 줄은 `지수 기술지표의 방향은?` 카드 라벨 안 (P392). 문장에 같은 숫자가 있다
+    if streak:   # 0일이면 줄을 뺀다 — 문장이 `웃돌지 못했습니다` 로 말한다
+        lines.append(("row", f"{nq}이 앞선 날", f"{int(streak)}일 연속", ""))
+    won = [w for v, w in ((q, "기술주"), (i, "소형주")) if (v or 0) > 0]
+    tip = (f"최근 5거래일 동안 {nq}(기술주) · 러셀 2000(소형주)이 S&P 500(시장 전체)보다 더 강했는지 견준 것\n"
            "· 오늘 : " + (" · ".join(won) + " 쪽이 시장 전체보다 강했다" if won else "둘 다 시장 전체보다 약했다")
            + "\n· 참고 : 값이 플러스면 앞에 적힌 쪽이 더 많이 올랐다는 뜻")
     theme, ink = _dir(len(strong) * 2 - len(known))   # 둘 다 강함 = 주황 · 둘 다 약함 = 파랑 · 엇갈림 = 회색
@@ -277,7 +280,7 @@ def flow_card(a, parts=False):
     오늘 탭 = 오늘 하루에 일어난 일, 시장 탭 = 지금 시장의 상태. 변동성 지수 · 금리는 각자 카드가 있어 여기 두지 않는다.
     답 = S&P 500(SPY)이 20 · 50일 평균선 위인가. 둘 다 위 = 주황, 둘 다 아래 = 파랑, 엇갈림 = 회색 (답에 보라 금지, 7-1 — 옛 P330 엇갈림 보라를 바꿨다)."""
     se = a.get("series") or {}
-    spy = se.get("SPY") or {}
+    spy = se.get("^GSPC") or {}   # 지수 기준 (2026-11-07 사용자: 지수 기술지표 카드와 같은 값, 옛 SPY)
     pos = a.get("position") or {}
     sp = pos.get("sp500") or {}
     a20, a50 = spy.get("above_ma20"), spy.get("above_ma50")
@@ -526,7 +529,7 @@ def mood_card(a, prev):
     ph = m["pct_from_high"]
     where = "1년 최고가 근처" if ph > -0.5 else f"1년 최고가보다 {abs(ph):.1f}% 아래"
     first = f"1년 고점과 200일 평균으로 보면 S&P 500은 {where}이고, 200일 평균 가격보다 {'위' if m['above_ma200'] else '아래'}에 있습니다."   # 첫 문장 괄호 설명 금지 (7-1)
-    spy = (a.get("series") or {}).get("SPY") or {}
+    spy = (a.get("series") or {}).get("^GSPC") or {}   # 지수 기준 (같은 날)
     a20, a50 = spy.get("above_ma20"), spy.get("above_ma50")
     if a20 is not None and a50 is not None:   # 짧은 흐름 한 문장 — 답(긴 흐름)과 안쪽 `지금 시장 흐름은?`(짧은 흐름)이 반대로 보이는 날을 위해 (2026-11-07 사용자)
         short = ("둘 다 위" if a20 and a50 else "둘 다 아래" if not a20 and not a50 else ("20일 평균 아래, 50일 평균 위" if not a20 else "20일 평균 위, 50일 평균 아래"))
