@@ -278,7 +278,8 @@ def sec_chart(output_dir):
             f'style="position:relative;display:block;margin:0 0 16px;max-width:1024px;">'
             f'<img src="{url}" alt="S&amp;P 500 {c.get("window", 30)}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'
             f'<span style="position:absolute;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
-            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{ZOOM_ICON}</span></a>')
+            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{ZOOM_ICON}</span></a>'
+            + dk.tv_chart_fold("AMEX:SPY", "America/New_York", "SPY"))   # 장중 차트 접힘 줄 — 종목 페이지 · 한국 증시 리포트와 같은 자리 · 같은 버튼, 미국 정규장에만 보임 (2026-11-07 사용자). S&P 500 지수 대신 따라가는 ETF(SPY) — 무료 위젯이 지수 자료를 막는 경우가 있다
 
 
 def _cover_image(cover_url):
@@ -781,7 +782,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     #   ② 종목 · 업종 = 무엇이 움직였나(대형주 10개 → 업종 → 테마 → 고르게) ③ 시장 바탕(긴장 → 금리 → 경제)
     grid = lambda h: cards.cards_grid(h) if h else ""  # noqa: E731
     idx_cards = sx.normal_card(a) + sx.shock_card(a) + mk.index_cards(a, prev)
-    parts.append(dk.section("주요 지수", sec_indices(indices, analysis, report) + grid(idx_cards), tab=TAB_TODAY))
+    parts.append(dk.section("주요 지수", sx.split_chart(a) + sec_indices(indices, analysis, report) + grid(idx_cards), tab=TAB_TODAY))   # 맨 위 = 시가 갭 · 장중 · 하루 막대 (2026-11-07 사용자)
     move = mk.move_cards(a, prev)
     if move:
         parts.append(dk.section("종목 · 업종", grid(move), tab=TAB_TODAY))

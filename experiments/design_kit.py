@@ -831,7 +831,9 @@ def write_mock(body, path, title):
     js = re.search(r"//<!\[CDATA\[(.*?)//\]\]>", idx, re.S)
     if not (css and js):
         return None
-    body = re.sub(r"https://cdn\.jsdelivr\.net/gh/[^\"]+?@(?:gh-pages|kr-images)/(images/(?!logos/|people/)[^\"]+)", r"\1", body)   # 로고 · 인물 사진은 로컬 사본이 없다 — gh-pages 주소 그대로 (2026-10-25 · 11-07)
+    _here = os.path.dirname(os.path.abspath(path))
+    body = re.sub(r"https://cdn\.jsdelivr\.net/gh/[^\"]+?@(?:gh-pages|kr-images)/(images/(?!logos/|people/)[^\"]+)",
+                  lambda m: m.group(1) if os.path.exists(os.path.join(_here, m.group(1))) else m.group(0), body)   # 로컬 사본이 있을 때만 로컬 — 없으면 gh-pages 주소 그대로 (2026-11-07 사용자: 데일리 목업 S&P 500 그림이 안 보였다, 10-23 그림 로컬 사본 없음)   # 로고 · 인물 사진은 로컬 사본이 없다 — gh-pages 주소 그대로 (2026-10-25 · 11-07)
     # 글 아래 [목록] · TOP 줄 — 블로그 테마의 글 보기와 같은 마크업 (2026-10-18 사용자: 모든 페이지 공통). 목록 주소는 본문 [data-list-url] 이 있으면 그것
     lu = re.search(r'data-list-url="([^"]+)"', body)
     nav = (f'<p class="post-nav"><a class="post-nav-list" href="{lu.group(1) if lu else "#"}">목록</a>'

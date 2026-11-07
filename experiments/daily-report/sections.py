@@ -91,6 +91,21 @@ def normal_card(a, opened=True):
     return C.question_card("오늘 움직임은 평소와 달랐나?", state, theme, ink, lines, tip=tip, opened=opened)
 
 
+def split_chart(a):
+    """주요 지수 덩어리 맨 위 — 지수 4개 하루를 시가 갭 · 장중 · 하루 세 막대로 (2026-11-07 사용자: 한국 증시 리포트 head_chart 와 같은 모양).
+    시가 갭 = 전일 종가 → 시가(장이 닫힌 사이 반영된 몫), 장중 = 시가 → 종가. 막대 색은 구분용, 숫자는 증감 색. 시가가 없으면 그래프를 뺀다."""
+    sp = a.get("split") or {}
+    keys = [k for k in ("^GSPC", "^IXIC", "^DJI", "^RUT") if k in sp]
+    if not keys:
+        return ""
+    groups = [(INDEX_SHORT[k], [sp[k]["gap"], sp[k]["intra"], sp[k]["ret"]]) for k in keys]
+    amber = lambda v: C.AMBER   # noqa: E731
+    chart = C.chart_card("하루를 시가 갭 · 장중으로 나눈 등락 (%)", groups, [amber, C.sign_bg, C.gray], [C.sign_fg, C.sign_fg, C.sign_fg],
+                         [("시가 갭", C.AMBER), ("장중", C.PASTEL_UP), ("하루", C.GRAY_BAR)], keep_legend=True)
+    chart = chart.replace(f"margin:0 {dk.CHART_CARD_X}px;", "margin:0;", 1)   # 카드 밖 그래프 — 아래 카드와 왼쪽 끝을 맞춘다 (한국 M37 과 같게)
+    return f'<div data-cards="1" style="margin:0 0 8px;">{chart}</div>'
+
+
 def shock_card(a):
     """D6 충격 표시 — 충격 국면일 때만 (기획 5절 B3)."""
     sh = a.get("shock") or {}

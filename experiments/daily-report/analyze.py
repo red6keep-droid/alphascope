@@ -107,6 +107,22 @@ def _updown_days(close, n=20):
     return ups, downs
 
 
+SPLIT_SYMBOLS = ("^GSPC", "^IXIC", "^DJI", "^RUT")
+
+
+def day_split(raw_series):
+    """지수 4개의 마지막 날 하루를 시가 갭(전일 종가 → 시가) · 장중(시가 → 종가) · 하루(전일 종가 → 종가)로, % (2026-11-07 사용자: 한국 증시 리포트 `시가 갭 · 장중 · 하루` 처럼).
+    prices.json 의 open 칸(collect_yahoo OPEN_SYMBOLS)이 없거나 마지막 날 시가가 비면 그 지수는 뺀다."""
+    out = {}
+    for sym in SPLIT_SYMBOLS:
+        rec = raw_series.get(sym) or {}
+        c, o = rec.get("close") or [], rec.get("open") or []
+        if len(c) < 2 or len(o) != len(c) or not o[-1] or not c[-2]:
+            continue
+        out[sym] = {"gap": round((o[-1] / c[-2] - 1) * 100, 2), "intra": round((c[-1] / o[-1] - 1) * 100, 2), "ret": round((c[-1] / c[-2] - 1) * 100, 2)}
+    return out
+
+
 def series_stats(close):
     """B-1 · B-2. close는 오래된 것 → 최신 순."""
     ma20 = _ma(close, 20)
@@ -531,6 +547,7 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
     closes = {sym: rec["close"] for sym, rec in (prices.get("series") or {}).items() if rec.get("close")}
 
     series = {sym: series_stats(c) for sym, c in closes.items()}
+    split = day_split(prices.get("series") or {})   # 지수 4개 하루 = 시가 갭 + 장중 (2026-11-07 사용자: 한국 증시 리포트처럼)
 
     position = {}
     for key, sym in INDEX_SYMBOL.items():
@@ -605,6 +622,7 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "watch": watch,
         "symbols": symbols,
         "raw": raw,
+        "split": split,
     }
     # 재설계 계산 (2026-10-18, doc/기획/데일리-리포트-기획.md 6절) — 평소 범위 · 충격 · 한국 연결 · 환율 · 일정
     dates = {sym: rec["dates"] for sym, rec in (prices.get("series") or {}).items() if rec.get("close") and rec.get("dates")}   # 환율 그래프 가로축 (batch 8 ⑭)

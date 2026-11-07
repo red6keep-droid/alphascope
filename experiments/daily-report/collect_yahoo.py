@@ -43,6 +43,7 @@ HISTORY_UNIVERSE = {
     "link": ["^SOX"],
     "fx": ["KRW=X"],
 }
+OPEN_SYMBOLS = ("^GSPC", "^IXIC", "^DJI", "^RUT")   # 시가도 남기는 심볼 (2026-11-07)
 # 50일선과 그 기울기까지 보려면 3개월(약 63거래일)은 빠듯하다.
 # 평소 범위의 "1년에 몇 번"은 지난 252거래일 z 가 필요해 2년 (2026-10-18)
 HISTORY_PERIOD = "2y"
@@ -274,6 +275,12 @@ def collect_history():
             "dates": [d.strftime("%Y-%m-%d") for d in s.index],
             "close": [round(float(v), 4) for v in s.values],
         }
+        if symbol in OPEN_SYMBOLS:   # 시가 — 지수 4개만(시가 갭 · 장중 · 하루 그래프, 2026-11-07 사용자). 같은 응답에 이미 있다, 새 요청 없음
+            try:
+                o = df[symbol]["Open"].reindex(s.index)
+                series[symbol]["open"] = [None if v != v else round(float(v), 4) for v in o.values]
+            except Exception:
+                pass
     if missing:
         print(f"시계열 결측 심볼: {missing}")
     print(f"시계열 수집 완료: {len(series)}/{len(symbols)} 심볼, 기준일 {as_of.date()}")
