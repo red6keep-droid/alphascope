@@ -407,7 +407,7 @@ def sec_seo_lead(input_data, analysis):
     if not sents:
         return ""
     html = dk.bold_pct(dk._tint_inline(_esc(" ".join(sents))))   # 증감 숫자 굵게 (2026-11-07 사용자 P390)
-    html = re.sub(r"(평소의 [0-9.]+배|평소 하루 움직임의 범위를 벗어났습니다)", r'<span style="font-weight:700;">\1</span>', html)   # 배수 · `범위를 벗어났습니다` 굵게 (같은 날)
+    html = re.sub(r"(평소의 [0-9.]+배)", r'<span style="font-weight:700;">\1</span>', html)   # 배수 굵게 — `범위를 벗어났습니다` 는 굵게 하지 않는다 (같은 날 사용자 정정)
     return f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">' + html + "</p>"   # 요약 문장의 증감도 색 (가이드라인 3-3-1, 예외 없음) — 문장이라 숫자(와 앞 지수 이름)만 칠한다. dk.tint 는 가운뎃점 덩어리 통째로 칠해 문장 앞머리까지 파랗게 된다
 
 
