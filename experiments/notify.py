@@ -18,13 +18,14 @@ from collections import Counter
 
 import requests
 
+import alert_ko  # noqa: E402  — 알림 문구만 한국어 (2026-11-07)
 import ops_log  # noqa: F401  — 운영 기록 (experiments/ops_log.py, 2026-10-23): EVENTS 를 실행 끝에 KV 로
 
 EVENTS = Counter()
 
 
 def _run_name():
-    return os.environ.get("GITHUB_WORKFLOW") or "로컬 실행"
+    return alert_ko.run_name()   # 워크플로 이름 → 한국어 (알림에서만)
 
 
 def _run_link():
@@ -54,7 +55,7 @@ def event(kind, detail):
 def now(text):
     """바로 보낸다. sys.exit 직전처럼 atexit 를 기다릴 수 없을 때."""
     print(f"[notify] {text}")
-    _post(f"🚨 {_run_name()}\n{text}{_run_link()}")
+    _post(f"🚨 {_run_name()}\n{alert_ko.line(text)}{_run_link()}")
 
 
 def _flush():
@@ -62,7 +63,7 @@ def _flush():
         return
     lines = [f"⚠️ 운영 알림 — {_run_name()}", ""]
     for k, n in EVENTS.most_common():
-        lines.append(f"• {k}" + (f" ×{n}" if n > 1 else ""))
+        lines.append(f"• {alert_ko.line(k)}" + (f" ×{n}" if n > 1 else ""))
     lines.append(_run_link())
     _post("\n".join(lines))
 
