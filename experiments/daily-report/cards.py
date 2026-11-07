@@ -199,20 +199,18 @@ def _gauge_tip(x, text, col, dot_col, weight=400):
             f'<span style="position:absolute;left:{at};bottom:-3px;transform:translateX(-50%);z-index:3;box-sizing:border-box;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid {dot_col};"></span>')
 
 
-def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near_text, high_days=None, marks=None, days_in_head=False):
+def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near_text, marks=None):
     """1년 범위 막대 — 얇은 막대(최저~최고, 지금까지 연한 파랑) + 지금 위치 점 · 꼬리 · 말풍선(최고 대비 %). 제목 줄은 카드 밖, 막대는 흰 카드.
     fmt = 값 표기 함수. 질문 카드 lines 의 ("html") 항목으로 넣는다.
-    days_in_head = True 면 `(n거래일 전)` 을 최고 글자 옆이 아니라 제목 줄 오른쪽 범례 뒤에 (2026-11-07 사용자: 분위기 카드). tip 이 비면 ? 없음.
+    tip 이 비면 ? 없음. 최고가가 며칠 전인지는 싣지 않는다 (2026-11-07 사용자: 종목 페이지와 같게).
     marks = [(글자, 위치 %)] — 막대 위 파란 세로 눈금 + 최저 · 최고 아래 줄 글자 (애널리스트 목표가 막대의 중앙 · 평균 눈금과 같은 모양, 2026-11-07 사용자: 200일 평균)."""
     pos = max(0.0, min(100.0, pos_pct))
     near = pct_from_high > -0.5
     text = near_text if near else f"{pct_from_high:.1f}%".replace("-", "−")
     col, dot = ("#64748B", "#64748B") if near else (dk.lighten(dk.DOWN, 0.2), dk.DOWN)
-    ago = "" if high_days is None else " (오늘)" if high_days <= 0 else f" ({high_days}거래일 전)"
     head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
-            f'<span style="font-weight:700;color:#111;font-size:{dk.NAME};{"flex:none;white-space:nowrap;" if days_in_head else ""}">{dk.CHART_MARK}{dk.paren(esc(title))}{dk.tip_icon(tip) if tip else ""}</span>'
-            + (f'<span style="min-width:0;text-align:right;font-size:{dk.MICRO};line-height:20px;color:{NOTE};word-break:keep-all;">{esc(legend)}<span style="display:inline-block;white-space:nowrap;">{esc(ago)}</span></span></span>' if days_in_head   # 범례가 길면 범례 쪽이 줄을 바꾼다 — 제목은 한 줄
-               else f'<span style="flex:none;font-size:{dk.MICRO};color:{NOTE};white-space:nowrap;">{esc(legend)}</span></span>'))
+            f'<span style="font-weight:700;color:#111;font-size:{dk.NAME};">{dk.CHART_MARK}{dk.paren(esc(title))}{dk.tip_icon(tip) if tip else ""}</span>'
+            f'<span style="flex:none;font-size:{dk.MICRO};color:{NOTE};white-space:nowrap;">{esc(legend)}</span></span>')
     at = f"clamp({GAUGE_INSET}px, {pos:.1f}%, calc(100% - {GAUGE_INSET}px))"
     bar = (f'<span style="position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:3px;background:#E2E8F0;">'
            f'<span style="position:absolute;left:0;top:0;bottom:0;width:{at};border-radius:3px;background:#BFDBFE;"></span>'
@@ -221,9 +219,8 @@ def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near
     aria = esc(f"1년 범위 {fmt(low)}~{fmt(high)}, {text}")
     gauge = (f'<span data-range-gauge="1" aria-label="{aria}" style="position:relative;display:block;height:{GAUGE_H}px;">'
              f'{_gauge_tip(pos, text, col, dot, BUBBLE_W_STRONG)}{bar}</span>')
-    ago = "" if days_in_head else ago
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:{dk.TINY};line-height:20px;color:{NOTE};">'
-            f'<span style="white-space:nowrap;">최저 {fmt(low)}</span><span style="white-space:nowrap;">최고 {fmt(high)}{ago}</span></span>')
+            f'<span style="white-space:nowrap;">최저 {fmt(low)}</span><span style="white-space:nowrap;">최고 {fmt(high)}</span></span>')
     below = ""
     for t, p in (marks or []):   # 눈금 글자 = 막대 아래 둘째 줄, 가운데를 눈금 자리에 두되 카드 안으로 가둔다 (target_gauge 와 같게)
         w = round(len(t) * 14 * 0.62) + 2

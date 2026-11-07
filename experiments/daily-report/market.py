@@ -333,7 +333,7 @@ def vix_card(a):
     if lo is not None and hi is not None and v.get("pos_pct") is not None:
         gauge_tip = f"최근 1년(252거래일) 동안 변동성 지수의 가장 낮았던 값과 가장 높았던 값 사이에서 오늘 값의 자리\n· 오늘 {now:.2f} : 1년 최고 대비 {_s(v['pct_from_high'], 1)}"
         lines.append((C.range_gauge(lo, hi, v["pos_pct"], v["pct_from_high"], lambda x: f"{x:.2f}", dk.with_src(gauge_tip, SRC_PRICE),
-                                    "변동성 지수 범위 (1년)", "1년 최고 대비", "1년 최고 근처", v.get("high_days")), "html"))
+                                    "변동성 지수 범위 (1년)", "1년 최고 대비", "1년 최고 근처"), "html"))   # 최고가 며칠 전인지는 싣지 않는다 (2026-11-07 사용자: 종목 페이지처럼)
     if v.get("prev_5d") is not None:
         lines.append(("row", "5거래일 전", f"{v['prev_5d']:.2f}", ""))   # 1년 최고 · 최저는 범위 막대 아래에 있어 줄로 되풀이하지 않는다
     lines.append(("35를 넘으면 시장 충격 국면이 시작되고, 25 아래로 내려오면 끝난 것으로 봅니다 (오늘 탭 충격 카드와 같은 기준).", "note"))
@@ -544,9 +544,9 @@ def mood_card(a, prev):
         lo, hi = m["low_1y"], m["high_1y"]
         at = lambda v: (v - lo) / (hi - lo) * 100  # noqa: E731
         f0 = lambda v: f"{v:,.0f}"  # noqa: E731
-        # 제목에서 `(1년)` 뺌 — 범례 `1년 최고 대비` 와 겹친다 · `(n거래일 전)` 은 범례 뒤로 · 툴팁 없음 (2026-11-07 사용자: 정보 과잉)
+        # 제목에서 `(1년)` 뺌 — 범례 `1년 최고 대비` 와 겹친다 · 최고가 며칠 전인지 · 툴팁 없음 (2026-11-07 사용자: 정보 과잉)
         lines.append((C.range_gauge(lo, hi, at(m["last"]), m["pct_from_high"], f0, "", "S&P 500 가격 범위", "1년 최고 대비", "1년 최고 근처",
-                                    m.get("high_days"), marks=[(f"200일 평균 {f0(m['ma200'])} ({_s(m['pct_vs_ma200'], 1)})", at(m["ma200"]))], days_in_head=True), "html"))
+                                    marks=[(f"200일 평균 {f0(m['ma200'])} ({_s(m['pct_vs_ma200'], 1)})", at(m["ma200"]))]), "html"))
     parts = [x for x in (sx.normal_card(a, parts=True), flow_card(a, parts=True), rs_card(a, prev, parts=True)) if x]
     for q, st, _th, ik, ls, _tp in parts:   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄
         lines.append(_part_row(q, st, ik))
