@@ -95,15 +95,15 @@ def split_chart(a):
     """주요 지수 덩어리 맨 위 — 지수 4개 하루를 시가 갭 · 장중 · 하루 세 막대로 (2026-11-07 사용자: 한국 증시 리포트 head_chart 와 같은 모양).
     시가 갭 = 전일 종가 → 시가(장이 닫힌 사이 반영된 몫), 장중 = 시가 → 종가. 막대 색은 구분용, 숫자는 증감 색. 시가가 없으면 그래프를 뺀다."""
     sp = a.get("split") or {}
-    keys = [k for k in ("^GSPC", "^IXIC", "^DJI", "^RUT") if k in sp]
+    keys = [k for k in ("^RUT", "^DJI", "^IXIC", "^GSPC") if k in sp]   # S&P 500 을 맨 오른쪽 — 넘겨 보기 그래프는 처음에 오른쪽 끝이 보인다 (2026-11-07 사용자)
     if not keys:
         return ""
     groups = [(INDEX_SHORT[k], [sp[k]["gap"], sp[k]["intra"], sp[k]["ret"]]) for k in keys]
     amber = lambda v: C.AMBER   # noqa: E731
-    chart = C.chart_card("하루를 시가 갭 · 장중으로 나눈 등락 (%)", groups, [amber, C.sign_bg, C.gray], [C.sign_fg, C.sign_fg, C.sign_fg],
+    chart = C.chart_card("", groups, [amber, C.sign_bg, C.gray], [C.sign_fg, C.sign_fg, C.sign_fg],
                          [("시가 갭", C.AMBER), ("장중", C.PASTEL_UP), ("하루", C.GRAY_BAR)], keep_legend=True)
     chart = chart.replace(f"margin:0 {dk.CHART_CARD_X}px;", "margin:0;", 1)   # 카드 밖 그래프 — 아래 카드와 왼쪽 끝을 맞춘다 (한국 M37 과 같게)
-    return f'<div data-cards="1" style="margin:0 0 8px;">{chart}</div>'
+    return f'<div data-cards="1" style="margin:0 0 8px;padding-top:10px;">{chart}</div>'   # 탭 줄 바로 아래 첫 콘텐츠 — 위 +10 (오늘 탭 첫 콘텐츠 규칙)
 
 
 def shock_card(a):

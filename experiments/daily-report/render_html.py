@@ -406,7 +406,7 @@ def sec_lead(report, analysis):
     one = str(report.get("one_line") or "").strip()
     inner = f'<div style="color:#111;font-weight:700;padding-left:{dk.ALIGN_PX}px;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 카드 대신 굵게 (2026-10-13 사용자)
     # 구분선 아래 종합(Gemini opinion, data-insight)은 뺐다 — `최근 며칠 · 몇 주와 비교` 는 시장 탭 `지금 시장 흐름은?` 과 겹친다 (2026-11-07 사용자). 홈 카드는 10-20부터 한 줄만 읽는다
-    return dk.cards(f'<div style="margin:0 0 8px;padding-top:{TAB_TOP}px;line-height:{dk.LH_BODY};">{inner}</div>')   # 오늘 탭 첫 콘텐츠 위 +10 (2026-10-13 사용자)   # 강조 카드 디자인 삭제 — 배경 · 테두리 · 안쪽 여백 없음 (2026-10-13 사용자)
+    return dk.cards(f'<div style="margin:16px 0 8px;line-height:{dk.LH_BODY};">{inner}</div>')   # 지수 표 아래로 옮김 — 위 여백 16 (2026-11-07 사용자 순서: 그래프 → 지수 표 → 한 줄 결론)   # 오늘 탭 첫 콘텐츠 위 +10 (2026-10-13 사용자)   # 강조 카드 디자인 삭제 — 배경 · 테두리 · 안쪽 여백 없음 (2026-10-13 사용자)
 
 
 def sec_regime(analysis, report, prev=None):
@@ -454,7 +454,7 @@ def _arrows(last5):
 INDEX_SHOWN = 1   # S&P 500 만 보이고 나머지는 펼침 (2026-11-07 사용자, 옛 2 = S&P 500 · 나스닥)
 
 
-def sec_indices(indices, analysis, report):
+def sec_indices(indices, analysis, report, with_text=True):
     """주요 지수 — 해설 먼저(2026-10-12 사용자), C 카드(왼쪽 60%): 지수, 값 가격 + 1일 등락, 보조 줄 5일·20일·최근 5일.
     S&P 500 만 보이고 나스닥 · 다우존스 · 러셀 2000 은 펼침 버튼 안 (2026-11-07).
     VIX 줄 · 20일 위치는 뺐다 — 시장 탭 `시장은 얼마나 긴장했나?` · `지금 시장 흐름은?` 이 말한다 (2026-11-07 사용자: 오늘 = 그날 기록만)."""
@@ -472,7 +472,7 @@ def sec_indices(indices, analysis, report):
         if s.get("last5"):
             sub.append("최근 5일 " + _arrows(s["last5"]))
         rows.append((_esc(INDEX_LABELS.get(key, key)), value, " · ".join(sub)))
-    return _text(report.get("summary")) + dk.ccard(rows, left=60, fold_at=INDEX_SHOWN, noun="지수")   # 펼침 버튼은 같은 카드 안 (2026-10-13 사용자)
+    return (_text(report.get("summary")) if with_text else "") + dk.ccard(rows, left=60, fold_at=INDEX_SHOWN, noun="지수")   # 펼침 버튼은 같은 카드 안 (2026-10-13 사용자)
 
 
 FOLD_SHOWN = 2   # 카드 줄이 많으면 앞 2줄만 보이고 나머지는 '더 보기' 펼침 (2026-10-12 사용자: "섹터는 2개만, 다른 탭에도 동일하게 2개만")
@@ -775,14 +775,19 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
         sec_seo_lead(input_data, analysis),   # 검색 결과 요약 — 보이는 첫 요소, data-lead 보다 앞 (2026-10-18)
         # S&P 500 그래프가 커버 이미지 자리 (2026-10-18 사용자, 엔비디아처럼). 그래프가 없는 날만 AI 커버
         sec_chart(output_dir) or _cover_image(cover_url),
+        # 오늘 탭 머리 = 탭 줄 바로 아래 (2026-11-07 사용자: 한국 증시 리포트처럼, 구획 제목 · 그래프 제목 없이)
+        #   시가 갭 · 장중 · 하루 막대 → 지수 표(S&P 500 + 지수 3개 더 보기) → 한 줄 결론(data-lead) → 지수 해설 문장. 테마는 첫 data-cards 부터 첫 h2 까지를 첫 탭에 넣는다
+        sx.split_chart(a),
+        sec_indices(indices, analysis, report, with_text=False),
         sec_lead(report, analysis),
+        _text(report.get("summary")),
     ]
     # 오늘 탭 = 옛 시장 탭 카드까지 한 곳에 (2026-11-07 사용자: "시장 탭을 오늘 탭으로 다 옮기자" — 시장 탭은 없앰). 맨 첫 카드만 펼침
     # 세 덩어리 (같은 날 P384): ① 주요 지수 = 같은 지수를 근거로 쓰는 것(지수 값 → 평소와 달랐나 → 충격 → 흐름 → 기술주 · 소형주)
     #   ② 종목 · 업종 = 무엇이 움직였나(대형주 10개 → 업종 → 테마 → 고르게) ③ 시장 바탕(긴장 → 금리 → 경제)
     grid = lambda h: cards.cards_grid(h) if h else ""  # noqa: E731
     idx_cards = sx.normal_card(a) + sx.shock_card(a) + mk.index_cards(a, prev)
-    parts.append(dk.section("주요 지수", sx.split_chart(a) + sec_indices(indices, analysis, report) + grid(idx_cards), tab=TAB_TODAY))   # 맨 위 = 시가 갭 · 장중 · 하루 막대 (2026-11-07 사용자)
+    parts.append(dk.section(TAB_TODAY, grid(idx_cards), tab=TAB_TODAY))   # 탭 이름과 같은 제목은 테마가 숨긴다 — `주요 지수` 제목 삭제 (2026-11-07 사용자), 지수 표 · 그래프는 탭 머리로
     move = mk.move_cards(a, prev)
     if move:
         parts.append(dk.section("종목 · 업종", grid(move), tab=TAB_TODAY))
