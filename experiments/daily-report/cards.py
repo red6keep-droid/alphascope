@@ -214,7 +214,7 @@ def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near
     at = f"clamp({GAUGE_INSET}px, {pos:.1f}%, calc(100% - {GAUGE_INSET}px))"
     bar = (f'<span style="position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:3px;background:#E2E8F0;">'
            f'<span style="position:absolute;left:0;top:0;bottom:0;width:{at};border-radius:3px;background:#BFDBFE;"></span>'
-           + "".join(f'<span style="position:absolute;left:{max(0.0, min(100.0, p)):.2f}%;top:-4px;z-index:1;width:2px;height:14px;margin-left:-1px;background:{dk.DOWN};"></span>' for _t, p in (marks or []))
+           + "".join(f'<span style="position:absolute;left:{max(0.0, min(100.0, p)):.2f}%;top:-4px;z-index:1;width:2px;height:18px;margin-left:-1px;background:{dk.DOWN};"></span>' for _t, p in (marks or []))
            + '</span>')
     aria = esc(f"1년 범위 {fmt(low)}~{fmt(high)}, {text}")
     gauge = (f'<span data-range-gauge="1" aria-label="{aria}" style="position:relative;display:block;height:{GAUGE_H}px;">'
