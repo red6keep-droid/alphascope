@@ -231,6 +231,14 @@ def is_korea(r):
     return "kr" in (r.get("groups") or [r.get("group")])
 
 
+def us_to_kr(iss, n=None):
+    """미국 증시 리포트 `한국장` 탭 (2026-11-07 사용자 P373: 한국 증시 리포트와 겹치지 않게 내용으로 나눔) — 미국(한국 아닌) 이야기인데 한국 종목이 걸린 이슈.
+    예: 애플 폴더블 아이폰 → 삼성전자, 마이크론 실적 → SK하이닉스. 한국 증시 이야기(is_korea)는 한국 증시 리포트에만."""
+    out = [r for r in iss if r["category"] != "OTHER" and not is_korea(r) and any(kr_code(t) for t in r["tickers"])]
+    out = sorted(out, key=lambda r: str(r["published_at"]), reverse=True)
+    return out[:n] if n else out
+
+
 def korea(iss, n=6):
     """한국장에 영향을 줄 만한 소식 — country=KR 이거나 한국 종목('(KR)')이 붙은 이슈, 최근 순 n 개 (media-daily cluster.korea_links 와 같은 기준).
     2026-10-25 사용자: 미국 데일리 `한국장` 탭으로. iss = issues() 결과."""
@@ -456,14 +464,24 @@ def direction_counts(iss):
     return out
 
 
-def event(r, n_all=0):
+def kr_related(r, prices):
+    """방송 이슈의 한국 종목 → [(이름, 그날 등락%)] — prices = {코드: (이름, 등락)} (P355)."""
+    out = []
+    for t in r.get("tickers") or []:
+        c = kr_code(t)
+        if c and c in prices and all(c != x for x, _ in out):
+            out.append((c, prices[c]))
+    return [(nm, v) for _, (nm, v) in out]
+
+
+def event(r, n_all=0, prices=None):
     """종목 페이지 · 엔비디아 리포트 뉴스 목록 한 줄 (nvda-report judge._ev 모양). 헤드라인 = 방송 주제, 요약 줄 = 방송 주장(note), 매체 자리 = 채널, 라벨 = 영역 · 방향 · 방송.
     has_fact=False · media=True — 중요 이슈(사실 문장) · AI 서술 입력에는 넣지 않는다 (의견이 섞여 있다)."""
     return {"area": AREA.get(r["category"], "Other"), "kind": "news", "title": r["topic"], "fact": r["topic"], "detail": r["note"], "url": r["url"],
             "direction": "uncertain" if r.get("split") else r["direction"], "emphasis": False, "published_at": r["published_at"],
             "source": r["channel"] + (f" · 방송 {r['n_channels']}곳" if r.get("n_channels", 1) > 1 and not n_all else ""), "n_all": n_all,   # 분모를 알면 칸 막대(P338), 모르면 옛 글씨
             "speaker": LABEL, "media": True, "has_fact": False, "rel": 0, "prio": False,
-            "issue": r.get("category"), "pop_lines": r.get("lines") or [], "n_channels": r.get("n_channels", 1), "channel": r["channel"], "pop_key": r.get("id") or r["url"]}   # 요약 팝업 재료 (2026-11-07 P337)
+            "issue": r.get("category"), "related": kr_related(r, prices) if prices else [], "pop_lines": r.get("lines") or [], "n_channels": r.get("n_channels", 1), "channel": r["channel"], "pop_key": r.get("id") or r["url"]}   # 요약 팝업 재료 (2026-11-07 P337)
 
 
 def main():

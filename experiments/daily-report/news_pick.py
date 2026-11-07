@@ -43,6 +43,31 @@ def _seed_home_summaries(cache_path):
         news_summary._save(cache_path, cache)
         print(f"[news_pick] 홈 요약 {len(add)}건 재사용")
 
+
+# 뉴스 탭 분야 탭 = 8개 묶음 (2026-11-07 사용자 P357: 18개 분류를 전부 탭으로 만들어 너무 많았다 — 탭에만, 줄 라벨 · 기록은 18개 그대로).
+# 근거 = 방송 이슈 12일 1,467건 하루 평균 — 하루 10건 안팎씩 되게 작은 분야를 뜻이 가까운 큰 탭에 붙였다
+TAB_GROUP = {"AI_CAPEX": "AI · 반도체", "EARNINGS": "실적 · 기업", "CORP_EVENT": "실적 · 기업", "INVESTOR_CALLS": "실적 · 기업",
+             "RATES_FED": "금리 · 경기", "INFLATION": "금리 · 경기", "GROWTH_JOBS": "금리 · 경기",
+             "FISCAL_POLITICS": "정치 · 규제", "REGULATION": "정치 · 규제", "GEOPOLITICS": "지정학 · 무역", "TARIFF_TRADE": "지정학 · 무역",
+             "OIL_ENERGY": "유가 · 원자재"}   # 나머지(수급 · 신용 · 환율 · 부동산 · 암호화폐 · 그 밖) = 시장 · 기타
+
+
+def tab_of(theme_ko):
+    import issue_codes
+    code = next((c for c, n in issue_codes.ISSUE_KO.items() if n == theme_ko), "OTHER")
+    return TAB_GROUP.get(code, "시장 · 기타")
+
+
+def tab_order(picks, rest):
+    """분야 탭 순서 (P358): 주요 뉴스 1번 기사의 탭 → 2번 … (같은 탭은 한 번) → 나머지 탭은 그날 건수 많은 순. 값 = [(탭, 건수)]."""
+    counts = {}
+    for g in picks + rest:
+        t = tab_of(g["theme"])
+        counts[t] = counts.get(t, 0) + 1
+    order = list(dict.fromkeys(tab_of(g["theme"]) for g in picks))
+    order += [t for t, _ in sorted(counts.items(), key=lambda kv: -kv[1]) if t not in order]
+    return [(t, counts[t]) for t in order]
+
 def _issue_ko(n):
     """CNBC 기사 분야 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339). 옛 theme(8개 화면 어휘)은 issue 가 없을 때만."""
     import issue_codes
@@ -90,13 +115,14 @@ def prev_run():
         return {"links": set(), "at": ""}
 
 
-def build(input_data, analysis, media_lines, now=None, summarize=True, all_channels=None):
+def build(input_data, analysis, media_lines, now=None, summarize=True, all_channels=None, prev=None, stories_cache=None, label="daily-stories"):
     """재료 → {"stories", "picks", "rest", "chips", "n_channels_all", "channels_all", "prev", "lines", "stocks"}.
-    media_lines = media_feed.market_top(issues) (시장 · 업종 이슈, 48시간). analysis 는 없을 수 있다."""
+    media_lines = media_feed.market_top(issues) (시장 · 업종 이슈, 48시간). analysis 는 없을 수 있다.
+    한국 증시 리포트(M82) = 기사 없이 방송만, prev · stories_cache 를 따로 준다 (미국 데일리 상태를 쓰지 않게)."""
     now = now or datetime.datetime.now(datetime.timezone.utc)
     series = (analysis or {}).get("series") or {}
     sx = stocks()
-    prev = prev_run()
+    prev = prev if prev is not None else prev_run()
     items, src = [], {}
     for i, n in enumerate(input_data.get("news") or []):
         if not (n.get("headline_ko") or n.get("title")):
@@ -116,7 +142,7 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
               "lines": [str(x) for x in (r.get("lines") or []) if x][:5], "new": _iso(r["published_at"]) > prev["at"] if prev["at"] else False}
         items.append(it)
         src[it["id"]] = it
-    stories = news_stories.group(items, cache_path=os.path.join(STATE_DIR, "news_stories.json"), label="daily-stories")
+    stories = news_stories.group(items, cache_path=stories_cache or os.path.join(STATE_DIR, "news_stories.json"), label=label)
     story_of = {it["id"]: g for g in stories for it in g["items"]}
     recent = (now - datetime.timedelta(hours=RECENT_HOURS)).strftime("%Y-%m-%dT%H:%M")
 

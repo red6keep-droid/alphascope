@@ -13,8 +13,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 # 2026-10-18 재설계: 시장 상태 점수 해설(regime_*) · 급등주 · 관심 종목 · 위험요인 칸을 뺐다 (doc/기획/데일리-리포트-기획.md 5절 B5 · B6)
-REQUIRED_LLM_KEYS = ["one_line", "summary", "change_comment", "sector_comment", "news",
-                     "macro_comment", "opinion", "image_prompt"]
+REQUIRED_LLM_KEYS = ["one_line", "summary", "news", "image_prompt"]   # change · sector · macro_comment · opinion 은 2026-11-07 시장 탭 질문 카드로 바뀌며 뺐다
 
 ONE_LINE_MAX_LEN = 80   # 원인 하나 한 문장 (2026-10-18 재설계 — 지수 등락 · 평소 범위는 맨 앞 요약이 말한다)
 
@@ -82,19 +81,13 @@ def validate(input_path, output_path, analysis_path=None):
             errors.append(f"Gemini 출력 필수 키 누락: {key}")
 
     # 점수 · 등급 말투가 남았는지 — 지시문 규칙 9. 게시를 막지는 않는다
-    for k in ("one_line", "opinion", "summary"):
+    for k in ("one_line", "summary"):
         if any(w in str(report.get(k) or "") for w in ("위험 선호", "위험 회피", "Risk-On", "Risk-Off")):
             warnings.append(f"{k} 에 시장 등급 말투가 있습니다 (규칙 9).")
         if any(w in str(report.get(k) or "") for w in ("지지선", "저항선", "저점 시험", "돌파", "급등했", "폭등")):
             warnings.append(f"{k} 에 차트 해석 · 과장 말투가 있습니다 (규칙 9).")
 
-    # 칸끼리 같은 말 되풀이 — 한 줄 결론과 종합이 같은 낱말을 많이 나누면 경고 (2026-10-18 사용자: 홈 카드 요약이 같은 말 반복)
-    def _words(t):
-        return {w for w in re.findall(r"[가-힣A-Za-z0-9]{2,}", str(t or "")) if len(w) >= 2}
-    a_, b_ = _words(report.get("one_line")), _words(report.get("opinion"))
-    if a_ and b_ and len(a_ & b_) / max(1, min(len(a_), len(b_))) >= 0.5:
-        warnings.append(f"one_line 과 opinion 이 같은 말을 되풀이합니다 (겹치는 낱말 {sorted(a_ & b_)[:8]}).")
-    for k in ("one_line", "opinion", "summary"):
+    for k in ("one_line", "summary"):
         if "평소 범위" in str(report.get(k) or "") or "평소 하루" in str(report.get(k) or ""):
             warnings.append(f"{k} 에 '평소 범위' 이야기가 있습니다 — 맨 앞 요약 · 카드와 겹칩니다.")
 

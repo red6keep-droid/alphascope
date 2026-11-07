@@ -59,9 +59,10 @@ def main():
         import narrate
         narrate.narrate()
     print("[6/7] 렌더"); render_html.render()
-    import stock_mentions   # 종목 페이지 · 미국 증시 리포트용 발언 (2026-11-07 사용자 P324) — 상태 폴더에 써서 radar-state 로 저장
-    stock_mentions.update(os.path.join(config.OUTPUT_DIR, "radar.json"), narrative_path, os.path.join(a.state, "people_mentions.json") if a.state else stock_mentions.OUT)
     print("[7/7] 게시" + ("" if a.publish else " — dry-run")); publish.publish(do_publish=a.publish)
+    import stock_mentions   # 종목 페이지 · 미국 증시 리포트용 발언 (2026-11-07 사용자 P324) — 게시 뒤(그 글 주소를 `○○ 발언 더 보기` 에 쓴다, P371). 상태 폴더 → radar-state
+    stock_mentions.update(os.path.join(config.OUTPUT_DIR, "radar.json"), narrative_path, os.path.join(a.state, "people_mentions.json") if a.state else stock_mentions.OUT,
+                          post_url_path=os.path.join(config.OUTPUT_DIR, "post_url.txt") if a.publish else None)
 
 
 if __name__ == "__main__":

@@ -452,9 +452,10 @@ def sec_company(s):
     if not c.get("name"):
         return intro or _dk.muted("기업 정보를 아직 받지 못했습니다.")
     url = c.get("website") or ""
+    url_short = re.sub(r"^https?://(www\.)?", "", url).rstrip("/")   # f-string 밖에서 — Python 3.10 은 f-string 안 백슬래시를 못 읽는다
     place = " · ".join(x for x in (c.get("city"), STATE_KO.get(c.get("state"), c.get("state")) if c.get("country") == "United States" else c.get("country")) if x)
     rows = [("정식 이름", _esc(c["name"])), ("대표", _esc(_person(c.get("ceo")))), ("본사", _esc(place)),
-            ("홈페이지", f'<a href="{_esc(url)}" style="color:inherit;text-decoration:none;" target="_blank" rel="nofollow noopener">{_esc(re.sub(r"^https?://(www\.)?", "", url).rstrip("/"))}</a>' if url else ""),
+            ("홈페이지", f'<a href="{_esc(url)}" style="color:inherit;text-decoration:none;" target="_blank" rel="nofollow noopener">{_esc(url_short)}</a>' if url else ""),
             ("직원", f"{c['employees']:,}명" if c.get("employees") else ""), ("결산", f"{c['fy_month']}월" if c.get("fy_month") else ""),
             ("상장", " · ".join(x for x in (_esc(c.get("exchange") or ""), f"티커 {s['sym']}", f"{c['listed']}년부터" if c.get("listed") else "") if x)),
             ("업종", _esc(U.BY_SYM[s["sym"]][3]) if s["sym"] in U.BY_SYM and len(U.BY_SYM[s["sym"]]) > 3 else "")]
@@ -763,7 +764,7 @@ def sec_today_tab(s, news):
 def sec_people(s):
     """오늘 탭 뉴스 아래 — 최근 7일 이 종목을 지목한 인물 발언 3줄 + 접기 + 전체 보기 (2026-11-07 사용자). 없으면 구획을 뺀다."""
     body = people_section.for_stock(s["sym"])
-    return R._section("인물 발언", body, summary="최근 7일", line=False, tab="오늘") if body else ""
+    return R._section("인물 발언", body, line=False, tab="오늘") if body else ""   # `최근 7일` 뺌 — 줄마다 시각 (P369)
 
 
 def _bil(v):

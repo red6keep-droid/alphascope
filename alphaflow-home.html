@@ -334,14 +334,14 @@ body.menu-open { overflow: hidden; }
 .nt-chg { margin-left: auto; flex: none; font-family: var(--num); font-size: 15px; white-space: nowrap; }
 .nt-chg .nt-ex { margin-left: 6px; font-size: 13px; color: #6B7280; }
 .nt-more { padding: 8px 0 4px; font-size: 14px; line-height: 20px; color: #2563EB; cursor: pointer; }
-.nt-note { padding: 8px 0; font-size: 15px; line-height: 22px; color: var(--gray-400); }
+.nt-note { padding: 8px 0; font-size: 15px; line-height: 23px; color: var(--gray-400); }
 @media (max-width: 900px) { .nt-grid { grid-template-columns: minmax(0, 1fr); } }
 #radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
 .kv-stats + .kv-row, .kv-row + .kv-row { border-top: 1px solid #E2E8F0; }
 .kv-name { flex: none; font-weight: 700; font-size: 16px; line-height: 24px; color: #111; }
-.kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 19px; line-height: 24px; color: #111; white-space: nowrap; }
+.kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 19px; line-height: 25px; color: #111; white-space: nowrap; }
 .kv-value.up { color: var(--up); } .kv-value.down { color: var(--down); }
 .kv-value small { font-size: 14px; font-weight: 400; color: #7A7A7A; }
 .kv-rel { display: inline-flex; align-items: baseline; gap: 6px; flex: none; }   /* 가격 줄 왼쪽: 시장 대비 증감 값 + '시장 대비' (2026-10-15 사용자) */
@@ -353,7 +353,7 @@ body.menu-open { overflow: hidden; }
 .kv-stat { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0 4px; text-align: center; }
 .kv-stat + .kv-stat { border-left: 1px solid #E2E8F0; }
 .kv-stat-name { font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
-.kv-stat-value { font-family: var(--num); font-weight: 700; font-size: 17px; line-height: 24px; color: #111; white-space: nowrap; }
+.kv-stat-value { font-family: var(--num); font-weight: 700; font-size: 17px; line-height: 25px; color: #111; white-space: nowrap; }
 .kv-stat-value.up { color: var(--up); } .kv-stat-value.down { color: var(--down); }
 .kv-row--block ul { display: flex; flex-direction: column; gap: 12px; }
 .kv-row--block li { display: flex; align-items: flex-start; gap: 7px; font-size: 19px; line-height: 35px; color: #111; word-break: keep-all; }
@@ -701,12 +701,12 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .eb-slide .stock-avatar.has-logo { background: transparent !important; }
 .eb-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .eb-kicker { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.eb-name { font-size: 29px; font-weight: 800; line-height: 38px; letter-spacing: -.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.eb-dday { flex: none; padding: 0 9px; border-radius: 6px; background: #F43F5E; color: #fff; font-family: var(--num); font-size: 15px; font-weight: 700; line-height: 26px; white-space: nowrap; }
+.eb-name { font-size: 29px; font-weight: 800; line-height: 39px; letter-spacing: -.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eb-dday { flex: none; padding: 0 9px; border-radius: 6px; background: #F43F5E; color: #fff; font-family: var(--num); font-size: 15px; font-weight: 700; line-height: 27px; white-space: nowrap; }
 .eb-dday.is-ahead { background: #F97316; }   /* D-숫자는 전부 주황, D-DAY 만 빨강 (2026-10-29 사용자) */
 .eb-title-line { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
 .eb-title { flex: none; font-size: 18px; font-weight: 700; line-height: 26px; }
-.eb-when { min-width: 0; font-size: 15px; line-height: 22px; color: rgba(255, 255, 255, .78); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eb-when { min-width: 0; font-size: 15px; line-height: 23px; color: rgba(255, 255, 255, .78); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .eb-slide:hover .eb-name { text-decoration: underline; text-underline-offset: 5px; }
 .eb-more { margin-left: auto; flex: none; display: flex; align-items: center; gap: 14px; margin-right: 8px; color: rgba(255, 255, 255, .7); font-size: 15px; white-space: nowrap; }
 .eb-chev { width: 18px; height: 18px; border-top: 3px solid rgba(255, 255, 255, .55); border-right: 3px solid rgba(255, 255, 255, .55); transform: rotate(45deg); }
@@ -718,11 +718,11 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 @media (max-width: 680px) {
   .eb-slide { gap: 12px; padding: 24px 4px 40px; }
   .eb-slide .stock-avatar { width: 44px; height: 44px; font-size: 16px; }
-  .eb-name { font-size: 23px; line-height: 30px; }
-  .eb-dday { font-size: 13px; line-height: 22px; padding: 0 7px; }
+  .eb-name { font-size: 23px; line-height: 31px; }
+  .eb-dday { font-size: 13px; line-height: 23px; padding: 0 7px; }
   .eb-title-line { gap: 8px; }
-  .eb-title { font-size: 15px; line-height: 22px; }
-  .eb-when { font-size: 13px; line-height: 20px; }
+  .eb-title { font-size: 15px; line-height: 23px; }
+  .eb-when { font-size: 13px; line-height: 21px; }
   .eb-more { margin-right: 4px; }
   .eb-more-text { display: none; }   /* 폰은 화살표만 */
   .eb-chev { width: 14px; height: 14px; border-width: 2.5px; }
@@ -890,7 +890,7 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
     overflow-y: auto;
   }
   .menu-items.is-open { transform: none; }
-  .nav-item { padding: 14px 24px; font-size: 18px; line-height: 27px; border-bottom: 1px solid var(--border); }
+  .nav-item { padding: 14px 24px; font-size: 18px; line-height: 28px; border-bottom: 1px solid var(--border); }
   .nav-item[aria-current="page"]::after { display: none; }
   .nav-close { display: flex; }
 
@@ -1357,7 +1357,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var img = document.createElement('img');
     img.alt = ''; img.loading = 'lazy'; img.width = 26; img.height = 26;
     img.onload = function () { av.classList.add('has-logo'); };
-    img.onerror = function () { if (img.parentNode) img.parentNode.removeChild(img); };
+    var tried = false;   /* svg 없으면 jpg 한 번 더 — 출처에 JPEG 만 있는 종목(META · JPM · ABBV · PG, 2026-11-07 P374) */
+    img.onerror = function () { if (!tried) { tried = true; img.src = LOGO_BASE + encodeURIComponent(String(ticker).toUpperCase()) + '.jpg'; return; } if (img.parentNode) img.parentNode.removeChild(img); };
     img.src = LOGO_BASE + encodeURIComponent(String(ticker).toUpperCase()) + '.svg';
     av.appendChild(img);
     return av;
@@ -1992,13 +1993,14 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var media = it.kind === 'media';
     homePop.querySelector('.rt-pop-title').textContent = it.title;
     var body = homePop.querySelector('.rt-pop-body'); body.textContent = '';
-    var meta = el('span', null, [mdhm(kstTime(it.published)), (it.source || 'CNBC') + (media ? ' 방송' : ' 기사')].concat(media && it.n_channels > 1 ? ['방송 ' + it.n_channels + '곳'] : []).join(' · '));
-    meta.style.cssText = 'display:block;font-size:13px;line-height:19px;color:#999;margin:0 0 6px;';
-    body.appendChild(meta);
     it.lines.forEach(function (ln) {
-      var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:4px 0;';
-      var dot = el('span'); dot.style.cssText = 'flex:none;width:3px;height:3px;margin-top:15px;border-radius:50%;background:#111;';
-      var tx = el('span', null, ln); tx.style.cssText = 'min-width:0;font-size:19px;line-height:35px;color:#333;word-break:keep-all;';
+      var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:11px 0;';   /* 행간 28 · 항목 여백 11 (P359) */
+      var dot = el('span'); dot.style.cssText = 'flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;';
+      /* 발언자 = 내용 뒤 작은 회색 `- 이름`, 이름 없으면 `- 방송 의견` (P353, design_kit.speaker_split 과 같은 규칙) */
+      var m = /^\s*([^:：]{0,30}?)\s*(진행자 발언|기자 보도|발언|진행자|앵커|보도|발표)\s*[:：]\s*(.+)$/.exec(ln), who = '';   /* 접두 꼴 넓힘 (P377) */
+      if (m) { ln = m[3]; who = /^(진행자|앵커|방송|패널|출연자|기자)?$/.test(m[1].trim()) ? '방송 의견' : m[1].trim() + (m[2] === '기자 보도' ? ' 기자' : ''); }
+      var tx = el('span', null, ln); tx.style.cssText = 'min-width:0;font-size:19px;line-height:28px;color:#333;word-break:keep-all;';
+      if (who) { var wt = el('span', null, ' - ' + who); wt.style.cssText = 'color:#999;font-size:14px;white-space:nowrap;'; tx.appendChild(wt); }
       row.appendChild(dot); row.appendChild(tx); body.appendChild(row);
     });
     if (it.link) {
@@ -3101,7 +3103,9 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     /* 2026-10-22 사용자: 로고는 신뢰도 — 우리 gh-pages 사본이 있으면 배지 자리를 로고로 바꾼다. 없으면 배지 그대로 (운영지침 4-6) */
     var img = document.createElement('img'); img.alt = ''; img.className = 'title-logo';
     img.onload = function () { if (b.parentNode) b.parentNode.replaceChild(img, b); };
-    img.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/' + (kr ? 'KR_' + kr[1] : encodeURIComponent(sym.replace('.', '-'))) + '.svg';
+    var lb = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/' + (kr ? 'KR_' + kr[1] : encodeURIComponent(sym.replace('.', '-')));
+    img.onerror = function () { if (!img.dataset.jpg) { img.dataset.jpg = '1'; img.src = lb + '.jpg'; } };   /* svg 없으면 jpg (P374) */
+    img.src = lb + '.svg';
   });
 })();
 
@@ -3273,6 +3277,22 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
   pop.querySelector('.rt-pop-close').addEventListener('click', close);
   document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
+})();
+
+/* ============================================================ 팝업 스크롤 잠금 (2026-11-07 사용자 P350)
+   .rt-pop(뉴스 팝업 · 홈 뉴스 팝업 · 툴팁 팝업 · 그래프 확대)이 하나라도 열려 있으면 html.pop-lock — 뒤 본문이 같이 스크롤되지 않는다.
+   iOS 는 overflow 만으로 안 막혀서 열 때 스크롤 위치를 고정(position:fixed + top)하고 닫을 때 되돌린다 */
+(function () {
+  'use strict';
+  var y = 0, locked = false, root = document.documentElement;
+  function sync() {
+    var open = [].some.call(document.querySelectorAll('.rt-pop'), function (p) { return !p.hidden; });
+    if (open === locked) return;
+    locked = open;
+    if (open) { y = window.scrollY; root.classList.add('pop-lock'); document.body.style.cssText += ';position:fixed;top:' + (-y) + 'px;left:0;right:0;'; }
+    else { root.classList.remove('pop-lock'); document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = ''; window.scrollTo(0, y); }
+  }
+  new MutationObserver(sync).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden'] });
 })();
 
 /* ============================================================ 더 보기 단계 (2026-11-07 사용자 P340)

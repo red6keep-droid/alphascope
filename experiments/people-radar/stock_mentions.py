@@ -20,6 +20,7 @@ import subprocess
 import sys
 
 import config
+import paths
 
 sys.path.insert(0, os.path.join(config.BASE_DIR, "..", "stock-radar"))
 try:
@@ -40,8 +41,38 @@ def _ko(sym):
         return ""
 
 
+def _pop_lines(s, card):
+    """팝업 줄 (2026-11-07 사용자 P366) — 새 AI 없이 레이더가 만든 한국어 재료만. 영어 원문 인용은 싣지 않는다(운영지침 4-3)."""
+    out = []
+    if card.get("detail"):
+        out.append(card["detail"])
+    pth = s.get("path")
+    if pth and pth.get("assets"):
+        why = card.get("path") or paths.CHANNEL_KO.get(pth.get("channel"), "")
+        out.append(" · ".join((paths.asset_label(a) if a in paths.ASSET_KO else f"{_ko(a)}({a})" if _ko(a) else a) for a in pth["assets"]) + (f" : {why}" if why else ""))   # 종목은 `엔비디아(NVDA)` (인물 발언 글과 같게)
+    n = s.get("novelty") or {}
+    if n.get("first30"):
+        out.append("30일 만에 처음 나온 주제")
+    elif n.get("streak", 0) >= 2:
+        out.append(f"{n['streak']}일째 같은 주제")
+    nx = s.get("next")
+    if nx and nx.get("day"):
+        _, m, d = nx["day"].split("-")
+        out.append(f"다음 날짜 : {int(m)}월 {int(d)}일 {nx.get('kind', '')}".strip())
+    return out   # `보도 : 매체` 줄은 뺐다 — 매체는 원문 링크 글자에 (2026-11-07 사용자 P370)
+
+
+def _avatar(p):
+    """줄 왼쪽 얼굴 동그라미 (2026-11-07 사용자 P368) — 인물 발언 글과 같은 것(사진, 없으면 성 첫 글자 · 인물군 색)."""
+    try:
+        import render_html
+        return render_html._avatar(p, 32)
+    except Exception:  # noqa: BLE001
+        return ""
+
+
 def _item(p, s, card):
-    return {"id": s["lead"]["id"], "speaker": p["speaker"], "name_ko": p["name_ko"], "title_ko": p["title_ko"],
+    return {"pop": _pop_lines(s, card), "avatar": _avatar(p),"id": s["lead"]["id"], "speaker": p["speaker"], "name_ko": p["name_ko"], "title_ko": p["title_ko"],
             "headline": card["headline"], "detail": card.get("detail") or "",
             "url": s["lead"]["url"] if (s["lead"].get("url") or "").startswith("http") else None,
             "at": s["first_at"], "publisher": (s["lead"].get("publisher") or "").strip(), "primary": s["source_kind"] == "primary",
@@ -56,7 +87,41 @@ def _points_at(it, sym):
     return bool(name) and (name in it["headline"] or name in it["detail"])
 
 
-def build(snapshots, now=None, prior=None):
+def summary(radar):
+    """인물 발언 탭 맨 위 요약 (2026-11-07 사용자 P376) — 오늘(레이더 24시간) 신호만, 파이썬 셈 · AI 없음.
+    topics = 많이 나온 분야 3 [(이슈 코드, 건수, [이름], {방향: 건수})] · split = 의견이 갈린 분야(긍정 · 부정 각 2건 이상, 적은 쪽이 많은 쪽의 절반 이상)
+    [(이슈, 긍정 쪽 대표 (이름, 건수), 부정 쪽 대표 (이름, 건수))] · stocks = 많이 언급된 종목 3 [(티커, 이름, 건수, [인물])]."""
+    from collections import Counter, defaultdict
+    sig = [(p, s) for p in radar.get("people", []) for s in p["signals"]]
+    by = defaultdict(list)
+    for p, s in sig:
+        by[s.get("issue") or "OTHER"].append((p["name_ko"], s["direction"]))
+    topics = []
+    for k, v in sorted(by.items(), key=lambda kv: (-len(kv[1]), -len({n for n, _ in kv[1]})))[:3]:   # 같은 건수면 말한 인물이 많은 쪽 (P380)
+        who = list(dict.fromkeys(n for n, _ in v))
+        topics.append({"issue": k, "n": len(v), "n_who": len(who), "who": who[:4], "dirs": dict(Counter(d for _, d in v))})
+    split = []
+    for k, v in by.items():
+        pos = Counter(n for n, d in v if d == "positive")
+        neg = Counter(n for n, d in v if d == "negative")
+        np_, nn = sum(pos.values()), sum(neg.values())
+        if np_ >= 2 and nn >= 2 and min(np_, nn) * 2 >= max(np_, nn):
+            pa = pos.most_common(1)[0]
+            na = next((x for x in neg.most_common() if x[0] != pa[0]), None)   # 양쪽은 다른 사람 — 한 사람이 오락가락한 건 `갈림` 이 아니다
+            if na:
+                split.append({"issue": k, "pos": pa, "neg": na, "n": np_ + nn})
+    split.sort(key=lambda x: -x["n"])
+    comp, cdir = defaultdict(list), defaultdict(Counter)
+    for p, s in sig:
+        for c in s.get("companies") or []:
+            comp[c].append(p["name_ko"])
+            cdir[c][s["direction"]] += 1   # 그 종목 발언의 방향 — 질문 카드 색 (P380)
+    stocks = [{"sym": c, "name": _ko(c) or c, "n": len(v), "who": list(dict.fromkeys(v))[:3], "dirs": dict(cdir[c])}
+              for c, v in sorted(comp.items(), key=lambda kv: -len(kv[1]))[:3] if len(v) >= 2]
+    return {"topics": topics, "split": split[:2], "stocks": stocks, "n_people": len(radar.get("people", [])), "n": len(sig)}
+
+
+def build(snapshots, now=None, prior=None, post_url=None):
     """snapshots = [(radar, cards)] 오래된 것부터. 같은 발언(id)은 마지막 것. prior = 지난 실행의 items(7일 누적)."""
     now = now or datetime.datetime.now(datetime.timezone.utc)
     since7 = (now - datetime.timedelta(days=DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -82,7 +147,8 @@ def build(snapshots, now=None, prior=None):
         seen.add(it["speaker"])
         market.append(it["id"])
     used = set(market) | {i for ids in by_stock.values() for i in ids}
-    return {"generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "days": DAYS, "market": market[:6], "by_stock": by_stock,
+    return {"generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "days": DAYS, "post_url": post_url,
+            "summary": summary(snapshots[-1][0]) if snapshots else {}, "market": market[:6], "by_stock": by_stock,
             "items": {i: items[i] for i in used}}
 
 
@@ -104,7 +170,8 @@ def from_git(ref="state/radar-state"):
             snaps.append((radar, narr.get("cards") or {}))
     last = snaps[-1][0]["generated_at"] if snaps else None
     now = datetime.datetime.strptime(last, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc) if last else None
-    return build(snaps, now)
+    pu = os.path.join(config.BASE_DIR, "output", "post_url.txt")   # 목업 = 로컬에 남은 마지막 게시 주소
+    return build(snaps, now, post_url=open(pu, encoding="utf-8").read().strip() if os.path.exists(pu) else None)
 
 
 def write(data, path=OUT):
@@ -114,7 +181,7 @@ def write(data, path=OUT):
     print(f"[mentions] 종목 {len(data['by_stock'])}개 · 시장 {len(data['market'])}건 · 발언 {len(data['items'])}건 → {path}")
 
 
-def update(radar_path, narrative_path, path=OUT):
+def update(radar_path, narrative_path, path=OUT, post_url_path=None):
     """정기 실행 끝 (people-radar main.py) — 지난 파일(상태 브랜치 radar-state 에서 불러옴)의 7일 발언 + 오늘 신호 · 한국어 헤드라인. 실패해도 글은 나간다."""
     try:
         with open(radar_path, encoding="utf-8") as f:
@@ -123,11 +190,15 @@ def update(radar_path, narrative_path, path=OUT):
         if os.path.exists(narrative_path):
             with open(narrative_path, encoding="utf-8") as f:
                 cards = (json.load(f) or {}).get("cards") or {}
-        prior = {}
+        prior, old = {}, {}
         if os.path.exists(path):
             with open(path, encoding="utf-8") as f:
-                prior = (json.load(f) or {}).get("items") or {}
-        write(build([(radar, cards)], prior=prior), path)
+                old = json.load(f) or {}
+            prior = old.get("items") or {}
+        url = old.get("post_url")   # 오늘 게시가 없으면(dry-run · 0건) 지난 글 주소 그대로
+        if post_url_path and os.path.exists(post_url_path):
+            url = open(post_url_path, encoding="utf-8").read().strip() or url
+        write(build([(radar, cards)], prior=prior, post_url=url), path)
     except Exception as e:  # noqa: BLE001
         print(f"::warning::[mentions] 종목 · 증시 리포트용 발언 파일 실패 (글은 계속): {e!r}")
 

@@ -315,19 +315,7 @@ def col_frame(bars_html, axis_names, height, top, scale, ticks, min_w, right=Tru
     dec = max(0, -math.floor(math.log10(step) + 1e-9)) if step < 1 else 0
     fmt = lambda v: f"{abs(v):.{dec}f}" if abs(v) < 10 ** -(dec + 1) else f"{v:.{dec}f}".replace("-", "−")   # noqa: E731
     gut = int(max(text_px(fmt(v), GRID_FS) for v in ticks) + 6)
-    grid = []
-    for v in ticks:
-        y = top - v * scale
-        if abs(v) > 1e-12:
-            grid.append(f'<span style="position:absolute;left:{gut}px;right:0;top:{y:.1f}px;height:1px;background:{GRID_LINE};"></span>')
-        grid.append(f'<span style="position:absolute;left:0;width:{gut - 6}px;top:{y - 7:.1f}px;height:14px;line-height:14px;text-align:right;font-size:{GRID_FS}px;color:{NOTE};">{fmt(v)}</span>')
-    plot = (f'<span style="position:absolute;left:{gut}px;right:0;top:0;bottom:0;">'
-            f'<span style="position:absolute;left:0;right:0;top:{top:.1f}px;height:1px;background:#CBD5E1;"></span>{bars_html}</span>')
-    xl = "".join(f'<span style="flex:1 1 0;min-width:0;text-align:center;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;">{"<br>".join(esc(x) for x in g.split(chr(10)))}</span>' for g in axis_names)   # 긴 이름은 두 줄로 — 묶음 폭 상한(AXIS_MAX) 때문 (P155)   # 이름 아래 줄(연결 이유 · `지금`)은 줄바꿈 (2026-10-27 P31 · P36)
-    if right:
-        return _col_frame_right(bars_html, axis_names, height, top, scale, ticks, min_w, fmt, gut)
-    return scroll_x(f'<span style="display:block;position:relative;height:{height}px;">{"".join(grid)}{plot}</span>'
-                    f'<span style="display:flex;padding-left:{gut}px;font-size:{AXIS_FS};line-height:21px;color:{NOTE};margin:2px 0 6px;">{xl}</span>', min_w + gut)
+    return _col_frame_right(bars_html, axis_names, height, top, scale, ticks, min_w, fmt, gut)   # 옛 왼쪽 세로축 · 오른쪽 `넘겨 보기 ›` 경로는 지웠다 (2026-11-07, P166 통일 뒤 쓰는 곳 없음)
 
 
 def _col_frame_right(bars_html, axis_names, height, top, scale, ticks, min_w, fmt, gut):
@@ -451,27 +439,9 @@ def legend_top(chart_html, legend_html):
     return top + chart_html + '<span style="display:block;height:4px;"></span>'
 
 
-SCROLL_SHADE = ("background:linear-gradient(to left,#fff 30%,rgba(255,255,255,0)) 100% 0/28px 100% no-repeat local,"
-                "radial-gradient(farthest-side at 100% 50%,rgba(15,23,42,.18),rgba(15,23,42,0)) 100% 0/14px 100% no-repeat scroll;background-color:#fff;")
-
-
-SCROLL_CHEV = ('<svg viewBox="0 0 6 10" width="0.42em" height="0.7em" aria-hidden="true" style="margin-left:4px;vertical-align:-0.02em;position:relative;top:-1px;" '
-               'fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1.2 1.2 4.8 5 1.2 8.8"/></svg>')   # `›` 글자는 폰 글꼴에서 찌그러지고 가운데가 낮았다 — 직접 그림, 1px 위 (2026-10-26 사용자)
 SCROLL_SHADE_UP = 8   # 그림자를 그래프 위로 더 (안내 줄 쪽)
 SCROLL_HINT = "넘겨 보기"   # 옛 `밀어서 보기` (2026-10-26 사용자)
 FAINT = "#9CA3AF"   # 블로그 푸터 설명글의 흐린 글씨(테마 --gray-350) — `넘겨 보기` (같은 날 사용자)
-
-
-def scroll_x(html, min_w):
-    """화면이 그래프 최소 폭보다 좁으면 가로 스크롤 (넓으면 그대로 꽉 채운다).
-    더 있다는 표시 (2026-10-26 사용자: "밀어서 보기를 오른쪽 상단에, 오른쪽에 세로로 그림자를 넣어 더 있다는 걸"):
-    ① 오른쪽 세로 그림자 — 오른쪽에 더 있을 때만 보이고 끝까지 밀면 사라진다(CSS 만: 덮개 local · 그림자 scroll 배경) ·
-    ② 그래프 오른쪽 위 `밀어서 보기 ›` — 폰 폭에서 넘칠 때만 넣고, 화면이 넓어 안 넘치면 테마 JS(`data-scroll-hint`)가 숨긴다."""
-    hint = (f'<span data-scroll-hint="1" style="display:block;text-align:right;font-size:{TINY};line-height:{LH_TINY};color:{FAINT};margin:{LEGEND_TOP}px 0 4px;">{SCROLL_HINT}{SCROLL_CHEV}</span>'
-            if min_w > CHART_PHONE_W else "")   # 범례 없는 그래프는 오른쪽 위 (2026-10-26 사용자) — 범례가 있으면 legend_top 이 범례 줄 왼쪽으로 옮긴다
-    up = SCROLL_SHADE_UP if hint else 0   # 오른쪽 그림자를 위로 더 길게 — 안내 줄 높이까지 (2026-10-26 사용자)
-    return (f'{hint}<span data-scroll-x="1" data-shade-up="{up}" style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;{SCROLL_SHADE}padding-top:{up}px;margin-top:-{up}px;">'
-            f'<span style="display:block;min-width:{min_w}px;">{html}</span></span>')
 
 
 def sub_line(sub_html, lead=""):
@@ -861,7 +831,7 @@ def write_mock(body, path, title):
     js = re.search(r"//<!\[CDATA\[(.*?)//\]\]>", idx, re.S)
     if not (css and js):
         return None
-    body = re.sub(r"https://cdn\.jsdelivr\.net/gh/[^\"]+?@(?:gh-pages|kr-images)/(images/(?!logos/)[^\"]+)", r"\1", body)   # 로고는 로컬 사본이 없다 — gh-pages 주소 그대로 (2026-10-25)
+    body = re.sub(r"https://cdn\.jsdelivr\.net/gh/[^\"]+?@(?:gh-pages|kr-images)/(images/(?!logos/|people/)[^\"]+)", r"\1", body)   # 로고 · 인물 사진은 로컬 사본이 없다 — gh-pages 주소 그대로 (2026-10-25 · 11-07)
     # 글 아래 [목록] · TOP 줄 — 블로그 테마의 글 보기와 같은 마크업 (2026-10-18 사용자: 모든 페이지 공통). 목록 주소는 본문 [data-list-url] 이 있으면 그것
     lu = re.search(r'data-list-url="([^"]+)"', body)
     nav = (f'<p class="post-nav"><a class="post-nav-list" href="{lu.group(1) if lu else "#"}">목록</a>'
@@ -1336,39 +1306,6 @@ def bar(label, segs, split="right"):
             f'<span style="display:flex;width:100%;height:24px;border-radius:6px;overflow:hidden;background:#F1F5F9;margin:0 0 3px;">{body}</span>' + bar_pcts(pcts))
 
 
-# 범례 막대 — 지금 기준 모양 (가이드라인 1절 4-1 9 · 10-7: 엔비디아 `_legend_bar` 애널리스트 · 뉴스 막대와 같은 값). 위 bar() 는 2026-10-13 이전 모양이라
-# 새 막대는 이것을 쓴다 (2026-10-23 사용자: "다른 막대 그래프와 같은 규칙인지 — 범례 · 타이틀 · 막대 높이 · 막대 안 숫자 크기가 다르다")
-LEGEND_BAR_H, LEGEND_BAR_NUM, LEGEND_BAR_PAD = 30, "17px", 5   # 막대 높이 30 · 막대 안 숫자 17 · 위아래 바깥 +5 (2026-10-14 사용자)
-LEGEND_CHIP, LEGEND_INDENT = 9, 10   # 범례 색 사각형 9px · 범례 왼쪽 들여쓰기 10px (2026-10-17 사용자)
-
-
-def legend_bar(title, segs, aside="", legend_top=False):
-    """제목(왼쪽, 16px 검정 굵게) · 막대 · 막대 색과 같은 범례 칩 `■ 긍정 47% ■ 부정 37%`. segs = [(이름, 개수, 배경, 글자)], 0건은 뺀다.
-    aside: 제목 줄 오른쪽 글(14px 안내 회색) — 기준 규칙은 비워 두지만, 미디어 데일리는 `영상 n개 · 방송 n곳` (2026-10-23 사용자).
-    legend_top=True: 제목을 쓰지 않고 범례를 막대 위 줄 왼쪽에, aside 를 같은 줄 오른쪽에 둔다 (미디어 데일리, 2026-10-23 사용자)."""
-    segs = [x for x in segs if x[1]]
-    total = sum(x[1] for x in segs)
-    if not total:
-        return ""
-    title_html = f'<b style="color:#111;font-weight:700;">{esc(title)}</b>'
-    if aside:
-        title_html += f'<span style="font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};white-space:nowrap;">{aside}</span>'
-    head = f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:{BAR_LABEL};line-height:{LH_CARD};margin:0 0 3px;">{title_html}</span>'
-    body = "".join(f'<span style="display:block;width:{c / total * 100:.1f}%;background:{bg};color:{fg};font-size:{LEGEND_BAR_NUM};font-weight:700;'
-                   f'text-align:center;line-height:{LEGEND_BAR_H}px;overflow:hidden;white-space:nowrap;">{f"{c / total * 100:.0f}%" if c / total >= 0.08 else ""}</span>' for _, c, bg, fg in segs)
-    bar_html = (f'<span style="display:flex;width:100%;height:{LEGEND_BAR_H}px;border-radius:6px;overflow:hidden;background:#F1F5F9;'
-                f'margin:{LEGEND_BAR_PAD}px 0 {3 + LEGEND_BAR_PAD}px;">{body}</span>')
-    legend = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
-                     f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{bg};"></span>{esc(nm)} {c / total * 100:.0f}%</span>'
-                     for nm, c, bg, _ in segs)
-    if legend_top:
-        aside_html = (f'<span style="margin-left:auto;font-size:{TINY};line-height:{LH_TINY};font-weight:400;color:{NOTE};white-space:nowrap;">{aside}</span>' if aside else "")
-        top = (f'<span style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0 8px;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;'
-               f'font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 3px;"><span>{legend}</span>{aside_html}</span>')
-        return top + bar_html.replace(f"margin:{LEGEND_BAR_PAD}px 0 {3 + LEGEND_BAR_PAD}px;", f"margin:0 0 {3 + LEGEND_BAR_PAD}px;", 1)
-    return head + bar_html + (f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{legend}</span>')
-
-
 def hbar(value, max_value, color, width="80px"):
     """가로 막대 하나 (섹터 등락 등) — 카드 값 칸 안에 작게. width 는 CSS 폭 (값 칸을 채우려면 calc(100% - n px))."""
     pct = 0 if not max_value else min(100, abs(value) / max_value * 100)
@@ -1449,7 +1386,7 @@ NEWS_TITLE_FS, NEWS_TITLE_LH = "17px", "31px"   # 뉴스 기사 제목 — 본�
 NEWS_SUM = "display:block;color:#333;font-size:16px;line-height:26px;font-weight:400;margin-top:4px;word-break:keep-all;"   # 뉴스 요약 줄 = 홈 주요 뉴스 기사 소개(.news-sum)와 같게 (2026-10-26 사용자: 14px 로 더 작았다)
 
 
-def news_item(headline_html, url=None, detail="", subs=(), labels="", meta=(), link_attrs=""):
+def news_item(headline_html, url=None, detail="", subs=(), labels="", meta=(), link_attrs="", count_html=""):
     """공용 뉴스 카드 한 줄 (doc/기획/뉴스-형식-통일.md 2절, 기준 = 인물 발언 카드, 2026-10-25 사용자: 뉴스 형식 통일).
         헤드라인(굵게, 원문 링크) / 요약 한 줄(16px #333 = 홈 기사 소개, 없으면 생략) / 보조 줄들(subs) / [라벨] [라벨]  회색 메타(시각 · 매체)
     headline_html = 이스케이프한 헤드라인(명사형). detail = 요약 글(이스케이프 전 — 뉴스 문체로 바꾼다). labels = 알약 HTML 묶음. meta = 글자 목록.
@@ -1458,12 +1395,16 @@ def news_item(headline_html, url=None, detail="", subs=(), labels="", meta=(), l
             if url else f'<span style="color:#111;font-weight:700;font-size:{NEWS_TITLE_FS};line-height:{NEWS_TITLE_LH};display:block;">{headline_html}</span>')   # 제목 줄 = 블록 — 바깥 행간 34 가 끼어 위 여백만 3px 더 컸다 (2026-10-31 사용자 P187: 위 · 아래 여백 맞추기)   # 기사 제목 19 → 17 · 행간 34 → 30, 굵게 유지 (2026-10-31 사용자 P159)
     out = keep_tone(head)
     if detail:
-        out += keep_tone(f'<span style="{NEWS_SUM}">{esc(headline(detail))}</span>')
+        out += keep_tone(f'<span style="{NEWS_SUM}">{speaker_html(detail, tail=False)}</span>')   # 목록 줄은 발언자 없이 — 발언자는 팝업에서만 (P353 → P364)
     out += "".join(subs)
     meta = [m for m in meta if m]
+    meta_html = f'<span style="color:{SUB};font-size:{TINY};line-height:{LH_TINY};">{esc(" · ".join(meta))}</span>' if meta else ""
+    if count_html:   # 곳 수 막대가 있으면 라벨 줄 다음 줄에 `■■■□ 7곳 / 10곳  시각 · 매체` (2026-11-07 사용자 P348)
+        return (out + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 0;line-height:1;">{pill_row(labels)}</span>'
+                + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;">{count_html}{meta_html}</span>')
     return (out + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;">'   # 아래 +1 — 구분선 ~ 제목 26 · 메타 ~ 구분선 26 (P187)
             + pill_row(labels)   # 라벨끼리 2px (PILL_PAIR_GAP)
-            + (f'<span style="color:{SUB};font-size:{TINY};line-height:{LH_TINY};">{esc(" · ".join(meta))}</span>' if meta else "") + "</span>")
+            + meta_html + "</span>")
 
 
 def footer(data_line, disclaimer_line, indent=True):
@@ -1559,8 +1500,22 @@ def direction_bars(today, week):
     bar = lambda label, c: legend_bar(f"{label} {sum(c.values())}건", [(DIR_KO[d], c.get(d, 0), *BAR_PASTEL[d]) for d in ("positive", "negative", "uncertain", "neutral")])   # noqa: E731
     # 두 막대 묶음 사이 보이는 24px (2026-10-12 사용자) — 앞 묶음 비율 글자 → 다음 라벨 글자, 행간 반쪽 3 + 3 을 뺀 값
     gap = f'<span style="display:block;height:{BAR_GROUP_GAP - 5}px;"></span>' if sum((today or {}).values()) and sum((week or {}).values()) else ""   # 한쪽이 비면 그 막대 · 사이 여백 없이 (데일리 = 오늘만)
-    return (f'<div data-cards="1" style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{SEP_GAP - 3}px 12px {SEP_GAP - 3 - 10}px;">{bar("오늘", today or {})}'   # 두 막대를 카드 하나에 (2026-10-13 사용자)
-            f'{gap}{bar("최근 7일", week or {})}</div>')
+    box = f'<div data-cards="1" style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{SEP_GAP - 3}px 12px {SEP_GAP - 3 - 10}px;">'   # 두 막대를 카드 하나에 (2026-10-13 사용자)
+    if sum((today or {}).values()) and sum((week or {}).values()):
+        # 처음엔 `오늘` 막대만 — 제목 줄 오른쪽 작은 접기 버튼(공식 화살표, 같은 크기)을 누르면 `최근 7일` 막대가 펼쳐진다 (2026-11-07 사용자 P346)
+        t = bar("오늘", today)
+        title = f"오늘 {sum(today.values())}건"
+        plain = f'<span style="display:block;font-size:{TINY};line-height:{LH_TINY};margin:0 0 3px;color:#111;font-weight:700;">{esc(title)}</span>'
+        # 제목 줄 높이 = 버튼 높이(31), 카드 위 안쪽 여백 = 오른쪽 여백 12 — 버튼 위 · 오른쪽 간격이 같다 (2026-11-07 사용자 P362)
+        # 버튼 왼쪽 `최근 7일` 글자 = 분야 탭 비활성 글자(14px · #4B5563 · 보통 굵기), 글자 · 버튼 한 덩어리를 눌러도 펼침 (P363)
+        head = (f'<span style="display:flex;justify-content:space-between;align-items:center;height:{FOLD_BOX}px;margin:0;">'
+                f'<span style="font-size:{TINY};line-height:{LH_TINY};color:#111;font-weight:700;">{esc(title)}</span>'
+                f'<span style="display:inline-flex;align-items:center;"><span style="font-size:{TINY};line-height:{LH_TINY};color:#4B5563;font-weight:400;">최근 7일</span>{fold_btn()}</span></span>')
+        t = t.replace(plain, head, 1)
+        box = box.replace(f"padding:{SEP_GAP - 3}px 12px", "padding:12px 12px", 1)
+        return (box + f'<details data-acc="1" data-bars="1"><summary style="list-style:none;cursor:pointer;display:block;" aria-label="최근 7일 막대 보기">{t}</summary>'
+                f'{gap}{bar("최근 7일", week)}</details></div>')
+    return box + f'{bar("오늘", today or {})}{gap}{bar("최근 7일", week or {})}</div>'
 
 
 def report_stamp(day_text, when_text):
@@ -1710,7 +1665,7 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
         step = 46
         W = n * step + 14   # 끝 점 숫자 ~ 세로축 숫자 사이 14px (2026-11-05 사용자 M77: 너무 붙었다)
         X = lambda i: step / 2 + i * step   # noqa: E731
-        g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
+        g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="{GRID_LINE}" stroke-width="1"/>' for t in ticks)
         lines_, dots, labs = "", "", ""
         cols = {}
         for k, (nm, xs, col, kind) in reversed(list(enumerate(series))):
@@ -1748,7 +1703,7 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
     else:
         X = lambda i: i / (n - 1) * 1000   # noqa: E731
         P = lambda i: i / (n - 1) * 100   # noqa: E731
-        grid = "".join(f'<line x1="0" x2="1000" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1" vector-effect="non-scaling-stroke"/>' for t in ticks)
+        grid = "".join(f'<line x1="0" x2="1000" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="{GRID_LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>' for t in ticks)
         paths, ends = "", []
         for k, (nm, xs, col, kind) in reversed(list(enumerate(series))):   # 주인공 선이 맨 위에
             pts = [(i, v) for i, v in enumerate(xs) if v is not None]
@@ -1838,6 +1793,14 @@ def emph_fold_btn(bg="#fff", bd="#E2E8F0", left=FOLD_LEFT + 8):
     return fold_btn(bg, bd, mix("#111111", hue, 0.2) if hue else "#111").replace(f"margin-left:{FOLD_LEFT}px;", f"margin-left:{left}px;")
 
 
+VIOLET = "#6D28D9"   # 중립 강조(증감 아닌 핵심 숫자 — 순위 · 몇 개 중 몇 개). 다가오는 일정 보라와 같은 값 (2026-11-07 사용자)
+
+
+def violet(html_text):
+    """`23위` · `36번` 처럼 방향 없는 핵심 숫자 — 보라 굵게. 앞말(`63종목 중`)은 감싸지 않는다 (가이드라인 0-2 글자 강조 세 단계)."""
+    return f'<span style="color:{VIOLET};font-weight:700;">{html_text}</span>'
+
+
 def bold_pct(html):
     """강조 카드 문장 안 증감 색 `+1.5%` · `−0.5%p` 를 굵게 (P279)."""
     return _PCT_SPAN.sub(lambda m: f'<span style="color:{m.group(1)};font-weight:700;{m.group(2)}">{m.group(3)}</span>', html)
@@ -1867,17 +1830,27 @@ def news_pop_id(prefix, key):
     return f"{prefix}-{hashlib.md5(str(key).encode('utf-8')).hexdigest()[:10]}"
 
 
-def news_pop_body(pid, title, lines, when="", source="", kind="방송", url=None, n_channels=0):
-    li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:4px 0;"><span style="flex:none;width:3px;height:3px;margin-top:15px;border-radius:50%;background:#111;"></span>'
-                 f'<span style="min-width:0;font-size:{BODY};line-height:{LH_BODY};color:#333;word-break:keep-all;">{esc(ln)}</span></span>' for ln in lines)
-    meta = " · ".join(x for x in (when, f"{source} {kind}".strip(), f"방송 {n_channels}곳" if n_channels > 1 else "") if x)
+POP_LH, POP_ITEM_GAP = 28, 11   # 팝업 요약 줄 행간 · 항목 여백 (P359)
+
+
+def _link_src(source, kind):
+    if not source:
+        return ""
+    return f" ({esc(source)}" + (" · 영어" if kind == "기사" else "") + ")"
+
+
+def news_pop_body(pid, title, lines, when="", source="", kind="방송", url=None, n_channels=0, related=()):
+    """팝업 글 = 요약 줄 → 관련 종목(있으면) → 작은 원문 링크. 머리 줄(시각 · 매체)과 `같은 뉴스` 칸은 없다 (2026-11-07 사용자 P352 · P354).
+    when · n_channels 는 옛 호출 호환용 — 쓰지 않는다. related = [(이름, 등락%)]."""
+    # 줄 안 행간 35 → 28 (20%), 글머리표 사이 보이는 간격은 그대로 — 줄어든 행간 7px 만큼 항목 여백 4 → 11 (2026-11-07 사용자 P359)
+    li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{POP_ITEM_GAP}px 0;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
+                 f'<span style="min-width:0;font-size:{BODY};line-height:{POP_LH}px;color:#333;word-break:keep-all;">{speaker_html(ln, headline_style=False)}</span></span>' for ln in lines)
     link = ""
     if url:
         link = (f'<span style="display:block;text-align:right;margin:14px 0 0;"><a href="{esc(url)}" target="_blank" rel="noopener" data-trhelp="skip" '
                 f'style="font-size:13px;line-height:19px;color:{SUB};text-decoration:underline;text-underline-offset:3px;">{"영상 보기" if kind == "방송" else "원문 보기"}'
-                f'{f" ({esc(source)})" if source else ""} {LINK_ICON}</a></span>')
-    return (f'<div data-news-pop-body="{esc(pid)}" data-news-pop-title="{esc(title)}" hidden>'
-            f'<span style="display:block;font-size:13px;line-height:19px;color:{SUB};margin:0 0 6px;">{esc(meta)}</span>{li}{link}</div>')
+                f'{_link_src(source, kind)} {LINK_ICON}</a></span>')
+    return (f'<div data-news-pop-body="{esc(pid)}" data-news-pop-title="{esc(title)}" hidden>{li}{related_box(related)}{link}</div>')
 
 
 def news_pop_wrap(item_html, pid):
@@ -1933,3 +1906,38 @@ def more_list(items_html, noun="뉴스", shown=MORE_SHOWN, step=MORE_STEP, inden
         out += (f'<button type="button" data-more-btn="1" style="{FOLD_BTN}width:100%;margin:0 0 8px;">'
                 f'<span>{esc(noun)} {min(step, rest)}건 더 보기</span> {ACC_CHEV}</button>')
     return out
+
+
+# ── 발언자 = 내용 뒤 작은 회색 `- 이름`, 이름 없으면 `- 방송 의견` (2026-11-07 사용자 P353) ──
+# 수집기 · 요약이 앞에 붙이는 `제인 프레이저 발언 : …` · `진행자 발언 : …` · `질 슈나이더 진행자 : …` 를 읽어 뒤로 옮긴다. 사실 줄(접두 없음)은 그대로.
+_SPEAKER = re.compile(r"^\s*([^:：]{0,30}?)\s*(진행자 발언|기자 보도|발언|진행자|앵커|보도|발표)\s*[:：]\s*(.+)$")   # 지난 8일 실제 접두 꼴 (P377): ○○ 발언 · 기자 보도 · 보도 · 발표 · 진행자 발언 · 진행자
+_GENERIC = {"", "진행자", "앵커", "방송", "패널", "출연자", "기자"}
+
+
+def speaker_split(text):
+    m = _SPEAKER.match(str(text or ""))
+    if not m:
+        return str(text or ""), ""
+    who = m.group(1).strip()
+    if who and m.group(2) == "기자 보도":
+        who += " 기자"
+    return m.group(3).strip(), ("방송 의견" if who in _GENERIC else who)
+
+
+def speaker_html(text, headline_style=True, tail=True):
+    """tail=False: 목록 줄 — 접두만 떼고 발언자는 붙이지 않는다(발언자는 팝업에서만, 2026-11-07 사용자 P364)."""
+    body, who = speaker_split(text)
+    body = esc(headline(body) if headline_style else body)
+    return body + (f' <span style="color:{SUB};font-size:{TINY};white-space:nowrap;">- {esc(who)}</span>' if who and tail else "")
+
+
+def related_box(related):
+    """팝업 관련 종목 칸 — 제목 없음(P367) (P351 · P356 → P360 · P361): 두 열, 칸마다 종목명 · 그 바로 아래 등락(왼쪽 정렬). 테두리 · 가운데 세로선 없음, 연한 배경만."""
+    related = [(n, v) for n, v in (related or []) if v is not None][:6]
+    if not related:
+        return ""
+    cells = "".join(f'<span style="display:block;min-width:0;padding:6px 0;">'
+                    f'<span style="display:block;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{esc(n)}</span>'
+                    f'<span style="display:block;font-weight:700;">{arrow(v)}</span></span>' for n, v in related)
+    return (f'<div style="margin:12px 0 0;padding:8px 12px;background:#F8FAFC;border-radius:8px;font-size:15px;line-height:23px;">'
+            f'<span style="display:grid;grid-template-columns:1fr 1fr;column-gap:16px;">{cells}</span></div>')

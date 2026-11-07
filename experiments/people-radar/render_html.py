@@ -301,7 +301,7 @@ def _list_row(p, cards, first):
         f'<span style="flex:1 1 auto;min-width:0;">'
         f'<span style="display:block;font-size:{dk.SMALL};line-height:25px;"><b>{_esc(p["name_ko"])}</b> <span style="color:{dk.SUB};font-size:{dk.TINY};line-height:20px;">{_esc(p["title_ko"])} · 오늘 {n}건</span></span>'
         + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;margin-top:2px;word-break:keep-all;">{dk.keep_tone(_esc(head))}</span>' if head else "")
-        + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};margin-top:2px;">닿는 곳 : {_esc(touch)}</span>' if touch else "")
+        + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};margin-top:2px;">연결 자산 : {_esc(touch)}</span>' if touch else "")
         + f'</span><span style="flex:none;color:#94A3B8;display:inline-flex;margin-top:10px;">{chev}</span></a>')
 
 

@@ -7,6 +7,7 @@
 
 import html as html_mod
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
@@ -41,6 +42,19 @@ def _title_with_icon(title, tail_html):
     if not sep:
         return f'<span style="white-space:nowrap;">{dk.paren(t)}{tail_html}</span>'
     return f'{dk.paren(head)} <span style="white-space:nowrap;">{dk.paren(last)}{tail_html}</span>'
+
+
+def _ends_white(html):
+    """html 조각이 흰 카드(dk.MULTI 틀)로 끝나는가 — 끝 여백을 맞출 대상. 흰 카드 뒤에 글(안내 줄 · 칸 이름)이 있으면 아니다."""
+    i = html.rfind(f'<span style="{dk.MULTI}')
+    if i < 0:
+        return False
+    depth = 0
+    for m in re.finditer(r"<(/?)span\b[^>]*>", html[i:]):
+        depth += -1 if m.group(1) else 1
+        if depth == 0:
+            return not html[i + m.end():].strip()
+    return False
 
 
 def question_card(title, state, theme, color, lines, tip="", fold=True, opened=False):
@@ -86,6 +100,10 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
         if (isinstance(t, tuple) and len(t) == 2 and t[1] == "html" and dk.CHART_MARK in t[0][:600]
                 and isinstance(prev, tuple) and len(prev) == 2 and prev[1] == "html" and dk.CHART_MARK in prev[0][:600]):
             h = h.replace('<li style="list-style:none;margin:6px 0 12px;">', f'<li style="list-style:none;margin:{12 + dk.CHART_STACK_GAP}px 0 12px;">', 1)
+        if k == len(lines) - 1 and isinstance(t, tuple) and len(t) == 2 and t[1] == "html" and _ends_white(t[0]):
+            # 강조 카드가 흰 카드로 끝나면 아래 여백 = 좌우 여백 (가이드라인 7-1 끝 여백, 엔비디아 R._pull_end_chart 와 같은 결과).
+            # li 아래 12 를 0 으로 — ul −9 와 겹쳐 보이는 아래 22 → 10 = 좌우 10 (Chrome 실측, 2026-11-07 사용자: "넌 왜 이걸 지키지 않았어")
+            h = re.sub(r'^(<li style="list-style:none;margin:\d+px 0) 12px;">', r'\1 0;">', h, count=1)   # 위 여백은 그대로(연달은 그래프면 22)
         lis += h
     ans = state if str(state).startswith("<span") else dk.tint(esc(state))   # 이미 색을 입힌 답(HTML)은 그대로 — 한국 증시 리포트 결과 단어 색 (2026-10-26)
     state_html = (f'<span style="display:inline-flex;align-items:center;">{ans}{_fold_btn(dk.lighten(bg), bd)}</span>' if fold else ans)   # 답 글자의 증감도 색 (가이드라인 3-3-1)
@@ -156,3 +174,49 @@ sign_fg = lambda v: UP if v > 0 else DOWN   # noqa: E731
 gray = lambda v: GRAY_BAR   # noqa: E731
 note_fg = lambda v: NOTE   # noqa: E731
 amber = lambda v: AMBER   # noqa: E731
+
+
+# ── 범위 막대 (1년) — 엔비디아 year_range_in 의 사본 (nvda-report/render_html.py, 2026-11-07 시장 탭 `시장은 얼마나 긴장했나?`) ──
+# 엔비디아 렌더러를 통째로 읽으면 수집 모듈(판다스)까지 따라와 데일리 3.10 실행에서 깨진다 — 막대 · 말풍선 값은 저쪽과 같게 둔다 (가이드라인 9절).
+GAUGE_INSET = 14   # 점 · 꼬리가 막대 끝 · 말풍선 가장자리에서 떨어지는 최소 px = 말풍선 모서리 8 + 꼬리 반폭 6
+BUBBLE_FONT, BUBBLE_H, BUBBLE_W_STRONG, GAUGE_H = 14, 24, 500, 50   # 말풍선 글자 14 · 높이 24 · 굵기 500 · 막대 칸 50 (P183 · P186)
+
+
+def _bubble_w(text):
+    """말풍선 폭 px (글자 폭 어림 + 좌우 8) — 폭을 정해 두어야 CSS 만으로 카드 안에 가둘 수 있다."""
+    return round(16 + sum(5 if ch in ",. " else 17 if "가" <= ch <= "힣" else 10 for ch in text) * BUBBLE_FONT / 17) + 2
+
+
+def _gauge_tip(x, text, col, dot_col, weight=400):
+    """말풍선 + 꼬리 + 원형 점. x = 위치 %. 점 · 꼬리는 막대 끝에서 GAUGE_INSET 안쪽까지, 말풍선은 카드 안에 멈추고 꼬리만 그 안에서 움직인다."""
+    x = max(0.0, min(100.0, x))
+    w = _bubble_w(text)
+    at = f"clamp({GAUGE_INSET}px, {x:.1f}%, calc(100% - {GAUGE_INSET}px))"
+    return (f'<span style="position:absolute;left:clamp(0px, calc({at} - {w / 2:g}px), calc(100% - {w}px));width:{w}px;bottom:16px;z-index:1;background:{col};color:#fff;font-weight:{weight};'
+            f'font-size:{BUBBLE_FONT}px;display:flex;align-items:center;justify-content:center;height:{BUBBLE_H}px;line-height:1;padding:0;box-sizing:border-box;border-radius:8px;white-space:nowrap;"><span>{esc(text)}</span></span>'
+            f'<span style="position:absolute;left:{at};bottom:10px;z-index:1;transform:translateX(-50%);width:0;height:0;'
+            f'border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid {col};"></span>'
+            f'<span style="position:absolute;left:{at};bottom:-3px;transform:translateX(-50%);z-index:3;box-sizing:border-box;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid {dot_col};"></span>')
+
+
+def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near_text, high_days=None):
+    """1년 범위 막대 — 얇은 막대(최저~최고, 지금까지 연한 파랑) + 지금 위치 점 · 꼬리 · 말풍선(최고 대비 %). 제목 줄은 카드 밖, 막대는 흰 카드.
+    fmt = 값 표기 함수. 질문 카드 lines 의 ("html") 항목으로 넣는다."""
+    pos = max(0.0, min(100.0, pos_pct))
+    near = pct_from_high > -0.5
+    text = near_text if near else f"{pct_from_high:.1f}%".replace("-", "−")
+    col, dot = ("#64748B", "#64748B") if near else (dk.lighten(dk.DOWN, 0.2), dk.DOWN)
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
+            f'<span style="font-weight:700;color:#111;font-size:{dk.NAME};">{dk.CHART_MARK}{dk.paren(esc(title))}{dk.tip_icon(tip)}</span>'
+            f'<span style="flex:none;font-size:{dk.MICRO};color:{NOTE};white-space:nowrap;">{esc(legend)}</span></span>')
+    at = f"clamp({GAUGE_INSET}px, {pos:.1f}%, calc(100% - {GAUGE_INSET}px))"
+    bar = (f'<span style="position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:3px;background:#E2E8F0;">'
+           f'<span style="position:absolute;left:0;top:0;bottom:0;width:{at};border-radius:3px;background:#BFDBFE;"></span></span>')
+    aria = esc(f"1년 범위 {fmt(low)}~{fmt(high)}, {text}")
+    gauge = (f'<span data-range-gauge="1" aria-label="{aria}" style="position:relative;display:block;height:{GAUGE_H}px;">'
+             f'{_gauge_tip(pos, text, col, dot, BUBBLE_W_STRONG)}{bar}</span>')
+    ago = "" if high_days is None else " (오늘)" if high_days <= 0 else f" ({high_days}거래일 전)"
+    ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:{dk.TINY};line-height:20px;color:{NOTE};">'
+            f'<span style="white-space:nowrap;">최저 {fmt(low)}</span><span style="white-space:nowrap;">최고 {fmt(high)}{ago}</span></span>')
+    card = f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.SEP_GAP - dk.VP - 1}px 12px {12 - 3}px;">{gauge}{ends}</span></span>'
+    return f'<span style="display:block;margin:0 0 {dk.CHART_TITLE_GAP}px;">{head}</span>{card}'

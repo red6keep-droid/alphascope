@@ -21,7 +21,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import design_kit as dk  # noqa: E402
 import media_feed  # noqa: E402
 
-TITLE = "한국장에 영향을 줄 만한 소식"
+TITLE = "한국 종목과 연결된 미국 뉴스"   # 2026-11-07 사용자 P373 (옛 `한국장에 영향을 줄 만한 소식` — 한국 증시 리포트와 같은 뉴스였다)
+KR_REPORT_URL = "https://alpha-scope.blogspot.com/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"   # 한국 증시 리포트 목록 — 한국 증시 이야기는 그쪽에
 TAB = "한국장"   # render_html.TAB_KOREA 와 같다
 HOURS, SHOWN = 48, 5   # 최근 48시간 전부, 앞 5건만 펼치고 나머지는 접기 (2026-10-30 사용자). 옛: 6건 · 12시간(어제 아침 한국 방송은 뺌)
 MARK_OPEN, MARK_CLOSE = "<!--kr-news-->", "<!--/kr-news-->"
@@ -32,29 +33,33 @@ def rows_now():
     return media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=8))   # 목록 48시간 + 방향 막대 `최근 7일` (P143) — edition 여드레
 
 
-def section(rows, hours=HOURS, pick=None, shown=SHOWN):
+def section(rows, hours=HOURS, pick=None, shown=SHOWN, prices=None):
     """표시 주석으로 감싼 구획 HTML. 공용 뉴스 카드: 방송 주제(영상 링크) / 방송 주장 / [한국 종목 · 분야] [방향] [예상 밖]  시각 · 채널 · 방송 n곳.
     소식이 없으면 표시만 (빈 칸)."""
     since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M")
     items = []
     n_all = dk.n_channels_of(media_feed.issues(rows, since))   # 분모 = 이 시간 안 방송 채널 수 (P338)
-    for r in (pick or media_feed.korea)(media_feed.issues(rows, since), None):   # 같은 이슈는 한 줄로 정리한 뒤 — 전부(상한 없음, 2026-10-30). pick: 고르는 규칙(기본 media_feed.korea = 한국 증시 내용, 채널 무관 — 2026-10-30)
+    for r in (pick or media_feed.us_to_kr)(media_feed.issues(rows, since), None):   # 같은 이슈는 한 줄로 정리한 뒤 — 전부(상한 없음, 2026-10-30). pick: 고르는 규칙(기본 media_feed.korea = 한국 증시 내용, 채널 무관 — 2026-10-30)
         d = r["direction"]
         dd = "uncertain" if r.get("split") else d if d in ("positive", "negative") else "neutral"
         labels = " ".join([dk.pill(media_feed.kr_label(r), bare=True),
                            dk.pill(dk.DIR_KO[dd], dd, bare=True)]   # 방향 라벨 = 막대와 같은 네 단어 중 하나, 섞이면 `불확실` (2026-11-07 사용자 P335) — 옛 `중립` + `엇갈림` 두 개
-                          + ([dk.pill("예상 밖", "uncertain", bare=True)] if r["surprise"] else [])
-                          + ([dk.channel_count(r["n_channels"], n_all)] if r["n_channels"] > 1 else []))   # 방송 곳 수 = 칸 막대 (P338)   # `방송` 라벨은 뺀다 — 메타의 채널 · 방송 n곳과 같은 정보 (2026-10-26 사용자)
+                          + ([dk.pill("예상 밖", "uncertain", bare=True)] if r["surprise"] else []))
+        count = dk.channel_count(r["n_channels"], n_all) if r["n_channels"] > 1 else ""   # 곳 수 막대 = 라벨 다음 줄 (P338 · P348)   # `방송` 라벨은 뺀다 — 메타의 채널 · 방송 n곳과 같은 정보 (2026-10-26 사용자)
         meta = [dk.news_when(r["published_at"]), r["channel"]]
-        item = dk.news_item(html_mod.escape(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"')
+        item = dk.news_item(html_mod.escape(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"', count_html=count)
         if len(r.get("lines") or []) >= 2:   # 누르면 요약 다섯 줄 팝업 (2026-11-07 사용자 P337, 데일리 뉴스 탭과 같게)
             pid = dk.news_pop_id("kr", r.get("id") or r["url"])
-            item = dk.news_pop_wrap(item, pid) + dk.news_pop_body(pid, r["topic"], r["lines"], dk.news_when(r["published_at"]), r["channel"], "방송", r["url"], r["n_channels"])
+            item = dk.news_pop_wrap(item, pid) + dk.news_pop_body(pid, r["topic"], r["lines"], source=r["channel"], kind="방송", url=r["url"],
+                                                                   related=media_feed.kr_related(r, prices) if prices else ())   # 관련 종목 = 그날 한국 등락 (P355, 데일리 한국장 탭은 prices 없음 — 장 열기 전)
         items.append(item)
     lst = dk.more_list(items, "뉴스", shown or len(items), indent=dk.ALIGN_PX, first_top=18)   # 5건 + 10건씩 더 보기 (2026-11-07 사용자 P340)   # 종목 페이지 뉴스와 같은 여백 — 아래 19 · 방향 막대 아래 첫 기사 위 18(NEWS_FIRST_TOP) (2026-11-07 0절)
     now = datetime.datetime.now(datetime.timezone.utc)
-    within = lambda h: (pick or media_feed.korea)(media_feed.issues(rows, (now - datetime.timedelta(hours=h)).strftime("%Y-%m-%dT%H:%M")), None)   # noqa: E731
+    within = lambda h: (pick or media_feed.us_to_kr)(media_feed.issues(rows, (now - datetime.timedelta(hours=h)).strftime("%Y-%m-%dT%H:%M")), None)   # noqa: E731
     lst = dk.direction_bars(media_feed.direction_counts(within(24)), media_feed.direction_counts(within(24 * 7))) + lst   # 엔비디아처럼 오늘 · 최근 7일 방향 막대 (2026-10-31 사용자 P143)
+    if items and pick is None:   # 데일리 한국장 탭 끝 — 한국 증시 이야기는 한국 증시 리포트로 (P373)
+        lst += (f'<p style="margin:0 0 8px;padding:0 {dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};">'
+                f'<a href="{KR_REPORT_URL}" style="color:#111;font-weight:700;text-decoration:none;">한국 증시 이야기는 한국 증시 리포트에서 보기 ›</a></p>')
     body = dk.keep_tone(dk.section(TITLE, lst, tab=TAB)) if items else ""   # 방송 소식 = 헤드라인체 그대로
     return MARK_OPEN + body + MARK_CLOSE
 

@@ -95,6 +95,8 @@ def main():
                 missing.append(sym)
                 continue
             data = re.sub(r"^\s*<!--.*?-->\s*", "", svg, flags=re.S).encode("utf-8")   # 원본 주석 — 출처는 ref 에 남긴다
+        elif ext == "png" and data.startswith(b"\xff\xd8\xff"):
+            ext = "jpg"   # 출처의 META · JPM · ABBV · PG 는 이름만 .png 인 JPEG — 실제 형식대로 저장 (2026-11-07 P374)
         elif ext == "png" and not data.startswith(bytes([0x89]) + b"PNG"):
             data = None
         if not data:

@@ -714,7 +714,7 @@ def _boll_lines(bb):
     else:
         low = bb["state"] == "하단 도달"
         zone_ko, days = ("하락" if low else "상승"), bb.get("days", 0)
-        reach = "닿았다" if days <= 1 else f"{days}일째 닿아 있다"
+        reach = "도달했다" if days <= 1 else f"{days}일째 머물러 있다"   # `닿` 표현 정리 (2026-11-07)
         plain = f"최근 한 달 평소 {won(lo)}~{won(hi)}에서 움직였는데 오늘 {won(c)}으로 {zone_ko} 범위에 {reach}."
         where = f"{zone_ko} 범위"
     lines = [(plain, "plain"), (gauge, "html")]   # 범위 · 종가 줄은 막대가 보여 주니 뺀다 (2026-10-25 사용자)
@@ -806,7 +806,7 @@ MEDIA_WEEK = []     # 최근 7일 방송 이슈 — 뉴스 방향 막대 `최근
 def sec_today(s):
     """`오늘` 탭 — 방송 뉴스 (2026-10-25 사용자: 한국 종목 뉴스는 방송 자막 뉴스로). 이 종목이 중심인 이슈 + 이 종목 묶음(반도체 · 2차전지 …)의 업종 이슈,
     한국 증시 채널 · 미국 채널 모두. 공용 뉴스 카드(엔비디아 · 미국 종목 페이지와 같은 _event_html): 주제 / 방송 주장 / [영역] [방향] [방송]  시각 · 채널."""
-    ev = [media_feed.event(r, _dk.n_channels_of(MEDIA)) for r in sorted(media_feed.for_kr_page(MEDIA, s["code"]), key=lambda r: str(r["published_at"]), reverse=True)]
+    ev = [media_feed.event(r, _dk.n_channels_of(MEDIA), KR_PRICES) for r in sorted(media_feed.for_kr_page(MEDIA, s["code"]), key=lambda r: str(r["published_at"]), reverse=True)]
     bars = R.sec_direction_bars({"direction_counts": {"today": media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])),
                                                       "week": media_feed.direction_counts(media_feed.for_kr_page(MEDIA_WEEK, s["code"]))}})   # 엔비디아처럼 오늘 · 최근 7일 방향 막대 (2026-10-31 사용자 P143)
     if not ev:
@@ -817,7 +817,7 @@ def sec_today(s):
 def mock_news():
     """목업 전용 뉴스 샘플 (2026-10-27 사용자 P26: "공용 뉴스 카드로 우선 샘플") — 이 종목 방송이 없을 때 최근 한국 채널 방송 4건을 공용 카드로.
     발행 본문에는 들어가지 않는다 (write_all 이 MOCK_NEWS 를 지운다)."""
-    ev = [media_feed.event(r, _dk.n_channels_of(MEDIA)) for r in media_feed.korea(MEDIA, 4)]
+    ev = [media_feed.event(r, _dk.n_channels_of(MEDIA), KR_PRICES) for r in media_feed.korea(MEDIA, 4)]
     if not ev:
         return ""
     return (f'<div style="margin:12px 0 6px;padding:6px 10px;border:1px dashed #F59E0B;border-radius:6px;font-size:{TINY};line-height:20px;color:#92400E;">'
@@ -1675,8 +1675,13 @@ def list_body(a):
     return wrap(body + home_marker())
 
 
+KR_PRICES = {}   # {코드: (이름, 그날 등락%)} — 방송 팝업 `관련 종목` (2026-11-07 P355)
+
+
 def write_all(a, out_dir, snap=None, media=None, extra=None):
     os.makedirs(out_dir, exist_ok=True)
+    KR_PRICES.clear()
+    KR_PRICES.update({s["code"]: (s["name"], s.get("ret_1d")) for s in a["stocks"] if s.get("ret_1d") is not None})
     if extra and snap:
         caps = snap.get("caps") or {}
         group = set(sorted((c[0] for c in U.CANDIDATES if caps.get(c[0])), key=lambda x: -caps[x])[:U.PEER_GROUP_N])   # 한국 시총 상위 20개

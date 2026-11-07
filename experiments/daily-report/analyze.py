@@ -560,6 +560,13 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "prev_5d": round(vix_close[-6], 2) if len(vix_close) >= 6 else None,
         "change_5d": round(vix_close[-1] - vix_close[-6], 2) if len(vix_close) >= 6 else None,
     }
+    if len(vix_close) >= 60:   # 1년 범위(최근 252거래일) — 시장 탭 `시장은 얼마나 긴장했나?` 범위 막대 (2026-11-07 사용자)
+        yr = vix_close[-252:]
+        lo, hi = min(yr), max(yr)
+        vix.update({"low_1y": round(lo, 2), "high_1y": round(hi, 2),
+                    "pos_pct": round((yr[-1] - lo) / (hi - lo) * 100, 1) if hi > lo else 50.0,
+                    "pct_from_high": round((yr[-1] / hi - 1) * 100, 1) if hi else None,
+                    "high_days": len(yr) - 1 - max(k for k, x in enumerate(yr) if x == hi)})
 
     g = lambda s: series.get(s) or {}
     rs = {

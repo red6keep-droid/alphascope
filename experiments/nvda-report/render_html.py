@@ -609,7 +609,8 @@ def _multi_single(rows):
 def year_range_in(y, money, tip, high_days=None):
     """가격 범위 (1년) — 가격 정보 강조 카드 펼침 맨 위 (2026-10-26 사용자, 제목 `가격 범위 (1년)`). money = 금액 표기 함수(달러 · 원화).
     2026-10-27 P34: 한 달 범위처럼 **말풍선 가로 막대** — 얇은 막대(최저~최고, 지금까지 연한 파랑) + 지금 위치 점 · 꼬리 · 말풍선 `최고가 대비 −42.5%`,
-    그래서 머리 줄 오른쪽 `최고가 대비 ▼ n%` 는 뺐다. 그래프라 흰 카드(P23, 가이드라인 5-9), 제목 줄은 카드 밖. 최고가 옆 `(N거래일 전)`(P15)."""
+    그래서 머리 줄 오른쪽 `최고가 대비 ▼ n%` 는 뺐다. 그래프라 흰 카드(P23, 가이드라인 5-9), 제목 줄은 카드 밖. 최고가 옆 `(N거래일 전)`(P15).
+    데일리 변동성 지수 1년 범위는 같은 모양의 사본 cards.range_gauge (2026-11-07)."""
     if not y:
         return ""
     pos = max(0.0, min(100.0, y["pos_pct"]))
@@ -675,7 +676,7 @@ def line_chart(labels, series, fmt, unit=""):
     y = lambda v: top + (hi - v) / (hi - lo) * (LINE_H - top - bot)   # noqa: E731
     x = (lambda i: f"{(i + 0.5) / n * 100:.2f}%") if fit else (lambda i: f"{step / 2 + i * step:.1f}")   # noqa: E731
     W = "100%" if fit else str(w)
-    g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
+    g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="{_dk.GRID_LINE}" stroke-width="1"/>' for t in ticks)
     if lo < 0 < hi:
         g += f'<line x1="0" x2="{W}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#CBD5E1" stroke-width="1"/>'
     main, comp = series[0][1], (series[1][1] if len(series) > 1 else [None] * n)
@@ -769,10 +770,10 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
     names = [("하위 25%", 25), (f"우리 {total}종목 순위", 50), ("상위 25%", 25)]
     gauge = _zone_gauge(x, zone, names, f"{mom:+.1f}%".replace("-", "−"), f"12개월 모멘텀 {mom:+.1f}%, {total}종목 중 {rank}위", last=False, weight=BUBBLE_W_STRONG)   # 말풍선 숫자 한 단계 굵게 (P184)
     gauge = gauge.replace(f"margin:0 {_dk.CHART_CARD_X - 2}px 0px;", f"margin:0 {_dk.CHART_CARD_X}px;", 1)
-    col = UP if zone == 2 else DOWN if zone == 0 else "#111"
+    # 순위는 증감이 아니라 위치 — 핵심 숫자(`23위`)만 보라 SOON, `63종목 중` 은 검정 (2026-11-07 사용자: 보라 = 중립 강조). 옛 = 상위 25% 빨강 · 하위 25% 파랑
     head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 {_dk.CHART_TITLE_GAP}px;line-height:{_dk.LH_CARD};">'
             f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}12개월 모멘텀 <span style="white-space:nowrap;">{_paren(_esc("(최근 1개월 제외)"))}{_tipx(tip)}</span></span>'   # 괄호 · ? 는 함께 줄바꿈 — ? 만 홀로 떨어지지 않게 (P177)
-            f'<span style="flex:none;font-weight:700;color:{col};font-size:{_dk.NAME};white-space:nowrap;">{total}종목 중 {rank}위</span></span>')
+            f'<span style="flex:none;font-weight:700;color:#111;font-size:{_dk.NAME};white-space:nowrap;">{total}종목 중 {_dk.violet(f"{rank}위")}</span></span>')
     out = head + gauge
     if med is not None:   # B — 세로 막대 셋
         groups = [(name, [mom]), (f"우리 {total}종목 중앙값", [med])] + ([(bench_name, [bench])] if bench is not None else [])
@@ -782,7 +783,7 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
         # B = 중앙값 · KOSPI 와 비교 (2026-10-31 사용자: A 순위 막대와 뜻이 달라 둘 다 둔다, P163)
         # 한 제목 아래 그래프 둘 — 순위 카드와 3px 띄워 붙이고, 따로 있던 제목은 카드 안 오른쪽 범례로 (P168)
         legend = (f'<span style="display:block;font-size:{_dk.MICRO};line-height:{_dk.LH_CARD};color:{NOTE};">'
-                  f'<span style="white-space:nowrap;">중앙값 · {_dk.josa(bench_name, '와')} 비교</span><span data-unit="1" style="margin-left:7px;white-space:nowrap;">단위 : %</span></span>')
+                  f'<span style="white-space:nowrap;">중앙값 · {_dk.josa(bench_name, "와")} 비교</span><span data-unit="1" style="margin-left:7px;white-space:nowrap;">단위 : %</span></span>')
         out += (f'<span style="{MULTI}margin:{MOM_GAP}px {_dk.CHART_CARD_X}px 0;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span>')
     return out
 
@@ -1374,7 +1375,7 @@ def line_tabs(cid, labels, series, fmt, unit="", overlay=None, int_ticks=False):
         allser.append((onm, oxs, ocol, ofmt, oy))
     x = (lambda i: f"{(i + 0.5) / n * 100:.2f}%") if fit else (lambda i: f"{step / 2 + i * step:.1f}")   # noqa: E731
     W = "100%" if fit else str(w)
-    g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="#EEF0F3" stroke-width="1"/>' for t in ticks)
+    g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="{_dk.GRID_LINE}" stroke-width="1"/>' for t in ticks)
     if lo < 0 < hi:
         g += f'<line x1="0" x2="{W}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#CBD5E1" stroke-width="1"/>'
     # 처음 = 모든 선 제 색 · 점 있음 · 숫자 없음. 버튼을 누르면 그 선만 색 · 점 · 숫자, 나머지는 회색 가는 선(점 없음). 버튼 = 흰 작은 외곽선 버튼(가이드 2-3), 누르면 선 색 테두리 · 글자 · 연한 바탕
@@ -2068,7 +2069,7 @@ def sector_lines(sf, bench):
     lines = [(f"최근 {n}거래일 {sf['name']} ETF({sf.get('etf_label') or sf['etf']})가 {bench}보다 {more}. {tail}", "plain"),
              (flow_gauge(sf, sf["name"]), "html"),   # 엔비디아 반도체 자금 카드와 같은 막대 (2026-10-23 사용자: 새 그래프 모든 페이지)
              ("row", f"{sf['name']} vs 시장 ({n}일)", f"{_sgn1(rel)}%p", f"+{pp:.0f}%p 넘으면 유입 · −{pp:.0f}%p 아래면 유출", False, True),
-             ("row", "업계 순위", f"{sf['n_pool']}개 중 {sf['rank']}위", "같은 기간 수익률 순")]   # 업종 → 업계 (2026-11-01 사용자 P198)
+             ("row", "업계 순위", f"{sf['n_pool']}개 중 {_dk.violet(str(sf['rank']) + '위')}", "같은 기간 수익률 순", True)]   # 순위 숫자 = 보라 (2026-11-07 사용자)   # 업종 → 업계 (2026-11-01 사용자 P198)
     secs = sf.get("sectors") or []
     if secs:
         lines.append(("row", "앞선 업계", "\n".join(f"{x['name']} {_sgn1(x['rel'])}%p" for x in secs[:2]), "시장보다 많이 오른 업계"))
@@ -2161,7 +2162,7 @@ def sector_flow_lines(sf):
              (flow_gauge(sf), "html"),   # 판정 막대 + 반도체 값 말풍선 (2026-10-23 사용자 A안)
              ("row", f"반도체 vs 시장 ({sf['days']}일)", f"{sf['rel_pp']:+.1f}%p", f"+{pp:.0f}%p 넘으면 유입 · −{pp:.0f}%p 아래면 유출", False, True)]
     if sf.get("smh_rank"):
-        lines.append(("row", "섹터 순위", f"12개 중 {sf['smh_rank']}위", "같은 기간 수익률 순"))
+        lines.append(("row", "섹터 순위", f"12개 중 {_dk.violet(str(sf['smh_rank']) + '위')}", "같은 기간 수익률 순", True))
     secs = sf.get("sectors") or []
     if secs:
         lines.append(("row", "앞선 섹터", "\n".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[:2]), "시장보다 많이 오른 섹터"))   # 섹터마다 한 줄 (2026-10-17 사용자)
@@ -2172,7 +2173,7 @@ def sector_flow_lines(sf):
 
 
 BOLL_THEME = {"하단 도달": ("negative", DOWN), "상단 도달": ("positive", UP)}
-BOLL_STATE_KO = {"하단 도달": "하락 범위에 닿음", "상단 도달": "상승 범위에 닿음"}   # 그 밖(밴드 안) = "범위 안"
+BOLL_STATE_KO = {"하단 도달": "하락 범위 도달", "상단 도달": "상승 범위 도달"}   # `닿음` → `도달` (2026-11-07 사용자: 닿다 표현 정리 — 가격이 범위 끝에 이른 것이라 `연결` 이 아니다)   # 그 밖(밴드 안) = "범위 안"
 
 
 def bollinger_rule(bb):
@@ -2358,14 +2359,14 @@ def bollinger_lines(bb):
     st = (bb.get("stats") or {}).get("boll_lower" if low else "boll_upper")
     base = (bb.get("stats") or {}).get("base") or {}
     zone, days = ("하락" if low else "상승"), bb.get("days", 0)   # 2026-10-17 사용자: "아래 끝을 넘어 있다" 대신 "하락 범위에 닿음"
-    reach = "닿았다" if days <= 1 else f"{days}일째 닿아 있다"
+    reach = "도달했다" if days <= 1 else f"{days}일째 머물러 있다"   # `닿` 표현 정리 (2026-11-07)
     plain = f"최근 한 달 평소 ${bb['lower']:,.0f}~${bb['upper']:,.0f}에서 움직였는데 오늘 ${bb['close']:,.2f}로 {zone} 범위에 {reach}."   # 2문장 (2026-10-17 사용자: 약간만 줄여)
     lines = [(plain, "plain"),
              (range_gauge(bb, last=False), "html")]   # 아래 근거 줄이 붙을 수 있다   # 한 달 범위 막대 + 오늘 종가 말풍선 (2026-10-23 사용자) — 범위 · 종가 줄은 뺐다 (2026-10-25 사용자)
     if bb.get("days", 0) > 1:
         lines.append(("row", "연속", f"{bb['days']}일째", f"{zone} 범위에 머문 날"))
     if st and base:
-        lines.append(("row", f"{_span_label(bb.get('stats'))} 같은 날", f"{st['n']}회", f"{zone} 범위에 처음 닿은 날"))
+        lines.append(("row", f"{_span_label(bb.get('stats'))} 같은 날", f"{st['n']}회", f"{zone} 범위에 처음 도달한 날"))
         lines.append(("row", "20일 뒤 오른 비율", f"{st['up20']}%", f"일반적인 날 {base['up20']}%"))
         lines.append(("row", "60일 뒤 오른 비율", f"{st['up60']}%", f"일반적인 날 {base['up60']}% · 예측 아님"))
     return lines
@@ -2509,19 +2510,18 @@ def _event_html(e):
     meta = [_when(e.get("published_at")), src if (doc and src and src != "googlenews") else ""]
     # 라벨 사이는 news_item(pill_row)이 2px 로 맞춘다 (2026-10-14 사용자 0 → 3, 2026-10-26 → 2 어디서나)
     labels = tag.replace(f"margin:0 {_dk.PILL_GAP}px;", "margin:0 3px 0 0;").replace("</span> <span", "</span><span")
-    if e.get("n_all"):   # 방송 곳 수 = 칸 막대 + `n곳 / 전체곳` (2026-11-07 P338)
-        labels += " " + _dk.channel_count(e.get("n_channels", 1), e["n_all"])
+    count = _dk.channel_count(e.get("n_channels", 1), e["n_all"]) if e.get("n_all") else ""   # 방송 곳 수 = 칸 막대, 라벨 다음 줄 (P338 · P348)
     tip_t = _esc(f"{src}: {e['title'][:90]}" if doc else f"{src} 원문").replace(chr(34), "&quot;")
     trhelp = ' data-trhelp="skip"' if e.get("media") else ""   # 방송 줄(media_feed)은 한국어 주제 + 유튜브 영상 — 영문 기사용 `번역 방법` 을 붙이지 않는다
-    inner = _dk.news_item(head, e.get("url"), detail, subs, labels, meta, f' title="{tip_t}"{trhelp}')
+    inner = _dk.news_item(head, e.get("url"), detail, subs, labels, meta, f' title="{tip_t}"{trhelp}', count_html=count)
     if len(e.get("pop_lines") or []) >= 2:   # 누르면 요약 다섯 줄 팝업 — 방송(P337) · 기사(P341), 데일리 뉴스 탭과 같게. 원문은 팝업 안 작은 링크
         pid = _dk.news_pop_id("ev", e["pop_key"])
         kind = e.get("pop_kind") or "방송"
         title = head if kind == "기사" else e["title"]
         title = re.sub(r"<[^>]+>", "", title) if kind == "기사" else title
-        inner = _dk.news_pop_wrap(inner, pid) + _dk.news_pop_body(pid, html_mod.unescape(title) if kind == "기사" else title, e["pop_lines"], _when(e.get("published_at")),
-                                                                 rr.SOURCE_KO.get(e.get("pop_source") or "", e.get("pop_source") or "") if kind == "기사" else e.get("channel", ""),
-                                                                 kind, e.get("url"), e.get("n_channels", 1) if kind == "방송" else 0)
+        inner = _dk.news_pop_wrap(inner, pid) + _dk.news_pop_body(pid, html_mod.unescape(title) if kind == "기사" else title, e["pop_lines"],
+                                                                 source=rr.SOURCE_KO.get(e.get("pop_source") or "", e.get("pop_source") or "") if kind == "기사" else e.get("channel", ""),
+                                                                 kind=kind, url=e.get("url"), related=e.get("related") or ())   # 관련 종목 (P355 · 한국 종목 페이지)
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절) — 배경 · 테두리만 방향 색
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
         return (f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px {_dk.SEP_GAP - _dk.VP}px;margin:0 0 8px;line-height:{_dk.LH_BODY};">'   # 폭은 다른 카드와 같게 (2026-10-16 사용자; 10-14 의 좌우 −13 은 되돌림). 일반 기사는 좌측 기준선 6px — 카드 안 글자보다 7px 바깥 (가이드라인, 2026-10-27 P38)   # 끝 줄이 라벨(행간 1)이라 아래는 VP 만 뺀다
@@ -2536,7 +2536,6 @@ RATING_PASTEL = [("strongBuy", "강매수", "#F4ACA6", "#7F1D1D"), ("buy", "매�
                  ("hold", "보유", "#E2E8F0", "#475569"), ("sell", "매도", "#C9DCF7", "#1E3A8A"), ("strongSell", "강매도", "#A9C5F2", "#1E3A8A")]
 
 
-BAR_H, BAR_NUM, BAR_PAD = 30, "17px", 5   # 막대 안 숫자 18 → 17 (2026-10-14 사용자)   # 높이 26 → 30 (+15%, 2026-10-14 사용자) · 막대 위아래 +5   # 막대 높이 24 → 26 (+10%, 정수) · 막대 안 숫자 19 → 18 (2026-10-13 사용자, 가이드라인 10-7)
 
 
 LEGEND_CHIP = 9      # 범례 색 사각형 11 → 9px (20% 줄임, 2026-10-17 사용자)
@@ -3349,7 +3348,7 @@ def cal_court(c):
     first = (f"추적 중인 소송은 {len(cs)}건이다. 가장 가까운 일정은 {nxt['name']}의 {nxt['label'] or '심리'}로 {_md_short(nxt['day'])}, {nxt['left']}일 뒤다."
              f" 법원 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드 색이 보라로 바뀐다.")
     lines = [(first, "plain")] + [("row", x["name"], _md_short(x["day"]), f"{x['label'] or '일정'} · {_left(x['left'])}") for x in cs]
-    tip = ("엔비디아가 당사자인 소송 가운데 주가에 닿을 수 있는 것(주주 집단소송 등)의 법원 일정\n"
+    tip = ("엔비디아가 당사자인 소송 가운데 주가와 연결될 수 있는 것(주주 집단소송 등)의 법원 일정\n"
            f"· {_left(nxt['left'])} : {nxt['name']} {nxt['label'] or ''}\n"
            f"· 나누는 법 : 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드가 보라색")
     theme = ("soon", SOON) if nxt["left"] <= config.COURT_LOOKAHEAD_DAYS else ("neutral", "#111")

@@ -362,14 +362,14 @@ body.menu-open { overflow: hidden; }
 .nt-chg { margin-left: auto; flex: none; font-family: var(--num); font-size: 15px; white-space: nowrap; }
 .nt-chg .nt-ex { margin-left: 6px; font-size: 13px; color: #6B7280; }
 .nt-more { padding: 8px 0 4px; font-size: 14px; line-height: 20px; color: #2563EB; cursor: pointer; }
-.nt-note { padding: 8px 0; font-size: 15px; line-height: 22px; color: var(--gray-400); }
+.nt-note { padding: 8px 0; font-size: 15px; line-height: 23px; color: var(--gray-400); }
 @media (max-width: 900px) { .nt-grid { grid-template-columns: minmax(0, 1fr); } }
 #radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
 .kv-stats + .kv-row, .kv-row + .kv-row { border-top: 1px solid #E2E8F0; }
 .kv-name { flex: none; font-weight: 700; font-size: 16px; line-height: 24px; color: #111; }
-.kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 19px; line-height: 24px; color: #111; white-space: nowrap; }
+.kv-value { min-width: 0; text-align: right; font-weight: 700; font-size: 19px; line-height: 25px; color: #111; white-space: nowrap; }
 .kv-value.up { color: var(--up); } .kv-value.down { color: var(--down); }
 .kv-value small { font-size: 14px; font-weight: 400; color: #7A7A7A; }
 .kv-rel { display: inline-flex; align-items: baseline; gap: 6px; flex: none; }   /* 가격 줄 왼쪽: 시장 대비 증감 값 + '시장 대비' (2026-10-15 사용자) */
@@ -381,7 +381,7 @@ body.menu-open { overflow: hidden; }
 .kv-stat { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0 4px; text-align: center; }
 .kv-stat + .kv-stat { border-left: 1px solid #E2E8F0; }
 .kv-stat-name { font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
-.kv-stat-value { font-family: var(--num); font-weight: 700; font-size: 17px; line-height: 24px; color: #111; white-space: nowrap; }
+.kv-stat-value { font-family: var(--num); font-weight: 700; font-size: 17px; line-height: 25px; color: #111; white-space: nowrap; }
 .kv-stat-value.up { color: var(--up); } .kv-stat-value.down { color: var(--down); }
 .kv-row--block ul { display: flex; flex-direction: column; gap: 12px; }
 .kv-row--block li { display: flex; align-items: flex-start; gap: 7px; font-size: 19px; line-height: 35px; color: #111; word-break: keep-all; }
@@ -729,12 +729,12 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .eb-slide .stock-avatar.has-logo { background: transparent !important; }
 .eb-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .eb-kicker { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.eb-name { font-size: 29px; font-weight: 800; line-height: 38px; letter-spacing: -.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.eb-dday { flex: none; padding: 0 9px; border-radius: 6px; background: #F43F5E; color: #fff; font-family: var(--num); font-size: 15px; font-weight: 700; line-height: 26px; white-space: nowrap; }
+.eb-name { font-size: 29px; font-weight: 800; line-height: 39px; letter-spacing: -.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eb-dday { flex: none; padding: 0 9px; border-radius: 6px; background: #F43F5E; color: #fff; font-family: var(--num); font-size: 15px; font-weight: 700; line-height: 27px; white-space: nowrap; }
 .eb-dday.is-ahead { background: #F97316; }   /* D-숫자는 전부 주황, D-DAY 만 빨강 (2026-10-29 사용자) */
 .eb-title-line { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
 .eb-title { flex: none; font-size: 18px; font-weight: 700; line-height: 26px; }
-.eb-when { min-width: 0; font-size: 15px; line-height: 22px; color: rgba(255, 255, 255, .78); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eb-when { min-width: 0; font-size: 15px; line-height: 23px; color: rgba(255, 255, 255, .78); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .eb-slide:hover .eb-name { text-decoration: underline; text-underline-offset: 5px; }
 .eb-more { margin-left: auto; flex: none; display: flex; align-items: center; gap: 14px; margin-right: 8px; color: rgba(255, 255, 255, .7); font-size: 15px; white-space: nowrap; }
 .eb-chev { width: 18px; height: 18px; border-top: 3px solid rgba(255, 255, 255, .55); border-right: 3px solid rgba(255, 255, 255, .55); transform: rotate(45deg); }
@@ -746,11 +746,11 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 @media (max-width: 680px) {
   .eb-slide { gap: 12px; padding: 24px 4px 40px; }
   .eb-slide .stock-avatar { width: 44px; height: 44px; font-size: 16px; }
-  .eb-name { font-size: 23px; line-height: 30px; }
-  .eb-dday { font-size: 13px; line-height: 22px; padding: 0 7px; }
+  .eb-name { font-size: 23px; line-height: 31px; }
+  .eb-dday { font-size: 13px; line-height: 23px; padding: 0 7px; }
   .eb-title-line { gap: 8px; }
-  .eb-title { font-size: 15px; line-height: 22px; }
-  .eb-when { font-size: 13px; line-height: 20px; }
+  .eb-title { font-size: 15px; line-height: 23px; }
+  .eb-when { font-size: 13px; line-height: 21px; }
   .eb-more { margin-right: 4px; }
   .eb-more-text { display: none; }   /* 폰은 화살표만 */
   .eb-chev { width: 14px; height: 14px; border-width: 2.5px; }
@@ -918,7 +918,7 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
     overflow-y: auto;
   }
   .menu-items.is-open { transform: none; }
-  .nav-item { padding: 14px 24px; font-size: 18px; line-height: 27px; border-bottom: 1px solid var(--border); }
+  .nav-item { padding: 14px 24px; font-size: 18px; line-height: 28px; border-bottom: 1px solid var(--border); }
   .nav-item[aria-current="page"]::after { display: none; }
   .nav-close { display: flex; }
 
@@ -1074,12 +1074,12 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 .blog-pager { display: flex; justify-content: center; gap: 12px; padding-top: 4px; }
 /* 글 더 보기 — 목록 버튼과 같은 검은 테마 버튼, 가로 30% 넓게 (2026-10-13 사용자: "모든 하단 버튼은 블랙 테마 버튼") */
 .blog-pager a {
-  padding: 12px 42px;
+  padding: 9px 42px;   /* 글 아래 `목록` 버튼과 같은 크기 14px · 9 42 (2026-11-07 가이드라인 10절) */
   background: #111;
   border: 1px solid #111;
   border-radius: 8px;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 14px;
+  line-height: 20px;
   font-weight: 700;
   color: #fff;
 }
@@ -1106,7 +1106,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   margin: 0 0 10px;
   font-weight: 700;
   font-size: 35px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") */
-  line-height: 48px;
+  line-height: 49px;   /* 홀짝 — 줄 높이 − 글자 = 짝수 (2026-11-07 가이드라인 3절) */
   letter-spacing: -.6px;
   color: var(--ink);
 }
@@ -1122,7 +1122,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
 .post-card-title a:has(.post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
 .post-card-title .post-title-date { margin-left: auto; }
-.post-title .post-title-date { font-size: 14px; }
+.post-title .post-title-date { font-size: 14px; line-height: 20px; }   /* 제목 행간(49 · 37 · 33)을 물려받으면 홀짝이 어긋난다 (2026-11-07) */
 .post-title-sub { font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; margin-left: 9px; }   /* 종목 제목 꼬리 `주가 실적 일정` — 숨기지 않고 작게만 (2026-10-27 사용자 P20) · 14px = `넘겨 보기` 와 같게 (P29) */
 /* 이름 ~ 꼬리 사이 = 띄어쓰기의 1.5배(실측 5.7 · 5.1 · 4.6px → 9 · 8 · 7px), 꼬리는 이름 줄의 세로 가운데 (2026-10-27 사용자 P21). 칸이 flex 라 띄어쓰기는 접히고 여백만 남는다 */
 .post-title-label:has(> .post-title-sub) { display: flex; flex-wrap: wrap; align-items: center; }
@@ -1177,14 +1177,15 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .post-body [data-tip] { outline: none; cursor: pointer; }
 .post-body [data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 50%; }
 .rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.45); }
+html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업이 열린 동안 뒤 본문이 스크롤되지 않게 (2026-11-07 사용자 P350) */
 .rt-pop[hidden] { display: none; }
 .rt-pop-box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
 /* 팝업 제목 · 닫기는 위에 고정, 내용만 스크롤 (2026-10-13 사용자) */
 .rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; }
 .rt-pop-head::after { content: ""; position: absolute; left: 20px; right: 12px; bottom: 0; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색 (2026-10-18 사용자). 폭은 제목 왼쪽 선(20px) ~ 닫기 버튼 오른쪽 선(12px)까지 (같은 날 사용자) */
 .rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
-.rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 24px; color: #111; }
-.rt-pop-body { font-size: 19px; font-weight: 400; line-height: 35px; color: #333; word-break: keep-all; }
+.rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 25px; color: #111; word-break: keep-all; overflow-wrap: anywhere; }   /* 줄바꿈 = 띄어쓰기 기준 (2026-11-07 사용자 P375) */
+.rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 35px; color: #333; word-break: keep-all; }
 /* 툴팁 내용 행간 = 본문 35px(2026-11-06 34 → 35, 19/35 홀짝 맞춤) (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
 .rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; padding-left: 8px; }   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
 .rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
@@ -1198,7 +1199,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .news-pop-body { font-size: 16px; line-height: 26px; }
 .post-body [data-news-chips] { scrollbar-width: none; }
 .post-body [data-news-chips]::-webkit-scrollbar { display: none; }
-.post-body [data-chip][aria-pressed="true"] { color: #111 !important; font-weight: 700; box-shadow: inset 0 0 0 1px #111; }   /* 분야 탭 선택 = 홈 테마 종목 묶음 탭과 같게: 굵은 검정 + 1px 검정 외곽선 (2026-11-07 사용자 P332, 옛 검정 알약) */
+.post-body [data-chip][aria-pressed="true"] { color: #111 !important; font-weight: 700 !important; box-shadow: inset 0 0 0 1px #111; }   /* !important — 버튼 인라인 font:inherit 이 굵기를 덮었다 (2026-11-07 사용자 P344) */   /* 분야 탭 선택 = 홈 테마 종목 묶음 탭과 같게: 굵은 검정 + 1px 검정 외곽선 (2026-11-07 사용자 P332, 옛 검정 알약) */
 .post-body [data-news-more] .acc-chev { transition: transform .2s; }
 /* 그래프 확대 팝업 (2026-10-16 사용자) — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
 .img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); cursor: pointer; }   /* cursor:pointer — 아이폰은 누를 수 있는 모양이 없는 요소의 탭을 click 으로 올리지 않아 바깥 탭이 두 번째에야 닫혔다 (2026-10-21 사용자) */
@@ -1254,7 +1255,7 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
-.post-body .rt-subtab { flex: none; padding: 6px 11px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
+.post-body .rt-subtab { flex: none; padding: 6px 11px; font: inherit; font-size: 19px; line-height: 25px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
 /* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.
    data-grid=2 (C 카드 줄 묶음) → 2열 그리드 + 짝수 칸 왼쪽 세로 구분선. 둘째 칸의 인라인 border-top 은 지운다(첫 줄에 선이 생기지 않게).
@@ -1271,14 +1272,14 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
 /* 전환 버튼 (data-switch, 당일 · 5일 그래프): 회색 바탕 알약 둘, 선택은 흰 바탕 · 검정 굵게 (2026-10-11) */
 .post-body .rt-segs { display: inline-flex; gap: 2px; padding: 3px; margin: 4px 0 8px; background: #F1F5F9; border-radius: 8px; }
 .post-body .rt-segs[hidden] { display: none; }
-.post-body .rt-seg { padding: 6px 15px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
+.post-body .rt-seg { padding: 6px 15px; font: inherit; font-size: 19px; line-height: 25px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
 .post-body .rt-seg[aria-pressed="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .post-body [data-switch-panel][hidden], .post-body [data-hz-panel][hidden] { display: none; }
 .post-body .rt-segs--in-sub { margin: 0 0 4px auto; flex: none; }
 /* 하위탭 (부정 발언 · 긍정 발언 · 전체): 서브탭보다 한 단계 아래 — 16px, 밑줄 2px 검정, 줄 아래 선 없음. 표본이 모자란 탭은 흐리게 (2026-10-11) */
 .post-body .rt-dirs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 0 8px; }
 .post-body .rt-dirs[hidden] { display: none; }
-.post-body .rt-dir { flex: none; padding: 4px 9px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
+.post-body .rt-dir { flex: none; padding: 4px 9px; font: inherit; font-size: 19px; line-height: 25px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
 .post-body .rt-dir[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: #111; }
 .post-body .rt-dir[data-empty] { color: #CBD5E1; }
 /* E 2열 카드는 폰에서도 2열 (2026-10-12 사용자: "왜 2열로 적용 안 했냐") — 예전의 폰 한 칸 쌓기 규칙 삭제.
@@ -1326,6 +1327,7 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
   border: 1px solid #111;
   border-radius: 8px;
   font-size: 14px;   /* 16 → 14 한 단계 작게 (P213) */
+  line-height: 20px;   /* 홀짝 14/20 (2026-11-07, 옛 물려받은 21) */
   font-weight: 700;
   color: #fff;
 }
@@ -1380,7 +1382,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 12px;
   background: var(--surface-sub); border: 1px solid var(--border-strong); border-radius: 8px;
-  font-size: 14px; font-weight: 700; color: var(--gray-600); cursor: pointer;
+  font-size: 14px; line-height: 20px; font-weight: 700; color: var(--gray-600); cursor: pointer;   /* 홀짝 14/20 (2026-11-07) */
 }
 .sharing-platform-button:hover { border-color: #111; color: #111; }
 .platform-sharing-text { white-space: nowrap; }
@@ -1390,10 +1392,10 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 /* 댓글 — 우리 것 (2026-10-14 사용자: "우리가 댓글 프로그램을 만드는 건 어때?" — 폰에서 블로거 댓글 입력창이 좁다. 디자인 가이드 10-2).
    블로거 댓글(blogger.com iframe · 전체 페이지)을 버리고 테마 JS 가 Firebase(Firestore REST + Google 로그인)로 그린다.
    마크업은 테마 JS "댓글" IIFE 가 만든다 — 열기 버튼만 카드, 펼친 목록 · 쓰기 칸은 카드 밖 본문 폭 전체, 댓글 사이 1px 구분선.
-   글자: 이름 16px 굵게, 글 19px · 행간 24, 날짜 · 안내 · 버튼 14px. 사진 24px. 입력창은 본문 폭 전체(폰 화면 − 28px). */
+   글자: 이름 16px 굵게, 글 19px · 행간 25, 날짜 · 안내 · 버튼 14px. 사진 24px. 입력창은 본문 폭 전체(폰 화면 − 28px). */
 .comments {
   width: 100%; max-width: var(--shell); margin: 40px auto 0;   /* 목록 버튼과 40px (2026-10-12 사용자) */
-  font-size: 19px; line-height: 24px; color: #333; word-break: keep-all;
+  font-size: 19px; line-height: 25px; color: #333; word-break: keep-all;
 }
 .comments .comments-title { margin: 0; padding: 0; border: 0; font-size: 16px; line-height: 24px; }
 /* 열기 버튼 = 흰 카드, `댓글 n` 16px 굵게 · 오른쪽 공식 접기 화살표(테두리 없이). 기본 닫힘, 주소가 #comments · #c… 면 열린 채로 (2026-10-12 · 13 사용자) */
@@ -1419,12 +1421,12 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-name { font-size: 16px; font-weight: 700; color: #111; }
 .comments .cm-tag { display: inline-block; margin: 0; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; vertical-align: middle; position: relative; top: -1px; }   /* 운영자 라벨 — 영역 라벨 모양 (가이드 5절) */
 .comments .cm-date { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
-.comments .cm-text { margin: 4px 0 0; font-size: 19px; line-height: 24px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comments .cm-text { margin: 4px 0 0; font-size: 19px; line-height: 25px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
 .comments .cm-text.is-deleted { color: #94A3B8; font-size: 14px; line-height: 20px; }   /* 원 댓글이 지워진 답글 묶음의 자리 */
 /* 동작 버튼(답글 · 삭제)은 할 수 있는 사람에게만 — 로그인 전에는 보이지 않는다 (2026-10-13 사용자: "로그인 전에는 기능이 안 되는 버튼은 노출하지 마라") */
 .comments .cm-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }
 .comments .cm-actions:empty { display: none; }
-.comments .cm-btn { display: inline-flex; align-items: center; margin: 0; padding: 5px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 14px; line-height: 21px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.comments .cm-btn { display: inline-flex; align-items: center; margin: 0; padding: 5px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 14px; line-height: 22px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .comments .cm-btn:hover { border-color: #111; }
 .comments .cm-btn[disabled] { opacity: .4; cursor: default; }
 .comments .cm-replies { grid-column: 2; margin: 0; }   /* 답글은 원 댓글 글 왼쪽 선에 맞춰 */
@@ -1444,7 +1446,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-link { margin-left: auto; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; line-height: 20px; color: #7A7A7A; cursor: pointer; }
 .comments .cm-link:hover { color: #111; }
 /* 입력창 — 본문 폭 전체, 테두리 #E2E8F0 · 모서리 8, 안쪽 11 · 12, 글 19px · 행간 24, 처음 4줄 높이. 글을 쓰면 아래로 늘어난다 */
-.comments .cm-input { display: block; width: 100%; min-height: 118px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 19px; line-height: 24px; color: #333; resize: none; overflow: hidden; }
+.comments .cm-input { display: block; width: 100%; min-height: 118px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 19px; line-height: 25px; color: #333; resize: none; overflow: hidden; }
 .comments .cm-input:focus { outline: none; border-color: #111; }
 .comments .cm-input::placeholder { color: #94A3B8; }
 .comments .cm-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
@@ -1466,7 +1468,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .post-outer-container { padding: 24px; }
   body.item-view .post-outer-container { padding-top: 13px; }   /* 카드 위 → 제목 글자 보이는 20 (2026-10-12 사용자) */
-  .post-title { font-size: 27px; line-height: 36px; }
+  .post-title { font-size: 27px; line-height: 37px; }
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
@@ -1475,7 +1477,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
   body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 26px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) → −5 (2026-10-25 사용자: 상세 제목 줄 위 여백) */
-  .post-title { font-size: 23px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
+  .post-title { font-size: 23px; line-height: 33px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
   .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
   .post-body { font-size: 19px; line-height: 35px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
   .post-body [data-sent] { display: inline; }   /* 모바일: 문장 줄바꿈 없이 이어 흐른다 — 문단(빈 줄)만 남는다 (2026-10-16 사용자) */
@@ -1493,8 +1495,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .section-title { font-size: 18.5px; line-height: 23.5px; }
   .report-title { font-size: 18.5px; line-height: 23.5px; }
   #radar-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
-  .kv-value { font-size: 16px; line-height: 20px; }
-  .kv-stat-value { font-size: 16px; line-height: 22.5px; }
+  .kv-value { font-size: 16px; line-height: 21px; }
+  .kv-stat-value { font-size: 16px; line-height: 23.5px; }
   .kv-row--block li { font-size: 16px; line-height: 32px; }
   .report-columns li { font-size: 16px; line-height: 32px; }
   .tab { font-size: 16px; line-height: 21.5px; }
@@ -1502,25 +1504,25 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .news-item a { font-size: 16px; line-height: 32px; }
   .footer-title { font-size: 16px; }
   .eb-slide .stock-avatar { font-size: 17px; }
-  .eb-name { font-size: 24.5px; line-height: 32px; }
+  .eb-name { font-size: 24.5px; line-height: 33px; }
   .eb-title { font-size: 16px; line-height: 23px; }
   .theme-name { font-size: 16px; line-height: 23px; }
   .post-card-title { font-size: 17px; }
   .post-title { font-size: 28px; line-height: 36px; }
   .post-body { font-size: 16px; line-height: 32px; }
-  .rt-pop-title { font-size: 16px; line-height: 20px; }
+  .rt-pop-title { font-size: 16px; line-height: 21px; }
   .rt-pop-body { font-size: 16px; line-height: 32px; }
   .rt-pop-close { font-size: 17px; line-height: 24px; }
   .post-body .rt-tab { font-size: 16px; line-height: 21.5px; }
-  .post-body .rt-subtab { font-size: 16px; line-height: 20px; }
-  .post-body .rt-seg { font-size: 16px; line-height: 20px; }
-  .post-body .rt-dir { font-size: 16px; line-height: 20px; }
+  .post-body .rt-subtab { font-size: 16px; line-height: 21px; }
+  .post-body .rt-seg { font-size: 16px; line-height: 21px; }
+  .post-body .rt-dir { font-size: 16px; line-height: 21px; }
   .post-body > div[style*="font-size:15px"] { font-size: 16px !important; }
   .post-body table[style*="font-size:14px"] { font-size: 16px !important; }
   .post-body div[style*="font-size:14px"] { font-size: 16px !important; }
-  .comments { font-size: 16px; line-height: 20px; }
-  .comments .cm-text { font-size: 16px; line-height: 20px; }
-  .comments .cm-input { font-size: 16px; line-height: 20px; }
+  .comments { font-size: 16px; line-height: 21px; }
+  .comments .cm-text { font-size: 16px; line-height: 21px; }
+  .comments .cm-input { font-size: 16px; line-height: 21px; }
   .post-body [style*="font-size:17px"], .post-body [style*="font-size: 17px"] { font-size: 16px !important; }
   .post-body [style*="font-size:18px"], .post-body [style*="font-size: 18px"] { font-size: 16px !important; }
   .post-body [style*="font-size:19px"], .post-body [style*="font-size: 19px"] { font-size: 16px !important; }
@@ -1589,8 +1591,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
             <b:attr cond='data:view.isHomepage' name='aria-current' value='page'/>홈</a>
           <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91&quot;'>
             <b:attr cond='data:view.search.label == &quot;데일리 브리핑&quot;' name='aria-current' value='page'/>미국 증시 리포트</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C&quot;'>
-            <b:attr cond='data:view.search.label == &quot;트럼프 트렌드&quot;' name='aria-current' value='page'/>트럼프 SNS 트렌드</a>
           <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;p/us-market-cap-top10.html&quot;'>시총 TOP 10</a>
         </nav>
       </div>
@@ -2527,7 +2527,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var img = document.createElement('img');
           img.alt = ''; img.loading = 'lazy'; img.width = 26; img.height = 26;
           img.onload = function () { av.classList.add('has-logo'); };
-          img.onerror = function () { if (img.parentNode) img.parentNode.removeChild(img); };
+          var tried = false;   /* svg 없으면 jpg 한 번 더 — 출처에 JPEG 만 있는 종목(META · JPM · ABBV · PG, 2026-11-07 P374) */
+          img.onerror = function () { if (!tried) { tried = true; img.src = LOGO_BASE + encodeURIComponent(String(ticker).toUpperCase()) + '.jpg'; return; } if (img.parentNode) img.parentNode.removeChild(img); };
           img.src = LOGO_BASE + encodeURIComponent(String(ticker).toUpperCase()) + '.svg';
           av.appendChild(img);
           return av;
@@ -3162,13 +3163,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var media = it.kind === 'media';
           homePop.querySelector('.rt-pop-title').textContent = it.title;
           var body = homePop.querySelector('.rt-pop-body'); body.textContent = '';
-          var meta = el('span', null, [mdhm(kstTime(it.published)), (it.source || 'CNBC') + (media ? ' 방송' : ' 기사')].concat(media && it.n_channels > 1 ? ['방송 ' + it.n_channels + '곳'] : []).join(' · '));
-          meta.style.cssText = 'display:block;font-size:13px;line-height:19px;color:#999;margin:0 0 6px;';
-          body.appendChild(meta);
           it.lines.forEach(function (ln) {
-            var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:4px 0;';
-            var dot = el('span'); dot.style.cssText = 'flex:none;width:3px;height:3px;margin-top:15px;border-radius:50%;background:#111;';
-            var tx = el('span', null, ln); tx.style.cssText = 'min-width:0;font-size:19px;line-height:35px;color:#333;word-break:keep-all;';
+            var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:11px 0;';   /* 행간 28 · 항목 여백 11 (P359) */
+            var dot = el('span'); dot.style.cssText = 'flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;';
+            /* 발언자 = 내용 뒤 작은 회색 `- 이름`, 이름 없으면 `- 방송 의견` (P353, design_kit.speaker_split 과 같은 규칙) */
+            var m = /^\s*([^:：]{0,30}?)\s*(진행자 발언|기자 보도|발언|진행자|앵커|보도|발표)\s*[:：]\s*(.+)$/.exec(ln), who = '';   /* 접두 꼴 넓힘 (P377) */
+            if (m) { ln = m[3]; who = /^(진행자|앵커|방송|패널|출연자|기자)?$/.test(m[1].trim()) ? '방송 의견' : m[1].trim() + (m[2] === '기자 보도' ? ' 기자' : ''); }
+            var tx = el('span', null, ln); tx.style.cssText = 'min-width:0;font-size:19px;line-height:28px;color:#333;word-break:keep-all;';
+            if (who) { var wt = el('span', null, ' - ' + who); wt.style.cssText = 'color:#999;font-size:14px;white-space:nowrap;'; tx.appendChild(wt); }
             row.appendChild(dot); row.appendChild(tx); body.appendChild(row);
           });
           if (it.link) {
@@ -4271,7 +4273,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
           /* 2026-10-22 사용자: 로고는 신뢰도 — 우리 gh-pages 사본이 있으면 배지 자리를 로고로 바꾼다. 없으면 배지 그대로 (운영지침 4-6) */
           var img = document.createElement('img'); img.alt = ''; img.className = 'title-logo';
           img.onload = function () { if (b.parentNode) b.parentNode.replaceChild(img, b); };
-          img.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/' + (kr ? 'KR_' + kr[1] : encodeURIComponent(sym.replace('.', '-'))) + '.svg';
+          var lb = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/' + (kr ? 'KR_' + kr[1] : encodeURIComponent(sym.replace('.', '-')));
+          img.onerror = function () { if (!img.dataset.jpg) { img.dataset.jpg = '1'; img.src = lb + '.jpg'; } };   /* svg 없으면 jpg (P374) */
+          img.src = lb + '.svg';
         });
       })();
 
@@ -4443,6 +4447,22 @@ body.no-dashboard .main-content { padding-top: 32px; }
         pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
         pop.querySelector('.rt-pop-close').addEventListener('click', close);
         document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
+      })();
+
+      /* ============================================================ 팝업 스크롤 잠금 (2026-11-07 사용자 P350)
+         .rt-pop(뉴스 팝업 · 홈 뉴스 팝업 · 툴팁 팝업 · 그래프 확대)이 하나라도 열려 있으면 html.pop-lock — 뒤 본문이 같이 스크롤되지 않는다.
+         iOS 는 overflow 만으로 안 막혀서 열 때 스크롤 위치를 고정(position:fixed + top)하고 닫을 때 되돌린다 */
+      (function () {
+        'use strict';
+        var y = 0, locked = false, root = document.documentElement;
+        function sync() {
+          var open = [].some.call(document.querySelectorAll('.rt-pop'), function (p) { return !p.hidden; });
+          if (open === locked) return;
+          locked = open;
+          if (open) { y = window.scrollY; root.classList.add('pop-lock'); document.body.style.cssText += ';position:fixed;top:' + (-y) + 'px;left:0;right:0;'; }
+          else { root.classList.remove('pop-lock'); document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = ''; window.scrollTo(0, y); }
+        }
+        new MutationObserver(sync).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden'] });
       })();
 
       /* ============================================================ 더 보기 단계 (2026-11-07 사용자 P340)

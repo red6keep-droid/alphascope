@@ -103,32 +103,6 @@ def shock_card(a):
     return C.question_card("시장 충격 국면인가?", f"{sh.get('days_in') or 1}거래일째", "uncertain", "#92400E", lines, tip=tip, opened=True)
 
 
-def market_now_card(a):
-    """D6 지금 시장은 — 옛 점수 · 신호등 대신 사실만 (기획 5절 B5). 우리 검증은 툴팁."""
-    se = a.get("series") or {}
-    spy = se.get("SPY") or {}
-    pos = (a.get("position") or {}).get("sp500") or {}
-    vix = a.get("vix") or {}
-    rates = a.get("rates") or {}
-    a20, a50 = spy.get("above_ma20"), spy.get("above_ma50")
-    if a20 is None or a50 is None:
-        return ""
-    state = "평균선 위" if a20 and a50 else "평균선 아래" if not a20 and not a50 else ("20일선 아래" if not a20 else "50일선 아래")
-    # 첫 줄 "점수나 신호등으로 묶지 않고 …" 삭제 (2026-11-07 사용자 P329). 추세 값 = 두 줄 · 위 상승 색 · 아래 하락 색 (P330)
-    ma = lambda n, up: f'<span style="color:{C.UP if up else C.DOWN};">{n}일선 {"위" if up else "아래"}</span>'   # noqa: E731
-    lines = [("row", "S&P 500 추세", f'<span style="display:inline-block;text-align:right;">{ma(20, a20)}<br>{ma(50, a50)}</span>', "최근 20 · 50거래일 평균 가격과 비교")]
-    if pos.get("from_high_pct") is not None:
-        lines.append(("row", "20일 고점 대비", _s(pos["from_high_pct"]), "최근 20거래일 가장 높던 종가와 비교"))
-    if vix.get("now") is not None:
-        lines.append(("row", "VIX", f"{vix['now']:.2f}", f"5거래일 전 {vix['prev_5d']:.2f}" if vix.get("prev_5d") is not None else "시장이 예상하는 흔들림"))
-    if rates.get("us10y_change_5d_bp") is not None:
-        lines.append(("row", "10년물 금리 (5일)", f"{int(rates['us10y_change_5d_bp']):+d}bp".replace("-", "−"), f"지금 {rates['us10y']:.2f}%" if rates.get("us10y") else ""))
-    tip = ("시장 흐름을 이루는 사실들 (추세 · 흔들림 · 금리)\n"
-           f"· 오늘 {state} : S&P 500(SPY)이 20일선 {'위' if a20 else '아래'}, 50일선 {'위' if a50 else '아래'}")
-    theme, ink = ("positive", C.UP) if a20 and a50 else ("negative", C.DOWN) if not a20 and not a50 else ("uncertain", C.SOON)   # 답 색 (P330): 둘 다 위 상승 · 둘 다 아래 하락 · 엇갈림 불확실
-    return C.question_card("지금 시장 흐름은?", state, theme, ink, lines, tip=tip)
-
-
 # ── 한국장 탭 ───────────────────────────────────────────────────────────
 
 DIFF_MIN = 0.10   # 시기별 장중이 아무 날과 이만큼(%p) 넘게 달라야 "그 시기에 있었다"로 본다
@@ -179,7 +153,7 @@ def seo_korea(a):
 
 
 def korea_open_card(a, opened=True):
-    """K1 오늘 한국장에 미국장이 얼마나 닿나 — 코스피 ← S&P 500."""
+    """K1 미국장과 오늘 한국장 연결 — 코스피 ← S&P 500 (2026-11-07 사용자 P378: `닿나` → `연결`)."""
     ks = next((p for p in a.get("korea") or [] if p["kr"] == "^KS11"), None)
     if not ks:
         return ""
@@ -201,7 +175,7 @@ def korea_open_card(a, opened=True):
     tip = ("미국 증시가 밤사이 움직인 만큼이 다음 날 한국 증시 시작 가격에 얼마나 들어가는지\n"
            f"· 오늘 S&P 500 {_s(ks['us_ret'])} : 평소의 {_times(ks['us_z'])}")
     state = f"S&P 500 {_s(ks['us_ret'])}"
-    return C.question_card("오늘 한국장에 얼마나 닿나?", state, "neutral", "#111", lines, tip=tip, opened=opened)
+    return C.question_card("미국장과 오늘 한국장 연결은?", state, "neutral", "#111", lines, tip=tip, opened=opened)
 
 
 def korea_pairs_card(a):
@@ -222,7 +196,7 @@ def korea_pairs_card(a):
         lines.append(("row", p["kr_name"], _s(p["us_ret"]), f"짝 : {p['us_name']} · 상관 {p['corr']:.2f}"))
     tip = ("한국 종목과 흔히 같이 보는 미국 지수 · 종목의 지난밤 움직임\n"
            f"· 오늘 {lead['us_name']} {_s(lead['us_ret'])} : 평소의 {_times(lead['us_z'])}")
-    return C.question_card("이어진 국내 종목은?", f"{lead['us_name']} {_s(lead['us_ret'])}", "neutral", "#111", lines, tip=tip)
+    return C.question_card("연결된 국내 종목은?", f"{lead['us_name']} {_s(lead['us_ret'])}", "neutral", "#111", lines, tip=tip)
 
 
 def fx_card(a):
