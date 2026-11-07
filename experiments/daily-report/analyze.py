@@ -139,6 +139,32 @@ def index_tech(raw_series):
     return out
 
 
+def _nvda_config():
+    """NVDA 리포트 config(국면 기준값) — 경로를 sys.path 에 넣지 않고 파일로 읽는다(daily 의 analyze · render_html 와 이름이 겹친다)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("nvda_config", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "nvda-report", "config.py"))
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def market_mood(closes):
+    """미국 증시 분위기 — 종목 페이지 `미국 증시 분위기는?`(stock-radar analyze.market_regime)과 같은 규칙 · 같은 기준값 · 같은 SPY (2026-11-07 사용자: 데일리 세 카드를 한 카드로).
+    VIX ≥ 30 → 불안 국면, 1년 고점 대비 −10% 이하 또는 200일 평균 아래 → 조정장, −3% 이하 → 단기 조정, 그 밖 상승 추세. 판정은 보이는 소수 한 자리 값(P275)."""
+    NC = _nvda_config()
+    c = closes.get("SPY") or []
+    if len(c) < NC.REGIME_MA_DAYS:
+        return None
+    vix = (closes.get("^VIX") or [None])[-1]
+    ph = (c[-1] / max(c[-NC.REGIME_HIGH_DAYS:]) - 1) * 100
+    ma = sum(c[-NC.REGIME_MA_DAYS:]) / NC.REGIME_MA_DAYS
+    phr = round(ph, 1)
+    regime = ("불안 국면" if vix is not None and vix >= NC.REGIME_VIX_HIGH else
+              "조정장" if phr <= NC.REGIME_CORRECTION_PCT or c[-1] < ma else "단기 조정" if phr <= NC.REGIME_PULLBACK_PCT else "상승 추세")
+    return {"regime": regime, "pct_from_high": round(ph, 2), "above_ma200": c[-1] >= ma, "pct_vs_ma200": round((c[-1] / ma - 1) * 100, 2), "vix": vix,
+            "pullback": NC.REGIME_PULLBACK_PCT, "correction": NC.REGIME_CORRECTION_PCT, "vix_high": NC.REGIME_VIX_HIGH}
+
+
 def series_stats(close):
     """B-1 · B-2. close는 오래된 것 → 최신 순."""
     ma20 = _ma(close, 20)
@@ -564,7 +590,8 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
 
     series = {sym: series_stats(c) for sym, c in closes.items()}
     split = day_split(prices.get("series") or {})
-    tech_idx = index_tech(prices.get("series") or {})   # 지수 4개 기술지표 — 종목 페이지 `기술지표의 방향은?` 과 같은 계산 (2026-11-07 사용자 P392)   # 지수 4개 하루 = 시가 갭 + 장중 (2026-11-07 사용자: 한국 증시 리포트처럼)
+    tech_idx = index_tech(prices.get("series") or {})
+    mood = market_mood(closes)   # 미국 증시 분위기 (종목 페이지와 같은 규칙, 2026-11-07)   # 지수 4개 기술지표 — 종목 페이지 `기술지표의 방향은?` 과 같은 계산 (2026-11-07 사용자 P392)   # 지수 4개 하루 = 시가 갭 + 장중 (2026-11-07 사용자: 한국 증시 리포트처럼)
 
     position = {}
     for key, sym in INDEX_SYMBOL.items():
@@ -641,6 +668,7 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "raw": raw,
         "split": split,
         "tech_idx": tech_idx,
+        "mood": mood,
     }
     # 재설계 계산 (2026-10-18, doc/기획/데일리-리포트-기획.md 6절) — 평소 범위 · 충격 · 한국 연결 · 환율 · 일정
     dates = {sym: rec["dates"] for sym, rec in (prices.get("series") or {}).items() if rec.get("close") and rec.get("dates")}   # 환율 그래프 가로축 (batch 8 ⑭)

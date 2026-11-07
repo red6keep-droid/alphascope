@@ -50,7 +50,7 @@ def _times(z):
 
 # ── 오늘 탭 ─────────────────────────────────────────────────────────────
 
-def normal_card(a, opened=True):
+def normal_card(a, opened=True, parts=False):
     """D3 오늘 움직임은 평소와 달랐나 — 지수별 평소 범위 (엔비디아 W1 과 같은 자)."""
     nr = a.get("normal") or {}
     keys = [k for k in ("^GSPC", "^IXIC", "^DJI", "^RUT") if k in nr]
@@ -86,6 +86,8 @@ def normal_card(a, opened=True):
     # 지수별 줄(오늘 · 평소 ± · 배수)은 `지수 기술지표의 방향은?` 카드 라벨 안으로 (2026-11-07 사용자 P392)
     tip = ("하루 움직임이 그 지수의 평소 크기 안이었는지. 평소 크기는 최근 움직임에 무게를 더 둔 표준편차이고, 2배를 넘으면 평소 밖으로 봅니다"
            + (f"\n· 오늘 S&P 500 {_s(sp['ret_pct'])} : 평소의 {_times(sp['z'])}, 지난 1년 중 이만큼 이상 움직인 날 {sp['n_year']}번" if sp else ""))
+    if parts:   # `미국 증시 분위기는?` 카드 안 한 묶음으로 (2026-11-07 사용자)
+        return ("오늘 움직임은 평소와 달랐나?", state, theme, ink, lines, tip)
     return C.question_card("오늘 움직임은 평소와 달랐나?", state, theme, ink, lines, tip=tip, opened=opened)
 
 

@@ -797,7 +797,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     # 세 덩어리 (같은 날 P384): ① 주요 지수 = 같은 지수를 근거로 쓰는 것(지수 값 → 평소와 달랐나 → 충격 → 흐름 → 기술주 · 소형주)
     #   ② 종목 · 업종 = 무엇이 움직였나(대형주 10개 → 업종 → 테마 → 고르게) ③ 시장 바탕(긴장 → 금리 → 경제)
     grid = lambda h: cards.cards_grid(h) if h else ""  # noqa: E731
-    idx_cards = sx.normal_card(a, opened=False) + sx.shock_card(a) + mk.index_cards(a, prev)   # 오늘 탭 카드는 모두 닫힌 채로 (2026-11-07 사용자, 옛 P216 첫 카드 펼침)
+    idx_cards = sx.shock_card(a) + mk.index_cards(a, prev)   # `오늘 움직임은 평소와 달랐나?` 는 `미국 증시 분위기는?` 안으로 (2026-11-07 사용자)   # 오늘 탭 카드는 모두 닫힌 채로 (2026-11-07 사용자, 옛 P216 첫 카드 펼침)
     parts.append(dk.section(TAB_TODAY, grid(idx_cards), tab=TAB_TODAY))   # 탭 이름과 같은 제목은 테마가 숨긴다 — `주요 지수` 제목 삭제 (2026-11-07 사용자), 지수 표 · 그래프는 탭 머리로
     move = mk.move_cards(a, prev)
     if move:

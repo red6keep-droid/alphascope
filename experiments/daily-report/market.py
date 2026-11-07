@@ -235,7 +235,7 @@ def breadth_card(a, prev):
 
 # ── 4 ~ 6 시장의 결 ───────────────────────────────────────────────────
 
-def rs_card(a, prev):
+def rs_card(a, prev, parts=False):
     """4. 기술주 · 소형주는 시장보다 셌나? — 답 `기술주 ▲ · 소형주 ▼`. 5거래일 상대강도(나스닥 100 · 러셀 2000 vs S&P 500, 상장지수펀드 QQQ · IWM · SPY — 2026-11-07 P384: 나스닥 종합과 다르다) + 연속 일수."""
     rs = a.get("rs") or {}
     prs = (prev or {}).get("rs") or {}
@@ -267,10 +267,12 @@ def rs_card(a, prev):
            "· 오늘 : " + (" · ".join(won) + " 쪽이 시장 전체보다 강했다" if won else "둘 다 시장 전체보다 약했다")
            + "\n· 참고 : 값이 플러스면 앞에 적힌 쪽이 더 많이 올랐다는 뜻")
     theme, ink = _dir(len(strong) * 2 - len(known))   # 둘 다 강함 = 주황 · 둘 다 약함 = 파랑 · 엇갈림 = 회색
+    if parts:   # `미국 증시 분위기는?` 카드 안 한 묶음으로 (2026-11-07 사용자)
+        return ("기술주 · 소형주는 시장보다 셌나?", state, theme, ink, lines, dk.with_src(tip, SRC_PRICE))
     return C.question_card("기술주 · 소형주는 시장보다 셌나?", state, theme, ink, lines, tip=dk.with_src(tip, SRC_PRICE))
 
 
-def flow_card(a):
+def flow_card(a, parts=False):
     """지금 시장 흐름은? — 옛 오늘 탭 카드(sections.market_now_card, D6)와 `고점에서 얼마나 떨어져 있나?` 를 합쳤다 (2026-11-07 사용자: 오늘 · 시장 탭 겹침).
     오늘 탭 = 오늘 하루에 일어난 일, 시장 탭 = 지금 시장의 상태. 변동성 지수 · 금리는 각자 카드가 있어 여기 두지 않는다.
     답 = S&P 500(SPY)이 20 · 50일 평균선 위인가. 둘 다 위 = 주황, 둘 다 아래 = 파랑, 엇갈림 = 회색 (답에 보라 금지, 7-1 — 옛 P330 엇갈림 보라를 바꿨다)."""
@@ -297,6 +299,8 @@ def flow_card(a):
     tip = ("S&P 500이 평균 가격선(최근 20 · 50거래일) 위에 있는지와, 최근 한 달 고점 · 저점 사이에서 지금 어디쯤인지\n"
            f"· 오늘 {state} : 20일선 {'위' if a20 else '아래'}, 50일선 {'위' if a50 else '아래'}"
            "\n· 20일 위치 : 고점과 1% 안이면 고점 부근, 저점과 1% 안이면 저점 부근, 그 사이는 박스 중간. 고점 부근이면서 한 달에 5% 넘게 오르면 과열 주의")
+    if parts:   # `미국 증시 분위기는?` 카드 안 한 묶음으로 (2026-11-07 사용자)
+        return ("지금 시장 흐름은?", state, theme, ink, lines, dk.with_src(tip, SRC_PRICE))
     return C.question_card("지금 시장 흐름은?", state, theme, ink, lines, tip=dk.with_src(tip, SRC_PRICE))   # 오늘 탭 중간이라 접힘 — 탭 첫 카드만 펼침 (P216, 2026-11-07 시장 탭 없앰)
 
 
@@ -422,7 +426,10 @@ def index_cards(a, prev):
     """오늘 탭 첫 덩어리(주요 지수 아래) — 같은 지수를 근거로 쓰는 카드: 흐름(20 · 50일) → 기술주 · 소형주(5거래일) (2026-11-07 사용자 P384).
     `오늘 움직임은 평소와 달랐나?`(sections.normal_card) · 충격 카드는 render_html 이 이 앞에 둔다."""
     a = a or {}
-    return "".join(x for x in (flow_card(a), rs_card(a, prev), index_tech_card(a, prev)) if x)   # 지수 기술지표 카드 = 덩어리 끝 (P392)
+    mood = mood_card(a, prev)
+    if not mood:   # 분위기 값이 없는 날은 옛 카드 셋을 따로
+        mood = sx.normal_card(a, opened=False) + flow_card(a) + rs_card(a, prev)
+    return "".join(x for x in (mood, index_tech_card(a, prev)) if x)   # 세 카드 → `미국 증시 분위기는?` 한 카드 (2026-11-07 사용자) · 지수 기술지표 카드 = 덩어리 끝 (P392)
 
 
 def move_cards(a, prev):
@@ -493,3 +500,41 @@ def index_tech_card(a, prev):
     tip = ("지수 4개의 오늘 움직임 · 평균 가격선 · 최근 한 달 자리와, 종목 페이지와 같은 기술지표 11개 · 이동평균 12개가 가리키는 방향. 라벨을 누르면 그 지수로 바뀝니다. 답은 S&P 500 기준\n"
            f"· 오늘 S&P 500 {head['word']} : 상승 − 하락을 전체로 나눈 값이 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락")
     return C.question_card("지수 기술지표의 방향은?", head["word"], theme, ink, [(html, "html")], tip=dk.with_src(tip, SRC_PRICE))
+
+
+MOOD_KIND = {"상승 추세": ("positive", UP), "단기 조정": ("neutral", "#111"), "조정장": ("negative", DOWN), "불안 국면": ("uncertain", "#92400E")}   # nvda config REGIME_DIRECTION 과 같은 방향
+
+
+def _part_head(q, state, ink, tip, line_col, first):
+    """한 카드 안 묶음 머리 — 옛 카드의 질문(+ ? 툴팁) 왼쪽 · 답 오른쪽, 묶음 사이 가는 선."""
+    if ink == "#111":
+        ink = MUTED
+    ans = state if str(state).startswith("<span") else dk.tint(C.esc(state))
+    return (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;{"" if first else f"border-top:1px solid {line_col};padding-top:14px;margin-top:6px;"}'
+            f'font-weight:700;font-size:17px;line-height:25px;color:#111;"><span style="min-width:0;">{C.esc(q)}{dk.tip_icon(tip) if tip else ""}</span>'
+            f'<span style="flex:none;text-align:right;color:{ink};">{ans}</span></span>')
+
+
+def mood_card(a, prev):
+    """미국 증시 분위기는? — 종목 페이지와 같은 질문 · 같은 답(상승 추세 · 단기 조정 · 조정장 · 불안 국면, analyze.market_mood) (2026-11-07 사용자).
+    안에 옛 카드 셋을 묶음으로: `오늘 움직임은 평소와 달랐나?` · `지금 시장 흐름은?` · `기술주 · 소형주는 시장보다 셌나?` — 각 묶음 머리에 옛 질문 · 답 · 툴팁 그대로."""
+    m = a.get("mood") or {}
+    if not m.get("regime"):
+        return ""
+    theme, ink = MOOD_KIND.get(m["regime"], ("neutral", "#111"))
+    line_col = dk.darken(dk.lighten(dk.lighten(dk.CARD_DIR[theme][1]), 0.3), 0.02)
+    ph = m["pct_from_high"]
+    where = "1년 최고가 근처" if ph > -0.5 else f"1년 최고가보다 {abs(ph):.1f}% 아래"
+    first = f"S&P 500은 {where}이고, 200일 평균 가격보다 {'위' if m['above_ma200'] else '아래'}에 있습니다."
+    if m["regime"] == "불안 국면" and m.get("vix") is not None:
+        first += f" 변동성 지수(VIX)가 {m['vix']:.1f}로 {m['vix_high']:.0f}을 넘었습니다."
+    lines = [(first, "plain")]
+    parts = [x for x in (sx.normal_card(a, parts=True), flow_card(a, parts=True), rs_card(a, prev, parts=True)) if x]
+    for i, (q, st, _th, ik, ls, tp) in enumerate(parts):
+        lines.append((_part_head(q, st, ik, tp, line_col, False), "html"))
+        lines += ls
+    pb, cr = abs(m["pullback"]), abs(m["correction"])
+    tip = ("미국 시장 전체(S&P 500)가 오르는 흐름인지, 쉬어 가는지, 흔들리는지. 종목 페이지 `미국 증시 분위기는?` 과 같은 기준\n"
+           f"· 오늘 {m['regime']} : S&P 500이 {where}, 200일 평균보다 {'위' if m['above_ma200'] else '아래'}\n"
+           f"· 나누는 법 : 고점에서 {pb:.0f}% 안이면 상승 추세, {pb:.0f}~{cr:.0f}% 아래면 단기 조정, {cr:.0f}% 넘게 빠지거나 200일 평균 아래면 조정장, 변동성 지수 {m['vix_high']:.0f} 이상이면 불안 국면")
+    return C.question_card("미국 증시 분위기는?", m["regime"], theme, ink, lines, tip=dk.with_src(tip, SRC_PRICE))
