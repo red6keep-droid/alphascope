@@ -509,14 +509,17 @@ def index_tech_card(a, prev):
 MOOD_KIND = {"상승 추세": ("positive", UP), "단기 조정": ("neutral", "#111"), "조정장": ("negative", DOWN), "불안 국면": ("uncertain", "#92400E")}   # nvda config REGIME_DIRECTION 과 같은 방향
 
 
-PART_NAME = {"오늘 움직임은 평소와 달랐나?": "오늘 움직임", "지금 시장 흐름은?": "짧은 흐름", "기술주 · 소형주는 시장보다 셌나?": "기술주 · 소형주"}   # 펼침 안 소제목 = 명사형 (가이드라인 7-1)
+PART_NAME = {"오늘 움직임은 평소와 달랐나?": ("오늘 움직임", "지수 4개 · 평소 하루 움직임과 비교"),
+             "지금 시장 흐름은?": ("짧은 흐름", "S&P 500 · 20 · 50거래일 평균 가격"),
+             "기술주 · 소형주는 시장보다 셌나?": ("기술주 · 소형주", "최근 5거래일 · S&P 500 대비")}   # 묶음 머리 = 근거 줄(이름 · 값 · 뜻) — 옛 카드의 답이 오른쪽 값 (2026-11-07 사용자: 그래프 제목 모양 취소)
 
 
-def _part_head(name, tip):
-    """한 카드 안 묶음 제목 — 종목 페이지 묶음 제목(nvda render_html.group_head)과 같은 모양: 굵은 15/23, 위 29 · 아래 6, 선 없음 (2026-11-07 사용자: 강조 카드 규칙).
-    옛 카드의 답은 제목 옆에 두지 않는다 — 묶음 첫 문장이 말한다. ? 툴팁(읽는 법)은 남긴다."""
-    return (f'<span data-group="1" style="display:flex;align-items:center;padding:29px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:23px;">'
-            f'{C.esc(name)}{dk.tip_icon(tip) if tip else ""}</span>')
+def _part_row(q, state, ink):
+    """한 카드 안 묶음 머리 — 근거 줄 꼴 `("row", 이름, 값, 뜻)`: 왼쪽 명사형 이름 · 오른쪽 옛 카드의 답(그 방향 색) · 아래 회색 뜻 (가이드라인 7-1 근거 줄)."""
+    name, note = PART_NAME.get(q, (q, ""))
+    col = "#111" if ink in ("#111", MUTED) else ink
+    val = state if str(state).startswith("<span") else f'<span style="color:{col};">{dk.tint(C.esc(state))}</span>'
+    return ("row", name, val, note)
 
 
 def mood_card(a, prev):
@@ -538,8 +541,8 @@ def mood_card(a, prev):
         first += f" 변동성 지수(VIX)가 {m['vix']:.1f}로 {m['vix_high']:.0f}을 넘었습니다."
     lines = [(first, "plain")]
     parts = [x for x in (sx.normal_card(a, parts=True), flow_card(a, parts=True), rs_card(a, prev, parts=True)) if x]
-    for q, _st, _th, _ik, ls, tp in parts:   # 묶음마다 문장 → 그래프 → 수치 줄 (7-1 순서는 묶음 안에서 지킨다)
-        lines.append((_part_head(PART_NAME.get(q, q), tp), "html"))
+    for q, st, _th, ik, ls, _tp in parts:   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄
+        lines.append(_part_row(q, st, ik))
         lines += ls
     pb, cr = abs(m["pullback"]), abs(m["correction"])
     tip = ("미국 시장 전체(S&P 500)가 오르는 흐름인지, 쉬어 가는지, 흔들리는지. 종목 페이지 `미국 증시 분위기는?` 과 같은 기준\n"
