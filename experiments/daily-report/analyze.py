@@ -171,10 +171,10 @@ def index_rs(closes, n=5):
 
 
 def market_mood(closes):
-    """미국 증시 분위기 — 종목 페이지 `미국 증시 분위기는?`(stock-radar analyze.market_regime)과 같은 규칙 · 같은 기준값 · 같은 SPY (2026-11-07 사용자: 데일리 세 카드를 한 카드로).
+    """미국 증시 분위기 — 종목 페이지 `미국 증시 분위기는?`(stock-radar analyze.market_regime)과 같은 규칙 · 같은 기준값, 값은 S&P 500 지수 (2026-11-07 사용자: 데일리 세 카드를 한 카드로).
     VIX ≥ 30 → 불안 국면, 1년 고점 대비 −10% 이하 또는 200일 평균 아래 → 조정장, −3% 이하 → 단기 조정, 그 밖 상승 추세. 판정은 보이는 소수 한 자리 값(P275)."""
     NC = _nvda_config()
-    c = closes.get("SPY") or []
+    c = closes.get("^GSPC") or []   # 지수 기준 (2026-11-07 사용자: 데일리는 지수로 맞춤 — 옛 SPY, 종목 페이지는 아직 SPY)
     if len(c) < NC.REGIME_MA_DAYS:
         return None
     vix = (closes.get("^VIX") or [None])[-1]
@@ -183,7 +183,11 @@ def market_mood(closes):
     phr = round(ph, 1)
     regime = ("불안 국면" if vix is not None and vix >= NC.REGIME_VIX_HIGH else
               "조정장" if phr <= NC.REGIME_CORRECTION_PCT or c[-1] < ma else "단기 조정" if phr <= NC.REGIME_PULLBACK_PCT else "상승 추세")
+    yr = c[-NC.REGIME_HIGH_DAYS:]
+    lo, hi = min(yr), max(yr)
     return {"regime": regime, "pct_from_high": round(ph, 2), "above_ma200": c[-1] >= ma, "pct_vs_ma200": round((c[-1] / ma - 1) * 100, 2), "vix": vix,
+            "last": round(c[-1], 2), "ma200": round(ma, 2), "low_1y": round(lo, 2), "high_1y": round(hi, 2),
+            "high_days": len(yr) - 1 - max(range(len(yr)), key=lambda i: yr[i]),
             "pullback": NC.REGIME_PULLBACK_PCT, "correction": NC.REGIME_CORRECTION_PCT, "vix_high": NC.REGIME_VIX_HIGH}
 
 

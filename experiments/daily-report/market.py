@@ -540,6 +540,14 @@ def mood_card(a, prev):
     if m["regime"] == "불안 국면" and m.get("vix") is not None:
         first += f" 변동성 지수(VIX)가 {m['vix']:.1f}로 {m['vix_high']:.0f}을 넘었습니다."
     lines = [(first, "plain")]
+    if m.get("low_1y") is not None and m.get("high_1y", 0) > m["low_1y"]:   # 1년 범위 막대 + 200일 평균 눈금 (2026-11-07 사용자: 종목 페이지 `가격 범위 (1년)` 막대 · 목표가 막대 눈금처럼)
+        lo, hi = m["low_1y"], m["high_1y"]
+        at = lambda v: (v - lo) / (hi - lo) * 100  # noqa: E731
+        f0 = lambda v: f"{v:,.0f}"  # noqa: E731
+        gtip = ("S&P 500 의 최근 1년(252거래일) 가장 낮았던 종가와 가장 높았던 종가 사이에서 오늘 종가의 자리, 파란 눈금은 200일 평균 가격\n"
+                f"· 오늘 {f0(m['last'])} : 1년 최고 대비 {_s(m['pct_from_high'], 1)} · 200일 평균 대비 {_s(m['pct_vs_ma200'], 1)}")
+        lines.append((C.range_gauge(lo, hi, at(m["last"]), m["pct_from_high"], f0, dk.with_src(gtip, SRC_PRICE), "S&P 500 가격 범위 (1년)", "1년 최고 대비", "1년 최고 근처",
+                                    m.get("high_days"), marks=[(f"200일 평균 {f0(m['ma200'])} ({_s(m['pct_vs_ma200'], 1)})", at(m["ma200"]))]), "html"))
     parts = [x for x in (sx.normal_card(a, parts=True), flow_card(a, parts=True), rs_card(a, prev, parts=True)) if x]
     for q, st, _th, ik, ls, _tp in parts:   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄
         lines.append(_part_row(q, st, ik))
