@@ -40,22 +40,12 @@ INDEX_SYMBOL = {
     "vix": "^VIX",
 }
 
-SECTOR_THEME = {
-    "SMH": "AI / 반도체",
-    "XLK": "기술",
-    "XLF": "금융",
-    "XLE": "에너지",
-    "XLV": "헬스케어",
-    "XLY": "소비 (경기민감)",
-    "XLP": "소비 (필수)",
-    "XLU": "유틸리티",
-    "XLI": "산업",
-    "XLB": "소재",
-    "XLRE": "리츠",
-    "XLC": "통신",
-}
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import taxonomy as TX  # noqa: E402  — 업종 · 세부 업종 이름은 공용 분류표 (2026-11-07 P385)
+
+SECTOR_THEME = {**{e: TX.sector_name(e) for e in TX.SUB_INDUSTRIES}, **TX.SECTORS}   # 세부 업종(SMH 반도체) + 업종 11개 — 순위 표에는 함께, 카드가 업종만 골라 쓴다
 # 시장 폭 프록시의 분모. SMH는 테마라 빼고 섹터 11개만 센다.
-BREADTH_SECTORS = ["XLK", "XLF", "XLE", "XLV", "XLP", "XLY", "XLU", "XLI", "XLB", "XLRE", "XLC"]
+BREADTH_SECTORS = list(TX.SECTORS)
 
 REGIME_RISK_ON = 70
 REGIME_RISK_OFF = 45

@@ -764,7 +764,7 @@ def sec_status(analysis, report, prev=None):
 
 def build_body(input_data, report, cover_url=None, analysis=None, output_dir=None):
     """2026-10-18 재설계 (doc/기획/데일리-리포트-기획.md 6절) — 탭 = 독자 질문 묶음.
-    오늘(D1 · D2 · D3 · D6) · 한국장(K1 · K2 · K3) · 시장(D4) · 일정(D5). 시장 상태 점수 · 신호등 · 급등주 · 거래 상위 · 위험요인은 뺐다 (5절 B5 · B6).
+    오늘(D1 · D2 · D3 · D6 + 옛 시장 탭 카드 8개, 2026-11-07 시장 탭 없앰) · 뉴스 · 인물 발언 · 한국장(K1 · K2 · K3) · 일정(D5). 시장 상태 점수 · 신호등 · 급등주 · 거래 상위 · 위험요인은 뺐다 (5절 B5 · B6).
     홈 카드 CARDS: summary = (머리), insight = (종합) — 머리 카드의 data-insight 그대로."""
     indices = input_data.get("market", {}).get("indices", {})
     prev = _prev_analysis(analysis)   # 어제 대비 (2026-10-13 사용자)
@@ -776,11 +776,19 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
         sec_chart(output_dir) or _cover_image(cover_url),
         sec_lead(report, analysis),
     ]
-    today_cards = sx.normal_card(a) + sx.shock_card(a)   # `지금 시장 흐름은?` 은 시장 탭으로 (2026-11-07 사용자: 오늘 = 오늘 하루, 시장 = 지금 상태)
-    if today_cards:
-        parts.append(dk.section(TAB_TODAY, cards.cards_grid(today_cards), tab=TAB_TODAY))   # 제목 `핵심 질문` 삭제 (2026-11-05 사용자 batch 8 ①) — 탭 이름과 같은 제목은 테마가 숨긴다, 탭 나누기 h2 는 남아야 한다
+    # 오늘 탭 = 옛 시장 탭 카드까지 한 곳에 (2026-11-07 사용자: "시장 탭을 오늘 탭으로 다 옮기자" — 시장 탭은 없앰). 맨 첫 카드만 펼침
+    # 세 덩어리 (같은 날 P384): ① 주요 지수 = 같은 지수를 근거로 쓰는 것(지수 값 → 평소와 달랐나 → 충격 → 흐름 → 기술주 · 소형주)
+    #   ② 종목 · 업종 = 무엇이 움직였나(대형주 10개 → 업종 → 테마 → 고르게) ③ 시장 바탕(긴장 → 금리 → 경제)
+    grid = lambda h: cards.cards_grid(h) if h else ""  # noqa: E731
+    idx_cards = sx.normal_card(a) + sx.shock_card(a) + mk.index_cards(a, prev)
+    parts.append(dk.section("주요 지수", sec_indices(indices, analysis, report) + grid(idx_cards), tab=TAB_TODAY))
+    move = mk.move_cards(a, prev)
+    if move:
+        parts.append(dk.section("종목 · 업종", grid(move), tab=TAB_TODAY))
+    base = mk.base_cards(a, input_data.get("macro") or {})
+    if base:
+        parts.append(dk.section("시장 바탕", grid(base), tab=TAB_TODAY))
     parts += [
-        dk.section("주요 지수", sec_indices(indices, analysis, report), tab=TAB_TODAY),
         # 뉴스 = 오늘 옆 탭 (2026-11-07 사용자: 오늘 탭이 너무 길다). 탭 이름과 같은 제목 `뉴스` 는 테마가 숨긴다. 읽는 법 툴팁 삭제 (같은 날)
         dk.keep_tone(dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_NEWS)),   # 뉴스는 헤드라인체 그대로 (2026-10-18 사용자)
     ]
@@ -791,9 +799,6 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     if korea:
         parts.append(dk.section(TAB_KOREA, cards.cards_grid(korea), tab=TAB_KOREA))   # 탭 이름과 같은 구획 제목은 테마가 탭 화면에서 숨긴다
     parts.append(kr_news.section(_media_rows()))   # 소식이 없어도 표시 주석은 남긴다 — 미디어 데일리 실행 뒤 kr_news.py 가 이 칸만 채운다 (2026-10-25)
-    market = mk.cards(a, prev, input_data.get("macro") or {})   # 시장 탭 = 질문 카드 8개 (2026-11-07 사용자) — 옛 구획 5개(대형주 · 시장 폭 · 달라진 것 · 섹터 · 금리·지표)와 Gemini 해설 대신
-    if market:
-        parts.append(dk.section(TAB_MARKET, cards.cards_grid(market).replace('style="margin:0 0 8px;"', f'style="margin:0 0 8px;padding-top:{TAB_TOP}px;"', 1), tab=TAB_MARKET))   # 탭 이름과 같은 제목은 테마가 숨긴다 · 시장 탭 첫 콘텐츠 위 +10 (2026-10-13 사용자)
     if a.get("calendar"):
         parts.append(dk.section(TAB_CAL, cards.cards_grid(sx.macro_cal_card(a) + sx.earnings_cal_card(a)), tab=TAB_CAL))
     parts.append(dk.WRAP_CLOSE)   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지, 가이드라인 6절)

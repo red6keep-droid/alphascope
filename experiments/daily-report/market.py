@@ -1,4 +1,5 @@
-"""시장 탭 — 독자 질문 카드 8개 (2026-11-07 사용자: "시장 탭도 종목 페이지처럼 질문하고 답하는 형태로").
+"""옛 시장 탭 질문 카드 8개 — 2026-11-07 오후 시장 탭을 없애고 오늘 탭 `오늘 움직임은 평소와 달랐나?` 아래로 옮겼다 (사용자: "시장 탭을 오늘 탭으로 다 옮기자").
+처음: 2026-11-07 사용자 "시장 탭도 종목 페이지처럼 질문하고 답하는 형태로".
 
 옛 구획(대형주 · 시장 폭 · 달라진 것 · 섹터 · 금리·지표)과 Gemini 해설(change · sector · macro_comment)을 대신한다 —
 숫자는 analysis.json(파이썬), 문장은 여기 고정 틀(합니다체). 오늘 · 한국장 · 일정 탭(sections.py)과 같은 방식.
@@ -11,6 +12,7 @@
 import cards as C
 import design_kit as dk
 import sections as sx
+import taxonomy as TX   # 업종 · 세부 업종 · 테마 공용 분류표 (P385)
 
 UP, DOWN, MUTED = dk.UP, dk.DOWN, dk.MUTED
 SRC_PRICE = "Yahoo Finance"
@@ -56,6 +58,22 @@ def _rows_block(rows_html):
     return f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px;">{"".join(rows_html)}</span>'
 
 
+def _rows_fold(rows_html, n_show, label):
+    """질문 카드 안 줄 목록 — 앞 n_show 줄만 보이고 나머지는 같은 흰 카드 안 `○○ n개 더 보기` (테마 details[data-fold], dk.fold_card 와 같은 버튼).
+    2026-11-07 사용자 P381 · P382: 평소 밖 종목 · 맨 위 업종만 보이고 나머지는 접기."""
+    rows_html = list(rows_html)
+    if len(rows_html) <= n_show:
+        return _rows_block(rows_html)
+    return (f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span data-grid="2" style="display:block;">{"".join(rows_html[:n_show])}</span>'
+            f'<details data-acc="1" data-fold="1" data-label="{C.esc(label)}"><summary style="{dk.FOLD_IN_CARD}"><span>{C.esc(label)}</span> {dk.ACC_CHEV}</summary>'
+            f'<span data-grid="2" style="display:block;border-top:1px solid #E2E8F0;">{"".join(rows_html[n_show:])}</span></details></span>')
+
+
+def _two_line(name, pct, ink):
+    """답 두 줄 — 이름 줄바꿈 등락, 오른쪽 정렬 (normal_card 두 지수 답과 같은 꼴, P382)."""
+    return f'<span style="display:inline-block;text-align:right;color:{ink};">{C.esc(name)}<br>{C.esc(_s(pct))}</span>'
+
+
 def _pos_word(pct):
     return "아래쪽 끝" if pct <= 15 else "아래쪽" if pct <= 40 else "가운데" if pct < 60 else "위쪽" if pct < 85 else "위쪽 끝"
 
@@ -76,7 +94,8 @@ def pos_label(label):
 # ── 1 ~ 3 무엇이 움직였나 ─────────────────────────────────────────────
 
 def mega_card(a):
-    """1. 시총 상위 10개 중 평소와 다르게 움직인 종목은? — 답 `10개 중 N개`(보라) · 줄은 sections.mega_rows(종목 링크)."""
+    """1. 시총 상위 10개 중 평소와 다르게 움직인 종목은? — 답 = 평소 밖 종목 수 `1종목`(없으면 `모두 평소 안`), 카드 색 = 가장 크게 벗어난 종목의 방향.
+    펼치면 평소 밖 종목 줄만 보이고, 평소 안 종목은 `평소 범위 안 n개 더 보기` 안. 툴팁 없음 (2026-11-07 사용자 P381)."""
     nr = a.get("normal") or {}
     syms = [s for s in sx.MEGA_KO if s in nr]
     if not syms:
@@ -84,52 +103,96 @@ def mega_card(a):
     outs = sorted((s for s in syms if nr[s]["outside"]), key=lambda s: -abs(nr[s]["z"]))
     theme, ink = "neutral", "#111"
     if outs:
-        top = outs[0]   # 답 = 평소에서 가장 크게 벗어난 종목과 등락 — 카드 색 = 그 종목의 방향
-        theme, ink = _dir(nr[top]["ret_pct"])
-        state = f"{sx.MEGA_SHORT[top]} {_s(nr[top]['ret_pct'])}" + (f" 외 {len(outs) - 1}개" if len(outs) > 1 else "")
-        first = ("오늘 그 종목의 평소 하루 크기 밖으로 움직인 종목은 " + " · ".join(f"{sx.MEGA_KO[s]} {_s(nr[s]['ret_pct'])}" for s in outs)
+        theme, ink = _dir(nr[outs[0]]["ret_pct"])
+        state = f"{len(outs)}종목"
+        first = ("오늘 그 종목의 평소 하루 움직임보다 크게 움직인 종목은 " + " · ".join(f"{sx.MEGA_KO[s]} {_s(nr[s]['ret_pct'])}" for s in outs)
                  + "입니다. 나머지는 평소 범위 안이었습니다.")
     else:
-        state = "모두 평소 범위 안"
-        first = f"{len(syms)}개 모두 그 종목의 평소 하루 크기 안에서 움직였습니다."
-    lines = [(first, "plain"), (_rows_block(sx.mega_rows(a)), "html")]
-    return C.question_card("시총 상위 10개 중 평소와 다르게 움직인 종목은?", state, theme, ink, lines,
-                           tip=dk.with_src(sx.mega_tip(a), SRC_PRICE))
+        state = "모두 평소 안"
+        first = f"{len(syms)}개 모두 그 종목의 평소 하루 움직임 안에서 움직였습니다."
+    rows = sx.mega_rows(a)   # 평소에서 벗어난 크기 순 — 평소 밖 종목이 앞
+    lines = [(first, "plain"), (_rows_fold(rows, len(outs), f"평소 범위 안 {len(rows) - len(outs)}개 더 보기"), "html")]
+    return C.question_card("시총 상위 10개 중 평소와 다르게 움직인 종목은?", state, theme, ink, lines)
 
 
 def sector_card(a):
-    """2. 어느 섹터가 움직였나? — 답 = 가장 오른 섹터와 등락. 줄 = 막대 11개(5일 순위 대비)."""
+    """2. 어느 업종이 움직였나? — 공식 업종 11개만(분류표 TX.SECTORS, P385). 답 = 가장 크게 움직인 업종 · 등락 두 줄(P382), 카드 색 = 그 방향.
+    반도체(세부 업종, 기술 안)는 순위 · 개수 · 답에 넣지 않고 기술 줄 바로 아래 따로 한 줄. 막대는 맨 위(가장 오른 업종) 한 줄만, 나머지는 펼침."""
     sec = a.get("sectors") or {}
-    ranked = sec.get("ranked_1d") or []
+    allr = sec.get("ranked_1d") or []
+    ranked = sorted((dict(r, theme=TX.SECTORS[r["etf"]]) for r in allr if r["etf"] in TX.SECTORS), key=lambda r: -r["ret_1d"])
     if not ranked:
         return ""
+    r5 = {r["etf"]: i for i, r in enumerate(sorted(ranked, key=lambda r: -(r.get("ret_5d") or 0)))}   # 5일 순위도 업종 11개 안에서 다시
+    for i, r in enumerate(ranked):
+        r["rank_change"] = r5[r["etf"]] - i if r.get("ret_5d") is not None else None
+    subs = {TX.SUB_INDUSTRIES[r["etf"]][1]: dict(r, theme=TX.SUB_INDUSTRIES[r["etf"]][0]) for r in allr if r["etf"] in TX.SUB_INDUSTRIES}   # 속한 업종 ETF → 세부 업종 줄
     top, bot = ranked[0], ranked[-1]
     ups = sum(1 for r in ranked if r["ret_1d"] > 0)
-    by = {r["etf"]: r for r in ranked}
-    names = lambda etfs: " · ".join(by[e]["theme"] for e in etfs if e in by)  # noqa: E731
     top_word = "가장 오른" if top["ret_1d"] > 0 else "가장 덜 내린"
     bot_word = "가장 내린" if bot["ret_1d"] < 0 else "가장 덜 오른"
-    first = (f"섹터 {len(ranked)}개 중 {ups}개가 올랐습니다. {top_word} 섹터는 {top['theme']} {_s(top['ret_1d'])}, "
-             f"{bot_word} 섹터는 {bot['theme']} {_s(bot['ret_1d'])}입니다.")
+    first = (f"업종 {len(ranked)}개 중 {ups}개가 올랐습니다. {top_word} 업종은 {top['theme']} {_s(top['ret_1d'])}, "
+             f"{bot_word} 업종은 {bot['theme']} {_s(bot['ret_1d'])}입니다.")
+    for parent, sub in subs.items():
+        first += f" {TX.SECTORS.get(parent, parent)} 업종 안의 {sub['theme']}는 {_s(sub['ret_1d'])}였습니다."
     moved = [r for r in ranked if (r.get("rank_change") or 0) >= 3]
     if moved:
-        first += " 5일 순위보다 세 계단 넘게 올라선 섹터는 " + " · ".join(r["theme"] for r in moved) + "입니다."
-    max_abs = max(abs(r["ret_1d"]) for r in ranked) or 1.0
+        first += " 5일 순위보다 세 계단 넘게 올라선 업종은 " + " · ".join(r["theme"] for r in moved) + "입니다."
+    max_abs = max(abs(r["ret_1d"]) for r in ranked + list(subs.values())) or 1.0
     bars = []
     for r in ranked:
         d = r.get("rank_change")
         sub = "" if d is None else (f"5일 순위 대비 ▲{d}" if d > 0 else f"5일 순위 대비 ▼{-d}" if d < 0 else "5일 순위와 같음")
-        sub = " · ".join(x for x in (r["etf"], sub) if x)
-        bars.append((C.esc(r["theme"]), abs(r["ret_1d"]) / max_abs, UP if r["ret_1d"] >= 0 else DOWN, dk.arrow(r["ret_1d"]), C.esc(sub)))
+        bars.append((C.esc(r["theme"]), abs(r["ret_1d"]) / max_abs, UP if r["ret_1d"] >= 0 else DOWN, dk.arrow(r["ret_1d"]), C.esc(" · ".join(x for x in (r["etf"], sub) if x))))
+        if r["etf"] in subs:   # 세부 업종은 속한 업종 바로 아래 — 순위 없음
+            x = subs[r["etf"]]
+            bars.append((C.esc(f"{x['theme']} ({r['theme']} 안)"), abs(x["ret_1d"]) / max_abs, UP if x["ret_1d"] >= 0 else DOWN, dk.arrow(x["ret_1d"]), C.esc(f"{x['etf']} · 세부 업종, 순위에 넣지 않음")))
     w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])
     rows = [dk.bar_row(n, f, c, v, w, sb, first=(i == 0)) for i, (n, f, c, v, sb) in enumerate(bars)]
-    lines = [(first, "plain"), (f"오늘 앞선 세 섹터(주도)는 {names(sec.get('leaders') or [])}, 뒤처진 세 섹터(약세)는 {names(sec.get('laggards') or [])}입니다.", "plain"),
-             (_rows_block(rows), "html")]
-    tip = ("미국 주요 업종을 대표 상장지수펀드(ETF) 11개로 본 하루 등락. 막대 길이는 등락 크기, 아래 줄은 최근 5일 순위와 견준 자리 변화\n"
+    names = lambda rs: " · ".join(r["theme"] for r in rs)  # noqa: E731
+    lines = [(first, "plain"), (f"오늘 앞선 세 업종은 {names(ranked[:3])}, 뒤처진 세 업종은 {names(ranked[-3:][::-1])}입니다.", "plain"),
+             (_rows_fold(rows, 1, f"업종 {len(ranked) - 1}개 더 보기"), "html")]
+    tip = (f"미국 공식 업종 {len(ranked)}개를 대표 상장지수펀드(ETF)로 본 하루 등락. 막대 길이는 등락 크기, 아래 줄은 최근 5일 순위와 견준 자리 변화. "
+           "반도체처럼 업종 안의 세부 업종은 속한 업종 아래 따로 두고 순위에는 넣지 않습니다\n"
            f"· 오늘 : {top['theme']} {_s(top['ret_1d'])} ~ {bot['theme']} {_s(bot['ret_1d'])}")
-    big = max(ranked, key=lambda r: abs(r["ret_1d"]))   # 답 = 가장 크게 움직인 섹터 (한국 리포트 `어느 테마가 움직였나?` 와 같은 기준) · 카드 색 = 그 방향
+    big = max(ranked, key=lambda r: abs(r["ret_1d"]))   # 답 = 가장 크게 움직인 업종 (한국 리포트 `어느 테마가 움직였나?` 와 같은 기준) · 카드 색 = 그 방향
     theme, ink = _dir(big["ret_1d"])
-    return C.question_card("어느 섹터가 움직였나?", f"{big['theme']} {_s(big['ret_1d'])}", theme, ink, lines, tip=dk.with_src(tip, SRC_PRICE))
+    return C.question_card("어느 업종이 움직였나?", _two_line(big["theme"], big["ret_1d"], ink), theme, ink, lines, tip=dk.with_src(tip, SRC_PRICE))
+
+
+def theme_card(a):
+    """어느 테마가 움직였나? — 테마(TX.THEMES, 업종을 가로지르는 묶음, 기록하지 않음) 구성 종목 하루 등락의 단순 평균 (2026-11-07 P383 · P385).
+    지금 테마 = 하이퍼스케일러 하나(이미 모으는 시총 상위 10개 가격만, 새 수집 없음). 답 = 가장 크게 움직인 테마 · 평균 두 줄, 카드 색 = 그 방향.
+    구성 종목 값이 일부 빠지면 있는 종목만, 모두 없으면 그 테마를 뺀다."""
+    se = a.get("series") or {}
+    spx = (se.get("^GSPC") or {}).get("ret_1d")
+    got = []
+    for key, t in TX.THEMES.items():
+        vals = [(m, (se.get(m) or {}).get("ret_1d")) for m in t["members"]]
+        vals = [(m, v) for m, v in vals if v is not None]
+        if vals:
+            got.append((t, sum(v for _, v in vals) / len(vals), vals))
+    if not got:
+        return ""
+    big = max(got, key=lambda g: abs(g[1]))
+    theme, ink = _dir(round(big[1], 2))
+    lines = []
+    max_abs = max([abs(v) for _, _, vals in got for _, v in vals] + [abs(g[1]) for g in got]) or 1.0
+    for t, avg, vals in got:
+        sent = f"{t['name']}는 {t['desc']}입니다. " + " · ".join(sx.MEGA_KO.get(m, m) for m, _ in vals) + f" {len(vals)}곳 평균은 {_s(avg)}"
+        if spx is not None:
+            gap = avg - spx
+            sent += f"로, S&P 500({_s(spx)})보다 {abs(gap):.2f}%p {'높았' if gap > 0 else '낮았' if gap < 0 else '같았'}습니다."
+        else:
+            sent += "입니다."
+        lines.append((sent, "plain"))
+        bars = [(C.esc(f"{t['name']} 평균"), abs(avg) / max_abs, UP if avg >= 0 else DOWN, dk.arrow(round(avg, 2)), "")]
+        bars += [(C.esc(sx.MEGA_KO.get(m, m)), abs(v) / max_abs, UP if v >= 0 else DOWN, dk.arrow(v), C.esc(m)) for m, v in sorted(vals, key=lambda x: -x[1])]
+        w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])
+        lines.append((_rows_block([dk.bar_row(n, f, c, v, w, sb, first=(i == 0)) for i, (n, f, c, v, sb) in enumerate(bars)]), "html"))
+    tip = ("업종을 가로질러 같은 이야기로 묶은 종목들의 하루 등락 평균. 공식 업종이 아니라 서로 겹칠 수 있고, 업종 개수 셈에는 넣지 않습니다\n"
+           f"· 오늘 : {big[0]['name']} {_s(big[1])}")
+    return C.question_card("어느 테마가 움직였나?", _two_line(big[0]["name"], round(big[1], 2), ink), theme, ink, lines, tip=dk.with_src(tip, SRC_PRICE))
 
 
 def breadth_card(a, prev):
@@ -173,7 +236,7 @@ def breadth_card(a, prev):
 # ── 4 ~ 6 시장의 결 ───────────────────────────────────────────────────
 
 def rs_card(a, prev):
-    """4. 기술주 · 소형주는 시장보다 셌나? — 답 `기술주 ▲ · 소형주 ▼`. 5거래일 상대강도(나스닥 · 러셀 2000 vs S&P 500) + 연속 일수."""
+    """4. 기술주 · 소형주는 시장보다 셌나? — 답 `기술주 ▲ · 소형주 ▼`. 5거래일 상대강도(나스닥 100 · 러셀 2000 vs S&P 500, 상장지수펀드 QQQ · IWM · SPY — 2026-11-07 P384: 나스닥 종합과 다르다) + 연속 일수."""
     rs = a.get("rs") or {}
     prs = (prev or {}).get("rs") or {}
     q, i = rs.get("qqq_spy_5d"), rs.get("iwm_spy_5d")
@@ -181,7 +244,7 @@ def rs_card(a, prev):
         return ""
     sent = []
     if q is not None:
-        sent.append(f"나스닥(기술주)은 S&P 500보다 {abs(q):.2f}%p {'앞섰' if q > 0 else '뒤졌' if q < 0 else '같았'}")
+        sent.append(f"나스닥 100(기술주)은 S&P 500보다 {abs(q):.2f}%p {'앞섰' if q > 0 else '뒤졌' if q < 0 else '같았'}")
     if i is not None:
         sent.append(f"러셀 2000(소형주)은 {abs(i):.2f}%p {'앞섰' if i > 0 else '뒤졌' if i < 0 else '같았'}")
     strong = [w for v, w in ((q, "기술주"), (i, "소형주")) if v is not None and v > 0]
@@ -192,18 +255,18 @@ def rs_card(a, prev):
     first = "최근 5거래일 동안 " + "고, ".join(sent) + "습니다."
     streak = rs.get("qqq_streak")
     if streak:
-        first += f" 나스닥이 S&P 500을 웃돈 날이 {int(streak)}일째 이어졌습니다."
+        first += f" 나스닥 100이 S&P 500을 웃돈 날이 {int(streak)}일째 이어졌습니다."
     elif streak == 0:
-        first += " 오늘은 나스닥이 S&P 500을 웃돌지 못했습니다."
+        first += " 오늘은 나스닥 100이 S&P 500을 웃돌지 못했습니다."
     lines = [(first, "plain")]
     if q is not None:
-        lines.append(("row", "나스닥 − S&P 500", dk.arrow(q, 2, "%p"), "5거래일" + (f" · 어제 {_s(prs['qqq_spy_5d'])}p" if prs.get("qqq_spy_5d") is not None else "")))
+        lines.append(("row", "나스닥 100 − S&P 500", dk.arrow(q, 2, "%p"), "5거래일" + (f" · 어제 {_s(prs['qqq_spy_5d'])}p" if prs.get("qqq_spy_5d") is not None else "")))
     if i is not None:
         lines.append(("row", "러셀 2000 − S&P 500", dk.arrow(i, 2, "%p"), "5거래일" + (f" · 어제 {_s(prs['iwm_spy_5d'])}p" if prs.get("iwm_spy_5d") is not None else "")))
     if streak is not None:
-        lines.append(("row", "나스닥이 S&P 500을 웃돈 연속 일수", f"{int(streak)}일", ""))
+        lines.append(("row", "나스닥 100이 앞선 날", f"{int(streak)}일 연속", ""))
     won = [w for k, w in (("qqq_spy_5d", "기술주"), ("iwm_spy_5d", "소형주")) if (rs.get(k) or 0) > 0]
-    tip = ("최근 5거래일 동안 나스닥(기술주) · 러셀 2000(소형주)이 S&P 500(시장 전체)보다 더 강했는지 견준 것\n"
+    tip = ("최근 5거래일 동안 나스닥 100(기술주) · 러셀 2000(소형주)이 S&P 500(시장 전체)보다 더 강했는지 견준 것\n"
            "· 오늘 : " + (" · ".join(won) + " 쪽이 시장 전체보다 강했다" if won else "둘 다 시장 전체보다 약했다")
            + "\n· 참고 : 값이 플러스면 앞에 적힌 쪽이 더 많이 올랐다는 뜻")
     theme, ink = _dir(len(strong) * 2 - len(known))   # 둘 다 강함 = 주황 · 둘 다 약함 = 파랑 · 엇갈림 = 회색
@@ -246,7 +309,7 @@ def flow_card(a):
     tip = ("S&P 500이 평균 가격선(최근 20 · 50거래일) 위에 있는지와, 최근 한 달 고점 · 저점 사이에서 지금 어디쯤인지\n"
            f"· 오늘 {state} : 20일선 {'위' if a20 else '아래'}, 50일선 {'위' if a50 else '아래'}"
            "\n· 20일 위치 : 고점과 1% 안이면 고점 부근, 저점과 1% 안이면 저점 부근, 그 사이는 박스 중간. 고점 부근이면서 한 달에 5% 넘게 오르면 과열 주의")
-    return C.question_card("지금 시장 흐름은?", state, theme, ink, lines, tip=dk.with_src(tip, SRC_PRICE), opened=True)   # 탭 첫 카드는 펼침 (P216)
+    return C.question_card("지금 시장 흐름은?", state, theme, ink, lines, tip=dk.with_src(tip, SRC_PRICE))   # 오늘 탭 중간이라 접힘 — 탭 첫 카드만 펼침 (P216, 2026-11-07 시장 탭 없앰)
 
 
 def vix_card(a):
@@ -367,8 +430,20 @@ def economy_card(macro):
     return C.question_card("경제 바탕은 어떤가?", _span(" · ".join(parts)), theme, ink, lines, tip=dk.with_src(tip, SRC_FRED))
 
 
-def cards(a, prev, macro):
-    """시장 탭 카드 8개를 순서대로 — 흐름 → 무엇이 움직였나 → 기술주 · 소형주 → 긴장 → 금리 → 경제 — 값이 없는 카드는 빠진다."""
+def index_cards(a, prev):
+    """오늘 탭 첫 덩어리(주요 지수 아래) — 같은 지수를 근거로 쓰는 카드: 흐름(20 · 50일) → 기술주 · 소형주(5거래일) (2026-11-07 사용자 P384).
+    `오늘 움직임은 평소와 달랐나?`(sections.normal_card) · 충격 카드는 render_html 이 이 앞에 둔다."""
+    a = a or {}
+    return "".join(x for x in (flow_card(a), rs_card(a, prev)) if x)
+
+
+def move_cards(a, prev):
+    """둘째 덩어리 — 무엇이 움직였나: 대형주 10개 → 업종 → 테마 → 고르게."""
+    a = a or {}
+    return "".join(x for x in (mega_card(a), sector_card(a), theme_card(a), breadth_card(a, prev)) if x)
+
+
+def base_cards(a, macro):
+    """셋째 덩어리 — 시장 바탕: 긴장 → 금리 → 경제."""
     a, macro = a or {}, macro or {}
-    return "".join(x for x in (flow_card(a), mega_card(a), sector_card(a), breadth_card(a, prev), rs_card(a, prev),
-                                vix_card(a), rates_card(a, macro), economy_card(macro)) if x)
+    return "".join(x for x in (vix_card(a), rates_card(a, macro), economy_card(macro)) if x)

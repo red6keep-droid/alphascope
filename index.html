@@ -973,7 +973,7 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
 a, button, summary, .tab { -webkit-tap-highlight-color: transparent; }
 .is-pressed { transition: none !important; }
 .rank-table tbody tr.is-pressed, .rank-table tbody tr.is-pressed td,
-.news-item.is-pressed, [data-row-link].is-pressed { background-color: #EEF2F7 !important; }
+.news-item.is-pressed, [data-row-link].is-pressed, [data-goto-tab].is-pressed { background-color: #EEF2F7 !important; }
 a.report-card.is-pressed, .post-card.is-pressed { background-color: #F1F5F9 !important; transform: scale(.985); }
 a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-pressed { opacity: .55; }
 .news-item:not(.load-status), [data-row-link] { transition: background-color .15s ease; }
@@ -4969,7 +4969,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
       (function () {
         'use strict';
         var ROWS = '.rank-table tbody tr, .post-card, .news-item:not(.load-status), [data-row-link]';
-        var PRESS = ROWS + ', a[href], button, summary, .tab';
+        var PRESS = ROWS + ', a[href], button, summary, .tab, [data-goto-tab]';   /* 같은 글 안 이동 줄(data-goto-tab — 엔비디아 함께 보기 · 호재 · 리스크 줄)도 눌림 표시 (2026-11-07, 가이드라인 10-9) */
         var INNER = 'a[href], button, summary, details, input, select, label, [data-tip], [role="button"]';
 
         var bar, veil, veilTimer;
