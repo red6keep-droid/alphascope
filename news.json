@@ -1,6 +1,34 @@
 {
-  "updated_at": "2026-11-06 21:47:27 UTC",
+  "updated_at": "2026-11-07 01:12:10 UTC",
   "items": [
+    {
+      "title": "OpenAI will keep investing in AI data centers despite election results, CFO tells CNBC",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/06/open-ai-data-centers-election.html",
+      "published": "2026-11-06 22:25:58",
+      "title_ko": "OpenAI, 선거 결과에도 AI 데이터센터 투자 지속 CFO CNBC 인터뷰",
+      "summary_ko": "선거 결과 데이터센터 개발 제한 약속 후보 지지"
+    },
+    {
+      "title": "Trump says Stephen Miller to replace Susie Wiles as White House chief of staff",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/06/trump-stephen-miller-wiles-chief-of-staff.html",
+      "published": "2026-11-06 22:22:53",
+      "title_ko": "트럼프, 스티븐 밀러를 백악관 수석 보좌관으로 교체 선언",
+      "summary_ko": "민주당 중간선거 대승 후 3일 뒤 발표"
+    },
+    {
+      "title": "AI 데이터센터 규제 및 인프라 구축 우려",
+      "title_ko": "AI 데이터센터 규제 및 인프라 구축 우려",
+      "summary_ko": "중간선거 이후 AI 데이터센터와 반도체 인프라를 향한 정치적·규제적 압박이 커지면서 관련주가 큰 폭으로 조정을 받음",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=26FnoirIW_8",
+      "published": "2026-11-06 22:07:26",
+      "kind": "media",
+      "tag": "AI/반도체",
+      "direction": "neutral",
+      "n_channels": 3
+    },
     {
       "title": "Sen. Chris Murphy released from hospital after stroke, will miss votes for 'several weeks' as he rehabs",
       "source": "CNBC",
@@ -26,20 +54,36 @@
       "summary_ko": ""
     },
     {
+      "title": "민주당 의회 장악과 AI 데이터센터 규제",
+      "title_ko": "민주당 의회 장악과 AI 데이터센터 규제",
+      "summary_ko": "민주당의 의회 승리와 AI 규제 우려가 맞물려 기술주 중심의 대규모 조정을 불러일으켰",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=Ve2eFzwom_4",
+      "published": "2026-11-06 21:04:31",
+      "kind": "media",
+      "tag": "정책/규제",
+      "direction": "negative",
+      "n_channels": 4
+    },
+    {
+      "title": "10월 고용보고서 서프라이즈",
+      "title_ko": "10월 고용보고서 서프라이즈",
+      "summary_ko": "10월 비농업 고용이 예상을 크게 웃돌며 강력한 노동시장 회복세를 확인시켜 주었",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=Ve2eFzwom_4",
+      "published": "2026-11-06 21:04:31",
+      "kind": "media",
+      "tag": "거시경제",
+      "direction": "positive",
+      "n_channels": 3
+    },
+    {
       "title": "Nasdaq drops into correction territory — here’s what typically happens next",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/05/nasdaq-drops-into-correction-territory-heres-what-typically-happens-next.html",
       "published": "2026-11-06 20:42:28",
       "title_ko": "나스닥, 조정 국면 진입, 통상 다음에 일어나는 일",
       "summary_ko": "과거 회복 사례 분석"
-    },
-    {
-      "title": "Trump says Stephen Miller to replace Susie Wiles as White House chief of staff",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/06/trump-stephen-miller-wiles-chief-of-staff.html",
-      "published": "2026-11-06 20:42:07",
-      "title_ko": "트럼프, 스티븐 밀러를 백악관 수석 보좌관으로 교체 선언",
-      "summary_ko": "민주당 중간선거 대승 후 3일 뒤 발표"
     },
     {
       "title": "Here's a rapid-fire update on all 31 of our stocks, including 2 to buy now",
@@ -64,50 +108,6 @@
       "published": "2026-11-06 19:44:33",
       "title_ko": "미시시피 상원: 롱샷 타이 핑킨스, 하이드-스미스 교란 및 콜롬 지지 의도 밝혀",
       "summary_ko": ""
-    },
-    {
-      "title": "Top House Oversight Democrat warns Trump family to 'lawyer up'",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/06/robert-garcia-trump-congress-oversight-investigations.html",
-      "published": "2026-11-06 19:42:36",
-      "title_ko": "하원 감독위원회 민주당 간사, 트럼프 가족에 '변호사 고용' 경고",
-      "summary_ko": "민주당, 1월 하원 장악 예정"
-    },
-    {
-      "title": "AI 수요와 데이터 센터 구축",
-      "title_ko": "AI 수요와 데이터 센터 구축",
-      "summary_ko": "제인 프레이저는 AI 수요가 실제적이며 데이터 센터 구축 과정에서 병목 현상과 우려가 있지만 기술의 본질은 변하지 않는다고 평가",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=f0Q9vgdU538",
-      "published": "2026-11-06 19:41:03",
-      "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "positive",
-      "n_channels": 5
-    },
-    {
-      "title": "데이터 센터 건설 반대 여론",
-      "title_ko": "데이터 센터 건설 반대 여론",
-      "summary_ko": "일부 지역에서 데이터 센터 건설에 반대하는 목소리가 커지면서 AI 인프라 확충에 대한 투자자들의 재고가 이어지고 있음",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=dGo9cnjemec",
-      "published": "2026-11-06 19:40:28",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "negative",
-      "n_channels": 5
-    },
-    {
-      "title": "민주당 의회 승리와 AI 규제 우려",
-      "title_ko": "민주당 의회 승리와 AI 규제 우려",
-      "summary_ko": "민주당의 중간선거 승리로 워싱턴 규제 강화 우려가 커지며 나스닥과 AI 관련 주가가 급락",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=bEHRHYO7Kgk",
-      "published": "2026-11-06 17:52:46",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "negative",
-      "n_channels": 4
     }
   ]
 }
