@@ -113,7 +113,7 @@ def shock_card(a):
              ("row", "VIX", f"{sh['vix']:.2f}", "35 이상에서 시작 · 25 아래에서 끝")]
     tip = ("시장 전체가 크게 흔들리는 기간인지. VIX가 35 이상이 되면 시작, 25 아래로 내려오면 끝으로 봅니다\n"
            f"· 오늘 VIX {sh['vix']:.2f} : 충격 국면 {sh.get('days_in') or 1}거래일째")
-    return C.question_card("시장 충격 국면인가?", f"{sh.get('days_in') or 1}거래일째", "uncertain", "#92400E", lines, tip=tip, opened=True)
+    return C.question_card("시장 충격 국면인가?", f"{sh.get('days_in') or 1}거래일째", "uncertain", "#92400E", lines, tip=tip)   # 닫힌 채로 — 오늘 탭 카드 모두 닫힘 (2026-11-07 사용자)
 
 
 # ── 한국장 탭 ───────────────────────────────────────────────────────────

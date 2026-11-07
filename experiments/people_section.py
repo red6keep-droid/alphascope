@@ -125,7 +125,7 @@ def summary_card(qcard):
         first += f" 다음은 {' · '.join(_issue(t['issue']) for t in tp[1:])} 순입니다." if not ties else f" {' · '.join(_issue(t['issue']) for t in ties)}도 비슷하게 많이 나왔습니다."
     lines = [(first, "plain")] + [("row", _issue(t["issue"]), _dir_val(t["dirs"]), " · ".join(t["who"])) for t in tp]
     lines.append((f"오늘 인물 {sm.get('n_people', 0)}명 · 발언 {sm.get('n', 0)}건 기준", "note"))
-    out.append(qcard("인물들이 가장 많이 말한 분야는?", state, theme, ink, lines, opened=True))
+    out.append(qcard("인물들이 가장 많이 말한 분야는?", state, theme, ink, lines))   # 닫힌 채로 — 데일리 인물 발언 탭 카드 모두 닫힘 (2026-11-07 사용자, 옛 P380 첫 카드 펼침)
     # ② 의견이 갈린 분야 — 회색 (갈림 = 방향 없음)
     sp = sm.get("split") or []
     if sp:
