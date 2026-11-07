@@ -292,9 +292,10 @@ def flow_card(a, parts=False):
     s0 = se.get("^GSPC") or {}
     if s0.get("up_days_20") is not None:
         first += f" 20거래일 중 {s0['up_days_20']}일 올랐고 {s0['down_days_20']}일 내렸습니다."
-    ma = lambda n, up: f'<span style="color:{UP if up else DOWN};">{n}일선 {"위" if up else "아래"}</span>'  # noqa: E731
-    lines = [(first, "plain"),
-             ("row", "S&P 500 추세", f'<span style="display:inline-block;text-align:right;">{ma(20, a20)}<br>{ma(50, a50)}</span>', "최근 20 · 50거래일 평균 가격과 비교")]
+    lines = [(first, "plain")]
+    for n in (20, 50):   # 값 = 평균 가격 대비 % (7-1: 방향 글자만 있는 값 금지, 2026-11-07)
+        if spy.get("last") and spy.get(f"ma{n}"):
+            lines.append(("row", f"{n}일 평균 가격 대비", dk.arrow(round((spy["last"] / spy[f"ma{n}"] - 1) * 100, 2)), f"S&P 500 · 최근 {n}거래일 평균"))
     # 지수별 `20일 위치` 줄은 `지수 기술지표의 방향은?` 카드 라벨 안으로 옮겼다 (2026-11-07 사용자 P392: 지수 수치를 한 카드에)
     tip = ("S&P 500이 평균 가격선(최근 20 · 50거래일) 위에 있는지와, 최근 한 달 고점 · 저점 사이에서 지금 어디쯤인지\n"
            f"· 오늘 {state} : 20일선 {'위' if a20 else '아래'}, 50일선 {'위' if a50 else '아래'}"
@@ -469,9 +470,9 @@ def index_tech_card(a, prev):
             x = nr[k]
             rows.append(f'<span>하루 등락 <span style="font-size:{TS.WHY_FS};color:#6B7280;">평소 ±{x["sigma_pct"]:.2f}%의 {sx._times(x["z"])}</span></span><b>{dk.arrow(x["ret_pct"])}</b>')   # `오늘` → `하루 등락` (2026-11-07 사용자: 오늘이라고 쓰면 무엇인지 모른다) — 평소 ± = 그 지수의 평소 하루 움직임 크기
         s_ = se.get(k) or {}
-        if s_.get("above_ma20") is not None and s_.get("above_ma50") is not None:
-            w = lambda d, up: f'<span style="color:{UP if up else DOWN};">{d}일선 {"위" if up else "아래"}</span>'  # noqa: E731
-            rows.append(f'<span>평균 가격선</span><b>{w(20, s_["above_ma20"])} · {w(50, s_["above_ma50"])}</b>')
+        for d in (20, 50):   # 값 = 평균 가격 대비 % (7-1: 방향 글자만 있는 값 금지, 2026-11-07)
+            if s_.get("last") and s_.get(f"ma{d}"):
+                rows.append(f'<span>{d}일 평균 가격 대비</span><b>{dk.arrow(round((s_["last"] / s_[f"ma{d}"] - 1) * 100, 2))}</b>')
         p = pos.get(IDX_POS[k]) or {}
         if p.get("from_high_pct") is not None:
             note = f"고점 {_s(p['from_high_pct'])}" + (f" · 저점 {_s(p['from_low_pct'])}" if p.get("from_low_pct") is not None else "")
@@ -505,14 +506,14 @@ def index_tech_card(a, prev):
 MOOD_KIND = {"상승 추세": ("positive", UP), "단기 조정": ("neutral", "#111"), "조정장": ("negative", DOWN), "불안 국면": ("uncertain", "#92400E")}   # nvda config REGIME_DIRECTION 과 같은 방향
 
 
-def _part_head(q, state, ink, tip, line_col, first):
-    """한 카드 안 묶음 머리 — 옛 카드의 질문(+ ? 툴팁) 왼쪽 · 답 오른쪽, 묶음 사이 가는 선."""
-    if ink == "#111":
-        ink = MUTED
-    ans = state if str(state).startswith("<span") else dk.tint(C.esc(state))
-    return (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;{"" if first else f"border-top:1px solid {line_col};padding-top:14px;margin-top:6px;"}'
-            f'font-weight:700;font-size:17px;line-height:25px;color:#111;"><span style="min-width:0;">{C.esc(q)}{dk.tip_icon(tip) if tip else ""}</span>'
-            f'<span style="flex:none;text-align:right;color:{ink};">{ans}</span></span>')
+PART_NAME = {"오늘 움직임은 평소와 달랐나?": "오늘 움직임", "지금 시장 흐름은?": "짧은 흐름", "기술주 · 소형주는 시장보다 셌나?": "기술주 · 소형주"}   # 펼침 안 소제목 = 명사형 (가이드라인 7-1)
+
+
+def _part_head(name, tip):
+    """한 카드 안 묶음 제목 — 종목 페이지 묶음 제목(nvda render_html.group_head)과 같은 모양: 굵은 15/23, 위 29 · 아래 6, 선 없음 (2026-11-07 사용자: 강조 카드 규칙).
+    옛 카드의 답은 제목 옆에 두지 않는다 — 묶음 첫 문장이 말한다. ? 툴팁(읽는 법)은 남긴다."""
+    return (f'<span data-group="1" style="display:flex;align-items:center;padding:29px 0 6px;font-weight:700;color:#111;font-size:15px;line-height:23px;">'
+            f'{C.esc(name)}{dk.tip_icon(tip) if tip else ""}</span>')
 
 
 def mood_card(a, prev):
@@ -522,22 +523,20 @@ def mood_card(a, prev):
     if not m.get("regime"):
         return ""
     theme, ink = MOOD_KIND.get(m["regime"], ("neutral", "#111"))
-    line_col = dk.darken(dk.lighten(dk.lighten(dk.CARD_DIR[theme][1]), 0.3), 0.02)
     ph = m["pct_from_high"]
     where = "1년 최고가 근처" if ph > -0.5 else f"1년 최고가보다 {abs(ph):.1f}% 아래"
-    first = f"긴 흐름(1년 · 200일)으로 보면 S&P 500은 {where}이고, 200일 평균 가격보다 {'위' if m['above_ma200'] else '아래'}에 있습니다."
+    first = f"1년 고점과 200일 평균으로 보면 S&P 500은 {where}이고, 200일 평균 가격보다 {'위' if m['above_ma200'] else '아래'}에 있습니다."   # 첫 문장 괄호 설명 금지 (7-1)
     spy = (a.get("series") or {}).get("SPY") or {}
     a20, a50 = spy.get("above_ma20"), spy.get("above_ma50")
     if a20 is not None and a50 is not None:   # 짧은 흐름 한 문장 — 답(긴 흐름)과 안쪽 `지금 시장 흐름은?`(짧은 흐름)이 반대로 보이는 날을 위해 (2026-11-07 사용자)
-        short = ("20일 · 50일 평균 가격보다 모두 위" if a20 and a50 else "20일 · 50일 평균 가격보다 모두 아래" if not a20 and not a50
-                 else f"{'20일' if not a20 else '50일'} 평균 가격보다만 아래")
-        first += f" 짧은 흐름(20 · 50일)으로 보면 {short}입니다."
+        short = ("둘 다 위" if a20 and a50 else "둘 다 아래" if not a20 and not a50 else ("20일 평균 아래, 50일 평균 위" if not a20 else "20일 평균 위, 50일 평균 아래"))
+        first += f" 20일 · 50일 평균 가격과 견주면 {short}입니다."
     if m["regime"] == "불안 국면" and m.get("vix") is not None:
         first += f" 변동성 지수(VIX)가 {m['vix']:.1f}로 {m['vix_high']:.0f}을 넘었습니다."
     lines = [(first, "plain")]
     parts = [x for x in (sx.normal_card(a, parts=True), flow_card(a, parts=True), rs_card(a, prev, parts=True)) if x]
-    for i, (q, st, _th, ik, ls, tp) in enumerate(parts):
-        lines.append((_part_head(q, st, ik, tp, line_col, False), "html"))
+    for q, _st, _th, _ik, ls, tp in parts:   # 묶음마다 문장 → 그래프 → 수치 줄 (7-1 순서는 묶음 안에서 지킨다)
+        lines.append((_part_head(PART_NAME.get(q, q), tp), "html"))
         lines += ls
     pb, cr = abs(m["pullback"]), abs(m["correction"])
     tip = ("미국 시장 전체(S&P 500)가 오르는 흐름인지, 쉬어 가는지, 흔들리는지. 종목 페이지 `미국 증시 분위기는?` 과 같은 기준\n"
