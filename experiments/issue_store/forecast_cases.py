@@ -271,7 +271,7 @@ def op_for(t, fc, st, extra=None):
     else:
         rows = [("규칙", f'{H.RULES} (틀 R) · 자 = β 조정 초과수익(β {fc.get("beta") or 1.0}) · 반등 · 조정 = 폭 절반 · 지속 = 금만큼 더 · 창 D+60'),
                 ("자료", "B1 일봉 대상 · 비교 계열 · 거래량 · B2 _VIX · A5 이슈 코드(크게 움직인 날 상위 3일) · GPR · EPU 일별"),
-                ("우리 전망", f'{fc["scenarios"][fc["pick"] - 1]["name"]} {f"{fc["pick_prob"] * 100:.0f}%" if fc.get("pick_prob") else ""} — {fc.get("pick_why") or "기록상 같은 종류 뒤 20일 중앙값 부호"} (뉴스 유무 = {"1위 이슈 뚜렷" if fc.get("news", True) else "원인 미상"})')]
+                ("우리 전망", f'{fc["scenarios"][fc["pick"] - 1]["name"]} {(str(round(fc["pick_prob"] * 100)) + "%") if fc.get("pick_prob") else ""} — {fc.get("pick_why") or "기록상 같은 종류 뒤 20일 중앙값 부호"} (뉴스 유무 = {"1위 이슈 뚜렷" if fc.get("news", True) else "원인 미상"})')]
     if extra:
         rows += extra
     fx = st.get("fixed") or {}
