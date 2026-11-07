@@ -135,13 +135,17 @@ def _notify_summary():
     url = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
     if not EVENTS or not url:
         return
-    run = os.environ.get("GITHUB_WORKFLOW") or "로컬 실행"
+    try:   # 알림 문구만 한국어 (2026-11-07) — 없어도 알림은 간다
+        import alert_ko
+        run, _ko = alert_ko.run_name(), alert_ko.line
+    except Exception:  # noqa: BLE001
+        run, _ko = os.environ.get("GITHUB_WORKFLOW") or "로컬 실행", (lambda x: x)
     link = ""
     if os.environ.get("GITHUB_RUN_ID"):
         link = f"\n🔗 https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
     lines = [f"⚠️ AI 호출 알림 — {run}", ""]
     for k, n in EVENTS.most_common():
-        lines.append(f"• {k}" + (f" ×{n}" if n > 1 else ""))
+        lines.append(f"• {_ko(k)}" + (f" ×{n}" if n > 1 else ""))
     lines += ["", f"단계별 성공/시도: {usage_line()}", link]
     try:
         requests.post(url, json={"text": "\n".join(lines), "unfurl_links": False}, timeout=20)

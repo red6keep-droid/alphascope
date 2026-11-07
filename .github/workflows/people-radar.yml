@@ -149,7 +149,7 @@ jobs:
         if: steps.cards_deploy_retry.outcome == 'failure'
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
-          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"⚠️ 홈 카드 cards/radar.json 배포 실패(재시도 포함) — ${{ github.workflow }}. 홈은 피드로 돈다\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"⚠️ 홈 카드 cards/radar.json 배포 실패(재시도 포함) — 주요 인물 발언. 홈은 피드로 돈다\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
 
       # 추출 · 분류 결과는 뒤 단계가 실패해도 남긴다 — LLM 호출을 헛되게 하지 않기 위해.
       - name: Save state (radar-state branch)
@@ -188,4 +188,4 @@ jobs:
         if: failure()
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
-          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — ${{ github.workflow }}\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 주요 인물 발언\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
