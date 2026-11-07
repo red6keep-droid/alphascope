@@ -525,7 +525,13 @@ def mood_card(a, prev):
     line_col = dk.darken(dk.lighten(dk.lighten(dk.CARD_DIR[theme][1]), 0.3), 0.02)
     ph = m["pct_from_high"]
     where = "1년 최고가 근처" if ph > -0.5 else f"1년 최고가보다 {abs(ph):.1f}% 아래"
-    first = f"S&P 500은 {where}이고, 200일 평균 가격보다 {'위' if m['above_ma200'] else '아래'}에 있습니다."
+    first = f"긴 흐름(1년 · 200일)으로 보면 S&P 500은 {where}이고, 200일 평균 가격보다 {'위' if m['above_ma200'] else '아래'}에 있습니다."
+    spy = (a.get("series") or {}).get("SPY") or {}
+    a20, a50 = spy.get("above_ma20"), spy.get("above_ma50")
+    if a20 is not None and a50 is not None:   # 짧은 흐름 한 문장 — 답(긴 흐름)과 안쪽 `지금 시장 흐름은?`(짧은 흐름)이 반대로 보이는 날을 위해 (2026-11-07 사용자)
+        short = ("20일 · 50일 평균 가격보다 모두 위" if a20 and a50 else "20일 · 50일 평균 가격보다 모두 아래" if not a20 and not a50
+                 else f"{'20일' if not a20 else '50일'} 평균 가격보다만 아래")
+        first += f" 짧은 흐름(20 · 50일)으로 보면 {short}입니다."
     if m["regime"] == "불안 국면" and m.get("vix") is not None:
         first += f" 변동성 지수(VIX)가 {m['vix']:.1f}로 {m['vix_high']:.0f}을 넘었습니다."
     lines = [(first, "plain")]
