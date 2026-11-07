@@ -93,7 +93,7 @@ def today_info(day):
 
 def base_of(fc):
     if fc["kind"] == "pre":
-        return fc.get("detect_day") or fc["event_day"]
+        return fc.get("detect_day") or fc.get("base_day") or fc["event_day"]
     return fc.get("base_day", "2026-11-04")
 
 
@@ -108,6 +108,10 @@ def run(state_dir=None):
     today = max(px["spx"])
     os.makedirs(os.path.join(OUT, "proof"), exist_ok=True)
     states, lines = {}, []
+    tdays_all = sorted(px["spx"])
+    for r, fc in pub:
+        if fc["kind"] == "pre" and not fc.get("base_day"):   # 결과 직전 종가 (2026-11-08) — 장 마감 뒤 발표만 발표 날 종가
+            fc["base_day"] = H.pre_base_day(fc["event_day"], fc.get("release_et"), tdays_all)
     for r, fc in pub:
         try:
             days, rel = series(px, base_of(fc), fc.get("beta") or 1.0)

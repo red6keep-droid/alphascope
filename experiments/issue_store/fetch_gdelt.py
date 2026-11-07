@@ -25,7 +25,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT = os.path.join(ROOT, "data", "store", "gdelt")
 RAW = os.path.join(OUT, "raw")
 API = "https://api.gdeltproject.org/api/v2/doc/doc"
-GAP = 8.0   # 안내는 5초지만 넉넉히 (2026-11-07 시험 중 몇 번 막힘)
+GAP = 60.0   # 1분에 1번 — 20초 간격 · 1~5분 재시도가 차단을 계속 연장했다(2026-11-07 밤 429, 4시간에 10개)
 START_YEAR = 2017
 
 # 이슈 코드 → GDELT 검색어 (영어 기사). 뉴스 분류 issue_codes.ISSUES 와 같은 이름
@@ -55,12 +55,15 @@ def fetch_one(topic, year, mode):
     q = f'{TOPICS[topic]} sourcelang:english'
     url = (f"{API}?query={urllib.parse.quote(q)}&mode={MODES[mode]}&format=csv"
            f"&startdatetime={year}0101000000&enddatetime={end.strftime('%Y%m%d')}235959")
-    for attempt in range(4):
-        r = requests.get(url, headers={"User-Agent": "alphascope-research/1.0"}, timeout=90)
-        txt = r.text
-        if r.status_code == 200 and txt.lstrip("﻿").startswith("Date"):
-            return txt
-        time.sleep(30 * (attempt + 1))   # 한도 안내 문구 · 오류면 30 · 60 · 90초 쉬고 다시
+    for attempt in range(3):
+        try:
+            r = requests.get(url, headers={"User-Agent": "alphascope-research/1.0"}, timeout=90)
+            txt = r.text
+            if r.status_code == 200 and txt.lstrip("﻿").startswith("Date"):
+                return txt
+        except requests.RequestException:
+            pass
+        time.sleep(1800)   # 막히면 30분 쉰다 — 짧은 재시도는 차단을 연장한다 (2026-11-07)
     raise RuntimeError(f"{topic} {year} {mode}: 응답 형식 아님")
 
 
@@ -125,5 +128,8 @@ if __name__ == "__main__":
     if a.build:
         build()
     else:
-        download()
+        for _ in range(3):   # 실패한 것만 다시 (받은 파일은 건너뜀)
+            if download() == 0:
+                break
+            time.sleep(300)
         build()
