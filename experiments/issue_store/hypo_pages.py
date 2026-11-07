@@ -20,6 +20,7 @@
 - 11-07 밤 재점검 14절 순서대로: ① 공개 등록 증명(proof_record → 공개 저장소 gh-pages proof/{slug}.json, 날짜 줄 `등록 증명` 링크 = 그 파일의 커밋 기록) ② 가벼운 페이지(날짜 줄 = 게시 · 사건 · 결과 셋 + 등록 증명, 현재 증시 · 한국 · 분위기는 `지금은?` 접기 하나) ④ 공개 = fc["publish"] 가 False 가 아닌 전망만(EH-001 전망 1 = 사후 등록 샘플 → 내부)
 - 11-07 밤 틀림의 가치 (사용자: 인하는 됐는데 S&P 500 이 빠지면? 교정하나?): 교정 안 함(사전 등록). 고리 상태 `끊김`(대리 지표가 반대) + 틀린 뒤 `어디서 끊겼나` 카드(fc["broke"]: 끊긴 고리 · 미리 적어 둔 갈림점 중 일어난 쪽 · 등록 때 경고 · 다음 세부 전망)
 - 11-07 밤 독자 문장 = 숫자 대신 세기 말 (사용자: 수치를 들이밀지 마라): strength · share_word · near_word · prob_word · vix_word · recov_word, 남은 수치는 wordify 가 마지막에 말로. 숫자는 운영자 상자에만
+- 11-07 밤 `오늘 나온 것` 한 줄 (사용자: 모자란 일별 자료 추가): today_line(info) — 그날 경제지표 발표 · 10년 금리 · 신용 위험 웃돈 · 장단기 금리 차 · 뉴스 1위 묶음을 말로. 판정에는 안 쓰고 보이기만(고르기 편향 방지)
 - 운영자 확인용(operator_box) = 목업에서만 그리는 회색 작은 글씨 상자 — 쓰인 요인(80개 중) · 이슈 코드 · 범위 비율 · 동행 · 겹침 · 규칙 버전. 발행 코드는 op 를 넘기지 않는다.
 """
 import json
@@ -188,6 +189,28 @@ def move_text(fc, v, ref=None):
 
 
 PRICED_WORDS = {"priced_in": "선반영 중"}
+
+
+def today_line(info):
+    """그날 나온 것 → 짧은 문장들 (숫자 X). info = {"releases": [이름], "rate10": 하루 변화(%p), "hy": 하루 변화(%p), "curve": 값, "news": (묶음 이름, 방향)}."""
+    if not info:
+        return ""
+    out = []
+    if info.get("releases"):
+        out.append(" · ".join(info["releases"]) + "가 발표됐습니다.")
+    r = info.get("rate10")
+    if r is not None and abs(r) >= 0.04:
+        out.append(f'금리는 {"조금 " if abs(r) < 0.08 else "크게 " if abs(r) >= 0.15 else ""}{"올랐습니다" if r > 0 else "내렸습니다"}.')
+    h = info.get("hy")
+    if h is not None and abs(h) >= 0.08:
+        out.append("신용 위험 웃돈이 " + ("크게 벌어졌습니다. 회사채 시장이 겁을 먹은 모습입니다." if h >= 0.2 else "벌어졌습니다." if h > 0 else "좁혀졌습니다."))
+    c = info.get("curve")
+    if c is not None and c < 0:
+        out.append("장단기 금리는 거꾸로입니다.")
+    if info.get("news"):
+        name, tone = info["news"]
+        out.append(f"뉴스는 ‘{name}’ 이야기가 가장 많았습니다." + (f" {tone.rstrip('.')}." if tone else ""))
+    return " ".join(out)
 
 
 def _entry(day, key, label, d, text, rel, theme=None):
@@ -552,7 +575,9 @@ def _day_entry(e, first, bd):
             f'<span style="display:flex;align-items:baseline;gap:10px;font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};font-weight:700;">'
             f'<span style="color:#111;white-space:nowrap;">{dk.esc(md(e["day"]))}</span>'
             f'<span style="color:{INK[e["dir"]]};">{dk.esc(e["label"])}</span></span>'
-            f'<span style="display:block;margin-top:2px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#333;word-break:keep-all;">{num_html(wordify(e["text"]))}</span></div>')
+            f'<span style="display:block;margin-top:2px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#333;word-break:keep-all;">{num_html(wordify(e["text"]))}</span>'
+            + (f'<span style="display:block;margin-top:4px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">오늘 나온 것 : {dk.esc(wordify(e["today"]))}</span>' if e.get("today") else "")
+            + '</div>')
 
 
 def _top_card(fc, log):

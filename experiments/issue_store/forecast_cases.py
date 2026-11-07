@@ -744,6 +744,10 @@ def case(t, k):
             fc["overlap"] = [dict(o, sign="same")]
             others.append((o["no"], o["title"], "case-x"))
         st = run(fc, dd, rel, cond=1, vix=vix_for(rel) if vx else None, end=end)
+        sim = [{"releases": ["소비자물가"], "rate10": 0.11, "news": ("금리 인하 기대", "")}, {"rate10": -0.06, "hy": -0.09},
+               {"releases": ["고용 보고서"], "rate10": 0.16, "hy": 0.12, "news": ("경기 걱정", "나쁜 이야기가 많았습니다")}, {"news": ("AI 투자", "좋은 이야기가 많았습니다")}]
+        for i, e in enumerate(st["log"][1:]):   # 가상 — 날마다 오늘 나온 것 (기획 9-2)
+            e["today"] = H.today_line(sim[i % len(sim)])
         if k == "4":   # 틀림의 가치 — 어디서 끊겼나 (2026-11-07 사용자)
             a = fc["scenarios"][0]
             a["chain"][1].update(state="broken", ev={"A": "10년 금리가 내리지 않고 0.18%p 올랐음 (침체 걱정 · 회견이 매파적)", "B": "AI 투자 기대 대신 ‘다음 분기 안내’ 걱정이 뉴스 1위", "C": "데이터센터 매출은 넘었지만 마진 하락이 뉴스 1위"}[t])

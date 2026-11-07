@@ -63,6 +63,34 @@ def series(px, base_day, beta, sub="sox", mkt="spx"):
     return days, rel
 
 
+_FRED = {}
+_REL = {}
+
+
+def _load_side():
+    """FRED 일별(fetch_fred_daily) · 경제지표 발표일(calendar/econ_releases.csv) — 없으면 빈 채로(그 줄만 생략)."""
+    import csv
+    import fetch_fred_daily as FF
+    for sid in ("DGS10", "BAMLH0A0HYM2", "T10Y2Y"):
+        _FRED[sid] = FF.load(sid)
+    p = os.path.join(os.path.dirname(os.path.dirname(_HERE)), "data", "store", "calendar", "econ_releases.csv")
+    if os.path.exists(p):
+        for r in csv.DictReader(open(p, encoding="utf-8")):
+            _REL.setdefault(r["day"], []).append(r["subkind"])
+
+
+def _diff(series, day):
+    ks = sorted(k for k in series if k <= day)
+    return round(series[ks[-1]] - series[ks[-2]], 3) if len(ks) >= 2 and ks[-1] == day else None
+
+
+def today_info(day):
+    if not _FRED and not _REL:
+        _load_side()
+    return {"releases": _REL.get(day, [])[:2], "rate10": _diff(_FRED.get("DGS10", {}), day), "hy": _diff(_FRED.get("BAMLH0A0HYM2", {}), day),
+            "curve": _FRED.get("T10Y2Y", {}).get(day)}
+
+
 def base_of(fc):
     if fc["kind"] == "pre":
         return fc.get("detect_day") or fc["event_day"]
@@ -86,6 +114,8 @@ def run(state_dir=None):
             vix = [px["vix"].get(d) for d in days] if px["vix"] else None
             cond = fc.get("cond_known")   # 결과가 난 사건 전 전망 — 결과 칸은 사건 날 코드(실적 · FOMC)가 채운다
             st = H.judge(fc, days, rel, cond=cond, vix=vix if vix and all(v is not None for v in vix) else None)
+            for e in st["log"]:   # 오늘 나온 것 — 판정엔 안 쓰고 보이기만 (기획 9-2)
+                e["today"] = H.today_line(today_info(e["day"]))
             states[fc["slug"]] = st
             FA.missing_days(st.get("missing", []))
             e = st["log"][-1]
