@@ -506,6 +506,7 @@ def index_tech_card(a, prev):
     return C.question_card("지수 기술지표의 방향은?", head["word"], theme, ink, [(html, "html")], tip=dk.with_src(tip, SRC_PRICE))
 
 
+MOOD_CHART_GAP = 26   # 구분선 ~ `오늘 움직임과 평소 하루 크기` 제목 (px) — 가격 범위 제목 위 여백과 같게 실측
 MOOD_KIND = {"상승 추세": ("positive", UP), "단기 조정": ("neutral", "#111"), "조정장": ("negative", DOWN), "불안 국면": ("uncertain", "#92400E")}   # nvda config REGIME_DIRECTION 과 같은 방향
 
 
@@ -529,6 +530,7 @@ def mood_card(a, prev):
     if not m.get("regime"):
         return ""
     theme, ink = MOOD_KIND.get(m["regime"], ("neutral", "#111"))
+    line_col = dk.darken(dk.lighten(dk.lighten(dk.CARD_DIR[theme][1]), 0.3), 0.02)   # 근거 줄 구분선과 같은 색
     ph = m["pct_from_high"]
     where = "1년 최고가 근처" if ph > -0.5 else f"1년 최고가보다 {abs(ph):.1f}% 아래"
     first = f"1년 고점과 200일 평균으로 보면 S&P 500은 {where}이고, 200일 평균 가격보다 {'위' if m['above_ma200'] else '아래'}에 있습니다."   # 첫 문장 괄호 설명 금지 (7-1)
@@ -550,7 +552,8 @@ def mood_card(a, prev):
     for k, (q, st, _th, ik, ls, _tp) in enumerate(parts):   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄
         if q == "오늘 움직임은 평소와 달랐나?":   # 그래프(오늘 움직임과 평소 하루 크기)를 `오늘 움직임` 줄 위로 (2026-11-08 사용자)
             charts = [x for x in ls if isinstance(x, tuple) and len(x) == 2 and x[1] == "html"]
-            lines += charts
+            # 위 수치 줄(50일 평균 가격 대비) 아래 구분선 + 선에서 그래프 제목까지 = 가격 범위 제목 위 여백과 같게 (2026-11-08 사용자) — MOOD_CHART_GAP 은 Chrome 실측으로 맞춘 값
+            lines += [(f'<span data-mood-sep="1" style="display:block;border-top:1px solid {line_col};margin-top:-6px;padding-top:{MOOD_CHART_GAP}px;">{h}</span>', "html") for h, _k in charts[:1]] + charts[1:]
             ls = [x for x in ls if x not in charts]
         lines.append(_part_row(q, st, ik, noline=(lines[-1][1] == "html")))   # 가로 막대 · 그래프 바로 아래 줄은 위 선 없음 (9절)
         lines += ls
