@@ -19,7 +19,7 @@
 - 11-07 밤 지도 13-5 순서대로: ① `한국은 어떻게?` 카드(fc["korea"]: 미국 사건 → 한국 다음 날, 기록상 같은 방향 비율 · 크기 배수 — 2016~ 실측: 반도체 지수 큰 날 뒤 코스피 77% 같은 방향 · 0.26배, KODEX 반도체 75% · 0.38배, S&P 500 큰 날 뒤 코스피 82% · 0.28배) ② 판정 `보류`(fc["ambiguous"]: 결과가 두 조건 어느 쪽도 아님 — 채점 안 하고 움직임만) · `무효`(fc["void"]: 사건 취소 · 연기 · 자료 결함) ③ 번복(fc["reversal_of"]: 같은 사건 n회차, 성적표에서 묶음 한 건) · 연속 사건(묶음 전망: 조건 = "넷 중 셋 이상", 자 = 마지막 결과일 종가부터, 구성 사건은 따로 등록 안 함)
 - 11-07 밤 재점검 14절 순서대로: ① 공개 등록 증명(proof_record → 공개 저장소 gh-pages proof/{slug}.json, 날짜 줄 `등록 증명` 링크 = 그 파일의 커밋 기록) ② 가벼운 페이지(날짜 줄 = 게시 · 사건 · 결과 셋 + 등록 증명, 현재 증시 · 한국 · 분위기는 `지금은?` 접기 하나) ④ 공개 = fc["publish"] 가 False 가 아닌 전망만(EH-001 전망 1 = 사후 등록 샘플 → 내부)
 - 11-07 밤 틀림의 가치 (사용자: 인하는 됐는데 S&P 500 이 빠지면? 교정하나?): 교정 안 함(사전 등록). 고리 상태 `끊김`(대리 지표가 반대) + 틀린 뒤 `어디서 끊겼나` 카드(fc["broke"]: 끊긴 고리 · 미리 적어 둔 갈림점 중 일어난 쪽 · 등록 때 경고 · 다음 세부 전망)
-- 11-07 밤 독자 문장 = 숫자 대신 세기 말 (사용자: 수치를 들이밀지 마라): strength · share_word · near_word · prob_word · vix_word · recov_word, 남은 수치는 wordify 가 마지막에 말로. 숫자는 운영자 상자에만
+- 11-07 밤 독자 문장 = 과한 수치만 말로 (사용자 정정: "전부 빼면 날마다 같은 문장이 반복된다"): **한 문장에 핵심 숫자 하나는 둔다**(시장 대비 %p · 기준까지 남은 값 · 불안 지수 · 되찾은 비율) + 세기 말을 곁들임. 말로만 쓰는 것 = 비율(n번 중 m번) · 확률(시장 예상 %) · 건수(뉴스 n건) · 배수 · 거래일 수
 - 11-07 밤 `오늘 나온 것` 한 줄 (사용자: 모자란 일별 자료 추가): today_line(info) — 그날 경제지표 발표 · 10년 금리 · 신용 위험 웃돈 · 장단기 금리 차 · 뉴스 1위 묶음을 말로. 판정에는 안 쓰고 보이기만(고르기 편향 방지)
 - 운영자 확인용(operator_box) = 목업에서만 그리는 회색 작은 글씨 상자 — 쓰인 요인(80개 중) · 이슈 코드 · 범위 비율 · 동행 · 겹침 · 규칙 버전. 발행 코드는 op 를 넘기지 않는다.
 """
@@ -97,9 +97,7 @@ def wordify(text, L=3.0):
     t = _re.sub(r"(시장 예상[^·\d]*?)\s*(\d+(?:\.\d+)?)\s*%", lambda m: f"{m.group(1)} {prob_word(float(m.group(2)))}", t)   # '시장 예상 82%' → '시장 예상 대체로'
     t = _re.sub(r"(부정|긍정)\s*(?:보도\s*)?(\d+)\s*%", lambda m: f"{m.group(1)} 보도가 많음", t)                         # '부정 72%' → '부정 보도가 많음'
     t = _re.sub(r"누적\s*[+\-−]?\s*[\d.]+\s*%p?", "누적으로 꽤 내림", t)
-    t = _RE_PAREN.sub("", t)
     t = _RE_X.sub(lambda m: ("훨씬 작게" if float(m.group(1)) < 0.5 else "조금 작게" if float(m.group(1)) < 0.9 else "비슷하게" if float(m.group(1)) < 1.2 else "크게" if float(m.group(1)) < 2.5 else "아주 크게"), t)
-    t = _RE_PCT.sub(lambda m: strength(float(m.group(0).replace("−", "-").replace("%p", "").replace("%", "").strip()), L), t)
     return t.replace("기록상 기록상", "기록상")
 RULES = "EH-2026-11-07b"   # 자 β 조정 · 뉴스 유무 갈림 · 비율 · 고정 시점 병기
 NEWS_TILT = 0.10            # 뉴스 유무 갈림 — 1위 이슈 뚜렷하면 지속 쪽 10%p, 원인 미상이면 반등 · 조정 쪽 10%p (Chan 2003)
@@ -178,14 +176,15 @@ def num_html(text):
 
 def move_text(fc, v, ref=None):
     """자의 값 → 쉬운 문장. 상대 자(cmp 있음) = `반도체가 시장보다 3.4%p 더 빠졌습니다`, 절대 자 = `S&P 500 이 결정일 종가보다 4.1% 내렸습니다`."""
-    w = strength(v, fc.get("line", 3.0))   # 숫자 대신 세기 말 (2026-11-07)
+    unit, a = fc.get("unit", "%p"), abs(v)
+    w = strength(v, fc.get("line", 3.0))   # 핵심 숫자 하나 + 세기 말 (2026-11-07 정정)
     if fc.get("cmp"):
         if w == "거의 같게":
-            return f'{fc["subj_ga"]} {fc["cmp"].replace("보다", "와")} 거의 같게 움직였습니다'
-        return f'{fc["subj_ga"]} {fc["cmp"]} {w} 더 {"올랐" if v > 0 else "빠졌"}습니다'
+            return f'{fc["subj_ga"]} {fc["cmp"].replace("보다", "와")} 거의 같게 움직였습니다({a:.1f}{unit})'
+        return f'{fc["subj_ga"]} {fc["cmp"]} {a:.1f}{unit} 더 {"올랐" if v > 0 else "빠졌"}습니다, {w} {"오른" if v > 0 else "빠진"} 편입니다'
     if w == "거의 같게":
-        return f'{fc["subj_ga"]} {ref or fc.get("ref") or fc["ruler_from"]} 거의 움직이지 않았습니다'
-    return f'{fc["subj_ga"]} {ref or fc.get("ref") or fc["ruler_from"]} {w} {"올랐" if v > 0 else "내렸"}습니다'
+        return f'{fc["subj_ga"]} {ref or fc.get("ref") or fc["ruler_from"]} 거의 움직이지 않았습니다({a:.1f}{unit})'
+    return f'{fc["subj_ga"]} {ref or fc.get("ref") or fc["ruler_from"]} {a:.1f}{unit} {"올랐" if v > 0 else "내렸"}습니다, {w} {"오른" if v > 0 else "내린"} 편입니다'
 
 
 PRICED_WORDS = {"priced_in": "선반영 중"}
@@ -281,7 +280,7 @@ def judge(fc, days, rel, cond=None, vix=None):
             if a.get("priced"):   # 이미 반영 갈래 — 더 가면 틀림, 되돌리거나 20거래일 기준 안이면 맞음
                 if x >= L:
                     result = {"word": RESULT["miss"], "crossed": None, "day": day}
-                    log.append(_entry(day, "miss", RESULT["miss"], dd, f'{mv}. 결과 뒤에도 기준을 넘게 더 가, ‘{a["name"]}’이 틀렸습니다 — 먼저 반영된 것이 다가 아니었습니다.', r, THEME[dd]))
+                    log.append(_entry(day, "miss", RESULT["miss"], dd, f'{mv}. 결과 뒤에도 기준({L:g}{unit}) 넘게 더 가, ‘{a["name"]}’이 틀렸습니다 — 먼저 반영된 것이 다가 아니었습니다.', r, THEME[dd]))
                     break
                 if -x >= L:
                     result = {"word": RESULT["hit"], "crossed": cond, "day": day}
@@ -296,13 +295,13 @@ def judge(fc, days, rel, cond=None, vix=None):
             if x >= L:
                 result = {"word": RESULT["hit"], "crossed": cond, "day": day}
                 tail = f' 세부 전망 ‘{fc["follow"]["title"]}’ 에서 이어 갑니다.' if fc.get("follow") else ""
-                log.append(_entry(day, "hit", RESULT["hit"], dd, f'{mv}. 기준을 넘어 미리 적은 ‘{a["name"]}’이 맞았습니다.{tail}', r, THEME[dd]))
+                log.append(_entry(day, "hit", RESULT["hit"], dd, f'{mv}. 기준({L:g}{unit})을 넘어 미리 적은 ‘{a["name"]}’이 맞았습니다.{tail}', r, THEME[dd]))
                 break
             if -x >= L:
                 result = {"word": RESULT["miss"], "crossed": None, "day": day}
-                log.append(_entry(day, "miss", RESULT["miss"], -dd, f'{mv}. 미리 적은 ‘{a["name"]}’과 반대로 기준을 넘어 틀렸습니다.', r, THEME[-dd]))
+                log.append(_entry(day, "miss", RESULT["miss"], -dd, f'{mv}. 미리 적은 ‘{a["name"]}’과 반대로 기준({L:g}{unit})을 넘어 틀렸습니다.', r, THEME[-dd]))
                 break
-            ahead = f' 기준까지 {near_word(L - abs(x), L)}. 넘으면 ‘{a["name"] if x >= 0 else fc["subject"] + " " + DIR_WORD[-dd]}’입니다.'   # 앞을 보는 꼬리 (묘사 X)
+            ahead = f' 기준까지 {L - abs(x):.1f}{unit} 남았습니다. 넘으면 ‘{a["name"] if x >= 0 else fc["subject"] + " " + DIR_WORD[-dd]}’입니다.'   # 앞을 보는 꼬리 (묘사 X)
             if x >= L * EARLY:
                 log.append(_entry(day, "lean", f'{a["name"]} 조짐', dd, f'{mv}. ‘{a["name"]}’ 쪽으로 기울고 있습니다.{ahead}', r))
             elif -x >= L * EARLY:
@@ -322,17 +321,17 @@ def judge(fc, days, rel, cond=None, vix=None):
             if crossed:
                 ok = crossed == fc["pick"]
                 result = {"word": RESULT["hit" if ok else "miss"], "crossed": crossed, "day": day}
-                what = (f'{SHOCK[s]} 폭의 {recov_word(recov)}를 {REV[s][1]}해 ‘{b1["name"]}’이 일어났습니다' if crossed == 1
-                        else f'{SHOCK[s]} 뒤 {strength(ext, L)} 더 {"올라" if s > 0 else "빠져"} ‘{b2["name"]}’이 일어났습니다')
+                what = (f'{SHOCK[s]} 폭의 {recov * 100:.0f}%({recov_word(recov)})를 {REV[s][1]}해 ‘{b1["name"]}’이 일어났습니다' if crossed == 1
+                        else f'{SHOCK[s]} 뒤 {ext:.1f}{unit} 더 {"올라" if s > 0 else "빠져"} ‘{b2["name"]}’이 일어났습니다')
                 dd = sc[crossed - 1]["dir"]
                 log.append(_entry(day, "hit" if ok else "miss", result["word"], dd,
                                   f'{what}. 우리가 고른 ‘{pick}’이 {"맞았" if ok else "틀렸"}습니다.', r, THEME[dd]))
                 break
-            ahead = f' ‘{b1["name"]}’까지 {near_word(max(0.0, (R_HIT - recov) * abs(gap)), L).replace("습니다", "고")}, ‘{b2["name"]}’까지는 {near_word(max(0.0, L - ext), L)}.'
+            ahead = f' ‘{b1["name"]}’까지 {max(0.0, (R_HIT - recov) * abs(gap)):.1f}{unit} 더 {REV[s][1]}하면, ‘{b2["name"]}’까지 {max(0.0, L - ext):.1f}{unit} 더 {"오르면" if s > 0 else "빠지면"}입니다.'
             if recov >= R_EARLY:
-                log.append(_entry(day, "lean", f'{b1["name"]} 조짐', b1["dir"], f'{SHOCK[s]} 폭의 {recov_word(recov)}를 {REV[s][1]}했습니다. ‘{b1["name"]}’ 쪽으로 기울고 있습니다.{ahead}', r))
+                log.append(_entry(day, "lean", f'{b1["name"]} 조짐', b1["dir"], f'{SHOCK[s]} 폭의 {recov * 100:.0f}%({recov_word(recov)})를 {REV[s][1]}했습니다. ‘{b1["name"]}’ 쪽으로 기울고 있습니다.{ahead}', r))
             elif ext >= L * EARLY:
-                log.append(_entry(day, "lean_x", f'{b2["name"]} 조짐', b2["dir"], f'{SHOCK[s]} 뒤 {strength(ext, L)} 더 {"올랐" if s > 0 else "빠졌"}습니다. ‘{b2["name"]}’ 쪽으로 기울고 있습니다.{ahead}', r))
+                log.append(_entry(day, "lean_x", f'{b2["name"]} 조짐', b2["dir"], f'{SHOCK[s]} 뒤 {ext:.1f}{unit} 더 {"올랐" if s > 0 else "빠졌"}습니다. ‘{b2["name"]}’ 쪽으로 기울고 있습니다.{ahead}', r))
             else:
                 log.append(_entry(day, "watch", "지켜보는 중", 0, f"{move_text(fc, r)}. {SHOCK[s]} 뒤 아직 어느 쪽으로도 기울지 않았습니다.{ahead}", r))
         if fc.get("end_day") and day >= fc["end_day"] and not result:
@@ -418,17 +417,17 @@ def _now_block(fc, st):
     unit, L = fc.get("unit", "%p"), fc["line"]
     sent = e["text"].split(". ")[0] + "." if e["text"] else ""
     rv = st.get("rel")
-    rel_word = "—" if rv is None else (("거의 같음" if strength(rv, L) == "거의 같게" else f'{strength(rv, L)} {"강함" if rv > 0 else "약함"}') if fc.get("cmp") else ("거의 그대로" if strength(rv, L) == "거의 같게" else f'{strength(rv, L)} {"오름" if rv > 0 else "내림"}'))
-    lines = [("SENTENCE_SLOT", "plain"), ("row", fc["ruler_short"], rel_word, fc["ruler_from"])]   # 값 = 말 (숫자 X, 2026-11-07)
+    rel_word = "" if rv is None else (("거의 같음" if strength(rv, L) == "거의 같게" else f'{strength(rv, L)} {"강함" if rv > 0 else "약함"}') if fc.get("cmp") else ("거의 그대로" if strength(rv, L) == "거의 같게" else f'{strength(rv, L)} {"오름" if rv > 0 else "내림"}'))
+    lines = [("SENTENCE_SLOT", "plain"), ("row", fc["ruler_short"], fmt_v(rv, unit), (fc["ruler_from"] + (" · " + rel_word if rel_word else "")))]   # 값 = 숫자 + 세기 말 (2026-11-07 정정)
     if st.get("volume_x"):   # 거래량 배수 (개선 ⑤) — 되돌림은 거래량 없는 급변에서 흔하다
         vx_ = st["volume_x"]
         lines.append(("row", "거래량", "평소보다 아주 많음" if vx_ >= 3 else "평소보다 많음" if vx_ >= 1.5 else "평소 수준", ""))
     if fc["kind"] == "after":
         rec = st.get("recovery")
         s0 = 1 if fc["gap"] > 0 else -1
-        lines.append(("row", f'{SHOCK[s0]} 폭 중 {REV[s0][1]}', recov_word(rec / 100) if rec is not None else "—", ""))
+        lines.append(("row", f'{SHOCK[s0]} 폭 중 {REV[s0][1]}', f"{rec:.0f}%" if rec is not None else "—", recov_word(rec / 100) if rec is not None else ""))
     if st.get("vix") is not None:
-        lines.append(("row", "불안 지수", vix_word(st["vix"]), ""))
+        lines.append(("row", "불안 지수 (VIX)", f'{st["vix"]:.1f}', vix_word(st["vix"])))
     days, vals = st.get("days", []), st.get("rel_series", [])
     if days:
         n = len(days)
@@ -444,7 +443,7 @@ def _now_block(fc, st):
         gr = dk.trend_card(f'{fc["ruler_short"]} ({unit})', labels, [(fc["ruler_short"], vals, dk.CHART_MAIN, "solid")] + guides, lambda v: fmt_v(v, unit))
         lines.append((f'<span data-end-chart="1" style="display:block;margin:0 0 -{END_PULL}px;">{gr}</span>', "html"))
     html = qc.question_card("현재 증시는?", e["label"], e["theme"] if e["theme"] in qc.CARD_DIR else "neutral", INK[e["dir"]], lines, fold=True, opened=True)
-    return html.replace("SENTENCE_SLOT", num_html(wordify(sent, L)))
+    return html.replace("SENTENCE_SLOT", num_html(sent))
 
 
 def _pressure_card(fc):
@@ -523,14 +522,14 @@ def _history_card(fc):
             lines.append(("row", wordify(r[0], L), wordify(r[1], L), ""))
         else:
             k, m, rng = r
-            lines.append(("row", f"{k.replace('5거래일', '일주일').replace('20거래일', '한 달').replace('60거래일', '석 달')} 올랐다", share_word(m, h["n"]).replace("이었습니다", ""), ""))
+            lines.append(("row", f"{k.replace('5거래일', '일주일').replace('20거래일', '한 달').replace('60거래일', '석 달')} 올랐다", share_word(m, h["n"]).replace("이었습니다", ""), f'열에 {round(m / h["n"] * 10)} 꼴'))
     for when, name, val in h.get("alike", []):   # 가장 비슷했던 때 셋 — 이름 + 그 뒤 한 달의 말
         try:
             v = float(str(val).replace("−", "-").replace("%p", "").replace("%", ""))
             vw = ("시장과 비슷" if strength(v, L) == "거의 같게" else f'{strength(v, L)} {"오름" if v > 0 else "내림"}')
         except ValueError:
             vw = wordify(str(val), L)
-        lines.append(("row", wordify(f"{when} {name}".strip(), L), vw, "가장 비슷했던 때 · 그 뒤 한 달"))
+        lines.append(("row", wordify(f"{when} {name}".strip(), L), f"{vw} ({val})", "가장 비슷했던 때 · 그 뒤 한 달"))
     lines.append(("기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다.", "note"))
     return qc.question_card("기록상 비슷한 때는?", "기록 보기", "neutral", "#111", lines, fold=True, opened=False)
 
