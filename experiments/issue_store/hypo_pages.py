@@ -18,6 +18,7 @@
 - 11-07 밤 "묘사가 아니라 경고" (사용자: 출발점은 중간선거처럼 "이렇게 되면 이런 일이 올 수 있으니 미리 생각해 두자"였다): ① 맨 위 `앞으로 올 수 있는 일` 카드(fc["prepare"]) = 다가오는 사건 × 지금 분위기 × 기록 → 조건부 경고 + 볼 것, 매수 · 매도 말 없음 ② 국면 문장 끝에 앞을 보는 꼬리("기준까지 1.2%p 남았습니다. 넘으면 ‘…’").
 - 11-07 밤 지도 13-5 순서대로: ① `한국은 어떻게?` 카드(fc["korea"]: 미국 사건 → 한국 다음 날, 기록상 같은 방향 비율 · 크기 배수 — 2016~ 실측: 반도체 지수 큰 날 뒤 코스피 77% 같은 방향 · 0.26배, KODEX 반도체 75% · 0.38배, S&P 500 큰 날 뒤 코스피 82% · 0.28배) ② 판정 `보류`(fc["ambiguous"]: 결과가 두 조건 어느 쪽도 아님 — 채점 안 하고 움직임만) · `무효`(fc["void"]: 사건 취소 · 연기 · 자료 결함) ③ 번복(fc["reversal_of"]: 같은 사건 n회차, 성적표에서 묶음 한 건) · 연속 사건(묶음 전망: 조건 = "넷 중 셋 이상", 자 = 마지막 결과일 종가부터, 구성 사건은 따로 등록 안 함)
 - 11-07 밤 재점검 14절 순서대로: ① 공개 등록 증명(proof_record → 공개 저장소 gh-pages proof/{slug}.json, 날짜 줄 `등록 증명` 링크 = 그 파일의 커밋 기록) ② 가벼운 페이지(날짜 줄 = 게시 · 사건 · 결과 셋 + 등록 증명, 현재 증시 · 한국 · 분위기는 `지금은?` 접기 하나) ④ 공개 = fc["publish"] 가 False 가 아닌 전망만(EH-001 전망 1 = 사후 등록 샘플 → 내부)
+- 11-07 밤 틀림의 가치 (사용자: 인하는 됐는데 S&P 500 이 빠지면? 교정하나?): 교정 안 함(사전 등록). 고리 상태 `끊김`(대리 지표가 반대) + 틀린 뒤 `어디서 끊겼나` 카드(fc["broke"]: 끊긴 고리 · 미리 적어 둔 갈림점 중 일어난 쪽 · 등록 때 경고 · 다음 세부 전망)
 - 운영자 확인용(operator_box) = 목업에서만 그리는 회색 작은 글씨 상자 — 쓰인 요인(80개 중) · 이슈 코드 · 범위 비율 · 동행 · 겹침 · 규칙 버전. 발행 코드는 op 를 넘기지 않는다.
 """
 import json
@@ -284,7 +285,7 @@ def judge(fc, days, rel, cond=None, vix=None):
 
 # ---------------------------------------------------------------- 전망 페이지 — 공용 카드 유형만 (가이드라인 2-1)
 
-CHAIN = {"done": ("확인", "down"), "wait": ("대기", "flat"), "no": ("해당 없음", "flat")}   # 대기 = 회색, 실제 결과 = 노랑 (P319)
+CHAIN = {"done": ("확인", "down"), "wait": ("대기", "flat"), "no": ("해당 없음", "flat"), "broken": ("끊김", "caution")}   # 끊김 = 조건은 일어났는데 그 고리의 대리 지표가 반대로 감 (2026-11-07: 틀린 전망의 가치 = 어디서 끊겼나)   # 대기 = 회색, 실제 결과 = 노랑 (P319)
 END_PULL = 21   # 강조 카드가 그래프로 끝날 때 아래 여백 당기기 (P140)
 
 
@@ -380,6 +381,19 @@ def _pressure_card(fc):
     for n, t, sl in fc.get("children", []):
         lines.append((f'세부 전망 : <a href="{page_url(sl)}" style="color:#111;">‘{dk.esc(t)}’</a>', "html"))
     return qc.question_card("지금 시장 분위기는?", pr["answer"] if pr else "사슬 보기", "neutral", "#111", lines, fold=True, opened=bool(pr))
+
+
+def _broke_card(fc):
+    """어디서 끊겼나 — 틀린 전망의 가치 (2026-11-07 사용자). fc["broke"] = {"lead", "items": [(이름, 글, 근거)]}. 변명이 아니라 미리 적어 둔 것과 대조만."""
+    b = fc.get("broke")
+    if not b:
+        return ""
+    lines = [(b["lead"], "plain")]
+    for cond, rec, watch in b["items"]:
+        lines.append((f'<span style="display:block;padding:10px 0 0;font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};font-weight:700;color:#111;word-break:keep-all;">{dk.esc(cond)}</span>'
+                      f'<span style="display:block;margin-top:2px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#333;word-break:keep-all;">{num_html(rec)}</span>'
+                      + (f'<span style="display:block;margin-top:2px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">{dk.esc(watch)}</span>' if watch else ""), "html"))
+    return qc.question_card("어디서 끊겼나", b.get("answer", "고리 대조"), "neutral", "#111", lines, fold=True, opened=True)
 
 
 def _prepare_card(fc):
@@ -533,7 +547,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
     st = state or {}
     fc = fc or forecasts(reg)[0]
     log = st.get("log") or [_entry(fc["registered"], "start", "지켜보는 중", 0, fc["start_text"], 0.0)]
-    head = f'<div data-lead="1" style="margin:0 0 8px;">{dk.section("전망 결과", _top_card(fc, log), line=False)}</div>' + _prepare_card(fc)
+    head = f'<div data-lead="1" style="margin:0 0 8px;">{dk.section("전망 결과", _top_card(fc, log), line=False)}</div>' + _broke_card(fc) + _prepare_card(fc)
     sides = "<div>" + "".join(_scenario_card(sc, branch_view(fc, st, sc)) for sc in fc["scenarios"]) + "</div>"
     more = (_event_chart(reg) if fc.get("event_chart") else "") + _history_card(fc) + _next_card(fc)
     if others is None:
