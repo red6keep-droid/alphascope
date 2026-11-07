@@ -550,7 +550,7 @@ def mood_card(a, prev):
         # 제목에서 `(1년)` 뺌 — 범례 `1년 최고 대비` 와 겹친다 · 최고가 며칠 전인지 · 툴팁 없음 (2026-11-07 사용자: 정보 과잉)
         lines.append((C.range_gauge(lo, hi, at(m["last"]), m["pct_from_high"], f0, "", "가격 범위 (1년)", legend, "최고가 근처",
                                     marks=avg_marks), "html"))
-    parts = [x for x in (sx.normal_card(a, parts=True), flow_card(a, parts=True), rs_card(a, prev, parts=True)) if x]
+    parts = [x for x in (flow_card(a, parts=True), sx.normal_card(a, parts=True), rs_card(a, prev, parts=True)) if x]   # 최근 흐름(20 · 50일 평균 대비)을 가격 범위 막대 바로 아래로 — 첫 문장 · 막대와 같은 평균 가격 이야기 (2026-11-07 사용자)
     for k, (q, st, _th, ik, ls, _tp) in enumerate(parts):   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄
         lines.append(_part_row(q, st, ik, noline=(k == 0 and lines[-1][1] == "html")))   # 가로 막대 바로 아래 첫 묶음은 위 선 없음 (9절)
         lines += ls
