@@ -28,7 +28,7 @@ import design_kit as dk  # noqa: E402
 KST = datetime.timezone(datetime.timedelta(hours=9))
 TITLE_NAME = "주요 인물 발언"   # 2026-10-21 사용자: "트럼프 · 연준 · 월가 인물 발언"은 너무 길다 — 짧게, 제목에 날짜 없음(날짜는 본문 글자)
 SLUG_NAME = "market moving remarks"
-LABELS = ["인물 발언", "미국 증시", "자동 리포트"]
+LABELS = ["인물 발언", "자동 리포트"]   # `미국 증시` 라벨 뗌 (2026-11-07 사용자)
 MAX_SIGNALS_PER_PERSON = 3
 SEO_LEAD_MAX = 120
 COLLECT_SINCE = "2026-10-22"   # record_store 가 발언 · 신호를 쌓기 시작한 날 (데이터-기록-계획 A3-1 2번)
@@ -237,7 +237,7 @@ def _signal_item(p, s, cards):
         targets = [x for x in s["companies"][:4]] + [config.SECTOR_KO.get(x, x) for x in s["sectors"][:2]]
         if targets:
             subs.append(_sub("대상 : " + _esc(" · ".join(targets))))
-    pills = [dk.pill(_topic(s["topic"]), bare=True), _dir_pill(s["direction"]), dk.pill(f"강도 {s['intensity']}", bare=True)]
+    pills = [dk.pill(dk.ISSUE_KO.get(s.get("issue") or "OTHER", "그 밖"), bare=True), _dir_pill(s["direction"]), dk.pill(f"강도 {s['intensity']}", bare=True)]   # 분야 라벨 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339, 옛: 인물 주제)
     # 공용 뉴스 카드 (design_kit.news_item) — 라벨 줄 오른쪽에 시각 · 출처 · 보도 수 (2026-10-25 사용자)
     return dk.news_item(h_html, url, detail, subs, " ".join(pills), meta)
 

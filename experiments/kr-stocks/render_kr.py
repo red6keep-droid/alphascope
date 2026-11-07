@@ -806,7 +806,7 @@ MEDIA_WEEK = []     # 최근 7일 방송 이슈 — 뉴스 방향 막대 `최근
 def sec_today(s):
     """`오늘` 탭 — 방송 뉴스 (2026-10-25 사용자: 한국 종목 뉴스는 방송 자막 뉴스로). 이 종목이 중심인 이슈 + 이 종목 묶음(반도체 · 2차전지 …)의 업종 이슈,
     한국 증시 채널 · 미국 채널 모두. 공용 뉴스 카드(엔비디아 · 미국 종목 페이지와 같은 _event_html): 주제 / 방송 주장 / [영역] [방향] [방송]  시각 · 채널."""
-    ev = [media_feed.event(r) for r in sorted(media_feed.for_kr_page(MEDIA, s["code"]), key=lambda r: str(r["published_at"]), reverse=True)]
+    ev = [media_feed.event(r, _dk.n_channels_of(MEDIA)) for r in sorted(media_feed.for_kr_page(MEDIA, s["code"]), key=lambda r: str(r["published_at"]), reverse=True)]
     bars = R.sec_direction_bars({"direction_counts": {"today": media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])),
                                                       "week": media_feed.direction_counts(media_feed.for_kr_page(MEDIA_WEEK, s["code"]))}})   # 엔비디아처럼 오늘 · 최근 7일 방향 막대 (2026-10-31 사용자 P143)
     if not ev:
@@ -817,7 +817,7 @@ def sec_today(s):
 def mock_news():
     """목업 전용 뉴스 샘플 (2026-10-27 사용자 P26: "공용 뉴스 카드로 우선 샘플") — 이 종목 방송이 없을 때 최근 한국 채널 방송 4건을 공용 카드로.
     발행 본문에는 들어가지 않는다 (write_all 이 MOCK_NEWS 를 지운다)."""
-    ev = [media_feed.event(r) for r in media_feed.korea(MEDIA, 4)]
+    ev = [media_feed.event(r, _dk.n_channels_of(MEDIA)) for r in media_feed.korea(MEDIA, 4)]
     if not ev:
         return ""
     return (f'<div style="margin:12px 0 6px;padding:6px 10px;border:1px dashed #F59E0B;border-radius:6px;font-size:{TINY};line-height:20px;color:#92400E;">'

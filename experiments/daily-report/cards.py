@@ -56,17 +56,18 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
         text = item if isinstance(item, str) else item[0]
         if kind == "row":   # 근거 줄 18px · 행간 30 — 질문 · 대답과 같게, 설명 문장은 19 그대로 (2026-10-27 사용자)
             _, name, value, note = item
+            val = value if str(value).startswith("<span") else dk.tint(esc(value))   # 이미 색 · 줄바꿈을 입힌 값(HTML)은 그대로 (2026-11-07 P330)
             fits = _est_w(name, 17) + _est_w(f"({note})", 14) + _est_w(value, 17) <= INLINE_W
             nt = f'<span style="display:block;margin-top:2px;font-size:{dk.TINY};line-height:20px;color:{NOTE};white-space:normal;">{dk.tint(esc(note))}</span>' if note else ""
             if note and fits:
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
                         f'<span style="flex:none;white-space:nowrap;color:#111;">{esc(name)} <span style="font-size:{dk.TINY};color:{NOTE};">({dk.tint(esc(note))})</span></span>'
-                        f'<span style="flex:none;text-align:right;font-weight:{dk.STATE_VAL_W};white-space:nowrap;">{dk.tint(esc(value))}</span></span></li>')
+                        f'<span style="flex:none;text-align:right;font-weight:{dk.STATE_VAL_W};white-space:nowrap;">{val}</span></span></li>')
             return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
                     f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
                     f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{esc(name)}</span>{nt}</span>'
-                    f'<span style="flex:none;text-align:right;font-weight:{dk.STATE_VAL_W};word-break:keep-all;">{dk.tint(esc(value))}</span></span></li>')
+                    f'<span style="flex:none;text-align:right;font-weight:{dk.STATE_VAL_W};word-break:keep-all;">{val}</span></span></li>')
         if kind == "html":
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
         if kind == "rich":   # plain 과 같은 모양, 글은 이미 만든 HTML (강조 숫자 — 한국 증시 리포트 주식 비중, 2026-11-05 M69)

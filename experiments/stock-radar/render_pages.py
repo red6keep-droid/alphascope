@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.join(_HERE, ".."))
 sys.path.insert(0, os.path.join(_HERE, "..", "nvda-report"))
 
 import design_kit as _dk  # noqa: E402
+import people_section  # noqa: E402  — 인물 발언 구획 (2026-11-07 사용자, 목업)
 import media_feed  # noqa: E402
 import news_store  # noqa: E402  — 공용 뉴스 처리 (헤드라인 · 요약 줄 고르기)
 import chart_price as CP  # noqa: E402
@@ -688,7 +689,8 @@ def _news_for(s, news):
             continue   # 사실 문장 검사에서 두 번 탈락한 기사 = 영문 원제를 그대로 싣게 되므로 뺀다. 방향 집계(counted)에는 남는다 (2026-10-21, 운영지침 D3-1f)
         if sc["relevance"] >= 1:   # 목록이 오늘자만이 된 뒤로 관련도 1(업종 맥락)도 싣는다 — `오늘 n건` 막대와 목록 기사 수를 맞춘다 (2026-10-25). 중요 이슈는 아래에서 2 이상만
             out.append({"area": x["area"], "kind": "news", "title": x["title"], "fact": x["fact"], "headline": news_store.headline(x), "detail": news_store.summary(x),   # 목록 헤드라인 = 원제 번역 · 요약 줄 (공용 뉴스 처리, 2026-10-25). 중요 이슈는 fact 그대로
-                        "has_fact": True, "url": x.get("url"), "direction": sc["direction"],
+                        "has_fact": True, "url": x.get("url"), "direction": sc["direction"], "issue": x.get("issue"),
+                        "pop_key": x.get("item_id"), "pop_lines": SUMMARY.get(x.get("item_id")) or [], "pop_kind": "기사", "pop_source": x.get("source") or "",   # 요약 다섯 줄 팝업 (2026-11-07 사용자 P341)
                         "emphasis": sc["relevance"] >= 3 or prio, "source": x.get("source"), "published_at": x["published_at"], "rel": sc["relevance"], "prio": prio})
     for f in s.get("filings") or []:   # SEC 공시 — NVDA 리포트처럼 기사와 같은 목록에 (제목은 파이썬 규칙, AI 없음)
         if f["filed"] >= cut:
@@ -704,7 +706,7 @@ def _today_list(s, events):
     방송 줄은 중요 이슈에는 넣지 않는다 (의견 섞임). 정렬은 _news_for 그대로(법무 · 규제 → 강조 → 최근)."""
     since = _since()
     media = sorted(media_feed.for_page(MEDIA, s["sym"]), key=lambda r: str(r["published_at"]), reverse=True)[:MAX_MEDIA]   # MEDIA = 정리된 이슈(같은 이슈는 한 줄)
-    today = [e for e in events if _ts(e["published_at"]) >= since] + [media_feed.event(r) for r in media]
+    today = [e for e in events if _ts(e["published_at"]) >= since] + [media_feed.event(r, _dk.n_channels_of(MEDIA)) for r in media]
     today.sort(key=lambda e: _ts(e["published_at"]), reverse=True)
     today.sort(key=lambda e: (not e["prio"], not e["emphasis"]))
     return today
@@ -754,7 +756,14 @@ def sec_today_tab(s, news):
     a = {"events": today[:MAX_EVENTS], "events_overflow": today[MAX_EVENTS:MAX_EVENTS + 12], "direction_counts": dc}
     issue_html = R.sec_narrative(a, {"today": issues}) if issues else _dk.muted("최근 7일 동안 이 종목을 주로 다룬 큰 소식이 없습니다.")
     return sec_crash(s, dc["today"]) + _dk.keep_tone(R._section("중요 이슈", issue_html, tab="오늘")   # 뉴스 · 중요 이슈는 합니다체로 바꾸지 않는다 (2026-10-18 사용자)
-                         + R._section("뉴스", R.sec_direction_bars(a) + (R.sec_events(a) if today else _dk.muted("오늘은 새 뉴스가 없습니다.")), line=False, tab="오늘"))
+                         + R._section("뉴스", R.sec_direction_bars(a) + (R.sec_events(a) if today else _dk.muted("오늘은 새 뉴스가 없습니다.")), line=False, tab="오늘")
+                         + sec_people(s))
+
+
+def sec_people(s):
+    """오늘 탭 뉴스 아래 — 최근 7일 이 종목을 지목한 인물 발언 3줄 + 접기 + 전체 보기 (2026-11-07 사용자). 없으면 구획을 뺀다."""
+    body = people_section.for_stock(s["sym"])
+    return R._section("인물 발언", body, summary="최근 7일", line=False, tab="오늘") if body else ""
 
 
 def _bil(v):
@@ -1097,8 +1106,32 @@ def list_body(a):
     return wrap(body + home_marker())
 
 
-def write_all(a, out_dir, snap=None, news=None, media=None):
+SUMMARY = {}   # 기사 요약 다섯 줄 {item_id: [줄]} — data/news_summaries.json (news_summary 캐시, 상태 브랜치 radar/ 에 남는다)
+SUMMARY_PATH = os.path.join(_HERE, "data", "news_summaries.json")
+SUMMARY_MAX = 40   # 하루 새로 요약하는 기사 상한 — Groq 하루 토큰 보호 (2026-11-07 P341, CLAUDE.md 한도 표)
+
+
+def summarize_shown(a, news):
+    """목록에 실리는 기사(최근 24시간 · 관련도 1 이상 · 사실 문장 있음)만 요약 — 이미 요약한 기사는 캐시. 실패해도 페이지는 나간다(요약 줄 하나 + 원문)."""
+    import news_summary
+    seen, items = set(), []
+    since = _since()
+    for s in a["stocks"]:
+        for e in _news_for(s, news)[0]:
+            k = e.get("pop_key")
+            if e["kind"] == "news" and k and k not in seen and _ts(e["published_at"]) >= since:
+                seen.add(k)
+                items.append({"item_id": k, "title": e["title"], "url": e.get("url"), "snippet": e.get("detail") or ""})
+    try:
+        news_summary.summarize(items, cache_path=SUMMARY_PATH, lead_cache=os.path.join(_HERE, "data", "leads.json"), label="radar-summary", max_items=SUMMARY_MAX)
+    except Exception as e:  # noqa: BLE001
+        print(f"[radar] 기사 요약 실패 — 요약 줄 하나로 : {str(e)[:100]}")
+    print(f"[radar] 팝업 대상 기사 {len(items)}건")
+
+
+def write_all(a, out_dir, snap=None, news=None, media=None, summarize=False):
     os.makedirs(out_dir, exist_ok=True)
+    global SUMMARY
     global MEDIA, NOW, NEWS, COURT
     COURT = court.load()   # 그날 court.fetch() 가 쓴 것 (main) — 없으면 소송 카드 없이
     NEWS = news or {}   # 전망 카드 뉴스 · 방송 분위기 · 호재 · 리스크 (P218)
@@ -1112,6 +1145,13 @@ def write_all(a, out_dir, snap=None, news=None, media=None):
         media = media_feed.issues(media_feed.rows(vids), _since())
         PICKS = media_feed.picks(vids, PICK_SINCE)   # 최근 5거래일 (2026-11-04 P290, 옛 48시간 10-31)
     MEDIA = media
+    if summarize and news:
+        summarize_shown(a, news)
+    try:
+        import news_summary
+        SUMMARY = {k: v["lines"] for k, v in news_summary._load(SUMMARY_PATH).items()}
+    except Exception:  # noqa: BLE001
+        SUMMARY = {}
     if snap:
         draw_charts(snap, [s for s in a["stocks"] if s["sym"] not in U.REPORT_TYPE], out_dir)
     pages = {"list": (U.LIST_TITLE, list_body(a))}

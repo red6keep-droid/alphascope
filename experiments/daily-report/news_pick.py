@@ -27,6 +27,28 @@ STOCKS_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pag
 _stocks = None
 
 
+
+
+def _seed_home_summaries(cache_path):
+    """gh-pages 의 홈 요약 캐시(news_summaries_home.json, 열쇠 = 같은 item_id)를 데일리 캐시에 없는 것만 채운다. 못 받으면 그냥 지나간다."""
+    import requests
+    try:
+        home = requests.get("https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/news_summaries_home.json", timeout=15).json()
+    except Exception:  # noqa: BLE001
+        return
+    cache = news_summary._load(cache_path)
+    add = {k: v for k, v in home.items() if k not in cache and isinstance(v, dict) and v.get("lines")}
+    if add:
+        cache.update(add)
+        news_summary._save(cache_path, cache)
+        print(f"[news_pick] 홈 요약 {len(add)}건 재사용")
+
+def _issue_ko(n):
+    """CNBC 기사 분야 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339). 옛 theme(8개 화면 어휘)은 issue 가 없을 때만."""
+    import issue_codes
+    iss = n.get("issue")
+    return issue_codes.ISSUE_KO.get(iss) if iss in issue_codes.ISSUE_KO else (n.get("theme") or "그 밖")
+
 def item_id(link):
     return hashlib.sha1(str(link or "").encode()).hexdigest()[:12]   # fetch_news._iid · collect_news.process 와 같은 열쇠
 
@@ -79,7 +101,7 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
     for i, n in enumerate(input_data.get("news") or []):
         if not (n.get("headline_ko") or n.get("title")):
             continue
-        it = {"id": item_id(n.get("link")), "kind": "article", "text": n.get("headline_ko") or n.get("title") or "", "theme": n.get("theme") or "기타",
+        it = {"id": item_id(n.get("link")), "kind": "article", "text": n.get("headline_ko") or n.get("title") or "", "theme": _issue_ko(n),
               "published_at": _iso(n.get("published")), "index": i, "url": n.get("link"), "source": n.get("source") or "CNBC",
               "detail": n.get("detail_ko") or "", "related": [s for s in (n.get("related") or []) if isinstance(s, str)],
               "surprise": n.get("surprise"), "market_dir": n.get("market_dir"), "title": n.get("title") or "", "snippet": n.get("summary") or "",
@@ -144,6 +166,7 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
         lines = {k: v["lines"] for k, v in news_summary._load(os.path.join(STATE_DIR, "news_summaries.json")).items()}
     if summarize and not os.environ.get("NEWS_NO_AI"):   # NEWS_NO_AI=1: 캐시된 요약만 (목업 · 다시 그리기)
         reps = [g["rep"] for g in picks + rest if g["rep"]["kind"] == "article"]
+        _seed_home_summaries(os.path.join(STATE_DIR, "news_summaries.json"))   # 홈(06:45)이 이미 요약한 CNBC 기사는 다시 AI 에 보내지 않는다 (2026-11-07 P342)
         try:
             lines = news_summary.summarize([{"item_id": x["id"], "title": x["title"], "url": x["url"], "snippet": x["snippet"]} for x in reps],
                                            cache_path=os.path.join(STATE_DIR, "news_summaries.json"), lead_cache=os.path.join(DATA_DIR, "leads.json"), label="daily-summary")

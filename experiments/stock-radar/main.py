@@ -58,5 +58,5 @@ if __name__ == "__main__":
             record(a, news)
         except Exception as e:  # noqa: BLE001
             print(f"::warning::[radar] 기록 저장 실패 (페이지는 계속): {e!r}")
-    pages = render_pages.write_all(a, OUT, snap, news)
+    pages = render_pages.write_all(a, OUT, snap, news, summarize=not cached)   # 목록 기사 요약(팝업) — 받기 실행만, --cached 는 캐시만 (P341)
     print(f"[radar] {a['day']} · 페이지 {len(pages)}개 → {OUT}")

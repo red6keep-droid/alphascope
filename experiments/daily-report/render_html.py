@@ -15,6 +15,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import design_kit as dk  # noqa: E402  — 디자인-가이드라인.md 공통 조각 (2026-10-11)
+import people_section  # noqa: E402  — 인물 발언 구획 (2026-11-07 사용자, 목업)
 
 dk.TIP_SRC = "Yahoo Finance"   # 툴팁 기본 데이터 출처. 금리 · 경제 일정이 들어간 툴팁만 with_src (2026-10-20 사용자)
 import cards  # noqa: E402  — 질문 카드 · 막대 그래프 (2026-10-18 재설계)
@@ -101,7 +102,7 @@ TERM_KO = {"위험선호(Risk-On)": "위험 선호", "위험회피(Risk-Off)": "
            "Risk-On": "위험 선호", "Risk-Off": "위험 회피", "Risk On": "위험 선호", "Risk Off": "위험 회피", "Neutral": "중립",
            "Nasdaq": "나스닥", "Dow Jones": "다우존스", "Dow": "다우", "Russell 2000": "러셀 2000", "Market Regime": "시장 상태"}
 TAB_TODAY, TAB_MARKET, TAB_STOCKS, TAB_RISK = "오늘", "시장", "종목 · 뉴스", "위험"   # "·" 앞뒤 띄우기 (2026-10-13 사용자)
-TAB_KOREA, TAB_CAL = "한국장", "일정"   # 2026-10-18 재설계: 오늘 · 한국장 · 시장 · 일정 (종목 · 뉴스 · 위험 탭은 없앰 — 기획 6절)
+TAB_KOREA, TAB_CAL, TAB_NEWS = "한국장", "일정", "뉴스"   # 2026-10-18 재설계: 오늘 · 한국장 · 시장 · 일정 (종목 · 뉴스 · 위험 탭은 없앰 — 기획 6절)
 
 # report_input.json의 지수 키 → analysis.json series의 심볼 (analyze.INDEX_SYMBOL과 동일)
 INDEX_SYMBOL = {
@@ -574,12 +575,12 @@ def _arrows(last5):
     return "".join(f'<b style="color:{colors.get(a, MUTED)};">{_esc(a)}</b>' for a in last5)
 
 
-INDEX_SHOWN = 2   # S&P 500 · 나스닥만 보이고 나머지는 펼침 (2026-10-12 사용자) — FOLD_SHOWN 과 같은 값
+INDEX_SHOWN = 1   # S&P 500 만 보이고 나머지는 펼침 (2026-11-07 사용자, 옛 2 = S&P 500 · 나스닥)
 
 
 def sec_indices(indices, analysis, report):
     """주요 지수 — 해설 먼저(2026-10-12 사용자), C 카드(왼쪽 60%): 지수, 값 가격 + 1일 등락, 보조 줄 5일·20일·최근 5일·위치.
-    S&P 500 · 나스닥만 보이고 다우존스 · 러셀 2000 · VIX는 펼침 버튼 안."""
+    S&P 500 만 보이고 나스닥 · 다우존스 · 러셀 2000 · VIX는 펼침 버튼 안 (2026-11-07)."""
     series = (analysis or {}).get("series") or {}
     position = (analysis or {}).get("position") or {}
     rows = []
@@ -806,9 +807,7 @@ NEWS_REL_SIZE = "15px"   # 뉴스 `관련 자산` 줄 14 → 15 굵게 (2026-10-
 
 def _meter(n, total):
     """방송 n곳 / 전체 — 작은 네모 칸 (2026-11-05 batch 8 ③: "13곳 중 8곳"이 한눈에)."""
-    on, off = CHART_MAIN, "#E2E8F0"
-    cells = "".join(f'<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:{on if i < n else off};"></span>' for i in range(max(total, n)))
-    return f'<span style="display:inline-flex;gap:2px;vertical-align:middle;position:relative;top:-1px;">{cells}</span>'
+    return dk.channel_meter(n, total)   # 공용으로 옮김 (2026-11-07 P338)
 
 
 def _kst(iso):
@@ -832,6 +831,21 @@ def _has_pop(g, built):
     return len(_pop_lines(g, built)) >= 2
 
 
+def _story_dir(g):
+    """묶음의 방향 하나 — 막대(긍정 · 부정 · 불확실 · 중립)와 같은 네 단어 (2026-11-07 사용자 P335).
+    긍정 · 부정이 같이 있거나, 그 둘 없이 불확실이 있으면 `불확실` · 한쪽만 있으면 그쪽 · 아무 방향도 없으면 `중립`."""
+    ds = [x.get("market_dir") for x in g["items"]]
+    pn = {d for d in ds if d in ("positive", "negative")}
+    if len(pn) > 1 or (not pn and "uncertain" in ds):
+        return "uncertain"
+    return pn.pop() if pn else "neutral"
+
+
+def _dir_pill(g):
+    d = _story_dir(g)
+    return dk.pill(dk.DIR_KO[d], d, bare=True)
+
+
 def _story_row(g, built, first):
     """주요 뉴스 한 줄 (2026-11-05 사용자: `여러 방송이 같이 다룬 뉴스` 5줄과 주요 뉴스 5건이 같아 하나로) — 대표 기사 제목 · 보조 한 줄 · 사건 이름 + `n곳 / 전체` 칸 막대 · 시각 · 매체."""
     n_ch = built["n_channels_all"]
@@ -843,7 +857,7 @@ def _story_row(g, built, first):
                         f'{NEW_LEAD if g.get("new") else ""}{_esc(rep["text"])}</a>')   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
     return (head + (dk.keep_tone(f'<span style="{dk.NEWS_SUM}">{_esc(dk.headline(sub))}</span>') if sub else "")
             + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;">'   # 종목 페이지 뉴스(dk.news_item) 라벨 줄과 같은 간격 6 · 10 (2026-11-07 0절)
-            + dk.pill_row(dk.pill(g["name"], bare=True))   # 사건 이름 = 외곽선 라벨 (옛 14px 회색 글자)
+            + dk.pill_row(dk.pill(g["theme"], bare=True) + " " + _dir_pill(g))   # 분야 라벨 (2026-11-07 사용자 P336: 사건 이름이 제목과 거의 같은 글자였다) · 방향 하나 (P335)
             + f'<span style="display:inline-flex;align-items:center;gap:6px;">{_meter(g["n_channels"], n_ch)}'
             f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;"><b style="color:#111;">{g["n_channels"]}곳</b> / {n_ch}곳</span></span>'
             f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{_kst(rep["published_at"])} · {_esc(rep["source"])}</span></span>')   # 메타 = `시각 · 매체` (옛 끝 ` 기사` · ` 방송` 꼬리 뺌, 0-6)
@@ -904,7 +918,7 @@ def _story_item(g, built, reaction, known, compact=False):
     if related and not compact:
         subs.append(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;"><span style="font-size:{NEWS_REL_SIZE};font-weight:700;">관련 자산 : '
                     + " · ".join(_named_reaction(s, reaction(s)) for s in dict.fromkeys(related)) + "</span></span>")
-    labels = dk.pill(g["theme"], bare=True) + (" " + dk.pill(f"{g['n_channels']}곳", "uncertain", bare=True) if g["n_channels"] >= 2 else "")
+    labels = dk.pill(g["theme"], bare=True) + " " + _dir_pill(g) + (" " + dk.channel_count(g["n_channels"], built["n_channels_all"]) if g["n_channels"] >= 2 else "")   # 옛 `[n곳]` 라벨 → 칸 막대 (P338)
     meta = [_kst(rep["published_at"]), rep["source"]]   # `시각 · 매체` — 종목 페이지와 같게 (2026-11-07 0-6, 옛 ` 기사` · ` 방송` 꼬리)
     head = (NEW_LEAD if g.get("new") else "") + _esc(rep["text"])
     pop = _has_pop(g, built)
@@ -949,17 +963,27 @@ def sec_news(input_data, report, analysis):
             dirs[n["market_dir"]] = dirs.get(n["market_dir"], 0) + 1
     for k, v in media_feed.direction_counts(media).items():
         dirs[k] = dirs.get(k, 0) + v
-    out = dk.direction_bars(dirs, {})   # 뉴스 방향 막대 — 데일리는 `오늘` 만 (P143)
+    week = dict(dirs)   # 최근 7일 = 오늘 기사(CNBC 는 48시간만 받는다) + 방송 이슈 7일 (2026-11-07 사용자: 종목 페이지처럼 오늘 · 최근 7일 막대 두 개)
+    since7 = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=7)).strftime("%Y-%m-%dT%H:%M")
+    for k, v in media_feed.direction_counts(media_feed.market_top(media_feed.issues(_media_rows(), since7), None)).items():
+        week[k] = week.get(k, 0) - media_feed.direction_counts(media).get(k, 0) + v
+    bars = dk.direction_bars(dirs, week)   # 뉴스 방향 막대 오늘 · 최근 7일 (P143 의 `오늘` 만 → 둘, 2026-11-07) — 분야 탭 아래 (P334)
+    out = ""
     # `유튜브 방송이 많이 다룬 분야는?` 카드 · `여러 방송이 같이 다룬 뉴스` 5줄은 뺐다 — 분야 칩이 많은 순이고 주요 뉴스 5건과 같았다 (2026-11-05 사용자). 막대 바로 아래 칩
     picks, rest = built["picks"], built["rest"]
     pops = []
     if picks or rest:
         chips = [("주요 뉴스", len(picks))] + sorted(built["chips"].items(), key=lambda kv: -kv[1])   # `전체` 없음 — 주요 뉴스가 첫 칩 · 기본 (batch 9 ①)
-        chip_css = f"flex:none;padding:5px 10px;border:1px solid #E2E8F0;border-radius:999px;background:#fff;color:#374151;font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;"
-        out += (f'<div style="display:flex;align-items:center;gap:4px;margin:4px 0 2px;position:relative;">'
-                f'<div data-news-chips="1" style="flex:1 1 auto;min-width:0;display:flex;gap:6px;overflow-x:auto;padding:6px {dk.ALIGN_PX}px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
-                + "".join(f'<button type="button" data-chip="{_esc(k)}" aria-pressed="{"true" if i == 0 else "false"}" style="{chip_css}">{_esc(k)} <span style="color:{dk.SUB};">{n}</span></button>'
-                          for i, (k, n) in enumerate(chips)) + "</div></div>")   # 읽는 법 ? 는 구획 제목 `뉴스` 옆 (news_tip, 2026-11-05 사용자)
+        # 분야 탭 = 홈 `테마 종목` 묶음 탭 모양 (2026-11-07 사용자 P332): 하나로 이은 둥근 박스 · 메뉴 사이 세로 구분선 · 선택 = 굵은 검정 + 1px 검정 외곽선(테마 CSS).
+        # 박스 테두리는 버튼들이 나눠 가진다(위 · 아래 + 첫 버튼 왼쪽 · 끝 버튼 오른쪽) — 가로로 밀면 박스째 움직인다 (P333). 위치 = 뉴스 탭 맨 위, 방향 막대는 그 아래 (P334)
+        last = len(chips) - 1
+        def chip_css(i):
+            return (f"flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;color:#4B5563;font:inherit;font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;"
+                    f"border:1px solid #E2E8F0;{'border-left:0;' if i else ''}border-radius:{'7px' if i == 0 else '0'} {'7px' if i == last else '0'} {'7px' if i == last else '0'} {'7px' if i == 0 else '0'};")
+        out += (f'<div data-news-chips="1" style="display:flex;overflow-x:auto;margin:0 0 12px;padding:0;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
+                + "".join(f'<button type="button" data-chip="{_esc(k)}" aria-pressed="{"true" if i == 0 else "false"}" style="{chip_css(i)}">{_esc(k)} <span style="color:{dk.SUB};">{n}</span></button>'
+                          for i, (k, n) in enumerate(chips)) + "</div>")
+        out += bars
         lis = []
         for i, g in enumerate(picks + rest):
             is_pick = i < len(picks)
@@ -973,6 +997,8 @@ def sec_news(input_data, report, analysis):
         out += f'<ul data-news-list="1" data-shown="{news_pick.LIST_SHOWN}" style="margin:0 0 8px;padding:0;list-style:none;font-size:{dk.SMALL};">{"".join(lis)}</ul>'
         out += (f'<button type="button" data-news-more="1" style="{dk.FOLD_BTN}width:100%;margin:0 0 8px;display:none;">'
                 f'<span>뉴스 더 보기</span> {dk.ACC_CHEV}</button>')   # 글자 · 보임은 테마 JS (분야 칩마다 LIST_SHOWN 넘는 만큼)
+    else:
+        out += bars
     out += "".join(pops)
     return out
 
@@ -1052,9 +1078,12 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
         parts.append(dk.section(TAB_TODAY, cards.cards_grid(today_cards), tab=TAB_TODAY))   # 제목 `핵심 질문` 삭제 (2026-11-05 사용자 batch 8 ①) — 탭 이름과 같은 제목은 테마가 숨긴다, 탭 나누기 h2 는 남아야 한다
     parts += [
         dk.section("주요 지수", sec_indices(indices, analysis, report), tab=TAB_TODAY),
-        dk.keep_tone(dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_TODAY,
-                                aside=dk.tip_line([("읽는 법", news_tip())], in_title=True))),   # 뉴스는 헤드라인체 그대로 (2026-10-18 사용자) · 읽는 법 ? 는 제목 옆 (2026-11-05 사용자)
+        # 뉴스 = 오늘 옆 탭 (2026-11-07 사용자: 오늘 탭이 너무 길다). 탭 이름과 같은 제목 `뉴스` 는 테마가 숨긴다. 읽는 법 툴팁 삭제 (같은 날)
+        dk.keep_tone(dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_NEWS)),   # 뉴스는 헤드라인체 그대로 (2026-10-18 사용자)
     ]
+    people = people_section.for_market()   # 뉴스 탭 맨 아래 — 최근 24시간 시장 관련도 높은 인물 발언 3줄 (2026-11-07 사용자). 없으면 뺀다
+    if people:
+        parts.append(dk.keep_tone(dk.section("인물 발언", people, summary="최근 24시간", tab=TAB_NEWS)))
     korea = sx.korea_open_card(a) + sx.korea_pairs_card(a) + sx.fx_card(a)
     if korea:
         parts.append(dk.section(TAB_KOREA, cards.cards_grid(korea), tab=TAB_KOREA))   # 탭 이름과 같은 구획 제목은 테마가 탭 화면에서 숨긴다

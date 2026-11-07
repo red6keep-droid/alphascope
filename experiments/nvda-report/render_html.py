@@ -2491,7 +2491,8 @@ def _when(iso):
 def _event_html(e):
     """뉴스 한 줄 = 공용 뉴스 카드 (design_kit.news_item, 2026-10-25 사용자: 뉴스 형식 통일) — 헤드라인 / 요약 한 줄 / [영역] [방향] (발언자 · 방송)  시각 · 매체.
     문서(기사 · 뉴스룸 · 관보 · 법원)는 사실 문장이 헤드라인, 요약 = detail(기사 첫 문단에서 · 방송 주장). 가격 · 옵션 같은 계산 이벤트는 제목 + 사실 줄."""
-    tag = _tag(e["area"], e["direction"])
+    tag = (_pill(_dk.ISSUE_KO.get(e["issue"], "그 밖"), "area") + " " + _pill(rr.DIR_KO.get(e["direction"], e["direction"]), e["direction"])
+           if e.get("issue") else _tag(e["area"], e["direction"]))   # 분야 라벨 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339). 공시 · 계산 이벤트(issue 없음)는 옛 영역 라벨
     if e.get("speaker"):   # 발언자 라벨 — 영역·방향 뒤 세 번째 알약 (2026-10-11 사용자: 대표 발언에 "누가 말했다") · 방송 줄은 `방송`
         tag += "" if e.get("media") else " " + _pill(config.SPEAKER_KO.get(e["speaker"], e["speaker"]), "area")   # 방송 줄은 `방송` 라벨을 쓰지 않는다 — 메타의 채널 · 방송 n곳과 중복 (2026-10-26 사용자)
     src = rr.SOURCE_KO.get(e.get("source") or "", e.get("source") or "")
@@ -2508,9 +2509,19 @@ def _event_html(e):
     meta = [_when(e.get("published_at")), src if (doc and src and src != "googlenews") else ""]
     # 라벨 사이는 news_item(pill_row)이 2px 로 맞춘다 (2026-10-14 사용자 0 → 3, 2026-10-26 → 2 어디서나)
     labels = tag.replace(f"margin:0 {_dk.PILL_GAP}px;", "margin:0 3px 0 0;").replace("</span> <span", "</span><span")
+    if e.get("n_all"):   # 방송 곳 수 = 칸 막대 + `n곳 / 전체곳` (2026-11-07 P338)
+        labels += " " + _dk.channel_count(e.get("n_channels", 1), e["n_all"])
     tip_t = _esc(f"{src}: {e['title'][:90]}" if doc else f"{src} 원문").replace(chr(34), "&quot;")
     trhelp = ' data-trhelp="skip"' if e.get("media") else ""   # 방송 줄(media_feed)은 한국어 주제 + 유튜브 영상 — 영문 기사용 `번역 방법` 을 붙이지 않는다
     inner = _dk.news_item(head, e.get("url"), detail, subs, labels, meta, f' title="{tip_t}"{trhelp}')
+    if len(e.get("pop_lines") or []) >= 2:   # 누르면 요약 다섯 줄 팝업 — 방송(P337) · 기사(P341), 데일리 뉴스 탭과 같게. 원문은 팝업 안 작은 링크
+        pid = _dk.news_pop_id("ev", e["pop_key"])
+        kind = e.get("pop_kind") or "방송"
+        title = head if kind == "기사" else e["title"]
+        title = re.sub(r"<[^>]+>", "", title) if kind == "기사" else title
+        inner = _dk.news_pop_wrap(inner, pid) + _dk.news_pop_body(pid, html_mod.unescape(title) if kind == "기사" else title, e["pop_lines"], _when(e.get("published_at")),
+                                                                 rr.SOURCE_KO.get(e.get("pop_source") or "", e.get("pop_source") or "") if kind == "기사" else e.get("channel", ""),
+                                                                 kind, e.get("url"), e.get("n_channels", 1) if kind == "방송" else 0)
     if e.get("emphasis"):   # 법무·규제 등 우선 영역: 굵게·크게 대신 연한 배경 카드 (가이드라인 2절) — 배경 · 테두리만 방향 색
         bg, bd = CARD_DIR.get(e.get("direction"), CARD_DIR["neutral"])
         return (f'<div style="background:{bg};border:1px solid {bd};border-radius:8px;padding:{_dk.SEP_GAP - _dk.NEWS_VP}px 12px {_dk.SEP_GAP - _dk.VP}px;margin:0 0 8px;line-height:{_dk.LH_BODY};">'   # 폭은 다른 카드와 같게 (2026-10-16 사용자; 10-14 의 좌우 −13 은 되돌림). 일반 기사는 좌측 기준선 6px — 카드 안 글자보다 7px 바깥 (가이드라인, 2026-10-27 P38)   # 끝 줄이 라벨(행간 1)이라 아래는 VP 만 뺀다
@@ -2603,11 +2614,9 @@ def sec_events(a):
     cards = [e for e in a["events"] if e.get("emphasis")]
     plain = [e for e in a["events"] if not e.get("emphasis")]
     # 강조 카드만 카드, 나머지는 가로 구분선 목록 (2026-10-13 사용자). 일반 기사는 카드 안쪽만큼(테두리 1 + 안쪽 12) 들여 제목 왼쪽 선을 강조 카드 제목에 맞춘다 (2026-10-16 사용자)
-    out = "".join(_event_html(e) for e in cards) + _dk.item_rules([_event_html(e) for e in plain], indent=_dk.ALIGN_PX, first_top=NEWS_FIRST_TOP)   # 좌우 = 좌측 기준선 6px(홈 실시간 뉴스 글자 선) — 옛 13px 이 남아 있었다 (2026-10-27 사용자 P38)
-    if a["events_overflow"]:
-        # 카드 버튼 (가운데, 검정) — 2026-10-11 사용자
-        out += (f'<details data-acc="1" style="margin:8px 0;"><summary style="{_dk.FOLD_BTN}">그 외 {len(a["events_overflow"])}건 {ACC_CHEV}</summary>'
-                + '<div style="margin-top:8px;">' + _dk.item_rules([_event_html(dict(e, emphasis=False)) for e in a["events_overflow"]], indent=_dk.ALIGN_PX) + "</div></details>")
+    # 처음 5건(강조 카드 포함) + `뉴스 n건 더 보기` 10건씩 (2026-11-07 사용자 P340, 옛: 8건 + `그 외 n건` 한 번에 전부). 좌우 = 좌측 기준선 6px (P38)
+    rest = plain + [dict(e, emphasis=False) for e in a["events_overflow"]]
+    out = "".join(_event_html(e) for e in cards) + _dk.more_list([_event_html(e) for e in rest], "뉴스", max(0, _dk.MORE_SHOWN - len(cards)), indent=_dk.ALIGN_PX, first_top=NEWS_FIRST_TOP)
     if a.get("analyst_target_only"):
         out += _muted(f"목표가만 바뀐 애널리스트 {len(a['analyst_target_only'])}건 (등급 변경 아님): "
                       + " · ".join(t["title"] for t in a["analyst_target_only"][:6]))

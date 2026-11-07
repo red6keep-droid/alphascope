@@ -485,7 +485,7 @@ def sub_line(sub_html, lead=""):
         plain = html_mod.unescape(re.sub(r"<[^>]+>", "", c))
         if i == 0 and lead:
             plain = plain.strip()
-        parts.append(f'<span style="display:inline-block;max-width:100%;vertical-align:top;">{c}{sep}</span>')   # 덩어리마다 통째로 — 줄바꿈은 가운뎃점 사이에서만, 한 줄보다 긴 덩어리만 안에서 줄이 바뀐다 (2026-10-23 사용자: 가격 정보 하단 글)
+        parts.append(f'<span style="display:inline-block;max-width:100%;vertical-align:top;word-break:keep-all;">{c}{sep}</span>')   # 덩어리 안에서도 띄어쓰기에서만 줄바꿈 (2026-11-07 사용자 P331)   # 덩어리마다 통째로 — 줄바꿈은 가운뎃점 사이에서만, 한 줄보다 긴 덩어리만 안에서 줄이 바뀐다 (2026-10-23 사용자: 가격 정보 하단 글)
     return paren(" ".join(parts))
 
 
@@ -1856,3 +1856,80 @@ def news_when(iso):
         except ValueError:
             return ""
     return iso[:10].replace("-", ".") if iso else ""
+
+
+# ── 뉴스 요약 팝업 (공용, 2026-11-07 사용자: "팝업 형식을 쉬운 곳부터" — 데일리 뉴스 탭 _news_pop_body 와 같은 모양) ──
+# 줄을 누르면 테마 JS(alphaflow-home.html 뉴스 팝업)가 [data-news-pop-body=id] 숨긴 div 를 화면 가운데 창에 띄운다. 두 줄 이상일 때만 (한 줄 팝업은 의미 없다, batch 9 ④).
+# id 는 글 안에서 겹치지 않게 앞머리(prefix)를 붙인다 — 한 글에 목록이 여럿이어도 된다.
+
+def news_pop_id(prefix, key):
+    import hashlib
+    return f"{prefix}-{hashlib.md5(str(key).encode('utf-8')).hexdigest()[:10]}"
+
+
+def news_pop_body(pid, title, lines, when="", source="", kind="방송", url=None, n_channels=0):
+    li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:4px 0;"><span style="flex:none;width:3px;height:3px;margin-top:15px;border-radius:50%;background:#111;"></span>'
+                 f'<span style="min-width:0;font-size:{BODY};line-height:{LH_BODY};color:#333;word-break:keep-all;">{esc(ln)}</span></span>' for ln in lines)
+    meta = " · ".join(x for x in (when, f"{source} {kind}".strip(), f"방송 {n_channels}곳" if n_channels > 1 else "") if x)
+    link = ""
+    if url:
+        link = (f'<span style="display:block;text-align:right;margin:14px 0 0;"><a href="{esc(url)}" target="_blank" rel="noopener" data-trhelp="skip" '
+                f'style="font-size:13px;line-height:19px;color:{SUB};text-decoration:underline;text-underline-offset:3px;">{"영상 보기" if kind == "방송" else "원문 보기"}'
+                f'{f" ({esc(source)})" if source else ""} {LINK_ICON}</a></span>')
+    return (f'<div data-news-pop-body="{esc(pid)}" data-news-pop-title="{esc(title)}" hidden>'
+            f'<span style="display:block;font-size:13px;line-height:19px;color:{SUB};margin:0 0 6px;">{esc(meta)}</span>{li}{link}</div>')
+
+
+def news_pop_wrap(item_html, pid):
+    """한 줄 전체를 눌러 팝업 (가이드라인 10-9 줄 전체 링크) — 테마 JS 가 closest('[data-news-pop]') 로 잡는다."""
+    return f'<div data-news-pop="{esc(pid)}" style="cursor:pointer;">{item_html}</div>'
+
+
+# ── 곳 수 표시 (2026-11-07 사용자 P338): 방송이 다룬 수 = 칸 막대 + `n곳 / 전체곳`(우리가 보는 채널 수가 분모), 1곳이면 그리지 않는다.
+#    기사가 보도된 수 = 회색 메타 `보도 n곳`(전체 매체 수를 몰라 막대로 비교가 안 된다). 옛 `[n곳]` 라벨 · 메타 `방송 n곳` 은 쓰지 않는다.
+def channel_meter(n, total):
+    """작은 네모 칸 (2026-11-05 batch 8 ③: "13곳 중 8곳"이 한눈에) — 데일리 _meter 를 공용으로."""
+    cells = "".join(f'<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:{CHART_MAIN if i < n else "#E2E8F0"};"></span>' for i in range(max(total, n)))
+    return f'<span style="display:inline-flex;gap:2px;vertical-align:middle;position:relative;top:-1px;">{cells}</span>'
+
+
+def channel_count(n, total):
+    """라벨 줄 끝에 붙는 `■■■□□ 3곳 / 10곳` — n < 2 또는 total 모르면 ""."""
+    if n < 2 or not total:
+        return ""
+    return (f'<span style="display:inline-flex;align-items:center;gap:6px;">{channel_meter(n, total)}'
+            f'<span style="font-size:{TINY};line-height:{LH_TINY};color:#374151;"><b style="color:#111;">{n}곳</b> / {max(total, n)}곳</span></span>')
+
+
+def n_channels_of(issue_rows):
+    """분모 = 그 목록 재료(방송 이슈들)에 나온 채널 수."""
+    return len({c for r in issue_rows for c in (r.get("channels") or [r.get("channel")]) if c})
+
+
+# 분야 라벨 = 기록 이슈 코드 18개 화면 이름 (2026-11-07 사용자 P339)
+try:
+    import issue_codes as _ic
+    ISSUE_KO = dict(_ic.ISSUE_KO)
+except Exception:  # noqa: BLE001
+    ISSUE_KO = {}
+
+
+# ── 더 보기 기준 (2026-11-07 사용자 P340): 처음 5건, 버튼을 누를 때마다 10건씩 더, 버튼 글자 `○○ n건 더 보기`(n = 다음에 펼칠 수),
+#    다 펼치면 `접기`(처음 5건으로). ○○ = `뉴스`(방송만 있는 목록도) · 인물 발언은 `인물 발언`. 데일리 뉴스 탭(분야 칩 목록)은 예외 — 10건.
+#    펼치기는 테마 JS(alphaflow-home.html `더 보기 단계`)가 [data-more-list] 의 숨긴 li 를 step 건씩 연다. JS 가 없으면 처음 5건만 보인다.
+MORE_SHOWN, MORE_STEP = 5, 10
+
+
+def more_list(items_html, noun="뉴스", shown=MORE_SHOWN, step=MORE_STEP, indent=0, first_top=2, sub=False):
+    items_html = [h for h in items_html if h]
+    if not items_html:
+        return ""
+    bottom = RULE_GAP - (VP if sub else NEWS_VP)
+    lis = "".join(f'<li{" hidden" if i >= shown else ""} style="margin:0;padding:{(RULE_GAP - NEWS_VP) if i else first_top}px {indent}px {bottom}px;line-height:{LH_BODY};{"box-shadow:inset 0 1px 0 #E2E8F0;" if i else ""}">{h}</li>'
+                  for i, h in enumerate(items_html))
+    out = f'<ul data-more-list="1" data-shown="{shown}" data-step="{step}" data-noun="{esc(noun)}" style="margin:0 0 8px;padding:0;list-style:none;font-size:{SMALL};">{lis}</ul>'
+    rest = len(items_html) - shown
+    if rest > 0:
+        out += (f'<button type="button" data-more-btn="1" style="{FOLD_BTN}width:100%;margin:0 0 8px;">'
+                f'<span>{esc(noun)} {min(step, rest)}건 더 보기</span> {ACC_CHEV}</button>')
+    return out

@@ -12,7 +12,7 @@ ISSUES = {
     "GROWTH_JOBS":      ("경기 · 고용 · 소비", "GDP, payrolls, unemployment, retail sales, PMI, consumer sentiment, recession debate, labor supply"),
     "TARIFF_TRADE":     ("관세 · 무역",        "tariffs imposed/paused/negotiated, trade deals, trade deficits, supply-chain reshoring (export controls -> REGULATION)"),
     "GEOPOLITICS":      ("지정학",             "wars, ceasefires, Middle East, Taiwan, sanctions, terrorism, disasters, pandemics, US-China security/diplomacy"),
-    "OIL_ENERGY":       ("유가 · 에너지",      "crude, natural gas, OPEC, power, nuclear, energy prices (AI data-center power demand -> AI_CAPEX)"),
+    "OIL_ENERGY":       ("유가 · 에너지 · 원자재", "crude, natural gas, OPEC, power, nuclear, energy prices, gold, metals and other commodities (AI data-center power demand -> AI_CAPEX)"),   # 금 · 원자재 더함 — 방송 수집기 ENERGY_COMMODITY 와 같은 뜻 (2026-11-07 사용자 P339)
     "AI_CAPEX":         ("AI 투자 · 반도체 수요", "data-center capex, GPU/accelerator demand, AI bubble debate, hyperscaler spending, AI power demand"),
     "EARNINGS":         ("실적 · 가이던스",    "earnings results, guidance, consensus, analyst targets/ratings — big tech included (ticker attribute tells)"),
     "CORP_EVENT":       ("기업 사건",          "M&A, IPO, buybacks, splits, dividends, executive changes, large contracts, product launches"),

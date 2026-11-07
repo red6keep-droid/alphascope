@@ -156,6 +156,13 @@ jobs:
           fi
           # 트럼프 반응 통계 — trump_bridge 가 state/trump-state 를 git show 로 읽는다 (2026-11-04: 공개 raw URL 대신)
           git fetch --no-tags state trump-state:refs/remotes/state/trump-state 2>/dev/null || echo "trump-state 없음 — 트럼프 구획 없이"
+          # 인물 발언 (종목 · 증시 리포트 `인물 발언` 구획, 2026-11-07 P324) — 인물 레이더가 radar-state 에 남긴 파일. 없으면 구획을 뺀다
+          mkdir -p experiments/people-radar/output/state
+          if git fetch --no-tags state radar-state:refs/remotes/state/radar-state 2>/dev/null; then
+            git show refs/remotes/state/radar-state:experiments/people-radar/output/state/people_mentions.json > experiments/people-radar/output/state/people_mentions.json 2>/dev/null && echo "인물 발언 파일 받음" || { rm -f experiments/people-radar/output/state/people_mentions.json; echo "인물 발언 파일 없음"; }
+          else
+            echo "radar-state 없음 — 인물 발언 구획 없이"
+          fi
 
       - name: Run pipeline
         id: run_nvda
@@ -178,7 +185,7 @@ jobs:
           if [ -d "$STATE_DIR/radar" ]; then cp "$STATE_DIR"/radar/*.json experiments/stock-radar/data/ 2>/dev/null || true; fi
           python experiments/stock-radar/main.py
           mkdir -p "$STATE_DIR/radar"
-          for f in news.json iv_history.json history.json rank_state.json capex.json est_history.json court.json; do   # court.json = 소송 일정 (P270)   # capex.json = 돈을 어디에 쓰나 분기 표 (기록 보존, 2026-10-30)
+          for f in news.json news_summaries.json iv_history.json history.json rank_state.json capex.json est_history.json court.json; do   # news_summaries.json = 기사 요약 캐시 (P341, 같은 기사를 다시 AI 에 보내지 않게)   # court.json = 소송 일정 (P270)   # capex.json = 돈을 어디에 쓰나 분기 표 (기록 보존, 2026-10-30)
             [ -f "experiments/stock-radar/data/$f" ] && cp "experiments/stock-radar/data/$f" "$STATE_DIR/radar/$f"
           done
 

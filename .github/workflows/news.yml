@@ -42,7 +42,8 @@ jobs:
         run: |
           mkdir -p deploy
           cp news.json deploy/news.json
-          [ -f news_store_home.json ] && cp news_store_home.json deploy/news_store_home.json || true   # 공용 뉴스 처리 결과 — 다음 실행이 이미 처리한 기사를 다시 AI 에 보내지 않게 (2026-10-25)
+          [ -f news_store_home.json ] && cp news_store_home.json deploy/news_store_home.json || true
+          [ -f news_summaries_home.json ] && cp news_summaries_home.json deploy/news_summaries_home.json || true   # 기사 요약 캐시 — 홈 팝업 (P342)   # 공용 뉴스 처리 결과 — 다음 실행이 이미 처리한 기사를 다시 AI 에 보내지 않게 (2026-10-25)
 
       - name: Deploy news.json to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4.1.0

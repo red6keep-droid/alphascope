@@ -26,6 +26,8 @@ KST = datetime.timezone(datetime.timedelta(hours=9))
 _spec = importlib.util.spec_from_file_location("media_daily_config", os.path.join(BASE, "media-daily", "config.py"))
 MC = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(MC)
+sys.path.insert(0, BASE)
+import issue_codes  # noqa: E402  — 기록 이슈 코드 (P339)
 _spec = importlib.util.spec_from_file_location("radar_universe", os.path.join(BASE, "stock-radar", "universe.py"))   # 종목 페이지 후보 · 업종 · 테마 묶음
 UNI = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(UNI)
@@ -36,9 +38,9 @@ _spec.loader.exec_module(UNI_KR)
 DIRECTION = {"bullish": "positive", "bearish": "negative", "neutral": "neutral"}
 # 수집기 분류 17개 → 뉴스 목록 영역 라벨 (nvda-report render_report.AREA_KO 의 열 개)
 AREA = {"EARNINGS": "Earnings", "CORP_EVENT": "Corporate", "AI_CAPEX": "Demand", "REGULATION": "Regulation", "MARKET_STRUCTURE": "Flows",
-        "RATES_CB": "Macro", "INFLATION": "Macro", "GROWTH_JOBS": "Macro", "TARIFF_TRADE": "Macro", "GEOPOLITICS": "Macro",
-        "ENERGY_COMMODITY": "Macro", "CREDIT_BANKS": "Macro", "FISCAL_POLITICS": "Macro", "FX": "Macro", "REAL_ESTATE": "Macro",
-        "CRYPTO": "Other", "OTHER": "Other"}
+        "RATES_FED": "Macro", "INFLATION": "Macro", "GROWTH_JOBS": "Macro", "TARIFF_TRADE": "Macro", "GEOPOLITICS": "Macro",
+        "OIL_ENERGY": "Macro", "CREDIT_BANKS": "Macro", "FISCAL_POLITICS": "Macro", "FX_GLOBAL": "Macro", "REAL_ESTATE": "Macro",
+        "INVESTOR_CALLS": "Flows", "CRYPTO": "Other", "OTHER": "Other"}   # 키 = 기록 이슈 코드 (rows 가 수집기 옛 이름을 바꿔 둔다, P339)
 # 요약 단계가 적는 다른 이름 → 우리 티커 (스페이스X 는 2026-06 나스닥 상장인데 요약은 아직 비상장으로 적는다)
 ALIAS = {"SPACEX(비상장)": "SPCX", "스페이스X(비상장)": "SPCX", "SPACEX": "SPCX", "CWV(비상장)": "CRWV", "COREWEAVE(비상장)": "CRWV", "코어위브(비상장)": "CRWV", "TSMC(비상장)": "TSM", "TSMC": "TSM", "GOOG": "GOOGL", "BRK.B": "BRK-B", "BRK-A": "BRK-B"}
 # 업종 이슈 → 묶음 (2026-10-25 사용자: "반도체 이슈면 반도체 종목 전부에"). 묶음 = 종목 업종 칸(universe.CANDIDATES) ∪ 테마 묶음(universe.WATCH)
@@ -79,7 +81,7 @@ SECTOR_WORDS += [("AI 모델", "빅테크"), ("AI 기업", "빅테크"), ("프�
                  ("귀금속", "소재"), ("금 가격", "소재"), ("광산", "소재"), ("리튬", "소재"), ("희토류", "소재"),
                  ("식음료", "필수 소비재"), ("담배", "필수 소비재"), ("생활용품", "필수 소비재"), ("식료품", "필수 소비재"),
                  ("영화", "커뮤니케이션"), ("할리우드", "커뮤니케이션"), ("엔터테인먼트", "커뮤니케이션"), ("테마파크", "커뮤니케이션"), ("콘텐츠", "커뮤니케이션")]
-SECTOR_CATEGORY = {"ENERGY_COMMODITY": ("에너지",), "CRYPTO": ("가상자산",),
+SECTOR_CATEGORY = {"OIL_ENERGY": ("에너지",), "CRYPTO": ("가상자산",),
                    "CREDIT_BANKS": ("금융",), "REAL_ESTATE": ("부동산",)}
 LABEL = "방송"   # 뉴스 줄의 세 번째 라벨 — 기사가 아니라 방송 내용(의견 포함)이라는 표시
 
@@ -157,7 +159,7 @@ def rows(items):
             pub = it.get("publishedAt")
             out.append({"id": f"{it.get('id')}/{i}", "topic": iss["topic"], "note": iss.get("note") or "",
                         "lines": [str(x) for x in (iss.get("lines") or []) if x][:5],   # 수집기 요약 다섯 줄 — 데일리 뉴스 팝업 (2026-11-05 요청, yutb-sub doc/요청-이슈-요약-다섯-줄.md)
-                        "category": iss.get("category") or "OTHER", "scope": iss.get("scope") or "",
+                        "category": issue_codes.FROM_YTB_CATEGORY.get(iss.get("category") or "OTHER", "OTHER"), "scope": iss.get("scope") or "",
                         "direction": DIRECTION.get(iss.get("stance"), "neutral"), "surprise": iss.get("surprise") == "surprise",
                         "tickers": [_ticker(t) for t in iss.get("tickers") or []], "country": iss.get("country") or "",
                         "channel": MC.CHANNEL_SHORT.get(ch, ch), "url": it.get("url"), "group": channel_groups().get(it.get("channelId"), "main"),
@@ -237,13 +239,8 @@ def korea(iss, n=6):
 
 
 def kr_label(r):
-    """한국장 소식 줄 라벨 — 연결된 한국 종목 · 기업 이름, 없으면 분야 이름 (`[삼성전자] 애플 첫 폴더블 아이폰 출시`, 2026-10-23 사용자 안)."""
-    for t in r["tickers"]:
-        base = t.replace("(KR)", "").strip()
-        # 한국 종목만 — 한글 이름 · 알려진 장외 티커 · 6자리 코드. 요약이 해외 종목에도 (KR) 을 붙인다(BABA(KR) · VOLVO(KR), 10-23) → 분야 이름으로
-        if "(KR)" in t and (base in KR_NAME or base.isdigit() or re.search(r"[가-힣]", base)):
-            return KR_NAME.get(base, base)
-    return MC.CATEGORY_KO.get(r["category"], "한국")
+    """한국장 소식 줄 라벨 = 분야 이름 (P339). 옛: 연결된 한국 종목 이름, 없으면 분야 (2026-10-23)."""
+    return issue_codes.ISSUE_KO.get(r["category"], "그 밖")
 
 
 # ---------------------------------------------------------------- 한국 종목 페이지 (2026-10-25 사용자: 한국 종목 상세 `오늘` 탭 = 방송 뉴스)
@@ -334,9 +331,7 @@ def market(rs):
 _WORD = re.compile(r"[가-힣A-Za-z0-9]{2,}")
 _STOP = {"기대", "전망", "우려", "논쟁", "강세", "약세", "상승", "하락", "증가", "감소", "영향", "관련", "지속", "확대", "축소", "가능성", "발표", "소식", "실적", "분기", "1분기", "2분기", "3분기", "4분기", "주가", "시장", "및", "AI", "ai", "성장", "투자", "급증", "흑자", "적자"}
 # 데일리 뉴스 라벨(daily-report THEME_VOCAB) — 홈도 같은 이름
-THEME = {"RATES_CB": "금리", "AI_CAPEX": "AI/반도체", "EARNINGS": "실적", "ENERGY_COMMODITY": "에너지", "TARIFF_TRADE": "정책/규제", "REGULATION": "정책/규제",
-         "FISCAL_POLITICS": "정책/규제", "GEOPOLITICS": "지정학", "INFLATION": "거시경제", "GROWTH_JOBS": "거시경제", "FX": "거시경제", "CREDIT_BANKS": "거시경제",
-         "REAL_ESTATE": "거시경제", "MARKET_STRUCTURE": "거시경제", "CRYPTO": "기타", "OTHER": "기타"}
+THEME = dict(issue_codes.ISSUE_KO)   # 분야 라벨 · 칩 (2026-11-07 사용자 P339: 화면 분야 라벨 = 기록 이슈 코드 18개 이름) — 옛: 8개로 뭉갬(거시경제 · 정책/규제 …)
 
 
 def _words(t):
@@ -461,13 +456,14 @@ def direction_counts(iss):
     return out
 
 
-def event(r):
+def event(r, n_all=0):
     """종목 페이지 · 엔비디아 리포트 뉴스 목록 한 줄 (nvda-report judge._ev 모양). 헤드라인 = 방송 주제, 요약 줄 = 방송 주장(note), 매체 자리 = 채널, 라벨 = 영역 · 방향 · 방송.
     has_fact=False · media=True — 중요 이슈(사실 문장) · AI 서술 입력에는 넣지 않는다 (의견이 섞여 있다)."""
     return {"area": AREA.get(r["category"], "Other"), "kind": "news", "title": r["topic"], "fact": r["topic"], "detail": r["note"], "url": r["url"],
-            "direction": r["direction"], "emphasis": False, "published_at": r["published_at"],
-            "source": r["channel"] + (f" · 방송 {r['n_channels']}곳" if r.get("n_channels", 1) > 1 else ""),
-            "speaker": LABEL, "media": True, "has_fact": False, "rel": 0, "prio": False}
+            "direction": "uncertain" if r.get("split") else r["direction"], "emphasis": False, "published_at": r["published_at"],
+            "source": r["channel"] + (f" · 방송 {r['n_channels']}곳" if r.get("n_channels", 1) > 1 and not n_all else ""), "n_all": n_all,   # 분모를 알면 칸 막대(P338), 모르면 옛 글씨
+            "speaker": LABEL, "media": True, "has_fact": False, "rel": 0, "prio": False,
+            "issue": r.get("category"), "pop_lines": r.get("lines") or [], "n_channels": r.get("n_channels", 1), "channel": r["channel"], "pop_key": r.get("id") or r["url"]}   # 요약 팝업 재료 (2026-11-07 P337)
 
 
 def main():

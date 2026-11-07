@@ -763,14 +763,14 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .home-cards .theme-list { margin: 0; }   /* 시장 흐름 줄도 탭 · 표와 같은 왼쪽 기준선 (2026-10-25 사용자: "시장 흐름 내용의 세로 기준선이 다른 탭과 안 맞는다") — 옛 좌우 16 */
 .home-cards .seg-row:not(.mkt-tabs) { padding-left: 0; padding-right: 0; }   /* 테마 종목 묶음 알약도 같은 기준선 (2026-10-25) */
 /* 테마 종목 묶음 탭 = 하나로 이은 둥근 박스, 메뉴 사이는 세로 구분선만 (2026-10-25 사용자, 홈 수정 H10). 선택: 글자 굵은 검정 + 진한 외곽선 */
-.home-cards #watch-tabs { gap: 0; padding: 0; margin: 12px 0 4px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; }
-.home-cards #watch-tabs .seg { flex: 1 0 auto; padding: 6px 14px; border: 0; border-radius: 0; background: none; color: var(--gray-600); font-weight: 400; text-align: center; }
-.home-cards #watch-tabs .seg + .seg { box-shadow: inset 1px 0 0 #E2E8F0; }
+/* 가로로 밀면 박스(테두리 · 둥근 모서리)째 움직이게 — 테두리를 스크롤 상자가 아니라 버튼들이 나눠 가진다 (2026-11-07 사용자 P333, 옛: 상자 테두리가 제자리에 남았다) */
+.home-cards #watch-tabs { gap: 0; padding: 0; margin: 12px 0 4px; border: 0; border-radius: 0; background: none; }
+.home-cards #watch-tabs .seg { flex: 1 0 auto; padding: 6px 14px; border: 1px solid #E2E8F0; border-radius: 0; background: #fff; color: var(--gray-600); font-weight: 400; text-align: center; }
+.home-cards #watch-tabs .seg + .seg { border-left: 0; }
 .home-cards #watch-tabs .seg:first-child { border-radius: 7px 0 0 7px; }   /* 모서리는 바깥 네 귀퉁이만 둥글고 안쪽은 직선 (2026-10-25 사용자) */
 .home-cards #watch-tabs .seg:last-child { border-radius: 0 7px 7px 0; }
 .home-cards #watch-tabs .seg:only-child { border-radius: 7px; }
 .home-cards #watch-tabs .seg[aria-selected="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: inset 0 0 0 1px #111; }   /* 선택 외곽선 2 → 1px, 높이 −4 (패딩 8 → 6) */
-.home-cards #watch-tabs .seg[aria-selected="true"] + .seg { box-shadow: none; }
 .home-cards .report-card-date,
 .home-cards .section-note { margin-right: 0; }
 /* 안쪽 카드는 테두리 · 모서리를 겉 카드에 맡긴다 */
@@ -1216,7 +1216,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     <div class="news-list" id="news-list">
       <article class="news-item load-status">뉴스를 불러오는 중…</article>
     </div>
-    <!-- 3개까지 보이고 나머지는 더 보기 (2026-10-20 사용자) -->
+    <!-- 5건까지 보이고 나머지는 10건씩 더 보기 (2026-11-07 사용자 P340) -->
     <button type="button" class="fold-btn" id="news-toggle" aria-expanded="false" aria-controls="news-list" hidden="hidden"><span>뉴스 더 보기</span>
       <svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></button>
   </section>
@@ -1974,7 +1974,44 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     return '시장';
   }
 
-  var NEWS_SHOWN = 3;   /* 홈 주요 뉴스는 3개까지, 나머지는 더 보기 (2026-10-20 사용자) */
+  /* 홈 뉴스 팝업 (P342) — 글 보기의 뉴스 팝업(.rt-pop · .news-pop-body 테마 CSS)과 같은 상자. 홈은 .post-body 밖이라 따로 만든다 */
+  var homePop = null, homeLast = null;
+  function homeNewsPop(it, from) {
+    if (!homePop) {
+      homePop = document.createElement('div'); homePop.className = 'rt-pop news-pop'; homePop.hidden = true;
+      homePop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-labelledby="home-news-pop-title">' +
+        '<div class="rt-pop-head"><div class="rt-pop-title" id="home-news-pop-title"></div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
+        '<div class="rt-pop-body news-pop-body"></div></div>';
+      document.body.appendChild(homePop);
+      var close = function () { homePop.hidden = true; if (homeLast) homeLast.focus(); };
+      homePop.querySelector('.rt-pop-close').addEventListener('click', close);
+      homePop.addEventListener('click', function (e) { if (e.target === homePop) close(); });
+      document.addEventListener('keydown', function (e) { if (!homePop.hidden && e.key === 'Escape') close(); });
+    }
+    homeLast = from;
+    var media = it.kind === 'media';
+    homePop.querySelector('.rt-pop-title').textContent = it.title;
+    var body = homePop.querySelector('.rt-pop-body'); body.textContent = '';
+    var meta = el('span', null, [mdhm(kstTime(it.published)), (it.source || 'CNBC') + (media ? ' 방송' : ' 기사')].concat(media && it.n_channels > 1 ? ['방송 ' + it.n_channels + '곳'] : []).join(' · '));
+    meta.style.cssText = 'display:block;font-size:13px;line-height:19px;color:#999;margin:0 0 6px;';
+    body.appendChild(meta);
+    it.lines.forEach(function (ln) {
+      var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:4px 0;';
+      var dot = el('span'); dot.style.cssText = 'flex:none;width:3px;height:3px;margin-top:15px;border-radius:50%;background:#111;';
+      var tx = el('span', null, ln); tx.style.cssText = 'min-width:0;font-size:19px;line-height:35px;color:#333;word-break:keep-all;';
+      row.appendChild(dot); row.appendChild(tx); body.appendChild(row);
+    });
+    if (it.link) {
+      var wrap = el('span'); wrap.style.cssText = 'display:block;text-align:right;margin:14px 0 0;';
+      var ln2 = el('a', null, (media ? '영상 보기 (' : '원문 보기 (') + (it.source || 'CNBC') + (media ? ')' : ' · 영어)'));
+      ln2.href = it.link; ln2.target = '_blank'; ln2.rel = 'noopener'; ln2.setAttribute('data-trhelp', 'skip');
+      ln2.style.cssText = 'font-size:13px;line-height:19px;color:#999;text-decoration:underline;text-underline-offset:3px;';
+      wrap.appendChild(ln2); body.appendChild(wrap);
+    }
+    body.scrollTop = 0; homePop.hidden = false; homePop.querySelector('.rt-pop-close').focus();
+  }
+
+  var NEWS_SHOWN = 5, NEWS_STEP = 10;   /* 홈 주요 뉴스 5건 + 누를 때마다 10건씩 (2026-11-07 사용자 P340, 옛 3건 · 8건까지 한 번에) */
   fetch(NEWS_URL + '?v=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (json) {
@@ -2001,10 +2038,10 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       var list = document.getElementById('news-list');
       if (!list) return;
       list.textContent = '';
-      items.slice(0, 8).forEach(function (it, idx) {
+      items.forEach(function (it, idx) {
         /* 증시 리포트 뉴스 구성: 굵은 제목(원문 링크) → 맨 아래 라벨 줄(라벨 · 출처 · 시각) (2026-10-14 사용자) */
         var card = el('article', 'news-item');
-        if (idx >= NEWS_SHOWN) { card.hidden = true; card.setAttribute('data-news-more', '1'); }   /* 3개 뒤는 더 보기 안 (2026-10-20 사용자) */
+        if (idx >= NEWS_SHOWN) { card.hidden = true; card.setAttribute('data-news-more', '1'); }   /* 5건 뒤는 더 보기 안 (P340) */
         var a = el('a', null, it.title);
         if (it.link) { a.href = it.link; a.target = '_blank'; a.rel = 'noopener'; }
         card.appendChild(a);
@@ -2021,16 +2058,22 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         var sub = el('span', 'news-sub', [mdhm(kstTime(it.published)), it.source || 'CNBC'].concat(media && it.n_channels > 1 ? ['방송 ' + it.n_channels + '곳'] : []).filter(Boolean).join(' · '));
         labs.appendChild(sub);
         card.appendChild(labs);
+        if (it.lines && it.lines.length >= 2) {   /* 요약 다섯 줄이 있으면 줄을 눌러 팝업 — 원문은 팝업 안 작은 링크 (2026-11-07 사용자 P342, 리포트 뉴스 팝업과 같은 모양) */
+          card.setAttribute('data-home-pop', '1'); card.style.cursor = 'pointer'; a.setAttribute('aria-haspopup', 'dialog');
+          card.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); homeNewsPop(it, a); }, true);
+        }
         list.appendChild(card);
       });
-      var nb = document.getElementById('news-toggle'), nmore = Math.min(items.length, 8) - NEWS_SHOWN;
-      if (nb && nmore > 0) {
-        nb.hidden = false; nb.firstChild.textContent = '뉴스 ' + nmore + '개 더 보기';
+      var nb = document.getElementById('news-toggle');
+      var hid = function () { return [].slice.call(list.querySelectorAll('[data-news-more]')).filter(function (x) { return x.hidden; }); };
+      var paint = function () { var h = hid().length; nb.firstChild.textContent = h ? '뉴스 ' + Math.min(NEWS_STEP, h) + '건 더 보기' : '접기'; nb.setAttribute('aria-expanded', String(!h)); };
+      if (nb && items.length > NEWS_SHOWN) {
+        nb.hidden = false; paint();
         nb.addEventListener('click', function () {
-          var open = nb.getAttribute('aria-expanded') !== 'true';
-          [].slice.call(list.querySelectorAll('[data-news-more]')).forEach(function (x) { x.hidden = !open; });
-          nb.setAttribute('aria-expanded', String(open));
-          nb.firstChild.textContent = open ? '접기' : '뉴스 ' + nmore + '개 더 보기';   /* 펼치면 '접기' — 지수 · 종목 더 보기와 같다 */
+          var h = hid();
+          if (!h.length) [].slice.call(list.querySelectorAll('[data-news-more]')).forEach(function (x) { x.hidden = true; });   /* 다 펼친 뒤 `접기` = 처음 5건 */
+          else h.slice(0, NEWS_STEP).forEach(function (x) { x.hidden = false; });
+          paint();
         });
       }
     })
@@ -3230,6 +3273,28 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
   pop.querySelector('.rt-pop-close').addEventListener('click', close);
   document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
+})();
+
+/* ============================================================ 더 보기 단계 (2026-11-07 사용자 P340)
+   렌더러 design_kit.more_list: ul[data-more-list] 의 숨긴 li 를 누를 때마다 data-step(10) 건씩 연다. 버튼 글자 `○○ n건 더 보기`(n = 다음에 펼칠 수),
+   다 펼치면 `접기` → 처음 data-shown(5) 건으로. 홈 주요 뉴스도 같은 규칙(아래 홈 뉴스 코드). */
+(function () {
+  'use strict';
+  [].slice.call(document.querySelectorAll('ul[data-more-list]')).forEach(function (ul) {
+    var btn = ul.nextElementSibling;
+    if (!btn || !btn.hasAttribute('data-more-btn')) return;
+    var lis = [].slice.call(ul.children), shown = parseInt(ul.getAttribute('data-shown') || '5', 10), step = parseInt(ul.getAttribute('data-step') || '10', 10);
+    var noun = ul.getAttribute('data-noun') || '뉴스', label = btn.querySelector('span');
+    function hiddenN() { return lis.filter(function (li) { return li.hidden; }).length; }
+    function paint() { var h = hiddenN(); label.textContent = h ? noun + ' ' + Math.min(step, h) + '건 더 보기' : '접기'; btn.setAttribute('aria-expanded', String(!h)); }
+    btn.addEventListener('click', function () {
+      var h = hiddenN();
+      if (!h) { lis.forEach(function (li, i) { li.hidden = i >= shown; }); ul.scrollIntoView({ block: 'nearest' }); }
+      else { var n = 0; lis.forEach(function (li) { if (li.hidden && n < step) { li.hidden = false; n++; } }); }
+      paint();
+    });
+    paint();
+  });
 })();
 
 /* ============================================================ 뉴스 팝업 · 분야 칩 (2026-11-05 사용자 batch 8 ④ ⑤ ⑥ ⑦ ⑬)

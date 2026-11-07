@@ -244,8 +244,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .news-pop-body { font-size: 16px; line-height: 26px; }
 .post-body [data-news-chips] { scrollbar-width: none; }
 .post-body [data-news-chips]::-webkit-scrollbar { display: none; }
-.post-body [data-chip][aria-pressed="true"] { background: #111 !important; border-color: #111 !important; color: #fff !important; }
-.post-body [data-chip][aria-pressed="true"] span { color: #CBD5E1 !important; }
+.post-body [data-chip][aria-pressed="true"] { color: #111 !important; font-weight: 700; box-shadow: inset 0 0 0 1px #111; }   /* 분야 탭 선택 = 홈 테마 종목 묶음 탭과 같게: 굵은 검정 + 1px 검정 외곽선 (2026-11-07 사용자 P332, 옛 검정 알약) */
 .post-body [data-news-more] .acc-chev { transition: transform .2s; }
 /* 그래프 확대 팝업 (2026-10-16 사용자) — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
 .img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); cursor: pointer; }   /* cursor:pointer — 아이폰은 누를 수 있는 모양이 없는 요소의 탭을 click 으로 올리지 않아 바깥 탭이 두 번째에야 닫혔다 (2026-10-21 사용자) */

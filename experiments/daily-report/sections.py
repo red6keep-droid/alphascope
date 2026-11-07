@@ -57,7 +57,22 @@ def normal_card(a, opened=True):
     if not keys:
         return ""
     outs = [k for k in keys if nr[k]["outside"]]
-    state = "모두 평소 안" if not outs else " · ".join(INDEX_SHORT[k] for k in outs) + " 평소 밖"
+    # 답 글자 = 평소 밖 지수 수에 따라 (2026-11-07 사용자 P327): 1개 `나스닥 평소 밖` · 2개 `나스닥 · 다우` 줄바꿈 `평소 밖` · 3개 `세 개 지수 평소 밖` · 4개(전부) `모두 평소 밖`
+    if not outs:
+        state = "모두 평소 안"
+    elif len(outs) == len(keys) and len(keys) > 1:
+        state = "모두 평소 밖"
+    elif len(outs) == 3:
+        state = "세 개 지수 평소 밖"
+    elif len(outs) == 2:
+        state = None
+    else:
+        state = INDEX_SHORT[outs[0]] + " 평소 밖"
+    # 색 (P328): 모두 평소 안 = 중립 · 평소 밖 지수가 모두 올랐으면 상승 · 모두 내렸으면 하락 · 섞이면 불확실 (옛: 늘 중립 고정)
+    ups = {nr[k]["ret_pct"] >= 0 for k in outs}
+    theme, ink = ("neutral", "#111") if not outs else ("positive", C.UP) if ups == {True} else ("negative", C.DOWN) if ups == {False} else ("uncertain", C.SOON)
+    if state is None:
+        state = (f'<span style="display:inline-block;text-align:right;color:{ink};">{" · ".join(INDEX_SHORT[k] for k in outs)}<br>평소 밖</span>')
     sp = nr.get("^GSPC")
     lines = []
     if not outs and sp:
@@ -73,7 +88,7 @@ def normal_card(a, opened=True):
         lines.append(("row", INDEX_NAME[k], _s(n["ret_pct"]), f"평소 ±{n['sigma_pct']:.2f}% · {_times(n['z'])}"))
     tip = ("하루 움직임이 그 지수의 평소 크기 안이었는지. 평소 크기는 최근 움직임에 무게를 더 둔 표준편차이고, 2배를 넘으면 평소 밖으로 봅니다"
            + (f"\n· 오늘 S&P 500 {_s(sp['ret_pct'])} : 평소의 {_times(sp['z'])}, 지난 1년 중 이만큼 이상 움직인 날 {sp['n_year']}번" if sp else ""))
-    return C.question_card("오늘 움직임은 평소와 달랐나?", state, "neutral", "#111", lines, tip=tip, opened=opened)
+    return C.question_card("오늘 움직임은 평소와 달랐나?", state, theme, ink, lines, tip=tip, opened=opened)
 
 
 def shock_card(a):
@@ -99,8 +114,9 @@ def market_now_card(a):
     if a20 is None or a50 is None:
         return ""
     state = "평균선 위" if a20 and a50 else "평균선 아래" if not a20 and not a50 else ("20일선 아래" if not a20 else "50일선 아래")
-    lines = [("점수나 신호등으로 묶지 않고 사실만 보여 드립니다.", "plain"),
-             ("row", "S&P 500 추세", f"20일선 {'위' if a20 else '아래'} · 50일선 {'위' if a50 else '아래'}", "최근 20 · 50거래일 평균 가격과 비교")]
+    # 첫 줄 "점수나 신호등으로 묶지 않고 …" 삭제 (2026-11-07 사용자 P329). 추세 값 = 두 줄 · 위 상승 색 · 아래 하락 색 (P330)
+    ma = lambda n, up: f'<span style="color:{C.UP if up else C.DOWN};">{n}일선 {"위" if up else "아래"}</span>'   # noqa: E731
+    lines = [("row", "S&P 500 추세", f'<span style="display:inline-block;text-align:right;">{ma(20, a20)}<br>{ma(50, a50)}</span>', "최근 20 · 50거래일 평균 가격과 비교")]
     if pos.get("from_high_pct") is not None:
         lines.append(("row", "20일 고점 대비", _s(pos["from_high_pct"]), "최근 20거래일 가장 높던 종가와 비교"))
     if vix.get("now") is not None:
@@ -109,7 +125,8 @@ def market_now_card(a):
         lines.append(("row", "10년물 금리 (5일)", f"{int(rates['us10y_change_5d_bp']):+d}bp".replace("-", "−"), f"지금 {rates['us10y']:.2f}%" if rates.get("us10y") else ""))
     tip = ("시장 흐름을 이루는 사실들 (추세 · 흔들림 · 금리)\n"
            f"· 오늘 {state} : S&P 500(SPY)이 20일선 {'위' if a20 else '아래'}, 50일선 {'위' if a50 else '아래'}")
-    return C.question_card("지금 시장 흐름은?", state, "neutral", "#111", lines, tip=tip)
+    theme, ink = ("positive", C.UP) if a20 and a50 else ("negative", C.DOWN) if not a20 and not a50 else ("uncertain", C.SOON)   # 답 색 (P330): 둘 다 위 상승 · 둘 다 아래 하락 · 엇갈림 불확실
+    return C.question_card("지금 시장 흐름은?", state, theme, ink, lines, tip=tip)
 
 
 # ── 한국장 탭 ───────────────────────────────────────────────────────────
