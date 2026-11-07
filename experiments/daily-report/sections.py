@@ -80,7 +80,7 @@ def normal_card(a, opened=True, parts=False):
     for k in outs:
         n = nr[k]
         lines.append((f"{INDEX_NAME[k]} {_s(n['ret_pct'])}는 평소 하루 움직임(±{n['sigma_pct']:.2f}%)의 {_times(n['z'])}로, 지난 1년에 {n['n_year']}번 있던 크기였습니다.", "plain"))
-    groups = [(INDEX_SHORT[k], [nr[k]["ret_pct"], nr[k]["sigma_pct"] if nr[k]["ret_pct"] >= 0 else -nr[k]["sigma_pct"]]) for k in keys]
+    groups = [(INDEX_SHORT[k], [nr[k]["ret_pct"], nr[k]["sigma_pct"] if nr[k]["ret_pct"] >= 0 else -nr[k]["sigma_pct"]]) for k in reversed(keys)]   # S&P 500 을 맨 오른쪽 — 넘겨 보기 그래프는 처음에 오른쪽 끝이 보인다 (2026-11-08 사용자, 시가 갭 그래프와 같게)
     lines.append((C.chart_card("오늘 움직임과 평소 하루 크기 (%)", groups, [C.sign_bg, C.gray], [C.sign_fg, C.note_fg],
                                [("오늘", C.sign_bg(sp["ret_pct"] if sp else 1)), ("평소 하루 크기", C.GRAY_BAR)]), "html"))
     # 지수별 줄(오늘 · 평소 ± · 배수)은 `지수 기술지표의 방향은?` 카드 라벨 안으로 (2026-11-07 사용자 P392)

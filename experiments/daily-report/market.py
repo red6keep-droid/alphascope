@@ -548,7 +548,11 @@ def mood_card(a, prev):
                                     marks=avg_marks), "html"))
     parts = [x for x in (flow_card(a, parts=True), sx.normal_card(a, parts=True), rs_card(a, prev, parts=True)) if x]   # 최근 흐름(20 · 50일 평균 대비)을 가격 범위 막대 바로 아래로 — 첫 문장 · 막대와 같은 평균 가격 이야기 (2026-11-07 사용자)
     for k, (q, st, _th, ik, ls, _tp) in enumerate(parts):   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄
-        lines.append(_part_row(q, st, ik, noline=(k == 0 and lines[-1][1] == "html")))   # 가로 막대 바로 아래 첫 묶음은 위 선 없음 (9절)
+        if q == "오늘 움직임은 평소와 달랐나?":   # 그래프(오늘 움직임과 평소 하루 크기)를 `오늘 움직임` 줄 위로 (2026-11-08 사용자)
+            charts = [x for x in ls if isinstance(x, tuple) and len(x) == 2 and x[1] == "html"]
+            lines += charts
+            ls = [x for x in ls if x not in charts]
+        lines.append(_part_row(q, st, ik, noline=(lines[-1][1] == "html")))   # 가로 막대 · 그래프 바로 아래 줄은 위 선 없음 (9절)
         lines += ls
     pb, cr = abs(m["pullback"]), abs(m["correction"])
     tip = ("미국 시장 전체(S&P 500)가 오르는 흐름인지, 쉬어 가는지, 흔들리는지. 종목 페이지 `미국 증시 분위기는?` 과 같은 기준\n"
