@@ -1,6 +1,46 @@
 {
-  "updated_at": "2026-11-07 01:12:10 UTC",
+  "updated_at": "2026-11-07 12:46:24 UTC",
   "items": [
+    {
+      "title": "Tech companies face mounting child safety lawsuits while pushing AI into schools",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/07/snap-social-media-teen-safety-lawsuits.html",
+      "published": "2026-11-07 12:00:01",
+      "title_ko": "기술 기업들, 아동 안전 소송 증가 속 AI를 학교에 확대",
+      "summary_ko": "스냅도 소송 대상"
+    },
+    {
+      "title": "Why a wave of bomb threats is proving so difficult for Europe's aviation authorities to contain",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/07/hoax-bomb-threats-flights-europe.html",
+      "published": "2026-11-07 09:01:57",
+      "title_ko": "유럽 항공 당국, 폭탄 협박 물결 대응 왜 어려운가",
+      "summary_ko": "분석가, 항공의 가장 취약한 점은 비행 중 표적이라고 지적"
+    },
+    {
+      "title": "Trump says U.S. carried out ‘minor strikes’ on Iran as missiles hit Qeshm Island",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/07/trump-us-minor-strikes-iran-qeshm-island.html",
+      "published": "2026-11-07 07:37:36",
+      "title_ko": "트럼프, 미사일 호르무즈 해협 인근 섬 타격 속 이란 '소규모 타격' 단행 발언",
+      "summary_ko": "이란 언론, 호르무즈 해협 인근 게شم 섬 미사일 2기 타격 보도"
+    },
+    {
+      "title": "The race is on to build the first fusion power plant — and Europe is looking to Japan for help",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/07/proxima-fusion-power-japan-supply-chain.html",
+      "published": "2026-11-07 06:00:01",
+      "title_ko": "첫 융합 발전소 건설 경쟁, 유럽, 일본에 도움 요청",
+      "summary_ko": "융합 에너지, 풍부하고 깨끗한 전력 공급 잠재력"
+    },
+    {
+      "title": "Inside the card-grading empire shaping the price of Pokémon cards",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/06/card-pokemon-grading-psa-collectors-price.html",
+      "published": "2026-11-07 02:00:01",
+      "title_ko": "포켓몬 카드 가격 형성하는 카드 등급 평가 제국 속으로",
+      "summary_ko": "PSA 재판매 프리미엄 · 대기 물량 · 등급 시장 지배력, 수집가 지불 가격 결정"
+    },
     {
       "title": "OpenAI will keep investing in AI data centers despite election results, CFO tells CNBC",
       "source": "CNBC",
@@ -27,7 +67,19 @@
       "kind": "media",
       "tag": "AI/반도체",
       "direction": "neutral",
-      "n_channels": 3
+      "n_channels": 2
+    },
+    {
+      "title": "예상을 상회하는 고용 보고서",
+      "title_ko": "예상을 상회하는 고용 보고서",
+      "summary_ko": "지난달 미국의 신규 고용이 예상치를 크게 웃돌고 실업률이 하락하면서 경제 펀더멘털의 강세가 확인",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=h5b2aDOXZII",
+      "published": "2026-11-06 21:44:34",
+      "kind": "media",
+      "tag": "거시경제",
+      "direction": "positive",
+      "n_channels": 2
     },
     {
       "title": "Sen. Chris Murphy released from hospital after stroke, will miss votes for 'several weeks' as he rehabs",
@@ -46,26 +98,6 @@
       "summary_ko": ""
     },
     {
-      "title": "Investors brace for lower Anthropic valuation, calling $1.5 trillion a 'stretch'",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/06/investors-brace-for-anthropic-valuation-1point5-trillion-a-stretch.html",
-      "published": "2026-11-06 21:07:07",
-      "title_ko": "투자자들, 1.5조 달러 ‘과대평가’라며 안트로픽 가치 하락 대비",
-      "summary_ko": ""
-    },
-    {
-      "title": "민주당 의회 장악과 AI 데이터센터 규제",
-      "title_ko": "민주당 의회 장악과 AI 데이터센터 규제",
-      "summary_ko": "민주당의 의회 승리와 AI 규제 우려가 맞물려 기술주 중심의 대규모 조정을 불러일으켰",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=Ve2eFzwom_4",
-      "published": "2026-11-06 21:04:31",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "negative",
-      "n_channels": 4
-    },
-    {
       "title": "10월 고용보고서 서프라이즈",
       "title_ko": "10월 고용보고서 서프라이즈",
       "summary_ko": "10월 비농업 고용이 예상을 크게 웃돌며 강력한 노동시장 회복세를 확인시켜 주었",
@@ -76,38 +108,6 @@
       "tag": "거시경제",
       "direction": "positive",
       "n_channels": 3
-    },
-    {
-      "title": "Nasdaq drops into correction territory — here’s what typically happens next",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/05/nasdaq-drops-into-correction-territory-heres-what-typically-happens-next.html",
-      "published": "2026-11-06 20:42:28",
-      "title_ko": "나스닥, 조정 국면 진입, 통상 다음에 일어나는 일",
-      "summary_ko": "과거 회복 사례 분석"
-    },
-    {
-      "title": "Here's a rapid-fire update on all 31 of our stocks, including 2 to buy now",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/11/06/heres-a-rapid-fire-update-on-our-31-stocks-including-2-to-buy-now.html",
-      "published": "2026-11-06 20:36:03",
-      "title_ko": "지금 사야 할 2종목 포함, 31개 종목에 대한 빠른 업데이트",
-      "summary_ko": ""
-    },
-    {
-      "title": "A disturbing employment trend is hiding beneath the latest strong job numbers",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/06/long-term-unemployment-october-jobs-report.html",
-      "published": "2026-11-06 20:11:17",
-      "title_ko": "최신 강한 고용 수치 뒤에 숨은 우려되는 고용 추세",
-      "summary_ko": "10월, 팬데믹 이후 10년 최고"
-    },
-    {
-      "title": "Mississippi Senate: Longshot Ty Pinkins says he aimed to spoil Hyde-Smith, boost Colom vote",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/06/mississippi-senate-ty-pinkins-colom-hyde-smith.html",
-      "published": "2026-11-06 19:44:33",
-      "title_ko": "미시시피 상원: 롱샷 타이 핑킨스, 하이드-스미스 교란 및 콜롬 지지 의도 밝혀",
-      "summary_ko": ""
     }
   ]
 }
