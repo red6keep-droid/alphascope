@@ -69,16 +69,20 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
         kind = "row" if isinstance(item, tuple) and item[0] == "row" else ("" if isinstance(item, str) else item[1])
         text = item if isinstance(item, str) else item[0]
         if kind == "row":   # 근거 줄 18px · 행간 30 — 질문 · 대답과 같게, 설명 문장은 19 그대로 (2026-10-27 사용자)
-            _, name, value, note = item
+            _, name, value, note = item[:4]
+            if len(item) > 4 and item[4] == "noline":   # 가로 막대 바로 아래 줄 — 위 구분선 없이 1px 투명 테두리로 여백만 (가이드라인 9절, 2026-11-07 분위기 카드)
+                bd_line = "transparent"
+            else:
+                bd_line = bd_row
             val = value if str(value).startswith("<span") else dk.tint(esc(value))   # 이미 색 · 줄바꿈을 입힌 값(HTML)은 그대로 (2026-11-07 P330)
             fits = _est_w(name, 17) + _est_w(f"({note})", 14) + _est_w(value, 17) <= INLINE_W
             nt = f'<span style="display:block;margin-top:2px;font-size:{dk.TINY};line-height:20px;color:{NOTE};white-space:normal;">{dk.tint(esc(note))}</span>' if note else ""
             if note and fits:
-                return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
+                return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_line};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
                         f'<span style="flex:none;white-space:nowrap;color:#111;">{esc(name)} <span style="font-size:{dk.TINY};color:{NOTE};">({dk.tint(esc(note))})</span></span>'
                         f'<span style="flex:none;text-align:right;font-weight:{dk.STATE_VAL_W};white-space:nowrap;">{val}</span></span></li>')
-            return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
+            return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_line};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
                     f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
                     f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{esc(name)}</span>{nt}</span>'
                     f'<span style="flex:none;text-align:right;font-weight:{dk.STATE_VAL_W};word-break:keep-all;">{val}</span></span></li>')

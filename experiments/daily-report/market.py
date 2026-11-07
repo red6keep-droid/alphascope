@@ -514,12 +514,12 @@ PART_NAME = {"오늘 움직임은 평소와 달랐나?": ("오늘 움직임", "�
              "기술주 · 소형주는 시장보다 셌나?": ("기술주 · 소형주", "최근 5거래일 · S&P 500 대비")}   # 묶음 머리 = 근거 줄(이름 · 값 · 뜻) — 옛 카드의 답이 오른쪽 값 (2026-11-07 사용자: 그래프 제목 모양 취소)
 
 
-def _part_row(q, state, ink):
+def _part_row(q, state, ink, noline=False):
     """한 카드 안 묶음 머리 — 근거 줄 꼴 `("row", 이름, 값, 뜻)`: 왼쪽 명사형 이름 · 오른쪽 옛 카드의 답(그 방향 색) · 아래 회색 뜻 (가이드라인 7-1 근거 줄)."""
     name, note = PART_NAME.get(q, (q, ""))
     col = "#111" if ink in ("#111", MUTED) else ink
     val = state if str(state).startswith("<span") else f'<span style="color:{col};">{dk.tint(C.esc(state))}</span>'
-    return ("row", name, val, note)
+    return ("row", name, val, note) + (("noline",) if noline else ())
 
 
 def mood_card(a, prev):
@@ -549,8 +549,8 @@ def mood_card(a, prev):
         lines.append((C.range_gauge(lo, hi, at(m["last"]), m["pct_from_high"], f0, "", "S&P 500 가격 범위", "1년 최고 대비", "1년 최고 근처",
                                     marks=avg_marks), "html"))
     parts = [x for x in (sx.normal_card(a, parts=True), flow_card(a, parts=True), rs_card(a, prev, parts=True)) if x]
-    for q, st, _th, ik, ls, _tp in parts:   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄
-        lines.append(_part_row(q, st, ik))
+    for k, (q, st, _th, ik, ls, _tp) in enumerate(parts):   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄
+        lines.append(_part_row(q, st, ik, noline=(k == 0 and lines[-1][1] == "html")))   # 가로 막대 바로 아래 첫 묶음은 위 선 없음 (9절)
         lines += ls
     pb, cr = abs(m["pullback"]), abs(m["correction"])
     tip = ("미국 시장 전체(S&P 500)가 오르는 흐름인지, 쉬어 가는지, 흔들리는지. 종목 페이지 `미국 증시 분위기는?` 과 같은 기준\n"
