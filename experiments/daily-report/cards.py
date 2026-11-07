@@ -221,12 +221,28 @@ def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near
              f'{_gauge_tip(pos, text, col, dot, BUBBLE_W_STRONG)}{bar}</span>')
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:{dk.TINY};line-height:20px;color:{NOTE};">'
             f'<span style="white-space:nowrap;">최저 {fmt(low)}</span><span style="white-space:nowrap;">최고 {fmt(high)}</span></span>')
-    below = ""
-    for t, p in (marks or []):   # 눈금 글자 = 막대 아래 둘째 줄, 가운데를 눈금 자리에 두되 카드 안으로 가둔다 (target_gauge 와 같게)
+    # 눈금 글자 = 막대 아래 줄. 가까운 눈금(14% 안)은 한 덩어리 `20일 평균 7,658 · 50일 평균 7,679` (target_gauge 와 같게), 그래도 글자가 겹치면 다음 줄로
+    groups = []
+    for t, p in sorted(marks or [], key=lambda x: x[1]):
+        p = max(0.0, min(100.0, p))
+        if groups and p - groups[-1][2] < 14:
+            groups[-1] = (groups[-1][0] + " · " + t, (groups[-1][1] * groups[-1][3] + p) / (groups[-1][3] + 1), p, groups[-1][3] + 1)
+        else:
+            groups.append((t, p, p, 1))
+    rows, W = [], 300   # 360px 화면의 막대 폭 어림
+    for t, p, _last, _n in groups:
         w = round(len(t) * 14 * 0.62) + 2
-        below += (f'<span style="position:absolute;top:0;left:clamp(0px, calc({max(0.0, min(100.0, p)):.1f}% - {w / 2:g}px), calc(100% - {w}px));'
-                  f'font-size:{dk.TINY};line-height:20px;color:#111;white-space:nowrap;">{esc(t)}</span>')
-    if below:
-        ends += f'<span style="position:relative;display:block;height:20px;margin-top:2px;">{below}</span>'
+        x0 = max(0, min(W - w, p / 100 * W - w / 2))
+        for r in rows:
+            if all(x0 >= e + 8 or x0 + w + 8 <= b for b, e in r["spans"]):
+                break
+        else:
+            r = {"spans": [], "html": ""}
+            rows.append(r)
+        r["spans"].append((x0, x0 + w))
+        r["html"] += (f'<span style="position:absolute;top:0;left:clamp(0px, calc({p:.1f}% - {w / 2:g}px), calc(100% - {w}px));'
+                      f'font-size:{dk.TINY};line-height:20px;color:#111;white-space:nowrap;">{esc(t)}</span>')
+    for r in rows:
+        ends += f'<span style="position:relative;display:block;height:20px;margin-top:2px;">{r["html"]}</span>'
     card = f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.SEP_GAP - dk.VP - 1}px 12px {12 - 3}px;">{gauge}{ends}</span></span>'
     return f'<span style="display:block;margin:0 0 {dk.CHART_TITLE_GAP}px;">{head}</span>{card}'

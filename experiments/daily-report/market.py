@@ -544,9 +544,11 @@ def mood_card(a, prev):
         lo, hi = m["low_1y"], m["high_1y"]
         at = lambda v: (v - lo) / (hi - lo) * 100  # noqa: E731
         f0 = lambda v: f"{v:,.0f}"  # noqa: E731
+        g = (a.get("series") or {}).get("^GSPC") or {}
+        avg_marks = [(f"{n}일 평균 {f0(v)}", at(v)) for n, v in ((20, g.get("ma20")), (50, g.get("ma50")), (200, m.get("ma200"))) if v]   # 20 · 50 · 200일 평균 눈금 (2026-11-07 사용자)
         # 제목에서 `(1년)` 뺌 — 범례 `1년 최고 대비` 와 겹친다 · 최고가 며칠 전인지 · 툴팁 없음 (2026-11-07 사용자: 정보 과잉)
         lines.append((C.range_gauge(lo, hi, at(m["last"]), m["pct_from_high"], f0, "", "S&P 500 가격 범위", "1년 최고 대비", "1년 최고 근처",
-                                    marks=[(f"200일 평균 {f0(m['ma200'])} ({_s(m['pct_vs_ma200'], 1)})", at(m["ma200"]))]), "html"))
+                                    marks=avg_marks), "html"))
     parts = [x for x in (sx.normal_card(a, parts=True), flow_card(a, parts=True), rs_card(a, prev, parts=True)) if x]
     for q, st, _th, ik, ls, _tp in parts:   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄
         lines.append(_part_row(q, st, ik))
