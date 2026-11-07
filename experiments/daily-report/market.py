@@ -460,7 +460,7 @@ def index_tech_card(a, prev):
         rows = []
         if k in nr:
             x = nr[k]
-            rows.append(f'<span>오늘 <span style="font-size:{TS.WHY_FS};color:#6B7280;">평소 ±{x["sigma_pct"]:.2f}% · {sx._times(x["z"])}</span></span><b>{dk.arrow(x["ret_pct"])}</b>')
+            rows.append(f'<span>하루 등락 <span style="font-size:{TS.WHY_FS};color:#6B7280;">평소 ±{x["sigma_pct"]:.2f}%의 {sx._times(x["z"])}</span></span><b>{dk.arrow(x["ret_pct"])}</b>')   # `오늘` → `하루 등락` (2026-11-07 사용자: 오늘이라고 쓰면 무엇인지 모른다) — 평소 ± = 그 지수의 평소 하루 움직임 크기
         s_ = se.get(k) or {}
         if s_.get("above_ma20") is not None and s_.get("above_ma50") is not None:
             w = lambda d, up: f'<span style="color:{UP if up else DOWN};">{d}일선 {"위" if up else "아래"}</span>'  # noqa: E731
@@ -472,20 +472,22 @@ def index_tech_card(a, prev):
         if k != "^GSPC" and spx5 is not None and s_.get("ret_5d") is not None:
             rows.append(f'<span>S&amp;P 500 대비 <span style="font-size:{TS.WHY_FS};color:#6B7280;">5거래일</span></span><b>{dk.arrow(round(s_["ret_5d"] - spx5, 2), 2, "%p")}</b>')
         lines, _ = TS.card(tx[k], sx.INDEX_NAME[k], UP, DOWN, MUTED)
-        body = (TS._sub("오늘 · 흐름") + TS._table(rows, line_col) if rows else "") + "".join(f'<div style="margin:0 0 12px;">{h}</div>' for h, _k in lines)
+        flow = (TS._sub("오늘 · 흐름") + TS._table(rows, line_col)) if rows else ""
+        # 순서 = 게이지(전체 요약 · 기술지표 · 이동평균) → 오늘 · 흐름 → 기술지표 표 → 이동평균 표 (2026-11-07 사용자: 오늘 · 흐름은 `기술지표` 글자 위)
+        body = "".join(f'<div style="margin:0 0 12px;">{(flow if i == 1 else "") + h}</div>' for i, (h, _k) in enumerate(lines))
         panels.append(f'<div data-ixp="{n}"{"" if n == 0 else " hidden"}>{body}</div>')
     last = len(keys) - 1
     def chip(i, k):
         on = i == 0
-        return (f'<button type="button" data-ixc="{i}" aria-pressed="{"true" if on else "false"}" style="flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;font:inherit;'
+        # 뉴스 탭 분야 탭과 같은 단추(data-chip) — 선택 = 굵은 검정 + 1px 검정 외곽선(테마 CSS [data-chip][aria-pressed=true], P332 · P344) (2026-11-07 사용자: 주요 뉴스 탭과 통일)
+        return (f'<button type="button" data-chip="{C.esc(sx.INDEX_NAME[k])}" data-ixc="{i}" aria-pressed="{"true" if on else "false"}" style="flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;color:#4B5563;font:inherit;'
                 f'font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;border:1px solid #E2E8F0;{"border-left:0;" if i else ""}'
-                f'border-radius:{"7px" if i == 0 else "0"} {"7px" if i == last else "0"} {"7px" if i == last else "0"} {"7px" if i == 0 else "0"};'
-                f'color:{"#111" if on else "#4B5563"};font-weight:{700 if on else 400};">{C.esc(sx.INDEX_NAME[k])}</button>')
+                f'border-radius:{"7px" if i == 0 else "0"} {"7px" if i == last else "0"} {"7px" if i == last else "0"} {"7px" if i == 0 else "0"};">{C.esc(sx.INDEX_NAME[k])}</button>')
     chips = (f'<div data-ix-chips="1" style="display:flex;overflow-x:auto;margin:6px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
              + "".join(chip(i, k) for i, k in enumerate(keys)) + "</div>")
     js = ("<script>(function(){var s=document.currentScript,b=s&&s.parentNode;if(!b)return;var cs=b.querySelectorAll('[data-ixc]'),ps=b.querySelectorAll('[data-ixp]');"
           "[].forEach.call(cs,function(c){c.addEventListener('click',function(){var i=c.getAttribute('data-ixc');"
-          "[].forEach.call(cs,function(x){var on=x===c;x.setAttribute('aria-pressed',on?'true':'false');x.style.color=on?'#111':'#4B5563';x.style.fontWeight=on?'700':'400';});"
+          "[].forEach.call(cs,function(x){x.setAttribute('aria-pressed',x===c?'true':'false');});"
           "[].forEach.call(ps,function(p){p.hidden=p.getAttribute('data-ixp')!==i;});});});})();</script>")
     html = f'<div data-ix-tech="1">{chips}{"".join(panels)}{js}</div>'
     tip = ("지수 4개의 오늘 움직임 · 평균 가격선 · 최근 한 달 자리와, 종목 페이지와 같은 기술지표 11개 · 이동평균 12개가 가리키는 방향. 라벨을 누르면 그 지수로 바뀝니다. 답은 S&P 500 기준\n"
