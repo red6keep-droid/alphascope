@@ -469,7 +469,7 @@ def _pos(label):
     if not label:
         return ""
     col = UP_COLOR if "고점" in label else DOWN_COLOR if "저점" in label else None
-    t = _esc(label).replace("고점", "<b>고점</b>").replace("저점", "<b>저점</b>")
+    t = _esc(label).replace("고점", '<span style="font-weight:700;">고점</span>').replace("저점", '<span style="font-weight:700;">저점</span>')   # <b> 는 굵은 칸 안에서 900 이 된다 (2026-11-07 0-2 굵기 네 단계)
     return f'<span style="color:{col};">{t}</span>' if col else t
 
 
@@ -634,7 +634,7 @@ def sec_change(analysis, report, prev=None):
             sub.append(_vs(p["from_high_pct"], _get(prev, "position", key, "from_high_pct"), word="고점 대비 어제보다"))   # 고점과의 거리 변화 (2026-10-13 사용자: 어제 대비)
         trows.append((_esc(INDEX_LABELS[key]), _pos(p.get("position_label")) or "—", _join(*sub)))
     if vix.get("now") is not None and vix.get("prev_5d") is not None:   # VIX 는 같은 카드 마지막 줄 (2026-10-13 사용자: 더 보기 안으로)
-        trows.append(("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → <b>{vix["now"]:.2f}</b> {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}',
+        trows.append(("VIX (5거래일)", f'{vix["prev_5d"]:.2f} → {vix["now"]:.2f} {dk.arrow(vix.get("change_5d") or 0.0, 2, "")}',
                       _vs(vix["now"], _get(prev, "vix", "now"), 2, ""), 35, True, True))   # 값 한 줄 (2026-10-12 사용자), 어제 대비는 줄 아래
     return out + dk.sub_label("20일 위치", position_tip(position.get("sp500"))) + dk.ccard(trows, fold_at=FOLD_SHOWN, noun="항목")
 
@@ -815,7 +815,7 @@ def _kst(iso):
     try:
         t = datetime.datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
         t = t if t.tzinfo else t.replace(tzinfo=datetime.timezone.utc)
-        return t.astimezone(media_feed.KST).strftime("%m.%d %H:%M").lstrip("0")
+        return t.astimezone(media_feed.KST).strftime("%m.%d %H:%M")   # 모든 리포트 같은 `01.05 07:07` — 옛 lstrip("0") 은 `1.05` (2026-11-07 0-6)
     except ValueError:
         return ""
 
@@ -842,10 +842,11 @@ def _story_row(g, built, first):
     head = dk.keep_tone(f'<a href="{_esc(rep.get("url") or "#")}" target="_blank" rel="noopener"{attrs} style="color:#111;font-weight:700;text-decoration:none;font-size:{dk.NEWS_TITLE_FS};line-height:{dk.NEWS_TITLE_LH};display:block;">'
                         f'{NEW_LEAD if g.get("new") else ""}{_esc(rep["text"])}</a>')   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
     return (head + (dk.keep_tone(f'<span style="{dk.NEWS_SUM}">{_esc(dk.headline(sub))}</span>') if sub else "")
-            + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:8px 0 1px;line-height:1;">'
-            f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;">{_esc(g["name"])}</span>{_meter(g["n_channels"], n_ch)}'
-            f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;"><b style="color:#111;">{g["n_channels"]}곳</b> / {n_ch}곳</span>'
-            f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{_kst(rep["published_at"])} · {_esc(rep["source"])} {"기사" if rep["kind"] == "article" else "방송"}</span></span>')
+            + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;">'   # 종목 페이지 뉴스(dk.news_item) 라벨 줄과 같은 간격 6 · 10 (2026-11-07 0절)
+            + dk.pill_row(dk.pill(g["name"], bare=True))   # 사건 이름 = 외곽선 라벨 (옛 14px 회색 글자)
+            + f'<span style="display:inline-flex;align-items:center;gap:6px;">{_meter(g["n_channels"], n_ch)}'
+            f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;"><b style="color:#111;">{g["n_channels"]}곳</b> / {n_ch}곳</span></span>'
+            f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{_kst(rep["published_at"])} · {_esc(rep["source"])}</span></span>')   # 메타 = `시각 · 매체` (옛 끝 ` 기사` · ` 방송` 꼬리 뺌, 0-6)
 
 
 def _sub_title(t, note, tip_html="", line=False):
@@ -879,19 +880,19 @@ def _news_pop_body(g, built):
                     f'<span style="font-weight:700;white-space:nowrap;">{dk.arrow(v)}</span></span>')
     box = ""
     if data or g["n_channels"] >= 2:
-        box = f'<div style="margin:12px 0 0;padding:8px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;font-size:15px;line-height:22px;">'
+        box = f'<div style="margin:12px 0 0;padding:8px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;font-size:15px;line-height:23px;">'
         if data:
-            box += (f'<span style="display:block;font-size:13px;line-height:18px;font-weight:700;color:{dk.NOTE};margin:2px 0;">관련 종목 · 오늘</span>'
+            box += (f'<span style="display:block;font-size:13px;line-height:19px;font-weight:700;color:{dk.NOTE};margin:2px 0;">관련 종목 · 오늘</span>'
                     f'<span style="display:grid;grid-template-columns:1fr 1fr;column-gap:16px;">{"".join(data)}</span>')   # 2열 (batch 9 ③)
         if g["n_channels"] >= 2:
-            box += (f'<span style="display:block;font-size:13px;line-height:18px;font-weight:700;color:{dk.NOTE};margin:{8 if data else 2}px 0 4px;">같은 뉴스</span>'
+            box += (f'<span style="display:block;font-size:13px;line-height:19px;font-weight:700;color:{dk.NOTE};margin:{8 if data else 2}px 0 4px;">같은 뉴스</span>'
                     f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;color:#111;">{_meter(g["n_channels"], n_ch)}<span><b>{_esc(g["short"])}</b> · 방송 {g["n_channels"]}곳 / {n_ch}곳</span></span>')
         box += "</div>"
     kind = "기사" if rep["kind"] == "article" else "방송"
     link_text = f'{"원문 보기" if rep["kind"] == "article" else "영상 보기"} ({_esc(rep["source"])}{" · 영어" if rep["kind"] == "article" else ""})'
     link = (f'<span style="display:block;text-align:right;margin:14px 0 0;"><a href="{_esc(rep["url"])}" target="_blank" rel="noopener" data-trhelp="skip" '
-            f'style="font-size:13px;line-height:18px;color:{dk.SUB};text-decoration:underline;text-underline-offset:3px;">{link_text} {dk.LINK_ICON}</a></span>')   # 작은 글자 링크 (⑦)
-    meta = f'<span style="display:block;font-size:13px;line-height:18px;color:{dk.SUB};margin:0 0 6px;">{_kst(rep["published_at"])} · {_esc(rep["source"])} {kind}{" · 새 뉴스" if g.get("new") else ""}</span>'
+            f'style="font-size:13px;line-height:19px;color:{dk.SUB};text-decoration:underline;text-underline-offset:3px;">{link_text} {dk.LINK_ICON}</a></span>')   # 작은 글자 링크 (⑦)
+    meta = f'<span style="display:block;font-size:13px;line-height:19px;color:{dk.SUB};margin:0 0 6px;">{_kst(rep["published_at"])} · {_esc(rep["source"])} {kind}{" · 새 뉴스" if g.get("new") else ""}</span>'
     return f'<div data-news-pop-body="{_esc(g["id"])}" data-news-pop-title="{_esc(rep["text"])}" hidden>{meta}{li}{box}{link}</div>'
 
 
@@ -904,7 +905,7 @@ def _story_item(g, built, reaction, known, compact=False):
         subs.append(f'<span style="display:block;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};margin-top:2px;"><span style="font-size:{NEWS_REL_SIZE};font-weight:700;">관련 자산 : '
                     + " · ".join(_named_reaction(s, reaction(s)) for s in dict.fromkeys(related)) + "</span></span>")
     labels = dk.pill(g["theme"], bare=True) + (" " + dk.pill(f"{g['n_channels']}곳", "uncertain", bare=True) if g["n_channels"] >= 2 else "")
-    meta = [_kst(rep["published_at"]), f'{rep["source"]} {"기사" if rep["kind"] == "article" else "방송"}']
+    meta = [_kst(rep["published_at"]), rep["source"]]   # `시각 · 매체` — 종목 페이지와 같게 (2026-11-07 0-6, 옛 ` 기사` · ` 방송` 꼬리)
     head = (NEW_LEAD if g.get("new") else "") + _esc(rep["text"])
     pop = _has_pop(g, built)
     lines = _pop_lines(g, built)
@@ -965,7 +966,7 @@ def sec_news(input_data, report, analysis):
             item = _story_row(g, built, i == 0) if is_pick else _story_item(g, built, reaction, known, compact=True)   # 주요 뉴스 = 사건 이름 + n곳 막대 줄
             pick_attr = ' data-pick="1"' if is_pick else " hidden"
             pick_attr += (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else f' data-row-link="1" data-href="{_esc(g["rep"].get("url") or "#")}"')   # 구분선 안 아무 데나 눌러도 팝업 · 원문 (2026-11-05 사용자, 가이드라인 10-9 줄 전체 링크)
-            lis.append(f'<li data-theme="{_esc(g["theme"])}"{pick_attr} style="margin:0;padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px {dk.RULE_GAP - dk.VP}px;'
+            lis.append(f'<li data-theme="{_esc(g["theme"])}"{pick_attr} style="margin:0;padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px {dk.RULE_GAP - dk.NEWS_VP}px;'
                        f'line-height:{dk.LH_BODY};box-shadow:inset 0 1px 0 #E2E8F0;">{item}</li>')   # 첫 줄 구분선은 테마 JS 가 지운다. 주요 뉴스 외는 숨김 — 칩이 켠다
             if _has_pop(g, built):
                 pops.append(_news_pop_body(g, built))

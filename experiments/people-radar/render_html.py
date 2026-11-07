@@ -99,7 +99,7 @@ def _avatar(p, size=40):
 
 def kst_hm(utc_iso):
     dt = datetime.datetime.strptime(utc_iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
-    return dt.astimezone(KST).strftime("%m-%d %H:%M")
+    return dk.news_when(utc_iso)   # 모든 리포트 같은 `11.06 06:18` (2026-11-07, 옛 `10-23 01:26`)
 
 
 def _topic(t):
@@ -224,14 +224,14 @@ def _signal_item(p, s, cards):
     h_html = (f'<span style="display:none;">{_esc(who_h)}</span>' if who_h else "") + _esc(rest_h)
     url = s["lead"]["url"] if (s["lead"]["url"] or "").startswith("http") else None
     who = s["lead"]["sub_speaker"].title() if p["speaker"] == "fed" and s["lead"]["sub_speaker"] not in (None, "fomc") else ""
-    meta = ([who] if who else []) + [kst_hm(s["first_at"])]   # 인물 이름은 뺀다 — 인물 페이지 제목과 겹친다 (2026-10-25 사용자). 연준은 연설자만
+    meta = [kst_hm(s["first_at"])] + ([who] if who else [])   # 시각 먼저 — 종목 페이지 뉴스 `시각 · 매체 · n곳` 순서 (2026-11-07 0-6)   # 인물 이름은 뺀다 — 인물 페이지 제목과 겹친다 (2026-10-25 사용자). 연준은 연설자만
     if s["source_kind"] == "primary":
         meta.append(PATH_KO.get(s["attribution"], "원문"))
-    if s["n_reports"]:
-        meta.append(f"보도 {s['n_reports']}곳")
     pub = (s["lead"].get("publisher") or "").strip()   # 매체명을 보이는 글자로 (2026-10-21, 운영지침 D4-3)
     if pub and pub != "googlenews" and s["source_kind"] != "primary":
         meta.append(pub)
+    if s["n_reports"]:   # 곳 수는 맨 끝 (종목 `방송 n곳` 과 같은 자리)
+        meta.append(f"보도 {s['n_reports']}곳")
     subs = _path_line(s, c) + _novelty_line(s) + _next_line(s)   # 요약 줄(detail)은 공용 카드가 헤드라인 바로 아래 검정으로 (2026-10-25 사용자)   # 그날 시장 줄은 뺐다 (2026-10-25 사용자: 발언 효과로 오해 · 카드마다 반복 · 해석 어려움) — 값은 기록(record_store)에만 쌓아 90일 뒤 통계로
     if not s.get("path"):   # 닿는 곳이 없는 발언만 대상 줄 (닿는 곳이 있으면 자산 이름이 대상이다)
         targets = [x for x in s["companies"][:4]] + [config.SECTOR_KO.get(x, x) for x in s["sectors"][:2]]
@@ -273,10 +273,10 @@ def sec_people(r, cards):
         if not items:
             continue
         shown, more = items[:MAX_SIGNALS_PER_PERSON], items[MAX_SIGNALS_PER_PERSON:]
-        page = [dk.sub_label(f"{p['name_ko']} ({p['title_ko']})"), dk.item_rules(shown, sub=True, indent=dk.ALIGN_PX)]
+        page = [dk.sub_label(f"{p['name_ko']} ({p['title_ko']})"), dk.item_rules(shown, indent=dk.ALIGN_PX)]
         if more:
             # 펼친 목록의 첫 기사 위에도 구분선 (2026-10-21 사용자: 기사 영역은 더 보기를 펼쳐도 선이 이어져야 한다)
-            ml = dk.item_rules(more, sub=True, indent=dk.ALIGN_PX).replace(f"padding:2px {dk.ALIGN_PX}px ", f"padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px ", 1).replace("line-height:" + dk.LH_BODY + ";", "line-height:" + dk.LH_BODY + ";box-shadow:inset 0 1px 0 #E2E8F0;", 1)
+            ml = dk.item_rules(more, indent=dk.ALIGN_PX).replace(f"padding:2px {dk.ALIGN_PX}px ", f"padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px ", 1).replace("line-height:" + dk.LH_BODY + ";", "line-height:" + dk.LH_BODY + ";box-shadow:inset 0 1px 0 #E2E8F0;", 1)
             page.append(dk.fold(f"{p['name_ko']} 발언 {len(more)}건 더 보기", ml).replace("margin-top:8px;margin-bottom:8px;", "margin:0 0 8px;", 1))
         page.append(_collecting_card())
         out.append(f'<div data-person-page="{p["speaker"]}">{"".join(page)}</div>')
@@ -299,7 +299,7 @@ def _list_row(p, cards, first):
         f'style="display:flex;align-items:flex-start;gap:12px;padding:13px {dk.ALIGN_PX}px;{"" if first else "border-top:1px solid #E2E8F0;"}color:#111;text-decoration:none;cursor:pointer;">'
         f'{_avatar(p)}'
         f'<span style="flex:1 1 auto;min-width:0;">'
-        f'<span style="display:block;font-size:{dk.SMALL};line-height:{dk.LH_CARD};"><b>{_esc(p["name_ko"])}</b> <span style="color:{dk.SUB};font-size:{dk.TINY};">{_esc(p["title_ko"])} · 오늘 {n}건</span></span>'
+        f'<span style="display:block;font-size:{dk.SMALL};line-height:25px;"><b>{_esc(p["name_ko"])}</b> <span style="color:{dk.SUB};font-size:{dk.TINY};line-height:20px;">{_esc(p["title_ko"])} · 오늘 {n}건</span></span>'
         + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;margin-top:2px;word-break:keep-all;">{dk.keep_tone(_esc(head))}</span>' if head else "")
         + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};margin-top:2px;">닿는 곳 : {_esc(touch)}</span>' if touch else "")
         + f'</span><span style="flex:none;color:#94A3B8;display:inline-flex;margin-top:10px;">{chev}</span></a>')

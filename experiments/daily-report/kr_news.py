@@ -27,13 +27,6 @@ HOURS, SHOWN = 48, 5   # 최근 48시간 전부, 앞 5건만 펼치고 나머지
 MARK_OPEN, MARK_CLOSE = "<!--kr-news-->", "<!--/kr-news-->"
 
 
-def _kst_hm(iso):
-    try:
-        return datetime.datetime.fromisoformat(str(iso).replace("Z", "+00:00")).astimezone(media_feed.KST).strftime("%H:%M")
-    except ValueError:
-        return ""
-
-
 def rows_now():
     now = datetime.datetime.now(datetime.timezone.utc)
     return media_feed.rows(media_feed.load(now.astimezone(media_feed.KST).strftime("%Y-%m-%d"), days=8))   # 목록 48시간 + 방향 막대 `최근 7일` (P143) — edition 여드레
@@ -50,14 +43,14 @@ def section(rows, hours=HOURS, pick=None, shown=SHOWN):
                            dk.pill({"positive": "긍정", "negative": "부정"}.get(d, "중립"), d if d in ("positive", "negative") else "neutral", bare=True)]
                           + ([dk.pill("엇갈림", "uncertain", bare=True)] if r.get("split") else [])
                           + ([dk.pill("예상 밖", "uncertain", bare=True)] if r["surprise"] else []))   # `방송` 라벨은 뺀다 — 메타의 채널 · 방송 n곳과 같은 정보 (2026-10-26 사용자)
-        meta = [_kst_hm(r["published_at"]), r["channel"], f"방송 {r['n_channels']}곳" if r["n_channels"] > 1 else ""]
+        meta = [dk.news_when(r["published_at"]), r["channel"], f"방송 {r['n_channels']}곳" if r["n_channels"] > 1 else ""]
         items.append(dk.news_item(html_mod.escape(r["topic"]), r["url"], r["note"], (), labels, meta, ' data-trhelp="skip"'))
-    lst = dk.item_rules(items[:shown] if shown else items, sub=True, indent=dk.ALIGN_PX)
+    lst = dk.item_rules(items[:shown] if shown else items, indent=dk.ALIGN_PX, first_top=18)   # 종목 페이지 뉴스와 같은 여백 — 아래 19 · 방향 막대 아래 첫 기사 위 18(NEWS_FIRST_TOP) (2026-11-07 0절)
     now = datetime.datetime.now(datetime.timezone.utc)
     within = lambda h: (pick or media_feed.korea)(media_feed.issues(rows, (now - datetime.timedelta(hours=h)).strftime("%Y-%m-%dT%H:%M")), None)   # noqa: E731
     lst = dk.direction_bars(media_feed.direction_counts(within(24)), media_feed.direction_counts(within(24 * 7))) + lst   # 엔비디아처럼 오늘 · 최근 7일 방향 막대 (2026-10-31 사용자 P143)
     if shown and len(items) > shown:   # 앞 shown 건만 펼쳐 두고 나머지는 접기 (한국 증시 리포트 2026-10-26 사용자: "너무 길다")
-        lst += dk.fold(f"방송 {len(items) - shown}건 더 보기", dk.item_rules(items[shown:], sub=True, indent=dk.ALIGN_PX))
+        lst += dk.fold(f"방송 {len(items) - shown}건 더 보기", dk.item_rules(items[shown:], indent=dk.ALIGN_PX))
     body = dk.keep_tone(dk.section(TITLE, lst, tab=TAB)) if items else ""   # 방송 소식 = 헤드라인체 그대로
     return MARK_OPEN + body + MARK_CLOSE
 

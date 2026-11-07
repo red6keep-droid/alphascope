@@ -32,7 +32,7 @@ def _est_w(text, px):
 
 
 def _fold_btn(bg="#fff", bd="#E2E8F0"):
-    return dk.fold_btn(bg, bd).replace(f"margin-left:{dk.FOLD_LEFT}px;", f"margin-left:{FOLD_LEFT}px;")
+    return dk.emph_fold_btn(bg, bd, FOLD_LEFT)   # 화살표 = 검정에 카드 테마 색 20% — 종목 페이지와 같은 공용 함수 (P187, 2026-11-07)
 
 
 def _title_with_icon(title, tail_html):
@@ -47,6 +47,8 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
     """질문 카드 — 첫 줄 질문 · 오른쪽 답(상태), 펼치면 쉬운 말 · 근거 줄 · 그래프.
     lines 항목: (글, "plain") 쉬운 말 · ("row", 이름, 값, 뜻) 근거 줄 · (html, "html") 그래프 · (글, "note") 안내 · 글 = 점 글머리표."""
     bg, bd = CARD_DIR[theme]
+    if theme == "neutral" and color == "#111":   # 중립(회색) 카드 답 = 흐린 회색 — 종목 페이지와 같게 (R.MUTED, 2026-11-07)
+        color = dk.MUTED
     bd_row = dk.darken(dk.lighten(dk.lighten(bd), 0.3), 0.02)   # 줄 구분선 2% 진하게 (2026-10-26 사용자: 5% → 2%)
 
     def li(item):
@@ -60,18 +62,20 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
                         f'<span style="flex:none;white-space:nowrap;color:#111;">{esc(name)} <span style="font-size:{dk.TINY};color:{NOTE};">({dk.tint(esc(note))})</span></span>'
-                        f'<span style="flex:none;text-align:right;font-weight:700;white-space:nowrap;">{dk.tint(esc(value))}</span></span></li>')
+                        f'<span style="flex:none;text-align:right;font-weight:{dk.STATE_VAL_W};white-space:nowrap;">{dk.tint(esc(value))}</span></span></li>')
             return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_row};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
                     f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
                     f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{esc(name)}</span>{nt}</span>'
-                    f'<span style="flex:none;text-align:right;font-weight:700;word-break:keep-all;">{dk.tint(esc(value))}</span></span></li>')
+                    f'<span style="flex:none;text-align:right;font-weight:{dk.STATE_VAL_W};word-break:keep-all;">{dk.tint(esc(value))}</span></span></li>')
         if kind == "html":
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
         if kind == "rich":   # plain 과 같은 모양, 글은 이미 만든 HTML (강조 숫자 — 한국 증시 리포트 주식 비중, 2026-11-05 M69)
-            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;line-height:{dk.LH_EMPH};word-break:keep-all;">{text}</li>'
-        if kind == "plain":
-            return f'<li style="list-style:none;margin:14px 0 17px;font-weight:400;color:#111;line-height:{dk.LH_EMPH};word-break:keep-all;">{dk.tint(esc(text))}</li>'
-        col = NOTE if kind == "note" else "#111"
+            return f'<li {dk.SENT_ATTR} style="list-style:none;margin:{dk.SENT_TOP}px 0 17px;font-weight:400;color:#111;font-size:{dk.STATE_SENT_FS};line-height:{dk.LH_EMPH};word-break:keep-all;">{dk.bold_pct(text)}</li>'
+        if kind == "plain":   # 펼친 설명 문장 18/32 · 증감 숫자 굵게 — 종목 페이지 _state_card 와 같게 (P132 · P279, 2026-11-07)
+            return f'<li {dk.SENT_ATTR} style="list-style:none;margin:{dk.SENT_TOP}px 0 17px;font-weight:400;color:#111;font-size:{dk.STATE_SENT_FS};line-height:{dk.LH_EMPH};word-break:keep-all;">{dk.bold_pct(dk.tint(esc(text)))}</li>'
+        if kind == "note":   # 늘 같은 안내 = 작은 회색 14/20 (P67 · 0절, 옛 19/32 점 줄)
+            return f'<li data-note="1" style="list-style:none;margin:0 0 12px;font-size:{dk.TINY};line-height:20px;color:{NOTE};word-break:keep-all;">{dk.tint(esc(text))}</li>'
+        col = "#111"
         return dk.dot_li(dk.label_text(text), size=3, color=col, lh=dk.LH_EMPH)
 
     lis = ""
@@ -85,11 +89,12 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
     ans = state if str(state).startswith("<span") else dk.tint(esc(state))   # 이미 색을 입힌 답(HTML)은 그대로 — 한국 증시 리포트 결과 단어 색 (2026-10-26)
     state_html = (f'<span style="display:inline-flex;align-items:center;">{ans}{_fold_btn(dk.lighten(bg), bd)}</span>' if fold else ans)   # 답 글자의 증감도 색 (가이드라인 3-3-1)
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;line-height:{dk.LH_EMPH_Q};">'   # 질문 · 대답 18px · 행간 30 (2026-10-27 사용자)
-            f'<span style="{"flex:1 1 auto;min-width:0;" if fold else dk.COL_L}font-weight:700;color:#111;font-size:{dk.EMPH_Q};">{_title_with_icon(title, dk.tip_icon(tip) if tip else "")}</span>'
-            f'<span style="{"flex:none;white-space:nowrap;" if fold else dk.COL_R}font-weight:700;color:{color};font-size:{dk.EMPH_Q};">{state_html}</span></span> ')
+            f'<span style="{"flex:1 1 auto;min-width:0;" if fold else dk.COL_L}font-weight:{dk.STATE_TITLE_W};color:#111;font-size:{dk.EMPH_Q};">{_title_with_icon(title, dk.tip_icon(tip) if tip else "")}</span>'
+            f'<span style="{"flex:none;white-space:nowrap;" if fold else dk.COL_R}font-weight:{dk.STATE_ANS_W};color:{color};font-size:{dk.EMPH_Q};">{state_html}</span></span> ')
     body = (f'<div style="margin-top:{14 - dk.VP_EMPH + 3}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div>")
     inner = (f'<details data-acc="1"{" open" if opened else ""}><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{body}</details>' if fold else head + body)
+    inner = dk.emph_white(inner)   # 강조 카드 안 흰 카드 외곽선 50% (P188)
     return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px;margin:0 0 8px;line-height:{dk.LH_EMPH};">'
             f'{inner}</div>')
 

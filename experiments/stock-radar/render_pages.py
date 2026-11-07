@@ -1089,9 +1089,11 @@ def list_body(a):
     tip = ("미국 S&P 500 종목 가운데 회사 전체 값(주가 × 주식 수)이 가장 큰 10개\n"
            f"· 오늘 1위 : {top[0]['name']} {cap_text(top[0]['cap'])}\n"
            f"· 나누는 법 : 11위 밖으로 {U.SWAP_DAYS}거래일 연속 밀리면 후보 중 가장 높았던 종목과 바꾼다")
-    body = (list_lead(a) + updated_line(a) + R.title_with_sort("시가총액 순위", tip, "us-cap10") + card(top, "us-cap10")
+    body = (_dk.report_stamp(_md(a["day"]) + "(미국 시간)", "한국 시간 아침 7시 30분 무렵")   # 맨 위 안내 상자 = 상세 페이지와 같게 (2026-11-07 0-1, 옛 `마지막 갱신` 회색 한 줄)
+            + list_lead(a) + R.title_with_sort("시가총액 순위", tip, "us-cap10") + card(top, "us-cap10")
             + _dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest))
-            + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다."))
+            + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다.")
+            + R.related_buttons([("엔비디아 NVDA 주가", U.page_url("NVDA"))]))   # 함께 보는 페이지 — 한국 목록 · 상세 페이지처럼 (2026-11-07)
     return wrap(body + home_marker())
 
 

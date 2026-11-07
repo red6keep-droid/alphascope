@@ -603,17 +603,16 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 /* 실시간 주요 뉴스 — 증시 리포트 뉴스와 같은 구성 (2026-10-14 사용자: "홈 실시간 주요 뉴스도 증시 리포트 뉴스 구성 배치, 기사 제목 볼드").
    카드 없이 기사 사이 1px 가로 구분선(위아래 보이는 27), 제목 19px 굵게 · 행간 34(원문 링크), 아래 14px 보조 줄(출처 · 시각), 맨 아래 라벨 줄(여백 없이 왼쪽, 위 8). 한 열 — design_kit.item_rules() */
 .news-list { display: flex; flex-direction: column; }
-.news-item { margin: 0; padding: 20px 0 25px; border-top: 1px solid #E2E8F0; font-size: 18px; line-height: 34px; color: #111; word-break: keep-all; }
+.news-item { margin: 0; padding: 18px 0 19px; border-top: 1px solid #E2E8F0; font-size: 17px; line-height: 31px; color: #111; word-break: keep-all; }   /* 종목 페이지 뉴스(design_kit.news_item · item_rules)와 같은 폼 — 위 19(선 1 + 18) · 아래 19 (2026-11-07 사용자: 홈 뉴스와 개별 페이지 뉴스 폼 통일, 옛 18/34 · 20 25) */
 .news-item:first-child { padding-top: 2px; border-top: 0; }
-.news-item a { color: #111; font-weight: 700; }
-.news-item a:hover { color: var(--accent); }
+.news-item a { display: block; color: #111; font-weight: 700; font-size: 17px; line-height: 31px; }   /* 제목 17/31 블록 = 종목 페이지. 마우스 강조색은 뺐다(종목 페이지에 없음) */
 .news-tag {   /* 영역 라벨 (가이드 5절): 회색 외곽선 · 흰 바탕 · 14px, 줄에 홀로 놓여 여백 없음 */
   display: inline-block; padding: 3px 5px 2px;
   border: 1px solid #CBD5E1; border-radius: 4px; background: #fff;
   font-size: 14px; font-weight: 400; line-height: 1; color: #334155; white-space: nowrap;
 }
-.news-labels { display: flex; align-items: center; gap: 6px; margin-top: 8px; line-height: 20px; }   /* 라벨 뒤에 출처 · 시각 (2026-10-14 사용자) */
-.news-sub { font-size: 14px; line-height: 20px; color: #7A7A7A; }
+.news-labels { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 2px; margin: 8px 0 1px; line-height: 1; }   /* 라벨끼리 2 · 라벨 ~ 메타 10 = 종목 페이지 (2026-11-07) */   /* 라벨 뒤에 출처 · 시각 (2026-10-14 사용자) */
+.news-sub { margin-left: 8px; font-size: 14px; line-height: 20px; color: #7A7A7A; }
 .news-sum { display: block; margin-top: 4px; font-size: 16px; line-height: 26px; font-weight: 400; color: #333; word-break: keep-all; }   /* 기사 소개 (2026-10-19 사용자) — 제목 아래, 선정 이유 위 */
 .news-why { display: block; margin-top: 2px; font-size: 14px; line-height: 20px; color: #7A7A7A; word-break: keep-all; }   /* 선정 이유 (2026-10-14 사용자) — 제목은 18px(19 − 1) */
 .news-sub .num { margin-left: 6px; }
@@ -1501,6 +1500,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .report-columns li { font-size: 16px; line-height: 32px; }
   .tab { font-size: 16px; line-height: 21.5px; }
   .news-item { font-size: 16px; line-height: 32px; }
+  .news-item a { font-size: 16px; line-height: 32px; }
   .footer-title { font-size: 16px; }
   .eb-slide .stock-avatar { font-size: 17px; }
   .eb-name { font-size: 24.5px; line-height: 32px; }
@@ -2463,6 +2463,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
           return isNaN(d) ? null : d;
         }
 
+        function mdhm(date) {   /* `11.07 07:07` (KST) — 뉴스 메타, design_kit.news_when 과 같은 형식 (2026-11-07) */
+          if (!date) return '';
+          var p = {};
+          new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+            .formatToParts(date).forEach(function (x) { p[x.type] = x.value; });
+          return p.month + '.' + p.day + ' ' + p.hour + ':' + p.minute;
+        }
+
         function hhmm(date) {
           if (!date) return '--:--';
           return date.toLocaleTimeString('ko-KR', {
@@ -3180,9 +3188,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
               var labs = el('span', 'news-labels');   /* 라벨 줄: 분류 라벨 뒤에 출처 · 시각 (2026-10-14 사용자) */
               labs.appendChild(el('span', 'news-tag', media ? (it.tag || '시장') : newsCategory(it)));
               if (media) labs.appendChild(el('span', 'news-tag', '방송'));   /* 기사가 아니라 방송 내용(의견 포함) — 채널이 매체 자리 */
-              var sub = el('span', 'news-sub');
-              sub.appendChild(el('span', null, (it.source || 'CNBC') + (media && it.n_channels > 1 ? ' · 방송 ' + it.n_channels + '곳' : '')));
-              sub.appendChild(el('span', 'num', hhmm(kstTime(it.published))));
+              /* 메타 = `11.07 07:07 · 매체 · 방송 n곳` — 종목 페이지 뉴스와 같은 순서 · 형식 (2026-11-07 사용자: 뉴스 폼 통일, 옛 `CNBC 17:06`) */
+              var sub = el('span', 'news-sub', [mdhm(kstTime(it.published)), it.source || 'CNBC'].concat(media && it.n_channels > 1 ? ['방송 ' + it.n_channels + '곳'] : []).filter(Boolean).join(' · '));
               labs.appendChild(sub);
               card.appendChild(labs);
               list.appendChild(card);

@@ -300,7 +300,7 @@ def sec_bsi(s):
     rows = ""
     for i, r in enumerate(b["rows"]):
         mo = f"{r['month'][:4]}년 {int(r['month'][5:])}월"
-        fc = f'<br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">다음 달 전망 {r["forecast"]:.0f}</span>' if r.get("forecast") is not None else ""
+        fc = f'<br><span style="font-size:{TINY};line-height:20px;font-weight:400;color:{NOTE};">다음 달 전망 {r["forecast"]:.0f}</span>' if r.get("forecast") is not None else ""
         col = UP if r["v"] >= 100 else "#111"
         note = f"{mo} 실적 · 전달보다 {_sgn(r['chg'], 0)}p · 12개월 범위의 {r['pos12']:.0f}% 지점 · 2009년 이후 아래에서 {r['pct_all']:.0f}% 지점"
         rows += _row_html(f"{r['name']} BSI", f'<span style="color:{col};">{r["v"]:.0f}</span>{fc}', note, first=i == 0)
@@ -1346,7 +1346,7 @@ def sec_investors(m):
     if sh:
         L = sh["last"]
         # 날짜는 위 줄처럼 괄호 안에 짧게, 설명(사고판 돈 · 12개월 범위 · 과열)은 카드 문장으로 (2026-10-29 사용자 M56)
-        rows += _row_html("거래 비중", f'<span style="color:#111;">개인 {L["indiv"]:.0f}%</span><br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">외국인 {L["foreign"]:.0f}% · 기관 {L["inst"]:.0f}%</span>',
+        rows += _row_html("거래 비중", f'<span style="color:#111;">개인 {L["indiv"]:.0f}%</span><br><span style="font-size:{TINY};line-height:20px;font-weight:400;color:{NOTE};">외국인 {L["foreign"]:.0f}% · 기관 {L["inst"]:.0f}%</span>',
                             f"{L['month'][:4]}년 {int(L['month'][5:])}월", inline_note=True)
         ser = sh["series"][-12:]   # 선 그래프 12개월 — 비중이 오르내리는 흐름 (2026-11-05 사용자 M67, 옛 6개월 막대)
         tc = _dk.trend_card("", [x["month"][2:].replace("-", ".") for x in ser],   # 달마다 이름 · 점 — 넘겨 보기 (2026-11-05 사용자 M77)
@@ -1430,7 +1430,7 @@ def sec_heat(m):
     if h:
         tr = h.get("turnover_ratio")
         how = "평소보다 많이" if tr and tr >= 1.5 else "평소보다 적게" if tr and tr < 0.7 else "평소와 비슷하게"
-        rows += _row_html("유가증권 거래대금", f'<span style="color:#111;">{eok(h["turnover"])}</span>' + (f'<br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">20일 평균의 {tr:.1f}배</span>' if tr else ""),
+        rows += _row_html("유가증권 거래대금", f'<span style="color:#111;">{eok(h["turnover"])}</span>' + (f'<br><span style="font-size:{TINY};line-height:20px;font-weight:400;color:{NOTE};">20일 평균의 {tr:.1f}배</span>' if tr else ""),
                             f"{_md(h['day'])} · {how} 거래됐다 · 1년 중 아래에서 {h['pct_rank_1y']:.0f}% 지점", first=True)
         first = False
         if h.get("volume"):
@@ -1449,7 +1449,7 @@ def sec_heat(m):
                  f'<span style="display:block;height:6px;"></span>{chart}</span>')
     if n:
         d = n["v"] - n["avg_1y"]
-        rows += _row_html("뉴스심리지수", f'<span style="color:{UP if d > 0 else DOWN};">{n["v"]:.1f}</span>' + f'<br><span style="font-size:{TINY};font-weight:400;color:{NOTE};">20일 평균 {n["avg20"]:.1f}</span>',
+        rows += _row_html("뉴스심리지수", f'<span style="color:{UP if d > 0 else DOWN};">{n["v"]:.1f}</span>' + f'<br><span style="font-size:{TINY};line-height:20px;font-weight:400;color:{NOTE};">20일 평균 {n["avg20"]:.1f}</span>',
                             f"{_md(n['day'])} · 100 위면 긍정 기사가 많음 · 1년 평균 {n['avg_1y']:.1f} · 1년 중 아래에서 {n['pct_rank_1y']:.0f}% 지점 · 한국은행 실험적 통계, 약 1주 늦게 나옴", first=first)
     tip = ("돈이 얼마나 활발히 오가는지(거래대금)와 경제 뉴스의 분위기(뉴스심리지수 — 한국은행이 경제 기사 문장을 긍정 · 부정으로 나눠 지수화, 100이 기준). 급등 · 급락 날은 거래대금이 평소의 1.5배를 넘곤 한다\n"
            + (f"· 오늘 거래대금 {eok(h['turnover'])} : 20일 평균의 {h['turnover_ratio']:.1f}배" if h and h.get("turnover_ratio") else "")
@@ -1575,14 +1575,14 @@ def sec_household(m):
         return f" · 전년 같은 분기보다 {_sgn(x['yoy'], 1)}%" if x and x.get("yoy") is not None else ""
     s, r, d = hh.get("hh_surplus"), hh.get("hh_surplus_rate"), hh.get("hh_disp_income")
     if s:
-        rate = f"<br><span style=\"font-size:{TINY};font-weight:400;color:{NOTE};\">흑자율 {r['v']:.1f}%</span>" if r else ""
+        rate = f"<br><span style=\"font-size:{TINY};line-height:20px;font-weight:400;color:{NOTE};\">흑자율 {r['v']:.1f}%</span>" if r else ""
         row("가구당 월평균 흑자액", f'<span style="color:#111;">{s["v"] / 1e4:,.0f}만 원</span>{rate}',
             f"{_qlabel(s['q'])} · 소득에서 소비 · 세금을 빼고 남은 돈 = 저축 · 투자 여력{yoy_txt(s)}" + (f" · 흑자율은 전년 같은 분기 {r['same']:.1f}%" if r and r.get("same") is not None else ""))
     if d:
         row("가구당 월평균 처분가능소득", f'<span style="color:#111;">{d["v"] / 1e4:,.0f}만 원</span>', f"{_qlabel(d['q'])} · 전국 1인 이상 가구 · 명목{yoy_txt(d)}")
     st, sh, sb = hh.get("hh_stock"), hh.get("hh_stock_share"), hh.get("hh_stock_buy")
     if st:
-        share = f"<br><span style=\"font-size:{TINY};font-weight:400;color:{NOTE};\">금융자산의 {sh['v']:.1f}%</span>" if sh else ""
+        share = f"<br><span style=\"font-size:{TINY};line-height:20px;font-weight:400;color:{NOTE};\">금융자산의 {sh['v']:.1f}%</span>" if sh else ""
         row("가계가 보유한 국내 주식", f'<span style="color:#111;">{st["v"] / 1e3:,.0f}조 원</span>{share}',   # 십억원 → 조원
             f"{_qlabel(st['q'])} · 자금순환표 잔액(시가){yoy_txt(st)}" + (f" · 비중 최근 4분기 {sh['lo4']:.1f}~{sh['hi4']:.1f}%" if sh else ""))
     if sb:
@@ -1667,7 +1667,8 @@ def list_body(a):
     tip = ("한국 유가증권시장 보통주 가운데 회사 전체 값(주가 × 주식 수)이 가장 큰 10개. 우선주 · 코스닥은 뺀다\n"
            f"· 오늘 1위 : {top[0]['name']} {cap_text(top[0]['cap'])}\n"
            f"· 나누는 법 : 11위 밖으로 {U.SWAP_DAYS}거래일 연속 밀리면 후보 중 가장 높았던 종목과 바꾼다")
-    body = (list_lead(a) + R.title_with_sort("시가총액 순위", tip, "kr-cap10") + card(top, "kr-cap10")
+    body = (_dk.report_stamp(_md(a["day"]), "오후 4시 10분 무렵")   # 맨 위 안내 상자 = 상세 페이지와 같게 (2026-11-07 0-1)
+            + list_lead(a) + R.title_with_sort("시가총액 순위", tip, "kr-cap10") + card(top, "kr-cap10")
             + (_dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest)) if rest else "")
             + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다.")
             + related())   # 시장 흐름 카드는 한국 증시 리포트로 옮김 — 목록은 미국처럼 순위만 (2026-10-26 사용자, 리포트 기획 M8)

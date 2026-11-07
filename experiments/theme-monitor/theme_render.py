@@ -72,7 +72,7 @@ def page_title(t, day):
 
 def _head(t, state, kind, sub, guide):
     """머리 상태 카드 — 질문 제목 옆 ? 툴팁이 읽는 법 (2026-10-21 사용자: 탭 대신 상단 제목 옆 툴팁). 둘째 줄 요약은 증감 색."""
-    card = R._state_card(t["question"], state, kind, KIND_COLOR[kind], [(dk.tint(_esc(sub)), "html")], "", tip=guide)
+    card = R._state_card(t["question"], state, kind, KIND_COLOR[kind], [(dk.tint(_esc(sub)), "rich")], "", tip=guide)   # rich = 펼친 설명 문장 18/32 · 증감 굵게 (2026-11-07 0-2, 옛 html 은 19/32)
     return dk.cards(card)
 
 
@@ -83,7 +83,8 @@ def _stock_chart(title, members, key="ret_20d", fmt=None, height=140):
     if not ms:
         return ""
     chart = R._col_chart([(m.get("label") or _short(m["sym"]), [m[key]]) for m in ms], [R._sign_bg], [R._sign_fg], height=height, fmt=fmt)
-    return R._card_title(title) + f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span></div>'   # 그래프 카드 위아래 10 (2026-10-26)
+    return (f'<span style="{dk._CHART_TITLE_STYLE}margin:0 0 {dk.CHART_TITLE_GAP}px;padding-left:{dk.ALIGN_PX}px;">{dk.CHART_MARK}{R._paren(_esc(title))}</span>'   # 그래프 제목 = 종목 페이지 `※ 제목` 16/24 · 간격 4 (2026-11-07 0-5, 옛 카드 제목 19/24 · 아래 8)
+            f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span></div>')   # 그래프 카드 아래 안쪽 0 = 종목 페이지 (옛 4)   # 그래프 카드 위아래 10 (2026-10-26)
 
 
 # ── A. AI 투자 ──────────────────────────────────────────────────────────
@@ -177,7 +178,7 @@ def body_fed(t, a, day, guide):
     if len(gs) >= 20:
         pts = [gs[-1 - k] for k in (60, 40, 20, 10, 5, 0) if k < len(gs)]
         chart = R._col_chart([(f"{p[0][5:7]}.{p[0][8:10]}", [p[1]]) for p in pts], [R._sign_bg], [R._sign_fg], height=120, fmt=lambda v: f"{v:+.0f}".replace("-", "−"))
-        lines.append((f'{dk.CHART_TITLE_M}기준금리 − 2년물 (bp)</span><span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span>', "html"))   # ※ 제목은 카드 밖 · 그래프만 흰 카드 (2026-10-26)
+        lines.append((f'{dk.CHART_TITLE_M}기준금리 − 2년물 (bp)</span><span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>', "html"))   # ※ 제목은 카드 밖 · 그래프만 흰 카드 (2026-10-26)
     cards += R._state_card("기대가 커지나, 줄어드나?", a["state"], a["theme_kind"], KIND_COLOR[a["theme_kind"]], lines, "", tip="차이의 20거래일 변화. 커지면 시장이 더 빨리 · 더 많이 내릴 것으로 보는 것", fold=True)
 
     cd = a.get("cpi_days") or []
@@ -187,7 +188,7 @@ def body_fed(t, a, day, guide):
         k3 = "negative" if last["y2_change_bp"] > 0 else "positive" if last["y2_change_bp"] < 0 else "neutral"   # 2년물 오름 = 인하 기대 후퇴 → 파랑
         lines = [("row", f"{_md(x['day'])} CPI 발표", f"{_pp(x['y2_change_bp'], 0)}bp", "발표일 2년물 변화 (전일 대비)") for x in reversed(cd)]
         chart = R._col_chart([(f"{x['day'][5:7]}.{x['day'][8:10]}", [x["y2_change_bp"]]) for x in cd], [R._sign_bg], [R._sign_fg], height=110, fmt=lambda v: f"{v:+.0f}".replace("-", "−"))
-        lines.append((f'<span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span>', "html"))   # 그래프는 흰 카드 (2026-10-26)
+        lines.append((f'{dk.CHART_TITLE_M}발표일 2년물 변화 (bp)</span><span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>', "html"))   # 강조 카드 안 그래프는 늘 ※ 제목 (2026-11-07 0-5)
         cards += R._state_card("CPI 발표 뒤 2년물은?", st3, k3, KIND_COLOR[k3], lines, "", tip="소비자물가 발표일 2년물 금리의 하루 변화. 오르면 시장이 인하 기대를 줄인 날. 30건이 쌓이기 전에는 통계를 말하지 않는다", fold=True)
     out += _cards(cards)
 

@@ -86,7 +86,7 @@ _PAREN = re.compile(r"\s*(\([^()]*\))")
 def _paren(name_html):
     """카드 구분명의 (…) 부분을 한 단계 작게(12px)·보통 굵기로. 이미 이스케이프된 HTML 에 적용한다."""
     # inline-block: 한 줄에 못 들면 괄호째 다음 줄로 — design_kit.paren 과 같다 (2026-10-17 사용자: 52주 고점 대비 · 단기 과열 온도의 괄호가 중간에서 끊김)
-    return _PAREN.sub(lambda m: f' <span style="display:inline-block;font-size:{MICRO};font-weight:400;">{m.group(1)}</span>', name_html)
+    return _PAREN.sub(lambda m: f' <span style="display:inline-block;font-size:{MICRO};line-height:20px;font-weight:400;">{m.group(1)}</span>', name_html)   # 행간 20 = 14px 짝 (2026-11-07)
 
 
 def _esc(t):
@@ -635,10 +635,10 @@ def year_range_in(y, money, tip, high_days=None):
 
 # ---------------------------------------------------------------- 선 그래프 (2026-10-31 사용자 — 그래프 비교 목업에서 정한 모양, P161)
 # 최신 = 오른쪽 · 세로 눈금 = 오른쪽 · 처음엔 오른쪽 끝(최신)이 보이고 왼쪽으로 넘겨 과거 · 왼쪽 그림자(넘길 것이 남았을 때만, 테마 JS data-lscroll) ·
-# `‹ 넘겨 보기` 왼쪽 · 범례 오른쪽 · 단위는 그 아래 오른쪽. 이 종목 선 2px · 비교 선 1.25px 회색 점선 · 속 빈 동그라미, 최신 점만 굵은 테두리.
+# `‹ 넘겨 보기` 왼쪽 · 범례 오른쪽 · 단위는 그 아래 오른쪽. 이 종목 선 2px · 비교 선 1px 회색 점선 · 속 빈 동그라미, 최신 점만 굵은 테두리.
 # 최신 값 13px 굵게 · 나머지 12px 보통(세로 눈금 숫자와 같게) · 두 선 중 위에 있는 쪽 숫자는 위, 아래 쪽은 아래 · 비교 선을 먼저 그려 이 종목 선이 위.
 # 최신 가로축 이름 = 이 종목 색 + 글자 위 3px 강조점.
-LINE_W, LINE_W2, DOT_R, DOT_SW, LAST_R, LAST_SW = 2, 1.25, 3, 1.5, 4.5, 4
+LINE_W, LINE_W2, DOT_R, DOT_SW, LAST_R, LAST_SW = 2, 1, 3, 2, 5, 4   # 정수 px (2026-11-07 사용자: "정수로 바꿔줘" — 옛 비교 선 1.25 · 점 테두리 1.5 · 최신 점 반지름 4.5)
 LINE_H, LINE_STEP, LINE_GRAY = 230, 46, _dk.CHART_CMP   # 비교 선 = 그래프 색 표 ③ 회색 점선 (가이드라인 8-0 · 0-5, 2026-11-06 사용자, 옛 #9CA3AF)
 LINE_THIS = _dk.CHART_MAIN   # 선 그래프 이 종목 선 = 그래프 색 표 ② 주황 (2026-11-06 사용자: "주황으로 해" — 옛 파랑 #5B8DEF 는 하락 색과 헷갈림, P161)
 LINE_FIT_W = 250   # 360px 폰에서 그래프 칸 폭(실측 250~257) — 점들이 이 안에 들어가면 넘겨 보기 없이 카드 폭에 고르게 편다 (2026-10-31 사용자: 짧으면 한쪽으로 몰렸다)
@@ -1617,7 +1617,7 @@ def dd_cur(x, st):
     return next((l for l in ("30", "20", "10") if -x > int(l) and (st.get(l) or {}).get("median_days") is not None), None)
 
 
-_SEC_RE = re.compile(r'<div style="[^"]*margin:25px 0 8px;">(.*?)</div><div data-cards="1" style="margin:0 0 8px;"><span style="[^"]*">(.*)</span></div>$', re.S)
+_SEC_RE = re.compile(r'<div style="[^"]*margin:24px 0 10px;">(.*?)</div><div data-cards="1" style="margin:0 0 8px;"><span style="[^"]*">(.*)</span></div>$', re.S)
 _WHITE_CARD = "margin:0 0 6px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;"   # MULTI · design_kit.MULTI 의 흰 카드 부분
 
 
@@ -1651,15 +1651,12 @@ def rows_after(rows):
     return f'<div style="margin-top:8px;">{rows}</div>' if rows else ""
 
 
-_EMPH_WHITE_RE = re.compile(r"((?:margin:0 0 6px;|display:block;)background:#fff;)border:1px solid (?:#[0-9A-Fa-f]{6}|rgb\(226,232,240\));(border-radius:8px;)")
-EMPH_WHITE_BD = "rgba(226,232,240,0.5)"   # 강조 카드 안 흰 카드 외곽선 = 보통 흰 카드 외곽선(#E2E8F0) 투명도 50% (2026-10-31 사용자 P188, P187 의 지우기 대신)
+EMPH_WHITE_BD = _dk.EMPH_WHITE_BD   # 50% (P188) — 공용 값
 
 
 def emph_white(html):
-    """강조 카드(색 바탕) 안 흰 카드(그래프 · 범위 막대 · 함께 보기)의 외곽선을 반투명(50%)으로 (2026-10-31 사용자 P187 → P188).
-    MULTI 흰 카드와 rgb() 로 적은 그래프 카드(평균선 · 고점 회복) 모두. 흰 버튼(`차트 정보 보기` 등, padding 으로 시작)은 그대로.
-    바깥(흰 바탕) 그래프 카드는 손대지 않는다."""
-    return _EMPH_WHITE_RE.sub(rf"\1border:1px solid {EMPH_WHITE_BD};\2", html)
+    """강조 카드 안 흰 카드 외곽선 50% (P188) — 공용 design_kit.emph_white."""
+    return _dk.emph_white(html)
 
 
 PRICE_IN_EXTRA = 10   # 가격 카드 펼침(오늘 탭) 안 아래 영역들의 위 여백 +10 — 이 카드에서만 (2026-10-31 사용자 P191)
@@ -1914,8 +1911,8 @@ def _est_w(text, px):
 INLINE_W = 316   # 상태 카드 줄 안쪽 폭 어림 (390px 폰 − 여백 · 카드 안쪽) − 이름과 값 사이 간격
 
 
-STATE_SENT_FS = "18px"   # 상태 카드 제목 아래 설명 문장 19 → 18 (2026-10-30 사용자 P132) — 줄 높이 32 와 위아래 7 로 정수
-STATE_TITLE_W = 500   # 상태 카드 제목 = 보통보다 한 단계 굵게 (2026-10-30 사용자 P131, 옛 700). PC 나눔바른고딕 · 윈도 맑은 고딕은 500 이 없어 보통으로 보인다
+STATE_SENT_FS = _dk.STATE_SENT_FS   # 18 (P132) — 공용 값 (2026-11-07, 데일리 · 한국 증시 리포트 질문 카드와 하나)
+STATE_TITLE_W = _dk.STATE_TITLE_W   # 500 (P131) — 공용 값
 
 
 BOX_END_PULL = 16   # 폭 가득 흰 카드로 끝나는 강조 카드 — 아래 22 → 좌우와 같은 15 (P140). 겹친 음수 여백은 가장 큰 것 하나만 먹으므로(ul −9) 9 + 7
@@ -1953,7 +1950,7 @@ def _pull_end_chart(html):
     return html[:k] + f" {-GAUGE_PULL}px" + html[k:]
 
 
-STATE_ANS_W = 500   # 강조 카드 답(접기 버튼 앞 값) 굵기 700 → 500 (2026-11-01 사용자 P205). 블로그 글꼴(AS Barun)은 400 · 700 뿐이라 블로그에선 보통 굵기로 보인다
+STATE_ANS_W = _dk.STATE_ANS_W   # 500 (P205) — 공용 값
 
 
 _DIR_SKIP = ("tech", "news")   # 기술지표는 말에 이미 ▲▼, 뉴스는 기호를 붙이지 않는다. 의견 매수 · 매도는 ▲ · ▼ (2026-11-02 사용자 P278: 인베스팅닷컴처럼)
@@ -1979,7 +1976,7 @@ def _dir_state(title, state):
     return f"▲ {state}" if d == SG.UP else f"▼ {state}" if d == SG.DOWN else state
 
 
-STATE_VAL_W = 600   # 강조 카드 근거 줄 오른쪽 값 굵기 700 → 600 (2026-11-01 사용자 P260) — PC 글꼴(나눔바른고딕 400 · 700)에선 700 으로 보인다
+STATE_VAL_W = _dk.STATE_VAL_W   # 600 (P260) — 공용 값
 
 
 def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False, opened=False, below_notes=False, state_rich=""):
@@ -2283,19 +2280,18 @@ def small_note(text):
 def note_span(note, mark=False):
     """작은 회색 안내 한 줄 (괄호) — plain 줄은 SMALL_NOTE 로, rich 줄은 이것을 직접 붙인다. mark=True 는 괄호 대신 앞에 ※ (P258)."""
     # 다음 줄 · 괄호 · 작은 글씨 행간 20 (2026-10-28 사용자 P76 · P77 · P78: 문장 끝에 이어 붙이니 본문 행간 32 를 따라 너무 벌어졌다)
-    text = f"{_dk.CHART_MARK}{_esc(note)}" if mark else f"({_esc(note)})"
+    text = f"{_dk.CHART_MARK.replace('font-size:14px;', 'font-size:12px;').replace('top:-2px;', 'top:-1px;')}{_esc(note)}" if mark else f"({_esc(note)})"   # 14px 안내 줄 안 ※ = 12px 정수 (옛 .85em = 11.9px)
     return f'<span data-note="1" style="display:block;margin-top:4px;font-size:{TINY};line-height:20px;color:{NOTE};">{text}</span>'
 
 
-SENT_TOP = 14   # 강조 카드 펼친 문장 위 margin — 구분선 ~ 글자 보이는 20px (2026-11-02 사용자 P284: "원래 맞아, 20으로" — P283 의 14 는 되돌림)
+SENT_TOP = _dk.SENT_TOP   # 20 보이게 (P284) — 공용 값
 
 
-_PCT_SPAN = re.compile(r'<span style="color:(%s|%s);([^"]*)">([^<]*%%[^<]*)</span>' % (UP, DOWN))
 
 
 def _bold_pct(html):
-    """강조 카드 문장 안 증감 색 `+1.5%` · `−0.5%` · `+0.7%p` 를 굵게 (2026-11-02 사용자 P279: 색만 있고 보통 굵기라 눈에 덜 띈다)."""
-    return _PCT_SPAN.sub(lambda m: f'<span style="color:{m.group(1)};font-weight:700;{m.group(2)}">{m.group(3)}</span>', html)
+    """문장 안 증감 숫자 굵게 (P279) — 공용 design_kit.bold_pct."""
+    return _dk.bold_pct(html)
 
 
 def _plain_note(text):
@@ -2557,13 +2553,12 @@ ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" ar
 FOLD_LEFT = _dk.FOLD_LEFT + 8   # 접기 버튼 왼쪽 여백 4 → 12 (2026-10-14 사용자: "접기 버튼 좌측 여백 8픽셀 추가", 엔비디아)
 
 
-FOLD_HUE = {"#FEE6CA": "#F97316", "#D6E8FE": "#2563EB", "#E8E4FE": "#7C3AED"}   # 강조 카드 테두리 → 테마 색(주황 · 파랑 · 보라). 회색(중립)은 없음 = 검정 그대로
+FOLD_HUE = _dk.FOLD_HUE   # 공용 값
 
 
 def _fold_btn(bg="#fff", bd="#E2E8F0"):
-    """강조 카드 접기 버튼 — 화살표 색 = 검정에 카드 테마 색 20% (2026-10-31 사용자 P187: 거의 검정, 색감만 살짝). 중립 · 흰 카드는 검정 그대로."""
-    hue = FOLD_HUE.get(bd.upper())
-    return _dk.fold_btn(bg, bd, _dk.mix("#111111", hue, 0.2) if hue else "#111").replace(f"margin-left:{_dk.FOLD_LEFT}px;", f"margin-left:{FOLD_LEFT}px;")
+    """강조 카드 접기 버튼 (P187) — 공용 design_kit.emph_fold_btn."""
+    return _dk.emph_fold_btn(bg, bd, FOLD_LEFT)
 
 
 ACC_BTN = _fold_btn()   # 네모 박스 안 화살표 버튼 (2026-10-11 사용자) = 공식 접기 버튼, 28 → 31px (2026-10-13 사용자, 가이드라인 10-6)
@@ -2640,7 +2635,7 @@ def _ccard(rows, left=None):
 def _card_title(t, tip=""):
     """카드 위 카드 제목 — 굵게 · 검정 · 위쪽 여백 25px · 아래 8px (3 → 8, 2026-10-26 사용자: 카드 위 타이틀 아래 +5px, 모든 페이지). 설명은 툴팁 안으로.
     data-sub 를 붙이지 않는다 — 테마 탭이 서브탭으로 읽는 표시라 오늘 탭에 서브탭이 생길 수 있다."""
-    return (f'<div style="font-size:{_dk.EMPH_NAME};line-height:{LH_CARD};font-weight:700;color:#111;margin:25px 0 8px;">'
+    return (f'<div style="font-size:{_dk.EMPH_NAME};line-height:29px;font-weight:700;color:#111;margin:24px 0 10px;">'   # 묶음 제목(group_title)과 같은 19/29 · 위 24 · 아래 10 (2026-11-07 0절: 옛 19/24 · 25 · 8 은 홀짝 어긋남)
             f'{_paren(_esc(t))}{_tipx(tip) if tip else ""}</div>')
 
 

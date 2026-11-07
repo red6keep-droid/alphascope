@@ -746,8 +746,9 @@ def _monthly_card(title, state, color, lines, sec_html, opened=False, charts_arg
     charts_extra = list(charts_arg)
     bd_row = _dk.darken(_dk.lighten(_dk.lighten(C.CARD_DIR["neutral"][1]), 0.3), 0.02)   # 질문 카드 줄 구분선과 같은 색
     pad = f"padding:{RK.PAD}px 12px;line-height:{R.LH_CARD};"
-    rows = (rows.replace(pad + R.MULTI_SEP, f"padding:10px 0;line-height:{R.LH_CARD};border-top:1px solid {bd_row};")
-                .replace(pad + '"', f'padding:10px 0;line-height:{R.LH_CARD};border-top:1px solid {bd_row};"')
+    rl = f"font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};"   # 근거 줄 18/30 — 종목 페이지 강조 카드 근거 줄과 같게 (2026-11-07 0-2, 옛 19/24 홀짝 어긋남)
+    rows = (rows.replace(pad + R.MULTI_SEP, f"padding:10px 0;{rl}border-top:1px solid {bd_row};")
+                .replace(pad + '"', f'padding:10px 0;{rl}border-top:1px solid {bd_row};"')
                 .replace(f"color:#111;font-weight:700;font-size:{_dk.NAME};", "color:#111;font-weight:400;"))   # 줄 이름 = 질문 카드 줄과 같게(보통 굵기 · 카드 글자)
     # 순서 = 질문 → 답 → 설명 문장 → 그래프 → 보조 수치 줄 (2026-10-29 사용자 M59 — 옛 순서는 수치 줄이 그래프보다 먼저)
     out = list(lines) + [(c, "html") for c in charts_extra] + ([] if drop_sec_charts else [(_chart_white(c), "html") for c in charts])
