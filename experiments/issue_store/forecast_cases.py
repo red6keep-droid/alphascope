@@ -887,7 +887,7 @@ def build():
             if t == "C":
                 head += '<div><span class="k">주의</span>개별 종목 방향 전망은 공개 여부 미정 — 기획(데이터-기록-계획 3부 10-2)은 종목 방향을 공개하지 않는 것으로 정해 두었다(법 기준). 목업으로만 본다.</div>'
             ex = (f'<details class="fc-det fc-ex" open><summary>{t}-{k} · {T["name"]} · {dk.esc(n)} <span class="fc-chev">▾</span></summary><div class="body">' + head
-                  + "".join(f'<div><span class="k">{dk.esc(a)}</span>{_re.sub(r"`([^`]+)`", r"‘\1’", dk.esc(b))}</div>' for a, b in expl)
+                  + "".join('<div><span class="k">' + dk.esc(a) + '</span>' + _re.sub(r"`([^`]+)`", r"‘\1’", dk.esc(b)) + '</div>' for a, b in expl)
                   + '<button type="button" class="fc-fold" onclick="this.closest(\'details\').removeAttribute(\'open\')">접기</button></div></details>')
             body = "".join((f'<div class="fc-sub">{dk.esc(s)}</div>' if i else "") + h for i, (s, h) in enumerate(pages))
             panes.append(f'<div data-pane="{t}{k}" hidden>{ex}{body}</div>')
