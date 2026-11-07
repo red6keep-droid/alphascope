@@ -303,6 +303,16 @@ def _paragraphs(text):
     return paras
 
 
+def _text_flow(text):
+    """한 문단으로 이어 쓰기 — 문단 · 문장 나눔 없이 PC · 모바일 같게, 줄바꿈은 띄어쓰기에서만 (2026-11-07 사용자 P391: 오늘 탭 지수 해설).
+    data-sent 를 달지 않는다(테마 CSS 가 PC 에서 문장마다 줄을 바꾸는 표시)."""
+    sents = [x for p in _paragraphs(text) for x in p]
+    if not sents:
+        return ""
+    return (f'<div style="margin:0 0 6px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;">'
+            + " ".join(dk.tint(_esc(dk.ko(x, TERM_KO))) for x in sents) + "</div>")
+
+
 def _text(text):
     """Gemini 문구 — 문장마다 한 줄, 문단 사이 빈 줄 하나(PARA_GAP), 영어 용어는 한국어로. 비어 있으면 ⓘ 안내."""
     paras = _paragraphs(text)
@@ -396,8 +406,9 @@ def sec_seo_lead(input_data, analysis):
         sents.append(k)
     if not sents:
         return ""
-    return (f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">'
-            + dk._tint_inline(_esc(" ".join(sents))) + "</p>")   # 요약 문장의 증감도 색 (가이드라인 3-3-1, 예외 없음) — 문장이라 숫자(와 앞 지수 이름)만 칠한다. dk.tint 는 가운뎃점 덩어리 통째로 칠해 문장 앞머리까지 파랗게 된다
+    html = dk.bold_pct(dk._tint_inline(_esc(" ".join(sents))))   # 증감 숫자 굵게 (2026-11-07 사용자 P390)
+    html = re.sub(r"(평소의 [0-9.]+배|평소 하루 움직임의 범위를 벗어났습니다)", r'<span style="font-weight:700;">\1</span>', html)   # 배수 · `범위를 벗어났습니다` 굵게 (같은 날)
+    return f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">' + html + "</p>"   # 요약 문장의 증감도 색 (가이드라인 3-3-1, 예외 없음) — 문장이라 숫자(와 앞 지수 이름)만 칠한다. dk.tint 는 가운뎃점 덩어리 통째로 칠해 문장 앞머리까지 파랗게 된다
 
 
 def sec_lead(report, analysis):
@@ -780,7 +791,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
         sx.split_chart(a),
         sec_indices(indices, analysis, report, with_text=False),
         sec_lead(report, analysis),
-        _text(report.get("summary")),
+        _text_flow(report.get("summary")),   # 한 문단 이어 쓰기 (P391)
     ]
     # 오늘 탭 = 옛 시장 탭 카드까지 한 곳에 (2026-11-07 사용자: "시장 탭을 오늘 탭으로 다 옮기자" — 시장 탭은 없앰). 맨 첫 카드만 펼침
     # 세 덩어리 (같은 날 P384): ① 주요 지수 = 같은 지수를 근거로 쓰는 것(지수 값 → 평소와 달랐나 → 충격 → 흐름 → 기술주 · 소형주)

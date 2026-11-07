@@ -259,11 +259,8 @@ def rs_card(a, prev):
     elif streak == 0:
         first += " 오늘은 나스닥 100이 S&P 500을 웃돌지 못했습니다."
     lines = [(first, "plain")]
-    if q is not None:
-        lines.append(("row", "나스닥 100 − S&P 500", dk.arrow(q, 2, "%p"), "5거래일" + (f" · 어제 {_s(prs['qqq_spy_5d'])}p" if prs.get("qqq_spy_5d") is not None else "")))
-    if i is not None:
-        lines.append(("row", "러셀 2000 − S&P 500", dk.arrow(i, 2, "%p"), "5거래일" + (f" · 어제 {_s(prs['iwm_spy_5d'])}p" if prs.get("iwm_spy_5d") is not None else "")))
-    if streak is not None:
+    # 나스닥 100 · 러셀 2000 − S&P 500 줄은 뺐다 — 지수별 5거래일 S&P 500 대비는 `지수 기술지표의 방향은?` 카드 라벨 안 (2026-11-07 사용자 P392). 문장에 같은 숫자가 있다
+    if streak:   # 0일이면 줄을 뺀다 — 문장이 `웃돌지 못했습니다` 로 말한다 (2026-11-07)
         lines.append(("row", "나스닥 100이 앞선 날", f"{int(streak)}일 연속", ""))
     won = [w for k, w in (("qqq_spy_5d", "기술주"), ("iwm_spy_5d", "소형주")) if (rs.get(k) or 0) > 0]
     tip = ("최근 5거래일 동안 나스닥 100(기술주) · 러셀 2000(소형주)이 S&P 500(시장 전체)보다 더 강했는지 견준 것\n"
@@ -296,16 +293,7 @@ def flow_card(a):
     ma = lambda n, up: f'<span style="color:{UP if up else DOWN};">{n}일선 {"위" if up else "아래"}</span>'  # noqa: E731
     lines = [(first, "plain"),
              ("row", "S&P 500 추세", f'<span style="display:inline-block;text-align:right;">{ma(20, a20)}<br>{ma(50, a50)}</span>', "최근 20 · 50거래일 평균 가격과 비교")]
-    for key, sym, name in INDEX_ROWS:
-        p, s = pos.get(key) or {}, se.get(sym) or {}
-        if p.get("from_high_pct") is None:
-            continue
-        note = [f"고점 {_s(p['from_high_pct'])}"]
-        if p.get("from_low_pct") is not None:
-            note.append(f"저점 {_s(p['from_low_pct'])}")
-        if s.get("up_days_20") is not None:
-            note.append(f"20일 중 상승 {s['up_days_20']}")
-        lines.append(("row", f"{name} 20일 위치", pos_label(p.get("position_label")) or "—", " · ".join(note)))
+    # 지수별 `20일 위치` 줄은 `지수 기술지표의 방향은?` 카드 라벨 안으로 옮겼다 (2026-11-07 사용자 P392: 지수 수치를 한 카드에)
     tip = ("S&P 500이 평균 가격선(최근 20 · 50거래일) 위에 있는지와, 최근 한 달 고점 · 저점 사이에서 지금 어디쯤인지\n"
            f"· 오늘 {state} : 20일선 {'위' if a20 else '아래'}, 50일선 {'위' if a50 else '아래'}"
            "\n· 20일 위치 : 고점과 1% 안이면 고점 부근, 저점과 1% 안이면 저점 부근, 그 사이는 박스 중간. 고점 부근이면서 한 달에 5% 넘게 오르면 과열 주의")
@@ -434,7 +422,7 @@ def index_cards(a, prev):
     """오늘 탭 첫 덩어리(주요 지수 아래) — 같은 지수를 근거로 쓰는 카드: 흐름(20 · 50일) → 기술주 · 소형주(5거래일) (2026-11-07 사용자 P384).
     `오늘 움직임은 평소와 달랐나?`(sections.normal_card) · 충격 카드는 render_html 이 이 앞에 둔다."""
     a = a or {}
-    return "".join(x for x in (flow_card(a), rs_card(a, prev)) if x)
+    return "".join(x for x in (flow_card(a), rs_card(a, prev), index_tech_card(a, prev)) if x)   # 지수 기술지표 카드 = 덩어리 끝 (P392)
 
 
 def move_cards(a, prev):
@@ -447,3 +435,59 @@ def base_cards(a, macro):
     """셋째 덩어리 — 시장 바탕: 긴장 → 금리 → 경제."""
     a, macro = a or {}, macro or {}
     return "".join(x for x in (vix_card(a), rates_card(a, macro), economy_card(macro)) if x)
+
+
+IDX_POS = {"^GSPC": "sp500", "^IXIC": "nasdaq", "^DJI": "dow", "^RUT": "russell"}   # analysis.position 키
+
+
+def index_tech_card(a, prev):
+    """지수 기술지표의 방향은? — 지수 4개(S&P 500 · 나스닥 · 다우 · 러셀 2000) 라벨을 눌러 바꿔 보는 한 카드 (2026-11-07 사용자 P392).
+    라벨 안 = ① 오늘 · 흐름(오늘 등락 · 평소 배수 · 20 · 50일선 · 20일 위치 · 5거래일 S&P 500 대비 — `평소와 달랐나?` · `시장 흐름` · `기술주 · 소형주` 카드의 지수 숫자를 여기로)
+    ② 종목 페이지 `기술지표의 방향은?` 과 같은 게이지 · 지표 · 이동평균(tech_signals.card). 답 · 카드 색 = S&P 500 전체 요약. 라벨 전환은 글 안 짧은 스크립트(테마 붙여넣기 없음).
+    정보 전달만 — 지수 기술지표 판정은 검증한 적 없다(가이드라인 1절 4-2)."""
+    import tech_signals as TS
+    tx = a.get("tech_idx") or {}
+    keys = [k for k in ("^GSPC", "^IXIC", "^DJI", "^RUT") if k in tx]
+    if not keys:
+        return ""
+    nr, se, pos = a.get("normal") or {}, a.get("series") or {}, a.get("position") or {}
+    head = tx[keys[0]]
+    theme, ink = TS.theme(head["net"], UP, DOWN, MUTED)
+    line_col = dk.darken(dk.lighten(dk.lighten(dk.CARD_DIR[theme][1]), 0.3), 0.02)
+    spx5 = (se.get("^GSPC") or {}).get("ret_5d")
+    panels = []
+    for n, k in enumerate(keys):
+        rows = []
+        if k in nr:
+            x = nr[k]
+            rows.append(f'<span>오늘 <span style="font-size:{TS.WHY_FS};color:#6B7280;">평소 ±{x["sigma_pct"]:.2f}% · {sx._times(x["z"])}</span></span><b>{dk.arrow(x["ret_pct"])}</b>')
+        s_ = se.get(k) or {}
+        if s_.get("above_ma20") is not None and s_.get("above_ma50") is not None:
+            w = lambda d, up: f'<span style="color:{UP if up else DOWN};">{d}일선 {"위" if up else "아래"}</span>'  # noqa: E731
+            rows.append(f'<span>평균 가격선</span><b>{w(20, s_["above_ma20"])} · {w(50, s_["above_ma50"])}</b>')
+        p = pos.get(IDX_POS[k]) or {}
+        if p.get("from_high_pct") is not None:
+            note = f"고점 {_s(p['from_high_pct'])}" + (f" · 저점 {_s(p['from_low_pct'])}" if p.get("from_low_pct") is not None else "")
+            rows.append(f'<span>20일 위치 <span style="font-size:{TS.WHY_FS};color:#6B7280;">{dk.tint(C.esc(note))}</span></span><b>{pos_label(p.get("position_label")) or "—"}</b>')
+        if k != "^GSPC" and spx5 is not None and s_.get("ret_5d") is not None:
+            rows.append(f'<span>S&amp;P 500 대비 <span style="font-size:{TS.WHY_FS};color:#6B7280;">5거래일</span></span><b>{dk.arrow(round(s_["ret_5d"] - spx5, 2), 2, "%p")}</b>')
+        lines, _ = TS.card(tx[k], sx.INDEX_NAME[k], UP, DOWN, MUTED)
+        body = (TS._sub("오늘 · 흐름") + TS._table(rows, line_col) if rows else "") + "".join(f'<div style="margin:0 0 12px;">{h}</div>' for h, _k in lines)
+        panels.append(f'<div data-ixp="{n}"{"" if n == 0 else " hidden"}>{body}</div>')
+    last = len(keys) - 1
+    def chip(i, k):
+        on = i == 0
+        return (f'<button type="button" data-ixc="{i}" aria-pressed="{"true" if on else "false"}" style="flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;font:inherit;'
+                f'font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;border:1px solid #E2E8F0;{"border-left:0;" if i else ""}'
+                f'border-radius:{"7px" if i == 0 else "0"} {"7px" if i == last else "0"} {"7px" if i == last else "0"} {"7px" if i == 0 else "0"};'
+                f'color:{"#111" if on else "#4B5563"};font-weight:{700 if on else 400};">{C.esc(sx.INDEX_NAME[k])}</button>')
+    chips = (f'<div data-ix-chips="1" style="display:flex;overflow-x:auto;margin:6px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
+             + "".join(chip(i, k) for i, k in enumerate(keys)) + "</div>")
+    js = ("<script>(function(){var s=document.currentScript,b=s&&s.parentNode;if(!b)return;var cs=b.querySelectorAll('[data-ixc]'),ps=b.querySelectorAll('[data-ixp]');"
+          "[].forEach.call(cs,function(c){c.addEventListener('click',function(){var i=c.getAttribute('data-ixc');"
+          "[].forEach.call(cs,function(x){var on=x===c;x.setAttribute('aria-pressed',on?'true':'false');x.style.color=on?'#111':'#4B5563';x.style.fontWeight=on?'700':'400';});"
+          "[].forEach.call(ps,function(p){p.hidden=p.getAttribute('data-ixp')!==i;});});});})();</script>")
+    html = f'<div data-ix-tech="1">{chips}{"".join(panels)}{js}</div>'
+    tip = ("지수 4개의 오늘 움직임 · 평균 가격선 · 최근 한 달 자리와, 종목 페이지와 같은 기술지표 11개 · 이동평균 12개가 가리키는 방향. 라벨을 누르면 그 지수로 바뀝니다. 답은 S&P 500 기준\n"
+           f"· 오늘 S&P 500 {head['word']} : 상승 − 하락을 전체로 나눈 값이 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락")
+    return C.question_card("지수 기술지표의 방향은?", head["word"], theme, ink, [(html, "html")], tip=dk.with_src(tip, SRC_PRICE))

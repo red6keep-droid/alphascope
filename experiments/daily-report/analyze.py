@@ -123,6 +123,22 @@ def day_split(raw_series):
     return out
 
 
+def index_tech(raw_series):
+    """지수 4개 일봉(시가 · 고가 · 저가 · 종가) → tech_signals.compute (종목 페이지와 같은 지표 · 이동평균). 고가 · 저가가 없으면 그 지수는 뺀다."""
+    import tech_signals
+    out = {}
+    for sym in SPLIT_SYMBOLS:
+        rec = raw_series.get(sym) or {}
+        c, h, l, o = rec.get("close") or [], rec.get("high") or [], rec.get("low") or [], rec.get("open") or []
+        if not c or len(h) != len(c) or len(l) != len(c):
+            continue
+        bars = [{"day": d, "open": o[i] if i < len(o) else None, "high": h[i], "low": l[i], "close": c[i]} for i, d in enumerate(rec.get("dates") or [])]
+        sig = tech_signals.compute(bars)
+        if sig:
+            out[sym] = sig
+    return out
+
+
 def series_stats(close):
     """B-1 · B-2. close는 오래된 것 → 최신 순."""
     ma20 = _ma(close, 20)
@@ -547,7 +563,8 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
     closes = {sym: rec["close"] for sym, rec in (prices.get("series") or {}).items() if rec.get("close")}
 
     series = {sym: series_stats(c) for sym, c in closes.items()}
-    split = day_split(prices.get("series") or {})   # 지수 4개 하루 = 시가 갭 + 장중 (2026-11-07 사용자: 한국 증시 리포트처럼)
+    split = day_split(prices.get("series") or {})
+    tech_idx = index_tech(prices.get("series") or {})   # 지수 4개 기술지표 — 종목 페이지 `기술지표의 방향은?` 과 같은 계산 (2026-11-07 사용자 P392)   # 지수 4개 하루 = 시가 갭 + 장중 (2026-11-07 사용자: 한국 증시 리포트처럼)
 
     position = {}
     for key, sym in INDEX_SYMBOL.items():
@@ -623,6 +640,7 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "symbols": symbols,
         "raw": raw,
         "split": split,
+        "tech_idx": tech_idx,
     }
     # 재설계 계산 (2026-10-18, doc/기획/데일리-리포트-기획.md 6절) — 평소 범위 · 충격 · 한국 연결 · 환율 · 일정
     dates = {sym: rec["dates"] for sym, rec in (prices.get("series") or {}).items() if rec.get("close") and rec.get("dates")}   # 환율 그래프 가로축 (batch 8 ⑭)

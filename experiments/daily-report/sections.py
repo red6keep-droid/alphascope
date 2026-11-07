@@ -83,9 +83,7 @@ def normal_card(a, opened=True):
     groups = [(INDEX_SHORT[k], [nr[k]["ret_pct"], nr[k]["sigma_pct"] if nr[k]["ret_pct"] >= 0 else -nr[k]["sigma_pct"]]) for k in keys]
     lines.append((C.chart_card("오늘 움직임과 평소 하루 크기 (%)", groups, [C.sign_bg, C.gray], [C.sign_fg, C.note_fg],
                                [("오늘", C.sign_bg(sp["ret_pct"] if sp else 1)), ("평소 하루 크기", C.GRAY_BAR)]), "html"))
-    for k in keys:
-        n = nr[k]
-        lines.append(("row", INDEX_NAME[k], _s(n["ret_pct"]), f"평소 ±{n['sigma_pct']:.2f}% · {_times(n['z'])}"))
+    # 지수별 줄(오늘 · 평소 ± · 배수)은 `지수 기술지표의 방향은?` 카드 라벨 안으로 (2026-11-07 사용자 P392)
     tip = ("하루 움직임이 그 지수의 평소 크기 안이었는지. 평소 크기는 최근 움직임에 무게를 더 둔 표준편차이고, 2배를 넘으면 평소 밖으로 봅니다"
            + (f"\n· 오늘 S&P 500 {_s(sp['ret_pct'])} : 평소의 {_times(sp['z'])}, 지난 1년 중 이만큼 이상 움직인 날 {sp['n_year']}번" if sp else ""))
     return C.question_card("오늘 움직임은 평소와 달랐나?", state, theme, ink, lines, tip=tip, opened=opened)
@@ -164,7 +162,7 @@ def seo_korea(a):
     if b in ("up", "down") and rec and _decade_check(rec) is not None:
         word = "오른" if b == "up" else "내린"
         return (f"S&P 500이 평소의 {_times(ks['us_z'])}로 크게 {word} 밤이었고, {since}년 이후 이런 밤 다음 날 코스피는 평균 {_s(rec['gap'])}로 시작했습니다.")
-    return (f"S&P 500 움직임은 평소의 {_times(ks['us_z'])}였고, {since}년 이후 기록에서 미국 밤사이 움직임은 다음 날 코스피 시작 가격에 절반가량 미리 반영됐습니다.")
+    return f"S&P 500 움직임은 평소의 {_times(ks['us_z'])}였습니다."   # 뒤 `2000년 이후 … 절반가량 미리 반영됐습니다` 삭제 — 날마다 같은 안내 (2026-11-07 사용자 P390)
 
 
 def korea_open_card(a, opened=True):
