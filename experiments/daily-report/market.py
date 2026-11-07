@@ -544,9 +544,11 @@ def mood_card(a, prev):
         lo, hi = m["low_1y"], m["high_1y"]
         at = lambda v: (v - lo) / (hi - lo) * 100  # noqa: E731
         f0 = lambda v: f"{v:,.0f}"  # noqa: E731
-        avg_marks = [(f"200일 평균 {f0(m['ma200'])} ({_s(m['pct_vs_ma200'], 1)})", at(m["ma200"]))]   # 눈금은 200일 평균만 — 20 · 50일은 넣었다가 뺐다 (2026-11-07 사용자)
+        avg_marks = [("", at(m["ma200"]))]   # 눈금은 200일 평균만(20 · 50일은 넣었다가 뺐다) · 눈금 글자 `200일 평균 7,325` 삭제 (2026-11-07 사용자)
+        hd = m.get("high_days")
+        legend = "최고가 대비" + ("" if hd is None else " (오늘)" if hd <= 0 else f" ({hd}거래일 전)")   # 종목 페이지 `가격 범위 (1년)` 과 같은 머리 (같은 날 사용자)
         # 제목에서 `(1년)` 뺌 — 범례 `1년 최고 대비` 와 겹친다 · 최고가 며칠 전인지 · 툴팁 없음 (2026-11-07 사용자: 정보 과잉)
-        lines.append((C.range_gauge(lo, hi, at(m["last"]), m["pct_from_high"], f0, "", "S&P 500 가격 범위", "1년 최고 대비", "1년 최고 근처",
+        lines.append((C.range_gauge(lo, hi, at(m["last"]), m["pct_from_high"], f0, "", "가격 범위 (1년)", legend, "최고가 근처",
                                     marks=avg_marks), "html"))
     parts = [x for x in (sx.normal_card(a, parts=True), flow_card(a, parts=True), rs_card(a, prev, parts=True)) if x]
     for k, (q, st, _th, ik, ls, _tp) in enumerate(parts):   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄

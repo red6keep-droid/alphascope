@@ -227,7 +227,7 @@ def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near
             f'<span style="white-space:nowrap;">최저 {fmt(low)}</span><span style="white-space:nowrap;">최고 {fmt(high)}</span></span>')
     # 눈금 글자 = 막대 아래 줄. 가까운 눈금(14% 안)은 한 덩어리 `20일 평균 7,658 · 50일 평균 7,679` (target_gauge 와 같게), 그래도 글자가 겹치면 다음 줄로
     groups = []
-    for t, p in sorted(marks or [], key=lambda x: x[1]):
+    for t, p in sorted(((t, p) for t, p in (marks or []) if t), key=lambda x: x[1]):   # 글자 없는 눈금은 막대 위 선만 (2026-11-07 사용자: 200일 평균 글자 삭제)
         p = max(0.0, min(100.0, p))
         if groups and p - groups[-1][2] < 14:
             groups[-1] = (groups[-1][0] + " · " + t, (groups[-1][1] * groups[-1][3] + p) / (groups[-1][3] + 1), p, groups[-1][3] + 1)

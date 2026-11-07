@@ -619,8 +619,8 @@ def year_range_in(y, money, tip, high_days=None):
     text = "최고가 근처" if near else f"{pct:.1f}%".replace("-", "−")   # 말풍선은 % 만 — `최고가 대비` 는 제목 줄 오른쪽 범례 글씨 (2026-10-27 사용자)
     col, dot = ("#64748B", "#64748B") if near else (_dk.lighten(DOWN, 0.2), DOWN)
     head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
-            f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{_paren(_esc("가격 범위 (1년)"))}{_tipx(tip)}</span>'
-            f'<span style="flex:none;font-size:{MICRO};color:{NOTE};white-space:nowrap;">최고가 대비</span></span>')   # 범례 글씨 크기 (2026-10-27 사용자)
+            f'<span style="font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}{_paren(_esc("가격 범위 (1년)"))}</span>'   # 툴팁 삭제 (2026-11-07 사용자: 미국 증시 리포트와 같게)
+            f'<span style="flex:none;font-size:{MICRO};color:{NOTE};white-space:nowrap;">최고가 대비{_high_ago(high_days)}</span></span>')   # 범례 글씨 크기 (2026-10-27) · `(N거래일 전)` 은 최고 글자 옆에서 범례 뒤로 (2026-11-07 사용자)
     at = f"clamp({GAUGE_INSET}px, {pos:.1f}%, calc(100% - {GAUGE_INSET}px))"
     bar = (f'<span style="position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:3px;background:#E2E8F0;">'
            f'<span style="position:absolute;left:0;top:0;bottom:0;width:{at};border-radius:3px;background:#BFDBFE;"></span></span>')
@@ -628,7 +628,7 @@ def year_range_in(y, money, tip, high_days=None):
     gauge = (f'<span data-range-gauge="1" aria-label="{aria}" style="position:relative;display:block;height:{GAUGE_H}px;">'
              f'{_gauge_tip(pos, text, col, dot, BUBBLE_W_STRONG)}{bar}</span>')   # 한 단계 굵게 (P184)
     ends = (f'<span style="display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:{TINY};line-height:20px;color:{NOTE};">'
-            f'<span style="white-space:nowrap;">최저 {money(y["low"])}</span><span style="white-space:nowrap;">최고 {money(y["high"])}{_high_ago(high_days)}</span></span>')
+            f'<span style="white-space:nowrap;">최저 {money(y["low"])}</span><span style="white-space:nowrap;">최고 {money(y["high"])}</span></span>')
     # 최저 · 최고는 줄바꿈 금지 — 가운데 `(오늘 …)` 는 뺐다(머리 줄에 오늘 가격, 2026-10-26). 카드 안 아래 = 좌우 12 보이는 거리(P32 와 같게)
     card = f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.SEP_GAP - _dk.VP - 1}px 12px {12 - 3}px;">{gauge}{ends}</span></span>'
     return ("white", f'<span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;">{head}</span>{card}')
