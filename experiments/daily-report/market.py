@@ -532,11 +532,7 @@ def mood_card(a, prev):
     ph = m["pct_from_high"]
     where = "1년 최고가 근처" if ph > -0.5 else f"1년 최고가보다 {abs(ph):.1f}% 아래"
     first = f"1년 고점과 200일 평균으로 보면 S&P 500은 {where}이고, 200일 평균 가격보다 {'위' if m['above_ma200'] else '아래'}에 있습니다."   # 첫 문장 괄호 설명 금지 (7-1)
-    spy = (a.get("series") or {}).get("^GSPC") or {}   # 지수 기준 (같은 날)
-    a20, a50 = spy.get("above_ma20"), spy.get("above_ma50")
-    if a20 is not None and a50 is not None:   # 짧은 흐름 한 문장 — 답(긴 흐름)과 안쪽 `지금 시장 흐름은?`(짧은 흐름)이 반대로 보이는 날을 위해 (2026-11-07 사용자)
-        short = ("둘 다 위" if a20 and a50 else "둘 다 아래" if not a20 and not a50 else ("20일 평균 아래, 50일 평균 위" if not a20 else "20일 평균 위, 50일 평균 아래"))
-        first += f" 20일 · 50일 평균 가격과 견주면 {short}입니다."
+    # 20일 · 50일 평균 문장은 뺐다 — 바로 아래 `최근 흐름` 묶음이 같은 말을 한다 (2026-11-07 사용자: 반복)
     if m["regime"] == "불안 국면" and m.get("vix") is not None:
         first += f" 변동성 지수(VIX)가 {m['vix']:.1f}로 {m['vix_high']:.0f}을 넘었습니다."
     lines = [(first, "plain")]
