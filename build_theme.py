@@ -120,12 +120,12 @@ BLOGGER_CSS = """
 .blog-pager { display: flex; justify-content: center; gap: 12px; padding-top: 4px; }
 /* 글 더 보기 — 목록 버튼과 같은 검은 테마 버튼, 가로 30% 넓게 (2026-10-13 사용자: "모든 하단 버튼은 블랙 테마 버튼") */
 .blog-pager a {
-  padding: 12px 42px;
+  padding: 9px 42px;   /* 글 아래 `목록` 버튼과 같은 크기 14px · 9 42 (2026-11-07 가이드라인 10절) */
   background: #111;
   border: 1px solid #111;
   border-radius: 8px;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 14px;
+  line-height: 20px;
   font-weight: 700;
   color: #fff;
 }
@@ -152,7 +152,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
   margin: 0 0 10px;
   font-weight: 700;
   font-size: 35px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") */
-  line-height: 48px;
+  line-height: 49px;   /* 홀짝 — 줄 높이 − 글자 = 짝수 (2026-11-07 가이드라인 3절) */
   letter-spacing: -.6px;
   color: var(--ink);
 }
@@ -168,7 +168,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
 .post-card-title a:has(.post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
 .post-card-title .post-title-date { margin-left: auto; }
-.post-title .post-title-date { font-size: 14px; }
+.post-title .post-title-date { font-size: 14px; line-height: 20px; }   /* 제목 행간(49 · 37 · 33)을 물려받으면 홀짝이 어긋난다 (2026-11-07) */
 .post-title-sub { font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; margin-left: 9px; }   /* 종목 제목 꼬리 `주가 실적 일정` — 숨기지 않고 작게만 (2026-10-27 사용자 P20) · 14px = `넘겨 보기` 와 같게 (P29) */
 /* 이름 ~ 꼬리 사이 = 띄어쓰기의 1.5배(실측 5.7 · 5.1 · 4.6px → 9 · 8 · 7px), 꼬리는 이름 줄의 세로 가운데 (2026-10-27 사용자 P21). 칸이 flex 라 띄어쓰기는 접히고 여백만 남는다 */
 .post-title-label:has(> .post-title-sub) { display: flex; flex-wrap: wrap; align-items: center; }
@@ -223,14 +223,15 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .post-body [data-tip] { outline: none; cursor: pointer; }
 .post-body [data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 50%; }
 .rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.45); }
+html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업이 열린 동안 뒤 본문이 스크롤되지 않게 (2026-11-07 사용자 P350) */
 .rt-pop[hidden] { display: none; }
 .rt-pop-box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
 /* 팝업 제목 · 닫기는 위에 고정, 내용만 스크롤 (2026-10-13 사용자) */
 .rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; }
 .rt-pop-head::after { content: ""; position: absolute; left: 20px; right: 12px; bottom: 0; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색 (2026-10-18 사용자). 폭은 제목 왼쪽 선(20px) ~ 닫기 버튼 오른쪽 선(12px)까지 (같은 날 사용자) */
 .rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
-.rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 24px; color: #111; }
-.rt-pop-body { font-size: 19px; font-weight: 400; line-height: 35px; color: #333; word-break: keep-all; }
+.rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 25px; color: #111; word-break: keep-all; overflow-wrap: anywhere; }   /* 줄바꿈 = 띄어쓰기 기준 (2026-11-07 사용자 P375) */
+.rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 35px; color: #333; word-break: keep-all; }
 /* 툴팁 내용 행간 = 본문 35px(2026-11-06 34 → 35, 19/35 홀짝 맞춤) (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
 .rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; padding-left: 8px; }   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
 .rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
@@ -244,8 +245,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .news-pop-body { font-size: 16px; line-height: 26px; }
 .post-body [data-news-chips] { scrollbar-width: none; }
 .post-body [data-news-chips]::-webkit-scrollbar { display: none; }
-.post-body [data-chip][aria-pressed="true"] { background: #111 !important; border-color: #111 !important; color: #fff !important; }
-.post-body [data-chip][aria-pressed="true"] span { color: #CBD5E1 !important; }
+.post-body [data-chip][aria-pressed="true"] { color: #111 !important; font-weight: 700 !important; box-shadow: inset 0 0 0 1px #111; }   /* !important — 버튼 인라인 font:inherit 이 굵기를 덮었다 (2026-11-07 사용자 P344) */   /* 분야 탭 선택 = 홈 테마 종목 묶음 탭과 같게: 굵은 검정 + 1px 검정 외곽선 (2026-11-07 사용자 P332, 옛 검정 알약) */
 .post-body [data-news-more] .acc-chev { transition: transform .2s; }
 /* 그래프 확대 팝업 (2026-10-16 사용자) — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
 .img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); cursor: pointer; }   /* cursor:pointer — 아이폰은 누를 수 있는 모양이 없는 요소의 탭을 click 으로 올리지 않아 바깥 탭이 두 번째에야 닫혔다 (2026-10-21 사용자) */
@@ -301,7 +301,7 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
-.post-body .rt-subtab { flex: none; padding: 6px 11px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
+.post-body .rt-subtab { flex: none; padding: 6px 11px; font: inherit; font-size: 19px; line-height: 25px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
 /* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.
    data-grid=2 (C 카드 줄 묶음) → 2열 그리드 + 짝수 칸 왼쪽 세로 구분선. 둘째 칸의 인라인 border-top 은 지운다(첫 줄에 선이 생기지 않게).
@@ -318,14 +318,14 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
 /* 전환 버튼 (data-switch, 당일 · 5일 그래프): 회색 바탕 알약 둘, 선택은 흰 바탕 · 검정 굵게 (2026-10-11) */
 .post-body .rt-segs { display: inline-flex; gap: 2px; padding: 3px; margin: 4px 0 8px; background: #F1F5F9; border-radius: 8px; }
 .post-body .rt-segs[hidden] { display: none; }
-.post-body .rt-seg { padding: 6px 15px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
+.post-body .rt-seg { padding: 6px 15px; font: inherit; font-size: 19px; line-height: 25px; font-weight: 400; color: #6B7280; background: none; border: 0; border-radius: 6px; cursor: pointer; }
 .post-body .rt-seg[aria-pressed="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .post-body [data-switch-panel][hidden], .post-body [data-hz-panel][hidden] { display: none; }
 .post-body .rt-segs--in-sub { margin: 0 0 4px auto; flex: none; }
 /* 하위탭 (부정 발언 · 긍정 발언 · 전체): 서브탭보다 한 단계 아래 — 16px, 밑줄 2px 검정, 줄 아래 선 없음. 표본이 모자란 탭은 흐리게 (2026-10-11) */
 .post-body .rt-dirs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 0 8px; }
 .post-body .rt-dirs[hidden] { display: none; }
-.post-body .rt-dir { flex: none; padding: 4px 9px; font: inherit; font-size: 19px; line-height: 24px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
+.post-body .rt-dir { flex: none; padding: 4px 9px; font: inherit; font-size: 19px; line-height: 25px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
 .post-body .rt-dir[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: #111; }
 .post-body .rt-dir[data-empty] { color: #CBD5E1; }
 /* E 2열 카드는 폰에서도 2열 (2026-10-12 사용자: "왜 2열로 적용 안 했냐") — 예전의 폰 한 칸 쌓기 규칙 삭제.
@@ -373,6 +373,7 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
   border: 1px solid #111;
   border-radius: 8px;
   font-size: 14px;   /* 16 → 14 한 단계 작게 (P213) */
+  line-height: 20px;   /* 홀짝 14/20 (2026-11-07, 옛 물려받은 21) */
   font-weight: 700;
   color: #fff;
 }
@@ -427,7 +428,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 12px;
   background: var(--surface-sub); border: 1px solid var(--border-strong); border-radius: 8px;
-  font-size: 14px; font-weight: 700; color: var(--gray-600); cursor: pointer;
+  font-size: 14px; line-height: 20px; font-weight: 700; color: var(--gray-600); cursor: pointer;   /* 홀짝 14/20 (2026-11-07) */
 }
 .sharing-platform-button:hover { border-color: #111; color: #111; }
 .platform-sharing-text { white-space: nowrap; }
@@ -437,10 +438,10 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 /* 댓글 — 우리 것 (2026-10-14 사용자: "우리가 댓글 프로그램을 만드는 건 어때?" — 폰에서 블로거 댓글 입력창이 좁다. 디자인 가이드 10-2).
    블로거 댓글(blogger.com iframe · 전체 페이지)을 버리고 테마 JS 가 Firebase(Firestore REST + Google 로그인)로 그린다.
    마크업은 테마 JS "댓글" IIFE 가 만든다 — 열기 버튼만 카드, 펼친 목록 · 쓰기 칸은 카드 밖 본문 폭 전체, 댓글 사이 1px 구분선.
-   글자: 이름 16px 굵게, 글 19px · 행간 24, 날짜 · 안내 · 버튼 14px. 사진 24px. 입력창은 본문 폭 전체(폰 화면 − 28px). */
+   글자: 이름 16px 굵게, 글 19px · 행간 25, 날짜 · 안내 · 버튼 14px. 사진 24px. 입력창은 본문 폭 전체(폰 화면 − 28px). */
 .comments {
   width: 100%; max-width: var(--shell); margin: 40px auto 0;   /* 목록 버튼과 40px (2026-10-12 사용자) */
-  font-size: 19px; line-height: 24px; color: #333; word-break: keep-all;
+  font-size: 19px; line-height: 25px; color: #333; word-break: keep-all;
 }
 .comments .comments-title { margin: 0; padding: 0; border: 0; font-size: 16px; line-height: 24px; }
 /* 열기 버튼 = 흰 카드, `댓글 n` 16px 굵게 · 오른쪽 공식 접기 화살표(테두리 없이). 기본 닫힘, 주소가 #comments · #c… 면 열린 채로 (2026-10-12 · 13 사용자) */
@@ -466,12 +467,12 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-name { font-size: 16px; font-weight: 700; color: #111; }
 .comments .cm-tag { display: inline-block; margin: 0; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; vertical-align: middle; position: relative; top: -1px; }   /* 운영자 라벨 — 영역 라벨 모양 (가이드 5절) */
 .comments .cm-date { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
-.comments .cm-text { margin: 4px 0 0; font-size: 19px; line-height: 24px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comments .cm-text { margin: 4px 0 0; font-size: 19px; line-height: 25px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
 .comments .cm-text.is-deleted { color: #94A3B8; font-size: 14px; line-height: 20px; }   /* 원 댓글이 지워진 답글 묶음의 자리 */
 /* 동작 버튼(답글 · 삭제)은 할 수 있는 사람에게만 — 로그인 전에는 보이지 않는다 (2026-10-13 사용자: "로그인 전에는 기능이 안 되는 버튼은 노출하지 마라") */
 .comments .cm-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }
 .comments .cm-actions:empty { display: none; }
-.comments .cm-btn { display: inline-flex; align-items: center; margin: 0; padding: 5px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 14px; line-height: 21px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.comments .cm-btn { display: inline-flex; align-items: center; margin: 0; padding: 5px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 14px; line-height: 22px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .comments .cm-btn:hover { border-color: #111; }
 .comments .cm-btn[disabled] { opacity: .4; cursor: default; }
 .comments .cm-replies { grid-column: 2; margin: 0; }   /* 답글은 원 댓글 글 왼쪽 선에 맞춰 */
@@ -491,7 +492,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-link { margin-left: auto; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; line-height: 20px; color: #7A7A7A; cursor: pointer; }
 .comments .cm-link:hover { color: #111; }
 /* 입력창 — 본문 폭 전체, 테두리 #E2E8F0 · 모서리 8, 안쪽 11 · 12, 글 19px · 행간 24, 처음 4줄 높이. 글을 쓰면 아래로 늘어난다 */
-.comments .cm-input { display: block; width: 100%; min-height: 118px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 19px; line-height: 24px; color: #333; resize: none; overflow: hidden; }
+.comments .cm-input { display: block; width: 100%; min-height: 118px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 19px; line-height: 25px; color: #333; resize: none; overflow: hidden; }
 .comments .cm-input:focus { outline: none; border-color: #111; }
 .comments .cm-input::placeholder { color: #94A3B8; }
 .comments .cm-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
@@ -513,7 +514,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .post-outer-container { padding: 24px; }
   body.item-view .post-outer-container { padding-top: 13px; }   /* 카드 위 → 제목 글자 보이는 20 (2026-10-12 사용자) */
-  .post-title { font-size: 27px; line-height: 36px; }
+  .post-title { font-size: 27px; line-height: 37px; }
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
@@ -522,7 +523,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
   body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 26px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) → −5 (2026-10-25 사용자: 상세 제목 줄 위 여백) */
-  .post-title { font-size: 23px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
+  .post-title { font-size: 23px; line-height: 33px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
   .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
   .post-body { font-size: 19px; line-height: 35px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
   .post-body [data-sent] { display: inline; }   /* 모바일: 문장 줄바꿈 없이 이어 흐른다 — 문단(빈 줄)만 남는다 (2026-10-16 사용자) */
@@ -789,7 +790,7 @@ SITE_DESC = "미국 증시 지수와 섹터, 트럼프 발언, 종목별 주가�
 
 # 상단 메뉴 = 지금 있는 리포트 연재 (2026-10-13 사용자: "리포트들은 메뉴에 있어야 하고 클릭하면 리포트 리스트 화면으로"). (보이는 이름, 블로거 라벨)
 # 엔비디아 리포트는 뺐다 — 2026-11-01 부터 날짜별 글 없이 종목 고정 페이지(시총 TOP 10 에서 들어감). 지난 글 목록 화면 · 목록 버튼은 아래 NVDA_LABEL 로 그대로
-NAV_LABELS = [("미국 증시 리포트", "데일리 브리핑"), ("트럼프 SNS 트렌드", "트럼프 트렌드")]
+NAV_LABELS = [("미국 증시 리포트", "데일리 브리핑")]   # 트럼프 연재 메뉴 삭제 (2026-11-04 종료 · 2026-11-07 사용자)
 
 # 데일리 리포트 목록 화면. publish_blogger.LABELS 의 첫 라벨과 같아야 한다 —
 # 파이프라인이 실제로 붙이는 라벨이라야 목록에 글이 잡힌다.
@@ -1385,7 +1386,7 @@ FALLBACK_TRUMP_BODY = """<div style="font-family:-apple-system,'Apple SD Gothic 
 <ul style='margin:8px 0 8px 20px;'><li style='margin:4px 0;'>최근 90일간 등장하지 않았던 Regulation / Medicare 주제가 최근 7일간 1건 나타났으며 트렌드 점수 68.8점이 관찰됐다.</li><li style='margin:4px 0;'>Trade / Tariff 주제는 직전 7일간 0건에서 최근 7일간 2건으로 증가한 변화가 관찰됐다.</li><li style='margin:4px 0;'>신규 진입 대상으로는 South Korea와 BAYRY, CVS가 나타났다.</li></ul>
 <h2 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;margin-top:28px;">내일 볼 것</h2>
 <ul style='margin:8px 0 8px 20px;'><li style='margin:4px 0;'>과거 Regulation 이벤트 28건에서 익일 평균 -0.54% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.002)로 관찰된 XLI가 관찰 대상으로 나타났다.</li><li style='margin:4px 0;'>과거 Trade 이벤트 23건에서 +3거래일 평균 2.001% 초과 반응이 발언 없는 날 대비 드문 크기(p=0.002)로 관찰된 AAPL이 관찰 대상으로 나타났다.</li></ul>
-<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:15px;color:#777;line-height:20px;">데이터: Truth Social 게시물 공개 아카이브(CNN) · 가격 Yahoo Finance · 거시 일정 FRED. 이 글의 시장 반응 수치는 과거 발언 이후 <b>관찰된 값</b>이며 인과 관계나 향후 방향을 의미하지 않습니다. 투자 권고가 아닙니다.</div>
+<div style="margin-top:32px;padding-top:12px;border-top:1px solid #eee;font-size:15px;color:#777;line-height:21px;">데이터: Truth Social 게시물 공개 아카이브(CNN) · 가격 Yahoo Finance · 거시 일정 FRED. 이 글의 시장 반응 수치는 과거 발언 이후 <b>관찰된 값</b>이며 인과 관계나 향후 방향을 의미하지 않습니다. 투자 권고가 아닙니다.</div>
 </div>"""
 
 

@@ -40,22 +40,12 @@ INDEX_SYMBOL = {
     "vix": "^VIX",
 }
 
-SECTOR_THEME = {
-    "SMH": "AI / 반도체",
-    "XLK": "기술",
-    "XLF": "금융",
-    "XLE": "에너지",
-    "XLV": "헬스케어",
-    "XLY": "소비 (경기민감)",
-    "XLP": "소비 (필수)",
-    "XLU": "유틸리티",
-    "XLI": "산업",
-    "XLB": "소재",
-    "XLRE": "리츠",
-    "XLC": "통신",
-}
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import taxonomy as TX  # noqa: E402  — 업종 · 세부 업종 이름은 공용 분류표 (2026-11-07 P385)
+
+SECTOR_THEME = {**{e: TX.sector_name(e) for e in TX.SUB_INDUSTRIES}, **TX.SECTORS}   # 세부 업종(SMH 반도체) + 업종 11개 — 순위 표에는 함께, 카드가 업종만 골라 쓴다
 # 시장 폭 프록시의 분모. SMH는 테마라 빼고 섹터 11개만 센다.
-BREADTH_SECTORS = ["XLK", "XLF", "XLE", "XLV", "XLP", "XLY", "XLU", "XLI", "XLB", "XLRE", "XLC"]
+BREADTH_SECTORS = list(TX.SECTORS)
 
 REGIME_RISK_ON = 70
 REGIME_RISK_OFF = 45
@@ -115,6 +105,90 @@ def _updown_days(close, n=20):
         elif close[i] < close[i - 1]:
             downs += 1
     return ups, downs
+
+
+SPLIT_SYMBOLS = ("^GSPC", "^IXIC", "^DJI", "^RUT")
+
+
+def day_split(raw_series):
+    """지수 4개의 마지막 날 하루를 시가 갭(전일 종가 → 시가) · 장중(시가 → 종가) · 하루(전일 종가 → 종가)로, % (2026-11-07 사용자: 한국 증시 리포트 `시가 갭 · 장중 · 하루` 처럼).
+    prices.json 의 open 칸(collect_yahoo OPEN_SYMBOLS)이 없거나 마지막 날 시가가 비면 그 지수는 뺀다."""
+    out = {}
+    for sym in SPLIT_SYMBOLS:
+        rec = raw_series.get(sym) or {}
+        c, o = rec.get("close") or [], rec.get("open") or []
+        if len(c) < 2 or len(o) != len(c) or not o[-1] or not c[-2]:
+            continue
+        out[sym] = {"gap": round((o[-1] / c[-2] - 1) * 100, 2), "intra": round((c[-1] / o[-1] - 1) * 100, 2), "ret": round((c[-1] / c[-2] - 1) * 100, 2)}
+    return out
+
+
+def index_tech(raw_series):
+    """지수 4개 일봉(시가 · 고가 · 저가 · 종가) → tech_signals.compute (종목 페이지와 같은 지표 · 이동평균). 고가 · 저가가 없으면 그 지수는 뺀다."""
+    import tech_signals
+    out = {}
+    for sym in SPLIT_SYMBOLS:
+        rec = raw_series.get(sym) or {}
+        c, h, l, o = rec.get("close") or [], rec.get("high") or [], rec.get("low") or [], rec.get("open") or []
+        if not c or len(h) != len(c) or len(l) != len(c):
+            continue
+        bars = [{"day": d, "open": o[i] if i < len(o) else None, "high": h[i], "low": l[i], "close": c[i]} for i, d in enumerate(rec.get("dates") or [])]
+        sig = tech_signals.compute(bars)
+        if sig:
+            out[sym] = sig
+    return out
+
+
+def _nvda_config():
+    """NVDA 리포트 config(국면 기준값) — 경로를 sys.path 에 넣지 않고 파일로 읽는다(daily 의 analyze · render_html 와 이름이 겹친다)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("nvda_config", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "nvda-report", "config.py"))
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def index_rs(closes, n=5):
+    """지수 기준 상대강도 — 나스닥 종합 · 러셀 2000 의 5거래일 등락 − S&P 500(%p) + 나스닥이 S&P 500 을 웃돈 연속 일수 (2026-11-07 사용자: 상장지수펀드 대신 지수로 맞춤 —
+    `지수 기술지표의 방향은?` 의 S&P 500 대비와 같은 값). 옛 rs(QQQ · IWM · SPY)는 다른 곳이 쓰므로 그대로 둔다."""
+    g, q, r = closes.get("^GSPC") or [], closes.get("^IXIC") or [], closes.get("^RUT") or []
+    if len(g) <= n:
+        return {}
+    ret = lambda c: (c[-1] / c[-1 - n] - 1) * 100 if len(c) > n else None  # noqa: E731
+    out = {"nasdaq_5d": None, "russell_5d": None, "nasdaq_streak": None}
+    if ret(q) is not None:
+        out["nasdaq_5d"] = round(ret(q) - ret(g), 2)
+        k = 0
+        for i in range(1, min(len(q), len(g))):
+            if q[-i] / q[-i - 1] > g[-i] / g[-i - 1]:
+                k += 1
+            else:
+                break
+        out["nasdaq_streak"] = k
+    if ret(r) is not None:
+        out["russell_5d"] = round(ret(r) - ret(g), 2)
+    return out
+
+
+def market_mood(closes):
+    """미국 증시 분위기 — 종목 페이지 `미국 증시 분위기는?`(stock-radar analyze.market_regime)과 같은 규칙 · 같은 기준값, 값은 S&P 500 지수 (2026-11-07 사용자: 데일리 세 카드를 한 카드로).
+    VIX ≥ 30 → 불안 국면, 1년 고점 대비 −10% 이하 또는 200일 평균 아래 → 조정장, −3% 이하 → 단기 조정, 그 밖 상승 추세. 판정은 보이는 소수 한 자리 값(P275)."""
+    NC = _nvda_config()
+    c = closes.get("^GSPC") or []   # 지수 기준 (2026-11-07 사용자: 데일리는 지수로 맞춤 — 옛 SPY, 종목 페이지는 아직 SPY)
+    if len(c) < NC.REGIME_MA_DAYS:
+        return None
+    vix = (closes.get("^VIX") or [None])[-1]
+    ph = (c[-1] / max(c[-NC.REGIME_HIGH_DAYS:]) - 1) * 100
+    ma = sum(c[-NC.REGIME_MA_DAYS:]) / NC.REGIME_MA_DAYS
+    phr = round(ph, 1)
+    regime = ("불안 국면" if vix is not None and vix >= NC.REGIME_VIX_HIGH else
+              "조정장" if phr <= NC.REGIME_CORRECTION_PCT or c[-1] < ma else "단기 조정" if phr <= NC.REGIME_PULLBACK_PCT else "상승 추세")
+    yr = c[-NC.REGIME_HIGH_DAYS:]
+    lo, hi = min(yr), max(yr)
+    return {"regime": regime, "pct_from_high": round(ph, 2), "above_ma200": c[-1] >= ma, "pct_vs_ma200": round((c[-1] / ma - 1) * 100, 2), "vix": vix,
+            "last": round(c[-1], 2), "ma200": round(ma, 2), "low_1y": round(lo, 2), "high_1y": round(hi, 2),
+            "high_days": len(yr) - 1 - max(range(len(yr)), key=lambda i: yr[i]),
+            "pullback": NC.REGIME_PULLBACK_PCT, "correction": NC.REGIME_CORRECTION_PCT, "vix_high": NC.REGIME_VIX_HIGH}
 
 
 def series_stats(close):
@@ -541,6 +615,10 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
     closes = {sym: rec["close"] for sym, rec in (prices.get("series") or {}).items() if rec.get("close")}
 
     series = {sym: series_stats(c) for sym, c in closes.items()}
+    split = day_split(prices.get("series") or {})
+    tech_idx = index_tech(prices.get("series") or {})
+    mood = market_mood(closes)
+    rs_idx = index_rs(closes)   # 지수 기준 상대강도 (2026-11-07)   # 미국 증시 분위기 (종목 페이지와 같은 규칙, 2026-11-07)   # 지수 4개 기술지표 — 종목 페이지 `기술지표의 방향은?` 과 같은 계산 (2026-11-07 사용자 P392)   # 지수 4개 하루 = 시가 갭 + 장중 (2026-11-07 사용자: 한국 증시 리포트처럼)
 
     position = {}
     for key, sym in INDEX_SYMBOL.items():
@@ -560,6 +638,13 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "prev_5d": round(vix_close[-6], 2) if len(vix_close) >= 6 else None,
         "change_5d": round(vix_close[-1] - vix_close[-6], 2) if len(vix_close) >= 6 else None,
     }
+    if len(vix_close) >= 60:   # 1년 범위(최근 252거래일) — 시장 탭 `시장은 얼마나 긴장했나?` 범위 막대 (2026-11-07 사용자)
+        yr = vix_close[-252:]
+        lo, hi = min(yr), max(yr)
+        vix.update({"low_1y": round(lo, 2), "high_1y": round(hi, 2),
+                    "pos_pct": round((yr[-1] - lo) / (hi - lo) * 100, 1) if hi > lo else 50.0,
+                    "pct_from_high": round((yr[-1] / hi - 1) * 100, 1) if hi else None,
+                    "high_days": len(yr) - 1 - max(k for k, x in enumerate(yr) if x == hi)})
 
     g = lambda s: series.get(s) or {}
     rs = {
@@ -608,6 +693,10 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "watch": watch,
         "symbols": symbols,
         "raw": raw,
+        "split": split,
+        "tech_idx": tech_idx,
+        "mood": mood,
+        "rs_idx": rs_idx,
     }
     # 재설계 계산 (2026-10-18, doc/기획/데일리-리포트-기획.md 6절) — 평소 범위 · 충격 · 한국 연결 · 환율 · 일정
     dates = {sym: rec["dates"] for sym, rec in (prices.get("series") or {}).items() if rec.get("close") and rec.get("dates")}   # 환율 그래프 가로축 (batch 8 ⑭)

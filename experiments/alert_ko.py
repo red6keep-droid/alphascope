@@ -21,6 +21,7 @@ NAMES = {
     "Court Survey": "소송 조사",
     "Gemini Model Check": "Gemini 모델 점검",
     "Trump Trend": "트럼프 트렌드 (종료)",
+    "Market Forecast": "증시 전망",   # 발행 단계 워크플로 이름(예정) — forecast_alerts.py
 }
 
 # (찾을 말, 한국어 원인) — 위에서부터 먼저 맞는 것 하나

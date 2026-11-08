@@ -55,7 +55,7 @@ def _issue_rows(items):
     rows = []
     for it in items:
         for k, iss in enumerate(it.get("issues") or []):
-            cat = iss.get("category") or "OTHER"
+            cat = issue_codes.FROM_YTB_CATEGORY.get(iss.get("category") or "OTHER", "OTHER")   # 수집기 옛 이름 → 기록 코드 (P339)
             rows.append({
                 "video": it["id"], "channel": it.get("channelName") or "", "title": it.get("title") or "", "url": it.get("url") or "",
                 "published": it.get("publishedAt"), "created": it.get("createdAt"), "speakers": it.get("speakers") or [],

@@ -50,14 +50,27 @@ def _times(z):
 
 # ── 오늘 탭 ─────────────────────────────────────────────────────────────
 
-def normal_card(a, opened=True):
+def normal_card(a, opened=True, parts=False):
     """D3 오늘 움직임은 평소와 달랐나 — 지수별 평소 범위 (엔비디아 W1 과 같은 자)."""
     nr = a.get("normal") or {}
     keys = [k for k in ("^GSPC", "^IXIC", "^DJI", "^RUT") if k in nr]
     if not keys:
         return ""
     outs = [k for k in keys if nr[k]["outside"]]
-    state = "모두 평소 안" if not outs else " · ".join(INDEX_SHORT[k] for k in outs) + " 평소 밖"
+    # 답 글자 = 평소 밖 지수 수에 따라 (2026-11-07 사용자 P327): 1개 `나스닥 평소 밖` · 2개 `나스닥 · 다우` 줄바꿈 `평소 밖` · 3개 `세 개 지수 평소 밖` · 4개(전부) `모두 평소 밖`
+    if not outs:
+        state = "모두 평소 안"
+    elif len(outs) == len(keys) and len(keys) > 1:
+        state = "모두 평소 밖"
+    elif len(outs) == 3:
+        state = "세 개 지수 평소 밖"
+    elif len(outs) == 2:
+        state = " · ".join(INDEX_SHORT[k] for k in outs) + " 평소 밖"   # 한 줄 (2026-11-08 사용자 P405: 답이 두 줄이면 카드가 길어진다 — 옛 P327 두 줄)
+    else:
+        state = INDEX_SHORT[outs[0]] + " 평소 밖"
+    # 색 (P328): 모두 평소 안 = 중립 · 평소 밖 지수가 모두 올랐으면 상승 · 모두 내렸으면 하락 · 섞이면 불확실 (옛: 늘 중립 고정)
+    ups = {nr[k]["ret_pct"] >= 0 for k in outs}
+    theme, ink = ("neutral", "#111") if not outs else ("positive", C.UP) if ups == {True} else ("negative", C.DOWN) if ups == {False} else ("uncertain", C.SOON)
     sp = nr.get("^GSPC")
     lines = []
     if not outs and sp:
@@ -65,15 +78,30 @@ def normal_card(a, opened=True):
     for k in outs:
         n = nr[k]
         lines.append((f"{INDEX_NAME[k]} {_s(n['ret_pct'])}는 평소 하루 움직임(±{n['sigma_pct']:.2f}%)의 {_times(n['z'])}로, 지난 1년에 {n['n_year']}번 있던 크기였습니다.", "plain"))
-    groups = [(INDEX_SHORT[k], [nr[k]["ret_pct"], nr[k]["sigma_pct"] if nr[k]["ret_pct"] >= 0 else -nr[k]["sigma_pct"]]) for k in keys]
+    groups = [(INDEX_SHORT[k], [nr[k]["ret_pct"], nr[k]["sigma_pct"] if nr[k]["ret_pct"] >= 0 else -nr[k]["sigma_pct"]]) for k in reversed(keys)]   # S&P 500 을 맨 오른쪽 — 넘겨 보기 그래프는 처음에 오른쪽 끝이 보인다 (2026-11-08 사용자, 시가 갭 그래프와 같게)
     lines.append((C.chart_card("오늘 움직임과 평소 하루 크기 (%)", groups, [C.sign_bg, C.gray], [C.sign_fg, C.note_fg],
                                [("오늘", C.sign_bg(sp["ret_pct"] if sp else 1)), ("평소 하루 크기", C.GRAY_BAR)]), "html"))
-    for k in keys:
-        n = nr[k]
-        lines.append(("row", INDEX_NAME[k], _s(n["ret_pct"]), f"평소 ±{n['sigma_pct']:.2f}% · {_times(n['z'])}"))
+    # 지수별 줄(오늘 · 평소 ± · 배수)은 `지수 기술지표의 방향은?` 카드 라벨 안으로 (2026-11-07 사용자 P392)
     tip = ("하루 움직임이 그 지수의 평소 크기 안이었는지. 평소 크기는 최근 움직임에 무게를 더 둔 표준편차이고, 2배를 넘으면 평소 밖으로 봅니다"
            + (f"\n· 오늘 S&P 500 {_s(sp['ret_pct'])} : 평소의 {_times(sp['z'])}, 지난 1년 중 이만큼 이상 움직인 날 {sp['n_year']}번" if sp else ""))
-    return C.question_card("오늘 움직임은 평소와 달랐나?", state, "neutral", "#111", lines, tip=tip, opened=opened)
+    if parts:   # `미국 증시 분위기는?` 카드 안 한 묶음으로 (2026-11-07 사용자)
+        return ("평소와 달랐나?", state, theme, ink, lines, tip)
+    return C.question_card("평소와 달랐나?", state, theme, ink, lines, tip=tip, opened=opened)
+
+
+def split_chart(a):
+    """주요 지수 덩어리 맨 위 — 지수 4개 하루를 시가 갭 · 장중 · 하루 세 막대로 (2026-11-07 사용자: 한국 증시 리포트 head_chart 와 같은 모양).
+    시가 갭 = 전일 종가 → 시가(장이 닫힌 사이 반영된 몫), 장중 = 시가 → 종가, 종가 = 전일 종가 → 종가(옛 이름 `하루`, 2026-11-08 사용자). 막대 색은 구분용, 숫자는 증감 색. 시가가 없으면 그래프를 뺀다."""
+    sp = a.get("split") or {}
+    keys = [k for k in ("^RUT", "^DJI", "^IXIC", "^GSPC") if k in sp]   # S&P 500 을 맨 오른쪽 — 넘겨 보기 그래프는 처음에 오른쪽 끝이 보인다 (2026-11-07 사용자)
+    if not keys:
+        return ""
+    groups = [(INDEX_SHORT[k], [sp[k]["gap"], sp[k]["intra"], sp[k]["ret"]]) for k in keys]
+    amber = lambda v: C.AMBER   # noqa: E731
+    chart = C.chart_card("", groups, [amber, C.sign_bg, C.gray], [C.sign_fg, C.sign_fg, C.sign_fg],
+                         [("시가 갭", C.AMBER), ("장중", C.PASTEL_UP), ("종가", C.GRAY_BAR)], keep_legend=True)
+    chart = chart.replace(f"margin:0 {dk.CHART_CARD_X}px;", "margin:0;", 1)   # 카드 밖 그래프 — 아래 카드와 왼쪽 끝을 맞춘다 (한국 M37 과 같게)
+    return f'<div data-cards="1" style="margin:0 0 8px;">{chart}</div>'   # 탭 줄 아래 여백 = 다른 탭과 같은 14 (2026-11-08 사용자 P415: 옛 +10 이 뉴스 · 인물 발언 탭과 달랐다)
 
 
 def shock_card(a):
@@ -85,31 +113,7 @@ def shock_card(a):
              ("row", "VIX", f"{sh['vix']:.2f}", "35 이상에서 시작 · 25 아래에서 끝")]
     tip = ("시장 전체가 크게 흔들리는 기간인지. VIX가 35 이상이 되면 시작, 25 아래로 내려오면 끝으로 봅니다\n"
            f"· 오늘 VIX {sh['vix']:.2f} : 충격 국면 {sh.get('days_in') or 1}거래일째")
-    return C.question_card("시장 충격 국면인가?", f"{sh.get('days_in') or 1}거래일째", "uncertain", "#92400E", lines, tip=tip, opened=True)
-
-
-def market_now_card(a):
-    """D6 지금 시장은 — 옛 점수 · 신호등 대신 사실만 (기획 5절 B5). 우리 검증은 툴팁."""
-    se = a.get("series") or {}
-    spy = se.get("SPY") or {}
-    pos = (a.get("position") or {}).get("sp500") or {}
-    vix = a.get("vix") or {}
-    rates = a.get("rates") or {}
-    a20, a50 = spy.get("above_ma20"), spy.get("above_ma50")
-    if a20 is None or a50 is None:
-        return ""
-    state = "평균선 위" if a20 and a50 else "평균선 아래" if not a20 and not a50 else ("20일선 아래" if not a20 else "50일선 아래")
-    lines = [("점수나 신호등으로 묶지 않고 사실만 보여 드립니다.", "plain"),
-             ("row", "S&P 500 추세", f"20일선 {'위' if a20 else '아래'} · 50일선 {'위' if a50 else '아래'}", "최근 20 · 50거래일 평균 가격과 비교")]
-    if pos.get("from_high_pct") is not None:
-        lines.append(("row", "20일 고점 대비", _s(pos["from_high_pct"]), "최근 20거래일 가장 높던 종가와 비교"))
-    if vix.get("now") is not None:
-        lines.append(("row", "VIX", f"{vix['now']:.2f}", f"5거래일 전 {vix['prev_5d']:.2f}" if vix.get("prev_5d") is not None else "시장이 예상하는 흔들림"))
-    if rates.get("us10y_change_5d_bp") is not None:
-        lines.append(("row", "10년물 금리 (5일)", f"{int(rates['us10y_change_5d_bp']):+d}bp".replace("-", "−"), f"지금 {rates['us10y']:.2f}%" if rates.get("us10y") else ""))
-    tip = ("시장 흐름을 이루는 사실들 (추세 · 흔들림 · 금리)\n"
-           f"· 오늘 {state} : S&P 500(SPY)이 20일선 {'위' if a20 else '아래'}, 50일선 {'위' if a50 else '아래'}")
-    return C.question_card("지금 시장 흐름은?", state, "neutral", "#111", lines, tip=tip)
+    return C.question_card("시장 충격 국면인가?", f"{sh.get('days_in') or 1}거래일째", "uncertain", "#92400E", lines, tip=tip)   # 닫힌 채로 — 오늘 탭 카드 모두 닫힘 (2026-11-07 사용자)
 
 
 # ── 한국장 탭 ───────────────────────────────────────────────────────────
@@ -158,54 +162,65 @@ def seo_korea(a):
     if b in ("up", "down") and rec and _decade_check(rec) is not None:
         word = "오른" if b == "up" else "내린"
         return (f"S&P 500이 평소의 {_times(ks['us_z'])}로 크게 {word} 밤이었고, {since}년 이후 이런 밤 다음 날 코스피는 평균 {_s(rec['gap'])}로 시작했습니다.")
-    return (f"S&P 500 움직임은 평소의 {_times(ks['us_z'])}였고, {since}년 이후 기록에서 미국 밤사이 움직임은 다음 날 코스피 시작 가격에 절반가량 미리 반영됐습니다.")
+    return f"S&P 500 움직임은 평소의 {_times(ks['us_z'])}였습니다."   # 뒤 `2000년 이후 … 절반가량 미리 반영됐습니다` 삭제 — 날마다 같은 안내 (2026-11-07 사용자 P390)
 
 
 def korea_open_card(a, opened=True):
-    """K1 오늘 한국장에 미국장이 얼마나 닿나 — 코스피 ← S&P 500."""
+    """K1 미국장과 오늘 한국장 연결 — 코스피 ← S&P 500 (2026-11-07 사용자 P378: `닿나` → `연결`).
+    2026-11-08 사용자 P407: 평소에는 카드 없음 — S&P 500 이 평소의 2배 넘게 움직인 밤 다음 날만(기록이 시기마다 같은 방향일 때).
+    날마다 같던 첫 문장(시작 가격 절반 반영)은 `연결된 국내 종목은?` 툴팁으로, `S&P 500 (밤사이)` 줄은 그 카드 맨 위로 옮겼다 (데일리에는 읽는 법 페이지가 없다)."""
     ks = next((p for p in a.get("korea") or [] if p["kr"] == "^KS11"), None)
-    if not ks:
+    if not ks or ks.get("bucket") not in ("up", "down"):
+        return ""
+    t1, t2 = _bucket_text(ks, "코스피")
+    if not t1.startswith("미국 쪽이"):   # 기록이 시기마다 엇갈린 날 — 크기만 말하는 문장은 아래 카드 S&P 500 줄과 같다
         return ""
     first_year = ks["first"][:4]
-    lines = [(f"{first_year}년 이후 기록에서 미국 밤사이 움직임은 다음 날 코스피 시작 가격에 절반가량 미리 들어갔습니다 (시작 가격 상관 {ks['corr']:.2f}). "
-              "그래서 시작 가격은 이미 미국장을 반영한 값입니다.", "plain")]
-    t1, t2 = _bucket_text(ks, "코스피")
-    if t1:
-        lines.append((t1, "plain"))
-    if t2:
-        lines.append((t2, "plain"))
+    lines = [(t1, "plain")] + ([(t2, "plain")] if t2 else [])
     bk = ks.get("buckets") or {}
     if bk:
         order = [("크게 오른 밤", "up"), ("평범한 밤", "normal"), ("크게 내린 밤", "down")]
         groups = [(nm, [bk[k]["gap"], bk[k]["intra"]]) for nm, k in order if k in bk]
         lines.append((C.chart_card(f"다음 날 코스피 평균 ({first_year}년 이후, %)", groups, [C.amber, C.gray], [C.sign_fg, C.sign_fg],
                                    [("시작 (전날 종가 대비)", C.AMBER), ("장중 (시작 → 종가)", C.GRAY_BAR)], keep_legend=True), "html"))   # 하루를 나눈 조각 — 범례 그대로
-    lines.append(("row", "S&P 500 (밤사이)", _s(ks["us_ret"]), f"평소의 {_times(ks['us_z'])}"))
-    tip = ("미국 증시가 밤사이 움직인 만큼이 다음 날 한국 증시 시작 가격에 얼마나 들어가는지\n"
+    tip = ("미국 증시가 밤사이 크게 움직인 다음 날, 기록상 한국 증시가 어떻게 시작하고 움직였는지. S&P 500 이 평소의 2배 넘게 움직인 날만 나옵니다\n"
            f"· 오늘 S&P 500 {_s(ks['us_ret'])} : 평소의 {_times(ks['us_z'])}")
     state = f"S&P 500 {_s(ks['us_ret'])}"
-    return C.question_card("오늘 한국장에 얼마나 닿나?", state, "neutral", "#111", lines, tip=tip, opened=opened)
+    return C.question_card("미국장과 오늘 한국장 연결은?", state, "neutral", "#111", lines, tip=tip, opened=opened)
 
 
-def korea_pairs_card(a):
-    """K2 이어진 국내 종목 — 짝마다 오늘 미국 쪽 움직임과 기록."""
+def korea_pairs_card(a, opened=False):
+    """K2 이어진 국내 종목 — 맨 위 = 매일 바뀌는 값: S&P 500 밤사이 · 한국 주식 상장지수펀드(EWY) 밤사이 (2026-11-08 사용자 P407), 그 아래 짝마다 오늘 미국 쪽 움직임과 기록."""
     ps = [p for p in a.get("korea") or [] if p["kr"] != "^KS11" and p["kr"] not in PAIR_HIDE]
-    if not ps:
+    ks = next((p for p in a.get("korea") or [] if p["kr"] == "^KS11"), None)
+    ew = a.get("ewy") or {}
+    if not ps and not ks and not ew:
         return ""
-    lead = max(ps, key=lambda p: abs(p["us_z"]))
-    lines = [("국내 종목마다 함께 보는 미국 쪽 움직임입니다. 오른쪽 값은 지난밤 미국 쪽 등락이고, 상관이 1에 가까울수록 다음 날 시작 가격이 미국 쪽을 따라갔습니다.", "plain")]
-    for p in ps:
-        t1, t2 = _bucket_text(p, p["kr_name"])
-        if p["bucket"] in ("up", "down") and t1.startswith("미국 쪽이"):
-            lines.append(f"{p['kr_name']} : {t1}" + (f" {t2}" if t2 else ""))
-    weak = [p for p in ps if p["corr"] < 0.45]
-    if weak:
-        lines.append((" · ".join(p["kr_name"] for p in weak) + "와 미국 쪽의 연결은 약했습니다 (상관 0.45 아래, 장중 경향 없음).", "note"))
-    for p in ps:
-        lines.append(("row", p["kr_name"], _s(p["us_ret"]), f"짝 : {p['us_name']} · 상관 {p['corr']:.2f}"))
-    tip = ("한국 종목과 흔히 같이 보는 미국 지수 · 종목의 지난밤 움직임\n"
-           f"· 오늘 {lead['us_name']} {_s(lead['us_ret'])} : 평소의 {_times(lead['us_z'])}")
-    return C.question_card("이어진 국내 종목은?", f"{lead['us_name']} {_s(lead['us_ret'])}", "neutral", "#111", lines, tip=tip)
+    lines = []
+    if ks:
+        lines.append(("row", "S&P 500 (밤사이)", _s(ks["us_ret"]), f"평소의 {_times(ks['us_z'])}"))
+    if ew.get("ret_pct") is not None:
+        lines.append(("row", "한국 주식 상장지수펀드 (EWY)", _s(ew["ret_pct"]), f"미국 장에서 거래 · 평소의 {_times(ew['z'])}"))
+    if lines:
+        lines[0] = lines[0] + ("noline",)   # 카드 머리 아래 선과 겹치지 않게
+    if ps:
+        lines.append(("국내 종목마다 함께 보는 미국 쪽 움직임입니다. 오른쪽 값은 지난밤 미국 쪽 등락이고, 상관이 1에 가까울수록 다음 날 시작 가격이 미국 쪽을 따라갔습니다.", "plain"))
+        for p in ps:
+            t1, t2 = _bucket_text(p, p["kr_name"])
+            if p["bucket"] in ("up", "down") and t1.startswith("미국 쪽이"):
+                lines.append(f"{p['kr_name']} : {t1}" + (f" {t2}" if t2 else ""))
+        weak = [p for p in ps if p["corr"] < 0.45]
+        if weak:
+            lines.append((" · ".join(p["kr_name"] for p in weak) + "와 미국 쪽의 연결은 약했습니다 (상관 0.45 아래, 장중 경향 없음).", "note"))
+        for p in ps:
+            lines.append(("row", p["kr_name"], _s(p["us_ret"]), f"짝 : {p['us_name']} · 상관 {p['corr']:.2f}"))
+    lead = max(ps, key=lambda p: abs(p["us_z"])) if ps else None
+    first_year = ks["first"][:4] if ks else "2000"
+    tip = ("한국 종목과 흔히 같이 보는 미국 지수 · 종목의 지난밤 움직임. 한국 주식 상장지수펀드(EWY)는 미국 시간에 거래된 한국 주식 값이라 오늘 한국 증시 시작과 가장 가깝습니다\n"
+           + (f"· 오늘 {lead['us_name']} {_s(lead['us_ret'])} : 평소의 {_times(lead['us_z'])}" if lead else f"· 오늘 EWY {_s(ew.get('ret_pct'))}")
+           + (f"\n· 참고 : {first_year}년 이후 기록에서 미국 밤사이 움직임은 다음 날 코스피 시작 가격에 절반가량 미리 들어갔습니다 (시작 가격 상관 {ks['corr']:.2f}). 시작 가격은 이미 미국장을 반영한 값입니다" if ks else ""))
+    state = f"{lead['us_name']} {_s(lead['us_ret'])}" if lead else f"EWY {_s(ew.get('ret_pct'))}"
+    return C.question_card("연결된 국내 종목은?", state, "neutral", "#111", lines, tip=tip, opened=opened)
 
 
 def fx_card(a):
@@ -232,9 +247,7 @@ def fx_card(a):
         lines.append((dk.trend_card(f"원화로 본 S&P 500 ({n}거래일 전 = 100)", lab,
                                     [("원화로 본 S&P 500", h["spx_won"], dk.CHART_MAIN, "solid"), ("달러 기준", h["spx_usd"], dk.CHART_CMP, "dash")],
                                     lambda v: f"{v:,.1f}"), "html"))
-    tip = ("1달러가 몇 원인지와, 미국 주식을 원화로 들고 있을 때의 하루 등락\n"
-           f"· 오늘 {fx['krw']:,.2f}원 : 하루 {_s(fx['ret_1d'])}")
-    return C.question_card("환율은?", f"{fx['krw']:,.2f}원", "neutral", "#111", lines, tip=tip)
+    return C.question_card("환율은?", f"{fx['krw']:,.2f}원", "neutral", "#111", lines)   # 툴팁 없음 — 카드 문장 · 근거 줄이 뜻과 값을 다 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 # ── 시장 탭 ─────────────────────────────────────────────────────────────
@@ -301,9 +314,7 @@ def macro_cal_card(a, opened=True):
         e = x.get("effect")
         lines.append(("row", MACRO_KO[x["kind"]], _md(x["day"]), f"그날 S&P 500 보통 ±{e['median']:.2f}% ({e['n']}번)" if e else ""))
     theme, col = _theme_for(items[0]["day"], cal.get("from") or items[0]["day"])
-    tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정\n"
-           f"· {days}일 안 {len(items)}건 : 가장 가까운 일정은 {MACRO_KO[items[0]['kind']]} {_md(items[0]['day'])}")
-    return C.question_card("다가오는 경제 일정은?", f"{len(items)}건 · {days}일 안", theme, col, lines, tip=dk.with_src(tip, "FRED · Yahoo Finance"), opened=opened)   # 일정 = FRED 발표일, 움직임 = 가격 (2026-10-20 툴팁 출처)
+    return C.question_card("다가오는 경제 일정은?", f"{len(items)}건 · {days}일 안", theme, col, lines, opened=opened)   # 툴팁 없음 — 카드 문장 · 근거 줄이 뜻과 값을 다 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 def earnings_cal_card(a):
@@ -327,6 +338,4 @@ def earnings_cal_card(a):
         lines.append(("row", f"{MEGA_KO[x['symbol']]} ({x['symbol']})", when, f"다음 날 보통 ±{e['median']:.1f}% · 평소 ±{e['normal']:.1f}%" if e else ""))
     lines.append(("발표일은 회사가 확정하기 전 추정일일 수 있습니다.", "note"))
     theme, col = _theme_for(items[0]["day"], cal.get("from") or items[0]["day"])
-    tip = ("미국 시가총액 상위 10개 회사의 실적 발표일\n"
-           f"· {days}일 안 {len(items)}곳 : 가장 가까운 발표는 {MEGA_KO[items[0]['symbol']]} {_md(items[0]['day'])}")
-    return C.question_card("대형주 실적 발표는?", f"{len(items)}곳 · {days}일 안", theme, col, lines, tip=tip)
+    return C.question_card("대형주 실적 발표는?", f"{len(items)}곳 · {days}일 안", theme, col, lines)   # 툴팁 없음 — 카드 문장 · 근거 줄이 뜻과 값을 다 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)

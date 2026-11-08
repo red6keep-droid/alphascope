@@ -120,7 +120,7 @@ def related_html(labels, self_titles, blog_url=None, creds=None):
     li = "".join(f'<li style="margin:0;line-height:35px;"><a href="{_h.escape(p["url"])}" style="color:#111;">{_h.escape(str(p["title"]).strip().replace(" — ", " "))}</a></li>' for p in picks)
     lists = " · ".join(f'<a href="{blog_url}/search/label/{quote(lb)}" style="color:#111;">{_h.escape(name)}</a>' for lb, name in SERIES)
     # 좌측 기준선 6px — 홈 실시간 뉴스 글자 선 (2026-10-24 사용자, 디자인-가이드라인 5-9). 위 구분선은 전체 폭
-    return ('<div data-related="1" style="margin:28px 0 0;padding-top:14px;border-top:1px solid #E2E8F0;font-size:16px;line-height:24px;">'
+    return ('<div data-related="report" style="margin:28px 0 0;padding-top:14px;border-top:1px solid #E2E8F0;font-size:16px;line-height:24px;">'
             '<div style="font-size:14px;line-height:20px;color:#6B7280;margin:0 0 4px;padding-left:6px;">함께 보는 리포트</div>'
             f'<ul style="list-style:none;margin:0 0 6px;padding:0 0 0 6px;">{li}</ul>'
             f'<div style="font-size:14px;line-height:20px;color:#6B7280;padding-left:6px;">리포트 목록 : {lists}</div></div>')
@@ -129,7 +129,9 @@ def related_html(labels, self_titles, blog_url=None, creds=None):
 def with_related(content, labels, self_titles, blog_url=None, creds=None):
     """본문 끝에 함께 보는 리포트를 붙인다. 이미 붙어 있으면(갱신) 새로 바꾼다. 목록을 못 읽으면 본문 그대로."""
     import re as _re
-    content = _re.sub(r'<div data-related="1".*\Z', "", content, flags=_re.S)   # 맨 끝 블록만 붙이므로 끝까지 지운다
+    # 공통 블록만 지운다 — 본문의 `함께 보는 페이지`(design_kit.related_buttons, data-related="1")는 남긴다 (2026-11-08 사용자: 두 블록 다 있어야 한다).
+    # 옛 글의 공통 블록은 data-related="1" + 아래 style 로 시작한다 — 갱신 때 그것도 지운다
+    content = _re.sub(r'<div data-related="(?:report|1)" style="margin:28px 0 0;padding-top:14px;.*\Z', "", content, flags=_re.S)   # 맨 끝 블록만 붙이므로 끝까지 지운다
     try:
         return content + related_html(labels, self_titles, blog_url, creds)
     except Exception as e:  # noqa: BLE001

@@ -35,6 +35,18 @@ DEFAULT = [
     "^KS11", "^KQ11", "EWY", "091160.KS", "091170.KS", "091180.KS", "117460.KS",
 ]
 
+# 신호 지표판 — 사건보다 먼저 움직이는 앞 고리 (기획 증시-전망-기획 8-19, 2026-11-08 사용자 "지표가 먼저 말할 때").
+# 위 DEFAULT 에 이미 있는 유가 · 금 · 달러 · 엔 · 10년 · 3개월 · VIX · 섹터 ETF · 한국은 그대로 쓰고, 빠진 것만 더한다. FRED(신용 웃돈 · 2년 · 기대 물가)는 fetch_fred_daily.py
+SIGNAL = [
+    "KRW=X", "CNY=X", "EURUSD=X",                    # 원화 · 위안 · 유로 — 위험 회피 · 무역
+    "HG=F", "NG=F", "SI=F", "ZW=F",                  # 구리(경기) · 천연가스(유럽 · 전쟁) · 은 · 밀(우크라이나 · 식량)
+    "^OVX", "^GVZ", "^MOVE",                         # 유가 · 금 · 채권 변동성 — 가격보다 먼저 불안이 오른다
+    "^FVX", "TLT", "HYG", "LQD",                     # 5년 금리 · 장기 국채 · 하이일드 · 투자등급 회사채 ETF
+    "ITA", "JETS", "BDRY", "URA",                    # 방산 · 항공 · 해운 운임 · 우라늄
+    "EEM", "FXI", "EWJ", "BTC-USD",                  # 신흥국 · 중국 · 일본 · 비트코인(위험 선호)
+]
+DEFAULT = DEFAULT + SIGNAL
+
 
 def safe(sym):
     return sym.replace("^", "_").replace("=", "_").replace("/", "_")

@@ -78,8 +78,8 @@ def _cluster_item(i, c, narrative, n_today):
     이슈마다의 줄은 종목 페이지 · 데일리 · 홈으로 흩어 보내고(media_feed), 여기는 모아 보는 순위만 — 시각 막대 · 종목 수 줄은 뺐다."""
     detail = (narrative or {}).get("items", {}).get(f"c{i}") or _py_detail(c)
     st = c["stances"]
-    view = "엇갈림" if c["split"] else config.STANCE_KO.get(max(st, key=st.get), "중립")
-    kind = "uncertain" if c["split"] else STANCE_PILL.get(max(st, key=st.get), "neutral")
+    view = "불확실" if c["split"] else config.STANCE_KO.get(max(st, key=st.get), "중립")
+    kind = "uncertain" if c["split"] else STANCE_PILL.get(max(st, key=st.get), "neutral")   # 방향 라벨 = 막대와 같은 네 단어 중 하나, 섞이면 `불확실` (2026-11-07 사용자 P335) — 옛 `엇갈림`
     pills = [dk.pill(c["category_ko"], bare=True), dk.pill(view, kind, bare=True)] + ([dk.pill("예상 밖", "uncertain", bare=True)] if c["surprise"] else [])
     pills.append(dk.pill(f"관심도 {interest(c, n_today)}", bare=True))
     if c.get("daily"):

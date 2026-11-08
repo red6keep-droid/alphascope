@@ -40,9 +40,10 @@ HISTORY_UNIVERSE = {
     "rates": ["^TNX", "^FVX", "^IRX"],
     # 2026-10-18 재설계 (doc/기획/데일리-리포트-기획.md 6절): 대형주 10개 평소 범위(D4) · 한국 짝의 미국 쪽(K2) · 원/달러(K3)
     "mega": ["NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "LLY"],
-    "link": ["^SOX"],
+    "link": ["^SOX", "EWY"],   # EWY = 미국에 상장된 한국 주식 상장지수펀드 — 한국장 탭 매일 바뀌는 값 (2026-11-08 사용자 P407)
     "fx": ["KRW=X"],
 }
+OPEN_SYMBOLS = ("^GSPC", "^IXIC", "^DJI", "^RUT")   # 시가 · 고가 · 저가도 남기는 심볼 (2026-11-07)
 # 50일선과 그 기울기까지 보려면 3개월(약 63거래일)은 빠듯하다.
 # 평소 범위의 "1년에 몇 번"은 지난 252거래일 z 가 필요해 2년 (2026-10-18)
 HISTORY_PERIOD = "2y"
@@ -274,6 +275,13 @@ def collect_history():
             "dates": [d.strftime("%Y-%m-%d") for d in s.index],
             "close": [round(float(v), 4) for v in s.values],
         }
+        if symbol in OPEN_SYMBOLS:   # 시가 · 고가 · 저가 — 지수 4개만(시가 갭 그래프 · 지수 기술지표 카드, 2026-11-07 사용자). 같은 응답에 이미 있다, 새 요청 없음
+            for col, key in (("Open", "open"), ("High", "high"), ("Low", "low")):
+                try:
+                    o = df[symbol][col].reindex(s.index)
+                    series[symbol][key] = [None if v != v else round(float(v), 4) for v in o.values]
+                except Exception:
+                    pass
     if missing:
         print(f"시계열 결측 심볼: {missing}")
     print(f"시계열 수집 완료: {len(series)}/{len(symbols)} 심볼, 기준일 {as_of.date()}")

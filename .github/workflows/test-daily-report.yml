@@ -71,6 +71,13 @@ jobs:
           ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
           git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
           git remote add state git@github.com:red6keep-droid/alphascope-state.git
+          # 인물 발언 (종목 · 증시 리포트 `인물 발언` 구획, 2026-11-07 P324) — 인물 레이더가 radar-state 에 남긴 파일. 없으면 구획을 뺀다
+          mkdir -p experiments/people-radar/output/state
+          if git fetch --no-tags state radar-state:refs/remotes/state/radar-state 2>/dev/null; then
+            git show refs/remotes/state/radar-state:experiments/people-radar/output/state/people_mentions.json > experiments/people-radar/output/state/people_mentions.json 2>/dev/null && echo "인물 발언 파일 받음" || { rm -f experiments/people-radar/output/state/people_mentions.json; echo "인물 발언 파일 없음"; }
+          else
+            echo "radar-state 없음 — 인물 발언 구획 없이"
+          fi
       - name: Set up Python
         uses: actions/setup-python@v6
         with:

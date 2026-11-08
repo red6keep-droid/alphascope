@@ -223,7 +223,7 @@ const RUN_STATE = { success: ["성공", "ok"], failure: ["실패", "bad"], cance
 const dotList = (items) => (items.length ? `<ul class="dots">${items.map((x) => `<li><span class="dot"></span><span>${x}</span></li>`).join("")}</ul>` : "");
 const muted = (t) => `<p class="muted-line">${INFO_ICON}${T(t)}</p>`;
 
-// H 아코디언 줄 (가이드라인 2-1 H): 접힌 줄 = 구분명 16px 굵게 왼쪽 · 값 오른쪽 굵게 · 28px 화살표 버튼
+// H 아코디언 줄 (가이드라인 2-1 H): 접힌 줄 = 구분명 16px 굵게 왼쪽 · 값 오른쪽 굵게 · 31px 화살표 버튼(블로그 접기 버튼과 같게, 2026-11-07)
 function accRow(name, valueHtml, inner, open) {
   return `<details class="acc"${open ? " open" : ""}><summary class="row"><span class="row-l name">${T(name)}</span><span class="row-r val">${valueHtml}</span><span class="chev">${CHEV}</span></summary><div class="acc-body">${inner}</div></details>`;
 }
@@ -281,11 +281,11 @@ ${head}<div class="card multi">${rows}</div></section>`;
 
 const CSS = `
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
-body{margin:0;background:#fff;color:#333;font-family:'Noto Sans KR',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:19px;line-height:34px;word-break:keep-all;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#fff;color:#333;font-family:'Noto Sans KR',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:19px;line-height:35px;word-break:keep-all;-webkit-tap-highlight-color:transparent}
 main{max-width:860px;margin:0 auto;padding:12px 20px 48px}
 a{color:#1a73e8}
 .top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin:0 0 14px}
-h1{margin:0;color:#111;font-size:35px;line-height:44px;font-weight:700}
+h1{margin:0;color:#111;font-size:35px;line-height:45px;font-weight:700}
 .h1-date{font-size:14px;line-height:20px;color:#7A7A7A;font-weight:400;white-space:nowrap}
 .nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
 .btn{display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1px solid #B5BAC0;border-radius:8px;color:#111;font:inherit;font-size:16px;font-weight:700;line-height:24px;padding:11px 12px;text-decoration:none;cursor:pointer}
@@ -323,7 +323,7 @@ h2 .pill{order:3;margin:0 0 0 auto;top:0}
 .val{font-weight:700;color:#111;white-space:nowrap}
 .none{color:#999;font-weight:400}
 .warn-t{color:#e8710a}
-.chev{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid #E2E8F0;border-radius:6px;color:#111;margin-right:-4px}
+.chev{flex:none;display:inline-flex;align-items:center;justify-content:center;width:31px;height:31px;border:1px solid #E2E8F0;border-radius:7px;color:#111;margin-right:-4px}
 .chev svg{transition:transform .15s}
 details[open] .chev svg{transform:rotate(180deg)}
 .acc-body{padding:0 12px 19px}
@@ -338,8 +338,8 @@ ul.dots .dot{flex:none;width:2px;height:2px;border-radius:50%;background:#333;ma
 .muted-line{margin:8px 0 0;font-size:14px;line-height:20px;color:#6B7280}
 .foot{margin:28px 0 0;padding:2px 0 0 12px;border-top:1px solid #f3f3f3;font-size:14px;line-height:20px;color:#6B7280}
 .foot p{margin:6px 0}
-@media (max-width:900px){h1{font-size:27px;line-height:36px}}
-@media (max-width:680px){main{padding:5px 14px 40px}h1{font-size:23px;line-height:32px}h2{font-size:20px;line-height:26px}.h2-sum{order:4;flex-basis:100%}}
+@media (max-width:900px){h1{font-size:27px;line-height:37px}}
+@media (max-width:680px){main{padding:5px 14px 40px}h1{font-size:23px;line-height:33px}h2{font-size:20px;line-height:26px}.h2-sum{order:4;flex-basis:100%}}
 `;
 
 function capsules(verdicts) {

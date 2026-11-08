@@ -747,11 +747,15 @@ def drawdown_now(conn, day, yr=None):
 MAX_MEDIA = 3   # 방송 줄 최대 수 (2026-10-25 사용자: 미디어 데일리의 엔비디아 이야기를 엔비디아 리포트로)
 
 
+def media_feed_n(iss):
+    return len({c for r in iss for c in (r.get("channels") or [r.get("channel")]) if c})
+
+
 def media_events(day, run_date):
     """엔비디아가 중심인 방송 이슈 + 반도체 업종 이슈 (media_feed.for_page) — 기준 거래일(UTC 날짜) 이후 올라온 영상만. 못 읽으면 0건."""
     iss = media_feed.issues(media_feed.rows(media_feed.load(run_date, days=2)), since=f"{day}T00:00")   # 같은 이슈는 한 줄로 정리한 뒤
     rs = sorted(media_feed.for_page(iss, config.SYMBOL), key=lambda r: str(r["published_at"]), reverse=True)
-    return [media_feed.event(r) for r in rs[:MAX_MEDIA]]
+    return [media_feed.event(r, media_feed_n(iss)) for r in rs[:MAX_MEDIA]]
 
 
 def build(conn, day, run_date):

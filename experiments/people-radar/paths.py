@@ -10,13 +10,13 @@ CHANNEL_KO = {
 }
 CHANNEL_WHY = {   # 경로 이름 옆 짧은 뜻 (독자용, 가이드라인 3-4: 어려운 말은 풀어서)
     "rates": "금리 기대가 바뀌면 국채 · 금융 · 성장주가 먼저 움직입니다",
-    "cost": "관세는 수입 원가와 상대국 통화에 먼저 닿습니다",
-    "supply": "공급 · 생산 발언은 유가와 에너지 업종에 먼저 닿습니다",
-    "risk": "전쟁 · 긴장 발언은 변동성과 유가, 시장 전체에 닿습니다",
-    "regulation": "규제는 그 업종과 이름이 오른 회사에 닿습니다",
-    "fiscal": "세금 · 재정 발언은 시장 전체와 국채 금리에 닿습니다",
-    "earnings": "제품 · 투자 · 실적 발언은 그 회사와 거래 상대의 실적 기대에 닿습니다",
-    "attention": "유명 투자자의 매매 · 의견은 그 종목에 당일 관심으로 닿고, 되돌아오는 일이 잦습니다",
+    "cost": "관세는 수입 원가와 상대국 통화로 먼저 연결됩니다",
+    "supply": "공급 · 생산 발언은 유가와 에너지 업종으로 먼저 연결됩니다",
+    "risk": "전쟁 · 긴장 발언은 변동성과 유가, 시장 전체로 연결됩니다",
+    "regulation": "규제는 그 업종과 이름이 오른 회사로 연결됩니다",
+    "fiscal": "세금 · 재정 발언은 시장 전체와 국채 금리로 연결됩니다",
+    "earnings": "제품 · 투자 · 실적 발언은 그 회사와 거래 상대의 실적 기대로 연결됩니다",
+    "attention": "유명 투자자의 매매 · 의견은 그 종목에 당일 관심으로 연결되고, 되돌아오는 일이 잦습니다",
 }
 SECTOR_ETF = {"Semiconductor": "SMH", "Technology": "XLK", "Financials": "XLF", "Energy": "XLE", "Healthcare": "XLV", "Industrials": "XLI",
               "Consumer": "XLY", "Materials": "XLB", "Real Estate": "XLRE", "Utilities": "XLU", "Defense": "ITA", "Bonds/Rates": "^TNX",

@@ -166,6 +166,7 @@ def build(raw, closes, series, dates=None):
         "normal": normal,
         "shock": market_shock(closes.get("^VIX")),
         "korea": korea(normal, stats),
+        "ewy": normal_range(closes.get("EWY")),   # 한국 주식 상장지수펀드 밤사이 등락 · 평소 배수 (P407). 값이 없으면 None — 줄 생략
         "fx": fx(closes, series, dates or {}),
         "calendar": calendar(raw.get("calendar"), stats),
         "regime_check": stats.get("regime"),

@@ -6,9 +6,11 @@
 - `/` 인덱스는 열 때마다 experiments/*/output/*.html 을 새로 읽는다 — 목업이 늘거나 바뀌어도 새로고침만 하면 된다.
 - 주소가 바뀌지 않게 포트를 고정하고, IP 대신 맥 이름(.local) 주소도 함께 찍는다.
 - 같은 와이파이에 열리므로 output 폴더 밖(.env 등)은 내주지 않는다.
-- 즐겨찾기(☆ 누르기) · 자주 연 목업(연 횟수)은 맨 위에 (2026-11-01 사용자). 기록은 맥의 experiments/.mock_prefs.json 하나 — 태블릿 · 맥이 같은 목록을 본다.
+- 즐겨찾기(☆ 누르기)는 맨 위에 (2026-11-01 사용자). 기록은 맥의 experiments/.mock_prefs.json 하나 — 태블릿 · 맥이 같은 목록을 본다.
+- 2026-11-07 사용자: 이름으로 찾기 · 자주 연 목업 삭제, 종목 목업은 `한국 종목` · `미국 종목` 대신 종목 이름(삼성전자 · 애플)을 보인다.
 """
 import html
+import re
 import json
 import threading
 import os
@@ -37,8 +39,8 @@ LABELS = {
     "issue_store": "증시 전망",   # 사건 가설 질문 페이지 · 목록 · 홈 카드 목업 (2026-11-06)
 }
 RECENT_N = 12
-FREQ_N, FREQ_MIN = 6, 2   # 자주 연 목업 = 2번 이상 연 것 중 많이 연 순서로 6개
-PREFS = os.path.join(BASE, ".mock_prefs.json")   # {"star": ["폴더/파일"], "opens": {"폴더/파일": 횟수}} — output 밖이라 서버가 내주지 않는다
+STOCK_DIRS = ("kr-stocks", "stock-radar")   # 폴더 이름 대신 종목 이름을 보이는 폴더 (2026-11-07 사용자)
+PREFS = os.path.join(BASE, ".mock_prefs.json")   # {"star": ["폴더/파일"]} — output 밖이라 서버가 내주지 않는다
 _lock = threading.Lock()
 
 
@@ -48,7 +50,7 @@ def load_prefs():
             p = json.load(fh)
     except (OSError, ValueError):
         p = {}
-    return {"star": p.get("star", []), "opens": p.get("opens", {})}
+    return {"star": p.get("star", [])}
 
 
 def save_prefs(p):
@@ -57,7 +59,8 @@ def save_prefs(p):
     os.replace(PREFS + ".tmp", PREFS)
 
 
-_themed = {}   # 경로 → (수정 시각, 테마 있음)
+_themed = {}   # 경로 → (수정 시각, 테마 있음, 종목 이름)
+_TITLE = re.compile(r"<title>([^<]*?) 주가", re.I)
 
 
 def themed(path, mtime):
@@ -66,9 +69,20 @@ def themed(path, mtime):
     hit = _themed.get(path)
     if not hit or hit[0] != mtime:
         with open(path, encoding="utf-8", errors="replace") as fh:
-            s = fh.read().lower()
-        hit = _themed[path] = (mtime, "<style" in s or 'rel="stylesheet"' in s)
+            raw = fh.read()
+        s = raw.lower()
+        m = _TITLE.search(raw)   # `애플 AAPL 주가 …` → 애플 · `삼성전자 주가 …` → 삼성전자
+        nm = re.sub(r"\s+[A-Z][A-Z0-9.\-]*$", "", m.group(1).strip()) if m else ""
+        hit = _themed[path] = (mtime, "<style" in s or 'rel="stylesheet"' in s, html.unescape(nm))
     return hit[1]
+
+
+def stock_name(d, f):
+    """종목 목업이면 제목의 종목 이름, 아니면 빈 문자열."""
+    if d not in STOCK_DIRS:
+        return ""
+    hit = _themed.get(os.path.join(BASE, d, "output", f))
+    return hit[2] if hit else ""
 
 
 def mockups():
@@ -80,21 +94,23 @@ def mockups():
             continue
         for f in os.listdir(od):
             p = os.path.join(od, f)
+            if d in STOCK_DIRS and not f.startswith("mock_"):   # 게시용 본문(AAPL.html)은 목업이 아니다 — mock_AAPL 과 같은 내용, 주소로는 열린다 (2026-11-07 사용자)
+                continue
             if f.endswith(".html") and themed(p, t := os.path.getmtime(p)):
                 out.append((d, f, t))
     return sorted(out, key=lambda x: -x[2])
 
 
-def row(d, f, t, show_dir=False, stars=(), opens=None):
+def row(d, f, t, show_dir=False, stars=()):
     href = f"/{quote(d)}/output/{quote(f)}"
     when = datetime.fromtimestamp(t).strftime("%m-%d %H:%M")
-    sub = f"{LABELS.get(d, d)} · {when}" if show_dir else when
-    if opens:
-        sub += f" · {opens}번"
+    nm = stock_name(d, f)
+    label = nm or (LABELS.get(d, d) if show_dir else "")
+    sub = f"{label} · {when}" if label else when
     name = html.escape(f[:-5])
     key = html.escape(f"{d}/{f}")
     on = f"{d}/{f}" in stars
-    return (f'<div class="row" data-q="{html.escape(d + " " + f).lower()}"><a class="go" href="{href}">'
+    return (f'<div class="row"><a class="go" href="{href}">'
             f'<span class="name">{name}</span><span class="sub">{html.escape(sub)}</span></a>'
             f'<button class="star{" on" if on else ""}" data-k="{key}" aria-label="즐겨찾기">{"★" if on else "☆"}</button></div>')
 
@@ -103,7 +119,7 @@ def index_page():
     items = mockups()
     with _lock:
         prefs = load_prefs()
-    stars, opens = prefs["star"], prefs["opens"]
+    stars = prefs["star"]
     by_key = {f"{d}/{f}": (d, f, t) for d, f, t in items}
     groups = {}
     for d, f, t in items:
@@ -112,9 +128,6 @@ def index_page():
     fav = [by_key[k] for k in stars if k in by_key]   # 누른 순서대로
     if fav:
         parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars) for x in fav), "</section>"]
-    freq = sorted((k for k, n in opens.items() if n >= FREQ_MIN and k in by_key and k not in stars), key=lambda k: -opens[k])[:FREQ_N]
-    if freq:
-        parts += ['<section><h2>자주 연 목업</h2>', *(row(*by_key[k], show_dir=True, stars=stars, opens=opens[k]) for k in freq), "</section>"]
     parts += ['<section><h2>최근 바뀐 목업</h2>', *(row(*x, show_dir=True, stars=stars) for x in items[:RECENT_N]), "</section>"]
     for d in sorted(groups, key=lambda k: -groups[k][0][2]):   # 최근에 손댄 폴더가 위
         parts.append(f'<details><summary>{html.escape(LABELS.get(d, d))} <span class="n">{len(groups[d])}</span></summary>')
@@ -125,8 +138,7 @@ def index_page():
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>목업 목록</title>
 <style>
 body{{margin:0;padding:16px;font:16px/1.4 -apple-system,"Apple SD Gothic Neo",sans-serif;background:#f6f7f9;color:#1d2127}}
-h1{{font-size:20px;margin:0 0 4px}} .meta{{color:#8a919c;font-size:13px;margin-bottom:12px}}
-input{{width:100%;box-sizing:border-box;font-size:16px;padding:10px 12px;border:1px solid #d5d9e0;border-radius:8px;margin-bottom:16px}}
+h1{{font-size:20px;margin:0 0 4px}} .meta{{color:#8a919c;font-size:13px;margin-bottom:16px}}
 h2{{font-size:15px;color:#5b6370;margin:0 0 8px}} section{{margin-bottom:20px}}
 details{{background:#fff;border:1px solid #e3e6eb;border-radius:10px;margin-bottom:10px}}
 summary{{padding:14px;font-weight:600;cursor:pointer}} .n{{color:#8a919c;font-weight:400;font-size:14px}}
@@ -137,32 +149,25 @@ details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
 .star{{flex:0 0 48px;border:0;background:none;font-size:22px;color:#c3c8d0;cursor:pointer;padding:0}} .star.on{{color:#f5a623}}
 </style></head><body>
 <h1>목업 목록</h1><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록</div>
-<input id="q" type="search" placeholder="이름으로 찾기 (예: 005930, mock_)">
 {''.join(parts)}
 <script>
-const q = document.getElementById('q'), ds = [...document.querySelectorAll('details')];
-function filter() {{
-  const v = q.value.trim().toLowerCase();
-  document.querySelectorAll('.row').forEach(r => r.style.display = !v || r.dataset.q.includes(v) ? '' : 'none');
-  if (v) ds.forEach(d => d.open = true);
-}}
-q.addEventListener('input', filter);
+const ds = [...document.querySelectorAll('details')];
 // ☆ 누르면 즐겨찾기 넣기 · 빼기 → 목록을 다시 받아 맨 위 즐겨찾기에 반영
 document.querySelectorAll('.star').forEach(b => b.addEventListener('click', async () => {{
   await fetch('/star?k=' + encodeURIComponent(b.dataset.k), {{method: 'POST'}});
   try {{ sessionStorage.setItem('mockIndex', JSON.stringify({{
-    open: ds.filter(d => d.open).map(d => d.querySelector('summary').textContent), q: q.value, y: scrollY }})); }} catch (e) {{}}
+    open: ds.filter(d => d.open).map(d => d.querySelector('summary').textContent), y: scrollY }})); }} catch (e) {{}}
   location.reload();
 }}));
-// 목업에서 '목록으로' 눌러 돌아오면 펼친 접기 · 검색어 · 스크롤을 그대로 (같은 창 전환)
+// 목업에서 '목록으로' 눌러 돌아오면 펼친 접기 · 스크롤을 그대로 (같은 창 전환)
 try {{
   const s = JSON.parse(sessionStorage.getItem('mockIndex') || 'null');
   if (s) {{ ds.forEach((d, i) => d.open = s.open.includes(d.querySelector('summary').textContent));
-           q.value = s.q; if (s.q) filter(); scrollTo(0, s.y); }}
+           scrollTo(0, s.y); }}
 }} catch (e) {{}}
 addEventListener('pagehide', () => {{
   try {{ sessionStorage.setItem('mockIndex', JSON.stringify({{
-    open: ds.filter(d => d.open).map(d => d.querySelector('summary').textContent), q: q.value, y: scrollY }})); }} catch (e) {{}}
+    open: ds.filter(d => d.open).map(d => d.querySelector('summary').textContent), y: scrollY }})); }} catch (e) {{}}
 }});
 </script></body></html>"""
 
@@ -213,11 +218,6 @@ class Handler(SimpleHTTPRequestHandler):
                 page = fh.read()
             i = page.lower().rfind("</body>")
             page = page[:i] + BACK_BAR + page[i:] if i >= 0 else page + BACK_BAR
-            with _lock:   # 자주 연 목업 — 연 횟수
-                p = load_prefs()
-                k = f"{seg[0]}/{seg[2]}"
-                p["opens"][k] = p["opens"].get(k, 0) + 1
-                save_prefs(p)
             body = page.encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")

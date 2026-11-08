@@ -100,6 +100,34 @@ def process(items):
     print(f"[공용 처리] 헤드라인 {n}/{len(items)} · 요약 {sum(1 for it in items if it['summary_ko'])}")
 
 
+SUM_FILE = "news_summaries_home.json"   # 기사 요약 다섯 줄 캐시 (gh-pages 에 같이 배포 — 같은 기사를 다시 AI 에 보내지 않게, 2026-11-07 P342)
+SUM_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/" + SUM_FILE
+SUM_MAX = 12   # 한 실행에 새로 요약하는 기사 상한 (Groq 하루 토큰 보호, CLAUDE.md 한도 표)
+
+
+def summarize(items):
+    """홈 주요 뉴스 팝업 (2026-11-07 사용자 P342) — CNBC 기사마다 요약 다섯 줄(experiments/news_summary.py, 데일리 뉴스 탭과 같은 규칙 · 사슬).
+    처음 본 기사만 AI, 실패하면 lines 없이(홈은 원문 링크로)."""
+    import news_summary
+    try:
+        cache = requests.get(SUM_URL, timeout=20).json()
+    except Exception:  # noqa: BLE001
+        cache = {}
+    with open(SUM_FILE, "w", encoding="utf-8") as f:
+        json.dump(cache, f, ensure_ascii=False)
+    try:
+        lines = news_summary.summarize([{"item_id": _iid(it["link"]), "title": it["title"], "url": it["link"], "snippet": it.get("summary", "")} for it in items],
+                                       cache_path=SUM_FILE, lead_cache="leads_home.json", label="home-summary", max_items=SUM_MAX)
+    except Exception as e:  # noqa: BLE001
+        print(f"[요약] 실패 — 홈은 원문 링크로: {str(e)[:100]}")
+        lines = {}
+    for it in items:
+        ln = lines.get(_iid(it["link"])) or []
+        if len(ln) >= 2:
+            it["lines"] = ln
+    print(f"[요약] 팝업 {sum(1 for it in items if it.get('lines'))}/{len(items)}")
+
+
 MEDIA_MAX = 3   # 홈 주요 뉴스에 섞는 방송 줄 — 방송 여러 곳이 같이 다룬 시장 · 업종 이슈 (2026-10-25 사용자)
 
 
@@ -122,7 +150,8 @@ def media_items():
         except ValueError:
             continue
         out.append({"title": r["topic"], "title_ko": r["topic"], "summary_ko": dk.headline(r["note"]) if r["note"] else "", "source": r["channel"],
-                    "link": r["url"], "published": pub, "kind": "media", "tag": r["theme"], "direction": r["direction"], "n_channels": r["n_channels"]})
+                    "link": r["url"], "published": pub, "kind": "media", "tag": r["theme"], "direction": r["direction"], "n_channels": r["n_channels"],
+                    **({"lines": r["lines"]} if len(r.get("lines") or []) >= 2 else {})})   # 수집기 요약 다섯 줄 — 홈 팝업 (P342)
     print(f"[방송] 시장 이슈 {len(out)}줄")
     return out
 
@@ -168,6 +197,7 @@ def main():
     media = media_items()
     results = items[:MAX_ITEMS - len(media)]
     process(results)
+    summarize(results)
     results = sorted(results + media, key=lambda it: it["published"], reverse=True)   # 방송 줄도 시각 순으로 섞는다
     # 영문 RSS 요약은 번역 입력으로만 쓰고 공개 파일(gh-pages, PUBLIC 저장소 = 배포)에는 남기지 않는다 (2026-10-21, 운영지침 4-2 · D4-2).
     # 홈은 summary_ko(우리 소개 한 줄)만 쓴다

@@ -35,12 +35,10 @@ KOREA_CHANNELS = {"당잠사", "증시각도기"}
 NARRATE_CHAIN = "json-backup-first"   # 서술은 예비 공급자 먼저 (운영지침 3-2: Groq → lite → flash)
 
 # 분류 17개 (수집기 doc/데이터-설계.md) → 우리 이슈 코드 (experiments/issue_codes.py). 이름이 다른 셋만 바꾼다
-CATEGORY_KO = {
-    "RATES_CB": "금리 · 중앙은행", "INFLATION": "물가", "GROWTH_JOBS": "경기 · 고용", "TARIFF_TRADE": "관세 · 무역", "GEOPOLITICS": "지정학",
-    "ENERGY_COMMODITY": "에너지 · 원자재", "AI_CAPEX": "AI 투자", "EARNINGS": "실적", "CORP_EVENT": "기업 이벤트", "CREDIT_BANKS": "은행 · 신용",
-    "MARKET_STRUCTURE": "수급 · 변동성", "REGULATION": "규제", "FISCAL_POLITICS": "재정 · 정치", "FX": "환율", "CRYPTO": "암호화폐",
-    "REAL_ESTATE": "부동산", "OTHER": "그 밖",
-}
+import sys as _sys   # noqa: E402
+_sys.path.insert(0, os.path.join(BASE_DIR, ".."))
+import issue_codes as _ic  # noqa: E402
+CATEGORY_KO = dict(_ic.ISSUE_KO)   # 분야 화면 이름 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339: 화면 분야 라벨 = 기록 이슈 코드 18개 이름). 수집기 옛 이름(RATES_CB · ENERGY_COMMODITY · FX)은 읽을 때 FROM_YTB_CATEGORY 로 바꾼다
 STANCE_KO = {"bullish": "긍정", "bearish": "부정", "neutral": "중립"}
 SURPRISE_KO = {"surprise": "예상 밖", "expected": "예상대로", "unknown": ""}
 SPEAKER_KO = {"Jim Cramer": "짐 크레이머", "Steve Liesman": "스티브 리스먼", "Dan Ives": "댄 아이브스", "Jerome Powell": "제롬 파월", "Scott Bessent": "스콧 베센트",
