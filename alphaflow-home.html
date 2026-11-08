@@ -314,7 +314,13 @@ body.menu-open { overflow: hidden; }
 .report-chart { display: block; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px; cursor: zoom-in; }   /* 홈 미국 증시 카드의 S&P 500 그래프 (2026-10-21 사용자) */
 .report-chart[hidden] { display: none; }
 /* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
-#radar-col { grid-column: 1 / -1; }   /* 트럼프 카드를 뺀 뒤(2026-11-04 H32) 셋째 카드라 전폭 — 10-20 ~ 10-23 과 같은 규칙 */
+/* #radar-col 전폭 규칙은 뺐다 (2026-11-08 H34): 넷째 카드 `증시 전망` 이 들어와 미국 · 한국 / 인물 · 증시 전망 2 × 2 */
+/* 홈 증시 전망 카드 (2026-11-08 H34) — 줄 = 전망 질문(18 · 행간 34 · 보통 굵기, 인물 발언 줄과 같게) + 분류 라벨 · 게시일. 국면 · 문장은 전망 페이지에서. 자료 = gh-pages hypo.json (forecast_daily, 하루 1회) */
+#hypo-card { padding: 0 16px; gap: 0; }
+#hypo-card .kv-rows { padding: 12px 0 14px; }
+#hypo-card .kv-row.plain-row { display: block; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; overflow-wrap: anywhere; }
+#hypo-card .kv-row.plain-row + .kv-row.plain-row { border-top: 1px solid #E2E8F0; padding-top: 12px; margin-top: 8px; }
+#hypo-card .hypo-empty { padding: 14px 0 16px; font-size: 16px; line-height: 24px; color: #7A7A7A; }
 #radar-card { padding: 0 16px; gap: 0; }
 /* 인물 발언 · 미디어 데일리 줄 = 글자만 (2026-10-24 사용자: 라벨 · 강도 · 관심도 · 구분선 · 굵게 모두 뺌). 18 · 행간 34 · 보통 굵기, 줄 사이 위아래 4 */
 #radar-card .kv-row.plain-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 7px; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; }
@@ -1008,6 +1014,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     <nav class="menu-items" id="primary-menu" aria-label="주 메뉴">
       <a class="nav-item" href="/" aria-current="page">홈</a>
       <a class="nav-item" href="/search/label/데일리%20브리핑">미국 증시</a>
+      <a class="nav-item" href="/p/forecast-list.html">증시 전망</a>   <!-- 2026-11-08 사용자 (홈 수정 H34) — 전망 목록 고정 페이지 -->
     </nav>
   </div>
 
@@ -1080,6 +1087,14 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         <h3 class="report-title"><span class="report-icon" style="background:#0F766E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4"/></svg></span>주요 인물 발언<span class="report-card-date" data-date="radar-card"></span></h3>
         <a class="report-card" id="radar-card" href="/search/label/인물%20발언">
           <div class="kv-rows" data-hook="radar-rows"><div class="kv-row"><span class="kv-name">리포트를 불러오는 중…</span></div></div>
+        </a>
+        </div>
+
+        <!-- 증시 전망 (2026-11-08 사용자 H34) — 큰 사건마다 두 갈래 전망을 미리 적고 날마다 확인. 줄 = 지켜보는 전망(최대 3) 질문 · 라벨 · 게시일, 줄을 누르면 그 전망 페이지, 제목 · 카드 바탕은 목록 -->
+        <div class="report-col" id="hypo-col">
+        <h3 class="report-title" data-row-link="1" data-href="/p/forecast-list.html"><span class="report-icon" style="background:#7C3AED;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v12M4.5 14h7"/><path d="M2.5 5h11"/><path d="M4 5 2 9.5h4L4 5zM12 5l-2 4.5h4L12 5z"/></svg></span>증시 전망<span class="report-card-date" data-date="hypo-card"></span></h3>
+        <a class="report-card" id="hypo-card" href="/p/forecast-list.html">
+          <div class="kv-rows" data-hook="hypo-rows"><div class="kv-row"><span class="kv-name">불러오는 중…</span></div></div>
         </a>
         </div>
 
@@ -1746,6 +1761,31 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     .then(function (r) { return r.json(); })
     .then(function (json) { krHome = json; setEvents('kr', json.events); renderNotable('kr', json.notable); if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); syncLiveUI(); })
     .catch(function () { renderNotable('kr', null); });
+
+  /* ================================================= 증시 전망 (hypo.json, 2026-11-08 사용자 H34) — experiments/issue_store/forecast_daily.py 가 하루 1회 gh-pages 에 올린다.
+     j = { generated, list_url, open: [{ title, url, posted, tags }] }. 줄 = 질문 + 라벨 + `게시일 게시`. 지켜보는 전망이 없으면 한 줄 안내 */
+  function renderHypo(j) {
+    var box = document.querySelector('[data-hook="hypo-rows"]');
+    if (!box) return;
+    box.textContent = '';
+    if (!j) { box.appendChild(el('div', 'hypo-empty', LOAD_FAILED)); return; }
+    var rows = j.open || [];
+    if (!rows.length) { box.appendChild(el('div', 'hypo-empty', '지금 지켜보는 전망이 없습니다')); }
+    rows.forEach(function (q) {
+      var d = el('div', 'kv-row plain-row', q.title);
+      var labels = el('div', 'news-labels');
+      (q.tags || []).forEach(function (t) { labels.appendChild(el('span', 'news-tag', t)); });
+      if (q.posted) labels.appendChild(el('span', 'news-sub', q.posted + ' 게시'));
+      d.appendChild(labels);
+      if (q.url) { d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', q.url); }
+      box.appendChild(d);
+    });
+    if (j.generated) setDate('hypo-card', ntMd(String(j.generated).slice(0, 10)) + ' 기준');
+  }
+  fetch(GH + 'hypo.json?v=' + Date.now())
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(renderHypo)
+    .catch(function () { renderHypo(null); });
 
   fetch(DATA_URL + '?v=' + Date.now())
     .then(function (r) { return r.json(); })
