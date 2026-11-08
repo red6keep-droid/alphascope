@@ -1,112 +1,166 @@
 {
-  "updated_at": "2026-11-08 12:47:22 UTC",
+  "updated_at": "2026-11-08 18:07:31 UTC",
   "items": [
+    {
+      "title": "Here are the 2 big things we're watching in the stock market in the week ahead",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/11/08/here-are-the-2-big-things-were-watching-in-the-stock-market-in-the-week-ahead.html",
+      "published": "2026-11-08 17:40:15",
+      "title_ko": "주간 시장 전망: 코어위브 실적·인플레이션 데이터 주목",
+      "summary_ko": "주간 시장 전망",
+      "lines": [
+        "코어웨이브 실적 발표 주시",
+        "인플레이션 데이터 발표 예정"
+      ]
+    },
+    {
+      "title": "중동 정세와 유가 하외 안정",
+      "title_ko": "중동 정세와 유가 하외 안정",
+      "summary_ko": "중동 상황이 외교적으로 해결되면 유가와 원자재 가격이 하락하여 인플레이션 완화에 기여할 것",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=zZGwK5vfCi8",
+      "published": "2026-11-08 16:16:05",
+      "kind": "media",
+      "tag": "유가 · 에너지 · 원자재",
+      "direction": "neutral",
+      "n_channels": 2,
+      "lines": [
+        "조 라보라냐 발언 : 중동 갈등이 완화되면 유가와 원자재 가격 하락 기대",
+        "조 라보라냐 발언 : 에너지 가격 안정이 인플레이션 측면에 도움을 줄 것"
+      ]
+    },
+    {
+      "title": "AI 데이터센터와 하이스케일러 규제",
+      "title_ko": "AI 데이터센터와 하이스케일러 규제",
+      "summary_ko": "AI 데이터센터와 하이스케일러들이 세제 혜택 요구와 정보 은폐 등으로 정치적 반발을 자초했다고 지적",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=dHeLmxS9aoM",
+      "published": "2026-11-08 16:00:11",
+      "kind": "media",
+      "tag": "규제 · 산업정책",
+      "direction": "negative",
+      "n_channels": 2,
+      "lines": [
+        "고탐 무쿤다 발언 : 하이스케일러의 장기 고용 창출 효과 제한",
+        "고탐 무쿤다 발언 : 텍사스 신임 주지사의 신규 인허가 엄격한 심사 예고",
+        "고탐 무쿤다 발언 : 업계의 과도한 세제 혜택 요구와 비밀주의 반발 초래"
+      ]
+    },
+    {
+      "title": "How Democrats will try to end Trump's tariffs",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/trump-tariffs-democrats-congress-canada.html",
+      "published": "2026-11-08 15:36:39",
+      "title_ko": "민주당, 트럼프 관세 종료 시도",
+      "summary_ko": "제프리스, 하우스 스피커 후보",
+      "lines": [
+        "하킴 제프리스 하원의장 후보 지명",
+        "민주당 트럼프 관세 폐지 최우선 과제 설정"
+      ]
+    },
+    {
+      "title": "관세 철폐 및 의회 무역 권한 회복",
+      "title_ko": "관세 철폐 및 의회 무역 권한 회복",
+      "summary_ko": "관세는 물가 상승을 유발하는 직접적인 세금이므로 의회가 관세 권한을 다시 가져와야 ",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=6l9ny1JXyxs",
+      "published": "2026-11-08 14:56:40",
+      "kind": "media",
+      "tag": "관세 · 무역",
+      "direction": "neutral",
+      "n_channels": 1,
+      "lines": [
+        "섀넌 테일러 발언 : 불법적인 관세 철폐를 통한 생활비 인하",
+        "폴 베링거 발언 : 관세는 직접적인 인플레이션을 유발하므로 의회가 통제권 행사 필요",
+        "폴 베링거 발언 : 헌법상 의회 권한인 관세 및 무역 통제권 회복 추진"
+      ]
+    },
+    {
+      "title": "Trump targets Slotkin in call for DOJ probe of alleged Democratic threats to Republicans",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/07/trump-doj-democrats-alleged-threats-slotkin.html",
+      "published": "2026-11-08 14:15:00",
+      "title_ko": "트럼프, 민주당의 공화당 위협 의혹 DOJ 수사 촉구하며 슬로킨 지목",
+      "summary_ko": "",
+      "lines": [
+        "트럼프 DOJ 공화당 위협 수사 지시",
+        "슬로킨 특정 지목"
+      ]
+    },
+    {
+      "title": "Recent AI agent experiments reveal a risky future of machine 'teamwork' inside corporations",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/ai-agents-risks.html",
+      "published": "2026-11-08 14:14:11",
+      "title_ko": "최근 AI 에이전트 실험, 기업 내 기계 '팀워크' 위험성 드러남",
+      "summary_ko": "목표 불일치·윤리 미준수",
+      "lines": [
+        "AI 에이전트 기업 내 협업 실험 진행",
+        "AI 에이전트 목표 불일치 및 윤리 부재 연구 결과"
+      ]
+    },
+    {
+      "title": "Poppi founders are going after PepsiCo's Gatorade with new beverage startup Jetty",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/poppi-founders-jetty-hydration-gatorade.html",
+      "published": "2026-11-08 14:00:01",
+      "title_ko": "포피 창업자, 페프시코 가토레이드 겨냥 신생 브랜드 '제티' 출시",
+      "summary_ko": "홀푸즈 · 타깃 · 아마존 판매",
+      "lines": [
+        "포피 창업자 앨리슨과 스티븐 엘스워스, 수분 보충 브랜드 제티 설립 발표",
+        "제티, 물병 음료 및 분말 제품 판매 개시",
+        "판매 채널로 홀푸즈, 타깃, 아마존 선정"
+      ]
+    },
+    {
+      "title": "Using miles to fly for Thanksgiving? These are the most expensive and cheapest routes",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/frequent-flyer-miles-points-thanksgiving.html",
+      "published": "2026-11-08 13:00:01",
+      "title_ko": "감사절 항공편, 가장 비싸고 저렴한 노선",
+      "summary_ko": "지난해 대비 운임 상승",
+      "lines": [
+        "터키데이 항공편 운임, 전년 대비 상승 전망",
+        "강력한 수요 지속으로 항공권 가격 인상 요인 작용"
+      ]
+    },
+    {
+      "title": "Amazon's Astro home robot has fans but looks destined for the 'trash heap.' Why it's trying again",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/amazon-home-robot-fauna-sprout.html",
+      "published": "2026-11-08 13:00:01",
+      "title_ko": "아마존 아스트로 로봇, 재도전 이유",
+      "summary_ko": "직무 공고 분석 기반",
+      "lines": [
+        "아마존, 신규 홈 로봇 팀 구성",
+        "신규 로봇 제품 관련 채용 진행 중",
+        "CNBC, 채용 공고 분석 결과 발표"
+      ]
+    },
+    {
+      "title": "Brands are sponsoring IRL communities. Some experts say that could spell their end",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/make-it/2026/11/08/brand-sponsorship-local-communities.html",
+      "published": "2026-11-08 13:00:01",
+      "title_ko": "브랜드, 오프라인 커뮤니티 후원… 끝을 알리나",
+      "summary_ko": "독서 클럽 등 대상",
+      "lines": [
+        "브랜드, 북클럽 등 지역 커뮤니티 스폰서십 확대",
+        "지역 모임 주최자, 신규 수익원 확보",
+        "커뮤니티 신뢰도 및 지속 가능성에 대한 우려 제기"
+      ]
+    },
     {
       "title": "Top Wall Street analysts like these 3 dividend stocks for consistent income",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/08/top-analysts-like-these-3-dividend-stocks-for-consistent-income.html",
       "published": "2026-11-08 11:47:24",
       "title_ko": "월가 주요 애널리스트가 추천하는 꾸준한 수익을 위한 3개 배당주",
-      "summary_ko": ""
-    },
-    {
-      "title": "In pictures: France protests draw 146,000 as clashes erupt for fourth straight weekend",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/08/france-protests-clashes-arrests.html",
-      "published": "2026-11-08 09:29:04",
-      "title_ko": "프랑스 시위, 146,000명 참여·4일째 충돌",
-      "summary_ko": "시위 4일 연속 발생"
-    },
-    {
-      "title": "Cathie Wood 'always feels better when the market is worried' — here's why",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/08/cathie-wood-ai-selloff.html",
-      "published": "2026-11-08 06:00:01",
-      "title_ko": "캐시 우드 \"시장이 걱정할 때 항상 더 편안하다\", 그 이유는",
-      "summary_ko": "캐시 우드, 현재 시장 '우려의 벽' 언급"
-    },
-    {
-      "title": "Trump offers UFC chief Dana White press secretary job",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/trump-ufc-dana-white-press-secretary-offer.html",
-      "published": "2026-11-07 23:13:38",
-      "title_ko": "트럼프, UFC 회장 데이나 화이트에 대변인직 제안",
-      "summary_ko": ""
-    },
-    {
-      "title": "Risk of Iran war escalation remains high despite Democratic sweep in U.S. midterm elections",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/iran-war-midterm-election-oil-price-trump.html",
-      "published": "2026-11-07 22:17:52",
-      "title_ko": "미국 중간선거 민주당 승리로 이란 전쟁 확전 위험 여전히 높아",
-      "summary_ko": "미국과 이란, 중동 긴장 고조"
-    },
-    {
-      "title": "Meta chief strategy officer Dave Wehner leaves to join AI infrastructure startup Fireworks as CFO",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/dave-wehner-meta-fireworks-cfo.html",
-      "published": "2026-11-07 22:01:17",
-      "title_ko": "메타 최고전략책임자 데이브 웨너, AI 인프라 스타트업 파이어웍스 CFO로 이직",
-      "summary_ko": "파이어웍스, 7월 175억 달러 기업가치 평가"
-    },
-    {
-      "title": "Trump targets Slotkin in call for DOJ probe of alleged Democratic threats to Republicans",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/trump-doj-democrats-alleged-threats-slotkin.html",
-      "published": "2026-11-07 21:59:10",
-      "title_ko": "트럼프, 민주당의 공화당 위협 의혹 DOJ 수사 촉구하며 슬로킨 지목",
-      "summary_ko": ""
-    },
-    {
-      "title": "AI를 활용한 방위산업 제조 공정 혁신",
-      "title_ko": "AI를 활용한 방위산업 제조 공정 혁신",
-      "summary_ko": "AI 소프트웨어를 활용해 미사일 등 복잡한 무기 체계의 조립 및 제조 공정 설계를 획기적으로 단축할 수 있음",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=MuKNTziO7K8",
-      "published": "2026-11-07 19:00:31",
-      "kind": "media",
-      "tag": "AI/반도체",
-      "direction": "positive",
-      "n_channels": 1
-    },
-    {
-      "title": "10월 호조의 고용보고서 발표",
-      "title_ko": "10월 호조의 고용보고서 발표",
-      "summary_ko": "실업률이 4.1%로 하락하고 고용 증가세가 화이트칼라 및 제조업 등으로 광범위하게 확산되는 강력한 고용보고서가 발표",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=CMOo74j2Lzo",
-      "published": "2026-11-07 17:15:41",
-      "kind": "media",
-      "tag": "거시경제",
-      "direction": "positive",
-      "n_channels": 2
-    },
-    {
-      "title": "스티븐 밀러 백악관 비서실장 임명",
-      "title_ko": "스티븐 밀러 백악관 비서실장 임명",
-      "summary_ko": "트럼프 대통령이 수지 와일즈의 뒤를 이어 강경파인 스티븐 밀러를 비서실장으로 임명하면서 민주당과의 대립각이 더욱 뚜렷해졌",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=CMOo74j2Lzo",
-      "published": "2026-11-07 17:15:41",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "neutral",
-      "n_channels": 1
-    },
-    {
-      "title": "Decisive election. Dramatic stock swings. How we handled the market last week",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/11/07/decisive-election-dramatic-stock-swings-how-we-handled-the-market-last-week.html",
-      "published": "2026-11-07 16:31:00",
-      "title_ko": "결정적 선거. 극적인 주가 변동. 지난주 시장 대응 방식",
-      "summary_ko": "금요일 발표"
-    },
-    {
-      "title": "Berkshire Hathaway more than doubles buybacks in third quarter as earnings decline",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/berkshire-hathaway-q3-2026-earnings-buybacks.html",
-      "published": "2026-11-07 15:23:46",
-      "summary_ko": ""
+      "summary_ko": "",
+      "lines": [
+        "배당주 3종 선정",
+        "월스트리트 최고 애널리스트 추천"
+      ]
     }
   ]
 }
