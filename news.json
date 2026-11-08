@@ -1,21 +1,41 @@
 {
-  "updated_at": "2026-11-07 21:46:24 UTC",
+  "updated_at": "2026-11-08 00:55:01 UTC",
   "items": [
     {
       "title": "Trump offers UFC chief Dana White press secretary job",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/07/trump-ufc-dana-white-press-secretary-offer.html",
-      "published": "2026-11-07 21:17:54",
+      "published": "2026-11-07 23:13:38",
       "title_ko": "트럼프, UFC 회장 데이나 화이트에 대변인직 제안",
       "summary_ko": ""
+    },
+    {
+      "title": "Risk of Iran war escalation remains high despite Democratic sweep in U.S. midterm elections",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/07/iran-war-midterm-election-oil-price-trump.html",
+      "published": "2026-11-07 22:17:52",
+      "title_ko": "미국 중간선거 민주당 승리로 이란 전쟁 확전 위험 여전히 높아",
+      "summary_ko": "미국과 이란, 중동 긴장 고조"
     },
     {
       "title": "Trump targets Slotkin in call for DOJ probe of alleged Democratic threats to Republicans",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/07/trump-doj-democrats-alleged-threats-slotkin.html",
-      "published": "2026-11-07 20:28:17",
+      "published": "2026-11-07 21:59:10",
       "title_ko": "트럼프, 민주당의 공화당 위협 의혹 DOJ 수사 촉구하며 슬로킨 지목",
       "summary_ko": ""
+    },
+    {
+      "title": "AI를 활용한 방위산업 제조 공정 혁신",
+      "title_ko": "AI를 활용한 방위산업 제조 공정 혁신",
+      "summary_ko": "AI 소프트웨어를 활용해 미사일 등 복잡한 무기 체계의 조립 및 제조 공정 설계를 획기적으로 단축할 수 있음",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=MuKNTziO7K8",
+      "published": "2026-11-07 19:00:31",
+      "kind": "media",
+      "tag": "AI/반도체",
+      "direction": "positive",
+      "n_channels": 1
     },
     {
       "title": "10월 호조의 고용보고서 발표",
@@ -28,6 +48,18 @@
       "tag": "거시경제",
       "direction": "positive",
       "n_channels": 2
+    },
+    {
+      "title": "스티븐 밀러 백악관 비서실장 임명",
+      "title_ko": "스티븐 밀러 백악관 비서실장 임명",
+      "summary_ko": "트럼프 대통령이 수지 와일즈의 뒤를 이어 강경파인 스티븐 밀러를 비서실장으로 임명하면서 민주당과의 대립각이 더욱 뚜렷해졌",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=CMOo74j2Lzo",
+      "published": "2026-11-07 17:15:41",
+      "kind": "media",
+      "tag": "정책/규제",
+      "direction": "neutral",
+      "n_channels": 1
     },
     {
       "title": "Decisive election. Dramatic stock swings. How we handled the market last week",
@@ -53,18 +85,6 @@
       "summary_ko": ""
     },
     {
-      "title": "미국 중간선거 민주당 압승",
-      "title_ko": "미국 중간선거 민주당 압승",
-      "summary_ko": "중간선거에서 민주당의 압승은 이란 전쟁과 경제적 불만에 대한 유권자들의 심판 결과",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=c7OM8A7SM-A",
-      "published": "2026-11-07 15:00:05",
-      "kind": "media",
-      "tag": "정책/규제",
-      "direction": "negative",
-      "n_channels": 2
-    },
-    {
       "title": "America's newest small business owners with no employees are off to a hot start in AI era",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/07/americas-new-no-employee-small-business-owners-start-hot-in-ai-era.html",
@@ -87,26 +107,6 @@
       "published": "2026-11-07 14:30:01",
       "title_ko": "많은 근로자, 사용하지 않은 FSA 금액 상실, 하지만 여전히 이득 가능. 방법은?",
       "summary_ko": "세금 절감액이 포기액 초과 가능"
-    },
-    {
-      "title": "31-year-old dumpster diver brought in $140,000 in 12 months: I 'did much more than I thought was possible'",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/11/07/dumpster-diver-resale-business.html",
-      "published": "2026-11-07 14:15:01",
-      "title_ko": "31세 쓰레기통 잠입자, 12개월간 14만 달러 벌어들여",
-      "summary_ko": "테네시주 내슈빌, 2024년 3월 폐품 재판매 시작"
-    },
-    {
-      "title": "미국 제조업 지표와 공장 생산 반등",
-      "title_ko": "미국 제조업 지표와 공장 생산 반등",
-      "summary_ko": "미국 제조업 생산과 고용이 회복세를 보이며 경제에 긍정적인 모멘텀을 제공 중",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=igSUxfQCdPQ",
-      "published": "2026-11-07 13:00:29",
-      "kind": "media",
-      "tag": "거시경제",
-      "direction": "positive",
-      "n_channels": 2
     }
   ]
 }
