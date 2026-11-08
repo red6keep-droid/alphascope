@@ -1,0 +1,32 @@
+{
+ "id": "EH-2026-001",
+ "slug": "forecast-2",
+ "title": "반도체 급락, 반등할까 더 빠질까?",
+ "kind": "after",
+ "registered": "2026-11-06",
+ "event": "11.05 반도체 급락",
+ "event_day": null,
+ "ruler": "반도체 vs 시장",
+ "line": 3.0,
+ "unit": "%p",
+ "gap": -7.9,
+ "pick": 2,
+ "pick_prob": 0.5621848739495798,
+ "market_prob": null,
+ "rules": "EH-2026-11-07b",
+ "scenarios": [
+  {
+   "cond": "반등 쪽이면",
+   "name": "반도체 반등",
+   "dir": 1,
+   "win": "반도체가 11.05 급락 폭(7.9%p)의 절반을 회복한다"
+  },
+  {
+   "cond": "지속 쪽이면",
+   "name": "반도체 하락 지속",
+   "dir": -1,
+   "win": "반도체가 11.05 급락 뒤 시장보다 3%p 더 빠진다"
+  }
+ ],
+ "sha256": "bce21b564cb9ed263751a019f6870f0c6ebbcc04fb17cf8b67672db6ebe9b12e"
+}

@@ -1,0 +1,33 @@
+{
+ "id": "hypo-card",
+ "label": "증시 전망",
+ "generated": "2026-11-08T23:22:46Z",
+ "list_url": "https://alpha-scope.blogspot.com/p/forecast-list.html",
+ "open": [
+  {
+   "no": 2,
+   "eh": "EH-2026-001",
+   "title": "반도체 급락, 반등할까 더 빠질까?",
+   "url": "https://alpha-scope.blogspot.com/p/forecast-2.html",
+   "posted": "11.06",
+   "tags": [
+    "반도체",
+    "반등"
+   ],
+   "event": "11.05 반도체 급락"
+  },
+  {
+   "no": 1,
+   "eh": "EH-2026-002",
+   "title": "엔비디아 실적 뒤 반도체는?",
+   "url": "https://alpha-scope.blogspot.com/p/forecast-nvda-2026q3.html",
+   "posted": "11.07",
+   "tags": [
+    "실적",
+    "반도체"
+   ],
+   "event": "11.17 엔비디아 실적"
+  }
+ ],
+ "done_count": 0
+}

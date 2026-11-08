@@ -1,0 +1,38 @@
+{
+ "id": "EH-2026-002",
+ "slug": "forecast-nvda-2026q3",
+ "title": "엔비디아 실적 뒤 반도체는?",
+ "kind": "pre",
+ "registered": "2026-11-07",
+ "event": "11.17 엔비디아 실적",
+ "event_day": "2026-11-17",
+ "ruler": "반도체 vs 시장",
+ "line": 3.0,
+ "unit": "%p",
+ "gap": null,
+ "pick": null,
+ "pick_prob": null,
+ "market_prob": {
+  "probs": [
+   83,
+   17
+  ],
+  "src": "최근 12번 실적 중 크게 넘은 10번 (earnings.csv)"
+ },
+ "rules": "EH-2026-11-07b",
+ "scenarios": [
+  {
+   "cond": "예상을 크게 넘으면 (예상대로)",
+   "name": "반도체 이미 반영",
+   "dir": 1,
+   "win": "결과 뒤 20거래일 동안 반도체가 기준(3%p) 넘게 더 오르지 않거나 조정을 받는다"
+  },
+  {
+   "cond": "그 밖이면 (예상 밖)",
+   "name": "반도체 하락",
+   "dir": -1,
+   "win": "반도체가 11.17 종가보다 시장보다 3%p 넘게 더 빠진다"
+  }
+ ],
+ "sha256": "09afde14d5abf0a564053f94dc5fbd2ceb39d6eba8645d898157ed07b9b6738c"
+}
