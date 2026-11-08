@@ -1,6 +1,7 @@
 """신호 서명 검증 — 지표가 사건보다 먼저 말하나 (기획 증시-전망-기획 8-19 2단계, 2026-11-08).
 
-    .venv/bin/python experiments/issue_store/signal_signatures.py   → results/signal_signatures.md · .csv
+    .venv/bin/python experiments/issue_store/signal_signatures.py          → results/signal_signatures.md · .csv  (사건표 159건)
+    .venv/bin/python experiments/issue_store/signal_signatures.py --wide   → results/signal_signatures_wide.md   (signal_events.py 가 늘린 표, 3-a)
 
 질문 넷 (기준은 결과 보기 전에 고정 — 아래 상수):
 A. 사건 전 신호: 사건 전 5거래일 누적 변화가 평소(사건 11거래일 전까지 60거래일)의 2σ 를 넘는 지표가 2개 이상인 사건 비율
@@ -12,6 +13,7 @@ D. 매일 스캔 헛울림: 2008~ 매일, 지표 2개 이상이 같은 날 하�
 AI 0. 자료 = data/store/bars · fred (깃 밖).
 """
 import os
+import sys
 
 import numpy as np
 import pandas as pd
@@ -19,8 +21,9 @@ import pandas as pd
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 STORE = os.path.join(ROOT, "data", "store")
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT_MD = os.path.join(HERE, "results", "signal_signatures.md")
-OUT_CSV = os.path.join(HERE, "results", "signal_signatures.csv")
+_SUF = "_wide" if "--wide" in sys.argv else ""
+OUT_MD = os.path.join(HERE, "results", f"signal_signatures{_SUF}.md")
+OUT_CSV = os.path.join(HERE, "results", f"signal_signatures{_SUF}.csv")
 
 # 지표판: 이름 → (파일, 변화 방식) — pct = 로그 수익률, diff = 차이(금리 · 스프레드)
 BOARD = {
@@ -103,7 +106,8 @@ def main():
     cal = load("bars/_GSPC").index
     cal = cal[cal >= "1995-01-01"]
     ch = changes(cal)
-    ev = pd.read_csv(os.path.join(HERE, "events_curated.csv"))
+    wide = "--wide" in sys.argv   # 3-a: signal_events.py 가 늘린 사건표(사건표 + 충격 설명 + GPR 급등일, 지정학 셋으로 나눔)
+    ev = pd.read_csv(os.path.join(HERE, "results", "signal_events.csv") if wide else os.path.join(HERE, "events_curated.csv"))
     ev["day"] = pd.to_datetime(ev["start"])
     rows = []
     for _, e in ev.iterrows():
@@ -111,7 +115,8 @@ def main():
         if i < GAP + BASE or i + REACT > len(cal):
             continue
         zp, zr = zscores(ch, i)
-        rows.append({"day": cal[i], "subkind": e["subkind"], "family": FAMILY.get(e["subkind"], "그 밖"), "title": e["title"],
+        fam = e["family"] if wide else FAMILY.get(e["subkind"], "그 밖")
+        rows.append({"day": cal[i], "subkind": e.get("subkind", fam), "family": fam, "title": e["title"],
                      **{f"pre:{k}": v for k, v in zp.items()}, **{f"react:{k}": v for k, v in zr.items()}})
     df = pd.DataFrame(rows)
     # 유가 충격은 방향이 반대인 사건(급등 · 급락)이 섞여 평균이 0 으로 지워진다 → 반응 날 유가 부호로 나눈다 (첫 실행에서 찾음)
@@ -199,7 +204,16 @@ def main():
     base_prec = float(np.mean([any((j + k) in targets for k in range(1, 6)) for j in range(s08, len(cal) - 6)]))
 
     # 쓰기
-    df.round(2).to_csv(OUT_CSV, index=False)
+    if wide:   # 매일 스캔(signal_scan.py, 3-b)이 쓰는 반응 서명 평균 — 3건 이상 묶음만, 지표별 평균 z 와 건수
+        import json
+        cents = {}
+        for fam, g in df.groupby("family"):
+            if len(g) >= 3:
+                Rg = R.loc[g.index]
+                cents[fam] = {k: [round(float(Rg[k].mean()), 2), int(Rg[k].notna().sum())] for k in names if Rg[k].notna().sum() >= 3}
+        with open(os.path.join(HERE, "results", "signal_centroids.json"), "w", encoding="utf-8") as f:
+            json.dump({"made": str(df["day"].max().date()), "events": len(df), "react_days": REACT, "families": cents}, f, ensure_ascii=False, indent=1)
+    df.assign(day=df["day"].dt.strftime("%Y-%m-%d")).round(2).to_csv(OUT_CSV, index=False)
     L = ["# 신호 서명 검증 (기획 증시-전망-기획 8-19 2단계)", "",
          f"사건표 {len(df)}건 ({df['day'].min():%Y}~{df['day'].max():%Y}) · 지표판 {len(names)}개 · 기준은 스크립트 머리말에 결과 전 고정. AI 0.", "",
          "## A. 사건 전 신호 — 사건 전 5거래일, 2σ 넘는 지표 2개 이상", "",
