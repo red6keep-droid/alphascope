@@ -1028,6 +1028,9 @@ def _date_row(fc, out=False):
     if len(items) > 1:
         if fc["kind"] == "pre":
             items[1][0] = "결과"   # `발표` 글자 삭제 (P456, 2026-11-08 사용자)
+            m = _re.match(r"^\d{2}\.\d{2}(?:\s*~\s*\d{2}\.\d{2})?", str(items[1][1]))
+            if m:   # 날짜만 — `01.26~01.28 빅테크 실적 주간 (4건)` 의 사건 이름은 뺀다 (2026-11-08 사용자: 결과 날짜만 오른쪽 정렬)
+                items[1][1] = m.group(0).replace(" ", "")
         elif fc.get("gap") is not None:
             items[1][0] = SHOCK[1 if fc["gap"] > 0 else -1] + "일"
             m = _re.match(r"^\d{2}\.\d{2}", str(items[1][1]))
@@ -1440,14 +1443,14 @@ def _row(fc, st):
     e = log[-1]
     sub = fc.get("follow_of") or fc.get("reversal_of") or any(o.get("role") == "parent" for o in fc.get("overlap", []))   # 번복 n회차도 세부 전망 (2026-11-08)   # 이어받았거나 겹쳐서 따로 적은 전망 = 세부 전망 (P464)
     tags = dk.pill_row((violet_box("세부 전망") if sub else "") + "".join(dk.pill(t, kind="area", bare=True) for t in fc.get("tags", [])))
-    left = (f'<a href="{page_url(fc["slug"])}" style="display:block;color:#111;font-weight:700;font-size:18px;line-height:34px;text-decoration:none;word-break:keep-all;">'
+    left = (f'<a href="{page_url(fc["slug"])}" style="display:block;color:#111;font-weight:400;font-size:18px;line-height:28px;text-decoration:none;word-break:keep-all;overflow-wrap:anywhere;">'   # 보통 굵기 · 긴 낱말도 카드 안에서 줄 바꿈 (2026-11-08 사용자: 목록 전부 레귤러, 카드 밖으로 삐져나옴)
             f'{dk.esc(fc["title"])}</a>'
-            f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;">{tags}'
+            f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;min-width:0;">{tags.replace("white-space:nowrap;", "flex-wrap:wrap;", 1)}'
             f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{dk.esc(fc["posted"])} 게시</span>'
             + (f'<a href="{dk.esc(fc["record_url"])}" style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};text-decoration:underline;">등록 기록</a>' if fc.get("record_url") else "")
             + "</span>")
     lab = e["label"][len(fc["subject"]) + 1:] if fc.get("subject") and e["label"].startswith(fc["subject"] + " ") else e["label"]   # 대상 이름은 제목에 있으니 뺀다 — `에너지 업종 조정 우세` 이 카드 밖으로 넘쳤다 (P464, 타임라인 P440 과 같은 규칙)
-    right = f'<b style="color:{INK[e["dir"]]};font-size:{dk.BODY};white-space:nowrap;">{dk.esc(lab)}</b>'
+    right = f'<span style="color:{INK[e["dir"]]};font-size:16px;line-height:24px;font-weight:400;word-break:keep-all;overflow-wrap:anywhere;">{dk.esc(lab)}</span>'   # 보통 굵기 · 줄 바꿈 허용 — `조정 조짐이 보임` 이 오른쪽 칸 밖으로 나가던 것 (2026-11-08)
     inner = (f'<div data-row-link="1" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
              f'<div style="{dk.COL_L}">{left}</div><div style="{dk.COL_R}">{right}</div></div>')
     return dk.dcard(inner, theme=e["theme"])
@@ -1467,22 +1470,58 @@ def scoreboard_card(sc):
         lines.append(("row", "여러 사건이 겹친 전망", f'{sc["crowded"]}개', "세지 않음"))
     if sc.get("note"):
         lines.append((sc["note"], "note"))
-    return qc.question_card("우리 전망 성적표", f'{sc["n"]}개', "neutral", "#111", lines, fold=True, opened=True)
+    return qc.question_card("우리 전망 성적표", f'{sc["n"]}개', "neutral", "#111", lines, fold=True, opened=False)   # 늘 닫힌 채로 (2026-11-08 사용자)
+
+
+DONE_PER_PAGE, DONE_PAGES_SHOWN = 10, 5   # 끝난 전망 한 쪽 10개 · 쪽 번호는 한 번에 5개까지 (2026-11-08 사용자)
+
+
+def done_list(done):
+    """끝난 전망 — 접힌 구획(제목 18 굵게 — 구획 제목 22 보다 확실히 작게, 2026-11-08 사용자: 21 은 똑같아 보임 · 개수 · 화살표), 펼치면 `함께 보는 페이지` 같은 구분선 목록: 점 + 전망 제목(15 보통 = 함께 보기 줄 16 보다 작게) + ›.
+    줄을 누르면 그 전망 페이지. 아래 쪽 번호 — 스크립트 없이 CSS 라디오로 넘긴다(블로그 본문에서 스크립트가 지워져도 돈다) (2026-11-08 사용자: 표 → 제목만 · 쪽 번호로 쌓기).
+    done = [(제목, 일어난 쪽, 결과) 또는 (제목, 일어난 쪽, 결과, slug)]."""
+    n = len(done)
+    head = (f'<summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:0 {dk.ALIGN_PX}px 10px;border-bottom:1px solid #E2E8F0;'
+            f'font-size:18px;line-height:26px;font-weight:700;color:#111;">끝난 전망<span style="font-size:15px;font-weight:400;color:{dk.SUB};">{n}개</span>'
+            f'<span class="fc-done-chev" style="margin-left:auto;display:inline-flex;color:{dk.SUB};">{dk.ACC_CHEV}</span></summary>')
+    if not n:
+        return (f'<details class="fc-done" style="margin:28px 0 0;">{head}<div style="padding:12px {dk.ALIGN_PX}px;font-size:15px;line-height:23px;color:{dk.MUTED};">아직 없습니다</div></details>')
+    dot = '<span aria-hidden="true" style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-right:8px;"></span>'
+    chev = f'<span style="flex:none;display:inline-flex;margin-left:8px;color:{dk.NOTE};transform:rotate(-90deg);">{dk.ACC_CHEV}</span>'
+
+    def row(d):
+        url = page_url(d[3]) if len(d) > 3 and d[3] else "#"
+        return (f'<a href="{dk.esc(url)}" data-row-link="1" style="display:flex;align-items:center;padding:11px {dk.ALIGN_PX}px;border-bottom:1px solid #E2E8F0;'
+                f'font-size:15px;line-height:23px;font-weight:400;color:#111;text-decoration:none;">{dot}<span style="flex:1 1 auto;min-width:0;word-break:keep-all;overflow-wrap:anywhere;">{dk.esc(d[0])}</span>{chev}</a>')
+    pages = [done[i:i + DONE_PER_PAGE] for i in range(0, n, DONE_PER_PAGE)]
+    m = len(pages)
+    css = ".fc-done[open] .fc-done-chev{transform:rotate(180deg);} .fc-done summary::-webkit-details-marker{display:none;} .fc-pp{display:none;}"
+    css += "".join(f"#fcpg{i}:checked~.fc-pp[data-p='{i}']{{display:block;}}" for i in range(1, m + 1))
+    nums_style = "display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 6px;border-radius:6px;font-size:15px;cursor:pointer;"
+
+    def nav(cur):   # 지금 쪽 둘레 5개 + 앞 · 뒤 화살표
+        lo = max(1, min(cur - DONE_PAGES_SHOWN // 2, m - DONE_PAGES_SHOWN + 1))
+        hi = min(m, lo + DONE_PAGES_SHOWN - 1)
+        btn = lambda i, t, lab: (f'<label for="fcpg{i}" aria-label="{lab}" style="{nums_style}' + ("background:#111;color:#fff;font-weight:700;" if i == cur and t.isdigit() else "color:#333;") + f'">{t}</label>')
+        out = (btn(cur - 1, "‹", "앞 쪽") if cur > 1 else "")
+        out += "".join(btn(i, str(i), f"{i}쪽") for i in range(lo, hi + 1))
+        out += (btn(cur + 1, "›", "다음 쪽") if cur < m else "")
+        return f'<div style="display:flex;justify-content:center;gap:4px;padding:12px 0 0;">{out}</div>' if m > 1 else ""
+    radios = "".join(f'<input type="radio" name="fcpg" id="fcpg{i}"{" checked" if i == 1 else ""} hidden>' for i in range(1, m + 1))
+    body = "".join(f'<div class="fc-pp" data-p="{i}">' + "".join(row(d) for d in pg) + nav(i) + '</div>' for i, pg in enumerate(pages, 1))
+    return f'<style>{css}</style><details class="fc-done" style="margin:28px 0 0;">{head}<div>{radios}{body}</div></details>'
 
 
 def list_body(pairs, states=None, done=(), score=None):
     """pairs = [(reg, fc)] 열린 전망, states = {slug: state}, done = [(전망, 결과, 최종)] 끝난 전망(지우지 않고 쌓는다). score = 성적표(없으면 안 그린다)."""
     states = states or {}
     rows = [_row(fc, states.get(fc["slug"], {})) for _, fc in pairs]
-    opened = (scoreboard_card(score) if score else "") + ("".join(rows) if rows else dk.muted("지금 지켜보는 전망이 없습니다"))
-    tip = "큰 사건마다 두 갈래 전망을 미리 적어 두고, 사건 뒤 날마다 숫자를 한 마디로 바꿔 확인합니다"
+    opened = "".join(rows) if rows else dk.muted("지금 지켜보는 전망이 없습니다")
+    # 옛 data-tip(페이지 맨 바깥) 삭제 — 테마가 [data-tip] 을 누르면 팝업이라 페이지 어디를 눌러도(접기 줄 포함) 팝업이 떴다 (2026-11-08 사용자)
     sec1 = f'<div style="margin:12px 0 0;">{opened}</div>'
-    if done:
-        body2 = dk.table(["전망", "일어난 쪽", "결과"], [list(c) for c in done])
-    else:
-        body2 = f'<div style="padding:6px 0 4px {dk.ALIGN_PX}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:{dk.MUTED};">아직 없습니다</div>'
-    sec2 = sec("끝난 전망", body2, [])   # 툴팁 없음 — 한 줄 안내라 제목이 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략)
-    return dk.fix_colons(f'<div data-list-url="{BLOG}" data-seo-lead="증시 전망, 큰 사건 전에 두 갈래 전망을 적어 두고 숫자로 확인한 기록" data-tip="{dk.esc(tip)}">{sec1 + sec2}</div>')
+    board = f'<div style="margin:28px 0 0;">{scoreboard_card(score)}</div>' if score else ""   # 성적표 = 지켜보는 전망 아래 · 끝난 전망 바로 위 (2026-11-08 사용자 — 옛 맨 위)
+    sec2 = board + done_list(done)
+    return dk.fix_colons(f'<div data-list-url="{BLOG}" data-seo-lead="증시 전망, 큰 사건 전에 두 갈래 전망을 적어 두고 숫자로 확인한 기록">{sec1 + sec2}</div>')
 
 
 # ---------------------------------------------------------------- 홈 카드 JSON (국면 한 마디는 넣지 않는다 — 2026-11-07 사용자, 제목 · 라벨 · 게시일만)
@@ -1558,6 +1597,6 @@ if __name__ == "__main__":
             oth = [o for o in others_all if o[2] != fc["slug"]]
             print(dk.write_mock(local(forecast_body(r, states[fc["slug"]], fc, others=oth, op=op)), os.path.join(out_dir, f'mock_{fc["slug"]}.html'), CARD_NAME))   # 머리 줄 = `증시 전망` (P454). 블로그 글 제목은 질문 그대로(검색) — 머리 줄 이름 바꾸기는 테마 수정 필요
     score = {"n": 2, "hit": 0, "miss": 0, "neither": 0, "watch": 2, "note": "결과가 나오기 전에 적은 전망만 셉니다. 사건 뒤에 적은 보기는 넣지 않습니다."}
-    print(dk.write_mock(local(list_body(pub, states, score=score)), os.path.join(out_dir, f"mock_{LIST_SLUG}.html"), CARD_NAME))
+    print(dk.write_mock(local(list_body(pub, states, score=score)), os.path.join(out_dir, f"mock_{LIST_SLUG}-eh.html"), CARD_NAME))   # 실제 등록만 — mock_forecast-list.html 은 forecast_cases.py 가 상황 탭 전부로 (2026-11-08)
     with open(os.path.join(out_dir, "hypo.json"), "w", encoding="utf-8") as f:
         json.dump(home_card(pub, "2026-11-07T04:00:00Z"), f, ensure_ascii=False, indent=1)

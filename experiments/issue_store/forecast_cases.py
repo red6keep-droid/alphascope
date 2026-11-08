@@ -650,7 +650,7 @@ def case_hold_void(t, days, end):
             ("내부 기록", "결과 = 보류 / 무효 · 사유. 분기 점검 때 보류가 잦은 사건은 조건을 셋으로 늘릴지 결정(사전 등록 원칙: 지금 전망은 안 고침).")]
     return expl, [("판정 보류", H.forecast_body({"id": f"EH-{t}-h"}, st1, f1, others=[], op=op_for(t, f1, st1, extra=[("보류 사유", am["why"])]))),
                   ("무효", H.forecast_body({"id": f"EH-{t}-v"}, st2, f2, others=[], op=op_for(t, f2, st2, extra=[("무효 사유", "earnings.csv / fomc.csv 날짜 변경 감지")]))),
-                  ("목록", H.list_body([], {}, done=[(f1["title"], "—", "판정 보류"), (f2["title"], "—", "무효")], score=score))]
+                  ("목록", H.list_body([], {}, done=[(f1["title"], "—", "판정 보류", f1["slug"]), (f2["title"], "—", "무효", f2["slug"])], score=score))]
 
 
 def case_reversal(t):
@@ -688,7 +688,7 @@ def case_reversal(t):
             ("내부 기록", "번복 = 1회차 slug · 회차 번호 · 뒤집은 날 1위 이슈. 묶음 성적 · 번복 횟수 · 회차별 폭(2회차가 작았나)을 쌓는다.")]
     return expl, [("1회차", H.forecast_body({"id": f"EH-{t}-r"}, st1, f1, others=[(2, f2["title"], f2["slug"])], op=op_for(t, f1, st1))),
                   ("2회차", H.forecast_body({"id": f"EH-{t}-r"}, st2, f2, others=[(1, f1["title"], f1["slug"])], op=op_for(t, f2, st2, extra=[("번복", f'1회차 {f1["slug"]} · 뒤집은 날 {H.md(dd[10])} 1위 이슈 TARIFF_TRADE 48건 (유예 철회) · 2회차 폭 {abs(f2["gap"]):.1f}{u} < 1회차 {abs(f1["gap"]):.1f}{u}')]))),
-                  ("목록", H.list_body([], {}, done=[(f1["title"], f1["scenarios"][0]["name"], "맞음 · 번복 2회차 진행 중")], score=score))]
+                  ("목록", H.list_body([], {}, done=[(f1["title"], f1["scenarios"][0]["name"], "맞음 · 번복 2회차 진행 중", f1["slug"])], score=score))]
 
 
 def case_season(t):
@@ -884,9 +884,9 @@ def case(t, k):
                     ("내부 기록", "전망 · 세부 전망 결과 = 맞음 · 맞음, 겹침 없음. 사건 닫힘(closed) 한 줄.")]
         out = [("전망", page(f1, st1, oth1)), ("세부 전망", page(f2, st2, oth2))]   # 하위 탭 이름 = 관계 (P452)
         if k == "7":   # 목록 — 세부 전망 줄에 `세부 전망` 라벨, 끝난 전망은 아래 표 (P464)
-            out.append(("목록", H.list_body([({}, f2)], {f2["slug"]: st2}, done=[(f1["title"], f1["scenarios"][0]["name"], "맞음")])))
+            out.append(("목록", H.list_body([({}, f2)], {f2["slug"]: st2}, done=[(f1["title"], f1["scenarios"][0]["name"], "맞음", f1["slug"])])))
         if k == "8":
-            done = [(f1["title"], f1["scenarios"][0]["name"], "맞음"), (f2["title"], f2["scenarios"][0]["name"], "맞음")]
+            done = [(f1["title"], f1["scenarios"][0]["name"], "맞음", f1["slug"]), (f2["title"], f2["scenarios"][0]["name"], "맞음", f2["slug"])]
             score = {"n": 7, "hit": 4, "miss": 1, "neither": 1, "watch": 1, "picked_hit": (3, 4), "note": "사건이 셋 이상 겹친 전망은 맞음 · 틀림에 넣지 않고 따로 셉니다."}
             out.append(("목록", H.list_body([], {}, done=done, score=score)))
         return expl, out
@@ -992,14 +992,73 @@ def build():
           "document.querySelectorAll('#fc-tabs [data-t]').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});"
           "document.querySelectorAll('#fc-tabs [data-k]').forEach(function(b){b.classList.toggle('on',b.dataset.k===k);});"
           "document.getElementById('fc-cur').textContent=t+' · '+TIER[t]+' / '+k+'. '+NAMES[k];try{location.hash=t+k;}catch(e){}}"
-          "var h=(location.hash||'').slice(1);if(/^[ABC](?:[1-9]|1[0-8])$/.test(h)){t=h[0];k=h.slice(1);}"
+          "var h=(location.hash||'').slice(1);if(/^[ABC](?:[1-9]|1[0-9])$/.test(h)){t=h[0];k=h.slice(1);}"
           "var ti=document.querySelector('.post-title');if(ti){var hb=document.createElement('button');hb.type='button';hb.id='fc-help';hb.setAttribute('aria-label','설명 보기');hb.setAttribute('aria-pressed','false');hb.innerHTML='<svg viewBox=\"0 0 18 18\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"9\" r=\"7.5\"/><path d=\"M9 8v5\"/><path d=\"M9 5.2v.1\"/></svg>';hb.addEventListener('click',function(){var on=document.body.classList.toggle('fc-help-on');hb.setAttribute('aria-pressed',on?'true':'false');});ti.appendChild(hb);}"
           "document.querySelectorAll('.fc-subtabs button.sub').forEach(function(b){b.addEventListener('click',function(){var w=b.closest('[data-pane]');w.querySelectorAll('.fc-subtabs button.sub').forEach(function(x){x.classList.toggle('on',x===b);});w.querySelectorAll('[data-sp]').forEach(function(p){p.hidden=p.dataset.sp!==b.dataset.s;});});});"
           "document.querySelectorAll('#fc-tabs button.tab').forEach(function(b){b.addEventListener('click',function(){if(b.dataset.t)t=b.dataset.t;if(b.dataset.k)k=b.dataset.k;show();window.scrollTo(0,0);});});show();})();</script>")
     return TAB_CSS + tabs + terms + "".join(panes) + js
 
 
+TYPICAL_OPEN = ("B7", "A2", "C1")   # 실제에 가까운 목록 — 지켜보는 전망 셋(규칙 상한 3, 기획 8-1): 세부 전망 · 사건 뒤 조짐 · 사건 전 등록
+TYPICAL_DONE = 12                    # 끝난 전망 1년 치 안팎(연 15~25개 중 반년 남짓)
+
+
+def build_list(typical=False):
+    """목록 페이지 목업 — 상황 탭(A · B · C × 1~19)에서 그린 전망을 전부 모아 한 목록으로 (2026-11-08 사용자: "리스트 페이지에 다 적용").
+    지켜보는 중 = 카드, 판정 난 것 = `끝난 전망` 표. 같은 제목 · 같은 상태는 하나만. 줄을 누르면 그 상황 탭으로. 성적표 숫자는 모은 것으로 센다."""
+    seen, opened, done, states = set(), [], [], {}
+    real = H.forecast_body
+
+    def spy(reg, st, fc, *a, **kw):
+        cur.append((fc, st))
+        return real(reg, st, fc, *a, **kw)
+    H.forecast_body = spy
+    try:
+        for t in TIERS:
+            for k, _ in SITU:
+                cur = []
+                case(t, k)
+                for fc, st in cur:
+                    res = (st or {}).get("result") or {}
+                    log = (st or {}).get("log") or []
+                    key = (fc["title"], res.get("word") or (log[-1]["label"] if log else ""))   # 같은 제목이라도 상태(맞음 · 틀림 · 제자리 · 국면)가 다르면 따로 — 상황마다 결과가 달라서
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    link = f"LINK-{t}{k}"
+                    if typical and not res.get("word") and f"{t}{k}" not in TYPICAL_OPEN:
+                        continue
+                    if res.get("word"):
+                        side = fc["scenarios"][res["crossed"] - 1]["name"] if res.get("crossed") else "—"
+                        done.append((res.get("day", ""), fc["title"], side, res["word"], link))
+                    else:
+                        f2 = dict(fc, slug=link)
+                        states[link] = st
+                        opened.append((fc.get("registered", ""), f2))
+    finally:
+        H.forecast_body = real
+    opened.sort(key=lambda x: x[0], reverse=True)
+    done.sort(key=lambda x: x[0], reverse=True)
+    if typical:   # 같은 종류(제목)가 겹치지 않게 골라 12줄
+        pick, seen_t = [], {f["title"] for _, f in opened}   # 지켜보는 카드와 같은 제목은 끝난 전망에서 뺀다
+        for d in done:
+            if d[1] not in seen_t:
+                seen_t.add(d[1]); pick.append(d)
+        done = pick[:TYPICAL_DONE]
+    words = [d[3] for d in done]
+    score = {"n": len(opened) + len(done), "hit": words.count(H.RESULT["hit"]), "miss": words.count(H.RESULT["miss"]),
+             "neither": words.count(H.RESULT["neither"]), "watch": len(opened),
+             "hold": words.count(H.RESULT["hold"]), "void": words.count(H.RESULT["void"]),
+             "note": "목업 — " + (f"실제 운영에 가까운 양(지켜보는 전망 {len(opened)} · 끝난 전망 {len(done)})." if typical else "상황 탭에서 그린 전망을 모은 것(가상 숫자).")}
+    html = H.list_body([(None, f) for _, f in opened], states, done=[(ti, sd, w, link) for _, ti, sd, w, link in done], score=score)
+    return _re.sub(rf"{_re.escape(H.BLOG)}p/LINK-([ABC]\d+)\.html", r"mock_forecast-cases.html#\1", html)
+
+
 if __name__ == "__main__":
     out = os.path.join(_HERE, "output", "mock_forecast-cases.html")
     html = build().replace(f"{H.BLOG}p/", "mock_")
     print(dk.write_mock(html, out, H.CARD_NAME))   # 머리 줄 = `증시 전망` (P454)
+    lst = build_list().replace(f"{H.BLOG}p/", "mock_")   # 목록 목업 = 상황 탭 전부 (2026-11-08). 실제 등록(EH) 목록 목업은 hypo_pages.py → mock_forecast-list-eh.html
+    print(dk.write_mock(lst, os.path.join(_HERE, "output", "mock_forecast-list.html"), H.CARD_NAME))
+    typ = build_list(typical=True).replace(f"{H.BLOG}p/", "mock_")   # 실제에 가까운 양 (2026-11-08 사용자)
+    print(dk.write_mock(typ, os.path.join(_HERE, "output", "mock_forecast-list-typical.html"), H.CARD_NAME))
