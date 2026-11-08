@@ -8,6 +8,7 @@
 2. 지표마다 오늘 하루 z(직전 60거래일 σ 배수) · 10거래일 누적 z.
 3. 경보 = 하루 3σ 지표 2개 이상(검증 D: 연 17번, 5일 안 사건 27% vs 평소 14%) · 느린 경보 = 10일 2σ 지표 2개 이상.
 4. 서명 후보 = 오늘 + 어제 반응 벡터 ↔ results/signal_centroids.json(검증 3-a 의 묶음 평균) 코사인 상위 3. 사건 전 분류는 우연 수준이라 **경보 날만** 적는다.
+끝에 signal_standby.update 를 불러 뉴스로 장전된 대기 시나리오의 격발 후보 · 서명 일치를 오늘 값으로 확인한다.
 기록 칸: day · alarm · slow · movers(지표 · 하루 z · 10일 z) · candidates(묶음 · 유사도) · n_board(받은 지표 수) · rules.
 1~2달 쌓은 뒤 "경보 뒤 5일 안 실제 사건 · 서명 후보가 그날 뉴스 이슈 코드와 맞았나" 를 잰다(뉴스 대조는 그때 — 지금은 가격 쪽만).
 """
@@ -100,8 +101,15 @@ def scan(px):
             if pd.notna(sim):
                 cands.append((fam, round(sim, 2)))
         cands = sorted(cands, key=lambda x: -x[1])[:3]
+    z = {n: (None if pd.isna(zd[n]) else float(zd[n]), None if pd.isna(z10[n]) else float(z10[n])) for n in ch.columns}
+    if not cands:   # 장전된 시나리오의 서명 확인용 — 경보가 없는 날도 후보는 계산해 둔다(기록에는 경보 날만)
+        cent = json.load(open(CENT, encoding="utf-8"))["families"]
+        sims = [(fam, SS.cos(zr.reindex(list(v)), pd.Series({k: x[0] for k, x in v.items()}))) for fam, v in cent.items()]
+        quiet = sorted([(f, round(x, 2)) for f, x in sims if pd.notna(x)], key=lambda t: -t[1])[:3]
+    else:
+        quiet = cands
     return {"day": day.strftime("%Y-%m-%d"), "alarm": alarm, "slow": slow, "movers": movers[:10], "candidates": cands,
-            "n_board": int(ch.iloc[-1].notna().sum()), "rules": RULES}
+            "n_board": int(ch.iloc[-1].notna().sum()), "rules": RULES, "_z": z, "_cands_all": quiet}
 
 
 def main():
@@ -117,11 +125,17 @@ def main():
     print(f'[signal] {row["day"]} {tag} · 지표 {row["n_board"]}/{len(SS.BOARD)} · 움직인 것 '
           + (", ".join(f"{n} {d:+.1f}σ(10일 {t:+.1f})" for n, d, t in row["movers"][:5]) or "없음")
           + (" · 서명 후보 " + ", ".join(f"{f} {s:.2f}" for f, s in row["candidates"]) if row["candidates"] else ""))
+    z, quiet = row.pop("_z"), row.pop("_cands_all")
     if a.state:
         d = os.path.join(a.state, "records", "signals")
         os.makedirs(d, exist_ok=True)
         with open(os.path.join(d, "scan.jsonl"), "a", encoding="utf-8") as f:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    try:   # 대기 시나리오 — 뉴스로 장전, 오늘 가격으로 격발 후보 · 서명 일치 확인 (signal_standby.py)
+        import signal_standby
+        signal_standby.update(a.state, z=z, cands=quiet, day=row["day"])
+    except Exception as e:  # noqa: BLE001 — 그림자 모드, 막지 않는다
+        print(f"[standby] 실패: {type(e).__name__}: {str(e)[:120]}")
     return 0
 
 
