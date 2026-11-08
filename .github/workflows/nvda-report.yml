@@ -265,6 +265,8 @@ jobs:
           mkdir -p experiments/issue_store/output
           [ -f "$STATE_DIR/forecast/page_hashes.json" ] && cp "$STATE_DIR/forecast/page_hashes.json" experiments/issue_store/output/forecast_page_hashes.json || true
           python experiments/issue_store/forecast_daily.py --state "$STATE_DIR"
+          # 신호 서명 매일 스캔 — 그림자 모드(기획 8-19 3-b): 독자 노출 · 알림 없음, nvda-state records/signals/scan.jsonl 하루 한 줄만. 실패해도 넘어간다
+          python experiments/issue_store/signal_scan.py --state "$STATE_DIR" || echo "::warning::신호 스캔 실패 — 오늘 기록 없음"
           if [ "$DO_PUBLISH" = "true" ]; then
             python experiments/issue_store/publish_forecast.py
           else

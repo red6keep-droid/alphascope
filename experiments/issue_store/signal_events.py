@@ -12,6 +12,7 @@
 """
 import os
 import re
+import sys
 
 import numpy as np
 import pandas as pd
@@ -20,6 +21,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 STORE = os.path.join(ROOT, "data", "store")
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "results", "signal_events.csv")
+GPR_Z = float(next((a.split("=")[1] for a in sys.argv if a.startswith("--gpr-z=")), 3.0))   # 민감도 확인용 (기본 3σ)
 
 # 사건표 subkind → 묶음 (지정학을 셋으로 나눔, 3-a)
 CURATED_FAMILY = {
@@ -89,7 +91,7 @@ def main():
     lg = np.log(g[g > 0])
     z = (lg - lg.rolling(60).mean().shift(1)) / lg.rolling(60).std().shift(1)
     last = None
-    for d, v in z[(z >= 3) & (z.index >= "2000-01-01")].items():
+    for d, v in z[(z >= GPR_Z) & (z.index >= "2000-01-01")].items():
         i = pos(d)
         if i >= len(cal):
             continue
