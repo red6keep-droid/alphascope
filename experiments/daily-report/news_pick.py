@@ -102,7 +102,19 @@ def stocks():
     except Exception as e:  # noqa: BLE001
         print(f"[news_pick] 종목 등락 목록 없음 : {str(e)[:80]}")
     _stocks = {x["s"]: x for x in ((data or {}).get("stocks") or []) if x.get("s")}
+    global _notable
+    _notable = (data or {}).get("notable") or {}
     return _stocks
+
+
+_notable = None
+
+
+def notable():
+    """같은 stocks.json 의 `notable` — 최근 급락일에 버틴 종목(종목 레이더 crash_watch, 홈 `주목할 종목` 카드와 같은 재료). 데일리 `급락한 날 버틴 종목은?` (2026-11-08 사용자). 못 읽으면 {}."""
+    if _notable is None:
+        stocks()
+    return _notable or {}
 
 
 def prev_run():

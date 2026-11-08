@@ -33,5 +33,63 @@
   "license": "Public domain",
   "author": "U.S. Government",
   "page": "https://commons.wikimedia.org/wiki/File:Seal_of_the_United_States_Federal_Reserve_System.svg"
+ },
+ "wood": {
+  "file": "wood.jpg",
+  "source_file": "Cathie_Wood_ARK_Invest_Photo.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Caroline Wood",
+  "page": "https://commons.wikimedia.org/wiki/File:Cathie_Wood_ARK_Invest_Photo.jpg"
+ },
+ "ackman": {
+  "file": "ackman.jpg",
+  "source_file": "Valeant_Pharmaceuticals'_Business_Model_(headshot).jpg",
+  "license": "CC BY 2.0",
+  "author": "Senate Democrats",
+  "page": "https://commons.wikimedia.org/wiki/File:Valeant_Pharmaceuticals'_Business_Model_(headshot).jpg"
+ },
+ "cramer": {
+  "file": "cramer.jpg",
+  "source_file": "Andrew_Aziz_Cramer_(cropped).jpg",
+  "license": "CC BY 2.0",
+  "author": "Bear Bull Traders",
+  "page": "https://commons.wikimedia.org/wiki/File:Andrew_Aziz_Cramer_(cropped).jpg"
+ },
+ "musk": {
+  "file": "musk.jpg",
+  "source_file": "Elon_Musk_-_54820081119_(3x4_cropped,_Rule_of_thirds).jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Gage Skidmore",
+  "page": "https://commons.wikimedia.org/wiki/File:Elon_Musk_-_54820081119_(3x4_cropped,_Rule_of_thirds).jpg"
+ },
+ "altman": {
+  "file": "altman.jpg",
+  "source_file": "Meeting_with_Masayoshi_Son_and_Sam_Altman_(February_3,_2025)_(3x4_cropped_on_Altman).jpg",
+  "license": "CC BY 4.0",
+  "author": "首相官邸ホームページ / Office of the Prime Minister of Japan Official Website",
+  "page": "https://commons.wikimedia.org/wiki/File:Meeting_with_Masayoshi_Son_and_Sam_Altman_(February_3,_2025)_(3x4_cropped_on_Altman).jpg"
+ },
+ "huang": {
+  "file": "huang.jpg",
+  "source_file": "Jensen_Huang_Stanford_2026-04-30_010_(cropped).jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Anderseidesvik",
+  "page": "https://commons.wikimedia.org/wiki/File:Jensen_Huang_Stanford_2026-04-30_010_(cropped).jpg"
+ },
+ "burry": {
+  "file": "burry.jpg",
+  "source_file": "사용자 제공 (2026-11-08)",
+  "license": "사용자 제공 — 저작권 미확인",
+  "author": "",
+  "page": "",
+  "manual": true
+ },
+ "timiraos": {
+  "file": "timiraos.jpg",
+  "source_file": "사용자 제공 (2026-11-08)",
+  "license": "사용자 제공 — 저작권 미확인",
+  "author": "",
+  "page": "",
+  "manual": true
  }
 }

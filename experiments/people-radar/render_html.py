@@ -2,7 +2,7 @@
 
 구획: 맨 앞 요약(p[data-seo-lead]) → 인물 목록(이름 · 오늘 가장 강한 발언 · 닿는 곳) → (숨김) h2 발언 + 인물별 발언 묶음 + 읽는 법 카드.
 발언 카드 = 헤드라인 → 인물 · 시각 · 출처 → 설명 → 닿는 곳(경로 → 자산 + 한 문장) → 그날 시장(D 일 등락 · 평소 대비) → 새로운가 → 다음 날짜 → 라벨.
-인물 페이지 끝 = 말과 행동 · 신뢰 기록 (정보 수집 중, 90일 뒤).
+인물 페이지 끝의 말과 행동 · 신뢰 기록 카드는 뺐다 (2026-11-08 사용자). _collecting_card 는 90일 뒤 다시 쓸 때를 위해 남김.
 문체: 헤드라인 = 명사형(keep_tone), 그 밖 = 합니다체(dk.formal). 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터.
 출력: output/radar_body.html · output/radar.html(미리보기) · output/title.txt · output/radar_mock.html(테마 목업, 로컬만)
 """
@@ -64,7 +64,8 @@ def post_title(d):
 GROUP_COLOR = {"policy": "#1D4ED8", "investor": "#B45309", "commentator": "#7C3AED", "ceo": "#0F766E"}   # 인물군 색 — 동그라미 배지
 PHOTOS_PATH = os.path.join(config.BASE_DIR, "ref", "people_photos.json")   # speaker → {file, license, author, page} (위키미디어 공용 자유 라이선스)
 PHOTO_BASE = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/people/"   # 우리 gh-pages 에 복사해 둔 사진 (핫링크 아님). 목업은 로컬 images/people
-PHOTO_PUBLIC = {"trump", "bessent", "lutnick", "greer", "fed"}   # 공직자(+기관)만 사진 (2026-10-21 사용자 결정: "공적인 사람만"). 민간인은 초상권 · 퍼블리시티권 때문에 글자 동그라미
+# 사진 쓰는 인물 — 2026-10-21 공직자만 → 2026-11-08 사용자 결정으로 민간인도 위키미디어 공용 자유 라이선스 사진(fetch_photos.py). 버리 · 티미라오스는 사용자 제공 사진(manual, CC 아님 → 출처 줄 없음)
+PHOTO_PUBLIC = {"trump", "bessent", "lutnick", "greer", "fed", "wood", "ackman", "cramer", "musk", "altman", "huang", "burry", "timiraos"}
 REFS_PATH = os.path.join(config.BASE_DIR, "ref", "reaction_refs.json")   # 과거 참고치 (reaction_refs.py) — 인물 × 주제, 지금은 트럼프 × 무역 · 연준 × Fed 둘
 PATH_KO = {"self": "본인 글", "office": "기관 발표", "trade": "매매 공시", "report": "보도"}
 
@@ -77,6 +78,23 @@ def _photos():
         return {}
 
 
+def photo_credit(speakers, names=None):
+    """사진 출처 줄 — CC BY · BY-SA 는 작성자 · 라이선스 · 출처 표기 의무(퍼블릭 도메인은 빼도 됨). 사진을 쓴 글(인물 발언 · 종목 페이지) 끝에 붙인다.
+    speakers = 이 글에 사진이 나온 인물 키, names = 키 → 한국어 이름. 표기할 게 없으면 ""."""
+    ph, seen, out = _photos(), set(), []
+    for k in speakers:
+        m = ph.get(k)
+        if not m or k in seen or not m.get("license", "").upper().startswith("CC"):
+            continue
+        seen.add(k)
+        nm = (names or {}).get(k) or (config.PEOPLE.get(k) or {}).get("name_ko", k)
+        out.append(f'{_esc(nm)} — {_esc(m.get("author") or "작성자 미상")}, '
+                   f'<a href="{_esc(m["page"])}" target="_blank" rel="noopener" style="color:inherit;">{_esc(m["license"])}</a>')
+    if not out:
+        return ""
+    return dk.credit_fold(" · ".join(out), dk.ALIGN_PX)
+
+
 def _refs():
     try:
         with open(REFS_PATH, encoding="utf-8") as f:
@@ -86,11 +104,12 @@ def _refs():
 
 
 def _avatar(p, size=40):
-    """이름 앞 동그라미 — 얼굴 사진(2026-10-21 사용자: "조그맣게라도 얼굴을"; 운영지침 4-6 의 인물 사진 금지는 사용자 결정으로 예외, 자유 라이선스 사진만 · 출처 표기는 공통 푸터 크레딧).
+    """이름 앞 동그라미 — 얼굴 사진(2026-10-21 사용자: "조그맣게라도 얼굴을"; 운영지침 4-6 의 인물 사진 금지는 사용자 결정으로 예외, 자유 라이선스 사진만 · CC 사진 출처는 photo_credit 줄 + 이미지 title).
     사진이 없는 인물은 성(姓) 첫 글자 · 인물군 색."""
     ph = _photos().get(p["speaker"])
     if ph:
-        return (f'<img src="{PHOTO_BASE}{_esc(ph["file"])}" alt="" width="{size}" height="{size}" loading="lazy" '
+        cr = f' title="사진: {_esc(ph.get("author", ""))} ({_esc(ph.get("license", ""))}, 위키미디어 공용)"' if ph.get("license", "").upper().startswith("CC") else ""
+        return (f'<img src="{PHOTO_BASE}{_esc(ph["file"])}" alt=""{cr} width="{size}" height="{size}" loading="lazy" '
                 f'style="flex:none;width:{size}px;height:{size}px;border-radius:50%;object-fit:cover;background:#F1F5F9;border:1px solid #E2E8F0;"/>')
     ch = p["name_ko"].split()[-1][0]
     return (f'<span aria-hidden="true" style="display:inline-flex;flex:none;align-items:center;justify-content:center;width:{size}px;height:{size}px;border-radius:50%;'
@@ -245,16 +264,12 @@ def _signal_item(p, s, cards):
 # ── 구획 ────────────────────────────────────────────────────────────────
 
 def sec_seo_lead(r, d, cards):
-    """글 맨 앞 두 줄 (2026-10-21 사용자): 첫 줄 = 가장 강한 발언(인물, 내용), 둘째 줄 = 날짜 · 최근 24시간 발언 수 · 인물 수."""
+    """글 맨 앞 한 줄 = 작은 회색 안내(ⓘ) `날짜 기준 최근 24시간 시장 발언 n건 · n명` (2026-11-08 사용자: `가장 강한 발언` 줄 삭제, 작은 글씨 + 아이콘)."""
     _, m, dd = d.split("-")
-    top = r["people"][0]["signals"][0] if r["people"] else None
-    c = _card(top, cards) if top else None
-    first = f"<b>가장 강한 발언</b> : {_esc(c['headline'])}" if c else ""
-    second = f"{int(m)}월 {int(dd)}일 기준 최근 24시간 시장 발언 {r['event_count']}건 · {r['people_count']}명"
+    line = f"{int(m)}월 {int(dd)}일 기준 최근 24시간 시장 발언 {r['event_count']}건 · {r['people_count']}명"
     if r.get("only_reports"):
-        second += " · 오늘은 보도된 발언만"
-    lines = [x for x in (first, second) if x]
-    return f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">{"<br>".join(lines)}</p>'
+        line += " · 오늘은 보도된 발언만"
+    return f'<p data-seo-lead="1" style="margin:0 0 12px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};word-break:keep-all;">{dk.INFO_ICON}{line}</p>'
 
 
 def _collecting_card():
@@ -278,7 +293,6 @@ def sec_people(r, cards):
             # 펼친 목록의 첫 기사 위에도 구분선 (2026-10-21 사용자: 기사 영역은 더 보기를 펼쳐도 선이 이어져야 한다)
             ml = dk.item_rules(more, indent=dk.ALIGN_PX).replace(f"padding:2px {dk.ALIGN_PX}px ", f"padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px ", 1).replace("line-height:" + dk.LH_BODY + ";", "line-height:" + dk.LH_BODY + ";box-shadow:inset 0 1px 0 #E2E8F0;", 1)
             page.append(dk.fold(f"{p['name_ko']} 발언 {len(more)}건 더 보기", ml).replace("margin-top:8px;margin-bottom:8px;", "margin:0 0 8px;", 1))
-        page.append(_collecting_card())
         out.append(f'<div data-person-page="{p["speaker"]}">{"".join(page)}</div>')
     return "".join(out)
 
@@ -305,9 +319,28 @@ def _list_row(p, cards, first):
         + f'</span><span style="flex:none;color:#94A3B8;display:inline-flex;margin-top:10px;">{chev}</span></a>')
 
 
+def sec_summary_cards(r):
+    """맨 위 질문 카드 3개 — 미국 증시 리포트 `인물 발언` 탭 맨 위와 같은 카드 (2026-11-08 사용자: "주요 인물 발언에도 동일하게").
+    셈 = stock_mentions.summary(오늘 레이더), 모양 = people_section.summary_card + daily-report/cards.question_card. 파이썬 셈만, AI 없음.
+    목록과 같은 부모 아래 두므로 인물을 누르면 테마 JS 가 목록과 함께 숨긴다. 실패하면 카드 없이 (글은 그대로)."""
+    try:
+        import importlib.util
+        import people_section
+        import stock_mentions
+        spec = importlib.util.spec_from_file_location("dr_cards", os.path.join(config.BASE_DIR, "..", "daily-report", "cards.py"))   # 같은 이름 모듈이 여럿 — 경로로
+        C = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(C)
+        faces = {p["name_ko"]: _avatar(p, 32) for p in r["people"]}
+        return people_section.summary_card(C.question_card, stock_mentions.summary(r), faces)
+    except Exception as e:  # noqa: BLE001
+        print(f"[html] 질문 카드 건너뜀: {e}")
+        return ""
+
+
 def sec_people_list(r, cards):
     rows = [_list_row(p, cards, i == 0) for i, p in enumerate(r["people"])]
-    return f'<div data-people-list="1" style="margin:0 0 8px;">{"".join(rows)}</div>'
+    credit = photo_credit([p["speaker"] for p in r["people"]], {p["speaker"]: p["name_ko"] for p in r["people"]})
+    return f'<div data-people-list="1" style="margin:0 0 8px;">{"".join(rows)}</div>' + credit
 
 
 def _ref_text(sp, prof, refs):
@@ -371,6 +404,7 @@ def build_body(r, n, d):
     body = "\n".join([
         dk.WRAP_OPEN,
         sec_seo_lead(r, d, cards),
+        sec_summary_cards(r),   # 맨 위 질문 카드 (미국 증시 리포트 인물 발언 탭과 같게, 2026-11-08 사용자)
         sec_people_list(r, cards),
         dk.h2("발언", line=True).replace("<h2 ", '<h2 data-person-pages="1" ', 1),   # 홈 카드가 읽는 구획 제목 — 화면에서는 JS 가 숨긴다
         sec_people(r, cards),

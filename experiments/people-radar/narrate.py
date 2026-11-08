@@ -148,7 +148,9 @@ def translate_subtopics(radar, pool):
     except (OSError, ValueError):
         cache = {}
     have = {k.lower() for k in cache}
-    need = sorted({k["key"] for kws in (radar.get("keywords") or {}).values() for k in kws if k["key"].lower() not in have and k["key"] not in config.TOPIC_KO})
+    keys = {k["key"] for kws in (radar.get("keywords") or {}).values() for k in kws}
+    keys |= {(s.get("subtopic") or "").strip() for p in radar.get("people", []) for s in p.get("signals", [])} - {""}   # 오늘 신호의 세부 주제도 — 데일리 인물 발언 탭 이슈 카드(P406)가 쓴다, 같은 한 번 호출
+    need = sorted(k for k in keys if k.lower() not in have and k not in config.TOPIC_KO)
     if not need:
         return cache
     def _check(v):   # generate_json 의 validate 는 탈락이면 예외, 통과면 None — bool 을 돌려주면 그 값이 결과가 된다

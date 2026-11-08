@@ -87,6 +87,24 @@ def arrow(v, digits=2, unit="%"):
     return f'<span style="color:{col};font-weight:700;white-space:nowrap;">{tri}&nbsp;{abs(v):.{digits}f}{unit}</span>'
 
 
+EMPH_TRI = 14   # 강조 카드 답 앞 ▲ · ▼ — 답 글자 18 의 80% = 14.4 → 14 (2026-11-08 사용자: 삼각형 20% 작게, tech_signals._tri_small 과 같은 방식)
+_EMPH_TRI_RE = re.compile(r"(^|>)([▲▼])")
+
+
+PRICE_TRI = 15   # 가격 카드 머리 줄 등락 `▲ 2.36%` 의 ▲ · ▼ — 가격 글자 19 의 80% = 15.2 → 15 (2026-11-08 사용자: 답 삼각형과 똑같이)
+
+
+def emph_tri(html, px=None, every=False):
+    """강조 카드 답(오른쪽) 앞 ▲ · ▼ 만 px(기본 EMPH_TRI)로. 이미 줄인 답(data-tri)은 그대로.
+    every=True = 문단 안 모든 ▲ · ▼ (의견 탭 요약 `▲ 상승 추세` · `▲ 올랐고`, 19px 글 → PRICE_TRI 15, 2026-11-08 사용자)."""
+    px = px or EMPH_TRI
+    s = str(html or "")
+    if "data-tri" in s:
+        return s
+    out = _EMPH_TRI_RE.sub(lambda m: f'{m.group(1)}<span data-tri="1" style="font-size:{px}px;vertical-align:1px;">{m.group(2)}</span>', s, count=0 if every else 1)
+    return f"<span>{out}</span>" if out != s else s   # 답 칸이 inline-flex 라 통째로 감싼다 — 안 감싸면 ▲ 뒤 공백이 flex 항목 사이에서 사라짐
+
+
 def dash():
     return f'<span style="color:{MUTED};">—</span>'
 
@@ -180,7 +198,7 @@ def tint(html_text):
         if "<" not in c:
             plain = html_mod.unescape(c).strip()
             d = _chunk_dir(plain)
-            if d and len(plain) < CHUNK_TINT and "," not in plain and not plain.rstrip(".").endswith("다"):   # 문장(쉼표 · `다.` 끝)은 통째로 칠하지 않는다 — 숫자만 (2026-11-06 사용자: 함께 움직이는 종목 문장 이름까지 칠해짐)
+            if d and len(plain) < CHUNK_TINT and not re.search(r",(?!\d)", plain) and not plain.rstrip(".").endswith("다"):   # 천 단위 쉼표(1,300억 순매도)는 문장 쉼표가 아니다 (2026-11-08 사용자: 순매도인데 검정)   # 문장(쉼표 · `다.` 끝)은 통째로 칠하지 않는다 — 숫자만 (2026-11-06 사용자: 함께 움직이는 종목 문장 이름까지 칠해짐)
                 out.append(f'<span style="color:{UP if d == "+" else DOWN};">{c}</span>')
                 continue
             out.append(_tint_inline(c))
@@ -549,7 +567,10 @@ def _split_src(text):
 
 def tip(text):
     """ⓘ 툴팁 아이콘 — 글은 data-tip 속성, 모양은 테마 CSS(build_theme.py `[data-tip]::after`). 줄바꿈(\n)은 툴팁 안에서 줄을 바꾼다.
-    상자는 position:relative 인 가장 가까운 줄 기준으로 놓인다 — 아이콘은 그런 줄 안에 둔다. 데이터 출처는 data-src (위 TIP_SRC)."""
+    상자는 position:relative 인 가장 가까운 줄 기준으로 놓인다 — 아이콘은 그런 줄 안에 둔다. 데이터 출처는 data-src (위 TIP_SRC).
+    글이 비면 아이콘도 없다 — 카드가 뜻 · 기준을 다 말하는 툴팁은 "" 로 지운다 (2026-11-08 사용자, 가이드라인 11절 `두지 않는 툴팁`)."""
+    if not str(text or "").strip():
+        return ""
     text, src = _split_src(text)
     q = lambda x: esc(x).replace(chr(34), "&quot;").replace("\n", "&#10;")   # noqa: E731
     t = q(text)
@@ -1171,7 +1192,7 @@ def state_card(head_html, kind="neutral", right_html="", sub_html="", items=(), 
     bg, bd = STATE_CARD.get(kind, STATE_CARD["neutral"])
     head = (f'<span style="display:flex;justify-content:{"center" if center else "space-between"};align-items:center;gap:12px;{"text-align:center;" if center else ""}">'
             f'<span style="font-weight:{STATE_TITLE_W};color:#111;font-size:{EMPH_Q};line-height:{LH_EMPH_Q};">{head_html}</span>'   # 굵기 = 종목 페이지 질문 500 (P131, 2026-11-07)
-            + (f'<span style="display:inline-flex;align-items:center;font-weight:{STATE_ANS_W};white-space:nowrap;font-size:{EMPH_Q};line-height:{LH_EMPH_Q};{"margin-left:auto;" if chev else ""}">{right_html}</span>' if right_html else "")   # 라벨 · 숫자 세로 가운데 (2026-10-13 사용자)
+            + (f'<span style="display:inline-flex;align-items:center;font-weight:{STATE_ANS_W};white-space:nowrap;font-size:{EMPH_Q};line-height:{LH_EMPH_Q};{"margin-left:auto;" if chev else ""}">{emph_tri(right_html)}</span>' if right_html else "")   # 라벨 · 숫자 세로 가운데 (2026-10-13 사용자)
             + ((("" if right_html else '<span style="margin-left:auto;"></span>') + emph_fold_btn(lighten(bg), bd)) if chev else "") + "</span>")   # 접기 버튼 = 종목 페이지와 같은 함수(왼쪽 12 · 화살표 색, 2026-11-07)   # chev: 맨 오른쪽 공식 접기 버튼, 바탕은 카드 색 20% 밝게 (2026-10-13 사용자)
     sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#374151;margin-top:2px;{"text-align:center;" if center else ""}">{sub_html}</div>' if sub_html else ""   # center: 종합 상태 카드 가운데 (2026-10-13 사용자)
     lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#374151", margin="8px 0") for k, v in items)
@@ -1218,7 +1239,35 @@ def darken(hex_color, amt=0.05):
     return "#" + "".join(f"{round(c * (1 - amt)):02X}" for c in (r, g, b))
 
 
-FOLD_BOX, FOLD_RADIUS, FOLD_ICON, FOLD_LEFT = 31, 7, 18, 4   # 공식 접기 버튼: 엔비디아 평균 등급 네모 28 → 10% 크게 31, 화살표 16 → 18, 왼쪽 여백 4 (2026-10-13 사용자)
+def card_line(theme):
+    """강조 카드 안 연한 구분선 색 — 근거 줄 사이 선(cards.question_card bd_row · cards.line_col)과 같다."""
+    return darken(lighten(lighten(CARD_DIR[theme][1]), 0.3), 0.02)
+
+
+def dir_theme(v, d=2):
+    """등락 값 → 카드 방향(positive · negative · neutral). 반올림해 0 이면 보합 = neutral."""
+    return "neutral" if v is None or round(v, d) == 0 else "positive" if v > 0 else "negative"
+
+
+def dir_cells(cells, themes, radius=8):
+    """지수 가로 카드 칸들 — 칸마다 그날 방향의 강조 카드 모양 (2026-11-08 사용자: "강조 카드 외곽선 · 연한 구분선으로, 미국 증시도 똑같이").
+    칸 html 은 `<span data-idx-cell="1" style="` 로 시작하고 배경은 칸이 갖는다. 바깥 테두리 = 그 칸 방향의 카드 테두리(CARD_DIR 둘째 값),
+    칸 사이 세로선 = 오른쪽 칸 방향의 연한 구분선(card_line). 방향이 다른 칸이 이웃하면 바깥선 색이 칸 경계에서 바뀐다."""
+    out, n = [], len(cells)
+    for i, (c, th) in enumerate(zip(cells, themes)):
+        bd = CARD_DIR[th][1]
+        st = f"border-top:1px solid {bd};border-bottom:1px solid {bd};"
+        st += f"border-left:1px solid {bd};" if i == 0 else f"border-left:1px solid {card_line(th)};"
+        if i == n - 1:
+            st += f"border-right:1px solid {bd};"
+        r_l, r_r = (radius if i == 0 else 0), (radius if i == n - 1 else 0)
+        st += f"border-radius:{r_l}px {r_r}px {r_r}px {r_l}px;"
+        out.append(c.replace('data-idx-cell="1" style="', f'data-idx-cell="1" style="{st}', 1))
+    return "".join(out)
+
+
+
+FOLD_BOX, FOLD_RADIUS, FOLD_ICON, FOLD_LEFT = 31, 7, 14, 4   # 화살표 18 → 14 (2026-11-08 사용자: 20% 작게, 14.4 → 정수 14 · 선 굵기도 viewBox 비율로 같이 줄어듦)   # 공식 접기 버튼: 엔비디아 평균 등급 네모 28 → 10% 크게 31, 화살표 16 → 18, 왼쪽 여백 4 (2026-10-13 사용자)
 
 
 def fold_btn(bg="#fff", bd="#E2E8F0", ink="#111"):
@@ -1409,6 +1458,20 @@ def news_item(headline_html, url=None, detail="", subs=(), labels="", meta=(), l
             + meta_html + "</span>")
 
 
+PC_CHEV_BOX = ('<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:6px;border:1px solid #E2E8F0;'
+               'border-radius:6px;background:#fff;color:#111;box-sizing:border-box;"><svg class="pc-chev" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" '
+               'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .15s;"><path d="M4 6l4 4 4-4"/></svg></span>')
+
+
+def credit_fold(items_html, indent_px=0):
+    """사진 출처 — 접힌 채로 오른쪽 정렬 `사진 출처 [⌄]`, 누르면 아래에 출처 목록 (2026-11-08 사용자).
+    화살표 = 블로그 공통 푸터(.footer-more)와 같은 20px 외곽선 상자 · 12px 화살표, 펼치면 뒤집힌다."""
+    return ('<style>details[data-photo-credit][open] .pc-chev{transform:rotate(180deg);}details[data-photo-credit]>summary::-webkit-details-marker{display:none;}</style>'
+            f'<details data-photo-credit="1" style="margin:4px 0 8px;padding:0 {indent_px}px;">'
+            f'<summary style="list-style:none;cursor:pointer;display:flex;justify-content:flex-end;align-items:center;font-size:12px;line-height:20px;color:{NOTE};">사진 출처{PC_CHEV_BOX}</summary>'
+            f'<p style="margin:6px 0 0;font-size:12px;line-height:18px;color:{NOTE};word-break:keep-all;">위키미디어 공용 : {items_html}</p></details>')
+
+
 def footer(data_line, disclaimer_line, indent=True):
     """출처 · 면책 줄. indent=False: 들여쓰기 없이 위 목록과 같은 왼쪽 선 (데일리 위험 탭, 2026-10-13 사용자)."""
     return (f'<div data-footer="1" style="margin-top:3px;padding-top:2px;border-top:1px solid #f3f3f3;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};{GUIDE_IND if indent else ""}">'
@@ -1495,7 +1558,10 @@ def legend_bar(title, segs):
     return head + bar_html + (f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 5px;">{legend}</span>')   # 범례 아래 10 → 5 (2026-10-31 사용자 P187: 뉴스 `최근 N건` 범례)
 
 
-def direction_bars(today, week):
+BARS_EMPTY_PAD = 12 - (SEP_GAP - 3 - 10)   # 오늘 0건 카드: 버튼 아래 보이는 여백 = 위 12 (카드 아래 안쪽 여백을 채운다)
+
+
+def direction_bars(today, week, empty_text=""):
     """뉴스 방향 막대 두 개 (오늘 · 최근 7일) 를 흰 카드 하나에 — today · week = {positive · negative · uncertain · neutral: 건수}. 둘 다 0건이면 빈 문자열."""
     if not sum((today or {}).values()) and not sum((week or {}).values()):
         return ""
@@ -1503,11 +1569,16 @@ def direction_bars(today, week):
     # 두 막대 묶음 사이 보이는 24px (2026-10-12 사용자) — 앞 묶음 비율 글자 → 다음 라벨 글자, 행간 반쪽 3 + 3 을 뺀 값
     gap = f'<span style="display:block;height:{BAR_GROUP_GAP - 5}px;"></span>' if sum((today or {}).values()) and sum((week or {}).values()) else ""   # 한쪽이 비면 그 막대 · 사이 여백 없이 (데일리 = 오늘만)
     box = f'<div data-cards="1" style="margin:0 0 8px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:{SEP_GAP - 3}px 12px {SEP_GAP - 3 - 10}px;">'   # 두 막대를 카드 하나에 (2026-10-13 사용자)
-    if sum((today or {}).values()) and sum((week or {}).values()):
+    if sum((week or {}).values()):   # 오늘이 0건이어도 같은 꼴 — `오늘 0건` + 안내 한 줄, 펼치면 최근 7일 (2026-11-08 사용자: 종목 페이지 뉴스도 한국 증시 리포트처럼 오늘 먼저 · 펼침 = 7일)
         # 처음엔 `오늘` 막대만 — 제목 줄 오른쪽 작은 접기 버튼(공식 화살표, 같은 크기)을 누르면 `최근 7일` 막대가 펼쳐진다 (2026-11-07 사용자 P346)
-        t = bar("오늘", today)
-        title = f"오늘 {sum(today.values())}건"
+        n_today = sum((today or {}).values())
+        title = f"오늘 {n_today}건"
         plain = f'<span style="display:block;font-size:{TINY};line-height:{LH_TINY};margin:0 0 3px;color:#111;font-weight:700;">{esc(title)}</span>'
+        # 오늘 0건 = 제목 줄(`오늘 0건` · 최근 7일 버튼)만 — `오늘은 새 뉴스가 없습니다` 는 아래 목록 자리가 이미 말한다. 아래 여백 = 위 12 (BARS_EMPTY_PAD)
+        # empty_text = 오늘 0건일 때 막대 자리에 쓰는 한 줄(종목 페이지 `오늘은 이 종목을 다룬 방송이 없습니다.`, 아이콘 없음 — 2026-11-08 사용자)
+        empty = (f'<span style="display:block;margin:4px 0 0;font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{esc(empty_text)}</span>' if empty_text else "")
+        t = bar("오늘", today) if n_today else plain + empty + f'<span style="display:block;height:{BARS_EMPTY_PAD}px;"></span>'
+        gap = gap if n_today else ""
         # 제목 줄 높이 = 버튼 높이(31), 카드 위 안쪽 여백 = 오른쪽 여백 12 — 버튼 위 · 오른쪽 간격이 같다 (2026-11-07 사용자 P362)
         # 버튼 왼쪽 `최근 7일` 글자 = 분야 탭 비활성 글자(14px · #4B5563 · 보통 굵기), 글자 · 버튼 한 덩어리를 눌러도 펼침 (P363)
         head = (f'<span style="display:flex;justify-content:space-between;align-items:center;height:{FOLD_BOX}px;margin:0;">'
@@ -1943,3 +2014,18 @@ def related_box(related):
                     f'<span style="display:block;font-weight:700;">{arrow(v)}</span></span>' for n, v in related)
     return (f'<div style="margin:12px 0 0;padding:8px 12px;background:#F8FAFC;border-radius:8px;font-size:15px;line-height:23px;">'
             f'<span style="display:grid;grid-template-columns:1fr 1fr;column-gap:16px;">{cells}</span></div>')
+
+
+OUT_ICON = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" '
+            'style="flex:none;"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>')
+
+
+def related_buttons(links):
+    """글 맨 아래 `함께 보는 페이지` — 버튼 대신 구분선 목록 (2026-10-31 사용자 P187, 옛 P160 버튼): 제목 아래 · 줄 사이 · 맨 끝에 가로 구분선,
+    줄 = 3px 점 + 페이지 이름(16px 보통 = 기사 요약 줄 크기, P185) + 오른쪽 나가는 아이콘(회색). 줄 전체가 링크(data-row-link, 가이드라인 10-9)."""
+    dot = '<span aria-hidden="true" style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-right:8px;"></span>'
+    rows = "".join(f'<a href="{esc(u)}" data-row-link="1" style="display:flex;align-items:center;gap:0;padding:12px {ALIGN_PX}px;border-bottom:1px solid #E2E8F0;'
+                   f'font-size:16px;line-height:26px;font-weight:400;color:#111;text-decoration:none;">{dot}<span style="flex:1 1 auto;min-width:0;">{esc(t)}</span>'
+                   f'<span style="flex:none;display:inline-flex;margin-left:8px;color:{NOTE};">{OUT_ICON}</span></a>' for t, u in links)
+    return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{EMPH_NAME};padding:0 {ALIGN_PX}px 10px;border-bottom:1px solid #E2E8F0;">함께 보는 페이지</div>'
+            f'{rows}</div>')

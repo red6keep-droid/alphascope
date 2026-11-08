@@ -40,7 +40,7 @@ HISTORY_UNIVERSE = {
     "rates": ["^TNX", "^FVX", "^IRX"],
     # 2026-10-18 재설계 (doc/기획/데일리-리포트-기획.md 6절): 대형주 10개 평소 범위(D4) · 한국 짝의 미국 쪽(K2) · 원/달러(K3)
     "mega": ["NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "LLY"],
-    "link": ["^SOX"],
+    "link": ["^SOX", "EWY"],   # EWY = 미국에 상장된 한국 주식 상장지수펀드 — 한국장 탭 매일 바뀌는 값 (2026-11-08 사용자 P407)
     "fx": ["KRW=X"],
 }
 OPEN_SYMBOLS = ("^GSPC", "^IXIC", "^DJI", "^RUT")   # 시가 · 고가 · 저가도 남기는 심볼 (2026-11-07)

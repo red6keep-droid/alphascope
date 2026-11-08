@@ -496,7 +496,7 @@ def card_industry_work(s):
         lines.append(("row", r["name"], _ind_value(r), f"{r['month'][:4]}년 {int(r['month'][5:])}월" + (f" · {cmp_txt} {_sgn(r['chg'], 2 if u2 == '%p' else 1)}{u2}" if r.get("chg") is not None else "")
                       + (f" · {r['note']}" if r.get("note") else "")))
     title = f"{U.biz_name(s['sym'])} 업계 {U.BIZ_Q[b['group']]}" if b.get("group") else b["q"]   # `가전 업계 수출은?` (P151)
-    return R._state_card(title, state, theme, col, lines, "", tip=_tip_of(sec_industry(s)), fold=True)
+    return R._state_card(title, state, theme, col, lines, "", fold=True)   # 툴팁 없음 — 문장 · 줄이 값과 `1~2달 늦게` 를 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 def biz_money_state(s):
@@ -525,7 +525,7 @@ def card_industry_money(s):
         val = f"{r['v'] / 1e3:,.0f}조 원" if r["unit"] == "조 원" else f"{r['v']:.1f}%"
         lines.append(("row", _fin_short(s, r["name"]), val, f"{_qlabel(r['q'])}" + (f" · 전년 같은 분기보다 {_sgn(r['chg'], 1)}{r['chg_unit']}" if r.get("chg") is not None else "") + f" · {r['note']}"))
     return R._state_card(f"{U.biz_name(s['sym'])} 업계 수익성은?",   # `[업계] 업계 수익성은?` (P151, 옛 회사들의 돈 버는 힘은?)
-                          state, theme, col, lines, "", tip=_tip_of(sec_fin(s)), fold=True)
+                          state, theme, col, lines, "", fold=True)   # 툴팁 없음 — 문장이 `실제 집계 · 2~3달 뒤` 를 말한다(옛 툴팁은 카드와 다른 첫 줄 값을 적었다) (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 def card_sector_flow(s):
@@ -534,7 +534,7 @@ def card_sector_flow(s):
     if not sf:
         return ""
     th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
-    return R._state_card(f"{sf['name']} 업계 자금 흐름은?", sf["state"], th, col, _kospi(R.sector_lines(sf, "KOSPI")), "", tip=_kospi(R.sector_rule(sf)), fold=True, opened=True)   # 탭 첫 강조 카드는 펼침 (P216)
+    return R._state_card(f"{sf['name']} 업계 자금 흐름은?", sf["state"], th, col, _kospi(R.sector_lines(sf, "KOSPI")), "", fold=True, opened=True)   # 탭 첫 강조 카드는 펼침 (P216)
 
 
 def sec_industry_tab(s):
@@ -582,7 +582,7 @@ def price_card(s):
     # (2026-10-31 사용자: "에코프로처럼 이름이 짧으면 줄 바꿈이 되면 안 된다", P138. P137 은 모두 두 줄이었다 — 서버 글자 폭 어림은 경계에서 틀려 에코프로를 놓쳤다)
     price = (f'<span style="display:flex;justify-content:flex-end;align-items:center;column-gap:{PRICE_BTN_GAP}px;">'   # 가격 · % 오른쪽 끝 ~ 버튼 12 = 상태 카드 답 ~ 버튼
              f'<span style="display:flex;flex:0 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end;align-items:baseline;column-gap:6px;">{close_html} '
-             f'<span style="white-space:nowrap;margin-top:{-2 if r else 6}px;">{R._arrow(r)}</span></span>{btn}</span>')   # 두 줄일 때 가격 ~ 증감 7px (P136) — 등락 0 인 날은 흰 카드 · 줄 높이 24 라 +6 (P137). 한 줄일 땐 기준선 맞춤이라 영향 없음
+             f'<span style="white-space:nowrap;margin-top:{-2 if r else 6}px;">{_dk.emph_tri(R._arrow(r), _dk.PRICE_TRI)}</span></span>{btn}</span>')   # 두 줄일 때 가격 ~ 증감 7px (P136) — 등락 0 인 날은 흰 카드 · 줄 높이 24 라 +6 (P137). 한 줄일 땐 기준선 맞춤이라 영향 없음
     head = R.price_row(R._row("@@", price, tone)).replace("margin:0 0 6px;", "margin:0;", 1)
     head = head.replace(R.PRICE_ROW_L, "flex:0 0 auto;min-width:0;white-space:nowrap;", 1)
     head = head.replace("align-items:center;", "align-items:flex-start;", 1)   # 이름 = 가격과 같은 줄 (P135 — 가운데 맞춤이면 두 줄 사이에 떴다)
@@ -601,16 +601,6 @@ def price_card(s):
             f'{R.price_in(bg, bd, [sec_year_range(s), R.in_card(sec_drawdown(s), join=True), sec_month_range(s), R.in_card(sec_periods(s), white=True), sec_momentum(s), sec_chart_indicators(s)])}{R.rows_after(rows)}</details></div>')
 
 
-def periods_tip(s, ps):
-    p = ps[-1]
-    now = ""
-    if p.get("spy") is not None:
-        d = p["stock"] - p["spy"]
-        now = (f"\n· {p['label']} {_sgn(p['stock'])}% : 같은 기간 KOSPI({_sgn(p['spy'])}%)보다 "
-               + (f"{abs(d):.1f}%p 앞섰다" if d > 0 else f"{abs(d):.1f}%p 뒤처졌다" if d < 0 else "같았다"))
-    return "지금 가격이 1주 · 1개월 · 3개월 · 6개월 · 1년 전보다 얼마나 오르거나 내렸는지. 배당을 넣어 계산했다" + now
-
-
 def sec_periods(s):
     ps = s.get("periods") or []
     if not ps:
@@ -618,7 +608,7 @@ def sec_periods(s):
     chart = R._col_chart([(p["label"], [p["stock"], p.get("spy")]) for p in ps[::-1]], [R._sign_bg, lambda v: R._GRAY_BAR], [R._sign_fg, lambda v: NOTE], right=True)   # 1년 → 1주 (P165)
     legend = R._legend_chips([(f"{s['name']} 오름", R._PASTEL_UP), (f"{s['name']} 내림", R._PASTEL_DN), ("KOSPI", R._GRAY_BAR)])
     card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
-    return R._card_title("기간별 수익률 (%)", periods_tip(s, ps)) + card
+    return R._card_title("기간별 수익률 (%, 배당 포함)") + card   # 툴팁 없음 — 미국 종목과 같게 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 def year_tip(y):
@@ -642,7 +632,7 @@ def sec_month_range(s):
     if not bb or bb.get("lower") is None:
         return ""
     th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
-    return ("white", R.month_range_in(bb, won, _boll_rule(bb), R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col, top=0))
+    return ("white", R.month_range_in(bb, won, "", R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col, top=0))
 
 
 def sec_drawdown(s):
@@ -667,15 +657,10 @@ def sec_drawdown(s):
         r1 = cell(_esc(s["name"]), True) + "".join(cell(f"{a:.0f}%") for _, a, _ in cols)
         r2 = cell("KOSPI", True) + "".join(cell(f"{b:.0f}%") for _, _, b in cols)
         tbl = "".join(f'<span style="display:flex;align-items:stretch;line-height:24px;">{r}</span>' for r in (th, r1, r2))
-        tip = "크게 떨어진 일 가운데, 최고가를 되찾기까지 1년(250거래일) 넘게 걸린 경우의 비율"
         title = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 4px;">'
-                 f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율{R._tipx(tip)}</span></span>')   # `(약 30년 기간 중)` 은 뺐다 — 기간은 머리 작은 줄에 (2026-10-27 P17 · P24)
+                 f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율</span></span>')   # `(약 30년 기간 중)` 은 뺐다 — 기간은 머리 작은 줄에 (2026-10-27 P17 · P24)
         tail = f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px;font-size:{TINY};color:{NOTE};">{title}{tbl}</span>'
-    x = d["pct_from_high"]
-    lv = next((l for l in ("30", "20", "10") if -x > int(l) and (st.get(l) or {}).get("median_days") is not None), None)
-    now = (f"\n· 지금 {_sgn(x)}% : −{lv}% 넘게 빠졌을 때 절반은 {st[lv]['median_days']}거래일 안에 최고가를 되찾았다" if lv else f"\n· 지금 {_sgn(x)}% : 1년 최고가에서 10% 안쪽")
-    ttip = "주가가 최고가에서 크게 떨어졌을 때 그 최고가를 다시 넘기까지 걸린 거래일. '보통' 은 절반이 이보다 빨리 회복한 값" + now
-    return R.dd_block(s["name"], st, bn, "KOSPI", span, d["pct_from_high"], ttip, tail)   # 영역 제목 없이 한 덩이 · 구간 막대 (2026-10-27 P24 · P28)
+    return R.dd_block(s["name"], st, bn, "KOSPI", span, d["pct_from_high"], "", tail)   # 툴팁 없음 — 머리 문장과 겹침 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)   # 영역 제목 없이 한 덩이 · 구간 막대 (2026-10-27 P24 · P28)
 
 
 def sec_chart_indicators(s):
@@ -723,12 +708,6 @@ def _boll_lines(bb):
     return lines
 
 
-def _boll_rule(bb):
-    lo, hi, c = bb["lower"], bb["upper"], bb["close"]
-    return ("최근 한 달 동안 가격이 보통 움직인 범위\n"
-            f"· 오늘 {won(c)} : 범위 {won(lo)}~{won(hi)}" + (" 안" if bb["state"] not in R.BOLL_THEME else f" 밖({R.BOLL_STATE_KO.get(bb['state'], '')})"))
-
-
 def sec_tech(s):
     """기술지표의 방향은? (옛 제목 기술 지표는 어느 쪽을 가리키나?, P121) (2026-10-30 사용자: 인베스팅닷컴 기술적 분석 화면처럼 — 용어 상승 · 하락 · 중립, P99) — experiments/tech_signals."""
     sig = (s.get("tech") or {}).get("signals")
@@ -763,7 +742,7 @@ def sec_regime(s):
     lines = _kospi(R.regime_lines(mr))
     if s.get("chart"):
         lines.insert(1, R.index_chart_line(f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{KOSPI_REF}", f"images/{KOSPI_REF}", "KOSPI"))
-    card = R._state_card("한국 증시 분위기는?", mr["regime"], th, col, lines, "", tip=_dk.with_src(_kospi(R.regime_rule(mr)), "Yahoo Finance"), fold=True)
+    card = R._state_card("한국 증시 분위기는?", mr["regime"], th, col, lines, "", fold=True)   # 툴팁 없음 — 근거 줄마다 나누는 법이 있다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
@@ -808,9 +787,11 @@ def sec_today(s):
     한국 증시 채널 · 미국 채널 모두. 공용 뉴스 카드(엔비디아 · 미국 종목 페이지와 같은 _event_html): 주제 / 방송 주장 / [영역] [방향] [방송]  시각 · 채널."""
     ev = [media_feed.event(r, _dk.n_channels_of(MEDIA), KR_PRICES) for r in sorted(media_feed.for_kr_page(MEDIA, s["code"]), key=lambda r: str(r["published_at"]), reverse=True)]
     bars = R.sec_direction_bars({"direction_counts": {"today": media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])),
-                                                      "week": media_feed.direction_counts(media_feed.for_kr_page(MEDIA_WEEK, s["code"]))}})   # 엔비디아처럼 오늘 · 최근 7일 방향 막대 (2026-10-31 사용자 P143)
+                                                      "week": media_feed.direction_counts(media_feed.for_kr_page(MEDIA_WEEK, s["code"]))},
+                                 "empty_text": "오늘은 이 종목을 다룬 방송이 없습니다."})   # 엔비디아처럼 오늘 · 최근 7일 방향 막대 (2026-10-31 사용자 P143)
     if not ev:
-        return bars + _dk.muted("오늘은 이 종목을 다룬 방송 소식이 없습니다.") + MOCK_NEWS   # 목업에서만 샘플 카드로 바뀐다 (P26)
+        # 최근 7일 방송이 아예 없으면 뉴스 구획을 숨긴다 · 오늘 0건 안내는 카드의 막대 자리(아이콘 없음) (2026-11-08 사용자)
+        return (bars + MOCK_NEWS) if bars else ""   # 목업에서만 샘플 카드로 바뀐다 (P26)
     return bars + R.sec_events({"events": ev[:MAX_NEWS], "events_overflow": ev[MAX_NEWS:MAX_NEWS + 12]})
 
 
@@ -1137,9 +1118,7 @@ def cal_earn_card(s, c):
         lines.append(("row", "반영된 날 보통", f"±{c['median']:.1f}%", f"지난 {len(c['bars'])}번 중앙값"))
     if c.get("normal"):
         lines.append(("row", "평소 하루", f"±{c['normal']:.1f}%", "최근 1년 중앙값"))
-    tip = ("회사가 석 달마다 잠정실적을 공시하면 주가가 크게 움직이곤 한다. 장 마감 뒤 공시는 다음 날, 장 전 · 장중 공시는 그날을 본다\n"
-           f"· {c['left']}일 남음 : {when}\n· 나누는 법 : {CC.SOON_DAYS}일 안으로 다가오면 카드가 보라색")
-    return lines, _dk.with_src(tip, "금융감독원 DART · Yahoo Finance"), f"{c['left']}일 남음", c["left"]
+    return lines, "", f"{c['left']}일 남음", c["left"]   # 툴팁 없음 — 문장 `실적이 반영된 날` 과 겹침(보라 카드 규칙은 독자 몫이 아님) (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 def cal_pair_card(s, c):
@@ -1165,9 +1144,7 @@ def cal_pair_card(s, c):
         e = c["effect"].get(u["symbol"]) or {}
         lines.append(("row", f"{usn(u['symbol'])} ({u['symbol']})", R._md_short(u["day"]), "미국과 연결" + (f" · 다음 날 {nm} 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else "")))
     left = (datetime.date.fromisoformat(up[0]["day"]) - datetime.date.fromisoformat(s["day"])).days
-    tip = (f"{_dk.josa(nm, '와')} 같은 재료로 움직이는 미국 종목(미국과 연결)의 실적 발표. 미국 장 마감 뒤 나오는 발표는 한국 시간 다음 날 장에 반영된다\n"
-           f"· {days}일 안 {len(up)}곳 : 가장 가까운 발표는 {usn(up[0]['symbol'])} {R._md_short(up[0]['day'])}")   # 참고 줄은 뺐다 (batch 7 g)
-    return lines, _dk.with_src(tip, "Yahoo Finance"), f"{len(up)}곳", left
+    return lines, "", f"{len(up)}곳", left   # 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 def cal_macro_card(s, c):   # 답 `5건` — 옛 `5건 · 30일 안` 이 제목을 두 줄로 밀었다(30일은 문장 · 툴팁에, P163)
@@ -1179,9 +1156,7 @@ def cal_macro_card(s, c):   # 답 `5건` — 옛 `5건 · 30일 안` 이 제목�
         return [("앞으로 30일 안에 잡힌 큰 일정이 없다.", "plain"), (link, "html")], "", "없음", None
     near = " · ".join(_macro_name(u["kind"], u.get("label", "")) + "(" + R._md_short(u["day"]) + ")" for u in up[:2])
     first = f"가장 가까운 큰 일정은 {near}이다." + (f" 30일 안에 모두 {len(up)}건이 있다." if len(up) > 2 else "")
-    tip = ("미국 금리 결정 · 물가 · 고용 발표와 국내 옵션 만기처럼 시장 전체가 함께 보는 일정\n"
-           f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {_macro_name(up[0]['kind'], up[0].get('label', ''))} {R._md_short(up[0]['day'])}")
-    return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED · Yahoo Finance"), f"{len(up)}건", None
+    return [(first, "plain"), (link, "html")], "", f"{len(up)}건", None   # 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 CAL_TAB = "일정"   # 한국 증시 리포트 일정 탭 이름 (kr-market-report TAB_CAL) — 테마가 #tab-일정 으로 연다
@@ -1244,7 +1219,7 @@ def detail_body(s, a):
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
             + _dk.report_stamp(_md(s["day"]), "오후 4시 10분 무렵") + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
             + RP.sec_crash(s, media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])) if MEDIA else None)   # 급락장에서 어땠나? — 코스피가 2% 넘게 내린 날 버틴 종목 (2026-11-04)
-            + _dk.keep_tone(R._section("뉴스", sec_today(s), tab="오늘"))   # 뉴스는 헤드라인체 그대로
+            + ((lambda n: _dk.keep_tone(R._section("뉴스", n, tab="오늘")) if n else "")(sec_today(s)))   # 뉴스는 헤드라인체 그대로 · 최근 7일 0건이면 구획 숨김 (2026-11-08)
             + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
             + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
             + R._section("업계상황", sec_industry_tab(s), tab="업계상황")   # 업종 → 업계 상황 (P151) → 붙여 쓴 업계상황 (2026-10-31 사용자 P167)

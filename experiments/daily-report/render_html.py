@@ -371,7 +371,6 @@ def _light_pill(light, text=None):
     return dk.pill(text or _light_word(light) or "—", kind).replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 {dk.PILL_GAP + 5}px 0 {dk.PILL_GAP}px;", 1)   # 등급 라벨 오른쪽 +5 (2026-10-13 사용자)
 
 
-TAB_TOP = 10   # 오늘 · 시장 탭 첫 콘텐츠 위 여백 +10 — margin 은 탭 줄 아래 14 와 겹쳐 사라지므로 padding (2026-10-13 사용자: "오늘, 시장 탭의 콘텐츠 시작 위쪽 여백을 10픽셀 추가")
 
 
 SEO_GRADE = {"Risk-On": "위험 선호", "Neutral": "중립", "Risk-Off": "위험 회피"}   # analyze.regime_score 라벨 → 한국어
@@ -465,25 +464,52 @@ def _arrows(last5):
 INDEX_SHOWN = 1   # S&P 500 만 보이고 나머지는 펼침 (2026-11-07 사용자, 옛 2 = S&P 500 · 나스닥)
 
 
+IDX_CELL_W = 190     # 칸 폭 — `5일 -3.37% · 20일 -10.18%` 한 줄이 들어가는 폭(Chrome 360px 실측). 360px 화면에서 둘째 칸(나스닥)이 화면 끝에 잘려 넘겨 보기가 있다는 게 보인다
+IDX_PAD_R = 20      # 칸 오른쪽 여백(내용 ~ 구분선) — 왼쪽 12 보다 넓게 (2026-11-08 사용자 P416). 칸은 내용만큼 넓어진다(옛 고정 190 에 러셀 2000 이 넘쳤다)
+IDX_BLEED = 14       # 글 좌우 여백(폰) — 넘겨 보기 줄은 오른쪽 화면 끝까지 (2026-11-08 사용자 P408: "화면 밖으로 걸쳐지게")
+
+
+def _idx_cell(key, rec, s):
+    """지수 한 칸 — 이름(괄호 작게) · `가격 ▲ 등락` 한 줄 · 아래 작은 회색 `5일 · 20일` 한 줄 · 최근 5일 (2026-11-08 사용자 P399 · P408)."""
+    sub = []
+    if s.get("ret_5d") is not None:
+        sub.append(f"5일 {s['ret_5d']:+.2f}%")
+    if s.get("ret_20d") is not None:
+        sub.append(f"20일 {s['ret_20d']:+.2f}%")
+    lines = []
+    if sub:
+        lines.append(dk.tint(" · ".join(sub)))   # 덩어리마다 증감 색
+    if s.get("last5"):
+        lines.append("최근 5일 " + _arrows(s["last5"]))
+    sub_html = "".join(f'<span style="display:block;white-space:nowrap;">{x}</span>' for x in lines)
+    bg = "#fff"   # 칸 배경 흰색 — 방향 색 배경 없앰 (2026-11-08 사용자, 옛 CARD_DIR 방향 배경)
+    return (f'<span data-idx-cell="1" style="display:block;flex:0 0 auto;min-width:{IDX_CELL_W}px;box-sizing:border-box;background:{bg};padding:{14 - dk.VP}px {IDX_PAD_R}px {14 - dk.VP}px 12px;">'
+            f'<span style="display:block;font-weight:700;color:#111;font-size:{dk.NAME};line-height:{dk.LH_CARD};white-space:nowrap;">{dk.paren(_esc(INDEX_LABELS.get(key, key)))}</span>'
+            f'<span style="display:block;margin-top:4px;line-height:25px;white-space:nowrap;"><span style="font-size:{dk.NAME};color:#111;">{_esc(_fmt_price(rec.get("price")))}</span> '
+            f'<span style="font-size:{dk.CHG_SIZE};">{dk.small_chg(dk.arrow(rec.get("change_pct")))}</span></span>'
+            f'<span style="display:block;margin-top:6px;font-size:13px;line-height:19px;color:{dk.SUB};">{sub_html}</span></span>')
+
+
 def sec_indices(indices, analysis, report, with_text=True):
-    """주요 지수 — 해설 먼저(2026-10-12 사용자), C 카드(왼쪽 60%): 지수, 값 가격 + 1일 등락, 보조 줄 5일·20일·최근 5일.
-    S&P 500 만 보이고 나스닥 · 다우존스 · 러셀 2000 은 펼침 버튼 안 (2026-11-07).
-    VIX 줄 · 20일 위치는 뺐다 — 시장 탭 `시장은 얼마나 긴장했나?` · `지금 시장 흐름은?` 이 말한다 (2026-11-07 사용자: 오늘 = 그날 기록만)."""
+    """주요 지수 — 칸 4개(S&P 500 · 나스닥 · 다우존스 · 러셀 2000)를 가로로 넘겨 보는 줄 (2026-11-08 사용자 P408, 옛 P399 2열 + `지수 2개 더 보기`).
+    순서 = 탭 줄처럼 왼쪽부터, 넘기면 오른쪽 칸이 나온다. 줄은 오른쪽 화면 끝까지 걸쳐 둘째 칸이 잘려 보인다 — 넘겨 보기가 있다는 표시.
+    칸 = 이름 · 가격 ▲ 등락 · 5일 · 20일 · 최근 5일. VIX 줄 · 20일 위치는 뺐다 — 분위기 카드가 말한다 (2026-11-07 사용자: 오늘 = 그날 기록만)."""
     series = (analysis or {}).get("series") or {}
-    rows = []
+    cells, themes = [], []
     for key in ("sp500", "nasdaq", "dow", "russell"):
         rec = indices.get(key) or {}
-        s = series.get(INDEX_SYMBOL[key]) or {}
-        value = f'<span style="font-weight:400;">{_esc(_fmt_price(rec.get("price")))}</span> {dk.arrow(rec.get("change_pct"))}'   # 지수 가격 보통 굵기 (2026-10-13 사용자)
-        sub = []
-        if s.get("ret_5d") is not None:
-            sub.append(f"5일 {s['ret_5d']:+.2f}%")   # 덩어리째 증감 색은 crow 의 tint
-        if s.get("ret_20d") is not None:
-            sub.append(f"20일 {s['ret_20d']:+.2f}%")
-        if s.get("last5"):
-            sub.append("최근 5일 " + _arrows(s["last5"]))
-        rows.append((_esc(INDEX_LABELS.get(key, key)), value, " · ".join(sub)))
-    return (_text(report.get("summary")) if with_text else "") + dk.ccard(rows, left=60, fold_at=INDEX_SHOWN, noun="지수")   # 펼침 버튼은 같은 카드 안 (2026-10-13 사용자)
+        if rec.get("price") is None and rec.get("change_pct") is None:
+            continue
+        cells.append(_idx_cell(key, rec, series.get(INDEX_SYMBOL[key]) or {}))
+        themes.append("neutral")   # 테두리 · 구분선도 회색 하나로 — 흰 카드 (2026-11-08 사용자, 옛 칸마다 방향 색)
+    if not cells:
+        return _text(report.get("summary")) if with_text else ""
+    # 가로로 긴 흰 카드 한 장 안에 칸 4개 · 칸 사이 세로 구분선만 (2026-11-08 사용자 P414, 옛 P408 칸마다 카드). 카드는 화면 오른쪽 밖으로 잘린다
+    # 칸마다 강조 카드 모양 — 바깥선 = 그 방향 카드 테두리, 칸 사이 = 연한 구분선 (2026-11-08 사용자: 옛 회색 #E2E8F0 바깥선 · 구분선, 한국과 같게)
+    row = (f'<div data-cards="1" data-idx-scroll="1" style="overflow-x:auto;margin:0 -{IDX_BLEED}px 8px 0;padding:0 {IDX_BLEED}px 0 0;'
+           f'-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
+           f'<span style="display:flex;width:max-content;border-radius:8px;overflow:hidden;">{dk.dir_cells(cells, themes)}</span></div>')
+    return (_text(report.get("summary")) if with_text else "") + row
 
 
 FOLD_SHOWN = 2   # 카드 줄이 많으면 앞 2줄만 보이고 나머지는 '더 보기' 펼침 (2026-10-12 사용자: "섹터는 2개만, 다른 탭에도 동일하게 2개만")
@@ -774,6 +800,12 @@ def sec_status(analysis, report, prev=None):
     return risk_ul + overall_card + dk.rule_rows(rows)   # 신호 줄은 흰 카드 대신 가로 구분선 (2026-10-13 사용자)   # 글 먼저, 강조 카드 (2026-10-12 사용자), 소제목 없음 — 구획 제목이 '주의할 위험요인'   # 판정 규칙은 제목 옆 ? 툴팁 (가이드라인 2-1 상태 카드 규칙)
 
 
+KR_REPORT_URL = f"{mk.BLOG}/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"   # 한국 증시 리포트 라벨 목록 (kr-stocks universe_kr.REPORT_URL 과 같다)
+RELATED_LINKS = [("미국 시가총액 상위 10개 종목 주가", mk.US_LIST_URL), ("한국 증시 리포트", KR_REPORT_URL),
+                 ("한국 시가총액 상위 10개 종목 주가", f"{mk.BLOG}/p/kr-market-cap-top10.html"),
+                 ("주요 인물 발언 전체 보기", people_section.ALL_URL)]   # 함께 보는 페이지 (2026-11-08 사용자: 미국 증시 리포트에도, 인물 발언 전체 보기 포함)
+
+
 def build_body(input_data, report, cover_url=None, analysis=None, output_dir=None):
     """2026-10-18 재설계 (doc/기획/데일리-리포트-기획.md 6절) — 탭 = 독자 질문 묶음.
     오늘(D1 · D2 · D3 · D6 + 옛 시장 탭 카드 8개, 2026-11-07 시장 탭 없앰) · 뉴스 · 인물 발언 · 한국장(K1 · K2 · K3) · 일정(D5). 시장 상태 점수 · 신호등 · 급등주 · 거래 상위 · 위험요인은 뺐다 (5절 B5 · B6).
@@ -788,8 +820,8 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
         sec_chart(output_dir) or _cover_image(cover_url),
         # 오늘 탭 머리 = 탭 줄 바로 아래 (2026-11-07 사용자: 한국 증시 리포트처럼, 구획 제목 · 그래프 제목 없이)
         #   시가 갭 · 장중 · 하루 막대 → 지수 표(S&P 500 + 지수 3개 더 보기) → 한 줄 결론(data-lead) → 지수 해설 문장. 테마는 첫 data-cards 부터 첫 h2 까지를 첫 탭에 넣는다
+        sec_indices(indices, analysis, report, with_text=False),   # 넘겨 보기 지수 줄 = 오늘 탭 바로 아래, 그래프 위 (2026-11-08 사용자)
         sx.split_chart(a),
-        sec_indices(indices, analysis, report, with_text=False),
         sec_lead(report, analysis),
         _text_flow(report.get("summary")),   # 한 문단 이어 쓰기 (P391)
     ]
@@ -804,7 +836,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
         parts.append(dk.section("종목 · 업종", grid(move), tab=TAB_TODAY))
     base = mk.base_cards(a, input_data.get("macro") or {})
     if base:
-        parts.append(dk.section("시장 바탕", grid(base), tab=TAB_TODAY))
+        parts.append(dk.section("시장 환경", grid(base), tab=TAB_TODAY))   # 옛 `시장 바탕` (2026-11-08 사용자 P404)
     parts += [
         # 뉴스 = 오늘 옆 탭 (2026-11-07 사용자: 오늘 탭이 너무 길다). 탭 이름과 같은 제목 `뉴스` 는 테마가 숨긴다. 읽는 법 툴팁 삭제 (같은 날)
         dk.keep_tone(dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_NEWS)),   # 뉴스는 헤드라인체 그대로 (2026-10-18 사용자)
@@ -812,12 +844,14 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     people = people_section.for_market()   # 뉴스 탭 맨 아래 — 최근 24시간 시장 관련도 높은 인물 발언 3줄 (2026-11-07 사용자). 없으면 뺀다
     if people:
         parts.append(dk.keep_tone(dk.section(TAB_PEOPLE, people_section.summary_card(cards.question_card) + people, tab=TAB_PEOPLE)))   # 맨 위 질문 카드 3개 (P380, 옛 요약 상자 P376)   # `최근 24시간` 뺌 — 줄마다 시각 (P369)
-    korea = sx.korea_open_card(a) + sx.korea_pairs_card(a) + sx.fx_card(a)
+    k_open = sx.korea_open_card(a)   # 한국장 탭 첫 카드는 펼친 채로 (2026-11-08 사용자) — 연결 카드가 없는 날(평소)은 `연결된 국내 종목은?` 이 첫 카드
+    korea = k_open + sx.korea_pairs_card(a, opened=not k_open) + sx.fx_card(a)
     if korea:
         parts.append(dk.section(TAB_KOREA, cards.cards_grid(korea), tab=TAB_KOREA))   # 탭 이름과 같은 구획 제목은 테마가 탭 화면에서 숨긴다
     parts.append(kr_news.section(_media_rows()))   # 소식이 없어도 표시 주석은 남긴다 — 미디어 데일리 실행 뒤 kr_news.py 가 이 칸만 채운다 (2026-10-25)
     if a.get("calendar"):
         parts.append(dk.section(TAB_CAL, cards.cards_grid(sx.macro_cal_card(a) + sx.earnings_cal_card(a)), tab=TAB_CAL))
+    parts.append(dk.related_buttons(RELATED_LINKS))   # 함께 보는 페이지 — 한국 증시 리포트와 같은 블록 · 주요 인물 발언 전체 보기 포함 (2026-11-08 사용자)
     parts.append(dk.WRAP_CLOSE)   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지, 가이드라인 6절)
     # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지) · 반말 문장 끝은 합니다체 (2026-10-18 사용자: 블로그 기본 문체, 데일리는 재작업 때 일괄 — 지금)
     return dk.formal(dk.fix_colons(dk.align_titles("\n".join(p for p in parts if p))))   # 카드 밖 제목을 좌측 기준선(ALIGN_PX)으로 (2026-10-23 사용자)

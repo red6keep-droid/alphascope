@@ -57,12 +57,16 @@ def _ends_white(html):
     return False
 
 
+ROW_TIGHT_PAD = 4    # 묶음 안 수치 줄 위아래 (선 없음)
+ROW_GROUP_GAP = 16   # 묶음 머리 줄 위 여백 — 묶음 사이
+
+
 def question_card(title, state, theme, color, lines, tip="", fold=True, opened=False):
     """질문 카드 — 첫 줄 질문 · 오른쪽 답(상태), 펼치면 쉬운 말 · 근거 줄 · 그래프.
     lines 항목: (글, "plain") 쉬운 말 · ("row", 이름, 값, 뜻) 근거 줄 · (html, "html") 그래프 · (글, "note") 안내 · 글 = 점 글머리표."""
     bg, bd = CARD_DIR[theme]
-    if theme == "neutral" and color == "#111":   # 중립(회색) 카드 답 = 흐린 회색 — 종목 페이지와 같게 (R.MUTED, 2026-11-07)
-        color = dk.MUTED
+    if theme == "neutral" and color in (dk.MUTED, "#999", "#9CA3AF"):   # 회색 카드 답 = 검정 (2026-11-08 사용자: "흐린 글씨 말고 블랙으로 전부" — 옛 2026-11-07 흐린 회색 R.MUTED)
+        color = "#111"
     bd_row = dk.darken(dk.lighten(dk.lighten(bd), 0.3), 0.02)   # 줄 구분선 2% 진하게 (2026-10-26 사용자: 5% → 2%)
 
     def li(item):
@@ -70,21 +74,24 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
         text = item if isinstance(item, str) else item[0]
         if kind == "row":   # 근거 줄 18px · 행간 30 — 질문 · 대답과 같게, 설명 문장은 19 그대로 (2026-10-27 사용자)
             _, name, value, note = item[:4]
-            if len(item) > 4 and item[4] == "noline":   # 가로 막대 바로 아래 줄 — 위 구분선 없이 1px 투명 테두리로 여백만 (가이드라인 9절, 2026-11-07 분위기 카드)
-                bd_line = "transparent"
-            else:
-                bd_line = bd_row
+            flags = set(item[4:])
+            bd_line = "transparent" if flags & {"noline", "tight"} else bd_row   # noline = 가로 막대 바로 아래 줄 — 위 구분선 없이 1px 투명 테두리로 여백만 (가이드라인 9절, 2026-11-07 분위기 카드)
+            # tight = 묶음 안 수치 줄 — 선 없이 위아래 4 (2026-11-08 사용자: 분위기 카드 묶음 경계가 안 보인다 — 선은 묶음 머리 줄 위에만)
+            # gap = 둘째 묶음부터의 머리 줄 — 위 여백 ROW_GROUP_GAP 을 더해 묶음 사이를 벌린다
+            pad = f"{ROW_TIGHT_PAD}px 0" if "tight" in flags else "10px 0"
+            mt = f"{ROW_GROUP_GAP}px" if "gap" in flags else "0"
             val = value if str(value).startswith("<span") else dk.tint(esc(value))   # 이미 색 · 줄바꿈을 입힌 값(HTML)은 그대로 (2026-11-07 P330)
+            nm = name if str(name).startswith("<span") else esc(name)   # 이름도 HTML 이면 그대로 — 라벨을 붙인 이름 (2026-11-08 인물 발언 `반도체 ▼ 부정`)
             fits = _est_w(name, 17) + _est_w(f"({note})", 14) + _est_w(value, 17) <= INLINE_W
             nt = f'<span style="display:block;margin-top:2px;font-size:{dk.TINY};line-height:20px;color:{NOTE};white-space:normal;">{dk.tint(esc(note))}</span>' if note else ""
             if note and fits:
-                return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_line};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
+                return (f'<li style="list-style:none;margin:{mt} 0 0;padding:{pad};border-top:1px solid {bd_line};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-                        f'<span style="flex:none;white-space:nowrap;color:#111;">{esc(name)} <span style="font-size:{dk.TINY};color:{NOTE};">({dk.tint(esc(note))})</span></span>'
+                        f'<span style="flex:none;white-space:nowrap;color:#111;">{nm} <span style="font-size:{dk.TINY};color:{NOTE};">({dk.tint(esc(note))})</span></span>'
                         f'<span style="flex:none;text-align:right;font-weight:{dk.STATE_VAL_W};white-space:nowrap;">{val}</span></span></li>')
-            return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bd_line};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
+            return (f'<li style="list-style:none;margin:{mt} 0 0;padding:{pad};border-top:1px solid {bd_line};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};">'
                     f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-                    f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{esc(name)}</span>{nt}</span>'
+                    f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{nm}</span>{nt}</span>'
                     f'<span style="flex:none;text-align:right;font-weight:{dk.STATE_VAL_W};word-break:keep-all;">{val}</span></span></li>')
         if kind == "html":
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
@@ -109,7 +116,7 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
             # li 아래 12 를 0 으로 — ul −9 와 겹쳐 보이는 아래 22 → 10 = 좌우 10 (Chrome 실측, 2026-11-07 사용자: "넌 왜 이걸 지키지 않았어")
             h = re.sub(r'^(<li style="list-style:none;margin:\d+px 0) 12px;">', r'\1 0;">', h, count=1)   # 위 여백은 그대로(연달은 그래프면 22)
         lis += h
-    ans = state if str(state).startswith("<span") else dk.tint(esc(state))   # 이미 색을 입힌 답(HTML)은 그대로 — 한국 증시 리포트 결과 단어 색 (2026-10-26)
+    ans = dk.emph_tri(state if str(state).startswith("<span") else dk.tint(esc(state)))   # ▲ · ▼ 답 글자의 80% (2026-11-08 사용자)   # 이미 색을 입힌 답(HTML)은 그대로 — 한국 증시 리포트 결과 단어 색 (2026-10-26)
     state_html = (f'<span style="display:inline-flex;align-items:center;">{ans}{_fold_btn(dk.lighten(bg), bd)}</span>' if fold else ans)   # 답 글자의 증감도 색 (가이드라인 3-3-1)
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;line-height:{dk.LH_EMPH_Q};">'   # 질문 · 대답 18px · 행간 30 (2026-10-27 사용자)
             f'<span style="{"flex:1 1 auto;min-width:0;" if fold else dk.COL_L}font-weight:{dk.STATE_TITLE_W};color:#111;font-size:{dk.EMPH_Q};">{_title_with_icon(title, dk.tip_icon(tip) if tip else "")}</span>'
@@ -203,11 +210,27 @@ def _gauge_tip(x, text, col, dot_col, weight=400):
             f'<span style="position:absolute;left:{at};bottom:-3px;transform:translateX(-50%);z-index:3;box-sizing:border-box;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid {dot_col};"></span>')
 
 
-def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near_text, marks=None):
+REF_FS, REF_LH = 13, 19   # 비교 시점 글자 — 기술지표 괄호 글과 같은 13/19
+REF_TICK = "#94A3B8"     # 비교 시점 눈금 = 회색(지금 점은 파랑) — 둘이 다른 것으로 읽히게
+
+
+def _ref_marks(ref, pos):
+    """비교 시점 회색 눈금 + 비교 시점 ~ 지금 구간(오르면 연한 빨강, 내리면 연한 파랑). 막대 칸 안 절대 위치."""
+    if not ref:
+        return ""
+    p = max(0.0, min(100.0, ref[1]))
+    lo, hi = min(p, pos), max(p, pos)
+    seg = dk.lighten(dk.UP, 0.62) if pos >= p else dk.lighten(dk.DOWN, 0.55)
+    return (f'<span style="position:absolute;left:{lo:.2f}%;width:{hi - lo:.2f}%;top:0;bottom:0;background:{seg};"></span>'
+            f'<span style="position:absolute;left:{p:.2f}%;top:-4px;z-index:1;width:2px;height:14px;margin-left:-1px;background:{REF_TICK};"></span>')
+
+
+def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near_text, marks=None, ref=None):
     """1년 범위 막대 — 얇은 막대(최저~최고, 지금까지 연한 파랑) + 지금 위치 점 · 꼬리 · 말풍선(최고 대비 %). 제목 줄은 카드 밖, 막대는 흰 카드.
     fmt = 값 표기 함수. 질문 카드 lines 의 ("html") 항목으로 넣는다.
     tip 이 비면 ? 없음. 최고가가 며칠 전인지는 싣지 않는다 (2026-11-07 사용자: 종목 페이지와 같게).
-    marks = [(글자, 위치 %)] — 막대 위 파란 세로 눈금 + 최저 · 최고 아래 줄 글자 (애널리스트 목표가 막대의 중앙 · 평균 눈금과 같은 모양, 2026-11-07 사용자: 200일 평균)."""
+    marks = [(글자, 위치 %)] — 막대 위 파란 세로 눈금 + 최저 · 최고 아래 줄 글자 (애널리스트 목표가 막대의 중앙 · 평균 눈금과 같은 모양, 2026-11-07 사용자: 200일 평균).
+    ref = (글자, 위치 %) — 비교 시점(5거래일 전) 회색 눈금 + 지금까지 연한 증감 색 구간 + 아래 줄 작은 회색 글자 (2026-11-08 사용자 P403: 변동성 지수 5거래일 전 값을 막대 안에)."""
     pos = max(0.0, min(100.0, pos_pct))
     near = pct_from_high > -0.5
     text = near_text if near else f"{pct_from_high:.1f}%".replace("-", "−")
@@ -219,7 +242,7 @@ def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near
     bar = (f'<span style="position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:3px;background:#E2E8F0;">'
            f'<span style="position:absolute;left:0;top:0;bottom:0;width:{at};border-radius:3px;background:#BFDBFE;"></span>'
            + "".join(f'<span style="position:absolute;left:{max(0.0, min(100.0, p)):.2f}%;top:-4px;z-index:1;width:2px;height:18px;margin-left:-1px;background:{dk.DOWN};"></span>' for _t, p in (marks or []))
-           + '</span>')
+           + _ref_marks(ref, pos) + '</span>')
     aria = esc(f"1년 범위 {fmt(low)}~{fmt(high)}, {text}")
     gauge = (f'<span data-range-gauge="1" aria-label="{aria}" style="position:relative;display:block;height:{GAUGE_H}px;">'
              f'{_gauge_tip(pos, text, col, dot, BUBBLE_W_STRONG)}{bar}</span>')
@@ -248,5 +271,78 @@ def range_gauge(low, high, pos_pct, pct_from_high, fmt, tip, title, legend, near
                       f'font-size:{dk.TINY};line-height:20px;color:#111;white-space:nowrap;">{esc(t)}</span>')
     for r in rows:
         ends += f'<span style="position:relative;display:block;height:20px;margin-top:2px;">{r["html"]}</span>'
+    if ref and ref[0]:   # 비교 시점 글자 = 최저 · 최고 아래 한 줄, 눈금 아래 가운데 (끝에서는 카드 안에 멈춤)
+        t, p = ref[0], max(0.0, min(100.0, ref[1]))
+        w = round(len(t) * REF_FS * 0.62) + 2
+        ends += (f'<span style="position:relative;display:block;height:{REF_LH}px;margin-top:2px;"><span style="position:absolute;top:0;'
+                 f'left:clamp(0px, calc({p:.1f}% - {w / 2:g}px), calc(100% - {w}px));font-size:{REF_FS}px;line-height:{REF_LH}px;color:{NOTE};white-space:nowrap;">{esc(t)}</span></span>')
     card = f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.SEP_GAP - dk.VP - 1}px 12px {12 - 3}px;">{gauge}{ends}</span></span>'
     return f'<span style="display:block;margin:0 0 {dk.CHART_TITLE_GAP}px;">{head}</span>{card}'
+
+
+# ── 질문 카드 안 줄 목록 · 더 보기 (미국 증시 리포트 P400 · P411 · P417 — 한국 증시 리포트 공용, 2026-11-08) ──
+
+# 종목 · 업종 카드 안 줄 목록 = 흰 상자 없이 구분선만 · 글자 = `지수 기술지표의 방향은?` 표 글자(15/23 · 보조 13/19) (2026-11-08 사용자 P400)
+FLAT_FS, FLAT_LH, FLAT_SUB_FS, FLAT_SUB_LH = 15, 23, 13, 19   # tech_signals TABLE_FS · TABLE_LH · WHY_FS 와 같다
+FLAT_BAR_H = 9   # 가로 막대 두께 (옛 10, P411)
+FLAT_PAD = 10   # 줄 위아래 — 기술지표 표의 머리 줄(9 · 5)보다 넉넉하게: 막대 줄 · 두 줄(이름 + 보조) 줄이라
+# 더 보기 버튼 = 카드 머리 접기 버튼(네모 외곽선 화살표, dk.emph_fold_btn)과 같은 모양 · 카드 폭 가득 (2026-11-08 사용자 P417, 옛 P401 면 버튼):
+#   바탕 = 카드 바탕 20% 밝게 · 외곽선 = 카드 테두리 · 둥글기 7 · 높이 31 · 글자 · 화살표 = 검정에 카드 색 20%. 버튼 아래 ~ 카드 끝 = 카드 좌우 여백 14
+MORE_GAP_TOP = 12   # 마지막 줄 ~ 버튼
+MORE_END_FIX = 7    # 버튼이 카드 끝일 때 아래 여백 21 → 14
+
+
+def end_fix(card_html):
+    """버튼이 카드 끝이면 그 li 아래 여백 12 → 5 (버튼 아래 ~ 카드 끝 = 좌우 여백 14, Chrome 실측)."""
+    return card_html.replace('<li style="list-style:none;margin:6px 0 12px;"><span data-qmore-end="1"',
+                             f'<li style="list-style:none;margin:6px 0 {12 - MORE_END_FIX}px;"><span data-qmore-end="1"', 1)
+
+
+def line_col(theme):
+    """질문 카드 근거 줄 구분선과 같은 색 (cards.question_card bd_row)."""
+    return dk.darken(dk.lighten(dk.lighten(dk.CARD_DIR[theme][1]), 0.3), 0.02)
+
+
+def flat_rows(rows_html, line):
+    """dk.crow · dk.bar_row 줄(흰 카드용)을 상자 없는 구분선 줄로 — 좌우 여백 0 · 모든 줄 위 구분선 · 글자 15 · 보조 13."""
+    out = []
+    for r in rows_html:
+        r = r.replace(f"padding:{dk.SEP_GAP - dk.VP - 1}px 12px;", f"padding:{FLAT_PAD}px 0;")
+        r = r.replace(dk.MULTI_SEP, "")
+        head = r.index('style="') + len('style="')
+        r = r[:head] + f"border-top:1px solid {line};" + r[head:]   # 첫 줄도 위 선 — 위 문장과 나눈다 (기술지표 표 머리 줄처럼)
+        r = (r.replace(f"font-size:{dk.NAME};", f"font-size:{FLAT_FS}px;")
+              .replace(f"font-size:{dk.CHG_SIZE};line-height:25px;", f"font-size:{FLAT_FS}px;line-height:{FLAT_LH}px;")
+              .replace(f"font-size:{dk.TINY};line-height:{dk.LH_TINY};", f"font-size:{FLAT_SUB_FS}px;line-height:{FLAT_SUB_LH}px;")
+              .replace(f"line-height:{dk.LH_CARD};", f"line-height:{FLAT_LH}px;"))
+        r = r.replace("height:10px;background:#F1F5F9;", f"height:{FLAT_BAR_H}px;background:#fff;")   # 막대 바탕 흰색 · 두께 10 → 9 (−10%, 2026-11-08 사용자 P411)
+        out.append(r)
+    return out
+
+
+def more_details(label, more_html, theme="neutral"):
+    """`○○ n개 더 보기` 버튼 + 펼칠 내용 — 테마 JS(details[data-fold])가 내용을 버튼 위로 옮기고 글자를 `접기`로 바꾼다.
+    버튼 = 카드 머리 접기 버튼과 같은 모양, 카드 폭 가득 (P417)."""
+    bg, bd = dk.CARD_DIR[theme]
+    hue = dk.FOLD_HUE.get(bd.upper())
+    ink = dk.mix("#111111", hue, 0.2) if hue else "#111"
+    btn = (f"display:flex;align-items:center;justify-content:center;gap:4px;width:100%;height:{dk.FOLD_BOX}px;box-sizing:border-box;"
+           f"background:{dk.lighten(bg)};border:1px solid {bd};border-radius:{dk.FOLD_RADIUS}px;color:{ink};font-size:14px;line-height:20px;font-weight:700;white-space:nowrap;")
+    return (f'<details data-acc="1" data-fold="1" data-label="{esc(label)}"><summary style="cursor:pointer;list-style:none;display:block;padding-top:{MORE_GAP_TOP}px;">'
+            f'<span data-qmore="1" style="{btn}"><span data-fold-label="1">{esc(label)}</span>{dk.ACC_CHEV}</span></summary>{more_html}</details>')
+
+
+def rows_block(rows_html, theme="neutral"):
+    """줄 목록을 질문 카드 안 구분선 줄로 (옛: 흰 카드 MULTI, 2026-11-08 사용자 P400)."""
+    return f'<span style="display:block;">{"".join(flat_rows(rows_html, line_col(theme)))}</span>'
+
+
+def rows_fold(rows_html, n_show, label, theme="neutral"):
+    """질문 카드 안 줄 목록 — 앞 n_show 줄만 보이고 나머지는 `○○ n개 더 보기` (면 있는 버튼, P401) 안.
+    2026-11-07 사용자 P381 · P382: 평소 밖 종목 · 맨 위 업종만 보이고 나머지는 접기."""
+    rows_html = flat_rows(list(rows_html), line_col(theme))
+    if len(rows_html) <= n_show:
+        return f'<span style="display:block;">{"".join(rows_html)}</span>'
+    # 버튼 아래 ~ 카드 끝 = 좌우 여백 14 — 질문 카드 li 아래 12 · ul −9 · 카드 아래 패딩이 겹쳐 21 이 되던 것을 −7 (Chrome 360px 실측)
+    return (f'<span data-qmore-end="1" style="display:block;">{"".join(rows_html[:n_show])}'
+            + more_details(label, f'<span style="display:block;">{"".join(rows_html[n_show:])}</span>', theme) + "</span>")

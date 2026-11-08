@@ -176,16 +176,6 @@ def draw_charts(snap, stocks, out_dir):
 SPX_REF = "radar-sp500-price.png"
 
 
-def periods_tip(s, ps):
-    p = ps[-1]
-    now = ""
-    if p.get("spy") is not None:
-        d = p["stock"] - p["spy"]
-        now = (f"\n· {p['label']} {_sgn(p['stock'])}% : 같은 기간 S&P 500({_sgn(p['spy'])}%)보다 "
-               + (f"{abs(d):.1f}%p 앞섰다" if d > 0 else f"{abs(d):.1f}%p 뒤처졌다" if d < 0 else "같았다"))
-    return "지금 가격이 1주 · 1개월 · 3개월 · 6개월 · 1년 전보다 얼마나 오르거나 내렸는지. 배당을 넣어 계산했다" + now
-
-
 def sec_periods(s):
     ps = s.get("periods") or []
     if not ps:
@@ -193,7 +183,7 @@ def sec_periods(s):
     chart = R._col_chart([(p["label"], [p["stock"], p.get("spy")]) for p in ps[::-1]], [R._sign_bg, lambda v: R._GRAY_BAR], [R._sign_fg, lambda v: NOTE], right=True)   # 1년 → 1주 (P165)
     legend = R._legend_chips([(f"{s['name']} 오름", R._PASTEL_UP), (f"{s['name']} 내림", R._PASTEL_DN), ("S&P 500", R._GRAY_BAR)])
     card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
-    return R._card_title("기간별 수익률 (%)", periods_tip(s, ps)) + card
+    return R._card_title("기간별 수익률 (%, 배당 포함)") + card   # 툴팁 없음 — 그래프가 기간 · S&P 500 비교를, 제목 괄호가 `배당 포함` 을 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 def year_tip(y):
@@ -217,15 +207,11 @@ def sec_month_range(s):
     if not bb or bb.get("lower") is None:
         return ""
     th, col = R.BOLL_THEME.get(bb["state"], ("neutral", R.MUTED))
-    return ("white", R.month_range_in(bb, lambda v: f"${v:,.0f}", R.bollinger_rule(bb), R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col, top=0))
+    return ("white", R.month_range_in(bb, lambda v: f"${v:,.0f}", "", R.BOLL_STATE_KO.get(bb["state"], "범위 안"), col, top=0))
 
 
 def sector_lines(sf):
     return R.sector_lines(sf, "S&P 500")
-
-
-def sector_rule(sf):
-    return R.sector_rule(sf)
 
 
 def sec_tech(s):
@@ -282,9 +268,8 @@ def sec_pairs(s):
         lines.append((f'{_dk.CHART_TITLE_M}한국 연결 종목 <span style="font-weight:400;font-size:{R.TINY};color:{R.NOTE};">(다음 날 시가)</span></span>', "html"))
         for k, (nm, sp, _ok, us) in enumerate(ok):
             lines.append(("row", nm, f"{_sgn(sp)}%p", f"{_dk.josa(' · '.join(us), '이')} 많이 오른 밤과 내린 밤의 차이", False, k == 0))
-    tip = ("이 종목과 경쟁 · 공급 · 고객으로 이어진 미국 회사의 오늘 등락, 그리고 이 종목을 따라 다음 날 아침 움직이는 한국 종목\n"
-           f"· 오늘 {state} : 함께 보는 회사 {len(moves)}곳 중 오른 곳 {ups} · 내린 곳 {downs} (±0.5% 기준)")
-    card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance"), fold=True)
+    R.add_small_note(lines, "±0.5% 넘게 움직인 회사만 오른 곳 · 내린 곳으로 셉니다.")   # 옛 툴팁의 기준을 카드 작은 글씨로 — 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
+    card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
@@ -297,7 +282,7 @@ def sec_regime(s):
     lines = R.regime_lines(mr)
     if s.get("chart"):
         lines.insert(1, R.index_chart_line(f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{SPX_REF}", f"images/{SPX_REF}", "S&P 500"))
-    card = R._state_card("미국 증시 분위기는?", mr["regime"], th, col, lines, "", tip=_dk.with_src(R.regime_rule(mr), "Yahoo Finance · CNN"), fold=True)
+    card = R._state_card("미국 증시 분위기는?", mr["regime"], th, col, lines, "", fold=True)   # 툴팁 없음 — 근거 줄마다 나누는 법이 있다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
@@ -385,13 +370,6 @@ def _fred_chart(x, title, q=False):
     return [(f'{_dk.CHART_TITLE_M}{_esc(title)}</span>{chart}', "html")]
 
 
-def _fred_tip(x, state, q=False, money=False):
-    """툴팁 — 뜻 · 오늘 (가이드라인 2-6, `기록상` 줄 없음 — 1절 4-2)."""
-    lim = 10 if money else 5
-    return _dk.with_src(f"업계 전체의 일감 · 값 · 이익을 미국 정부 통계({x['name']})로 본다. 1년 전 같은 {'분기와' if q else '달과'} 비교\n"
-                        f"· {state} : {_when(x['month'], q)} 1년 전보다 {_sgn(x['chg'])}% (±{lim}% 넘으면 방향)", f"FRED · {x['src']}")
-
-
 def industry_cards(s):
     """미국 업계 카드 — `○○ 업계 생산은?` · `제품 값은?` · `수익성은?` (2026-11-01 사용자 P268: 한국처럼 방향까지). 재료 = industry_us.build."""
     d = s.get("industry_us")
@@ -404,19 +382,19 @@ def industry_cards(s):
         q = x.get("quarterly", False)
         unit = "분기" if q else "달"
         head = f"{_dk.josa(x['name'], '은')} {_when(x['month'], q)} {_dk.josa(_fred_value(x['fred'], x['v']), '로')} 1년 전 같은 {unit}보다 {_sgn(x['chg'])}%였다."
-        note = "분기 자료라 2~3달 늦게 나옵니다." if q else "월별 자료라 1~2달 늦게 나옵니다."
+        note = ("분기 자료라 2~3달 늦게 나옵니다." if q else "월별 자료라 1~2달 늦게 나옵니다.") + " 1년 전보다 5% 넘게 바뀌면 방향을 적습니다."   # 옛 툴팁 기준을 문장 작은 글씨로 (2026-11-08)
         lines = [(head + R.small_note(note), "plain")]
         lines += _fred_chart(x, f"{x['name']}, 올해와 작년 같은 {unit}", q=q)
         lines.append(("row", x["name"], _fred_value(x["fred"], x["v"]), f"{_when(x['month'], q)} · 1년 전보다 {_sgn(x['chg'])}%"))
-        out += R._state_card(f"{x.get('biz', d['biz'])} 업계 {x['q']}", x["state"], theme, col, lines, "", tip=_fred_tip(x, x["state"], q=q), fold=True)
+        out += R._state_card(f"{x.get('biz', d['biz'])} 업계 {x['q']}", x["state"], theme, col, lines, "", fold=True)   # 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     m = d.get("money")
     if m:
         theme, col = {"나아짐": ("positive", R.UP), "나빠짐": ("negative", R.DOWN)}.get(m["state"], ("neutral", R.MUTED))
         head = f"{_dk.josa(m['name'], '은')} {_when(m['month'], True)} {_dk.josa(_fred_value(m['fred'], m['v']), '로')} 1년 전 같은 분기보다 {_sgn(m['chg'])}%였다."
-        lines = [(head + R.small_note("분기 자료라 2~3달 늦게 나오고, 1년치로 환산한 금액입니다."), "plain")]
+        lines = [(head + R.small_note("분기 자료라 2~3달 늦게 나오고, 1년치로 환산한 금액입니다. 1년 전보다 10% 넘게 바뀌면 방향을 적습니다."), "plain")]
         lines += _fred_chart(m, f"{m['name']}, 올해와 작년 같은 분기", q=True)
         lines.append(("row", "업종 기업이익", _fred_value(m["fred"], m["v"]), f"{_when(m['month'], True)} · 1년 전보다 {_sgn(m['chg'])}%"))
-        out += R._state_card(f"{d['biz']} 업계 수익성은?", m["state"], theme, col, lines, "", tip=_fred_tip(m, m["state"], q=True, money=True), fold=True)
+        out += R._state_card(f"{d['biz']} 업계 수익성은?", m["state"], theme, col, lines, "", fold=True)
     return out
 
 
@@ -427,7 +405,7 @@ def sec_industry_tab(s):
     if sf:
         th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
         title = f"{sf['name']} 업계 자금 흐름은?"   # 옛 `○○ 업계 자금 흐름은?` — 앞날이 아니라 지난 20거래일, 회사 매출이 아니라 주식 쪽 돈 (2026-11-01 사용자 P198)
-        card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=sector_rule(sf), fold=True, opened=True)   # 탭 첫 강조 카드는 펼침 (P216)
+        card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", fold=True, opened=True)   # 툴팁 없음 — 근거 줄에 유입 · 유출 기준 · 순위가 있다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)   # 탭 첫 강조 카드는 펼침 (P216)
     card += industry_cards(s)
     if not card:
         return _dk.muted("이 종목은 업계 자료를 아직 연결하지 않았습니다.")
@@ -496,21 +474,16 @@ def sec_drawdown(s):
         r1 = cell(_esc(s["name"]), True) + "".join(cell(f"{a:.0f}%") for _, a, _ in cols)
         r2 = cell("S&amp;P 500", True) + "".join(cell(f"{b:.0f}%") for _, _, b in cols)
         tbl = "".join(f'<span style="display:flex;align-items:stretch;line-height:24px;">{r}</span>' for r in (tbl_head, r1, r2))
-        tip = "크게 떨어진 일 가운데, 최고가를 되찾기까지 1년(250거래일) 넘게 걸린 경우의 비율"
         title = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 4px;">'
-                 f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율{R._tipx(tip)}</span></span>')   # `(약 30년 기간 중)` 은 뺐다 — 기간은 머리 작은 줄에 (2026-10-27 P17 · P24)
+                 f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율</span></span>')   # `(약 30년 기간 중)` 은 뺐다 — 기간은 머리 작은 줄에 (2026-10-27 P17 · P24)
         tail = f'<span style="display:block;{R.MULTI_SEP}padding:{PAD}px 12px;font-size:{TINY};color:{NOTE};">{title}{tbl}</span>'
-    x = d["pct_from_high"]
-    lv = next((l for l in ("30", "20", "10") if -x > int(l) and (st.get(l) or {}).get("median_days") is not None), None)
-    now = (f"\n· 지금 {_sgn(x)}% : −{lv}% 넘게 빠졌을 때 절반은 {st[lv]['median_days']}거래일 안에 최고가를 되찾았다" if lv else
-           f"\n· 지금 {_sgn(x)}% : 1년 최고가에서 10% 안쪽")
-    ttip = (f"주가가 최고가에서 크게 떨어졌을 때 그 최고가를 다시 넘기까지 걸린 거래일. '보통' 은 절반이 이보다 빨리 회복한 값" + now)
-    return R.dd_block(s["name"], st, sp, "S&P 500", span, d["pct_from_high"], ttip, tail)   # 영역 제목 없이 한 덩이 · 구간 막대 (2026-10-27 P24 · P28)
+    return R.dd_block(s["name"], st, sp, "S&P 500", span, d["pct_from_high"], "", tail)   # 툴팁 없음 — 머리 문장이 지금 구간 · 보통 회복 일수를 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)   # 영역 제목 없이 한 덩이 · 구간 막대 (2026-10-27 P24 · P28)
 
 
 def related(s):
     """함께 보는 리포트 (가이드라인 10-5 4) — HTML 링크라 검색엔진이 따라간다."""
     links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL)] + ([] if s["sym"] == "NVDA" else [("엔비디아 NVDA 주가", U.page_url("NVDA"))])   # 엔비디아도 고정 페이지 (2026-11-01 사용자)
+    links.append(("주요 인물 발언 전체 보기", people_section.ALL_URL))   # 인물 발언 전체 목록 (2026-11-08 사용자) — 발언 카드 맨 아래 링크와 같은 주소
     return R.related_buttons(links)   # 전부 나가는 버튼 (2026-10-31 사용자 P160, 옛 점 글머리표 링크)
 
 
@@ -757,7 +730,8 @@ def sec_today_tab(s, news):
     a = {"events": today[:MAX_EVENTS], "events_overflow": today[MAX_EVENTS:MAX_EVENTS + 12], "direction_counts": dc}
     issue_html = R.sec_narrative(a, {"today": issues}) if issues else _dk.muted("최근 7일 동안 이 종목을 주로 다룬 큰 소식이 없습니다.")
     return sec_crash(s, dc["today"]) + _dk.keep_tone(R._section("중요 이슈", issue_html, tab="오늘")   # 뉴스 · 중요 이슈는 합니다체로 바꾸지 않는다 (2026-10-18 사용자)
-                         + R._section("뉴스", R.sec_direction_bars(a) + (R.sec_events(a) if today else _dk.muted("오늘은 새 뉴스가 없습니다.")), line=False, tab="오늘")
+                         + (R._section("뉴스", R.sec_direction_bars(dict(a, empty_text="오늘은 이 종목을 다룬 뉴스가 없습니다.")) + (R.sec_events(a) if today else ""), line=False, tab="오늘")
+                            if today or sum(dc["week"].values()) else "")   # 최근 7일 뉴스가 없으면 구획 숨김 · 오늘 0건 안내 = 막대 자리, 아이콘 없음 (2026-11-08 사용자)
                          + sec_people(s))
 
 
@@ -992,10 +966,7 @@ def cal_peers(s, c):
         lines.append(("row", f"{U.peer_name(u['symbol'])} ({u['symbol']})", R._md_short(u["day"]),
                       roles.get(u["symbol"], "") + (f" · 다음 날 {nm} 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else "")))
     left = (datetime.date.fromisoformat(up[0]["day"]) - datetime.date.fromisoformat(s["day"])).days
-    listed = " · ".join(f"{U.peer_name(x)}({r})" for x, r in roles.items())
-    tip = (f"{nm}와(과) 사업으로 이어진 회사({listed})의 실적 발표. 이 회사들의 실적 소식에 {nm} 주가도 함께 움직이곤 한다\n"
-           f"· {days}일 안 {len(up)}곳 : 가장 가까운 발표는 {U.peer_name(up[0]['symbol'])} {R._md_short(up[0]['day'])}")   # 참고 줄은 뺐다 (batch 7 g)
-    return lines, tip, f"{len(up)}곳", left
+    return lines, "", f"{len(up)}곳", left   # 툴팁 없음 — 문장이 고객 · 공급 · 경쟁 회사와 일정을 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 def cal_macro(c):
@@ -1008,9 +979,7 @@ def cal_macro(c):
     name = lambda u: R.cal_cards.MACRO_KO.get(u["kind"], u["label"])   # noqa: E731
     near = " · ".join(f"{name(u)}({R._md_short(u['day'])})" for u in up[:2])
     first = f"가장 가까운 큰 일정은 {near}이다." + (f" 30일 안에 모두 {len(up)}건이 있다." if len(up) > 2 else "")
-    tip = ("금리 결정 · 물가 · 고용 같은 경제 발표와 옵션 만기처럼 시장 전체가 함께 보는 일정\n"
-           f"· 30일 안 {len(up)}건 : 가장 가까운 일정은 {name(up[0])} {R._md_short(up[0]['day'])}")
-    return [(first, "plain"), (link, "html")], _dk.with_src(tip, "FRED"), f"{len(up)}건", None
+    return [(first, "plain"), (link, "html")], "", f"{len(up)}건", None   # 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
 
 def sec_calendar(s, keys=("earnings", "peers", "macro"), open_first=True, extra_cards=""):

@@ -87,38 +87,72 @@ def _points_at(it, sym):
     return bool(name) and (name in it["headline"] or name in it["detail"])
 
 
+# 세부 주제(ai_subtopic) 같은 뜻 합치기 — 분류 모델이 같은 이야기를 다른 말로 붙인다 (2026-11-08 사용자 P406). 소문자 키 → 대표 영어 키(subtopic_ko.json 의 키)
+SUBTOPIC_SAME = {"chips": "Semiconductors", "semiconductor": "Semiconductors", "semiconductors": "Semiconductors", "ai chips": "Semiconductors",
+                 "roadster": "Tesla Roadster", "artificial intelligence": "AI", "ai": "AI", "tariffs": "Tariff", "tariff": "Tariff"}
+SUBTOPIC_KO_PATH = os.path.join(config.BASE_DIR, "ref", "subtopic_ko.json")   # narrate.translate_subtopics 가 채운다 (깃에 남는다)
+SUBTOPIC_BROAD = {"ai", "artificial intelligence", "economy", "markets", "stock market", "stocks", "technology", "investing", "earnings"}   # 좁은 이슈가 아니다 — 큰 분야와 같은 문제(P406)라 셈에서 뺀다
+ISSUE_MIN_WHO = 2   # 많이 말한 이슈 = 두 명 이상이 말한 이슈만 — 없으면 카드 생략 (빈 답 금지)
+
+
+def _subtopic_ko():
+    try:
+        with open(SUBTOPIC_KO_PATH, encoding="utf-8") as f:
+            return {k.lower(): v for k, v in json.load(f).items()}
+    except (OSError, ValueError):
+        return {}
+
+
+def _issue_key(sub, ko):
+    """세부 주제 → (대표 키, 한국어). 비었거나 한국어 표기가 없으면 None — 영어 원문은 독자에게 보이지 않는다 (운영지침 4-3)."""
+    k = (sub or "").strip()
+    if not k:
+        return None
+    k = SUBTOPIC_SAME.get(k.lower(), k)
+    if k.lower() in SUBTOPIC_BROAD:
+        return None
+    name = ko.get(k.lower())
+    return (k, name) if name else None
+
+
 def summary(radar):
     """인물 발언 탭 맨 위 요약 (2026-11-07 사용자 P376) — 오늘(레이더 24시간) 신호만, 파이썬 셈 · AI 없음.
-    topics = 많이 나온 분야 3 [(이슈 코드, 건수, [이름], {방향: 건수})] · split = 의견이 갈린 분야(긍정 · 부정 각 2건 이상, 적은 쪽이 많은 쪽의 절반 이상)
-    [(이슈, 긍정 쪽 대표 (이름, 건수), 부정 쪽 대표 (이름, 건수))] · stocks = 많이 언급된 종목 3 [(티커, 이름, 건수, [인물])]."""
+    2026-11-08 사용자 P406: 큰 분야(`기업 사건` · `투자자 매매 · 의견`)는 범위가 넓어 뜻이 없다 → 좁은 이슈(세부 주제, 예 관세 · AI 거품 · 반도체).
+    issues = 많이 말한 이슈 3 (두 명 이상) [{key, name, n, n_who, who, dirs}] · split = 의견이 갈린 이슈 · 종목 — 같은 이슈(또는 같은 종목)를 두고
+    다른 사람이 긍정 · 부정으로 맞선 것만 [{name, pos (이름, 건수), neg (이름, 건수), n}] (옛: 분야로만 묶어 다른 종목끼리도 '갈림') · stocks = 많이 언급된 종목 3."""
     from collections import Counter, defaultdict
+    ko = _subtopic_ko()
     sig = [(p, s) for p in radar.get("people", []) for s in p["signals"]]
-    by = defaultdict(list)
+    by, names = defaultdict(list), {}
     for p, s in sig:
-        by[s.get("issue") or "OTHER"].append((p["name_ko"], s["direction"]))
-    topics = []
-    for k, v in sorted(by.items(), key=lambda kv: (-len(kv[1]), -len({n for n, _ in kv[1]})))[:3]:   # 같은 건수면 말한 인물이 많은 쪽 (P380)
+        ik = _issue_key(s.get("subtopic"), ko)
+        if ik:
+            by[ik[0]].append((p["name_ko"], s["direction"]))
+            names[ik[0]] = ik[1]
+    issues = []
+    for k, v in sorted(by.items(), key=lambda kv: (-len({n for n, _ in kv[1]}), -len(kv[1]))):   # 말한 인물 수 먼저, 같으면 건수
         who = list(dict.fromkeys(n for n, _ in v))
-        topics.append({"issue": k, "n": len(v), "n_who": len(who), "who": who[:4], "dirs": dict(Counter(d for _, d in v))})
-    split = []
-    for k, v in by.items():
-        pos = Counter(n for n, d in v if d == "positive")
-        neg = Counter(n for n, d in v if d == "negative")
-        np_, nn = sum(pos.values()), sum(neg.values())
-        if np_ >= 2 and nn >= 2 and min(np_, nn) * 2 >= max(np_, nn):
-            pa = pos.most_common(1)[0]
-            na = next((x for x in neg.most_common() if x[0] != pa[0]), None)   # 양쪽은 다른 사람 — 한 사람이 오락가락한 건 `갈림` 이 아니다
-            if na:
-                split.append({"issue": k, "pos": pa, "neg": na, "n": np_ + nn})
-    split.sort(key=lambda x: -x["n"])
+        if len(who) >= ISSUE_MIN_WHO:
+            issues.append({"key": k, "name": names[k], "n": len(v), "n_who": len(who), "who": who[:4], "dirs": dict(Counter(d for _, d in v))})
     comp, cdir = defaultdict(list), defaultdict(Counter)
     for p, s in sig:
         for c in s.get("companies") or []:
-            comp[c].append(p["name_ko"])
+            comp[c].append((p["name_ko"], s["direction"]))
             cdir[c][s["direction"]] += 1   # 그 종목 발언의 방향 — 질문 카드 색 (P380)
-    stocks = [{"sym": c, "name": _ko(c) or c, "n": len(v), "who": list(dict.fromkeys(v))[:3], "dirs": dict(cdir[c])}
+    split = []
+    for name, v in [(names[k], v) for k, v in by.items()] + [(_ko(c) or c, v) for c, v in comp.items()]:
+        pos = Counter(n for n, d in v if d == "positive")
+        neg = Counter(n for n, d in v if d == "negative")
+        if not pos or not neg:
+            continue
+        pa = pos.most_common(1)[0]
+        na = next((x for x in neg.most_common() if x[0] != pa[0]), None)   # 양쪽은 다른 사람 — 한 사람이 오락가락한 건 `갈림` 이 아니다
+        if na:
+            split.append({"name": name, "pos": pa, "neg": na, "n": sum(pos.values()) + sum(neg.values())})
+    split.sort(key=lambda x: -x["n"])
+    stocks = [{"sym": c, "name": _ko(c) or c, "n": len(v), "who": list(dict.fromkeys(n for n, _ in v))[:3], "dirs": dict(cdir[c])}
               for c, v in sorted(comp.items(), key=lambda kv: -len(kv[1]))[:3] if len(v) >= 2]
-    return {"topics": topics, "split": split[:2], "stocks": stocks, "n_people": len(radar.get("people", [])), "n": len(sig)}
+    return {"issues": issues[:3], "split": split[:2], "stocks": stocks, "n_people": len(radar.get("people", [])), "n": len(sig)}
 
 
 def build(snapshots, now=None, prior=None, post_url=None):
