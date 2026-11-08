@@ -1,6 +1,30 @@
 {
-  "updated_at": "2026-11-08 00:55:01 UTC",
+  "updated_at": "2026-11-08 12:47:22 UTC",
   "items": [
+    {
+      "title": "Top Wall Street analysts like these 3 dividend stocks for consistent income",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/top-analysts-like-these-3-dividend-stocks-for-consistent-income.html",
+      "published": "2026-11-08 11:47:24",
+      "title_ko": "월가 주요 애널리스트가 추천하는 꾸준한 수익을 위한 3개 배당주",
+      "summary_ko": ""
+    },
+    {
+      "title": "In pictures: France protests draw 146,000 as clashes erupt for fourth straight weekend",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/france-protests-clashes-arrests.html",
+      "published": "2026-11-08 09:29:04",
+      "title_ko": "프랑스 시위, 146,000명 참여·4일째 충돌",
+      "summary_ko": "시위 4일 연속 발생"
+    },
+    {
+      "title": "Cathie Wood 'always feels better when the market is worried' — here's why",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/cathie-wood-ai-selloff.html",
+      "published": "2026-11-08 06:00:01",
+      "title_ko": "캐시 우드 \"시장이 걱정할 때 항상 더 편안하다\", 그 이유는",
+      "summary_ko": "캐시 우드, 현재 시장 '우려의 벽' 언급"
+    },
     {
       "title": "Trump offers UFC chief Dana White press secretary job",
       "source": "CNBC",
@@ -16,6 +40,14 @@
       "published": "2026-11-07 22:17:52",
       "title_ko": "미국 중간선거 민주당 승리로 이란 전쟁 확전 위험 여전히 높아",
       "summary_ko": "미국과 이란, 중동 긴장 고조"
+    },
+    {
+      "title": "Meta chief strategy officer Dave Wehner leaves to join AI infrastructure startup Fireworks as CFO",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/07/dave-wehner-meta-fireworks-cfo.html",
+      "published": "2026-11-07 22:01:17",
+      "title_ko": "메타 최고전략책임자 데이브 웨너, AI 인프라 스타트업 파이어웍스 CFO로 이직",
+      "summary_ko": "파이어웍스, 7월 175억 달러 기업가치 평가"
     },
     {
       "title": "Trump targets Slotkin in call for DOJ probe of alleged Democratic threats to Republicans",
@@ -70,43 +102,11 @@
       "summary_ko": "금요일 발표"
     },
     {
-      "title": "Why the prognosis for healthcare stocks is uncertain ahead of Congress’ new makeup",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/healthcare-stocks-may-face-trouble-due-to-midterm-results.html",
-      "published": "2026-11-07 16:02:33",
-      "title_ko": "보건주, 새 의회 구성을 앞두고 전망 불투명",
-      "summary_ko": ""
-    },
-    {
       "title": "Berkshire Hathaway more than doubles buybacks in third quarter as earnings decline",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/07/berkshire-hathaway-q3-2026-earnings-buybacks.html",
       "published": "2026-11-07 15:23:46",
       "summary_ko": ""
-    },
-    {
-      "title": "America's newest small business owners with no employees are off to a hot start in AI era",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/americas-new-no-employee-small-business-owners-start-hot-in-ai-era.html",
-      "published": "2026-11-07 14:45:01",
-      "title_ko": "AI 시대, 직원 없는 신생 소기업이 뜨거운 출발",
-      "summary_ko": ""
-    },
-    {
-      "title": "What midterm election blue wave rebuke of Trump means for renewable energy",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/midterm-election-blue-wave-trump-renewable-energy.html",
-      "published": "2026-11-07 14:33:32",
-      "title_ko": "중간선거 청색 물결이 트럼프에 대한 반발, 재생에너지에 의미는?",
-      "summary_ko": ""
-    },
-    {
-      "title": "Many workers lose unused FSA money — but could still come out ahead. Here's how",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/07/fsa-forfeit.html",
-      "published": "2026-11-07 14:30:01",
-      "title_ko": "많은 근로자, 사용하지 않은 FSA 금액 상실, 하지만 여전히 이득 가능. 방법은?",
-      "summary_ko": "세금 절감액이 포기액 초과 가능"
     }
   ]
 }
