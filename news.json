@@ -1,6 +1,43 @@
 {
-  "updated_at": "2026-11-08 18:07:31 UTC",
+  "updated_at": "2026-11-08 21:47:21 UTC",
   "items": [
+    {
+      "title": "Trump says renewed Iran strikes ‘highly unlikely’ if talks progress but warns he could still strike",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/trump-iran-strikes-unlikely-talks-hormuz.html",
+      "published": "2026-11-08 21:28:12",
+      "title_ko": "트럼프, 협상 진전 시 이란 재공격 ‘매우 불확실’ 발언, 여전히 공격 가능 경고",
+      "summary_ko": "호르무즈 해협 관련 협상 진전 여부 공세 조건으로 제시",
+      "lines": [
+        "트럼프, 이란 핵 프로그램 및 호르무즈 해협 협상 진전 시 재공격 가능성 낮다고 발언",
+        "미국, 이란에 대한 추가 군사적 행동 여부는 협상 진행 상황에 따라 결정"
+      ]
+    },
+    {
+      "title": "Nvidia investigates CEO Jensen Huang's relationship with alleged Chinese spy",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/nvidia-jensen-huang-investigation-china-spy.html",
+      "published": "2026-11-08 21:13:38",
+      "title_ko": "엔비디아, 젠슨 황 CEO와 중국 스파이 의혹 관계 조사",
+      "summary_ko": "황, 직원 이메일로 불륜 사실 및 이사회 조사 개시 통보",
+      "lines": [
+        "엔비디아, 젠슨 황 CEO의 중국 스파이 의혹 연루 여성과의 관계 조사 착수",
+        "젠슨 황, 직원 대상 이메일로 해당 여성과의 불륜 사실 인정",
+        "엔비디아 이사회, 해당 여성이 중국 스파이라는 주장에 대한 조사 개시"
+      ]
+    },
+    {
+      "title": "Democrats amp up Trump investigation threats, Blanche counters he may probe lawmakers",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/democrats-trump-oversight-blanche-doj-investigations.html",
+      "published": "2026-11-08 18:57:56",
+      "title_ko": "민주당, 트럼프 조사 위협 강화, 블랜치 의원에 대한 조사 가능성 언급",
+      "summary_ko": "블랜치, 의원에 대한 조사 가능성 언급",
+      "lines": [
+        "민주당, 트럼프 행정부 백악관 및 협력 기업 대상 조사 의지 표명",
+        "블랜치, 민주당 의원들에 대한 역조사 가능성 언급"
+      ]
+    },
     {
       "title": "Here are the 2 big things we're watching in the stock market in the week ahead",
       "source": "CNBC",
@@ -122,44 +159,6 @@
       "lines": [
         "터키데이 항공편 운임, 전년 대비 상승 전망",
         "강력한 수요 지속으로 항공권 가격 인상 요인 작용"
-      ]
-    },
-    {
-      "title": "Amazon's Astro home robot has fans but looks destined for the 'trash heap.' Why it's trying again",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/08/amazon-home-robot-fauna-sprout.html",
-      "published": "2026-11-08 13:00:01",
-      "title_ko": "아마존 아스트로 로봇, 재도전 이유",
-      "summary_ko": "직무 공고 분석 기반",
-      "lines": [
-        "아마존, 신규 홈 로봇 팀 구성",
-        "신규 로봇 제품 관련 채용 진행 중",
-        "CNBC, 채용 공고 분석 결과 발표"
-      ]
-    },
-    {
-      "title": "Brands are sponsoring IRL communities. Some experts say that could spell their end",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/11/08/brand-sponsorship-local-communities.html",
-      "published": "2026-11-08 13:00:01",
-      "title_ko": "브랜드, 오프라인 커뮤니티 후원… 끝을 알리나",
-      "summary_ko": "독서 클럽 등 대상",
-      "lines": [
-        "브랜드, 북클럽 등 지역 커뮤니티 스폰서십 확대",
-        "지역 모임 주최자, 신규 수익원 확보",
-        "커뮤니티 신뢰도 및 지속 가능성에 대한 우려 제기"
-      ]
-    },
-    {
-      "title": "Top Wall Street analysts like these 3 dividend stocks for consistent income",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/08/top-analysts-like-these-3-dividend-stocks-for-consistent-income.html",
-      "published": "2026-11-08 11:47:24",
-      "title_ko": "월가 주요 애널리스트가 추천하는 꾸준한 수익을 위한 3개 배당주",
-      "summary_ko": "",
-      "lines": [
-        "배당주 3종 선정",
-        "월스트리트 최고 애널리스트 추천"
       ]
     }
   ]
