@@ -255,6 +255,37 @@ jobs:
           python experiments/stock-radar/home_feed.py
           mkdir -p deploy-home && cp experiments/stock-radar/output/home/stocks.json deploy-home/stocks.json
 
+      # 증시 전망 (doc/기획/증시-전망-기획.md 5절 · 14-1 5, 2026-11-08 연결). AI 0 · 시세는 forecast_daily 가 직접 받는다(yfinance → 예비 사슬).
+      # 판정 → 기록(상태 $STATE_DIR/records/forecasts/{EH}.jsonl, 아래 Save state 가 nvda-state 에 커밋) → 고정 페이지(공개 전망 n + 목록 1, 바뀐 것만) → 증명 · 홈 카드 JSON(gh-pages).
+      # 장 마감 뒤 본 실행만 — 갱신(refresh) 실행은 같은 날 봉이라 판정이 같다. 실패해도 다른 단계는 그대로(continue-on-error), 실패 알림은 forecast_alerts.
+      - name: Forecast pages (증시 전망)
+        if: needs.check.outputs.mode != 'refresh'
+        continue-on-error: true
+        run: |
+          mkdir -p experiments/issue_store/output
+          [ -f "$STATE_DIR/forecast/page_hashes.json" ] && cp "$STATE_DIR/forecast/page_hashes.json" experiments/issue_store/output/forecast_page_hashes.json || true
+          python experiments/issue_store/forecast_daily.py --state "$STATE_DIR"
+          if [ "$DO_PUBLISH" = "true" ]; then
+            python experiments/issue_store/publish_forecast.py
+          else
+            python experiments/issue_store/publish_forecast.py --dry
+          fi
+          mkdir -p "$STATE_DIR/forecast" deploy-forecast/proof
+          [ -f experiments/issue_store/output/forecast_page_hashes.json ] && cp experiments/issue_store/output/forecast_page_hashes.json "$STATE_DIR/forecast/page_hashes.json" || true
+          cp experiments/issue_store/output/forecast/proof/*.json deploy-forecast/proof/ 2>/dev/null || true
+          cp experiments/issue_store/output/forecast/hypo.json deploy-forecast/hypo.json 2>/dev/null || true
+
+      # 공개 등록 증명(proof/{slug}.json — 커밋 시각 = 미리 적었다는 증명, 내용은 등록 때 고정) · 홈 `증시 전망` 카드 자료(hypo.json)
+      - name: Deploy forecast proof + hypo.json to gh-pages
+        if: env.DO_PUBLISH == 'true' && needs.check.outputs.mode != 'refresh' && hashFiles('deploy-forecast/hypo.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-forecast
+          publish_branch: gh-pages
+          keep_files: true
+
       # 테마 페이지 3개 (doc/테마-모니터-기획.md, 2026-10-21) — 레이더 자료(snapshot · extra)를 그대로 쓴다. 게시 · 홈 카드(themes.json)
       - name: Theme pages (AI 투자 · 연준 기대 · 임원 매매)
         if: env.DO_PUBLISH == 'true' && needs.check.outputs.mode != 'refresh'
