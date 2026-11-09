@@ -4300,6 +4300,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
         'use strict';
         [].slice.call(document.querySelectorAll('.post-title, .post-card-title')).forEach(function (h) {
           if (h.querySelector('.title-logo')) return;
+          /* 머리 줄 글자를 본문이 정한 글(증시 전망 — data-head-title)은 종목 글이 아니다 — "엔비디아 실적 뒤 반도체는?" 이 아래 `엔비디아` 규칙에 걸려 NVDA 로고가 붙던 것 (2026-11-09 사용자) */
+          if (h.classList.contains('post-title') && document.querySelector('.post-body [data-head-title]')) return;
           var m = /(?:\(|\s)([A-Z][A-Z.\-]{0,5})\)?\s+주가/.exec(h.textContent) || /\(([A-Z][A-Z.\-]{0,5})\)\s*주가/.exec(h.textContent);
           var sym = m ? m[1] : (/^\s*엔비디아/.test(h.textContent) ? 'NVDA' : '');
           var kr = /(?:^|\s)(\d{6})\s+주가/.exec(h.textContent);   /* 한국 종목 옛 제목 "삼성전자 005930 주가" (2026-10-25) — 배지는 한글 첫 글자, 로고는 KR_<코드> */
