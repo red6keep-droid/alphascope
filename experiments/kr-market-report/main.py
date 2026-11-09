@@ -406,9 +406,13 @@ def news_section():
         mf, NP = RH.media_feed, RH.news_pick
         rows = [x for x in RH.kr_news.rows_now() if mf.is_korea(x)]   # 묶기 전에 한국 증시 내용만 — 미국 내용 줄과 한 이슈로 묶이지 않게
         now = datetime.datetime.now(datetime.timezone.utc)
-        since = (now - datetime.timedelta(hours=NEWS_HOURS)).strftime("%Y-%m-%dT%H:%M")
         since7 = (now - datetime.timedelta(days=7)).strftime("%Y-%m-%dT%H:%M")
-        media = _kr_content(mf.issues(rows, since), 10 ** 6)
+        # 48시간 안 한국 증시 방송이 없으면 96시간까지 (2026-11-09 사용자: 월요일 16:10 은 주말이 끼어 48시간 안 한국 방송이 0 → 뉴스 탭이 비었다)
+        for hours in (NEWS_HOURS, max(NEWS_HOURS, 96)):
+            since = (now - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M")
+            media = _kr_content(mf.issues(rows, since), 10 ** 6)
+            if media:
+                break
         series, names = {}, {}
         for x in media:   # 관련 종목 = 그날 한국 등락 (팝업 · 주요 뉴스 점수 `관련 자산 움직임`)
             for t in x.get("tickers") or []:
@@ -426,7 +430,8 @@ def news_section():
         return _dk.keep_tone(_dk.section("뉴스", RH.news_tab(built, dirs, week), tab=TAB_NEWS))   # 헤드라인체 그대로 · 탭 이름과 같은 제목은 테마가 숨긴다
     except Exception as e:  # noqa: BLE001
         print(f"[kr-report] 뉴스 못 읽음 (목업은 자리만): {str(e)[:120]}")
-    return _dk.section("뉴스", _dk.muted("뉴스 자리 — 발행 때 한국 증시 내용 방송(공용 뉴스 처리)으로 채웁니다."), tab=TAB_NEWS)
+    # 독자 화면에 내부 안내(`뉴스 자리 — 발행 때 …`)가 나가던 것 (2026-11-09 사용자) → 독자 말 한 줄
+    return _dk.section("뉴스", _dk.muted("최근 나흘 동안 한국 증시를 다룬 방송 뉴스가 없습니다."), tab=TAB_NEWS)
 
 
 SORT_BTN = R.SORT_BTN
