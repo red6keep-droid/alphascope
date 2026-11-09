@@ -44,6 +44,57 @@ LIST_SLUG = "forecast-list"
 CARD_NAME = "증시 전망"
 # 글 보기 고정 머리 줄 글자 (2026-11-09 사용자: 질문이 머리 줄 · 본문 맨 위에 두 번 나온다) — 테마가 본문 [data-head-title] 로 바꾼다. 블로그 글 제목(검색)은 그대로
 HEAD_FORECAST, HEAD_LIST = "증시 전망 보기", "증시 전망 목록"
+
+
+# 질문 속 종목명 앞 로고 (2026-11-09 사용자: "개별 종목에 관한 전망이면 해당하는 종목명 앞에 로고") — 미국 · 한국 종목 후보의 한글 이름을 찾아
+# 각 이름의 첫 자리 앞에 design_kit.ticker_logo(우리 gh-pages 사본). 로고 파일이 없는 한국 종목은 이름 첫 글자 배지(테마 krAvatar 와 같게)
+_STOCK_NAMES = None
+
+
+def _stock_names():
+    global _STOCK_NAMES
+    if _STOCK_NAMES is None:
+        import importlib.util
+        out = {}
+        for rel in (("stock-radar", "universe.py"), ("kr-stocks", "universe_kr.py")):
+            path = os.path.join(os.path.dirname(_HERE), *rel)
+            try:
+                spec = importlib.util.spec_from_file_location("_fc_" + rel[1][:-3], path)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                for c in mod.CANDIDATES:
+                    out.setdefault(c[1], c[0])
+            except Exception:   # 후보 모듈을 못 읽으면 로고 없이 — 페이지는 그대로 나간다
+                continue
+        _STOCK_NAMES = out
+    return _STOCK_NAMES
+
+
+def _logo_for(sym, name, size):
+    if sym.endswith((".KS", ".KQ")) and not dk._logo_files().get(sym.upper()):
+        fs = max(8, int(size * 0.5))
+        return (f'<span aria-hidden="true" style="display:inline-block;width:{size}px;height:{size}px;line-height:{size}px;border-radius:50%;'
+                f'vertical-align:-4px;margin-right:6px;background:#E2E8F0;color:#334155;font-size:{fs}px;font-weight:700;text-align:center;">{dk.esc(name[:1])}</span>')
+    return dk.ticker_logo(sym, size)
+
+
+def with_logos(text, size=22):
+    """이스케이프한 질문 글자 + 종목명마다(처음 한 번) 앞에 로고. 긴 이름부터 맞춘다 — `에코프로비엠` 안의 `에코프로` 에 두 번 붙지 않게"""
+    names = _stock_names()
+    html = dk.esc(text)
+    if not names:
+        return html
+    pat = _re.compile("|".join(_re.escape(dk.esc(n)) for n in sorted(names, key=len, reverse=True)))
+    seen = set()
+    rev = {dk.esc(n): n for n in names}
+
+    def rep(m):
+        n = rev[m.group(0)]
+        if n in seen:
+            return m.group(0)
+        seen.add(n)
+        return '<span style="white-space:nowrap;">' + _logo_for(names[n], n, size) + m.group(0) + "</span>"
+    return pat.sub(rep, html)
 # 상세 하단 버튼 · 머리 줄 화살표 = 전망 목록 (2026-11-09 사용자: 홈이 아니라 목록으로) — 테마가 data-nav="list" · data-title-back 을 읽는다
 
 # ---------------------------------------------------------------- 용어 · 색
@@ -1418,7 +1469,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
                 f'font-size:13px;line-height:18px;font-weight:600;color:#4B5563;text-decoration:none;white-space:nowrap;">이전전망'
                 f'<span style="display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right").replace(chr(39) + "16" + chr(39), chr(39) + "14" + chr(39))}</span></a>') if back else ""
     q = (f'<h2 style="{dk.H2}display:flex;flex-wrap:nowrap;align-items:flex-start;gap:8px;margin:0 0 11px;">' + icon
-         + f'<span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;"><span style="word-break:keep-all;">{dk.esc(fc["title"])}{sub_lab}</span>'
+         + f'<span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;"><span style="word-break:keep-all;">{with_logos(fc["title"])}{sub_lab}</span>'
          # 날짜(급락일 · 결과) · `이전전망 ›` = 제목 아래 줄, 오른쪽 정렬 (2026-11-08 사용자 — 옛 P455 제목 줄 오른쪽 끝)
          + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:4px;line-height:{dk.LH_TINY};">'
          + _date_row(fc, out=not before and fc["kind"] == "pre").replace("flex-direction:column;align-items:flex-end;", "flex-wrap:wrap;align-items:center;gap:4px 10px;", 1)
@@ -1448,7 +1499,7 @@ def _row(fc, st):
     sub = fc.get("follow_of") or fc.get("reversal_of") or any(o.get("role") == "parent" for o in fc.get("overlap", []))   # 번복 n회차도 세부 전망 (2026-11-08)   # 이어받았거나 겹쳐서 따로 적은 전망 = 세부 전망 (P464)
     tags = dk.pill_row((violet_box("세부 전망") if sub else "") + "".join(dk.pill(t, kind="area", bare=True) for t in fc.get("tags", [])))
     left = (f'<a href="{page_url(fc["slug"])}" style="display:block;color:#111;font-weight:400;font-size:18px;line-height:28px;text-decoration:none;word-break:keep-all;overflow-wrap:anywhere;">'   # 보통 굵기 · 긴 낱말도 카드 안에서 줄 바꿈 (2026-11-08 사용자: 목록 전부 레귤러, 카드 밖으로 삐져나옴)
-            f'{dk.esc(fc["title"])}</a>'
+            f'{with_logos(fc["title"], 18)}</a>'
             f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;min-width:0;">{tags.replace("white-space:nowrap;", "flex-wrap:wrap;", 1)}'
             f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{dk.esc(fc["posted"])} 게시</span>'
             # `등록 기록` 링크 삭제 (2026-11-09 사용자: 독자에게 과한 정보 · GitHub 는 일반 독자에게 어렵다)
