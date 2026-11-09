@@ -42,6 +42,8 @@ BLOG = "https://alpha-scope.blogspot.com/"
 PROOF_REPO = "red6keep-droid/alphascope"   # 공개 저장소 — gh-pages/proof/{slug}.json 커밋 시각 = 등록 증명 (비공개 alphascope-state 는 독자가 못 연다)
 LIST_SLUG = "forecast-list"
 CARD_NAME = "증시 전망"
+# 글 보기 고정 머리 줄 글자 (2026-11-09 사용자: 질문이 머리 줄 · 본문 맨 위에 두 번 나온다) — 테마가 본문 [data-head-title] 로 바꾼다. 블로그 글 제목(검색)은 그대로
+HEAD_FORECAST, HEAD_LIST = "증시 전망 보기", "증시 전망 목록"
 
 # ---------------------------------------------------------------- 용어 · 색
 DIR_WORD = {1: "상승", -1: "하락"}
@@ -1036,7 +1038,8 @@ def _date_row(fc, out=False):
             m = _re.match(r"^\d{2}\.\d{2}", str(items[1][1]))
             if m:   # 날짜 줄은 날짜만 — 사건 설명(`유예 철회 (같은 사건 2회차)`)은 번복 · 겹침 카드에 (P443)
                 items[1][1] = m.group(0)
-    proof = (f'<a href="{dk.esc(fc["proof_url"])}" style="color:{dk.SUB};text-decoration:underline;white-space:nowrap;">등록 증명</a>' if fc.get("proof_url") else "")
+    # `등록 증명` 링크 삭제 (2026-11-09 사용자: 독자에게 과한 정보 · 일반 독자는 GitHub 를 모른다). 증명 파일(gh-pages proof/) 커밋은 내부 기록으로 그대로 둔다
+    proof = ""
     items = items[1:]   # `게시` 날짜는 빼고 결과 발표(충격 뒤 = 급락일 · 급등일)만 — 게시일은 타임라인 맨 아래 `개시` 줄에 있다 (P455, 2026-11-08 사용자)
     # 질문 제목 줄 오른쪽 끝 (P455) — 등록 증명은 그 아래
     return (f'<span style="display:flex;flex:none;flex-direction:column;align-items:flex-end;font-size:{dk.TINY};font-weight:400;color:{dk.SUB};">'
@@ -1423,7 +1426,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
             + (operator_box(op + _op_mood(fc) + ([("거래량", f'평소의 {st["volume_x"]:.1f}배 — 우리 전망 고르기 재료(뉴스 · 거래량 없는 급변은 반등 · 조정 쪽, 많으면 지속 쪽)')] if fc["kind"] == "after" and st.get("volume_x") else [])) if op else "")
             + more   # `더 궁금한 것` 제목 삭제 — 기록 · 앞으로 볼 것은 각자 구분선 구획 (2026-11-07 사용자)
             )   # `다른 전망` 구획 삭제 — 글 아래 [목록] 버튼이 전망 목록으로 간다, 이어진 전망은 겹침 카드 안 링크로 (P442, 2026-11-08 사용자)
-    return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}</div>')
+    return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-head-title="{HEAD_FORECAST}" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}</div>')
 
 
 def seo_lead(fc, st=None):
@@ -1447,7 +1450,7 @@ def _row(fc, st):
             f'{dk.esc(fc["title"])}</a>'
             f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;min-width:0;">{tags.replace("white-space:nowrap;", "flex-wrap:wrap;", 1)}'
             f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{dk.esc(fc["posted"])} 게시</span>'
-            + (f'<a href="{dk.esc(fc["record_url"])}" style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};text-decoration:underline;">등록 기록</a>' if fc.get("record_url") else "")
+            # `등록 기록` 링크 삭제 (2026-11-09 사용자: 독자에게 과한 정보 · GitHub 는 일반 독자에게 어렵다)
             + "</span>")
     lab = e["label"][len(fc["subject"]) + 1:] if fc.get("subject") and e["label"].startswith(fc["subject"] + " ") else e["label"]   # 대상 이름은 제목에 있으니 뺀다 — `에너지 업종 조정 우세` 이 카드 밖으로 넘쳤다 (P464, 타임라인 P440 과 같은 규칙)
     right = f'<span style="color:{INK[e["dir"]]};font-size:16px;line-height:24px;font-weight:400;word-break:keep-all;overflow-wrap:anywhere;">{dk.esc(lab)}</span>'   # 보통 굵기 · 줄 바꿈 허용 — `조정 조짐이 보임` 이 오른쪽 칸 밖으로 나가던 것 (2026-11-08)
@@ -1521,7 +1524,7 @@ def list_body(pairs, states=None, done=(), score=None):
     sec1 = f'<div style="margin:12px 0 0;">{opened}</div>'
     board = f'<div style="margin:28px 0 0;">{scoreboard_card(score)}</div>' if score else ""   # 성적표 = 지켜보는 전망 아래 · 끝난 전망 바로 위 (2026-11-08 사용자 — 옛 맨 위)
     sec2 = board + done_list(done)
-    return dk.fix_colons(f'<div data-list-url="{BLOG}" data-seo-lead="증시 전망, 큰 사건 전에 두 갈래 전망을 적어 두고 숫자로 확인한 기록">{sec1 + sec2}</div>')
+    return dk.fix_colons(f'<div data-list-url="{BLOG}" data-head-title="{HEAD_LIST}" data-seo-lead="증시 전망, 큰 사건 전에 두 갈래 전망을 적어 두고 숫자로 확인한 기록">{sec1 + sec2}</div>')
 
 
 # ---------------------------------------------------------------- 홈 카드 JSON (국면 한 마디는 넣지 않는다 — 2026-11-07 사용자, 제목 · 라벨 · 게시일만)
@@ -1575,7 +1578,7 @@ if __name__ == "__main__":
     pub = [(r, fc) for r in regs for fc in forecasts(r, public=True)]   # 공개 = publish 가 False 아닌 것 (14절 4)
     for r, fc in pub:   # 공개 등록 증명 파일 — 발행 단계에서 공개 저장소 gh-pages/proof/ 로 커밋
         fc["proof_url"] = proof_url(fc)
-        fc["record_url"] = fc["proof_url"]
+        # 목록 `등록 기록` 링크도 독자에게 내보내지 않는다 (2026-11-09 사용자: GitHub 는 일반 독자에게 어렵다) — proof_url 은 운영 상자(내부)에만
         with open(os.path.join(out_dir, "proof", f'{fc["slug"]}.json'), "w", encoding="utf-8") as f:
             json.dump(proof_record(r, fc), f, ensure_ascii=False, indent=1)
     others_all = [(fc["no"], fc["title"], fc["slug"]) for _, fc in pub]

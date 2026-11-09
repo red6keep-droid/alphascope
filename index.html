@@ -1596,9 +1596,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
         <nav class='menu-items' id='primary-menu'>
           <a class='nav-item' expr:href='data:blog.homepageUrl'>
             <b:attr cond='data:view.isHomepage' name='aria-current' value='page'/>홈</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91&quot;'>
+          <a class='nav-item' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>
             <b:attr cond='data:view.search.label == &quot;데일리 브리핑&quot;' name='aria-current' value='page'/>미국 증시 리포트</a>
-          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;p/us-market-cap-top10.html&quot;'>시총 TOP 10</a>
+          <a class='nav-item' href='/p/us-market-cap-top10.html'>시총 TOP 10</a>
+          <a class='nav-item' href='/p/forecast-list.html'>증시 전망</a>
         </nav>
       </div>
 
@@ -1847,13 +1848,13 @@ body.no-dashboard .main-content { padding-top: 32px; }
                     <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 고정 페이지는 홈으로(종목 상세는 테마 JS 가 온 곳 따라 목록으로 · 홈으로, 2026-10-29 P94), 아니면 데일리 리포트 목록.
                       오른쪽 끝 TOP 은 맨 위로 (2026-10-13 사용자). 이전 글 · 다음 글은 같은 날 삭제.</b:comment>
                     <b:if cond='data:post.labels any (l =&gt; l.name == &quot;트럼프 트렌드&quot;)'>
-                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C&quot;'>목록</a>
+                      <a class='post-nav-list' href='/search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;엔비디아&quot;)'/>
-                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84&quot;'>목록</a>
+                      <a class='post-nav-list' href='/search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84'>목록</a>
                     <b:elseif cond='data:view.isPage'/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
                     <b:else/>
-                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91&quot;'>목록</a>
+                      <a class='post-nav-list' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>목록</a>
                     </b:if>
                     <button aria-label='맨 위로' class='post-nav-top' type='button'>TOP<svg aria-hidden='true' fill='none' height='22' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.6' viewBox='0 0 22 22' width='22'><circle cx='11' cy='11' r='10'/><path d='M11 15.5V7M7.5 10.5 11 7l3.5 3.5'/></svg></button>
                   </p>
@@ -4833,6 +4834,17 @@ body.no-dashboard .main-content { padding-top: 32px; }
         back.setAttribute('aria-label', (mark && mark.getAttribute('data-title-back-label')) || (mark ? '홈' : '목록'));
         back.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8 10 12.5"/></svg>';
         head.appendChild(back); head.appendChild(title);
+        /* 머리 줄 글자를 본문이 정할 때 (2026-11-09 사용자: 증시 전망 — 질문이 본문 맨 위에 또 나와 두 번 보였다) — 본문 [data-head-title] 이 있으면 제목 글자만 그것으로.
+           블로그 글 제목(검색 · 탭 · 공유)은 그대로 두고 화면의 고정 줄만 바꾼다. 공유 버튼(.post-title-meta)은 건드리지 않는다 */
+        var ht = document.querySelector('.post-body [data-head-title]');
+        if (ht) {
+          var lab = title.querySelector('.post-title-label');
+          if (lab) lab.textContent = ht.getAttribute('data-head-title');
+          else {
+            var texts = [].slice.call(title.childNodes).filter(function (n) { return n.nodeType === 3 && n.nodeValue.trim(); });
+            texts.forEach(function (n, i) { n.nodeValue = i ? '' : ht.getAttribute('data-head-title'); });
+          }
+        }
       })();
 
       /* ============================================================ 전환 버튼 (data-switch) · 오늘·5일 (data-hz-control) — 2026-10-11
