@@ -33,6 +33,11 @@ on:
         type: boolean
         required: false
         default: false
+      update:
+        description: '오늘 리포트 글이 이미 있으면 본문을 새로 덮어쓰기 (report 와 함께, 자료 빠진 글 다시 채울 때)'
+        type: boolean
+        required: false
+        default: false
       scheduled:
         description: '외부 cron(Cloudflare Worker)용 — 스케줄 실행과 똑같이 동작 (사람은 끄고 쓴다)'
         type: boolean
@@ -63,6 +68,7 @@ env:
   DO_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.KR_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
   DO_REPORT: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.KR_REPORT_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.report) }}
   FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force == true }}
+  UPDATE_REPORT: ${{ github.event_name == 'workflow_dispatch' && inputs.update == true }}   # 2026-11-09 사용자: 같은 날 리포트 글 본문 덮어쓰기
 
 jobs:
   # 수능일 게이트 (2026-11-05 사용자): 수능일(universe_kr.EXAM_DAYS)은 장이 한 시간 늦게 끝나 16:10 예약을 건너뛰고 17:10 예약만 돈다.
@@ -181,7 +187,8 @@ jobs:
         if: steps.gate.outputs.go == 'true' && hashFiles('experiments/kr-market-report/output/report_body.html') != ''
         continue-on-error: true
         run: |
-          if [ "$DO_REPORT" = "true" ]; then python experiments/kr-market-report/publish_report.py
+          if [ "$DO_REPORT" = "true" ] && [ "$UPDATE_REPORT" = "true" ]; then python experiments/kr-market-report/publish_report.py --update
+          elif [ "$DO_REPORT" = "true" ]; then python experiments/kr-market-report/publish_report.py
           else echo "리포트 그림자 모드 (저장소 변수 KR_REPORT_PUBLISH=true 로 켠다)"; python experiments/kr-market-report/publish_report.py --dry; fi
 
       # 홈 한국 탭 데이터 — 발행된 페이지만 링크 (pages_live.json)
@@ -226,7 +233,7 @@ jobs:
           python experiments/record_store.py run-log "$KR_DIR/data" kr "${{ steps.run_kr.outcome }}" "job=${{ job.status }}"   # 실행 한 줄 — data/records/runs (2026-11-07, A3-3-2 의 1)
           # 임시 인덱스로 실제 경로(experiments/kr-stocks/data/…)를 그대로 올린다 — records/ 하위 폴더(매일 기록, 2026-11-01)까지 (옛: 파일만 mktree)
           export GIT_INDEX_FILE="$(mktemp -u)"
-          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_fin_all.json dart_corp.json dart_company.json dart_earn.json est_history.json report_posts.json; do   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
+          for f in rank_state.json page_hashes.json pages_live.json history.json dart_fin.json dart_fin_all.json dart_corp.json dart_company.json dart_earn.json est_history.json report_posts.json flows.json; do   # flows.json = 마지막으로 받은 ECOS 자금 흐름 — 다음 날 ECOS 가 실패하면 이것을 쓴다 (2026-11-09 사용자)   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
             [ -f "$KR_DIR/data/$f" ] && git add -f "$KR_DIR/data/$f" || true
           done
           [ -d "$KR_DIR/data/records" ] && git add -f "$KR_DIR/data/records" || true   # 카드 판정 · 애널리스트 · 방송 의견 (stock_records, 데이터-기록-계획 A5-4)
