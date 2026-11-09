@@ -1243,7 +1243,7 @@ def sec_foreign(m):
         return ""
     sign_word = "순매수" if f["today"] > 0 else "순매도"
     streak = f"{f['streak']}일 연속 {'순매수' if f['streak_sign'] > 0 else '순매도'}" if f["streak"] > 1 else sign_word
-    rows = _row_html("오늘", f'<span style="color:{UP if f["today"] > 0 else DOWN};">{_sgn(f["today"], 0)}억</span>', f"{_md(f['day'])} · {streak}", first=True, inline_note=True)
+    rows = _row_html("최근" if (m or {}).get("stale") else "오늘", f'<span style="color:{UP if f["today"] > 0 else DOWN};">{_sgn(f["today"], 0)}억</span>', f"{_md(f['day'])} · {streak}", first=True, inline_note=True)   # 지난 자료로 대신한 날은 `최근` (2026-11-09)
     rows += _row_html("20일 누적", f'<span style="color:{UP if f["cum20"] > 0 else DOWN};">{_sgn(f["cum20"] / 1e4, 1)}조</span>',
                         f"과거 20일 구간 중 아래에서 {f['cum20_pct_rank']:.0f}% 지점" if f.get("cum20_pct_rank") is not None else "", inline_note=False)
     rows += _row_html("올해 누적", f'<span style="color:{UP if f["ytd"] > 0 else DOWN};">{_sgn(f["ytd"] / 1e4, 1)}조</span>', f"{f['day'][:4]}년", inline_note=True)

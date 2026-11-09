@@ -404,7 +404,17 @@ def run():
         flows = run_flows()
     except Exception as e:   # noqa: BLE001 — 자금 흐름이 실패해도 시세는 살린다
         print(f"[kr] ECOS 실패: {str(e)[:160]}")
-        notify.event("수집 실패", f"ECOS 자금 흐름 — {str(e)[:120]}")
+        # 지난번에 받은 자금 흐름(kr-state 의 data/flows.json)으로 대신 — 칸을 비우지 않고 그 날짜 그대로 보인다 (2026-11-09 사용자: 11-09 ECOS 연결 실패로 자금 흐름이 빠진 채 발행)
+        try:
+            with open(FLOWS, encoding="utf-8") as f:
+                flows = json.load(f)
+            flows["stale"] = True
+            last = ((flows.get("daily") or {}).get("foreign_kospi") or [{}])[-1].get("day", "?")
+            print(f"[kr] ECOS 실패 — 지난 자금 흐름으로 대신 (마지막 {last}, 받은 때 {flows.get('fetched_at')})")
+            notify.event("수집 실패", f"ECOS 자금 흐름 — 지난 자료({last})로 대신 발행 · {str(e)[:100]}")
+        except (OSError, ValueError):
+            flows = None
+            notify.event("수집 실패", f"ECOS 자금 흐름 — 지난 자료도 없어 빼고 발행 · {str(e)[:100]}")
     return snap, flows, hist
 
 

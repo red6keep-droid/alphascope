@@ -299,7 +299,7 @@ def flows(flow_data, bench_bars):
         return None
     d = flow_data.get("daily") or {}
     fk, fq = d.get("foreign_kospi") or [], d.get("foreign_kosdaq") or []
-    out = {"source": flow_data.get("source"), "fetched_at": flow_data.get("fetched_at")}
+    out = {"source": flow_data.get("source"), "fetched_at": flow_data.get("fetched_at"), "stale": bool(flow_data.get("stale"))}   # stale = ECOS 실패로 지난 자료 (2026-11-09)
     if fk:
         vals = [x["v"] for x in fk]
         sd = _ewma_sd(vals)
