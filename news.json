@@ -1,29 +1,63 @@
 {
-  "updated_at": "2026-11-08 21:47:21 UTC",
+  "updated_at": "2026-11-09 01:12:38 UTC",
   "items": [
     {
-      "title": "Trump says renewed Iran strikes ‘highly unlikely’ if talks progress but warns he could still strike",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/08/trump-iran-strikes-unlikely-talks-hormuz.html",
-      "published": "2026-11-08 21:28:12",
-      "title_ko": "트럼프, 협상 진전 시 이란 재공격 ‘매우 불확실’ 발언, 여전히 공격 가능 경고",
-      "summary_ko": "호르무즈 해협 관련 협상 진전 여부 공세 조건으로 제시",
+      "title": "데이터 센터 신규 인허가 중단 및 위기",
+      "title_ko": "데이터 센터 신규 인허가 중단 및 위기",
+      "summary_ko": "주민 반발과 규제로 인해 데이터 센터 신규 건설과 인허가가 위축될 전망",
+      "source": "증시각도기",
+      "link": "https://www.youtube.com/watch?v=I2D1_MgAir8",
+      "published": "2026-11-08 23:29:16",
+      "kind": "media",
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "neutral",
+      "n_channels": 2,
       "lines": [
-        "트럼프, 이란 핵 프로그램 및 호르무즈 해협 협상 진전 시 재공격 가능성 낮다고 발언",
-        "미국, 이란에 대한 추가 군사적 행동 여부는 협상 진행 상황에 따라 결정"
+        "진행자 발언 : 텍사스 주지사의 신규 인허가 중단 방침으로 데이터 센터 건설 차질 불가피",
+        "진행자 발언 : 전기 요금 상승과 물 사용량 문제로 주민들의 데이터 센터 부정적 인식 확산",
+        "진행자 발언 : 신규 건설 위축으로 기존 데이터 센터 자원을 보유한 빅테크가 상대적 수혜",
+        "진행자 발언 : 데이터 센터 설비 속도 둔화로 인해 반도체 주식들의 하락 압력 가중"
+      ]
+    },
+    {
+      "title": "유가 하락 및 전쟁 종식 기대감",
+      "title_ko": "유가 하락 및 전쟁 종식 기대감",
+      "summary_ko": "전쟁 종식 기대감으로 유가가 하락하며 생활비 부담을 완화 중",
+      "source": "증시각도기",
+      "link": "https://www.youtube.com/watch?v=I2D1_MgAir8",
+      "published": "2026-11-08 23:29:16",
+      "kind": "media",
+      "tag": "유가 · 에너지 · 원자재",
+      "direction": "neutral",
+      "n_channels": 2,
+      "lines": [
+        "진행자 발언 : 이란 전쟁 종식 기대감으로 유가 및 가솔린 가격 하락세 유지",
+        "진행자 발언 : 고유가로 인한 생활비 부담 폭발이 선거 패배의 주요 원인으로 작용"
       ]
     },
     {
       "title": "Nvidia investigates CEO Jensen Huang's relationship with alleged Chinese spy",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/08/nvidia-jensen-huang-investigation-china-spy.html",
-      "published": "2026-11-08 21:13:38",
+      "published": "2026-11-08 22:53:57",
       "title_ko": "엔비디아, 젠슨 황 CEO와 중국 스파이 의혹 관계 조사",
       "summary_ko": "황, 직원 이메일로 불륜 사실 및 이사회 조사 개시 통보",
       "lines": [
         "엔비디아, 젠슨 황 CEO의 중국 스파이 의혹 연루 여성과의 관계 조사 착수",
         "젠슨 황, 직원 대상 이메일로 해당 여성과의 불륜 사실 인정",
         "엔비디아 이사회, 해당 여성이 중국 스파이라는 주장에 대한 조사 개시"
+      ]
+    },
+    {
+      "title": "Trump says renewed Iran strikes ‘highly unlikely’ if talks progress but warns he could still strike",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/08/trump-iran-strikes-unlikely-talks-hormuz.html",
+      "published": "2026-11-08 21:53:02",
+      "title_ko": "트럼프, 협상 진전 시 이란 재공격 ‘매우 불확실’ 발언, 여전히 공격 가능 경고",
+      "summary_ko": "호르무즈 해협 관련 협상 진전 여부 공세 조건으로 제시",
+      "lines": [
+        "트럼프, 이란 핵 프로그램 및 호르무즈 해협 협상 진전 시 재공격 가능성 낮다고 발언",
+        "미국, 이란에 대한 추가 군사적 행동 여부는 협상 진행 상황에 따라 결정"
       ]
     },
     {
@@ -48,22 +82,6 @@
       "lines": [
         "코어웨이브 실적 발표 주시",
         "인플레이션 데이터 발표 예정"
-      ]
-    },
-    {
-      "title": "중동 정세와 유가 하외 안정",
-      "title_ko": "중동 정세와 유가 하외 안정",
-      "summary_ko": "중동 상황이 외교적으로 해결되면 유가와 원자재 가격이 하락하여 인플레이션 완화에 기여할 것",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=zZGwK5vfCi8",
-      "published": "2026-11-08 16:16:05",
-      "kind": "media",
-      "tag": "유가 · 에너지 · 원자재",
-      "direction": "neutral",
-      "n_channels": 2,
-      "lines": [
-        "조 라보라냐 발언 : 중동 갈등이 완화되면 유가와 원자재 가격 하락 기대",
-        "조 라보라냐 발언 : 에너지 가격 안정이 인플레이션 측면에 도움을 줄 것"
       ]
     },
     {
@@ -93,23 +111,6 @@
       "lines": [
         "하킴 제프리스 하원의장 후보 지명",
         "민주당 트럼프 관세 폐지 최우선 과제 설정"
-      ]
-    },
-    {
-      "title": "관세 철폐 및 의회 무역 권한 회복",
-      "title_ko": "관세 철폐 및 의회 무역 권한 회복",
-      "summary_ko": "관세는 물가 상승을 유발하는 직접적인 세금이므로 의회가 관세 권한을 다시 가져와야 ",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=6l9ny1JXyxs",
-      "published": "2026-11-08 14:56:40",
-      "kind": "media",
-      "tag": "관세 · 무역",
-      "direction": "neutral",
-      "n_channels": 1,
-      "lines": [
-        "섀넌 테일러 발언 : 불법적인 관세 철폐를 통한 생활비 인하",
-        "폴 베링거 발언 : 관세는 직접적인 인플레이션을 유발하므로 의회가 통제권 행사 필요",
-        "폴 베링거 발언 : 헌법상 의회 권한인 관세 및 무역 통제권 회복 추진"
       ]
     },
     {
