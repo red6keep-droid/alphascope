@@ -31,18 +31,30 @@ def load():
     return [str(i) for i in data[KEY]]
 
 
-SINCE_KEY = "fs_last_created"   # 마지막으로 본 댓글의 created — 다음 실행은 이보다 3일 앞부터만 읽는다 (2026-10-21)
+SINCE_KEY = "fs_last_created"   # 이어 읽을 시각 — 다음 실행은 이보다 10분 앞부터만 읽는다 (2026-10-21 3일 → 2026-11-09 10분)
 
 
 def last_created():
     return _read().get(SINCE_KEY)
 
 
-def save(processed, newest_created=None):
+DAY_KEY = "fs_day"   # {"date": "YYYY-MM-DD"(KST), "replies": n} — 하루 AI 답글 상한용 (2026-11-09)
+
+
+def day_count(today):
+    d = _read().get(DAY_KEY) or {}
+    return int(d.get("replies", 0)) if d.get("date") == today else 0
+
+
+def save(processed, newest_created=None, day=None, day_add=0):
+    """newest_created = 다음 실행이 이어 읽을 시각(못 다룬 가장 오래된 댓글, 없으면 가장 최근 댓글).
+    2026-11-09 전에는 max() 로 앞으로만 갔다 — 이제 남은 댓글이 있으면 그 시각에 머문다."""
     data = _read()
     data[KEY] = [str(i) for i in processed]
     if newest_created:
-        data[SINCE_KEY] = max(newest_created, data.get(SINCE_KEY) or "")
+        data[SINCE_KEY] = newest_created
+    if day:
+        data[DAY_KEY] = {"date": day, "replies": day_count(day) + day_add}
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)

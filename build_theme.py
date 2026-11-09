@@ -479,6 +479,10 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-replies > .cm-item { padding: 18px 0 0; border-top: 0; }
 .comments .cm-replybox { grid-column: 2; margin-top: 10px; }
 .comments .cm-replybox:empty { display: none; }
+.comments .cm-more { display: block; width: 100%; margin: 14px 0 0; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; color: #111; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* `이전 댓글 n개 더 보기` — 목록 위, 로그인 버튼과 같은 공식 흰 버튼 (2026-11-09 댓글 20개씩) */
+.comments .cm-more:hover { border-color: #111; }
+.comments .cm-more[disabled] { opacity: .5; cursor: default; }
+.comments .cm-more[hidden] { display: none; }
 .comments .cm-status { padding: 14px 0; font-size: 14px; line-height: 20px; color: #7A7A7A; text-align: center; }   /* 불러오는 중 · 못 불러옴 · 첫 댓글 안내도 가운데 (2026-10-14 사용자) */
 .comments .cm-status[hidden] { display: none; }
 /* 쓰기 칸 — 윗선 아래. 댓글이 없으면 선 없이 (댓글 목록 바로 아래 흰 버튼 하나였던 자리, 2026-10-13 사용자) */

@@ -2913,7 +2913,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       .then(function (r) { return r.text().then(function (t) {
         var j = {}; try { j = t ? JSON.parse(t) : {}; } catch (e) {}
         var er = (Array.isArray(j) ? j[0] : j) || {}; er = er.error;   /* runQuery 는 오류도 배열 [{error}] 로 준다 */
-        if (!r.ok || er) { var x = new Error((er && er.status) || 'HTTP'); x.status = r.status; throw x; }
+        if (!r.ok || er) { var x = new Error((er && er.status) || 'HTTP'); x.status = r.status || (er && er.code) || 0; throw x; }
         return j;
       }); });
   }
@@ -2922,10 +2922,27 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     return { id: d.name.split('/').pop(), uid: s('uid'), name: s('name'), photo: s('photo'), text: s('text'), parent: s('parent') || '', created: (f.created && f.created.timestampValue) || d.createTime || '' };
   }
   function newId() { var s = '', A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; for (var i = 0; i < 20; i++) s += A.charAt(Math.floor(Math.random() * A.length)); return s; }
-  var store = MOCK || {
-    list: function () {
-      return call(BASE + '/posts/' + encodeURIComponent(postId) + ':runQuery', 'POST', { structuredQuery: { from: [{ collectionId: 'comments' }], orderBy: [{ field: { fieldPath: 'created' }, direction: 'ASCENDING' }], limit: 500 } })
-        .then(function (rows) { return (rows || []).filter(function (r) { return r.document; }).map(function (r) { return fromDoc(r.document); }); });
+  /* 댓글은 최신 PAGE 개씩 읽는다 (2026-11-09 사용자 "지금 고치자"). 전에는 글을 볼 때마다 그 글 댓글을 전부(최대 500) 읽어
+     방문자 × 댓글 수만큼 무료 읽기 한도(하루 5만)를 썼고, 오래된 순 500개라 501번째부터 새 댓글이 안 보였다.
+     이제 최신 20개(+1개로 더 있는지만 확인) → `이전 댓글 n개 더 보기` 로 20개씩. 더 있을 때만 개수 질의 1회(읽기 1회). */
+  var PAGE = 20;
+  var store = MOCK ? {
+    page: function () { return MOCK.list().then(function (rows) { return { rows: rows, more: false }; }); },
+    count: function () { return Promise.resolve(null); },
+    add: MOCK.add, del: MOCK.del
+  } : {
+    page: function (before) {
+      var q = { from: [{ collectionId: 'comments' }], orderBy: [{ field: { fieldPath: 'created' }, direction: 'DESCENDING' }, { field: { fieldPath: '__name__' }, direction: 'DESCENDING' }], limit: PAGE + 1 };
+      if (before) q.startAt = { values: [{ timestampValue: before.created }, { referenceValue: DOC_PARENT + '/comments/' + before.id }], before: false };   /* before:false = 그 댓글 다음부터 */
+      return call(BASE + '/posts/' + encodeURIComponent(postId) + ':runQuery', 'POST', { structuredQuery: q })
+        .then(function (rows) {
+          var docs = (rows || []).filter(function (r) { return r.document; }).map(function (r) { return fromDoc(r.document); });
+          return { rows: docs.slice(0, PAGE).reverse(), more: docs.length > PAGE };
+        });
+    },
+    count: function () {
+      return call(BASE + '/posts/' + encodeURIComponent(postId) + ':runAggregationQuery', 'POST', { structuredAggregationQuery: { structuredQuery: { from: [{ collectionId: 'comments' }] }, aggregations: [{ alias: 'n', count: {} }] } })
+        .then(function (rows) { var f = rows && rows[0] && rows[0].result && rows[0].result.aggregateFields; return f && f.n ? parseInt(f.n.integerValue, 10) : null; });
     },
     add: function (data, token) {
       var id = newId(), name = DOC_PARENT + '/comments/' + id;
@@ -2956,7 +2973,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         onAuth: function (cb) { a.onAuthStateChanged(function (u) { cb(u ? { uid: u.uid, name: u.displayName || '이름 없음', photo: u.photoURL || '' } : null); }); },
         login: function () { return a.signInWithPopup(new fb.auth.GoogleAuthProvider()); },
         logout: function () { return a.signOut(); },
-        token: function () { return a.currentUser ? a.currentUser.getIdToken() : Promise.reject(new Error('로그인이 필요합니다.')); }
+        token: function (force) { return a.currentUser ? a.currentUser.getIdToken(!!force) : Promise.reject(new Error('UNAUTHENTICATED')); }
       };
     });
     return authP;
@@ -2969,14 +2986,19 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     if (/unauthorized-domain|operation-not-allowed/.test(m)) return '지금은 로그인을 준비하고 있어요. 잠시 뒤에 다시 시도해 주세요.';
     if (/network|Failed to fetch|load |UNAVAILABLE/.test(m)) return '인터넷 연결이 잠시 불안정해요. 잠시 뒤에 다시 시도해 주세요.';
     if (what === 'list') return '댓글을 잠시 불러오지 못했어요. 잠시 뒤에 다시 열어 주세요.';
-    if (/PERMISSION_DENIED|UNAUTHENTICATED/.test(m) || (e && (e.status === 401 || e.status === 403))) return '로그인이 풀린 것 같아요. 다시 로그인한 뒤 시도해 주세요.';
+    /* 로그인 만료(401)와 규칙 거절(403)을 나눈다 (2026-11-09). 전에는 둘 다 `로그인이 풀린 것 같아요` 라
+       20초 제한 · 규칙 미게시로 막힌 것도 로그인 문제로 보였다. 401 은 토큰을 새로 받아 한 번 더 시도한 뒤에만 여기 온다 */
+    if (/UNAUTHENTICATED/.test(m) || (e && e.status === 401)) return '로그인이 풀린 것 같아요. 다시 로그인한 뒤 시도해 주세요.';
+    if (/RESOURCE_EXHAUSTED/.test(m) || (e && e.status === 429)) return '지금은 댓글이 많이 몰려 잠시 쉬고 있어요. 잠시 뒤에 다시 시도해 주세요.';
     if (what === 'del') return '댓글을 지우지 못했어요. 잠시 뒤에 다시 시도해 주세요.';
-    if (what === 'add') return '댓글을 올리지 못했어요. 잠시 뒤에 다시 시도해 주세요.';
+    if (what === 'add') return '댓글을 올리지 못했어요. 잠시 뒤에 다시 올려 주세요.';
     return '잠시 문제가 생겼어요. 잠시 뒤에 다시 시도해 주세요.';
   }
 
   /* ---------------------------------------------------------------- 틀: 열기 버튼(카드) + 접는 판 */
   var items = [], me = null, api = null, loaded = false;
+  var more = false, cursor = null, total = null, lastPost = 0;   /* more = 더 오래된 댓글 있음 · cursor = 지금까지 읽은 가장 오래된 댓글 · total = 개수 질의 값 · lastPost = 이 화면에서 마지막으로 올린 시각 */
+  var GAP = 20000;   /* 같은 사람 20초에 한 번 — firestore.rules notTooFast 와 같다. 미리 막아 거절(403)까지 가지 않게 */
   box.classList.add('is-foldable');
   var head = box.querySelector('.comments-title') || box.appendChild(el('h3', 'comments-title'));
   head.textContent = '';
@@ -2985,8 +3007,20 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   head.appendChild(toggle);
   var panel = el('div', 'comments-panel'); panel.id = 'comments-panel'; panel.hidden = true; box.appendChild(panel);
   var list = el('ol', 'cm-list'), status = el('div', 'cm-status', '댓글을 불러오는 중…'), write = el('div', 'cm-write');
-  panel.appendChild(list); panel.appendChild(status); panel.appendChild(write);
-  function setCount() { toggle.firstChild.textContent = '댓글' + (loaded ? ' ' + items.length : ''); }
+  var moreBtn = btn('cm-more'); moreBtn.hidden = true;   /* `이전 댓글 n개 더 보기` — 목록 위(오래된 쪽), 공식 흰 버튼 */
+  panel.appendChild(moreBtn); panel.appendChild(list); panel.appendChild(status); panel.appendChild(write);
+  function shown() { return total !== null ? total : items.length; }
+  function setCount() {
+    toggle.firstChild.textContent = '댓글' + (loaded && (total !== null || !more) ? ' ' + shown() : '');
+    var rest = total !== null ? Math.max(total - items.length, 0) : 0;
+    moreBtn.hidden = !more;
+    moreBtn.textContent = '이전 댓글 ' + (rest ? rest + '개 ' : '') + '더 보기';
+  }
+  moreBtn.addEventListener('click', function () {
+    moreBtn.disabled = true;
+    store.page(cursor).then(function (p) { merge(p, true); }).catch(function (e) { window.alert(errText(e, 'list')); })
+      .then(function () { moreBtn.disabled = false; });
+  });
   function setOpen(open) {
     box.classList.toggle('is-open', open); panel.hidden = !open; toggle.setAttribute('aria-expanded', String(open));
     if (open) loadOnce();   /* 열면 그때 읽는다 (H30) */
@@ -3016,8 +3050,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     if (!loaded) return;
     var tops = items.filter(function (c) { return !c.parent; }), kids = {};
     items.forEach(function (c) { if (c.parent) (kids[c.parent] = kids[c.parent] || []).push(c); });
-    /* 원 댓글이 지워진 답글은 자리 표시 아래 둔다 */
-    Object.keys(kids).forEach(function (p) { if (!items.some(function (c) { return c.id === p; })) tops.push({ id: p, uid: '', name: '', text: '', created: kids[p][0].created, deleted: true }); });
+    /* 원 댓글이 지워진 답글은 자리 표시 아래 둔다. 더 오래된 댓글이 남아 있으면(more) 원 댓글이 아직 안 읽힌 것일 수 있어 그때는 숨긴다 */
+    Object.keys(kids).forEach(function (p) { if (!more && !items.some(function (c) { return c.id === p; })) tops.push({ id: p, uid: '', name: '', text: '', created: kids[p][0].created, deleted: true }); });
     tops.sort(function (a, b) { return a.created < b.created ? -1 : a.created > b.created ? 1 : 0; });
     tops.forEach(function (c) {
       var li;
@@ -3029,14 +3063,33 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       li.appendChild(el('div', 'cm-replybox'));
       list.appendChild(li);
     });
-    status.hidden = tops.length > 0;
+    status.hidden = tops.length > 0 || more;
     if (!tops.length) status.textContent = '첫 댓글을 남겨 보세요.';
     write.classList.toggle('is-first', !tops.length);
     setCount();
   }
+  /* 읽은 한 묶음을 합친다 — 같은 ID 는 한 번만, 늘 오래된 순 */
+  function merge(p, older) {
+    var seen = {}; items.forEach(function (c) { seen[c.id] = 1; });
+    var add = p.rows.filter(function (c) { return !seen[c.id]; });
+    items = older ? add.concat(items) : items.concat(add);
+    if (p.rows.length) cursor = p.rows[0];
+    more = p.more;
+    renderList();
+  }
   function load() {
-    store.list().then(function (rows) { items = rows; loaded = true; renderList(); if (/^#c[A-Za-z0-9]+$/.test(location.hash)) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); } })
-      .catch(function (e) { status.hidden = false; status.textContent = errText(e, 'list'); });
+    store.page(null).then(function (p) {
+      loaded = true; merge(p, false);
+      if (more) store.count().then(function (n) { if (n !== null) { total = n; setCount(); } }, function () {});
+      if (/^#c[A-Za-z0-9]+$/.test(location.hash)) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
+    }).catch(function (e) { status.hidden = false; status.textContent = errText(e, 'list'); });
+  }
+  /* 쓰기 · 지우기 — 토큰이 만료돼 401 이면 새 토큰으로 한 번만 다시 (2026-11-09: 오래 열어 둔 화면에서 `로그인이 풀린` 처럼 보이던 것) */
+  function withToken(fn) {
+    return api.token().then(fn).catch(function (e) {
+      if (!(e && e.status === 401)) throw e;
+      return api.token(true).then(fn);
+    });
   }
 
   /* ---------------------------------------------------------------- 쓰기 칸 */
@@ -3055,9 +3108,11 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     f.addEventListener('submit', function (e) {
       e.preventDefault();
       var text = ta.value.trim(); if (!text || !me) return;
+      var wait = Math.ceil((lastPost + GAP - Date.now()) / 1000);
+      if (wait > 0) { showErr(f, '댓글은 20초에 한 번 올릴 수 있어요. ' + wait + '초 뒤에 다시 올려 주세요.'); return; }
       submit.disabled = true; ta.disabled = true; showErr(f, '');
-      api.token().then(function (tok) { return store.add({ uid: me.uid, name: me.name, photo: me.photo, text: text, parent: parent || '' }, tok); })
-        .then(function (c) { items.push(c); renderList(); onDone(c); })
+      withToken(function (tok) { return store.add({ uid: me.uid, name: me.name, photo: me.photo, text: text, parent: parent || '' }, tok); })
+        .then(function (c) { lastPost = Date.now(); items.push(c); if (total !== null) total++; renderList(); onDone(c); })
         .catch(function (err) { ta.disabled = false; submit.disabled = false; showErr(f, errText(err, 'add')); });
     });
     setTimeout(function () { ta.focus(); }, 0);
@@ -3084,8 +3139,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   function remove(c, b) {
     if (!window.confirm('이 댓글을 삭제할까요?')) return;
     b.disabled = true;
-    api.token().then(function (tok) { return store.del(c.id, tok); })
-      .then(function () { items = items.filter(function (x) { return x.id !== c.id; }); renderList(); })
+    withToken(function (tok) { return store.del(c.id, tok); })
+      .then(function () { items = items.filter(function (x) { return x.id !== c.id; }); if (total !== null) total--; renderList(); })
       .catch(function (e) { b.disabled = false; window.alert(errText(e, 'del')); });
   }
 

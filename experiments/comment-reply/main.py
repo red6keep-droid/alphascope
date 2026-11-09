@@ -65,6 +65,30 @@ def format_message(kind, comment, post, reply):
     return "\n".join(lines)
 
 
+DAILY_MAX = 30   # 하루(KST) AI 답글 상한 — 지금 댓글 규모(하루 0~수 건)의 수십 배 여유, 몰릴 때 리포트 한도 보호
+
+
+def _today():
+    return datetime.datetime.now(KST).strftime("%Y-%m-%d")
+
+
+def _notify(notes, over):
+    """Slack — 3건까지는 건마다, 넘으면 한 통으로 묶는다 (댓글이 몰릴 때 알림이 쏟아지지 않게, 2026-11-09)."""
+    msgs = []
+    if len(notes) <= 3:
+        msgs = [format_message("spam" if spam else "reply", c, post, reply) for spam, c, post, reply in notes]
+    else:
+        n_spam = sum(1 for n in notes if n[0])
+        msgs = [f"💬 댓글 {len(notes)}건 처리 ({_now()} KST)\n자동 답글 {len(notes) - n_spam}건 · 스팸 삭제 {n_spam}건"]
+    if over:
+        msgs.append(f"⏸ 오늘 자동 답글 상한({DAILY_MAX}건)을 넘어 댓글 {len(over)}건은 답글 없이 넘겼습니다 ({_now()} KST)")
+    for m in msgs:
+        try:
+            notify_slack.send(m)
+        except Exception as e:
+            print(f"[Slack] 알림 실패 (게시는 끝남): {e}")
+
+
 def threads_answered(comments, owner_uid):
     """주인이 그 댓글 뒤에 같은 스레드에 쓴 적이 있으면 이미 답한 것으로 본다 (사람이 먼저 답한 경우)."""
     last_owner = {}
@@ -82,6 +106,7 @@ def main():
     parser.add_argument("--test-notification", action="store_true", help="Slack 테스트 메시지 발송")
     parser.add_argument("--test-comment", metavar="TEXT", help="가상 댓글로 답글 생성만 확인 (게시 안 함)")
     parser.add_argument("--max", type=int, default=10, help="1회 최대 처리 댓글 수 (기본 10)")
+    parser.add_argument("--daily-max", type=int, default=DAILY_MAX, help=f"하루(KST) AI 답글 상한 (기본 {DAILY_MAX})")
     args = parser.parse_args()
 
     load_dotenv()
@@ -103,9 +128,11 @@ def main():
     processed = state.load()
     since = None
     if processed is not None and not args.baseline and state.last_created():
-        # 마지막으로 본 댓글보다 3일 앞부터만 읽는다 — 주인이 먼저 답한 스레드 판정(threads_answered)에 필요한 앞 댓글은 그 안에 있다
+        # 이어 읽을 시각(아직 못 다룬 가장 오래된 댓글, 없으면 마지막으로 본 댓글)보다 10분 앞부터만 읽는다 (2026-11-09).
+        # 전에는 3일 앞부터라 실행마다 3일 치 댓글 전체를 다시 읽었다 — 하루 댓글 1만 개면 한 번에 3만 읽기로 무료 한도(하루 5만)를 넘는다.
+        # 주인이 먼저 답했는지(threads_answered)는 그 댓글보다 뒤에 쓰인 주인 댓글만 보면 되므로 창 안에 있다.
         try:
-            t = datetime.datetime.fromisoformat(state.last_created().replace("Z", "+00:00")) - datetime.timedelta(days=3)
+            t = datetime.datetime.fromisoformat(state.last_created().replace("Z", "+00:00")) - datetime.timedelta(minutes=10)
             since = t.astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             since = None
@@ -121,10 +148,17 @@ def main():
     done = set(processed)
     new = [c for c in comments if c["id"] not in done and c["uid"] != fs.owner_uid]
     skipped = [c for c in new if answered(c)]
-    todo = [c for c in new if not answered(c)][: args.max]
-    print(f"댓글 {len(comments)}건 | 새 댓글 {len(new)}건 (주인이 이미 답함 {len(skipped)}건) | 이번에 처리 {len(todo)}건")
+    waiting = [c for c in new if not answered(c)]
+    # 하루 AI 답글 상한 (2026-11-09) — 댓글이 몰리면 `comment` 사슬이 리포트와 같은 Groq · Gemini 하루 한도를 먹는다.
+    # 상한을 넘은 댓글은 답글 · 스팸 판정 없이 '처리됨'으로만 넘긴다(밀려 쌓이지 않게). 주인은 Slack 묶음 알림으로 안다.
+    left = max(args.daily_max - state.day_count(_today()), 0)
+    todo = waiting[: min(args.max, left)]
+    over = waiting[len(todo):] if len(todo) >= left else []   # 상한 때문에 못 한 것만 — 1회 처리 수(--max)로 밀린 것은 다음 실행에
+    print(f"댓글 {len(comments)}건 | 새 댓글 {len(new)}건 (주인이 이미 답함 {len(skipped)}건) | 이번에 처리 {len(todo)}건 | 오늘 남은 답글 {left}건 · 상한 넘음 {len(over)}건")
 
-    handled = [c["id"] for c in skipped]
+    handled = [c["id"] for c in skipped] + [c["id"] for c in over]
+    replied = 0
+    notes = []   # Slack 으로 보낼 것 — 3건 넘으면 한 통으로 묶는다
     posts = {}
     for c in todo:
         try:
@@ -143,16 +177,22 @@ def main():
                 fs.add_reply(c["post_id"], c["parent"] or c["id"], reply)
             print(f"[게시] comment={c['id']} → {'삭제(스팸)' if spam else '답글'}")
             handled.append(c["id"])
-            try:
-                notify_slack.send(format_message("spam" if spam else "reply", c, post, reply))
-            except Exception as e:
-                print(f"[Slack] 알림 실패 (게시는 끝남): {e}")
+            replied += 1
+            notes.append((spam, c, post, reply))
         except Exception as e:
             print(f"[오류] comment={c['id']} 처리 실패 (다음 실행에 다시): {e}")
             notify.event("댓글 처리 실패", f"comment={c['id']} — {str(e)[:120]}")   # 성공만 알리던 것을 실패도 (2026-10-21)
 
+    if args.send:
+        _notify(notes, over)
+
     if args.send and (handled or newest):
-        state.save(sorted(done | set(handled)), newest_created=newest)
+        # 이어 읽을 시각 = 아직 못 다룬 가장 오래된 새 댓글(1회 처리 수 · 오류로 남은 것), 없으면 가장 최근 댓글
+        rest = [c["created"] for c in new if c["id"] not in set(handled)]
+        resume = min(rest) if rest else newest
+        # 처리 목록은 읽는 창 안의 ID 만 남긴다 — 창 밖 댓글은 다시 읽히지 않으므로 목록이 끝없이 늘지 않게
+        window = {c["id"] for c in comments}
+        state.save(sorted((done | set(handled)) & window), newest_created=resume, day=_today(), day_add=replied)
         print(f"[state] 처리됨 {len(handled)}건 저장 -> {state.STATE_FILE}")
 
 
