@@ -1,6 +1,66 @@
 {
-  "updated_at": "2026-11-09 21:48:26 UTC",
+  "updated_at": "2026-11-09 22:42:47 UTC",
   "items": [
+    {
+      "title": "Hegseth impeachment articles introduced by Rep. Massie",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/pete-hegseth-impeachment-articles-massie.html",
+      "published": "2026-11-09 22:41:12",
+      "title_ko": "피트 히그셋 국방부 장관 탄핵 조항, 매시 의원이 도입",
+      "summary_ko": "하원 이번 주 투표 예정",
+      "lines": [
+        "마시 의원 헤그세스 국방장관 탄핵안 발의",
+        "하원 이번 주 탄핵안 표결 예정"
+      ]
+    },
+    {
+      "title": "Jensen Huang affair puts Nvidia's future at risk, with no clear successor to the renowned CEO",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/jensen-huang-affair-nvidia-succession.html",
+      "published": "2026-11-09 22:40:26",
+      "title_ko": "젠슨 황 사태, 엔비디아 미래 위협… 명성 높은 CEO 후계자 불분명",
+      "summary_ko": "1993년 공동 창립, 최고 가치 기업 중 하나로 성장",
+      "lines": [
+        "젠슨 황이 1993년 공동 설립한 엔비디아의 핵심 인물로 자리매김",
+        "엔비디아가 글로벌 최고 가치 기업 중 하나로 성장"
+      ]
+    },
+    {
+      "title": "Trump questions midterm election results, revives voting-machine conspiracy",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/trump-election-results-democrats.html",
+      "published": "2026-11-09 22:40:09",
+      "title_ko": "트럼프, 중간선거 결과 의문 제기하며 투표기 음모론 재점화",
+      "summary_ko": "2020년 선거 패배 정당성 의문, 의회 습격 언급",
+      "lines": [
+        "트럼프 대통령, 2020년 대선 패배 정당성 의문 제기",
+        "지지자 군중의 미 의회 습격으로 사태 고조"
+      ]
+    },
+    {
+      "title": "Nvidia’s Trump ties draw scrutiny after reports Huang was targeted by Chinese intelligence",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/nvidia-jensen-huang-china-spy-trump-lobbying.html",
+      "published": "2026-11-09 22:40:04",
+      "title_ko": "중국 정보기관 표적 보도 후 엔비디아의 트럼프 연루 의혹 주목",
+      "summary_ko": "젠슨 황, 중국 스파이와의 외도 의혹 보도",
+      "lines": [
+        "엔비디아 젠슨 황, 중국 스파이와의 불륜 의혹 보도",
+        "중국 정보기관 표적설로 엔비디아 감시 강화 전망"
+      ]
+    },
+    {
+      "title": "3 unexpected reasons the October jobs report was so strong",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/october-jobs-report-hiring-by-sector.html",
+      "published": "2026-11-09 22:23:56",
+      "title_ko": "10월 고용 보고서가 강했던 예상 밖 3가지 이유",
+      "summary_ko": "10월 고용 보고서, 예상치 상회 3가지 이유",
+      "lines": [
+        "10월 고용보고서, 경제학자 전망 상회",
+        "고용 지표 강세 배경 3가지 요인 분석"
+      ]
+    },
     {
       "title": "Skydance outlines its $6 billion in planned cost savings. Here's the breakdown",
       "source": "CNBC",
@@ -39,30 +99,6 @@
       ]
     },
     {
-      "title": "Hegseth impeachment articles introduced by Rep. Massie",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/pete-hegseth-impeachment-articles-massie.html",
-      "published": "2026-11-09 21:15:56",
-      "title_ko": "피트 히그셋 국방부 장관 탄핵 조항, 매시 의원이 도입",
-      "summary_ko": "하원 이번 주 투표 예정",
-      "lines": [
-        "마시 의원 헤그세스 국방장관 탄핵안 발의",
-        "하원 이번 주 탄핵안 표결 예정"
-      ]
-    },
-    {
-      "title": "Jensen Huang affair puts Nvidia's future at risk, with no clear successor to the renowned CEO",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/jensen-huang-affair-nvidia-succession.html",
-      "published": "2026-11-09 21:04:50",
-      "title_ko": "젠슨 황 사태, 엔비디아 미래 위협… 명성 높은 CEO 후계자 불분명",
-      "summary_ko": "1993년 공동 창립, 최고 가치 기업 중 하나로 성장",
-      "lines": [
-        "젠슨 황이 1993년 공동 설립한 엔비디아의 핵심 인물로 자리매김",
-        "엔비디아가 글로벌 최고 가치 기업 중 하나로 성장"
-      ]
-    },
-    {
       "title": "A key report for where inflation stood in October comes out Tuesday. Here's what to expect",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/09/october-cpi-report-2026-inflation.html",
@@ -72,42 +108,6 @@
       "lines": [
         "10월 CPI 헤드라인 수치 0.3% 상승 전망",
         "10월 근원 CPI 수치 0.2% 상승 전망"
-      ]
-    },
-    {
-      "title": "Children’s Place files for bankruptcy protection, seeks buyer",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/childrens-place-chapter-11-sale.html",
-      "published": "2026-11-09 20:57:46",
-      "title_ko": "칠드런스 플레이스, 파산보호 신청 및 매수자 모집",
-      "summary_ko": "12월 9일까지 잠재적 새 소유주 입찰 접수",
-      "lines": [
-        "칠드런스 플레이스, 챕터 11 파산보호 신청",
-        "12월 9일까지 새 소유주 입찰 접수 예정"
-      ]
-    },
-    {
-      "title": "PepsiCo to cut about 1,000 jobs as North American business struggles",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/pepsico-north-america-job-cuts.html",
-      "published": "2026-11-09 20:41:38",
-      "title_ko": "북미 사업 부진에 펩시코, 약 1,000명 감원",
-      "summary_ko": "북미 지역 운영 효율화 및 매출 회복 목적",
-      "lines": [
-        "펩시코, 북미 지역 약 1,000명 감원 계획",
-        "북미 사업 부진 대응 및 본토 시장 매출 회복 목적"
-      ]
-    },
-    {
-      "title": "Nvidia's CEO turmoil gives newly empowered Democrats fresh ammunition in pursuit of oversight",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/nvidia-jensen-huang-affair-congress-scrutiny.html",
-      "published": "2026-11-09 20:29:36",
-      "title_ko": "엔비디아 CEO 혼란, 민주당 감독 추진에 새 탄환",
-      "summary_ko": "젠슨 황, 외국 스파이 의심",
-      "lines": [
-        "젠슨 황 CEO 중국 스파이와의 불륜 의혹 보도",
-        "엔비디아 감시 강화 국면 진입"
       ]
     },
     {
