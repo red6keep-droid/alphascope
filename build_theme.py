@@ -817,10 +817,13 @@ def nav_items():
         )
     # 시총 TOP 10 목록 고정 페이지 (experiments/stock-radar/universe.LIST_SLUG, 2026-10-18 첫 발행) — 라벨 목록이 아니라 페이지 주소
     out.append("          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;p/{0}.html&quot;'>{1}</a>".format(TOP10_SLUG, TOP10_NAME))
+    # 증시 전망 목록 고정 페이지 (experiments/issue_store/publish_forecast.py, 2026-11-09 첫 발행) — 사용자 요청으로 상단 메뉴에
+    out.append("          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;p/{0}.html&quot;'>{1}</a>".format(FORECAST_SLUG, FORECAST_NAME))
     return "\n".join(out)
 
 
 TOP10_SLUG, TOP10_NAME = "us-market-cap-top10", "시총 TOP 10"
+FORECAST_SLUG, FORECAST_NAME = "forecast-list", "증시 전망"
 
 
 def blog_includables(backup_path="index.indie-backup.html"):
