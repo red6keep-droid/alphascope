@@ -2020,12 +2020,36 @@ OUT_ICON = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" 
             'style="flex:none;"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>')
 
 
-def related_buttons(links):
-    """글 맨 아래 `함께 보는 페이지` — 버튼 대신 구분선 목록 (2026-10-31 사용자 P187, 옛 P160 버튼): 제목 아래 · 줄 사이 · 맨 끝에 가로 구분선,
-    줄 = 3px 점 + 페이지 이름(16px 보통 = 기사 요약 줄 크기, P185) + 오른쪽 나가는 아이콘(회색). 줄 전체가 링크(data-row-link, 가이드라인 10-9)."""
+BLOG_URL = "https://alpha-scope.blogspot.com"
+# 리포트 목록 주소 — `함께 보는 페이지` 링크를 리포트마다 같은 이름 · 같은 주소로 (2026-11-09 사용자: 함께 보는 블록 공통 적용)
+REPORT_LINKS = {
+    "us": ("미국 증시 리포트", f"{BLOG_URL}/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91"),   # 라벨 `데일리 브리핑`
+    "kr": ("한국 증시 리포트", f"{BLOG_URL}/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"),   # 라벨 `한국 증시 리포트`
+    "people": ("주요 인물 발언 전체 보기", f"{BLOG_URL}/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8"),   # 라벨 `인물 발언` (people_section.ALL_URL 과 같음)
+    "forecast": ("증시 전망", f"{BLOG_URL}/p/forecast-list.html"),
+    "us_top": ("미국 시가총액 상위 10개 종목 주가", f"{BLOG_URL}/p/us-market-cap-top10.html"),
+    "kr_top": ("한국 시가총액 상위 10개 종목 주가", f"{BLOG_URL}/p/kr-market-cap-top10.html"),
+}
+
+
+def report_links(*keys):
+    return [REPORT_LINKS[k] for k in keys]
+
+
+def related_rows(links):
+    """`함께 보는 페이지` · `함께 보는 리포트` 공용 줄 — 3px 점 + 이름(16px 보통) + 오른쪽 나가는 아이콘(회색), 줄 아래 구분선, 줄 전체가 링크."""
     dot = '<span aria-hidden="true" style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-right:8px;"></span>'
-    rows = "".join(f'<a href="{esc(u)}" data-row-link="1" style="display:flex;align-items:center;gap:0;padding:12px {ALIGN_PX}px;border-bottom:1px solid #E2E8F0;'
+    return "".join(f'<a href="{esc(u)}" data-row-link="1" style="display:flex;align-items:center;gap:0;padding:12px {ALIGN_PX}px;border-bottom:1px solid #E2E8F0;'
                    f'font-size:16px;line-height:26px;font-weight:400;color:#111;text-decoration:none;">{dot}<span style="flex:1 1 auto;min-width:0;">{esc(t)}</span>'
                    f'<span style="flex:none;display:inline-flex;margin-left:8px;color:{NOTE};">{OUT_ICON}</span></a>' for t, u in links)
-    return (f'<div data-related="1" style="margin-top:24px;"><div style="font-weight:700;color:#111;font-size:{EMPH_NAME};padding:0 {ALIGN_PX}px 10px;border-bottom:1px solid #E2E8F0;">함께 보는 페이지</div>'
-            f'{rows}</div>')
+
+
+def related_title(text):
+    return f'<div style="font-weight:700;color:#111;font-size:{EMPH_NAME};padding:0 {ALIGN_PX}px 10px;border-bottom:1px solid #E2E8F0;">{esc(text)}</div>'
+
+
+def related_buttons(links):
+    """글 맨 아래 `함께 보는 페이지` — 버튼 대신 구분선 목록 (2026-10-31 사용자 P187, 옛 P160 버튼): 제목 아래 · 줄 사이 · 맨 끝에 가로 구분선,
+    줄 = 3px 점 + 페이지 이름(16px 보통 = 기사 요약 줄 크기, P185) + 오른쪽 나가는 아이콘(회색). 줄 전체가 링크(data-row-link, 가이드라인 10-9).
+    모든 리포트 글 끝에 둔다 (2026-11-09 사용자) — 게시 때 붙는 `함께 보는 리포트`(publish_blogger.related_html)와 두 블록."""
+    return f'<div data-related="1" style="margin-top:24px;">{related_title("함께 보는 페이지")}{related_rows(links)}</div>'

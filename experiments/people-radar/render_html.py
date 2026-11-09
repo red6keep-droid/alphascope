@@ -409,6 +409,7 @@ def build_body(r, n, d):
         dk.h2("발언", line=True).replace("<h2 ", '<h2 data-person-pages="1" ', 1),   # 홈 카드가 읽는 구획 제목 — 화면에서는 JS 가 숨긴다
         sec_people(r, cards),
         sec_person_head(r),
+        dk.related_buttons(dk.report_links("us", "kr", "forecast", "us_top")),   # 함께 보는 페이지 — 모든 리포트 공통 (2026-11-09 사용자)
         dk.WRAP_CLOSE,
     ])
     return dk.fix_colons(dk.formal(dk.align_titles(body)))   # 카드 밖 구획 제목은 좌측 기준선(ALIGN_PX) (2026-10-23 사용자)

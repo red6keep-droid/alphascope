@@ -44,6 +44,7 @@ LIST_SLUG = "forecast-list"
 CARD_NAME = "증시 전망"
 # 글 보기 고정 머리 줄 글자 (2026-11-09 사용자: 질문이 머리 줄 · 본문 맨 위에 두 번 나온다) — 테마가 본문 [data-head-title] 로 바꾼다. 블로그 글 제목(검색)은 그대로
 HEAD_FORECAST, HEAD_LIST = "증시 전망 보기", "증시 전망 목록"
+RELATED = dk.related_buttons(dk.report_links("us", "kr", "people"))   # 글 끝 `함께 보는 페이지` — 모든 리포트 공통 (2026-11-09 사용자)
 
 
 # 질문 속 종목명 앞 로고 (2026-11-09 사용자: "개별 종목에 관한 전망이면 해당하는 종목명 앞에 로고") — 미국 · 한국 종목 후보의 한글 이름을 찾아
@@ -1479,7 +1480,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
             + (operator_box(op + _op_mood(fc) + ([("거래량", f'평소의 {st["volume_x"]:.1f}배 — 우리 전망 고르기 재료(뉴스 · 거래량 없는 급변은 반등 · 조정 쪽, 많으면 지속 쪽)')] if fc["kind"] == "after" and st.get("volume_x") else [])) if op else "")
             + more   # `더 궁금한 것` 제목 삭제 — 기록 · 앞으로 볼 것은 각자 구분선 구획 (2026-11-07 사용자)
             )   # `다른 전망` 구획 삭제 — 글 아래 [목록] 버튼이 전망 목록으로 간다, 이어진 전망은 겹침 카드 안 링크로 (P442, 2026-11-08 사용자)
-    return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-head-title="{HEAD_FORECAST}" data-nav="list" data-title-back="{page_url(LIST_SLUG)}" data-title-back-label="목록" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}</div>')
+    return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-head-title="{HEAD_FORECAST}" data-nav="list" data-title-back="{page_url(LIST_SLUG)}" data-title-back-label="목록" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}{RELATED}</div>')
 
 
 def seo_lead(fc, st=None):
@@ -1577,7 +1578,7 @@ def list_body(pairs, states=None, done=(), score=None):
     sec1 = f'<div style="margin:12px 0 0;">{opened}</div>'
     board = f'<div style="margin:28px 0 0;">{scoreboard_card(score)}</div>' if score else ""   # 성적표 = 지켜보는 전망 아래 · 끝난 전망 바로 위 (2026-11-08 사용자 — 옛 맨 위)
     sec2 = board + done_list(done)
-    return dk.fix_colons(f'<div data-list-url="{BLOG}" data-head-title="{HEAD_LIST}" data-seo-lead="증시 전망, 큰 사건 전에 두 갈래 전망을 적어 두고 숫자로 확인한 기록">{sec1 + sec2}</div>')
+    return dk.fix_colons(f'<div data-list-url="{BLOG}" data-head-title="{HEAD_LIST}" data-seo-lead="증시 전망, 큰 사건 전에 두 갈래 전망을 적어 두고 숫자로 확인한 기록">{sec1 + sec2}{RELATED}</div>')
 
 
 # ---------------------------------------------------------------- 홈 카드 JSON (국면 한 마디는 넣지 않는다 — 2026-11-07 사용자, 제목 · 라벨 · 게시일만)

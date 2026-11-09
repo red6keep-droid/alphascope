@@ -95,7 +95,8 @@ def find_post_by_title(title, blog_url=None, creds=None, max_results=15):
 
 # 함께 보는 리포트 (검색 노출, 2026-10-18 사용자 — 가이드라인 10-5): 글끼리 HTML 링크로 잇는다. 게시 · 갱신 때 최근 글 목록을 읽어
 # 같은 연재의 바로 앞 글 + 다른 두 연재의 최신 글 + 연재 목록 화면. 실패해도 게시는 그대로 한다(링크 없이).
-SERIES = [("데일리 브리핑", "미국 증시 리포트"), ("엔비디아", "엔비디아 리포트"), ("트럼프 트렌드", "트럼프 SNS 트렌드")]   # (블로거 라벨, 목록 이름) — 라벨은 build_theme.NAV_LABELS 와 같다
+# 연재 = 지금 매일 나오는 날짜별 글만 (2026-11-09 사용자): 트럼프(11-04 종료) · 엔비디아 날짜별 글(11-01 고정 페이지로) 뺌, 한국 증시 · 인물 발언 넣음
+SERIES = [("데일리 브리핑", "미국 증시 리포트"), ("한국 증시 리포트", "한국 증시 리포트"), ("인물 발언", "주요 인물 발언")]   # (블로거 라벨, 목록 이름)
 
 
 def related_html(labels, self_titles, blog_url=None, creds=None):
@@ -117,13 +118,14 @@ def related_html(labels, self_titles, blog_url=None, creds=None):
             picks.append(p)
     if not picks:
         return ""
-    li = "".join(f'<li style="margin:0;line-height:35px;"><a href="{_h.escape(p["url"])}" style="color:#111;">{_h.escape(str(p["title"]).strip().replace(" — ", " "))}</a></li>' for p in picks)
-    lists = " · ".join(f'<a href="{blog_url}/search/label/{quote(lb)}" style="color:#111;">{_h.escape(name)}</a>' for lb, name in SERIES)
-    # 좌측 기준선 6px — 홈 실시간 뉴스 글자 선 (2026-10-24 사용자, 디자인-가이드라인 5-9). 위 구분선은 전체 폭
-    return ('<div data-related="report" style="margin:28px 0 0;padding-top:14px;border-top:1px solid #E2E8F0;font-size:16px;line-height:24px;">'
-            '<div style="font-size:14px;line-height:20px;color:#6B7280;margin:0 0 4px;padding-left:6px;">함께 보는 리포트</div>'
-            f'<ul style="list-style:none;margin:0 0 6px;padding:0 0 0 6px;">{li}</ul>'
-            f'<div style="font-size:14px;line-height:20px;color:#6B7280;padding-left:6px;">리포트 목록 : {lists}</div></div>')
+    import sys as _sys
+    _sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+    import design_kit as dk
+    rows = dk.related_rows([(str(p["title"]).strip().replace(" — ", " "), p["url"]) for p in picks])
+    lists = " · ".join(f'<a href="{blog_url}/search/label/{quote(lb)}" style="color:inherit;">{_h.escape(name)}</a>' for lb, name in SERIES)
+    # 모양 = `함께 보는 페이지`(design_kit.related_buttons)와 같은 제목 · 구분선 목록 (2026-11-09 사용자: 공통 적용). 연재 목록은 작은 회색 한 줄
+    return ('<div data-related="report" style="margin-top:24px;">' + dk.related_title("함께 보는 리포트") + rows
+            + f'<div style="padding:10px {dk.ALIGN_PX}px 0;font-size:14px;line-height:20px;color:{dk.NOTE};">리포트 목록 : {lists}</div></div>')
 
 
 def with_related(content, labels, self_titles, blog_url=None, creds=None):
@@ -131,7 +133,7 @@ def with_related(content, labels, self_titles, blog_url=None, creds=None):
     import re as _re
     # 공통 블록만 지운다 — 본문의 `함께 보는 페이지`(design_kit.related_buttons, data-related="1")는 남긴다 (2026-11-08 사용자: 두 블록 다 있어야 한다).
     # 옛 글의 공통 블록은 data-related="1" + 아래 style 로 시작한다 — 갱신 때 그것도 지운다
-    content = _re.sub(r'<div data-related="(?:report|1)" style="margin:28px 0 0;padding-top:14px;.*\Z', "", content, flags=_re.S)   # 맨 끝 블록만 붙이므로 끝까지 지운다
+    content = _re.sub(r'<div data-related="report".*\Z|<div data-related="(?:report|1)" style="margin:28px 0 0;padding-top:14px;.*\Z', "", content, flags=_re.S)   # 맨 끝 블록만 붙이므로 끝까지 지운다 (옛 모양 · 11-09 새 모양 둘 다)
     try:
         return content + related_html(labels, self_titles, blog_url, creds)
     except Exception as e:  # noqa: BLE001
