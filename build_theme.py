@@ -663,13 +663,13 @@ __DASHBOARD__
                     <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 고정 페이지는 홈으로(종목 상세는 테마 JS 가 온 곳 따라 목록으로 · 홈으로, 2026-10-29 P94), 아니면 데일리 리포트 목록.
                       오른쪽 끝 TOP 은 맨 위로 (2026-10-13 사용자). 이전 글 · 다음 글은 같은 날 삭제.</b:comment>
                     <b:if cond='data:post.labels any (l =&gt; l.name == &quot;__TRUMP_LABEL__&quot;)'>
-                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__TRUMP_LIST_PATH__&quot;'>목록</a>
+                      <a class='post-nav-list' href='/__TRUMP_LIST_PATH__'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;__NVDA_LABEL__&quot;)'/>
-                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__NVDA_LIST_PATH__&quot;'>목록</a>
+                      <a class='post-nav-list' href='/__NVDA_LIST_PATH__'>목록</a>
                     <b:elseif cond='data:view.isPage'/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
                     <b:else/>
-                      <a class='post-nav-list' expr:href='data:blog.homepageUrl + &quot;__LIST_PATH__&quot;'>목록</a>
+                      <a class='post-nav-list' href='/__LIST_PATH__'>목록</a>
                     </b:if>
                     <button aria-label='맨 위로' class='post-nav-top' type='button'>TOP<svg aria-hidden='true' fill='none' height='22' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.6' viewBox='0 0 22 22' width='22'><circle cx='11' cy='11' r='10'/><path d='M11 15.5V7M7.5 10.5 11 7l3.5 3.5'/></svg></button>
                   </p>
@@ -812,13 +812,14 @@ def nav_items():
     for name, label in NAV_LABELS:
         # 주소는 인코딩한다 — "트럼프 트렌드"처럼 띄어쓰기가 있는 라벨 때문. 비교는 원문으로.
         out.append(
-            "          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;search/label/{1}&quot;'>\n"
+            "          <a class='nav-item' href='/search/label/{1}'>\n"
             "            <b:attr cond='data:view.search.label == &quot;{0}&quot;' name='aria-current' value='page'/>{2}</a>".format(label, quote(label), name)
         )
     # 시총 TOP 10 목록 고정 페이지 (experiments/stock-radar/universe.LIST_SLUG, 2026-10-18 첫 발행) — 라벨 목록이 아니라 페이지 주소
-    out.append("          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;p/{0}.html&quot;'>{1}</a>".format(TOP10_SLUG, TOP10_NAME))
+    # 주소는 '/' 로 시작 (2026-11-09): 폰 화면(?m=1)에서 homepageUrl 이 `/?m=1` 이라 `/?m=1p/...` 로 붙어 메뉴 · 목록이 모두 홈으로 갔다
+    out.append("          <a class='nav-item' href='/p/{0}.html'>{1}</a>".format(TOP10_SLUG, TOP10_NAME))
     # 증시 전망 목록 고정 페이지 (experiments/issue_store/publish_forecast.py, 2026-11-09 첫 발행) — 사용자 요청으로 상단 메뉴에
-    out.append("          <a class='nav-item' expr:href='data:blog.homepageUrl + &quot;p/{0}.html&quot;'>{1}</a>".format(FORECAST_SLUG, FORECAST_NAME))
+    out.append("          <a class='nav-item' href='/p/{0}.html'>{1}</a>".format(FORECAST_SLUG, FORECAST_NAME))
     return "\n".join(out)
 
 
