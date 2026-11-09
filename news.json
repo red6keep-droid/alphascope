@@ -1,31 +1,108 @@
 {
-  "updated_at": "2026-11-09 12:48:39 UTC",
+  "updated_at": "2026-11-09 21:48:26 UTC",
   "items": [
     {
-      "title": "Restaurant chains refocus on food quality to bring back diners",
+      "title": "Skydance outlines its $6 billion in planned cost savings. Here's the breakdown",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/restaurant-chains-better-food-diners.html",
-      "published": "2026-11-09 12:00:01",
-      "title_ko": "레스토랑 체인, 식품 품질 재집중으로 고객 유치",
-      "summary_ko": "",
+      "link": "https://www.cnbc.com/2026/11/09/skydance-cost-savings-breakdown.html",
+      "published": "2026-11-09 21:28:40",
+      "title_ko": "스카이댄스, 60억 달러 규모 비용 절감 계획 발표",
+      "summary_ko": "세부 항목 공개",
       "lines": [
-        "웬디스 버거킹 치폴레 등 체인점 메뉴 품질 개선 추진",
-        "할인 의존 탈피해 고객 유치 전략 전환"
+        "스카이댄스 60억 달러 비용 절감 계획 발표",
+        "구 파라마운트 스카이댄스 3분기 실적 발표와 함께 공개"
       ]
     },
     {
-      "title": "CoreWeave confronts 'doom cycle' narrative as neocloud credit risk overshadows growth",
+      "title": "Lucid misses Wall Street’s earnings expectations, expands loan from Saudi Arabia fund",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/coreweave-debt-credit-risk-neoclouds.html",
-      "published": "2026-11-09 12:00:01",
-      "title_ko": "코어위브, '둠 사이클' 서사와 신용 위험으로 성장 위협",
-      "summary_ko": "가치 절반 감소"
+      "link": "https://www.cnbc.com/2026/11/09/lucid-group-lcid-earnings-q3-2026.html",
+      "published": "2026-11-09 21:27:54",
+      "title_ko": "루시드, 월스트리트 기대치 미달 실적 발표, 사우디 펀드로부터 대출 확대",
+      "summary_ko": "사우디 펀드로부터 대출 확대",
+      "lines": [
+        "루시드 월스트리트 실적 기대치 미달",
+        "사우디 펀드 대출 확대",
+        "실버비오 나폴리 CEO 취임 후 첫 분기 실적"
+      ]
+    },
+    {
+      "title": "Tokenization platform Securitize gains 10% postmarket on Q3 results, move into asset-backed finance",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/tokenization-platform-securitize-reports-gains-expands-into-asset-backed-finance.html",
+      "published": "2026-11-09 21:24:13",
+      "title_ko": "시큐리타이즈, Q3 실적 발표 후 10% 사후시장 상승, 자산 기반 금융 진출",
+      "summary_ko": "Q3 실적 발표 후 10% 사후시장 상승",
+      "lines": [
+        "시큐리티즈 3분기 실적 발표 후 시간외 10% 상승",
+        "리버 원 인수 통해 자산담보 금융 사업 확장"
+      ]
+    },
+    {
+      "title": "Hegseth impeachment articles introduced by Rep. Massie",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/pete-hegseth-impeachment-articles-massie.html",
+      "published": "2026-11-09 21:15:56",
+      "title_ko": "피트 히그셋 국방부 장관 탄핵 조항, 매시 의원이 도입",
+      "summary_ko": "하원 이번 주 투표 예정",
+      "lines": [
+        "마시 의원 헤그세스 국방장관 탄핵안 발의",
+        "하원 이번 주 탄핵안 표결 예정"
+      ]
+    },
+    {
+      "title": "Jensen Huang affair puts Nvidia's future at risk, with no clear successor to the renowned CEO",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/jensen-huang-affair-nvidia-succession.html",
+      "published": "2026-11-09 21:04:50",
+      "title_ko": "젠슨 황 사태, 엔비디아 미래 위협… 명성 높은 CEO 후계자 불분명",
+      "summary_ko": "1993년 공동 창립, 최고 가치 기업 중 하나로 성장",
+      "lines": [
+        "젠슨 황이 1993년 공동 설립한 엔비디아의 핵심 인물로 자리매김",
+        "엔비디아가 글로벌 최고 가치 기업 중 하나로 성장"
+      ]
+    },
+    {
+      "title": "A key report for where inflation stood in October comes out Tuesday. Here's what to expect",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/october-cpi-report-2026-inflation.html",
+      "published": "2026-11-09 21:03:55",
+      "title_ko": "10월 인플레이션 수준 가늠할 주요 보고서 화요일 발표 예정",
+      "summary_ko": "화요일 발표 예정",
+      "lines": [
+        "10월 CPI 헤드라인 수치 0.3% 상승 전망",
+        "10월 근원 CPI 수치 0.2% 상승 전망"
+      ]
+    },
+    {
+      "title": "Children’s Place files for bankruptcy protection, seeks buyer",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/childrens-place-chapter-11-sale.html",
+      "published": "2026-11-09 20:57:46",
+      "title_ko": "칠드런스 플레이스, 파산보호 신청 및 매수자 모집",
+      "summary_ko": "12월 9일까지 잠재적 새 소유주 입찰 접수",
+      "lines": [
+        "칠드런스 플레이스, 챕터 11 파산보호 신청",
+        "12월 9일까지 새 소유주 입찰 접수 예정"
+      ]
+    },
+    {
+      "title": "PepsiCo to cut about 1,000 jobs as North American business struggles",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/09/pepsico-north-america-job-cuts.html",
+      "published": "2026-11-09 20:41:38",
+      "title_ko": "북미 사업 부진에 펩시코, 약 1,000명 감원",
+      "summary_ko": "북미 지역 운영 효율화 및 매출 회복 목적",
+      "lines": [
+        "펩시코, 북미 지역 약 1,000명 감원 계획",
+        "북미 사업 부진 대응 및 본토 시장 매출 회복 목적"
+      ]
     },
     {
       "title": "Nvidia's CEO turmoil gives newly empowered Democrats fresh ammunition in pursuit of oversight",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/09/nvidia-jensen-huang-affair-congress-scrutiny.html",
-      "published": "2026-11-09 12:00:01",
+      "published": "2026-11-09 20:29:36",
       "title_ko": "엔비디아 CEO 혼란, 민주당 감독 추진에 새 탄환",
       "summary_ko": "젠슨 황, 외국 스파이 의심",
       "lines": [
@@ -34,127 +111,53 @@
       ]
     },
     {
-      "title": "Nvidia stock falls 5% as scrutiny turns to Jensen Huang’s relationship with alleged Chinese spy",
+      "title": "미국 경제 기관을 향한 중국의 스파이 활동",
+      "title_ko": "미국 경제 기관을 향한 중국의 스파이 활동",
+      "summary_ko": "중국 정보기관이 미국 연준 이코노미스트 등 핵심 인물들을 대상으로 장기간 침투 활동을 벌여왔음이 지적",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/nvidia-jensen-huang-chinese-spy-investigation.html",
-      "published": "2026-11-09 11:26:45",
-      "title_ko": "엔비디아 주가 5% 하락, 젠슨 황과 의심받는 중국 스파이 관계 조사 전환",
-      "summary_ko": "젠슨 황, 중국 스파이 의심 대상",
-      "lines": [
-        "젠슨 황 중국 스파이 연루 의혹으로 엔비디아 주가 5% 하락",
-        "엔비디아 이사회 독립 조사 착수"
-      ]
-    },
-    {
-      "title": "Rubio sees little hope of diplomatic breakthrough to Mideast deadlock amid 'outrageous' Iranian demands",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/us-iran-war-trump-hormuz.html",
-      "published": "2026-11-09 11:09:14",
-      "title_ko": "루비오, '황당무계한' 이란 요구 속 중동 교착상태 외교적 돌파구 희망 적어",
-      "summary_ko": "이란의 요구를 '황당무계'로 규정",
-      "lines": [
-        "루비오 미 국무장관, 이란 협상 성과 부재 언급",
-        "이란의 요구 사항에 대한 외교적 돌파구 기대 낮음"
-      ]
-    },
-    {
-      "title": "Congress returns with government funding, Pete Hegseth and the debt limit on the agenda",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/congress-government-funding-debt-limit-elections.html",
-      "published": "2026-11-09 11:00:01",
-      "title_ko": "의회 복귀, 정부 자금·헤그세스·부채한도 의제",
-      "summary_ko": "공화당, 상하원 다수 의석 유지 기간 2개월 미만",
-      "lines": [
-        "미 의회, 정부 자금 및 부채 한도 등 주요 의안 처리 예정",
-        "공화당, 상하원 다수 의석 유지 기간 2개월 미만"
-      ]
-    },
-    {
-      "title": "From supermarket fridges to passenger flights, a wave of threats is testing Europe's defenses",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/europe-fridge-hacks-bomb-threats-cyberattack.html",
-      "published": "2026-11-09 08:59:16",
-      "title_ko": "슈퍼마켓 냉장고부터 여객기까지, 유럽 방위력 시험하는 위협의 물결",
-      "summary_ko": "슈퍼마켓 냉장고 사이버 공격 및 폭탄 협박 사례",
-      "lines": [
-        "유럽, 슈퍼마켓 냉장고 대상 사이버 공격 및 폭탄 협박 발생",
-        "유럽 핵심 인프라 방호 능력 시험대"
-      ]
-    },
-    {
-      "title": "China wholesale inflation hits highest in more than four years as consumer measure slows",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/09/china-wholesale-inflation-rises-consumer.html",
-      "published": "2026-11-09 02:50:22",
-      "title_ko": "중국 도매물가 4년여 만에 최고치, 소비자물가 둔화",
-      "summary_ko": "로이터 조사 경제학자 예상치 5.3% 대비 상회",
-      "lines": [
-        "중국 10월 생산자물가지수 5.7% 기록",
-        "4년여 만에 최고치 경신",
-        "로이터 조사 예상치 5.3% 상회"
-      ]
-    },
-    {
-      "title": "미국 10월 비농업 고용 깜짝 증가",
-      "title_ko": "미국 10월 비농업 고용 깜짝 증가",
-      "summary_ko": "미국의 10월 비농업 고용이 예상치를 크게 웃돌면서 연준의 12월 금리 인상 가능성이 높아졌",
-      "source": "당잠사",
-      "link": "https://www.youtube.com/watch?v=THDY9UY_i_Y",
-      "published": "2026-11-08 21:23:12",
+      "link": "https://www.youtube.com/watch?v=huA1JJNf_ME",
+      "published": "2026-11-09 19:12:39",
       "kind": "media",
-      "tag": "경기 · 고용 · 소비",
+      "tag": "지정학",
       "direction": "neutral",
       "n_channels": 2,
       "lines": [
-        "미국 노동부 : 10월 비농업 신규 고용 16만 5,000건 증가",
-        "블룸버그 : 노동 통계국 예산 삭감으로 통계 정확성 유지 어려움 지적",
-        "CME 패드워치 : 고용 지표 발표 후 12월 금리 인상 확률 78%로 상승"
+        "에이먼 재버스 발언 : 연준 저위직 이코노미스트를 겨냥한 중국의 10년 이상 침투 활동",
+        "에이먼 재버스 발언 : 미국 경제 정보를 얻기 위한 중국 정보기관의 광범위한 첩보 노력"
       ]
     },
     {
-      "title": "Democrats amp up Trump investigation threats, Blanche counters he may probe lawmakers",
+      "title": "AI 인프라 투자 지속성과 데이터센터 구축 전망",
+      "title_ko": "AI 인프라 투자 지속성과 데이터센터 구축 전망",
+      "summary_ko": "AI 자본 지출(CAPEX)이 향후 지속될 것이라는 확신이 필요하며, 엔비디아의 생태계 내 위치는 변함없다고 강조",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/08/democrats-trump-oversight-blanche-doj-investigations.html",
-      "published": "2026-11-08 18:57:56",
-      "title_ko": "민주당, 트럼프 조사 위협 강화, 블랜치 의원에 대한 조사 가능성 언급",
-      "summary_ko": "블랜치, 의원에 대한 조사 가능성 언급",
+      "link": "https://www.youtube.com/watch?v=5aDwBb7JWvQ",
+      "published": "2026-11-09 17:27:05",
+      "kind": "media",
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "neutral",
+      "n_channels": 2,
       "lines": [
-        "민주당, 트럼프 행정부 백악관 및 협력 기업 대상 조사 의지 표명",
-        "블랜치, 민주당 의원들에 대한 역조사 가능성 언급"
+        "스콧 크로너트 발언 : 데이터센터 구축과 AI 자본 지출의 지속성에 대한 확인이 필요",
+        "스콧 크로너트 발언 : AI 생태계 내에서 엔비디아의 기본적 위치는 여전히 변함없음",
+        "스콧 크로너트 발언 : 단기적인 투자 심리 악화에도 불구하고 AI 활용에 대한 확신은 유지됨"
       ]
     },
     {
-      "title": "AI 데이터센터와 하이스케일러 규제",
-      "title_ko": "AI 데이터센터와 하이스케일러 규제",
-      "summary_ko": "AI 데이터센터와 하이스케일러들이 세제 혜택 요구와 정보 은폐 등으로 정치적 반발을 자초했다고 지적",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=dHeLmxS9aoM",
-      "published": "2026-11-08 16:00:11",
+      "title": "미국과 이란의 핵 프로그램 및 호르무즈 협상",
+      "title_ko": "미국과 이란의 핵 프로그램 및 호르무즈 협상",
+      "summary_ko": "트럼프 대통령은 이란과의 핵 프로그램 협상 진전에 따라 추가 공습은 희박하다고 발표",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=R6C1Vqc4LLA",
+      "published": "2026-11-09 14:30:21",
       "kind": "media",
-      "tag": "규제 · 산업정책",
+      "tag": "지정학",
       "direction": "neutral",
-      "n_channels": 1,
+      "n_channels": 2,
       "lines": [
-        "고탐 무쿤다 발언 : 하이스케일러의 장기 고용 창출 효과 제한",
-        "고탐 무쿤다 발언 : 텍사스 신임 주지사의 신규 인허가 엄격한 심사 예고",
-        "고탐 무쿤다 발언 : 업계의 과도한 세제 혜택 요구와 비밀주의 반발 초래"
-      ]
-    },
-    {
-      "title": "관세 철폐 및 의회 무역 권한 회복",
-      "title_ko": "관세 철폐 및 의회 무역 권한 회복",
-      "summary_ko": "관세는 물가 상승을 유발하는 직접적인 세금이므로 의회가 관세 권한을 다시 가져와야 ",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=6l9ny1JXyxs",
-      "published": "2026-11-08 14:56:40",
-      "kind": "media",
-      "tag": "관세 · 무역",
-      "direction": "neutral",
-      "n_channels": 1,
-      "lines": [
-        "섀넌 테일러 발언 : 불법적인 관세 철폐를 통한 생활비 인하",
-        "폴 베링거 발언 : 관세는 직접적인 인플레이션을 유발하므로 의회가 통제권 행사 필요",
-        "폴 베링거 발언 : 헌법상 의회 권한인 관세 및 무역 통제권 회복 추진"
+        "진행자 발언 : 트럼프 대통령은 이란 핵 프로그램 협상 진행 시 추가 공습 희박 시사",
+        "마르코 루비오 발언 : 이란의 요구 사항은 비현실적이며 수용 불가",
+        "댄 호프먼 발언 : 이란은 트럼프 행정부 임기를 버틸 수 있다고 판단 중"
       ]
     }
   ]
