@@ -3755,7 +3755,9 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   var homeUrl = location.protocol + '//' + location.host + '/';
   var fromHome = false;
   try { var ref = document.referrer ? new URL(document.referrer) : null; fromHome = !!ref && ref.host === location.host && /^\/(index\.html|preview\.html)?$/.test(ref.pathname); } catch (e) {}
-  if (kind === 'home' || (kind === 'back' && (fromHome || !lu))) setNav('홈으로', homeUrl);
+  /* list = 늘 `목록으로`(본문 [data-list-url]) — 증시 전망 상세 (2026-11-09 사용자: 홈이 아니라 전망 목록으로) */
+  if (kind === 'list' && lu) setNav('목록으로', lu.getAttribute('data-list-url'));
+  else if (kind === 'home' || (kind === 'back' && (fromHome || !lu))) setNav('홈으로', homeUrl);
   else if (kind === 'back') setNav('목록으로', lu.getAttribute('data-list-url'));
   else if (lu) navs.forEach(function (a) { a.href = lu.getAttribute('data-list-url'); });
   [].slice.call(document.querySelectorAll('.post-nav-top')).forEach(function (b) {

@@ -44,6 +44,7 @@ LIST_SLUG = "forecast-list"
 CARD_NAME = "증시 전망"
 # 글 보기 고정 머리 줄 글자 (2026-11-09 사용자: 질문이 머리 줄 · 본문 맨 위에 두 번 나온다) — 테마가 본문 [data-head-title] 로 바꾼다. 블로그 글 제목(검색)은 그대로
 HEAD_FORECAST, HEAD_LIST = "증시 전망 보기", "증시 전망 목록"
+# 상세 하단 버튼 · 머리 줄 화살표 = 전망 목록 (2026-11-09 사용자: 홈이 아니라 목록으로) — 테마가 data-nav="list" · data-title-back 을 읽는다
 
 # ---------------------------------------------------------------- 용어 · 색
 DIR_WORD = {1: "상승", -1: "하락"}
@@ -1426,7 +1427,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
             + (operator_box(op + _op_mood(fc) + ([("거래량", f'평소의 {st["volume_x"]:.1f}배 — 우리 전망 고르기 재료(뉴스 · 거래량 없는 급변은 반등 · 조정 쪽, 많으면 지속 쪽)')] if fc["kind"] == "after" and st.get("volume_x") else [])) if op else "")
             + more   # `더 궁금한 것` 제목 삭제 — 기록 · 앞으로 볼 것은 각자 구분선 구획 (2026-11-07 사용자)
             )   # `다른 전망` 구획 삭제 — 글 아래 [목록] 버튼이 전망 목록으로 간다, 이어진 전망은 겹침 카드 안 링크로 (P442, 2026-11-08 사용자)
-    return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-head-title="{HEAD_FORECAST}" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}</div>')
+    return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-head-title="{HEAD_FORECAST}" data-nav="list" data-title-back="{page_url(LIST_SLUG)}" data-title-back-label="목록" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}</div>')
 
 
 def seo_lead(fc, st=None):
