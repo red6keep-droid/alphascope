@@ -1468,8 +1468,8 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
     back_btn = (f'<a href="{page_url(back[1])}" style="display:inline-flex;align-items:center;gap:2px;margin-top:6px;padding:2px 6px 2px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;'
                 f'font-size:13px;line-height:18px;font-weight:600;color:#4B5563;text-decoration:none;white-space:nowrap;">이전전망'
                 f'<span style="display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right").replace(chr(39) + "16" + chr(39), chr(39) + "14" + chr(39))}</span></a>') if back else ""
-    # 머리 줄 구분선 ~ 질문 = 테마 .pr-sticky 아래 14 + 아이콘 위 2 = 16 → 위 여백 16 더해 32 (2026-11-09 사용자: 100% 늘려)
-    q = (f'<h2 style="{dk.H2}display:flex;flex-wrap:nowrap;align-items:flex-start;gap:8px;margin:16px 0 11px;">' + icon
+    # 머리 줄 구분선 ~ 질문 = 테마 .pr-sticky 아래 14 + 아이콘 위 2 = 16 → 위 여백 16 더해 32 (2026-11-09 사용자: 100% 늘려) → +10 = 위 여백 26 · 보이는 42 (같은 날 사용자)
+    q = (f'<h2 style="{dk.H2}display:flex;flex-wrap:nowrap;align-items:flex-start;gap:8px;margin:26px 0 11px;">' + icon
          + f'<span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;"><span style="word-break:keep-all;">{with_logos(fc["title"])}{sub_lab}</span>'
          # 날짜(급락일 · 결과) · `이전전망 ›` = 제목 아래 줄, 오른쪽 정렬 (2026-11-08 사용자 — 옛 P455 제목 줄 오른쪽 끝)
          + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:4px;line-height:{dk.LH_TINY};">'
