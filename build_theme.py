@@ -386,6 +386,10 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
 .post-nav-top:hover { color: var(--accent); }
 .post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
 .post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
+.post-nav-cm { grid-column: 1; grid-row: 1; justify-self: start; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; padding: 8px 0; background: none; border: 0;
+  font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 댓글 = 왼쪽 끝 글자 버튼, 말풍선 · 댓글 — TOP 과 거울 (2026-11-10 사용자) */
+.post-nav-cm:hover { color: var(--accent); }   /* TOP 과 같은 규칙 — 열린 상태 색은 두지 않는다(빨강 = ▲상승과 겹침) */
+.post-nav .post-nav-list, .post-nav .post-nav-top { grid-row: 1; }
 /* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px (테마 JS .ends-text, 2026-10-12 사용자) */
 body.item-view .post-outer-container { padding-bottom: 0 !important; }
 body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0; }
@@ -440,13 +444,16 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
    마크업은 테마 JS "댓글" IIFE 가 만든다 — 열기 버튼만 카드, 펼친 목록 · 쓰기 칸은 카드 밖 본문 폭 전체, 댓글 사이 1px 구분선.
    글자: 이름 16px 굵게, 글 19px · 행간 25, 날짜 · 안내 · 버튼 14px. 사진 24px. 입력창은 본문 폭 전체(폰 화면 − 28px). */
 .comments {
-  width: 100%; max-width: var(--shell); margin: 40px auto 0;   /* 목록 버튼과 40px (2026-10-12 사용자) */
+  width: 100%; max-width: var(--shell); margin: 0 auto;   /* 열기 버튼이 버튼 줄로 올라가 닫히면 빈 자리 (2026-11-10 사용자, 옛 40px) */
   font-size: 19px; line-height: 25px; color: #333; word-break: keep-all;
 }
 .comments .comments-title { margin: 0; padding: 0; border: 0; font-size: 16px; line-height: 24px; }
 /* 열기 버튼 = 흰 카드, `댓글 n` 16px 굵게 · 오른쪽 공식 접기 화살표(테두리 없이). 기본 닫힘, 주소가 #comments · #c… 면 열린 채로 (2026-10-12 · 13 사용자) */
 .comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 8px 8px 8px 16px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .comments-panel[hidden] { display: none; }
+.comments .comments-title[hidden] { display: none; }
+.post-nav ~ .comments .comments-panel { padding-top: 6px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
+.post-shell > [data-related].is-moved { margin-top: 40px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
 .comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
