@@ -1464,6 +1464,9 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
     icon = (f'<span style="display:flex;flex:none;align-items:center;height:1lh;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#0E7490;color:#fff;" aria-hidden="true">'
             '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">'
             '<path d="M8 2v12M4.5 14h7"/><path d="M2.5 5h11"/><path d="M4 5 2 9.5h4L4 5zM12 5l-2 4.5h4L12 5z"/></svg></span></span>')
+    title_html = with_logos(fc["title"])
+    if title_html != dk.esc(fc["title"]):   # 질문에 종목 로고가 붙으면 저울 아이콘 빼기 — 아이콘 두 개가 겹쳐 보임 (2026-11-10 사용자: `엔비디아 실적 뒤 반도체는?`)
+        icon = ""
     back = _back_of(fc)   # 세부 전망 페이지 — 질문 앞 보라 `세부전망` 라벨 + 날짜 아래 작은 `이전전망 ›` 버튼 (P481, 2026-11-08 사용자: 세부 전망은 전망이 있어야 있는 것)
     sub_lab = violet_word("- 세부전망") if back else ""   # 질문 문장 끝 · 보라 굵은 글씨, 상자 없음 (2026-11-08 사용자 — 옛 P481 질문 앞 상자 → 라벨)
     back_btn = (f'<a href="{page_url(back[1])}" style="display:inline-flex;align-items:center;gap:2px;margin-top:6px;padding:2px 6px 2px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;'
@@ -1471,7 +1474,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
                 f'<span style="display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right").replace(chr(39) + "16" + chr(39), chr(39) + "14" + chr(39))}</span></a>') if back else ""
     # 머리 줄 구분선 ~ 질문 = 테마 .pr-sticky 아래 14 + 아이콘 위 2 = 16 → 위 여백 16 더해 32 (2026-11-09 사용자: 100% 늘려) → +10 = 위 여백 26 · 보이는 42 (같은 날 사용자)
     q = (f'<h2 style="{dk.H2}display:flex;flex-wrap:nowrap;align-items:flex-start;gap:8px;margin:26px 0 11px;">' + icon
-         + f'<span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;"><span style="word-break:keep-all;">{with_logos(fc["title"])}{sub_lab}</span>'
+         + f'<span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;"><span style="word-break:keep-all;">{title_html}{sub_lab}</span>'
          # 날짜(급락일 · 결과) · `이전전망 ›` = 제목 아래 줄, 오른쪽 정렬 (2026-11-08 사용자 — 옛 P455 제목 줄 오른쪽 끝)
          + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:4px;line-height:{dk.LH_TINY};">'
          + _date_row(fc, out=not before and fc["kind"] == "pre").replace("flex-direction:column;align-items:flex-end;", "flex-wrap:wrap;align-items:center;gap:4px 10px;", 1)
