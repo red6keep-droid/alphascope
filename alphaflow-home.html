@@ -200,6 +200,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 
 .nav-toggle { display: none; }
+.menu-quick { display: none; }   /* 폰 · 태블릿에서만 (아래 900px 규칙) */
 /* 서랍 메뉴의 닫기 버튼·뒤 가림막 — JS가 만든다. 데스크톱에서는 쓰지 않는다 */
 .nav-close {
   display: none; position: absolute; top: 16px; right: 16px;
@@ -342,6 +343,14 @@ body.menu-open { overflow: hidden; }
 .nt-more { padding: 8px 0 4px; font-size: 14px; line-height: 20px; color: #2563EB; cursor: pointer; }
 .nt-note { padding: 8px 0; font-size: 15px; line-height: 23px; color: var(--gray-400); }
 @media (max-width: 900px) { .nt-grid { grid-template-columns: minmax(0, 1fr); } }
+/* 미국 · 한국 화면 나누기 (2026-11-10 사용자, 홈 수정 H35) — body[data-home-mkt="us"|"kr"] 일 때만. 속성이 없으면 지금 홈(두 시장 함께) 그대로.
+   카드 넷 = 그 시장 리포트 · 인물 발언 · 증시 전망 · 주목할 종목(그 시장 칸만) → 2×2. 시장 탭은 숨기고 그 시장으로 고정 */
+body[data-home-mkt] .mkt-tabs { display: none; }
+body[data-home-mkt="us"] #kr-report-col, body[data-home-mkt="kr"] #us-report-col { display: none; }
+body[data-home-mkt="us"] [data-hook="notable-kr"], body[data-home-mkt="kr"] [data-hook="notable-us"] { display: none; }
+body[data-home-mkt] #notable-col { grid-column: auto; }
+body[data-home-mkt] .nt-grid { grid-template-columns: minmax(0, 1fr); }
+body[data-home-mkt="kr"] .news-section, body[data-home-mkt="kr"] .breaking { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 (아래 영어 뉴스 띠도) */
 #radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
@@ -699,39 +708,38 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .event-banner { --eb-bg: #111827; position: relative; overflow: hidden; margin-top: calc(-1 * var(--card-gap)); background: var(--eb-bg); color: #fff;
   box-shadow: 0 0 0 100vmax var(--eb-bg); clip-path: inset(0 -100vmax); transition: background-color .45s ease, box-shadow .45s ease; }
 .event-banner[hidden] { display: none; }
-.eb-viewport { overflow: hidden; }
+.eb-viewport { overflow: hidden; touch-action: pan-y; }   /* 옆으로 미는 손짓은 JS 가 받는다 (2026-11-10 사용자: 손으로 넘기기) */
 .eb-track { display: flex; transition: transform .45s ease; }
-.eb-slide { flex: 0 0 100%; min-width: 0; display: flex; align-items: center; gap: 18px; padding: 34px 8px 48px; color: inherit; text-decoration: none; }
-.eb-slide .stock-avatar { flex: none; width: 56px; height: 56px; font-size: 20px; }
+.eb-track.is-drag { transition: none; }
+.eb-slide { flex: 0 0 100%; min-width: 0; display: flex; align-items: center; gap: 14px; padding: 18px 8px 26px; color: inherit; text-decoration: none; }
+.eb-slide .stock-avatar { flex: none; width: 44px; height: 44px; font-size: 16px; }
 /* 짙은 바탕에서는 로고 뒤 밝은 원이 가장자리로 새어 나와 테두리가 깨져 보인다 (2026-10-29 사용자) — 로고가 뜨면 뒤 원을 지운다 */
 .eb-slide .stock-avatar.has-logo { background: transparent !important; }
-.eb-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.eb-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .eb-kicker { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.eb-name { font-size: 29px; font-weight: 800; line-height: 39px; letter-spacing: -.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.eb-dday { flex: none; padding: 0 9px; border-radius: 6px; background: #F43F5E; color: #fff; font-family: var(--num); font-size: 15px; font-weight: 700; line-height: 27px; white-space: nowrap; }
+.eb-name { font-size: 22px; font-weight: 800; line-height: 30px; letter-spacing: -.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eb-dday { flex: none; padding: 0 7px; border-radius: 5px; background: #F43F5E; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 22px; white-space: nowrap; }
 .eb-dday.is-ahead { background: #F97316; }   /* D-숫자는 전부 주황, D-DAY 만 빨강 (2026-10-29 사용자) */
 .eb-title-line { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
 .eb-title { flex: none; font-size: 18px; font-weight: 700; line-height: 26px; }
 .eb-when { min-width: 0; font-size: 15px; line-height: 23px; color: rgba(255, 255, 255, .78); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .eb-slide:hover .eb-name { text-decoration: underline; text-underline-offset: 5px; }
 .eb-more { margin-left: auto; flex: none; display: flex; align-items: center; gap: 14px; margin-right: 8px; color: rgba(255, 255, 255, .7); font-size: 15px; white-space: nowrap; }
-.eb-chev { width: 18px; height: 18px; border-top: 3px solid rgba(255, 255, 255, .55); border-right: 3px solid rgba(255, 255, 255, .55); transform: rotate(45deg); }
-.eb-dots { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 2px; }
+.eb-dots { position: absolute; left: 0; right: 6px; bottom: 9px; display: flex; justify-content: flex-end; gap: 2px; }   /* 점은 오른쪽 정렬 (2026-11-10 사용자) — 점 버튼 안쪽 2 + 6 = 글자 기준선 8 */
 .eb-dots[hidden] { display: none; }
-.eb-dot { height: 20px; padding: 0 2px; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-.eb-dot::before { content: ''; width: 8px; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .35); transition: width .25s, background .25s; }
-.eb-dot[aria-selected="true"]::before { width: 26px; background: #fff; }   /* 바탕색이 바뀌므로 파랑 대신 흰색 */
+.eb-dot { height: 12px; padding: 0 2px; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.eb-dot::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, .35); transition: background .25s; }   /* 점 5×5 (2026-11-10 사용자) */
+.eb-dot[aria-selected="true"]::before { background: #fff; }   /* 바탕색이 바뀌므로 파랑 대신 흰색 */
 @media (max-width: 680px) {
-  .eb-slide { gap: 12px; padding: 24px 4px 40px; }
-  .eb-slide .stock-avatar { width: 44px; height: 44px; font-size: 16px; }
-  .eb-name { font-size: 23px; line-height: 31px; }
-  .eb-dday { font-size: 13px; line-height: 23px; padding: 0 7px; }
+  .eb-slide { gap: 10px; padding: 12px 4px 20px; }
+  .eb-slide .stock-avatar { width: 36px; height: 36px; font-size: 14px; }
+  .eb-name { font-size: 17px; line-height: 24px; }
+  .eb-dday { font-size: 12px; line-height: 19px; padding: 0 6px; }
   .eb-title-line { gap: 8px; }
   .eb-title { font-size: 15px; line-height: 23px; }
   .eb-when { font-size: 13px; line-height: 21px; }
   .eb-more { margin-right: 4px; }
-  .eb-more-text { display: none; }   /* 폰은 화살표만 */
-  .eb-chev { width: 14px; height: 14px; border-width: 2.5px; }
+  .eb-more-text { display: none; }   /* 폰은 글자도 없음 — 화살표는 삭제 (2026-11-10 사용자) */
 }
 @media (prefers-reduced-motion: reduce) { .eb-track, .eb-dot::before { transition: none; } }
 .home-cards .report-col,
@@ -899,9 +907,26 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
   .nav-item { padding: 14px 24px; font-size: 18px; line-height: 28px; border-bottom: 1px solid var(--border); }
   .nav-item[aria-current="page"]::after { display: none; }
   .nav-close { display: flex; }
+  /* 폰 · 태블릿: 로고 오른쪽 · 메뉴 아이콘 앞에 메뉴를 바로 보인다 (2026-11-10 사용자). 서랍 메뉴를 JS 가 복사 — 메뉴 원본은 하나.
+     좁아서 넘치면 이 줄만 옆으로 밀린다(가로 스크롤) — 로고 · 아이콘은 줄지 않는다 */
+  .menu-quick { display: flex; align-items: center; flex: 0 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .menu-quick::-webkit-scrollbar { display: none; }
+  .menu-quick .nav-item { padding: 6px 7px; border-bottom: 0; font-size: 16px; line-height: 22px; }
+  .navbar { flex-wrap: nowrap; }
+  .nav-left { flex: none; }
+  .nav-right { flex: 0 1 auto; min-width: 0; }
 
   .briefing-main { grid-template-columns: minmax(0, 1fr); }
   .briefing-main > .report-col:last-child { grid-column: auto; }
+}
+@media (max-width: 480px) {
+  /* 폰: 로고 · 메뉴 · 아이콘이 한 줄에 다 들어가게 (360 폭 기준) */
+  .navbar { gap: 6px; }
+  .nav-right { gap: 4px; }
+  .logo { gap: 6px; }
+  .logo-mark { width: 28px; height: 26px; }
+  .logo-word { font-size: 19px; line-height: 26px; letter-spacing: -0.4px; }
+  .menu-quick .nav-item { padding: 6px 5px; font-size: 15px; letter-spacing: -0.3px; }
 }
 
 @media (max-width: 680px) {
@@ -1052,7 +1077,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       <div class="briefing-main">
         <!-- 연동 훅: 카드 전체가 그 리포트 글로 가는 링크다.
              href · 날짜 · 본문 문구는 블로거 피드에서 채운다 (라벨별 최신 글 1건). -->
-        <div class="report-col">
+        <div class="report-col" id="us-report-col">
         <h3 class="report-title"><span class="report-icon" style="background:#E53E3E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="5" width="3" height="9" rx=".5"/><rect x="11" y="2" width="3" height="12" rx=".5"/></svg></span>미국 증시<span class="report-card-date" data-date="report-card"></span></h3>
         <a class="report-card" id="report-card" href="#">
           <!-- 리포트 본문 맨 위 S&P 500 그래프를 그대로 복제해 카드 안에 (2026-10-21 사용자: "상세 페이지 그래프는 그대로, 복제해서 홈 카드에"). 그래프를 누르면 확대 팝업, 그 밖은 글로 -->
@@ -1068,7 +1093,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         </div>
 
         <!-- 한국 증시 리포트 카드 — 미국 증시 카드와 같은 모양, 코스피 봉차트 복제 + 요약 한 줄 (2026-10-29 사용자, 홈 수정 H24). 글이 없으면 라벨 목록으로 -->
-        <div class="report-col">
+        <div class="report-col" id="kr-report-col">
         <h3 class="report-title"><span class="report-icon" style="background:#1D4ED8;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="5" width="3" height="9" rx=".5"/><rect x="11" y="2" width="3" height="12" rx=".5"/></svg></span>한국 증시<span class="report-card-date" data-date="kr-report-card"></span></h3>
         <a class="report-card" id="kr-report-card" href="/search/label/한국%20증시%20리포트">
           <img class="report-chart" data-hook="kr-report-chart" data-zoom="1" alt="" hidden="hidden"/>
@@ -1385,7 +1410,10 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 
   var stocks = [];
   /* 한국 탭 (2026-10-24 사용자) — kr.json (experiments/kr-stocks/home_feed_kr.py, 한국 장 마감 뒤 하루 1회). 두 카드가 각자 미국 · 한국을 고른다 */
-  var krHome = null, rankMarket = 'us', picksMarket = 'us';
+  /* 미국 · 한국 화면 (H35, 2026-11-10 사용자) — body[data-home-mkt] 가 있으면 그 시장만. 없으면 '' = 지금 홈(두 시장) */
+  var HOME_MKT = (document.body && document.body.getAttribute('data-home-mkt')) || '';
+  var krHome = null, rankMarket = HOME_MKT || 'us', picksMarket = HOME_MKT || 'us';
+  if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/kr-market-cap-top10.html'; }
   var KR_URL = GH + 'kr.json';
 
   /* ===== 장중 가격 (2026-11-05 사용자) — 한국 종목 live.json (experiments/kr-stocks/collect_kr_live.py, 장중 10분마다, 야후 약 20분 지연).
@@ -1639,6 +1667,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   function pickEvents() {
     var today = kstToday();
     var lists = ['us', 'kr'].map(function (m) {
+      if (HOME_MKT && m !== HOME_MKT) return [];   /* 시장 화면이면 그 시장 일정만 (H35) */
       return (eventFeeds[m] || []).filter(function (e) { return e && e.slug && e.day >= today; })
         .map(function (e, i) { return { e: e, m: m, i: i }; });
     });
@@ -1664,7 +1693,6 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     a.appendChild(t);
     var more = el('span', 'eb-more');
     more.appendChild(el('span', 'eb-more-text', '일정 보기'));
-    more.appendChild(el('span', 'eb-chev'));
     a.appendChild(more);
     return a;
   }
@@ -1704,6 +1732,27 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       box.dataset.wired = '1';
       box.addEventListener('mouseenter', ebStop); box.addEventListener('mouseleave', ebStart);
       box.addEventListener('focusin', ebStop); box.addEventListener('focusout', ebStart);
+      /* 손으로 밀어 넘기기 (2026-11-10 사용자) — 손가락을 따라 움직이고, 폭의 15% 넘게 밀면 다음 · 이전 장. 민 뒤 따라오는 click(글로 이동)은 막는다 */
+      var vp = box.querySelector('.eb-viewport'), sx = 0, sy = 0, dx = 0, drag = false, swiped = false;
+      vp.addEventListener('touchstart', function (e) {
+        var t = e.touches[0]; sx = t.clientX; sy = t.clientY; dx = 0; drag = false; swiped = false; ebStop();
+      }, { passive: true });
+      vp.addEventListener('touchmove', function (e) {
+        var t = e.touches[0], mx = t.clientX - sx, my = t.clientY - sy;
+        if (!drag && Math.abs(mx) > 8 && Math.abs(mx) > Math.abs(my)) { drag = true; track.classList.add('is-drag'); }
+        if (!drag) return;
+        dx = mx;
+        track.style.transform = 'translateX(calc(' + (-100 * ebIndex) + '% + ' + dx + 'px))';
+      }, { passive: true });
+      vp.addEventListener('touchend', function () {
+        track.classList.remove('is-drag');
+        if (drag) {
+          swiped = true;
+          if (Math.abs(dx) > vp.clientWidth * 0.15) ebGo(ebIndex + (dx < 0 ? 1 : -1)); else ebGo(ebIndex);
+        }
+        drag = false; ebStart();
+      });
+      vp.addEventListener('click', function (e) { if (swiped) { e.preventDefault(); e.stopPropagation(); swiped = false; } }, true);
     }
     ebGo(0); ebStart();
   }
@@ -2639,6 +2688,10 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   var closeBtn = document.createElement('button'); closeBtn.type = 'button'; closeBtn.className = 'nav-close';
   closeBtn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg><span class="sr-only">메뉴 닫기</span>';
   menu.insertBefore(closeBtn, menu.firstChild);
+  /* 폰에서 바로 보이는 메뉴 줄 — 서랍 메뉴 링크를 그대로 복사해 아이콘 앞에 (2026-11-10 사용자) */
+  var quick = document.createElement('nav'); quick.className = 'menu-quick'; quick.setAttribute('aria-label', '주 메뉴 바로가기');
+  [].forEach.call(menu.querySelectorAll('a.nav-item'), function (a) { quick.appendChild(a.cloneNode(true)); });
+  toggle.parentNode.insertBefore(quick, toggle);
   function narrow() { return window.matchMedia('(max-width: 900px)').matches; }
   function setMenu(open) {
     toggle.setAttribute('aria-expanded', String(open));

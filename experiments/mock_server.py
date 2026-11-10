@@ -36,6 +36,7 @@ LABELS = {
     "theme-monitor": "테마",
     "media-daily": "미디어 데일리",
     "competitiveness": "국가 경쟁력",
+    "home-split": "홈 나누기",   # 미국 화면 · 한국 화면 (2026-11-10 사용자, H35)
     "issue_store": "증시 전망",   # 사건 가설 질문 페이지 · 목록 · 홈 카드 목업 (2026-11-06)
 }
 RECENT_N = 12
