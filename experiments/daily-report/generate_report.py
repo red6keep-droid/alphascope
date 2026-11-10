@@ -40,12 +40,22 @@ def _load_payload(input_path, analysis_path):
             for k in ("regime", "status", "watch", "korea", "fx", "calendar", "regime_check", "krw_check"):
                 data.pop(k, None)
             data["raw"].pop("calendar", None)
+            _drop_card_only(data["raw"])
             return data
         print("[Gemini] analysis.json에 raw가 없어 원본만 보냅니다.")
     else:
         print("[Gemini] 입력: report_input.json (원본만 — 분석 없음)")
     with open(input_path, "r", encoding="utf-8") as f:
-        return {"raw": json.load(f)}
+        raw = json.load(f)
+    _drop_card_only(raw)
+    return {"raw": raw}
+
+
+def _drop_card_only(raw):
+    """카드 전용 값은 AI 에 보내지 않는다 — 실업수당 청구 · 헤지펀드 선물 포지션 (2026-11-09: 프롬프트 · 토큰 그대로, 문장이 포지션을 해석하지 않게)."""
+    raw.pop("cftc", None)
+    for k in ("claims", "claims_4wk", "claims_cont"):
+        (raw.get("macro") or {}).pop(k, None)
 
 
 def generate_report(input_path, output_path, analysis_path=None):

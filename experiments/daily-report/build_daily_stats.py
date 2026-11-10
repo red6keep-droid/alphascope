@@ -134,7 +134,8 @@ def macro_effect():
         "OPEX": set(ms[ms.subkind == "월간 옵션 만기"].day),
     }
     days = r.index.strftime("%Y-%m-%d")
-    any_ev = set().union(*kinds.values())
+    any_ev = set().union(*kinds.values())   # `보통 날` = 위 큰 일정이 없는 날 — 주간 실업수당은 거의 매주라 보통 날에서 빼지 않는다 (빼면 기존 숫자가 다 바뀐다)
+    kinds["CLAIMS"] = set(ev[ev.subkind == "주간 실업수당"].day)   # 2009~ (2026-11-09 사용자)
     normal = r[[d not in any_ev for d in days]].abs()
     out = {"from": str(r.index[0].date()), "to": str(r.index[-1].date()), "normal": _pct(normal.median()), "normal_n": int(len(normal)), "kinds": {}}
     for k, ds in kinds.items():

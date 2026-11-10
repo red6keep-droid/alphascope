@@ -17,7 +17,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 STATS = os.path.join(BASE, "static", "daily_stats.json")
 LOOKAHEAD = 14
 FRED_URL = "https://api.stlouisfed.org/fred/release/dates"
-FRED_RELEASES = {10: "CPI", 50: "NFP", 53: "GDP", 54: "PCE"}
+FRED_RELEASES = {10: "CPI", 50: "NFP", 53: "GDP", 54: "PCE", 180: "CLAIMS"}   # 180 = 주간 실업수당 (매주 목, 2026-11-09 사용자)
 MEGA = ["NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "LLY"]
 
 

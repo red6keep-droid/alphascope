@@ -834,7 +834,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     move = mk.move_cards(a, prev)
     if move:
         parts.append(dk.section("종목 · 업종", grid(move), tab=TAB_TODAY))
-    base = mk.base_cards(a, input_data.get("macro") or {})
+    base = mk.base_cards(a, input_data.get("macro") or {}, input_data.get("cftc"))
     if base:
         parts.append(dk.section("시장 환경", grid(base), tab=TAB_TODAY))   # 옛 `시장 바탕` (2026-11-08 사용자 P404)
     parts += [

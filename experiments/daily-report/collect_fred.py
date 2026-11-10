@@ -1,6 +1,7 @@
 """FRED 경제 지표 수집
 
-실업률(UNRATE), CPI(CPIAUCSL), VIX(VIXCLS)와 금리 4종(DGS10, DGS2, T10Y2Y, DFF)
+실업률(UNRATE), CPI(CPIAUCSL), VIX(VIXCLS), 금리 4종(DGS10, DGS2, T10Y2Y, DFF),
+주간 실업수당 3종(ICSA 신규 · IC4WSA 4주 평균 · CCSA 계속)
 시계열의 최근 관측치를 가져온다. API 키는 FRED_API_KEY 환경 변수(.env)에서 읽는다.
 
 금리 일간 시리즈는 전 영업일 값으로 내려오는 날이 많다. 당일 10년물은
@@ -24,6 +25,10 @@ SERIES = {
     "us2y": "DGS2",
     "spread_10_2": "T10Y2Y",
     "fed_funds": "DFF",
+    # 주간 실업수당 청구 (매주 목 08:30 ET, 계절 조정) — 필수 아님. 결측이면 `경제 지표는?` 카드에서 그 줄만 빠진다 (2026-11-09 사용자)
+    "claims": "ICSA",           # 신규 청구, 기준일 = 그 주 토요일
+    "claims_4wk": "IC4WSA",     # 신규 청구 4주 평균
+    "claims_cont": "CCSA",      # 계속 청구 (신규보다 한 주 늦다)
 }
 
 TIMEOUT = 30
