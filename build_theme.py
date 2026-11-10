@@ -453,7 +453,10 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments-panel[hidden] { display: none; }
 .comments .comments-title[hidden] { display: none; }
 .post-nav ~ .comments .comments-panel { padding-top: 6px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
-.post-shell > [data-related].is-moved > div:first-child { font-size: 16px !important; line-height: 26px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
+.post-shell > [data-related].is-moved > div:first-child { font-size: 16px !important; line-height: 26px; }
+.post-shell > [data-related] a[data-row-link] { font-weight: 700 !important; }   /* `함께 보는 페이지` 줄 16 굵게 (2026-11-10 사용자) — 이미 게시된 글의 인라인 400 을 덮는다. 렌더러 dk.related_rows 도 700 */
+body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
+body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
 .post-shell > [data-related].is-moved { margin-top: 40px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
