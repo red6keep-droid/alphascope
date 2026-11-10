@@ -48,7 +48,7 @@ def _load(path, default):
 
 def targets():
     """(키 = slug, 한글 제목, 영문 제목, 주소, 본문 파일) — 본문이 없는 것은 건너뛴다(그날 판정 실패 등)."""
-    regs = [H.load(p) for p in sorted(glob.glob(os.path.join(HERE, "hypotheses", "EH-*.json"))) if not p.endswith("_prices.json")]
+    regs = H.load_regs(os.environ.get("STATE_DIR"))   # 손으로 만든 hypotheses/ + 자동 등록(상태 저장소 records/hypotheses, 워크플로 STATE_DIR) (2026-11-11)
     rows = [(fc["slug"], fc["title"]) for r in regs for fc in H.forecasts(r, public=True)] + [(H.LIST_SLUG, LIST_TITLE)]
     out = []
     for slug, title in rows:

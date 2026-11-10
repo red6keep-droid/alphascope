@@ -452,7 +452,7 @@ def judge(fc, days, rel, cond=None, vix=None):
                 e["text"] = f'결과가 나왔습니다 : {fc["outcomes"][cond - 1]}.{sur} 결과 직전 종가({md(bday)})부터 잽니다. ' + e["text"]
                 break
     st = {"log": log, "result": result, "cond": cond, "rel": last_rel, "days": days, "rel_series": rel, "fixed": fixed, "missing": missing,
-          "vix": vix[[j for j, v in enumerate(rel) if v is not None][-1]] if vix else None}
+          "vix": vix[[j for j, v in enumerate(rel) if v is not None][-1]] if vix and any(v is not None for v in rel) else None}   # 값이 하나도 없는 날(기준일 시세 없음)에 멈추던 것 (2026-11-11)
     if fc["kind"] == "after" and last_rel is not None:
         st["recovery"] = max(0.0, (1 - last_rel / fc["gap"]) * 100)
     return st
@@ -1402,6 +1402,20 @@ def _overlap_card(o, text):
         lines.append(_link_btn(f'{"전망" if parent else "세부 전망"} : {o.get("title", "")}', o["slug"]))
     html = qc.end_fix(qc.question_card(title, ans, "neutral", "#111", lines, fold=True, opened=False))
     return _tag_title(html, title, overlap_pill())   # 노랑 뉴스 라벨 크기 (2026-11-08 사용자)
+
+
+def reg_dirs(state_dir=None):
+    """등록 파일 폴더 — 손으로 만든 hypotheses/ + 자동 등록(forecast_register) 폴더: 상태 저장소 records/hypotheses, 미리보기는 output/forecast/hypotheses (2026-11-11)."""
+    auto = os.path.join(state_dir, "records", "hypotheses") if state_dir else os.path.join(_HERE, "output", "forecast", "hypotheses")
+    return [os.path.join(_HERE, "hypotheses"), auto]
+
+
+def load_regs(state_dir=None):
+    import glob as _glob
+    out = []
+    for d in reg_dirs(state_dir):
+        out += [load(p) for p in sorted(_glob.glob(os.path.join(d, "EH-*.json"))) if not p.endswith("_prices.json")]
+    return out
 
 
 def forecasts(reg, public=False):
