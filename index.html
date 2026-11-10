@@ -138,12 +138,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav-right { display: flex; align-items: center; gap: 20px; flex: none; }
 
 .logo { display: flex; align-items: center; gap: 8px; flex: none; }
-.logo-mark { width: 36px; height: 33px; flex: none; display: block; }   /* 로고 313:286 (2026-10-13 사용자 새 로고) */
+.logo-mark { width: 36px; height: 33px; flex: none; display: block; }   /* 로고 313:286 (2026-10-13 사용자 새 로고). 36 → 32.4 → 34 → 36 (5% 키움 35.7 → 정수, 2026-11-10 사용자) */
 .logo-word {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 900;
-  font-size: 24px;
-  line-height: 32px;
+  font-size: 22px;   /* 24 → 19.2 → 21 → 22 (5% 키움 22.05 → 정수, 2026-11-10 사용자) */
+  line-height: 30px;
   letter-spacing: -0.2px;
   color: #000;
   white-space: nowrap;
@@ -233,6 +233,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 
 .nav-toggle { display: none; }
+.menu-quick { display: none; }   /* 폰 · 태블릿에서만 (아래 900px 규칙) */
 /* 서랍 메뉴의 닫기 버튼·뒤 가림막 — JS가 만든다. 데스크톱에서는 쓰지 않는다 */
 .nav-close {
   display: none; position: absolute; top: 16px; right: 16px;
@@ -243,6 +244,33 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav-overlay { position: fixed; inset: 0; z-index: 49; background: transparent; }   /* 헤더(50) 아래 — 서랍은 헤더 안에 있어 55로 두면 가림막이 서랍을 덮어 메뉴가 눌리지 않았다 (2026-10-13 사용자: "메뉴를 클릭시 목록 화면으로 이동되지 않는다")   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
+/* 미국 ⇄ 한국 스위치 (2026-11-10 사용자: "스위치로. 홈은 미국이니 미국일 때는 한국 국기") — 지금 화면이 아닌 쪽 국기 + 이름 하나 */
+.nav-switch { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 4px 12px 4px 4px; border: 1px solid var(--border-strong); border-radius: 999px; background: #fff; color: #111; font-size: 15px; font-weight: 700; line-height: 22px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: border-color .15s ease, background-color .15s ease; }
+.nav-switch:hover { border-color: #94A3B8; background: #F8FAFC; }
+/* 높이 36 = 메뉴 아이콘 테두리 36 과 같게 (국기 26 + 위아래 4 + 테두리 1, 2026-11-10 사용자) */
+.nav-switch svg { width: 26px; height: 26px; flex: none; display: block; border-radius: 50%; }
+/* 바로 보이는 메뉴 · 서랍 메뉴 나누기 (2026-11-10 사용자: "미국, 한국만 메뉴, 증시 전망은 메뉴 아이콘 안으로").
+   서랍 메뉴 링크 가운데 data-bar 가 붙은 것만 로고 오른쪽 줄에 복사하고 body.has-bar 를 붙인다(JS). 그때는 PC 에서도 메뉴 아이콘 · 서랍을 쓴다.
+   data-bar 가 하나도 없으면(지금 테마) 예전 그대로: PC 는 메뉴 전부 줄로, 폰은 전부 복사 */
+@media (min-width: 901px) {
+  body.has-bar .menu-quick { display: flex; align-items: center; gap: 12px; align-self: stretch; }
+  body.has-bar .nav-toggle {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; flex: none;
+    border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600);
+  }
+  body.has-bar .menu-items {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 60;
+    width: 320px; flex-direction: column; align-items: stretch; gap: 0;
+    padding: 72px 0 24px; background: var(--surface);
+    box-shadow: -8px 0 30px rgba(15,23,42,.18);
+    transform: translateX(100%); transition: transform .22s ease; overflow-y: auto;
+  }
+  body.has-bar .menu-items.is-open { transform: none; }
+  body.has-bar .menu-items .nav-item { padding: 14px 24px; font-size: 18px; line-height: 28px; border-bottom: 1px solid var(--border); }
+  body.has-bar .menu-items .nav-item[aria-current="page"]::after { display: none; }
+  body.has-bar .nav-close { display: flex; }
+}
 
 /* ==========================================================================
    shell
@@ -375,6 +403,14 @@ body.menu-open { overflow: hidden; }
 .nt-more { padding: 8px 0 4px; font-size: 14px; line-height: 20px; color: #2563EB; cursor: pointer; }
 .nt-note { padding: 8px 0; font-size: 15px; line-height: 23px; color: var(--gray-400); }
 @media (max-width: 900px) { .nt-grid { grid-template-columns: minmax(0, 1fr); } }
+/* 미국 · 한국 화면 나누기 (2026-11-10 사용자, 홈 수정 H35) — body[data-home-mkt="us"|"kr"] 일 때만. 속성이 없으면 지금 홈(두 시장 함께) 그대로.
+   카드 넷 = 그 시장 리포트 · 인물 발언 · 증시 전망 · 주목할 종목(그 시장 칸만) → 2×2. 시장 탭은 숨기고 그 시장으로 고정 */
+body[data-home-mkt] .mkt-tabs { display: none; }
+body[data-home-mkt="us"] #kr-report-col, body[data-home-mkt="kr"] #us-report-col { display: none; }
+body[data-home-mkt="us"] [data-hook="notable-kr"], body[data-home-mkt="kr"] [data-hook="notable-us"] { display: none; }
+body[data-home-mkt] #notable-col { grid-column: auto; }
+body[data-home-mkt] .nt-grid { grid-template-columns: minmax(0, 1fr); }
+body[data-home-mkt="kr"] .news-section, body[data-home-mkt="kr"] .breaking { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 (아래 영어 뉴스 띠도) */
 #radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
@@ -729,42 +765,41 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 /* 일정 배너 (2026-10-29 사용자 시안) — 헤더 바로 아래 화면 전폭 띠. 한 장씩 옆으로 넘어가고(4초) 가운데 아래 점으로 고른다.
    글자는 카드 열에 맞추고 바탕만 box-shadow 로 화면 끝까지 (회색 구역과 같은 방식).
    바탕은 장마다 짙은 색을 돌려 쓴다 (2026-10-29 사용자: "전부 남색이면 단조롭다") — JS 가 --eb-bg 를 바꾸고 여기서 서서히 바뀐다 */
-.event-banner { --eb-bg: #111827; position: relative; overflow: hidden; margin-top: calc(-1 * var(--card-gap)); background: var(--eb-bg); color: #fff;
+.event-banner { --eb-bg: #1E3A8A; position: relative; overflow: hidden; margin-top: calc(-1 * var(--card-gap)); background: var(--eb-bg); color: #fff;
   box-shadow: 0 0 0 100vmax var(--eb-bg); clip-path: inset(0 -100vmax); transition: background-color .45s ease, box-shadow .45s ease; }
 .event-banner[hidden] { display: none; }
-.eb-viewport { overflow: hidden; }
+.eb-viewport { overflow: hidden; touch-action: pan-y; }   /* 옆으로 미는 손짓은 JS 가 받는다 (2026-11-10 사용자: 손으로 넘기기) */
 .eb-track { display: flex; transition: transform .45s ease; }
-.eb-slide { flex: 0 0 100%; min-width: 0; display: flex; align-items: center; gap: 18px; padding: 34px 8px 48px; color: inherit; text-decoration: none; }
-.eb-slide .stock-avatar { flex: none; width: 56px; height: 56px; font-size: 20px; }
+.eb-track.is-drag { transition: none; }
+.eb-slide { flex: 0 0 100%; min-width: 0; display: flex; align-items: center; gap: 14px; padding: 28px 8px 36px;   /* 높이 102 → 122 (20%, 2026-11-10 사용자) */ color: inherit; text-decoration: none; }
+.eb-slide .stock-avatar { flex: none; width: 44px; height: 44px; font-size: 16px; }
 /* 짙은 바탕에서는 로고 뒤 밝은 원이 가장자리로 새어 나와 테두리가 깨져 보인다 (2026-10-29 사용자) — 로고가 뜨면 뒤 원을 지운다 */
 .eb-slide .stock-avatar.has-logo { background: transparent !important; }
-.eb-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.eb-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .eb-kicker { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.eb-name { font-size: 29px; font-weight: 800; line-height: 39px; letter-spacing: -.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.eb-dday { flex: none; padding: 0 9px; border-radius: 6px; background: #F43F5E; color: #fff; font-family: var(--num); font-size: 15px; font-weight: 700; line-height: 27px; white-space: nowrap; }
+.eb-name { font-size: 22px; font-weight: 800; line-height: 30px; letter-spacing: -.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eb-dday { flex: none; padding: 0 7px; border-radius: 5px; background: #F43F5E; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 22px; white-space: nowrap; }
 .eb-dday.is-ahead { background: #F97316; }   /* D-숫자는 전부 주황, D-DAY 만 빨강 (2026-10-29 사용자) */
 .eb-title-line { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
 .eb-title { flex: none; font-size: 18px; font-weight: 700; line-height: 26px; }
 .eb-when { min-width: 0; font-size: 15px; line-height: 23px; color: rgba(255, 255, 255, .78); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .eb-slide:hover .eb-name { text-decoration: underline; text-underline-offset: 5px; }
 .eb-more { margin-left: auto; flex: none; display: flex; align-items: center; gap: 14px; margin-right: 8px; color: rgba(255, 255, 255, .7); font-size: 15px; white-space: nowrap; }
-.eb-chev { width: 18px; height: 18px; border-top: 3px solid rgba(255, 255, 255, .55); border-right: 3px solid rgba(255, 255, 255, .55); transform: rotate(45deg); }
-.eb-dots { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 2px; }
+.eb-dots { position: absolute; left: 0; right: 6px; bottom: 9px; display: flex; justify-content: flex-end; gap: 2px; }   /* 점은 오른쪽 정렬 (2026-11-10 사용자) — 점 버튼 안쪽 2 + 6 = 글자 기준선 8 */
 .eb-dots[hidden] { display: none; }
-.eb-dot { height: 20px; padding: 0 2px; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-.eb-dot::before { content: ''; width: 8px; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .35); transition: width .25s, background .25s; }
-.eb-dot[aria-selected="true"]::before { width: 26px; background: #fff; }   /* 바탕색이 바뀌므로 파랑 대신 흰색 */
+.eb-dot { height: 12px; padding: 0 2px; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.eb-dot::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, .35); transition: background .25s; }   /* 점 5×5 (2026-11-10 사용자) */
+.eb-dot[aria-selected="true"]::before { background: #fff; }   /* 바탕색이 바뀌므로 파랑 대신 흰색 */
 @media (max-width: 680px) {
-  .eb-slide { gap: 12px; padding: 24px 4px 40px; }
-  .eb-slide .stock-avatar { width: 44px; height: 44px; font-size: 16px; }
-  .eb-name { font-size: 23px; line-height: 31px; }
-  .eb-dday { font-size: 13px; line-height: 23px; padding: 0 7px; }
+  .eb-slide { gap: 10px; padding: 20px 4px 28px; }   /* 높이 81 → 97 (20%, 2026-11-10 사용자) */
+  .eb-slide .stock-avatar { width: 36px; height: 36px; font-size: 14px; }
+  .eb-name { font-size: 17px; line-height: 24px; }
+  .eb-dday { font-size: 12px; line-height: 19px; padding: 0 6px; }
   .eb-title-line { gap: 8px; }
   .eb-title { font-size: 15px; line-height: 23px; }
   .eb-when { font-size: 13px; line-height: 21px; }
   .eb-more { margin-right: 4px; }
-  .eb-more-text { display: none; }   /* 폰은 화살표만 */
-  .eb-chev { width: 14px; height: 14px; border-width: 2.5px; }
+  .eb-more-text { display: none; }   /* 폰은 글자도 없음 — 화살표는 삭제 (2026-11-10 사용자) */
 }
 @media (prefers-reduced-motion: reduce) { .eb-track, .eb-dot::before { transition: none; } }
 .home-cards .report-col,
@@ -932,9 +967,28 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
   .nav-item { padding: 14px 24px; font-size: 18px; line-height: 28px; border-bottom: 1px solid var(--border); }
   .nav-item[aria-current="page"]::after { display: none; }
   .nav-close { display: flex; }
+  /* 폰 · 태블릿: 로고 오른쪽 · 메뉴 아이콘 앞에 메뉴를 바로 보인다 (2026-11-10 사용자). 서랍 메뉴를 JS 가 복사 — 메뉴 원본은 하나.
+     좁아서 넘치면 이 줄만 옆으로 밀린다(가로 스크롤) — 로고 · 아이콘은 줄지 않는다 */
+  .menu-quick { display: flex; align-items: center; flex: 0 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .menu-quick::-webkit-scrollbar { display: none; }
+  .menu-quick .nav-item { padding: 6px 7px; border-bottom: 0; font-size: 16px; line-height: 22px; }
+  .navbar { flex-wrap: nowrap; }
+  .nav-left { flex: none; }
+  .nav-right { flex: 0 1 auto; min-width: 0; }
+  body.has-bar .nav-left { flex: 1 1 auto; min-width: 0; }   /* 바로 보이는 메뉴가 로고 줄에 있을 때 — 아이콘 앞으로 붙인다 */
+  body.has-bar .menu-quick { margin-left: auto; }
 
   .briefing-main { grid-template-columns: minmax(0, 1fr); }
   .briefing-main > .report-col:last-child { grid-column: auto; }
+}
+@media (max-width: 480px) {
+  /* 폰: 로고 · 메뉴 · 아이콘이 한 줄에 다 들어가게 (360 폭 기준) */
+  .navbar { gap: 6px; }
+  .nav-right { gap: 4px; }
+  .logo { gap: 6px; }
+  .logo-mark { width: 28px; height: 26px; }   /* 28 → 25.2 → 27 → 28 (5% 키움 28.35 → 정수, 2026-11-10) */
+  .logo-word { font-size: 18px; line-height: 26px; letter-spacing: -0.3px; }   /* 19 → 15.2 → 17 → 18 (5% 키움 17.85 → 정수, 2026-11-10) */
+  .menu-quick .nav-item { padding: 6px 5px; font-size: 15px; letter-spacing: -0.3px; }
 }
 
 @media (max-width: 680px) {
@@ -1351,6 +1405,10 @@ body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스�
 .post-nav-top:hover { color: var(--accent); }
 .post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
 .post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
+.post-nav-cm { grid-column: 1; grid-row: 1; justify-self: start; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; padding: 8px 0; background: none; border: 0;
+  font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 댓글 = 왼쪽 끝 글자 버튼, 말풍선 · 댓글 — TOP 과 거울 (2026-11-10 사용자) */
+.post-nav-cm:hover { color: var(--accent); }   /* TOP 과 같은 규칙 — 열린 상태 색은 두지 않는다(빨강 = ▲상승과 겹침) */
+.post-nav .post-nav-list, .post-nav .post-nav-top { grid-row: 1; }
 /* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px (테마 JS .ends-text, 2026-10-12 사용자) */
 body.item-view .post-outer-container { padding-bottom: 0 !important; }
 body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0; }
@@ -1405,13 +1463,16 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
    마크업은 테마 JS "댓글" IIFE 가 만든다 — 열기 버튼만 카드, 펼친 목록 · 쓰기 칸은 카드 밖 본문 폭 전체, 댓글 사이 1px 구분선.
    글자: 이름 16px 굵게, 글 19px · 행간 25, 날짜 · 안내 · 버튼 14px. 사진 24px. 입력창은 본문 폭 전체(폰 화면 − 28px). */
 .comments {
-  width: 100%; max-width: var(--shell); margin: 40px auto 0;   /* 목록 버튼과 40px (2026-10-12 사용자) */
+  width: 100%; max-width: var(--shell); margin: 0 auto;   /* 열기 버튼이 버튼 줄로 올라가 닫히면 빈 자리 (2026-11-10 사용자, 옛 40px) */
   font-size: 19px; line-height: 25px; color: #333; word-break: keep-all;
 }
 .comments .comments-title { margin: 0; padding: 0; border: 0; font-size: 16px; line-height: 24px; }
 /* 열기 버튼 = 흰 카드, `댓글 n` 16px 굵게 · 오른쪽 공식 접기 화살표(테두리 없이). 기본 닫힘, 주소가 #comments · #c… 면 열린 채로 (2026-10-12 · 13 사용자) */
 .comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 8px 8px 8px 16px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .comments-panel[hidden] { display: none; }
+.comments .comments-title[hidden] { display: none; }
+.post-nav ~ .comments .comments-panel { padding-top: 6px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
+.post-shell > [data-related].is-moved { margin-top: 40px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
 .comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
@@ -1505,8 +1566,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
 @font-face { font-family: 'AS Barun'; font-weight: 700; font-display: swap; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumBarunGothic/NanumBarunGothicWebBold.woff) format('woff'); }
 @media (min-width: 901px) {
   body { font-size: 16px; }
-  .logo-word { font-size: 20px; line-height: 26.5px; }
+  .logo-word { font-size: 18.5px; line-height: 25px; }
   .nav-item { font-size: 16px; line-height: 22px; }
+  body.has-bar .menu-items .nav-item { font-size: 16px; line-height: 25px; }
   .section-title { font-size: 18.5px; line-height: 23.5px; }
   .report-title { font-size: 18.5px; line-height: 23.5px; }
   #hypo-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
@@ -1519,8 +1581,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .news-item { font-size: 16px; line-height: 32px; }
   .news-item a { font-size: 16px; line-height: 32px; }
   .footer-title { font-size: 16px; }
-  .eb-slide .stock-avatar { font-size: 17px; }
-  .eb-name { font-size: 24.5px; line-height: 33px; }
+  .eb-name { font-size: 18.5px; line-height: 25px; }
   .eb-title { font-size: 16px; line-height: 23px; }
   .theme-name { font-size: 16px; line-height: 23px; }
   .post-card-title { font-size: 17px; }
@@ -1653,7 +1714,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             <div class='briefing-main'>
               <!-- 연동 훅: 카드 전체가 그 리포트 글로 가는 링크다.
                    href · 날짜 · 본문 문구는 블로거 피드에서 채운다 (라벨별 최신 글 1건). -->
-              <div class='report-col'>
+              <div class='report-col' id='us-report-col'>
               <h3 class='report-title'><span class='report-icon' style='background:#E53E3E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='5' width='3' height='9' rx='.5'/><rect x='11' y='2' width='3' height='12' rx='.5'/></svg></span>미국 증시<span class='report-card-date' data-date='report-card'></span></h3>
               <a class='report-card' id='report-card' href='#'>
                 <!-- 리포트 본문 맨 위 S&P 500 그래프를 그대로 복제해 카드 안에 (2026-10-21 사용자: "상세 페이지 그래프는 그대로, 복제해서 홈 카드에"). 그래프를 누르면 확대 팝업, 그 밖은 글로 -->
@@ -1669,7 +1730,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               </div>
 
               <!-- 한국 증시 리포트 카드 — 미국 증시 카드와 같은 모양, 코스피 봉차트 복제 + 요약 한 줄 (2026-10-29 사용자, 홈 수정 H24). 글이 없으면 라벨 목록으로 -->
-              <div class='report-col'>
+              <div class='report-col' id='kr-report-col'>
               <h3 class='report-title'><span class='report-icon' style='background:#1D4ED8;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='5' width='3' height='9' rx='.5'/><rect x='11' y='2' width='3' height='12' rx='.5'/></svg></span>한국 증시<span class='report-card-date' data-date='kr-report-card'></span></h3>
               <a class='report-card' id='kr-report-card' href='/search/label/한국%20증시%20리포트'>
                 <img class='report-chart' data-hook='kr-report-chart' data-zoom='1' alt='' hidden='hidden'/>
@@ -2565,7 +2626,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
         var stocks = [];
         /* 한국 탭 (2026-10-24 사용자) — kr.json (experiments/kr-stocks/home_feed_kr.py, 한국 장 마감 뒤 하루 1회). 두 카드가 각자 미국 · 한국을 고른다 */
-        var krHome = null, rankMarket = 'us', picksMarket = 'us';
+        /* 미국 · 한국 화면 (H35, 2026-11-10 사용자) — body[data-home-mkt] 가 있으면 그 시장만. 없으면 '' = 지금 홈(두 시장) */
+        var HOME_MKT = (document.body && document.body.getAttribute('data-home-mkt')) || '';
+        var krHome = null, rankMarket = HOME_MKT || 'us', picksMarket = HOME_MKT || 'us';
+        if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/kr-market-cap-top10.html'; }
         var KR_URL = GH + 'kr.json';
 
         /* ===== 장중 가격 (2026-11-05 사용자) — 한국 종목 live.json (experiments/kr-stocks/collect_kr_live.py, 장중 10분마다, 야후 약 20분 지연).
@@ -2804,7 +2868,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
            stocks.json · kr.json 의 events 를 합쳐 오늘(KST) 이후 가까운 6개(2026-10-29 사용자: 3개 → 6개) — 같은 날은 각 파일 순서(큰 시총 먼저)대로 미국 · 한국을 번갈아.
            4초마다 다음 장, 마우스를 올리거나 초점이 있으면 멈춘다. 점을 누르면 그 장으로. 누르면 그 종목 페이지 캘린더 탭(#tab-캘린더) */
         var EVENT_COUNT = 6, EVENT_MS = 4000, CAL_TAB = '일정';   /* 캘린더 → 일정 (2026-10-31 P145) */
-        var EVENT_BGS = ['#111827', '#1E3A8A', '#4C1D95', '#065F46', '#155E75', '#312E81'];   /* 장마다 바탕색 — 남색 · 파랑 · 보라 · 초록 · 청록 · 남보라 */
+        var EVENT_BGS = ['#1E3A8A', '#4C1D95', '#065F46', '#155E75', '#312E81'];   /* 장마다 바탕색 — 파랑 · 보라 · 초록 · 청록 · 남보라. 검정에 가까운 남색(#111827)은 뺐다 — 검은 로고(삼성 등)가 묻힌다 (2026-11-10 사용자) */
         var eventFeeds = { us: [], kr: [] };
         var ebIndex = 0, ebTimer = null;
         function kstToday() { return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); }
@@ -2819,6 +2883,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         function pickEvents() {
           var today = kstToday();
           var lists = ['us', 'kr'].map(function (m) {
+            if (HOME_MKT && m !== HOME_MKT) return [];   /* 시장 화면이면 그 시장 일정만 (H35) */
             return (eventFeeds[m] || []).filter(function (e) { return e && e.slug && e.day >= today; })
               .map(function (e, i) { return { e: e, m: m, i: i }; });
           });
@@ -2844,7 +2909,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
           a.appendChild(t);
           var more = el('span', 'eb-more');
           more.appendChild(el('span', 'eb-more-text', '일정 보기'));
-          more.appendChild(el('span', 'eb-chev'));
           a.appendChild(more);
           return a;
         }
@@ -2884,6 +2948,27 @@ body.no-dashboard .main-content { padding-top: 32px; }
             box.dataset.wired = '1';
             box.addEventListener('mouseenter', ebStop); box.addEventListener('mouseleave', ebStart);
             box.addEventListener('focusin', ebStop); box.addEventListener('focusout', ebStart);
+            /* 손으로 밀어 넘기기 (2026-11-10 사용자) — 손가락을 따라 움직이고, 폭의 15% 넘게 밀면 다음 · 이전 장. 민 뒤 따라오는 click(글로 이동)은 막는다 */
+            var vp = box.querySelector('.eb-viewport'), sx = 0, sy = 0, dx = 0, drag = false, swiped = false;
+            vp.addEventListener('touchstart', function (e) {
+              var t = e.touches[0]; sx = t.clientX; sy = t.clientY; dx = 0; drag = false; swiped = false; ebStop();
+            }, { passive: true });
+            vp.addEventListener('touchmove', function (e) {
+              var t = e.touches[0], mx = t.clientX - sx, my = t.clientY - sy;
+              if (!drag && Math.abs(mx) > 8 && Math.abs(mx) > Math.abs(my)) { drag = true; track.classList.add('is-drag'); }
+              if (!drag) return;
+              dx = mx;
+              track.style.transform = 'translateX(calc(' + (-100 * ebIndex) + '% + ' + dx + 'px))';
+            }, { passive: true });
+            vp.addEventListener('touchend', function () {
+              track.classList.remove('is-drag');
+              if (drag) {
+                swiped = true;
+                if (Math.abs(dx) > vp.clientWidth * 0.15) ebGo(ebIndex + (dx < 0 ? 1 : -1)); else ebGo(ebIndex);
+              }
+              drag = false; ebStart();
+            });
+            vp.addEventListener('click', function (e) { if (swiped) { e.preventDefault(); e.stopPropagation(); swiped = false; } }, true);
           }
           ebGo(0); ebStart();
         }
@@ -3819,6 +3904,56 @@ body.no-dashboard .main-content { padding-top: 32px; }
         var closeBtn = document.createElement('button'); closeBtn.type = 'button'; closeBtn.className = 'nav-close';
         closeBtn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg><span class="sr-only">메뉴 닫기</span>';
         menu.insertBefore(closeBtn, menu.firstChild);
+        /* 둥근 국기 (그림 — 국기 이모지는 윈도우에서 글자 US · KR 로 나온다). 태극기는 작아서 4괘 · 흰 바탕 · 테두리를 빼고 태극을 원 가득(미국 국기와 같은 크기로 보이게, 2026-11-10 사용자) */
+        var NAV_FLAGS = {
+          us: '<svg viewBox="0 0 22 22" aria-hidden="true"><defs><clipPath id="flag-us-c"><circle cx="11" cy="11" r="11"/></clipPath></defs><g clip-path="url(#flag-us-c)"><rect width="22" height="22" fill="#fff"/>' +
+            [0, 2, 4, 6, 8, 10, 12].map(function (i) { return '<rect y="' + (i * 22 / 13).toFixed(2) + '" width="22" height="' + (22 / 13).toFixed(2) + '" fill="#B22234"/>'; }).join('') +
+            '<rect width="11" height="' + (7 * 22 / 13).toFixed(2) + '" fill="#3C3B6E"/><g fill="#fff"><circle cx="3" cy="3" r=".8"/><circle cx="6.5" cy="3" r=".8"/><circle cx="4.75" cy="5.6" r=".8"/><circle cx="8.25" cy="5.6" r=".8"/><circle cx="3" cy="8.2" r=".8"/><circle cx="6.5" cy="8.2" r=".8"/></g></g><circle cx="11" cy="11" r="10.5" fill="none" stroke="rgba(0,0,0,.12)"/></svg>',
+          kr: '<svg viewBox="0 0 22 22" aria-hidden="true">' +
+            /* 태극 = 원 넷(파랑 바탕 · 빨강 위 반원 · 작은 빨강 · 작은 파랑) — 경로 틈으로 흰 물결이 비치던 것 고침 (2026-11-10 사용자) */
+            '<g transform="rotate(33.7 11 11)"><circle cx="11" cy="11" r="11" fill="#0047A0"/><path d="M0 11a11 11 0 0 1 22 0z" fill="#CD2E3A"/><circle cx="5.5" cy="11" r="5.5" fill="#CD2E3A"/><circle cx="16.5" cy="11" r="5.5" fill="#0047A0"/></g></svg>'
+        };
+        /* 바로 보이는 메뉴 줄 — 서랍 메뉴 링크를 복사 (2026-11-10 사용자). data-bar 가 붙은 링크만(미국 · 한국) → 로고 오른쪽, PC 도 서랍 사용(body.has-bar).
+           data-bar 가 없으면 전부 복사해 폰에서만 아이콘 앞에 (PC 는 예전 메뉴 줄) */
+        var quick = document.createElement('nav'); quick.className = 'menu-quick'; quick.setAttribute('aria-label', '주 메뉴 바로가기');
+        var barLinks = [].slice.call(menu.querySelectorAll('a.nav-item[data-bar]'));
+        var hasBar = barLinks.length > 0;
+        if (hasBar) {
+          /* 스위치: 지금 화면(aria-current)이 아닌 쪽 하나만, 국기 + 이름. 지금 화면 표시가 없으면(글 보기 등) 첫째(미국 = 홈)를 지금으로 본다 */
+          /* 고른 홈 기억 (2026-11-10 사용자: "한국 홈으로 설정한 상태에서 여러 가지 보다가 홈으로 가도 한국 홈. 미국 버튼을 누르지 않는 이상").
+             한국 홈을 열거나 미국 · 한국 버튼(스위치 · 서랍)을 누르면 그 시장을 브라우저에 적는다. 미국 홈(/)을 그냥 여는 것만으로는 바꾸지 않는다.
+             시장 화면이 아닌 곳(글 · 종목 · 전망)에서는 기억이 한국이면 홈으로 가는 링크(로고 · 홈으로 버튼)를 한국 홈으로, 스위치는 미국으로.
+             기억을 못 읽으면(사생활 보호 창 등) 예전 그대로 미국 홈 */
+          var HOME_KEY = 'as-home-mkt';
+          var homePref = ''; try { homePref = localStorage.getItem(HOME_KEY) || ''; } catch (e) {}
+          function setHomePref(m) { try { localStorage.setItem(HOME_KEY, m); } catch (e) {} }
+          var onBar = barLinks.filter(function (a) { return a.getAttribute('aria-current') === 'page'; })[0];
+          if (onBar && onBar.getAttribute('data-flag') === 'kr') setHomePref('kr');
+          var prefBar = barLinks.filter(function (a) { return a.getAttribute('data-flag') === homePref; })[0];
+          var curBar = onBar || prefBar || barLinks[0];
+          if (!onBar && prefBar && prefBar !== barLinks[0]) {
+            var usHome = new URL(barLinks[0].getAttribute('href'), location.href).href, siteHome = location.origin + '/';
+            [].forEach.call(document.querySelectorAll('a[href]'), function (a) {
+              if (a.hasAttribute('data-flag') || a.classList.contains('nav-switch')) return;
+              var u = new URL(a.getAttribute('href'), location.href); u.hash = ''; u.search = '';
+              if (u.href === usHome || u.href === siteHome) a.setAttribute('href', prefBar.getAttribute('href'));
+            });
+          }
+          menu.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a[data-flag]'); if (a) setHomePref(a.getAttribute('data-flag')); });
+          quick.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.nav-switch'); if (a) setHomePref(a.getAttribute('data-flag')); });
+          barLinks.forEach(function (a) {
+            if (a === curBar) return;
+            var name = a.textContent.trim(), sw = document.createElement('a');
+            sw.className = 'nav-switch'; sw.href = a.getAttribute('href'); sw.setAttribute('data-flag', a.getAttribute('data-flag') || ''); sw.setAttribute('aria-label', name + ' 화면으로');
+            sw.innerHTML = (NAV_FLAGS[a.getAttribute('data-flag')] || '') + '<span>' + name + '</span>';
+            quick.appendChild(sw);
+          });
+        } else {
+          [].forEach.call(menu.querySelectorAll('a.nav-item'), function (a) { quick.appendChild(a.cloneNode(true)); });
+        }
+        var logo = document.querySelector('.navbar .logo');
+        if (hasBar && logo) { document.body.classList.add('has-bar'); logo.parentNode.insertBefore(quick, logo.nextSibling); }
+        else toggle.parentNode.insertBefore(quick, toggle);
         function narrow() { return window.matchMedia('(max-width: 900px)').matches; }
         function setMenu(open) {
           toggle.setAttribute('aria-expanded', String(open));
@@ -3831,7 +3966,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         closeBtn.addEventListener('click', function () { setMenu(false); });
         overlay.addEventListener('click', function () { setMenu(false); });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('is-open')) setMenu(false); });
-        window.addEventListener('resize', function () { if (!narrow() && menu.classList.contains('is-open')) setMenu(false); });
+        window.addEventListener('resize', function () { if (!hasBar && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 */
       })();
 
       /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
@@ -4017,6 +4152,24 @@ body.no-dashboard .main-content { padding-top: 32px; }
         document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
       })();
 
+      /* ============================================================ `함께 보는 페이지` 자리 (2026-11-10 사용자: 홈 · TOP 버튼 줄 아래로)
+         렌더러는 본문 맨 끝에 [data-related] 를 둔다 — 이미 게시된 글까지 테마가 버튼 줄(+ 댓글 판) 아래로 옮긴다.
+         본문 끝 구분선 판정(아래 .ends-text)보다 먼저 옮겨야 옮긴 뒤 본문 끝으로 정한다 */
+      (function () {
+        'use strict';
+        var shell = document.querySelector('.post-shell'), nav = shell && shell.querySelector('.post-nav');
+        if (!nav) return;
+        var after = shell.querySelector('.comments') || nav;
+        /* 게시 때 붙던 옛 `함께 보는 리포트`(data-related="report", 11-10 없앰)는 `함께 보는 페이지`가 있는 글에서 지운다 — 블록이 두 개 보이던 것 (2026-11-10 사용자).
+           옛 블록 하나뿐인 글(인물 발언 등)은 남겨 옮긴다. 다음 게시 · 갱신 때 publish_blogger.with_related 가 본문에서도 지운다 */
+        var olds = [].slice.call(shell.querySelectorAll('.post-body [data-related="report"]'));
+        if (olds.length && shell.querySelector('.post-body [data-related]:not([data-related="report"])')) olds.forEach(function (r) { r.parentNode.removeChild(r); });
+        [].slice.call(shell.querySelectorAll('.post-body [data-related]')).forEach(function (r) {
+          after.parentNode.insertBefore(r, after.nextSibling); after = r;
+          r.classList.add('is-moved');
+        });
+      })();
+
       /* ============================================================ 목록 버튼 위 구분선 (2026-10-12 사용자: "콘텐츠 영역에서 하단이 텍스트로 끝날 때만 구분선, 목록 버튼과 콘텐츠 사이 40픽셀")
          본문의 마지막 글자가 카드(테두리 · 배경 있는 상자) 안이거나 구분선으로 끝나면 구분선 없이 40px, 카드 밖 글이면 20px · 구분선 · 20px. 모양은 테마 CSS(.post-shell.ends-text) */
       (function () {
@@ -4180,18 +4333,21 @@ body.no-dashboard .main-content { padding-top: 32px; }
         var more = false, cursor = null, total = null, lastPost = 0;   /* more = 더 오래된 댓글 있음 · cursor = 지금까지 읽은 가장 오래된 댓글 · total = 개수 질의 값 · lastPost = 이 화면에서 마지막으로 올린 시각 */
         var GAP = 20000;   /* 같은 사람 20초에 한 번 — firestore.rules notTooFast 와 같다. 미리 막아 거절(403)까지 가지 않게 */
         box.classList.add('is-foldable');
+        /* 열기 버튼 = 글 아래 버튼 줄 왼쪽 끝 글자 버튼 `💬 댓글` — TOP 과 짝 (2026-11-10 사용자: 접는 카드 대신 TOP 처럼, 누르면 버튼 줄 바로 아래에 판이 열린다).
+           버튼 줄이 없는 화면이면 옛 자리(댓글 제목) 에 둔다 */
         var head = box.querySelector('.comments-title') || box.appendChild(el('h3', 'comments-title'));
         head.textContent = '';
-        var toggle = btn('comments-toggle'); toggle.setAttribute('aria-controls', 'comments-panel');
-        toggle.innerHTML = '<span>댓글</span><span class="fold-box"><svg class="acc-chev" viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></span>';   /* 공식 접기 버튼 (2026-10-13 사용자) */
-        head.appendChild(toggle);
+        var navRow = box.parentNode && box.parentNode.querySelector('.post-nav');
+        var toggle = btn(navRow ? 'post-nav-cm' : 'comments-toggle'); toggle.setAttribute('aria-controls', 'comments-panel'); toggle.setAttribute('aria-expanded', 'false');
+        toggle.innerHTML = '<svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 4.5h13a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H10l-4 3.5v-3.5H4.5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2z"/></svg><span class="cm-label">댓글</span>';   /* 말풍선 22px · 선 1.6 = TOP 원형 화살표와 같은 굵기 */
+        if (navRow) { navRow.insertBefore(toggle, navRow.firstChild); head.hidden = true; } else head.appendChild(toggle);
         var panel = el('div', 'comments-panel'); panel.id = 'comments-panel'; panel.hidden = true; box.appendChild(panel);
         var list = el('ol', 'cm-list'), status = el('div', 'cm-status', '댓글을 불러오는 중…'), write = el('div', 'cm-write');
         var moreBtn = btn('cm-more'); moreBtn.hidden = true;   /* `이전 댓글 n개 더 보기` — 목록 위(오래된 쪽), 공식 흰 버튼 */
         panel.appendChild(moreBtn); panel.appendChild(list); panel.appendChild(status); panel.appendChild(write);
         function shown() { return total !== null ? total : items.length; }
         function setCount() {
-          toggle.firstChild.textContent = '댓글' + (loaded && (total !== null || !more) ? ' ' + shown() : '');
+          toggle.querySelector('.cm-label').textContent = '댓글' + (loaded && (total !== null || !more) ? ' ' + shown() : '');
           var rest = total !== null ? Math.max(total - items.length, 0) : 0;
           moreBtn.hidden = !more;
           moreBtn.textContent = '이전 댓글 ' + (rest ? rest + '개 ' : '') + '더 보기';
