@@ -92,13 +92,8 @@ def lead(s):
     nxt = (s.get("earnings") or {}).get("next")
     if nxt and kind != "earnings":
         more.append(f"다음 실적 발표는 {_md(nxt)} 예정")
-    about = U.ABOUT.get(s["sym"], "").split(". ")[0].rstrip(".")   # `기업` 탭 소개 첫 문장 — `브로드컴은 반도체 · 인프라 소프트웨어 기업이다` (종목마다 다른 고정 문장)
     text = first + (" " + fact if fact else "") + (" " + "이고, ".join(more) + "이다." if more else "")
-    # 회사 소개 첫 문장은 요약 아래 작은 안내 줄 (2026-11-10 사용자: 독자는 다 아는 말 · 매일 반복 — 줄바꿈 + 안내 기호 + 작은 글씨).
-    # 블로그 문장 글씨 중 가장 작은 12px · 행간 18 (사진 출처 줄과 같은 크기, 2026-11-10 사용자). 숨기지 않는다 — 페이지마다 다른 문장이라 검색엔진이 읽어야 한다
-    note = (f'<p style="margin:-4px 0 12px;padding-left:{_dk.ALIGN_PX}px;font-size:12px;line-height:18px;color:{_dk.NOTE};word-break:keep-all;">'
-            f'{INFO_ICON_12}{_esc(about)}.</p>') if about else ""
-    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_dk.tint(_esc(text))}</p>' + note   # 요약 문장의 증감도 색 (가이드라인 3-3, 2026-10-21)
+    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_dk.tint(_esc(text))}</p>' + lead_note(U.ABOUT.get(s["sym"]))   # 요약 문장의 증감도 색 (가이드라인 3-3, 2026-10-21)
 
 
 ITEM_8K = {"1.01": "중요한 계약을 맺었다는", "2.02": "실적을 알리는", "2.03": "회사채 발행 등 새로 돈을 빌렸다는", "5.02": "임원 · 이사가 바뀌었다는",
@@ -107,34 +102,23 @@ ITEM_8K = {"1.01": "중요한 계약을 맺었다는", "2.02": "실적을 알리
 
 def lead_fact(s):
     """맨 위 요약 둘째 문장 — 후보 사실마다 점수, 가장 높은 하나 (2026-11-10 사용자: 브로드컴 · 애플 · 엔비디아 첫 내용이 같은 틀).
-    파이썬 값만 · 평가 · 예측 · 매수 · 매도 말 없음. 문장 틀 · 자리는 모든 종목 같고 고르는 사실만 다르다. (문장, 종류) — 없으면 ("", "")."""
-    cands = []   # (점수, 종류, 문장)
+    파이썬 값만 · 평가 · 예측 · 매수 · 매도 말 없음. 문장 틀 · 자리는 모든 종목 같고 고르는 사실만 다르다. (문장, 종류) — 없으면 ("", "").
+    한국 종목(render_kr.lead_fact)도 공통 후보(fact_*)를 같이 쓴다."""
     day = datetime.date.fromisoformat(s["day"])
+    cands = []   # (점수, 종류, 문장)
     nxt = (s.get("earnings") or {}).get("next")
     if nxt:
-        n = (datetime.date.fromisoformat(nxt) - day).days
-        if 0 < n <= 14:
-            cands.append((8 if n <= 7 else 4, "earnings", f"{n}일 뒤 {_md(nxt)}에 실적 발표가 있다."))
-    yr = s.get("year_range") or {}
-    if yr.get("high"):
-        p = yr["pct_from_high"]
-        if p >= -3:
-            cands.append((6, "high", f"1년 고점(${yr['high']:,.2f}, {_md(yr['high_day'])})과의 차이는 {abs(p):.1f}%다."))
-        elif p <= -25:
-            cands.append((4 + min(abs(p) - 25, 20) / 10, "high", f"1년 고점(${yr['high']:,.2f}, {_md(yr['high_day'])})보다 {abs(p):.1f}% 낮은 자리다."))
-        elif yr.get("pos_pct", 50) <= 10:
-            cands.append((6, "low", f"1년 저점(${yr['low']:,.2f}, {_md(yr['low_day'])})에 가까운 자리다."))
+        cands += fact_earnings((datetime.date.fromisoformat(nxt) - day).days, _md(nxt))
+    cands += fact_year(s, lambda v: f"${v:,.2f}")
     for f in s.get("filings") or []:
         if f.get("form") == "8-K" and f.get("emphasis") and 0 <= (day - datetime.date.fromisoformat(f["filed"])).days <= 7:
             item = re.search(r"Item ([\d.]+)", f.get("title", ""))
+            if item and item.group(1) in ("2.02", "7.01"):   # 실적 발표 · 투자자 자료 8-K 는 실적 시즌에 거의 모든 종목이 내 같은 문장이 된다 (2026-11-10: 64종목 중 26)
+                continue
             what = ITEM_8K.get(item.group(1), "") if item else ""
             cands.append((5.5, "filing", f"{_md(f['filed'])}에 " + (f"{what} " if what else "") + "수시 공시(8-K)를 냈다."))
             break
-    per = {p["label"]: p for p in s.get("periods") or []}.get("1개월")
-    if per and per.get("stock") is not None and per.get("spy") is not None:
-        d = per["stock"] - per["spy"]
-        if abs(d) >= 8:
-            cands.append((3 + min(abs(d), 30) / 10, "month", f"최근 한 달 수익률은 {_sgn(per['stock'])}%로 같은 기간 S&P 500({_sgn(per['spy'])}%)보다 {abs(d):.1f}%p {'높다' if d > 0 else '낮다'}."))
+    cands += fact_month(s, "S&P 500")
     r = s.get("ret_1d") or 0
     pm = [(p, rr) for p, _, rr in s.get("peer_moves") or [] if abs(rr) >= 1]
     if abs(r) >= 0.5 and len(pm) >= 2:
@@ -144,18 +128,72 @@ def lead_fact(s):
         top = sorted(grp, key=lambda x: -abs(x[1]))[:3]
         names = " · ".join(f"{U.peer_name(p)} {_sgn(rr)}%" for p, rr in top)
         cands.append((6 if grp is opp else 4.5, "peers", f"같은 날 함께 보는 회사 {names}도 {word}." if grp is same else f"같은 날 함께 보는 회사 {names}는 {word}."))
-    if (s.get("vol_ratio") or 0) >= 2:
-        cands.append((4 + min(s["vol_ratio"], 5) / 2, "volume", f"거래량은 20일 평균의 {s['vol_ratio']:.1f}배였다."))
-    closes = [b["close"] for b in BARS.get(s["sym"]) or [] if b.get("close")]
-    k = 0
-    while k + 1 < len(closes) and (closes[-1 - k] > closes[-2 - k]) == (r > 0) and closes[-1 - k] != closes[-2 - k]:
-        k += 1
-    if k >= 4:
-        cands.append((3 + k / 2, "streak", f"{k}거래일 연속 {'올랐다' if r > 0 else '내렸다'}."))
+    cands += fact_volume(s) + fact_streak(s, [b["close"] for b in BARS.get(s["sym"]) or [] if b.get("close")])
+    return pick_fact(cands)
+
+
+def pick_fact(cands):
+    """점수가 가장 높은 후보 → (문장, 종류). 없으면 ("", "")."""
     if not cands:
         return "", ""
     _, kind, text = max(cands, key=lambda c: c[0])
     return text, kind
+
+
+def fact_earnings(n, when):
+    """실적 발표 D-n (14일 안). when = `11월 3일` 처럼 이미 쓴 날짜."""
+    return [(8 if n <= 7 else 4, "earnings", f"{n}일 뒤 {when}에 실적 발표가 있다.")] if 0 < n <= 14 else []
+
+
+def fact_year(s, money):
+    """1년 고점 근처 · 고점보다 25% 넘게 아래 · 1년 저점 근처. money = 가격 글자 함수(미국 `$`, 한국 원).
+    지난해 날짜는 연도를 붙인다 — `11월 3일` 이 내일처럼 읽혔다 (2026-11-10, HD한국조선해양 1년 고점 = 2025-11-03)."""
+    yr = s.get("year_range") or {}
+    if not yr.get("high"):
+        return []
+    when = lambda d: _md(d) if d[:4] == s["day"][:4] else f"{int(d[:4])}년 {_md(d)}"
+    p = yr["pct_from_high"]
+    if p >= -3:
+        return [(4.4, "high", f"1년 고점({money(yr['high'])}, {when(yr['high_day'])})과의 차이는 {abs(p):.1f}%다.")]
+    if p <= -25:
+        return [(4 + min(abs(p) - 25, 20) / 20, "high", f"1년 고점({money(yr['high'])}, {when(yr['high_day'])})보다 {abs(p):.1f}% 낮은 자리다.")]
+    if yr.get("pos_pct", 50) <= 10:
+        return [(6, "low", f"1년 저점({money(yr['low'])}, {when(yr['low_day'])})에 가까운 자리다.")]
+    return []
+
+
+def fact_month(s, bench):
+    """최근 한 달 수익률이 기준 지수와 8%p 넘게 다를 때. periods 의 `spy` 칸 = 그 시장 기준 지수(한국은 코스피)."""
+    per = {p["label"]: p for p in s.get("periods") or []}.get("1개월")
+    if not per or per.get("stock") is None or per.get("spy") is None:
+        return []
+    d = per["stock"] - per["spy"]
+    if abs(d) < 8:
+        return []
+    return [(3 + min(abs(d), 30) / 10, "month", f"최근 한 달 수익률은 {_sgn(per['stock'])}%로 같은 기간 {bench}({_sgn(per['spy'])}%)보다 {abs(d):.1f}%p {'높다' if d > 0 else '낮다'}.")]
+
+
+def fact_volume(s):
+    return [(4 + min(s["vol_ratio"], 5) / 2, "volume", f"거래량은 20일 평균의 {s['vol_ratio']:.1f}배였다.")] if (s.get("vol_ratio") or 0) >= 2 else []
+
+
+def fact_streak(s, closes):
+    """그날 방향으로 n거래일 연속 (4일 이상)."""
+    r = s.get("ret_1d") or 0
+    k = 0
+    while k + 1 < len(closes) and (closes[-1 - k] > closes[-2 - k]) == (r > 0) and closes[-1 - k] != closes[-2 - k]:
+        k += 1
+    return [(3 + k / 2, "streak", f"{k}거래일 연속 {'올랐다' if r > 0 else '내렸다'}.")] if k >= 4 else []
+
+
+def lead_note(about):
+    """요약 아래 12px 안내 줄 — 회사 소개 첫 문장 (2026-11-10 사용자: 독자는 다 아는 말 · 매일 반복 — 줄바꿈 + 안내 기호 + 블로그 문장 최소 글씨 12px).
+    숨기지 않는다 — 페이지마다 다른 문장이라 검색엔진이 읽어야 한다. 한국 종목도 같은 줄."""
+    first = (about or "").split(". ")[0].rstrip(".")
+    if not first:
+        return ""
+    return (f'<p style="margin:-4px 0 12px;padding-left:{_dk.ALIGN_PX}px;font-size:12px;line-height:18px;color:{_dk.NOTE};word-break:keep-all;">'
+            f'{INFO_ICON_12}{_esc(first)}.</p>')
 
 
 def range_tip(s):

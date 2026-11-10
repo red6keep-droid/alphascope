@@ -149,7 +149,30 @@ def lead(s):
     if nr:
         text += " 평소 하루 움직임 안의 변화였다." if abs(nr["z"]) < 2 else f" 평소 하루 움직임의 {abs(nr['z']):.1f}배였다."
     text += R.gap_sentence((s.get("tech") or {}).get("gap"))   # 시가 갭 상승 · 하락 (2026-10-28 사용자 P80)
-    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_dk.tint(_esc(text))}</p>'
+    fact, _ = lead_fact(s)   # 둘째 문장 — 그날 이 종목에서 가장 눈에 띄는 사실 하나 (2026-11-10 사용자: 색인 안 된 페이지가 한국 종목, AI 없이 — 미국과 같은 규칙)
+    if fact:
+        text += " " + fact
+    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_dk.tint(_esc(text))}</p>' + RP.lead_note(U.ABOUT.get(s["code"]))   # 요약 아래 12px 회사 소개 줄 (미국과 같게)
+
+
+def lead_fact(s):
+    """한국 종목 요약 둘째 문장 — 미국 render_pages.lead_fact 와 같은 점수 방식. 공통 후보(실적 · 1년 고점 · 한 달 · 거래량 · 연속) +
+    한국만: 밤사이 미국 연결 종목 · 코스피 급락일에 버팀. 파이썬 값만 · 평가 · 예측 · 매수 · 매도 말 없음."""
+    cands = []
+    e = (s.get("calendar_cards") or {}).get("earnings")
+    if e:
+        cands += RP.fact_earnings(e["left"], _md(e["day"]) + (" 무렵" if e.get("est") else ""))
+    cands += RP.fact_year(s, won) + RP.fact_month(s, "코스피")
+    mv = [m for m in (s.get("pairs") or {}).get("moves") or [] if m.get("ret") is not None and abs(m["ret"]) >= 1]
+    if mv and max(abs(m["ret"]) for m in mv) >= 2:
+        top = sorted(mv, key=lambda m: -abs(m["ret"]))[:3]
+        cands.append((4.5 + min(max(abs(m["ret"]) for m in top), 10) / 4, "pairs",
+                      "밤사이 미국 연결 종목은 " + " · ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in top) + "였다."))
+    c = s.get("crash") or {}
+    if c.get("recent") and c.get("held") and c.get("index_ret") is not None and c.get("ret") is not None:
+        cands.append((5, "crash", f"{c.get('index', '코스피')}가 {_sgn(c['index_ret'])}% 내린 {_md(c['day'])}에도 {_sgn(c['ret'])}%로 버텼다."))
+    cands += RP.fact_volume(s) + RP.fact_streak(s, [b["close"] for b in s.get("_bars") or [] if b.get("close")])
+    return RP.pick_fact(cands)
 
 
 def _small(t):
