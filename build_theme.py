@@ -453,6 +453,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments-panel[hidden] { display: none; }
 .comments .comments-title[hidden] { display: none; }
 .post-nav ~ .comments .comments-panel { padding-top: 6px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
+.post-shell > [data-related].is-moved > div:first-child { font-size: 16px !important; line-height: 26px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
 .post-shell > [data-related].is-moved { margin-top: 40px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
@@ -471,7 +472,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-avatar.is-owner svg { width: 14px; height: 13px; display: block; }
 .comments .cm-body { grid-column: 2; grid-row: 1; min-width: 0; }
 .comments .cm-head { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 0; line-height: 24px; }
-.comments .cm-name { font-size: 16px; font-weight: 700; color: #111; }
+.comments .cm-name { font-size: 14px; line-height: 20px; font-weight: 400; color: #111; }   /* 작성자 이름 = 가장 작은 글씨 14/20 보통 (2026-11-10 사용자, 옛 16 굵게) */
 .comments .cm-tag { display: inline-block; margin: 0; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; vertical-align: middle; position: relative; top: -1px; }   /* 운영자 라벨 — 영역 라벨 모양 (가이드 5절) */
 .comments .cm-date { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
 .comments .cm-text { margin: 4px 0 0; font-size: 19px; line-height: 25px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -494,6 +495,10 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-status[hidden] { display: none; }
 /* 쓰기 칸 — 윗선 아래. 댓글이 없으면 선 없이 (댓글 목록 바로 아래 흰 버튼 하나였던 자리, 2026-10-13 사용자) */
 .comments .cm-write { margin-top: 0; padding-top: 14px; border-top: 1px solid #E2E8F0; }
+/* `댓글 쓰기` 작은 버튼 — 댓글이 있을 때만, 목록 아래 오른쪽. 답글 · 삭제(.cm-btn)와 같은 14 외곽선 + 연필 14 (2026-11-10 사용자: 보기만 할 때 입력창 X) */
+.comments .cm-write-row { display: flex; justify-content: flex-end; }
+.comments .cm-write-btn { display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 5px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 14px; line-height: 22px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.comments .cm-write-btn:hover { border-color: #111; }
 .comments .cm-write.is-first { border-top: 0; }
 .comments .cm-login { display: block; width: 100%; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; color: #111; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 공식 흰 버튼 — 외곽선 #E2E8F0 → 20% 진하게 #B5BAC0 (2026-10-14 사용자, 가이드 2-3 흰 버튼) */
 .comments .cm-login:hover { border-color: #111; }

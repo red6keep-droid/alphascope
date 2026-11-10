@@ -2923,6 +2923,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       mkItem('X', ICONS.x, function () { window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareTitle), '_blank', 'noopener,width=640,height=560'); });
     }
     if (!present.facebook) {
+    /* 최대 3줄 (2026-11-10 사용자) — 이미 게시된 글의 4줄 이상도 앞 3줄만. 렌더러(dk.related_buttons)도 3개로 자른다 */
+    [].slice.call(r.querySelectorAll('a[data-row-link]')).slice(3).forEach(function (x) { x.parentNode.removeChild(x); });
       mkItem('Facebook', ICONS.facebook,
         function () { window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank', 'noopener,width=640,height=560'); });
     }
@@ -3158,6 +3160,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   var list = el('ol', 'cm-list'), status = el('div', 'cm-status', '댓글을 불러오는 중…'), write = el('div', 'cm-write');
   var moreBtn = btn('cm-more'); moreBtn.hidden = true;   /* `이전 댓글 n개 더 보기` — 목록 위(오래된 쪽), 공식 흰 버튼 */
   panel.appendChild(moreBtn); panel.appendChild(list); panel.appendChild(status); panel.appendChild(write);
+    renderWrite();
   function shown() { return total !== null ? total : items.length; }
   function setCount() {
     toggle.querySelector('.cm-label').textContent = '댓글' + (loaded && (total !== null || !more) ? ' ' + shown() : '');
@@ -3210,10 +3213,25 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       (kids[c.id] || []).forEach(function (k) { rep.appendChild(item(k, false)); });
       if (rep.children.length) li.appendChild(rep);
       li.appendChild(el('div', 'cm-replybox'));
+  /* 쓰기 칸 (2026-11-10 사용자: "댓글만 보려는데 입력창이 뜬다") — 댓글이 있으면 작은 `댓글 쓰기` 버튼만, 누르면 로그인 버튼 또는 입력창.
+     댓글이 없으면 `댓글이 없습니다.` 아래 바로 로그인 버튼(로그인했으면 입력창). 올리고 나면 다시 버튼으로 */
+  var writing = /^#comment-form$/.test(location.hash), writeKey = '';
       list.appendChild(li);
+    if (!loaded) { write.textContent = ''; writeKey = ''; return; }
+    var none = !items.length && !more, open = writing || none;
+    var key = (open ? 'o' : 'c') + (me ? me.uid : '-');
+    if (key === writeKey) return;   /* 같은 상태면 다시 그리지 않는다 — 쓰던 글이 지워지지 않게 */
+    writeKey = key;
     });
+    if (!open) {
+      var wb = btn('cm-write-btn');
+      wb.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg>댓글 쓰기';
+      wb.addEventListener('click', function () { writing = true; renderWrite(); });
+      var wr = el('div', 'cm-write-row'); wr.appendChild(wb); write.appendChild(wr);
+      return;
+    }
     status.hidden = tops.length > 0 || more;
-    if (!tops.length) status.textContent = '첫 댓글을 남겨 보세요.';
+    if (!tops.length) status.textContent = '댓글이 없습니다.';   /* 옛 `첫 댓글을 남겨 보세요.` (2026-11-10 사용자) */
     write.classList.toggle('is-first', !tops.length);
     setCount();
   }
@@ -3264,7 +3282,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         .then(function (c) { lastPost = Date.now(); items.push(c); if (total !== null) total++; renderList(); onDone(c); })
         .catch(function (err) { ta.disabled = false; submit.disabled = false; showErr(f, errText(err, 'add')); });
     });
-    setTimeout(function () { ta.focus(); }, 0);
+    if (parent || writing) setTimeout(function () { ta.focus(); }, 0);   /* 댓글이 없어 바로 보이는 입력창은 자판을 띄우지 않는다 — 보기만 하는 사람 (2026-11-10) */
     return f;
   }
   function renderWrite() {
@@ -3278,7 +3296,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var row = el('div', 'cm-me'); row.appendChild(avatar(me)); row.appendChild(el('span', 'cm-name', nameOf(me)));
     var out = btn('cm-link', '로그아웃'); out.addEventListener('click', function () { api.logout(); }); row.appendChild(out);
     write.appendChild(row);
-    write.appendChild(form('', function () { renderWrite(); }));
+    write.appendChild(form('', function () { writing = false; writeKey = ''; renderWrite(); }));
   }
   function openReply(li, c) {
     [].slice.call(list.querySelectorAll('.cm-replybox')).forEach(function (b) { b.textContent = ''; });
