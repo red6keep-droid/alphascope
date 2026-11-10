@@ -211,6 +211,28 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav-overlay { position: fixed; inset: 0; z-index: 49; background: transparent; }   /* 헤더(50) 아래 — 서랍은 헤더 안에 있어 55로 두면 가림막이 서랍을 덮어 메뉴가 눌리지 않았다 (2026-10-13 사용자: "메뉴를 클릭시 목록 화면으로 이동되지 않는다")   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
+/* 바로 보이는 메뉴 · 서랍 메뉴 나누기 (2026-11-10 사용자: "미국, 한국만 메뉴, 증시 전망은 메뉴 아이콘 안으로").
+   서랍 메뉴 링크 가운데 data-bar 가 붙은 것만 로고 오른쪽 줄에 복사하고 body.has-bar 를 붙인다(JS). 그때는 PC 에서도 메뉴 아이콘 · 서랍을 쓴다.
+   data-bar 가 하나도 없으면(지금 테마) 예전 그대로: PC 는 메뉴 전부 줄로, 폰은 전부 복사 */
+@media (min-width: 901px) {
+  body.has-bar .menu-quick { display: flex; align-items: stretch; gap: 12px; align-self: stretch; }
+  body.has-bar .nav-toggle {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; flex: none;
+    border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600);
+  }
+  body.has-bar .menu-items {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 60;
+    width: 320px; flex-direction: column; align-items: stretch; gap: 0;
+    padding: 72px 0 24px; background: var(--surface);
+    box-shadow: -8px 0 30px rgba(15,23,42,.18);
+    transform: translateX(100%); transition: transform .22s ease; overflow-y: auto;
+  }
+  body.has-bar .menu-items.is-open { transform: none; }
+  body.has-bar .menu-items .nav-item { padding: 14px 24px; font-size: 18px; line-height: 28px; border-bottom: 1px solid var(--border); }
+  body.has-bar .menu-items .nav-item[aria-current="page"]::after { display: none; }
+  body.has-bar .nav-close { display: flex; }
+}
 
 /* ==========================================================================
    shell
@@ -915,6 +937,8 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
   .navbar { flex-wrap: nowrap; }
   .nav-left { flex: none; }
   .nav-right { flex: 0 1 auto; min-width: 0; }
+  body.has-bar .nav-left { flex: 1 1 auto; min-width: 0; }   /* 바로 보이는 메뉴가 로고 줄에 있을 때 — 아이콘 앞으로 붙인다 */
+  body.has-bar .menu-quick { margin-left: auto; }
 
   .briefing-main { grid-template-columns: minmax(0, 1fr); }
   .briefing-main > .report-col:last-child { grid-column: auto; }
@@ -1499,6 +1523,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   body { font-size: 16px; }
   .logo-word { font-size: 20px; line-height: 26.5px; }
   .nav-item { font-size: 16px; line-height: 22px; }
+  body.has-bar .menu-items .nav-item { font-size: 16px; line-height: 25px; }
   .section-title { font-size: 18.5px; line-height: 23.5px; }
   .report-title { font-size: 18.5px; line-height: 23.5px; }
   #hypo-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
@@ -1621,8 +1646,8 @@ body[data-pv-view="post"] #pv-reports { display: none; }
     </a>
 
     <nav class="menu-items" id="primary-menu" aria-label="주 메뉴">
-      <a class="nav-item" href="mock_home_us.html">미국</a>
-      <a class="nav-item" href="mock_home_kr.html" aria-current="page">한국</a>
+      <a class="nav-item" href="mock_home_us.html" data-bar="1">미국</a>
+      <a class="nav-item" href="mock_home_kr.html" aria-current="page" data-bar="1">한국</a>
       <a class="nav-item" href="/p/forecast-list.html">증시 전망</a>
     </nav>
   </div>
@@ -3444,10 +3469,15 @@ body[data-pv-view="post"] #pv-reports { display: none; }
   var closeBtn = document.createElement('button'); closeBtn.type = 'button'; closeBtn.className = 'nav-close';
   closeBtn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg><span class="sr-only">메뉴 닫기</span>';
   menu.insertBefore(closeBtn, menu.firstChild);
-  /* 폰에서 바로 보이는 메뉴 줄 — 서랍 메뉴 링크를 그대로 복사해 아이콘 앞에 (2026-11-10 사용자) */
+  /* 바로 보이는 메뉴 줄 — 서랍 메뉴 링크를 복사 (2026-11-10 사용자). data-bar 가 붙은 링크만(미국 · 한국) → 로고 오른쪽, PC 도 서랍 사용(body.has-bar).
+     data-bar 가 없으면 전부 복사해 폰에서만 아이콘 앞에 (PC 는 예전 메뉴 줄) */
   var quick = document.createElement('nav'); quick.className = 'menu-quick'; quick.setAttribute('aria-label', '주 메뉴 바로가기');
-  [].forEach.call(menu.querySelectorAll('a.nav-item'), function (a) { quick.appendChild(a.cloneNode(true)); });
-  toggle.parentNode.insertBefore(quick, toggle);
+  var barLinks = menu.querySelectorAll('a.nav-item[data-bar]');
+  var hasBar = barLinks.length > 0;
+  [].forEach.call(hasBar ? barLinks : menu.querySelectorAll('a.nav-item'), function (a) { var c = a.cloneNode(true); c.removeAttribute('data-bar'); quick.appendChild(c); });
+  var logo = document.querySelector('.navbar .logo');
+  if (hasBar && logo) { document.body.classList.add('has-bar'); logo.parentNode.insertBefore(quick, logo.nextSibling); }
+  else toggle.parentNode.insertBefore(quick, toggle);
   function narrow() { return window.matchMedia('(max-width: 900px)').matches; }
   function setMenu(open) {
     toggle.setAttribute('aria-expanded', String(open));
@@ -3460,7 +3490,7 @@ body[data-pv-view="post"] #pv-reports { display: none; }
   closeBtn.addEventListener('click', function () { setMenu(false); });
   overlay.addEventListener('click', function () { setMenu(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('is-open')) setMenu(false); });
-  window.addEventListener('resize', function () { if (!narrow() && menu.classList.contains('is-open')) setMenu(false); });
+  window.addEventListener('resize', function () { if (!hasBar && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 */
 })();
 
 /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
