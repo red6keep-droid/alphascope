@@ -105,12 +105,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav-right { display: flex; align-items: center; gap: 20px; flex: none; }
 
 .logo { display: flex; align-items: center; gap: 8px; flex: none; }
-.logo-mark { width: 36px; height: 33px; flex: none; display: block; }   /* 로고 313:286 (2026-10-13 사용자 새 로고) */
+.logo-mark { width: 32.4px; height: 29.6px; flex: none; display: block; }   /* 로고 313:286 (2026-10-13 사용자 새 로고). 36 → 32.4 (10% 작게, 2026-11-10 사용자) */
 .logo-word {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 900;
-  font-size: 24px;
-  line-height: 32px;
+  font-size: 19.2px;   /* 24 → 19.2 (20% 작게, 2026-11-10 사용자) */
+  line-height: 26px;
   letter-spacing: -0.2px;
   color: #000;
   white-space: nowrap;
@@ -211,11 +211,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav-overlay { position: fixed; inset: 0; z-index: 49; background: transparent; }   /* 헤더(50) 아래 — 서랍은 헤더 안에 있어 55로 두면 가림막이 서랍을 덮어 메뉴가 눌리지 않았다 (2026-10-13 사용자: "메뉴를 클릭시 목록 화면으로 이동되지 않는다")   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
+/* 미국 ⇄ 한국 스위치 (2026-11-10 사용자: "스위치로. 홈은 미국이니 미국일 때는 한국 국기") — 지금 화면이 아닌 쪽 국기 + 이름 하나 */
+.nav-switch { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 3px 11px 3px 3px; border: 1px solid var(--border-strong); border-radius: 999px; background: #fff; color: #111; font-size: 15px; font-weight: 700; line-height: 22px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: border-color .15s ease, background-color .15s ease; }
+.nav-switch:hover { border-color: #94A3B8; background: #F8FAFC; }
+.nav-switch svg { width: 22px; height: 22px; flex: none; display: block; border-radius: 50%; }
 /* 바로 보이는 메뉴 · 서랍 메뉴 나누기 (2026-11-10 사용자: "미국, 한국만 메뉴, 증시 전망은 메뉴 아이콘 안으로").
    서랍 메뉴 링크 가운데 data-bar 가 붙은 것만 로고 오른쪽 줄에 복사하고 body.has-bar 를 붙인다(JS). 그때는 PC 에서도 메뉴 아이콘 · 서랍을 쓴다.
    data-bar 가 하나도 없으면(지금 테마) 예전 그대로: PC 는 메뉴 전부 줄로, 폰은 전부 복사 */
 @media (min-width: 901px) {
-  body.has-bar .menu-quick { display: flex; align-items: stretch; gap: 12px; align-self: stretch; }
+  body.has-bar .menu-quick { display: flex; align-items: center; gap: 12px; align-self: stretch; }
   body.has-bar .nav-toggle {
     display: flex; align-items: center; justify-content: center;
     width: 36px; height: 36px; flex: none;
@@ -948,8 +952,8 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
   .navbar { gap: 6px; }
   .nav-right { gap: 4px; }
   .logo { gap: 6px; }
-  .logo-mark { width: 28px; height: 26px; }
-  .logo-word { font-size: 19px; line-height: 26px; letter-spacing: -0.4px; }
+  .logo-mark { width: 25.2px; height: 23px; }   /* 28 → 25.2 (10%) */
+  .logo-word { font-size: 15.2px; line-height: 22px; letter-spacing: -0.3px; }   /* 19 → 15.2 (20%) */
   .menu-quick .nav-item { padding: 6px 5px; font-size: 15px; letter-spacing: -0.3px; }
 }
 
@@ -1521,7 +1525,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
 @font-face { font-family: 'AS Barun'; font-weight: 700; font-display: swap; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumBarunGothic/NanumBarunGothicWebBold.woff) format('woff'); }
 @media (min-width: 901px) {
   body { font-size: 16px; }
-  .logo-word { font-size: 20px; line-height: 26.5px; }
+  .logo-word { font-size: 16px; line-height: 21.5px; }
   .nav-item { font-size: 16px; line-height: 22px; }
   body.has-bar .menu-items .nav-item { font-size: 16px; line-height: 25px; }
   .section-title { font-size: 18.5px; line-height: 23.5px; }
@@ -1646,8 +1650,8 @@ body[data-pv-view="post"] #pv-reports { display: none; }
     </a>
 
     <nav class="menu-items" id="primary-menu" aria-label="주 메뉴">
-      <a class="nav-item" href="mock_home_us.html" data-bar="1">미국</a>
-      <a class="nav-item" href="mock_home_kr.html" aria-current="page" data-bar="1">한국</a>
+      <a class="nav-item" href="mock_home_us.html" data-bar="1" data-flag="us">미국</a>
+      <a class="nav-item" href="mock_home_kr.html" aria-current="page" data-bar="1" data-flag="kr">한국</a>
       <a class="nav-item" href="/p/forecast-list.html">증시 전망</a>
     </nav>
   </div>
@@ -3469,12 +3473,34 @@ body[data-pv-view="post"] #pv-reports { display: none; }
   var closeBtn = document.createElement('button'); closeBtn.type = 'button'; closeBtn.className = 'nav-close';
   closeBtn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg><span class="sr-only">메뉴 닫기</span>';
   menu.insertBefore(closeBtn, menu.firstChild);
+  /* 둥근 국기 (그림 — 국기 이모지는 윈도우에서 글자 US · KR 로 나온다). 태극기는 작아서 4괘를 굵은 막대로 줄였다 */
+  var NAV_FLAGS = {
+    us: '<svg viewBox="0 0 22 22" aria-hidden="true"><defs><clipPath id="flag-us-c"><circle cx="11" cy="11" r="11"/></clipPath></defs><g clip-path="url(#flag-us-c)"><rect width="22" height="22" fill="#fff"/>' +
+      [0, 2, 4, 6, 8, 10, 12].map(function (i) { return '<rect y="' + (i * 22 / 13).toFixed(2) + '" width="22" height="' + (22 / 13).toFixed(2) + '" fill="#B22234"/>'; }).join('') +
+      '<rect width="11" height="' + (7 * 22 / 13).toFixed(2) + '" fill="#3C3B6E"/><g fill="#fff"><circle cx="3" cy="3" r=".8"/><circle cx="6.5" cy="3" r=".8"/><circle cx="4.75" cy="5.6" r=".8"/><circle cx="8.25" cy="5.6" r=".8"/><circle cx="3" cy="8.2" r=".8"/><circle cx="6.5" cy="8.2" r=".8"/></g></g><circle cx="11" cy="11" r="10.5" fill="none" stroke="rgba(0,0,0,.12)"/></svg>',
+    kr: '<svg viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="11" fill="#fff"/>' +
+      '<g transform="rotate(33.7 11 11)"><path d="M5.5 11a5.5 5.5 0 0 1 11 0a2.75 2.75 0 0 1-5.5 0a2.75 2.75 0 0 0-5.5 0z" fill="#CD2E3A"/><path d="M5.5 11a2.75 2.75 0 0 0 5.5 0a2.75 2.75 0 0 1 5.5 0a5.5 5.5 0 0 1-11 0z" fill="#0047A0"/></g>' +
+      '<g fill="#111"><rect x="2.6" y="4.6" width="4" height="1.6" rx=".3" transform="rotate(-56.3 4.6 5.4)"/><rect x="15.4" y="15.8" width="4" height="1.6" rx=".3" transform="rotate(-56.3 17.4 16.6)"/><rect x="15.4" y="4.6" width="4" height="1.6" rx=".3" transform="rotate(56.3 17.4 5.4)"/><rect x="2.6" y="15.8" width="4" height="1.6" rx=".3" transform="rotate(56.3 4.6 16.6)"/></g>' +
+      '<circle cx="11" cy="11" r="10.5" fill="none" stroke="rgba(0,0,0,.12)"/></svg>'
+  };
   /* 바로 보이는 메뉴 줄 — 서랍 메뉴 링크를 복사 (2026-11-10 사용자). data-bar 가 붙은 링크만(미국 · 한국) → 로고 오른쪽, PC 도 서랍 사용(body.has-bar).
      data-bar 가 없으면 전부 복사해 폰에서만 아이콘 앞에 (PC 는 예전 메뉴 줄) */
   var quick = document.createElement('nav'); quick.className = 'menu-quick'; quick.setAttribute('aria-label', '주 메뉴 바로가기');
-  var barLinks = menu.querySelectorAll('a.nav-item[data-bar]');
+  var barLinks = [].slice.call(menu.querySelectorAll('a.nav-item[data-bar]'));
   var hasBar = barLinks.length > 0;
-  [].forEach.call(hasBar ? barLinks : menu.querySelectorAll('a.nav-item'), function (a) { var c = a.cloneNode(true); c.removeAttribute('data-bar'); quick.appendChild(c); });
+  if (hasBar) {
+    /* 스위치: 지금 화면(aria-current)이 아닌 쪽 하나만, 국기 + 이름. 지금 화면 표시가 없으면(글 보기 등) 첫째(미국 = 홈)를 지금으로 본다 */
+    var curBar = barLinks.filter(function (a) { return a.getAttribute('aria-current') === 'page'; })[0] || barLinks[0];
+    barLinks.forEach(function (a) {
+      if (a === curBar) return;
+      var name = a.textContent.trim(), sw = document.createElement('a');
+      sw.className = 'nav-switch'; sw.href = a.getAttribute('href'); sw.setAttribute('aria-label', name + ' 화면으로');
+      sw.innerHTML = (NAV_FLAGS[a.getAttribute('data-flag')] || '') + '<span>' + name + '</span>';
+      quick.appendChild(sw);
+    });
+  } else {
+    [].forEach.call(menu.querySelectorAll('a.nav-item'), function (a) { quick.appendChild(a.cloneNode(true)); });
+  }
   var logo = document.querySelector('.navbar .logo');
   if (hasBar && logo) { document.body.classList.add('has-bar'); logo.parentNode.insertBefore(quick, logo.nextSibling); }
   else toggle.parentNode.insertBefore(quick, toggle);
