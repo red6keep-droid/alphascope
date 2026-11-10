@@ -168,7 +168,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-card-title a:has(.post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
 .post-card-title .post-title-date { margin-left: auto; }
 .post-title .post-title-date { font-size: 14px; line-height: 20px; }   /* 제목 행간(49 · 37 · 33)을 물려받으면 홀짝이 어긋난다 (2026-11-07) */
-.post-title-sub { font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; margin-left: 9px; }   /* 종목 제목 꼬리 `주가 실적 일정` — 숨기지 않고 작게만 (2026-10-27 사용자 P20) · 14px = `넘겨 보기` 와 같게 (P29) */
+.post-title-sub { font-size: 13px; line-height: 19px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; margin-left: 9px; }   /* 13/19 = 기준 상자 글씨와 같은 가장 작은 글씨 (2026-11-11 사용자, 옛 14/20) · 종목 제목 꼬리 `주가 실적 일정` — 숨기지 않고 작게만 (2026-10-27 사용자 P20) · 14px = `넘겨 보기` 와 같게 (P29) */
 /* 이름 ~ 꼬리 사이 = 띄어쓰기의 1.5배(실측 5.7 · 5.1 · 4.6px → 9 · 8 · 7px), 꼬리는 이름 줄의 세로 가운데 (2026-10-27 사용자 P21). 칸이 flex 라 띄어쓰기는 접히고 여백만 남는다 */
 .post-title-label:has(> .post-title-sub) { display: flex; flex-wrap: wrap; align-items: center; }
 @media (max-width: 900px) { .post-title-sub { margin-left: 8px; } }
@@ -265,6 +265,9 @@ body.item-view .navbar { position: static; }
 /* 상세 페이지(폰 680px 이하) = 로고 줄 없음, 메뉴 버튼은 제목 줄 공유 버튼 뒤, 공유 버튼 32 → 36 = 메뉴 · 뒤로 버튼과 같은 상자 (2026-11-10 사용자, PC 는 그대로).
    body.detail-nav 는 테마 JS 가 폰 폭 + 고정 제목 줄일 때만 붙인다 */
 @media (max-width: 680px) { body.item-view .title-share { width: 36px; height: 36px; } }
+/* 종목 페이지 공유 버튼 = 제목 아래 회색 기준 상자 오른쪽 (2026-11-11 사용자) — 31 상자 · 아이콘 19(28 · 16 → 10% 30 · 18 → 2% 더, 같은 날 사용자), 위아래 −6 · 오른쪽 −6 이라 상자(위아래 10 + 글 19 = 39) 높이는 그대로, 상자 세로 가운데 */
+body.item-view .post-body [data-report-stamp].has-share .title-share { width: 31px; height: 31px; margin: -6px -6px -6px auto; align-self: center; }
+body.item-view .post-body [data-report-stamp].has-share .title-share svg { width: 19px; height: 19px; }
 body.detail-nav .navbar { display: none; }
 body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
