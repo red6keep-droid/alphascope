@@ -13,7 +13,7 @@
 - 표시 라벨 = 충격 뒤 전망의 `우리 전망`(기록상 분포로 고른 쪽)만. 사건 전 전망의 `실제 결과` 라벨은 삭제(P414 — 일어난 쪽은 답 · 색으로 보인다).
 - 갈래 순서 = 높은 쪽(상승 이름표) 위 `전망 A` · 낮은 쪽 아래 `전망 B`(P411, 화면 순서만 — 판정 번호 no 는 그대로). `그 밖이면` 같은 조건은 짝 조건의 반대 문장으로 자동(P412).
 - 독자 말(2026-11-07 저녁 재점검): `금` → `기준`, `충격 폭` → `급락 폭` · `급등 폭`, `창` → `60거래일 안에`, 구획 `더 알아보기` → `더 궁금한 것`, 갈래 구획은 `두 갈래 전망` 하나.
-- 2026-11-07 밤 개선 10 전부 채택(기획 10절): ① 자 = 시장 모형 β 조정 초과수익(abnormal) ② 우리 전망에 기록상 비율(n번 중 m번) + 브라이어 ③ 고정 시점 판정(D+5 · 20 · 60) 병기, 플라시보는 검증해 때 ④ 뉴스 유무 갈림(Chan 2003: 뉴스 동반 = 지속 가중, 원인 미상 = 반등 · 조정 가중) ⑤ 거래량 배수 ⑥ GPR · EPU 배경 ⑦ 기록 카드 n번 중 m번 + 범위 ⑧ 실적 전망 기준 = 옵션 내재 예상 폭
+- 2026-11-07 밤 개선 10 전부 채택(기획 10절): ① 자 = 시장 모형 β 조정 초과수익(abnormal) ② 우리 전망에 기록상 비율(n번 중 m번) + 브라이어 ③ 고정 시점 판정(D+5 · 20 · 60) 병기, 플라시보는 검증해 때 ④ ~~뉴스 유무 갈림(Chan 2003)~~ 2026-11-10 폐지(바깥 연구 일반화) ⑤ 거래량 배수 ⑥ GPR · EPU 배경 ⑦ 기록 카드 n번 중 m번 + 범위 ⑧ 실적 전망 기준 = 옵션 내재 예상 폭
 - 11-07 밤 11절 채택(1 · 2 · 3 · 6): 틀 S 에 시장 예상 확률(market_prob) → 결과 줄 `예상대로` · `예상 밖` · 목록 맨 위 `우리 전망 성적표`(scoreboard) · 기록 카드 `가장 비슷했던 때` 셋(history.alike) · 시점 고정(운영자 상자). 4 · 5 는 발행 단계 · 검증해 때
 - 11-07 밤 선반영 · 느린 누적 (사용자: "뻔한 결과는 먼저 반영되고, 하루 1%씩 쌓이는 하락은 3배 감지에 안 걸린다"): 틀 S 에 `detect_day`(감지일 = 시장 확률 ≥ 70% 사흘 + 뉴스 묶음 집중) — 감지일부터 사건 전날까지 `선반영 중` 국면, 결과일 종가로 자를 다시 놓고 뒤를 잰다. 예상대로 쪽 갈래는 `priced`(이미 반영): 결과 뒤 기준 넘게 더 가면 틀림, 반대로 가거나 20거래일 기준 안이면 맞음. 느린 누적 = 틀 R 에 감지만 다른 것(10거래일 누적 2σ, 하루 기준 미달).
 - 11-07 밤 "묘사가 아니라 경고" (사용자: 출발점은 중간선거처럼 "이렇게 되면 이런 일이 올 수 있으니 미리 생각해 두자"였다): ① 맨 위 `앞으로 올 수 있는 일` 카드(fc["prepare"]) = 다가오는 사건 × 지금 분위기 × 기록 → 조건부 경고 + 볼 것, 매수 · 매도 말 없음 ② 국면 문장 끝에 앞을 보는 꼬리("기준까지 1.2%p 남았습니다. 넘으면 ‘…’").
@@ -158,8 +158,9 @@ def wordify(text, L=3.0):
     t = _re.sub(r"누적\s*[+\-−]?\s*[\d.]+\s*%p?", "누적으로 꽤 내림", t)
     t = _RE_X.sub(lambda m: ("훨씬 작게" if float(m.group(1)) < 0.5 else "조금 작게" if float(m.group(1)) < 0.9 else "비슷하게" if float(m.group(1)) < 1.2 else "크게" if float(m.group(1)) < 2.5 else "아주 크게"), t)
     return t.replace("기록상 기록상", "기록상")
-RULES = "EH-2026-11-07b"   # 자 β 조정 · 뉴스 유무 갈림 · 비율 · 고정 시점 병기
-NEWS_TILT = 0.10            # 뉴스 유무 갈림 — 1위 이슈 뚜렷하면 지속 쪽 10%p, 원인 미상이면 반등 · 조정 쪽 10%p (Chan 2003)
+RULES = "EH-2026-11-10"   # 자 β 조정 · 비율 · 고정 시점 병기 — 뉴스 유무 10%p 가중 폐지 · `유력` = 기록이 반반과 분명히 다를 때만 (2026-11-10 사용자)
+# 옛 EH-2026-11-07b 의 NEWS_TILT(뉴스 동반 급변은 지속 쪽 10%p, Chan 2003) 폐지 — 바깥 연구 하나를 우리 사건에 그대로 일반화한 가정이고,
+# 큰 사건은 거의 다 뉴스가 있어 사실상 늘 지속 쪽으로 기울였다. 전망 2(11.05 반도체 급락)에서 기록상 반등 54% 를 지속 56% 로 뒤집어 틀림 (2026-11-10 사용자).
 
 
 def beta(y, x, window=120):
@@ -184,13 +185,18 @@ def abnormal(sub, mkt, base_i, b=1.0):
     return out
 
 
-def pick_side(rate_rev, news):
-    """틀 R 우리 전망 — ① 뉴스 유무 ② 같은 종류 기록 비율. rate_rev = 기록상 반등(조정) 비율 m/n, news = 1위 이슈 뚜렷(True) · 원인 미상(False).
-    → (갈래 번호 1=반등·조정 / 2=지속, 그 갈래의 확률, 설명)."""
-    p = min(0.95, max(0.05, rate_rev - (NEWS_TILT if news else -NEWS_TILT)))
+def pick_side(m, n):
+    """틀 R 우리 전망 = 같은 종류 기록만. m = 기록상 반등(급등 뒤면 조정) 횟수, n = 전체.
+    → (갈래 번호 1=반등·조정 / 2=지속, 그 갈래의 비율, 설명, 유력 여부).
+    유력 = 95% 윌슨 구간이 50% 를 넘지 않을 때만 — 표본이 말하는 것보다 세게 말하지 않는다 (2026-11-10 사용자: 56% 에 `유력`)."""
+    p = m / n
     side = 1 if p >= 0.5 else 2
-    why = f'기록상 {rate_rev * 100:.0f}% {"−" if news else "+"} 뉴스 {"동반(지속 가중)" if news else "없음(반등 · 조정 가중)"} {NEWS_TILT * 100:.0f}%p → {p * 100:.0f}%'
-    return side, (p if side == 1 else 1 - p), why
+    q = p if side == 1 else 1 - p
+    z = 1.96
+    lo = (q + z * z / (2 * n) - z * ((q * (1 - q) + z * z / (4 * n)) / n) ** 0.5) / (1 + z * z / n)
+    strong = lo > 0.5
+    why = f'기록상 {m}/{n} = {p * 100:.0f}% · 95% 구간 아래 끝 {lo * 100:.0f}% → {"유력" if strong else "반반(유력 없음)"}'
+    return side, q, why, strong
 
 
 def brier(p, hit):
@@ -492,7 +498,7 @@ def branch_view(fc, st, sc):
             return {"answer": NOT_HAPPENED, "theme": "neutral", "label": None, "active": False, "opened": False}
         label, toward = None, key == "lean"   # `실제 결과` 라벨 삭제 (P414)
     else:
-        label = "유력" if sc["no"] == fc["pick"] else None   # 옛 `우리 전망` — 카드 이름표 `전망 A · B` 와 겹쳐 헷갈림 (2026-11-08 사용자)
+        label = "유력" if sc["no"] == fc.get("pick") and fc.get("pick_strong", True) else None   # pick_strong 없음 = 옛 규칙으로 등록된 전망(등록 그대로) · False = 기록이 반반이라 고르기만 하고 `유력` 은 안 붙임 (2026-11-10)   # 옛 `우리 전망` — 카드 이름표 `전망 A · B` 와 겹쳐 헷갈림 (2026-11-08 사용자)
         toward = (key == "lean" and sc["no"] == 1) or (key == "lean_x" and sc["no"] == 2)
     if res:
         if res.get("crossed") == sc["no"]:
@@ -1480,7 +1486,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
          + _date_row(fc, out=not before and fc["kind"] == "pre").replace("flex-direction:column;align-items:flex-end;", "flex-wrap:wrap;align-items:center;gap:4px 10px;", 1)
          + back_btn.replace("margin-top:6px;", "", 1) + '</span></span></h2>') + _follow_btn(fc, st)
     body = (q + sides + head + crowd_line(fc)   # 겹침이 2개를 넘으면 사실 한 줄 (2026-11-08)
-            + (operator_box(op + _op_mood(fc) + ([("거래량", f'평소의 {st["volume_x"]:.1f}배 — 우리 전망 고르기 재료(뉴스 · 거래량 없는 급변은 반등 · 조정 쪽, 많으면 지속 쪽)')] if fc["kind"] == "after" and st.get("volume_x") else [])) if op else "")
+            + (operator_box(op + _op_mood(fc) + ([("거래량", f'평소의 {st["volume_x"]:.1f}배 — 기록만 — 우리 전망 고르기엔 안 씀')] if fc["kind"] == "after" and st.get("volume_x") else [])) if op else "")
             + more   # `더 궁금한 것` 제목 삭제 — 기록 · 앞으로 볼 것은 각자 구분선 구획 (2026-11-07 사용자)
             )   # `다른 전망` 구획 삭제 — 글 아래 [목록] 버튼이 전망 목록으로 간다, 이어진 전망은 겹침 카드 안 링크로 (P442, 2026-11-08 사용자)
     return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-head-title="{HEAD_FORECAST}" data-nav="list" data-title-back="{page_url(LIST_SLUG)}" data-title-back-label="목록" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}{RELATED}</div>')

@@ -178,15 +178,16 @@ def after_fc(t, no, gap, registered, shock_day, base_day, pick=1, title_event=No
            "chain": [{"step": f"{H.SHOCK[s]} 뒤 {L / 3:.0f}{u} 더 {more}", "state": "wait", "ev": "", "date": ""},
                      {"step": f"{H.SHOCK[s]} 뒤 {L:g}{u} 더 {more}", "state": "wait", "ev": "", "date": ""}],
            "win": f'{T["subj_ga"]} {H.SHOCK[s]} 뒤 {L:g}{u} 더 {"오른다" if s > 0 else "빠진다"}'}]
-    # 우리 전망 = ① 뉴스 유무 ② 같은 종류 기록 비율 (개선 ④ · ②). hist_after 20거래일 줄의 "오른 횟수" 가 반등(급락 뒤) 또는 지속(급등 뒤)의 횟수
+    # 우리 전망 = 같은 종류 기록 비율만 (2026-11-10 사용자: 뉴스 유무 10%p 가중 폐지). hist_after 20거래일 줄의 "오른 횟수" 가 반등(급락 뒤) 또는 지속(급등 뒤)의 횟수
     h = T.get("hist_after")
+    strong = None
     if h and len(h["rows"][1]) == 3:
         up = h["rows"][1][1]; n = h["n"]
-        rate_rev = (up / n) if s < 0 else (1 - up / n)
-        side, prob, why = H.pick_side(rate_rev, T.get("news", True))
+        m_rev = up if s < 0 else n - up
+        side, prob, why, strong = H.pick_side(m_rev, n)
         pick = side
-        m = (up if s < 0 else n - up) if side == 1 else (n - up if s < 0 else up)   # 독자 줄 = 실제 횟수(가중 전), 확률 · 계산식은 운영자 상자
-        pick_odds = (m, n, "같은 종류 사건 뒤 20거래일 · " + ("뉴스가 있는 급변은 이어지는 쪽이 더 흔해 조금 더 무게" if T.get("news", True) else "뉴스 없는 급변은 반등 · 조정 쪽이 더 흔해 조금 더 무게"))
+        m = m_rev if side == 1 else n - m_rev
+        pick_odds = (m, n, "같은 종류 사건 뒤 20거래일")
     else:
         prob, why, pick_odds = None, "", None
     ev_word = title_event or ("급등" if s > 0 else "급락")
@@ -199,7 +200,7 @@ def after_fc(t, no, gap, registered, shock_day, base_day, pick=1, title_event=No
                          "lines": [f"시장도 같이 움직였나 : 혼자 크게 움직인 {H.SHOCK[s]}과 시장이 같이 움직인 {H.SHOCK[s]}은 그 뒤 모양이 다릅니다",
                                    f"크게 움직인 날의 뉴스 : {H.SHOCK[s]}과 같은 종류의 뉴스가 이어지면 지속 쪽, 다른 종류의 뉴스가 늘면 {rw} 쪽입니다"],
                          "tail": f'{H.SHOCK[s]} 폭의 절반을 {rv}하면 ‘{sc[0]["name"]}’, {H.SHOCK[s]} 뒤 {L:g}{u} 더 가면 ‘{sc[1]["name"]}’으로 적습니다.'},
-                   history=T.get("hist_after"), pick_prob=prob, pick_why=why, pick_odds=pick_odds, news=T.get("news", True), beta=T.get("beta"), T=T)
+                   history=T.get("hist_after"), pick_prob=prob, pick_why=why, pick_odds=pick_odds, pick_strong=strong, news=T.get("news", True), beta=T.get("beta"), T=T)
 
 
 def mark_chain(fc, st):
@@ -306,7 +307,7 @@ def op_for(t, fc, st, extra=None):
     else:
         rows = [("규칙", f'{H.RULES} (틀 R) · 자 = β 조정 초과수익(β {fc.get("beta") or 1.0}) · 반등 · 조정 = 폭 절반 · 지속 = 금만큼 더 · 창 D+60'),
                 ("자료", "B1 일봉 대상 · 비교 계열 · 거래량 · B2 _VIX · A5 이슈 코드(크게 움직인 날 상위 3일) · GPR · EPU 일별"),
-                ("우리 전망", f'{fc["scenarios"][fc["pick"] - 1]["name"]} {(str(round(fc["pick_prob"] * 100)) + "%") if fc.get("pick_prob") else ""} — {fc.get("pick_why") or "기록상 같은 종류 뒤 20일 중앙값 부호"} (뉴스 유무 = {"1위 이슈 뚜렷" if fc.get("news", True) else "원인 미상"})')]
+                ("우리 전망", f'{fc["scenarios"][fc["pick"] - 1]["name"]} {(str(round(fc["pick_prob"] * 100)) + "%") if fc.get("pick_prob") else ""} — {fc.get("pick_why") or "기록상 같은 종류 뒤 20일 중앙값 부호"}')]
     if extra:
         rows += extra
     fx = st.get("fixed") or {}
@@ -526,10 +527,10 @@ def case_slow(t):
     fc["pressure"] = pressure(t, "shock")
     fc["pressure"]["rows"][1] = ("시장 충격 국면", "평소", "VIX 21 — 급락 없이 내려옴")
     extra = [("감지 규칙", f'둘째 감지기: 10거래일 누적 β 조정 초과수익 {g:+.1f}{u} = 10일 분포 2.3σ(기준 2σ). 하루 최대 −{abs(g) * 0.16:.1f}{u} = 평소 1.5배(하루 기준 3배 미달). 하루 감지기와 따로 돌고, 둘 다 걸리면 하루 쪽이 먼저'),
-             ("뉴스", "A5 10거래일 누적 1위 이슈 묶음 = " + ("RATES_FED 41건 · INFLATION 19건 (‘인상 우려’ 꾸준히)" if t == "A" else "OIL_ENERGY 29건 · GROWTH_JOBS 11건 (‘수요 둔화 우려’ 꾸준히)" if t == "B" else "AI_CAPEX 33건 · EARNINGS 15건 (‘투자 둔화 우려’ 꾸준히)") + " → 뉴스 동반(지속 가중). 하루에 몰린 뉴스가 아니라 열흘 내내 같은 이야기"),
+             ("뉴스", "A5 10거래일 누적 1위 이슈 묶음 = " + ("RATES_FED 41건 · INFLATION 19건 (‘인상 우려’ 꾸준히)" if t == "A" else "OIL_ENERGY 29건 · GROWTH_JOBS 11건 (‘수요 둔화 우려’ 꾸준히)" if t == "B" else "AI_CAPEX 33건 · EARNINGS 15건 (‘투자 둔화 우려’ 꾸준히)") + " — 하루에 몰린 뉴스가 아니라 열흘 내내 같은 이야기(기록만, 우리 전망 고르기엔 안 씀)"),
              ("왜 따로 두나", "하루 3배 기준은 1년에 2~4번 — 조용한 하락은 그 사이를 빠져나간다(지표 검증의 ‘H4 조용한 하락’ 가설과 같은 자리). 반등 vs 지속 기록은 급락과 따로 센다(종류 = 느린 누적)")]
     expl = [("상황", f'{T["subject"]}이 열흘 동안 하루 {abs(g) * 0.1:.1f}{u} 안팎으로 조금씩 내려 누적 {g:+.1f}{u} (가상). 하루로는 어느 날도 기준에 안 걸림. 뉴스는 열흘 내내 같은 걱정.'),
-            ("코드가 한 일", "둘째 감지기(10거래일 누적 2σ)가 걸린 날 장 마감 뒤 틀 R 로 등록 — 자는 10거래일 전 종가 기준, 갈래는 급락과 같은 반등 vs 하락 지속, 우리 전망은 뉴스 동반이라 지속 가중."),
+            ("코드가 한 일", "둘째 감지기(10거래일 누적 2σ)가 걸린 날 장 마감 뒤 틀 R 로 등록 — 자는 10거래일 전 종가 기준, 갈래는 급락과 같은 반등 vs 하락 지속, 우리 전망은 같은 종류 기록 비율로."),
             ("독자가 보는 것", f'제목 ‘{fc["title"]}’, 날짜 줄 `감지 : 10거래일 누적 {g:+.1f}{u}`, 첫 문장 "하루 기준엔 안 걸리게 조금씩 내렸습니다". 나머지는 급락 페이지와 같다.'),
             ("내부 기록", "종류 = 느린 누적(급락과 따로), 감지 σ, 뉴스 누적 묶음. 선반영(상황 13)과 짝 — 뻔한 결과가 가까이 있으면 선반영 쪽으로 등록된다(일정 있음 우선).")]
     return expl, [("전망 페이지 (느린 누적 → 지속 우세)", H.forecast_body({"id": f"EH-{t}-slow"}, st, fc, others=[], op=op_for(t, fc, st, extra=extra)))]
@@ -902,7 +903,7 @@ def case(t, k):
         st = run(fc, dd, rel, vix=vix_for(rel) if vx else None, volume_x=1.2)
         mine = fc["scenarios"][fc["pick"] - 1]["name"]
         expl = [("상황", f'일정에 없던 큰 하락({H.md(dd[1])}, 평소의 3배 넘게), 그날 1위 뉴스 없음(원인 미상 충격 · 거래량 1.2배). 다음 날 장 마감 뒤 자동 등록. 규칙이 고른 우리 전망 = ‘{mine}’ {fc["pick_prob"] * 100:.0f}%. 잠깐 회복하다가 다시 빠져 ‘{fc["scenarios"][1]["name"]}’ 이 실현 → {st["result"]["word"]}.'),
-                ("코드가 한 일", f'큰 움직임 감지 → 틀 R 등록(AI 호출 0) → 우리 전망 = 뉴스 유무(없음 → 반등 · 조정 가중) + 같은 종류 기록 비율 → {fc["pick_why"]} → 지속 기준을 넘은 날 판정 · 브라이어 {H.brier(fc["pick_prob"], st["result"]["word"] == "맞음")}.'),
+                ("코드가 한 일", f'큰 움직임 감지 → 틀 R 등록(AI 호출 0) → 우리 전망 = 같은 종류 기록 비율 → {fc["pick_why"]} → 지속 기준을 넘은 날 판정 · 브라이어 {H.brier(fc["pick_prob"], st["result"]["word"] == "맞음")}.'),
                 ("독자가 보는 것", f'맨 위 ‘{st["result"]["word"]}’. ‘{mine}’ 갈래 = 우리 전망 라벨 + 기록상 n번 중 m번 줄, 지속 갈래 = 실현.'),
                 ("내부 기록", "결과 · 겹침 없음 · 고정 시점 판정(D+5 · 20) · 브라이어. 충격에서 시작한 사건이라 첫 전망이 틀 R.")]
         return expl, [(f'전망 페이지 ({st["result"]["word"]})', page(fc, st))]
