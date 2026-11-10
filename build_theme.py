@@ -545,12 +545,17 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
     <title><data:view.title.escaped/></title>
     <b:include data='blog' name='all-head-content'/>
-    <!-- 검색 (2026-10-13 사용자): Google Search Console 소유 확인. 블로거 설정의 검색 설명이 비어 있으면 홈 · 목록에 기본 설명을 단다(글 보기는 블로거가 본문 앞부분으로 채운다) -->
+    <!-- 검색 (2026-10-13 사용자): Google Search Console 소유 확인. 블로거 설정의 검색 설명이 비어 있으면 홈 · 목록에 기본 설명을 단다. 글 · 페이지에는 블로거가 설명을 달지 않는다(2026-11-10 확인) -->
     <meta content='GWtZLHo2CgnmBBgSxQQg0BKY_xKZJTSba7BBOZ6e4Ts' name='google-site-verification'/>
     <!-- 네이버 서치어드바이저 소유 확인 (2026-10-15 사용자). 블로거는 루트에 HTML 파일을 못 올려 메타 태그 방식 -->
     <meta content='4b16f0e43da3e199130fd61a86cb96dff343fb9d' name='naver-site-verification'/>
     <b:if cond='!data:view.isSingleItem and data:blog.metaDescription == &quot;&quot;'>
       <meta content='__SITE_DESC__' name='description'/>
+    </b:if>
+    <!-- 고정 페이지(종목 · 목록 · 전망) 검색 설명 = 페이지 제목 + 공통 꼬리 (2026-11-10 사용자: Search Console 크롤링됨-색인 안 됨 · 페이지에 검색 설명이 없었다).
+         Blogger API 의 Page 에는 설명 칸이 없어 테마가 만든다. 글(날짜별 리포트)은 맨 위 요약이 있어 그대로 -->
+    <b:if cond='data:view.isPage'>
+      <meta expr:content='data:view.title + &quot; — 매 거래일 장 마감 뒤 종가와 그날 눈에 띄는 사실, 실적 일정을 정리합니다&quot;' name='description'/>
     </b:if>
     <!-- 홈 화면 아이콘 (2026-10-13 사용자, 디자인 가이드 10-4). 블로거에는 파일을 못 올리므로 리포 pwa/ 를 jsDelivr 로 쓴다 -->
     <link href='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/manifest.json' rel='manifest'/>
@@ -790,7 +795,7 @@ __JS__
 
 # 홈 · 목록의 검색 설명 (블로거 설정의 검색 설명이 비어 있을 때만, 2026-10-13 사용자: 구글 검색에 잘 안 나온다)
 # 특정 종목 이름은 넣지 않는다 — 종목별 리포트는 늘어날 수 있다 (2026-10-13 사용자)
-SITE_DESC = "미국 증시 지수와 섹터, 트럼프 발언, 종목별 주가와 뉴스를 매일 아침 정리하는 자동 리포트"
+SITE_DESC = "미국 · 한국 증시 리포트와 종목별 주가 · 실적 일정 · 뉴스를 매 거래일 정리합니다"   # 2026-11-10 사용자: 트럼프 리포트 종료(11-04) · 한국 리포트 · 종목 페이지를 넣은 문장 (113바이트)
 
 # 상단 메뉴 = 지금 있는 리포트 연재 (2026-10-13 사용자: "리포트들은 메뉴에 있어야 하고 클릭하면 리포트 리스트 화면으로"). (보이는 이름, 블로거 라벨)
 # 엔비디아 리포트는 뺐다 — 2026-11-01 부터 날짜별 글 없이 종목 고정 페이지(시총 TOP 10 에서 들어감). 지난 글 목록 화면 · 목록 버튼은 아래 NVDA_LABEL 로 그대로
