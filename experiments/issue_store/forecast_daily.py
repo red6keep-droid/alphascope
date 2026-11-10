@@ -7,7 +7,7 @@
 하는 일 (순서 = 기록 먼저, 렌더 나중):
 1. hypotheses/EH-*.json 에서 공개 전망(publish 가 False 아님)만 고른다. 목업 파일(forecast_cases.py)은 절대 읽지 않는다 — 가상 숫자 차단(14절 3).
 2. 시세: yfinance → 실패하면 price_source 예비 사슬(FRED → …). 하나도 못 받으면 Slack ‘자료 대기’ 알림 뒤 끝(페이지는 전날 그대로).
-2-1. 자동 등록(forecast_register, 2026-11-11): 지수 · 업종이 평소의 3배 넘게 움직인 다음 날이면 틀 R 전망을 새로 적는다(AI 0, 동시 3개, 상태 저장소 records/hypotheses).
+2-1. 자동 등록(forecast_register, 2026-11-11): 지수 · 업종 · 종목(업종 대비)이 평소의 3배 넘게 움직인 다음 날이면 틀 R 전망을 새로 적는다(AI 0, 지수 · 업종 3 · 종목 2, 종목은 고르지 않음, 이유 카드).
 3. 판정: 매일 시세 이력 전체에서 다시 계산(stateless) — 어제 실행이 죽어도 오늘이 다시 잰다. 빈 날은 건너뛰고 알림.
 4. 기록: records/forecasts/{EH}.jsonl 에 그날 한 줄(국면 · 값 · 결과 · 빈 날) 덧붙이기. 결과는 처음 난 날 값으로 고정(시점 고정).
 5. 렌더: 전망 페이지 · 목록 · hypo.json · 공개 증명 파일(proof/{slug}.json).
@@ -126,7 +126,7 @@ def run(state_dir=None):
     pub = [(r, fc) for r in regs for fc in H.forecasts(r, public=True)]
     first = min([base_of(fc) for _, fc in pub] + [(dt.date.today() - dt.timedelta(days=30)).isoformat()])   # 자동 등록이 볼 최근 며칠도 받는다
     start = (dt.date.fromisoformat(first) - dt.timedelta(days=10)).isoformat()
-    extra = {w[0] for w in R.WATCH} | {(fc.get("series") or {}).get("sub") for _, fc in pub} | {(fc.get("series") or {}).get("mkt") for _, fc in pub}
+    extra = {x for w in R.INDEX + R.stocks() for x in (w["sym"], w["mkt"]) if x} | {(fc.get("series") or {}).get("sub") for _, fc in pub} | {(fc.get("series") or {}).get("mkt") for _, fc in pub}
     px = fetch(start, extra)
     if not px["sox"] or not px["spx"]:
         FA.no_prices()
@@ -160,7 +160,7 @@ def run(state_dir=None):
     # 자동 등록 (기획 8-1 · 틀 R, AI 0) — 오늘 봉이 충격 다음 날이면 새 전망을 적고 바로 첫 판정(시작 줄)까지
     try:
         reg_dir = H.reg_dirs(state_dir)[1]
-        for r, fc in R.register(px, today, pub, states, reg_dir, read_dirs=H.reg_dirs(state_dir)[:1], alert=FA):
+        for r, fc in R.register(px, today, pub, states, reg_dir, read_dirs=H.reg_dirs(state_dir)[:1], alert=FA, state_dir=state_dir):
             pub.append((r, fc))
             judge(r, fc)
     except Exception as e:  # noqa: BLE001

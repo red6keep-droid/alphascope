@@ -103,7 +103,7 @@ DIR_WORD = {1: "상승", -1: "하락"}
 THEME = {1: "positive", -1: "negative", 0: "neutral"}
 INK = {1: dk.UP, -1: dk.DOWN, 0: "#111"}
 PHASE_INK = {"negative": dk.DOWN, "positive": dk.UP}
-RESULT = {"hit": "맞음", "miss": "틀림", "neither": "제자리", "hold": "판정 보류", "void": "무효"}
+RESULT = {"hit": "맞음", "miss": "틀림", "neither": "제자리", "hold": "판정 보류", "void": "무효", "done": "결과"}   # done = 고르지 않는 전망(종목, fc["pick"] 없음)이 어느 쪽인지 난 날 — 맞음 · 틀림 없이 일어난 갈래 이름 (2026-11-11)
 EARLY = 1 / 3            # 우세 = 금의 3분의 1
 R_EARLY, R_HIT = 0.25, 0.5   # 반등 · 조정 우세 = 충격 폭 4분의 1 회복(반납), 반등 · 조정 = 절반
 LEAN = "조짐이 보임"   # 타임라인 국면 `상승 조짐이 보임` · `조정 조짐이 보임` (2026-11-08 사용자, 옛 `○○ 조짐` → `○○ 우세`)
@@ -400,8 +400,16 @@ def judge(fc, days, rel, cond=None, vix=None):
             ext = s * (r - gap)
             last_rel = r
             b1, b2 = sc[0], sc[1]
-            pick = sc[fc["pick"] - 1]["name"]
+            pick = sc[fc["pick"] - 1]["name"] if fc.get("pick") else None
             crossed = 1 if recov >= R_HIT else (2 if ext >= L else None)
+            if crossed and not pick:   # 종목 전망 = 우리가 고르지 않는다 — 일어난 쪽만 적고 성적표에 넣지 않는다 (2026-11-11 사용자, 매수 추천 금지)
+                word = REV[s][0] if crossed == 1 else f"{DIR_WORD[s]} 지속"
+                result = {"word": word, "crossed": crossed, "day": day, "unscored": True}
+                what = (f'{SHOCK[s]} 폭의 {recov * 100:.0f}%({recov_word(recov)})를 {REV[s][1]}해 ‘{b1["name"]}’이 일어났습니다' if crossed == 1
+                        else f'{SHOCK[s]} 뒤 {ext:.1f}{unit} 더 {"올라" if s > 0 else "빠져"} ‘{b2["name"]}’이 일어났습니다')
+                dd = sc[crossed - 1]["dir"]
+                log.append(_entry(day, "done", word, dd, f'{what}.', r, THEME[dd]))
+                break
             if crossed:
                 ok = crossed == fc["pick"]
                 result = {"word": RESULT["hit" if ok else "miss"], "crossed": crossed, "day": day}
@@ -507,7 +515,7 @@ def branch_view(fc, st, sc):
             return {"answer": res.get("word") or RESULT["miss"], "theme": "neutral", "label": None, "active": True, "opened": True}
         return {"answer": NOT_HAPPENED, "theme": "neutral", "label": label, "active": bool(label), "opened": bool(label)}
     return {"answer": ANS_LEAN if toward else "", "theme": "uncertain" if toward else "neutral", "label": label, "active": True,   # 우세 = 보라 강조 카드 (P421, 2026-11-08 사용자)
-            "opened": fc["kind"] == "pre" or sc["no"] == fc.get("pick")}
+            "opened": fc["kind"] == "pre" or sc["no"] == fc.get("pick") or not fc.get("pick")}
 
 
 NUM_KO = ["하나", "둘", "셋", "넷", "다섯", "여섯"]
@@ -950,6 +958,34 @@ def _plain_sec(title, lead, rows, note="", lines=True):
 
 
 # 접는 구획 제목 = `함께 보는 페이지` 제목과 같은 글씨(19 굵게 · 왼쪽 기준선 6) (2026-11-07 사용자, 옛 21)
+
+
+def _reasons_card(fc):
+    """무엇이 이유로 꼽혔나? — 자동 등록 때 모아 고정한 fc["reasons"] (forecast_register.reasons, 2026-11-11 사용자).
+    기사 · 방송이 든 이유(이슈 건수 · 대표 기사) · 애널리스트 목표가 변경 · 우리 기록상 신호. 원인을 판단하지 않고 모은 것만 — 가이드라인 1절 4-2."""
+    w = fc.get("reasons")
+    if not w:
+        return ""
+    rows = []
+    if w.get("issues"):
+        rows.append(("기사가 든 이유", " · ".join(f"{k} {n}건" for k, n in w["issues"]),
+                     f'{md(w["window"][0])} ~ {md(w["window"][1])} {"이 종목을 주로 다룬 같은 방향" if fc.get("target") == "stock" else "시장 · 업종"} 기사 {w.get("n", 0)}건 가운데'))
+    for h, day, src in w.get("heads") or []:
+        rows.append((h, "", f"{md(day)} · {src}" if src else md(day)))
+    a = w.get("analyst")
+    if a:
+        parts = ([f'목표가 내림 {a["down"]}곳'] if a.get("down") else []) + ([f'목표가 올림 {a["up"]}곳'] if a.get("up") else []) + ([f'의견 낮춤 {a["downgrade"]}곳'] if a.get("downgrade") else [])
+        rows.append(("애널리스트", " · ".join(parts), "같은 기간 바뀐 것"))
+    if w.get("signals"):
+        rows.append(("우리 기록상", "", " · ".join(w["signals"])))
+    if not rows:
+        return ""
+    note = "기사 · 애널리스트 · 우리 기록에서 모은 것입니다. 원인을 판단한 것은 아닙니다."
+    body = _plain_rows("", rows, note=note)
+    if fc.get("stock_page"):
+        body += (f'<a href="{dk.esc(fc["stock_page"])}" style="display:block;margin:8px 0 0;padding:0 {dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
+                 f'color:#4B5563;text-decoration:underline;text-underline-offset:3px;">{dk.esc(fc["subject"])} 종목 페이지 ›</a>')
+    return _fold_row("무엇이 이유로 꼽혔나?", body).replace('<details data-acc="1"', '<details data-acc="1" open', 1)   # 독자가 가장 먼저 묻는 것 — 펼친 채로
 
 
 def _fold_row(title, html, label=""):
@@ -1477,7 +1513,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
              _scenario_card(sc, branch_view(fc, st, sc), tag="전망" + chr(65 + i), extra=per.get(sc["no"]), compact=None, mkt=sc["no"] == _mkt_no(fc)) for i, sc in enumerate(order))
              + (_third_card(third[0], third[1], fc.get("line", 3.0)) if third else "") + "</div>")   # 셋째 카드 = `선반영` (사건 전) · `제자리` (충격 뒤) (2026-11-07 사용자)
     now = "" if before else _fold_row("현재 증시는?", _now_plain(fc, st))   # 옛 `지금은?` 구획 → 접는 줄, 기록 줄과 한 묶음 (P418) · 카드 없이 · 한국 카드 삭제 (P425)
-    more = (_event_chart(reg) if fc.get("event_chart") else "") + _fold_group(_broke_card(fc) + now + _history_card(fc))   # 어디서 끊겼나 = 접는 줄 묶음 맨 위 (P435)   # `앞으로 볼 것은?` 삭제 — 안내 문구 · 내부 방법 설명뿐, 위험 · 다음 일은 갈래 카드 안에 (P394)
+    more = (_event_chart(reg) if fc.get("event_chart") else "") + _fold_group(_reasons_card(fc) + _broke_card(fc) + now + _history_card(fc))   # 어디서 끊겼나 = 접는 줄 묶음 맨 위 (P435)   # `앞으로 볼 것은?` 삭제 — 안내 문구 · 내부 방법 설명뿐, 위험 · 다음 일은 갈래 카드 안에 (P394)
     # 질문 제목 = 날짜 줄 위 (P454, 2026-11-08 사용자: 머리 줄은 `증시 전망`, 질문은 길 수 있어 본문 맨 위에 따로). 구획 제목 글씨(22/28 · 폰 20/26), 아래가 날짜 줄이라 밑줄 없음
     # 질문 줄 = 왼쪽 질문 · 오른쪽 결과 발표 날짜 한 줄, 질문이 길면 날짜 칸을 침범하지 않고 왼쪽 칸 안에서 두 줄 (P455, 2026-11-08 사용자). 날짜는 질문 첫 줄 글자 바닥에 맞춘다(baseline)
     # 질문 앞 = 증시 전망 저울 아이콘(배경 = 홈 `시장 흐름과 종목` 아이콘 청록 #0E7490, P457) 24 · 모서리 6 · 그림 16, P456). 한 줄 높이(1lh = 22/28 · 폰 20/26)를 아이콘 · 날짜 칸이 물려받아 첫 줄 가운데, 둘째 줄은 아이콘 아래로 들어가지 않는다
