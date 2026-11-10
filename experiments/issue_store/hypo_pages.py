@@ -1550,8 +1550,8 @@ def done_list(done):
     head = (f'<summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:0 {dk.ALIGN_PX}px 10px;border-bottom:1px solid #E2E8F0;'
             f'font-size:18px;line-height:26px;font-weight:700;color:#111;">끝난 전망<span style="font-size:15px;font-weight:400;color:{dk.SUB};">{n}개</span>'
             f'<span class="fc-done-chev" style="margin-left:auto;display:inline-flex;color:{dk.SUB};">{dk.ACC_CHEV}</span></summary>')
-    if not n:
-        return (f'<details class="fc-done" style="margin:28px 0 0;">{head}<div style="padding:12px {dk.ALIGN_PX}px;font-size:15px;line-height:23px;color:{dk.MUTED};">아직 없습니다</div></details>')
+    if not n:   # 끝난 전망이 하나도 없으면 구획째 숨긴다 — 옛 `아직 없습니다` 접는 줄 (2026-11-10 사용자)
+        return ""
     dot = '<span aria-hidden="true" style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-right:8px;"></span>'
     chev = f'<span style="flex:none;display:inline-flex;margin-left:8px;color:{dk.NOTE};transform:rotate(-90deg);">{dk.ACC_CHEV}</span>'
 
