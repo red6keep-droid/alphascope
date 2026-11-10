@@ -339,7 +339,7 @@ body.menu-open { overflow: hidden; }
 /* 카드 머리: 어느 연재인지와 그 글의 날짜. 날짜는 피드에서 채운다. */
 .report-card-date { margin-left: auto; margin-right: 8px; font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) */
 .report-block { display: flex; flex-direction: column; gap: 8px; }
-.report-chart { display: block; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px; cursor: zoom-in; }   /* 홈 미국 증시 카드의 S&P 500 그래프 (2026-10-21 사용자) */
+.report-chart { display: block; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px; }   /* 홈 미국 · 한국 증시 카드 그래프 (2026-10-21 사용자). 확대 없음 — 눌러도 카드처럼 상세 리포트로 (2026-11-10 사용자) */
 .report-chart[hidden] { display: none; }
 /* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
 /* #radar-col 전폭 규칙은 뺐다 (2026-11-08 H34): 넷째 카드 `증시 전망` 이 들어와 미국 · 한국 / 인물 · 증시 전망 2 × 2 */
@@ -1109,8 +1109,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         <div class="report-col" id="us-report-col">
         <h3 class="report-title"><span class="report-icon" style="background:#E53E3E;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="5" width="3" height="9" rx=".5"/><rect x="11" y="2" width="3" height="12" rx=".5"/></svg></span>미국 증시<span class="report-card-date" data-date="report-card"></span></h3>
         <a class="report-card" id="report-card" href="#">
-          <!-- 리포트 본문 맨 위 S&P 500 그래프를 그대로 복제해 카드 안에 (2026-10-21 사용자: "상세 페이지 그래프는 그대로, 복제해서 홈 카드에"). 그래프를 누르면 확대 팝업, 그 밖은 글로 -->
-          <img class="report-chart" data-hook="report-chart" data-zoom="1" alt="" hidden="hidden"/>
+          <!-- 리포트 본문 맨 위 S&P 500 그래프를 그대로 복제해 카드 안에 (2026-10-21 사용자: "상세 페이지 그래프는 그대로, 복제해서 홈 카드에"). 그래프를 눌러도 카드 전체처럼 글로 간다 — 확대 팝업 없앰 (2026-11-10 사용자) -->
+          <img class="report-chart" data-hook="report-chart" alt="" hidden="hidden"/>
           <!-- 요약은 한 줄만 — 자세한 것은 글에서 (2026-10-20 사용자: "너무 길다"). 핵심 인사이트 구획은 삭제 -->
           <div class="report-block" data-hook="summary">
             <!-- 첫 구획 라벨은 두지 않는다 (2026-10-13 사용자) -->
@@ -1125,7 +1125,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         <div class="report-col" id="kr-report-col">
         <h3 class="report-title"><span class="report-icon" style="background:#1D4ED8;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="5" width="3" height="9" rx=".5"/><rect x="11" y="2" width="3" height="12" rx=".5"/></svg></span>한국 증시<span class="report-card-date" data-date="kr-report-card"></span></h3>
         <a class="report-card" id="kr-report-card" href="/search/label/한국%20증시%20리포트">
-          <img class="report-chart" data-hook="kr-report-chart" data-zoom="1" alt="" hidden="hidden"/>
+          <img class="report-chart" data-hook="kr-report-chart" alt="" hidden="hidden"/>
           <div class="report-block" data-hook="kr-summary">   <!-- 미국 카드와 다른 이름 — 같은 이름이면 JS 가 첫 칸(미국)만 채운다 (H27, 2026-10-30) -->
             <div class="report-columns">
               <ul><li class="load-status">리포트를 불러오는 중…</li></ul>
@@ -3416,7 +3416,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
    그림을 화면 폭의 2.2배(최소 원본 폭, 최대 원본의 2배)로 띄우고 가로 스크롤 — 처음 위치는 오른쪽 끝(최근 봉). 닫기 × · 바깥 · Esc. 디자인 가이드 8절 */
 (function () {
   'use strict';
-  var links = document.querySelectorAll('.post-body a[data-zoom], .post-body a[aria-label="그래프 확대 보기"], .report-chart[data-zoom]');   /* .report-chart: 홈 미국 증시 카드의 그래프 (2026-10-21) */
+  var links = document.querySelectorAll('.post-body a[data-zoom], .post-body a[aria-label="그래프 확대 보기"]');   /* 홈 카드 그래프(.report-chart)는 빼고 카드 링크로 (2026-11-10 사용자, 옛 2026-10-21 확대) */
   if (!links.length) return;
   var pop = document.createElement('div'); pop.className = 'img-pop'; pop.hidden = true;
   pop.innerHTML = '<div class="img-pop-head"><span class="img-pop-title"></span><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
