@@ -174,12 +174,49 @@ jobs:
           # 게시는 아래 별도 단계에서 — 가격 그래프 PNG가 gh-pages에 먼저 올라가 있어야 글의 <img>가 깨지지 않는다 (2026-10-11)
           python experiments/nvda-report/main.py $ARGS
 
+      # 2026-11-10 사용자: 종목 레이더 뒤에 있던 증시 전망을 앞으로 — 레이더(AI 뉴스 분류)가 길어져 60분 제한에 걸리면
+      # 전망 판정 · 기록이 통째로 빠졌다(11-09 ~ 11-10 여섯 번). 전망은 AI 0 · 레이더와 독립이라 먼저 돌린다. 기록은 아래 Save state(always)가 저장
+      # 증시 전망 (doc/기획/증시-전망-기획.md 5절 · 14-1 5, 2026-11-08 연결). AI 0 · 시세는 forecast_daily 가 직접 받는다(yfinance → 예비 사슬).
+      # 판정 → 기록(상태 $STATE_DIR/records/forecasts/{EH}.jsonl, 아래 Save state 가 nvda-state 에 커밋) → 고정 페이지(공개 전망 n + 목록 1, 바뀐 것만) → 증명 · 홈 카드 JSON(gh-pages).
+      # 장 마감 뒤 본 실행만 — 갱신(refresh) 실행은 같은 날 봉이라 판정이 같다. 실패해도 다른 단계는 그대로(continue-on-error), 실패 알림은 forecast_alerts.
+      - name: Forecast pages (증시 전망)
+        if: needs.check.outputs.mode != 'refresh'
+        continue-on-error: true
+        run: |
+          mkdir -p experiments/issue_store/output
+          [ -f "$STATE_DIR/forecast/page_hashes.json" ] && cp "$STATE_DIR/forecast/page_hashes.json" experiments/issue_store/output/forecast_page_hashes.json || true
+          python experiments/issue_store/forecast_daily.py --state "$STATE_DIR"
+          # 신호 서명 매일 스캔 — 그림자 모드(기획 8-19 3-b): 독자 노출 · 알림 없음, nvda-state records/signals/scan.jsonl 하루 한 줄만. 실패해도 넘어간다
+          python experiments/issue_store/signal_scan.py --state "$STATE_DIR" || echo "::warning::신호 스캔 실패 — 오늘 기록 없음"
+          if [ "$DO_PUBLISH" = "true" ]; then
+            python experiments/issue_store/publish_forecast.py
+          else
+            python experiments/issue_store/publish_forecast.py --dry
+          fi
+          mkdir -p "$STATE_DIR/forecast" deploy-forecast/proof
+          [ -f experiments/issue_store/output/forecast_page_hashes.json ] && cp experiments/issue_store/output/forecast_page_hashes.json "$STATE_DIR/forecast/page_hashes.json" || true
+          cp experiments/issue_store/output/forecast/proof/*.json deploy-forecast/proof/ 2>/dev/null || true
+          cp experiments/issue_store/output/forecast/hypo.json deploy-forecast/hypo.json 2>/dev/null || true
+
+      # 공개 등록 증명(proof/{slug}.json — 커밋 시각 = 미리 적었다는 증명, 내용은 등록 때 고정) · 홈 `증시 전망` 카드 자료(hypo.json)
+      - name: Deploy forecast proof + hypo.json to gh-pages
+        if: env.DO_PUBLISH == 'true' && needs.check.outputs.mode != 'refresh' && hashFiles('deploy-forecast/hypo.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-forecast
+          publish_branch: gh-pages
+          keep_files: true
+
       # 시총 TOP 10 고정 페이지 20개 (experiments/stock-radar, 2026-10-18 첫 발행). 엔비디아 DB(일정) · 그래프 코드를 같이 쓰므로 이 실행 안에서 돈다.
       # 이어서 쌓는 파일(뉴스 분류 · 변동성 이력 · 순위 교체 상태)만 nvda-state 의 radar/ 에 둔다. 일봉 snapshot 은 매번 새로 받는다.
       # 실패해도 엔비디아 글은 나간다 (continue-on-error).
       - name: Run stock radar (시총 TOP 10 pages)
         id: run_radar
         continue-on-error: true
+        env:
+          NEWS_MAX_MINUTES: '15'   # 뉴스 분류 시간 예산 30 → 15분 (2026-11-10) — 남은 기사는 다음 실행, 1시간 안에 끝까지 가게
         run: |
           mkdir -p experiments/stock-radar/data
           if [ -d "$STATE_DIR/radar" ]; then cp "$STATE_DIR"/radar/*.json experiments/stock-radar/data/ 2>/dev/null || true; fi
@@ -254,39 +291,6 @@ jobs:
           # 홈 `관심 종목` · `섹터 상위 종목` 카드 데이터 (2026-10-21 사용자) — 발행된 페이지만 링크
           python experiments/stock-radar/home_feed.py
           mkdir -p deploy-home && cp experiments/stock-radar/output/home/stocks.json deploy-home/stocks.json
-
-      # 증시 전망 (doc/기획/증시-전망-기획.md 5절 · 14-1 5, 2026-11-08 연결). AI 0 · 시세는 forecast_daily 가 직접 받는다(yfinance → 예비 사슬).
-      # 판정 → 기록(상태 $STATE_DIR/records/forecasts/{EH}.jsonl, 아래 Save state 가 nvda-state 에 커밋) → 고정 페이지(공개 전망 n + 목록 1, 바뀐 것만) → 증명 · 홈 카드 JSON(gh-pages).
-      # 장 마감 뒤 본 실행만 — 갱신(refresh) 실행은 같은 날 봉이라 판정이 같다. 실패해도 다른 단계는 그대로(continue-on-error), 실패 알림은 forecast_alerts.
-      - name: Forecast pages (증시 전망)
-        if: needs.check.outputs.mode != 'refresh'
-        continue-on-error: true
-        run: |
-          mkdir -p experiments/issue_store/output
-          [ -f "$STATE_DIR/forecast/page_hashes.json" ] && cp "$STATE_DIR/forecast/page_hashes.json" experiments/issue_store/output/forecast_page_hashes.json || true
-          python experiments/issue_store/forecast_daily.py --state "$STATE_DIR"
-          # 신호 서명 매일 스캔 — 그림자 모드(기획 8-19 3-b): 독자 노출 · 알림 없음, nvda-state records/signals/scan.jsonl 하루 한 줄만. 실패해도 넘어간다
-          python experiments/issue_store/signal_scan.py --state "$STATE_DIR" || echo "::warning::신호 스캔 실패 — 오늘 기록 없음"
-          if [ "$DO_PUBLISH" = "true" ]; then
-            python experiments/issue_store/publish_forecast.py
-          else
-            python experiments/issue_store/publish_forecast.py --dry
-          fi
-          mkdir -p "$STATE_DIR/forecast" deploy-forecast/proof
-          [ -f experiments/issue_store/output/forecast_page_hashes.json ] && cp experiments/issue_store/output/forecast_page_hashes.json "$STATE_DIR/forecast/page_hashes.json" || true
-          cp experiments/issue_store/output/forecast/proof/*.json deploy-forecast/proof/ 2>/dev/null || true
-          cp experiments/issue_store/output/forecast/hypo.json deploy-forecast/hypo.json 2>/dev/null || true
-
-      # 공개 등록 증명(proof/{slug}.json — 커밋 시각 = 미리 적었다는 증명, 내용은 등록 때 고정) · 홈 `증시 전망` 카드 자료(hypo.json)
-      - name: Deploy forecast proof + hypo.json to gh-pages
-        if: env.DO_PUBLISH == 'true' && needs.check.outputs.mode != 'refresh' && hashFiles('deploy-forecast/hypo.json') != ''
-        continue-on-error: true
-        uses: peaceiris/actions-gh-pages@v4.1.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./deploy-forecast
-          publish_branch: gh-pages
-          keep_files: true
 
       # 테마 페이지 3개 (doc/테마-모니터-기획.md, 2026-10-21) — 레이더 자료(snapshot · extra)를 그대로 쓴다. 게시 · 홈 카드(themes.json)
       - name: Theme pages (AI 투자 · 연준 기대 · 임원 매매)
@@ -369,8 +373,11 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+      # 시간 제한(60분)으로 중단된 실행도 알린다 — failure() 만으로는 cancelled 가 빠져 11-09 ~ 11-10 여섯 번을 몰랐다 (2026-11-10 사용자).
+      # 이 워크플로는 cancel-in-progress: false 라 cancelled = 시간 초과 또는 사람이 멈춘 것뿐
       - name: Notify failure
-        if: failure()
+        if: failure() || cancelled()
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
-          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 엔비디아 · 시총 TOP 10 페이지\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
+          WHAT="실패"; [ "${{ job.status }}" = "cancelled" ] && WHAT="중단(시간 초과 등)"
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 ${WHAT} — 엔비디아 · 시총 TOP 10 페이지\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
