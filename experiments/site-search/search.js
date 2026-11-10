@@ -191,14 +191,20 @@
 
   function card(s, c, compact) {
     var list = c.intents.slice();
-    if (c.why) list = ['change', 'news'];
-    if (!list.length) list = compact ? ['change'] : ['change', 'valuation', 'earnDate'];   // 종목 이름만 → 요약
-    if (list.indexOf('earnings') >= 0) list = list.filter(function (x) { return x !== 'earnDate'; });
-    var body = PART.price(s);
+    /* 맨 위 = 검색한 내용 (2026-11-10 사용자: "엔비디아 실적을 검색했는데 실적이 먼저 안 나온다 — 첫 번째는 검색한 내용, 부가 정보는 그 아래").
+       묻은 칸(실적 · EPS …)을 먼저, 주가 한 줄은 그 아래 '오늘 주가'. 종목 이름만 · 주가를 물으면 주가가 곧 답이라 맨 위 */
+    var asked = list.filter(function (x) { return x !== 'price'; });
+    if (c.why) asked = ['news', 'change'];   // 왜 떨어졌어 → 최근 소식이 먼저
+    if (asked.indexOf('earnings') >= 0) asked = asked.filter(function (x) { return x !== 'earnDate'; });
+    var priceFirst = !asked.length;
+    var extra = priceFirst ? (compact ? ['change'] : ['change', 'valuation', 'earnDate']) : [];   // 종목 이름만 → 요약
+    var body = '';
     if (c.why) body += '<p class="as-note">AlphaScope는 등락 이유를 짐작해서 답하지 않습니다. 확인된 숫자와 최근 소식만 모았습니다.</p>';
-    list.filter(function (x) { return x !== 'price'; }).forEach(function (k) {
-      body += '<div class="as-sec"><h4>' + TITLE[k] + '</h4>' + PART[k](s, c) + '</div>';
+    if (priceFirst) body += PART.price(s);
+    asked.concat(extra).forEach(function (k, i) {
+      body += '<div class="as-sec' + (!priceFirst && i === 0 ? ' as-first' : '') + '"><h4>' + TITLE[k] + '</h4>' + PART[k](s, c) + '</div>';
     });
+    if (!priceFirst) body += '<div class="as-sec"><h4>오늘 주가</h4>' + PART.price(s) + '</div>';
     return '<article class="as-card">'
       + '<header><span class="as-mkt as-' + s.m + '">' + (s.m === 'us' ? '미국' : '한국') + '</span><h3>' + label(s) + '</h3><span class="as-day">' + md(s.p.d) + ' 종가 기준</span></header>'
       + body
@@ -367,6 +373,9 @@
 
   function init() {
     var s = buildSearch();
+    /* 검색 아이콘 = 국기 스위치 왼쪽 (2026-11-10 사용자). 스위치 줄(.menu-quick)은 테마 JS 가 만든다 — 그 맨 앞으로 옮긴다 */
+    var quick = document.querySelector('.menu-quick'), sbtn = document.querySelector('.as-search-btn');
+    if (quick && sbtn) quick.insertBefore(sbtn, quick.firstChild);
     document.querySelectorAll('[data-as-search]').forEach(function (b) { b.addEventListener('click', function () { s.open(); }); });
     buildChat();
     mountOnSearchPage();

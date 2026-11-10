@@ -19,16 +19,32 @@ OUT = os.path.join(HERE, "output")
 FILES = {"us": "mock_home_us.html", "kr": "mock_home_kr.html"}
 
 
-def nav(mkt):
+def nav(mkt, files=FILES):
     cur = lambda m: ' aria-current="page"' if m == mkt else ""
     return (
         '<nav class="menu-items" id="primary-menu" aria-label="주 메뉴">\n'
         # data-bar = 로고 줄 스위치 후보(지금 화면이 아닌 쪽 하나가 국기 data-flag 와 함께 보인다). 나머지(증시 전망)는 메뉴 아이콘 서랍에만 (2026-11-10 사용자)
-        f'      <a class="nav-item" href="{FILES["us"]}"{cur("us")} data-bar="1" data-flag="us">미국</a>\n'
-        f'      <a class="nav-item" href="{FILES["kr"]}"{cur("kr")} data-bar="1" data-flag="kr">한국</a>\n'
+        f'      <a class="nav-item" href="{files["us"]}"{cur("us")} data-bar="1" data-flag="us">미국</a>\n'
+        f'      <a class="nav-item" href="{files["kr"]}"{cur("kr")} data-bar="1" data-flag="kr">한국</a>\n'
         '      <a class="nav-item" href="/p/forecast-list.html">증시 전망</a>\n'
         '    </nav>'
     )
+
+
+def split_html(src, mkt, files=FILES):
+    """preview.html → 홈 나누기 화면(mkt = us | kr). 다른 목업(검색 · 질문하기 등)도 이걸 써서 지금 홈 기준으로 맞춘다 (2026-11-10)"""
+    html = src
+    html, n1 = re.subn(r'<body data-pv-view="home"', f'<body data-pv-view="home" data-home-mkt="{mkt}"', html, count=1)
+    html, n2 = re.subn(r'<nav class="menu-items" id="primary-menu".*?</nav>', lambda m: nav(mkt, files), html, count=1, flags=re.S)
+    html = html.replace('<a class="logo" href="/">', f'<a class="logo" href="{files["us"]}">', 1)
+    # 미리보기 스크립트는 메뉴 첫 줄을 '현재'로 칠한다 — 이 목업에서는 그 시장 메뉴를
+    html = html.replace("var homeLink = document.querySelector('.menu-items .nav-item');",
+                        "var homeLink = document.querySelector('.menu-items .nav-item[aria-current]');", 1)
+    # 미리보기 전환 막대(홈 · 목록 · 글 보기)는 이 목업과 상관없어 숨긴다
+    html = html.replace("</head>", "<style>.pv-bar{display:none!important}</style>\n</head>", 1)
+    if not (n1 and n2):
+        sys.exit(f"바꿀 자리를 못 찾음 (body {n1} · 메뉴 {n2}) — preview.html 구조 확인")
+    return html
 
 
 def main():
@@ -39,19 +55,9 @@ def main():
         src = f.read()
     os.makedirs(OUT, exist_ok=True)
     for mkt, name in FILES.items():
-        html = src
-        html, n1 = re.subn(r'<body data-pv-view="home"', f'<body data-pv-view="home" data-home-mkt="{mkt}"', html, count=1)
-        html, n2 = re.subn(r'<nav class="menu-items" id="primary-menu".*?</nav>', lambda m: nav(mkt), html, count=1, flags=re.S)
-        html = html.replace('<a class="logo" href="/">', f'<a class="logo" href="{FILES["us"]}">', 1)
-        # 미리보기 스크립트는 메뉴 첫 줄을 '현재'로 칠한다 — 이 목업에서는 그 시장 메뉴를
-        html = html.replace("var homeLink = document.querySelector('.menu-items .nav-item');",
-                            "var homeLink = document.querySelector('.menu-items .nav-item[aria-current]');", 1)
-        # 미리보기 전환 막대(홈 · 목록 · 글 보기)는 이 목업과 상관없어 숨긴다
-        html = html.replace("</head>", "<style>.pv-bar{display:none!important}</style>\n</head>", 1)
+        html = split_html(src, mkt)
         title = "홈 나누기 — 미국 화면" if mkt == "us" else "홈 나누기 — 한국 화면"
         html = re.sub(r"<title>.*?</title>", f"<title>{title}</title>", html, count=1, flags=re.S)
-        if not (n1 and n2):
-            sys.exit(f"바꿀 자리를 못 찾음 (body {n1} · 메뉴 {n2}) — preview.html 구조 확인")
         with open(os.path.join(OUT, name), "w", encoding="utf-8") as f:
             f.write(html)
         print("만듦:", os.path.join("experiments", "home-split", "output", name))

@@ -31,6 +31,10 @@ def main():
     subprocess.run([sys.executable, os.path.join(HERE, "build_search_index.py")], env=env, check=True)
     subprocess.run([sys.executable, os.path.join(ROOT, "build_theme.py"), "--preview"], cwd=ROOT, env=env, check=True, stdout=subprocess.DEVNULL)
     html = read(os.path.join(ROOT, "preview.html"))
+    # 상단 · 홈 = 지금 홈 나누기 화면(미국) 기준 — 미국 · 한국 스위치는 홈 나누기 목업으로 간다 (2026-11-10 사용자: "질문하기 상단이 예전 것")
+    sys.path.insert(0, os.path.join(ROOT, "experiments", "home-split"))
+    import mock_home_split as HS  # noqa: E402
+    html = HS.split_html(html, "us", {m: "../../home-split/output/" + f for m, f in HS.FILES.items()})
     html, n = re.subn(r'(<button class="nav-toggle")', lambda m: ICON + m.group(1), html, count=1)
     if not n:
         sys.exit("헤더 메뉴 버튼 자리를 못 찾음 — preview.html 구조 확인")

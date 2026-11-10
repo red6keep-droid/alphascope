@@ -35,6 +35,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-up { color: var(--up, #E53E3E); }
 .as-dn { color: var(--down, #1A73E8); }
 .as-sec { border-top: 1px solid var(--border, #F0F0F0); margin-top: 10px; padding-top: 10px; }
+.as-sec.as-first { border-top: 0; margin-top: 0; padding-top: 0; }   /* 검색한 내용이 카드 첫 칸 — 머리 바로 아래 (2026-11-10) */
 .as-sec h4, .as-related h4 { margin: 0 0 6px; font-size: 14px; color: #475569; font-weight: 700; }
 .as-related h4 small { font-weight: 400; color: #94A3B8; }
 .as-row { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 15px; }

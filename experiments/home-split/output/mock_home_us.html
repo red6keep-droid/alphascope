@@ -3503,11 +3503,31 @@ body[data-pv-view="post"] #pv-reports { display: none; }
   var hasBar = barLinks.length > 0;
   if (hasBar) {
     /* 스위치: 지금 화면(aria-current)이 아닌 쪽 하나만, 국기 + 이름. 지금 화면 표시가 없으면(글 보기 등) 첫째(미국 = 홈)를 지금으로 본다 */
-    var curBar = barLinks.filter(function (a) { return a.getAttribute('aria-current') === 'page'; })[0] || barLinks[0];
+    /* 고른 홈 기억 (2026-11-10 사용자: "한국 홈으로 설정한 상태에서 여러 가지 보다가 홈으로 가도 한국 홈. 미국 버튼을 누르지 않는 이상").
+       한국 홈을 열거나 미국 · 한국 버튼(스위치 · 서랍)을 누르면 그 시장을 브라우저에 적는다. 미국 홈(/)을 그냥 여는 것만으로는 바꾸지 않는다.
+       시장 화면이 아닌 곳(글 · 종목 · 전망)에서는 기억이 한국이면 홈으로 가는 링크(로고 · 홈으로 버튼)를 한국 홈으로, 스위치는 미국으로.
+       기억을 못 읽으면(사생활 보호 창 등) 예전 그대로 미국 홈 */
+    var HOME_KEY = 'as-home-mkt';
+    var homePref = ''; try { homePref = localStorage.getItem(HOME_KEY) || ''; } catch (e) {}
+    function setHomePref(m) { try { localStorage.setItem(HOME_KEY, m); } catch (e) {} }
+    var onBar = barLinks.filter(function (a) { return a.getAttribute('aria-current') === 'page'; })[0];
+    if (onBar && onBar.getAttribute('data-flag') === 'kr') setHomePref('kr');
+    var prefBar = barLinks.filter(function (a) { return a.getAttribute('data-flag') === homePref; })[0];
+    var curBar = onBar || prefBar || barLinks[0];
+    if (!onBar && prefBar && prefBar !== barLinks[0]) {
+      var usHome = new URL(barLinks[0].getAttribute('href'), location.href).href, siteHome = location.origin + '/';
+      [].forEach.call(document.querySelectorAll('a[href]'), function (a) {
+        if (a.hasAttribute('data-flag') || a.classList.contains('nav-switch')) return;
+        var u = new URL(a.getAttribute('href'), location.href); u.hash = ''; u.search = '';
+        if (u.href === usHome || u.href === siteHome) a.setAttribute('href', prefBar.getAttribute('href'));
+      });
+    }
+    menu.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a[data-flag]'); if (a) setHomePref(a.getAttribute('data-flag')); });
+    quick.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a.nav-switch'); if (a) setHomePref(a.getAttribute('data-flag')); });
     barLinks.forEach(function (a) {
       if (a === curBar) return;
       var name = a.textContent.trim(), sw = document.createElement('a');
-      sw.className = 'nav-switch'; sw.href = a.getAttribute('href'); sw.setAttribute('aria-label', name + ' 화면으로');
+      sw.className = 'nav-switch'; sw.href = a.getAttribute('href'); sw.setAttribute('data-flag', a.getAttribute('data-flag') || ''); sw.setAttribute('aria-label', name + ' 화면으로');
       sw.innerHTML = (NAV_FLAGS[a.getAttribute('data-flag')] || '') + '<span>' + name + '</span>';
       quick.appendChild(sw);
     });
