@@ -2605,7 +2605,19 @@ def sec_direction_bars(a):
     return _dk.direction_bars(dc.get("today") or {}, dc.get("week") or {}, a.get("empty_text", ""))   # 오늘 0건 안내 = 막대 자리 (종목 페이지, 2026-11-08)
 
 
+def _thin(e):
+    """요약 두 줄 못 되는 기사 · 방송 줄 — 독자 목록에서 뺀다 (2026-11-10 사용자: 한 줄짜리 뉴스는 싣지 않는다, 옛 원문 링크 줄 폐지).
+    팝업 재료가 있는 줄(pop_key)만 본다 — 공시 · 소송 · 가격 이벤트는 그대로. pop_unchecked = 요약 캐시를 못 읽은 실행(거르지 않음)."""
+    return bool(e.get("pop_key")) and not e.get("pop_unchecked") and len([x for x in (e.get("pop_lines") or []) if x]) < 2
+
+
 def sec_events(a):
+    if a["events"] or a.get("events_overflow"):
+        a = dict(a, events=[e for e in a["events"] if not _thin(e)], events_overflow=[e for e in a.get("events_overflow") or [] if not _thin(e)])
+        if not a["events"] and a["events_overflow"]:
+            a["events"], a["events_overflow"] = a["events_overflow"][:1], a["events_overflow"][1:]
+        if not a["events"]:
+            return _muted("오늘은 요약할 만한 뉴스가 없습니다.")
     if not a["events"]:
         return _muted("오늘은 임계값을 넘은 이벤트가 없습니다. 공시·기사·가격·옵션·예상 실적 어느 쪽도 기준에 걸리지 않았다는 뜻입니다.")
     cards = [e for e in a["events"] if e.get("emphasis")]

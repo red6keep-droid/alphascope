@@ -40,6 +40,8 @@ def section(rows, hours=HOURS, pick=None, shown=SHOWN, prices=None):
     items = []
     n_all = dk.n_channels_of(media_feed.issues(rows, since))   # 분모 = 이 시간 안 방송 채널 수 (P338)
     for r in (pick or media_feed.us_to_kr)(media_feed.issues(rows, since), None):   # 같은 이슈는 한 줄로 정리한 뒤 — 전부(상한 없음, 2026-10-30). pick: 고르는 규칙(기본 media_feed.korea = 한국 증시 내용, 채널 무관 — 2026-10-30)
+        if len([x for x in (r.get("lines") or []) if x]) < 2:   # 요약 두 줄 못 되는 방송 줄은 싣지 않는다 (2026-11-10 사용자)
+            continue
         d = r["direction"]
         dd = "uncertain" if r.get("split") else d if d in ("positive", "negative") else "neutral"
         labels = " ".join([dk.pill(media_feed.kr_label(r), bare=True),

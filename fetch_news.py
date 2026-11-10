@@ -102,6 +102,7 @@ def process(items):
 
 SUM_FILE = "news_summaries_home.json"   # 기사 요약 다섯 줄 캐시 (gh-pages 에 같이 배포 — 같은 기사를 다시 AI 에 보내지 않게, 2026-11-07 P342)
 SUM_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/" + SUM_FILE
+SPARE = 3      # 한 줄 요약으로 빠지는 기사 대신 채울 여분 (2026-11-10)
 SUM_MAX = 12   # 한 실행에 새로 요약하는 기사 상한 (Groq 하루 토큰 보호, CLAUDE.md 한도 표)
 
 
@@ -195,9 +196,14 @@ def main():
 
     items.sort(key=lambda it: it["published"], reverse=True)   # 두 피드를 섞어 최신 순
     media = media_items()
-    results = items[:MAX_ITEMS - len(media)]
+    media = [m for m in media if len(m.get("lines") or []) >= 2]   # 요약 두 줄 못 되는 방송 줄은 싣지 않는다 (2026-11-10 사용자)
+    need = MAX_ITEMS - len(media)
+    results = items[:min(need + SPARE, SUM_MAX)]   # 한 줄 요약으로 빠질 자리를 다음 기사로 채우려고 몇 건 더 (요약 상한 SUM_MAX 안)
     process(results)
     summarize(results)
+    thin = [it for it in results if len(it.get("lines") or []) < 2]
+    results = [it for it in results if len(it.get("lines") or []) >= 2][:need]   # 요약 두 줄 못 되는 기사는 홈에 싣지 않는다 — 옛: 원문 링크 줄 (2026-11-10 사용자)
+    print(f"[요약] 두 줄 못 된 기사 {len(thin)}건 뺌 · 홈 기사 {len(results)}/{need}")
     results = sorted(results + media, key=lambda it: it["published"], reverse=True)   # 방송 줄도 시각 순으로 섞는다
     # 영문 RSS 요약은 번역 입력으로만 쓰고 공개 파일(gh-pages, PUBLIC 저장소 = 배포)에는 남기지 않는다 (2026-10-21, 운영지침 4-2 · D4-2).
     # 홈은 summary_ko(우리 소개 한 줄)만 쓴다

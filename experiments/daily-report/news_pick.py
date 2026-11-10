@@ -191,25 +191,45 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
             score += 1
             why.append("12시간 안")
         g["score"], g["why"] = score, why
-    ranked = sorted(stories, key=lambda g: g["latest"], reverse=True)   # 점수가 같으면 최근 것
-    ranked.sort(key=lambda g: -g["score"])
-    picks = [g for g in ranked if g["score"] > 0][:PICK_N]
-    pick_ids = {g["id"] for g in picks}
-    rest = sorted([g for g in stories if g["id"] not in pick_ids], key=lambda g: g["latest"], reverse=True)
-    chips = {}
-    for g in rest:
-        chips[g["theme"]] = chips.get(g["theme"], 0) + 1
     lines = {}
     if os.environ.get("NEWS_NO_AI"):
         lines = {k: v["lines"] for k, v in news_summary._load(os.path.join(STATE_DIR, "news_summaries.json")).items()}
     if summarize and not os.environ.get("NEWS_NO_AI"):   # NEWS_NO_AI=1: 캐시된 요약만 (목업 · 다시 그리기)
-        reps = [g["rep"] for g in picks + rest if g["rep"]["kind"] == "article"]
+        reps = [g["rep"] for g in stories if g["rep"]["kind"] == "article"]
         _seed_home_summaries(os.path.join(STATE_DIR, "news_summaries.json"))   # 홈(06:45)이 이미 요약한 CNBC 기사는 다시 AI 에 보내지 않는다 (2026-11-07 P342)
         try:
             lines = news_summary.summarize([{"item_id": x["id"], "title": x["title"], "url": x["url"], "snippet": x["snippet"]} for x in reps],
                                            cache_path=os.path.join(STATE_DIR, "news_summaries.json"), lead_cache=os.path.join(DATA_DIR, "leads.json"), label="daily-summary")
         except Exception as e:  # noqa: BLE001
             print(f"[news_pick] 요약 실패 — 요약 줄 하나로 : {str(e)[:100]}")
+    # 요약 두 줄 못 되는 뉴스는 독자 목록에서 뺀다 — 기록 · 방향 막대 · n곳은 그대로 (2026-11-10 사용자: "한 줄짜리 기사는 가치가 없을 수 있다", 옛 batch 9 ④ 원문 링크 폐지)
+    # 묶음 안에 두 줄 이상인 기사 · 방송이 있으면 그것을 대표로 바꾼다
+    checked = bool(summarize or os.environ.get("NEWS_NO_AI"))   # 요약을 안 돌린 호출(기록용 summarize=False)은 기사를 거르지 않는다 — 방송은 수집기 줄이 늘 있다
+
+    def pop_of(x):
+        if x["kind"] == "article" and not checked:
+            return ["", ""]
+        ln = (lines.get(x["id"]) if x["kind"] == "article" else x.get("lines")) or []
+        return [l for l in ln if l] if x["kind"] == "media" or checked else ln
+    shown, hidden = [], 0
+    for g in stories:
+        if len(pop_of(g["rep"])) < 2:
+            alt = [x for x in g["items"] if len(pop_of(x)) >= 2]
+            if not alt:
+                hidden += 1
+                continue
+            g["rep"] = next((x for x in alt if x["kind"] == "article"), alt[0])
+        shown.append(g)
+    if hidden:
+        print(f"[news_pick] 요약 두 줄 못 된 뉴스 {hidden}건은 목록에서 뺌 (기록은 그대로)")
+    ranked = sorted(shown, key=lambda g: g["latest"], reverse=True)   # 점수가 같으면 최근 것
+    ranked.sort(key=lambda g: -g["score"])
+    picks = [g for g in ranked if g["score"] > 0][:PICK_N]   # 빠진 자리는 다음 점수 순으로 채운다
+    pick_ids = {g["id"] for g in picks}
+    rest = sorted([g for g in shown if g["id"] not in pick_ids], key=lambda g: g["latest"], reverse=True)
+    chips = {}
+    for g in rest:
+        chips[g["theme"]] = chips.get(g["theme"], 0) + 1
     all_ch = sorted(set(all_channels) if all_channels else {c for r in (media_lines or []) for c in (r.get("channels") or [])})   # 분모 = 48시간 안 영상이 있던 방송 전부
     return {"stories": stories, "picks": picks, "rest": rest, "chips": chips, "story_of": story_of, "lines": lines, "stocks": sx,
             "channels_all": all_ch, "n_channels_all": len(all_ch), "series": series, "prev": prev, "n_items": len(items)}

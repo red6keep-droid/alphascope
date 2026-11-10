@@ -773,7 +773,7 @@ def _news_for(s, news):
         if sc["relevance"] >= 1:   # 목록이 오늘자만이 된 뒤로 관련도 1(업종 맥락)도 싣는다 — `오늘 n건` 막대와 목록 기사 수를 맞춘다 (2026-10-25). 중요 이슈는 아래에서 2 이상만
             out.append({"area": x["area"], "kind": "news", "title": x["title"], "fact": x["fact"], "headline": news_store.headline(x), "detail": news_store.summary(x),   # 목록 헤드라인 = 원제 번역 · 요약 줄 (공용 뉴스 처리, 2026-10-25). 중요 이슈는 fact 그대로
                         "has_fact": True, "url": x.get("url"), "direction": sc["direction"], "issue": x.get("issue"),
-                        "pop_key": x.get("item_id"), "pop_lines": SUMMARY.get(x.get("item_id")) or [], "pop_kind": "기사", "pop_source": x.get("source") or "",   # 요약 다섯 줄 팝업 (2026-11-07 사용자 P341)
+                        "pop_key": x.get("item_id"), "pop_lines": SUMMARY.get(x.get("item_id")) or [], "pop_unchecked": not SUMMARY, "pop_kind": "기사", "pop_source": x.get("source") or "",   # 요약 다섯 줄 팝업 (2026-11-07 사용자 P341)
                         "emphasis": sc["relevance"] >= 3 or prio, "source": x.get("source"), "published_at": x["published_at"], "rel": sc["relevance"], "prio": prio})
     for f in s.get("filings") or []:   # SEC 공시 — NVDA 리포트처럼 기사와 같은 목록에 (제목은 파이썬 규칙, AI 없음)
         if f["filed"] >= cut:
