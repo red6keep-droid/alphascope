@@ -68,8 +68,10 @@ def summarize(items, cache_path, lead_cache=None, label="summary", max_items=Non
     """items = [{"item_id", "title", "url", "snippet"(RSS 요약, 없을 수 있음)}] → {item_id: [줄]}. 캐시에 있으면 그대로.
     lead_cache = 첫 문단 캐시 파일(깃 밖). None 이면 기사를 열지 않고 snippet 만 쓴다."""
     cache = _load(cache_path) if cache_path else {}
+    # 요약이 두 줄 못 된 기사(팝업 없이 원문 링크로 나감)는 한 번만 다시 — 재료가 RSS 요약뿐이었던 것을 첫 문단으로 (2026-11-10 사용자: 뉴스를 눌렀는데 원문으로 나감)
+    redo = {k for k, v in cache.items() if len(v.get("lines") or []) < 2 and not v.get("retry")} if lead_cache else set()
     out = {x["item_id"]: cache[x["item_id"]]["lines"] for x in items if x.get("item_id") in cache}
-    need = [x for x in items if x.get("item_id") and x["item_id"] not in cache and x.get("title")]
+    need = [x for x in items if x.get("item_id") and (x["item_id"] not in cache or x["item_id"] in redo) and x.get("title")]
     if max_items:
         need = need[:max_items]
     if not need:
@@ -109,7 +111,7 @@ def summarize(items, cache_path, lead_cache=None, label="summary", max_items=Non
         for row in res["items"]:
             x = next(y for y in part if y["item_id"] == row["id"])
             lines = _check(row.get("lines"), x["title"] + " " + src[x["item_id"]])
-            cache[x["item_id"]] = {"lines": lines, "model": pool.last_model, "at": now, "n_src": len(src[x["item_id"]])}
+            cache[x["item_id"]] = {"lines": lines, "model": pool.last_model, "at": now, "n_src": len(src[x["item_id"]]), **({"retry": True} if x["item_id"] in redo else {})}
             out[x["item_id"]] = lines
             ok += bool(lines)
         if cache_path:

@@ -34,7 +34,8 @@ def _cache(path):
 
 
 def _save(c, path):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    if os.path.dirname(path):   # 파일 이름만 받으면(홈 fetch_news `leads_home.json`) 폴더 만들기를 건너뛴다 — 전엔 makedirs('') 오류로 홈 뉴스 첫 문단이 매번 버려졌다 (2026-11-10)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(c, f, ensure_ascii=False)
 
