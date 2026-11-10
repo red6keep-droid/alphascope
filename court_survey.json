@@ -301,5 +301,191 @@
  "CVX": {
   "at": "2026-11-02 03:27",
   "rows": []
+ },
+ "LIN": {
+  "at": "2026-11-10 14:01",
+  "rows": []
+ },
+ "NEM": {
+  "at": "2026-11-10 14:01",
+  "rows": []
+ },
+ "WELL": {
+  "at": "2026-11-10 14:01",
+  "rows": []
+ },
+ "PLD": {
+  "at": "2026-11-10 14:01",
+  "rows": []
+ },
+ "NEE": {
+  "at": "2026-11-10 14:01",
+  "rows": []
+ },
+ "SO": {
+  "at": "2026-11-10 14:02",
+  "rows": []
+ },
+ "COP": {
+  "at": "2026-11-10 14:02",
+  "rows": []
+ },
+ "SLB": {
+  "at": "2026-11-10 14:02",
+  "rows": []
+ },
+ "EOG": {
+  "at": "2026-11-10 14:03",
+  "rows": []
+ },
+ "COIN": {
+  "at": "2026-11-10 14:04",
+  "rows": [
+   {
+    "docket_id": 71872260,
+    "title": "Heabeart v. Coinbase, Inc.",
+    "court": "NYSD",
+    "filed": "2025-11-04",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/71872260/heabeart-v-coinbase-inc/"
+   },
+   {
+    "docket_id": 70443284,
+    "title": "State of Oregon v. Coinbase, Inc.",
+    "court": "ORD",
+    "filed": "2025-06-02",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/70443284/state-of-oregon-v-coinbase-inc/"
+   },
+   {
+    "docket_id": 70343031,
+    "title": "NESSLER v. COINBASE GLOBAL, INC.",
+    "court": "PAED",
+    "filed": "2025-05-22",
+    "nature": "850 Other Statutes: Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/70343031/nessler-v-coinbase-global-inc/"
+   },
+   {
+    "docket_id": 69661239,
+    "title": "Aceves v. Coinbase Global, Inc.",
+    "court": "NYSD",
+    "filed": "2025-02-21",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/69661239/aceves-v-coinbase-global-inc/"
+   },
+   {
+    "docket_id": 64872383,
+    "title": "PATEL v. COINBASE GLOBAL, INC.",
+    "court": "NJD",
+    "filed": "2022-08-04",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/64872383/patel-v-coinbase-global-inc/"
+   },
+   {
+    "docket_id": 64869843,
+    "title": "PATEL v. COINBASE GLOBAL, INC.",
+    "court": "NJD",
+    "filed": "2022-08-04",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/64869843/patel-v-coinbase-global-inc/"
+   }
+  ]
+ },
+ "MSTR": {
+  "at": "2026-11-10 14:04",
+  "rows": []
+ },
+ "HOOD": {
+  "at": "2026-11-10 14:05",
+  "rows": [
+   {
+    "docket_id": 74758287,
+    "title": "George v. Robinhood Markets, Inc.",
+    "court": "FLSD",
+    "filed": "2026-09-08",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/74758287/george-v-robinhood-markets-inc/"
+   }
+  ]
+ },
+ "MARA": {
+  "at": "2026-11-10 14:05",
+  "rows": [
+   {
+    "docket_id": 67570049,
+    "title": "In re Marathon Digital Holdings, Inc. Derivative Litigation",
+    "court": "NVD",
+    "filed": "2023-07-08",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/67570049/in-re-marathon-digital-holdings-inc-derivative-litigation/"
+   }
+  ]
+ },
+ "CRCL": {
+  "at": "2026-11-10 14:05",
+  "rows": []
+ },
+ "VST": {
+  "at": "2026-11-10 14:05",
+  "rows": []
+ },
+ "SMR": {
+  "at": "2026-11-10 14:06",
+  "rows": [
+   {
+    "docket_id": 72296825,
+    "title": "Truedson v. NuScale Power Corporation",
+    "court": "ORD",
+    "filed": "2026-02-18",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/72296825/truedson-v-nuscale-power-corporation/"
+   }
+  ]
+ },
+ "IONQ": {
+  "at": "2026-11-10 14:06",
+  "rows": []
+ },
+ "RGTI": {
+  "at": "2026-11-10 14:06",
+  "rows": []
+ },
+ "QBTS": {
+  "at": "2026-11-10 14:06",
+  "rows": [
+   {
+    "docket_id": 74989375,
+    "title": "Lawrence v. D-Wave Quantum Inc.",
+    "court": "CAND",
+    "filed": "2026-10-20",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/74989375/lawrence-v-d-wave-quantum-inc/"
+   },
+   {
+    "docket_id": 74969950,
+    "title": "Fessler v. D-Wave Quantum, Inc.",
+    "court": "CAND",
+    "filed": "2026-10-15",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/74969950/fessler-v-d-wave-quantum-inc/"
+   }
+  ]
+ },
+ "QUBT": {
+  "at": "2026-11-10 14:06",
+  "rows": [
+   {
+    "docket_id": 69670299,
+    "title": "COHEN v. QUANTUM COMPUTING INC.",
+    "court": "NJD",
+    "filed": "2025-02-25",
+    "nature": "850 Securities/Commodities",
+    "url": "https://www.courtlistener.com/docket/69670299/cohen-v-quantum-computing-inc/"
+   }
+  ]
+ },
+ "IBM": {
+  "at": "2026-11-10 14:07",
+  "rows": []
  }
 }

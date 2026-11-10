@@ -1,6 +1,6 @@
 # 소송 추적 후보 (court.py --survey)
 
-갱신 2026-11-02 03:28 · 종결 안 된 1심 증권 소송 중 회사가 피고 · **조사 43/64종목** · 남음 : LIN NEM WELL PLD NEE SO COP SLB EOG COIN MSTR HOOD MARA CRCL VST SMR IONQ RGTI QBTS QUBT IBM
+갱신 2026-11-10 14:07 · 종결 안 된 1심 증권 소송 중 회사가 피고 · **조사 64/64종목** · 끝
 
 다시 돌리면 남은 종목부터 이어 간다 (`python court.py --survey`). 한 종목만 다시 = `python court.py --survey --redo AAPL`.
 
@@ -146,4 +146,79 @@
 
 
 ## CVX (0건 · 2026-11-02 03:27)
+
+
+## LIN (0건 · 2026-11-10 14:01)
+
+
+## NEM (0건 · 2026-11-10 14:01)
+
+
+## WELL (0건 · 2026-11-10 14:01)
+
+
+## PLD (0건 · 2026-11-10 14:01)
+
+
+## NEE (0건 · 2026-11-10 14:01)
+
+
+## SO (0건 · 2026-11-10 14:02)
+
+
+## COP (0건 · 2026-11-10 14:02)
+
+
+## SLB (0건 · 2026-11-10 14:02)
+
+
+## EOG (0건 · 2026-11-10 14:03)
+
+
+## COIN (6건 · 2026-11-10 14:04)
+
+- 2025-11-04 NYSD [Heabeart v. Coinbase, Inc.](https://www.courtlistener.com/docket/71872260/heabeart-v-coinbase-inc/) · docket 71872260
+- 2025-06-02 ORD [State of Oregon v. Coinbase, Inc.](https://www.courtlistener.com/docket/70443284/state-of-oregon-v-coinbase-inc/) · docket 70443284
+- 2025-05-22 PAED [NESSLER v. COINBASE GLOBAL, INC.](https://www.courtlistener.com/docket/70343031/nessler-v-coinbase-global-inc/) · docket 70343031
+- 2025-02-21 NYSD [Aceves v. Coinbase Global, Inc.](https://www.courtlistener.com/docket/69661239/aceves-v-coinbase-global-inc/) · docket 69661239
+- 2022-08-04 NJD [PATEL v. COINBASE GLOBAL, INC.](https://www.courtlistener.com/docket/64872383/patel-v-coinbase-global-inc/) · docket 64872383
+- 2022-08-04 NJD [PATEL v. COINBASE GLOBAL, INC.](https://www.courtlistener.com/docket/64869843/patel-v-coinbase-global-inc/) · docket 64869843
+
+## MSTR (0건 · 2026-11-10 14:04)
+
+
+## HOOD (1건 · 2026-11-10 14:05)
+
+- 2026-09-08 FLSD [George v. Robinhood Markets, Inc.](https://www.courtlistener.com/docket/74758287/george-v-robinhood-markets-inc/) · docket 74758287
+
+## MARA (1건 · 2026-11-10 14:05)
+
+- 2023-07-08 NVD [In re Marathon Digital Holdings, Inc. Derivative Litigation](https://www.courtlistener.com/docket/67570049/in-re-marathon-digital-holdings-inc-derivative-litigation/) · docket 67570049
+
+## CRCL (0건 · 2026-11-10 14:05)
+
+
+## VST (0건 · 2026-11-10 14:05)
+
+
+## SMR (1건 · 2026-11-10 14:06)
+
+- 2026-02-18 ORD [Truedson v. NuScale Power Corporation](https://www.courtlistener.com/docket/72296825/truedson-v-nuscale-power-corporation/) · docket 72296825
+
+## IONQ (0건 · 2026-11-10 14:06)
+
+
+## RGTI (0건 · 2026-11-10 14:06)
+
+
+## QBTS (2건 · 2026-11-10 14:06)
+
+- 2026-10-20 CAND [Lawrence v. D-Wave Quantum Inc.](https://www.courtlistener.com/docket/74989375/lawrence-v-d-wave-quantum-inc/) · docket 74989375
+- 2026-10-15 CAND [Fessler v. D-Wave Quantum, Inc.](https://www.courtlistener.com/docket/74969950/fessler-v-d-wave-quantum-inc/) · docket 74969950
+
+## QUBT (1건 · 2026-11-10 14:06)
+
+- 2025-02-25 NJD [COHEN v. QUANTUM COMPUTING INC.](https://www.courtlistener.com/docket/69670299/cohen-v-quantum-computing-inc/) · docket 69670299
+
+## IBM (0건 · 2026-11-10 14:07)
 
