@@ -1650,6 +1650,11 @@ MOCK_NEWS = [
 ]
 
 
+def _js_json(obj):
+    """<script> 안에 넣을 JSON. 본문 속 `</script>` 가 바깥 스크립트를 닫지 않게 `</` → `<\\/` (2026-11-10: 데일리 본문 안 스크립트 때문에 미리보기 맨 아래로 글이 새어 나왔다)"""
+    return json.dumps(obj, ensure_ascii=False).replace("</", "<\\/")
+
+
 def preview_mock_js():
     """fetch 를 가로채 고정 데이터를 돌려준다. 네트워크도 서버도 필요 없다."""
     data = {
@@ -1739,17 +1744,17 @@ def preview_mock_js():
         "    }\n"
         "  };"
         % (
-            json.dumps(data, ensure_ascii=False),
-            json.dumps(news, ensure_ascii=False),
-            json.dumps(feed, ensure_ascii=False),
-            json.dumps(trump_feed, ensure_ascii=False),
-            json.dumps(nvda_feed, ensure_ascii=False),
-            json.dumps(radar_feed, ensure_ascii=False),
-            json.dumps(media_feed, ensure_ascii=False),
-            json.dumps(dict(MOCK_PICKS, events=preview_events("us")), ensure_ascii=False),
-            json.dumps(MOCK_THEMES, ensure_ascii=False),
-            json.dumps(preview_kr_home(), ensure_ascii=False),
-            json.dumps([dict(c, photo=_avatar_data_uri(c["avatar"])) for c in PREVIEW_COMMENTS], ensure_ascii=False),
+            _js_json(data),
+            _js_json(news),
+            _js_json(feed),
+            _js_json(trump_feed),
+            _js_json(nvda_feed),
+            _js_json(radar_feed),
+            _js_json(media_feed),
+            _js_json(dict(MOCK_PICKS, events=preview_events("us"))),
+            _js_json(MOCK_THEMES),
+            _js_json(preview_kr_home()),
+            _js_json([dict(c, photo=_avatar_data_uri(c["avatar"])) for c in PREVIEW_COMMENTS]),
         )
     )
 
