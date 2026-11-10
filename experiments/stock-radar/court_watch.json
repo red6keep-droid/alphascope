@@ -17,7 +17,6 @@
   {"docket_id": 60991960, "name": "In re Meta Platforms, Inc., Securities Litigation"}
  ],
  "XOM": [
-  {"docket_id": 71978760, "name": "Boca Raton Police and Fire Fighters' Retirement System v. Exxon Mobil Corporation"},
   {"docket_id": 50862211, "name": "Yoshikawa v. Exxon Mobil Corporation"}
  ],
  "ASML": [
@@ -31,5 +30,18 @@
  ],
  "CRWV": [
   {"docket_id": 72134362, "name": "Masaitis v. CoreWeave, Inc."}
+ ],
+ "COIN": [
+  {"docket_id": 69661239, "name": "Aceves v. Coinbase Global, Inc."},
+  {"docket_id": 64872383, "name": "Patel v. Coinbase Global, Inc."}
+ ],
+ "SMR": [
+  {"docket_id": 72296825, "name": "Truedson v. NuScale Power Corporation"}
+ ],
+ "QBTS": [
+  {"docket_id": 74969950, "name": "Fessler v. D-Wave Quantum, Inc."}
+ ],
+ "QUBT": [
+  {"docket_id": 69670299, "name": "Cohen v. Quantum Computing Inc."}
  ]
 }

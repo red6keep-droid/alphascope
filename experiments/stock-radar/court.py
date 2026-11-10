@@ -148,6 +148,8 @@ def fetch(day=None):
     for sym, cases in watch().items():
         for c in cases:
             key = str(c["docket_id"])
+            if n:
+                time.sleep(3)   # 사건 사이 간격 — 짧게 몰리면 CourtListener 가 429 로 막는다 (2026-11-10, 17건)
             try:
                 entries = CW.fetch_entries(key, headers)
             except Exception as e:  # noqa: BLE001
@@ -156,7 +158,8 @@ def fetch(day=None):
             if not entries:
                 continue
             ms = CW.milestones_from(entries, today)
-            store[key] = {"sym": sym, "name": c["name"], "dates": sorted(({"label": k, "day": v[0]} for k, v in ms.items()), key=lambda x: x["day"])}
+            store[key] = {"sym": sym, "name": c["name"], "dates": sorted(({"label": k, "day": v[0]} for k, v in ms.items()), key=lambda x: x["day"]),
+                          "status": CW.case_status(entries)}   # 합의 · 정지 (2026-11-10) — 합의는 일정이 없어도 카드에 `합의 진행 중`
             n += 1
     os.makedirs(os.path.dirname(DATA), exist_ok=True)
     json.dump(store, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
@@ -174,7 +177,9 @@ def card(sym, day, store):
         nxt = next((x for x in v["dates"] if x["day"] > day), None)
         if nxt:
             out.append({"name": v["name"], "day": nxt["day"], "label": nxt["label"], "left": (datetime.date.fromisoformat(nxt["day"]) - d0).days})
-    out.sort(key=lambda x: x["day"])
+        elif v.get("status") == "settled":   # 원칙적 합의로 일정이 멈춘 사건 — 날짜 없이 한 줄 (2026-11-10 사용자)
+            out.append({"name": v["name"], "day": None, "label": "합의 진행 중", "left": None})
+    out.sort(key=lambda x: (x["day"] is None, x["day"] or ""))
     return {"cases": out} if out else None
 
 

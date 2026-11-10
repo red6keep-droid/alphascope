@@ -3340,10 +3340,17 @@ def cal_macro(c):
 
 def cal_court(c):
     cs = c["cases"]
-    nxt = cs[0]
+    dated = [x for x in cs if x.get("day")]
+    settled = [x for x in cs if not x.get("day")]   # 원칙적 합의로 일정이 멈춘 사건 — 날짜 없음 (2026-11-10, court.card)
+    srows = [("row", x["name"], "합의", "합의 진행 중 · 법원 일정 멈춤") for x in settled]
+    if not dated:
+        first = f"추적 중인 소송은 {len(cs)}건이다. " + ", ".join(x["name"] for x in settled) + " 사건은 원칙적 합의로 법원 일정이 멈춰 있다."
+        tip = "엔비디아가 당사자인 소송 가운데 주가와 연결될 수 있는 것(주주 집단소송 등)의 법원 일정\n· 합의 진행 중 : 양측이 원칙적 합의를 알려 법원이 일정을 멈춘 사건"
+        return [(first, "plain")] + srows, _dk.with_src(tip, "CourtListener"), "합의 진행 중", ("neutral", "#111")
+    nxt = dated[0]
     first = (f"추적 중인 소송은 {len(cs)}건이다. 가장 가까운 일정은 {nxt['name']}의 {nxt['label'] or '심리'}로 {_md_short(nxt['day'])}, {nxt['left']}일 뒤다."
              f" 법원 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드 색이 보라로 바뀐다.")
-    lines = [(first, "plain")] + [("row", x["name"], _md_short(x["day"]), f"{x['label'] or '일정'} · {_left(x['left'])}") for x in cs]
+    lines = [(first, "plain")] + [("row", x["name"], _md_short(x["day"]), f"{x['label'] or '일정'} · {_left(x['left'])}") for x in dated] + srows
     tip = ("엔비디아가 당사자인 소송 가운데 주가와 연결될 수 있는 것(주주 집단소송 등)의 법원 일정\n"
            f"· {_left(nxt['left'])} : {nxt['name']} {nxt['label'] or ''}\n"
            f"· 나누는 법 : 일정이 {config.COURT_LOOKAHEAD_DAYS}일 안으로 다가오면 카드가 보라색")

@@ -51,6 +51,36 @@ RULINGS = [  # (패턴, 한국어, NVDA(피고) 기준 방향, cases.status 전�
 ]
 EXCLUDE_RE = re.compile(r"seal|administrative motion|pro hac vice|withdraw|extension of time|leave to file", re.I)
 
+# 일정을 지우는 문서 (2026-11-10 사용자 확인: NVDA 카드에 합의로 멈춘 2027 일정 · 서면 판단으로 없어진 11-19 심리가 남아 있었다).
+# 법원 명령 · 서기 공지 · 양측 합의서(머리가 ORDER · CLERK'S NOTICE · STIPULATION · NOTICE OF SETTLEMENT · MINUTE)에 정지 · 취소 · 서면 판단 · 합의가 있으면
+# 그 문서보다 먼저 잡힌 일정은 버린다. 그 뒤에 새로 잡힌 일정(정지가 풀려 다시 잡힘)은 남는다. 당사자의 `정지 신청`(MOTION to stay)은 명령이 아니라 보지 않는다
+CANCEL_HEAD_RE = re.compile(r"^\s*(ORDER|CLERK'?S NOTICE|NOTICE OF SETTLEMENT|STIPULATION|MINUTE)", re.I)
+SETTLE_RE = re.compile(r"settlement[- ]in[- ]principle|notice of settlement|stipulation of settlement|preliminary approval[^.]{0,60}settlement", re.I)
+STAY_RE = re.compile(r"\bstay(?:s|ed|ing)?\b[^.]{0,40}\b(?:deadlines|action|case|proceedings)\b|\bstaying\b", re.I)
+VACATE_RE = re.compile(r"\bvacat(?:e|es|ed|ing)\b|under submission without oral argument|without (?:a )?hearing", re.I)
+
+
+def cancel_kind(text):
+    """일정을 지우는 문서면 'settled' · 'stayed' · 'vacated', 아니면 ''."""
+    if not text or not CANCEL_HEAD_RE.search(text):
+        return ""
+    if SETTLE_RE.search(text):
+        return "settled"
+    if STAY_RE.search(text):
+        return "stayed"
+    if VACATE_RE.search(text):
+        return "vacated"
+    return ""
+
+
+def case_status(entries):
+    """최신 문서부터 — 가장 최근의 합의 · 정지 표시 ('settled' · 'stayed' · ''). 일정 취소(vacated)는 사건 상태가 아니라 비운다."""
+    for e in entries:
+        k = cancel_kind(entry_text(e))
+        if k in ("settled", "stayed"):
+            return k
+    return ""
+
 
 SEP, OLD_SEP = " · ", " — "   # 일정 이름 = `사건 · 일정`. 옛 행은 ` — ` (2026-10-18 줄표 금지 전), 지우기 · 찾기는 둘 다 본다
 
@@ -88,8 +118,14 @@ def entry_text(e):
 def milestones_from(entries, today):
     """최신 문서부터 훑어 라벨별로 첫(=가장 최근 명령의) 미래 날짜만 남긴다."""
     found = {}
+    cut = False   # 이 문서부터 과거 쪽은 정지 · 취소 · 합의 문서보다 앞 — 그 일정은 지워진 것
     for e in entries:  # 최신 → 과거
         text = entry_text(e)
+        if cut:
+            continue
+        if cancel_kind(text):
+            cut = True
+            continue
         for m in SET_FOR_RE.finditer(text):
             phrase = m.group(1)
             if SKIP_PHRASE_RE.search(phrase):
