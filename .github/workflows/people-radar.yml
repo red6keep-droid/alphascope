@@ -28,6 +28,7 @@ on:
 
 permissions:
   contents: write
+  actions: read   # notify_recovered.py — 오늘 실패한 실행이 있었는지 본다
 
 concurrency:
   group: people-radar
@@ -189,3 +190,11 @@ jobs:
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
           curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 주요 인물 발언\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
+
+      # 오늘 실패 알림이 나간 뒤 이번 실행에서 게시에 성공했을 때만 '다시 성공' 알림. 평소 성공은 조용히 (2026-11-10 사용자)
+      - name: Notify recovered
+        if: success() && hashFiles('experiments/people-radar/output/post_meta.json') != ''
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python .github/scripts/notify_recovered.py "주요 인물 발언" experiments/people-radar/output/post_meta.json
