@@ -377,7 +377,7 @@ body[data-home-mkt="us"] #kr-report-col, body[data-home-mkt="kr"] #us-report-col
 body[data-home-mkt="us"] [data-hook="notable-kr"], body[data-home-mkt="kr"] [data-hook="notable-us"] { display: none; }
 body[data-home-mkt] #notable-col { grid-column: auto; }
 body[data-home-mkt] .nt-grid { grid-template-columns: minmax(0, 1fr); }
-body[data-home-mkt="kr"] .news-section, body[data-home-mkt="kr"] .breaking { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 (아래 영어 뉴스 띠도) */
+body[data-home-mkt="kr"] .news-section { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 */
 #radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
@@ -636,46 +636,8 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .news-section .fold-btn { margin-top: 6px; }
 
 /* ==========================================================================
-   6. breaking ticker + footer
+   6. footer  (위 주요 뉴스 흐르는 띠는 삭제 — 2026-11-10 사용자)
    ========================================================================== */
-
-.breaking {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px var(--gutter);
-  background: var(--surface);
-  border-top: 1px solid var(--border-strong);
-  border-bottom: 1px solid var(--border-strong);
-  overflow: hidden;
-}
-.breaking-badge {
-  flex: none;
-  padding: 3px 8px;
-  border: 1px solid var(--accent);
-  border-radius: 4px;
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 18px;
-  letter-spacing: .4px;
-  color: var(--accent);
-}
-.breaking-track { flex: 1; min-width: 0; overflow: hidden; }
-.breaking-text {
-  display: inline-block;
-  white-space: nowrap;
-  font-size: 16px;
-  color: var(--gray-600);
-  animation: ticker 46s linear infinite;
-}
-.breaking-track:hover .breaking-text { animation-play-state: paused; }
-@keyframes ticker {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .breaking-text { animation: none; }
-}
 
 .site-footer {
   padding: 36px var(--gutter) 48px;
@@ -2005,13 +1967,6 @@ body[data-pv-view="post"] #pv-reports { display: none; }
   </div>
 </main>
 
-<div class="breaking">
-  <span class="breaking-badge">주요 뉴스</span>
-  <div class="breaking-track">
-    <span class="breaking-text" id="breaking-text">ALPHASCOPE 주요 뉴스: 데이터를 불러오는 중…</span>
-  </div>
-</div>
-
 <footer class="site-footer">
   <!-- 2026-10-18 사용자: "투자 의사 결정 보조" 문구 수정 · 리포트 꼬리말의 출처 · 투자 권유 안내를 이 푸터 하나로 모은다 (Claude 문안).
        "의사 결정 보조"는 투자 자문처럼 읽히고, "AI 모델의 가공적 연산"은 사실과 다르다(계산은 정해진 규칙). 2026-10-18 밤: AI 해설 문장(데일리 · 엔비디아 · 트럼프 서술)도 있어 "뉴스 분류와 해설 문장"으로 고침, 글마다의 꼬리말은 모두 뺐다 (사용자: 중복 안내 금지).
@@ -2917,13 +2872,6 @@ body[data-pv-view="post"] #pv-reports { display: none; }
         if (best >= 0) items.splice(NEWS_SHOWN - 1, 0, items.splice(best, 1)[0]);
       }
 
-      /* BREAKING 티커 — 애니메이션이 -50% 로 감기므로 내용을 2회 반복 */
-      var line = items.slice(0, 6).map(function (i) { return i.title; }).join('  ·  ');
-      var tick = document.getElementById('breaking-text');
-      if (tick) tick.textContent =
-        'ALPHASCOPE 주요 뉴스: ' + line + '  ·  ' +
-        'ALPHASCOPE 주요 뉴스: ' + line + '  ·  ';
-
       /* 기사 목록 — 썸네일 없음, 기사 사이 가로 구분선 (2026-10-14 사용자) */
       var list = document.getElementById('news-list');
       if (!list) return;
@@ -2970,8 +2918,6 @@ body[data-pv-view="post"] #pv-reports { display: none; }
     .catch(function () {
       var l2 = document.getElementById('news-list');
       if (l2) { l2.textContent = ''; l2.appendChild(el('article', 'news-item load-status', '뉴스를 불러올 수 없습니다.')); }
-      var t2 = document.getElementById('breaking-text');
-      if (t2) t2.textContent = 'ALPHASCOPE 주요 뉴스';
     });
 
   /* ====================================================== 오늘의 데일리 리포트
@@ -3743,6 +3689,10 @@ body[data-pv-view="post"] #pv-reports { display: none; }
   var shell = document.querySelector('.post-shell'), nav = shell && shell.querySelector('.post-nav');
   if (!nav) return;
   var after = shell.querySelector('.comments') || nav;
+  /* 게시 때 붙던 옛 `함께 보는 리포트`(data-related="report", 11-10 없앰)는 `함께 보는 페이지`가 있는 글에서 지운다 — 블록이 두 개 보이던 것 (2026-11-10 사용자).
+     옛 블록 하나뿐인 글(인물 발언 등)은 남겨 옮긴다. 다음 게시 · 갱신 때 publish_blogger.with_related 가 본문에서도 지운다 */
+  var olds = [].slice.call(shell.querySelectorAll('.post-body [data-related="report"]'));
+  if (olds.length && shell.querySelector('.post-body [data-related]:not([data-related="report"])')) olds.forEach(function (r) { r.parentNode.removeChild(r); });
   [].slice.call(shell.querySelectorAll('.post-body [data-related]')).forEach(function (r) {
     after.parentNode.insertBefore(r, after.nextSibling); after = r;
     r.classList.add('is-moved');

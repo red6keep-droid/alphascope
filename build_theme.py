@@ -47,7 +47,6 @@ def extract(src):
         "js": one(r"<script>\n(.*?)\n</script>", "<script> 블록"),
         "navbar": one(r'(<header class="navbar">.*?</header>)', "navbar"),
         "dashboard": one(r'<main class="main-content">\n(.*?)\n</main>', "<main> 대시보드"),
-        "breaking": one(r'(<div class="breaking">.*?</div>\n</div>)', "BREAKING 티커"),
         "footer": one(r"(<footer class=\"site-footer\">.*?</footer>)", "footer"),
     }
 
@@ -453,12 +452,12 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments-panel[hidden] { display: none; }
 .comments .comments-title[hidden] { display: none; }
 .post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
+.post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
+.post-shell > [data-related].is-moved { margin-top: 20px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
 .post-shell > [data-related].is-moved > div:first-child { font-size: 16px !important; line-height: 26px; }
 .post-shell > [data-related] a[data-row-link] { font-weight: 700 !important; }   /* `함께 보는 페이지` 줄 16 굵게 (2026-11-10 사용자) — 이미 게시된 글의 인라인 400 을 덮는다. 렌더러 dk.related_rows 도 700 */
 body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
 body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
-.post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
-.post-shell > [data-related].is-moved { margin-top: 20px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
 .comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
@@ -499,11 +498,11 @@ body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글�
 .comments .cm-status[hidden] { display: none; }
 /* 쓰기 칸 — 윗선 아래. 댓글이 없으면 선 없이 (댓글 목록 바로 아래 흰 버튼 하나였던 자리, 2026-10-13 사용자) */
 .comments .cm-write { margin-top: 0; padding-top: 14px; border-top: 1px solid #E2E8F0; }
+.comments .cm-write.is-first { border-top: 0; }
 /* `댓글 쓰기` 작은 버튼 — 댓글이 있을 때만, 목록 아래 오른쪽. 답글 · 삭제(.cm-btn)와 같은 14 외곽선 + 연필 14 (2026-11-10 사용자: 보기만 할 때 입력창 X) */
 .comments .cm-write-row { display: flex; justify-content: flex-end; }
 .comments .cm-write-btn { display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 5px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 14px; line-height: 22px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .comments .cm-write-btn:hover { border-color: #111; }
-.comments .cm-write.is-first { border-top: 0; }
 .comments .cm-login { display: block; width: 100%; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; color: #111; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 공식 흰 버튼 — 외곽선 #E2E8F0 → 20% 진하게 #B5BAC0 (2026-10-14 사용자, 가이드 2-3 흰 버튼) */
 .comments .cm-login:hover { border-color: #111; }
 .comments .cm-login[disabled] { opacity: .5; cursor: default; }
@@ -605,7 +604,6 @@ __BLOGGER_CSS__
     <b:template-skin><![CDATA[
       body#layout .navbar,
       body#layout .header-bar,
-      body#layout .breaking,
       body#layout .site-footer { display: none; }
       body#layout .hidden-widgets { display: block; }
       body#layout .main-content { display: block; max-width: none; padding: 0; }
@@ -757,8 +755,6 @@ __BLOG_INCLUDABLES__
         </b:widget>
       </b:section>
     </main>
-
-__BREAKING__
 
 __FOOTER_BLOCK__
 
@@ -1011,7 +1007,6 @@ def build_theme(parts):
     out = out.replace("__NVDA_LIST_PATH__", NVDA_LIST_PATH)
     out = out.replace("__DASHBOARD__", indent(to_xml_attrs(parts["dashboard"]), 6))
     out = out.replace("__BLOG_INCLUDABLES__", includables)
-    out = out.replace("__BREAKING__", indent(to_xml_attrs(parts["breaking"]), 4))
     out = out.replace(
         "__FOOTER_BLOCK__",
         indent(footer_with_attribution(to_xml_attrs(parts["footer"])), 4),
@@ -1871,8 +1866,6 @@ __REPORTS__
 __POST__
 </main>
 
-__BREAKING__
-
 __FOOTER__
 
 <div class="pv-bar" role="group" aria-label="미리보기 화면 전환">
@@ -1915,7 +1908,6 @@ def build_preview(parts):
     out = out.replace("__DASHBOARD__", indent(parts["dashboard"], 2))
     out = out.replace("__REPORTS__", preview_reports())
     out = out.replace("__POST__", preview_post())
-    out = out.replace("__BREAKING__", parts["breaking"])
     out = out.replace("__FOOTER__", parts["footer"])
     out = out.replace("__MOCK__", preview_mock_js())
     out = out.replace("__JS__", parts["js"])

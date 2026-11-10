@@ -372,7 +372,7 @@ body.menu-open { overflow: hidden; }
 /* 카드 머리: 어느 연재인지와 그 글의 날짜. 날짜는 피드에서 채운다. */
 .report-card-date { margin-left: auto; margin-right: 8px; font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) */
 .report-block { display: flex; flex-direction: column; gap: 8px; }
-.report-chart { display: block; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px; cursor: zoom-in; }   /* 홈 미국 증시 카드의 S&P 500 그래프 (2026-10-21 사용자) */
+.report-chart { display: block; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px; }   /* 홈 미국 · 한국 증시 카드 그래프 (2026-10-21 사용자). 확대 없음 — 눌러도 카드처럼 상세 리포트로 (2026-11-10 사용자) */
 .report-chart[hidden] { display: none; }
 /* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
 /* #radar-col 전폭 규칙은 뺐다 (2026-11-08 H34): 넷째 카드 `증시 전망` 이 들어와 미국 · 한국 / 인물 · 증시 전망 2 × 2 */
@@ -410,7 +410,7 @@ body[data-home-mkt="us"] #kr-report-col, body[data-home-mkt="kr"] #us-report-col
 body[data-home-mkt="us"] [data-hook="notable-kr"], body[data-home-mkt="kr"] [data-hook="notable-us"] { display: none; }
 body[data-home-mkt] #notable-col { grid-column: auto; }
 body[data-home-mkt] .nt-grid { grid-template-columns: minmax(0, 1fr); }
-body[data-home-mkt="kr"] .news-section, body[data-home-mkt="kr"] .breaking { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 (아래 영어 뉴스 띠도) */
+body[data-home-mkt="kr"] .news-section { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 */
 #radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
@@ -669,46 +669,8 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .news-section .fold-btn { margin-top: 6px; }
 
 /* ==========================================================================
-   6. breaking ticker + footer
+   6. footer  (위 주요 뉴스 흐르는 띠는 삭제 — 2026-11-10 사용자)
    ========================================================================== */
-
-.breaking {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px var(--gutter);
-  background: var(--surface);
-  border-top: 1px solid var(--border-strong);
-  border-bottom: 1px solid var(--border-strong);
-  overflow: hidden;
-}
-.breaking-badge {
-  flex: none;
-  padding: 3px 8px;
-  border: 1px solid var(--accent);
-  border-radius: 4px;
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 18px;
-  letter-spacing: .4px;
-  color: var(--accent);
-}
-.breaking-track { flex: 1; min-width: 0; overflow: hidden; }
-.breaking-text {
-  display: inline-block;
-  white-space: nowrap;
-  font-size: 16px;
-  color: var(--gray-600);
-  animation: ticker 46s linear infinite;
-}
-.breaking-track:hover .breaking-text { animation-play-state: paused; }
-@keyframes ticker {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .breaking-text { animation: none; }
-}
 
 .site-footer {
   padding: 36px var(--gutter) 48px;
@@ -720,8 +682,8 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   text-align: center;   /* 제목은 가운데 · 그 오른쪽에 접기 버튼 (2026-10-25 사용자, 홈 수정 H19) */
   margin: 0 0 14px;
   font-weight: 700;
-  font-size: 17px;
-  line-height: 1.5;
+  font-size: 14px;   /* 17 (PC 16) → 14 어디서나 (2026-11-10 사용자) — 아래 설명 13 보다 한 단계 위 */
+  line-height: 20px;   /* 홀짝 14/20 */
   color: var(--ink-2);
 }
 .footer-disclaimer {
@@ -1471,8 +1433,13 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 8px 8px 8px 16px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .comments-panel[hidden] { display: none; }
 .comments .comments-title[hidden] { display: none; }
-.post-nav ~ .comments .comments-panel { padding-top: 6px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
-.post-shell > [data-related].is-moved { margin-top: 40px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
+.post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
+.post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
+.post-shell > [data-related].is-moved { margin-top: 20px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
+.post-shell > [data-related].is-moved > div:first-child { font-size: 16px !important; line-height: 26px; }
+.post-shell > [data-related] a[data-row-link] { font-weight: 700 !important; }   /* `함께 보는 페이지` 줄 16 굵게 (2026-11-10 사용자) — 이미 게시된 글의 인라인 400 을 덮는다. 렌더러 dk.related_rows 도 700 */
+body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
+body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
 .comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
@@ -1490,7 +1457,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-avatar.is-owner svg { width: 14px; height: 13px; display: block; }
 .comments .cm-body { grid-column: 2; grid-row: 1; min-width: 0; }
 .comments .cm-head { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 0; line-height: 24px; }
-.comments .cm-name { font-size: 16px; font-weight: 700; color: #111; }
+.comments .cm-name { font-size: 14px; line-height: 20px; font-weight: 400; color: #111; }   /* 작성자 이름 = 가장 작은 글씨 14/20 보통 (2026-11-10 사용자, 옛 16 굵게) */
 .comments .cm-tag { display: inline-block; margin: 0; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; vertical-align: middle; position: relative; top: -1px; }   /* 운영자 라벨 — 영역 라벨 모양 (가이드 5절) */
 .comments .cm-date { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
 .comments .cm-text { margin: 4px 0 0; font-size: 19px; line-height: 25px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -1514,6 +1481,10 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 /* 쓰기 칸 — 윗선 아래. 댓글이 없으면 선 없이 (댓글 목록 바로 아래 흰 버튼 하나였던 자리, 2026-10-13 사용자) */
 .comments .cm-write { margin-top: 0; padding-top: 14px; border-top: 1px solid #E2E8F0; }
 .comments .cm-write.is-first { border-top: 0; }
+/* `댓글 쓰기` 작은 버튼 — 댓글이 있을 때만, 목록 아래 오른쪽. 답글 · 삭제(.cm-btn)와 같은 14 외곽선 + 연필 14 (2026-11-10 사용자: 보기만 할 때 입력창 X) */
+.comments .cm-write-row { display: flex; justify-content: flex-end; }
+.comments .cm-write-btn { display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 5px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 14px; line-height: 22px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.comments .cm-write-btn:hover { border-color: #111; }
 .comments .cm-login { display: block; width: 100%; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; color: #111; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 공식 흰 버튼 — 외곽선 #E2E8F0 → 20% 진하게 #B5BAC0 (2026-10-14 사용자, 가이드 2-3 흰 버튼) */
 .comments .cm-login:hover { border-color: #111; }
 .comments .cm-login[disabled] { opacity: .5; cursor: default; }
@@ -1580,7 +1551,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .tab { font-size: 16px; line-height: 21.5px; }
   .news-item { font-size: 16px; line-height: 32px; }
   .news-item a { font-size: 16px; line-height: 32px; }
-  .footer-title { font-size: 16px; }
   .eb-name { font-size: 18.5px; line-height: 25px; }
   .eb-title { font-size: 16px; line-height: 23px; }
   .theme-name { font-size: 16px; line-height: 23px; }
@@ -1631,7 +1601,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
     <b:template-skin><![CDATA[
       body#layout .navbar,
       body#layout .header-bar,
-      body#layout .breaking,
       body#layout .site-footer { display: none; }
       body#layout .hidden-widgets { display: block; }
       body#layout .main-content { display: block; max-width: none; padding: 0; }
@@ -1717,8 +1686,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
               <div class='report-col' id='us-report-col'>
               <h3 class='report-title'><span class='report-icon' style='background:#E53E3E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='5' width='3' height='9' rx='.5'/><rect x='11' y='2' width='3' height='12' rx='.5'/></svg></span>미국 증시<span class='report-card-date' data-date='report-card'></span></h3>
               <a class='report-card' id='report-card' href='#'>
-                <!-- 리포트 본문 맨 위 S&P 500 그래프를 그대로 복제해 카드 안에 (2026-10-21 사용자: "상세 페이지 그래프는 그대로, 복제해서 홈 카드에"). 그래프를 누르면 확대 팝업, 그 밖은 글로 -->
-                <img class='report-chart' data-hook='report-chart' data-zoom='1' alt='' hidden='hidden'/>
+                <!-- 리포트 본문 맨 위 S&P 500 그래프를 그대로 복제해 카드 안에 (2026-10-21 사용자: "상세 페이지 그래프는 그대로, 복제해서 홈 카드에"). 그래프를 눌러도 카드 전체처럼 글로 간다 — 확대 팝업 없앰 (2026-11-10 사용자) -->
+                <img class='report-chart' data-hook='report-chart' alt='' hidden='hidden'/>
                 <!-- 요약은 한 줄만 — 자세한 것은 글에서 (2026-10-20 사용자: "너무 길다"). 핵심 인사이트 구획은 삭제 -->
                 <div class='report-block' data-hook='summary'>
                   <!-- 첫 구획 라벨은 두지 않는다 (2026-10-13 사용자) -->
@@ -1733,7 +1702,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               <div class='report-col' id='kr-report-col'>
               <h3 class='report-title'><span class='report-icon' style='background:#1D4ED8;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='5' width='3' height='9' rx='.5'/><rect x='11' y='2' width='3' height='12' rx='.5'/></svg></span>한국 증시<span class='report-card-date' data-date='kr-report-card'></span></h3>
               <a class='report-card' id='kr-report-card' href='/search/label/한국%20증시%20리포트'>
-                <img class='report-chart' data-hook='kr-report-chart' data-zoom='1' alt='' hidden='hidden'/>
+                <img class='report-chart' data-hook='kr-report-chart' alt='' hidden='hidden'/>
                 <div class='report-block' data-hook='kr-summary'>   <!-- 미국 카드와 다른 이름 — 같은 이름이면 JS 가 첫 칸(미국)만 채운다 (H27, 2026-10-30) -->
                   <div class='report-columns'>
                     <ul><li class='load-status'>리포트를 불러오는 중…</li></ul>
@@ -2428,13 +2397,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
       </b:section>
     </main>
 
-    <div class='breaking'>
-      <span class='breaking-badge'>주요 뉴스</span>
-      <div class='breaking-track'>
-        <span class='breaking-text' id='breaking-text'>ALPHASCOPE 주요 뉴스: 데이터를 불러오는 중…</span>
-      </div>
-    </div>
-
     <footer class='site-footer'>
       <!-- 2026-10-18 사용자: "투자 의사 결정 보조" 문구 수정 · 리포트 꼬리말의 출처 · 투자 권유 안내를 이 푸터 하나로 모은다 (Claude 문안).
            "의사 결정 보조"는 투자 자문처럼 읽히고, "AI 모델의 가공적 연산"은 사실과 다르다(계산은 정해진 규칙). 2026-10-18 밤: AI 해설 문장(데일리 · 엔비디아 · 트럼프 서술)도 있어 "뉴스 분류와 해설 문장"으로 고침, 글마다의 꼬리말은 모두 뺐다 (사용자: 중복 안내 금지).
@@ -2444,7 +2406,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
            첫 줄에 "권유하지 않습니다"까지 둔다 — 투자 권유 아님은 접지 않는다(운영지침 5절). 접힌 글도 HTML 에 있어 검색엔진이 읽는다(details, JS 없음).
            같은 날 사용자: "코드가 계산" 은 첫 문장과 중복이라 뺌, AI 는 목록 대신 한 줄(AI 기본법 생성형 AI 고지), "늦거나 틀릴 수" → 참고용 한 문장. 문구 확정(사용자): "해설 문장 일부는 AI 가 씁니다." · "모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다." -->
       <details class='footer-disclaimer'>
-        <summary><span class='footer-title'>ALPHASCOPE 미국 주식 데이터 리포트<span class='footer-more' role='img' aria-label='더 보기'><svg viewBox='0 0 16 16' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></span></span><span class='footer-lead'>ALPHASCOPE 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.</span></summary>
+        <summary><span class='footer-title'>ALPHASCOPE 주식 리포트<span class='footer-more' role='img' aria-label='더 보기'><svg viewBox='0 0 16 16' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></span></span><span class='footer-lead'>ALPHASCOPE 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.</span></summary>
         <p>해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다.
         개별 투자 상담을 하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다.
         종목 로고는 각 회사의 상표이며, 종목을 구분하는 용도로만 쓰고 해당 회사와 제휴 관계가 없습니다.</p>
@@ -3334,13 +3296,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
               if (best >= 0) items.splice(NEWS_SHOWN - 1, 0, items.splice(best, 1)[0]);
             }
 
-            /* BREAKING 티커 — 애니메이션이 -50% 로 감기므로 내용을 2회 반복 */
-            var line = items.slice(0, 6).map(function (i) { return i.title; }).join('  ·  ');
-            var tick = document.getElementById('breaking-text');
-            if (tick) tick.textContent =
-              'ALPHASCOPE 주요 뉴스: ' + line + '  ·  ' +
-              'ALPHASCOPE 주요 뉴스: ' + line + '  ·  ';
-
             /* 기사 목록 — 썸네일 없음, 기사 사이 가로 구분선 (2026-10-14 사용자) */
             var list = document.getElementById('news-list');
             if (!list) return;
@@ -3387,8 +3342,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
           .catch(function () {
             var l2 = document.getElementById('news-list');
             if (l2) { l2.textContent = ''; l2.appendChild(el('article', 'news-item load-status', '뉴스를 불러올 수 없습니다.')); }
-            var t2 = document.getElementById('breaking-text');
-            if (t2) t2.textContent = 'ALPHASCOPE 주요 뉴스';
           });
 
         /* ====================================================== 오늘의 데일리 리포트
@@ -4167,6 +4120,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
         [].slice.call(shell.querySelectorAll('.post-body [data-related]')).forEach(function (r) {
           after.parentNode.insertBefore(r, after.nextSibling); after = r;
           r.classList.add('is-moved');
+          /* 최대 3줄 (2026-11-10 사용자) — 이미 게시된 글의 4줄 이상도 앞 3줄만. 렌더러(dk.related_buttons)도 3개로 자른다 */
+          [].slice.call(r.querySelectorAll('a[data-row-link]')).slice(3).forEach(function (x) { x.parentNode.removeChild(x); });
         });
       })();
 
@@ -4400,8 +4355,9 @@ body.no-dashboard .main-content { padding-top: 32px; }
             list.appendChild(li);
           });
           status.hidden = tops.length > 0 || more;
-          if (!tops.length) status.textContent = '첫 댓글을 남겨 보세요.';
+          if (!tops.length) status.textContent = '댓글이 없습니다.';   /* 옛 `첫 댓글을 남겨 보세요.` (2026-11-10 사용자) */
           write.classList.toggle('is-first', !tops.length);
+          renderWrite();
           setCount();
         }
         /* 읽은 한 묶음을 합친다 — 같은 ID 는 한 번만, 늘 오래된 순 */
@@ -4451,11 +4407,26 @@ body.no-dashboard .main-content { padding-top: 32px; }
               .then(function (c) { lastPost = Date.now(); items.push(c); if (total !== null) total++; renderList(); onDone(c); })
               .catch(function (err) { ta.disabled = false; submit.disabled = false; showErr(f, errText(err, 'add')); });
           });
-          setTimeout(function () { ta.focus(); }, 0);
+          if (parent || writing) setTimeout(function () { ta.focus(); }, 0);   /* 댓글이 없어 바로 보이는 입력창은 자판을 띄우지 않는다 — 보기만 하는 사람 (2026-11-10) */
           return f;
         }
+        /* 쓰기 칸 (2026-11-10 사용자: "댓글만 보려는데 입력창이 뜬다") — 댓글이 있으면 작은 `댓글 쓰기` 버튼만, 누르면 로그인 버튼 또는 입력창.
+           댓글이 없으면 `댓글이 없습니다.` 아래 바로 로그인 버튼(로그인했으면 입력창). 올리고 나면 다시 버튼으로 */
+        var writing = /^#comment-form$/.test(location.hash), writeKey = '';
         function renderWrite() {
+          if (!loaded) { write.textContent = ''; writeKey = ''; return; }
+          var none = !items.length && !more, open = writing || none;
+          var key = (open ? 'o' : 'c') + (me ? me.uid : '-');
+          if (key === writeKey) return;   /* 같은 상태면 다시 그리지 않는다 — 쓰던 글이 지워지지 않게 */
+          writeKey = key;
           write.textContent = '';
+          if (!open) {
+            var wb = btn('cm-write-btn');
+            wb.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg>댓글 쓰기';
+            wb.addEventListener('click', function () { writing = true; renderWrite(); });
+            var wr = el('div', 'cm-write-row'); wr.appendChild(wb); write.appendChild(wr);
+            return;
+          }
           if (!me) {
             var login = btn('cm-login', 'Google 계정으로 로그인하고 댓글 쓰기');
             login.addEventListener('click', function () { login.disabled = true; showErr(write, ''); api.login().catch(function (e) { showErr(write, errText(e)); }).then(function () { login.disabled = false; }); });
@@ -4465,7 +4436,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var row = el('div', 'cm-me'); row.appendChild(avatar(me)); row.appendChild(el('span', 'cm-name', nameOf(me)));
           var out = btn('cm-link', '로그아웃'); out.addEventListener('click', function () { api.logout(); }); row.appendChild(out);
           write.appendChild(row);
-          write.appendChild(form('', function () { renderWrite(); }));
+          write.appendChild(form('', function () { writing = false; writeKey = ''; renderWrite(); }));
         }
         function openReply(li, c) {
           [].slice.call(list.querySelectorAll('.cm-replybox')).forEach(function (b) { b.textContent = ''; });
@@ -4603,7 +4574,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
          그림을 화면 폭의 2.2배(최소 원본 폭, 최대 원본의 2배)로 띄우고 가로 스크롤 — 처음 위치는 오른쪽 끝(최근 봉). 닫기 × · 바깥 · Esc. 디자인 가이드 8절 */
       (function () {
         'use strict';
-        var links = document.querySelectorAll('.post-body a[data-zoom], .post-body a[aria-label="그래프 확대 보기"], .report-chart[data-zoom]');   /* .report-chart: 홈 미국 증시 카드의 그래프 (2026-10-21) */
+        var links = document.querySelectorAll('.post-body a[data-zoom], .post-body a[aria-label="그래프 확대 보기"]');   /* 홈 카드 그래프(.report-chart)는 빼고 카드 링크로 (2026-11-10 사용자, 옛 2026-10-21 확대) */
         if (!links.length) return;
         var pop = document.createElement('div'); pop.className = 'img-pop'; pop.hidden = true;
         pop.innerHTML = '<div class="img-pop-head"><span class="img-pop-title"></span><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +

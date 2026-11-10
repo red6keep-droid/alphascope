@@ -377,7 +377,7 @@ body[data-home-mkt="us"] #kr-report-col, body[data-home-mkt="kr"] #us-report-col
 body[data-home-mkt="us"] [data-hook="notable-kr"], body[data-home-mkt="kr"] [data-hook="notable-us"] { display: none; }
 body[data-home-mkt] #notable-col { grid-column: auto; }
 body[data-home-mkt] .nt-grid { grid-template-columns: minmax(0, 1fr); }
-body[data-home-mkt="kr"] .news-section, body[data-home-mkt="kr"] .breaking { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 (아래 영어 뉴스 띠도) */
+body[data-home-mkt="kr"] .news-section { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 */
 #radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
@@ -636,46 +636,8 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .news-section .fold-btn { margin-top: 6px; }
 
 /* ==========================================================================
-   6. breaking ticker + footer
+   6. footer  (위 주요 뉴스 흐르는 띠는 삭제 — 2026-11-10 사용자)
    ========================================================================== */
-
-.breaking {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px var(--gutter);
-  background: var(--surface);
-  border-top: 1px solid var(--border-strong);
-  border-bottom: 1px solid var(--border-strong);
-  overflow: hidden;
-}
-.breaking-badge {
-  flex: none;
-  padding: 3px 8px;
-  border: 1px solid var(--accent);
-  border-radius: 4px;
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 18px;
-  letter-spacing: .4px;
-  color: var(--accent);
-}
-.breaking-track { flex: 1; min-width: 0; overflow: hidden; }
-.breaking-text {
-  display: inline-block;
-  white-space: nowrap;
-  font-size: 16px;
-  color: var(--gray-600);
-  animation: ticker 46s linear infinite;
-}
-.breaking-track:hover .breaking-text { animation-play-state: paused; }
-@keyframes ticker {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .breaking-text { animation: none; }
-}
 
 .site-footer {
   padding: 36px var(--gutter) 48px;
@@ -1291,16 +1253,6 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   </section>
 
 </main>
-
-<!-- ======================================================================
-     breaking ticker
-     ====================================================================== -->
-<div class="breaking">
-  <span class="breaking-badge">주요 뉴스</span>
-  <div class="breaking-track">
-    <span class="breaking-text" id="breaking-text">ALPHASCOPE 주요 뉴스: 데이터를 불러오는 중…</span>
-  </div>
-</div>
 
 <footer class="site-footer">
   <!-- 2026-10-18 사용자: "투자 의사 결정 보조" 문구 수정 · 리포트 꼬리말의 출처 · 투자 권유 안내를 이 푸터 하나로 모은다 (Claude 문안).
@@ -2147,13 +2099,6 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         if (best >= 0) items.splice(NEWS_SHOWN - 1, 0, items.splice(best, 1)[0]);
       }
 
-      /* BREAKING 티커 — 애니메이션이 -50% 로 감기므로 내용을 2회 반복 */
-      var line = items.slice(0, 6).map(function (i) { return i.title; }).join('  ·  ');
-      var tick = document.getElementById('breaking-text');
-      if (tick) tick.textContent =
-        'ALPHASCOPE 주요 뉴스: ' + line + '  ·  ' +
-        'ALPHASCOPE 주요 뉴스: ' + line + '  ·  ';
-
       /* 기사 목록 — 썸네일 없음, 기사 사이 가로 구분선 (2026-10-14 사용자) */
       var list = document.getElementById('news-list');
       if (!list) return;
@@ -2200,8 +2145,6 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     .catch(function () {
       var l2 = document.getElementById('news-list');
       if (l2) { l2.textContent = ''; l2.appendChild(el('article', 'news-item load-status', '뉴스를 불러올 수 없습니다.')); }
-      var t2 = document.getElementById('breaking-text');
-      if (t2) t2.textContent = 'ALPHASCOPE 주요 뉴스';
     });
 
   /* ====================================================== 오늘의 데일리 리포트
@@ -2923,8 +2866,6 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       mkItem('X', ICONS.x, function () { window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareTitle), '_blank', 'noopener,width=640,height=560'); });
     }
     if (!present.facebook) {
-    /* 최대 3줄 (2026-11-10 사용자) — 이미 게시된 글의 4줄 이상도 앞 3줄만. 렌더러(dk.related_buttons)도 3개로 자른다 */
-    [].slice.call(r.querySelectorAll('a[data-row-link]')).slice(3).forEach(function (x) { x.parentNode.removeChild(x); });
       mkItem('Facebook', ICONS.facebook,
         function () { window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank', 'noopener,width=640,height=560'); });
     }
@@ -2982,6 +2923,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   [].slice.call(shell.querySelectorAll('.post-body [data-related]')).forEach(function (r) {
     after.parentNode.insertBefore(r, after.nextSibling); after = r;
     r.classList.add('is-moved');
+    /* 최대 3줄 (2026-11-10 사용자) — 이미 게시된 글의 4줄 이상도 앞 3줄만. 렌더러(dk.related_buttons)도 3개로 자른다 */
+    [].slice.call(r.querySelectorAll('a[data-row-link]')).slice(3).forEach(function (x) { x.parentNode.removeChild(x); });
   });
 })();
 
@@ -3160,7 +3103,6 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   var list = el('ol', 'cm-list'), status = el('div', 'cm-status', '댓글을 불러오는 중…'), write = el('div', 'cm-write');
   var moreBtn = btn('cm-more'); moreBtn.hidden = true;   /* `이전 댓글 n개 더 보기` — 목록 위(오래된 쪽), 공식 흰 버튼 */
   panel.appendChild(moreBtn); panel.appendChild(list); panel.appendChild(status); panel.appendChild(write);
-    renderWrite();
   function shown() { return total !== null ? total : items.length; }
   function setCount() {
     toggle.querySelector('.cm-label').textContent = '댓글' + (loaded && (total !== null || !more) ? ' ' + shown() : '');
@@ -3213,26 +3155,12 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       (kids[c.id] || []).forEach(function (k) { rep.appendChild(item(k, false)); });
       if (rep.children.length) li.appendChild(rep);
       li.appendChild(el('div', 'cm-replybox'));
-  /* 쓰기 칸 (2026-11-10 사용자: "댓글만 보려는데 입력창이 뜬다") — 댓글이 있으면 작은 `댓글 쓰기` 버튼만, 누르면 로그인 버튼 또는 입력창.
-     댓글이 없으면 `댓글이 없습니다.` 아래 바로 로그인 버튼(로그인했으면 입력창). 올리고 나면 다시 버튼으로 */
-  var writing = /^#comment-form$/.test(location.hash), writeKey = '';
       list.appendChild(li);
-    if (!loaded) { write.textContent = ''; writeKey = ''; return; }
-    var none = !items.length && !more, open = writing || none;
-    var key = (open ? 'o' : 'c') + (me ? me.uid : '-');
-    if (key === writeKey) return;   /* 같은 상태면 다시 그리지 않는다 — 쓰던 글이 지워지지 않게 */
-    writeKey = key;
     });
-    if (!open) {
-      var wb = btn('cm-write-btn');
-      wb.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg>댓글 쓰기';
-      wb.addEventListener('click', function () { writing = true; renderWrite(); });
-      var wr = el('div', 'cm-write-row'); wr.appendChild(wb); write.appendChild(wr);
-      return;
-    }
     status.hidden = tops.length > 0 || more;
     if (!tops.length) status.textContent = '댓글이 없습니다.';   /* 옛 `첫 댓글을 남겨 보세요.` (2026-11-10 사용자) */
     write.classList.toggle('is-first', !tops.length);
+    renderWrite();
     setCount();
   }
   /* 읽은 한 묶음을 합친다 — 같은 ID 는 한 번만, 늘 오래된 순 */
@@ -3285,8 +3213,23 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     if (parent || writing) setTimeout(function () { ta.focus(); }, 0);   /* 댓글이 없어 바로 보이는 입력창은 자판을 띄우지 않는다 — 보기만 하는 사람 (2026-11-10) */
     return f;
   }
+  /* 쓰기 칸 (2026-11-10 사용자: "댓글만 보려는데 입력창이 뜬다") — 댓글이 있으면 작은 `댓글 쓰기` 버튼만, 누르면 로그인 버튼 또는 입력창.
+     댓글이 없으면 `댓글이 없습니다.` 아래 바로 로그인 버튼(로그인했으면 입력창). 올리고 나면 다시 버튼으로 */
+  var writing = /^#comment-form$/.test(location.hash), writeKey = '';
   function renderWrite() {
+    if (!loaded) { write.textContent = ''; writeKey = ''; return; }
+    var none = !items.length && !more, open = writing || none;
+    var key = (open ? 'o' : 'c') + (me ? me.uid : '-');
+    if (key === writeKey) return;   /* 같은 상태면 다시 그리지 않는다 — 쓰던 글이 지워지지 않게 */
+    writeKey = key;
     write.textContent = '';
+    if (!open) {
+      var wb = btn('cm-write-btn');
+      wb.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg>댓글 쓰기';
+      wb.addEventListener('click', function () { writing = true; renderWrite(); });
+      var wr = el('div', 'cm-write-row'); wr.appendChild(wb); write.appendChild(wr);
+      return;
+    }
     if (!me) {
       var login = btn('cm-login', 'Google 계정으로 로그인하고 댓글 쓰기');
       login.addEventListener('click', function () { login.disabled = true; showErr(write, ''); api.login().catch(function (e) { showErr(write, errText(e)); }).then(function () { login.disabled = false; }); });
