@@ -23,8 +23,9 @@ def nav(mkt):
     cur = lambda m: ' aria-current="page"' if m == mkt else ""
     return (
         '<nav class="menu-items" id="primary-menu" aria-label="주 메뉴">\n'
-        f'      <a class="nav-item" href="{FILES["us"]}"{cur("us")}>미국</a>\n'
-        f'      <a class="nav-item" href="{FILES["kr"]}"{cur("kr")}>한국</a>\n'
+        # data-bar = 로고 오른쪽에 바로 보이는 메뉴. 나머지(증시 전망)는 메뉴 아이콘 서랍에만 (2026-11-10 사용자)
+        f'      <a class="nav-item" href="{FILES["us"]}"{cur("us")} data-bar="1">미국</a>\n'
+        f'      <a class="nav-item" href="{FILES["kr"]}"{cur("kr")} data-bar="1">한국</a>\n'
         '      <a class="nav-item" href="/p/forecast-list.html">증시 전망</a>\n'
         '    </nav>'
     )
