@@ -10,10 +10,10 @@
  "line": 3.0,
  "unit": "%p",
  "gap": -7.9,
- "pick": 2,
- "pick_prob": 0.5621848739495798,
+ "pick": 1,
+ "pick_prob": 0.5378151260504201,
  "market_prob": null,
- "rules": "EH-2026-11-07b",
+ "rules": "EH-2026-11-10",
  "scenarios": [
   {
    "cond": "반등 쪽이면",
@@ -28,5 +28,5 @@
    "win": "반도체가 11.05 급락 뒤 시장보다 3%p 더 빠진다"
   }
  ],
- "sha256": "bce21b564cb9ed263751a019f6870f0c6ebbcc04fb17cf8b67672db6ebe9b12e"
+ "sha256": "a5714362aab40339c5c453449a32b432f91d4507cc6114f3e71031bf1dd2e07c"
 }

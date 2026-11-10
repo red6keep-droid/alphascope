@@ -1,0 +1,32 @@
+{
+ "id": "EH-2026-004",
+ "slug": "forecast-2026-004",
+ "title": "AMD 급등, 조정 올까 더 오를까?",
+ "kind": "after",
+ "registered": "2026-11-10",
+ "event": "11.06 AMD 급등",
+ "event_day": null,
+ "ruler": "AMD vs 업종",
+ "line": 12.0,
+ "unit": "%p",
+ "gap": 6.8,
+ "pick": null,
+ "pick_prob": null,
+ "market_prob": null,
+ "rules": "EH-2026-11-10",
+ "scenarios": [
+  {
+   "cond": "조정 쪽이면",
+   "name": "AMD 조정",
+   "dir": -1,
+   "win": "AMD가 급등 폭(6.8%p)의 절반을 반납한다"
+  },
+  {
+   "cond": "지속 쪽이면",
+   "name": "AMD 상승 지속",
+   "dir": 1,
+   "win": "AMD가 급등 뒤 12%p 더 오른다"
+  }
+ ],
+ "sha256": "a19c9db7e8a5f797f7032eb6e95eac0155b9e14ce81548f03ece247406b19c93"
+}

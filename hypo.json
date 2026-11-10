@@ -1,7 +1,7 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-10T08:53:18Z",
+ "generated": "2026-11-10T22:32:23Z",
  "list_url": "https://alpha-scope.blogspot.com/p/forecast-list.html",
  "open": [
   {
@@ -27,6 +27,30 @@
     "반도체"
    ],
    "event": "11.17 엔비디아 실적"
+  },
+  {
+   "no": 1,
+   "eh": "EH-2026-003",
+   "title": "엔비디아 급락, 반등할까 더 빠질까?",
+   "url": "https://alpha-scope.blogspot.com/p/forecast-2026-003.html",
+   "posted": "11.10",
+   "tags": [
+    "종목",
+    "반등"
+   ],
+   "event": "11.09 엔비디아 급락"
+  },
+  {
+   "no": 1,
+   "eh": "EH-2026-004",
+   "title": "AMD 급등, 조정 올까 더 오를까?",
+   "url": "https://alpha-scope.blogspot.com/p/forecast-2026-004.html",
+   "posted": "11.10",
+   "tags": [
+    "종목",
+    "조정"
+   ],
+   "event": "11.06 AMD 급등"
   }
  ],
  "done_count": 0

@@ -1,0 +1,32 @@
+{
+ "id": "EH-2026-003",
+ "slug": "forecast-2026-003",
+ "title": "엔비디아 급락, 반등할까 더 빠질까?",
+ "kind": "after",
+ "registered": "2026-11-10",
+ "event": "11.09 엔비디아 급락",
+ "event_day": null,
+ "ruler": "엔비디아 vs 업종",
+ "line": 9.0,
+ "unit": "%p",
+ "gap": -11.1,
+ "pick": null,
+ "pick_prob": null,
+ "market_prob": null,
+ "rules": "EH-2026-11-10",
+ "scenarios": [
+  {
+   "cond": "반등 쪽이면",
+   "name": "엔비디아 반등",
+   "dir": 1,
+   "win": "엔비디아가 급락 폭(11.1%p)의 절반을 회복한다"
+  },
+  {
+   "cond": "지속 쪽이면",
+   "name": "엔비디아 하락 지속",
+   "dir": -1,
+   "win": "엔비디아가 급락 뒤 9%p 더 빠진다"
+  }
+ ],
+ "sha256": "4d256f9959fd7f82c3e092f26cbde27e7dd2496e96b46e4f28b870ae849f8a2b"
+}
