@@ -23,6 +23,7 @@ on:
 
 permissions:
   contents: write
+  actions: read   # notify_recovered.py — 오늘 실패한 실행이 있었는지 본다
 
 concurrency:
   group: daily-report
@@ -161,15 +162,12 @@ jobs:
           if [ -z "$IMAGE_REF" ]; then
             echo "::warning::커버 이미지 ref가 없습니다."; exit 0
           fi
-          curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}"
-          sleep 5
-          curl -sS -f -o /dev/null "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}"
-          echo "커버 이미지 CDN 확인 완료: ${IMAGE_REF}"
+          # 푸시 직후 퍼지는 옛 커밋을 다시 붙잡는다(11-10 07:00 404) — 기다리며 내용까지 맞춰 본다. 끝내 실패하면 게시 막음
+          bash .github/scripts/jsd_purge.sh "${IMAGE_REF}" "deploy/${IMAGE_REF}"
           # S&P 500 그래프 — 확인 실패는 경고만 (글은 그래프 자리가 빈 채로 나가지 않게 publish_saved 가 다시 본다)
           CHART_REF=$(cat experiments/daily-report/output/chart_ref.txt 2>/dev/null || true)
           if [ -n "$CHART_REF" ]; then
-            curl -sS "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${CHART_REF}" || true
-            curl -sS -f -o /dev/null "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${CHART_REF}" && echo "그래프 CDN 확인 완료: ${CHART_REF}" || echo "::warning::그래프 CDN 확인 실패: ${CHART_REF}"
+            bash .github/scripts/jsd_purge.sh "${CHART_REF}" "deploy/${CHART_REF}" || echo "::warning::그래프 CDN 확인 실패: ${CHART_REF}"
           fi
 
       # 스케줄 실행(외부 cron 포함)은 자동 게시. 수동 실행은 publish 체크 시에만 게시.
@@ -212,7 +210,8 @@ jobs:
       - name: Purge report.json cache
         if: hashFiles('deploy-cards/cards/report.json') != '' && steps.cards_deploy_retry.outcome != 'failure'
         continue-on-error: true
-        run: curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/cards/report.json" || true
+        # 11-10: 푸시 1초 뒤 퍼지 → jsDelivr 가 11-07 카드를 다시 붙잡아 홈 카드가 옛 글로 연결됨. 내용 확인까지
+        run: bash .github/scripts/jsd_purge.sh cards/report.json deploy-cards/cards/report.json
 
       - name: Notify card deploy failure
         if: steps.cards_deploy_retry.outcome == 'failure'
@@ -293,3 +292,11 @@ jobs:
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
           curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 미국 데일리 리포트\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
+
+      # 오늘 실패 알림이 나간 뒤 이번 실행에서 게시에 성공했을 때만 '다시 성공' 알림. 평소 성공은 조용히 (2026-11-10 사용자)
+      - name: Notify recovered
+        if: success() && hashFiles('experiments/daily-report/output/post_meta.json') != ''
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python .github/scripts/notify_recovered.py "미국 데일리 리포트" experiments/daily-report/output/post_meta.json
