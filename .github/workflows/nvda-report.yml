@@ -85,7 +85,9 @@ jobs:
         if: env.IS_SCHEDULED == 'true'
 
       # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
+      # 이 check 잡은 예약 실행만 확인한다 — 위 checkout 과 같은 조건. 조건이 없어 사람이 누른 수동 실행이 `not in a git directory` 로 8초 만에 실패했다 (2026-11-10)
       - name: State repo (private alphascope-state)
+        if: env.IS_SCHEDULED == 'true'
         env:
           STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
         run: |
