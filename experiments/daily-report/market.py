@@ -436,6 +436,36 @@ def rates_card(a, macro, parts=False):
     return C.question_card("금리의 움직임은?", state, theme, ink, lines, tip=dk.with_src(tip, f"{SRC_FRED} · {SRC_PRICE}"))   # 옛 `금리는 어떻게 움직였나?` (2026-11-08 사용자 P409)
 
 
+def _man(v):
+    """219000 → `21.9만` (실업수당 청구 건수)."""
+    return f"{v / 10000:,.1f}만"
+
+
+def _wk(day):
+    """FRED 주간 기준일(토요일) → `11월 1일로 끝난 주`."""
+    return f"{int(str(day)[5:7])}월 {int(str(day)[8:10])}일로 끝난 주" if day and len(str(day)) >= 10 else "최근 주"
+
+
+def claims_lines(macro):
+    """주간 실업수당 청구 — 문장 하나 + 줄 둘(신규 · 계속). 사실만 (값 · 전주 대비 · 4주 평균), 좋다 · 나쁘다 판정 없음 (2026-11-09 사용자)."""
+    c, c4, cc = macro.get("claims") or {}, macro.get("claims_4wk") or {}, macro.get("claims_cont") or {}
+    if c.get("value") is None:
+        return []
+    d = c["value"] - c["prev"] if c.get("prev") is not None else None
+    s = f"{_wk(c.get('date'))} 신규 실업수당 청구는 {_man(c['value'])} 건으로 " + (
+        (f"전주보다 {_man(abs(d))} 건 {'늘었' if d > 0 else '줄었'}습니다." if d else "전주와 같습니다.") if d is not None else "나왔습니다.")
+    if c4.get("value") is not None:
+        s += f" 들쭉날쭉한 주간 값을 고른 4주 평균은 {_man(c4['value'])} 건입니다."
+    out = [(s, "plain"),
+           ("row", "실업수당 신규 청구", f"{_man(c['value'])} 건", " · ".join(x for x in (
+               dk.day(c.get("date", "")) + " 주", f"전주 {_man(c['prev'])}" if c.get("prev") is not None else "",
+               f"4주 평균 {_man(c4['value'])}" if c4.get("value") is not None else "") if x))]
+    if cc.get("value") is not None:
+        out.append(("row", "실업수당 계속 청구", f"{_man(cc['value'])} 건", " · ".join(x for x in (
+            dk.day(cc.get("date", "")) + " 주", f"전주 {_man(cc['prev'])}" if cc.get("prev") is not None else "") if x)))
+    return out
+
+
 def economy_card(macro, parts_out=False):
     """8. 경제 바탕은 어떤가? — 한 달에 한 번 나오는 값(실업률 · 소비자물가지수). 답 = 둘의 전월 대비 방향."""
     un, cpi = macro.get("unemployment_rate") or {}, macro.get("cpi") or {}
@@ -457,7 +487,10 @@ def economy_card(macro, parts_out=False):
         lines.append(("row", "소비자물가지수", f"{cpi['value']:.1f}", " · ".join(x for x in (dk.day(cpi.get("date", "")), f"전월 대비 {_s(pct, 1)}" if pct is not None else "") if x)))
         now.append(f"물가 전월 대비 {_s(pct, 1)}" if pct is not None else f"물가지수 {cpi['value']:.1f}")
     lines.insert(0, (" ".join(sent), "plain"))
-    lines.append(("고용과 물가는 한 달에 한 번 나와 날마다 바뀌지 않습니다. 발표 날짜는 일정 탭에 있습니다.", "note"))
+    cl = claims_lines(macro)
+    lines += cl
+    lines.append(("고용과 물가는 한 달에 한 번, 실업수당 청구는 매주 목요일에 나와 날마다 바뀌지 않습니다. 발표 날짜는 일정 탭에 있습니다." if cl
+                  else "고용과 물가는 한 달에 한 번 나와 날마다 바뀌지 않습니다. 발표 날짜는 일정 탭에 있습니다.", "note"))
     tip = ("미국 고용(실업률)과 물가(소비자물가지수, 1982 ~ 1984년 = 100)의 가장 최근 달 값과 전월 대비 변화\n· 오늘 : " + " · ".join(now))
     signs = {(x > 0) - (x < 0) for x in dirs}
     theme, ink = _dir(signs.pop() if len(signs) == 1 else 0)   # 둘 다 오름 = 주황 · 둘 다 내림 = 파랑 · 엇갈림 · 없음 = 회색 (증감 방향, 좋고 나쁨이 아니다)
@@ -482,10 +515,68 @@ def move_cards(a, prev):
     return "".join(x for x in (mega_card(a, prev), sector_card(a), theme_card(a), notable_card()) if x)
 
 
-def base_cards(a, macro):
+SRC_CFTC = "CFTC"
+
+
+def _ct(v):
+    """−372318 → `순매도 37.2만 계약` · 10073 → `순매수 1.0만 계약`."""
+    return f"{'순매수' if v >= 0 else '순매도'} {abs(v) / 10000:.1f}만 계약"
+
+
+def cftc_card(cftc):
+    """헤지펀드 선물은? — CFTC 레버리지 펀드의 S&P 500 · 나스닥 100 선물 순포지션, 3년 범위 막대 (2026-11-09 사용자).
+    사실만 (값 · 전주 대비 · 3년 범위 안 자리). 위험 점수 · 판정 없음 — 극단 포지션이 급락을 앞서는지는 검증 전.
+    답 = 두 선물의 3년 범위 자리, 카드 색 = S&P 500 순포지션 전주 대비 방향 (증감 색, 좋고 나쁨이 아니다)."""
+    cftc = cftc or {}
+    ks = [k for k in ("sp500", "nasdaq") if (cftc.get(k) or {}).get("net") is not None]
+    if not ks:
+        return ""
+    short = {"sp500": "S&P", "nasdaq": "나스닥"}
+    state = _span(" · ".join(f"{short[k]} {cftc[k]['pos_pct']}%" for k in ks))
+    head = cftc[ks[0]]
+    theme, ink = _dir(head["net"] - head["prev"] if head.get("prev") is not None else None)
+    lines = []
+    for i, k in enumerate(ks):
+        x = cftc[k]
+        yrs = max(1, round(x.get("weeks", 156) / 52))
+        lines.append((C.range_gauge(x["lo"], x["hi"], x["pos_pct"], 0, lambda v: _ct(v).replace(" 계약", ""), "",
+                                    f"{x['name']} 선물 순포지션 ({yrs}년)", f"{yrs}년 범위 안 자리", f"{x['pos_pct']}% 지점"), "html"))
+        d = x["date"]
+        s = (f"{int(d[5:7])}월 {int(d[8:10])}일(화) 기준 " if i == 0 else "") + f"헤지펀드의 {x['name']} 선물 순포지션은 {_ct(x['net'])}"
+        if x.get("prev") is not None:
+            ch = x["net"] - x["prev"]
+            s += (f"으로, 전주({_ct(x['prev'])})보다 {abs(ch) / 10000:.1f}만 계약 {'매수' if ch > 0 else '매도'} 쪽으로 움직였습니다." if ch
+                  else f"으로 전주와 같습니다.")
+        else:
+            s += "입니다."
+        s += f" 최근 {yrs}년 범위의 {x['pos_pct']}% 지점입니다."
+        lines.append((s, "plain"))
+        am = x.get("am") or {}
+        if am.get("net") is not None:   # 같은 선물의 반대편 큰손 — 자산운용사 · 연기금 (2026-11-09 사용자)
+            ach = am["net"] - am["prev"] if am.get("prev") is not None else None
+            lines.append(("row", "자산운용사 · 연기금", _ct(am["net"]), " · ".join(t for t in (
+                f"전주보다 {abs(ach) / 10000:.1f}만 계약 {'매수' if ach > 0 else '매도'} 쪽" if ach else ("전주와 같음" if ach == 0 else ""),
+                f"{yrs}년 범위의 {am['pos_pct']}% 지점") if t)))
+    lines.append(("헤지펀드는 주식을 사고 선물을 파는 거래를 많이 해서 S&P 500 선물은 보통 순매도 쪽입니다. 그래서 방향보다 몇 년 범위의 어디쯤인지를 봅니다. "
+                  "범위 끝에 있다고 곧 사거나 판다는 뜻은 아닙니다.", "note"))
+    # 2026-11-09 사용자 "넣는데 오른다는 거야? 하락한다는 거야?" — 둘 다 아님. 크게 빠진 주 46번 중 80% 되삼(position_check · 비공개 doc/검증/헤지펀드-포지션-급락-검증.md),
+    # 그 뒤 4주는 반등 · 추가 하락 모두 평소보다 컸다 → 방향 신호 아님을 같은 줄에
+    # 같은 날 사용자 "자산운용사 · 연기금 줄 추가" — 크게 빠진 주에 판 쪽은 자산운용사 · 연기금(46번 중 45번), 받은 쪽이 헤지펀드
+    lines.append(("2009년 이후 S&P 500이 크게 빠진 주에 이 선물을 판 쪽은 거의 늘 자산운용사 · 연기금(46번 중 45번)이었고, 헤지펀드는 80%에서 되샀습니다. "
+                  "팔아 둔 선물을 정리한 것으로, 그 뒤 주가가 오른다거나 내린다는 신호는 아닙니다.", "note"))
+    lines.append(("화요일 포지션을 그 주 금요일에 발표해 며칠 같은 값이 이어집니다.", "note"))
+    tip = ("미국 상품선물거래위원회(CFTC)가 매주 내는 선물 포지션 중 `레버리지 펀드`(헤지펀드 등)의 매수 계약 − 매도 계약. "
+           "0% 지점 = 최근 몇 년 중 가장 매도 쪽, 100% 지점 = 가장 매수 쪽. 자산운용사 · 연기금 줄은 같은 선물의 `자산운용사`(연기금 · 뮤추얼 펀드 등) 값\n· 이번 주 : "
+           + " · ".join(f"{cftc[k]['name']} {_ct(cftc[k]['net'])}" for k in ks))
+    if any(cftc[k].get("source") for k in ks):
+        tip += "\n· 이번 주 값을 못 받아 지난번 받은 값입니다"
+    return C.question_card("헤지펀드 선물은?", state, theme, ink, lines, tip=dk.with_src(tip, SRC_CFTC))
+
+
+def base_cards(a, macro, cftc=None):
     """셋째 덩어리 — 시장 환경: `금리의 움직임은?` · `경제 지표는?` 두 카드 (2026-11-08 사용자 P409, P404 한 카드 묶음을 되돌림). 긴장(변동성 지수)은 분위기 카드 안(P403)."""
     a, macro = a or {}, macro or {}
-    return "".join(x for x in (rates_card(a, macro), economy_card(macro)) if x)
+    return "".join(x for x in (rates_card(a, macro), economy_card(macro), cftc_card(cftc)) if x)   # 헤지펀드 선물 포지션 = 덩어리 끝 (2026-11-09 사용자)
 
 
 def env_card(a, macro):

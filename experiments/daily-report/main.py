@@ -33,6 +33,7 @@ import record_store  # noqa: E402  — 판정 · 이슈 누적 (experiments/reco
 import analyze
 import chart_spx
 import collect_calendar
+import collect_cftc
 import collect_fred
 import collect_news
 import collect_nowcast
@@ -74,6 +75,11 @@ def collect():
     except Exception as e:  # noqa: BLE001
         print(f"::warning::일정 수집 실패: {e!r}")
         calendar = None
+    try:   # 헤지펀드 선물 포지션 카드 (2026-11-09 사용자) — 실패해도 리포트는 나간다, 카드만 빠진다
+        cftc = collect_cftc.collect_cftc()
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::CFTC 수집 실패: {e!r}")
+        cftc = None
 
     collect_fred.apply_fallbacks(macro, yahoo.get("history"), yahoo.get("indices"))
 
@@ -89,6 +95,7 @@ def collect():
         "most_active": yahoo["most_active"],
         "news": news,
         "calendar": calendar,
+        "cftc": cftc,
     }
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)

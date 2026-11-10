@@ -16,8 +16,9 @@ MEGA_KO = {"NVDA": "엔비디아", "AAPL": "애플", "MSFT": "마이크로소프
            "AVGO": "브로드컴", "TSLA": "테슬라", "BRK-B": "버크셔 해서웨이", "LLY": "일라이 릴리"}
 MEGA_SHORT = {"NVDA": "엔비디아", "AAPL": "애플", "MSFT": "MS", "GOOGL": "구글", "AMZN": "아마존", "META": "메타",
               "AVGO": "브로드컴", "TSLA": "테슬라", "BRK-B": "버크셔", "LLY": "릴리"}
-MACRO_KO = {"FOMC": "금리 결정 (FOMC)", "CPI": "소비자물가 (CPI)", "NFP": "고용 보고서", "PCE": "물가 (PCE)", "GDP": "성장률 (GDP)", "OPEX": "월간 옵션 만기"}
-MACRO_SHORT = {"FOMC": "FOMC", "CPI": "CPI", "NFP": "고용", "PCE": "PCE", "GDP": "GDP", "OPEX": "옵션 만기"}
+MACRO_KO = {"FOMC": "금리 결정 (FOMC)", "CPI": "소비자물가 (CPI)", "NFP": "고용 보고서", "PCE": "물가 (PCE)", "GDP": "성장률 (GDP)", "OPEX": "월간 옵션 만기",
+            "CLAIMS": "주간 실업수당"}
+MACRO_SHORT = {"FOMC": "FOMC", "CPI": "CPI", "NFP": "고용", "PCE": "PCE", "GDP": "GDP", "OPEX": "옵션 만기", "CLAIMS": "실업수당"}
 # 표본이 적어 화면에서 빼는 짝 (기획 4-1: LG에너지솔루션은 2022년 상장, 크게 움직인 밤 17 · 23번 — 판단 유보)
 PAIR_HIDE = {"373220.KS"}
 MIN_BUCKET = 30
@@ -290,7 +291,11 @@ def macro_cal_card(a, opened=True):
     if not items:
         return C.question_card("다가오는 경제 일정은?", "없음", "neutral", "#111",
                                [(f"앞으로 {days}일 안에 잡힌 큰 경제 일정이 없습니다.", "plain")], opened=opened)
-    names = " · ".join(f"{MACRO_KO[x['kind']]}({_md(x['day'])})" for x in items)
+    by_kind = {}   # 같은 일정은 한 번만 — `주간 실업수당(11월 12일 · 19일)` (매주 목요일이라 14일 안에 두 번, 2026-11-09)
+    for x in items:
+        by_kind.setdefault(x["kind"], []).append(x["day"])
+    names = " · ".join(f"{MACRO_KO[k]}({' · '.join(_md(d) if i == 0 or d[5:7] != ds[i - 1][5:7] else f'{int(d[8:10])}일' for i, d in enumerate(ds))})"
+                       for k, ds in by_kind.items())
     eff = {}
     for x in items:
         if x.get("effect"):
