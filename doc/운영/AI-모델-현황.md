@@ -52,7 +52,7 @@ NVIDIA(DeepSeek)는 10-26부터 다시 예비로 들어간다 — 1순위에는 
 | `json-gemini` | flash → lite | NVDA · 트럼프 재분류 (예비 모델이 임시로 단 라벨을 Gemini 로 다시) | 정식 라벨은 Gemini 만 |
 | `json-backup-first` | **Qwen → gpt-oss → DeepSeek → lite** | 인물 레이더 인용 추출, Media Daily 서술 | 새 기능은 예비 먼저 (10-19). 출력이 짧은 일 |
 | `json-oss-first` | **gpt-oss → Qwen → DeepSeek → lite** | 인물 레이더 분류 · 카드 요약 | **10-26 신설** — 출력 2천 토큰이 Qwen 출력 한도에 걸려서 |
-| `news` / `news-alt` | Qwen → gpt-oss → DeepSeek → lite / gpt-oss → Qwen → DeepSeek → lite | 공용 뉴스 처리(news_store): 홈 뉴스 · 데일리 뉴스 · 종목 레이더 | 배치마다 번갈아 — 모델마다 60초 기다림을 반으로 (10-25). **10-26: Qwen 차례는 4건, gpt-oss 차례는 10건** · 24시간 넘은 새 기사는 AI 안 보냄(10-26 48 → 24) · 시간 예산 30분 |
+| `news` / `news-alt` | **lite → Qwen → gpt-oss → DeepSeek / lite → gpt-oss → Qwen → DeepSeek** (2026-11-10) | 공용 뉴스 처리(news_store): 홈 뉴스 · 데일리 뉴스 · 종목 레이더 | **11-10 사용자: lite 먼저.** 뉴스(하루 약 300 ~ 400건)가 Groq 두 모델 하루 토큰을 아침마다 바닥내 양이 적은 일(인물 발언 · 방송 · 댓글)이 Groq 를 못 썼고, NVDA 레이더 뉴스가 60초 간격 · DeepSeek 지연으로 60분 제한에 걸렸다. lite 는 하루 약 430회가 비어 있고 분류 일치도 lite 가 높다. 10건 묶음 · 하루 약 30 ~ 40회 · flash 로는 넘어가지 않음. 시간 예산 30분(NVDA 15분). 옛 10-25: Groq 먼저 · Qwen 4건 |
 | `comment` | gpt-oss → Qwen → DeepSeek → lite → flash | 블로그 댓글 답글 | 댓글 한 건에 Gemini 를 쓰지 않게, flash 는 맨 뒤 |
 | `translate` · `json-lite` | — | **지금 쓰는 곳 없음** (news 사슬로 옮김) | 정리 대상 |
 
@@ -80,6 +80,8 @@ NVIDIA(DeepSeek)는 10-26부터 다시 예비로 들어간다 — 1순위에는 
 | 댓글 답글 (`comment-reply.yml`) | 하루 여러 번 (댓글 있을 때만 호출) | 답글 | comment | gpt-oss |
 | 한국 주식 (`kr-stocks.yml`) | 1 (평일) | **AI 안 씀** (파이썬 계산만) | — | — |
 | 데일리 커버 | 1 | 이미지 | (llm_chain 밖) | Pollinations |
+
+2026-11-10: 뉴스 처리 세 줄(데일리 뉴스 · 홈 뉴스 · 종목 레이더 뉴스)의 1순위는 **Gemini lite** 로 바뀜(2절 `news`).
 
 정리: **flash 는 독자에게 나가는 긴 서술 3개(NVDA · 트럼프 · 데일리)에 거의 전부** 쓰이고, 그 셋은 Groq 로 대신할 수 없다(프롬프트가 8,000토큰을 넘어 413).
 나머지(뉴스 · 인물 레이더 · Media Daily · 댓글)는 Groq 먼저.
@@ -176,6 +178,8 @@ NVIDIA(DeepSeek)는 10-26부터 다시 예비로 들어간다 — 1순위에는 
 6. 운영 기록 콘솔(ops-console)은 `USAGE` · 사건을 실행 끝에 KV 로 남긴다 — 로그 대신 그쪽을 봐도 된다.
 
 ## 변경 이력
+- 2026-11-10 사용자: 뉴스 처리 사슬 `news` · `news-alt` 를 **Gemini lite 먼저**로 (Groq 는 예비, qwen · gpt-oss 순서만 번갈아). 이유 · 숫자는 2절. 시험: 종목 레이더 기사 20건 → lite 2회 · 15초 · 20/20 통과.
+  같은 날 NVDA 워크플로: 증시 전망을 레이더 앞으로 · 뉴스 시간 예산 15분 · 중단도 Slack (11-09 ~ 10 여섯 번 60분 초과).
 - 2026-10-26 작성. 같은 날 인물 레이더 Groq 한도 맞춤(인용 추출 입력 축소 · 배치 18 · `json-oss-first`), llm_chain 429 처리, 예비 cron 중복 실행 건너뛰기.
   수동 실행에서 gpt-oss 하루 토큰 소진 발견 → R9 · 7절 고침.
   이어서: Qwen 출력 규칙 실측(상한 1,000 · 4건) → Qwen 출력 상한 1,000, 뉴스 처리 Qwen 4건 · 48시간 · 시간 예산 30분, 하루 한도 단계 건너뛰기, 인용 추출 16묶음.

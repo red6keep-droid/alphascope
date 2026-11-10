@@ -8,7 +8,8 @@
   종목별 관련도 · 방향(scores) · 영역(area) · 이슈 코드 · 범위 · 영어 문장(fact_en). 테마 · 관련 종목은 이 칸에서 파이썬이 정한다(theme · related).
 - 헤드라인 = 원제를 옮긴 번역 (2026-10-25 사용자: "왜 제목 그대로 표현 안 하고 가공하나") — 사실 문장은 요약 줄이 비었을 때의 요약 · 중요 이슈용.
 - 재료 : 제목 + 최근 LEAD_HOURS 기사의 첫 문단(article_lead — AI 입력으로만, 저장 · 공개 안 함) 또는 RSS 요약(snippet).
-- 사슬 : `news` · `news-alt` 를 배치마다 번갈아 — Groq(qwen · gpt-oss) 먼저, DeepSeek, 맨 뒤 Gemini lite (2026-10-25 사용자: Gemini 는 다른 곳에 아낀다).
+- 사슬 : `news` · `news-alt` 를 배치마다 번갈아 — Gemini lite 먼저(2026-11-10 사용자: Groq 하루 토큰은 양이 적은 일에), 예비 Groq(qwen · gpt-oss 순서만 번갈아) · DeepSeek.
+  (옛 10-25: Groq 먼저 · lite 맨 뒤)
   Groq 가 정식 — 예비 답을 다음 실행에서 Gemini 로 다시 받는 규칙 · 관련도 3 flash 재확인은 없앴다.
 - 보정 : NVDA 리포트 labels 의 의견 매체 · 의견형 제목 규칙으로 관련도를 1 이하로 깎는다(올리지 않는다).
 - 검사 : 헤드라인 · 요약의 숫자는 원문(제목 + 첫 문단)에 있는 것만, 인과 · 평가 말 금지, 요약은 영어 · 문장체면 그 줄만 뺀다. 두 번 탈락하면 헤드라인 없이(목록에서 빠짐).
@@ -251,7 +252,7 @@ def _leads(items, cache_path):
 
 
 def classify(store, save, lead_cache=None, label="radar-news", hours=CLASSIFY_HOURS):
-    """새 기사 · 문장 탈락 기사만 분류 (ai_model 이 없는 것). Groq 두 사슬(news · news-alt)을 배치마다 번갈아 쓴다.
+    """새 기사 · 문장 탈락 기사만 분류 (ai_model 이 없는 것). 두 사슬(news · news-alt, 둘 다 lite 먼저 · 예비 Groq 순서만 다름)을 배치마다 번갈아 쓴다.
     save(store) = 부르는 쪽의 저장 함수 (배치마다 부른다). lead_cache = 첫 문단 캐시 파일 (깃에 넣지 않는 곳, None 이면 기사를 열지 않는다).
     hours = 이보다 오래된 미분류 기사는 보내지 않는다 — 기본 CLASSIFY_HOURS(24), 미국 데일리는 48 (2026-11-05 사용자: 뉴스 기사는 48시간, 시차 때문에 안전하게)."""
     _env()

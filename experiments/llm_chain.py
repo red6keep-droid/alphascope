@@ -105,10 +105,13 @@ CHAINS = {
     # 출력이 긴 일(호출당 출력 1,000토큰 넘게 — 인물 레이더 분류 20건 · 카드 요약 16건)은 gpt-oss 먼저 (2026-10-26).
     # Qwen 은 분당 출력 1,000토큰(OTPM) 한도라 출력 2천 토큰짜리는 몇 분에 한 번만 받힌다 — 10-25 분류에서 Qwen 12번 중 11번 429
     "json-oss-first": ["groq", "groq-qwen", "nvidia-deepseek", "gemini-lite"],
-    # 공용 뉴스 처리(news_store: 제목 번역 · 사실 문장 · 요약 · 종목 관련도) — Groq 먼저 (2026-10-25 사용자: "Gemini 는 쓸 곳이 많다, Groq 로 할 수 있는 건 Groq").
-    # 두 사슬을 배치마다 번갈아 쓴다 — Groq 는 모델마다 분당 8,000토큰(호출 간격 60초)이라 qwen · gpt-oss 를 엇갈려 기다림을 반으로. Gemini lite 는 맨 뒤 예비
-    "news": ["groq-qwen", "groq", "nvidia-deepseek", "gemini-lite"],
-    "news-alt": ["groq", "groq-qwen", "nvidia-deepseek", "gemini-lite"],
+    # 공용 뉴스 처리(news_store: 제목 번역 · 사실 문장 · 요약 · 종목 관련도) — Gemini lite 먼저 (2026-11-10 사용자).
+    # 옛(10-25): Groq 먼저 → 뉴스(하루 약 300 ~ 400건)가 Groq 두 모델 하루 토큰 20만을 아침마다 바닥내, 양이 적은 인물 발언 · 방송 · 댓글이 Groq 를 못 쓰고
+    # NVDA 레이더 뉴스가 60초 간격 · DeepSeek 지연으로 30분을 다 써 워크플로 60분 제한에 걸렸다(11-09 ~ 10). lite 는 하루 500회 중 약 430회가 비어 있고
+    # 분류 일치도 lite 75/80 · Qwen 56 · gpt-oss 51 (10-14 · 10-16 비교). 하루 약 30 ~ 40회(10건 묶음). flash 로는 넘어가지 않는다(flash 호출 0 증가).
+    # 뒤 예비는 배치마다 qwen · gpt-oss 순서를 번갈아 (lite 하루 한도 · 실패 때 Groq 기다림을 반으로)
+    "news": ["gemini-lite", "groq-qwen", "groq", "nvidia-deepseek"],
+    "news-alt": ["gemini-lite", "groq", "groq-qwen", "nvidia-deepseek"],
 }
 
 # NVIDIA(build.nvidia.com) 무료 엔드포인트는 공식 FAQ 상 개발 · 테스트 · 연구 · 평가 전용 — "실제 최종 사용자에게 서비스하는 활동" 은
