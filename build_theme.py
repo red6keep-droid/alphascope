@@ -184,7 +184,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title-text .title-logo { flex: none; margin-right: 0; vertical-align: top; margin-top: calc((1lh - var(--logo-size, 32px)) / 2); }   /* 로고는 첫 줄 글자 높이의 가운데에 — 가운데 정렬 아님 (2026-10-23 사용자) */
 .post-title-meta { flex: none; margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
 .post-title-meta .title-share { margin-left: 0; }
-.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; margin-left: auto; padding: 0;   /* 32 → 36 = 메뉴 버튼 · 뒤로 버튼과 같은 상자 (2026-11-10 사용자) */
+.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
   background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; cursor: pointer; }
 .title-share:hover { border-color: #111; }
 /* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
@@ -262,7 +262,9 @@ html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업�
 /* 글 보기: 제목 오른쪽 날짜는 숨긴다 — 날짜는 요약글 맨 앞 (2026-10-23 사용자). 글 제목 자체(검색 결과 · 목록 · 탭 이름)에는 날짜가 그대로 있다 */
 body.item-view .post-title .post-title-date { display: none; }
 body.item-view .navbar { position: static; }
-/* 상세 페이지 = 로고 줄 없음, 메뉴 버튼은 제목 줄 공유 버튼 뒤 (2026-11-10 사용자) — body.detail-nav 는 테마 JS 가 고정 제목 줄이 있을 때만 붙인다 */
+/* 상세 페이지(폰 680px 이하) = 로고 줄 없음, 메뉴 버튼은 제목 줄 공유 버튼 뒤, 공유 버튼 32 → 36 = 메뉴 · 뒤로 버튼과 같은 상자 (2026-11-10 사용자, PC 는 그대로).
+   body.detail-nav 는 테마 JS 가 폰 폭 + 고정 제목 줄일 때만 붙인다 */
+@media (max-width: 680px) { body.item-view .title-share { width: 36px; height: 36px; } }
 body.detail-nav .navbar { display: none; }
 body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
