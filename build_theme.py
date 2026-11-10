@@ -700,6 +700,8 @@ __DASHBOARD__
                       <a class='post-nav-list' href='/__TRUMP_LIST_PATH__'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;__NVDA_LABEL__&quot;)'/>
                       <a class='post-nav-list' href='/__NVDA_LIST_PATH__'>목록</a>
+                    <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;__KR_REPORT_LABEL__&quot;)'/>
+                      <a class='post-nav-list' href='/__KR_REPORT_LIST_PATH__'>목록</a>
                     <b:elseif cond='data:view.isPage'/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
                     <b:else/>
@@ -719,27 +721,20 @@ __DASHBOARD__
                   <h2 class='section-title'>
                     <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;__TRUMP_LABEL__&quot;'>트럼프 SNS 트렌드 목록
                     <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;__NVDA_LABEL__&quot;'/>엔비디아 리포트 목록
+                    <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;__KR_REPORT_LABEL__&quot;'/>한국 증시 리포트 목록
                     <b:elseif cond='data:view.isLabelSearch'/>미국 증시 리포트 목록
                     <b:else/><data:view.title.escaped/></b:if>
                   </h2>
                   <span class='section-note'>
                     <b:if cond='data:view.isLabelSearch and (data:view.search.label == &quot;__TRUMP_LABEL__&quot; or data:view.search.label == &quot;__NVDA_LABEL__&quot;)'>AI 자동 생성 · 매일 아침 · 미국장 마감 후
+                    <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;__KR_REPORT_LABEL__&quot;'/>AI 자동 생성 · 매 거래일 오후 · 한국장 마감 후
                     <b:else/>AI 자동 생성 · 매 거래일 아침 · 미국장 마감 후</b:if>
                   </span>
                 </div>
                 <div class='post-grid'>
                   <b:loop values='data:posts' var='post'>
                     <article class='post-card'>
-                      <b:comment>트럼프 · 엔비디아 글은 카드 위 이미지를 두지 않는다 — 제목 · 요약만 (2026-10-13 사용자). 데일리는 커버 이미지 그대로.</b:comment>
-                      <b:if cond='!(data:post.labels any (l =&gt; l.name == &quot;__TRUMP_LABEL__&quot; or l.name == &quot;__NVDA_LABEL__&quot;))'>
-                      <a expr:href='data:post.url'>
-                        <b:if cond='data:post.featuredImage'>
-                          <img class='post-card-img' expr:alt='data:post.title' expr:src='data:post.featuredImage'/>
-                        <b:else/>
-                          <span class='post-card-img'></span>
-                        </b:if>
-                      </a>
-                      </b:if>
+                      <b:comment>목록 카드 위 이미지는 두지 않는다 — 날짜 · 제목 · 요약만. 트럼프 · 엔비디아(2026-10-13) → 모든 리포트 (2026-11-10 사용자: 데일리 목록에 글 첫 그림인 S&amp;P 500 그래프가 표지로 떠 이상했다)</b:comment>
                       <div class='post-card-body'>
                         <div class='post-card-meta'>
                           <b:eval expr='data:post.date format &quot;yyyy.MM.dd&quot;'/>
@@ -837,6 +832,10 @@ TRUMP_LIST_PATH = "search/label/" + quote(TRUMP_LABEL)
 # 엔비디아 리포트 연재 (experiments/nvda-report/report_title.LABELS 의 첫 라벨). 목록 버튼이 데일리 목록으로 가던 것을 바로잡음 (2026-10-12)
 NVDA_LABEL = "엔비디아"
 NVDA_LIST_PATH = "search/label/" + quote(NVDA_LABEL)
+
+# 한국 증시 리포트 연재 (experiments/kr-market-report/publish_report.LABEL). 글 아래 목록 버튼이 미국(데일리) 목록으로 가고, 라벨 목록 제목도 `미국 증시 리포트 목록` 이던 것 (2026-11-10 사용자)
+KR_REPORT_LABEL = "한국 증시 리포트"
+KR_REPORT_LIST_PATH = "search/label/" + quote(KR_REPORT_LABEL)
 
 
 def nav_items():
@@ -1009,6 +1008,8 @@ def build_theme(parts):
     out = out.replace("__TRUMP_LIST_PATH__", TRUMP_LIST_PATH)
     out = out.replace("__NVDA_LABEL__", NVDA_LABEL)
     out = out.replace("__NVDA_LIST_PATH__", NVDA_LIST_PATH)
+    out = out.replace("__KR_REPORT_LABEL__", KR_REPORT_LABEL)
+    out = out.replace("__KR_REPORT_LIST_PATH__", KR_REPORT_LIST_PATH)
     out = out.replace("__DASHBOARD__", indent(to_xml_attrs(parts["dashboard"]), 6))
     out = out.replace("__BLOG_INCLUDABLES__", includables)
     out = out.replace(

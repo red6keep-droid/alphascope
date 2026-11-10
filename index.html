@@ -1898,6 +1898,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
                       <a class='post-nav-list' href='/search/label/%ED%8A%B8%EB%9F%BC%ED%94%84%20%ED%8A%B8%EB%A0%8C%EB%93%9C'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;엔비디아&quot;)'/>
                       <a class='post-nav-list' href='/search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84'>목록</a>
+                    <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;한국 증시 리포트&quot;)'/>
+                      <a class='post-nav-list' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>목록</a>
                     <b:elseif cond='data:view.isPage'/>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
                     <b:else/>
@@ -1917,27 +1919,20 @@ body.no-dashboard .main-content { padding-top: 32px; }
                   <h2 class='section-title'>
                     <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;트럼프 트렌드&quot;'>트럼프 SNS 트렌드 목록
                     <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;엔비디아&quot;'/>엔비디아 리포트 목록
+                    <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;한국 증시 리포트&quot;'/>한국 증시 리포트 목록
                     <b:elseif cond='data:view.isLabelSearch'/>미국 증시 리포트 목록
                     <b:else/><data:view.title.escaped/></b:if>
                   </h2>
                   <span class='section-note'>
                     <b:if cond='data:view.isLabelSearch and (data:view.search.label == &quot;트럼프 트렌드&quot; or data:view.search.label == &quot;엔비디아&quot;)'>AI 자동 생성 · 매일 아침 · 미국장 마감 후
+                    <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;한국 증시 리포트&quot;'/>AI 자동 생성 · 매 거래일 오후 · 한국장 마감 후
                     <b:else/>AI 자동 생성 · 매 거래일 아침 · 미국장 마감 후</b:if>
                   </span>
                 </div>
                 <div class='post-grid'>
                   <b:loop values='data:posts' var='post'>
                     <article class='post-card'>
-                      <b:comment>트럼프 · 엔비디아 글은 카드 위 이미지를 두지 않는다 — 제목 · 요약만 (2026-10-13 사용자). 데일리는 커버 이미지 그대로.</b:comment>
-                      <b:if cond='!(data:post.labels any (l =&gt; l.name == &quot;트럼프 트렌드&quot; or l.name == &quot;엔비디아&quot;))'>
-                      <a expr:href='data:post.url'>
-                        <b:if cond='data:post.featuredImage'>
-                          <img class='post-card-img' expr:alt='data:post.title' expr:src='data:post.featuredImage'/>
-                        <b:else/>
-                          <span class='post-card-img'></span>
-                        </b:if>
-                      </a>
-                      </b:if>
+                      <b:comment>목록 카드 위 이미지는 두지 않는다 — 날짜 · 제목 · 요약만. 트럼프 · 엔비디아(2026-10-13) → 모든 리포트 (2026-11-10 사용자: 데일리 목록에 글 첫 그림인 S&amp;P 500 그래프가 표지로 떠 이상했다)</b:comment>
                       <div class='post-card-body'>
                         <div class='post-card-meta'>
                           <b:eval expr='data:post.date format &quot;yyyy.MM.dd&quot;'/>
@@ -3918,7 +3913,11 @@ body.no-dashboard .main-content { padding-top: 32px; }
           [].forEach.call(menu.querySelectorAll('a.nav-item'), function (a) { quick.appendChild(a.cloneNode(true)); });
         }
         var logo = document.querySelector('.navbar .logo');
-        if (hasBar && logo) { document.body.classList.add('has-bar'); logo.parentNode.insertBefore(quick, logo.nextSibling); }
+        /* 스위치 줄은 로고 줄(.nav-left)의 직속으로 — 블로그 테마는 로고가 위젯 상자 두 겹(div.section > div.widget) 안이라 로고 바로 뒤에 붙이면 상자 안에서 줄이 바뀌어 로고 밑으로 내려갔다 (2026-11-10 사용자) */
+        var logoBox = logo;
+        while (logoBox && logoBox.parentNode && !(logoBox.parentNode.classList && logoBox.parentNode.classList.contains('nav-left'))) logoBox = logoBox.parentNode;
+        if (!logoBox || !logoBox.parentNode || logoBox.parentNode.nodeType !== 1) logoBox = logo;
+        if (hasBar && logo) { document.body.classList.add('has-bar'); logoBox.parentNode.insertBefore(quick, logoBox.nextSibling); }
         else toggle.parentNode.insertBefore(quick, toggle);
         function narrow() { return window.matchMedia('(max-width: 900px)').matches; }
         function setMenu(open) {

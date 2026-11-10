@@ -1135,7 +1135,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title-text .title-logo { flex: none; margin-right: 0; vertical-align: top; margin-top: calc((1lh - var(--logo-size, 32px)) / 2); }   /* 로고는 첫 줄 글자 높이의 가운데에 — 가운데 정렬 아님 (2026-10-23 사용자) */
 .post-title-meta { flex: none; margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
 .post-title-meta .title-share { margin-left: 0; }
-.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; margin-left: auto; padding: 0;   /* 32 → 36 = 메뉴 버튼 · 뒤로 버튼과 같은 상자 (2026-11-10 사용자) */
+.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
   background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; cursor: pointer; }
 .title-share:hover { border-color: #111; }
 /* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
@@ -1213,7 +1213,9 @@ html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업�
 /* 글 보기: 제목 오른쪽 날짜는 숨긴다 — 날짜는 요약글 맨 앞 (2026-10-23 사용자). 글 제목 자체(검색 결과 · 목록 · 탭 이름)에는 날짜가 그대로 있다 */
 body.item-view .post-title .post-title-date { display: none; }
 body.item-view .navbar { position: static; }
-/* 상세 페이지 = 로고 줄 없음, 메뉴 버튼은 제목 줄 공유 버튼 뒤 (2026-11-10 사용자) — body.detail-nav 는 테마 JS 가 고정 제목 줄이 있을 때만 붙인다 */
+/* 상세 페이지(폰 680px 이하) = 로고 줄 없음, 메뉴 버튼은 제목 줄 공유 버튼 뒤, 공유 버튼 32 → 36 = 메뉴 · 뒤로 버튼과 같은 상자 (2026-11-10 사용자, PC 는 그대로).
+   body.detail-nav 는 테마 JS 가 폰 폭 + 고정 제목 줄일 때만 붙인다 */
+@media (max-width: 680px) { body.item-view .title-share { width: 36px; height: 36px; } }
 body.detail-nav .navbar { display: none; }
 body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
@@ -3496,7 +3498,11 @@ body[data-pv-view="post"] #pv-reports { display: none; }
     [].forEach.call(menu.querySelectorAll('a.nav-item'), function (a) { quick.appendChild(a.cloneNode(true)); });
   }
   var logo = document.querySelector('.navbar .logo');
-  if (hasBar && logo) { document.body.classList.add('has-bar'); logo.parentNode.insertBefore(quick, logo.nextSibling); }
+  /* 스위치 줄은 로고 줄(.nav-left)의 직속으로 — 블로그 테마는 로고가 위젯 상자 두 겹(div.section > div.widget) 안이라 로고 바로 뒤에 붙이면 상자 안에서 줄이 바뀌어 로고 밑으로 내려갔다 (2026-11-10 사용자) */
+  var logoBox = logo;
+  while (logoBox && logoBox.parentNode && !(logoBox.parentNode.classList && logoBox.parentNode.classList.contains('nav-left'))) logoBox = logoBox.parentNode;
+  if (!logoBox || !logoBox.parentNode || logoBox.parentNode.nodeType !== 1) logoBox = logo;
+  if (hasBar && logo) { document.body.classList.add('has-bar'); logoBox.parentNode.insertBefore(quick, logoBox.nextSibling); }
   else toggle.parentNode.insertBefore(quick, toggle);
   function narrow() { return window.matchMedia('(max-width: 900px)').matches; }
   function setMenu(open) {
@@ -3510,7 +3516,7 @@ body[data-pv-view="post"] #pv-reports { display: none; }
   closeBtn.addEventListener('click', function () { setMenu(false); });
   overlay.addEventListener('click', function () { setMenu(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('is-open')) setMenu(false); });
-  window.addEventListener('resize', function () { if (!document.body.classList.contains('has-bar') && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 — 상세 페이지는 뒤에서 has-bar 를 붙인다(2026-11-10) */
+  window.addEventListener('resize', function () { if (!hasBar && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 */
 })();
 
 /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
@@ -4631,18 +4637,30 @@ body[data-pv-view="post"] #pv-reports { display: none; }
   }
 })();
 
-/* ============================================================ 상세 페이지 = 로고 줄 없음 · 메뉴 버튼은 제목 줄 공유 버튼 뒤 (2026-11-10 사용자: "상세 페이지에서 로고 영역은 삭제, 메뉴 아이콘은 공유 아이콘 뒤로").
-   고정 제목 줄(.pr-sticky)이 있는 글 보기에서만: 메뉴 버튼(.nav-toggle)을 공유 버튼 바로 뒤로 옮기고, 서랍(#primary-menu)은 body 로 꺼내(로고 줄을 숨겨도 열리게)
-   body.detail-nav 를 붙인다 — 로고 줄 숨김 · 모든 폭에서 서랍 메뉴는 CSS(build_theme). 제목 줄이 없는 화면은 로고 줄 그대로 */
+/* ============================================================ 상세 페이지(폰) = 로고 줄 없음 · 메뉴 버튼은 제목 줄 공유 버튼 뒤 (2026-11-10 사용자: "상세 페이지에서 로고 영역은 삭제, 메뉴 아이콘은 공유 아이콘 뒤로").
+   폰 폭(680px 이하)에서만 — PC 는 그대로(나중에 PC 화면은 따로 짠다, 같은 날 사용자). 고정 제목 줄(.pr-sticky)이 있는 글 보기에서
+   메뉴 버튼(.nav-toggle)을 공유 버튼 바로 뒤로, 서랍(#primary-menu)은 body 로 꺼내(로고 줄을 숨겨도 열리게) body.detail-nav 를 붙인다 — 로고 줄 숨김은 CSS(build_theme).
+   폭이 PC 로 바뀌면 둘 다 제자리로 */
 (function () {
   'use strict';
   var head = document.querySelector('body.item-view .pr-sticky');
   var toggle = document.querySelector('.navbar .nav-toggle'), menu = document.getElementById('primary-menu');
-  if (!head || !toggle || !menu) return;
-  var meta = head.querySelector('.post-title-meta');
-  (meta || head).appendChild(toggle);
-  document.body.appendChild(menu);
-  document.body.classList.add('detail-nav', 'has-bar');   /* has-bar = PC 에서도 서랍 메뉴 (홈 나누기 규칙과 같은 CSS) */
+  if (!head || !toggle || !menu || !window.matchMedia) return;
+  var tHome = { p: toggle.parentNode, n: toggle.nextSibling }, mHome = { p: menu.parentNode, n: menu.nextSibling };
+  var mq = window.matchMedia('(max-width: 680px)');
+  function apply() {
+    if (mq.matches) {
+      (head.querySelector('.post-title-meta') || head).appendChild(toggle);
+      document.body.appendChild(menu);
+      document.body.classList.add('detail-nav');
+    } else {
+      tHome.p.insertBefore(toggle, tHome.n && tHome.n.parentNode === tHome.p ? tHome.n : null);
+      mHome.p.insertBefore(menu, mHome.n && mHome.n.parentNode === mHome.p ? mHome.n : null);
+      document.body.classList.remove('detail-nav');
+    }
+  }
+  apply();
+  if (mq.addEventListener) mq.addEventListener('change', apply); else if (mq.addListener) mq.addListener(apply);
 })();
 
 /* ============================================================ 전환 버튼 (data-switch) · 오늘·5일 (data-hz-control) — 2026-10-11

@@ -2715,7 +2715,11 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     [].forEach.call(menu.querySelectorAll('a.nav-item'), function (a) { quick.appendChild(a.cloneNode(true)); });
   }
   var logo = document.querySelector('.navbar .logo');
-  if (hasBar && logo) { document.body.classList.add('has-bar'); logo.parentNode.insertBefore(quick, logo.nextSibling); }
+  /* 스위치 줄은 로고 줄(.nav-left)의 직속으로 — 블로그 테마는 로고가 위젯 상자 두 겹(div.section > div.widget) 안이라 로고 바로 뒤에 붙이면 상자 안에서 줄이 바뀌어 로고 밑으로 내려갔다 (2026-11-10 사용자) */
+  var logoBox = logo;
+  while (logoBox && logoBox.parentNode && !(logoBox.parentNode.classList && logoBox.parentNode.classList.contains('nav-left'))) logoBox = logoBox.parentNode;
+  if (!logoBox || !logoBox.parentNode || logoBox.parentNode.nodeType !== 1) logoBox = logo;
+  if (hasBar && logo) { document.body.classList.add('has-bar'); logoBox.parentNode.insertBefore(quick, logoBox.nextSibling); }
   else toggle.parentNode.insertBefore(quick, toggle);
   function narrow() { return window.matchMedia('(max-width: 900px)').matches; }
   function setMenu(open) {
