@@ -640,12 +640,14 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
    ========================================================================== */
 
 .site-footer {
-  padding: 36px var(--gutter) 48px;
+  padding: 36px var(--gutter) 38px;   /* 아래 48 → 38 (20%, 2026-11-10 사용자) */
   text-align: center;
   background: var(--bg);
 }
 .footer-title {
-  display: block;
+  display: flex;   /* 제목 · 접기 버튼을 세로 가운데로 (2026-11-10 사용자, 옛 block + 버튼 vertical-align −3) */
+  align-items: center;
+  justify-content: center;
   text-align: center;   /* 제목은 가운데 · 그 오른쪽에 접기 버튼 (2026-10-25 사용자, 홈 수정 H19) */
   margin: 0 0 14px;
   font-weight: 700;
@@ -664,7 +666,7 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .footer-disclaimer summary { list-style: none; cursor: pointer; }   /* 제목 + 첫 문장 — 눌러서 나머지 (2026-10-24 사용자 · 10-25 버튼을 제목 오른쪽으로) */
 .footer-lead { display: block; }
 .footer-disclaimer summary::-webkit-details-marker { display: none; }
-.footer-more { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 8px; vertical-align: -3px; border: 1px solid #E2E8F0; border-radius: 6px; background: #fff; color: #111; box-sizing: border-box; }   /* 외곽선 있는 화살표 버튼 = 다른 더 보기 버튼(.fold-btn)과 같은 테두리 · 바탕 (2026-10-24 사용자) */
+.footer-more { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 8px; flex: none; border: 1px solid #E2E8F0; border-radius: 6px; background: #fff; color: #111; box-sizing: border-box; }   /* 외곽선 있는 화살표 버튼 = 다른 더 보기 버튼(.fold-btn)과 같은 테두리 · 바탕 (2026-10-24 사용자) */
 .footer-more svg { width: 12px; height: 12px; }
 .footer-more svg { transition: transform .15s; }
 .footer-disclaimer[open] .footer-more svg { transform: rotate(180deg); }
@@ -1213,7 +1215,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         <thead>
           <tr>
             <th class="col-name" colspan="2">종목명</th>   <!-- 순위 구분명 삭제 · 종목명이 구분 영역 맨 왼쪽 (2026-10-25 사용자, 홈 수정 H5) -->
-            <th id="rank-th-price">현재가 · 전일 대비</th>
+            <th id="rank-th-price">종가 · 전일 대비</th>
             <th class="col-sector">업종</th>
             <th>거래량</th>
             <th>거래대금</th>
@@ -1390,6 +1392,10 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   /* ================================================================ 랭킹 */
 
   var stocks = [];
+
+  var usSession = '';   /* data.json market — `장중` 이면 미국 가격 머리글 = 현재가, 아니면 종가 (2026-11-10 사용자) */
+
+  function priceHead() { return (rankMarket === 'kr' ? liveOpen() : usSession === '장중') ? '현재가 · 전일 대비' : '종가 · 전일 대비'; }
   /* 한국 탭 (2026-10-24 사용자) — kr.json (experiments/kr-stocks/home_feed_kr.py, 한국 장 마감 뒤 하루 1회). 두 카드가 각자 미국 · 한국을 고른다 */
   /* 미국 · 한국 화면 (H35, 2026-11-10 사용자) — body[data-home-mkt] 가 있으면 그 시장만. 없으면 '' = 지금 홈(두 시장) */
   var HOME_MKT = (document.body && document.body.getAttribute('data-home-mkt')) || '';
@@ -1428,7 +1434,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       if (t) { if (liveOpen()) n.appendChild(el('span', 'dot')); n.appendChild(document.createTextNode(t)); }
     });
     var th = document.getElementById('rank-th-price');
-    if (th) th.textContent = rankMarket === 'kr' && !liveOpen() ? '종가 · 전일 대비' : '현재가 · 전일 대비';
+    if (th) th.textContent = priceHead();
     var thc = document.getElementById('rank-th-chart');
     if (thc) thc.hidden = rankMarket !== 'kr';
   }
@@ -1529,7 +1535,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var kr = rankMarket === 'kr';
     var src = kr ? ((krHome && krHome.stocks) || []).filter(function (s) { return s.top; }) : stocks;   /* 한국 TOP 10 = 유가증권 보통주 가운데 시총 10개 (home_feed_kr 의 top, 기획 11-2) */
     var th = document.getElementById('rank-th-price');
-    if (th) th.textContent = kr && !liveOpen() ? '종가 · 전일 대비' : '현재가 · 전일 대비';   /* 장중 가격이 켜진 장중엔 현재가 (2026-11-05) */
+    if (th) th.textContent = priceHead();   /* 장중 가격이 켜진 장중엔 현재가 (2026-11-05) · 미국은 data.json 장 상태 (2026-11-10) */
     var thc = document.getElementById('rank-th-chart'); if (thc) thc.hidden = !kr;
 
     if (!src.length) {
@@ -1572,7 +1578,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       var tdPrice = el('td');
       var pr;
       if (kr) pr = feedPrice(s);   /* 한국은 종목 줄과 같은 칸 — 장중 가격 토글을 따른다 (2026-11-05) */
-      else { pr = el('span', 'cell-price ' + signClass(s.cp), '$' + fmt(s.p)); pr.appendChild(el('small', null, arrow(s.cp) + fmt(Math.abs(s.c)) + ' (' + (s.cp >= 0 ? '+' : '-') + fmt(Math.abs(s.cp)) + '%)')); }
+      else pr = feedPrice(s);   /* 미국도 한국과 같은 칸 — 가격 + ▲▼ 등락률만, 증감 금액은 뺐다 (2026-11-10 사용자: 미국 · 한국 시총 가격 표시를 같게) */
       tdPrice.appendChild(pr);
       tr.appendChild(tdPrice);
 
@@ -1821,6 +1827,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     .then(function (r) { return r.json(); })
     .then(function (json) {
       stocks = json.stocks || [];
+      usSession = json.market || '';
       renderRankings();
     })
     .catch(function () { renderRankings(); });
@@ -2722,7 +2729,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   closeBtn.addEventListener('click', function () { setMenu(false); });
   overlay.addEventListener('click', function () { setMenu(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('is-open')) setMenu(false); });
-  window.addEventListener('resize', function () { if (!hasBar && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 */
+  window.addEventListener('resize', function () { if (!document.body.classList.contains('has-bar') && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 — 상세 페이지는 뒤에서 has-bar 를 붙인다(2026-11-10) */
 })();
 
 /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
@@ -3198,7 +3205,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     if (parent) { var cancel = btn('cm-btn', '취소'); cancel.addEventListener('click', function () { onDone(null); }); btns.appendChild(cancel); }
     btns.appendChild(submit); foot.appendChild(count); foot.appendChild(btns);
     f.appendChild(ta); f.appendChild(foot); f.appendChild(el('div', 'cm-error'));
-    function grow() { ta.style.height = 'auto'; ta.style.height = Math.max(118, ta.scrollHeight + 2) + 'px'; }   /* 글이 늘면 입력창도 아래로 (테두리 2) */
+    function grow() { ta.style.height = 'auto'; ta.style.height = Math.max(128, ta.scrollHeight + 2) + 'px'; }   /* 글이 늘면 입력창도 아래로 (테두리 2) */
     ta.addEventListener('input', function () { count.textContent = ta.value.length + ' / ' + MAX; submit.disabled = !ta.value.trim(); grow(); });
     f.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -3841,6 +3848,20 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       texts.forEach(function (n, i) { n.nodeValue = i ? '' : ht.getAttribute('data-head-title'); });
     }
   }
+})();
+
+/* ============================================================ 상세 페이지 = 로고 줄 없음 · 메뉴 버튼은 제목 줄 공유 버튼 뒤 (2026-11-10 사용자: "상세 페이지에서 로고 영역은 삭제, 메뉴 아이콘은 공유 아이콘 뒤로").
+   고정 제목 줄(.pr-sticky)이 있는 글 보기에서만: 메뉴 버튼(.nav-toggle)을 공유 버튼 바로 뒤로 옮기고, 서랍(#primary-menu)은 body 로 꺼내(로고 줄을 숨겨도 열리게)
+   body.detail-nav 를 붙인다 — 로고 줄 숨김 · 모든 폭에서 서랍 메뉴는 CSS(build_theme). 제목 줄이 없는 화면은 로고 줄 그대로 */
+(function () {
+  'use strict';
+  var head = document.querySelector('body.item-view .pr-sticky');
+  var toggle = document.querySelector('.navbar .nav-toggle'), menu = document.getElementById('primary-menu');
+  if (!head || !toggle || !menu) return;
+  var meta = head.querySelector('.post-title-meta');
+  (meta || head).appendChild(toggle);
+  document.body.appendChild(menu);
+  document.body.classList.add('detail-nav', 'has-bar');   /* has-bar = PC 에서도 서랍 메뉴 (홈 나누기 규칙과 같은 CSS) */
 })();
 
 /* ============================================================ 전환 버튼 (data-switch) · 오늘·5일 (data-hz-control) — 2026-10-11

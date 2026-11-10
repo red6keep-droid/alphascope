@@ -184,7 +184,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title-text .title-logo { flex: none; margin-right: 0; vertical-align: top; margin-top: calc((1lh - var(--logo-size, 32px)) / 2); }   /* 로고는 첫 줄 글자 높이의 가운데에 — 가운데 정렬 아님 (2026-10-23 사용자) */
 .post-title-meta { flex: none; margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
 .post-title-meta .title-share { margin-left: 0; }
-.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
+.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; margin-left: auto; padding: 0;   /* 32 → 36 = 메뉴 버튼 · 뒤로 버튼과 같은 상자 (2026-11-10 사용자) */
   background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; cursor: pointer; }
 .title-share:hover { border-color: #111; }
 /* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
@@ -261,7 +261,10 @@ html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업�
 }
 /* 글 보기: 제목 오른쪽 날짜는 숨긴다 — 날짜는 요약글 맨 앞 (2026-10-23 사용자). 글 제목 자체(검색 결과 · 목록 · 탭 이름)에는 날짜가 그대로 있다 */
 body.item-view .post-title .post-title-date { display: none; }
-body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
+body.item-view .navbar { position: static; }
+/* 상세 페이지 = 로고 줄 없음, 메뉴 버튼은 제목 줄 공유 버튼 뒤 (2026-11-10 사용자) — body.detail-nav 는 테마 JS 가 고정 제목 줄이 있을 때만 붙인다 */
+body.detail-nav .navbar { display: none; }
+body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
 .pr-sticky .post-title { margin: 0; min-width: 0; }
 .pr-sticky .post-title .pr-role { margin-left: 10px; font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }
@@ -453,9 +456,8 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comments-title[hidden] { display: none; }
 .post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
 .post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
-.post-shell > [data-related].is-moved { margin-top: 20px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
+.post-shell > [data-related].is-moved { margin-top: 40px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
 .post-shell > [data-related].is-moved > div:first-child { font-size: 16px !important; line-height: 26px; }
-.post-shell > [data-related] a[data-row-link] { font-weight: 700 !important; }   /* `함께 보는 페이지` 줄 16 굵게 (2026-11-10 사용자) — 이미 게시된 글의 인라인 400 을 덮는다. 렌더러 dk.related_rows 도 700 */
 body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
 body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
@@ -478,7 +480,7 @@ body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글�
 .comments .cm-name { font-size: 14px; line-height: 20px; font-weight: 400; color: #111; }   /* 작성자 이름 = 가장 작은 글씨 14/20 보통 (2026-11-10 사용자, 옛 16 굵게) */
 .comments .cm-tag { display: inline-block; margin: 0; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; vertical-align: middle; position: relative; top: -1px; }   /* 운영자 라벨 — 영역 라벨 모양 (가이드 5절) */
 .comments .cm-date { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
-.comments .cm-text { margin: 4px 0 0; font-size: 19px; line-height: 25px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comments .cm-text { margin: 4px 0 0; font-size: 16px; line-height: 26px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }   /* 댓글 글 16/26 어디서나 (2026-11-10 사용자: 16 · 행간 20% — 옛 폰 19/25 · PC 16/21) */
 .comments .cm-text.is-deleted { color: #94A3B8; font-size: 14px; line-height: 20px; }   /* 원 댓글이 지워진 답글 묶음의 자리 */
 /* 동작 버튼(답글 · 삭제)은 할 수 있는 사람에게만 — 로그인 전에는 보이지 않는다 (2026-10-13 사용자: "로그인 전에는 기능이 안 되는 버튼은 노출하지 마라") */
 .comments .cm-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }
@@ -511,7 +513,7 @@ body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글�
 .comments .cm-link { margin-left: auto; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; line-height: 20px; color: #7A7A7A; cursor: pointer; }
 .comments .cm-link:hover { color: #111; }
 /* 입력창 — 본문 폭 전체, 테두리 #E2E8F0 · 모서리 8, 안쪽 11 · 12, 글 19px · 행간 24, 처음 4줄 높이. 글을 쓰면 아래로 늘어난다 */
-.comments .cm-input { display: block; width: 100%; min-height: 118px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 19px; line-height: 25px; color: #333; resize: none; overflow: hidden; }
+.comments .cm-input { display: block; width: 100%; min-height: 128px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; line-height: 26px; color: #333; resize: none; overflow: hidden; }   /* 입력창 16/26 = 댓글 글과 같게 · 처음 4줄 높이 128 = 26 × 4 + 위아래 22 + 테두리 2 (2026-11-10 사용자, 옛 19/25 · 118) */
 .comments .cm-input:focus { outline: none; border-color: #111; }
 .comments .cm-input::placeholder { color: #94A3B8; }
 .comments .cm-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
@@ -843,10 +845,10 @@ def nav_items():
 
 TOP10_SLUG, TOP10_NAME = "us-market-cap-top10", "시총 TOP 10"
 FORECAST_SLUG, FORECAST_NAME = "forecast-list", "증시 전망"
-
-
 # 한국 홈 고정 페이지 (H35, 2026-11-10 사용자) — 테마는 제목으로 알아본다(Blogger 조건식에서 주소 비교가 불안정). 제목을 바꾸면 페이지 제목도 같이 (experiments/home-split/publish_korea_home.py)
 KR_HOME_SLUG, KR_HOME_TITLE = "korea", "한국 증시 · 종목 주가"
+
+
 def blog_includables(backup_path="index.indie-backup.html"):
     """기존 테마의 Blog1 위젯에서 main 이외의 includable 을 그대로 가져온다.
 
@@ -998,9 +1000,9 @@ def build_theme(parts):
     out = out.replace("__CSS__", parts["css"])
     out = out.replace("__BLOGGER_CSS__", BLOGGER_CSS.strip() + "\n\n" + pc_type_css(parts["css"] + "\n" + BLOGGER_CSS))
     out = out.replace("__NAV_ITEMS__", nav_items())
+    out = out.replace("__KR_HOME_SLUG__", KR_HOME_SLUG).replace("__KR_HOME_TITLE__", html_mod.escape(KR_HOME_TITLE, quote=True))
     out = out.replace("__SITE_DESC__", html_mod.escape(SITE_DESC, quote=True))
     out = out.replace("__LIST_PATH__", LIST_PATH)
-    out = out.replace("__KR_HOME_SLUG__", KR_HOME_SLUG).replace("__KR_HOME_TITLE__", html_mod.escape(KR_HOME_TITLE, quote=True))
     out = out.replace("__TRUMP_LABEL__", TRUMP_LABEL)
     out = out.replace("__TRUMP_LIST_PATH__", TRUMP_LIST_PATH)
     out = out.replace("__NVDA_LABEL__", NVDA_LABEL)

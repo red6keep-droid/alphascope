@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head><script>try{sessionStorage.setItem('pv-view','post')}catch(e){} if(!location.hash) location.hash='post';</script>
+<head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>AlphaScope — 디자인 미리보기</title>
@@ -640,17 +640,19 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
    ========================================================================== */
 
 .site-footer {
-  padding: 36px var(--gutter) 48px;
+  padding: 36px var(--gutter) 38px;   /* 아래 48 → 38 (20%, 2026-11-10 사용자) */
   text-align: center;
   background: var(--bg);
 }
 .footer-title {
-  display: block;
+  display: flex;   /* 제목 · 접기 버튼을 세로 가운데로 (2026-11-10 사용자, 옛 block + 버튼 vertical-align −3) */
+  align-items: center;
+  justify-content: center;
   text-align: center;   /* 제목은 가운데 · 그 오른쪽에 접기 버튼 (2026-10-25 사용자, 홈 수정 H19) */
   margin: 0 0 14px;
   font-weight: 700;
-  font-size: 17px;
-  line-height: 1.5;
+  font-size: 14px;   /* 17 (PC 16) → 14 어디서나 (2026-11-10 사용자) — 아래 설명 13 보다 한 단계 위 */
+  line-height: 20px;   /* 홀짝 14/20 */
   color: var(--ink-2);
 }
 .footer-disclaimer {
@@ -664,7 +666,7 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .footer-disclaimer summary { list-style: none; cursor: pointer; }   /* 제목 + 첫 문장 — 눌러서 나머지 (2026-10-24 사용자 · 10-25 버튼을 제목 오른쪽으로) */
 .footer-lead { display: block; }
 .footer-disclaimer summary::-webkit-details-marker { display: none; }
-.footer-more { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 8px; vertical-align: -3px; border: 1px solid #E2E8F0; border-radius: 6px; background: #fff; color: #111; box-sizing: border-box; }   /* 외곽선 있는 화살표 버튼 = 다른 더 보기 버튼(.fold-btn)과 같은 테두리 · 바탕 (2026-10-24 사용자) */
+.footer-more { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 8px; flex: none; border: 1px solid #E2E8F0; border-radius: 6px; background: #fff; color: #111; box-sizing: border-box; }   /* 외곽선 있는 화살표 버튼 = 다른 더 보기 버튼(.fold-btn)과 같은 테두리 · 바탕 (2026-10-24 사용자) */
 .footer-more svg { width: 12px; height: 12px; }
 .footer-more svg { transition: transform .15s; }
 .footer-disclaimer[open] .footer-more svg { transform: rotate(180deg); }
@@ -1133,7 +1135,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title-text .title-logo { flex: none; margin-right: 0; vertical-align: top; margin-top: calc((1lh - var(--logo-size, 32px)) / 2); }   /* 로고는 첫 줄 글자 높이의 가운데에 — 가운데 정렬 아님 (2026-10-23 사용자) */
 .post-title-meta { flex: none; margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
 .post-title-meta .title-share { margin-left: 0; }
-.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
+.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; margin-left: auto; padding: 0;   /* 32 → 36 = 메뉴 버튼 · 뒤로 버튼과 같은 상자 (2026-11-10 사용자) */
   background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; cursor: pointer; }
 .title-share:hover { border-color: #111; }
 /* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
@@ -1210,7 +1212,10 @@ html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업�
 }
 /* 글 보기: 제목 오른쪽 날짜는 숨긴다 — 날짜는 요약글 맨 앞 (2026-10-23 사용자). 글 제목 자체(검색 결과 · 목록 · 탭 이름)에는 날짜가 그대로 있다 */
 body.item-view .post-title .post-title-date { display: none; }
-body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
+body.item-view .navbar { position: static; }
+/* 상세 페이지 = 로고 줄 없음, 메뉴 버튼은 제목 줄 공유 버튼 뒤 (2026-11-10 사용자) — body.detail-nav 는 테마 JS 가 고정 제목 줄이 있을 때만 붙인다 */
+body.detail-nav .navbar { display: none; }
+body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
 .pr-sticky .post-title { margin: 0; min-width: 0; }
 .pr-sticky .post-title .pr-role { margin-left: 10px; font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }
@@ -1400,9 +1405,12 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 8px 8px 8px 16px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .comments-panel[hidden] { display: none; }
 .comments .comments-title[hidden] { display: none; }
-.post-nav ~ .comments .comments-panel { padding-top: 6px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
+.post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
+.post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
 .post-shell > [data-related].is-moved { margin-top: 40px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
-.post-shell > [data-related].is-moved > div:first-child { font-size: 16px !important; line-height: 26px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
+.post-shell > [data-related].is-moved > div:first-child { font-size: 16px !important; line-height: 26px; }
+body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
+body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
 .comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
@@ -1423,7 +1431,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-name { font-size: 14px; line-height: 20px; font-weight: 400; color: #111; }   /* 작성자 이름 = 가장 작은 글씨 14/20 보통 (2026-11-10 사용자, 옛 16 굵게) */
 .comments .cm-tag { display: inline-block; margin: 0; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; vertical-align: middle; position: relative; top: -1px; }   /* 운영자 라벨 — 영역 라벨 모양 (가이드 5절) */
 .comments .cm-date { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
-.comments .cm-text { margin: 4px 0 0; font-size: 19px; line-height: 25px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comments .cm-text { margin: 4px 0 0; font-size: 16px; line-height: 26px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }   /* 댓글 글 16/26 어디서나 (2026-11-10 사용자: 16 · 행간 20% — 옛 폰 19/25 · PC 16/21) */
 .comments .cm-text.is-deleted { color: #94A3B8; font-size: 14px; line-height: 20px; }   /* 원 댓글이 지워진 답글 묶음의 자리 */
 /* 동작 버튼(답글 · 삭제)은 할 수 있는 사람에게만 — 로그인 전에는 보이지 않는다 (2026-10-13 사용자: "로그인 전에는 기능이 안 되는 버튼은 노출하지 마라") */
 .comments .cm-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }
@@ -1456,7 +1464,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .cm-link { margin-left: auto; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; line-height: 20px; color: #7A7A7A; cursor: pointer; }
 .comments .cm-link:hover { color: #111; }
 /* 입력창 — 본문 폭 전체, 테두리 #E2E8F0 · 모서리 8, 안쪽 11 · 12, 글 19px · 행간 24, 처음 4줄 높이. 글을 쓰면 아래로 늘어난다 */
-.comments .cm-input { display: block; width: 100%; min-height: 118px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 19px; line-height: 25px; color: #333; resize: none; overflow: hidden; }
+.comments .cm-input { display: block; width: 100%; min-height: 128px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; line-height: 26px; color: #333; resize: none; overflow: hidden; }   /* 입력창 16/26 = 댓글 글과 같게 · 처음 4줄 높이 128 = 26 × 4 + 위아래 22 + 테두리 2 (2026-11-10 사용자, 옛 19/25 · 118) */
 .comments .cm-input:focus { outline: none; border-color: #111; }
 .comments .cm-input::placeholder { color: #94A3B8; }
 .comments .cm-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
@@ -1514,7 +1522,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .tab { font-size: 16px; line-height: 21.5px; }
   .news-item { font-size: 16px; line-height: 32px; }
   .news-item a { font-size: 16px; line-height: 32px; }
-  .footer-title { font-size: 16px; }
   .eb-name { font-size: 18.5px; line-height: 25px; }
   .eb-title { font-size: 16px; line-height: 23px; }
   .theme-name { font-size: 16px; line-height: 23px; }
@@ -1532,8 +1539,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-body table[style*="font-size:14px"] { font-size: 16px !important; }
   .post-body div[style*="font-size:14px"] { font-size: 16px !important; }
   .comments { font-size: 16px; line-height: 21px; }
-  .comments .cm-text { font-size: 16px; line-height: 21px; }
-  .comments .cm-input { font-size: 16px; line-height: 21px; }
   .post-body [style*="font-size:17px"], .post-body [style*="font-size: 17px"] { font-size: 16px !important; }
   .post-body [style*="font-size:18px"], .post-body [style*="font-size: 18px"] { font-size: 16px !important; }
   .post-body [style*="font-size:19px"], .post-body [style*="font-size: 19px"] { font-size: 16px !important; }
@@ -1980,7 +1985,7 @@ body[data-pv-view="post"] #pv-reports { display: none; }
        첫 줄에 "권유하지 않습니다"까지 둔다 — 투자 권유 아님은 접지 않는다(운영지침 5절). 접힌 글도 HTML 에 있어 검색엔진이 읽는다(details, JS 없음).
        같은 날 사용자: "코드가 계산" 은 첫 문장과 중복이라 뺌, AI 는 목록 대신 한 줄(AI 기본법 생성형 AI 고지), "늦거나 틀릴 수" → 참고용 한 문장. 문구 확정(사용자): "해설 문장 일부는 AI 가 씁니다." · "모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다." -->
   <details class="footer-disclaimer">
-    <summary><span class="footer-title">ALPHASCOPE 미국 주식 데이터 리포트<span class="footer-more" role="img" aria-label="더 보기"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></span></span><span class="footer-lead">ALPHASCOPE 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.</span></summary>
+    <summary><span class="footer-title">ALPHASCOPE 주식 리포트<span class="footer-more" role="img" aria-label="더 보기"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></span></span><span class="footer-lead">ALPHASCOPE 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.</span></summary>
     <p>해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다.
     개별 투자 상담을 하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다.
     종목 로고는 각 회사의 상표이며, 종목을 구분하는 용도로만 쓰고 해당 회사와 제휴 관계가 없습니다.</p>
@@ -3499,7 +3504,7 @@ body[data-pv-view="post"] #pv-reports { display: none; }
   closeBtn.addEventListener('click', function () { setMenu(false); });
   overlay.addEventListener('click', function () { setMenu(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('is-open')) setMenu(false); });
-  window.addEventListener('resize', function () { if (!hasBar && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 */
+  window.addEventListener('resize', function () { if (!document.body.classList.contains('has-bar') && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 — 상세 페이지는 뒤에서 has-bar 를 붙인다(2026-11-10) */
 })();
 
 /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
@@ -3975,7 +3980,7 @@ body[data-pv-view="post"] #pv-reports { display: none; }
     if (parent) { var cancel = btn('cm-btn', '취소'); cancel.addEventListener('click', function () { onDone(null); }); btns.appendChild(cancel); }
     btns.appendChild(submit); foot.appendChild(count); foot.appendChild(btns);
     f.appendChild(ta); f.appendChild(foot); f.appendChild(el('div', 'cm-error'));
-    function grow() { ta.style.height = 'auto'; ta.style.height = Math.max(118, ta.scrollHeight + 2) + 'px'; }   /* 글이 늘면 입력창도 아래로 (테두리 2) */
+    function grow() { ta.style.height = 'auto'; ta.style.height = Math.max(128, ta.scrollHeight + 2) + 'px'; }   /* 글이 늘면 입력창도 아래로 (테두리 2) */
     ta.addEventListener('input', function () { count.textContent = ta.value.length + ' / ' + MAX; submit.disabled = !ta.value.trim(); grow(); });
     f.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -4618,6 +4623,20 @@ body[data-pv-view="post"] #pv-reports { display: none; }
       texts.forEach(function (n, i) { n.nodeValue = i ? '' : ht.getAttribute('data-head-title'); });
     }
   }
+})();
+
+/* ============================================================ 상세 페이지 = 로고 줄 없음 · 메뉴 버튼은 제목 줄 공유 버튼 뒤 (2026-11-10 사용자: "상세 페이지에서 로고 영역은 삭제, 메뉴 아이콘은 공유 아이콘 뒤로").
+   고정 제목 줄(.pr-sticky)이 있는 글 보기에서만: 메뉴 버튼(.nav-toggle)을 공유 버튼 바로 뒤로 옮기고, 서랍(#primary-menu)은 body 로 꺼내(로고 줄을 숨겨도 열리게)
+   body.detail-nav 를 붙인다 — 로고 줄 숨김 · 모든 폭에서 서랍 메뉴는 CSS(build_theme). 제목 줄이 없는 화면은 로고 줄 그대로 */
+(function () {
+  'use strict';
+  var head = document.querySelector('body.item-view .pr-sticky');
+  var toggle = document.querySelector('.navbar .nav-toggle'), menu = document.getElementById('primary-menu');
+  if (!head || !toggle || !menu) return;
+  var meta = head.querySelector('.post-title-meta');
+  (meta || head).appendChild(toggle);
+  document.body.appendChild(menu);
+  document.body.classList.add('detail-nav', 'has-bar');   /* has-bar = PC 에서도 서랍 메뉴 (홈 나누기 규칙과 같은 CSS) */
 })();
 
 /* ============================================================ 전환 버튼 (data-switch) · 오늘·5일 (data-hz-control) — 2026-10-11

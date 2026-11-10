@@ -2037,10 +2037,10 @@ def report_links(*keys):
 
 
 def related_rows(links):
-    """`함께 보는 페이지` · `함께 보는 리포트` 공용 줄 — 3px 점 + 이름(16px 굵게, 2026-11-10 사용자 · 옛 보통) + 오른쪽 나가는 아이콘(회색), 줄 아래 구분선, 줄 전체가 링크."""
+    """`함께 보는 페이지` · `함께 보는 리포트` 공용 줄 — 3px 점 + 이름(16px 보통 — 2026-11-10 사용자: 굵게 했다가 같은 날 되돌림) + 오른쪽 나가는 아이콘(회색), 줄 아래 구분선, 줄 전체가 링크."""
     dot = '<span aria-hidden="true" style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-right:8px;"></span>'
     return "".join(f'<a href="{esc(u)}" data-row-link="1" style="display:flex;align-items:center;gap:0;padding:12px {ALIGN_PX}px;border-bottom:1px solid #E2E8F0;'
-                   f'font-size:16px;line-height:26px;font-weight:700;color:#111;text-decoration:none;">{dot}<span style="flex:1 1 auto;min-width:0;">{esc(t)}</span>'
+                   f'font-size:16px;line-height:26px;font-weight:400;color:#111;text-decoration:none;">{dot}<span style="flex:1 1 auto;min-width:0;">{esc(t)}</span>'
                    f'<span style="flex:none;display:inline-flex;margin-left:8px;color:{NOTE};">{OUT_ICON}</span></a>' for t, u in links)
 
 

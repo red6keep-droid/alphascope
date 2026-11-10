@@ -673,12 +673,14 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
    ========================================================================== */
 
 .site-footer {
-  padding: 36px var(--gutter) 48px;
+  padding: 36px var(--gutter) 38px;   /* 아래 48 → 38 (20%, 2026-11-10 사용자) */
   text-align: center;
   background: var(--bg);
 }
 .footer-title {
-  display: block;
+  display: flex;   /* 제목 · 접기 버튼을 세로 가운데로 (2026-11-10 사용자, 옛 block + 버튼 vertical-align −3) */
+  align-items: center;
+  justify-content: center;
   text-align: center;   /* 제목은 가운데 · 그 오른쪽에 접기 버튼 (2026-10-25 사용자, 홈 수정 H19) */
   margin: 0 0 14px;
   font-weight: 700;
@@ -697,7 +699,7 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .footer-disclaimer summary { list-style: none; cursor: pointer; }   /* 제목 + 첫 문장 — 눌러서 나머지 (2026-10-24 사용자 · 10-25 버튼을 제목 오른쪽으로) */
 .footer-lead { display: block; }
 .footer-disclaimer summary::-webkit-details-marker { display: none; }
-.footer-more { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 8px; vertical-align: -3px; border: 1px solid #E2E8F0; border-radius: 6px; background: #fff; color: #111; box-sizing: border-box; }   /* 외곽선 있는 화살표 버튼 = 다른 더 보기 버튼(.fold-btn)과 같은 테두리 · 바탕 (2026-10-24 사용자) */
+.footer-more { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 8px; flex: none; border: 1px solid #E2E8F0; border-radius: 6px; background: #fff; color: #111; box-sizing: border-box; }   /* 외곽선 있는 화살표 버튼 = 다른 더 보기 버튼(.fold-btn)과 같은 테두리 · 바탕 (2026-10-24 사용자) */
 .footer-more svg { width: 12px; height: 12px; }
 .footer-more svg { transition: transform .15s; }
 .footer-disclaimer[open] .footer-more svg { transform: rotate(180deg); }
@@ -1166,7 +1168,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title-text .title-logo { flex: none; margin-right: 0; vertical-align: top; margin-top: calc((1lh - var(--logo-size, 32px)) / 2); }   /* 로고는 첫 줄 글자 높이의 가운데에 — 가운데 정렬 아님 (2026-10-23 사용자) */
 .post-title-meta { flex: none; margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
 .post-title-meta .title-share { margin-left: 0; }
-.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
+.title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; margin-left: auto; padding: 0;   /* 32 → 36 = 메뉴 버튼 · 뒤로 버튼과 같은 상자 (2026-11-10 사용자) */
   background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; cursor: pointer; }
 .title-share:hover { border-color: #111; }
 /* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
@@ -1243,7 +1245,10 @@ html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업�
 }
 /* 글 보기: 제목 오른쪽 날짜는 숨긴다 — 날짜는 요약글 맨 앞 (2026-10-23 사용자). 글 제목 자체(검색 결과 · 목록 · 탭 이름)에는 날짜가 그대로 있다 */
 body.item-view .post-title .post-title-date { display: none; }
-body.item-view .navbar { position: static; }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
+body.item-view .navbar { position: static; }
+/* 상세 페이지 = 로고 줄 없음, 메뉴 버튼은 제목 줄 공유 버튼 뒤 (2026-11-10 사용자) — body.detail-nav 는 테마 JS 가 고정 제목 줄이 있을 때만 붙인다 */
+body.detail-nav .navbar { display: none; }
+body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
 .pr-sticky .post-title { margin: 0; min-width: 0; }
 .pr-sticky .post-title .pr-role { margin-left: 10px; font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }
@@ -1435,9 +1440,8 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comments-title[hidden] { display: none; }
 .post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
 .post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
-.post-shell > [data-related].is-moved { margin-top: 20px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
+.post-shell > [data-related].is-moved { margin-top: 40px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
 .post-shell > [data-related].is-moved > div:first-child { font-size: 16px !important; line-height: 26px; }
-.post-shell > [data-related] a[data-row-link] { font-weight: 700 !important; }   /* `함께 보는 페이지` 줄 16 굵게 (2026-11-10 사용자) — 이미 게시된 글의 인라인 400 을 덮는다. 렌더러 dk.related_rows 도 700 */
 body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
 body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
@@ -1460,7 +1464,7 @@ body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글�
 .comments .cm-name { font-size: 14px; line-height: 20px; font-weight: 400; color: #111; }   /* 작성자 이름 = 가장 작은 글씨 14/20 보통 (2026-11-10 사용자, 옛 16 굵게) */
 .comments .cm-tag { display: inline-block; margin: 0; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; vertical-align: middle; position: relative; top: -1px; }   /* 운영자 라벨 — 영역 라벨 모양 (가이드 5절) */
 .comments .cm-date { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
-.comments .cm-text { margin: 4px 0 0; font-size: 19px; line-height: 25px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comments .cm-text { margin: 4px 0 0; font-size: 16px; line-height: 26px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }   /* 댓글 글 16/26 어디서나 (2026-11-10 사용자: 16 · 행간 20% — 옛 폰 19/25 · PC 16/21) */
 .comments .cm-text.is-deleted { color: #94A3B8; font-size: 14px; line-height: 20px; }   /* 원 댓글이 지워진 답글 묶음의 자리 */
 /* 동작 버튼(답글 · 삭제)은 할 수 있는 사람에게만 — 로그인 전에는 보이지 않는다 (2026-10-13 사용자: "로그인 전에는 기능이 안 되는 버튼은 노출하지 마라") */
 .comments .cm-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }
@@ -1493,7 +1497,7 @@ body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글�
 .comments .cm-link { margin-left: auto; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; line-height: 20px; color: #7A7A7A; cursor: pointer; }
 .comments .cm-link:hover { color: #111; }
 /* 입력창 — 본문 폭 전체, 테두리 #E2E8F0 · 모서리 8, 안쪽 11 · 12, 글 19px · 행간 24, 처음 4줄 높이. 글을 쓰면 아래로 늘어난다 */
-.comments .cm-input { display: block; width: 100%; min-height: 118px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 19px; line-height: 25px; color: #333; resize: none; overflow: hidden; }
+.comments .cm-input { display: block; width: 100%; min-height: 128px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; line-height: 26px; color: #333; resize: none; overflow: hidden; }   /* 입력창 16/26 = 댓글 글과 같게 · 처음 4줄 높이 128 = 26 × 4 + 위아래 22 + 테두리 2 (2026-11-10 사용자, 옛 19/25 · 118) */
 .comments .cm-input:focus { outline: none; border-color: #111; }
 .comments .cm-input::placeholder { color: #94A3B8; }
 .comments .cm-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
@@ -1568,8 +1572,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-body table[style*="font-size:14px"] { font-size: 16px !important; }
   .post-body div[style*="font-size:14px"] { font-size: 16px !important; }
   .comments { font-size: 16px; line-height: 21px; }
-  .comments .cm-text { font-size: 16px; line-height: 21px; }
-  .comments .cm-input { font-size: 16px; line-height: 21px; }
   .post-body [style*="font-size:17px"], .post-body [style*="font-size: 17px"] { font-size: 16px !important; }
   .post-body [style*="font-size:18px"], .post-body [style*="font-size: 18px"] { font-size: 16px !important; }
   .post-body [style*="font-size:19px"], .post-body [style*="font-size: 19px"] { font-size: 16px !important; }
@@ -1608,10 +1610,14 @@ body.no-dashboard .main-content { padding-top: 32px; }
   </head>
 
   <body>
-    <b:class cond='data:view.isSingleItem' name='item-view'/>
+    <b:comment>홈 나누기 (H35, 2026-11-10 사용자): 홈(/) = 미국 화면, 고정 페이지 /p/korea.html(제목 한국 증시 · 종목 주가) = 한국 화면.
+      두 화면 모두 대시보드를 그리고 body data-home-mkt 로 시장을 알린다 — 카드 거르기 · 국기 스위치는 alphaflow-home.html 의 H35 장치. 한국 화면은 글 보기(item-view)가 아니다</b:comment>
+    <b:class cond='data:view.isSingleItem and !(data:view.isPage and data:view.title == &quot;한국 증시 · 종목 주가&quot;)' name='item-view'/>
     <b:class cond='data:view.isArchive' name='archive-view'/>
     <b:class cond='data:view.isLabelSearch' name='label-view'/>
-    <b:class cond='!data:view.isHomepage' name='no-dashboard'/>
+    <b:class cond='!(data:view.isHomepage or (data:view.isPage and data:view.title == &quot;한국 증시 · 종목 주가&quot;))' name='no-dashboard'/>
+    <b:attr cond='data:view.isHomepage' name='data-home-mkt' value='us'/>
+    <b:attr cond='data:view.isPage and data:view.title == &quot;한국 증시 · 종목 주가&quot;' name='data-home-mkt' value='kr'/>
 
     <!-- =================================================================
          navbar
@@ -1633,11 +1639,11 @@ body.no-dashboard .main-content { padding-top: 32px; }
         </b:section>
 
         <nav class='menu-items' id='primary-menu'>
-          <a class='nav-item' expr:href='data:blog.homepageUrl'>
-            <b:attr cond='data:view.isHomepage' name='aria-current' value='page'/>홈</a>
-          <a class='nav-item' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>
-            <b:attr cond='data:view.search.label == &quot;데일리 브리핑&quot;' name='aria-current' value='page'/>미국 증시 리포트</a>
-          <a class='nav-item' href='/p/us-market-cap-top10.html'>시총 TOP 10</a>
+          <b:comment>메뉴 = 미국 · 한국(data-bar · data-flag → 로고 오른쪽 국기 스위치) · 증시 전망(서랍만) — H35 목업 그대로 (2026-11-10 사용자). 옛 홈 · 미국 증시 리포트 · 시총 TOP 10 메뉴는 뺐다(홈 카드 · 글 아래 함께 보는 페이지로 간다)</b:comment>
+          <a class='nav-item' data-bar='1' data-flag='us' href='/'>
+            <b:attr cond='data:view.isHomepage' name='aria-current' value='page'/>미국</a>
+          <a class='nav-item' data-bar='1' data-flag='kr' href='/p/korea.html'>
+            <b:attr cond='data:view.isPage and data:view.title == &quot;한국 증시 · 종목 주가&quot;' name='aria-current' value='page'/>한국</a>
           <a class='nav-item' href='/p/forecast-list.html'>증시 전망</a>
         </nav>
       </div>
@@ -1663,8 +1669,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
     <div class='header-bar'></div>
 
     <main class='main-content'>
-      <!-- 대시보드: 홈에서만 -->
-      <b:if cond='data:view.isHomepage and !data:view.isLayoutMode'>
+      <!-- 대시보드: 홈(미국) · 한국 홈에서 (H35) -->
+      <b:if cond='(data:view.isHomepage or (data:view.isPage and data:view.title == &quot;한국 증시 · 종목 주가&quot;)) and !data:view.isLayoutMode'>
 
         <!-- ====================================================================
              1. AI 데일리 브리핑
@@ -1828,7 +1834,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
               <thead>
                 <tr>
                   <th class='col-name' colspan='2'>종목명</th>   <!-- 순위 구분명 삭제 · 종목명이 구분 영역 맨 왼쪽 (2026-10-25 사용자, 홈 수정 H5) -->
-                  <th id='rank-th-price'>현재가 · 전일 대비</th>
+                  <th id='rank-th-price'>종가 · 전일 대비</th>
                   <th class='col-sector'>업종</th>
                   <th>거래량</th>
                   <th>거래대금</th>
@@ -1877,7 +1883,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
 
         <b:widget id='Blog1' locked='true' title='Blog Posts' type='Blog' visible='true'>
           <b:includable id='main'>
-            <b:if cond='data:view.isSingleItem'>
+            <b:if cond='data:view.isSingleItem and !(data:view.isPage and data:view.title == &quot;한국 증시 · 종목 주가&quot;)'>
               <div class='post-shell'>
                 <b:loop values='data:posts' var='post'>
                   <article class='post-outer-container'>
@@ -1901,8 +1907,8 @@ body.no-dashboard .main-content { padding-top: 32px; }
                   <section class='comments' expr:data-post-id='data:post.id' id='comments'><h3 class='comments-title'>댓글</h3></section>
                 </b:loop>
               </div>
-            <b:elseif cond='data:view.isHomepage'/>
-              <b:comment>홈 아래 최근 리포트 링크 영역은 삭제 (2026-10-14 사용자). 홈은 위 대시보드만.</b:comment>
+            <b:elseif cond='data:view.isHomepage or (data:view.isPage and data:view.title == &quot;한국 증시 · 종목 주가&quot;)'/>
+              <b:comment>홈 아래 최근 리포트 링크 영역은 삭제 (2026-10-14 사용자). 홈 · 한국 홈은 위 대시보드만 — 한국 홈 페이지 본문은 그리지 않는다 (H35).</b:comment>
             <b:else/>
               <section class='reports'>
                 <div class='section-head'>
@@ -2587,6 +2593,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
         /* ================================================================ 랭킹 */
 
         var stocks = [];
+
+        var usSession = '';   /* data.json market — `장중` 이면 미국 가격 머리글 = 현재가, 아니면 종가 (2026-11-10 사용자) */
+
+        function priceHead() { return (rankMarket === 'kr' ? liveOpen() : usSession === '장중') ? '현재가 · 전일 대비' : '종가 · 전일 대비'; }
         /* 한국 탭 (2026-10-24 사용자) — kr.json (experiments/kr-stocks/home_feed_kr.py, 한국 장 마감 뒤 하루 1회). 두 카드가 각자 미국 · 한국을 고른다 */
         /* 미국 · 한국 화면 (H35, 2026-11-10 사용자) — body[data-home-mkt] 가 있으면 그 시장만. 없으면 '' = 지금 홈(두 시장) */
         var HOME_MKT = (document.body && document.body.getAttribute('data-home-mkt')) || '';
@@ -2625,7 +2635,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             if (t) { if (liveOpen()) n.appendChild(el('span', 'dot')); n.appendChild(document.createTextNode(t)); }
           });
           var th = document.getElementById('rank-th-price');
-          if (th) th.textContent = rankMarket === 'kr' && !liveOpen() ? '종가 · 전일 대비' : '현재가 · 전일 대비';
+          if (th) th.textContent = priceHead();
           var thc = document.getElementById('rank-th-chart');
           if (thc) thc.hidden = rankMarket !== 'kr';
         }
@@ -2726,7 +2736,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           var kr = rankMarket === 'kr';
           var src = kr ? ((krHome && krHome.stocks) || []).filter(function (s) { return s.top; }) : stocks;   /* 한국 TOP 10 = 유가증권 보통주 가운데 시총 10개 (home_feed_kr 의 top, 기획 11-2) */
           var th = document.getElementById('rank-th-price');
-          if (th) th.textContent = kr && !liveOpen() ? '종가 · 전일 대비' : '현재가 · 전일 대비';   /* 장중 가격이 켜진 장중엔 현재가 (2026-11-05) */
+          if (th) th.textContent = priceHead();   /* 장중 가격이 켜진 장중엔 현재가 (2026-11-05) · 미국은 data.json 장 상태 (2026-11-10) */
           var thc = document.getElementById('rank-th-chart'); if (thc) thc.hidden = !kr;
 
           if (!src.length) {
@@ -2769,7 +2779,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
             var tdPrice = el('td');
             var pr;
             if (kr) pr = feedPrice(s);   /* 한국은 종목 줄과 같은 칸 — 장중 가격 토글을 따른다 (2026-11-05) */
-            else { pr = el('span', 'cell-price ' + signClass(s.cp), '$' + fmt(s.p)); pr.appendChild(el('small', null, arrow(s.cp) + fmt(Math.abs(s.c)) + ' (' + (s.cp >= 0 ? '+' : '-') + fmt(Math.abs(s.cp)) + '%)')); }
+            else pr = feedPrice(s);   /* 미국도 한국과 같은 칸 — 가격 + ▲▼ 등락률만, 증감 금액은 뺐다 (2026-11-10 사용자: 미국 · 한국 시총 가격 표시를 같게) */
             tdPrice.appendChild(pr);
             tr.appendChild(tdPrice);
 
@@ -3018,6 +3028,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           .then(function (r) { return r.json(); })
           .then(function (json) {
             stocks = json.stocks || [];
+            usSession = json.market || '';
             renderRankings();
           })
           .catch(function () { renderRankings(); });
@@ -3919,7 +3930,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
         closeBtn.addEventListener('click', function () { setMenu(false); });
         overlay.addEventListener('click', function () { setMenu(false); });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('is-open')) setMenu(false); });
-        window.addEventListener('resize', function () { if (!hasBar && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 */
+        window.addEventListener('resize', function () { if (!document.body.classList.contains('has-bar') && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 — 상세 페이지는 뒤에서 has-bar 를 붙인다(2026-11-10) */
       })();
 
       /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
@@ -4395,7 +4406,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           if (parent) { var cancel = btn('cm-btn', '취소'); cancel.addEventListener('click', function () { onDone(null); }); btns.appendChild(cancel); }
           btns.appendChild(submit); foot.appendChild(count); foot.appendChild(btns);
           f.appendChild(ta); f.appendChild(foot); f.appendChild(el('div', 'cm-error'));
-          function grow() { ta.style.height = 'auto'; ta.style.height = Math.max(118, ta.scrollHeight + 2) + 'px'; }   /* 글이 늘면 입력창도 아래로 (테두리 2) */
+          function grow() { ta.style.height = 'auto'; ta.style.height = Math.max(128, ta.scrollHeight + 2) + 'px'; }   /* 글이 늘면 입력창도 아래로 (테두리 2) */
           ta.addEventListener('input', function () { count.textContent = ta.value.length + ' / ' + MAX; submit.disabled = !ta.value.trim(); grow(); });
           f.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -5038,6 +5049,20 @@ body.no-dashboard .main-content { padding-top: 32px; }
             texts.forEach(function (n, i) { n.nodeValue = i ? '' : ht.getAttribute('data-head-title'); });
           }
         }
+      })();
+
+      /* ============================================================ 상세 페이지 = 로고 줄 없음 · 메뉴 버튼은 제목 줄 공유 버튼 뒤 (2026-11-10 사용자: "상세 페이지에서 로고 영역은 삭제, 메뉴 아이콘은 공유 아이콘 뒤로").
+         고정 제목 줄(.pr-sticky)이 있는 글 보기에서만: 메뉴 버튼(.nav-toggle)을 공유 버튼 바로 뒤로 옮기고, 서랍(#primary-menu)은 body 로 꺼내(로고 줄을 숨겨도 열리게)
+         body.detail-nav 를 붙인다 — 로고 줄 숨김 · 모든 폭에서 서랍 메뉴는 CSS(build_theme). 제목 줄이 없는 화면은 로고 줄 그대로 */
+      (function () {
+        'use strict';
+        var head = document.querySelector('body.item-view .pr-sticky');
+        var toggle = document.querySelector('.navbar .nav-toggle'), menu = document.getElementById('primary-menu');
+        if (!head || !toggle || !menu) return;
+        var meta = head.querySelector('.post-title-meta');
+        (meta || head).appendChild(toggle);
+        document.body.appendChild(menu);
+        document.body.classList.add('detail-nav', 'has-bar');   /* has-bar = PC 에서도 서랍 메뉴 (홈 나누기 규칙과 같은 CSS) */
       })();
 
       /* ============================================================ 전환 버튼 (data-switch) · 오늘·5일 (data-hz-control) — 2026-10-11
