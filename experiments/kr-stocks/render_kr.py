@@ -103,14 +103,15 @@ def chart_ref(sym):
     return f"radar-{U.BY_SYM[sym][2]}-price.png"
 
 
-def chart_url(sym):
-    return f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{chart_ref(sym)}"
+def chart_url(sym, day=""):
+    """고정 이름 그림 + `?v=봉 날짜` — 독자 브라우저 7일 캐시 무효화 (2026-11-10, 미국 render_pages.chart_url 과 같은 이유)."""
+    return RP.with_ver(f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{chart_ref(sym)}", day)
 
 
 def sec_chart(s):
     if not s.get("chart"):
         return ""
-    url = chart_url(s["sym"])
+    url = chart_url(s["sym"], s.get("day", ""))
     zoom = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'
             '<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg>')
     return (f'<a href="{_esc(url)}" data-zoom="1" target="_blank" rel="noopener" title="그래프 확대 보기" aria-label="그래프 확대 보기" '
@@ -741,7 +742,7 @@ def sec_regime(s):
     th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
     lines = _kospi(R.regime_lines(mr))
     if s.get("chart"):
-        lines.insert(1, R.index_chart_line(f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{KOSPI_REF}", f"images/{KOSPI_REF}", "KOSPI"))
+        lines.insert(1, R.index_chart_line(RP.with_ver(f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{KOSPI_REF}", s.get("day", "")), f"images/{KOSPI_REF}", "KOSPI"))
     card = R._state_card("한국 증시 분위기는?", mr["regime"], th, col, lines, "", fold=True)   # 툴팁 없음 — 근거 줄마다 나누는 법이 있다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 

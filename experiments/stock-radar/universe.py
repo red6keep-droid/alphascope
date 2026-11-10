@@ -217,7 +217,7 @@ PEERS = {
     "QUBT": {"IONQ": "경쟁", "RGTI": "경쟁", "QBTS": "경쟁"},
     "IBM": {"IONQ": "경쟁", "GOOGL": "경쟁", "MSFT": "경쟁", "NVDA": "협력"},
 }
-PEER_KO = {"TSM": "TSMC", "QCOM": "퀄컴", "ORCL": "오라클", "UPS": "UPS", "SNAP": "스냅", "PINS": "핀터레스트", "MRVL": "마벨", "GM": "GM", "F": "포드",
+PEER_KO = {"TSM": "TSMC", "DELL": "델", "SMCI": "슈퍼마이크로", "QCOM": "퀄컴", "ORCL": "오라클", "UPS": "UPS", "SNAP": "스냅", "PINS": "핀터레스트", "MRVL": "마벨", "GM": "GM", "F": "포드",
            "RIVN": "리비안", "AXP": "아메리칸 익스프레스", "BAC": "뱅크오브아메리카", "KO": "코카콜라", "NVO": "노보 노디스크", "MRK": "머크", "PFE": "화이자",
            "WDC": "웨스턴디지털", "COST": "코스트코", "TGT": "타깃", "KR": "크로거", "WFC": "웰스파고", "C": "씨티그룹", "GS": "골드만삭스", "PYPL": "페이팔",
            "CVX": "셰브런", "COP": "코노코필립스", "SLB": "SLB", "ABT": "애보트", "AMGN": "암젠",

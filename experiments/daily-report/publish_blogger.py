@@ -93,52 +93,16 @@ def find_post_by_title(title, blog_url=None, creds=None, max_results=15):
     return None
 
 
-# 함께 보는 리포트 (검색 노출, 2026-10-18 사용자 — 가이드라인 10-5): 글끼리 HTML 링크로 잇는다. 게시 · 갱신 때 최근 글 목록을 읽어
-# 같은 연재의 바로 앞 글 + 다른 두 연재의 최신 글 + 연재 목록 화면. 실패해도 게시는 그대로 한다(링크 없이).
-# 연재 = 지금 매일 나오는 날짜별 글만 (2026-11-09 사용자): 트럼프(11-04 종료) · 엔비디아 날짜별 글(11-01 고정 페이지로) 뺌, 한국 증시 · 인물 발언 넣음
-SERIES = [("데일리 브리핑", "미국 증시 리포트"), ("한국 증시 리포트", "한국 증시 리포트"), ("인물 발언", "주요 인물 발언")]   # (블로거 라벨, 목록 이름)
+# 함께 보는 리포트 — 게시 때 본문 끝에 붙이던 두 번째 블록은 없앴다 (2026-11-10 사용자: 한국 증시 리포트에 함께 보는 블록이 두 개,
+# 모든 리포트 `함께 보는 페이지`(design_kit.related_buttons) 하나만). 옛 2026-10-18 · 11-08 `두 블록 다` 결정을 바꾼 것.
+# with_related 는 이름 · 인자를 그대로 두고, 갱신(PUT) 때 옛 글 본문에 남은 블록을 지우기만 한다 — 호출자(각 리포트 publish)는 그대로.
 
 
-def related_html(labels, self_titles, blog_url=None, creds=None):
-    import html as _h
-    from urllib.parse import quote
-    blog_url = (blog_url or os.environ.get("BLOG_URL", DEFAULT_BLOG_URL)).replace("http://", "https://").rstrip("/")
-    creds = creds or _credentials()
-    blog_id = _blog_id(creds, blog_url)
-    r = requests.get(f"{BLOGGER_API}/blogs/{blog_id}/posts", params={"maxResults": 25, "fetchBodies": "false", "fetchImages": "false"},
-                     headers={"Authorization": f"Bearer {creds.token}"}, timeout=30)
-    r.raise_for_status()
-    own = {t.strip() for t in self_titles}
-    posts = [p for p in r.json().get("items", []) if str(p.get("title", "")).strip() not in own and p.get("url")]
-    mine = next((lb for lb, _ in SERIES if lb in (labels or [])), None)
-    picks = []
-    for lb, _ in sorted(SERIES, key=lambda x: x[0] != mine):   # 같은 연재 앞 글이 맨 위
-        p = next((p for p in posts if lb in (p.get("labels") or [])), None)
-        if p:
-            picks.append(p)
-    if not picks:
-        return ""
-    import sys as _sys
-    _sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-    import design_kit as dk
-    rows = dk.related_rows([(str(p["title"]).strip().replace(" — ", " "), p["url"]) for p in picks])
-    lists = " · ".join(f'<a href="{blog_url}/search/label/{quote(lb)}" style="color:inherit;">{_h.escape(name)}</a>' for lb, name in SERIES)
-    # 모양 = `함께 보는 페이지`(design_kit.related_buttons)와 같은 제목 · 구분선 목록 (2026-11-09 사용자: 공통 적용). 연재 목록은 작은 회색 한 줄
-    return ('<div data-related="report" style="margin-top:24px;">' + dk.related_title("함께 보는 리포트") + rows
-            + f'<div style="padding:10px {dk.ALIGN_PX}px 0;font-size:14px;line-height:20px;color:{dk.NOTE};">리포트 목록 : {lists}</div></div>')
-
-
-def with_related(content, labels, self_titles, blog_url=None, creds=None):
-    """본문 끝에 함께 보는 리포트를 붙인다. 이미 붙어 있으면(갱신) 새로 바꾼다. 목록을 못 읽으면 본문 그대로."""
+def with_related(content, labels=None, self_titles=None, blog_url=None, creds=None):
+    """본문 끝의 옛 `함께 보는 리포트` 블록을 지운다(갱신 때). 본문의 `함께 보는 페이지`(data-related="1" style="margin-top:24px;")는 남긴다."""
     import re as _re
-    # 공통 블록만 지운다 — 본문의 `함께 보는 페이지`(design_kit.related_buttons, data-related="1")는 남긴다 (2026-11-08 사용자: 두 블록 다 있어야 한다).
-    # 옛 글의 공통 블록은 data-related="1" + 아래 style 로 시작한다 — 갱신 때 그것도 지운다
-    content = _re.sub(r'<div data-related="report".*\Z|<div data-related="(?:report|1)" style="margin:28px 0 0;padding-top:14px;.*\Z', "", content, flags=_re.S)   # 맨 끝 블록만 붙이므로 끝까지 지운다 (옛 모양 · 11-09 새 모양 둘 다)
-    try:
-        return content + related_html(labels, self_titles, blog_url, creds)
-    except Exception as e:  # noqa: BLE001
-        print(f"[게시] 함께 보는 리포트 생략 ({str(e)[:80]})")
-        return content
+    # 옛 모양 둘: 11-09 새 모양 data-related="report" · 그 전 모양 data-related="report"|"1" + margin:28px 스타일. 맨 끝에만 붙었으므로 끝까지 지운다
+    return _re.sub(r'<div data-related="report".*\Z|<div data-related="(?:report|1)" style="margin:28px 0 0;padding-top:14px;.*\Z', "", content, flags=_re.S)
 
 
 def _write(method, url, **kw):

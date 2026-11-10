@@ -853,7 +853,7 @@ def write_mock(body, path, title):
     if not (css and js):
         return None
     _here = os.path.dirname(os.path.abspath(path))
-    body = re.sub(r"https://cdn\.jsdelivr\.net/gh/[^\"]+?@(?:gh-pages|kr-images)/(images/(?!logos/|people/)[^\"]+)",
+    body = re.sub(r"https://cdn\.jsdelivr\.net/gh/[^\"]+?@(?:gh-pages|kr-images)/(images/(?!logos/|people/)[^\"?]+)(?:\?v=\d+)?",
                   lambda m: m.group(1) if os.path.exists(os.path.join(_here, m.group(1))) else m.group(0), body)   # 로컬 사본이 있을 때만 로컬 — 없으면 gh-pages 주소 그대로 (2026-11-07 사용자: 데일리 목업 S&P 500 그림이 안 보였다, 10-23 그림 로컬 사본 없음)   # 로고 · 인물 사진은 로컬 사본이 없다 — gh-pages 주소 그대로 (2026-10-25 · 11-07)
     # 글 아래 [목록] · TOP 줄 — 블로그 테마의 글 보기와 같은 마크업 (2026-10-18 사용자: 모든 페이지 공통). 목록 주소는 본문 [data-list-url] 이 있으면 그것
     lu = re.search(r'data-list-url="([^"]+)"', body)
@@ -2051,5 +2051,5 @@ def related_title(text):
 def related_buttons(links):
     """글 맨 아래 `함께 보는 페이지` — 버튼 대신 구분선 목록 (2026-10-31 사용자 P187, 옛 P160 버튼): 제목 아래 · 줄 사이 · 맨 끝에 가로 구분선,
     줄 = 3px 점 + 페이지 이름(16px 보통 = 기사 요약 줄 크기, P185) + 오른쪽 나가는 아이콘(회색). 줄 전체가 링크(data-row-link, 가이드라인 10-9).
-    모든 리포트 글 끝에 둔다 (2026-11-09 사용자) — 게시 때 붙는 `함께 보는 리포트`(publish_blogger.related_html)와 두 블록."""
+    모든 리포트 글 끝에 둔다 (2026-11-09 사용자) — 글 끝 블록은 이것 하나 (2026-11-10 사용자: 게시 때 붙던 `함께 보는 리포트`는 없앴다)."""
     return f'<div data-related="1" style="margin-top:24px;">{related_title("함께 보는 페이지")}{related_rows(links)}</div>'

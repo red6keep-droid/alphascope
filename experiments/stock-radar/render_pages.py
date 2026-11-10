@@ -73,6 +73,9 @@ def home_marker():
 
 # ---------------------------------------------------------------- 상세 (간단형)
 
+INFO_ICON_12 = _dk.INFO_ICON.replace('width="14" height="14"', 'width="12" height="12"')   # 12px 안내 줄용 ⓘ — 글씨 크기에 맞춤 (2026-11-10)
+
+
 def lead(s):
     """맨 위 요약 1~2문장 (p[data-seo-lead], 가이드라인 10-5) — 날마다 달라지는 글. 파이썬 값만, 평가 · 예측 없음."""
     r = s["ret_1d"]
@@ -84,14 +87,75 @@ def lead(s):
         first += (" 실적 발표에 처음 반응한 날이었다." if nr["earnings_day"] else
                   " 평소 하루 움직임 안의 변화였다." if abs(nr["z"]) < 2 else f" 평소 하루 움직임의 {abs(nr['z']):.1f}배였다.")
     first += R.gap_sentence((s.get("tech") or {}).get("gap"))   # 시가 갭은 평소 범위 바로 뒤 (P80)
-    more = []
-    if s.get("rank"):
-        more.append(f"시가총액은 미국 {s['rank']}위({cap_text(s['cap'])})")
+    fact, kind = lead_fact(s)   # 둘째 문장 — 그날 이 종목에서 가장 눈에 띄는 사실 하나 (2026-11-10 사용자: 페이지끼리 첫 내용이 비슷하다, AI 없이)
+    more = []   # 시가총액 순위 문장은 뺐다 (2026-11-10 사용자: 요약이 너무 길다 — 순위는 가격 카드 · 목록에 있다)
+    nxt = (s.get("earnings") or {}).get("next")
+    if nxt and kind != "earnings":
+        more.append(f"다음 실적 발표는 {_md(nxt)} 예정")
+    about = U.ABOUT.get(s["sym"], "").split(". ")[0].rstrip(".")   # `기업` 탭 소개 첫 문장 — `브로드컴은 반도체 · 인프라 소프트웨어 기업이다` (종목마다 다른 고정 문장)
+    text = first + (" " + fact if fact else "") + (" " + "이고, ".join(more) + "이다." if more else "")
+    # 회사 소개 첫 문장은 요약 아래 작은 안내 줄 (2026-11-10 사용자: 독자는 다 아는 말 · 매일 반복 — 줄바꿈 + 안내 기호 + 작은 글씨).
+    # 블로그 문장 글씨 중 가장 작은 12px · 행간 18 (사진 출처 줄과 같은 크기, 2026-11-10 사용자). 숨기지 않는다 — 페이지마다 다른 문장이라 검색엔진이 읽어야 한다
+    note = (f'<p style="margin:-4px 0 12px;padding-left:{_dk.ALIGN_PX}px;font-size:12px;line-height:18px;color:{_dk.NOTE};word-break:keep-all;">'
+            f'{INFO_ICON_12}{_esc(about)}.</p>') if about else ""
+    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_dk.tint(_esc(text))}</p>' + note   # 요약 문장의 증감도 색 (가이드라인 3-3, 2026-10-21)
+
+
+ITEM_8K = {"1.01": "중요한 계약을 맺었다는", "2.02": "실적을 알리는", "2.03": "회사채 발행 등 새로 돈을 빌렸다는", "5.02": "임원 · 이사가 바뀌었다는",
+           "5.07": "주주총회 결과를 알리는", "7.01": "투자자 안내 자료를 담은", "8.01": "주요 소식을 알리는"}   # 요약 둘째 문장용 쉬운 꾸밈말 (2026-11-10). 없는 항목은 꾸밈말 없이
+
+
+def lead_fact(s):
+    """맨 위 요약 둘째 문장 — 후보 사실마다 점수, 가장 높은 하나 (2026-11-10 사용자: 브로드컴 · 애플 · 엔비디아 첫 내용이 같은 틀).
+    파이썬 값만 · 평가 · 예측 · 매수 · 매도 말 없음. 문장 틀 · 자리는 모든 종목 같고 고르는 사실만 다르다. (문장, 종류) — 없으면 ("", "")."""
+    cands = []   # (점수, 종류, 문장)
+    day = datetime.date.fromisoformat(s["day"])
     nxt = (s.get("earnings") or {}).get("next")
     if nxt:
-        more.append(f"다음 실적 발표는 {_md(nxt)} 예정")
-    text = first + (" " + "이고, ".join(more) + "이다." if more else "")
-    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_dk.tint(_esc(text))}</p>'   # 요약 문장의 증감도 색 (가이드라인 3-3, 2026-10-21)
+        n = (datetime.date.fromisoformat(nxt) - day).days
+        if 0 < n <= 14:
+            cands.append((8 if n <= 7 else 4, "earnings", f"{n}일 뒤 {_md(nxt)}에 실적 발표가 있다."))
+    yr = s.get("year_range") or {}
+    if yr.get("high"):
+        p = yr["pct_from_high"]
+        if p >= -3:
+            cands.append((6, "high", f"1년 고점(${yr['high']:,.2f}, {_md(yr['high_day'])})과의 차이는 {abs(p):.1f}%다."))
+        elif p <= -25:
+            cands.append((4 + min(abs(p) - 25, 20) / 10, "high", f"1년 고점(${yr['high']:,.2f}, {_md(yr['high_day'])})보다 {abs(p):.1f}% 낮은 자리다."))
+        elif yr.get("pos_pct", 50) <= 10:
+            cands.append((6, "low", f"1년 저점(${yr['low']:,.2f}, {_md(yr['low_day'])})에 가까운 자리다."))
+    for f in s.get("filings") or []:
+        if f.get("form") == "8-K" and f.get("emphasis") and 0 <= (day - datetime.date.fromisoformat(f["filed"])).days <= 7:
+            item = re.search(r"Item ([\d.]+)", f.get("title", ""))
+            what = ITEM_8K.get(item.group(1), "") if item else ""
+            cands.append((5.5, "filing", f"{_md(f['filed'])}에 " + (f"{what} " if what else "") + "수시 공시(8-K)를 냈다."))
+            break
+    per = {p["label"]: p for p in s.get("periods") or []}.get("1개월")
+    if per and per.get("stock") is not None and per.get("spy") is not None:
+        d = per["stock"] - per["spy"]
+        if abs(d) >= 8:
+            cands.append((3 + min(abs(d), 30) / 10, "month", f"최근 한 달 수익률은 {_sgn(per['stock'])}%로 같은 기간 S&P 500({_sgn(per['spy'])}%)보다 {abs(d):.1f}%p {'높다' if d > 0 else '낮다'}."))
+    r = s.get("ret_1d") or 0
+    pm = [(p, rr) for p, _, rr in s.get("peer_moves") or [] if abs(rr) >= 1]
+    if abs(r) >= 0.5 and len(pm) >= 2:
+        same = [x for x in pm if (x[1] > 0) == (r > 0)]
+        opp = [x for x in pm if (x[1] > 0) != (r > 0)]
+        grp, word = (opp, "반대로 " + ("내렸다" if r > 0 else "올랐다")) if len(opp) > len(same) else (same, "함께 " + ("올랐다" if r > 0 else "내렸다"))
+        top = sorted(grp, key=lambda x: -abs(x[1]))[:3]
+        names = " · ".join(f"{U.peer_name(p)} {_sgn(rr)}%" for p, rr in top)
+        cands.append((6 if grp is opp else 4.5, "peers", f"같은 날 함께 보는 회사 {names}도 {word}." if grp is same else f"같은 날 함께 보는 회사 {names}는 {word}."))
+    if (s.get("vol_ratio") or 0) >= 2:
+        cands.append((4 + min(s["vol_ratio"], 5) / 2, "volume", f"거래량은 20일 평균의 {s['vol_ratio']:.1f}배였다."))
+    closes = [b["close"] for b in BARS.get(s["sym"]) or [] if b.get("close")]
+    k = 0
+    while k + 1 < len(closes) and (closes[-1 - k] > closes[-2 - k]) == (r > 0) and closes[-1 - k] != closes[-2 - k]:
+        k += 1
+    if k >= 4:
+        cands.append((3 + k / 2, "streak", f"{k}거래일 연속 {'올랐다' if r > 0 else '내렸다'}."))
+    if not cands:
+        return "", ""
+    _, kind, text = max(cands, key=lambda c: c[0])
+    return text, kind
 
 
 def range_tip(s):
@@ -135,10 +199,17 @@ def price_card(s, today):
 IMAGE_BRANCH = "radar-images"   # 종목 그래프 전용 브랜치 — 매 실행 그날 그림만 담아 덮어쓴다(이력 없음). 지난 그림은 남지 않는다 (2026-10-20 사용자: 이미지는 휘발성)
 
 
-def chart_url(sym):
+def chart_url(sym, day=""):
     """가격 그래프 주소 — 고정 페이지라 파일 이름도 고정(날짜 없음). 게시 때 radar-images 브랜치에 올리고 jsDelivr 캐시를 비운다.
-    gh-pages(keep_files)에 두면 매일 49장이 커밋 이력에 쌓여 저장소가 커진다 — 그래서 따로 (2026-10-20)."""
-    return f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{chart_ref(sym)}"
+    gh-pages(keep_files)에 두면 매일 49장이 커밋 이력에 쌓여 저장소가 커진다 — 그래서 따로 (2026-10-20).
+    day = 그날 봉 날짜 → `?v=YYYYMMDD`. jsDelivr 가 max-age 7일로 내주므로 퍼지만으로는 독자 브라우저의 지난 그림이 안 바뀐다
+    (2026-11-10 사용자: 브로드컴 그래프 종가 ≠ 본문 종가). 같은 날 갱신 실행은 같은 주소라 본문 해시도 그대로."""
+    return with_ver(f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{chart_ref(sym)}", day)
+
+
+def with_ver(url, day):
+    """고정 이름 그림 주소 + 봉 날짜 버전 (브라우저 캐시 무효화). day 가 없으면 주소 그대로."""
+    return f"{url}?v={day.replace('-', '')}" if day else url
 
 
 def chart_ref(sym):
@@ -149,7 +220,7 @@ def sec_chart(s):
     """가격 그래프 — NVDA 리포트 sec_chart 와 같은 자리 · 모양 (본문 맨 앞 요약 아래, 확대 보기)."""
     if not s.get("chart"):
         return ""
-    url = chart_url(s["sym"])
+    url = chart_url(s["sym"], s.get("day", ""))
     zoom = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'
             '<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14M7 5v4M5 7h4"/></svg>')
     return (f'<a href="{_esc(url)}" data-zoom="1" target="_blank" rel="noopener" title="그래프 확대 보기" aria-label="그래프 확대 보기" '
@@ -281,7 +352,7 @@ def sec_regime(s):
     th, col = R.REGIME_THEME.get(mr["regime"], ("neutral", R.MUTED))
     lines = R.regime_lines(mr)
     if s.get("chart"):
-        lines.insert(1, R.index_chart_line(f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{SPX_REF}", f"images/{SPX_REF}", "S&P 500"))
+        lines.insert(1, R.index_chart_line(with_ver(f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@{IMAGE_BRANCH}/images/{SPX_REF}", s.get("day", "")), f"images/{SPX_REF}", "S&P 500"))
     card = R._state_card("미국 증시 분위기는?", mr["regime"], th, col, lines, "", fold=True)   # 툴팁 없음 — 근거 줄마다 나누는 법이 있다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
