@@ -611,10 +611,14 @@ __BLOGGER_CSS__
   </head>
 
   <body>
-    <b:class cond='data:view.isSingleItem' name='item-view'/>
+    <b:comment>홈 나누기 (H35, 2026-11-10 사용자): 홈(/) = 미국 화면, 고정 페이지 /p/__KR_HOME_SLUG__.html(제목 __KR_HOME_TITLE__) = 한국 화면.
+      두 화면 모두 대시보드를 그리고 body data-home-mkt 로 시장을 알린다 — 카드 거르기 · 국기 스위치는 alphaflow-home.html 의 H35 장치. 한국 화면은 글 보기(item-view)가 아니다</b:comment>
+    <b:class cond='data:view.isSingleItem and !(data:view.isPage and data:view.title == &quot;__KR_HOME_TITLE__&quot;)' name='item-view'/>
     <b:class cond='data:view.isArchive' name='archive-view'/>
     <b:class cond='data:view.isLabelSearch' name='label-view'/>
-    <b:class cond='!data:view.isHomepage' name='no-dashboard'/>
+    <b:class cond='!(data:view.isHomepage or (data:view.isPage and data:view.title == &quot;__KR_HOME_TITLE__&quot;))' name='no-dashboard'/>
+    <b:attr cond='data:view.isHomepage' name='data-home-mkt' value='us'/>
+    <b:attr cond='data:view.isPage and data:view.title == &quot;__KR_HOME_TITLE__&quot;' name='data-home-mkt' value='kr'/>
 
     <!-- =================================================================
          navbar
@@ -636,8 +640,11 @@ __BLOGGER_CSS__
         </b:section>
 
         <nav class='menu-items' id='primary-menu'>
-          <a class='nav-item' expr:href='data:blog.homepageUrl'>
-            <b:attr cond='data:view.isHomepage' name='aria-current' value='page'/>홈</a>
+          <b:comment>메뉴 = 미국 · 한국(data-bar · data-flag → 로고 오른쪽 국기 스위치) · 증시 전망(서랍만) — H35 목업 그대로 (2026-11-10 사용자). 옛 홈 · 미국 증시 리포트 · 시총 TOP 10 메뉴는 뺐다(홈 카드 · 글 아래 함께 보는 페이지로 간다)</b:comment>
+          <a class='nav-item' data-bar='1' data-flag='us' href='/'>
+            <b:attr cond='data:view.isHomepage' name='aria-current' value='page'/>미국</a>
+          <a class='nav-item' data-bar='1' data-flag='kr' href='/p/__KR_HOME_SLUG__.html'>
+            <b:attr cond='data:view.isPage and data:view.title == &quot;__KR_HOME_TITLE__&quot;' name='aria-current' value='page'/>한국</a>
 __NAV_ITEMS__
         </nav>
       </div>
@@ -663,8 +670,8 @@ __NAV_ITEMS__
     <div class='header-bar'></div>
 
     <main class='main-content'>
-      <!-- 대시보드: 홈에서만 -->
-      <b:if cond='data:view.isHomepage and !data:view.isLayoutMode'>
+      <!-- 대시보드: 홈(미국) · 한국 홈에서 (H35) -->
+      <b:if cond='(data:view.isHomepage or (data:view.isPage and data:view.title == &quot;__KR_HOME_TITLE__&quot;)) and !data:view.isLayoutMode'>
 __DASHBOARD__
       </b:if>
 
@@ -676,7 +683,7 @@ __DASHBOARD__
 
         <b:widget id='Blog1' locked='true' title='Blog Posts' type='Blog' visible='true'>
           <b:includable id='main'>
-            <b:if cond='data:view.isSingleItem'>
+            <b:if cond='data:view.isSingleItem and !(data:view.isPage and data:view.title == &quot;__KR_HOME_TITLE__&quot;)'>
               <div class='post-shell'>
                 <b:loop values='data:posts' var='post'>
                   <article class='post-outer-container'>
@@ -700,8 +707,8 @@ __DASHBOARD__
                   <section class='comments' expr:data-post-id='data:post.id' id='comments'><h3 class='comments-title'>댓글</h3></section>
                 </b:loop>
               </div>
-            <b:elseif cond='data:view.isHomepage'/>
-              <b:comment>홈 아래 최근 리포트 링크 영역은 삭제 (2026-10-14 사용자). 홈은 위 대시보드만.</b:comment>
+            <b:elseif cond='data:view.isHomepage or (data:view.isPage and data:view.title == &quot;__KR_HOME_TITLE__&quot;)'/>
+              <b:comment>홈 아래 최근 리포트 링크 영역은 삭제 (2026-10-14 사용자). 홈 · 한국 홈은 위 대시보드만 — 한국 홈 페이지 본문은 그리지 않는다 (H35).</b:comment>
             <b:else/>
               <section class='reports'>
                 <div class='section-head'>
@@ -829,25 +836,17 @@ NVDA_LIST_PATH = "search/label/" + quote(NVDA_LABEL)
 
 
 def nav_items():
-    out = []
-    for name, label in NAV_LABELS:
-        # 주소는 인코딩한다 — "트럼프 트렌드"처럼 띄어쓰기가 있는 라벨 때문. 비교는 원문으로.
-        out.append(
-            "          <a class='nav-item' href='/search/label/{1}'>\n"
-            "            <b:attr cond='data:view.search.label == &quot;{0}&quot;' name='aria-current' value='page'/>{2}</a>".format(label, quote(label), name)
-        )
-    # 시총 TOP 10 목록 고정 페이지 (experiments/stock-radar/universe.LIST_SLUG, 2026-10-18 첫 발행) — 라벨 목록이 아니라 페이지 주소
+    # 서랍 메뉴 = 미국 · 한국(템플릿에 직접) + 증시 전망 (H35, 2026-11-10 사용자). 옛 `미국 증시 리포트`(라벨 목록) · `시총 TOP 10` 메뉴는 뺐다.
     # 주소는 '/' 로 시작 (2026-11-09): 폰 화면(?m=1)에서 homepageUrl 이 `/?m=1` 이라 `/?m=1p/...` 로 붙어 메뉴 · 목록이 모두 홈으로 갔다
-    out.append("          <a class='nav-item' href='/p/{0}.html'>{1}</a>".format(TOP10_SLUG, TOP10_NAME))
-    # 증시 전망 목록 고정 페이지 (experiments/issue_store/publish_forecast.py, 2026-11-09 첫 발행) — 사용자 요청으로 상단 메뉴에
-    out.append("          <a class='nav-item' href='/p/{0}.html'>{1}</a>".format(FORECAST_SLUG, FORECAST_NAME))
-    return "\n".join(out)
+    return "          <a class='nav-item' href='/p/{0}.html'>{1}</a>".format(FORECAST_SLUG, FORECAST_NAME)
 
 
 TOP10_SLUG, TOP10_NAME = "us-market-cap-top10", "시총 TOP 10"
 FORECAST_SLUG, FORECAST_NAME = "forecast-list", "증시 전망"
 
 
+# 한국 홈 고정 페이지 (H35, 2026-11-10 사용자) — 테마는 제목으로 알아본다(Blogger 조건식에서 주소 비교가 불안정). 제목을 바꾸면 페이지 제목도 같이 (experiments/home-split/publish_korea_home.py)
+KR_HOME_SLUG, KR_HOME_TITLE = "korea", "한국 증시 · 종목 주가"
 def blog_includables(backup_path="index.indie-backup.html"):
     """기존 테마의 Blog1 위젯에서 main 이외의 includable 을 그대로 가져온다.
 
@@ -1001,6 +1000,7 @@ def build_theme(parts):
     out = out.replace("__NAV_ITEMS__", nav_items())
     out = out.replace("__SITE_DESC__", html_mod.escape(SITE_DESC, quote=True))
     out = out.replace("__LIST_PATH__", LIST_PATH)
+    out = out.replace("__KR_HOME_SLUG__", KR_HOME_SLUG).replace("__KR_HOME_TITLE__", html_mod.escape(KR_HOME_TITLE, quote=True))
     out = out.replace("__TRUMP_LABEL__", TRUMP_LABEL)
     out = out.replace("__TRUMP_LIST_PATH__", TRUMP_LIST_PATH)
     out = out.replace("__NVDA_LABEL__", NVDA_LABEL)
