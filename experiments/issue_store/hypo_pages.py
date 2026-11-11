@@ -1603,7 +1603,7 @@ def _side_names(fc):
     out = {}
     for sc in (fc or {}).get("scenarios") or []:
         if sc.get("dir") in (1, -1):
-            out[sc["dir"]] = (sc["name"], side_word(sc) or sc.get("cond", ""))   # `반등` · `지속` (2026-11-11 사용자: `쪽` 삭제)
+            out[sc["dir"]] = (sc["name"], side_word(sc) or ("전망A" if _tag_kind(sc) == "up" else "전망B"))   # 사건 전 전망 = 갈래 이름표 `전망A` · `전망B`(조건 문장은 라벨로 길다, 2026-11-11 경우의 수 목업에서 찾음)   # `반등` · `지속` (2026-11-11 사용자: `쪽` 삭제)
     return out
 
 
@@ -1663,6 +1663,10 @@ def day_why_html(x, fc):
     if pick:
         line = (f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{label}{_one_line(dk.esc(pick["t"]), grow=False, color=TL_WHY_INK)}'
                 + (_talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if pick.get("stage") == "talk" else "") + "</span>")
+    elif w.get("open"):   # 갈래 기사 없이 향방미정만 있는 날 — 그 줄 + `향방미정` 라벨 (옛: 빈 `: ›` 줄, 2026-11-11 경우의 수 목업에서 찾음)
+        o = w["open"][0]
+        line = (f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{open_pill().replace("flex:none;", f"flex:none;margin-right:{dk.PILL_GAP}px;", 1)}'
+                f'{_one_line(dk.esc(o["t"]), grow=False, color=TL_WHY_INK)}</span>')
     else:   # 기사 없이 신호만 바뀐 날
         c = (w.get("changes") or [{}])[0]
         txt = f'{c.get("name", "")} : {c["from"]} → {c.get("to", "")}' if c.get("from") else f'{c.get("name", "")} : {c.get("to", "")}'

@@ -8,6 +8,7 @@
 import json
 import math
 import re as _re
+import copy
 import os
 import sys
 from datetime import date, timedelta
@@ -1055,7 +1056,56 @@ def build_list(typical=False):
     return _re.sub(rf"{_re.escape(H.BLOG)}p/LINK-([ABC]\d+)\.html", r"mock_forecast-cases.html#\1", html)
 
 
+# ---------------------------------------------------------------- 표본 근거 (2026-11-11 사용자: 경우의 수 18가지에도 `관련 주식 정보` · 향방미정 · 날마다 근거 줄 · 기사 팝업)
+# 사례 자료에는 근거 재료가 없어 오늘 다듬은 칸이 안 그려진다 → 목업을 만들 때만 사례마다 지어낸 기사 · 신호를 끼운다(발행 코드 · 상태 자료는 그대로).
+_FAKE2 = ["가상 기사 요약 둘째 줄 — 목업 확인용으로 지어낸 문장입니다.", "가상 기사 요약 셋째 줄 — 실제 화면은 뉴스 요약 줄이 들어갑니다."]
+_SRC = ["Reuters", "Bloomberg", "CNBC", "WSJ", "FT", "Axios", "MarketWatch"]
+
+
+def _fake_row(t, day, i, stage="done"):
+    src = _SRC[i % len(_SRC)]
+    return {"t": t, "day": day, "src": src, "stage": stage, "lv": 3, "lines": [t] + _FAKE2, "url": f"https://example.com/{day}/{i}"}
+
+
+def _fake_reasons(fc):
+    s = fc.get("subject", "시장")
+    day = (fc.get("registered") or "2026-12-01")
+    good = [_fake_row(f"{s}, 기관 매수 확대 보도", day, 0), _fake_row(f"{s} 관련 수요 회복 기대", day, 1),
+            {"t": "애널리스트 목표가 올림 2곳", "day": day, "src": "", "stage": "done", "lv": 3}]
+    bad = [_fake_row(f"{s}, 규제 강화 검토", day, 2, "talk"), _fake_row(f"{s} 비용 부담 커진다는 지적", day, 3)]
+    opn = [_fake_row(f"{fc.get('event') or s} 관련 정책 결정 일정 논의", day, 4)]
+    sig = {"as_of": day, "rows": [{"key": "tech", "name": "기술지표 방향", "state": "하락", "dir": -1, "hz": "단기"},
+                                  {"key": "regime", "name": "미국 증시 분위기", "state": "상승 추세", "dir": 1, "hz": "단기"},
+                                  {"key": "momentum", "name": "12개월 모멘텀", "state": "상위권", "dir": 1, "hz": "중기"},
+                                  {"key": "ma", "name": "평균선 대비", "state": "평균 아래", "dir": -1, "hz": "중기"}]}
+    return {"good": good, "bad": bad, "open": opn, "count": {"good": len(good), "bad": len(bad), "open": len(opn)}, "our_signals": sig}
+
+
+def _fake_day(x, s, i):
+    day = x.get("day") or ""
+    g = [_fake_row(f"{s} 관련 신규 수주 소식", day, i)] if i % 2 == 0 else []
+    b = [_fake_row(f"{s} 관련 매도 의견 나와", day, i + 1)] if i % 3 != 2 else []
+    o = [_fake_row("관련 법안 표결 일정 논의", day, i + 2, "talk")] if i % 4 == 1 else []
+    ch = [{"hz": "단기", "name": "기술지표 방향", "from": "중립", "to": "하락"}] if i % 5 == 3 else []
+    return {"good": g, "bad": b, "open": o, "changes": ch, "count": {"good": len(g), "bad": len(b), "open": len(o)}}
+
+
+def with_fake_reasons(body_fn):
+    """H.forecast_body 를 감싸 — 근거가 없는 사례에 표본 근거 · 날마다 근거를 끼운다(이미 있으면 그대로)."""
+    def wrap(reg, st=None, fc=None, *a, **kw):
+        if fc is not None and "reasons" not in fc:
+            fc = copy.deepcopy(fc)
+            fc["reasons"] = _fake_reasons(fc)
+        if st and st.get("log"):
+            st = dict(st)
+            st["log"] = [x if x.get("key") == "start" or x.get("why") else dict(x, why=_fake_day(x, (fc or {}).get("subject", ""), i))
+                         for i, x in enumerate(st["log"])]
+        return body_fn(reg, st, fc, *a, **kw)
+    return wrap
+
+
 if __name__ == "__main__":
+    H.forecast_body = with_fake_reasons(H.forecast_body)   # 목업에만 — 발행(publish_forecast)은 이 파일을 쓰지 않는다
     out = os.path.join(_HERE, "output", "mock_forecast-cases.html")
     html = build().replace(f"{H.BLOG}p/", "mock_")
     print(dk.write_mock(html, out, H.CARD_NAME))   # 머리 줄 = `증시 전망` (P454)
