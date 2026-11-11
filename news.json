@@ -1,25 +1,59 @@
 {
-  "updated_at": "2026-11-11 12:46:47 UTC",
+  "updated_at": "2026-11-11 19:51:58 UTC",
   "items": [
     {
-      "title": "Rep. Jim Jordan, Sen. John Thune elected GOP leaders in Congress",
+      "title": "Prediction markets tied to clinical trials and drug approvals draw lawmakers' ire",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/jim-jordan-congress-republicans-midterm.html",
-      "published": "2026-11-11 12:42:09",
-      "title_ko": "짐 조던, 하원 공화당 원내대표로 선출",
-      "summary_ko": "마이크 존슨 하원의장, 선거 다음 날 120대 의회 소수당 원내대표 불출마 발표",
+      "link": "https://www.cnbc.com/2026/11/11/kalsi-polymarket-prediction-market-senators-hhs-drug-approval.html",
+      "published": "2026-11-11 19:16:23",
+      "title_ko": "임상시험 및 약물 승인 연계 예측 시장, 의회의 반발 직면",
+      "summary_ko": "앤젤라 알소브룩스 상원의원과 론 와이든 상원의원, 보건복지부가 시장 리스크 완화를 위해 취한 조치 질의",
       "lines": [
-        "공화당 하원의원들의 비공개 투표",
-        "오하이오주 짐 조던 하원 법사위원장의 공화당 원내대표 선출",
-        "106대 73의 득표 결과",
-        "스티브 스칼리스 하원 원내대표를 상대로 한 승리"
+        "안젤라 알소브룩스와 론 와이든 의원의 보건복지부 장관 서한 발송",
+        "임상시험 및 식품의약국 승인 관련 예측 시장 계약에 대한 우려 제기"
+      ]
+    },
+    {
+      "title": "Meta head of infrastructure will leave and be succeeded by former AWS cloud exec",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/meta-infrastructure-departure-aws-cloud.html",
+      "published": "2026-11-11 18:57:38",
+      "title_ko": "메타 인프라 책임자 사임, 전 AWS 클라우드 임원이 후임으로",
+      "summary_ko": "메타 인프라 책임자 겸 엔지니어링 공동 책임자 산토시 자나르단 2027년 퇴사 예정이며 전 AWS 수석 부사장 데이비드 브라운이 후임으로 취임",
+      "lines": [
+        "메타의 인프라 책임자 산토쉬 자나르단 2027년 퇴사 예정",
+        "전 아마존웹서비스 임원 데이비드 브라운의 인프라 책임자 승계"
+      ]
+    },
+    {
+      "title": "How Democrats could snarl Trump administration stakes in private sector companies",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/trump-company-equity-takes.html",
+      "published": "2026-11-11 18:55:39",
+      "title_ko": "민주당이 트럼프 행정부의 민간 기업 지분 참여를 방해하는 방법",
+      "summary_ko": "CATO 연구소 집계에 따르면 트럼프 행정부가 11월 기준 41개 기업에서 지분 포지션 구축",
+      "lines": [
+        "11월 기준 트럼프 행정부 민간 기업 41곳 지분 보유",
+        "민주당의 트럼프 정부 연계 기업 조사 대상에 인텔 포함"
+      ]
+    },
+    {
+      "title": "Apple's record run ignites options flurry — Watch Options Action live",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/apples-record-run-ignites-options-flurry-watch-options-action-live.html",
+      "published": "2026-11-11 18:53:03",
+      "title_ko": "애플의 기록적인 상승세가 옵션 거래 열풍 촉발",
+      "summary_ko": "기술주의 피난처를 찾는 옵션 거래자들의 이목 집중",
+      "lines": [
+        "애플 2026년 랠리 30% 상승 및 사상 최고가 기록",
+        "수요일 전반 거래 시간 동안 애플 옵션 약 약 90만 건 거래"
       ]
     },
     {
       "title": "General strikes to paralyze Spain as protestors clash with police ahead of election campaign",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/11/spain-protests-general-strikes-election.html",
-      "published": "2026-11-11 12:39:20",
+      "published": "2026-11-11 18:02:32",
       "title_ko": "총파업으로 스페인 마비 조짐, 선거 운동 앞두고 시위대와 경찰 충돌",
       "summary_ko": "스페인 노동자 수백만 명이 14년 만에 첫 총파업에 참여할 예정",
       "lines": [
@@ -28,90 +62,28 @@
       ]
     },
     {
-      "title": "Mortgage rates jump sharply higher, after easing for four straight weeks. Here's why",
+      "title": "Nvidia shares rebound as Jensen Huang faces scrutiny ahead of earnings",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/mortgage-rates-jump-sharply-higher-after-easing-for-4-straight-weeks.html",
-      "published": "2026-11-11 12:38:32",
-      "title_ko": "4주 연속 하락 후 급등한 모기지 금리, 그 이유는",
-      "summary_ko": "",
+      "link": "https://www.cnbc.com/2026/11/11/nvidia-stock-jensen-huang-affair-china.html",
+      "published": "2026-11-11 17:39:26",
+      "title_ko": "실적 발표 앞두고 젠슨 황 스캔들 조사 직면 속 엔비디아 주가 5% 반등",
+      "summary_ko": "투자자들이 젠슨 황 CEO의 스캔들이 엔비디아 사업에 미칠 파급 효과 평가 중",
       "lines": [
-        "30년 고정 주택담보대출 평균 금리 7.30%로 상승",
-        "주택담보대출 금리 하루 동안 12베이시스포인트 상승"
+        "최고경영자 스캔들 여파로 화요일 엔비디아 주가 5.47% 하락",
+        "엔비디아 기밀 유출 여부 조사를 위해 웩텔 로펌 고용",
+        "엔비디아 분기 실적 발표 11월 17일 예정"
       ]
     },
     {
-      "title": "Consumers are showing signs of strain even as they keep spending, CNBC/NRF Retail Monitor shows",
+      "title": "CoreWeave soars 26% as CEO reaffirms AI compute demand after strong Q3 report",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/october-retail-sales-cnbc-nrf-2026.html",
-      "published": "2026-11-11 12:27:47",
-      "title_ko": "소비 지출은 유지되지만 압박 징후도 나타나고 있다고 밝힌 CNBC·NRF 소매 모니터",
-      "summary_ko": "미국 소비자들이 고물가로 인한 압박을 받으면서 10월 소매 판매가 거의 1년 만에 가장 느린 속도로 증가",
+      "link": "https://www.cnbc.com/2026/11/11/coreweave-crwv-outlook-earnings-ai.html",
+      "published": "2026-11-11 17:38:34",
+      "title_ko": "코어위브, 강력한 3분기 실적 발표 후 CEO의 AI 연산 수요 재확인에 26% 급등",
+      "summary_ko": "코어위브, 네비우스, 아이렌 등 네오클라우드 업체들 AI 거래 지속 가능성 관련 심사 직면",
       "lines": [
-        "10월 미국 소매 판매 5,617억 달러 기록",
-        "10월 총 소매 지출 전월 대비 0.2% 증가",
-        "10월 핵심 소매 지출 4,542억 달러 기록"
-      ]
-    },
-    {
-      "title": "Zelenskyy warns Ukraine is 'not real estate' as experts say a Russia peace deal remains elusive",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/ukraine-russia-peace-talks-zelenskyy-putin.html",
-      "published": "2026-11-11 12:12:48",
-      "title_ko": "러시아 평화 협상 난항 속 우크라이나는 부동산이 아니라고 경고한 젤렌스키",
-      "summary_ko": "미국 중재의 평화 회담 이틀째이자 마지막 날이 진행되는 가운데 젤렌스키 대통령이 우크라이나는 부동산이 아니라고 경고",
-      "lines": [
-        "아부다비에서 우크라이나와 러시아 대표단의 평화 협상 진행",
-        "미국 특사 스티브 위트코프와 재러드 쿠슈너가 우크라이나 평화 협상 중재"
-      ]
-    },
-    {
-      "title": "Hundreds of schools in Italy, UK evacuated over 'hoax' bomb threats",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/hoax-bomb-threats-schools-italy-uk.html",
-      "published": "2026-11-11 12:03:28",
-      "title_ko": "거짓 폭탄 위협으로 이탈리아와 영국의 수백 개 학교 대피",
-      "summary_ko": "하이브리드 위협에 대한 우려가 커진 가운데 경찰 당국에 따르면 수백 개 학교가 수요일 폭탄 위협을 받고 대피",
-      "lines": [
-        "이탈리아와 영국 등 유럽 수백 개 학교 폭탄 협박으로 대피",
-        "이탈리아 교육부 장관 주세페 발디타라가 이메일 협박은 허위로 추정된다고 발표",
-        "300곳 이상의 학교가 오전 10시 이전 폭탄 협박 이메일 수신"
-      ]
-    },
-    {
-      "title": "Bessent reportedly moved to military base over Iranian threats on his life",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/us-iran-war-trump-hormuz-bessent-threats.html",
-      "published": "2026-11-11 12:02:36",
-      "title_ko": "이란의 생명 위협에 따라 군 기지로 이동한 베스컨트",
-      "summary_ko": "법무부가 화요일 늦게 테러 관련 혐의로 이란 국적자 3명을 기소했다고 밝힌 가운데 이동 조치 단행",
-      "lines": [
-        "미국 재무장관 스콧 베센트가 이란의 살해 위협으로 군사 기지로 이동",
-        "미국 법무부가 이란 국적자 3명을 테러 관련 혐의로 기소"
-      ]
-    },
-    {
-      "title": "Measles is surging in the U.S. — and outbreaks can cost millions",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/measles-outbreak-us-economic-cost.html",
-      "published": "2026-11-11 12:00:01",
-      "title_ko": "미국 내 급증하는 홍역, 수백만 달러의 비용 발생 가능",
-      "summary_ko": "존스 홉킨스 연구진이 개발한 새로운 도구에 따르면 2025년 미국 홍역 확산의 경제적 비용이 3,700만 달러 상회",
-      "lines": [
-        "2025년 미국 홍역 확산 경제적 비용 3700만 달러 상회",
-        "2026년 11월 초 기준 전국 홍역 환자 5100명 초과",
-        "2026년 홍역 관련 사망자 펜실베이니아 등 8명 확인"
-      ]
-    },
-    {
-      "title": "How Democrats could snarl Trump administration stakes in private-sector companies",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/trump-company-equity-takes.html",
-      "published": "2026-11-11 11:00:01",
-      "title_ko": "민주당이 트럼프 행정부의 민간 기업 지분 참여를 방해하는 방법",
-      "summary_ko": "CATO 연구소 집계에 따르면 트럼프 행정부가 11월 기준 41개 기업에서 지분 포지션 구축",
-      "lines": [
-        "11월 기준 트럼프 행정부 민간 기업 41곳 지분 보유",
-        "민주당의 트럼프 정부 연계 기업 조사 대상에 인텔 포함"
+        "코어위브 수요일 주가 26% 급등",
+        "코어위브 3분기 호실적 발표 및 연간 가이던스 상향"
       ]
     },
     {
@@ -124,7 +96,7 @@
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "negative",
-      "n_channels": 4,
+      "n_channels": 2,
       "lines": [
         "진행자 발언 : 10월 헤드라인 CPI 전월 대비 0.4% 증가로 예상치 상회",
         "진행자 발언 : 근원 CPI 0.3% 기록하며 서비스 및 식품 물가 상승 확인",
@@ -133,40 +105,38 @@
       ]
     },
     {
-      "title": "AI 인프라 투자 지속 가능성 및 성장 둔화",
-      "title_ko": "AI 인프라 투자 지속 가능성 및 성장 둔화",
-      "summary_ko": "AI 관련 기업들의 성장세가 둔화하고 있으며, 인프라 장비 상각 등 경고 신호가 나타나고 있어 주의가 필요하",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=QIdXVK2GsqQ",
-      "published": "2026-11-10 22:00:01",
+      "title": "엔트로픽 IPO 추진 및 클로드 오피스 출시",
+      "title_ko": "엔트로픽 IPO 추진 및 클로드 오피스 출시",
+      "summary_ko": "엔트로픽이 1조 달러에 육박하는 시총으로 IPO를 추진하는 동시에 오피스 자동화 도구를 공개하면서 기존 소프트웨어 기업들의 시장 잠식 우려가 제기되었습니",
+      "source": "증시각도기",
+      "link": "https://www.youtube.com/watch?v=DgGf6V9iERU",
+      "published": "2026-11-10 23:30:13",
       "kind": "media",
       "tag": "AI 투자 · 반도체 수요",
-      "direction": "neutral",
-      "n_channels": 3,
+      "direction": "negative",
+      "n_channels": 1,
       "lines": [
-        "댄 나일스 발언 : 앤트로픽의 분기별 매출 성장률이 145%에서 45% 그리고 25%로 둔화",
-        "댄 나일스 발언 : 소프트뱅크의 오하이오 전력 시설 장비 관련 37억 달러 자산 상각 단행",
-        "댄 나일스 발언 : 반도체 기업들의 장기 공급 계약은 침체기 도래 시 무용지물로 전락 우려",
-        "댄 나일스 발언 : 현재의 AI 열풍이 2000년 3월 닷컴 버블 정점과 유사할 가능성 제기"
+        "진행자 발언 : 엔트로픽 공모가 중간값 기준 시가총액 9,684억 달러 전망",
+        "진행자 발언 : 알파벳과 엔비디아 등 주요 빅테크 기업들의 사모 발행 참여",
+        "진행자 발언 : 엔트로픽의 클로드 오피스 출시로 마이크로소프트 주가 하락",
+        "진행자 발언 : 엔트로픽의 막대한 캐펙스 투자 규모 대비 매출 성장 추이 주목"
       ]
     },
     {
-      "title": "10월 인플레이션 상승 및 연준 12월 금리 인상 전망",
-      "title_ko": "10월 인플레이션 상승 및 연준 12월 금리 인상 전망",
-      "summary_ko": "10월 소비자물가가 예상보다 높게 상승하며 연준의 12월 금리 인상 가능성을 상향",
-      "source": "폭스",
-      "link": "https://www.youtube.com/watch?v=qsAKC-gyrN4",
-      "published": "2026-11-10 16:45:25",
+      "title": "빅테크 CEO와 트럼프 행정부의 유착 의혹",
+      "title_ko": "빅테크 CEO와 트럼프 행정부의 유착 의혹",
+      "summary_ko": "트럼프 행정부와 빅테크 CEO들의 친밀한 접근과 안보 프로토콜 준수 여부가 도마 위에 상승",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=lOertlcg5OA",
+      "published": "2026-11-10 22:11:35",
       "kind": "media",
-      "tag": "물가",
-      "direction": "negative",
-      "n_channels": 3,
+      "tag": "재정 · 정치",
+      "direction": "neutral",
+      "n_channels": 1,
       "lines": [
-        "에드워드 로렌스 보도 : 10월 물가 전월비 0.4% 상승",
-        "에드워드 로렌스 발언 : 에너지 가격 상승이 전체 인플레이션을 자극",
-        "에드워드 로렌스 발언 : 12월 9일 연준 금리 인상 가능성 제기",
-        "케빈 하셋 발언 : 최근 3개월간 물가 상승세 가속화",
-        "케빈 하셋 발언 : 에너지 가격과 휘발유 가격의 급등이 데이터에 반영"
+        "데이브 리 발언 : 젠슨 황과 트럼프 대통령의 밀접한 정책 자문 관계",
+        "뉴욕타임스 보도 : 알래스카 에어포스원 회동과 마코 루비오의 사전 경고",
+        "데이브 리 발언 : 안보 리스크보다 정치적 측근 관계를 우선시한 정황"
       ]
     }
   ]

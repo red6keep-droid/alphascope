@@ -915,5 +915,206 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-11T12:46:47.287859+00:00",
   "n_src": 900
+ },
+ "4adcecd39d3e": {
+  "lines": [
+   "연방준비제도와 금융기관들의 인공지능 인프라 구축 모니터링"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "AI_CAPEX",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T19:51:51.632292+00:00",
+  "n_src": 900
+ },
+ "9eaff884d4a0": {
+  "lines": [
+   "안젤라 알소브룩스와 론 와이든 의원의 보건복지부 장관 서한 발송",
+   "임상시험 및 식품의약국 승인 관련 예측 시장 계약에 대한 우려 제기"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T19:51:51.632292+00:00",
+  "n_src": 900
+ },
+ "592e66788189": {
+  "lines": [
+   "메타의 인프라 책임자 산토쉬 자나르단 2027년 퇴사 예정",
+   "전 아마존웹서비스 임원 데이비드 브라운의 인프라 책임자 승계"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "META"
+    ],
+    "sector": "XLC",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "META"
+    ],
+    "sector": "XLC",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T19:51:51.632292+00:00",
+  "n_src": 900
+ },
+ "da9e419ec94a": {
+  "lines": [
+   "애플 2026년 랠리 30% 상승 및 사상 최고가 기록",
+   "수요일 전반 거래 시간 동안 애플 옵션 약 약 90만 건 거래"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "AAPL"
+    ],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "AAPL"
+    ],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T19:51:55.706426+00:00",
+  "n_src": 900
+ },
+ "c3d57e6b25d1": {
+  "lines": [
+   "윈 리조트 연초 이후 주가 27% 이상 하락"
+  ],
+  "tags": [
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T19:51:55.706426+00:00",
+  "n_src": 900
+ },
+ "16dadfebd335": {
+  "lines": [
+   "코어위브 수요일 주가 26% 급등",
+   "코어위브 3분기 호실적 발표 및 연간 가이던스 상향"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T19:51:55.706426+00:00",
+  "n_src": 900
+ },
+ "8ed0c79ac0a1": {
+  "lines": [
+   "아메리칸항공의 뉴욕-시카고 노선 퍼스트클래스 신선식품 재도입"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T19:51:58.148724+00:00",
+  "n_src": 900
+ },
+ "65274679228c": {
+  "lines": [
+   "미 상품선물거래위원회의 칼시 이벤트 계약 자체 인증 조사 착수"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T19:51:58.148724+00:00",
+  "n_src": 900
+ },
+ "b61c3675cf53": {
+  "lines": [
+   "젯블루항공의 국내선 퍼스트클래스 좌석 공개 및 신규 서비스 도입"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T19:51:58.148724+00:00",
+  "n_src": 900
  }
 }
