@@ -304,9 +304,7 @@ def today_line(info):
     c = info.get("curve")
     if c is not None and c < 0:
         out.append("장단기 금리는 거꾸로입니다.")
-    if info.get("news"):
-        name, tone = info["news"]
-        out.append(f"뉴스는 ‘{name}’ 이야기가 가장 많았습니다." + (f" {tone.rstrip('.')}." if tone else ""))
+    # 뉴스 1위 묶음 문장은 뺐다 — 같은 날 `관련 주식 정보` 근거 줄 · 그날 팝업과 겹친다 (2026-11-11 사용자). 시장 지표(발표 · 금리 · 신용 · 장단기)만
     return " ".join(out)
 
 
@@ -892,7 +890,7 @@ def timeline_lead(fc, log):
 def timeline_title():
     """타임라인 구획 제목 `Timeline`(영어) — `향방미정` 줄 위, 위 여백 +30 (P484 · P485, 2026-11-11 사용자). 구획 제목 글씨(dk.h2), 밑줄 없음."""
     h = (dk.h2("Timeline", line=False).replace(f"font-size:{dk.H2_SIZE};", f"font-size:{TL_TITLE_FS}px;", 1).replace("align-items:baseline;", "align-items:center;", 1)
-         .replace(">Timeline", f'><span style="display:inline-flex;color:{dk.SUB};margin-right:-4px;">{CLOCK.replace('width="16" height="16"', f'width="{TL_TITLE_ICON}" height="{TL_TITLE_ICON}"', 1)}</span>Timeline', 1))   # 제목 앞 시계 (2026-11-11 사용자 — 옛 오늘 줄 마디)
+         .replace(">Timeline", '><span style="display:inline-flex;color:' + dk.SUB + ';margin-right:-4px;">' + CLOCK.replace('width="16" height="16"', f'width="{TL_TITLE_ICON}" height="{TL_TITLE_ICON}"', 1) + '</span>Timeline', 1))   # 3.10 호환 — f-string 안 따옴표 겹침 금지   # 제목 앞 시계 (2026-11-11 사용자 — 옛 오늘 줄 마디)
     return f'<div data-tl-title="1" style="padding-top:{TL_TITLE_GAP}px;">{h}</div>'
 
 
@@ -1411,7 +1409,7 @@ def _day_text(e):
           f'겹친 사건 : <b style="color:{dk.VIOLET};">{dk.esc(_re.sub(r"(?<! )[(]", " (", o["event"]))}</b>'   # 사건 이름만 보라 굵게 (2026-11-08 사용자: 겹침은 중요하니 겹친 사건만 보라)
           + (" · 세부 전망으로 따로 적었습니다" if o.get("slug") else "") + '</span>') if o else ""   # P468 — 셋째 겹침부터는 따로 안 적으니(SUB_MAX) 꼬리 말 없음
     return (f'<span style="display:block;margin-top:2px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#333;word-break:keep-all;">{num_html(wordify(e["text"]))}</span>'
-            + ov + (f'<span style="display:block;margin-top:4px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">오늘 나온 것 : {dk.esc(wordify(e["today"]))}</span>' if e.get("today") else ""))
+            + ov + (f'<span style="display:block;margin-top:4px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">오늘 시장 : {dk.esc(wordify(e["today"]))}</span>' if e.get("today") else ""))
 
 
 PAST_SHOWN = 5   # 지난 날 줄은 최근 5개까지 바로, 그 앞은 `지난 경과 n개 더 보기` 안에
