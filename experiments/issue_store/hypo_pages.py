@@ -775,7 +775,7 @@ def side_why(fc, sc, border):
     return f'<div data-why="1" style="margin:12px 0 4px;padding-top:10px;border-top:1px solid {border};">{_why_head("근거", total, pid)}{body}{pop}</div>'
 
 
-OPEN_TITLE = "향방 미정"   # 옛 `방향이 아직 안 정해진 일` 카드 (2026-11-11 사용자: 문장을 줄여 새 제목, 카드 없이 타임라인 위 한 줄)
+OPEN_TITLE = "향방미정"   # 붙여 쓰기 · 회색 라벨 (2026-11-11 사용자)   # 옛 `방향이 아직 안 정해진 일` 카드 (2026-11-11 사용자: 문장을 줄여 새 제목, 카드 없이 타임라인 위 한 줄)
 
 
 def open_line(fc, log):
@@ -796,7 +796,7 @@ def open_line(fc, log):
     chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
     talk = _talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if top.get("stage") == "talk" else ""
     return (f'<div data-why-open="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:0 {dk.ALIGN_PX}px;cursor:pointer;">'
-            f'<span style="flex:none;font-size:14px;line-height:20px;font-weight:700;color:#111;">{OPEN_TITLE}</span>'
+            + dk.pill(OPEN_TITLE, "neutral", bare=True).replace("vertical-align:middle;", "vertical-align:middle;flex:none;", 1)
             + (f'<span style="flex:none;font-size:13px;line-height:19px;color:{dk.SUB};">{md(top["day"])}</span>' if top.get("day") else "")
             + f'<span style="display:flex;align-items:center;gap:4px;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(top["t"]), grow=False)}{talk}{chev}</span>{body}</div>')
 
