@@ -13,7 +13,8 @@ import sys
 import config
 
 sys.path.insert(0, os.path.join(config.BASE_DIR, ".."))
-import fact_check  # noqa: E402
+import fact_check
+import hedge_check  # noqa: E402
 from llm_chain import LLMPool, usage_line  # noqa: E402
 
 HEAD_MAX = 48
@@ -122,6 +123,13 @@ def _validate(v, src, min_ratio=0.7):
         probs = fact_check.check([h, d], by_id[it["id"]])
         if probs:
             why.append(f"숫자 {probs[0]}")
+        if not probs:   # 원문이 어림 · 예상으로 말한 숫자 = `약` · `(예상)` (2026-11-12 사용자 — 추정이 사실처럼 읽히던 것, hedge_check)
+            src_txt = hedge_check.hedge_text(by_id[it["id"]])
+            h2, hw1 = hedge_check.hedge(h, src_txt)
+            d2, hw2 = hedge_check.hedge(d, src_txt)
+            if hw1 or hw2:
+                print(f"[narrate] 말투 바로잡음 {it['id']}: {', '.join(hw1 + hw2)}")
+            h, d = (h2 if len(h2) <= HEAD_MAX + 5 else h), d2
         if why:
             bad.append((it["id"], why))
             continue

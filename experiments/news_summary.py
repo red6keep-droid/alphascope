@@ -22,6 +22,7 @@ import sys
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
 import article_lead  # noqa: E402
+import hedge_check  # noqa: E402  — 원문의 `대략 · 예상` 이 빠진 줄 바로잡기 (2026-11-12 사용자)
 import news_store  # noqa: E402
 
 BATCH = 3          # Qwen 분당 출력 1,000토큰 — 기사당 다섯 줄 + 줄 태그 ≈ 290토큰 (11-11 태그 추가로 4 → 3, 4건이면 약 1,160 으로 넘친다)
@@ -110,6 +111,9 @@ def _price_only(ln):
     return bool(PRICE_LINE.search(ln) or PCT_MOVE.search(ln)) and not ACTION_LINE.search(ln)
 
 
+HEDGED = []   # 이번 실행에서 말투를 바로잡은 줄 — summarize 가 세어 출력 · 캐시에 남긴다
+
+
 def _check(lines, src):
     """줄 검사 — 문장체 · 영어 · 재료에 없는 숫자 · 너무 긴 줄은 뺀다. → (남은 줄, 줄 태그). 줄은 옛 형식(문자열)도 받는다."""
     out, tags = [], []
@@ -118,6 +122,9 @@ def _check(lines, src):
         ln = str(ln or "").replace("—", ", ").strip().rstrip(".")
         if not ln or len(ln) > MAX_LINE_CHARS or news_store.detail_style_bad(ln) or news_store._num_problem(ln, src):
             continue
+        ln, hw = hedge_check.hedge(ln, src)   # 원문이 어림 · 예상으로 말한 숫자 = `약` · `(예상)` (2026-11-12 사용자: 추정이 사실처럼 읽히던 것)
+        if hw:
+            HEDGED.append((ln, hw))
         if ln not in out:
             out.append(ln)
             t = _tag(r)
@@ -182,5 +189,7 @@ def summarize(items, cache_path, lead_cache=None, label="summary", max_items=Non
         if cache_path:
             _save(cache_path, cache)
         print(f"[summary] {min(i + BATCH, len(need))}/{len(need)} ({pool.last_model})", flush=True)
-    print(f"[summary] 요약 {ok}/{len(need)} · {usage_line()}")
+    print(f"[summary] 요약 {ok}/{len(need)} · {usage_line()}" + (f" · 말투 바로잡음 {len(HEDGED)}줄" if HEDGED else ""))
+    for ln, hw in HEDGED[:5]:
+        print(f"[summary]   {'·'.join(hw)} : {ln}")
     return out
