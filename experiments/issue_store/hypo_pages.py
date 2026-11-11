@@ -1486,14 +1486,16 @@ def day_why_html(x, fc):
             pop += "".join(_pop_li(f'{c["name"]} : {c["from"]} → {c["to"]}' if c.get("from") else f'{c["name"]} : {c["to"]}') for c in cs)
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(md(x["day"]) + " 근거")}" hidden>{pop}</div>'
     if pick:
-        line = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;">{label}{_one_line(dk.esc(pick["t"]), grow=False)}'
+        line = (f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{label}{_one_line(dk.esc(pick["t"]), grow=False)}'
                 + (_talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if pick.get("stage") == "talk" else "") + "</span>")
     else:   # 기사 없이 신호만 바뀐 날
         c = (w.get("changes") or [{}])[0]
         txt = f'{c.get("name", "")} : {c["from"]} → {c.get("to", "")}' if c.get("from") else f'{c.get("name", "")} : {c.get("to", "")}'
-        line = f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;">{_one_line(dk.esc(txt), grow=False)}</span>'
-    return (f'<div data-why-day="1" style="display:flex;align-items:center;gap:8px;margin:-4px 0 {12 - dk.VP}px;">{line}'
-            f'<span style="flex:none;display:flex;align-items:center;gap:6px;"><span style="font-size:13px;line-height:19px;color:{dk.SUB};white-space:nowrap;">근거 {total}건</span>{_why_more(pid)}</span>{body}</div>')
+        line = f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(txt), grow=False)}</span>'
+    # 줄 전체 = 팝업 버튼, 끝에 › 만 (2026-11-11 사용자: `근거 n건` · 더보기 버튼 삭제, 문장을 누르면 팝업)
+    chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
+    return (f'<div data-why-day="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:4px;margin:-4px 0 {12 - dk.VP}px;cursor:pointer;">'
+            f'{line}{chev}{body}</div>')
 
 
 def why_note_html(fc):
