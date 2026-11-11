@@ -582,5 +582,338 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-11T01:29:07.327520+00:00",
   "n_src": 900
+ },
+ "adb2bc10a1bb": {
+  "lines": [
+   "스페인에서 14년 만의 첫 총파업 예정",
+   "지난 10년간 스페인 임대료 두 배 상승"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLRE",
+    "issue": "REAL_ESTATE",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:33.931212+00:00",
+  "n_src": 900
+ },
+ "3e7e1f0436d0": {
+  "lines": [
+   "30년 고정 주택담보대출 평균 금리 7.30%로 상승",
+   "주택담보대출 금리 하루 동안 12베이시스포인트 상승"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:33.931212+00:00",
+  "n_src": 900
+ },
+ "b5bf9a9ab7fd": {
+  "lines": [
+   "10월 미국 소매 판매 5,617억 달러 기록",
+   "10월 총 소매 지출 전월 대비 0.2% 증가",
+   "10월 핵심 소매 지출 4,542억 달러 기록"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "GROWTH_JOBS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "GROWTH_JOBS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "GROWTH_JOBS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:33.931212+00:00",
+  "n_src": 900
+ },
+ "4f95e313b717": {
+  "lines": [
+   "아부다비에서 우크라이나와 러시아 대표단의 평화 협상 진행",
+   "미국 특사 스티브 위트코프와 재러드 쿠슈너가 우크라이나 평화 협상 중재"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:35.390385+00:00",
+  "n_src": 900
+ },
+ "2f7a247f9262": {
+  "lines": [
+   "이탈리아와 영국 등 유럽 수백 개 학교 폭탄 협박으로 대피",
+   "이탈리아 교육부 장관 주세페 발디타라가 이메일 협박은 허위로 추정된다고 발표",
+   "300곳 이상의 학교가 오전 10시 이전 폭탄 협박 이메일 수신"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:35.390385+00:00",
+  "n_src": 900
+ },
+ "eb87dafad822": {
+  "lines": [
+   "미국 재무장관 스콧 베센트가 이란의 살해 위협으로 군사 기지로 이동",
+   "미국 법무부가 이란 국적자 3명을 테러 관련 혐의로 기소"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:35.390385+00:00",
+  "n_src": 900
+ },
+ "fafd0716dc85": {
+  "lines": [
+   "2025년 미국 홍역 확산 경제적 비용 3700만 달러 상회",
+   "2026년 11월 초 기준 전국 홍역 환자 5100명 초과",
+   "2026년 홍역 관련 사망자 펜실베이니아 등 8명 확인"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:41.376726+00:00",
+  "n_src": 900
+ },
+ "2dedcfedf592": {
+  "lines": [
+   "11월 기준 트럼프 행정부 민간 기업 41곳 지분 보유",
+   "민주당의 트럼프 정부 연계 기업 조사 대상에 인텔 포함"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "INTC"
+    ],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:41.376726+00:00",
+  "n_src": 900
+ },
+ "7befb3377f15": {
+  "lines": [
+   "최고경영자 스캔들 여파로 화요일 엔비디아 주가 5.47% 하락",
+   "엔비디아 기밀 유출 여부 조사를 위해 웩텔 로펌 고용",
+   "엔비디아 분기 실적 발표 11월 17일 예정"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "EARNINGS",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:41.376726+00:00",
+  "n_src": 900
+ },
+ "4482bc3c74e5": {
+  "lines": [
+   "닛산, 연간 판매 전망 두 번째 하향",
+   "중국 개발 차량 수출 확대 계획 발표"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "EARNINGS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:47.287859+00:00",
+  "n_src": 900
+ },
+ "230c6116294d": {
+  "lines": [
+   "미국 육군 상급 군인 영국서 러시아 간첩 혐의 체포"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T12:46:47.287859+00:00",
+  "n_src": 900
  }
 }

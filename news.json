@@ -1,32 +1,117 @@
 {
-  "updated_at": "2026-11-11 01:29:08 UTC",
+  "updated_at": "2026-11-11 12:46:47 UTC",
   "items": [
     {
-      "title": "Hegseth impeachment effort torpedoed in House",
+      "title": "Rep. Jim Jordan, Sen. John Thune elected GOP leaders in Congress",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/pete-hegseth-impeachment-massie-iran.html",
-      "published": "2026-11-10 23:46:41",
-      "title_ko": "피트 헤그세스, 탄핵 추진 비난 및 이란 전쟁 대응 방어",
-      "summary_ko": "중간선거에서 민주당이 선전한 블루 웨이브 며칠 만에 트럼프 대통령과 충돌해 온 매시 의원이 탄핵 추진 시작",
+      "link": "https://www.cnbc.com/2026/11/10/jim-jordan-congress-republicans-midterm.html",
+      "published": "2026-11-11 12:42:09",
+      "title_ko": "짐 조던, 하원 공화당 원내대표로 선출",
+      "summary_ko": "마이크 존슨 하원의장, 선거 다음 날 120대 의회 소수당 원내대표 불출마 발표",
       "lines": [
-        "토마스 매시 공화당 하원의원의 피트 헤그세스 국방장관 탄핵안 발의",
-        "탄핵소추안 총 8개 조항 포함",
-        "헤그세스 장관의 6개월 만의 펜타곤 기자회견 개최",
-        "이란 전쟁 지휘 및 군사 작전 관련 탄핵안 제기"
+        "공화당 하원의원들의 비공개 투표",
+        "오하이오주 짐 조던 하원 법사위원장의 공화당 원내대표 선출",
+        "106대 73의 득표 결과",
+        "스티브 스칼리스 하원 원내대표를 상대로 한 승리"
       ]
     },
     {
-      "title": "Jim Cramer says Anthropic's explosive growth could justify a record-breaking IPO",
+      "title": "General strikes to paralyze Spain as protestors clash with police ahead of election campaign",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/anthropic-ipo-revenue-growth-cramer.html",
-      "published": "2026-11-10 23:46:35",
-      "title_ko": "앤트로픽의 폭발적 성장이 사상 최대 규모의 IPO를 정당화할 수 있다고 말하는 짐 크레이머",
-      "summary_ko": "이 계약이 진행 중이라는 사실이 기술주와 AI 거래에 강세 요인이라고 CNBC의 짐 크레이머가 화요일에 밝힘",
+      "link": "https://www.cnbc.com/2026/11/11/spain-protests-general-strikes-election.html",
+      "published": "2026-11-11 12:39:20",
+      "title_ko": "총파업으로 스페인 마비 조짐, 선거 운동 앞두고 시위대와 경찰 충돌",
+      "summary_ko": "스페인 노동자 수백만 명이 14년 만에 첫 총파업에 참여할 예정",
       "lines": [
-        "앤스로픽의 8억 2500만 주 공모 예정",
-        "공모가 희망 밴드 70달러에서 78달러",
-        "완전 희석 기준 기업가치 1조 4050억 달러",
-        "공모가 11월 18일 확정 및 다음 날 거래 개시"
+        "스페인에서 14년 만의 첫 총파업 예정",
+        "지난 10년간 스페인 임대료 두 배 상승"
+      ]
+    },
+    {
+      "title": "Mortgage rates jump sharply higher, after easing for four straight weeks. Here's why",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/mortgage-rates-jump-sharply-higher-after-easing-for-4-straight-weeks.html",
+      "published": "2026-11-11 12:38:32",
+      "title_ko": "4주 연속 하락 후 급등한 모기지 금리, 그 이유는",
+      "summary_ko": "",
+      "lines": [
+        "30년 고정 주택담보대출 평균 금리 7.30%로 상승",
+        "주택담보대출 금리 하루 동안 12베이시스포인트 상승"
+      ]
+    },
+    {
+      "title": "Consumers are showing signs of strain even as they keep spending, CNBC/NRF Retail Monitor shows",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/october-retail-sales-cnbc-nrf-2026.html",
+      "published": "2026-11-11 12:27:47",
+      "title_ko": "소비 지출은 유지되지만 압박 징후도 나타나고 있다고 밝힌 CNBC·NRF 소매 모니터",
+      "summary_ko": "미국 소비자들이 고물가로 인한 압박을 받으면서 10월 소매 판매가 거의 1년 만에 가장 느린 속도로 증가",
+      "lines": [
+        "10월 미국 소매 판매 5,617억 달러 기록",
+        "10월 총 소매 지출 전월 대비 0.2% 증가",
+        "10월 핵심 소매 지출 4,542억 달러 기록"
+      ]
+    },
+    {
+      "title": "Zelenskyy warns Ukraine is 'not real estate' as experts say a Russia peace deal remains elusive",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/ukraine-russia-peace-talks-zelenskyy-putin.html",
+      "published": "2026-11-11 12:12:48",
+      "title_ko": "러시아 평화 협상 난항 속 우크라이나는 부동산이 아니라고 경고한 젤렌스키",
+      "summary_ko": "미국 중재의 평화 회담 이틀째이자 마지막 날이 진행되는 가운데 젤렌스키 대통령이 우크라이나는 부동산이 아니라고 경고",
+      "lines": [
+        "아부다비에서 우크라이나와 러시아 대표단의 평화 협상 진행",
+        "미국 특사 스티브 위트코프와 재러드 쿠슈너가 우크라이나 평화 협상 중재"
+      ]
+    },
+    {
+      "title": "Hundreds of schools in Italy, UK evacuated over 'hoax' bomb threats",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/hoax-bomb-threats-schools-italy-uk.html",
+      "published": "2026-11-11 12:03:28",
+      "title_ko": "거짓 폭탄 위협으로 이탈리아와 영국의 수백 개 학교 대피",
+      "summary_ko": "하이브리드 위협에 대한 우려가 커진 가운데 경찰 당국에 따르면 수백 개 학교가 수요일 폭탄 위협을 받고 대피",
+      "lines": [
+        "이탈리아와 영국 등 유럽 수백 개 학교 폭탄 협박으로 대피",
+        "이탈리아 교육부 장관 주세페 발디타라가 이메일 협박은 허위로 추정된다고 발표",
+        "300곳 이상의 학교가 오전 10시 이전 폭탄 협박 이메일 수신"
+      ]
+    },
+    {
+      "title": "Bessent reportedly moved to military base over Iranian threats on his life",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/us-iran-war-trump-hormuz-bessent-threats.html",
+      "published": "2026-11-11 12:02:36",
+      "title_ko": "이란의 생명 위협에 따라 군 기지로 이동한 베스컨트",
+      "summary_ko": "법무부가 화요일 늦게 테러 관련 혐의로 이란 국적자 3명을 기소했다고 밝힌 가운데 이동 조치 단행",
+      "lines": [
+        "미국 재무장관 스콧 베센트가 이란의 살해 위협으로 군사 기지로 이동",
+        "미국 법무부가 이란 국적자 3명을 테러 관련 혐의로 기소"
+      ]
+    },
+    {
+      "title": "Measles is surging in the U.S. — and outbreaks can cost millions",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/measles-outbreak-us-economic-cost.html",
+      "published": "2026-11-11 12:00:01",
+      "title_ko": "미국 내 급증하는 홍역, 수백만 달러의 비용 발생 가능",
+      "summary_ko": "존스 홉킨스 연구진이 개발한 새로운 도구에 따르면 2025년 미국 홍역 확산의 경제적 비용이 3,700만 달러 상회",
+      "lines": [
+        "2025년 미국 홍역 확산 경제적 비용 3700만 달러 상회",
+        "2026년 11월 초 기준 전국 홍역 환자 5100명 초과",
+        "2026년 홍역 관련 사망자 펜실베이니아 등 8명 확인"
+      ]
+    },
+    {
+      "title": "How Democrats could snarl Trump administration stakes in private-sector companies",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/trump-company-equity-takes.html",
+      "published": "2026-11-11 11:00:01",
+      "title_ko": "민주당이 트럼프 행정부의 민간 기업 지분 참여를 방해하는 방법",
+      "summary_ko": "CATO 연구소 집계에 따르면 트럼프 행정부가 11월 기준 41개 기업에서 지분 포지션 구축",
+      "lines": [
+        "11월 기준 트럼프 행정부 민간 기업 41곳 지분 보유",
+        "민주당의 트럼프 정부 연계 기업 조사 대상에 인텔 포함"
       ]
     },
     {
@@ -39,7 +124,7 @@
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "negative",
-      "n_channels": 5,
+      "n_channels": 4,
       "lines": [
         "진행자 발언 : 10월 헤드라인 CPI 전월 대비 0.4% 증가로 예상치 상회",
         "진행자 발언 : 근원 CPI 0.3% 기록하며 서비스 및 식품 물가 상승 확인",
@@ -48,101 +133,21 @@
       ]
     },
     {
-      "title": "CoreWeave beats on revenue and lifts guidance, easing AI slowdown concerns",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/coreweave-crwv-q3-earnings-report-2026.html",
-      "published": "2026-11-10 23:16:15",
-      "title_ko": "코어위브, 매출 상회 및 가이드 상향으로 AI 둔화 우려 완화",
-      "summary_ko": "",
+      "title": "AI 인프라 투자 지속 가능성 및 성장 둔화",
+      "title_ko": "AI 인프라 투자 지속 가능성 및 성장 둔화",
+      "summary_ko": "AI 관련 기업들의 성장세가 둔화하고 있으며, 인프라 장비 상각 등 경고 신호가 나타나고 있어 주의가 필요하",
+      "source": "폭스",
+      "link": "https://www.youtube.com/watch?v=QIdXVK2GsqQ",
+      "published": "2026-11-10 22:00:01",
+      "kind": "media",
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "neutral",
+      "n_channels": 3,
       "lines": [
-        "코어위브의 3분기 매출 168% 급증",
-        "코어위브의 순손실 7억 900만 달러 기록",
-        "화요일 실적 발표와 함께 2026년 가이던스 상향 조정"
-      ]
-    },
-    {
-      "title": "Nvidia's Huang tries to project 'business as usual' in return to office after affair revelation",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/nvidia-jensen-huang-affair-office.html",
-      "published": "2026-11-10 23:11:34",
-      "title_ko": "불륜 폭로 후 복귀한 엔비디아 황, 사무실에서 '평소와 다름없는 업무' 강조 시도",
-      "summary_ko": "엔비디아 직원들은 CEO 젠슨 황이 불륜을 공개한 후 사무실에 복귀했을 때 분위기를 슬프다고 묘사함",
-      "lines": [
-        "엔비디아 젠슨 황 최고경영자 캘리포니아 산타클라라 본사 복귀",
-        "월요일 임원진 대상 비공개 오전 회의 진행",
-        "직원들에게 불륜 사실 언급 및 사과 표명",
-        "화요일에도 사무실에서 회의 주재",
-        "분기 실적 발표 일주일 앞둔 시점"
-      ]
-    },
-    {
-      "title": "FDA warns of vision loss risk linked to popular GLP-1 drugs like Wegovy, Zepbound",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/fda-warning-vision-loss-glp1-wegovy-zepbound.html",
-      "published": "2026-11-10 23:03:11",
-      "title_ko": "FDA, 위고비 및 제페바 등 인기 GLP-1 치료제 연관 시력 상실 위험 경고",
-      "summary_ko": "보건 당국은 체중 관리 및 당뇨병 치료에 사용되는 GLP-1 약물 사용과 연관된 희귀 안과 질환의 잠재적 위험 증가 증거를 발견함",
-      "lines": [
-        "위고비와 제바운드 등 GLP-1 약물과 시력 상실 위험 연관성 경고",
-        "체중 관리 및 당뇨병 치료용 GLP-1 약물 사용과 희귀 안질환 증가 위험 발견",
-        "미국 식품의약국의 관련 증거 확인"
-      ]
-    },
-    {
-      "title": "Fossil CEO says turnaround is ahead of plan as sales return to growth",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/fossil-fosl-q3-2026-earnings.html",
-      "published": "2026-11-10 22:39:30",
-      "title_ko": "파실 CEO, 매출 성장세 회복으로 턴어라운드 계획보다 앞서 있다고 밝혀",
-      "summary_ko": "시계 제조사 파실, 턴어라운드 전략의 첫 징후로 수익 및 매출 성장세 회복 발표",
-      "lines": [
-        "화요일 파슬의 3분기 영업이익 2530만 달러 기록",
-        "파슬의 순매출 0.4% 증가한 2억 7120만 달러 달성",
-        "파슬 CEO 프랑코 포글리아토의 턴어라운드 전략 추진"
-      ]
-    },
-    {
-      "title": "Nvidia sells off for second day in fallout from Jensen Huang’s affair with alleged spy",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/nvidia-nvda-jensen-huang-affair-chinese-spy.html",
-      "published": "2026-11-10 22:08:25",
-      "title_ko": "간첩 혐의 여성과의 스캔들 여파로 엔비디아 이틀째 하락",
-      "summary_ko": "투자자들이 CEO의 간첩 혐의 중국인 여성과의 불륜에 따른 잠재적 여파를 저울질함",
-      "lines": [
-        "화요일 엔비디아 주가 5.47% 하락",
-        "장중 시가총액 4조 달러 아래로 하락 후 반등 마감",
-        "전일 주가 4% 이상 하락 기록",
-        "젠슨 황 최고경영자 직원 대상 이메일로 불륜 사실 인정",
-        "중국 간첩 연루 의혹 제기된 메가스피드 임원 앨리스 황과 관계"
-      ]
-    },
-    {
-      "title": "Mississippi Senate: Scott Colom extends tight lead over Hyde-Smith as ballot deadlines hit",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/mississippi-senate-scott-colom-hyde-smith.html",
-      "published": "2026-11-10 22:01:52",
-      "title_ko": "미시시피 상원: 투표용지 마감일 속 하이드스미스를 상대로 우세를 연장하는 스콧 콜롬",
-      "summary_ko": "화요일은 미시시피주의 잠정 투표용지 해결 및 우편 부재자 투표용지 접수 마감일임",
-      "lines": [
-        "미시시피주 상원 선거 민주당 스콧 콜롬 후보 우세",
-        "현직 신디 하이드스미스 상원의원 상대로 리드 유지",
-        "오후 4시 30분 기준 2607표 차이",
-        "총 95만 3547표 집계 및 개표율 97% 추정",
-        "격차는 0.27%포인트 기록"
-      ]
-    },
-    {
-      "title": "Rep. Jim Jordan, Sen. John Thune elected GOP leaders in Congress",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/jim-jordan-congress-republicans-midterm.html",
-      "published": "2026-11-10 22:00:40",
-      "title_ko": "짐 조던, 하원 공화당 원내대표로 선출",
-      "summary_ko": "마이크 존슨 하원의장, 선거 다음 날 120대 의회 소수당 원내대표 불출마 발표",
-      "lines": [
-        "공화당 하원의원들의 비공개 투표",
-        "오하이오주 짐 조던 하원 법사위원장의 공화당 원내대표 선출",
-        "106대 73의 득표 결과",
-        "스티브 스칼리스 하원 원내대표를 상대로 한 승리"
+        "댄 나일스 발언 : 앤트로픽의 분기별 매출 성장률이 145%에서 45% 그리고 25%로 둔화",
+        "댄 나일스 발언 : 소프트뱅크의 오하이오 전력 시설 장비 관련 37억 달러 자산 상각 단행",
+        "댄 나일스 발언 : 반도체 기업들의 장기 공급 계약은 침체기 도래 시 무용지물로 전락 우려",
+        "댄 나일스 발언 : 현재의 AI 열풍이 2000년 3월 닷컴 버블 정점과 유사할 가능성 제기"
       ]
     },
     {
@@ -155,29 +160,13 @@
       "kind": "media",
       "tag": "물가",
       "direction": "negative",
-      "n_channels": 4,
+      "n_channels": 3,
       "lines": [
         "에드워드 로렌스 보도 : 10월 물가 전월비 0.4% 상승",
         "에드워드 로렌스 발언 : 에너지 가격 상승이 전체 인플레이션을 자극",
         "에드워드 로렌스 발언 : 12월 9일 연준 금리 인상 가능성 제기",
         "케빈 하셋 발언 : 최근 3개월간 물가 상승세 가속화",
         "케빈 하셋 발언 : 에너지 가격과 휘발유 가격의 급등이 데이터에 반영"
-      ]
-    },
-    {
-      "title": "이란 전쟁 향방과 유가 전망",
-      "title_ko": "이란 전쟁 향방과 유가 전망",
-      "summary_ko": "이란과의 전쟁 및 외교적 협상 여부가 향후 유가 방향성을 결정할 세 가지 시나리오를 만들고 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=sMyhTauQTeA",
-      "published": "2026-11-10 14:59:04",
-      "kind": "media",
-      "tag": "유가 · 에너지 · 원자재",
-      "direction": "positive",
-      "n_channels": 3,
-      "lines": [
-        "에모스 호슈타인 발언 : 민주당의 선거 승리로 이란과의 전쟁이 종식될 가능성이 경제의 부담을 덜어줄 것으로 기대",
-        "에모스 호슈타인 발언 : 이란 대응에 따라 유가가 상승하거나 현재 80달러선을 유지하거나 50달러대로 폭락할 수 있음"
       ]
     }
   ]
