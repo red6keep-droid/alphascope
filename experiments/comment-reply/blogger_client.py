@@ -20,6 +20,10 @@ DEFAULT_BLOG_URL = "http://alpha-scope.blogspot.com/"
 REQUIRED_ENV = ["BLOGGER_CLIENT_ID", "BLOGGER_CLIENT_SECRET", "BLOGGER_REFRESH_TOKEN"]
 
 
+class PostGone(Exception):
+    """댓글이 달린 글 · 페이지가 Blogger 에 없다 (지워짐 · 초안) — 다시 해도 같으니 재시도하지 않는다"""
+
+
 def _credentials():
     missing = [k for k in REQUIRED_ENV if not os.environ.get(k)]
     if missing:
@@ -91,13 +95,20 @@ class BloggerClient:
         return items
 
     def get_post(self, post_id):
-        resp = requests.get(
-            f"{BLOGGER_API}/blogs/{self.blog_id}/posts/{post_id}",
-            headers=self._headers(),
-            timeout=30,
-        )
-        resp.raise_for_status()
-        return resp.json()
+        """댓글이 달린 글 — 글(posts)에 없으면 고정 페이지(pages)에서 찾는다.
+        테마 댓글 칸의 번호(data:post.id)는 고정 페이지(종목 · 증시 전망 · 리포트)에서는 페이지 번호다 (2026-11-11 — posts 만 찾아 404).
+        둘 다 없으면(지워진 글 · 초안) PostGone."""
+        for kind in ("posts", "pages"):
+            resp = requests.get(
+                f"{BLOGGER_API}/blogs/{self.blog_id}/{kind}/{post_id}",
+                headers=self._headers(),
+                timeout=30,
+            )
+            if resp.status_code == 404:
+                continue
+            resp.raise_for_status()
+            return resp.json()
+        raise PostGone(post_id)
 
     def get_latest_post(self):
         resp = requests.get(

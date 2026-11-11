@@ -179,6 +179,12 @@ def main():
             handled.append(c["id"])
             replied += 1
             notes.append((spam, c, post, reply))
+        except blogger_client.PostGone as e:
+            # 글 · 페이지가 지워진 댓글 — 다시 해도 404 라 '처리됨'으로 넘기고 알림 한 번만 (2026-11-11: 실행마다 같은 실패 알림)
+            print(f"[건너뜀] comment={c['id']} 글 · 페이지 없음(post={e}) — 답글 없이 처리됨")
+            if args.send:
+                handled.append(c["id"])
+                notify.event("댓글 건너뜀", f"comment={c['id']} — 글 · 페이지가 지워져 답글 없이 넘김 (post={e})")
         except Exception as e:
             print(f"[오류] comment={c['id']} 처리 실패 (다음 실행에 다시): {e}")
             notify.event("댓글 처리 실패", f"comment={c['id']} — {str(e)[:120]}")   # 성공만 알리던 것을 실패도 (2026-10-21)
