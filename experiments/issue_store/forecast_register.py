@@ -468,11 +468,11 @@ def build(eid, w, today, shock_day, base_day, gap, z, line, rec, late, why=None)
     unit = "%p" if mkt else "%"
     more = "오름" if s > 0 else "빠짐"
     m_ok, n = rec
-    sc = [{"no": 1, "cond": f"{rw} 쪽이면", "name": f"{subject} {rw}", "dir": -s,
+    sc = [{"no": 1, "cond": f"{rw}한다", "name": f"{subject} {rw}", "dir": -s,
            "chain": [{"step": f"{shock} 폭의 4분의 1 {rv}", "state": "wait", "ev": "", "date": ""},
                      {"step": f"{shock} 폭의 절반 {rv}", "state": "wait", "ev": "", "date": ""}],
            "win": f"{subj_ga} {shock} 폭({abs(gap):.1f}{unit})의 절반을 {rv}한다"},
-          {"no": 2, "cond": "지속 쪽이면", "name": f"{subject} {dw} 지속", "dir": s,
+          {"no": 2, "cond": "지속한다", "name": f"{subject} {dw} 지속", "dir": s,
            "chain": [{"step": f"{shock} 뒤 {max(1, round(line / 3))}{unit} 더 {more}", "state": "wait", "ev": "", "date": ""},
                      {"step": f"{shock} 뒤 {line}{unit} 더 {more}", "state": "wait", "ev": "", "date": ""}],
            "win": f"{subj_ga} {shock} 뒤 {line}{unit} 더 {'오른다' if s > 0 else '빠진다'}"}]

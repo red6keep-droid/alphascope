@@ -170,11 +170,11 @@ def after_fc(t, no, gap, registered, shock_day, base_day, pick=1, title_event=No
     w = H.DIR_WORD[s]
     more = "오름" if s > 0 else "빠짐"
     rw, rv = H.REV[s]
-    sc = [{"no": 1, "cond": f"{rw} 쪽이면", "name": f'{T["subject"]} {rw}', "dir": -s,
+    sc = [{"no": 1, "cond": f"{rw}한다", "name": f'{T["subject"]} {rw}', "dir": -s,
            "chain": [{"step": f"{H.SHOCK[s]} 폭의 4분의 1 {rv}", "state": "wait", "ev": "", "date": ""},
                      {"step": f"{H.SHOCK[s]} 폭의 절반 {rv}", "state": "wait", "ev": "", "date": ""}],
            "win": f'{T["subj_ga"]} {H.SHOCK[s]} 폭({abs(gap):.1f}{u})의 절반을 {rv}한다'},
-          {"no": 2, "cond": "지속 쪽이면", "name": f'{T["subject"]} {w} 지속', "dir": s,
+          {"no": 2, "cond": "지속한다", "name": f'{T["subject"]} {w} 지속', "dir": s,
            "chain": [{"step": f"{H.SHOCK[s]} 뒤 {L / 3:.0f}{u} 더 {more}", "state": "wait", "ev": "", "date": ""},
                      {"step": f"{H.SHOCK[s]} 뒤 {L:g}{u} 더 {more}", "state": "wait", "ev": "", "date": ""}],
            "win": f'{T["subj_ga"]} {H.SHOCK[s]} 뒤 {L:g}{u} 더 {"오른다" if s > 0 else "빠진다"}'}]

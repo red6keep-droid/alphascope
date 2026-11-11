@@ -655,7 +655,7 @@ def _tag_title(html, cond, box, stack=False, tail=""):
         return html
     close = html.rfind("</span>", i, ans)   # 제목 span 의 닫는 태그
     lh = int(dk.LH_EMPH_Q.rstrip("px"))
-    top = 0 if stack else (lh - 24) // 2   # 라벨 상자 높이 24(글자 18 + 위 3 · 아래 2 + 테두리 2)를 제목 첫 줄 가운데에
+    top = 0 if stack else (lh - 24) // 2 - 1   # 라벨 상자를 제목 첫 줄 가운데에 — 잉크 실측(4배 캡처)에서 라벨이 글보다 1px 아래라 1 올림 (P486, 2026-11-11 사용자)
     # stack = 시장예상 · 유력 라벨이 붙으면 라벨 줄 아래로 조건 글을 내린다 (P474, 2026-11-08 사용자)
     flex = "flex-direction:column;align-items:flex-start;gap:6px;" if stack else "align-items:flex-start;gap:8px;"   # 이름표 ↔ 조건 글 8 (2026-11-08 사용자: 3 은 너무 붙어 이전 여백으로)
     cls = ' class="fc-th-wrap fc-th-stack"' if stack else ' class="fc-th-wrap"'
@@ -790,9 +790,18 @@ def _sigs(fc, d):
 
 
 def side_word(sc):
-    """갈래를 부르는 짧은 말 — 자동 등록 `반등 쪽이면` · `지속 쪽이면` → `반등` · `지속`, 그 밖(사건 전 조건 문장)은 None."""
+    """갈래를 부르는 짧은 말 — 자동 등록 `반등한다` · `지속한다`(옛 등록 `반등 쪽이면` · `지속 쪽이면`도) → `반등` · `지속`, 그 밖(사건 전 조건 문장)은 None."""
     c = (sc.get("cond") or "").strip()
-    return c.removesuffix("쪽이면").strip() if c.endswith("쪽이면") else None
+    for suf in ("쪽이면", "한다"):
+        if c.endswith(suf) and 0 < len(c) - len(suf) <= 6:
+            return c.removesuffix(suf).strip()
+    return None
+
+
+def cond_text(sc):
+    """카드 첫 줄 조건 글 — 옛 자동 등록 `반등 쪽이면` 도 `반등한다` 로 (P482, 2026-11-11 사용자: "전망이니까 `반등한다` · `지속한다`")."""
+    c = sc.get("cond") or ""
+    return side_word(sc) + "한다" if c.endswith("쪽이면") and side_word(sc) else c
 
 
 def _first_line(rows, sigs):
@@ -828,6 +837,14 @@ def side_why(fc, sc, border):
 
 
 OPEN_TITLE = "향방미정"   # 붙여 쓰기 · 회색 라벨 (2026-11-11 사용자)   # 옛 `방향이 아직 안 정해진 일` 카드 (2026-11-11 사용자: 문장을 줄여 새 제목, 카드 없이 타임라인 위 한 줄)
+
+
+def timeline_title():
+    """타임라인 구획 제목 `Timeline`(영어) — `향방미정` 줄 위, 위 여백 +30 (P484 · P485, 2026-11-11 사용자). 구획 제목 글씨(dk.h2), 밑줄 없음."""
+    return f'<div data-tl-title="1" style="padding-top:{TL_TITLE_GAP}px;">{dk.h2("Timeline", line=False)}</div>'
+
+
+TL_TITLE_GAP = 30
 
 
 def open_pill():
@@ -880,7 +897,7 @@ def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""
         m, n, note = sc["odds"]
         lines.insert(0, ("row", "기록상", share_word(m, n).replace("이었습니다", ""), wordify(note, Lw)))
     lines += _ahead_lines(extra or [], Lw)   # 미리 알아 둘 것 (옛 `앞으로 올 수 있는 일`, 2026-11-07 사용자)
-    html = qc.question_card(sc["cond"], v["answer"], th, ink, lines, fold=True, opened=False)   # 전망 카드는 처음에 모두 닫힘 — 일어난 갈래도 (P462, 2026-11-08 사용자). 답 · 색으로 상태는 닫힌 채 보인다
+    html = qc.question_card(cond_text(sc), v["answer"], th, ink, lines, fold=True, opened=False)   # 전망 카드는 처음에 모두 닫힘 — 일어난 갈래도 (P462, 2026-11-08 사용자). 답 · 색으로 상태는 닫힌 채 보인다
     html = _small_row(html, f'‘{sc["name"]}’ 이 되는 기준', _crit_text(sc, Lw), th)
     if compact is None:   # 얇은 카드 = 결과가 났고 해당 없는 갈래만, 일어난 갈래는 원래 크기 (P471, 2026-11-08 사용자)
         compact = v["answer"] == NOT_HAPPENED
@@ -899,7 +916,7 @@ def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""
         tbox = tbox.replace("justify-content:center;", "justify-content:flex-start;", 1).replace("padding-left:7px;padding-right:7px;", f"width:{TAG_W}px;padding-left:7px;padding-right:0;", 1)
         if compact:   # 접힌 얇은 카드 = 이름표 상자의 바탕 · 테두리만 지워 글씨로 (P472 → P478) — 상자 폭 · 안쪽 여백은 그대로라 `전망 A` 글자와 조건 글 시작선이 펼친 카드(`전망 B`)와 같은 세로선
             tbox = tbox.replace('<span style="display:inline-flex;align-items:center;justify-content:flex-start;gap:3px;', '<span class="fc-th-ghost" style="display:inline-flex;align-items:center;justify-content:flex-start;gap:3px;', 1)
-        html = _tag_title(html, sc["cond"], tbox, tail=boxes)   # 짧으면 이름표 · 조건 글 · 라벨 한 줄 (옛 stack: 라벨 줄 아래로 조건 글)
+        html = _tag_title(html, cond_text(sc), tbox, tail=boxes)   # 짧으면 이름표 · 조건 글 · 라벨 한 줄 (옛 stack: 라벨 줄 아래로 조건 글)
     if compact:
         html = _thin(html, th)
     return html
@@ -1291,7 +1308,7 @@ def _day_cols(e, unit="%", subj=""):
     r = None if start else e.get("shown", e.get("rel"))
     val = (dk.arrow(r, 1, unit).replace("font-weight:700;", "font-weight:400;") if r is not None and round(r, 1) != 0 else "")
     ink = dk.VIOLET if e.get("key") in RESULT else ("#111" if calm else INK[e["dir"]])   # 판정(맞음 · 틀림 · 제자리 · 보류 · 무효) = 보라 (P469, 2026-11-08 사용자) — 방향 색 X
-    lab = f'<span style="color:{ink};{"font-weight:400;" if calm else ""}white-space:nowrap;">{dk.esc(label)}</span>'
+    lab = f'<span style="color:{ink};{"" if e.get("key") in RESULT else "font-weight:400;"}white-space:nowrap;">{dk.esc(label)}</span>'   # `○○ 조짐` 도 보통 굵기, 판정만 굵게 (P483, 2026-11-11 사용자)
     # 옛 `(세부 전망으로 이어감 ›)` 괄호 링크(P453)는 뺐다 — 바로 위 끝 줄 `세부 전망으로 이어집니다 ›`(P465)와 겹쳐서 (P466, 2026-11-08 사용자)
     return (f'<span style="color:#111;white-space:nowrap;">{dk.esc(md(e["day"]))}</span>',
             lab,
@@ -1515,7 +1532,7 @@ def _side_names(fc):
     out = {}
     for sc in (fc or {}).get("scenarios") or []:
         if sc.get("dir") in (1, -1):
-            out[sc["dir"]] = (sc["name"], sc.get("cond", "").removesuffix("이면").strip().removesuffix("쪽").strip())   # `반등` · `지속` (2026-11-11 사용자: `쪽` 삭제)
+            out[sc["dir"]] = (sc["name"], side_word(sc) or sc.get("cond", ""))   # `반등` · `지속` (2026-11-11 사용자: `쪽` 삭제)
     return out
 
 
@@ -1944,7 +1961,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
          + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:24px;line-height:{dk.LH_TINY};">'
          + _date_row(fc, out=not before and fc["kind"] == "pre").replace("flex-direction:column;align-items:flex-end;", "flex-wrap:wrap;align-items:center;gap:4px 10px;", 1)
          + back_btn.replace("margin-top:6px;", "", 1) + '</span></span></h2>') + _follow_btn(fc, st)
-    body = (q + sides + open_line(fc, log) + head + crowd_line(fc)   # 겹침이 2개를 넘으면 사실 한 줄 (2026-11-08)
+    body = (q + sides + timeline_title() + open_line(fc, log) + head + crowd_line(fc)   # 겹침이 2개를 넘으면 사실 한 줄 (2026-11-08)
             + (operator_box(op + _op_mood(fc) + ([("거래량", f'평소의 {st["volume_x"]:.1f}배 — 기록만 — 우리 전망 고르기엔 안 씀')] if fc["kind"] == "after" and st.get("volume_x") else [])) if op else "")
             + more + why_note_html(fc)   # 근거 안내 = `현재 증시는?` 아래 한 번 (2026-11-11 사용자)   # `더 궁금한 것` 제목 삭제 — 기록 · 앞으로 볼 것은 각자 구분선 구획 (2026-11-07 사용자)
             )   # `다른 전망` 구획 삭제 — 글 아래 [목록] 버튼이 전망 목록으로 간다, 이어진 전망은 겹침 카드 안 링크로 (P442, 2026-11-08 사용자)
