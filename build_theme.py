@@ -27,6 +27,9 @@ for _stream in (sys.stdout, sys.stderr):
         _stream.reconfigure(encoding="utf-8", errors="replace")
 
 SOURCE = "alphaflow-home.html"
+# 검색 즉답 (2026-11-11 사용자 "진행해") — 원본은 목업과 같은 파일. 고치면 이 스크립트를 다시 돌린다. 미리보기는 experiments/site-search/mock_search.py
+SEARCH_CSS = "experiments/site-search/search.css"
+SEARCH_JS = "experiments/site-search/search.js"
 TARGET = "index.html"
 PREVIEW_TARGET = "preview.html"
 
@@ -607,6 +610,8 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
 __CSS__
 
 __BLOGGER_CSS__
+
+__SEARCH_CSS__
 ]]></b:skin>
 
     <b:template-skin><![CDATA[
@@ -665,6 +670,9 @@ __NAV_ITEMS__
         </b:section>
 
         <!-- 알림 · 검색 버튼 삭제 (2026-10-25 사용자, 홈 수정 H1 · H2) — 헤더 오른쪽은 메뉴 버튼만 -->
+        <!-- 검색 즉답 아이콘 (2026-11-11 사용자 "진행해", 목업 experiments/site-search) — search.js 가 국기 스위치 줄 맨 앞으로 옮긴다 -->
+        <button aria-label='검색 (단축키 /)' class='as-search-btn' data-as-search='' type='button'><svg aria-hidden='true' viewBox='0 0 24 24'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg></button>
+
         <button class='nav-toggle' type='button' aria-controls='primary-menu' aria-expanded='false'>
           <svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
             <path d='M3 6h18M3 12h18M3 18h18'/>
@@ -813,6 +821,12 @@ __FOOTER_BLOCK__
     <script>
       //<![CDATA[
 __JS__
+      //]]>
+    </script>
+    <script>
+      //<![CDATA[
+      window.AS_SEARCH_OPTS = { chat: false };   // 질문하기 버튼은 목업에서만 (2026-11-11 검색만 반영)
+__SEARCH_JS__
       //]]>
     </script>
   </body>
@@ -1033,6 +1047,12 @@ def build_theme(parts):
         indent(footer_with_attribution(to_xml_attrs(parts["footer"])), 4),
     )
     out = out.replace("__JS__", indent(parts["js"], 6))
+    search_css = io.open(SEARCH_CSS, encoding="utf-8").read().strip()
+    search_js = io.open(SEARCH_JS, encoding="utf-8").read().strip()
+    if "]]>" in search_css + search_js:
+        sys.exit("[build_theme] 검색 CSS/JS 안에 ']]>' — CDATA 가 끊긴다")
+    out = out.replace("__SEARCH_CSS__", search_css)
+    out = out.replace("__SEARCH_JS__", indent(search_js, 6))
 
     # 남은 플레이스홀더 확인
     left = re.findall(r"__[A-Z_]+__", out)

@@ -1,21 +1,34 @@
 /* AlphaScope 검색 즉답 · 질문하기 (2026-11-10 사용자 목업).
  * AI 호출 0 — 질문에서 종목(별명표) · 질문 종류(낱말표)를 코드로 찾고, 색인 값으로 정해진 문장을 만든다.
- * 색인: 목업은 window.AS_SEARCH_INDEX(파일에 넣어 둠), 적용 때는 INDEX_URL(jsDelivr gh-pages)을 처음 열 때 한 번만 읽는다.
+ * 색인: 목업은 window.AS_SEARCH_INDEX(파일에 넣어 둠), 블로그는 INDEX_BASE(jsDelivr gh-pages search/us.json · kr.json)를 처음 열 때 한 번만 읽는다.
+ * 블로그 테마에는 build_theme.py 가 이 파일과 search.css 를 그대로 넣는다 — 고치면 build_theme.py 다시.
  * 관련 글: Blogger 공개 피드 검색(JSONP) — 서버 없이 블로그 글을 찾는다.
  * 지킬 것: 값마다 기준일("10-30 종가") · 사라/팔라 의견 없음 · 등락 이유를 지어내지 않음 · 다루지 않는 종목은 솔직하게.
  */
 (function () {
   'use strict';
   var BLOG = 'https://alpha-scope.blogspot.com';
-  var INDEX_URL = 'https://cdn.jsdelivr.net/gh/OWNER/REPO@gh-pages/search/index.json';   // 적용 때 채움
+  /* 색인 = 시장마다 한 파일 (2026-11-11): 미국은 nvda-report 실행, 한국은 kr-stocks 실행이 gh-pages 에 올린다.
+     둘 중 하나만 받아도 그 시장으로 답한다 — 둘 다 실패해야 "불러오지 못했습니다" */
+  var INDEX_BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/search/';
+  var INDEX_FILES = ['us.json', 'kr.json'];
+  var OPTS = window.AS_SEARCH_OPTS || {};   // 테마: { chat: false } — 질문하기 버튼은 목업에서만 (2026-11-11 검색만 반영)
   var MINUS = '−';
 
   /* ---------- 색인 ---------- */
   var indexP = null;
+  function fetchJson(u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
+  function fetchIndex() {
+    var got = INDEX_FILES.map(function (f) { return fetchJson(INDEX_BASE + f).catch(function () { return null; }); });
+    return Promise.all(got).then(function (docs) {
+      docs = docs.filter(Boolean);
+      if (!docs.length) throw new Error('index');
+      return { built: docs.map(function (d) { return d.built; }).sort().pop(), stocks: [].concat.apply([], docs.map(function (d) { return d.stocks || []; })) };
+    });
+  }
   function loadIndex() {
     if (!indexP) {
-      indexP = window.AS_SEARCH_INDEX ? Promise.resolve(window.AS_SEARCH_INDEX)
-        : fetch(INDEX_URL).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
+      indexP = window.AS_SEARCH_INDEX ? Promise.resolve(window.AS_SEARCH_INDEX) : fetchIndex();
       indexP = indexP.then(prep, function (e) { indexP = null; throw e; });
     }
     return indexP;
@@ -377,7 +390,7 @@
     var quick = document.querySelector('.menu-quick'), sbtn = document.querySelector('.as-search-btn');
     if (quick && sbtn) quick.insertBefore(sbtn, quick.firstChild);
     document.querySelectorAll('[data-as-search]').forEach(function (b) { b.addEventListener('click', function () { s.open(); }); });
-    buildChat();
+    if (OPTS.chat !== false) buildChat();
     mountOnSearchPage();
     var q = new URLSearchParams(location.search).get('ask');   // 목업 시험용: ?ask=엔비디아 실적
     if (q) s.open(q);

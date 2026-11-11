@@ -1,13 +1,17 @@
 """블로그 검색 즉답 색인 — 종목 이름 · 별명 → 최신 값 (2026-11-10 사용자: 검색 + 블로그 챗봇 목업).
 
-    python experiments/site-search/build_search_index.py     # output/search_index.json
+    python experiments/site-search/build_search_index.py                 # output/search_index.json (목업 · 두 시장)
+    python experiments/site-search/build_search_index.py --market us --out deploy-home/search/us.json   # 실행 때
 
 AI 호출 0. 이미 모아 둔 자료만 읽는다:
   미국  stock-radar/data/snapshot.json(일봉 · 시총 · 실적 발표일) · extra.json(EPS · 목표가 · 회사 · 매출) · news.json(한국어 요약)
   한국  kr-stocks/data/snapshot.json · extra.json(EPS · 목표가 · 매출 · DART 회사 정보)
-적용 때: 종목 페이지 실행(nvda-report · 한국 종목) 끝에서 이 파일을 gh-pages search/index.json 으로 올리고 테마 JS 가 jsDelivr 로 읽는다.
+블로그 (2026-11-11 사용자 "진행해"): 미국 = nvda-report.yml(stock-radar 자료가 있는 실행) → gh-pages search/us.json,
+  한국 = kr-stocks.yml → search/kr.json. 각 실행이 이미 하던 홈 JSON 푸시(deploy-home)에 얹는다 — gh-pages 쓰기 추가 없음.
+  한 시장이 실패해도 다른 시장 파일은 그대로(전날 것) — 테마 JS(search.js) 가 둘을 따로 읽어 합친다.
 값마다 기준일을 넣는다 — 화면은 "현재"가 아니라 "MM-DD 종가"로 쓴다(미국은 정규장 종가만).
 """
+import argparse
 import json
 import os
 import sys
@@ -125,15 +129,12 @@ def us_news(news, sym, n=3):
     return [[(v.get("published_at") or "")[:10], v.get("title_ko") or v.get("fact"), v.get("source") or ""] for v in rows[:n]]
 
 
-def main():
-    today = date.today().isoformat()
+def us_stocks(today):
     us_snap = load(os.path.join(EXP, "stock-radar", "data", "snapshot.json"))
     us_x = load(os.path.join(EXP, "stock-radar", "data", "extra.json"))
-    news = load(os.path.join(EXP, "stock-radar", "data", "news.json"))
-    kr_snap = load(os.path.join(EXP, "kr-stocks", "data", "snapshot.json"))
-    kr_x = load(os.path.join(EXP, "kr-stocks", "data", "extra.json"))
+    news_path = os.path.join(EXP, "stock-radar", "data", "news.json")
+    news = load(news_path) if os.path.exists(news_path) else {}
     stocks = []
-
     for sym, name, slug, sector in U.CANDIDATES:
         bars = us_snap["bars"].get(sym)
         if not bars or len(bars) < 30:
@@ -150,7 +151,13 @@ def main():
             s["co"] = {"nm": co.get("name"), "ceo": (co.get("ceo") or "").replace("  ", " "), "hq": ", ".join(v for v in (co.get("city"), co.get("state"), co.get("country")) if v),
                        "web": co.get("website"), "emp": co.get("employees"), "ex": co.get("exchange"), "listed": co.get("listed")}
         stocks.append(s)
+    return stocks
 
+
+def kr_stocks(today):
+    kr_snap = load(os.path.join(EXP, "kr-stocks", "data", "snapshot.json"))
+    kr_x = load(os.path.join(EXP, "kr-stocks", "data", "extra.json"))
+    stocks = []
     for sym, name, slug, sector, _groups in UK.CANDIDATES:
         bars = kr_snap["bars"].get(sym)
         if not bars or len(bars) < 30:
@@ -169,12 +176,26 @@ def main():
                        "web": co.get("hm_url"), "est": f"{est[:4]}-{est[4:6]}-{est[6:]}" if len(est) == 8 else None,
                        "ex": {"Y": "유가증권", "K": "코스닥"}.get(co.get("corp_cls"))}
         stocks.append(s)
+    return stocks
 
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--market", choices=("us", "kr", "all"), default="all")
+    ap.add_argument("--out", default=OUT)
+    a = ap.parse_args()
+    today = date.today().isoformat()
+    stocks = (us_stocks(today) if a.market in ("us", "all") else []) + (kr_stocks(today) if a.market in ("kr", "all") else [])
+    # 종목이 너무 적으면 자료가 덜 받아진 날 — 올리지 않고 전날 파일을 둔다
+    want = {"us": 20, "kr": 10, "all": 30}[a.market]
+    if len(stocks) < want:
+        sys.exit(f"색인 종목 {len(stocks)}개 < {want} — 만들지 않음(전날 파일 유지)")
+    out = os.path.abspath(a.out)
+    os.makedirs(os.path.dirname(out), exist_ok=True)
     doc = {"built": datetime.now().strftime("%Y-%m-%d %H:%M"), "stocks": stocks}
-    with open(OUT, "w", encoding="utf-8") as f:
+    with open(out, "w", encoding="utf-8") as f:
         json.dump(doc, f, ensure_ascii=False, separators=(",", ":"))
-    print(f"만듦: {OUT} — 미국 {sum(s['m'] == 'us' for s in stocks)} · 한국 {sum(s['m'] == 'kr' for s in stocks)}종목, {os.path.getsize(OUT) / 1024:.0f}KB")
+    print(f"만듦: {out} — 미국 {sum(s['m'] == 'us' for s in stocks)} · 한국 {sum(s['m'] == 'kr' for s in stocks)}종목, {os.path.getsize(out) / 1024:.0f}KB")
 
 
 if __name__ == "__main__":

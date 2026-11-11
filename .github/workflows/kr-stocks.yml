@@ -205,6 +205,13 @@ jobs:
         continue-on-error: true
         run: python experiments/daily-report/home_card.py --card kr-report --body experiments/kr-market-report/output/report_body.html --meta experiments/kr-market-report/output/post_meta.json --out deploy-home/cards/kr-report.json
 
+      # 블로그 검색 즉답 색인 — 한국 (2026-11-11 사용자 "진행해"). 이 실행의 snapshot · extra 만 읽는다, AI 0.
+      # 아래 kr.json 푸시에 얹는다 — gh-pages 쓰기 추가 없음. 실패 · 종목 부족이면 파일을 안 만들고 전날 것이 남는다
+      - name: Search index (search/kr.json)
+        if: steps.gate.outputs.go == 'true' && hashFiles('deploy-home/kr.json') != ''
+        continue-on-error: true
+        run: python experiments/site-search/build_search_index.py --market kr --out deploy-home/search/kr.json
+
       - name: Deploy kr.json to gh-pages
         if: steps.gate.outputs.go == 'true' && hashFiles('deploy-home/kr.json') != ''
         continue-on-error: true
@@ -222,6 +229,7 @@ jobs:
           # 푸시 직후 퍼지는 jsDelivr 가 아직 옛 커밋을 보고 전날 파일을 다시 붙잡는다(11-05 stocks.json) — 잠깐 기다린다
           sleep 10
           curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr.json" || true
+          [ -f deploy-home/search/kr.json ] && curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/search/kr.json" || true
           # 홈 카드는 옛 글로 연결되면 안 된다(11-10 미국 카드) — 내용 확인까지
           [ -f deploy-home/cards/kr-report.json ] && bash .github/scripts/jsd_purge.sh cards/kr-report.json deploy-home/cards/kr-report.json || true
 

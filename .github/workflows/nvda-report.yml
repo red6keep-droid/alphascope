@@ -308,6 +308,13 @@ jobs:
           cp experiments/theme-monitor/output/home/themes.json deploy-home/themes.json
           [ -f experiments/theme-monitor/data/page_hashes.json ] && cp experiments/theme-monitor/data/page_hashes.json "$STATE_DIR/themes/page_hashes.json" || true
 
+      # 블로그 검색 즉답 색인 — 미국 (2026-11-11 사용자 "진행해"). 위 레이더 자료(snapshot · extra · news)만 읽는다, AI 0.
+      # 아래 홈 JSON 푸시(deploy-home)에 얹는다 — gh-pages 쓰기 추가 없음. 실패 · 종목 부족이면 파일을 안 만들고 전날 것이 남는다
+      - name: Search index (search/us.json)
+        if: env.DO_PUBLISH == 'true' && hashFiles('deploy-home/stocks.json') != ''
+        continue-on-error: true
+        run: python experiments/site-search/build_search_index.py --market us --out deploy-home/search/us.json
+
       - name: Deploy home stocks.json to gh-pages branch
         if: env.DO_PUBLISH == 'true' && hashFiles('deploy-home/stocks.json') != ''
         continue-on-error: true
@@ -326,6 +333,7 @@ jobs:
           sleep 10
           curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/stocks.json" || true
           curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/themes.json" || true
+          [ -f deploy-home/search/us.json ] && curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/search/us.json" || true
 
       # 판정까지 끝난 상태가 있으면 뒤 단계가 실패했어도 저장한다 — Gemini 분류를 헛되게 하지 않기 위해.
       - name: Save state + report (nvda-state branch)
