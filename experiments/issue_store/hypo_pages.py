@@ -96,6 +96,24 @@ def with_logos(text, size=22):
         seen.add(n)
         return '<span style="white-space:nowrap;">' + _logo_for(names[n], n, size) + m.group(0) + "</span>"
     return pat.sub(rep, html)
+
+
+def is_stock_fc(fc):
+    """개별 종목 전망인가 — 자동 등록이 종목 페이지 미국 종목에서 감지한 것(target=stock). 직접 쓴 전망 · 지수 · 업종은 아님"""
+    return fc.get("target") == "stock"
+
+
+def title_for(fc, size=22):
+    """질문 글자 — 개별 종목 전망만 종목명 앞 로고, 거시 · 업종 전망은 글자만(앞에 저울 아이콘) (2026-11-11 사용자)"""
+    return with_logos(fc["title"], size) if is_stock_fc(fc) else dk.esc(fc["title"])
+
+
+def scale_icon(size=24):
+    """증시 전망 저울 아이콘 — 청록 #0E7490 사각(P457) · 모서리 = 크기/4 · 그림 = 크기의 2/3 (상세 질문 줄 24 · 목록 줄 18)"""
+    g = round(size * 2 / 3)
+    return (f'<span style="display:inline-flex;align-items:center;justify-content:center;width:{size}px;height:{size}px;border-radius:{round(size / 4)}px;background:#0E7490;color:#fff;" aria-hidden="true">'
+            f'<svg viewBox="0 0 16 16" width="{g}" height="{g}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">'
+            '<path d="M8 2v12M4.5 14h7"/><path d="M2.5 5h11"/><path d="M4 5 2 9.5h4L4 5zM12 5l-2 4.5h4L12 5z"/></svg></span>')
 # 상세 하단 버튼 · 머리 줄 화살표 = 전망 목록 (2026-11-09 사용자: 홈이 아니라 목록으로) — 테마가 data-nav="list" · data-title-back 을 읽는다
 
 # ---------------------------------------------------------------- 용어 · 색
@@ -1517,11 +1535,10 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
     # 질문 제목 = 날짜 줄 위 (P454, 2026-11-08 사용자: 머리 줄은 `증시 전망`, 질문은 길 수 있어 본문 맨 위에 따로). 구획 제목 글씨(22/28 · 폰 20/26), 아래가 날짜 줄이라 밑줄 없음
     # 질문 줄 = 왼쪽 질문 · 오른쪽 결과 발표 날짜 한 줄, 질문이 길면 날짜 칸을 침범하지 않고 왼쪽 칸 안에서 두 줄 (P455, 2026-11-08 사용자). 날짜는 질문 첫 줄 글자 바닥에 맞춘다(baseline)
     # 질문 앞 = 증시 전망 저울 아이콘(배경 = 홈 `시장 흐름과 종목` 아이콘 청록 #0E7490, P457) 24 · 모서리 6 · 그림 16, P456). 한 줄 높이(1lh = 22/28 · 폰 20/26)를 아이콘 · 날짜 칸이 물려받아 첫 줄 가운데, 둘째 줄은 아이콘 아래로 들어가지 않는다
-    icon = (f'<span style="display:flex;flex:none;align-items:center;height:1lh;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#0E7490;color:#fff;" aria-hidden="true">'
-            '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">'
-            '<path d="M8 2v12M4.5 14h7"/><path d="M2.5 5h11"/><path d="M4 5 2 9.5h4L4 5zM12 5l-2 4.5h4L12 5z"/></svg></span></span>')
-    title_html = with_logos(fc["title"])
-    if title_html != dk.esc(fc["title"]):   # 질문에 종목 로고가 붙으면 저울 아이콘 빼기 — 아이콘 두 개가 겹쳐 보임 (2026-11-10 사용자: `엔비디아 실적 뒤 반도체는?`)
+    icon = f'<span style="display:flex;flex:none;align-items:center;height:1lh;">{scale_icon(24)}</span>'
+    # 개별 종목 전망(자동 등록 target=stock)만 티커 로고 · 저울 없음, 거시 · 업종 전망은 종목명이 있어도 로고 없이 저울만 (2026-11-11 사용자 — 옛 11-10 `질문에 종목명이 있으면 로고`)
+    title_html = title_for(fc)
+    if is_stock_fc(fc):
         icon = ""
     back = _back_of(fc)   # 세부 전망 페이지 — 질문 앞 보라 `세부전망` 라벨 + 날짜 아래 작은 `이전전망 ›` 버튼 (P481, 2026-11-08 사용자: 세부 전망은 전망이 있어야 있는 것)
     sub_lab = violet_word("- 세부전망") if back else ""   # 질문 문장 끝 · 보라 굵은 글씨, 상자 없음 (2026-11-08 사용자 — 옛 P481 질문 앞 상자 → 라벨)
@@ -1560,7 +1577,8 @@ def _row(fc, st):
     sub = fc.get("follow_of") or fc.get("reversal_of") or any(o.get("role") == "parent" for o in fc.get("overlap", []))   # 번복 n회차도 세부 전망 (2026-11-08)   # 이어받았거나 겹쳐서 따로 적은 전망 = 세부 전망 (P464)
     tags = dk.pill_row((violet_box("세부 전망") if sub else "") + "".join(dk.pill(t, kind="area", bare=True) for t in fc.get("tags", [])))
     left = (f'<a href="{page_url(fc["slug"])}" style="display:block;color:#111;font-weight:400;font-size:18px;line-height:28px;text-decoration:none;word-break:keep-all;overflow-wrap:anywhere;">'   # 보통 굵기 · 긴 낱말도 카드 안에서 줄 바꿈 (2026-11-08 사용자: 목록 전부 레귤러, 카드 밖으로 삐져나옴)
-            f'{with_logos(fc["title"], 18)}</a>'
+            + ("" if is_stock_fc(fc) else f'<span style="display:inline-flex;vertical-align:-3px;margin-right:6px;">{scale_icon(18)}</span>')   # 거시 · 업종 줄 앞 저울 = 종목 줄 로고 자리 (2026-11-11 사용자)
+            + f'{title_for(fc, 18)}</a>'
             f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;min-width:0;">{tags.replace("white-space:nowrap;", "flex-wrap:wrap;", 1)}'
             f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{dk.esc(fc["posted"])} 게시</span>'
             # `등록 기록` 링크 삭제 (2026-11-09 사용자: 독자에게 과한 정보 · GitHub 는 일반 독자에게 어렵다)
