@@ -608,7 +608,6 @@ def cftc_card(cftc):
     ach = am["net"] - am["prev"] if am.get("net") is not None and am.get("prev") is not None else None
     state = _span("늘림" if ach and ach > 0 else "줄임" if ach and ach < 0 else "그대로" if ach == 0 else "—")
     theme, ink = _dir(ach)
-    yrs = max(1, round(head.get("weeks", 156) / 52))
     d = head["date"]
     # 2026-11-11 사용자: 늘 같은 안내 두 문장(무엇을 보는 카드 · 신호 아님)은 툴팁으로, 큰손 문장마다 이번 주 순매수 · 순매도 막대
     chs = {(who, k): ((cftc[k] if who == "hf" else (cftc[k].get("am") or {})).get("net"), (cftc[k] if who == "hf" else (cftc[k].get("am") or {})).get("prev"))
@@ -640,23 +639,11 @@ def cftc_card(cftc):
         if bars:
             w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])
             lines.append((_rows_block([dk.bar_row(n, f, c, v, w, first=(j == 0)) for j, (n, f, c, v) in enumerate(bars)], theme), "html"))
-    tip = ("미국 지수 선물로 본 큰손의 이번 주 주식 쪽 움직임. 지수 선물을 사면 그 지수의 주식을 사 둔 것과 같은 효과가 있습니다. "
-           "실제로 주식을 얼마나 사고팔았는지가 아니라 선물로 본 효과이고, 주가가 오른다 · 내린다는 신호는 아닙니다"
-           "\n· 막대 = 주마다 순매수(위) · 순매도(아래) 계약 수, 단위 만 계약. 맨 오른쪽이 이번 주"
-           "\n· 자료 : 미국 상품선물거래위원회(CFTC) 주간 선물 잔고. 헤지펀드 = `레버리지 펀드`, 자산운용사 · 연기금 = `자산운용사`(연기금 · 뮤추얼 펀드 등)")
-    for k in ks:
-        x, a = cftc[k], cftc[k].get("am") or {}
-        tip += f"\n· {x['name']} 들고 있는 잔고 : 헤지펀드 {_ct(x['net'])}({yrs}년 중 {x['pos_pct']}% 지점)"
-        if a.get("net") is not None:
-            tip += f" · 자산운용사 · 연기금 {_ct(a['net'])}({yrs}년 중 {a['pos_pct']}% 지점)"
-        if x.get("prev_long") is not None and x.get("prev_short") is not None and x.get("prev") is not None:
-            dl, ds = x["long"] - x["prev_long"], x["short"] - x["prev_short"]
-            sub = [f"{'신규 매수' if dl > 0 else '매수 청산'} {_man(dl)}" if dl else "", f"{'신규 매도' if ds > 0 else '환매수'} {_man(ds)}" if ds else ""]
-            if any(sub):
-                tip += f"\n· {x['name']} 헤지펀드 이번 주 세부 : " + " · ".join(t for t in sub if t)
-    tip += ("\n· 헤지펀드의 S&P 500 선물 순매도는 대부분 사 둔 주식의 하락 대비라, 순매도가 커도 하락에 건 돈으로 보기 어렵습니다"
-            "\n· 2009년 이후 S&P 500이 크게 빠진 주 46번 중 45번은 자산운용사 · 연기금이 선물을 팔아 주식 비중을 줄였고, 헤지펀드가 그중 80%에서 받아 줬습니다"
-            "\n· 화요일 잔고를 그 주 금요일에 발표해 며칠 같은 값이 이어집니다")
+    # 2026-11-11 사용자 "툴팁 내용이 너무 많다" — 카드를 읽는 데 꼭 필요한 넉 줄만. 잔고 · 3년 자리 · 신규 매수 / 환매수 세부 · 급락 주 기록(46번 중 45번)은 뺐다 (기사 재료, 비공개 doc/검증)
+    tip = ("지수 선물을 사면 그 지수의 주식을 사 둔 것과 같은 효과가 있습니다. 실제 주식 매매가 아니고, 주가 방향 신호도 아닙니다"
+           "\n· 선 = 주마다 순매수(+) · 순매도(−), 단위 만 계약"
+           "\n· 헤지펀드의 S&P 500 선물 순매도는 대부분 사 둔 주식의 하락 대비입니다"
+           "\n· 화요일 기준 값을 금요일에 발표합니다")
     if any(cftc[k].get("source") for k in ks):
         tip += "\n· 이번 주 값을 못 받아 지난번 받은 값입니다"
     return C.question_card("큰손은 주식 비중을 늘렸나?", state, theme, ink, lines, tip=dk.with_src(tip, SRC_CFTC))
