@@ -11,6 +11,7 @@ import csv
 import datetime
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -23,6 +24,7 @@ import prices
 
 RELEVANCE_EVENT_MIN = 2   # trump-trend 와 같다
 WINDOW_HOURS = 24
+MADMONEY_WINDOW_HOURS = 40   # 매드머니(크레이머)는 하루 전 방송이 들어온다 — 미국 동부 18시 방송 · 유튜브 게시가 다음 날 KST 08시 실행 때 24시간을 막 넘기는 날이 있다 (2026-11-11 사용자 A안)
 TREND_DAYS = 7
 
 
@@ -40,8 +42,9 @@ def _ago(**kw):
 
 def _labeled(conn, since, until=None):
     q = """SELECT * FROM statements WHERE analyzed_at IS NOT NULL AND noise_reason IS NULL
-             AND ai_market_relevance >= ? AND published_at >= ?"""
-    args = [RELEVANCE_EVENT_MIN, since]
+             AND ai_market_relevance >= ? AND (published_at >= ? OR (collector = 'madmoney' AND published_at >= ?))"""
+    wide = (datetime.datetime.strptime(since, "%Y-%m-%dT%H:%M:%SZ") - datetime.timedelta(hours=MADMONEY_WINDOW_HOURS - WINDOW_HOURS)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    args = [RELEVANCE_EVENT_MIN, since, wide if until is None else since]
     if until:
         q += " AND published_at < ?"
         args.append(until)
@@ -70,11 +73,14 @@ def build_signals(rows):
         prim = [r for r in items if r["source_kind"] == "primary"]
         lead = max(prim or items, key=lambda r: (r["ai_intensity"], r["ai_market_relevance"]))
         dirs = [r["ai_direction"] for r in items]
+        # 한 묶음 안에 긍정 · 부정이 같이 있으면 중립 (2026-11-11 사용자: 머스크 `사이버트럭 주문 급증` 이 부정 — 같은 주제 묶음의
+        # 단종 · 환불 기사가 다수결로 이겼고, 헤드라인은 대표 기사의 주문 적체 쪽을 골라 둘이 정반대였다)
+        mixed = "positive" in dirs and "negative" in dirs
         s.update({
             "intensity": max(r["ai_intensity"] for r in items),
             "relevance": max(r["ai_market_relevance"] for r in items),
             "issue": (lead["ai_issue"] if "ai_issue" in lead.keys() else None) or issue_codes.FROM_PEOPLE_TOPIC.get(s["topic"], "OTHER"),   # 이슈 코드 — 기록(records)용 (2026-10-22)
-            "direction": lead["ai_direction"] if dirs.count(lead["ai_direction"]) * 2 >= len(dirs) else max(set(dirs), key=dirs.count),
+            "direction": "neutral" if mixed else lead["ai_direction"] if dirs.count(lead["ai_direction"]) * 2 >= len(dirs) else max(set(dirs), key=dirs.count),
             "source_kind": "primary" if prim else "secondary",
             "attribution": lead["attribution"],
             "n_primary": len(prim),
@@ -212,6 +218,22 @@ def history(conn):
 
 CAL_DIR = os.path.join(config.BASE_DIR, "..", "..", "data", "store", "calendar")   # 30년 저장소 캘린더 (로컬만 — CI 엔 없어 그 줄만 빠진다)
 CEO_TICKER = {"huang": "NVDA", "musk": "TSLA"}   # CEO 군 자사 티커 (올트먼 OpenAI 는 비상장)
+# 자사 티커는 발언이 그 회사 이야기일 때만 붙인다 (2026-11-11 사용자: 머스크의 Grok(xAI) 지연 · 앤트로픽 칭찬이 테슬라 발언으로 집계됐다).
+# 분류가 그 티커를 직접 짚었거나, 세부 주제 · 제목 · 인용 · 함께 보도된 제목에 회사 · 제품 이름이 있을 때. xAI · 스페이스X · X 는 비상장 — 연결 종목 없음
+OWN_WORDS = {
+    "TSLA": re.compile(r"tesla|cybertruck|cybercab|robotaxi|\bfsd\b|full self-driving|autopilot|optimus|\bmodel [3sxy]\b|megapack|powerwall"
+                       r"|테슬라|사이버트럭|사이버캡|로보택시|옵티머스", re.I),
+    "NVDA": re.compile(r"nvidia|geforce|blackwell|\brubin\b|\bcuda\b|\bdgx\b|\bgpus?\b|엔비디아", re.I),
+}
+
+
+def _about_own(s, ticker):
+    if ticker in (s.get("companies") or []):
+        return True
+    rx = OWN_WORDS.get(ticker)
+    ld = s.get("lead") or {}
+    text = " ".join([s.get("subtopic") or "", ld.get("title") or "", ld.get("quote") or ""] + [o.get("title") or "" for o in s.get("others") or []])
+    return bool(rx and rx.search(text))
 PROFILE_TOP = 6
 
 
@@ -310,7 +332,8 @@ def enrich(people, out):
     for p in people:
         for s in p["signals"]:
             s["group"] = p["group"]
-            s["path"] = paths.resolve(s, own_ticker=CEO_TICKER.get(p["speaker"]))
+            own = CEO_TICKER.get(p["speaker"])
+            s["path"] = paths.resolve(s, own_ticker=own if own and _about_own(s, own) else None)
             if s["path"]:
                 need.update(s["path"]["assets"])
     try:

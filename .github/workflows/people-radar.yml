@@ -86,12 +86,12 @@ jobs:
         if: env.IS_SCHEDULED == 'true'
         run: python experiments/daily-report/check_published.py --series people
 
-      # classify.py 는 state/trump-state, aggregate.py 는 state/report-state 를 git show 로 읽는다.
+      # classify.py 는 state/trump-state, aggregate.py 는 state/report-state, 크레이머 매드머니(madmoney.py)는 state/media-state 를 git show 로 읽는다.
       # actions/checkout 은 main 만 받으므로 원격 추적 ref 로 따로 받는다. 없으면 각 단계가 알아서 건너뛴다.
-      - name: Fetch trump-state / report-state / radar-state
+      - name: Fetch trump-state / report-state / radar-state / media-state
         if: steps.check.outputs.already_published != 'true'
         run: |
-          for b in trump-state report-state radar-state; do
+          for b in trump-state report-state radar-state media-state; do
             git fetch --no-tags state "$b:refs/remotes/state/$b" 2>/dev/null && echo "$b 받음" || echo "$b 없음"
           done
           if git rev-parse --verify -q refs/remotes/state/radar-state > /dev/null; then

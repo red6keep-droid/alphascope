@@ -142,7 +142,8 @@ PEOPLE = {
                "primary": [], "aliases": ["ackman"],
         "news": '"Bill Ackman"'},
     "cramer": {"name_ko": "짐 크레이머", "title_ko": "CNBC 진행자", "group": "commentator", "start": False,
-               "primary": [], "aliases": ["cramer"],
+               "primary": [("madmoney", None, "self")],   # 매드머니 방송 기록(media-state) — 하루 전 방송, AI 0 (2026-11-11 사용자 A안)
+               "aliases": ["cramer"],
         "news": '"Jim Cramer"'},
     "timiraos": {"name_ko": "닉 티미라오스", "title_ko": "WSJ 연준 담당 기자", "group": "commentator", "start": False,
                  "primary": [], "aliases": ["timiraos"],

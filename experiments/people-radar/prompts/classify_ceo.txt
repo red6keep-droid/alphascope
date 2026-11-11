@@ -62,6 +62,11 @@ TOPIC — non-market:
   Politics, Personal, Media/Press, Other
 
 direction: stance toward the main target — positive = favorable for that company/sector (growth, deal, praise), negative = unfavorable (cut, delay, attack, warning), neutral = mixed.
+  - The main target is the company the statement is about: the speaker's own company unless another company is the subject. Judge for THAT company, never for the market in general.
+  - Mixed news is "neutral": good and bad in one headline (e.g. "demand exceeds production, but the product is being discontinued", "orders too big to fill before production ends"). Do not let one negative word ("ends", "refund", "late") decide when the headline also carries a positive fact.
+  - Praising a competitor is about the competitor (Industry View, the competitor's ticker if listed), not a negative for the speaker's company.
+mentioned_companies: xAI, Grok, SpaceX, Starlink, X (Twitter), Neuralink, The Boring Company, OpenAI and Anthropic are NOT listed — never map them to TSLA or any other ticker.
+issue for company news: product launches, discontinuations, production shifts, order backlogs, extra shifts at a plant -> CORP_EVENT (not GROWTH_JOBS — that is the national economy).
 
 INTENSITY (concreteness, 1-10):
   1-2  passing mention

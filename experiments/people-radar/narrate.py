@@ -53,6 +53,8 @@ path: 입력에 "channel"(경로 이름) 과 "assets"(연결 자산) 가 있는 
       예: "정제 · 물류 용량 확대로 공급 쪽 내림 압력" · "장기 인도량 목표 상향, 생산 규모 · 점유율 기대 자극" · "네오클라우드 수요 지속, GPU 주문 기대"
           "아처 · 조비 매수 공시로 당일 관심 집중" · "사이버캡 운행 대수 급증, 로보택시 매출 기대 자극" · "엔터테인먼트 지분 투자, 본업과 거리 있는 자금 이동"
       "channel" 이 없는 신호는 path 를 비운다("").
+"direction" 은 이 신호에 붙는 긍정 · 부정 · 중립 라벨이다 — headline 이 이 라벨과 반대로 읽히면 안 된다 (2026-11-11 사용자: 라벨 부정인데 "사이버트럭 주문 급증").
+  positive 면 좋은 쪽 사실, negative 면 나쁜 쪽 사실을 headline 에. neutral 이면 엇갈리는 두 사실을 함께 (예: "머스크, 사이버트럭 주문 적체 속 생산 종료").
 종목은 회사 이름을 한국어로 쓰고 티커는 괄호 (예: 테슬라(TSLA)). 사람 이름은 한국어 표기.
 
 INPUT:
@@ -80,7 +82,7 @@ def _source(radar):
         for s in p["signals"]:
             ld = s["lead"]
             row = {"id": ld["id"], "speaker": f'{p["name_ko"]} ({p["title_ko"]})', "attribution": s["attribution"],
-                   "topic": s["topic"], "subtopic": s["subtopic"],
+                   "topic": s["topic"], "subtopic": s["subtopic"], "direction": s.get("direction") or "neutral",
                    "text": _units(ld["quote"] or ld["title"]), "body": _units((ld["body"] or got.get(ld["url"], ""))[:900]),
                    "also_reported": [_units(o["title"]) for o in s["others"]][:3]}
             if s.get("path"):   # 경로표가 정한 자산만 (기획 9-2)

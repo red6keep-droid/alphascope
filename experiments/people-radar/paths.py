@@ -73,11 +73,12 @@ def resolve(signal, own_ticker=None):
         a = _dedupe(companies[:2] + sector_etfs[:1])
         return {"channel": "earnings", "assets": (a or ["SPY"])[:MAX_ASSETS]}
     if t in ("Product", "Investment", "Earnings", "Deal"):
-        a = _dedupe([own_ticker] + [c for c in companies if c != own_ticker][:2])
-        return {"channel": "earnings", "assets": (a or sector_etfs[:1] or ["SPY"])[:MAX_ASSETS]}
+        a = _dedupe([own_ticker] + [c for c in companies if c != own_ticker][:2]) or sector_etfs[:1]
+        # 자사 티커를 못 붙인 CEO 발언(xAI · 스페이스X 같은 비상장 회사 이야기)은 S&P 500 으로 메우지 않는다 — 연결 자산 없음 (2026-11-11 사용자)
+        return {"channel": "earnings", "assets": a[:MAX_ASSETS]} if a else None
     if t == "Industry View":
         a = _dedupe(sector_etfs[:1] + [own_ticker])
-        return {"channel": "earnings", "assets": (a or ["SPY"])[:MAX_ASSETS]}
+        return {"channel": "earnings", "assets": a[:MAX_ASSETS]} if a else None
     if t in ("Stock Call", "Position"):
         a = _dedupe(companies)[:MAX_ASSETS]
         return {"channel": "attention", "assets": a} if a else None

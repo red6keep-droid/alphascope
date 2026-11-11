@@ -186,9 +186,23 @@ def c_ark_trades(speaker, _arg, attribution):
     return out
 
 
+def c_madmoney(speaker, _arg, attribution):
+    # 매드머니 방송 기록(media-state) — 영상 × 이슈 한 줄 = 한 행. 같은 영상의 이슈들이 (인물, 주소) 유일 키에 막히지 않게 주소 끝에 #이슈번호 (2026-11-11 사용자)
+    import madmoney
+    year = datetime.datetime.now(datetime.timezone.utc).year
+    out = []
+    for rid, r in madmoney.load(sorted({year - 1, year})).items():
+        k = rid.rsplit("/", 1)[-1]
+        out.append(_row(madmoney.COLLECTOR, speaker, attribution, madmoney.title_of(r), f'{r.get("url") or "https://www.youtube.com/"}#i{k}',
+                        parse_iso(str(r["published"])) or str(r["published"]), body=r.get("subtopic") or None,
+                        publisher="CNBC Mad Money (YouTube)", ext_id=rid))
+    return out
+
+
 PRIMARY = {
     "rss": c_rss, "fed_speeches": c_fed_speeches, "fed_press": c_fed_press,
     "treasury_html": c_treasury_html, "cnn_archive": c_cnn_archive, "ark_trades": c_ark_trades,
+    "madmoney": c_madmoney,
 }
 
 
