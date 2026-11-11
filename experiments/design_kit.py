@@ -2064,4 +2064,4 @@ def related_buttons(links):
     """글 맨 아래 `함께 보는 페이지` — 버튼 대신 구분선 목록 (2026-10-31 사용자 P187, 옛 P160 버튼): 제목 아래 · 줄 사이 · 맨 끝에 가로 구분선,
     줄 = 3px 점 + 페이지 이름(16px 보통 = 기사 요약 줄 크기, P185) + 오른쪽 나가는 아이콘(회색). 줄 전체가 링크(data-row-link, 가이드라인 10-9).
     모든 리포트 글 끝에 둔다 (2026-11-09 사용자) — 글 끝 블록은 이것 하나 (2026-11-10 사용자: 게시 때 붙던 `함께 보는 리포트`는 없앴다)."""
-    return f'<div data-related="1" style="margin-top:24px;">{related_title("함께 보는 페이지")}{related_rows(list(links)[:3])}</div>'   # 최대 3줄 (2026-11-10 사용자)
+    return f'<div data-related="1" style="margin-top:39px;">{related_title("함께 보는 페이지")}{related_rows(list(links)[:3])}</div>'   # 최대 3줄 (2026-11-10 사용자)

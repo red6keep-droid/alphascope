@@ -1445,7 +1445,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .comments .comments-title[hidden] { display: none; }
 .post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
 .post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
-.post-shell > [data-related].is-moved { margin-top: 40px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 본문 → 버튼 줄과 같은 40px (2026-11-10 사용자) */
+.post-shell > [data-related].is-moved { margin-top: 55px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 40 → 55 (2026-11-11 사용자: 15 더, 옛 2026-11-10 본문 → 버튼 줄과 같은 40) */
 .post-shell > [data-related].is-moved > div:first-child { font-size: 14px !important; line-height: 20px !important; padding-bottom: 8px !important; }   /* 제목 = 푸터 제목과 같은 14/20 굵게 (2026-11-11 사용자, 옛 16/26) */
 .post-shell > [data-related].is-moved > a { font-size: 14px !important; line-height: 20px !important; padding-top: 9px !important; padding-bottom: 9px !important; }   /* 줄 = 14/20 · 위아래 9 (옛 16/26 · 12) — 이미 게시된 글의 인라인 값을 덮는다 (2026-11-11 사용자) */
 body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
