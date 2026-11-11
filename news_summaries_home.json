@@ -918,21 +918,24 @@
  },
  "4adcecd39d3e": {
   "lines": [
-   "연방준비제도와 금융기관들의 인공지능 인프라 구축 모니터링"
+   "엔비디아 다른 기업들에 수천억 달러 규모 재정 약속 체결"
   ],
   "tags": [
    {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
     "issue": "AI_CAPEX",
     "dir": "neutral",
     "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T19:51:51.632292+00:00",
-  "n_src": 900
+  "at": "2026-11-11T21:46:22.982657+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "9eaff884d4a0": {
   "lines": [
@@ -1101,7 +1104,8 @@
  },
  "b61c3675cf53": {
   "lines": [
-   "젯블루항공의 국내선 퍼스트클래스 좌석 공개 및 신규 서비스 도입"
+   "블루퍼스트 국내선 일등석 공개",
+   "2024년 12월 블루퍼스트 출시 예정"
   ],
   "tags": [
    {
@@ -1111,10 +1115,120 @@
     "issue": "CORP_EVENT",
     "dir": "positive",
     "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T19:51:58.148724+00:00",
+  "at": "2026-11-11T21:46:24.982994+00:00",
+  "n_src": 900,
+  "retry": true
+ },
+ "fd6c8945165f": {
+  "lines": [
+   "캐나다 의약품 유통사 임원들 불법 수입 혐의 기소",
+   "캐나다 회사 캐나릭스 최고재무책임자 일요일 체포"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T21:46:22.982657+00:00",
+  "n_src": 900
+ },
+ "776bc90552c6": {
+  "lines": [
+   "코스트코 특별 배당 실시 발표"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "COST"
+    ],
+    "sector": "XLP",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T21:46:22.982657+00:00",
+  "n_src": 311
+ },
+ "3a7234e850d1": {
+  "lines": [
+   "관세로 인한 투자 비용 상승",
+   "미국 연방준비제도 내년 소비재 가격 인상 전망"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "TARIFF_TRADE",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "INFLATION",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T21:46:24.982994+00:00",
+  "n_src": 900
+ },
+ "e4db49d81e89": {
+  "lines": [
+   "지난 4십년간 과세 대상 급여 비중 하락",
+   "세수가 GDP와 보조를 맞췄을 경우 2059년까지 전액 지급 가능"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-11T21:46:24.982994+00:00",
   "n_src": 900
  }
 }

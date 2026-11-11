@@ -1,6 +1,94 @@
 {
-  "updated_at": "2026-11-11 19:51:58 UTC",
+  "updated_at": "2026-11-11 21:46:24 UTC",
   "items": [
+    {
+      "title": "Feds arrest top official of healthcare company, alleging illegal drug importation",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/canarx-official-arrested-drug-importation.html",
+      "published": "2026-11-11 21:33:17",
+      "title_ko": "연방 기관, 불법 의약품 수입 혐의로 헬스케어 기업 고위 임원 체포",
+      "summary_ko": "법원 기록에 따르면 미국 당국은 캐나다 기업의 고위 임원 두 명이 처방약을 불법으로 수입하는 계획을 운영한 혐의로 기소함",
+      "lines": [
+        "캐나다 의약품 유통사 임원들 불법 수입 혐의 기소",
+        "캐나다 회사 캐나릭스 최고재무책임자 일요일 체포"
+      ]
+    },
+    {
+      "title": "CoreWeave soars more than 24% for best day since April 2025 after strong Q3 report",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/coreweave-crwv-outlook-earnings-ai.html",
+      "published": "2026-11-11 21:11:26",
+      "title_ko": "코어위브, 강력한 3분기 실적 발표 후 CEO의 AI 연산 수요 재확인에 26% 급등",
+      "summary_ko": "코어위브, 네비우스, 아이렌 등 네오클라우드 업체들 AI 거래 지속 가능성 관련 심사 직면",
+      "lines": [
+        "코어위브 수요일 주가 26% 급등",
+        "코어위브 3분기 호실적 발표 및 연간 가이던스 상향"
+      ]
+    },
+    {
+      "title": "Nvidia shares rebound as Jensen Huang faces scrutiny ahead of earnings",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/nvidia-stock-jensen-huang-affair-china.html",
+      "published": "2026-11-11 21:04:36",
+      "title_ko": "실적 발표 앞두고 젠슨 황 스캔들 조사 직면 속 엔비디아 주가 5% 반등",
+      "summary_ko": "투자자들이 젠슨 황 CEO의 스캔들이 엔비디아 사업에 미칠 파급 효과 평가 중",
+      "lines": [
+        "최고경영자 스캔들 여파로 화요일 엔비디아 주가 5.47% 하락",
+        "엔비디아 기밀 유출 여부 조사를 위해 웩텔 로펌 고용",
+        "엔비디아 분기 실적 발표 11월 17일 예정"
+      ]
+    },
+    {
+      "title": "JetBlue unveils new first-class seats to bring back profits",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/jetblue-ceo-premium.html",
+      "published": "2026-11-11 20:35:45",
+      "title_ko": "젯블루, 수익성 개선 위해 새로운 일등석 좌석 공개",
+      "summary_ko": "젯블루, 수요일에 기자들에게 새로운 일등석 좌석 공개 예정",
+      "lines": [
+        "블루퍼스트 국내선 일등석 공개",
+        "2024년 12월 블루퍼스트 출시 예정"
+      ]
+    },
+    {
+      "title": "Canada’s ambassador warns Trump tariffs are driving up costs, threatening U.S. investment",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/canada-ambassador-trump-tariffs-investments.html",
+      "published": "2026-11-11 20:30:23",
+      "title_ko": "캐나다 대사, 트럼프 관세가 비용 상승 및 미국 투자 위협 경고",
+      "summary_ko": "트럼프 관세로 비용이 상승하고 투자가 위협받으며 양국 간 협상이 복잡해지면서 미국과 캐나다 간 무역 긴장이 지속됨",
+      "lines": [
+        "관세로 인한 투자 비용 상승",
+        "미국 연방준비제도 내년 소비재 가격 인상 전망"
+      ]
+    },
+    {
+      "title": "Mississippi Senate: Scott Colom lead over Hyde-Smith pops to more than 4,400 votes",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/10/mississippi-senate-scott-colom-hyde-smith.html",
+      "published": "2026-11-11 19:55:39",
+      "title_ko": "미시시피 상원: 투표용지 마감일 속 하이드스미스를 상대로 우세를 연장하는 스콧 콜롬",
+      "summary_ko": "화요일은 미시시피주의 잠정 투표용지 해결 및 우편 부재자 투표용지 접수 마감일임",
+      "lines": [
+        "미시시피주 상원 선거 민주당 스콧 콜롬 후보 우세",
+        "현직 신디 하이드스미스 상원의원 상대로 리드 유지",
+        "오후 4시 30분 기준 2607표 차이",
+        "총 95만 3547표 집계 및 개표율 97% 추정",
+        "격차는 0.27%포인트 기록"
+      ]
+    },
+    {
+      "title": "Social Security could pay full benefits until 2059 if taxable payroll kept pace with GDP: AARP report",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/social-security-benefits-taxable-payroll-gdp.html",
+      "published": "2026-11-11 19:54:27",
+      "title_ko": "AARP 보고서에 따르면 과세 대상 급여가 GDP 보조를 맞출 경우 사회보장기금 2059년까지 전액 지급 가능",
+      "summary_ko": "고령화 노동력이 사회보장기금 신탁기금의 임박한 부족 원인 중 유일한 요인이 아니라고 AARP 공공정책연구소 연구에서 밝혀짐",
+      "lines": [
+        "지난 4십년간 과세 대상 급여 비중 하락",
+        "세수가 GDP와 보조를 맞췄을 경우 2059년까지 전액 지급 가능"
+      ]
+    },
     {
       "title": "Prediction markets tied to clinical trials and drug approvals draw lawmakers' ire",
       "source": "CNBC",
@@ -26,67 +114,6 @@
       ]
     },
     {
-      "title": "How Democrats could snarl Trump administration stakes in private sector companies",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/trump-company-equity-takes.html",
-      "published": "2026-11-11 18:55:39",
-      "title_ko": "민주당이 트럼프 행정부의 민간 기업 지분 참여를 방해하는 방법",
-      "summary_ko": "CATO 연구소 집계에 따르면 트럼프 행정부가 11월 기준 41개 기업에서 지분 포지션 구축",
-      "lines": [
-        "11월 기준 트럼프 행정부 민간 기업 41곳 지분 보유",
-        "민주당의 트럼프 정부 연계 기업 조사 대상에 인텔 포함"
-      ]
-    },
-    {
-      "title": "Apple's record run ignites options flurry — Watch Options Action live",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/apples-record-run-ignites-options-flurry-watch-options-action-live.html",
-      "published": "2026-11-11 18:53:03",
-      "title_ko": "애플의 기록적인 상승세가 옵션 거래 열풍 촉발",
-      "summary_ko": "기술주의 피난처를 찾는 옵션 거래자들의 이목 집중",
-      "lines": [
-        "애플 2026년 랠리 30% 상승 및 사상 최고가 기록",
-        "수요일 전반 거래 시간 동안 애플 옵션 약 약 90만 건 거래"
-      ]
-    },
-    {
-      "title": "General strikes to paralyze Spain as protestors clash with police ahead of election campaign",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/spain-protests-general-strikes-election.html",
-      "published": "2026-11-11 18:02:32",
-      "title_ko": "총파업으로 스페인 마비 조짐, 선거 운동 앞두고 시위대와 경찰 충돌",
-      "summary_ko": "스페인 노동자 수백만 명이 14년 만에 첫 총파업에 참여할 예정",
-      "lines": [
-        "스페인에서 14년 만의 첫 총파업 예정",
-        "지난 10년간 스페인 임대료 두 배 상승"
-      ]
-    },
-    {
-      "title": "Nvidia shares rebound as Jensen Huang faces scrutiny ahead of earnings",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/nvidia-stock-jensen-huang-affair-china.html",
-      "published": "2026-11-11 17:39:26",
-      "title_ko": "실적 발표 앞두고 젠슨 황 스캔들 조사 직면 속 엔비디아 주가 5% 반등",
-      "summary_ko": "투자자들이 젠슨 황 CEO의 스캔들이 엔비디아 사업에 미칠 파급 효과 평가 중",
-      "lines": [
-        "최고경영자 스캔들 여파로 화요일 엔비디아 주가 5.47% 하락",
-        "엔비디아 기밀 유출 여부 조사를 위해 웩텔 로펌 고용",
-        "엔비디아 분기 실적 발표 11월 17일 예정"
-      ]
-    },
-    {
-      "title": "CoreWeave soars 26% as CEO reaffirms AI compute demand after strong Q3 report",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/coreweave-crwv-outlook-earnings-ai.html",
-      "published": "2026-11-11 17:38:34",
-      "title_ko": "코어위브, 강력한 3분기 실적 발표 후 CEO의 AI 연산 수요 재확인에 26% 급등",
-      "summary_ko": "코어위브, 네비우스, 아이렌 등 네오클라우드 업체들 AI 거래 지속 가능성 관련 심사 직면",
-      "lines": [
-        "코어위브 수요일 주가 26% 급등",
-        "코어위브 3분기 호실적 발표 및 연간 가이던스 상향"
-      ]
-    },
-    {
       "title": "미국 10월 CPI 발표 및 연준 12월 금리 인상 우려",
       "title_ko": "미국 10월 CPI 발표 및 연준 12월 금리 인상 우려",
       "summary_ko": "10월 CPI가 예상보다 높게 나오고 월러 이사가 12월 추가 금리 인상 가능성을 강하게 시사하면서 시장에 금리 인상 공포가 다시 부각되었습니",
@@ -96,7 +123,7 @@
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "negative",
-      "n_channels": 2,
+      "n_channels": 1,
       "lines": [
         "진행자 발언 : 10월 헤드라인 CPI 전월 대비 0.4% 증가로 예상치 상회",
         "진행자 발언 : 근원 CPI 0.3% 기록하며 서비스 및 식품 물가 상승 확인",
