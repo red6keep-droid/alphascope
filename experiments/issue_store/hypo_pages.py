@@ -791,14 +791,13 @@ def open_line(fc, log):
     rows.sort(key=lambda r: r.get("day") or "", reverse=True)
     top = rows[0]
     pid = dk.news_pop_id("whyopen", fc.get("slug"))
-    pop = "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q), r.get("stage") == "talk") for r in rows)
+    pop = "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q)) for r in rows)   # `논의중` 라벨 없음 — 향방미정이 이미 정해지지 않은 일 (2026-11-11 사용자)
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{OPEN_TITLE}" hidden>{pop}</div>'
     chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
-    talk = _talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if top.get("stage") == "talk" else ""
     return (f'<div data-why-open="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:0 {dk.ALIGN_PX}px;cursor:pointer;">'
             + dk.pill(OPEN_TITLE, "neutral", bare=True).replace("vertical-align:middle;", "vertical-align:middle;flex:none;", 1)
             + (f'<span style="flex:none;font-size:13px;line-height:19px;color:{dk.SUB};">{md(top["day"])}</span>' if top.get("day") else "")
-            + f'<span style="display:flex;align-items:center;gap:4px;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(top["t"]), grow=False)}{talk}{chev}</span>{body}</div>')
+            + f'<span style="display:flex;align-items:center;gap:4px;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(top["t"]), grow=False)}{chev}</span>{body}</div>')
 
 
 def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""):
@@ -1491,7 +1490,7 @@ def day_why_html(x, fc):
             pop += _pop_sub(f'{dk.esc(names[d][1])} <span style="font-weight:400;color:{dk.SUB};">· {len(rs)}건</span>')
             pop += "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q), r.get("stage") == "talk") for r in rs)
     if w.get("open"):
-        pop += _pop_sub("방향이 아직 안 정해진 일") + "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q), r.get("stage") == "talk") for r in w["open"])
+        pop += _pop_sub(OPEN_TITLE) + "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q)) for r in w["open"])
     for hz, span in WHY_HZ:
         cs = [c for c in w.get("changes") or [] if c["hz"] == hz]
         if cs:
