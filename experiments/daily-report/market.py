@@ -523,60 +523,149 @@ def _ct(v):
     return f"{'순매수' if v >= 0 else '순매도'} {abs(v) / 10000:.1f}만 계약"
 
 
+def _man(v):
+    return f"{abs(v) / 10000:.1f}만 계약"
+
+
+def _cftc_actor(cftc, ks, who):
+    """한 큰손 = 한 문장 — 이번 주 선물 순매수 · 순매도를 주식 쪽 말로 (2026-11-11 사용자 "주가 시장 관점 · 매수 · 매도 물량 흐름만 간단히").
+    지수 선물 순매수 = 주식을 사 둔 것과 같은 효과. 헤지펀드가 순매도 잔고인 선물은 사 둔 주식의 하락 대비라 `하락 대비를 줄였 · 늘렸` 으로."""
+    name = {"hf": "헤지펀드는", "am": "자산운용사 · 연기금(우리 시장의 기관)은"}[who]
+    parts = []   # (지수 이름, 이번 주 변화, 뜻)
+    for k in ks:
+        x = cftc[k] if who == "hf" else (cftc[k].get("am") or {})
+        if x.get("net") is None or x.get("prev") is None:
+            continue
+        ch = x["net"] - x["prev"]
+        hedge = who == "hf" and x["net"] < 0
+        verb = ("변화가 없었" if not ch else ("하락 대비를 줄였" if ch > 0 else "하락 대비를 늘렸") if hedge
+                else ("주식 비중을 늘렸" if ch > 0 else "주식 비중을 줄였"))
+        parts.append((cftc[k]["name"], ch, verb))
+    if not parts:
+        return None
+    act = lambda ch: "순매수해" if ch > 0 else "순매도해"
+    if len(parts) > 1 and all(p[1] for p in parts) and len({(p[1] > 0, p[2]) for p in parts}) == 1:
+        # 같은 쪽 같은 뜻 — 한 번만: `S&P 500 선물 0.5만 · 나스닥 100 선물 0.8만 계약을 순매수해 주식 비중을 늘렸습니다`
+        nums = " · ".join(f"{n} 선물 {abs(c) / 10000:.1f}만" for n, c, _v in parts)
+        return f"{name} {nums} 계약을 {act(parts[0][1])} {parts[0][2]}습니다."
+    seg = [(f"{n} 선물을 {_man(c)} {act(c)} " if c else f"{n} 선물은 ") + v for n, c, v in parts]
+    return f"{name} " + ", ".join(t + ("습니다" if i == len(seg) - 1 else "고") for i, t in enumerate(seg)) + "."
+
+
+def _cftc_flows(x, who):
+    """[(기준일, 그 주 순매수(+) · 순매도(−) 계약)] — hist 의 잔고 차이. 없으면 []."""
+    h = x.get("hist") or []
+    j = 1 if who == "hf" else 2
+    return [(h[i][0], h[i][j] - h[i - 1][j]) for i in range(1, len(h))]
+
+
+def _cftc_trend(cftc, ks, who):
+    """S&P 500 기준 몇 주 연속인지 · 12주 합계 — 막대 위 한 문장 (늘고 있나 · 얼마나)."""
+    k = ks[0]
+    f = _cftc_flows(cftc[k], who)
+    if len(f) < 2:
+        return ""
+    last = f[-1][1]
+    if not last:
+        return ""
+    n = 0
+    for _d, v in reversed(f):
+        if (v > 0) != (last > 0) or not v:
+            break
+        n += 1
+    tot = sum(v for _d, v in f)
+    run = f"{n}주 연속 {'순매수' if last > 0 else '순매도'}" if n >= 2 else f"{len(f)}주 중 {sum(1 for _d, v in f if v > 0)}주 순매수"
+    return (f"{cftc[k]['name']} 기준으로 {run}이고, 최근 {len(f)}주 합계는 "
+            + (f"{_man(tot)} {'순매수' if tot > 0 else '순매도'}입니다." if tot else "0입니다."))
+
+
+def _cftc_weeks_chart(cftc, ks, who):
+    """큰손 하나 = 세로 막대 하나: 최근 12주 주간 순매수(위) · 순매도(아래), S&P 500 = 빨강 · 파랑, 나스닥 100 = 회색. 단위 만 계약, 최신 = 오른쪽."""
+    fl = {k: dict(_cftc_flows(cftc[k], who)) for k in ks}
+    dates = [d for d, _v in _cftc_flows(cftc[ks[0]], who)]
+    if len(dates) < 4:
+        return ""
+    # 2026-11-11 사용자: 세로 막대 → 선 그래프, 수치는 마지막만 · 날짜마다 동그라미 (ends_only — 증시 전망 비교 그래프와 같은 모양)
+    n = len(dates)
+    labels = [f"{int(d[5:7])}/{int(d[8:10])}" if (n - 1 - i) % 3 == 0 else "" for i, d in enumerate(dates)]   # 3주마다 이름 — 폰 폭에서 안 겹치게, 마지막 주는 늘
+    series = [(cftc[k]["name"], [round(fl[k].get(d, 0) / 10000, 1) for d in dates], dk.CHART_MAIN if i == 0 else dk.CHART_CMP, "solid") for i, k in enumerate(ks)]
+    who_name = "헤지펀드" if who == "hf" else "자산운용사 · 연기금"
+    return dk.trend_card(f"{who_name} 주간 순매수(+) · 순매도(−) (만 계약, {n}주)", labels, series,
+                         lambda v: f"{v:+.1f}".replace("-", "−"), ends_only=True, end_right=True)
+
+
 def cftc_card(cftc):
-    """헤지펀드 선물은? — CFTC 레버리지 펀드의 S&P 500 · 나스닥 100 선물 순포지션, 3년 범위 막대 (2026-11-09 사용자).
-    사실만 (값 · 전주 대비 · 3년 범위 안 자리). 위험 점수 · 판정 없음 — 극단 포지션이 급락을 앞서는지는 검증 전.
-    답 = 두 선물의 3년 범위 자리, 카드 색 = S&P 500 순포지션 전주 대비 방향 (증감 색, 좋고 나쁨이 아니다)."""
+    """큰손은 주식 비중을 늘렸나? — CFTC 지수 선물 잔고의 이번 주 변화를 주식 쪽 말로 (2026-11-11 사용자: 옛 `헤지펀드 선물은?` 이 어렵다,
+    "자금 흐름 매수 · 매도 물량만 간단히 · 주가 시장 관점으로"). 본문 = 기관 한 문장 · 헤지펀드 한 문장 · 한 줄 주의.
+    잔고 · 3년 범위 자리 · 신규 매수 / 환매수 세부 · 급락 주 기록은 제목 툴팁. 위험 점수 · 판정 없음 (방향 검증 = 표본 부족, 비공개 doc/검증/헤지펀드-포지션-급락-검증.md).
+    답 · 카드 색 = 자산운용사 · 연기금의 S&P 500 선물 이번 주 증감 (증감 색, 좋고 나쁨이 아니다)."""
     cftc = cftc or {}
     ks = [k for k in ("sp500", "nasdaq") if (cftc.get(k) or {}).get("net") is not None]
     if not ks:
         return ""
-    short = {"sp500": "S&P", "nasdaq": "나스닥"}
-    state = _span(" · ".join(f"{short[k]} {cftc[k]['pos_pct']}%" for k in ks))
     head = cftc[ks[0]]
-    theme, ink = _dir(head["net"] - head["prev"] if head.get("prev") is not None else None)
+    am = head.get("am") or {}
+    ach = am["net"] - am["prev"] if am.get("net") is not None and am.get("prev") is not None else None
+    state = _span("늘림" if ach and ach > 0 else "줄임" if ach and ach < 0 else "그대로" if ach == 0 else "—")
+    theme, ink = _dir(ach)
+    yrs = max(1, round(head.get("weeks", 156) / 52))
+    d = head["date"]
+    # 2026-11-11 사용자: 늘 같은 안내 두 문장(무엇을 보는 카드 · 신호 아님)은 툴팁으로, 큰손 문장마다 이번 주 순매수 · 순매도 막대
+    chs = {(who, k): ((cftc[k] if who == "hf" else (cftc[k].get("am") or {})).get("net"), (cftc[k] if who == "hf" else (cftc[k].get("am") or {})).get("prev"))
+           for who in ("am", "hf") for k in ks}
+    chs = {key: n - p for key, (n, p) in chs.items() if n is not None and p is not None}
+    max_abs = max([abs(v) for v in chs.values()] + [1])
     lines = []
-    for i, k in enumerate(ks):
-        x = cftc[k]
-        yrs = max(1, round(x.get("weeks", 156) / 52))
-        lines.append((C.range_gauge(x["lo"], x["hi"], x["pos_pct"], 0, lambda v: _ct(v).replace(" 계약", ""), "",
-                                    f"{x['name']} 선물 순포지션 ({yrs}년)", f"{yrs}년 범위 안 자리", f"{x['pos_pct']}% 지점"), "html"))
-        d = x["date"]
-        s = (f"{int(d[5:7])}월 {int(d[8:10])}일(화) 기준 " if i == 0 else "") + f"헤지펀드의 {x['name']} 선물 순포지션은 {_ct(x['net'])}"
-        if x.get("prev") is not None:
-            ch = x["net"] - x["prev"]
-            s += (f"으로, 전주({_ct(x['prev'])})보다 {abs(ch) / 10000:.1f}만 계약 {'매수' if ch > 0 else '매도'} 쪽으로 움직였습니다." if ch
-                  else f"으로 전주와 같습니다.")
-        else:
-            s += "입니다."
-        s += f" 최근 {yrs}년 범위의 {x['pos_pct']}% 지점입니다."
-        lines.append((s, "plain"))
-        am = x.get("am") or {}
-        if am.get("net") is not None:   # 같은 선물의 반대편 큰손 — 자산운용사 · 연기금 (2026-11-09 사용자)
-            ach = am["net"] - am["prev"] if am.get("prev") is not None else None
-            lines.append(("row", "자산운용사 · 연기금", _ct(am["net"]), " · ".join(t for t in (
-                f"전주보다 {abs(ach) / 10000:.1f}만 계약 {'매수' if ach > 0 else '매도'} 쪽" if ach else ("전주와 같음" if ach == 0 else ""),
-                f"{yrs}년 범위의 {am['pos_pct']}% 지점") if t)))
-    lines.append(("헤지펀드는 주식을 사고 선물을 파는 거래를 많이 해서 S&P 500 선물은 보통 순매도 쪽입니다. 그래서 방향보다 몇 년 범위의 어디쯤인지를 봅니다. "
-                  "범위 끝에 있다고 곧 사거나 판다는 뜻은 아닙니다.", "note"))
-    # 2026-11-09 사용자 "넣는데 오른다는 거야? 하락한다는 거야?" — 둘 다 아님. 크게 빠진 주 46번 중 80% 되삼(position_check · 비공개 doc/검증/헤지펀드-포지션-급락-검증.md),
-    # 그 뒤 4주는 반등 · 추가 하락 모두 평소보다 컸다 → 방향 신호 아님을 같은 줄에
-    # 같은 날 사용자 "자산운용사 · 연기금 줄 추가" — 크게 빠진 주에 판 쪽은 자산운용사 · 연기금(46번 중 45번), 받은 쪽이 헤지펀드
-    lines.append(("2009년 이후 S&P 500이 크게 빠진 주에 이 선물을 판 쪽은 거의 늘 자산운용사 · 연기금(46번 중 45번)이었고, 헤지펀드는 80%에서 되샀습니다. "
-                  "팔아 둔 선물을 정리한 것으로, 그 뒤 주가가 오른다거나 내린다는 신호는 아닙니다.", "note"))
-    lines.append(("화요일 포지션을 그 주 금요일에 발표해 며칠 같은 값이 이어집니다.", "note"))
-    tip = ("미국 상품선물거래위원회(CFTC)가 매주 내는 선물 포지션 중 `레버리지 펀드`(헤지펀드 등)의 매수 계약 − 매도 계약. "
-           "0% 지점 = 최근 몇 년 중 가장 매도 쪽, 100% 지점 = 가장 매수 쪽. 자산운용사 · 연기금 줄은 같은 선물의 `자산운용사`(연기금 · 뮤추얼 펀드 등) 값\n· 이번 주 : "
-           + " · ".join(f"{cftc[k]['name']} {_ct(cftc[k]['net'])}" for k in ks))
+    for i, who in enumerate(("am", "hf")):
+        t = _cftc_actor(cftc, ks, who)
+        if not t:
+            continue
+        if not lines:   # 첫 문장 앞에 기준일 — 매주 바뀌는 값이라 본문에
+            t = f"{int(d[5:7])}월 {int(d[8:10])}일(화)까지 한 주 동안 " + t
+        trend = _cftc_trend(cftc, ks, who)
+        lines.append((t + (" " + trend if trend else ""), "plain"))
+        chart = _cftc_weeks_chart(cftc, ks, who)
+        if chart:   # 12주 주간 순매수 · 순매도 세로 막대 (2026-11-11 사용자 "기간에 따라 늘고 있는지 · 어느 정도인지")
+            lines.append((chart, "html"))
+            continue
+        bars = []   # 지난 주 수 기록이 없는 저장값 — 이번 주 가로 막대만
+        for k in ks:
+            c = chs.get((who, k))
+            if c is None:
+                continue
+            col = UP if c > 0 else DOWN if c < 0 else dk.MUTED
+            word = "순매수" if c > 0 else "순매도" if c < 0 else "변화 없음"
+            val = f'<span style="color:{col};">{word}{f" {abs(c) / 10000:.1f}만" if c else ""}</span>'
+            bars.append((C.esc(cftc[k]["name"]), abs(c) / max_abs, col, val))
+        if bars:
+            w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])
+            lines.append((_rows_block([dk.bar_row(n, f, c, v, w, first=(j == 0)) for j, (n, f, c, v) in enumerate(bars)], theme), "html"))
+    tip = ("미국 지수 선물로 본 큰손의 이번 주 주식 쪽 움직임. 지수 선물을 사면 그 지수의 주식을 사 둔 것과 같은 효과가 있습니다. "
+           "실제로 주식을 얼마나 사고팔았는지가 아니라 선물로 본 효과이고, 주가가 오른다 · 내린다는 신호는 아닙니다"
+           "\n· 막대 = 주마다 순매수(위) · 순매도(아래) 계약 수, 단위 만 계약. 맨 오른쪽이 이번 주"
+           "\n· 자료 : 미국 상품선물거래위원회(CFTC) 주간 선물 잔고. 헤지펀드 = `레버리지 펀드`, 자산운용사 · 연기금 = `자산운용사`(연기금 · 뮤추얼 펀드 등)")
+    for k in ks:
+        x, a = cftc[k], cftc[k].get("am") or {}
+        tip += f"\n· {x['name']} 들고 있는 잔고 : 헤지펀드 {_ct(x['net'])}({yrs}년 중 {x['pos_pct']}% 지점)"
+        if a.get("net") is not None:
+            tip += f" · 자산운용사 · 연기금 {_ct(a['net'])}({yrs}년 중 {a['pos_pct']}% 지점)"
+        if x.get("prev_long") is not None and x.get("prev_short") is not None and x.get("prev") is not None:
+            dl, ds = x["long"] - x["prev_long"], x["short"] - x["prev_short"]
+            sub = [f"{'신규 매수' if dl > 0 else '매수 청산'} {_man(dl)}" if dl else "", f"{'신규 매도' if ds > 0 else '환매수'} {_man(ds)}" if ds else ""]
+            if any(sub):
+                tip += f"\n· {x['name']} 헤지펀드 이번 주 세부 : " + " · ".join(t for t in sub if t)
+    tip += ("\n· 헤지펀드의 S&P 500 선물 순매도는 대부분 사 둔 주식의 하락 대비라, 순매도가 커도 하락에 건 돈으로 보기 어렵습니다"
+            "\n· 2009년 이후 S&P 500이 크게 빠진 주 46번 중 45번은 자산운용사 · 연기금이 선물을 팔아 주식 비중을 줄였고, 헤지펀드가 그중 80%에서 받아 줬습니다"
+            "\n· 화요일 잔고를 그 주 금요일에 발표해 며칠 같은 값이 이어집니다")
     if any(cftc[k].get("source") for k in ks):
         tip += "\n· 이번 주 값을 못 받아 지난번 받은 값입니다"
-    return C.question_card("헤지펀드 선물은?", state, theme, ink, lines, tip=dk.with_src(tip, SRC_CFTC))
+    return C.question_card("큰손은 주식 비중을 늘렸나?", state, theme, ink, lines, tip=dk.with_src(tip, SRC_CFTC))
 
 
 def base_cards(a, macro, cftc=None):
     """셋째 덩어리 — 시장 환경: `금리의 움직임은?` · `경제 지표는?` 두 카드 (2026-11-08 사용자 P409, P404 한 카드 묶음을 되돌림). 긴장(변동성 지수)은 분위기 카드 안(P403)."""
     a, macro = a or {}, macro or {}
-    return "".join(x for x in (rates_card(a, macro), economy_card(macro), cftc_card(cftc)) if x)   # 헤지펀드 선물 포지션 = 덩어리 끝 (2026-11-09 사용자)
+    return "".join(x for x in (rates_card(a, macro), economy_card(macro), cftc_card(cftc)) if x)   # 큰손 선물(옛 헤지펀드 선물) = 덩어리 끝 (2026-11-09 · 11-11 사용자)
 
 
 def env_card(a, macro):

@@ -1706,7 +1706,7 @@ def _trend_ticks(lo, hi, n=4):
     return out
 
 
-def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False, ends_only=False):   # 선 굵기 · 점선 · 끝 값 = 종목 페이지 line_chart 와 같게(2 · 1 · 6 5 · 13/17 · 점 3/2 · 최신 점 5/4 — 정수 px, 2026-11-07 0-5)
+def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False, ends_only=False, end_right=False):   # 선 굵기 · 점선 · 끝 값 = 종목 페이지 line_chart 와 같게(2 · 1 · 6 5 · 13/17 · 점 3/2 · 최신 점 5/4 — 정수 px, 2026-11-07 0-5)
     """흐름을 보는 선 그래프 흰 카드 (2026-11-05 사용자 M67 · M70 · M71 · M72 · M76).
     labels = 가로축 이름(오래된 것 → 최신, 최신 오른쪽 P164). series = [(이름, 값 목록(None 허용), 색, 모양)] 모양 = "solid" · "dash"(비교 대상 · 기준선) · "step" · "stepdash"(계단 점선 — 기준금리).
     첫 계열이 주인공. 점선 계열은 범례에서 `비교 대상 : 이름`.
@@ -1796,15 +1796,17 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
                 for i, v in pts[:-1]:
                     dots += (f'<span style="position:absolute;left:calc({P(i):.2f}% - 3px);top:{y(v) - 3:.1f}px;width:6px;height:6px;box-sizing:border-box;border-radius:50%;'
                              f'background:#fff;border:2px solid {col};"></span>')
+        end_w = max([text_px(fmt(e[2]), 13) for e in ends] + [0]) + 8 if end_right else 0   # 끝 점 오른쪽 숫자 칸 (점 ~ 숫자 8)
         for k, i, v, col in sorted(ends, key=lambda e: y(e[2])):   # 끝 값 숫자 — 위에서부터, 겹치면 아래로
             yy = y(v)
-            ly = yy - 22
+            ly = yy - (8.5 if end_right else 22)   # end_right = 점과 같은 높이, 점 오른쪽 (2026-11-11 사용자: 큰손 선물 그래프 "마지막 수치는 점보다 우측")
             while any(abs(ly - u) < 17 for u in used):
                 ly += 17
             used.append(ly)
             dots += (f'<span style="position:absolute;left:calc({P(i):.2f}% - 4px);top:{yy - 4:.1f}px;width:8px;height:8px;box-sizing:border-box;border-radius:50%;'
                      f'background:#fff;border:2px solid {col};"></span>')
-            labs += (f'<span style="position:absolute;right:calc({100 - P(i):.2f}% + 6px);top:{ly:.1f}px;font-size:13px;line-height:17px;font-weight:700;white-space:nowrap;'
+            pos = f"left:calc({P(i):.2f}% + 8px);" if end_right else f"right:calc({100 - P(i):.2f}% + 6px);"
+            labs += (f'<span style="position:absolute;{pos}top:{ly:.1f}px;font-size:13px;line-height:17px;font-weight:700;white-space:nowrap;'
                      f'color:{"#111" if k == 0 else NOTE};">{esc(fmt(v))}</span>')
         xl = ""
         for i, lb in enumerate(labels):
@@ -1812,8 +1814,12 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
                 continue
             tr = "translateX(0)" if P(i) < 6 else "translateX(-100%)" if P(i) > 94 else "translateX(-50%)"
             xl += f'<span style="position:absolute;left:{P(i):.2f}%;top:0;transform:{tr};white-space:nowrap;font-size:{TINY};line-height:20px;color:{NOTE};">{esc(lb)}</span>'
-        plot = (f'<span style="display:block;position:relative;padding-right:{axis_w + 10}px;">'   # 끝 점 ~ 세로축 숫자 10px (M76: 너무 붙었다)
-                f'<span style="display:block;position:relative;height:{H}px;">'
+        long_grid = ""
+        if end_right:   # 눈금선을 오른쪽 세로축 숫자 앞까지 (2026-11-11 사용자: 큰손 선물 그래프 "눈금선은 우측 범례까지") — 끝 값 숫자 칸 아래로도 이어진다
+            grid = ""
+            long_grid = "".join(f'<span aria-hidden="true" style="position:absolute;left:0;right:{axis_w - 4}px;top:{y(t) - 0.5:.1f}px;height:1px;background:{GRID_LINE};"></span>' for t in ticks)
+        plot = (f'<span style="display:block;position:relative;padding-right:{axis_w + 10 + end_w}px;">'   # 끝 점 ~ 세로축 숫자 10px (M76: 너무 붙었다) · end_right 면 숫자 칸만큼 더
+                f'{long_grid}<span style="display:block;position:relative;height:{H}px;">'
                 f'<svg viewBox="0 0 1000 {H}" preserveAspectRatio="none" width="100%" height="{H}" aria-hidden="true" style="display:block;overflow:visible;">{grid}{paths}</svg>'
                 f'{dots}{labs}</span>{axis}'
                 f'<span style="display:block;position:relative;height:26px;margin-top:2px;">{xl}</span></span>')
