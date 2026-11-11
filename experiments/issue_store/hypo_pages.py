@@ -691,10 +691,10 @@ def _talk_mark():
 
 
 WHY_HZ = (("단기", "며칠"), ("중기", "한 달~분기"))   # 우리 신호 기간 제목 (signal_groups.HORIZONS, 2026-11-11 사용자: "기간은 단기 · 중기로 타이틀")
-CAL_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '
-            'style="flex:none;margin-right:4px;position:relative;top:2px;"><rect x="2.5" y="3.5" width="11" height="10" rx="1.5"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/></svg>')   # 팝업 `단기` · `중기` 제목 앞 (2026-11-11 사용자)
-NEWS_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '
-             'style="flex:none;margin-right:4px;position:relative;top:2px;"><path d="M3 2.5h8.5v11H4.5A1.5 1.5 0 0 1 3 12V2.5Z"/><path d="M11.5 5.5h1.5v6.5a1.5 1.5 0 0 1-1.5 1.5"/><path d="M5.5 5.5h3.5M5.5 8h3.5M5.5 10.5h2"/></svg>')   # 팝업 `뉴스 기사` 앞 신문 (P501)
+CAL_ICON = ('<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="#6B7280" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '
+            'style="flex:none;margin-right:5px;position:relative;top:3px;"><circle cx="8" cy="8" r="7"/><rect x="5" y="5.5" width="6" height="5.5" rx=".8"/><path d="M5 7.5h6M6.6 4.5v1.6M9.4 4.5v1.6"/></svg>')   # 팝업 `단기` · `중기` 앞 = 회색 원 안 달력 (타임라인 시계 아이콘과 같은 모양, 2026-11-11 사용자)
+NEWS_ICON = ('<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="#6B7280" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '
+             'style="flex:none;margin-right:5px;position:relative;top:3px;"><circle cx="8" cy="8" r="7"/><path d="M5 5h4.8v6H5.8a.8.8 0 0 1-.8-.8V5Z"/><path d="M9.8 6.8H11v3.4a.8.8 0 0 1-.8.8"/><path d="M6.4 6.8h2M6.4 8.6h2"/></svg>')   # 팝업 `뉴스 기사` 앞 = 회색 원 안 신문 (P501)
 WHY_TITLE_W = 30   # 카드 안 묶음 제목 칸(`기사` · `단기` · `중기`) 폭
 
 
@@ -723,7 +723,7 @@ def _pop_li(text, meta="", talk=False):
 
 
 def _pop_sub(title):
-    return f'<span style="display:block;margin:26px 0 0;font-size:14px;line-height:20px;font-weight:700;color:#111;">{title}</span>'   # 위 16 → 26 (P502)
+    return f'<span style="display:block;margin:31px 0 0;font-size:15px;line-height:22px;font-weight:700;color:#111;">{title}</span>'   # 위 16 → 26 (P502)
 
 
 def _why_pop(pid, title, rows, total, sigs=(), as_of=None, page=None):
@@ -741,12 +741,13 @@ def _why_pop(pid, title, rows, total, sigs=(), as_of=None, page=None):
             out += _pop_sub(f'{CAL_ICON}{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>') + "".join(_pop_li(_sig_text(r)) for r in xs)
     if sigs and as_of:   # 기준 날짜 — 종목 페이지가 있으면 링크 `10.30 종목 페이지 ›` (2026-11-11 사용자: `우리 신호 = … 값` 은 독자가 모른다)
         st = f'display:inline-flex;align-items:center;gap:2px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};'
-        out += (f'<a href="{dk.esc(page)}" style="{dk.FOLD_BTN}display:inline-flex;margin:16px 0 0;text-decoration:none;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page   # 인물 발언 팝업 `○○ 발언 더 보기` 와 같은 외곽선 버튼 (P503)
+        out += (f'<a href="{dk.esc(page)}" style="{dk.FOLD_BTN}display:inline-flex;margin:16px 0 0;text-decoration:none;font-weight:400;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page   # 인물 발언 팝업 `○○ 발언 더 보기` 와 같은 외곽선 버튼 (P503)
                 else f'<span style="{st}">{SIG_NAME} 기준 : {md(as_of)}</span>')
     return f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(title)}" hidden>{out}</div>'
 
 
-_CHEV_R = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'   # 줄 끝 › (타임라인 근거 줄과 같은 것)
+CHEV14 = dk.ACC_CHEV.replace("acc-chev", "fc-right").replace('width="16" height="16"', 'width="14" height="14"', 1)   # 줄 끝 › 16 → 14 (10% 작게, 2026-11-11 사용자)
+_CHEV_R = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{CHEV14}</span>'   # 줄 끝 › (타임라인 근거 줄과 같은 것)
 
 
 def _one_line(inner, grow=True, color="#111"):
@@ -846,10 +847,14 @@ OPEN_TITLE = "향방미정"   # 붙여 쓰기 · 회색 라벨 (2026-11-11 사�
 
 def timeline_title():
     """타임라인 구획 제목 `Timeline`(영어) — `향방미정` 줄 위, 위 여백 +30 (P484 · P485, 2026-11-11 사용자). 구획 제목 글씨(dk.h2), 밑줄 없음."""
-    return f'<div data-tl-title="1" style="padding-top:{TL_TITLE_GAP}px;">{dk.h2("Timeline", line=False)}</div>'
+    return f'<div data-tl-title="1" style="padding-top:{TL_TITLE_GAP}px;">{dk.h2("Timeline", line=False).replace(f"font-size:{dk.H2_SIZE};", f"font-size:{TL_TITLE_FS}px;", 1)}</div>'
 
 
-TL_TITLE_GAP = 20   # +30 → +20 (P490)
+TL_TITLE_FS = 20   # `Timeline` = 구획 제목 22 에서 2 작게 (2026-11-11 사용자)
+TL_TITLE_GAP = 10   # +30 → +20 (P490)
+
+
+OPEN_GAP = 35   # `향방미정` 줄 ~ 첫 날짜 = 타임라인 근거 줄 ~ 다음 날짜와 같은 35 (실측, 2026-11-11 사용자: "날짜 사이 여백과 동일")
 
 
 def open_pill():
@@ -874,8 +879,8 @@ def open_line(fc, log):
     pid = dk.news_pop_id("whyopen", fc.get("slug"))
     pop = "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q)) for r in rows)   # `논의중` 라벨 없음 — 향방미정이 이미 정해지지 않은 일 (2026-11-11 사용자)
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{OPEN_TITLE}" hidden>{pop}</div>'
-    chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
-    return (f'<div data-why-open="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:8px;margin:0 0 26px;padding:0 {dk.ALIGN_PX}px 0 0;cursor:pointer;">'
+    chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{CHEV14}</span>'
+    return (f'<div data-why-open="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:8px;margin:0 0 {OPEN_GAP}px;padding:0 {dk.ALIGN_PX}px 0 0;cursor:pointer;">'
             + open_pill()
             + (f'<span style="flex:none;font-size:13px;line-height:19px;color:{dk.SUB};">{md(top["day"])}</span>' if top.get("day") else "")
             + f'<span style="display:flex;align-items:center;gap:4px;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(top["t"]), grow=False)}{chev}</span>{body}</div>')
@@ -1290,7 +1295,7 @@ def _event_chart(reg):
                                         "선거 전인 10.30 에도 이미 -7.2% 빠졌습니다."))
 
 
-PLUS_BOX, PLUS_RADIUS, PLUS_ICON = 22, 6, 12   # 지난 날 펼침 + 아이콘: 공식 접기 버튼(네모 31 · 화살표 18)보다 작게 (2026-11-07 사용자)
+PLUS_BOX, PLUS_RADIUS, PLUS_ICON = 22, 6, 11   # 지난 날 펼침 + 아이콘: 공식 접기 버튼(네모 31 · 화살표 18)보다 작게 (2026-11-07 사용자)
 PLUS_CSS = ('<style>.fc-day>summary{list-style:none;cursor:pointer;}.fc-day>summary::-webkit-details-marker{display:none;}'
             '.fc-day[open]>summary .fc-plus-v{display:none;}'
             '.fc-more>summary::-webkit-details-marker{display:none;}.fc-more[open]>summary{display:none;}</style>')   # 지난 경과 더 보기 = 펼치면 버튼을 숨기고 타임라인이 이어진다 (P418)   # 펼치면 세로획을 숨겨 − 로. 테마 붙여넣기 없이 되도록 본문 안 style (render_html 여러 그래프와 같은 방식)
@@ -1435,7 +1440,7 @@ def _stock_now(fc, st):
              f'<b style="flex:none;color:#111;">{dk.esc(fc.get("subject", ""))}</b>'
              f'<span style="flex:none;font-size:13px;line-height:19px;color:{dk.SUB};">{dk.esc(sym)}</span>{price}'
              f'<span style="flex:1 1 auto;"></span>'
-             f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>')
+             f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{CHEV14}</span>')
     style = (f'display:flex;align-items:center;gap:8px;margin:4px 0 12px;padding:0 {dk.ALIGN_PX}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};'
              f'color:#111;text-decoration:none;white-space:nowrap;overflow:hidden;')
     if fc.get("stock_page"):
@@ -1614,7 +1619,7 @@ def day_why_html(x, fc):
         txt = f'{c.get("name", "")} : {c["from"]} → {c.get("to", "")}' if c.get("from") else f'{c.get("name", "")} : {c.get("to", "")}'
         line = f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(txt), grow=False, color=TL_WHY_INK)}</span>'
     # 줄 전체 = 팝업 버튼, 끝에 › 만 (2026-11-11 사용자: `근거 n건` · 더보기 버튼 삭제, 문장을 누르면 팝업)
-    chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
+    chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{CHEV14}</span>'
     return (f'<div data-why-day="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:4px;margin:-4px 0 {12 - dk.VP}px;cursor:pointer;">'
             f'{line}{chev}{body}</div>')
 
