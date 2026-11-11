@@ -212,8 +212,28 @@ def history(conn):
     # 새로운가 재료 (기획 9-1 4번): 날짜별 (인물|주제) 집합 — enrich 가 오늘 신호마다 며칠째 · 30일 만에 처음을 센다
     topic_days = [sorted({f'{x["speaker"]}|{x["topic"]}' for x in day}) for day in days]
     return {"people_trend": people_trend, "topic_trend": topic_trend, "targets7": targets7, "strips": strips, "keywords": keywords,
+            "person7": person_counts(now7),   # 인물 페이지 요약 카드 `최근 7일 …` 재료 (2026-11-11 사용자) — 파이썬 셈, AI 없음
             "profiles": profiles(conn, window(0, STRIP_DAYS)),   # 인물별 발언 특징 (2026-10-25)
             "topic_days": topic_days}
+
+
+def person_counts(sigs):
+    """인물별 세부 주제(ai_subtopic) · 언급 종목 건수와 방향 — {speaker: {"n", "dirs", "subs": {key: {positive, negative, neutral}}, "companies": {sym: {…}}}}.
+    한국어 이슈 이름 · 같은 뜻 합치기는 화면(people_section.person_cards → stock_mentions._issue_key)이 한다."""
+    out = {}
+    for s in sigs:
+        p = out.setdefault(s["speaker"], {"n": 0, "dirs": {"positive": 0, "negative": 0, "neutral": 0}, "subs": {}, "companies": {}})
+        d = s["direction"] if s["direction"] in p["dirs"] else "neutral"
+        p["n"] += 1
+        p["dirs"][d] += 1
+        k = (s.get("subtopic") or "").strip()
+        if k:
+            e = p["subs"].setdefault(k, {"positive": 0, "negative": 0, "neutral": 0})
+            e[d] += 1
+        for c in s.get("companies") or []:
+            e = p["companies"].setdefault(c, {"positive": 0, "negative": 0, "neutral": 0})
+            e[d] += 1
+    return out
 
 
 CAL_DIR = os.path.join(config.BASE_DIR, "..", "..", "data", "store", "calendar")   # 30년 저장소 캘린더 (로컬만 — CI 엔 없어 그 줄만 빠진다)

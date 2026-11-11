@@ -367,14 +367,34 @@ def _head_row(title, body_html, first, right=""):
             + f'</span><span style="display:block;margin-top:4px;">{body_html}</span></span>')
 
 
+def _person_cards(r):
+    """인물 → 요약 강조 카드 HTML 함수. 실패하면 빈 카드(글은 그대로)."""
+    try:
+        import importlib.util
+        import people_section
+        import stock_mentions
+        spec = importlib.util.spec_from_file_location("dr_cards", os.path.join(config.BASE_DIR, "..", "daily-report", "cards.py"))
+        C = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(C)
+        p7 = r.get("person7") or {}
+        return lambda p: people_section.person_cards(C.question_card, stock_mentions.person_summary(p["signals"], p7.get(p["speaker"])), p["name_ko"])
+    except Exception as e:  # noqa: BLE001
+        print(f"[html] 인물 카드 건너뜀: {e}")
+        return lambda p: ""
+
+
 def sec_person_head(r):
     """인물 상세 첫 카드 `이 사람 말 읽는 법` (기획 9-4) — 발언 경로 · 과거 참고(또는 정보 수집 중) · 다음 날짜. 평소엔 숨김, 테마 JS 가 제목 아래로 옮긴다
     (data-person-strip 이름은 테마 JS 호환용). 건수 통계 카드(대상 국가 · 말한 것 · 키워드)는 뺐다 — 뜻이 없다 (2026-10-25 사용자)."""
     refs = _refs()
     out = []
+    pc = _person_cards(r)
     for p in r["people"]:
         prof = (r.get("profiles") or {}).get(p["speaker"])
+        cards_html = pc(p)   # 인물 요약 강조 카드 — 읽는 법 카드 위 (2026-11-11 사용자)
         if not prof:
+            if cards_html:
+                out.append(f'<div data-person-strip="{p["speaker"]}" hidden>{cards_html}</div>')
             continue
         rows = []
         pth = " · ".join(f'{PATH_KO.get(k, k)} {v}' for k, v in sorted(prof["paths"].items(), key=lambda kv: -kv[1]))
@@ -393,7 +413,7 @@ def sec_person_head(r):
         body = "".join(_head_row(t, b, i == 0, right=rt) for i, (t, b, rt) in enumerate(rows))
         body = body.replace(f'padding:{17 - dk.VP}px 12px;">', f'padding:{17 - dk.VP}px 12px;{dk.MULTI_SEP}">', 1)
         card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{dk.MULTI}">{head}{body}</span></div>'
-        out.append(f'<div data-person-strip="{p["speaker"]}" hidden>{card}</div>')
+        out.append(f'<div data-person-strip="{p["speaker"]}" hidden>{cards_html}{card}</div>')
     return "".join(out)
 
 

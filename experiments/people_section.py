@@ -207,6 +207,58 @@ def summary_card(qcard, sm=None, faces=None):
     return f'<div style="margin:0 0 {PEOPLE_CARDS_GAP}px;">{"".join(out)}</div>' if out else ""
 
 
+def person_cards(qcard, ps, name):
+    """인물 페이지 맨 위 강조 카드(질문 카드) — `오늘 가장 많이 말한 이슈는?` · `최근 7일 가장 많이 말한 이슈는?` · `최근 7일 많이 언급한 종목은?`
+    (2026-11-11 사용자). ps = stock_mentions.person_summary. 재료가 없는 카드는 뺀다(빈 답 금지): 이슈 · 종목은 2건 이상만. 파이썬 셈만, AI 없음."""
+    out = []
+
+    def issue_card(q, part, when, least=PERSON_MIN):
+        iss = [x for x in part.get("issues") or [] if x["n"] >= least]
+        if not iss:
+            return
+        top = iss[0]
+        ties = [x for x in iss[1:] if x["n"] == top["n"]]
+        theme, ink, lean = _lean(top["dirs"])
+        if top["n"] < 2:   # 모두 1건 = `가장 많이` 가 아니다 — 말한 이슈를 그대로 (2026-11-11 Claude: 1건짜리를 `가장 많이` 로 쓰면 사실과 다르다)
+            alld = {}
+            for x in iss:
+                for k, v in x["dirs"].items():
+                    alld[k] = alld.get(k, 0) + v
+            theme, ink, lean = _lean(alld)
+            if sum(alld.values()) == 1:
+                lean = lean.replace("발언이 많았습니다", "발언이었습니다")
+            first = f"{when} {dk.josa(name, '은')} {' · '.join(x['name'] for x in iss[:PERSON_ROWS])} 이슈를 말했습니다. {lean}."
+            lines = [(first, "plain")] + [("row", x["name"], _dir_val(x["dirs"]), "") for x in iss[:PERSON_ROWS]]
+            lines.append((DIR_NOTE, "note"))
+            out.append(qcard(q.replace("가장 많이 말한 이슈는?", "어떤 이슈를 말했나?"), top["name"] + (f" 외 {len(iss) - 1}개" if len(iss) > 1 else ""), theme, ink, lines))
+            return
+        first = f"{when} {name}의 발언 {part['n']}건 중 가장 많이 나온 이슈는 {top['name']}입니다(발언 {top['n']}건). {lean}."
+        if len(iss) > 1:
+            first += f" 다음은 {' · '.join(x['name'] for x in iss[1:PERSON_ROWS])} 순입니다."
+        lines = [(first, "plain")] + [("row", x["name"], _dir_val(x["dirs"]), f"발언 {x['n']}건") for x in iss[:PERSON_ROWS]]
+        lines.append((DIR_NOTE, "note"))
+        out.append(qcard(q, top["name"] + (f" 외 {len(ties)}개" if ties else ""), theme, ink, lines))
+
+    issue_card("오늘 가장 많이 말한 이슈는?", ps.get("today") or {}, "오늘", 1)   # 오늘은 이슈마다 1건인 날이 많다 — 1건부터, 같으면 `외 n개`
+    d7 = ps.get("d7") or {}
+    issue_card("최근 7일 가장 많이 말한 이슈는?", d7, "최근 7일")
+    st = [x for x in d7.get("stocks") or [] if x["n"] >= PERSON_MIN]
+    if st:
+        x = st[0]
+        theme, ink, lean = _lean(x["dirs"])
+        first = f"최근 7일 {name}이(가) 가장 많이 언급한 종목은 {x['name']}입니다(발언 {x['n']}건). {lean}."
+        first = first.replace(f"{name}이(가)", dk.josa(name, "이"))
+        if len(st) > 1:
+            first += f" 다음은 {' · '.join(y['name'] for y in st[1:PERSON_ROWS])} 순입니다."
+        lines = [(first, "plain")] + [("row", y["name"], _dir_val(y["dirs"]), f"발언 {y['n']}건") for y in st[:PERSON_ROWS]]
+        lines.append((DIR_NOTE, "note"))
+        out.append(qcard("최근 7일 많이 언급한 종목은?", x["name"], theme, ink, lines))
+    return f'<div data-person-cards="1" style="margin:0 0 {PEOPLE_CARDS_GAP}px;">{"".join(out)}</div>' if out else ""
+
+
+PERSON_MIN, PERSON_ROWS = 2, 3   # 인물 카드: 2건 이상인 이슈 · 종목만 · 줄은 3개까지
+
+
 def for_stock(sym):
     """종목 페이지 — 최근 7일 이 종목을 지목한 발언. 없으면 ""."""
     d = load()

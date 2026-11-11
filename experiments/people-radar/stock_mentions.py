@@ -155,6 +155,33 @@ def summary(radar):
     return {"issues": issues[:3], "split": split[:2], "stocks": stocks, "n_people": len(radar.get("people", [])), "n": len(sig)}
 
 
+def person_summary(today_sigs, p7):
+    """인물 페이지 요약 카드 재료 (2026-11-11 사용자: "인물마다 많이 한 말 · 이슈 카드, 오늘 · 최근 7일") — 파이썬 셈, AI 없음.
+    today_sigs = 레이더 그 인물 signals(24시간), p7 = radar["person7"][speaker](aggregate.person_counts, 7일).
+    → {"today": {n, dirs, issues}, "d7": {n, dirs, issues, stocks}} · issues · stocks = [{name, n, dirs}] 건수 순. 한국어 이름이 없는 세부 주제는 뺀다(영문 노출 금지)."""
+    from collections import Counter
+    ko = _subtopic_ko()
+
+    def merge_issues(pairs):
+        by, names = {}, {}
+        for sub, dirs in pairs:
+            ik = _issue_key(sub, ko)
+            if not ik:
+                continue
+            e = by.setdefault(ik[0], Counter())
+            e.update({k: v for k, v in dirs.items() if v})
+            names[ik[0]] = ik[1]
+        return [{"name": names[k], "n": sum(c.values()), "dirs": dict(c)} for k, c in sorted(by.items(), key=lambda kv: -sum(kv[1].values()))]
+
+    today = {"n": len(today_sigs), "dirs": dict(Counter(x["direction"] for x in today_sigs)),
+             "issues": merge_issues([(x.get("subtopic"), {x["direction"]: 1}) for x in today_sigs])}
+    p7 = p7 or {}
+    d7 = {"n": p7.get("n", 0), "dirs": p7.get("dirs") or {},
+          "issues": merge_issues(list((p7.get("subs") or {}).items())),
+          "stocks": [{"name": _ko(c) or c, "n": sum(v.values()), "dirs": v} for c, v in sorted((p7.get("companies") or {}).items(), key=lambda kv: -sum(kv[1].values()))]}
+    return {"today": today, "d7": d7}
+
+
 def build(snapshots, now=None, prior=None, post_url=None):
     """snapshots = [(radar, cards)] 오래된 것부터. 같은 발언(id)은 마지막 것. prior = 지난 실행의 items(7일 누적)."""
     now = now or datetime.datetime.now(datetime.timezone.utc)
