@@ -212,10 +212,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
 /* 미국 ⇄ 한국 스위치 (2026-11-10 사용자: "스위치로. 홈은 미국이니 미국일 때는 한국 국기") — 지금 화면이 아닌 쪽 국기 + 이름 하나 */
-.nav-switch { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 5.5px 12px 5.5px 5.5px; border: 1px solid var(--border-strong); border-radius: 999px; background: #fff; color: #111; font-size: 15px; font-weight: 700; line-height: 22px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: border-color .15s ease, background-color .15s ease; }
+.nav-switch { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 7px 12px 7px 8px; border: 1px solid var(--border-strong); border-radius: 999px; background: #fff; color: #111; font-size: 14px; font-weight: 700; line-height: 20px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: border-color .15s ease, background-color .15s ease; }
 .nav-switch:hover { border-color: #94A3B8; background: #F8FAFC; }
 /* 높이 36 = 메뉴 아이콘 테두리 36 과 같게 (국기 23 + 위아래 5.5 + 테두리 1). 국기 26 → 23 으로 10% 줄임(2026-11-11 사용자) */
-.nav-switch svg { width: 23px; height: 23px; flex: none; display: block; border-radius: 50%; }
+.nav-switch svg { width: 18px; height: 18px; flex: none; display: block; border-radius: 50%; }   /* 국기 23 → 18 · 글자 14/20 · 높이 36 그대로 (2026-11-11 사용자) */
 /* 바로 보이는 메뉴 · 서랍 메뉴 나누기 (2026-11-10 사용자: "미국, 한국만 메뉴, 증시 전망은 메뉴 아이콘 안으로").
    서랍 메뉴 링크 가운데 data-bar 가 붙은 것만 로고 오른쪽 줄에 복사하고 body.has-bar 를 붙인다(JS). 그때는 PC 에서도 메뉴 아이콘 · 서랍을 쓴다.
    data-bar 가 하나도 없으면(지금 테마) 예전 그대로: PC 는 메뉴 전부 줄로, 폰은 전부 복사 */
