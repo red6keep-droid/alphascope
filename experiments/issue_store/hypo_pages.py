@@ -1439,11 +1439,11 @@ END_GO = ('<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="c
 
 
 def _side_names(fc):
-    """{+1: (갈래 이름, `반등 쪽`), −1: (…, `지속 쪽`)} — 갈래 dir 로 (급락 뒤 반등 = +1, 급등 뒤 조정 = −1)."""
+    """{+1: (갈래 이름, `반등`), −1: (…, `지속`)} — 갈래 dir 로 (급락 뒤 반등 = +1, 급등 뒤 조정 = −1)."""
     out = {}
     for sc in (fc or {}).get("scenarios") or []:
         if sc.get("dir") in (1, -1):
-            out[sc["dir"]] = (sc["name"], sc.get("cond", "").removesuffix("이면").strip())
+            out[sc["dir"]] = (sc["name"], sc.get("cond", "").removesuffix("이면").strip().removesuffix("쪽").strip())   # `반등` · `지속` (2026-11-11 사용자: `쪽` 삭제)
     return out
 
 
@@ -1453,7 +1453,7 @@ def _side_pill(word):
 
 def day_why_html(x, fc):
     """타임라인 그날 줄 아래 근거 한 줄 + 그날 더보기 팝업 (2026-11-11 사용자).
-    기운 쪽(우세 · 실현)이 있는 날 = 그 쪽 근거 맨 위 한 줄, `지켜보는 중` 날 = 그날 근거 맨 위 한 줄 앞에 `반등 쪽` · `지속 쪽` 라벨. 그날 소식이 없으면 없음.
+    기운 쪽(우세 · 실현)이 있는 날 = 그 쪽 근거 맨 위 한 줄, `지켜보는 중` 날 = 그날 근거 맨 위 한 줄 앞에 `반등` · `지속` 라벨. 그날 소식이 없으면 없음.
     팝업 = 갈래별 그날 기사(날짜 · 매체 · 논의중) · 방향이 안 정해진 일 · 우리 신호 바뀐 것(전날 → 그날)."""
     w = x.get("why") or {}
     names = _side_names(fc)
