@@ -245,10 +245,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
 /* 미국 ⇄ 한국 스위치 (2026-11-10 사용자: "스위치로. 홈은 미국이니 미국일 때는 한국 국기") — 지금 화면이 아닌 쪽 국기 + 이름 하나 */
-.nav-switch { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 4px 12px 4px 4px; border: 1px solid var(--border-strong); border-radius: 999px; background: #fff; color: #111; font-size: 15px; font-weight: 700; line-height: 22px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: border-color .15s ease, background-color .15s ease; }
+.nav-switch { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 5.5px 12px 5.5px 5.5px; border: 1px solid var(--border-strong); border-radius: 999px; background: #fff; color: #111; font-size: 15px; font-weight: 700; line-height: 22px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: border-color .15s ease, background-color .15s ease; }
 .nav-switch:hover { border-color: #94A3B8; background: #F8FAFC; }
-/* 높이 36 = 메뉴 아이콘 테두리 36 과 같게 (국기 26 + 위아래 4 + 테두리 1, 2026-11-10 사용자) */
-.nav-switch svg { width: 26px; height: 26px; flex: none; display: block; border-radius: 50%; }
+/* 높이 36 = 메뉴 아이콘 테두리 36 과 같게 (국기 23 + 위아래 5.5 + 테두리 1). 국기 26 → 23 으로 10% 줄임(2026-11-11 사용자) */
+.nav-switch svg { width: 23px; height: 23px; flex: none; display: block; border-radius: 50%; }
 /* 바로 보이는 메뉴 · 서랍 메뉴 나누기 (2026-11-10 사용자: "미국, 한국만 메뉴, 증시 전망은 메뉴 아이콘 안으로").
    서랍 메뉴 링크 가운데 data-bar 가 붙은 것만 로고 오른쪽 줄에 복사하고 body.has-bar 를 붙인다(JS). 그때는 PC 에서도 메뉴 아이콘 · 서랍을 쓴다.
    data-bar 가 하나도 없으면(지금 테마) 예전 그대로: PC 는 메뉴 전부 줄로, 폰은 전부 복사 */
@@ -1359,7 +1359,7 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 42px;   /* 가로 30% 넓게 — 하단 버튼 공통 (2026-10-13 사용자) · 높이 −6(위아래 3씩, 홀수면 글자가 반 px 치우침) (2026-11-01 사용자 P213) */
+  padding: 9px clamp(42px, calc((100vw - 238px) / 2), 70px);   /* 가로 50% 넓게 42 → 70(목록 114 → 170px, 2026-11-11 사용자). 폰이 좁으면 양옆 댓글 · TOP 자리를 남기고 줄어든다 — 375 폭 ≈ 167 · 360 ≈ 152 · 320 이하 = 옛 42. 높이 −6(위아래 3씩, 홀수면 글자가 반 px 치우침) (2026-11-01 사용자 P213) */
   background: #111;
   border: 1px solid #111;
   border-radius: 8px;
@@ -1903,7 +1903,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
                       <a class='post-nav-list' href='/search/label/%EC%97%94%EB%B9%84%EB%94%94%EC%95%84'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;한국 증시 리포트&quot;)'/>
                       <a class='post-nav-list' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>목록</a>
-                    <b:elseif cond='data:view.isPage'/>
+                    <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;인물 발언&quot;)'/>
+                      <a class='post-nav-list' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>목록</a>
+                    <b:elseif cond='data:view.isPage or data:post.labels any (l =&gt; l.name == &quot;미디어 데일리&quot;)'/>
+                      <b:comment>인물 발언 = 인물 발언 목록 · 미디어 데일리(방송) = 홈으로 — 둘 다 미국 증시 리포트 목록으로 가던 것 (2026-11-11 사용자)</b:comment>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
                     <b:else/>
                       <a class='post-nav-list' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>목록</a>
@@ -1923,6 +1926,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
                     <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;트럼프 트렌드&quot;'>트럼프 SNS 트렌드 목록
                     <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;엔비디아&quot;'/>엔비디아 리포트 목록
                     <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;한국 증시 리포트&quot;'/>한국 증시 리포트 목록
+                    <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;인물 발언&quot;'/>인물 발언 목록
                     <b:elseif cond='data:view.isLabelSearch'/>미국 증시 리포트 목록
                     <b:else/><data:view.title.escaped/></b:if>
                   </h2>
@@ -3858,6 +3862,65 @@ body.no-dashboard .main-content { padding-top: 32px; }
             .catch(function () {});
         })();
 
+        /* ====================================================== 라벨 목록 = 피드로 다시 그리기 (2026-11-11 사용자: "증시 리포트 목록이 한 개뿐이고 더보기 해도 안 나온다")
+           블로거는 목록 화면에도 글 본문을 통째로 싣고 페이지 크기 제한에 걸리면 글 수를 줄인다 — 리포트 한 편이 약 90만 바이트라 한 화면에 1편,
+           `글 더 보기`도 다음 1편짜리 화면으로 넘어갔다. 가벼운 요약 피드(/feeds/posts/summary)로 20편씩 카드를 그리고, `글 더 보기`는 같은 화면 아래에 다음 20편을 붙인다.
+           피드도 한 번에 몇 편만 줄 때가 있어(5편) start-index 로 이어 받는다. 피드가 실패하면 블로거 화면을 그대로 둔다. AI · 쓰기 없음, 방문자 브라우저의 읽기만 */
+        (function () {
+          var grid = document.querySelector('.post-grid');
+          var lm = /\/search\/label\/([^/?#]+)/.exec(location.pathname);
+          if (!grid || !lm || !window.fetch) return;
+          var PAGE = 20, next = 1, total = Infinity, busy = false;
+          var um = /[?&]updated-max=([^&]+)/.exec(location.search);
+          var base = '/feeds/posts/summary/-/' + lm[1] + '?alt=json' + (um ? '&updated-max=' + um[1] : '');
+          var oldPager = document.querySelector('.blog-pager');
+          function pad(n) { return (n < 10 ? '0' : '') + n; }
+          function card(e) {
+            var link = (e.link || []).filter(function (l) { return l.rel === 'alternate'; })[0];
+            if (!link) return null;
+            var p = String((e.published || {}).$t || '');   /* 2026-11-10T16:22:00.000+09:00 — 블로그 시간대 그대로 */
+            var art = el('article', 'post-card'), body = el('div', 'post-card-body');
+            var meta = el('div', 'post-card-meta'); meta.textContent = p.slice(0, 10).replace(/-/g, '.');
+            var h = el('h3', 'post-card-title'), a = el('a'); a.href = link.href; a.textContent = (e.title || {}).$t || '';
+            var sn = el('div', 'post-card-snippet'); sn.textContent = ((e.summary || {}).$t || '').replace(/\s+/g, ' ').trim();
+            h.appendChild(a); body.appendChild(meta); body.appendChild(h); body.appendChild(sn); art.appendChild(body);
+            return art;
+          }
+          /* need 편을 다 받을 때까지(피드가 덜 주면 이어서) — 끝이면 total 을 맞춘다 */
+          function load(need, got) {
+            got = got || [];
+            if (need <= 0 || next > total) return Promise.resolve(got);
+            return fetch(base + '&start-index=' + next + '&max-results=' + need)
+              .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+              .then(function (json) {
+                var f = json.feed || {}, es = f.entry || [];
+                var t = +(((f['openSearch$totalResults'] || {}).$t) || 0); if (t) total = t;
+                if (!es.length) { total = next - 1; return got; }
+                next += es.length;
+                return load(need - es.length, got.concat(es));
+              });
+          }
+          var more = el('a', 'blog-pager-older-link'); more.textContent = '글 더 보기';
+          more.href = (oldPager && oldPager.querySelector('a') || {}).href || location.pathname;
+          var pager = el('div', 'blog-pager'); pager.appendChild(more);
+          function sync() { pager.hidden = next > total; pager.style.display = pager.hidden ? 'none' : ''; }
+          more.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            if (busy) return; busy = true; more.textContent = '불러오는 중…';
+            load(PAGE).then(function (es) { es.forEach(function (e) { var c = card(e); if (c) grid.appendChild(c); }); })
+              .catch(function () {})
+              .then(function () { busy = false; more.textContent = '글 더 보기'; sync(); });
+          });
+          load(PAGE).then(function (es) {
+            var cards = es.map(card).filter(Boolean);
+            if (!cards.length) return;   /* 못 받으면 블로거 화면 그대로 */
+            grid.textContent = '';
+            cards.forEach(function (c) { grid.appendChild(c); });
+            if (oldPager) oldPager.parentNode.replaceChild(pager, oldPager); else grid.parentNode.insertBefore(pager, grid.nextSibling);
+            sync();
+          }).catch(function () {});
+        })();
+
         /* ============================================================ 모바일 메뉴 (2026-10-12 사용자: 메뉴를 누르면 오른쪽에서 열리는 서랍) */
 
         var toggle = document.querySelector('.nav-toggle');
@@ -4958,6 +5021,17 @@ body.no-dashboard .main-content { padding-top: 32px; }
         });
       })();
 
+      /* ============================================================ 제목 줄 화살표 = 뒤로 가기 (2026-11-11 사용자: "타이틀 좌측 화살표는 히스토리 뒤로 가기 아닌가? 홈 → 상세 → 화살표가 왜 목록으로")
+         우리 사이트 안에서 왔으면(같은 호스트 referrer · 방문 기록 있음) 브라우저 뒤로 — 홈에서 왔으면 홈, 목록에서 왔으면 목록.
+         검색 · 카톡 · 주소 직접 입력처럼 밖에서 바로 들어왔으면 화살표 주소(fallback)로 간다. fallback 은 누를 때 읽는다 — 아래 [목록] 버튼 주소가 테마 JS 로 늦게 정해지기 때문 */
+      window.asTitleBack = function (ev, fallback) {
+        var same = false;
+        try { same = !!document.referrer && new URL(document.referrer).host === location.host && new URL(document.referrer).href !== location.href; } catch (e) {}
+        if (same && history.length > 1) { ev.preventDefault(); history.back(); return; }
+        var f = typeof fallback === 'function' ? fallback() : fallback;
+        if (f) { ev.preventDefault(); location.href = f; }
+      };
+
       /* ============================================================ 인물 발언 — 인물 목록 → 인물 상세 (2026-10-21 사용자, 저녁: 탭 없이)
          글 = 인물 목록([data-people-list]) · 언급 대상 · (숨김) h2[data-person-pages] + 인물별 발언 묶음([data-person-page]) + 30일 띠([data-person-strip]).
          처음에 발언 묶음 · 띠 · 그 h2 를 숨긴다. 인물 줄을 누르면 목록 쪽을 숨기고 그 자리에 제목 줄(왼쪽 네모 화살표 = 목록으로 · 이름 · 직함) +
@@ -4983,6 +5057,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
           backBtn = document.createElement('a'); backBtn.className = 'pr-back'; backBtn.setAttribute('aria-label', '목록');
           var lu = document.querySelector('.post-nav-list'); backBtn.href = (lu && lu.getAttribute('href')) || '/';
           backBtn.innerHTML = ARROW;
+          backBtn.addEventListener('click', function (e) { if (detail.hidden) window.asTitleBack(e, function () { return backBtn.href; }); });   /* 인물 화면이 열려 있으면 onclick(목록으로)이 맡는다 */
           headBox.appendChild(backBtn); headBox.appendChild(title);
         }
         var shareMeta = title ? title.querySelector('.post-title-meta') : null;   /* 공유 버튼 — 제목 글자를 바꿔도 같은 버튼을 다시 붙인다 */
@@ -5052,6 +5127,10 @@ body.no-dashboard .main-content { padding-top: 32px; }
         back.href = (mark && mark.getAttribute('data-title-back')) || (lu && lu.getAttribute('href')) || '/';
         back.setAttribute('aria-label', (mark && mark.getAttribute('data-title-back-label')) || (mark ? '홈' : '목록'));
         back.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8 10 12.5"/></svg>';
+        /* 밖에서 바로 들어왔을 때 갈 곳 = 본문 [data-title-back] → 아래 버튼의 최종 주소(종목 상세: 시총 목록 · 홈) → 홈. 예전엔 버튼 주소가 정해지기 전에 읽어 종목 상세 화살표가 늘 홈이었다 */
+        back.addEventListener('click', function (e) {
+          window.asTitleBack(e, function () { var b = document.querySelector('.post-nav-list'); return (mark && mark.getAttribute('data-title-back')) || (b && b.href) || '/'; });
+        });
         head.appendChild(back); head.appendChild(title);
         /* 머리 줄 글자를 본문이 정할 때 (2026-11-09 사용자: 증시 전망 — 질문이 본문 맨 위에 또 나와 두 번 보였다) — 본문 [data-head-title] 이 있으면 제목 글자만 그것으로.
            블로그 글 제목(검색 · 탭 · 공유)은 그대로 두고 화면의 고정 줄만 바꾼다. 공유 버튼(.post-title-meta)은 건드리지 않는다 */

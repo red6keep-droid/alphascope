@@ -375,7 +375,7 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 42px;   /* 가로 30% 넓게 — 하단 버튼 공통 (2026-10-13 사용자) · 높이 −6(위아래 3씩, 홀수면 글자가 반 px 치우침) (2026-11-01 사용자 P213) */
+  padding: 9px clamp(42px, calc((100vw - 238px) / 2), 70px);   /* 가로 50% 넓게 42 → 70(목록 114 → 170px, 2026-11-11 사용자). 폰이 좁으면 양옆 댓글 · TOP 자리를 남기고 줄어든다 — 375 폭 ≈ 167 · 360 ≈ 152 · 320 이하 = 옛 42. 높이 −6(위아래 3씩, 홀수면 글자가 반 px 치우침) (2026-11-01 사용자 P213) */
   background: #111;
   border: 1px solid #111;
   border-radius: 8px;
@@ -705,7 +705,10 @@ __DASHBOARD__
                       <a class='post-nav-list' href='/__NVDA_LIST_PATH__'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;__KR_REPORT_LABEL__&quot;)'/>
                       <a class='post-nav-list' href='/__KR_REPORT_LIST_PATH__'>목록</a>
-                    <b:elseif cond='data:view.isPage'/>
+                    <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;__PEOPLE_LABEL__&quot;)'/>
+                      <a class='post-nav-list' href='/__PEOPLE_LIST_PATH__'>목록</a>
+                    <b:elseif cond='data:view.isPage or data:post.labels any (l =&gt; l.name == &quot;__MEDIA_LABEL__&quot;)'/>
+                      <b:comment>인물 발언 = 인물 발언 목록 · 미디어 데일리(방송) = 홈으로 — 둘 다 미국 증시 리포트 목록으로 가던 것 (2026-11-11 사용자)</b:comment>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
                     <b:else/>
                       <a class='post-nav-list' href='/__LIST_PATH__'>목록</a>
@@ -725,6 +728,7 @@ __DASHBOARD__
                     <b:if cond='data:view.isLabelSearch and data:view.search.label == &quot;__TRUMP_LABEL__&quot;'>트럼프 SNS 트렌드 목록
                     <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;__NVDA_LABEL__&quot;'/>엔비디아 리포트 목록
                     <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;__KR_REPORT_LABEL__&quot;'/>한국 증시 리포트 목록
+                    <b:elseif cond='data:view.isLabelSearch and data:view.search.label == &quot;__PEOPLE_LABEL__&quot;'/>인물 발언 목록
                     <b:elseif cond='data:view.isLabelSearch'/>미국 증시 리포트 목록
                     <b:else/><data:view.title.escaped/></b:if>
                   </h2>
@@ -839,6 +843,11 @@ NVDA_LIST_PATH = "search/label/" + quote(NVDA_LABEL)
 # 한국 증시 리포트 연재 (experiments/kr-market-report/publish_report.LABEL). 글 아래 목록 버튼이 미국(데일리) 목록으로 가고, 라벨 목록 제목도 `미국 증시 리포트 목록` 이던 것 (2026-11-10 사용자)
 KR_REPORT_LABEL = "한국 증시 리포트"
 KR_REPORT_LIST_PATH = "search/label/" + quote(KR_REPORT_LABEL)
+
+# 인물 발언 (experiments/people-radar/render_html.LABELS 첫 라벨) = 인물 발언 목록, 미디어 데일리(experiments/media-daily/config.LABELS 첫 라벨) = 홈으로 (2026-11-11 사용자)
+PEOPLE_LABEL = "인물 발언"
+PEOPLE_LIST_PATH = "search/label/" + quote(PEOPLE_LABEL)
+MEDIA_LABEL = "미디어 데일리"
 
 
 def nav_items():
@@ -1013,6 +1022,9 @@ def build_theme(parts):
     out = out.replace("__NVDA_LIST_PATH__", NVDA_LIST_PATH)
     out = out.replace("__KR_REPORT_LABEL__", KR_REPORT_LABEL)
     out = out.replace("__KR_REPORT_LIST_PATH__", KR_REPORT_LIST_PATH)
+    out = out.replace("__PEOPLE_LABEL__", PEOPLE_LABEL)
+    out = out.replace("__PEOPLE_LIST_PATH__", PEOPLE_LIST_PATH)
+    out = out.replace("__MEDIA_LABEL__", MEDIA_LABEL)
     out = out.replace("__DASHBOARD__", indent(to_xml_attrs(parts["dashboard"]), 6))
     out = out.replace("__BLOG_INCLUDABLES__", includables)
     out = out.replace(
