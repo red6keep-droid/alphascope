@@ -847,10 +847,13 @@ OPEN_TITLE = "향방미정"   # 붙여 쓰기 · 회색 라벨 (2026-11-11 사�
 
 def timeline_title():
     """타임라인 구획 제목 `Timeline`(영어) — `향방미정` 줄 위, 위 여백 +30 (P484 · P485, 2026-11-11 사용자). 구획 제목 글씨(dk.h2), 밑줄 없음."""
-    return f'<div data-tl-title="1" style="padding-top:{TL_TITLE_GAP}px;">{dk.h2("Timeline", line=False).replace(f"font-size:{dk.H2_SIZE};", f"font-size:{TL_TITLE_FS}px;", 1)}</div>'
+    h = (dk.h2("Timeline", line=False).replace(f"font-size:{dk.H2_SIZE};", f"font-size:{TL_TITLE_FS}px;", 1).replace("align-items:baseline;", "align-items:center;", 1)
+         .replace(">Timeline", f'><span style="display:inline-flex;color:{dk.SUB};margin-right:-4px;">{CLOCK.replace('width="16" height="16"', f'width="{TL_TITLE_ICON}" height="{TL_TITLE_ICON}"', 1)}</span>Timeline', 1))   # 제목 앞 시계 (2026-11-11 사용자 — 옛 오늘 줄 마디)
+    return f'<div data-tl-title="1" style="padding-top:{TL_TITLE_GAP}px;">{h}</div>'
 
 
-TL_TITLE_FS = 20   # `Timeline` = 구획 제목 22 에서 2 작게 (2026-11-11 사용자)
+TL_TITLE_FS = 19   # `Timeline` = 구획 제목 22 에서 3 작게 (2026-11-11 사용자: 2 → 1 더)
+TL_TITLE_ICON = 18   # 제목 앞 시계 크기 (제목 19 와 비슷하게)
 TL_TITLE_GAP = 10   # +30 → +20 (P490)
 
 
@@ -1528,7 +1531,7 @@ CLOCK = ('<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="cu
 
 TL_LINE = "#CBD5E1"   # 타임라인 세로 점선 = 비교 · 기준선 회색 (가이드 8절 ③)
 TL_RAIL = 16          # 왼쪽 레일 폭 = 시계 아이콘 16
-TL_WHY_INK = "#333"   # 타임라인 근거 줄 = 연한 검정(글자 세 톤 둘째, P499)
+TL_WHY_INK = "#4B5563"   # 타임라인 근거 줄 — 시험: #333 이 검정과 거의 같아 보여 이 줄만 #4B5563 (2026-11-11 사용자 "이 줄만 먼저"), 연한 검정 톤 결정 전
 TL_TRI = 14           # 타임라인 증감 ▲ · ▼ 크기 (P497)
 TL_DOT = 8            # 지난 날 점
 TL_DAY_GAP = 15       # 날짜 줄 묶음 사이 더 띄움 (2026-11-11 사용자)
@@ -1658,7 +1661,7 @@ def _waiting(log, unit="%", subj="", fc=None):
                     f'padding:{{pad}}px 0;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;">{a}{b}<span>{c}</span>{tail}</summary>')
         return (f'<summary style="display:flex;align-items:center;gap:8px;padding:{{pad}}px 0;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;">'
                 f'{a}{b}{c}{tail}</summary>')
-    clock = f'<span style="display:inline-flex;color:{dk.SUB};">{CLOCK}</span>'
+    clock = f'<span style="display:block;width:{TL_DOT}px;height:{TL_DOT}px;box-sizing:border-box;border:2px solid {TL_LINE};border-radius:50%;background:#fff;"></span>'   # 오늘 줄 마디 = 지난 날과 같은 동그라미 (2026-11-11 사용자: 시계는 Timeline 제목 앞으로)
     # 아래 여백 = 지난 날 줄과 같은 10 (접혀도 펼쳐도) — 옛 4px 띄움은 접으면 다음 줄과 붙어 좁았다 (P436, 2026-11-08 사용자)
     past = days[1:]
     gap = f'<div style="height:{TL_DAY_GAP}px;"></div>'   # 날짜와 날짜 사이 +10 (2026-11-11 사용자) — 마지막 줄 아래엔 없음
