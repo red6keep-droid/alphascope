@@ -63,6 +63,7 @@ TOPIC — non-market:
   Personal, Media/Press, Charity, Other
 
 direction: positive = bullish / buying / favorable on the target; negative = bearish / selling / shorting / warning; neutral = mixed or reporting facts.
+Judge direction by the effect on stock prices (the target company, its sector, or the market): positive = good for prices, negative = bad for prices. A warning about a risk (e.g. "AI bubble") is negative, even when the topic word itself sounds negative.
 
 INTENSITY (concreteness, 1-10):
   1-2  passing mention

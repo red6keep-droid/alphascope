@@ -62,6 +62,7 @@ TOPIC — non-market:
   Politics, Personal, Media/Press, Other
 
 direction: stance toward the main target — positive = favorable for that company/sector (growth, deal, praise), negative = unfavorable (cut, delay, attack, warning), neutral = mixed.
+Judge direction by the effect on stock prices (the target company, its sector, or the market): positive = good for prices, negative = bad for prices. A warning about a risk (e.g. "AI bubble") is negative, even when the topic word itself sounds negative.
   - The main target is the company the statement is about: the speaker's own company unless another company is the subject. Judge for THAT company, never for the market in general.
   - Mixed news is "neutral": good and bad in one headline (e.g. "demand exceeds production, but the product is being discontinued", "orders too big to fill before production ends"). Do not let one negative word ("ends", "refund", "late") decide when the headline also carries a positive fact.
   - Praising a competitor is about the competitor (Industry View, the competitor's ticker if listed), not a negative for the speaker's company.

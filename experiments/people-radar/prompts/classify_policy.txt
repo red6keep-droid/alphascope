@@ -11,7 +11,7 @@ For each post return:
   "target_country": string[],      // countries/regions the post targets. Use English short names ("China", "Canada", "EU", "Russia"). [] if none.
   "target_sector": string[],       // ONLY values from the SECTOR list. [] if none.
   "mentioned_companies": string[], // US tickers of companies EXPLICITLY NAMED in the text. Do not infer. [] if none.
-  "direction": "positive" | "negative" | "neutral",  // the post's stance toward its main target (a hostile post about China is "negative"; praising a company is "positive")
+  "direction": "positive" | "negative" | "neutral",  // effect on stock prices of the target (company, sector, or market): positive = good for prices, negative = bad for prices (a new tariff or a threat to a company is "negative"; praising or helping a company is "positive"; a warning about a risk is "negative")
   "intensity": integer 1-10,       // POLICY CONCRETENESS scale below — not emotional tone
   "market_relevance": integer 0-3, // scale below
   "issue": string                  // ONE code from ISSUE below — what in the world the statement is about (the cause). Independent of "topic".

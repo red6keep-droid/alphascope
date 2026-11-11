@@ -20,6 +20,7 @@ TOPIC_KO = {"Trade": "무역", "Fed": "연준 · 금리", "Tax": "세금", "Ener
             "Macro Warning": "거시 경고", "Market Outlook": "시장 전망", "Policy": "정책 의견", "Product": "제품", "Investment": "투자",
             "Earnings": "실적", "Deal": "거래 · 제휴", "Industry View": "업계 평가", "Politics": "정치"}   # people-radar/config.TOPIC_KO 와 같게
 DIR_KO = {"positive": "긍정", "negative": "부정", "neutral": "중립"}
+DIR_NOTE = "▲ 상승 쪽 = 주가에 유리하게 본 발언, ▼ 하락 쪽 = 불리하게 본(경고한) 발언"   # 요약 카드 안내 (2026-11-11 사용자: `AI 거품 · 부정` 은 부정의 부정으로 읽힌다)
 _data = None
 
 
@@ -111,10 +112,10 @@ def _lean(d):
     """긍정 · 부정 건수 → (카드 색, 답 색, 쉬운 말). 질문 카드 색 = 답의 방향 (가이드라인 7-1)."""
     p, n = d.get("positive", 0), d.get("negative", 0)
     if p > n:
-        return "positive", dk.UP, "긍정 쪽이 많았습니다"
+        return "positive", dk.UP, "주가에 유리하게 본 발언이 많았습니다"
     if n > p:
-        return "negative", dk.DOWN, "부정 쪽이 많았습니다"
-    return "neutral", "#111", ("긍정과 부정이 반반이었습니다" if p else "방향이 없는 발언이었습니다")
+        return "negative", dk.DOWN, "주가에 불리하게 본(경고한) 발언이 많았습니다"
+    return "neutral", "#111", ("주가에 유리하게 본 발언과 불리하게 본 발언이 반반이었습니다" if p else "방향이 없는 발언이었습니다")
 
 
 def _igo(w):
@@ -134,7 +135,7 @@ def _box(kind, text):
 
 def _dir_val(d):
     """근거 줄 값 = 라벨 `▲ 긍정 4` `▼ 부정 2` (라벨끼리 2px, dk.PILL_PAIR_GAP). 둘 다 없으면 `— 중립`."""
-    parts = [_box(kind, f"{k} {d[key]}") for key, k, kind in (("positive", "긍정", "up"), ("negative", "부정", "down")) if d.get(key)]
+    parts = [_box(kind, f"{k} {d[key]}") for key, k, kind in (("positive", "상승 쪽", "up"), ("negative", "하락 쪽", "down")) if d.get(key)]   # 옛 `긍정` · `부정` — `AI 거품 · 부정` 이 "거품이 아니다"로 읽혀 (2026-11-11 사용자)
     if not parts:
         parts = [_box("flat", "중립")]
     return f'<span style="display:inline-flex;gap:{dk.PILL_PAIR_GAP}px;vertical-align:middle;">{"".join(parts)}</span>'
@@ -172,22 +173,24 @@ def summary_card(qcard, sm=None, faces=None):
             first += f" 다음은 {' · '.join(t['name'] for t in iss[1:])} 순입니다." if not ties else f" {' · '.join(t['name'] for t in ties)}도 비슷하게 많이 나왔습니다."
         lines = [(first, "plain")] + [("row", t["name"], _dir_val(t["dirs"]), " · ".join(t["who"])) for t in iss]
         lines.append((f"오늘 인물 {sm.get('n_people', 0)}명 · 발언 {sm.get('n', 0)}건 기준, 두 명 이상이 말한 이슈만", "note"))
+        lines.append((DIR_NOTE, "note"))
         out.append(qcard("인물들이 많이 말한 이슈는?", state, theme, ink, lines))   # 닫힌 채로 — 데일리 인물 발언 탭 카드 모두 닫힘 (2026-11-07 사용자)
     # ② 의견이 갈린 이슈 — 같은 이슈 · 같은 종목을 두고 다른 사람이 긍정 · 부정. 회색 (갈림 = 방향 없음)
     sp = sm.get("split") or []
     if sp:
         x = sp[0]
-        first = f"{dk.josa(x['name'], '을')} 두고 {dk.josa(x['neg'][0], '은')} 부정, {dk.josa(x['pos'][0], '은')} 긍정 쪽이었습니다."
+        first = f"{dk.josa(x['name'], '을')} 두고 {dk.josa(x['neg'][0], '은')} 하락 쪽, {dk.josa(x['pos'][0], '은')} 상승 쪽으로 봤습니다."
         if len(sp) > 1:
             first += f" {sp[1]['name']}에서도 의견이 갈렸습니다."
         lines = [(first, "plain")]
         for y in sp:   # 줄 = `반도체 [▼ 부정]` · 오른쪽 얼굴 + 이름 (2026-11-08 사용자: 기술지표 라벨처럼 · 얼굴 아이콘)
-            for side, kind, word in (("neg", "down", "부정"), ("pos", "up", "긍정")):
+            for side, kind, word in (("neg", "down", "하락 쪽"), ("pos", "up", "상승 쪽")):
                 who, n = y[side]
                 # 한 줄 = `[▼ 부정] 발언 1건` (이슈 이름 · 세로 구분선 삭제 — 카드 답 · 첫 문장에 이슈가 있다, 2026-11-08 사용자) · 오른쪽 얼굴 + 이름
                 lines.append(("row", f'<span style="display:inline-flex;align-items:center;gap:{dk.PILL_GAP}px;vertical-align:middle;white-space:nowrap;">{_box(kind, word)}'
                                      f'<span style="font-size:{dk.TINY};color:{NOTE_GRAY};">발언 {n}건</span></span>',
                               f'<span style="display:inline-flex;align-items:center;white-space:nowrap;">{_face(who, faces=faces)}{dk.esc(who)}</span>', ""))
+        lines.append((DIR_NOTE, "note"))
         out.append(qcard("의견이 갈린 이슈는?", x["name"] + (f" 외 {len(sp) - 1}개" if len(sp) > 1 else ""), "neutral", "#111", lines))
     # ③ 많이 언급된 종목 — 색 = 그 종목 발언의 우세 방향
     st = sm.get("stocks") or []
@@ -198,6 +201,7 @@ def summary_card(qcard, sm=None, faces=None):
         if len(st) > 1:
             first += f" 다음은 {' · '.join(y['name'] for y in st[1:])} 순입니다."
         lines = [(first, "plain")] + [("row", y["name"], _dir_val(y.get("dirs") or {}), " · ".join(y["who"])) for y in st]
+        lines.append((DIR_NOTE, "note"))
         out.append(qcard("많이 언급된 종목은?", x["name"], theme, ink, lines))
     # 질문 카드 ~ 아래 발언 목록 첫 줄(얼굴) 10 → 30 (×3, 2026-11-08 사용자, Chrome 실측). 카드 아래 8 과 겹쳐 PEOPLE_CARDS_GAP 가 된다
     return f'<div style="margin:0 0 {PEOPLE_CARDS_GAP}px;">{"".join(out)}</div>' if out else ""
