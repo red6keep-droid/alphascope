@@ -944,7 +944,7 @@ def ticker_logo(sym, size=20):
     if rec:
         return (f'<img src="{LOGO_BASE}{esc(rec["file"])}" alt="" width="{size}" height="{size}" loading="lazy" '
                 f'style="display:inline-block;width:{size}px;height:{size}px;border-radius:50%;vertical-align:-4px;margin-right:6px;'
-                f'background:#F1F5F9;object-fit:cover;">')
+                f'background:#F1F5F9;object-fit:cover;' + ('outline:1px solid #E2E8F0;outline-offset:-1px;' if rec.get("light") else "") + '">')   # 흰 바탕 로고 = 회색 외곽선 (logo_edge_check.py 가 light 를 적는다, 2026-11-11 사용자: 블로그 전체 공통)
     txt = sym.replace("-", "").replace(".", "")[:2]
     fs = max(8, int(size * 0.42))
     return (f'<span aria-hidden="true" style="display:inline-block;width:{size}px;height:{size}px;line-height:{size}px;border-radius:50%;'
@@ -2064,7 +2064,7 @@ def related_rows(links):
 
 def related_title(text):
     # 제목 = 줄 글씨와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 EMPH_NAME 19 → 16 → 11-11 14)
-    return f'<div style="font-weight:700;color:#111;font-size:{RELATED_FS};line-height:{RELATED_LH};padding:0 {ALIGN_PX}px 8px;border-bottom:1px solid #E2E8F0;">{esc(text)}</div>'
+    return f'<div style="font-weight:700;color:{SUB};font-size:{RELATED_FS};line-height:{RELATED_LH};padding:0 {ALIGN_PX}px 8px;border-bottom:1px solid #E2E8F0;">{esc(text)}</div>'
 
 
 def related_buttons(links):

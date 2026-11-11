@@ -579,6 +579,9 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   position: relative;
 }
 .stock-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }   /* 로고가 머리글자를 덮는다 (2026-10-22) */
+/* LIGHT_LOGOS_START */
+img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/CVX.svg"], img[src$="/EOG.svg"], img[src$="/GE.svg"], img[src$="/GOOGL.svg"], img[src$="/KR_000660.svg"], img[src$="/KR_009540.svg"], img[src$="/KR_010130.svg"], img[src$="/KR_012450.svg"], img[src$="/KR_017670.svg"], img[src$="/KR_042660.svg"], img[src$="/KR_042700.svg"], img[src$="/KR_068270.svg"], img[src$="/KR_086790.svg"], img[src$="/KR_196170.svg"], img[src$="/KR_247540.svg"], img[src$="/KR_329180.svg"], img[src$="/KR_402340.svg"], img[src$="/META.jpg"], img[src$="/MSFT.svg"], img[src$="/PG.jpg"], img[src$="/SMR.svg"], img[src$="/SO.svg"], img[src$="/TXN.svg"] { outline: 1px solid #E2E8F0; outline-offset: -1px; }   /* 흰 바탕 로고 외곽선 — logo_edge_check.py 가 쓴다 (2026-11-11 사용자) */
+/* LIGHT_LOGOS_END */
 .stock-avatar.has-logo { background: #F1F5F9 !important; }
 .stock-label { display: flex; flex-direction: column; min-width: 0; }
 .stock-name {
@@ -1446,7 +1449,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
 .post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
 .post-shell > [data-related].is-moved { margin-top: 65px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 40 → 55 → 65 (2026-11-11 사용자: 15 더 · 10 더, 옛 2026-11-10 본문 → 버튼 줄과 같은 40) */
-.post-shell > [data-related].is-moved > div:first-child { font-size: 14px !important; line-height: 20px !important; padding-bottom: 8px !important; }   /* 제목 = 푸터 제목과 같은 14/20 굵게 (2026-11-11 사용자, 옛 16/26) */
+.post-shell > [data-related].is-moved > div:first-child { font-size: 14px !important; line-height: 20px !important; padding-bottom: 8px !important; color: #6B7280 !important; }   /* 제목 = 푸터 제목과 같은 14/20 굵게 (2026-11-11 사용자, 옛 16/26) */
 .post-shell > [data-related].is-moved > a { font-size: 14px !important; line-height: 20px !important; padding-top: 9px !important; padding-bottom: 9px !important; }   /* 줄 = 14/20 · 위아래 9 (옛 16/26 · 12) — 이미 게시된 글의 인라인 값을 덮는다 (2026-11-11 사용자) */
 body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
 body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */

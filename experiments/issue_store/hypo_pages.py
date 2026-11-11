@@ -691,17 +691,22 @@ def _talk_mark():
 
 
 WHY_HZ = (("단기", "며칠"), ("중기", "한 달~분기"))   # 우리 신호 기간 제목 (signal_groups.HORIZONS, 2026-11-11 사용자: "기간은 단기 · 중기로 타이틀")
-CAL_ICON = ('<svg viewBox="0 0 18 18" width="18" height="18" fill="none" aria-hidden="true" style="flex:none;margin-right:6px;position:relative;top:4px;">'
-            '<circle cx="9" cy="9" r="9" fill="#E5E7EB"/><g stroke="#4B5563" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">'
+CAL_ICON = ('<svg viewBox="0 0 22 22" width="22" height="22" fill="none" aria-hidden="true" style="flex:none;margin-right:6px;position:relative;top:6px;">'
+            '<circle cx="11" cy="11" r="11" fill="#E5E7EB"/><g transform="translate(2 2)" stroke="#4B5563" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">'
             '<rect x="5" y="5.8" width="8" height="7" rx="1"/><path d="M5 8.4h8M7 4.6v2M11 4.6v2"/></g></svg>')   # 팝업 `단기` · `중기` 앞 = 회색 면 원 안 달력 (P505, 2026-11-11 사용자: 외곽선 원 X)
-NEWS_ICON = ('<svg viewBox="0 0 18 18" width="18" height="18" fill="none" aria-hidden="true" style="flex:none;margin-right:6px;position:relative;top:4px;">'
-             '<circle cx="9" cy="9" r="9" fill="#E5E7EB"/><g stroke="#4B5563" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">'
+NEWS_ICON = ('<svg viewBox="0 0 22 22" width="22" height="22" fill="none" aria-hidden="true" style="flex:none;margin-right:6px;position:relative;top:6px;">'
+             '<circle cx="11" cy="11" r="11" fill="#E5E7EB"/><g transform="translate(2 2)" stroke="#4B5563" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">'
              '<path d="M5 5.2h6v7.6H5.9a.9.9 0 0 1-.9-.9V5.2Z"/><path d="M11 7.4h2v4.5a.9.9 0 0 1-.9.9"/><path d="M6.7 7.4h2.6M6.7 9.4h2.6"/></g></svg>')   # 팝업 `뉴스 기사` 앞 = 회색 면 원 안 신문 (P505)
 WHY_TITLE_W = 30   # 카드 안 묶음 제목 칸(`기사` · `단기` · `중기`) 폭
 
 
 def _sig_text(r):
     return f'{r["name"]} : {r["state"]}'
+
+
+def _sig_html(name, value):
+    """팝업 신호 줄 = 이름 회색 · `:` 뒤 값 그대로 (P511, 2026-11-11 사용자)."""
+    return f'<span style="color:{dk.SUB};">{dk.esc(name)}</span> : {dk.esc(value)}'
 
 
 TAIL_SEP = 10   # 꼬리 `-` 칸 폭 — 꼬리가 다음 줄로 넘어가면 이 칸이 글 상자 왼쪽 밖으로 밀려 잘린다(overflow:hidden)
@@ -717,11 +722,11 @@ def _src_tail(meta):
             f'<span style="display:inline-block;width:{TAIL_SEP}px;">-</span>{dk.esc(meta)}</span>')
 
 
-def _pop_li(text, meta="", talk=False):
+def _pop_li(text, meta="", talk=False, html=False):
     """팝업 한 줄 = 글머리 점 + 문장(+ 논의중) + 끝 꼬리 `- 날짜 · 매체` (옛: 날짜 · 매체 아랫줄)."""
     return (f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{dk.POP_ITEM_GAP}px 0;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
             f'<span style="display:block;min-width:0;overflow:hidden;font-size:{dk.BODY};line-height:{dk.POP_LH}px;color:#333;word-break:keep-all;">'
-            f'{dk.esc(text)}{_talk_mark().replace("top:-1px;", "top:-2px;", 1) if talk else ""}{_src_tail(meta)}</span></span>')   # 팝업 문장 안 `논의중` = 1px 더 올림 — 잉크 실측 상자 가운데가 한글보다 0.75px 아래 (P504)
+            f'{text if html else dk.esc(text)}{_talk_mark().replace("top:-1px;", "top:-2px;", 1) if talk else ""}{_src_tail(meta)}</span></span>')   # 팝업 문장 안 `논의중` = 1px 더 올림 — 잉크 실측 상자 가운데가 한글보다 0.75px 아래 (P504)
 
 
 POP_SUB_GAP, POP_SUB_FIRST = 31, 19   # 팝업 소제목 위 여백 — 첫 소제목은 팝업 제목 바로 아래라 40% 줄임 (P506 · P509, 2026-11-11 사용자: 모든 팝업 같은 규칙)
@@ -749,7 +754,7 @@ def _why_pop(pid, title, rows, total, sigs=(), as_of=None, page=None):
     for hz, span in WHY_HZ:
         xs = [r for r in sigs if r["hz"] == hz]
         if xs:
-            out += _pop_sub(f'{CAL_ICON}{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>') + "".join(_pop_li(_sig_text(r)) for r in xs)
+            out += _pop_sub(f'{CAL_ICON}{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>') + "".join(_pop_li(_sig_html(r["name"], r["state"]), html=True) for r in xs)
     if sigs and as_of:   # 기준 날짜 — 종목 페이지가 있으면 링크 `10.30 종목 페이지 ›` (2026-11-11 사용자: `우리 신호 = … 값` 은 독자가 모른다)
         st = f'display:inline-flex;align-items:center;gap:2px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};'
         out += (f'<a href="{dk.esc(page)}" style="{dk.FOLD_BTN}display:inline-flex;margin:16px 0 0;text-decoration:none;font-weight:400;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page   # 인물 발언 팝업 `○○ 발언 더 보기` 와 같은 외곽선 버튼 (P503)
@@ -840,7 +845,7 @@ def side_why(fc, sc, border):
     rows, n_news = w.get(key) or [], (w.get("count") or {}).get(key, len(w.get(key) or []))
     sigs, as_of = _sigs(fc, 1 if sc["dir"] > 0 else -1)
     total = n_news + len(sigs)
-    head = (f'<span style="display:block;margin:0 0 2px;font-size:{WHY_HEAD_FS}px;line-height:{WHY_HEAD_LH}px;color:#111;">{WHY_WORD}'
+    head = (f'<span style="display:block;margin:0 0 2px;font-size:{WHY_HEAD_FS}px;line-height:{WHY_HEAD_LH}px;color:{dk.SUB};">{WHY_WORD}'
             f' <span style="font-size:14px;color:{dk.SUB};">{total}건</span></span>')   # 옛 14 굵게 → 카드 줄 이름과 같은 크기 (2026-11-11 사용자: 근거를 큰 글씨로)
     if not total:
         return (f'<div data-why="1" style="margin:12px 0 4px;padding-top:10px;border-top:1px solid {border};">{head}'
@@ -1600,7 +1605,8 @@ def drop_subj(t, subj):
 
 def _side_pill(word, kind="flat"):
     """타임라인 `반등` · `지속` 라벨 = 그 갈래 `전망A` · `전망B` 이름표와 같은 색(TS.box, 2026-11-11 사용자 — 옛 회색 dk.pill)."""
-    return TS.box(kind, word, dk.esc, sym=False, fit=True).replace("flex:none;", f"flex:none;margin-right:{dk.PILL_GAP}px;", 1)
+    pk = {"up": "positive", "down": "negative"}.get(kind, "neutral")   # 뉴스 기사 긍정 · 부정 라벨 모양 · 크기 (P514, 2026-11-11 사용자: TS.box 는 크다)
+    return dk.pill(word, pk, bare=True).replace("vertical-align:middle;", f"vertical-align:middle;flex:none;margin-right:{dk.PILL_GAP}px;", 1)
 
 
 def day_why_html(x, fc):
@@ -1637,7 +1643,7 @@ def day_why_html(x, fc):
         cs = [c for c in w.get("changes") or [] if c["hz"] == hz]
         if cs:
             pop += _pop_sub(f'{CAL_ICON}{SIG_NAME} {hz} <span style="font-weight:400;color:{dk.SUB};">· 바뀐 것</span>')
-            pop += "".join(_pop_li(f'{c["name"]} : {c["from"]} → {c["to"]}' if c.get("from") else f'{c["name"]} : {c["to"]}') for c in cs)
+            pop += "".join(_pop_li(_sig_html(c["name"], f'{c["from"]} → {c["to"]}' if c.get("from") else c["to"]), html=True) for c in cs)
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(md(x["day"]) + " " + WHY_WORD)}" hidden>{_pop_first(pop)}</div>'
     if pick:
         line = (f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{label}{_one_line(dk.esc(pick["t"]), grow=False, color=TL_WHY_INK)}'
