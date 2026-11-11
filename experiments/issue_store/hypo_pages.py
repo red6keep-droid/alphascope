@@ -686,11 +686,24 @@ def _sig_text(r):
     return f'{r["name"]} : {r["state"]}'
 
 
+TAIL_SEP = 10   # 꼬리 `-` 칸 폭 — 꼬리가 다음 줄로 넘어가면 이 칸이 글 상자 왼쪽 밖으로 밀려 잘린다(overflow:hidden)
+
+
+def _src_tail(meta):
+    """기사 팝업 발언자처럼 문장 끝에 `- 11.07 · Reuters`(작은 회색 · 한 덩어리) — 줄이 바뀌어 꼬리가 줄 첫머리로 가면 `-` 는 안 보인다 (2026-11-11 사용자).
+    앞 빈칸(TAIL_SEP + 4)은 문장에 붙고(단어 잇기 문자), 꼬리는 그만큼 왼쪽으로 당겨 `-` 가 빈칸 위에 놓인다."""
+    if not meta:
+        return ""
+    return (f'\u2060<span style="display:inline-block;width:{TAIL_SEP + 4}px;"></span><wbr>'
+            f'<span style="display:inline-block;white-space:nowrap;margin-left:-{TAIL_SEP}px;font-size:{dk.TINY};color:{dk.SUB};">'
+            f'<span style="display:inline-block;width:{TAIL_SEP}px;">-</span>{dk.esc(meta)}</span>')
+
+
 def _pop_li(text, meta="", talk=False):
+    """팝업 한 줄 = 글머리 점 + 문장(+ 논의중) + 끝 꼬리 `- 날짜 · 매체` (옛: 날짜 · 매체 아랫줄)."""
     return (f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{dk.POP_ITEM_GAP}px 0;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
-            f'<span style="min-width:0;"><span style="display:block;font-size:{dk.BODY};line-height:{dk.POP_LH}px;color:#333;word-break:keep-all;">'
-            f'{dk.esc(text)}{_talk_mark() if talk else ""}</span>'
-            + (f'<span style="display:block;font-size:13px;line-height:19px;color:{dk.SUB};">{dk.esc(meta)}</span>' if meta else "") + "</span></span>")
+            f'<span style="display:block;min-width:0;overflow:hidden;font-size:{dk.BODY};line-height:{dk.POP_LH}px;color:#333;word-break:keep-all;">'
+            f'{dk.esc(text)}{_talk_mark() if talk else ""}{_src_tail(meta)}</span></span>')
 
 
 def _pop_sub(title):
@@ -778,6 +791,13 @@ def side_why(fc, sc, border):
 OPEN_TITLE = "향방미정"   # 붙여 쓰기 · 회색 라벨 (2026-11-11 사용자)   # 옛 `방향이 아직 안 정해진 일` 카드 (2026-11-11 사용자: 문장을 줄여 새 제목, 카드 없이 타임라인 위 한 줄)
 
 
+def open_pill():
+    """`향방미정` 라벨 = 회색 강조 카드 색(바탕 #F8FAFC · 테두리 #E2E8F0, dk.CARD_DIR neutral) · 글자는 회색 라벨 그대로 (2026-11-11 사용자)."""
+    bg, bd = dk.CARD_DIR["neutral"]
+    return (dk.pill(OPEN_TITLE, "neutral", bare=True).replace("vertical-align:middle;", "vertical-align:middle;flex:none;", 1)
+            .replace("background:#fff;", f"background:{bg};", 1).replace(f"border:1px solid {dk.PILL['neutral'][0]};", f"border:1px solid {bd};", 1))
+
+
 def open_line(fc, log):
     """타임라인 위 한 줄 `향방 미정  11.10  기사 [논의중] ›` — 좋고 나쁨 자체가 갈리는 기사(open)를 등록 때 + 날마다 쌓은 것에서 가장 최근 하나만,
     줄 전체를 누르면 팝업에 전부(최근 순 · 날짜 · 매체). 우리 신호 중립은 사건이 아니라 넣지 않는다. 없으면 빈 문자열."""
@@ -794,8 +814,8 @@ def open_line(fc, log):
     pop = "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q)) for r in rows)   # `논의중` 라벨 없음 — 향방미정이 이미 정해지지 않은 일 (2026-11-11 사용자)
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{OPEN_TITLE}" hidden>{pop}</div>'
     chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
-    return (f'<div data-why-open="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:0 {dk.ALIGN_PX}px;cursor:pointer;">'
-            + dk.pill(OPEN_TITLE, "neutral", bare=True).replace("vertical-align:middle;", "vertical-align:middle;flex:none;", 1)
+    return (f'<div data-why-open="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:0 {dk.ALIGN_PX}px 0 0;cursor:pointer;">'
+            + open_pill()
             + (f'<span style="flex:none;font-size:13px;line-height:19px;color:{dk.SUB};">{md(top["day"])}</span>' if top.get("day") else "")
             + f'<span style="display:flex;align-items:center;gap:4px;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(top["t"]), grow=False)}{chev}</span>{body}</div>')
 
@@ -1432,6 +1452,7 @@ CLOCK = ('<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="cu
 TL_LINE = "#CBD5E1"   # 타임라인 세로 점선 = 비교 · 기준선 회색 (가이드 8절 ③)
 TL_RAIL = 16          # 왼쪽 레일 폭 = 시계 아이콘 16
 TL_DOT = 8            # 지난 날 점
+TL_DAY_GAP = 10       # 날짜 줄 묶음 사이 더 띄움 (2026-11-11 사용자)
 
 
 def _tl_row(node, node_h, top_pad, content, first, last):
@@ -1459,6 +1480,17 @@ def _side_names(fc):
     return out
 
 
+def drop_subj(t, subj):
+    """타임라인 근거 줄 · 그날 팝업에서 문장 맨 앞 대상 이름 빼기 — 한 페이지가 그 대상 이야기라 `메타, …` 가 줄마다 반복된다 (2026-11-11 사용자).
+    `메타, ` · `메타 ` · `메타는/가/의 ` 만 뺀다. 가운데 든 이름(`유럽연합, 메타에 …`) · 붙은 말(`메타와`) · 뺀 뒤 빈 문장은 그대로."""
+    if subj and t and t.startswith(subj):
+        m = _re.match(r"(?:,\s*|(?:은|는|이|가|의)\s+|\s+)", t[len(subj):])
+        rest = t[len(subj) + m.end():] if m else ""
+        if rest.strip():
+            return rest
+    return t
+
+
 def _side_pill(word):
     return dk.pill(word, "area").replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 {dk.PILL_GAP}px 0 0;flex:none;", 1)
 
@@ -1467,7 +1499,8 @@ def day_why_html(x, fc):
     """타임라인 그날 줄 아래 근거 한 줄 + 그날 더보기 팝업 (2026-11-11 사용자).
     기운 쪽(우세 · 실현)이 있는 날 = 그 쪽 근거 맨 위 한 줄, `지켜보는 중` 날 = 그날 근거 맨 위 한 줄 앞에 `반등` · `지속` 라벨. 그날 소식이 없으면 없음.
     팝업 = 갈래별 그날 기사(날짜 · 매체 · 논의중) · 방향이 안 정해진 일 · 우리 신호 바뀐 것(전날 → 그날)."""
-    w = x.get("why") or {}
+    subj = (fc or {}).get("subject", "")
+    w = {k: ([dict(r, t=drop_subj(r.get("t", ""), subj)) for r in v] if k in ("good", "bad", "open") else v) for k, v in (x.get("why") or {}).items()}
     names = _side_names(fc)
     key_of = {1: "good", -1: "bad"}
     groups = [(d, w.get(key_of[d]) or []) for d in (1, -1) if d in names]
@@ -1546,8 +1579,9 @@ def _waiting(log, unit="%", subj="", fc=None):
                 f'{a}{b}{c}{tail}</summary>')
     clock = f'<span style="display:inline-flex;color:{dk.SUB};">{CLOCK}</span>'
     # 아래 여백 = 지난 날 줄과 같은 10 (접혀도 펼쳐도) — 옛 4px 띄움은 접으면 다음 줄과 붙어 좁았다 (P436, 2026-11-08 사용자)
-    today = (f'<details class="fc-day" open style="margin:0;padding:0 0 {12 - dk.VP}px;">' + head(e).replace("{pad}", "0") + f'{_day_text(e)}</details>') + (day_why_html(e, fc) if fc else "")
     past = days[1:]
+    gap = f'<div style="height:{TL_DAY_GAP}px;"></div>'   # 날짜와 날짜 사이 +10 (2026-11-11 사용자) — 마지막 줄 아래엔 없음
+    today = (f'<details class="fc-day" open style="margin:0;padding:0 0 {12 - dk.VP}px;">' + head(e).replace("{pad}", "0") + f'{_day_text(e)}</details>') + (day_why_html(e, fc) if fc else "") + (gap if past else "")
     out = PLUS_CSS + '<div style="margin:0 0 24px;">'
     end = e.get("key") in RESULT   # 판정이 난 전망 — 시계 줄 위에 끝 줄 하나 (P465, 2026-11-08 사용자): 세부 전망이 이어받으면 `세부 전망으로 이어집니다 ›`, 아니면 `전망이 종료되었습니다`
     if end:
@@ -1567,7 +1601,7 @@ def _waiting(log, unit="%", subj="", fc=None):
 
         def row(x, last):
             fold = (f'<details class="fc-day" style="margin:0;">' + head(x).replace("{pad}", str(12 - dk.VP)) +
-                    f'<div style="padding:0 0 {12 - dk.VP}px;margin-top:-4px;">{_day_text(x)}</div></details>') + (day_why_html(x, fc) if fc else "")   # 근거 줄 = 접어도 보인다
+                    f'<div style="padding:0 0 {12 - dk.VP}px;margin-top:-4px;">{_day_text(x)}</div></details>') + (day_why_html(x, fc) if fc else "") + ("" if last else gap)   # 근거 줄 = 접어도 보인다
             return _tl_row(dot, lh, 12 - dk.VP, fold, False, last)
         out += "".join(row(x, i == len(shown) - 1 and not rest) for i, x in enumerate(shown))
         if rest:
