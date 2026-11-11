@@ -384,6 +384,16 @@ def issues(rs, since=""):
 
 
 PICK_ACTION = {"buy": "매수", "hold": "보유", "watch": "관망", "sell": "매도"}
+# 종목 의견의 티커 바로잡기 (2026-11-11 사용자: 스페이스X 방송 매수 의견이 수집기엔 많은데 페이지는 `없음`).
+# 수집기 요약이 티커를 비우거나(스페이스X 4건) 옛 이름(SPACEX · BRK.B)으로 적는다 — 뉴스 줄(rows)처럼 ALIAS 를 쓰고, 비었으면 종목 이름으로 찾는다.
+_US_BY_NAME = {re.sub(r"\s+", "", n).lower(): t for t, n, *_ in UNI.CANDIDATES}
+
+
+def _pick_ticker(p):
+    t = _ticker(p.get("ticker") or "")
+    if not t and str(p.get("market") or "").upper() == "US":
+        t = _US_BY_NAME.get(re.sub(r"\s+", "", str(p.get("name") or "")).lower(), "")
+    return t
 
 
 def _as_utc(s):
@@ -412,7 +422,7 @@ def picks(items, since=""):
             continue
         ch = it.get("channelName") or ""
         for p in it.get("picks") or []:
-            t = str(p.get("ticker") or "").strip().upper()
+            t = _pick_ticker(p)
             key = (it.get("id"), p.get("speaker"), t)
             if not t or key in seen or p.get("action") not in PICK_ACTION:
                 continue
