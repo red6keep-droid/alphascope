@@ -1468,10 +1468,10 @@ def day_why_html(x, fc):
     if lean in names and w.get(key_of[lean]):
         pick = w[key_of[lean]][0]
     else:
-        cands = [(d, rs[0]) for d, rs in groups if rs]
-        if cands:
-            d, pick = sorted(cands, key=lambda c: (-c[1].get("lv", 0), c[1].get("day", "")), reverse=False)[0]
-            label = _side_pill(names[d][1])
+        cands = [(d, rs) for d, rs in groups if rs]
+        if cands:   # 그날 건수가 많은 쪽 → 같으면 대상에 가까운 줄 → 더 최근 기사 (늘 반등 쪽이 먼저 뽑히던 것, 2026-11-11 가상 목업에서 찾음)
+            d, rs = max(cands, key=lambda c: (len(c[1]), c[1][0].get("lv", 0), c[1][0].get("day", "")))
+            pick, label = rs[0], _side_pill(names[d][1])
     pid = dk.news_pop_id("whyday", f'{fc.get("slug")}-{x["day"]}')
     pop = ""
     for d, rs in groups:
