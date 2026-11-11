@@ -2044,17 +2044,20 @@ def report_links(*keys):
     return [REPORT_LINKS[k] for k in keys]
 
 
+RELATED_FS, RELATED_LH, RELATED_PAD = "14px", "20px", 9   # 글 끝 `함께 보는 페이지` = 푸터 제목(`ALPHASCOPE 주식 리포트` 14/20)과 같은 글씨 · 줄 위아래 12 → 9 (줄 높이 50 → 38, 2026-11-11 사용자)
+
+
 def related_rows(links):
     """`함께 보는 페이지` · `함께 보는 리포트` 공용 줄 — 3px 점 + 이름(16px 보통 — 2026-11-10 사용자: 굵게 했다가 같은 날 되돌림) + 오른쪽 나가는 아이콘(회색), 줄 아래 구분선, 줄 전체가 링크."""
     dot = '<span aria-hidden="true" style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-right:8px;"></span>'
-    return "".join(f'<a href="{esc(u)}" data-row-link="1" style="display:flex;align-items:center;gap:0;padding:12px {ALIGN_PX}px;border-bottom:1px solid #E2E8F0;'
-                   f'font-size:16px;line-height:26px;font-weight:400;color:#111;text-decoration:none;">{dot}<span style="flex:1 1 auto;min-width:0;">{esc(t)}</span>'
+    return "".join(f'<a href="{esc(u)}" data-row-link="1" style="display:flex;align-items:center;gap:0;padding:{RELATED_PAD}px {ALIGN_PX}px;border-bottom:1px solid #E2E8F0;'
+                   f'font-size:{RELATED_FS};line-height:{RELATED_LH};font-weight:400;color:#111;text-decoration:none;">{dot}<span style="flex:1 1 auto;min-width:0;">{esc(t)}</span>'
                    f'<span style="flex:none;display:inline-flex;margin-left:8px;color:{NOTE};">{OUT_ICON}</span></a>' for t, u in links)
 
 
 def related_title(text):
-    # 제목 = 줄 글씨와 같은 16 · 굵게 (2026-11-10 사용자, 옛 EMPH_NAME 19)
-    return f'<div style="font-weight:700;color:#111;font-size:16px;line-height:26px;padding:0 {ALIGN_PX}px 10px;border-bottom:1px solid #E2E8F0;">{esc(text)}</div>'
+    # 제목 = 줄 글씨와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 EMPH_NAME 19 → 16 → 11-11 14)
+    return f'<div style="font-weight:700;color:#111;font-size:{RELATED_FS};line-height:{RELATED_LH};padding:0 {ALIGN_PX}px 8px;border-bottom:1px solid #E2E8F0;">{esc(text)}</div>'
 
 
 def related_buttons(links):
