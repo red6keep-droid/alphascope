@@ -775,17 +775,30 @@ def side_why(fc, sc, border):
     return f'<div data-why="1" style="margin:12px 0 4px;padding-top:10px;border-top:1px solid {border};">{_why_head("근거", total, pid)}{body}{pop}</div>'
 
 
-def open_why(fc):
-    """두 갈래 카드 위 공통 줄 — 방향이 아직 안 정해진 일(좋고 나쁨 자체가 갈리는 기사 줄 + 중립인 우리 신호). 없으면 빈 문자열."""
-    w = fc.get("reasons") or {}
-    rows, n_news = w.get("open") or [], (w.get("count") or {}).get("open", len(w.get("open") or []))
-    sigs, as_of = _sigs(fc, 0)
-    if not rows and not sigs:
+OPEN_TITLE = "향방 미정"   # 옛 `방향이 아직 안 정해진 일` 카드 (2026-11-11 사용자: 문장을 줄여 새 제목, 카드 없이 타임라인 위 한 줄)
+
+
+def open_line(fc, log):
+    """타임라인 위 한 줄 `향방 미정  11.10  기사 [논의중] ›` — 좋고 나쁨 자체가 갈리는 기사(open)를 등록 때 + 날마다 쌓은 것에서 가장 최근 하나만,
+    줄 전체를 누르면 팝업에 전부(최근 순 · 날짜 · 매체). 우리 신호 중립은 사건이 아니라 넣지 않는다. 없으면 빈 문자열."""
+    rows, seen = [], set()
+    for r in ((fc.get("reasons") or {}).get("open") or []) + [r for e in log or [] for r in ((e.get("why") or {}).get("open") or [])]:
+        if r.get("t") and r["t"] not in seen:
+            seen.add(r["t"])
+            rows.append(r)
+    if not rows:
         return ""
-    pid = dk.news_pop_id("why", f'{fc.get("slug")}-open')
-    bg, bd = dk.CARD_DIR["neutral"]
-    return (f'<div data-why="open" style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:0 0 8px;">'
-            f'{_why_head("방향이 아직 안 정해진 일", n_news + len(sigs), pid)}{_why_lines(rows, sigs)}{_why_pop(pid, "방향이 아직 안 정해진 일", rows, n_news, sigs, as_of)}</div>')
+    rows.sort(key=lambda r: r.get("day") or "", reverse=True)
+    top = rows[0]
+    pid = dk.news_pop_id("whyopen", fc.get("slug"))
+    pop = "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q), r.get("stage") == "talk") for r in rows)
+    body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{OPEN_TITLE}" hidden>{pop}</div>'
+    chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
+    talk = _talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if top.get("stage") == "talk" else ""
+    return (f'<div data-why-open="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:0 {dk.ALIGN_PX}px;cursor:pointer;">'
+            f'<span style="flex:none;font-size:14px;line-height:20px;font-weight:700;color:#111;">{OPEN_TITLE}</span>'
+            + (f'<span style="flex:none;font-size:13px;line-height:19px;color:{dk.SUB};">{md(top["day"])}</span>' if top.get("day") else "")
+            + f'<span style="display:flex;align-items:center;gap:4px;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(top["t"]), grow=False)}{talk}{chev}</span>{body}</div>')
 
 
 def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""):
@@ -1831,7 +1844,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
     # 두 갈래 카드 = 페이지 맨 위, 구획 제목 없이 · 카드마다 `전망 A` · `전망 B` 이름표 (P386). 문장 안에서는 계속 갈래 이름으로 부른다(번호 금지 규칙)
     per, third = _split_ahead(fc, st)
     order = sorted(fc["scenarios"], key=lambda sc: {"up": 0, "flat": 1, "down": 2}[_tag_kind(sc)])   # 높은 쪽 위 = 전망 A, 낮은 쪽 아래 = 전망 B (P411, 화면 순서만 · 판정 no 그대로)
-    sides = (THIN_CSS + '<div style="margin:0 0 24px;">' + open_why(fc) + "".join(   # 회색 번복 카드 없앰 — 회차는 세부전망 카드 · `이전전망 ›` 로 잇는다 (2026-11-08 사용자)   # 겹침 카드는 없앰 — 질문 아래 세부 전망 카드 셋째 줄 `겹침 · …` 로 (P479)   # 번복 · 겹침 카드 = 전망 A 위 (P441 · P443)
+    sides = (THIN_CSS + '<div style="margin:0 0 24px;">' + "".join(   # 옛 open_why 카드 = 타임라인 위 `향방 미정` 한 줄로 (2026-11-11 사용자)   # 회색 번복 카드 없앰 — 회차는 세부전망 카드 · `이전전망 ›` 로 잇는다 (2026-11-08 사용자)   # 겹침 카드는 없앰 — 질문 아래 세부 전망 카드 셋째 줄 `겹침 · …` 로 (P479)   # 번복 · 겹침 카드 = 전망 A 위 (P441 · P443)
              _scenario_card(sc, branch_view(fc, st, sc), tag="전망" + chr(65 + i), extra=per.get(sc["no"]), compact=None, mkt=sc["no"] == _mkt_no(fc),
                             why=side_why(fc, sc, dk.CARD_DIR[branch_view(fc, st, sc)["theme"]][1])) for i, sc in enumerate(order))
              + (_third_card(third[0], third[1], fc.get("line", 3.0)) if third else "") + "</div>")   # 셋째 카드 = `선반영` (사건 전) · `제자리` (충격 뒤) (2026-11-07 사용자)
@@ -1857,7 +1870,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
          + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:24px;line-height:{dk.LH_TINY};">'
          + _date_row(fc, out=not before and fc["kind"] == "pre").replace("flex-direction:column;align-items:flex-end;", "flex-wrap:wrap;align-items:center;gap:4px 10px;", 1)
          + back_btn.replace("margin-top:6px;", "", 1) + '</span></span></h2>') + _follow_btn(fc, st)
-    body = (q + sides + head + crowd_line(fc)   # 겹침이 2개를 넘으면 사실 한 줄 (2026-11-08)
+    body = (q + sides + open_line(fc, log) + head + crowd_line(fc)   # 겹침이 2개를 넘으면 사실 한 줄 (2026-11-08)
             + (operator_box(op + _op_mood(fc) + ([("거래량", f'평소의 {st["volume_x"]:.1f}배 — 기록만 — 우리 전망 고르기엔 안 씀')] if fc["kind"] == "after" and st.get("volume_x") else [])) if op else "")
             + more + why_note_html(fc)   # 근거 안내 = `현재 증시는?` 아래 한 번 (2026-11-11 사용자)   # `더 궁금한 것` 제목 삭제 — 기록 · 앞으로 볼 것은 각자 구분선 구획 (2026-11-07 사용자)
             )   # `다른 전망` 구획 삭제 — 글 아래 [목록] 버튼이 전망 목록으로 간다, 이어진 전망은 겹침 카드 안 링크로 (P442, 2026-11-08 사용자)
