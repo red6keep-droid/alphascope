@@ -961,6 +961,29 @@ TERMS = [("방향", "상승 · 하락 둘뿐"),
          ("회색 점선 상자", "운영자 확인용 — 80개 요인 중 쓰인 것 · 이슈 코드 · 범위 비율 · 동행 · 겹침 · 규칙. 블로그에는 안 나감")]
 
 
+def _strip_related(html):
+    """[data-related] 블록을 모두 빼고 (나머지, 첫 블록) — div 짝을 세어 통째로."""
+    first, out, i = "", [], 0
+    while True:
+        j = html.find('<div data-related="1"', i)
+        if j < 0:
+            out.append(html[i:])
+            break
+        out.append(html[i:j])
+        depth, k = 0, j
+        while True:
+            o, c = html.find("<div", k), html.find("</div>", k)
+            if o != -1 and o < c:
+                depth, k = depth + 1, o + 4
+            else:
+                depth, k = depth - 1, c + 6
+                if depth == 0:
+                    break
+        first = first or html[j:k]
+        i = k
+    return "".join(out), first
+
+
 def build():
     tiers = list(TIERS)
     terms = ('<details class="fc-det fc-terms"><summary>용어 (모든 탭 공통) <span class="fc-chev">▾</span></summary><div class="body">'
@@ -998,7 +1021,8 @@ def build():
           "var ti=document.querySelector('.post-title');if(ti){var hb=document.createElement('button');hb.type='button';hb.id='fc-help';hb.setAttribute('aria-label','설명 보기');hb.setAttribute('aria-pressed','false');hb.innerHTML='<svg viewBox=\"0 0 18 18\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"9\" r=\"7.5\"/><path d=\"M9 8v5\"/><path d=\"M9 5.2v.1\"/></svg>';hb.addEventListener('click',function(){var on=document.body.classList.toggle('fc-help-on');hb.setAttribute('aria-pressed',on?'true':'false');});ti.appendChild(hb);}"
           "document.querySelectorAll('.fc-subtabs button.sub').forEach(function(b){b.addEventListener('click',function(){var w=b.closest('[data-pane]');w.querySelectorAll('.fc-subtabs button.sub').forEach(function(x){x.classList.toggle('on',x===b);});w.querySelectorAll('[data-sp]').forEach(function(p){p.hidden=p.dataset.sp!==b.dataset.s;});});});"
           "document.querySelectorAll('#fc-tabs button.tab').forEach(function(b){b.addEventListener('click',function(){if(b.dataset.t)t=b.dataset.t;if(b.dataset.k)k=b.dataset.k;show();window.scrollTo(0,0);});});show();})();</script>")
-    return TAB_CSS + tabs + terms + "".join(panes) + js
+    body, rel = _strip_related("".join(panes))   # 탭마다 든 `함께 보는 페이지` 를 하나만 — 테마가 숨은 탭 것까지 글 끝으로 옮겨 수십 번 겹쳤다 (2026-11-11 사용자)
+    return TAB_CSS + tabs + terms + body + rel + js
 
 
 TYPICAL_OPEN = ("B7", "A2", "C1")   # 실제에 가까운 목록 — 지켜보는 전망 셋(규칙 상한 3, 기획 8-1): 세부 전망 · 사건 뒤 조짐 · 사건 전 등록
