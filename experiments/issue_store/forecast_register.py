@@ -195,24 +195,7 @@ def reasons(w, shock_day, today, s, c, z_val, paths):
     top = [k for k, _ in cnt.most_common(1)]
     heads = [(x["fact"], str(x["published_at"])[:10], x.get("source") or "")
              for _, x in sorted(picked, key=lambda p: (-p[0], p[1].get("issue") not in top, str(p[1].get("published_at"))))[:2]]
-    analyst = None
-    if w.get("stock"):
-        est = _load(est_path) or {}
-        seen, down, up, cut_rating = set(), 0, 0, 0
-        for day in sorted(est):
-            if not (lo <= day <= today):
-                continue
-            for ch in (((est[day] or {}).get(w["sym"]) or {}).get("analysts") or {}).get("changes") or []:
-                at = str(ch.get("at") or "")[:10]
-                key = (ch.get("firm"), at, ch.get("pt"))
-                if key in seen or not (lo <= at <= today):
-                    continue
-                seen.add(key)
-                down += ch.get("pt_action") == "Lowers"
-                up += ch.get("pt_action") == "Raises"
-                cut_rating += ch.get("action") == "down"
-        if down or up or cut_rating:
-            analyst = {"down": down, "up": up, "downgrade": cut_rating}
+    analyst = _analyst(w["sym"], lo, today, est_path) if w.get("stock") else None
     sig = [f"하루 움직임 평소의 {abs(z_val):.1f}배"]
     import pandas as pd
     i = c.index.get_loc(pd.Timestamp(shock_day))
@@ -405,6 +388,61 @@ def _etf_of(sym):
     if not _UNI or sym not in _UNI.BY_SYM:
         return None
     return _UNI.sector_etf(sym)[0]
+
+
+def _analyst(sym, lo, today, est_path):
+    """lo ~ today 에 바뀐 애널리스트 목표가 · 의견 → {"down", "up", "downgrade"} 또는 None."""
+    est = _load(est_path) or {}
+    seen, down, up, cut_rating = set(), 0, 0, 0
+    for day in sorted(est):
+        if not (lo <= day <= today):
+            continue
+        for ch in (((est[day] or {}).get(sym) or {}).get("analysts") or {}).get("changes") or []:
+            at = str(ch.get("at") or "")[:10]
+            key = (ch.get("firm"), at, ch.get("pt"))
+            if key in seen or not (lo <= at <= today):
+                continue
+            seen.add(key)
+            down += ch.get("pt_action") == "Lowers"
+            up += ch.get("pt_action") == "Raises"
+            cut_rating += ch.get("action") == "down"
+    return {"down": down, "up": up, "downgrade": cut_rating} if (down or up or cut_rating) else None
+
+
+# ---------------------------------------------------------------- 날마다 근거 (2026-11-11 사용자: 타임라인 그날 줄에 한 줄 + 그날 더보기 팝업, 날마다 쌓임)
+# 그날 = 직전 타임라인 날 다음 날 ~ 그날(기사 게시 UTC 날짜). 갈래 · 방향이 안 정해진 일은 side_news 그대로, 우리 신호는 전날 기록과 달라진 것만(changes).
+# 전망 단계가 레이더보다 먼저 돌아 그날 기사가 다음 실행에 더 들어온다 → forecast_daily 가 최근 REDO_DAYS 날은 다시 모아 덮고 그 앞은 고정.
+REDO_DAYS = 2
+
+
+def w_of(fc):
+    """등록 파일 fc → side_news · our_signals 가 쓰는 계열 정보."""
+    sr = fc.get("series") or {}
+    return {"sym": sr.get("sub"), "mkt": sr.get("mkt"), "stock": fc.get("target") == "stock"}
+
+
+def day_why(fc, day, prev_day, radar_dir, prev_sigs=None):
+    """→ {"day", "good", "bad", "open", "count", "changes": [{name, from, to, dir, hz}], "sigs": [그날 신호 전체 — 다음 날 비교용]}."""
+    w = w_of(fc)
+    if not w["sym"]:
+        return None
+    lo = (dt.date.fromisoformat(prev_day) + dt.timedelta(days=1)).isoformat() if prev_day else day
+    hi = (dt.date.fromisoformat(day) + dt.timedelta(days=1)).isoformat()
+    news = _load(os.path.join(radar_dir, "news.json")) or {}
+    an = _analyst(w["sym"], lo, day, os.path.join(radar_dir, "est_history.json")) if w["stock"] else None
+    out = {"day": day, **side_news(w, lo, hi, news, os.path.join(radar_dir, "news_summaries.json"), an)}
+    try:
+        sg = our_signals(w, lo, day, radar_dir) or {}
+    except Exception:  # noqa: BLE001
+        sg = {}
+    cur = [r for r in sg.get("rows") or [] if r["key"] != "picks"]
+    before = {r["name"]: r for r in prev_sigs or []}
+    out["changes"] = [{"name": r["name"], "from": before[r["name"]]["state"], "to": r["state"], "dir": r["dir"], "hz": r["hz"]}
+                      for r in cur if r["name"] in before and before[r["name"]]["state"] != r["state"]]
+    out["changes"] += [{"name": r["name"], "from": None, "to": r["state"], "dir": r["dir"], "hz": r["hz"]}
+                       for r in sg.get("rows") or [] if r["key"] == "picks" and lo <= day]   # 방송 의견 = 그 기간 새로 나온 것
+    out["sigs"] = cur or (prev_sigs or [])
+    return out
 
 
 # ---------------------------------------------------------------- 등록 파일

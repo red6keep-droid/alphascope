@@ -1439,7 +1439,67 @@ END_GO = ('<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="c
           '<circle cx="8" cy="8" r="6.5"/><path d="M5 8h6M8.5 5.5 11 8l-2.5 2.5"/></svg>')   # 원 안 오른쪽 화살표(이어짐)
 
 
-def _waiting(log, unit="%", subj=""):
+def _side_names(fc):
+    """{+1: (갈래 이름, `반등 쪽`), −1: (…, `지속 쪽`)} — 갈래 dir 로 (급락 뒤 반등 = +1, 급등 뒤 조정 = −1)."""
+    out = {}
+    for sc in (fc or {}).get("scenarios") or []:
+        if sc.get("dir") in (1, -1):
+            out[sc["dir"]] = (sc["name"], sc.get("cond", "").removesuffix("이면").strip())
+    return out
+
+
+def _side_pill(word):
+    return dk.pill(word, "area").replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 {dk.PILL_GAP}px 0 0;flex:none;", 1)
+
+
+def day_why_html(x, fc):
+    """타임라인 그날 줄 아래 근거 한 줄 + 그날 더보기 팝업 (2026-11-11 사용자).
+    기운 쪽(우세 · 실현)이 있는 날 = 그 쪽 근거 맨 위 한 줄, `지켜보는 중` 날 = 그날 근거 맨 위 한 줄 앞에 `반등 쪽` · `지속 쪽` 라벨. 그날 소식이 없으면 없음.
+    팝업 = 갈래별 그날 기사(날짜 · 매체 · 논의중) · 방향이 안 정해진 일 · 우리 신호 바뀐 것(전날 → 그날)."""
+    w = x.get("why") or {}
+    names = _side_names(fc)
+    key_of = {1: "good", -1: "bad"}
+    groups = [(d, w.get(key_of[d]) or []) for d in (1, -1) if d in names]
+    total = sum(len(rs) for _, rs in groups) + len(w.get("open") or []) + len(w.get("changes") or [])
+    if not total:
+        return ""
+    lean = x.get("dir") if x.get("key") != "watch" else 0
+    pick, label = None, ""
+    if lean in names and w.get(key_of[lean]):
+        pick = w[key_of[lean]][0]
+    else:
+        cands = [(d, rs[0]) for d, rs in groups if rs]
+        if cands:
+            d, pick = sorted(cands, key=lambda c: (-c[1].get("lv", 0), c[1].get("day", "")), reverse=False)[0]
+            label = _side_pill(names[d][1])
+    pid = dk.news_pop_id("whyday", f'{fc.get("slug")}-{x["day"]}')
+    pop = ""
+    for d, rs in groups:
+        if rs:
+            pop += _pop_sub(f'{dk.esc(names[d][1])} <span style="font-weight:400;color:{dk.SUB};">· {len(rs)}건</span>')
+            pop += "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q), r.get("stage") == "talk") for r in rs)
+    if w.get("open"):
+        pop += _pop_sub("방향이 아직 안 정해진 일") + "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q), r.get("stage") == "talk") for r in w["open"])
+    for hz, span in WHY_HZ:
+        cs = [c for c in w.get("changes") or [] if c["hz"] == hz]
+        if cs:
+            pop += _pop_sub(f'우리 신호 {hz} <span style="font-weight:400;color:{dk.SUB};">· 바뀐 것</span>')
+            pop += "".join(_pop_li(f'{c["name"]} : {c["from"]} → {c["to"]}' if c.get("from") else f'{c["name"]} : {c["to"]}') for c in cs)
+    pop += (f'<span style="display:flex;align-items:flex-start;gap:4px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
+            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{WHY_NOTE} 그날 나온 기사와 바뀐 신호만 적었습니다.</span></span>')
+    body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(md(x["day"]) + " 근거")}" hidden>{pop}</div>'
+    if pick:
+        line = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;">{label}{_one_line(dk.esc(pick["t"]), grow=False)}'
+                + (_talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if pick.get("stage") == "talk" else "") + "</span>")
+    else:   # 기사 없이 신호만 바뀐 날
+        c = (w.get("changes") or [{}])[0]
+        txt = f'{c.get("name", "")} : {c["from"]} → {c.get("to", "")}' if c.get("from") else f'{c.get("name", "")} : {c.get("to", "")}'
+        line = f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;">{_one_line(dk.esc(txt), grow=False)}</span>'
+    return (f'<div data-why-day="1" style="display:flex;align-items:center;gap:8px;margin:-4px 0 {12 - dk.VP}px;">{line}'
+            f'<span style="flex:none;display:flex;align-items:center;gap:6px;"><span style="font-size:13px;line-height:19px;color:{dk.SUB};white-space:nowrap;">근거 {total}건</span>{_why_more(pid)}</span>{body}</div>')
+
+
+def _waiting(log, unit="%", subj="", fc=None):
     """카드 아래 세로 타임라인 — 결과 전 · 결과 뒤 같은 모양 (P409 · P418, 2026-11-08 사용자: 아래 내용은 A 1번 화면과 통일).
     오늘 = 시계 아이콘 + 날짜 · 국면 · ▲ 움직임 + (펼쳐 둔 채) 문장 · 오늘 나온 것, + 버튼으로 접고 펼침(P422). 지난 날 = 점 + 같은 머리 줄(+ 펼침).
     마디 사이는 세로 점선. 지난 날이 많으면 최근 PAST_SHOWN 개 + 맨 아래 `지난 경과 n개 더 보기`(펼치면 같은 타임라인으로 이어짐)."""
@@ -1466,7 +1526,7 @@ def _waiting(log, unit="%", subj=""):
                 f'{a}{b}{c}{tail}</summary>')
     clock = f'<span style="display:inline-flex;color:{dk.SUB};">{CLOCK}</span>'
     # 아래 여백 = 지난 날 줄과 같은 10 (접혀도 펼쳐도) — 옛 4px 띄움은 접으면 다음 줄과 붙어 좁았다 (P436, 2026-11-08 사용자)
-    today = (f'<details class="fc-day" open style="margin:0;padding:0 0 {12 - dk.VP}px;">' + head(e).replace("{pad}", "0") + f'{_day_text(e)}</details>')
+    today = (f'<details class="fc-day" open style="margin:0;padding:0 0 {12 - dk.VP}px;">' + head(e).replace("{pad}", "0") + f'{_day_text(e)}</details>') + (day_why_html(e, fc) if fc else "")
     past = days[1:]
     out = PLUS_CSS + '<div style="margin:0 0 24px;">'
     end = e.get("key") in RESULT   # 판정이 난 전망 — 시계 줄 위에 끝 줄 하나 (P465, 2026-11-08 사용자): 세부 전망이 이어받으면 `세부 전망으로 이어집니다 ›`, 아니면 `전망이 종료되었습니다`
@@ -1487,7 +1547,7 @@ def _waiting(log, unit="%", subj=""):
 
         def row(x, last):
             fold = (f'<details class="fc-day" style="margin:0;">' + head(x).replace("{pad}", str(12 - dk.VP)) +
-                    f'<div style="padding:0 0 {12 - dk.VP}px;margin-top:-4px;">{_day_text(x)}</div></details>')
+                    f'<div style="padding:0 0 {12 - dk.VP}px;margin-top:-4px;">{_day_text(x)}</div></details>') + (day_why_html(x, fc) if fc else "")   # 근거 줄 = 접어도 보인다
             return _tl_row(dot, lh, 12 - dk.VP, fold, False, last)
         out += "".join(row(x, i == len(shown) - 1 and not rest) for i, x in enumerate(shown))
         if rest:
@@ -1757,7 +1817,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
         log = [dict(x, overlap=ov[md(x["day"])]) if md(x.get("day") or "") in ov else x for x in log]
     before = fc["kind"] == "pre" and not st.get("cond") and not st.get("result")   # 사건 전 등록 화면 — 결과가 없으니 `전망 결과` 를 그리지 않는다 (2026-11-07 사용자)
     # 결과 뒤도 결과 전과 같은 타임라인 — `전망 결과` 제목 · 강조 카드 · `결과 :` 상자 없음 (P418, 결과 날짜 = 날짜 줄 보라 P413 · 결과 내용 = 갈래 카드 첫 고리 줄)
-    head = (_waiting(log, fc.get("unit", "%p"), fc.get("subject", "")) if before else f'<div data-lead="1">{_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""))}</div>')   # `앞으로 올 수 있는 일` 카드 삭제 — 내용은 갈래 카드 · 셋째 카드 안으로 (2026-11-07 사용자 · Claude 판단)
+    head = (_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc) if before else f'<div data-lead="1">{_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc)}</div>')   # `앞으로 올 수 있는 일` 카드 삭제 — 내용은 갈래 카드 · 셋째 카드 안으로 (2026-11-07 사용자 · Claude 판단)
     for sc in fc["scenarios"]:
         sc["_L"] = fc.get("line", 3.0)
     # 두 갈래 카드 = 페이지 맨 위, 구획 제목 없이 · 카드마다 `전망 A` · `전망 B` 이름표 (P386). 문장 안에서는 계속 갈래 이름으로 부른다(번호 금지 규칙)

@@ -121,6 +121,46 @@ def base_of(fc):
     return fc.get("base_day", "2026-11-04")
 
 
+def why_path(slug, state_dir=None):
+    """날마다 근거 저장 — 등록 파일 옆 why/{slug}.json = {날짜: day_why}. 상태 저장소에 남아야 8일 뒤 기사가 지워져도 팝업이 그대로다."""
+    return os.path.join(H.reg_dirs(state_dir)[1], "why", f"{slug}.json")
+
+
+def attach_why(fc, st, state_dir=None):
+    """타임라인 날(st["log"])마다 근거 — 저장된 날은 그대로, 없는 날 · 최근 REDO_DAYS 날은 새로 모아 덮는다. 판정이 난 뒤엔 쌓지 않는다(로그가 멈춘다).
+    갈래별 근거가 없는 옛 등록(reasons 에 good 없음)은 건너뛴다. log 줄에 e["why"] 를 붙여 렌더가 읽는다."""
+    if "good" not in (fc.get("reasons") or {}):
+        return
+    path = why_path(fc["slug"], state_dir)
+    saved = {}
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            saved = json.load(f)
+    radar = os.path.dirname(R.radar_paths(state_dir)[0])
+    log = [e for e in st.get("log") or [] if e.get("day") and e.get("key") != "start"]
+    days = [e["day"] for e in log]
+    redo = set(days[-R.REDO_DAYS:])
+    cut = (dt.date.today() - dt.timedelta(days=8)).isoformat()   # 기사 파일이 8일만 남는다 — 그보다 오래된 빈 날은 새로 만들지 않는다
+    prev_sigs, changed = None, False
+    for i, d in enumerate(days):
+        if d in saved and d not in redo:
+            prev_sigs = saved[d].get("sigs") or prev_sigs
+            continue
+        if d < cut:
+            continue
+        rec = R.day_why(fc, d, days[i - 1] if i else fc.get("registered"), radar, prev_sigs)
+        if rec:
+            saved[d], changed = rec, True
+            prev_sigs = rec.get("sigs") or prev_sigs
+    if changed:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(saved, f, ensure_ascii=False, indent=1)
+    for e in log:
+        if e["day"] in saved:
+            e["why"] = {k: v for k, v in saved[e["day"]].items() if k != "sigs"}
+
+
 def run(state_dir=None):
     regs = H.load_regs(state_dir)
     pub = [(r, fc) for r in regs for fc in H.forecasts(r, public=True)]
@@ -151,6 +191,11 @@ def run(state_dir=None):
                 st["quote"] = H.quote_of(px.get(sub))
             if fc["kind"] == "after":   # 현재 증시는? 비교 그래프 — 종목 · 업종 · S&P 500 (이미 받은 종가, 2026-11-11 사용자)
                 st["compare"] = H.compare_of(px, fc.get("base_day") or base_of(fc), H.compare_lines(fc))
+            if fc["kind"] == "after":   # 타임라인 날마다 근거 (2026-11-11 사용자) — 실패해도 판정 · 렌더는 그대로
+                try:
+                    attach_why(fc, st, state_dir)
+                except Exception as e:  # noqa: BLE001
+                    print(f"[forecast] 날마다 근거 실패 {fc['slug']}: {type(e).__name__}")
             states[fc["slug"]] = st
             FA.missing_days(st.get("missing", []))
             e = st["log"][-1]
