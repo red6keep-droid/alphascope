@@ -11,8 +11,9 @@ import math
 import os
 import re
 
-UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
-SUB = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
+UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#9CA3AF", "#e8710a"   # MUTED = 흐림(상태 색, 글자 세 톤 밖, P496 — 옛 #999)
+SUB = "#6B7280"   # 글자 세 톤의 회색 (P496, 2026-11-11 — 옛 #7A7A7A)
+_SUB_OLD = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
 NOTE = "#6B7280"          # 안내 글 회색
 BODY, SMALL, TINY, MICRO = "19px", "19px", "14px", "14px"   # 본문 18 → 19 (2026-10-13 사용자: "모든 리포트의 블로그 전체의 본문 폰트는 19포인트")   # 안내 글(14px)을 빼고 모두 18px (2026-10-12 사용자: "안내 14포인트를 제외하고 본문 폰트는 모두 18")
 NAME = "16px"   # 가로 구분선이 있는 카드의 왼쪽 정보(구분명) — 2026-10-12 사용자: "가로 구분선이 있는 카드의 좌측 정보는 16포인트"
@@ -520,7 +521,7 @@ def guide(title, body, line=True, grid=False, in_card=False):
         top = "margin:8px 0 4px;padding-top:6px;border-top:1px solid #f3f3f3;" if line else "margin:4px 0 0;"
     else:   # 카드 밖: 위아래 여백 40% 줄임 + 20px 들여쓰기 (2026-10-11 사용자)
         top = ("margin:3px 0 1px;padding-top:2px;border-top:1px solid #f3f3f3;" if line else "margin:1px 0 0;") + GUIDE_IND   # 여백은 정수 px만 (2026-10-12 사용자: 2.76 · 1.38 · 2.07 반올림)
-    head = f'{INFO_ICON}<b style="color:#4B5563;">{esc(title)}</b>'
+    head = f'{INFO_ICON}<b style="color:#333;">{esc(title)}</b>'
     if isinstance(body, str) and len(body) <= GUIDE_SHORT:
         return f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head} : {esc(body)}</div>'   # data-guide: 홈 카드가 건너뛴다
     items = [body] if isinstance(body, str) else body
@@ -1194,8 +1195,8 @@ def state_card(head_html, kind="neutral", right_html="", sub_html="", items=(), 
             f'<span style="font-weight:{STATE_TITLE_W};color:#111;font-size:{EMPH_Q};line-height:{LH_EMPH_Q};">{head_html}</span>'   # 굵기 = 종목 페이지 질문 500 (P131, 2026-11-07)
             + (f'<span style="display:inline-flex;align-items:center;font-weight:{STATE_ANS_W};white-space:nowrap;font-size:{EMPH_Q};line-height:{LH_EMPH_Q};{"margin-left:auto;" if chev else ""}">{emph_tri(right_html)}</span>' if right_html else "")   # 라벨 · 숫자 세로 가운데 (2026-10-13 사용자)
             + ((("" if right_html else '<span style="margin-left:auto;"></span>') + emph_fold_btn(lighten(bg), bd)) if chev else "") + "</span>")   # 접기 버튼 = 종목 페이지와 같은 함수(왼쪽 12 · 화살표 색, 2026-11-07)   # chev: 맨 오른쪽 공식 접기 버튼, 바탕은 카드 색 20% 밝게 (2026-10-13 사용자)
-    sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#374151;margin-top:2px;{"text-align:center;" if center else ""}">{sub_html}</div>' if sub_html else ""   # center: 종합 상태 카드 가운데 (2026-10-13 사용자)
-    lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#374151", margin="8px 0") for k, v in items)
+    sub = f'<div style="font-size:{TINY};line-height:{LH_TINY};color:#333;margin-top:2px;{"text-align:center;" if center else ""}">{sub_html}</div>' if sub_html else ""   # center: 종합 상태 카드 가운데 (2026-10-13 사용자)
+    lis = "".join(dot_li((f"<b>{esc(k)}</b> : " if k else "") + esc(v), size=2, color="#333", margin="8px 0") for k, v in items)
     body = (f'<div style="margin-top:{14 - VP_EMPH + 3}px;padding-top:{14 - VP}px;border-top:1px solid {bd};font-size:{TINY};line-height:{LH_TINY};">'   # 제목 ~ 구분선 14 · 구분선 ~ 글 14 (보이는 여백, 2026-10-12 사용자: 4 → 14)
             f"<ul style='margin:-8px 0;padding:0;list-style:none;'>{lis}</ul></div>") if lis else ""   # 음수 margin = 첫·끝 li 의 8px 지우기
     # 위아래 24 — 끝 줄이 14px 글(행간 20)이면 반쪽 2, 18px 제목이면 6 (2026-10-12 사용자)
@@ -1583,7 +1584,7 @@ def direction_bars(today, week, empty_text=""):
         # 버튼 왼쪽 `최근 7일` 글자 = 분야 탭 비활성 글자(14px · #4B5563 · 보통 굵기), 글자 · 버튼 한 덩어리를 눌러도 펼침 (P363)
         head = (f'<span style="display:flex;justify-content:space-between;align-items:center;height:{FOLD_BOX}px;margin:0;">'
                 f'<span style="font-size:{TINY};line-height:{LH_TINY};color:#111;font-weight:700;">{esc(title)}</span>'
-                f'<span style="display:inline-flex;align-items:center;"><span style="font-size:{TINY};line-height:{LH_TINY};color:#4B5563;font-weight:400;">최근 7일</span>{fold_btn()}</span></span>')
+                f'<span style="display:inline-flex;align-items:center;"><span style="font-size:{TINY};line-height:{LH_TINY};color:#333;font-weight:400;">최근 7일</span>{fold_btn()}</span></span>')
         t = t.replace(plain, head, 1)
         box = box.replace(f"padding:{SEP_GAP - 3}px 12px", "padding:12px 12px", 1)
         return (box + f'<details data-acc="1" data-bars="1"><summary style="list-style:none;cursor:pointer;display:block;" aria-label="최근 7일 막대 보기">{t}</summary>'
@@ -1612,7 +1613,7 @@ def intraday_chart_fold(code, bars_url, precision=0):
           .replace("__PREC__", str(int(precision))).replace("__MOVE__", str(10 ** -int(precision))).replace("__LIVE__", _KR_LIVE_JS))   # 지수(코스피) = 소수 둘째 자리 (P315)
     return (f'<details id="{sid}" data-ichart="1" style="display:none;margin:-8px 0 16px;max-width:1024px;text-align:right;">'   # 처음엔 숨김 — 한국 정규장이면 스크립트가 보인다 (2026-11-06 사용자: "장중에만 보이도록", 미국 P314 와 같게)   # 버튼은 오른쪽 (2026-11-05 사용자)
             f'<summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #E2E8F0;border-radius:8px;'
-            f'font-size:13px;font-weight:600;color:#4B5563;background:#fff;">{ico}장중 차트 보기 (15분봉)</summary>'
+            f'font-size:13px;font-weight:600;color:#333;background:#fff;">{ico}장중 차트 보기 (15분봉)</summary>'
             f'<div data-ic-box="1" style="margin-top:8px;min-height:200px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff;text-align:left;">'
             f'<div style="display:flex;align-items:center;justify-content:center;height:200px;color:#9CA3AF;font-size:13px;">장중 차트를 불러오는 중…</div></div></details>'
             f'<script>{js}</script>')
@@ -1671,7 +1672,7 @@ def tv_chart_fold(symbol, tz, key):
                       "calendar": False, "support_host": "https://www.tradingview.com"}, ensure_ascii=False)
     return (f'<details id="{sid}" data-tv="1" style="display:none;margin:-8px 0 16px;max-width:1024px;text-align:right;">'   # 처음엔 숨김 — 정규장이면 스크립트가 보인다 (P314)   # 버튼은 오른쪽 (2026-11-05 사용자)
             f'<summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #E2E8F0;border-radius:8px;'
-            f'font-size:13px;font-weight:600;color:#4B5563;background:#fff;">{ico}장중 차트 보기 (15분봉)</summary>'
+            f'font-size:13px;font-weight:600;color:#333;background:#fff;">{ico}장중 차트 보기 (15분봉)</summary>'
             f'<div data-tv-box="1" style="margin-top:8px;min-height:360px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff;text-align:left;">'
             f'<div style="display:flex;align-items:center;justify-content:center;height:360px;color:#9CA3AF;font-size:13px;">TradingView 차트를 불러오는 중…</div></div></details>'
             f'<script>(function(){{var d=document.getElementById("{sid}");if(!d||d.__tv)return;d.__tv=1;'
@@ -1958,7 +1959,7 @@ def channel_count(n, total):
     if n < 2 or not total:
         return ""
     return (f'<span style="display:inline-flex;align-items:center;gap:6px;">{channel_meter(n, total)}'
-            f'<span style="font-size:{TINY};line-height:{LH_TINY};color:#374151;"><b style="color:#111;">{n}곳</b> / {max(total, n)}곳</span></span>')
+            f'<span style="font-size:{TINY};line-height:{LH_TINY};color:#333;"><b style="color:#111;">{n}곳</b> / {max(total, n)}곳</span></span>')
 
 
 def n_channels_of(issue_rows):

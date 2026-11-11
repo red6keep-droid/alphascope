@@ -718,7 +718,7 @@ def index_tech_card(a, prev):
     def chip(i, k):
         on = i == 0
         # 뉴스 탭 분야 탭과 같은 단추(data-chip) — 선택 = 굵은 검정 + 1px 검정 외곽선(테마 CSS [data-chip][aria-pressed=true], P332 · P344) (2026-11-07 사용자: 주요 뉴스 탭과 통일)
-        return (f'<button type="button" data-chip="{C.esc(sx.INDEX_NAME[k])}" data-ixc="{i}" aria-pressed="{"true" if on else "false"}" style="flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;color:#4B5563;font:inherit;'
+        return (f'<button type="button" data-chip="{C.esc(sx.INDEX_NAME[k])}" data-ixc="{i}" aria-pressed="{"true" if on else "false"}" style="flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;color:#333;font:inherit;'
                 f'font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;border:1px solid #E2E8F0;{"border-left:0;" if i else ""}'
                 f'border-radius:{"7px" if i == 0 else "0"} {"7px" if i == last else "0"} {"7px" if i == last else "0"} {"7px" if i == 0 else "0"};">{C.esc(sx.INDEX_NAME[k])}</button>')
     chips = (f'<div data-ix-chips="1" style="display:flex;overflow-x:auto;margin:6px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'

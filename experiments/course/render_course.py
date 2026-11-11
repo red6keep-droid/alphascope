@@ -72,7 +72,7 @@ def next_card(text, href, links):
             '<span style="flex:1 1 auto;min-width:0;">'
             '<span style="display:block;font-size:13px;line-height:18px;font-weight:700;color:#6B7280;margin:0 0 4px;">다음 편</span>'
             f'<span style="display:block;font-size:18px;line-height:27px;font-weight:700;color:#111;word-break:keep-all;">{inline(head, links)}</span>'
-            + (f'<span style="display:block;margin-top:6px;font-size:15px;line-height:24px;color:#4B5563;word-break:keep-all;">{inline(teaser, links)}</span>' if teaser else "")
+            + (f'<span style="display:block;margin-top:6px;font-size:15px;line-height:24px;color:#333;word-break:keep-all;">{inline(teaser, links)}</span>' if teaser else "")
             + f'</span><span style="flex:none;color:#6B7280;">{chev}</span></a>')
 
 

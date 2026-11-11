@@ -1465,7 +1465,7 @@ def index_tech_card(r):
     last = len(keys) - 1
 
     def chip(i, k):
-        return (f'<button type="button" data-chip="{_dk.esc(INDEX[k])}" data-ixc="{i}" aria-pressed="{"true" if i == 0 else "false"}" style="flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;color:#4B5563;font:inherit;'
+        return (f'<button type="button" data-chip="{_dk.esc(INDEX[k])}" data-ixc="{i}" aria-pressed="{"true" if i == 0 else "false"}" style="flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;color:#333;font:inherit;'
                 f'font-size:{_dk.TINY};line-height:{_dk.LH_TINY};cursor:pointer;white-space:nowrap;border:1px solid #E2E8F0;{"border-left:0;" if i else ""}'
                 f'border-radius:{"7px" if i == 0 else "0"} {"7px" if i == last else "0"} {"7px" if i == last else "0"} {"7px" if i == 0 else "0"};">{_dk.esc(INDEX[k])}</button>')
     chips = (f'<div data-ix-chips="1" style="display:flex;overflow-x:auto;margin:6px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'

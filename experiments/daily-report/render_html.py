@@ -198,7 +198,7 @@ def _fmt_volume(value):
 
 def _pct_cell(change, unit="%", missing="데이터 없음"):
     if change is None:
-        return f'<span style="color:#999;">{missing}</span>'
+        return f'<span style="color:#9CA3AF;">{missing}</span>'
     change = float(change)
     color = UP_COLOR if change >= 0 else DOWN_COLOR
     sign = "+" if change >= 0 else ""
@@ -211,7 +211,7 @@ def _pct_cell(change, unit="%", missing="데이터 없음"):
 def _arrows_cell(last5):
     """최근 5거래일 방향. 마지막이 오늘. 상승 빨강 · 하락 파랑 · 보합 회색."""
     if not last5:
-        return '<span style="color:#999;">—</span>'
+        return '<span style="color:#9CA3AF;">—</span>'
     colors = {"↑": UP_COLOR, "↓": DOWN_COLOR}
     return '<span style="font-family:monospace;letter-spacing:2px;">' + "".join(
         f'<span style="color:{colors.get(a, "#999")};">{a}</span>' for a in last5
@@ -247,7 +247,7 @@ def _paragraph(rows, headers):
 
 def _text_block(text):
     if not str(text).strip():
-        return '<span style="color:#999;">데이터 없음</span>'
+        return '<span style="color:#9CA3AF;">데이터 없음</span>'
     return "".join(f"<div>{_esc(line)}</div>" for line in str(text).splitlines())
 
 
@@ -611,7 +611,7 @@ def _story_row(g, built, first):
                         f'{NEW_LEAD if g.get("new") else ""}{_esc(rep["text"])}</a>')   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
     meta = f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{_kst(rep["published_at"])} · {_esc(rep["source"])}</span>'   # 메타 = `시각 · 매체` (0-6)
     count = (f'<span style="display:inline-flex;align-items:center;gap:6px;">{_meter(g["n_channels"], n_ch)}'
-             f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#374151;"><b style="color:#111;">{g["n_channels"]}곳</b> / {n_ch}곳</span></span>') if g["n_channels"] >= 2 else ""
+             f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#333;"><b style="color:#111;">{g["n_channels"]}곳</b> / {n_ch}곳</span></span>') if g["n_channels"] >= 2 else ""
     return (head + (dk.keep_tone(f'<span style="{dk.NEWS_SUM}">{dk.speaker_html(sub, tail=False)}</span>') if sub else "")   # 목록 줄은 발언자 없이 — 팝업에서만 (P364)
             + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 0;line-height:1;">'
             + dk.pill_row(dk.pill(g["theme"], bare=True) + " " + _dir_pill(g)) + "</span>"   # 분야 · 방향 (P335 · P336)
@@ -719,7 +719,7 @@ def news_tab(built, dirs, week, reaction=None, known=()):
         # 박스 테두리는 버튼들이 나눠 가진다(위 · 아래 + 첫 버튼 왼쪽 · 끝 버튼 오른쪽) — 가로로 밀면 박스째 움직인다 (P333). 위치 = 뉴스 탭 맨 위, 방향 막대는 그 아래 (P334)
         last = len(chips) - 1
         def chip_css(i):
-            return (f"flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;color:#4B5563;font:inherit;font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;"
+            return (f"flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;color:#333;font:inherit;font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;"
                     f"border:1px solid #E2E8F0;{'border-left:0;' if i else ''}border-radius:{'7px' if i == 0 else '0'} {'7px' if i == last else '0'} {'7px' if i == last else '0'} {'7px' if i == 0 else '0'};")
         out += (f'<div data-news-chips="1" style="display:flex;overflow-x:auto;margin:0 0 12px;padding:0;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
                 + "".join(f'<button type="button" data-chip="{_esc(k)}" aria-pressed="{"true" if i == 0 else "false"}" style="{chip_css(i)}">{_esc(k)} <span style="color:{dk.SUB};">{n}</span></button>'
@@ -790,7 +790,7 @@ def sec_status(analysis, report, prev=None):
     overall_card = dk.state_card(_esc(head), LIGHT_KIND.get(overall, "neutral"), sub_html=_esc(why), center=True)   # 가운데 정렬 (2026-10-13 사용자)
     pad_old = f"padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px {dk.EMPH_PAD - dk.VP}px;margin:0 0 8px;"
     overall_card = overall_card.replace(pad_old, f"padding:{dk.EMPH_PAD - dk.VP_EMPH - 12}px 14px {dk.EMPH_PAD - dk.VP - 13}px;margin:40px 0 8px;", 1)   # 높이 −20%(83 → 66: 위아래 패딩 −8 · −8) · 위 여백 20 → 40 (2026-10-14 사용자)
-    overall_card = overall_card.replace("color:#374151;margin-top:2px;", "color:#374151;margin-top:1px;", 1)   # 두 문장 사이 보이는 12 → 11 (−10%, 같은 날)   # 높이 약 10% 줄임(위아래 −4 · −5) · 위 여백 +20 (2026-10-13 사용자)   # 종합은 따로 카드, 라벨 없이 설명, 배경은 신호 색 (2026-10-12 사용자)
+    overall_card = overall_card.replace("color:#333;margin-top:2px;", "color:#333;margin-top:1px;", 1)   # 두 문장 사이 보이는 12 → 11 (−10%, 같은 날)   # 높이 약 10% 줄임(위아래 −4 · −5) · 위 여백 +20 (2026-10-13 사용자)   # 종합은 따로 카드, 라벨 없이 설명, 배경은 신호 색 (2026-10-12 사용자)
     rows = []
     for label, light, basis in items:
         changed = f"어제 {_light_word(was[label])}" if was.get(label) and light and was[label] != light else ""   # 신호가 바뀐 날만 어제 신호

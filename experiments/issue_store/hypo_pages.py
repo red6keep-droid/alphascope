@@ -607,6 +607,8 @@ def _small_row(html, name, text, theme):
     k = html.find("</li>", i)
     if i < 0 or j < 0 or k < 0:
         return html
+    if text is None:   # 줄 자체를 뺀다 (P487)
+        return html[:j] + html[k + len("</li>"):]
     bd = qc.CARD_DIR.get(theme, qc.CARD_DIR["neutral"])[1]
     line = dk.darken(dk.lighten(dk.lighten(bd), 0.3), 0.02)   # 질문 카드 줄 구분선과 같은 셈
     li = (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {line};font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{qc.NOTE};word-break:keep-all;">'
@@ -673,11 +675,12 @@ def _tag_title(html, cond, box, stack=False, tail=""):
 # 방향이 안 정해진 일(open)은 두 카드 위 공통 줄 — 버리지 않는다. 논의 중인 줄은 `논의중` 라벨(띄어쓰기 없음 · 글과 세로 가운데)만, 순서는 낮추지 않는다.
 # 팝업 = 테마 뉴스 팝업([data-news-pop] → [data-news-pop-body]) 그대로. 끝 안내 = 느낌표 아이콘 + 가장 작은 글씨 13/19.
 WHY_SHOWN = 2
+WHY_WORD = "관련 주식 정보"   # 옛 `근거` (P488, 2026-11-11 사용자)
 WHY_HEAD_FS, WHY_HEAD_LH = 17, 28   # 갈래 카드 `근거` 제목 = 고리 줄 이름과 같은 17 (2026-11-11 사용자)
 CHAIN_FS = 17   # 갈래 카드 고리 줄 이름(`급락 폭의 4분의 1 회복`) — 카드 줄 18 에서 한 단계 작게 (2026-11-11 사용자)
 WHY_FS, WHY_LH = 16, 26
 SIG_NAME = "알파스코프 신호"   # 독자 문장에서 `우리 신호` 대신 (2026-11-11 사용자: 독자는 `우리`가 누군지 모른다)
-WHY_NOTE = f"기사 · 애널리스트 · {SIG_NAME}에서 모은 것입니다. 원인을 판단하거나 어느 쪽이 맞을지 고른 것은 아닙니다."
+WHY_NOTE = "전망에 따른 주식 정보를 모은 것입니다. 판단하거나 어느 쪽이 맞을지 고른 것은 아닙니다."   # P498, 2026-11-11 사용자 문구
 EXCL_ICON = ('<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" style="flex:none;display:block;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>')   # 느낌표 = INFO_ICON(i) 뒤집은 모양
 
@@ -688,8 +691,10 @@ def _talk_mark():
 
 
 WHY_HZ = (("단기", "며칠"), ("중기", "한 달~분기"))   # 우리 신호 기간 제목 (signal_groups.HORIZONS, 2026-11-11 사용자: "기간은 단기 · 중기로 타이틀")
-CAL_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="#7A7A7A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '
+CAL_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '
             'style="flex:none;margin-right:4px;position:relative;top:2px;"><rect x="2.5" y="3.5" width="11" height="10" rx="1.5"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/></svg>')   # 팝업 `단기` · `중기` 제목 앞 (2026-11-11 사용자)
+NEWS_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '
+             'style="flex:none;margin-right:4px;position:relative;top:2px;"><path d="M3 2.5h8.5v11H4.5A1.5 1.5 0 0 1 3 12V2.5Z"/><path d="M11.5 5.5h1.5v6.5a1.5 1.5 0 0 1-1.5 1.5"/><path d="M5.5 5.5h3.5M5.5 8h3.5M5.5 10.5h2"/></svg>')   # 팝업 `뉴스 기사` 앞 신문 (P501)
 WHY_TITLE_W = 30   # 카드 안 묶음 제목 칸(`기사` · `단기` · `중기`) 폭
 
 
@@ -714,18 +719,18 @@ def _pop_li(text, meta="", talk=False):
     """팝업 한 줄 = 글머리 점 + 문장(+ 논의중) + 끝 꼬리 `- 날짜 · 매체` (옛: 날짜 · 매체 아랫줄)."""
     return (f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{dk.POP_ITEM_GAP}px 0;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
             f'<span style="display:block;min-width:0;overflow:hidden;font-size:{dk.BODY};line-height:{dk.POP_LH}px;color:#333;word-break:keep-all;">'
-            f'{dk.esc(text)}{_talk_mark() if talk else ""}{_src_tail(meta)}</span></span>')
+            f'{dk.esc(text)}{_talk_mark().replace("top:-1px;", "top:-2px;", 1) if talk else ""}{_src_tail(meta)}</span></span>')   # 팝업 문장 안 `논의중` = 1px 더 올림 — 잉크 실측 상자 가운데가 한글보다 0.75px 아래 (P504)
 
 
 def _pop_sub(title):
-    return f'<span style="display:block;margin:16px 0 0;font-size:14px;line-height:20px;font-weight:700;color:#111;">{title}</span>'
+    return f'<span style="display:block;margin:26px 0 0;font-size:14px;line-height:20px;font-weight:700;color:#111;">{title}</span>'   # 위 16 → 26 (P502)
 
 
 def _why_pop(pid, title, rows, total, sigs=(), as_of=None, page=None):
     """팝업 글 = `기사`(줄마다 사실 · 날짜 · 매체, 논의중) → `단기 · 며칠` → `중기 · 한 달~분기`(우리 신호 `이름 : 판정`) → 느낌표 안내."""
     out = ""
     if rows:
-        out += _pop_sub("기사") if sigs else ""
+        out += _pop_sub(f"{NEWS_ICON}뉴스 기사") if sigs else ""   # 옛 `기사` (P501)
         for r in rows:
             out += _pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q), r.get("stage") == "talk")
         if total > len(rows):
@@ -736,16 +741,16 @@ def _why_pop(pid, title, rows, total, sigs=(), as_of=None, page=None):
             out += _pop_sub(f'{CAL_ICON}{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>') + "".join(_pop_li(_sig_text(r)) for r in xs)
     if sigs and as_of:   # 기준 날짜 — 종목 페이지가 있으면 링크 `10.30 종목 페이지 ›` (2026-11-11 사용자: `우리 신호 = … 값` 은 독자가 모른다)
         st = f'display:inline-flex;align-items:center;gap:2px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};'
-        out += (f'<a href="{dk.esc(page)}" style="{st}text-decoration:underline;text-underline-offset:3px;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page
+        out += (f'<a href="{dk.esc(page)}" style="{dk.FOLD_BTN}display:inline-flex;margin:16px 0 0;text-decoration:none;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page   # 인물 발언 팝업 `○○ 발언 더 보기` 와 같은 외곽선 버튼 (P503)
                 else f'<span style="{st}">{SIG_NAME} 기준 : {md(as_of)}</span>')
     return f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(title)}" hidden>{out}</div>'
 
 
-_CHEV_R = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'   # 줄 끝 › (타임라인 근거 줄과 같은 것)
+_CHEV_R = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'   # 줄 끝 › (타임라인 근거 줄과 같은 것)
 
 
-def _one_line(inner, grow=True):
-    return (f'<span style="min-width:0;flex:{"1 1 auto" if grow else "0 1 auto"};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:{WHY_FS}px;line-height:{WHY_LH}px;color:#111;">{inner}</span>')
+def _one_line(inner, grow=True, color="#111"):
+    return (f'<span style="min-width:0;flex:{"1 1 auto" if grow else "0 1 auto"};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:{WHY_FS}px;line-height:{WHY_LH}px;color:{color};">{inner}</span>')
 
 
 def _why_group(title, lines_html):
@@ -774,7 +779,7 @@ def _why_lines(rows, sigs=()):
 def _why_more(pid):
     """외곽선 `더보기` 버튼 — `이전전망 ›` 버튼과 같은 모양(13/19 · 흰 바탕 · #E2E8F0 · 모서리 6 · 굵기 600)."""
     return (f'<span data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="flex:none;display:inline-flex;align-items:center;gap:2px;cursor:pointer;'
-            f'padding:2px 6px 2px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;font-size:13px;line-height:19px;font-weight:600;color:#4B5563;white-space:nowrap;">더보기'
+            f'padding:2px 6px 2px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;font-size:13px;line-height:19px;font-weight:600;color:#333;white-space:nowrap;">더보기'
             f'<span style="display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right").replace(chr(39) + "16" + chr(39), chr(39) + "14" + chr(39))}</span></span>')
 
 
@@ -823,7 +828,7 @@ def side_why(fc, sc, border):
     rows, n_news = w.get(key) or [], (w.get("count") or {}).get(key, len(w.get(key) or []))
     sigs, as_of = _sigs(fc, 1 if sc["dir"] > 0 else -1)
     total = n_news + len(sigs)
-    head = (f'<span style="display:block;margin:0 0 2px;font-size:{WHY_HEAD_FS}px;line-height:{WHY_HEAD_LH}px;color:#111;">근거'
+    head = (f'<span style="display:block;margin:0 0 2px;font-size:{WHY_HEAD_FS}px;line-height:{WHY_HEAD_LH}px;color:#111;">{WHY_WORD}'
             f' <span style="font-size:14px;color:{dk.SUB};">{total}건</span></span>')   # 옛 14 굵게 → 카드 줄 이름과 같은 크기 (2026-11-11 사용자: 근거를 큰 글씨로)
     if not total:
         return (f'<div data-why="1" style="margin:12px 0 4px;padding-top:10px;border-top:1px solid {border};">{head}'
@@ -844,7 +849,7 @@ def timeline_title():
     return f'<div data-tl-title="1" style="padding-top:{TL_TITLE_GAP}px;">{dk.h2("Timeline", line=False)}</div>'
 
 
-TL_TITLE_GAP = 30
+TL_TITLE_GAP = 20   # +30 → +20 (P490)
 
 
 def open_pill():
@@ -869,8 +874,8 @@ def open_line(fc, log):
     pid = dk.news_pop_id("whyopen", fc.get("slug"))
     pop = "".join(_pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q)) for r in rows)   # `논의중` 라벨 없음 — 향방미정이 이미 정해지지 않은 일 (2026-11-11 사용자)
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{OPEN_TITLE}" hidden>{pop}</div>'
-    chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
-    return (f'<div data-why-open="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:0 {dk.ALIGN_PX}px 0 0;cursor:pointer;">'
+    chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
+    return (f'<div data-why-open="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:8px;margin:0 0 26px;padding:0 {dk.ALIGN_PX}px 0 0;cursor:pointer;">'
             + open_pill()
             + (f'<span style="flex:none;font-size:13px;line-height:19px;color:{dk.SUB};">{md(top["day"])}</span>' if top.get("day") else "")
             + f'<span style="display:flex;align-items:center;gap:4px;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(top["t"]), grow=False)}{chev}</span>{body}</div>')
@@ -890,7 +895,8 @@ def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""
         if state == "no":   # `해당 없음` = 흐린 회색 라벨 (P417)
             return dim_box(word)
         k = (("down" if d < 0 else "up") if v["active"] else "flat") if kind == "down" else kind
-        return TS.box(k, word, dk.esc, sym=False, fit=True)
+        b = TS.box(k, word, dk.esc, sym=False, fit=True)
+        return b.replace("font-weight:700;", "font-weight:400;", 1) if state == "wait" else b   # 덜 중요한 라벨 = 보통 굵기 (P500)
     Lw = sc.get("_L", 3.0)
     lines = [("row", f'<span style="font-size:{CHAIN_FS}px;">{dk.esc(wordify(c["step"], Lw))}</span>', box(c["state"]), wordify(c["ev"], Lw)) for c in sc["chain"]] + [("row", f'‘{sc["name"]}’ 이 되는 기준', "", wordify(sc["win"], Lw))]   # 옛 `이 전망이 맞으면` — 지시어 대신 갈래 이름 (2026-11-07 사용자)
     if sc.get("odds") and odds_meaningful(*sc["odds"][:2]):   # 기록상 줄 = 한쪽으로 뚜렷할 때만(윌슨 구간, `유력` 과 같은 잣대) — 반반은 적지 않는다 (2026-11-11 사용자: "반반이면 어쩌라고")
@@ -898,7 +904,7 @@ def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""
         lines.insert(0, ("row", "기록상", share_word(m, n).replace("이었습니다", ""), wordify(note, Lw)))
     lines += _ahead_lines(extra or [], Lw)   # 미리 알아 둘 것 (옛 `앞으로 올 수 있는 일`, 2026-11-07 사용자)
     html = qc.question_card(cond_text(sc), v["answer"], th, ink, lines, fold=True, opened=False)   # 전망 카드는 처음에 모두 닫힘 — 일어난 갈래도 (P462, 2026-11-08 사용자). 답 · 색으로 상태는 닫힌 채 보인다
-    html = _small_row(html, f'‘{sc["name"]}’ 이 되는 기준', _crit_text(sc, Lw), th)
+    html = _small_row(html, f'‘{sc["name"]}’ 이 되는 기준', None if side_word(sc) else _crit_text(sc, Lw), th)   # 자동 등록 = 기준 줄 없음(고리 마지막 줄 `급락 폭의 절반 회복` 과 같은 말, P487)
     if compact is None:   # 얇은 카드 = 결과가 났고 해당 없는 갈래만, 일어난 갈래는 원래 크기 (P471, 2026-11-08 사용자)
         compact = v["answer"] == NOT_HAPPENED
     marks = [m for m in (v["label"], MKT_LABEL if mkt else None) if m]   # 유력 · 시장예상 = 조건 끝 보라 굵은 글씨 `- 유력` (2026-11-08 사용자: 라벨 상자 대신 글자)
@@ -1223,7 +1229,7 @@ def _reasons_card(fc):
     body = _plain_rows("", rows, note=note)
     if fc.get("stock_page"):
         body += (f'<a href="{dk.esc(fc["stock_page"])}" style="display:block;margin:8px 0 0;padding:0 {dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
-                 f'color:#4B5563;text-decoration:underline;text-underline-offset:3px;">{dk.esc(fc["subject"])} 종목 페이지 ›</a>')
+                 f'color:#333;text-decoration:underline;text-underline-offset:3px;">{dk.esc(fc["subject"])} 종목 페이지 ›</a>')
     return _fold_row("무엇이 이유로 꼽혔나?", body).replace('<details data-acc="1"', '<details data-acc="1" open', 1)   # 독자가 가장 먼저 묻는 것 — 펼친 채로
 
 
@@ -1306,7 +1312,7 @@ def _day_cols(e, unit="%", subj=""):
         label = label[len(subj) + 1:]
     calm = start or label == "지켜보는 중"
     r = None if start else e.get("shown", e.get("rel"))
-    val = (dk.arrow(r, 1, unit).replace("font-weight:700;", "font-weight:400;") if r is not None and round(r, 1) != 0 else "")
+    val = (dk.emph_tri(dk.arrow(r, 1, unit).replace("font-weight:700;", "font-weight:400;"), TL_TRI) if r is not None and round(r, 1) != 0 else "")   # ▲ · ▼ 16 → 14 (10% 작게, 정수, P497)
     ink = dk.VIOLET if e.get("key") in RESULT else ("#111" if calm else INK[e["dir"]])   # 판정(맞음 · 틀림 · 제자리 · 보류 · 무효) = 보라 (P469, 2026-11-08 사용자) — 방향 색 X
     lab = f'<span style="color:{ink};{"" if e.get("key") in RESULT else "font-weight:400;"}white-space:nowrap;">{dk.esc(label)}</span>'   # `○○ 조짐` 도 보통 굵기, 판정만 굵게 (P483, 2026-11-11 사용자)
     # 옛 `(세부 전망으로 이어감 ›)` 괄호 링크(P453)는 뺐다 — 바로 위 끝 줄 `세부 전망으로 이어집니다 ›`(P465)와 겹쳐서 (P466, 2026-11-08 사용자)
@@ -1324,11 +1330,21 @@ def _aligned(x, unit, subj=""):
     return label if v and (label == "지켜보는 중" or label.endswith(LEAN)) else None
 
 
+_TL_EM = {" ": 0.262, ".": 0.278, "%": 0.906, "p": 0.591, "▲": 0.694, "▼": 0.694}   # Noto Sans KR 16px 실측(Chrome, 2026-11-11) / 16
+
+
+def _tl_w(t, px=16):
+    """국면 칸 폭 = 글자 폭 실측 비율 합 + 2 (P492 · P493: 옛 _est_w 는 한글 1em · 빈칸 .55em 로 잡아 긴 국면 말일수록 칸이 넓었다 — `하락 지속 조짐이 보임` 170 vs 실제 137).
+    한글 .865em · 숫자 .445em. 칸 사이 8 과 합쳐 국면 ~ 값 간격 = 약 10 (옛 약 23 의 절반)."""
+    em = sum(0.865 if ord(c) > 0x2E80 else 0.445 if c.isdigit() else _TL_EM.get(c, 0.55) for c in str(t))
+    return int(em * px + 0.999) + 2
+
+
 def _col_widths(days, unit, subj=""):
     """칸 폭 — 날짜 칸은 맞추는 줄 전체에서, 국면 · 움직임 칸은 같은 국면 말 묶음 안에서 가장 긴 글. 정수 px.
     → {묶음 이름: (날짜, 국면, 움직임)}"""
     rows = [(g, _day_cols(x, unit, subj)[1]) for x in days if (g := _aligned(x, unit, subj))]
-    w = lambda ts, i: max([int(qc._est_w(t[i], 16)) for t in ts] + [0])   # noqa: E731  — 추정이 실제보다 2~4px 넓어 여유를 따로 두지 않는다(여유를 두면 이어 쓰는 줄보다 간격이 벌어짐, 2026-11-08 캡처)
+    w = lambda ts, i: max([int(qc._est_w(t[i], 16)) if i != 1 else _tl_w(t[i]) for t in ts] + [0])   # noqa: E731  — 추정이 실제보다 2~4px 넓어 여유를 따로 두지 않는다(여유를 두면 이어 쓰는 줄보다 간격이 벌어짐, 2026-11-08 캡처)
     dw = w([t for _, t in rows], 0)
     out = {}
     for g in {g for g, _ in rows}:
@@ -1380,7 +1396,7 @@ def _date_row(fc, out=False):
     # 질문 제목 줄 오른쪽 끝 (P455) — 등록 증명은 그 아래
     return (f'<span style="display:flex;flex:none;flex-direction:column;align-items:flex-end;font-size:{dk.TINY};font-weight:400;color:{dk.SUB};">'
             # 결과 날짜 = 늘 검정 (P471, 옛 P413 결과 뒤 보라는 없앰) — 글자 `결과 :` 는 회색
-            + "".join(f'<span style="white-space:nowrap;">{dk.esc(k)} : <b style="color:#111;">{dk.esc(wordify(v))}</b>{_shock_size(fc) if fc["kind"] != "pre" else ""}</span>' for k, v in items)
+            + "".join(f'<span style="white-space:nowrap;">{dk.esc(k)} : <span style="color:#111;">{dk.esc(wordify(v))}</span>{_shock_size(fc) if fc["kind"] != "pre" else ""}</span>' for k, v in items)
             + (f'<span>{proof}</span>' if proof else "") + "</span>")
 
 
@@ -1390,8 +1406,8 @@ def _shock_size(fc):
     if g is None:
         return ""
     col = dk.UP if g > 0 else dk.DOWN
-    out = f' · <b style="color:{col};font-weight:700;">{"▲" if g > 0 else "▼"} {abs(g):.1f}{dk.esc(fc.get("unit", "%"))}</b>'
-    return out + (f' · 평소의 <b style="color:#111;">{abs(z):.1f}배</b>' if z else "")
+    out = f' · <span style="color:{col};">{"▲" if g > 0 else "▼"} {abs(g):.1f}{dk.esc(fc.get("unit", "%"))}</span>'   # 굵게 빼기 (P495)
+    return out + (f' · 평소의 <span style="color:#111;">{abs(z):.1f}배</span>' if z else "")
 
 
 def quote_of(closes):
@@ -1419,7 +1435,7 @@ def _stock_now(fc, st):
              f'<b style="flex:none;color:#111;">{dk.esc(fc.get("subject", ""))}</b>'
              f'<span style="flex:none;font-size:13px;line-height:19px;color:{dk.SUB};">{dk.esc(sym)}</span>{price}'
              f'<span style="flex:1 1 auto;"></span>'
-             f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>')
+             f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>')
     style = (f'display:flex;align-items:center;gap:8px;margin:4px 0 12px;padding:0 {dk.ALIGN_PX}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};'
              f'color:#111;text-decoration:none;white-space:nowrap;overflow:hidden;')
     if fc.get("stock_page"):
@@ -1507,8 +1523,10 @@ CLOCK = ('<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="cu
 
 TL_LINE = "#CBD5E1"   # 타임라인 세로 점선 = 비교 · 기준선 회색 (가이드 8절 ③)
 TL_RAIL = 16          # 왼쪽 레일 폭 = 시계 아이콘 16
+TL_WHY_INK = "#333"   # 타임라인 근거 줄 = 연한 검정(글자 세 톤 둘째, P499)
+TL_TRI = 14           # 타임라인 증감 ▲ · ▼ 크기 (P497)
 TL_DOT = 8            # 지난 날 점
-TL_DAY_GAP = 10       # 날짜 줄 묶음 사이 더 띄움 (2026-11-11 사용자)
+TL_DAY_GAP = 15       # 날짜 줄 묶음 사이 더 띄움 (2026-11-11 사용자)
 
 
 def _tl_row(node, node_h, top_pad, content, first, last):
@@ -1587,16 +1605,16 @@ def day_why_html(x, fc):
         if cs:
             pop += _pop_sub(f'{CAL_ICON}{SIG_NAME} {hz} <span style="font-weight:400;color:{dk.SUB};">· 바뀐 것</span>')
             pop += "".join(_pop_li(f'{c["name"]} : {c["from"]} → {c["to"]}' if c.get("from") else f'{c["name"]} : {c["to"]}') for c in cs)
-    body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(md(x["day"]) + " 근거")}" hidden>{pop}</div>'
+    body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(md(x["day"]) + " " + WHY_WORD)}" hidden>{pop}</div>'
     if pick:
-        line = (f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{label}{_one_line(dk.esc(pick["t"]), grow=False)}'
+        line = (f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{label}{_one_line(dk.esc(pick["t"]), grow=False, color=TL_WHY_INK)}'
                 + (_talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if pick.get("stage") == "talk" else "") + "</span>")
     else:   # 기사 없이 신호만 바뀐 날
         c = (w.get("changes") or [{}])[0]
         txt = f'{c.get("name", "")} : {c["from"]} → {c.get("to", "")}' if c.get("from") else f'{c.get("name", "")} : {c.get("to", "")}'
-        line = f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(txt), grow=False)}</span>'
+        line = f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(txt), grow=False, color=TL_WHY_INK)}</span>'
     # 줄 전체 = 팝업 버튼, 끝에 › 만 (2026-11-11 사용자: `근거 n건` · 더보기 버튼 삭제, 문장을 누르면 팝업)
-    chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
+    chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
     return (f'<div data-why-day="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:4px;margin:-4px 0 {12 - dk.VP}px;cursor:pointer;">'
             f'{line}{chev}{body}</div>')
 
@@ -1665,7 +1683,7 @@ def _waiting(log, unit="%", subj="", fc=None):
         if rest:
             label = f"지난 경과 {len(rest)}개 더 보기"
             btn = (f"display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;"
-                   f"font:inherit;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:600;color:#4B5563;cursor:pointer;")
+                   f"font:inherit;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:600;color:#333;cursor:pointer;")
             up = f'<span style="display:inline-flex;transform:rotate(180deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-up")}</span>'
             # 펼치면 맨 아래 `접기` 버튼 — 펼친 뒤 다시 접을 수 없던 것 (P439, 2026-11-08 사용자). 접으면 버튼 자리로 돌아오게 스크롤을 맞춘다
             close = (f'<div style="padding:6px 0 0 {TL_RAIL + 8}px;"><button type="button" style="{btn}" '
@@ -1952,13 +1970,13 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
     back = _back_of(fc)   # 세부 전망 페이지 — 질문 앞 보라 `세부전망` 라벨 + 날짜 아래 작은 `이전전망 ›` 버튼 (P481, 2026-11-08 사용자: 세부 전망은 전망이 있어야 있는 것)
     sub_lab = violet_word("- 세부전망") if back else ""   # 질문 문장 끝 · 보라 굵은 글씨, 상자 없음 (2026-11-08 사용자 — 옛 P481 질문 앞 상자 → 라벨)
     back_btn = (f'<a href="{page_url(back[1])}" style="display:inline-flex;align-items:center;gap:2px;margin-top:6px;padding:2px 6px 2px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;'
-                f'font-size:13px;line-height:19px;font-weight:600;color:#4B5563;text-decoration:none;white-space:nowrap;">이전전망'
+                f'font-size:13px;line-height:19px;font-weight:600;color:#333;text-decoration:none;white-space:nowrap;">이전전망'
                 f'<span style="display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right").replace(chr(39) + "16" + chr(39), chr(39) + "14" + chr(39))}</span></a>') if back else ""
     # 머리 줄 구분선 ~ 질문 = 테마 .pr-sticky 아래 14 + 아이콘 위 2 = 16 → 위 여백 16 더해 32 (2026-11-09 사용자: 100% 늘려) → +10 = 위 여백 26 · 보이는 42 (같은 날 사용자)
     q = (f'<h2 style="{dk.H2}display:flex;flex-wrap:nowrap;align-items:flex-start;gap:8px;margin:26px 0 11px;">' + icon
          + f'<span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;"><span style="word-break:keep-all;">{title_html}{sub_lab}</span>'
          # 날짜(급락일 · 결과) · `이전전망 ›` = 제목 아래 줄, 오른쪽 정렬 (2026-11-08 사용자 — 옛 P455 제목 줄 오른쪽 끝)
-         + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:24px;line-height:{dk.LH_TINY};">'
+         + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:29px;line-height:{dk.LH_TINY};">'
          + _date_row(fc, out=not before and fc["kind"] == "pre").replace("flex-direction:column;align-items:flex-end;", "flex-wrap:wrap;align-items:center;gap:4px 10px;", 1)
          + back_btn.replace("margin-top:6px;", "", 1) + '</span></span></h2>') + _follow_btn(fc, st)
     body = (q + sides + timeline_title() + open_line(fc, log) + head + crowd_line(fc)   # 겹침이 2개를 넘으면 사실 한 줄 (2026-11-08)

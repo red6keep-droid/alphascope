@@ -20,7 +20,7 @@ YEARS = (2014, 2019, 2024)
 # 글자 · 색 — 디자인-가이드라인 3절 · 4절 · 5절
 BODY, TINY, NAME = 19, 14, 16
 LH_BODY, LH_CARD, LH_TINY = 34, 24, 20
-C_TITLE, C_TEXT, C_GUIDE, C_SUB = "#111", "#333", "#6B7280", "#7A7A7A"
+C_TITLE, C_TEXT, C_GUIDE, C_SUB = "#111", "#333", "#6B7280", "#6B7280"
 PILL = {  # 테두리, 글자, 배경
     "pos": ("#FCA5A5", "#B91C1C", "#FEF2F2"),
     "neg": ("#93C5FD", "#1D4ED8", "#EFF6FF"),

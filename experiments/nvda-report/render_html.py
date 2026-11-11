@@ -28,9 +28,10 @@ _dk.TIP_SRC = "Yahoo Finance"   # 툴팁 기본 데이터 출처 — 가격 · �
 H2 = f"color:#111;font-size:{_dk.H2_SIZE};font-weight:700;line-height:{_dk.LH_H2};margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"   # 옆 요약이 폰에서는 제목 아래 줄로 내려온다
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"   # 구분선 위 여백 8 → 6 (20% 줄임, 2026-10-11)
 _NO_LINE_START = re.compile(r'^\s*(<div style="(?:overflow-x:auto;|background:)|<div data-cards|<img\b)')   # 표 래퍼 · 카드 · 카드 묶음 · 그림
-UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#999", "#e8710a"
+UP, DOWN, MUTED, WARN = "#d93025", "#1a73e8", "#9CA3AF", "#e8710a"   # MUTED = 흐림(상태 색, 글자 세 톤 밖, P496 — 옛 #999)
 VAL = f"font-size:{_dk.CHG_SIZE};line-height:25px;"   # 17px → 행간 25 홀짝 맞춤 (2026-11-06 사용자: 소수점 없어)   # 흰 카드 오른쪽 정보 17px — 강조(색 배경) 카드 제외 (2026-10-13 사용자, 가이드라인 10-7)
-SUB = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
+SUB = "#6B7280"   # 글자 세 톤의 회색 (P496, 2026-11-11 — 옛 #7A7A7A)
+_SUB_OLD = "#7A7A7A"   # 카드 보조 글(보조 줄·· 현재가·/ 100·날짜) — #999 보다 20% 진하게 (2026-10-11 사용자). "—" 자리 표시는 MUTED 그대로
 # 글자 크기 체계 (디자인-가이드라인.md 3절): 본문은 바깥 div의 18px 하나 — 강조한다고 키우지 않는다. 라벨·날짜는 한 단계 작게(16px), 안내 글·범례·면책은 두 단계 작게(14px)
 SMALL, TINY = "19px", "14px"   # 본문 19 (2026-10-13 사용자)   # 안내 글(14px)을 빼고 모두 18px (2026-10-12 사용자)
 LH_CARD, LH_TINY = _dk.LH_CARD, _dk.LH_TINY   # 행간은 px 정수만 (2026-10-12 사용자)
@@ -181,7 +182,7 @@ def _guide(title, body, line=True):
     """제목이 있는 안내 글 (가이드라인 3-3, 2026-10-11 사용자) — design_kit.guide 와 같은 규칙.
     짧으면 한 줄 "ⓘ **제목**: 내용", 길거나 항목이 여럿이면 "ⓘ **제목**" 다음 줄부터 글머리표 "이름 = 내용"."""
     top = ("margin:3px 0 1px;padding-top:2px;border-top:1px solid #f3f3f3;" if line else "margin:1px 0 0;") + _dk.GUIDE_IND   # 여백 40% 줄임 (2026-10-11 사용자)   # 카드 밖 안내 20px 들여쓰기 (2026-10-11 사용자)
-    head = f'{INFO_ICON}<b style="color:#4B5563;">{_esc(title)}</b>'
+    head = f'{INFO_ICON}<b style="color:#333;">{_esc(title)}</b>'
     if isinstance(body, str) and len(body) <= 70:
         return f'<div data-guide="1" style="{top}font-size:{TINY};line-height:{LH_TINY};color:{NOTE};">{head} : {_esc(body)}</div>'   # data-guide: 홈 카드가 건너뛴다 (2026-10-12)
     items = [body] if isinstance(body, str) else body
@@ -1134,7 +1135,7 @@ TOGETHER_TITLE = "Alpha Scope 데이터로 함께 보기"   # 방송 의견 아�
 
 
 # 함께 보기 안쪽 카드 (2026-10-31 사용자 P168): 상승 쪽 · 하락 쪽 · 중립을 각자 카드로 감싼다. 바깥 강조 카드와 같은 색이면 한 단계 진하게
-TOGETHER_FLAT = "#4B5563"   # 함께 보기 중립 대답 — 흐린 회색 대신 조금 빠진 검정 (2026-10-31 사용자 P173)
+TOGETHER_FLAT = "#333"   # 연한 검정 (P496 — 옛 #4B5563)   # 함께 보기 중립 대답 — 흐린 회색 대신 조금 빠진 검정 (2026-10-31 사용자 P173)
 TOGETHER_FIRST_PAD = 10   # 분류 첫 줄(`12개월 모멘텀` · `회사 매출` …) 위 = 구분선 ~ 글자 보이는 7 → 17 (2.5배, 2026-11-01 사용자 P247) — 줄 높이 · 위 padding 에 더한다
 TOGETHER_HEAD_FS, TOGETHER_ROW_H = "15px", 38   # `▲ 상승 쪽` 14 → 15 · 줄 높이 44 → 57 (×1.3) (2026-10-31 사용자 P169) → 38: 라벨(25) 사이 위아래 여백 32 → 13 (60% 줄임, 정수, 2026-11-01 사용자 P239)
 TOGETHER_END = "<!--together-end-->"   # 강조 카드가 함께 보기로 끝나면 아래 = 좌우 15 로 당긴다 (_pull_end_chart, P169)
