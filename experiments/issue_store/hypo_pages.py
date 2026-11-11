@@ -217,6 +217,11 @@ def pick_side(m, n):
     return side, q, why, strong
 
 
+def odds_meaningful(m, n):
+    """기록이 한쪽으로 뚜렷한가 — 95% 윌슨 구간이 50% 를 벗어남(pick_side 의 `유력` 잣대) + 말이 `반반` 이 아님."""
+    return bool(n) and pick_side(m, n)[3] and "반반" not in share_word(m, n)
+
+
 def brier(p, hit):
     """브라이어 = (확률 − 결과)² — 0 이 완벽, 0.25 가 동전 던지기."""
     return round((p - (1.0 if hit else 0.0)) ** 2, 3)
@@ -617,7 +622,8 @@ def _crit_text(sc, Lw):
     win = _re.sub(rf"^{_re.escape(subj)}\s+", "", win)
     for a, b in (("오른다", "오름"), ("내린다", "내림"), ("빠진다", "빠짐"), ("회복한다", "회복"), ("반납한다", "반납"), ("받는다", "받음")):   # 한 줄 요약이라 명사형 끝
         win = win.replace(a, b)
-    return f'‘{sc["name"]}’ 기준 : {win}'
+    sw = side_word(sc)
+    return f'{sw} 기준 : {win}' if sw else f'‘{sc["name"]}’ 기준 : {win}'   # 자동 등록은 `반등 기준` — 대상 이름 반복 없이 (2026-11-11 사용자)
 
 
 def news_pill(text, colors, inline=True):
@@ -667,8 +673,11 @@ def _tag_title(html, cond, box, stack=False, tail=""):
 # 방향이 안 정해진 일(open)은 두 카드 위 공통 줄 — 버리지 않는다. 논의 중인 줄은 `논의중` 라벨(띄어쓰기 없음 · 글과 세로 가운데)만, 순서는 낮추지 않는다.
 # 팝업 = 테마 뉴스 팝업([data-news-pop] → [data-news-pop-body]) 그대로. 끝 안내 = 느낌표 아이콘 + 가장 작은 글씨 13/19.
 WHY_SHOWN = 2
+WHY_HEAD_FS, WHY_HEAD_LH = 17, 28   # 갈래 카드 `근거` 제목 = 고리 줄 이름과 같은 17 (2026-11-11 사용자)
+CHAIN_FS = 17   # 갈래 카드 고리 줄 이름(`급락 폭의 4분의 1 회복`) — 카드 줄 18 에서 한 단계 작게 (2026-11-11 사용자)
 WHY_FS, WHY_LH = 16, 26
-WHY_NOTE = "기사 · 애널리스트 · 우리 신호에서 모은 것입니다. 원인을 판단하거나 어느 쪽이 맞을지 고른 것은 아닙니다."
+SIG_NAME = "알파스코프 신호"   # 독자 문장에서 `우리 신호` 대신 (2026-11-11 사용자: 독자는 `우리`가 누군지 모른다)
+WHY_NOTE = f"기사 · 애널리스트 · {SIG_NAME}에서 모은 것입니다. 원인을 판단하거나 어느 쪽이 맞을지 고른 것은 아닙니다."
 EXCL_ICON = ('<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" style="flex:none;display:block;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>')   # 느낌표 = INFO_ICON(i) 뒤집은 모양
 
@@ -679,6 +688,8 @@ def _talk_mark():
 
 
 WHY_HZ = (("단기", "며칠"), ("중기", "한 달~분기"))   # 우리 신호 기간 제목 (signal_groups.HORIZONS, 2026-11-11 사용자: "기간은 단기 · 중기로 타이틀")
+CAL_ICON = ('<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="#7A7A7A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '
+            'style="flex:none;margin-right:4px;position:relative;top:2px;"><rect x="2.5" y="3.5" width="11" height="10" rx="1.5"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/></svg>')   # 팝업 `단기` · `중기` 제목 앞 (2026-11-11 사용자)
 WHY_TITLE_W = 30   # 카드 안 묶음 제목 칸(`기사` · `단기` · `중기`) 폭
 
 
@@ -710,7 +721,7 @@ def _pop_sub(title):
     return f'<span style="display:block;margin:16px 0 0;font-size:14px;line-height:20px;font-weight:700;color:#111;">{title}</span>'
 
 
-def _why_pop(pid, title, rows, total, sigs=(), as_of=None):
+def _why_pop(pid, title, rows, total, sigs=(), as_of=None, page=None):
     """팝업 글 = `기사`(줄마다 사실 · 날짜 · 매체, 논의중) → `단기 · 며칠` → `중기 · 한 달~분기`(우리 신호 `이름 : 판정`) → 느낌표 안내."""
     out = ""
     if rows:
@@ -722,10 +733,15 @@ def _why_pop(pid, title, rows, total, sigs=(), as_of=None):
     for hz, span in WHY_HZ:
         xs = [r for r in sigs if r["hz"] == hz]
         if xs:
-            out += _pop_sub(f'{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>') + "".join(_pop_li(_sig_text(r)) for r in xs)
-    if sigs and as_of:   # 기준 날짜만 — 원인 판단 아님 안내는 페이지에 한 번(why_note_html, 2026-11-11 사용자: 팝업마다 반복하지 않기)
-        out += f'<span style="display:block;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};">우리 신호 = {md(as_of)} 종목 페이지 값</span>'
+            out += _pop_sub(f'{CAL_ICON}{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>') + "".join(_pop_li(_sig_text(r)) for r in xs)
+    if sigs and as_of:   # 기준 날짜 — 종목 페이지가 있으면 링크 `10.30 종목 페이지 ›` (2026-11-11 사용자: `우리 신호 = … 값` 은 독자가 모른다)
+        st = f'display:inline-flex;align-items:center;gap:2px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};'
+        out += (f'<a href="{dk.esc(page)}" style="{st}text-decoration:underline;text-underline-offset:3px;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page
+                else f'<span style="{st}">{SIG_NAME} 기준 : {md(as_of)}</span>')
     return f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(title)}" hidden>{out}</div>'
+
+
+_CHEV_R = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'   # 줄 끝 › (타임라인 근거 줄과 같은 것)
 
 
 def _one_line(inner, grow=True):
@@ -773,6 +789,22 @@ def _sigs(fc, d):
     return [r for r in sg.get("rows") or [] if r.get("dir") == d], sg.get("as_of")
 
 
+def side_word(sc):
+    """갈래를 부르는 짧은 말 — 자동 등록 `반등 쪽이면` · `지속 쪽이면` → `반등` · `지속`, 그 밖(사건 전 조건 문장)은 None."""
+    c = (sc.get("cond") or "").strip()
+    return c.removesuffix("쪽이면").strip() if c.endswith("쪽이면") else None
+
+
+def _first_line(rows, sigs):
+    """근거 칸에 보이는 한 줄 = 기사 맨 위(매체 있는 줄 먼저) → 없으면 신호 `이름 : 판정` (2026-11-11 사용자: 첫 줄 하나만, 나머지는 팝업)."""
+    news = [r for r in rows if r.get("src")] or rows
+    if news:
+        r = news[0]
+        return (f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(r["t"]), grow=False)}'
+                + (_talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if r.get("stage") == "talk" else "") + "</span>")
+    return f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{_one_line(dk.esc(_sig_text(sigs[0])), grow=False)}</span>'
+
+
 def side_why(fc, sc, border):
     """갈래 카드 펼침 안 맨 아래 근거 칸 — `근거 n건` · 더보기 + 기사 두 줄 + 단기 · 중기 신호. 재료가 없으면 빈 문자열(옛 등록)."""
     w = fc.get("reasons") or {}
@@ -782,10 +814,17 @@ def side_why(fc, sc, border):
     rows, n_news = w.get(key) or [], (w.get("count") or {}).get(key, len(w.get(key) or []))
     sigs, as_of = _sigs(fc, 1 if sc["dir"] > 0 else -1)
     total = n_news + len(sigs)
-    pid = dk.news_pop_id("why", f'{fc.get("slug")}-{key}') if total else ""
-    body = _why_lines(rows, sigs) if total else f'<span style="display:block;font-size:14px;line-height:20px;color:{dk.SUB};">같은 기간 {word}이나 이 쪽 신호는 없었습니다.</span>'
-    pop = _why_pop(pid, f'‘{sc["name"]}’ 쪽 근거', rows, n_news, sigs, as_of) if total else ""
-    return f'<div data-why="1" style="margin:12px 0 4px;padding-top:10px;border-top:1px solid {border};">{_why_head("근거", total, pid)}{body}{pop}</div>'
+    head = (f'<span style="display:block;margin:0 0 2px;font-size:{WHY_HEAD_FS}px;line-height:{WHY_HEAD_LH}px;color:#111;">근거'
+            f' <span style="font-size:14px;color:{dk.SUB};">{total}건</span></span>')   # 옛 14 굵게 → 카드 줄 이름과 같은 크기 (2026-11-11 사용자: 근거를 큰 글씨로)
+    if not total:
+        return (f'<div data-why="1" style="margin:12px 0 4px;padding-top:10px;border-top:1px solid {border};">{head}'
+                f'<span style="display:block;font-size:14px;line-height:20px;color:{dk.SUB};">같은 기간 {word}이나 이 쪽 신호는 없었습니다.</span></div>')
+    pid = dk.news_pop_id("why", f'{fc.get("slug")}-{key}')
+    sw = side_word(sc)
+    pop = _why_pop(pid, f'{sw} 요인' if sw else f'‘{sc["name"]}’ 요인', rows, n_news, sigs, as_of, fc.get("stock_page"))   # 옛 `‘메타 반등’ 쪽 근거` (2026-11-11 사용자: 대상 이름 반복 · 없어 보이는 말)
+    # 더보기 버튼 없음 — 첫 줄 끝 › · 칸 전체를 누르면 팝업 (타임라인 근거 줄과 같은 방식, 2026-11-11 사용자)
+    return (f'<div data-why="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="margin:12px 0 4px;padding-top:10px;border-top:1px solid {border};cursor:pointer;">{head}'
+            f'<span style="display:flex;align-items:center;gap:4px;min-width:0;">{_first_line(rows, sigs)}{_CHEV_R}</span>{pop}</div>')
 
 
 OPEN_TITLE = "향방미정"   # 붙여 쓰기 · 회색 라벨 (2026-11-11 사용자)   # 옛 `방향이 아직 안 정해진 일` 카드 (2026-11-11 사용자: 문장을 줄여 새 제목, 카드 없이 타임라인 위 한 줄)
@@ -836,8 +875,8 @@ def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""
         k = (("down" if d < 0 else "up") if v["active"] else "flat") if kind == "down" else kind
         return TS.box(k, word, dk.esc, sym=False, fit=True)
     Lw = sc.get("_L", 3.0)
-    lines = [("row", wordify(c["step"], Lw), box(c["state"]), wordify(c["ev"], Lw)) for c in sc["chain"]] + [("row", f'‘{sc["name"]}’ 이 되는 기준', "", wordify(sc["win"], Lw))]   # 옛 `이 전망이 맞으면` — 지시어 대신 갈래 이름 (2026-11-07 사용자)
-    if sc.get("odds"):   # 우리 전망 갈래 — 기록상 n번 중 m번 (개선 ②: 확률이 있어야 실력을 잰다)
+    lines = [("row", f'<span style="font-size:{CHAIN_FS}px;">{dk.esc(wordify(c["step"], Lw))}</span>', box(c["state"]), wordify(c["ev"], Lw)) for c in sc["chain"]] + [("row", f'‘{sc["name"]}’ 이 되는 기준', "", wordify(sc["win"], Lw))]   # 옛 `이 전망이 맞으면` — 지시어 대신 갈래 이름 (2026-11-07 사용자)
+    if sc.get("odds") and odds_meaningful(*sc["odds"][:2]):   # 기록상 줄 = 한쪽으로 뚜렷할 때만(윌슨 구간, `유력` 과 같은 잣대) — 반반은 적지 않는다 (2026-11-11 사용자: "반반이면 어쩌라고")
         m, n, note = sc["odds"]
         lines.insert(0, ("row", "기록상", share_word(m, n).replace("이었습니다", ""), wordify(note, Lw)))
     lines += _ahead_lines(extra or [], Lw)   # 미리 알아 둘 것 (옛 `앞으로 올 수 있는 일`, 2026-11-07 사용자)
@@ -1491,8 +1530,9 @@ def drop_subj(t, subj):
     return t
 
 
-def _side_pill(word):
-    return dk.pill(word, "area").replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 {dk.PILL_GAP}px 0 0;flex:none;", 1)
+def _side_pill(word, kind="flat"):
+    """타임라인 `반등` · `지속` 라벨 = 그 갈래 `전망A` · `전망B` 이름표와 같은 색(TS.box, 2026-11-11 사용자 — 옛 회색 dk.pill)."""
+    return TS.box(kind, word, dk.esc, sym=False, fit=True).replace("flex:none;", f"flex:none;margin-right:{dk.PILL_GAP}px;", 1)
 
 
 def day_why_html(x, fc):
@@ -1502,6 +1542,7 @@ def day_why_html(x, fc):
     subj = (fc or {}).get("subject", "")
     w = {k: ([dict(r, t=drop_subj(r.get("t", ""), subj)) for r in v] if k in ("good", "bad", "open") else v) for k, v in (x.get("why") or {}).items()}
     names = _side_names(fc)
+    kinds = {sc["dir"]: _tag_kind(sc) for sc in (fc or {}).get("scenarios") or [] if sc.get("dir") in (1, -1)}
     key_of = {1: "good", -1: "bad"}
     groups = [(d, w.get(key_of[d]) or []) for d in (1, -1) if d in names]
     total = sum(len(rs) for _, rs in groups) + len(w.get("open") or []) + len(w.get("changes") or [])
@@ -1515,7 +1556,7 @@ def day_why_html(x, fc):
         cands = [(d, rs) for d, rs in groups if rs]
         if cands:   # 그날 건수가 많은 쪽 → 같으면 대상에 가까운 줄 → 더 최근 기사 (늘 반등 쪽이 먼저 뽑히던 것, 2026-11-11 가상 목업에서 찾음)
             d, rs = max(cands, key=lambda c: (len(c[1]), c[1][0].get("lv", 0), c[1][0].get("day", "")))
-            pick, label = rs[0], _side_pill(names[d][1])
+            pick, label = rs[0], _side_pill(names[d][1], kinds.get(d, "flat"))
     pid = dk.news_pop_id("whyday", f'{fc.get("slug")}-{x["day"]}')
     pop = ""
     for d, rs in groups:
@@ -1527,7 +1568,7 @@ def day_why_html(x, fc):
     for hz, span in WHY_HZ:
         cs = [c for c in w.get("changes") or [] if c["hz"] == hz]
         if cs:
-            pop += _pop_sub(f'우리 신호 {hz} <span style="font-weight:400;color:{dk.SUB};">· 바뀐 것</span>')
+            pop += _pop_sub(f'{CAL_ICON}{SIG_NAME} {hz} <span style="font-weight:400;color:{dk.SUB};">· 바뀐 것</span>')
             pop += "".join(_pop_li(f'{c["name"]} : {c["from"]} → {c["to"]}' if c.get("from") else f'{c["name"]} : {c["to"]}') for c in cs)
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(md(x["day"]) + " 근거")}" hidden>{pop}</div>'
     if pick:
