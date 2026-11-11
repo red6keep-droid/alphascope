@@ -1497,11 +1497,11 @@ def day_why_html(x, fc):
 
 
 def why_note_html(fc):
-    """근거 안내 — 페이지에 한 번, 타임라인 바로 아래 (2026-11-11 사용자: 팝업마다 반복하지 않기). 느낌표 아이콘 + 가장 작은 글씨 13/19, 아이콘 = 첫 줄 가운데."""
+    """근거 안내 — 페이지에 한 번, 접는 줄 묶음(`현재 증시는?`) 아래 (2026-11-11 사용자: 팝업마다 반복하지 않기 → 현재 증시 아래로). 느낌표 아이콘 + 가장 작은 글씨 13/19, 아이콘 = 첫 줄 가운데."""
     w = (fc or {}).get("reasons") or {}
     if "good" not in w and not w.get("our_signals"):
         return ""
-    return (f'<div data-why-note="1" style="display:flex;align-items:flex-start;gap:4px;margin:-12px 0 24px;padding:0 {dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
+    return (f'<div data-why-note="1" style="display:flex;align-items:flex-start;gap:4px;margin:12px 0 0;padding:0 {dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
             f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{WHY_NOTE}</span></div>')
 
 
@@ -1823,7 +1823,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
         log = [dict(x, overlap=ov[md(x["day"])]) if md(x.get("day") or "") in ov else x for x in log]
     before = fc["kind"] == "pre" and not st.get("cond") and not st.get("result")   # 사건 전 등록 화면 — 결과가 없으니 `전망 결과` 를 그리지 않는다 (2026-11-07 사용자)
     # 결과 뒤도 결과 전과 같은 타임라인 — `전망 결과` 제목 · 강조 카드 · `결과 :` 상자 없음 (P418, 결과 날짜 = 날짜 줄 보라 P413 · 결과 내용 = 갈래 카드 첫 고리 줄)
-    head = (_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc) if before else f'<div data-lead="1">{_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc)}</div>') + why_note_html(fc)   # `앞으로 올 수 있는 일` 카드 삭제 — 내용은 갈래 카드 · 셋째 카드 안으로 (2026-11-07 사용자 · Claude 판단)
+    head = (_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc) if before else f'<div data-lead="1">{_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc)}</div>')   # `앞으로 올 수 있는 일` 카드 삭제 — 내용은 갈래 카드 · 셋째 카드 안으로 (2026-11-07 사용자 · Claude 판단)
     for sc in fc["scenarios"]:
         sc["_L"] = fc.get("line", 3.0)
     # 두 갈래 카드 = 페이지 맨 위, 구획 제목 없이 · 카드마다 `전망 A` · `전망 B` 이름표 (P386). 문장 안에서는 계속 갈래 이름으로 부른다(번호 금지 규칙)
@@ -1857,7 +1857,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
          + back_btn.replace("margin-top:6px;", "", 1) + '</span></span></h2>') + _follow_btn(fc, st)
     body = (q + sides + head + crowd_line(fc)   # 겹침이 2개를 넘으면 사실 한 줄 (2026-11-08)
             + (operator_box(op + _op_mood(fc) + ([("거래량", f'평소의 {st["volume_x"]:.1f}배 — 기록만 — 우리 전망 고르기엔 안 씀')] if fc["kind"] == "after" and st.get("volume_x") else [])) if op else "")
-            + more   # `더 궁금한 것` 제목 삭제 — 기록 · 앞으로 볼 것은 각자 구분선 구획 (2026-11-07 사용자)
+            + more + why_note_html(fc)   # 근거 안내 = `현재 증시는?` 아래 한 번 (2026-11-11 사용자)   # `더 궁금한 것` 제목 삭제 — 기록 · 앞으로 볼 것은 각자 구분선 구획 (2026-11-07 사용자)
             )   # `다른 전망` 구획 삭제 — 글 아래 [목록] 버튼이 전망 목록으로 간다, 이어진 전망은 겹침 카드 안 링크로 (P442, 2026-11-08 사용자)
     return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-head-title="{HEAD_FORECAST}" data-nav="list" data-title-back="{page_url(LIST_SLUG)}" data-title-back-label="목록" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}{RELATED}</div>')
 
