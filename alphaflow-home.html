@@ -640,7 +640,7 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
    ========================================================================== */
 
 .site-footer {
-  padding: 36px var(--gutter) 38px;   /* 아래 48 → 38 (20%, 2026-11-10 사용자) */
+  padding: 18px var(--gutter) 19px;   /* 위 36 → 18 · 아래 38 → 19 (각 50%, 2026-11-11 사용자) — 옛 아래 48 → 38 (11-10) */
   text-align: center;
   background: var(--bg);
 }
@@ -649,11 +649,11 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   align-items: center;
   justify-content: center;
   text-align: center;   /* 제목은 가운데 · 그 오른쪽에 접기 버튼 (2026-10-25 사용자, 홈 수정 H19) */
-  margin: 0 0 14px;
+  margin: 0 0 11px;   /* 제목 아래 14 → 11 (20%, 2026-11-11 사용자) */
   font-weight: 700;
   font-size: 14px;   /* 17 (PC 16) → 14 어디서나 (2026-11-10 사용자) — 아래 설명 13 보다 한 단계 위 */
   line-height: 20px;   /* 홀짝 14/20 */
-  color: var(--ink-2);
+  color: #6B7280;   /* 회색 = 글자 세 톤 셋째 (2026-11-11 사용자) — 옛 var(--ink-2) */
 }
 .footer-disclaimer {
   max-width: 880px;
@@ -674,7 +674,8 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .footer-copy {
   margin: 0;
   font-family: var(--num);
-  font-size: 13px;
+  font-size: 13px;   /* 가장 작은 글씨 13/19 (2026-11-11 사용자) */
+  line-height: 19px;
   color: var(--gray-400);
 }
 

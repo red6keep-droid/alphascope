@@ -676,7 +676,7 @@ img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/C
    ========================================================================== */
 
 .site-footer {
-  padding: 36px var(--gutter) 38px;   /* 아래 48 → 38 (20%, 2026-11-10 사용자) */
+  padding: 18px var(--gutter) 19px;   /* 위 36 → 18 · 아래 38 → 19 (각 50%, 2026-11-11 사용자) — 옛 아래 48 → 38 (11-10) */
   text-align: center;
   background: var(--bg);
 }
@@ -685,11 +685,11 @@ img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/C
   align-items: center;
   justify-content: center;
   text-align: center;   /* 제목은 가운데 · 그 오른쪽에 접기 버튼 (2026-10-25 사용자, 홈 수정 H19) */
-  margin: 0 0 14px;
+  margin: 0 0 11px;   /* 제목 아래 14 → 11 (20%, 2026-11-11 사용자) */
   font-weight: 700;
   font-size: 14px;   /* 17 (PC 16) → 14 어디서나 (2026-11-10 사용자) — 아래 설명 13 보다 한 단계 위 */
   line-height: 20px;   /* 홀짝 14/20 */
-  color: var(--ink-2);
+  color: #6B7280;   /* 회색 = 글자 세 톤 셋째 (2026-11-11 사용자) — 옛 var(--ink-2) */
 }
 .footer-disclaimer {
   max-width: 880px;
@@ -710,7 +710,8 @@ img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/C
 .footer-copy {
   margin: 0;
   font-family: var(--num);
-  font-size: 13px;
+  font-size: 13px;   /* 가장 작은 글씨 13/19 (2026-11-11 사용자) */
+  line-height: 19px;
   color: var(--gray-400);
 }
 
@@ -1452,7 +1453,7 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .post-shell > [data-related].is-moved > div:first-child { font-size: 14px !important; line-height: 20px !important; padding-bottom: 8px !important; color: #6B7280 !important; }   /* 제목 = 푸터 제목과 같은 14/20 굵게 (2026-11-11 사용자, 옛 16/26) */
 .post-shell > [data-related].is-moved > a { font-size: 14px !important; line-height: 20px !important; padding-top: 9px !important; padding-bottom: 9px !important; }   /* 줄 = 14/20 · 위아래 9 (옛 16/26 · 12) — 이미 게시된 글의 인라인 값을 덮는다 (2026-11-11 사용자) */
 body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
-body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
+body.item-view .site-footer { padding-top: 19px; }   /* 38 → 19 (50%, 2026-11-11 사용자) */   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
 .comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
