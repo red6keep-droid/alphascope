@@ -856,6 +856,19 @@ def side_why(fc, sc, border):
 OPEN_TITLE = "향방미정"   # 붙여 쓰기 · 회색 라벨 (2026-11-11 사용자)   # 옛 `방향이 아직 안 정해진 일` 카드 (2026-11-11 사용자: 문장을 줄여 새 제목, 카드 없이 타임라인 위 한 줄)
 
 
+def timeline_lead(fc, log):
+    """레일 맨 위 두 줄 = 시계 아이콘 마디 + `Timeline` 제목, 그 아래 마디 없이 점선만 + `향방미정` 줄 — 시계부터 날짜 동그라미까지 한 줄로 이어진다 (2026-11-11 사용자).
+    위 여백 = 옛 구획 제목 위 28 + TL_TITLE_GAP."""
+    big = CLOCK.replace('width="16" height="16"', f'width="{TL_TITLE_ICON}" height="{TL_TITLE_ICON}"', 1)
+    icon = f'<span style="display:inline-flex;color:{dk.SUB};">{big}</span>'
+    title = (f'<div data-tl-title="1" style="padding:0 0 11px;font-size:{TL_TITLE_FS}px;line-height:{TL_TITLE_ICON + 4}px;font-weight:700;color:#111;">Timeline</div>')
+    out = f'<div style="height:{28 + TL_TITLE_GAP}px;"></div>' + _tl_row(icon, TL_TITLE_ICON + 4, 0, title, True, False)
+    ol = open_line(fc, log)
+    if ol:
+        out += _tl_row("", 0, 0, ol, False, False)
+    return out
+
+
 def timeline_title():
     """타임라인 구획 제목 `Timeline`(영어) — `향방미정` 줄 위, 위 여백 +30 (P484 · P485, 2026-11-11 사용자). 구획 제목 글씨(dk.h2), 밑줄 없음."""
     h = (dk.h2("Timeline", line=False).replace(f"font-size:{dk.H2_SIZE};", f"font-size:{TL_TITLE_FS}px;", 1).replace("align-items:baseline;", "align-items:center;", 1)
@@ -863,8 +876,8 @@ def timeline_title():
     return f'<div data-tl-title="1" style="padding-top:{TL_TITLE_GAP}px;">{h}</div>'
 
 
-TL_TITLE_FS = 19   # `Timeline` = 구획 제목 22 에서 3 작게 (2026-11-11 사용자: 2 → 1 더)
-TL_TITLE_ICON = 18   # 제목 앞 시계 크기 (제목 19 와 비슷하게)
+TL_TITLE_FS = 18   # `Timeline` = 구획 제목 22 에서 3 작게 (2026-11-11 사용자: 2 → 1 더)
+TL_TITLE_ICON = 20   # 제목 앞 시계 크기 (제목 19 와 비슷하게)
 TL_TITLE_GAP = 10   # +30 → +20 (P490)
 
 
@@ -1541,8 +1554,9 @@ CLOCK = ('<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="cu
 
 
 TL_LINE = "#CBD5E1"   # 타임라인 세로 점선 = 비교 · 기준선 회색 (가이드 8절 ③)
-TL_RAIL = 16          # 왼쪽 레일 폭 = 시계 아이콘 16
-TL_WHY_INK = "#4B5563"   # 타임라인 근거 줄 — 시험: #333 이 검정과 거의 같아 보여 이 줄만 #4B5563 (2026-11-11 사용자 "이 줄만 먼저"), 연한 검정 톤 결정 전
+TL_RAIL = 20          # 왼쪽 레일 폭 = 맨 위 시계 아이콘 20 (2026-11-11 — 옛 16)
+TL_WHY_INK = dk.SUB   # 타임라인 근거 줄 = 회색(세 톤 셋째 #6B7280, 2026-11-11 사용자: "논의중 회색 글씨 컬러로") — 옛 시험 #4B5563
+_TL_WHY_INK_OLD = "#4B5563"   # 타임라인 근거 줄 — 시험: #333 이 검정과 거의 같아 보여 이 줄만 #4B5563 (2026-11-11 사용자 "이 줄만 먼저"), 연한 검정 톤 결정 전
 TL_TRI = 14           # 타임라인 증감 ▲ · ▼ 크기 (P497)
 TL_DOT = 8            # 지난 날 점
 TL_DAY_GAP = 15       # 날짜 줄 묶음 사이 더 띄움 (2026-11-11 사용자)
@@ -1677,7 +1691,8 @@ def _waiting(log, unit="%", subj="", fc=None):
     past = days[1:]
     gap = f'<div style="height:{TL_DAY_GAP}px;"></div>'   # 날짜와 날짜 사이 +10 (2026-11-11 사용자) — 마지막 줄 아래엔 없음
     today = (f'<details class="fc-day" open style="margin:0;padding:0 0 {12 - dk.VP}px;">' + head(e).replace("{pad}", "0") + f'{_day_text(e)}</details>') + (day_why_html(e, fc) if fc else "") + (gap if past else "")
-    out = PLUS_CSS + '<div style="margin:0 0 24px;">'
+    out = PLUS_CSS + '<div style="margin:0 0 24px;">' + (timeline_lead(fc, log) if fc else "")
+    lead = bool(fc)
     end = e.get("key") in RESULT   # 판정이 난 전망 — 시계 줄 위에 끝 줄 하나 (P465, 2026-11-08 사용자): 세부 전망이 이어받으면 `세부 전망으로 이어집니다 ›`, 아니면 `전망이 종료되었습니다`
     if end:
         f = e.get("follow")
@@ -1687,8 +1702,8 @@ def _waiting(log, unit="%", subj="", fc=None):
         else:
             node, txt = END_STOP, "전망이 종료되었습니다"
         out += _tl_row(f'<span style="display:inline-flex;color:{dk.SUB};">{node}</span>', lh, 0,
-                       f'<div style="padding:0 0 {12 - dk.VP}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;">{txt}</div>', True, False)
-    out += _tl_row(clock, lh, 0, today, not end, False)   # 오늘 줄은 지난 날이 없어도 문장 끝까지 점선을 내린다
+                       f'<div style="padding:0 0 {12 - dk.VP}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;">{txt}</div>', not lead, False)
+    out += _tl_row(clock, lh, 0, today, not end and not lead, False)   # 오늘 줄은 지난 날이 없어도 문장 끝까지 점선을 내린다
     if past:
         shown = past if len(past) <= PAST_SHOWN + 2 else past[:PAST_SHOWN]   # 1~2개 숨기려고 버튼을 두지 않는다
         rest = past[len(shown):]
@@ -1998,7 +2013,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
          + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:29px;line-height:{dk.LH_TINY};">'
          + _date_row(fc, out=not before and fc["kind"] == "pre").replace("flex-direction:column;align-items:flex-end;", "flex-wrap:wrap;align-items:center;gap:4px 10px;", 1)
          + back_btn.replace("margin-top:6px;", "", 1) + '</span></span></h2>') + _follow_btn(fc, st)
-    body = (q + sides + timeline_title() + open_line(fc, log) + head + crowd_line(fc)   # 겹침이 2개를 넘으면 사실 한 줄 (2026-11-08)
+    body = (q + sides + head + crowd_line(fc)   # 겹침이 2개를 넘으면 사실 한 줄 (2026-11-08)
             + (operator_box(op + _op_mood(fc) + ([("거래량", f'평소의 {st["volume_x"]:.1f}배 — 기록만 — 우리 전망 고르기엔 안 씀')] if fc["kind"] == "after" and st.get("volume_x") else [])) if op else "")
             + more + why_note_html(fc)   # 근거 안내 = `현재 증시는?` 아래 한 번 (2026-11-11 사용자)   # `더 궁금한 것` 제목 삭제 — 기록 · 앞으로 볼 것은 각자 구분선 구획 (2026-11-07 사용자)
             )   # `다른 전망` 구획 삭제 — 글 아래 [목록] 버튼이 전망 목록으로 간다, 이어진 전망은 겹침 카드 안 링크로 (P442, 2026-11-08 사용자)
