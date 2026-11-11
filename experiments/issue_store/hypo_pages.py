@@ -1342,7 +1342,7 @@ def _event_chart(reg):
                                         "선거 전인 10.30 에도 이미 -7.2% 빠졌습니다."))
 
 
-PLUS_BOX, PLUS_RADIUS, PLUS_ICON = 22, 6, 11   # 지난 날 펼침 + 아이콘: 공식 접기 버튼(네모 31 · 화살표 18)보다 작게 (2026-11-07 사용자)
+PLUS_BOX, PLUS_RADIUS, PLUS_ICON = 22, 6, 10   # 지난 날 펼침 + 아이콘: 공식 접기 버튼(네모 31 · 화살표 18)보다 작게 (2026-11-07 사용자)
 PLUS_CSS = ('<style>.fc-day>summary{list-style:none;cursor:pointer;}.fc-day>summary::-webkit-details-marker{display:none;}'
             '.fc-day[open]>summary .fc-plus-v{display:none;}'
             '.fc-more>summary::-webkit-details-marker{display:none;}.fc-more[open]>summary{display:none;}</style>')   # 지난 경과 더 보기 = 펼치면 버튼을 숨기고 타임라인이 이어진다 (P418)   # 펼치면 세로획을 숨겨 − 로. 테마 붙여넣기 없이 되도록 본문 안 style (render_html 여러 그래프와 같은 방식)
@@ -1351,7 +1351,7 @@ PLUS_CSS = ('<style>.fc-day>summary{list-style:none;cursor:pointer;}.fc-day>summ
 def _plus(bd):
     return (f'<span aria-hidden="true" style="display:inline-flex;flex:none;align-items:center;justify-content:center;width:{PLUS_BOX}px;height:{PLUS_BOX}px;'
             f'box-sizing:border-box;border:1px solid {bd};border-radius:{PLUS_RADIUS}px;background:#fff;color:#111;align-self:center;">'
-            f'<svg viewBox="0 0 12 12" width="{PLUS_ICON}" height="{PLUS_ICON}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'
+            f'<svg viewBox="0 0 12 12" width="{PLUS_ICON}" height="{PLUS_ICON}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'
             f'<path d="M2 6h8"/><path class="fc-plus-v" d="M6 2v8"/></svg></span>')
 
 
