@@ -11,6 +11,7 @@ forecast_daily.run 이 판정 뒤 부른다 (AI 호출 0). 하는 일:
    종목: **우리 전망을 고르지 않는다**(fc["pick"] 없음) — 두 갈래에 기록상 횟수만 나란히, 판정은 어느 쪽이 일어났나만, 성적표 밖 (매수 추천 금지, 2026-11-11 사용자).
 5. 이유 카드(fc["reasons"]) — 등록 때 한 번 모아 고정: 기사 · 방송이 든 이유(종목 뉴스 분류의 이슈 코드 건수 · 대표 기사), 애널리스트 목표가 변경,
    우리 기록상 신호(평소의 몇 배 · 20거래일 평균 · 52주 고점). 원인 판단이 아니라 모은 것 (가이드라인 1절 4-2 단일 이유 단언 금지).
+   갈래별 근거(good · bad · open) — 기사 요약 줄 태그에서 이 대상에 걸린 사실을 좋은 소식 · 나쁜 소식 · 방향이 안 정해진 일로 (side_news, 2026-11-11 사용자).
 6. 저장 — EH-YYYY-NNN.json 을 reg_dir(상태 저장소 records/hypotheses · 미리보기는 output/forecast/hypotheses), 같은 폴더 YYYY.jsonl 에 registered · skipped 한 줄.
 """
 import datetime as dt
@@ -44,7 +45,7 @@ MAX_OPEN, MAX_OPEN_STOCK = 3, 2
 SAME_EPISODE_DAYS = 5
 HIST_START = "1998-01-01"
 LINE_YEARS = 10         # 기준(금) = 최근 10년 (1998~2002 거품 구간이 반도체 기준을 7%p 로 부풀렸다)
-WIN_D5, WIN_D20, WIN_D60 = 5, 20, 60
+WIN_D5, WIN_D20, WIN_END = 5, 20, 40   # 기간 만료 = 40거래일(두 달) — 2026-11-11 사용자 (옛 60). 지난 충격 1,626번에 지금 판정 규칙: 20거래일 안 77% · 40 안 93% · 60 안 96% 가 끝남
 
 
 def stocks():
@@ -222,7 +223,188 @@ def reasons(w, shock_day, today, s, c, z_val, paths):
     off = (float(c.iloc[i]) / hi52 - 1) * 100
     if off <= -10:
         sig.append(f"52주 고점보다 {off:.0f}%".replace("-", "−"))
-    return {"issues": issues, "n": len(picked), "heads": heads, "analyst": analyst, "signals": sig, "window": [lo, today]}
+    out = {"issues": issues, "n": len(picked), "heads": heads, "analyst": analyst, "signals": sig, "window": [lo, today]}
+    try:
+        out.update(side_news(w, lo, hi, news, os.path.join(os.path.dirname(news_path), "news_summaries.json"), analyst))
+    except Exception as e:  # noqa: BLE001
+        print(f"[register] 갈래 근거 실패: {type(e).__name__}")
+    try:
+        out["our_signals"] = our_signals(w, lo, today, os.path.dirname(news_path))   # `signals` 는 옛 `우리 기록상` 문장 목록 — 이름을 나눈다
+    except Exception as e:  # noqa: BLE001
+        print(f"[register] 우리 신호 실패: {type(e).__name__}")
+    return out
+
+
+# ---------------------------------------------------------------- 우리 신호 (2026-11-11 사용자: "우리가 가지고 있는 모든 신호를 분리해서 근거에")
+# 종목 페이지 판정(stock_records → 상태 저장소 radar/records/verdicts)의 그날 마지막 값을 signal_groups 관행 방향(상승 쪽 +1 · 하락 쪽 −1 · 중립 0)대로
+# 갈래에 나눈다 — 전망을 두 갈래로 나눈 것처럼 신호도 나눌 뿐, 맞을지는 독자가 판단한다. 검증 결과로 빼거나 거꾸로 놓지 않는다(같은 날 사용자: 검증도 가설).
+# 기간 = 단기(SHORT 분류) · 중기(MID · 업계 현황). 과열(세지 않는 줄)도 넣는다. 전망 등록이 레이더보다 먼저 돌아 값은 전날 종목 페이지 것 — as_of 로 적는다.
+# 지수 · 업종 전망 = 시장 신호(증시 분위기 · 충격 국면), 업종은 + 그 업종 종목의 업계 자금.
+MARKET_KEYS = ("regime", "shock")
+
+
+def our_signals(w, lo, today, radar_dir):
+    """→ {"as_of": 날짜, "rows": [{"key", "name", "state", "dir", "hz"(단기 · 중기), "group"}]} 또는 None."""
+    sys.path.insert(0, _EXP)
+    import record_store
+    import signal_groups as SG
+    rows = [r for r in record_store.read(radar_dir, "verdicts", today[:4]) if str(r.get("date") or "") <= today]
+    if not rows:
+        return None
+    kind, sym, etf = _target(w)
+    short = {k for _, ks in SG.SHORT for k in ks}
+    hz_of = lambda k: "단기" if k in short else "중기"   # noqa: E731 — MID · 업계 현황(분기)은 중기
+
+    def latest(target):
+        mine = [r for r in rows if r.get("sym") == target]
+        if not mine:
+            return None, {}
+        day = max(r["date"] for r in mine)
+        return day, {r["id"].split("/", 1)[1]: r for r in mine if r["date"] == day and "/pick/" not in r["id"]}
+    out, as_of = [], None
+    if kind == "stock":
+        as_of, got = latest(sym)
+        picks = [r for r in rows if r.get("sym") == sym and "/pick/" in r.get("id", "") and lo <= str(r.get("date")) <= today]
+    else:
+        _etf_of("NVDA")   # universe 불러오기
+        members = [s for s in (_UNI.BY_SYM if _UNI else {}) if kind == "market" or _etf_of(s) == etf]
+        got, picks = {}, []
+        for s in members:
+            d, g = latest(s)
+            if not g:
+                continue
+            as_of = max(as_of or d, d)
+            for k in MARKET_KEYS + (("sector_flow",) if kind == "sector" else ()):
+                if k in g and k not in got:
+                    got[k] = g[k]
+    for k in SG.ORDER:
+        r = got.get(k)
+        if not r or not r.get("state") or k == "analysts":
+            continue
+        out.append({"key": k, "name": r.get("label") or SG.TABLE[k]["name"], "state": r["state"], "dir": int(r.get("direction") or 0),
+                    "hz": hz_of(k), "group": SG.GROUP_OF.get(k, "")})
+    for r in picks:   # 방송 의견 = 사람마다 한 줄 (기간 안)
+        if r.get("state"):
+            out.append({"key": "picks", "name": f'방송 의견 · {r.get("speaker") or r.get("channel") or ""}'.rstrip(" ·"), "state": r["state"],
+                        "dir": int(r.get("direction") or 0), "hz": "단기", "group": SG.GROUP_OF.get("picks", "")})
+    return {"as_of": as_of, "rows": out} if out else None
+
+
+# ---------------------------------------------------------------- 갈래별 근거 (2026-11-11 사용자)
+# 기사 요약 줄 태그(news_summary: 대상 · 주제 · 방향 · 단계)에서 이 전망 대상에 걸린 사실 줄만 골라 좋은 소식 · 나쁜 소식 · 방향이 안 정해진 일로 나눈다.
+# 좋은 소식 = 오름 쪽 갈래(dir +1) 카드, 나쁜 소식 = 내림 쪽 갈래(dir −1) 카드 — 화면이 sc["dir"] 로 짝짓는다. 원인 판단이 아니라 기사에 붙은 성격을 모은 것.
+# 논의 중(검토 · 협상 · 보도된 계획)도 방향대로 넣는다 — "논의 중이라는 이야기라도 시장에 충격을 준다". `불확실`은 버리지 않고 open 으로 (두 갈래 모두에 걸린 일).
+# 주가 · 지수 움직임만 적은 줄(tag.price)과 방향 없는 줄(neutral)은 뺀다. 요약이 없는 기사는 기사 단위 값(종목 점수 · market_dir · stage)으로.
+TAG_ETF = {"^SOX": "SMH"}   # 우리 지수 기호 → 요약 태그의 업종 ETF
+SIDE_KEEP = 30              # 갈래마다 저장하는 줄 — 넘치면 건수만 (팝업에 `외 n건`)
+
+
+def _target(w):
+    """→ (종류, 기호, 업종 ETF). 종류 = market · sector · stock."""
+    if w.get("stock"):
+        return "stock", w["sym"], TAG_ETF.get(w["mkt"], w["mkt"])
+    if not w.get("mkt"):
+        return "market", None, None
+    return "sector", None, TAG_ETF.get(w["sym"], w["sym"])
+
+
+def side_news(w, lo, hi, news, summary_path, analyst=None):
+    """→ {"good": [줄], "bad": [줄], "open": [줄], "count": {good · bad · open: 전체 건수}}. 줄 = {"t", "day", "src", "stage", "lv"(3 종목 · 2 업종 · 1 시장)}."""
+    kind, sym, etf = _target(w)
+    summ = _load(summary_path) or {}
+    rows, seen = [], set()
+    try:
+        sys.path.insert(0, _EXP)
+        from news_summary import _price_only
+    except Exception:  # noqa: BLE001
+        def _price_only(t):
+            return False
+
+    def add(t, d, stage, lv, x):
+        t = (t or "").strip()
+        if not t or d not in ("positive", "negative", "uncertain") or t in seen or _price_only(t):
+            return
+        seen.add(t)
+        rows.append({"t": t, "dir": d, "stage": stage, "lv": lv, "day": str(x.get("published_at") or "")[:10], "src": x.get("source") or ""})
+
+    for iid, x in news.items():
+        day = str(x.get("published_at") or "")[:10]
+        if not (lo <= day < hi):
+            continue
+        sm = summ.get(iid) or {}
+        tags = sm.get("tags") or []
+        if any(tags):
+            for ln, tg in zip(sm.get("lines") or [], tags):
+                if not tg or tg.get("price"):
+                    continue
+                if kind == "market":
+                    lv = 1 if tg["scope"] == "market" else 0
+                elif kind == "sector":
+                    lv = 2 if tg.get("sector") == etf and tg["scope"] in ("sector", "stock") else 0
+                else:
+                    lv = 3 if sym in tg.get("tickers", []) else (2 if tg["scope"] == "sector" and tg.get("sector") == etf else 0)
+                if lv:
+                    add(ln, tg["dir"], tg.get("stage"), lv, x)
+            continue
+        if not x.get("fact") or x.get("opinion"):   # 요약 줄이 없는 기사 — 기사 단위 값 (의견 · 주가 움직임 기사는 제목이 곧 의견이라 뺀다. 요약 줄은 사실만이라 위에서 받는다)
+            continue
+        if kind == "market":
+            if x.get("scope") == "market":
+                add(x["fact"], x.get("market_dir"), x.get("stage"), 1, x)
+        else:
+            sc = [q for q in x.get("scores") or [] if q.get("relevance", 0) >= 2]
+            # 기사 대표 문장이 그 회사 이야기일 때만 (11-11 로컬 확인: 엔비디아 점수가 붙은 기사의 문장이 `애플 시가총액 기록` 이었다)
+            if kind == "stock":
+                q = next((q for q in sc if q.get("ticker") == sym), None)
+                if q and _named(sym, x["fact"]):
+                    add(x["fact"], q.get("direction"), x.get("stage"), 3, x)
+            else:
+                ds = [q.get("direction") for q in sc if _etf_of(q.get("ticker")) == etf and _named(q.get("ticker"), x["fact"])]
+                if ds:
+                    d = "uncertain" if "positive" in ds and "negative" in ds else next((v for v in ds if v != "neutral"), "neutral")
+                    add(x["fact"], d, x.get("stage"), 2, x)
+    end = (dt.date.fromisoformat(hi) - dt.timedelta(days=1)).isoformat()   # hi 는 창 끝 다음 날(열린 끝)
+    if analyst:   # 애널리스트 = 그 종목 사실 (같은 기간 바뀐 것)
+        if analyst.get("up"):
+            rows.append({"t": f"애널리스트 목표가 올림 {analyst['up']}곳", "dir": "positive", "stage": "done", "lv": 3, "day": end, "src": ""})
+        if analyst.get("down") or analyst.get("downgrade"):
+            parts = ([f"목표가 내림 {analyst['down']}곳"] if analyst.get("down") else []) + ([f"의견 낮춤 {analyst['downgrade']}곳"] if analyst.get("downgrade") else [])
+            rows.append({"t": "애널리스트 " + " · ".join(parts), "dir": "negative", "stage": "done", "lv": 3, "day": end, "src": ""})
+    rows.sort(key=lambda r: r["day"], reverse=True)
+    rows.sort(key=lambda r: -r["lv"])   # 대상에 가까운 줄 먼저, 같은 층은 최근 먼저 (안정 정렬) — 논의 중이라고 낮추지 않는다
+    out, count = {}, {}
+    for key, d in (("good", "positive"), ("bad", "negative"), ("open", "uncertain")):
+        sel = [{k: r[k] for k in ("t", "day", "src", "stage", "lv")} for r in rows if r["dir"] == d]
+        out[key], count[key] = sel[:SIDE_KEEP], len(sel)
+    out["count"] = count
+    return out
+
+
+_UNI = None
+
+
+def _named(sym, text):
+    """문장에 그 종목 한국어 이름(괄호 앞)이 있나."""
+    _etf_of(sym)
+    if not _UNI or sym not in _UNI.BY_SYM:
+        return False
+    nm = _UNI.BY_SYM[sym][1].split("(")[0].strip()
+    return bool(nm) and nm in (text or "")
+
+
+def _etf_of(sym):
+    """종목 → 업종 ETF (universe.sector_etf, 요약 태그와 같은 기준)."""
+    global _UNI
+    if _UNI is None:
+        sys.path.insert(0, os.path.join(_EXP, "stock-radar"))
+        try:
+            import universe
+            _UNI = universe
+        except Exception:  # noqa: BLE001
+            _UNI = False
+    if not _UNI or sym not in _UNI.BY_SYM:
+        return None
+    return _UNI.sector_etf(sym)[0]
 
 
 # ---------------------------------------------------------------- 등록 파일
@@ -266,7 +448,7 @@ def build(eid, w, today, shock_day, base_day, gap, z, line, rec, late, why=None)
         sc[pick - 1]["odds"] = [m_ok if pick == 1 else n - m_ok, n, "같은 종류 사건 뒤 20거래일"]
     else:
         pick, prob, why_pick, strong = 1, None, "같은 종류 기록 없음 — 고르기만 하고 유력 없음", False
-    d5, d20, d60 = _future_tdays(today, WIN_D5), _future_tdays(today, WIN_D20), _future_tdays(today, WIN_D60)
+    d5, d20, d60 = _future_tdays(today, WIN_D5), _future_tdays(today, WIN_D20), _future_tdays(today, WIN_END)   # d60 = 만료일 (이름은 옛것, 값은 WIN_END)
     vs = f"{mkt_name}보다 얼마나 더 움직였나(%p)" if mkt else "얼마나 움직였나(%)"
     slug = "forecast-" + eid[3:].lower()   # EH-2026-003 → forecast-2026-003 (영문 주소, 한 번 정하면 바꾸지 않는다)
     fc = {
@@ -283,18 +465,18 @@ def build(eid, w, today, shock_day, base_day, gap, z, line, rec, late, why=None)
         "hypothesis": "H-급락 뒤 (A 반등 vs B 추세 지속) — 설계 3부 2절 활성 가설 2" if s < 0 else "H-급등 뒤 (A 조정 vs B 추세 지속)",
         "scenarios": sc, "neither": f"그 사이({rw} 4분의 1 ~ 절반)에 머물면 어느 쪽도 아님",
         "checks": [{"date": d5, "label": "중간 확인", "note": f"{rw}의 이른 신호(4분의 1)만 본다"},
-                   {"date": d20, "label": "결과", "note": f"{rw} 절반 · 지속 기준을 처음 적용"},
-                   {"date": d60, "label": "최종", "note": "60거래일 뒤 확정. 끝난 전망으로 옮긴다"}],
+                   {"date": d20, "label": "한 달", "note": "판정은 날마다 — 여기는 한 달 지점 확인일 뿐"},
+                   {"date": d60, "label": "최종", "note": f"{WIN_END}거래일 뒤 확정. 끝난 전망으로 옮긴다"}],
         "dates": [["게시", _md(today)], [shock, _md(shock_day)], ["최종", _md(d60)], ["첫 확인", _md(d5)]],
         "tags": [w["tag"], rw], "subject": subject, "subj_ga": subj_ga, "cmp": f"{mkt_name}보다" if mkt else None, "unit": unit, "line": float(line),
         "line_src": f"20거래일 움직임 1σ(최근 {LINE_YEARS}년) → 정수 {line}{unit}",
-        "gap": round(gap, 1), "base_day": base_day, "end_day": d60, "beta": 1.0,
+        "gap": round(gap, 1), "base_day": base_day, "end_day": d60, "window": WIN_END, "beta": 1.0,
         "pick": pick, "pick_prob": prob, "pick_strong": strong, "pick_why": why_pick,
         "pick_note": (f"고르지 않음 — 같은 종목 같은 방향 {n}번 중 {m_ok}번 절반을 되찾음 (두 갈래에 나란히)" if stock else
                       f"우리 전망 = pick_side(같은 계열 같은 방향 {n}번 중 {m_ok}번 20거래일 안에 절반을 되찾음) → ‘{sc[pick - 1]['name']}’" + ("" if strong else " · 유력 없음")) + f" ({H.RULES})",
         "series": {"sub": w["sym"], "mkt": mkt}, "shock_day": shock_day, "z": round(z, 1), "late": bool(late), "reasons": why,
         "stock_page": H.page_url(w["page"]) if stock and w.get("page") else None,
-        "record": {"result": f"지켜보는 중 (자동 등록 {_md(today)}, 창 D+5 {_md(d5)} · D+20 {_md(d20)} · D+60 {_md(d60)})", "overlap": [],
+        "record": {"result": f"지켜보는 중 (자동 등록 {_md(today)}, 창 D+5 {_md(d5)} · D+20 {_md(d20)} · D+{WIN_END} {_md(d60)})", "overlap": [],
                    "cooccur": {"note": "창 안 상위 3일 이슈 코드 개수 — 매일 갱신 단계에서 채움", "days": []}},
     }
     reg = {"id": eid, "rules": H.RULES, "event": fc["event"], "kind": "shock", "auto": True, "registered_at": today,

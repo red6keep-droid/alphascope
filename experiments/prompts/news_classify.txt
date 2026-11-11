@@ -18,7 +18,8 @@ For each item return:
   "issue": string,              // ONE code from ISSUE below
   "subtopic": string,           // SHORTEST canonical noun phrase, 2-4 words, reused across items ("Tariff", "Oil Prices", "Memory Chips"). "" if none
   "scope": "market" | "sector" | "stock",   // what the item is about: the whole market, one sector, or one company
-  "market_dir": "positive" | "negative" | "uncertain" | "neutral",   // tone of the item for US stocks as a whole, as written: positive = good news for the broad market, negative = bad news, uncertain = mixed or unclear consequences, neutral = no bearing on the overall market. Label the news, do not predict prices
+  "market_dir": "positive" | "negative" | "uncertain" | "neutral",   // tone of the item for US stocks as a whole, as written: positive = good news for the broad market, negative = bad news, uncertain = good or bad depends on how it turns out, neutral = no bearing on the overall market — news about ONE company (its dividend, share sale, earnings, merger) is "neutral" here unless the item says it moved the whole market. A market-wide plan or talk (rate cut talks, tariff plans) still gets its sign. Label the news, do not predict prices
+  "stage": "done" | "talk",     // done = it happened or was decided/announced/released/filed; talk = under consideration, discussed, proposed, in negotiation, reportedly planned, officials say they may, rumored
   "countries": string[],        // countries/regions involved, English short names ("China", "EU", "Japan"). [] if none
   "scheduled": boolean,         // true if a pre-announced release/decision/report (CPI, FOMC, earnings date), false if unexpected
   "surprise": integer -2..2     // for scheduled items: vs expectations (-2 much worse ... +2 much better); 0 if unknown or unscheduled
@@ -62,15 +63,20 @@ RELEVANCE (direct connection to that company's business, NOT expected price impa
   1  sector context; the company is mentioned but is not the subject (lists of stocks, market wrap-ups)
   0  unrelated, promotional, or educational content
 
+A government, regulator or company reported to be considering, discussing or negotiating a concrete action that touches the company (export curbs, a probe, a deal, a price change) IS an action — score it like the action itself (2 or 3), not as a prediction.
+
 These are NOT actions and get relevance <= 1:
   - the stock price moving, record highs, market-cap milestones, the CEO's net worth
   - opinion, analysis, explainers, predictions, "should you buy", "X reasons", bull/bear cases, valuation debates
   - profiles or interviews with no business decision
 
-DIRECTION (for that company's business, as the item states it):
-  - recall, lawsuit against it, probe, lost customer, downgrade, supply constraint → "negative"
-  - contract win, approval, upgrade, demand increase, supply expansion → "positive"
-  - a probe opened, a policy under consideration, a delay with unknown outcome → "uncertain"
+DIRECTION (for that company's business, as the item states it — the sign of the thing itself, whether it is done or only talked about):
+  - recall, lawsuit against it, probe, lost customer, downgrade, supply constraint, tighter export controls or tariffs on its products → "negative"
+  - contract win, approval, upgrade, demand increase, supply expansion, a rule eased in its favor → "positive"
+  - Stage does NOT change the sign: "considering wider chip export curbs" is "negative" with stage "talk"; "talks on a rate cut" is "positive" for the market with stage "talk". Never turn a signed item into "uncertain" just because it is not final.
+  - "weighs a special dividend" = "positive" · "considers a $95B share sale" = "negative" (dilution) — same sign as when done.
+  - "uncertain" ONLY when the sign itself is unclear: the outcome could go either way for this company (merger talks with no terms), or the item says effects are mixed.
+  - The sign comes from the event, not from the writer's opinion: "X is considering a merger — here's why that would be a bad move" is still "uncertain".
   - pure description with no business sign → "neutral". Area "Other" is always "neutral".
 
 Other rules:

@@ -168,7 +168,7 @@ _RE_X = _re.compile(r"(\d+(?:\.\d+)?)\s*배")
 def wordify(text, L=3.0):
     """독자 문장에 남은 수치를 말로 — 'n번 중 m번' → 비율 말, 수치 괄호는 지움, 남은 %·%p 는 세기 말. 날짜(11.18) · 이름은 그대로. HTML 이 아닌 글에만."""
     t = _RE_NN.sub(lambda m: "기록상 " + share_word(int(m.group(2)), int(m.group(1))).replace("이었습니다", ""), text or "")
-    for a_, b_ in (("60거래일", "석 달"), ("20거래일", "한 달"), ("10거래일", "2주"), ("5거래일", "일주일")):
+    for a_, b_ in (("60거래일", "석 달"), ("40거래일", "두 달"), ("20거래일", "한 달"), ("10거래일", "2주"), ("5거래일", "일주일")):
         t = t.replace(a_, b_)
     t = _re.sub(r"(\d+(?:\.\d+)?)\s*%로", lambda m: prob_word(float(m.group(1))), t)                                  # '87%로 봤다' → '거의 확실하게 봤다'
     t = _re.sub(r"(시장 예상[^·\d]*?)\s*(\d+(?:\.\d+)?)\s*%", lambda m: f"{m.group(1)} {prob_word(float(m.group(2)))}", t)   # '시장 예상 82%' → '시장 예상 대체로'
@@ -315,7 +315,7 @@ def judge(fc, days, rel, cond=None, vix=None):
     발표 날 반응까지 판정에 넣는다 (2026-11-08 검증: 반응은 발표 날 하루에 있고 다음 날부터는 평소와 같다 → 옛 '결과 날 종가부터' 는 사건 몫을 빼고 쟀다). base_day 없으면 옛 방식(결과 날 종가).
     cond = 일어난 조건 번호(None = 사건 전).
     틀 R(kind after): 기준일 = 충격 전날 종가, fc["gap"] = 등록 때 적은 충격 폭(고정). fc["pick"] = 우리 전망 갈래.
-    창 = fc["end_day"](D+60) 까지 금을 넘지 않으면 `제자리`. 판정한 날에서 기록을 멈춘다(다음 움직임은 다음 전망의 몫)."""
+    창 = fc["end_day"](D+40, 2026-11-11 사용자 · 옛 등록은 D+60 그대로) 까지 금을 넘지 않으면 `제자리`. 판정한 날에서 기록을 멈춘다(다음 움직임은 다음 전망의 몫)."""
     L, unit, sc = fc["line"], fc.get("unit", "%p"), fc["scenarios"]
     reg = fc["registered"]
     log = [_entry(reg, "start", "지켜보는 중", 0, fc["start_text"], 0.0)]
@@ -446,7 +446,7 @@ def judge(fc, days, rel, cond=None, vix=None):
                 log.append(_entry(day, "watch", "지켜보는 중", 0, f"{move_text(fc, r)}. {SHOCK[s]} 뒤 아직 어느 쪽으로도 기울지 않았습니다.{ahead}", r))
         if fc.get("end_day") and day >= fc["end_day"] and not result:
             result = {"word": RESULT["neither"], "crossed": None, "day": day}
-            log[-1] = _entry(day, "neither", RESULT["neither"], 0, f'정해 둔 기간(석 달 가까이) 안에 기준을 넘지 않았습니다. {move_text(fc, r)}. 제자리입니다.', r)
+            log[-1] = _entry(day, "neither", RESULT["neither"], 0, f'정해 둔 기간({"두 달" if fc.get("window", 60) <= 40 else "석 달"} 가까이) 안에 기준을 넘지 않았습니다. {move_text(fc, r)}. 제자리입니다.', r)
             break
     if fc["kind"] == "after":   # 틀 R 타임라인 숫자 = 충격 날 종가부터 (2026-11-08 사용자: 조정 조짐인데 ▲ — 기준일(충격 전날)부터 재면 반납 중에도 ▲ 로 보였다)
         for e in log:
@@ -661,7 +661,135 @@ def _tag_title(html, cond, box, stack=False, tail=""):
     return html[:i] + opener + body + "</span></span>" + html[close:]
 
 
-def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False):
+# ── 갈래별 근거 (2026-11-11 사용자: "전망 카드에 각각 이유를 · 두 줄 정도 넣고 더보기를 하면 팝업창으로") ──
+# 재료 = 등록 때 고정한 fc["reasons"] 의 good · bad · open (forecast_register.side_news — 기사 요약 줄 태그). 오름 쪽 갈래(dir +1) = 좋은 소식, 내림 쪽 = 나쁜 소식.
+# 자리 = 갈래 카드 펼침 안 맨 아래(같은 날 사용자: "근거는 전망 펼침 안에"). 머리 `근거 n건` + 기사 사실 두 줄(애널리스트 집계 줄은 팝업에만) + 외곽선 `더보기` 버튼.
+# 방향이 안 정해진 일(open)은 두 카드 위 공통 줄 — 버리지 않는다. 논의 중인 줄은 `논의중` 라벨(띄어쓰기 없음 · 글과 세로 가운데)만, 순서는 낮추지 않는다.
+# 팝업 = 테마 뉴스 팝업([data-news-pop] → [data-news-pop-body]) 그대로. 끝 안내 = 느낌표 아이콘 + 가장 작은 글씨 13/19.
+WHY_SHOWN = 2
+WHY_FS, WHY_LH = 16, 26
+WHY_NOTE = "기사 · 애널리스트 · 우리 신호에서 모은 것입니다. 원인을 판단하거나 어느 쪽이 맞을지 고른 것은 아닙니다."
+EXCL_ICON = ('<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" style="flex:none;display:block;" fill="none" stroke="currentColor" stroke-width="1.6">'
+             '<circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>')   # 느낌표 = INFO_ICON(i) 뒤집은 모양
+
+
+def _talk_mark():
+    """`논의중` 라벨 = 공용 외곽선 라벨(dk.pill 회색) — 글과 세로 가운데 · 글자와 5 (디자인 가이드 8절)."""
+    return dk.pill("논의중", "neutral")
+
+
+WHY_HZ = (("단기", "며칠"), ("중기", "한 달~분기"))   # 우리 신호 기간 제목 (signal_groups.HORIZONS, 2026-11-11 사용자: "기간은 단기 · 중기로 타이틀")
+WHY_TITLE_W = 30   # 카드 안 묶음 제목 칸(`기사` · `단기` · `중기`) 폭
+
+
+def _sig_text(r):
+    return f'{r["name"]} : {r["state"]}'
+
+
+def _pop_li(text, meta="", talk=False):
+    return (f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{dk.POP_ITEM_GAP}px 0;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
+            f'<span style="min-width:0;"><span style="display:block;font-size:{dk.BODY};line-height:{dk.POP_LH}px;color:#333;word-break:keep-all;">'
+            f'{dk.esc(text)}{_talk_mark() if talk else ""}</span>'
+            + (f'<span style="display:block;font-size:13px;line-height:19px;color:{dk.SUB};">{dk.esc(meta)}</span>' if meta else "") + "</span></span>")
+
+
+def _pop_sub(title):
+    return f'<span style="display:block;margin:16px 0 0;font-size:14px;line-height:20px;font-weight:700;color:#111;">{title}</span>'
+
+
+def _why_pop(pid, title, rows, total, sigs=(), as_of=None):
+    """팝업 글 = `기사`(줄마다 사실 · 날짜 · 매체, 논의중) → `단기 · 며칠` → `중기 · 한 달~분기`(우리 신호 `이름 : 판정`) → 느낌표 안내."""
+    out = ""
+    if rows:
+        out += _pop_sub("기사") if sigs else ""
+        for r in rows:
+            out += _pop_li(r["t"], " · ".join(q for q in (md(r["day"]) if r.get("day") else "", r.get("src") or "") if q), r.get("stage") == "talk")
+        if total > len(rows):
+            out += f'<span style="display:block;margin:8px 0 0;font-size:14px;line-height:20px;color:{dk.SUB};">외 {total - len(rows)}건</span>'
+    for hz, span in WHY_HZ:
+        xs = [r for r in sigs if r["hz"] == hz]
+        if xs:
+            out += _pop_sub(f'{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>') + "".join(_pop_li(_sig_text(r)) for r in xs)
+    note = WHY_NOTE + (f" 우리 신호는 {md(as_of)} 종목 페이지 값입니다." if sigs and as_of else "")
+    out += (f'<span style="display:flex;align-items:flex-start;gap:4px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
+            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{note}</span></span>')   # 아이콘 = 첫 줄 가운데 (디자인 가이드 8절)
+    return f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(title)}" hidden>{out}</div>'
+
+
+def _one_line(inner, grow=True):
+    return (f'<span style="min-width:0;flex:{"1 1 auto" if grow else "0 1 auto"};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:{WHY_FS}px;line-height:{WHY_LH}px;color:#111;">{inner}</span>')
+
+
+def _why_group(title, lines_html):
+    """카드 안 묶음 = 왼쪽 제목 칸(13/19 굵게 회색, 첫 줄 가운데) + 오른쪽 줄들."""
+    return (f'<span style="display:flex;align-items:flex-start;gap:8px;margin:2px 0;">'
+            f'<span style="flex:none;width:{WHY_TITLE_W}px;display:flex;align-items:center;height:{WHY_LH}px;font-size:13px;line-height:19px;font-weight:700;color:{dk.SUB};">{title}</span>'
+            f'<span style="min-width:0;flex:1 1 auto;display:flex;flex-direction:column;">{lines_html}</span></span>')
+
+
+def _why_lines(rows, sigs=()):
+    """카드에 보이는 줄 — `기사` 두 줄(애널리스트 집계 줄 = 매체 없는 줄은 팝업에만) + `단기` · `중기` 한 줄씩(신호 이름 : 판정 · 로 잇고 말줄임)."""
+    news = [r for r in rows if r.get("src")] or rows
+    out = ""
+    if news:
+        ls = "".join(f'<span style="display:flex;align-items:center;min-width:0;">{_one_line(dk.esc(r["t"]), grow=False)}'
+                     + (_talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if r.get("stage") == "talk" else "") + "</span>"
+                     for r in news[:WHY_SHOWN])
+        out += _why_group("기사", ls) if sigs else ls
+    for hz, _ in WHY_HZ:
+        xs = [r for r in sigs if r["hz"] == hz]
+        if xs:
+            out += _why_group(hz, _one_line(dk.esc(" · ".join(_sig_text(r) for r in xs))))
+    return out
+
+
+def _why_more(pid):
+    """외곽선 `더보기` 버튼 — `이전전망 ›` 버튼과 같은 모양(13/19 · 흰 바탕 · #E2E8F0 · 모서리 6 · 굵기 600)."""
+    return (f'<span data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="flex:none;display:inline-flex;align-items:center;gap:2px;cursor:pointer;'
+            f'padding:2px 6px 2px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;font-size:13px;line-height:19px;font-weight:600;color:#4B5563;white-space:nowrap;">더보기'
+            f'<span style="display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right").replace(chr(39) + "16" + chr(39), chr(39) + "14" + chr(39))}</span></span>')
+
+
+def _why_head(title, total, pid):
+    return (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 4px;">'
+            f'<span style="font-size:14px;line-height:20px;font-weight:700;color:#111;">{title} <span style="font-weight:400;color:{dk.SUB};">{total}건</span></span>'
+            + (_why_more(pid) if pid else "") + "</span>")
+
+
+def _sigs(fc, d):
+    sg = (fc.get("reasons") or {}).get("our_signals") or {}
+    return [r for r in sg.get("rows") or [] if r.get("dir") == d], sg.get("as_of")
+
+
+def side_why(fc, sc, border):
+    """갈래 카드 펼침 안 맨 아래 근거 칸 — `근거 n건` · 더보기 + 기사 두 줄 + 단기 · 중기 신호. 재료가 없으면 빈 문자열(옛 등록)."""
+    w = fc.get("reasons") or {}
+    if "good" not in w and not w.get("our_signals"):
+        return ""
+    key, word = ("good", "좋은 소식") if sc["dir"] > 0 else ("bad", "나쁜 소식")
+    rows, n_news = w.get(key) or [], (w.get("count") or {}).get(key, len(w.get(key) or []))
+    sigs, as_of = _sigs(fc, 1 if sc["dir"] > 0 else -1)
+    total = n_news + len(sigs)
+    pid = dk.news_pop_id("why", f'{fc.get("slug")}-{key}') if total else ""
+    body = _why_lines(rows, sigs) if total else f'<span style="display:block;font-size:14px;line-height:20px;color:{dk.SUB};">같은 기간 {word}이나 이 쪽 신호는 없었습니다.</span>'
+    pop = _why_pop(pid, f'‘{sc["name"]}’ 쪽 근거', rows, n_news, sigs, as_of) if total else ""
+    return f'<div data-why="1" style="margin:12px 0 4px;padding-top:10px;border-top:1px solid {border};">{_why_head("근거", total, pid)}{body}{pop}</div>'
+
+
+def open_why(fc):
+    """두 갈래 카드 위 공통 줄 — 방향이 아직 안 정해진 일(좋고 나쁨 자체가 갈리는 기사 줄 + 중립인 우리 신호). 없으면 빈 문자열."""
+    w = fc.get("reasons") or {}
+    rows, n_news = w.get("open") or [], (w.get("count") or {}).get("open", len(w.get("open") or []))
+    sigs, as_of = _sigs(fc, 0)
+    if not rows and not sigs:
+        return ""
+    pid = dk.news_pop_id("why", f'{fc.get("slug")}-open')
+    bg, bd = dk.CARD_DIR["neutral"]
+    return (f'<div data-why="open" style="background:{bg};border:1px solid {bd};border-radius:10px;padding:10px 14px;margin:0 0 8px;">'
+            f'{_why_head("방향이 아직 안 정해진 일", n_news + len(sigs), pid)}{_why_lines(rows, sigs)}{_why_pop(pid, "방향이 아직 안 정해진 일", rows, n_news, sigs, as_of)}</div>')
+
+
+def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""):
     """갈래 카드 = 데일리 질문 카드(강조 카드 · 접기, 가이드 2-7) — 첫 줄 조건 + 라벨 · 오른쪽 답. 펼치면 고리 줄 + `이 전망이 맞으면`."""
     th, d = v["theme"], sc["dir"]
     tk = _tag_kind(sc)
@@ -689,6 +817,10 @@ def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False):
     marks = [m for m in (v["label"], MKT_LABEL if mkt else None) if m]   # 유력 · 시장예상 = 조건 끝 보라 굵은 글씨 `- 유력` (2026-11-08 사용자: 라벨 상자 대신 글자)
     boxes = violet_word("- " + " · ".join(marks), color=None if v["active"] else DIM_TEXT) if marks else ""   # 해당 없는 갈래 = 흐린 글씨 (P416 과 같게)
     # 자리 = 조건 문장 끝 · 뉴스 기사 라벨 크기 (2026-11-08 사용자 — 옛 P473 `전망 A · B` 이름표 옆 · 조건 글 아랫줄)
+    if why:   # 근거 칸 = 펼침 안 맨 아래 (2026-11-11 사용자: "근거는 전망 펼침 안에") — 펼친 몸통(</ul></div>) 바로 뒤, </details> 앞
+        k = html.rfind("</details>")
+        if k > 0:
+            html = html[:k] + why + html[k:]
     if not v["active"]:
         html = _dim(html)
     if tag:   # 카드 첫 줄 맨 앞 이름표 `전망 A` (P386) — 우리 전망 라벨과 같은 크기
@@ -775,10 +907,7 @@ def _now_block(fc, st, parts=False):
     rel_word = "" if rv is None else (("거의 같음" if strength(rv, L) == "거의 같게" else f'{strength(rv, L)} {"강함" if rv > 0 else "약함"}') if fc.get("cmp") else ("거의 그대로" if strength(rv, L) == "거의 같게" else f'{strength(rv, L)} {"오름" if rv > 0 else "내림"}'))
     # 첫 문장은 `전망 결과` 카드 문장과 겹쳐 뺀다 · 거래량은 독자에게 뜻이 안 읽혀 운영자 상자로 (2026-11-07 사용자 "이걸 왜 알아야 하나" → Claude 정리)
     lines = [("row", fc["ruler_short"], fmt_v(rv, unit), (fc["ruler_from"] + (" · " + rel_word if rel_word else "")))]   # 값 = 숫자 + 세기 말 (2026-11-07 정정)
-    if fc["kind"] == "after":
-        rec = st.get("recovery")
-        s0 = 1 if fc["gap"] > 0 else -1
-        lines.append(("row", f'{SHOCK[s0]} 폭 중 {REV[s0][1]}', f"{rec:.0f}%" if rec is not None else "—", recov_word(rec / 100) if rec is not None else ""))
+    # `급락 폭 중 회복` 줄 삭제 (2026-11-11 사용자: 반등 쪽 판단처럼 읽히고 타임라인에 이미 있다)
     if st.get("vix") is not None and (fc["kind"] == "after" or fc.get("baseline") is not None):   # 불안 지수는 그 전망의 기록 · 고르기가 쓸 때만
         lines.append(("row", "불안 지수 (VIX)", f'{st["vix"]:.1f}', vix_word(st["vix"])))
     days, vals = st.get("days", []), st.get("rel_series", [])
@@ -988,17 +1117,22 @@ def _reasons_card(fc):
     if w.get("issues"):
         rows.append(("기사가 든 이유", " · ".join(f"{k} {n}건" for k, n in w["issues"]),
                      f'{md(w["window"][0])} ~ {md(w["window"][1])} {"이 종목을 주로 다룬 같은 방향" if fc.get("target") == "stock" else "시장 · 업종"} 기사 {w.get("n", 0)}건 가운데'))
-    for h, day, src in w.get("heads") or []:
-        rows.append((h, "", f"{md(day)} · {src}" if src else md(day)))
-    a = w.get("analyst")
-    if a:
-        parts = ([f'목표가 내림 {a["down"]}곳'] if a.get("down") else []) + ([f'목표가 올림 {a["up"]}곳'] if a.get("up") else []) + ([f'의견 낮춤 {a["downgrade"]}곳'] if a.get("downgrade") else [])
-        rows.append(("애널리스트", " · ".join(parts), "같은 기간 바뀐 것"))
+    if "good" in w or w.get("our_signals"):   # 갈래별 근거가 있는 등록 = 카드 없음 (2026-11-11 사용자: 중복을 지우니 안내 글뿐) — 큰 움직임 크기는 급락일 줄, 종목 링크는 `현재 증시는?`
+        return ""
+    side = False
+    if not side:
+        for h, day, src in w.get("heads") or []:
+            rows.append((h, "", f"{md(day)} · {src}" if src else md(day)))
+        a = w.get("analyst")
+        if a:
+            parts = ([f'목표가 내림 {a["down"]}곳'] if a.get("down") else []) + ([f'목표가 올림 {a["up"]}곳'] if a.get("up") else []) + ([f'의견 낮춤 {a["downgrade"]}곳'] if a.get("downgrade") else [])
+            rows.append(("애널리스트", " · ".join(parts), "같은 기간 바뀐 것"))
     if w.get("signals"):
         rows.append(("우리 기록상", "", " · ".join(w["signals"])))
     if not rows:
         return ""
-    note = "기사 · 애널리스트 · 우리 기록에서 모은 것입니다. 원인을 판단한 것은 아닙니다."
+    note = ("기사 주제 · 우리 기록에서 모은 것입니다. 원인을 판단한 것은 아닙니다. 기사 · 애널리스트 줄은 전망 카드의 근거에 있습니다." if side
+            else "기사 · 애널리스트 · 우리 기록에서 모은 것입니다. 원인을 판단한 것은 아닙니다.")
     body = _plain_rows("", rows, note=note)
     if fc.get("stock_page"):
         body += (f'<a href="{dk.esc(fc["stock_page"])}" style="display:block;margin:8px 0 0;padding:0 {dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
@@ -1006,14 +1140,16 @@ def _reasons_card(fc):
     return _fold_row("무엇이 이유로 꼽혔나?", body).replace('<details data-acc="1"', '<details data-acc="1" open', 1)   # 독자가 가장 먼저 묻는 것 — 펼친 채로
 
 
-def _fold_row(title, html, label=""):
+def _fold_row(title, html, label="", side=""):
     """`기록상 비슷한 때는?` 과 같은 접는 구분선 줄 — 안에 카드 html 그대로 (P418: 옛 `지금은?` 구획 제목 + `현재 증시 · 한국 보기` 버튼)."""
     return (f'<details data-acc="1" class="fc-fsec" style="margin:0;border-bottom:1px solid #E2E8F0;">'
             f'<summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:0;padding:8px 0 8px {dk.ALIGN_PX}px;">'
             # 라벨이 있으면 점 대신 왼쪽에 라벨(특별한 줄 — `끊김`, P437), 없으면 3px 점
             + (f'<span style="flex:none;display:flex;margin-right:8px;">{label}</span>' if label else
                '<span aria-hidden="true" style="flex:none;width:3px;height:3px;border-radius:50%;background:#111;margin-right:8px;"></span>')
-            + f'<span class="fc-fsec-t" style="flex:1 1 auto;min-width:0;font-size:16px;line-height:26px;font-weight:400;color:#111;">{dk.esc(title)}</span>{dk.fold_btn()}</summary>'
+            + f'<span class="fc-fsec-t" style="flex:1 1 auto;min-width:0;font-size:16px;line-height:26px;font-weight:400;color:#111;">{dk.esc(title)}</span>'
+            + (f'<span style="flex:none;margin-right:8px;font-size:13px;line-height:19px;color:{dk.SUB};white-space:nowrap;">{dk.esc(side)}</span>' if side else "")   # 접기 버튼 앞 작은 회색 (`11.10 종가`, 2026-11-11 사용자)
+            + f'{dk.fold_btn()}</summary>'
             f'<div style="padding:4px 0 {16 - dk.VP}px;">{html}</div></details>')
 
 
@@ -1157,8 +1293,108 @@ def _date_row(fc, out=False):
     # 질문 제목 줄 오른쪽 끝 (P455) — 등록 증명은 그 아래
     return (f'<span style="display:flex;flex:none;flex-direction:column;align-items:flex-end;font-size:{dk.TINY};font-weight:400;color:{dk.SUB};">'
             # 결과 날짜 = 늘 검정 (P471, 옛 P413 결과 뒤 보라는 없앰) — 글자 `결과 :` 는 회색
-            + "".join(f'<span style="white-space:nowrap;">{dk.esc(k)} : <b style="color:#111;">{dk.esc(wordify(v))}</b></span>' for k, v in items)
+            + "".join(f'<span style="white-space:nowrap;">{dk.esc(k)} : <b style="color:#111;">{dk.esc(wordify(v))}</b>{_shock_size(fc) if fc["kind"] != "pre" else ""}</span>' for k, v in items)
             + (f'<span>{proof}</span>' if proof else "") + "</span>")
+
+
+def _shock_size(fc):
+    """급락일 · 급등일 뒤 = 그날 움직임(증감 색 ▲ · ▼) · 평소의 몇 배 (2026-11-11 사용자 — 옛 `무엇이 이유로 꼽혔나?` 의 `우리 기록상` 첫 줄)."""
+    g, z = fc.get("gap"), fc.get("z")
+    if g is None:
+        return ""
+    col = dk.UP if g > 0 else dk.DOWN
+    out = f' · <b style="color:{col};font-weight:700;">{"▲" if g > 0 else "▼"} {abs(g):.1f}{dk.esc(fc.get("unit", "%"))}</b>'
+    return out + (f' · 평소의 <b style="color:#111;">{abs(z):.1f}배</b>' if z else "")
+
+
+def quote_of(closes):
+    """{날짜: 종가} → {"day", "close", "chg"(전날 대비 %)} — 현재 증시는? 종목 줄. 둘 미만이면 None."""
+    ds = sorted(d for d, v in (closes or {}).items() if v)
+    if len(ds) < 2:
+        return None
+    c, p = closes[ds[-1]], closes[ds[-2]]
+    return {"day": ds[-1], "close": round(float(c), 2), "chg": round((c / p - 1) * 100, 2)}
+
+
+def _stock_now(fc, st):
+    """현재 증시는? 맨 위 종목 줄 (종목 전망만) = 한 줄 [로고 · 종목명 · 티커 · 종가 · 전날 대비 ……… ›], 줄 전체가 종목 페이지 링크 (2026-11-11 사용자 — 옛 `종목 바로가기` 버튼 삭제)."""
+    if not is_stock_fc(fc):
+        return ""
+    sym = (fc.get("series") or {}).get("sub", "")
+    q = st.get("quote") or {}
+    price = ""
+    if q:
+        col = dk.UP if q["chg"] > 0 else dk.DOWN if q["chg"] < 0 else "#111"
+        tri = "▲ " if q["chg"] > 0 else "▼ " if q["chg"] < 0 else ""
+        price = (f'<b style="flex:none;color:#111;">${q["close"]:,.2f}</b>'
+                 f'<span style="flex:none;color:{col};font-weight:600;">{tri}{abs(q["chg"]):.2f}%</span>')
+    inner = (f'<span style="flex:none;display:flex;">{_logo_for(sym, fc.get("subject", ""), 22).replace("margin-right:6px;", "")}</span>'
+             f'<b style="flex:none;color:#111;">{dk.esc(fc.get("subject", ""))}</b>'
+             f'<span style="flex:none;font-size:13px;line-height:19px;color:{dk.SUB};">{dk.esc(sym)}</span>{price}'
+             f'<span style="flex:1 1 auto;"></span>'
+             f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#4B5563;">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>')
+    style = (f'display:flex;align-items:center;gap:8px;margin:4px 0 12px;padding:0 {dk.ALIGN_PX}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};'
+             f'color:#111;text-decoration:none;white-space:nowrap;overflow:hidden;')
+    if fc.get("stock_page"):
+        return f'<a data-stock-now="1" href="{dk.esc(fc["stock_page"])}" aria-label="{dk.esc(fc.get("subject", ""))} 종목 페이지" style="{style}">{inner}</a>'
+    return f'<div data-stock-now="1" style="{style}">{inner.rsplit("<span aria-hidden", 1)[0]}</div>'
+
+
+def _close_day(st):
+    """현재 증시는? 접기 버튼 앞 `11.10 종가` — 시세 · 비교 그래프의 마지막 날."""
+    d = (st.get("quote") or {}).get("day") or ((st.get("compare") or {}).get("days") or [None])[-1]
+    return f"{md(d)} 종가" if d else ""
+
+
+def compare_lines(fc):
+    """비교 그래프 계열 [(기호, 이름)] — 종목 전망 = 종목 · 소속 업종 · S&P 500, 업종 전망 = 업종 · S&P 500, S&P 500 자체 = 없음."""
+    sr = fc.get("series") or {}
+    sub, mkt = sr.get("sub"), sr.get("mkt")
+    if not sub or not mkt:
+        return []
+    out = [(sub, fc.get("subject", sub)), (mkt, (fc.get("cmp") or "").removesuffix("보다") or mkt)]
+    if mkt != "^GSPC":
+        out.append(("^GSPC", "S&P 500"))
+    return out
+
+
+def compare_of(px, base_day, lines):
+    """{기호: {날짜: 종가}} → {"base", "days", "lines": [[이름, [기준일 대비 %]]]} — 기준일(충격 전날 종가) = 0. 휴장이면 그 전 거래일."""
+    if not lines or not px.get(lines[0][0]):
+        return None
+    main = px[lines[0][0]]
+    have = sorted(d for d in main if d <= base_day)
+    if not have:
+        return None
+    b = have[-1]
+    days = sorted(d for d in main if d >= b)
+    out = []
+    for sym, name in lines:
+        c = px.get(sym) or {}
+        if b not in c:
+            continue
+        out.append([name, [round((c[d] / c[b] - 1) * 100, 2) if d in c else None for d in days]])
+    return {"base": b, "days": days, "lines": out} if len(out) >= 2 and len(days) >= 2 else None
+
+
+CMP_COLORS = (dk.CHART_MAIN, "#5FBFAF")   # 주인공 주황 · 업종 청록 — S&P 500 은 비교 대상 회색 점선 (dk.CHART_CMP)
+
+
+def _compare_chart(fc, st):
+    """현재 증시는? 비교 그래프 (2026-11-11 사용자: 메타 · S&P 500 · 업종 평균을 겹친 선, 일자순) — 기준일 종가 대비 %, 숫자는 계열마다 끝 값만."""
+    cp = st.get("compare")
+    if not cp:
+        return ""
+    days, n = cp["days"], len(cp["days"])
+    at = {0, n // 2, n - 1}
+    labels = [md(d) if i in at else "" for i, d in enumerate(days)]
+    series = [(nm, vals, CMP_COLORS[i] if i < 2 and nm != "S&P 500" else dk.CHART_CMP, "solid" if i < 2 and nm != "S&P 500" else "dash")
+              for i, (nm, vals) in enumerate(cp["lines"])]
+    gr = dk.trend_card(f'{md(cp["base"])} 종가 대비 (%)', labels, series, lambda v: f"{v:+.1f}%".replace("-", "−"), ends_only=True)
+    if not gr:
+        return ""
+    gr = gr.replace(f"margin:0 {dk.CHART_CARD_X}px;", "margin:0;", 1)
+    return f'<div data-compare="1" style="margin:4px 0 16px;padding:0 0 0 {dk.ALIGN_PX}px;">{gr}</div>'
 
 
 def _priced(fc):
@@ -1527,10 +1763,11 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
     # 두 갈래 카드 = 페이지 맨 위, 구획 제목 없이 · 카드마다 `전망 A` · `전망 B` 이름표 (P386). 문장 안에서는 계속 갈래 이름으로 부른다(번호 금지 규칙)
     per, third = _split_ahead(fc, st)
     order = sorted(fc["scenarios"], key=lambda sc: {"up": 0, "flat": 1, "down": 2}[_tag_kind(sc)])   # 높은 쪽 위 = 전망 A, 낮은 쪽 아래 = 전망 B (P411, 화면 순서만 · 판정 no 그대로)
-    sides = (THIN_CSS + '<div style="margin:0 0 24px;">' + "".join(   # 회색 번복 카드 없앰 — 회차는 세부전망 카드 · `이전전망 ›` 로 잇는다 (2026-11-08 사용자)   # 겹침 카드는 없앰 — 질문 아래 세부 전망 카드 셋째 줄 `겹침 · …` 로 (P479)   # 번복 · 겹침 카드 = 전망 A 위 (P441 · P443)
-             _scenario_card(sc, branch_view(fc, st, sc), tag="전망" + chr(65 + i), extra=per.get(sc["no"]), compact=None, mkt=sc["no"] == _mkt_no(fc)) for i, sc in enumerate(order))
+    sides = (THIN_CSS + '<div style="margin:0 0 24px;">' + open_why(fc) + "".join(   # 회색 번복 카드 없앰 — 회차는 세부전망 카드 · `이전전망 ›` 로 잇는다 (2026-11-08 사용자)   # 겹침 카드는 없앰 — 질문 아래 세부 전망 카드 셋째 줄 `겹침 · …` 로 (P479)   # 번복 · 겹침 카드 = 전망 A 위 (P441 · P443)
+             _scenario_card(sc, branch_view(fc, st, sc), tag="전망" + chr(65 + i), extra=per.get(sc["no"]), compact=None, mkt=sc["no"] == _mkt_no(fc),
+                            why=side_why(fc, sc, dk.CARD_DIR[branch_view(fc, st, sc)["theme"]][1])) for i, sc in enumerate(order))
              + (_third_card(third[0], third[1], fc.get("line", 3.0)) if third else "") + "</div>")   # 셋째 카드 = `선반영` (사건 전) · `제자리` (충격 뒤) (2026-11-07 사용자)
-    now = "" if before else _fold_row("현재 증시는?", _now_plain(fc, st))   # 옛 `지금은?` 구획 → 접는 줄, 기록 줄과 한 묶음 (P418) · 카드 없이 · 한국 카드 삭제 (P425)
+    now = "" if before else _fold_row("현재 증시는?", _stock_now(fc, st) + _compare_chart(fc, st) + _now_plain(fc, st), side=_close_day(st))   # 종목 전망 = 맨 위 종목 줄 · 바로가기 (2026-11-11 사용자)   # 옛 `지금은?` 구획 → 접는 줄, 기록 줄과 한 묶음 (P418) · 카드 없이 · 한국 카드 삭제 (P425)
     more = (_event_chart(reg) if fc.get("event_chart") else "") + _fold_group(_reasons_card(fc) + _broke_card(fc) + now + _history_card(fc))   # 어디서 끊겼나 = 접는 줄 묶음 맨 위 (P435)   # `앞으로 볼 것은?` 삭제 — 안내 문구 · 내부 방법 설명뿐, 위험 · 다음 일은 갈래 카드 안에 (P394)
     # 질문 제목 = 날짜 줄 위 (P454, 2026-11-08 사용자: 머리 줄은 `증시 전망`, 질문은 길 수 있어 본문 맨 위에 따로). 구획 제목 글씨(22/28 · 폰 20/26), 아래가 날짜 줄이라 밑줄 없음
     # 질문 줄 = 왼쪽 질문 · 오른쪽 결과 발표 날짜 한 줄, 질문이 길면 날짜 칸을 침범하지 않고 왼쪽 칸 안에서 두 줄 (P455, 2026-11-08 사용자). 날짜는 질문 첫 줄 글자 바닥에 맞춘다(baseline)
@@ -1543,13 +1780,13 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
     back = _back_of(fc)   # 세부 전망 페이지 — 질문 앞 보라 `세부전망` 라벨 + 날짜 아래 작은 `이전전망 ›` 버튼 (P481, 2026-11-08 사용자: 세부 전망은 전망이 있어야 있는 것)
     sub_lab = violet_word("- 세부전망") if back else ""   # 질문 문장 끝 · 보라 굵은 글씨, 상자 없음 (2026-11-08 사용자 — 옛 P481 질문 앞 상자 → 라벨)
     back_btn = (f'<a href="{page_url(back[1])}" style="display:inline-flex;align-items:center;gap:2px;margin-top:6px;padding:2px 6px 2px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;'
-                f'font-size:13px;line-height:18px;font-weight:600;color:#4B5563;text-decoration:none;white-space:nowrap;">이전전망'
+                f'font-size:13px;line-height:19px;font-weight:600;color:#4B5563;text-decoration:none;white-space:nowrap;">이전전망'
                 f'<span style="display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right").replace(chr(39) + "16" + chr(39), chr(39) + "14" + chr(39))}</span></a>') if back else ""
     # 머리 줄 구분선 ~ 질문 = 테마 .pr-sticky 아래 14 + 아이콘 위 2 = 16 → 위 여백 16 더해 32 (2026-11-09 사용자: 100% 늘려) → +10 = 위 여백 26 · 보이는 42 (같은 날 사용자)
     q = (f'<h2 style="{dk.H2}display:flex;flex-wrap:nowrap;align-items:flex-start;gap:8px;margin:26px 0 11px;">' + icon
          + f'<span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;"><span style="word-break:keep-all;">{title_html}{sub_lab}</span>'
          # 날짜(급락일 · 결과) · `이전전망 ›` = 제목 아래 줄, 오른쪽 정렬 (2026-11-08 사용자 — 옛 P455 제목 줄 오른쪽 끝)
-         + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:4px;line-height:{dk.LH_TINY};">'
+         + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:24px;line-height:{dk.LH_TINY};">'
          + _date_row(fc, out=not before and fc["kind"] == "pre").replace("flex-direction:column;align-items:flex-end;", "flex-wrap:wrap;align-items:center;gap:4px 10px;", 1)
          + back_btn.replace("margin-top:6px;", "", 1) + '</span></span></h2>') + _follow_btn(fc, st)
     body = (q + sides + head + crowd_line(fc)   # 겹침이 2개를 넘으면 사실 한 줄 (2026-11-08)

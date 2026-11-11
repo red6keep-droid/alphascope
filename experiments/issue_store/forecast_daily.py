@@ -147,6 +147,10 @@ def run(state_dir=None):
             st = H.judge(fc, days, rel, cond=cond, vix=vix if vix and all(v is not None for v in vix) else None)
             for e in st["log"]:   # 오늘 나온 것 — 판정엔 안 쓰고 보이기만 (기획 9-2)
                 e["today"] = H.today_line(today_info(e["day"]))
+            if H.is_stock_fc(fc):   # 현재 증시는? 맨 위 종목 줄 — 판정용으로 이미 받은 종가에서 (새 수집 없음, 2026-11-11 사용자)
+                st["quote"] = H.quote_of(px.get(sub))
+            if fc["kind"] == "after":   # 현재 증시는? 비교 그래프 — 종목 · 업종 · S&P 500 (이미 받은 종가, 2026-11-11 사용자)
+                st["compare"] = H.compare_of(px, fc.get("base_day") or base_of(fc), H.compare_lines(fc))
             states[fc["slug"]] = st
             FA.missing_days(st.get("missing", []))
             e = st["log"][-1]

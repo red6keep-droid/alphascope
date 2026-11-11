@@ -1706,7 +1706,7 @@ def _trend_ticks(lo, hi, n=4):
     return out
 
 
-def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False):   # 선 굵기 · 점선 · 끝 값 = 종목 페이지 line_chart 와 같게(2 · 1 · 6 5 · 13/17 · 점 3/2 · 최신 점 5/4 — 정수 px, 2026-11-07 0-5)
+def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False, ends_only=False):   # 선 굵기 · 점선 · 끝 값 = 종목 페이지 line_chart 와 같게(2 · 1 · 6 5 · 13/17 · 점 3/2 · 최신 점 5/4 — 정수 px, 2026-11-07 0-5)
     """흐름을 보는 선 그래프 흰 카드 (2026-11-05 사용자 M67 · M70 · M71 · M72 · M76).
     labels = 가로축 이름(오래된 것 → 최신, 최신 오른쪽 P164). series = [(이름, 값 목록(None 허용), 색, 모양)] 모양 = "solid" · "dash"(비교 대상 · 기준선) · "step" · "stepdash"(계단 점선 — 기준금리).
     첫 계열이 주인공. 점선 계열은 범례에서 `비교 대상 : 이름`.
@@ -1718,7 +1718,7 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
         return ""
     ticks = _trend_ticks(min(vals), max(vals))
     t0, t1 = ticks[0], ticks[-1]
-    sparse = n <= 24
+    sparse = n <= 24 and not ends_only   # ends_only = 점이 적어도 카드 폭에 다 넣고 숫자는 계열마다 끝 값만 (2026-11-11 사용자: 증시 전망 비교 그래프 "수치는 마지막에만")
     top, bot = (26, 8) if sparse else (14, 6)
     H = height + (12 if sparse else 0)
     y = lambda v: top + (t1 - v) / (t1 - t0) * (H - top - bot)   # noqa: E731
@@ -1785,9 +1785,17 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
             dash = ' stroke-dasharray="6 5"' if dashed(kind) else ""
             paths += (f'<path d="{path_d(pts, X, kind)}" fill="none" stroke="{col}" stroke-width="{2 if k == 0 else 1}" stroke-linejoin="round" stroke-linecap="round"{dash} '
                       f'vector-effect="non-scaling-stroke"/>')
-            if not dashed(kind):
+            if not dashed(kind) or ends_only:   # ends_only = 비교 대상(점선)도 끝 값 (증시 전망 비교 그래프 S&P 500)
                 ends.append((k, pts[-1][0], pts[-1][1], col))
         dots, labs, used = "", "", []
+        if ends_only:   # 날마다 작은 동그라미 (2026-11-11 사용자: "일자별로 동그라미는 있어야") — 실선 계열만, 끝 점은 아래에서 크게. 점 = 6 · 테두리 2 (sparse 의 r 3 · 선 2 와 같은 크기)
+            for k, (nm, xs, col, kind) in enumerate(series):
+                if dashed(kind):
+                    continue
+                pts = [(i, v) for i, v in enumerate(xs) if v is not None]
+                for i, v in pts[:-1]:
+                    dots += (f'<span style="position:absolute;left:calc({P(i):.2f}% - 3px);top:{y(v) - 3:.1f}px;width:6px;height:6px;box-sizing:border-box;border-radius:50%;'
+                             f'background:#fff;border:2px solid {col};"></span>')
         for k, i, v, col in sorted(ends, key=lambda e: y(e[2])):   # 끝 값 숫자 — 위에서부터, 겹치면 아래로
             yy = y(v)
             ly = yy - 22

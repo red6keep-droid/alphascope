@@ -50,6 +50,7 @@ CLASSIFY_HOURS = 24   # 이보다 오래된 새 기사는 AI 에 보내지 않�
                       # 10-25 새 기사 406건 중 115건(28%)이 2 ~ 8일 전 기사였다 (구글 뉴스 7일 검색이 매일 새로 섞여 들어옴)
 AREAS = ("Earnings", "Flows", "Regulation", "Legal", "Product", "Demand", "Supply", "Corporate", "Macro", "Other")
 DIRS = ("positive", "negative", "uncertain", "neutral")
+STAGES = ("done", "talk")   # 확정 · 논의 중 (2026-11-11)
 EN = {"NVDA": "Nvidia", "AAPL": "Apple", "GOOGL": "Alphabet Google", "MSFT": "Microsoft", "AMZN": "Amazon", "META": "Meta Platforms",
       "AVGO": "Broadcom", "TSLA": "Tesla", "BRK-B": "Berkshire Hathaway", "LLY": "Eli Lilly", "MU": "Micron", "WMT": "Walmart",
       "JPM": "JPMorgan", "AMD": "AMD", "V": "Visa", "XOM": "Exxon Mobil", "JNJ": "Johnson & Johnson", "MA": "Mastercard",
@@ -215,6 +216,7 @@ def _apply(store, res, model, label, leads=None):
         if x["detail"] and (x["detail"] == x["fact"] or detail_style_bad(x["detail"]) or fact_problem(x, "detail", src)):
             x["detail"] = None
         x["market_dir"] = r.get("market_dir") if r.get("market_dir") in DIRS else None   # 시장 전체에 대한 뉴스 방향 — 데일리 뉴스 방향 막대 (2026-10-31 사용자 P143). 빠져도 분류는 살린다
+        x["stage"] = r.get("stage") if r.get("stage") in STAGES else None   # 확정(done) · 논의 중(talk) — 논의 중이어도 방향은 붙인다 (2026-11-11 사용자: "논의 중이라는 이야기라도 시장에 충격을 준다"). 빠져도 분류는 살린다
         x.update(issue_codes.coerce(r))   # 이슈 코드 · 세부 주제 · 범위 · 국가 · 예정 · 놀람 (doc/기획/이슈-분류-코드표.md, 2026-10-21) — 어휘 밖이면 OTHER
         _cap(x)
         why = fact_problem(x, "fact", src)
