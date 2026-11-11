@@ -710,9 +710,8 @@ def _why_pop(pid, title, rows, total, sigs=(), as_of=None):
         xs = [r for r in sigs if r["hz"] == hz]
         if xs:
             out += _pop_sub(f'{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>') + "".join(_pop_li(_sig_text(r)) for r in xs)
-    note = WHY_NOTE + (f" 우리 신호는 {md(as_of)} 종목 페이지 값입니다." if sigs and as_of else "")
-    out += (f'<span style="display:flex;align-items:flex-start;gap:4px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
-            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{note}</span></span>')   # 아이콘 = 첫 줄 가운데 (디자인 가이드 8절)
+    if sigs and as_of:   # 기준 날짜만 — 원인 판단 아님 안내는 페이지에 한 번(why_note_html, 2026-11-11 사용자: 팝업마다 반복하지 않기)
+        out += f'<span style="display:block;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};">우리 신호 = {md(as_of)} 종목 페이지 값</span>'
     return f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(title)}" hidden>{out}</div>'
 
 
@@ -1485,8 +1484,6 @@ def day_why_html(x, fc):
         if cs:
             pop += _pop_sub(f'우리 신호 {hz} <span style="font-weight:400;color:{dk.SUB};">· 바뀐 것</span>')
             pop += "".join(_pop_li(f'{c["name"]} : {c["from"]} → {c["to"]}' if c.get("from") else f'{c["name"]} : {c["to"]}') for c in cs)
-    pop += (f'<span style="display:flex;align-items:flex-start;gap:4px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
-            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{WHY_NOTE} 그날 나온 기사와 바뀐 신호만 적었습니다.</span></span>')
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(md(x["day"]) + " 근거")}" hidden>{pop}</div>'
     if pick:
         line = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;">{label}{_one_line(dk.esc(pick["t"]), grow=False)}'
@@ -1497,6 +1494,15 @@ def day_why_html(x, fc):
         line = f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;">{_one_line(dk.esc(txt), grow=False)}</span>'
     return (f'<div data-why-day="1" style="display:flex;align-items:center;gap:8px;margin:-4px 0 {12 - dk.VP}px;">{line}'
             f'<span style="flex:none;display:flex;align-items:center;gap:6px;"><span style="font-size:13px;line-height:19px;color:{dk.SUB};white-space:nowrap;">근거 {total}건</span>{_why_more(pid)}</span>{body}</div>')
+
+
+def why_note_html(fc):
+    """근거 안내 — 페이지에 한 번, 타임라인 바로 아래 (2026-11-11 사용자: 팝업마다 반복하지 않기). 느낌표 아이콘 + 가장 작은 글씨 13/19, 아이콘 = 첫 줄 가운데."""
+    w = (fc or {}).get("reasons") or {}
+    if "good" not in w and not w.get("our_signals"):
+        return ""
+    return (f'<div data-why-note="1" style="display:flex;align-items:flex-start;gap:4px;margin:-12px 0 24px;padding:0 {dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
+            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{WHY_NOTE}</span></div>')
 
 
 def _waiting(log, unit="%", subj="", fc=None):
@@ -1817,7 +1823,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
         log = [dict(x, overlap=ov[md(x["day"])]) if md(x.get("day") or "") in ov else x for x in log]
     before = fc["kind"] == "pre" and not st.get("cond") and not st.get("result")   # 사건 전 등록 화면 — 결과가 없으니 `전망 결과` 를 그리지 않는다 (2026-11-07 사용자)
     # 결과 뒤도 결과 전과 같은 타임라인 — `전망 결과` 제목 · 강조 카드 · `결과 :` 상자 없음 (P418, 결과 날짜 = 날짜 줄 보라 P413 · 결과 내용 = 갈래 카드 첫 고리 줄)
-    head = (_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc) if before else f'<div data-lead="1">{_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc)}</div>')   # `앞으로 올 수 있는 일` 카드 삭제 — 내용은 갈래 카드 · 셋째 카드 안으로 (2026-11-07 사용자 · Claude 판단)
+    head = (_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc) if before else f'<div data-lead="1">{_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc)}</div>') + why_note_html(fc)   # `앞으로 올 수 있는 일` 카드 삭제 — 내용은 갈래 카드 · 셋째 카드 안으로 (2026-11-07 사용자 · Claude 판단)
     for sc in fc["scenarios"]:
         sc["_L"] = fc.get("line", 3.0)
     # 두 갈래 카드 = 페이지 맨 위, 구획 제목 없이 · 카드마다 `전망 A` · `전망 B` 이름표 (P386). 문장 안에서는 계속 갈래 이름으로 부른다(번호 금지 규칙)
