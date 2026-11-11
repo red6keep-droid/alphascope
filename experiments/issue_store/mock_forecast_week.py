@@ -22,12 +22,21 @@ why = {"issues": [("실적", 5)], "n": 14, "heads": [], "analyst": None, "signal
            {"key": "regime", "name": "미국 증시 분위기", "state": "상승 추세", "dir": 1, "hz": "단기"},
            {"key": "momentum", "name": "12개월 모멘텀", "state": "상위권", "dir": 1, "hz": "중기"},
            {"key": "ma", "name": "평균선 대비", "state": "평균 아래", "dir": -1, "hz": "중기"}]}}
+for _k in ("good", "bad", "open"):   # 갈래 카드 팝업 기사에도 지어낸 요약 줄 (P516 확인용)
+    for _r in why[_k]:
+        if _r.get("src"):
+            _r["lines"] = [_r["t"], "가상 기사 요약 둘째 줄 — 목업 확인용으로 지어낸 문장입니다.", "가상 기사 요약 셋째 줄 — 실제 화면은 뉴스 요약 줄이 들어갑니다."]
+            _r["url"] = "https://example.com/" + _r["day"]
 reg, fc = R.build("EH-2026-903", w, "2026-10-31", "2026-10-30", "2026-10-29", -11.4, -5.2, 9, (6, 11), late=False, why=why)
 b1, b2 = fc["scenarios"][0]["name"], fc["scenarios"][1]["name"]   # 메타 반등(+1) · 메타 하락 지속(−1)
 
 
 def N(t, day, src, stage="done"):
-    return {"t": t, "day": day, "src": src, "stage": stage, "lv": 3}
+    r = {"t": t, "day": day, "src": src, "stage": stage, "lv": 3}
+    if src:   # 기사 팝업(팝업 위 팝업) 확인용 — 지어낸 요약 줄 · 주소 (P516)
+        r["lines"] = [t, "가상 기사 요약 둘째 줄 — 목업 확인용으로 지어낸 문장입니다.", "가상 기사 요약 셋째 줄 — 실제 화면은 뉴스 요약 줄이 들어갑니다."]
+        r["url"] = "https://example.com/" + day
+    return r
 
 
 def W(day, good=(), bad=(), open_=(), changes=()):

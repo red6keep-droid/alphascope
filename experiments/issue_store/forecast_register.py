@@ -303,12 +303,19 @@ def side_news(w, lo, hi, news, summary_path, analyst=None):
         def _price_only(t):
             return False
 
-    def add(t, d, stage, lv, x):
+    def add(t, d, stage, lv, x, lines=()):
         t = (t or "").strip()
         if not t or d not in ("positive", "negative", "uncertain") or t in seen or _price_only(t):
             return
         seen.add(t)
-        rows.append({"t": t, "dir": d, "stage": stage, "lv": lv, "day": str(x.get("published_at") or "")[:10], "src": x.get("source") or ""})
+        row = {"t": t, "dir": d, "stage": stage, "lv": lv, "day": str(x.get("published_at") or "")[:10], "src": x.get("source") or ""}
+        # 기사 팝업 재료(P516, 2026-11-11 사용자: 줄을 누르면 그 기사 팝업) — 이미 처리해 둔 요약 줄 · 원문 주소를 같이 둔다. 새 수집 · AI 0
+        ls = [str(q).strip() for q in (lines or []) if str(q).strip()][:5]
+        if len(ls) >= 2:
+            row["lines"] = ls
+        if x.get("url"):
+            row["url"] = x["url"]
+        rows.append(row)
 
     for iid, x in news.items():
         day = str(x.get("published_at") or "")[:10]
@@ -327,7 +334,7 @@ def side_news(w, lo, hi, news, summary_path, analyst=None):
                 else:
                     lv = 3 if sym in tg.get("tickers", []) else (2 if tg["scope"] == "sector" and tg.get("sector") == etf else 0)
                 if lv:
-                    add(ln, tg["dir"], tg.get("stage"), lv, x)
+                    add(ln, tg["dir"], tg.get("stage"), lv, x, sm.get("lines"))
             continue
         if not x.get("fact") or x.get("opinion"):   # 요약 줄이 없는 기사 — 기사 단위 값 (의견 · 주가 움직임 기사는 제목이 곧 의견이라 뺀다. 요약 줄은 사실만이라 위에서 받는다)
             continue

@@ -4926,25 +4926,37 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         'use strict';
         var root = document.querySelector('.post-body');
         if (!root) return;
-        var pop = null, last = null;
-        function close() { if (pop) pop.hidden = true; if (last) last.focus(); }
+        /* 팝업 위 팝업 (2026-11-11 사용자 P516): 팝업 안의 [data-news-pop](예: 증시 전망 `관련 주식 정보` 목록의 기사 줄)을 누르면 위에 한 겹 더 띄우고,
+           닫으면(× · 바깥 · Esc) 맨 위 한 겹만 닫혀 아래 목록 팝업으로 돌아간다. 겹마다 상자를 따로 둔다(pool) */
+        var stack = [], pool = [];
+        function closeTop() { var t = stack.pop(); if (!t) return; t.p.hidden = true; if (t.from && t.from.focus) t.from.focus(); }
+        function make(depth) {
+          var p = document.createElement('div'); p.className = 'rt-pop news-pop'; p.hidden = true; p.style.zIndex = String(1000 + depth);
+          p.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true">' +
+            '<div class="rt-pop-head"><div class="rt-pop-title"></div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
+            '<div class="rt-pop-body news-pop-body"></div></div>';
+          document.body.appendChild(p);
+          p.querySelector('.rt-pop-close').addEventListener('click', closeTop);
+          p.addEventListener('click', function (e) {
+            if (e.target === p) { closeTop(); return; }
+            var a = e.target.closest('[data-news-pop]');
+            if (!a || !p.contains(a)) return;
+            e.preventDefault(); e.stopPropagation();
+            open(a.getAttribute('data-news-pop'), a);
+          });
+          return p;
+        }
+        document.addEventListener('keydown', function (e) { if (stack.length && e.key === 'Escape') closeTop(); });
         function open(id, from) {
           var src = root.querySelector('[data-news-pop-body="' + id + '"]');
           if (!src) return;
-          if (!pop) {
-            pop = document.createElement('div'); pop.className = 'rt-pop news-pop'; pop.hidden = true;
-            pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-labelledby="news-pop-title">' +
-              '<div class="rt-pop-head"><div class="rt-pop-title" id="news-pop-title"></div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
-              '<div class="rt-pop-body news-pop-body"></div></div>';
-            document.body.appendChild(pop);
-            pop.querySelector('.rt-pop-close').addEventListener('click', close);
-            pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
-            document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
-          }
-          last = from;
+          var depth = stack.length, pop = pool[depth] || (pool[depth] = make(depth));
           pop.querySelector('.rt-pop-title').textContent = src.getAttribute('data-news-pop-title') || '';
+          pop.querySelector('.rt-pop-box').setAttribute('aria-label', src.getAttribute('data-news-pop-title') || '');
           var body = pop.querySelector('.rt-pop-body'); body.innerHTML = src.innerHTML; body.scrollTop = 0;
+          [].slice.call(body.querySelectorAll('[data-news-pop]')).forEach(function (a) { a.setAttribute('aria-haspopup', 'dialog'); });
           pop.hidden = false;
+          stack.push({ p: pop, from: from });
           pop.querySelector('.rt-pop-close').focus();
         }
         root.addEventListener('click', function (e) {
