@@ -207,10 +207,12 @@ def summary_card(qcard, sm=None, faces=None):
     return f'<div style="margin:0 0 {PEOPLE_CARDS_GAP}px;">{"".join(out)}</div>' if out else ""
 
 
-def person_cards(qcard, ps, name):
+def person_cards(qcard, ps, name, report_only=False, next_event=None):
     """인물 페이지 맨 위 강조 카드(질문 카드) — `오늘 가장 많이 말한 이슈는?` · `최근 7일 가장 많이 말한 이슈는?` · `최근 7일 많이 언급한 종목은?`
     (2026-11-11 사용자). ps = stock_mentions.person_summary. 재료가 없는 카드는 뺀다(빈 답 금지): 이슈 · 종목은 2건 이상만. 파이썬 셈만, AI 없음."""
     out = []
+
+    REPORT_NOTE = "이 인물의 발언은 모두 언론 보도로 옮긴 말입니다"   # 옛 읽는 법 카드 `발언 경로` 를 한 줄로 (2026-11-11 사용자)
 
     def issue_card(q, part, when, least=PERSON_MIN):
         iss = [x for x in part.get("issues") or [] if x["n"] >= least]
@@ -237,6 +239,8 @@ def person_cards(qcard, ps, name):
             first += f" 다음은 {' · '.join(x['name'] for x in iss[1:PERSON_ROWS])} 순입니다."
         lines = [(first, "plain")] + [("row", x["name"], _dir_val(x["dirs"]), f"발언 {x['n']}건") for x in iss[:PERSON_ROWS]]
         lines.append((DIR_NOTE, "note"))
+        if report_only and when != "오늘":
+            lines.append((REPORT_NOTE, "note"))
         out.append(qcard(q, top["name"] + (f" 외 {len(ties)}개" if ties else ""), theme, ink, lines))
 
     issue_card("오늘 가장 많이 말한 이슈는?", ps.get("today") or {}, "오늘", 1)   # 오늘은 이슈마다 1건인 날이 많다 — 1건부터, 같으면 `외 n개`
@@ -253,6 +257,10 @@ def person_cards(qcard, ps, name):
         lines = [(first, "plain")] + [("row", y["name"], _dir_val(y["dirs"]), f"발언 {y['n']}건") for y in st[:PERSON_ROWS]]
         lines.append((DIR_NOTE, "note"))
         out.append(qcard("최근 7일 많이 언급한 종목은?", x["name"], theme, ink, lines))
+    if next_event:   # 옛 읽는 법 카드의 `다음 날짜` (연준 FOMC 등) — 일정이 있을 때만
+        day, kind, left = next_event
+        out.append(qcard("다음 일정은?", f"D-{left}", "neutral", "#111",
+                         [(f"{day} {dk.josa(kind, '이')} 있습니다. 오늘부터 {left}일 남았습니다.", "plain"), ("row", kind, day, "")]))
     return f'<div data-person-cards="1" style="margin:0 0 {PEOPLE_CARDS_GAP}px;">{"".join(out)}</div>' if out else ""
 
 

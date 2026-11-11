@@ -377,43 +377,31 @@ def _person_cards(r):
         C = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(C)
         p7 = r.get("person7") or {}
-        return lambda p: people_section.person_cards(C.question_card, stock_mentions.person_summary(p["signals"], p7.get(p["speaker"])), p["name_ko"])
+
+        def one(p, report_only=False, nxt=None):
+            nx = (korean_md(nxt["day"]), nxt["kind"], nxt["days_left"]) if nxt else None
+            return people_section.person_cards(C.question_card, stock_mentions.person_summary(p["signals"], p7.get(p["speaker"])), p["name_ko"],
+                                               report_only=report_only, next_event=nx)
+        return one
     except Exception as e:  # noqa: BLE001
         print(f"[html] 인물 카드 건너뜀: {e}")
-        return lambda p: ""
+        return lambda p, *a: ""
 
 
 def sec_person_head(r):
-    """인물 상세 첫 카드 `이 사람 말 읽는 법` (기획 9-4) — 발언 경로 · 과거 참고(또는 정보 수집 중) · 다음 날짜. 평소엔 숨김, 테마 JS 가 제목 아래로 옮긴다
-    (data-person-strip 이름은 테마 JS 호환용). 건수 통계 카드(대상 국가 · 말한 것 · 키워드)는 뺐다 — 뜻이 없다 (2026-10-25 사용자)."""
-    refs = _refs()
+    """인물 페이지 맨 위 (테마 JS 가 이름 제목 아래로 옮긴다, data-person-strip 이름은 테마 JS 호환용) = 요약 강조 카드(오늘 · 7일 이슈 · 7일 종목)
+    + 일정이 있으면 `다음 일정은?` 카드. 옛 `이 사람 말 읽는 법` 카드(발언 경로 · 과거 참고 · 다음 날짜)는 뺐다 — 안내 · `정보 수집 중` 빈 답이 대부분 (2026-11-11 사용자).
+    발언이 모두 보도(언론이 옮긴 말)인 인물은 7일 이슈 카드 안내 줄에 한 줄. 과거 참고 계산(_ref_text)은 90일 기록이 쌓이면 다시 쓴다."""
     out = []
     pc = _person_cards(r)
     for p in r["people"]:
-        prof = (r.get("profiles") or {}).get(p["speaker"])
-        cards_html = pc(p)   # 인물 요약 강조 카드 — 읽는 법 카드 위 (2026-11-11 사용자)
-        if not prof:
-            if cards_html:
-                out.append(f'<div data-person-strip="{p["speaker"]}" hidden>{cards_html}</div>')
-            continue
-        rows = []
-        pth = " · ".join(f'{PATH_KO.get(k, k)} {v}' for k, v in sorted(prof["paths"].items(), key=lambda kv: -kv[1]))
-        why = ("본인 글 · 기관 발표는 직접 낸 말이고, 보도는 언론이 옮긴 말이라 앞뒤 맥락이 빠졌을 수 있습니다." if prof["paths"].get("report")
-               else "모두 본인 글 · 기관 발표라 직접 낸 말 그대로입니다.")
-        rows.append(("발언 경로", f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;">{_esc(pth)}</span>'
-                     f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin-top:2px;">{_esc(why)}</span>', "최근 30일"))
-        text, sub = _ref_text(p["speaker"], prof, refs)
-        rows.append(("과거 참고", f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;word-break:keep-all;">{_esc(text)}</span>'
-                     + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin-top:2px;">{_esc(sub)}</span>' if sub else ""), ""))
+        prof = (r.get("profiles") or {}).get(p["speaker"]) or {}
+        paths = prof.get("paths") or {}
+        report_only = bool(paths) and set(paths) == {"report"}
         nxt = next((s["next"] for s in p["signals"] if s.get("next")), None)
-        if nxt:
-            rows.append(("다음 날짜", f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;">{_esc(korean_md(nxt["day"]))} {_esc(nxt["kind"])}</span>',
-                         f'<b style="color:#111;">D-{nxt["days_left"]}</b>'))
-        head = (f'<span style="display:block;padding:{14 - dk.VP}px 12px 0;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:700;color:#111;">이 사람 말 읽는 법</span>')
-        body = "".join(_head_row(t, b, i == 0, right=rt) for i, (t, b, rt) in enumerate(rows))
-        body = body.replace(f'padding:{17 - dk.VP}px 12px;">', f'padding:{17 - dk.VP}px 12px;{dk.MULTI_SEP}">', 1)
-        card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{dk.MULTI}">{head}{body}</span></div>'
-        out.append(f'<div data-person-strip="{p["speaker"]}" hidden>{cards_html}{card}</div>')
+        html = pc(p, report_only, nxt)
+        if html:
+            out.append(f'<div data-person-strip="{p["speaker"]}" hidden>{html}</div>')
     return "".join(out)
 
 
