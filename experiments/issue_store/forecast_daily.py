@@ -86,6 +86,26 @@ def series(px, base_day, beta, sub="sox", mkt="spx"):
     return days, rel
 
 
+PRIOR_DAYS = 5   # 감지일 앞 몇 거래일 안의 충격을 보나
+
+
+def prior_shock(px, fc, sub, mkt):
+    """사건 전 전망(감지일 있는 틀 S)의 감지일 앞 PRIOR_DAYS 거래일 안에 같은 계열이 하루에 금(fc["line"], 20거래일 1σ) 넘게 움직인 날 → {"day", "move"}.
+    한 달 치 움직임이 하루에 난 날 바로 뒤를 0 으로 재면 그 뒤 되돌림이 선반영처럼 읽힌다 (2026-11-12 사용자: 11.05 반도체 −12% → 11.06 기준 엔비디아 실적 타임라인이 전부 ▲).
+    가장 큰 하루 하나만. 없으면 None. 새 수집 없음 — 이미 받은 종가."""
+    det = fc.get("detect_day")
+    if fc["kind"] != "pre" or not det or sub not in px:
+        return None
+    beta, L = fc.get("beta") or 1.0, fc.get("line", 3.0)
+    ds = [d for d in sorted(px[sub]) if d <= det and (mkt is None or d in px.get(mkt, {}))][-(PRIOR_DAYS + 1):]
+    best = None
+    for a, b in zip(ds, ds[1:]):
+        v = (px[sub][b] / px[sub][a] - 1) * 100 - (beta * (px[mkt][b] / px[mkt][a] - 1) * 100 if mkt else 0.0)
+        if abs(v) >= L and (best is None or abs(v) > abs(best[1])):
+            best = (b, round(v, 2))
+    return {"day": best[0], "move": best[1]} if best else None
+
+
 def series_of(fc):
     """전망의 (계열, 시장) 키 — 자동 등록은 fc["series"], 손으로 만든 옛 전망은 반도체 vs S&P 500."""
     s = fc.get("series") or {}
@@ -170,7 +190,7 @@ def run(state_dir=None):
     regs = H.load_regs(state_dir)
     pub = [(r, fc) for r in regs for fc in H.forecasts(r, public=True)]
     first = min([base_of(fc) for _, fc in pub] + [(dt.date.today() - dt.timedelta(days=30)).isoformat()])   # 자동 등록이 볼 최근 며칠도 받는다
-    start = (dt.date.fromisoformat(first) - dt.timedelta(days=10)).isoformat()
+    start = (dt.date.fromisoformat(first) - dt.timedelta(days=14)).isoformat()   # 10 → 14: 감지일 앞 PRIOR_DAYS 거래일 충격까지 보려고
     extra = {x for w in R.INDEX + R.stocks() + R.KR_INDEX + R.kr_stocks() for x in (w["sym"], w["mkt"]) if x} | {(fc.get("series") or {}).get("sub") for _, fc in pub} | {(fc.get("series") or {}).get("mkt") for _, fc in pub}
     px = fetch(start, extra)
     if not px["sox"] or not px["spx"]:
@@ -187,6 +207,7 @@ def run(state_dir=None):
         try:
             sub, mkt = series_of(fc)
             days, rel = series(px, base_of(fc), fc.get("beta") or 1.0, sub, mkt)
+            fc["prior_shock"] = prior_shock(px, fc, sub, mkt)
             vix = [px["vix"].get(d) for d in days] if px["vix"] else None
             cond = fc.get("cond_known")   # 결과가 난 사건 전 전망 — 결과 칸은 사건 날 코드(실적 · FOMC)가 채운다
             st = H.judge(fc, days, rel, cond=cond, vix=vix if vix and all(v is not None for v in vix) else None)

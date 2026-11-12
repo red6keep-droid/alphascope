@@ -279,7 +279,10 @@ def move_text(fc, v, ref=None):
     w = strength(v, fc.get("line", 3.0))   # 핵심 숫자 하나 + 세기 말 (2026-11-07 정정)
     if fc.get("cmp"):
         if w == "거의 같게":
-            return f'{fc["subj_ga"]} {fc["cmp"].replace("보다", "와")} 거의 같게 움직였습니다({a:.1f}{unit})'
+            obj = fc["cmp"].replace("보다", "")
+            ch = obj.strip()[-1:] or "가"
+            wa = ("과" if ch in "0136780" else "와") if ch.isdigit() else ("과" if 0xAC00 <= ord(ch) <= 0xD7A3 and (ord(ch) - 0xAC00) % 28 else "와")   # `시장와` → `시장과`, 숫자는 읽는 소리(500 = 오백 → 과) (받침 따라, 2026-11-12)
+            return f'{fc["subj_ga"]} {obj}{wa} 거의 같게 움직였습니다({a:.1f}{unit})'
         return f'{fc["subj_ga"]} {fc["cmp"]} {a:.1f}{unit} 더 {"올랐" if v > 0 else "빠졌"}습니다, {w} {"오른" if v > 0 else "빠진"} 편입니다'
     if w == "거의 같게":
         return f'{fc["subj_ga"]} {ref or fc.get("ref") or fc["ruler_from"]} 거의 움직이지 않았습니다({a:.1f}{unit})'
@@ -311,6 +314,32 @@ def today_line(info):
 
 def _entry(day, key, label, d, text, rel, theme=None):
     return {"day": day, "key": key, "label": label, "dir": d, "theme": theme or "neutral", "text": text, "rel": rel}
+
+
+def _priced_entry(fc, day, r, det):
+    """선반영 구간(감지일 ~ 결과 전날) 하루 줄 (2026-11-12 사용자: 엔비디아 실적 타임라인이 전부 ▲ `선반영 중`).
+    ① 감지일 바로 전에 같은 계열 충격(fc["prior_shock"], forecast_daily 가 붙임)이 있으면 그 뒤 움직임엔 되돌림이 섞여 있다
+       → `지켜보는 중` + 겹침 표시 — 11.05 반도체 −12% 바로 다음 날이 0 이라 반등이 선반영으로 읽혔다. 자(감지일 종가)는 사전 등록대로 두고 표시만.
+    ② 시장이 본 쪽(market_prob ≥ 55 인 결과의 갈래 방향)으로 움직일 때만 `선반영 중` — 반대로 가거나 거의 그대로면 `지켜보는 중`.
+       반반(45~55)이면 미리 반영할 쪽이 없으니 `지켜보는 중`."""
+    mv = move_text(fc, r, ref=f'감지일({md(det)}) 종가보다')
+    ps = fc.get("prior_shock")
+    if ps:
+        s = 1 if ps["move"] > 0 else -1
+        what = ("반등" if s < 0 else "되밀림") if r * s < 0 else f"{SHOCK[s]}의 여파"
+        e = _entry(day, "pre_watch", "지켜보는 중", 0,
+                   f'{mv}. {md(ps["day"])} {fc["subject"]} {SHOCK[s]} 바로 뒤라 {what}이 섞여 있어, 실적을 먼저 반영한 움직임인지 가릴 수 없습니다.', r)
+        e["overlap"] = {"event": f'{md(ps["day"])} {fc["subject"]} {SHOCK[s]}'}
+        return e
+    mp = fc.get("market_prob", {}).get("probs", [None])[0]
+    sc = fc["scenarios"]
+    ed = None if not mp or 45 <= mp <= 55 else (sc[0]["dir"] if mp > 55 else sc[1]["dir"])
+    exp = fc["outcomes"][0] if mp and mp > 55 else fc["outcomes"][-1]
+    if ed and r * ed > 0 and strength(r, fc.get("line", 3.0)) != "거의 같게":
+        return _entry(day, "priced_in", "선반영 중", ed, f'{mv}. 시장이 {prob_word(max(mp, 100 - mp))} 본 ‘{exp}’ 쪽이 먼저 반영되는 중입니다.', r)
+    if ed and r * ed < 0 and strength(r, fc.get("line", 3.0)) != "거의 같게":
+        return _entry(day, "pre_watch", "지켜보는 중", 0, f'{mv}. 시장이 {prob_word(max(mp, 100 - mp))} 본 ‘{exp}’ 쪽과 반대로 움직였습니다. 먼저 반영되는 모습은 아닙니다.', r)
+    return _entry(day, "pre_watch", "지켜보는 중", 0, f"{mv}. 결과 전이라 아직 어느 쪽으로도 먼저 움직이지 않았습니다.", r)
 
 
 def judge(fc, days, rel, cond=None, vix=None):
@@ -345,10 +374,7 @@ def judge(fc, days, rel, cond=None, vix=None):
             det = fc.get("detect_day")
             if det and det <= day < fc["event_day"]:   # 선반영 구간 — 감지일 종가가 0
                 last_rel = r
-                mp = fc.get("market_prob", {}).get("probs", [None])[0]
-                d0 = 1 if r > 0 else (-1 if r < 0 else 0)
-                tag = f'시장이 {prob_word(mp)} 본 ‘{fc["outcomes"][0]}’ 쪽이 먼저 반영되는 중입니다.' if mp and not 45 <= mp <= 55 else "결과 전에 먼저 움직이는 중입니다."   # P522
-                log.append(_entry(day, "priced_in", "선반영 중", d0, f"{move_text(fc, r, ref=f'감지일({md(det)}) 종가보다')}. {tag}", r))
+                log.append(_priced_entry(fc, day, r, det))
                 if day == bday:
                     ev_off = r   # 결과 직전 종가(발표 전날)로 자를 다시 놓는다
                 continue
@@ -478,7 +504,7 @@ def judge(fc, days, rel, cond=None, vix=None):
             pc = mp["probs"][cond - 1]
             sur = "" if 45 <= pc <= 55 else f' 시장이 {prob_word(pc)} 본 쪽이라 예상대로입니다.' if pc >= 50 else f' 시장은 {prob_word(100 - pc)} 반대쪽을 봤던 터라 예상 밖입니다.'   # P522
         for e in log:
-            if e["day"] == fc["event_day"] and e["key"] not in ("start", "priced_in"):
+            if e["day"] == fc["event_day"] and e["key"] not in ("start", "priced_in", "pre_watch"):
                 e["text"] = f'결과가 나왔습니다 : {fc["outcomes"][cond - 1]}.{sur} 결과 직전 종가({md(bday)})부터 잽니다. ' + e["text"]
                 break
     st = {"log": log, "result": result, "cond": cond, "rel": last_rel, "days": days, "rel_series": rel, "fixed": fixed, "missing": missing,
