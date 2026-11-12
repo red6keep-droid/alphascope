@@ -88,12 +88,13 @@ def fill(fc, st, px, ctx):
     lo = fc.get("shock_day") or reg
     lo = ks[ks.index(lo) - 1] if lo in ks and ks.index(lo) else lo
     fc.setdefault("reasons", {}).update(K.rows(fc, lo, reg, ctx))
-    prev = reg
+    fc["reasons"]["our_signals"] = K.signals(fc, reg, ctx)
+    prev, sigs = reg, (fc["reasons"]["our_signals"] or {}).get("rows")
     for e in st["log"]:
         if e.get("key") == "start" or not e.get("day"):
             continue
-        e["why"] = K.day_why(fc, e["day"], prev, ctx)
-        prev = e["day"]
+        e["why"] = K.day_why(fc, e["day"], prev, ctx, sigs)
+        prev, sigs = e["day"], e["why"].get("sigs") or sigs
 
 
 def semi_case(px):

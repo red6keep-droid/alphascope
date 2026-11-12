@@ -173,7 +173,12 @@ def attach_why(fc, st, state_dir=None):
             continue
         if d < cut:
             continue
-        rec = R.day_why(fc, d, days[i - 1] if i else fc.get("registered"), radar, prev_sigs)
+        prev = days[i - 1] if i else fc.get("registered")
+        if R.is_kr((fc.get("series") or {}).get("sub") or ""):   # 한국 = kr_why (2026-11-12 사용자)
+            import kr_why as K
+            rec = K.day_why(fc, d, prev, K.CTX, prev_sigs) if K.CTX is not None else None
+        else:
+            rec = R.day_why(fc, d, prev, radar, prev_sigs)
         if rec:
             saved[d], changed = rec, True
             prev_sigs = rec.get("sigs") or prev_sigs
@@ -197,6 +202,11 @@ def run(state_dir=None):
         FA.no_prices()
         return 1
     today = max(px["spx"])
+    try:   # 한국 전망 근거 자료 — 한 번 읽어 등록 · 날마다 근거가 같이 쓴다 (방송 Firestore · kr-state 수급 · 공시 · 애널리스트 · 판정 기록, 새 수집 · AI 없음)
+        import kr_why as K
+        K.CTX = K.load_ctx(dt.datetime.now(K.KST).strftime("%Y-%m-%d"), px)
+    except Exception as e:  # noqa: BLE001
+        print(f"[forecast] 한국 근거 자료 읽기 실패 — 한국 근거 없이: {type(e).__name__}")
     os.makedirs(os.path.join(OUT, "proof"), exist_ok=True)
     states, lines = {}, []
     tdays_all = sorted(px["spx"])

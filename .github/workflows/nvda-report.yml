@@ -158,6 +158,8 @@ jobs:
           fi
           # 트럼프 반응 통계 — trump_bridge 가 state/trump-state 를 git show 로 읽는다 (2026-11-04: 공개 raw URL 대신)
           git fetch --no-tags state trump-state:refs/remotes/state/trump-state 2>/dev/null || echo "trump-state 없음 — 트럼프 구획 없이"
+          # 한국 전망 근거 — kr_why 가 state/kr-state 를 git show 로 읽는다(외국인 수급 · 실적 공시일 · 애널리스트 평균 · 알파스코프 신호, 2026-11-12). 읽기만
+          git fetch --no-tags state kr-state:refs/remotes/state/kr-state 2>/dev/null || echo "kr-state 없음 — 한국 전망 근거는 방송 · 미국 줄만"
           # 인물 발언 (종목 · 증시 리포트 `인물 발언` 구획, 2026-11-07 P324) — 인물 레이더가 radar-state 에 남긴 파일. 없으면 구획을 뺀다
           mkdir -p experiments/people-radar/output/state
           if git fetch --no-tags state radar-state:refs/remotes/state/radar-state 2>/dev/null; then

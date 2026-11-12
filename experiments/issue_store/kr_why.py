@@ -54,6 +54,23 @@ def _kr_state(path, state_dir=None):
     return None
 
 
+def _kr_state_text(path):
+    try:
+        return subprocess.run(["git", "show", f"state/kr-state:{path}"], cwd=_ROOT, capture_output=True, check=True).stdout.decode("utf-8")
+    except Exception:  # noqa: BLE001
+        base = os.environ.get("KR_STATE_DIR") or _ROOT
+        p = os.path.join(base, path)
+        return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
+
+
+CTX = None   # forecast_daily 가 한 번 읽어 둔다 — forecast_register.reasons(한국 등록) · attach_why 가 같이 쓴다
+
+
+def fc_of_w(w):
+    """자동 등록 감시 목록 한 줄(w) → kr_why 가 읽는 전망 모양."""
+    return {"series": {"sub": w["sym"], "mkt": w.get("mkt")}, "target": "stock" if w.get("stock") else "index", "tags": [w.get("tag")], "subject": w["name"]}
+
+
 def load_ctx(today, px=None):
     """한 번만 읽어 전망 여럿이 같이 쓴다. today = 실행 날(KST 날짜)."""
     sys.path.insert(0, _EXP)
@@ -68,6 +85,8 @@ def load_ctx(today, px=None):
     fl = _kr_state("experiments/kr-stocks/data/flows.json") or {}
     ctx["flows"] = {k: {r["day"]: r["v"] for r in v} for k, v in (fl.get("daily") or {}).items() if k.startswith("foreign_")}
     ctx["dart"] = (_kr_state("experiments/kr-stocks/data/dart_earn.json") or {}).get("days") or {}
+    ctx["est"] = _kr_state("experiments/kr-stocks/data/est_history.json") or {}   # 애널리스트 평균 목표가 · 이익 예상 (한국 종목 페이지가 매일 쌓음)
+    ctx["verdicts"] = [json.loads(x) for x in _kr_state_text(f"experiments/kr-stocks/data/records/verdicts/{today[:4]}.jsonl").splitlines() if x.strip()]   # 알파스코프 신호 (한국 종목 페이지 판정 기록)
     return ctx
 
 
@@ -201,6 +220,66 @@ def _dart(fc, days, ctx):
     return [{"t": "분기 실적 공시", "dir": "uncertain", "day": d, "lv": 3, "kind": "공시", "src": "DART"} for d in days if d in have]
 
 
+def _analyst(fc, lo, hi, ctx):
+    """애널리스트 — 미국은 증권사별 목표가 변경(올림 n곳), 한국 자료(야후)는 평균만 있어 창 앞뒤 평균 목표가 · 이익 예상(EPS) 변화로. 1% 넘게 바뀐 것만."""
+    sym, kind, code = target(fc)
+    if kind != "stock":
+        return []
+    est = ctx.get("est") or {}
+    ds = [d for d in sorted(est) if sym in (est[d] or {})]
+    before = [d for d in ds if d <= lo]
+    within = [d for d in ds if lo < d <= hi]
+    if not within:
+        return []
+    a, b = est[(before or ds)[-1] if before else ds[0]][sym], est[within[-1]][sym]
+    out = []
+    for name, get in (("평균 목표가", lambda x: ((x or {}).get("analysts") or {}).get("pt_mean")), ("이익 예상", lambda x: ((x or {}).get("eps") or {}).get("current"))):
+        va, vb = get(a), get(b)
+        if not va or not vb:
+            continue
+        ch = (vb / va - 1) * 100
+        if abs(ch) < 1:
+            continue
+        out.append({"t": f"애널리스트 {name} {abs(ch):.1f}% {'올림' if ch > 0 else '내림'}", "dir": "positive" if ch > 0 else "negative",
+                    "day": within[-1], "lv": 3, "kind": "애널리스트", "src": "증권사 평균"})
+    return out
+
+
+def signals(fc, day, ctx):
+    """알파스코프 신호 — 한국 종목 페이지 판정 기록(kr-state records/verdicts)의 그날까지 마지막 값. forecast_register.our_signals 와 같은 모양
+    {"as_of", "rows": [{key, name, state, dir, hz, group}]}. 종목 = 그 종목 신호 전부, 지수 = 한국 증시 분위기, 업종 = 분위기 + 그 업종 종목의 업계 자금."""
+    sys.path.insert(0, _EXP)
+    import signal_groups as SG
+    sym, kind, code = target(fc)
+    rows = [r for r in ctx.get("verdicts") or [] if str(r.get("date") or "") <= day]
+    if not rows:
+        return None
+    short = {k for _, ks in SG.SHORT for k in ks}
+
+    def latest(s):
+        mine = [r for r in rows if r.get("sym") == s]
+        if not mine:
+            return None, {}
+        d = max(r["date"] for r in mine)
+        return d, {r["id"].split("/", 1)[1]: r for r in mine if r["date"] == d}
+    got, as_of = {}, None
+    if kind == "stock":
+        as_of, got = latest(sym)
+    else:
+        sys.path.insert(0, _HERE)
+        import forecast_register as R
+        members = [w["sym"] for w in R.kr_stocks() if kind == "index" or w["mkt"] == sym]
+        for s in members:
+            d, g = latest(s)
+            for k in ("regime", "shock") + (("sector_flow",) if kind == "sector" else ()):
+                if k in g and k not in got:
+                    got[k], as_of = g[k], max(as_of or d, d)
+    out = [{"key": k, "name": got[k].get("label") or SG.TABLE[k]["name"], "state": got[k]["state"], "dir": int(got[k].get("direction") or 0),
+            "hz": "단기" if k in short else "중기", "group": SG.GROUP_OF.get(k, "")} for k in SG.ORDER if k in got and got[k].get("state")]
+    as_of = max((r.get("as_of") or "" for k, r in got.items()), default=as_of) or as_of
+    return {"as_of": as_of, "rows": out} if out else None
+
+
 def _tdays(lo, hi, ctx, fc):
     """창(lo 다음 날 ~ hi)의 한국 거래일 — 그 대상 시세 날짜로 (가짜 달력 없음)."""
     sym = (fc.get("series") or {}).get("sub")
@@ -213,7 +292,7 @@ def rows(fc, lo, hi, ctx):
     """lo(전 거래일, 제외) ~ hi(포함) 사이 근거 → side_news 와 같은 {"good", "bad", "open", "count"}."""
     days = _tdays(lo, hi, ctx, fc)
     allr = []
-    for fn, args in ((_broadcast, (fc, lo, hi, ctx)), (_flow, (fc, days, ctx)), (_us_night, (fc, days, ctx)), (_dart, (fc, days, ctx))):
+    for fn, args in ((_broadcast, (fc, lo, hi, ctx)), (_flow, (fc, days, ctx)), (_us_night, (fc, days, ctx)), (_dart, (fc, days, ctx)), (_analyst, (fc, lo, hi, ctx))):
         try:
             allr += fn(*args)
         except Exception as e:  # noqa: BLE001 — 자료 하나가 빠져도 나머지로
@@ -228,6 +307,13 @@ def rows(fc, lo, hi, ctx):
     return out
 
 
-def day_why(fc, day, prev_day, ctx):
-    """타임라인 그날 근거 — forecast_register.day_why 와 같은 모양(우리 신호 바뀐 것은 한국 판정 기록이 아직 없어 빈 목록)."""
-    return {"day": day, **rows(fc, prev_day or day, day, ctx), "changes": [], "sigs": []}
+def day_why(fc, day, prev_day, ctx, prev_sigs=None):
+    """타임라인 그날 근거 — forecast_register.day_why 와 같은 모양: 갈래 줄 + 알파스코프 신호 중 전날과 달라진 것(changes) + 그날 신호 전체(sigs, 다음 날 비교용)."""
+    out = {"day": day, **rows(fc, prev_day or day, day, ctx)}
+    sg = signals(fc, day, ctx) or {}
+    cur = sg.get("rows") or []
+    before = {r["name"]: r for r in prev_sigs or []}
+    out["changes"] = [{"name": r["name"], "from": before[r["name"]]["state"], "to": r["state"], "dir": r["dir"], "hz": r["hz"]}
+                      for r in cur if r["name"] in before and before[r["name"]]["state"] != r["state"]]
+    out["sigs"] = cur or (prev_sigs or [])
+    return out

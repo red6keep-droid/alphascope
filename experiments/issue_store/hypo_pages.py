@@ -1506,6 +1506,11 @@ def quote_of(closes):
     return {"day": ds[-1], "close": round(float(c), 2), "chg": round((c / p - 1) * 100, 2)}
 
 
+def _won_or_usd(fc, v):
+    """종가 표기 — 한국 종목 = `93,600원`(가이드: 원화는 숫자 원), 미국 = `$93.60` (2026-11-12 목업에서 기아가 `$93,600.00` 으로 나옴)."""
+    return f"{v:,.0f}원" if mkt_of(fc) == "kr" else f"${v:,.2f}"
+
+
 def _stock_now(fc, st):
     """현재 증시는? 맨 위 종목 줄 (종목 전망만) = 한 줄 [로고 · 종목명 · 티커 · 종가 · 전날 대비 ……… ›], 줄 전체가 종목 페이지 링크 (2026-11-11 사용자 — 옛 `종목 바로가기` 버튼 삭제)."""
     if not is_stock_fc(fc):
@@ -1516,7 +1521,7 @@ def _stock_now(fc, st):
     if q:
         col = dk.UP if q["chg"] > 0 else dk.DOWN if q["chg"] < 0 else "#111"
         tri = "▲ " if q["chg"] > 0 else "▼ " if q["chg"] < 0 else ""
-        price = (f'<b style="flex:none;color:#111;">${q["close"]:,.2f}</b>'
+        price = (f'<b style="flex:none;color:#111;">{_won_or_usd(fc, q["close"])}</b>'
                  f'<span style="flex:none;color:{col};font-weight:600;">{tri}{abs(q["chg"]):.2f}%</span>')
     inner = (f'<span style="flex:none;display:flex;">{_logo_for(sym, fc.get("subject", ""), 22).replace("margin-right:6px;", "")}</span>'
              f'<b style="flex:none;color:#111;">{dk.esc(fc.get("subject", ""))}</b>'
