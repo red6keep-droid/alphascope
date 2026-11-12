@@ -40,37 +40,6 @@ G_LOGO = ('<svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><p
           '<path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.5 1.4l2.6-2.6A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>')
 
 
-LIVE_SAMPLE = os.path.join(HERE, "live_sample.json")   # 목업용 = gh-pages live.json 사본(11-12 14:54 KST). 실제는 홈 `장중 가격` 토글과 같은 파일을 jsDelivr 에서 읽는다
-
-
-def with_live(held):
-    """`장중 가격` 켰을 때 — 한국 종목만 live.json 지연 시세(현재가 · 오늘 등락)로 바꾼다. 미국 종목은 종가 그대로 (2026-11-12 사용자: 미국은 장중 가격 없어도 된다)."""
-    try:
-        lv = json.load(open(LIVE_SAMPLE, encoding="utf-8"))
-    except (OSError, ValueError):
-        return held, None
-    out = []
-    for s, q, a in held:
-        x = lv.get("stocks", {}).get(s["s"].split(".")[0]) if s["m"] == "kr" else None
-        if x and x.get("p"):
-            s = dict(s, p=dict(s["p"], c=x["p"], chg=x.get("cp", s["p"]["chg"])))
-        out.append((s, q, a))
-    return out, lv
-
-
-LIVE_CSS = ("<style>[data-ms-mode=live]{display:none;}.ms-live-on [data-ms-mode=live]{display:block;}.ms-live-on [data-ms-mode=close]{display:none;}"
-            ".ms-livebar .live-switch .t{display:inline !important;}"   # 홈은 폰에서 글자를 숨기지만(제목 줄 자리) 여기는 자리가 있어 `장중 가격` 글자를 보인다
-            ".ms-livebar .live-note{display:none !important;}.ms-live-on .ms-livebar .live-note{display:inline !important;}</style>")
-
-
-def live_bar(lv):
-    """총액 카드 위 오른쪽 = 기준 표시 + `장중 가격` 토글 — 홈 한국 카드와 같은 부품(.live-note · .live-switch, 테마 CSS)."""
-    at = (lv or {}).get("at", "")
-    note_on = f'<span class="live-note on"><span class="dot"></span>지연 시세 · {esc(at)} 기준 · 미국 종목은 종가</span>'
-    return (LIVE_CSS + f'<div class="ms-livebar" style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin:0 0 8px;">{note_on}'
-            f'<label class="live-switch" title="한국 종목 가격 · 등락률을 장중 지연 시세로"><input type="checkbox" data-ms-live="1"><span class="live-knob" aria-hidden="true"></span><span class="t">장중 가격</span></label></div>')
-
-
 def load():
     d = json.load(open(INDEX, encoding="utf-8"))
     return {s["s"]: s for s in d["stocks"]}
@@ -380,9 +349,7 @@ MOCK_JS = ("<script>(function(){function go(){var b=document.querySelector('[dat
            "if(l)l.textContent=b.getAttribute('data-head-label');}document.querySelectorAll('[data-mock]').forEach(function(e){e.addEventListener('click',function(ev){ev.preventDefault();});});"
            "document.querySelectorAll('[data-ms-open]').forEach(function(btn){btn.addEventListener('click',function(){var k=btn.getAttribute('data-ms-open');"
            "document.querySelectorAll('[data-ms-panel]').forEach(function(p){p.hidden=p.getAttribute('data-ms-panel')!==k||!p.hidden;});});});"
-           "document.querySelectorAll('[data-ms-live]').forEach(function(c){c.addEventListener('change',function(){document.body.classList.toggle('ms-live-on',c.checked);"
-           "});});"
-           "document.querySelectorAll('[data-ms-close]').forEach(function(b){b.addEventListener('click',function(){var p=b.closest('[data-ms-panel]');if(p)p.hidden=true;});});"
+                      "document.querySelectorAll('[data-ms-close]').forEach(function(b){b.addEventListener('click',function(){var p=b.closest('[data-ms-panel]');if(p)p.hidden=true;});});"
            "document.querySelectorAll('[data-ms-panel^=edit]').forEach(function(p){var segs=p.querySelectorAll('[data-ms-seg]');"
            "function pick(k){segs.forEach(function(x){x.classList.toggle('on',x.getAttribute('data-ms-seg')===k);});p.querySelectorAll('[data-ms-sub]').forEach(function(x){x.hidden=x.getAttribute('data-ms-sub')!==k;});}"
            "segs.forEach(function(x){x.addEventListener('click',function(){pick(x.getAttribute('data-ms-seg'));});});pick('buy');"
@@ -440,13 +407,7 @@ def main():
     kr = [h for h in held if h[0]["m"] == "kr"]
 
     # 로그인 뒤
-    held_live, lv = with_live(held)
-    us_l = [h for h in held_live if h[0]["m"] == "us"]
-    kr_l = [h for h in held_live if h[0]["m"] == "kr"]
-    mode = lambda m, html: f'<div data-ms-mode="{m}">{html}</div>'
-    body = (dk.cards(live_bar(lv)
-                     + mode("close", grand_card(held) + stock_rows(us, "us") + stock_rows(kr, "kr"))
-                     + mode("live", grand_card(held_live) + stock_rows(us_l, "us") + stock_rows(kr_l, "kr")))   # 종가(기본) · 장중 두 벌 — 토글이 바꿔 보인다
+    body = (dk.cards(grand_card(held) + stock_rows(us, "us") + stock_rows(kr, "kr"))   # 종가만 — `장중 가격` 토글 삭제 (2026-11-12 사용자: 종가 기준으로 하자. 한국만 장중이면 종목마다 기준이 섞이고, 300종목 장중은 야후 요청 부담)
             # 맨 위 = 총액 · 총 수익률. 글 머리 카드(data-lead) — 첫 h2 앞. 테마는 data-lead(없으면 첫 data-cards)부터 첫 h2 전까지를 머리로 옮긴다: h2 뒤에 두면 종목 줄 카드가 맨 아래로 밀렸다
             + basis_note()   # 안내 = 맨 끝 카드(종목 줄) 아래 오른쪽 (2026-11-12 사용자)   # 총액 바로 아래 = 보유 종목, 제목 없이 (U1 `보유 종목 n개` 삭제)
             + dk.h2("수익", tab="수익")   # 첫 탭 `수익` — 탭 이름과 같은 제목은 테마가 숨긴다. 머리(총액 · 종목 줄)가 이 첫 탭으로 들어간다 (U5)
