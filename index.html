@@ -248,7 +248,7 @@ body.menu-open { overflow: hidden; }
 .nav-switch { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 7px 12px 7px 8px; border: 1px solid var(--border-strong); border-radius: 999px; background: #fff; color: #111; font-size: 14px; font-weight: 700; line-height: 20px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: border-color .15s ease, background-color .15s ease; }
 .nav-switch:hover { border-color: #94A3B8; background: #F8FAFC; }
 /* 높이 36 = 메뉴 아이콘 테두리 36 과 같게 (국기 23 + 위아래 5.5 + 테두리 1). 국기 26 → 23 으로 10% 줄임(2026-11-11 사용자) */
-.nav-switch svg { width: 18px; height: 18px; flex: none; display: block; border-radius: 50%; }   /* 국기 23 → 18 · 글자 14/20 · 높이 36 그대로 (2026-11-11 사용자) */
+.nav-switch svg { width: 18px; height: 18px; flex: none; display: block; border-radius: 50%; }   /* 국기 23 → 18 (20%) · 글자 15/22 → 14/20 · 위아래 안쪽 5.5 → 7 · 왼쪽 8 = 스위치 높이 36 그대로 (2026-11-11 사용자) */
 /* 바로 보이는 메뉴 · 서랍 메뉴 나누기 (2026-11-10 사용자: "미국, 한국만 메뉴, 증시 전망은 메뉴 아이콘 안으로").
    서랍 메뉴 링크 가운데 data-bar 가 붙은 것만 로고 오른쪽 줄에 복사하고 body.has-bar 를 붙인다(JS). 그때는 PC 에서도 메뉴 아이콘 · 서랍을 쓴다.
    data-bar 가 하나도 없으면(지금 테마) 예전 그대로: PC 는 메뉴 전부 줄로, 폰은 전부 복사 */
@@ -579,6 +579,9 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   position: relative;
 }
 .stock-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }   /* 로고가 머리글자를 덮는다 (2026-10-22) */
+/* LIGHT_LOGOS_START */
+img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/CVX.svg"], img[src$="/EOG.svg"], img[src$="/GE.svg"], img[src$="/GOOGL.svg"], img[src$="/KR_000660.svg"], img[src$="/KR_009540.svg"], img[src$="/KR_010130.svg"], img[src$="/KR_012450.svg"], img[src$="/KR_017670.svg"], img[src$="/KR_042660.svg"], img[src$="/KR_042700.svg"], img[src$="/KR_068270.svg"], img[src$="/KR_086790.svg"], img[src$="/KR_196170.svg"], img[src$="/KR_247540.svg"], img[src$="/KR_329180.svg"], img[src$="/KR_402340.svg"], img[src$="/META.jpg"], img[src$="/MSFT.svg"], img[src$="/PG.jpg"], img[src$="/SMR.svg"], img[src$="/SO.svg"], img[src$="/TXN.svg"] { outline: 1px solid #E2E8F0; outline-offset: -1px; }   /* 흰 바탕 로고 외곽선 — logo_edge_check.py 가 쓴다 (2026-11-11 사용자) */
+/* LIGHT_LOGOS_END */
 .stock-avatar.has-logo { background: #F1F5F9 !important; }
 .stock-label { display: flex; flex-direction: column; min-width: 0; }
 .stock-name {
@@ -1375,12 +1378,12 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .post-nav { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
 .post-nav .post-nav-list { grid-column: 2; }
 .post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
-  font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* `TOP` 글자 16 → 14 (P517, 2026-11-11 사용자) — 화살표 원 22 그대로 */
 .post-nav-top:hover { color: var(--accent); }
 .post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
 .post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
 .post-nav-cm { grid-column: 1; grid-row: 1; justify-self: start; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; padding: 8px 0; background: none; border: 0;
-  font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 댓글 = 왼쪽 끝 글자 버튼, 말풍선 · 댓글 — TOP 과 거울 (2026-11-10 사용자) */
+  font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 글자 16 → 14 = TOP 과 같게 (2026-11-11 사용자) · 댓글 = 왼쪽 끝 글자 버튼, 말풍선 · 댓글 — TOP 과 거울 (2026-11-10 사용자) */
 .post-nav-cm:hover { color: var(--accent); }   /* TOP 과 같은 규칙 — 열린 상태 색은 두지 않는다(빨강 = ▲상승과 겹침) */
 .post-nav .post-nav-list, .post-nav .post-nav-top { grid-row: 1; }
 /* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px (테마 JS .ends-text, 2026-10-12 사용자) */
@@ -1448,10 +1451,10 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
 .post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
 .post-shell > [data-related].is-moved { margin-top: 65px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 40 → 55 → 65 (2026-11-11 사용자: 15 더 · 10 더, 옛 2026-11-10 본문 → 버튼 줄과 같은 40) */
-.post-shell > [data-related].is-moved > div:first-child { font-size: 14px !important; line-height: 20px !important; padding-bottom: 8px !important; }   /* 제목 = 푸터 제목과 같은 14/20 굵게 (2026-11-11 사용자, 옛 16/26) */
+.post-shell > [data-related].is-moved > div:first-child { font-size: 14px !important; line-height: 20px !important; padding-bottom: 8px !important; color: #6B7280 !important; }   /* 제목 = 푸터 제목과 같은 14/20 굵게 (2026-11-11 사용자, 옛 16/26) */
 .post-shell > [data-related].is-moved > a { font-size: 14px !important; line-height: 20px !important; padding-top: 9px !important; padding-bottom: 9px !important; }   /* 줄 = 14/20 · 위아래 9 (옛 16/26 · 12) — 이미 게시된 글의 인라인 값을 덮는다 (2026-11-11 사용자) */
 body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
-body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
+body.item-view .site-footer { padding-top: 19px; }   /* 38 → 19 (50%, 2026-11-11 사용자) */   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
 .comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
@@ -4925,25 +4928,37 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         'use strict';
         var root = document.querySelector('.post-body');
         if (!root) return;
-        var pop = null, last = null;
-        function close() { if (pop) pop.hidden = true; if (last) last.focus(); }
+        /* 팝업 위 팝업 (2026-11-11 사용자 P516): 팝업 안의 [data-news-pop](예: 증시 전망 `관련 주식 정보` 목록의 기사 줄)을 누르면 위에 한 겹 더 띄우고,
+           닫으면(× · 바깥 · Esc) 맨 위 한 겹만 닫혀 아래 목록 팝업으로 돌아간다. 겹마다 상자를 따로 둔다(pool) */
+        var stack = [], pool = [];
+        function closeTop() { var t = stack.pop(); if (!t) return; t.p.hidden = true; if (t.from && t.from.focus) t.from.focus(); }
+        function make(depth) {
+          var p = document.createElement('div'); p.className = 'rt-pop news-pop'; p.hidden = true; p.style.zIndex = String(1000 + depth);
+          p.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true">' +
+            '<div class="rt-pop-head"><div class="rt-pop-title"></div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
+            '<div class="rt-pop-body news-pop-body"></div></div>';
+          document.body.appendChild(p);
+          p.querySelector('.rt-pop-close').addEventListener('click', closeTop);
+          p.addEventListener('click', function (e) {
+            if (e.target === p) { closeTop(); return; }
+            var a = e.target.closest('[data-news-pop]');
+            if (!a || !p.contains(a)) return;
+            e.preventDefault(); e.stopPropagation();
+            open(a.getAttribute('data-news-pop'), a);
+          });
+          return p;
+        }
+        document.addEventListener('keydown', function (e) { if (stack.length && e.key === 'Escape') closeTop(); });
         function open(id, from) {
           var src = root.querySelector('[data-news-pop-body="' + id + '"]');
           if (!src) return;
-          if (!pop) {
-            pop = document.createElement('div'); pop.className = 'rt-pop news-pop'; pop.hidden = true;
-            pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-labelledby="news-pop-title">' +
-              '<div class="rt-pop-head"><div class="rt-pop-title" id="news-pop-title"></div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
-              '<div class="rt-pop-body news-pop-body"></div></div>';
-            document.body.appendChild(pop);
-            pop.querySelector('.rt-pop-close').addEventListener('click', close);
-            pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
-            document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
-          }
-          last = from;
+          var depth = stack.length, pop = pool[depth] || (pool[depth] = make(depth));
           pop.querySelector('.rt-pop-title').textContent = src.getAttribute('data-news-pop-title') || '';
+          pop.querySelector('.rt-pop-box').setAttribute('aria-label', src.getAttribute('data-news-pop-title') || '');
           var body = pop.querySelector('.rt-pop-body'); body.innerHTML = src.innerHTML; body.scrollTop = 0;
+          [].slice.call(body.querySelectorAll('[data-news-pop]')).forEach(function (a) { a.setAttribute('aria-haspopup', 'dialog'); });
           pop.hidden = false;
+          stack.push({ p: pop, from: from });
           pop.querySelector('.rt-pop-close').focus();
         }
         root.addEventListener('click', function (e) {
