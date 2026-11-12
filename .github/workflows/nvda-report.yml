@@ -370,6 +370,16 @@ jobs:
           git push state "$COMMIT:refs/heads/nvda-state"
           echo "저장: $COMMIT"
 
+      # 30일 지난 날짜 그림 정리 — 지난 글에서 그래프 칸을 빼고(Blogger PATCH) gh-pages 에서 지운다 (2026-11-12 사용자 "30일 정도만 키워줘. 칸까지도 다 빼야지").
+      # 하루 한 번(full), 보통 그날 넘어가는 글 2~3개 · 그림 2~3장. 글 고치기가 실패한 그림은 지우지 않는다. 실패해도 리포트는 그대로
+      - name: Prune old dated images (30 days)
+        if: env.DO_PUBLISH == 'true' && needs.check.outputs.mode != 'refresh'
+        continue-on-error: true
+        run: |
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          python experiments/image_prune.py --apply --days 30 --max-posts 20
+
       - name: Upload report artifact
         if: always() && needs.check.outputs.mode != 'refresh'
         uses: actions/upload-artifact@v4
