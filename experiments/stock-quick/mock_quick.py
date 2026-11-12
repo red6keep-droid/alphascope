@@ -8,6 +8,8 @@
 """
 
 import datetime
+import json
+import re
 import os
 import sys
 
@@ -27,7 +29,8 @@ LIST_DAY = ""
 SAMPLES = [
     {"sym": "UBER", "name": "우버", "market": "US", "sector": "산업재", "sub": "운송 · 플랫폼", "peers": [("엔비디아 NVDA 주가", "#"), ("테슬라 TSLA 주가", "#")]},
     {"sym": "SBUX", "name": "스타벅스", "market": "US", "sector": "경기 소비재", "sub": "외식", "peers": [("맥도날드 MCD 주가", "#"), ("코스트코 COST 주가", "#")]},
-    {"sym": "259960.KS", "name": "크래프톤", "market": "KR", "sector": "커뮤니케이션", "sub": "게임", "peers": [("NAVER 035420 주가", "#"), ("카카오 035720 주가", "#")]},
+    {"sym": "259960.KS", "name": "크래프톤", "market": "KR", "sector": "커뮤니케이션", "sub": "게임", "peers": [("NAVER 035420 주가", "#"), ("카카오 035720 주가", "#")],
+     "slug": "krafton", "kr_sector": "커뮤니케이션"},
 ]
 BENCH = {"US": ("^GSPC", "S&P 500"), "KR": ("^KS11", "코스피")}
 # 전체 종목 목록 목업에 같이 싣는 종목 (정식 몇 개 + 간단 정보 몇 개)
@@ -208,19 +211,113 @@ def page_us_full(smp):
     series = [(smp["name"], [(x / c[0] - 1) * 100 for x in c], C.UP if c[-1] >= c[0] else C.DOWN, "solid"),
               ("S&P 500", [(x / bc[0] - 1) * 100 for x in bc], "#94A3B8", "dash")]
     line = dk.trend_card("1년 전 대비 등락", dk.month_ticks(days[-252:]), series, pct)
-    nxt = [x for x in snap["earnings"][sym] if x["day"] >= s["day"]]
-    earn = ""
-    if nxt:
-        d = datetime.date.fromisoformat(nxt[0]["day"])
-        w = {"bmo": "장 시작 전", "amc": "장 마감 뒤"}.get(nxt[0].get("when"), "")
-        earn = C.cards_grid(C.question_card("다음 실적 발표는?", kday(d), "neutral", "#111", [(f"{kday(d)} {w} 발표 예정입니다." if w else f"{kday(d)} 발표 예정입니다.", "plain"),
-                                                                                         ("회사가 알린 날짜입니다. 바뀌면 다음 갱신 때 고쳐집니다.", "note")]))
-    stamp_html = stamp(RP._md(s["day"]) + "(미국 시간)", "가격 자료만으로 만든 간단 정보입니다. 매 거래일 장을 마감한 뒤 한 번 갱신됩니다.")
-    body = (stamp_html + RP.lead(s) + line + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500")
-            + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s) + flow + earn
-            + dk.muted("간단 정보는 가격 자료로 계산되는 카드만 싣습니다. 애널리스트 · 실적 · 뉴스 · 방송 의견은 종목 분석 페이지에서 다룹니다.")
+    # 상세 칸 — 정식 종목과 같은 카드, 받는 주기만 드물게(detail_cache 주기: 의견 · 이익 예상 주 1회 · 실적 뒤, 기업 90일). 공매도 · 옵션은 간단 종목에서 뺀다 (2026-11-12 사용자)
+    import collect_extra as CE
+    import analyze_tabs
+    nxt = next((x["day"] for x in snap["earnings"][sym] if x["day"] >= s["day"]), None)
+    _, st = CE._one((sym, s["close"], s["day"], nxt), only=("analysts", "eps", "company"))
+    rev, cash = sec_tables(sym)
+    extra = {"stocks": {sym: st}, "revenue": {"series": {sym: rev} if rev else {}}, "capex": {sym: cash} if cash else {}, "peer_earnings": {}, "edgar": {}}
+    analyze_tabs.build(s, snap, extra)
+    s["expect"]["move"] = s["expect"]["short"] = None   # 옵션 · 공매도 = 정식 종목만
+    tab_today = (line + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500")
+                 + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s))
+    stamp_html = stamp(RP._md(s["day"]) + "(미국 시간)", "간단 정보입니다. 가격은 매 거래일, 실적 · 의견은 주 1회 갱신됩니다.")
+    body = (stamp_html + RP.lead(s) + R._section("오늘", tab_today, line=False, tab="오늘")
+            + R._section("매수의견", RP.card_opinions(s) or dk.muted("애널리스트 의견이 아직 없습니다."), tab="매수의견")
+            + R._section("실적", RP.sec_expect(s) + RP.sec_calendar(s, ("earnings",), open_first=False), tab="실적")
+            + R._section("업계상황", flow or dk.muted("업계 자료가 없습니다."), tab="업계상황")
+            + R._section("기업", RP.sec_company(s), tab="기업")
+            + dk.muted("간단 정보는 뉴스 · 방송 의견 · 소송 · 옵션 · 공매도를 다루지 않습니다. 이 내용은 종목 분석 페이지에서 다룹니다.")
             + dk.related_buttons(smp["peers"] + [("전체 종목 목록", "mock_all_stocks.html")]))
     return RP.wrap(body), f'{smp["name"]} {sym} 간단 정보'
+
+
+def page_kr_full(smp):
+    """한국 간단 종목 — 한국 정식 종목과 같은 계산(kr-stocks/analyze_kr) · 같은 카드(render_kr). 미국과 같은 원칙(2026-11-12 사용자 "한국 거도 동일"):
+    가격 · 공용 시장 자료 카드 + 드물게 받는 상세(이익 예상 · 애널리스트 · 실적일 · 분기 매출). 뉴스 · 방송 의견 · 공매도는 뺀다. 기업 정보는 DART 기업개황(실제는 등록 때 한 번)."""
+    kd = os.path.join(EXP, "kr-stocks")
+    sys.path.insert(0, kd)
+    import universe_kr as K
+    sym = smp["sym"]
+    if sym not in K.BY_SYM:
+        K.CANDIDATES.append((sym, smp["name"], f"{smp['slug']}-{sym.split('.')[0]}-stock", smp["kr_sector"], []))
+        K.BY_SYM[sym] = K.CANDIDATES[-1]
+        K.SECTOR_ETF[sym] = smp.get("kr_etf") or K.SECTOR_ETF.get("035420.KS")
+    import collect_kr
+    import collect_kr_extra as KX
+    import analyze_kr
+    import render_kr
+    snap, flows, hist = collect_kr.load()
+    nb = collect_kr._bars([sym])
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    for k in list(snap["bars"]):   # 장중에 목업을 돌리면 오늘 봉은 종가가 아니다 — 모든 종목에서 뺀다
+        if snap["bars"][k] and snap["bars"][k][-1]["day"] == now.strftime("%Y-%m-%d") and now.hour < 16:
+            snap["bars"][k] = snap["bars"][k][:-1]
+    nb[sym] = [b for b in nb.get(sym, []) if not (b["day"] == now.strftime("%Y-%m-%d") and now.hour < 16)]
+    snap["bars"].update(nb)
+    snap["caps"][sym] = collect_kr._caps([sym]).get(sym)
+    a = analyze_kr.run(snap, flows, hist)
+    import yfinance as _yf
+    t = _yf.Ticker(sym)
+    with open(KX.EXTRA, encoding="utf-8") as f:
+        extra = json.load(f)
+    for key, fn in (("eps", lambda: KX.EX._eps(t)), ("analysts", lambda: KX._analysts(t))):
+        try:
+            extra.setdefault("stocks", {}).setdefault(sym, {})[key] = fn()
+        except Exception as e:  # noqa: BLE001
+            print(f"[quick] {sym} {key} 실패: {str(e)[:60]}")
+    try:
+        extra.setdefault("earnings", {})[sym] = KX._earn_dates(t)
+        extra.setdefault("revenue", {}).setdefault("series", {})[sym] = KX._revenue(t)
+    except Exception as e:  # noqa: BLE001
+        print(f"[quick] {sym} 실적 실패: {str(e)[:60]}")
+    try:   # 기업 정보 — DART 기업개황 (한국 정식 종목과 같은 칸)
+        import collect_kr_dart as KD
+        import requests as _rq
+        key = KD._key()
+        corp = KD.corp_codes(key).get(sym.split(".")[0]) if key else None
+        r = _rq.get(f"{KD.API}/company.json", params={"crtfc_key": key, "corp_code": corp}, timeout=30).json() if corp else {}
+        if r.get("status") == "000":
+            extra.setdefault("company", {})[sym.split(".")[0]] = {k: (r.get(k) or "").strip() for k in KD.COMPANY_KEYS}
+    except Exception as e:  # noqa: BLE001
+        print(f"[quick] {sym} 기업개황 실패: {str(e)[:60]}")
+    for x in a["stocks"]:   # 순위 목록에는 넣지 않는다 — 간단 종목은 시총 순위 밖
+        if x["sym"] == sym:
+            x["in_top"], x["rank"] = False, None
+    tmp = os.path.join(OUT, "_kr_tmp")
+    render_kr.write_all(a, tmp, snap, media=[], extra=extra)
+    code = sym.split(".")[0]
+    with open(os.path.join(tmp, f"{code}.html"), encoding="utf-8") as f:
+        body = f.read()
+    import re as _re
+    body = _re.sub(r"매 거래일 장을 마감한 뒤 발행되는 리포트입니다\. \([^)]*\)", "간단 정보입니다. 가격은 매 거래일, 실적 · 의견은 주 1회 갱신됩니다.", body, count=1)
+    # 종목 봉차트 그림(정식 종목만 만든다) 자리 → 오늘 탭 머리 + 브라우저가 그리는 1년 선 그래프 (미국 간단 정보와 같게)
+    b = snap["bars"][sym][-252:]
+    bmap = {x["day"]: x["close"] for x in snap["bars"].get(K.BENCH) or []}
+    bc = [bmap.get(x["day"]) for x in b]
+    bc = [v if v is not None else next(y for y in bc if y is not None) for v in bc]
+    c = [x["close"] for x in b]
+    series = [(smp["name"], [(v / c[0] - 1) * 100 for v in c], C.UP if c[-1] >= c[0] else C.DOWN, "solid"),
+              (K.BENCH_NAME, [(v / bc[0] - 1) * 100 for v in bc], "#94A3B8", "dash")]
+    line = dk.trend_card("1년 전 대비 등락", dk.month_ticks([x["day"] for x in b]), series, pct)
+    body = _re.sub(r'<a href="[^"]*radar-[^"]*-' + code + r'-stock-price[^"]*".*?</a>', lambda m: render_kr.R._section("오늘", line, line=False, tab="오늘"), body, count=1, flags=_re.S)
+    return body, f'{smp["name"]} {code} 간단 정보'
+
+
+def sec_tables(sym):
+    """분기 매출 · 돈 표 — 정식 종목 collect_extra.revenue 와 같은 SEC 공용 자료(companyfacts)를 이 종목만. 실패하면 빈 표."""
+    sys.path.insert(0, os.path.join(EXP, "nvda-report"))
+    import expect as EX
+    import collect_capex as CX
+    try:
+        tickers = EX._sec("https://www.sec.gov/files/company_tickers.json")
+        cik = {v["ticker"]: str(v["cik_str"]).zfill(10) for v in tickers.values()}[sym.replace("-", ".") if sym not in [v["ticker"] for v in tickers.values()] else sym]
+        facts = EX.company_facts(cik)
+        return EX.revenue_rows(facts), CX.rows_from_facts(facts, cik)
+    except Exception as e:  # noqa: BLE001
+        print(f"[quick] {sym} SEC 표 실패: {str(e)[:80]}")
+        return [], []
 
 
 def history_stats(syms):
@@ -268,17 +365,24 @@ def all_stocks(data):
     return dk.formal(html)
 
 
+def _no_media_opinions():
+    """간단 정보 = 방송 · 뉴스 의견 카드 없음 (2026-11-12 사용자 · 기획 6-6: 한 목소리만 남는 화면 위험). 공용 의견 카드 함수에서 두 카드만 끈다 — 목업 안에서만."""
+    sys.path.insert(0, os.path.join(EXP, "nvda-report"))
+    import render_html as RH
+    RH.picks_card = lambda *a, **k: ""
+    RH.news_opinion_card = lambda *a, **k: ""
+
+
 def main():
+    _no_media_opinions()
     global LIST_DAY
     os.makedirs(OUT, exist_ok=True)
     syms = sorted({s["sym"] for s in SAMPLES} | {x[0] for x in LIST_US} | {v[0] for v in BENCH.values()})
     df = yf.download(syms, period="1y", interval="1d", auto_adjust=False, group_by="ticker", progress=False, threads=True)
     data = {s: df[s] for s in syms if s in df.columns.get_level_values(0)}
     for s in SAMPLES:
-        if s["market"] == "US":   # 미국 = 정식 종목과 같은 카드 (한국은 render_kr 로 같은 작업 — 다음 차례)
-            body, title = page_us_full(s)
-        else:
-            body, title = page(s, data[s["sym"]], data[BENCH[s["market"]][0]])
+        body, title = page_us_full(s) if s["market"] == "US" else page_kr_full(s)   # 둘 다 정식 종목과 같은 카드 (2026-11-12)
+        body = re.sub(r"방송에서는[^.<]*\.\s*", "", body)   # 의견 요약의 방송 문장 — 간단 정보는 방송 의견을 싣지 않는다
         p = dk.write_mock(body, os.path.join(OUT, f'mock_quick_{s["sym"].split(".")[0]}.html'), title)
         print("만듦:", p)
     LIST_DAY = kday(datetime.date.fromisoformat(data["AAPL"].dropna(subset=["Close"]).index[-1].strftime("%Y-%m-%d"))) + "(미국 시간)"

@@ -1039,7 +1039,7 @@ def cal_earnings(s, c):
         x = _rename(x, s["name"])
         if isinstance(x, str):
             x = x.replace("장 마감 뒤 · 회사 확정", (when + " · " if when else "") + "Yahoo Finance 일정")
-            x = x.replace(" 장 마감 뒤로,", f" {when}로," if when else ",")
+            x = x.replace(" 장 마감 뒤로,", f" {_dk.josa(when, '로')}," if when else ",")   # `장 시작 전로` → `장 시작 전으로` (받침 따라, 2026-11-12)
         return x
     return [tuple(fix(v) for v in ln) for ln in lines], fix(tip), state, left
 
