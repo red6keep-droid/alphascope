@@ -289,7 +289,7 @@ def _color_icon(key, on, all_color, mkt="kr"):
     return f'<span {box.format(bg=bg)} aria-hidden="true"><svg viewBox="0 0 16 16" width="16" height="16" {attrs}>{g}</svg></span>'
 
 JTABS = [("home", "홈"), ("report", "증시 리포트"), ("stock", "종목"), ("forecast", "증시 전망"), ("people", "인물 발언")]
-BAR_PAD = 10   # 하단 메뉴 아래 여백 — 화면 맨 아래에서 10px 위로 (2026-11-12 사용자)
+BAR_PAD = 15   # 하단 메뉴 아래 여백 — 화면 맨 아래에서 15px 위로 (2026-11-12 사용자: 10 → 15)
 BAR_H = 56
 
 
