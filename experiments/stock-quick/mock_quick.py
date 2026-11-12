@@ -410,7 +410,12 @@ def main():
         body = re.sub(r"방송에서는[^.<]*\.\s*", "", body)   # 의견 요약의 방송 문장 — 간단 정보는 방송 의견을 싣지 않는다
         p = dk.write_mock(body, os.path.join(OUT, f'mock_quick_{s["sym"].split(".")[0]}.html'), title)
         print("만듦:", p)
-    p = dk.write_mock(all_stocks(data), os.path.join(OUT, "mock_all_stocks.html"), "전체 종목")
+    page = all_stocks(data)
+    p = dk.write_mock(page, os.path.join(OUT, "mock_all_stocks.html"), "전체 종목")
+    print("만듦:", p)
+    kr = (page.replace('data-mk-pane="US">', 'data-mk-pane="US" hidden>', 1).replace('data-mk-pane="KR" hidden>', 'data-mk-pane="KR">', 1)   # 한국을 먼저 연 같은 목록 (2026-11-12 사용자: 한국 목록이 어디 있나)
+          .replace("font-weight:700;color:#111;\">미국", "font-weight:400;color:#6B7280;\">미국", 1).replace("font-weight:400;color:#6B7280;\">한국", "font-weight:700;color:#111;\">한국", 1))
+    p = dk.write_mock(kr, os.path.join(OUT, "mock_all_stocks_kr.html"), "전체 종목 (한국)")
     print("만듦:", p)
 
 
