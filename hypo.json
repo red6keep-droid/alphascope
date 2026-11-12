@@ -1,21 +1,9 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-11T22:32:41Z",
+ "generated": "2026-11-12T22:32:36Z",
  "list_url": "https://alpha-scope.blogspot.com/p/forecast-list.html",
  "open": [
-  {
-   "no": 2,
-   "eh": "EH-2026-001",
-   "title": "반도체 급락, 반등할까 더 빠질까?",
-   "url": "https://alpha-scope.blogspot.com/p/forecast-2.html",
-   "posted": "11.06",
-   "tags": [
-    "반도체",
-    "반등"
-   ],
-   "event": "11.05 반도체 급락"
-  },
   {
    "no": 1,
    "eh": "EH-2026-002",
@@ -26,32 +14,38 @@
     "실적",
     "반도체"
    ],
-   "event": "11.17 엔비디아 실적"
+   "event": "11.17 엔비디아 실적",
+   "market": "us"
   },
   {
    "no": 1,
-   "eh": "EH-2026-003",
-   "title": "엔비디아 급락, 반등할까 더 빠질까?",
-   "url": "https://alpha-scope.blogspot.com/p/forecast-2026-003.html",
-   "posted": "11.10",
+   "eh": "EH-2026-006",
+   "title": "마이크로소프트 급락, 반등할까 더 빠질까?",
+   "url": "https://alpha-scope.blogspot.com/p/forecast-2026-006.html",
+   "posted": "11.12",
    "tags": [
     "종목",
     "반등"
    ],
-   "event": "11.09 엔비디아 급락"
+   "event": "11.11 마이크로소프트 급락",
+   "market": "us"
   },
   {
    "no": 1,
-   "eh": "EH-2026-004",
-   "title": "AMD 급등, 조정 올까 더 오를까?",
-   "url": "https://alpha-scope.blogspot.com/p/forecast-2026-004.html",
-   "posted": "11.10",
+   "eh": "EH-2026-005",
+   "title": "기아 급락, 반등할까 더 빠질까?",
+   "url": "https://alpha-scope.blogspot.com/p/forecast-2026-005.html",
+   "posted": "11.12",
    "tags": [
-    "종목",
-    "조정"
+    "한국 종목",
+    "반등"
    ],
-   "event": "11.06 AMD 급등"
+   "event": "11.10 기아 급락",
+   "market": "kr"
   }
  ],
- "done_count": 0
+ "done_count": {
+  "us": 3,
+  "kr": 0
+ }
 }

@@ -1,0 +1,32 @@
+{
+ "id": "EH-2026-005",
+ "slug": "forecast-2026-005",
+ "title": "기아 급락, 반등할까 더 빠질까?",
+ "kind": "after",
+ "registered": "2026-11-12",
+ "event": "11.10 기아 급락",
+ "event_day": null,
+ "ruler": "기아 vs 업종",
+ "line": 5.0,
+ "unit": "%p",
+ "gap": -4.4,
+ "pick": null,
+ "pick_prob": null,
+ "market_prob": null,
+ "rules": "EH-2026-11-10",
+ "scenarios": [
+  {
+   "cond": "반등한다",
+   "name": "기아 반등",
+   "dir": 1,
+   "win": "기아가 급락 폭(4.4%p)의 절반을 회복한다"
+  },
+  {
+   "cond": "지속한다",
+   "name": "기아 하락 지속",
+   "dir": -1,
+   "win": "기아가 급락 뒤 5%p 더 빠진다"
+  }
+ ],
+ "sha256": "600f94272db5f76db0358907eb2756f992e3d6042c281a7d309686ec8e523b3b"
+}
