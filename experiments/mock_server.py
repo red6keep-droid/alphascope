@@ -336,7 +336,7 @@ def icon_svg(style, key, on, mkt="kr", sv=0, pv=0):
         return _color_icon(key, on, style == "G", mkt)
     if style == "C" or (style == "D" and on):
         return f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">{_FILL[key]}</svg>'
-    w = ("2" if key in ("forecast", "people") else "2.2") if style == "B" else "1.8"   # B = 2.2px, 저울 · 마이크 = 2px (2026-11-12 사용자, 옛 2.4)
+    w = {"forecast": "1.8", "people": "2"}.get(key, "2.2") if style == "B" else "1.8"   # B = 2.2px · 마이크 2px · 저울 1.8px (2026-11-12 사용자: 저울만 0.2 더 가늘게, 옛 2.4)
     g = STOCK_V[sv][1] if key == "stock" else PEOPLE_V[pv][1] if key == "people" else _ICON[key]
     return (f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="{w}" '
             f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{g}</svg>')
