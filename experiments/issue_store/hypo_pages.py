@@ -969,8 +969,8 @@ def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""
     ink = INK[d] if v["answer"] in (ANS_HIT, ANS_LEAN) else ("#111" if v["active"] else dk.MUTED)
     def box(state):   # 근거 줄 값 = 라벨 박스(확인 = 그 갈래 방향 색, 대기 · 해당 없음 = 회색). 질문 카드는 <span 으로 시작하는 값을 그대로 쓴다(P330)
         word, kind = CHAIN[state]
-        if state == "no":   # `해당 없음` = 흐린 회색 라벨 (P417)
-            return dim_box(word)
+        if state == "no":   # `해당 없음` = 흐린 회색 라벨 (P417) · 보통 굵기 (2026-11-12 사용자, `대기` 와 같은 P500 규칙)
+            return dim_box(word).replace("font-weight:700;", "font-weight:400;", 1)
         k = (("down" if d < 0 else "up") if v["active"] else "flat") if kind == "down" else kind
         b = TS.box(k, word, dk.esc, sym=False, fit=True)
         return b.replace("font-weight:700;", "font-weight:400;", 1) if state == "wait" else b   # 덜 중요한 라벨 = 보통 굵기 (P500)
