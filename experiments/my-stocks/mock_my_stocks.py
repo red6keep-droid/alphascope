@@ -55,11 +55,11 @@ def pct(v):
     return f"{'+' if v > 0 else '−' if v < 0 else ''}{abs(v):.1f}%"
 
 
-def updown(v, text, px):
+def updown(v, text, px, tri=True):
     """증감 = ▲ 빨강 · ▼ 파랑 · 0 회색 + 절댓값 글자 (2026-11-12 사용자: + 대신 증감 삼각형, 삼각형은 숫자보다 작게).
     삼각형 = 숫자 글자의 80% · 위로 1 (가이드라인 1절 크기표 `dk.emph_tri` 와 같은 규칙). text 는 부호 없는 절댓값 글자."""
     col = dk.UP if v > 0 else dk.DOWN if v < 0 else dk.MUTED
-    tri = "▲" if v > 0 else "▼" if v < 0 else ""
+    tri = ("▲" if v > 0 else "▼" if v < 0 else "") if tri else ""   # tri=False = 금액(원) — 삼각형 없이 색만 (2026-11-12 사용자: 금액은 삼각형 빼기)
     t = f'<span data-tri="1" style="font-size:{round(px * 0.8)}px;vertical-align:1px;margin-right:2px;">{tri}</span>' if tri else ""
     return f'<span style="color:{col};white-space:nowrap;">{t}{esc(text)}</span>'
 
@@ -88,38 +88,43 @@ def total_card(rows, m):
 
 
 def grand_card(held):
-    """맨 위 = 보유 종목 전체 (2026-11-12 사용자). 줄마다 왼쪽 이름 · 오른쪽 값:
-      총 평가 금액 | 38,647,671원 (28px — 옛 30 에서 2 작게)
-      수익 금액    | ▲ 5,322,651원 · ▲ 16.0% (증감 색)
-      매수 금액    | 33,325,020원
-      미국 종목 · 3종목 ▲ 4,136,xxx원(원화, 왼쪽 이름 바로 뒤, 증감 색) | ▲ 23.2%
-      한국 종목 · 2종목 ▲ 1,185,000원                                    | ▲ 7.6%
-      현재 환율 1달러 1,356원 (작은 회색 한 줄)
-    미국 종목은 환율로 원화 환산해 더한다."""
+    """맨 위 = 보유 종목 전체 (2026-11-12 사용자):
+      총 평가 금액                   38,647,671원   ← 이름 굵게 · 금액 26px 굵게, 오른쪽
+      수익 금액 5,322,651원              ▲ 16.0%   ← 아래 네 줄 = 16px 보통 굵기 이름 + 금액 왼쪽, 수익률 오른쪽(굵게, 같은 크기)
+      매수 금액 33,325,020원
+      미국 종목 · 3종목 4,137,651원      ▲ 23.2%
+      한국 종목 · 2종목 1,185,000원       ▲ 7.6%
+      현재 환율 1달러 1,356원
+    금액은 원화 · 삼각형 없이 증감 색만, 수익률은 ▲▼ + 증감 색. 금액과 수익률 사이 점 없음. 미국 종목은 환율로 원화 환산해 더한다."""
     krw = lambda s, v: v * FX if s["m"] == "us" else v
     cost = sum(krw(s, q * a) for s, q, a in held)
     val = sum(krw(s, q * s["p"]["c"]) for s, q, a in held)
     gain = val - cost
     kind = "positive" if gain > 0 else "negative" if gain < 0 else "neutral"   # 카드 색 = 답 방향 (가이드라인 7-1)
     ROW = "display:flex;justify-content:space-between;align-items:baseline;gap:12px;"
-    LAB = "font-size:17px;line-height:24px;font-weight:700;color:#333;white-space:nowrap;"
-    top = (f'<div style="{ROW}"><span style="{LAB}">총 평가 금액</span>'
-           f'<span style="font-size:28px;line-height:36px;font-weight:800;color:#111;white-space:nowrap;">{esc(won(val))}</span></div>'
-           f'<div style="{ROW}margin:2px 0 0;"><span style="{LAB}">수익 금액</span>'
-           f'<span style="font-size:20px;line-height:28px;font-weight:800;">{updown(gain, won(gain), 20)} · {updown(gain, f"{abs(gain / cost * 100):.1f}%", 20)}</span></div>'
-           f'<div style="{ROW}margin:2px 0 0;"><span style="{LAB}">매수 금액</span>'
-           f'<span style="font-size:17px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">{esc(won(cost))}</span></div>')
+    FS = 16   # 아래 줄 글자 · 수익률 한 크기 (2026-11-12 사용자: 증감 정보는 다 같은 크기)
+    LAB = f"font-size:{FS}px;line-height:24px;font-weight:400;color:#333;"
+    AMT = "font-weight:400;"
+
+    def line(label, amount_html, rate_html="", top_rule=False):
+        rule = "padding:8px 0 0;margin:8px 0 0;border-top:1px solid #FEE6CA;" if top_rule else "margin:4px 0 0;"
+        return (f'<div style="{ROW}{rule}font-size:{FS}px;line-height:24px;">'
+                f'<span style="min-width:0;{LAB}">{label} <span style="{AMT}white-space:nowrap;">{amount_html}</span></span>'
+                + (f'<span style="font-weight:700;white-space:nowrap;">{rate_html}</span>' if rate_html else "") + '</div>')
+
+    top = (f'<div style="{ROW}"><span style="font-size:17px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">총 평가 금액</span>'
+           f'<span style="font-size:26px;line-height:34px;font-weight:800;color:#111;white-space:nowrap;">{esc(won(val))}</span></div>'   # 30 → 28 → 26 (2026-11-12 사용자)
+           + line("수익 금액", updown(gain, won(gain), FS, tri=False), updown(gain, f"{abs(gain / cost * 100):.1f}%", FS))
+           + line("매수 금액", f'<span style="color:#111;">{esc(won(cost))}</span>'))
     sub = []
-    for m, head in (("us", "미국 종목"), ("kr", "한국 종목")):
+    for k, (m, head) in enumerate((("us", "미국 종목"), ("kr", "한국 종목"))):
         rows = [h for h in held if h[0]["m"] == m]
         if not rows:
             continue
         c = sum(krw(s, q * a) for s, q, a in rows)
         v = sum(krw(s, q * s["p"]["c"]) for s, q, _ in rows)
-        sub.append(f'<div style="{ROW}padding:8px 0 0;margin:8px 0 0;border-top:1px solid #FEE6CA;font-size:16px;line-height:24px;font-weight:700;">'
-                   f'<span style="min-width:0;"><span style="color:#111;">{head}</span><span style="font-weight:400;color:{dk.NOTE};font-size:{dk.TINY};"> · {len(rows)}종목 </span>'
-                   f'{updown(v - c, won(v - c), 16)}</span>'   # 금액 = 이름 바로 뒤(왼쪽) · 증감 색 (2026-11-12 사용자)
-                   f'<span>{updown(v - c, f"{abs((v - c) / c * 100):.1f}%", 16)}</span></div>')
+        sub.append(line(f'{head}<span style="color:{dk.NOTE};font-size:{dk.TINY};"> · {len(rows)}종목</span>',
+                        updown(v - c, won(v - c), FS, tri=False), updown(v - c, f"{abs((v - c) / c * 100):.1f}%", FS), top_rule=True))
     fx = f'<div style="margin:10px 0 0;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">현재 환율 1달러 {FX:,.0f}원</div>'   # 환율만 간단히 (2026-11-12 사용자)
     return dk.dcard(top + "".join(sub) + fx, kind)
 
@@ -134,7 +139,7 @@ def stock_rows(rows, m):
         sub = f'{esc(f"{q:,}주 · 평균 {money(a, m)}")} · 오늘 {updown(chg, f"{abs(chg):.1f}%", 14)}'
         gk = gain * FX if m == "us" else gain   # 수익금 = 원화 (미국 종목은 환율로 바꿈, 평균 매수가는 산 통화 그대로) (2026-11-12 사용자)
         val = (f'{updown(gain, f"{abs((c - a) / a * 100):.1f}%", 17)}<br>'
-               f'<span style="font-size:15px;font-weight:400;">{updown(gain, won(gk), 15)}</span>')   # 수익률 · 수익금 모두 증감 색 + ▲▼ (2026-11-12 사용자)
+               f'<span style="font-size:15px;font-weight:400;">{updown(gain, won(gk), 15, tri=False)}</span>')   # 금액은 삼각형 없이 색만   # 수익률 · 수익금 모두 증감 색 + ▲▼ (2026-11-12 사용자)
         out.append(dk.stock_row_link(dk.crow(name, val, sub, first=(i == 0), sub_block=True), s["s"]).replace(
             'data-href="', f'data-href="{esc(s["u"])}" data-sym="', 1))
     return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(out)}</span></div>'
