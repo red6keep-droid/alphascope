@@ -244,8 +244,9 @@ def add_form(held):
            "font-size:18px;line-height:26px;color:#111;background:#fff;min-width:0;")   # 입력 칸 크게 44 → 52 · 글자 16 → 18 (2026-11-12 사용자)
     head = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};"
     COLS = "display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1.3fr);gap:6px;"
-    lines = "".join(f'<div style="{COLS}margin:0 0 6px;"><input data-mock="1" style="{inp}" placeholder="{ph}"><input data-mock="1" style="{inp}" inputmode="numeric" placeholder="주">'
-                    f'<input data-mock="1" style="{inp}" inputmode="decimal" placeholder="$ · 원"></div>'
+    lines = "".join(f'<div style="{COLS}margin:0 0 6px;"><span style="position:relative;min-width:0;"><input data-ms-stock="1" autocomplete="off" style="{inp}" placeholder="{ph}"></span>'
+                    f'<input data-mock="1" style="{inp}" inputmode="numeric" placeholder="주">'
+                    f'<input data-ms-price="1" style="{inp}" inputmode="decimal" placeholder="$ · 원"></div>'
                     for ph in ("엔비디아 · 005930", "", ""))
     chev = dk.ACC_CHEV
     sheet = (SHEET_CSS + f'<div class="ms-pad"></div><div class="ms-sheet"><details{" open" if not held else ""}>'   # 보유 종목이 없으면 처음부터 열림
@@ -303,17 +304,45 @@ MOCK_JS = ("<script>(function(){function go(){var b=document.querySelector('[dat
            "if(document.readyState==='complete')go();else window.addEventListener('load',go);})();</script>")
 
 
+def picker_js(st):
+    """종목 칸 찾기 (2026-11-12 사용자: 이름을 치면 종목을 찾아 주기). 실제 블로그는 검색 창이 이미 읽는 색인(search/us.json · kr.json, jsDelivr)을 그대로 쓴다 —
+    새 파일 · 새 요청 없음. 목업은 같은 색인(이름 · 코드 · 별명 a)을 페이지에 넣어 흉내. 2글자부터 · 최대 6개 · 입력 칸 위로 펼침(칸이 화면 아래 고정이라)."""
+    rows = [{"n": x["n"], "c": x["s"].split(".")[0], "m": x["m"], "a": [str(v).lower() for v in x.get("a", [])],
+             "l": dk.ticker_logo(x["s"], 22)} for x in st.values()]
+    data = json.dumps(rows, ensure_ascii=False).replace("</", "<\\/")
+    return ("<script>(function(){var S=" + data + ";"
+            "function norm(t){return String(t||'').toLowerCase().replace(/\\s+/g,'');}"
+            "function find(q){q=norm(q);if(q.length<1)return[];var out=[];S.forEach(function(x){var hit=norm(x.n).indexOf(q)>=0||x.c.toLowerCase().indexOf(q)===0||x.a.some(function(a){return norm(a).indexOf(q)===0;});"
+            "if(hit)out.push(x);});out.sort(function(a,b){return (norm(a.n).indexOf(q)===0?0:1)-(norm(b.n).indexOf(q)===0?0:1);});return out.slice(0,6);}"
+            "document.querySelectorAll('[data-ms-stock]').forEach(function(inp){var box=document.createElement('div');"
+            "box.style.cssText='position:absolute;left:0;bottom:calc(100% + 4px);z-index:5;min-width:240px;background:#fff;border:1px solid #E2E8F0;border-radius:10px;box-shadow:0 6px 20px rgba(15,23,42,.12);overflow:hidden;display:none;';"
+            "inp.parentNode.appendChild(box);"
+            "function close(){box.style.display='none';}"
+            "inp.addEventListener('input',function(){var r=find(inp.value);box.innerHTML='';if(!r.length){close();return;}"
+            "r.forEach(function(x,i){var b=document.createElement('button');b.type='button';"
+            "b.style.cssText='display:flex;align-items:center;width:100%;gap:0;padding:10px 12px;background:#fff;border:0;'+(i?'border-top:1px solid #F1F5F9;':'')+'text-align:left;cursor:pointer;font-size:16px;line-height:24px;color:#111;';"
+            "b.innerHTML=x.l+'<span style=\\'font-weight:700;\\'>'+x.n+'</span><span style=\\'margin-left:auto;padding-left:10px;font-size:14px;color:#6B7280;\\'>'+(x.m==='us'?'미국':'한국')+' · '+x.c+'</span>';"
+            "b.addEventListener('mousedown',function(e){e.preventDefault();inp.value=x.n;close();"
+            "var pr=inp.closest('div').querySelector('[data-ms-price]');if(pr)pr.placeholder=x.m==='us'?'$':'원';});box.appendChild(b);});box.style.display='block';});"
+            "inp.addEventListener('blur',close);});})();</script>")
+
+
 def write(body, name, title):
     path = dk.write_mock(head_label() + dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE), os.path.join(OUT, name), title)
     if path:
-        pg = open(path, encoding="utf-8").read().replace("</body>", MOCK_JS + "</body>", 1)
+        pg = open(path, encoding="utf-8").read().replace("</body>", MOCK_JS + (PICKER or "") + "</body>", 1)
         open(path, "w", encoding="utf-8").write(pg)
     print(f"[보유 종목] {name}")
 
 
+PICKER = None
+
+
 def main():
+    global PICKER
     os.makedirs(OUT, exist_ok=True)
     st = load()
+    PICKER = picker_js(st)
     held = [(st[k], q, a) for k, (q, a) in HOLD.items() if k in st]
     us = [h for h in held if h[0]["m"] == "us"]
     kr = [h for h in held if h[0]["m"] == "kr"]
