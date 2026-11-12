@@ -144,7 +144,7 @@ jobs:
         id: run_kr
         run: python "$KR_DIR/main_kr.py"
 
-      # 한국 증시 리포트 — 방금 받은 자료(data/*.json)로 그리기만. 코스피 그래프는 아래 kr-images 에 함께 올린다
+      # 한국 증시 리포트 — 방금 받은 자료(data/*.json)로 그리기만. 날짜 붙은 코스피 그래프는 아래 gh-pages 에 남긴다(지난 글이 씀)
       - name: Render KR market report
         continue-on-error: true
         run: python experiments/kr-market-report/main.py --cached
@@ -167,7 +167,7 @@ jobs:
         run: |
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
-          SUB="$(for f in "$KR_DIR"/output/images/radar-*.webp experiments/kr-market-report/output/images/kospi-price-*.webp; do
+          SUB="$(for f in "$KR_DIR"/output/images/radar-*.webp; do
             [ -f "$f" ] || continue
             printf '100644 blob %s\t%s\n' "$(git hash-object -w "$f")" "$(basename "$f")"
           done | git mktree)"
@@ -177,8 +177,22 @@ jobs:
           for f in "$KR_DIR"/output/images/radar-*.webp; do
             curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@kr-images/images/$(basename "$f")" || true
           done
-          curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@kr-images/images/kospi-price-$(date -u +%F).webp" || true
-          echo "한국 종목 · 코스피 그래프 $(git ls-tree "$SUB" | wc -l)장 → kr-images"
+          echo "한국 종목 그래프 $(git ls-tree "$SUB" | wc -l)장 → kr-images"
+
+      # 날짜 붙은 코스피 그래프 — 미국 S&P 500 그래프처럼 gh-pages 에 남긴다(keep_files). 휘발성 kr-images 에 두면 지난 날짜 글 그래프가 다음 날 깨진다 (2026-11-12)
+      - name: Prepare KOSPI chart for gh-pages
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          mkdir -p deploy-kr/images
+          cp experiments/kr-market-report/output/images/kospi-price-*.webp deploy-kr/images/ 2>/dev/null || echo "코스피 그래프 없음"
+      - name: Deploy KOSPI chart to gh-pages
+        if: steps.gate.outputs.go == 'true' && hashFiles('deploy-kr/images/*.webp') != ''
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-kr
+          publish_branch: gh-pages
+          keep_files: true
 
       - name: Publish pages (한국 시총 TOP 10 · 종목 35)
         if: steps.gate.outputs.go == 'true'

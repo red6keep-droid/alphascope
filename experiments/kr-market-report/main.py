@@ -33,7 +33,7 @@ _spec.loader.exec_module(C)
 _spec = importlib.util.spec_from_file_location("chart_spx", os.path.join(_HERE, "..", "daily-report", "chart_spx.py"))
 CS = importlib.util.module_from_spec(_spec)   # 데일리 S&P 500 그래프 — 같은 모양으로 코스피 (2026-10-26 사용자: "미국 증시처럼 코스피 주가 그래프, 요약글 아래")
 _spec.loader.exec_module(CS)
-IMAGE_BRANCH = RK.IMAGE_BRANCH   # 한국 종목 그래프와 같은 휘발성 브랜치 (kr-images)
+IMAGE_BRANCH = "gh-pages"   # 날짜 붙은 코스피 그래프는 지난 글이 계속 쓰므로 미국 S&P 500 그래프처럼 gh-pages 에 남긴다 (2026-11-12: 휘발성 kr-images 에 두어 지난 글 그래프가 다음 날 깨지던 것). 30일 지나면 image_prune.py 가 칸과 함께 정리
 
 OUT = os.path.join(_HERE, "output")
 DAILY_URL = f"{U.BLOG}/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91"   # 미국 증시 리포트 라벨(데일리 브리핑) 목록
