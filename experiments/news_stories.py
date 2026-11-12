@@ -101,11 +101,11 @@ def _ai_group(items, label, known=None):
 
         def valid(r):
             rows = (r or {}).get("items") if isinstance(r, dict) else None
-            if not isinstance(rows, list):
-                return "items 아님"
+            if not isinstance(rows, list):   # 탈락은 예외로 — 돌려준 값은 llm_chain 이 답으로 쓴다 (news_summary 와 같은 결함, 2026-11-12)
+                raise ValueError("items 아님")
             got = {str(x.get("id")) for x in rows if isinstance(x, dict)}
             if got != want:
-                return f"항목 불일치 {len(got & want)}/{len(want)}"
+                raise ValueError(f"항목 불일치 {len(got & want)}/{len(want)}")
             return None
 
         try:

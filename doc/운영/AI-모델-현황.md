@@ -78,7 +78,7 @@ NVIDIA(DeepSeek)는 10-26부터 다시 예비로 들어간다 — 1순위에는 
 | 인물 발언 레이더 (`people-radar.yml`) | 1 (10-26부터, 이전엔 2) | 인용 추출 / 분류 / 카드 요약 | backup-first / oss-first / oss-first | Qwen / gpt-oss / gpt-oss |
 | Media Daily (`media-daily.yml`) | 1 | 머리 한 줄 + 묶음마다 한 문장 | json-backup-first | Qwen |
 | 댓글 답글 (`comment-reply.yml`) | 하루 여러 번 (댓글 있을 때만 호출) | 답글 | comment | gpt-oss |
-| 한국 주식 (`kr-stocks.yml`) | 1 (평일) | **AI 안 씀** (파이썬 계산만) | — | — |
+| 한국 주식 (`kr-stocks.yml`) | 1 ~ 2 (평일) | 종목 페이지는 **AI 안 씀**. 한국 증시 리포트 뉴스 탭의 같은 뉴스 묶기(news_stories)만 — 실행당 1 ~ 2회, 하루 약 4회 (2026-11-12 키 연결, 그 전엔 키가 없어 규칙 묶음) | news-alt | Gemini lite (16:10 KST 는 Groq 하루 토큰이 이미 바닥) |
 | 데일리 커버 | 1 | 이미지 | (llm_chain 밖) | Pollinations |
 
 2026-11-10: 뉴스 처리 세 줄(데일리 뉴스 · 홈 뉴스 · 종목 레이더 뉴스)의 1순위는 **Gemini lite** 로 바뀜(2절 `news`).
