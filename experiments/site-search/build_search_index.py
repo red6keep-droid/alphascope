@@ -92,8 +92,11 @@ def eps_block(x):
     e, a = x.get("eps") or {}, x.get("analysts") or {}
     rc = a.get("rating_counts") or {}
     out = {}
+    # 수집(expect._eps)은 다음 회계연도(+1y) 예상이다 — 결산월(fy_end)을 같이 넣어 화면이 `2027년 12월 결산`으로 쓴다.
+    # 2026-11-12 사용자: 검색 창이 이것을 `올해 예상 EPS`로 보여 PER 까지 틀렸다(삼성전자 2.7배). 키 이름도 eps → ef 로 바꿔
+    # 옛 테마(올해 라벨)가 새 색인을 받으면 EPS · PER 줄을 아예 안 그린다 — 틀린 라벨이 다시 나올 길을 막는다
     if e.get("current"):
-        out["eps"] = [round(e["current"], 2), round(e.get("30daysAgo") or 0, 2) or None]
+        out["ef"] = [round(e["current"], 2), round(e.get("30daysAgo") or 0, 2) or None, e.get("fy_end")]
     if a.get("pt_mean"):
         out["pt"] = [round(a["pt_mean"], 2), round(a.get("pt_low") or 0, 2), round(a.get("pt_high") or 0, 2), sum(rc.values()) or None]
     return out
