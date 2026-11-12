@@ -45,15 +45,29 @@ def _bars(symbols):
             continue
         out[s] = [{"day": i.strftime("%Y-%m-%d"), "open": float(r["Open"]) if r["Open"] == r["Open"] else None, "high": float(r["High"]), "low": float(r["Low"]), "close": float(r["Close"]),
                    "adj": float(r["Adj Close"]), "volume": float(r["Volume"] or 0)} for i, r in sub.iterrows()]
+    # 늦은 봉도 예비로 (2026-11-12 사용자 "예비는 왜 안 도나") — 야후는 막을 때 빈 표만이 아니라 마지막 날이 빠진 표도 준다.
+    # 다수결 마지막 날보다 늦은 종목은 예비 사슬에서 빠진 날만 받아 붙인다 (조정 종가 adj 는 예비에 없어 종가로)
+    from collections import Counter
+    days = Counter(v[-1]["day"] for v in out.values() if v)
+    if days:
+        top = days.most_common(1)[0][0]
+        late = [s for s, v in out.items() if v and v[-1]["day"] < top and "." not in s and not s.startswith("^")][:15]   # 미국 종목 · ETF 만, 많아야 15개(Polygon 무료 분당 5회 — 실행이 3분 넘게 늘지 않게)
+        for s in late:
+            v = out[s]
+            fb = [b for b in price_source.daily_bars(s, v[-1]["day"]) if b["day"] > v[-1]["day"]]
+            if fb:
+                v += [{"day": b["day"], "open": b["open"], "high": b["high"], "low": b["low"], "close": b["close"], "adj": b["close"], "volume": float(b["volume"] or 0)} for b in fb]
+                print(f"[collect] {s}: 늦은 봉 {len(fb)}일 예비로 채움")
     return out
 
 
 def _cap(s):
     try:
-        return s, float(yf.Ticker(s).fast_info.market_cap or 0) or None
+        v = float(yf.Ticker(s).fast_info.market_cap or 0) or None
     except Exception as e:   # noqa: BLE001
         print(f"[collect] {s} 시총 실패: {e}")
-        return s, None
+        v = None
+    return s, v or price_source.market_cap(s)   # 비면 Finnhub (2026-11-12)
 
 
 def _earnings(s):
@@ -62,9 +76,9 @@ def _earnings(s):
         ed = yf.Ticker(s).get_earnings_dates(limit=16)
     except Exception as e:   # noqa: BLE001
         print(f"[collect] {s} 실적일 실패: {e}")
-        return s, []
+        ed = None
     if ed is None or ed.empty:
-        return s, []
+        return s, price_source.earnings_dates(s)   # 비면 Finnhub 실적 달력 (2026-11-12)
     out = []
     for ts in ed.index:
         t = pd.Timestamp(ts)
