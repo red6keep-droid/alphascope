@@ -210,9 +210,9 @@ ICON_BTN = ("display:inline-flex;align-items:center;justify-content:center;box-s
             "border:1px solid #E2E8F0;border-radius:8px;color:#111;cursor:pointer;")   # 머리 줄 뒤로 가기 버튼(.pr-back)과 같은 꼴 — 36 · 테두리 #E2E8F0 · 모서리 8 · 그림 20 (2026-11-12 사용자)
 
 
-def icon_btn(glyph, label):
-    return (f'<a data-mock="1" role="button" aria-label="{label}" title="{label}" style="{ICON_BTN}">'
-            f'<svg viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{glyph}</svg></a>')
+def icon_btn(glyph, label, attrs=""):
+    return (f'<a data-mock="1"{attrs} role="button" aria-label="{label}" title="{label}" style="{ICON_BTN}">'
+            f'<svg viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{glyph}</svg></a>')   # 선 1.2 × 20/16 = 보이는 1.5px (2026-11-12 사용자)
 
 
 # 아래 고정 입력 칸 — 폰 · 태블릿(900 이하)은 테마 하단 고정 메뉴(71 + 안전 영역) 바로 위, PC 는 화면 맨 아래. 글 폭(--shell 980) 안에 맞춤
@@ -224,7 +224,7 @@ SHEET_CSS = ("<style>.ms-sheet{position:fixed;left:0;right:0;bottom:0;z-index:43
              ".ms-sheet .acc-chev{transform:rotate(180deg);}"   # 위로 열리는 칸이라 닫힘 = 위 화살표, 열림 = 아래 화살표
              ".ms-sheet summary::-webkit-details-marker{display:none;}"
              ".ms-sheet details[open] .acc-chev{transform:none;}"
-             ".ms-pad{height:72px;}"
+             ".ms-pad{height:72px;}[data-ms-panel][hidden]{display:none !important;}"   # 고치기 · 빼기 칸은 누를 때만
              "@media (max-width:900px){.ms-sheet{bottom:calc(71px + env(safe-area-inset-bottom));}}</style>")
 
 
@@ -234,9 +234,34 @@ def add_form(held):
     ② `보유 종목 입력` = 화면 아래 고정 칸, 눌러 열고 닫음(기본 닫힘). 입력 줄(종목 | 수량 | 평균 매수가) 세 줄 ·
        버튼 두 칸 `+ 줄 추가` · `보유 종목 저장`(흰 테두리 버튼) — 10개를 넣어도 저장은 한 번(Firestore 쓰기 1회, 기획 3-2)"""
     sub = lambda s, q, a: esc(f"{q:,}주 · 평균 ") + (esc(money(a, s["m"])) if s["m"] == "us" else won_html(a, 14))
+    # 연필 = 그 줄 바로 아래에 고치기 칸이 열린다: 수량 · 평균 매수가(지금 값이 들어 있음) + `취소` · `저장`. 종목 이름은 못 바꾼다(다른 종목이면 빼고 새로 넣기)
+    # 휴지통 = 그 줄 안에서 `빼기` 확인(`취소` · `빼기`) — 한 번 더 눌러야 지워진다 (2026-11-12 사용자: 연필을 누르면 어떻게 되나)
+    einp = ("display:block;width:100%;box-sizing:border-box;height:52px;padding:0 12px;border:1px solid #CBD5E1;border-radius:8px;"
+            "font-size:18px;line-height:26px;color:#111;background:#fff;min-width:0;")
+    elab = f"display:block;margin:0 0 4px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};"
+
+    def edit_panel(i, s, q, a):
+        price = f"{a:,.2f}" if s["m"] == "us" else f"{a:,.0f}"
+        return (f'<span data-ms-panel="edit-{i}" hidden style="display:block;padding:0 12px 16px;">'
+                f'<span style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">'
+                f'<span><span style="{elab}">수량 (주)</span><input style="{einp}" inputmode="numeric" value="{q:,}"></span>'
+                f'<span><span style="{elab}">평균 매수가 ({"$" if s["m"] == "us" else "원"})</span><input style="{einp}" inputmode="decimal" value="{price}"></span></span>'
+                f'<span style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 0;">'
+                f'<a data-mock="1" data-ms-close="1" style="{WHITE_BTN}">취소</a><a data-mock="1" data-ms-close="1" style="{WHITE_BTN}">저장</a></span></span>')
+
+    def del_panel(i, s):
+        return (f'<span data-ms-panel="del-{i}" hidden style="display:block;padding:0 12px 16px;">'
+                f'<span style="display:block;font-size:15px;line-height:22px;color:#333;margin:0 0 8px;">{esc(s["n"])}을(를) 보유 종목에서 뺄까요?</span>'
+                f'<span style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">'
+                f'<a data-mock="1" data-ms-close="1" style="{WHITE_BTN}">취소</a><a data-mock="1" data-ms-close="1" style="{WHITE_BTN}color:#B91C1C;">빼기</a></span></span>')
+
+    def row_btns(i):
+        return icon_btn(EDIT_GLYPH, "고치기", f' data-ms-open="edit-{i}"') + icon_btn(TRASH_GLYPH, "빼기", f' data-ms-open="del-{i}"')
+
     rows = "".join(
-        f'<span style="{dk.MULTI_ROW}{"" if i == 0 else dk.MULTI_SEP}">{stock_left(s, sub(s, q, a))}'
-        f'<span style="flex:none;display:flex;gap:6px;">{icon_btn(EDIT_GLYPH, "고치기")}{icon_btn(TRASH_GLYPH, "빼기")}</span></span>'
+        f'<span style="display:block;{"" if i == 0 else dk.MULTI_SEP}"><span style="{dk.MULTI_ROW}">{stock_left(s, sub(s, q, a))}'
+        f'<span style="flex:none;display:flex;gap:6px;">{row_btns(i)}</span></span>'
+        f'{edit_panel(i, s, q, a)}{del_panel(i, s)}</span>'
         for i, (s, q, a) in enumerate(held))
     held_card = f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{rows}</span></div>'
 
@@ -300,7 +325,10 @@ def head_label(label=NAME):
 
 
 MOCK_JS = ("<script>(function(){function go(){var b=document.querySelector('[data-head-label]');if(b){var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');"
-           "if(l)l.textContent=b.getAttribute('data-head-label');}document.querySelectorAll('[data-mock]').forEach(function(e){e.addEventListener('click',function(ev){ev.preventDefault();});});}"
+           "if(l)l.textContent=b.getAttribute('data-head-label');}document.querySelectorAll('[data-mock]').forEach(function(e){e.addEventListener('click',function(ev){ev.preventDefault();});});"
+           "document.querySelectorAll('[data-ms-open]').forEach(function(btn){btn.addEventListener('click',function(){var k=btn.getAttribute('data-ms-open');"
+           "document.querySelectorAll('[data-ms-panel]').forEach(function(p){p.hidden=p.getAttribute('data-ms-panel')!==k||!p.hidden;});});});"
+           "document.querySelectorAll('[data-ms-close]').forEach(function(b){b.addEventListener('click',function(){var p=b.closest('[data-ms-panel]');if(p)p.hidden=true;});});}"
            "if(document.readyState==='complete')go();else window.addEventListener('load',go);})();</script>")
 
 
