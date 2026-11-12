@@ -1710,6 +1710,43 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   .as-chat { inset: 0; width: auto; height: auto; border-radius: 0; border: 0; }
   .as-chat-fab { right: 16px; bottom: 16px; padding: 11px 15px; }
 }
+/* ==========================================================================
+   하단 고정 메뉴 · 전체 메뉴 · 글 끝 순서 (2026-11-12 사용자 여정 테스트 → 확정. 목업 = experiments/mock_server.py /j · /icons, 가이드라인 2절)
+   ========================================================================== */
+/* 전체 메뉴(서랍) — 미국 · 한국 홈 두 버튼, 메뉴 줄 = 이름(오늘) + 오른쪽 작은 `지난 …`, 테마 묶음만 타이틀 */
+.menu-items .menu-mk { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.menu-items .menu-mk .nav-item { flex-direction: row; align-items: center; justify-content: center; height: 40px; padding: 0 !important; border: 1px solid #E2E8F0 !important; border-radius: 8px; font-size: 15px !important; line-height: 20px !important; font-weight: 400; color: #111; }
+.menu-items .menu-mk .nav-item[aria-current="page"] { border-color: #111 !important; font-weight: 700; color: #111; }
+.menu-items .menu-mk .nav-item::after, .menu-items .menu-mk .nav-item[aria-current="page"]::after { content: '\00a0홈'; display: inline !important; position: static !important; width: auto !important; height: auto !important; background: none !important; border: 0 !important; transform: none !important; }
+.menu-items .menu-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
+.menu-items .menu-row .nav-item { flex: 1 1 auto; min-width: 0; border-bottom: 0 !important; padding: 14px 12px 14px 20px !important; font-size: 16px !important; line-height: 24px !important; font-weight: 600; color: #111; white-space: normal; }
+.menu-items .menu-past { flex: none; display: flex; align-items: center; padding: 0 20px 0 12px; color: #6B7280; font-size: 13px; line-height: 18px; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.menu-items .menu-grp { padding: 6px 0 8px; border-bottom: 1px solid var(--border); }
+.menu-items .menu-grp-t { padding: 12px 20px 4px; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; }
+.menu-items .menu-grp .nav-item { border-bottom: 0 !important; padding: 11px 20px 11px 32px !important; font-size: 15px !important; line-height: 22px !important; font-weight: 400; color: #333; }
+.menu-items .menu-row .nav-item:active, .menu-items .menu-grp .nav-item:active, .menu-items .menu-past:active { background: #F1F5F9; }
+.menu-items .nav-item.is-here { background: #F8FAFC; box-shadow: inset 3px 0 0 #111; font-weight: 700; }   /* 지금 보는 메뉴 — 빨강은 ▲상승과 겹쳐 안 씀 */
+
+/* 하단 고정 메뉴 — 폰 · 태블릿(900 이하)만. 칸 56 + 아래 여백 15, 선택 = 색 #111 + 칸 바탕 #F1F5F9 · 아래 모서리 10. 선 굵기는 화면 px 그대로(non-scaling-stroke) */
+.as-tabbar { display: none; }
+@media (max-width: 900px) {
+  .as-tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 44; display: grid; grid-template-columns: repeat(5, 1fr); box-sizing: border-box;
+    height: calc(71px + env(safe-area-inset-bottom)); padding-bottom: calc(15px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid #E2E8F0; }
+  .as-tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #6B7280; text-decoration: none; font-size: 11px; line-height: 14px; -webkit-tap-highlight-color: transparent; }
+  .as-tabbar a.on { color: #111; background: #F1F5F9; border-radius: 0 0 10px 10px; }
+  .as-tabbar a:active { background: #F1F5F9; }
+  .as-tabbar svg { width: 22px; height: 22px; display: block; }
+  .as-tabbar svg * { vector-effect: non-scaling-stroke; }
+  body { padding-bottom: calc(71px + env(safe-area-inset-bottom)); }
+  .a2hs { bottom: calc(81px + env(safe-area-inset-bottom)); }   /* 홈 화면 추가 안내 = 하단 메뉴 위 10 */
+}
+
+/* 글 끝 — 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터. 검은 `목록` · `홈으로` 버튼은 숨김(주소는 위쪽 뒤로 가기가 읽는다), 버튼 줄 위아래 구분선 없음 */
+.post-shell .post-nav .post-nav-list { display: none !important; }
+.post-shell .post-nav, .post-shell.ends-text .post-nav { border-top: 0 !important; border-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+.post-shell.ends-text:not(.rel-first) .post-nav { margin-top: 40px !important; }
+.post-shell.rel-first > [data-related].is-moved { margin-top: 40px !important; }
+.post-shell.rel-first .post-nav { margin-top: 24px !important; }
 ]]></b:skin>
 
     <b:template-skin><![CDATA[
@@ -1752,11 +1789,22 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 
         <nav class='menu-items' id='primary-menu'>
           <b:comment>메뉴 = 미국 · 한국(data-bar · data-flag → 로고 오른쪽 국기 스위치) · 증시 전망(서랍만) — H35 목업 그대로 (2026-11-10 사용자). 옛 홈 · 미국 증시 리포트 · 시총 TOP 10 메뉴는 뺐다(홈 카드 · 글 아래 함께 보는 페이지로 간다)</b:comment>
-          <a class='nav-item' data-bar='1' data-flag='us' href='/'>
+          <b:comment>전체 메뉴 (2026-11-12 사용자 여정 테스트 확정, 목업 experiments/mock_server.py /j): 맨 위 미국 · 한국 홈(data-bar — 국기 스위치가 읽는다, 글자 `미국` · `한국` 그대로 · ` 홈` 은 CSS),
+            그 아래 메뉴 이름 = 오늘 화면(data-latest = 라벨의 최신 글로, 테마 JS) · 오른쪽 작은 `지난 …` = 목록. 타이틀은 하위 이름만으로 뜻이 안 통하는 테마 묶음에만.</b:comment>
+          <div class='menu-mk'>
+  <a class='nav-item' data-bar='1' data-flag='us' href='/'>
             <b:attr cond='data:view.isHomepage' name='aria-current' value='page'/>미국</a>
-          <a class='nav-item' data-bar='1' data-flag='kr' href='/p/korea.html'>
+  <a class='nav-item' data-bar='1' data-flag='kr' href='/p/korea.html'>
             <b:attr cond='data:view.isPage and data:view.title == &quot;한국 증시 · 종목 주가&quot;' name='aria-current' value='page'/>한국</a>
-          <a class='nav-item' href='/p/forecast-list.html'>증시 전망</a>
+          </div>
+          <div class='menu-row'><a class='nav-item' data-latest='데일리 브리핑' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>미국 증시 리포트</a><a class='menu-past' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>지난 리포트</a></div>
+          <div class='menu-row'><a class='nav-item' data-latest='한국 증시 리포트' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>한국 증시 리포트</a><a class='menu-past' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>지난 리포트</a></div>
+          <div class='menu-row'><a class='nav-item' href='/p/us-market-cap-top10.html'>미국 시가총액 상위 10 종목</a></div>
+          <div class='menu-row'><a class='nav-item' href='/p/kr-market-cap-top10.html'>한국 시가총액 상위 10 종목</a></div>
+          <div class='menu-row'><a class='nav-item' href='/p/forecast-list.html'>증시 전망</a></div>
+          <div class='menu-row'><a class='nav-item' data-latest='인물 발언' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>주요 인물 발언</a><a class='menu-past' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>지난 발언</a></div>
+          <div class='menu-row'><a class='nav-item' data-latest='미디어 데일리' href='/search/label/%EB%AF%B8%EB%94%94%EC%96%B4%20%EB%8D%B0%EC%9D%BC%EB%A6%AC'>방송 브리핑</a><a class='menu-past' href='/search/label/%EB%AF%B8%EB%94%94%EC%96%B4%20%EB%8D%B0%EC%9D%BC%EB%A6%AC'>지난 브리핑</a></div>
+          <div class='menu-grp'><div class='menu-grp-t'>테마</div><a class='nav-item' href='/p/theme-ai-capex.html'>AI 투자 자금 방향</a><a class='nav-item' href='/p/theme-fed-rate-cut-expectations.html'>연준 금리 인하 기대</a><a class='nav-item' href='/p/theme-insider-trading.html'>임원 기관 매매 동향</a></div>
         </nav>
       </div>
 
@@ -2548,6 +2596,15 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         </b:widget>
       </b:section>
     </footer>
+
+    <!-- 하단 고정 메뉴 (2026-11-12 사용자 여정 테스트 확정) — 주소 · 지금 칸은 테마 JS 가 채운다(나라 = 지금 페이지 · 고른 홈) -->
+    <nav aria-label='주요 페이지' class='as-tabbar'>
+      <a data-tab='home' href='/'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 11l8-7 8 7'/><path d='M6 10v10h12V10'/></svg><span>홈</span></a>
+      <a data-tab='report' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 19h16'/><path d='M6 16l4-5 3 3 5-7'/></svg><span>증시 리포트</span></a>
+      <a data-tab='stock' href='/p/us-market-cap-top10.html'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 20h16'/><path d='M7.5 16v-5M12 16V6M16.5 16v-8'/></svg><span>종목</span></a>
+      <a data-tab='forecast' href='/p/forecast-list.html'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='1.8'><path d='M12 3v18M7.5 21h9'/><path d='M4 7h16'/><path d='M6 7l-3 7h6zM18 7l-3 7h6z'/></svg><span>증시 전망</span></a>
+      <a data-tab='people' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2'><rect height='11' rx='3' width='6' x='9' y='3'/><path d='M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7'/></svg><span>인물 발언</span></a>
+    </nav>
 
     <!-- =================================================================
          보관용 위젯 — 화면에는 나오지 않지만 레이아웃 모드에서 관리 가능
@@ -4322,6 +4379,15 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           /* 최대 3줄 (2026-11-10 사용자) — 이미 게시된 글의 4줄 이상도 앞 3줄만. 렌더러(dk.related_buttons)도 3개로 자른다 */
           [].slice.call(r.querySelectorAll('a[data-row-link]')).slice(3).forEach(function (x) { x.parentNode.removeChild(x); });
         });
+        /* 글 끝 순서 = 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터 (2026-11-12 사용자 여정 테스트) — 버튼 줄 · 댓글 칸을 마지막 함께 보는 페이지 뒤로 */
+        var rels = [].slice.call(shell.querySelectorAll('.post-shell > [data-related].is-moved'));
+        if (rels.length) {
+          var last = rels[rels.length - 1], cm = shell.querySelector('.post-shell > .comments');
+          rels[0].parentNode.insertBefore(rels[0], nav);
+          rels.slice(1).forEach(function (r) { last.parentNode.insertBefore(r, nav); });
+          shell.classList.add('rel-first');
+          if (cm) nav.parentNode.insertBefore(cm, nav.nextSibling);
+        }
       })();
 
       /* ============================================================ 목록 버튼 위 구분선 (2026-10-12 사용자: "콘텐츠 영역에서 하단이 텍스트로 끝날 때만 구분선, 목록 버튼과 콘텐츠 사이 40픽셀")
@@ -5535,6 +5601,57 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         });
       })();
 
+
+      /* ============================================================ 하단 고정 메뉴 · 오늘 리포트 링크 (2026-11-12 사용자 여정 테스트 확정, 목업 experiments/mock_server.py /j)
+         나라 = 지금 페이지(한국 홈 · 한국 종목 · 한국 시총 목록 · 한국 증시 리포트 = 한국, 미국 쪽 = 미국), 그 밖엔 고른 홈(as-home-mkt). 홈 · 증시 리포트 · 종목 칸이 나라를 따라간다.
+         [data-latest] 링크(하단 증시 리포트 · 인물 발언, 서랍 오늘 리포트)는 누를 때만 그 라벨의 최신 글을 블로그 피드에서 찾아 간다 — 못 찾으면 목록 주소 그대로.
+         방문자 수와 무관: 피드는 누를 때 한 번뿐이다(페이지를 열 때는 부르지 않는다) */
+      (function () {
+        'use strict';
+        var path = location.pathname, dec = function (x) { try { return decodeURIComponent(x); } catch (e) { return x; } };
+        var nl = document.querySelector('.post-nav-list'), lab = '';
+        if (nl) lab = dec(((nl.getAttribute('href') || '').split('/search/label/')[1] || '').split('?')[0]);
+        if (!lab && path.indexOf('/search/label/') === 0) lab = dec(path.slice(14));
+        var LBL = {us: '데일리 브리핑', kr: '한국 증시 리포트'}, PEOPLE = '인물 발언';
+        var pref = ''; try { pref = localStorage.getItem('as-home-mkt') || ''; } catch (e) {}
+        var isKr = path === '/p/korea.html' || /-\d{6}-stock\.html$/.test(path) || path === '/p/kr-market-cap-top10.html' || lab === LBL.kr;
+        var isUs = path === '/' || (/-stock\.html$/.test(path) && !isKr) || path === '/p/us-market-cap-top10.html' || lab === LBL.us;
+        var mk = isKr ? 'kr' : isUs ? 'us' : (pref === 'kr' ? 'kr' : 'us');
+        var href = {home: mk === 'kr' ? '/p/korea.html' : '/', report: '/search/label/' + encodeURIComponent(LBL[mk]),
+                    stock: '/p/' + mk + '-market-cap-top10.html', forecast: '/p/forecast-list.html', people: '/search/label/' + encodeURIComponent(PEOPLE)};
+        var cur = (path === '/' || path === '/p/korea.html') ? 'home' : (lab === LBL.us || lab === LBL.kr) ? 'report'
+                : (/-stock\.html$/.test(path) || /market-cap-top10\.html$/.test(path)) ? 'stock' : /^\/p\/forecast-/.test(path) ? 'forecast' : lab === PEOPLE ? 'people' : '';
+        var bar = document.querySelector('.as-tabbar');
+        if (bar) [].forEach.call(bar.querySelectorAll('a[data-tab]'), function (a) {
+          var k = a.getAttribute('data-tab');
+          a.setAttribute('href', href[k]);
+          if (k === 'report') a.setAttribute('data-latest', LBL[mk]);
+          if (k === 'people') a.setAttribute('data-latest', PEOPLE);
+          if (k === cur) { a.classList.add('on'); a.setAttribute('aria-current', 'page'); }
+        });
+        /* 서랍 — 지금 보는 메뉴 표시 */
+        var here = cur === 'report' ? lab : cur === 'people' ? PEOPLE : '';
+        [].forEach.call(document.querySelectorAll('.menu-items .menu-row .nav-item, .menu-items .menu-grp .nav-item'), function (a) {
+          var h = a.getAttribute('href') || '';
+          if ((here && a.getAttribute('data-latest') === here) || (!a.hasAttribute('data-latest') && h === path)) a.classList.add('is-here');
+        });
+        document.addEventListener('click', function (e) {
+          var a = e.target.closest && e.target.closest('a[data-latest]');
+          if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          e.preventDefault(); e.stopPropagation();
+          var fallback = a.href, done = false;
+          function go(u) { if (done) return; done = true; location.href = u || fallback; }
+          setTimeout(function () { go(fallback); }, 2500);
+          fetch('/feeds/posts/summary/-/' + encodeURIComponent(a.getAttribute('data-latest')) + '?alt=json&max-results=1')
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
+              var en = j && j.feed && j.feed.entry && j.feed.entry[0];
+              var l = en && (en.link || []).filter(function (x) { return x.rel === 'alternate'; })[0];
+              go(l && l.href);
+            })
+            .catch(function () { go(fallback); });
+        }, true);
+      })();
       //]]>
     </script>
     <script>
