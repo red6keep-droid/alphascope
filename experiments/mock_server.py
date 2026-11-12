@@ -141,6 +141,12 @@ def row(d, f, t, show_dir=False, stars=(), restore=False):
 JOURNEY_START = "/j/home-split/output/mock_home_kr.html"
 
 
+ARCHIVED_LINKS = [   # 파일 목업이 아닌 화면 — 쓰지 않는 목업 쪽에 둔다 (2026-11-12 사용자: 여정 테스트 · 아이콘 비교). 되돌리려면 index_page 첫 화면으로 옮긴다
+    f'<a class="big" href="{JOURNEY_START}">사용자 여정 테스트 <span>홈에서 시작 · 상단 · 하단 메뉴로 이동 ›</span></a>',
+    '<a class="big" href="/icons">하단 메뉴 아이콘 비교 <span>스타일 8가지 ›</span></a>',
+]
+
+
 def index_page(archive=False):
     items = mockups()
     with _lock:
@@ -156,13 +162,12 @@ def index_page(archive=False):
     parts = []
     if archive:
         parts.append('<a class="big" href="/">← 목업 목록으로</a>')
+        parts += ARCHIVED_LINKS   # 사용자 여정 테스트 · 아이콘 비교 — 쓰지 않는 목업으로 (2026-11-12 사용자)
         for d in sorted(groups, key=lambda k: -groups[k][0][2]):
             parts += [f'<section><h2>{html.escape(LABELS.get(d, d))}</h2>', *(row(*x, restore=True) for x in groups[d]), "</section>"]
-        if not items:
+        if not items and not ARCHIVED_LINKS:
             parts.append('<div class="meta">쓰지 않는 목업이 없습니다</div>')
     else:
-        parts.append(f'<a class="big dark" href="{JOURNEY_START}">사용자 여정 테스트 <span>홈에서 시작 · 상단 · 하단 메뉴로 이동 ›</span></a>')
-        parts.append('<a class="big" href="/icons">하단 메뉴 아이콘 비교 <span>스타일 8가지 ›</span></a>')
         fav = [by_key[k] for k in stars if k in by_key]   # 누른 순서대로
         if fav:
             parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars) for x in fav), "</section>"]
@@ -171,8 +176,8 @@ def index_page(archive=False):
             parts.append(f'<details><summary>{html.escape(LABELS.get(d, d))} <span class="n">{len(groups[d])}</span></summary>')
             parts += [row(*x, stars=stars) for x in groups[d]]
             parts.append("</details>")
-        if old:
-            parts.append(f'<a class="big" href="/archive">쓰지 않는 목업 <span>{len(old)}개 ›</span></a>')
+        if old or ARCHIVED_LINKS:
+            parts.append(f'<a class="big" href="/archive">쓰지 않는 목업 <span>{len(old) + len(ARCHIVED_LINKS)}개 ›</span></a>')
     now = datetime.now().strftime("%m-%d %H:%M:%S")
     return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>목업 목록</title>
