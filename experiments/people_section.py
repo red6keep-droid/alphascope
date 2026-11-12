@@ -138,7 +138,7 @@ PILL_STACK_GAP = dk.PILL_PAIR_GAP   # 위아래로 쌓은 상승 · 하락 라�
 
 def _dir_val(d):
     """근거 줄 값 = 라벨 `▲ 긍정 4` `▼ 부정 2` (라벨끼리 2px, dk.PILL_PAIR_GAP). 둘 다 없으면 `— 중립`."""
-    parts = [_box(kind, f"{k} {d[key]}건") for key, k, kind in (("positive", "상승 의견", "up"), ("negative", "하락 의견", "down")) if d.get(key)]   # `상승 의견 2건` · `하락 의견 1건` (2026-11-12 사용자 P535, 옛 P530 `상승 2건` · 그 전 `상승 쪽 2`) — 옛 `긍정` · `부정` 은 `AI 거품 · 부정` 이 "거품이 아니다"로 읽혀 (2026-11-11 사용자)
+    parts = [_box(kind, f"{k} {d[key]}건") for key, k, kind in (("positive", "상승", "up"), ("negative", "하락", "down")) if d.get(key)]   # `상승 1건` · `하락 5건` — 1건도 보인다 (2026-11-12 사용자 P536: P535 `상승 의견 n건` 되돌림 · 그 전 `상승 쪽 2`) — 옛 `긍정` · `부정` 은 `AI 거품 · 부정` 이 "거품이 아니다"로 읽혀 (2026-11-11 사용자)
     if not parts:
         parts = [_box("flat", "중립")]
     if len(parts) == 2:   # 상승 · 하락 둘 다 = 위아래로 (2026-11-12 사용자 P533), 오른쪽 끝 맞춤
