@@ -58,9 +58,18 @@ def targets(only=None):
     """(키, 한글 제목, 영문 제목, 주소, 본문 파일)"""
     rows = [("list", U.LIST_TITLE, U.LIST_SLUG_TITLE, U.LIST_URL)]
     rows += [(s, U.page_title(s), U.slug_title(s), U.page_url(s)) for s, *_ in U.CANDIDATES if s not in U.REPORT_TYPE]
+    import data_guard   # 빈 값 막기 (2026-11-12) — 일봉이 비거나 늦은 종목은 어제 페이지 그대로, 너무 많으면 이번 실행 갱신 전부 멈춤
+    g = data_guard.load_report(os.path.join(BASE, "data"))
+    if g.get("block"):
+        print(f"[pages] 빈 값 막기 — 일봉 {len(g.get('skip') or [])}종목 비거나 늦음, 이번 실행은 페이지를 고쳐 쓰지 않음")
+        return []
+    skip = set(g.get("skip") or [])
     out = []
     for key, title, slug, url in rows:
         if only and key not in only:
+            continue
+        if key in skip:
+            print(f"[pages] {key}: 일봉 비거나 늦음 — 어제 페이지 그대로")
             continue
         path = os.path.join(OUT, f"{key}.html")
         if os.path.exists(path):

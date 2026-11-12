@@ -36,6 +36,14 @@ if __name__ == "__main__":
     cached = "--cached" in sys.argv
     snap = collect.load() if cached else collect.run()
     extra = (collect_extra.load() if cached else collect_extra.run(snap)) or {}
+    if not cached:   # 빈 값 막기 — 야후가 오류 없이 빈 값을 줄 때 (2026-11-12 사용자). 실패해도 페이지는 만든다
+        try:
+            import data_guard
+            import universe as U
+            data_guard.guard_run(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"), "미국 종목", [c[0] for c in U.CANDIDATES],
+                                 snap, extra, snap_path=collect.SNAP, extra_path=collect_extra.EXTRA)
+        except Exception as e:  # noqa: BLE001
+            print(f"::warning::[radar] 빈 값 검사 실패 (예전처럼 계속): {e!r}")
     news = collect_news.load() if cached else collect_news.run()
     a = analyze.run(snap)
     import industry_us   # 업계 카드 — FRED (2026-11-01 사용자 P268, 실패해도 페이지는 만든다)

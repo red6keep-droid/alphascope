@@ -34,12 +34,19 @@ if __name__ == "__main__":
     if snap is None:
         print("[kr] 시세 없음 — 이 실행은 자료 지연 (페이지를 만들지 않는다)")
         sys.exit(0)
-    a = analyze_kr.run(snap, flows, hist)
     try:   # 실적과 기대 · 캘린더 재료 — 실패해도 페이지는 만든다 (그 탭은 `판단 유보`)
         extra = collect_kr_extra.load() if cached else collect_kr_extra.run()
     except Exception as e:  # noqa: BLE001
         print(f"[kr] 탭 재료 실패: {str(e)[:120]}")
         extra = {}
+    if not cached:   # 빈 값 막기 — 미국과 같은 틀 (2026-11-12 사용자). 시총 · 일봉은 analyze 전에 메워야 하지만 일봉은 메우지 않고 건너뛰기만이라 여기서 함께
+        try:
+            import data_guard
+            data_guard.guard_run(collect_kr.DATA, "한국 종목", [c[0] for c in collect_kr.U.CANDIDATES], snap, extra, nested=("analysts", "eps"),
+                                 snap_path=collect_kr.SNAP, extra_path=collect_kr_extra.EXTRA)
+        except Exception as e:  # noqa: BLE001
+            print(f"::warning::[kr] 빈 값 검사 실패 (예전처럼 계속): {e!r}")
+    a = analyze_kr.run(snap, flows, hist)   # 빈 값을 메운 뒤에 (시총)
     if not cached:   # 실적 발표일 = DART 잠정실적 공시 (2026-10-31) — 실패하면 지난 캐시
         try:
             import collect_kr_earn_dart
