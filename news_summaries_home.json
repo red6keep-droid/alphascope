@@ -1481,28 +1481,17 @@
   "lines": [],
   "tags": [],
   "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-12T20:27:33.357421+00:00",
-  "n_src": 361
+  "at": "2026-11-12T21:46:31.742546+00:00",
+  "n_src": 361,
+  "retry": true
  },
  "564a7b5e35d6": {
-  "lines": [
-   "엔비디아의 내부 조사를 위한 로펌 왁텔 립튼 선임"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-12T20:27:35.006798+00:00",
-  "n_src": 900
+  "lines": [],
+  "tags": [],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-12T21:46:31.742546+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "177664ea8788": {
   "lines": [
@@ -1765,6 +1754,191 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-12T20:27:44.172213+00:00",
+  "n_src": 900
+ },
+ "d29d43d990e2": {
+  "lines": [
+   "목요일 마이크로소프트 접속 장애 발생",
+   "아마존 웹 서비스와 구글 이용자들의 장애 신고 접수"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "MSFT"
+    ],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T21:46:28.090419+00:00",
+  "n_src": 900
+ },
+ "642026de4eb8": {
+  "lines": [
+   "세레브라스 마이크로소프트와의 신규 계약 발표",
+   "세레브라스 분기 매출 및 가이드라인 시장 예상치 상회",
+   "시간외 거래에서 세레브라스 주가 18% 급등",
+   "전년 대비 70% 증가한 세레브라스 핵심 매출"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T21:46:28.090419+00:00",
+  "n_src": 900
+ },
+ "99fc1b1648d4": {
+  "lines": [
+   "시스코 회계연도 1분기 실적 예상치 상회",
+   "148억 8000만 달러에서 24% 증가한 시스코 매출",
+   "시스코 순이익 46억 달러 기록",
+   "올해 약 35% 상승한 시스코 주가"
+  ],
+  "tags": [
+   null,
+   null,
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T21:46:28.090419+00:00",
+  "n_src": 900
+ },
+ "87cb0c408a9c": {
+  "lines": [
+   "이란과의 합의 불필요성 언급"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T21:46:29.529933+00:00",
+  "n_src": 900
+ },
+ "dfc7b8fa0167": {
+  "lines": [
+   "5000억 달러 규모 인공지능 구축 계획 발표"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "AI_CAPEX",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T21:46:29.529933+00:00",
+  "n_src": 900
+ },
+ "901ffc9648f5": {
+  "lines": [
+   "유나이티드항공의 디지털 플랫폼 인공지능 봇 접근 제한"
+  ],
+  "tags": [
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T21:46:29.529933+00:00",
+  "n_src": 900
+ },
+ "b1db15f3f44a": {
+  "lines": [
+   "엔비디아 젠슨 황 CEO 사임 발표",
+   "엔비디아 주가 5% 이상 하락",
+   "엔비디아 시가총액 약 약 4조 달러 기록"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-12T21:46:31.742546+00:00",
   "n_src": 900
  }
 }

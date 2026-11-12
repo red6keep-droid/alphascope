@@ -1,11 +1,64 @@
 {
-  "updated_at": "2026-11-12 20:27:44 UTC",
+  "updated_at": "2026-11-12 21:46:31 UTC",
   "items": [
+    {
+      "title": "Microsoft outage hits Outlook. AWS and Google users also report issues",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/microsoft-outage-outlook-aws-google.html",
+      "published": "2026-11-12 21:43:11",
+      "title_ko": "마이크로소프트 아웃룩 접속 장애 발생, AWS와 구글 사용자도 문제 보고",
+      "summary_ko": "아마존 웹 서비스와 구글 사용자들도 목요일에 서비스 중단을 보고",
+      "lines": [
+        "목요일 마이크로소프트 접속 장애 발생",
+        "아마존 웹 서비스와 구글 이용자들의 장애 신고 접수"
+      ]
+    },
+    {
+      "title": "Cerebras surges 18% after beating on quarterly revenue and announcing Microsoft deal",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/cerebras-systems-cbrs-q3-earnings-report-2026.html",
+      "published": "2026-11-12 21:33:44",
+      "title_ko": "세레브라스, 분기 매출 호조 및 마이크로소프트와의 계약 발표로 18% 급등",
+      "summary_ko": "세레브라스는 주요 클라우드 제공업체인 아마존 및 오라클과 파트너십을 맺은 후 마이크로소프트와 새로운 계약 체결",
+      "lines": [
+        "세레브라스 마이크로소프트와의 신규 계약 발표",
+        "세레브라스 분기 매출 및 가이드라인 시장 예상치 상회",
+        "시간외 거래에서 세레브라스 주가 18% 급등",
+        "전년 대비 70% 증가한 세레브라스 핵심 매출"
+      ]
+    },
+    {
+      "title": "Cisco beats on earnings, says AI infrastructure revenue will double this fiscal year",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/cisco-csco-q1-2027-earnings.html",
+      "published": "2026-11-12 21:20:35",
+      "title_ko": "시스코, 실적 호조 및 이번 회계연도 AI 인프라 매출 두 배 증가 전망",
+      "summary_ko": "시스코는 초기 붐을 놓친 후 AI 분야의 주요 플레이어가 되기 위해 노력 중",
+      "lines": [
+        "시스코 회계연도 1분기 실적 예상치 상회",
+        "148억 8000만 달러에서 24% 증가한 시스코 매출",
+        "시스코 순이익 46억 달러 기록",
+        "올해 약 35% 상승한 시스코 주가"
+      ]
+    },
+    {
+      "title": "Nvidia stock closes down over 4% after CEO Jensen Huang announces resignation",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/nvidia-nvda-jensen-huang-second-affair.html",
+      "published": "2026-11-12 21:17:21",
+      "title_ko": "엔비디아 젠슨 황 CEO 사임 발표 이후 오전 하락세 축소",
+      "summary_ko": "콜레트 크레스 최고재무책임자가 신임 리더 선임 때까지 임시 CEO 역할 수행",
+      "lines": [
+        "최고재무책임자 콜레트 크레스의 임시 CEO 임명",
+        "시가총액 4조 달러 선을 유지 중인 엔비디아 주가",
+        "시놉시스 전 CEO 하비 C. 존스의 이사회 초대 의장 선임"
+      ]
+    },
     {
       "title": "Alice Huang tied to Nvidia’s biggest Chinese competitor",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/12/alice-huang-jensen-huang-nvidia-huawei.html",
-      "published": "2026-11-12 20:10:49",
+      "published": "2026-11-12 20:34:54",
       "title_ko": "앨리스 황, 엔비디아 경쟁사와 연관",
       "summary_ko": "앨리스 황, 화웨이에 컴퓨팅 파워 제공 기업 지분 보유",
       "lines": [
@@ -28,90 +81,16 @@
       ]
     },
     {
-      "title": "‘A dark day for Nvidia’: Here’s what analysts have been saying about Jensen Huang’s departure",
+      "title": "Jensen Huang is out and Nvidia stock is down—what market pros say about buying dips",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/jensen-huang-nvidia-affair-ceo.html",
-      "published": "2026-11-12 19:47:57",
-      "title_ko": "엔비디아의 어두운 날: 애널리스트들이 젠슨 황의 퇴진에 대해 한 말",
-      "summary_ko": "황과 직원 간의 불륜 보도가 나온 후 회사의 이사회가 수요일 저녁에 소집됨",
+      "link": "https://www.cnbc.com/make-it/2026/11/12/nvidia-what-market-pros-say-about-buying-dips.html",
+      "published": "2026-11-12 20:01:29",
+      "title_ko": "젠슨 황의 퇴임과 엔비디아 주가 하락, 시장 전문가들의 저가 매수 조언",
+      "summary_ko": "목요일 젠슨 황 CEO의 퇴임 이후 주가 하락 발생",
       "lines": [
-        "젠슨 황 엔비디아 CEO의 사임 발표",
-        "CEO 사임 발표 직후 증권사 6곳의 엔비디아 투자의견 하향"
-      ]
-    },
-    {
-      "title": "Nvidia stock pares morning losses after CEO Jensen Huang announces resignation",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/nvidia-nvda-jensen-huang-second-affair.html",
-      "published": "2026-11-12 19:42:56",
-      "title_ko": "엔비디아 젠슨 황 CEO 사임 발표 이후 오전 하락세 축소",
-      "summary_ko": "콜레트 크레스 최고재무책임자가 신임 리더 선임 때까지 임시 CEO 역할 수행",
-      "lines": [
-        "최고재무책임자 콜레트 크레스의 임시 CEO 임명",
-        "시가총액 4조 달러 선을 유지 중인 엔비디아 주가",
-        "시놉시스 전 CEO 하비 C. 존스의 이사회 초대 의장 선임"
-      ]
-    },
-    {
-      "title": "Here's what Nvidia interim CEO Colette Kress and board chair Harvey Jones wrote to Nvidia employees",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/nvidia-kress-jones-employee-emails.html",
-      "published": "2026-11-12 19:42:41",
-      "title_ko": "엔비디아 임시 CEO 콜레트 크레스와 이사회 의장 하비 존스가 엔비디아 직원들에게 보낸 메시지",
-      "summary_ko": "임시 CEO 콜레트 크레스와 이사회 의장 하비 존스가 엔비디아 직원들에게 이메일을 보냄",
-      "lines": [
-        "엔비디아 임시 최고경영자에 콜레트 크레스 임명",
-        "엔비디아 이사회 의장에 하비 존스 선임"
-      ]
-    },
-    {
-      "title": "Jensen Huang's Nvidia exit casts shadow over Wall Street’s $500 billion AI financing bet",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/nvidia-ceo-exit-ai-financing.html",
-      "published": "2026-11-12 19:33:50",
-      "title_ko": "젠슨 황의 엔비디아 사임, 월스트리트의 5,000억 달러 AI 자금 조달 베팅에 그림자 드리워",
-      "summary_ko": "엔비디아의 리더십 위기가 AI 자금 조달 붐으로 확산될 위험이 제기됨",
-      "lines": [
-        "젠슨 황 엔비디아 최고경영자 사임",
-        "엔비디아 주가 장중 13% 이상 하락",
-        "최고재무책임자 콜레트 크레스 임시 최고경영자 선임"
-      ]
-    },
-    {
-      "title": "In a policy switch, the Fed says its October 2027 meeting will not see a vote on interest rates",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/in-policy-switch-fed-says-its-october-2027-meeting-will-not-see-a-vote-on-interest-rates.html",
-      "published": "2026-11-12 19:05:25",
-      "title_ko": "정책 전환으로 연준은 20년에 2027년 10월 회의에서 금리 표결을 실시하지 않을 것이라고 밝혔다",
-      "summary_ko": "내년에 7차례의 투표 회의가 열리며, 10월 세션은 공식 투표나 성명 없이 정책 숙고를 위한 추가 시간으로 설정됨",
-      "lines": [
-        "미국 연방준비제도 2027년 10월 회의 금리 투표 제외 발표",
-        "2027년 연방공개시장위원회 투표 회의 7회로 변경"
-      ]
-    },
-    {
-      "title": "Oil prices rise after Trump says no Iran deal needed: 'We've got their Strait'",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/oil-prices-jump-after-trump-says-no-iran-deal-needed-weve-got-their-strait.html",
-      "published": "2026-11-12 19:04:21",
-      "title_ko": "트럼프가 이란과의 거래가 필요 없다고 말한 후 유가 상승",
-      "summary_ko": "도널드 트럼프 대통령의 최근 발언으로 미국과 이란 전쟁의 종식이 보이지 않는다는 우려가 제기됨",
-      "lines": [
-        "브렌트유 94.48달러로 1.9% 상승",
-        "서부텍사스산원유 88.19달러로 2% 상승"
-      ]
-    },
-    {
-      "title": "Jensen and Lori Huang's Nvidia fortune is jointly controlled. How that makes things complicated now that he's resigned",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/inside-jensen-and-lori-huangs-jointly-controlled-nvidia-fortune.html",
-      "published": "2026-11-12 19:00:12",
-      "title_ko": "젠슨과 로리 황의 엔비디아 지분은 공동 소유이며, 그의 사임으로 복잡해진 상황",
-      "summary_ko": "젠슨 황의 엔비디아 내 1,400억 달러 지분은 아내 로리와 공동 소유한 신탁으로 보유됨",
-      "lines": [
-        "젠슨 황의 엔비디아 지분 1,400억 달러 규모",
-        "젠슨 황 부부의 공동 소유 엔비디아 주식 약 8억 주",
-        "젠슨 황의 엔비디아 직접 보유 주식 약 7천만 주"
+        "엔비디아 젠슨 황 CEO 사임 발표",
+        "엔비디아 주가 5% 이상 하락",
+        "엔비디아 시가총액 약 약 4조 달러 기록"
       ]
     },
     {
@@ -124,7 +103,7 @@
       "kind": "media",
       "tag": "규제 · 산업정책",
       "direction": "negative",
-      "n_channels": 5,
+      "n_channels": 4,
       "lines": [
         "중국 스파이 연루 의혹 및 부적절한 관계 논란 확산",
         "미국 상무부와 트럼프 행정부 내 대중국 칩 수출 통제 관련 내분 보도",
