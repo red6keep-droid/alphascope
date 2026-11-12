@@ -1,165 +1,169 @@
 {
-  "updated_at": "2026-11-12 02:31:05 UTC",
+  "updated_at": "2026-11-12 20:27:44 UTC",
   "items": [
     {
-      "title": "Meta head of infrastructure will leave and be succeeded by former AWS cloud exec",
+      "title": "Alice Huang tied to Nvidia’s biggest Chinese competitor",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/meta-infrastructure-departure-aws-cloud.html",
-      "published": "2026-11-12 00:46:08",
-      "title_ko": "메타 인프라 책임자 사임, 전 AWS 클라우드 임원이 후임으로",
-      "summary_ko": "메타 인프라 책임자 겸 엔지니어링 공동 책임자 산토시 자나르단 2027년 퇴사 예정이며 전 AWS 수석 부사장 데이비드 브라운이 후임으로 취임",
+      "link": "https://www.cnbc.com/2026/11/12/alice-huang-jensen-huang-nvidia-huawei.html",
+      "published": "2026-11-12 20:10:49",
+      "title_ko": "앨리스 황, 엔비디아 경쟁사와 연관",
+      "summary_ko": "앨리스 황, 화웨이에 컴퓨팅 파워 제공 기업 지분 보유",
       "lines": [
-        "메타의 인프라 책임자 산토쉬 자나르단 2027년 퇴사 예정",
-        "전 아마존웹서비스 임원 데이비드 브라운의 인프라 책임자 승계"
+        "앨리스 황이 엔비디아 최대 경쟁사 화웨이 관련 기업 지분 보유",
+        "앨리스 황이 젠슨 황과 연인 관계 유지 중 화웨이 관련 사업 관여",
+        "정보 기업 테사리가 앨리스 황과 화웨이 간 연결고리 최초 발견"
       ]
     },
     {
-      "title": "Nvidia prepares to oust Jensen Huang, WSJ reports — stock sinks",
+      "title": "Donald Trump Jr. exits advisory role at Kalshi prediction market",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/nvidia-jensen-huang-affair-employee.html",
-      "published": "2026-11-12 00:21:27",
-      "title_ko": "WSJ 보도, 엔비디아 젠슨 황 해임 준비, 주가 하락",
-      "summary_ko": "황 CEO가 미 정보당국으로부터 중국 스파이로 의심되는 여성과의 스캔들을 인정한 지 며칠 만에 보도가 나옴",
+      "link": "https://www.cnbc.com/2026/11/12/donald-trump-jr-exits-kalshi-advisory-role.html",
+      "published": "2026-11-12 20:03:57",
+      "title_ko": "도널드 트럼프 주니어, 칼시 예측 시장 자문 역할 종료",
+      "summary_ko": "",
       "lines": [
-        "시간외 거래에서 엔비디아 주가 9% 이상 하락",
-        "젠슨 황의 사내 불륜 의혹 제기",
-        "이사회의 젠슨 황 거취 결정 회의 개최 예정"
+        "도널드 트럼프 주니어가 칼시 자문 역할 종료",
+        "칼시가 1789 캐피탈의 폴리마켓 지분 보유를 이유로 계약 해지",
+        "양측이 이해 충돌을 이유로 트럼프 주니어 자문직 종료 합의"
       ]
     },
     {
-      "title": "Inside India newsletter: Trump's poll setback fuels hope for U.S.-India trade deal by year end",
+      "title": "‘A dark day for Nvidia’: Here’s what analysts have been saying about Jensen Huang’s departure",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/us-india-trade-tariffs-trump-modi.html",
-      "published": "2026-11-11 23:57:38",
-      "title_ko": "인도 뉴스레터: 트럼프의 여론조사 부진, 연말까지 미-인도 무역 협정 기대감 지펴",
-      "summary_ko": "미국 유권자들이 캐나다산 수입품 관세에 더 큰 영향을 받지만, 인도와의 무역 협정이 관세에 대한 비판을 완화할 수 있다고 전문가들은 언급",
+      "link": "https://www.cnbc.com/2026/11/12/jensen-huang-nvidia-affair-ceo.html",
+      "published": "2026-11-12 19:47:57",
+      "title_ko": "엔비디아의 어두운 날: 애널리스트들이 젠슨 황의 퇴진에 대해 한 말",
+      "summary_ko": "황과 직원 간의 불륜 보도가 나온 후 회사의 이사회가 수요일 저녁에 소집됨",
       "lines": [
-        "미국 중간선거 결과에 따른 미·인도 무역협정 타결 기대감 증대",
-        "11월 외국인 투자자들의 인도 시장 복귀"
+        "젠슨 황 엔비디아 CEO의 사임 발표",
+        "CEO 사임 발표 직후 증권사 6곳의 엔비디아 투자의견 하향"
       ]
     },
     {
-      "title": "Scott Colom wins Mississippi Senate election over incumbent Republican Hyde-Smith",
+      "title": "Nvidia stock pares morning losses after CEO Jensen Huang announces resignation",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/democrat-scott-colom-projected-to-win-mississippi-senate-election-over-incumbent-hyde-smith.html",
-      "published": "2026-11-11 23:31:37",
-      "title_ko": "스콧 콜롬, 현직 공화당 하이드스미스 제치고 미시시피 상원의원 선거 승리",
-      "summary_ko": "스콧 콜롬은 1982년 이후 해당 주에서 선출된 최초의 민주당 상원의원이 될 예정",
+      "link": "https://www.cnbc.com/2026/11/12/nvidia-nvda-jensen-huang-second-affair.html",
+      "published": "2026-11-12 19:42:56",
+      "title_ko": "엔비디아 젠슨 황 CEO 사임 발표 이후 오전 하락세 축소",
+      "summary_ko": "콜레트 크레스 최고재무책임자가 신임 리더 선임 때까지 임시 CEO 역할 수행",
       "lines": [
-        "민주당 스콧 콜롬 후보의 미시시피주 상원의원 선거 승리",
-        "1982년 이후 미시시피주 최초의 민주당 소속 상원의원 탄생",
-        "남북전쟁 재건 시대 이후 미시시피주 최초의 흑인 상원의원 배출"
+        "최고재무책임자 콜레트 크레스의 임시 CEO 임명",
+        "시가총액 4조 달러 선을 유지 중인 엔비디아 주가",
+        "시놉시스 전 CEO 하비 C. 존스의 이사회 초대 의장 선임"
       ]
     },
     {
-      "title": "Feds arrest top official of healthcare company, alleging illegal drug importation",
+      "title": "Here's what Nvidia interim CEO Colette Kress and board chair Harvey Jones wrote to Nvidia employees",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/canarx-official-arrested-drug-importation.html",
-      "published": "2026-11-11 22:58:11",
-      "title_ko": "연방 기관, 불법 의약품 수입 혐의로 헬스케어 기업 고위 임원 체포",
-      "summary_ko": "법원 기록에 따르면 미국 당국은 캐나다 기업의 고위 임원 두 명이 처방약을 불법으로 수입하는 계획을 운영한 혐의로 기소함",
+      "link": "https://www.cnbc.com/2026/11/12/nvidia-kress-jones-employee-emails.html",
+      "published": "2026-11-12 19:42:41",
+      "title_ko": "엔비디아 임시 CEO 콜레트 크레스와 이사회 의장 하비 존스가 엔비디아 직원들에게 보낸 메시지",
+      "summary_ko": "임시 CEO 콜레트 크레스와 이사회 의장 하비 존스가 엔비디아 직원들에게 이메일을 보냄",
       "lines": [
-        "캐나다 의약품 유통사 임원들 불법 수입 혐의 기소",
-        "캐나다 회사 캐나릭스 최고재무책임자 일요일 체포"
+        "엔비디아 임시 최고경영자에 콜레트 크레스 임명",
+        "엔비디아 이사회 의장에 하비 존스 선임"
       ]
     },
     {
-      "title": "Jensen Huang affair in D.C.: Resignation calls and moves to tighten Nvidia China exports",
+      "title": "Jensen Huang's Nvidia exit casts shadow over Wall Street’s $500 billion AI financing bet",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/nvidia-jensen-huang-congress-resign-ai-chips.html",
-      "published": "2026-11-11 22:46:29",
-      "title_ko": "젠슨 황의 워싱턴 스캔들: 사임 요구 및 엔비디아 대중국 수출 강화 움직임",
-      "summary_ko": "황 CEO는 중국에 대한 엄격한 AI 칩 수출 통제에 반대 입장을 표명",
+      "link": "https://www.cnbc.com/2026/11/12/nvidia-ceo-exit-ai-financing.html",
+      "published": "2026-11-12 19:33:50",
+      "title_ko": "젠슨 황의 엔비디아 사임, 월스트리트의 5,000억 달러 AI 자금 조달 베팅에 그림자 드리워",
+      "summary_ko": "엔비디아의 리더십 위기가 AI 자금 조달 붐으로 확산될 위험이 제기됨",
       "lines": [
-        "미국 의원들의 엔비디아 CEO 젠슨 황 사퇴 촉구",
-        "중국 스파이 연루 의혹 관련 하원 의원들의 소환장 발부 추진"
+        "젠슨 황 엔비디아 최고경영자 사임",
+        "엔비디아 주가 장중 13% 이상 하락",
+        "최고재무책임자 콜레트 크레스 임시 최고경영자 선임"
       ]
     },
     {
-      "title": "Canada’s ambassador warns Trump tariffs are driving up costs, threatening U.S. investment",
+      "title": "In a policy switch, the Fed says its October 2027 meeting will not see a vote on interest rates",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/canada-ambassador-trump-tariffs-investments.html",
-      "published": "2026-11-11 22:30:57",
-      "title_ko": "캐나다 대사, 트럼프 관세가 비용 상승 및 미국 투자 위협 경고",
-      "summary_ko": "트럼프 관세로 비용이 상승하고 투자가 위협받으며 양국 간 협상이 복잡해지면서 미국과 캐나다 간 무역 긴장이 지속됨",
+      "link": "https://www.cnbc.com/2026/11/12/in-policy-switch-fed-says-its-october-2027-meeting-will-not-see-a-vote-on-interest-rates.html",
+      "published": "2026-11-12 19:05:25",
+      "title_ko": "정책 전환으로 연준은 20년에 2027년 10월 회의에서 금리 표결을 실시하지 않을 것이라고 밝혔다",
+      "summary_ko": "내년에 7차례의 투표 회의가 열리며, 10월 세션은 공식 투표나 성명 없이 정책 숙고를 위한 추가 시간으로 설정됨",
       "lines": [
-        "관세로 인한 투자 비용 상승",
-        "미국 연방준비제도 내년 소비재 가격 인상 전망"
+        "미국 연방준비제도 2027년 10월 회의 금리 투표 제외 발표",
+        "2027년 연방공개시장위원회 투표 회의 7회로 변경"
       ]
     },
     {
-      "title": "American Airlines brings fresh food back to NY-Chicago first class for first time since 2019",
+      "title": "Oil prices rise after Trump says no Iran deal needed: 'We've got their Strait'",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/american-airlines-first-class-chicago-new-york.html",
-      "published": "2026-11-11 22:20:58",
-      "title_ko": "아메리칸 항공, 2019년 이후 처음으로 뉴욕-시카고 일등석에 신선한 식품 재도입",
-      "summary_ko": "아메리칸 항공 일등석 식품 옵션에 샌드위치, 과일, 치아 푸딩 볼 포함",
+      "link": "https://www.cnbc.com/2026/11/12/oil-prices-jump-after-trump-says-no-iran-deal-needed-weve-got-their-strait.html",
+      "published": "2026-11-12 19:04:21",
+      "title_ko": "트럼프가 이란과의 거래가 필요 없다고 말한 후 유가 상승",
+      "summary_ko": "도널드 트럼프 대통령의 최근 발언으로 미국과 이란 전쟁의 종식이 보이지 않는다는 우려가 제기됨",
       "lines": [
-        "아메리칸항공의 뉴욕-시카고 노선 퍼스트클래스 신선식품 재도입",
-        "2019년 이후 해당 노선 퍼스트클래스 신선식품 서비스 중단"
+        "브렌트유 94.48달러로 1.9% 상승",
+        "서부텍사스산원유 88.19달러로 2% 상승"
       ]
     },
     {
-      "title": "JetBlue unveils new first-class seats to bring back profits",
+      "title": "Jensen and Lori Huang's Nvidia fortune is jointly controlled. How that makes things complicated now that he's resigned",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/jetblue-ceo-premium.html",
-      "published": "2026-11-11 22:10:50",
-      "title_ko": "젯블루, 수익성 개선 위해 새로운 일등석 좌석 공개",
-      "summary_ko": "젯블루, 수요일에 기자들에게 새로운 일등석 좌석 공개 예정",
+      "link": "https://www.cnbc.com/2026/11/12/inside-jensen-and-lori-huangs-jointly-controlled-nvidia-fortune.html",
+      "published": "2026-11-12 19:00:12",
+      "title_ko": "젠슨과 로리 황의 엔비디아 지분은 공동 소유이며, 그의 사임으로 복잡해진 상황",
+      "summary_ko": "젠슨 황의 엔비디아 내 1,400억 달러 지분은 아내 로리와 공동 소유한 신탁으로 보유됨",
       "lines": [
-        "블루퍼스트 국내선 일등석 공개",
-        "2024년 12월 블루퍼스트 출시 예정"
+        "젠슨 황의 엔비디아 지분 1,400억 달러 규모",
+        "젠슨 황 부부의 공동 소유 엔비디아 주식 약 8억 주",
+        "젠슨 황의 엔비디아 직접 보유 주식 약 7천만 주"
       ]
     },
     {
-      "title": "모기지 금리 하락 및 주택담보대출 증가",
-      "title_ko": "모기지 금리 하락 및 주택담보대출 증가",
-      "summary_ko": "모기지 금리가 하락하면서 주택 구입 수요가 자극되어 대출 신청이 크게 증가",
+      "title": "엔비디아 대중국 반도체 수출 통제 및 스파이 스캔들",
+      "title_ko": "엔비디아 대중국 반도체 수출 통제 및 스파이 스캔들",
+      "summary_ko": "중국 스파이 연루 의혹과 불법 칩 우회 수출 문제로 트럼프 행정부와 법 집행 기관의 조사가 강화될 전망",
       "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=XP0WqRKjBNg",
-      "published": "2026-11-11 22:00:08",
-      "kind": "media",
-      "tag": "부동산 · 주택",
-      "direction": "neutral",
-      "n_channels": 2,
-      "lines": [
-        "모기지 뉴스 데일리 기준 30년 고정 주택담보대출 평균 금리 7.3%",
-        "주택 구입자들의 모기지 신청 건수 전년 4월 이후 최대 주간 증가폭 기록"
-      ]
-    },
-    {
-      "title": "미국 의회 반도체 수출 통제 강화 법안",
-      "title_ko": "미국 의회 반도체 수출 통제 강화 법안",
-      "summary_ko": "미국 의회가 젠슨 황 스캔들을 계기로 중국을 향한 반도체 수출 통제를 강화하는 3대 법안을 추진 중",
-      "source": "당잠사",
-      "link": "https://www.youtube.com/watch?v=DEb5daFJUKU",
-      "published": "2026-11-11 21:26:48",
+      "link": "https://www.youtube.com/watch?v=ukuqWKKE_jA",
+      "published": "2026-11-12 18:24:36",
       "kind": "media",
       "tag": "규제 · 산업정책",
       "direction": "negative",
-      "n_channels": 2,
+      "n_channels": 5,
       "lines": [
-        "미국 공화당과 민주당 중국 대상 반도체 수출 통제 법안 추진",
-        "AI 오버워치법 및 반도체 보안법, 매치법 국방수권법 포함 시도",
-        "삼성전자와 SK하이닉스 등 국내 기업 영향 불가피",
-        "매치법 적용 시 동맹국 중국 공장 장비 반입 제약 우려"
+        "중국 스파이 연루 의혹 및 부적절한 관계 논란 확산",
+        "미국 상무부와 트럼프 행정부 내 대중국 칩 수출 통제 관련 내분 보도",
+        "엔비디아 불법 칩 우회 수출 관련 형사 책임 가능성 대두",
+        "중국 현지 엔비디아 칩 밀수 가격 급등 및 시장 불안 심화",
+        "알리바바 등 관련 중국 테크주 주가 하락 기록"
       ]
     },
     {
-      "title": "예상 웃돈 CPI와 금리 인상 우려",
-      "title_ko": "예상 웃돈 CPI와 금리 인상 우려",
-      "summary_ko": "예상보다 높은 소비자물가지수 발표로 연준의 추가 금리 인상 및 긴축 속도 가속화 우려가 고조",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=HRIjtvWogyE",
-      "published": "2026-11-11 16:38:23",
+      "title": "엔비디아 생태계와 경쟁력",
+      "title_ko": "엔비디아 생태계와 경쟁력",
+      "summary_ko": "미국이 단일 기업에 과도하게 의존하고 있지 않으며 구글, 마이크로소프트, 아마존 등의 경쟁으로 산업 기반이 탄탄함",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=U8ppflwJdaA",
+      "published": "2026-11-12 17:59:57",
       "kind": "media",
-      "tag": "금리 · 연준",
-      "direction": "negative",
-      "n_channels": 2,
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "positive",
+      "n_channels": 5,
       "lines": [
-        "전일 발표된 인플레이션 보고서가 예상치를 웃돌며 단기 채권 금리 급등",
-        "일부 연준 인사는 12월 회의에서 50bp 금리 인상 가능성 제기",
-        "오스탄 굴스비 발언 : 이번 인플레이션 보고서는 매우 우려스럽고 껄끄러운 수준"
+        "벤 뷰캐넌 발언 : 구글과 마이크로소프트, 아마존 등도 경쟁력 있는 자체 칩 설계",
+        "벤 뷰캐넌 발언 : 엔비디아의 우수한 인력과 제품으로 AI 생태계의 핵심 기둥 역할 지속 전망",
+        "벤 뷰캐넌 발언 : 엔비디아의 오픈 웨이트 모델 지속 유지 예상"
+      ]
+    },
+    {
+      "title": "AI 인프라 수요와 수혜주",
+      "title_ko": "AI 인프라 수요와 수혜주",
+      "summary_ko": "AI 데이터센터 구축 수요는 멈추지 않는 흐름이며 엔비디아 외에 브로드컴과 AMD 등이 수혜를 볼 것으로 봄",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=FIKj8BtIPW0",
+      "published": "2026-11-12 12:44:17",
+      "kind": "media",
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "positive",
+      "n_channels": 3,
+      "lines": [
+        "진행자 발언 : 데이터센터 구축과 AI 인프라 수요는 멈출 수 없는 흐름",
+        "조앤 피니 발언 : 엔비디아가 흔들릴 경우 브로드컴과 AMD 같은 기업이 수혜를 볼 것으로 봄"
       ]
     }
   ]

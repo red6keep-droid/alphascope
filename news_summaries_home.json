@@ -1398,5 +1398,373 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-12T02:31:04.315107+00:00",
   "n_src": 900
+ },
+ "299426b57f03": {
+  "lines": [
+   "앨리스 황이 엔비디아 최대 경쟁사 화웨이 관련 기업 지분 보유",
+   "앨리스 황이 젠슨 황과 연인 관계 유지 중 화웨이 관련 사업 관여",
+   "정보 기업 테사리가 앨리스 황과 화웨이 간 연결고리 최초 발견"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-12T20:27:33.357421+00:00",
+  "n_src": 900
+ },
+ "328245fb8418": {
+  "lines": [
+   "도널드 트럼프 주니어가 칼시 자문 역할 종료",
+   "칼시가 1789 캐피탈의 폴리마켓 지분 보유를 이유로 계약 해지",
+   "양측이 이해 충돌을 이유로 트럼프 주니어 자문직 종료 합의"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-12T20:27:33.357421+00:00",
+  "n_src": 900
+ },
+ "8d83ad07d439": {
+  "lines": [],
+  "tags": [],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-12T20:27:33.357421+00:00",
+  "n_src": 361
+ },
+ "564a7b5e35d6": {
+  "lines": [
+   "엔비디아의 내부 조사를 위한 로펌 왁텔 립튼 선임"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T20:27:35.006798+00:00",
+  "n_src": 900
+ },
+ "177664ea8788": {
+  "lines": [
+   "젠슨 황 엔비디아 CEO의 사임 발표",
+   "CEO 사임 발표 직후 증권사 6곳의 엔비디아 투자의견 하향"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T20:27:35.006798+00:00",
+  "n_src": 900
+ },
+ "371308033881": {
+  "lines": [
+   "최고재무책임자 콜레트 크레스의 임시 CEO 임명",
+   "시가총액 4조 달러 선을 유지 중인 엔비디아 주가",
+   "시놉시스 전 CEO 하비 C. 존스의 이사회 초대 의장 선임"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T20:27:35.006798+00:00",
+  "n_src": 900
+ },
+ "ca82d66df2f2": {
+  "lines": [
+   "엔비디아 임시 최고경영자에 콜레트 크레스 임명",
+   "엔비디아 이사회 의장에 하비 존스 선임"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T20:27:41.776742+00:00",
+  "n_src": 900
+ },
+ "a4da00f3e998": {
+  "lines": [
+   "젠슨 황 엔비디아 최고경영자 사임",
+   "엔비디아 주가 장중 13% 이상 하락",
+   "최고재무책임자 콜레트 크레스 임시 최고경영자 선임"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T20:27:41.776742+00:00",
+  "n_src": 900
+ },
+ "1ba52ba6ab37": {
+  "lines": [
+   "미국 연방준비제도 2027년 10월 회의 금리 투표 제외 발표",
+   "2027년 연방공개시장위원회 투표 회의 7회로 변경"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T20:27:41.776742+00:00",
+  "n_src": 900
+ },
+ "6e0a9a613845": {
+  "lines": [
+   "브렌트유 94.48달러로 1.9% 상승",
+   "서부텍사스산원유 88.19달러로 2% 상승"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T20:27:44.172213+00:00",
+  "n_src": 900
+ },
+ "b2082106b0d4": {
+  "lines": [
+   "젠슨 황의 엔비디아 지분 1,400억 달러 규모",
+   "젠슨 황 부부의 공동 소유 엔비디아 주식 약 8억 주",
+   "젠슨 황의 엔비디아 직접 보유 주식 약 7천만 주"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T20:27:44.172213+00:00",
+  "n_src": 900
+ },
+ "2921dd58fdf1": {
+  "lines": [
+   "오하이오 노동조합원들의 민주당 선거 지원 활동"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T20:27:44.172213+00:00",
+  "n_src": 900
  }
 }
