@@ -331,3 +331,49 @@ def main():
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     main()
+
+
+# ── 종목 목록 페이지의 ETF 구획 (2026-11-12 사용자 "목록 페이지도 보여줘. 목업 페이지에도 보여줘") ──
+MOCK_ONLY = ("<!--mock-only-->", "<!--/mock-only-->")   # 한국 render_kr 과 같은 표시 — 목업에만
+REAL_ONLY = ("<!--real-only-->", "<!--/real-only-->")   # 발행 본문에만
+LIST_SHOW = 6   # 처음 보이는 줄 — 나머지는 `ETF 더 보기` 접기 (후보 11~20위 접기와 같은 틀)
+
+
+def _list_rows(market, bars, syms):
+    sys.path.insert(0, os.path.join(EXP, "nvda-report"))
+    import render_html as R
+    items = []
+    for sym in syms:
+        b = bars.get(sym) or []
+        if len(b) < 2:
+            continue
+        c, p = b[-1]["close"], b[-2]["close"]
+        r = (c / p - 1) * 100 if p else 0.0
+        pcol = C.UP if r > 0 else C.DOWN if r < 0 else "#111"
+        price = f"${c:,.2f}" if market == "us" else f"{c:,.0f}원"
+        logo = dk.ticker_logo(sym) if market == "us" else ""   # 한국 ETF 는 로고 없이 (한국 목록의 배지는 종목 코드용)
+        left = (f'{logo}<a href="{dk.esc(E.page_url(sym))}" style="color:#111;text-decoration:none;">{dk.esc(E.BY_SYM[sym][1])}</a>'
+                f'<span style="display:block;padding-left:{26 if logo else 0}px;font-size:{dk.MICRO};line-height:20px;font-weight:400;color:{dk.NOTE};">'
+                f'{dk.esc(E.key(sym))} · {dk.esc(E.BY_SYM[sym][2])}</span>')
+        items.append((left, f'<span style="color:{pcol};">{price}</span><br>{R._arrow(r)}', r))
+    if not items:
+        return ""
+
+    def card(xs):   # 줄 전체가 ETF 페이지로 가는 터치 영역 (종목 목록 줄과 같다)
+        rows = "".join(R._row_html(lf, rt, first=i == 0).replace("<span", f'<span data-row-link="1" data-ret="{r:.4f}"', 1) for i, (lf, rt, r) in enumerate(xs))
+        return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{rows}</span></div>'
+    more = items[LIST_SHOW:]
+    return dk.section("ETF", card(items[:LIST_SHOW])) + (dk.fold(f"ETF {len(more)}개 더 보기", card(more)) if more else "")
+
+
+def list_section(market, bars):
+    """목록 페이지 ETF 구획 — 발행 본문은 발행된 ETF 페이지(etf_pages_live.json)만, 목업은 전부. 없는 페이지로 링크하지 않게."""
+    try:
+        syms = E.US_SYMS if market == "us" else E.KR_SYMS
+        live = load_live(market)
+        everything = _list_rows(market, bars, syms)
+        published = _list_rows(market, bars, [s for s in syms if E.key(s) in live])
+        return MOCK_ONLY[0] + everything + MOCK_ONLY[1] + REAL_ONLY[0] + published + REAL_ONLY[1]
+    except Exception as e:  # noqa: BLE001 — ETF 구획이 실패해도 목록은 나간다
+        print(f"::warning::[etf] 목록 구획 실패: {e!r}")
+        return ""
