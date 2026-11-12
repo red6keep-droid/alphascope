@@ -314,6 +314,16 @@ PEOPLE_V = [
 ]
 
 
+ON_STYLES = [   # 선택한 칸 표시 시안 (2026-11-12 사용자: 선택됐을 때 시안도 보고 싶다). 모두 회색 → 검정 색은 같고 그 위에 더하는 것만 다르다
+    ("1", "색만 진하게", "지금 — 회색에서 검정으로만"),
+    ("2", "색 + 굵은 글자", "예전 방식 — 글자 굵게"),
+    ("3", "색 + 굵은 아이콘 선", "아이콘 선 2.2 → 2.8"),
+    ("4", "색 + 위쪽 막대", "메뉴 줄 맨 위에 짧은 검정 막대"),
+    ("5", "색 + 아래 점", "글자 아래 작은 점"),
+    ("6", "색 + 둥근 바탕", "아이콘 뒤 옅은 회색 둥근 바탕"),
+    ("7", "색 + 칸 바탕", "선택한 칸 전체에 옅은 회색 바탕"),
+]
+ON_PICK = "1"
 ST_PICK, PP_PICK = 2, 3   # 정한 시안 (2026-11-12 사용자: 종목 = 세로 막대 · 인물 = 마이크)
 
 
@@ -337,21 +347,32 @@ def bar_css():
             f"height:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom));padding-bottom:calc({BAR_PAD}px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #E2E8F0;font-family:inherit}}"
             "#jbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#6B7280;text-decoration:none;font-size:11px;line-height:14px;-webkit-tap-highlight-color:transparent;position:relative}"
             "#jbar a.on{color:#111} #jbar a:active{background:#F1F5F9}"   # 선택 = 색만 진하게, 굵기는 그대로 (2026-11-12 사용자)
+            "#jbar[data-on='2'] a.on{font-weight:700}"
+            "#jbar[data-on='3'] a.on svg{stroke-width:2.8}"
+            "#jbar[data-on='4'] a.on::before{content:'';position:absolute;top:-1px;left:50%;width:28px;height:2px;margin-left:-14px;border-radius:0 0 2px 2px;background:#111}"
+            "#jbar[data-on='5'] a.on span{position:relative} #jbar[data-on='5'] a.on span::after{content:'';position:absolute;left:50%;bottom:-7px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#111}"
+            "#jbar[data-on='6'] a .ji{box-sizing:content-box;padding:3px 14px;border-radius:14px} #jbar[data-on='6'] a.on .ji{background:#E8EDF3}"
+            "#jbar[data-on='7'] a.on{background:#F1F5F9}"
             "#jbar[data-style=E] a .ji{box-sizing:content-box;padding:3px 16px;border-radius:15px}"
             "#jbar[data-style=E] a.on .ji{background:#E8EDF3}"
             "#jbar[data-style=F] a{font-size:13px;line-height:18px}"
             "#jbar[data-style=F] a.on::after{content:'';position:absolute;bottom:8px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:#111}")
 
 
-def bar_html(style, cur="", sv=0, pv=0):
-    return (f'<nav class="jsample" data-style="{style}">'
+def bar_html(style, cur="", sv=0, pv=0, on="1"):
+    return (f'<nav class="jsample" data-style="{style}" data-on="{on}">'
             + "".join(f'<a data-jt="{k}" href="#"' + (' class="on"' if k == cur else '') + f'>{icon_svg(style, k, k == cur, sv=sv, pv=pv)}<span>{t}</span></a>' for k, t in JTABS)
             + "</nav>")
 
 
 def icons_page():
     """아이콘 스타일 비교 화면 — 스타일마다 하단 메뉴 견본(지금 칸 = 종목) + `이 스타일로 여정 보기`."""
-    rows = ['<div class="sep">B 굵은 선 · 증시 전망 = 저울 — 종목 아이콘 시안 (지금 칸 = 종목)</div>']
+    rows = ['<div class="sep">선택한 칸 표시 시안 (정한 아이콘 · 지금 칸 = 종목)</div>']
+    for k, name, why in ON_STYLES:
+        rows.append(f'<section><h2>선택 {k}. {html.escape(name)}{" ✓ 지금" if k == ON_PICK else ""}</h2><div class="why">{html.escape(why)}</div>'
+                    f'{bar_html("B", "stock", sv=ST_PICK, pv=PP_PICK, on=k)}<a class="go" href="{JOURNEY_START}?icon=B&amp;on={k}">이 선택 표시로 여정 보기 ›</a></section>')
+    rows.append('<details class="old"><summary>종목 · 인물 아이콘 시안 (세로 막대 · 마이크로 정함)</summary>')
+    rows.append('<div class="sep">B 굵은 선 · 증시 전망 = 저울 — 종목 아이콘 시안 (지금 칸 = 종목)</div>')
     for i, (nm, _) in enumerate(STOCK_V):
         rows.append(f'<section><h2>종목 {i + 1}. {html.escape(nm)}{" ✓ 정함" if i == ST_PICK else ""}</h2>{bar_html("B", "stock", sv=i)}'
                     f'<a class="go" href="{JOURNEY_START}?icon=B&amp;st={i}">이 종목 아이콘으로 여정 보기 ›</a></section>')
@@ -359,7 +380,7 @@ def icons_page():
     for i, (nm, _) in enumerate(PEOPLE_V):
         rows.append(f'<section><h2>인물 {i + 1}. {html.escape(nm)}{" ✓ 정함" if i == PP_PICK else ""}</h2>{bar_html("B", "people", pv=i)}'
                     f'<a class="go" href="{JOURNEY_START}?icon=B&amp;pp={i}">이 인물 아이콘으로 여정 보기 ›</a></section>')
-    rows.append('<details class="old"><summary>지난 비교 — 스타일 8가지 (B 로 정함)</summary>')
+    rows.append('</details><details class="old"><summary>지난 비교 — 스타일 8가지 (B 로 정함)</summary>')
     for k, name, why in ICON_STYLES:
         if k == "G":
             rows.append('<div class="sep">강조 카드 · 홈 카드 컬러 아이콘</div>')
@@ -544,6 +565,10 @@ body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !im
   try {{ ic = ic || sessionStorage.getItem('jIcon2'); }} catch (e) {{}}
   ic = ic || 'B';   // 정한 스타일 = B 굵은 선 (2026-11-12 사용자)
   document.getElementById('jbar').setAttribute('data-style', ic);
+  var onv = (location.search.match(/[?&]on=([1-7])/) || [])[1];   // 선택한 칸 표시 시안
+  if (onv) {{ try {{ sessionStorage.setItem('jOn', onv); }} catch (e) {{}} }}
+  try {{ onv = onv || sessionStorage.getItem('jOn'); }} catch (e) {{}}
+  document.getElementById('jbar').setAttribute('data-on', onv || '{ON_PICK}');
   function pick(name, re, def) {{   // 종목 · 인물 시안 번호 — 주소에 있으면 기억, 없으면 기억한 것
     var v = (location.search.match(re) || [])[1];
     if (v) {{ try {{ sessionStorage.setItem(name, v); }} catch (e) {{}} }}
