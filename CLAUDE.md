@@ -12,6 +12,7 @@
 | 겹치는 실행 | 같은 시각에 같은 키 · 같은 모델을 쓰는 다른 워크플로 |
 | 넘치면 | 사슬 순서대로 어디로 떨어지나(`llm_chain.py`), Gemini 호출이 몇 회 늘어나나 |
 | 다른 한도 | Blogger 쓰기 · gh-pages · 상태 브랜치 · Cloudflare · GitHub API · 소스 차단(운영지침 11절 목록) |
+| 하루 방문객 10만 | 방문자 브라우저가 부르는 것(jsDelivr · Firestore · Blogger 피드 · Worker · 외부 API)이 방문자 수에 묶이나 — 방문자 1명당 요청 수 × 10만이 무료 한도 안인가. 부담이 있으면 숫자로 말하고, 없으면 "없음" |
 | 막는 장치 | 상한 · 캐시 · skip · 실패 시 대체 |
 
 설계 순서는 운영지침 3-2: ① 파이썬 틀 ② Groq · NVIDIA ③ Gemini lite ④ flash. Gemini 키 · 프로젝트를 늘려 한도를 피하지 않는다(약관).

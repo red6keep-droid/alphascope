@@ -188,7 +188,7 @@ def summary_card(qcard, sm=None, faces=None):
             first += f" {sp[1]['name']}에서도 의견이 갈렸습니다."
         lines = [(first, "plain")]
         for y in sp:   # 줄 = `반도체 [▼ 부정]` · 오른쪽 얼굴 + 이름 (2026-11-08 사용자: 기술지표 라벨처럼 · 얼굴 아이콘)
-            for side, kind, word in (("neg", "down", "하락 쪽"), ("pos", "up", "상승 쪽")):
+            for side, kind, word in (("neg", "down", "하락 의견"), ("pos", "up", "상승 의견")):   # 옛 `하락 쪽` · `상승 쪽` (2026-11-12 사용자 P534)
                 who, n = y[side]
                 # 한 줄 = `[▼ 부정] 발언 1건` (이슈 이름 · 세로 구분선 삭제 — 카드 답 · 첫 문장에 이슈가 있다, 2026-11-08 사용자) · 오른쪽 얼굴 + 이름
                 lines.append(("row", f'<span style="display:inline-flex;align-items:center;gap:{dk.PILL_GAP}px;vertical-align:middle;white-space:nowrap;">{_box(kind, word)}'
