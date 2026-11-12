@@ -133,11 +133,16 @@ def _box(kind, text):
     return TS.box(kind, text, dk.esc, fit=True)
 
 
+PILL_STACK_GAP = dk.PILL_PAIR_GAP   # 위아래로 쌓은 상승 · 하락 라벨 사이 = 라벨끼리 어디서나 2px 규칙 (P533)
+
+
 def _dir_val(d):
     """근거 줄 값 = 라벨 `▲ 긍정 4` `▼ 부정 2` (라벨끼리 2px, dk.PILL_PAIR_GAP). 둘 다 없으면 `— 중립`."""
     parts = [_box(kind, f"{k} {d[key]}건") for key, k, kind in (("positive", "상승", "up"), ("negative", "하락", "down")) if d.get(key)]   # `상승 2건` · `하락 1건` (2026-11-12 사용자: `상승 쪽 2` 는 어색) — 옛 `긍정` · `부정` 은 `AI 거품 · 부정` 이 "거품이 아니다"로 읽혀 (2026-11-11 사용자)
     if not parts:
         parts = [_box("flat", "중립")]
+    if len(parts) == 2:   # 상승 · 하락 둘 다 = 위아래로 (2026-11-12 사용자 P533), 오른쪽 끝 맞춤
+        return f'<span style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:{PILL_STACK_GAP}px;vertical-align:middle;">{"".join(parts)}</span>'
     return f'<span style="display:inline-flex;gap:{dk.PILL_PAIR_GAP}px;vertical-align:middle;">{"".join(parts)}</span>'
 
 
