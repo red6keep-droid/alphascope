@@ -55,13 +55,22 @@ def tickers():
     syms |= {s for th in t.THEMES for _, group in th.get("baskets", []) for s in group}
     y = _load("dr_yahoo", os.path.join(BASE, "daily-report", "collect_yahoo.py"))
     syms |= set(y.HISTORY_UNIVERSE["mega"])
+    syms |= {r["sym"] for r in _universe_all().get("us") or []}   # 전체 종목 범위 S&P 500 (universe_all, 2026-11-12 사용자 "로고는 기본적으로 다")
     return sorted(s for s in syms if re.fullmatch(r"[A-Z][A-Z.\-]{0,6}", s))
 
 
 def kr_tickers():
     """한국 종목 — yfinance 표기(005930.KS) 그대로 키로 쓴다. 파일 이름은 KR_005930 (미국 숫자 티커와 겹치지 않게)."""
     u = _load("kr_universe", os.path.join(BASE, "kr-stocks", "universe_kr.py"))
-    return sorted(c[0] for c in u.CANDIDATES)
+    return sorted({c[0] for c in u.CANDIDATES} | {r["sym"] for r in _universe_all().get("kr") or []})   # + 코스피 200 · 코스닥 150 (universe_all)
+
+
+def _universe_all():
+    try:
+        with open(os.path.join(BASE, "ref", "universe_all.json"), encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
 
 
 def get(url):
