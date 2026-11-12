@@ -50,6 +50,8 @@ NAME_KO = {"NVDA": "엔비디아", "MU": "마이크론", "AVGO": "브로드컴",
            "GS": "골드만삭스", "CAT": "캐터필러", "AMGN": "암젠", "MCD": "맥도날드", "COIN": "코인베이스", "ROKU": "로쿠", "SHOP": "쇼피파이", "HOOD": "로빈후드"}
 STAMP_US = "ETF 정보입니다. 가격은 매 거래일, 구성은 주 1회 갱신됩니다."
 STAMP_PRICE = "ETF 정보입니다. 가격은 매 거래일 갱신됩니다."
+MOCK_ONLY = ("<!--mock-only-->", "<!--/mock-only-->")   # 한국 render_kr 과 같은 표시 — 목업에만
+REAL_ONLY = ("<!--real-only-->", "<!--/real-only-->")   # 발행 본문에만
 
 
 # ── 구성 · 기본 정보 (야후 펀드 자료, 주 1회) ──
@@ -148,16 +150,18 @@ def tab_basic(sym, f):
 
 
 def related(sym, live, href=None):
-    """함께 보는 페이지 = 같은 것을 따라가는 다른 ETF. 같은 시장은 발행된 것만(live, None 이면 전부 — 목업).
+    """함께 보는 페이지 = 같은 것을 따라가는 다른 ETF. 발행 본문 = 같은 시장은 발행된 것만(live), 목업 = 전부.
     다른 시장 페이지는 그 실행의 기록이 여기 없어 거르지 않는다 — 처음 만드는 날(하루 10개 상한)만 잠깐 없는 주소일 수 있다."""
     href = href or E.page_url
-    out = []
-    for x in E.same_tracks(sym):
-        if live is not None and x.endswith(".KS") == sym.endswith(".KS") and E.key(x) not in live:
-            continue
-        nm = E.BY_SYM[x][1]
-        out.append((nm if x.endswith(".KS") else f"{nm} {x}", href(x)))
-    return dk.related_buttons(out) if out else ""
+
+    def buttons(xs):
+        out = [(E.BY_SYM[x][1] if x.endswith(".KS") else f"{E.BY_SYM[x][1]} {x}", href(x)) for x in xs]
+        return dk.related_buttons(out) if out else ""
+    allx = E.same_tracks(sym)
+    pub = [x for x in allx if live is None or x.endswith(".KS") != sym.endswith(".KS") or E.key(x) in live]
+    if pub == allx:
+        return buttons(allx)
+    return MOCK_ONLY[0] + buttons(allx) + MOCK_ONLY[1] + REAL_ONLY[0] + buttons(pub) + REAL_ONLY[1]
 
 
 def stamp(day_text, text):
@@ -299,10 +303,12 @@ def kr_pages(snap, flows, hist, live, us_fund):
 def write(pages, mock=True):
     os.makedirs(OUT, exist_ok=True)
     for key, (title, body) in pages.items():
+        real = re.sub(r"<!--mock-only-->.*?<!--/mock-only-->", "", body, flags=re.S).replace(REAL_ONLY[0], "").replace(REAL_ONLY[1], "")
+        body = re.sub(r"<!--real-only-->.*?<!--/real-only-->", "", body, flags=re.S).replace(MOCK_ONLY[0], "").replace(MOCK_ONLY[1], "")
         with open(os.path.join(OUT, f"{key}.html"), "w", encoding="utf-8") as f:
-            f.write(body)
-        if mock:
-            dk.write_mock(body, os.path.join(OUT, f"mock_{key}.html"), title)
+            f.write(real)
+        if mock:   # 목업 = output/mock_etf_<키>.html — 목업 서버가 블로그 주소(/p/<키>-etf.html)를 이 파일로 바꿔 연다
+            dk.write_mock(body, os.path.join(HERE, "output", f"mock_etf_{key}.html"), title)
     print(f"[etf] 페이지 {len(pages)}개 → {OUT}")
 
 
@@ -334,8 +340,6 @@ if __name__ == "__main__":
 
 
 # ── 종목 목록 페이지의 ETF 구획 (2026-11-12 사용자 "목록 페이지도 보여줘. 목업 페이지에도 보여줘") ──
-MOCK_ONLY = ("<!--mock-only-->", "<!--/mock-only-->")   # 한국 render_kr 과 같은 표시 — 목업에만
-REAL_ONLY = ("<!--real-only-->", "<!--/real-only-->")   # 발행 본문에만
 LIST_SHOW = 6   # 처음 보이는 줄 — 나머지는 `ETF 더 보기` 접기 (후보 11~20위 접기와 같은 틀)
 
 

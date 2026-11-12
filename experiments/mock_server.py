@@ -43,10 +43,11 @@ LABELS = {
     "issue_store": "증시 전망",   # 사건 가설 질문 페이지 · 목록 · 홈 카드 목업 (2026-11-06)
     "site-search": "검색 · 질문하기",   # 헤더 검색 아이콘 · 즉답 카드 · 질문하기 (2026-11-10 사용자)
     "post-footer": "글 아래 버튼 줄",   # 💬 댓글 · 홈으로 · TOP 한 줄, 함께 보는 페이지는 그 아래 (2026-11-10 사용자)
+    "stock-etf": "ETF",   # ETF 고정 페이지 37개 (2026-11-12 사용자 A안)
     "stock-title": "종목 제목 줄",   # 제목 꼬리 13/19 · 공유 버튼 = 회색 기준 상자 오른쪽 (2026-11-11 사용자)
 }
 RECENT_N = 12
-STOCK_DIRS = ("kr-stocks", "stock-radar")   # 폴더 이름 대신 종목 이름을 보이는 폴더 (2026-11-07 사용자)
+STOCK_DIRS = ("kr-stocks", "stock-radar", "stock-etf")   # 폴더 이름 대신 종목 이름을 보이는 폴더 (2026-11-07 사용자)
 PREFS = os.path.join(BASE, ".mock_prefs.json")   # {"star": ["폴더/파일"]} — output 밖이라 서버가 내주지 않는다
 _lock = threading.Lock()
 
@@ -443,6 +444,16 @@ def _slug_map():
                     out[c[2]] = f"{rel}/output/{f}"
         except Exception:  # noqa: BLE001
             continue
+    try:   # ETF 페이지 /p/<티커|코드>-etf.html → stock-etf/output/mock_etf_<키>.html (2026-11-12)
+        spec = importlib.util.spec_from_file_location("_mock_etf_universe", os.path.join(BASE, "etf_universe.py"))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        for sym in m.US_SYMS + m.KR_SYMS:
+            f = f"mock_etf_{m.key(sym)}.html"
+            if os.path.isfile(os.path.join(BASE, "stock-etf", "output", f)):
+                out[m.slug(sym)] = f"stock-etf/output/{f}"
+    except Exception:  # noqa: BLE001
+        pass
     return out
 
 
@@ -633,6 +644,7 @@ body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !im
     if (p === '/' || p === '') return P['home_' + mk];
     if (p === '/p/korea.html') return P.home_kr;
     if ((m = p.match(/^\\/p\\/(.+-stock)\\.html$/))) return C.slugs[m[1]] || '';
+    if ((m = p.match(/^\\/p\\/(.+-etf)\\.html$/))) return C.slugs[m[1]] || '';
     if (p === '/p/us-market-cap-top10.html') return P.list_us;
     if (p === '/p/kr-market-cap-top10.html') return P.list_kr;
     if (p === '/p/forecast-list.html') return P.forecast;
