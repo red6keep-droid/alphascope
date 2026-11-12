@@ -255,7 +255,7 @@ _FILL = {
 }
 ICON_STYLES = [   # (키, 이름, 설명)
     ("A", "가는 선", "지금 목업 — 선 1.8, 지금 칸은 검정 굵은 글자"),
-    ("B", "굵은 선", "선 2.4 — 작은 화면에서 더 또렷"),
+    ("B", "굵은 선", "선 2.2 — 작은 화면에서 더 또렷 (정함)"),
     ("C", "채운 모양", "모든 칸을 채운 아이콘, 지금 칸만 검정"),
     ("D", "지금 칸만 채움", "다른 칸은 선, 지금 칸만 채운 모양 (앱에서 흔한 방식)"),
     ("E", "둥근 바탕", "지금 칸 아이콘 뒤에 옅은 둥근 바탕"),
@@ -325,7 +325,7 @@ def icon_svg(style, key, on, mkt="kr", sv=0, pv=0):
         return _color_icon(key, on, style == "G", mkt)
     if style == "C" or (style == "D" and on):
         return f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">{_FILL[key]}</svg>'
-    w = "2.4" if style == "B" else "1.8"
+    w = "2.2" if style == "B" else "1.8"   # B = 2.2 (2026-11-12 사용자, 옛 2.4)
     g = STOCK_V[sv][1] if key == "stock" else PEOPLE_V[pv][1] if key == "people" else _ICON[key]
     return (f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="{w}" '
             f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{g}</svg>')
@@ -336,7 +336,7 @@ def bar_css():
     return (f"#jbar{{position:fixed;left:0;right:0;bottom:0;z-index:44;display:grid;grid-template-columns:repeat(5,1fr);box-sizing:border-box;"
             f"height:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom));padding-bottom:calc({BAR_PAD}px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #E2E8F0;font-family:inherit}}"
             "#jbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#6B7280;text-decoration:none;font-size:11px;line-height:14px;-webkit-tap-highlight-color:transparent;position:relative}"
-            "#jbar a.on{color:#111;font-weight:700} #jbar a:active{background:#F1F5F9}"
+            "#jbar a.on{color:#111} #jbar a:active{background:#F1F5F9}"   # 선택 = 색만 진하게, 굵기는 그대로 (2026-11-12 사용자)
             "#jbar[data-style=E] a .ji{box-sizing:content-box;padding:3px 16px;border-radius:15px}"
             "#jbar[data-style=E] a.on .ji{background:#E8EDF3}"
             "#jbar[data-style=F] a{font-size:13px;line-height:18px}"
