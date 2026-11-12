@@ -44,6 +44,8 @@ _UA = {"User-Agent": "alpha-scope/price-fallback"}
 _TIMEOUT = 30
 _GAP = {"polygon": 12.5, "twelvedata": 8, "finnhub": 1.1, "alphavantage": 13}   # 분당 한도 → 호출 간격(초)
 _last = {}
+import threading  # noqa: E402
+_LOCK = threading.Lock()   # 종목 수집이 스레드 3개로 부른다 — 간격 계산이 겹치지 않게 (2026-11-12)
 
 
 def _key(*names):
@@ -66,13 +68,14 @@ KEYS = {
 
 
 def _throttle(provider):
-    gap = _GAP.get(provider, 0)
-    t = _last.get(provider)
-    if t and gap:
-        wait = gap - (time.monotonic() - t)
-        if wait > 0:
-            time.sleep(wait)
-    _last[provider] = time.monotonic()
+    with _LOCK:
+        gap = _GAP.get(provider, 0)
+        t = _last.get(provider)
+        if t and gap:
+            wait = gap - (time.monotonic() - t)
+            if wait > 0:
+                time.sleep(wait)
+        _last[provider] = time.monotonic()
 
 
 def _get(provider, url, params):
@@ -254,6 +257,41 @@ def _finnhub_quote(symbol):
     return {"price": round(float(c), 2), "prev": round(float(pc), 2), "change_pct": round((c - pc) / pc * 100, 2), "volume": 0,
             "date": datetime.datetime.utcfromtimestamp(j.get("t") or 0).date().isoformat() if j.get("t") else "", "source": "Finnhub",
             "day_high": j.get("h"), "day_low": j.get("l")}
+
+
+def market_cap(symbol):
+    """시가총액(달러) — Finnhub profile2 (무료, 단위 백만 달러). yfinance fast_info 가 빈 종목만 (2026-11-12 빈 값 대비). 없으면 None."""
+    key = KEYS["finnhub"]()
+    if not key or not _plain(symbol):
+        return None
+    try:
+        j = _get("finnhub", "https://finnhub.io/api/v1/stock/profile2", {"symbol": _dot(symbol), "token": key})
+    except Exception as e:  # noqa: BLE001
+        print(f"[price_source] {symbol} Finnhub 시총 실패: {e}")
+        return None
+    m = j.get("marketCapitalization")
+    if not m or (j.get("currency") or "USD") != "USD":
+        return None
+    _log(symbol, "Finnhub", "시총")
+    return float(m) * 1e6
+
+
+def earnings_dates(symbol, back_days=400, ahead_days=120):
+    """실적 발표일 [{"day", "when": "bmo" | "amc" | None}] — Finnhub 실적 달력 (무료). yfinance 실적일이 빈 종목만 (2026-11-12). 없으면 []."""
+    key = KEYS["finnhub"]()
+    if not key or not _plain(symbol):
+        return []
+    t = datetime.date.today()
+    try:
+        j = _get("finnhub", "https://finnhub.io/api/v1/calendar/earnings",
+                 {"symbol": _dot(symbol), "from": (t - datetime.timedelta(days=back_days)).isoformat(), "to": (t + datetime.timedelta(days=ahead_days)).isoformat(), "token": key})
+    except Exception as e:  # noqa: BLE001
+        print(f"[price_source] {symbol} Finnhub 실적일 실패: {e}")
+        return []
+    out = [{"day": x["date"], "when": x.get("hour") if x.get("hour") in ("bmo", "amc") else None} for x in j.get("earningsCalendar") or [] if x.get("date")]
+    if out:
+        _log(symbol, "Finnhub", f"실적일 {len(out)}")
+    return sorted({x["day"]: x for x in out}.values(), key=lambda x: x["day"])
 
 
 # ── Alpha Vantage (무료: 25회/일 — 맨 뒤) ───────────────────────────────────
