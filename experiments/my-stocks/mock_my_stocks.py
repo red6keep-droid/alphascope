@@ -138,9 +138,9 @@ def grand_card(held):
     gain = val - cost
     kind = "positive" if gain > 0 else "negative" if gain < 0 else "neutral"   # 카드 색 = 답 방향 (가이드라인 7-1)
     ROW = "display:flex;justify-content:space-between;align-items:baseline;gap:12px;"
-    FS = 16   # 아래 줄 글자 · 수익률 한 크기 (2026-11-12 사용자: 증감 정보는 다 같은 크기)
+    FS = 15   # 아래 줄 금액 · 수익률 = 종목 줄 등락 숫자와 같은 15px (2026-11-12 사용자: 16 → 엔비디아 증감 숫자 크기)
     # 아래 네 줄 = 세 칸 격자: 이름 | 금액(왼쪽 정렬, 네 줄이 같은 세로선) | 수익률(오른쪽). 모두 보통 굵기 (2026-11-12 사용자)
-    GRID = f"display:grid;grid-template-columns:auto 1fr auto auto;column-gap:10px;align-items:baseline;font-size:{FS}px;line-height:24px;color:#333;font-weight:400;"
+    GRID = f"display:grid;grid-template-columns:auto 1fr auto auto;column-gap:10px;align-items:baseline;font-size:{FS}px;line-height:22px;color:#333;font-weight:400;"
     RULE = '<span aria-hidden="true" style="grid-column:1/-1;height:1px;background:#FEE6CA;margin:8px 0;"></span>'
 
     def cells(label, amount_html, rate_html=""):
@@ -150,7 +150,7 @@ def grand_card(held):
 
     top = (f'<div style="{ROW}"><span style="font-size:17px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">총 평가 금액</span>'
            f'<span style="font-size:21px;line-height:28px;font-weight:800;color:#111;white-space:nowrap;">{won_html(val, 21)}</span></div>')   # 30 → 28 → 26 → 23 → 21 (2026-11-12 사용자)
-    grid = [f'<span style="grid-column:1/-1;text-align:right;white-space:nowrap;font-size:{dk.TINY};color:{dk.NOTE};">매수 금액 {won_html(cost, 14)}</span>',   # 매수 금액 = 수익 금액 위 · `매수 금액 33,325,020 원` 한 덩어리 오른쪽 정렬, 회색 작은 글씨 (2026-11-12 사용자)
+    grid = [f'<span style="grid-column:1/-1;text-align:right;white-space:nowrap;font-size:{dk.TINY};color:{dk.NOTE};">{won_html(cost, 14)}</span>',   # 매수 금액 = 수익 금액 위 · 금액만 오른쪽 정렬, 회색 작은 글씨 (2026-11-12 사용자: `매수 금액` 글자 삭제)
             cells("수익 금액", updown(gain, won_html(gain, FS), FS, tri=False), updown(gain, f"{abs(gain / cost * 100):.1f}%", FS))]
     for m, head in (("us", "미국"), ("kr", "한국")):   # `미국 3종목` (2026-11-12 사용자: `미국 종목` → `미국`)
         rows = [h for h in held if h[0]["m"] == m]
