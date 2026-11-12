@@ -162,6 +162,7 @@ def index_page(archive=False):
             parts.append('<div class="meta">쓰지 않는 목업이 없습니다</div>')
     else:
         parts.append(f'<a class="big dark" href="{JOURNEY_START}">사용자 여정 테스트 <span>홈에서 시작 · 상단 · 하단 메뉴로 이동 ›</span></a>')
+        parts.append('<a class="big" href="/icons">하단 메뉴 아이콘 비교 <span>스타일 6가지 ›</span></a>')
         fav = [by_key[k] for k in stars if k in by_key]   # 누른 순서대로
         if fav:
             parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars) for x in fav), "</section>"]
@@ -244,6 +245,75 @@ _ICON = {   # 22px 선 아이콘 (viewBox 24, 선 1.8)
     "forecast": '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
     "people": '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
 }
+# 하단 메뉴 아이콘 스타일 비교 (2026-11-12 사용자: 여러 스타일을 그려 보고 고른다). 선 = 테두리만, 면 = 채운 모양
+_FILL = {
+    "home": '<path d="M3.2 10.6 12 3l8.8 7.6V20a1 1 0 0 1-1 1H15v-6.2H9V21H4.2a1 1 0 0 1-1-1z"/>',
+    "report": '<path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M6.5 15.5l3.5-4 3 2.5 4.5-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    "stock": '<rect x="3" y="4.5" width="18" height="4" rx="1.5"/><rect x="3" y="10" width="18" height="4" rx="1.5"/><rect x="3" y="15.5" width="18" height="4" rx="1.5"/>',
+    "forecast": '<path fill-rule="evenodd" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 4.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/><circle cx="12" cy="12" r="2.6"/>',
+    "people": '<circle cx="12" cy="7.5" r="4.5"/><path d="M3.5 21c.8-5 4.2-8 8.5-8s7.7 3 8.5 8z"/>',
+}
+ICON_STYLES = [   # (키, 이름, 설명)
+    ("A", "가는 선", "지금 목업 — 선 1.8, 지금 칸은 검정 굵은 글자"),
+    ("B", "굵은 선", "선 2.4 — 작은 화면에서 더 또렷"),
+    ("C", "채운 모양", "모든 칸을 채운 아이콘, 지금 칸만 검정"),
+    ("D", "지금 칸만 채움", "다른 칸은 선, 지금 칸만 채운 모양 (앱에서 흔한 방식)"),
+    ("E", "둥근 바탕", "지금 칸 아이콘 뒤에 옅은 둥근 바탕"),
+    ("F", "글자만", "아이콘 없이 글자, 지금 칸 아래 짧은 막대"),
+]
+JTABS = [("home", "홈"), ("report", "증시 리포트"), ("stock", "종목"), ("forecast", "증시 전망"), ("people", "인물 발언")]
+BAR_PAD = 10   # 하단 메뉴 아래 여백 — 화면 맨 아래에서 10px 위로 (2026-11-12 사용자)
+BAR_H = 56
+
+
+def icon_svg(style, key, on):
+    """하단 메뉴 아이콘 한 개 — 스타일 · 지금 칸 여부에 따라."""
+    if style == "F":
+        return ""
+    if style == "C" or (style == "D" and on):
+        return f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">{_FILL[key]}</svg>'
+    w = "2.4" if style == "B" else "1.8"
+    return (f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="{w}" '
+            f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{_ICON[key]}</svg>')
+
+
+def bar_css():
+    """하단 메뉴 공통 CSS — 여정 화면 · 아이콘 비교 화면이 같이 쓴다. 스타일은 #jbar 의 data-style."""
+    return (f"#jbar{{position:fixed;left:0;right:0;bottom:0;z-index:44;display:grid;grid-template-columns:repeat(5,1fr);box-sizing:border-box;"
+            f"height:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom));padding-bottom:calc({BAR_PAD}px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #E2E8F0;font-family:inherit}}"
+            "#jbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#6B7280;text-decoration:none;font-size:11px;line-height:14px;-webkit-tap-highlight-color:transparent;position:relative}"
+            "#jbar a.on{color:#111;font-weight:700} #jbar a:active{background:#F1F5F9}"
+            "#jbar[data-style=E] a .ji{box-sizing:content-box;padding:3px 16px;border-radius:15px}"
+            "#jbar[data-style=E] a.on .ji{background:#E8EDF3}"
+            "#jbar[data-style=F] a{font-size:13px;line-height:18px}"
+            "#jbar[data-style=F] a.on::after{content:'';position:absolute;bottom:8px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:#111}")
+
+
+def bar_html(style, cur=""):
+    return (f'<nav class="jsample" data-style="{style}">'
+            + "".join(f'<a data-jt="{k}" href="#"' + (' class="on"' if k == cur else '') + f'>{icon_svg(style, k, k == cur)}<span>{t}</span></a>' for k, t in JTABS)
+            + "</nav>")
+
+
+def icons_page():
+    """아이콘 스타일 비교 화면 — 스타일마다 하단 메뉴 견본(지금 칸 = 종목) + `이 스타일로 여정 보기`."""
+    rows = []
+    for k, name, why in ICON_STYLES:
+        rows.append(f'<section><h2>{k}. {html.escape(name)}</h2><div class="why">{html.escape(why)}</div>{bar_html(k, "stock")}'
+                    f'<a class="go" href="{JOURNEY_START}?icon={k}">이 스타일로 여정 보기 ›</a></section>')
+    css = bar_css().replace("#jbar", ".jsample").replace("position:fixed;left:0;right:0;bottom:0;z-index:44;", "position:relative;")
+    return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>하단 메뉴 아이콘 비교</title><style>
+body{{margin:0;padding:16px;font:16px/1.4 -apple-system,"Apple SD Gothic Neo",sans-serif;background:#f6f7f9;color:#1d2127}}
+h1{{font-size:20px;margin:0 0 4px}} .meta{{color:#8a919c;font-size:13px;margin-bottom:16px}}
+section{{background:#fff;border:1px solid #e3e6eb;border-radius:12px;margin:0 0 14px;overflow:hidden}}
+h2{{font-size:16px;margin:14px 14px 2px}} .why{{color:#6B7280;font-size:13px;margin:0 14px 12px}}
+.go{{display:block;padding:12px 14px;border-top:1px solid #eef0f3;color:#1d2127;text-decoration:none;font-size:14px;font-weight:600}}
+{css}
+</style></head><body><h1>하단 메뉴 아이콘 비교</h1><div class="meta">견본의 지금 칸 = 종목 · 아래 여백 {BAR_PAD}px 포함 · <a href="/">목업 목록으로</a></div>
+{''.join(rows)}</body></html>"""
+
+
 LOGO = ('<svg viewBox="0 0 313 286" width="31" height="28" aria-hidden="true"><path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/>'
         '<path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000000"/></svg>')
 CM_ICON = ('<svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
@@ -342,13 +412,15 @@ def journey_bar(d, f):
     od = os.path.join(BASE, "issue_store", "output")
     fore = {x[:-5].replace("mock_", "", 1): f"issue_store/output/{x}" for x in os.listdir(od)
             if x.startswith("mock_forecast-") and x.endswith(".html")} if os.path.isdir(od) else {}
-    tabs = [("home", "홈"), ("report", "증시 리포트"), ("stock", "종목"), ("forecast", "증시 전망"), ("people", "인물 발언")]
+    tabs = JTABS
+    icons = {st: {k: [icon_svg(st, k, False), icon_svg(st, k, True)] for k, _ in JTABS} for st, _, _ in ICON_STYLES}
     btns = "".join(f'<a data-jt="{k}" href="#"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" '
                    f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{_ICON[k]}</svg><span>{t}</span></a>' for k, t in tabs)
-    cfg = json.dumps({"pages": J_PAGES, "slugs": _slug_map(), "fore": fore, "dir": d, "file": f}, ensure_ascii=False)
+    cfg = json.dumps({"pages": J_PAGES, "slugs": _slug_map(), "fore": fore, "dir": d, "file": f, "icons": icons}, ensure_ascii=False)
     footer = ('<footer class="site-footer"><details class="footer-disclaimer"><summary><span class="footer-title">ALPHASCOPE 주식 리포트</span></summary>'
               '<p>해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다.</p></details>'
               '<p class="footer-copy">© 2026 ALPHASCOPE. All rights reserved.</p></footer>')
+    bar_css_esc = bar_css()
     return f"""
 {footer}
 <style>
@@ -373,21 +445,18 @@ header.navbar, .header-bar {{display:none !important}}   /* 홈 목업의 옛 �
 .jgt{{padding:12px 20px 4px;font-size:16px;line-height:24px;font-weight:700;color:#111}}
 .jgrp a{{display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 20px 0 32px;color:#333;text-decoration:none;font-size:15px;line-height:22px}}
 .jgrp a span{{color:#9CA3AF}} .jgrp a[data-jnone]{{color:#6B7280}} .jgrp a:active{{background:#F1F5F9}} .jgrp a.on{{color:#111;font-weight:700}}
-#jbar{{position:fixed;left:0;right:0;bottom:0;z-index:44;display:grid;grid-template-columns:repeat(5,1fr);height:56px;padding-bottom:env(safe-area-inset-bottom);
-  background:#fff;border-top:1px solid #E2E8F0;font-family:inherit}}
-#jbar a{{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#6B7280;text-decoration:none;font-size:11px;line-height:14px;-webkit-tap-highlight-color:transparent}}
-#jbar a.on{{color:#111;font-weight:700}} #jbar a:active{{background:#F1F5F9}}
-body{{padding-bottom:calc(56px + env(safe-area-inset-bottom)) !important}}
+{bar_css_esc}
+body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !important}}
 /* 글 끝 순서 (같은 날 사용자 4차): 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터. 버튼 줄 위아래 구분선 없음 */
 .post-shell .post-nav, .post-shell.ends-text .post-nav{{border-top:0 !important;border-bottom:0 !important;padding-top:0 !important;padding-bottom:0 !important;margin-top:24px !important}}
 .post-shell > [data-related].is-moved{{margin-top:40px !important}}
 .post-nav .post-nav-list{{display:none !important}}   /* 검은 `목록` · `홈으로` 버튼 뺌 — 지난 리포트는 서랍 메뉴 하위 칸, 홈은 하단 메뉴 */
-#jtoast{{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:10001;padding:10px 16px;border-radius:8px;background:#111;color:#fff;font-size:13px;line-height:18px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}}
+#jtoast{{position:fixed;left:50%;bottom:{BAR_H + BAR_PAD + 20}px;transform:translateX(-50%);z-index:10001;padding:10px 16px;border-radius:8px;background:#111;color:#fff;font-size:13px;line-height:18px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}}
 #jmock{{display:block;padding:18px 16px 26px;text-align:center;font:13px/18px -apple-system,'Apple SD Gothic Neo',sans-serif;color:#8a919c}}
 #jmock a{{color:#8a919c}}
 </style>
 <div id="jmock">사용자 여정 테스트 · <a href="/">목업 목록으로</a></div>
-<nav id="jbar" aria-label="주요 페이지">{btns}</nav><div id="jtoast"></div>
+<nav id="jbar" data-style="A" aria-label="주요 페이지">{btns}</nav><div id="jtoast"></div>
 <script>
 (function () {{
   var C = {cfg}, J = '{J}', here = C.dir + '/output/' + C.file, P = C.pages;
@@ -399,7 +468,17 @@ body{{padding-bottom:calc(56px + env(safe-area-inset-bottom)) !important}}
   var cur = /home-split/.test(here) ? 'home' : /daily-report|kr-market-report/.test(here) ? 'report' : /stock-radar|kr-stocks/.test(here) ? 'stock'
           : /issue_store/.test(here) ? 'forecast' : /people-radar/.test(here) ? 'people' : '';
   function go(key) {{ return J + (P[key] || key); }}
-  document.querySelectorAll('#jbar a').forEach(function (a) {{ a.href = J + tab[a.dataset.jt]; if (a.dataset.jt === cur) a.className = 'on'; }});
+  var ic = (location.search.match(/[?&]icon=([A-F])/) || [])[1];   // 아이콘 스타일 — 비교 화면에서 고른 것을 이 탭 동안 기억
+  if (ic) {{ try {{ sessionStorage.setItem('jIcon', ic); }} catch (e) {{}} }}
+  try {{ ic = ic || sessionStorage.getItem('jIcon'); }} catch (e) {{}}
+  ic = ic || 'A';
+  document.getElementById('jbar').setAttribute('data-style', ic);
+  document.querySelectorAll('#jbar a').forEach(function (a) {{
+    var k = a.dataset.jt, on = k === cur, svg = a.querySelector('svg'), sv = (C.icons[ic] || C.icons.A)[k][on ? 1 : 0];
+    if (svg) svg.remove();
+    if (sv) a.insertAdjacentHTML('afterbegin', sv);
+    a.href = J + tab[k]; if (on) a.className = 'on';
+  }});
   // 헤더 — 로고 = 지금 나라 홈, 국기 스위치 = 다른 나라 홈
   document.querySelectorAll('[data-jk]').forEach(function (a) {{ var k = a.dataset.jk; a.href = k === 'home' ? J + P['home_' + mk] : go(k); if (go(k) === location.pathname) a.classList.add('on'); }});
   var other = mk === 'kr' ? 'us' : 'kr', fl = document.querySelector('.jflag');
@@ -502,6 +581,14 @@ class Handler(SimpleHTTPRequestHandler):
         journey = path.startswith("/j/")   # 사용자 여정 테스트 — 같은 파일 + 하단 메뉴 · 링크 잇기
         if journey:
             path = path[2:]
+        if path == "/icons":
+            body = icons_page().encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
         if path in ("/", "/index.html", "/archive"):
             body = index_page(archive=path == "/archive").encode()
             self.send_response(200)
