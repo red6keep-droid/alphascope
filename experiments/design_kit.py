@@ -796,15 +796,82 @@ def _minus_bar(t):
 SENT_ATTR = 'data-emph-sent="1"'   # 강조 카드 문장 줄 표시 (render_html _state_card) — 문장 안 증감 숫자 굵게 (P279)
 
 
+# ---------------------------------------------------------------- 증감 = 삼각형 (2026-11-12 사용자: "그래프를 제외하고 전부 삼각형으로", 가이드라인 5절)
+# 증감 색(빨강 · 파랑)으로 칠한 부호 숫자 `+1.23%` · `−0.5%p` · `+5bp` · `+1,300억` → `▲ 1.23%` · `▼ 0.5%p`. 삼각형 = 그 자리 글자의 80% 정수 px · 위로 1 (회원 목업 updown · emph_tri 와 같은 꼴).
+# 그래프(세로 막대 · 선 · 가로 막대 말풍선 · SVG)는 그대로 + · −. 범위(`−0.6 ~ +0.6%`) · 기준(`+3%p 넘으면`)은 증감이 아니라 그대로. 0 은 부호 없이.
+_UP_COLS = {"#d93025", "#f44336"}
+_DN_COLS = {"#1a73e8", "#2196f3"}
+_TRI_SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d[\d,]*(?:\.\d+)?)" + _UNITS + r"(?![A-Za-z])(?!\s*~)(?!\s*(?:넘|아래|이상|이하|미만|초과|안팎|안쪽|밖|까지|부터))")
+_PAINTED = re.compile(r'(<span style="color:(#[0-9A-Fa-f]{6});[^"]*">)([^<]*)(</span>)')
+_CHART_MARKS = ("data-lscroll", "data-range-gauge", "data-chart-top", "data-ichart", "data-no-tri")
+_VOID = {"br", "img", "hr", "input", "meta", "link", "wbr", "source", "col", "area"}
+_COLOR_RE = re.compile(r"(?:^|[;\s\"])color:\s*(#[0-9A-Fa-f]{6})")
+_FS_RE = re.compile(r"font-size:\s*(\d+)px")
+BODY_PX = 19   # 테마 본문 글자 (dk.BODY) — 글자 크기를 안 정한 자리의 기준
+
+
+def tri_span(up, px):
+    return f'<span data-tri="1" style="font-size:{round(px * 0.8)}px;vertical-align:1px;margin-right:2px;">{"▲" if up else "▼"}</span>'
+
+
+def _tri_sub(text, px, paint=False, bold=False):
+    """paint = 바깥에 증감 색이 없다 — 숫자째 증감 색으로 감싼다(`삼성전자 +3.57%` · `목표가 (지금보다 +13.0%)` 처럼 칠하지 않고 남은 증감)."""
+    def rep(m):
+        num = m.group(2)
+        if float(num.replace(",", "")) == 0:
+            return num + m.group(3)
+        up = m.group(1) == "+"
+        out = tri_span(up, px) + num + m.group(3)
+        return f'<span style="color:{UP if up else DOWN};{"font-weight:700;" if bold else ""}white-space:nowrap;">{out}</span>' if paint else out   # bold = 강조 카드 문장 (P279)
+    return _TRI_SIGNED.sub(rep, text)
+
+
+def _tri_plain(text):
+    """툴팁 글(HTML 못 넣음) — `▲ 1.2%` 글자."""
+    def rep(m):
+        num = m.group(2)
+        if float(num.replace(",", "")) == 0:
+            return num + m.group(3)
+        return ("▲ " if m.group(1) == "+" else "▼ ") + num + m.group(3)
+    return _TRI_SIGNED.sub(rep, text)
+
+
+def _tri_in_text(t, px, colored, bold=False):
+    """글자 노드 하나(_sign_text 가 칠한 span 이 들어 있을 수 있음). colored = 바깥이 이미 증감 색."""
+    def painted(m):
+        col = m.group(2).lower()
+        if col in _UP_COLS or col in _DN_COLS:
+            return m.group(1) + _tri_sub(m.group(3), px) + m.group(4)
+        return m.group(0)
+    t = _PAINTED.sub(painted, t)
+    return "".join(p if p.startswith("<") else _tri_sub(p, px, paint=not colored, bold=bold) for p in _TAG.split(t))
+
+
 def fix_colons(html):
     """보이는 글의 ":" · "·" 는 앞뒤를 한 칸씩 띄운다 ("·" 는 2026-10-13 사용자) — "라벨 : 값" (2026-10-11 사용자: 꼭 반드시, 모든 페이지 일괄).
     글자 노드와 툴팁·제목 속성(data-tip · title · aria-label)만 고친다. style · script 안, 시각·비율(숫자:숫자), 주소(://)는 건드리지 않는다.
     각 리포트의 build_body 마지막에 한 번 건다 — LLM 서술도 같이 고쳐진다. 줄표 ` — ` 도 여기서 쉼표로 (_no_dash).
     숫자 앞 빼기(−3)는 그린 줄(MINUS_BAR)로, 툴팁 속 빼기는 엔 대시(–)로 (2026-10-26 사용자)."""
     out, skip, svg, sent = [], False, False, False
+    stack = []   # (태그 이름, 증감 색 여부, 글자 px, 그래프 안) — 삼각형 크기 · 그래프 건너뛰기용
     for part in _TAG.split(html):
         if part.startswith("<") and part.endswith(">"):
             low = part[:8].lower()
+            m_name = re.match(r"<\s*(/?)\s*([A-Za-z0-9:-]+)", part)
+            if m_name:
+                close, name = m_name.group(1) == "/", m_name.group(2).lower()
+                if close:
+                    for k in range(len(stack) - 1, -1, -1):
+                        if stack[k][0] == name:
+                            del stack[k:]
+                            break
+                elif name not in _VOID and not part.endswith("/>") and not name.startswith("!"):
+                    par = stack[-1] if stack else ("", None, BODY_PX, False)
+                    mc, mf = _COLOR_RE.search(part), _FS_RE.search(part)
+                    col = mc.group(1).lower() if mc else None
+                    colored = (col in _UP_COLS or col in _DN_COLS) if col else par[1]
+                    stack.append((name, colored, int(mf.group(1)) if mf else par[2],
+                                  par[3] or name == "svg" or any(k in part for k in _CHART_MARKS)))
             if low.startswith("<li") and SENT_ATTR in part:
                 sent = True   # 강조 카드 문장 — 여기서 붙이는 증감 숫자는 굵게 (2026-11-02 사용자 P279)
             elif low.startswith("</li"):
@@ -817,11 +884,14 @@ def fix_colons(html):
                 svg = True
             elif low.startswith("</svg"):
                 svg = False
-            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _MINUS_NUM.sub("–", _sign_text(_space_dots(_space_colons(_no_dash(m.group(2)))), False)) + m.group(3), part))   # 툴팁 글은 HTML 을 못 넣어 엔 대시로
+            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _MINUS_NUM.sub("–", (_tri_plain if m.group(1).startswith("data-tip") else (lambda x: x))(_sign_text(_space_dots(_space_colons(_no_dash(m.group(2)))), False))) + m.group(3), part))   # 툴팁 글은 HTML 을 못 넣어 엔 대시로 · 툴팁 증감 = `▲ 1.2%` 글자 (2026-11-12)
         elif skip:
             out.append(part)
         else:
             t = _sign_text(_space_dots(_space_colons(_no_dash(_ASCII_MINUS.sub("−", part) if not svg else part))), not svg, sent)
+            top = stack[-1] if stack else ("", None, BODY_PX, False)
+            if not svg and not top[3]:
+                t = _tri_in_text(t, top[2], bool(top[1]), sent)   # 증감 색 숫자 → 삼각형, 그래프 안은 그대로 (2026-11-12 사용자)
             out.append(t if svg else _minus_bar(t))   # 숫자 앞 − 는 그린 줄로 (MINUS_BAR) — SVG <text> 안은 HTML 을 못 넣어 글자 그대로 (2026-11-01: 매출 선 그래프 음수 값이 그림을 깼다, P233)
     return "".join(out)
 
@@ -1707,7 +1777,7 @@ def _trend_ticks(lo, hi, n=4):
     return out
 
 
-def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False, ends_only=False, end_right=False):   # 선 굵기 · 점선 · 끝 값 = 종목 페이지 line_chart 와 같게(2 · 1 · 6 5 · 13/17 · 점 3/2 · 최신 점 5/4 — 정수 px, 2026-11-07 0-5)
+def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False, ends_only=False, end_right=True):   # 선 굵기 · 점선 · 끝 값 = 종목 페이지 line_chart 와 같게(2 · 1 · 6 5 · 13/17 · 점 3/2 · 최신 점 5/4 — 정수 px, 2026-11-07 0-5)
     """흐름을 보는 선 그래프 흰 카드 (2026-11-05 사용자 M67 · M70 · M71 · M72 · M76).
     labels = 가로축 이름(오래된 것 → 최신, 최신 오른쪽 P164). series = [(이름, 값 목록(None 허용), 색, 모양)] 모양 = "solid" · "dash"(비교 대상 · 기준선) · "step" · "stepdash"(계단 점선 — 기준금리).
     첫 계열이 주인공. 점선 계열은 범례에서 `비교 대상 : 이름`.
@@ -1737,7 +1807,9 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
     hint = ""
     if sparse:
         step = 46
-        W = n * step + 14   # 끝 점 숫자 ~ 세로축 숫자 사이 14px (2026-11-05 사용자 M77: 너무 붙었다)
+        # 마지막 날 값 = 점 오른쪽(점 ~ 숫자 8, 점과 같은 높이) — 선 그래프 규칙 (2026-11-12 사용자: "마지막 날 증감 표시는 우측, 동그라미는 좌측", 가이드라인 9절)
+        last_w = max([text_px(fmt(v), 13) for _, xs, _, kind in series if not dashed(kind) for v in xs[-1:] if v is not None] + [0])
+        W = int(n * step + max(14, 5 + 8 + last_w - step / 2 + 14))   # 끝 점 숫자 ~ 세로축 숫자 사이 14px (2026-11-05 사용자 M77)
         X = lambda i: step / 2 + i * step   # noqa: E731
         g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="{GRID_LINE}" stroke-width="1"/>' for t in ticks)
         lines_, dots, labs = "", "", ""
@@ -1754,8 +1826,17 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
                 last = i == n - 1
                 dots += f'<circle cx="{X(i):.1f}" cy="{y(v):.1f}" r="{5 if last else 3}" fill="#fff" stroke="{col}" stroke-width="{4 if last else 2}"/>'
                 cols.setdefault(i, []).append((y(v), fmt(v), col, k, last))
-        for i, items in cols.items():   # 한 칸 안 숫자 — 위에서부터 15px 씩 겹치지 않게, 점 바로 위
+        for i, items in cols.items():   # 한 칸 안 숫자 — 위에서부터 15px 씩 겹치지 않게, 점 바로 위 (마지막 날은 점 오른쪽)
             used = []
+            if i == n - 1:
+                for yy, txt, col, k, last in sorted(items):
+                    ly = yy + 4.5
+                    while any(abs(ly - u) < 15 for u in used):
+                        ly += 15
+                    used.append(ly)
+                    labs += (f'<text x="{X(i) + 5 + 8:.1f}" y="{ly:.1f}" text-anchor="start" font-size="13" font-weight="700" '
+                             f'fill="{"#111" if k == 0 else NOTE}">{esc(txt)}</text>')
+                continue
             for yy, txt, col, k, last in sorted(items):
                 ly = yy - 8
                 while any(abs(ly - u) < 15 for u in used):

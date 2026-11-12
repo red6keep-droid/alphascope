@@ -43,9 +43,17 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-say b, .as-v, .as-grid b, .as-bars b { font-family: var(--num); }
 .as-up { color: var(--up, #E53E3E); }
 .as-dn { color: var(--down, #1A73E8); }
+/* 증감 삼각형 = 옆 숫자의 80% 정수 px · 위로 1 (회원 목업 · 가격 카드 PRICE_TRI 와 같은 방식, 2026-11-12 사용자) */
+.as-tri { position: relative; top: -1px; font-size: 13px; }               /* 문장 16 → 13 */
+.as-grid .as-tri { font-size: 12px; }                                    /* 기간별 등락 15 → 12 */
+.as-bot .as-say .as-tri, .as-bot .as-msg .as-tri { font-size: 12px; }   /* 질문하기 문장 15 → 12 */
+.as-bot .as-grid .as-tri { font-size: 10px; }                            /* 질문하기 기간별 등락 13 → 10 */
 .as-sec { border-top: 1px solid var(--border, #F0F0F0); margin-top: 10px; padding-top: 10px; }
 .as-sec.as-first { border-top: 0; margin-top: 0; padding-top: 0; }   /* 검색한 내용이 카드 첫 칸 — 머리 바로 아래 (2026-11-10) */
 .as-sec h4 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 15px; line-height: 22px; color: #111; font-weight: 700; }   /* 증시 전망 팝업 소제목과 같은 글씨 15/22 */
+.as-sec h4 small { font-size: 13px; font-weight: 400; color: #6B7280; }   /* 같은 기간 비교 (최근 1주) */
+.as-lv, .as-open { font-style: normal; font-size: 12px; line-height: 18px; padding: 0 5px; border: 1px solid #E2E8F0; border-radius: 4px; color: #6B7280; white-space: nowrap; }   /* 업종 기사 · 향방미정 = 회색 외곽선 라벨 (증시 전망 `논의중` 과 같은 꼴) */
+.as-hz { margin: 6px 0 2px; font-size: 13px; line-height: 19px; color: #6B7280; font-weight: 700; }   /* 알파스코프 신호 단기 · 중기 */
 .as-ico { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #E5E7EB; color: #4B5563; }   /* 기본형 아이콘 (가이드라인 8절) */
 .as-ico svg { width: 12px; height: 12px; display: block; }
 .as-related h4 { margin: 0 0 6px; font-size: 14px; color: #475569; font-weight: 700; }
@@ -57,13 +65,22 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-note { color: #6B7280; font-size: 13px; line-height: 1.6; margin: 6px 0; }
 .as-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .as-grid div { background: var(--surface-sub, #F8FAFC); border-radius: 8px; padding: 8px 4px; text-align: center; }
-.as-grid span { display: block; font-size: 12px; color: #6B7280; }
-.as-grid b { font-size: 15px; }
-.as-bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-items: end; margin: 6px 0 4px; }
-.as-bars div { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; }
-.as-bars i { display: block; width: 60%; background: #CBD5E1; border-radius: 3px 3px 0 0; }
-.as-bars div:last-child i { background: var(--ink, #0F172A); }
-.as-bars span { color: #6B7280; }
+.as-grid div > span { display: block; font-size: 12px; color: #6B7280; }   /* 칸 이름만 — 증감 삼각형(.as-tri)은 숫자와 한 줄 */
+.as-grid b { font-size: 15px; white-space: nowrap; }
+/* 분기 매출 선 그래프 = 가이드라인 9절 선 그래프(dk.trend_card) — 주황 선 2 · 속 빈 점 · 최신 값만 13 굵게 #111 · 세로축 오른쪽 12 · 단위는 머리 12 (2026-11-12 사용자) */
+.as-line { margin: 10px 0 6px; }
+.as-line-unit { text-align: right; font-size: 12px; line-height: 18px; color: #6B7280; margin-bottom: 2px; }
+.as-line-box { position: relative; padding-right: 34px; }
+.as-line-plot { position: relative; }
+.as-dot { position: absolute; box-sizing: border-box; border-radius: 50%; background: #fff; border: 2px solid #F5B971; }
+.as-val { position: absolute; transform: translateX(-50%); white-space: nowrap; font-family: var(--num); font-size: 12px; line-height: 14px; color: #6B7280; }
+.as-val.as-last { font-size: 13px; font-weight: 700; color: #111; }
+.as-val.as-end { transform: none; }   /* 마지막 날 = 점 오른쪽 (가운데 맞춤 없음) */
+.as-line-x { position: relative; height: 40px; margin-top: 6px; }
+.as-line-x span { position: absolute; top: 0; transform: translateX(-50%); text-align: center; white-space: nowrap; font-size: 12px; line-height: 16px; color: #6B7280; }
+.as-line-x span.as-last { color: #111; }
+.as-line-y { position: absolute; right: 0; top: 0; width: 30px; }
+.as-line-y span { position: absolute; right: 0; font-family: var(--num); font-size: 12px; line-height: 18px; color: #6B7280; }
 .as-news, .as-posts { list-style: none; margin: 0; padding: 0; }
 .as-news li { padding: 5px 0; font-size: 15px; line-height: 1.6; }
 .as-news li > span { color: #6B7280; font-family: var(--num); font-size: 13px; margin-right: 8px; }
@@ -95,28 +112,42 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-posts a:hover { text-decoration: underline; }
 .as-posts span { color: #94A3B8; font-family: var(--num); font-size: 13px; flex: none; }
 
-/* 질문하기 */
-.as-chat-fab { position: fixed; right: 20px; bottom: 20px; z-index: 150; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px;
-  background: var(--ink, #0F172A); color: #fff; padding: 12px 18px; font: inherit; font-family: var(--sans); font-size: 15px; font-weight: 700;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, .25); cursor: pointer; }
-.as-chat-fab svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+/* 질문하기 — 포인트 = 청록 그라데이션(C5): 질문하기 버튼 · 내 질문 말풍선 · 보내기 · 입력칸 테두리. 옛 주황 #F5B971 + 검정 글자는 안 어울림 (2026-11-12 사용자) */
+:root { --as-point: linear-gradient(135deg, #0E7490 0%, #0369A1 100%); --as-point-ink: #fff; --as-point-icon: currentColor; --as-point-line: transparent;
+  --as-point-edge: linear-gradient(135deg, #0E7490 0%, #0369A1 100%); }   /* 포인트 = C5 청록 → 바다 파랑 그라데이션 + 흰 글자(대비 5.4:1 이상) (2026-11-12 사용자, 시안 mock_point_gradient.html) */
+.as-chat-fab { position: fixed; right: 20px; bottom: 20px; z-index: 150; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--as-point-line); border-radius: 999px;
+  background: var(--as-point); color: var(--as-point-ink); padding: 12px 18px; font: inherit; font-family: var(--sans); font-size: 15px; font-weight: 700;
+  box-shadow: 0 8px 24px rgba(3, 105, 161, .30); cursor: pointer; }
+.as-chat-fab svg { width: 20px; height: 20px; fill: none; stroke: var(--as-point-icon); stroke-width: 1.5; stroke-linejoin: round; }   /* 반짝임 선 1.5 (2026-11-12 사용자) */
 .as-chat { position: fixed; right: 20px; bottom: 20px; z-index: 150; width: 400px; height: min(680px, calc(100vh - 40px)); display: flex; flex-direction: column;
   background: var(--bg, #fff); border: 1px solid var(--border-strong, #E2E8F0); border-radius: 16px; box-shadow: 0 16px 48px rgba(15, 23, 42, .22);
   font-family: var(--sans); color: var(--ink, #0F172A); overflow: hidden; }
-.as-chat > header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border, #F0F0F0); font-size: 16px; }
+/* 머리 닫기 = 검색 창과 같은 회색 원 32 안 × (.as-x) — 모든 닫기 통일 (2026-11-12 사용자) */
+.as-chat > header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 10px 16px; border-bottom: 1px solid var(--border, #F0F0F0); font-size: 16px; }
+/* 머리 제목 = 로고 그림(22 × 20, 313:286) + `AlphaScope`(로고 글꼴 Noto Sans KR 900 · 18) + `에 물어보기`(16 보통) (2026-11-12 사용자) */
+.as-chat-title { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; font-size: 16px; line-height: 24px; color: #111; }
+.as-chat-logo { width: 22px; height: 20px; flex: none; display: block; }
+.as-chat-word { font-family: 'Noto Sans KR', sans-serif; font-weight: 900; font-size: 18px; letter-spacing: -0.2px; color: #000; margin-right: 1px; }
 .as-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--surface-sub, #F8FAFC); }
 .as-msg { max-width: 100%; font-size: 15px; line-height: 1.6; }
 .as-msg p { margin: 0 0 8px; }
-.as-me { align-self: flex-end; background: var(--ink, #0F172A); color: #fff; border-radius: 14px 14px 4px 14px; padding: 8px 12px; max-width: 80%; }
+.as-me { align-self: flex-end; background: var(--as-point); color: var(--as-point-ink); border: 1px solid var(--as-point-line); border-radius: 14px 14px 4px 14px; padding: 8px 12px; max-width: 80%; }
 .as-bot { align-self: stretch; }
 .as-bot > p { background: var(--surface, #fff); border: 1px solid var(--border-strong, #E2E8F0); border-radius: 14px 14px 14px 4px; padding: 10px 12px; }
 .as-bot .as-card { margin-bottom: 0; padding: 12px 14px; }
+.as-bot .as-card header { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #E2E8F0; }   /* 종목 이름 아래 구분선 — 이름 ~ 선 12 · 선 ~ 첫 구획 16 (2026-11-12 사용자: 옛 여백 20 → 구분선 추가) */
 .as-bot .as-card h3 { font-size: 16px; }
 .as-bot .as-grid b { font-size: 13px; }
+/* 종목 페이지 버튼 = 질문하기 안에서는 낮게 · 한 단계 작게: 안쪽 위아래 11 → 7(높이 48 → 38) · 글자 16/24 → 15/22 (2026-11-12 사용자) */
+.as-bot .as-go { padding: 7px 12px; font-size: 15px; line-height: 22px; font-weight: 600; }   /* 굵기 700 → 600 (2026-11-12 사용자) */
+.as-bot .as-today { margin-top: 25px; }   /* `오늘 주가` 위 여유 +15 — 위 칸 끝 ~ 구분선 10 → 25 (2026-11-12 사용자) */
+.as-bot .as-go-note { margin-top: 22px; margin-bottom: 4px; }   /* 종목 페이지 버튼 아래 +10 (12 → 22, 2026-11-12 사용자) */   /* 버튼 ~ 안내 8 → 12, 안내 ~ 카드 아래 12 → 16 (2026-11-12 사용자: "딱 붙어있다") */
 .as-bot .as-related { margin-top: 8px; background: var(--surface, #fff); border-radius: 12px; padding: 10px 12px; }
-.as-chat form { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--border, #F0F0F0); }
-.as-chat input { flex: 1; min-width: 0; border: 1px solid var(--border-strong, #E2E8F0); border-radius: 999px; padding: 9px 14px; font: inherit; font-size: 15px; }
-.as-chat form button { border: 0; border-radius: 999px; background: var(--ink, #0F172A); color: #fff; padding: 0 16px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.as-chat form { display: flex; gap: 8px; padding: 10px 12px 20px; border-top: 1px solid var(--border, #F0F0F0); }   /* 보내기 줄 ~ 아래 안내 20 (2026-11-12 사용자) */
+.as-chat input { flex: 1; min-width: 0; border: 1px solid transparent; border-radius: 999px; padding: 9px 14px; font: inherit; font-size: 15px; outline: none;
+  background: linear-gradient(#fff, #fff) padding-box, var(--as-point-edge) border-box; }   /* 입력칸 테두리 = 포인트 그라데이션 1px (2026-11-12 사용자) */
+.as-chat input:focus { box-shadow: 0 0 0 3px rgba(3, 105, 161, .14); }
+.as-chat form button { border: 1px solid var(--as-point-line); border-radius: 999px; background: var(--as-point); color: var(--as-point-ink); padding: 0 16px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
 .as-chat footer { padding: 0 12px 10px; font-size: 12px; color: #94A3B8; text-align: center; }
 
 @media (max-width: 680px) {

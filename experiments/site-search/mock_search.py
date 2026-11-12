@@ -49,6 +49,40 @@ def main():
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(html)
     print("만듦:", os.path.relpath(OUT, ROOT))
+    demo_why(html, index)
+
+
+# `왜 떨어졌어` 칸이 다 찬 모양 (2026-11-12) — 로컬 기사 자료가 주가 날짜보다 오래돼 실제 자료로는 `최근 1주` 근거가 비어 나온다.
+# 엔비디아 근거만 예시 값으로 바꾼 사본. 문장마다 `(예시)` · 맨 위 노란 띠 — 실제 기사 · 신호가 아니다. 블로그에는 쓰지 않는다
+DEMO = "mock_why_demo.html"
+
+
+def demo_why(html, index_js):
+    import json
+    doc = json.loads(index_js.replace("<\\/", "</"))
+    for st in doc["stocks"]:
+        if st["s"] != "NVDA":
+            continue
+        d = st["p"]["d"]
+        st.setdefault("why", {})
+        st["why"].update({
+            "bad": [["2026-11-02", "(예시) 반도체 수출 규제 확대 검토 보도", "예시 매체", 2],
+                    ["2026-10-31", "(예시) 대형 고객사 자체 칩 비중 확대 계획", "예시 매체", 3],
+                    ["2026-10-29", "(예시) 데이터센터 투자 속도 조절 발언", "예시 매체", 2]],
+            "good": [["2026-10-30", "(예시) 신제품 출하 일정 앞당김", "예시 매체", 3]],
+            "open": [["2026-11-01", "(예시) 반독점 조사 범위 논의 중", "예시 매체", 3]],
+            "an": [["2026-10-30", "down"], ["2026-10-31", "down"], ["2026-11-01", "cut"]],
+            "sig": {"d": d, "rows": [["(예시) 단기 추세", "하락 추세", -1, "단기"], ["(예시) 20일 평균선", "아래", -1, "단기"],
+                                       ["(예시) 업계 자금", "유출", -1, "중기"], ["(예시) 애널리스트 목표가", "올림 우세", 1, "중기"]]}})
+    js = json.dumps(doc, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    out = html.replace(index_js, js, 1)
+    head, tail = out.split("<body", 1)
+    k = tail.index(">") + 1
+    out = head + "<body" + tail[:k] + '<div style="position:fixed;top:0;left:0;right:0;z-index:999;background:#FFF8E1;border-bottom:1px solid #F4D37A;padding:6px 12px;font-size:13px;color:#333;text-align:center;">목업 예시 값: 엔비디아 근거(기사 · 애널리스트 · 알파스코프 신호)는 모양을 보이려고 넣은 예시입니다</div>' + tail[k:]
+    out = out.replace("<title>검색 · 질문하기 목업</title>", "<title>질문하기 · 왜 떨어졌어 예시</title>", 1)
+    with open(os.path.join(HERE, "output", DEMO), "w", encoding="utf-8") as f:
+        f.write(out)
+    print("만듦:", os.path.join("experiments", "site-search", "output", DEMO))
 
 
 if __name__ == "__main__":
