@@ -215,6 +215,23 @@ def add_form(held):
     return form + f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{edit_rows}</span></div>'
 
 
+def basis_note():
+    """카드 아래 오른쪽 한 줄 `블로그 종목 페이지의 종가 기준입니다 ?` — 나머지 안내는 ? 팝업 안 (2026-11-12 사용자: 맨 아래 작은 글씨를 팝업으로)."""
+    text = "\n".join([
+        "· 수수료 · 세금 : 반영하지 않습니다.",
+        f"· 미국 종목 : 금액은 현재 환율(1달러 {FX:,.0f}원)로 원화로 바꾸고, 수익률은 달러 그대로 계산합니다.",
+        "· 적어 주신 내용 : 본인만 볼 수 있습니다. 운영자는 열람하지 않으며, 장애 대응 때만 최소한으로 확인합니다.",
+        "· 추천 없음 : 공개 페이지의 정보를 보유 종목만 모아 보여 드립니다. 종목 추천이나 매매 판단을 드리지 않습니다.",
+        "· 자리 : 60일 동안 열지 않으면 다음 분께 넘기고 적어 주신 내용을 지웁니다."])
+    return (f'<div style="display:flex;justify-content:flex-end;align-items:center;margin:-2px 0 12px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">'
+            f'블로그 종목 페이지의 종가 기준입니다{dk.tip(text)}</div>')
+
+
+def leave_link():
+    """탈퇴 = `종목 관리` 탭 맨 아래 작은 회색 링크 (안내 글을 팝업으로 옮기며 자리를 옮김)."""
+    return f'<p style="{SMALL}text-align:right;margin:12px 0 0;"><a data-mock="1" style="color:{dk.NOTE};text-decoration:underline;">탈퇴하고 내용 지우기</a></p>'
+
+
 def fine_print(member=True):
     lines = ["계산 기준: 블로그 종목 페이지와 같은 종가입니다. 수수료 · 세금은 반영하지 않습니다. 미국 종목 금액은 현재 환율로 원화로 바꾸고, 수익률은 달러 그대로 계산합니다.",
              "적어 주신 종목 · 수량 · 평균 매수가는 본인만 볼 수 있습니다. 운영자는 열람하지 않으며, 장애 대응 때만 최소한으로 확인합니다.",
@@ -259,12 +276,11 @@ def main():
     kr = [h for h in held if h[0]["m"] == "kr"]
 
     # 로그인 뒤
-    body = (dk.cards(grand_card(held))   # 맨 위 = 총액 · 총 수익률. 글 머리 카드(data-lead) — 첫 h2 앞. 테마는 data-lead(없으면 첫 data-cards)부터 첫 h2 전까지를 머리로 옮긴다: h2 뒤에 두면 종목 줄 카드가 맨 아래로 밀렸다
+    body = (dk.cards(grand_card(held) + basis_note())   # 맨 위 = 총액 · 총 수익률. 글 머리 카드(data-lead) — 첫 h2 앞. 테마는 data-lead(없으면 첫 data-cards)부터 첫 h2 전까지를 머리로 옮긴다: h2 뒤에 두면 종목 줄 카드가 맨 아래로 밀렸다
             + stock_rows(us, "us") + stock_rows(kr, "kr")   # 총액 바로 아래 = 보유 종목, 제목 없이 (U1 `보유 종목 n개` 삭제)
             + dk.h2("수익", tab="수익")   # 첫 탭 `수익` — 탭 이름과 같은 제목은 테마가 숨긴다. 머리(총액 · 종목 줄)가 이 첫 탭으로 들어간다 (U5)
             + news_block(held)
-            + dk.section("종목 넣기 · 고치기", add_form(held), one_line=True, tab="종목 관리")
-            + fine_print())
+            + dk.section("종목 넣기 · 고치기", add_form(held) + leave_link(), one_line=True, tab="종목 관리"))   # 맨 아래 작은 글씨 → 총액 카드 아래 ? 팝업 (2026-11-12 사용자)
     write(body, "mock_my-stocks.html", NAME)
 
     # 로그인 전
