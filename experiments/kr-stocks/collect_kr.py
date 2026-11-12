@@ -130,7 +130,16 @@ def run_prices():
     if len(got) < len(syms) // 2:
         notify.event("수집 실패", f"한국 종목 일봉 {len(got)}/{len(syms)} — yfinance 응답 부족, 이 실행은 자료 지연")
         return None
-    caps = _caps(got)
+    sys.path.insert(0, os.path.join(BASE, ".."))
+    import detail_cache as DC
+    cache = DC.shared(DATA)   # 시총은 새 거래일마다 한 번 (2026-11-12) — 하루 두 번 실행이 같은 날 값을 다시 받지 않게
+    bar_day = max(bars[s][-1]["day"] for s in got)
+    need = [s for s in got if cache.due(s, "caps", bar=bar_day)]
+    for s, v in _caps(need).items():
+        cache.put(s, "caps", v, bar=bar_day)
+    cache.reused += len(got) - len(need)
+    caps = {s: cache.get(s, "caps") for s in got}
+    cache.save("한국 종목 시총")
     # 미국 연결 짝(기획 11-3)의 최근 봉 — 밤사이 미국 움직임 → 오늘 한국 반응 카드. 묶음 한 번
     us = sorted({t for s in syms for t in U.PAIRS.get(s, ([], ""))[0]} | set(U.ADR.values()) | set(U.US_MARKET))   # 짝 + ADR(K24) + 미국 시장 변수(K25)
     us_bars = _bars(us, period="1mo") if us else {}

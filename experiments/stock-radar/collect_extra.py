@@ -139,6 +139,9 @@ def _options(t, spot, day, next_earn):
             "max_oi_strike_put": max(by_strike, key=lambda k: by_strike[k][1]) if by_strike else None}
 
 
+FIELDS = ("analysts", "eps", "short", "options", "company")   # 종목별 상세 칸 — detail_cache 주기로 받는다
+
+
 def _one(args, only=None):
     sym, spot, day, next_earn = args
     import yfinance as yf
@@ -292,20 +295,39 @@ def load_capex():
 def run(snap):
     have = load() or {}
     day = max(b[-1]["day"] for b in snap["bars"].values() if b)
+    sys.path.insert(0, os.path.join(BASE, ".."))
+    import detail_cache as DC
+    cache = DC.shared(os.path.join(BASE, "data"))   # 칸마다 바뀌는 주기에만 새로 받는다 (2026-11-12 사용자) — 옵션 = 새 거래일, 의견 · 이익 예상 = 주 1회(종목별 요일) · 실적 뒤, 공매도 14일, 기업 정보 90일
     out = {"day": day, "revenue": have.get("revenue")}
-    if have.get("day") == day and have.get("stocks"):
-        out.update(stocks=have["stocks"], spy_iv=have.get("spy_iv"))
-    else:
-        jobs = []
-        for sym, *_ in U.CANDIDATES:
-            bars = snap["bars"].get(sym) or []
-            nxt = next((e["day"] for e in snap["earnings"].get(sym) or [] if e["day"] >= day), None)
-            if bars:
-                jobs.append((sym, bars[-1]["close"], day, nxt))
-        with ThreadPoolExecutor(3) as ex:   # 6 → 3 (운영지침 D6-1, 2026-10-21)
-            out["stocks"] = dict(ex.map(_one, jobs))
+    jobs, plan = [], {}
+    for sym, *_ in U.CANDIDATES:
+        bars = snap["bars"].get(sym) or []
+        if not bars:
+            continue
+        past = [e["day"] for e in snap["earnings"].get(sym) or [] if e["day"] <= day]
+        nxt = next((e["day"] for e in snap["earnings"].get(sym) or [] if e["day"] >= day), None)
+        due = tuple(f for f in FIELDS if cache.due(sym, f, bar=day, earn_days=past, next_earn=nxt))
+        plan[sym] = due
+        if due:
+            jobs.append(((sym, bars[-1]["close"], day, nxt), due))
+    with ThreadPoolExecutor(3) as ex:   # 6 → 3 (운영지침 D6-1, 2026-10-21)
+        got = dict(ex.map(lambda j: _one(j[0], only=j[1]), jobs))
+    out["stocks"] = {}
+    for sym, due in plan.items():
+        g = got.get(sym) or {}
+        for f in due:
+            v = {"options": g.get("options"), "iv": g.get("iv"), "straddle": g.get("straddle")} if f == "options" else g.get(f)
+            cache.put(sym, f, None if f == "options" and not (g.get("options") or g.get("iv")) else v, bar=day if f == "options" else None)
+        cache.reused += len(FIELDS) - len(due)
+        st = {f: cache.get(sym, f) for f in FIELDS if f != "options"}
+        o = cache.get(sym, "options") or {}
+        st.update(options=o.get("options"), iv=o.get("iv"), straddle=o.get("straddle"))
+        out["stocks"][sym] = st
+    if cache.due("^SPY", "options", bar=day):
         _, spy = _one((U.BENCH, snap["bars"][U.BENCH][-1]["close"], day, None), only=("options",))   # S&P 500 은 옵션만 (ETF 라 재무 값이 없다)
-        out["spy_iv"] = spy.get("iv")
+        cache.put("^SPY", "options", {"iv": spy.get("iv")} if spy.get("iv") else None, bar=day)
+    out["spy_iv"] = (cache.get("^SPY", "options") or {}).get("iv")
+    print(f"[extra] 새로 받은 종목 {len(jobs)}/{len(plan)} · 칸 {sum(len(d) for d in plan.values())}/{len(plan) * len(FIELDS)}")
     iv_history(out["stocks"], day)
     try:   # 추정치 · 등급 · 목표가 · 공매도 날짜별 기록 (K16, 2026-10-31 — 야후는 오늘 값만 준다)
         sys.path.insert(0, os.path.join(BASE, ".."))
@@ -313,13 +335,17 @@ def run(snap):
         est_history.append(os.path.join(BASE, "data", "est_history.json"), day, out["stocks"])
     except Exception as e:   # noqa: BLE001
         print(f"[extra] 추정치 기록 실패 : {e}")
+    have.setdefault("revenue", cache.blob("revenue", 10 ** 6))   # 실행 사이에 남는 저장값 — '주 1회'가 실제로 주 1회가 되게 (extra.json 은 실행마다 새로 만든다)
+    have.setdefault("peer_earnings", cache.blob("peer_earnings", 10 ** 6))
     try:
         out["revenue"] = revenue(have.get("revenue"))
+        cache.put_blob("revenue", out["revenue"])
     except Exception as e:   # noqa: BLE001
         print(f"[extra] 매출 수집 실패 — 지난 값으로 계속 : {e}")
     out["capex"] = (load_capex() or {}).get("series") or {}   # 돈을 어디에 쓰나 — revenue() 가 방금 쓴 표 (실패했으면 지난 표)
     try:
         out["peer_earnings"] = peer_earnings(have.get("peer_earnings"))
+        cache.put_blob("peer_earnings", out["peer_earnings"])
     except Exception as e:   # noqa: BLE001
         print(f"[extra] 함께 보는 회사 실적일 실패 — 지난 값으로 계속 : {e}")
         out["peer_earnings"] = have.get("peer_earnings")
@@ -330,6 +356,7 @@ def run(snap):
     except Exception as e:   # noqa: BLE001
         print(f"[extra] 공시 수집 실패 — 지난 값으로 계속 : {e}")
         out["edgar"] = have.get("edgar")
+    cache.save("미국 종목")
     with open(EXTRA, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False)
     ok = sum(1 for v in out["stocks"].values() if v.get("iv"))
