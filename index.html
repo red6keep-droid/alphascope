@@ -1743,7 +1743,10 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 
 /* 글 끝 — 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터. 검은 `목록` · `홈으로` 버튼은 숨김(주소는 위쪽 뒤로 가기가 읽는다), 버튼 줄 위아래 구분선 없음 */
 .post-shell .post-nav .post-nav-list { display: none !important; }
-.post-shell .post-nav, .post-shell.ends-text .post-nav { border-top: 0 !important; border-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+.post-shell .post-nav, .post-shell.ends-text .post-nav { border-top: 0 !important; border-bottom: 1px solid #E2E8F0 !important; padding-top: 0 !important; padding-bottom: 12px !important; }   /* 버튼 줄 아래 구분선 — 버튼 글자 → 선 20(버튼 안쪽 8 + 12), 그 아래 푸터 · 열린 댓글 (2026-11-12 사용자) */
+.post-nav-cm { color: #6B7280; }   /* 댓글이 없거나 아직 개수를 모를 때 = 회색(글자 · 말풍선 아이콘 모두 currentColor) — 안 고른 칸 색과 같다 (2026-11-12 사용자) */
+.post-nav-cm.has-cm { color: #111; }   /* 댓글이 하나라도 있으면 검정 */
+.post-nav-cm.has-cm:hover { color: var(--accent); }
 .post-shell.ends-text:not(.rel-first) .post-nav { margin-top: 40px !important; }
 .post-shell.rel-first > [data-related].is-moved { margin-top: 40px !important; }
 .post-shell.rel-first .post-nav { margin-top: 24px !important; }
@@ -4568,6 +4571,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function shown() { return total !== null ? total : items.length; }
         function setCount() {
           toggle.querySelector('.cm-label').textContent = '댓글' + (loaded && (total !== null || !more) ? ' ' + shown() : '');
+          toggle.classList.toggle('has-cm', loaded && shown() > 0);   /* 댓글이 있을 때만 검정 — 없거나 아직 못 읽었으면 회색 (2026-11-12 사용자) */
           var rest = total !== null ? Math.max(total - items.length, 0) : 0;
           moreBtn.hidden = !more;
           moreBtn.textContent = '이전 댓글 ' + (rest ? rest + '개 ' : '') + '더 보기';
