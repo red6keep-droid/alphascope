@@ -1378,14 +1378,15 @@ def _event_chart(reg):
                                         "선거 전인 10.30 에도 이미 -7.2% 빠졌습니다."))
 
 
-PLUS_ICON = 10   # 지난 날 펼침 + · − 아이콘: 상자 없이 그림만 10 · 선 1.5px(viewBox 12 의 1.8) (2026-11-12 사용자: 상자 제외, 그림만 — 옛 상자 22 · 모서리 6 · 테두리 #E2E8F0 폐지). 누르는 곳 = summary 줄 전체
+PLUS_BOX, PLUS_RADIUS, PLUS_ICON, PLUS_BD = 22, 6, 10, "#E2E8F0"   # 지난 날 펼침 + · − = 외곽선 상자 22 · 모서리 6 · 테두리 #E2E8F0 + 그림 10 · 선 1.5px(viewBox 12 의 1.8) — 11-11 f54e0d9b 상태로 되돌림 (2026-11-12 사용자: 외곽선은 두고 기호만 작게. P529 `그림만` 폐지). 누르는 곳 = summary 줄 전체
 PLUS_CSS = ('<style>.fc-day>summary{list-style:none;cursor:pointer;}.fc-day>summary::-webkit-details-marker{display:none;}'
             '.fc-day[open]>summary .fc-plus-v{display:none;}'
             '.fc-more>summary::-webkit-details-marker{display:none;}.fc-more[open]>summary{display:none;}</style>')   # 지난 경과 더 보기 = 펼치면 버튼을 숨기고 타임라인이 이어진다 (P418)   # 펼치면 세로획을 숨겨 − 로. 테마 붙여넣기 없이 되도록 본문 안 style (render_html 여러 그래프와 같은 방식)
 
 
 def _plus():
-    return (f'<span aria-hidden="true" style="display:inline-flex;flex:none;align-items:center;justify-content:center;width:{PLUS_ICON}px;height:{PLUS_ICON}px;color:#111;align-self:center;">'
+    return (f'<span aria-hidden="true" style="display:inline-flex;flex:none;align-items:center;justify-content:center;width:{PLUS_BOX}px;height:{PLUS_BOX}px;'
+            f'box-sizing:border-box;border:1px solid {PLUS_BD};border-radius:{PLUS_RADIUS}px;background:#fff;color:#111;align-self:center;">'
             f'<svg viewBox="0 0 12 12" width="{PLUS_ICON}" height="{PLUS_ICON}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'
             f'<path d="M2 6h8"/><path class="fc-plus-v" d="M6 2v8"/></svg></span>')
 
