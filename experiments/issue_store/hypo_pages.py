@@ -1762,7 +1762,12 @@ def _waiting(log, unit="%", subj="", fc=None):
             node, txt = END_GO, (f'<a href="{page_url(f["slug"])}" style="display:inline-flex;align-items:center;gap:2px;color:#111;text-decoration:none;">세부 전망으로 이어집니다'
                                  f'<span style="display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span></a>')
         else:
-            node, txt = END_STOP, "전망이 종료되었습니다"
+            node, txt = END_STOP, dk.esc((fc or {}).get("end_text") or "전망을 마쳤습니다")   # 결과를 담은 끝 줄 (2026-11-12 사용자: 맞혔는데 `전망이 종료되었습니다` 만 있어 끊긴 듯 읽혔다)
+            nx = (fc or {}).get("next_fc")
+            if nx:   # 같은 대상의 지금 지켜보는 전망 — 이야기가 이어지는 곳 (2026-11-12 사용자)
+                txt += (f'<a href="{page_url(nx["slug"])}" style="display:flex;align-items:center;gap:2px;margin-top:4px;font-weight:400;color:#111;text-decoration:none;word-break:keep-all;">'
+                        f'<span><span style="color:{dk.SUB};">다음 전망 : </span>{dk.esc(nx["title"])}</span>'
+                        f'<span style="flex:none;display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span></a>')
         out += _tl_row(f'<span style="display:inline-flex;color:{dk.SUB};">{node}</span>', lh, 0,
                        f'<div style="padding:0 0 {12 - dk.VP}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;">{txt}</div>', not lead, False)
     out += _tl_row(clock, lh, 0, today, not end and not lead, False)   # 오늘 줄은 지난 날이 없어도 문장 끝까지 점선을 내린다
@@ -2113,6 +2118,64 @@ def _row(fc, st):
     return dk.dcard(inner, theme=e["theme"])
 
 
+def _ig(word):
+    ch = (word or "가")[-1]
+    return "이" if 0xAC00 <= ord(ch) <= 0xD7A3 and (ord(ch) - 0xAC00) % 28 else "가"
+
+
+def end_text(fc, st):
+    """판정이 난 전망의 끝 줄 — 무엇으로 끝났는지 한 문장 (2026-11-12 사용자)."""
+    res = (st or {}).get("result") or {}
+    sc, k = fc["scenarios"], (st.get("log") or [{}])[-1].get("key")
+    c = res.get("crossed")
+    name = (sc[fc["pick"] - 1]["name"] if fc.get("pick") and k == "hit" else sc[c - 1]["name"]) if (c or (fc.get("pick") and k == "hit")) else ""
+    if k == "hit" and name:
+        return f"‘{name}’{_ig(name)} 맞아 전망을 마쳤습니다"
+    if k == "miss":
+        return "미리 적은 전망이 틀려 마쳤습니다"
+    if k == "neither":
+        return "정해 둔 기간 안에 기준을 넘지 않아 전망을 마쳤습니다"
+    if k in ("hold", "void"):
+        return "채점하지 않고 전망을 마쳤습니다"
+    if name:
+        return f"‘{name}’{_ig(name)} 일어나 전망을 마쳤습니다"
+    return "전망을 마쳤습니다"
+
+
+def split_done(pub, states):
+    """공개 전망 → (지켜보는 [(reg, fc)], 끝난 [(제목, 일어난 쪽, 결과, slug)], 성적표). 판정이 난 전망(state result)은 목록 · 홈 카드에서 `끝난 전망` 으로 (2026-11-12 사용자: 맞혔는데 계속 지켜보는 줄에 있었다).
+    끝난 전망마다 fc["end_text"] · fc["next_fc"](같은 대상의 지켜보는 전망, 최근 게시 먼저)를 붙인다 — 페이지 끝 줄이 읽는다."""
+    opened, done = [], []
+    for r, fc in pub:
+        res = (states.get(fc["slug"]) or {}).get("result")
+        (done if res else opened).append((r, fc))
+    score = {"n": 0, "hit": 0, "miss": 0, "neither": 0, "watch": 0, "hold": 0, "void": 0}   # 목업 note(`사건 뒤에 적은 보기는 넣지 않습니다`)는 뺐다 — 급락 · 급등 뒤 전망도 우리가 고른 쪽을 채점한다
+    picked = [0, 0]
+    rows = []
+    for r, fc in done:
+        st = states[fc["slug"]]
+        res, k = st["result"], st["log"][-1].get("key")
+        c = res.get("crossed")
+        rows.append((fc["title"], fc["scenarios"][c - 1]["name"] if c else "—", res.get("word", ""), fc["slug"], st["log"][-1].get("day", "")))
+        fc["end_text"] = end_text(fc, st)
+        nx = [f for _, f in opened if f.get("subject") and f.get("subject") == fc.get("subject")]
+        fc["next_fc"] = {"title": nx[-1]["title"], "slug": nx[-1]["slug"]} if nx else None
+        if res.get("unscored"):
+            continue
+        if k in score:
+            score[k] += 1
+            score["n"] += 1
+        if fc.get("pick") and k in ("hit", "miss"):
+            picked[1] += 1
+            picked[0] += k == "hit"
+    score["watch"] = sum(1 for _, fc in opened if not is_stock_fc(fc))
+    score["n"] += score["watch"]
+    if picked[1] >= 5:   # 1개 중 1개를 `대부분` 이라 하지 않게 — 다섯 개부터 (2026-11-12)
+        score["picked_hit"] = tuple(picked)
+    rows.sort(key=lambda x: x[4], reverse=True)   # 최근 끝난 것 먼저
+    return opened, [x[:4] for x in rows], score
+
+
 def scoreboard_card(sc):
     """우리 전망 성적표 (11절 2) — sc = {"n", "hit", "miss", "neither", "watch", "picked_hit": (m, n), "note"}. 겹친 전망은 따로."""
     lines = [("큰 사건마다 결과가 나오기 전에 두 갈래를 적어 두고, 지나고 나서 맞았는지를 그대로 셉니다. 지우거나 고치지 않습니다.", "plain"),
@@ -2183,8 +2246,8 @@ def list_body(pairs, states=None, done=(), score=None):
 
 # ---------------------------------------------------------------- 홈 카드 JSON (국면 한 마디는 넣지 않는다 — 2026-11-07 사용자, 제목 · 라벨 · 게시일만)
 
-def home_card(pairs, generated=""):
-    out = {"id": "hypo-card", "label": CARD_NAME, "generated": generated, "list_url": page_url(LIST_SLUG), "open": [], "done_count": 0}
+def home_card(pairs, generated="", done_count=0):
+    out = {"id": "hypo-card", "label": CARD_NAME, "generated": generated, "list_url": page_url(LIST_SLUG), "open": [], "done_count": done_count}
     for reg, fc in pairs:
         out["open"].append({"no": fc["no"], "eh": reg["id"], "title": fc["title"], "url": page_url(fc["slug"]),
                             "posted": fc["posted"], "tags": fc.get("tags", []), "event": fc["event"]})

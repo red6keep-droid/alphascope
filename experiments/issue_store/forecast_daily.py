@@ -251,6 +251,7 @@ def run(state_dir=None):
         except Exception as e:  # noqa: BLE001
             FA.save_failed("상태 저장소", e)
     # 렌더 나중
+    opened, done, score = H.split_done(pub, states)   # 판정 난 전망 = `끝난 전망` (2026-11-12 사용자) — 끝 줄 문구 · 다음 전망도 여기서 붙는다
     others = [(fc["no"], fc["title"], fc["slug"]) for _, fc in pub]
     for r, fc in pub:
         if fc["slug"] not in states:
@@ -262,9 +263,9 @@ def run(state_dir=None):
         with open(os.path.join(OUT, f'{fc["slug"]}.html'), "w", encoding="utf-8") as f:
             f.write(html)
     with open(os.path.join(OUT, f"{H.LIST_SLUG}.html"), "w", encoding="utf-8") as f:
-        f.write(H.list_body(pub, states))
+        f.write(H.list_body(opened, states, done=done, score=score))
     with open(os.path.join(OUT, "hypo.json"), "w", encoding="utf-8") as f:
-        json.dump(H.home_card(pub, dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")), f, ensure_ascii=False, indent=1)
+        json.dump(H.home_card(opened, dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), len(done)), f, ensure_ascii=False, indent=1)
     for r, fc in pub:
         st = states.get(fc["slug"]) or {}
         print(f'[forecast] {fc["slug"]}: {st.get("log", [{}])[-1].get("label")} · 값 {st.get("rel")} · 빈 날 {len(st.get("missing", []))}')
