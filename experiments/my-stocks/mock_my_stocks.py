@@ -119,8 +119,8 @@ def grand_card(held):
 
     top = (f'<div style="{ROW}"><span style="font-size:17px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">총 평가 금액</span>'
            f'<span style="font-size:21px;line-height:28px;font-weight:800;color:#111;white-space:nowrap;">{won_html(val, 21)}</span></div>')   # 30 → 28 → 26 → 23 → 21 (2026-11-12 사용자)
-    grid = [cells("수익 금액", updown(gain, won_html(gain, FS), FS, tri=False), updown(gain, f"{abs(gain / cost * 100):.1f}%", FS)),
-            cells("매수 금액", f'<span style="font-size:{dk.TINY};color:{dk.NOTE};">{won_html(cost, 14)}</span>')]   # 매수 금액 = 회색 작은 글씨 (2026-11-12 사용자)
+    grid = [cells("", f'<span style="font-size:{dk.TINY};color:{dk.NOTE};">{won_html(cost, 14)}</span>'),   # 매수 금액 = 수익 금액 위 · 이름 없이 회색 작은 글씨 (2026-11-12 사용자)
+            cells("수익 금액", updown(gain, won_html(gain, FS), FS, tri=False), updown(gain, f"{abs(gain / cost * 100):.1f}%", FS))]
     for m, head in (("us", "미국 종목"), ("kr", "한국 종목")):
         rows = [h for h in held if h[0]["m"] == m]
         if not rows:
@@ -155,7 +155,7 @@ def stock_rows(rows, m):
                 f'<span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">{esc(s["n"])}</span>'
                 f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};white-space:nowrap;">{esc(f"{q:,}주 · 평균 ")}{esc(money(a, m)) if m == "us" else won_html(a, 14)}</span></span></span>')   # 원 = 띄우고 2 작게
         # 오른쪽 = 윗줄 `오늘 등락(굵게) | 수익률`(15px, 사이 세로 구분선) · 아랫줄 수익금(보통) — `오늘` 글자 없음 (2026-11-12 사용자)
-        rule = '<span aria-hidden="true" style="flex:none;width:1px;height:14px;margin:0 8px;background:#CBD5E1;"></span>'
+        rule = '<span aria-hidden="true" style="flex:none;width:1px;height:10px;margin:0 8px;background:#CBD5E1;"></span>'   # 세로 구분선 = 글자 15 의 70% → 10 (2026-11-12 사용자)
         right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">'
                  f'<span style="display:flex;align-items:center;font-size:15px;line-height:22px;"><b style="font-weight:700;">{updown(chg, f"{abs(chg):.1f}%", 15)}</b>{rule}'
                  f'{updown(gain, f"{abs((c - a) / a * 100):.1f}%", 15)}</span>'
