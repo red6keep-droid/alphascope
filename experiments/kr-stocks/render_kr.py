@@ -118,8 +118,7 @@ def sec_chart(s):
             f'style="position:relative;display:block;margin:0 0 16px;max-width:1024px;">'
             f'<img src="{_esc(url)}" alt="{_esc(s["name"])} {CP.WINDOW}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'
             f'<span style="position:absolute;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
-            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{zoom}</span></a>'
-            + _dk.intraday_chart_fold(s["code"], f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@gh-pages/live_bars.json"))   # 장중 차트 접힘 줄 — 펼칠 때만 우리 5분봉 (2026-11-05). TradingView 위젯은 KRX 를 막는다
+            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{zoom}</span></a>')   # 장중 차트 접힘 줄 삭제 (2026-11-12 사용자: 종가 기준 블로그 — 장중 가격에 얽매이지 말자, kr-live 수집 멈춤)
 
 
 def draw_charts(snap, stocks, out_dir):

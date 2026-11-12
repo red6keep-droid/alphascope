@@ -1410,8 +1410,9 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
      신호 · 의견 · 주목할 종목은 전날 종가 기준 그대로. 미국 종목은 종가만(한국 독자 기준, 새벽 장중 시세 불필요).
      `장중 차트` 버튼은 누를 때만 우리 15분봉(live_bars.json)을 그 줄 아래에 그린다 — TradingView 무료 위젯은 KRX 종목을 막아 쓰지 않는다. */
   var LIVE_URL = GH + 'live.json', LIVE_BARS_URL = GH + 'live_bars.json', LIVE_KEY = 'as_live_kr';
+  var LIVE_ENABLED = false;   /* 한국 장중 가격 · 장중 차트 끔 (2026-11-12 사용자: 우리는 종목 리포트 블로그 — 장중 가격에 얽매이지 말자, 종가 기준). kr-live 수집도 멈춤. 켜려면 true + kr-live.yml 되살리기 */
   var liveOn = false, liveData = null, liveTimer = null;
-  try { liveOn = localStorage.getItem(LIVE_KEY) === '1'; } catch (e) {}
+  try { liveOn = LIVE_ENABLED && localStorage.getItem(LIVE_KEY) === '1'; } catch (e) {}
   function liveRow(r) { return (liveOn && liveData && liveData.stocks && isKR(r) && liveData.stocks[r.s]) || null; }
   function liveOpen() { return !!(liveOn && liveData && liveData.session === 'open'); }
   function pOf(r) { var l = liveRow(r); return l && l.p != null ? l.p : r.p; }
@@ -1427,7 +1428,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   function syncLiveUI() {   /* 토글 · 기준 표시는 그 카드가 한국일 때만 */
     [].slice.call(document.querySelectorAll('[data-live-switch]')).forEach(function (lab) {
       var kr = (lab.getAttribute('data-live-switch') === 'rank' ? rankMarket : picksMarket) === 'kr';
-      lab.hidden = !kr; lab.querySelector('input').checked = liveOn;
+      lab.hidden = !kr || !LIVE_ENABLED; lab.querySelector('input').checked = liveOn;
     });
     [].slice.call(document.querySelectorAll('[data-live-note]')).forEach(function (n) {
       var kr = (n.getAttribute('data-live-note') === 'rank' ? rankMarket : picksMarket) === 'kr';
@@ -1438,7 +1439,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var th = document.getElementById('rank-th-price');
     if (th) th.textContent = priceHead();
     var thc = document.getElementById('rank-th-chart');
-    if (thc) thc.hidden = rankMarket !== 'kr';
+    if (thc) thc.hidden = rankMarket !== 'kr' || !LIVE_ENABLED;
   }
   function renderKR() { if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); syncLiveUI(); }
   function fetchLive() {
@@ -1538,7 +1539,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var src = kr ? ((krHome && krHome.stocks) || []).filter(function (s) { return s.top; }) : stocks;   /* 한국 TOP 10 = 유가증권 보통주 가운데 시총 10개 (home_feed_kr 의 top, 기획 11-2) */
     var th = document.getElementById('rank-th-price');
     if (th) th.textContent = priceHead();   /* 장중 가격이 켜진 장중엔 현재가 (2026-11-05) · 미국은 data.json 장 상태 (2026-11-10) */
-    var thc = document.getElementById('rank-th-chart'); if (thc) thc.hidden = !kr;
+    var thc = document.getElementById('rank-th-chart'); if (thc) thc.hidden = !kr || !LIVE_ENABLED;
 
     if (!src.length) {
       var tr = el('tr');
@@ -1599,7 +1600,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       tr.appendChild(tdTurn);
 
 
-      if (kr) tr.appendChild(chartTd('rank', s));   /* 장중 차트 (2026-11-05) */
+      if (kr && LIVE_ENABLED) tr.appendChild(chartTd('rank', s));   /* 장중 차트 (2026-11-05) */
       if (folded) { tr.className = 'rank-more'; tr.hidden = !rankOpen; }
       body.appendChild(tr);
       if (kr && openChart.rank === s.s && !(folded && !rankOpen)) body.appendChild(chartRow('rank', s, 7));
@@ -1932,7 +1933,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       var tr = el('tr');
       var tdName = el('td', 'col-name'); tdName.appendChild(feedCell(r)); tr.appendChild(tdName);
       var tdPrice = el('td'); tdPrice.appendChild(feedPrice(r)); tr.appendChild(tdPrice);
-      if (isKR(r)) tr.appendChild(chartTd('watch', r));   /* 장중 차트 (2026-11-05) */
+      if (isKR(r) && LIVE_ENABLED) tr.appendChild(chartTd('watch', r));   /* 장중 차트 (2026-11-05) */
       body.appendChild(tr);   /* 테마 종목은 더 보기 없이 묶음 종목 전부 (2026-10-25 사용자) */
       if (isKR(r) && openChart.watch === r.s) body.appendChild(chartRow('watch', r, 3));
     });
@@ -1966,7 +1967,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       tr.appendChild(tdName);
       var tdSector = el('td', 'col-sector'); tdSector.appendChild(el('span', 'cell-sector', x.sector)); tr.appendChild(tdSector);   /* 종목 → 업종 → 종가 (2026-10-25 사용자) */
       var tdPrice = el('td'); tdPrice.appendChild(feedPrice(top)); tr.appendChild(tdPrice);
-      if (isKR(top)) tr.appendChild(chartTd('sector', top));   /* 장중 차트 (2026-11-05) */
+      if (isKR(top) && LIVE_ENABLED) tr.appendChild(chartTd('sector', top));   /* 장중 차트 (2026-11-05) */
       body.appendChild(tr);   /* 업종 줄은 접기 없이 전부 (2026-10-25 사용자: 시장 흐름과 종목의 더 보기 버튼 전부 삭제) */
       if (isKR(top) && openChart.sector === top.s) body.appendChild(chartRow('sector', top, 4));
     });
