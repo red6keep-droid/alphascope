@@ -113,15 +113,15 @@ def grand_card(held):
     RULE = '<span aria-hidden="true" style="grid-column:1/-1;height:1px;background:#FEE6CA;margin:8px 0;"></span>'
 
     def cells(label, amount_html, rate_html=""):
-        # 이름(회색 14) | (빈 칸) | 금액(오른쪽 정렬) | 수익률(맨 오른쪽 끝) (2026-11-12 사용자)
+        # 이름(회색 14) | (빈 칸) | 수익률 | 금액(맨 오른쪽 끝) — 등락률을 금액 앞에 (2026-11-12 사용자)
         return (f'<span style="white-space:nowrap;font-size:{dk.TINY};color:{dk.NOTE};">{label}</span><span></span>'
-                f'<span style="white-space:nowrap;text-align:right;">{amount_html}</span><span style="white-space:nowrap;text-align:right;">{rate_html}</span>')
+                f'<span style="white-space:nowrap;text-align:right;">{rate_html}</span><span style="white-space:nowrap;text-align:right;">{amount_html}</span>')
 
     top = (f'<div style="{ROW}"><span style="font-size:17px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">총 평가 금액</span>'
            f'<span style="font-size:21px;line-height:28px;font-weight:800;color:#111;white-space:nowrap;">{won_html(val, 21)}</span></div>')   # 30 → 28 → 26 → 23 → 21 (2026-11-12 사용자)
     grid = [cells("", f'<span style="font-size:{dk.TINY};color:{dk.NOTE};">{won_html(cost, 14)}</span>'),   # 매수 금액 = 수익 금액 위 · 이름 없이 회색 작은 글씨 (2026-11-12 사용자)
             cells("수익 금액", updown(gain, won_html(gain, FS), FS, tri=False), updown(gain, f"{abs(gain / cost * 100):.1f}%", FS))]
-    for m, head in (("us", "미국 종목"), ("kr", "한국 종목")):
+    for m, head in (("us", "미국"), ("kr", "한국")):   # `미국 3종목` (2026-11-12 사용자: `미국 종목` → `미국`)
         rows = [h for h in held if h[0]["m"] == m]
         if not rows:
             continue
@@ -129,7 +129,7 @@ def grand_card(held):
         v = sum(krw(s, q * s["p"]["c"]) for s, q, _ in rows)
         if m == "us":
             grid.append(RULE)
-        grid.append(cells(f'{head} · {len(rows)}종목',
+        grid.append(cells(f'{head} {len(rows)}종목',
                           updown(v - c, won_html(v - c, FS), FS, tri=False), updown(v - c, f"{abs((v - c) / c * 100):.1f}%", FS)))
     sub = [f'<div style="{GRID}margin:6px 0 0;">{"".join(grid)}</div>']
     fx = ""   # 환율 줄 삭제 (2026-11-12 사용자) — 계산 기준은 맨 아래 작은 글씨
