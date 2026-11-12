@@ -378,6 +378,9 @@ header.navbar, .header-bar {{display:none !important}}   /* 홈 목업의 옛 �
 #jbar a{{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#6B7280;text-decoration:none;font-size:11px;line-height:14px;-webkit-tap-highlight-color:transparent}}
 #jbar a.on{{color:#111;font-weight:700}} #jbar a:active{{background:#F1F5F9}}
 body{{padding-bottom:calc(56px + env(safe-area-inset-bottom)) !important}}
+/* 글 끝 순서 (같은 날 사용자 4차): 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터. 버튼 줄 위아래 구분선 없음 */
+.post-shell .post-nav, .post-shell.ends-text .post-nav{{border-top:0 !important;border-bottom:0 !important;padding-top:0 !important;padding-bottom:0 !important;margin-top:24px !important}}
+.post-shell > [data-related].is-moved{{margin-top:40px !important}}
 .post-nav .post-nav-list{{display:none !important}}   /* 검은 `목록` · `홈으로` 버튼 뺌 — 지난 리포트는 서랍 메뉴 하위 칸, 홈은 하단 메뉴 */
 #jtoast{{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:10001;padding:10px 16px;border-radius:8px;background:#111;color:#fff;font-size:13px;line-height:18px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}}
 #jmock{{display:block;padding:18px 16px 26px;text-align:center;font:13px/18px -apple-system,'Apple SD Gothic Neo',sans-serif;color:#8a919c}}
@@ -414,7 +417,15 @@ body{{padding-bottom:calc(56px + env(safe-area-inset-bottom)) !important}}
   function toast(t) {{ var e = document.getElementById('jtoast'); e.textContent = t; e.style.opacity = 1; clearTimeout(e._t); e._t = setTimeout(function () {{ e.style.opacity = 0; }}, 1600); }}
   document.querySelectorAll('[data-jnone]').forEach(function (a) {{ a.addEventListener('click', function (e) {{ e.preventDefault(); toast('지난 글 목록 화면 (목업 없음)'); }}); }});
   document.querySelector('[data-jsearch]').addEventListener('click', function () {{ toast('검색 (목업에서는 열지 않음)'); }});
-  // 글 끝 — 테마 순서 그대로 [댓글 · TOP] 줄. 목업 껍데기엔 댓글 칸이 없어 버튼만 흉내
+  // 글 끝 — 함께 보는 페이지(테마가 버튼 줄 아래로 옮겨 둔 것) 뒤로 버튼 줄 · 댓글 칸을 옮긴다
+  document.querySelectorAll('.post-shell').forEach(function (sh) {{
+    var nav = sh.querySelector('.post-nav'), rel = sh.querySelectorAll(':scope > [data-related]');
+    if (!nav || !rel.length) return;
+    var last = rel[rel.length - 1], cm = sh.querySelector(':scope > .comments');
+    last.parentNode.insertBefore(nav, last.nextSibling);
+    if (cm) nav.parentNode.insertBefore(cm, nav.nextSibling);
+  }});
+  // [댓글 · TOP] 줄. 목업 껍데기엔 댓글 칸이 없어 버튼만 흉내
   document.querySelectorAll('.post-nav').forEach(function (n) {{
     if (n.querySelector('.post-nav-cm')) return;
     var b = document.createElement('button'); b.type = 'button'; b.className = 'post-nav-cm'; b.innerHTML = '{CM_ICON}<span class="cm-label">댓글</span>';
