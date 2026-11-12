@@ -1031,6 +1031,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 .home-cards .section-head .head-right .mkt-tabs { margin: 0; }
 .section-title { min-width: 0; }
 .live-note { font-size: 12px; color: var(--gray-500); }
+.day-note { font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 구획 제목 줄 오른쪽 `11월 11일 기준` — 홈 카드 날짜와 같은 모양 (2026-11-12 사용자: 종가 기준이니 날짜 표기, 한글로 통일) */
 .live-note.on { color: #0E7490; font-weight: 600; }
 .live-note .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #0E7490; margin-right: 5px; vertical-align: 1px; animation: livepulse 1.6s ease-in-out infinite; }
 @keyframes livepulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
@@ -1940,7 +1941,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             <h2 class='section-title' id='picks-title'>
               <span class='report-icon' style='background:#0E7490;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='8' r='6'/><path d='M10.6 5.4 9.2 9.2 5.4 10.6 6.8 6.8z' fill='currentColor' stroke='none'/></svg></span>시장 흐름과 종목
             </h2>
-            <div class='head-right'><span class='live-note' data-live-note='picks' hidden='hidden'></span><label class='live-switch' data-live-switch='picks' hidden='hidden' title='한국 종목 가격 · 등락률 · 거래량을 장중 지연 시세로'><input type='checkbox'/><span class='live-knob' aria-hidden='true'></span><span class='t'>장중 가격</span></label><div class='seg-row mkt-tabs' role='tablist' aria-label='시장 고르기' data-mkt-for='picks'><button type='button' class='seg' role='tab' aria-selected='true' data-mkt='us'>미국</button><button type='button' class='seg' role='tab' aria-selected='false' data-mkt='kr'>한국</button></div></div>
+            <div class='head-right'><span class='day-note' data-day-note='picks'></span><span class='live-note' data-live-note='picks' hidden='hidden'></span><label class='live-switch' data-live-switch='picks' hidden='hidden' title='한국 종목 가격 · 등락률 · 거래량을 장중 지연 시세로'><input type='checkbox'/><span class='live-knob' aria-hidden='true'></span><span class='t'>장중 가격</span></label><div class='seg-row mkt-tabs' role='tablist' aria-label='시장 고르기' data-mkt-for='picks'><button type='button' class='seg' role='tab' aria-selected='true' data-mkt='us'>미국</button><button type='button' class='seg' role='tab' aria-selected='false' data-mkt='kr'>한국</button></div></div>
           </div>
           <div class='card rank-card'>
             <div class='tabs' role='tablist' id='picks-tabs'>
@@ -1991,7 +1992,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               <span class='report-icon' style='background:#6D28D9;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='currentColor'><rect x='2' y='8' width='3' height='6' rx='.5'/><rect x='6.5' y='3' width='3' height='11' rx='.5'/><rect x='11' y='10' width='3' height='4' rx='.5'/></svg></span>시총 TOP 10
             </h2>
             <!-- 오른쪽 "10.21 종가 기준" 표시는 뺐다 (2026-10-24 사용자). 그 자리에 미국 · 한국 탭 (2026-10-24 사용자: 홈 카드에 해외 · 국내 탭 → 해외가 미국뿐이라 미국 · 한국) -->
-            <div class='head-right'><span class='live-note' data-live-note='rank' hidden='hidden'></span><label class='live-switch' data-live-switch='rank' hidden='hidden' title='한국 종목 가격 · 등락률 · 거래량을 장중 지연 시세로'><input type='checkbox'/><span class='live-knob' aria-hidden='true'></span><span class='t'>장중 가격</span></label><div class='seg-row mkt-tabs' role='tablist' aria-label='시장 고르기' data-mkt-for='rank'><button type='button' class='seg' role='tab' aria-selected='true' data-mkt='us'>미국</button><button type='button' class='seg' role='tab' aria-selected='false' data-mkt='kr'>한국</button></div></div>
+            <div class='head-right'><span class='day-note' data-day-note='rank'></span><span class='live-note' data-live-note='rank' hidden='hidden'></span><label class='live-switch' data-live-switch='rank' hidden='hidden' title='한국 종목 가격 · 등락률 · 거래량을 장중 지연 시세로'><input type='checkbox'/><span class='live-knob' aria-hidden='true'></span><span class='t'>장중 가격</span></label><div class='seg-row mkt-tabs' role='tablist' aria-label='시장 고르기' data-mkt-for='rank'><button type='button' class='seg' role='tab' aria-selected='true' data-mkt='us'>미국</button><button type='button' class='seg' role='tab' aria-selected='false' data-mkt='kr'>한국</button></div></div>
           </div>
 
           <!-- 탭 · 표 · 더 보기 버튼이 카드 하나 (2026-10-13 사용자) -->
@@ -2791,6 +2792,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
            `장중 차트` 버튼은 누를 때만 우리 15분봉(live_bars.json)을 그 줄 아래에 그린다 — TradingView 무료 위젯은 KRX 종목을 막아 쓰지 않는다. */
         var LIVE_URL = GH + 'live.json', LIVE_BARS_URL = GH + 'live_bars.json', LIVE_KEY = 'as_live_kr';
         var LIVE_ENABLED = false;   /* 한국 장중 가격 · 장중 차트 끔 (2026-11-12 사용자: 우리는 종목 리포트 블로그 — 장중 가격에 얽매이지 말자, 종가 기준). kr-live 수집도 멈춤. 켜려면 true + kr-live.yml 되살리기 */
+        var mktDay = { us: '', kr: '' };   /* 시장별 종가 날짜 — stocks.json · kr.json 의 day (2026-11-12) */
+        function dayKo(day) { var p = String(day || '').split(/[-.]/); return p.length === 3 ? Number(p[1]) + '월 ' + Number(p[2]) + '일 기준' : ''; }   /* 날짜 표기 통일 `11월 11일 기준` (2026-11-12 사용자) */
+        function nyDay(iso) { var t = Date.parse(iso || ''); return t > 0 ? new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(t)) : ''; }   /* 미국 리포트 = 뉴욕 날짜(장 마감 뒤 실행) = 종가 날짜 */
         var liveOn = false, liveData = null, liveTimer = null;
         try { liveOn = LIVE_ENABLED && localStorage.getItem(LIVE_KEY) === '1'; } catch (e) {}
         function liveRow(r) { return (liveOn && liveData && liveData.stocks && isKR(r) && liveData.stocks[r.s]) || null; }
@@ -2820,6 +2824,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           if (th) th.textContent = priceHead();
           var thc = document.getElementById('rank-th-chart');
           if (thc) thc.hidden = rankMarket !== 'kr' || !LIVE_ENABLED;
+          [].slice.call(document.querySelectorAll('[data-day-note]')).forEach(function (n) { n.textContent = dayKo(mktDay[n.getAttribute('data-day-note') === 'rank' ? rankMarket : picksMarket]); });
         }
         function renderKR() { if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); syncLiveUI(); }
         function fetchLive() {
@@ -3171,14 +3176,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             });
             box.appendChild(more);
           }
-          ntDays[market] = n.day;
+          ntDays[market] = mktDay[market] || n.day;   /* 머리 날짜 = 그 시장 종가 날짜(통일, 2026-11-12) — 급락일은 카드 안 `마지막 급락일` */
           var days = Object.keys(ntDays).map(function (k) { return ntDays[k]; }).filter(Boolean).sort();
           if (days.length) setDate('notable-card', ntMd(days[days.length - 1]) + ' 기준');
         }
 
         fetch(KR_URL + '?v=' + Date.now())
           .then(function (r) { return r.json(); })
-          .then(function (json) { krHome = json; setEvents('kr', json.events); renderNotable('kr', json.notable); if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); syncLiveUI(); })
+          .then(function (json) { krHome = json; mktDay.kr = json.day || ''; setEvents('kr', json.events); renderNotable('kr', json.notable); if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); syncLiveUI(); })
           .catch(function () { renderNotable('kr', null); });
 
         /* ================================================= 증시 전망 (hypo.json, 2026-11-08 사용자 H34) — experiments/issue_store/forecast_daily.py 가 하루 1회 gh-pages 에 올린다.
@@ -3202,7 +3207,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             if (q.url) { d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', q.url); }
             box.appendChild(d);
           });
-          if (j.generated) setDate('hypo-card', ntMd(String(j.generated).slice(0, 10)) + ' 기준');
+          if (j.generated) setDate('hypo-card', ntMd(new Date(Date.parse(j.generated) + 9 * 3600000).toISOString().slice(0, 10)) + ' 기준');   /* 한국 날짜 — generated 는 UTC 라 아침 실행이 하루 앞으로 보였다 (2026-11-12) */
         }
         fetch(GH + 'hypo.json?v=' + Date.now())
           .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
@@ -3377,6 +3382,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             feedWatch = json.watch || [];
             feedSectors = json.sectors || [];
             setEvents('us', json.events);
+            mktDay.us = json.day || ''; syncLiveUI();
             setPicksDay(json.day);
             renderNotable('us', json.notable);   /* 주목할 종목 (H28) */
             renderWatchTabs(); renderWatch(); renderSectorTop();
@@ -3899,7 +3905,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
                 var d = new DOMParser().parseFromString('<body>' + j.sections[k], 'text/html');
                 sec[k] = [].slice.call(d.body.children);
               });
-              return { title: j.title, href: j.url, day: j.date || '', sec: sec, chart: j.chart || null, body: '' };
+              return { title: j.title, href: j.url, day: j.date || '', gen: j.generated || '', sec: sec, chart: j.chart || null, body: '' };
             });
         }
 
@@ -3934,7 +3940,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         /* 카드 그리기 — p = { title, href, day, sec, chart, body } (JSON 경로 · 피드 경로 공통) */
         function renderCard(card, p) {
           var title = p.title, href = p.href, sec = p.sec, body = p.body;
-          setDate(card.id, String(p.day || '').split('.').slice(-2).join('.'));   /* 홈 카드 날짜는 연도 없이 10.23 (2026-10-24 사용자) */
+          setDate(card.id, dayKo(card.id === 'report-card' && p.gen ? nyDay(p.gen) : p.day));   /* `11월 11일 기준` — 미국 리포트는 종가 날짜(뉴욕), 나머지는 글 날짜 (2026-11-12 사용자: 한글로 통일) */
 
           /* 카드를 누르면 그 글로 간다 */
           var a = document.getElementById(card.id);
