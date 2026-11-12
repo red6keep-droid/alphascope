@@ -17,6 +17,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 import design_kit as dk  # noqa: E402
+import tech_signals as TS  # noqa: E402  — 판정 라벨 = 채운 상자 (가이드라인 8절, U3)
 
 OUT = os.path.join(HERE, "output")
 INDEX = os.path.join(HERE, "..", "site-search", "output", "search_index.json")
@@ -92,8 +93,8 @@ def grand_card(held):
                    f'<span style="color:#111;font-weight:700;">{head}<span style="font-weight:400;color:{dk.NOTE};font-size:{dk.TINY};"> · {len(rows)}종목 · {esc(money(v, m))}</span></span>'
                    f'<span style="font-weight:700;white-space:nowrap;">{dk.tint(esc(pct((v - c) / c * 100)))}</span></div>')
     return dk.dcard(
-        f'<div style="font-size:15px;line-height:22px;color:#333;">총 평가 금액</div>'
-        f'<div style="font-size:30px;line-height:38px;font-weight:800;color:#111;">{esc(money(val, "kr"))}</div>'
+        f'<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;"><span style="font-size:17px;line-height:24px;font-weight:700;color:#333;">총 평가 금액</span>'   # 이름 · 금액 한 줄 (U4)
+        f'<span style="font-size:30px;line-height:38px;font-weight:800;color:#111;">{esc(money(val, "kr"))}</span></div>'
         f'<div style="margin:2px 0 0;font-size:22px;line-height:30px;font-weight:800;">{dk.tint(esc(pct(gain / cost * 100)) + " · " + esc(money(gain, "kr", True)))}</div>'
         f'<div style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:2px 0 0;">산 금액 {esc(money(cost, "kr"))} · 미국 종목은 원화로 바꿔 더함(1달러 {FX:,.0f}원)</div>'
         + "".join(sub), kind)
@@ -104,7 +105,7 @@ def stock_rows(rows, m):
     for i, (s, q, a) in enumerate(rows):
         c = s["p"]["c"]
         gain = (c - a) * q
-        name = f'{esc(s["n"])}({esc(code(s))})'
+        name = f'{dk.ticker_logo(s["s"], 22)}{esc(s["n"])}({esc(code(s))})'   # 종목 이름 앞 티커 로고 — 종목 페이지 · 검색과 같은 우리 gh-pages 사본 (U2)
         sub = f'{q:,}주 · 평균 {money(a, m)} · 오늘 {pct(s["p"]["chg"]) if s["p"]["chg"] else "0.0%"}'
         val = dk.tint(f'{esc(pct((c - a) / a * 100))}<br><span style="font-size:15px;font-weight:400;">{esc(money(gain, m, True))}</span>')
         out.append(dk.stock_row_link(dk.crow(name, val, dk.tint(esc(sub)), first=(i == 0), sub_block=True), s["s"]).replace(
@@ -121,13 +122,13 @@ def news_block(held):
         if not last:
             continue
         up = bool(last[2])
-        lab = dk.pill("▲상승", "positive", bare=True) if up else dk.pill("▼하락", "negative", bare=True)
-        trend.append((f'{esc(s["n"])}', f'{lab}', f'200일 평균선 {"위" if up else "아래"}'))
+        lab = TS.box("up", "상승", esc) if up else TS.box("down", "하락", esc)   # 판정 = 채운 상자(종목 페이지 평균선 대비 줄과 같은 꼴, U3) — 옛 외곽선 라벨은 뉴스 영역 · 긍정 · 부정용
+        trend.append((f'{dk.ticker_logo(s["s"], 22)}{esc(s["n"])}', f'{lab}', f'200일 평균선 {"위" if up else "아래"}'))
     rows = [dk.crow(n, v, sub, first=(i == 0), nowrap=True) for i, (n, v, sub) in enumerate(trend)]
     trend_card = f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(rows)}</span></div>'
 
     ev = sorted(((s["ne"], s) for s, _, _ in held if s.get("ne")), key=lambda x: x[0])
-    ev_rows = [dk.crow(esc(s["n"]), f'{int(d[5:7])}월 {int(d[8:])}일', "실적 발표", first=(i == 0), nowrap=True) for i, (d, s) in enumerate(ev[:4])]
+    ev_rows = [dk.crow(dk.ticker_logo(s["s"], 22) + esc(s["n"]), f'{int(d[5:7])}월 {int(d[8:])}일', "실적 발표", first=(i == 0), nowrap=True) for i, (d, s) in enumerate(ev[:4])]
     ev_card = f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(ev_rows)}</span></div>'
 
     items = sorted(((d, t, src, s) for s in [h[0] for h in held] for d, t, src in (s.get("news") or [])[:2]), reverse=True)[:5]
@@ -135,9 +136,9 @@ def news_block(held):
                  + "".join(f'<span style="display:block;padding:{dk.SEP_GAP - dk.VP - 1}px 12px;{"" if i == 0 else dk.MULTI_SEP}">{x}</span>'
                            for i, x in enumerate(dk.news_item(esc(t), None, meta=(f'{int(d[5:7])}월 {int(d[8:])}일', s["n"])) for d, t, src, s in items))
                  + "</span></div>") if items else ""
-    return (dk.section("추세는?", trend_card, one_line=True)
-            + dk.section("다음 실적 발표는?", ev_card, one_line=True)
-            + (dk.section("최근 뉴스는?", news_card, one_line=True) if news_card else ""))
+    return (dk.section("추세는?", trend_card, one_line=True, tab="추세")
+            + dk.section("다음 실적 발표는?", ev_card, one_line=True, tab="일정")
+            + (dk.section("최근 뉴스는?", news_card, one_line=True, tab="뉴스") if news_card else ""))
 
 
 def add_form(held):
@@ -153,7 +154,7 @@ def add_form(held):
             f'<div style="margin:10px 0 0;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">블로그에서 다루는 미국 64 · 한국 35종목 중에서 고를 수 있습니다. 최대 30종목.</div></div>')
     edit_rows = "".join(
         f'<span style="display:flex;align-items:center;gap:8px;padding:{dk.SEP_GAP - dk.VP - 1}px 12px;{"" if i == 0 else dk.MULTI_SEP}">'
-        f'<span style="flex:1 1 auto;min-width:0;font-size:17px;line-height:24px;font-weight:700;color:#111;">{esc(s["n"])}'
+        f'<span style="flex:1 1 auto;min-width:0;font-size:17px;line-height:24px;font-weight:700;color:#111;">{dk.ticker_logo(s["s"], 22)}{esc(s["n"])}'
         f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:400;color:{dk.NOTE};">{q:,}주 · 평균 {money(a, s["m"])}</span></span>'
         f'<a data-mock="1" style="flex:none;padding:6px 12px;border:1px solid #CBD5E1;border-radius:8px;font-size:15px;line-height:22px;color:#111;">고치기</a>'
         f'<a data-mock="1" style="flex:none;padding:6px 12px;border:1px solid #CBD5E1;border-radius:8px;font-size:15px;line-height:22px;color:{dk.NOTE};">빼기</a></span>'
@@ -169,7 +170,7 @@ def fine_print(member=True):
     out = "".join(f'<p style="{SMALL}">{esc(t)}</p>' for t in lines)
     if member:
         out += f'<p style="{SMALL}"><a data-mock="1" style="color:{dk.NOTE};text-decoration:underline;">탈퇴하고 내용 지우기</a></p>'
-    return f'<div style="margin:32px 0 0;padding:16px 0 0;border-top:1px solid #E2E8F0;">{out}</div>'
+    return f'<div data-related="1" style="margin:32px 0 0;padding:16px 0 0;border-top:1px solid #E2E8F0;">{out}</div>'   # data-related = 테마 탭 밖, 어느 탭에서나 맨 아래 (U5)
 
 
 def seats_bar(taken):
@@ -206,9 +207,10 @@ def main():
 
     # 로그인 뒤
     body = (dk.cards(grand_card(held))   # 맨 위 = 총액 · 총 수익률. 글 머리 카드(data-lead) — 첫 h2 앞. 테마는 data-lead(없으면 첫 data-cards)부터 첫 h2 전까지를 머리로 옮긴다: h2 뒤에 두면 종목 줄 카드가 맨 아래로 밀렸다
-            + dk.section(f"보유 종목 {len(held)}개", stock_rows(us, "us") + stock_rows(kr, "kr"), one_line=True)   # 총액 바로 아래 = 보유 종목 (2026-11-12 사용자)
+            + stock_rows(us, "us") + stock_rows(kr, "kr")   # 총액 바로 아래 = 보유 종목, 제목 없이 (U1 `보유 종목 n개` 삭제)
+            + dk.h2("수익", tab="수익")   # 첫 탭 `수익` — 탭 이름과 같은 제목은 테마가 숨긴다. 머리(총액 · 종목 줄)가 이 첫 탭으로 들어간다 (U5)
             + news_block(held)
-            + dk.section("종목 넣기 · 고치기", add_form(held), one_line=True)
+            + dk.section("종목 넣기 · 고치기", add_form(held), one_line=True, tab="종목 관리")
             + fine_print())
     write(body, "mock_my-stocks.html", NAME)
 
