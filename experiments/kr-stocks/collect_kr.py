@@ -143,7 +143,7 @@ def run_prices():
     caps = {s: cache.get(s, "caps") for s in got}
     cache.save("한국 종목 시총")
     # 미국 연결 짝(기획 11-3)의 최근 봉 — 밤사이 미국 움직임 → 오늘 한국 반응 카드. 묶음 한 번
-    us = sorted({t for s in syms for t in U.PAIRS.get(s, ([], ""))[0]} | set(U.ADR.values()) | set(U.US_MARKET))   # 짝 + ADR(K24) + 미국 시장 변수(K25)
+    us = sorted({t for s in syms for t in U.PAIRS.get(s, ([], ""))[0]} | set(U.ADR.values()) | set(U.US_MARKET) | set(etf_universe.KR_US_TICKERS))   # 짝 + ADR(K24) + 미국 시장 변수(K25) + ETF 미국과 연결 (2026-11-12)
     us_bars = _bars(us, period="1mo") if us else {}
     snap = {"fetched_at": datetime.datetime.now(KST).strftime("%Y-%m-%d %H:%M %Z"), "bars": bars, "caps": caps, "us_bars": us_bars,
             "missing": [s for s in syms if s not in bars]}

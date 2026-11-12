@@ -116,6 +116,7 @@ def weight_rows(items):
 
 
 def tab_holdings(f, src_note=""):
+    """구획 제목마다 data-tab — 테마는 표시 없는 h2 를 첫 탭(오늘)으로 옮긴다 (2026-11-12 목업에서 `어떤 ETF 인가?` 가 오늘 탭에 나온 것)."""
     if not f or not f.get("top"):
         return ""
     names = []
@@ -123,9 +124,9 @@ def tab_holdings(f, src_note=""):
         nm = NAME_KO.get(s, n)
         names.append((dk.esc(nm) + (f' <span style="font-size:14px;color:#6B7280;">{dk.esc(s)}</span>' if nm != s else ""), w))
     top_sum = sum(w for _, w in names)
-    out = dk.section("무엇을 담고 있나?", weight_rows(names) + dk.muted(f"상위 10종목이 전체의 {top_sum:.0f}%입니다." + (" " + src_note if src_note else "")))
+    out = dk.section("무엇을 담고 있나?", weight_rows(names) + dk.muted(f"상위 10종목이 전체의 {top_sum:.0f}%입니다." + (" " + src_note if src_note else "")), tab="구성")
     if f.get("sectors") and f["sectors"][0][1] < 99:
-        out += dk.section("업종 비중은?", weight_rows([tuple(x) for x in f["sectors"]]))
+        out += dk.section("업종 비중은?", weight_rows([tuple(x) for x in f["sectors"]]), tab="구성")
     return out
 
 
@@ -146,7 +147,7 @@ def tab_basic(sym, f):
         rows.append(("상장일", f["since"].replace("-", ". ") + ".", ""))
     if (f or {}).get("yield"):
         rows.append(("분배금 수익률(1년)", f'{f["yield"] * 100:.2f}%', ""))
-    return dk.section("어떤 ETF 인가?", dk.ccard(rows).replace('data-cards="1" ', ""))
+    return dk.section("어떤 ETF 인가?", dk.ccard(rows).replace('data-cards="1" ', ""), tab="기본 정보")
 
 
 def related(sym, live, href=None):
@@ -241,6 +242,62 @@ def us_pages(snap, live, fund):
 
 # ── 한국 ──
 
+ALIAS_SYM = ("SECTOR_ETF", "PAIRS", "TRADE_TAG")              # 종목 키 표 중 업종 칸만 (연결 성적 PAIR_RECORD · 회사 소개 ABOUT 은 회사 것이라 뺀다)
+ALIAS_IN = ("BSI_INDUSTRY", "FIN_INDUSTRY", "LOAN_INDUSTRY")    # {업종 코드: (이름, [종목])}
+ALIAS_CODE = ("BIZ_OF",)                                      # {종목 코드: 사업 묶음}
+
+
+def alias_kr(K, rep, etf):
+    """한국 업종 ETF 를 대표 종목의 업종 칸에 잇는다 — 업계 카드 · 미국과 연결이 대표 종목과 같은 자료를 읽게 (이 실행 안에서만)."""
+    for n in ALIAS_SYM:
+        d = getattr(K, n)
+        if rep in d:
+            d[etf] = d[rep]
+    for n in ALIAS_IN:
+        for _code, (_name, syms) in getattr(K, n).items():
+            if rep in syms and etf not in syms:
+                syms.append(etf)
+    for n in ALIAS_CODE:
+        d = getattr(K, n)
+        if E.key(rep) in d:
+            d[E.key(etf)] = d[E.key(rep)]
+
+
+def peers_card(sym, snap, stocks, K):
+    """`같은 업종 종목은?` — 우리가 다루는 같은 업종 한국 종목의 오늘 (업종 ETF), 코스피 · 코스닥 지수 ETF 는 시가총액 큰 종목.
+    ETF 가 실제로 담은 종목 표가 아니다 — 카드 아래에 그렇게 적는다. 줄을 누르면 종목 페이지로."""
+    sys.path.insert(0, os.path.join(EXP, "nvda-report"))
+    import render_html as R
+    tracks = E.BY_SYM[sym][2]
+    caps = snap.get("caps") or {}
+    rep = E.KR_REP.get(tracks)
+    if rep:
+        g = (K.groups(rep) or [None])[0]
+        pick = [c for c in stocks if g in c[4]]
+        title, note = "같은 업종 종목은?", f"이 ETF 가 담은 종목 표가 아니라 AlphaScope 가 다루는 {g} 종목입니다."
+    elif tracks.startswith("코스피 200") or tracks.startswith("코스닥 150"):
+        mk = ".KS" if tracks.startswith("코스피") else ".KQ"
+        pick = sorted((c for c in stocks if c[0].endswith(mk) and caps.get(c[0])), key=lambda c: -caps[c[0]])[:8]
+        title, note = "시가총액 큰 종목은?", f"이 ETF 가 담은 종목 표가 아니라 AlphaScope 가 다루는 {'유가증권시장' if mk == '.KS' else '코스닥'} 종목 중 시가총액 상위입니다."
+    else:
+        return ""
+    pick = sorted(pick, key=lambda c: -(caps.get(c[0]) or 0))[:8]
+    rows = []
+    for c in pick:
+        b = snap["bars"].get(c[0]) or []
+        if len(b) < 2 or not b[-2]["close"]:
+            continue
+        r = (b[-1]["close"] / b[-2]["close"] - 1) * 100
+        pcol = C.UP if r > 0 else C.DOWN if r < 0 else "#111"
+        left = (f'<a href="{dk.esc(K.page_url(c[0]))}" style="color:#111;text-decoration:none;">{dk.esc(c[1])}</a>'
+                f'<span style="display:block;font-size:{dk.MICRO};line-height:20px;font-weight:400;color:{dk.NOTE};">{dk.esc(E.key(c[0]))}</span>')
+        right = f'<span style="color:{pcol};">{b[-1]["close"]:,.0f}원</span><br>{R._arrow(r)}'
+        rows.append(R._row_html(left, right, first=not rows).replace("<span", f'<span data-row-link="1" data-ret="{r:.4f}"', 1))
+    if not rows:
+        return ""
+    return dk.section(title, tab="오늘", html=f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}">{"".join(rows)}</span></div>' + dk.muted(note))
+
+
 def kr_pages(snap, flows, hist, live, us_fund):
     sys.path.insert(0, os.path.join(EXP, "kr-stocks"))
     import universe_kr as K
@@ -252,11 +309,16 @@ def kr_pages(snap, flows, hist, live, us_fund):
     for sym in E.KR_SYMS:
         if sym not in syms:
             print(f"[etf] {sym}: 일봉 부족 — 건너뜀")
-    K.CANDIDATES[:] = [(sym, E.BY_SYM[sym][1], E.slug(sym), "ETF", []) for sym in syms]   # 이 실행 안에서만 — 정식 종목 페이지는 main_kr 가 이미 그렸다
-    K.BY_SYM.clear()
-    K.BY_SYM.update({c[0]: c for c in K.CANDIDATES})
-    for sym in syms:
-        K.SECTOR_ETF[sym] = "091160.KS" if "반도체" in E.BY_SYM[sym][2] else "266370.KS"
+    stocks_kr = list(K.CANDIDATES)   # 정식 한국 종목 — `같은 업종 종목은?` 재료
+    for sym in syms:   # 이 실행 안에서만 후보에 더한다 — 정식 종목 페이지는 main_kr 가 이미 그렸다. 순위 계산(run)은 부르지 않는다
+        tracks = E.BY_SYM[sym][2]
+        rep = E.KR_REP.get(tracks)
+        K.CANDIDATES.append((sym, E.BY_SYM[sym][1], E.slug(sym), K.sector(rep) if rep else "ETF", list(K.groups(rep)) if rep else []))
+        K.BY_SYM[sym] = K.CANDIDATES[-1]
+        if rep:
+            alias_kr(K, rep, sym)
+        elif tracks in E.KR_US_LINK:
+            K.PAIRS[sym] = E.KR_US_LINK[tracks]
     stocks = [x for x in (analyze_kr.stock(sym, snap, hist, flows) for sym in syms) if x]
     if not stocks:
         return {}
@@ -265,7 +327,7 @@ def kr_pages(snap, flows, hist, live, us_fund):
     market["overnight"] = analyze_kr.overnight(snap, day)
     mr = analyze_kr.A.market_regime({"bars": {analyze_kr.NC.REGIME_BENCHMARK: snap["bars"].get(K.BENCH) or []}})
     for s in stocks:   # 순위 · 모멘텀 순위 없음 (mom_rank 가 없으면 카드가 빠진다)
-        s.update(market_regime=mr, sector_flow=None, fx=market.get("fx"), crash=None, rank=None, in_top=False)
+        s.update(market_regime=mr, sector_flow=analyze_kr.sector_flow(snap, s["sym"]), fx=market.get("fx"), crash=None, rank=None, in_top=False)
     a = {"day": day, "fetched_at": snap.get("fetched_at"), "stocks": stocks, "market": market, "crash": {}}
     kbench = {x["day"]: x["close"] for x in snap["bars"].get(K.BENCH) or []}
 
@@ -284,15 +346,18 @@ def kr_pages(snap, flows, hist, live, us_fund):
                 body = f.read()
             nxt = next((m for m in re.finditer(r'<h2[^>]*data-tab="([^"]*)"', body) if m.group(1) != "오늘"), None)
             cut = nxt is not None
-            if cut:   # 오늘 탭 뒤(매수의견 · 실적 · 업계상황 · 기업 …)는 회사 자료라 뺀다
+            if cut:   # 오늘 탭 뒤(매수의견 · 실적 · 업계상황 · 기업 …)는 회사 자료라 뺀다 — 업계상황은 아래에서 ETF 것으로 다시 붙인다
                 body = body[:nxt.start()]
             twin = next((t[0] for t in E.US if t[2] == E.BY_SYM[sym][2]), None) if "미국" in E.BY_SYM[sym][1] else None
             f = dict(us_fund.get(twin) or {}) if twin else {}
             hold = tab_holdings(f, f"같은 지수를 따라가는 미국 상장 {twin} 기준입니다.") if twin else ""
             note = STAMP_US if hold else STAMP_PRICE
             body = re.sub(r"매 거래일 장을 마감한 뒤 발행되는 리포트입니다\. \([^)]*\)", note, body, count=1)
+            ind = (render_kr.card_sector_flow(s) + render_kr.card_industry_mood(s) + render_kr.card_industry_work(s) + render_kr.card_industry_money(s))
             basic = {"family": KR_FAMILY.get(E.BY_SYM[sym][1].split(" ")[0])}
-            body += ((render_kr.R._section("구성", hold, tab="구성") if hold else "")
+            body += (peers_card(sym, snap, stocks_kr, K)
+                     + (render_kr.R._section("업계상황", f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{ind}</div>', tab="업계상황") if ind else "")
+                     + (render_kr.R._section("구성", hold, tab="구성") if hold else "")
                      + render_kr.R._section("기본 정보", tab_basic(sym, basic), tab="기본 정보") + related(sym, live) + ("</div>" if cut else ""))   # 잘라낸 본문의 바깥 틀 닫기
             pages[code] = (E.page_title(sym), body)
         except Exception as e:  # noqa: BLE001
