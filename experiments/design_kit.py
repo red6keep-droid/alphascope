@@ -2072,3 +2072,38 @@ def related_buttons(links):
     줄 = 3px 점 + 페이지 이름(16px 보통 = 기사 요약 줄 크기, P185) + 오른쪽 나가는 아이콘(회색). 줄 전체가 링크(data-row-link, 가이드라인 10-9).
     모든 리포트 글 끝에 둔다 (2026-11-09 사용자) — 글 끝 블록은 이것 하나 (2026-11-10 사용자: 게시 때 붙던 `함께 보는 리포트`는 없앴다)."""
     return f'<div data-related="1" style="margin-top:49px;">{related_title("함께 보는 페이지")}{related_rows(list(links)[:3])}</div>'   # 최대 3줄 (2026-11-10 사용자)
+
+
+# ---------------------------------------------------------------- 아이콘 두 꼴 (가이드라인 8절 `아이콘`, 2026-11-12 사용자)
+# 그림은 모두 viewBox 16 선 그림(선 1.6 · 끝 둥글게). 검색 창 JS(site-search/search.js ICONS)는 이 표를 그대로 옮겨 쓴다 — 고치면 둘 다.
+ICON_GLYPHS = {
+    "calendar": '<rect x="2.5" y="3.5" width="11" height="10" rx="1.5"/><path d="M2.5 7h11M5.5 2v3M10.5 2v3"/>',
+    "news": '<path d="M3 3h8v10H4a1 1 0 0 1-1-1V3z"/><path d="M11 6h2v6a1 1 0 0 1-1 1"/><path d="M5 6h4M5 9h4"/>',
+    "trend": '<path d="M2 11.5l4-4 3 3 5-6"/><path d="M10.5 4.5H14v3.5"/>',
+    "pulse": '<path d="M1.5 8.5h3l1.5-4 3 8 1.5-4h4"/>',
+    "bars": '<path d="M2.5 13.5h11M4.5 11V8M8 11V5M11.5 11V3"/>',
+    "volume": '<path d="M3 13V10M6 13V7M9 13V9M12 13V5"/>',
+    "target": '<circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="2.5"/>',
+    "gauge": '<path d="M2.8 11.5a5.2 5.2 0 1 1 10.4 0"/><path d="M8 11.5l2.6-3"/>',
+    "range": '<path d="M5 3v10M3 5l2-2 2 2M11 13V3M9 11l2 2 2-2"/>',
+    "pie": '<circle cx="8" cy="8" r="5.5"/><path d="M8 2.5V8h5.5"/>',
+    "building": '<path d="M3.5 14V3h6v11M9.5 7h3v7M2 14h12M5.5 5.5h2M5.5 8h2M5.5 10.5h2"/>',
+    "scale": '<path d="M8 2v12M4.5 14h7"/><path d="M2.5 5h11"/><path d="M4 5 2 9.5h4L4 5zM12 5l-2 4.5h4L12 5z"/>',
+    "clock": '<circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.2 1.4"/>',
+    "person": '<circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4"/>',
+}
+SOFT_ICON_BG, SOFT_ICON_INK, SOFT_ICON_SIZE = "#E5E7EB", "#4B5563", 22   # 기본형 = 회색 면 원 + 진회색 그림 (증시 전망 팝업 소제목 P505)
+
+
+def soft_icon(name, size=SOFT_ICON_SIZE):
+    """기본형 아이콘 — 회색 면 원(#E5E7EB) 안 진회색 선 그림(#4B5563), 그림 = 원의 0.55. 소제목 · 구획 제목 앞, 글자와 6."""
+    g = round(size * 0.55)
+    return (f'<span aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:{size}px;height:{size}px;border-radius:50%;background:{SOFT_ICON_BG};color:{SOFT_ICON_INK};">'
+            f'<svg viewBox="0 0 16 16" width="{g}" height="{g}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">{ICON_GLYPHS[name]}</svg></span>')
+
+
+def solid_icon(name, bg, size=24):
+    """강조형 아이콘 — 색 면 네모(모서리 = 크기/4) 안 흰 선 그림, 그림 = 크기의 2/3. 강조 카드 · 질문 줄 · 홈 카드 제목 앞, 글자와 8. 색 = 그 기능의 색 하나."""
+    g = round(size * 2 / 3)
+    return (f'<span aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:{size}px;height:{size}px;border-radius:{round(size / 4)}px;background:{bg};color:#fff;">'
+            f'<svg viewBox="0 0 16 16" width="{g}" height="{g}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">{ICON_GLYPHS[name]}</svg></span>')

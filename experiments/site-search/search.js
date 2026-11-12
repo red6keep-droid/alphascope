@@ -203,6 +203,24 @@
       return '<ul class="as-news">' + s.news.map(function (n) { return '<li><span>' + md(n[0]) + '</span>' + esc(n[1]) + ' <small>' + esc(n[2]) + '</small></li>'; }).join('') + '</ul>';
     },
   };
+  /* 구획 제목 아이콘 = 기본형(회색 면 원 22 · #E5E7EB, 그림 #4B5563 = 원의 0.55) — 가이드라인 8절 `아이콘`, 그림 원본 = design_kit.ICON_GLYPHS (2026-11-12 사용자) */
+  var ICONS = {
+    price: '<path d="M1.5 8.5h3l1.5-4 3 8 1.5-4h4"/>',
+    change: '<path d="M2 11.5l4-4 3 3 5-6"/><path d="M10.5 4.5H14v3.5"/>',
+    range: '<path d="M5 3v10M3 5l2-2 2 2M11 13V3M9 11l2 2 2-2"/>',
+    volume: '<path d="M3 13V10M6 13V7M9 13V9M12 13V5"/>',
+    cap: '<circle cx="8" cy="8" r="5.5"/><path d="M8 2.5V8h5.5"/>',
+    earnDate: '<rect x="2.5" y="3.5" width="11" height="10" rx="1.5"/><path d="M2.5 7h11M5.5 2v3M10.5 2v3"/>',
+    earnings: '<path d="M2.5 13.5h11M4.5 11V8M8 11V5M11.5 11V3"/>',
+    valuation: '<circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="2.5"/>',
+    tech: '<path d="M2.8 11.5a5.2 5.2 0 1 1 10.4 0"/><path d="M8 11.5l2.6-3"/>',
+    company: '<path d="M3.5 14V3h6v11M9.5 7h3v7M2 14h12M5.5 5.5h2M5.5 8h2M5.5 10.5h2"/>',
+    news: '<path d="M3 3h8v10H4a1 1 0 0 1-1-1V3z"/><path d="M11 6h2v6a1 1 0 0 1-1 1"/><path d="M5 6h4M5 9h4"/>'
+  };
+  function ico(k) {
+    return ICONS[k] ? '<span class="as-ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + ICONS[k] + '</svg></span>' : '';
+  }
+  var EXCL = '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>';
   var TITLE = { change: '기간별 등락', range: '52주 범위', volume: '거래량', cap: '시가총액', earnDate: '실적 발표일', earnings: '실적', valuation: 'EPS · PER · 목표가', tech: '기술 지표', company: '회사 정보', news: '최근 소식' };
 
   function card(s, c, compact) {
@@ -220,15 +238,15 @@
     if (c.why) body += '<p class="as-note">AlphaScope는 등락 이유를 짐작해서 답하지 않습니다. 확인된 숫자와 최근 소식만 모았습니다.</p>';
     if (priceFirst) body += PART.price(s);
     asked.concat(extra).forEach(function (k, i) {
-      body += '<div class="as-sec' + (!priceFirst && i === 0 ? ' as-first' : '') + '"><h4>' + TITLE[k] + '</h4>' + PART[k](s, c) + '</div>';
+      body += '<div class="as-sec' + (!priceFirst && i === 0 ? ' as-first' : '') + '"><h4>' + ico(k) + TITLE[k] + '</h4>' + PART[k](s, c) + '</div>';
     });
-    if (!priceFirst) body += '<div class="as-sec"><h4>오늘 주가</h4>' + PART.price(s) + '</div>';
+    if (!priceFirst) body += '<div class="as-sec"><h4>' + ico('price') + '오늘 주가</h4>' + PART.price(s) + '</div>';
     return '<article class="as-card">'
       + '<header><span class="as-mkt as-' + s.m + '">' + (s.m === 'us' ? '미국' : '한국') + '</span><h3>' + label(s) + '</h3><span class="as-day">' + md(s.p.d) + ' 종가 기준</span></header>'
       + body
-      /* 독자가 실제로 가야 할 곳 = 종목 페이지 → 카드 끝 검은 버튼(가이드라인 10절 검은 버튼, 2026-11-12 사용자) */
+      /* 독자가 실제로 가야 할 곳 = 종목 페이지 → 카드 끝 흰 버튼(가이드라인 10절 흰 버튼: 외곽선 · 검은 글씨, 2026-11-12 사용자 — 처음 검은 버튼에서 바꿈) */
       + '<a class="as-go" href="' + esc(s.u) + '">' + esc(s.n) + ' 종목 페이지 보기</a>'
-      + '<p class="as-go-note">주가 차트 · 실적 · 애널리스트 의견 · 기술 지표 · 뉴스를 한 페이지에 모았습니다.</p></article>';
+      + '<p class="as-go-note"><span>' + EXCL + '</span><span>주가 차트 · 실적 · 애널리스트 의견 · 기술 지표 · 뉴스를 한 페이지에 모았습니다.</span></p></article>';
   }
 
   function answer(doc, q, compact) {
@@ -287,7 +305,7 @@
     var head = '<h4>함께 보는 페이지</h4>';
     if (stocks.length) {
       var m = stocks[0].m;
-      box.innerHTML = head + outBtn(LINKS[m + '_top'][0], LINKS[m + '_top'][1]) + outBtn(LINKS[m][0], LINKS[m][1]);
+      box.innerHTML = head + outBtn(LINKS[m][0], LINKS[m][1]) + outBtn(LINKS[m + '_top'][0], LINKS[m + '_top'][1]);   // 증시 리포트 → 시총 TOP 10 (2026-11-12 사용자)
       return;
     }
     var fixed = outBtn(LINKS.us[0], LINKS.us[1]) + outBtn(LINKS.kr[0], LINKS.kr[1]);
