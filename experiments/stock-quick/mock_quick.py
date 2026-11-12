@@ -171,6 +171,75 @@ def page(s, df, bdf):
     return dk.formal(body), title
 
 
+def page_us_full(smp):
+    """정식 종목과 같은 계산(stock-radar/analyze) · 같은 카드(stock-radar/render_pages)를 간단 정보 종목에 그대로 — 가격 · 공용 시장 자료로 되는 것만 (2026-11-12 사용자).
+    빠지는 것 = 종목별 상세 호출 · 다른 수집 · AI 가 필요한 카드(의견 · 실적 · 기업 · 뉴스 · 방송 · 소송), 가격 그래프 PNG(브라우저가 그리는 1년 선 그래프로)."""
+    rd = os.path.join(EXP, "stock-radar")
+    sys.path.insert(0, rd)
+    import universe as U
+    sym = smp["sym"]
+    if sym not in U.BY_SYM:   # 목업 안에서만 후보에 잠깐 넣는다 — 이름 · 업종 칸을 정식 계산이 읽는다
+        U.CANDIDATES.append((sym, smp["name"], f"{sym.lower()}-stock", smp["sector"]))
+        U.BY_SYM[sym] = U.CANDIDATES[-1]
+    import collect
+    import analyze
+    import render_pages as RP
+    syms = sorted({sym, U.BENCH, "^VIX", "SMH", *collect.SECTOR_ETFS})
+    bars = collect._bars(syms)
+    snap = {"fetched_at": "", "bars": bars, "caps": {sym: collect._cap(sym)[1]}, "earnings": {sym: collect._earnings(sym)[1]}, "history": history_stats([sym, U.BENCH])}
+    s = analyze.stock(sym, snap)
+    b = s.pop("_bars")
+    s["tech"] = analyze.technical(b, snap, sym)
+    s["market_regime"], s["market_shock"] = analyze.market_regime(snap), analyze.market_shock(snap)
+    s["sector_flow"], s["bollinger"] = analyze.sector_flow(snap, sym), analyze.bollinger(b)
+    s["overheat"], s["drawdown"] = analyze.overheat(b, s["tech"]), analyze.drawdown(b, s["year_range"], snap, sym)
+    s.update(peer_moves=[], in_top=False, rank=None, industry_us=None, mom_12_1=None)
+    R = RP.R
+    sf = s.get("sector_flow")
+    flow = ""
+    if sf:
+        th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
+        flow = f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{R._state_card(sf["name"] + " 업계 자금 흐름은?", sf["state"], th, col, RP.sector_lines(sf), "", fold=True)}</div>'
+    days = [x["day"] for x in b]
+    c = [x["close"] for x in b][-252:]
+    bmap = {x["day"]: x["close"] for x in bars[U.BENCH]}
+    bc = [bmap.get(d) for d in days[-252:]]
+    bc = [x if x is not None else next(y for y in bc if y is not None) for x in bc]
+    series = [(smp["name"], [(x / c[0] - 1) * 100 for x in c], C.UP if c[-1] >= c[0] else C.DOWN, "solid"),
+              ("S&P 500", [(x / bc[0] - 1) * 100 for x in bc], "#94A3B8", "dash")]
+    line = dk.trend_card("1년 전 대비 등락", dk.month_ticks(days[-252:]), series, pct)
+    nxt = [x for x in snap["earnings"][sym] if x["day"] >= s["day"]]
+    earn = ""
+    if nxt:
+        d = datetime.date.fromisoformat(nxt[0]["day"])
+        w = {"bmo": "장 시작 전", "amc": "장 마감 뒤"}.get(nxt[0].get("when"), "")
+        earn = C.cards_grid(C.question_card("다음 실적 발표는?", kday(d), "neutral", "#111", [(f"{kday(d)} {w} 발표 예정입니다." if w else f"{kday(d)} 발표 예정입니다.", "plain"),
+                                                                                         ("회사가 알린 날짜입니다. 바뀌면 다음 갱신 때 고쳐집니다.", "note")]))
+    stamp_html = stamp(RP._md(s["day"]) + "(미국 시간)", "가격 자료만으로 만든 간단 정보입니다. 매 거래일 장을 마감한 뒤 한 번 갱신됩니다.")
+    body = (stamp_html + RP.lead(s) + line + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500")
+            + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s) + flow + earn
+            + dk.muted("간단 정보는 가격 자료로 계산되는 카드만 싣습니다. 애널리스트 · 실적 · 뉴스 · 방송 의견은 종목 분석 페이지에서 다룹니다.")
+            + dk.related_buttons(smp["peers"] + [("전체 종목 목록", "mock_all_stocks.html")]))
+    return RP.wrap(body), f'{smp["name"]} {sym} 간단 정보'
+
+
+def history_stats(syms):
+    """고점 하락 후 회복 통계 — stock-radar collect.history 와 같은 계산을 이 종목 · S&P 500 만 (실제는 주 1회 긴 일봉 묶음)."""
+    sys.path.insert(0, os.path.join(EXP, "nvda-report"))
+    import history_stats as HS
+    df = yf.download(syms, start="1999-01-01", interval="1d", auto_adjust=False, group_by="ticker", progress=False, threads=True)
+    spy = df[syms[-1]]["Close"].dropna()
+    out = {"stats": {}}
+    for s in syms:
+        cc = df[s]["Close"].dropna()
+        cc = cc[cc > 0]
+        if len(cc) < 500:
+            continue
+        out["stats"][s] = {"from": cc.index[0].strftime("%Y-%m-%d"), "to": cc.index[-1].strftime("%Y-%m-%d"), "dd": HS.dd_summary(HS.drawdown_cycles(cc)),
+                           "spy_dd": HS.dd_summary(HS.drawdown_cycles(spy[spy.index >= cc.index[0]]))}
+    return out
+
+
 def all_stocks(data):
     """전체 종목 목록 — 업종별 표: 이름 · 하루 등락 · 1년 범위 위치. 정식 종목은 이름 옆 `분석`."""
     rows = {}
@@ -206,7 +275,10 @@ def main():
     df = yf.download(syms, period="1y", interval="1d", auto_adjust=False, group_by="ticker", progress=False, threads=True)
     data = {s: df[s] for s in syms if s in df.columns.get_level_values(0)}
     for s in SAMPLES:
-        body, title = page(s, data[s["sym"]], data[BENCH[s["market"]][0]])
+        if s["market"] == "US":   # 미국 = 정식 종목과 같은 카드 (한국은 render_kr 로 같은 작업 — 다음 차례)
+            body, title = page_us_full(s)
+        else:
+            body, title = page(s, data[s["sym"]], data[BENCH[s["market"]][0]])
         p = dk.write_mock(body, os.path.join(OUT, f'mock_quick_{s["sym"].split(".")[0]}.html'), title)
         print("만듦:", p)
     LIST_DAY = kday(datetime.date.fromisoformat(data["AAPL"].dropna(subset=["Close"]).index[-1].strftime("%Y-%m-%d"))) + "(미국 시간)"
