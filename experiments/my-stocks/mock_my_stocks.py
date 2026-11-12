@@ -203,17 +203,40 @@ def stock_left(s, sub_html):
             f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};white-space:nowrap;">{sub_html}</span></span></span>')
 
 
+# 연필 · 휴지통 — 아이콘 꼴 규칙(가이드라인 8절: viewBox 16 선 그림 · 선 1.6 · 끝 둥글게). 실제 적용 때 design_kit.ICON_GLYPHS 로 옮긴다
+EDIT_GLYPH = '<path d="M10.5 2.5l3 3L6 13H3v-3l7.5-7.5z"/><path d="M9 4l3 3"/>'
+TRASH_GLYPH = '<path d="M2.5 4.5h11M6 4.5V3h4v1.5M4 4.5l.7 9h6.6l.7-9"/><path d="M6.8 7v4.5M9.2 7v4.5"/>'
+ICON_BTN = ("display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:40px;height:40px;background:#fff;"
+            "border:1px solid #B5BAC0;border-radius:8px;color:#111;cursor:pointer;")   # 흰 버튼(10절)과 같은 테두리 · 모서리, 아이콘만
+
+
+def icon_btn(glyph, label):
+    return (f'<a data-mock="1" role="button" aria-label="{label}" title="{label}" style="{ICON_BTN}">'
+            f'<svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{glyph}</svg></a>')
+
+
+# 아래 고정 입력 칸 — 폰 · 태블릿(900 이하)은 테마 하단 고정 메뉴(71 + 안전 영역) 바로 위, PC 는 화면 맨 아래. 글 폭(--shell 980) 안에 맞춤
+SHEET_CSS = ("<style>.ms-sheet{position:fixed;left:0;right:0;bottom:0;z-index:43;display:flex;justify-content:center;pointer-events:none;}"
+             ".ms-sheet>details{pointer-events:auto;width:100%;max-width:980px;box-sizing:border-box;background:#fff;border-top:1px solid #E2E8F0;"
+             "box-shadow:0 -4px 16px rgba(15,23,42,.08);border-radius:12px 12px 0 0;padding:0 14px 14px;}"
+             ".ms-sheet summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:14px 0;}"
+             ".ms-sheet summary::-webkit-details-marker{display:none;}"
+             ".ms-sheet details[open] .ms-chev{transform:rotate(180deg);}"
+             ".ms-pad{height:72px;}"
+             "@media (max-width:900px){.ms-sheet{bottom:calc(71px + env(safe-area-inset-bottom));}}</style>")
+
+
 def add_form(held):
     """`종목 관리` 탭 (2026-11-12 사용자): 제목 없음 · 안내 문구 없음.
-    ① 지금 보유 종목 = `수익` 탭과 같은 줄 + 오른쪽 흰 버튼 `고치기` · `빼기`
-    ② 여러 종목 한 번에 넣기 = 입력 줄(종목 | 수량 | 평균 매수가) 세 줄로 시작, `+ 줄 추가` 로 늘리고 `한 번에 넣기` 한 번으로 저장 — 10개를 넣어도 저장은 한 번
-       (Firestore 쓰기 1회 · portfolios/{uid} 한 문서, 기획 3-2)"""
+    ① 지금 보유 종목 = `수익` 탭과 같은 줄 + 오른쪽 아이콘 버튼 연필(고치기) · 휴지통(빼기)
+    ② `보유 종목 입력` = 화면 아래 고정 칸, 눌러 열고 닫음(기본 닫힘). 입력 줄(종목 | 수량 | 평균 매수가) 세 줄 ·
+       버튼 두 칸 `+ 줄 추가` · `보유 종목 저장`(흰 테두리 버튼) — 10개를 넣어도 저장은 한 번(Firestore 쓰기 1회, 기획 3-2)"""
     sub = lambda s, q, a: esc(f"{q:,}주 · 평균 ") + (esc(money(a, s["m"])) if s["m"] == "us" else won_html(a, 14))
     rows = "".join(
         f'<span style="{dk.MULTI_ROW}{"" if i == 0 else dk.MULTI_SEP}">{stock_left(s, sub(s, q, a))}'
-        f'<span style="flex:none;display:flex;gap:6px;"><a data-mock="1" style="{WHITE_BTN}">고치기</a><a data-mock="1" style="{WHITE_BTN}">빼기</a></span></span>'
+        f'<span style="flex:none;display:flex;gap:6px;">{icon_btn(EDIT_GLYPH, "고치기")}{icon_btn(TRASH_GLYPH, "빼기")}</span></span>'
         for i, (s, q, a) in enumerate(held))
-    held_card = f'<div data-cards="1" style="margin:0 0 16px;"><span data-grid="2" style="{dk.MULTI}">{rows}</span></div>'
+    held_card = f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{rows}</span></div>'
 
     inp = ("display:block;width:100%;box-sizing:border-box;height:44px;padding:0 10px;border:1px solid #E2E8F0;border-radius:8px;"
            "font-size:16px;line-height:24px;color:#111;background:#fff;min-width:0;")
@@ -222,13 +245,16 @@ def add_form(held):
     lines = "".join(f'<div style="{COLS}margin:0 0 6px;"><input data-mock="1" style="{inp}" placeholder="{ph}"><input data-mock="1" style="{inp}" inputmode="numeric" placeholder="주">'
                     f'<input data-mock="1" style="{inp}" inputmode="decimal" placeholder="$ · 원"></div>'
                     for ph in ("엔비디아 · 005930", "", ""))
-    add_card = (f'<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px 12px;margin:0 0 8px;">'
-                f'<div style="font-size:16px;line-height:24px;font-weight:700;color:#111;margin:0 0 10px;">여러 종목 한 번에 넣기</div>'
-                f'<div style="{COLS}margin:0 0 6px;"><span style="{head}">종목</span><span style="{head}">수량</span><span style="{head}">평균 매수가</span></div>'
-                f'{lines}'
-                f'<a data-mock="1" style="{WHITE_BTN}width:100%;margin:4px 0 8px;">+ 줄 추가</a>'
-                f'<a data-mock="1" style="{BTN}background:#111;color:#fff;border-radius:8px;">한 번에 넣기</a></div>')
-    return held_card + add_card
+    chev = ('<svg class="ms-chev" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:#6B7280;transition:transform .15s;">'
+            '<path d="M4 10l4-4 4 4"/></svg>')
+    sheet = (SHEET_CSS + f'<div class="ms-pad"></div><div class="ms-sheet"><details>'
+             f'<summary><span style="font-size:16px;line-height:24px;font-weight:700;color:#111;">보유 종목 입력</span>{chev}</summary>'
+             f'<div style="{COLS}margin:0 0 6px;"><span style="{head}">종목</span><span style="{head}">수량</span><span style="{head}">평균 매수가</span></div>'
+             f'{lines}'
+             f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0 0;">'
+             f'<a data-mock="1" style="{WHITE_BTN}">+ 줄 추가</a><a data-mock="1" style="{WHITE_BTN}">보유 종목 저장</a></div>'
+             f'</details></div>')
+    return held_card, sheet
 
 
 def basis_note():
@@ -296,7 +322,7 @@ def main():
             + stock_rows(us, "us") + stock_rows(kr, "kr") + basis_note()   # 안내 = 맨 끝 카드(종목 줄) 아래 오른쪽 (2026-11-12 사용자)   # 총액 바로 아래 = 보유 종목, 제목 없이 (U1 `보유 종목 n개` 삭제)
             + dk.h2("수익", tab="수익")   # 첫 탭 `수익` — 탭 이름과 같은 제목은 테마가 숨긴다. 머리(총액 · 종목 줄)가 이 첫 탭으로 들어간다 (U5)
             + news_block(held)
-            + dk.section("종목 관리", add_form(held) + leave_link(), one_line=True, tab="종목 관리"))   # 제목 = 탭 이름과 같게 → 테마가 숨김 (2026-11-12 사용자: `종목 넣기 · 고치기` 제목 삭제)   # 맨 아래 작은 글씨 → 총액 카드 아래 ? 팝업 (2026-11-12 사용자)
+            + dk.section("종목 관리", "".join([add_form(held)[0], leave_link(), add_form(held)[1]]), one_line=True, tab="종목 관리"))   # 제목 = 탭 이름과 같게 → 테마가 숨김 (2026-11-12 사용자: `종목 넣기 · 고치기` 제목 삭제)   # 맨 아래 작은 글씨 → 총액 카드 아래 ? 팝업 (2026-11-12 사용자)
     write(body, "mock_my-stocks.html", NAME)
 
     # 로그인 전
