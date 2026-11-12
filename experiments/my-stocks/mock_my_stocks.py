@@ -240,7 +240,7 @@ def basis_note():
         "· 추천 없음 : 공개 페이지의 정보를 보유 종목만 모아 보여 드립니다. 종목 추천이나 매매 판단을 드리지 않습니다.",
         "· 자리 : 60일 동안 열지 않으면 다음 분께 넘기고 적어 주신 내용을 지웁니다."])
     return (f'<div style="display:flex;justify-content:flex-end;align-items:center;margin:-2px 0 12px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">'
-            f'블로그 종목 페이지의 종가 기준입니다{dk.tip(text)}</div>')
+            f'종가 기준입니다{dk.tip(text)}</div>')   # 문구 = `종가 기준입니다` 만 (2026-11-12 사용자)
 
 
 def leave_link():
@@ -292,8 +292,8 @@ def main():
     kr = [h for h in held if h[0]["m"] == "kr"]
 
     # 로그인 뒤
-    body = (dk.cards(grand_card(held) + basis_note())   # 맨 위 = 총액 · 총 수익률. 글 머리 카드(data-lead) — 첫 h2 앞. 테마는 data-lead(없으면 첫 data-cards)부터 첫 h2 전까지를 머리로 옮긴다: h2 뒤에 두면 종목 줄 카드가 맨 아래로 밀렸다
-            + stock_rows(us, "us") + stock_rows(kr, "kr")   # 총액 바로 아래 = 보유 종목, 제목 없이 (U1 `보유 종목 n개` 삭제)
+    body = (dk.cards(grand_card(held))   # 맨 위 = 총액 · 총 수익률. 글 머리 카드(data-lead) — 첫 h2 앞. 테마는 data-lead(없으면 첫 data-cards)부터 첫 h2 전까지를 머리로 옮긴다: h2 뒤에 두면 종목 줄 카드가 맨 아래로 밀렸다
+            + stock_rows(us, "us") + stock_rows(kr, "kr") + basis_note()   # 안내 = 맨 끝 카드(종목 줄) 아래 오른쪽 (2026-11-12 사용자)   # 총액 바로 아래 = 보유 종목, 제목 없이 (U1 `보유 종목 n개` 삭제)
             + dk.h2("수익", tab="수익")   # 첫 탭 `수익` — 탭 이름과 같은 제목은 테마가 숨긴다. 머리(총액 · 종목 줄)가 이 첫 탭으로 들어간다 (U5)
             + news_block(held)
             + dk.section("종목 관리", add_form(held) + leave_link(), one_line=True, tab="종목 관리"))   # 제목 = 탭 이름과 같게 → 테마가 숨김 (2026-11-12 사용자: `종목 넣기 · 고치기` 제목 삭제)   # 맨 아래 작은 글씨 → 총액 카드 아래 ? 팝업 (2026-11-12 사용자)
