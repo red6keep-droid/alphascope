@@ -242,7 +242,7 @@ _ICON = {   # 22px 선 아이콘 (viewBox 24, 선 1.8)
     "home": '<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/>',
     "report": '<path d="M4 19h16"/><path d="M6 16l4-5 3 3 5-7"/>',
     "stock": '<path d="M9 7h11M9 12h11M9 17h11"/><path d="M4.5 7h.01M4.5 12h.01M4.5 17h.01"/>',   # 목록 모양 — 돋보기는 검색으로 읽힌다
-    "forecast": '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+    "forecast": '<path d="M12 3v18M7.5 21h9"/><path d="M4 7h16"/><path d="M6 7l-3 7h6zM18 7l-3 7h6z"/>',   # 저울 — 홈 · 증시 전망 질문 줄과 같은 그림 (2026-11-12 사용자)
     "people": '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
 }
 # 하단 메뉴 아이콘 스타일 비교 (2026-11-12 사용자: 여러 스타일을 그려 보고 고른다). 선 = 테두리만, 면 = 채운 모양
@@ -293,7 +293,28 @@ BAR_PAD = 10   # 하단 메뉴 아래 여백 — 화면 맨 아래에서 10px �
 BAR_H = 56
 
 
-def icon_svg(style, key, on, mkt="kr"):
+# 종목 · 인물 아이콘 시안 (2026-11-12 사용자: B 스타일로, 종목 · 인물은 여러 시안). viewBox 24 선 그림. 0 = 지금 것
+STOCK_V = [
+    ("목록 (지금)", _ICON["stock"]),
+    ("캔들 차트", '<path d="M7 3v18M17 3v18"/><rect x="4.5" y="7" width="5" height="8" rx="1"/><rect x="14.5" y="5" width="5" height="10" rx="1"/>'),
+    ("세로 막대", '<path d="M4 20h16"/><path d="M7.5 16v-5M12 16V6M16.5 16v-8"/>'),
+    ("네 칸 타일", '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'),
+    ("건물 (회사)", '<path d="M5 20V4.5h9V20M14 9h5v11M3 20h18"/><path d="M8 8h3M8 12h3M8 16h3"/>'),
+    ("파이 차트", '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12h8.5"/>'),
+    ("가방 (포트폴리오)", '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2M3 12.5h18"/>'),
+]
+PEOPLE_V = [
+    ("사람 (지금)", _ICON["people"]),
+    ("사람 + 말풍선", '<circle cx="9" cy="9" r="3.5"/><path d="M2.5 20.5c.6-3.6 3.1-5.6 6.5-5.6s5.9 2 6.5 5.6"/><path d="M15 3.5h6.5v5h-3.2L16 10.5v-2h-1z"/>'),
+    ("말풍선", '<path d="M4 4.5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8.5L6 20.5v-4H4a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1z"/><path d="M8 10.5h.01M12 10.5h.01M16 10.5h.01"/>'),
+    ("마이크", '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>'),
+    ("확성기", '<path d="M3.5 10v4h3.5l7.5 4.5v-13L7 10z"/><path d="M17.5 9a4.2 4.2 0 0 1 0 6M19.8 6.5a7.5 7.5 0 0 1 0 11"/>'),
+    ("두 사람", '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.1-5.6 6.5-5.6s5.9 2 6.5 5.6"/><path d="M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.9.8 3.1 2.6 3.5 5.2"/>'),
+    ("따옴표", '<path d="M10 6.5H6.5a2 2 0 0 0-2 2V12H10z"/><path d="M10 12c0 3.2-1.6 4.8-4.5 5.5"/><path d="M19.5 6.5H16a2 2 0 0 0-2 2V12h5.5z"/><path d="M19.5 12c0 3.2-1.6 4.8-4.5 5.5"/>'),
+]
+
+
+def icon_svg(style, key, on, mkt="kr", sv=0, pv=0):
     """하단 메뉴 아이콘 한 개 — 스타일 · 지금 칸 여부에 따라."""
     if style == "F":
         return ""
@@ -302,8 +323,9 @@ def icon_svg(style, key, on, mkt="kr"):
     if style == "C" or (style == "D" and on):
         return f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">{_FILL[key]}</svg>'
     w = "2.4" if style == "B" else "1.8"
+    g = STOCK_V[sv][1] if key == "stock" else PEOPLE_V[pv][1] if key == "people" else _ICON[key]
     return (f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="{w}" '
-            f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{_ICON[key]}</svg>')
+            f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{g}</svg>')
 
 
 def bar_css():
@@ -318,20 +340,29 @@ def bar_css():
             "#jbar[data-style=F] a.on::after{content:'';position:absolute;bottom:8px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:#111}")
 
 
-def bar_html(style, cur=""):
+def bar_html(style, cur="", sv=0, pv=0):
     return (f'<nav class="jsample" data-style="{style}">'
-            + "".join(f'<a data-jt="{k}" href="#"' + (' class="on"' if k == cur else '') + f'>{icon_svg(style, k, k == cur)}<span>{t}</span></a>' for k, t in JTABS)
+            + "".join(f'<a data-jt="{k}" href="#"' + (' class="on"' if k == cur else '') + f'>{icon_svg(style, k, k == cur, sv=sv, pv=pv)}<span>{t}</span></a>' for k, t in JTABS)
             + "</nav>")
 
 
 def icons_page():
     """아이콘 스타일 비교 화면 — 스타일마다 하단 메뉴 견본(지금 칸 = 종목) + `이 스타일로 여정 보기`."""
-    rows = []
+    rows = ['<div class="sep">B 굵은 선 · 증시 전망 = 저울 — 종목 아이콘 시안 (지금 칸 = 종목)</div>']
+    for i, (nm, _) in enumerate(STOCK_V):
+        rows.append(f'<section><h2>종목 {i + 1}. {html.escape(nm)}</h2>{bar_html("B", "stock", sv=i)}'
+                    f'<a class="go" href="{JOURNEY_START}?icon=B&amp;st={i}">이 종목 아이콘으로 여정 보기 ›</a></section>')
+    rows.append('<div class="sep">B 굵은 선 — 인물 아이콘 시안 (지금 칸 = 인물 발언)</div>')
+    for i, (nm, _) in enumerate(PEOPLE_V):
+        rows.append(f'<section><h2>인물 {i + 1}. {html.escape(nm)}</h2>{bar_html("B", "people", pv=i)}'
+                    f'<a class="go" href="{JOURNEY_START}?icon=B&amp;pp={i}">이 인물 아이콘으로 여정 보기 ›</a></section>')
+    rows.append('<details class="old"><summary>지난 비교 — 스타일 8가지 (B 로 정함)</summary>')
     for k, name, why in ICON_STYLES:
         if k == "G":
             rows.append('<div class="sep">강조 카드 · 홈 카드 컬러 아이콘</div>')
         rows.append(f'<section><h2>{k}. {html.escape(name)}</h2><div class="why">{html.escape(why)}</div>{bar_html(k, "stock")}'
                     f'<a class="go" href="{JOURNEY_START}?icon={k}">이 스타일로 여정 보기 ›</a></section>')
+    rows.append('</details>')
     css = bar_css().replace("#jbar", ".jsample").replace("position:fixed;left:0;right:0;bottom:0;z-index:44;", "position:relative;")
     return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>하단 메뉴 아이콘 비교</title><style>
@@ -340,9 +371,10 @@ h1{{font-size:20px;margin:0 0 4px}} .meta{{color:#8a919c;font-size:13px;margin-b
 section{{background:#fff;border:1px solid #e3e6eb;border-radius:12px;margin:0 0 14px;overflow:hidden}}
 h2{{font-size:16px;margin:14px 14px 2px}} .why{{color:#6B7280;font-size:13px;margin:0 14px 12px}}
 .sep{{margin:22px 2px 10px;color:#5b6370;font-size:14px;font-weight:600}}
+.old{{margin-top:28px}} .old>summary{{padding:14px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;font-weight:600;cursor:pointer;margin-bottom:10px}}
 .go{{display:block;padding:12px 14px;border-top:1px solid #eef0f3;color:#1d2127;text-decoration:none;font-size:14px;font-weight:600}}
 {css}
-</style></head><body><h1>하단 메뉴 아이콘 비교</h1><div class="meta">견본의 지금 칸 = 종목 · 아래 여백 {BAR_PAD}px 포함 · <a href="/">목업 목록으로</a></div>
+</style></head><body><h1>하단 메뉴 아이콘 비교</h1><div class="meta">아래 여백 {BAR_PAD}px 포함 · 종목 · 인물 시안을 하나씩 고르면 여정에서 둘 다 기억 · <a href="/">목업 목록으로</a></div>
 {''.join(rows)}</body></html>"""
 
 
@@ -446,6 +478,8 @@ def journey_bar(d, f):
             if x.startswith("mock_forecast-") and x.endswith(".html")} if os.path.isdir(od) else {}
     tabs = JTABS
     icons = {st: {**{k: [icon_svg(st, k, False), icon_svg(st, k, True)] for k, _ in JTABS},
+                  "stock_v": [[icon_svg(st, "stock", False, sv=i), icon_svg(st, "stock", True, sv=i)] for i in range(len(STOCK_V))],
+                  "people_v": [[icon_svg(st, "people", False, pv=i), icon_svg(st, "people", True, pv=i)] for i in range(len(PEOPLE_V))],
                   **{f"report_{m}": [icon_svg(st, "report", False, m), icon_svg(st, "report", True, m)] for m in ("us", "kr")}} for st, _, _ in ICON_STYLES}
     btns = "".join(f'<a data-jt="{k}" href="#"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" '
                    f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{_ICON[k]}</svg><span>{t}</span></a>' for k, t in tabs)
@@ -506,8 +540,17 @@ body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !im
   try {{ ic = ic || sessionStorage.getItem('jIcon'); }} catch (e) {{}}
   ic = ic || 'A';
   document.getElementById('jbar').setAttribute('data-style', ic);
+  function pick(name, re) {{   // 종목 · 인물 시안 번호 — 주소에 있으면 기억, 없으면 기억한 것
+    var v = (location.search.match(re) || [])[1];
+    if (v) {{ try {{ sessionStorage.setItem(name, v); }} catch (e) {{}} }}
+    try {{ v = v || sessionStorage.getItem(name); }} catch (e) {{}}
+    return +(v || 0);
+  }}
+  var stv = pick('jSt', /[?&]st=(\\d+)/), ppv = pick('jPp', /[?&]pp=(\\d+)/);
   document.querySelectorAll('#jbar a').forEach(function (a) {{
-    var k = a.dataset.jt, on = k === cur, svg = a.querySelector('svg'), ics = C.icons[ic] || C.icons.A, sv = (k === 'report' ? ics['report_' + mk] : ics[k])[on ? 1 : 0];
+    var k = a.dataset.jt, on = k === cur, svg = a.querySelector('.ji') || a.querySelector('svg'), ics = C.icons[ic] || C.icons.A;
+    var set = k === 'report' ? ics['report_' + mk] : k === 'stock' && ics.stock_v ? ics.stock_v[stv] || ics.stock : k === 'people' && ics.people_v ? ics.people_v[ppv] || ics.people : ics[k];
+    var sv = set[on ? 1 : 0];
     if (svg) svg.remove();
     if (sv) a.insertAdjacentHTML('afterbegin', sv);
     a.href = J + tab[k]; if (on) a.className = 'on';
