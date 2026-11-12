@@ -228,21 +228,21 @@ jobs:
             [ -f "experiments/stock-radar/data/$f" ] && cp "experiments/stock-radar/data/$f" "$STATE_DIR/radar/$f"
           done
 
-      # ① 아래 가격 그래프 (chart_price.py → output/images/nvda-price-{day}.png). daily-report 커버 이미지와 같은 경로
+      # ① 아래 가격 그래프 (chart_price.py → output/images/nvda-price-{day}.webp). daily-report 커버 이미지와 같은 경로
       - name: Prepare chart image for deploy
         if: needs.check.outputs.mode != 'refresh'
         run: |
           mkdir -p deploy/images
-          if compgen -G "experiments/nvda-report/output/images/*.png" > /dev/null; then
-            cp experiments/nvda-report/output/images/*.png deploy/images/
+          if compgen -G "experiments/nvda-report/output/images/*.webp" > /dev/null; then
+            cp experiments/nvda-report/output/images/*.webp deploy/images/
             ls -la deploy/images/
           else
             echo "::warning::가격 그래프가 없습니다 — 글은 그래프 없이 나간다."
           fi
-          # 종목 그래프(radar-*.png)는 여기 넣지 않는다 — 아래 radar-images 단계 (2026-10-20 휘발성)
+          # 종목 그래프(radar-*.webp)는 여기 넣지 않는다 — 아래 radar-images 단계 (2026-10-20 휘발성)
 
       - name: Deploy chart image to gh-pages branch
-        if: needs.check.outputs.mode != 'refresh' && hashFiles('deploy/images/*.png') != ''
+        if: needs.check.outputs.mode != 'refresh' && hashFiles('deploy/images/*.webp') != ''
         uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -253,12 +253,12 @@ jobs:
       # 종목 그래프 — radar-images 브랜치를 그날 그림만으로 새로 만들어 덮어쓴다(부모 커밋 없음 = 이력 없음, 2026-10-20 사용자: 이미지는 휘발성).
       # gh-pages(keep_files)에 두면 매일 수십 장이 커밋 이력에 쌓인다. 페이지 <img> 주소는 render_pages.chart_url (@radar-images).
       - name: Deploy stock charts (radar-images branch, no history)
-        if: needs.check.outputs.mode != 'refresh' && hashFiles('experiments/stock-radar/output/images/radar-*.png') != ''   # 갱신 실행은 같은 날 봉 — 그래프는 아침 것 그대로
+        if: needs.check.outputs.mode != 'refresh' && hashFiles('experiments/stock-radar/output/images/radar-*.webp') != ''   # 갱신 실행은 같은 날 봉 — 그래프는 아침 것 그대로
         run: |
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
           # 트리를 직접 만든다 (images/ 아래 그날 PNG 만) — 작업 폴더 · 다른 브랜치 내용이 섞이지 않게
-          SUB="$(for f in experiments/stock-radar/output/images/radar-*.png; do
+          SUB="$(for f in experiments/stock-radar/output/images/radar-*.webp; do
             printf '100644 blob %s\t%s\n' "$(git hash-object -w "$f")" "$(basename "$f")"
           done | git mktree)"
           TREE="$(printf '040000 tree %s\timages\n' "$SUB" | git mktree)"
@@ -283,7 +283,7 @@ jobs:
         if: env.DO_PUBLISH == 'true'
         continue-on-error: true
         run: |
-          for f in experiments/stock-radar/output/images/radar-*.png; do
+          for f in experiments/stock-radar/output/images/radar-*.webp; do
             [ -f "$f" ] && curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@radar-images/images/$(basename "$f")" || true
           done
           python experiments/stock-radar/publish_pages.py

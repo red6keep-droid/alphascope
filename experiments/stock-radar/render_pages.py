@@ -251,7 +251,7 @@ def with_ver(url, day):
 
 
 def chart_ref(sym):
-    return f"radar-{U.BY_SYM[sym][2]}-price.png"
+    return f"radar-{U.BY_SYM[sym][2]}-price.webp"
 
 
 def sec_chart(s):
@@ -282,7 +282,7 @@ def draw_charts(snap, stocks, out_dir):
         CP.draw(sb, os.path.join(out_dir, "images", SPX_REF), "S&P 500")
 
 
-SPX_REF = "radar-sp500-price.png"
+SPX_REF = "radar-sp500-price.webp"
 
 
 def sec_periods(s):

@@ -157,18 +157,18 @@ def draw(bars, path, symbol="S&P 500"):
 
     fig.tight_layout()
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    fig.savefig(path, dpi=100)
+    fig.savefig(path, dpi=100, **({"pil_kwargs": {"lossless": True, "method": 6}} if path.endswith(".webp") else {}))   # WebP 무손실 — 같은 그림 PNG 의 약 45% 크기 (2026-11-12 사용자: png 말고 다른 그림 형식, 실측 73 → 33KB)
     plt.close(fig)
     return ch
 
 
 def run(day, as_of=None, output_dir=OUTPUT_DIR):
-    """PNG 를 만들고 chart.json 을 쓴다. 실패하면 None — 리포트는 그래프 없이 나간다."""
+    """그래프(WebP)를 만들고 chart.json 을 쓴다. 실패하면 None — 리포트는 그래프 없이 나간다."""
     bars = load_bars(as_of)
     if len(bars) < 2:
         print("[chart] 일봉 부족 — 그래프 생략")
         return None
-    image_ref = f"images/spx-price-{day}.png"
+    image_ref = f"images/spx-price-{day}.webp"
     path = os.path.join(output_dir, image_ref)
     draw(bars, path)
     url = f"https://cdn.jsdelivr.net/gh/{_repo_slug()}@gh-pages/{image_ref}"
