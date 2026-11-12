@@ -321,9 +321,10 @@ ON_STYLES = [   # 선택한 칸 표시 시안 (2026-11-12 사용자: 선택됐�
     ("4", "색 + 위쪽 막대", "메뉴 줄 맨 위에 짧은 검정 막대"),
     ("5", "색 + 아래 점", "글자 아래 작은 점"),
     ("6", "색 + 둥근 바탕", "아이콘 뒤 옅은 회색 둥근 바탕"),
-    ("7", "색 + 칸 바탕", "선택한 칸 전체에 옅은 회색 바탕"),
+    ("7", "색 + 칸 바탕", "선택한 칸 전체에 옅은 회색 바탕, 아래 모서리 둥글게"),
 ]
-ON_PICK = "1"
+ON_PICK = "7"   # 정함 = 칸 바탕 + 아래 모서리 둥글게 (2026-11-12 사용자)
+ON_RADIUS = 10   # 칸 바탕 아래 모서리 — 카드 모서리(10)와 같게
 ST_PICK, PP_PICK = 2, 3   # 정한 시안 (2026-11-12 사용자: 종목 = 세로 막대 · 인물 = 마이크)
 
 
@@ -335,7 +336,7 @@ def icon_svg(style, key, on, mkt="kr", sv=0, pv=0):
         return _color_icon(key, on, style == "G", mkt)
     if style == "C" or (style == "D" and on):
         return f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">{_FILL[key]}</svg>'
-    w = "2.2" if style == "B" else "1.8"   # B = 2.2 (2026-11-12 사용자, 옛 2.4)
+    w = ("2" if key in ("forecast", "people") else "2.2") if style == "B" else "1.8"   # B = 2.2px, 저울 · 마이크 = 2px (2026-11-12 사용자, 옛 2.4)
     g = STOCK_V[sv][1] if key == "stock" else PEOPLE_V[pv][1] if key == "people" else _ICON[key]
     return (f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="{w}" '
             f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{g}</svg>')
@@ -352,7 +353,8 @@ def bar_css():
             "#jbar[data-on='4'] a.on::before{content:'';position:absolute;top:-1px;left:50%;width:28px;height:2px;margin-left:-14px;border-radius:0 0 2px 2px;background:#111}"
             "#jbar[data-on='5'] a.on span{position:relative} #jbar[data-on='5'] a.on span::after{content:'';position:absolute;left:50%;bottom:-7px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#111}"
             "#jbar[data-on='6'] a .ji{box-sizing:content-box;padding:3px 14px;border-radius:14px} #jbar[data-on='6'] a.on .ji{background:#E8EDF3}"
-            "#jbar[data-on='7'] a.on{background:#F1F5F9}"
+            f"#jbar[data-on='7'] a.on{{background:#F1F5F9;border-radius:0 0 {ON_RADIUS}px {ON_RADIUS}px}}"
+            "#jbar svg *{vector-effect:non-scaling-stroke}"   # 선 굵기 = 화면 px 그대로 (22px 로 줄여 그려도 2.2 · 2 가 그대로 나온다)
             "#jbar[data-style=E] a .ji{box-sizing:content-box;padding:3px 16px;border-radius:15px}"
             "#jbar[data-style=E] a.on .ji{background:#E8EDF3}"
             "#jbar[data-style=F] a{font-size:13px;line-height:18px}"
