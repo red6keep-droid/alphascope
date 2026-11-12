@@ -163,21 +163,21 @@ jobs:
 
       # 그래프 — kr-images 브랜치를 그날 그림만으로 새로 만들어 덮어쓴다 (이력 없음, 2026-10-20 사용자: 이미지는 휘발성)
       - name: Deploy charts (kr-images branch, no history)
-        if: steps.gate.outputs.go == 'true' && hashFiles('experiments/kr-stocks/output/images/radar-*.png') != ''
+        if: steps.gate.outputs.go == 'true' && hashFiles('experiments/kr-stocks/output/images/radar-*.webp') != ''
         run: |
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
-          SUB="$(for f in "$KR_DIR"/output/images/radar-*.png experiments/kr-market-report/output/images/kospi-price-*.png; do
+          SUB="$(for f in "$KR_DIR"/output/images/radar-*.webp experiments/kr-market-report/output/images/kospi-price-*.webp; do
             [ -f "$f" ] || continue
             printf '100644 blob %s\t%s\n' "$(git hash-object -w "$f")" "$(basename "$f")"
           done | git mktree)"
           TREE="$(printf '040000 tree %s\timages\n' "$SUB" | git mktree)"
           COMMIT="$(git commit-tree "$TREE" -m "KR stock charts $(date -u +%F) [skip ci]")"
           git push --force origin "$COMMIT:refs/heads/kr-images"
-          for f in "$KR_DIR"/output/images/radar-*.png; do
+          for f in "$KR_DIR"/output/images/radar-*.webp; do
             curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@kr-images/images/$(basename "$f")" || true
           done
-          curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@kr-images/images/kospi-price-$(date -u +%F).png" || true
+          curl -sS -o /dev/null "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@kr-images/images/kospi-price-$(date -u +%F).webp" || true
           echo "한국 종목 · 코스피 그래프 $(git ls-tree "$SUB" | wc -l)장 → kr-images"
 
       - name: Publish pages (한국 시총 TOP 10 · 종목 35)

@@ -100,7 +100,7 @@ def home_marker():
 # ---------------------------------------------------------------- 그래프
 
 def chart_ref(sym):
-    return f"radar-{U.BY_SYM[sym][2]}-price.png"
+    return f"radar-{U.BY_SYM[sym][2]}-price.webp"
 
 
 def chart_url(sym, day=""):
@@ -134,7 +134,7 @@ def draw_charts(snap, stocks, out_dir):
         CP.draw(kb, os.path.join(out_dir, "images", KOSPI_REF), "KOSPI")
 
 
-KOSPI_REF = "radar-kospi-price.png"
+KOSPI_REF = "radar-kospi-price.webp"
 
 
 # ---------------------------------------------------------------- 상세

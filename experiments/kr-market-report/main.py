@@ -264,7 +264,7 @@ ZOOM_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"
 
 def price_chart(day, bars):
     """코스피 30거래일 봉 + 5 · 20 · 60일선 + 볼린저 PNG — 데일리 sec_chart 와 같은 모양 (누르면 확대, data-zoom). 실패하면 그래프 없이."""
-    ref = f"images/kospi-price-{day}.png"
+    ref = f"images/kospi-price-{day}.webp"
     try:
         CS.draw([b for b in bars if b.get("open")], os.path.join(OUT, ref), symbol="KOSPI")   # 그림 글자는 영문만 (CI 에 한글 폰트 없음)
     except Exception as e:  # noqa: BLE001

@@ -133,15 +133,12 @@ jobs:
         if: steps.check.outputs.already_published != 'true'
         run: |
           mkdir -p deploy/images
-          if compgen -G "experiments/daily-report/output/images/*.webp" > /dev/null; then
-            cp experiments/daily-report/output/images/*.webp deploy/images/
-          else
+          cp experiments/daily-report/output/images/*.webp deploy/images/ 2>/dev/null || true   # 커버 + S&P 500 그래프(둘 다 WebP)
+          if ! compgen -G "experiments/daily-report/output/images/[0-9]*.webp" > /dev/null; then
             echo "::warning::생성된 커버 이미지가 없습니다."
           fi
-          # S&P 500 가격 그래프 (chart_spx.py, 2026-10-18)
-          if compgen -G "experiments/daily-report/output/images/*.png" > /dev/null; then
-            cp experiments/daily-report/output/images/*.png deploy/images/
-          else
+          # S&P 500 가격 그래프 (chart_spx.py, 2026-10-18) — 2026-11-12 부터 WebP, 위 복사에 같이 들어간다
+          if ! compgen -G "experiments/daily-report/output/images/spx-price-*.webp" > /dev/null; then
             echo "::warning::S&P 500 그래프가 없습니다 (글은 커버 이미지로 나갑니다)."
           fi
           ls -la deploy/images/ || true

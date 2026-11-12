@@ -1463,7 +1463,7 @@ def preview_post_body():
     try:
         body = io.open(SAVED_POST_BODY, encoding="utf-8").read().strip()
         # 로컬에서 만든 그래프는 gh-pages 에 없다(404) — 미리보기만 가장 최근 발행된 날짜의 그래프로 바꿔 홈 카드 · 글 보기에 그림이 보이게 (2026-10-21)
-        body = re.sub(r"images/spx-price-\d{4}-\d{2}-\d{2}\.png", "images/spx-price-2026-10-21.png", body)
+        body = re.sub(r"images/spx-price-\d{4}-\d{2}-\d{2}\.(?:png|webp)", "images/spx-price-2026-10-21.png", body)
         return body, f"실제 리포트 본문({SAVED_POST_BODY})"
     except OSError:
         cover = _svg_data_uri("#2563EB", "#7DD3FC")
