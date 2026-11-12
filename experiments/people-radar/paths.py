@@ -8,6 +8,11 @@ CHANNEL_KO = {
     "rates": "금리 경로", "cost": "비용 경로", "supply": "공급 경로", "risk": "위험 회피 경로",
     "regulation": "규제 경로", "fiscal": "재정 경로", "earnings": "실적 경로", "attention": "관심 경로",
 }
+def related_label(assets):
+    """AI 구절이 없을 때 자산 앞 이름표 — 모두 종목이면 `관련 종목`, 지수 · 금리 · 유가 · 환율 · 업종 ETF 가 섞이면 `관련 시장` (2026-11-12 사용자: `관심 경로` 같은 경로 이름은 독자에게 안 보인다)."""
+    return "관련 종목" if assets and all(a not in ASSET_KO for a in assets) else "관련 시장"
+
+
 CHANNEL_WHY = {   # 경로 이름 옆 짧은 뜻 (독자용, 가이드라인 3-4: 어려운 말은 풀어서)
     "rates": "금리 기대가 바뀌면 국채 · 금융 · 성장주가 먼저 움직입니다",
     "cost": "관세는 수입 원가와 상대국 통화로 먼저 연결됩니다",

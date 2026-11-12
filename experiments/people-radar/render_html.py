@@ -188,7 +188,9 @@ def _path_line(s, card):
         return []
     # 종목은 상세 페이지가 있으면 파란색 링크 · 없으면 검정, 굵게 없음 (2026-10-25 사용자). ETF · 지수 · 유가 · 환율은 검정
     names = " · ".join(dk.stock_link(a, _esc(_asset_name(a))) for a in pth["assets"])
-    why = dk.headline((card or {}).get("path") or "") or paths.CHANNEL_KO[pth["channel"]]
+    why = dk.headline((card or {}).get("path") or "")
+    if not why:   # AI 구절이 없으면 `관련 종목 : 로켓랩(RKLB)` — 옛 `로켓랩(RKLB) : 관심 경로` (2026-11-12 사용자: `○○ 경로` 말 쓰지 말 것, 이름표를 앞에)
+        return [_sub(dk.keep_tone(f'{paths.related_label(pth["assets"])} : {names}'), "#111")]
     return [_sub(dk.keep_tone(f'{names} : {_esc(why)}'), "#111")]
 
 

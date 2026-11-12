@@ -135,7 +135,7 @@ def _box(kind, text):
 
 def _dir_val(d):
     """근거 줄 값 = 라벨 `▲ 긍정 4` `▼ 부정 2` (라벨끼리 2px, dk.PILL_PAIR_GAP). 둘 다 없으면 `— 중립`."""
-    parts = [_box(kind, f"{k} {d[key]}") for key, k, kind in (("positive", "상승 쪽", "up"), ("negative", "하락 쪽", "down")) if d.get(key)]   # 옛 `긍정` · `부정` — `AI 거품 · 부정` 이 "거품이 아니다"로 읽혀 (2026-11-11 사용자)
+    parts = [_box(kind, f"{k} {d[key]}건") for key, k, kind in (("positive", "상승", "up"), ("negative", "하락", "down")) if d.get(key)]   # `상승 2건` · `하락 1건` (2026-11-12 사용자: `상승 쪽 2` 는 어색) — 옛 `긍정` · `부정` 은 `AI 거품 · 부정` 이 "거품이 아니다"로 읽혀 (2026-11-11 사용자)
     if not parts:
         parts = [_box("flat", "중립")]
     return f'<span style="display:inline-flex;gap:{dk.PILL_PAIR_GAP}px;vertical-align:middle;">{"".join(parts)}</span>'
@@ -233,7 +233,7 @@ def person_cards(qcard, ps, name, report_only=False, next_event=None):
         first = f"{when} {name}의 발언 {part['n']}건 중 가장 많이 나온 이슈는 {top['name']}입니다(발언 {top['n']}건). {lean}."
         if len(iss) > 1:
             first += f" 다음은 {' · '.join(x['name'] for x in iss[1:PERSON_ROWS])} 순입니다."
-        lines = [(first, "plain")] + [("row", x["name"], _dir_val(x["dirs"]), f"발언 {x['n']}건") for x in iss[:PERSON_ROWS]]
+        lines = [(first, "plain")] + [("row", _name_n(x["name"], x["n"]), _dir_val(x["dirs"]), "") for x in iss[:PERSON_ROWS]]
         if report_only and when != "오늘":
             lines.append((REPORT_NOTE, "note"))
         out.append(qcard(q, top["name"] + (f" 외 {len(ties)}개" if ties else ""), theme, ink, lines))
@@ -249,7 +249,7 @@ def person_cards(qcard, ps, name, report_only=False, next_event=None):
         first = first.replace(f"{name}이(가)", dk.josa(name, "이"))
         if len(st) > 1:
             first += f" 다음은 {' · '.join(y['name'] for y in st[1:PERSON_ROWS])} 순입니다."
-        lines = [(first, "plain")] + [("row", y["name"], _dir_val(y["dirs"]), f"발언 {y['n']}건") for y in st[:PERSON_ROWS]]
+        lines = [(first, "plain")] + [("row", _name_n(y["name"], y["n"]), _dir_val(y["dirs"]), "") for y in st[:PERSON_ROWS]]
         out.append(qcard("최근 7일 많이 언급한 종목은?", x["name"], theme, ink, lines))
     if next_event:   # 옛 읽는 법 카드의 `다음 날짜` (연준 FOMC 등) — 일정이 있을 때만
         day, kind, left = next_event
@@ -258,7 +258,12 @@ def person_cards(qcard, ps, name, report_only=False, next_event=None):
     return f'<div data-person-cards="1" style="margin:0 0 {PEOPLE_CARDS_GAP}px;">{"".join(out)}</div>' if out else ""
 
 
-PERSON_MIN, PERSON_ROWS = 2, 3   # 인물 카드: 2건 이상인 이슈 · 종목만 · 줄은 3개까지
+PERSON_MIN, PERSON_ROWS = 2, 3
+
+
+def _name_n(name, n):
+    """인물 카드 근거 줄 이름 = `브로드컴 – 발언 5건` 한 줄 (2026-11-12 사용자: 건수가 이름 아래로 줄바꿈되지 말고 짧은 막대로 이어서). 건수는 작은 회색."""
+    return (f'<span style="white-space:nowrap;">{dk.esc(name)} <span style="font-size:{dk.TINY};color:{NOTE_GRAY};">– 발언 {n}건</span></span>')   # 인물 카드: 2건 이상인 이슈 · 종목만 · 줄은 3개까지
 
 
 def for_stock(sym):
