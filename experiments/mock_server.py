@@ -314,6 +314,9 @@ PEOPLE_V = [
 ]
 
 
+ST_PICK, PP_PICK = 2, 3   # 정한 시안 (2026-11-12 사용자: 종목 = 세로 막대 · 인물 = 마이크)
+
+
 def icon_svg(style, key, on, mkt="kr", sv=0, pv=0):
     """하단 메뉴 아이콘 한 개 — 스타일 · 지금 칸 여부에 따라."""
     if style == "F":
@@ -350,11 +353,11 @@ def icons_page():
     """아이콘 스타일 비교 화면 — 스타일마다 하단 메뉴 견본(지금 칸 = 종목) + `이 스타일로 여정 보기`."""
     rows = ['<div class="sep">B 굵은 선 · 증시 전망 = 저울 — 종목 아이콘 시안 (지금 칸 = 종목)</div>']
     for i, (nm, _) in enumerate(STOCK_V):
-        rows.append(f'<section><h2>종목 {i + 1}. {html.escape(nm)}</h2>{bar_html("B", "stock", sv=i)}'
+        rows.append(f'<section><h2>종목 {i + 1}. {html.escape(nm)}{" ✓ 정함" if i == ST_PICK else ""}</h2>{bar_html("B", "stock", sv=i)}'
                     f'<a class="go" href="{JOURNEY_START}?icon=B&amp;st={i}">이 종목 아이콘으로 여정 보기 ›</a></section>')
     rows.append('<div class="sep">B 굵은 선 — 인물 아이콘 시안 (지금 칸 = 인물 발언)</div>')
     for i, (nm, _) in enumerate(PEOPLE_V):
-        rows.append(f'<section><h2>인물 {i + 1}. {html.escape(nm)}</h2>{bar_html("B", "people", pv=i)}'
+        rows.append(f'<section><h2>인물 {i + 1}. {html.escape(nm)}{" ✓ 정함" if i == PP_PICK else ""}</h2>{bar_html("B", "people", pv=i)}'
                     f'<a class="go" href="{JOURNEY_START}?icon=B&amp;pp={i}">이 인물 아이콘으로 여정 보기 ›</a></section>')
     rows.append('<details class="old"><summary>지난 비교 — 스타일 8가지 (B 로 정함)</summary>')
     for k, name, why in ICON_STYLES:
@@ -526,6 +529,7 @@ body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !im
 <nav id="jbar" data-style="A" aria-label="주요 페이지">{btns}</nav><div id="jtoast"></div>
 <script>
 (function () {{
+  var ST_PICK = {ST_PICK}, PP_PICK = {PP_PICK};
   var C = {cfg}, J = '{J}', here = C.dir + '/output/' + C.file, P = C.pages;
   var mk = sessionStorage.getItem('jMarket') || 'kr';   // 지금 보는 나라 — 홈 · 증시 리포트 · 종목 칸이 따라간다
   if (/kr-stocks|kr-market-report|mock_home_kr/.test(here)) mk = 'kr';
@@ -536,17 +540,17 @@ body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !im
           : /issue_store/.test(here) ? 'forecast' : /people-radar/.test(here) ? 'people' : '';
   function go(key) {{ return J + (P[key] || key); }}
   var ic = (location.search.match(/[?&]icon=([A-H])/) || [])[1];   // 아이콘 스타일 — 비교 화면에서 고른 것을 이 탭 동안 기억
-  if (ic) {{ try {{ sessionStorage.setItem('jIcon', ic); }} catch (e) {{}} }}
-  try {{ ic = ic || sessionStorage.getItem('jIcon'); }} catch (e) {{}}
-  ic = ic || 'A';
+  if (ic) {{ try {{ sessionStorage.setItem('jIcon2', ic); }} catch (e) {{}} }}
+  try {{ ic = ic || sessionStorage.getItem('jIcon2'); }} catch (e) {{}}
+  ic = ic || 'B';   // 정한 스타일 = B 굵은 선 (2026-11-12 사용자)
   document.getElementById('jbar').setAttribute('data-style', ic);
-  function pick(name, re) {{   // 종목 · 인물 시안 번호 — 주소에 있으면 기억, 없으면 기억한 것
+  function pick(name, re, def) {{   // 종목 · 인물 시안 번호 — 주소에 있으면 기억, 없으면 기억한 것
     var v = (location.search.match(re) || [])[1];
     if (v) {{ try {{ sessionStorage.setItem(name, v); }} catch (e) {{}} }}
     try {{ v = v || sessionStorage.getItem(name); }} catch (e) {{}}
-    return +(v || 0);
+    return +(v || def);
   }}
-  var stv = pick('jSt', /[?&]st=(\\d+)/), ppv = pick('jPp', /[?&]pp=(\\d+)/);
+  var stv = pick('jSt2', /[?&]st=(\\d+)/, ST_PICK), ppv = pick('jPp2', /[?&]pp=(\\d+)/, PP_PICK);   // 정한 시안 = 종목 세로 막대 · 인물 마이크
   document.querySelectorAll('#jbar a').forEach(function (a) {{
     var k = a.dataset.jt, on = k === cur, svg = a.querySelector('.ji') || a.querySelector('svg'), ics = C.icons[ic] || C.icons.A;
     var set = k === 'report' ? ics['report_' + mk] : k === 'stock' && ics.stock_v ? ics.stock_v[stv] || ics.stock : k === 'people' && ics.people_v ? ics.people_v[ppv] || ics.people : ics[k];
