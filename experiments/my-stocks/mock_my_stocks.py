@@ -55,6 +55,19 @@ def pct(v):
     return f"{'+' if v > 0 else '−' if v < 0 else ''}{abs(v):.1f}%"
 
 
+def updown(v, text, px):
+    """증감 = ▲ 빨강 · ▼ 파랑 · 0 회색 + 절댓값 글자 (2026-11-12 사용자: + 대신 증감 삼각형, 삼각형은 숫자보다 작게).
+    삼각형 = 숫자 글자의 80% · 위로 1 (가이드라인 1절 크기표 `dk.emph_tri` 와 같은 규칙). text 는 부호 없는 절댓값 글자."""
+    col = dk.UP if v > 0 else dk.DOWN if v < 0 else dk.MUTED
+    tri = "▲" if v > 0 else "▼" if v < 0 else ""
+    t = f'<span data-tri="1" style="font-size:{round(px * 0.8)}px;vertical-align:1px;margin-right:2px;">{tri}</span>' if tri else ""
+    return f'<span style="color:{col};white-space:nowrap;">{t}{esc(text)}</span>'
+
+
+def won(v):
+    return f"{abs(v):,.0f}원"
+
+
 def code(s):
     return s["s"].split(".")[0]
 
@@ -75,29 +88,40 @@ def total_card(rows, m):
 
 
 def grand_card(held):
-    """맨 위 = 보유 종목 전체 총액 · 총 수익률 (2026-11-12 사용자: 처음엔 총액 · 총액 수익률을 먼저 보고 싶다).
-    미국 종목은 환율로 원화 환산해 더한다. 아래 두 줄 = 미국 · 한국 따로(각자 통화)."""
+    """맨 위 = 보유 종목 전체 (2026-11-12 사용자). 줄마다 왼쪽 이름 · 오른쪽 값:
+      총 평가 금액 | 38,647,671원 (28px — 옛 30 에서 2 작게)
+      수익 금액    | ▲ 5,322,651원 · ▲ 16.0% (증감 색)
+      매수 금액    | 33,325,020원
+      미국 종목 · 3종목 ▲ 4,136,xxx원(원화, 왼쪽 이름 바로 뒤, 증감 색) | ▲ 23.2%
+      한국 종목 · 2종목 ▲ 1,185,000원                                    | ▲ 7.6%
+      현재 환율 1달러 1,356원 (작은 회색 한 줄)
+    미국 종목은 환율로 원화 환산해 더한다."""
     krw = lambda s, v: v * FX if s["m"] == "us" else v
     cost = sum(krw(s, q * a) for s, q, a in held)
     val = sum(krw(s, q * s["p"]["c"]) for s, q, a in held)
     gain = val - cost
     kind = "positive" if gain > 0 else "negative" if gain < 0 else "neutral"   # 카드 색 = 답 방향 (가이드라인 7-1)
+    ROW = "display:flex;justify-content:space-between;align-items:baseline;gap:12px;"
+    LAB = "font-size:17px;line-height:24px;font-weight:700;color:#333;white-space:nowrap;"
+    top = (f'<div style="{ROW}"><span style="{LAB}">총 평가 금액</span>'
+           f'<span style="font-size:28px;line-height:36px;font-weight:800;color:#111;white-space:nowrap;">{esc(won(val))}</span></div>'
+           f'<div style="{ROW}margin:2px 0 0;"><span style="{LAB}">수익 금액</span>'
+           f'<span style="font-size:20px;line-height:28px;font-weight:800;">{updown(gain, won(gain), 20)} · {updown(gain, f"{abs(gain / cost * 100):.1f}%", 20)}</span></div>'
+           f'<div style="{ROW}margin:2px 0 0;"><span style="{LAB}">매수 금액</span>'
+           f'<span style="font-size:17px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">{esc(won(cost))}</span></div>')
     sub = []
     for m, head in (("us", "미국 종목"), ("kr", "한국 종목")):
         rows = [h for h in held if h[0]["m"] == m]
         if not rows:
             continue
-        c = sum(q * a for _, q, a in rows)
-        v = sum(q * s["p"]["c"] for s, q, _ in rows)
-        sub.append(f'<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0 0;margin:8px 0 0;border-top:1px solid #FEE6CA;font-size:16px;line-height:24px;">'
-                   f'<span style="color:#111;font-weight:700;">{head}<span style="font-weight:400;color:{dk.NOTE};font-size:{dk.TINY};"> · {len(rows)}종목 · {esc(money(v, m))}</span></span>'
-                   f'<span style="font-weight:700;white-space:nowrap;">{dk.tint(esc(pct((v - c) / c * 100)))}</span></div>')
-    return dk.dcard(
-        f'<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;"><span style="font-size:17px;line-height:24px;font-weight:700;color:#333;">총 평가 금액</span>'   # 이름 · 금액 한 줄 (U4)
-        f'<span style="font-size:30px;line-height:38px;font-weight:800;color:#111;">{esc(money(val, "kr"))}</span></div>'
-        f'<div style="margin:2px 0 0;font-size:22px;line-height:30px;font-weight:800;">{dk.tint(esc(pct(gain / cost * 100)) + " · " + esc(money(gain, "kr", True)))}</div>'
-        f'<div style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:2px 0 0;">산 금액 {esc(money(cost, "kr"))} · 미국 종목은 원화로 바꿔 더함(1달러 {FX:,.0f}원)</div>'
-        + "".join(sub), kind)
+        c = sum(krw(s, q * a) for s, q, a in rows)
+        v = sum(krw(s, q * s["p"]["c"]) for s, q, _ in rows)
+        sub.append(f'<div style="{ROW}padding:8px 0 0;margin:8px 0 0;border-top:1px solid #FEE6CA;font-size:16px;line-height:24px;font-weight:700;">'
+                   f'<span style="min-width:0;"><span style="color:#111;">{head}</span><span style="font-weight:400;color:{dk.NOTE};font-size:{dk.TINY};"> · {len(rows)}종목 </span>'
+                   f'{updown(v - c, won(v - c), 16)}</span>'   # 금액 = 이름 바로 뒤(왼쪽) · 증감 색 (2026-11-12 사용자)
+                   f'<span>{updown(v - c, f"{abs((v - c) / c * 100):.1f}%", 16)}</span></div>')
+    fx = f'<div style="margin:10px 0 0;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">현재 환율 1달러 {FX:,.0f}원</div>'   # 환율만 간단히 (2026-11-12 사용자)
+    return dk.dcard(top + "".join(sub) + fx, kind)
 
 
 def stock_rows(rows, m):
@@ -106,9 +130,12 @@ def stock_rows(rows, m):
         c = s["p"]["c"]
         gain = (c - a) * q
         name = f'{dk.ticker_logo(s["s"], 22)}{esc(s["n"])}({esc(code(s))})'   # 종목 이름 앞 티커 로고 — 종목 페이지 · 검색과 같은 우리 gh-pages 사본 (U2)
-        sub = f'{q:,}주 · 평균 {money(a, m)} · 오늘 {pct(s["p"]["chg"]) if s["p"]["chg"] else "0.0%"}'
-        val = dk.tint(f'{esc(pct((c - a) / a * 100))}<br><span style="font-size:15px;font-weight:400;">{esc(money(gain, m, True))}</span>')
-        out.append(dk.stock_row_link(dk.crow(name, val, dk.tint(esc(sub)), first=(i == 0), sub_block=True), s["s"]).replace(
+        chg = s["p"]["chg"] or 0
+        sub = f'{esc(f"{q:,}주 · 평균 {money(a, m)}")} · 오늘 {updown(chg, f"{abs(chg):.1f}%", 14)}'
+        gk = gain * FX if m == "us" else gain   # 수익금 = 원화 (미국 종목은 환율로 바꿈, 평균 매수가는 산 통화 그대로) (2026-11-12 사용자)
+        val = (f'{updown(gain, f"{abs((c - a) / a * 100):.1f}%", 17)}<br>'
+               f'<span style="font-size:15px;font-weight:400;">{updown(gain, won(gk), 15)}</span>')   # 수익률 · 수익금 모두 증감 색 + ▲▼ (2026-11-12 사용자)
+        out.append(dk.stock_row_link(dk.crow(name, val, sub, first=(i == 0), sub_block=True), s["s"]).replace(
             'data-href="', f'data-href="{esc(s["u"])}" data-sym="', 1))
     return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(out)}</span></div>'
 
@@ -163,7 +190,7 @@ def add_form(held):
 
 
 def fine_print(member=True):
-    lines = ["계산 기준: 블로그 종목 페이지와 같은 종가입니다. 수수료 · 세금은 반영하지 않습니다. 총액은 미국 종목을 그날 환율로 원화로 바꿔 더하고, 종목별 수익률은 각 통화 그대로 계산합니다.",
+    lines = ["계산 기준: 블로그 종목 페이지와 같은 종가입니다. 수수료 · 세금은 반영하지 않습니다. 미국 종목 금액은 현재 환율로 원화로 바꾸고, 수익률은 달러 그대로 계산합니다.",
              "적어 주신 종목 · 수량 · 평균 매수가는 본인만 볼 수 있습니다. 운영자는 열람하지 않으며, 장애 대응 때만 최소한으로 확인합니다.",
              "이 화면은 공개 페이지의 정보를 보유 종목만 모아 보여 드리는 것입니다. 종목 추천이나 매매 판단을 드리지 않습니다.",
              "60일 동안 열지 않으면 자리를 다음 분께 넘기고 적어 주신 내용을 지웁니다."]
