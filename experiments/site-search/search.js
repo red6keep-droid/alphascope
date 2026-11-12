@@ -172,9 +172,12 @@
     },
     valuation: function (s) {
       var out = '';
-      if (s.eps) {
-        out += row('올해 예상 EPS', money(s, s.eps[0]) + (s.eps[1] ? ' <small>(30일 전 ' + money(s, s.eps[1]) + ')</small>' : ''));
-        out += row('예상 EPS로 본 PER', (s.p.c / s.eps[0]).toFixed(1) + '배 <small>(' + md(s.p.d) + ' 종가 ÷ 예상 EPS)</small>');
+      /* ef = [다음 회계연도 예상 EPS, 30일 전, 결산월 'YYYY-MM'] — 올해 것이 아니다 (2026-11-12 사용자: `올해 예상 EPS` 라벨 오류).
+         종목 페이지 card_eps 와 같은 말: `다음 회계연도(2027년 12월 결산)` */
+      if (s.ef) {
+        var fy = s.ef[2] ? (+s.ef[2].slice(0, 4)) + '년 ' + (+s.ef[2].slice(5, 7)) + '월 결산' : '';
+        out += row('다음 회계연도 예상 EPS', money(s, s.ef[0]) + ' <small>(' + (fy ? fy + ' · ' : '') + (s.ef[1] ? '30일 전 ' + money(s, s.ef[1]) : '애널리스트 평균') + ')</small>');
+        if (s.ef[0] > 0) out += row('다음 회계연도 예상 PER', (s.p.c / s.ef[0]).toFixed(1) + '배 <small>(' + md(s.p.d) + ' 종가 ÷ 다음 회계연도 예상 EPS)</small>');
       }
       if (s.pt) out += row('애널리스트 목표가 평균', money(s, s.pt[0]) + ' <small>(' + money(s, s.pt[1]) + ' ~ ' + money(s, s.pt[2]) + (s.pt[3] ? ', ' + s.pt[3] + '명' : '') + ')</small>');
       return out || '<p class="as-note">EPS · 목표가 자료가 없습니다.</p>';
