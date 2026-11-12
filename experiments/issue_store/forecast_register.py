@@ -39,9 +39,24 @@ SECTOR_IDX = {"반도체": ("^SOX", "반도체 지수"), "빅테크": ("XLK", "�
               "헬스케어": ("XLV", "헬스케어 업종"), "필수 소비재": ("XLP", "필수 소비재 업종"), "결제": ("XLF", "금융 업종"), "에너지": ("XLE", "에너지 업종")}
 TICKER_IDX = {"GOOGL": ("XLC", "통신 서비스 업종"), "META": ("XLC", "통신 서비스 업종")}
 STOCK_N = 20            # 종목 페이지가 먼저 생긴 20개 (universe.CANDIDATES 앞 20)
+# 한국 계열 (2026-11-12 사용자 "적용해" — 검증 validate_kr_register.py · 기획 8-1): 코스피 그대로 · 코스닥과 KODEX 업종은 코스피 대비
+# (코스닥을 그대로 재면 93번 중 30번이 코스피와 같은 묶음). 한국 열린 전망은 미국과 따로 센다. VIX 자리는 비운다(판정은 회복 · 기준만).
+KR_INDEX = [
+    {"sym": "^KS11", "mkt": None, "name": "코스피", "mkt_name": None, "amin": 2.0, "tag": "한국 증시", "kr": True},
+    {"sym": "^KQ11", "mkt": "^KS11", "name": "코스닥", "mkt_name": "코스피", "amin": 2.0, "tag": "한국 증시", "kr": True},
+    {"sym": "091160.KS", "mkt": "^KS11", "name": "한국 반도체 업종", "mkt_name": "코스피", "amin": 3.0, "tag": "반도체", "kr": True},
+    {"sym": "091170.KS", "mkt": "^KS11", "name": "한국 은행 업종", "mkt_name": "코스피", "amin": 2.5, "tag": "금융", "kr": True},
+    {"sym": "091180.KS", "mkt": "^KS11", "name": "한국 자동차 업종", "mkt_name": "코스피", "amin": 2.5, "tag": "자동차", "kr": True},
+    {"sym": "117460.KS", "mkt": "^KS11", "name": "한국 에너지화학 업종", "mkt_name": "코스피", "amin": 2.5, "tag": "에너지", "kr": True},
+]
+KR_MARKETS = ("^KS11", "^KQ11")
+KR_BANKS = ("105560.KS", "055550.KS", "086790.KS")   # 은행 지주 → KODEX 은행 (보험 · 인터넷 은행은 코스피)
+KR_AUTOS = ("005380.KS", "000270.KS")
 STOCK_AMIN = 3.0        # 종목 절대 기준 %p (업종 대비)
 Z_MIN, LOOKBACK = 3.0, 60
 MAX_OPEN, MAX_OPEN_STOCK = 3, 2
+MAX_OPEN_KR, MAX_OPEN_KR_STOCK = 2, 2   # 한국 지수 · 업종 · 종목 — 미국 자리와 따로 (2026-11-12)
+KR_FRESH_DAYS = 4                       # 한국 마지막 봉이 미국 마지막 봉보다 이만큼 넘게 오래되면 (한국 연휴 · 자료 지연) 등록하지 않는다
 SAME_EPISODE_DAYS = 5
 HIST_START = "1998-01-01"
 LINE_YEARS = 10         # 기준(금) = 최근 10년 (1998~2002 거품 구간이 반도체 기준을 7%p 로 부풀렸다)
@@ -65,6 +80,51 @@ def stocks():
     return out
 
 
+def is_kr(sym):
+    return bool(sym) and (sym in KR_MARKETS or sym.endswith((".KS", ".KQ")))
+
+
+def kr_stocks():
+    """한국 종목 계열 — universe_kr.CANDIDATES 전부(종목 페이지가 있는 것). 비교 = 반도체 · 은행 · 자동차는 KODEX 업종, 코스닥 종목은 코스닥, 나머지는 코스피."""
+    sys.path.insert(0, os.path.join(_EXP, "kr-stocks"))
+    try:
+        import universe_kr
+    except Exception:  # noqa: BLE001
+        return []
+    out = []
+    for sym, name, slug, _cat, tags in universe_kr.CANDIDATES:
+        if sym.endswith(".KQ"):
+            mk = ("^KQ11", "코스닥")
+        elif "반도체" in tags:
+            mk = ("091160.KS", "한국 반도체 업종")
+        elif sym in KR_BANKS:
+            mk = ("091170.KS", "한국 은행 업종")
+        elif sym in KR_AUTOS:
+            mk = ("091180.KS", "한국 자동차 업종")
+        else:
+            mk = ("^KS11", "코스피")
+        out.append({"sym": sym, "mkt": mk[0], "name": name, "mkt_name": mk[1], "amin": STOCK_AMIN, "tag": "한국 종목", "stock": True, "page": slug, "kr": True})
+    return out
+
+
+def kst_partial_day(now=None):
+    """한국 장이 아직 안 끝났으면 오늘(KST) 날짜 — 그날 한국 봉은 장중 값이라 감지 · 판정에 쓰지 않는다. 끝났거나 주말이면 None.
+    nvda-report 13:00 KST 실행이 한국 장중이다 (2026-11-12). 마감 15:30 + 지연 여유 → 16:00, 수능일은 장이 한 시간 늦게 끝나 17:00."""
+    now = now or dt.datetime.now(dt.timezone(dt.timedelta(hours=9)))
+    if now.weekday() >= 5:
+        return None
+    day = now.date().isoformat()
+    close_h = 16
+    try:
+        sys.path.insert(0, os.path.join(_EXP, "kr-stocks"))
+        import universe_kr
+        if day in universe_kr.EXAM_DAYS:
+            close_h = 17
+    except Exception:  # noqa: BLE001
+        pass
+    return day if now.hour < close_h else None
+
+
 def josa(word, pair=("이", "가")):
     """받침 있으면 pair[0], 없으면 pair[1] — 한글 끝 글자 · 영문 끝 글자(L · M · N · R 은 받침 소리)."""
     ch = word.strip()[-1]
@@ -77,12 +137,13 @@ def _md(iso):
     return H.md(iso)
 
 
-def _future_tdays(day, n):
-    """day 다음 n 번째 미국 거래일 (연방 공휴일 제외 근사 — 날짜 표시용, 판정은 실제 시세 날짜로 한다)."""
+def _future_tdays(day, n, kr=False):
+    """day 다음 n 번째 거래일 — 미국 = 연방 공휴일 제외 근사, 한국 = 주말만 뺀 근사(공휴일 달력 없음). 날짜 표시 · 만료일용, 판정은 실제 시세 날짜로 한다."""
     import pandas as pd
     from pandas.tseries.holiday import USFederalHolidayCalendar
-    from pandas.tseries.offsets import CustomBusinessDay
-    return (pd.Timestamp(day) + n * CustomBusinessDay(calendar=USFederalHolidayCalendar())).date().isoformat()
+    from pandas.tseries.offsets import BDay, CustomBusinessDay
+    off = BDay() if kr else CustomBusinessDay(calendar=USFederalHolidayCalendar())
+    return (pd.Timestamp(day) + n * off).date().isoformat()
 
 
 def _long_history(syms):
@@ -90,6 +151,11 @@ def _long_history(syms):
     try:
         import yfinance as yf
         df = yf.download(sorted(syms), start=HIST_START, progress=False, auto_adjust=True, threads=False)["Close"]
+        part = kst_partial_day()
+        if part and len(df):   # 한국 장중 봉은 빈칸으로 (미국 봉은 그대로)
+            import pandas as pd
+            kr_cols = [x for x in df.columns if is_kr(x)]
+            df.loc[df.index >= pd.Timestamp(part), kr_cols] = float("nan")
         return df if len(df) else None
     except Exception as e:  # noqa: BLE001
         print(f"[register] 긴 일봉 실패: {type(e).__name__}")
@@ -163,10 +229,27 @@ def radar_paths(state_dir=None):
     return os.path.join(base, "news.json"), os.path.join(base, "est_history.json")
 
 
+def _price_signals(shock_day, c, z_val):
+    """우리 기록상 신호 문장 — 평소의 몇 배 · 20거래일 평균 위 · 아래 · 52주 고점 −10% 이하."""
+    import pandas as pd
+    sig = [f"하루 움직임 평소의 {abs(z_val):.1f}배"]
+    i = c.index.get_loc(pd.Timestamp(shock_day))
+    if i >= 20:
+        ma = float(c.iloc[i - 19:i + 1].mean())
+        sig.append(f"20거래일 평균 {'위' if c.iloc[i] >= ma else '아래'}")
+    hi52 = float(c.iloc[max(0, i - 251):i + 1].max())
+    off = (float(c.iloc[i]) / hi52 - 1) * 100
+    if off <= -10:
+        sig.append(f"52주 고점보다 {off:.0f}%".replace("-", "−"))
+    return sig
+
+
 def reasons(w, shock_day, today, s, c, z_val, paths):
     """→ {"issues": [(이슈 이름, 건수)], "n": 모은 기사 수, "heads": [(헤드라인, 날짜, 매체)], "analyst": {...} 또는 None, "signals": [문장]}.
     기사 창 = 충격 전날 ~ 등록일 (UTC 날짜). 종목은 그 종목 점수(관련도 2 이상 · 충격과 같은 방향), 지수 · 업종은 시장 · 업종 범위 기사."""
     import collections
+    if w.get("kr"):   # 한국 = 아직 한국 기사 분류가 없다 — 미국 기사가 붙지 않게 우리 기록상 신호만 (갈래 근거 · 우리 신호 없음 → 날마다 근거도 건너뜀)
+        return {"issues": [], "n": 0, "heads": [], "analyst": None, "signals": _price_signals(shock_day, c, z_val), "window": [shock_day, today]}
     try:
         sys.path.insert(0, _EXP)
         import issue_codes
@@ -196,16 +279,7 @@ def reasons(w, shock_day, today, s, c, z_val, paths):
     heads = [(x["fact"], str(x["published_at"])[:10], x.get("source") or "")
              for _, x in sorted(picked, key=lambda p: (-p[0], p[1].get("issue") not in top, str(p[1].get("published_at"))))[:2]]
     analyst = _analyst(w["sym"], lo, today, est_path) if w.get("stock") else None
-    sig = [f"하루 움직임 평소의 {abs(z_val):.1f}배"]
-    import pandas as pd
-    i = c.index.get_loc(pd.Timestamp(shock_day))
-    if i >= 20:
-        ma = float(c.iloc[i - 19:i + 1].mean())
-        sig.append(f"20거래일 평균 {'위' if c.iloc[i] >= ma else '아래'}")
-    hi52 = float(c.iloc[max(0, i - 251):i + 1].max())
-    off = (float(c.iloc[i]) / hi52 - 1) * 100
-    if off <= -10:
-        sig.append(f"52주 고점보다 {off:.0f}%".replace("-", "−"))
+    sig = _price_signals(shock_day, c, z_val)
     out = {"issues": issues, "n": len(picked), "heads": heads, "analyst": analyst, "signals": sig, "window": [lo, today]}
     try:
         out.update(side_news(w, lo, hi, news, os.path.join(os.path.dirname(news_path), "news_summaries.json"), analyst))
@@ -493,18 +567,19 @@ def build(eid, w, today, shock_day, base_day, gap, z, line, rec, late, why=None)
         sc[pick - 1]["odds"] = [m_ok if pick == 1 else n - m_ok, n, "같은 종류 사건 뒤 20거래일"]
     else:
         pick, prob, why_pick, strong = 1, None, "같은 종류 기록 없음 — 고르기만 하고 유력 없음", False
-    d5, d20, d60 = _future_tdays(today, WIN_D5), _future_tdays(today, WIN_D20), _future_tdays(today, WIN_END)   # d60 = 만료일 (이름은 옛것, 값은 WIN_END)
+    kr = bool(w.get("kr"))
+    d5, d20, d60 = _future_tdays(today, WIN_D5, kr), _future_tdays(today, WIN_D20, kr), _future_tdays(today, WIN_END, kr)   # d60 = 만료일 (이름은 옛것, 값은 WIN_END)
     vs = f"{mkt_name}보다 얼마나 더 움직였나(%p)" if mkt else "얼마나 움직였나(%)"
     slug = "forecast-" + eid[3:].lower()   # EH-2026-003 → forecast-2026-003 (영문 주소, 한 번 정하면 바꾸지 않는다)
     fc = {
-        "no": 1, "slug": slug, "kind": "after", "auto": True, "publish": True, "target": "stock" if stock else "index",
+        "no": 1, "slug": slug, "kind": "after", "auto": True, "publish": True, "target": "stock" if stock else "index", "market": "kr" if kr else "us",
         "title": f"{subject} {shock}, " + ("조정 올까 더 오를까?" if s > 0 else "반등할까 더 빠질까?"),
         "event": f"{_md(shock_day)} {subject} {shock}", "registered": today, "registered_display": _md(today), "posted": _md(today),
         "what": f"{_md(shock_day)} {subject}의 큰 {dw} 뒤 {rw}하는지, 더 이어지는지를 다음 거래일({_md(today)}) 장 마감 뒤에 두 갈래로 적어 두었습니다."
                 + (" 종목은 어느 쪽이 맞을지 고르지 않고, 어느 쪽이 일어나는지만 적습니다." if stock else ""),
         "ruler": f"{subject} vs {mkt_name} 상대수익" if mkt else f"{subject} 수익률",
         "ruler_plain": f"{_md(base_day)} 종가부터 {subj_ga} {vs}. {shock} 폭의 절반을 되찾으면 {rw}, 기준만큼 더 가면 지속으로 가른다",
-        "ruler_short": f"{subject} vs {'업종' if stock else '시장'}" if mkt else subject,
+        "ruler_short": f"{subject} vs {'업종' if stock and mkt not in KR_MARKETS else '시장'}" if mkt else subject,
         "ruler_from": f"{_md(base_day)} 종가 대비", "recov_note": f"{_md(shock_day)} 하루 {shock} 폭 대비",
         "start_text": f"{_md(shock_day)} {shock} 뒤 두 갈래를 적었습니다. 다음 거래일부터 봅니다.",
         "hypothesis": "H-급락 뒤 (A 반등 vs B 추세 지속) — 설계 3부 2절 활성 가설 2" if s < 0 else "H-급등 뒤 (A 조정 vs B 추세 지속)",
@@ -539,14 +614,19 @@ def register(px, today, pubs, states, reg_dir, read_dirs=(), alert=None, state_d
 
     def is_open(fc):
         return not (states.get(fc["slug"]) or {}).get("result")
-    open_idx = sum(1 for _, fc in pubs if is_open(fc) and fc.get("target") != "stock")
-    open_stock = sum(1 for _, fc in pubs if is_open(fc) and fc.get("target") == "stock")
+    def slot(fc):   # 자리 = (한국?, 종목?) — 한국은 미국과 따로 센다
+        return (is_kr(sub_of(fc)), fc.get("target") == "stock")
+    opened = {}
+    for _, fc in pubs:
+        if is_open(fc):
+            opened[slot(fc)] = opened.get(slot(fc), 0) + 1
+    cap = {(False, False): MAX_OPEN, (False, True): MAX_OPEN_STOCK, (True, False): MAX_OPEN_KR, (True, True): MAX_OPEN_KR_STOCK}
     open_series = {sub_of(fc) for _, fc in pubs if is_open(fc)}
     shocks_seen = {}
     for _, fc in pubs:
         if fc.get("shock_day"):   # 손으로 만든 옛 전망(EH-2026-001 전망 2)은 칸이 없다 — 판정이 끝나 막지 않는다
             shocks_seen.setdefault(sub_of(fc), []).append(fc["shock_day"])
-    watch = INDEX + stocks()
+    watch = INDEX + stocks() + KR_INDEX + kr_stocks()
     df = _long_history({w["sym"] for w in watch} | {w["mkt"] for w in watch if w["mkt"]})
     if df is None:
         return []
@@ -559,27 +639,31 @@ def register(px, today, pubs, states, reg_dir, read_dirs=(), alert=None, state_d
             print(f"[register] {w['name']} 계산 실패: {type(e).__name__}")
             continue
         days = [d.date().isoformat() for d in c.index]
-        if len(days) < 4 or days[-1] != today:   # 긴 일봉에 오늘 봉이 아직 없으면 다음 실행에서
+        if w.get("kr"):   # 한국 = 한국 마지막 봉이 등록일 (미국 실행 07:30 KST = 한국 장 마감 뒤 · 다음 장 전). 장중 봉은 _long_history 가 뺐다
+            if len(days) < 4 or (dt.date.fromisoformat(today) - dt.date.fromisoformat(days[-1])).days > KR_FRESH_DAYS:
+                continue
+        elif len(days) < 4 or days[-1] != today:   # 긴 일봉에 오늘 봉이 아직 없으면 다음 실행에서
             continue
         hit_days = {h.date().isoformat() for h in hits}
         shock = next(((d, k) for k, d in ((1, days[-2]), (2, days[-3])) if d in hit_days), None)
         if shock:
-            found.append((abs(float(z[pd.Timestamp(shock[0])])), w, c, m, z, hits, line, shock[0], shock[1], days[days.index(shock[0]) - 1]))
-    for _az, w, c, m, z, hits, line, shock_day, lag, base_day in sorted(found, key=lambda x: -x[0]):   # 2) 등록
+            found.append((abs(float(z[pd.Timestamp(shock[0])])), w, c, m, z, hits, line, shock[0], shock[1], days[days.index(shock[0]) - 1], days[-1]))
+    for _az, w, c, m, z, hits, line, shock_day, lag, base_day, reg_day in sorted(found, key=lambda x: -x[0]):   # 2) 등록
         sym, mkt, stock = w["sym"], w["mkt"], bool(w.get("stock"))
+        sl = (bool(w.get("kr")), stock)
         why_skip = None
         if sym in open_series:
             why_skip = "같은 계열 전망이 아직 지켜보는 중"
         elif any(abs((dt.date.fromisoformat(shock_day) - dt.date.fromisoformat(x)).days) <= SAME_EPISODE_DAYS for x in shocks_seen.get(sym, [])):
             why_skip = "같은 묶음(5일 안)으로 이미 등록"
-        elif (open_stock >= MAX_OPEN_STOCK) if stock else (open_idx >= MAX_OPEN):
-            why_skip = f"지켜보는 {'종목 ' if stock else ''}전망 {MAX_OPEN_STOCK if stock else MAX_OPEN}개 — 자리 없음"
+        elif opened.get(sl, 0) >= cap[sl]:
+            why_skip = f"지켜보는 {'한국 ' if sl[0] else ''}{'종목 ' if stock else ''}전망 {cap[sl]}개 — 자리 없음"
         sub = px.get(sym) or {}
         mk = (px.get(mkt) or {}) if mkt else None
         if base_day not in sub or shock_day not in sub or (mkt and (base_day not in mk or shock_day not in mk)):
             why_skip = why_skip or "판정용 시세에 충격 날이 없음"
         if why_skip:
-            log.append({"day": today, "event": "skipped", "series": sym, "shock_day": shock_day, "why": why_skip})
+            log.append({"day": reg_day, "event": "skipped", "series": sym, "shock_day": shock_day, "why": why_skip})
             print(f"[register] {w['name']} {shock_day} 건너뜀 — {why_skip}")
             continue
         gap = (sub[shock_day] / sub[base_day] - 1) * 100 - ((mk[shock_day] / mk[base_day] - 1) * 100 if mkt else 0)   # 판정과 같은 시세 · β 1
@@ -587,12 +671,12 @@ def register(px, today, pubs, states, reg_dir, read_dirs=(), alert=None, state_d
         zv = float(z[pd.Timestamp(shock_day)])
         rec = _record(c, m, hits, pd.Timestamp(shock_day), s)
         try:
-            why = reasons(w, shock_day, today, s, c, zv, paths)
+            why = reasons(w, shock_day, reg_day, s, c, zv, paths)
         except Exception as e:  # noqa: BLE001
             print(f"[register] 이유 모으기 실패: {type(e).__name__}")
             why = None
-        eid = _next_id(today[:4], [reg_dir, *read_dirs])
-        reg, fc = build(eid, w, today, shock_day, base_day, gap, zv, line, rec, late=lag > 1, why=why)
+        eid = _next_id(reg_day[:4], [reg_dir, *read_dirs])
+        reg, fc = build(eid, w, reg_day, shock_day, base_day, gap, zv, line, rec, late=lag > 1, why=why)
         try:
             os.makedirs(reg_dir, exist_ok=True)
             with open(os.path.join(reg_dir, f"{eid}.json"), "w", encoding="utf-8") as f:
@@ -601,7 +685,7 @@ def register(px, today, pubs, states, reg_dir, read_dirs=(), alert=None, state_d
             if alert:
                 alert.save_failed("자동 등록 파일", e)
             continue
-        log.append({"day": today, "event": "registered", "id": eid, "slug": fc["slug"], "series": sym, "target": fc["target"], "shock_day": shock_day,
+        log.append({"day": reg_day, "event": "registered", "id": eid, "slug": fc["slug"], "series": sym, "target": fc["target"], "shock_day": shock_day,
                     "gap": fc["gap"], "z": fc["z"], "line": line, "pick": fc["pick"], "record": list(rec), "late": lag > 1, "rules": H.RULES})
         print(f"[register] {eid} 등록 — {fc['title']} (충격 {shock_day} {fc['gap']:+.1f}{fc['unit']} · 평소의 {abs(fc['z']):.1f}배 · 기준 {line} · 기록 {rec[1]}번 중 {rec[0]}번)")
         if alert:
@@ -609,10 +693,7 @@ def register(px, today, pubs, states, reg_dir, read_dirs=(), alert=None, state_d
                 alert.registration_missed(fc["event"], late=True)
             alert.status_changed(fc["title"], "자동 등록")
         out.append((reg, fc))
-        if stock:
-            open_stock += 1
-        else:
-            open_idx += 1
+        opened[sl] = opened.get(sl, 0) + 1
         open_series.add(sym)
     if log:
         try:

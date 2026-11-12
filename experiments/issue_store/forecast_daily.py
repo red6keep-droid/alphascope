@@ -57,6 +57,11 @@ def fetch(start, extra=()):
                 out[k] = {d: float(c) for d, c in price_source.daily_closes(sym, start)}
             except Exception as e:  # noqa: BLE001
                 print(f"[forecast] 예비 사슬 실패 {sym}: {type(e).__name__}")
+    part = R.kst_partial_day()
+    if part:   # 한국 장중(13:00 KST 실행) 봉은 빼다 — 장중 값으로 판정 · 등록하지 않는다 (2026-11-12)
+        for k, sym in syms.items():
+            if R.is_kr(sym):
+                out[k] = {d: v for d, v in out[k].items() if d < part}
     for k, sym in syms.items():
         out[sym] = out[k]
     return out
@@ -166,7 +171,7 @@ def run(state_dir=None):
     pub = [(r, fc) for r in regs for fc in H.forecasts(r, public=True)]
     first = min([base_of(fc) for _, fc in pub] + [(dt.date.today() - dt.timedelta(days=30)).isoformat()])   # 자동 등록이 볼 최근 며칠도 받는다
     start = (dt.date.fromisoformat(first) - dt.timedelta(days=10)).isoformat()
-    extra = {x for w in R.INDEX + R.stocks() for x in (w["sym"], w["mkt"]) if x} | {(fc.get("series") or {}).get("sub") for _, fc in pub} | {(fc.get("series") or {}).get("mkt") for _, fc in pub}
+    extra = {x for w in R.INDEX + R.stocks() + R.KR_INDEX + R.kr_stocks() for x in (w["sym"], w["mkt"]) if x} | {(fc.get("series") or {}).get("sub") for _, fc in pub} | {(fc.get("series") or {}).get("mkt") for _, fc in pub}
     px = fetch(start, extra)
     if not px["sox"] or not px["spx"]:
         FA.no_prices()
