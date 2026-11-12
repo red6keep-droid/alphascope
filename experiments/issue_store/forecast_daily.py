@@ -154,7 +154,7 @@ def why_path(slug, state_dir=None):
 def attach_why(fc, st, state_dir=None):
     """타임라인 날(st["log"])마다 근거 — 저장된 날은 그대로, 없는 날 · 최근 REDO_DAYS 날은 새로 모아 덮는다. 판정이 난 뒤엔 쌓지 않는다(로그가 멈춘다).
     갈래별 근거가 없는 옛 등록(reasons 에 good 없음)은 건너뛴다. log 줄에 e["why"] 를 붙여 렌더가 읽는다."""
-    if "good" not in (fc.get("reasons") or {}):
+    if not (fc.get("series") or {}).get("sub"):   # 계열 기호만 있으면 모은다 — 옛 `reasons.good` 조건은 11-11 저녁 전 자동 등록(EH-003 · 004)을 전부 건너뛰어 블로그 어느 전망에도 근거가 없었다 (2026-11-12)
         return
     path = why_path(fc["slug"], state_dir)
     saved = {}
@@ -222,6 +222,10 @@ def run(state_dir=None):
                     attach_why(fc, st, state_dir)
                 except Exception as e:  # noqa: BLE001
                     print(f"[forecast] 날마다 근거 실패 {fc['slug']}: {type(e).__name__}")
+            try:   # 고리 상태 · 어디서 끊겼나 (근거 뒤 — `왜` 가 근거를 읽는다)
+                H.chain_track(fc, st)
+            except Exception as e:  # noqa: BLE001
+                print(f"[forecast] 고리 매기기 실패 {fc['slug']}: {type(e).__name__}")
             states[fc["slug"]] = st
             FA.missing_days(st.get("missing", []))
             e = st["log"][-1]

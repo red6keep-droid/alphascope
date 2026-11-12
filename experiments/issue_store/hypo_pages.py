@@ -2118,6 +2118,90 @@ def _row(fc, st):
     return dk.dcard(inner, theme=e["theme"])
 
 
+def chain_track(fc, st):
+    """실제 전망의 고리 상태 · `어디서 끊겼나` 를 판정 기록에서 코드가 매긴다 (2026-11-12 사용자 "작업 진행해" — 전엔 목업만 매기고 실제 전망은 고리가 늘 `대기`).
+    렌더 전용 — 등록 파일은 고치지 않는다(fc 는 실행마다 새로 읽힘).
+    틀 R(급락 · 급등 뒤): 갈래 1 고리 = 충격 폭 4분의 1 · 절반 회복(반납), 갈래 2 고리 = 금 3분의 1 · 금만큼 더 — 넘은 날 `확인` + 날짜.
+      판정이 나면 못 넘은 고리는 `해당 없음`, 우리가 고른 갈래가 틀렸으면 그 갈래의 첫 못 넘은 고리 = `끊김` + fc["broke"].
+    틀 S(사건 전): 틀렸을 때만 — 일어난 조건 갈래의 마지막 고리(결과 뒤 움직임) = `끊김` + fc["broke"].
+    `왜` = 그 기간 근거(e["why"], 날마다 쌓은 기사 요약 줄) 중 고른 갈래 반대쪽 맨 위 한 줄, 없으면 줄째 생략. AI 0 · 새 수집 0."""
+    log, res = st.get("log") or [], st.get("result") or {}
+    k = log[-1].get("key") if log else None
+    sc, L, unit = fc["scenarios"], fc.get("line", 3.0), fc.get("unit", "%p")
+    if fc["kind"] == "pre":
+        c = st.get("cond")
+        if k != "miss" or not c:
+            return
+        a = sc[c - 1]
+        if not a.get("chain"):
+            return
+        last = a["chain"][-1]
+        last.update(state="broken", date=md(log[-1]["day"]))
+        fc["broke"] = {"lead": f'‘{last["step"]}’ 고리에서 끊겼습니다.',
+                       "items": [("실제로는", log[-1]["text"].split(". ")[0] + ".", "")]}
+        return
+    gap = fc.get("gap")
+    if not gap or not st.get("days"):
+        return
+    s_ = 1 if gap > 0 else -1
+
+    def mark(step):   # 고리 글에서 기준을 읽는다 — 손으로 만든 전망은 고리 수 · 순서가 다르다(EH-2026-001 전망 2 = `시장 전체가 같이 빠졌나` 가 앞에)
+        if "4분의 1" in step:
+            return 0, R_EARLY
+        if "절반" in step:
+            return 0, R_HIT
+        m = _re.search(r"(\d+(?:\.\d+)?)\s*%p?\s*더", step)
+        return (1, float(m.group(1))) if m else None
+    end_day = res.get("day")
+    first = {}
+    best = [None, None]   # 최대 회복 비율 · 최대 더 간 폭
+    for d, v in zip(st["days"], st.get("rel_series") or []):
+        if v is None or d <= fc["registered"] or (end_day and d > end_day):
+            continue
+        rc, ex = 1 - v / gap, s_ * (v - gap)
+        best = [rc if best[0] is None else max(best[0], rc), ex if best[1] is None else max(best[1], ex)]
+        for i, a in enumerate(sc[:2]):
+            for j, link in enumerate(a.get("chain") or []):
+                mk = mark(link.get("step", ""))
+                if mk and (rc, ex)[mk[0]] >= mk[1] and (i, j) not in first:
+                    first[(i, j)] = d
+    broken = None
+    for i, a in enumerate(sc[:2]):
+        for j, link in enumerate(a.get("chain") or []):
+            if not mark(link.get("step", "")):
+                continue   # 기준을 읽을 수 없는 고리(사실 확인 줄)는 등록 때 상태 그대로
+            if (i, j) in first:
+                link.update(state="done", date=md(first[(i, j)]))
+            elif res:
+                if fc.get("pick") == i + 1 and k == "miss" and broken is None:
+                    link.update(state="broken", date=md(end_day))
+                    broken = (i, link)
+                else:
+                    link.update(state="no")
+    if not broken:
+        return
+    i, link = broken
+    rw, rv = REV[s_]
+    shock = SHOCK[s_]
+    more = "빠졌" if s_ < 0 else "올랐"
+    if i == 0:   # 되찾기를 골랐는데 더 갔다
+        got = best[0] or 0
+        did = f"{shock} 폭을 {recov_word(got)} {rv}하는 데 그치고" if got > 0 else f"{shock} 뒤 {rv}하지 못하고"
+        real = f"{did}, {md(end_day)}에 기준({L:g}{unit})보다 더 {more}습니다."
+    else:   # 지속을 골랐는데 되찾았다
+        went = best[1] or 0
+        did = f"{shock} 뒤 {went:.1f}{unit}까지 더 가고 멈춘 뒤" if went >= 0.1 else f"{shock} 뒤 더 {'빠지지' if s_ < 0 else '오르지'} 않고"
+        real = f"{did}, {md(end_day)}에 {shock} 폭의 절반을 {rv}했습니다."
+    items = [("실제로는", real, "")]
+    other = {1: "good", -1: "bad"}[-sc[i]["dir"]]   # 고른 갈래 반대쪽 기사
+    for e in reversed(log):
+        rows = (e.get("why") or {}).get(other) or []
+        if rows:
+            items.append(("왜", drop_subj(rows[0].get("t", ""), fc.get("subject", "")), ""))
+            break
+    fc["broke"] = {"lead": f'‘{link["step"]}’ 고리에서 끊겼습니다.', "items": items}
+
+
 def _ig(word):
     ch = (word or "가")[-1]
     return "이" if 0xAC00 <= ord(ch) <= 0xD7A3 and (ord(ch) - 0xAC00) % 28 else "가"
