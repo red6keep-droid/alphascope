@@ -149,7 +149,7 @@ def history():
     import sys
     sys.path.insert(0, os.path.join(BASE, "..", "nvda-report"))
     import history_stats as HS
-    syms = [c[0] for c in U.CANDIDATES] + [U.BENCH]
+    syms = [c[0] for c in U.CANDIDATES] + [e for e in etf_universe.US_SYMS if e != U.BENCH] + [U.BENCH]   # ETF 페이지도 같은 카드 (2026-11-12) — 주 1회
     df = yf.download(syms, start="1999-01-01", interval="1d", auto_adjust=False, group_by="ticker", progress=False, threads=True)
     out = {"built": datetime.date.today().isoformat(), "stats": {}}
     spy = df[U.BENCH]["Close"].dropna()

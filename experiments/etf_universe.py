@@ -52,3 +52,32 @@ KR = [
 
 US_SYMS = [t[0] for t in US]
 KR_SYMS = [t[0] for t in KR]
+
+# ── 고정 페이지 (2026-11-12 사용자 A안: ETF 마다 고정 페이지) ──
+BLOG = "https://alpha-scope.blogspot.com"
+BY_SYM = {t[0]: t for t in US + KR}
+
+
+def key(sym):
+    """페이지 키 · 본문 파일 이름 — 미국 = 티커, 한국 = 6자리 코드."""
+    return sym.split(".")[0]
+
+
+def slug(sym):
+    """영문 주소 — 미국 `soxx-etf`, 한국 `069500-etf` (처음 만들 때 이 영문 제목으로 주소가 정해진다)."""
+    return f"{key(sym).lower()}-etf"
+
+
+def page_url(sym):
+    return f"{BLOG}/p/{slug(sym)}.html"
+
+
+def page_title(sym):
+    """종목 페이지와 같은 검색어 틀 — 미국 `아이셰어즈 반도체 SOXX 주가`, 한국 `KODEX 200 주가`(한국 종목처럼 코드 없이). ETF 는 실적 일정이 없어 `· 실적 일정` 없음."""
+    nm = BY_SYM[sym][1]
+    return f"{nm} 주가" if sym.endswith(".KS") or sym in nm.split() else f"{nm} {sym} 주가"   # `인베스코 QQQ` 처럼 이름에 티커가 있으면 한 번만
+
+
+def same_tracks(sym):
+    """같은 것을 따라가는 다른 ETF (함께 보는 페이지)."""
+    return [t[0] for t in US + KR if t[2] == BY_SYM[sym][2] and t[0] != sym]

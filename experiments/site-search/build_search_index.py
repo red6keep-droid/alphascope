@@ -191,7 +191,7 @@ def etfs(market):
         bars = snap["bars"].get(sym)
         if not bars or len(bars) < 30:
             continue
-        out.append({"s": sym, "n": name, "m": market, "k": "etf", "tr": tracks, "a": aliases(sym, name, extra),
+        out.append({"s": sym, "n": name, "m": market, "k": "etf", "tr": tracks, "u": E.page_url(sym), "a": aliases(sym, name, extra),
                     "p": price_block(bars), "t": {"ma": tech_block(bars, market)["ma"]}})
     return out
 
