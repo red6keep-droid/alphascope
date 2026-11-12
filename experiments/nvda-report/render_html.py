@@ -673,7 +673,9 @@ def line_chart(labels, series, fmt, unit=""):
     axis_w = int(max(est(f"{t:,.0f}" if float(t).is_integer() else fmt(t)) for t in ticks) + 8)
     top, bot = 30, 52 if any("\n" in lb for lb in labels) is False else 66
     fit = n * step <= LINE_FIT_W   # 들어가면 가로는 % — 카드 폭에 고르게, 넘겨 보기 · 그림자 없음
-    w = int(max(n * step, 260))
+    # 마지막 날 값 = 점 오른쪽(점 ~ 숫자 8, 점과 같은 높이) — 선 그래프 규칙 (2026-11-12 사용자: "마지막 날 증감 표시는 우측, 동그라미는 좌측", 가이드라인 9절)
+    end_w = int(max([est(fmt(xs[-1]), 13) for _, xs, _, _ in series if xs and xs[-1] is not None] + [0]) + LAST_R + 8 + 6)   # 끝 숫자가 그림 밖으로 나가는 폭
+    w = int(max(n * step, 260)) + end_w
     y = lambda v: top + (hi - v) / (hi - lo) * (LINE_H - top - bot)   # noqa: E731
     x = (lambda i: f"{(i + 0.5) / n * 100:.2f}%") if fit else (lambda i: f"{step / 2 + i * step:.1f}")   # noqa: E731
     W = "100%" if fit else str(w)
@@ -692,6 +694,16 @@ def line_chart(labels, series, fmt, unit=""):
         for j, (i, px, py) in enumerate(pts):
             last = j == len(pts) - 1
             big = k == 0 and last
+            if i == n - 1:   # 마지막 날 = 점 오른쪽 숫자 (dx 로 % 좌표에도 붙는다). 두 선 끝이 가까우면 위 · 아래로 벌린다
+                dots += f'<circle cx="{px}" cy="{py:.1f}" r="{LAST_R if big else DOT_R}" fill="#fff" stroke="{col}" stroke-width="{LAST_SW if big else DOT_SW}"/>'
+                other = comp[i] if k == 0 else main[i]
+                oy = y(other) if other is not None else None
+                ly = py + 4.5
+                if oy is not None and abs(py - oy) < 15:
+                    ly = (min(py, oy) - 3) if (other is not None and xs[i] >= other) else (max(py, oy) + 12)
+                labs += (f'<text x="{px}" dx="{LAST_R + 8}" y="{ly:.1f}" text-anchor="start" font-size="{13 if big else 12}" font-weight="{700 if big else 400}" '
+                         f'fill="{col}">{_esc(fmt(xs[i]))}</text>')
+                continue
             dots += f'<circle cx="{px}" cy="{py:.1f}" r="{LAST_R if big else DOT_R}" fill="#fff" stroke="{col}" stroke-width="{LAST_SW if big else DOT_SW}"/>'
             other = comp[i] if k == 0 else main[i]
             up = (xs[i] >= other) if other is not None else (k == 0)
@@ -714,7 +726,7 @@ def line_chart(labels, series, fmt, unit=""):
     shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
              'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>')   # 왼쪽 그림자 — 테마 JS 가 맨 왼쪽에서 끈다
     if fit:
-        scroll, shade = f'<span style="display:block;margin-right:{axis_w}px;">{svg}</span>', ""
+        scroll, shade = f'<span style="display:block;margin-right:{axis_w + end_w}px;">{svg}</span>', ""   # 끝 숫자 자리만큼 그림을 좁힌다
     else:
         scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{axis_w}px;">'
                   f'<span style="display:inline-block;vertical-align:top;direction:ltr;">{svg}</span></span>')   # vertical-align — 줄 아래 빈틈(약 7px) 없이

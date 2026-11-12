@@ -65,12 +65,12 @@ const JOBS = {
   "18:30": [{ workflow: "test-daily-report.yml", when: WEEKDAY }],
   // 홈 시세(update.yml) — 블로그는 종가 기준(doc/기획/블로그-목적과-방향.md 5절, 2026-10-22). 장 마감 20분 뒤 확정 1회 +
   // 장중 1시간 간격 (뉴욕 월~금). 15분 수집(하루 96회, 야후 ~3,400호출)은 가격 알림 성격이라 뺐다. scheduled 입력이 없어 inputs 없이 건다.
-  "10:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
-  "11:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
-  "12:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
-  "13:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
-  "14:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
-  "15:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
+  "10:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY, watch: false }],
+  "11:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY, watch: false }],
+  "12:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY, watch: false }],
+  "13:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY, watch: false }],
+  "14:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY, watch: false }],
+  "15:00": [{ workflow: "update.yml", inputs: null, when: WEEKDAY, watch: false }],
   "16:20": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
 };
 
@@ -80,44 +80,125 @@ const REPEAT = [
   // 뉴스 2시간마다는 2026-10-25 KST_JOBS 하루 두 번으로 옮겼다 (피드가 며칠에 몇 개라 33번 연속 새 기사 0)
 ];
 
-async function dispatch(workflow, token, inputs = { scheduled: "true" }) {
-  const res = await fetch(
-    `https://api.github.com/repos/${REPO}/actions/workflows/${workflow}/dispatches`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "alphascope-cron-trigger",
-      },
-      body: JSON.stringify(inputs ? { ref: REF, inputs } : { ref: REF }),
+// 알림 (2026-11-12 사용자: "실패됐을 때 나한테 알림이 와야") — 11-12 GitHub 토큰 만료로 13:00 · 16:10 · 21:45 실행이
+// 소리 없이 빠졌다(Worker 는 오류를 대시보드에만 남겼다). 두 겹:
+//   ① 걸기 실패 → 그 자리에서 Slack
+//   ② 감시: 건 지 60분 뒤 그 워크플로 실행이 있었나 · 성공했나 → 없거나 실패면 Slack (GitHub cron 예비가 대신 돌았으면 통과)
+// 문구는 Slack 알림 규칙(한국어 이름 · 한국어 원인 한 마디 · 영어 원문 X · 실행 링크). 이름은 experiments/alert_ko.py NAMES 와 같게.
+const NAMES = {
+  "test-daily-report.yml": "미국 데일리 리포트",
+  "nvda-report.yml": "엔비디아 · 시총 TOP 10 페이지",
+  "kr-stocks.yml": "한국 종목 · 한국 증시 리포트",
+  "people-radar.yml": "주요 인물 발언",
+  "media-daily.yml": "방송 이슈 (미디어 데일리)",
+  "news.yml": "뉴스 갱신 (하루 2회)",
+  "update.yml": "홈 시세 갱신",
+};
+const WATCH_AFTER_MIN = 60;
+const name = (wf) => NAMES[wf] || wf;
+
+function reason(status) {
+  if (status === 401) return "GitHub 토큰 만료 또는 잘못됨 — Worker 의 GITHUB_TOKEN 을 새로 넣어야 합니다";
+  if (status === 403) return "GitHub 권한 또는 요청 한도 문제";
+  if (status === 404) return "main 에서 워크플로를 찾지 못함";
+  if (status === 422) return "실행 입력값이 워크플로와 맞지 않음";
+  return `GitHub 응답 ${status}`;
+}
+
+function gh(path, token, init = {}) {
+  return fetch(`https://api.github.com/repos/${REPO}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "alphascope-cron-trigger",
+      ...(init.headers || {}),
     },
-  );
+  });
+}
+
+async function slack(env, text) {
+  if (!env.SLACK_WEBHOOK_URL) { console.log(`[알림 꺼짐] ${text}`); return; }
+  try {
+    await fetch(env.SLACK_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, unfurl_links: false }) });
+  } catch (e) {
+    console.log(`Slack 보내기 실패: ${e}`);
+  }
+}
+
+async function dispatch(workflow, token, inputs = { scheduled: "true" }) {
+  const res = await gh(`/actions/workflows/${workflow}/dispatches`, token, {
+    method: "POST",
+    body: JSON.stringify(inputs ? { ref: REF, inputs } : { ref: REF }),
+  });
   if (res.status !== 204) {
-    throw new Error(`${workflow}: HTTP ${res.status} ${await res.text()}`);
+    const err = new Error(`${workflow}: HTTP ${res.status} ${await res.text()}`);
+    err.workflow = workflow;
+    err.status = res.status;
+    throw err;
   }
   console.log(`dispatched ${workflow}`);
+}
+
+function dueAt(at) {
+  const ny = nyTime(at);
+  const kst = kstTime(at);
+  const utc = { h: at.getUTCHours(), m: at.getUTCMinutes() };
+  return [
+    ...(JOBS[ny.hm] || []).filter((j) => !j.when || j.when(ny)),
+    ...(KST_JOBS[kst.hm] || []).filter((j) => !j.when || j.when(kst)),
+    ...REPEAT.filter((j) => j.when(utc)),
+  ];
+}
+
+// 감시 — at 에 걸었어야 할 실행이 그 뒤로 있었나. 돌고 있으면 통과(긴 실행), 하나라도 성공이면 통과.
+async function watch(at, env) {
+  const jobs = dueAt(at).filter((j) => j.watch !== false);
+  const since = new Date(at.getTime() - 5 * 60 * 1000).toISOString().slice(0, 19) + "Z";
+  const lines = [];
+  for (const wf of [...new Set(jobs.map((j) => j.workflow))]) {
+    const res = await gh(`/actions/workflows/${wf}/runs?created=%3E%3D${since}&per_page=20`, env.GITHUB_TOKEN);
+    if (res.status !== 200) { lines.push(`• ${name(wf)} — 확인 못 함: ${reason(res.status)}`); continue; }
+    const runs = ((await res.json()).workflow_runs || []).filter((r) => r.event === "workflow_dispatch" || r.event === "schedule");
+    if (!runs.length) { lines.push(`• ${name(wf)} — ${WATCH_AFTER_MIN}분이 지나도 실행이 없습니다`); continue; }
+    if (runs.some((r) => r.status !== "completed" || r.conclusion === "success")) continue;
+    lines.push(`• ${name(wf)} — 실패했습니다\n🔗 ${runs[0].html_url}`);
+  }
+  if (lines.length) {
+    const t = kstTime(at).hm;
+    await slack(env, `🚨 정기 실행 확인 (${t} 예정분)\n${lines.join("\n")}`);
+  }
+}
+
+// 토큰 만료 미리 알림 — 하루 한 번(KST 09:00) 남은 날이 7일 이하면. fine-grained 토큰은 응답 머리에 만료 시각이 온다.
+async function tokenCheck(env) {
+  const res = await gh("", env.GITHUB_TOKEN);
+  if (res.status === 401) { await slack(env, `🚨 정기 실행 Worker\n• ${reason(401)}`); return; }
+  const exp = res.headers.get("github-authentication-token-expiration");
+  if (!exp) return;
+  const days = Math.floor((Date.parse(exp.replace(" UTC", "Z").replace(" ", "T")) - Date.now()) / 86400000);
+  if (days <= 7) await slack(env, `⚠️ 정기 실행 Worker\n• GitHub 토큰이 ${days}일 뒤 만료됩니다 — 새로 발급해 GITHUB_TOKEN 에 넣어 주세요`);
 }
 
 export default {
   async scheduled(event, env, ctx) {
     const at = new Date(event.scheduledTime);
-    const ny = nyTime(at);
-    const kst = kstTime(at);
-    const utc = { h: at.getUTCHours(), m: at.getUTCMinutes() };
-    const due = [
-      ...(JOBS[ny.hm] || []).filter((j) => !j.when || j.when(ny)),
-      ...(KST_JOBS[kst.hm] || []).filter((j) => !j.when || j.when(kst)),
-      ...REPEAT.filter((j) => j.when(utc)),
-    ];
+    const due = dueAt(at);
+    const watchAt = new Date(at.getTime() - WATCH_AFTER_MIN * 60 * 1000);
+    ctx.waitUntil(watch(watchAt, env).catch((e) => console.log(`감시 오류: ${e}`)));
+    if (kstTime(at).hm === "09:00") ctx.waitUntil(tokenCheck(env).catch((e) => console.log(`토큰 확인 오류: ${e}`)));
     if (!due.length) return; // 할 일 없는 회차
 
-    // 하나가 실패해도 나머지는 건다. 실패는 마지막에 던져 Cloudflare 대시보드에 남긴다.
+    // 하나가 실패해도 나머지는 건다. 실패는 Slack 으로 알리고, 마지막에 던져 Cloudflare 대시보드에도 남긴다.
     const results = await Promise.allSettled(
-      due.map((j) => dispatch(j.workflow, env.GITHUB_TOKEN, j.inputs)),
+      due.map((j) => dispatch(j.workflow, env.GITHUB_TOKEN, j.inputs).catch((e) => { e.workflow = e.workflow || j.workflow; throw e; })),
     );
-    const failed = results.filter((r) => r.status === "rejected").map((r) => r.reason.message);
-    if (failed.length) throw new Error(failed.join("\n"));
+    const failed = results.filter((r) => r.status === "rejected").map((r) => r.reason);
+    if (failed.length) {
+      const t = kstTime(at).hm;
+      await slack(env, `🚨 정기 실행 걸기 실패 (${t})\n${failed.map((e) => `• ${name(e.workflow)} — ${e.status ? reason(e.status) : "연결 실패"}`).join("\n")}`);
+      throw new Error(failed.map((e) => e.message).join("\n"));
+    }
   },
 };

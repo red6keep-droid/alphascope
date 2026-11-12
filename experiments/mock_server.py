@@ -43,10 +43,11 @@ LABELS = {
     "issue_store": "증시 전망",   # 사건 가설 질문 페이지 · 목록 · 홈 카드 목업 (2026-11-06)
     "site-search": "검색 · 질문하기",   # 헤더 검색 아이콘 · 즉답 카드 · 질문하기 (2026-11-10 사용자)
     "post-footer": "글 아래 버튼 줄",   # 💬 댓글 · 홈으로 · TOP 한 줄, 함께 보는 페이지는 그 아래 (2026-11-10 사용자)
+    "stock-etf": "ETF",   # ETF 고정 페이지 37개 (2026-11-12 사용자 A안)
     "stock-title": "종목 제목 줄",   # 제목 꼬리 13/19 · 공유 버튼 = 회색 기준 상자 오른쪽 (2026-11-11 사용자)
 }
 RECENT_N = 12
-STOCK_DIRS = ("kr-stocks", "stock-radar")   # 폴더 이름 대신 종목 이름을 보이는 폴더 (2026-11-07 사용자)
+STOCK_DIRS = ("kr-stocks", "stock-radar", "stock-etf")   # 폴더 이름 대신 종목 이름을 보이는 폴더 (2026-11-07 사용자)
 PREFS = os.path.join(BASE, ".mock_prefs.json")   # {"star": ["폴더/파일"]} — output 밖이라 서버가 내주지 않는다
 _lock = threading.Lock()
 
@@ -141,6 +142,12 @@ def row(d, f, t, show_dir=False, stars=(), restore=False):
 JOURNEY_START = "/j/home-split/output/mock_home_kr.html"
 
 
+ARCHIVED_LINKS = [   # 파일 목업이 아닌 화면 — 쓰지 않는 목업 쪽에 둔다 (2026-11-12 사용자: 여정 테스트 · 아이콘 비교). 되돌리려면 index_page 첫 화면으로 옮긴다
+    f'<a class="big" href="{JOURNEY_START}">사용자 여정 테스트 <span>홈에서 시작 · 상단 · 하단 메뉴로 이동 ›</span></a>',
+    '<a class="big" href="/icons">하단 메뉴 아이콘 비교 <span>스타일 8가지 ›</span></a>',
+]
+
+
 def index_page(archive=False):
     items = mockups()
     with _lock:
@@ -156,13 +163,12 @@ def index_page(archive=False):
     parts = []
     if archive:
         parts.append('<a class="big" href="/">← 목업 목록으로</a>')
+        parts += ARCHIVED_LINKS   # 사용자 여정 테스트 · 아이콘 비교 — 쓰지 않는 목업으로 (2026-11-12 사용자)
         for d in sorted(groups, key=lambda k: -groups[k][0][2]):
             parts += [f'<section><h2>{html.escape(LABELS.get(d, d))}</h2>', *(row(*x, restore=True) for x in groups[d]), "</section>"]
-        if not items:
+        if not items and not ARCHIVED_LINKS:
             parts.append('<div class="meta">쓰지 않는 목업이 없습니다</div>')
     else:
-        parts.append(f'<a class="big dark" href="{JOURNEY_START}">사용자 여정 테스트 <span>홈에서 시작 · 상단 · 하단 메뉴로 이동 ›</span></a>')
-        parts.append('<a class="big" href="/icons">하단 메뉴 아이콘 비교 <span>스타일 8가지 ›</span></a>')
         fav = [by_key[k] for k in stars if k in by_key]   # 누른 순서대로
         if fav:
             parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars) for x in fav), "</section>"]
@@ -171,8 +177,8 @@ def index_page(archive=False):
             parts.append(f'<details><summary>{html.escape(LABELS.get(d, d))} <span class="n">{len(groups[d])}</span></summary>')
             parts += [row(*x, stars=stars) for x in groups[d]]
             parts.append("</details>")
-        if old:
-            parts.append(f'<a class="big" href="/archive">쓰지 않는 목업 <span>{len(old)}개 ›</span></a>')
+        if old or ARCHIVED_LINKS:
+            parts.append(f'<a class="big" href="/archive">쓰지 않는 목업 <span>{len(old) + len(ARCHIVED_LINKS)}개 ›</span></a>')
     now = datetime.now().strftime("%m-%d %H:%M:%S")
     return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>목업 목록</title>
@@ -242,7 +248,7 @@ _ICON = {   # 22px 선 아이콘 (viewBox 24, 선 1.8)
     "home": '<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/>',
     "report": '<path d="M4 19h16"/><path d="M6 16l4-5 3 3 5-7"/>',
     "stock": '<path d="M9 7h11M9 12h11M9 17h11"/><path d="M4.5 7h.01M4.5 12h.01M4.5 17h.01"/>',   # 목록 모양 — 돋보기는 검색으로 읽힌다
-    "forecast": '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+    "forecast": '<path d="M12 3v18M7.5 21h9"/><path d="M4 7h16"/><path d="M6 7l-3 7h6zM18 7l-3 7h6z"/>',   # 저울 — 홈 · 증시 전망 질문 줄과 같은 그림 (2026-11-12 사용자)
     "people": '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
 }
 # 하단 메뉴 아이콘 스타일 비교 (2026-11-12 사용자: 여러 스타일을 그려 보고 고른다). 선 = 테두리만, 면 = 채운 모양
@@ -255,7 +261,7 @@ _FILL = {
 }
 ICON_STYLES = [   # (키, 이름, 설명)
     ("A", "가는 선", "지금 목업 — 선 1.8, 지금 칸은 검정 굵은 글자"),
-    ("B", "굵은 선", "선 2.4 — 작은 화면에서 더 또렷"),
+    ("B", "굵은 선", "선 2.2 — 작은 화면에서 더 또렷 (정함)"),
     ("C", "채운 모양", "모든 칸을 채운 아이콘, 지금 칸만 검정"),
     ("D", "지금 칸만 채움", "다른 칸은 선, 지금 칸만 채운 모양 (앱에서 흔한 방식)"),
     ("E", "둥근 바탕", "지금 칸 아이콘 뒤에 옅은 둥근 바탕"),
@@ -289,11 +295,46 @@ def _color_icon(key, on, all_color, mkt="kr"):
     return f'<span {box.format(bg=bg)} aria-hidden="true"><svg viewBox="0 0 16 16" width="16" height="16" {attrs}>{g}</svg></span>'
 
 JTABS = [("home", "홈"), ("report", "증시 리포트"), ("stock", "종목"), ("forecast", "증시 전망"), ("people", "인물 발언")]
-BAR_PAD = 10   # 하단 메뉴 아래 여백 — 화면 맨 아래에서 10px 위로 (2026-11-12 사용자)
+BAR_PAD = 15   # 하단 메뉴 아래 여백 — 화면 맨 아래에서 15px 위로 (2026-11-12 사용자: 10 → 15)
 BAR_H = 56
 
 
-def icon_svg(style, key, on, mkt="kr"):
+# 종목 · 인물 아이콘 시안 (2026-11-12 사용자: B 스타일로, 종목 · 인물은 여러 시안). viewBox 24 선 그림. 0 = 지금 것
+STOCK_V = [
+    ("목록 (지금)", _ICON["stock"]),
+    ("캔들 차트", '<path d="M7 3v18M17 3v18"/><rect x="4.5" y="7" width="5" height="8" rx="1"/><rect x="14.5" y="5" width="5" height="10" rx="1"/>'),
+    ("세로 막대", '<path d="M4 20h16"/><path d="M7.5 16v-5M12 16V6M16.5 16v-8"/>'),
+    ("네 칸 타일", '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'),
+    ("건물 (회사)", '<path d="M5 20V4.5h9V20M14 9h5v11M3 20h18"/><path d="M8 8h3M8 12h3M8 16h3"/>'),
+    ("파이 차트", '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12h8.5"/>'),
+    ("가방 (포트폴리오)", '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2M3 12.5h18"/>'),
+]
+PEOPLE_V = [
+    ("사람 (지금)", _ICON["people"]),
+    ("사람 + 말풍선", '<circle cx="9" cy="9" r="3.5"/><path d="M2.5 20.5c.6-3.6 3.1-5.6 6.5-5.6s5.9 2 6.5 5.6"/><path d="M15 3.5h6.5v5h-3.2L16 10.5v-2h-1z"/>'),
+    ("말풍선", '<path d="M4 4.5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8.5L6 20.5v-4H4a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1z"/><path d="M8 10.5h.01M12 10.5h.01M16 10.5h.01"/>'),
+    ("마이크", '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>'),
+    ("확성기", '<path d="M3.5 10v4h3.5l7.5 4.5v-13L7 10z"/><path d="M17.5 9a4.2 4.2 0 0 1 0 6M19.8 6.5a7.5 7.5 0 0 1 0 11"/>'),
+    ("두 사람", '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.1-5.6 6.5-5.6s5.9 2 6.5 5.6"/><path d="M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.9.8 3.1 2.6 3.5 5.2"/>'),
+    ("따옴표", '<path d="M10 6.5H6.5a2 2 0 0 0-2 2V12H10z"/><path d="M10 12c0 3.2-1.6 4.8-4.5 5.5"/><path d="M19.5 6.5H16a2 2 0 0 0-2 2V12h5.5z"/><path d="M19.5 12c0 3.2-1.6 4.8-4.5 5.5"/>'),
+]
+
+
+ON_STYLES = [   # 선택한 칸 표시 시안 (2026-11-12 사용자: 선택됐을 때 시안도 보고 싶다). 모두 회색 → 검정 색은 같고 그 위에 더하는 것만 다르다
+    ("1", "색만 진하게", "지금 — 회색에서 검정으로만"),
+    ("2", "색 + 굵은 글자", "예전 방식 — 글자 굵게"),
+    ("3", "색 + 굵은 아이콘 선", "아이콘 선 2.2 → 2.8"),
+    ("4", "색 + 위쪽 막대", "메뉴 줄 맨 위에 짧은 검정 막대"),
+    ("5", "색 + 아래 점", "글자 아래 작은 점"),
+    ("6", "색 + 둥근 바탕", "아이콘 뒤 옅은 회색 둥근 바탕"),
+    ("7", "색 + 칸 바탕", "선택한 칸 전체에 옅은 회색 바탕, 아래 모서리 둥글게"),
+]
+ON_PICK = "7"   # 정함 = 칸 바탕 + 아래 모서리 둥글게 (2026-11-12 사용자)
+ON_RADIUS = 10   # 칸 바탕 아래 모서리 — 카드 모서리(10)와 같게
+ST_PICK, PP_PICK = 2, 3   # 정한 시안 (2026-11-12 사용자: 종목 = 세로 막대 · 인물 = 마이크)
+
+
+def icon_svg(style, key, on, mkt="kr", sv=0, pv=0):
     """하단 메뉴 아이콘 한 개 — 스타일 · 지금 칸 여부에 따라."""
     if style == "F":
         return ""
@@ -301,9 +342,10 @@ def icon_svg(style, key, on, mkt="kr"):
         return _color_icon(key, on, style == "G", mkt)
     if style == "C" or (style == "D" and on):
         return f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">{_FILL[key]}</svg>'
-    w = "2.4" if style == "B" else "1.8"
+    w = {"forecast": "1.8", "people": "2"}.get(key, "2.2") if style == "B" else "1.8"   # B = 2.2px · 마이크 2px · 저울 1.8px (2026-11-12 사용자: 저울만 0.2 더 가늘게, 옛 2.4)
+    g = STOCK_V[sv][1] if key == "stock" else PEOPLE_V[pv][1] if key == "people" else _ICON[key]
     return (f'<svg class="ji" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="{w}" '
-            f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{_ICON[key]}</svg>')
+            f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{g}</svg>')
 
 
 def bar_css():
@@ -311,27 +353,48 @@ def bar_css():
     return (f"#jbar{{position:fixed;left:0;right:0;bottom:0;z-index:44;display:grid;grid-template-columns:repeat(5,1fr);box-sizing:border-box;"
             f"height:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom));padding-bottom:calc({BAR_PAD}px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #E2E8F0;font-family:inherit}}"
             "#jbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#6B7280;text-decoration:none;font-size:11px;line-height:14px;-webkit-tap-highlight-color:transparent;position:relative}"
-            "#jbar a.on{color:#111;font-weight:700} #jbar a:active{background:#F1F5F9}"
+            "#jbar a.on{color:#111} #jbar a:active{background:#F1F5F9}"   # 선택 = 색만 진하게, 굵기는 그대로 (2026-11-12 사용자)
+            "#jbar[data-on='2'] a.on{font-weight:700}"
+            "#jbar[data-on='3'] a.on svg{stroke-width:2.8}"
+            "#jbar[data-on='4'] a.on::before{content:'';position:absolute;top:-1px;left:50%;width:28px;height:2px;margin-left:-14px;border-radius:0 0 2px 2px;background:#111}"
+            "#jbar[data-on='5'] a.on span{position:relative} #jbar[data-on='5'] a.on span::after{content:'';position:absolute;left:50%;bottom:-7px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#111}"
+            "#jbar[data-on='6'] a .ji{box-sizing:content-box;padding:3px 14px;border-radius:14px} #jbar[data-on='6'] a.on .ji{background:#E8EDF3}"
+            f"#jbar[data-on='7'] a.on{{background:#F1F5F9;border-radius:0 0 {ON_RADIUS}px {ON_RADIUS}px}}"
+            "#jbar svg *{vector-effect:non-scaling-stroke}"   # 선 굵기 = 화면 px 그대로 (22px 로 줄여 그려도 2.2 · 2 가 그대로 나온다)
             "#jbar[data-style=E] a .ji{box-sizing:content-box;padding:3px 16px;border-radius:15px}"
             "#jbar[data-style=E] a.on .ji{background:#E8EDF3}"
             "#jbar[data-style=F] a{font-size:13px;line-height:18px}"
             "#jbar[data-style=F] a.on::after{content:'';position:absolute;bottom:8px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:#111}")
 
 
-def bar_html(style, cur=""):
-    return (f'<nav class="jsample" data-style="{style}">'
-            + "".join(f'<a data-jt="{k}" href="#"' + (' class="on"' if k == cur else '') + f'>{icon_svg(style, k, k == cur)}<span>{t}</span></a>' for k, t in JTABS)
+def bar_html(style, cur="", sv=0, pv=0, on="1"):
+    return (f'<nav class="jsample" data-style="{style}" data-on="{on}">'
+            + "".join(f'<a data-jt="{k}" href="#"' + (' class="on"' if k == cur else '') + f'>{icon_svg(style, k, k == cur, sv=sv, pv=pv)}<span>{t}</span></a>' for k, t in JTABS)
             + "</nav>")
 
 
 def icons_page():
     """아이콘 스타일 비교 화면 — 스타일마다 하단 메뉴 견본(지금 칸 = 종목) + `이 스타일로 여정 보기`."""
-    rows = []
+    rows = ['<div class="sep">선택한 칸 표시 시안 (정한 아이콘 · 지금 칸 = 종목)</div>']
+    for k, name, why in ON_STYLES:
+        rows.append(f'<section><h2>선택 {k}. {html.escape(name)}{" ✓ 지금" if k == ON_PICK else ""}</h2><div class="why">{html.escape(why)}</div>'
+                    f'{bar_html("B", "stock", sv=ST_PICK, pv=PP_PICK, on=k)}<a class="go" href="{JOURNEY_START}?icon=B&amp;on={k}">이 선택 표시로 여정 보기 ›</a></section>')
+    rows.append('<details class="old"><summary>종목 · 인물 아이콘 시안 (세로 막대 · 마이크로 정함)</summary>')
+    rows.append('<div class="sep">B 굵은 선 · 증시 전망 = 저울 — 종목 아이콘 시안 (지금 칸 = 종목)</div>')
+    for i, (nm, _) in enumerate(STOCK_V):
+        rows.append(f'<section><h2>종목 {i + 1}. {html.escape(nm)}{" ✓ 정함" if i == ST_PICK else ""}</h2>{bar_html("B", "stock", sv=i)}'
+                    f'<a class="go" href="{JOURNEY_START}?icon=B&amp;st={i}">이 종목 아이콘으로 여정 보기 ›</a></section>')
+    rows.append('<div class="sep">B 굵은 선 — 인물 아이콘 시안 (지금 칸 = 인물 발언)</div>')
+    for i, (nm, _) in enumerate(PEOPLE_V):
+        rows.append(f'<section><h2>인물 {i + 1}. {html.escape(nm)}{" ✓ 정함" if i == PP_PICK else ""}</h2>{bar_html("B", "people", pv=i)}'
+                    f'<a class="go" href="{JOURNEY_START}?icon=B&amp;pp={i}">이 인물 아이콘으로 여정 보기 ›</a></section>')
+    rows.append('</details><details class="old"><summary>지난 비교 — 스타일 8가지 (B 로 정함)</summary>')
     for k, name, why in ICON_STYLES:
         if k == "G":
             rows.append('<div class="sep">강조 카드 · 홈 카드 컬러 아이콘</div>')
         rows.append(f'<section><h2>{k}. {html.escape(name)}</h2><div class="why">{html.escape(why)}</div>{bar_html(k, "stock")}'
                     f'<a class="go" href="{JOURNEY_START}?icon={k}">이 스타일로 여정 보기 ›</a></section>')
+    rows.append('</details>')
     css = bar_css().replace("#jbar", ".jsample").replace("position:fixed;left:0;right:0;bottom:0;z-index:44;", "position:relative;")
     return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>하단 메뉴 아이콘 비교</title><style>
@@ -340,9 +403,10 @@ h1{{font-size:20px;margin:0 0 4px}} .meta{{color:#8a919c;font-size:13px;margin-b
 section{{background:#fff;border:1px solid #e3e6eb;border-radius:12px;margin:0 0 14px;overflow:hidden}}
 h2{{font-size:16px;margin:14px 14px 2px}} .why{{color:#6B7280;font-size:13px;margin:0 14px 12px}}
 .sep{{margin:22px 2px 10px;color:#5b6370;font-size:14px;font-weight:600}}
+.old{{margin-top:28px}} .old>summary{{padding:14px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;font-weight:600;cursor:pointer;margin-bottom:10px}}
 .go{{display:block;padding:12px 14px;border-top:1px solid #eef0f3;color:#1d2127;text-decoration:none;font-size:14px;font-weight:600}}
 {css}
-</style></head><body><h1>하단 메뉴 아이콘 비교</h1><div class="meta">견본의 지금 칸 = 종목 · 아래 여백 {BAR_PAD}px 포함 · <a href="/">목업 목록으로</a></div>
+</style></head><body><h1>하단 메뉴 아이콘 비교</h1><div class="meta">아래 여백 {BAR_PAD}px 포함 · 종목 · 인물 시안을 하나씩 고르면 여정에서 둘 다 기억 · <a href="/">목업 목록으로</a></div>
 {''.join(rows)}</body></html>"""
 
 
@@ -380,6 +444,16 @@ def _slug_map():
                     out[c[2]] = f"{rel}/output/{f}"
         except Exception:  # noqa: BLE001
             continue
+    try:   # ETF 페이지 /p/<티커|코드>-etf.html → stock-etf/output/mock_etf_<키>.html (2026-11-12)
+        spec = importlib.util.spec_from_file_location("_mock_etf_universe", os.path.join(BASE, "etf_universe.py"))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        for sym in m.US_SYMS + m.KR_SYMS:
+            f = f"mock_etf_{m.key(sym)}.html"
+            if os.path.isfile(os.path.join(BASE, "stock-etf", "output", f)):
+                out[m.slug(sym)] = f"stock-etf/output/{f}"
+    except Exception:  # noqa: BLE001
+        pass
     return out
 
 
@@ -446,6 +520,8 @@ def journey_bar(d, f):
             if x.startswith("mock_forecast-") and x.endswith(".html")} if os.path.isdir(od) else {}
     tabs = JTABS
     icons = {st: {**{k: [icon_svg(st, k, False), icon_svg(st, k, True)] for k, _ in JTABS},
+                  "stock_v": [[icon_svg(st, "stock", False, sv=i), icon_svg(st, "stock", True, sv=i)] for i in range(len(STOCK_V))],
+                  "people_v": [[icon_svg(st, "people", False, pv=i), icon_svg(st, "people", True, pv=i)] for i in range(len(PEOPLE_V))],
                   **{f"report_{m}": [icon_svg(st, "report", False, m), icon_svg(st, "report", True, m)] for m in ("us", "kr")}} for st, _, _ in ICON_STYLES}
     btns = "".join(f'<a data-jt="{k}" href="#"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" '
                    f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{_ICON[k]}</svg><span>{t}</span></a>' for k, t in tabs)
@@ -492,6 +568,7 @@ body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !im
 <nav id="jbar" data-style="A" aria-label="주요 페이지">{btns}</nav><div id="jtoast"></div>
 <script>
 (function () {{
+  var ST_PICK = {ST_PICK}, PP_PICK = {PP_PICK};
   var C = {cfg}, J = '{J}', here = C.dir + '/output/' + C.file, P = C.pages;
   var mk = sessionStorage.getItem('jMarket') || 'kr';   // 지금 보는 나라 — 홈 · 증시 리포트 · 종목 칸이 따라간다
   if (/kr-stocks|kr-market-report|mock_home_kr/.test(here)) mk = 'kr';
@@ -502,12 +579,25 @@ body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !im
           : /issue_store/.test(here) ? 'forecast' : /people-radar/.test(here) ? 'people' : '';
   function go(key) {{ return J + (P[key] || key); }}
   var ic = (location.search.match(/[?&]icon=([A-H])/) || [])[1];   // 아이콘 스타일 — 비교 화면에서 고른 것을 이 탭 동안 기억
-  if (ic) {{ try {{ sessionStorage.setItem('jIcon', ic); }} catch (e) {{}} }}
-  try {{ ic = ic || sessionStorage.getItem('jIcon'); }} catch (e) {{}}
-  ic = ic || 'A';
+  if (ic) {{ try {{ sessionStorage.setItem('jIcon2', ic); }} catch (e) {{}} }}
+  try {{ ic = ic || sessionStorage.getItem('jIcon2'); }} catch (e) {{}}
+  ic = ic || 'B';   // 정한 스타일 = B 굵은 선 (2026-11-12 사용자)
   document.getElementById('jbar').setAttribute('data-style', ic);
+  var onv = (location.search.match(/[?&]on=([1-7])/) || [])[1];   // 선택한 칸 표시 시안
+  if (onv) {{ try {{ sessionStorage.setItem('jOn', onv); }} catch (e) {{}} }}
+  try {{ onv = onv || sessionStorage.getItem('jOn'); }} catch (e) {{}}
+  document.getElementById('jbar').setAttribute('data-on', onv || '{ON_PICK}');
+  function pick(name, re, def) {{   // 종목 · 인물 시안 번호 — 주소에 있으면 기억, 없으면 기억한 것
+    var v = (location.search.match(re) || [])[1];
+    if (v) {{ try {{ sessionStorage.setItem(name, v); }} catch (e) {{}} }}
+    try {{ v = v || sessionStorage.getItem(name); }} catch (e) {{}}
+    return +(v || def);
+  }}
+  var stv = pick('jSt2', /[?&]st=(\\d+)/, ST_PICK), ppv = pick('jPp2', /[?&]pp=(\\d+)/, PP_PICK);   // 정한 시안 = 종목 세로 막대 · 인물 마이크
   document.querySelectorAll('#jbar a').forEach(function (a) {{
-    var k = a.dataset.jt, on = k === cur, svg = a.querySelector('svg'), ics = C.icons[ic] || C.icons.A, sv = (k === 'report' ? ics['report_' + mk] : ics[k])[on ? 1 : 0];
+    var k = a.dataset.jt, on = k === cur, svg = a.querySelector('.ji') || a.querySelector('svg'), ics = C.icons[ic] || C.icons.A;
+    var set = k === 'report' ? ics['report_' + mk] : k === 'stock' && ics.stock_v ? ics.stock_v[stv] || ics.stock : k === 'people' && ics.people_v ? ics.people_v[ppv] || ics.people : ics[k];
+    var sv = set[on ? 1 : 0];
     if (svg) svg.remove();
     if (sv) a.insertAdjacentHTML('afterbegin', sv);
     a.href = J + tab[k]; if (on) a.className = 'on';
@@ -554,6 +644,7 @@ body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !im
     if (p === '/' || p === '') return P['home_' + mk];
     if (p === '/p/korea.html') return P.home_kr;
     if ((m = p.match(/^\\/p\\/(.+-stock)\\.html$/))) return C.slugs[m[1]] || '';
+    if ((m = p.match(/^\\/p\\/(.+-etf)\\.html$/))) return C.slugs[m[1]] || '';
     if (p === '/p/us-market-cap-top10.html') return P.list_us;
     if (p === '/p/kr-market-cap-top10.html') return P.list_kr;
     if (p === '/p/forecast-list.html') return P.forecast;

@@ -118,8 +118,7 @@ def sec_chart(s):
             f'style="position:relative;display:block;margin:0 0 16px;max-width:1024px;">'
             f'<img src="{_esc(url)}" alt="{_esc(s["name"])} {CP.WINDOW}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'
             f'<span style="position:absolute;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
-            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{zoom}</span></a>'
-            + _dk.intraday_chart_fold(s["code"], f"https://cdn.jsdelivr.net/gh/{CP._repo_slug()}@gh-pages/live_bars.json"))   # 장중 차트 접힘 줄 — 펼칠 때만 우리 5분봉 (2026-11-05). TradingView 위젯은 KRX 를 막는다
+            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{zoom}</span></a>')   # 장중 차트 접힘 줄 삭제 (2026-11-12 사용자: 종가 기준 블로그 — 장중 가격에 얽매이지 말자, kr-live 수집 멈춤)
 
 
 def draw_charts(snap, stocks, out_dir):
@@ -1659,6 +1658,13 @@ def list_row(s, first):
     return _row_html(left, right, first=first).replace("<span", f'<span data-row-link="1" data-ret="{r:.4f}"', 1)
 
 
+def etf_section():
+    """종목 목록 페이지 ETF 구획 — experiments/stock-etf/etf_pages.list_section (미국 목록과 같은 함수). 그날 일봉(BARS)에서."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "stock-etf"))
+    import etf_pages
+    return etf_pages.list_section("kr", BARS)
+
+
 def list_body(a):
     top = [s for s in a["stocks"] if s["in_top"]]
     rest = [s for s in a["stocks"] if not s["in_top"] and s.get("rank") and s["rank"] <= U.PEER_GROUP_N]
@@ -1669,6 +1675,7 @@ def list_body(a):
     body = (_dk.report_stamp(_md(a["day"]), "오후 4시 10분 무렵")   # 맨 위 안내 상자 = 상세 페이지와 같게 (2026-11-07 0-1)
             + list_lead(a) + R.title_with_sort("시가총액 순위", tip, "kr-cap10") + card(top, "kr-cap10")
             + (_dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest)) if rest else "")
+            + etf_section()   # ETF 구획 (2026-11-12 사용자) — 발행된 ETF 페이지만, 목업은 전부
             + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다.")
             + related())   # 시장 흐름 카드는 한국 증시 리포트로 옮김 — 목록은 미국처럼 순위만 (2026-10-26 사용자, 리포트 기획 M8)
     return wrap(body + home_marker())

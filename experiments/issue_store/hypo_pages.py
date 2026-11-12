@@ -279,7 +279,10 @@ def move_text(fc, v, ref=None):
     w = strength(v, fc.get("line", 3.0))   # 핵심 숫자 하나 + 세기 말 (2026-11-07 정정)
     if fc.get("cmp"):
         if w == "거의 같게":
-            return f'{fc["subj_ga"]} {fc["cmp"].replace("보다", "와")} 거의 같게 움직였습니다({a:.1f}{unit})'
+            obj = fc["cmp"].replace("보다", "")
+            ch = obj.strip()[-1:] or "가"
+            wa = ("과" if ch in "0136780" else "와") if ch.isdigit() else ("과" if 0xAC00 <= ord(ch) <= 0xD7A3 and (ord(ch) - 0xAC00) % 28 else "와")   # `시장와` → `시장과`, 숫자는 읽는 소리(500 = 오백 → 과) (받침 따라, 2026-11-12)
+            return f'{fc["subj_ga"]} {obj}{wa} 거의 같게 움직였습니다({a:.1f}{unit})'
         return f'{fc["subj_ga"]} {fc["cmp"]} {a:.1f}{unit} 더 {"올랐" if v > 0 else "빠졌"}습니다, {w} {"오른" if v > 0 else "빠진"} 편입니다'
     if w == "거의 같게":
         return f'{fc["subj_ga"]} {ref or fc.get("ref") or fc["ruler_from"]} 거의 움직이지 않았습니다({a:.1f}{unit})'
@@ -311,6 +314,32 @@ def today_line(info):
 
 def _entry(day, key, label, d, text, rel, theme=None):
     return {"day": day, "key": key, "label": label, "dir": d, "theme": theme or "neutral", "text": text, "rel": rel}
+
+
+def _priced_entry(fc, day, r, det):
+    """선반영 구간(감지일 ~ 결과 전날) 하루 줄 (2026-11-12 사용자: 엔비디아 실적 타임라인이 전부 ▲ `선반영 중`).
+    ① 감지일 바로 전에 같은 계열 충격(fc["prior_shock"], forecast_daily 가 붙임)이 있으면 그 뒤 움직임엔 되돌림이 섞여 있다
+       → `지켜보는 중` + 겹침 표시 — 11.05 반도체 −12% 바로 다음 날이 0 이라 반등이 선반영으로 읽혔다. 자(감지일 종가)는 사전 등록대로 두고 표시만.
+    ② 시장이 본 쪽(market_prob ≥ 55 인 결과의 갈래 방향)으로 움직일 때만 `선반영 중` — 반대로 가거나 거의 그대로면 `지켜보는 중`.
+       반반(45~55)이면 미리 반영할 쪽이 없으니 `지켜보는 중`."""
+    mv = move_text(fc, r, ref=f'감지일({md(det)}) 종가보다')
+    ps = fc.get("prior_shock")
+    if ps:
+        s = 1 if ps["move"] > 0 else -1
+        what = ("반등" if s < 0 else "되밀림") if r * s < 0 else f"{SHOCK[s]}의 여파"
+        e = _entry(day, "pre_watch", "지켜보는 중", 0,
+                   f'{mv}. {md(ps["day"])} {fc["subject"]} {SHOCK[s]} 바로 뒤라 {what}이 섞여 있어, 실적을 먼저 반영한 움직임인지 가릴 수 없습니다.', r)
+        e["overlap"] = {"event": f'{md(ps["day"])} {fc["subject"]} {SHOCK[s]}'}
+        return e
+    mp = fc.get("market_prob", {}).get("probs", [None])[0]
+    sc = fc["scenarios"]
+    ed = None if not mp or 45 <= mp <= 55 else (sc[0]["dir"] if mp > 55 else sc[1]["dir"])
+    exp = fc["outcomes"][0] if mp and mp > 55 else fc["outcomes"][-1]
+    if ed and r * ed > 0 and strength(r, fc.get("line", 3.0)) != "거의 같게":
+        return _entry(day, "priced_in", "선반영 중", ed, f'{mv}. 시장이 {prob_word(max(mp, 100 - mp))} 본 ‘{exp}’ 쪽이 먼저 반영되는 중입니다.', r)
+    if ed and r * ed < 0 and strength(r, fc.get("line", 3.0)) != "거의 같게":
+        return _entry(day, "pre_watch", "지켜보는 중", 0, f'{mv}. 시장이 {prob_word(max(mp, 100 - mp))} 본 ‘{exp}’ 쪽과 반대로 움직였습니다. 먼저 반영되는 모습은 아닙니다.', r)
+    return _entry(day, "pre_watch", "지켜보는 중", 0, f"{mv}. 결과 전이라 아직 어느 쪽으로도 먼저 움직이지 않았습니다.", r)
 
 
 def judge(fc, days, rel, cond=None, vix=None):
@@ -345,10 +374,7 @@ def judge(fc, days, rel, cond=None, vix=None):
             det = fc.get("detect_day")
             if det and det <= day < fc["event_day"]:   # 선반영 구간 — 감지일 종가가 0
                 last_rel = r
-                mp = fc.get("market_prob", {}).get("probs", [None])[0]
-                d0 = 1 if r > 0 else (-1 if r < 0 else 0)
-                tag = f'시장이 {prob_word(mp)} 본 ‘{fc["outcomes"][0]}’ 쪽이 먼저 반영되는 중입니다.' if mp and not 45 <= mp <= 55 else "결과 전에 먼저 움직이는 중입니다."   # P522
-                log.append(_entry(day, "priced_in", "선반영 중", d0, f"{move_text(fc, r, ref=f'감지일({md(det)}) 종가보다')}. {tag}", r))
+                log.append(_priced_entry(fc, day, r, det))
                 if day == bday:
                     ev_off = r   # 결과 직전 종가(발표 전날)로 자를 다시 놓는다
                 continue
@@ -478,7 +504,7 @@ def judge(fc, days, rel, cond=None, vix=None):
             pc = mp["probs"][cond - 1]
             sur = "" if 45 <= pc <= 55 else f' 시장이 {prob_word(pc)} 본 쪽이라 예상대로입니다.' if pc >= 50 else f' 시장은 {prob_word(100 - pc)} 반대쪽을 봤던 터라 예상 밖입니다.'   # P522
         for e in log:
-            if e["day"] == fc["event_day"] and e["key"] not in ("start", "priced_in"):
+            if e["day"] == fc["event_day"] and e["key"] not in ("start", "priced_in", "pre_watch"):
                 e["text"] = f'결과가 나왔습니다 : {fc["outcomes"][cond - 1]}.{sur} 결과 직전 종가({md(bday)})부터 잽니다. ' + e["text"]
                 break
     st = {"log": log, "result": result, "cond": cond, "rel": last_rel, "days": days, "rel_series": rel, "fixed": fixed, "missing": missing,
@@ -943,8 +969,8 @@ def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""
     ink = INK[d] if v["answer"] in (ANS_HIT, ANS_LEAN) else ("#111" if v["active"] else dk.MUTED)
     def box(state):   # 근거 줄 값 = 라벨 박스(확인 = 그 갈래 방향 색, 대기 · 해당 없음 = 회색). 질문 카드는 <span 으로 시작하는 값을 그대로 쓴다(P330)
         word, kind = CHAIN[state]
-        if state == "no":   # `해당 없음` = 흐린 회색 라벨 (P417)
-            return dim_box(word)
+        if state == "no":   # `해당 없음` = 흐린 회색 라벨 (P417) · 보통 굵기 (2026-11-12 사용자, `대기` 와 같은 P500 규칙)
+            return dim_box(word).replace("font-weight:700;", "font-weight:400;", 1)
         k = (("down" if d < 0 else "up") if v["active"] else "flat") if kind == "down" else kind
         b = TS.box(k, word, dk.esc, sym=False, fit=True)
         return b.replace("font-weight:700;", "font-weight:400;", 1) if state == "wait" else b   # 덜 중요한 라벨 = 보통 굵기 (P500)
@@ -1106,7 +1132,7 @@ def _broke_card(fc):
     if not b:
         return ""
     L, A = fc.get("line", 3.0), dk.ALIGN_PX
-    out = f'<p style="margin:0 0 4px;padding:0 {A}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{tri_text(dk.esc(wordify(b["lead"], L)))}</p>'
+    out = f'<p style="margin:0 0 4px;padding:0 {A}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{tri_text(dk.esc(wordify(b["lead"], L)))}</p>' if b.get("lead") else ""
     for i, (name, rec, note) in enumerate(b["items"]):
         out += (f'<div style="padding:{14 - dk.VP}px {A}px {14 - dk.VP}px {A}px;{"border-top:1px solid #E2E8F0;" if i else ""}">'
                 f'<span style="display:block;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{dk.esc(name)}</span>'
@@ -1352,14 +1378,15 @@ def _event_chart(reg):
                                         "선거 전인 10.30 에도 이미 -7.2% 빠졌습니다."))
 
 
-PLUS_ICON = 10   # 지난 날 펼침 + · − 아이콘: 상자 없이 그림만 10 · 선 1.5px(viewBox 12 의 1.8) (2026-11-12 사용자: 상자 제외, 그림만 — 옛 상자 22 · 모서리 6 · 테두리 #E2E8F0 폐지). 누르는 곳 = summary 줄 전체
+PLUS_BOX, PLUS_RADIUS, PLUS_ICON, PLUS_BD = 22, 6, 10, "#E2E8F0"   # 지난 날 펼침 + · − = 외곽선 상자 22 · 모서리 6 · 테두리 #E2E8F0 + 그림 10 · 선 1.5px(viewBox 12 의 1.8) — 11-11 f54e0d9b 상태로 되돌림 (2026-11-12 사용자: 외곽선은 두고 기호만 작게. P529 `그림만` 폐지). 누르는 곳 = summary 줄 전체
 PLUS_CSS = ('<style>.fc-day>summary{list-style:none;cursor:pointer;}.fc-day>summary::-webkit-details-marker{display:none;}'
             '.fc-day[open]>summary .fc-plus-v{display:none;}'
             '.fc-more>summary::-webkit-details-marker{display:none;}.fc-more[open]>summary{display:none;}</style>')   # 지난 경과 더 보기 = 펼치면 버튼을 숨기고 타임라인이 이어진다 (P418)   # 펼치면 세로획을 숨겨 − 로. 테마 붙여넣기 없이 되도록 본문 안 style (render_html 여러 그래프와 같은 방식)
 
 
 def _plus():
-    return (f'<span aria-hidden="true" style="display:inline-flex;flex:none;align-items:center;justify-content:center;width:{PLUS_ICON}px;height:{PLUS_ICON}px;color:#111;align-self:center;">'
+    return (f'<span aria-hidden="true" style="display:inline-flex;flex:none;align-items:center;justify-content:center;width:{PLUS_BOX}px;height:{PLUS_BOX}px;'
+            f'box-sizing:border-box;border:1px solid {PLUS_BD};border-radius:{PLUS_RADIUS}px;background:#fff;color:#111;align-self:center;">'
             f'<svg viewBox="0 0 12 12" width="{PLUS_ICON}" height="{PLUS_ICON}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'
             f'<path d="M2 6h8"/><path class="fc-plus-v" d="M6 2v8"/></svg></span>')
 
@@ -1423,6 +1450,7 @@ def _day_text(e):
             + ov + (f'<span style="display:block;margin-top:4px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">오늘 시장 : {dk.esc(wordify(e["today"]))}</span>' if e.get("today") else ""))
 
 
+MORE_STEP = 10   # `지난 경과 더 보기` 한 번에 펼치는 개수 (2026-11-12 사용자)
 PAST_SHOWN = 5   # 지난 날 줄은 최근 5개까지 바로, 그 앞은 `지난 경과 n개 더 보기` 안에
 
 
@@ -1480,6 +1508,11 @@ def quote_of(closes):
     return {"day": ds[-1], "close": round(float(c), 2), "chg": round((c / p - 1) * 100, 2)}
 
 
+def _won_or_usd(fc, v):
+    """종가 표기 — 한국 종목 = `93,600원`(가이드: 원화는 숫자 원), 미국 = `$93.60` (2026-11-12 목업에서 기아가 `$93,600.00` 으로 나옴)."""
+    return f"{v:,.0f}원" if mkt_of(fc) == "kr" else f"${v:,.2f}"
+
+
 def _stock_now(fc, st):
     """현재 증시는? 맨 위 종목 줄 (종목 전망만) = 한 줄 [로고 · 종목명 · 티커 · 종가 · 전날 대비 ……… ›], 줄 전체가 종목 페이지 링크 (2026-11-11 사용자 — 옛 `종목 바로가기` 버튼 삭제)."""
     if not is_stock_fc(fc):
@@ -1490,7 +1523,7 @@ def _stock_now(fc, st):
     if q:
         col = dk.UP if q["chg"] > 0 else dk.DOWN if q["chg"] < 0 else "#111"
         tri = "▲ " if q["chg"] > 0 else "▼ " if q["chg"] < 0 else ""
-        price = (f'<b style="flex:none;color:#111;">${q["close"]:,.2f}</b>'
+        price = (f'<b style="flex:none;color:#111;">{_won_or_usd(fc, q["close"])}</b>'
                  f'<span style="flex:none;color:{col};font-weight:600;">{tri}{abs(q["chg"]):.2f}%</span>')
     inner = (f'<span style="flex:none;display:flex;">{_logo_for(sym, fc.get("subject", ""), 22).replace("margin-right:6px;", "")}</span>'
              f'<b style="flex:none;color:#111;">{dk.esc(fc.get("subject", ""))}</b>'
@@ -1736,7 +1769,12 @@ def _waiting(log, unit="%", subj="", fc=None):
             node, txt = END_GO, (f'<a href="{page_url(f["slug"])}" style="display:inline-flex;align-items:center;gap:2px;color:#111;text-decoration:none;">세부 전망으로 이어집니다'
                                  f'<span style="display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span></a>')
         else:
-            node, txt = END_STOP, "전망이 종료되었습니다"
+            node, txt = END_STOP, dk.esc((fc or {}).get("end_text") or "전망을 마쳤습니다")   # 결과를 담은 끝 줄 (2026-11-12 사용자: 맞혔는데 `전망이 종료되었습니다` 만 있어 끊긴 듯 읽혔다)
+            nx = (fc or {}).get("next_fc")
+            if nx:   # 같은 대상의 지금 지켜보는 전망 — 이야기가 이어지는 곳 (2026-11-12 사용자)
+                txt += (f'<a href="{page_url(nx["slug"])}" style="display:flex;align-items:center;gap:2px;margin-top:4px;font-weight:400;color:#111;text-decoration:none;word-break:keep-all;">'
+                        f'<span><span style="color:{dk.SUB};">다음 전망 : </span>{dk.esc(nx["title"])}</span>'
+                        f'<span style="flex:none;display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span></a>')
         out += _tl_row(f'<span style="display:inline-flex;color:{dk.SUB};">{node}</span>', lh, 0,
                        f'<div style="padding:0 0 {12 - dk.VP}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;">{txt}</div>', not lead, False)
     out += _tl_row(clock, lh, 0, today, not end and not lead, False)   # 오늘 줄은 지난 날이 없어도 문장 끝까지 점선을 내린다
@@ -1750,19 +1788,27 @@ def _waiting(log, unit="%", subj="", fc=None):
                     f'<div style="padding:0 0 {12 - dk.VP}px;margin-top:-4px;">{_day_text(x)}</div></details>') + (day_why_html(x, fc) if fc else "") + ("" if last else gap)   # 근거 줄 = 접어도 보인다
             return _tl_row(dot, lh, 12 - dk.VP, fold, False, last)
         out += "".join(row(x, i == len(shown) - 1 and not rest) for i, x in enumerate(shown))
-        if rest:
-            label = f"지난 경과 {len(rest)}개 더 보기"
+        if rest:   # 10개씩 펼친다 (2026-11-12 사용자: 50개 넘게 한 번에 펼쳐졌다) — 펼친 묶음 끝에 다음 `더 보기`, 맨 끝 묶음에만 `접기`
             btn = (f"display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;"
                    f"font:inherit;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:600;color:#333;cursor:pointer;")
             up = f'<span style="display:inline-flex;transform:rotate(180deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-up")}</span>'
-            # 펼치면 맨 아래 `접기` 버튼 — 펼친 뒤 다시 접을 수 없던 것 (P439, 2026-11-08 사용자). 접으면 버튼 자리로 돌아오게 스크롤을 맞춘다
+            # 접기 = 맨 바깥 묶음을 닫는다(안쪽 묶음은 열린 채 남아도 바깥이 닫히면 안 보임) — 접으면 버튼 자리로 스크롤 (P439)
             close = (f'<div style="padding:6px 0 0 {TL_RAIL + 8}px;"><button type="button" style="{btn}" '
-                     'onclick="var d=this.closest(\'details\');d.open=false;d.scrollIntoView({block:\'nearest\'});">'
+                     'onclick="var d=this.closest(\'.fc-more-root\');d.open=false;d.scrollIntoView({block:\'nearest\'});">'
                      f'접기 {up}</button></div>')
-            out += (f'<details class="fc-more" style="margin:0;">'
-                    f'<summary style="list-style:none;cursor:pointer;padding:6px 0 0 {TL_RAIL + 8}px;">'
-                    f'<span style="{btn}">{label} {dk.ACC_CHEV}</span></summary>'
-                    + "".join(row(x, i == len(rest) - 1) for i, x in enumerate(rest)) + close + '</details>')
+            chunks = [rest[k:k + MORE_STEP] for k in range(0, len(rest), MORE_STEP)]
+            if len(chunks) > 1 and len(chunks[-1]) <= 2:   # 1~2개 숨기려고 버튼을 두지 않는다 (PAST_SHOWN 과 같은 규칙)
+                chunks[-2:] = [chunks[-2] + chunks[-1]]
+
+            def chunk(ci):
+                part, left = chunks[ci], sum(len(c) for c in chunks[ci:])
+                label = f"지난 경과 {len(part)}개 더 보기" + (f" (남은 {left}개)" if left > len(part) else "")
+                last = ci == len(chunks) - 1
+                inner = "".join(row(x, i == len(part) - 1 and last) for i, x in enumerate(part)) + (close if last else chunk(ci + 1))
+                return (f'<details class="fc-more{" fc-more-root" if ci == 0 else ""}" style="margin:0;">'
+                        f'<summary style="list-style:none;cursor:pointer;padding:6px 0 0 {TL_RAIL + 8}px;">'
+                        f'<span style="{btn}">{label} {dk.ACC_CHEV}</span></summary>' + inner + '</details>')
+            out += chunk(0)
     return out + "</div>"
 
 
@@ -2087,6 +2133,148 @@ def _row(fc, st):
     return dk.dcard(inner, theme=e["theme"])
 
 
+def chain_track(fc, st):
+    """실제 전망의 고리 상태 · `어디서 끊겼나` 를 판정 기록에서 코드가 매긴다 (2026-11-12 사용자 "작업 진행해" — 전엔 목업만 매기고 실제 전망은 고리가 늘 `대기`).
+    렌더 전용 — 등록 파일은 고치지 않는다(fc 는 실행마다 새로 읽힘).
+    틀 R(급락 · 급등 뒤): 갈래 1 고리 = 충격 폭 4분의 1 · 절반 회복(반납), 갈래 2 고리 = 금 3분의 1 · 금만큼 더 — 넘은 날 `확인` + 날짜.
+      판정이 나면 못 넘은 고리는 `해당 없음`, 우리가 고른 갈래가 틀렸으면 그 갈래의 첫 못 넘은 고리 = `끊김` + fc["broke"].
+    틀 S(사건 전): 틀렸을 때만 — 일어난 조건 갈래의 마지막 고리(결과 뒤 움직임) = `끊김` + fc["broke"].
+    `왜` = 그 기간 근거(e["why"], 날마다 쌓은 기사 요약 줄) 중 고른 갈래 반대쪽 맨 위 한 줄, 없으면 줄째 생략. AI 0 · 새 수집 0."""
+    log, res = st.get("log") or [], st.get("result") or {}
+    k = log[-1].get("key") if log else None
+    sc, L, unit = fc["scenarios"], fc.get("line", 3.0), fc.get("unit", "%p")
+    if fc["kind"] == "pre":
+        c = st.get("cond")
+        if k != "miss" or not c:
+            return
+        a = sc[c - 1]
+        if not a.get("chain"):
+            return
+        last = a["chain"][-1]
+        last.update(state="broken", date=md(log[-1]["day"]))
+        fc["broke"] = {"lead": f'‘{last["step"]}’ 고리에서 끊겼습니다.',
+                       "items": [("실제로는", log[-1]["text"].split(". ")[0] + ".", "")]}
+        return
+    gap = fc.get("gap")
+    if not gap or not st.get("days"):
+        return
+    s_ = 1 if gap > 0 else -1
+
+    def mark(step):   # 고리 글에서 기준을 읽는다 — 손으로 만든 전망은 고리 수 · 순서가 다르다(EH-2026-001 전망 2 = `시장 전체가 같이 빠졌나` 가 앞에)
+        if "4분의 1" in step:
+            return 0, R_EARLY
+        if "절반" in step:
+            return 0, R_HIT
+        m = _re.search(r"(\d+(?:\.\d+)?)\s*%p?\s*더", step)
+        return (1, float(m.group(1))) if m else None
+    end_day = res.get("day")
+    first = {}
+    best = [None, None]   # 최대 회복 비율 · 최대 더 간 폭
+    for d, v in zip(st["days"], st.get("rel_series") or []):
+        if v is None or d <= fc["registered"] or (end_day and d > end_day):
+            continue
+        rc, ex = 1 - v / gap, s_ * (v - gap)
+        best = [rc if best[0] is None else max(best[0], rc), ex if best[1] is None else max(best[1], ex)]
+        for i, a in enumerate(sc[:2]):
+            for j, link in enumerate(a.get("chain") or []):
+                mk = mark(link.get("step", ""))
+                if mk and (rc, ex)[mk[0]] >= mk[1] and (i, j) not in first:
+                    first[(i, j)] = d
+    broken = None
+    for i, a in enumerate(sc[:2]):
+        for j, link in enumerate(a.get("chain") or []):
+            if not mark(link.get("step", "")):
+                continue   # 기준을 읽을 수 없는 고리(사실 확인 줄)는 등록 때 상태 그대로
+            if (i, j) in first:
+                link.update(state="done", date=md(first[(i, j)]))
+            elif res:
+                if fc.get("pick") == i + 1 and k == "miss" and broken is None:
+                    link.update(state="broken", date=md(end_day))
+                    broken = (i, link)
+                else:
+                    link.update(state="no")
+    if not broken:
+        return
+    i, link = broken
+    rw, rv = REV[s_]
+    shock = SHOCK[s_]
+    more = "빠졌" if s_ < 0 else "올랐"
+    if i == 0:   # 되찾기를 골랐는데 더 갔다
+        got = best[0] or 0
+        did = f"{shock} 폭을 {recov_word(got)} {rv}하는 데 그치고" if got > 0 else f"{shock} 뒤 {rv}하지 못하고"
+        real = f"{did}, {md(end_day)}에 기준({L:g}{unit})보다 더 {more}습니다."
+    else:   # 지속을 골랐는데 되찾았다
+        went = best[1] or 0
+        did = f"{shock} 뒤 {went:.1f}{unit}까지 더 가고 멈춘 뒤" if went >= 0.1 else f"{shock} 뒤 더 {'빠지지' if s_ < 0 else '오르지'} 않고"
+        real = f"{did}, {md(end_day)}에 {shock} 폭의 절반을 {rv}했습니다."
+    items = [("실제로는", real, "")]
+    other = {1: "good", -1: "bad"}[-sc[i]["dir"]]   # 고른 갈래 반대쪽 기사
+    for e in reversed(log):
+        rows = (e.get("why") or {}).get(other) or []
+        if rows:
+            items.append(("왜", drop_subj(rows[0].get("t", ""), fc.get("subject", "")), ""))
+            break
+    fc["broke"] = {"lead": f'‘{link["step"]}’ 고리에서 끊겼습니다.', "items": items}
+
+
+def _ig(word):
+    ch = (word or "가")[-1]
+    return "이" if 0xAC00 <= ord(ch) <= 0xD7A3 and (ord(ch) - 0xAC00) % 28 else "가"
+
+
+def end_text(fc, st):
+    """판정이 난 전망의 끝 줄 — 무엇으로 끝났는지 한 문장 (2026-11-12 사용자)."""
+    res = (st or {}).get("result") or {}
+    sc, k = fc["scenarios"], (st.get("log") or [{}])[-1].get("key")
+    c = res.get("crossed")
+    name = (sc[fc["pick"] - 1]["name"] if fc.get("pick") and k == "hit" else sc[c - 1]["name"]) if (c or (fc.get("pick") and k == "hit")) else ""
+    if k == "hit" and name:
+        return f"‘{name}’{_ig(name)} 맞아 전망을 마쳤습니다"
+    if k == "miss":
+        return "미리 적은 전망이 틀려 마쳤습니다"
+    if k == "neither":
+        return "정해 둔 기간 안에 기준을 넘지 않아 전망을 마쳤습니다"
+    if k in ("hold", "void"):
+        return "채점하지 않고 전망을 마쳤습니다"
+    if name:
+        return f"‘{name}’{_ig(name)} 일어나 전망을 마쳤습니다"
+    return "전망을 마쳤습니다"
+
+
+def split_done(pub, states):
+    """공개 전망 → (지켜보는 [(reg, fc)], 끝난 [(제목, 일어난 쪽, 결과, slug)], 성적표). 판정이 난 전망(state result)은 목록 · 홈 카드에서 `끝난 전망` 으로 (2026-11-12 사용자: 맞혔는데 계속 지켜보는 줄에 있었다).
+    끝난 전망마다 fc["end_text"] · fc["next_fc"](같은 대상의 지켜보는 전망, 최근 게시 먼저)를 붙인다 — 페이지 끝 줄이 읽는다."""
+    opened, done = [], []
+    for r, fc in pub:
+        res = (states.get(fc["slug"]) or {}).get("result")
+        (done if res else opened).append((r, fc))
+    score = {"n": 0, "hit": 0, "miss": 0, "neither": 0, "watch": 0, "hold": 0, "void": 0}   # 목업 note(`사건 뒤에 적은 보기는 넣지 않습니다`)는 뺐다 — 급락 · 급등 뒤 전망도 우리가 고른 쪽을 채점한다
+    picked = [0, 0]
+    rows = []
+    for r, fc in done:
+        st = states[fc["slug"]]
+        res, k = st["result"], st["log"][-1].get("key")
+        c = res.get("crossed")
+        rows.append((fc["title"], fc["scenarios"][c - 1]["name"] if c else "—", res.get("word", ""), fc["slug"], st["log"][-1].get("day", "")))
+        fc["end_text"] = end_text(fc, st)
+        nx = [f for _, f in opened if f.get("subject") and f.get("subject") == fc.get("subject")]
+        fc["next_fc"] = {"title": nx[-1]["title"], "slug": nx[-1]["slug"]} if nx else None
+        if res.get("unscored"):
+            continue
+        if k in score:
+            score[k] += 1
+            score["n"] += 1
+        if fc.get("pick") and k in ("hit", "miss"):
+            picked[1] += 1
+            picked[0] += k == "hit"
+    score["watch"] = sum(1 for _, fc in opened if not is_stock_fc(fc))
+    score["n"] += score["watch"]
+    if picked[1] >= 5:   # 1개 중 1개를 `대부분` 이라 하지 않게 — 다섯 개부터 (2026-11-12)
+        score["picked_hit"] = tuple(picked)
+    rows.sort(key=lambda x: x[4], reverse=True)   # 최근 끝난 것 먼저
+    return opened, [x[:4] for x in rows], score
+
+
 def scoreboard_card(sc):
     """우리 전망 성적표 (11절 2) — sc = {"n", "hit", "miss", "neither", "watch", "picked_hit": (m, n), "note"}. 겹친 전망은 따로."""
     lines = [("큰 사건마다 결과가 나오기 전에 두 갈래를 적어 두고, 지나고 나서 맞았는지를 그대로 셉니다. 지우거나 고치지 않습니다.", "plain"),
@@ -2143,6 +2331,30 @@ def done_list(done):
     return f'<style>{css}</style><details class="fc-done" style="margin:28px 0 0;">{head}<div>{radios}{body}</div></details>'
 
 
+MKT_TABS = (("us", "미국"), ("kr", "한국"))   # 목록 탭 순서 — 한국 탭 = #tab-1 (홈 한국 카드 · 하단 메뉴가 이 번호로 연다, 2026-11-12 사용자 홈 나누기)
+
+
+def mkt_of(fc):
+    return fc.get("market") or "us"
+
+
+def list_body_tabs(groups, states=None):
+    """목록 = 미국 · 한국 탭 (2026-11-12 사용자: 홈 나누기에 맞춰 증시 전망도 나라별). groups = {mkt: (열린, 끝난, 성적표)}.
+    탭은 테마 표준 탭(h2 data-tab, 가이드라인 11절) — 탭 이름과 같은 구획 제목은 테마가 숨긴다. 탭마다 지켜보는 전망 · 성적표 · 끝난 전망을 따로."""
+    out = ""
+    for m, name in MKT_TABS:
+        opened, done, score = groups.get(m, ([], [], None))
+        out += dk.h2(name, line=False, tab=name) + _list_inner(opened, states or {}, done, score if score and score.get("n") else None)
+    return dk.fix_colons(f'<div data-list-url="{BLOG}" data-head-title="{HEAD_LIST}" data-seo-lead="증시 전망, 큰 사건 전에 두 갈래 전망을 적어 두고 숫자로 확인한 기록">{out}</div>') + RELATED
+
+
+def _list_inner(pairs, states, done, score):
+    rows = [_row(fc, states.get(fc["slug"], {})) for _, fc in pairs]
+    opened = "".join(rows) if rows else dk.muted("지금 지켜보는 전망이 없습니다")
+    board = f'<div style="margin:28px 0 0;">{scoreboard_card(score)}</div>' if score else ""
+    return f'<div style="margin:12px 0 0;">{opened}</div>' + board + done_list(done)
+
+
 def list_body(pairs, states=None, done=(), score=None):
     """pairs = [(reg, fc)] 열린 전망, states = {slug: state}, done = [(전망, 결과, 최종)] 끝난 전망(지우지 않고 쌓는다). score = 성적표(없으면 안 그린다)."""
     states = states or {}
@@ -2157,11 +2369,11 @@ def list_body(pairs, states=None, done=(), score=None):
 
 # ---------------------------------------------------------------- 홈 카드 JSON (국면 한 마디는 넣지 않는다 — 2026-11-07 사용자, 제목 · 라벨 · 게시일만)
 
-def home_card(pairs, generated=""):
-    out = {"id": "hypo-card", "label": CARD_NAME, "generated": generated, "list_url": page_url(LIST_SLUG), "open": [], "done_count": 0}
-    for reg, fc in pairs:
+def home_card(pairs, generated="", done_count=0):
+    out = {"id": "hypo-card", "label": CARD_NAME, "generated": generated, "list_url": page_url(LIST_SLUG), "open": [], "done_count": done_count}
+    for reg, fc in pairs:   # market = 홈 미국 · 한국 화면이 제 나라 전망만 거른다 (2026-11-12 사용자 홈 나누기)
         out["open"].append({"no": fc["no"], "eh": reg["id"], "title": fc["title"], "url": page_url(fc["slug"]),
-                            "posted": fc["posted"], "tags": fc.get("tags", []), "event": fc["event"]})
+                            "posted": fc["posted"], "tags": fc.get("tags", []), "event": fc["event"], "market": mkt_of(fc)})
     return out
 
 

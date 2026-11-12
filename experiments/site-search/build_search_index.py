@@ -23,6 +23,7 @@ sys.path[:0] = [EXP, os.path.join(EXP, "stock-radar"), os.path.join(EXP, "kr-sto
 import tech_signals as T  # noqa: E402
 import universe as U  # noqa: E402
 import universe_kr as UK  # noqa: E402
+import etf_universe as E  # noqa: E402
 
 BLOG = "https://alpha-scope.blogspot.com"
 OUT = os.path.join(HERE, "output", "search_index.json")
@@ -132,7 +133,72 @@ def us_news(news, sym, n=3):
     return [[(v.get("published_at") or "")[:10], v.get("title_ko") or v.get("fact"), v.get("source") or ""] for v in rows[:n]]
 
 
-def us_stocks(today):
+# ---------------------------------------------------------------- `왜 떨어졌어 · 왜 올랐어` 근거 (2026-11-12 사용자: "증시 전망 하락 근거 규칙을 참고해서 비슷하게")
+# 증시 전망 이유 카드(issue_store/forecast_register)와 같은 재료 · 같은 함수 — 새 수집 · AI 0:
+#   ① 기사 요약 줄 태그의 좋은 소식 · 나쁜 소식 · 방향 안 정해진 일(side_news, 이 종목 lv3 · 같은 업종 lv2)  ② 애널리스트 목표가 · 의견 변경(est_history, 날짜별)
+#   ③ 평소 하루 움직임(직전 60거래일 하루 변화 표준편차)  ④ 알파스코프 신호(종목 페이지 판정 기록 — 상태 저장소가 있을 때만)
+# 최근 WHY_DAYS 일만 담고, 화면(search.js)이 질문 기간(그날 · 1주 · 1달)으로 다시 거른다. 갈래마다 WHY_KEEP 줄 상한.
+WHY_DAYS, WHY_KEEP = 31, 8
+
+
+def _sd60(bars):
+    import statistics
+    cl = [b["close"] for b in bars[-61:] if b.get("close")]
+    ch = [(b / a - 1) * 100 for a, b in zip(cl, cl[1:])]
+    return round(statistics.pstdev(ch), 2) if len(ch) >= 20 else None
+
+
+def _analyst_days(sym, lo, hi, est):
+    """lo ~ hi 에 바뀐 목표가 · 의견 → [[날짜, 'down' | 'up' | 'cut']] (forecast_register._analyst 와 같은 중복 제거)."""
+    seen, out = set(), []
+    for day in sorted(est):
+        for ch in (((est[day] or {}).get(sym) or {}).get("analysts") or {}).get("changes") or []:
+            at = str(ch.get("at") or "")[:10]
+            key = (ch.get("firm"), at, ch.get("pt"))
+            if key in seen or not (lo <= at <= hi):
+                continue
+            seen.add(key)
+            if ch.get("pt_action") == "Lowers":
+                out.append([at, "down"])
+            elif ch.get("pt_action") == "Raises":
+                out.append([at, "up"])
+            if ch.get("action") == "down":
+                out.append([at, "cut"])
+    return out
+
+
+def why_block(sym, bars, news, data_dir, state_dir):
+    day = bars[-1]["day"]
+    lo = (date.fromisoformat(day) - timedelta(days=WHY_DAYS)).isoformat()
+    hi = (date.fromisoformat(day) + timedelta(days=1)).isoformat()
+    out = {"sd": _sd60(bars)}
+    try:
+        sys.path.insert(0, os.path.join(EXP, "issue_store"))
+        import forecast_register as FR
+        side = FR.side_news({"sym": sym, "mkt": FR._etf_of(sym), "stock": True}, lo, hi, news, os.path.join(data_dir, "news_summaries.json"))
+        for k in ("bad", "good", "open"):
+            rows = [[r["day"], r["t"], r.get("src") or "", r["lv"]] for r in side.get(k) or []]
+            if rows:
+                out[k] = rows[:WHY_KEEP]
+    except Exception as e:  # noqa: BLE001
+        print(f"[search] {sym} 근거 줄 실패: {type(e).__name__}: {e}")
+    est_path = os.path.join(data_dir, "est_history.json")
+    if os.path.exists(est_path):
+        an = _analyst_days(sym, lo, day, load(est_path))
+        if an:
+            out["an"] = an
+    if state_dir:
+        try:
+            import forecast_register as FR
+            sg = FR.our_signals({"sym": sym, "mkt": FR._etf_of(sym), "stock": True}, lo, day, os.path.join(state_dir, "radar"))
+            if sg and sg.get("rows"):
+                out["sig"] = {"d": sg.get("as_of"), "rows": [[r["name"], r["state"], r["dir"], r["hz"]] for r in sg["rows"] if r.get("dir")]}
+        except Exception as e:  # noqa: BLE001
+            print(f"[search] {sym} 알파스코프 신호 실패: {type(e).__name__}: {e}")
+    return out
+
+
+def us_stocks(today, state_dir=None):
     us_snap = load(os.path.join(EXP, "stock-radar", "data", "snapshot.json"))
     us_x = load(os.path.join(EXP, "stock-radar", "data", "extra.json"))
     news_path = os.path.join(EXP, "stock-radar", "data", "news.json")
@@ -148,7 +214,7 @@ def us_stocks(today):
              "a": aliases(sym, name, [(co.get("name") or "").split(" ")[0]]),
              "p": price_block(bars), "t": tech_block(bars, "us"), "cap": us_snap["caps"].get(sym),
              "rev": rev_block(us_x["revenue"]["series"].get(sym)), "ne": next_earn(us_snap["earnings"].get(sym), today),
-             "news": us_news(news, sym)}
+             "news": us_news(news, sym), "why": why_block(sym, bars, news, os.path.join(EXP, "stock-radar", "data"), state_dir)}
         s.update(eps_block(x))
         if co:
             s["co"] = {"nm": co.get("name"), "ceo": (co.get("ceo") or "").replace("  ", " "), "hq": ", ".join(v for v in (co.get("city"), co.get("state"), co.get("country")) if v),
@@ -182,23 +248,38 @@ def kr_stocks(today):
     return stocks
 
 
+def etfs(market):
+    """회원 `내 종목` ETF (2026-11-12) — 가격 · 평균선만. 페이지 · 실적 · 뉴스 없음. `etfs` 칸이라 검색창(search.js, `stocks` 만 읽음)에는 안 나온다."""
+    snap = load(os.path.join(EXP, "stock-radar" if market == "us" else "kr-stocks", "data", "snapshot.json"))
+    out = []
+    for sym, name, tracks, extra in (E.US if market == "us" else E.KR):
+        bars = snap["bars"].get(sym)
+        if not bars or len(bars) < 30:
+            continue
+        out.append({"s": sym, "n": name, "m": market, "k": "etf", "tr": tracks, "u": E.page_url(sym), "a": aliases(sym, name, extra),
+                    "p": price_block(bars), "t": {"ma": tech_block(bars, market)["ma"]}})
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--market", choices=("us", "kr", "all"), default="all")
     ap.add_argument("--out", default=OUT)
+    ap.add_argument("--state", default=None, help="상태 저장소 폴더 — 있으면 알파스코프 신호(radar/records/verdicts)를 근거에 넣는다")
     a = ap.parse_args()
     today = date.today().isoformat()
-    stocks = (us_stocks(today) if a.market in ("us", "all") else []) + (kr_stocks(today) if a.market in ("kr", "all") else [])
+    stocks = (us_stocks(today, a.state) if a.market in ("us", "all") else []) + (kr_stocks(today) if a.market in ("kr", "all") else [])
     # 종목이 너무 적으면 자료가 덜 받아진 날 — 올리지 않고 전날 파일을 둔다
     want = {"us": 20, "kr": 10, "all": 30}[a.market]
     if len(stocks) < want:
         sys.exit(f"색인 종목 {len(stocks)}개 < {want} — 만들지 않음(전날 파일 유지)")
     out = os.path.abspath(a.out)
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    doc = {"built": datetime.now().strftime("%Y-%m-%d %H:%M"), "stocks": stocks}
+    doc = {"built": datetime.now().strftime("%Y-%m-%d %H:%M"), "stocks": stocks,
+           "etfs": [x for m in (("us", "kr") if a.market == "all" else (a.market,)) for x in etfs(m)]}
     with open(out, "w", encoding="utf-8") as f:
         json.dump(doc, f, ensure_ascii=False, separators=(",", ":"))
-    print(f"만듦: {out} — 미국 {sum(s['m'] == 'us' for s in stocks)} · 한국 {sum(s['m'] == 'kr' for s in stocks)}종목, {os.path.getsize(out) / 1024:.0f}KB")
+    print(f"만듦: {out} — 미국 {sum(s['m'] == 'us' for s in stocks)} · 한국 {sum(s['m'] == 'kr' for s in stocks)}종목 · ETF {len(doc['etfs'])}개, {os.path.getsize(out) / 1024:.0f}KB")
 
 
 if __name__ == "__main__":

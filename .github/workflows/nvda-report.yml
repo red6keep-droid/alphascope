@@ -158,6 +158,8 @@ jobs:
           fi
           # 트럼프 반응 통계 — trump_bridge 가 state/trump-state 를 git show 로 읽는다 (2026-11-04: 공개 raw URL 대신)
           git fetch --no-tags state trump-state:refs/remotes/state/trump-state 2>/dev/null || echo "trump-state 없음 — 트럼프 구획 없이"
+          # 한국 전망 근거 — kr_why 가 state/kr-state 를 git show 로 읽는다(외국인 수급 · 실적 공시일 · 애널리스트 평균 · 알파스코프 신호, 2026-11-12). 읽기만
+          git fetch --no-tags state kr-state:refs/remotes/state/kr-state 2>/dev/null || echo "kr-state 없음 — 한국 전망 근거는 방송 · 미국 줄만"
           # 인물 발언 (종목 · 증시 리포트 `인물 발언` 구획, 2026-11-07 P324) — 인물 레이더가 radar-state 에 남긴 파일. 없으면 구획을 뺀다
           mkdir -p experiments/people-radar/output/state
           if git fetch --no-tags state radar-state:refs/remotes/state/radar-state 2>/dev/null; then
@@ -293,6 +295,22 @@ jobs:
           # 홈 `관심 종목` · `섹터 상위 종목` 카드 데이터 (2026-10-21 사용자) — 발행된 페이지만 링크
           python experiments/stock-radar/home_feed.py
           mkdir -p deploy-home && cp experiments/stock-radar/output/home/stocks.json deploy-home/stocks.json
+
+      # ETF 고정 페이지 — 미국 상장 18개 (experiments/stock-etf, 2026-11-12 사용자 A안). 위 레이더 snapshot 일봉만 읽는다 · AI 0.
+      # 구성 · 기본 정보는 주 1회만 받는다(data/etf_fund.json). 게시는 저장소 변수 ETF_PUBLISH=true 일 때만 — 그 전엔 그림자 모드(--dry)
+      - name: ETF pages (미국 상장 18)
+        if: env.DO_PUBLISH == 'true'
+        continue-on-error: true
+        env:
+          ETF_PUBLISH: ${{ vars.ETF_PUBLISH }}
+        run: |
+          python experiments/stock-etf/etf_pages.py --market us
+          if [ "$ETF_PUBLISH" = "true" ]; then python experiments/stock-etf/publish_etf.py --market us
+          else echo "ETF 그림자 모드 — 게시하지 않는다 (저장소 변수 ETF_PUBLISH=true 로 켠다)"; python experiments/stock-etf/publish_etf.py --market us --dry || true; fi
+          mkdir -p "$STATE_DIR/radar"
+          for f in etf_fund.json etf_page_hashes.json etf_pages_live.json; do
+            [ -f "experiments/stock-radar/data/$f" ] && cp "experiments/stock-radar/data/$f" "$STATE_DIR/radar/$f" || true
+          done
 
       # 테마 페이지 3개 (doc/테마-모니터-기획.md, 2026-10-21) — 레이더 자료(snapshot · extra)를 그대로 쓴다. 게시 · 홈 카드(themes.json)
       - name: Theme pages (AI 투자 · 연준 기대 · 임원 매매)

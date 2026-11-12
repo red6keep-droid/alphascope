@@ -66,3 +66,5 @@ experiments/issue_store/output/
 
 # 주식 강좌 목업 — 초안은 비공개 문서 저장소(alphascope-docs)에 있다. 발행 전 글이 공개 저장소에 올라가지 않게 (2026-11-10)
 experiments/course/output/
+experiments/stock-etf/output/pages/
+experiments/stock-etf/data/

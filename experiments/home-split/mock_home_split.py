@@ -42,6 +42,11 @@ def split_html(src, mkt, files=FILES):
                         "var homeLink = document.querySelector('.menu-items .nav-item[aria-current]');", 1)
     # 미리보기 전환 막대(홈 · 목록 · 글 보기)는 이 목업과 상관없어 숨긴다
     html = html.replace("</head>", "<style>.pv-bar{display:none!important}</style>\n</head>", 1)
+    # 증시 전망 카드 자료 = 로컬 forecast_daily 결과(experiments/issue_store/output/forecast/hypo.json) — 홈 화면이 그 나라 전망만 거르는지 본다 (2026-11-12)
+    hp = os.path.join(ROOT, "experiments", "issue_store", "output", "forecast", "hypo.json")
+    if os.path.exists(hp):
+        with open(hp, encoding="utf-8") as f:
+            html = html.replace("<head>", "<head>\n<script>window.PV_HYPO = " + f.read().replace("</", "<\\/") + ";</script>", 1)
     if not (n1 and n2):
         sys.exit(f"바꿀 자리를 못 찾음 (body {n1} · 메뉴 {n2}) — preview.html 구조 확인")
     return html

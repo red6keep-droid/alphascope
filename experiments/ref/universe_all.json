@@ -1,0 +1,5826 @@
+{
+ "built": "2026-11-12",
+ "us": [
+  {
+   "sym": "MMM",
+   "name": "3M",
+   "sector": "Industrials",
+   "sub": "Industrial Conglomerates"
+  },
+  {
+   "sym": "AOS",
+   "name": "A. O. Smith",
+   "sector": "Industrials",
+   "sub": "Building Products"
+  },
+  {
+   "sym": "ABT",
+   "name": "Abbott Laboratories",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "ABBV",
+   "name": "AbbVie",
+   "sector": "Health Care",
+   "sub": "Biotechnology"
+  },
+  {
+   "sym": "ACN",
+   "name": "Accenture",
+   "sector": "Information Technology",
+   "sub": "IT Consulting & Other Services"
+  },
+  {
+   "sym": "ADBE",
+   "name": "Adobe Inc.",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "AMD",
+   "name": "Advanced Micro Devices",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "AES",
+   "name": "AES Corporation",
+   "sector": "Utilities",
+   "sub": "Independent Power Producers & Energy Traders"
+  },
+  {
+   "sym": "AFL",
+   "name": "Aflac",
+   "sector": "Financials",
+   "sub": "Life & Health Insurance"
+  },
+  {
+   "sym": "A",
+   "name": "Agilent Technologies",
+   "sector": "Health Care",
+   "sub": "Life Sciences Tools & Services"
+  },
+  {
+   "sym": "APD",
+   "name": "Air Products",
+   "sector": "Materials",
+   "sub": "Industrial Gases"
+  },
+  {
+   "sym": "ABNB",
+   "name": "Airbnb",
+   "sector": "Consumer Discretionary",
+   "sub": "Hotels, Resorts & Cruise Lines"
+  },
+  {
+   "sym": "AKAM",
+   "name": "Akamai Technologies",
+   "sector": "Information Technology",
+   "sub": "Internet Services & Infrastructure"
+  },
+  {
+   "sym": "ALB",
+   "name": "Albemarle Corporation",
+   "sector": "Materials",
+   "sub": "Specialty Chemicals"
+  },
+  {
+   "sym": "ARE",
+   "name": "Alexandria Real Estate Equities",
+   "sector": "Real Estate",
+   "sub": "Office REITs"
+  },
+  {
+   "sym": "ALGN",
+   "name": "Align Technology",
+   "sector": "Health Care",
+   "sub": "Health Care Supplies"
+  },
+  {
+   "sym": "ALLE",
+   "name": "Allegion",
+   "sector": "Industrials",
+   "sub": "Building Products"
+  },
+  {
+   "sym": "LNT",
+   "name": "Alliant Energy",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "ALL",
+   "name": "Allstate",
+   "sector": "Financials",
+   "sub": "Property & Casualty Insurance"
+  },
+  {
+   "sym": "GOOGL",
+   "name": "Alphabet Inc. (Class A)",
+   "sector": "Communication Services",
+   "sub": "Interactive Media & Services"
+  },
+  {
+   "sym": "GOOG",
+   "name": "Alphabet Inc. (Class C)",
+   "sector": "Communication Services",
+   "sub": "Interactive Media & Services"
+  },
+  {
+   "sym": "MO",
+   "name": "Altria",
+   "sector": "Consumer Staples",
+   "sub": "Tobacco"
+  },
+  {
+   "sym": "AMZN",
+   "name": "Amazon",
+   "sector": "Consumer Discretionary",
+   "sub": "Broadline Retail"
+  },
+  {
+   "sym": "AMCR",
+   "name": "Amcor",
+   "sector": "Materials",
+   "sub": "Paper & Plastic Packaging Products & Materials"
+  },
+  {
+   "sym": "AEE",
+   "name": "Ameren",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "AEP",
+   "name": "American Electric Power",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "AXP",
+   "name": "American Express",
+   "sector": "Financials",
+   "sub": "Consumer Finance"
+  },
+  {
+   "sym": "AIG",
+   "name": "American International Group",
+   "sector": "Financials",
+   "sub": "Multi-line Insurance"
+  },
+  {
+   "sym": "AMT",
+   "name": "American Tower",
+   "sector": "Real Estate",
+   "sub": "Telecom Tower REITs"
+  },
+  {
+   "sym": "AWK",
+   "name": "American Water Works",
+   "sector": "Utilities",
+   "sub": "Water Utilities"
+  },
+  {
+   "sym": "AMP",
+   "name": "Ameriprise Financial",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "AME",
+   "name": "Ametek",
+   "sector": "Industrials",
+   "sub": "Electrical Components & Equipment"
+  },
+  {
+   "sym": "AMGN",
+   "name": "Amgen",
+   "sector": "Health Care",
+   "sub": "Biotechnology"
+  },
+  {
+   "sym": "APH",
+   "name": "Amphenol",
+   "sector": "Information Technology",
+   "sub": "Electronic Components"
+  },
+  {
+   "sym": "ADI",
+   "name": "Analog Devices",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "AON",
+   "name": "Aon plc",
+   "sector": "Financials",
+   "sub": "Insurance Brokers"
+  },
+  {
+   "sym": "APA",
+   "name": "APA Corporation",
+   "sector": "Energy",
+   "sub": "Oil & Gas Exploration & Production"
+  },
+  {
+   "sym": "APO",
+   "name": "Apollo Global Management",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "AAPL",
+   "name": "Apple Inc.",
+   "sector": "Information Technology",
+   "sub": "Technology Hardware, Storage & Peripherals"
+  },
+  {
+   "sym": "AMAT",
+   "name": "Applied Materials",
+   "sector": "Information Technology",
+   "sub": "Semiconductor Materials & Equipment"
+  },
+  {
+   "sym": "APP",
+   "name": "AppLovin",
+   "sector": "Communication Services",
+   "sub": "Advertising"
+  },
+  {
+   "sym": "APTV",
+   "name": "Aptiv",
+   "sector": "Consumer Discretionary",
+   "sub": "Automotive Parts & Equipment"
+  },
+  {
+   "sym": "ACGL",
+   "name": "Arch Capital Group",
+   "sector": "Financials",
+   "sub": "Property & Casualty Insurance"
+  },
+  {
+   "sym": "ADM",
+   "name": "Archer Daniels Midland",
+   "sector": "Consumer Staples",
+   "sub": "Agricultural Products & Services"
+  },
+  {
+   "sym": "ARES",
+   "name": "Ares Management",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "ANET",
+   "name": "Arista Networks",
+   "sector": "Information Technology",
+   "sub": "Communications Equipment"
+  },
+  {
+   "sym": "AJG",
+   "name": "Arthur J. Gallagher & Co.",
+   "sector": "Financials",
+   "sub": "Insurance Brokers"
+  },
+  {
+   "sym": "AIZ",
+   "name": "Assurant",
+   "sector": "Financials",
+   "sub": "Multi-line Insurance"
+  },
+  {
+   "sym": "T",
+   "name": "AT&T",
+   "sector": "Communication Services",
+   "sub": "Integrated Telecommunication Services"
+  },
+  {
+   "sym": "ATO",
+   "name": "Atmos Energy",
+   "sector": "Utilities",
+   "sub": "Gas Utilities"
+  },
+  {
+   "sym": "ADSK",
+   "name": "Autodesk",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "ADP",
+   "name": "Automatic Data Processing",
+   "sector": "Industrials",
+   "sub": "Human Resource & Employment Services"
+  },
+  {
+   "sym": "AZO",
+   "name": "AutoZone",
+   "sector": "Consumer Discretionary",
+   "sub": "Automotive Retail"
+  },
+  {
+   "sym": "AVY",
+   "name": "Avery Dennison",
+   "sector": "Materials",
+   "sub": "Paper & Plastic Packaging Products & Materials"
+  },
+  {
+   "sym": "AXON",
+   "name": "Axon Enterprise",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "BKR",
+   "name": "Baker Hughes",
+   "sector": "Energy",
+   "sub": "Oil & Gas Equipment & Services"
+  },
+  {
+   "sym": "BALL",
+   "name": "Ball Corporation",
+   "sector": "Materials",
+   "sub": "Metal, Glass & Plastic Containers"
+  },
+  {
+   "sym": "BAC",
+   "name": "Bank of America",
+   "sector": "Financials",
+   "sub": "Diversified Banks"
+  },
+  {
+   "sym": "BAX",
+   "name": "Baxter International",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "BDX",
+   "name": "Becton Dickinson",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "BRK-B",
+   "name": "Berkshire Hathaway",
+   "sector": "Financials",
+   "sub": "Multi-Sector Holdings"
+  },
+  {
+   "sym": "BBY",
+   "name": "Best Buy",
+   "sector": "Consumer Discretionary",
+   "sub": "Computer & Electronics Retail"
+  },
+  {
+   "sym": "TECH",
+   "name": "Bio-Techne",
+   "sector": "Health Care",
+   "sub": "Life Sciences Tools & Services"
+  },
+  {
+   "sym": "BIIB",
+   "name": "Biogen",
+   "sector": "Health Care",
+   "sub": "Biotechnology"
+  },
+  {
+   "sym": "BLK",
+   "name": "BlackRock",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "BX",
+   "name": "Blackstone Inc.",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "XYZ",
+   "name": "Block, Inc.",
+   "sector": "Financials",
+   "sub": "Transaction & Payment Processing Services"
+  },
+  {
+   "sym": "BE",
+   "name": "Bloom Energy",
+   "sector": "Industrials",
+   "sub": "Electrical Components & Equipment"
+  },
+  {
+   "sym": "BNY",
+   "name": "BNY Mellon",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "BA",
+   "name": "Boeing",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "BKNG",
+   "name": "Booking Holdings",
+   "sector": "Consumer Discretionary",
+   "sub": "Hotels, Resorts & Cruise Lines"
+  },
+  {
+   "sym": "BSX",
+   "name": "Boston Scientific",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "BMY",
+   "name": "Bristol Myers Squibb",
+   "sector": "Health Care",
+   "sub": "Pharmaceuticals"
+  },
+  {
+   "sym": "AVGO",
+   "name": "Broadcom",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "BR",
+   "name": "Broadridge Financial Solutions",
+   "sector": "Industrials",
+   "sub": "Data Processing & Outsourced Services"
+  },
+  {
+   "sym": "BRO",
+   "name": "Brown & Brown",
+   "sector": "Financials",
+   "sub": "Insurance Brokers"
+  },
+  {
+   "sym": "BF-B",
+   "name": "Brown–Forman",
+   "sector": "Consumer Staples",
+   "sub": "Distillers & Vintners"
+  },
+  {
+   "sym": "BG",
+   "name": "Bunge Global",
+   "sector": "Consumer Staples",
+   "sub": "Agricultural Products & Services"
+  },
+  {
+   "sym": "BXP",
+   "name": "BXP, Inc.",
+   "sector": "Real Estate",
+   "sub": "Office REITs"
+  },
+  {
+   "sym": "CHRW",
+   "name": "C.H. Robinson",
+   "sector": "Industrials",
+   "sub": "Air Freight & Logistics"
+  },
+  {
+   "sym": "CDNS",
+   "name": "Cadence Design Systems",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "CPT",
+   "name": "Camden Property Trust",
+   "sector": "Real Estate",
+   "sub": "Multi-Family Residential REITs"
+  },
+  {
+   "sym": "COF",
+   "name": "Capital One",
+   "sector": "Financials",
+   "sub": "Consumer Finance"
+  },
+  {
+   "sym": "CAH",
+   "name": "Cardinal Health",
+   "sector": "Health Care",
+   "sub": "Health Care Distributors"
+  },
+  {
+   "sym": "CCL",
+   "name": "Carnival Corporation",
+   "sector": "Consumer Discretionary",
+   "sub": "Hotels, Resorts & Cruise Lines"
+  },
+  {
+   "sym": "CARR",
+   "name": "Carrier Global",
+   "sector": "Industrials",
+   "sub": "Building Products"
+  },
+  {
+   "sym": "CVNA",
+   "name": "Carvana",
+   "sector": "Consumer Discretionary",
+   "sub": "Automotive Retail"
+  },
+  {
+   "sym": "CASY",
+   "name": "Casey's",
+   "sector": "Consumer Staples",
+   "sub": "Food Retail"
+  },
+  {
+   "sym": "CAT",
+   "name": "Caterpillar Inc.",
+   "sector": "Industrials",
+   "sub": "Construction Machinery & Heavy Transportation Equipment"
+  },
+  {
+   "sym": "CBOE",
+   "name": "Cboe Global Markets",
+   "sector": "Financials",
+   "sub": "Financial Exchanges & Data"
+  },
+  {
+   "sym": "CBRE",
+   "name": "CBRE Group",
+   "sector": "Real Estate",
+   "sub": "Real Estate Services"
+  },
+  {
+   "sym": "CDW",
+   "name": "CDW Corporation",
+   "sector": "Information Technology",
+   "sub": "Technology Distributors"
+  },
+  {
+   "sym": "COR",
+   "name": "Cencora",
+   "sector": "Health Care",
+   "sub": "Health Care Distributors"
+  },
+  {
+   "sym": "CNC",
+   "name": "Centene Corporation",
+   "sector": "Health Care",
+   "sub": "Managed Health Care"
+  },
+  {
+   "sym": "CNP",
+   "name": "CenterPoint Energy",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "CF",
+   "name": "CF Industries",
+   "sector": "Materials",
+   "sub": "Fertilizers & Agricultural Chemicals"
+  },
+  {
+   "sym": "CRL",
+   "name": "Charles River Laboratories",
+   "sector": "Health Care",
+   "sub": "Life Sciences Tools & Services"
+  },
+  {
+   "sym": "SCHW",
+   "name": "Charles Schwab Corporation",
+   "sector": "Financials",
+   "sub": "Investment Banking & Brokerage"
+  },
+  {
+   "sym": "CHTR",
+   "name": "Charter Communications",
+   "sector": "Communication Services",
+   "sub": "Cable & Satellite"
+  },
+  {
+   "sym": "CVX",
+   "name": "Chevron Corporation",
+   "sector": "Energy",
+   "sub": "Integrated Oil & Gas"
+  },
+  {
+   "sym": "CMG",
+   "name": "Chipotle Mexican Grill",
+   "sector": "Consumer Discretionary",
+   "sub": "Restaurants"
+  },
+  {
+   "sym": "CB",
+   "name": "Chubb Limited",
+   "sector": "Financials",
+   "sub": "Property & Casualty Insurance"
+  },
+  {
+   "sym": "CHD",
+   "name": "Church & Dwight",
+   "sector": "Consumer Staples",
+   "sub": "Household Products"
+  },
+  {
+   "sym": "CIEN",
+   "name": "Ciena",
+   "sector": "Information Technology",
+   "sub": "Communications Equipment"
+  },
+  {
+   "sym": "CI",
+   "name": "Cigna",
+   "sector": "Health Care",
+   "sub": "Health Care Services"
+  },
+  {
+   "sym": "CINF",
+   "name": "Cincinnati Financial",
+   "sector": "Financials",
+   "sub": "Property & Casualty Insurance"
+  },
+  {
+   "sym": "CTAS",
+   "name": "Cintas",
+   "sector": "Industrials",
+   "sub": "Diversified Support Services"
+  },
+  {
+   "sym": "CSCO",
+   "name": "Cisco",
+   "sector": "Information Technology",
+   "sub": "Communications Equipment"
+  },
+  {
+   "sym": "C",
+   "name": "Citigroup",
+   "sector": "Financials",
+   "sub": "Diversified Banks"
+  },
+  {
+   "sym": "CFG",
+   "name": "Citizens Financial Group",
+   "sector": "Financials",
+   "sub": "Regional Banks"
+  },
+  {
+   "sym": "CLX",
+   "name": "Clorox",
+   "sector": "Consumer Staples",
+   "sub": "Household Products"
+  },
+  {
+   "sym": "CME",
+   "name": "CME Group",
+   "sector": "Financials",
+   "sub": "Financial Exchanges & Data"
+  },
+  {
+   "sym": "CMS",
+   "name": "CMS Energy",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "KO",
+   "name": "Coca-Cola Company (The)",
+   "sector": "Consumer Staples",
+   "sub": "Soft Drinks & Non-alcoholic Beverages"
+  },
+  {
+   "sym": "CTSH",
+   "name": "Cognizant",
+   "sector": "Information Technology",
+   "sub": "IT Consulting & Other Services"
+  },
+  {
+   "sym": "COHR",
+   "name": "Coherent Corp.",
+   "sector": "Information Technology",
+   "sub": "Electronic Components"
+  },
+  {
+   "sym": "COIN",
+   "name": "Coinbase",
+   "sector": "Financials",
+   "sub": "Financial Exchanges & Data"
+  },
+  {
+   "sym": "CL",
+   "name": "Colgate-Palmolive",
+   "sector": "Consumer Staples",
+   "sub": "Household Products"
+  },
+  {
+   "sym": "CMCSA",
+   "name": "Comcast",
+   "sector": "Communication Services",
+   "sub": "Cable & Satellite"
+  },
+  {
+   "sym": "FIX",
+   "name": "Comfort Systems USA",
+   "sector": "Industrials",
+   "sub": "Construction & Engineering"
+  },
+  {
+   "sym": "COP",
+   "name": "ConocoPhillips",
+   "sector": "Energy",
+   "sub": "Oil & Gas Exploration & Production"
+  },
+  {
+   "sym": "ED",
+   "name": "Consolidated Edison",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "STZ",
+   "name": "Constellation Brands",
+   "sector": "Consumer Staples",
+   "sub": "Distillers & Vintners"
+  },
+  {
+   "sym": "CEG",
+   "name": "Constellation Energy",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "COO",
+   "name": "Cooper Companies (The)",
+   "sector": "Health Care",
+   "sub": "Health Care Supplies"
+  },
+  {
+   "sym": "CPRT",
+   "name": "Copart",
+   "sector": "Industrials",
+   "sub": "Diversified Support Services"
+  },
+  {
+   "sym": "GLW",
+   "name": "Corning Inc.",
+   "sector": "Information Technology",
+   "sub": "Electronic Components"
+  },
+  {
+   "sym": "CPAY",
+   "name": "Corpay",
+   "sector": "Financials",
+   "sub": "Transaction & Payment Processing Services"
+  },
+  {
+   "sym": "CSGP",
+   "name": "CoStar Group",
+   "sector": "Real Estate",
+   "sub": "Real Estate Services"
+  },
+  {
+   "sym": "COST",
+   "name": "Costco",
+   "sector": "Consumer Staples",
+   "sub": "Consumer Staples Merchandise Retail"
+  },
+  {
+   "sym": "CRH",
+   "name": "CRH plc",
+   "sector": "Materials",
+   "sub": "Construction Materials"
+  },
+  {
+   "sym": "CRWD",
+   "name": "CrowdStrike",
+   "sector": "Information Technology",
+   "sub": "Systems Software"
+  },
+  {
+   "sym": "CCI",
+   "name": "Crown Castle",
+   "sector": "Real Estate",
+   "sub": "Telecom Tower REITs"
+  },
+  {
+   "sym": "CSX",
+   "name": "CSX Corporation",
+   "sector": "Industrials",
+   "sub": "Rail Transportation"
+  },
+  {
+   "sym": "CMI",
+   "name": "Cummins",
+   "sector": "Industrials",
+   "sub": "Construction Machinery & Heavy Transportation Equipment"
+  },
+  {
+   "sym": "CVS",
+   "name": "CVS Health",
+   "sector": "Health Care",
+   "sub": "Health Care Services"
+  },
+  {
+   "sym": "DHR",
+   "name": "Danaher Corporation",
+   "sector": "Health Care",
+   "sub": "Life Sciences Tools & Services"
+  },
+  {
+   "sym": "DRI",
+   "name": "Darden Restaurants",
+   "sector": "Consumer Discretionary",
+   "sub": "Restaurants"
+  },
+  {
+   "sym": "DDOG",
+   "name": "Datadog",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "DVA",
+   "name": "DaVita",
+   "sector": "Health Care",
+   "sub": "Health Care Services"
+  },
+  {
+   "sym": "DECK",
+   "name": "Deckers Brands",
+   "sector": "Consumer Discretionary",
+   "sub": "Footwear"
+  },
+  {
+   "sym": "DE",
+   "name": "Deere & Company",
+   "sector": "Industrials",
+   "sub": "Agricultural & Farm Machinery"
+  },
+  {
+   "sym": "DELL",
+   "name": "Dell Technologies",
+   "sector": "Information Technology",
+   "sub": "Technology Hardware, Storage & Peripherals"
+  },
+  {
+   "sym": "DAL",
+   "name": "Delta Air Lines",
+   "sector": "Industrials",
+   "sub": "Passenger Airlines"
+  },
+  {
+   "sym": "DVN",
+   "name": "Devon Energy",
+   "sector": "Energy",
+   "sub": "Oil & Gas Exploration & Production"
+  },
+  {
+   "sym": "DXCM",
+   "name": "Dexcom",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "FANG",
+   "name": "Diamondback Energy",
+   "sector": "Energy",
+   "sub": "Oil & Gas Exploration & Production"
+  },
+  {
+   "sym": "DLR",
+   "name": "Digital Realty",
+   "sector": "Real Estate",
+   "sub": "Data Center REITs"
+  },
+  {
+   "sym": "DG",
+   "name": "Dollar General",
+   "sector": "Consumer Staples",
+   "sub": "Consumer Staples Merchandise Retail"
+  },
+  {
+   "sym": "DLTR",
+   "name": "Dollar Tree",
+   "sector": "Consumer Staples",
+   "sub": "Consumer Staples Merchandise Retail"
+  },
+  {
+   "sym": "D",
+   "name": "Dominion Energy",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "DPZ",
+   "name": "Domino's",
+   "sector": "Consumer Discretionary",
+   "sub": "Restaurants"
+  },
+  {
+   "sym": "DASH",
+   "name": "DoorDash",
+   "sector": "Consumer Discretionary",
+   "sub": "Specialized Consumer Services"
+  },
+  {
+   "sym": "DOV",
+   "name": "Dover Corporation",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "DOW",
+   "name": "Dow Inc.",
+   "sector": "Materials",
+   "sub": "Commodity Chemicals"
+  },
+  {
+   "sym": "DHI",
+   "name": "D. R. Horton",
+   "sector": "Consumer Discretionary",
+   "sub": "Homebuilding"
+  },
+  {
+   "sym": "DTE",
+   "name": "DTE Energy",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "DUK",
+   "name": "Duke Energy",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "DD",
+   "name": "DuPont",
+   "sector": "Industrials",
+   "sub": "Industrial Conglomerates"
+  },
+  {
+   "sym": "ETN",
+   "name": "Eaton Corporation",
+   "sector": "Industrials",
+   "sub": "Electrical Components & Equipment"
+  },
+  {
+   "sym": "EBAY",
+   "name": "eBay Inc.",
+   "sector": "Consumer Discretionary",
+   "sub": "Broadline Retail"
+  },
+  {
+   "sym": "ECHO",
+   "name": "EchoStar",
+   "sector": "Communication Services",
+   "sub": "Wireless Telecommunication Services"
+  },
+  {
+   "sym": "ECL",
+   "name": "Ecolab",
+   "sector": "Materials",
+   "sub": "Specialty Chemicals"
+  },
+  {
+   "sym": "EIX",
+   "name": "Edison International",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "EW",
+   "name": "Edwards Lifesciences",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "ELV",
+   "name": "Elevance Health",
+   "sector": "Health Care",
+   "sub": "Managed Health Care"
+  },
+  {
+   "sym": "EME",
+   "name": "Emcor",
+   "sector": "Industrials",
+   "sub": "Construction & Engineering"
+  },
+  {
+   "sym": "EMR",
+   "name": "Emerson Electric",
+   "sector": "Industrials",
+   "sub": "Electrical Components & Equipment"
+  },
+  {
+   "sym": "ETR",
+   "name": "Entergy",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "EOG",
+   "name": "EOG Resources",
+   "sector": "Energy",
+   "sub": "Oil & Gas Exploration & Production"
+  },
+  {
+   "sym": "EQT",
+   "name": "EQT Corporation",
+   "sector": "Energy",
+   "sub": "Oil & Gas Exploration & Production"
+  },
+  {
+   "sym": "EFX",
+   "name": "Equifax",
+   "sector": "Industrials",
+   "sub": "Research & Consulting Services"
+  },
+  {
+   "sym": "EQIX",
+   "name": "Equinix",
+   "sector": "Real Estate",
+   "sub": "Data Center REITs"
+  },
+  {
+   "sym": "ERIE",
+   "name": "Erie Indemnity",
+   "sector": "Financials",
+   "sub": "Insurance Brokers"
+  },
+  {
+   "sym": "ESS",
+   "name": "Essex Property Trust",
+   "sector": "Real Estate",
+   "sub": "Multi-Family Residential REITs"
+  },
+  {
+   "sym": "EL",
+   "name": "Estée Lauder Companies (The)",
+   "sector": "Consumer Staples",
+   "sub": "Personal Care Products"
+  },
+  {
+   "sym": "EG",
+   "name": "Everest Group",
+   "sector": "Financials",
+   "sub": "Reinsurance"
+  },
+  {
+   "sym": "EVRG",
+   "name": "Evergy",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "P",
+   "name": "Everpure",
+   "sector": "Information Technology",
+   "sub": "Technology Hardware, Storage & Peripherals"
+  },
+  {
+   "sym": "ES",
+   "name": "Eversource Energy",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "EXC",
+   "name": "Exelon",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "EXE",
+   "name": "Expand Energy",
+   "sector": "Energy",
+   "sub": "Oil & Gas Exploration & Production"
+  },
+  {
+   "sym": "EXPE",
+   "name": "Expedia Group",
+   "sector": "Consumer Discretionary",
+   "sub": "Hotels, Resorts & Cruise Lines"
+  },
+  {
+   "sym": "EXPD",
+   "name": "Expeditors International",
+   "sector": "Industrials",
+   "sub": "Air Freight & Logistics"
+  },
+  {
+   "sym": "EXR",
+   "name": "Extra Space Storage",
+   "sector": "Real Estate",
+   "sub": "Self-Storage REITs"
+  },
+  {
+   "sym": "XOM",
+   "name": "ExxonMobil",
+   "sector": "Energy",
+   "sub": "Integrated Oil & Gas"
+  },
+  {
+   "sym": "FFIV",
+   "name": "F5, Inc.",
+   "sector": "Information Technology",
+   "sub": "Communications Equipment"
+  },
+  {
+   "sym": "FDS",
+   "name": "FactSet",
+   "sector": "Financials",
+   "sub": "Financial Exchanges & Data"
+  },
+  {
+   "sym": "FICO",
+   "name": "Fair Isaac",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "FAST",
+   "name": "Fastenal",
+   "sector": "Industrials",
+   "sub": "Trading Companies & Distributors"
+  },
+  {
+   "sym": "FRT",
+   "name": "Federal Realty Investment Trust",
+   "sector": "Real Estate",
+   "sub": "Retail REITs"
+  },
+  {
+   "sym": "FDX",
+   "name": "FedEx",
+   "sector": "Industrials",
+   "sub": "Air Freight & Logistics"
+  },
+  {
+   "sym": "FDXF",
+   "name": "FedEx Freight",
+   "sector": "Industrials",
+   "sub": "Cargo Ground Transportation"
+  },
+  {
+   "sym": "FERG",
+   "name": "Ferguson Enterprises",
+   "sector": "Industrials",
+   "sub": "Trading Companies & Distributors"
+  },
+  {
+   "sym": "FIS",
+   "name": "Fidelity National Information Services",
+   "sector": "Financials",
+   "sub": "Transaction & Payment Processing Services"
+  },
+  {
+   "sym": "FITB",
+   "name": "Fifth Third Bancorp",
+   "sector": "Financials",
+   "sub": "Regional Banks"
+  },
+  {
+   "sym": "FSLR",
+   "name": "First Solar",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "FE",
+   "name": "FirstEnergy",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "FISV",
+   "name": "Fiserv",
+   "sector": "Financials",
+   "sub": "Transaction & Payment Processing Services"
+  },
+  {
+   "sym": "FLEX",
+   "name": "Flex Ltd.",
+   "sector": "Information Technology",
+   "sub": "Electronic Manufacturing Services"
+  },
+  {
+   "sym": "F",
+   "name": "Ford Motor Company",
+   "sector": "Consumer Discretionary",
+   "sub": "Automobile Manufacturers"
+  },
+  {
+   "sym": "FTNT",
+   "name": "Fortinet",
+   "sector": "Information Technology",
+   "sub": "Systems Software"
+  },
+  {
+   "sym": "FTV",
+   "name": "Fortive",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "FOXA",
+   "name": "Fox Corporation (Class A)",
+   "sector": "Communication Services",
+   "sub": "Broadcasting"
+  },
+  {
+   "sym": "FOX",
+   "name": "Fox Corporation (Class B)",
+   "sector": "Communication Services",
+   "sub": "Broadcasting"
+  },
+  {
+   "sym": "BEN",
+   "name": "Franklin Resources",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "FCX",
+   "name": "Freeport-McMoRan",
+   "sector": "Materials",
+   "sub": "Copper"
+  },
+  {
+   "sym": "GRMN",
+   "name": "Garmin",
+   "sector": "Consumer Discretionary",
+   "sub": "Consumer Electronics"
+  },
+  {
+   "sym": "IT",
+   "name": "Gartner",
+   "sector": "Information Technology",
+   "sub": "IT Consulting & Other Services"
+  },
+  {
+   "sym": "GE",
+   "name": "GE Aerospace",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "GEHC",
+   "name": "GE HealthCare",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "GEV",
+   "name": "GE Vernova",
+   "sector": "Industrials",
+   "sub": "Heavy Electrical Equipment"
+  },
+  {
+   "sym": "GEN",
+   "name": "Gen Digital",
+   "sector": "Information Technology",
+   "sub": "Systems Software"
+  },
+  {
+   "sym": "GNRC",
+   "name": "Generac",
+   "sector": "Industrials",
+   "sub": "Heavy Electrical Equipment"
+  },
+  {
+   "sym": "GD",
+   "name": "General Dynamics",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "GIS",
+   "name": "General Mills",
+   "sector": "Consumer Staples",
+   "sub": "Packaged Foods & Meats"
+  },
+  {
+   "sym": "GM",
+   "name": "General Motors",
+   "sector": "Consumer Discretionary",
+   "sub": "Automobile Manufacturers"
+  },
+  {
+   "sym": "GPC",
+   "name": "Genuine Parts Company",
+   "sector": "Consumer Discretionary",
+   "sub": "Distributors"
+  },
+  {
+   "sym": "GILD",
+   "name": "Gilead Sciences",
+   "sector": "Health Care",
+   "sub": "Biotechnology"
+  },
+  {
+   "sym": "GPN",
+   "name": "Global Payments",
+   "sector": "Financials",
+   "sub": "Transaction & Payment Processing Services"
+  },
+  {
+   "sym": "GL",
+   "name": "Globe Life",
+   "sector": "Financials",
+   "sub": "Life & Health Insurance"
+  },
+  {
+   "sym": "GDDY",
+   "name": "GoDaddy",
+   "sector": "Information Technology",
+   "sub": "Internet Services & Infrastructure"
+  },
+  {
+   "sym": "GS",
+   "name": "Goldman Sachs",
+   "sector": "Financials",
+   "sub": "Investment Banking & Brokerage"
+  },
+  {
+   "sym": "HAL",
+   "name": "Halliburton",
+   "sector": "Energy",
+   "sub": "Oil & Gas Equipment & Services"
+  },
+  {
+   "sym": "HIG",
+   "name": "Hartford (The)",
+   "sector": "Financials",
+   "sub": "Property & Casualty Insurance"
+  },
+  {
+   "sym": "HAS",
+   "name": "Hasbro",
+   "sector": "Consumer Discretionary",
+   "sub": "Leisure Products"
+  },
+  {
+   "sym": "HCA",
+   "name": "HCA Healthcare",
+   "sector": "Health Care",
+   "sub": "Health Care Facilities"
+  },
+  {
+   "sym": "DOC",
+   "name": "Healthpeak Properties",
+   "sector": "Real Estate",
+   "sub": "Health Care REITs"
+  },
+  {
+   "sym": "HSIC",
+   "name": "Henry Schein",
+   "sector": "Health Care",
+   "sub": "Health Care Distributors"
+  },
+  {
+   "sym": "HSY",
+   "name": "Hershey Company (The)",
+   "sector": "Consumer Staples",
+   "sub": "Packaged Foods & Meats"
+  },
+  {
+   "sym": "HPE",
+   "name": "Hewlett Packard Enterprise",
+   "sector": "Information Technology",
+   "sub": "Technology Hardware, Storage & Peripherals"
+  },
+  {
+   "sym": "HLT",
+   "name": "Hilton Worldwide",
+   "sector": "Consumer Discretionary",
+   "sub": "Hotels, Resorts & Cruise Lines"
+  },
+  {
+   "sym": "HD",
+   "name": "Home Depot (The)",
+   "sector": "Consumer Discretionary",
+   "sub": "Home Improvement Retail"
+  },
+  {
+   "sym": "HONA",
+   "name": "Honeywell Aerospace",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "HON",
+   "name": "Honeywell Technologies",
+   "sector": "Industrials",
+   "sub": "Industrial Conglomerates"
+  },
+  {
+   "sym": "HRL",
+   "name": "Hormel Foods",
+   "sector": "Consumer Staples",
+   "sub": "Packaged Foods & Meats"
+  },
+  {
+   "sym": "HST",
+   "name": "Host Hotels & Resorts",
+   "sector": "Real Estate",
+   "sub": "Hotel & Resort REITs"
+  },
+  {
+   "sym": "HWM",
+   "name": "Howmet Aerospace",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "HPQ",
+   "name": "HP Inc.",
+   "sector": "Information Technology",
+   "sub": "Technology Hardware, Storage & Peripherals"
+  },
+  {
+   "sym": "HUBB",
+   "name": "Hubbell Incorporated",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "HUM",
+   "name": "Humana",
+   "sector": "Health Care",
+   "sub": "Managed Health Care"
+  },
+  {
+   "sym": "HBAN",
+   "name": "Huntington Bancshares",
+   "sector": "Financials",
+   "sub": "Regional Banks"
+  },
+  {
+   "sym": "HII",
+   "name": "Huntington Ingalls Industries",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "IBM",
+   "name": "IBM",
+   "sector": "Information Technology",
+   "sub": "IT Consulting & Other Services"
+  },
+  {
+   "sym": "IEX",
+   "name": "IDEX Corporation",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "IDXX",
+   "name": "Idexx Laboratories",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "ITW",
+   "name": "Illinois Tool Works",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "ILMN",
+   "name": "Illumina, Inc.",
+   "sector": "Health Care",
+   "sub": "Life Sciences Tools & Services"
+  },
+  {
+   "sym": "INCY",
+   "name": "Incyte",
+   "sector": "Health Care",
+   "sub": "Biotechnology"
+  },
+  {
+   "sym": "IR",
+   "name": "Ingersoll Rand",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "PODD",
+   "name": "Insulet Corporation",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "INTC",
+   "name": "Intel",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "IBKR",
+   "name": "Interactive Brokers",
+   "sector": "Financials",
+   "sub": "Investment Banking & Brokerage"
+  },
+  {
+   "sym": "ICE",
+   "name": "Intercontinental Exchange",
+   "sector": "Financials",
+   "sub": "Financial Exchanges & Data"
+  },
+  {
+   "sym": "IFF",
+   "name": "International Flavors & Fragrances",
+   "sector": "Materials",
+   "sub": "Specialty Chemicals"
+  },
+  {
+   "sym": "IP",
+   "name": "International Paper",
+   "sector": "Materials",
+   "sub": "Paper & Plastic Packaging Products & Materials"
+  },
+  {
+   "sym": "INTU",
+   "name": "Intuit",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "ISRG",
+   "name": "Intuitive Surgical",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "IVZ",
+   "name": "Invesco",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "INVH",
+   "name": "Invitation Homes",
+   "sector": "Real Estate",
+   "sub": "Single-Family Residential REITs"
+  },
+  {
+   "sym": "IQV",
+   "name": "IQVIA",
+   "sector": "Health Care",
+   "sub": "Life Sciences Tools & Services"
+  },
+  {
+   "sym": "IRM",
+   "name": "Iron Mountain",
+   "sector": "Real Estate",
+   "sub": "Other Specialized REITs"
+  },
+  {
+   "sym": "JBHT",
+   "name": "J.B. Hunt",
+   "sector": "Industrials",
+   "sub": "Cargo Ground Transportation"
+  },
+  {
+   "sym": "JBL",
+   "name": "Jabil",
+   "sector": "Information Technology",
+   "sub": "Electronic Manufacturing Services"
+  },
+  {
+   "sym": "JKHY",
+   "name": "Jack Henry & Associates",
+   "sector": "Financials",
+   "sub": "Transaction & Payment Processing Services"
+  },
+  {
+   "sym": "J",
+   "name": "Jacobs Solutions",
+   "sector": "Industrials",
+   "sub": "Construction & Engineering"
+  },
+  {
+   "sym": "JNJ",
+   "name": "Johnson & Johnson",
+   "sector": "Health Care",
+   "sub": "Pharmaceuticals"
+  },
+  {
+   "sym": "JCI",
+   "name": "Johnson Controls",
+   "sector": "Industrials",
+   "sub": "Building Products"
+  },
+  {
+   "sym": "JPM",
+   "name": "JPMorgan Chase",
+   "sector": "Financials",
+   "sub": "Diversified Banks"
+  },
+  {
+   "sym": "KDP",
+   "name": "Keurig Dr Pepper",
+   "sector": "Consumer Staples",
+   "sub": "Soft Drinks & Non-alcoholic Beverages"
+  },
+  {
+   "sym": "KEY",
+   "name": "KeyCorp",
+   "sector": "Financials",
+   "sub": "Regional Banks"
+  },
+  {
+   "sym": "KEYS",
+   "name": "Keysight Technologies",
+   "sector": "Information Technology",
+   "sub": "Electronic Equipment & Instruments"
+  },
+  {
+   "sym": "KMB",
+   "name": "Kimberly-Clark",
+   "sector": "Consumer Staples",
+   "sub": "Household Products"
+  },
+  {
+   "sym": "KIM",
+   "name": "Kimco Realty",
+   "sector": "Real Estate",
+   "sub": "Retail REITs"
+  },
+  {
+   "sym": "KMI",
+   "name": "Kinder Morgan",
+   "sector": "Energy",
+   "sub": "Oil & Gas Storage & Transportation"
+  },
+  {
+   "sym": "KKR",
+   "name": "KKR & Co.",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "KLAC",
+   "name": "KLA Corporation",
+   "sector": "Information Technology",
+   "sub": "Semiconductor Materials & Equipment"
+  },
+  {
+   "sym": "KHC",
+   "name": "Kraft Heinz",
+   "sector": "Consumer Staples",
+   "sub": "Packaged Foods & Meats"
+  },
+  {
+   "sym": "KR",
+   "name": "Kroger",
+   "sector": "Consumer Staples",
+   "sub": "Food Retail"
+  },
+  {
+   "sym": "LHX",
+   "name": "L3Harris",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "LH",
+   "name": "Labcorp",
+   "sector": "Health Care",
+   "sub": "Health Care Services"
+  },
+  {
+   "sym": "LRCX",
+   "name": "Lam Research",
+   "sector": "Information Technology",
+   "sub": "Semiconductor Materials & Equipment"
+  },
+  {
+   "sym": "LVS",
+   "name": "Las Vegas Sands",
+   "sector": "Consumer Discretionary",
+   "sub": "Casinos & Gaming"
+  },
+  {
+   "sym": "LDOS",
+   "name": "Leidos",
+   "sector": "Industrials",
+   "sub": "Diversified Support Services"
+  },
+  {
+   "sym": "LEN",
+   "name": "Lennar",
+   "sector": "Consumer Discretionary",
+   "sub": "Homebuilding"
+  },
+  {
+   "sym": "LII",
+   "name": "Lennox International",
+   "sector": "Industrials",
+   "sub": "Building Products"
+  },
+  {
+   "sym": "LLY",
+   "name": "Lilly (Eli)",
+   "sector": "Health Care",
+   "sub": "Pharmaceuticals"
+  },
+  {
+   "sym": "LIN",
+   "name": "Linde plc",
+   "sector": "Materials",
+   "sub": "Industrial Gases"
+  },
+  {
+   "sym": "LYV",
+   "name": "Live Nation Entertainment",
+   "sector": "Communication Services",
+   "sub": "Movies & Entertainment"
+  },
+  {
+   "sym": "LMT",
+   "name": "Lockheed Martin",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "L",
+   "name": "Loews Corporation",
+   "sector": "Financials",
+   "sub": "Multi-line Insurance"
+  },
+  {
+   "sym": "LOW",
+   "name": "Lowe's",
+   "sector": "Consumer Discretionary",
+   "sub": "Home Improvement Retail"
+  },
+  {
+   "sym": "LULU",
+   "name": "Lululemon Athletica",
+   "sector": "Consumer Discretionary",
+   "sub": "Apparel, Accessories & Luxury Goods"
+  },
+  {
+   "sym": "LITE",
+   "name": "Lumentum",
+   "sector": "Information Technology",
+   "sub": "Communications Equipment"
+  },
+  {
+   "sym": "LYB",
+   "name": "LyondellBasell",
+   "sector": "Materials",
+   "sub": "Specialty Chemicals"
+  },
+  {
+   "sym": "MTB",
+   "name": "M&T Bank",
+   "sector": "Financials",
+   "sub": "Regional Banks"
+  },
+  {
+   "sym": "MPC",
+   "name": "Marathon Petroleum",
+   "sector": "Energy",
+   "sub": "Oil & Gas Refining & Marketing"
+  },
+  {
+   "sym": "MAR",
+   "name": "Marriott International",
+   "sector": "Consumer Discretionary",
+   "sub": "Hotels, Resorts & Cruise Lines"
+  },
+  {
+   "sym": "MRSH",
+   "name": "Marsh McLennan",
+   "sector": "Financials",
+   "sub": "Insurance Brokers"
+  },
+  {
+   "sym": "MLM",
+   "name": "Martin Marietta Materials",
+   "sector": "Materials",
+   "sub": "Construction Materials"
+  },
+  {
+   "sym": "MRVL",
+   "name": "Marvell Technology",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "MAS",
+   "name": "Masco",
+   "sector": "Industrials",
+   "sub": "Building Products"
+  },
+  {
+   "sym": "MA",
+   "name": "Mastercard",
+   "sector": "Financials",
+   "sub": "Transaction & Payment Processing Services"
+  },
+  {
+   "sym": "MKC",
+   "name": "McCormick & Company",
+   "sector": "Consumer Staples",
+   "sub": "Packaged Foods & Meats"
+  },
+  {
+   "sym": "MCD",
+   "name": "McDonald's",
+   "sector": "Consumer Discretionary",
+   "sub": "Restaurants"
+  },
+  {
+   "sym": "MCK",
+   "name": "McKesson",
+   "sector": "Health Care",
+   "sub": "Health Care Distributors"
+  },
+  {
+   "sym": "MDT",
+   "name": "Medtronic",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "MRK",
+   "name": "Merck & Co.",
+   "sector": "Health Care",
+   "sub": "Pharmaceuticals"
+  },
+  {
+   "sym": "META",
+   "name": "Meta Platforms",
+   "sector": "Communication Services",
+   "sub": "Interactive Media & Services"
+  },
+  {
+   "sym": "MET",
+   "name": "MetLife",
+   "sector": "Financials",
+   "sub": "Life & Health Insurance"
+  },
+  {
+   "sym": "MTD",
+   "name": "Mettler Toledo",
+   "sector": "Health Care",
+   "sub": "Life Sciences Tools & Services"
+  },
+  {
+   "sym": "MGM",
+   "name": "MGM Resorts",
+   "sector": "Consumer Discretionary",
+   "sub": "Casinos & Gaming"
+  },
+  {
+   "sym": "MCHP",
+   "name": "Microchip Technology",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "MU",
+   "name": "Micron Technology",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "MSFT",
+   "name": "Microsoft",
+   "sector": "Information Technology",
+   "sub": "Systems Software"
+  },
+  {
+   "sym": "MAA",
+   "name": "Mid-America Apartment Communities",
+   "sector": "Real Estate",
+   "sub": "Multi-Family Residential REITs"
+  },
+  {
+   "sym": "MRNA",
+   "name": "Moderna",
+   "sector": "Health Care",
+   "sub": "Biotechnology"
+  },
+  {
+   "sym": "MDLZ",
+   "name": "Mondelez International",
+   "sector": "Consumer Staples",
+   "sub": "Packaged Foods & Meats"
+  },
+  {
+   "sym": "MPWR",
+   "name": "Monolithic Power Systems",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "MNST",
+   "name": "Monster Beverage",
+   "sector": "Consumer Staples",
+   "sub": "Soft Drinks & Non-alcoholic Beverages"
+  },
+  {
+   "sym": "MCO",
+   "name": "Moody's Corporation",
+   "sector": "Financials",
+   "sub": "Financial Exchanges & Data"
+  },
+  {
+   "sym": "MS",
+   "name": "Morgan Stanley",
+   "sector": "Financials",
+   "sub": "Investment Banking & Brokerage"
+  },
+  {
+   "sym": "MOS",
+   "name": "Mosaic Company (The)",
+   "sector": "Materials",
+   "sub": "Fertilizers & Agricultural Chemicals"
+  },
+  {
+   "sym": "MSI",
+   "name": "Motorola Solutions",
+   "sector": "Information Technology",
+   "sub": "Communications Equipment"
+  },
+  {
+   "sym": "MSCI",
+   "name": "MSCI",
+   "sector": "Financials",
+   "sub": "Financial Exchanges & Data"
+  },
+  {
+   "sym": "NDAQ",
+   "name": "Nasdaq, Inc.",
+   "sector": "Financials",
+   "sub": "Financial Exchanges & Data"
+  },
+  {
+   "sym": "NTAP",
+   "name": "NetApp",
+   "sector": "Information Technology",
+   "sub": "Technology Hardware, Storage & Peripherals"
+  },
+  {
+   "sym": "NFLX",
+   "name": "Netflix",
+   "sector": "Communication Services",
+   "sub": "Movies & Entertainment"
+  },
+  {
+   "sym": "NEM",
+   "name": "Newmont",
+   "sector": "Materials",
+   "sub": "Gold"
+  },
+  {
+   "sym": "NWSA",
+   "name": "News Corp (Class A)",
+   "sector": "Communication Services",
+   "sub": "Publishing"
+  },
+  {
+   "sym": "NWS",
+   "name": "News Corp (Class B)",
+   "sector": "Communication Services",
+   "sub": "Publishing"
+  },
+  {
+   "sym": "NEE",
+   "name": "NextEra Energy",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "NKE",
+   "name": "Nike, Inc.",
+   "sector": "Consumer Discretionary",
+   "sub": "Apparel, Accessories & Luxury Goods"
+  },
+  {
+   "sym": "NI",
+   "name": "NiSource",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "NDSN",
+   "name": "Nordson Corporation",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "NSC",
+   "name": "Norfolk Southern",
+   "sector": "Industrials",
+   "sub": "Rail Transportation"
+  },
+  {
+   "sym": "NTRS",
+   "name": "Northern Trust",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "NOC",
+   "name": "Northrop Grumman",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "NCLH",
+   "name": "Norwegian Cruise Line Holdings",
+   "sector": "Consumer Discretionary",
+   "sub": "Hotels, Resorts & Cruise Lines"
+  },
+  {
+   "sym": "NRG",
+   "name": "NRG Energy",
+   "sector": "Utilities",
+   "sub": "Independent Power Producers & Energy Traders"
+  },
+  {
+   "sym": "NUE",
+   "name": "Nucor",
+   "sector": "Materials",
+   "sub": "Steel"
+  },
+  {
+   "sym": "NVDA",
+   "name": "Nvidia",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "NVR",
+   "name": "NVR, Inc.",
+   "sector": "Consumer Discretionary",
+   "sub": "Homebuilding"
+  },
+  {
+   "sym": "NXPI",
+   "name": "NXP Semiconductors",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "ORLY",
+   "name": "O'Reilly Automotive",
+   "sector": "Consumer Discretionary",
+   "sub": "Automotive Retail"
+  },
+  {
+   "sym": "OXY",
+   "name": "Occidental Petroleum",
+   "sector": "Energy",
+   "sub": "Oil & Gas Exploration & Production"
+  },
+  {
+   "sym": "OKTA",
+   "name": "Okta, Inc.",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "ODFL",
+   "name": "Old Dominion",
+   "sector": "Industrials",
+   "sub": "Cargo Ground Transportation"
+  },
+  {
+   "sym": "OMC",
+   "name": "Omnicom Group",
+   "sector": "Communication Services",
+   "sub": "Advertising"
+  },
+  {
+   "sym": "ON",
+   "name": "ON Semiconductor",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "OKE",
+   "name": "Oneok",
+   "sector": "Energy",
+   "sub": "Oil & Gas Storage & Transportation"
+  },
+  {
+   "sym": "ORCL",
+   "name": "Oracle Corporation",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "OTIS",
+   "name": "Otis Worldwide",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "PCAR",
+   "name": "Paccar",
+   "sector": "Industrials",
+   "sub": "Construction Machinery & Heavy Transportation Equipment"
+  },
+  {
+   "sym": "PKG",
+   "name": "Packaging Corporation of America",
+   "sector": "Materials",
+   "sub": "Paper & Plastic Packaging Products & Materials"
+  },
+  {
+   "sym": "PLTR",
+   "name": "Palantir Technologies",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "PANW",
+   "name": "Palo Alto Networks",
+   "sector": "Information Technology",
+   "sub": "Systems Software"
+  },
+  {
+   "sym": "PH",
+   "name": "Parker Hannifin",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "PAYX",
+   "name": "Paychex",
+   "sector": "Industrials",
+   "sub": "Human Resource & Employment Services"
+  },
+  {
+   "sym": "PYPL",
+   "name": "PayPal",
+   "sector": "Financials",
+   "sub": "Transaction & Payment Processing Services"
+  },
+  {
+   "sym": "PNR",
+   "name": "Pentair",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "PEP",
+   "name": "PepsiCo",
+   "sector": "Consumer Staples",
+   "sub": "Soft Drinks & Non-alcoholic Beverages"
+  },
+  {
+   "sym": "PFE",
+   "name": "Pfizer",
+   "sector": "Health Care",
+   "sub": "Pharmaceuticals"
+  },
+  {
+   "sym": "PCG",
+   "name": "PG&E Corporation",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "PM",
+   "name": "Philip Morris International",
+   "sector": "Consumer Staples",
+   "sub": "Tobacco"
+  },
+  {
+   "sym": "PSX",
+   "name": "Phillips 66",
+   "sector": "Energy",
+   "sub": "Oil & Gas Refining & Marketing"
+  },
+  {
+   "sym": "PNW",
+   "name": "Pinnacle West Capital",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "PNC",
+   "name": "PNC Financial Services",
+   "sector": "Financials",
+   "sub": "Diversified Banks"
+  },
+  {
+   "sym": "PPG",
+   "name": "PPG Industries",
+   "sector": "Materials",
+   "sub": "Specialty Chemicals"
+  },
+  {
+   "sym": "PPL",
+   "name": "PPL Corporation",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "PFG",
+   "name": "Principal Financial Group",
+   "sector": "Financials",
+   "sub": "Life & Health Insurance"
+  },
+  {
+   "sym": "PG",
+   "name": "Procter & Gamble",
+   "sector": "Consumer Staples",
+   "sub": "Personal Care Products"
+  },
+  {
+   "sym": "PGR",
+   "name": "Progressive Corporation",
+   "sector": "Financials",
+   "sub": "Property & Casualty Insurance"
+  },
+  {
+   "sym": "PLD",
+   "name": "Prologis",
+   "sector": "Real Estate",
+   "sub": "Industrial REITs"
+  },
+  {
+   "sym": "PRU",
+   "name": "Prudential Financial",
+   "sector": "Financials",
+   "sub": "Life & Health Insurance"
+  },
+  {
+   "sym": "PTC",
+   "name": "PTC Inc.",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "PEG",
+   "name": "Public Service Enterprise Group",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "PSA",
+   "name": "Public Storage",
+   "sector": "Real Estate",
+   "sub": "Self-Storage REITs"
+  },
+  {
+   "sym": "PHM",
+   "name": "PulteGroup",
+   "sector": "Consumer Discretionary",
+   "sub": "Homebuilding"
+  },
+  {
+   "sym": "Q",
+   "name": "Qnity Electronics",
+   "sector": "Information Technology",
+   "sub": "Semiconductor Materials & Equipment"
+  },
+  {
+   "sym": "QCOM",
+   "name": "Qualcomm",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "PWR",
+   "name": "Quanta Services",
+   "sector": "Industrials",
+   "sub": "Construction & Engineering"
+  },
+  {
+   "sym": "DGX",
+   "name": "Quest Diagnostics",
+   "sector": "Health Care",
+   "sub": "Health Care Services"
+  },
+  {
+   "sym": "RL",
+   "name": "Ralph Lauren Corporation",
+   "sector": "Consumer Discretionary",
+   "sub": "Apparel, Accessories & Luxury Goods"
+  },
+  {
+   "sym": "RJF",
+   "name": "Raymond James Financial",
+   "sector": "Financials",
+   "sub": "Investment Banking & Brokerage"
+  },
+  {
+   "sym": "RDDT",
+   "name": "Reddit",
+   "sector": "Communication Services",
+   "sub": "Interactive Media & Services"
+  },
+  {
+   "sym": "O",
+   "name": "Realty Income",
+   "sector": "Real Estate",
+   "sub": "Retail REITs"
+  },
+  {
+   "sym": "REG",
+   "name": "Regency Centers",
+   "sector": "Real Estate",
+   "sub": "Retail REITs"
+  },
+  {
+   "sym": "REGN",
+   "name": "Regeneron Pharmaceuticals",
+   "sector": "Health Care",
+   "sub": "Biotechnology"
+  },
+  {
+   "sym": "RF",
+   "name": "Regions Financial Corporation",
+   "sector": "Financials",
+   "sub": "Regional Banks"
+  },
+  {
+   "sym": "RSG",
+   "name": "Republic Services",
+   "sector": "Industrials",
+   "sub": "Environmental & Facilities Services"
+  },
+  {
+   "sym": "RMD",
+   "name": "ResMed",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "RVTY",
+   "name": "Revvity",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "HOOD",
+   "name": "Robinhood Markets",
+   "sector": "Financials",
+   "sub": "Investment Banking & Brokerage"
+  },
+  {
+   "sym": "ROK",
+   "name": "Rockwell Automation",
+   "sector": "Industrials",
+   "sub": "Electrical Components & Equipment"
+  },
+  {
+   "sym": "ROL",
+   "name": "Rollins, Inc.",
+   "sector": "Industrials",
+   "sub": "Environmental & Facilities Services"
+  },
+  {
+   "sym": "ROP",
+   "name": "Roper Technologies",
+   "sector": "Information Technology",
+   "sub": "Electronic Equipment & Instruments"
+  },
+  {
+   "sym": "ROST",
+   "name": "Ross Stores",
+   "sector": "Consumer Discretionary",
+   "sub": "Apparel Retail"
+  },
+  {
+   "sym": "RCL",
+   "name": "Royal Caribbean Group",
+   "sector": "Consumer Discretionary",
+   "sub": "Hotels, Resorts & Cruise Lines"
+  },
+  {
+   "sym": "RTX",
+   "name": "RTX Corporation",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "SPGI",
+   "name": "S&P Global",
+   "sector": "Financials",
+   "sub": "Financial Exchanges & Data"
+  },
+  {
+   "sym": "CRM",
+   "name": "Salesforce",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "SNDK",
+   "name": "Sandisk",
+   "sector": "Information Technology",
+   "sub": "Technology Hardware, Storage & Peripherals"
+  },
+  {
+   "sym": "SBAC",
+   "name": "SBA Communications",
+   "sector": "Real Estate",
+   "sub": "Telecom Tower REITs"
+  },
+  {
+   "sym": "SLB",
+   "name": "Schlumberger",
+   "sector": "Energy",
+   "sub": "Oil & Gas Equipment & Services"
+  },
+  {
+   "sym": "STX",
+   "name": "Seagate Technology",
+   "sector": "Information Technology",
+   "sub": "Technology Hardware, Storage & Peripherals"
+  },
+  {
+   "sym": "SRE",
+   "name": "Sempra",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "NOW",
+   "name": "ServiceNow",
+   "sector": "Information Technology",
+   "sub": "Systems Software"
+  },
+  {
+   "sym": "SHW",
+   "name": "Sherwin-Williams",
+   "sector": "Materials",
+   "sub": "Specialty Chemicals"
+  },
+  {
+   "sym": "SPG",
+   "name": "Simon Property Group",
+   "sector": "Real Estate",
+   "sub": "Retail REITs"
+  },
+  {
+   "sym": "SKYD",
+   "name": "Skydance",
+   "sector": "Communication Services",
+   "sub": "Movies & Entertainment"
+  },
+  {
+   "sym": "SWKS",
+   "name": "Skyworks Solutions",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "SJM",
+   "name": "J.M. Smucker Company (The)",
+   "sector": "Consumer Staples",
+   "sub": "Packaged Foods & Meats"
+  },
+  {
+   "sym": "SW",
+   "name": "Smurfit Westrock",
+   "sector": "Materials",
+   "sub": "Paper & Plastic Packaging Products & Materials"
+  },
+  {
+   "sym": "SNA",
+   "name": "Snap-on",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "SOLV",
+   "name": "Solventum",
+   "sector": "Health Care",
+   "sub": "Health Care Technology"
+  },
+  {
+   "sym": "SO",
+   "name": "Southern Company",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "LUV",
+   "name": "Southwest Airlines",
+   "sector": "Industrials",
+   "sub": "Passenger Airlines"
+  },
+  {
+   "sym": "SWK",
+   "name": "Stanley Black & Decker",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "SBUX",
+   "name": "Starbucks",
+   "sector": "Consumer Discretionary",
+   "sub": "Restaurants"
+  },
+  {
+   "sym": "STT",
+   "name": "State Street Corporation",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "STLD",
+   "name": "Steel Dynamics",
+   "sector": "Materials",
+   "sub": "Steel"
+  },
+  {
+   "sym": "STE",
+   "name": "Steris",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "SYK",
+   "name": "Stryker Corporation",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "SMCI",
+   "name": "Supermicro",
+   "sector": "Information Technology",
+   "sub": "Technology Hardware, Storage & Peripherals"
+  },
+  {
+   "sym": "SYF",
+   "name": "Synchrony Financial",
+   "sector": "Financials",
+   "sub": "Consumer Finance"
+  },
+  {
+   "sym": "SNPS",
+   "name": "Synopsys",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "SYY",
+   "name": "Sysco",
+   "sector": "Consumer Staples",
+   "sub": "Food Distributors"
+  },
+  {
+   "sym": "TMUS",
+   "name": "T-Mobile US",
+   "sector": "Communication Services",
+   "sub": "Wireless Telecommunication Services"
+  },
+  {
+   "sym": "TROW",
+   "name": "T. Rowe Price",
+   "sector": "Financials",
+   "sub": "Asset Management & Custody Banks"
+  },
+  {
+   "sym": "TTWO",
+   "name": "Take-Two Interactive",
+   "sector": "Communication Services",
+   "sub": "Interactive Home Entertainment"
+  },
+  {
+   "sym": "TPR",
+   "name": "Tapestry, Inc.",
+   "sector": "Consumer Discretionary",
+   "sub": "Apparel, Accessories & Luxury Goods"
+  },
+  {
+   "sym": "TRGP",
+   "name": "Targa Resources",
+   "sector": "Energy",
+   "sub": "Oil & Gas Storage & Transportation"
+  },
+  {
+   "sym": "TGT",
+   "name": "Target Corporation",
+   "sector": "Consumer Staples",
+   "sub": "Consumer Staples Merchandise Retail"
+  },
+  {
+   "sym": "TEL",
+   "name": "TE Connectivity",
+   "sector": "Information Technology",
+   "sub": "Electronic Manufacturing Services"
+  },
+  {
+   "sym": "TDY",
+   "name": "Teledyne Technologies",
+   "sector": "Information Technology",
+   "sub": "Electronic Equipment & Instruments"
+  },
+  {
+   "sym": "TER",
+   "name": "Teradyne",
+   "sector": "Information Technology",
+   "sub": "Semiconductor Materials & Equipment"
+  },
+  {
+   "sym": "TSLA",
+   "name": "Tesla, Inc.",
+   "sector": "Consumer Discretionary",
+   "sub": "Automobile Manufacturers"
+  },
+  {
+   "sym": "TXN",
+   "name": "Texas Instruments",
+   "sector": "Information Technology",
+   "sub": "Semiconductors"
+  },
+  {
+   "sym": "TPL",
+   "name": "Texas Pacific Land Corporation",
+   "sector": "Energy",
+   "sub": "Oil & Gas Exploration & Production"
+  },
+  {
+   "sym": "TXT",
+   "name": "Textron",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "TMO",
+   "name": "Thermo Fisher Scientific",
+   "sector": "Health Care",
+   "sub": "Life Sciences Tools & Services"
+  },
+  {
+   "sym": "TJX",
+   "name": "TJX Companies",
+   "sector": "Consumer Discretionary",
+   "sub": "Apparel Retail"
+  },
+  {
+   "sym": "TKO",
+   "name": "TKO Group Holdings",
+   "sector": "Communication Services",
+   "sub": "Movies & Entertainment"
+  },
+  {
+   "sym": "TSCO",
+   "name": "Tractor Supply",
+   "sector": "Consumer Discretionary",
+   "sub": "Other Specialty Retail"
+  },
+  {
+   "sym": "TT",
+   "name": "Trane Technologies",
+   "sector": "Industrials",
+   "sub": "Building Products"
+  },
+  {
+   "sym": "TDG",
+   "name": "TransDigm Group",
+   "sector": "Industrials",
+   "sub": "Aerospace & Defense"
+  },
+  {
+   "sym": "TRV",
+   "name": "Travelers Companies (The)",
+   "sector": "Financials",
+   "sub": "Property & Casualty Insurance"
+  },
+  {
+   "sym": "TRMB",
+   "name": "Trimble Inc.",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "TFC",
+   "name": "Truist Financial",
+   "sector": "Financials",
+   "sub": "Diversified Banks"
+  },
+  {
+   "sym": "TWLO",
+   "name": "Twilio",
+   "sector": "Information Technology",
+   "sub": "Systems Software"
+  },
+  {
+   "sym": "TYL",
+   "name": "Tyler Technologies",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "TSN",
+   "name": "Tyson Foods",
+   "sector": "Consumer Staples",
+   "sub": "Packaged Foods & Meats"
+  },
+  {
+   "sym": "USB",
+   "name": "U.S. Bancorp",
+   "sector": "Financials",
+   "sub": "Diversified Banks"
+  },
+  {
+   "sym": "UBER",
+   "name": "Uber",
+   "sector": "Industrials",
+   "sub": "Passenger Ground Transportation"
+  },
+  {
+   "sym": "UDR",
+   "name": "UDR, Inc.",
+   "sector": "Real Estate",
+   "sub": "Multi-Family Residential REITs"
+  },
+  {
+   "sym": "ULTA",
+   "name": "Ulta Beauty",
+   "sector": "Consumer Discretionary",
+   "sub": "Other Specialty Retail"
+  },
+  {
+   "sym": "UNP",
+   "name": "Union Pacific Corporation",
+   "sector": "Industrials",
+   "sub": "Rail Transportation"
+  },
+  {
+   "sym": "UAL",
+   "name": "United Airlines Holdings",
+   "sector": "Industrials",
+   "sub": "Passenger Airlines"
+  },
+  {
+   "sym": "UPS",
+   "name": "United Parcel Service",
+   "sector": "Industrials",
+   "sub": "Air Freight & Logistics"
+  },
+  {
+   "sym": "URI",
+   "name": "United Rentals",
+   "sector": "Industrials",
+   "sub": "Trading Companies & Distributors"
+  },
+  {
+   "sym": "UNH",
+   "name": "UnitedHealth Group",
+   "sector": "Health Care",
+   "sub": "Managed Health Care"
+  },
+  {
+   "sym": "UHS",
+   "name": "Universal Health Services",
+   "sector": "Health Care",
+   "sub": "Health Care Facilities"
+  },
+  {
+   "sym": "VLO",
+   "name": "Valero Energy",
+   "sector": "Energy",
+   "sub": "Oil & Gas Refining & Marketing"
+  },
+  {
+   "sym": "VEEV",
+   "name": "Veeva Systems",
+   "sector": "Health Care",
+   "sub": "Health Care Technology"
+  },
+  {
+   "sym": "VTR",
+   "name": "Ventas",
+   "sector": "Real Estate",
+   "sub": "Health Care REITs"
+  },
+  {
+   "sym": "VLTO",
+   "name": "Veralto",
+   "sector": "Industrials",
+   "sub": "Environmental & Facilities Services"
+  },
+  {
+   "sym": "VRSN",
+   "name": "Verisign",
+   "sector": "Information Technology",
+   "sub": "Internet Services & Infrastructure"
+  },
+  {
+   "sym": "VRSK",
+   "name": "Verisk Analytics",
+   "sector": "Industrials",
+   "sub": "Research & Consulting Services"
+  },
+  {
+   "sym": "VZ",
+   "name": "Verizon",
+   "sector": "Communication Services",
+   "sub": "Integrated Telecommunication Services"
+  },
+  {
+   "sym": "VRTX",
+   "name": "Vertex Pharmaceuticals",
+   "sector": "Health Care",
+   "sub": "Biotechnology"
+  },
+  {
+   "sym": "VRT",
+   "name": "Vertiv",
+   "sector": "Industrials",
+   "sub": "Electrical Components & Equipment"
+  },
+  {
+   "sym": "VTRS",
+   "name": "Viatris",
+   "sector": "Health Care",
+   "sub": "Pharmaceuticals"
+  },
+  {
+   "sym": "VICI",
+   "name": "Vici Properties",
+   "sector": "Real Estate",
+   "sub": "Hotel & Resort REITs"
+  },
+  {
+   "sym": "V",
+   "name": "Visa Inc.",
+   "sector": "Financials",
+   "sub": "Transaction & Payment Processing Services"
+  },
+  {
+   "sym": "VST",
+   "name": "Vistra Corp.",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "VMRK",
+   "name": "Vivmark Residential",
+   "sector": "Real Estate",
+   "sub": "Multi-Family Residential REITs"
+  },
+  {
+   "sym": "VMC",
+   "name": "Vulcan Materials Company",
+   "sector": "Materials",
+   "sub": "Construction Materials"
+  },
+  {
+   "sym": "VYLR",
+   "name": "Vylor",
+   "sector": "Consumer Staples",
+   "sub": "Agricultural Products & Services"
+  },
+  {
+   "sym": "WRB",
+   "name": "W. R. Berkley Corporation",
+   "sector": "Financials",
+   "sub": "Property & Casualty Insurance"
+  },
+  {
+   "sym": "GWW",
+   "name": "W. W. Grainger",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "WAB",
+   "name": "Wabtec",
+   "sector": "Industrials",
+   "sub": "Construction Machinery & Heavy Transportation Equipment"
+  },
+  {
+   "sym": "WMT",
+   "name": "Walmart",
+   "sector": "Consumer Staples",
+   "sub": "Consumer Staples Merchandise Retail"
+  },
+  {
+   "sym": "DIS",
+   "name": "Walt Disney Company (The)",
+   "sector": "Communication Services",
+   "sub": "Movies & Entertainment"
+  },
+  {
+   "sym": "WM",
+   "name": "Waste Management",
+   "sector": "Industrials",
+   "sub": "Environmental & Facilities Services"
+  },
+  {
+   "sym": "WAT",
+   "name": "Waters Corporation",
+   "sector": "Health Care",
+   "sub": "Life Sciences Tools & Services"
+  },
+  {
+   "sym": "WEC",
+   "name": "WEC Energy Group",
+   "sector": "Utilities",
+   "sub": "Electric Utilities"
+  },
+  {
+   "sym": "WFC",
+   "name": "Wells Fargo",
+   "sector": "Financials",
+   "sub": "Diversified Banks"
+  },
+  {
+   "sym": "WELL",
+   "name": "Welltower",
+   "sector": "Real Estate",
+   "sub": "Health Care REITs"
+  },
+  {
+   "sym": "WST",
+   "name": "West Pharmaceutical Services",
+   "sector": "Health Care",
+   "sub": "Health Care Supplies"
+  },
+  {
+   "sym": "WDC",
+   "name": "Western Digital",
+   "sector": "Information Technology",
+   "sub": "Technology Hardware, Storage & Peripherals"
+  },
+  {
+   "sym": "WY",
+   "name": "Weyerhaeuser",
+   "sector": "Real Estate",
+   "sub": "Timber REITs"
+  },
+  {
+   "sym": "WSM",
+   "name": "Williams-Sonoma, Inc.",
+   "sector": "Consumer Discretionary",
+   "sub": "Homefurnishing Retail"
+  },
+  {
+   "sym": "WMB",
+   "name": "Williams Companies",
+   "sector": "Energy",
+   "sub": "Oil & Gas Storage & Transportation"
+  },
+  {
+   "sym": "WTW",
+   "name": "Willis Towers Watson",
+   "sector": "Financials",
+   "sub": "Insurance Brokers"
+  },
+  {
+   "sym": "WDAY",
+   "name": "Workday, Inc.",
+   "sector": "Information Technology",
+   "sub": "Application Software"
+  },
+  {
+   "sym": "WYNN",
+   "name": "Wynn Resorts",
+   "sector": "Consumer Discretionary",
+   "sub": "Casinos & Gaming"
+  },
+  {
+   "sym": "XEL",
+   "name": "Xcel Energy",
+   "sector": "Utilities",
+   "sub": "Multi-Utilities"
+  },
+  {
+   "sym": "XYL",
+   "name": "Xylem Inc.",
+   "sector": "Industrials",
+   "sub": "Industrial Machinery & Supplies & Components"
+  },
+  {
+   "sym": "YUM",
+   "name": "Yum! Brands",
+   "sector": "Consumer Discretionary",
+   "sub": "Restaurants"
+  },
+  {
+   "sym": "ZBRA",
+   "name": "Zebra Technologies",
+   "sector": "Information Technology",
+   "sub": "Electronic Equipment & Instruments"
+  },
+  {
+   "sym": "ZBH",
+   "name": "Zimmer Biomet",
+   "sector": "Health Care",
+   "sub": "Health Care Equipment"
+  },
+  {
+   "sym": "ZTS",
+   "name": "Zoetis",
+   "sector": "Health Care",
+   "sub": "Pharmaceuticals"
+  }
+ ],
+ "kr": [
+  {
+   "code": "005930",
+   "name": "Samsung Electronics Co., Ltd.",
+   "cap": 1746770439147949,
+   "industry": "Semiconductors",
+   "sym": "005930.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000660",
+   "name": "SK hynix Inc.",
+   "cap": 1341841345947266,
+   "industry": "Semiconductors",
+   "sym": "000660.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "402340",
+   "name": "SK Square Co., Ltd.",
+   "cap": 152704753417969,
+   "industry": "Financial Conglomerates",
+   "sym": "402340.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "009150",
+   "name": "Samsung Electro-Mechanics Co., Ltd",
+   "cap": 116426847758532,
+   "industry": "Semiconductors",
+   "sym": "009150.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "373220",
+   "name": "LG Energy Solution Ltd.",
+   "cap": 86814000000000,
+   "industry": "Electrical Products",
+   "sym": "373220.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "005380",
+   "name": "Hyundai Motor Company",
+   "cap": 79430940713120,
+   "industry": "Motor Vehicles",
+   "sym": "005380.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "207940",
+   "name": "SAMSUNG BIOLOGICS Co., Ltd.",
+   "cap": 65139561744690,
+   "industry": "Biotechnology",
+   "sym": "207940.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "105560",
+   "name": "KB Financial Group Inc.",
+   "cap": 56477009234619,
+   "industry": "Regional Banks",
+   "sym": "105560.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "028260",
+   "name": "SAMSUNG C&T CORP",
+   "cap": 53732422436833,
+   "industry": "Engineering & Construction",
+   "sym": "028260.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "034020",
+   "name": "Doosan Enerbility Co., Ltd.",
+   "cap": 51941728527832,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "034020.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "032830",
+   "name": "Samsung Life Insurance Co., Ltd.",
+   "cap": 51897112380981,
+   "industry": "Life/Health Insurance",
+   "sym": "032830.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "055550",
+   "name": "Shinhan Financial Group Co., Ltd.",
+   "cap": 47988571801758,
+   "industry": "Major Banks",
+   "sym": "055550.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "329180",
+   "name": "HD Hyundai Heavy Industries Co., Ltd.",
+   "cap": 44713482879639,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "329180.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000270",
+   "name": "Kia Corporation",
+   "cap": 43190603381348,
+   "industry": "Motor Vehicles",
+   "sym": "000270.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "006400",
+   "name": "Samsung SDI Co., Ltd",
+   "cap": 41170455412090,
+   "industry": "Electrical Products",
+   "sym": "006400.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "068270",
+   "name": "Celltrion, Inc.",
+   "cap": 40426613543701,
+   "industry": "Biotechnology",
+   "sym": "068270.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "066570",
+   "name": "LG Electronics Inc.",
+   "cap": 36469231710815,
+   "industry": "Electronics/Appliances",
+   "sym": "066570.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "012330",
+   "name": "Hyundai Mobis Co., Ltd",
+   "cap": 33343220127106,
+   "industry": "Auto Parts: OEM",
+   "sym": "012330.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "086790",
+   "name": "Hana Financial Group Inc.",
+   "cap": 33312192898560,
+   "industry": "Major Banks",
+   "sym": "086790.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "034730",
+   "name": "SK Inc.",
+   "cap": 31840849853516,
+   "industry": "Financial Conglomerates",
+   "sym": "034730.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "010120",
+   "name": "LS Electric Co., Ltd.",
+   "cap": 31151070182800,
+   "industry": "Electrical Products",
+   "sym": "010120.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "035420",
+   "name": "NAVER Corp.",
+   "cap": 27816442379761,
+   "industry": "Packaged Software",
+   "sym": "035420.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "298040",
+   "name": "Hyosung Heavy Industries Corp.",
+   "cap": 25933198337555,
+   "industry": "Electrical Products",
+   "sym": "298040.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "042700",
+   "name": "Hanmi Semiconductor Co., Ltd",
+   "cap": 25800015136719,
+   "industry": "Industrial Machinery",
+   "sym": "042700.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "096770",
+   "name": "SK Innovation Co., Ltd",
+   "cap": 25643528668022,
+   "industry": "Oil Refining/Marketing",
+   "sym": "096770.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "316140",
+   "name": "Woori Financial Group, Inc.",
+   "cap": 24680542266846,
+   "industry": "Major Banks",
+   "sym": "316140.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "267260",
+   "name": "HD Hyundai Electric",
+   "cap": 24403052284241,
+   "industry": "Electrical Products",
+   "sym": "267260.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000810",
+   "name": "Samsung Fire & Marine Insurance Co., Ltd",
+   "cap": 24199965786099,
+   "industry": "Property/Casualty Insurance",
+   "sym": "000810.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "042660",
+   "name": "Hanwha Ocean Co., Ltd.",
+   "cap": 24144098278809,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "042660.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "009540",
+   "name": "HD KOREA SHIPBUILDING & OFFSHORE ENGINEERING CO. LTD.",
+   "cap": 23052969421387,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "009540.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "005490",
+   "name": "POSCO Holdings Inc.",
+   "cap": 22992028411865,
+   "industry": "Steel",
+   "sym": "005490.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "010130",
+   "name": "Korea Zinc Co., Ltd.",
+   "cap": 22024690933228,
+   "industry": "Other Metals/Minerals",
+   "sym": "010130.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "138040",
+   "name": "Meritz Financial Group Inc.",
+   "cap": 20792865026855,
+   "industry": "Investment Banks/Brokers",
+   "sym": "138040.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "011200",
+   "name": "HMM CO.,LTD",
+   "cap": 20279616485596,
+   "industry": "Marine Shipping",
+   "sym": "011200.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000150",
+   "name": "Doosan Corporation",
+   "cap": 20122854743481,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "000150.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "051910",
+   "name": "LG Chem Ltd.",
+   "cap": 19423227448750,
+   "industry": "Chemicals: Specialty",
+   "sym": "051910.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "015760",
+   "name": "Korea Electric Power Corporation",
+   "cap": 19291019711304,
+   "industry": "Electric Utilities",
+   "sym": "015760.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "010950",
+   "name": "S-Oil Corporation",
+   "cap": 19050524800587,
+   "industry": "Oil Refining/Marketing",
+   "sym": "010950.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "017670",
+   "name": "SK Telecom Co., Ltd.",
+   "cap": 18659345367432,
+   "industry": "Wireless Telecommunications",
+   "sym": "017670.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "033780",
+   "name": "KT & G Corporation",
+   "cap": 18364069546509,
+   "industry": "Tobacco",
+   "sym": "033780.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "010140",
+   "name": "Samsung Heavy Industries Co., Ltd",
+   "cap": 17046550246582.002,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "010140.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "018260",
+   "name": "SAMSUNG SDS CO., LTD.",
+   "cap": 16978366531372,
+   "industry": "Information Technology Services",
+   "sym": "018260.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "003670",
+   "name": "POSCO FUTURE M CO., LTD.",
+   "cap": 16624042888641,
+   "industry": "Electronic Equipment/Instruments",
+   "sym": "003670.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "003550",
+   "name": "LG Corp",
+   "cap": 16246392032552,
+   "industry": "Electronics/Appliances",
+   "sym": "003550.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "024110",
+   "name": "Industrial Bank Of Korea",
+   "cap": 16108003247070,
+   "industry": "Regional Banks",
+   "sym": "024110.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "272210",
+   "name": "Hanwha Systems Co., Ltd.",
+   "cap": 15501742155457,
+   "industry": "Aerospace & Defense",
+   "sym": "272210.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "086280",
+   "name": "HYUNDAI GLOVIS Co., Ltd.",
+   "cap": 15112500000000,
+   "industry": "Air Freight/Couriers",
+   "sym": "086280.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "035720",
+   "name": "Kakao Corp.",
+   "cap": 14736404237366,
+   "industry": "Information Technology Services",
+   "sym": "035720.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "006800",
+   "name": "MIRAE ASSET SECURITIES CO., LTD.",
+   "cap": 14486434516783,
+   "industry": "Investment Banks/Brokers",
+   "sym": "006800.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "267250",
+   "name": "HD HYUNDAI CO.,LTD.",
+   "cap": 14204353729248,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "267250.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "278470",
+   "name": "APR Co.,Ltd.",
+   "cap": 13702365142822,
+   "industry": "Household/Personal Care",
+   "sym": "278470.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "011070",
+   "name": "LG Innotek Co., Ltd",
+   "cap": 13583426967621,
+   "industry": "Electronic Production Equipment",
+   "sym": "011070.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000720",
+   "name": "Hyundai Engineering & Construction Co., Ltd",
+   "cap": 12793521822262,
+   "industry": "Homebuilding",
+   "sym": "000720.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "064350",
+   "name": "Hyundai Rotem Co.",
+   "cap": 12715077465057,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "064350.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "030200",
+   "name": "KT Corporation",
+   "cap": 12512833731079,
+   "industry": "Major Telecommunications",
+   "sym": "030200.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "003490",
+   "name": "Korean Air Lines Co., Ltd.",
+   "cap": 11291764045358,
+   "industry": "Airlines",
+   "sym": "003490.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "307950",
+   "name": "Hyundai Autoever Corp.",
+   "cap": 10489341402054,
+   "industry": "Information Technology Services",
+   "sym": "307950.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "443060",
+   "name": "HD Hyundai Marine Solution Co., Ltd.",
+   "cap": 10426502193451,
+   "industry": "Wholesale Distributors",
+   "sym": "443060.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "071050",
+   "name": "KOREA INVESTMENT HOLDINGS CO LTD",
+   "cap": 10361952951050,
+   "industry": "Investment Banks/Brokers",
+   "sym": "071050.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "005940",
+   "name": "NH INVESTMENT & SECURITIES CO.LTD.",
+   "cap": 10327979105759,
+   "industry": "Investment Banks/Brokers",
+   "sym": "005940.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "005830",
+   "name": "DB INSURANCE CO. LTD",
+   "cap": 10007169633484,
+   "industry": "Multi-Line Insurance",
+   "sym": "005830.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "078930",
+   "name": "GS Holdings Corp.",
+   "cap": 9986839428008,
+   "industry": "Food Retail",
+   "sym": "078930.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000500",
+   "name": "Gaon Cable Co., Ltd.",
+   "cap": 9796832691193,
+   "industry": "Electrical Products",
+   "sym": "000500.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "047050",
+   "name": "POSCO INTERNATIONAL Corporation",
+   "cap": 9647158050537,
+   "industry": "Industrial Conglomerates",
+   "sym": "047050.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "323410",
+   "name": "KakaoBank Corp.",
+   "cap": 9388785653687,
+   "industry": "Regional Banks",
+   "sym": "323410.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "028050",
+   "name": "SAMSUNG E&A CO. LTD.",
+   "cap": 9359000000000,
+   "industry": "Engineering & Construction",
+   "sym": "028050.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "003230",
+   "name": "Samyang Foods Co., Ltd",
+   "cap": 9031792978287,
+   "industry": "Food: Major Diversified",
+   "sym": "003230.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "007660",
+   "name": "ISU Petasys Co., Ltd.",
+   "cap": 8897197201538,
+   "industry": "Electronic Components",
+   "sym": "007660.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "180640",
+   "name": "HANJIN KAL Corp.",
+   "cap": 8790356076812.999,
+   "industry": "Hotels/Resorts/Cruise lines",
+   "sym": "180640.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "259960",
+   "name": "Krafton, Inc.",
+   "cap": 8590581243515,
+   "industry": "Packaged Software",
+   "sym": "259960.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "006260",
+   "name": "LS Corp.",
+   "cap": 8278868076324,
+   "industry": "Electrical Products",
+   "sym": "006260.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "090430",
+   "name": "Amorepacific Corp.",
+   "cap": 8174570344543,
+   "industry": "Household/Personal Care",
+   "sym": "090430.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "009830",
+   "name": "HANWHA SOLUTIONS CORPORATION",
+   "cap": 8078390211489,
+   "industry": "Semiconductors",
+   "sym": "009830.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "016360",
+   "name": "Samsung Securities Co., Ltd.",
+   "cap": 8072720275879,
+   "industry": "Investment Banks/Brokers",
+   "sym": "016360.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "353200",
+   "name": "Daeduck Electronics Co., Ltd.",
+   "cap": 7361448634815,
+   "industry": "Electronic Components",
+   "sym": "353200.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "161390",
+   "name": "HANKOOK TIRE & TECHNOLOGY Co., Ltd.",
+   "cap": 7307126380920,
+   "industry": "Automotive Aftermarket",
+   "sym": "161390.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "047040",
+   "name": "Daewoo Engineering & Construction Co., Ltd",
+   "cap": 7152666296997,
+   "industry": "Homebuilding",
+   "sym": "047040.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "021240",
+   "name": "Coway Co., Ltd.",
+   "cap": 7123462091064,
+   "industry": "Electronics/Appliances",
+   "sym": "021240.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "064400",
+   "name": "LG CNS Co., Ltd.",
+   "cap": 6966099674225,
+   "industry": "Information Technology Services",
+   "sym": "064400.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "062040",
+   "name": "Sanil Electric Co., Ltd.",
+   "cap": 6942136247635,
+   "industry": "Electrical Products",
+   "sym": "062040.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "352820",
+   "name": "HYBE Co., Ltd.",
+   "cap": 6676633993149,
+   "industry": "Miscellaneous Commercial Services",
+   "sym": "352820.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "039490",
+   "name": "Kiwoom Securities Co., Ltd",
+   "cap": 6576246774673,
+   "industry": "Investment Banks/Brokers",
+   "sym": "039490.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "128940",
+   "name": "Hanmi Pharmaceutical Co., Ltd.",
+   "cap": 6416188247681,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "128940.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000880",
+   "name": "Hanwha Corp",
+   "cap": 6154413462067,
+   "industry": "Industrial Specialties",
+   "sym": "000880.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "032640",
+   "name": "LG Uplus Corp",
+   "cap": 6096844299316,
+   "industry": "Major Telecommunications",
+   "sym": "032640.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "326030",
+   "name": "SK Biopharmaceuticals Co., Ltd.",
+   "cap": 5936144174194,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "326030.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "001440",
+   "name": "Taihan Cable & Solution Co., Ltd.",
+   "cap": 5851427810669,
+   "industry": "Metal Fabrication",
+   "sym": "001440.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "267270",
+   "name": "HD Construction Equipment Co., Ltd.",
+   "cap": 5599941919327,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "267270.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000990",
+   "name": "DB HiTek Co. LTD",
+   "cap": 5539490966797,
+   "industry": "Semiconductors",
+   "sym": "000990.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "377300",
+   "name": "kakaopay Corp.",
+   "cap": 5432320240784,
+   "industry": "Miscellaneous Commercial Services",
+   "sym": "377300.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "175330",
+   "name": "JB Financial Group Co., Ltd.",
+   "cap": 5336804473877,
+   "industry": "Major Banks",
+   "sym": "175330.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "241560",
+   "name": "Doosan Bobcat Inc.",
+   "cap": 5283402099609,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "241560.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000100",
+   "name": "Yuhan Corporation",
+   "cap": 5069141640723,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "000100.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "011790",
+   "name": "SKC Co., Ltd.",
+   "cap": 4877549600601,
+   "industry": "Chemicals: Specialty",
+   "sym": "011790.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "052690",
+   "name": "KEPCO Engineering & Construction Co., Inc.",
+   "cap": 4835329206848,
+   "industry": "Engineering & Construction",
+   "sym": "052690.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "138930",
+   "name": "BNK Financial Group, Inc.",
+   "cap": 4827929168091,
+   "industry": "Regional Banks",
+   "sym": "138930.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "454910",
+   "name": "Doosan Robotics Inc.",
+   "cap": 4738340304565,
+   "industry": "Industrial Machinery",
+   "sym": "454910.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "036570",
+   "name": "NC Corporation",
+   "cap": 4673805309296,
+   "industry": "Packaged Software",
+   "sym": "036570.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "029780",
+   "name": "Samsung Card Co., Ltd",
+   "cap": 4476513586426,
+   "industry": "Finance/Rental/Leasing",
+   "sym": "029780.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "066970",
+   "name": "L & F Co., Ltd.",
+   "cap": 4436128748703,
+   "industry": "Electronic Production Equipment",
+   "sym": "066970.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "010060",
+   "name": "OCI Holdings Company Ltd.",
+   "cap": 4381291872025,
+   "industry": "Chemicals: Specialty",
+   "sym": "010060.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "034220",
+   "name": "LG Display Co., Ltd",
+   "cap": 4285000000000,
+   "industry": "Electronic Production Equipment",
+   "sym": "034220.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "001040",
+   "name": "CJ Corporation",
+   "cap": 4251251633215,
+   "industry": "Food: Specialty/Candy",
+   "sym": "001040.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "271560",
+   "name": "ORION CORP.",
+   "cap": 4161608287811,
+   "industry": "Food: Specialty/Candy",
+   "sym": "271560.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "103590",
+   "name": "Iljin Electric Co., Ltd.",
+   "cap": 4109780586243,
+   "industry": "Electrical Products",
+   "sym": "103590.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "082740",
+   "name": "Hanwha Engine Co., Ltd.",
+   "cap": 4054480732727,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "082740.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "088350",
+   "name": "HANWHA LIFE INSURANCE Co., Ltd.",
+   "cap": 4004910079346,
+   "industry": "Life/Health Insurance",
+   "sym": "088350.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "051900",
+   "name": "LG H&H Co., Ltd.",
+   "cap": 3995056771183,
+   "industry": "Household/Personal Care",
+   "sym": "051900.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "004020",
+   "name": "Hyundai Steel Company",
+   "cap": 3946371917725,
+   "industry": "Steel",
+   "sym": "004020.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "018880",
+   "name": "Hanon Systems",
+   "cap": 3930038646240,
+   "industry": "Auto Parts: OEM",
+   "sym": "018880.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "008930",
+   "name": "Hanmi Science Co., Ltd",
+   "cap": 3744567573547,
+   "industry": "Medical Distributors",
+   "sym": "008930.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "001450",
+   "name": "Hyundai Marine & Fire Insurance Co., Ltd.",
+   "cap": 3546046251297,
+   "industry": "Property/Casualty Insurance",
+   "sym": "001450.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "028670",
+   "name": "Pan Ocean Co., Ltd.",
+   "cap": 3335713798828,
+   "industry": "Marine Shipping",
+   "sym": "028670.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "002380",
+   "name": "KCC Corporation",
+   "cap": 3332601306915,
+   "industry": "Industrial Specialties",
+   "sym": "002380.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "161890",
+   "name": "KOLMAR KOREA CO. LTD",
+   "cap": 3224453359222,
+   "industry": "Household/Personal Care",
+   "sym": "161890.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "022100",
+   "name": "POSCO DX COMPANY LTD.",
+   "cap": 3165499646759,
+   "industry": "Information Technology Services",
+   "sym": "022100.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "336260",
+   "name": "Doosan Fuel Cell Co., Ltd.",
+   "cap": 3104049447937,
+   "industry": "Electronic Production Equipment",
+   "sym": "336260.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "036460",
+   "name": "Korea Gas Corporation",
+   "cap": 3089770202637,
+   "industry": "Gas Distributors",
+   "sym": "036460.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "192820",
+   "name": "COSMAX, Inc.",
+   "cap": 3063328771591,
+   "industry": "Household/Personal Care",
+   "sym": "192820.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "375500",
+   "name": "DL E&C Co., Ltd.",
+   "cap": 3010367345810,
+   "industry": "Engineering & Construction",
+   "sym": "375500.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "031210",
+   "name": "Seoul Guarantee Insurance Company",
+   "cap": 2935998358536,
+   "industry": "Multi-Line Insurance",
+   "sym": "031210.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "139130",
+   "name": "iM Financial Group Co. Ltd.",
+   "cap": 2926254167480,
+   "industry": "Major Banks",
+   "sym": "139130.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "023530",
+   "name": "Lotte Shopping Co., Ltd",
+   "cap": 2886432479477,
+   "industry": "Department Stores",
+   "sym": "023530.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "035250",
+   "name": "Kangwon Land, Inc.",
+   "cap": 2863797244720,
+   "industry": "Casinos/Gaming",
+   "sym": "035250.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "302440",
+   "name": "SK bioscience Co.,Ltd.",
+   "cap": 2863664375305,
+   "industry": "Biotechnology",
+   "sym": "302440.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "004170",
+   "name": "Shinsegae Co., Ltd",
+   "cap": 2844469879150,
+   "industry": "Department Stores",
+   "sym": "004170.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "111770",
+   "name": "Youngone Corp.",
+   "cap": 2843015481567,
+   "industry": "Apparel/Footwear",
+   "sym": "111770.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "014680",
+   "name": "Hansol Chemical Co., Ltd",
+   "cap": 2829526832581,
+   "industry": "Chemicals: Major Diversified",
+   "sym": "014680.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "012750",
+   "name": "S-1 Corporation",
+   "cap": 2809630768204,
+   "industry": "Miscellaneous Commercial Services",
+   "sym": "012750.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "006360",
+   "name": "GS Engineering & Construction Corporation",
+   "cap": 2805578170013,
+   "industry": "Homebuilding",
+   "sym": "006360.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "251270",
+   "name": "Netmarble Corp.",
+   "cap": 2797581178284,
+   "industry": "Packaged Software",
+   "sym": "251270.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "097950",
+   "name": "CJ CheilJedang Corporation",
+   "cap": 2773399654293,
+   "industry": "Air Freight/Couriers",
+   "sym": "097950.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "026960",
+   "name": "Dongsuh Companies, Inc.",
+   "cap": 2733228900909,
+   "industry": "Food: Major Diversified",
+   "sym": "026960.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "450080",
+   "name": "Ecopro Materials Co Ltd.",
+   "cap": 2690926895142,
+   "industry": "Chemicals: Specialty",
+   "sym": "450080.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "011780",
+   "name": "Kumho Petrochemical Co., Ltd.",
+   "cap": 2687237588358,
+   "industry": "Chemicals: Specialty",
+   "sym": "011780.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "020150",
+   "name": "LOTTE ENERGY MATERIALS CORPORATION",
+   "cap": 2660165533447,
+   "industry": "Electrical Products",
+   "sym": "020150.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "004800",
+   "name": "Hyosung Corporation",
+   "cap": 2646396663094,
+   "industry": "Financial Conglomerates",
+   "sym": "004800.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "017800",
+   "name": "Hyundai Elevator Co., Ltd",
+   "cap": 2628448687744,
+   "industry": "Building Products",
+   "sym": "017800.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "383220",
+   "name": "F&F Co., Ltd.",
+   "cap": 2619519425583,
+   "industry": "Apparel/Footwear",
+   "sym": "383220.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "007340",
+   "name": "DN AUTOMOTIVE CORPORATION",
+   "cap": 2581573295593,
+   "industry": "Auto Parts: OEM",
+   "sym": "007340.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "011170",
+   "name": "Lotte Chemical Corporation",
+   "cap": 2572196063995,
+   "industry": "Chemicals: Specialty",
+   "sym": "011170.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "489790",
+   "name": "Hanwha Vision Co., Ltd.",
+   "cap": 2569254764557,
+   "industry": "Telecommunications Equipment",
+   "sym": "489790.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "085620",
+   "name": "Mirae Asset Life Insurance Co., Ltd.",
+   "cap": 2545960121155,
+   "industry": "Life/Health Insurance",
+   "sym": "085620.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "003690",
+   "name": "Korean Reinsurance Company",
+   "cap": 2543015748596,
+   "industry": "Multi-Line Insurance",
+   "sym": "003690.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000240",
+   "name": "HANKOOK & COMPANY CO., LTD.",
+   "cap": 2410576654053,
+   "industry": "Electrical Products",
+   "sym": "000240.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "457190",
+   "name": "ISU SPECIALTY CHEMICAL Co., Ltd.",
+   "cap": 2407796859550,
+   "industry": "Chemicals: Major Diversified",
+   "sym": "457190.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "009420",
+   "name": "Hanall Biopharma Co., Ltd.",
+   "cap": 2340951436996,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "009420.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "112610",
+   "name": "CS Wind Corp.",
+   "cap": 2336294190216,
+   "industry": "Electrical Products",
+   "sym": "112610.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "004370",
+   "name": "Nongshim Co., Ltd.",
+   "cap": 2336179231644,
+   "industry": "Food: Specialty/Candy",
+   "sym": "004370.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "005850",
+   "name": "SL Corporation",
+   "cap": 2308066728210,
+   "industry": "Auto Parts: OEM",
+   "sym": "005850.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "483650",
+   "name": "Dalba Global Co., Ltd.",
+   "cap": 2293723987103,
+   "industry": "Household/Personal Care",
+   "sym": "483650.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "204320",
+   "name": "HL Mando Co., Ltd.",
+   "cap": 2211476624107,
+   "industry": "Auto Parts: OEM",
+   "sym": "204320.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "282330",
+   "name": "BGF retail CO., LTD.",
+   "cap": 2209474402809,
+   "industry": "Food Retail",
+   "sym": "282330.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "005440",
+   "name": "HYUNDAI G.F. HOLDINGS CO. LTD.",
+   "cap": 2195365352783,
+   "industry": "Home Furnishings",
+   "sym": "005440.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "279570",
+   "name": "K Bank Co., Ltd.",
+   "cap": 2186696911926,
+   "industry": "Regional Banks",
+   "sym": "279570.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "103140",
+   "name": "Poongsan Corporation",
+   "cap": 2179679356383.9998,
+   "industry": "Other Metals/Minerals",
+   "sym": "103140.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "018670",
+   "name": "SK Gas Co., Ltd.",
+   "cap": 2143914983749,
+   "industry": "Gas Distributors",
+   "sym": "018670.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "081660",
+   "name": "Misto Holdings Corporation",
+   "cap": 2067927122688,
+   "industry": "Apparel/Footwear",
+   "sym": "081660.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "007810",
+   "name": "Korea Circuit Co., Ltd.",
+   "cap": 2051228539653,
+   "industry": "Electronic Components",
+   "sym": "007810.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "051600",
+   "name": "KEPCO Plant Service & Engineering Co., Ltd",
+   "cap": 2022750000000,
+   "industry": "Engineering & Construction",
+   "sym": "051600.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "229640",
+   "name": "LS Eco Energy Ltd.",
+   "cap": 2013751025391,
+   "industry": "Electrical Products",
+   "sym": "229640.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "002790",
+   "name": "AMOREPACIFIC Holdings Corp.",
+   "cap": 1974633776059,
+   "industry": "Household/Personal Care",
+   "sym": "002790.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "073240",
+   "name": "Kumho Tire Co., Inc.",
+   "cap": 1973478153992,
+   "industry": "Automotive Aftermarket",
+   "sym": "073240.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "139480",
+   "name": "E-MART Inc.",
+   "cap": 1926082578278,
+   "industry": "Department Stores",
+   "sym": "139480.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "030000",
+   "name": "Cheil Worldwide Inc",
+   "cap": 1893912151337,
+   "industry": "Advertising/Marketing Services",
+   "sym": "030000.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "089860",
+   "name": "LOTTE rental co., ltd.",
+   "cap": 1873564379883,
+   "industry": "Finance/Rental/Leasing",
+   "sym": "089860.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "007070",
+   "name": "GS Retail Co., Ltd.",
+   "cap": 1850977985382,
+   "industry": "Food Retail",
+   "sym": "007070.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "069960",
+   "name": "Hyundai Department Store Co., Ltd",
+   "cap": 1845806053162,
+   "industry": "Department Stores",
+   "sym": "069960.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "281820",
+   "name": "KCTECH CO., LTD.",
+   "cap": 1821037178040,
+   "industry": "Electronic Production Equipment",
+   "sym": "281820.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "462870",
+   "name": "SHIFT UP Corp",
+   "cap": 1791301883698,
+   "industry": "Packaged Software",
+   "sym": "462870.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "009970",
+   "name": "Youngone Holdings Co., Ltd.",
+   "cap": 1779469979000,
+   "industry": "Apparel/Footwear",
+   "sym": "009970.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "181710",
+   "name": "NHN Corporation",
+   "cap": 1759850843620,
+   "industry": "Internet Software/Services",
+   "sym": "181710.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "093370",
+   "name": "Foosung Co., Ltd.",
+   "cap": 1757913281403,
+   "industry": "Chemicals: Specialty",
+   "sym": "093370.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "120110",
+   "name": "Kolon Industries, Inc.",
+   "cap": 1752464296424,
+   "industry": "Textiles",
+   "sym": "120110.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "439260",
+   "name": "DAEHAN SHIPBUILDING Co., Ltd.",
+   "cap": 1746368264008,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "439260.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "004990",
+   "name": "Lotte Corp",
+   "cap": 1698252408731,
+   "industry": "Food: Specialty/Candy",
+   "sym": "004990.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "475150",
+   "name": "SK Eternix Co., Ltd.",
+   "cap": 1691995647049,
+   "industry": "Alternative Power Generation",
+   "sym": "475150.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "020560",
+   "name": "Asiana Airlines Inc.",
+   "cap": 1681942027740,
+   "industry": "Airlines",
+   "sym": "020560.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "001430",
+   "name": "SeAH Besteel Holdings Corporation",
+   "cap": 1672967971802,
+   "industry": "Steel",
+   "sym": "001430.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "071970",
+   "name": "HD-Hyundai Marine Engine Co., Ltd.",
+   "cap": 1665544395828,
+   "industry": "Trucks/Construction/Farm Machinery",
+   "sym": "071970.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "001820",
+   "name": "SAMWHA CAPACITOR CO., LTD.",
+   "cap": 1605846449852,
+   "industry": "Electronic Components",
+   "sym": "001820.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "001120",
+   "name": "LX INTERNATIONAL CORP.",
+   "cap": 1586184528351,
+   "industry": "Wholesale Distributors",
+   "sym": "001120.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "023590",
+   "name": "DAOU TECHNOLOGY Inc.",
+   "cap": 1582033531380,
+   "industry": "Investment Banks/Brokers",
+   "sym": "023590.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "005070",
+   "name": "Cosmo AM&T Co., Ltd.",
+   "cap": 1567172735596,
+   "industry": "Electronic Equipment/Instruments",
+   "sym": "005070.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "006040",
+   "name": "Dongwon Industries Co., Ltd",
+   "cap": 1560315131187,
+   "industry": "Air Freight/Couriers",
+   "sym": "006040.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "322000",
+   "name": "HD HYUNDAI ENERGY SOLUTIONS CO. LTD.",
+   "cap": 1560159973431,
+   "industry": "Semiconductors",
+   "sym": "322000.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "008770",
+   "name": "HOTEL SHILLA CO., LTD.",
+   "cap": 1479241847843,
+   "industry": "Hotels/Resorts/Cruise lines",
+   "sym": "008770.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "361610",
+   "name": "Sk Ie Technology Co., Ltd.",
+   "cap": 1445995958862,
+   "industry": "Chemicals: Major Diversified",
+   "sym": "361610.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "003540",
+   "name": "Daishin Securities Co., Ltd",
+   "cap": 1444862396812,
+   "industry": "Investment Banks/Brokers",
+   "sym": "003540.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "006280",
+   "name": "GC Biopharma Corp.",
+   "cap": 1435777728271,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "006280.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "294870",
+   "name": "IPARK Hyundai Development Company",
+   "cap": 1424612057304,
+   "industry": "Engineering & Construction",
+   "sym": "294870.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "011210",
+   "name": "Hyundai Wia Corporation",
+   "cap": 1413084107208,
+   "industry": "Auto Parts: OEM",
+   "sym": "011210.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "000120",
+   "name": "CJ Logistics Corp",
+   "cap": 1410101095009,
+   "industry": "Marine Shipping",
+   "sym": "000120.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "097230",
+   "name": "HJ SHIPBUILDING & CONSTRUCTION CO. LTD",
+   "cap": 1383233697205,
+   "industry": "Engineering & Construction",
+   "sym": "097230.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "001800",
+   "name": "ORION Holdings Corporation",
+   "cap": 1320594475174,
+   "industry": "Food: Specialty/Candy",
+   "sym": "001800.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "001740",
+   "name": "SK Networks Co., Ltd.",
+   "cap": 1270526395416,
+   "industry": "Wholesale Distributors",
+   "sym": "001740.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "069620",
+   "name": "Daewoong Pharmaceutical Co., Ltd.",
+   "cap": 1254183370590,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "069620.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "415640",
+   "name": "KB Balhae Infrastructure Fund",
+   "cap": 1237710029602,
+   "industry": "Financial Conglomerates",
+   "sym": "415640.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "006120",
+   "name": "SK Discovery Co. Ltd.",
+   "cap": 1187765419006,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "006120.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "007310",
+   "name": "OTOKI Corporation",
+   "cap": 1180734911919,
+   "industry": "Food: Specialty/Candy",
+   "sym": "007310.KS",
+   "market": "KOSPI"
+  },
+  {
+   "code": "196170",
+   "name": "ALTEOGEN Inc.",
+   "cap": 18069354515076,
+   "industry": "Biotechnology",
+   "sym": "196170.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "247540",
+   "name": "Ecopro BM Co., Ltd.",
+   "cap": 12341723201752,
+   "industry": "Electrical Products",
+   "sym": "247540.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "086520",
+   "name": "Ecopro Co., Ltd.",
+   "cap": 11946655091858,
+   "industry": "Chemicals: Major Diversified",
+   "sym": "086520.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "036930",
+   "name": "Jusung Engineering Co., Ltd",
+   "cap": 10642893356323,
+   "industry": "Industrial Machinery",
+   "sym": "036930.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "277810",
+   "name": "Rainbow Robotics, Inc.",
+   "cap": 8720235527039.001,
+   "industry": "Industrial Machinery",
+   "sym": "277810.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "240810",
+   "name": "Wonik IPS Co., Ltd.",
+   "cap": 6724216252899,
+   "industry": "Industrial Machinery",
+   "sym": "240810.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "039030",
+   "name": "EO Technics Co., Ltd",
+   "cap": 6438345809937,
+   "industry": "Industrial Machinery",
+   "sym": "039030.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "222800",
+   "name": "Simmtech Co., Ltd.",
+   "cap": 6433230862427,
+   "industry": "Semiconductors",
+   "sym": "222800.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "058470",
+   "name": "Leeno Industrial Inc.",
+   "cap": 6397999026489,
+   "industry": "Semiconductors",
+   "sym": "058470.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "028300",
+   "name": "HLB Co., Ltd.",
+   "cap": 5377511978149,
+   "industry": "Biotechnology",
+   "sym": "028300.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "403870",
+   "name": "HPSP Co., Ltd.",
+   "cap": 5203998786926,
+   "industry": "Semiconductors",
+   "sym": "403870.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "000250",
+   "name": "Sam Chun Dang Pharm. Co., Ltd.",
+   "cap": 4814296909332,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "000250.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "108490",
+   "name": "ROBOTIS Co., Ltd.",
+   "cap": 4512728708267,
+   "industry": "Industrial Machinery",
+   "sym": "108490.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "319660",
+   "name": "PSK INC",
+   "cap": 4402940658569,
+   "industry": "Industrial Machinery",
+   "sym": "319660.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "440110",
+   "name": "FADU, Inc.",
+   "cap": 4304537199020,
+   "industry": "Semiconductors",
+   "sym": "440110.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "095340",
+   "name": "ISC Co., Ltd.",
+   "cap": 4215623435974,
+   "industry": "Semiconductors",
+   "sym": "095340.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "031980",
+   "name": "PSK HOLDINGS INC.",
+   "cap": 4174480059814,
+   "industry": "Semiconductors",
+   "sym": "031980.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "084370",
+   "name": "Eugene Technology Co., Ltd.",
+   "cap": 3934629222107,
+   "industry": "Industrial Machinery",
+   "sym": "084370.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "067310",
+   "name": "Hana Micron Inc.",
+   "cap": 3424279682159,
+   "industry": "Semiconductors",
+   "sym": "067310.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "064760",
+   "name": "Tokai Carbon Korea Co., Ltd.",
+   "cap": 3217791244507,
+   "industry": "Electrical Products",
+   "sym": "064760.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "357780",
+   "name": "Soulbrain Co., Ltd.",
+   "cap": 3216635370255,
+   "industry": "Chemicals: Specialty",
+   "sym": "357780.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "214450",
+   "name": "PharmaResearch Co., Ltd.",
+   "cap": 3179232421875,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "214450.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "131290",
+   "name": "TSE Co., Ltd",
+   "cap": 3133193443775,
+   "industry": "Semiconductors",
+   "sym": "131290.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "080220",
+   "name": "Jeju Semiconductor Corp.",
+   "cap": 3112318945312,
+   "industry": "Semiconductors",
+   "sym": "080220.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "095610",
+   "name": "TES Co., Ltd.",
+   "cap": 3039394097137,
+   "industry": "Electronic Production Equipment",
+   "sym": "095610.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "141080",
+   "name": "LigaChem Biosciences Inc.",
+   "cap": 3032790350723,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "141080.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "087010",
+   "name": "Peptron, Inc.",
+   "cap": 3010018892288,
+   "industry": "Biotechnology",
+   "sym": "087010.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "298380",
+   "name": "ABL Bio, Inc.",
+   "cap": 2877755696106,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "298380.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "010170",
+   "name": "Taihan Fiberoptics Co., Ltd",
+   "cap": 2767644689941,
+   "industry": "Electrical Products",
+   "sym": "010170.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "310210",
+   "name": "Voronoi, Inc.",
+   "cap": 2682646568298,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "310210.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "226950",
+   "name": "OliX Pharmaceuticals, Inc.",
+   "cap": 2657263046265,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "226950.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "005290",
+   "name": "Dongjin Semichem Co., Ltd",
+   "cap": 2650446411133,
+   "industry": "Electronic Production Equipment",
+   "sym": "005290.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "178320",
+   "name": "SEOJIN SYSTEM CO.,LTD",
+   "cap": 2644524745941,
+   "industry": "Computer Communications",
+   "sym": "178320.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "257720",
+   "name": "SILICON 2 Co.,Ltd.",
+   "cap": 2432878807068,
+   "industry": "Specialty Stores",
+   "sym": "257720.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "043260",
+   "name": "Sungho Electronics Corp.",
+   "cap": 2354097747803,
+   "industry": "Electronic Components",
+   "sym": "043260.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "319400",
+   "name": "HUYNDAI MOVEX Co. Ltd.",
+   "cap": 2281592993164,
+   "industry": "Industrial Machinery",
+   "sym": "319400.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "058610",
+   "name": "SPG Co., Ltd",
+   "cap": 2279832466888,
+   "industry": "Electrical Products",
+   "sym": "058610.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "098460",
+   "name": "Koh Young Technology Inc.",
+   "cap": 2235013153076,
+   "industry": "Semiconductors",
+   "sym": "098460.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "030530",
+   "name": "WONIK HOLDINGS CO., LTD.",
+   "cap": 2230383917236,
+   "industry": "Semiconductors",
+   "sym": "030530.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "032820",
+   "name": "Woori Technology Inc.",
+   "cap": 2194344548035,
+   "industry": "Electronics/Appliances",
+   "sym": "032820.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "140410",
+   "name": "Mezzion Pharma Co., Ltd.",
+   "cap": 2082273803711,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "140410.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "214370",
+   "name": "Caregen Co., Ltd.",
+   "cap": 2079451891518,
+   "industry": "Chemicals: Major Diversified",
+   "sym": "214370.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "140860",
+   "name": "Park Systems Corp.",
+   "cap": 2073228279114,
+   "industry": "Electronic Equipment/Instruments",
+   "sym": "140860.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "131970",
+   "name": "DOOSAN TESNA Inc.",
+   "cap": 2056599179840,
+   "industry": "Miscellaneous Commercial Services",
+   "sym": "131970.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "214150",
+   "name": "CLASSYS Inc.",
+   "cap": 2007612180710,
+   "industry": "Medical Specialties",
+   "sym": "214150.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "263750",
+   "name": "PearlAbyss Corp.",
+   "cap": 2004516523743,
+   "industry": "Packaged Software",
+   "sym": "263750.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "145020",
+   "name": "Hugel, Inc.",
+   "cap": 1982582604218,
+   "industry": "Biotechnology",
+   "sym": "145020.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "347850",
+   "name": "D&D Pharmatech Co., Ltd.",
+   "cap": 1977836132050,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "347850.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "237690",
+   "name": "ST PHARM CO., LTD.",
+   "cap": 1947790363884,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "237690.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "089030",
+   "name": "Techwing, Inc.",
+   "cap": 1945681893539,
+   "industry": "Industrial Machinery",
+   "sym": "089030.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "036540",
+   "name": "SFA Semicon Co., Ltd.",
+   "cap": 1864282008362,
+   "industry": "Semiconductors",
+   "sym": "036540.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "083650",
+   "name": "BHI Co. Ltd.",
+   "cap": 1841057024002,
+   "industry": "Industrial Machinery",
+   "sym": "083650.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "323280",
+   "name": "TAESUNG CO., LTD.",
+   "cap": 1817009871483,
+   "industry": "Industrial Machinery",
+   "sym": "323280.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "041510",
+   "name": "SM ENTERTAINMENT CO. Ltd.",
+   "cap": 1813259413147,
+   "industry": "Movies/Entertainment",
+   "sym": "041510.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "089970",
+   "name": "VM Inc.",
+   "cap": 1740199170494,
+   "industry": "Industrial Machinery",
+   "sym": "089970.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "183300",
+   "name": "KoMiCo Ltd.",
+   "cap": 1736003291130,
+   "industry": "Semiconductors",
+   "sym": "183300.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "060370",
+   "name": "LS Marine Solution Co., Ltd.",
+   "cap": 1725271976852,
+   "industry": "Engineering & Construction",
+   "sym": "060370.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "068760",
+   "name": "Celltrion Pharm Inc.",
+   "cap": 1667636865234,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "068760.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "078600",
+   "name": "Daejoo Electronic Materials Co., Ltd.",
+   "cap": 1647300016308,
+   "industry": "Electrical Products",
+   "sym": "078600.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "290650",
+   "name": "L&C BIO Co., Ltd.",
+   "cap": 1642989257812,
+   "industry": "Medical Specialties",
+   "sym": "290650.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "420770",
+   "name": "GigaVis Co., Ltd.",
+   "cap": 1638975432873,
+   "industry": "Electronic Components",
+   "sym": "420770.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "437730",
+   "name": "Samhyun Co., Ltd.",
+   "cap": 1629970790863,
+   "industry": "Building Products",
+   "sym": "437730.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "007390",
+   "name": "NATURECELL Co., Ltd.",
+   "cap": 1594767511368,
+   "industry": "Beverages: Non-Alcoholic",
+   "sym": "007390.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "218410",
+   "name": "RFHIC Corp.",
+   "cap": 1576305252075,
+   "industry": "Semiconductors",
+   "sym": "218410.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "096530",
+   "name": "Seegene, Inc.",
+   "cap": 1478690108871,
+   "industry": "Medical Specialties",
+   "sym": "096530.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "039200",
+   "name": "Oscotec Inc.",
+   "cap": 1400249201202,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "039200.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "950160",
+   "name": "Kolon TissueGene. Inc. Shs Korean Deposit Receipt Repr 1/5 Sh",
+   "cap": 1370568660377,
+   "industry": "Medical Specialties",
+   "sym": "950160.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "232140",
+   "name": "YC Corporation",
+   "cap": 1355631769409,
+   "industry": "Electronic Equipment/Instruments",
+   "sym": "232140.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "082920",
+   "name": "VITZROCELL Co., Ltd.",
+   "cap": 1324142016602,
+   "industry": "Electrical Products",
+   "sym": "082920.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "204270",
+   "name": "JNTC Co., Ltd.",
+   "cap": 1247100769234,
+   "industry": "Electronic Production Equipment",
+   "sym": "204270.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "035900",
+   "name": "JYP Entertainment Corp",
+   "cap": 1239176461029,
+   "industry": "Movies/Entertainment",
+   "sym": "035900.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "347700",
+   "name": "Sphere Corp.",
+   "cap": 1218031354523,
+   "industry": "Packaged Software",
+   "sym": "347700.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "166090",
+   "name": "Hana Materials Inc.",
+   "cap": 1217164395905,
+   "industry": "Semiconductors",
+   "sym": "166090.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "241710",
+   "name": "COSMECCA KOREA CO. LTD",
+   "cap": 1174800033569,
+   "industry": "Household/Personal Care",
+   "sym": "241710.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "252990",
+   "name": "SEMCNS Co., Ltd.",
+   "cap": 1165318565254,
+   "industry": "Electrical Products",
+   "sym": "252990.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "356860",
+   "name": "TLB Co., Ltd.",
+   "cap": 1142996498680,
+   "industry": "Electronic Components",
+   "sym": "356860.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "195940",
+   "name": "HK inno.N Corporation",
+   "cap": 1137445131874,
+   "industry": "Medical/Nursing Services",
+   "sym": "195940.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "003380",
+   "name": "Harim Holdings Co., Ltd.",
+   "cap": 1098078689041.0001,
+   "industry": "Wholesale Distributors",
+   "sym": "003380.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "101490",
+   "name": "S & S Tech Corporation",
+   "cap": 1097790885925.0001,
+   "industry": "Semiconductors",
+   "sym": "101490.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "127120",
+   "name": "JS Link, Inc.",
+   "cap": 1088954353333.0001,
+   "industry": "Medical/Nursing Services",
+   "sym": "127120.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "293490",
+   "name": "Kakao Games Corp.",
+   "cap": 1073737358551,
+   "industry": "Packaged Software",
+   "sym": "293490.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "458870",
+   "name": "SEERS Co. Ltd.",
+   "cap": 1035324817657,
+   "industry": "Medical Specialties",
+   "sym": "458870.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "417200",
+   "name": "LS Materials Co. Ltd.",
+   "cap": 1023584693680,
+   "industry": "Electronic Components",
+   "sym": "417200.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "086450",
+   "name": "DongKook Pharmaceutical Co., Ltd.",
+   "cap": 1017806312561,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "086450.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "445680",
+   "name": "Curiox Biosystems Co., Ltd.",
+   "cap": 1002477482986,
+   "industry": "Packaged Software",
+   "sym": "445680.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "161580",
+   "name": "Philoptics Co., Ltd.",
+   "cap": 959959952545,
+   "industry": "Industrial Machinery",
+   "sym": "161580.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "083450",
+   "name": "Global Standard Technology Co., Ltd.",
+   "cap": 958150094604,
+   "industry": "Industrial Machinery",
+   "sym": "083450.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "036830",
+   "name": "Soulbrain Holdings Co., Ltd.",
+   "cap": 957593518066,
+   "industry": "Chemicals: Specialty",
+   "sym": "036830.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "100790",
+   "name": "Mirae Asset Venture Investment Co., Ltd.",
+   "cap": 950785774994,
+   "industry": "Investment Managers",
+   "sym": "100790.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "327260",
+   "name": "RF Materials Co., Ltd.",
+   "cap": 931352691650,
+   "industry": "Industrial Conglomerates",
+   "sym": "327260.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "115180",
+   "name": "Qurient Co., Ltd.",
+   "cap": 928836879730,
+   "industry": "Biotechnology",
+   "sym": "115180.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "491000",
+   "name": "Livsmed Inc.",
+   "cap": 916766370392,
+   "industry": "Medical Specialties",
+   "sym": "491000.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "388210",
+   "name": "CMTX Co., Ltd.",
+   "cap": 903655398560,
+   "industry": "Semiconductors",
+   "sym": "388210.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "099320",
+   "name": "Satrec Initiative Co., Ltd.",
+   "cap": 895814596558,
+   "industry": "Telecommunications Equipment",
+   "sym": "099320.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "032500",
+   "name": "KMW, Inc.",
+   "cap": 890244869614,
+   "industry": "Electronic Production Equipment",
+   "sym": "032500.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "065350",
+   "name": "Shinsung Delta Tech Co., Ltd.",
+   "cap": 884837462139,
+   "industry": "Electronic Components",
+   "sym": "065350.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "056190",
+   "name": "SFA Engineering Corp.",
+   "cap": 882871140289,
+   "industry": "Electronic Production Equipment",
+   "sym": "056190.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "295310",
+   "name": "HVM CO. LTD.",
+   "cap": 872365762711,
+   "industry": "Metal Fabrication",
+   "sym": "295310.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "033790",
+   "name": "FINO INC.",
+   "cap": 870095603409,
+   "industry": "Packaged Software",
+   "sym": "033790.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "031330",
+   "name": "SAMT Co., Ltd.",
+   "cap": 863273773956,
+   "industry": "Semiconductors",
+   "sym": "031330.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "425420",
+   "name": "TFE Co., Ltd.",
+   "cap": 858431200790,
+   "industry": "Semiconductors",
+   "sym": "425420.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "074600",
+   "name": "WONIK QnC Corporation",
+   "cap": 849102403450,
+   "industry": "Industrial Machinery",
+   "sym": "074600.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "388720",
+   "name": "Yuilrobotics Co., Ltd.",
+   "cap": 835297318935,
+   "industry": "Industrial Machinery",
+   "sym": "388720.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "119850",
+   "name": "GnCenergy Co., Ltd.",
+   "cap": 830475436211,
+   "industry": "Electrical Products",
+   "sym": "119850.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "281740",
+   "name": "Lake Materials Co. Ltd.",
+   "cap": 824917861557,
+   "industry": "Semiconductors",
+   "sym": "281740.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "014620",
+   "name": "SUNG KWANG BEND Co., Ltd.",
+   "cap": 808671718884,
+   "industry": "Metal Fabrication",
+   "sym": "014620.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "160190",
+   "name": "HIGEN RNM Co., Ltd.",
+   "cap": 800385614014,
+   "industry": "Electrical Products",
+   "sym": "160190.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "033100",
+   "name": "Cheryong Electric Co., Ltd.",
+   "cap": 793482977295,
+   "industry": "Electrical Products",
+   "sym": "033100.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "476830",
+   "name": "Rznomics Inc.",
+   "cap": 789760500336,
+   "industry": "Biotechnology",
+   "sym": "476830.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "085660",
+   "name": "CHA Biotech Co., Ltd.",
+   "cap": 786550285492,
+   "industry": "Electronic Components",
+   "sym": "085660.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "328130",
+   "name": "Lunit Inc.",
+   "cap": 786224392700,
+   "industry": "Packaged Software",
+   "sym": "328130.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "090360",
+   "name": "Robostar Co., Ltd",
+   "cap": 773175000000,
+   "industry": "Industrial Machinery",
+   "sym": "090360.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "090710",
+   "name": "Hyulim ROBOT Co., Ltd.",
+   "cap": 770854178238,
+   "industry": "Industrial Machinery",
+   "sym": "090710.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "064290",
+   "name": "INTEKPLUS Co., Ltd.",
+   "cap": 765792842388,
+   "industry": "Electronic Equipment/Instruments",
+   "sym": "064290.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "053610",
+   "name": "Protec Co., Ltd.",
+   "cap": 765000000000,
+   "industry": "Industrial Machinery",
+   "sym": "053610.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "044490",
+   "name": "Taewoong Co., Ltd",
+   "cap": 759280125618,
+   "industry": "Metal Fabrication",
+   "sym": "044490.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "122870",
+   "name": "YG Entertainment, Inc.",
+   "cap": 753930623817,
+   "industry": "Movies/Entertainment",
+   "sym": "122870.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "059090",
+   "name": "MiCo Ltd.",
+   "cap": 752756731796,
+   "industry": "Semiconductors",
+   "sym": "059090.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "137400",
+   "name": "People & Technology, Inc.",
+   "cap": 751517310333,
+   "industry": "Other Metals/Minerals",
+   "sym": "137400.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "251970",
+   "name": "PUM-TECH KOREA CO., LTD.",
+   "cap": 750102353096,
+   "industry": "Containers/Packaging",
+   "sym": "251970.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "189300",
+   "name": "Intellian Technologies, Inc.",
+   "cap": 749624319649,
+   "industry": "Telecommunications Equipment",
+   "sym": "189300.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "213420",
+   "name": "DUK SAN NEOLUX CO.LTD",
+   "cap": 738115562534,
+   "industry": "Electrical Products",
+   "sym": "213420.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "466100",
+   "name": "CLOBOT Co., Ltd.",
+   "cap": 735151305199,
+   "industry": "Industrial Machinery",
+   "sym": "466100.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "053800",
+   "name": "AhnLab, Inc.",
+   "cap": 734579997063,
+   "industry": "Packaged Software",
+   "sym": "053800.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "035760",
+   "name": "CJ ENM Co., Ltd.",
+   "cap": 730218725586,
+   "industry": "Broadcasting",
+   "sym": "035760.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "038500",
+   "name": "SAMPYO Cement Co. Ltd.",
+   "cap": 727857094574,
+   "industry": "Construction Materials",
+   "sym": "038500.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "456160",
+   "name": "G2GBIO, Inc.",
+   "cap": 725042932129,
+   "industry": "Biotechnology",
+   "sym": "456160.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "032190",
+   "name": "Daou Data Corp",
+   "cap": 724635985565,
+   "industry": "Electronics Distributors",
+   "sym": "032190.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "041960",
+   "name": "Komipharm International Co., Ltd",
+   "cap": 721883354797,
+   "industry": "Biotechnology",
+   "sym": "041960.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "033640",
+   "name": "Nepes Corporation",
+   "cap": 719447048950,
+   "industry": "Electronic Components",
+   "sym": "033640.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "006730",
+   "name": "Seobu T&D Co., Ltd.",
+   "cap": 717703811340,
+   "industry": "Oil Refining/Marketing",
+   "sym": "006730.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "121600",
+   "name": "Advanced Nano Products Co., Ltd",
+   "cap": 715825726032,
+   "industry": "Chemicals: Specialty",
+   "sym": "121600.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "171090",
+   "name": "SUNIC SYSTEM Co., Ltd.",
+   "cap": 714474155807,
+   "industry": "Industrial Machinery",
+   "sym": "171090.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "476060",
+   "name": "Onconic Therapeutics, Inc.",
+   "cap": 713357177849,
+   "industry": "Biotechnology",
+   "sym": "476060.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "036810",
+   "name": "Fine Semitech Corp",
+   "cap": 708734418869,
+   "industry": "Industrial Machinery",
+   "sym": "036810.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "023160",
+   "name": "TK Corporation",
+   "cap": 705303819942,
+   "industry": "Industrial Machinery",
+   "sym": "023160.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "102710",
+   "name": "ENF Technology Co., Ltd",
+   "cap": 697960792255,
+   "industry": "Chemicals: Major Diversified",
+   "sym": "102710.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "122640",
+   "name": "YEST Co.,Ltd.",
+   "cap": 697311575699,
+   "industry": "Food: Specialty/Candy",
+   "sym": "122640.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "490470",
+   "name": "SemiFive Inc.",
+   "cap": 694118980408,
+   "industry": "Packaged Software",
+   "sym": "490470.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "225570",
+   "name": "NEXON Games Co. Ltd.",
+   "cap": 689810198021,
+   "industry": "Packaged Software",
+   "sym": "225570.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "048410",
+   "name": "HYUNDAI BIOSCIENCE CO. LTD.",
+   "cap": 680348343658,
+   "industry": "Pharmaceuticals: Major",
+   "sym": "048410.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "124500",
+   "name": "ITCENGLOBAL CO. LTD.",
+   "cap": 678732411861,
+   "industry": "Metal Fabrication",
+   "sym": "124500.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "126340",
+   "name": "VINATECH CO,. LTD.",
+   "cap": 663160705948,
+   "industry": "Electronic Components",
+   "sym": "126340.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "253590",
+   "name": "NEOSEM, Inc.",
+   "cap": 662135379486,
+   "industry": "Electronic Equipment/Instruments",
+   "sym": "253590.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "092870",
+   "name": "Exicon Co., Ltd.",
+   "cap": 657626712418,
+   "industry": "Electronic Equipment/Instruments",
+   "sym": "092870.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "222080",
+   "name": "SFA NEXEL Co., Ltd.",
+   "cap": 649393041229,
+   "industry": "Industrial Machinery",
+   "sym": "222080.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "077360",
+   "name": "Duksan Hi-Metal Co., Ltd.",
+   "cap": 638389907455,
+   "industry": "Industrial Machinery",
+   "sym": "077360.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "050890",
+   "name": "SOLiD Inc.",
+   "cap": 635447404480,
+   "industry": "Computer Communications",
+   "sym": "050890.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "041830",
+   "name": "InBody Co., Ltd.",
+   "cap": 635216486549,
+   "industry": "Medical Specialties",
+   "sym": "041830.KQ",
+   "market": "KOSDAQ"
+  },
+  {
+   "code": "056090",
+   "name": "CG MedTech Co.Ltd.",
+   "cap": 614391292953,
+   "industry": "Medical Specialties",
+   "sym": "056090.KQ",
+   "market": "KOSDAQ"
+  }
+ ],
+ "_note": "미국 = S&P 500 (datasets/s-and-p-500-companies, ODC-PDDL) · 한국 = 코스피 시총 상위 200 + 코스닥 상위 150, 보통주 (시총 = 로고 저장소 메타데이터)"
+}

@@ -86,6 +86,26 @@ def series(px, base_day, beta, sub="sox", mkt="spx"):
     return days, rel
 
 
+PRIOR_DAYS = 5   # 감지일 앞 몇 거래일 안의 충격을 보나
+
+
+def prior_shock(px, fc, sub, mkt):
+    """사건 전 전망(감지일 있는 틀 S)의 감지일 앞 PRIOR_DAYS 거래일 안에 같은 계열이 하루에 금(fc["line"], 20거래일 1σ) 넘게 움직인 날 → {"day", "move"}.
+    한 달 치 움직임이 하루에 난 날 바로 뒤를 0 으로 재면 그 뒤 되돌림이 선반영처럼 읽힌다 (2026-11-12 사용자: 11.05 반도체 −12% → 11.06 기준 엔비디아 실적 타임라인이 전부 ▲).
+    가장 큰 하루 하나만. 없으면 None. 새 수집 없음 — 이미 받은 종가."""
+    det = fc.get("detect_day")
+    if fc["kind"] != "pre" or not det or sub not in px:
+        return None
+    beta, L = fc.get("beta") or 1.0, fc.get("line", 3.0)
+    ds = [d for d in sorted(px[sub]) if d <= det and (mkt is None or d in px.get(mkt, {}))][-(PRIOR_DAYS + 1):]
+    best = None
+    for a, b in zip(ds, ds[1:]):
+        v = (px[sub][b] / px[sub][a] - 1) * 100 - (beta * (px[mkt][b] / px[mkt][a] - 1) * 100 if mkt else 0.0)
+        if abs(v) >= L and (best is None or abs(v) > abs(best[1])):
+            best = (b, round(v, 2))
+    return {"day": best[0], "move": best[1]} if best else None
+
+
 def series_of(fc):
     """전망의 (계열, 시장) 키 — 자동 등록은 fc["series"], 손으로 만든 옛 전망은 반도체 vs S&P 500."""
     s = fc.get("series") or {}
@@ -134,7 +154,7 @@ def why_path(slug, state_dir=None):
 def attach_why(fc, st, state_dir=None):
     """타임라인 날(st["log"])마다 근거 — 저장된 날은 그대로, 없는 날 · 최근 REDO_DAYS 날은 새로 모아 덮는다. 판정이 난 뒤엔 쌓지 않는다(로그가 멈춘다).
     갈래별 근거가 없는 옛 등록(reasons 에 good 없음)은 건너뛴다. log 줄에 e["why"] 를 붙여 렌더가 읽는다."""
-    if "good" not in (fc.get("reasons") or {}):
+    if not (fc.get("series") or {}).get("sub"):   # 계열 기호만 있으면 모은다 — 옛 `reasons.good` 조건은 11-11 저녁 전 자동 등록(EH-003 · 004)을 전부 건너뛰어 블로그 어느 전망에도 근거가 없었다 (2026-11-12)
         return
     path = why_path(fc["slug"], state_dir)
     saved = {}
@@ -153,7 +173,12 @@ def attach_why(fc, st, state_dir=None):
             continue
         if d < cut:
             continue
-        rec = R.day_why(fc, d, days[i - 1] if i else fc.get("registered"), radar, prev_sigs)
+        prev = days[i - 1] if i else fc.get("registered")
+        if R.is_kr((fc.get("series") or {}).get("sub") or ""):   # 한국 = kr_why (2026-11-12 사용자)
+            import kr_why as K
+            rec = K.day_why(fc, d, prev, K.CTX, prev_sigs) if K.CTX is not None else None
+        else:
+            rec = R.day_why(fc, d, prev, radar, prev_sigs)
         if rec:
             saved[d], changed = rec, True
             prev_sigs = rec.get("sigs") or prev_sigs
@@ -170,13 +195,18 @@ def run(state_dir=None):
     regs = H.load_regs(state_dir)
     pub = [(r, fc) for r in regs for fc in H.forecasts(r, public=True)]
     first = min([base_of(fc) for _, fc in pub] + [(dt.date.today() - dt.timedelta(days=30)).isoformat()])   # 자동 등록이 볼 최근 며칠도 받는다
-    start = (dt.date.fromisoformat(first) - dt.timedelta(days=10)).isoformat()
+    start = (dt.date.fromisoformat(first) - dt.timedelta(days=14)).isoformat()   # 10 → 14: 감지일 앞 PRIOR_DAYS 거래일 충격까지 보려고
     extra = {x for w in R.INDEX + R.stocks() + R.KR_INDEX + R.kr_stocks() for x in (w["sym"], w["mkt"]) if x} | {(fc.get("series") or {}).get("sub") for _, fc in pub} | {(fc.get("series") or {}).get("mkt") for _, fc in pub}
     px = fetch(start, extra)
     if not px["sox"] or not px["spx"]:
         FA.no_prices()
         return 1
     today = max(px["spx"])
+    try:   # 한국 전망 근거 자료 — 한 번 읽어 등록 · 날마다 근거가 같이 쓴다 (방송 Firestore · kr-state 수급 · 공시 · 애널리스트 · 판정 기록, 새 수집 · AI 없음)
+        import kr_why as K
+        K.CTX = K.load_ctx(dt.datetime.now(K.KST).strftime("%Y-%m-%d"), px)
+    except Exception as e:  # noqa: BLE001
+        print(f"[forecast] 한국 근거 자료 읽기 실패 — 한국 근거 없이: {type(e).__name__}")
     os.makedirs(os.path.join(OUT, "proof"), exist_ok=True)
     states, lines = {}, []
     tdays_all = sorted(px["spx"])
@@ -187,6 +217,7 @@ def run(state_dir=None):
         try:
             sub, mkt = series_of(fc)
             days, rel = series(px, base_of(fc), fc.get("beta") or 1.0, sub, mkt)
+            fc["prior_shock"] = prior_shock(px, fc, sub, mkt)
             vix = [px["vix"].get(d) for d in days] if px["vix"] else None
             cond = fc.get("cond_known")   # 결과가 난 사건 전 전망 — 결과 칸은 사건 날 코드(실적 · FOMC)가 채운다
             st = H.judge(fc, days, rel, cond=cond, vix=vix if vix and all(v is not None for v in vix) else None)
@@ -201,6 +232,10 @@ def run(state_dir=None):
                     attach_why(fc, st, state_dir)
                 except Exception as e:  # noqa: BLE001
                     print(f"[forecast] 날마다 근거 실패 {fc['slug']}: {type(e).__name__}")
+            try:   # 고리 상태 · 어디서 끊겼나 (근거 뒤 — `왜` 가 근거를 읽는다)
+                H.chain_track(fc, st)
+            except Exception as e:  # noqa: BLE001
+                print(f"[forecast] 고리 매기기 실패 {fc['slug']}: {type(e).__name__}")
             states[fc["slug"]] = st
             FA.missing_days(st.get("missing", []))
             e = st["log"][-1]
@@ -230,6 +265,9 @@ def run(state_dir=None):
         except Exception as e:  # noqa: BLE001
             FA.save_failed("상태 저장소", e)
     # 렌더 나중
+    groups = {m: H.split_done([(r, fc) for r, fc in pub if H.mkt_of(fc) == m], states) for m, _ in H.MKT_TABS}   # 판정 난 전망 = `끝난 전망` · 나라별 탭 (2026-11-12 사용자) — 끝 줄 문구 · 다음 전망(같은 나라 안)도 여기서 붙는다
+    opened = [x for m, _ in H.MKT_TABS for x in groups[m][0]]
+    done_n = {m: len(groups[m][1]) for m, _ in H.MKT_TABS}
     others = [(fc["no"], fc["title"], fc["slug"]) for _, fc in pub]
     for r, fc in pub:
         if fc["slug"] not in states:
@@ -241,9 +279,9 @@ def run(state_dir=None):
         with open(os.path.join(OUT, f'{fc["slug"]}.html'), "w", encoding="utf-8") as f:
             f.write(html)
     with open(os.path.join(OUT, f"{H.LIST_SLUG}.html"), "w", encoding="utf-8") as f:
-        f.write(H.list_body(pub, states))
+        f.write(H.list_body_tabs(groups, states))
     with open(os.path.join(OUT, "hypo.json"), "w", encoding="utf-8") as f:
-        json.dump(H.home_card(pub, dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")), f, ensure_ascii=False, indent=1)
+        json.dump(H.home_card(opened, dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), done_n), f, ensure_ascii=False, indent=1)
     for r, fc in pub:
         st = states.get(fc["slug"]) or {}
         print(f'[forecast] {fc["slug"]}: {st.get("log", [{}])[-1].get("label")} · 값 {st.get("rel")} · 빈 날 {len(st.get("missing", []))}')

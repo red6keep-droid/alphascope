@@ -23,6 +23,7 @@ import universe_kr as U
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(BASE, ".."))
 import notify  # noqa: E402
+import etf_universe  # noqa: E402  — 회원 `내 종목` ETF, 가격만 (2026-11-12)
 
 DATA = os.path.join(BASE, "data")
 SNAP = os.path.join(DATA, "snapshot.json")
@@ -125,7 +126,8 @@ def _caps(symbols):
 
 def run_prices():
     syms = [c[0] for c in U.CANDIDATES]
-    bars = _bars(syms + [U.BENCH, U.KOSDAQ] + sorted(U.SECTOR_ETF_LIST))   # 업종 ETF — 업종 자금 카드 (2026-10-31)
+    base = syms + [U.BENCH, U.KOSDAQ] + sorted(U.SECTOR_ETF_LIST)   # 업종 ETF — 업종 자금 카드 (2026-10-31)
+    bars = _bars(base + sorted(set(etf_universe.KR_SYMS) - set(base)))   # 회원 `내 종목` ETF (2026-11-12)
     got = [s for s in syms if s in bars]
     if len(got) < len(syms) // 2:
         notify.event("수집 실패", f"한국 종목 일봉 {len(got)}/{len(syms)} — yfinance 응답 부족, 이 실행은 자료 지연")
@@ -141,8 +143,8 @@ def run_prices():
     caps = {s: cache.get(s, "caps") for s in got}
     cache.save("한국 종목 시총")
     # 미국 연결 짝(기획 11-3)의 최근 봉 — 밤사이 미국 움직임 → 오늘 한국 반응 카드. 묶음 한 번
-    us = sorted({t for s in syms for t in U.PAIRS.get(s, ([], ""))[0]} | set(U.ADR.values()) | set(U.US_MARKET))   # 짝 + ADR(K24) + 미국 시장 변수(K25)
-    us_bars = _bars(us, period="1mo") if us else {}
+    us = sorted({t for s in syms for t in U.PAIRS.get(s, ([], ""))[0]} | set(U.ADR.values()) | set(U.US_MARKET) | set(etf_universe.KR_US_TICKERS))   # 짝 + ADR(K24) + 미국 시장 변수(K25) + ETF 미국과 연결 (2026-11-12)
+    us_bars = _bars(us, period="6mo") if us else {}   # 1mo → 6mo (2026-11-12): ETF `함께 움직이는 종목은?` 3개월 선 그래프
     snap = {"fetched_at": datetime.datetime.now(KST).strftime("%Y-%m-%d %H:%M %Z"), "bars": bars, "caps": caps, "us_bars": us_bars,
             "missing": [s for s in syms if s not in bars]}
     os.makedirs(DATA, exist_ok=True)

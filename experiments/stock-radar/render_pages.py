@@ -1039,7 +1039,7 @@ def cal_earnings(s, c):
         x = _rename(x, s["name"])
         if isinstance(x, str):
             x = x.replace("장 마감 뒤 · 회사 확정", (when + " · " if when else "") + "Yahoo Finance 일정")
-            x = x.replace(" 장 마감 뒤로,", f" {when}로," if when else ",")
+            x = x.replace(" 장 마감 뒤로,", f" {_dk.josa(when, '로')}," if when else ",")   # `장 시작 전로` → `장 시작 전으로` (받침 따라, 2026-11-12)
         return x
     return [tuple(fix(v) for v in ln) for ln in lines], fix(tip), state, left
 
@@ -1170,6 +1170,13 @@ def list_row(s, first):
     return R._row_html(left, right, first=first).replace("<span", f'<span data-row-link="1" data-ret="{r:.4f}"', 1)
 
 
+def etf_section(market):
+    """종목 목록 페이지 ETF 구획 — experiments/stock-etf/etf_pages.list_section (한국 목록과 같은 함수). 그날 일봉(BARS)에서."""
+    sys.path.insert(0, os.path.join(_HERE, "..", "stock-etf"))
+    import etf_pages
+    return etf_pages.list_section(market, BARS)
+
+
 def list_body(a):
     top = [s for s in a["stocks"] if s["in_top"]]
     rest = [s for s in a["stocks"] if not s["in_top"] and s.get("rank") and s["rank"] <= U.PEER_GROUP_N]   # 목록은 시총 상위 20위까지 — 48개 확대 뒤에도 같은 목록 (2026-10-20)
@@ -1180,6 +1187,7 @@ def list_body(a):
     body = (_dk.report_stamp(_md(a["day"]) + "(미국 시간)", "한국 시간 아침 7시 30분 무렵")   # 맨 위 안내 상자 = 상세 페이지와 같게 (2026-11-07 0-1, 옛 `마지막 갱신` 회색 한 줄)
             + list_lead(a) + R.title_with_sort("시가총액 순위", tip, "us-cap10") + card(top, "us-cap10")
             + _dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest))
+            + etf_section("us")   # ETF 구획 (2026-11-12 사용자) — 발행된 ETF 페이지만, 목업은 전부
             + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다.")
             + R.related_buttons([("엔비디아 NVDA 주가", U.page_url("NVDA"))]))   # 함께 보는 페이지 — 한국 목록 · 상세 페이지처럼 (2026-11-07)
     return wrap(body + home_marker())
@@ -1238,7 +1246,10 @@ def write_all(a, out_dir, snap=None, news=None, media=None, summarize=False):
         if s["sym"] not in U.REPORT_TYPE:
             pages[s["sym"]] = (U.page_title(s["sym"]), detail_body(s, a["day"], news))
     for key, (title, body) in pages.items():
+        # 목업에만 · 발행 본문에만 표시 (목록 ETF 구획, 2026-11-12) — 한국 render_kr.write_all 과 같은 처리
+        real = re.sub(r"<!--mock-only-->.*?<!--/mock-only-->", "", body, flags=re.S).replace("<!--real-only-->", "").replace("<!--/real-only-->", "")
+        mock = re.sub(r"<!--real-only-->.*?<!--/real-only-->", "", body, flags=re.S).replace("<!--mock-only-->", "").replace("<!--/mock-only-->", "")
         with open(os.path.join(out_dir, f"{key}.html"), "w", encoding="utf-8") as f:
-            f.write(body)
-        _dk.write_mock(body, os.path.join(out_dir, f"mock_{key}.html"), title)
+            f.write(real)
+        _dk.write_mock(mock, os.path.join(out_dir, f"mock_{key}.html"), title)
     return pages

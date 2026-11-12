@@ -1,659 +1,4340 @@
 {
  "_note": "종목 로고 — 식별 용도. 각 로고는 해당 회사의 상표. 출처 MrChartist/global-stock-logos (TradingView 로고 서비스)",
  "logos": {
+  "000100.KS": {
+   "file": "KR_000100.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "000120.KS": {
+   "file": "KR_000120.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "000150.KS": {
+   "file": "KR_000150.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "000240.KS": {
+   "file": "KR_000240.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "000250.KQ": {
+   "file": "KR_000250.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
   "000270.KS": {
    "file": "KR_000270.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "000500.KS": {
+   "file": "KR_000500.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "000660.KS": {
    "file": "KR_000660.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "000720.KS": {
+   "file": "KR_000720.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "000810.KS": {
    "file": "KR_000810.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "000880.KS": {
+   "file": "KR_000880.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "000990.KS": {
+   "file": "KR_000990.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "001040.KS": {
+   "file": "KR_001040.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "001120.KS": {
+   "file": "KR_001120.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "001430.KS": {
+   "file": "KR_001430.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "001440.KS": {
+   "file": "KR_001440.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "001450.KS": {
+   "file": "KR_001450.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "001740.KS": {
+   "file": "KR_001740.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "001800.KS": {
+   "file": "KR_001800.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "001820.KS": {
+   "file": "KR_001820.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "002380.KS": {
+   "file": "KR_002380.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "002790.KS": {
+   "file": "KR_002790.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "003230.KS": {
+   "file": "KR_003230.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "003380.KQ": {
+   "file": "KR_003380.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "003490.KS": {
+   "file": "KR_003490.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "003540.KS": {
+   "file": "KR_003540.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "003550.KS": {
+   "file": "KR_003550.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "003670.KS": {
    "file": "KR_003670.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "003690.KS": {
+   "file": "KR_003690.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "004020.KS": {
+   "file": "KR_004020.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "004170.KS": {
+   "file": "KR_004170.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "004370.KS": {
+   "file": "KR_004370.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "004800.KS": {
+   "file": "KR_004800.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "004990.KS": {
+   "file": "KR_004990.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "005070.KS": {
+   "file": "KR_005070.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "005290.KQ": {
+   "file": "KR_005290.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "005380.KS": {
    "file": "KR_005380.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "005440.KS": {
+   "file": "KR_005440.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "005490.KS": {
    "file": "KR_005490.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "005830.KS": {
+   "file": "KR_005830.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "005850.KS": {
+   "file": "KR_005850.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "005930.KS": {
    "file": "KR_005930.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "005940.KS": {
+   "file": "KR_005940.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "006040.KS": {
+   "file": "KR_006040.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "006120.KS": {
+   "file": "KR_006120.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "006260.KS": {
+   "file": "KR_006260.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "006280.KS": {
+   "file": "KR_006280.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "006360.KS": {
+   "file": "KR_006360.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "006400.KS": {
    "file": "KR_006400.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "006730.KQ": {
+   "file": "KR_006730.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "006800.KS": {
+   "file": "KR_006800.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "007070.KS": {
+   "file": "KR_007070.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "007310.KS": {
+   "file": "KR_007310.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "007340.KS": {
+   "file": "KR_007340.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "007390.KQ": {
+   "file": "KR_007390.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "007660.KS": {
+   "file": "KR_007660.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "007810.KS": {
+   "file": "KR_007810.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "008770.KS": {
+   "file": "KR_008770.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "008930.KS": {
+   "file": "KR_008930.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "009150.KS": {
+   "file": "KR_009150.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "009420.KS": {
+   "file": "KR_009420.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "009540.KS": {
    "file": "KR_009540.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "009830.KS": {
+   "file": "KR_009830.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "009970.KS": {
+   "file": "KR_009970.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "010060.KS": {
+   "file": "KR_010060.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "010120.KS": {
+   "file": "KR_010120.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "010130.KS": {
    "file": "KR_010130.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "010140.KS": {
+   "file": "KR_010140.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "010170.KQ": {
+   "file": "KR_010170.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "010950.KS": {
+   "file": "KR_010950.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "011070.KS": {
+   "file": "KR_011070.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "011170.KS": {
+   "file": "KR_011170.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "011200.KS": {
+   "file": "KR_011200.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "011210.KS": {
+   "file": "KR_011210.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "011780.KS": {
+   "file": "KR_011780.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "011790.KS": {
+   "file": "KR_011790.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "012330.KS": {
+   "file": "KR_012330.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "012450.KS": {
    "file": "KR_012450.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "012750.KS": {
+   "file": "KR_012750.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "014620.KQ": {
+   "file": "KR_014620.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "014680.KS": {
+   "file": "KR_014680.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "015760.KS": {
    "file": "KR_015760.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "016360.KS": {
+   "file": "KR_016360.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "017670.KS": {
    "file": "KR_017670.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "017800.KS": {
+   "file": "KR_017800.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "018260.KS": {
+   "file": "KR_018260.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "018670.KS": {
+   "file": "KR_018670.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "018880.KS": {
+   "file": "KR_018880.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "020150.KS": {
+   "file": "KR_020150.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "020560.KS": {
+   "file": "KR_020560.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "021240.KS": {
+   "file": "KR_021240.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "022100.KS": {
+   "file": "KR_022100.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "023160.KQ": {
+   "file": "KR_023160.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "023530.KS": {
+   "file": "KR_023530.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "023590.KS": {
+   "file": "KR_023590.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "024110.KS": {
+   "file": "KR_024110.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "026960.KS": {
+   "file": "KR_026960.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "028050.KS": {
+   "file": "KR_028050.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "028260.KS": {
    "file": "KR_028260.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "028300.KQ": {
+   "file": "KR_028300.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "028670.KS": {
+   "file": "KR_028670.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "029780.KS": {
+   "file": "KR_029780.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "030000.KS": {
+   "file": "KR_030000.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "030200.KS": {
+   "file": "KR_030200.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "030530.KQ": {
+   "file": "KR_030530.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "031210.KS": {
+   "file": "KR_031210.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "031330.KQ": {
+   "file": "KR_031330.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "031980.KQ": {
+   "file": "KR_031980.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "032190.KQ": {
+   "file": "KR_032190.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "032500.KQ": {
+   "file": "KR_032500.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "032640.KS": {
+   "file": "KR_032640.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "032820.KQ": {
+   "file": "KR_032820.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "032830.KS": {
    "file": "KR_032830.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "033100.KQ": {
+   "file": "KR_033100.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "033640.KQ": {
+   "file": "KR_033640.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "033780.KS": {
+   "file": "KR_033780.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "033790.KQ": {
+   "file": "KR_033790.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "034020.KS": {
    "file": "KR_034020.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "034220.KS": {
+   "file": "KR_034220.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "034730.KS": {
+   "file": "KR_034730.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "035250.KS": {
+   "file": "KR_035250.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "035420.KS": {
    "file": "KR_035420.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "035720.KS": {
    "file": "KR_035720.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "035760.KQ": {
+   "file": "KR_035760.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "035900.KQ": {
+   "file": "KR_035900.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "036460.KS": {
+   "file": "KR_036460.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "036540.KQ": {
+   "file": "KR_036540.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "036570.KS": {
+   "file": "KR_036570.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "036810.KQ": {
+   "file": "KR_036810.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "036830.KQ": {
+   "file": "KR_036830.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "036930.KQ": {
+   "file": "KR_036930.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "038500.KQ": {
+   "file": "KR_038500.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "039030.KQ": {
+   "file": "KR_039030.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "039200.KQ": {
+   "file": "KR_039200.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "039490.KS": {
+   "file": "KR_039490.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "041510.KQ": {
+   "file": "KR_041510.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "041830.KQ": {
+   "file": "KR_041830.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "041960.KQ": {
+   "file": "KR_041960.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "042660.KS": {
    "file": "KR_042660.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
   },
   "042700.KS": {
    "file": "KR_042700.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "043260.KQ": {
+   "file": "KR_043260.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "044490.KQ": {
+   "file": "KR_044490.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "047040.KS": {
+   "file": "KR_047040.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "047050.KS": {
+   "file": "KR_047050.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "048410.KQ": {
+   "file": "KR_048410.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "050890.KQ": {
+   "file": "KR_050890.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "051600.KS": {
+   "file": "KR_051600.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "051900.KS": {
+   "file": "KR_051900.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "051910.KS": {
    "file": "KR_051910.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "052690.KS": {
+   "file": "KR_052690.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "053610.KQ": {
+   "file": "KR_053610.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "053800.KQ": {
+   "file": "KR_053800.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "055550.KS": {
    "file": "KR_055550.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "056090.KQ": {
+   "file": "KR_056090.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "056190.KQ": {
+   "file": "KR_056190.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "058470.KQ": {
+   "file": "KR_058470.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "058610.KQ": {
+   "file": "KR_058610.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "059090.KQ": {
+   "file": "KR_059090.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "060370.KQ": {
+   "file": "KR_060370.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "062040.KS": {
+   "file": "KR_062040.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "064290.KQ": {
+   "file": "KR_064290.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "064350.KS": {
    "file": "KR_064350.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "064400.KS": {
+   "file": "KR_064400.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "064760.KQ": {
+   "file": "KR_064760.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "065350.KQ": {
+   "file": "KR_065350.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "066570.KS": {
    "file": "KR_066570.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "066970.KS": {
+   "file": "KR_066970.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "067310.KQ": {
+   "file": "KR_067310.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "068270.KS": {
    "file": "KR_068270.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "068760.KQ": {
+   "file": "KR_068760.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "069620.KS": {
+   "file": "KR_069620.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "069960.KS": {
+   "file": "KR_069960.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "071050.KS": {
+   "file": "KR_071050.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "071970.KS": {
+   "file": "KR_071970.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "073240.KS": {
+   "file": "KR_073240.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "074600.KQ": {
+   "file": "KR_074600.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "077360.KQ": {
+   "file": "KR_077360.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "078600.KQ": {
+   "file": "KR_078600.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "078930.KS": {
+   "file": "KR_078930.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "080220.KQ": {
+   "file": "KR_080220.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "081660.KS": {
+   "file": "KR_081660.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "082740.KS": {
+   "file": "KR_082740.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "082920.KQ": {
+   "file": "KR_082920.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "083450.KQ": {
+   "file": "KR_083450.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "083650.KQ": {
+   "file": "KR_083650.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "084370.KQ": {
+   "file": "KR_084370.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "085620.KS": {
+   "file": "KR_085620.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "085660.KQ": {
+   "file": "KR_085660.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "086280.KS": {
+   "file": "KR_086280.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "086450.KQ": {
+   "file": "KR_086450.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "086520.KQ": {
    "file": "KR_086520.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "086790.KS": {
    "file": "KR_086790.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "087010.KQ": {
+   "file": "KR_087010.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "088350.KS": {
+   "file": "KR_088350.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "089030.KQ": {
+   "file": "KR_089030.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "089860.KS": {
+   "file": "KR_089860.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "089970.KQ": {
+   "file": "KR_089970.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "090360.KQ": {
+   "file": "KR_090360.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "090430.KS": {
+   "file": "KR_090430.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "090710.KQ": {
+   "file": "KR_090710.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "092870.KQ": {
+   "file": "KR_092870.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "093370.KS": {
+   "file": "KR_093370.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "095340.KQ": {
+   "file": "KR_095340.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "095610.KQ": {
+   "file": "KR_095610.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "096530.KQ": {
+   "file": "KR_096530.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "096770.KS": {
+   "file": "KR_096770.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "097230.KS": {
+   "file": "KR_097230.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "097950.KS": {
+   "file": "KR_097950.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "098460.KQ": {
+   "file": "KR_098460.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "099320.KQ": {
+   "file": "KR_099320.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "100790.KQ": {
+   "file": "KR_100790.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "101490.KQ": {
+   "file": "KR_101490.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "102710.KQ": {
+   "file": "KR_102710.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "103140.KS": {
+   "file": "KR_103140.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "103590.KS": {
+   "file": "KR_103590.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "105560.KS": {
    "file": "KR_105560.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "108490.KQ": {
+   "file": "KR_108490.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "111770.KS": {
+   "file": "KR_111770.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "112610.KS": {
+   "file": "KR_112610.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "115180.KQ": {
+   "file": "KR_115180.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "119850.KQ": {
+   "file": "KR_119850.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "120110.KS": {
+   "file": "KR_120110.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "121600.KQ": {
+   "file": "KR_121600.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "122640.KQ": {
+   "file": "KR_122640.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "122870.KQ": {
+   "file": "KR_122870.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "124500.KQ": {
+   "file": "KR_124500.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "126340.KQ": {
+   "file": "KR_126340.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "127120.KQ": {
+   "file": "KR_127120.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "128940.KS": {
+   "file": "KR_128940.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "131290.KQ": {
+   "file": "KR_131290.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "131970.KQ": {
+   "file": "KR_131970.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "137400.KQ": {
+   "file": "KR_137400.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "138040.KS": {
+   "file": "KR_138040.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "138930.KS": {
+   "file": "KR_138930.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "139130.KS": {
+   "file": "KR_139130.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "139480.KS": {
+   "file": "KR_139480.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "140410.KQ": {
+   "file": "KR_140410.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "140860.KQ": {
+   "file": "KR_140860.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "141080.KQ": {
+   "file": "KR_141080.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "145020.KQ": {
+   "file": "KR_145020.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "160190.KQ": {
+   "file": "KR_160190.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "161390.KS": {
+   "file": "KR_161390.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "161580.KQ": {
+   "file": "KR_161580.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "161890.KS": {
+   "file": "KR_161890.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "166090.KQ": {
+   "file": "KR_166090.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "171090.KQ": {
+   "file": "KR_171090.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "175330.KS": {
+   "file": "KR_175330.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "178320.KQ": {
+   "file": "KR_178320.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "180640.KS": {
+   "file": "KR_180640.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "181710.KS": {
+   "file": "KR_181710.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "183300.KQ": {
+   "file": "KR_183300.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "189300.KQ": {
+   "file": "KR_189300.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "192820.KS": {
+   "file": "KR_192820.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "195940.KQ": {
+   "file": "KR_195940.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "196170.KQ": {
    "file": "KR_196170.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "204270.KQ": {
+   "file": "KR_204270.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "204320.KS": {
+   "file": "KR_204320.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "207940.KS": {
    "file": "KR_207940.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "213420.KQ": {
+   "file": "KR_213420.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "214150.KQ": {
+   "file": "KR_214150.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "214370.KQ": {
+   "file": "KR_214370.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "214450.KQ": {
+   "file": "KR_214450.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "218410.KQ": {
+   "file": "KR_218410.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "222080.KQ": {
+   "file": "KR_222080.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "222800.KQ": {
+   "file": "KR_222800.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "225570.KQ": {
+   "file": "KR_225570.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "226950.KQ": {
+   "file": "KR_226950.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "229640.KS": {
+   "file": "KR_229640.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "232140.KQ": {
+   "file": "KR_232140.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "237690.KQ": {
+   "file": "KR_237690.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "240810.KQ": {
+   "file": "KR_240810.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "241560.KS": {
+   "file": "KR_241560.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "241710.KQ": {
+   "file": "KR_241710.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "247540.KQ": {
    "file": "KR_247540.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "251270.KS": {
+   "file": "KR_251270.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "251970.KQ": {
+   "file": "KR_251970.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "252990.KQ": {
+   "file": "KR_252990.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "253590.KQ": {
+   "file": "KR_253590.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "257720.KQ": {
+   "file": "KR_257720.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "259960.KS": {
+   "file": "KR_259960.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "263750.KQ": {
+   "file": "KR_263750.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "267250.KS": {
+   "file": "KR_267250.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "267260.KS": {
+   "file": "KR_267260.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "267270.KS": {
+   "file": "KR_267270.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "271560.KS": {
+   "file": "KR_271560.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "272210.KS": {
+   "file": "KR_272210.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "277810.KQ": {
+   "file": "KR_277810.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "278470.KS": {
+   "file": "KR_278470.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "279570.KS": {
+   "file": "KR_279570.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "281740.KQ": {
+   "file": "KR_281740.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "281820.KS": {
+   "file": "KR_281820.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "282330.KS": {
+   "file": "KR_282330.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "290650.KQ": {
+   "file": "KR_290650.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "293490.KQ": {
+   "file": "KR_293490.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "294870.KS": {
+   "file": "KR_294870.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "295310.KQ": {
+   "file": "KR_295310.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "298040.KS": {
+   "file": "KR_298040.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "298380.KQ": {
+   "file": "KR_298380.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "302440.KS": {
+   "file": "KR_302440.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "307950.KS": {
+   "file": "KR_307950.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "310210.KQ": {
+   "file": "KR_310210.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "316140.KS": {
+   "file": "KR_316140.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "319400.KQ": {
+   "file": "KR_319400.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "319660.KQ": {
+   "file": "KR_319660.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "322000.KS": {
+   "file": "KR_322000.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "323280.KQ": {
+   "file": "KR_323280.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "323410.KS": {
    "file": "KR_323410.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "326030.KS": {
+   "file": "KR_326030.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "327260.KQ": {
+   "file": "KR_327260.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "328130.KQ": {
+   "file": "KR_328130.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "329180.KS": {
    "file": "KR_329180.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "336260.KS": {
+   "file": "KR_336260.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "347700.KQ": {
+   "file": "KR_347700.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "347850.KQ": {
+   "file": "KR_347850.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "352820.KS": {
+   "file": "KR_352820.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "353200.KS": {
+   "file": "KR_353200.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "356860.KQ": {
+   "file": "KR_356860.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "357780.KQ": {
+   "file": "KR_357780.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "361610.KS": {
+   "file": "KR_361610.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "373220.KS": {
    "file": "KR_373220.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "375500.KS": {
+   "file": "KR_375500.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "377300.KS": {
+   "file": "KR_377300.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "383220.KS": {
+   "file": "KR_383220.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "388210.KQ": {
+   "file": "KR_388210.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "388720.KQ": {
+   "file": "KR_388720.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "402340.KS": {
    "file": "KR_402340.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "403870.KQ": {
+   "file": "KR_403870.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "415640.KS": {
+   "file": "KR_415640.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "417200.KQ": {
+   "file": "KR_417200.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "420770.KQ": {
+   "file": "KR_420770.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "425420.KQ": {
+   "file": "KR_425420.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "437730.KQ": {
+   "file": "KR_437730.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "439260.KS": {
+   "file": "KR_439260.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "440110.KQ": {
+   "file": "KR_440110.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "443060.KS": {
+   "file": "KR_443060.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "445680.KQ": {
+   "file": "KR_445680.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "450080.KS": {
+   "file": "KR_450080.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "454910.KS": {
+   "file": "KR_454910.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "456160.KQ": {
+   "file": "KR_456160.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "457190.KS": {
+   "file": "KR_457190.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "458870.KQ": {
+   "file": "KR_458870.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "462870.KS": {
+   "file": "KR_462870.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "466100.KQ": {
+   "file": "KR_466100.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "475150.KS": {
+   "file": "KR_475150.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "476060.KQ": {
+   "file": "KR_476060.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "476830.KQ": {
+   "file": "KR_476830.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "483650.KS": {
+   "file": "KR_483650.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "489790.KS": {
+   "file": "KR_489790.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "490470.KQ": {
+   "file": "KR_490470.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "491000.KQ": {
+   "file": "KR_491000.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "950160.KQ": {
+   "file": "KR_950160.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "A": {
+   "file": "A.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "AAPL": {
    "file": "AAPL.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "ABBV": {
    "file": "ABBV.jpg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "ABNB": {
+   "file": "ABNB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ABT": {
+   "file": "ABT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ACGL": {
+   "file": "ACGL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ACN": {
+   "file": "ACN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "ADBE": {
    "file": "ADBE.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "ADI": {
+   "file": "ADI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ADM": {
+   "file": "ADM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ADP": {
+   "file": "ADP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ADSK": {
+   "file": "ADSK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AEE": {
+   "file": "AEE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AEP": {
+   "file": "AEP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AES": {
+   "file": "AES.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AFL": {
+   "file": "AFL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AIG": {
+   "file": "AIG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AIZ": {
+   "file": "AIZ.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AJG": {
+   "file": "AJG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AKAM": {
+   "file": "AKAM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ALB": {
+   "file": "ALB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ALGN": {
+   "file": "ALGN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ALL": {
+   "file": "ALL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ALLE": {
+   "file": "ALLE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "AMAT": {
    "file": "AMAT.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "AMCR": {
+   "file": "AMCR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "AMD": {
    "file": "AMD.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "AME": {
+   "file": "AME.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AMGN": {
+   "file": "AMGN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AMP": {
+   "file": "AMP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AMT": {
+   "file": "AMT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "AMZN": {
    "file": "AMZN.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "ANET": {
    "file": "ANET.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "AON": {
+   "file": "AON.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AOS": {
+   "file": "AOS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "APA": {
+   "file": "APA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "APD": {
+   "file": "APD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "APH": {
+   "file": "APH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "APO": {
+   "file": "APO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "APP": {
+   "file": "APP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "APTV": {
+   "file": "APTV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ARE": {
+   "file": "ARE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ARES": {
+   "file": "ARES.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "ARM": {
    "file": "ARM.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "ASML": {
    "file": "ASML.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "ATO": {
+   "file": "ATO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "AVGO": {
    "file": "AVGO.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "AVY": {
+   "file": "AVY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AWK": {
+   "file": "AWK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AXON": {
+   "file": "AXON.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AXP": {
+   "file": "AXP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "AZO": {
+   "file": "AZO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BA": {
+   "file": "BA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BAC": {
+   "file": "BAC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BALL": {
+   "file": "BALL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BAX": {
+   "file": "BAX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BBY": {
+   "file": "BBY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BDX": {
+   "file": "BDX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BE": {
+   "file": "BE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BEN": {
+   "file": "BEN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BF-B": {
+   "file": "BF-B.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BG": {
+   "file": "BG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BIIB": {
+   "file": "BIIB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BKNG": {
+   "file": "BKNG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BKR": {
+   "file": "BKR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BLK": {
+   "file": "BLK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BMY": {
+   "file": "BMY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BNY": {
+   "file": "BNY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BR": {
+   "file": "BR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "BRK-B": {
    "file": "BRK-B.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "BRO": {
+   "file": "BRO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BSX": {
+   "file": "BSX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BX": {
+   "file": "BX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "BXP": {
+   "file": "BXP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "C": {
+   "file": "C.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CAH": {
+   "file": "CAH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CARR": {
+   "file": "CARR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CASY": {
+   "file": "CASY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "CAT": {
    "file": "CAT.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "CB": {
+   "file": "CB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CBOE": {
+   "file": "CBOE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CBRE": {
+   "file": "CBRE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CCI": {
+   "file": "CCI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CCL": {
+   "file": "CCL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CDNS": {
+   "file": "CDNS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CDW": {
+   "file": "CDW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "CEG": {
    "file": "CEG.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "CF": {
+   "file": "CF.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CFG": {
+   "file": "CFG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CHD": {
+   "file": "CHD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CHRW": {
+   "file": "CHRW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CHTR": {
+   "file": "CHTR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CI": {
+   "file": "CI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CIEN": {
+   "file": "CIEN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CINF": {
+   "file": "CINF.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CL": {
+   "file": "CL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CLX": {
+   "file": "CLX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CMCSA": {
+   "file": "CMCSA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CME": {
+   "file": "CME.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CMG": {
+   "file": "CMG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CMI": {
+   "file": "CMI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CMS": {
+   "file": "CMS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CNC": {
+   "file": "CNC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CNP": {
+   "file": "CNP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "COF": {
+   "file": "COF.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "COHR": {
+   "file": "COHR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "COIN": {
    "file": "COIN.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "COO": {
+   "file": "COO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "COP": {
    "file": "COP.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "COR": {
+   "file": "COR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "COST": {
    "file": "COST.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "CPAY": {
+   "file": "CPAY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CPRT": {
+   "file": "CPRT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CPT": {
+   "file": "CPT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "CRCL": {
    "file": "CRCL.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "CRH": {
+   "file": "CRH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CRL": {
+   "file": "CRL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "CRM": {
    "file": "CRM.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "CRWD": {
+   "file": "CRWD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "CRWV": {
    "file": "CRWV.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "CSCO": {
+   "file": "CSCO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CSGP": {
+   "file": "CSGP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CSX": {
+   "file": "CSX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CTAS": {
+   "file": "CTAS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CTSH": {
+   "file": "CTSH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CVNA": {
+   "file": "CVNA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "CVS": {
+   "file": "CVS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "CVX": {
    "file": "CVX.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "D": {
+   "file": "D.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DAL": {
+   "file": "DAL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DASH": {
+   "file": "DASH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DDOG": {
+   "file": "DDOG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DE": {
+   "file": "DE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DECK": {
+   "file": "DECK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "DELL": {
    "file": "DELL.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "DG": {
+   "file": "DG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DGX": {
+   "file": "DGX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DHI": {
+   "file": "DHI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DHR": {
+   "file": "DHR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "DIS": {
    "file": "DIS.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "DLR": {
+   "file": "DLR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DLTR": {
+   "file": "DLTR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DOC": {
+   "file": "DOC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DOV": {
+   "file": "DOV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DOW": {
+   "file": "DOW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DPZ": {
+   "file": "DPZ.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DRI": {
+   "file": "DRI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DTE": {
+   "file": "DTE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DUK": {
+   "file": "DUK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DVA": {
+   "file": "DVA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DVN": {
+   "file": "DVN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "DXCM": {
+   "file": "DXCM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EBAY": {
+   "file": "EBAY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ECHO": {
+   "file": "ECHO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ECL": {
+   "file": "ECL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ED": {
+   "file": "ED.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EFX": {
+   "file": "EFX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EG": {
+   "file": "EG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EIX": {
+   "file": "EIX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EL": {
+   "file": "EL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ELV": {
+   "file": "ELV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EME": {
+   "file": "EME.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EMR": {
+   "file": "EMR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "EOG": {
    "file": "EOG.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
   },
   "EQIX": {
    "file": "EQIX.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "EQT": {
+   "file": "EQT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ERIE": {
+   "file": "ERIE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ES": {
+   "file": "ES.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ESS": {
+   "file": "ESS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ETN": {
+   "file": "ETN.jpg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ETR": {
+   "file": "ETR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EVRG": {
+   "file": "EVRG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EW": {
+   "file": "EW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EXC": {
+   "file": "EXC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EXE": {
+   "file": "EXE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EXPD": {
+   "file": "EXPD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EXPE": {
+   "file": "EXPE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "EXR": {
+   "file": "EXR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "F": {
+   "file": "F.jpg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FANG": {
+   "file": "FANG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FAST": {
+   "file": "FAST.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FCX": {
+   "file": "FCX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FDS": {
+   "file": "FDS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FDX": {
+   "file": "FDX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FDXF": {
+   "file": "FDXF.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FE": {
+   "file": "FE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FERG": {
+   "file": "FERG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FFIV": {
+   "file": "FFIV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FICO": {
+   "file": "FICO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FIS": {
+   "file": "FIS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FISV": {
+   "file": "FISV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FITB": {
+   "file": "FITB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FIX": {
+   "file": "FIX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FLEX": {
+   "file": "FLEX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FOX": {
+   "file": "FOX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FOXA": {
+   "file": "FOXA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FRT": {
+   "file": "FRT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FSLR": {
+   "file": "FSLR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FTNT": {
+   "file": "FTNT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "FTV": {
+   "file": "FTV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GD": {
+   "file": "GD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GDDY": {
+   "file": "GDDY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "GE": {
    "file": "GE.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "GEHC": {
+   "file": "GEHC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GEN": {
+   "file": "GEN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GEV": {
+   "file": "GEV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GILD": {
+   "file": "GILD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GIS": {
+   "file": "GIS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GL": {
+   "file": "GL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GLW": {
+   "file": "GLW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GM": {
+   "file": "GM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GNRC": {
+   "file": "GNRC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GOOG": {
+   "file": "GOOG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "GOOGL": {
    "file": "GOOGL.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "GPC": {
+   "file": "GPC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GPN": {
+   "file": "GPN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GRMN": {
+   "file": "GRMN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GS": {
+   "file": "GS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "GWW": {
+   "file": "GWW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HAL": {
+   "file": "HAL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HAS": {
+   "file": "HAS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HBAN": {
+   "file": "HBAN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HCA": {
+   "file": "HCA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "HD": {
    "file": "HD.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "HIG": {
+   "file": "HIG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HII": {
+   "file": "HII.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HLT": {
+   "file": "HLT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HON": {
+   "file": "HON.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HONA": {
+   "file": "HONA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "HOOD": {
    "file": "HOOD.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "HPE": {
+   "file": "HPE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HPQ": {
+   "file": "HPQ.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HRL": {
+   "file": "HRL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HSIC": {
+   "file": "HSIC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HST": {
+   "file": "HST.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HSY": {
+   "file": "HSY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HUBB": {
+   "file": "HUBB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HUM": {
+   "file": "HUM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "HWM": {
+   "file": "HWM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "IBKR": {
+   "file": "IBKR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "IBM": {
    "file": "IBM.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "ICE": {
+   "file": "ICE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "IDXX": {
+   "file": "IDXX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "IEX": {
+   "file": "IEX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "IFF": {
+   "file": "IFF.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ILMN": {
+   "file": "ILMN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "INCY": {
+   "file": "INCY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "INTC": {
    "file": "INTC.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "INTU": {
+   "file": "INTU.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "INVH": {
+   "file": "INVH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "IONQ": {
    "file": "IONQ.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "IP": {
+   "file": "IP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "IQV": {
+   "file": "IQV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "IR": {
+   "file": "IR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "IRM": {
+   "file": "IRM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ISRG": {
+   "file": "ISRG.jpg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "IT": {
+   "file": "IT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ITW": {
+   "file": "ITW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "IVZ": {
+   "file": "IVZ.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "J": {
+   "file": "J.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "JBHT": {
+   "file": "JBHT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "JBL": {
+   "file": "JBL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "JCI": {
+   "file": "JCI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "JKHY": {
+   "file": "JKHY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "JNJ": {
    "file": "JNJ.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "JPM": {
    "file": "JPM.jpg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "KDP": {
+   "file": "KDP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "KEY": {
+   "file": "KEY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "KEYS": {
+   "file": "KEYS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "KHC": {
+   "file": "KHC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "KIM": {
+   "file": "KIM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "KKR": {
+   "file": "KKR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "KLAC": {
+   "file": "KLAC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "KMB": {
+   "file": "KMB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "KMI": {
+   "file": "KMI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "KO": {
    "file": "KO.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "KR": {
+   "file": "KR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "L": {
+   "file": "L.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LDOS": {
+   "file": "LDOS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LEN": {
+   "file": "LEN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LH": {
+   "file": "LH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LHX": {
+   "file": "LHX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LII": {
+   "file": "LII.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "LIN": {
    "file": "LIN.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "LITE": {
+   "file": "LITE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "LLY": {
    "file": "LLY.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "LMT": {
+   "file": "LMT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LNT": {
+   "file": "LNT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LOW": {
+   "file": "LOW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "LRCX": {
    "file": "LRCX.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "LULU": {
+   "file": "LULU.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LUV": {
+   "file": "LUV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LVS": {
+   "file": "LVS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LYB": {
+   "file": "LYB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "LYV": {
+   "file": "LYV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "MA": {
    "file": "MA.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "MAA": {
+   "file": "MAA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MAR": {
+   "file": "MAR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "MARA": {
    "file": "MARA.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "MAS": {
+   "file": "MAS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "MCD": {
    "file": "MCD.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "MCHP": {
+   "file": "MCHP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MCK": {
+   "file": "MCK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MCO": {
+   "file": "MCO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MDLZ": {
+   "file": "MDLZ.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MDT": {
+   "file": "MDT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MET": {
+   "file": "MET.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "META": {
    "file": "META.jpg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "MGM": {
+   "file": "MGM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MKC": {
+   "file": "MKC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MLM": {
+   "file": "MLM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MMM": {
+   "file": "MMM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MNST": {
+   "file": "MNST.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MO": {
+   "file": "MO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MOS": {
+   "file": "MOS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MPC": {
+   "file": "MPC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MPWR": {
+   "file": "MPWR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MRK": {
+   "file": "MRK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MRNA": {
+   "file": "MRNA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MRSH": {
+   "file": "MRSH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MRVL": {
+   "file": "MRVL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MS": {
+   "file": "MS.jpg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MSCI": {
+   "file": "MSCI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "MSFT": {
    "file": "MSFT.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "MSI": {
+   "file": "MSI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "MSTR": {
    "file": "MSTR.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "MTB": {
+   "file": "MTB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "MTD": {
+   "file": "MTD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "MU": {
    "file": "MU.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "NCLH": {
+   "file": "NCLH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NDAQ": {
+   "file": "NDAQ.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NDSN": {
+   "file": "NDSN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "NEE": {
    "file": "NEE.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "NEM": {
    "file": "NEM.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "NFLX": {
    "file": "NFLX.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "NI": {
+   "file": "NI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NKE": {
+   "file": "NKE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NOC": {
+   "file": "NOC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NOW": {
+   "file": "NOW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NRG": {
+   "file": "NRG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NSC": {
+   "file": "NSC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NTAP": {
+   "file": "NTAP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NTRS": {
+   "file": "NTRS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NUE": {
+   "file": "NUE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "NVDA": {
    "file": "NVDA.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "NVR": {
+   "file": "NVR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NWS": {
+   "file": "NWS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NWSA": {
+   "file": "NWSA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "NXPI": {
+   "file": "NXPI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "O": {
+   "file": "O.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ODFL": {
+   "file": "ODFL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "OKE": {
+   "file": "OKE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "OKTA": {
+   "file": "OKTA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "OMC": {
+   "file": "OMC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ON": {
+   "file": "ON.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "ORCL": {
    "file": "ORCL.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "ORLY": {
+   "file": "ORLY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "OTIS": {
+   "file": "OTIS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "OXY": {
+   "file": "OXY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "P": {
+   "file": "P.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PANW": {
+   "file": "PANW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PAYX": {
+   "file": "PAYX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PCAR": {
+   "file": "PCAR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PCG": {
+   "file": "PCG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PEG": {
+   "file": "PEG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PEP": {
+   "file": "PEP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PFE": {
+   "file": "PFE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PFG": {
+   "file": "PFG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "PG": {
    "file": "PG.jpg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "PGR": {
+   "file": "PGR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PH": {
+   "file": "PH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PHM": {
+   "file": "PHM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PKG": {
+   "file": "PKG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "PLD": {
    "file": "PLD.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "PLTR": {
    "file": "PLTR.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "PM": {
    "file": "PM.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "PNC": {
+   "file": "PNC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PNR": {
+   "file": "PNR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PNW": {
+   "file": "PNW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PODD": {
+   "file": "PODD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PPG": {
+   "file": "PPG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PPL": {
+   "file": "PPL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PRU": {
+   "file": "PRU.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PSA": {
+   "file": "PSA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PSX": {
+   "file": "PSX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PTC": {
+   "file": "PTC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PWR": {
+   "file": "PWR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "PYPL": {
+   "file": "PYPL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "Q": {
+   "file": "Q.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "QBTS": {
    "file": "QBTS.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "QCOM": {
    "file": "QCOM.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "QUBT": {
    "file": "QUBT.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "RCL": {
+   "file": "RCL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "RDDT": {
+   "file": "RDDT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "REG": {
+   "file": "REG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "REGN": {
+   "file": "REGN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "RF": {
+   "file": "RF.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "RGTI": {
    "file": "RGTI.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "RJF": {
+   "file": "RJF.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "RKLB": {
    "file": "RKLB.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "RL": {
+   "file": "RL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "RMD": {
+   "file": "RMD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ROK": {
+   "file": "ROK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ROL": {
+   "file": "ROL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ROP": {
+   "file": "ROP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ROST": {
+   "file": "ROST.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "RSG": {
+   "file": "RSG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "RTX": {
+   "file": "RTX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "RVTY": {
+   "file": "RVTY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SBAC": {
+   "file": "SBAC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SBUX": {
+   "file": "SBUX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SCHW": {
+   "file": "SCHW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "SHOP": {
    "file": "SHOP.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "SHW": {
+   "file": "SHW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SJM": {
+   "file": "SJM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SKYD": {
+   "file": "SKYD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "SLB": {
    "file": "SLB.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "SMCI": {
    "file": "SMCI.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "SMR": {
    "file": "SMR.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "SNA": {
+   "file": "SNA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SNDK": {
+   "file": "SNDK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SNPS": {
+   "file": "SNPS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "SO": {
    "file": "SO.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "SOLV": {
+   "file": "SOLV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "SPCX": {
    "file": "SPCX.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "SPG": {
+   "file": "SPG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SPGI": {
+   "file": "SPGI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SRE": {
+   "file": "SRE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "STE": {
+   "file": "STE.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "STLD": {
+   "file": "STLD.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "STT": {
+   "file": "STT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "STX": {
+   "file": "STX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "STZ": {
+   "file": "STZ.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SW": {
+   "file": "SW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SWK": {
+   "file": "SWK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SWKS": {
+   "file": "SWKS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SYF": {
+   "file": "SYF.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SYK": {
+   "file": "SYK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "SYY": {
+   "file": "SYY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "T": {
+   "file": "T.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TDG": {
+   "file": "TDG.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TDY": {
+   "file": "TDY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TECH": {
+   "file": "TECH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TEL": {
+   "file": "TEL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TER": {
+   "file": "TER.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TFC": {
+   "file": "TFC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TGT": {
+   "file": "TGT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TJX": {
+   "file": "TJX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TKO": {
+   "file": "TKO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TMO": {
+   "file": "TMO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TMUS": {
+   "file": "TMUS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TPL": {
+   "file": "TPL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TPR": {
+   "file": "TPR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TRGP": {
+   "file": "TRGP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TRMB": {
+   "file": "TRMB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TROW": {
+   "file": "TROW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TRV": {
+   "file": "TRV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TSCO": {
+   "file": "TSCO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "TSLA": {
    "file": "TSLA.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
   },
   "TSM": {
    "file": "TSM.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "TSN": {
+   "file": "TSN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TT": {
+   "file": "TT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TTWO": {
+   "file": "TTWO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TWLO": {
+   "file": "TWLO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "TXN": {
    "file": "TXN.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": true
+   "fetched": "2026-11-12"
+  },
+  "TXT": {
+   "file": "TXT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "TYL": {
+   "file": "TYL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "UAL": {
+   "file": "UAL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "UBER": {
    "file": "UBER.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "UDR": {
+   "file": "UDR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "UHS": {
+   "file": "UHS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ULTA": {
+   "file": "ULTA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "UNH": {
+   "file": "UNH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "UNP": {
+   "file": "UNP.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "UPS": {
+   "file": "UPS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "URI": {
+   "file": "URI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "USB": {
+   "file": "USB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "V": {
    "file": "V.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "VEEV": {
+   "file": "VEEV.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "VICI": {
+   "file": "VICI.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "VLO": {
+   "file": "VLO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "VLTO": {
+   "file": "VLTO.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "VMC": {
+   "file": "VMC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "VMRK": {
+   "file": "VMRK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "VRSK": {
+   "file": "VRSK.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "VRSN": {
+   "file": "VRSN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "VRT": {
    "file": "VRT.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "VRTX": {
+   "file": "VRTX.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "VST": {
    "file": "VST.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "VTR": {
+   "file": "VTR.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "VTRS": {
+   "file": "VTRS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "VZ": {
+   "file": "VZ.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WAB": {
+   "file": "WAB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WAT": {
+   "file": "WAT.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WDAY": {
+   "file": "WDAY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WDC": {
+   "file": "WDC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WEC": {
+   "file": "WEC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "WELL": {
    "file": "WELL.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "WFC": {
+   "file": "WFC.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WM": {
+   "file": "WM.jpg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WMB": {
+   "file": "WMB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "WMT": {
    "file": "WMT.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "WRB": {
+   "file": "WRB.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WSM": {
+   "file": "WSM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WST": {
+   "file": "WST.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WTW": {
+   "file": "WTW.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WY": {
+   "file": "WY.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "WYNN": {
+   "file": "WYNN.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "XEL": {
+   "file": "XEL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   },
   "XOM": {
    "file": "XOM.svg",
    "source": "MrChartist/global-stock-logos@0f4bf99",
-   "fetched": "2026-11-07",
-   "light": false
+   "fetched": "2026-11-12"
+  },
+  "XYL": {
+   "file": "XYL.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "XYZ": {
+   "file": "XYZ.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "YUM": {
+   "file": "YUM.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ZBH": {
+   "file": "ZBH.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ZBRA": {
+   "file": "ZBRA.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
+  },
+  "ZTS": {
+   "file": "ZTS.svg",
+   "source": "MrChartist/global-stock-logos@0f4bf99",
+   "fetched": "2026-11-12"
   }
  }
 }

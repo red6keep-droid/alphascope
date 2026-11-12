@@ -17,6 +17,7 @@ import universe as U
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import price_source  # noqa: E402  — yfinance 예비 사슬 (2026-10-21)
+import etf_universe  # noqa: E402  — 회원 `내 종목` ETF, 가격만 (2026-11-12)
 
 SECTOR_ETFS = ("XLK", "XLF", "XLE", "XLV", "XLP", "XLY", "XLI", "XLB", "XLU", "XLRE", "XLC")   # NVDA 리포트 config.SECTOR_ETFS 와 같은 11개
 HIST_MAX_AGE_DAYS = 7
@@ -103,7 +104,8 @@ def run():
     syms = [c[0] for c in U.CANDIDATES]
     extra = sorted({U.BENCH, "^VIX", "SMH", *SECTOR_ETFS})
     peers = sorted({p for v in U.PEERS.values() for p in v} - set(syms))   # 함께 보는 회사 중 64종목 밖 — `함께 움직이는 종목은?` 오늘 등락 (2026-11-01 사용자 P263). 페이지는 만들지 않는다
-    bars = _bars(syms + extra + peers)
+    etfs = sorted(set(etf_universe.US_SYMS) - set(syms) - set(extra) - set(peers))   # 맨 뒤 — 늦은 봉 예비(15개) 자리를 종목이 먼저 쓰게
+    bars = _bars(syms + extra + peers + etfs)
     # 시총 · 실적일은 바뀌는 주기에 맞춰서만 (detail_cache, 2026-11-12 사용자) — 시총 = 새 거래일마다, 실적일 = 주 1회 · 발표 14일 안이면 매일 · 발표 지난 뒤 처음.
     # 하루 네 번 실행이 같은 날 값을 다시 받던 것 (64종목 × 2 × 4)
     import detail_cache as DC
@@ -147,7 +149,7 @@ def history():
     import sys
     sys.path.insert(0, os.path.join(BASE, "..", "nvda-report"))
     import history_stats as HS
-    syms = [c[0] for c in U.CANDIDATES] + [U.BENCH]
+    syms = [c[0] for c in U.CANDIDATES] + [e for e in etf_universe.US_SYMS if e != U.BENCH] + [U.BENCH]   # ETF 페이지도 같은 카드 (2026-11-12) — 주 1회
     df = yf.download(syms, start="1999-01-01", interval="1d", auto_adjust=False, group_by="ticker", progress=False, threads=True)
     out = {"built": datetime.date.today().isoformat(), "stats": {}}
     spy = df[U.BENCH]["Close"].dropna()

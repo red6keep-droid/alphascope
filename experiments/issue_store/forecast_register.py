@@ -248,8 +248,18 @@ def reasons(w, shock_day, today, s, c, z_val, paths):
     """→ {"issues": [(이슈 이름, 건수)], "n": 모은 기사 수, "heads": [(헤드라인, 날짜, 매체)], "analyst": {...} 또는 None, "signals": [문장]}.
     기사 창 = 충격 전날 ~ 등록일 (UTC 날짜). 종목은 그 종목 점수(관련도 2 이상 · 충격과 같은 방향), 지수 · 업종은 시장 · 업종 범위 기사."""
     import collections
-    if w.get("kr"):   # 한국 = 아직 한국 기사 분류가 없다 — 미국 기사가 붙지 않게 우리 기록상 신호만 (갈래 근거 · 우리 신호 없음 → 날마다 근거도 건너뜀)
-        return {"issues": [], "n": 0, "heads": [], "analyst": None, "signals": _price_signals(shock_day, c, z_val), "window": [shock_day, today]}
+    if w.get("kr"):   # 한국 = 한국 기사 분류가 없어 미국 기사 대신 kr_why(방송 · 외국인 · 전날 밤 미국 · 공시 · 애널리스트 평균 · 알파스코프 신호, 2026-11-12 사용자)
+        out = {"issues": [], "n": 0, "heads": [], "analyst": None, "signals": _price_signals(shock_day, c, z_val), "window": [shock_day, today]}
+        try:
+            import kr_why as K
+            if K.CTX is not None:
+                fw = K.fc_of_w(w)
+                lo = (dt.date.fromisoformat(shock_day) - dt.timedelta(days=1)).isoformat()   # 미국과 같은 창 — 충격 전날 장 마감 뒤 ~ 등록일
+                out.update(K.rows(fw, lo, today, K.CTX))
+                out["our_signals"] = K.signals(fw, today, K.CTX)
+        except Exception as e:  # noqa: BLE001
+            print(f"[register] 한국 근거 실패: {type(e).__name__}: {str(e)[:80]}")
+        return out
     try:
         sys.path.insert(0, _EXP)
         import issue_codes
