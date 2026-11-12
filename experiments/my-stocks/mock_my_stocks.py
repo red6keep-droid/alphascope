@@ -206,22 +206,24 @@ def stock_left(s, sub_html):
 # 연필 · 휴지통 — 아이콘 꼴 규칙(가이드라인 8절: viewBox 16 선 그림 · 선 1.6 · 끝 둥글게). 실제 적용 때 design_kit.ICON_GLYPHS 로 옮긴다
 EDIT_GLYPH = '<path d="M10.5 2.5l3 3L6 13H3v-3l7.5-7.5z"/><path d="M9 4l3 3"/>'
 TRASH_GLYPH = '<path d="M2.5 4.5h11M6 4.5V3h4v1.5M4 4.5l.7 9h6.6l.7-9"/><path d="M6.8 7v4.5M9.2 7v4.5"/>'
-ICON_BTN = ("display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:40px;height:40px;background:#fff;"
-            "border:1px solid #B5BAC0;border-radius:8px;color:#111;cursor:pointer;")   # 흰 버튼(10절)과 같은 테두리 · 모서리, 아이콘만
+ICON_BTN = ("display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:36px;height:36px;background:#fff;"
+            "border:1px solid #E2E8F0;border-radius:8px;color:#111;cursor:pointer;")   # 머리 줄 뒤로 가기 버튼(.pr-back)과 같은 꼴 — 36 · 테두리 #E2E8F0 · 모서리 8 · 그림 20 (2026-11-12 사용자)
 
 
 def icon_btn(glyph, label):
     return (f'<a data-mock="1" role="button" aria-label="{label}" title="{label}" style="{ICON_BTN}">'
-            f'<svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{glyph}</svg></a>')
+            f'<svg viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{glyph}</svg></a>')
 
 
 # 아래 고정 입력 칸 — 폰 · 태블릿(900 이하)은 테마 하단 고정 메뉴(71 + 안전 영역) 바로 위, PC 는 화면 맨 아래. 글 폭(--shell 980) 안에 맞춤
 SHEET_CSS = ("<style>.ms-sheet{position:fixed;left:0;right:0;bottom:0;z-index:43;display:flex;justify-content:center;pointer-events:none;}"
              ".ms-sheet>details{pointer-events:auto;width:100%;max-width:980px;box-sizing:border-box;background:#fff;border-top:1px solid #E2E8F0;"
              "box-shadow:0 -4px 16px rgba(15,23,42,.08);border-radius:12px 12px 0 0;padding:0 14px 14px;}"
-             ".ms-sheet summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:14px 0;}"
+             ".ms-sheet summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 0;"
+             "color:#111;font-size:14px;line-height:20px;font-weight:700;}"   # 펼치기 버튼(dk.FOLD_IN_CARD) 꼴 — 가운데 14/20 굵게 + 화살표 16
+             ".ms-sheet .acc-chev{transform:rotate(180deg);}"   # 위로 열리는 칸이라 닫힘 = 위 화살표, 열림 = 아래 화살표
              ".ms-sheet summary::-webkit-details-marker{display:none;}"
-             ".ms-sheet details[open] .ms-chev{transform:rotate(180deg);}"
+             ".ms-sheet details[open] .acc-chev{transform:none;}"
              ".ms-pad{height:72px;}"
              "@media (max-width:900px){.ms-sheet{bottom:calc(71px + env(safe-area-inset-bottom));}}</style>")
 
@@ -238,17 +240,16 @@ def add_form(held):
         for i, (s, q, a) in enumerate(held))
     held_card = f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{rows}</span></div>'
 
-    inp = ("display:block;width:100%;box-sizing:border-box;height:44px;padding:0 10px;border:1px solid #E2E8F0;border-radius:8px;"
-           "font-size:16px;line-height:24px;color:#111;background:#fff;min-width:0;")
+    inp = ("display:block;width:100%;box-sizing:border-box;height:52px;padding:0 12px;border:1px solid #CBD5E1;border-radius:8px;"
+           "font-size:18px;line-height:26px;color:#111;background:#fff;min-width:0;")   # 입력 칸 크게 44 → 52 · 글자 16 → 18 (2026-11-12 사용자)
     head = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};"
     COLS = "display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1.3fr);gap:6px;"
     lines = "".join(f'<div style="{COLS}margin:0 0 6px;"><input data-mock="1" style="{inp}" placeholder="{ph}"><input data-mock="1" style="{inp}" inputmode="numeric" placeholder="주">'
                     f'<input data-mock="1" style="{inp}" inputmode="decimal" placeholder="$ · 원"></div>'
                     for ph in ("엔비디아 · 005930", "", ""))
-    chev = ('<svg class="ms-chev" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:#6B7280;transition:transform .15s;">'
-            '<path d="M4 10l4-4 4 4"/></svg>')
-    sheet = (SHEET_CSS + f'<div class="ms-pad"></div><div class="ms-sheet"><details>'
-             f'<summary><span style="font-size:16px;line-height:24px;font-weight:700;color:#111;">보유 종목 입력</span>{chev}</summary>'
+    chev = dk.ACC_CHEV
+    sheet = (SHEET_CSS + f'<div class="ms-pad"></div><div class="ms-sheet"><details{" open" if not held else ""}>'   # 보유 종목이 없으면 처음부터 열림
+             f'<summary><span>보유 종목 입력</span>{chev}</summary>'
              f'<div style="{COLS}margin:0 0 6px;"><span style="{head}">종목</span><span style="{head}">수량</span><span style="{head}">평균 매수가</span></div>'
              f'{lines}'
              f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0 0;">'
@@ -324,6 +325,12 @@ def main():
             + news_block(held)
             + dk.section("종목 관리", "".join([add_form(held)[0], leave_link(), add_form(held)[1]]), one_line=True, tab="종목 관리"))   # 제목 = 탭 이름과 같게 → 테마가 숨김 (2026-11-12 사용자: `종목 넣기 · 고치기` 제목 삭제)   # 맨 아래 작은 글씨 → 총액 카드 아래 ? 팝업 (2026-11-12 사용자)
     write(body, "mock_my-stocks.html", NAME)
+
+    # 로그인 뒤 · 아직 아무것도 안 적었을 때 — 탭 없이 안내 카드 + 아래 입력 칸 열림 (2026-11-12 사용자: 처음엔 어떻게 보이나)
+    empty = (dk.dcard(f'<div style="font-size:17px;line-height:26px;font-weight:700;color:#111;">아직 적어 둔 보유 종목이 없습니다</div>'
+                      f'<div style="font-size:15px;line-height:24px;color:#333;margin:4px 0 0;">아래 칸에 종목 · 수량 · 평균 매수가를 적고 저장하면, 여기에 총 평가 금액과 수익률이 보입니다.</div>')
+             + add_form([])[1])
+    write(empty, "mock_my-stocks-empty.html", NAME)
 
     # 로그인 전
     what = "".join(f'<li style="margin:0 0 6px;">{esc(t)}</li>' for t in (
