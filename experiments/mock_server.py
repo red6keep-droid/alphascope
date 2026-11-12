@@ -248,15 +248,18 @@ LOGO = ('<svg viewBox="0 0 313 286" width="31" height="28" aria-hidden="true"><p
         '<path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000000"/></svg>')
 CM_ICON = ('<svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
            '<path d="M4.5 4.5h13a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H10l-4 3.5v-3.5H4.5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2z"/></svg>')
-# 서랍 메뉴 = 블로그 주요 메뉴 전체 (2026-11-12 Claude 정리). (제목, [(하위 이름, 목업 키 또는 None = 목업 없음)])
+# 서랍 메뉴 = 블로그 주요 메뉴 전체 (2026-11-12 Claude 정리, 같은 날 사용자 2차: 하위가 오늘 · 지난 둘뿐인 곳은 타이틀 없이 —
+# 메뉴 이름을 누르면 오늘 화면, `지난 …` 은 같은 줄 오른쪽 작은 글자. 타이틀은 하위 이름만으로 뜻이 안 통하는 묶음(테마)에만).
+# 줄 = ("row", 이름, 목업 키, 지난 이름 또는 None) · 묶음 = ("group", 타이틀, [(이름, 목업 키)])
 MENU = [
-    ("미국 증시 리포트", [("오늘 리포트", "us"), ("지난 리포트", None)]),
-    ("한국 증시 리포트", [("오늘 리포트", "kr"), ("지난 리포트", None)]),
-    ("종목", [("미국 시가총액 상위 10", "list_us"), ("한국 시가총액 상위 10", "list_kr")]),
-    ("증시 전망", [("전망 목록", "forecast")]),
-    ("주요 인물 발언", [("오늘 발언", "people"), ("지난 발언", None)]),
-    ("테마", [("AI 투자 자금 방향", "th_ai"), ("연준 금리 인하 기대", "th_fed"), ("임원 기관 매매 동향", "th_ins")]),
-    ("방송 브리핑", [("오늘 브리핑", "media"), ("지난 브리핑", None)]),
+    ("row", "미국 증시 리포트", "us", "지난 리포트"),
+    ("row", "한국 증시 리포트", "kr", "지난 리포트"),
+    ("row", "미국 시가총액 상위 10 종목", "list_us", None),
+    ("row", "한국 시가총액 상위 10 종목", "list_kr", None),
+    ("row", "증시 전망", "forecast", None),
+    ("row", "주요 인물 발언", "people", "지난 발언"),
+    ("row", "방송 브리핑", "media", "지난 브리핑"),
+    ("group", "테마", [("AI 투자 자금 방향", "th_ai"), ("연준 금리 인하 기대", "th_fed"), ("임원 기관 매매 동향", "th_ins")]),
 ]
 
 
@@ -315,9 +318,15 @@ def fresh_theme(page):
 def journey_head():
     """상단 헤더 + 전체 메뉴(서랍) — <body> 바로 뒤에 넣는다."""
     rows = []
-    for title, subs in MENU:
-        items = "".join(f'<a {"data-jk" if k else "data-jnone"}="{k or ""}" href="#">{html.escape(n)}<span aria-hidden="true">›</span></a>' for n, k in subs)
-        rows.append(f'<div class="jgrp"><div class="jgt">{html.escape(title)}</div>{items}</div>')
+    for it in MENU:
+        if it[0] == "row":
+            _, name, k, past = it
+            pa = f'<a class="jpast" data-jnone href="#">{html.escape(past)}</a>' if past else ""
+            rows.append(f'<div class="jrow"><a class="jmain" data-jk="{k}" href="#">{html.escape(name)}</a>{pa}</div>')
+        else:
+            _, title, subs = it
+            items = "".join(f'<a data-jk="{k}" href="#">{html.escape(n)}<span aria-hidden="true">›</span></a>' for n, k in subs)
+            rows.append(f'<div class="jgrp"><div class="jgt">{html.escape(title)}</div>{items}</div>')
     return f"""
 <header id="jhead"><a class="jlogo" data-jk="home" href="#">{LOGO}<b>AlphaScope</b></a>
   <span class="jr"><a class="jflag" href="#"></a>
@@ -356,6 +365,10 @@ header.navbar, .header-bar {{display:none !important}}   /* 홈 목업의 옛 �
 .jmk{{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 20px}}
 .jmk a{{display:flex;align-items:center;justify-content:center;height:40px;border:1px solid #E2E8F0;border-radius:8px;color:#111;text-decoration:none;font-size:15px}}
 .jmk a.on{{border-color:#111;font-weight:700}}
+.jrow{{display:flex;align-items:stretch;border-top:1px solid #E2E8F0}}
+.jrow .jmain{{flex:1 1 auto;display:flex;align-items:center;min-height:52px;padding:0 12px 0 20px;color:#111;text-decoration:none;font-size:16px;line-height:24px;font-weight:600}}
+.jrow .jpast{{flex:none;display:flex;align-items:center;padding:0 20px 0 12px;color:#6B7280;text-decoration:none;font-size:13px;line-height:18px}}
+.jrow a:active{{background:#F1F5F9}} .jrow .jmain.on, .jgrp a.on{{background:#F8FAFC;box-shadow:inset 3px 0 0 #111;font-weight:700}}   /* 지금 보는 메뉴 — 빨강은 ▲상승과 겹쳐 안 씀 */
 .jgrp{{padding:6px 0 8px;border-top:1px solid #E2E8F0}}
 .jgt{{padding:12px 20px 4px;font-size:16px;line-height:24px;font-weight:700;color:#111}}
 .jgrp a{{display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 20px 0 32px;color:#333;text-decoration:none;font-size:15px;line-height:22px}}
@@ -385,7 +398,7 @@ body{{padding-bottom:calc(56px + env(safe-area-inset-bottom)) !important}}
   function go(key) {{ return J + (P[key] || key); }}
   document.querySelectorAll('#jbar a').forEach(function (a) {{ a.href = J + tab[a.dataset.jt]; if (a.dataset.jt === cur) a.className = 'on'; }});
   // 헤더 — 로고 = 지금 나라 홈, 국기 스위치 = 다른 나라 홈
-  document.querySelectorAll('[data-jk]').forEach(function (a) {{ var k = a.dataset.jk; a.href = k === 'home' ? J + P['home_' + mk] : go(k); if (go(k) === location.pathname) a.className = 'on'; }});
+  document.querySelectorAll('[data-jk]').forEach(function (a) {{ var k = a.dataset.jk; a.href = k === 'home' ? J + P['home_' + mk] : go(k); if (go(k) === location.pathname) a.classList.add('on'); }});
   var other = mk === 'kr' ? 'us' : 'kr', fl = document.querySelector('.jflag');
   fl.textContent = other === 'kr' ? '한국' : '미국'; fl.href = J + P['home_' + other];
   fl.addEventListener('click', function () {{ try {{ sessionStorage.setItem('jMarket', other); }} catch (e) {{}} }});
