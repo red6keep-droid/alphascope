@@ -34,6 +34,9 @@ SAMPLES = [
 ]
 BENCH = {"US": ("^GSPC", "S&P 500"), "KR": ("^KS11", "코스피")}
 # 전체 종목 목록 목업에 같이 싣는 종목 (정식 몇 개 + 간단 정보 몇 개)
+LIST_KR = [("005930.KS", "삼성전자", "반도체", True), ("000660.KS", "SK하이닉스", "반도체", True), ("035420.KS", "NAVER", "커뮤니케이션", True),
+           ("259960.KS", "크래프톤", "커뮤니케이션", False), ("352820.KS", "하이브", "커뮤니케이션", False), ("009150.KS", "삼성전기", "정보기술", False),
+           ("011200.KS", "HMM", "산업재", False), ("128940.KS", "한미약품", "헬스케어", False), ("000100.KS", "유한양행", "헬스케어", False)]
 LIST_US = [("NVDA", "엔비디아", "반도체", True), ("AAPL", "애플", "정보기술", True), ("UBER", "우버", "산업재", False), ("SBUX", "스타벅스", "경기 소비재", False),
            ("PLTR", "팔란티어", "정보기술", False), ("NKE", "나이키", "경기 소비재", False), ("SHOP", "쇼피파이", "정보기술", False), ("DE", "디어", "산업재", False)]
 
@@ -215,11 +218,11 @@ def page_us_full(smp):
     import collect_extra as CE
     import analyze_tabs
     nxt = next((x["day"] for x in snap["earnings"][sym] if x["day"] >= s["day"]), None)
-    _, st = CE._one((sym, s["close"], s["day"], nxt), only=("analysts", "eps", "company"))
+    _, st = CE._one((sym, s["close"], s["day"], nxt), only=("analysts", "eps", "company", "short"))   # 공매도 = 2주 1회 (2026-11-12 사용자 "공매도를 넣어서")
     rev, cash = sec_tables(sym)
     extra = {"stocks": {sym: st}, "revenue": {"series": {sym: rev} if rev else {}}, "capex": {sym: cash} if cash else {}, "peer_earnings": {}, "edgar": {}}
     analyze_tabs.build(s, snap, extra)
-    s["expect"]["move"] = s["expect"]["short"] = None   # 옵션 · 공매도 = 정식 종목만
+    s["expect"]["move"] = None   # 옵션(시장 예상 흔들림) = 정식 종목만 — 매일 받아야 뜻이 있다
     tab_today = (line + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500")
                  + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s))
     stamp_html = stamp(RP._md(s["day"]) + "(미국 시간)", "간단 정보입니다. 가격은 매 거래일, 실적 · 의견은 주 1회 갱신됩니다.")
@@ -228,7 +231,7 @@ def page_us_full(smp):
             + R._section("실적", RP.sec_expect(s) + RP.sec_calendar(s, ("earnings",), open_first=False), tab="실적")
             + R._section("업계상황", flow or dk.muted("업계 자료가 없습니다."), tab="업계상황")
             + R._section("기업", RP.sec_company(s), tab="기업")
-            + dk.muted("간단 정보는 뉴스 · 방송 의견 · 소송 · 옵션 · 공매도를 다루지 않습니다. 이 내용은 종목 분석 페이지에서 다룹니다.")
+            + dk.muted("간단 정보는 뉴스 · 방송 의견 · 소송 · 옵션을 다루지 않습니다. 이 내용은 종목 분석 페이지에서 다룹니다.")
             + dk.related_buttons(smp["peers"] + [("전체 종목 목록", "mock_all_stocks.html")]))
     return RP.wrap(body), f'{smp["name"]} {sym} 간단 정보'
 
@@ -337,30 +340,52 @@ def history_stats(syms):
     return out
 
 
-def all_stocks(data):
-    """전체 종목 목록 — 업종별 표: 이름 · 하루 등락 · 1년 범위 위치. 정식 종목은 이름 옆 `분석`."""
-    rows = {}
-    for sym, name, sector, full in LIST_US:
+def _market_rows(data, items, market):
+    """업종별 표 줄 — 이름 · 코드 · 1년 범위 위치 막대 · 하루 등락. 정식 종목은 이름 옆 `분석`."""
+    rows, last = {}, None
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    for sym, name, sector, full in items:
         df = data.get(sym)
         if df is None:
             continue
-        c = [float(x) for x in df.dropna(subset=["Close"])["Close"]]
+        sub = df.dropna(subset=["Close"])
+        if market == "KR" and sub.index[-1].strftime("%Y-%m-%d") == now.strftime("%Y-%m-%d") and now.hour < 16:
+            sub = sub.iloc[:-1]   # 한국 장중 봉 — 종가가 아니다
+        if len(sub) < 2:
+            continue
+        last = max(last or "", sub.index[-1].strftime("%Y-%m-%d"))
+        c = [float(x) for x in sub["Close"]]
         d1 = ret(c, 1)
         hi, lo = max(c[-252:]), min(c[-252:])
         pos = (c[-1] - lo) / (hi - lo) * 100 if hi > lo else 50
         tag = ('<span style="margin-left:6px;padding:1px 6px;border:1px solid #E2E8F0;border-radius:4px;font-size:12px;line-height:16px;color:#6B7280;font-weight:600;">분석</span>' if full else "")
         bar = (f'<span style="display:inline-block;position:relative;width:64px;height:6px;border-radius:3px;background:#E2E8F0;vertical-align:middle;margin-right:8px;">'
                f'<span style="position:absolute;left:{pos:.0f}%;top:-3px;width:8px;height:12px;margin-left:-4px;border-radius:2px;background:#1a73e8;"></span></span>')
-        href = "#" if full else f"mock_quick_{sym}.html"
-        nm = f'<a href="{href}" style="color:#111;text-decoration:none;">{dk.esc(name)}</a> <span style="font-size:14px;color:#6B7280;">{sym}</span>{tag}'
+        code = sym.split(".")[0]
+        href = "#" if full else (f"mock_quick_{code}.html" if os.path.exists(os.path.join(OUT, f"mock_quick_{code}.html")) else "#")
+        nm = f'<a href="{href}" style="color:#111;text-decoration:none;">{dk.esc(name)}</a> <span style="font-size:14px;color:#6B7280;">{code}</span>{tag}'
         rows.setdefault(sector, []).append((nm, f'{bar}<span style="color:{color(d1)};">{pct(d1)}</span>', ""))
+    return rows, last
+
+
+def all_stocks(data):
+    """전체 종목 목록 — 미국 · 한국 전환, 업종별 표: 이름 · 하루 등락 · 1년 범위 위치. 정식 종목은 이름 옆 `분석`."""
     search = ('<div style="margin:0 0 16px;"><input type="search" placeholder="종목 이름이나 코드로 찾기" '
               'style="width:100%;box-sizing:border-box;border:1px solid #E2E8F0;border-radius:999px;padding:10px 16px;font:inherit;font-size:16px;"></div>')
-    tabs = '<p style="margin:0 0 12px;font-size:15px;"><b>미국</b> · <span style="color:#6B7280;">한국</span></p>'
-    body = [stamp(LIST_DAY, "AlphaScope 가 다루는 모든 종목입니다."), tabs, search]
-    for sector, rs in rows.items():
-        body.append(dk.section(sector, dk.ccard(rs).replace('data-cards="1" ', '')))   # data-cards 는 테마가 탭 카드로 옮긴다 — 목록 표엔 쓰지 않음
-    body.append(dk.muted("이름 옆에 분석 표시가 있는 종목은 뉴스 · 의견까지 다루는 종목 분석 페이지로, 나머지는 간단 정보로 갑니다. 막대는 1년 최저 ~ 최고 사이 오늘 위치입니다."))
+    btn = ('<button type="button" data-mk="{k}" onclick="document.querySelectorAll(\'[data-mk-pane]\').forEach(function(p){{p.hidden=p.dataset.mkPane!==\'{k}\'}});'
+           'document.querySelectorAll(\'[data-mk]\').forEach(function(b){{b.style.fontWeight=b.dataset.mk===\'{k}\'?700:400;b.style.color=b.dataset.mk===\'{k}\'?\'#111\':\'#6B7280\'}})" '
+           'style="border:0;background:none;padding:0 4px;font:inherit;font-size:15px;cursor:pointer;font-weight:{w};color:{c};">{t}</button>')
+    tabs = ('<p style="margin:0 0 12px;">' + btn.format(k="US", t="미국", w=700, c="#111") + '<span style="color:#CBD5E1;"> · </span>'
+            + btn.format(k="KR", t="한국", w=400, c="#6B7280") + "</p>")
+    panes = []
+    for market, items, tail in (("US", LIST_US, "(미국 시간)"), ("KR", LIST_KR, "")):
+        rows, last = _market_rows(data, items, market)
+        part = [stamp(kday(datetime.date.fromisoformat(last)) + tail, "AlphaScope 가 다루는 모든 종목입니다.")] if last else []
+        for sector, rs in rows.items():
+            part.append(dk.section(sector, dk.ccard(rs).replace('data-cards="1" ', '')))   # data-cards 는 테마가 탭 카드로 옮긴다 — 목록 표엔 쓰지 않음
+        panes.append(f'<div data-mk-pane="{market}"{" hidden" if market == "KR" else ""}>{"".join(part)}</div>')
+    body = [tabs, search, *panes,
+            dk.muted("이름 옆에 분석 표시가 있는 종목은 뉴스 · 의견까지 다루는 종목 분석 페이지로, 나머지는 간단 정보로 갑니다. 막대는 1년 최저 ~ 최고 사이 오늘 위치입니다.")]
     html = f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:19px;line-height:35px;color:#333;">{"".join(body)}</div>'
     return dk.formal(html)
 
@@ -377,7 +402,7 @@ def main():
     _no_media_opinions()
     global LIST_DAY
     os.makedirs(OUT, exist_ok=True)
-    syms = sorted({s["sym"] for s in SAMPLES} | {x[0] for x in LIST_US} | {v[0] for v in BENCH.values()})
+    syms = sorted({s["sym"] for s in SAMPLES} | {x[0] for x in LIST_US + LIST_KR} | {v[0] for v in BENCH.values()})
     df = yf.download(syms, period="1y", interval="1d", auto_adjust=False, group_by="ticker", progress=False, threads=True)
     data = {s: df[s] for s in syms if s in df.columns.get_level_values(0)}
     for s in SAMPLES:
@@ -385,7 +410,6 @@ def main():
         body = re.sub(r"방송에서는[^.<]*\.\s*", "", body)   # 의견 요약의 방송 문장 — 간단 정보는 방송 의견을 싣지 않는다
         p = dk.write_mock(body, os.path.join(OUT, f'mock_quick_{s["sym"].split(".")[0]}.html'), title)
         print("만듦:", p)
-    LIST_DAY = kday(datetime.date.fromisoformat(data["AAPL"].dropna(subset=["Close"]).index[-1].strftime("%Y-%m-%d"))) + "(미국 시간)"
     p = dk.write_mock(all_stocks(data), os.path.join(OUT, "mock_all_stocks.html"), "전체 종목")
     print("만듦:", p)
 
