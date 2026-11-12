@@ -119,7 +119,7 @@ def grand_card(held):
 
     top = (f'<div style="{ROW}"><span style="font-size:17px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">총 평가 금액</span>'
            f'<span style="font-size:21px;line-height:28px;font-weight:800;color:#111;white-space:nowrap;">{won_html(val, 21)}</span></div>')   # 30 → 28 → 26 → 23 → 21 (2026-11-12 사용자)
-    grid = [cells("", f'<span style="font-size:{dk.TINY};color:{dk.NOTE};">{won_html(cost, 14)}</span>'),   # 매수 금액 = 수익 금액 위 · 이름 없이 회색 작은 글씨 (2026-11-12 사용자)
+    grid = [f'<span style="grid-column:1/-1;text-align:right;white-space:nowrap;font-size:{dk.TINY};color:{dk.NOTE};">매수 금액 {won_html(cost, 14)}</span>',   # 매수 금액 = 수익 금액 위 · `매수 금액 33,325,020 원` 한 덩어리 오른쪽 정렬, 회색 작은 글씨 (2026-11-12 사용자)
             cells("수익 금액", updown(gain, won_html(gain, FS), FS, tri=False), updown(gain, f"{abs(gain / cost * 100):.1f}%", FS))]
     for m, head in (("us", "미국"), ("kr", "한국")):   # `미국 3종목` (2026-11-12 사용자: `미국 종목` → `미국`)
         rows = [h for h in held if h[0]["m"] == m]
