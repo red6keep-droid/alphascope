@@ -213,7 +213,9 @@
     if (c.why) asked = ['news', 'change'];   // 왜 떨어졌어 → 최근 소식이 먼저
     if (asked.indexOf('earnings') >= 0) asked = asked.filter(function (x) { return x !== 'earnDate'; });
     var priceFirst = !asked.length;
-    var extra = priceFirst ? (compact ? ['change'] : ['change', 'valuation', 'earnDate']) : [];   // 종목 이름만 → 요약
+    /* 종목 이름만 → 요약 = 주가 한 문장 · 기간별 등락 · 다음 실적 발표 (2026-11-12 사용자: "요약이 독자가 원하는 내용이 맞아?").
+       EPS · PER · 목표가는 물을 때만 — 이름만 친 독자에게는 어려운 숫자이고 목표가는 사라는 말처럼 읽힌다. 자세한 것은 종목 페이지로 */
+    var extra = priceFirst ? (compact ? ['change'] : ['change', 'earnDate']) : [];
     var body = '';
     if (c.why) body += '<p class="as-note">AlphaScope는 등락 이유를 짐작해서 답하지 않습니다. 확인된 숫자와 최근 소식만 모았습니다.</p>';
     if (priceFirst) body += PART.price(s);
@@ -224,7 +226,9 @@
     return '<article class="as-card">'
       + '<header><span class="as-mkt as-' + s.m + '">' + (s.m === 'us' ? '미국' : '한국') + '</span><h3>' + label(s) + '</h3><span class="as-day">' + md(s.p.d) + ' 종가 기준</span></header>'
       + body
-      + '<a class="as-more" href="' + esc(s.u) + '">' + esc(s.n) + ' 종목 페이지에서 자세히 보기 →</a></article>';
+      /* 독자가 실제로 가야 할 곳 = 종목 페이지 → 카드 끝 검은 버튼(가이드라인 10절 검은 버튼, 2026-11-12 사용자) */
+      + '<a class="as-go" href="' + esc(s.u) + '">' + esc(s.n) + ' 종목 페이지 보기</a>'
+      + '<p class="as-go-note">주가 차트 · 실적 · 애널리스트 의견 · 기술 지표 · 뉴스를 한 페이지에 모았습니다.</p></article>';
   }
 
   function answer(doc, q, compact) {
@@ -262,21 +266,39 @@
       document.head.appendChild(sc);
     });
   }
-  function searchTerm(q, stocks) {   // "엔비디아 실적 알려줘" 를 그대로 넣으면 Blogger 가 못 찾는다 — 종목 이름으로
-    if (stocks.length) return stocks[0].n.replace(/\(.*\)/, '');
+  /* 함께 보는 페이지 (2026-11-12 사용자: "관련 글이 삼성전자와 어떤 관련인지 모르겠다 · 블로그에서 더 찾기가 옛 리포트로 간다").
+     Blogger 피드 검색은 고정 페이지(종목 페이지)를 못 찾고, 종목 이름이 한 번 나온 날짜별 리포트만 돌려준다 → 종목을 찾았으면 쓰지 않는다.
+     종목을 찾았으면 = 그 시장 시총 TOP 10 · 그 시장 증시 리포트(이름 · 주소 = design_kit.REPORT_LINKS).
+     못 찾았으면 = 그 말이 나온 글(피드 검색, 최대 3) + 두 시장 리포트. `블로그에서 더 찾기`(Blogger /search)는 없앤다 — 그 화면이 옛 글 하나만 보인다 */
+  var LINKS = {
+    us: ['미국 증시 리포트', BLOG + '/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'],
+    kr: ['한국 증시 리포트', BLOG + '/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'],
+    us_top: ['미국 시가총액 상위 10개 종목 주가', BLOG + '/p/us-market-cap-top10.html'],
+    kr_top: ['한국 시가총액 상위 10개 종목 주가', BLOG + '/p/kr-market-cap-top10.html'],
+  };
+  var OUT_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg>';
+  function outBtn(name, url, sub) {
+    return '<a class="as-out" href="' + esc(url) + '"><span>' + esc(name) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span>' + OUT_ICON + '</a>';
+  }
+  function searchTerm(q) {
     return q.replace(/알려\s*줘|알려\s*주세요|어때|뭐야|인가요|있어\??|[?？!]/g, ' ').trim();
   }
-  function fillRelated(box, q, stocks, n) {
-    var term = searchTerm(q, stocks), all = BLOG + '/search?q=' + encodeURIComponent(term);
-    box.innerHTML = '<h4>관련 글 <small>“' + esc(term) + '”</small></h4><p class="as-note">불러오는 중…</p>';
-    relatedPosts(term, n).then(function (rows) {
-      box.innerHTML = '<h4>관련 글 <small>“' + esc(term) + '”</small></h4>'
-        + (rows.length ? '<ul class="as-posts">' + rows.map(function (r) { return '<li><a href="' + esc(r.u) + '">' + esc(r.t) + '</a><span>' + r.d + '</span></li>'; }).join('') + '</ul>'
-          : '<p class="as-note">이 말로 찾은 글이 없습니다.</p>')
-        + '<a class="as-more" href="' + all + '">블로그에서 더 찾기 →</a>';
-    }, function () {
-      box.innerHTML = '<h4>관련 글</h4><p class="as-note">글 목록을 불러오지 못했습니다. <a href="' + all + '">블로그 검색으로 보기</a></p>';
-    });
+  function fillRelated(box, q, stocks) {
+    var head = '<h4>함께 보는 페이지</h4>';
+    if (stocks.length) {
+      var m = stocks[0].m;
+      box.innerHTML = head + outBtn(LINKS[m + '_top'][0], LINKS[m + '_top'][1]) + outBtn(LINKS[m][0], LINKS[m][1]);
+      return;
+    }
+    var fixed = outBtn(LINKS.us[0], LINKS.us[1]) + outBtn(LINKS.kr[0], LINKS.kr[1]);
+    var term = searchTerm(q);
+    box.innerHTML = head + fixed;
+    if (!term) return;
+    relatedPosts(term, 3).then(function (rows) {
+      if (!rows.length) return;
+      box.innerHTML = '<h4>‘' + esc(term) + '’이 나온 글</h4>' + rows.map(function (r) { return outBtn(r.t, r.u, r.d.replace(/-/g, '.')); }).join('')
+        + '<h4 class="as-h-next">함께 보는 페이지</h4>' + fixed;
+    }, function () {});
   }
 
   /* ---------- 검색 창 (헤더 아이콘) ---------- */
@@ -290,23 +312,28 @@
     layer.innerHTML = '<div class="as-search-box" role="dialog" aria-modal="true" aria-label="검색">'
       + '<form class="as-search-form" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
       + '<input type="search" name="q" placeholder="종목 이름이나 궁금한 것 (예: 엔비디아 실적)" autocomplete="off" enterkeyhint="search">'
-      + '<button type="button" class="as-x" aria-label="검색 닫기">닫기</button></form>'
-      + '<div class="as-search-out">' + chips('as-chips') + '<p class="as-hint">주가 · 등락 · 실적 · EPS · 기술 지표 · 회사 정보를 바로 답하고, 관련 글을 함께 보여 줍니다.</p></div></div>';
+      + '<button type="button" class="as-clear" aria-label="검색어 지우기" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10"/><path d="M7 7l6 6M13 7l-6 6"/></svg></button>'
+      + '<button type="button" class="as-x" aria-label="검색 닫기"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9"/></svg></button></form>'
+      + '<div class="as-search-out">' + chips('as-chips') + '<p class="as-hint">주가 · 등락 · 실적 · EPS · 기술 지표 · 회사 정보를 바로 답하고, 종목 페이지로 안내합니다.</p></div></div>';
     document.body.appendChild(layer);
-    var form = layer.querySelector('form'), input = form.q, out = layer.querySelector('.as-search-out');
+    var form = layer.querySelector('form'), input = form.q, out = layer.querySelector('.as-search-out'), clr = layer.querySelector('.as-clear');
+    function syncClear() { clr.hidden = !input.value; }
+    input.addEventListener('input', syncClear);
+    clr.addEventListener('click', function () { input.value = ''; syncClear(); input.focus(); });
 
     function run(q) {
       q = q.trim();
       if (!q) return;
       input.value = q;
+      syncClear();
       out.innerHTML = '<p class="as-note">찾는 중…</p>';
       loadIndex().then(function (doc) {
         var a = answer(doc, q, false);
         out.innerHTML = '<section class="as-answer">' + a.html + '</section><section class="as-related"></section>';
-        fillRelated(out.querySelector('.as-related'), q, a.stocks, 5);
+        fillRelated(out.querySelector('.as-related'), q, a.stocks);
       }, function () {
         out.innerHTML = '<p class="as-note">종목 자료를 불러오지 못했습니다.</p><section class="as-related"></section>';
-        fillRelated(out.querySelector('.as-related'), q, [], 5);
+        fillRelated(out.querySelector('.as-related'), q, []);
       });
     }
     form.addEventListener('submit', function (e) { e.preventDefault(); run(input.value); });

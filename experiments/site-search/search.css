@@ -12,7 +12,16 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-search-form { display: flex; align-items: center; gap: 10px; border-bottom: 2px solid var(--ink, #0F172A); padding: 6px 0 10px; }
 .as-search-form input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; font-size: 20px; background: transparent; color: inherit; }
 .as-search-form input::-webkit-search-cancel-button { display: none; }
-.as-x { border: 0; background: none; color: #6B7280; font: inherit; font-size: 14px; cursor: pointer; padding: 6px 4px; }
+/* 닫기 = 회색 원 안 × (32) · 검색어 지우기 = 작은 회색 원 안 흰 × (20, 글자가 있을 때만) — 2026-11-12 사용자 */
+.as-x, .as-clear { flex: none; display: inline-flex; border: 0; background: none; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.as-x[hidden], .as-clear[hidden] { display: none; }
+.as-x svg { width: 32px; height: 32px; }
+.as-x circle { fill: #EEF0F3; stroke: none; }
+.as-x path { fill: none; stroke: #4B5563; stroke-width: 2; stroke-linecap: round; }
+.as-x:hover circle { fill: #E2E5EA; }
+.as-clear svg { width: 20px; height: 20px; }
+.as-clear circle { fill: #B5BAC0; stroke: none; }
+.as-clear path { fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; }
 .as-search-out { padding-top: 16px; }
 .as-hint { color: #6B7280; font-size: 14px; margin: 12px 0 0; }
 
@@ -61,7 +70,20 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-empty { background: var(--surface-sub, #F8FAFC); border-radius: 10px; padding: 14px; font-size: 15px; line-height: 1.7; margin-bottom: 12px; }
 .as-basis { display: flex; gap: 6px; margin: 8px 0 0; color: #6B7280; font-size: 13px; line-height: 1.6; }
 .as-basis span { flex: none; }
-.as-related { margin-top: 18px; }
+.as-related { margin-top: 22px; }
+.as-related h4 { font-size: 16px; line-height: 26px; color: #111; margin: 0 0 8px; }
+.as-related .as-h-next { margin-top: 18px; }
+/* 종목 페이지 = 검은 버튼(가이드라인 10절: #111 · 흰 글자 굵게 · 모서리 8 · 화살표 없음), 폭 전체 */
+.as-go { display: flex; align-items: center; justify-content: center; margin-top: 14px; min-height: 46px; padding: 11px 12px; border-radius: 8px;
+  background: #111; color: #fff !important; font-size: 16px; line-height: 24px; font-weight: 700; text-decoration: none; }
+.as-go:hover { background: #333; }
+.as-go-note { margin: 8px 0 0; color: #6B7280; font-size: 13px; line-height: 20px; text-align: center; }
+/* 함께 보는 페이지 = 블로그 안 다른 페이지 버튼(가이드라인 10절 R.out_btn: 흰 · #E2E8F0 · 모서리 8 · 14 굵게 · 안쪽 8 12 · 높이 38 · 아이콘 16 오른쪽) */
+.as-out { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 38px; box-sizing: border-box; padding: 8px 12px; margin: 0 0 8px;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; font-size: 14px; line-height: 20px; font-weight: 700; text-decoration: none; }
+.as-out:hover { border-color: #111; }
+.as-out small { display: block; font-weight: 400; color: #7A7A7A; font-size: 13px; line-height: 18px; }
+.as-out svg { flex: none; width: 16px; height: 16px; fill: none; stroke: #7A7A7A; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .as-posts li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border, #F0F0F0); font-size: 15px; }
 .as-posts a { color: var(--ink, #0F172A); text-decoration: none; }
 .as-posts a:hover { text-decoration: underline; }
