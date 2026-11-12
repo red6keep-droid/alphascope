@@ -317,3 +317,98 @@ def day_why(fc, day, prev_day, ctx, prev_sigs=None):
                       for r in cur if r["name"] in before and before[r["name"]]["state"] != r["state"]]
     out["sigs"] = cur or (prev_sigs or [])
     return out
+
+
+# ---------------------------------------------------------------- 미국 보완 (2026-11-12 사용자: "미국 것도 보완해줘")
+# 미국 전망 근거 = 기사 · 애널리스트 · 알파스코프 신호. 한국에만 있던 것 중 미국에도 맞는 둘을 붙인다:
+#   ① 방송 이슈(media_feed — 미국 증시 내용, 종목 = stocks_for · 업종 = sector_groups · 지수 = 시장 범위) — 미국 전망은 방송을 쓰지 않았다
+#   ② 실적 발표일(data/store/calendar/earnings.csv — 그날 그 종목 실적, 좋고 나쁨은 날짜만으로 모르니 향방미정)
+# 외국인 수급 · 전날 밤 미국은 한국 쪽 자료라 미국에는 없다.
+US_CLOSE_UTC = "21:00"   # 미국 장 마감(16:00 ET) ≈ 21:00 UTC (서머타임 땐 20:00 — 한 시간 차는 방송 시각 묶음에 영향 작음)
+
+
+def _us_target(fc):
+    sym = (fc.get("series") or {}).get("sub") or ""
+    if fc.get("target") == "stock":
+        return sym, "stock", None
+    sys.path.insert(0, _HERE)
+    import forecast_register as R
+    grp = next((g for g, v in R.SECTOR_IDX.items() if v[0] == sym), None)
+    return sym, ("sector" if grp else "index"), grp
+
+
+def _us_broadcast(fc, lo, hi, ctx):
+    mf = ctx.get("mf")
+    if not mf:
+        return []
+    sym, kind, grp = _us_target(fc)
+    a, b = f"{lo}T{US_CLOSE_UTC}", f"{hi}T{US_CLOSE_UTC}"
+    rows = [r for r in ctx["media"] if a < str(r["published_at"])[:16] <= b and not mf.is_korea(r)]
+    out = []
+    for r in mf.issues(rows, ""):
+        if r["category"] == "OTHER" or len([x for x in (r.get("lines") or []) if x]) < 2:
+            continue
+        if kind == "stock":
+            if sym not in mf.stocks_for(r):
+                continue
+            lv = 3 if r["scope"] == "stock" else 2
+        elif kind == "sector":
+            if r["scope"] != "sector" or grp not in mf.sector_groups(r):
+                continue
+            lv = 2
+        else:
+            if r["scope"] != "market":
+                continue
+            lv = 1
+        d = "uncertain" if r.get("split") else r["direction"] if r["direction"] in ("positive", "negative") else None
+        if not d:
+            continue
+        n = r.get("n_channels", 1)
+        out.append({"t": r["topic"], "dir": d, "day": str(r["published_at"])[:10], "lv": lv, "kind": "방송",
+                    "src": r["channel"] + (f" 외 {n - 1}곳" if n > 1 else ""), "lines": [x for x in r["lines"] if x][:5], "url": r.get("url")})
+    return out
+
+
+_EARN = None
+
+
+def _us_earnings(fc, lo, hi):
+    global _EARN
+    sym, kind, grp = _us_target(fc)
+    if kind != "stock":
+        return []
+    if _EARN is None:
+        import csv
+        p = os.path.join(_ROOT, "data", "store", "calendar", "earnings.csv")
+        _EARN = {}
+        if os.path.exists(p):
+            for r in csv.DictReader(open(p, encoding="utf-8")):
+                _EARN.setdefault(r["symbol"], set()).add(r["day"])
+    return [{"t": "분기 실적 발표", "dir": "uncertain", "day": d, "lv": 3, "kind": "실적", "src": "실적 일정"}
+            for d in sorted(_EARN.get(sym, ())) if lo < d <= hi]
+
+
+def us_extra(fc, lo, hi, ctx):
+    """미국 전망에 더할 줄 → side_news 와 같은 {"good", "bad", "open"} (건수는 부르는 쪽이 합친다)."""
+    allr = []
+    for fn, args in ((_us_broadcast, (fc, lo, hi, ctx)), (_us_earnings, (fc, lo, hi))):
+        try:
+            allr += fn(*args)
+        except Exception as e:  # noqa: BLE001
+            print(f"[kr_why] {fn.__name__} 실패: {type(e).__name__}: {str(e)[:80]}")
+    return {key: [r for r in allr if r["dir"] == d] for key, d in (("good", "positive"), ("bad", "negative"), ("open", "uncertain"))}
+
+
+def merge(side, extra, keep=30):
+    """기사 근거(side) 뒤에 보완 줄(extra)을 붙인다 — 대상에 가까운 줄 먼저(lv), 같은 층은 최근 먼저. 건수(count)도 더한다."""
+    out = dict(side or {})
+    cnt = dict((side or {}).get("count") or {})
+    for k in ("good", "bad", "open"):
+        rs = list((side or {}).get(k) or []) + list(extra.get(k) or [])
+        rs.sort(key=lambda r: r.get("day", ""), reverse=True)
+        rs.sort(key=lambda r: -r.get("lv", 0))
+        out[k] = rs[:keep]
+        cnt[k] = cnt.get(k, len((side or {}).get(k) or [])) + len(extra.get(k) or [])
+    out["count"] = cnt
+    return out
+

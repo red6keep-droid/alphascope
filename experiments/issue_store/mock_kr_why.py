@@ -119,6 +119,8 @@ def main():
     px = F.fetch((dt.date.today() - dt.timedelta(days=60)).isoformat(), {s for s in syms if s})
     ctx = K.load_ctx(dt.datetime.now(K.KST).strftime("%Y-%m-%d"), px)
     print(dk.write_mock(map_page(targets, px, ctx), os.path.join(OUT, "mock_kr_why-map.html"), "한국 전망 근거"))
+    us_case(px, ctx)
+    long_case()
     sr, sfc = semi_case(px)
     for r, fc in kr_regs + [(sr, sfc)]:
         fc = copy.deepcopy(fc)
@@ -138,5 +140,57 @@ def main():
         print(f'  {fc["title"]}: 등록 근거 상승 {w["count"]["good"]} · 하락 {w["count"]["bad"]} · 향방미정 {w["count"]["open"]} / 타임라인 근거 날 {sum(1 for e in st["log"] if e.get("why") and any(e["why"][k] for k in ("good", "bad")))}/{len(st["log"]) - 1}')
 
 
+def us_case(px, ctx):
+    """미국 보완 확인용 — 블로그의 실제 `엔비디아 급락` 전망(state nvda-state EH-2026-003)에 방송 · 실적일 줄을 더한 모습."""
+    import subprocess
+    raw = subprocess.run(["git", "show", "state/nvda-state:experiments/nvda-report/output/state/records/hypotheses/EH-2026-003.json"],
+                         cwd=K._ROOT, capture_output=True).stdout
+    if not raw:
+        return
+    reg = json.loads(raw)
+    fc = copy.deepcopy(reg["forecasts"][0])
+    sub, mkt = F.series_of(fc)
+    if sub not in px:
+        px.update(F.fetch((dt.date.today() - dt.timedelta(days=60)).isoformat(), {sub, mkt}))
+    days, rel = F.series(px, F.base_of(fc), fc.get("beta") or 1.0, sub, mkt)
+    st = H.judge(fc, days, rel)
+    st["quote"] = H.quote_of(px.get(sub))
+    st["compare"] = H.compare_of(px, fc.get("base_day") or F.base_of(fc), H.compare_lines(fc))
+    lo = (dt.date.fromisoformat(fc["shock_day"]) - dt.timedelta(days=1)).isoformat()
+    before = {k: len((fc.get("reasons") or {}).get(k) or []) for k in ("good", "bad", "open")}
+    fc["reasons"] = K.merge(fc.get("reasons") or {}, K.us_extra(fc, lo, fc["registered"], ctx))
+    radar = os.path.dirname(R.radar_paths(None)[0])
+    prev, sigs = fc["registered"], None
+    for e in st["log"]:
+        if e.get("key") == "start":
+            continue
+        w = R.day_why(fc, e["day"], prev, radar, sigs) or {"good": [], "bad": [], "open": [], "count": {}, "changes": [], "sigs": []}
+        e["why"] = {**w, **K.merge(w, K.us_extra(fc, prev, e["day"], ctx))}
+        prev, sigs = e["day"], w.get("sigs") or sigs
+    H.chain_track(fc, st)
+    html = H.forecast_body(reg, st, fc, others=[])
+    print(dk.write_mock(html.replace(f"{H.BLOG}p/", "mock_"), os.path.join(OUT, "mock_kr_why-us-nvda.html"), H.CARD_NAME))
+    after = {k: len(fc["reasons"].get(k) or []) for k in ("good", "bad", "open")}
+    print(f"  {fc['title']}: 등록 근거 전 {before} → 후 {after}")
+
+
+def long_case():
+    """`지난 경과 더 보기` 10개씩 확인용 — 기준을 끝까지 넘지 않는 가상 전망 58거래일 (2026-11-12 사용자)."""
+    import math
+    w = next(x for x in R.INDEX if x["sym"] == "^SOX") if any(x["sym"] == "^SOX" for x in R.INDEX) else R.INDEX[0]
+    days = [d.isoformat() for d in (dt.date(2026, 8, 3) + dt.timedelta(days=i) for i in range(90)) if d.weekday() < 5][:59]
+    reg, fc = R.build("EH-2026-091", w, days[1], days[0], days[0], -6.0, 3.0, 30, (0, 0), False,
+                      {"issues": [], "n": 0, "heads": [], "analyst": None, "signals": [], "window": [days[0], days[1]]})
+    fc["title"] += " (긴 타임라인 가상)"
+    fc["end_day"] = "2026-12-31"
+    rel = [-6.0 + 1.0 * math.sin(i / 4) for i in range(len(days))]
+    st = H.judge(fc, days, rel)
+    print(dk.write_mock(H.forecast_body(reg, st, fc, others=[]), os.path.join(OUT, "mock_kr_why-long-timeline.html"), H.CARD_NAME))
+    return st
+
+
 if __name__ == "__main__":
+    if "--long" in sys.argv:
+        long_case()
+        sys.exit(0)
     main()

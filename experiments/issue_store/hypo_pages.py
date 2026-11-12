@@ -1449,6 +1449,7 @@ def _day_text(e):
             + ov + (f'<span style="display:block;margin-top:4px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">오늘 시장 : {dk.esc(wordify(e["today"]))}</span>' if e.get("today") else ""))
 
 
+MORE_STEP = 10   # `지난 경과 더 보기` 한 번에 펼치는 개수 (2026-11-12 사용자)
 PAST_SHOWN = 5   # 지난 날 줄은 최근 5개까지 바로, 그 앞은 `지난 경과 n개 더 보기` 안에
 
 
@@ -1786,19 +1787,27 @@ def _waiting(log, unit="%", subj="", fc=None):
                     f'<div style="padding:0 0 {12 - dk.VP}px;margin-top:-4px;">{_day_text(x)}</div></details>') + (day_why_html(x, fc) if fc else "") + ("" if last else gap)   # 근거 줄 = 접어도 보인다
             return _tl_row(dot, lh, 12 - dk.VP, fold, False, last)
         out += "".join(row(x, i == len(shown) - 1 and not rest) for i, x in enumerate(shown))
-        if rest:
-            label = f"지난 경과 {len(rest)}개 더 보기"
+        if rest:   # 10개씩 펼친다 (2026-11-12 사용자: 50개 넘게 한 번에 펼쳐졌다) — 펼친 묶음 끝에 다음 `더 보기`, 맨 끝 묶음에만 `접기`
             btn = (f"display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;"
                    f"font:inherit;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:600;color:#333;cursor:pointer;")
             up = f'<span style="display:inline-flex;transform:rotate(180deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-up")}</span>'
-            # 펼치면 맨 아래 `접기` 버튼 — 펼친 뒤 다시 접을 수 없던 것 (P439, 2026-11-08 사용자). 접으면 버튼 자리로 돌아오게 스크롤을 맞춘다
+            # 접기 = 맨 바깥 묶음을 닫는다(안쪽 묶음은 열린 채 남아도 바깥이 닫히면 안 보임) — 접으면 버튼 자리로 스크롤 (P439)
             close = (f'<div style="padding:6px 0 0 {TL_RAIL + 8}px;"><button type="button" style="{btn}" '
-                     'onclick="var d=this.closest(\'details\');d.open=false;d.scrollIntoView({block:\'nearest\'});">'
+                     'onclick="var d=this.closest(\'.fc-more-root\');d.open=false;d.scrollIntoView({block:\'nearest\'});">'
                      f'접기 {up}</button></div>')
-            out += (f'<details class="fc-more" style="margin:0;">'
-                    f'<summary style="list-style:none;cursor:pointer;padding:6px 0 0 {TL_RAIL + 8}px;">'
-                    f'<span style="{btn}">{label} {dk.ACC_CHEV}</span></summary>'
-                    + "".join(row(x, i == len(rest) - 1) for i, x in enumerate(rest)) + close + '</details>')
+            chunks = [rest[k:k + MORE_STEP] for k in range(0, len(rest), MORE_STEP)]
+            if len(chunks) > 1 and len(chunks[-1]) <= 2:   # 1~2개 숨기려고 버튼을 두지 않는다 (PAST_SHOWN 과 같은 규칙)
+                chunks[-2:] = [chunks[-2] + chunks[-1]]
+
+            def chunk(ci):
+                part, left = chunks[ci], sum(len(c) for c in chunks[ci:])
+                label = f"지난 경과 {len(part)}개 더 보기" + (f" (남은 {left}개)" if left > len(part) else "")
+                last = ci == len(chunks) - 1
+                inner = "".join(row(x, i == len(part) - 1 and last) for i, x in enumerate(part)) + (close if last else chunk(ci + 1))
+                return (f'<details class="fc-more{" fc-more-root" if ci == 0 else ""}" style="margin:0;">'
+                        f'<summary style="list-style:none;cursor:pointer;padding:6px 0 0 {TL_RAIL + 8}px;">'
+                        f'<span style="{btn}">{label} {dk.ACC_CHEV}</span></summary>' + inner + '</details>')
+            out += chunk(0)
     return out + "</div>"
 
 
