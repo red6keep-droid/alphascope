@@ -1,111 +1,11 @@
 {
-  "updated_at": "2026-11-11 21:46:24 UTC",
+  "updated_at": "2026-11-12 02:31:05 UTC",
   "items": [
-    {
-      "title": "Feds arrest top official of healthcare company, alleging illegal drug importation",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/canarx-official-arrested-drug-importation.html",
-      "published": "2026-11-11 21:33:17",
-      "title_ko": "연방 기관, 불법 의약품 수입 혐의로 헬스케어 기업 고위 임원 체포",
-      "summary_ko": "법원 기록에 따르면 미국 당국은 캐나다 기업의 고위 임원 두 명이 처방약을 불법으로 수입하는 계획을 운영한 혐의로 기소함",
-      "lines": [
-        "캐나다 의약품 유통사 임원들 불법 수입 혐의 기소",
-        "캐나다 회사 캐나릭스 최고재무책임자 일요일 체포"
-      ]
-    },
-    {
-      "title": "CoreWeave soars more than 24% for best day since April 2025 after strong Q3 report",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/coreweave-crwv-outlook-earnings-ai.html",
-      "published": "2026-11-11 21:11:26",
-      "title_ko": "코어위브, 강력한 3분기 실적 발표 후 CEO의 AI 연산 수요 재확인에 26% 급등",
-      "summary_ko": "코어위브, 네비우스, 아이렌 등 네오클라우드 업체들 AI 거래 지속 가능성 관련 심사 직면",
-      "lines": [
-        "코어위브 수요일 주가 26% 급등",
-        "코어위브 3분기 호실적 발표 및 연간 가이던스 상향"
-      ]
-    },
-    {
-      "title": "Nvidia shares rebound as Jensen Huang faces scrutiny ahead of earnings",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/nvidia-stock-jensen-huang-affair-china.html",
-      "published": "2026-11-11 21:04:36",
-      "title_ko": "실적 발표 앞두고 젠슨 황 스캔들 조사 직면 속 엔비디아 주가 5% 반등",
-      "summary_ko": "투자자들이 젠슨 황 CEO의 스캔들이 엔비디아 사업에 미칠 파급 효과 평가 중",
-      "lines": [
-        "최고경영자 스캔들 여파로 화요일 엔비디아 주가 5.47% 하락",
-        "엔비디아 기밀 유출 여부 조사를 위해 웩텔 로펌 고용",
-        "엔비디아 분기 실적 발표 11월 17일 예정"
-      ]
-    },
-    {
-      "title": "JetBlue unveils new first-class seats to bring back profits",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/jetblue-ceo-premium.html",
-      "published": "2026-11-11 20:35:45",
-      "title_ko": "젯블루, 수익성 개선 위해 새로운 일등석 좌석 공개",
-      "summary_ko": "젯블루, 수요일에 기자들에게 새로운 일등석 좌석 공개 예정",
-      "lines": [
-        "블루퍼스트 국내선 일등석 공개",
-        "2024년 12월 블루퍼스트 출시 예정"
-      ]
-    },
-    {
-      "title": "Canada’s ambassador warns Trump tariffs are driving up costs, threatening U.S. investment",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/canada-ambassador-trump-tariffs-investments.html",
-      "published": "2026-11-11 20:30:23",
-      "title_ko": "캐나다 대사, 트럼프 관세가 비용 상승 및 미국 투자 위협 경고",
-      "summary_ko": "트럼프 관세로 비용이 상승하고 투자가 위협받으며 양국 간 협상이 복잡해지면서 미국과 캐나다 간 무역 긴장이 지속됨",
-      "lines": [
-        "관세로 인한 투자 비용 상승",
-        "미국 연방준비제도 내년 소비재 가격 인상 전망"
-      ]
-    },
-    {
-      "title": "Mississippi Senate: Scott Colom lead over Hyde-Smith pops to more than 4,400 votes",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/10/mississippi-senate-scott-colom-hyde-smith.html",
-      "published": "2026-11-11 19:55:39",
-      "title_ko": "미시시피 상원: 투표용지 마감일 속 하이드스미스를 상대로 우세를 연장하는 스콧 콜롬",
-      "summary_ko": "화요일은 미시시피주의 잠정 투표용지 해결 및 우편 부재자 투표용지 접수 마감일임",
-      "lines": [
-        "미시시피주 상원 선거 민주당 스콧 콜롬 후보 우세",
-        "현직 신디 하이드스미스 상원의원 상대로 리드 유지",
-        "오후 4시 30분 기준 2607표 차이",
-        "총 95만 3547표 집계 및 개표율 97% 추정",
-        "격차는 0.27%포인트 기록"
-      ]
-    },
-    {
-      "title": "Social Security could pay full benefits until 2059 if taxable payroll kept pace with GDP: AARP report",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/social-security-benefits-taxable-payroll-gdp.html",
-      "published": "2026-11-11 19:54:27",
-      "title_ko": "AARP 보고서에 따르면 과세 대상 급여가 GDP 보조를 맞출 경우 사회보장기금 2059년까지 전액 지급 가능",
-      "summary_ko": "고령화 노동력이 사회보장기금 신탁기금의 임박한 부족 원인 중 유일한 요인이 아니라고 AARP 공공정책연구소 연구에서 밝혀짐",
-      "lines": [
-        "지난 4십년간 과세 대상 급여 비중 하락",
-        "세수가 GDP와 보조를 맞췄을 경우 2059년까지 전액 지급 가능"
-      ]
-    },
-    {
-      "title": "Prediction markets tied to clinical trials and drug approvals draw lawmakers' ire",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/11/kalsi-polymarket-prediction-market-senators-hhs-drug-approval.html",
-      "published": "2026-11-11 19:16:23",
-      "title_ko": "임상시험 및 약물 승인 연계 예측 시장, 의회의 반발 직면",
-      "summary_ko": "앤젤라 알소브룩스 상원의원과 론 와이든 상원의원, 보건복지부가 시장 리스크 완화를 위해 취한 조치 질의",
-      "lines": [
-        "안젤라 알소브룩스와 론 와이든 의원의 보건복지부 장관 서한 발송",
-        "임상시험 및 식품의약국 승인 관련 예측 시장 계약에 대한 우려 제기"
-      ]
-    },
     {
       "title": "Meta head of infrastructure will leave and be succeeded by former AWS cloud exec",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/11/meta-infrastructure-departure-aws-cloud.html",
-      "published": "2026-11-11 18:57:38",
+      "published": "2026-11-12 00:46:08",
       "title_ko": "메타 인프라 책임자 사임, 전 AWS 클라우드 임원이 후임으로",
       "summary_ko": "메타 인프라 책임자 겸 엔지니어링 공동 책임자 산토시 자나르단 2027년 퇴사 예정이며 전 AWS 수석 부사장 데이비드 브라운이 후임으로 취임",
       "lines": [
@@ -114,56 +14,152 @@
       ]
     },
     {
-      "title": "미국 10월 CPI 발표 및 연준 12월 금리 인상 우려",
-      "title_ko": "미국 10월 CPI 발표 및 연준 12월 금리 인상 우려",
-      "summary_ko": "10월 CPI가 예상보다 높게 나오고 월러 이사가 12월 추가 금리 인상 가능성을 강하게 시사하면서 시장에 금리 인상 공포가 다시 부각되었습니",
-      "source": "증시각도기",
-      "link": "https://www.youtube.com/watch?v=DgGf6V9iERU",
-      "published": "2026-11-10 23:30:13",
+      "title": "Nvidia prepares to oust Jensen Huang, WSJ reports — stock sinks",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/nvidia-jensen-huang-affair-employee.html",
+      "published": "2026-11-12 00:21:27",
+      "title_ko": "WSJ 보도, 엔비디아 젠슨 황 해임 준비, 주가 하락",
+      "summary_ko": "황 CEO가 미 정보당국으로부터 중국 스파이로 의심되는 여성과의 스캔들을 인정한 지 며칠 만에 보도가 나옴",
+      "lines": [
+        "시간외 거래에서 엔비디아 주가 9% 이상 하락",
+        "젠슨 황의 사내 불륜 의혹 제기",
+        "이사회의 젠슨 황 거취 결정 회의 개최 예정"
+      ]
+    },
+    {
+      "title": "Inside India newsletter: Trump's poll setback fuels hope for U.S.-India trade deal by year end",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/us-india-trade-tariffs-trump-modi.html",
+      "published": "2026-11-11 23:57:38",
+      "title_ko": "인도 뉴스레터: 트럼프의 여론조사 부진, 연말까지 미-인도 무역 협정 기대감 지펴",
+      "summary_ko": "미국 유권자들이 캐나다산 수입품 관세에 더 큰 영향을 받지만, 인도와의 무역 협정이 관세에 대한 비판을 완화할 수 있다고 전문가들은 언급",
+      "lines": [
+        "미국 중간선거 결과에 따른 미·인도 무역협정 타결 기대감 증대",
+        "11월 외국인 투자자들의 인도 시장 복귀"
+      ]
+    },
+    {
+      "title": "Scott Colom wins Mississippi Senate election over incumbent Republican Hyde-Smith",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/democrat-scott-colom-projected-to-win-mississippi-senate-election-over-incumbent-hyde-smith.html",
+      "published": "2026-11-11 23:31:37",
+      "title_ko": "스콧 콜롬, 현직 공화당 하이드스미스 제치고 미시시피 상원의원 선거 승리",
+      "summary_ko": "스콧 콜롬은 1982년 이후 해당 주에서 선출된 최초의 민주당 상원의원이 될 예정",
+      "lines": [
+        "민주당 스콧 콜롬 후보의 미시시피주 상원의원 선거 승리",
+        "1982년 이후 미시시피주 최초의 민주당 소속 상원의원 탄생",
+        "남북전쟁 재건 시대 이후 미시시피주 최초의 흑인 상원의원 배출"
+      ]
+    },
+    {
+      "title": "Feds arrest top official of healthcare company, alleging illegal drug importation",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/canarx-official-arrested-drug-importation.html",
+      "published": "2026-11-11 22:58:11",
+      "title_ko": "연방 기관, 불법 의약품 수입 혐의로 헬스케어 기업 고위 임원 체포",
+      "summary_ko": "법원 기록에 따르면 미국 당국은 캐나다 기업의 고위 임원 두 명이 처방약을 불법으로 수입하는 계획을 운영한 혐의로 기소함",
+      "lines": [
+        "캐나다 의약품 유통사 임원들 불법 수입 혐의 기소",
+        "캐나다 회사 캐나릭스 최고재무책임자 일요일 체포"
+      ]
+    },
+    {
+      "title": "Jensen Huang affair in D.C.: Resignation calls and moves to tighten Nvidia China exports",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/nvidia-jensen-huang-congress-resign-ai-chips.html",
+      "published": "2026-11-11 22:46:29",
+      "title_ko": "젠슨 황의 워싱턴 스캔들: 사임 요구 및 엔비디아 대중국 수출 강화 움직임",
+      "summary_ko": "황 CEO는 중국에 대한 엄격한 AI 칩 수출 통제에 반대 입장을 표명",
+      "lines": [
+        "미국 의원들의 엔비디아 CEO 젠슨 황 사퇴 촉구",
+        "중국 스파이 연루 의혹 관련 하원 의원들의 소환장 발부 추진"
+      ]
+    },
+    {
+      "title": "Canada’s ambassador warns Trump tariffs are driving up costs, threatening U.S. investment",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/canada-ambassador-trump-tariffs-investments.html",
+      "published": "2026-11-11 22:30:57",
+      "title_ko": "캐나다 대사, 트럼프 관세가 비용 상승 및 미국 투자 위협 경고",
+      "summary_ko": "트럼프 관세로 비용이 상승하고 투자가 위협받으며 양국 간 협상이 복잡해지면서 미국과 캐나다 간 무역 긴장이 지속됨",
+      "lines": [
+        "관세로 인한 투자 비용 상승",
+        "미국 연방준비제도 내년 소비재 가격 인상 전망"
+      ]
+    },
+    {
+      "title": "American Airlines brings fresh food back to NY-Chicago first class for first time since 2019",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/american-airlines-first-class-chicago-new-york.html",
+      "published": "2026-11-11 22:20:58",
+      "title_ko": "아메리칸 항공, 2019년 이후 처음으로 뉴욕-시카고 일등석에 신선한 식품 재도입",
+      "summary_ko": "아메리칸 항공 일등석 식품 옵션에 샌드위치, 과일, 치아 푸딩 볼 포함",
+      "lines": [
+        "아메리칸항공의 뉴욕-시카고 노선 퍼스트클래스 신선식품 재도입",
+        "2019년 이후 해당 노선 퍼스트클래스 신선식품 서비스 중단"
+      ]
+    },
+    {
+      "title": "JetBlue unveils new first-class seats to bring back profits",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/11/jetblue-ceo-premium.html",
+      "published": "2026-11-11 22:10:50",
+      "title_ko": "젯블루, 수익성 개선 위해 새로운 일등석 좌석 공개",
+      "summary_ko": "젯블루, 수요일에 기자들에게 새로운 일등석 좌석 공개 예정",
+      "lines": [
+        "블루퍼스트 국내선 일등석 공개",
+        "2024년 12월 블루퍼스트 출시 예정"
+      ]
+    },
+    {
+      "title": "모기지 금리 하락 및 주택담보대출 증가",
+      "title_ko": "모기지 금리 하락 및 주택담보대출 증가",
+      "summary_ko": "모기지 금리가 하락하면서 주택 구입 수요가 자극되어 대출 신청이 크게 증가",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=XP0WqRKjBNg",
+      "published": "2026-11-11 22:00:08",
+      "kind": "media",
+      "tag": "부동산 · 주택",
+      "direction": "neutral",
+      "n_channels": 2,
+      "lines": [
+        "모기지 뉴스 데일리 기준 30년 고정 주택담보대출 평균 금리 7.3%",
+        "주택 구입자들의 모기지 신청 건수 전년 4월 이후 최대 주간 증가폭 기록"
+      ]
+    },
+    {
+      "title": "미국 의회 반도체 수출 통제 강화 법안",
+      "title_ko": "미국 의회 반도체 수출 통제 강화 법안",
+      "summary_ko": "미국 의회가 젠슨 황 스캔들을 계기로 중국을 향한 반도체 수출 통제를 강화하는 3대 법안을 추진 중",
+      "source": "당잠사",
+      "link": "https://www.youtube.com/watch?v=DEb5daFJUKU",
+      "published": "2026-11-11 21:26:48",
+      "kind": "media",
+      "tag": "규제 · 산업정책",
+      "direction": "negative",
+      "n_channels": 2,
+      "lines": [
+        "미국 공화당과 민주당 중국 대상 반도체 수출 통제 법안 추진",
+        "AI 오버워치법 및 반도체 보안법, 매치법 국방수권법 포함 시도",
+        "삼성전자와 SK하이닉스 등 국내 기업 영향 불가피",
+        "매치법 적용 시 동맹국 중국 공장 장비 반입 제약 우려"
+      ]
+    },
+    {
+      "title": "예상 웃돈 CPI와 금리 인상 우려",
+      "title_ko": "예상 웃돈 CPI와 금리 인상 우려",
+      "summary_ko": "예상보다 높은 소비자물가지수 발표로 연준의 추가 금리 인상 및 긴축 속도 가속화 우려가 고조",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=HRIjtvWogyE",
+      "published": "2026-11-11 16:38:23",
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "negative",
-      "n_channels": 1,
+      "n_channels": 2,
       "lines": [
-        "진행자 발언 : 10월 헤드라인 CPI 전월 대비 0.4% 증가로 예상치 상회",
-        "진행자 발언 : 근원 CPI 0.3% 기록하며 서비스 및 식품 물가 상승 확인",
-        "크리스토퍼 월러 발언 : 12월 기준금리 25bp 또는 50bp 인상 지지 시사",
-        "크리스토퍼 월러 발언 : 물가 압력이 지속될 경우 추가 긴축 필요성 강조"
-      ]
-    },
-    {
-      "title": "엔트로픽 IPO 추진 및 클로드 오피스 출시",
-      "title_ko": "엔트로픽 IPO 추진 및 클로드 오피스 출시",
-      "summary_ko": "엔트로픽이 1조 달러에 육박하는 시총으로 IPO를 추진하는 동시에 오피스 자동화 도구를 공개하면서 기존 소프트웨어 기업들의 시장 잠식 우려가 제기되었습니",
-      "source": "증시각도기",
-      "link": "https://www.youtube.com/watch?v=DgGf6V9iERU",
-      "published": "2026-11-10 23:30:13",
-      "kind": "media",
-      "tag": "AI 투자 · 반도체 수요",
-      "direction": "negative",
-      "n_channels": 1,
-      "lines": [
-        "진행자 발언 : 엔트로픽 공모가 중간값 기준 시가총액 9,684억 달러 전망",
-        "진행자 발언 : 알파벳과 엔비디아 등 주요 빅테크 기업들의 사모 발행 참여",
-        "진행자 발언 : 엔트로픽의 클로드 오피스 출시로 마이크로소프트 주가 하락",
-        "진행자 발언 : 엔트로픽의 막대한 캐펙스 투자 규모 대비 매출 성장 추이 주목"
-      ]
-    },
-    {
-      "title": "빅테크 CEO와 트럼프 행정부의 유착 의혹",
-      "title_ko": "빅테크 CEO와 트럼프 행정부의 유착 의혹",
-      "summary_ko": "트럼프 행정부와 빅테크 CEO들의 친밀한 접근과 안보 프로토콜 준수 여부가 도마 위에 상승",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=lOertlcg5OA",
-      "published": "2026-11-10 22:11:35",
-      "kind": "media",
-      "tag": "재정 · 정치",
-      "direction": "neutral",
-      "n_channels": 1,
-      "lines": [
-        "데이브 리 발언 : 젠슨 황과 트럼프 대통령의 밀접한 정책 자문 관계",
-        "뉴욕타임스 보도 : 알래스카 에어포스원 회동과 마코 루비오의 사전 경고",
-        "데이브 리 발언 : 안보 리스크보다 정치적 측근 관계를 우선시한 정황"
+        "전일 발표된 인플레이션 보고서가 예상치를 웃돌며 단기 채권 금리 급등",
+        "일부 연준 인사는 12월 회의에서 50bp 금리 인상 가능성 제기",
+        "오스탄 굴스비 발언 : 이번 인플레이션 보고서는 매우 우려스럽고 껄끄러운 수준"
       ]
     }
   ]

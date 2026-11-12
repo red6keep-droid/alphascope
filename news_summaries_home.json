@@ -1068,7 +1068,8 @@
  },
  "8ed0c79ac0a1": {
   "lines": [
-   "아메리칸항공의 뉴욕-시카고 노선 퍼스트클래스 신선식품 재도입"
+   "아메리칸항공의 뉴욕-시카고 노선 퍼스트클래스 신선식품 재도입",
+   "2019년 이후 해당 노선 퍼스트클래스 신선식품 서비스 중단"
   ],
   "tags": [
    {
@@ -1078,11 +1079,20 @@
     "issue": "CORP_EVENT",
     "dir": "positive",
     "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T19:51:58.148724+00:00",
-  "n_src": 900
+  "at": "2026-11-12T02:31:04.315107+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "65274679228c": {
   "lines": [
@@ -1159,7 +1169,7 @@
  },
  "776bc90552c6": {
   "lines": [
-   "코스트코 특별 배당 실시 발표"
+   "코스트코 특별 배당 발표"
   ],
   "tags": [
    {
@@ -1174,8 +1184,9 @@
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T21:46:22.982657+00:00",
-  "n_src": 311
+  "at": "2026-11-12T02:31:05.091987+00:00",
+  "n_src": 311,
+  "retry": true
  },
  "3a7234e850d1": {
   "lines": [
@@ -1229,6 +1240,163 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-11T21:46:24.982994+00:00",
+  "n_src": 900
+ },
+ "4e54d5748085": {
+  "lines": [
+   "엔비디아 이사회의 젠슨 황 CEO 해임 준비 보도"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T02:31:02.583505+00:00",
+  "n_src": 368
+ },
+ "9d0d46181104": {
+  "lines": [
+   "시간외 거래에서 엔비디아 주가 9% 이상 하락",
+   "젠슨 황의 사내 불륜 의혹 제기",
+   "이사회의 젠슨 황 거취 결정 회의 개최 예정"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T02:31:02.583505+00:00",
+  "n_src": 900
+ },
+ "83cce1e2eac8": {
+  "lines": [
+   "미국 중간선거 결과에 따른 미·인도 무역협정 타결 기대감 증대",
+   "11월 외국인 투자자들의 인도 시장 복귀"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "TARIFF_TRADE",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T02:31:02.583505+00:00",
+  "n_src": 900
+ },
+ "c47cddbcf095": {
+  "lines": [
+   "민주당 스콧 콜롬 후보의 미시시피주 상원의원 선거 승리",
+   "1982년 이후 미시시피주 최초의 민주당 소속 상원의원 탄생",
+   "남북전쟁 재건 시대 이후 미시시피주 최초의 흑인 상원의원 배출"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T02:31:04.315107+00:00",
+  "n_src": 900
+ },
+ "44087d608320": {
+  "lines": [
+   "미국 의원들의 엔비디아 CEO 젠슨 황 사퇴 촉구",
+   "중국 스파이 연루 의혹 관련 하원 의원들의 소환장 발부 추진"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-12T02:31:04.315107+00:00",
   "n_src": 900
  }
 }
