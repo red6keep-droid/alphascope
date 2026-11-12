@@ -168,10 +168,12 @@ def summarize(items, cache_path, lead_cache=None, label="summary", max_items=Non
 
         def valid(r):
             rows = (r or {}).get("items") if isinstance(r, dict) else None
+            # 탈락은 예외로 — llm_chain.generate_json 은 validate 가 돌려준 값을 답으로 바꿔 쓴다. 문자열을 돌려주던 때(11-11 22:47 UTC)
+            # 그 문자열이 답이 되어 res["items"] 에서 'string indices must be integers' 로 요약 전체가 멈췄다 (2026-11-12)
             if not isinstance(rows, list) or not all(isinstance(x, dict) for x in rows) or {str(x.get("id")) for x in rows} != want:
-                return "항목 불일치"
+                raise ValueError("항목 불일치")
             if any(not isinstance(x.get("lines"), list) or not all(isinstance(q, (str, dict)) for q in x["lines"]) for x in rows):
-                return "줄 형식 불일치"   # 11-11 시험: 줄 태그를 붙인 뒤 모양이 어긋난 답이 한 번 있었다 → 다음 모델로
+                raise ValueError("줄 형식 불일치")   # 11-11 시험: 줄 태그를 붙인 뒤 모양이 어긋난 답이 한 번 있었다 → 다음 모델로
             return None
 
         try:
