@@ -255,7 +255,9 @@ def run(state_dir=None):
         except Exception as e:  # noqa: BLE001
             FA.save_failed("상태 저장소", e)
     # 렌더 나중
-    opened, done, score = H.split_done(pub, states)   # 판정 난 전망 = `끝난 전망` (2026-11-12 사용자) — 끝 줄 문구 · 다음 전망도 여기서 붙는다
+    groups = {m: H.split_done([(r, fc) for r, fc in pub if H.mkt_of(fc) == m], states) for m, _ in H.MKT_TABS}   # 판정 난 전망 = `끝난 전망` · 나라별 탭 (2026-11-12 사용자) — 끝 줄 문구 · 다음 전망(같은 나라 안)도 여기서 붙는다
+    opened = [x for m, _ in H.MKT_TABS for x in groups[m][0]]
+    done_n = {m: len(groups[m][1]) for m, _ in H.MKT_TABS}
     others = [(fc["no"], fc["title"], fc["slug"]) for _, fc in pub]
     for r, fc in pub:
         if fc["slug"] not in states:
@@ -267,9 +269,9 @@ def run(state_dir=None):
         with open(os.path.join(OUT, f'{fc["slug"]}.html'), "w", encoding="utf-8") as f:
             f.write(html)
     with open(os.path.join(OUT, f"{H.LIST_SLUG}.html"), "w", encoding="utf-8") as f:
-        f.write(H.list_body(opened, states, done=done, score=score))
+        f.write(H.list_body_tabs(groups, states))
     with open(os.path.join(OUT, "hypo.json"), "w", encoding="utf-8") as f:
-        json.dump(H.home_card(opened, dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), len(done)), f, ensure_ascii=False, indent=1)
+        json.dump(H.home_card(opened, dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), done_n), f, ensure_ascii=False, indent=1)
     for r, fc in pub:
         st = states.get(fc["slug"]) or {}
         print(f'[forecast] {fc["slug"]}: {st.get("log", [{}])[-1].get("label")} · 값 {st.get("rel")} · 빈 날 {len(st.get("missing", []))}')

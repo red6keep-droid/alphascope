@@ -2316,6 +2316,30 @@ def done_list(done):
     return f'<style>{css}</style><details class="fc-done" style="margin:28px 0 0;">{head}<div>{radios}{body}</div></details>'
 
 
+MKT_TABS = (("us", "미국"), ("kr", "한국"))   # 목록 탭 순서 — 한국 탭 = #tab-1 (홈 한국 카드 · 하단 메뉴가 이 번호로 연다, 2026-11-12 사용자 홈 나누기)
+
+
+def mkt_of(fc):
+    return fc.get("market") or "us"
+
+
+def list_body_tabs(groups, states=None):
+    """목록 = 미국 · 한국 탭 (2026-11-12 사용자: 홈 나누기에 맞춰 증시 전망도 나라별). groups = {mkt: (열린, 끝난, 성적표)}.
+    탭은 테마 표준 탭(h2 data-tab, 가이드라인 11절) — 탭 이름과 같은 구획 제목은 테마가 숨긴다. 탭마다 지켜보는 전망 · 성적표 · 끝난 전망을 따로."""
+    out = ""
+    for m, name in MKT_TABS:
+        opened, done, score = groups.get(m, ([], [], None))
+        out += dk.h2(name, line=False, tab=name) + _list_inner(opened, states or {}, done, score if score and score.get("n") else None)
+    return dk.fix_colons(f'<div data-list-url="{BLOG}" data-head-title="{HEAD_LIST}" data-seo-lead="증시 전망, 큰 사건 전에 두 갈래 전망을 적어 두고 숫자로 확인한 기록">{out}</div>') + RELATED
+
+
+def _list_inner(pairs, states, done, score):
+    rows = [_row(fc, states.get(fc["slug"], {})) for _, fc in pairs]
+    opened = "".join(rows) if rows else dk.muted("지금 지켜보는 전망이 없습니다")
+    board = f'<div style="margin:28px 0 0;">{scoreboard_card(score)}</div>' if score else ""
+    return f'<div style="margin:12px 0 0;">{opened}</div>' + board + done_list(done)
+
+
 def list_body(pairs, states=None, done=(), score=None):
     """pairs = [(reg, fc)] 열린 전망, states = {slug: state}, done = [(전망, 결과, 최종)] 끝난 전망(지우지 않고 쌓는다). score = 성적표(없으면 안 그린다)."""
     states = states or {}
@@ -2332,9 +2356,9 @@ def list_body(pairs, states=None, done=(), score=None):
 
 def home_card(pairs, generated="", done_count=0):
     out = {"id": "hypo-card", "label": CARD_NAME, "generated": generated, "list_url": page_url(LIST_SLUG), "open": [], "done_count": done_count}
-    for reg, fc in pairs:
+    for reg, fc in pairs:   # market = 홈 미국 · 한국 화면이 제 나라 전망만 거른다 (2026-11-12 사용자 홈 나누기)
         out["open"].append({"no": fc["no"], "eh": reg["id"], "title": fc["title"], "url": page_url(fc["slug"]),
-                            "posted": fc["posted"], "tags": fc.get("tags", []), "event": fc["event"]})
+                            "posted": fc["posted"], "tags": fc.get("tags", []), "event": fc["event"], "market": mkt_of(fc)})
     return out
 
 

@@ -3186,8 +3186,11 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var box = document.querySelector('[data-hook="hypo-rows"]');
           if (!box) return;
           box.textContent = '';
+          if (HOME_MKT === 'kr') { var hc = document.getElementById('hypo-card'), ht = document.querySelector('#hypo-col .report-title');
+            if (hc) hc.href = '/p/forecast-list.html#tab-1'; if (ht) ht.setAttribute('data-href', '/p/forecast-list.html#tab-1'); }
           if (!j) { box.appendChild(el('div', 'hypo-empty', LOAD_FAILED)); return; }
-          var rows = j.open || [];
+          /* 미국 · 한국 화면이면 그 나라 전망만 (2026-11-12 사용자 홈 나누기) — market 없는 옛 자료는 미국. 한국 화면 카드는 목록 한국 탭(#tab-1)으로 */
+          var rows = (j.open || []).filter(function (q) { return !HOME_MKT || (q.market || 'us') === HOME_MKT; });
           if (!rows.length) { box.appendChild(el('div', 'hypo-empty', '지금 지켜보는 전망이 없습니다')); }
           rows.forEach(function (q) {
             var d = el('div', 'kv-row plain-row', q.title);
@@ -5629,7 +5632,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         var isUs = path === '/' || (/-stock\.html$/.test(path) && !isKr) || path === '/p/us-market-cap-top10.html' || lab === LBL.us;
         var mk = isKr ? 'kr' : isUs ? 'us' : (pref === 'kr' ? 'kr' : 'us');
         var href = {home: mk === 'kr' ? '/p/korea.html' : '/', report: '/search/label/' + encodeURIComponent(LBL[mk]),
-                    stock: '/p/' + mk + '-market-cap-top10.html', forecast: '/p/forecast-list.html', people: '/search/label/' + encodeURIComponent(PEOPLE)};
+                    stock: '/p/' + mk + '-market-cap-top10.html', forecast: '/p/forecast-list.html' + (mk === 'kr' ? '#tab-1' : ''), people: '/search/label/' + encodeURIComponent(PEOPLE)};
         var cur = (path === '/' || path === '/p/korea.html') ? 'home' : (lab === LBL.us || lab === LBL.kr) ? 'report'
                 : (/-stock\.html$/.test(path) || /market-cap-top10\.html$/.test(path)) ? 'stock' : /^\/p\/forecast-/.test(path) ? 'forecast' : lab === PEOPLE ? 'people' : '';
         var bar = document.querySelector('.as-tabbar');

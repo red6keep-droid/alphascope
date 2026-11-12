@@ -1806,8 +1806,11 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var box = document.querySelector('[data-hook="hypo-rows"]');
     if (!box) return;
     box.textContent = '';
+    if (HOME_MKT === 'kr') { var hc = document.getElementById('hypo-card'), ht = document.querySelector('#hypo-col .report-title');
+      if (hc) hc.href = '/p/forecast-list.html#tab-1'; if (ht) ht.setAttribute('data-href', '/p/forecast-list.html#tab-1'); }
     if (!j) { box.appendChild(el('div', 'hypo-empty', LOAD_FAILED)); return; }
-    var rows = j.open || [];
+    /* 미국 · 한국 화면이면 그 나라 전망만 (2026-11-12 사용자 홈 나누기) — market 없는 옛 자료는 미국. 한국 화면 카드는 목록 한국 탭(#tab-1)으로 */
+    var rows = (j.open || []).filter(function (q) { return !HOME_MKT || (q.market || 'us') === HOME_MKT; });
     if (!rows.length) { box.appendChild(el('div', 'hypo-empty', '지금 지켜보는 전망이 없습니다')); }
     rows.forEach(function (q) {
       var d = el('div', 'kv-row plain-row', q.title);

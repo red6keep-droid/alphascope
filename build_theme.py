@@ -1772,6 +1772,7 @@ def preview_mock_js():
         "      var lab = decodeURIComponent(u);\n"
         "      body = lab.indexOf('트럼프 트렌드') >= 0 ? PV_TRUMP_FEED : lab.indexOf('엔비디아') >= 0 ? PV_NVDA_FEED : lab.indexOf('인물 발언') >= 0 ? PV_RADAR_FEED : lab.indexOf('미디어 데일리') >= 0 ? PV_MEDIA_FEED : PV_FEED;\n"
         "    }\n"
+        "    else if (u.indexOf('hypo.json') >= 0) { body = window.PV_HYPO; return Promise.resolve({ ok: !!body, status: body ? 200 : 404, json: function () { return Promise.resolve(body); } }); }   /* 증시 전망 카드 — 목업이 window.PV_HYPO 를 넣을 때만 (홈 나누기 목업, 2026-11-12) */\n"
         "    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;\n"
         "    else if (u.indexOf('stocks.json') >= 0) body = PV_PICKS;\n"
         "    else if (u.indexOf('themes.json') >= 0) body = PV_THEMES;\n"
