@@ -104,15 +104,16 @@ def grand_card(held):
     ROW = "display:flex;justify-content:space-between;align-items:baseline;gap:12px;"
     FS = 16   # 아래 줄 글자 · 수익률 한 크기 (2026-11-12 사용자: 증감 정보는 다 같은 크기)
     # 아래 네 줄 = 세 칸 격자: 이름 | 금액(왼쪽 정렬, 네 줄이 같은 세로선) | 수익률(오른쪽). 모두 보통 굵기 (2026-11-12 사용자)
-    GRID = f"display:grid;grid-template-columns:auto 1fr auto;column-gap:10px;align-items:baseline;font-size:{FS}px;line-height:24px;color:#333;font-weight:400;"
+    GRID = f"display:grid;grid-template-columns:auto 1fr auto auto;column-gap:10px;align-items:baseline;font-size:{FS}px;line-height:24px;color:#333;font-weight:400;"
     RULE = '<span aria-hidden="true" style="grid-column:1/-1;height:1px;background:#FEE6CA;margin:8px 0;"></span>'
 
     def cells(label, amount_html, rate_html=""):
-        return (f'<span style="white-space:nowrap;">{label}</span><span style="white-space:nowrap;">{amount_html}</span>'
-                f'<span style="white-space:nowrap;text-align:right;">{rate_html}</span>')
+        # 이름 | (빈 칸) | 수익률 | 금액 — 금액은 오른쪽 끝 선(총 평가 금액 · 환율과 같은 선)에 오른쪽 정렬, 수익률은 그 앞 칸 (2026-11-12 사용자)
+        return (f'<span style="white-space:nowrap;">{label}</span><span></span>'
+                f'<span style="white-space:nowrap;text-align:right;">{rate_html}</span><span style="white-space:nowrap;text-align:right;">{amount_html}</span>')
 
     top = (f'<div style="{ROW}"><span style="font-size:17px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">총 평가 금액</span>'
-           f'<span style="font-size:23px;line-height:30px;font-weight:800;color:#111;white-space:nowrap;">{esc(won(val))}</span></div>')   # 30 → 28 → 26 → 23 (2026-11-12 사용자)
+           f'<span style="font-size:21px;line-height:28px;font-weight:800;color:#111;white-space:nowrap;">{esc(won(val))}</span></div>')   # 30 → 28 → 26 → 23 → 21 (2026-11-12 사용자)
     grid = [cells("수익 금액", updown(gain, won(gain), FS, tri=False), updown(gain, f"{abs(gain / cost * 100):.1f}%", FS)),
             cells("매수 금액", f'<span style="color:#111;">{esc(won(cost))}</span>')]
     for m, head in (("us", "미국 종목"), ("kr", "한국 종목")):
@@ -126,7 +127,7 @@ def grand_card(held):
         grid.append(cells(f'{head}<span style="color:{dk.NOTE};font-size:{dk.TINY};"> · {len(rows)}종목</span>',
                           updown(v - c, won(v - c), FS, tri=False), updown(v - c, f"{abs((v - c) / c * 100):.1f}%", FS)))
     sub = [f'<div style="{GRID}margin:6px 0 0;">{"".join(grid)}</div>']
-    fx = f'<div style="margin:10px 0 0;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">현재 환율 1달러 {FX:,.0f}원</div>'   # 환율만 간단히 (2026-11-12 사용자)
+    fx = f'<div style="margin:10px 0 0;text-align:right;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">환율 {FX:,.0f}원</div>'   # 짧게 · 오른쪽 정렬 (2026-11-12 사용자)
     return dk.dcard(top + "".join(sub) + fx, kind)
 
 
@@ -148,14 +149,14 @@ def stock_rows(rows, m):
                 f'<span style="min-width:0;">'
                 f'<span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">{esc(s["n"])}</span>'
                 f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};white-space:nowrap;">{esc(f"{q:,}주 · 평균 {money(a, m)}")}</span></span></span>')
-        today = (f'<span style="flex:none;width:52px;text-align:right;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};white-space:nowrap;">'
-                 f'오늘<br>{updown(chg, f"{abs(chg):.1f}%", 14)}</span>')
-        rule = '<span aria-hidden="true" style="flex:none;align-self:stretch;width:1px;margin:2px 0;background:#E2E8F0;"></span>'
-        total = (f'<span style="flex:none;width:96px;text-align:right;white-space:nowrap;">'
-                 f'<span style="display:block;font-size:17px;line-height:24px;">{updown(gain, f"{abs((c - a) / a * 100):.1f}%", 17)}</span>'
-                 f'<span style="display:block;font-size:15px;line-height:20px;">{updown(gain, won(gk), 15, tri=False)}</span></span>')
+        # 오른쪽 = 윗줄 `오늘 등락 | 수익률`(15px 보통, 사이 세로 구분선) · 아랫줄 수익금(굵게) — `오늘` 글자 없음 (2026-11-12 사용자)
+        rule = '<span aria-hidden="true" style="flex:none;width:1px;height:14px;margin:0 8px;background:#CBD5E1;"></span>'
+        right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">'
+                 f'<span style="display:flex;align-items:center;font-size:15px;line-height:22px;">{updown(chg, f"{abs(chg):.1f}%", 15)}{rule}'
+                 f'{updown(gain, f"{abs((c - a) / a * 100):.1f}%", 15)}</span>'
+                 f'<span style="font-size:16px;line-height:24px;font-weight:700;">{updown(gain, won(gk), 16, tri=False)}</span></span>')
         row = (f'<span style="{dk.MULTI_ROW}{"" if i == 0 else dk.MULTI_SEP}">{left}'
-               f'<span style="flex:none;display:flex;align-items:center;gap:10px;">{today}{rule}{total}</span></span>')
+               f'{right}</span>')
         out.append(row.replace("<span ", f'<span data-row-link="1" data-href="{esc(s["u"])}" ', 1))
     return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(out)}</span></div>'
 
