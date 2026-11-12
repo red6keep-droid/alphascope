@@ -212,7 +212,7 @@ ICON_BTN = ("display:inline-flex;align-items:center;justify-content:center;box-s
 
 def icon_btn(glyph, label, attrs=""):
     return (f'<a data-mock="1"{attrs} role="button" aria-label="{label}" title="{label}" style="{ICON_BTN}">'
-            f'<svg viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{glyph}</svg></a>')   # 선 1.2 × 20/16 = 보이는 1.5px (2026-11-12 사용자)
+            f'<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{glyph}</svg></a>')   # 그림 20 → 16(20% 작게, 상자 36 · 외곽선 그대로) · 선 1.5 = 보이는 1.5px (2026-11-12 사용자)
 
 
 # 아래 고정 입력 칸 — 폰 · 태블릿(900 이하)은 테마 하단 고정 메뉴(71 + 안전 영역) 바로 위, PC 는 화면 맨 아래. 글 폭(--shell 980) 안에 맞춤
@@ -224,7 +224,8 @@ SHEET_CSS = ("<style>.ms-sheet{position:fixed;left:0;right:0;bottom:0;z-index:43
              ".ms-sheet .acc-chev{transform:rotate(180deg);}"   # 위로 열리는 칸이라 닫힘 = 위 화살표, 열림 = 아래 화살표
              ".ms-sheet summary::-webkit-details-marker{display:none;}"
              ".ms-sheet details[open] .acc-chev{transform:none;}"
-             ".ms-pad{height:72px;}[data-ms-panel][hidden]{display:none !important;}"   # 고치기 · 빼기 칸은 누를 때만
+             ".ms-pad{height:72px;}[data-ms-panel][hidden],[data-ms-sub][hidden]{display:none !important;}"
+             "[data-ms-seg].on{color:#111 !important;background:#F1F5F9 !important;}"   # 고치기 · 빼기 칸은 누를 때만
              "@media (max-width:900px){.ms-sheet{bottom:calc(71px + env(safe-area-inset-bottom));}}</style>")
 
 
@@ -240,13 +241,33 @@ def add_form(held):
             "font-size:18px;line-height:26px;color:#111;background:#fff;min-width:0;")
     elab = f"display:block;margin:0 0 4px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};"
 
+    SEG = (f"display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;margin:0 0 10px;")
+    SEG_BTN = ("display:flex;align-items:center;justify-content:center;height:40px;font-size:15px;line-height:22px;font-weight:700;color:#6B7280;"
+               "background:#fff;cursor:pointer;border-left:1px solid #E2E8F0;")
+
     def edit_panel(i, s, q, a):
+        """연필 = 세 가지 고치기 (2026-11-12 사용자: 추가 매수 · 매도 방식 vs 평균 단가 입력) — 저장하는 값은 늘 `수량 · 평균 매수가` 둘뿐(거래 기록은 남기지 않음).
+          추가 매수 = 산 수량 · 산 가격 → 새 평균 = (지금 수량 × 평균 + 산 수량 × 가격) ÷ 합친 수량 (화면에 바로 계산해 보여 줌)
+          매도      = 판 수량 → 수량만 줄고 평균은 그대로(실현 손익은 계산 · 저장하지 않음)
+          직접 고치기 = 수량 · 평균 매수가를 증권사 앱 숫자 그대로 덮어쓰기"""
+        cur = "$" if s["m"] == "us" else "원"
         price = f"{a:,.2f}" if s["m"] == "us" else f"{a:,.0f}"
-        return (f'<span data-ms-panel="edit-{i}" hidden style="display:block;padding:0 12px 16px;">'
-                f'<span style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">'
-                f'<span><span style="{elab}">수량 (주)</span><input style="{einp}" inputmode="numeric" value="{q:,}"></span>'
-                f'<span><span style="{elab}">평균 매수가 ({"$" if s["m"] == "us" else "원"})</span><input style="{einp}" inputmode="decimal" value="{price}"></span></span>'
-                f'<span style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 0;">'
+        seg = (f'<span style="{SEG}">'
+               + "".join(f'<a data-ms-seg="{k}" style="{SEG_BTN}{"border-left:0;" if n == 0 else ""}">{t}</a>' for n, (k, t) in enumerate((("buy", "추가 매수"), ("sell", "매도"), ("set", "직접 고치기"))))
+               + '</span>')
+        field = lambda lab, val="", ph="", attrs="": (f'<span><span style="{elab}">{lab}</span><input style="{einp}" inputmode="decimal" value="{val}" placeholder="{ph}"{attrs}></span>')
+        buy = (f'<span data-ms-sub="buy" style="display:block;"><span style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">'
+               + field("산 수량 (주)", "", "주", ' data-ms-bq="1"') + field(f"산 가격 ({cur})", "", cur, ' data-ms-bp="1"')
+               + f'</span><span data-ms-preview="1" data-q="{q}" data-a="{a}" data-cur="{cur}" style="display:block;margin:8px 0 0;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">'
+               f'지금 {q:,}주 · 평균 {price}{"" if cur == "$" else " 원"}{" " if cur == "$" else ""}</span></span>')
+        sell = (f'<span data-ms-sub="sell" hidden style="display:block;"><span style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">'
+                + field("판 수량 (주)", "", "주") + '</span>'
+                f'<span style="display:block;margin:8px 0 0;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">수량만 줄고 평균 매수가는 그대로입니다. 전부 팔았으면 휴지통으로 빼 주세요.</span></span>')
+        sets = (f'<span data-ms-sub="set" hidden style="display:block;"><span style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">'
+                + field("수량 (주)", f"{q:,}") + field(f"평균 매수가 ({cur})", price) + '</span>'
+                f'<span style="display:block;margin:8px 0 0;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">증권사 앱에 보이는 숫자를 그대로 적으면 됩니다.</span></span>')
+        return (f'<span data-ms-panel="edit-{i}" hidden style="display:block;padding:0 12px 16px;">{seg}{buy}{sell}{sets}'
+                f'<span style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0 0;">'
                 f'<a data-mock="1" data-ms-close="1" style="{WHITE_BTN}">취소</a><a data-mock="1" data-ms-close="1" style="{WHITE_BTN}">저장</a></span></span>')
 
     def del_panel(i, s):
@@ -328,7 +349,17 @@ MOCK_JS = ("<script>(function(){function go(){var b=document.querySelector('[dat
            "if(l)l.textContent=b.getAttribute('data-head-label');}document.querySelectorAll('[data-mock]').forEach(function(e){e.addEventListener('click',function(ev){ev.preventDefault();});});"
            "document.querySelectorAll('[data-ms-open]').forEach(function(btn){btn.addEventListener('click',function(){var k=btn.getAttribute('data-ms-open');"
            "document.querySelectorAll('[data-ms-panel]').forEach(function(p){p.hidden=p.getAttribute('data-ms-panel')!==k||!p.hidden;});});});"
-           "document.querySelectorAll('[data-ms-close]').forEach(function(b){b.addEventListener('click',function(){var p=b.closest('[data-ms-panel]');if(p)p.hidden=true;});});}"
+           "document.querySelectorAll('[data-ms-close]').forEach(function(b){b.addEventListener('click',function(){var p=b.closest('[data-ms-panel]');if(p)p.hidden=true;});});"
+           "document.querySelectorAll('[data-ms-panel^=edit]').forEach(function(p){var segs=p.querySelectorAll('[data-ms-seg]');"
+           "function pick(k){segs.forEach(function(x){x.classList.toggle('on',x.getAttribute('data-ms-seg')===k);});p.querySelectorAll('[data-ms-sub]').forEach(function(x){x.hidden=x.getAttribute('data-ms-sub')!==k;});}"
+           "segs.forEach(function(x){x.addEventListener('click',function(){pick(x.getAttribute('data-ms-seg'));});});pick('buy');"
+           "var pv=p.querySelector('[data-ms-preview]'),bq=p.querySelector('[data-ms-bq]'),bp=p.querySelector('[data-ms-bp]');"
+           "function num(v){return parseFloat(String(v||'').replace(/,/g,''))||0;}"
+           "function upd(){var q=num(pv.getAttribute('data-q')),a=num(pv.getAttribute('data-a')),c=pv.getAttribute('data-cur'),nq=num(bq.value),np=num(bp.value);"
+           "var f=function(v){return c==='$'?'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):Math.round(v).toLocaleString('ko-KR')+' 원';};"
+           "if(nq>0&&np>0){var tq=q+nq;pv.textContent='저장하면 '+tq.toLocaleString('ko-KR')+'주 · 새 평균 '+f((q*a+nq*np)/tq);}"
+           "else pv.textContent='지금 '+q.toLocaleString('ko-KR')+'주 · 평균 '+f(a);}"
+           "[bq,bp].forEach(function(x){x.addEventListener('input',upd);});upd();});}"
            "if(document.readyState==='complete')go();else window.addEventListener('load',go);})();</script>")
 
 
