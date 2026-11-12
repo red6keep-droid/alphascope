@@ -1132,7 +1132,7 @@ def _broke_card(fc):
     if not b:
         return ""
     L, A = fc.get("line", 3.0), dk.ALIGN_PX
-    out = f'<p style="margin:0 0 4px;padding:0 {A}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{tri_text(dk.esc(wordify(b["lead"], L)))}</p>'
+    out = f'<p style="margin:0 0 4px;padding:0 {A}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{tri_text(dk.esc(wordify(b["lead"], L)))}</p>' if b.get("lead") else ""
     for i, (name, rec, note) in enumerate(b["items"]):
         out += (f'<div style="padding:{14 - dk.VP}px {A}px {14 - dk.VP}px {A}px;{"border-top:1px solid #E2E8F0;" if i else ""}">'
                 f'<span style="display:block;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{dk.esc(name)}</span>'
