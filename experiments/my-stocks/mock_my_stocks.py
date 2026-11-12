@@ -61,7 +61,12 @@ def updown(v, text, px, tri=True):
     col = dk.UP if v > 0 else dk.DOWN if v < 0 else dk.MUTED
     tri = ("▲" if v > 0 else "▼" if v < 0 else "") if tri else ""   # tri=False = 금액(원) — 삼각형 없이 색만 (2026-11-12 사용자: 금액은 삼각형 빼기)
     t = f'<span data-tri="1" style="font-size:{round(px * 0.8)}px;vertical-align:1px;margin-right:2px;">{tri}</span>' if tri else ""
-    return f'<span style="color:{col};white-space:nowrap;">{t}{esc(text)}</span>'
+    return f'<span style="color:{col};white-space:nowrap;">{t}{text if "<" in text else esc(text)}</span>'
+
+
+def won_html(v, px):
+    """가격 `5,322,651 원` — 숫자 뒤 띄어 쓰고 `원`은 보통 굵기 · 숫자보다 2px 작게 (2026-11-12 사용자: 모든 가격의 원)."""
+    return f'{abs(v):,.0f}<span style="font-weight:400;font-size:{px - 2}px;"> 원</span>'
 
 
 def won(v):
@@ -108,14 +113,14 @@ def grand_card(held):
     RULE = '<span aria-hidden="true" style="grid-column:1/-1;height:1px;background:#FEE6CA;margin:8px 0;"></span>'
 
     def cells(label, amount_html, rate_html=""):
-        # 이름 | (빈 칸) | 수익률 | 금액 — 금액은 오른쪽 끝 선(총 평가 금액 · 환율과 같은 선)에 오른쪽 정렬, 수익률은 그 앞 칸 (2026-11-12 사용자)
-        return (f'<span style="white-space:nowrap;">{label}</span><span></span>'
-                f'<span style="white-space:nowrap;text-align:right;">{rate_html}</span><span style="white-space:nowrap;text-align:right;">{amount_html}</span>')
+        # 이름(회색 14) | (빈 칸) | 금액(오른쪽 정렬) | 수익률(맨 오른쪽 끝) (2026-11-12 사용자)
+        return (f'<span style="white-space:nowrap;font-size:{dk.TINY};color:{dk.NOTE};">{label}</span><span></span>'
+                f'<span style="white-space:nowrap;text-align:right;">{amount_html}</span><span style="white-space:nowrap;text-align:right;">{rate_html}</span>')
 
     top = (f'<div style="{ROW}"><span style="font-size:17px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">총 평가 금액</span>'
-           f'<span style="font-size:21px;line-height:28px;font-weight:800;color:#111;white-space:nowrap;">{esc(won(val))}</span></div>')   # 30 → 28 → 26 → 23 → 21 (2026-11-12 사용자)
-    grid = [cells("수익 금액", updown(gain, won(gain), FS, tri=False), updown(gain, f"{abs(gain / cost * 100):.1f}%", FS)),
-            cells("매수 금액", f'<span style="color:#111;">{esc(won(cost))}</span>')]
+           f'<span style="font-size:21px;line-height:28px;font-weight:800;color:#111;white-space:nowrap;">{won_html(val, 21)}</span></div>')   # 30 → 28 → 26 → 23 → 21 (2026-11-12 사용자)
+    grid = [cells("수익 금액", updown(gain, won_html(gain, FS), FS, tri=False), updown(gain, f"{abs(gain / cost * 100):.1f}%", FS)),
+            cells("매수 금액", f'<span style="font-size:{dk.TINY};color:{dk.NOTE};">{won_html(cost, 14)}</span>')]   # 매수 금액 = 회색 작은 글씨 (2026-11-12 사용자)
     for m, head in (("us", "미국 종목"), ("kr", "한국 종목")):
         rows = [h for h in held if h[0]["m"] == m]
         if not rows:
@@ -124,10 +129,10 @@ def grand_card(held):
         v = sum(krw(s, q * s["p"]["c"]) for s, q, _ in rows)
         if m == "us":
             grid.append(RULE)
-        grid.append(cells(f'{head}<span style="color:{dk.NOTE};font-size:{dk.TINY};"> · {len(rows)}종목</span>',
-                          updown(v - c, won(v - c), FS, tri=False), updown(v - c, f"{abs((v - c) / c * 100):.1f}%", FS)))
+        grid.append(cells(f'{head} · {len(rows)}종목',
+                          updown(v - c, won_html(v - c, FS), FS, tri=False), updown(v - c, f"{abs((v - c) / c * 100):.1f}%", FS)))
     sub = [f'<div style="{GRID}margin:6px 0 0;">{"".join(grid)}</div>']
-    fx = f'<div style="margin:10px 0 0;text-align:right;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">환율 {FX:,.0f}원</div>'   # 짧게 · 오른쪽 정렬 (2026-11-12 사용자)
+    fx = ""   # 환율 줄 삭제 (2026-11-12 사용자) — 계산 기준은 맨 아래 작은 글씨
     return dk.dcard(top + "".join(sub) + fx, kind)
 
 
@@ -148,13 +153,13 @@ def stock_rows(rows, m):
                 f'<span style="flex:none;display:flex;height:24px;align-items:center;">{dk.ticker_logo(s["s"], LOGO).replace("vertical-align:-4px;", "vertical-align:0;")}</span>'
                 f'<span style="min-width:0;">'
                 f'<span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">{esc(s["n"])}</span>'
-                f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};white-space:nowrap;">{esc(f"{q:,}주 · 평균 {money(a, m)}")}</span></span></span>')
-        # 오른쪽 = 윗줄 `오늘 등락 | 수익률`(15px 보통, 사이 세로 구분선) · 아랫줄 수익금(굵게) — `오늘` 글자 없음 (2026-11-12 사용자)
+                f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};white-space:nowrap;">{esc(f"{q:,}주 · 평균 ")}{esc(money(a, m)) if m == "us" else won_html(a, 14)}</span></span></span>')   # 원 = 띄우고 2 작게
+        # 오른쪽 = 윗줄 `오늘 등락(굵게) | 수익률`(15px, 사이 세로 구분선) · 아랫줄 수익금(보통) — `오늘` 글자 없음 (2026-11-12 사용자)
         rule = '<span aria-hidden="true" style="flex:none;width:1px;height:14px;margin:0 8px;background:#CBD5E1;"></span>'
         right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">'
-                 f'<span style="display:flex;align-items:center;font-size:15px;line-height:22px;">{updown(chg, f"{abs(chg):.1f}%", 15)}{rule}'
+                 f'<span style="display:flex;align-items:center;font-size:15px;line-height:22px;"><b style="font-weight:700;">{updown(chg, f"{abs(chg):.1f}%", 15)}</b>{rule}'
                  f'{updown(gain, f"{abs((c - a) / a * 100):.1f}%", 15)}</span>'
-                 f'<span style="font-size:16px;line-height:24px;font-weight:700;">{updown(gain, won(gk), 16, tri=False)}</span></span>')
+                 f'<span style="font-size:16px;line-height:24px;font-weight:400;">{updown(gain, won_html(gk, 16), 16, tri=False)}</span></span>')   # 굵게 = 오늘 등락만, 수익금은 보통 (2026-11-12 사용자)
         row = (f'<span style="{dk.MULTI_ROW}{"" if i == 0 else dk.MULTI_SEP}">{left}'
                f'{right}</span>')
         out.append(row.replace("<span ", f'<span data-row-link="1" data-href="{esc(s["u"])}" ', 1))
