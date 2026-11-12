@@ -23,6 +23,7 @@ sys.path[:0] = [EXP, os.path.join(EXP, "stock-radar"), os.path.join(EXP, "kr-sto
 import tech_signals as T  # noqa: E402
 import universe as U  # noqa: E402
 import universe_kr as UK  # noqa: E402
+import etf_universe as E  # noqa: E402
 
 BLOG = "https://alpha-scope.blogspot.com"
 OUT = os.path.join(HERE, "output", "search_index.json")
@@ -182,6 +183,19 @@ def kr_stocks(today):
     return stocks
 
 
+def etfs(market):
+    """회원 `내 종목` ETF (2026-11-12) — 가격 · 평균선만. 페이지 · 실적 · 뉴스 없음. `etfs` 칸이라 검색창(search.js, `stocks` 만 읽음)에는 안 나온다."""
+    snap = load(os.path.join(EXP, "stock-radar" if market == "us" else "kr-stocks", "data", "snapshot.json"))
+    out = []
+    for sym, name, tracks, extra in (E.US if market == "us" else E.KR):
+        bars = snap["bars"].get(sym)
+        if not bars or len(bars) < 30:
+            continue
+        out.append({"s": sym, "n": name, "m": market, "k": "etf", "tr": tracks, "a": aliases(sym, name, extra),
+                    "p": price_block(bars), "t": {"ma": tech_block(bars, market)["ma"]}})
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--market", choices=("us", "kr", "all"), default="all")
@@ -195,10 +209,11 @@ def main():
         sys.exit(f"색인 종목 {len(stocks)}개 < {want} — 만들지 않음(전날 파일 유지)")
     out = os.path.abspath(a.out)
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    doc = {"built": datetime.now().strftime("%Y-%m-%d %H:%M"), "stocks": stocks}
+    doc = {"built": datetime.now().strftime("%Y-%m-%d %H:%M"), "stocks": stocks,
+           "etfs": [x for m in (("us", "kr") if a.market == "all" else (a.market,)) for x in etfs(m)]}
     with open(out, "w", encoding="utf-8") as f:
         json.dump(doc, f, ensure_ascii=False, separators=(",", ":"))
-    print(f"만듦: {out} — 미국 {sum(s['m'] == 'us' for s in stocks)} · 한국 {sum(s['m'] == 'kr' for s in stocks)}종목, {os.path.getsize(out) / 1024:.0f}KB")
+    print(f"만듦: {out} — 미국 {sum(s['m'] == 'us' for s in stocks)} · 한국 {sum(s['m'] == 'kr' for s in stocks)}종목 · ETF {len(doc['etfs'])}개, {os.path.getsize(out) / 1024:.0f}KB")
 
 
 if __name__ == "__main__":
