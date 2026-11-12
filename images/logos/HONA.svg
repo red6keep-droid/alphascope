@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="grad-HONA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#6d28d9" />
+    </linearGradient>
+    <filter id="shadow-HONA" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <!-- Background Rounded Canvas -->
+  <rect width="256" height="256" rx="56" fill="url(#grad-HONA)" filter="url(#shadow-HONA)"/>
+  <!-- Subtle Internal Border -->
+  <rect x="2" y="2" width="252" height="252" rx="54" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.15"/>
+  <!-- Brand Text -->
+  <text 
+    x="128" 
+    y="142" 
+    font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+    font-size="96" 
+    font-weight="800" 
+    letter-spacing="-1.5"
+    fill="#ffffff" 
+    text-anchor="middle" 
+    dominant-baseline="middle">
+    HA
+  </text>
+  <!-- Micro ticker watermark at bottom -->
+  <text 
+    x="128" 
+    y="218" 
+    font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" 
+    font-size="20" 
+    font-weight="700" 
+    letter-spacing="2"
+    fill="#ffffff" 
+    fill-opacity="0.6"
+    text-anchor="middle">
+    HONA
+  </text>
+</svg>
