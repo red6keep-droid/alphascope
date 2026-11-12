@@ -20,7 +20,7 @@ TOPIC_KO = {"Trade": "무역", "Fed": "연준 · 금리", "Tax": "세금", "Ener
             "Macro Warning": "거시 경고", "Market Outlook": "시장 전망", "Policy": "정책 의견", "Product": "제품", "Investment": "투자",
             "Earnings": "실적", "Deal": "거래 · 제휴", "Industry View": "업계 평가", "Politics": "정치"}   # people-radar/config.TOPIC_KO 와 같게
 DIR_KO = {"positive": "긍정", "negative": "부정", "neutral": "중립"}
-DIR_NOTE = "▲ 상승 쪽 = 주가에 유리하게 본 발언, ▼ 하락 쪽 = 불리하게 본(경고한) 발언"   # 카드 안내 줄은 뺐다(2026-11-11 사용자) — 문장이 이미 `주가에 유리 · 불리하게 본` 으로 풀어 쓴다. 요약 카드 안내 (2026-11-11 사용자: `AI 거품 · 부정` 은 부정의 부정으로 읽힌다)
+DIR_NOTE = "▲ 상승 의견 = 주가에 유리하게 본 발언, ▼ 하락 의견 = 불리하게 본(경고한) 발언"   # 카드 안내 줄은 뺐다(2026-11-11 사용자) — 문장이 이미 `주가에 유리 · 불리하게 본` 으로 풀어 쓴다. 요약 카드 안내 (2026-11-11 사용자: `AI 거품 · 부정` 은 부정의 부정으로 읽힌다)
 _data = None
 
 
@@ -138,7 +138,7 @@ PILL_STACK_GAP = dk.PILL_PAIR_GAP   # 위아래로 쌓은 상승 · 하락 라�
 
 def _dir_val(d):
     """근거 줄 값 = 라벨 `▲ 긍정 4` `▼ 부정 2` (라벨끼리 2px, dk.PILL_PAIR_GAP). 둘 다 없으면 `— 중립`."""
-    parts = [_box(kind, f"{k} {d[key]}건") for key, k, kind in (("positive", "상승", "up"), ("negative", "하락", "down")) if d.get(key)]   # `상승 2건` · `하락 1건` (2026-11-12 사용자: `상승 쪽 2` 는 어색) — 옛 `긍정` · `부정` 은 `AI 거품 · 부정` 이 "거품이 아니다"로 읽혀 (2026-11-11 사용자)
+    parts = [_box(kind, f"{k} {d[key]}건") for key, k, kind in (("positive", "상승 의견", "up"), ("negative", "하락 의견", "down")) if d.get(key)]   # `상승 의견 2건` · `하락 의견 1건` (2026-11-12 사용자 P535, 옛 P530 `상승 2건` · 그 전 `상승 쪽 2`) — 옛 `긍정` · `부정` 은 `AI 거품 · 부정` 이 "거품이 아니다"로 읽혀 (2026-11-11 사용자)
     if not parts:
         parts = [_box("flat", "중립")]
     if len(parts) == 2:   # 상승 · 하락 둘 다 = 위아래로 (2026-11-12 사용자 P533), 오른쪽 끝 맞춤
@@ -183,7 +183,7 @@ def summary_card(qcard, sm=None, faces=None):
     sp = sm.get("split") or []
     if sp:
         x = sp[0]
-        first = f"{dk.josa(x['name'], '을')} 두고 {dk.josa(x['neg'][0], '은')} 하락 쪽, {dk.josa(x['pos'][0], '은')} 상승 쪽으로 봤습니다."
+        first = f"{dk.josa(x['name'], '을')} 두고 {dk.josa(x['neg'][0], '은')} 하락 의견을, {dk.josa(x['pos'][0], '은')} 상승 의견을 냈습니다."   # `쪽` 말 빼기 (2026-11-12 사용자 P535)
         if len(sp) > 1:
             first += f" {sp[1]['name']}에서도 의견이 갈렸습니다."
         lines = [(first, "plain")]
