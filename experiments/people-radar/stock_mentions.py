@@ -48,8 +48,9 @@ def _pop_lines(s, card):
         out.append(card["detail"])
     pth = s.get("path")
     if pth and pth.get("assets"):
-        why = card.get("path") or paths.CHANNEL_KO.get(pth.get("channel"), "")
-        out.append(" · ".join((paths.asset_label(a) if a in paths.ASSET_KO else f"{_ko(a)}({a})" if _ko(a) else a) for a in pth["assets"]) + (f" : {why}" if why else ""))   # 종목은 `엔비디아(NVDA)` (인물 발언 글과 같게)
+        why = card.get("path") or ""
+        names = " · ".join((paths.asset_label(a) if a in paths.ASSET_KO else f"{_ko(a)}({a})" if _ko(a) else a) for a in pth["assets"])
+        out.append(f"{names} : {why}" if why else f"{paths.related_label(pth['assets'])} : {names}")   # AI 구절 없으면 `관련 종목 : …` (2026-11-12 사용자: `○○ 경로` 말 금지)   # 종목은 `엔비디아(NVDA)` (인물 발언 글과 같게)
     n = s.get("novelty") or {}
     if n.get("first30"):
         out.append("30일 만에 처음 나온 주제")
