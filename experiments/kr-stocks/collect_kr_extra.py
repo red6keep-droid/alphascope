@@ -66,24 +66,38 @@ def _analysts(t):
 
 def run():
     import yfinance as yf
+    sys.path.insert(0, os.path.join(BASE, ".."))
+    import detail_cache as DC
+    cache = DC.shared(os.path.join(BASE, "data"))   # 칸마다 바뀌는 주기에만 (2026-11-12 사용자) — 매출 30일 · 실적 뒤, 이익 예상 · 의견 주 1회(종목별 요일) · 실적 뒤, 실적일 주 1회 · 14일 안이면 매일
     out = {"day": datetime.date.today().isoformat(), "stocks": {}, "revenue": {"series": {}}, "earnings": {}, "pair_earnings": {}}
+    n_new = 0
     for sym, *_ in U.CANDIDATES:
-        t = yf.Ticker(sym)
-        for key, f in (("revenue", lambda: _revenue(t)), ("eps", lambda: EX._eps(t)), ("earnings", lambda: _earn_dates(t)), ("analysts", lambda: _analysts(t))):
-            try:
-                v = f()
-            except Exception as e:  # noqa: BLE001 — 한 칸이 실패해도 나머지는 받는다
-                print(f"[kr-extra] {sym} {key} 실패: {str(e)[:80]}")
+        past, nxt = DC.earn_info(cache, sym)
+        due = [k for k in ("revenue", "eps", "earnings", "analysts") if cache.due(sym, k, earn_days=past, next_earn=nxt)]
+        cache.reused += 4 - len(due)
+        if due:
+            n_new += 1
+            t = yf.Ticker(sym)
+            fns = {"revenue": lambda: _revenue(t), "eps": lambda: EX._eps(t), "earnings": lambda: _earn_dates(t), "analysts": lambda: _analysts(t)}
+            for key in due:
+                try:
+                    v = fns[key]()
+                except Exception as e:  # noqa: BLE001 — 한 칸이 실패해도 나머지는 받는다
+                    print(f"[kr-extra] {sym} {key} 실패: {str(e)[:80]}")
+                    v = None
+                cache.put(sym, key, v)
+            time.sleep(0.5)
+        for key in ("revenue", "eps", "earnings", "analysts"):
+            v = cache.get(sym, key)
+            if v is None:
                 continue
             if key == "revenue":
                 out["revenue"]["series"][sym] = v
-            elif key == "eps":
-                out["stocks"].setdefault(sym, {})["eps"] = v
-            elif key == "analysts":
-                out["stocks"].setdefault(sym, {})["analysts"] = v
-            else:
+            elif key == "earnings":
                 out["earnings"][sym] = v
-        time.sleep(0.5)
+            else:
+                out["stocks"].setdefault(sym, {})[key] = v
+    print(f"[kr-extra] 새로 받은 종목 {n_new}/{len(U.CANDIDATES)} (나머지 저장값)")
     try:   # DART 분기 매출이 있으면 그것으로 (2026-10-25 사용자: 1년치뿐인 Yahoo 대신)
         import collect_kr_dart
         for sym, rows in collect_kr_dart.run().items():
@@ -101,18 +115,24 @@ def run():
         out["company"] = collect_kr_dart.company()
     except Exception as e:  # noqa: BLE001
         print(f"[kr-extra] 기업개황 실패: {str(e)[:120]}")
-    for us in sorted({u for v in U.PAIRS.values() for u in v[0]}):   # 미국과 연결 종목 실적일 (캘린더)
-        try:
-            out["pair_earnings"][us] = [{"day": x["day"]} for x in _earn_dates(yf.Ticker(us))]
-        except Exception as e:  # noqa: BLE001
-            print(f"[kr-extra] {us} 실적일 실패: {str(e)[:80]}")
-        time.sleep(0.5)
+    pe = cache.blob("pair_earnings", 7)   # 미국 연결 종목 실적일 — 주 1회 (2026-11-12, 전에는 실행마다 20여 회)
+    if pe is not None:
+        out["pair_earnings"] = pe
+    else:
+        for us in sorted({u for v in U.PAIRS.values() for u in v[0]}):   # 미국과 연결 종목 실적일 (캘린더)
+            try:
+                out["pair_earnings"][us] = [{"day": x["day"]} for x in _earn_dates(yf.Ticker(us))]
+            except Exception as e:  # noqa: BLE001
+                print(f"[kr-extra] {us} 실적일 실패: {str(e)[:80]}")
+            time.sleep(0.5)
+        cache.put_blob("pair_earnings", out["pair_earnings"])
     try:   # 추정치 · 등급 · 목표가 날짜별 기록 (K16, 2026-10-31 — 옛 extra.json 은 매일 덮어써 이력이 안 남았다)
         sys.path.insert(0, os.path.join(BASE, ".."))
         import est_history
         est_history.append(os.path.join(BASE, "data", "est_history.json"), out["day"], out["stocks"])
     except Exception as e:  # noqa: BLE001
         print(f"[kr-extra] 추정치 기록 실패: {str(e)[:120]}")
+    cache.save("한국 종목")
     os.makedirs(os.path.dirname(EXTRA), exist_ok=True)
     with open(EXTRA, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False)

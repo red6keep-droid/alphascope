@@ -104,10 +104,28 @@ def run():
     extra = sorted({U.BENCH, "^VIX", "SMH", *SECTOR_ETFS})
     peers = sorted({p for v in U.PEERS.values() for p in v} - set(syms))   # 함께 보는 회사 중 64종목 밖 — `함께 움직이는 종목은?` 오늘 등락 (2026-11-01 사용자 P263). 페이지는 만들지 않는다
     bars = _bars(syms + extra + peers)
+    # 시총 · 실적일은 바뀌는 주기에 맞춰서만 (detail_cache, 2026-11-12 사용자) — 시총 = 새 거래일마다, 실적일 = 주 1회 · 발표 14일 안이면 매일 · 발표 지난 뒤 처음.
+    # 하루 네 번 실행이 같은 날 값을 다시 받던 것 (64종목 × 2 × 4)
+    import detail_cache as DC
+    cache = DC.shared(os.path.join(BASE, "data"))
+    bar_day = max((bars[s][-1]["day"] for s in syms if bars.get(s)), default=None)
+    need_cap = [s for s in syms if cache.due(s, "caps", bar=bar_day)]
+    need_earn = []
+    for s in syms:
+        past, nxt = DC.earn_info(cache, s)
+        if cache.due(s, "earnings", earn_days=past, next_earn=nxt):
+            need_earn.append(s)
     # 스레드 8 → 3: 49종목 × 2 호출을 한꺼번에 쏘면 러너 IP 가 Yahoo 에 막힐 때 전부 같이 죽는다 (운영지침 D6-1, 2026-10-21)
     with ThreadPoolExecutor(3) as ex:
-        caps = dict(ex.map(_cap, syms))
-        earn = dict(ex.map(_earnings, syms))
+        for s, v in ex.map(_cap, need_cap):
+            cache.put(s, "caps", v, bar=bar_day)
+        for s, v in ex.map(_earnings, need_earn):
+            cache.put(s, "earnings", v)
+    cache.reused += (len(syms) - len(need_cap)) + (len(syms) - len(need_earn))
+    caps = {s: cache.get(s, "caps") for s in syms}
+    earn = {s: cache.get(s, "earnings") or [] for s in syms}
+    print(f"[collect] 시총 새로 {len(need_cap)} · 실적일 새로 {len(need_earn)} (나머지 저장값)")
+    cache.save("미국 종목 시총 · 실적일")
     snap = {"fetched_at": datetime.datetime.now(NY).isoformat(timespec="minutes"), "bars": bars, "caps": caps, "earnings": earn, "history": history()}
     os.makedirs(os.path.dirname(SNAP), exist_ok=True)
     with open(SNAP, "w", encoding="utf-8") as f:
