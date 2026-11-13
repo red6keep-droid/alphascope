@@ -11,7 +11,7 @@
 - 2026-11-12 사용자: ① 쓰지 않는 목업은 지우지 않고 `/archive` 한 곳에 묶는다(목록 · 최근 · 묶음에서 빠짐, 되돌리기 버튼). 기록 = .mock_prefs.json "archive".
   ② 사용자 여정 테스트 `/j/…` — 같은 목업 파일을 보내면서 하단 고정 메뉴(홈 · 미국 증시 · 한국 증시 · 종목 · 인물)를 붙이고,
   블로그 주소 링크(종목 페이지 · 리포트 · 인물 발언 · 증시 전망)를 다른 목업으로 이어 준다. 목업 파일은 건드리지 않는다(보낼 때만) — 목업을 다시 그리면 여정도 최신.
-- 2026-11-13 사용자: 목업 줄마다 `삭제` — 사용자가 잘 안 보는 목업을 직접 지운다. 확인 창을 거쳐 맥 휴지통(~/.Trash)으로 옮긴다(되살리기 = 휴지통에서).
+- 2026-11-13 사용자: 오른쪽 위 수정(연필) 아이콘을 누르면 목업 줄마다 `삭제` — 사용자가 잘 안 보는 목업을 직접 지운다. 확인 창을 거쳐 맥 휴지통(~/.Trash)으로 옮긴다(되살리기 = 휴지통에서).
 """
 import html
 import re
@@ -197,18 +197,28 @@ details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
 .go{{flex:1 1 auto;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 4px 10px 14px;color:inherit;text-decoration:none}}
 .go:active{{background:#eef2f8}} .name{{word-break:break-all}} .sub{{color:#8a919c;font-size:13px;white-space:nowrap}}
 .star{{flex:0 0 48px;border:0;background:none;font-size:22px;color:#c3c8d0;cursor:pointer;padding:0}} .star.on{{color:#f5a623}}
-.del{{flex:0 0 auto;border:0;border-left:1px solid #eef0f3;background:none;font-size:13px;color:#b42318;cursor:pointer;padding:0 14px}}
+.del{{display:none;flex:0 0 auto;border:0;border-left:1px solid #eef0f3;background:none;font-size:13px;color:#b42318;cursor:pointer;padding:0 14px}}
+body.edit .del{{display:block}}
+.top{{display:flex;justify-content:space-between;align-items:center;gap:12px}}
+.edit-btn{{flex:0 0 auto;width:44px;height:44px;border:1px solid #e3e6eb;border-radius:10px;background:#fff;color:#5b6370;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}}
+body.edit .edit-btn{{background:#1d2127;border-color:#1d2127;color:#fff}}
 .back{{flex:0 0 auto;border:0;background:none;font-size:13px;color:#5b6370;cursor:pointer;padding:0 14px}}
 .big{{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:0 14px;margin:0 0 16px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;color:inherit;text-decoration:none;font-weight:600}}
 .big span{{color:#8a919c;font-weight:400;font-size:13px}} .big.dark{{background:#1d2127;border-color:#1d2127;color:#fff}} .big.dark span{{color:#c3c8d0}}
 </style></head><body>
-<h1>{"쓰지 않는 목업" if archive else "목업 목록"}</h1><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록</div>
+<div class="top"><h1>{"쓰지 않는 목업" if archive else "목업 목록"}</h1><button class="edit-btn" aria-label="수정 — 삭제 버튼 보이기" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록</div>
 {''.join(parts)}
 <script>
 const ds = [...document.querySelectorAll('details')];
 document.querySelectorAll('.back').forEach(b => b.addEventListener('click', async () => {{
   await fetch('/archive?k=' + encodeURIComponent(b.dataset.k), {{method: 'POST'}}); location.reload();
 }}));
+// 수정(연필) 아이콘 = 삭제 버튼 보이기 · 숨기기, 삭제 뒤 새로고침에도 유지 (2026-11-13 사용자)
+const eb = document.querySelector('.edit-btn');
+const setEdit = on => {{ document.body.classList.toggle('edit', on); eb.setAttribute('aria-pressed', on);
+  try {{ sessionStorage.setItem('mockEdit', on ? '1' : ''); }} catch (e) {{}} }};
+try {{ setEdit(sessionStorage.getItem('mockEdit') === '1'); }} catch (e) {{}}
+eb.addEventListener('click', () => setEdit(!document.body.classList.contains('edit')));
 // 삭제 = 확인 뒤 맥 휴지통으로 (2026-11-13 사용자)
 document.querySelectorAll('.del').forEach(b => b.addEventListener('click', async () => {{
   if (!confirm(b.dataset.k + '\n\n이 목업을 삭제할까요? (맥 휴지통으로 옮깁니다)')) return;
