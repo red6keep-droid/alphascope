@@ -1,0 +1,32 @@
+{
+ "id": "EH-2026-007",
+ "slug": "forecast-2026-007",
+ "title": "브로드컴 급등, 조정 올까 더 오를까?",
+ "kind": "after",
+ "registered": "2026-11-13",
+ "event": "11.12 브로드컴 급등",
+ "event_day": null,
+ "ruler": "브로드컴 vs 업종",
+ "line": 7.0,
+ "unit": "%p",
+ "gap": 6.1,
+ "pick": null,
+ "pick_prob": null,
+ "market_prob": null,
+ "rules": "EH-2026-11-10",
+ "scenarios": [
+  {
+   "cond": "조정한다",
+   "name": "브로드컴 조정",
+   "dir": -1,
+   "win": "브로드컴이 급등 폭(6.1%p)의 절반을 반납한다"
+  },
+  {
+   "cond": "지속한다",
+   "name": "브로드컴 상승 지속",
+   "dir": 1,
+   "win": "브로드컴이 급등 뒤 7%p 더 오른다"
+  }
+ ],
+ "sha256": "31d69e657a52889279b5dff02275e7e3cb7e4bdbcec02cca4f26eae3d40f426b"
+}

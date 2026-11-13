@@ -1,7 +1,7 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-12T22:32:36Z",
+ "generated": "2026-11-13T22:32:48Z",
  "list_url": "https://alpha-scope.blogspot.com/p/forecast-list.html",
  "open": [
   {
@@ -19,15 +19,15 @@
   },
   {
    "no": 1,
-   "eh": "EH-2026-006",
-   "title": "마이크로소프트 급락, 반등할까 더 빠질까?",
-   "url": "https://alpha-scope.blogspot.com/p/forecast-2026-006.html",
-   "posted": "11.12",
+   "eh": "EH-2026-007",
+   "title": "브로드컴 급등, 조정 올까 더 오를까?",
+   "url": "https://alpha-scope.blogspot.com/p/forecast-2026-007.html",
+   "posted": "11.13",
    "tags": [
     "종목",
-    "반등"
+    "조정"
    ],
-   "event": "11.11 마이크로소프트 급락",
+   "event": "11.12 브로드컴 급등",
    "market": "us"
   },
   {
@@ -45,7 +45,7 @@
   }
  ],
  "done_count": {
-  "us": 3,
+  "us": 4,
   "kr": 0
  }
 }
