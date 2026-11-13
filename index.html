@@ -1736,6 +1736,25 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .menu-items .menu-row .nav-item:active, .menu-items .menu-grp .nav-item:active, .menu-items .menu-past:active { background: #F1F5F9; }
 .menu-items .nav-item.is-here { background: #F8FAFC; box-shadow: inset 3px 0 0 #111; font-weight: 700; }   /* 지금 보는 메뉴 — 빨강은 ▲상승과 겹쳐 안 씀 */
 .menu-items .menu-admin[hidden] { display: none; }   /* 관리자 줄 — .menu-row 의 flex 가 hidden 을 이기지 않게 (2026-11-13) */
+/* 로그인 · 계정 (2026-11-13 사용자) — 헤더 메뉴 버튼 앞, 메뉴 버튼과 같은 36 상자. 로그인 뒤엔 상자 안에 내 사진 26 원 */
+.as-login-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; border: 1px solid var(--border-strong); border-radius: 8px; background: #fff; color: var(--gray-600); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.as-login-btn svg { width: 20px; height: 20px; display: block; }
+.as-login-btn img, .as-login-btn .as-ini { width: 26px; height: 26px; border-radius: 50%; display: block; object-fit: cover; }
+.as-login-btn .as-ini { display: flex; align-items: center; justify-content: center; background: #94A3B8; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 26px; }
+.as-login-btn:hover { border-color: #94A3B8; }
+.as-acct .rt-pop-box { max-width: 400px; }
+.as-acct-x { position: absolute; top: 14px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: #EEF0F3; color: #4B5563; cursor: pointer; }   /* 닫기 = 회색 원 32 (가이드라인 닫기 통일) */
+.as-acct-x:hover { background: #E2E5EA; }
+.as-acct-x svg { width: 14px; height: 14px; display: block; }
+.as-acct-note { margin: 0 0 14px; font-size: 14px; line-height: 20px; color: #6B7280; word-break: keep-all; }
+.as-acct-me { display: flex; align-items: center; gap: 10px; margin: 2px 0 14px; font-size: 16px; line-height: 24px; color: #111; }
+.as-acct-me img, .as-acct-me .as-ini { width: 32px; height: 32px; border-radius: 50%; flex: none; object-fit: cover; }
+.as-acct-me .as-ini { display: flex; align-items: center; justify-content: center; background: #94A3B8; color: #fff; font-weight: 700; font-size: 14px; }
+.as-acct-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin: 8px 0 0; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 흰 버튼 = 가이드라인 10절 .cm-login */
+.as-acct-btn:hover { border-color: #111; }
+.as-acct-btn[disabled] { opacity: .5; cursor: default; }
+.as-acct-err { margin: 10px 0 0; font-size: 14px; line-height: 20px; color: #B91C1C; text-align: center; }
+.as-acct-err:empty { display: none; }
 
 /* 하단 고정 메뉴 — 폰 · 태블릿(900 이하)만. 칸 56 + 아래 여백 15, 선택 = 색 #111 + 칸 바탕 #F1F5F9 · 아래 모서리 10. 선 굵기는 화면 px 그대로(non-scaling-stroke) */
 .as-tabbar { display: none; }
@@ -1833,6 +1852,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         <!-- 알림 · 검색 버튼 삭제 (2026-10-25 사용자, 홈 수정 H1 · H2) — 헤더 오른쪽은 메뉴 버튼만 -->
         <!-- 검색 즉답 아이콘 (2026-11-11 사용자 "진행해", 목업 experiments/site-search) — search.js 가 국기 스위치 줄 맨 앞으로 옮긴다 -->
         <button aria-label='검색 (단축키 /)' class='as-search-btn' data-as-search='' type='button'><svg aria-hidden='true' viewBox='0 0 24 24'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg></button>
+
+        <!-- 로그인 · 계정 버튼 (2026-11-13 사용자 "상단 메뉴 앞에 로그인 버튼") — 로그인 전 = 사람 아이콘, 로그인 뒤 = 내 사진. 누르면 계정 창(테마 JS). 방문자 요청 0: Firebase 는 누를 때 · 로그인해 둔 기기에서만 불러온다 -->
+        <button aria-label='로그인' class='as-login-btn' type='button'><svg aria-hidden='true' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8.5' r='3.5'/><path d='M5 19.5c.9-3.3 3.6-5 7-5s6.1 1.7 7 5'/></svg></button>
 
         <button class='nav-toggle' type='button' aria-controls='primary-menu' aria-expanded='false'>
           <svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
@@ -4112,69 +4134,117 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           }).catch(function () {});
         })();
 
-        /* ============================================================ 관리자 줄 `운영 현황` (2026-11-13 사용자: "알파스코프 계정으로 로그인하면 관리자만 보는 페이지, 우측 메뉴 버튼 아래")
-           보이는 조건 = 이 기기의 as-admin 표시. 표시는 ① 블로그 주소 끝에 #ops 를 붙여 열 때 ② 댓글에서 주인 계정으로 로그인했을 때 생긴다.
-           (2026-11-13 사용자 "블로그에 로그인 화면이 없어서 진입이 안 된다" → ① 추가). 방문자는 표시가 없어 아무것도 하지 않는다(요청 0).
-           줄이 보이면 로그인 도구(Firebase)를 미리 불러 둔다 — 누르는 순간 구글 로그인 창을 바로 열어야 팝업 차단을 피한다.
-           누르면: 로그인돼 있으면 ID 토큰, 아니면 구글 로그인 창 → 주인 UID 면 운영 Worker /fb-login 으로 POST(주소에 토큰을 넣지 않음).
-           주인이 아니면 표시를 지우고 줄을 숨긴다. 그 밖의 실패는 Worker 첫 화면(GitHub 로그인)으로 간다. */
+        /* ============================================================ 로그인 · 계정 · 관리자 줄 (2026-11-13 사용자: "상단 메뉴 앞에 로그인 버튼", "관리자 페이지는 우측 메뉴 버튼 아래")
+           헤더 `.as-login-btn` — 로그인 전 = 사람 아이콘, 누르면 계정 창(구글 로그인 흰 버튼). 로그인 뒤 = 내 사진, 누르면 계정 창(이름 · [운영 현황] · 로그아웃).
+           방문자 요청 0: Firebase 로그인 도구(gstatic)는 계정 창을 열 때 · 이 기기에서 로그인해 둔 표시(as-signed)가 있을 때만 불러온다.
+           구글 로그인 창은 계정 창의 버튼을 누를 때 연다 — 도구를 그 전에 불러 두어야 폰 브라우저가 팝업을 막지 않는다.
+           블로그 주인(UID)이면 as-admin 표시 → 메뉴 맨 아래 `운영 현황` 줄 + 계정 창 버튼. 누르면 ID 토큰을 운영 Worker /fb-login 으로 POST(주소에 넣지 않음).
+           주소 끝 #ops 도 표시를 남긴다(예비 입구). 로그아웃하면 두 표시를 지운다. */
         (function () {
-          var row = document.querySelector('#primary-menu .menu-admin');
-          if (!row) return;
-          var on = false;
-          try {
-            if (location.hash === '#ops') {
-              localStorage.setItem('as-admin', '1');
-              history.replaceState(null, '', location.pathname + location.search);
-            }
-            on = localStorage.getItem('as-admin') === '1';
-          } catch (e) {}
-          if (!on) return;
-          row.hidden = false;
-          var a = row.querySelector('a'), OPS = a.href.replace(/\/$/, '');
+          var btn = document.querySelector('.as-login-btn'), row = document.querySelector('#primary-menu .menu-admin');
+          var OPS = 'https://alphascope-ops-console.red6keep.workers.dev';
           var SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
           var CFG = { apiKey: 'AIzaSyDY59SYxDKvQAAOxwbxYwZexolbx_5B-q0', authDomain: 'alphascope-352e9.firebaseapp.com', projectId: 'alphascope-352e9', appId: '1:143644264576:web:96972235fa5e8ac58c3e65', owner: 'u1vln4bbDgSgWQDe2F2FaNs81D43' };   /* 댓글 CFG 와 같은 공개 값 */
-          function load(src) {
-            return new Promise(function (ok, no) {
-              var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = no; document.head.appendChild(s);
-            });
+          function flag(k, v) { try { if (v === undefined) return localStorage.getItem(k) === '1'; if (v) localStorage.setItem(k, '1'); else localStorage.removeItem(k); } catch (e) {} return false; }
+          try { if (location.hash === '#ops') { flag('as-admin', true); history.replaceState(null, '', location.pathname + location.search); } } catch (e) {}
+          function showRow() { if (row) row.hidden = !flag('as-admin'); }
+          showRow();
+          var fb = null, au = null, user = null, readyP = null, pop = null, from = null;
+          var ICON = btn ? btn.innerHTML : '';
+          function load(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+          function ready() {
+            if (readyP) return readyP;
+            readyP = (window.firebase && window.firebase.auth ? Promise.resolve()
+              : (window.firebase ? Promise.resolve() : load(SDK + 'firebase-app-compat.js')).then(function () { return load(SDK + 'firebase-auth-compat.js'); }))
+              .then(function () {
+                fb = window.firebase;
+                if (!fb.apps.length) fb.initializeApp({ apiKey: CFG.apiKey, authDomain: CFG.authDomain, projectId: CFG.projectId, appId: CFG.appId });
+                au = fb.auth(); au.languageCode = 'ko';
+                return new Promise(function (ok) { var first = true; au.onAuthStateChanged(function (u) { setUser(u); if (first) { first = false; ok(); } }); });
+              });
+            readyP.catch(function () { readyP = null; });
+            return readyP;
           }
-          var fb = null, au = null, user = null;
-          var ready = (window.firebase && window.firebase.auth ? Promise.resolve()
-            : (window.firebase ? Promise.resolve() : load(SDK + 'firebase-app-compat.js')).then(function () { return load(SDK + 'firebase-auth-compat.js'); }))
-            .then(function () {
-              fb = window.firebase;
-              if (!fb.apps.length) fb.initializeApp({ apiKey: CFG.apiKey, authDomain: CFG.authDomain, projectId: CFG.projectId, appId: CFG.appId });
-              au = fb.auth(); au.languageCode = 'ko';
-              return new Promise(function (ok) { var off = au.onAuthStateChanged(function (u) { off(); user = u; ok(); }); });
-            });
-          ready.catch(function () {});
-          function send(u) {
-            if (!u || u.uid !== CFG.owner) {
-              try { localStorage.removeItem('as-admin'); } catch (e) {}
-              row.hidden = true;
-              throw new Error('not owner');
-            }
-            return u.getIdToken(true).then(function (t) {
-              var f = document.createElement('form');
-              f.method = 'POST'; f.action = OPS + '/fb-login'; f.style.display = 'none';
+          function mk(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+          function face(u) {
+            if (u.photoURL) { var im = document.createElement('img'); im.alt = ''; im.referrerPolicy = 'no-referrer'; im.src = u.photoURL; return im; }
+            return mk('span', 'as-ini', (u.displayName || '?').charAt(0));
+          }
+          function setUser(u) {
+            user = u || null;
+            flag('as-signed', !!user);
+            flag('as-admin', !!user && user.uid === CFG.owner);
+            showRow();
+            if (btn) { btn.innerHTML = ''; if (user) { btn.appendChild(face(user)); btn.setAttribute('aria-label', '내 계정'); } else { btn.innerHTML = ICON; btn.setAttribute('aria-label', '로그인'); } }
+            if (pop && !pop.hidden) paint();
+          }
+          /* 운영 현황 — 토큰을 POST(form) 로 Worker 에 */
+          function goOps() {
+            if (!user || user.uid !== CFG.owner) { location.href = OPS + '/'; return Promise.resolve(); }
+            return user.getIdToken(true).then(function (t) {
+              var f = document.createElement('form'); f.method = 'POST'; f.action = OPS + '/fb-login'; f.style.display = 'none';
               var i = document.createElement('input'); i.type = 'hidden'; i.name = 'id_token'; i.value = t; f.appendChild(i);
               document.body.appendChild(f); f.submit();
             });
           }
-          a.addEventListener('click', function (ev) {
+          /* 계정 창 — 툴팁 팝업(.rt-pop)과 같은 상자, 닫기 = 회색 원 */
+          var G = '<svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 0 1 0-3.4V5H.9a9 9 0 0 0 0 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.5 1.4l2.6-2.6A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>';
+          function close() { if (pop) pop.hidden = true; if (from) from.focus(); }
+          function paint() {
+            var body = pop.querySelector('.rt-pop-body'), title = pop.querySelector('.rt-pop-title');
+            body.textContent = '';
+            var err = mk('p', 'as-acct-err');
+            if (!user) {
+              title.textContent = '로그인';
+              body.appendChild(mk('p', 'as-acct-note', '댓글에 쓰는 구글 계정으로 로그인합니다.'));
+              var lg = mk('button', 'as-acct-btn'); lg.type = 'button'; lg.innerHTML = G + '<span>Google 계정으로 로그인</span>';
+              lg.disabled = !au;
+              if (!au) ready().then(function () { lg.disabled = false; }, function () { err.textContent = '로그인 도구를 불러오지 못했어요. 잠시 뒤에 다시 시도해 주세요.'; });
+              lg.addEventListener('click', function () {
+                lg.disabled = true; err.textContent = '';
+                au.signInWithPopup(new fb.auth.GoogleAuthProvider()).then(function (r) { setUser(r.user); }, function (e) {
+                  var m = String((e && (e.code || e.message)) || '');
+                  if (/popup-blocked/.test(m)) err.textContent = '로그인 창이 열리지 않았어요. 브라우저의 팝업 차단을 잠시 풀고 다시 눌러 주세요.';
+                  else if (/unauthorized-domain|operation-not-allowed/.test(m)) err.textContent = '지금은 로그인을 준비하고 있어요. 잠시 뒤에 다시 시도해 주세요.';
+                  else if (!/popup-closed|cancelled-popup/.test(m)) err.textContent = '로그인하지 못했어요. 잠시 뒤에 다시 시도해 주세요.';
+                }).then(function () { lg.disabled = false; });
+              });
+              body.appendChild(lg);
+            } else {
+              title.textContent = '내 계정';
+              var me = mk('div', 'as-acct-me'); me.appendChild(face(user)); me.appendChild(mk('span', null, user.uid === CFG.owner ? 'AlphaScope 운영자' : (user.displayName || '이름 없음')));
+              body.appendChild(me);
+              if (user.uid === CFG.owner) {
+                var ob = mk('button', 'as-acct-btn', '운영 현황'); ob.type = 'button';
+                ob.addEventListener('click', function () { ob.disabled = true; goOps().catch(function () { location.href = OPS + '/'; }); });
+                body.appendChild(ob);
+              }
+              var out = mk('button', 'as-acct-btn', '로그아웃'); out.type = 'button';
+              out.addEventListener('click', function () { out.disabled = true; au.signOut().then(function () { setUser(null); close(); }, function () { out.disabled = false; }); });
+              body.appendChild(out);
+            }
+            body.appendChild(err);
+          }
+          function open() {
+            if (!pop) {
+              pop = mk('div', 'rt-pop as-acct'); pop.hidden = true;
+              pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-labelledby="as-acct-title"><div class="rt-pop-head"><div class="rt-pop-title" id="as-acct-title"></div>' +
+                '<button type="button" class="as-acct-x" aria-label="닫기"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8"/></svg></button></div><div class="rt-pop-body"></div></div>';
+              document.body.appendChild(pop);
+              pop.querySelector('.as-acct-x').addEventListener('click', close);
+              pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
+              document.addEventListener('keydown', function (e) { if (pop && !pop.hidden && e.key === 'Escape') close(); });
+            }
+            paint(); pop.hidden = false; pop.querySelector('.as-acct-x').focus();
+            if (!au) ready().then(function () { if (!pop.hidden) paint(); }, function () {});
+          }
+          if (btn) btn.addEventListener('click', function () { from = btn; open(); });
+          /* 로그인해 둔 기기 · 관리자 표시가 있으면 미리 불러 사진 · 상태를 맞춘다 (방문자는 표시가 없어 불러오지 않는다) */
+          if (flag('as-signed') || flag('as-admin')) ready().catch(function () {});
+          /* 메뉴 `운영 현황` 줄 — 로그인돼 있으면 바로, 아니면 계정 창(로그인 버튼) */
+          if (row) row.querySelector('a').addEventListener('click', function (ev) {
             ev.preventDefault();
-            if (a.getAttribute('aria-busy')) return;
-            a.setAttribute('aria-busy', 'true');
-            var go;
-            if (au && !user) go = au.signInWithPopup(new fb.auth.GoogleAuthProvider()).then(function (r) { return send(r.user); });   /* 미리 불러 둔 상태 — 누른 순간 창을 연다 */
-            else if (au) go = send(user);
-            else go = ready.then(function () { return user ? send(user) : au.signInWithPopup(new fb.auth.GoogleAuthProvider()).then(function (r) { return send(r.user); }); });
-            go.catch(function (e) {
-              var m = String((e && (e.code || e.message)) || '');
-              if (/popup-closed|cancelled-popup/.test(m)) return;   /* 사용자가 창을 닫음 — 그대로 */
-              location.href = OPS + '/';
-            }).then(function () { a.removeAttribute('aria-busy'); });
+            ready().then(function () { if (user && user.uid === CFG.owner) return goOps(); from = btn; open(); }, function () { location.href = OPS + '/'; });
           });
         })();
 
@@ -4671,7 +4741,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function setOpen(open) {
           box.classList.toggle('is-open', open); panel.hidden = !open; toggle.setAttribute('aria-expanded', String(open));
           if (open) loadOnce();   /* 열면 그때 읽는다 (H30) */
-          if (open && !api) auth().then(function (a) { api = a; a.onAuth(function (u) { me = u; try { if (u && OWNER && u.uid === OWNER) localStorage.setItem('as-admin', '1'); } catch (e) {} renderWrite(); renderList(); });   /* 주인 로그인 = 메뉴에 관리자 줄 (2026-11-13) */ }, function (e) { showErr(write, errText(e)); });
+          if (open && !api) auth().then(function (a) { api = a; a.onAuth(function (u) { me = u; try { if (u) { localStorage.setItem('as-signed', '1'); if (OWNER && u.uid === OWNER) localStorage.setItem('as-admin', '1'); } } catch (e) {} renderWrite(); renderList(); });   /* 주인 로그인 = 메뉴에 관리자 줄 (2026-11-13) */ }, function (e) { showErr(write, errText(e)); });
         }
         toggle.addEventListener('click', function () { setOpen(panel.hidden); });
 

@@ -3211,7 +3211,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   function setOpen(open) {
     box.classList.toggle('is-open', open); panel.hidden = !open; toggle.setAttribute('aria-expanded', String(open));
     if (open) loadOnce();   /* 열면 그때 읽는다 (H30) */
-    if (open && !api) auth().then(function (a) { api = a; a.onAuth(function (u) { me = u; try { if (u && OWNER && u.uid === OWNER) localStorage.setItem('as-admin', '1'); } catch (e) {} renderWrite(); renderList(); });   /* 주인 로그인 = 메뉴에 관리자 줄 (2026-11-13, index.html 메뉴) */ }, function (e) { showErr(write, errText(e)); });
+    if (open && !api) auth().then(function (a) { api = a; a.onAuth(function (u) { me = u; try { if (u) { localStorage.setItem('as-signed', '1'); if (OWNER && u.uid === OWNER) localStorage.setItem('as-admin', '1'); } } catch (e) {} renderWrite(); renderList(); });   /* 주인 로그인 = 메뉴에 관리자 줄 (2026-11-13, index.html 메뉴) */ }, function (e) { showErr(write, errText(e)); });
   }
   toggle.addEventListener('click', function () { setOpen(panel.hidden); });
 
