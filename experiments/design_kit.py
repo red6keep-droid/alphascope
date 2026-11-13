@@ -946,6 +946,16 @@ def write_mock(body, path, title):
     return path
 
 
+EXCL_ICON = ('<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" style="flex:none;display:block;" fill="none" stroke="currentColor" stroke-width="1.6">'
+             '<circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>')   # 느낌표 = INFO_ICON(i) 뒤집은 모양 (가이드라인 8절 안내형, 원본 hypo_pages)
+
+
+def excl_note(t, margin="10px 0 0"):
+    """주의 · 한계 안내 한 줄 — 느낌표 13 + 13/19 회색, 사이 4, 아이콘 = 첫 줄 가운데 (가이드라인 8절 안내형, 2026-11-13 사용자: ETF `미국 값은 …` 안내)."""
+    return (f'<div style="display:flex;align-items:flex-start;gap:4px;margin:{margin};font-size:13px;line-height:19px;color:{NOTE};word-break:keep-all;">'
+            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{esc(t)}</span></div>')
+
+
 def muted(t):
     """짧은 안내 글 (빈 구획 안내 등) — ⓘ 필수."""
     return f'<div style="color:{NOTE};font-size:{TINY};line-height:{LH_TINY};margin:2px 0;{GUIDE_IND}">{INFO_ICON}{esc(t)}</div>'   # 여백 40% 줄임 (2026-10-11 사용자), 정수 px (2026-10-12)
@@ -1796,7 +1806,8 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
     tf = (lambda t: f"{t:,.0f}") if all(float(t).is_integer() for t in ticks) else (lambda t: fmt(t).lstrip("+"))   # 축 숫자엔 + 부호 없이 (M78)
     axis_w = int(max(text_px(tf(t), 12) for t in ticks) + 10)
     axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{NOTE};">{esc(tf(t))}</span>' for t in ticks)
-    dashed = lambda kind: kind in ("dash", "stepdash")   # noqa: E731
+    dashed = lambda kind: kind in ("dash", "stepdash")   # noqa: E731 — 선을 점선으로 그릴지
+    cmp = lambda kind: kind in ("dash", "stepdash", "thin")   # noqa: E731 — 비교 대상인지(끝 값 · 점 없음 · 범례 `비교 대상 :`). thin = 얇은 실선 비교 (2026-11-13 사용자: "점선 두 개는 눈이 아프다")
 
     def path_d(pts, X, kind):
         d = f"M{X(pts[0][0]):.1f},{y(pts[0][1]):.1f}"
@@ -1808,7 +1819,7 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
     if sparse:
         step = 46
         # 마지막 날 값 = 점 오른쪽(점 ~ 숫자 8, 점과 같은 높이) — 선 그래프 규칙 (2026-11-12 사용자: "마지막 날 증감 표시는 우측, 동그라미는 좌측", 가이드라인 9절)
-        last_w = max([text_px(fmt(v), 13) for _, xs, _, kind in series if not dashed(kind) for v in xs[-1:] if v is not None] + [0])
+        last_w = max([text_px(fmt(v), 13) for _, xs, _, kind in series if not cmp(kind) for v in xs[-1:] if v is not None] + [0])
         W = int(n * step + max(14, 5 + 8 + last_w - step / 2 + 14))   # 끝 점 숫자 ~ 세로축 숫자 사이 14px (2026-11-05 사용자 M77)
         X = lambda i: step / 2 + i * step   # noqa: E731
         g = "".join(f'<line x1="0" x2="{W}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="{GRID_LINE}" stroke-width="1"/>' for t in ticks)
@@ -1819,8 +1830,8 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
             if len(pts) < 2:
                 continue
             dash = ' stroke-dasharray="6 5"' if dashed(kind) else ""
-            lines_ += f'<path d="{path_d(pts, X, kind)}" fill="none" stroke="{col}" stroke-width="{2 if k == 0 or not dashed(kind) else 1}" stroke-linejoin="round" stroke-linecap="round"{dash}/>'
-            if dashed(kind):
+            lines_ += f'<path d="{path_d(pts, X, kind)}" fill="none" stroke="{col}" stroke-width="{2 if k == 0 or not cmp(kind) else 1}" stroke-linejoin="round" stroke-linecap="round"{dash}/>'
+            if cmp(kind):
                 continue
             for i, v in pts:
                 last = i == n - 1
@@ -1867,12 +1878,12 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
             dash = ' stroke-dasharray="6 5"' if dashed(kind) else ""
             paths += (f'<path d="{path_d(pts, X, kind)}" fill="none" stroke="{col}" stroke-width="{2 if k == 0 else 1}" stroke-linejoin="round" stroke-linecap="round"{dash} '
                       f'vector-effect="non-scaling-stroke"/>')
-            if not dashed(kind) or ends_only:   # ends_only = 비교 대상(점선)도 끝 값 (증시 전망 비교 그래프 S&P 500)
+            if not cmp(kind) or ends_only:   # ends_only = 비교 대상(점선)도 끝 값 (증시 전망 비교 그래프 S&P 500)
                 ends.append((k, pts[-1][0], pts[-1][1], col))
         dots, labs, used = "", "", []
         if ends_only:   # 날마다 작은 동그라미 (2026-11-11 사용자: "일자별로 동그라미는 있어야") — 실선 계열만, 끝 점은 아래에서 크게. 점 = 6 · 테두리 2 (sparse 의 r 3 · 선 2 와 같은 크기)
             for k, (nm, xs, col, kind) in enumerate(series):
-                if dashed(kind):
+                if cmp(kind):
                     continue
                 pts = [(i, v) for i, v in enumerate(xs) if v is not None]
                 for i, v in pts[:-1]:
@@ -1907,9 +1918,9 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
                 f'<span style="display:block;position:relative;height:26px;margin-top:2px;">{xl}</span></span>')
     chips = ""
     for nm, _, col, kind in series:
-        name = f"비교 대상 : {nm}" if dashed(kind) else nm
-        dot = "" if dashed(kind) or not sparse else f'<circle cx="9" cy="5" r="3" fill="#fff" stroke="{col}" stroke-width="2"/>'
-        line = (f'<svg width="18" height="10" aria-hidden="true"><line x1="1" x2="17" y1="5" y2="5" stroke="{col}" stroke-width="{1 if dashed(kind) else 2}"'
+        name = f"비교 대상 : {nm}" if cmp(kind) else nm
+        dot = "" if cmp(kind) or not sparse else f'<circle cx="9" cy="5" r="3" fill="#fff" stroke="{col}" stroke-width="2"/>'
+        line = (f'<svg width="18" height="10" aria-hidden="true"><line x1="1" x2="17" y1="5" y2="5" stroke="{col}" stroke-width="{1 if cmp(kind) else 2}"'
                 + (' stroke-dasharray="4 3"' if dashed(kind) else "") + f' stroke-linecap="round"/>{dot}</svg>')
         chips += f'<span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">{line}{esc(name)}</span>'
     if legend_note:

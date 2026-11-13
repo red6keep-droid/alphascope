@@ -24,6 +24,7 @@ sys.path[:0] = [EXP, os.path.join(EXP, "daily-report")]
 import design_kit as dk  # noqa: E402
 import cards as C  # noqa: E402
 import etf_universe as E  # noqa: E402
+import candle_chart as CC  # noqa: E402 — 봉차트(페이지 안 실제 차트, 2026-11-13)
 
 OUT = os.path.join(HERE, "output", "pages")   # 실행 결과(저장소에 올리지 않음) — 목업은 output/mock_etf_*.html (mock_etf.py)
 FUND_MAX_AGE = 7   # 일 — 구성 · 보수 · 순자산은 자주 안 바뀐다
@@ -259,6 +260,20 @@ def line_card(name, days, c, bench_days_close, bench_name):
     return dk.trend_card("1년 전 대비 등락", dk.month_ticks(days), series, pct)
 
 
+E_MOCK, E_REAL = ("<!--etf-mock-->", "<!--/etf-mock-->"), ("<!--etf-real-->", "<!--/etf-real-->")
+MOCK_AVG = 0.97   # 목업에만 보이는 `내 평단 (예시)` = 마지막 종가의 97% — 실제 페이지엔 없다(회원 본인 화면에서만 브라우저가 그린다, 회원 기능 때)
+
+
+def candle(name, bars, dec):
+    """맨 위 = 봉차트(일 · 주 · 월 · 넘겨보기 · 확대 · 전체 화면 지표) — 옛 `1년 전 대비 등락` 선 그래프 자리 (2026-11-13 사용자). 1년 비교는 `기간별 수익률` 막대에 있다."""
+    real = CC.card(name, bars, dec)
+    if not real:
+        return ""
+    last = bars[-1]["close"]
+    mock = CC.card(name, bars, dec, avg={"price": round(last * MOCK_AVG, dec), "label": "내 평단 (예시)"})
+    return E_MOCK[0] + mock + E_MOCK[1] + E_REAL[0] + real + E_REAL[1] + CC.SCRIPT   # ETF 전용 표시 — 한국 ETF 본문은 render_kr 를 거치며 mock-only 를 먼저 지운다
+
+
 def load_live(market):
     try:
         with open(live_path(market), encoding="utf-8") as f:
@@ -298,8 +313,7 @@ def us_pages(snap, live, fund):
             s["overheat"], s["drawdown"] = analyze.overheat(b, s["tech"]), analyze.drawdown(b, s["year_range"], snap, sym)
             s.update(peer_moves=[], in_top=False, rank=None, industry_us=None, mom_12_1=None)
             days = [x["day"] for x in b][-252:]
-            line = line_card(name, days, [x["close"] for x in b][-252:], {x["day"]: x["close"] for x in snap["bars"].get(U.BENCH) or []}, "S&P 500")
-            today = (line + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), name, "S&P 500")
+            today = (candle(name, b0, 2) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), name, "S&P 500")
                      + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s))
             f = fund.get(sym) or {}
             hold = tab_holdings(f)
@@ -390,7 +404,7 @@ def move_card(sym, snap, stocks, K, s=None):
         m = {x["day"]: x["close"] for x in snap["bars"].get(peer[0]) or []}
         v = norm([m.get(d) for d in days])
         if v and sum(x is not None for x in v) >= 20:
-            series.append((peer[1], v, dk.CHART_SERIES[1], "dash"))
+            series.append((peer[1], v, dk.CHART_SERIES[1], "thin"))   # 비교 = 얇은 실선 (2026-11-13 사용자: 점선 둘은 눈이 아프다)
     peer_ret = None
     if peer:
         pb = snap["bars"].get(peer[0]) or []
@@ -407,7 +421,7 @@ def move_card(sym, snap, stocks, K, s=None):
             vals.append(ub[k]["close"] if k >= 0 else None)
         v = norm(vals)
         if v and sum(x is not None for x in v) >= 20:
-            series.append((us[1], v, dk.CHART_SERIES[2], "dash"))
+            series.append((us[1], v, dk.CHART_SERIES[2], "thin"))
         if k >= 1 and ub[k - 1]["close"]:   # 마지막 한국 날짜 앞의 미국 하루 등락 = 강조 카드 답
             us_ret, us_day = (ub[k]["close"] / ub[k - 1]["close"] - 1) * 100, ub[k]["day"]
     if len(series) < 2:
@@ -423,7 +437,7 @@ def move_card(sym, snap, stocks, K, s=None):
     import render_html as R
     state, theme, sent = st
     col = {"positive": C.UP, "negative": C.DOWN}.get(theme, "#111")   # 회색 카드 답 = 검정 (가이드라인 7절, 2026-11-08)
-    lines = [(sent, "plain"), (chart, "html")] + ([(note, "note")] if note else [])
+    lines = [(sent, "plain"), (chart + (dk.excl_note(note) if note else ""), "html")]   # 안내 = 느낌표 + 작은 회색 (2026-11-13 사용자, 가이드라인 8절 안내형)
     return R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", fold=True, opened=True)
 
 
@@ -461,7 +475,7 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
 
     def chart(s):   # 봉차트 그림 자리 → 오늘 탭 머리 + 1년 선 그래프 (미국 ETF 와 같게)
         b = snap["bars"][s["sym"]][-252:]
-        return render_kr.R._section("오늘", line_card(s["name"], [x["day"] for x in b], [x["close"] for x in b], kbench, K.BENCH_NAME), line=False, tab="오늘")
+        return render_kr.R._section("오늘", candle(s["name"], snap["bars"][s["sym"]], 0), line=False, tab="오늘")
     render_kr.sec_chart = chart
     render_kr.sec_pairs = lambda s, a=None: move_card(s["sym"], snap, stocks_kr, K, s)   # 종목 페이지 `함께 움직이는 종목은?` 자리 → ETF 는 선 그래프
     tmp = os.path.join(OUT, "_kr_tmp")
@@ -506,8 +520,10 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
 def write(pages, mock=True):
     os.makedirs(OUT, exist_ok=True)
     for key, (title, body) in pages.items():
-        real = re.sub(r"<!--mock-only-->.*?<!--/mock-only-->", "", body, flags=re.S).replace(REAL_ONLY[0], "").replace(REAL_ONLY[1], "")
-        body = re.sub(r"<!--real-only-->.*?<!--/real-only-->", "", body, flags=re.S).replace(MOCK_ONLY[0], "").replace(MOCK_ONLY[1], "")
+        real = re.sub(r"<!--(?:etf-)?mock(?:-only)?-->.*?<!--/(?:etf-)?mock(?:-only)?-->", "", body, flags=re.S)
+        real = re.sub(r"<!--/?(?:real-only|etf-real)-->", "", real)
+        body = re.sub(r"<!--(?:etf-)?real(?:-only)?-->.*?<!--/(?:etf-)?real(?:-only)?-->", "", body, flags=re.S)
+        body = re.sub(r"<!--/?(?:mock-only|etf-mock)-->", "", body)
         with open(os.path.join(OUT, f"{key}.html"), "w", encoding="utf-8") as f:
             f.write(real)
         if mock:   # 목업 = output/mock_etf_<키>.html — 목업 서버가 블로그 주소(/p/<키>-etf.html)를 이 파일로 바꿔 연다
