@@ -1,11 +1,98 @@
 {
-  "updated_at": "2026-11-12 21:46:31 UTC",
+  "updated_at": "2026-11-13 02:08:12 UTC",
   "items": [
     {
-      "title": "Microsoft outage hits Outlook. AWS and Google users also report issues",
+      "title": "Oil prices rise after Trump says no Iran deal needed: 'We've got their Strait'",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/oil-prices-jump-after-trump-says-no-iran-deal-needed-weve-got-their-strait.html",
+      "published": "2026-11-13 00:01:19",
+      "title_ko": "트럼프가 이란과의 거래가 필요 없다고 말한 후 유가 상승",
+      "summary_ko": "도널드 트럼프 대통령의 최근 발언으로 미국과 이란 전쟁의 종식이 보이지 않는다는 우려가 제기됨",
+      "lines": [
+        "브렌트유 94.48달러로 1.9% 상승",
+        "서부텍사스산원유 88.19달러로 2% 상승"
+      ]
+    },
+    {
+      "title": "지정학적 리스크와 유가 상승",
+      "title_ko": "지정학적 리스크와 유가 상승",
+      "summary_ko": "트럼프 대통령의 대이란 강경 발언과 호르무즈 해협 긴장으로 유가가 반등했습니",
+      "source": "증시각도기",
+      "link": "https://www.youtube.com/watch?v=GWc9kKhbifU",
+      "published": "2026-11-12 23:22:32",
+      "kind": "media",
+      "tag": "유가 · 에너지 · 원자재",
+      "direction": "positive",
+      "n_channels": 5,
+      "lines": [
+        "진행자 발언 : 도널드 트럼프 대통령의 이란 관련 강경 발언 및 호르무즈 해협 장악 언급",
+        "진행자 발언 : 유가 상승세로 이어져 WTI 가격이 86~88달러 선으로 회복",
+        "진행자 발언 : 브렌트유 역시 95달러까지 상승하며 에너지 가격 전반에 상방 압력"
+      ]
+    },
+    {
+      "title": "국채 금리 급등과 연준 긴축 기조",
+      "title_ko": "국채 금리 급등과 연준 긴축 기조",
+      "summary_ko": "유가 상승과 연준 인사들의 매파적 발언으로 금리가 급등하며 증시에 부담을 주었습니",
+      "source": "증시각도기",
+      "link": "https://www.youtube.com/watch?v=GWc9kKhbifU",
+      "published": "2026-11-12 23:22:32",
+      "kind": "media",
+      "tag": "금리 · 연준",
+      "direction": "negative",
+      "n_channels": 4,
+      "lines": [
+        "진행자 발언 : 크리스토퍼 월러 연준 이사와 클리블랜드 연은 총재 등의 추가 금리 인상 가능성 시사",
+        "진행자 발언 : 유가 상승에 따른 인플레이션 재점화 우려가 금리 상승 압력으로 작용",
+        "진행자 발언 : 10년물 국채 금리가 하루 만에 약 13bp 급등하여 5.1% 기록",
+        "진행자 발언 : 2년물 국채 금리 또한 큰 폭으로 상승하며 12월 금리 인상 경계감 반영"
+      ]
+    },
+    {
+      "title": "Cramer says Jensen Huang betrayed Nvidia shareholders. How to pick up the pieces",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-exit-cramer.html",
+      "published": "2026-11-12 23:14:56",
+      "title_ko": "크레이머, 젠슨 황이 엔비디아 주주들을 배신했다고 발언",
+      "summary_ko": "황 없이는 더 나은 엔비디아가 아니라 그저 다른 엔비디아일 뿐이라고 목요일에 크레이머가 언급",
+      "lines": [
+        "엔비디아 최고경영자 젠슨 황 사임",
+        "최고재무책임자 콜레트 크레스 임시 최고경영자 선임",
+        "목요일 엔비디아 주가 4퍼센트 이상 하락 마감"
+      ]
+    },
+    {
+      "title": "Cerebras surges 17% after beating on quarterly revenue and announcing Microsoft deal",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/cerebras-systems-cbrs-q3-earnings-report-2026.html",
+      "published": "2026-11-12 22:48:26",
+      "title_ko": "세레브라스, 분기 매출 호조 및 마이크로소프트와의 계약 발표로 18% 급등",
+      "summary_ko": "세레브라스는 주요 클라우드 제공업체인 아마존 및 오라클과 파트너십을 맺은 후 마이크로소프트와 새로운 계약 체결",
+      "lines": [
+        "세레브라스 마이크로소프트와의 신규 계약 발표",
+        "세레브라스 분기 매출 및 가이드라인 시장 예상치 상회",
+        "시간외 거래에서 세레브라스 주가 18% 급등",
+        "전년 대비 70% 증가한 세레브라스 핵심 매출"
+      ]
+    },
+    {
+      "title": "Alice Huang tied to Nvidia’s biggest Chinese competitor",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/alice-huang-jensen-huang-nvidia-huawei.html",
+      "published": "2026-11-12 22:47:28",
+      "title_ko": "앨리스 황, 엔비디아 경쟁사와 연관",
+      "summary_ko": "앨리스 황, 화웨이에 컴퓨팅 파워 제공 기업 지분 보유",
+      "lines": [
+        "앨리스 황이 엔비디아 최대 경쟁사 화웨이 관련 기업 지분 보유",
+        "앨리스 황이 젠슨 황과 연인 관계 유지 중 화웨이 관련 사업 관여",
+        "정보 기업 테사리가 앨리스 황과 화웨이 간 연결고리 최초 발견"
+      ]
+    },
+    {
+      "title": "Widespread Microsoft outage takes down Outlook and other 365 services",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/12/microsoft-outage-outlook-aws-google.html",
-      "published": "2026-11-12 21:43:11",
+      "published": "2026-11-12 22:24:12",
       "title_ko": "마이크로소프트 아웃룩 접속 장애 발생, AWS와 구글 사용자도 문제 보고",
       "summary_ko": "아마존 웹 서비스와 구글 사용자들도 목요일에 서비스 중단을 보고",
       "lines": [
@@ -14,17 +101,45 @@
       ]
     },
     {
-      "title": "Cerebras surges 18% after beating on quarterly revenue and announcing Microsoft deal",
+      "title": "Scout Motors has 212,000 vehicle reservations as $2 billion South Carolina plant nears completion",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/cerebras-systems-cbrs-q3-earnings-report-2026.html",
-      "published": "2026-11-12 21:33:44",
-      "title_ko": "세레브라스, 분기 매출 호조 및 마이크로소프트와의 계약 발표로 18% 급등",
-      "summary_ko": "세레브라스는 주요 클라우드 제공업체인 아마존 및 오라클과 파트너십을 맺은 후 마이크로소프트와 새로운 계약 체결",
+      "link": "https://www.cnbc.com/2026/11/12/scout-motors-reservations-south-carolina-plant.html",
+      "published": "2026-11-12 22:17:05",
+      "title_ko": "스카우트 모터스, 20억 달러 사우스캐롤라이나 공장 완공 임박 속 차량 예약 21만 2,000대 기록",
+      "summary_ko": "스카우트 모터스의 테라 픽업과 트래블러 SUV 예약이 약 21만 2,000대라고 CEO 스콧 키오가 CNBC에 밝힘",
       "lines": [
-        "세레브라스 마이크로소프트와의 신규 계약 발표",
-        "세레브라스 분기 매출 및 가이드라인 시장 예상치 상회",
-        "시간외 거래에서 세레브라스 주가 18% 급등",
-        "전년 대비 70% 증가한 세레브라스 핵심 매출"
+        "폭스바겐 지원 스카우트 모터스 테라 픽업과 트래블러 SUV 예약 대수 약 21만 2000대 기록 (예상)",
+        "사우스캐롤라이나주 20억 달러 규모 공장 완공 임박",
+        "내년 전면 생산 시작 및 2028년 고객 인도 예정"
+      ]
+    },
+    {
+      "title": "대중국 반도체 수출 통제 파장",
+      "title_ko": "대중국 반도체 수출 통제 파장",
+      "summary_ko": "젠슨 황의 퇴진이 미국의 대중국 반도체 수출 통제 및 AI 칩 공급에 영향을 미칠 전망",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=QJ_ENts-OT4",
+      "published": "2026-11-12 22:10:12",
+      "kind": "media",
+      "tag": "규제 · 산업정책",
+      "direction": "negative",
+      "n_channels": 3,
+      "lines": [
+        "미국의 대중국 반도체 수출 통제 지속",
+        "젠슨 황의 대중국 칩 공급 완화 노력에 타격",
+        "국가 안보 및 기밀 유출 관련 조사 진행"
+      ]
+    },
+    {
+      "title": "Without Jensen Huang, Nvidia's organizational structure isn't 'built to last,' management expert says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/make-it/2026/11/12/nvidia-jensen-huang-management-structure.html",
+      "published": "2026-11-12 22:06:08",
+      "title_ko": "젠슨 황 없는 엔비디아의 조직 구조는 지속 가능하지 않다고 경영 전문가 지적",
+      "summary_ko": "엔비디아의 수평적 조직 구조가 후임자에게 과제가 될 수 있다고 전문가 언급",
+      "lines": [
+        "1993년 공동 창업자 젠슨 황 엔비디아 최고경영자 사임",
+        "최고재무책임자 콜레트 크레스 임시 최고경영자 임명"
       ]
     },
     {
@@ -52,97 +167,6 @@
         "최고재무책임자 콜레트 크레스의 임시 CEO 임명",
         "시가총액 4조 달러 선을 유지 중인 엔비디아 주가",
         "시놉시스 전 CEO 하비 C. 존스의 이사회 초대 의장 선임"
-      ]
-    },
-    {
-      "title": "Alice Huang tied to Nvidia’s biggest Chinese competitor",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/alice-huang-jensen-huang-nvidia-huawei.html",
-      "published": "2026-11-12 20:34:54",
-      "title_ko": "앨리스 황, 엔비디아 경쟁사와 연관",
-      "summary_ko": "앨리스 황, 화웨이에 컴퓨팅 파워 제공 기업 지분 보유",
-      "lines": [
-        "앨리스 황이 엔비디아 최대 경쟁사 화웨이 관련 기업 지분 보유",
-        "앨리스 황이 젠슨 황과 연인 관계 유지 중 화웨이 관련 사업 관여",
-        "정보 기업 테사리가 앨리스 황과 화웨이 간 연결고리 최초 발견"
-      ]
-    },
-    {
-      "title": "Donald Trump Jr. exits advisory role at Kalshi prediction market",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/donald-trump-jr-exits-kalshi-advisory-role.html",
-      "published": "2026-11-12 20:03:57",
-      "title_ko": "도널드 트럼프 주니어, 칼시 예측 시장 자문 역할 종료",
-      "summary_ko": "",
-      "lines": [
-        "도널드 트럼프 주니어가 칼시 자문 역할 종료",
-        "칼시가 1789 캐피탈의 폴리마켓 지분 보유를 이유로 계약 해지",
-        "양측이 이해 충돌을 이유로 트럼프 주니어 자문직 종료 합의"
-      ]
-    },
-    {
-      "title": "Jensen Huang is out and Nvidia stock is down—what market pros say about buying dips",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/11/12/nvidia-what-market-pros-say-about-buying-dips.html",
-      "published": "2026-11-12 20:01:29",
-      "title_ko": "젠슨 황의 퇴임과 엔비디아 주가 하락, 시장 전문가들의 저가 매수 조언",
-      "summary_ko": "목요일 젠슨 황 CEO의 퇴임 이후 주가 하락 발생",
-      "lines": [
-        "엔비디아 젠슨 황 CEO 사임 발표",
-        "엔비디아 주가 5% 이상 하락",
-        "엔비디아 시가총액 약 약 4조 달러 기록"
-      ]
-    },
-    {
-      "title": "엔비디아 대중국 반도체 수출 통제 및 스파이 스캔들",
-      "title_ko": "엔비디아 대중국 반도체 수출 통제 및 스파이 스캔들",
-      "summary_ko": "중국 스파이 연루 의혹과 불법 칩 우회 수출 문제로 트럼프 행정부와 법 집행 기관의 조사가 강화될 전망",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=ukuqWKKE_jA",
-      "published": "2026-11-12 18:24:36",
-      "kind": "media",
-      "tag": "규제 · 산업정책",
-      "direction": "negative",
-      "n_channels": 4,
-      "lines": [
-        "중국 스파이 연루 의혹 및 부적절한 관계 논란 확산",
-        "미국 상무부와 트럼프 행정부 내 대중국 칩 수출 통제 관련 내분 보도",
-        "엔비디아 불법 칩 우회 수출 관련 형사 책임 가능성 대두",
-        "중국 현지 엔비디아 칩 밀수 가격 급등 및 시장 불안 심화",
-        "알리바바 등 관련 중국 테크주 주가 하락 기록"
-      ]
-    },
-    {
-      "title": "엔비디아 생태계와 경쟁력",
-      "title_ko": "엔비디아 생태계와 경쟁력",
-      "summary_ko": "미국이 단일 기업에 과도하게 의존하고 있지 않으며 구글, 마이크로소프트, 아마존 등의 경쟁으로 산업 기반이 탄탄함",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=U8ppflwJdaA",
-      "published": "2026-11-12 17:59:57",
-      "kind": "media",
-      "tag": "AI 투자 · 반도체 수요",
-      "direction": "positive",
-      "n_channels": 5,
-      "lines": [
-        "벤 뷰캐넌 발언 : 구글과 마이크로소프트, 아마존 등도 경쟁력 있는 자체 칩 설계",
-        "벤 뷰캐넌 발언 : 엔비디아의 우수한 인력과 제품으로 AI 생태계의 핵심 기둥 역할 지속 전망",
-        "벤 뷰캐넌 발언 : 엔비디아의 오픈 웨이트 모델 지속 유지 예상"
-      ]
-    },
-    {
-      "title": "AI 인프라 수요와 수혜주",
-      "title_ko": "AI 인프라 수요와 수혜주",
-      "summary_ko": "AI 데이터센터 구축 수요는 멈추지 않는 흐름이며 엔비디아 외에 브로드컴과 AMD 등이 수혜를 볼 것으로 봄",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=FIKj8BtIPW0",
-      "published": "2026-11-12 12:44:17",
-      "kind": "media",
-      "tag": "AI 투자 · 반도체 수요",
-      "direction": "positive",
-      "n_channels": 3,
-      "lines": [
-        "진행자 발언 : 데이터센터 구축과 AI 인프라 수요는 멈출 수 없는 흐름",
-        "조앤 피니 발언 : 엔비디아가 흔들릴 경우 브로드컴과 AMD 같은 기업이 수혜를 볼 것으로 봄"
       ]
     }
   ]

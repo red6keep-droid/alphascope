@@ -1850,7 +1850,7 @@
  },
  "87cb0c408a9c": {
   "lines": [
-   "이란과의 합의 불필요성 언급"
+   "이란과의 합의 불필요성 표명"
   ],
   "tags": [
    {
@@ -1858,17 +1858,18 @@
     "tickers": [],
     "sector": null,
     "issue": "GEOPOLITICS",
-    "dir": "positive",
+    "dir": "neutral",
     "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-12T21:46:29.529933+00:00",
-  "n_src": 900
+  "at": "2026-11-13T02:08:12.506487+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "dfc7b8fa0167": {
   "lines": [
-   "5000억 달러 규모 인공지능 구축 계획 발표"
+   "5000억 달러 규모 인공지능 인프라 구축 계획 발표"
   ],
   "tags": [
    {
@@ -1879,12 +1880,13 @@
     "sector": "SMH",
     "issue": "AI_CAPEX",
     "dir": "positive",
-    "stage": "talk"
+    "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-12T21:46:29.529933+00:00",
-  "n_src": 900
+  "at": "2026-11-13T02:08:12.506487+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "901ffc9648f5": {
   "lines": [
@@ -1939,6 +1941,116 @@
   ],
   "model": "groq:qwen/qwen3.8-27b",
   "at": "2026-11-12T21:46:31.742546+00:00",
+  "n_src": 900
+ },
+ "213455771f2f": {
+  "lines": [
+   "엔비디아 최고경영자 젠슨 황 사임",
+   "최고재무책임자 콜레트 크레스 임시 최고경영자 선임",
+   "목요일 엔비디아 주가 4퍼센트 이상 하락 마감"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T02:08:11.655629+00:00",
+  "n_src": 900
+ },
+ "8865be63c867": {
+  "lines": [
+   "폭스바겐 지원 스카우트 모터스 테라 픽업과 트래블러 SUV 예약 대수 약 21만 2000대 기록 (예상)",
+   "사우스캐롤라이나주 20억 달러 규모 공장 완공 임박",
+   "내년 전면 생산 시작 및 2028년 고객 인도 예정"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T02:08:11.655629+00:00",
+  "n_src": 900
+ },
+ "02a3c2a4fcc8": {
+  "lines": [
+   "1993년 공동 창업자 젠슨 황 엔비디아 최고경영자 사임",
+   "최고재무책임자 콜레트 크레스 임시 최고경영자 임명"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T02:08:11.655629+00:00",
   "n_src": 900
  }
 }
