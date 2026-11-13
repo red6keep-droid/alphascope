@@ -2383,5 +2383,290 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-13T12:48:09.420475+00:00",
   "n_src": 900
+ },
+ "4242ca1a2f03": {
+  "lines": [
+   "로빈후드 상장 공모 정보 누락 소송 상고 심리 수용"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "HOOD"
+    ],
+    "sector": "XLF",
+    "issue": "REGULATION",
+    "dir": "uncertain",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T20:01:53.526812+00:00",
+  "n_src": 900
+ },
+ "73c73a78d637": {
+  "lines": [
+   "케빈 해싯 백악관 사임 보도 부인"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T20:01:53.526812+00:00",
+  "n_src": 900
+ },
+ "e276e77530e2": {
+  "lines": [
+   "엔비디아 신임 최고경영자 인선 서치펌 미선정"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T20:01:53.526812+00:00",
+  "n_src": 900
+ },
+ "9a7e193fcc8b": {
+  "lines": [
+   "젠슨 황 엔비디아 CEO 사임 발표",
+   "엔비디아 주가 목요일 4% 하락",
+   "CNBC 재무자문사 122곳 대상 설문조사 실시"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "INVESTOR_CALLS",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-13T20:01:57.056625+00:00",
+  "n_src": 900
+ },
+ "651952f48421": {
+  "lines": [
+   "골드만삭스 앤트로픽 IPO 공동 주관 및 자산관리 참여 추진"
+  ],
+  "tags": [
+   null
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-13T20:01:57.056625+00:00",
+  "n_src": 380
+ },
+ "a663158ee53e": {
+  "lines": [
+   "엔비디아 주가 10월 6일 이후 약 약 30% 하락",
+   "엔비디아 주가 160달러대 거래"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-13T20:01:57.056625+00:00",
+  "n_src": 900
+ },
+ "be0f439fc3d0": {
+  "lines": [
+   "캔터 피츠제럴드의 엔비디아 보유 주식 약 50% 감소",
+   "캔터 피츠제럴드의 엔비디아 목표가 350달러 유지"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "INVESTOR_CALLS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T20:01:58.858428+00:00",
+  "n_src": 900
+ },
+ "9abcd6109fea": {
+  "lines": [
+   "은퇴자의 비정기적 지출을 위한 401k 및 IRA 인출 활용"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "OTHER",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T20:01:58.858428+00:00",
+  "n_src": 900
+ },
+ "88d77a52ad5e": {
+  "lines": [
+   "오픈에이아이의 챗GPT 월렛 출시",
+   "아메리칸 익스프레스와 마스터카드 및 비자의 챗GPT 월렛 제휴"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T20:01:58.858428+00:00",
+  "n_src": 900
+ },
+ "933879ad3b47": {
+  "lines": [
+   "나스닥100지수의 9월 상승 돌파 실패 및 하락",
+   "나스닥100지수의 2만5000~2만6000 구간 지지선 형성"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T20:02:00.132226+00:00",
+  "n_src": 900
+ },
+ "e777ffc92eb6": {
+  "lines": [
+   "10년 만기 미 국채 수익률의 5.17% 기록",
+   "10월 생산자물가지수의 전월 대비 0.3% 상승 (예상)",
+   "2년 만기 미 국채 수익률의 4.855% 기록"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "INFLATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T20:02:00.132226+00:00",
+  "n_src": 900
  }
 }

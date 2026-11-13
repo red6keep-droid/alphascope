@@ -1,23 +1,60 @@
 {
-  "updated_at": "2026-11-13 12:48:09 UTC",
+  "updated_at": "2026-11-13 20:02:00 UTC",
   "items": [
     {
-      "title": "Trump says he wants to ‘get Cuba done’ before leaving office, would consider military force",
+      "title": "After Jensen Huang’s exit, what top financial advisors are doing with Nvidia: Exclusive CNBC poll",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/trump-cuba-us-military-force-iran.html",
-      "published": "2026-11-13 12:28:55",
-      "title_ko": "트럼프, 임기 마치기 전 쿠바 문제 해결 원하며 군사력 사용 고려한다고 밝혀",
-      "summary_ko": "미국은 쿠바에 대한 포괄적 경제 금수 조치를 계속 집행 중",
+      "link": "https://www.cnbc.com/2026/11/13/nvidia-stock-advisors-jensen-huang-exit-exclusive-poll.html",
+      "published": "2026-11-13 19:53:38",
+      "title_ko": "젠슨 황 사임 이후 최고 재무 자문가들이 엔비디아를 다루는 방식",
+      "summary_ko": "자문가들은 리더십 교체에 반응하기 전에 엔비디아 노출도, 투자 기간, 위험 감수 성향을 따져봐야 한다고 언급",
       "lines": [
-        "도널드 트럼프 미국 대통령의 2029년 임기 내 쿠바 문제 해결 표명",
-        "쿠바에 대한 군사적 개입 가능성 언급"
+        "젠슨 황 엔비디아 CEO 사임 발표",
+        "엔비디아 주가 목요일 4% 하락",
+        "CNBC 재무자문사 122곳 대상 설문조사 실시"
       ]
     },
     {
-      "title": "Outlook outage continues as Microsoft flags 'encouraging recovery progress'",
+      "title": "A trading strategy to ride out the Nvidia uncertainty and generate income in the process",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/a-trading-strategy-to-ride-out-the-nvidia-uncertainty-and-generate-income-in-the-process.html",
+      "published": "2026-11-13 19:30:36",
+      "title_ko": "엔비디아 불확실성을 헤쳐나가며 수익을 창출하는 거래 전략",
+      "summary_ko": "",
+      "lines": [
+        "엔비디아 주가 10월 6일 이후 약 약 30% 하락",
+        "엔비디아 주가 160달러대 거래"
+      ]
+    },
+    {
+      "title": "Lutnick faces questions over Nvidia spy scandal. His sons’ firm has deep ties to the chipmaker",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html",
+      "published": "2026-11-13 19:11:13",
+      "title_ko": "러트닉, 엔비디아 스파이 스캔들 관련 질의 직면, 두 아들 회사는 칩 제조사와 깊은 연관",
+      "summary_ko": "젠슨 황의 엔비디아 최고경영자 사임으로 하워드 러트닉 상무장관과 가족의 금융 연관성에 대한 감시가 재점화",
+      "lines": [
+        "캔터 피츠제럴드의 엔비디아 보유 주식 약 50% 감소",
+        "캔터 피츠제럴드의 엔비디아 목표가 350달러 유지"
+      ]
+    },
+    {
+      "title": "OpenAI launches ChatGPT Wallet, allowing its 'dots' AI agents to make purchases for users",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/openai-chatgpt-wallet-dot-purchases.html",
+      "published": "2026-11-13 18:56:26",
+      "title_ko": "오픈에이아이, 챗GPT 지갑 출시하며 에이전트의 사용자 구매 허용",
+      "summary_ko": "챗GPT 지갑은 아메리칸 익스프레스, 마스터카드, 비자와 제휴를 맺고 기존 신용카드 보상을 유지",
+      "lines": [
+        "오픈에이아이의 챗GPT 월렛 출시",
+        "아메리칸 익스프레스와 마스터카드 및 비자의 챗GPT 월렛 제휴"
+      ]
+    },
+    {
+      "title": "Microsoft apologizes for massive outage that took down Outlook and other 365 services",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/12/microsoft-outage-outlook-aws-google.html",
-      "published": "2026-11-13 12:21:41",
+      "published": "2026-11-13 18:18:28",
       "title_ko": "마이크로소프트 아웃룩 접속 장애 발생, AWS와 구글 사용자도 문제 보고",
       "summary_ko": "아마존 웹 서비스와 구글 사용자들도 목요일에 서비스 중단을 보고",
       "lines": [
@@ -26,144 +63,82 @@
       ]
     },
     {
-      "title": "Russian crude production rebounds after Trump diesel deal, IEA says as oil markets return to surplus",
+      "title": "Is a bottom in for the Nasdaq-100? Charts to watch",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/russia-oil-exports-iea-diesel-deal.html",
-      "published": "2026-11-13 12:05:22",
-      "title_ko": "트럼프 디젤 협상 이후 러시아 원유 생산량 반등, IEA는 석유 시장이 공급 과다로 복귀했다고 밝힘",
-      "summary_ko": "걸프 지역 수출 회복으로 글로벌 공급량이 수요를 초과",
+      "link": "https://www.cnbc.com/2026/11/13/is-a-bottom-in-for-the-nasdaq-100-charts-to-watch.html",
+      "published": "2026-11-13 18:00:01",
+      "title_ko": "나스닥 100 지수 바닥쳤나, 주목할 차트들",
+      "summary_ko": "캡스시스의 프랭크 캡펠레리가 질문에 답하기 위해 여러 차트를 분석",
       "lines": [
-        "10월 러시아 원유 생산량 하루 873만 바렐로 증가",
-        "러시아 일일 원유 생산량 21만 바렐 급증",
-        "걸프 지역 수출 회복에 따른 글로벌 석유 시장 공급 과잉 진입"
+        "나스닥100지수의 9월 상승 돌파 실패 및 하락",
+        "나스닥100지수의 2만5000~2만6000 구간 지지선 형성"
       ]
     },
     {
-      "title": "U.S. seizes $1.2 billion in cryptocurrency stolen from Binance",
+      "title": "10-year Treasury yield moves to 5.17% as traders weigh producer price report",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/us-seizes-binance-hack-crypto.html",
-      "published": "2026-11-13 12:03:24",
-      "title_ko": "미국, 바이낸스에서 도난당한 12억 달러 상당의 암호화폐 압수",
-      "summary_ko": "북한 정권의 암호화폐 대규모 절도 자금 조달 계획에 대응 조치 실시",
+      "link": "https://www.cnbc.com/2026/11/13/treasury-yields-fed-rates.html",
+      "published": "2026-11-13 17:39:48",
+      "title_ko": "10년물 국채 금리 5.17%로 상승, 트레이더들은 생산자물가 보고서 주시",
+      "summary_ko": "연방준비제도의 12월 금리 인상에 대한 투자자들의 기대감이 강화되면서 국채 금리가 상승",
       "lines": [
-        "미국 당국의 바이낸스 해킹 피해 가상자산 12억 달러 압수",
-        "바이낸스에서 발생한 60억 달러 상당의 가상자산 탈취 사건",
-        "북한 군 소속 해커들의 가상자산 탈취 공모 발표"
+        "10년 만기 미 국채 수익률의 5.17% 기록",
+        "10월 생산자물가지수의 전월 대비 0.3% 상승 (예상)",
+        "2년 만기 미 국채 수익률의 4.855% 기록"
       ]
     },
     {
-      "title": "The Tech Download: I interviewed Huang at peak ‘Jensenmania.’ Three weeks later, Nvidia is grappling with a world without him",
+      "title": "앤트로픽 IPO 및 로드쇼 라이브스트림",
+      "title_ko": "앤트로픽 IPO 및 로드쇼 라이브스트림",
+      "summary_ko": "앤트로픽 IPO를 앞두고 다리오 아모데이와 제이미 다이먼이 라이브스트림 대담을 진행하며 개인 투자자 참여를 독려함",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/tech-download-jensen-huang-nvidia-departure-jensenmania.html",
-      "published": "2026-11-13 12:00:02",
-      "title_ko": "테크 다운로드: '젠슨매니아' 절정기에 황을 인터뷰했다. 3주 후 엔비디아는 그가 없는 세상과 사투를 벌이고 있음",
-      "summary_ko": "베를린 GTC 인터뷰 불과 몇 주 만에 벌어진 CEO 관련 사태",
-      "lines": [
-        "엔비디아 CEO 젠슨 황의 베를린 GTC 행사 진행",
-        "미국 정보기관의 젠슨 황 관련 대중국 스파이 연루 의혹 제기"
-      ]
-    },
-    {
-      "title": "NHL’s next media deal will test the league’s strength",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/nhls-next-media-deal-will-test-the-leagues-strength.html",
-      "published": "2026-11-13 11:48:56",
-      "title_ko": "NHL의 다음 미디어 계약은 리그의 힘을 시험할 것",
-      "summary_ko": "NFL 외 권리의 가치를 평가하는 미디어 기업들의 행보",
-      "lines": [
-        "NHL의 디즈니 및 TNT 스포츠와의 신규 미디어 판권 협상 개시 예정일 1월 1일",
-        "NHL의 기존 계약 대비 50%에서 100% 사이의 전체 판권료 인상 요구"
-      ]
-    },
-    {
-      "title": "CNBC's Official NHL Team Valuations 2026: How the 32 franchises stack up",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/cnbcs-official-nhl-team-valuations-2026-how-the-32-clubs-stack-up.html",
-      "published": "2026-11-13 11:48:31",
-      "title_ko": "CNBC의 2026년 공식 NHL 팀 가치 산정: 32개 프랜차이즈의 순위",
-      "summary_ko": "1년 전보다 23% 상승한 수치",
-      "lines": [
-        "NHL 구단 평균 가치 27억 1000만 달러로 전년 대비 23% 상승",
-        "토론토 메이플 리프스 54억 달러 및 뉴욕 레이어스 47억 달러 기록",
-        "호프만 가문에 대한 18억 달러 규모 피츠버그 펭귄스 매각 승인",
-        "캐롤라이나 허리케인스 지분 12.5% 매각 가치 26억 6000만 달러 기록"
-      ]
-    },
-    {
-      "title": "The Fed expected rate cuts this year. Now it’s bracing for another inflation fight",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/us-inflation-outlook-federal-reserve-rate-hike.html",
-      "published": "2026-11-13 11:31:10",
-      "title_ko": "연준은 올해 금리 인하를 예상했으나, 이제 또 다른 인플레이션과의 싸움을 대비하고 있음",
-      "summary_ko": "10월 인플레이션 수치가 예상치 상회",
-      "lines": [
-        "10월 소비자물가상승률 0.4% 기록 (예상)",
-        "근원 소비자물가 0.3% 상승 (예상)",
-        "연방공개시장위원회 최종 회의 12월 8일 예정"
-      ]
-    },
-    {
-      "title": "Nvidia scandal draws in Commerce Secretary Lutnick, who reportedly agrees to testify about China chip sales",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/nvidia-scandal-lutnick-chip-sales.html",
-      "published": "2026-11-13 10:54:40",
-      "title_ko": "엔비디아 스캔들에 휘말린 러트닉 상무장관, 중국 칩 판매에 대해 증언하기로 동의한 것으로 전해짐",
-      "summary_ko": "젠슨 황과 중국계 스파이 혐의 여성과의 관계 발각 이후 상원 은행위원회 출석 예정",
-      "lines": [
-        "하워드 루트닉 상무장관 상원 은행위원회 증언 동의",
-        "증언 요청 서한 발송 12월 3일과 12월 10일 예정"
-      ]
-    },
-    {
-      "title": "앤트로픽 대규모 IPO 임박",
-      "title_ko": "앤트로픽 대규모 IPO 임박",
-      "summary_ko": "사상 최대 규모가 될 앤트로픽 IPO는 반도체 생태계에 긍정적이지만 초기 보호예수 해제 물량으로 변동성이 클 수 있음",
-      "source": "Mad Money",
-      "link": "https://www.youtube.com/watch?v=ylbP-2VSZyc",
-      "published": "2026-11-13 00:52:20",
+      "link": "https://www.youtube.com/watch?v=yMlsX9l4YSI",
+      "published": "2026-11-13 17:12:55",
       "kind": "media",
       "tag": "기업 사건",
       "direction": "positive",
-      "n_channels": 3,
+      "n_channels": 4,
       "lines": [
-        "짐 크레이머 발언 : 앤트로픽 상장 후 막대한 현금 보유고 확보 예상",
-        "짐 크레이머 발언 : 초기 보호예수 해제 물량으로 인한 스페이스엑스 유사 주가 변동성 우려 (발언자 예상)",
-        "짐 크레이머 발언 : 앤트로픽 IPO는 반도체 생태계 및 엔비디아 투자금 회수에 긍정적"
+        "케이트 루니 보도 : 앤트로픽 CEO 다리오 아모데이와 JP모간 CEO 제이미 다이먼의 라이브스트림 대담 진행 예정",
+        "케이트 루니 보도 : 개인 투자자들이 브로커리지를 통해 IPO 공모가로 매수할 수 있는 기회 제공 예상",
+        "반타 리서치 : 앤트로픽 관련 선행 계약 거래량 기준 첫날 개인 투자자 매수세가 스페이스X를 넘어설 것으로 (발언자 추정)",
+        "케이트 루니 보도 : 기관 투자자들의 관심 또한 매우 강력한 것으로 나타남",
+        "케이트 루니 보도 : 다음주 목요일 상장 이후 실제 메인스트림 투자자들의 매수 규모가 시험대에 오를 예정"
       ]
     },
     {
-      "title": "지정학적 리스크와 유가 상승",
-      "title_ko": "지정학적 리스크와 유가 상승",
-      "summary_ko": "트럼프 대통령의 대이란 강경 발언과 호르무즈 해협 긴장으로 유가가 반등했습니",
-      "source": "증시각도기",
-      "link": "https://www.youtube.com/watch?v=GWc9kKhbifU",
-      "published": "2026-11-12 23:22:32",
+      "title": "미국 금리 인상 베팅 강화 및 국채 금리 변동",
+      "title_ko": "미국 금리 인상 베팅 강화 및 국채 금리 변동",
+      "summary_ko": "견조한 고용 및 인플레이션 지표 여파로 연준의 매파적 기조가 강화되며 국채 금리와 금리 인상 전망이 자극을 받고 있음",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=vO_kT_4MIiY",
+      "published": "2026-11-13 13:54:47",
+      "kind": "media",
+      "tag": "금리 · 연준",
+      "direction": "negative",
+      "n_channels": 5,
+      "lines": [
+        "진행자 발언 : 투자자들이 중요한 PPI 데이터를 앞두고 금리 인상 베팅을 강화하는 중",
+        "마이클 퍼베스 발언 : 연준이 중립금리가 예상보다 높다는 점을 깨닫고 조정 과정을 거치는 것으로 봄",
+        "마이클 퍼베스 발언 : 단기적으로 고배당 주식 등 금리 민감 섹터에 긴장감이 존재할 것으로 예상"
+      ]
+    },
+    {
+      "title": "트럼프의 이란 갈등 방치 전략과 유가 변동성",
+      "title_ko": "트럼프의 이란 갈등 방치 전략과 유가 변동성",
+      "summary_ko": "트럼프 대통령이 이란과의 협상에 나서지 않겠다고 밝히면서 중동 지정학적 리스크와 유가 불확실성이 지속 중",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=GLbcP0I-oec",
+      "published": "2026-11-13 08:56:12",
       "kind": "media",
       "tag": "유가 · 에너지 · 원자재",
       "direction": "positive",
       "n_channels": 4,
       "lines": [
-        "진행자 발언 : 도널드 트럼프 대통령의 이란 관련 강경 발언 및 호르무즈 해협 장악 언급",
-        "진행자 발언 : 유가 상승세로 이어져 WTI 가격이 86~88달러 선으로 회복",
-        "진행자 발언 : 브렌트유 역시 95달러까지 상승하며 에너지 가격 전반에 상방 압력"
-      ]
-    },
-    {
-      "title": "국채 금리 급등과 연준 긴축 기조",
-      "title_ko": "국채 금리 급등과 연준 긴축 기조",
-      "summary_ko": "유가 상승과 연준 인사들의 매파적 발언으로 금리가 급등하며 증시에 부담을 주었습니",
-      "source": "증시각도기",
-      "link": "https://www.youtube.com/watch?v=GWc9kKhbifU",
-      "published": "2026-11-12 23:22:32",
-      "kind": "media",
-      "tag": "금리 · 연준",
-      "direction": "negative",
-      "n_channels": 3,
-      "lines": [
-        "진행자 발언 : 크리스토퍼 월러 연준 이사와 클리블랜드 연은 총재 등의 추가 금리 인상 가능성 시사",
-        "진행자 발언 : 유가 상승에 따른 인플레이션 재점화 우려가 금리 상승 압력으로 작용",
-        "진행자 발언 : 10년물 국채 금리가 하루 만에 약 13bp 급등하여 5.1% 기록",
-        "진행자 발언 : 2년물 국채 금리 또한 큰 폭으로 상승하며 12월 금리 인상 경계감 반영"
+        "진행자 발언 : 트럼프 대통령의 이란 갈등 방치 및 대화 거부 전략 시사",
+        "에이프릴 홍 발언 : 브렌트유는 2주 연속 하락세를 기록 중이나 중동 지정학적 리스크 상존",
+        "니콜라스 로 발언 : 호르무즈 해협 통행 차질 및 정유 제품 마진 압박 지속",
+        "그렉 슈나엘 발언 : 글로벌 석유 재고 및 정제 설비 여유분이 타이트하여 변동성 지속 예상"
       ]
     }
   ]
