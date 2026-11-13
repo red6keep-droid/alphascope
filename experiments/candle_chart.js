@@ -6,7 +6,7 @@
 (function () {
   if (window.__asCandle) return;
   window.__asCandle = 1;
-  var UP = '#d93025', DN = '#1a73e8', UPL = '#F5B5AF', DNL = '#A9C9F5', GRID = '#ECF0F5', NOTE = '#6B7280', INK = '#111';
+  var VIO = '#6D28D9', UP = '#d93025', DN = '#1a73e8', UPL = '#F5B5AF', DNL = '#A9C9F5', GRID = '#ECF0F5', NOTE = '#6B7280', INK = '#111';
   var MA_COL = { 5: '#9CA3AF', 20: '#5FBFAF', 60: '#BFA2E8', 120: '#F5B971', 200: '#E879A6' };
   var VIEW = { D: 60, W: 52, M: 36 }, MIN_N = 15, MAX_N = 400, AXIS_W = 58;
 
@@ -66,13 +66,12 @@
     var self = this;
     this.root = root; this.d = JSON.parse(root.getAttribute('data-candle')); this.dec = this.d.dec || 0;
     this.unit = 'D'; this.full = false;
-    this.on = { ma: { 20: true, 60: true }, boll: false, lower: 'vol' };
+    this.on = { ma: { 20: true, 60: true }, boll: false, lower: 'none' };   // 페이지 안 = 아래 칸 없음(가격 칸을 크게, 2026-11-13 사용자) · 전체 화면 = 거래량부터
     root.innerHTML = '';
-    this.top = el('div', 'display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 6px;');
-    this.info = el('div', 'font-size:13px;line-height:19px;color:' + NOTE + ';min-height:19px;margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;');
+    this.top = el('div', 'display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;');
+    this.val = el('span', 'font-size:15px;line-height:22px;white-space:nowrap;font-variant-numeric:tabular-nums;');   // 종가 + 증감만 (누른 날이면 그날)
     this.cv = el('canvas', 'display:block;width:100%;touch-action:pan-y;cursor:crosshair;');
-    this.legend = el('div', 'display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;line-height:19px;color:' + NOTE + ';margin:6px 0 0;');
-    root.appendChild(this.top); root.appendChild(this.info); root.appendChild(this.cv); root.appendChild(this.legend);
+    root.appendChild(this.top); root.appendChild(this.cv);
     this.build();
     this.bind();
     var lastW = 0, again = function () { var w = root.clientWidth; if (w && w !== lastW) { lastW = w; requestAnimationFrame(function () { self.draw(); }); } };
@@ -90,10 +89,12 @@
   };
   Chart.prototype.topBar = function () {
     var self = this, t = this.top; t.innerHTML = '';
-    [['D', '일'], ['W', '주'], ['M', '월']].forEach(function (u) {
-      var b = btn(u[1], self.unit === u[0]); b.onclick = function () { self.unit = u[0]; self.build(); self.draw(); }; t.appendChild(b);
-    });
+    // 일 → 주 → 월 → 일 한 버튼으로 돌아간다 (2026-11-13 사용자)
+    var cyc = btn({ D: '일', W: '주', M: '월' }[this.unit], false); cyc.style.minWidth = '40px';
+    cyc.setAttribute('aria-label', '일봉 · 주봉 · 월봉 바꾸기');
+    cyc.onclick = function () { self.unit = { D: 'W', W: 'M', M: 'D' }[self.unit]; self.build(); self.draw(); }; t.appendChild(cyc);
     t.appendChild(el('span', 'flex:1;'));
+    t.appendChild(this.val);
     if (this.full) {
       var ind = btn('지표', this.menu); ind.onclick = function () { self.menu = !self.menu; self.topBar(); self.draw(); }; t.appendChild(ind);
     }
@@ -124,10 +125,10 @@
       this.ov.appendChild(el('div', 'font-size:17px;line-height:24px;font-weight:700;color:#111;margin:0 0 8px;', this.d.name));
       this.ov.appendChild(this.root);
       document.body.appendChild(this.ov); document.documentElement.style.overflow = 'hidden';
-      this.full = true; this.on.ma = { 5: false, 20: true, 60: true, 120: false, 200: true }; this.n = Math.min(this.unit === 'D' ? 120 : VIEW[this.unit] * 2, this.bars.length);
+      this.full = true; this.on.lower = 'vol'; this.on.ma = { 5: false, 20: true, 60: true, 120: false, 200: true }; this.n = Math.min(this.unit === 'D' ? 120 : VIEW[this.unit] * 2, this.bars.length);
     } else {
       this.ph.parentNode.insertBefore(this.root, this.ph); this.ph.remove(); this.ov.remove(); document.documentElement.style.overflow = '';
-      this.full = false; this.menu = false; this.on = { ma: { 20: true, 60: true }, boll: false, lower: 'vol' }; this.n = Math.min(VIEW[this.unit], this.bars.length); this.end = this.bars.length;
+      this.full = false; this.menu = false; this.on = { ma: { 20: true, 60: true }, boll: false, lower: 'none' }; this.n = Math.min(VIEW[this.unit], this.bars.length); this.end = this.bars.length;
     }
     this.topBar(); this.draw();
   };
@@ -166,12 +167,12 @@
   };
   Chart.prototype.draw = function () {
     var self = this, cv = this.cv, W = Math.floor(this.root.clientWidth); if (!W) return;
-    var lowerH = this.full ? 90 : 46, priceH = 210;
+    var lowerH = this.on.lower === 'none' ? 0 : this.full ? 90 : 46, priceH = 264;
     if (this.full) {   // 전체 화면 = 남은 높이를 가격 칸이 다 쓴다
-      var rest = window.innerHeight - this.cv.getBoundingClientRect().top - this.legend.offsetHeight - 6 - 16;
+      var rest = window.innerHeight - this.cv.getBoundingClientRect().top - 16;
       priceH = Math.max(200, Math.floor(rest - lowerH - 8 - 20));
     }
-    var xH = 20, gap = 8, H = priceH + gap + lowerH + xH, dpr = window.devicePixelRatio || 1;
+    var xH = 20, gap = lowerH ? 8 : 0, H = priceH + gap + lowerH + xH, dpr = window.devicePixelRatio || 1;
     cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + 'px';
     var g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     var font = getComputedStyle(this.root).fontFamily, pw = W - AXIS_W, s = this.end - this.n, B = this.bars.slice(s, this.end), slot = pw / this.n;
@@ -218,12 +219,14 @@
     // 내 평단 (기준선 = 점선)
     if (avg) {
       var ya = avgIn ? Y(avg.price) : (avg.price > hi ? 7.5 : priceH - 7.5), last = this.bars[this.bars.length - 1][4], diff = (last / avg.price - 1) * 100;
-      if (avgIn) { g.strokeStyle = '#4B5563'; g.lineWidth = 1; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(0, ya); g.lineTo(pw, ya); g.stroke(); g.setLineDash([]); }
-      g.font = '12px ' + font; g.textAlign = 'left'; g.fillStyle = '#4B5563';
-      var lab = (avg.label || '내 평단') + ' ' + fmt(avg.price, self.dec) + ' · ' + pct(diff) + (avgIn ? '' : avg.price > hi ? ' ↑' : ' ↓');
-      var lw = Math.ceil(g.measureText(lab).width) + 6, ly2 = Math.round(ya + (avgIn ? -9 : 0));
-      g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(2, ly2 - 9, lw, 18); g.fillStyle = '#4B5563';   // 글자 뒤 흰 바탕 — 봉과 겹쳐도 읽히게
-      g.fillText(lab, 5, ly2);
+      if (avgIn) { g.strokeStyle = VIO; g.lineWidth = 1; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(0, ya); g.lineTo(pw, ya); g.stroke(); g.setLineDash([]); }
+      // `내 평단 15,893 ▲3.10%` — 이름 · 가격 = 보라(중립 강조), 차이 = 증감 색 (2026-11-13 사용자)
+      g.font = '12px ' + font; g.textAlign = 'left';
+      var lab = (avg.label || '내 평단') + ' ' + fmt(avg.price, self.dec) + ' ', dtx = pct(diff) + (avgIn ? '' : avg.price > hi ? ' ↑' : ' ↓');
+      var w1 = Math.ceil(g.measureText(lab).width), w2 = Math.ceil(g.measureText(dtx).width), ly2 = Math.round(ya + (avgIn ? -9 : 0));
+      g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(2, ly2 - 9, w1 + w2 + 6, 18);   // 글자 뒤 흰 바탕 — 봉과 겹쳐도 읽히게
+      g.fillStyle = VIO; g.fillText(lab, 5, ly2);
+      g.fillStyle = diff > 0 ? UP : diff < 0 ? DN : INK; g.fillText(dtx, 5 + w1, ly2);
     }
     // 마지막 종가 = 오른쪽 칸 (점과 같은 높이)
     if (this.end === this.bars.length && B.length) {
@@ -233,9 +236,9 @@
     }
     // 아래 칸
     var top2 = priceH + gap, Y2;
-    g.strokeStyle = '#E2E8F0'; g.beginPath(); g.moveTo(0, top2 - gap / 2 + 0.5); g.lineTo(W, top2 - gap / 2 + 0.5); g.stroke();
+    if (lowerH) { g.strokeStyle = '#E2E8F0'; g.beginPath(); g.moveTo(0, top2 - gap / 2 + 0.5); g.lineTo(W, top2 - gap / 2 + 0.5); g.stroke(); }
     g.font = '12px ' + font;
-    if (this.on.lower === 'vol') {
+    if (!lowerH) { /* 페이지 안 = 아래 칸 없음 */ } else if (this.on.lower === 'vol') {
       var vm = Math.max.apply(null, B.map(function (b) { return b[5]; })) || 1;
       B.forEach(function (b, j) { var x = X(s + j), h = Math.round(b[5] / vm * (lowerH - 4)); g.fillStyle = b[4] >= b[1] ? UPL : DNL; g.fillRect(Math.round(x - bw / 2), top2 + lowerH - h, bw, h); });
       g.fillStyle = NOTE; g.textAlign = 'left'; g.fillText('거래량', pw + 6, top2 + 8);
@@ -265,20 +268,16 @@
     });
     // 누른 날
     var hi_ = this.hover, sel = hi_ !== null && hi_ >= s && hi_ < this.end ? hi_ : null, b = this.bars[sel === null ? this.end - 1 : sel], pb = this.bars[(sel === null ? this.end - 1 : sel) - 1];
-    if (sel !== null) { g.strokeStyle = '#94A3B8'; g.lineWidth = 1; g.beginPath(); g.moveTo(X(sel), 0); g.lineTo(X(sel), H - xH); g.stroke(); }
-    if (b) {
-      var c1 = pb ? (b[4] / pb[4] - 1) * 100 : 0, cc = c1 > 0 ? UP : c1 < 0 ? DN : INK;
-      var dl = this.unit === 'M' ? b[0].slice(0, 4) + '.' + b[0].slice(5, 7).replace(/^0/, '') + '월' : this.unit === 'W' ? (function () { var x = new Date(b[0] + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() - (x.getUTCDay() + 6) % 7); return md(x.toISOString()) + ' 주'; })() : md(b[0]);
-      this.info.innerHTML = '<b style="color:' + INK + ';font-weight:600;">' + dl + '</b> · 시 ' + fmt(b[1], this.dec) + ' · 고 ' + fmt(b[2], this.dec) +
-        ' · 저 ' + fmt(b[3], this.dec) + ' · 종 <b style="color:' + INK + ';font-weight:600;">' + fmt(b[4], this.dec) + '</b> <span style="color:' + cc + ';">' + pct(c1) + '</span>';
+    if (sel !== null) {   // 누른 날 = 세로선 + 가로축 날짜 칸
+      g.strokeStyle = '#94A3B8'; g.lineWidth = 1; g.beginPath(); g.moveTo(X(sel), 0); g.lineTo(X(sel), H - xH); g.stroke();
+      var dl = this.unit === 'M' ? b[0].slice(0, 4) + '.' + b[0].slice(5, 7).replace(/^0/, '') : this.unit === 'W' ? (function () { var x = new Date(b[0] + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() - (x.getUTCDay() + 6) % 7); return md(x.toISOString()) + ' 주'; })() : md(b[0]);
+      g.font = '12px ' + font; var dw = Math.ceil(g.measureText(dl).width) + 10, dx = Math.min(Math.max(X(sel) - dw / 2, 0), pw - dw);
+      g.fillStyle = '#4B5563'; g.fillRect(Math.round(dx), H - xH + 1, dw, xH - 2); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(dl, Math.round(dx + dw / 2), H - xH / 2);
     }
-    var lg = [];
-    var has = function (arr) { for (var i = s; i < self.end; i++) if (arr[i] !== null) return true; return false; };
-    for (var m in this.on.ma) if (this.on.ma[m] && has(this.ma[m])) lg.push('<span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:16px;height:1px;background:' + MA_COL[m] + ';display:inline-block;"></span>' + m + (this.unit === 'D' ? '일' : this.unit === 'W' ? '주' : '달') + ' 평균</span>');
-    if (this.on.boll) lg.push('<span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:16px;height:1px;background:#94A3B8;display:inline-block;"></span>볼린저 밴드</span>');
-    if (avg) lg.push('<span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:16px;border-top:1px dashed #4B5563;display:inline-block;"></span>' + (avg.label || '내 평단') + '</span>');
-    lg.push('<span style="margin-left:auto;">밀기 = 넘겨 보기 · 두 손가락 = 확대</span>');
-    this.legend.innerHTML = lg.join('');
+    if (b) {   // 맨 위 = 종가 + 증감만 (2026-11-13 사용자)
+      var c1 = pb ? (b[4] / pb[4] - 1) * 100 : 0, cc = c1 > 0 ? UP : c1 < 0 ? DN : INK;
+      this.val.innerHTML = '<b style="color:' + INK + ';font-weight:700;">' + fmt(b[4], this.dec) + '</b> <span style="color:' + cc + ';">' + pct(c1) + '</span>';
+    }
   };
   function init() { document.querySelectorAll('[data-candle]').forEach(function (r) { if (!r.__c) r.__c = new Chart(r); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

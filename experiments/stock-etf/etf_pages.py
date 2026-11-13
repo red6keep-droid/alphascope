@@ -266,11 +266,11 @@ MOCK_AVG = 0.97   # 목업에만 보이는 `내 평단 (예시)` = 마지막 종
 
 def candle(name, bars, dec):
     """맨 위 = 봉차트(일 · 주 · 월 · 넘겨보기 · 확대 · 전체 화면 지표) — 옛 `1년 전 대비 등락` 선 그래프 자리 (2026-11-13 사용자). 1년 비교는 `기간별 수익률` 막대에 있다."""
-    real = CC.card(name, bars, dec)
+    real = CC.card(name, bars, dec, title="")   # 제목 없음 (2026-11-13 사용자: `가격 흐름` 삭제)
     if not real:
         return ""
     last = bars[-1]["close"]
-    mock = CC.card(name, bars, dec, avg={"price": round(last * MOCK_AVG, dec), "label": "내 평단 (예시)"})
+    mock = CC.card(name, bars, dec, avg={"price": round(last * MOCK_AVG, dec), "label": "내 평단"}, title="")
     return E_MOCK[0] + mock + E_MOCK[1] + E_REAL[0] + real + E_REAL[1] + CC.SCRIPT   # ETF 전용 표시 — 한국 ETF 본문은 render_kr 를 거치며 mock-only 를 먼저 지운다
 
 
@@ -313,11 +313,12 @@ def us_pages(snap, live, fund):
             s["overheat"], s["drawdown"] = analyze.overheat(b, s["tech"]), analyze.drawdown(b, s["year_range"], snap, sym)
             s.update(peer_moves=[], in_top=False, rank=None, industry_us=None, mom_12_1=None)
             days = [x["day"] for x in b][-252:]
-            today = (candle(name, b0, 2) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), name, "S&P 500")
+            today = (R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), name, "S&P 500")
                      + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s))
             f = fund.get(sym) or {}
             hold = tab_holdings(f)
             body = (stamp(RP._md(s["day"]) + "(미국 시간)", STAMP_US if hold else STAMP_PRICE) + RP.lead(s)
+                    + candle(name, b0, 2)   # 차트 = 탭 위 (2026-11-13 사용자)
                     + R._section("오늘", today, line=False, tab="오늘")
                     + (R._section("구성", hold, tab="구성") if hold else "")
                     + R._section("기본 정보", tab_basic(sym, f, b0), tab="기본 정보")
@@ -475,7 +476,7 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
 
     def chart(s):   # 봉차트 그림 자리 → 오늘 탭 머리 + 1년 선 그래프 (미국 ETF 와 같게)
         b = snap["bars"][s["sym"]][-252:]
-        return render_kr.R._section("오늘", candle(s["name"], snap["bars"][s["sym"]], 0), line=False, tab="오늘")
+        return candle(s["name"], snap["bars"][s["sym"]], 0) + render_kr.R._section("오늘", "", line=False, tab="오늘")   # 차트 = 탭 위(증시 리포트와 같은 자리, 2026-11-13 사용자)
     render_kr.sec_chart = chart
     render_kr.sec_pairs = lambda s, a=None: move_card(s["sym"], snap, stocks_kr, K, s)   # 종목 페이지 `함께 움직이는 종목은?` 자리 → ETF 는 선 그래프
     tmp = os.path.join(OUT, "_kr_tmp")
