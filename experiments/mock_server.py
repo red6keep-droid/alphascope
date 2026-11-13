@@ -221,7 +221,7 @@ try {{ setEdit(sessionStorage.getItem('mockEdit') === '1'); }} catch (e) {{}}
 eb.addEventListener('click', () => setEdit(!document.body.classList.contains('edit')));
 // 삭제 = 확인 뒤 맥 휴지통으로 (2026-11-13 사용자)
 document.querySelectorAll('.del').forEach(b => b.addEventListener('click', async () => {{
-  if (!confirm(b.dataset.k + '\n\n이 목업을 삭제할까요? (맥 휴지통으로 옮깁니다)')) return;
+  if (!confirm(b.dataset.k + ' — 이 목업을 삭제할까요? (맥 휴지통으로 옮깁니다)')) return;
   const r = await fetch('/delete?k=' + encodeURIComponent(b.dataset.k), {{method: 'POST'}});
   if (!r.ok) {{ alert('삭제하지 못했습니다'); return; }}
   try {{ sessionStorage.setItem('mockIndex', JSON.stringify({{
