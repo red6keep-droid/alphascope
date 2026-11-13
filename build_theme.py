@@ -311,6 +311,7 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
+.post-body .rt-sub[data-mid] { margin: 20px 0 22px; }   /* 중간 서브탭(앞에 보이는 내용이 있을 때) = 위 +20 · 아래 +10 (2026-11-13 사용자, 공통) */
 .post-body .rt-subtab { flex: none; padding: 6px 11px; font: inherit; font-size: 19px; line-height: 25px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
 /* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.

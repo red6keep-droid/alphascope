@@ -3823,7 +3823,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var sb = document.createElement('div'); sb.className = 'rt-sub';
     function sel2(i) { subs.forEach(function (s, j) { s.b.setAttribute('aria-selected', String(i === j)); s.nodes.forEach(function (n, k) { n.hidden = (i !== j) || k === 0; }); }); }
     subs.forEach(function (s, i) { var b = document.createElement('button'); b.className = 'rt-subtab'; b.type = 'button'; setLabel(b, s.name); b.onclick = function () { sel2(i); }; sb.appendChild(b); s.b = b; });
-    st.p.insertBefore(sb, subs[0].nodes[0]);
+    var pv = subs[0].nodes[0].previousElementSibling; while (pv && (pv.hidden || pv.style.display === 'none')) pv = pv.previousElementSibling; if (pv) sb.setAttribute('data-mid', '1');   /* 앞에 보이는 내용이 있으면 중간 서브탭 — 위 +20 · 아래 +10 (2026-11-13 사용자) */ st.p.insertBefore(sb, subs[0].nodes[0]);
     sel2(0);
   });
 })();
