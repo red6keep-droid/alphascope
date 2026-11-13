@@ -2386,7 +2386,7 @@
  },
  "4242ca1a2f03": {
   "lines": [
-   "로빈후드 상장 공모 정보 누락 소송 상고 심리 수용"
+   "미국 대법원 로빈후드 IPO 관련 소송 상고심 심리 수용"
   ],
   "tags": [
    {
@@ -2396,17 +2396,18 @@
     ],
     "sector": "XLF",
     "issue": "REGULATION",
-    "dir": "uncertain",
+    "dir": "neutral",
     "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-13T20:01:53.526812+00:00",
-  "n_src": 900
+  "at": "2026-11-13T21:46:32.024077+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "73c73a78d637": {
   "lines": [
-   "케빈 해싯 백악관 사임 보도 부인"
+   "케빈 해싯 백악관 국가경제위원회 국장 사임 보도 부인"
   ],
   "tags": [
    {
@@ -2414,13 +2415,14 @@
     "tickers": [],
     "sector": null,
     "issue": "FISCAL_POLITICS",
-    "dir": "neutral",
-    "stage": "done"
+    "dir": "positive",
+    "stage": "talk"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-13T20:01:53.526812+00:00",
-  "n_src": 900
+  "at": "2026-11-13T21:46:32.024077+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "e276e77530e2": {
   "lines": [
@@ -2487,14 +2489,15 @@
  },
  "651952f48421": {
   "lines": [
-   "골드만삭스 앤트로픽 IPO 공동 주관 및 자산관리 참여 추진"
+   "골드만삭스의 앤스로픽 기업공개 공동 주관 및 자산 관리 참여 추진"
   ],
   "tags": [
    null
   ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-13T20:01:57.056625+00:00",
-  "n_src": 380
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T21:46:29.181023+00:00",
+  "n_src": 380,
+  "retry": true
  },
  "a663158ee53e": {
   "lines": [
@@ -2667,6 +2670,224 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-13T20:02:00.132226+00:00",
+  "n_src": 900
+ },
+ "1ccb5e642976": {
+  "lines": [
+   "연방항공청의 전국 항공기 운항 일시중지 발령",
+   "관제 센터 통신 및 레이더 문제 발생"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T21:46:29.181023+00:00",
+  "n_src": 900
+ },
+ "00ccf51f4f6e": {
+  "lines": [
+   "엔비디아 주가의 2012년 이후 최장기 주간 하락 기록",
+   "엔비디아 시가총액 1조 7000억 달러 감소",
+   "젠슨 황 엔비디아 최고경영자 사임",
+   "콜레트 크레스 재무최고책임자의 임시 최고경영자 임명"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T21:46:29.181023+00:00",
+  "n_src": 900
+ },
+ "85baa2d47e03": {
+  "lines": [
+   "최고경영자 젠슨 황 목요일 사임",
+   "최고재무책임자 콜레트 크레스 임시 최고경영자 선임"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T21:46:30.564488+00:00",
+  "n_src": 900
+ },
+ "f8e3a2670000": {
+  "lines": [
+   "연방준비제도 금요일 발표 설문조사서 인공지능 금융 시스템 최대 위험 지목"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T21:46:30.564488+00:00",
+  "n_src": 900
+ },
+ "6d82c3026cea": {
+  "lines": [
+   "전 엔비디아 최고경영자 젠슨 황 사임 여파로 허니팟 사기 주목"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T21:46:30.564488+00:00",
+  "n_src": 900
+ },
+ "ae3217570306": {
+  "lines": [
+   "젠슨 황 엔비디아 CEO 목요일 사임 발표",
+   "공화당 주도 의회 젠슨 황 청문회 소환 및 소환장 발부 방침"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T21:46:32.024077+00:00",
+  "n_src": 900
+ },
+ "7495c20ae317": {
+  "lines": [
+   "CFTC 10월 암호화폐 시장 남용 방지 및 거래 규칙 제안 발표",
+   "CFTC 의장 셀리그 주요 암호화폐 거래소 신규 규칙 참여 수요 확인",
+   "CFTC 의장 셀리그 미국이 세계 암호화폐 수도 유지 위한 핵심 단계 강조"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "REGULATION",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "REGULATION",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-13T21:46:33.515961+00:00",
   "n_src": 900
  }
 }

@@ -1,6 +1,82 @@
 {
-  "updated_at": "2026-11-13 20:02:00 UTC",
+  "updated_at": "2026-11-13 21:46:33 UTC",
   "items": [
+    {
+      "title": "FAA issues nationwide ground stop citing communication issues affecting ‘multiple’ air traffic control facilities",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/faa-ground-stop.html",
+      "published": "2026-11-13 21:42:56",
+      "title_ko": "'다수' 항공 교통 관제 시설에 영향을 미치는 통신 문제를 이유로 FAA가 전국적인 운항 중단 조치 발령",
+      "summary_ko": "연방항공청, 비상 상황 및 안전 이유로 금요일 오후 전국 운항 중단 발행",
+      "lines": [
+        "연방항공청의 전국 항공기 운항 일시중지 발령",
+        "관제 센터 통신 및 레이더 문제 발생"
+      ]
+    },
+    {
+      "title": "Nvidia stock suffers longest weekly losing streak since 2012 as market value sinks by $1.7 trillion",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/nvidia-stock-jensen-affair-ai.html",
+      "published": "2026-11-13 21:27:15",
+      "title_ko": "엔비디아 주가 시가총액 1조 7,000억 달러 증발하며 2012년 이후 최장기 주간 하락세 기록",
+      "summary_ko": "젠슨 황 사임이 엔비디아 시장 부진 가중",
+      "lines": [
+        "엔비디아 주가의 2012년 이후 최장기 주간 하락 기록",
+        "엔비디아 시가총액 1조 7000억 달러 감소",
+        "젠슨 황 엔비디아 최고경영자 사임",
+        "콜레트 크레스 재무최고책임자의 임시 최고경영자 임명"
+      ]
+    },
+    {
+      "title": "What's ahead for AI financing after Nvidia CEO Jensen Huang departs",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/nvidia-jensen-huang-resignation-ai-financing.html",
+      "published": "2026-11-13 21:19:04",
+      "title_ko": "엔비디아 CEO 젠슨 황 사임 후 AI 자금 조달의 향방",
+      "summary_ko": "투자자들 신용시장과 네오클라우드 노출 주시 속 젠슨 황 사임",
+      "lines": [
+        "최고경영자 젠슨 황 목요일 사임",
+        "최고재무책임자 콜레트 크레스 임시 최고경영자 선임"
+      ]
+    },
+    {
+      "title": "10-year Treasury yield moves to 5.17% as traders weigh producer price report",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/treasury-yields-fed-rates.html",
+      "published": "2026-11-13 21:08:20",
+      "title_ko": "10년물 국채 금리 5.17%로 상승, 트레이더들은 생산자물가 보고서 주시",
+      "summary_ko": "연방준비제도의 12월 금리 인상에 대한 투자자들의 기대감이 강화되면서 국채 금리가 상승",
+      "lines": [
+        "10년 만기 미 국채 수익률의 5.17% 기록",
+        "10월 생산자물가지수의 전월 대비 0.3% 상승 (예상)",
+        "2년 만기 미 국채 수익률의 4.855% 기록"
+      ]
+    },
+    {
+      "title": "Nvidia is done with Jensen Huang. The fallout in Washington is just beginning",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/nvidia-jensen-huang-washington-congress.html",
+      "published": "2026-11-13 21:04:43",
+      "title_ko": "엔비디아는 젠슨 황과 끝났고, 워싱턴의 여파는 이제 시작이다",
+      "summary_ko": "1월 민주당 통제권 이전 전 젠슨 황 의회 출석 요구",
+      "lines": [
+        "젠슨 황 엔비디아 CEO 목요일 사임 발표",
+        "공화당 주도 의회 젠슨 황 청문회 소환 및 소환장 발부 방침"
+      ]
+    },
+    {
+      "title": "CFTC Chair Selig tells CNBC crypto industry is embracing agency rules as legislation hopes fade",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/cftc-chair-selig-crypto-industry-opting-into-agencys-crypto-rules-.html",
+      "published": "2026-11-13 20:07:30",
+      "title_ko": "CFTC 위원장 셀리그, CNBC에 암호화폐 업계가 입법 기대 희미해짐에 따라 기관 규제 수용 중이라고 밝혀",
+      "summary_ko": "상품선물거래위원회, 10월 자산 클래스 관할권 주장 위한 규제안 제안",
+      "lines": [
+        "CFTC 10월 암호화폐 시장 남용 방지 및 거래 규칙 제안 발표",
+        "CFTC 의장 셀리그 주요 암호화폐 거래소 신규 규칙 참여 수요 확인",
+        "CFTC 의장 셀리그 미국이 세계 암호화폐 수도 유지 위한 핵심 단계 강조"
+      ]
+    },
     {
       "title": "After Jensen Huang’s exit, what top financial advisors are doing with Nvidia: Exclusive CNBC poll",
       "source": "CNBC",
@@ -15,76 +91,20 @@
       ]
     },
     {
-      "title": "A trading strategy to ride out the Nvidia uncertainty and generate income in the process",
+      "title": "행정부 내 대중국 반도체 수출 통제 갈등",
+      "title_ko": "행정부 내 대중국 반도체 수출 통제 갈등",
+      "summary_ko": "재무장관이 상무부를 향해 대중국 칩 유출 책임을 공개 비판하면서 트럼프 행정부 내 수출 통제 정책을 둘러싼 갈등이 불거졌",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/a-trading-strategy-to-ride-out-the-nvidia-uncertainty-and-generate-income-in-the-process.html",
-      "published": "2026-11-13 19:30:36",
-      "title_ko": "엔비디아 불확실성을 헤쳐나가며 수익을 창출하는 거래 전략",
-      "summary_ko": "",
+      "link": "https://www.youtube.com/watch?v=85xmF02snhQ",
+      "published": "2026-11-13 17:58:52",
+      "kind": "media",
+      "tag": "규제 · 산업정책",
+      "direction": "negative",
+      "n_channels": 3,
       "lines": [
-        "엔비디아 주가 10월 6일 이후 약 약 30% 하락",
-        "엔비디아 주가 160달러대 거래"
-      ]
-    },
-    {
-      "title": "Lutnick faces questions over Nvidia spy scandal. His sons’ firm has deep ties to the chipmaker",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html",
-      "published": "2026-11-13 19:11:13",
-      "title_ko": "러트닉, 엔비디아 스파이 스캔들 관련 질의 직면, 두 아들 회사는 칩 제조사와 깊은 연관",
-      "summary_ko": "젠슨 황의 엔비디아 최고경영자 사임으로 하워드 러트닉 상무장관과 가족의 금융 연관성에 대한 감시가 재점화",
-      "lines": [
-        "캔터 피츠제럴드의 엔비디아 보유 주식 약 50% 감소",
-        "캔터 피츠제럴드의 엔비디아 목표가 350달러 유지"
-      ]
-    },
-    {
-      "title": "OpenAI launches ChatGPT Wallet, allowing its 'dots' AI agents to make purchases for users",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/openai-chatgpt-wallet-dot-purchases.html",
-      "published": "2026-11-13 18:56:26",
-      "title_ko": "오픈에이아이, 챗GPT 지갑 출시하며 에이전트의 사용자 구매 허용",
-      "summary_ko": "챗GPT 지갑은 아메리칸 익스프레스, 마스터카드, 비자와 제휴를 맺고 기존 신용카드 보상을 유지",
-      "lines": [
-        "오픈에이아이의 챗GPT 월렛 출시",
-        "아메리칸 익스프레스와 마스터카드 및 비자의 챗GPT 월렛 제휴"
-      ]
-    },
-    {
-      "title": "Microsoft apologizes for massive outage that took down Outlook and other 365 services",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/microsoft-outage-outlook-aws-google.html",
-      "published": "2026-11-13 18:18:28",
-      "title_ko": "마이크로소프트 아웃룩 접속 장애 발생, AWS와 구글 사용자도 문제 보고",
-      "summary_ko": "아마존 웹 서비스와 구글 사용자들도 목요일에 서비스 중단을 보고",
-      "lines": [
-        "목요일 마이크로소프트 접속 장애 발생",
-        "아마존 웹 서비스와 구글 이용자들의 장애 신고 접수"
-      ]
-    },
-    {
-      "title": "Is a bottom in for the Nasdaq-100? Charts to watch",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/is-a-bottom-in-for-the-nasdaq-100-charts-to-watch.html",
-      "published": "2026-11-13 18:00:01",
-      "title_ko": "나스닥 100 지수 바닥쳤나, 주목할 차트들",
-      "summary_ko": "캡스시스의 프랭크 캡펠레리가 질문에 답하기 위해 여러 차트를 분석",
-      "lines": [
-        "나스닥100지수의 9월 상승 돌파 실패 및 하락",
-        "나스닥100지수의 2만5000~2만6000 구간 지지선 형성"
-      ]
-    },
-    {
-      "title": "10-year Treasury yield moves to 5.17% as traders weigh producer price report",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/treasury-yields-fed-rates.html",
-      "published": "2026-11-13 17:39:48",
-      "title_ko": "10년물 국채 금리 5.17%로 상승, 트레이더들은 생산자물가 보고서 주시",
-      "summary_ko": "연방준비제도의 12월 금리 인상에 대한 투자자들의 기대감이 강화되면서 국채 금리가 상승",
-      "lines": [
-        "10년 만기 미 국채 수익률의 5.17% 기록",
-        "10월 생산자물가지수의 전월 대비 0.3% 상승 (예상)",
-        "2년 만기 미 국채 수익률의 4.855% 기록"
+        "스콧 베센트 재무장관 발언 : 상무부의 대중국 칩 유출 방지 조치 실패 지적",
+        "행정부 내 메가스피드 엔티티 리스트 등재 여부를 두고 부처 간 이견 발생",
+        "하워드 루트닉 상무장관 12월 의회 증인 출석 예정"
       ]
     },
     {
@@ -121,24 +141,6 @@
         "진행자 발언 : 투자자들이 중요한 PPI 데이터를 앞두고 금리 인상 베팅을 강화하는 중",
         "마이클 퍼베스 발언 : 연준이 중립금리가 예상보다 높다는 점을 깨닫고 조정 과정을 거치는 것으로 봄",
         "마이클 퍼베스 발언 : 단기적으로 고배당 주식 등 금리 민감 섹터에 긴장감이 존재할 것으로 예상"
-      ]
-    },
-    {
-      "title": "트럼프의 이란 갈등 방치 전략과 유가 변동성",
-      "title_ko": "트럼프의 이란 갈등 방치 전략과 유가 변동성",
-      "summary_ko": "트럼프 대통령이 이란과의 협상에 나서지 않겠다고 밝히면서 중동 지정학적 리스크와 유가 불확실성이 지속 중",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=GLbcP0I-oec",
-      "published": "2026-11-13 08:56:12",
-      "kind": "media",
-      "tag": "유가 · 에너지 · 원자재",
-      "direction": "positive",
-      "n_channels": 4,
-      "lines": [
-        "진행자 발언 : 트럼프 대통령의 이란 갈등 방치 및 대화 거부 전략 시사",
-        "에이프릴 홍 발언 : 브렌트유는 2주 연속 하락세를 기록 중이나 중동 지정학적 리스크 상존",
-        "니콜라스 로 발언 : 호르무즈 해협 통행 차질 및 정유 제품 마진 압박 지속",
-        "그렉 슈나엘 발언 : 글로벌 석유 재고 및 정제 설비 여유분이 타이트하여 변동성 지속 예상"
       ]
     }
   ]
