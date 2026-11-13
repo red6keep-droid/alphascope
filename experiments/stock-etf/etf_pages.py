@@ -83,15 +83,17 @@ def funds(market, syms):
     except (OSError, ValueError):
         cache = {}
     today = datetime.date.today()
-    got = 0
+    got, tried, fails = 0, 0, []
     for sym in syms:
         old = cache.get(sym)
         if old and (today - datetime.date.fromisoformat(old["at"])).days < FUND_MAX_AGE:
             continue
+        tried += 1
         try:
             cache[sym] = _fetch_fund(sym)
             got += 1
         except Exception as e:  # noqa: BLE001
+            fails.append(f"{sym} {str(e)[:60]}")
             print(f"[etf] {sym} 구성 받기 실패 (지난 값 유지): {str(e)[:80]}")
         time.sleep(1)
     if got:
@@ -99,6 +101,14 @@ def funds(market, syms):
         with open(path, "w", encoding="utf-8") as f:
             json.dump(cache, f, ensure_ascii=False)
         print(f"[etf] 구성 · 기본 정보 {got}개 새로 받음 → {path}")
+    if tried and market == "us":   # 운영 대시보드 `주기 자료는 제때 받았나?` (2026-11-13) — 한국 실행의 미국 짝 ETF 는 예비라 미국 실행 것만
+        try:
+            import feed_log
+            ats = sorted(v.get("at") or "" for k, v in cache.items() if k in syms)
+            feed_log.feed("미국 ETF 구성 · 보수 (야후)", ok=not fails, label=f"{len([k for k in syms if k in cache])}/{len(syms)}개", data_date=ats[-1] if ats else "",
+                          got_new=got > 0, error=" / ".join(fails)[:200], every_days=FUND_MAX_AGE)
+        except Exception as e:  # noqa: BLE001
+            print(f"[etf] 받기 현황 기록 건너뜀: {e!r}")
     return cache
 
 

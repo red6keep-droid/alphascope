@@ -206,6 +206,32 @@ def kv_records(days):
     return out
 
 
+# 주기 자료 (feed_log.feed 가 KV feed:<이름> 에 남긴다, 2026-11-13 사용자 "잘 받고 있는지 모니터링") — 기록이 아직 없어도 줄은 보인다
+FEEDS = ["국민연금 대량보유 내역", "국민연금 국내주식 투자 현황", "한국 ETF 구성 · 보수 (운용사)", "미국 ETF 구성 · 보수 (야후)"]
+
+
+def kv_feeds():
+    """feed:* 전부 → {이름: 기록}. KV 설정이 없으면 FEED_LOCAL 파일(로컬 확인용), 그것도 없으면 None."""
+    c = kv_conf()
+    if not c:
+        p = os.environ.get("FEED_LOCAL", "").strip()
+        if p and os.path.exists(p):
+            return json.load(open(p, encoding="utf-8"))
+        return None
+    h = {"Authorization": f"Bearer {c[2]}"}
+    j = requests.get(kv_url(c, "keys"), params={"prefix": "feed:", "limit": 1000}, headers=h, timeout=30).json()
+    out = {}
+    for k in j.get("result") or []:
+        r = requests.get(kv_url(c, f"values/{requests.utils.quote(k['name'], safe='')}"), headers=h, timeout=30)
+        if r.status_code == 200:
+            try:
+                v = r.json()
+                out[v.get("name") or k["name"][5:]] = v
+            except ValueError:
+                pass
+    return out
+
+
 def kv_put(key, text):
     c = kv_conf()
     r = requests.put(kv_url(c, f"values/{key}"), data=text.encode("utf-8"),
@@ -420,7 +446,43 @@ def publish_tab(now, runs, recs, I):
             + runs_html + count)
 
 
-def collect_tab(recs, I):
+def feeds_card(now, feeds, I):
+    """`주기 자료는 제때 받았나?` — 분기 · 연 · 주마다 받는 자료의 마지막 확인 · 가진 자료 · 다음 기한. 판정 = feed_log.status."""
+    import feed_log
+    rows, bad, late = [], [], []
+    for name in FEEDS + sorted(set(feeds or {}) - set(FEEDS)):
+        rec = (feeds or {}).get(name)
+        if feeds is None:
+            rows.append((name, warn("읽지 못함"), "운영 기록(KV)"))
+            continue
+        if not rec:
+            rows.append((name, idle("기록 없음"), "아직 한 번도 확인하지 않음 — 첫 정기 실행 뒤 생긴다"))
+            continue
+        st, why = feed_log.status(rec, now)
+        t = parse_time(rec.get("checked"))
+        bits = [rec.get("label") or "자료 없음", f"확인 {ago(t, now)}" if t else ""]
+        if rec.get("expect_new") and st == "정상":
+            bits.append(f"다음 기한 {rec['expect_new'][2:].replace('-', '.')}")
+        sub = " · ".join(b for b in bits if b) + (f" — {why}" if why else "")
+        if st == "실패":
+            rows.append((name, warn("실패"), sub))
+            bad.append(name)
+        elif st == "늦음":
+            rows.append((name, warn("늦음"), sub))
+            late.append(name)
+        else:
+            rows.append((name, ok(), sub))
+    rows.sort(key=lambda r: 0 if ("실패" in r[1] or "늦음" in r[1]) else 1)
+    if bad or late:
+        I.add("주기 자료", warn(f"{len(bad) + len(late)}곳"), " · ".join(bad + late), need=bool(bad))
+    state = f"{len(bad)}곳 실패" if bad else f"{len(late)}곳 늦음" if late else "제때" if feeds is not None else "읽지 못함"
+    head = QC.question_card("주기 자료는 제때 받았나?", state, "neutral", "#111",
+                            [("분기 · 연 · 주마다 받는 자료입니다. 받기 · 읽기가 실패하면 실패, 확인이 주기의 2배 넘게 없거나 새 자료 기한이 지나면 늦음.", "plain")]
+                            + [("row", n, v, s) for n, v, s in rows[:3]], opened=True)
+    return head + (dk.sub_label("주기 자료") + white_card(rows, fold_at=4, noun="자료") if len(rows) > 3 else "")
+
+
+def collect_tab(recs, I, feeds=None, now=None):
     lines = []
     for x in recs or []:
         lines += [w["text"] for w in x.get("warnings") or [] if w.get("cat") == "collect"]
@@ -446,7 +508,7 @@ def collect_tab(recs, I):
     rows = [("row", n, over(f"{len(ls)}줄"), ls[0][:70]) for n, ls in srcs[:4]]
     head = QC.question_card("막힌 수집 소스가 있나?", state, "neutral", "#111", [(head_line, "plain")] + rows, opened=True)
     every = [(n, f"{len(ls)}줄", ls[0][:90]) for n, ls in srcs]
-    return (dk.h2("수집", tab="수집") + head
+    return (dk.h2("수집", tab="수집") + feeds_card(now or now_kst(), feeds, I) + head
             + (dk.sub_label("소스별 실패 줄", "운영 기록의 수집 경고(cat=collect)와 운영 알림(notify)을 소스 이름으로 묶었습니다. 오늘(KST) 실행만.")
                + white_card(every, fold_at=3, noun="소스") if every else ""))
 
@@ -638,7 +700,10 @@ def main():
 
     screen = screen_tab(now, I)
     publish = publish_tab(now, runs, recs_today, I)
-    collect = collect_tab(recs_today, I)
+    feeds, err = safe(kv_feeds)
+    if err:
+        print(f"[ops] 주기 자료 기록 읽기 실패 {err}")
+    collect = collect_tab(recs_today, I, feeds, now)
     ai = ai_tab(now, recs2, I)
     record, hist = record_tab(now, heads, I)
     forecast = forecast_tab(now, I)

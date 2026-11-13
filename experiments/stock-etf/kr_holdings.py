@@ -276,25 +276,46 @@ def fetch_all(syms, cache_path, max_age_days=7):
     except (OSError, ValueError):
         cache = {}
     today = datetime.date.today()
-    got = 0
+    got, tried, fails = 0, 0, []
     for sym in syms:
         old = cache.get(sym)
         stamp = old and (old.get("got") or old.get("at"))
         if stamp and (today - datetime.date.fromisoformat(stamp)).days < max_age_days:
             continue
+        tried += 1
         try:
             new = fetch(sym)
             new["got"] = today.isoformat()
             cache[sym] = new
             got += 1
         except Exception as e:  # noqa: BLE001
+            fails.append(f"{sym.split('.')[0]} {str(e)[:60]}")
             print(f"[etf] {sym} 한국 구성 받기 실패 (지난 값 유지): {str(e)[:80]}")
+    if tried:   # 운영 대시보드 `주기 자료는 제때 받았나?` (2026-11-13) — 확인한 주에만 한 줄
+        _feed(cache, syms, got, fails, max_age_days)
     if got:
         os.makedirs(os.path.dirname(os.path.abspath(cache_path)), exist_ok=True)
         with open(cache_path, "w", encoding="utf-8") as f:
             json.dump(cache, f, ensure_ascii=False)
         print(f"[etf] 한국 구성 {got}개 새로 받음 → {cache_path}")
     return cache
+
+
+def _feed(cache, syms, got, fails, every):
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        import feed_log
+        ats = sorted(v.get("at") or "" for k, v in cache.items() if k in syms and v.get("at"))
+        by = {}
+        for k in syms:
+            v = cache.get(k) or {}
+            if v.get("source"):
+                by[v["source"]] = by.get(v["source"], 0) + 1
+        feed_log.feed("한국 ETF 구성 · 보수 (운용사)", ok=not fails, label=f"{len([k for k in syms if k in cache])}/{len(syms)}개" + (f" · 기준 {ats[-1]}" if ats else ""),
+                      data_date=ats[-1] if ats else "", got_new=got > 0, error=" / ".join(fails)[:200], every_days=every,
+                      detail=" · ".join(f"{s} {n}개" for s, n in by.items()))
+    except Exception as e:  # noqa: BLE001
+        print(f"[etf] 받기 현황 기록 건너뜀: {e!r}")
 
 
 if __name__ == "__main__":

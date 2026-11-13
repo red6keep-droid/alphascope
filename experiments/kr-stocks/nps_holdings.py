@@ -44,34 +44,54 @@ def load(candidates, company=None):
                 company = json.load(f).get("map") or {}
         except (OSError, ValueError):
             company = {}
-    annual = sorted(glob.glob(os.path.join(NPS, "annual_*.csv")))
-    if not annual:
+    a, a_day, b, by_code = {}, "", {}, {}
+    auto = _auto()
+    if auto.get("annual"):   # 자동 수집(collect_nps.py, data/nps.json) 이 먼저 — 게시판에서 주 1회
+        ya = max(auto["annual"].values(), key=lambda x: x["end"])
+        a_day = ya["end"]
+        a = {_norm(n): p for n, p in ya["rows"]}
+    else:
+        annual = sorted(glob.glob(os.path.join(NPS, "annual_*.csv")))
+        if annual:
+            a_day = _day(annual[-1])
+            for r in _rows(annual[-1]):
+                if len(r) >= 5:
+                    try:
+                        a[_norm(r[1])] = float(r[4])
+                    except ValueError:
+                        pass
+    if auto.get("major"):   # 분기 PDF 는 종목 코드가 있다
+        for q in auto["major"].values():
+            for code, _name, day, pct in q["rows"]:
+                if day > a_day:
+                    by_code.setdefault(code, set()).add((day, pct))
+    else:
+        for p in sorted(glob.glob(os.path.join(NPS, "major_*.csv"))):
+            for r in _rows(p):
+                if len(r) >= 4 and r[2] > a_day:
+                    try:
+                        b.setdefault(_norm(r[1]), []).append((r[2], float(r[3])))
+                    except ValueError:
+                        pass
+    if not a and not b and not by_code:
         return {}
-    a_day = _day(annual[-1])
-    a = {}
-    for r in _rows(annual[-1]):
-        if len(r) >= 5:
-            try:
-                a[_norm(r[1])] = float(r[4])
-            except ValueError:
-                pass
-    b = {}
-    for p in sorted(glob.glob(os.path.join(NPS, "major_*.csv"))):
-        for r in _rows(p):
-            if len(r) >= 4 and r[2] > a_day:
-                try:
-                    b.setdefault(_norm(r[1]), []).append((r[2], float(r[3])))
-                except ValueError:
-                    pass
     out = {}
     for c in candidates:
         code = c[0][:6]
         keys = [_norm(c[1]), _norm((company.get(code) or {}).get("corp_name"))]
         y = next((a[k] for k in keys if k and k in a), None)
-        rep = next((b[k] for k in keys if k and k in b), [])
+        rep = sorted(by_code.get(code) or set(next((b[k] for k in keys if k and k in b), [])))
         if y is not None or rep:
-            out[code] = {"year": (a_day, y) if y is not None else None, "reports": sorted(set(rep))}
+            out[code] = {"year": (a_day, y) if y is not None else None, "reports": rep}
     return out
+
+
+def _auto():
+    try:
+        with open(os.path.join(HERE, "data", "nps.json"), encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
 
 
 def _d(iso):

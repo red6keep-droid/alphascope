@@ -6,3 +6,4 @@ google-genai>=1.0.0
 tzdata; sys_platform == "win32"
 matplotlib>=3.8     # 가격 그래프 PNG (chart_price.py)
 google-cloud-firestore>=2.16.0   # 방송 줄 (experiments/media_feed.py) — 엔비디아 리포트 · 종목 페이지
+pypdf>=5.0,<8   # 국민연금 공시 PDF (experiments/kr-stocks/collect_nps.py, 2026-11-13) — 한국 종목 실행이 이 파일을 설치한다
