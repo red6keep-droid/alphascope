@@ -82,7 +82,7 @@ def save_prefs(p):
     os.replace(PREFS + ".tmp", PREFS)
 
 
-_themed = {}   # 경로 → (수정 시각, 테마 있음, 종목 이름)
+_themed = {}   # 경로 → (수정 시각, 테마 있음, 종목 이름, 페이지 제목, 본문 질문 제목)
 _TITLE = re.compile(r"<title>([^<]*?) 주가", re.I)
 
 
@@ -96,8 +96,80 @@ def themed(path, mtime):
         s = raw.lower()
         m = _TITLE.search(raw)   # `애플 AAPL 주가 …` → 애플 · `삼성전자 주가 …` → 삼성전자
         nm = re.sub(r"\s+[A-Z][A-Z0-9.\-]*$", "", m.group(1).strip()) if m else ""
-        hit = _themed[path] = (mtime, "<style" in s or 'rel="stylesheet"' in s, html.unescape(nm))
+        hit = _themed[path] = (mtime, "<style" in s or 'rel="stylesheet"' in s, html.unescape(nm), *page_titles(raw))
     return hit[1]
+
+
+_DATE = re.compile(r"\s*\d{4}년\s*\d{1,2}월\s*\d{1,2}일")
+
+
+def _clean(t):
+    t = html.unescape(re.sub(r"<[^>]+>", " ", t))
+    t = re.sub(r"\s+", " ", t).strip()
+    t = _DATE.sub("", t)
+    t = re.sub(r"^목업\s*·\s*", "", t)
+    t = re.sub(r"(\s*—\s*목업|\s+목업)+$", "", t)
+    return t.replace(" — ", " · ").strip()
+
+
+def page_titles(raw):
+    """(페이지 제목, 본문 질문 제목) — 질문 = 본문 h2 · h3 중 `?` 가 든 첫 줄의 앞부분(`결과 : 11.03` 같은 꼬리 뺌).
+    증시 전망 · 이슈 모니터링처럼 페이지 제목이 다 같은 목업을 질문으로 가른다 (2026-11-13 사용자)."""
+    m = re.search(r"<title>([^<]*)", raw, re.I)
+    title = _clean(m.group(1)) if m else ""
+    i = raw.lower().find("<body")
+    heads = [html.unescape(re.sub(r"<[^>]+>", " ", h)).strip()
+             for h in re.findall(r"<h[23][^>]*>(.*?)</h[23]>", raw[i:] if i >= 0 else raw, re.S | re.I)[:2]]
+    q = ""
+    # 첫 머리 = 페이지 제목(`증시 전망` · `이슈 모니터링`)이고 둘째 머리가 질문일 때만 — 검색 창 `오늘?` 같은 본문 질문은 아니다
+    # 전망 · 이슈 질문 제목은 뒤에 `결과 : 11.03` · `게시 : 11.13` 꼬리가 붙는다 — 꼬리 있는 질문만 (보유 종목 `무엇을 하나요?` 는 아님)
+    parts = re.split(r"\s{3,}", heads[1]) if len(heads) == 2 else []
+    if len(parts) > 1 and _clean(heads[0]) == title and "?" in parts[0]:
+        q = re.sub(r"\s+", " ", parts[0]).strip()
+    return title, q
+
+
+# 같은 폴더에 페이지 제목이 같은 목업이 여럿이면(증시 전망 목록 등) 파일 이름 조각을 한국어로 붙여 가른다
+HINTS = {"list": "목록", "auto": "자동 등록", "eh": "실제 등록", "tabs": "상황 탭", "typical": "대표 상황",
+         "cases": "경우의 수", "why": "근거", "week": "일주일", "kr": "한국", "us": "미국", "nvda": "엔비디아",
+         "map": "지도", "timeline": "타임라인", "long": "긴", "empty": "빈 화면", "full": "가득 찬 화면",
+         "guest": "로그인 전", "g5": "C5 청록", "point": "포인트 색", "search": "검색 창", "demo": "예시", "tariff": "관세", "export": "수출 통제"}
+SKIP_TOKENS = {"radar", "mock", "forecast", "my", "stocks", "issue", "watch", "home", "split", "report", "body"}
+
+
+def file_hint(f):
+    base = f[:-5]
+    date = re.search(r"(\d{4})-(\d{2})-(\d{2})", base)
+    base = re.sub(r"\d{4}-\d{2}-\d{2}", "", base)
+    words = [HINTS.get(x, x) for x in re.split(r"[-_]", base) if x and x not in SKIP_TOKENS]
+    if date:
+        words.append(f"{date.group(2)}-{date.group(3)}")
+    return " · ".join(words)
+
+
+def display_names(items):
+    """{(폴더, 파일): 큰 제목}. 종목 폴더 = 종목 이름, 질문이 있으면 질문, 아니면 페이지 제목(겹치면 파일 이름 조각 붙임)."""
+    raw = {}
+    for d, f, _ in items:
+        hit = _themed.get(os.path.join(BASE, d, "output", f)) or (0, 0, "", "", "")
+        raw[(d, f)] = hit
+    seen = {}
+    for (d, f), h in raw.items():
+        if not h[4]:
+            seen.setdefault((d, h[3]), []).append(f)
+    out = {}
+    for (d, f), h in raw.items():
+        if d in STOCK_DIRS and h[2]:
+            out[(d, f)] = h[2]
+        elif h[4]:
+            out[(d, f)] = h[4]
+            out[("label", d, f)] = h[3]   # 작은 회색 묶음 이름 = 페이지 제목(`이슈 모니터링`) — 폴더 이름(`증시 전망`)과 다를 때
+        elif h[3]:
+            hint = file_hint(f) if len(seen[(d, h[3])]) > 1 else ""
+            out[(d, f)] = f"{h[3]} · {hint}" if hint else h[3]
+        else:
+            out[(d, f)] = f[:-5]
+    return out
 
 
 def stock_name(d, f):
@@ -124,13 +196,14 @@ def mockups():
     return sorted(out, key=lambda x: -x[2])
 
 
-def row(d, f, t, show_dir=False, stars=(), restore=False):
+def row(d, f, t, show_dir=False, stars=(), restore=False, names=None):
+    """큰 검은 글씨 = 목업 이름(종목 이름 · 전망 질문 · 페이지 제목), 작은 회색 = 묶음 이름 · 파일 이름 · 수정 시각 (2026-11-13 사용자)"""
     href = f"/{quote(d)}/output/{quote(f)}"
     when = datetime.fromtimestamp(t).strftime("%m-%d %H:%M")
-    nm = stock_name(d, f)
-    label = nm or (LABELS.get(d, d) if show_dir else "")
-    sub = f"{label} · {when}" if label else when
-    name = html.escape(f[:-5])
+    title = (names or {}).get((d, f)) or f[:-5]
+    label = ((names or {}).get(("label", d, f)) or LABELS.get(d, d)) if show_dir else ""
+    sub = " · ".join(x for x in (label, f[:-5], when) if x)
+    name = html.escape(title)
     key = html.escape(f"{d}/{f}")
     on = f"{d}/{f}" in stars
     if restore:   # 쓰지 않는 목업 화면 — 별 대신 복원
@@ -156,7 +229,7 @@ ARCHIVED_LINKS = [   # 파일 목업이 아닌 화면 — 쓰지 않는 목업 �
 
 
 def index_page(archive=False):
-    items = mockups()
+    items = every = mockups()
     with _lock:
         prefs = load_prefs()
     stars = prefs["star"]
@@ -164,6 +237,7 @@ def index_page(archive=False):
     old = [x for x in items if f"{x[0]}/{x[1]}" in arch]
     items = old if archive else [x for x in items if f"{x[0]}/{x[1]}" not in arch]
     by_key = {f"{d}/{f}": (d, f, t) for d, f, t in items}
+    names = display_names(every)
     groups = {}
     for d, f, t in items:
         groups.setdefault(d, []).append((d, f, t))
@@ -172,17 +246,17 @@ def index_page(archive=False):
         parts.append('<a class="big" href="/">← 목업 목록으로</a>')
         parts += ARCHIVED_LINKS   # 사용자 여정 테스트 · 아이콘 비교 — 쓰지 않는 목업으로 (2026-11-12 사용자)
         for d in sorted(groups, key=lambda k: -groups[k][0][2]):
-            parts += [f'<section><h2>{html.escape(LABELS.get(d, d))}</h2>', *(row(*x, restore=True) for x in groups[d]), "</section>"]
+            parts += [f'<section><h2>{html.escape(LABELS.get(d, d))}</h2>', *(row(*x, restore=True, names=names) for x in groups[d]), "</section>"]
         if not items and not ARCHIVED_LINKS:
             parts.append('<div class="meta">쓰지 않는 목업이 없습니다</div>')
     else:
         fav = [by_key[k] for k in stars if k in by_key]   # 누른 순서대로
         if fav:
-            parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars) for x in fav), "</section>"]
-        parts += ['<section><h2>최근 바뀐 목업</h2>', *(row(*x, show_dir=True, stars=stars) for x in items[:RECENT_N]), "</section>"]
+            parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names) for x in fav), "</section>"]
+        parts += ['<section><h2>최근 바뀐 목업</h2>', *(row(*x, show_dir=True, stars=stars, names=names) for x in items[:RECENT_N]), "</section>"]
         for d in sorted(groups, key=lambda k: -groups[k][0][2]):   # 최근에 손댄 폴더가 위
             parts.append(f'<details><summary>{html.escape(LABELS.get(d, d))} <span class="n">{len(groups[d])}</span></summary>')
-            parts += [row(*x, stars=stars) for x in groups[d]]
+            parts += [row(*x, stars=stars, names=names) for x in groups[d]]
             parts.append("</details>")
         if old or ARCHIVED_LINKS:
             parts.append(f'<a class="big" href="/archive">쓰지 않는 목업 <span>{len(old) + len(ARCHIVED_LINKS)}개 ›</span></a>')
@@ -197,8 +271,8 @@ details{{background:#fff;border:1px solid #e3e6eb;border-radius:10px;margin-bott
 summary{{padding:14px;font-weight:600;cursor:pointer}} .n{{color:#8a919c;font-weight:400;font-size:14px}}
 details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
 .row{{display:flex;align-items:stretch;min-height:48px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}}
-.go{{flex:1 1 auto;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 4px 10px 14px;color:inherit;text-decoration:none}}
-.go:active{{background:#eef2f8}} .name{{word-break:break-all}} .sub{{color:#8a919c;font-size:13px;white-space:nowrap}}
+.go{{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:10px 4px 10px 14px;color:inherit;text-decoration:none}}
+.go:active{{background:#eef2f8}} .name{{color:#1d2127;font-size:16px;font-weight:600;word-break:keep-all;overflow-wrap:anywhere}} .sub{{color:#8a919c;font-size:12px;word-break:break-all}}
 .star{{flex:0 0 48px;border:0;background:none;font-size:22px;color:#c3c8d0;cursor:pointer;padding:0}} .star.on{{color:#f5a623}}
 .mv{{display:none;flex:0 0 auto;border:0;border-left:1px solid #eef0f3;background:none;font-size:13px;color:#5b6370;cursor:pointer;padding:0 14px;white-space:nowrap}}
 body.edit .mv{{display:block}}
