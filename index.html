@@ -4151,6 +4151,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           showRow();
           var fb = null, au = null, user = null, readyP = null, pop = null, from = null;
           var ICON = btn ? btn.innerHTML : '';
+          function gProvider(fb) { var p = new fb.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' }); return p; }   /* 매번 계정 고르는 창 — 계정이 둘 이상이면 마지막 계정으로 바로 들어가던 것 (2026-11-13 사용자) */
           function load(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
           function ready() {
             if (readyP) return readyP;
@@ -4202,7 +4203,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               if (!au) ready().then(function () { lg.disabled = false; }, function () { err.textContent = '로그인 도구를 불러오지 못했어요. 잠시 뒤에 다시 시도해 주세요.'; });
               lg.addEventListener('click', function () {
                 lg.disabled = true; err.textContent = '';
-                au.signInWithPopup(new fb.auth.GoogleAuthProvider()).then(function (r) { setUser(r.user); }, function (e) {
+                au.signInWithPopup(gProvider(fb)).then(function (r) { setUser(r.user); }, function (e) {
                   var m = String((e && (e.code || e.message)) || '');
                   if (/popup-blocked/.test(m)) err.textContent = '로그인 창이 열리지 않았어요. 브라우저의 팝업 차단을 잠시 풀고 다시 눌러 주세요.';
                   else if (/unauthorized-domain|operation-not-allowed/.test(m)) err.textContent = '지금은 로그인을 준비하고 있어요. 잠시 뒤에 다시 시도해 주세요.';
@@ -4674,6 +4675,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 
         /* ---------------------------------------------------------------- 로그인 (Firebase Auth, 펼칠 때 불러온다) */
         var authP = null;
+        function gProvider(fb) { var p = new fb.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' }); return p; }   /* 매번 계정 고르는 창 — 계정이 둘 이상이면 마지막 계정으로 바로 들어가던 것 (2026-11-13 사용자) */
         function script(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = function () { no(new Error('load ' + src)); }; document.head.appendChild(s); }); }
         function auth() {
           if (authP) return authP;
@@ -4684,7 +4686,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             var a = fb.auth(); a.languageCode = 'ko';
             return {
               onAuth: function (cb) { a.onAuthStateChanged(function (u) { cb(u ? { uid: u.uid, name: u.displayName || '이름 없음', photo: u.photoURL || '' } : null); }); },
-              login: function () { return a.signInWithPopup(new fb.auth.GoogleAuthProvider()); },
+              login: function () { return a.signInWithPopup(gProvider(fb)); },
               logout: function () { return a.signOut(); },
               token: function (force) { return a.currentUser ? a.currentUser.getIdToken(!!force) : Promise.reject(new Error('UNAUTHENTICATED')); }
             };
