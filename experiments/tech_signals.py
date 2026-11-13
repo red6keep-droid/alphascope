@@ -372,11 +372,12 @@ GAUGE_BIG = dict(width=260, r=90, top=30, arc=14, needle=3, hub=5, tip_gap=15, b
 GAUGE_SMALL = dict(width=134, r=55, top=10, arc=10, needle=2, hub=3, tip_gap=10, bottom=11)   # bottom 6 → 11: 가운데 원 ~ 답 글자 9 → 14px (+50%, P114)
 
 
-def gauge_svg(net, size="big"):
+def gauge_svg(net, size="big", zones=None):
     """반원 게이지 다섯 칸 + 바늘 + (큰 것만) 칸 이름. 바늘 = net (−1 … +1), 왼쪽 끝 = −1.
     양 끝(강한 하락 · 강한 상승)은 호 끝 아래, 가운데 셋은 호 바깥 위 — 옆에 두면 폭 안에서 잘렸다 (10-30 목업)."""
     g = GAUGE_BIG if size == "big" else GAUGE_SMALL
     labels = size == "big"
+    zs = zones or ZONES   # zones = 다른 칸 이름 · 색 (이슈 모니터링 종전 ↔ 확전, 2026-11-13) — 없으면 기술 지표 다섯 칸
     width, r = g["width"], g["r"]
     cx, cy = width // 2, r + g["top"]
 
@@ -387,12 +388,12 @@ def gauge_svg(net, size="big"):
         a = ang(v)
         return cx + rr * math.cos(a), cy - rr * math.sin(a)
     arcs = ""
-    for lo, hi, _, col in ZONES:
+    for lo, hi, _, col in zs:
         x0, y0 = pt(lo + 0.012, r)
         x1, y1 = pt(hi - 0.012, r)
         arcs += f'<path d="M{x0:.1f},{y0:.1f} A{r},{r} 0 0 1 {x1:.1f},{y1:.1f}" stroke="{col}" stroke-width="{g["arc"]}" fill="none"/>'
     labs = ""
-    for i, (lo, hi, name, _) in enumerate(ZONES if labels else []):
+    for i, (lo, hi, name, _) in enumerate(zs if labels else []):
         if i in (0, 4):   # 양 끝: 호 끝 바로 아래 가운데
             x, y = pt(-1.0 if i == 0 else 1.0, r)
             labs += f'<text x="{x:.0f}" y="{cy + 22}" font-size="12" fill="#6B7280" text-anchor="middle">{name}</text>'

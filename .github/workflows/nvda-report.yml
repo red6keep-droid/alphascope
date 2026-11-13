@@ -202,6 +202,19 @@ jobs:
           cp experiments/issue_store/output/forecast/proof/*.json deploy-forecast/proof/ 2>/dev/null || true
           cp experiments/issue_store/output/forecast/hypo.json deploy-forecast/hypo.json 2>/dev/null || true
 
+      # 이슈 모니터링 (2026-11-13 사용자: 이란 전쟁 · 관세 · 반도체 수출 통제, 운영 연결 + 바로 공개). AI 0.
+      # 본 실행(07:30) · 갱신 실행(13:00) 둘 다 = 하루 두 번. 구글 뉴스 한국어 검색 실행당 6번(이슈 3 × 오늘 · 어제), 캐시 · 기록 · 해시 = $STATE_DIR/records/issues (아래 Save state 가 저장)
+      # 고정 페이지 3장(/p/issue-iran · issue-tariff · issue-export) — 바뀐 것만 쓴다. 실패해도 다른 단계는 그대로
+      - name: Issue watch pages (이슈 모니터링)
+        continue-on-error: true
+        run: |
+          python experiments/issue_store/issue_watch_daily.py --state "$STATE_DIR"
+          if [ "$DO_PUBLISH" = "true" ]; then
+            python experiments/issue_store/publish_issue.py --state "$STATE_DIR"
+          else
+            python experiments/issue_store/publish_issue.py --state "$STATE_DIR" --dry
+          fi
+
       # 공개 등록 증명(proof/{slug}.json — 커밋 시각 = 미리 적었다는 증명, 내용은 등록 때 고정) · 홈 `증시 전망` 카드 자료(hypo.json)
       - name: Deploy forecast proof + hypo.json to gh-pages
         if: env.DO_PUBLISH == 'true' && needs.check.outputs.mode != 'refresh' && hashFiles('deploy-forecast/hypo.json') != ''
