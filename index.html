@@ -4113,14 +4113,22 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         })();
 
         /* ============================================================ 관리자 줄 `운영 현황` (2026-11-13 사용자: "알파스코프 계정으로 로그인하면 관리자만 보는 페이지, 우측 메뉴 버튼 아래")
-           블로그 주인이 이 기기에서 구글 로그인한 적이 있으면(댓글 로그인 때 as-admin 표시) 메뉴에 줄이 보인다. 방문자는 표시가 없어 아무것도 하지 않는다(요청 0).
-           누르면 Firebase 로그인 상태에서 ID 토큰을 받아 운영 Worker(infra/ops-console) /fb-login 으로 POST — Worker 가 서명 · UID 를 확인하고 12시간 세션을 준다.
-           토큰은 주소에 넣지 않는다(기록 · Referer 에 남지 않게). 실패하면 Worker 첫 화면(GitHub 로그인)으로 간다. */
+           보이는 조건 = 이 기기의 as-admin 표시. 표시는 ① 블로그 주소 끝에 #ops 를 붙여 열 때 ② 댓글에서 주인 계정으로 로그인했을 때 생긴다.
+           (2026-11-13 사용자 "블로그에 로그인 화면이 없어서 진입이 안 된다" → ① 추가). 방문자는 표시가 없어 아무것도 하지 않는다(요청 0).
+           줄이 보이면 로그인 도구(Firebase)를 미리 불러 둔다 — 누르는 순간 구글 로그인 창을 바로 열어야 팝업 차단을 피한다.
+           누르면: 로그인돼 있으면 ID 토큰, 아니면 구글 로그인 창 → 주인 UID 면 운영 Worker /fb-login 으로 POST(주소에 토큰을 넣지 않음).
+           주인이 아니면 표시를 지우고 줄을 숨긴다. 그 밖의 실패는 Worker 첫 화면(GitHub 로그인)으로 간다. */
         (function () {
           var row = document.querySelector('#primary-menu .menu-admin');
           if (!row) return;
           var on = false;
-          try { on = localStorage.getItem('as-admin') === '1'; } catch (e) {}
+          try {
+            if (location.hash === '#ops') {
+              localStorage.setItem('as-admin', '1');
+              history.replaceState(null, '', location.pathname + location.search);
+            }
+            on = localStorage.getItem('as-admin') === '1';
+          } catch (e) {}
           if (!on) return;
           row.hidden = false;
           var a = row.querySelector('a'), OPS = a.href.replace(/\/$/, '');
@@ -4131,34 +4139,42 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = no; document.head.appendChild(s);
             });
           }
-          function sdk() {
-            if (window.firebase && window.firebase.auth) return Promise.resolve();
-            return (window.firebase ? Promise.resolve() : load(SDK + 'firebase-app-compat.js')).then(function () { return load(SDK + 'firebase-auth-compat.js'); });
+          var fb = null, au = null, user = null;
+          var ready = (window.firebase && window.firebase.auth ? Promise.resolve()
+            : (window.firebase ? Promise.resolve() : load(SDK + 'firebase-app-compat.js')).then(function () { return load(SDK + 'firebase-auth-compat.js'); }))
+            .then(function () {
+              fb = window.firebase;
+              if (!fb.apps.length) fb.initializeApp({ apiKey: CFG.apiKey, authDomain: CFG.authDomain, projectId: CFG.projectId, appId: CFG.appId });
+              au = fb.auth(); au.languageCode = 'ko';
+              return new Promise(function (ok) { var off = au.onAuthStateChanged(function (u) { off(); user = u; ok(); }); });
+            });
+          ready.catch(function () {});
+          function send(u) {
+            if (!u || u.uid !== CFG.owner) {
+              try { localStorage.removeItem('as-admin'); } catch (e) {}
+              row.hidden = true;
+              throw new Error('not owner');
+            }
+            return u.getIdToken(true).then(function (t) {
+              var f = document.createElement('form');
+              f.method = 'POST'; f.action = OPS + '/fb-login'; f.style.display = 'none';
+              var i = document.createElement('input'); i.type = 'hidden'; i.name = 'id_token'; i.value = t; f.appendChild(i);
+              document.body.appendChild(f); f.submit();
+            });
           }
           a.addEventListener('click', function (ev) {
             ev.preventDefault();
             if (a.getAttribute('aria-busy')) return;
             a.setAttribute('aria-busy', 'true');
-            sdk().then(function () {
-              var fb = window.firebase;
-              if (!fb.apps.length) fb.initializeApp({ apiKey: CFG.apiKey, authDomain: CFG.authDomain, projectId: CFG.projectId, appId: CFG.appId });
-              var au = fb.auth();
-              return new Promise(function (ok) { var off = au.onAuthStateChanged(function (u) { off(); ok(u); }); })
-                .then(function (u) { return u || au.signInWithPopup(new fb.auth.GoogleAuthProvider()).then(function (r) { return r.user; }); });
-            }).then(function (u) {
-              if (!u || u.uid !== CFG.owner) {
-                try { localStorage.removeItem('as-admin'); } catch (e) {}
-                row.hidden = true;
-                throw new Error('not owner');
-              }
-              return u.getIdToken(true);
-            }).then(function (t) {
-              var f = document.createElement('form');
-              f.method = 'POST'; f.action = OPS + '/fb-login'; f.style.display = 'none';
-              var i = document.createElement('input'); i.type = 'hidden'; i.name = 'id_token'; i.value = t; f.appendChild(i);
-              document.body.appendChild(f); f.submit();
-            }).catch(function () { location.href = OPS + '/'; })
-              .then(function () { a.removeAttribute('aria-busy'); });
+            var go;
+            if (au && !user) go = au.signInWithPopup(new fb.auth.GoogleAuthProvider()).then(function (r) { return send(r.user); });   /* 미리 불러 둔 상태 — 누른 순간 창을 연다 */
+            else if (au) go = send(user);
+            else go = ready.then(function () { return user ? send(user) : au.signInWithPopup(new fb.auth.GoogleAuthProvider()).then(function (r) { return send(r.user); }); });
+            go.catch(function (e) {
+              var m = String((e && (e.code || e.message)) || '');
+              if (/popup-closed|cancelled-popup/.test(m)) return;   /* 사용자가 창을 닫음 — 그대로 */
+              location.href = OPS + '/';
+            }).then(function () { a.removeAttribute('aria-busy'); });
           });
         })();
 
