@@ -610,7 +610,8 @@ def shell(body, now):
     foot = (f'<p style="margin:24px 0 0;font-size:14px;line-height:20px;color:#6B7280;">{now.month}.{now.day} {now:%H:%M} 만듦 · '
             '<a href="/runs">날짜별 실행</a> · <a href="/logout">로그아웃</a></p>')
     return ('<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-            f'<meta name="robots" content="noindex,nofollow"><title>운영 현황</title><style>{css}</style></head>'
+            f'<meta name="robots" content="noindex,nofollow"><title>운영 현황</title><style>{css}</style>'
+            '<style>.title-share{display:none!important}</style></head>'   # 공유 버튼 없음 — 관리자 화면은 공유할 곳이 아니다 (2026-11-13 사용자)
             '<body class="item-view no-dashboard"><main class="main-content"><div class="post-shell"><article class="post-outer-container"><div class="post">'
             f'<h3 class="post-title">운영 현황</h3><div class="post-body entry-content">{body}{foot}</div></div></article></div></main>'
             f'<script>{js}</script></body></html>')
