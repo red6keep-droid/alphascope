@@ -36,6 +36,10 @@ jobs:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}   # 2순위 gpt-oss-20b
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 제목 한글 번역 예비 (둘 다 없으면 영문 유지)
           YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}   # 방송 줄 (experiments/media_feed.py, 2026-10-25) — 없으면 기사만
+          # 운영 기록 → Cloudflare KV (experiments/ops_log.py) — 뉴스가 Gemini lite 를 가장 많이 써서 운영 대시보드 AI 한도 칸에 넣는다 (2026-11-13). 하루 2건
+          OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
+          OPS_CF_KV_NAMESPACE_ID: ${{ secrets.OPS_CF_KV_NAMESPACE_ID }}
+          OPS_CF_API_TOKEN: ${{ secrets.OPS_CF_API_TOKEN }}
         run: python fetch_news.py
 
       - name: Prepare deployment files

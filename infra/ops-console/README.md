@@ -13,6 +13,34 @@
 Cloudflare Access 는 Zero Trust 무료 플랜도 카드 등록이 필요해 쓰지 않는다 (2026-10-23 사용자).
 ```
 
+## 운영 대시보드 (2026-11-13)
+
+```
+ops-dashboard.yml (매시 50분 UTC · 수동)
+  └ experiments/ops-dashboard/build_ops.py — 운영 기록(KV) · GitHub 실행 목록 · gh-pages 파일 · Blogger 피드 · 상태 저장소 브랜치 시각
+      → 블로그 테마 CSS · JS 로 감싼 한 페이지 → KV dash:html (+ dash:hist = gh-pages 크기 날짜별)
+이 Worker
+  ├ /          = KV dash:html 그대로 (없으면 /runs 로)
+  ├ /runs      = 날짜별 실행 화면 (예전 첫 화면)
+  └ /fb-login  = 블로그 메뉴 `운영 현황` 이 Firebase ID 토큰을 POST — 구글 공개 키로 서명 · 프로젝트 · 만료 확인,
+                 ADMIN_FIREBASE_UIDS 만 통과 → 같은 세션 쿠키(12시간). Origin 이 BLOG_ORIGIN 이 아니면 거부
+```
+
+블로그 메뉴 줄은 주인이 그 기기에서 댓글 구글 로그인을 한 번 하면 보인다(localStorage `as-admin`). 방문자 요청 0.
+GitHub 로그인(/login)은 그대로 남긴다(예비 입구).
+
+| 칸 | 자료 |
+|---|---|
+| 요약 | 아래 탭들의 판정을 모음 — 손이 필요한 곳 · 지켜볼 곳 |
+| 화면 | gh-pages data · kr · news · cards/* · hypo 의 갱신 시각, search/us · kr 의 종목별 가격 날짜 |
+| 발행 | 워크플로별 오늘 실행(GitHub API) + 운영 기록의 글 · 페이지 수, Blogger 피드 14일 새 글 |
+| 수집 | 운영 기록의 수집 경고 · 운영 알림을 소스 이름으로 묶음 |
+| AI | 운영 기록 llm.usage 의 req · tok (llm_chain, 11-13부터) — Gemini 는 태평양 자정부터, Groq · NVIDIA 는 최근 24시간 |
+| 기록 | 상태 저장소 7개 브랜치(워크플로가 시각만 받음) · 공개 3개 브랜치 · gh-pages 크기 |
+| 전망 | gh-pages hypo.json 진행 중 · 끝난 수 |
+
+배포: `npx wrangler deploy` (사용자 확인 뒤). Secrets 는 그대로 — 새 값은 [vars] 의 공개 값 셋뿐(FIREBASE_PROJECT_ID · ADMIN_FIREBASE_UIDS · BLOG_ORIGIN).
+
 저장소가 공개라 운영 기록은 `*-state` 브랜치 · gh-pages 에 두지 않는다. 기록을 보내기 전에 환경변수의 키 · 토큰 값과 URL 의 `key=` · `token=` 은 `***` 로 지운다.
 
 ## 설정 (한 번)
@@ -62,6 +90,7 @@ GitHub 저장소 → Settings → Secrets and variables → Actions 에 셋:
 | KV 목록 · 읽기 | 페이지를 열 때만 | 하루 1,000 · 100,000 |
 | Worker 요청 | 페이지를 열 때만 | 하루 100,000 |
 | GitHub API | 페이지 1회에 6번 | 토큰 있으면 시간당 5,000 (없으면 60) |
+| 대시보드 만들기 (ops-dashboard.yml) | 매시 1회 = 하루 24회 · KV 목록 2 · 읽기 약 30 ~ 60 · 쓰기 2 / 회 | KV 쓰기 하루 1,000 중 48 · 읽기 100,000 중 약 1,500 |
 | GitHub OAuth App | 로그인할 때만 | 무료 |
 
 AI 호출 · 시세 API 는 쓰지 않는다 (이미 끝난 실행의 결과를 읽기만).

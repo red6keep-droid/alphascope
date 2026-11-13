@@ -8,6 +8,10 @@
 // 자료: Cloudflare KV(OPS_KV) 의 운영 기록(experiments/ops_log.py 가 실행마다 씀) + GitHub Actions 실행 목록(API).
 //
 // 접근: GitHub OAuth 로그인 → ADMIN_GITHUB_LOGINS 의 계정만 통과 (Cloudflare Access 는 카드 등록이 필요해 쓰지 않는다, 2026-10-23 사용자).
+//       또는 블로그 구글 로그인(Firebase) — 블로그 메뉴 `운영 현황` 이 ID 토큰을 POST /fb-login 으로 보낸다. 서명(구글 공개 키) · 프로젝트 ·
+//       만료를 확인하고 ADMIN_FIREBASE_UIDS 의 UID 만 통과 (2026-11-13 사용자 "알파스코프 계정으로 로그인하면 관리자만 보는 페이지").
+// 첫 화면(/) = 운영 대시보드 — experiments/ops-dashboard/build_ops.py 가 한 시간마다 만들어 KV dash:html 에 올린 페이지를 그대로 보낸다.
+// 날짜별 실행 화면은 /runs.
 // GITHUB_CLIENT_ID · GITHUB_CLIENT_SECRET · SESSION_SECRET · ADMIN_GITHUB_LOGINS 중 하나라도 없으면 아무것도 보여 주지 않는다.
 
 const REPO = "red6keep-droid/alphascope";
@@ -36,6 +40,9 @@ function config(env) {
     clientSecret: (env.GITHUB_CLIENT_SECRET || "").trim(),
     sessionSecret: (env.SESSION_SECRET || "").trim(),
     admins: (env.ADMIN_GITHUB_LOGINS || "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean),
+    fbProject: (env.FIREBASE_PROJECT_ID || "").trim(),
+    fbUids: (env.ADMIN_FIREBASE_UIDS || "").split(",").map((x) => x.trim()).filter(Boolean),
+    blogOrigin: (env.BLOG_ORIGIN || "").trim(),
   };
   const missing = [!c.clientId && "GITHUB_CLIENT_ID", !c.clientSecret && "GITHUB_CLIENT_SECRET", !c.sessionSecret && "SESSION_SECRET", !c.admins.length && "ADMIN_GITHUB_LOGINS"].filter(Boolean);
   return { c, missing };
@@ -71,7 +78,9 @@ async function readSession(req, c) {
   if (!payload || !sig || !safeEqual(sig, await hmac(c.sessionSecret, payload))) return null;
   try {
     const s = JSON.parse(b64urlDecode(payload));
-    if (!(s.exp > Date.now() / 1000) || !c.admins.includes(String(s.login).toLowerCase())) return null;
+    const login = String(s.login);
+    const okUser = login.startsWith("google:") ? c.fbUids.includes(login.slice(7)) : c.admins.includes(login.toLowerCase());
+    if (!(s.exp > Date.now() / 1000) || !okUser) return null;
     return s;
   } catch {
     return null;
@@ -106,6 +115,52 @@ async function finishLogin(req, url, c) {
   const login = String(user.login || "");
   if (!login || !c.admins.includes(login.toLowerCase())) return deny("관리자 계정이 아닙니다.", 403);
   return redirect("/", [setCookie(SESSION_COOKIE, await makeSession(c, login), SESSION_SECONDS), setCookie(STATE_COOKIE, "", 0)]);
+}
+
+// ---------------------------------------------------------------- 블로그 구글 로그인 (Firebase ID 토큰)
+// 구글 공개 키(JWK)로 RS256 서명 확인 → aud = 프로젝트 · iss = securetoken.google.com/프로젝트 · exp · iat · auth_time → sub(UID) 대조.
+// 토큰은 확인에만 쓰고 저장하지 않는다. 블로그 화면에서만 보내도록 Origin 을 BLOG_ORIGIN 과 대조한다.
+const FB_JWKS = "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com";
+let jwksCache = { at: 0, keys: [] };
+
+async function fbKeys() {
+  if (Date.now() - jwksCache.at < 3600e3 && jwksCache.keys.length) return jwksCache.keys;
+  const j = await fetch(FB_JWKS).then((r) => (r.ok ? r.json() : { keys: [] }));
+  jwksCache = { at: Date.now(), keys: j.keys || [] };
+  return jwksCache.keys;
+}
+
+async function verifyFirebase(token, c) {
+  const [h, p, sig] = String(token || "").split(".");
+  if (!h || !p || !sig) return null;
+  let head, claims;
+  try {
+    head = JSON.parse(b64urlDecode(h));
+    claims = JSON.parse(b64urlDecode(p));
+  } catch {
+    return null;
+  }
+  if (head.alg !== "RS256" || !head.kid) return null;
+  const jwk = (await fbKeys()).find((k) => k.kid === head.kid);
+  if (!jwk) return null;
+  const key = await crypto.subtle.importKey("jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
+  const raw = Uint8Array.from(atob(sig.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((sig.length + 3) % 4)), (x) => x.charCodeAt(0));
+  if (!(await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, raw, enc.encode(`${h}.${p}`)))) return null;
+  const now = Date.now() / 1000;
+  if (claims.aud !== c.fbProject || claims.iss !== `https://securetoken.google.com/${c.fbProject}`) return null;
+  if (!(claims.exp > now) || !(claims.iat <= now + 60) || !(claims.auth_time <= now + 60) || !claims.sub) return null;
+  return String(claims.sub);
+}
+
+async function firebaseLogin(req, c) {
+  if (!c.fbProject || !c.fbUids.length || !c.blogOrigin) return deny("블로그 로그인 설정이 없습니다.", 403);
+  if (req.headers.get("Origin") !== c.blogOrigin) return deny("블로그 메뉴에서 들어와 주세요.", 403);
+  const form = await req.formData().catch(() => null);
+  const uid = await verifyFirebase(form && form.get("id_token"), c).catch(() => null);
+  if (!uid || !c.fbUids.includes(uid)) return deny("관리자 계정이 아닙니다.", 403);
+  const h = new Headers({ Location: "/", "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
+  h.append("Set-Cookie", setCookie(SESSION_COOKIE, await makeSession(c, `google:${uid}`), SESSION_SECONDS));
+  return new Response(null, { status: 303, headers: h });
 }
 
 function deny(why, status = 403) {
@@ -350,8 +405,8 @@ function capsules(verdicts) {
 
 function page(day, body, who) {
   const today = kstToday();
-  const nav = `<form class="nav" method="get" action="/">
-<a class="btn" href="?date=${shiftDay(day, -1)}">전날</a>${day < today ? `<a class="btn" href="?date=${shiftDay(day, 1)}">다음 날</a>` : ""}<a class="btn" href="/">오늘</a>
+  const nav = `<form class="nav" method="get" action="/runs">
+<a class="btn" href="/">대시보드</a><a class="btn" href="?date=${shiftDay(day, -1)}">전날</a>${day < today ? `<a class="btn" href="?date=${shiftDay(day, 1)}">다음 날</a>` : ""}<a class="btn" href="/runs">오늘</a>
 <input class="btn" type="date" name="date" value="${esc(day)}" max="${today}" aria-label="날짜 고르기"><button class="btn" type="submit">보기</button></form>`;
   return `<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -379,19 +434,31 @@ const HEADERS = {
   "X-Robots-Tag": "noindex, nofollow",
 };
 
+const DASH_HEADERS = {
+  ...HEADERS,
+  "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src https: data:; connect-src 'none'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+};
+
 export default {
   async fetch(req, env) {
     const { c, missing } = config(env);
     if (missing.length) return deny(`로그인 설정이 없습니다 (${missing.join(" · ")}).`);
     const url = new URL(req.url);
+    if (req.method === "POST" && url.pathname === "/fb-login") return firebaseLogin(req, c);
     if (req.method !== "GET") return deny("허용되지 않는 요청입니다.", 405);
     if (url.pathname === "/login") return startLogin(url, c);
     if (url.pathname === "/callback") return finishLogin(req, url, c);
     if (url.pathname === "/logout") return redirect("/signed-out", [setCookie(SESSION_COOKIE, "", 0)]);
     if (url.pathname === "/signed-out") return new Response(simplePage("로그아웃", "로그아웃했습니다.", true), { headers: HEADERS });
     const session = await readSession(req, c);
-    if (!session) return redirect("/login");
-    if (url.pathname !== "/") return new Response(simplePage("없는 페이지", "주소를 확인하세요.", false), { status: 404, headers: HEADERS });
+    if (!session) return new Response(simplePage("운영 현황", "관리자만 볼 수 있습니다. 블로그 오른쪽 메뉴의 운영 현황으로 들어오면 블로그 구글 로그인으로 열립니다.", true), { status: 401, headers: HEADERS });
+    if (url.pathname === "/") {
+      // 운영 대시보드 — 블로그 테마 CSS · JS 로 감싼 한 페이지라 인라인 스크립트를 허용한다(외부 연결 · 다른 곳 전송은 막음)
+      const dash = env.OPS_KV ? await env.OPS_KV.get("dash:html") : null;
+      if (dash) return new Response(dash, { headers: DASH_HEADERS });
+      return redirect("/runs");
+    }
+    if (url.pathname !== "/runs") return new Response(simplePage("없는 페이지", "주소를 확인하세요.", false), { status: 404, headers: HEADERS });
 
     const today = kstToday();
     const q = url.searchParams.get("date");

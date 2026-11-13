@@ -1735,6 +1735,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .menu-items .menu-grp .nav-item { border-bottom: 0 !important; padding: 11px 20px 11px 32px !important; font-size: 15px !important; line-height: 22px !important; font-weight: 400; color: #333; }
 .menu-items .menu-row .nav-item:active, .menu-items .menu-grp .nav-item:active, .menu-items .menu-past:active { background: #F1F5F9; }
 .menu-items .nav-item.is-here { background: #F8FAFC; box-shadow: inset 3px 0 0 #111; font-weight: 700; }   /* 지금 보는 메뉴 — 빨강은 ▲상승과 겹쳐 안 씀 */
+.menu-items .menu-admin[hidden] { display: none; }   /* 관리자 줄 — .menu-row 의 flex 가 hidden 을 이기지 않게 (2026-11-13) */
 
 /* 하단 고정 메뉴 — 폰 · 태블릿(900 이하)만. 칸 56 + 아래 여백 15, 선택 = 색 #111 + 칸 바탕 #F1F5F9 · 아래 모서리 10. 선 굵기는 화면 px 그대로(non-scaling-stroke) */
 .as-tabbar { display: none; }
@@ -1817,6 +1818,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           <div class='menu-row'><a class='nav-item' data-latest='인물 발언' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>주요 인물 발언</a><a class='menu-past' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>지난 발언</a></div>
           <div class='menu-row'><a class='nav-item' data-latest='미디어 데일리' href='/search/label/%EB%AF%B8%EB%94%94%EC%96%B4%20%EB%8D%B0%EC%9D%BC%EB%A6%AC'>방송 브리핑</a><a class='menu-past' href='/search/label/%EB%AF%B8%EB%94%94%EC%96%B4%20%EB%8D%B0%EC%9D%BC%EB%A6%AC'>지난 브리핑</a></div>
           <div class='menu-grp'><div class='menu-grp-t'>테마</div><a class='nav-item' href='/p/theme-ai-capex.html'>AI 투자 자금 방향</a><a class='nav-item' href='/p/theme-fed-rate-cut-expectations.html'>연준 금리 인하 기대</a><a class='nav-item' href='/p/theme-insider-trading.html'>임원 기관 매매 동향</a></div>
+          <b:comment>관리자 줄 (2026-11-13 사용자) — 블로그 주인이 구글 로그인한 기기에서만 보인다(localStorage as-admin, 방문자 요청 0). 누르면 Firebase ID 토큰을 운영 Worker 로 POST</b:comment>
+          <div class='menu-row menu-admin' hidden='hidden'><a class='nav-item' href='https://alphascope-ops-console.red6keep.workers.dev/'>운영 현황</a></div>
         </nav>
       </div>
 
@@ -4109,6 +4112,56 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           }).catch(function () {});
         })();
 
+        /* ============================================================ 관리자 줄 `운영 현황` (2026-11-13 사용자: "알파스코프 계정으로 로그인하면 관리자만 보는 페이지, 우측 메뉴 버튼 아래")
+           블로그 주인이 이 기기에서 구글 로그인한 적이 있으면(댓글 로그인 때 as-admin 표시) 메뉴에 줄이 보인다. 방문자는 표시가 없어 아무것도 하지 않는다(요청 0).
+           누르면 Firebase 로그인 상태에서 ID 토큰을 받아 운영 Worker(infra/ops-console) /fb-login 으로 POST — Worker 가 서명 · UID 를 확인하고 12시간 세션을 준다.
+           토큰은 주소에 넣지 않는다(기록 · Referer 에 남지 않게). 실패하면 Worker 첫 화면(GitHub 로그인)으로 간다. */
+        (function () {
+          var row = document.querySelector('#primary-menu .menu-admin');
+          if (!row) return;
+          var on = false;
+          try { on = localStorage.getItem('as-admin') === '1'; } catch (e) {}
+          if (!on) return;
+          row.hidden = false;
+          var a = row.querySelector('a'), OPS = a.href.replace(/\/$/, '');
+          var SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
+          var CFG = { apiKey: 'AIzaSyDY59SYxDKvQAAOxwbxYwZexolbx_5B-q0', authDomain: 'alphascope-352e9.firebaseapp.com', projectId: 'alphascope-352e9', appId: '1:143644264576:web:96972235fa5e8ac58c3e65', owner: 'u1vln4bbDgSgWQDe2F2FaNs81D43' };   /* 댓글 CFG 와 같은 공개 값 */
+          function load(src) {
+            return new Promise(function (ok, no) {
+              var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = no; document.head.appendChild(s);
+            });
+          }
+          function sdk() {
+            if (window.firebase && window.firebase.auth) return Promise.resolve();
+            return (window.firebase ? Promise.resolve() : load(SDK + 'firebase-app-compat.js')).then(function () { return load(SDK + 'firebase-auth-compat.js'); });
+          }
+          a.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            if (a.getAttribute('aria-busy')) return;
+            a.setAttribute('aria-busy', 'true');
+            sdk().then(function () {
+              var fb = window.firebase;
+              if (!fb.apps.length) fb.initializeApp({ apiKey: CFG.apiKey, authDomain: CFG.authDomain, projectId: CFG.projectId, appId: CFG.appId });
+              var au = fb.auth();
+              return new Promise(function (ok) { var off = au.onAuthStateChanged(function (u) { off(); ok(u); }); })
+                .then(function (u) { return u || au.signInWithPopup(new fb.auth.GoogleAuthProvider()).then(function (r) { return r.user; }); });
+            }).then(function (u) {
+              if (!u || u.uid !== CFG.owner) {
+                try { localStorage.removeItem('as-admin'); } catch (e) {}
+                row.hidden = true;
+                throw new Error('not owner');
+              }
+              return u.getIdToken(true);
+            }).then(function (t) {
+              var f = document.createElement('form');
+              f.method = 'POST'; f.action = OPS + '/fb-login'; f.style.display = 'none';
+              var i = document.createElement('input'); i.type = 'hidden'; i.name = 'id_token'; i.value = t; f.appendChild(i);
+              document.body.appendChild(f); f.submit();
+            }).catch(function () { location.href = OPS + '/'; })
+              .then(function () { a.removeAttribute('aria-busy'); });
+          });
+        })();
+
         /* ============================================================ 모바일 메뉴 (2026-10-12 사용자: 메뉴를 누르면 오른쪽에서 열리는 서랍) */
 
         var toggle = document.querySelector('.nav-toggle');
@@ -4602,7 +4655,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function setOpen(open) {
           box.classList.toggle('is-open', open); panel.hidden = !open; toggle.setAttribute('aria-expanded', String(open));
           if (open) loadOnce();   /* 열면 그때 읽는다 (H30) */
-          if (open && !api) auth().then(function (a) { api = a; a.onAuth(function (u) { me = u; renderWrite(); renderList(); }); }, function (e) { showErr(write, errText(e)); });
+          if (open && !api) auth().then(function (a) { api = a; a.onAuth(function (u) { me = u; try { if (u && OWNER && u.uid === OWNER) localStorage.setItem('as-admin', '1'); } catch (e) {} renderWrite(); renderList(); });   /* 주인 로그인 = 메뉴에 관리자 줄 (2026-11-13) */ }, function (e) { showErr(write, errText(e)); });
         }
         toggle.addEventListener('click', function () { setOpen(panel.hidden); });
 

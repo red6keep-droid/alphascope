@@ -16,6 +16,10 @@ keep_vars = true   # 대시보드에서 넣은 변수를 배포가 지우지 않
 [vars]
 ADMIN_GITHUB_LOGINS = "red6keep-droid"
 GITHUB_CLIENT_ID = "Ov23liGLCeQmPcV89d16"   # GitHub OAuth App alphascope-ops-console (red6keep-droid)
+# 블로그 구글 로그인 (2026-11-13) — 블로그 메뉴 `운영 현황` 이 Firebase ID 토큰을 POST /fb-login 으로. 셋 다 공개 값(테마 index.html 에 이미 있음)
+FIREBASE_PROJECT_ID = "alphascope-352e9"
+ADMIN_FIREBASE_UIDS = "u1vln4bbDgSgWQDe2F2FaNs81D43"   # 블로그 주인 UID (테마 CFG.owner 와 같게)
+BLOG_ORIGIN = "https://alpha-scope.blogspot.com"
 
 # 운영 기록 (experiments/ops_log.py 가 Cloudflare API 로 쓴다)
 [[kv_namespaces]]

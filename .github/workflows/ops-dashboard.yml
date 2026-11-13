@@ -1,0 +1,63 @@
+name: Ops Dashboard
+
+# 관리자 전용 운영 대시보드 (2026-11-13 사용자 "시작해") — experiments/ops-dashboard/build_ops.py 가 이미 있는 기록만 읽어
+# 한 페이지를 만들고 Cloudflare KV dash:html 에 올린다. 관리자 Worker(infra/ops-console)가 로그인 확인 뒤 그대로 보낸다.
+# AI 0 · 시세 API 0 · Blogger 쓰기 0 · gh-pages 쓰기 0 · 상태 브랜치 쓰기 0. KV 쓰기 2건/실행(dash:html · dash:hist).
+# GitHub 예약이 늦거나 빠져도 대시보드가 한두 시간 늦을 뿐이라 Cloudflare 트리거에 넣지 않는다.
+
+on:
+  schedule:
+    - cron: '50 * * * *'   # 매시 50분 (UTC) — 정시 실행들이 끝난 뒤
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: ops-dashboard
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      # 상태 저장소(비공개 alphascope-state) 브랜치의 마지막 커밋 시각만 — 내용은 받지 않는다(--filter=blob:none · 깊이 1)
+      - name: State branch times
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
+          echo "{" > state_heads.json
+          first=1
+          for b in report-state nvda-state kr-state radar-state media-state comment-state trump-state; do
+            if git fetch -q --depth=1 --filter=blob:none state "$b:refs/st/$b" 2>/dev/null; then
+              t=$(git log -1 --format=%cI "refs/st/$b")
+              [ $first = 1 ] || echo "," >> state_heads.json
+              printf '"%s": "%s"' "$b" "$t" >> state_heads.json
+              first=0
+            fi
+          done
+          echo "}" >> state_heads.json
+          cat state_heads.json
+          rm -f ~/.ssh/state_key
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - run: pip install requests
+
+      - name: Build and upload
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
+          OPS_CF_KV_NAMESPACE_ID: ${{ secrets.OPS_CF_KV_NAMESPACE_ID }}
+          OPS_CF_API_TOKEN: ${{ secrets.OPS_CF_API_TOKEN }}
+        run: python experiments/ops-dashboard/build_ops.py --state-heads state_heads.json --upload

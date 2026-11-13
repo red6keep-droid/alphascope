@@ -124,7 +124,8 @@ if os.environ.get("LLM_ALLOW_NVIDIA", "").strip() == "0":
 # 예비 모델이 남긴 ai_model 은 "공급자:모델" (nvidia:… · groq:…). Gemini("gemini-…") · 규칙("rule") 에는 콜론이 없다
 PROVISIONAL_SQL = "ai_model LIKE '%:%'"
 
-USAGE = defaultdict(lambda: {"ok": 0, "fail": 0})   # 단계 → 성공 · 실패 수 (이번 실행)
+USAGE = defaultdict(lambda: {"ok": 0, "fail": 0, "req": 0, "tok": 0})   # 단계 → 성공 · 실패 수 · 보낸 요청(HTTP 응답을 받은 것, 재시도 포함) · 쓴 토큰(입력 + 출력) (이번 실행)
+# req · tok 은 운영 대시보드의 하루 한도 칸(Gemini 하루 요청 · Groq 하루 토큰)용 — ops_log 가 실행 끝에 KV 로 (2026-11-13 사용자 "운영 대시보드 시작해")
 EVENTS = Counter()   # 알릴 일 (이번 실행): "한도 Gemini 키 #1" · "예비 nvda-narrate → nvidia-deepseek" · "전부 실패 …" · "검사 탈락 …"
 # Slack 알림 (2026-10-14 사용자: "한도가 걸린 걸 알림으로 보내줘") — 실행이 끝날 때 EVENTS 가 비어 있지 않으면 한 번만, SLACK_WEBHOOK_URL 로.
 # 한도(429) · 예비 모델 사용 · 사슬 전부 실패 · 검사 탈락이 대상. 503 재시도는 흔해서 알리지 않는다 (예비로 넘어가면 그때 알린다)
@@ -301,6 +302,7 @@ class LLMPool:
             key = self._keys[i]
             try:
                 r = requests.post(GEMINI_URL.format(model=step["model"]), params={"key": key}, json=body, timeout=step["timeout"])
+                USAGE[self._step]["req"] += 1
             except requests.RequestException as e:
                 last = f"네트워크: {str(e)[:120]}"
                 wait = RETRY_SLEEP_SECONDS * (2 ** (attempt - 1))
@@ -336,6 +338,7 @@ class LLMPool:
                 time.sleep(RETRY_SLEEP_SECONDS)
                 continue
             try:
+                USAGE[self._step]["tok"] += int((r.json().get("usageMetadata") or {}).get("totalTokenCount") or 0)
                 cand = r.json()["candidates"][0]
                 text = "".join(p.get("text", "") for p in cand["content"]["parts"])
                 return text
@@ -364,6 +367,7 @@ class LLMPool:
             try:
                 r = requests.post(step["url"], json=body, timeout=step["timeout"],
                                   headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json", "Accept": "application/json"})
+                USAGE[name]["req"] += 1
             except requests.RequestException as e:
                 raise StepFailed(f"{name} 네트워크: {str(e)[:120]}")
             if r.status_code != 429 or attempt == 2:
@@ -381,6 +385,7 @@ class LLMPool:
         data = r.json()
         # 토큰을 실제로 쓴 호출만 간격 계산에 (401 · 413 같은 즉시 거절은 제외). 출력 한도가 있으면 쓴 출력만큼 더 쉰다
         out_tokens = (data.get("usage") or {}).get("completion_tokens") or 0
+        USAGE[name]["tok"] += int((data.get("usage") or {}).get("total_tokens") or 0)
         _ready_at[slot] = time.time() + max(step.get("min_interval", 0), 60 * out_tokens / step["otpm"] if step.get("otpm") else 0)
         text = (data["choices"][0]["message"].get("content") or "").strip()
         if not text:
@@ -405,6 +410,7 @@ class LLMPool:
                 print(f"[{self.label}] {kind} → {name}({step['model']})")
                 event(kind, f"{self.label} → {name}")
             try:
+                self._step = name   # _gemini 이 USAGE 를 어느 단계에 적을지
                 text = (self._gemini(step, prompt, temperature, max_tokens) if step["kind"] == "gemini"
                         else self._openai(name, step, prompt, temperature, max_tokens))
                 value = parse_json(text)
