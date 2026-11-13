@@ -2052,5 +2052,336 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-13T02:08:11.655629+00:00",
   "n_src": 900
+ },
+ "1b59d5471552": {
+  "lines": [
+   "도널드 트럼프 미국 대통령의 2029년 임기 내 쿠바 문제 해결 표명",
+   "쿠바에 대한 군사적 개입 가능성 언급"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:47:37.772333+00:00",
+  "n_src": 900
+ },
+ "f2012d4f149b": {
+  "lines": [
+   "10월 러시아 원유 생산량 하루 873만 바렐로 증가",
+   "러시아 일일 원유 생산량 21만 바렐 급증",
+   "걸프 지역 수출 회복에 따른 글로벌 석유 시장 공급 과잉 진입"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "OIL_ENERGY",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "OIL_ENERGY",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "OIL_ENERGY",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:47:37.772333+00:00",
+  "n_src": 900
+ },
+ "fa6597bd5498": {
+  "lines": [
+   "미국 당국의 바이낸스 해킹 피해 가상자산 12억 달러 압수",
+   "바이낸스에서 발생한 60억 달러 상당의 가상자산 탈취 사건",
+   "북한 군 소속 해커들의 가상자산 탈취 공모 발표"
+  ],
+  "tags": [
+   null,
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:47:37.772333+00:00",
+  "n_src": 900
+ },
+ "23546ebf32cb": {
+  "lines": [
+   "엔비디아 CEO 젠슨 황의 베를린 GTC 행사 진행",
+   "미국 정보기관의 젠슨 황 관련 대중국 스파이 연루 의혹 제기"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:47:47.156791+00:00",
+  "n_src": 900
+ },
+ "f72c7564ed30": {
+  "lines": [
+   "NHL의 디즈니 및 TNT 스포츠와의 신규 미디어 판권 협상 개시 예정일 1월 1일",
+   "NHL의 기존 계약 대비 50%에서 100% 사이의 전체 판권료 인상 요구"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLC",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLC",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:47:47.156791+00:00",
+  "n_src": 900
+ },
+ "47b12924da98": {
+  "lines": [
+   "NHL 구단 평균 가치 27억 1000만 달러로 전년 대비 23% 상승",
+   "토론토 메이플 리프스 54억 달러 및 뉴욕 레이어스 47억 달러 기록",
+   "호프만 가문에 대한 18억 달러 규모 피츠버그 펭귄스 매각 승인",
+   "캐롤라이나 허리케인스 지분 12.5% 매각 가치 26억 6000만 달러 기록"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLC",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLC",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLC",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLC",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:47:47.156791+00:00",
+  "n_src": 900
+ },
+ "56336ba5738c": {
+  "lines": [
+   "10월 소비자물가상승률 0.4% 기록 (예상)",
+   "근원 소비자물가 0.3% 상승 (예상)",
+   "연방공개시장위원회 최종 회의 12월 8일 예정"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "INFLATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "INFLATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:47:57.417605+00:00",
+  "n_src": 900
+ },
+ "35841fa878f5": {
+  "lines": [
+   "하워드 루트닉 상무장관 상원 은행위원회 증언 동의",
+   "증언 요청 서한 발송 12월 3일과 12월 10일 예정"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "GEOPOLITICS",
+    "dir": "uncertain",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:47:57.417605+00:00",
+  "n_src": 900
+ },
+ "aa0175cd57a8": {
+  "lines": [
+   "목요일 엔비디아 주가 4% 하락 마감",
+   "목요일 젠슨 황 엔비디아 CEO 사임",
+   "금요일 장외 거래에서 엔비디아 주가 소폭 상승"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:47:57.417605+00:00",
+  "n_src": 900
+ },
+ "97a5327904e6": {
+  "lines": [
+   "스텔란티스의 브램턴 공장 생산 계획 변경과 연방 지원금 계약 위반 논란",
+   "캐나다 정부의 스텔란티스 대상 30일 이내 조치 요구와 법적 대응 경고"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:48:09.420475+00:00",
+  "n_src": 900
+ },
+ "1a1165928e28": {
+  "lines": [
+   "엔비디아 최고경영자 젠슨 황의 사임 및 관련 논란 발생",
+   "엔비디아 리더십 위기에 따른 AMD와 브로드컴 등 반도체주 순환매 유입"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-13T12:48:09.420475+00:00",
+  "n_src": 900
  }
 }

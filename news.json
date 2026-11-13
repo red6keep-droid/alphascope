@@ -1,16 +1,134 @@
 {
-  "updated_at": "2026-11-13 02:08:12 UTC",
+  "updated_at": "2026-11-13 12:48:09 UTC",
   "items": [
     {
-      "title": "Oil prices rise after Trump says no Iran deal needed: 'We've got their Strait'",
+      "title": "Trump says he wants to ‘get Cuba done’ before leaving office, would consider military force",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/oil-prices-jump-after-trump-says-no-iran-deal-needed-weve-got-their-strait.html",
-      "published": "2026-11-13 00:01:19",
-      "title_ko": "트럼프가 이란과의 거래가 필요 없다고 말한 후 유가 상승",
-      "summary_ko": "도널드 트럼프 대통령의 최근 발언으로 미국과 이란 전쟁의 종식이 보이지 않는다는 우려가 제기됨",
+      "link": "https://www.cnbc.com/2026/11/13/trump-cuba-us-military-force-iran.html",
+      "published": "2026-11-13 12:28:55",
+      "title_ko": "트럼프, 임기 마치기 전 쿠바 문제 해결 원하며 군사력 사용 고려한다고 밝혀",
+      "summary_ko": "미국은 쿠바에 대한 포괄적 경제 금수 조치를 계속 집행 중",
       "lines": [
-        "브렌트유 94.48달러로 1.9% 상승",
-        "서부텍사스산원유 88.19달러로 2% 상승"
+        "도널드 트럼프 미국 대통령의 2029년 임기 내 쿠바 문제 해결 표명",
+        "쿠바에 대한 군사적 개입 가능성 언급"
+      ]
+    },
+    {
+      "title": "Outlook outage continues as Microsoft flags 'encouraging recovery progress'",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/microsoft-outage-outlook-aws-google.html",
+      "published": "2026-11-13 12:21:41",
+      "title_ko": "마이크로소프트 아웃룩 접속 장애 발생, AWS와 구글 사용자도 문제 보고",
+      "summary_ko": "아마존 웹 서비스와 구글 사용자들도 목요일에 서비스 중단을 보고",
+      "lines": [
+        "목요일 마이크로소프트 접속 장애 발생",
+        "아마존 웹 서비스와 구글 이용자들의 장애 신고 접수"
+      ]
+    },
+    {
+      "title": "Russian crude production rebounds after Trump diesel deal, IEA says as oil markets return to surplus",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/russia-oil-exports-iea-diesel-deal.html",
+      "published": "2026-11-13 12:05:22",
+      "title_ko": "트럼프 디젤 협상 이후 러시아 원유 생산량 반등, IEA는 석유 시장이 공급 과다로 복귀했다고 밝힘",
+      "summary_ko": "걸프 지역 수출 회복으로 글로벌 공급량이 수요를 초과",
+      "lines": [
+        "10월 러시아 원유 생산량 하루 873만 바렐로 증가",
+        "러시아 일일 원유 생산량 21만 바렐 급증",
+        "걸프 지역 수출 회복에 따른 글로벌 석유 시장 공급 과잉 진입"
+      ]
+    },
+    {
+      "title": "U.S. seizes $1.2 billion in cryptocurrency stolen from Binance",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/us-seizes-binance-hack-crypto.html",
+      "published": "2026-11-13 12:03:24",
+      "title_ko": "미국, 바이낸스에서 도난당한 12억 달러 상당의 암호화폐 압수",
+      "summary_ko": "북한 정권의 암호화폐 대규모 절도 자금 조달 계획에 대응 조치 실시",
+      "lines": [
+        "미국 당국의 바이낸스 해킹 피해 가상자산 12억 달러 압수",
+        "바이낸스에서 발생한 60억 달러 상당의 가상자산 탈취 사건",
+        "북한 군 소속 해커들의 가상자산 탈취 공모 발표"
+      ]
+    },
+    {
+      "title": "The Tech Download: I interviewed Huang at peak ‘Jensenmania.’ Three weeks later, Nvidia is grappling with a world without him",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/tech-download-jensen-huang-nvidia-departure-jensenmania.html",
+      "published": "2026-11-13 12:00:02",
+      "title_ko": "테크 다운로드: '젠슨매니아' 절정기에 황을 인터뷰했다. 3주 후 엔비디아는 그가 없는 세상과 사투를 벌이고 있음",
+      "summary_ko": "베를린 GTC 인터뷰 불과 몇 주 만에 벌어진 CEO 관련 사태",
+      "lines": [
+        "엔비디아 CEO 젠슨 황의 베를린 GTC 행사 진행",
+        "미국 정보기관의 젠슨 황 관련 대중국 스파이 연루 의혹 제기"
+      ]
+    },
+    {
+      "title": "NHL’s next media deal will test the league’s strength",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/nhls-next-media-deal-will-test-the-leagues-strength.html",
+      "published": "2026-11-13 11:48:56",
+      "title_ko": "NHL의 다음 미디어 계약은 리그의 힘을 시험할 것",
+      "summary_ko": "NFL 외 권리의 가치를 평가하는 미디어 기업들의 행보",
+      "lines": [
+        "NHL의 디즈니 및 TNT 스포츠와의 신규 미디어 판권 협상 개시 예정일 1월 1일",
+        "NHL의 기존 계약 대비 50%에서 100% 사이의 전체 판권료 인상 요구"
+      ]
+    },
+    {
+      "title": "CNBC's Official NHL Team Valuations 2026: How the 32 franchises stack up",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/cnbcs-official-nhl-team-valuations-2026-how-the-32-clubs-stack-up.html",
+      "published": "2026-11-13 11:48:31",
+      "title_ko": "CNBC의 2026년 공식 NHL 팀 가치 산정: 32개 프랜차이즈의 순위",
+      "summary_ko": "1년 전보다 23% 상승한 수치",
+      "lines": [
+        "NHL 구단 평균 가치 27억 1000만 달러로 전년 대비 23% 상승",
+        "토론토 메이플 리프스 54억 달러 및 뉴욕 레이어스 47억 달러 기록",
+        "호프만 가문에 대한 18억 달러 규모 피츠버그 펭귄스 매각 승인",
+        "캐롤라이나 허리케인스 지분 12.5% 매각 가치 26억 6000만 달러 기록"
+      ]
+    },
+    {
+      "title": "The Fed expected rate cuts this year. Now it’s bracing for another inflation fight",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/us-inflation-outlook-federal-reserve-rate-hike.html",
+      "published": "2026-11-13 11:31:10",
+      "title_ko": "연준은 올해 금리 인하를 예상했으나, 이제 또 다른 인플레이션과의 싸움을 대비하고 있음",
+      "summary_ko": "10월 인플레이션 수치가 예상치 상회",
+      "lines": [
+        "10월 소비자물가상승률 0.4% 기록 (예상)",
+        "근원 소비자물가 0.3% 상승 (예상)",
+        "연방공개시장위원회 최종 회의 12월 8일 예정"
+      ]
+    },
+    {
+      "title": "Nvidia scandal draws in Commerce Secretary Lutnick, who reportedly agrees to testify about China chip sales",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/nvidia-scandal-lutnick-chip-sales.html",
+      "published": "2026-11-13 10:54:40",
+      "title_ko": "엔비디아 스캔들에 휘말린 러트닉 상무장관, 중국 칩 판매에 대해 증언하기로 동의한 것으로 전해짐",
+      "summary_ko": "젠슨 황과 중국계 스파이 혐의 여성과의 관계 발각 이후 상원 은행위원회 출석 예정",
+      "lines": [
+        "하워드 루트닉 상무장관 상원 은행위원회 증언 동의",
+        "증언 요청 서한 발송 12월 3일과 12월 10일 예정"
+      ]
+    },
+    {
+      "title": "앤트로픽 대규모 IPO 임박",
+      "title_ko": "앤트로픽 대규모 IPO 임박",
+      "summary_ko": "사상 최대 규모가 될 앤트로픽 IPO는 반도체 생태계에 긍정적이지만 초기 보호예수 해제 물량으로 변동성이 클 수 있음",
+      "source": "Mad Money",
+      "link": "https://www.youtube.com/watch?v=ylbP-2VSZyc",
+      "published": "2026-11-13 00:52:20",
+      "kind": "media",
+      "tag": "기업 사건",
+      "direction": "positive",
+      "n_channels": 3,
+      "lines": [
+        "짐 크레이머 발언 : 앤트로픽 상장 후 막대한 현금 보유고 확보 예상",
+        "짐 크레이머 발언 : 초기 보호예수 해제 물량으로 인한 스페이스엑스 유사 주가 변동성 우려 (발언자 예상)",
+        "짐 크레이머 발언 : 앤트로픽 IPO는 반도체 생태계 및 엔비디아 투자금 회수에 긍정적"
       ]
     },
     {
@@ -23,7 +141,7 @@
       "kind": "media",
       "tag": "유가 · 에너지 · 원자재",
       "direction": "positive",
-      "n_channels": 5,
+      "n_channels": 4,
       "lines": [
         "진행자 발언 : 도널드 트럼프 대통령의 이란 관련 강경 발언 및 호르무즈 해협 장악 언급",
         "진행자 발언 : 유가 상승세로 이어져 WTI 가격이 86~88달러 선으로 회복",
@@ -40,133 +158,12 @@
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "negative",
-      "n_channels": 4,
+      "n_channels": 3,
       "lines": [
         "진행자 발언 : 크리스토퍼 월러 연준 이사와 클리블랜드 연은 총재 등의 추가 금리 인상 가능성 시사",
         "진행자 발언 : 유가 상승에 따른 인플레이션 재점화 우려가 금리 상승 압력으로 작용",
         "진행자 발언 : 10년물 국채 금리가 하루 만에 약 13bp 급등하여 5.1% 기록",
         "진행자 발언 : 2년물 국채 금리 또한 큰 폭으로 상승하며 12월 금리 인상 경계감 반영"
-      ]
-    },
-    {
-      "title": "Cramer says Jensen Huang betrayed Nvidia shareholders. How to pick up the pieces",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-exit-cramer.html",
-      "published": "2026-11-12 23:14:56",
-      "title_ko": "크레이머, 젠슨 황이 엔비디아 주주들을 배신했다고 발언",
-      "summary_ko": "황 없이는 더 나은 엔비디아가 아니라 그저 다른 엔비디아일 뿐이라고 목요일에 크레이머가 언급",
-      "lines": [
-        "엔비디아 최고경영자 젠슨 황 사임",
-        "최고재무책임자 콜레트 크레스 임시 최고경영자 선임",
-        "목요일 엔비디아 주가 4퍼센트 이상 하락 마감"
-      ]
-    },
-    {
-      "title": "Cerebras surges 17% after beating on quarterly revenue and announcing Microsoft deal",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/cerebras-systems-cbrs-q3-earnings-report-2026.html",
-      "published": "2026-11-12 22:48:26",
-      "title_ko": "세레브라스, 분기 매출 호조 및 마이크로소프트와의 계약 발표로 18% 급등",
-      "summary_ko": "세레브라스는 주요 클라우드 제공업체인 아마존 및 오라클과 파트너십을 맺은 후 마이크로소프트와 새로운 계약 체결",
-      "lines": [
-        "세레브라스 마이크로소프트와의 신규 계약 발표",
-        "세레브라스 분기 매출 및 가이드라인 시장 예상치 상회",
-        "시간외 거래에서 세레브라스 주가 18% 급등",
-        "전년 대비 70% 증가한 세레브라스 핵심 매출"
-      ]
-    },
-    {
-      "title": "Alice Huang tied to Nvidia’s biggest Chinese competitor",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/alice-huang-jensen-huang-nvidia-huawei.html",
-      "published": "2026-11-12 22:47:28",
-      "title_ko": "앨리스 황, 엔비디아 경쟁사와 연관",
-      "summary_ko": "앨리스 황, 화웨이에 컴퓨팅 파워 제공 기업 지분 보유",
-      "lines": [
-        "앨리스 황이 엔비디아 최대 경쟁사 화웨이 관련 기업 지분 보유",
-        "앨리스 황이 젠슨 황과 연인 관계 유지 중 화웨이 관련 사업 관여",
-        "정보 기업 테사리가 앨리스 황과 화웨이 간 연결고리 최초 발견"
-      ]
-    },
-    {
-      "title": "Widespread Microsoft outage takes down Outlook and other 365 services",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/microsoft-outage-outlook-aws-google.html",
-      "published": "2026-11-12 22:24:12",
-      "title_ko": "마이크로소프트 아웃룩 접속 장애 발생, AWS와 구글 사용자도 문제 보고",
-      "summary_ko": "아마존 웹 서비스와 구글 사용자들도 목요일에 서비스 중단을 보고",
-      "lines": [
-        "목요일 마이크로소프트 접속 장애 발생",
-        "아마존 웹 서비스와 구글 이용자들의 장애 신고 접수"
-      ]
-    },
-    {
-      "title": "Scout Motors has 212,000 vehicle reservations as $2 billion South Carolina plant nears completion",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/scout-motors-reservations-south-carolina-plant.html",
-      "published": "2026-11-12 22:17:05",
-      "title_ko": "스카우트 모터스, 20억 달러 사우스캐롤라이나 공장 완공 임박 속 차량 예약 21만 2,000대 기록",
-      "summary_ko": "스카우트 모터스의 테라 픽업과 트래블러 SUV 예약이 약 21만 2,000대라고 CEO 스콧 키오가 CNBC에 밝힘",
-      "lines": [
-        "폭스바겐 지원 스카우트 모터스 테라 픽업과 트래블러 SUV 예약 대수 약 21만 2000대 기록 (예상)",
-        "사우스캐롤라이나주 20억 달러 규모 공장 완공 임박",
-        "내년 전면 생산 시작 및 2028년 고객 인도 예정"
-      ]
-    },
-    {
-      "title": "대중국 반도체 수출 통제 파장",
-      "title_ko": "대중국 반도체 수출 통제 파장",
-      "summary_ko": "젠슨 황의 퇴진이 미국의 대중국 반도체 수출 통제 및 AI 칩 공급에 영향을 미칠 전망",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=QJ_ENts-OT4",
-      "published": "2026-11-12 22:10:12",
-      "kind": "media",
-      "tag": "규제 · 산업정책",
-      "direction": "negative",
-      "n_channels": 3,
-      "lines": [
-        "미국의 대중국 반도체 수출 통제 지속",
-        "젠슨 황의 대중국 칩 공급 완화 노력에 타격",
-        "국가 안보 및 기밀 유출 관련 조사 진행"
-      ]
-    },
-    {
-      "title": "Without Jensen Huang, Nvidia's organizational structure isn't 'built to last,' management expert says",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/11/12/nvidia-jensen-huang-management-structure.html",
-      "published": "2026-11-12 22:06:08",
-      "title_ko": "젠슨 황 없는 엔비디아의 조직 구조는 지속 가능하지 않다고 경영 전문가 지적",
-      "summary_ko": "엔비디아의 수평적 조직 구조가 후임자에게 과제가 될 수 있다고 전문가 언급",
-      "lines": [
-        "1993년 공동 창업자 젠슨 황 엔비디아 최고경영자 사임",
-        "최고재무책임자 콜레트 크레스 임시 최고경영자 임명"
-      ]
-    },
-    {
-      "title": "Cisco beats on earnings, says AI infrastructure revenue will double this fiscal year",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/cisco-csco-q1-2027-earnings.html",
-      "published": "2026-11-12 21:20:35",
-      "title_ko": "시스코, 실적 호조 및 이번 회계연도 AI 인프라 매출 두 배 증가 전망",
-      "summary_ko": "시스코는 초기 붐을 놓친 후 AI 분야의 주요 플레이어가 되기 위해 노력 중",
-      "lines": [
-        "시스코 회계연도 1분기 실적 예상치 상회",
-        "148억 8000만 달러에서 24% 증가한 시스코 매출",
-        "시스코 순이익 46억 달러 기록",
-        "올해 약 35% 상승한 시스코 주가"
-      ]
-    },
-    {
-      "title": "Nvidia stock closes down over 4% after CEO Jensen Huang announces resignation",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/nvidia-nvda-jensen-huang-second-affair.html",
-      "published": "2026-11-12 21:17:21",
-      "title_ko": "엔비디아 젠슨 황 CEO 사임 발표 이후 오전 하락세 축소",
-      "summary_ko": "콜레트 크레스 최고재무책임자가 신임 리더 선임 때까지 임시 CEO 역할 수행",
-      "lines": [
-        "최고재무책임자 콜레트 크레스의 임시 CEO 임명",
-        "시가총액 4조 달러 선을 유지 중인 엔비디아 주가",
-        "시놉시스 전 CEO 하비 C. 존스의 이사회 초대 의장 선임"
       ]
     }
   ]
