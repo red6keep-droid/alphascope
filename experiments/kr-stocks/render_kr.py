@@ -1214,6 +1214,24 @@ def _info_rows(rows, px=None, lh=22, name_w=68):
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{R.MULTI}padding:{PAD - 3}px 0;display:block;">{out}</span></div>'
 
 
+_NPS = None
+
+
+def _nps_row(code):
+    """국민연금 지분율 줄 — nps/ 파일을 한 번만 읽는다. 실패해도 기업 탭은 나간다."""
+    global _NPS
+    try:
+        if _NPS is None:
+            import nps_holdings
+            _NPS = nps_holdings.load(U.CANDIDATES)
+        import nps_holdings
+        return nps_holdings.row(_NPS.get(code))
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr] 국민연금 지분율 건너뜀: {e!r}")
+        _NPS = {}
+        return None
+
+
 def sec_company(s):
     """`기업 정보` 탭 (2026-10-29 사용자 P84) — 한 줄 소개(직접 쓴 고정 문구, universe_kr.ABOUT) · 기본 정보(OpenDART 기업개황) · 같은 묶음 종목.
     평가 · 전망 · 추천은 없다. DART 칸이 없으면 그 줄만 뺀다."""
@@ -1230,6 +1248,10 @@ def sec_company(s):
             ("업종", _esc(" · ".join([U.sector(s["sym"])] + list(U.groups(s["sym"])))))]
     if s.get("rank"):
         rows.append(("시가총액", f"한국 {s['rank']}위 ({cap_text(s.get('cap'))})"))
+    nps = _nps_row(s["code"])
+    if nps:   # 국민연금 지분율 (2026-11-13 사용자 P545) — 공공데이터 국민연금공단, 이용허락 제한 없음
+        val, sub = nps
+        rows.append(("국민연금", _esc(val) + (f'<span style="display:block;color:{NOTE};">{_esc(sub)}</span>' if sub else "")))
     out += _info_rows([(k, v) for k, v in rows if v])   # 흰 카드 하나, 제목 · 접기 없이 (P154 — P146 의 접기를 되돌림). 출처(OpenDART)는 공통 푸터
     # `함께 움직이는 종목` 은 오늘 탭 `함께 움직이는 종목은?` 카드로 옮겼다 (P153)
     return out

@@ -200,7 +200,7 @@ jobs:
         run: python "$KR_DIR/publish_pages_kr.py"
 
       # ETF 고정 페이지 — 한국 상장 19개 (experiments/stock-etf, 2026-11-12 사용자 A안). 위 실행이 받은 일봉(snapshot)만 읽는다 · AI 0.
-      # 구성(같은 지수 미국 ETF) · 기본 정보는 주 1회만 받는다(data/etf_fund.json). 게시는 저장소 변수 ETF_PUBLISH=true 일 때만 — 그 전엔 그림자 모드(--dry)
+      # 구성 · 보수 · 순자산은 운용사 상품 페이지에서 주 1회(data/etf_kr_holdings.json, kr_holdings.py — 운영지침 D4-15-2), 미국 지수 ETF 예비 = 같은 지수 미국 ETF(data/etf_fund.json). 게시는 저장소 변수 ETF_PUBLISH=true 일 때만 — 그 전엔 그림자 모드(--dry)
       - name: ETF pages (한국 상장 19)
         if: steps.gate.outputs.go == 'true'
         continue-on-error: true
@@ -271,7 +271,7 @@ jobs:
           python experiments/record_store.py run-log "$KR_DIR/data" kr "${{ steps.run_kr.outcome }}" "job=${{ job.status }}"   # 실행 한 줄 — data/records/runs (2026-11-07, A3-3-2 의 1)
           # 임시 인덱스로 실제 경로(experiments/kr-stocks/data/…)를 그대로 올린다 — records/ 하위 폴더(매일 기록, 2026-11-01)까지 (옛: 파일만 mktree)
           export GIT_INDEX_FILE="$(mktemp -u)"
-          for f in rank_state.json page_hashes.json pages_live.json etf_fund.json etf_page_hashes.json etf_pages_live.json history.json dart_fin.json dart_fin_all.json dart_corp.json dart_company.json dart_earn.json est_history.json report_posts.json flows.json last_good.json detail_cache.json; do   # last_good.json = 빈 값 막기 (data_guard) · detail_cache.json = 칸별 주기로 받은 상세 값 (2026-11-12)   # flows.json = 마지막으로 받은 ECOS 자금 흐름 — 다음 날 ECOS 가 실패하면 이것을 쓴다 (2026-11-09 사용자)   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
+          for f in rank_state.json page_hashes.json pages_live.json etf_fund.json etf_kr_holdings.json etf_page_hashes.json etf_pages_live.json history.json dart_fin.json dart_fin_all.json dart_corp.json dart_company.json dart_earn.json est_history.json report_posts.json flows.json last_good.json detail_cache.json; do   # last_good.json = 빈 값 막기 (data_guard) · detail_cache.json = 칸별 주기로 받은 상세 값 (2026-11-12)   # flows.json = 마지막으로 받은 ECOS 자금 흐름 — 다음 날 ECOS 가 실패하면 이것을 쓴다 (2026-11-09 사용자)   # DART 캐시 — 이미 받은 보고서를 다시 부르지 않게 (2026-10-25)
             [ -f "$KR_DIR/data/$f" ] && git add -f "$KR_DIR/data/$f" || true
           done
           [ -d "$KR_DIR/data/records" ] && git add -f "$KR_DIR/data/records" || true   # 카드 판정 · 애널리스트 · 방송 의견 (stock_records, 데이터-기록-계획 A5-4)

@@ -185,6 +185,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title-text { flex: 1 1 auto; min-width: 0; display: flex; align-items: flex-start; gap: 5px; }   /* 로고(왼쪽 따로) + 글자 칸 — 줄바꿈된 둘째 줄은 로고 아래가 아니라 첫 글자 선에 맞는다 (2026-10-23 사용자) */
 .post-title-label { flex: 1 1 auto; min-width: 0; }
 .post-title-text .title-logo { flex: none; margin-right: 0; vertical-align: top; margin-top: calc((1lh - var(--logo-size, 32px)) / 2); }   /* 로고는 첫 줄 글자 높이의 가운데에 — 가운데 정렬 아님 (2026-10-23 사용자) */
+.post-title-text .title-badge { line-height: inherit; }   /* 글자 배지(한국 종목 · ETF `T`)는 line-height:1 이라 1lh 가 배지 글자 크기가 되어 위로 떴다 → 제목 줄 높이를 물려받아 첫 줄 가운데 (2026-11-13 사용자 P537 "미들 정렬") */
 .post-title-meta { flex: none; margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
 .post-title-meta .title-share { margin-left: 0; }
 .title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
