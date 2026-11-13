@@ -3145,6 +3145,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 
   /* ---------------------------------------------------------------- 로그인 (Firebase Auth, 펼칠 때 불러온다) */
   var authP = null;
+  function gProvider(fb) { var p = new fb.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' }); return p; }   /* 매번 계정 고르는 창 (2026-11-13 사용자) */
   function script(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = function () { no(new Error('load ' + src)); }; document.head.appendChild(s); }); }
   function auth() {
     if (authP) return authP;
@@ -3155,7 +3156,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       var a = fb.auth(); a.languageCode = 'ko';
       return {
         onAuth: function (cb) { a.onAuthStateChanged(function (u) { cb(u ? { uid: u.uid, name: u.displayName || '이름 없음', photo: u.photoURL || '' } : null); }); },
-        login: function () { return a.signInWithPopup(new fb.auth.GoogleAuthProvider()); },
+        login: function () { return a.signInWithPopup(gProvider(fb)); },
         logout: function () { return a.signOut(); },
         token: function (force) { return a.currentUser ? a.currentUser.getIdToken(!!force) : Promise.reject(new Error('UNAUTHENTICATED')); }
       };
