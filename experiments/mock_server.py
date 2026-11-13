@@ -11,6 +11,7 @@
 - 2026-11-12 사용자: ① 쓰지 않는 목업은 지우지 않고 `/archive` 한 곳에 묶는다(목록 · 최근 · 묶음에서 빠짐, 되돌리기 버튼). 기록 = .mock_prefs.json "archive".
   ② 사용자 여정 테스트 `/j/…` — 같은 목업 파일을 보내면서 하단 고정 메뉴(홈 · 미국 증시 · 한국 증시 · 종목 · 인물)를 붙이고,
   블로그 주소 링크(종목 페이지 · 리포트 · 인물 발언 · 증시 전망)를 다른 목업으로 이어 준다. 목업 파일은 건드리지 않는다(보낼 때만) — 목업을 다시 그리면 여정도 최신.
+- 2026-11-13 사용자: 목업 줄마다 `삭제` — 사용자가 잘 안 보는 목업을 직접 지운다. 확인 창을 거쳐 맥 휴지통(~/.Trash)으로 옮긴다(되살리기 = 휴지통에서).
 """
 import html
 import re
@@ -134,10 +135,12 @@ def row(d, f, t, show_dir=False, stars=(), restore=False):
     if restore:   # 쓰지 않는 목업 화면 — 별 대신 되돌리기
         return (f'<div class="row"><a class="go" href="{href}">'
                 f'<span class="name">{name}</span><span class="sub">{html.escape(sub)}</span></a>'
-                f'<button class="back" data-k="{key}" aria-label="목록으로 되돌리기">되돌리기</button></div>')
+                f'<button class="back" data-k="{key}" aria-label="목록으로 되돌리기">되돌리기</button>'
+                f'<button class="del" data-k="{key}" aria-label="삭제">삭제</button></div>')
     return (f'<div class="row"><a class="go" href="{href}">'
             f'<span class="name">{name}</span><span class="sub">{html.escape(sub)}</span></a>'
-            f'<button class="star{" on" if on else ""}" data-k="{key}" aria-label="즐겨찾기">{"★" if on else "☆"}</button></div>')
+            f'<button class="star{" on" if on else ""}" data-k="{key}" aria-label="즐겨찾기">{"★" if on else "☆"}</button>'
+            f'<button class="del" data-k="{key}" aria-label="삭제">삭제</button></div>')
 
 
 JOURNEY_START = "/j/home-split/output/mock_home_kr.html"
@@ -194,6 +197,7 @@ details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
 .go{{flex:1 1 auto;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 4px 10px 14px;color:inherit;text-decoration:none}}
 .go:active{{background:#eef2f8}} .name{{word-break:break-all}} .sub{{color:#8a919c;font-size:13px;white-space:nowrap}}
 .star{{flex:0 0 48px;border:0;background:none;font-size:22px;color:#c3c8d0;cursor:pointer;padding:0}} .star.on{{color:#f5a623}}
+.del{{flex:0 0 auto;border:0;border-left:1px solid #eef0f3;background:none;font-size:13px;color:#b42318;cursor:pointer;padding:0 14px}}
 .back{{flex:0 0 auto;border:0;background:none;font-size:13px;color:#5b6370;cursor:pointer;padding:0 14px}}
 .big{{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:0 14px;margin:0 0 16px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;color:inherit;text-decoration:none;font-weight:600}}
 .big span{{color:#8a919c;font-weight:400;font-size:13px}} .big.dark{{background:#1d2127;border-color:#1d2127;color:#fff}} .big.dark span{{color:#c3c8d0}}
@@ -204,6 +208,15 @@ details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
 const ds = [...document.querySelectorAll('details')];
 document.querySelectorAll('.back').forEach(b => b.addEventListener('click', async () => {{
   await fetch('/archive?k=' + encodeURIComponent(b.dataset.k), {{method: 'POST'}}); location.reload();
+}}));
+// 삭제 = 확인 뒤 맥 휴지통으로 (2026-11-13 사용자)
+document.querySelectorAll('.del').forEach(b => b.addEventListener('click', async () => {{
+  if (!confirm(b.dataset.k + '\n\n이 목업을 삭제할까요? (맥 휴지통으로 옮깁니다)')) return;
+  const r = await fetch('/delete?k=' + encodeURIComponent(b.dataset.k), {{method: 'POST'}});
+  if (!r.ok) {{ alert('삭제하지 못했습니다'); return; }}
+  try {{ sessionStorage.setItem('mockIndex', JSON.stringify({{
+    open: ds.filter(d => d.open).map(d => d.querySelector('summary').textContent), y: scrollY }})); }} catch (e) {{}}
+  location.reload();
 }}));
 // ☆ 누르면 즐겨찾기 넣기 · 빼기 → 목록을 다시 받아 맨 위 즐겨찾기에 반영
 document.querySelectorAll('.star').forEach(b => b.addEventListener('click', async () => {{
@@ -679,6 +692,37 @@ body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !im
 </script>"""
 
 
+TRASH = os.path.expanduser("~/.Trash")
+
+
+def delete_mock(k):
+    """'폴더/파일.html' 목업을 맥 휴지통으로 옮기고 즐겨찾기 · 쓰지 않는 목업 기록에서도 뺀다. output 폴더 안 .html 만."""
+    seg = k.split("/")
+    if len(seg) != 2 or not seg[1].endswith(".html") or any(s in ("", ".", "..") or s.startswith(".") for s in seg):
+        return False
+    fp = os.path.join(BASE, seg[0], "output", seg[1])
+    if not os.path.isfile(fp):
+        return False
+    dst = os.path.join(TRASH, seg[1])
+    if os.path.exists(dst):   # 휴지통에 같은 이름이 있으면 시각을 붙인다
+        dst = os.path.join(TRASH, f"{seg[1][:-5]} {datetime.now():%H%M%S}.html")
+    try:
+        os.replace(fp, dst)
+    except OSError:
+        import shutil
+        try:
+            shutil.move(fp, dst)
+        except OSError:
+            return False
+    with _lock:
+        p = load_prefs()
+        p["star"] = [x for x in p["star"] if x != k]
+        p["archive"] = [x for x in p["archive"] if x != k]
+        save_prefs(p)
+    _themed.pop(fp, None)
+    return True
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=BASE, **kw)
@@ -689,11 +733,15 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         u = urlparse(self.path)
-        if u.path not in ("/star", "/archive"):
+        if u.path not in ("/star", "/archive", "/delete"):
             self.send_error(404)
             return
         key = u.path[1:]
         k = unquote(dict(x.split("=", 1) for x in u.query.split("&") if "=" in x).get("k", ""))
+        if key == "delete":
+            self.send_response(204 if delete_mock(k) else 400)
+            self.end_headers()
+            return
         with _lock:
             p = load_prefs()
             p[key] = [x for x in p[key] if x != k] if k in p[key] else p[key] + [k]
