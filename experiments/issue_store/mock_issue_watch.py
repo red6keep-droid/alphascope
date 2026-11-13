@@ -16,6 +16,8 @@ import os
 import re
 import sys
 
+from collections import Counter
+
 import numpy as np
 import pandas as pd
 
@@ -32,6 +34,7 @@ import cards as qc  # noqa: E402  — 질문 카드(강조 카드 + 접기, 가�
 OUT = os.path.join(_HERE, "output")
 KST = dt.timezone(dt.timedelta(hours=9))
 RULES = "IW-2026-11-13a"
+HEAD_TITLE = "Hot Issue"   # 머리 줄 제목 — 옛 `이슈 모니터링` (2026-11-13 사용자: 영어로 핫 이슈)
 PUBLIC = False   # True = 블로그 게시용(issue_watch_daily.py): 목록 줄 = 블로그 주소 · 운영자 상자 없음 · 글 끝 `함께 보는 페이지`
 
 # 지켜보는 이슈 — 키워드로 모은다. by = 자동(뉴스가 평소 2배) · 운영자(직접 추가)
@@ -75,7 +78,7 @@ def side_pill(side, pop=False):
 
 
 SIDE_LABEL = {"종전": "종전", "확전": "확전", "방향 미정": "방향미정"}   # 안쪽 열쇠 `종전` = 시장에 좋은 쪽 · `확전` = 나쁜 쪽 — 화면 이름은 이슈마다 use() 가 바꾼다   # `쪽` 없이 — 증시 전망 `반등` · `지속` 과 같게 (2026-11-11 · 11-13 사용자)   # 라벨 글자는 띄어쓰기 없이 (가이드라인 8절, `논의중` · `시장예상` 과 같게)
-TALK = re.compile(r"[“”\"]|선언|밝혀|말했|발언|검토|기대|희망|우려|위험|경고|가능|전망|분석|어떻게|맞설|which|could|would", re.I)
+TALK = re.compile(r"[“”\"'‘’]|선언|밝혀|말했|발언|검토|기대|희망|우려|위험|경고|가능|전망|분석|어떻게|맞설|논의|추진|모멘텀|긍정|이냐|할까|\?|관측|시사|의향|촉구|요구|주장|which|could|would", re.I)   # 논의 · 추진 · 모멘텀 · `…이냐` 추가 (2026-11-13: 단계 사다리가 말을 일어난 일로 올렸다)
 
 # 가격 — 사슬 고리 지표(yfinance) + 비교
 LINK_SYM = {"CL_F": "CL=F", "_VIX": "^VIX", "XLK": "XLK", "EWY": "^KS11", "ITA": "ITA", "GC_F": "GC=F", "XLE": "XLE", "JETS": "JETS",
@@ -107,7 +110,12 @@ CFG = {
                  case_name="휴전 · 종전",
                  case_note="3번뿐이라 ‘보통 이렇다’고 말할 수는 없습니다. 03.31 과 04.08 은 20거래일이 겹칩니다. 04.08 휴전 뒤 전쟁은 다시 이어졌습니다(10월 해협 공격 · 11.07 타격).",
                  bridge="가격이 크게 움직이거나(에너지 업종이 S&P 500 보다 하루에 평소의 3배 · 2.5%p 넘게) 휴전 서명 · 협상 시한처럼 날짜가 잡히면 증시 전망으로 넘어갑니다.",
-                 bridge_sym="XLE", chart=None),
+                 bridge_sym="XLE", chart=None,
+                 stages={"종전": [("발언", r"끝날|끝나|종전|평화|휴전"), ("협상 제안", r"협상 제안|대화 제안|중재|협상.{0,6}(요구|의향|제의)"),
+                                  ("날짜 잡힘", r"일정|회담.{0,8}(열린|예정|개최)|협상.{0,4}재개"), ("회담", r"회담|대면 협상|직접 협상|담판|협상단.{0,8}만나"),
+                                  ("합의 · 서명", r"합의(했|문)|서명했|서명식|타결|휴전 발효|휴전 성립"), ("이행", r"철수(했|완료|시작)|재개방(했|됐|돼)|포로 교환|봉쇄 해제(했|됐)")],
+                         "확전": [("위협", r"위협|경고|불필요|최후통첩|일촉즉발"), ("제재 · 봉쇄", r"제재|봉쇄|나포"),
+                                  ("공격", r"공격|타격|공습|미사일|폭발|격추|피격|기뢰|드론"), ("보복 · 확대", r"보복 (공격|공습|타격)|지상군 투입|전면전|확전(했|됐|돼)")]}),
     "TARIFF": dict(slug="issue-tariff", good="완화", bad="강화", watch="강화", file="mock_issue_watch-tariff.html",
                    side_pat=[("멀어짐", r"결렬|교착|무산|거부"),
                              ("종전", r"유예|연기|인하|철회|면제|예외|합의|타결|협상 진전|완화|낮춰|철폐|pause|delay|exempt|deal|truce"),
@@ -119,7 +127,9 @@ CFG = {
                    case_exp=None, case_re=None, case_name="관세 · 무역",
                    case_note="강화 소식과 유예 · 완화 소식(2025.04.09)이 섞여 있습니다. 기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다.",
                    bridge="가격이 크게 움직이거나(S&P 500 이 하루에 평소의 3배 넘게) 관세 발효 · 협상 시한처럼 날짜가 잡히면 증시 전망으로 넘어갑니다.",
-                   bridge_sym="XLY", chart=("^GSPC", "S&P 500")),
+                   bridge_sym="XLY", chart=("^GSPC", "S&P 500"),
+                   stages={"종전": [("발언", r"유예|인하|완화|면제|협상"), ("협상", r"협상|회담|담판"), ("유예 · 인하", r"유예|연기|인하|면제|철회"), ("합의 · 서명", r"합의|타결|서명")],
+                           "확전": [("위협 · 예고", r"위협|경고|예고|시사|검토"), ("발표", r"발표|행정명령|부과 방침|서명"), ("발효", r"발효|시행|부과"), ("보복 · 확대", r"보복|맞불|확대|추가 관세")]}),
     "EXPORT": dict(slug="issue-export", good="완화", bad="강화", watch="강화", file="mock_issue_watch-export.html",
                    side_pat=[("종전", r"허가|승인|완화|면제|해제|재개|허용|풀어|풀린|license|approv|lift"),
                              ("확전", r"통제 강화|제한|금지|규제|명단|추가|확대|차단|단속|막아|ban|restrict|curb|blacklist|entity list|tighten")],
@@ -130,7 +140,9 @@ CFG = {
                    case_exp={"반도체 (SOX)": -1, "엔비디아": -1}, case_re=r"수출|BIS|H20|규제 강화", case_name="반도체 수출 규제",
                    case_note="기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다.",
                    bridge="가격이 크게 움직이거나(반도체 지수가 S&P 500 보다 하루에 평소의 3배 · 2.5%p 넘게) 규제 발효일처럼 날짜가 잡히면 증시 전망으로 넘어갑니다.",
-                   bridge_sym="_SOX", chart=("^SOX", "미국 반도체 지수 (SOX)")),
+                   bridge_sym="_SOX", chart=("^SOX", "미국 반도체 지수 (SOX)"),
+                   stages={"종전": [("발언", r"완화|허가|승인"), ("허가 · 승인", r"허가|승인|허용|면제"), ("규제 해제", r"해제|철회|폐지")],
+                           "확전": [("검토 · 보도", r"검토|추진|보도|위협"), ("발표", r"발표|명단|거래 제한|규정"), ("시행", r"시행|발효|금지|차단"), ("확대", r"확대|추가 제한|동맹국|강화")]}),
 }
 C = {}   # 지금 그리는 이슈 설정 (use() 가 채운다)
 
@@ -145,10 +157,10 @@ def use(iss):
     SIDE_PAT, GROUPS, EXTRA_LINKS, CASE_COLS, CASE_EXP = C["side_pat"], C["groups"], C["extra"], C["case_cols"], C["case_exp"] or {}
     GAUGE_ZONES = [(-1.0, -0.5, f"{b} 뚜렷", TS.ZONES[0][3]), (-0.5, -0.15, b, TS.ZONES[1][3]), (-0.15, 0.15, "방향미정", TS.ZONES[2][3]),
                    (0.15, 0.5, g, TS.ZONES[3][3]), (0.5, 1.0, f"{g} 뚜렷", TS.ZONES[4][3])]
-    WEEK_DESC = {f"{g} 뚜렷": f"{g} 기사가 훨씬 많았습니다", g: f"{g} 기사가 조금 더 많았습니다", "방향미정": f"{g} · {b} 기사가 엇갈렸습니다",
-                 b: f"{b} 기사가 조금 더 많았습니다", f"{b} 뚜렷": f"{b} 기사가 훨씬 많았습니다"}
-    WEEK_PREV = {f"{g} 뚜렷": f"{g} 기사가 훨씬 많았습니다", g: f"{g} 기사가 더 많았습니다", "방향미정": "엇갈렸습니다",
-                 b: f"{b} 기사가 더 많았습니다", f"{b} 뚜렷": f"{b} 기사가 훨씬 많았습니다"}
+    WEEK_DESC = {f"{g} 뚜렷": f"{g} 소식이 훨씬 많았습니다", g: f"{g} 소식이 조금 더 많았습니다", "방향미정": f"{g} · {b} 소식이 엇갈렸습니다",
+                 b: f"{b} 소식이 조금 더 많았습니다", f"{b} 뚜렷": f"{b} 소식이 훨씬 많았습니다"}   # `기사` → `소식` = 사건 단위 (2026-11-13)
+    WEEK_PREV = {f"{g} 뚜렷": f"{g} 소식이 훨씬 많았습니다", g: f"{g} 소식이 더 많았습니다", "방향미정": "엇갈렸습니다",
+                 b: f"{b} 소식이 더 많았습니다", f"{b} 뚜렷": f"{b} 소식이 훨씬 많았습니다"}
     POP_HEAD = {"종전": (f"{g} 전망 정보", dk.UP), "확전": (f"{b} 전망 정보", dk.DOWN), "방향 미정": ("방향미정 정보", "#111")}
     good_c, good_l, bad_c, bad_l = TS.ZONES[4][3], TS.ZONES[3][3], TS.ZONES[0][3], TS.ZONES[1][3]
     w_good = C["watch"] == g
@@ -256,7 +268,7 @@ def history(px, chain_id, rows, n=10):
         n48, base, hot = news_level(rows, at)
         st, _ = state_of(n48, base, g)
         r48 = [r for r in rows if at - dt.timedelta(hours=48) < r["t"] <= at]
-        side = _zone_word(_net(r48)[0]) if r48 else "방향미정"
+        side = _zone_word(ev_net(events(r48))) if r48 else "방향미정"   # 그날 48시간 사건 방향 (기사 수 X)
         out.append({"day": d.strftime("%Y-%m-%d"), "state": st, "n48": n48, "hot": hot, "side": side,
                     "groups": {gname: w for gname, w, *_ in g}})
     return out
@@ -481,11 +493,18 @@ def list_card(rows, cur_id):
     return f'<span style="{dk.MULTI}">{"".join(parts)}</span>'
 
 
-def news_chart(counts):
+NOW_LABEL = [""]
+
+
+def news_chart(counts, now_label="", base_day=None):
+    """now_label = 마지막 날이 오늘(진행 중)이면 그 눈금 글자 `오늘 23시` — 문장의 48시간 건수와 그래프가 같은 날까지 (2026-11-13 사용자: 오늘 확전 61건이 그래프에 없어 숫자가 안 맞아 보였다)."""
     days = list(counts)
     labels = [H.md(d) if i in (0, len(days) // 2, len(days) - 1) else "" for i, d in enumerate(days)]
-    series = [(f"{C['good']} 기사", [counts[d]["종전"] for d in days], qc.PASTEL_UP, "solid"),
-              (f"{C['bad']} 기사", [counts[d]["확전"] for d in days], qc.PASTEL_DN, "solid")]   # 라벨과 같은 빨강 · 파랑 (2026-11-13 사용자)   # 방향 미정은 선에서 뺀다 — 회색 점선은 범례가 `비교 대상` 이 된다. 건수는 아래 한 줄에
+    if now_label:
+        labels[-1] = now_label
+    series = [("기사", [sum(counts[d].values()) for d in days], dk.CHART_MAIN, "solid")]   # 하루 기사 수 한 줄 = 관심의 크기 — 종전 · 확전 두 선은 옮긴 기사 수라 방향으로 읽히면 안 된다 (2026-11-13 사용자)
+    if base_day:
+        series.append(("평소", [round(base_day, 1)] * len(days), dk.CHART_CMP, "dash"))   # 비교 대상 = 평소 하루 (직전 4주 48시간 평균 ÷ 2)   # 라벨과 같은 빨강 · 파랑 (2026-11-13 사용자)   # 방향 미정은 선에서 뺀다 — 회색 점선은 범례가 `비교 대상` 이 된다. 건수는 아래 한 줄에
     return dk.trend_card(f"날마다 {C['name']} 기사 (건)", labels, series, lambda v: f"{v:.0f}" if float(v).is_integer() else "", ends_only=True)   # 건수 축에 0.5 없음
 
 
@@ -679,7 +698,10 @@ def event_of(cl):
             srcs.append(m["src"])
             if len(links) < EV_LINKS and m.get("url"):
                 links.append((m["src"], m["url"]))
-    return {"title": own["fact"] if own else _clean_title(rep["title"]), "n_src": len(srcs), "n": len(cl), "links": links,
+    import hashlib
+    first = min(cl, key=lambda m: m["t"])
+    return {"key": hashlib.sha1(re.sub(r"[\W_]+", "", first["title"]).encode()).hexdigest()[:12],   # AI 판정 캐시 열쇠 — 첫 보도 제목 (묶음이 커져도 안 바뀜)
+            "title": own["fact"] if own else _clean_title(rep["title"]), "n_src": len(srcs), "n": len(cl), "links": links,
             "first": min(m["t"] for m in cl), "last": max(m["t"] for m in cl),
             "side": _major(cl, "side", "방향 미정"), "talk": sum(m["stage"] != "일어난 일" for m in cl) * 2 >= len(cl), "own": own, "rep": rep}
 
@@ -723,12 +745,12 @@ def side_bars(today_rows, rows):
         return {k: sum(r["side"] == k for r in rs) for k in SIDE_BAR}
 
     def bar(label, c):
-        return dk.legend_bar(f"{label} {sum(c.values())}건", [(SIDE_LABEL[k], c[k], *SIDE_BAR[k]) for k in SIDE_BAR])
+        return dk.legend_bar(f"{label} 소식 {sum(c.values())}개", [(SIDE_LABEL[k], c[k], *SIDE_BAR[k]) for k in SIDE_BAR])   # 사건 개수 — 같은 소식을 옮긴 기사는 하나로 (2026-11-13 사용자)
     t, w = cnt(today_rows), cnt(rows)
     if not sum(w.values()):
         return ""
     n_today = sum(t.values())
-    title = f"오늘 {n_today}건"
+    title = f"오늘 소식 {n_today}개"
     plain = f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};margin:0 0 3px;color:#111;font-weight:700;">{dk.esc(title)}</span>'
     head = (f'<span style="display:flex;justify-content:space-between;align-items:center;height:{dk.FOLD_BOX}px;margin:0;">'
             f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;font-weight:700;">{dk.esc(title)}</span>'
@@ -754,9 +776,13 @@ POP_ART_GAP = 10
 POP_HEAD = {"종전": ("종전 전망 정보", dk.UP), "확전": ("확전 전망 정보", dk.DOWN), "방향 미정": ("방향미정 정보", "#111")}   # 팝업 소제목 = 라벨 대신 글자 (2026-11-13 사용자: `확전 전망 정보` 파랑 굵게 본문 글씨)
 
 
-def pop_head(side):
-    t, c = POP_HEAD[side]
-    return f'<span style="flex:none;font-size:{dk.BODY};line-height:{dk.POP_LH}px;font-weight:700;color:{c};">{t}</span>'
+SIDE_KIND3 = {"종전": "up", "확전": "down", "방향 미정": "flat"}   # 팝업 소제목 아이콘 · 색 = H.pop_group_head (증시 전망 팝업과 같은 부품)
+
+
+def ev_rank(e):
+    """사건 순서 = 실제로 일어난 일 먼저 → 단계 높은 것 → 최근. 옮긴 기사 수는 쓰지 않는다 (2026-11-13 사용자: 복사 수가 중요도로 읽히는 선입견)."""
+    st = stage_of(e)
+    return (e["talk"], -(st if st is not None else -1), -e["first"].timestamp())
 
 
 def _day_pop(pid, day, evs):
@@ -764,16 +790,13 @@ def _day_pop(pid, day, evs):
     두 곳 이상 보도한 사건 + 한 곳만이라도 one_pick 에 맞는 사건. 나머지 한 곳만 보도는 팝업에 싣지 않는다 (옛 `그 밖에 n건` 줄 삭제, 2026-11-13 사용자)."""
     lis = ""
     many = [e for e in evs if e["n"] >= 2 or one_pick(e)] or evs[:1]
-    many.sort(key=lambda e: (-e["n"], e["first"]))
-    groups = sorted({e["side"] for e in many}, key=lambda k: -sum(e["n"] for e in many if e["side"] == k))   # 쪽마다 라벨 하나 + 그 아래 블릿 (2026-11-13 사용자) — 기사 많은 쪽 먼저
-    for gi, side in enumerate(groups):
-        lis += (f'<span style="display:flex;align-items:center;gap:8px;margin:{H.POP_SUB_FIRST if gi == 0 else H.POP_SUB_GAP - 10}px 0 0;padding-left:{H.POP_LI_PAD}px;line-height:1;">'
-                f'{pop_head(side)}<span aria-hidden="true" style="flex:1;height:0;border-top:1px dashed {H.TL_LINE};"></span></span>')   # 소제목 오른쪽 가로 점선 · 세로 가운데 (2026-11-13 사용자) — 타임라인 점선과 같은 회색
+    many.sort(key=ev_rank)
+    groups = sorted({e["side"] for e in many}, key=lambda k: -sum(W_TALK if e["talk"] else W_ACT for e in many if e["side"] == k))   # 무게(실제 일 1 · 발언 0.5) 큰 묶음 먼저 — 옮긴 기사 수 X
+    for gi, side in enumerate(groups):   # 묶음 = 방향 소제목(아이콘 + `확전 전망 정보`) + 기사 줄, 묶음 사이 가로 점선 + 15 (2026-11-13 사용자 — 옛 소제목 오른쪽 점선)
+        lis += H.pop_group_head(POP_HEAD[side][0], SIDE_KIND3[side], first=gi == 0)
         for k, e in enumerate([e for e in many if e["side"] == side]):
-            li = H._pop_li(e["title"], f'기사 {e["n"]}건', talk=e["talk"])
-            if k:   # 기사와 기사 사이 +10 (2026-11-13 사용자) — 위 여백만 늘려 겹침(collapse) 뒤 사이가 +10, 소제목 바로 아래 첫 줄은 그대로
-                li = li.replace(f"margin:{dk.POP_ITEM_GAP}px 0;", f"margin:{dk.POP_ITEM_GAP + POP_ART_GAP}px 0 {dk.POP_ITEM_GAP}px;", 1)
-            lis += li
+            li = H._pop_li(e["title"], "", talk=e["talk"])   # `- 기사 n건` 꼬리 삭제 — 옮긴 곳이 많다고 중요한 일이 아니다 (2026-11-13 사용자)
+            lis += H.art_gap(li, k)   # 기사와 기사 사이 +10 (2026-11-13 사용자) — 증시 전망 팝업과 같은 부품
     title = f'{H.md(day)} {C["name"]} 뉴스'
     return f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(title)}" hidden>{lis}</div>'
 
@@ -815,7 +838,7 @@ def news_timeline(evs, days_desc):
     node = (f'<span style="display:inline-block;width:{H.TL_DOT}px;height:{H.TL_DOT}px;box-sizing:border-box;border:2px solid {H.TL_LINE};border-radius:50%;background:#fff;"></span>')
 
     def row(d, last):
-        es = sorted(by[d], key=lambda e: (-e["n"], e["first"]))
+        es = sorted(by[d], key=ev_rank)   # 그날 대표 = 실제 일 · 높은 단계 먼저 (옛: 가장 많이 옮겨진 기사)
         top = es[0]
         pid = dk.news_pop_id("iwday", d)
         lab = side_pill(top["side"]) + (dk.pill("논의중", "neutral", bare=True) if top["talk"] else "")
@@ -864,7 +887,132 @@ def news_timeline(evs, days_desc):
 # ───────────── 뉴스 바늘 (2026-11-13 사용자: 기술 지표 게이지처럼 바늘이 종전 · 확전 쪽으로) — 기사 방향을 센 것, 예측 아님
 GAUGE_ZONES = [(-1.0, -0.5, "확전 뚜렷", TS.ZONES[0][3]), (-0.5, -0.15, "확전", TS.ZONES[1][3]), (-0.15, 0.15, "방향미정", TS.ZONES[2][3]),
                (0.15, 0.5, "종전", TS.ZONES[3][3]), (0.5, 1.0, "종전 뚜렷", TS.ZONES[4][3])]   # 왼쪽 확전 파랑 · 오른쪽 종전 빨강 = 라벨 색 그대로
+GAUGE_TITLE_TOP = 6 + 15   # 카드 안 위 테두리 ~ `최근 일주일 뉴스는 어느 쪽?` 글자 +15 (2026-11-13 사용자 — 카드 바깥 여백이 아니라 안쪽)
 GAUGE_DAYS = 7   # 바늘 = 최근 7일 기사 — 48시간은 하루 건수에 바늘이 크게 흔들린다
+
+
+W_ACT, W_TALK = 1.0, 0.5   # 사건 무게 — 실제로 일어난 일 1 · 발언 · 논의 0.5. 같은 일을 몇 곳이 옮겼는지는 세지 않는다 (2026-11-13 사용자: 복사 기사 수는 방향이 아니다)
+
+
+def events(rows):
+    return [event_of(c) for c in cluster(rows)]
+
+
+def ev_net(evs):
+    """사건 방향 — (종전 무게 − 확전 무게) ÷ 전체 무게(방향미정 포함). 기사 수 대신 (옛 _net = 기사 수)."""
+    w = lambda e: W_TALK if e["talk"] else W_ACT   # noqa: E731
+    tot = sum(w(e) for e in evs)
+    a = sum(w(e) for e in evs if e["side"] == "종전")
+    b = sum(w(e) for e in evs if e["side"] == "확전")
+    return (a - b) / tot if tot else 0.0
+
+
+# ───────────── 하루 한 번 AI 판정 (2026-11-13 사용자: "매시간 말고 하루 한 번 묶어서 결론") — 사건마다 방향 · 실제로 일어났나 · 단계
+AI_ON = False        # issue_watch_daily --ai (07:30 본 실행만). 13:00 갱신 · 목업은 캐시만 읽는다
+AI_CACHE = os.path.join(OUT, "_stage_ai.json")   # 운영 = 상태 저장소 records/issues/stage_ai.json
+AI_BATCH, AI_MAX_CALLS, AI_TIME = 20, 5, 120   # 20사건 묶음 · 이슈마다 실행당 최대 5회 · 이슈마다 2분(세 이슈 최대 6분, Groq 는 호출 사이 60초 — 07:30 실행 60분 제한).
+# 하루 새 사건 약 45개 = 이란 2회 · 관세 · 수출 통제 각 1회. 첫날 밀린 것(약 585개)은 최신부터 며칠에 나눠 (2026-11-13 시험: 공통 10회를 이란이 다 써 관세 · 수출 통제 0회)
+AI_CHAIN = "json-backup-first"   # Groq(Qwen → gpt-oss) → DeepSeek → Gemini lite — 운영지침 3-2 순서, flash 로는 안 넘어감
+_AI = {"cache": None, "calls": 0, "model": Counter(), "t0": None}
+
+
+def _ai_cache():
+    if _AI["cache"] is None:
+        try:
+            _AI["cache"] = json.load(open(AI_CACHE, encoding="utf-8"))
+        except (OSError, ValueError):
+            _AI["cache"] = {}
+    return _AI["cache"]
+
+
+def _ai_prompt(evs):
+    g, b = C["good"], C["bad"]
+    lad = lambda side: " → ".join(f"{i}:{nm}" for i, (nm, _) in enumerate(C["stages"][side]))   # noqa: E731
+    lines = "\n".join(f"{i}. {e['title']}" + (f" / {e['rep']['title']}" if e["rep"]["title"] != e["title"] else "") for i, e in enumerate(evs))
+    return (f"이슈: {C['name']}. 아래 뉴스 사건(기사 제목)마다 판정하라.\n"
+            f"side: '{g}'(시장에 좋은 쪽) · '{b}'(나쁜 쪽) · '없음'(어느 쪽도 아니거나 해설 · 반응).\n"
+            "done: 제목이 말하는 일이 실제로 일어났으면 true. 발언 · 주장 · 논의 · 검토 · 전망 · 임박 · 부인 · 의문문 · 칼럼이면 false.\n"
+            f"stage: {g} 사다리 [{lad('종전')}], {b} 사다리 [{lad('확전')}] 에서 그 side 의 번호. done 이 false 면 0(말 단계) 또는 null, "
+            "실제로 일어난 일만 그 단계 번호. side 가 '없음'이면 null.\n"
+            '답은 JSON 하나: {"items": [{"i": 번호, "side": "...", "done": true, "stage": 2}, ...]} — 모든 번호를 빠짐없이.\n\n' + lines)
+
+
+def _ai_validate(n):
+    def v(val):
+        items = val.get("items") if isinstance(val, dict) else None
+        if not isinstance(items, list) or sorted(int(x.get("i", -1)) for x in items) != list(range(n)):
+            raise ValueError("items 번호가 빠지거나 남음")
+        for x in items:
+            if x.get("side") not in (C["good"], C["bad"], "없음"):
+                raise ValueError(f"side 값 {x.get('side')}")
+            st = x.get("stage")
+            if st is not None:
+                side = "종전" if x["side"] == C["good"] else "확전" if x["side"] == C["bad"] else None
+                if side is None or not (0 <= int(st) < len(C["stages"][side])):
+                    raise ValueError(f"stage 범위 {st}")
+        return val
+    return v
+
+
+def ai_judge(evs, today):
+    """최근 2주 사건 중 캐시에 없는 것만, 최신 먼저 AI 로 판정 → 캐시. AI_ON 이 아니면 캐시만 붙인다. 실패하면 그 묶음은 글자 패턴 그대로."""
+    cache = _ai_cache()
+    todo = [e for e in sorted(evs, key=lambda e: e["first"], reverse=True) if f'{C["iss"]["id"]}|{e["key"]}' not in cache]
+    if AI_ON and todo:
+        import llm_chain as LC
+        import time
+        pool = LC.LLMPool(AI_CHAIN, label=f"issue-{C['iss']['id']}")
+        t0 = time.time()   # 이슈마다 따로 — 한 이슈의 밀린 사건이 다른 이슈 몫을 다 쓰지 않게
+        mine = 0
+        for k in range(0, len(todo), AI_BATCH):
+            if mine >= AI_MAX_CALLS or time.time() - t0 > AI_TIME:
+                print(f"[issue-ai] {C['iss']['id']} 상한(이슈마다 {AI_MAX_CALLS}회 · {AI_TIME}초) — 남은 {len(todo) - k}건은 다음 날")
+                break
+            part = todo[k:k + AI_BATCH]
+            _AI["calls"] += 1
+            mine += 1
+            try:
+                val = pool.generate_json(_ai_prompt(part), validate=_ai_validate(len(part)), max_tokens=1200)
+            except Exception as e:  # noqa: BLE001 — 실패 묶음은 글자 패턴으로
+                print(f"[issue-ai] 실패: {str(e)[:160]}")
+                continue
+            _AI["model"][pool.last_model] += 1
+            for x in val["items"]:
+                e = part[int(x["i"])]
+                cache[f'{C["iss"]["id"]}|{e["key"]}'] = {"side": x["side"], "done": bool(x.get("done")), "stage": x.get("stage"),
+                                                       "day": e["first"].astimezone(KST).date().isoformat(), "model": pool.last_model}
+        old = (today - dt.timedelta(days=30)).isoformat()
+        for k2 in [k2 for k2, v in cache.items() if v.get("day", "") < old]:   # 30일 지난 판정은 지운다
+            del cache[k2]
+        os.makedirs(os.path.dirname(AI_CACHE), exist_ok=True)
+        json.dump(cache, open(AI_CACHE, "w", encoding="utf-8"), ensure_ascii=False)
+    inv = {C["good"]: "종전", C["bad"]: "확전", "없음": "방향 미정"}
+    n = 0
+    for e in evs:
+        a = cache.get(f'{C["iss"]["id"]}|{e["key"]}')
+        if a:
+            e["side"], e["talk"] = inv[a["side"]], not a["done"]
+            e["ai_stage"] = None if a["stage"] is None or e["side"] == "방향 미정" else int(a["stage"])
+            n += 1
+    return n
+
+
+def stage_of(ev):
+    """사건의 단계 번호(사다리 아래 0부터) — 방향미정 · 맞는 낱말 없음 = None. 발언 · 논의는 첫 단계로만 (말만으로 회담 · 합의 단계에 올리지 않는다)."""
+    if "ai_stage" in ev:   # 하루 한 번 AI 판정(ai_judge)이 있으면 그것 — 글자 패턴은 부인 · 임박 · `목소리` 를 못 가린다
+        return ev["ai_stage"]
+    if _AI["cache"]:   # AI 판정을 쓰는 중이면 판정 전 사건은 단계에 올리지 않는다 — 글자 패턴과 섞이면 `부인` 이 `회담` 으로 오른다 (최신부터 판정되므로 며칠이면 다 찬다)
+        return None
+    if ev["side"] not in ("종전", "확전"):
+        return None
+    txt = f'{ev["title"]} {ev["rep"]["title"]}'
+    best = None
+    for i, (_, pat) in enumerate(C["stages"][ev["side"]]):
+        if i and ev["talk"]:
+            break
+        if re.search(pat, txt):
+            best = i
+    return best
 
 
 def _net(rs):
@@ -891,20 +1039,20 @@ def week_line(w, pw):
     return f"이번 주는 {WEEK_DESC[w]}. 지난주는 {WEEK_PREV[pw]}."
 
 
-def gauge_card(rows, today):
-    """제목 아래 요약 — 최근 7일 이슈 기사 방향 바늘 + 답 + 건수 · 지난주. 흰 카드 = 기술 지표 `전체요약` 게이지와 같은 틀."""
+def gauge_card(evs, today):
+    """제목 아래 요약 — 최근 7일 사건 방향 바늘(실제 일 1 · 발언 0.5, 옮긴 기사 수 무시) + 답 + 지난주 한 줄. 흰 카드 = 기술 지표 `전체요약` 게이지와 같은 틀."""
     d7 = (today - dt.timedelta(days=GAUGE_DAYS - 1)).isoformat()
     d14 = (today - dt.timedelta(days=GAUGE_DAYS * 2 - 1)).isoformat()
-    day = lambda r: r["t"].astimezone(KST).date().isoformat()
-    now = [r for r in rows if day(r) >= d7]
-    prev = [r for r in rows if d14 <= day(r) < d7]
-    net, a, b, c = _net(now)
-    pnet = _net(prev)[0] if prev else None
+    day = lambda e: e["first"].astimezone(KST).date().isoformat()   # noqa: E731
+    now = [e for e in evs if day(e) >= d7]
+    prev = [e for e in evs if d14 <= day(e) < d7]
+    net = ev_net(now)
+    pnet = ev_net(prev) if prev else None
     w = _zone_word(net)
     col = dk.UP if net >= 0.15 else dk.DOWN if net <= -0.15 else "#111"
     line = week_line(w, _zone_word(pnet) if pnet is not None else None)
-    return (f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px 8px;text-align:center;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 8px;">'
-            f'<span style="display:block;font-weight:700;color:#111;margin:6px 0 4px;font-size:16px;line-height:24px;">최근 일주일 뉴스는 어느 쪽?</span>'
+    return (f'<span style="{dk.MULTI}margin:0 0 8px;text-align:center;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 8px;">'
+            f'<span style="display:block;font-weight:700;color:#111;margin:{GAUGE_TITLE_TOP}px 0 4px;font-size:16px;line-height:24px;">최근 일주일 뉴스는 어느 쪽?</span>'
             f'{TS.gauge_svg(net, "big", zones=GAUGE_ZONES)}'
             f'<span style="display:block;font-weight:700;color:{col};font-size:19px;line-height:25px;margin-bottom:4px;">{dk.esc(w)}</span>'
             f'<span style="display:block;margin-bottom:4px;padding:0 4px;font-size:14px;line-height:20px;color:{dk.SUB};word-break:keep-all;">{dk.esc(line)}</span>'
@@ -934,18 +1082,15 @@ def q_news(iran, counts, days, r48):
     ratio = n48 / base if base else None
     th, ink = _theme(iran["hot"])
     ans = f"평소의 {ratio:.1f}배" if ratio else f"{n48}건"
-    a, b = sum(r["side"] == "종전" for r in r48), sum(r["side"] == "확전" for r in r48)
     nm = C["name"]
-    first = ((f"최근 48시간 {nm} 기사는 {n48}건으로 평소({base:.0f}건)의 {ratio:.1f}배입니다. " if ratio else f"최근 48시간 {nm} 기사는 {n48}건입니다. ")
-             + f"{C['good']} {a}건 · {C['bad']} {b}건 · 방향미정 {n48 - a - b}건입니다.")
+    first = (f"최근 48시간 {nm} 기사는 {n48}건으로 평소({base:.0f}건)의 {ratio:.1f}배입니다." if ratio else f"최근 48시간 {nm} 기사는 {n48}건입니다.")   # 방향 건수 삭제 — 화제성만 (2026-11-13 사용자)
     r2w = [x for x in iran["rows"] if x["t"].astimezone(KST).date().isoformat() >= days[0]]
     t, w = sum(x["side"] == "종전" for x in r2w), sum(x["side"] == "확전" for x in r2w)
     cap = sorted(c for c in iran["capped"] if c in days)
-    note = f"최근 2주는 {_zone_word(_net(r2w)[0])}입니다."   # 건수 · 100건 상한 안내 삭제 (2026-11-13 사용자: 세세한 것까지 안 알려도 된다) — 상한은 운영자 상자에
-    tip = (C["tip"] + "\n"
-           "출처 : 알파스코프 뉴스 모음(CNBC) + 구글 뉴스 한국어 검색, 방송은 아직 안 셈\n평소 = 직전 4주 동안 48시간마다 나온 기사 수의 평균")
-    lines = [(first, "plain"), (news_chart(counts), "html"), (note, "note")]
-    return qc.question_card("얼마나 화제인가?", ans, th, ink, lines, tip=tip, opened=True), r2w   # 첫 카드만 펼침 (데일리 P216 과 같게)
+    note = "같은 소식을 여러 곳이 옮긴 기사도 모두 센 숫자라, 관심의 크기만 보여 줍니다."   # 방향은 바늘 · `어디까지 왔나?` 가 사건 단위로 (2026-11-13 사용자: 복사 기사 수 ≠ 중요도)
+    tip = ("출처 : 알파스코프 뉴스 모음(CNBC) + 구글 뉴스 한국어 검색, 방송은 아직 안 셈\n평소 = 직전 4주 동안 48시간마다 나온 기사 수의 평균")
+    lines = [(first, "plain"), (news_chart(counts, NOW_LABEL[0], base / 2 if base else None), "html"), (note, "note")]
+    return qc.question_card("얼마나 화제인가?", ans, th, ink, lines, tip=tip), r2w   # 펼침은 `어디까지 왔나?` 로 옮김
 
 
 def q_market(links, groups, oil_gr, oil_line):
@@ -1046,7 +1191,7 @@ def q_now(st, kind, iran, groups, sides48, asof):
     """`지금은` = 다른 질문 카드와 같은 접는 강조 카드, 줄 = 왼쪽 구분 · 오른쪽 값 (2026-11-13 사용자: 강조 카드처럼 좌 구분명 · 우 값, 접는 방향)."""
     th, ink = ("uncertain", VIOLET) if kind in ("uncertain", "area") else ("neutral", "#111")
     n48, base = iran["n48"], iran["base48"]
-    lines = [("row", "뉴스", f"48시간 {n48}건", (f"{C['good']} {sides48[0]} · {C['bad']} {sides48[1]}" if n48 else "") + (f" · 평소 {base:.0f}건" if base is not None else ""))]
+    lines = [("row", "뉴스", f"48시간 {n48}건", f"평소 {base:.0f}건" if base is not None else "")]
     for g, w, ok, n, rs in groups:
         rev = sum(r["sg"] * r["z"] <= -Z_SOME for r in rs)
         lines.append(("row", g, w, f"{n}개 중 {rev}개 반대 방향" if "반대" in w else f"{n}개 중 {ok}개 {W()} 방향"))
@@ -1056,6 +1201,42 @@ def q_now(st, kind, iran, groups, sides48, asof):
            f"시장 = {W()}되면 움직인다고 흔히 설명하는 지표를 묶음별로 — 묶음 안 2개 이상이 그 방향으로 평소보다 크게(하나는 2배 넘게) 움직이면 `움직이는 중`.\n"
            "예측이 아니라 지금까지 일어난 일입니다.")
     return qc.question_card("지금은", short(st), th, ink, lines, tip=tip)
+
+
+def q_stage(evs):
+    """사건은 어디까지 왔나? — 최근 2주 사건을 단계 사다리(종전 쪽 · 확전 쪽)에 놓고, 단계마다 가장 최근 일 하나.
+    같은 일을 몇 곳이 옮겼는지 무관 · 발언 · 논의는 첫 단계로만 (2026-11-13 사용자: 복사 수보다 사건의 논리 · 연속 반응)."""
+    g, b = C["good"], C["bad"]
+    reach, lines, latest = {}, [], None
+    for side, lab in (("종전", g), ("확전", b)):
+        ladder = C["stages"][side]
+        hit = {}
+        for e in evs:
+            st = stage_of(e) if e["side"] == side else None
+            if st is None:
+                continue
+            if st not in hit or e["first"] > hit[st]["first"]:
+                hit[st] = e
+            if latest is None or (e["first"], st) > (latest[0]["first"], latest[1]):
+                latest = (e, st, side)
+        reach[side] = max(hit) if hit else None
+        ink = dk.UP if side == "종전" else dk.DOWN
+        lines.append(("row", _sp(f'<b style="color:{ink};">{dk.esc(lab)}</b>'), "", "", *(("gap",) if side == "확전" else ())))
+        for i, (nm, _) in enumerate(ladder):
+            e = hit.get(i)
+            val = _sp(f'<span style="color:{ink if e else dk.SUB};font-weight:{700 if e else 400};">{H.md(e["first"].astimezone(KST).date().isoformat()) if e else "없음"}</span>')
+            lines.append(("row", _sp(f'<span style="color:{"#111" if e else dk.SUB};">{i + 1}. {dk.esc(nm)}</span>'), val, e["title"] if e else "", "tight"))
+    word = lambda side: f"‘{C['stages'][side][reach[side]][0]}’ 단계까지" if reach[side] is not None else "아직 단계에 오른 일이 없이"   # noqa: E731
+    first = f"최근 2주 동안 {josa(g, ('은', '는'))} {word('종전')}, {josa(b, ('은', '는'))} {word('확전')} 일이 있었습니다."
+    if latest:
+        e, st, side = latest
+        first += f" 가장 최근은 {H.md(e['first'].astimezone(KST).date().isoformat())} {SIDE_LABEL[side]} ‘{C['stages'][side][st][0]}’ 입니다."
+    w = W()
+    wk = "종전" if C["watch"] == g else "확전"
+    ans = f"{w} · {C['stages'][wk][reach[wk]][0]}" if reach[wk] is not None else "아직 없음"
+    lines = [(first, "plain")] + lines + [("같은 일을 여러 곳이 보도해도 한 번만 셉니다. 발언 · 논의는 첫 단계로만 셉니다.", "note")]
+    tip = "단계 = 그 일이 실제로 어디까지 갔는지.\n날짜 = 그 단계의 가장 최근 일.\n기사 제목의 낱말로 나눈 것이라 틀릴 수 있습니다."
+    return qc.question_card("사건은 어디까지 왔나?", ans, "neutral", "#111", lines, tip=tip, opened=True)
 
 
 def q_related(today_rows, r2w):
@@ -1137,7 +1318,7 @@ def build():
         pages[C["slug"] if PUBLIC else C["file"]] = page(cur, watch, items, px, now, today, days, sums, logs)
         logs[cur["id"]] = {"day": today.isoformat(), "made": now.isoformat(), "rules": RULES, "state": cur["state"], "n48": cur["n48"],
                            "base48": cur["base48"], "hot": cur["hot"], "groups": {g: w for g, w, *_ in cur["groups"]},
-                           "gauge": _zone_word(_net([r for r in cur["rows"] if r["t"].astimezone(KST).date() >= today - dt.timedelta(days=GAUGE_DAYS - 1)])[0]),
+                           "gauge": _zone_word(ev_net(events([r for r in cur["rows"] if r["t"].astimezone(KST).date() >= today - dt.timedelta(days=GAUGE_DAYS - 1)]))),
                            "history": logs.get(cur["id"])}
     if not PUBLIC:
         json.dump({"rules": RULES, "made": now.isoformat(), "issues": logs}, open(os.path.join(OUT, "issue_state_log.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
@@ -1149,26 +1330,27 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
     links, groups, st, kind = cur["links"], cur["groups"], cur["state"], cur["kind"]
     hist = history(px, cur["chain"], cur["rows"])
     logs[cur["id"]] = hist
-    counts = daily_counts(cur["rows"], days[:-1])   # 오늘은 하루가 덜 지나 뚝 떨어져 보인다 — 다 지난 날만
+    counts = daily_counts(cur["rows"], days)   # 오늘(진행 중)까지 — 옛 `다 지난 날만` 은 오늘 급증이 문장에만 있고 그래프엔 없었다 (2026-11-13 사용자)
+    NOW_LABEL[0] = f"오늘 {now.astimezone(KST):%H}시"
     chart_gr, chart_line = oil_chart(px) if C["chart"] is None else year_chart(px, *C["chart"])
     cs = cases(px, cur["cases"])
 
-    lead = ('<p style="margin:0 0 12px;padding:0 6px;font-size:16px;line-height:26px;color:#333;word-break:keep-all;">'
-            '궁금한 이슈의 뉴스 · 시장 움직임을 매일 사실로 적습니다.</p>')   # 말 줄임 · `지켜보는 이슈` 제목 삭제 (2026-11-13 사용자)
-    top = f'<div style="margin:16px 0 0;">{lead}{list_card(watch, cur["id"])}</div>'
+    top = ""   # 맨 위 안내 문장 · 이슈 목록 삭제 — 이슈마다 따로 페이지, 제목이 바로 머리 줄 아래 (2026-11-13 사용자, 증시 전망 질문 줄과 같은 자리)
 
     q = title_h2(cur)
     r48 = [r for r in cur["rows"] if now - r["t"] <= dt.timedelta(hours=48)]
     asof = f'시장 {H.md(links[0]["d1"].strftime("%Y-%m-%d"))} 종가 · 뉴스 {H.md(today.isoformat())} {now.astimezone(KST):%H}시까지'
-    gauge = gauge_card(cur["rows"], today)
+    r14 = [r for r in cur["rows"] if r["t"].astimezone(KST).date().isoformat() >= days[0]]
+    evs = sorted(events(r14), key=lambda e: e["first"], reverse=True)   # 최근 2주 사건 — 바늘 · 어디까지 왔나 · 막대 · 타임라인이 같이 쓴다
+    n_ai = ai_judge(evs, today)   # AI 판정(하루 한 번)이 붙은 사건 수 — 없는 사건은 글자 패턴
+    gauge = gauge_card(evs, today)
     head = q_now(st, kind, cur, groups, (sum(r["side"] == "종전" for r in r48), sum(r["side"] == "확전" for r in r48)), asof)
 
     c_news, r2w = q_news(cur, counts, days, r48)
-    today_rows = [r for r in r2w if r["t"].astimezone(KST).date() == today]
-    qcards = f'<div style="margin:0 0 8px;">{head + c_news + q_market(links, groups, chart_gr, chart_line) + q_history(hist)}</div>'
+    today_evs = [e for e in evs if e["first"].astimezone(KST).date() == today]
+    qcards = f'<div style="margin:0 0 8px;">{head + q_stage(evs) + c_news + q_market(links, groups, chart_gr, chart_line) + q_history(hist)}</div>'
 
-    evs = sorted((event_of(cl) for cl in cluster(r2w)), key=lambda e: e["first"], reverse=True)
-    sec_list = (dk.section("관련 뉴스", side_bars(today_rows, r2w), line=False)
+    sec_list = (dk.section("관련 뉴스", side_bars(today_evs, evs), line=False)
                 + f'<div style="margin:0 0 24px;padding:0 0 {TL_BOTTOM}px;">{news_timeline(evs, days[::-1])}</div>')   # 아래 +5 = padding — margin 은 아래 접는 줄 묶음 위 28 과 겹쳐(collapse) 늘지 않았다 (2026-11-13 사용자)
 
     op_rows = [
@@ -1176,6 +1358,7 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
         ("지난 2주", "목업 = 오늘 가진 가격 · 뉴스로 거슬러 셈. 운영 = 날마다 그날 값을 기록(issue_state_log.json → 상태 브랜치)"),
         ("방향 · 단계", f"목업 = 글 패턴(CFG[{cur['id']}].side_pat · TALK). 운영 땐 공용 뉴스 처리 Groq 칸으로 옮길지 결정"),
         ("시장 지표", f"사슬 {cur['chain']} 고리 = {W()} 쪽 부호 · " + " / ".join(f"{g}: {', '.join(k)}" for g, k in GROUPS) + (f" · 뺀 고리 {', '.join(C['skip'])}" if C["skip"] else "")),
+        ("AI 판정", f"사건 {len(evs)}개 중 {n_ai}개 (사슬 {AI_CHAIN}, 묶음 {AI_BATCH} · 실행당 {AI_MAX_CALLS}회, 이번 실행 호출 {_AI['calls']}회 {dict(_AI['model'])}). 나머지 = 글자 패턴"),
         ("묶기", f"기사 {len(r2w)}건 → 사건 {len(evs)}개 (제목 글자 둘씩 겹침 {EV_SIM} · {EV_HOURS}시간 안, 사건 날짜 = 첫 보도 날). AI 0"),
         ("팝업 한 곳만", "한 곳만 보도한 사건은 one_pick(따옴표 발언 아닌 사건 낱말 ONE_HARD, 또는 통신사 ONE_WIRE)만 올림. 나머지는 팝업에 없음"),
         ("상태 규칙", f"뉴스 늘어남 = 48시간 ≥ 3 · 평소 2배 / 시장 = 묶음 안 2개 이상(지표 하나뿐인 묶음은 1개) {W()} 방향 1σ, 하나는 2σ"),
@@ -1193,10 +1376,17 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
     op = "" if PUBLIC else H.operator_box(op_rows)
     body = (top + q + gauge + qcards + sec_list + op + bottom(cur["chain"], cs) + (H.RELATED if PUBLIC else ""))
     body = body.replace('data-cards="1" ', "")   # data-cards 는 테마(엔비디아 탭) JS 가 글 머리로 옮긴다 — 이 페이지 카드는 제자리에
-    return dk.fix_colons(f'<div data-head-title="이슈 모니터링" data-seo-lead="{dk.esc("이슈 모니터링 — " + cur["q"] + " 지금 " + st)}">{body}</div>')
+    return dk.fix_colons(f'<div data-head-title="{HEAD_TITLE}" data-seo-lead="{dk.esc(HEAD_TITLE + " — " + cur["q"] + " 지금 " + st)}">{body}</div>')
 
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
+    AI_ON = os.environ.get("IW_AI") == "1"   # 목업에서 AI 판정까지 돌려 보기: IW_AI=1 (키 = .env)
+    if AI_ON:
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(os.path.join(_HERE, "..", "..", ".env"))
+        except ImportError:
+            pass
     for fn, body in build().items():
-        print(dk.write_mock(body, os.path.join(OUT, fn), "이슈 모니터링"))
+        print(dk.write_mock(body, os.path.join(OUT, fn), HEAD_TITLE))

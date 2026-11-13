@@ -778,8 +778,45 @@ def _art_li(r, talk=None, label=""):
             + dk.news_pop_body(pid, r["t"], r["lines"], source=r.get("src") or "", kind="기사", url=r.get("url")))
 
 
-def _pop_sub(title):
+def _pop_sub(title, sep=False):
+    """팝업 소제목. sep = 앞 묶음이 있다 — 묶음 사이 가로 점선 + 15 아래에 소제목 (2026-11-13 사용자, 모든 팝업 같은 규칙)."""
+    if sep:
+        return POP_SEP + f'<span style="display:block;margin:0;font-size:15px;line-height:22px;font-weight:700;color:#111;">{title}</span>'
     return f'<span style="display:block;margin:{POP_SUB_GAP}px 0 0;font-size:15px;line-height:22px;font-weight:700;color:#111;">{title}</span>'   # 위 16 → 26 (P502)
+
+
+# ── 팝업 묶음 = 방향 소제목(아이콘 + `○○ 전망 정보`) + 줄들, 묶음 사이 가로 점선 (2026-11-13 사용자: 이슈 모니터링 팝업과 증시 전망 팝업 같은 방식)
+POP_SEP_GAP, POP_SEP_BELOW = 15, 30   # 앞 줄 ~ 점선 15 (줄 아래 여백 11 과 겹쳐 15) · 점선 ~ 다음 소제목 30 (2026-11-13 사용자: 15 → +15)
+POP_ART_GAP = 10   # 같은 묶음 기사 줄 사이 +10 (2026-11-13 사용자: 이슈 모니터링 팝업과 같게) — 첫 줄 위는 그대로
+POP_SEP = f'<span aria-hidden="true" style="display:block;margin:{POP_SEP_GAP}px 0 {POP_SEP_BELOW}px;height:0;border-top:1px dashed {"#CBD5E1"};"></span>'   # 타임라인 점선과 같은 회색(TL_LINE) · 폭 = 팝업 제목 아래 구분선과 같게(줄이지 않음)
+# 소제목 아이콘 = 기본형(회색 면 원 + 선 그림 22, dk.soft_icon)을 방향 색으로. 그림은 주제가 아니라 방향 — 어떤 이슈 · 전망이든 같은 셋 (2026-11-13 사용자)
+POP_ICON = {"up": ("trend", "#FDE8E8", "#B91C1C"), "down": ("trend_down", "#DCE9FC", "#1D4ED8"), "flat": ("range", dk.SOFT_ICON_BG, dk.SOFT_ICON_INK)}   # 바탕 · 그림 = 기술 지표 라벨 상자(상승 · 하락) 색
+POP_HEAD_INK = {"up": dk.UP, "down": dk.DOWN, "flat": "#111"}
+GLYPH = dict(dk.ICON_GLYPHS, trend_down='<path d="M2 4.5l4 4 3-3 5 6"/><path d="M10.5 11.5H14V8"/>')   # `trend` 를 위아래로 뒤집은 것
+
+
+def art_gap(li, k):
+    """k 번째(0부터) 기사 줄 — 둘째 줄부터 위 여백만 +POP_ART_GAP (아래는 그대로라 겹친 뒤 사이가 +10)."""
+    return li if not k else li.replace(f"margin:{dk.POP_ITEM_GAP}px 0;", f"margin:{dk.POP_ITEM_GAP + POP_ART_GAP}px 0 {dk.POP_ITEM_GAP}px;", 1)
+
+
+def pop_icon(kind, size=dk.SOFT_ICON_SIZE):
+    name, bg, ink = POP_ICON[kind]
+    g = round(size * 0.55)
+    return (f'<span aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:{size}px;height:{size}px;border-radius:50%;background:{bg};color:{ink};">'
+            f'<svg viewBox="0 0 16 16" width="{g}" height="{g}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">{GLYPH[name]}</svg></span>')
+
+
+def pop_group_head(text, kind, first):
+    """방향 소제목 — 본문 글씨(19 굵게) · 방향 색 · 앞 아이콘(글자와 6). 아이콘 왼쪽 끝 = 점선 · 팝업 제목 아래 구분선 왼쪽 끝(들여쓰기 0, 2026-11-13 사용자: 세로 기준선). first = 팝업 맨 위(제목 바로 아래 POP_SUB_FIRST), 아니면 점선 + 15."""
+    head = (f'<span style="display:flex;align-items:center;gap:6px;margin:{POP_SUB_FIRST if first else 0}px 0 0;padding-left:0;'
+            f'font-size:{dk.BODY};line-height:{dk.POP_LH}px;font-weight:700;color:{POP_HEAD_INK[kind]};">{pop_icon(kind)}{dk.esc(text)}</span>')
+    return head if first else POP_SEP + head
+
+
+def side_info_title(word):
+    """`반등` → `반등 전망 정보` · `전망A` → `A 전망 정보` (2026-11-13 사용자)."""
+    return f"{word[2:]} 전망 정보" if word.startswith("전망") and len(word) > 2 else f"{word} 전망 정보"
 
 
 def _why_pop(pid, title, rows, total, sigs=(), as_of=None, page=None):
@@ -787,14 +824,14 @@ def _why_pop(pid, title, rows, total, sigs=(), as_of=None, page=None):
     out = ""
     if rows:
         out += _pop_sub(f"{NEWS_ICON}뉴스 기사") if sigs else ""   # 옛 `기사` (P501)
-        for r in rows:
-            out += _art_li(r)
+        for k, r in enumerate(rows):
+            out += art_gap(_art_li(r), k)
         if total > len(rows):
             out += f'<span style="display:block;margin:8px 0 0;font-size:14px;line-height:20px;color:{dk.SUB};">외 {total - len(rows)}건</span>'
     for hz, span in WHY_HZ:
         xs = [r for r in sigs if r["hz"] == hz]
         if xs:
-            out += _pop_sub(f'{CAL_ICON}{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>') + "".join(_pop_li(_sig_html(r["name"], r["state"]), html=True) for r in xs)
+            out += _pop_sub(f'{CAL_ICON}{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>', sep=bool(out)) + "".join(_pop_li(_sig_html(r["name"], r["state"]), html=True) for r in xs)
     if sigs and as_of:   # 기준 날짜 — 종목 페이지가 있으면 링크 `10.30 종목 페이지 ›` (2026-11-11 사용자: `우리 신호 = … 값` 은 독자가 모른다)
         st = f'display:inline-flex;align-items:center;gap:2px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};'
         out += (f'<a href="{dk.esc(page)}" style="{dk.FOLD_BTN}display:inline-flex;margin:16px 0 0;text-decoration:none;font-weight:400;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page   # 인물 발언 팝업 `○○ 발언 더 보기` 와 같은 외곽선 버튼 (P503)
@@ -1696,16 +1733,15 @@ def day_why_html(x, fc):
     pid = dk.news_pop_id("whyday", f'{fc.get("slug")}-{x["day"]}')
     pop = ""
     for d, rs in groups:
-        if rs:
-            lab = _side_pill(names[d][1], kinds.get(d, "flat")).replace(f"margin-right:{dk.PILL_GAP}px;", "", 1)
-            ghost = f'<span aria-hidden="true" style="visibility:hidden;display:inline-flex;">{lab}</span>'
-            pop += "".join(_art_li(r, label=lab if i == 0 else ghost) for i, r in enumerate(rs))   # 라벨은 갈래마다 첫 줄에만, 둘째 줄부터 빈 라벨 칸 + 점 (P520, 2026-11-11 사용자)
+        if rs:   # 갈래마다 방향 소제목(`반등 전망 정보` · `A 전망 정보`, 아이콘 + 방향 색) + 줄들, 갈래 사이 점선 (2026-11-13 사용자 — 옛 P520 줄 앞 라벨)
+            pop += pop_group_head(side_info_title(names[d][1]), kinds.get(d, "flat"), first=not pop)
+            pop += "".join(art_gap(_art_li(r), k) for k, r in enumerate(rs))
     if w.get("open"):
         pop += "".join(_art_li(r, talk=False, label=open_pill()) for r in w["open"])
     for hz, span in WHY_HZ:
         cs = [c for c in w.get("changes") or [] if c["hz"] == hz]
         if cs:
-            pop += _pop_sub(f'{CAL_ICON}{SIG_NAME} {hz} <span style="font-weight:400;color:{dk.SUB};">· 바뀐 것</span>')
+            pop += _pop_sub(f'{CAL_ICON}{SIG_NAME} {hz} <span style="font-weight:400;color:{dk.SUB};">· 바뀐 것</span>', sep=bool(pop))
             pop += "".join(_pop_li(_sig_html(c["name"], f'{c["from"]} → {c["to"]}' if c.get("from") else c["to"]), html=True) for c in cs)
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(md(x["day"]) + " " + WHY_WORD)}" hidden>{_pop_first(pop)}</div>'
     if pick:
