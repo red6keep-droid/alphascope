@@ -8,7 +8,7 @@
   window.__asCandle = 1;
   var VIO = '#6D28D9', UP = '#d93025', DN = '#1a73e8', UPL = '#F5B5AF', DNL = '#A9C9F5', GRID = '#ECF0F5', NOTE = '#6B7280', INK = '#111';
   var MA_COL = { 5: '#9CA3AF', 20: '#5FBFAF', 60: '#BFA2E8', 120: '#F5B971', 200: '#E879A6' };
-  var VIEW = { D: 60, W: 52, M: 36 }, MIN_N = 15, MAX_N = 400, AXIS_W = 58;
+  var VIEW = { D: 60, W: 52, M: 36 }, MIN_N = 15, MIN_SLOT = 7, AXIS_W = 66, FS = 13;   // MIN_SLOT = 봉 한 칸 최소 폭 — 축소해도 막대가 선처럼 가늘어지지 않게(몸통 5) (2026-11-14 사용자) · 눈금 · 종가 글자 13 (스크린샷 크기)
 
   function agg(d, u) {
     if (u === 'D') return d;
@@ -69,7 +69,7 @@
     this.on = { ma: { 20: true, 60: true }, boll: false, lower: 'none' };   // 페이지 안 = 아래 칸 없음(가격 칸을 크게, 2026-11-13 사용자) · 전체 화면 = 거래량부터
     root.innerHTML = '';
     this.top = el('div', 'display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;');
-    this.val = el('span', 'font-size:15px;line-height:22px;white-space:nowrap;font-variant-numeric:tabular-nums;');   // 종가 + 증감만 (누른 날이면 그날)
+    this.val = el('span', 'font-size:13px;line-height:19px;white-space:nowrap;font-variant-numeric:tabular-nums;');   // 종가 + 증감만 (누른 날이면 그날)
     this.cv = el('canvas', 'display:block;width:100%;touch-action:pan-y;cursor:crosshair;');
     root.appendChild(this.top); root.appendChild(this.cv);
     this.build();
@@ -84,7 +84,7 @@
     var c = this.bars.map(function (b) { return b[4]; });
     this.ma = {}; [5, 20, 60, 120, 200].forEach(function (n) { self.ma[n] = sma(c, n); });
     this.bb = boll(c, 20, 2); this.mc = macd(c); this.rs = rsi(c, 14);
-    this.n = Math.min(VIEW[this.unit], this.bars.length); this.end = this.bars.length; this.hover = null;
+    this.n = Math.min(VIEW[this.unit], this.bars.length); this.end = this.bars.length; this.cross = null;
     this.topBar();
   };
   Chart.prototype.topBar = function () {
@@ -132,41 +132,55 @@
     }
     this.topBar(); this.draw();
   };
+  Chart.prototype.maxN = function () { return Math.max(MIN_N, Math.floor((this.root.clientWidth - AXIS_W) / MIN_SLOT)); };
   Chart.prototype.bind = function () {
-    var self = this, cv = this.cv, pts = {}, start = null, moved = false;
-    function idx(x) { var r = cv.getBoundingClientRect(), pw = r.width - AXIS_W; return Math.max(0, Math.min(self.n - 1, Math.floor((x - r.left) / (pw / self.n)))) + self.end - self.n; }
+    // 옆으로 밀기 = 넘겨보기 · 두 손가락 = 확대 · 축소 · 짧게 누르기 = 그날 십자선(다시 누르면 끔) · 꾹 누르고 움직이기 = 십자선이 따라감 (2026-11-14 사용자 스크린샷)
+    var self = this, cv = this.cv, pts = {}, start = null, moved = false, timer = null, crossMode = false;
+    function at(e) {
+      var r = cv.getBoundingClientRect(), pw = r.width - AXIS_W;
+      return { i: Math.max(0, Math.min(self.n - 1, Math.floor((e.clientX - r.left) / (pw / self.n)))) + self.end - self.n, y: e.clientY - r.top };
+    }
     cv.addEventListener('pointerdown', function (e) {
       pts[e.pointerId] = e.clientX; cv.setPointerCapture(e.pointerId); moved = false;
       var ids = Object.keys(pts);
-      start = ids.length === 2 ? { pinch: Math.abs(pts[ids[0]] - pts[ids[1]]), n: self.n, end: self.end } : { x: e.clientX, end: self.end };
+      clearTimeout(timer);
+      if (ids.length === 2) { start = { pinch: Math.abs(pts[ids[0]] - pts[ids[1]]), n: self.n, end: self.end }; crossMode = false; self.cross = null; return; }
+      start = { x: e.clientX, end: self.end };
+      if (e.pointerType !== 'mouse') timer = setTimeout(function () { if (!moved) { crossMode = true; self.cross = at(e); self.draw(); } }, 280);
     });
     cv.addEventListener('pointermove', function (e) {
-      if (!(e.pointerId in pts)) { if (e.pointerType === 'mouse') { self.hover = idx(e.clientX); self.draw(); } return; }
+      if (!(e.pointerId in pts)) { if (e.pointerType === 'mouse') { self.cross = at(e); self.draw(); } return; }
       pts[e.pointerId] = e.clientX;
+      if (crossMode) { self.cross = at(e); self.draw(); return; }
       var ids = Object.keys(pts), slot = (cv.getBoundingClientRect().width - AXIS_W) / self.n;
       if (ids.length === 2 && start.pinch) {   // 두 손가락 = 확대 · 축소 (오른쪽 끝 기준)
         var d = Math.abs(pts[ids[0]] - pts[ids[1]]) || 1;
-        self.n = Math.max(MIN_N, Math.min(MAX_N, self.bars.length, Math.round(start.n * start.pinch / d))); moved = true;
+        self.n = Math.max(MIN_N, Math.min(self.maxN(), self.bars.length, Math.round(start.n * start.pinch / d))); self.end = Math.max(self.end, self.n); moved = true;
       } else if (start && start.x !== undefined) {   // 옆으로 밀기 = 넘겨보기
         var dx = e.clientX - start.x;
-        if (Math.abs(dx) > 4) moved = true;
+        if (Math.abs(dx) > 4) { moved = true; clearTimeout(timer); }
         self.end = Math.max(self.n, Math.min(self.bars.length, start.end - Math.round(dx / slot)));
       }
-      self.hover = null; self.draw();
+      if (moved) self.cross = null;
+      self.draw();
     });
+    cv.addEventListener('touchmove', function (e) { if (crossMode) e.preventDefault(); }, { passive: false });   // 십자선을 움직일 땐 페이지가 따라 내려가지 않게
     function up(e) {
-      if (!moved && e.type === 'pointerup') { var i = idx(e.clientX); self.hover = self.hover === i ? null : i; }
+      clearTimeout(timer);
+      if (!moved && !crossMode && e.type === 'pointerup' && e.pointerType !== 'mouse') { var a = at(e); self.cross = self.cross && self.cross.i === a.i ? null : a; }
+      crossMode = false;
       delete pts[e.pointerId]; start = Object.keys(pts).length ? { x: pts[Object.keys(pts)[0]], end: self.end } : null; self.draw();
     }
     cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
-    cv.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && !(e.pointerId in pts)) { self.hover = null; self.draw(); } });
+    cv.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && !(e.pointerId in pts)) { self.cross = null; self.draw(); } });
     cv.addEventListener('wheel', function (e) {   // PC 휠 = 확대 · 축소 — 페이지 안에서는 Ctrl 을 누를 때만(페이지 내리기를 막지 않게)
       if (!self.full && !e.ctrlKey) return;
-      e.preventDefault(); self.n = Math.max(MIN_N, Math.min(MAX_N, self.bars.length, Math.round(self.n * (e.deltaY > 0 ? 1.15 : 0.87)))); self.end = Math.max(self.end, self.n); self.draw();
+      e.preventDefault(); self.n = Math.max(MIN_N, Math.min(self.maxN(), self.bars.length, Math.round(self.n * (e.deltaY > 0 ? 1.15 : 0.87)))); self.end = Math.max(self.end, self.n); self.draw();
     }, { passive: false });
   };
   Chart.prototype.draw = function () {
     var self = this, cv = this.cv, W = Math.floor(this.root.clientWidth); if (!W) return;
+    if (this.n > this.maxN()) { this.n = Math.min(this.maxN(), this.bars.length); this.end = Math.max(this.end, this.n); }
     var lowerH = this.on.lower === 'none' ? 0 : this.full ? 90 : 46, priceH = 264;
     if (this.full) {   // 전체 화면 = 남은 높이를 가격 칸이 다 쓴다
       var rest = window.innerHeight - this.cv.getBoundingClientRect().top - 16;
@@ -185,11 +199,17 @@
     if (avgIn) look(avg.price);
     var pad = (hi - lo) * 0.06 || 1; lo -= pad; hi += pad;
     var Y = function (v) { return Math.round(6 + (hi - v) / (hi - lo) * (priceH - 12)) + 0.5; };
-    g.font = '12px ' + font; g.textBaseline = 'middle';
+    g.font = FS + 'px ' + font; g.textBaseline = 'middle';
+    var tagB = this.bars[this.end - 1], tagY = tagB ? Y(tagB[4]) : -99;   // 오른쪽 가격 칸 = 지금 보이는 맨 오른쪽 봉의 종가 — 넘겨볼 때도 따라간다
     ticks(lo, hi, this.full ? 6 : 4).forEach(function (t) {
       g.strokeStyle = GRID; g.lineWidth = 1; g.beginPath(); g.moveTo(0, Y(t)); g.lineTo(pw, Y(t)); g.stroke();
-      g.fillStyle = NOTE; g.textAlign = 'left'; g.fillText(fmt(t, self.dec), pw + 6, Y(t));
+      if (Math.abs(Y(t) - tagY) < 14) return;   // 가격 칸과 겹치는 눈금 숫자는 숨김
+      g.fillStyle = NOTE; g.textAlign = 'left'; g.fillText(fmt(t, self.dec), pw + 10, Y(t));
     });
+    var tag = function (y, txt, bg) {   // 삼각형 머리 달린 가격 칸 (2026-11-14 사용자)
+      y = Math.round(y); g.fillStyle = bg; g.beginPath(); g.moveTo(pw + 1, y); g.lineTo(pw + 8, y - 10); g.lineTo(W, y - 10); g.lineTo(W, y + 10); g.lineTo(pw + 8, y + 10); g.closePath(); g.fill();
+      g.fillStyle = '#fff'; g.font = '600 ' + FS + 'px ' + font; g.textAlign = 'left'; g.fillText(txt, pw + 10, y + 0.5); g.font = FS + 'px ' + font;
+    };
     // 볼린저 밴드 · 이동평균 (비교 = 얇은 실선)
     var line = function (arr, col, w, dash) {
       g.strokeStyle = col; g.lineWidth = w; g.setLineDash(dash || []); g.beginPath(); var on = false;
@@ -199,7 +219,7 @@
     if (this.on.boll) { line(this.bb.up, '#94A3B8', 1); line(this.bb.lo, '#94A3B8', 1); line(this.bb.mid, '#CBD5E1', 1); }
     for (var k in this.on.ma) if (this.on.ma[k]) line(this.ma[k], MA_COL[k], 1);
     // 봉
-    var bw = Math.max(1, Math.floor(slot * 0.66)); if (bw > 2 && bw % 2 === 0) bw -= 1;
+    var bw = Math.max(5, Math.min(Math.floor(slot) - 2, Math.floor(slot * 0.7))); if (bw % 2 === 0) bw -= 1;   // 몸통 최소 5
     B.forEach(function (b, j) {
       var i = s + j, x = X(i), col = b[4] >= b[1] ? UP : DN;
       g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1;
@@ -228,12 +248,8 @@
       g.fillStyle = VIO; g.fillText(lab, 5, ly2);
       g.fillStyle = diff > 0 ? UP : diff < 0 ? DN : INK; g.fillText(dtx, 5 + w1, ly2);
     }
-    // 마지막 종가 = 오른쪽 칸 (점과 같은 높이)
-    if (this.end === this.bars.length && B.length) {
-      var lb = B[B.length - 1], prev = this.bars[this.bars.length - 2], ch = prev ? (lb[4] / prev[4] - 1) * 100 : 0, ly = Y(lb[4]), tc = ch >= 0 ? UP : DN;
-      g.fillStyle = tc; g.fillRect(pw + 1, Math.round(ly - 9), AXIS_W - 1, 18);
-      g.fillStyle = '#fff'; g.font = '700 12px ' + font; g.textAlign = 'left'; g.fillText(fmt(lb[4], self.dec), pw + 5, ly);
-    }
+    // 오른쪽 가격 칸 = 보이는 맨 오른쪽 봉 종가, 색 = 그 봉의 전날 대비
+    if (tagB) { var tp = this.bars[this.end - 2]; tag(tagY, fmt(tagB[4], self.dec), !tp || tagB[4] >= tp[4] ? UP : DN); }
     // 아래 칸
     var top2 = priceH + gap, Y2;
     if (lowerH) { g.strokeStyle = '#E2E8F0'; g.beginPath(); g.moveTo(0, top2 - gap / 2 + 0.5); g.lineTo(W, top2 - gap / 2 + 0.5); g.stroke(); }
@@ -266,17 +282,21 @@
         g.fillText(self.unit === 'M' ? b[0].slice(0, 4) : b[0].slice(2, 4) + '.' + b[0].slice(5, 7).replace(/^0/, ''), Math.min(Math.max(x, 18), pw - 18), H - xH / 2);
       }
     });
-    // 누른 날
-    var hi_ = this.hover, sel = hi_ !== null && hi_ >= s && hi_ < this.end ? hi_ : null, b = this.bars[sel === null ? this.end - 1 : sel], pb = this.bars[(sel === null ? this.end - 1 : sel) - 1];
-    if (sel !== null) {   // 누른 날 = 세로선 + 가로축 날짜 칸
-      g.strokeStyle = '#94A3B8'; g.lineWidth = 1; g.beginPath(); g.moveTo(X(sel), 0); g.lineTo(X(sel), H - xH); g.stroke();
-      var dl = this.unit === 'M' ? b[0].slice(0, 4) + '.' + b[0].slice(5, 7).replace(/^0/, '') : this.unit === 'W' ? (function () { var x = new Date(b[0] + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() - (x.getUTCDay() + 6) % 7); return md(x.toISOString()) + ' 주'; })() : md(b[0]);
-      g.font = '12px ' + font; var dw = Math.ceil(g.measureText(dl).width) + 10, dx = Math.min(Math.max(X(sel) - dw / 2, 0), pw - dw);
-      g.fillStyle = '#4B5563'; g.fillRect(Math.round(dx), H - xH + 1, dw, xH - 2); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(dl, Math.round(dx + dw / 2), H - xH / 2);
+    // 누른 날 = 검은 점선 십자선 + 아래 날짜 칸 + 오른쪽 가격 칸 (2026-11-14 사용자 스크린샷)
+    var cr = this.cross, sel = cr && cr.i >= s && cr.i < this.end ? cr.i : null, b = this.bars[sel === null ? this.bars.length - 1 : sel], pb = this.bars[(sel === null ? this.bars.length - 1 : sel) - 1];
+    if (sel !== null) {
+      g.strokeStyle = INK; g.lineWidth = 1; g.setLineDash([2, 3]);
+      g.beginPath(); g.moveTo(X(sel), 0); g.lineTo(X(sel), H - xH); g.stroke();
+      var cy = Math.max(6, Math.min(priceH - 6, cr.y)) + 0.5;
+      g.beginPath(); g.moveTo(0, Math.round(cy) + 0.5); g.lineTo(pw, Math.round(cy) + 0.5); g.stroke(); g.setLineDash([]);
+      tag(cy, fmt(hi - (cy - 6) / (priceH - 12) * (hi - lo), self.dec), INK);
+      var dl = this.unit === 'M' ? b[0].slice(0, 4) + '.' + b[0].slice(5, 7).replace(/^0/, '') : this.unit === 'W' ? (function () { var x = new Date(b[0] + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() - (x.getUTCDay() + 6) % 7); return x.toISOString().slice(0, 10) + ' 주'; })() : b[0];
+      g.font = FS + 'px ' + font; var dw = Math.ceil(g.measureText(dl).width) + 12, dx = Math.min(Math.max(X(sel) - dw / 2, 0), pw - dw);
+      g.fillStyle = INK; g.fillRect(Math.round(dx), H - xH, dw, xH); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(dl, Math.round(dx + dw / 2), H - xH / 2 + 0.5);
     }
-    if (b) {   // 맨 위 = 종가 + 증감만 (2026-11-13 사용자)
+    if (b) {   // 맨 위 = 종가 + 증감만 (누른 날이면 그날)
       var c1 = pb ? (b[4] / pb[4] - 1) * 100 : 0, cc = c1 > 0 ? UP : c1 < 0 ? DN : INK;
-      this.val.innerHTML = '<b style="color:' + INK + ';font-weight:700;">' + fmt(b[4], this.dec) + '</b> <span style="color:' + cc + ';">' + pct(c1) + '</span>';
+      this.val.innerHTML = (sel !== null ? '<span style="color:' + NOTE + ';">' + md(b[0]) + '</span> ' : '') + '<b style="color:' + INK + ';font-weight:700;">' + fmt(b[4], this.dec) + '</b> <span style="color:' + cc + ';">' + pct(c1) + '</span>';
     }
   };
   function init() { document.querySelectorAll('[data-candle]').forEach(function (r) { if (!r.__c) r.__c = new Chart(r); }); }
