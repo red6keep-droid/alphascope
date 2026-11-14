@@ -238,7 +238,7 @@ jobs:
       - name: Home card kr-report.json
         if: steps.gate.outputs.go == 'true' && hashFiles('experiments/kr-market-report/output/post_meta.json') != ''
         continue-on-error: true
-        run: python experiments/daily-report/home_card.py --card kr-report --body experiments/kr-market-report/output/report_body.html --meta experiments/kr-market-report/output/post_meta.json --out deploy-home/cards/kr-report.json
+        run: python experiments/daily-report/home_card.py --card kr-report --body experiments/kr-market-report/output/report_body.html --meta experiments/kr-market-report/output/post_meta.json --out deploy-home/cards/kr-report.json --intraday "^KS11"   # 하루 그래프 5분봉 (2026-11-14)
 
       # 블로그 검색 즉답 색인 — 한국 (2026-11-11 사용자 "진행해"). 이 실행의 snapshot · extra 만 읽는다, AI 0.
       # 아래 kr.json 푸시에 얹는다 — gh-pages 쓰기 추가 없음. 실패 · 종목 부족이면 파일을 안 만들고 전날 것이 남는다

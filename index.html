@@ -374,6 +374,13 @@ body.menu-open { overflow: hidden; }
 .report-block { display: flex; flex-direction: column; gap: 8px; }
 .report-chart { display: block; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px; }   /* 홈 미국 · 한국 증시 카드 그래프 (2026-10-21 사용자). 확대 없음 — 눌러도 카드처럼 상세 리포트로 (2026-11-10 사용자) */
 .report-chart[hidden] { display: none; }
+.day-chart { position: relative; border: 1px solid #eee; border-radius: 8px; overflow: hidden; background: #fff; }   /* 홈 증시 카드 하루 그래프 (2026-11-14 사용자, B1) — 글자 = HTML, 크기 고정 */
+.day-chart svg { display: block; width: 100%; height: auto; }
+.day-head { position: absolute; right: 10px; top: 13px; display: flex; align-items: baseline; gap: 0 8px; font-family: var(--num); font-variant-numeric: tabular-nums; }
+.day-chg { font-size: 14px; line-height: 20px; font-weight: 700; }
+.day-num { font-size: 16px; line-height: 22px; font-weight: 700; }
+.day-mark { position: absolute; white-space: nowrap; font-family: var(--num); font-size: 12px; line-height: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.day-mark .k { font-weight: 400; }
 /* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
 /* #radar-col 전폭 규칙은 뺐다 (2026-11-08 H34): 넷째 카드 `증시 전망` 이 들어와 미국 · 한국 / 인물 · 증시 전망 2 × 2 */
 /* 홈 증시 전망 카드 (2026-11-08 H34) — 줄 = 전망 질문(18 · 행간 34 · 보통 굵기, 인물 발언 줄과 같게) + 분류 라벨 · 게시일. 국면 · 문장은 전망 페이지에서. 자료 = gh-pages hypo.json (forecast_daily, 하루 1회) */
@@ -3907,6 +3914,63 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           if (!src || !src.getAttribute('src')) return;
           fillChartSrc(hook, src.getAttribute('src'), src.getAttribute('alt'));
         }
+        /* 홈 증시 카드 하루(장중) 그래프 (2026-11-14 사용자, 시안 B1 — 목업 design-samples/mock_home_card_day).
+           재료 = 카드 JSON intraday {sym, prev, close, h, l, m:[장 시작부터 분], c:[값]} (home_card.py --intraday, 5분봉). 없거나 모자라면 false → 옛 그림.
+           선 = 전날 종가 위 빨강 · 아래 파랑 + 옅은 면, 점선 = 전날 종가, 배경 가로 눈금 3줄. 글자는 모두 HTML:
+           오른쪽 위 = ▲▼ 전날 대비 %(14) · 종가(16), 둘 다 그날 등락 색 / 최고(빨강) · 최저(파랑) 12 — 점 옆, 상자 끝에서 10 띄움 */
+        function fillDayChart(hook, d) {
+          var im = document.querySelector('[data-hook="' + hook + '"]');
+          if (!im || !d || !d.m || !d.c || d.c.length < 20 || d.m.length !== d.c.length) return false;
+          var W = 340, H = 150, T = 52, B = 32, S = 390, UP = '#d93025', DN = '#1a73e8';
+          var pc = +d.prev, close = +d.close;
+          var lo = Math.min.apply(null, d.c.concat([pc])), hi = Math.max.apply(null, d.c.concat([pc]));
+          if (!(hi > lo) || !(pc > 0)) return false;
+          function X(m) { return 2 + Math.min(m, S) / S * (W - 4); }
+          function Y(v) { return T + (hi - v) / (hi - lo) * (H - T - B); }
+          function f1(n) { return n.toFixed(1); }
+          function money(n) { return (+n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+          var pts = d.m.map(function (m, i) { return [X(m), Y(d.c[i])]; });
+          var top = pts[0], bot = pts[0];
+          pts.forEach(function (p) { if (p[1] < top[1]) top = p; if (p[1] > bot[1]) bot = p; });
+          var by = Y(pc), id = 'dc-' + hook;
+          var line = pts.map(function (p) { return f1(p[0]) + ',' + f1(p[1]); }).join(' ');
+          var area = 'M' + f1(pts[0][0]) + ',' + f1(by) + ' L' + line.split(' ').join(' L') + ' L' + f1(pts[pts.length - 1][0]) + ',' + f1(by) + ' Z';
+          var ns = ' vector-effect="non-scaling-stroke"';
+          var grid = [1, 2, 3].map(function (k) { return '<line x1="0" x2="' + W + '" y1="' + f1(H * k / 4) + '" y2="' + f1(H * k / 4) + '" stroke="#EEF1F5" stroke-width="1"' + ns + '/>'; }).join('');
+          function half(c, clip) {
+            return '<g clip-path="url(#' + clip + ')"><path d="' + area + '" fill="url(#g' + clip + ')"/><polyline points="' + line + '" fill="none" stroke="' + c + '" stroke-width="1.8" stroke-linejoin="round"' + ns + '/></g>';
+          }
+          var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + grid +
+            '<defs><clipPath id="' + id + 'u"><rect x="0" y="0" width="' + W + '" height="' + f1(by) + '"/></clipPath>' +
+            '<clipPath id="' + id + 'd"><rect x="0" y="' + f1(by) + '" width="' + W + '" height="' + f1(H - by) + '"/></clipPath>' +
+            '<linearGradient id="g' + id + 'u" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + UP + '" stop-opacity=".22"/><stop offset="1" stop-color="' + UP + '" stop-opacity=".02"/></linearGradient>' +
+            '<linearGradient id="g' + id + 'd" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + DN + '" stop-opacity=".22"/><stop offset="1" stop-color="' + DN + '" stop-opacity=".02"/></linearGradient></defs>' +
+            half(UP, id + 'u') + half(DN, id + 'd') +
+            '<line x1="0" x2="' + W + '" y1="' + f1(by) + '" y2="' + f1(by) + '" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="2 3"' + ns + '/>' +
+            '<circle cx="' + f1(top[0]) + '" cy="' + f1(top[1]) + '" r="3" fill="#fff" stroke="' + UP + '" stroke-width="1.5"' + ns + '/>' +
+            '<circle cx="' + f1(bot[0]) + '" cy="' + f1(bot[1]) + '" r="3" fill="#fff" stroke="' + DN + '" stroke-width="1.5"' + ns + '/></svg>';
+          function mark(p, kind, col, val) {
+            var x = p[0] / W * 100, y = p[1] / H * 100, hx, tx, ty = kind === '최고' ? 'calc(-100% - 5px)' : '5px';
+            if (x < 20) { hx = 'left:10px;'; tx = '0'; }
+            else if (x > 80) { hx = 'right:10px;'; tx = '0'; }
+            else { hx = 'left:' + f1(x) + '%;'; tx = '-50%'; }
+            if (kind === '최고' && x > 50 && p[1] - 23 < 39) { hx = 'right:' + f1(100 - x) + '%;'; tx = '-8px'; ty = '-50%'; }   /* 오른쪽 위 숫자 자리 → 점 왼쪽 옆 */
+            return '<span class="day-mark" style="' + hx + 'top:' + f1(y) + '%;transform:translate(' + tx + ',' + ty + ');color:' + col + ';"><span class="k">' + kind + '</span> ' + money(val) + '</span>';
+          }
+          var ch = close - pc, col = ch > 0 ? UP : ch < 0 ? DN : '#111', tri = ch > 0 ? '▲' : ch < 0 ? '▼' : '';
+          var pct = Math.abs(ch / pc * 100).toFixed(2) + '%';
+          var old = im.parentNode.querySelector('.day-chart');
+          if (old) old.parentNode.removeChild(old);
+          var box = document.createElement('div');
+          box.className = 'day-chart';
+          box.setAttribute('role', 'img');
+          box.setAttribute('aria-label', (d.sym === '^KS11' ? '코스피' : 'S&P 500') + ' 하루 그래프: 종가 ' + money(close) + ', 전날보다 ' + pct + (ch < 0 ? ' 하락' : ch > 0 ? ' 상승' : ''));
+          box.innerHTML = svg + '<div class="day-head" style="color:' + col + ';"><span class="day-chg">' + tri + pct + '</span><span class="day-num">' + money(close) + '</span></div>' +
+            mark(top, '최고', UP, d.h) + mark(bot, '최저', DN, d.l);
+          im.hidden = true;
+          im.parentNode.insertBefore(box, im);
+          return true;
+        }
         function fillChartSrc(hook, src, alt) {   /* 카드 재료 JSON 의 chart {src, alt} (H31) */
           var im = document.querySelector('[data-hook="' + hook + '"]');
           if (!im || !src) return;
@@ -3939,7 +4003,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
                 var d = new DOMParser().parseFromString('<body>' + j.sections[k], 'text/html');
                 sec[k] = [].slice.call(d.body.children);
               });
-              return { title: j.title, href: j.url, day: j.date || '', gen: j.generated || '', sec: sec, chart: j.chart || null, body: '' };
+              return { title: j.title, href: j.url, day: j.date || '', gen: j.generated || '', sec: sec, chart: j.chart || null, intraday: j.intraday || null, body: '' };
             });
         }
 
@@ -3985,7 +4049,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           if (head && href) { head.setAttribute('data-row-link', '1'); head.setAttribute('data-href', href); }
 
           if (!sec) throw new Error('unparsable');
-          if (card.chart) { if (p.chart) fillChartSrc(card.chart, p.chart.src, p.chart.alt); else fillChart(card.chart, body); }
+          if (card.chart && !fillDayChart(card.chart, p.intraday)) { if (p.chart) fillChartSrc(card.chart, p.chart.src, p.chart.alt); else fillChart(card.chart, body); }   /* 하루 그래프 먼저, 없으면 옛 그림 (2026-11-14) */
 
           if (card.fill) card.fill(sec);
           Object.keys(card.map).forEach(function (hook) {
