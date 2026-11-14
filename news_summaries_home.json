@@ -2787,41 +2787,50 @@
  },
  "f8e3a2670000": {
   "lines": [
-   "연방준비제도 금요일 발표 설문조사서 인공지능 금융 시스템 최대 위험 지목"
+   "연방준비제도 설문조사 결과 금융시스템 최대 위협 요소로 인공지능 지목",
+   "인공지능 관련 부채와 주식시장 밸류에이션 및 보안 위험 부각"
   ],
   "tags": [
    {
     "scope": "market",
     "tickers": [],
     "sector": null,
-    "issue": "GROWTH_JOBS",
+    "issue": "AI_CAPEX",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "AI_CAPEX",
     "dir": "negative",
     "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-13T21:46:30.564488+00:00",
-  "n_src": 900
+  "at": "2026-11-14T01:46:07.345819+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "6d82c3026cea": {
   "lines": [
-   "전 엔비디아 최고경영자 젠슨 황 사임 여파로 허니팟 사기 주목"
+   "링크드인 등에서 호감을 가장해 정보와 접근 권한을 탈취하는 허니팟 사기 수법 경계"
   ],
   "tags": [
    {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
     "issue": "CORP_EVENT",
     "dir": "negative",
     "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-13T21:46:30.564488+00:00",
-  "n_src": 900
+  "at": "2026-11-14T01:46:07.345819+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "ae3217570306": {
   "lines": [
@@ -2888,6 +2897,82 @@
   ],
   "model": "groq:qwen/qwen3.8-27b",
   "at": "2026-11-13T21:46:33.515961+00:00",
+  "n_src": 900
+ },
+ "be9027e9137a": {
+  "lines": [
+   "트럼프 미 대통령의 중국 방문",
+   "일론 머스크의 아시아태평양경제협력체 정상회의 동행 예정"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "TSLA"
+    ],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T01:46:06.150213+00:00",
+  "n_src": 900
+ },
+ "00a1f632da43": {
+  "lines": [
+   "스페이스엑스의 스타십 로켓 시험비행 실시",
+   "부스터 및 상단 회수 시도 실패",
+   "미국 연방항공청의 전국적 운항 중단 조치 발령"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T01:46:06.150213+00:00",
+  "n_src": 900
+ },
+ "11b76f57c271": {
+  "lines": [
+   "바이낸스에서 63억 달러 규모의 암호화폐 탈취 발생"
+  ],
+  "tags": [
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T01:46:06.150213+00:00",
   "n_src": 900
  }
 }

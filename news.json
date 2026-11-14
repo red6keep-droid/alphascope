@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-11-13 21:46:33 UTC",
+  "updated_at": "2026-11-14 01:46:07 UTC",
   "items": [
     {
-      "title": "FAA issues nationwide ground stop citing communication issues affecting ‘multiple’ air traffic control facilities",
+      "title": "FAA lifts ground stop after four hours, but flight cancellations will stretch into the weekend",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/13/faa-ground-stop.html",
-      "published": "2026-11-13 21:42:56",
+      "published": "2026-11-14 01:44:39",
       "title_ko": "'다수' 항공 교통 관제 시설에 영향을 미치는 통신 문제를 이유로 FAA가 전국적인 운항 중단 조치 발령",
       "summary_ko": "연방항공청, 비상 상황 및 안전 이유로 금요일 오후 전국 운항 중단 발행",
       "lines": [
@@ -14,10 +14,59 @@
       ]
     },
     {
+      "title": "Trump doesn’t plan to raise Nvidia, spy issue during China trip: U.S. officials",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/trump-nvidia-huang-china.html",
+      "published": "2026-11-14 01:34:11",
+      "title_ko": "트럼프, 중국 방문 시 엔비디아 및 스파이 문제 제기 계획 없어: 미국 관료들",
+      "summary_ko": "중국인 스파이 의심 인물을 포함한 여러 스캔들 보도 이후 엔비디아 CEO 젠슨 황이 이번 주 사임",
+      "lines": [
+        "트럼프 미 대통령의 중국 방문",
+        "일론 머스크의 아시아태평양경제협력체 정상회의 동행 예정"
+      ]
+    },
+    {
+      "title": "SpaceX launches Starship in key test flight of massive rocket",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/spacex-launches-starship-in-key-test-flight-of-massive-rocket.html",
+      "published": "2026-11-14 01:18:51",
+      "title_ko": "스페이스X, 대형 로켓의 핵심 시험 비행에서 스타십 발사",
+      "summary_ko": "이번 시험 비행은 텍사스주 스타베이스 발사장애서 슈퍼 헤비 부스터와 상단 우주선을 모두 회수하려는 스페이스X의 첫 시도",
+      "lines": [
+        "스페이스엑스의 스타십 로켓 시험비행 실시",
+        "부스터 및 상단 회수 시도 실패",
+        "미국 연방항공청의 전국적 운항 중단 조치 발령"
+      ]
+    },
+    {
+      "title": "Nvidia is done with Jensen Huang. The fallout in Washington is just beginning",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/nvidia-jensen-huang-washington-congress.html",
+      "published": "2026-11-13 23:54:36",
+      "title_ko": "엔비디아는 젠슨 황과 끝났고, 워싱턴의 여파는 이제 시작이다",
+      "summary_ko": "1월 민주당 통제권 이전 전 젠슨 황 의회 출석 요구",
+      "lines": [
+        "젠슨 황 엔비디아 CEO 목요일 사임 발표",
+        "공화당 주도 의회 젠슨 황 청문회 소환 및 소환장 발부 방침"
+      ]
+    },
+    {
+      "title": "Lutnick faces questions over Nvidia spy scandal. His sons' firm has deep ties to the chipmaker",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html",
+      "published": "2026-11-13 23:42:18",
+      "title_ko": "러트닉, 엔비디아 스파이 스캔들 관련 질의 직면, 두 아들 회사는 칩 제조사와 깊은 연관",
+      "summary_ko": "젠슨 황의 엔비디아 최고경영자 사임으로 하워드 러트닉 상무장관과 가족의 금융 연관성에 대한 감시가 재점화",
+      "lines": [
+        "캔터 피츠제럴드의 엔비디아 보유 주식 약 50% 감소",
+        "캔터 피츠제럴드의 엔비디아 목표가 350달러 유지"
+      ]
+    },
+    {
       "title": "Nvidia stock suffers longest weekly losing streak since 2012 as market value sinks by $1.7 trillion",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/13/nvidia-stock-jensen-affair-ai.html",
-      "published": "2026-11-13 21:27:15",
+      "published": "2026-11-13 22:18:43",
       "title_ko": "엔비디아 주가 시가총액 1조 7,000억 달러 증발하며 2012년 이후 최장기 주간 하락세 기록",
       "summary_ko": "젠슨 황 사임이 엔비디아 시장 부진 가중",
       "lines": [
@@ -40,6 +89,18 @@
       ]
     },
     {
+      "title": "AI risks are the biggest threat to the financial system, Fed survey finds",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/ai-risks-financial-system-federal-reserve.html",
+      "published": "2026-11-13 21:18:30",
+      "title_ko": "AI 리스크가 금융 시스템의 가장 큰 위협이라고 연준 설문조사 결과 밝혀져",
+      "summary_ko": "월가 AI 하이퍼스케일러 우려 및 데이터센터 급증 경계 속 보고서 발표",
+      "lines": [
+        "연방준비제도 설문조사 결과 금융시스템 최대 위협 요소로 인공지능 지목",
+        "인공지능 관련 부채와 주식시장 밸류에이션 및 보안 위험 부각"
+      ]
+    },
+    {
       "title": "10-year Treasury yield moves to 5.17% as traders weigh producer price report",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/13/treasury-yields-fed-rates.html",
@@ -53,77 +114,37 @@
       ]
     },
     {
-      "title": "Nvidia is done with Jensen Huang. The fallout in Washington is just beginning",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/nvidia-jensen-huang-washington-congress.html",
-      "published": "2026-11-13 21:04:43",
-      "title_ko": "엔비디아는 젠슨 황과 끝났고, 워싱턴의 여파는 이제 시작이다",
-      "summary_ko": "1월 민주당 통제권 이전 전 젠슨 황 의회 출석 요구",
-      "lines": [
-        "젠슨 황 엔비디아 CEO 목요일 사임 발표",
-        "공화당 주도 의회 젠슨 황 청문회 소환 및 소환장 발부 방침"
-      ]
-    },
-    {
-      "title": "CFTC Chair Selig tells CNBC crypto industry is embracing agency rules as legislation hopes fade",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/cftc-chair-selig-crypto-industry-opting-into-agencys-crypto-rules-.html",
-      "published": "2026-11-13 20:07:30",
-      "title_ko": "CFTC 위원장 셀리그, CNBC에 암호화폐 업계가 입법 기대 희미해짐에 따라 기관 규제 수용 중이라고 밝혀",
-      "summary_ko": "상품선물거래위원회, 10월 자산 클래스 관할권 주장 위한 규제안 제안",
-      "lines": [
-        "CFTC 10월 암호화폐 시장 남용 방지 및 거래 규칙 제안 발표",
-        "CFTC 의장 셀리그 주요 암호화폐 거래소 신규 규칙 참여 수요 확인",
-        "CFTC 의장 셀리그 미국이 세계 암호화폐 수도 유지 위한 핵심 단계 강조"
-      ]
-    },
-    {
-      "title": "After Jensen Huang’s exit, what top financial advisors are doing with Nvidia: Exclusive CNBC poll",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/nvidia-stock-advisors-jensen-huang-exit-exclusive-poll.html",
-      "published": "2026-11-13 19:53:38",
-      "title_ko": "젠슨 황 사임 이후 최고 재무 자문가들이 엔비디아를 다루는 방식",
-      "summary_ko": "자문가들은 리더십 교체에 반응하기 전에 엔비디아 노출도, 투자 기간, 위험 감수 성향을 따져봐야 한다고 언급",
-      "lines": [
-        "젠슨 황 엔비디아 CEO 사임 발표",
-        "엔비디아 주가 목요일 4% 하락",
-        "CNBC 재무자문사 122곳 대상 설문조사 실시"
-      ]
-    },
-    {
-      "title": "행정부 내 대중국 반도체 수출 통제 갈등",
-      "title_ko": "행정부 내 대중국 반도체 수출 통제 갈등",
-      "summary_ko": "재무장관이 상무부를 향해 대중국 칩 유출 책임을 공개 비판하면서 트럼프 행정부 내 수출 통제 정책을 둘러싼 갈등이 불거졌",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=85xmF02snhQ",
-      "published": "2026-11-13 17:58:52",
+      "title": "뉴욕 증시 및 반도체주 변동성",
+      "title_ko": "뉴욕 증시 및 반도체주 변동성",
+      "summary_ko": "엔비디아 관련 불확실성과 기술주 매도세로 인해 주요 지수와 반도체 주가가 약세를 보임",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=vAh4jhtnWS4",
+      "published": "2026-11-13 20:11:49",
       "kind": "media",
-      "tag": "규제 · 산업정책",
+      "tag": "수급 · 시장 구조",
       "direction": "negative",
-      "n_channels": 3,
+      "n_channels": 2,
       "lines": [
-        "스콧 베센트 재무장관 발언 : 상무부의 대중국 칩 유출 방지 조치 실패 지적",
-        "행정부 내 메가스피드 엔티티 리스트 등재 여부를 두고 부처 간 이견 발생",
-        "하워드 루트닉 상무장관 12월 의회 증인 출석 예정"
+        "찰리 팔레트 발언 : 필라델피아 반도체 지수 4.5% 하락 기록",
+        "찰리 팔레트 발언 : 엔비디아 주가 3.1% 하락 및 시가총액 4조 달러 하회",
+        "노라 앨린단 발언 : 시장이 엔비디아 상황의 파급력을 재평가하면서 변동성 확대"
       ]
     },
     {
-      "title": "앤트로픽 IPO 및 로드쇼 라이브스트림",
-      "title_ko": "앤트로픽 IPO 및 로드쇼 라이브스트림",
-      "summary_ko": "앤트로픽 IPO를 앞두고 다리오 아모데이와 제이미 다이먼이 라이브스트림 대담을 진행하며 개인 투자자 참여를 독려함",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=yMlsX9l4YSI",
-      "published": "2026-11-13 17:12:55",
+      "title": "우크라이나 종전 협상 및 트릴라터럴 회담",
+      "title_ko": "우크라이나 종전 협상 및 트릴라터럴 회담",
+      "summary_ko": "미국, 러시아, 우크라이나 간의 삼자 회담이 재개되고 포로 교환이 합의되는 등 외교적 움직임이 감지 중",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=vO_kT_4MIiY",
+      "published": "2026-11-13 13:54:47",
       "kind": "media",
-      "tag": "기업 사건",
-      "direction": "positive",
-      "n_channels": 4,
+      "tag": "지정학",
+      "direction": "neutral",
+      "n_channels": 2,
       "lines": [
-        "케이트 루니 보도 : 앤트로픽 CEO 다리오 아모데이와 JP모간 CEO 제이미 다이먼의 라이브스트림 대담 진행 예정",
-        "케이트 루니 보도 : 개인 투자자들이 브로커리지를 통해 IPO 공모가로 매수할 수 있는 기회 제공 예상",
-        "반타 리서치 : 앤트로픽 관련 선행 계약 거래량 기준 첫날 개인 투자자 매수세가 스페이스X를 넘어설 것으로 (발언자 추정)",
-        "케이트 루니 보도 : 기관 투자자들의 관심 또한 매우 강력한 것으로 나타남",
-        "케이트 루니 보도 : 다음주 목요일 상장 이후 실제 메인스트림 투자자들의 매수 규모가 시험대에 오를 예정"
+        "올리버 크룩 발언 : 아부다비, 모스크바, 더블린을 거쳐 미국, 러시아, 우크라이나 간 트릴라터럴 회담이 재개된 것은 중요한",
+        "올리버 크룩 발언 : 러-우 양측이 1,000명 이상의 포로 교환에 합의했으나 전쟁 종료에 가까워진 것은 아님",
+        "올리버 크룩 발언 : 기존 삼자 포맷에서 다자 포맷으로 전환되며 유럽국가들도 협상 테이블에 참여할 압박을 받게 됨"
       ]
     },
     {
@@ -136,7 +157,7 @@
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "negative",
-      "n_channels": 5,
+      "n_channels": 1,
       "lines": [
         "진행자 발언 : 투자자들이 중요한 PPI 데이터를 앞두고 금리 인상 베팅을 강화하는 중",
         "마이클 퍼베스 발언 : 연준이 중립금리가 예상보다 높다는 점을 깨닫고 조정 과정을 거치는 것으로 봄",
