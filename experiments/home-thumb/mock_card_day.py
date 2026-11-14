@@ -1,6 +1,6 @@
 """홈 미국 증시 · 한국 증시 카드 — 하루(장중) 그래프 시안, 실제 홈 카드 그대로 (2026-11-14 사용자).
 
-    python experiments/home-thumb/mock_card_day.py     # output/mock_home_card_day.html
+    python experiments/home-thumb/mock_card_day.py     # design-samples/output/mock_home_card_day.html (목업 목록 = 디자인 샘플 · 홈 카드 그래프)
 
 사용자 정정(같은 날): 네이버 화면은 '그래프 느낌'만 참고 — 숫자 · 글꼴 · 정보 배치는 우리 것으로.
   - 카드는 홈 그대로: 홈 목업(home-split/output/mock_home_us.html)의 CSS 를 통째로 넣고 같은 마크업(아이콘 · 제목 · 날짜 · 그래프 상자 · 요약 한 줄)
@@ -15,7 +15,7 @@ import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EXP = os.path.dirname(HERE)
-OUT = os.path.join(HERE, "output")
+OUT = os.path.join(EXP, "design-samples", "output")   # 목업 목록 = 디자인 샘플 묶음 (2026-11-14 사용자)
 UP, DN, INK, NOTE = "#d93025", "#1a73e8", "#111", "#6B7280"
 UP_FILL, DN_FILL = "rgba(217,48,37,.16)", "rgba(26,115,232,.16)"
 VW, VH = 340, 150   # 그래프 상자 = 지금 카드 그림 비율 2.27 : 1 (폰 실제 폭 약 316 ~ 338)
@@ -199,7 +199,7 @@ def main():
         secs.append(f'<section class="hc-sec"><h2>{kind}. {name}</h2><div class="hc-why">{why}</div>'
                     f'<div class="home-cards"><div class="hc-pair">{cards}</div></div></section>')
     html = ('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<title>홈 증시 카드 하루 그래프 — 목업</title>' + home_css() + f"<style>{CSS}</style></head>"
+            '<title>홈 카드 그래프</title>' + home_css() + f"<style>{CSS}</style></head>"
             '<body data-pv-view="home" style="background:#F3F4F6;"><div class="hc-page">'
             '<div class="hc-bar"><h1>홈 증시 카드 하루 그래프</h1>' + controls() + '</div>'
             '<p style="font-size:14px;line-height:21px;color:#6B7280;margin:10px 0 0;">실제 홈 카드 그대로(아이콘 · 제목 · 날짜 · 요약 한 줄)이고, 그래프 상자는 지금 그림과 같은 크기입니다. '
