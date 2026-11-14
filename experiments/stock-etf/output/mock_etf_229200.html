@@ -1963,6 +1963,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   };
   Chart.prototype.draw = function () {
     var self = this, cv = this.cv, W = Math.floor(this.root.clientWidth); if (!W) return;
+    // 작은 화면 = 그림을 카드 오른쪽 · 아래 안쪽 여백만큼 넓혀 종가 칸이 카드 외곽선에 붙게 (2026-11-14 사용자)
+    var box = getComputedStyle(this.root.parentNode), padR = this.full ? 0 : Math.round(parseFloat(box.paddingRight) || 0), padB = this.full ? 0 : Math.round(parseFloat(box.paddingBottom) || 0);
+    this.wrap.style.marginRight = -padR + 'px'; this.root.style.marginBottom = -padB + 'px'; W += padR;
     if (this.n > this.maxN()) { this.n = Math.min(this.maxN(), this.bars.length); this.end = Math.max(this.end, this.n); }
     var lowerH = this.on.lower === 'none' || !this.full ? 0 : 90, priceH = 264, gap = lowerH ? 26 : 0;   // gap = 거래량 범례 줄
     if (this.full) {
@@ -1980,10 +1983,10 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     B.forEach(function (b) { look(b[2]); look(b[3]); });
     for (var i = s; i < this.end; i++) { for (var n in this.on.ma) if (maShow(n)) look(this.ma[n][i]); if (this.on.boll) { look(this.bb.up[i]); look(this.bb.lo[i]); } }
     // 오른쪽 가격 칸 폭 — 전체 화면 66 고정, 작은 화면 = 가장 긴 숫자 + 왼쪽 9 · 오른쪽 3 (2026-11-14 사용자 "0 기준 우측 여백 최대한 좁게")
-    var TX = this.full ? 10 : 9, TFS = this.full ? FS : 12;   // TFS = 종가 칸 글자(작은 화면 12)
+    var TX = this.full ? 10 : 9, TFS = this.full ? FS : 10, AFS = this.full ? FS : 12;   // 작은 화면: TFS = 종가 칸 글자 10 · AFS = 오른쪽 눈금 12 (2026-11-14 사용자)
     if (this.full) this.axisW = AXIS_W;
     else {
-      var mw = 0; g.font = FS + 'px ' + font; ticks(lo, hi, 5).forEach(function (t) { mw = Math.max(mw, g.measureText(fmt(t, self.dec)).width); });
+      var mw = 0; g.font = AFS + 'px ' + font; ticks(lo, hi, 5).forEach(function (t) { mw = Math.max(mw, g.measureText(fmt(t, self.dec)).width); });
       g.font = '600 ' + TFS + 'px ' + font; [lo, hi, this.bars[this.end - 1][4]].forEach(function (v) { mw = Math.max(mw, g.measureText(fmt(v, self.dec)).width); });
       this.axisW = TX + Math.ceil(mw) + 3;
     }
@@ -2016,7 +2019,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     if (this.unit === 'M') B.forEach(function (b, j) { if (/-(04|07|10)$/.test(b[0].slice(0, 7))) add(j, +b[0].slice(5, 7) + '월', false, 46); });
     labs.forEach(function (l) { g.strokeStyle = GRID; g.lineWidth = 1; g.beginPath(); g.moveTo(Math.round(l[0]) + 0.5, TOPS); g.lineTo(Math.round(l[0]) + 0.5, H - XH); g.stroke(); });
     // 가로 격자 · 오른쪽 눈금
-    g.font = FS + 'px ' + font; g.textBaseline = 'middle';
+    g.font = AFS + 'px ' + font; g.textBaseline = 'middle';
     var tagB = this.bars[this.end - 1], tagY = tagB ? Y(tagB[4]) : -99;
     var tk = ticks(lo, hi, this.full ? 6 : 5);
     tk.forEach(function (t) {
