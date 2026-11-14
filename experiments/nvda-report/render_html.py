@@ -1299,7 +1299,9 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
     # ② 방송 · 뉴스 분위기 (5거래일)
     ev = [{"매수": 1, "매도": -1}.get(p["action"], 0) for p in ps or []] + [{"positive": 1, "negative": -1}.get(x.get("direction"), 0) for x in news_ops or []]
     where = "방송과 뉴스" if news_ops is not None else "방송"
-    if not ev:
+    if ps is None and news_ops is None:
+        pass   # 방송 · 뉴스를 보지 않는 화면(간단 정보, 2026-11-14) — `조용하다`고 말하면 틀린 말이 된다
+    elif not ev:
         sents.append(f"{where}에서는 요즘 {nm} 이야기가 조용하다.")
     else:
         up, dn, mid = ev.count(1), ev.count(-1), ev.count(0)

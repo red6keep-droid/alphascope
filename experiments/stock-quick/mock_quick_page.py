@@ -15,11 +15,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 EXP = os.path.dirname(HERE)
 sys.path.insert(0, EXP)
 import design_kit as dk  # noqa: E402
+import candle_chart as CC  # noqa: E402
 
 OUT = os.path.join(HERE, "output")
-# 예시 — 미국 간단 · 미국 이름 고친 것 · 한국 코스피(공시) · 한국 코스닥 · 1년 안 된 종목 · 정식 종목(종목 분석 링크) · 없는 코드
-SAMPLES = [("us", "UBER"), ("us", "SBUX"), ("us", "GPC"), ("kr", "259960"), ("kr", "011200"), ("kr", "196170"),
-           ("us", "FDXF"), ("us", "NVDA"), ("us", "ZZZZ")]
+# 예시 — 미국 간단 · 미국 이름 고친 것 · 한국(게임 · 해운 · 조선 = 업계 고침표 · 화학 = 업계 카드 없음) · 1년 안 된 종목 · 없는 코드
+SAMPLES = [("us", "UBER"), ("us", "SBUX"), ("us", "GPC"), ("kr", "259960"), ("kr", "011200"), ("kr", "010140"), ("kr", "009830"),
+           ("us", "FDXF"), ("us", "ZZZZ")]
 
 
 def main():
@@ -32,14 +33,15 @@ def main():
     for d in ("us", "kr"):
         os.makedirs(os.path.join(dst, d), exist_ok=True)
     for fn in ("version.json", "bench.json"):
-        shutil.copy(os.path.join(a.data, fn), os.path.join(dst, fn))
+        if os.path.exists(os.path.join(a.data, fn)):
+            shutil.copy(os.path.join(a.data, fn), os.path.join(dst, fn))
     js = open(os.path.join(HERE, "quick_page.js"), encoding="utf-8").read()
     for d, code in SAMPLES:
         src = os.path.join(a.data, d, code + ".html")
         if os.path.exists(src):
             shutil.copy(src, os.path.join(dst, d, code + ".html"))
         body = (f'<div id="as-quick" data-local="quick-data/" data-default="{code}" data-list="mock_all_stocks.html"></div>'
-                f'<script>{js}</script>')
+                f'<script>{js}</script>' + CC.SCRIPT)   # 발행 본문(publish_quick_page.body)과 같은 순서
         p = dk.write_mock(body, os.path.join(OUT, f"mock_qpage_{code}.html"), f"간단 정보 ({code})")
         print("만듦:", p)
 
