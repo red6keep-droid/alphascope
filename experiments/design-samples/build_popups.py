@@ -91,9 +91,9 @@ PAGE = ('<div class="post-body" style="padding:24px 16px;">' + "".join(
     f'<div style="height:{h}px;margin:0 0 12px;border-radius:12px;background:#F1F5F9;"></div>' for h in (40, 160, 90, 220, 120, 180)) + "</div>")
 
 
-def frame(inner, h=720, page=True, body_cls=""):
+def frame(inner, h=720, page=True, body_cls="", extra_css=""):
     doc = (f'<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-           f'<style>{CSS}\nbody{{margin:0;background:#fff;}}</style></head><body class="{body_cls}">{PAGE if page else ""}{inner}</body></html>')
+           f'<style>{CSS}\nbody{{margin:0;background:#fff;}}{extra_css}</style></head><body class="{body_cls}">{PAGE if page else ""}{inner}</body></html>')
     return f'<iframe srcdoc="{html.escape(doc, quote=True)}" style="width:390px;height:{h}px;border:1px solid #CBD5E1;border-radius:12px;background:#fff;flex:none;"></iframe>'
 
 
@@ -103,6 +103,21 @@ SHARE_ICONS = {
     "X": '<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M18.9 1.2h3.7l-8 9.2L24 22.8h-7.4l-5.8-7.6-6.6 7.6H.5l8.6-9.8L0 1.2h7.6l5.2 6.9Z"/></svg>',
     "카카오톡": '<svg viewBox="0 0 24 24" width="20" height="20"><ellipse cx="12" cy="11" rx="10.5" ry="8.2" fill="currentColor"/></svg>',
 }
+
+
+SHARE_MORE = [   # 단색 그림 (테마 아이콘과 같이 currentColor)
+    ("텔레그램", '<path fill="currentColor" d="M21.6 3.2 2.9 10.4c-1.3.5-1.3 1.2-.2 1.6l4.8 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.3-2.3 4.8 3.6c.9.5 1.5.2 1.7-.8l3.1-14.7c.3-1.3-.5-1.9-1.4-1.5ZM9 13.6l9.4-5.9c.5-.3.9-.1.5.2l-8 7.3-.3 3.4L9 13.6Z"/>'),
+    ("밴드", '<rect x="2" y="2" width="20" height="20" rx="6" fill="currentColor"/><path d="M8.5 6.5v9.2a3.3 3.3 0 1 0 3.3-3.3H8.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>'),
+    ("스레드", '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M17.5 8.5C16.6 5.6 14.6 4 12 4 7.6 4 5 7.3 5 12s2.6 8 7 8c3.6 0 6-2 6-4.8 0-2.6-2.1-4-5.2-4-2.4 0-3.8 1.1-3.8 2.6 0 1.4 1.2 2.3 2.8 2.3 2.7 0 4-2.2 3.6-6.6"/>'),
+    ("더 보기", '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></g>'),
+]
+SHARE7_CSS = """
+.share-pop .share-buttons { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.share-pop .share-buttons li.share-main { grid-column: 1 / -1; }
+.share-pop .share-buttons li.share-main .sharing-platform-button { display: flex; width: 100%; justify-content: center; gap: 8px; padding: 11px 16px; font-size: 16px; line-height: 24px; background: #fff; border-color: #B5BAC0; color: #111; }
+.share-pop .share-buttons li:not(.share-main) .sharing-platform-button { display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 4px; padding: 10px 4px 8px; font-size: 13px; line-height: 19px; }
+.share-pop .share-buttons li:not(.share-main) svg { width: 22px; height: 22px; }
+"""
 
 
 def samples():
@@ -135,6 +150,12 @@ def samples():
     items = "".join(f'<li{" class=share-main" if n == "링크 복사" else ""}><span class="sharing-platform-button" role="button">{svg}<span class="platform-sharing-text">{n}</span></span></li>' for n, svg in SHARE_ICONS.items())
     s.append(("A7", "공유 팝업", "글 제목 옆 공유 버튼", "짧은 창 400 · 링크 복사 = 맨 위 한 줄 큰 버튼(48 · 16 굵게) · 아래 페이스북 · X · 카카오톡 같은 폭",
               frame(box("공유", f'<ul class="share-buttons">{items}</ul>', "share-pop", "share-pop-body"), 420)))
+    # A7-2 = 채널 7개 안 (2026-11-14 사용자 "목업에 전부 넣어줘") — 아직 테마에 없다. 링크 복사 큰 버튼 아래 4칸 격자, 칸 = 아이콘 위 · 이름 아래
+    more = [(n, svg) for n, svg in SHARE_ICONS.items() if n != "링크 복사"] + [(n, f'<svg viewBox="0 0 24 24" width="22" height="22">{g}</svg>') for n, g in SHARE_MORE]
+    tiles = "".join(f'<li><span class="sharing-platform-button" role="button">{svg}<span class="platform-sharing-text">{n}</span></span></li>' for n, svg in more)
+    main = f'<li class="share-main"><span class="sharing-platform-button" role="button">{SHARE_ICONS["링크 복사"]}<span class="platform-sharing-text">링크 복사</span></span></li>'
+    s.append(("A7-2", "공유 팝업 · 채널 7개 안", "목업만 (테마 전)", "링크 복사 큰 버튼 아래 4칸 격자 · 칸 = 아이콘 22 위 · 이름 13 아래 · `더 보기`(휴대폰 기본 공유)는 폰에서만",
+              frame(box("공유", f'<ul class="share-buttons">{main}{tiles}</ul>', "share-pop", "share-pop-body"), 460, extra_css=SHARE7_CSS)))
     G = '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="10" fill="#4285F4"/></svg>'
     acct = ('<p class="as-acct-note">댓글에 쓰는 구글 계정으로 로그인합니다.</p>'
             f'<button type="button" class="as-acct-btn">{G}<span>Google 계정으로 로그인</span></button><p class="as-acct-err"></p>')
