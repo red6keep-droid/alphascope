@@ -42,6 +42,8 @@ sys.path.insert(0, EXP)
 sys.path.insert(0, os.path.join(EXP, "stock-radar"))
 sys.path.insert(0, os.path.join(EXP, "kr-stocks"))
 import tech_signals as ts  # noqa: E402
+sys.path.insert(0, HERE)
+import render_quick as RQ  # noqa: E402
 
 
 def load_env():
@@ -339,6 +341,7 @@ def main():
         for it in disc["days"][day]:
             disc_by.setdefault(it["c"], []).append(it)
 
+    full = RQ.full_index(ref)
     fresh = carried = missing = 0
     stats = {"short": 0, "halted": 0, "earn": 0, "news": 0, "disc": 0}
     for m in metas:
@@ -367,9 +370,15 @@ def main():
         stats["news"] += bool(f.get("news"))
         stats["disc"] += bool(f.get("disc"))
         json.dump(f, open(path, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+        try:   # 화면 조각 — 고정 페이지 stock-quick 이 끼워 넣는다(render_quick)
+            open(path[:-5] + ".html", "w", encoding="utf-8").write(RQ.render(f, bench, full))
+        except Exception as e:  # noqa: BLE001
+            stats["render_fail"] = stats.get("render_fail", 0) + 1
+            print(f"[quick] 화면 조각 실패 {m['sym']}: {str(e)[:100]}")
 
     total = len(metas)
-    sizes = [os.path.getsize(os.path.join(out, d, x)) for d in ("us", "kr") for x in os.listdir(os.path.join(out, d))]
+    sizes = [os.path.getsize(os.path.join(out, d, x)) for d in ("us", "kr") for x in os.listdir(os.path.join(out, d)) if x.endswith(".json")]
+    hsizes = [os.path.getsize(os.path.join(out, d, x)) for d in ("us", "kr") for x in os.listdir(os.path.join(out, d)) if x.endswith(".html")]
     version = {"built": datetime.datetime.now(KST).isoformat(timespec="minutes"), "date": newest,
                "n": total, "fresh": fresh, "carried": carried, "missing": missing}
     json.dump(version, open(os.path.join(out, "version.json"), "w", encoding="utf-8"), ensure_ascii=False)
@@ -377,6 +386,8 @@ def main():
     print(f"[quick] 1년 미만 {stats['short']} · 거래정지 {stats['halted']} · 실적일 {stats['earn']} · 기사 {stats['news']} · 공시 {stats['disc']}")
     if sizes:
         print(f"[quick] 종목 파일 평균 {sum(sizes) // len(sizes)}B · 최대 {max(sizes)}B · 합계 {sum(sizes) // 1024}KB")
+    if hsizes:
+        print(f"[quick] 화면 조각 {len(hsizes)}개 평균 {sum(hsizes) // len(hsizes) // 1024}KB · 합계 {sum(hsizes) // 1024 // 1024}MB · 실패 {stats.get('render_fail', 0)}")
     if fresh < total * MIN_SHARE:
         print(f"[quick] 받은 종목이 {MIN_SHARE:.0%} 밖 — 올리지 않는다")
         sys.exit(3)
