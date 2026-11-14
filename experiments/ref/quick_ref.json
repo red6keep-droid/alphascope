@@ -1,0 +1,7509 @@
+{
+ "ai_calls": 0,
+ "built": "2026-11-14",
+ "dup_names": {},
+ "kr": {
+  "000100.KS": {
+   "corp": "00145109",
+   "en": "Yuhan Corporation",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "유한양행",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "000120.KS": {
+   "corp": "00113410",
+   "en": "CJ Logistics Corp",
+   "industry_en": "Marine Shipping",
+   "ko": "CJ대한통운",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "해운"
+  },
+  "000150.KS": {
+   "corp": "00117212",
+   "en": "Doosan Corporation",
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "두산",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계"
+  },
+  "000240.KS": {
+   "corp": "00160047",
+   "en": "HANKOOK & COMPANY CO., LTD.",
+   "industry_en": "Electrical Products",
+   "ko": "한국앤컴퍼니",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "000250.KQ": {
+   "corp": "00128546",
+   "en": "Sam Chun Dang Pharm. Co., Ltd.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "삼천당제약",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "000270.KS": {
+   "corp": "00106641",
+   "en": "Kia Corporation",
+   "full": true,
+   "industry_en": "Motor Vehicles",
+   "ko": "기아",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "자동차",
+   "sub_ours": "경기 소비재"
+  },
+  "000500.KS": {
+   "corp": "00104768",
+   "en": "Gaon Cable Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "가온전선",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "000660.KS": {
+   "corp": "00164779",
+   "en": "SK hynix Inc.",
+   "full": true,
+   "industry_en": "Semiconductors",
+   "ko": "SK하이닉스",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_ours": "기술"
+  },
+  "000720.KS": {
+   "corp": "00164478",
+   "en": "Hyundai Engineering & Construction Co., Ltd",
+   "industry_en": "Homebuilding",
+   "ko": "현대건설",
+   "market": "KOSPI",
+   "sector": "부동산",
+   "sub": "주택 건설"
+  },
+  "000810.KS": {
+   "corp": "00139214",
+   "en": "Samsung Fire & Marine Insurance Co., Ltd",
+   "full": true,
+   "industry_en": "Property/Casualty Insurance",
+   "ko": "삼성화재",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "손해보험",
+   "sub_ours": "금융"
+  },
+  "000880.KS": {
+   "corp": "00160588",
+   "en": "Hanwha Corp",
+   "industry_en": "Industrial Specialties",
+   "ko": "한화",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "산업 특화"
+  },
+  "000990.KS": {
+   "corp": "00160843",
+   "en": "DB HiTek Co. LTD",
+   "industry_en": "Semiconductors",
+   "ko": "DB하이텍",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "001040.KS": {
+   "corp": "00148540",
+   "en": "CJ Corporation",
+   "industry_en": "Food: Specialty/Candy",
+   "ko": "CJ",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 · 특화 · 사탕"
+  },
+  "001120.KS": {
+   "corp": "00120076",
+   "en": "LX INTERNATIONAL CORP.",
+   "industry_en": "Wholesale Distributors",
+   "ko": "LX인터내셔널",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "도매 유통"
+  },
+  "001430.KS": {
+   "corp": "00106669",
+   "en": "SeAH Besteel Holdings Corporation",
+   "industry_en": "Steel",
+   "ko": "세아베스틸지주",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "철강"
+  },
+  "001440.KS": {
+   "corp": "00113207",
+   "en": "Taihan Cable & Solution Co., Ltd.",
+   "industry_en": "Metal Fabrication",
+   "ko": "대한전선",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "금속 가공"
+  },
+  "001450.KS": {
+   "corp": "00164973",
+   "en": "Hyundai Marine & Fire Insurance Co., Ltd.",
+   "industry_en": "Property/Casualty Insurance",
+   "ko": "현대해상",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "손해보험"
+  },
+  "001740.KS": {
+   "corp": "00131780",
+   "en": "SK Networks Co., Ltd.",
+   "industry_en": "Wholesale Distributors",
+   "ko": "SK네트웍스",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "도매 유통"
+  },
+  "001800.KS": {
+   "corp": "00117577",
+   "en": "ORION Holdings Corporation",
+   "industry_en": "Food: Specialty/Candy",
+   "ko": "오리온홀딩스",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 · 특화 · 사탕"
+  },
+  "001820.KS": {
+   "corp": "00129350",
+   "en": "SAMWHA CAPACITOR CO., LTD.",
+   "industry_en": "Electronic Components",
+   "ko": "삼화콘덴서공업",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "002380.KS": {
+   "corp": "00105271",
+   "en": "KCC Corporation",
+   "industry_en": "Industrial Specialties",
+   "ko": "케이씨씨",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "산업 특화"
+  },
+  "002790.KS": {
+   "corp": "00154462",
+   "en": "AMOREPACIFIC Holdings Corp.",
+   "industry_en": "Household/Personal Care",
+   "ko": "아모레퍼시픽홀딩스",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "가정 · 개인용품"
+  },
+  "003230.KS": {
+   "corp": "00126955",
+   "en": "Samyang Foods Co., Ltd",
+   "industry_en": "Food: Major Diversified",
+   "ko": "삼양식품",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 · 종합"
+  },
+  "003380.KQ": {
+   "corp": "00148364",
+   "en": "Harim Holdings Co., Ltd.",
+   "industry_en": "Wholesale Distributors",
+   "ko": "하림지주",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "도매 유통"
+  },
+  "003490.KS": {
+   "corp": "00113526",
+   "en": "Korean Air Lines Co., Ltd.",
+   "industry_en": "Airlines",
+   "ko": "대한항공",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "항공사"
+  },
+  "003540.KS": {
+   "corp": "00110893",
+   "en": "Daishin Securities Co., Ltd",
+   "industry_en": "Investment Banks/Brokers",
+   "ko": "대신증권",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "투자은행 · 증권"
+  },
+  "003550.KS": {
+   "corp": "00120021",
+   "en": "LG Corp",
+   "industry_en": "Electronics/Appliances",
+   "ko": "LG",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 · 가전"
+  },
+  "003670.KS": {
+   "corp": "00155276",
+   "en": "POSCO FUTURE M CO., LTD.",
+   "full": true,
+   "industry_en": "Electronic Equipment/Instruments",
+   "ko": "포스코퓨처엠",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기",
+   "sub_ours": "산업재"
+  },
+  "003690.KS": {
+   "corp": "00113191",
+   "en": "Korean Reinsurance Company",
+   "industry_en": "Multi-Line Insurance",
+   "ko": "코리안리",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "종합 보험"
+  },
+  "004020.KS": {
+   "corp": "00145880",
+   "en": "Hyundai Steel Company",
+   "industry_en": "Steel",
+   "ko": "현대제철",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "철강"
+  },
+  "004170.KS": {
+   "corp": "00136378",
+   "en": "Shinsegae Co., Ltd",
+   "industry_en": "Department Stores",
+   "ko": "신세계",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "백화점"
+  },
+  "004370.KS": {
+   "corp": "00108241",
+   "en": "Nongshim Co., Ltd.",
+   "industry_en": "Food: Specialty/Candy",
+   "ko": "농심",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 · 특화 · 사탕"
+  },
+  "004800.KS": {
+   "corp": "00117188",
+   "en": "Hyosung Corporation",
+   "industry_en": "Financial Conglomerates",
+   "ko": "효성",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "금융 지주"
+  },
+  "004990.KS": {
+   "corp": "00120562",
+   "en": "Lotte Corp",
+   "industry_en": "Food: Specialty/Candy",
+   "ko": "롯데지주",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 · 특화 · 사탕"
+  },
+  "005070.KS": {
+   "corp": "00129989",
+   "en": "Cosmo AM&T Co., Ltd.",
+   "industry_en": "Electronic Equipment/Instruments",
+   "ko": "코스모신소재",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기"
+  },
+  "005290.KQ": {
+   "corp": "00118804",
+   "en": "Dongjin Semichem Co., Ltd",
+   "industry_en": "Electronic Production Equipment",
+   "ko": "동진쎄미켐",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 생산 장비"
+  },
+  "005380.KS": {
+   "corp": "00164742",
+   "en": "Hyundai Motor Company",
+   "full": true,
+   "industry_en": "Motor Vehicles",
+   "ko": "현대차",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "자동차",
+   "sub_ours": "경기 소비재"
+  },
+  "005440.KS": {
+   "corp": "00105280",
+   "en": "HYUNDAI G.F. HOLDINGS CO. LTD.",
+   "industry_en": "Home Furnishings",
+   "ko": "현대지에프홀딩스",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "가구 · 인테리어"
+  },
+  "005490.KS": {
+   "corp": "00155319",
+   "en": "POSCO Holdings Inc.",
+   "full": true,
+   "industry_en": "Steel",
+   "ko": "POSCO홀딩스",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "철강",
+   "sub_ours": "소재"
+  },
+  "005830.KS": {
+   "corp": "00159102",
+   "en": "DB INSURANCE CO. LTD",
+   "industry_en": "Multi-Line Insurance",
+   "ko": "DB손해보험",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "종합 보험"
+  },
+  "005850.KS": {
+   "corp": "00125521",
+   "en": "SL Corporation",
+   "industry_en": "Auto Parts: OEM",
+   "ko": "에스엘",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "자동차 부품 OEM"
+  },
+  "005930.KS": {
+   "corp": "00126380",
+   "en": "Samsung Electronics Co., Ltd.",
+   "full": true,
+   "industry_en": "Semiconductors",
+   "ko": "삼성전자",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_ours": "기술"
+  },
+  "005940.KS": {
+   "corp": "00120182",
+   "en": "NH INVESTMENT & SECURITIES CO.LTD.",
+   "industry_en": "Investment Banks/Brokers",
+   "ko": "NH투자증권",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "투자은행 · 증권"
+  },
+  "006040.KS": {
+   "corp": "00118026",
+   "en": "Dongwon Industries Co., Ltd",
+   "industry_en": "Air Freight/Couriers",
+   "ko": "동원산업",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "항공 화물 · 택배"
+  },
+  "006120.KS": {
+   "corp": "00131832",
+   "en": "SK Discovery Co. Ltd.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "SK디스커버리",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "006260.KS": {
+   "corp": "00105952",
+   "en": "LS Corp.",
+   "industry_en": "Electrical Products",
+   "ko": "LS",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "006280.KS": {
+   "corp": "00129679",
+   "en": "GC Biopharma Corp.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "녹십자",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "006360.KS": {
+   "corp": "00120030",
+   "en": "GS Engineering & Construction Corporation",
+   "industry_en": "Homebuilding",
+   "ko": "GS건설",
+   "market": "KOSPI",
+   "sector": "부동산",
+   "sub": "주택 건설"
+  },
+  "006400.KS": {
+   "corp": "00126362",
+   "en": "Samsung SDI Co., Ltd",
+   "full": true,
+   "industry_en": "Electrical Products",
+   "ko": "삼성SDI",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품",
+   "sub_ours": "산업재"
+  },
+  "006730.KQ": {
+   "corp": "00130383",
+   "en": "Seobu T&D Co., Ltd.",
+   "industry_en": "Oil Refining/Marketing",
+   "ko": "서부T&D",
+   "market": "KOSDAQ",
+   "sector": "에너지",
+   "sub": "석유 정제 · 마케팅"
+  },
+  "006800.KS": {
+   "corp": "00111722",
+   "en": "MIRAE ASSET SECURITIES CO., LTD.",
+   "industry_en": "Investment Banks/Brokers",
+   "ko": "미래에셋증권",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "투자은행 · 증권"
+  },
+  "007070.KS": {
+   "corp": "00140177",
+   "en": "GS Retail Co., Ltd.",
+   "industry_en": "Food Retail",
+   "ko": "GS리테일",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 소매"
+  },
+  "007310.KS": {
+   "corp": "00141529",
+   "en": "OTOKI Corporation",
+   "industry_en": "Food: Specialty/Candy",
+   "ko": "오뚜기",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 · 특화 · 사탕"
+  },
+  "007340.KS": {
+   "corp": "00116949",
+   "en": "DN AUTOMOTIVE CORPORATION",
+   "industry_en": "Auto Parts: OEM",
+   "ko": "DN오토모티브",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "자동차 부품 OEM"
+  },
+  "007390.KQ": {
+   "corp": "00117276",
+   "en": "NATURECELL Co., Ltd.",
+   "industry_en": "Beverages: Non-Alcoholic",
+   "ko": "네이처셀",
+   "market": "KOSDAQ",
+   "sector": "필수 소비재",
+   "sub": "무알코올 음료"
+  },
+  "007660.KS": {
+   "corp": "00107613",
+   "en": "ISU Petasys Co., Ltd.",
+   "industry_en": "Electronic Components",
+   "ko": "이수페타시스",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "007810.KS": {
+   "corp": "00152686",
+   "en": "Korea Circuit Co., Ltd.",
+   "industry_en": "Electronic Components",
+   "ko": "코리아써키트",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "008770.KS": {
+   "corp": "00165680",
+   "en": "HOTEL SHILLA CO., LTD.",
+   "industry_en": "Hotels/Resorts/Cruise lines",
+   "ko": "호텔신라",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "호텔 · 리조트 · 크루즈"
+  },
+  "008930.KS": {
+   "corp": "00161426",
+   "en": "Hanmi Science Co., Ltd",
+   "industry_en": "Medical Distributors",
+   "ko": "한미사이언스",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "의료 유통"
+  },
+  "009150.KS": {
+   "corp": "00126371",
+   "en": "Samsung Electro-Mechanics Co., Ltd",
+   "industry_en": "Semiconductors",
+   "ko": "삼성전기",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "009420.KS": {
+   "corp": "00162586",
+   "en": "Hanall Biopharma Co., Ltd.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "한올바이오파마",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "009540.KS": {
+   "corp": "00164830",
+   "en": "HD KOREA SHIPBUILDING & OFFSHORE ENGINEERING CO. LTD.",
+   "full": true,
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "HD한국조선해양",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계",
+   "sub_ours": "산업재"
+  },
+  "009830.KS": {
+   "corp": "00162461",
+   "en": "HANWHA SOLUTIONS CORPORATION",
+   "industry_en": "Semiconductors",
+   "ko": "한화솔루션",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "009970.KS": {
+   "corp": "00140964",
+   "en": "Youngone Holdings Co., Ltd.",
+   "industry_en": "Apparel/Footwear",
+   "ko": "영원무역홀딩스",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "의류 · 신발"
+  },
+  "010060.KS": {
+   "corp": "00148896",
+   "en": "OCI Holdings Company Ltd.",
+   "industry_en": "Chemicals: Specialty",
+   "ko": "OCI홀딩스",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "특수 화학"
+  },
+  "010120.KS": {
+   "corp": "00105855",
+   "en": "LS Electric Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "엘에스일렉트릭",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "010130.KS": {
+   "corp": "00102858",
+   "en": "Korea Zinc Co., Ltd.",
+   "full": true,
+   "industry_en": "Other Metals/Minerals",
+   "ko": "고려아연",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "기타 금속 · 광물",
+   "sub_ours": "소재"
+  },
+  "010140.KS": {
+   "corp": "00126478",
+   "en": "Samsung Heavy Industries Co., Ltd",
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "삼성중공업",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계"
+  },
+  "010170.KQ": {
+   "corp": "00113261",
+   "en": "Taihan Fiberoptics Co., Ltd",
+   "industry_en": "Electrical Products",
+   "ko": "대한광통신",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "010950.KS": {
+   "corp": "00138279",
+   "en": "S-Oil Corporation",
+   "industry_en": "Oil Refining/Marketing",
+   "ko": "S-Oil",
+   "market": "KOSPI",
+   "sector": "에너지",
+   "sub": "석유 정제 · 마케팅"
+  },
+  "011070.KS": {
+   "corp": "00105961",
+   "en": "LG Innotek Co., Ltd",
+   "industry_en": "Electronic Production Equipment",
+   "ko": "LG이노텍",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 생산 장비"
+  },
+  "011170.KS": {
+   "corp": "00165413",
+   "en": "Lotte Chemical Corporation",
+   "industry_en": "Chemicals: Specialty",
+   "ko": "롯데케미칼",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "특수 화학"
+  },
+  "011200.KS": {
+   "corp": "00164645",
+   "en": "HMM CO.,LTD",
+   "industry_en": "Marine Shipping",
+   "ko": "HMM",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "해운"
+  },
+  "011210.KS": {
+   "corp": "00106623",
+   "en": "Hyundai Wia Corporation",
+   "industry_en": "Auto Parts: OEM",
+   "ko": "현대위아",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "자동차 부품 OEM"
+  },
+  "011780.KS": {
+   "corp": "00106368",
+   "en": "Kumho Petrochemical Co., Ltd.",
+   "industry_en": "Chemicals: Specialty",
+   "ko": "금호석유화학",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "특수 화학"
+  },
+  "011790.KS": {
+   "corp": "00139889",
+   "en": "SKC Co., Ltd.",
+   "industry_en": "Chemicals: Specialty",
+   "ko": "SKC",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "특수 화학"
+  },
+  "012330.KS": {
+   "corp": "00164788",
+   "en": "Hyundai Mobis Co., Ltd",
+   "industry_en": "Auto Parts: OEM",
+   "ko": "현대모비스",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "자동차 부품 OEM"
+  },
+  "012750.KS": {
+   "corp": "00158501",
+   "en": "S-1 Corporation",
+   "industry_en": "Miscellaneous Commercial Services",
+   "ko": "에스원",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "기타 상업 서비스"
+  },
+  "014620.KQ": {
+   "corp": "00132318",
+   "en": "SUNG KWANG BEND Co., Ltd.",
+   "industry_en": "Metal Fabrication",
+   "ko": "성광벤드",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "금속 가공"
+  },
+  "014680.KS": {
+   "corp": "00140955",
+   "en": "Hansol Chemical Co., Ltd",
+   "industry_en": "Chemicals: Major Diversified",
+   "ko": "한솔케미칼",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "종합 화학"
+  },
+  "015760.KS": {
+   "corp": "00159193",
+   "en": "Korea Electric Power Corporation",
+   "full": true,
+   "industry_en": "Electric Utilities",
+   "ko": "한국전력",
+   "market": "KOSPI",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_ours": "유틸리티"
+  },
+  "016360.KS": {
+   "corp": "00104856",
+   "en": "Samsung Securities Co., Ltd.",
+   "industry_en": "Investment Banks/Brokers",
+   "ko": "삼성증권",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "투자은행 · 증권"
+  },
+  "017670.KS": {
+   "corp": "00159023",
+   "en": "SK Telecom Co., Ltd.",
+   "full": true,
+   "industry_en": "Wireless Telecommunications",
+   "ko": "SK텔레콤",
+   "market": "KOSPI",
+   "sector": "커뮤니케이션",
+   "sub": "무선 통신",
+   "sub_ours": "커뮤니케이션"
+  },
+  "017800.KS": {
+   "corp": "00164724",
+   "en": "Hyundai Elevator Co., Ltd",
+   "industry_en": "Building Products",
+   "ko": "현대엘리베이터",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건자재"
+  },
+  "018260.KS": {
+   "corp": "00126186",
+   "en": "SAMSUNG SDS CO., LTD.",
+   "industry_en": "Information Technology Services",
+   "ko": "삼성에스디에스",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "IT 서비스"
+  },
+  "018670.KS": {
+   "corp": "00144164",
+   "en": "SK Gas Co., Ltd.",
+   "industry_en": "Gas Distributors",
+   "ko": "SK가스",
+   "market": "KOSPI",
+   "sector": "에너지",
+   "sub": "가스 유통"
+  },
+  "018880.KS": {
+   "corp": "00161125",
+   "en": "Hanon Systems",
+   "industry_en": "Auto Parts: OEM",
+   "ko": "한온시스템",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "자동차 부품 OEM"
+  },
+  "020150.KS": {
+   "corp": "00113997",
+   "en": "LOTTE ENERGY MATERIALS CORPORATION",
+   "industry_en": "Electrical Products",
+   "ko": "롯데에너지머티리얼즈",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "020560.KS": {
+   "corp": "00138792",
+   "en": "Asiana Airlines Inc.",
+   "industry_en": "Airlines",
+   "ko": "아시아나항공",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "항공사"
+  },
+  "021240.KS": {
+   "corp": "00170558",
+   "en": "Coway Co., Ltd.",
+   "industry_en": "Electronics/Appliances",
+   "ko": "코웨이",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 · 가전"
+  },
+  "022100.KS": {
+   "corp": "00155212",
+   "en": "POSCO DX COMPANY LTD.",
+   "industry_en": "Information Technology Services",
+   "ko": "포스코DX",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "IT 서비스"
+  },
+  "023160.KQ": {
+   "corp": "00153375",
+   "en": "TK Corporation",
+   "industry_en": "Industrial Machinery",
+   "ko": "태광",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "023530.KS": {
+   "corp": "00120526",
+   "en": "Lotte Shopping Co., Ltd",
+   "industry_en": "Department Stores",
+   "ko": "롯데쇼핑",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "백화점"
+  },
+  "023590.KS": {
+   "corp": "00176914",
+   "en": "DAOU TECHNOLOGY Inc.",
+   "industry_en": "Investment Banks/Brokers",
+   "ko": "다우기술",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "투자은행 · 증권"
+  },
+  "024110.KS": {
+   "corp": "00149646",
+   "en": "Industrial Bank Of Korea",
+   "industry_en": "Regional Banks",
+   "ko": "기업은행",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "지역 은행"
+  },
+  "026960.KS": {
+   "corp": "00144395",
+   "en": "Dongsuh Companies, Inc.",
+   "industry_en": "Food: Major Diversified",
+   "ko": "동서",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 · 종합"
+  },
+  "028050.KS": {
+   "corp": "00126308",
+   "en": "SAMSUNG E&A CO. LTD.",
+   "industry_en": "Engineering & Construction",
+   "ko": "삼성E&A",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "엔지니어링 · 건설"
+  },
+  "028260.KS": {
+   "corp": "00149655",
+   "en": "SAMSUNG C&T CORP",
+   "full": true,
+   "industry_en": "Engineering & Construction",
+   "ko": "삼성물산",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "엔지니어링 · 건설",
+   "sub_ours": "산업재"
+  },
+  "028300.KQ": {
+   "corp": "00199252",
+   "en": "HLB Co., Ltd.",
+   "industry_en": "Biotechnology",
+   "ko": "HLB",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "바이오 기술"
+  },
+  "028670.KS": {
+   "corp": "00122737",
+   "en": "Pan Ocean Co., Ltd.",
+   "industry_en": "Marine Shipping",
+   "ko": "팬오션",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "해운"
+  },
+  "029780.KS": {
+   "corp": "00126292",
+   "en": "Samsung Card Co., Ltd",
+   "industry_en": "Finance/Rental/Leasing",
+   "ko": "삼성카드",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "금융 · 임대 · 리스"
+  },
+  "030000.KS": {
+   "corp": "00148276",
+   "en": "Cheil Worldwide Inc",
+   "industry_en": "Advertising/Marketing Services",
+   "ko": "제일기획",
+   "market": "KOSPI",
+   "sector": "커뮤니케이션",
+   "sub": "광고 · 마케팅"
+  },
+  "030200.KS": {
+   "corp": "00190321",
+   "en": "KT Corporation",
+   "industry_en": "Major Telecommunications",
+   "ko": "케이티",
+   "market": "KOSPI",
+   "sector": "커뮤니케이션",
+   "sub": "대형 통신"
+  },
+  "030530.KQ": {
+   "corp": "00216647",
+   "en": "WONIK HOLDINGS CO., LTD.",
+   "industry_en": "Semiconductors",
+   "ko": "원익홀딩스",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "031210.KS": {
+   "corp": "00112998",
+   "en": "Seoul Guarantee Insurance Company",
+   "industry_en": "Multi-Line Insurance",
+   "ko": "서울보증보험",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "종합 보험"
+  },
+  "031330.KQ": {
+   "corp": "00128661",
+   "en": "SAMT Co., Ltd.",
+   "industry_en": "Semiconductors",
+   "ko": "에스에이엠티",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "031980.KQ": {
+   "corp": "00208444",
+   "en": "PSK HOLDINGS INC.",
+   "industry_en": "Semiconductors",
+   "ko": "피에스케이홀딩스",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "032190.KQ": {
+   "corp": "00238782",
+   "en": "Daou Data Corp",
+   "industry_en": "Electronics Distributors",
+   "ko": "다우데이타",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 유통"
+  },
+  "032500.KQ": {
+   "corp": "00226352",
+   "en": "KMW, Inc.",
+   "industry_en": "Electronic Production Equipment",
+   "ko": "케이엠더블유",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 생산 장비"
+  },
+  "032640.KS": {
+   "corp": "00231363",
+   "en": "LG Uplus Corp",
+   "industry_en": "Major Telecommunications",
+   "ko": "LG유플러스",
+   "market": "KOSPI",
+   "sector": "커뮤니케이션",
+   "sub": "대형 통신"
+  },
+  "032820.KQ": {
+   "corp": "00231044",
+   "en": "Woori Technology Inc.",
+   "industry_en": "Electronics/Appliances",
+   "ko": "우리기술",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 · 가전"
+  },
+  "032830.KS": {
+   "corp": "00126256",
+   "en": "Samsung Life Insurance Co., Ltd.",
+   "full": true,
+   "industry_en": "Life/Health Insurance",
+   "ko": "삼성생명",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "생명 · 건강보험",
+   "sub_ours": "금융"
+  },
+  "033100.KQ": {
+   "corp": "00185356",
+   "en": "Cheryong Electric Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "제룡전기",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "033640.KQ": {
+   "corp": "00227333",
+   "en": "Nepes Corporation",
+   "industry_en": "Electronic Components",
+   "ko": "네패스",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "033780.KS": {
+   "corp": "00244455",
+   "en": "KT & G Corporation",
+   "industry_en": "Tobacco",
+   "ko": "케이티앤지",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "담배"
+  },
+  "033790.KQ": {
+   "corp": "00276083",
+   "en": "FINO INC.",
+   "industry_en": "Packaged Software",
+   "ko": "피노",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "034020.KS": {
+   "corp": "00159616",
+   "en": "Doosan Enerbility Co., Ltd.",
+   "full": true,
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "두산에너빌리티",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계",
+   "sub_ours": "산업재"
+  },
+  "034220.KS": {
+   "corp": "00105873",
+   "en": "LG Display Co., Ltd",
+   "industry_en": "Electronic Production Equipment",
+   "ko": "LG디스플레이",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 생산 장비"
+  },
+  "034730.KS": {
+   "corp": "00181712",
+   "en": "SK Inc.",
+   "industry_en": "Financial Conglomerates",
+   "ko": "SK",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "금융 지주"
+  },
+  "035250.KS": {
+   "corp": "00255619",
+   "en": "Kangwon Land, Inc.",
+   "industry_en": "Casinos/Gaming",
+   "ko": "강원랜드",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "카지노 · 게임"
+  },
+  "035420.KS": {
+   "corp": "00266961",
+   "en": "NAVER Corp.",
+   "full": true,
+   "industry_en": "Packaged Software",
+   "ko": "NAVER",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어",
+   "sub_ours": "커뮤니케이션"
+  },
+  "035720.KS": {
+   "corp": "00258801",
+   "en": "Kakao Corp.",
+   "full": true,
+   "industry_en": "Information Technology Services",
+   "ko": "카카오",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "IT 서비스",
+   "sub_ours": "커뮤니케이션"
+  },
+  "035760.KQ": {
+   "corp": "00265324",
+   "en": "CJ ENM Co., Ltd.",
+   "industry_en": "Broadcasting",
+   "ko": "CJ ENM",
+   "market": "KOSDAQ",
+   "sector": "커뮤니케이션",
+   "sub": "방송"
+  },
+  "035900.KQ": {
+   "corp": "00258689",
+   "en": "JYP Entertainment Corp",
+   "industry_en": "Movies/Entertainment",
+   "ko": "JYP Ent.",
+   "market": "KOSDAQ",
+   "sector": "커뮤니케이션",
+   "sub": "영화 · 엔터테인먼트"
+  },
+  "036460.KS": {
+   "corp": "00261285",
+   "en": "Korea Gas Corporation",
+   "industry_en": "Gas Distributors",
+   "ko": "한국가스공사",
+   "market": "KOSPI",
+   "sector": "에너지",
+   "sub": "가스 유통"
+  },
+  "036540.KQ": {
+   "corp": "00301246",
+   "en": "SFA Semicon Co., Ltd.",
+   "industry_en": "Semiconductors",
+   "ko": "SFA반도체",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "036570.KS": {
+   "corp": "00261443",
+   "en": "NC Corporation",
+   "industry_en": "Packaged Software",
+   "ko": "NC",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "036810.KQ": {
+   "corp": "00223434",
+   "en": "Fine Semitech Corp",
+   "industry_en": "Industrial Machinery",
+   "ko": "에프에스티",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "036830.KQ": {
+   "corp": "00247975",
+   "en": "Soulbrain Holdings Co., Ltd.",
+   "industry_en": "Chemicals: Specialty",
+   "ko": "솔브레인홀딩스",
+   "market": "KOSDAQ",
+   "sector": "소재",
+   "sub": "특수 화학"
+  },
+  "036930.KQ": {
+   "corp": "00252135",
+   "en": "Jusung Engineering Co., Ltd",
+   "industry_en": "Industrial Machinery",
+   "ko": "주성엔지니어링",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "038500.KQ": {
+   "corp": "00239639",
+   "en": "SAMPYO Cement Co. Ltd.",
+   "industry_en": "Construction Materials",
+   "ko": "삼표시멘트",
+   "market": "KOSDAQ",
+   "sector": "소재",
+   "sub": "건설 자재"
+  },
+  "039030.KQ": {
+   "corp": "00246417",
+   "en": "EO Technics Co., Ltd",
+   "industry_en": "Industrial Machinery",
+   "ko": "이오테크닉스",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "039200.KQ": {
+   "corp": "00263654",
+   "en": "Oscotec Inc.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "오스코텍",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "039490.KS": {
+   "corp": "00296290",
+   "en": "Kiwoom Securities Co., Ltd",
+   "industry_en": "Investment Banks/Brokers",
+   "ko": "키움증권",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "투자은행 · 증권"
+  },
+  "041510.KQ": {
+   "corp": "00260930",
+   "en": "SM ENTERTAINMENT CO. Ltd.",
+   "industry_en": "Movies/Entertainment",
+   "ko": "에스엠",
+   "market": "KOSDAQ",
+   "sector": "커뮤니케이션",
+   "sub": "영화 · 엔터테인먼트"
+  },
+  "041830.KQ": {
+   "corp": "00269922",
+   "en": "InBody Co., Ltd.",
+   "industry_en": "Medical Specialties",
+   "ko": "인바디",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "의료 전문"
+  },
+  "041960.KQ": {
+   "corp": "00187415",
+   "en": "Komipharm International Co., Ltd",
+   "industry_en": "Biotechnology",
+   "ko": "코미팜",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "바이오 기술"
+  },
+  "042660.KS": {
+   "corp": "00111704",
+   "en": "Hanwha Ocean Co., Ltd.",
+   "full": true,
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "한화오션",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계",
+   "sub_ours": "산업재"
+  },
+  "042700.KS": {
+   "corp": "00161383",
+   "en": "Hanmi Semiconductor Co., Ltd",
+   "full": true,
+   "industry_en": "Industrial Machinery",
+   "ko": "한미반도체",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "산업 기계",
+   "sub_ours": "기술"
+  },
+  "043260.KQ": {
+   "corp": "00317210",
+   "en": "Sungho Electronics Corp.",
+   "industry_en": "Electronic Components",
+   "ko": "성호전자",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "044490.KQ": {
+   "corp": "00186799",
+   "en": "Taewoong Co., Ltd",
+   "industry_en": "Metal Fabrication",
+   "ko": "태웅",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "금속 가공"
+  },
+  "047040.KS": {
+   "corp": "00124540",
+   "en": "Daewoo Engineering & Construction Co., Ltd",
+   "industry_en": "Homebuilding",
+   "ko": "대우건설",
+   "market": "KOSPI",
+   "sector": "부동산",
+   "sub": "주택 건설"
+  },
+  "047050.KS": {
+   "corp": "00124504",
+   "en": "POSCO INTERNATIONAL Corporation",
+   "industry_en": "Industrial Conglomerates",
+   "ko": "포스코인터내셔널",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "산업 지주"
+  },
+  "048410.KQ": {
+   "corp": "00313649",
+   "en": "HYUNDAI BIOSCIENCE CO. LTD.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "현대바이오",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "050890.KQ": {
+   "corp": "00364403",
+   "en": "SOLiD Inc.",
+   "industry_en": "Computer Communications",
+   "ko": "쏠리드",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "컴퓨터 통신"
+  },
+  "051600.KS": {
+   "corp": "00159218",
+   "en": "KEPCO Plant Service & Engineering Co., Ltd",
+   "industry_en": "Engineering & Construction",
+   "ko": "한전KPS",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "엔지니어링 · 건설"
+  },
+  "051900.KS": {
+   "corp": "00356370",
+   "en": "LG H&H Co., Ltd.",
+   "industry_en": "Household/Personal Care",
+   "ko": "LG생활건강",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "가정 · 개인용품"
+  },
+  "051910.KS": {
+   "corp": "00356361",
+   "en": "LG Chem Ltd.",
+   "full": true,
+   "industry_en": "Chemicals: Specialty",
+   "ko": "LG화학",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "특수 화학",
+   "sub_ours": "소재"
+  },
+  "052690.KS": {
+   "corp": "00159209",
+   "en": "KEPCO Engineering & Construction Co., Inc.",
+   "industry_en": "Engineering & Construction",
+   "ko": "한전기술",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "엔지니어링 · 건설"
+  },
+  "053610.KQ": {
+   "corp": "00325112",
+   "en": "Protec Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "프로텍",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "053800.KQ": {
+   "corp": "00298270",
+   "en": "AhnLab, Inc.",
+   "industry_en": "Packaged Software",
+   "ko": "안랩",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "055550.KS": {
+   "corp": "00382199",
+   "en": "Shinhan Financial Group Co., Ltd.",
+   "full": true,
+   "industry_en": "Major Banks",
+   "ko": "신한지주",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "대형 은행",
+   "sub_ours": "금융"
+  },
+  "056090.KQ": {
+   "corp": "00346610",
+   "en": "CG MedTech Co.Ltd.",
+   "industry_en": "Medical Specialties",
+   "ko": "시지메드텍",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "의료 전문"
+  },
+  "056190.KQ": {
+   "corp": "00358271",
+   "en": "SFA Engineering Corp.",
+   "industry_en": "Electronic Production Equipment",
+   "ko": "SFA",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 생산 장비"
+  },
+  "058470.KQ": {
+   "corp": "00369657",
+   "en": "Leeno Industrial Inc.",
+   "industry_en": "Semiconductors",
+   "ko": "리노공업",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "058610.KQ": {
+   "corp": "00220686",
+   "en": "SPG Co., Ltd",
+   "industry_en": "Electrical Products",
+   "ko": "에스피지",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "059090.KQ": {
+   "corp": "00366942",
+   "en": "MiCo Ltd.",
+   "industry_en": "Semiconductors",
+   "ko": "미코",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "060370.KQ": {
+   "corp": "00225742",
+   "en": "LS Marine Solution Co., Ltd.",
+   "industry_en": "Engineering & Construction",
+   "ko": "LS마린솔루션",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "엔지니어링 · 건설"
+  },
+  "062040.KS": {
+   "corp": "00366438",
+   "en": "Sanil Electric Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "산일전기",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "064290.KQ": {
+   "corp": "00479787",
+   "en": "INTEKPLUS Co., Ltd.",
+   "industry_en": "Electronic Equipment/Instruments",
+   "ko": "인텍플러스",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기"
+  },
+  "064350.KS": {
+   "corp": "00302926",
+   "en": "Hyundai Rotem Co.",
+   "full": true,
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "현대로템",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계",
+   "sub_ours": "산업재"
+  },
+  "064400.KS": {
+   "corp": "00139834",
+   "en": "LG CNS Co., Ltd.",
+   "industry_en": "Information Technology Services",
+   "ko": "LG씨엔에스",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "IT 서비스"
+  },
+  "064760.KQ": {
+   "corp": "00245472",
+   "en": "Tokai Carbon Korea Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "티씨케이",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "065350.KQ": {
+   "corp": "00136226",
+   "en": "Shinsung Delta Tech Co., Ltd.",
+   "industry_en": "Electronic Components",
+   "ko": "신성델타테크",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "066570.KS": {
+   "corp": "00401731",
+   "en": "LG Electronics Inc.",
+   "full": true,
+   "industry_en": "Electronics/Appliances",
+   "ko": "LG전자",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 · 가전",
+   "sub_ours": "기술"
+  },
+  "066970.KS": {
+   "corp": "00398701",
+   "en": "L & F Co., Ltd.",
+   "industry_en": "Electronic Production Equipment",
+   "ko": "엘앤에프",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 생산 장비"
+  },
+  "067310.KQ": {
+   "corp": "00445054",
+   "en": "Hana Micron Inc.",
+   "industry_en": "Semiconductors",
+   "ko": "하나마이크론",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "068270.KS": {
+   "corp": "00413046",
+   "en": "Celltrion, Inc.",
+   "full": true,
+   "industry_en": "Biotechnology",
+   "ko": "셀트리온",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_ours": "헬스케어"
+  },
+  "068760.KQ": {
+   "corp": "00541349",
+   "en": "Celltrion Pharm Inc.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "셀트리온제약",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "069620.KS": {
+   "corp": "00427483",
+   "en": "Daewoong Pharmaceutical Co., Ltd.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "대웅제약",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "069960.KS": {
+   "corp": "00428251",
+   "en": "Hyundai Department Store Co., Ltd",
+   "industry_en": "Department Stores",
+   "ko": "현대백화점",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "백화점"
+  },
+  "071050.KS": {
+   "corp": "00432102",
+   "en": "KOREA INVESTMENT HOLDINGS CO LTD",
+   "industry_en": "Investment Banks/Brokers",
+   "ko": "한국금융지주",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "투자은행 · 증권"
+  },
+  "071970.KS": {
+   "corp": "00406046",
+   "en": "HD-Hyundai Marine Engine Co., Ltd.",
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "HD현대마린엔진",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계"
+  },
+  "073240.KS": {
+   "corp": "00481454",
+   "en": "Kumho Tire Co., Inc.",
+   "industry_en": "Automotive Aftermarket",
+   "ko": "금호타이어",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "자동차 애프터마켓"
+  },
+  "074600.KQ": {
+   "corp": "00468374",
+   "en": "WONIK QnC Corporation",
+   "industry_en": "Industrial Machinery",
+   "ko": "원익QnC",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "077360.KQ": {
+   "corp": "00471068",
+   "en": "Duksan Hi-Metal Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "덕산하이메탈",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "078600.KQ": {
+   "corp": "00177816",
+   "en": "Daejoo Electronic Materials Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "대주전자재료",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "078930.KS": {
+   "corp": "00500254",
+   "en": "GS Holdings Corp.",
+   "industry_en": "Food Retail",
+   "ko": "GS",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 소매"
+  },
+  "080220.KQ": {
+   "corp": "00447487",
+   "en": "Jeju Semiconductor Corp.",
+   "industry_en": "Semiconductors",
+   "ko": "제주반도체",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "081660.KS": {
+   "corp": "00195229",
+   "en": "Misto Holdings Corporation",
+   "industry_en": "Apparel/Footwear",
+   "ko": "미스토홀딩스",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "의류 · 신발"
+  },
+  "082740.KS": {
+   "corp": "00361008",
+   "en": "Hanwha Engine Co., Ltd.",
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "한화엔진",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계"
+  },
+  "082920.KQ": {
+   "corp": "00154718",
+   "en": "VITZROCELL Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "비츠로셀",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "083450.KQ": {
+   "corp": "00540863",
+   "en": "Global Standard Technology Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "GST",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "083650.KQ": {
+   "corp": "00409788",
+   "en": "BHI Co. Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "비에이치아이",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "084370.KQ": {
+   "corp": "00531014",
+   "en": "Eugene Technology Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "유진테크",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "085620.KS": {
+   "corp": "00112332",
+   "en": "Mirae Asset Life Insurance Co., Ltd.",
+   "industry_en": "Life/Health Insurance",
+   "ko": "미래에셋생명",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "생명 · 건강보험"
+  },
+  "085660.KQ": {
+   "corp": "00525679",
+   "en": "CHA Biotech Co., Ltd.",
+   "industry_en": "Electronic Components",
+   "ko": "차바이오텍",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "086280.KS": {
+   "corp": "00360595",
+   "en": "HYUNDAI GLOVIS Co., Ltd.",
+   "industry_en": "Air Freight/Couriers",
+   "ko": "현대글로비스",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "항공 화물 · 택배"
+  },
+  "086450.KQ": {
+   "corp": "00114808",
+   "en": "DongKook Pharmaceutical Co., Ltd.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "동국제약",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "086520.KQ": {
+   "corp": "00536541",
+   "en": "Ecopro Co., Ltd.",
+   "full": true,
+   "industry_en": "Chemicals: Major Diversified",
+   "ko": "에코프로",
+   "market": "KOSDAQ",
+   "sector": "소재",
+   "sub": "종합 화학",
+   "sub_ours": "산업재"
+  },
+  "086790.KS": {
+   "corp": "00547583",
+   "en": "Hana Financial Group Inc.",
+   "full": true,
+   "industry_en": "Major Banks",
+   "ko": "하나금융지주",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "대형 은행",
+   "sub_ours": "금융"
+  },
+  "087010.KQ": {
+   "corp": "00415868",
+   "en": "Peptron, Inc.",
+   "industry_en": "Biotechnology",
+   "ko": "펩트론",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "바이오 기술"
+  },
+  "088350.KS": {
+   "corp": "00113058",
+   "en": "HANWHA LIFE INSURANCE Co., Ltd.",
+   "industry_en": "Life/Health Insurance",
+   "ko": "한화생명",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "생명 · 건강보험"
+  },
+  "089030.KQ": {
+   "corp": "00535676",
+   "en": "Techwing, Inc.",
+   "industry_en": "Industrial Machinery",
+   "ko": "테크윙",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "089860.KS": {
+   "corp": "00545716",
+   "en": "LOTTE rental co., ltd.",
+   "industry_en": "Finance/Rental/Leasing",
+   "ko": "롯데렌탈",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "금융 · 임대 · 리스"
+  },
+  "089970.KQ": {
+   "corp": "00544577",
+   "en": "VM Inc.",
+   "industry_en": "Industrial Machinery",
+   "ko": "브이엠",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "090360.KQ": {
+   "corp": "00536523",
+   "en": "Robostar Co., Ltd",
+   "industry_en": "Industrial Machinery",
+   "ko": "로보스타",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "090430.KS": {
+   "corp": "00583424",
+   "en": "Amorepacific Corp.",
+   "industry_en": "Household/Personal Care",
+   "ko": "아모레퍼시픽",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "가정 · 개인용품"
+  },
+  "090710.KQ": {
+   "corp": "00540429",
+   "en": "Hyulim ROBOT Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "휴림로봇",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "092870.KQ": {
+   "corp": "00611736",
+   "en": "Exicon Co., Ltd.",
+   "industry_en": "Electronic Equipment/Instruments",
+   "ko": "엑시콘",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기"
+  },
+  "093370.KS": {
+   "corp": "00595191",
+   "en": "Foosung Co., Ltd.",
+   "industry_en": "Chemicals: Specialty",
+   "ko": "후성",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "특수 화학"
+  },
+  "095340.KQ": {
+   "corp": "00572905",
+   "en": "ISC Co., Ltd.",
+   "industry_en": "Semiconductors",
+   "ko": "ISC",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "095610.KQ": {
+   "corp": "00524421",
+   "en": "TES Co., Ltd.",
+   "industry_en": "Electronic Production Equipment",
+   "ko": "테스",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 생산 장비"
+  },
+  "096530.KQ": {
+   "corp": "00788773",
+   "en": "Seegene, Inc.",
+   "industry_en": "Medical Specialties",
+   "ko": "씨젠",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "의료 전문"
+  },
+  "096770.KS": {
+   "corp": "00631518",
+   "en": "SK Innovation Co., Ltd",
+   "industry_en": "Oil Refining/Marketing",
+   "ko": "SK이노베이션",
+   "market": "KOSPI",
+   "sector": "에너지",
+   "sub": "석유 정제 · 마케팅"
+  },
+  "097230.KS": {
+   "corp": "00633835",
+   "en": "HJ SHIPBUILDING & CONSTRUCTION CO. LTD",
+   "industry_en": "Engineering & Construction",
+   "ko": "HJ중공업",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "엔지니어링 · 건설"
+  },
+  "097950.KS": {
+   "corp": "00635134",
+   "en": "CJ CheilJedang Corporation",
+   "industry_en": "Air Freight/Couriers",
+   "ko": "CJ제일제당",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "항공 화물 · 택배"
+  },
+  "098460.KQ": {
+   "corp": "00579999",
+   "en": "Koh Young Technology Inc.",
+   "industry_en": "Semiconductors",
+   "ko": "고영",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "099320.KQ": {
+   "corp": "00449254",
+   "en": "Satrec Initiative Co., Ltd.",
+   "industry_en": "Telecommunications Equipment",
+   "ko": "쎄트렉아이",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "통신 장비"
+  },
+  "100790.KQ": {
+   "corp": "00340096",
+   "en": "Mirae Asset Venture Investment Co., Ltd.",
+   "industry_en": "Investment Managers",
+   "ko": "미래에셋벤처투자",
+   "market": "KOSDAQ",
+   "sector": "금융",
+   "sub": "자산운용"
+  },
+  "101490.KQ": {
+   "corp": "00411048",
+   "en": "S & S Tech Corporation",
+   "industry_en": "Semiconductors",
+   "ko": "에스앤에스텍",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "102710.KQ": {
+   "corp": "00530185",
+   "en": "ENF Technology Co., Ltd",
+   "industry_en": "Chemicals: Major Diversified",
+   "ko": "이엔에프테크놀로지",
+   "market": "KOSDAQ",
+   "sector": "소재",
+   "sub": "종합 화학"
+  },
+  "103140.KS": {
+   "corp": "00684714",
+   "en": "Poongsan Corporation",
+   "industry_en": "Other Metals/Minerals",
+   "ko": "풍산",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "기타 금속 · 광물"
+  },
+  "103590.KS": {
+   "corp": "00683469",
+   "en": "Iljin Electric Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "일진전기",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "105560.KS": {
+   "corp": "00688996",
+   "en": "KB Financial Group Inc.",
+   "full": true,
+   "industry_en": "Regional Banks",
+   "ko": "KB금융",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "지역 은행",
+   "sub_ours": "금융"
+  },
+  "108490.KQ": {
+   "corp": "00946030",
+   "en": "ROBOTIS Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "로보티즈",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "111770.KS": {
+   "corp": "00776820",
+   "en": "Youngone Corp.",
+   "industry_en": "Apparel/Footwear",
+   "ko": "영원무역",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "의류 · 신발"
+  },
+  "112610.KS": {
+   "corp": "00670340",
+   "en": "CS Wind Corp.",
+   "industry_en": "Electrical Products",
+   "ko": "씨에스윈드",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "115180.KQ": {
+   "corp": "01042650",
+   "en": "Qurient Co., Ltd.",
+   "industry_en": "Biotechnology",
+   "ko": "큐리언트",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "바이오 기술"
+  },
+  "119850.KQ": {
+   "corp": "00626464",
+   "en": "GnCenergy Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "지엔씨에너지",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "120110.KS": {
+   "corp": "00795135",
+   "en": "Kolon Industries, Inc.",
+   "industry_en": "Textiles",
+   "ko": "코오롱인더",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "섬유"
+  },
+  "121600.KQ": {
+   "corp": "00439965",
+   "en": "Advanced Nano Products Co., Ltd",
+   "industry_en": "Chemicals: Specialty",
+   "ko": "나노신소재",
+   "market": "KOSDAQ",
+   "sector": "소재",
+   "sub": "특수 화학"
+  },
+  "122640.KQ": {
+   "corp": "00530556",
+   "en": "YEST Co.,Ltd.",
+   "industry_en": "Food: Specialty/Candy",
+   "ko": "예스티",
+   "market": "KOSDAQ",
+   "sector": "필수 소비재",
+   "sub": "식품 · 특화 · 사탕"
+  },
+  "122870.KQ": {
+   "corp": "00613318",
+   "en": "YG Entertainment, Inc.",
+   "industry_en": "Movies/Entertainment",
+   "ko": "와이지엔터테인먼트",
+   "market": "KOSDAQ",
+   "sector": "커뮤니케이션",
+   "sub": "영화 · 엔터테인먼트"
+  },
+  "124500.KQ": {
+   "corp": "00620868",
+   "en": "ITCENGLOBAL CO. LTD.",
+   "industry_en": "Metal Fabrication",
+   "ko": "아이티센글로벌",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "금속 가공"
+  },
+  "126340.KQ": {
+   "corp": "00563518",
+   "en": "VINATECH CO,. LTD.",
+   "industry_en": "Electronic Components",
+   "ko": "비나텍",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "127120.KQ": {
+   "corp": "00642541",
+   "en": "JS Link, Inc.",
+   "industry_en": "Medical/Nursing Services",
+   "ko": "제이에스링크",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "의료 · 간호 서비스"
+  },
+  "128940.KS": {
+   "corp": "00828497",
+   "en": "Hanmi Pharmaceutical Co., Ltd.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "한미약품",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "131290.KQ": {
+   "corp": "00372226",
+   "en": "TSE Co., Ltd",
+   "industry_en": "Semiconductors",
+   "ko": "티에스이",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "131970.KQ": {
+   "corp": "00563545",
+   "en": "DOOSAN TESNA Inc.",
+   "industry_en": "Miscellaneous Commercial Services",
+   "ko": "두산테스나",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "기타 상업 서비스"
+  },
+  "137400.KQ": {
+   "corp": "00612294",
+   "en": "People & Technology, Inc.",
+   "industry_en": "Other Metals/Minerals",
+   "ko": "피엔티",
+   "market": "KOSDAQ",
+   "sector": "소재",
+   "sub": "기타 금속 · 광물"
+  },
+  "138040.KS": {
+   "corp": "00860332",
+   "en": "Meritz Financial Group Inc.",
+   "industry_en": "Investment Banks/Brokers",
+   "ko": "메리츠금융지주",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "투자은행 · 증권"
+  },
+  "138930.KS": {
+   "corp": "00858364",
+   "en": "BNK Financial Group, Inc.",
+   "industry_en": "Regional Banks",
+   "ko": "BNK금융지주",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "지역 은행"
+  },
+  "139130.KS": {
+   "corp": "00878915",
+   "en": "iM Financial Group Co. Ltd.",
+   "industry_en": "Major Banks",
+   "ko": "iM금융지주",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "대형 은행"
+  },
+  "139480.KS": {
+   "corp": "00872984",
+   "en": "E-MART Inc.",
+   "industry_en": "Department Stores",
+   "ko": "이마트",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "백화점"
+  },
+  "140410.KQ": {
+   "corp": "00808022",
+   "en": "Mezzion Pharma Co., Ltd.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "메지온",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "140860.KQ": {
+   "corp": "00244747",
+   "en": "Park Systems Corp.",
+   "industry_en": "Electronic Equipment/Instruments",
+   "ko": "파크시스템스",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기"
+  },
+  "141080.KQ": {
+   "corp": "00842619",
+   "en": "LigaChem Biosciences Inc.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "리가켐바이오",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "145020.KQ": {
+   "corp": "00888347",
+   "en": "Hugel, Inc.",
+   "industry_en": "Biotechnology",
+   "ko": "휴젤",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "바이오 기술"
+  },
+  "160190.KQ": {
+   "corp": "00650771",
+   "en": "HIGEN RNM Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "하이젠알앤엠",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "161390.KS": {
+   "corp": "00937324",
+   "en": "HANKOOK TIRE & TECHNOLOGY Co., Ltd.",
+   "industry_en": "Automotive Aftermarket",
+   "ko": "한국타이어앤테크놀로지",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "자동차 애프터마켓"
+  },
+  "161580.KQ": {
+   "corp": "00938721",
+   "en": "Philoptics Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "필옵틱스",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "161890.KS": {
+   "corp": "00939331",
+   "en": "KOLMAR KOREA CO. LTD",
+   "industry_en": "Household/Personal Care",
+   "ko": "한국콜마",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "가정 · 개인용품"
+  },
+  "166090.KQ": {
+   "corp": "00660750",
+   "en": "Hana Materials Inc.",
+   "industry_en": "Semiconductors",
+   "ko": "하나머티리얼즈",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "171090.KQ": {
+   "corp": "00327819",
+   "en": "SUNIC SYSTEM Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "선익시스템",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "175330.KS": {
+   "corp": "00980122",
+   "en": "JB Financial Group Co., Ltd.",
+   "industry_en": "Major Banks",
+   "ko": "JB금융지주",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "대형 은행"
+  },
+  "178320.KQ": {
+   "corp": "00838005",
+   "en": "SEOJIN SYSTEM CO.,LTD",
+   "industry_en": "Computer Communications",
+   "ko": "서진시스템",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "컴퓨터 통신"
+  },
+  "180640.KS": {
+   "corp": "00983040",
+   "en": "HANJIN KAL Corp.",
+   "industry_en": "Hotels/Resorts/Cruise lines",
+   "ko": "한진칼",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "호텔 · 리조트 · 크루즈"
+  },
+  "181710.KS": {
+   "corp": "00983271",
+   "en": "NHN Corporation",
+   "industry_en": "Internet Software/Services",
+   "ko": "NHN",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "인터넷 소프트웨어 · 서비스"
+  },
+  "183300.KQ": {
+   "corp": "00997812",
+   "en": "KoMiCo Ltd.",
+   "industry_en": "Semiconductors",
+   "ko": "코미코",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "189300.KQ": {
+   "corp": "00664181",
+   "en": "Intellian Technologies, Inc.",
+   "industry_en": "Telecommunications Equipment",
+   "ko": "인텔리안테크",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "통신 장비"
+  },
+  "192820.KS": {
+   "corp": "01009789",
+   "en": "COSMAX, Inc.",
+   "industry_en": "Household/Personal Care",
+   "ko": "코스맥스",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "가정 · 개인용품"
+  },
+  "195940.KQ": {
+   "corp": "01012066",
+   "en": "HK inno.N Corporation",
+   "industry_en": "Medical/Nursing Services",
+   "ko": "HK이노엔",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "의료 · 간호 서비스"
+  },
+  "196170.KQ": {
+   "corp": "00989619",
+   "en": "ALTEOGEN Inc.",
+   "full": true,
+   "industry_en": "Biotechnology",
+   "ko": "알테오젠",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_ours": "헬스케어"
+  },
+  "204270.KQ": {
+   "corp": "00447575",
+   "en": "JNTC Co., Ltd.",
+   "industry_en": "Electronic Production Equipment",
+   "ko": "제이앤티씨",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 생산 장비"
+  },
+  "204320.KS": {
+   "corp": "01042775",
+   "en": "HL Mando Co., Ltd.",
+   "industry_en": "Auto Parts: OEM",
+   "ko": "HL만도",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "자동차 부품 OEM"
+  },
+  "207940.KS": {
+   "corp": "00877059",
+   "en": "SAMSUNG BIOLOGICS Co., Ltd.",
+   "full": true,
+   "industry_en": "Biotechnology",
+   "ko": "삼성바이오로직스",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_ours": "헬스케어"
+  },
+  "213420.KQ": {
+   "corp": "01061558",
+   "en": "DUK SAN NEOLUX CO.LTD",
+   "industry_en": "Electrical Products",
+   "ko": "덕산네오룩스",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "214150.KQ": {
+   "corp": "01061327",
+   "en": "CLASSYS Inc.",
+   "industry_en": "Medical Specialties",
+   "ko": "클래시스",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "의료 전문"
+  },
+  "214370.KQ": {
+   "corp": "00549891",
+   "en": "Caregen Co., Ltd.",
+   "industry_en": "Chemicals: Major Diversified",
+   "ko": "케어젠",
+   "market": "KOSDAQ",
+   "sector": "소재",
+   "sub": "종합 화학"
+  },
+  "214450.KQ": {
+   "corp": "00970453",
+   "en": "PharmaResearch Co., Ltd.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "파마리서치",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "218410.KQ": {
+   "corp": "01078178",
+   "en": "RFHIC Corp.",
+   "industry_en": "Semiconductors",
+   "ko": "RFHIC",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "222080.KQ": {
+   "corp": "01090471",
+   "en": "SFA NEXEL Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "SFA넥셀",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "222800.KQ": {
+   "corp": "01095722",
+   "en": "Simmtech Co., Ltd.",
+   "industry_en": "Semiconductors",
+   "ko": "심텍",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "225570.KQ": {
+   "corp": "01096341",
+   "en": "NEXON Games Co. Ltd.",
+   "industry_en": "Packaged Software",
+   "ko": "넥슨게임즈",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "226950.KQ": {
+   "corp": "01113718",
+   "en": "OliX Pharmaceuticals, Inc.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "올릭스",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "229640.KS": {
+   "corp": "01093007",
+   "en": "LS Eco Energy Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "LS에코에너지",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "232140.KQ": {
+   "corp": "01109539",
+   "en": "YC Corporation",
+   "industry_en": "Electronic Equipment/Instruments",
+   "ko": "와이씨",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기"
+  },
+  "237690.KQ": {
+   "corp": "00871833",
+   "en": "ST PHARM CO., LTD.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "에스티팜",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "240810.KQ": {
+   "corp": "01135941",
+   "en": "Wonik IPS Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "원익IPS",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "241560.KS": {
+   "corp": "01032486",
+   "en": "Doosan Bobcat Inc.",
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "두산밥캣",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계"
+  },
+  "241710.KQ": {
+   "corp": "00763473",
+   "en": "COSMECCA KOREA CO. LTD",
+   "industry_en": "Household/Personal Care",
+   "ko": "코스메카코리아",
+   "market": "KOSDAQ",
+   "sector": "필수 소비재",
+   "sub": "가정 · 개인용품"
+  },
+  "247540.KQ": {
+   "corp": "01160363",
+   "en": "Ecopro BM Co., Ltd.",
+   "full": true,
+   "industry_en": "Electrical Products",
+   "ko": "에코프로비엠",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품",
+   "sub_ours": "산업재"
+  },
+  "251270.KS": {
+   "corp": "00904672",
+   "en": "Netmarble Corp.",
+   "industry_en": "Packaged Software",
+   "ko": "넷마블",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "251970.KQ": {
+   "corp": "00761059",
+   "en": "PUM-TECH KOREA CO., LTD.",
+   "industry_en": "Containers/Packaging",
+   "ko": "펌텍코리아",
+   "market": "KOSDAQ",
+   "sector": "소재",
+   "sub": "컨테이너 · 포장"
+  },
+  "252990.KQ": {
+   "corp": "01199727",
+   "en": "SEMCNS Co., Ltd.",
+   "industry_en": "Electrical Products",
+   "ko": "샘씨엔에스",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "253590.KQ": {
+   "corp": "01170865",
+   "en": "NEOSEM, Inc.",
+   "industry_en": "Electronic Equipment/Instruments",
+   "ko": "네오셈",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기"
+  },
+  "257720.KQ": {
+   "corp": "00982023",
+   "en": "SILICON 2 Co.,Ltd.",
+   "industry_en": "Specialty Stores",
+   "ko": "실리콘투",
+   "market": "KOSDAQ",
+   "sector": "경기 소비재",
+   "sub": "전문점"
+  },
+  "259960.KS": {
+   "corp": "00760971",
+   "en": "Krafton, Inc.",
+   "industry_en": "Packaged Software",
+   "ko": "크래프톤",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "263750.KQ": {
+   "corp": "01152470",
+   "en": "PearlAbyss Corp.",
+   "industry_en": "Packaged Software",
+   "ko": "펄어비스",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "267250.KS": {
+   "corp": "01205709",
+   "en": "HD HYUNDAI CO.,LTD.",
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "HD현대",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계"
+  },
+  "267260.KS": {
+   "corp": "01205851",
+   "en": "HD Hyundai Electric",
+   "industry_en": "Electrical Products",
+   "ko": "HD현대일렉트릭",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "267270.KS": {
+   "corp": "01205842",
+   "en": "HD Construction Equipment Co., Ltd.",
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "HD건설기계",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계"
+  },
+  "271560.KS": {
+   "corp": "01238169",
+   "en": "ORION CORP.",
+   "industry_en": "Food: Specialty/Candy",
+   "ko": "오리온",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 · 특화 · 사탕"
+  },
+  "272210.KS": {
+   "corp": "00339391",
+   "en": "Hanwha Systems Co., Ltd.",
+   "industry_en": "Aerospace & Defense",
+   "ko": "한화시스템",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업"
+  },
+  "277810.KQ": {
+   "corp": "01261644",
+   "en": "Rainbow Robotics, Inc.",
+   "industry_en": "Industrial Machinery",
+   "ko": "레인보우로보틱스",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "278470.KS": {
+   "corp": "01190568",
+   "en": "APR Co.,Ltd.",
+   "industry_en": "Household/Personal Care",
+   "ko": "에이피알",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "가정 · 개인용품"
+  },
+  "279570.KS": {
+   "corp": "01203312",
+   "en": "K Bank Co., Ltd.",
+   "industry_en": "Regional Banks",
+   "ko": "케이뱅크",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "지역 은행"
+  },
+  "281740.KQ": {
+   "corp": "01255652",
+   "en": "Lake Materials Co. Ltd.",
+   "industry_en": "Semiconductors",
+   "ko": "레이크머티리얼즈",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "281820.KS": {
+   "corp": "01261893",
+   "en": "KCTECH CO., LTD.",
+   "industry_en": "Electronic Production Equipment",
+   "ko": "케이씨텍",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 생산 장비"
+  },
+  "282330.KS": {
+   "corp": "01263022",
+   "en": "BGF retail CO., LTD.",
+   "industry_en": "Food Retail",
+   "ko": "BGF리테일",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "식품 소매"
+  },
+  "290650.KQ": {
+   "corp": "01181515",
+   "en": "L&C BIO Co., Ltd.",
+   "industry_en": "Medical Specialties",
+   "ko": "엘앤씨바이오",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "의료 전문"
+  },
+  "293490.KQ": {
+   "corp": "01137383",
+   "en": "Kakao Games Corp.",
+   "industry_en": "Packaged Software",
+   "ko": "카카오게임즈",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "294870.KS": {
+   "corp": "01310269",
+   "en": "IPARK Hyundai Development Company",
+   "industry_en": "Engineering & Construction",
+   "ko": "IPARK현대산업개발",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "엔지니어링 · 건설"
+  },
+  "295310.KQ": {
+   "corp": "01011368",
+   "en": "HVM CO. LTD.",
+   "industry_en": "Metal Fabrication",
+   "ko": "에이치브이엠",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "금속 가공"
+  },
+  "298040.KS": {
+   "corp": "01316245",
+   "en": "Hyosung Heavy Industries Corp.",
+   "industry_en": "Electrical Products",
+   "ko": "효성중공업",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품"
+  },
+  "298380.KQ": {
+   "corp": "01256864",
+   "en": "ABL Bio, Inc.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "에이비엘바이오",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "302440.KS": {
+   "corp": "01319899",
+   "en": "SK bioscience Co.,Ltd.",
+   "industry_en": "Biotechnology",
+   "ko": "SK바이오사이언스",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "바이오 기술"
+  },
+  "307950.KS": {
+   "corp": "00362441",
+   "en": "Hyundai Autoever Corp.",
+   "industry_en": "Information Technology Services",
+   "ko": "현대오토에버",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "IT 서비스"
+  },
+  "310210.KQ": {
+   "corp": "01327746",
+   "en": "Voronoi, Inc.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "보로노이",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "316140.KS": {
+   "corp": "01350869",
+   "en": "Woori Financial Group, Inc.",
+   "industry_en": "Major Banks",
+   "ko": "우리금융지주",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "대형 은행"
+  },
+  "319400.KQ": {
+   "corp": "01358463",
+   "en": "HUYNDAI MOVEX Co. Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "현대무벡스",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "319660.KQ": {
+   "corp": "01365825",
+   "en": "PSK INC",
+   "industry_en": "Industrial Machinery",
+   "ko": "피에스케이",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "322000.KS": {
+   "corp": "01199550",
+   "en": "HD HYUNDAI ENERGY SOLUTIONS CO. LTD.",
+   "industry_en": "Semiconductors",
+   "ko": "HD현대에너지솔루션",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "323280.KQ": {
+   "corp": "01366000",
+   "en": "TAESUNG CO., LTD.",
+   "industry_en": "Industrial Machinery",
+   "ko": "태성",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "323410.KS": {
+   "corp": "01133217",
+   "en": "KakaoBank Corp.",
+   "full": true,
+   "industry_en": "Regional Banks",
+   "ko": "카카오뱅크",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "지역 은행",
+   "sub_ours": "금융"
+  },
+  "326030.KS": {
+   "corp": "00878696",
+   "en": "SK Biopharmaceuticals Co., Ltd.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "에스케이바이오팜",
+   "market": "KOSPI",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "327260.KQ": {
+   "corp": "01343665",
+   "en": "RF Materials Co., Ltd.",
+   "industry_en": "Industrial Conglomerates",
+   "ko": "RF머트리얼즈",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 지주"
+  },
+  "328130.KQ": {
+   "corp": "01397620",
+   "en": "Lunit Inc.",
+   "industry_en": "Packaged Software",
+   "ko": "루닛",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "329180.KS": {
+   "corp": "01390344",
+   "en": "HD Hyundai Heavy Industries Co., Ltd.",
+   "full": true,
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "HD현대중공업",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계",
+   "sub_ours": "산업재"
+  },
+  "336260.KS": {
+   "corp": "01412725",
+   "en": "Doosan Fuel Cell Co., Ltd.",
+   "industry_en": "Electronic Production Equipment",
+   "ko": "두산퓨얼셀",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 생산 장비"
+  },
+  "347700.KQ": {
+   "corp": "01336762",
+   "en": "Sphere Corp.",
+   "industry_en": "Packaged Software",
+   "ko": "스피어",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "347850.KQ": {
+   "corp": "01376715",
+   "en": "D&D Pharmatech Co., Ltd.",
+   "industry_en": "Pharmaceuticals: Major",
+   "ko": "디앤디파마텍",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "대형 제약"
+  },
+  "352820.KS": {
+   "corp": "01204056",
+   "en": "HYBE Co., Ltd.",
+   "industry_en": "Miscellaneous Commercial Services",
+   "ko": "하이브",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "기타 상업 서비스"
+  },
+  "353200.KS": {
+   "corp": "01478712",
+   "en": "Daeduck Electronics Co., Ltd.",
+   "industry_en": "Electronic Components",
+   "ko": "대덕전자",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "356860.KQ": {
+   "corp": "00920379",
+   "en": "TLB Co., Ltd.",
+   "industry_en": "Electronic Components",
+   "ko": "티엘비",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "357780.KQ": {
+   "corp": "01489648",
+   "en": "Soulbrain Co., Ltd.",
+   "industry_en": "Chemicals: Specialty",
+   "ko": "솔브레인",
+   "market": "KOSDAQ",
+   "sector": "소재",
+   "sub": "특수 화학"
+  },
+  "361610.KS": {
+   "corp": "01386916",
+   "en": "Sk Ie Technology Co., Ltd.",
+   "industry_en": "Chemicals: Major Diversified",
+   "ko": "SK아이이테크놀로지",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "종합 화학"
+  },
+  "373220.KS": {
+   "corp": "01515323",
+   "en": "LG Energy Solution Ltd.",
+   "full": true,
+   "industry_en": "Electrical Products",
+   "ko": "LG에너지솔루션",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "전기 제품",
+   "sub_ours": "산업재"
+  },
+  "375500.KS": {
+   "corp": "01524093",
+   "en": "DL E&C Co., Ltd.",
+   "industry_en": "Engineering & Construction",
+   "ko": "DL이앤씨",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "엔지니어링 · 건설"
+  },
+  "377300.KS": {
+   "corp": "01244601",
+   "en": "kakaopay Corp.",
+   "industry_en": "Miscellaneous Commercial Services",
+   "ko": "카카오페이",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "기타 상업 서비스"
+  },
+  "383220.KS": {
+   "corp": "01568413",
+   "en": "F&F Co., Ltd.",
+   "industry_en": "Apparel/Footwear",
+   "ko": "F&F",
+   "market": "KOSPI",
+   "sector": "경기 소비재",
+   "sub": "의류 · 신발"
+  },
+  "388210.KQ": {
+   "corp": "01529982",
+   "en": "CMTX Co., Ltd.",
+   "industry_en": "Semiconductors",
+   "ko": "씨엠티엑스",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "388720.KQ": {
+   "corp": "01152586",
+   "en": "Yuilrobotics Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "유일로보틱스",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "402340.KS": {
+   "corp": "01596425",
+   "en": "SK Square Co., Ltd.",
+   "full": true,
+   "industry_en": "Financial Conglomerates",
+   "ko": "SK스퀘어",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "금융 지주",
+   "sub_ours": "기술"
+  },
+  "403870.KQ": {
+   "corp": "01288827",
+   "en": "HPSP Co., Ltd.",
+   "industry_en": "Semiconductors",
+   "ko": "HPSP",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "415640.KS": {
+   "corp": "01880801",
+   "en": "KB Balhae Infrastructure Fund",
+   "industry_en": "Financial Conglomerates",
+   "ko": "KB발해인프라",
+   "market": "KOSPI",
+   "sector": "금융",
+   "sub": "금융 지주"
+  },
+  "417200.KQ": {
+   "corp": "01528141",
+   "en": "LS Materials Co. Ltd.",
+   "industry_en": "Electronic Components",
+   "ko": "LS머트리얼즈",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "420770.KQ": {
+   "corp": "00765569",
+   "en": "GigaVis Co., Ltd.",
+   "industry_en": "Electronic Components",
+   "ko": "기가비스",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "전자 부품"
+  },
+  "425420.KQ": {
+   "corp": "01035368",
+   "en": "TFE Co., Ltd.",
+   "industry_en": "Semiconductors",
+   "ko": "티에프이",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "437730.KQ": {
+   "corp": "00262266",
+   "en": "Samhyun Co., Ltd.",
+   "industry_en": "Building Products",
+   "ko": "삼현",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "건자재"
+  },
+  "439260.KS": {
+   "corp": "00182696",
+   "en": "DAEHAN SHIPBUILDING Co., Ltd.",
+   "industry_en": "Trucks/Construction/Farm Machinery",
+   "ko": "대한조선",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "건설 기계"
+  },
+  "440110.KQ": {
+   "corp": "01292291",
+   "en": "FADU, Inc.",
+   "industry_en": "Semiconductors",
+   "ko": "파두",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "반도체"
+  },
+  "443060.KS": {
+   "corp": "01194689",
+   "en": "HD Hyundai Marine Solution Co., Ltd.",
+   "industry_en": "Wholesale Distributors",
+   "ko": "HD현대마린솔루션",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "도매 유통"
+  },
+  "445680.KQ": {
+   "corp": "01498974",
+   "en": "Curiox Biosystems Co., Ltd.",
+   "industry_en": "Packaged Software",
+   "ko": "큐리옥스바이오시스템즈",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "450080.KS": {
+   "corp": "01311408",
+   "en": "Ecopro Materials Co Ltd.",
+   "industry_en": "Chemicals: Specialty",
+   "ko": "에코프로머티",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "특수 화학"
+  },
+  "454910.KS": {
+   "corp": "01105153",
+   "en": "Doosan Robotics Inc.",
+   "industry_en": "Industrial Machinery",
+   "ko": "두산로보틱스",
+   "market": "KOSPI",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "456160.KQ": {
+   "corp": "01577952",
+   "en": "G2GBIO, Inc.",
+   "industry_en": "Biotechnology",
+   "ko": "지투지바이오",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "바이오 기술"
+  },
+  "457190.KS": {
+   "corp": "01762569",
+   "en": "ISU SPECIALTY CHEMICAL Co., Ltd.",
+   "industry_en": "Chemicals: Major Diversified",
+   "ko": "이수스페셜티케미컬",
+   "market": "KOSPI",
+   "sector": "소재",
+   "sub": "종합 화학"
+  },
+  "458870.KQ": {
+   "corp": "01514227",
+   "en": "SEERS Co. Ltd.",
+   "industry_en": "Medical Specialties",
+   "ko": "씨어스",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "의료 전문"
+  },
+  "462870.KS": {
+   "corp": "01384787",
+   "en": "SHIFT UP Corp",
+   "industry_en": "Packaged Software",
+   "ko": "시프트업",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "466100.KQ": {
+   "corp": "01784914",
+   "en": "CLOBOT Co., Ltd.",
+   "industry_en": "Industrial Machinery",
+   "ko": "클로봇",
+   "market": "KOSDAQ",
+   "sector": "산업재",
+   "sub": "산업 기계"
+  },
+  "475150.KS": {
+   "corp": "01817081",
+   "en": "SK Eternix Co., Ltd.",
+   "industry_en": "Alternative Power Generation",
+   "ko": "SK이터닉스",
+   "market": "KOSPI",
+   "sector": "에너지",
+   "sub": "대체 전력"
+  },
+  "476060.KQ": {
+   "corp": "01632912",
+   "en": "Onconic Therapeutics, Inc.",
+   "industry_en": "Biotechnology",
+   "ko": "온코닉테라퓨틱스",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "바이오 기술"
+  },
+  "476830.KQ": {
+   "corp": "01596920",
+   "en": "Rznomics Inc.",
+   "industry_en": "Biotechnology",
+   "ko": "알지노믹스",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "바이오 기술"
+  },
+  "483650.KS": {
+   "corp": "01649204",
+   "en": "Dalba Global Co., Ltd.",
+   "industry_en": "Household/Personal Care",
+   "ko": "달바글로벌",
+   "market": "KOSPI",
+   "sector": "필수 소비재",
+   "sub": "가정 · 개인용품"
+  },
+  "489790.KS": {
+   "corp": "01867758",
+   "en": "Hanwha Vision Co., Ltd.",
+   "industry_en": "Telecommunications Equipment",
+   "ko": "한화비전",
+   "market": "KOSPI",
+   "sector": "기술",
+   "sub": "통신 장비"
+  },
+  "490470.KQ": {
+   "corp": "01627363",
+   "en": "SemiFive Inc.",
+   "industry_en": "Packaged Software",
+   "ko": "세미파이브",
+   "market": "KOSDAQ",
+   "sector": "기술",
+   "sub": "패키지 소프트웨어"
+  },
+  "491000.KQ": {
+   "corp": "01385005",
+   "en": "Livsmed Inc.",
+   "industry_en": "Medical Specialties",
+   "ko": "리브스메드",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "의료 전문"
+  },
+  "950160.KQ": {
+   "corp": "01245062",
+   "en": "Kolon TissueGene. Inc. Shs Korean Deposit Receipt Repr 1/5 Sh",
+   "industry_en": "Medical Specialties",
+   "ko": "코오롱티슈진",
+   "market": "KOSDAQ",
+   "sector": "헬스케어",
+   "sub": "의료 전문"
+  }
+ },
+ "kr_sector": {
+  "Advertising/Marketing Services": "커뮤니케이션",
+  "Aerospace & Defense": "산업재",
+  "Air Freight/Couriers": "산업재",
+  "Airlines": "산업재",
+  "Alternative Power Generation": "에너지",
+  "Apparel/Footwear": "경기 소비재",
+  "Auto Parts: OEM": "산업재",
+  "Automotive Aftermarket": "산업재",
+  "Beverages: Non-Alcoholic": "필수 소비재",
+  "Biotechnology": "헬스케어",
+  "Broadcasting": "커뮤니케이션",
+  "Building Products": "산업재",
+  "Casinos/Gaming": "경기 소비재",
+  "Chemicals: Major Diversified": "소재",
+  "Chemicals: Specialty": "소재",
+  "Computer Communications": "기술",
+  "Construction Materials": "소재",
+  "Containers/Packaging": "소재",
+  "Department Stores": "경기 소비재",
+  "Electric Utilities": "유틸리티",
+  "Electrical Products": "산업재",
+  "Electronic Components": "기술",
+  "Electronic Equipment/Instruments": "기술",
+  "Electronic Production Equipment": "기술",
+  "Electronics Distributors": "기술",
+  "Electronics/Appliances": "기술",
+  "Engineering & Construction": "산업재",
+  "Finance/Rental/Leasing": "금융",
+  "Financial Conglomerates": "금융",
+  "Food Retail": "필수 소비재",
+  "Food: Major Diversified": "필수 소비재",
+  "Food: Specialty/Candy": "필수 소비재",
+  "Gas Distributors": "에너지",
+  "Home Furnishings": "경기 소비재",
+  "Homebuilding": "부동산",
+  "Hotels/Resorts/Cruise lines": "경기 소비재",
+  "Household/Personal Care": "필수 소비재",
+  "Industrial Conglomerates": "산업재",
+  "Industrial Machinery": "산업재",
+  "Industrial Specialties": "산업재",
+  "Information Technology Services": "기술",
+  "Internet Software/Services": "기술",
+  "Investment Banks/Brokers": "금융",
+  "Investment Managers": "금융",
+  "Life/Health Insurance": "금융",
+  "Major Banks": "금융",
+  "Major Telecommunications": "커뮤니케이션",
+  "Marine Shipping": "산업재",
+  "Medical Distributors": "헬스케어",
+  "Medical Specialties": "헬스케어",
+  "Medical/Nursing Services": "헬스케어",
+  "Metal Fabrication": "산업재",
+  "Miscellaneous Commercial Services": "산업재",
+  "Motor Vehicles": "경기 소비재",
+  "Movies/Entertainment": "커뮤니케이션",
+  "Multi-Line Insurance": "금융",
+  "Oil Refining/Marketing": "에너지",
+  "Other Metals/Minerals": "소재",
+  "Packaged Software": "기술",
+  "Pharmaceuticals: Major": "헬스케어",
+  "Property/Casualty Insurance": "금융",
+  "Regional Banks": "금융",
+  "Semiconductors": "기술",
+  "Specialty Stores": "경기 소비재",
+  "Steel": "소재",
+  "Telecommunications Equipment": "기술",
+  "Textiles": "소재",
+  "Tobacco": "필수 소비재",
+  "Trucks/Construction/Farm Machinery": "산업재",
+  "Wholesale Distributors": "산업재",
+  "Wireless Telecommunications": "커뮤니케이션"
+ },
+ "sub_ko": {
+  "Advertising": "광고",
+  "Advertising/Marketing Services": "광고 · 마케팅",
+  "Aerospace & Defense": "항공 · 방위산업",
+  "Agricultural & Farm Machinery": "농업 · 농기계",
+  "Agricultural Products & Services": "농산물 · 서비스",
+  "Air Freight & Logistics": "항공 화물 · 물류",
+  "Air Freight/Couriers": "항공 화물 · 택배",
+  "Airlines": "항공사",
+  "Alternative Power Generation": "대체 전력",
+  "Apparel Retail": "의류 유통",
+  "Apparel, Accessories & Luxury Goods": "의류 · 액세서리 · 명품",
+  "Apparel/Footwear": "의류 · 신발",
+  "Application Software": "응용 소프트웨어",
+  "Asset Management & Custody Banks": "자산관리 · 수탁 은행",
+  "Auto Parts: OEM": "자동차 부품 OEM",
+  "Automobile Manufacturers": "자동차 제조",
+  "Automotive Aftermarket": "자동차 애프터마켓",
+  "Automotive Parts & Equipment": "자동차 부품 · 장비",
+  "Automotive Retail": "자동차 유통",
+  "Beverages: Non-Alcoholic": "무알코올 음료",
+  "Biotechnology": "바이오 기술",
+  "Broadcasting": "방송",
+  "Broadline Retail": "종합 유통",
+  "Building Products": "건자재",
+  "Cable & Satellite": "케이블 · 위성",
+  "Cargo Ground Transportation": "육상 화물 운송",
+  "Casinos & Gaming": "카지노 · 게임",
+  "Casinos/Gaming": "카지노 · 게임",
+  "Chemicals: Major Diversified": "종합 화학",
+  "Chemicals: Specialty": "특수 화학",
+  "Commodity Chemicals": "기초 화학",
+  "Communications Equipment": "통신 장비",
+  "Computer & Electronics Retail": "컴퓨터 · 전자 유통",
+  "Computer Communications": "컴퓨터 통신",
+  "Construction & Engineering": "건설 · 엔지니어링",
+  "Construction Machinery & Heavy Transportation Equipment": "건설 · 중장비",
+  "Construction Materials": "건설 자재",
+  "Consumer Electronics": "소비자 전자",
+  "Consumer Finance": "소비자 금융",
+  "Consumer Staples Merchandise Retail": "생활용품 유통",
+  "Containers/Packaging": "컨테이너 · 포장",
+  "Copper": "구리",
+  "Data Center REITs": "데이터센터 리츠",
+  "Data Processing & Outsourced Services": "데이터 처리 · 아웃소싱",
+  "Department Stores": "백화점",
+  "Distillers & Vintners": "주류 · 양조",
+  "Distributors": "유통",
+  "Diversified Banks": "종합 은행",
+  "Diversified Support Services": "종합 지원 서비스",
+  "Electric Utilities": "전기 유틸리티",
+  "Electrical Components & Equipment": "전기 부품 · 장비",
+  "Electrical Products": "전기 제품",
+  "Electronic Components": "전자 부품",
+  "Electronic Equipment & Instruments": "전자 장비 · 계측기",
+  "Electronic Equipment/Instruments": "전자 장비 · 계측기",
+  "Electronic Manufacturing Services": "전자 위탁생산",
+  "Electronic Production Equipment": "전자 생산 장비",
+  "Electronics Distributors": "전자 유통",
+  "Electronics/Appliances": "전자 · 가전",
+  "Engineering & Construction": "엔지니어링 · 건설",
+  "Environmental & Facilities Services": "환경 · 시설 서비스",
+  "Fertilizers & Agricultural Chemicals": "비료 · 농약",
+  "Finance/Rental/Leasing": "금융 · 임대 · 리스",
+  "Financial Conglomerates": "금융 지주",
+  "Financial Exchanges & Data": "금융 거래소 · 데이터",
+  "Food Distributors": "식품 유통",
+  "Food Retail": "식품 소매",
+  "Food: Major Diversified": "식품 · 종합",
+  "Food: Specialty/Candy": "식품 · 특화 · 사탕",
+  "Footwear": "신발",
+  "Gas Distributors": "가스 유통",
+  "Gas Utilities": "가스 유틸리티",
+  "Gold": "금",
+  "Health Care Distributors": "의료 유통",
+  "Health Care Equipment": "의료 장비",
+  "Health Care Facilities": "의료 시설",
+  "Health Care REITs": "의료 리츠",
+  "Health Care Services": "의료 서비스",
+  "Health Care Supplies": "의료 용품",
+  "Health Care Technology": "의료 기술",
+  "Heavy Electrical Equipment": "중전기",
+  "Home Furnishings": "가구 · 인테리어",
+  "Home Improvement Retail": "홈인테리어 소매",
+  "Homebuilding": "주택 건설",
+  "Homefurnishing Retail": "가구 소매",
+  "Hotel & Resort REITs": "호텔 · 리조트 리츠",
+  "Hotels, Resorts & Cruise Lines": "호텔 · 리조트 · 크루즈",
+  "Hotels/Resorts/Cruise lines": "호텔 · 리조트 · 크루즈",
+  "Household Products": "가정용품",
+  "Household/Personal Care": "가정 · 개인용품",
+  "Human Resource & Employment Services": "인사 · 고용 서비스",
+  "IT Consulting & Other Services": "IT 컨설팅 · 서비스",
+  "Independent Power Producers & Energy Traders": "독립 발전 · 에너지 트레이딩",
+  "Industrial Conglomerates": "산업 지주",
+  "Industrial Gases": "산업 가스",
+  "Industrial Machinery": "산업 기계",
+  "Industrial Machinery & Supplies & Components": "산업 기계 · 부품 · 자재",
+  "Industrial REITs": "산업 리츠",
+  "Industrial Specialties": "산업 특화",
+  "Information Technology Services": "IT 서비스",
+  "Insurance Brokers": "보험중개",
+  "Integrated Oil & Gas": "종합 석유 · 가스",
+  "Integrated Telecommunication Services": "통합 통신 서비스",
+  "Interactive Home Entertainment": "인터랙티브 홈 엔터테인먼트",
+  "Interactive Media & Services": "인터랙티브 미디어 · 서비스",
+  "Internet Services & Infrastructure": "인터넷 서비스 · 인프라",
+  "Internet Software/Services": "인터넷 소프트웨어 · 서비스",
+  "Investment Banking & Brokerage": "투자은행 · 증권",
+  "Investment Banks/Brokers": "투자은행 · 증권",
+  "Investment Managers": "자산운용",
+  "Leisure Products": "여가 제품",
+  "Life & Health Insurance": "생명 · 건강보험",
+  "Life Sciences Tools & Services": "라이프 사이언스 도구 · 서비스",
+  "Life/Health Insurance": "생명 · 건강보험",
+  "Major Banks": "대형 은행",
+  "Major Telecommunications": "대형 통신",
+  "Managed Health Care": "관리형 의료",
+  "Marine Shipping": "해운",
+  "Medical Distributors": "의료 유통",
+  "Medical Specialties": "의료 전문",
+  "Medical/Nursing Services": "의료 · 간호 서비스",
+  "Metal Fabrication": "금속 가공",
+  "Metal, Glass & Plastic Containers": "금속 · 유리 · 플라스틱 용기",
+  "Miscellaneous Commercial Services": "기타 상업 서비스",
+  "Motor Vehicles": "자동차",
+  "Movies & Entertainment": "영화 · 엔터테인먼트",
+  "Movies/Entertainment": "영화 · 엔터테인먼트",
+  "Multi-Family Residential REITs": "다세대 주거 리츠",
+  "Multi-Line Insurance": "종합 보험",
+  "Multi-Sector Holdings": "다섹터 지주",
+  "Multi-Utilities": "종합 공업",
+  "Multi-line Insurance": "종합 보험",
+  "Office REITs": "오피스 리츠",
+  "Oil & Gas Equipment & Services": "석유 · 가스 장비 · 서비스",
+  "Oil & Gas Exploration & Production": "석유 · 가스 탐사 · 생산",
+  "Oil & Gas Refining & Marketing": "석유 정제 · 마케팅",
+  "Oil & Gas Storage & Transportation": "석유 · 가스 저장 · 수송",
+  "Oil Refining/Marketing": "석유 정제 · 마케팅",
+  "Other Metals/Minerals": "기타 금속 · 광물",
+  "Other Specialized REITs": "기타 전문 리츠",
+  "Other Specialty Retail": "기타 전문 유통",
+  "Packaged Foods & Meats": "포장 식품 · 육류",
+  "Packaged Software": "패키지 소프트웨어",
+  "Paper & Plastic Packaging Products & Materials": "종이 · 플라스틱 포장재",
+  "Passenger Airlines": "여객 항공",
+  "Passenger Ground Transportation": "여객 육상 운송",
+  "Personal Care Products": "개인 관리 제품",
+  "Pharmaceuticals": "제약",
+  "Pharmaceuticals: Major": "대형 제약",
+  "Property & Casualty Insurance": "재산 · 손해보험",
+  "Property/Casualty Insurance": "손해보험",
+  "Publishing": "출판",
+  "Rail Transportation": "철도 운송",
+  "Real Estate Services": "부동산 서비스",
+  "Regional Banks": "지역 은행",
+  "Reinsurance": "재보험",
+  "Research & Consulting Services": "연구 및 컨설팅",
+  "Restaurants": "식당",
+  "Retail REITs": "소매 부동산",
+  "Self-Storage REITs": "자주식 부동산",
+  "Semiconductor Materials & Equipment": "반도체 소재",
+  "Semiconductors": "반도체",
+  "Single-Family Residential REITs": "단독주택 부동산",
+  "Soft Drinks & Non-alcoholic Beverages": "음료",
+  "Specialized Consumer Services": "특수 소비자 서비스",
+  "Specialty Chemicals": "특수 화학",
+  "Specialty Stores": "전문점",
+  "Steel": "철강",
+  "Systems Software": "시스템 소프트웨어",
+  "Technology Distributors": "기술 유통",
+  "Technology Hardware, Storage & Peripherals": "기술 하드웨어",
+  "Telecom Tower REITs": "통신 타워 부동산",
+  "Telecommunications Equipment": "통신 장비",
+  "Textiles": "섬유",
+  "Timber REITs": "목재 부동산",
+  "Tobacco": "담배",
+  "Trading Companies & Distributors": "무역 및 유통",
+  "Transaction & Payment Processing Services": "결제 서비스",
+  "Trucks/Construction/Farm Machinery": "건설 기계",
+  "Water Utilities": "수도",
+  "Wholesale Distributors": "도매 유통",
+  "Wireless Telecommunication Services": "무선 통신 서비스",
+  "Wireless Telecommunications": "무선 통신"
+ },
+ "us": {
+  "A": {
+   "en": "Agilent Technologies",
+   "ko": "애질런트 테크놀로지스",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "라이프 사이언스 도구 · 서비스",
+   "sub_en": "Life Sciences Tools & Services"
+  },
+  "AAPL": {
+   "en": "Apple Inc.",
+   "full": true,
+   "ko": "애플",
+   "sector": "기술",
+   "sub": "기술 하드웨어",
+   "sub_en": "Technology Hardware, Storage & Peripherals"
+  },
+  "ABBV": {
+   "en": "AbbVie",
+   "full": true,
+   "ko": "애브비",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_en": "Biotechnology"
+  },
+  "ABNB": {
+   "en": "Airbnb",
+   "ko": "에어비앤비",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "호텔 · 리조트 · 크루즈",
+   "sub_en": "Hotels, Resorts & Cruise Lines"
+  },
+  "ABT": {
+   "en": "Abbott Laboratories",
+   "ko": "애벗 래버러토리스",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "ACGL": {
+   "en": "Arch Capital Group",
+   "ko": "아치 캐피탈 그룹",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "재산 · 손해보험",
+   "sub_en": "Property & Casualty Insurance"
+  },
+  "ACN": {
+   "en": "Accenture",
+   "ko": "액센츄어",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "IT 컨설팅 · 서비스",
+   "sub_en": "IT Consulting & Other Services"
+  },
+  "ADBE": {
+   "en": "Adobe Inc.",
+   "ko": "어도비",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "ADI": {
+   "en": "Analog Devices",
+   "ko": "아날로그 디바이스",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "ADM": {
+   "en": "Archer Daniels Midland",
+   "ko": "아처 대니얼스 미들랜드",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "농산물 · 서비스",
+   "sub_en": "Agricultural Products & Services"
+  },
+  "ADP": {
+   "en": "Automatic Data Processing",
+   "ko": "ADP",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "인사 · 고용 서비스",
+   "sub_en": "Human Resource & Employment Services"
+  },
+  "ADSK": {
+   "en": "Autodesk",
+   "ko": "오토데스크",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "AEE": {
+   "en": "Ameren",
+   "ko": "아메렌",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "AEP": {
+   "en": "American Electric Power",
+   "ko": "아메리칸 일렉트릭 파워",
+   "ko_src": "wikidata",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "AES": {
+   "en": "AES Corporation",
+   "ko": "AES",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "독립 발전 · 에너지 트레이딩",
+   "sub_en": "Independent Power Producers & Energy Traders"
+  },
+  "AFL": {
+   "en": "Aflac",
+   "ko": "아플락",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "생명 · 건강보험",
+   "sub_en": "Life & Health Insurance"
+  },
+  "AIG": {
+   "en": "American International Group",
+   "ko": "아메리칸 인터내셔널 그룹",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "종합 보험",
+   "sub_en": "Multi-line Insurance"
+  },
+  "AIZ": {
+   "en": "Assurant",
+   "ko": "어슈어런트",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "종합 보험",
+   "sub_en": "Multi-line Insurance"
+  },
+  "AJG": {
+   "en": "Arthur J. Gallagher & Co.",
+   "ko": "아서 J. 갤러거",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "보험중개",
+   "sub_en": "Insurance Brokers"
+  },
+  "AKAM": {
+   "en": "Akamai Technologies",
+   "ko": "아카마이",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "인터넷 서비스 · 인프라",
+   "sub_en": "Internet Services & Infrastructure"
+  },
+  "ALB": {
+   "en": "Albemarle Corporation",
+   "ko": "앨버말",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "특수 화학",
+   "sub_en": "Specialty Chemicals"
+  },
+  "ALGN": {
+   "en": "Align Technology",
+   "ko": "얼라인 테크놀로지",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 용품",
+   "sub_en": "Health Care Supplies"
+  },
+  "ALL": {
+   "en": "Allstate",
+   "ko": "올스테이트",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "재산 · 손해보험",
+   "sub_en": "Property & Casualty Insurance"
+  },
+  "ALLE": {
+   "en": "Allegion",
+   "ko": "알레기온",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "건자재",
+   "sub_en": "Building Products"
+  },
+  "AMAT": {
+   "en": "Applied Materials",
+   "full": true,
+   "ko": "어플라이드 머티어리얼즈",
+   "sector": "기술",
+   "sub": "반도체 소재",
+   "sub_en": "Semiconductor Materials & Equipment"
+  },
+  "AMCR": {
+   "en": "Amcor",
+   "ko": "앰코어",
+   "ko_src": "fix",
+   "sector": "소재",
+   "sub": "종이 · 플라스틱 포장재",
+   "sub_en": "Paper & Plastic Packaging Products & Materials"
+  },
+  "AMD": {
+   "en": "Advanced Micro Devices",
+   "full": true,
+   "ko": "AMD",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "AME": {
+   "en": "Ametek",
+   "ko": "아메텍",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "전기 부품 · 장비",
+   "sub_en": "Electrical Components & Equipment"
+  },
+  "AMGN": {
+   "en": "Amgen",
+   "ko": "암젠",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_en": "Biotechnology"
+  },
+  "AMP": {
+   "en": "Ameriprise Financial",
+   "ko": "아메리프라이즈 파이낸셜",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "AMT": {
+   "en": "American Tower",
+   "ko": "아메리칸 타워",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "통신 타워 부동산",
+   "sub_en": "Telecom Tower REITs"
+  },
+  "AMZN": {
+   "en": "Amazon",
+   "full": true,
+   "ko": "아마존",
+   "sector": "경기 소비재",
+   "sub": "종합 유통",
+   "sub_en": "Broadline Retail"
+  },
+  "ANET": {
+   "en": "Arista Networks",
+   "full": true,
+   "ko": "아리스타 네트웍스",
+   "sector": "기술",
+   "sub": "통신 장비",
+   "sub_en": "Communications Equipment"
+  },
+  "AON": {
+   "en": "Aon plc",
+   "ko": "에이온",
+   "ko_src": "fix",
+   "sector": "금융",
+   "sub": "보험중개",
+   "sub_en": "Insurance Brokers"
+  },
+  "AOS": {
+   "en": "A. O. Smith",
+   "ko": "A. O. 스미스",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "건자재",
+   "sub_en": "Building Products"
+  },
+  "APA": {
+   "en": "APA Corporation",
+   "ko": "APA",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 · 가스 탐사 · 생산",
+   "sub_en": "Oil & Gas Exploration & Production"
+  },
+  "APD": {
+   "en": "Air Products",
+   "ko": "에어 프로덕츠",
+   "ko_src": "wikidata",
+   "sector": "소재",
+   "sub": "산업 가스",
+   "sub_en": "Industrial Gases"
+  },
+  "APH": {
+   "en": "Amphenol",
+   "ko": "앰페놀",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "전자 부품",
+   "sub_en": "Electronic Components"
+  },
+  "APO": {
+   "en": "Apollo Global Management",
+   "ko": "아폴로 글로벌 매니지먼트",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "APP": {
+   "en": "AppLovin",
+   "ko": "앱러빈",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "광고",
+   "sub_en": "Advertising"
+  },
+  "APTV": {
+   "en": "Aptiv",
+   "ko": "앱티브",
+   "ko_src": "fix",
+   "sector": "경기 소비재",
+   "sub": "자동차 부품 · 장비",
+   "sub_en": "Automotive Parts & Equipment"
+  },
+  "ARE": {
+   "en": "Alexandria Real Estate Equities",
+   "ko": "알렉산드리아 리얼 에스테이트 이퀴티스",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "오피스 리츠",
+   "sub_en": "Office REITs"
+  },
+  "ARES": {
+   "en": "Ares Management",
+   "ko": "아레스 매니지먼트",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "ATO": {
+   "en": "Atmos Energy",
+   "ko": "애트모스 에너지",
+   "ko_src": "fix",
+   "sector": "유틸리티",
+   "sub": "가스 유틸리티",
+   "sub_en": "Gas Utilities"
+  },
+  "AVGO": {
+   "en": "Broadcom",
+   "full": true,
+   "ko": "브로드컴",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "AVY": {
+   "en": "Avery Dennison",
+   "ko": "에이버리 데니슨",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "종이 · 플라스틱 포장재",
+   "sub_en": "Paper & Plastic Packaging Products & Materials"
+  },
+  "AWK": {
+   "en": "American Water Works",
+   "ko": "아메리칸 워터 웍스",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "수도",
+   "sub_en": "Water Utilities"
+  },
+  "AXON": {
+   "en": "Axon Enterprise",
+   "ko": "액손",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "AXP": {
+   "en": "American Express",
+   "ko": "아메리칸 엑스프레스",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "소비자 금융",
+   "sub_en": "Consumer Finance"
+  },
+  "AZO": {
+   "en": "AutoZone",
+   "ko": "오토존",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "자동차 유통",
+   "sub_en": "Automotive Retail"
+  },
+  "BA": {
+   "en": "Boeing",
+   "ko": "보잉",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "BAC": {
+   "en": "Bank of America",
+   "ko": "뱅크 오브 아메리카",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "종합 은행",
+   "sub_en": "Diversified Banks"
+  },
+  "BALL": {
+   "en": "Ball Corporation",
+   "ko": "볼",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "금속 · 유리 · 플라스틱 용기",
+   "sub_en": "Metal, Glass & Plastic Containers"
+  },
+  "BAX": {
+   "en": "Baxter International",
+   "ko": "백스터",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "BBY": {
+   "en": "Best Buy",
+   "ko": "베스트 바이",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "컴퓨터 · 전자 유통",
+   "sub_en": "Computer & Electronics Retail"
+  },
+  "BDX": {
+   "en": "Becton Dickinson",
+   "ko": "벡톤 디킨슨",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "BE": {
+   "en": "Bloom Energy",
+   "ko": "블룸 에너지",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "전기 부품 · 장비",
+   "sub_en": "Electrical Components & Equipment"
+  },
+  "BEN": {
+   "en": "Franklin Resources",
+   "ko": "프랭클린 템플턴 인베스트먼츠",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "BF-B": {
+   "en": "Brown–Forman",
+   "ko": "브라운 포만",
+   "ko_src": "ai",
+   "sector": "필수 소비재",
+   "sub": "주류 · 양조",
+   "sub_en": "Distillers & Vintners"
+  },
+  "BG": {
+   "en": "Bunge Global",
+   "ko": "번지",
+   "ko_src": "fix",
+   "sector": "필수 소비재",
+   "sub": "농산물 · 서비스",
+   "sub_en": "Agricultural Products & Services"
+  },
+  "BIIB": {
+   "en": "Biogen",
+   "ko": "바이오젠",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_en": "Biotechnology"
+  },
+  "BKNG": {
+   "en": "Booking Holdings",
+   "ko": "부킹 홀딩스",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "호텔 · 리조트 · 크루즈",
+   "sub_en": "Hotels, Resorts & Cruise Lines"
+  },
+  "BKR": {
+   "en": "Baker Hughes",
+   "ko": "베이커 휴즈",
+   "ko_src": "wikidata",
+   "sector": "에너지",
+   "sub": "석유 · 가스 장비 · 서비스",
+   "sub_en": "Oil & Gas Equipment & Services"
+  },
+  "BLK": {
+   "en": "BlackRock",
+   "ko": "블랙록",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "BMY": {
+   "en": "Bristol Myers Squibb",
+   "ko": "브리스톨 마이어스 스퀴브",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "제약",
+   "sub_en": "Pharmaceuticals"
+  },
+  "BNY": {
+   "en": "BNY Mellon",
+   "ko": "BNY",
+   "ko_src": "fix",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "BR": {
+   "en": "Broadridge Financial Solutions",
+   "ko": "브로드리지 파이낸셜 솔루션스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "데이터 처리 · 아웃소싱",
+   "sub_en": "Data Processing & Outsourced Services"
+  },
+  "BRK-B": {
+   "en": "Berkshire Hathaway",
+   "full": true,
+   "ko": "버크셔 해서웨이",
+   "sector": "금융",
+   "sub": "다섹터 지주",
+   "sub_en": "Multi-Sector Holdings"
+  },
+  "BRO": {
+   "en": "Brown & Brown",
+   "ko": "브라운 앤 브라운",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "보험중개",
+   "sub_en": "Insurance Brokers"
+  },
+  "BSX": {
+   "en": "Boston Scientific",
+   "ko": "보스톤사이언티픽",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "BX": {
+   "en": "Blackstone Inc.",
+   "ko": "블랙스톤",
+   "ko_src": "fix",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "BXP": {
+   "en": "BXP, Inc.",
+   "ko": "BXP",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "오피스 리츠",
+   "sub_en": "Office REITs"
+  },
+  "C": {
+   "en": "Citigroup",
+   "ko": "씨티그룹",
+   "ko_src": "fix",
+   "sector": "금융",
+   "sub": "종합 은행",
+   "sub_en": "Diversified Banks"
+  },
+  "CAH": {
+   "en": "Cardinal Health",
+   "ko": "카디널 헬스",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 유통",
+   "sub_en": "Health Care Distributors"
+  },
+  "CARR": {
+   "en": "Carrier Global",
+   "ko": "캐리어",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "건자재",
+   "sub_en": "Building Products"
+  },
+  "CASY": {
+   "en": "Casey's",
+   "ko": "케이시스",
+   "ko_src": "fix",
+   "sector": "필수 소비재",
+   "sub": "식품 소매",
+   "sub_en": "Food Retail"
+  },
+  "CAT": {
+   "en": "Caterpillar Inc.",
+   "full": true,
+   "ko": "캐터필러",
+   "sector": "산업재",
+   "sub": "건설 · 중장비",
+   "sub_en": "Construction Machinery & Heavy Transportation Equipment"
+  },
+  "CB": {
+   "en": "Chubb Limited",
+   "ko": "처브",
+   "ko_src": "fix",
+   "sector": "금융",
+   "sub": "재산 · 손해보험",
+   "sub_en": "Property & Casualty Insurance"
+  },
+  "CBOE": {
+   "en": "Cboe Global Markets",
+   "ko": "Cboe 글로벌 마켓",
+   "ko_src": "fix",
+   "sector": "금융",
+   "sub": "금융 거래소 · 데이터",
+   "sub_en": "Financial Exchanges & Data"
+  },
+  "CBRE": {
+   "en": "CBRE Group",
+   "ko": "CBRE 그룹",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "부동산 서비스",
+   "sub_en": "Real Estate Services"
+  },
+  "CCI": {
+   "en": "Crown Castle",
+   "ko": "크라운캐슬",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "통신 타워 부동산",
+   "sub_en": "Telecom Tower REITs"
+  },
+  "CCL": {
+   "en": "Carnival Corporation",
+   "ko": "카니발",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "호텔 · 리조트 · 크루즈",
+   "sub_en": "Hotels, Resorts & Cruise Lines"
+  },
+  "CDNS": {
+   "en": "Cadence Design Systems",
+   "ko": "케이던스 디자인 시스템즈",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "CDW": {
+   "en": "CDW Corporation",
+   "ko": "CDW",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "기술 유통",
+   "sub_en": "Technology Distributors"
+  },
+  "CEG": {
+   "en": "Constellation Energy",
+   "full": true,
+   "ko": "컨스텔레이션 에너지",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "CF": {
+   "en": "CF Industries",
+   "ko": "CF 인더스트리스",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "비료 · 농약",
+   "sub_en": "Fertilizers & Agricultural Chemicals"
+  },
+  "CFG": {
+   "en": "Citizens Financial Group",
+   "ko": "시티즌스 파이낸셜 그룹",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "지역 은행",
+   "sub_en": "Regional Banks"
+  },
+  "CHD": {
+   "en": "Church & Dwight",
+   "ko": "처치 앤드 드와이트",
+   "ko_src": "ai",
+   "sector": "필수 소비재",
+   "sub": "가정용품",
+   "sub_en": "Household Products"
+  },
+  "CHRW": {
+   "en": "C.H. Robinson",
+   "ko": "C.H. 로빈슨",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "항공 화물 · 물류",
+   "sub_en": "Air Freight & Logistics"
+  },
+  "CHTR": {
+   "en": "Charter Communications",
+   "ko": "차터 커뮤니케이션스",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "케이블 · 위성",
+   "sub_en": "Cable & Satellite"
+  },
+  "CI": {
+   "en": "Cigna",
+   "ko": "시그나",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "의료 서비스",
+   "sub_en": "Health Care Services"
+  },
+  "CIEN": {
+   "en": "Ciena",
+   "ko": "시에나",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "통신 장비",
+   "sub_en": "Communications Equipment"
+  },
+  "CINF": {
+   "en": "Cincinnati Financial",
+   "ko": "신시내티 파이낸셜",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "재산 · 손해보험",
+   "sub_en": "Property & Casualty Insurance"
+  },
+  "CL": {
+   "en": "Colgate-Palmolive",
+   "ko": "콜게이트 파몰리브",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "가정용품",
+   "sub_en": "Household Products"
+  },
+  "CLX": {
+   "en": "Clorox",
+   "ko": "크로락스",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "가정용품",
+   "sub_en": "Household Products"
+  },
+  "CMCSA": {
+   "en": "Comcast",
+   "ko": "컴캐스트",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "케이블 · 위성",
+   "sub_en": "Cable & Satellite"
+  },
+  "CME": {
+   "en": "CME Group",
+   "ko": "CME 그룹",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "금융 거래소 · 데이터",
+   "sub_en": "Financial Exchanges & Data"
+  },
+  "CMG": {
+   "en": "Chipotle Mexican Grill",
+   "ko": "치포틀레 멕시칸 그릴",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "식당",
+   "sub_en": "Restaurants"
+  },
+  "CMI": {
+   "en": "Cummins",
+   "ko": "커민스",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "건설 · 중장비",
+   "sub_en": "Construction Machinery & Heavy Transportation Equipment"
+  },
+  "CMS": {
+   "en": "CMS Energy",
+   "ko": "CMS 에너지",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "CNC": {
+   "en": "Centene Corporation",
+   "ko": "센테네",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "관리형 의료",
+   "sub_en": "Managed Health Care"
+  },
+  "CNP": {
+   "en": "CenterPoint Energy",
+   "ko": "센터포인트 에너지",
+   "ko_src": "fix",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "COF": {
+   "en": "Capital One",
+   "ko": "캐피털 원",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "소비자 금융",
+   "sub_en": "Consumer Finance"
+  },
+  "COHR": {
+   "en": "Coherent Corp.",
+   "ko": "코히런트",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "전자 부품",
+   "sub_en": "Electronic Components"
+  },
+  "COIN": {
+   "en": "Coinbase",
+   "full": true,
+   "ko": "코인베이스",
+   "sector": "금융",
+   "sub": "금융 거래소 · 데이터",
+   "sub_en": "Financial Exchanges & Data"
+  },
+  "COO": {
+   "en": "Cooper Companies (The)",
+   "ko": "쿠퍼컴퍼니",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 용품",
+   "sub_en": "Health Care Supplies"
+  },
+  "COP": {
+   "en": "ConocoPhillips",
+   "full": true,
+   "ko": "코노코필립스",
+   "sector": "에너지",
+   "sub": "석유 · 가스 탐사 · 생산",
+   "sub_en": "Oil & Gas Exploration & Production"
+  },
+  "COR": {
+   "en": "Cencora",
+   "ko": "센코라",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 유통",
+   "sub_en": "Health Care Distributors"
+  },
+  "COST": {
+   "en": "Costco",
+   "full": true,
+   "ko": "코스트코",
+   "sector": "필수 소비재",
+   "sub": "생활용품 유통",
+   "sub_en": "Consumer Staples Merchandise Retail"
+  },
+  "CPAY": {
+   "en": "Corpay",
+   "ko": "코페이",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "결제 서비스",
+   "sub_en": "Transaction & Payment Processing Services"
+  },
+  "CPRT": {
+   "en": "Copart",
+   "ko": "코파트",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "종합 지원 서비스",
+   "sub_en": "Diversified Support Services"
+  },
+  "CPT": {
+   "en": "Camden Property Trust",
+   "ko": "캠든 프로퍼티 트러스트",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "다세대 주거 리츠",
+   "sub_en": "Multi-Family Residential REITs"
+  },
+  "CRH": {
+   "en": "CRH plc",
+   "ko": "CRH",
+   "ko_src": "wikidata",
+   "sector": "소재",
+   "sub": "건설 자재",
+   "sub_en": "Construction Materials"
+  },
+  "CRL": {
+   "en": "Charles River Laboratories",
+   "ko": "찰스 리버 랩",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "라이프 사이언스 도구 · 서비스",
+   "sub_en": "Life Sciences Tools & Services"
+  },
+  "CRM": {
+   "en": "Salesforce",
+   "ko": "세일즈포스",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "CRWD": {
+   "en": "CrowdStrike",
+   "ko": "크라우드스트라이크",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "시스템 소프트웨어",
+   "sub_en": "Systems Software"
+  },
+  "CSCO": {
+   "en": "Cisco",
+   "ko": "시스코 시스템즈",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "통신 장비",
+   "sub_en": "Communications Equipment"
+  },
+  "CSGP": {
+   "en": "CoStar Group",
+   "ko": "코스타그룹",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "부동산 서비스",
+   "sub_en": "Real Estate Services"
+  },
+  "CSX": {
+   "en": "CSX Corporation",
+   "ko": "CSX",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "철도 운송",
+   "sub_en": "Rail Transportation"
+  },
+  "CTAS": {
+   "en": "Cintas",
+   "ko": "신타스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "종합 지원 서비스",
+   "sub_en": "Diversified Support Services"
+  },
+  "CTSH": {
+   "en": "Cognizant",
+   "ko": "카그너전트",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "IT 컨설팅 · 서비스",
+   "sub_en": "IT Consulting & Other Services"
+  },
+  "CVNA": {
+   "en": "Carvana",
+   "ko": "카바나",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "자동차 유통",
+   "sub_en": "Automotive Retail"
+  },
+  "CVS": {
+   "en": "CVS Health",
+   "ko": "CVS 헬스",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "의료 서비스",
+   "sub_en": "Health Care Services"
+  },
+  "CVX": {
+   "en": "Chevron Corporation",
+   "full": true,
+   "ko": "셰브론",
+   "sector": "에너지",
+   "sub": "종합 석유 · 가스",
+   "sub_en": "Integrated Oil & Gas"
+  },
+  "D": {
+   "en": "Dominion Energy",
+   "ko": "도미니언에너지",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "DAL": {
+   "en": "Delta Air Lines",
+   "ko": "델타 항공",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "여객 항공",
+   "sub_en": "Passenger Airlines"
+  },
+  "DASH": {
+   "en": "DoorDash",
+   "ko": "도어대시",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "특수 소비자 서비스",
+   "sub_en": "Specialized Consumer Services"
+  },
+  "DD": {
+   "en": "DuPont",
+   "ko": "듀폰",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "산업 지주",
+   "sub_en": "Industrial Conglomerates"
+  },
+  "DDOG": {
+   "en": "Datadog",
+   "ko": "데이터도그",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "DE": {
+   "en": "Deere & Company",
+   "ko": "디어 앤 컴퍼니",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "농업 · 농기계",
+   "sub_en": "Agricultural & Farm Machinery"
+  },
+  "DECK": {
+   "en": "Deckers Brands",
+   "ko": "데커스브랜드",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "신발",
+   "sub_en": "Footwear"
+  },
+  "DELL": {
+   "en": "Dell Technologies",
+   "ko": "델",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "기술 하드웨어",
+   "sub_en": "Technology Hardware, Storage & Peripherals"
+  },
+  "DG": {
+   "en": "Dollar General",
+   "ko": "달러 제너럴",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "생활용품 유통",
+   "sub_en": "Consumer Staples Merchandise Retail"
+  },
+  "DGX": {
+   "en": "Quest Diagnostics",
+   "ko": "퀘스트 진단",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 서비스",
+   "sub_en": "Health Care Services"
+  },
+  "DHI": {
+   "en": "D. R. Horton",
+   "ko": "D.R. 호튼",
+   "ko_src": "fix",
+   "sector": "경기 소비재",
+   "sub": "주택 건설",
+   "sub_en": "Homebuilding"
+  },
+  "DHR": {
+   "en": "Danaher Corporation",
+   "ko": "다나허",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "라이프 사이언스 도구 · 서비스",
+   "sub_en": "Life Sciences Tools & Services"
+  },
+  "DIS": {
+   "en": "Walt Disney Company (The)",
+   "full": true,
+   "ko": "디즈니",
+   "sector": "커뮤니케이션",
+   "sub": "영화 · 엔터테인먼트",
+   "sub_en": "Movies & Entertainment"
+  },
+  "DLR": {
+   "en": "Digital Realty",
+   "ko": "디지털 리얼티",
+   "ko_src": "wikidata",
+   "sector": "부동산",
+   "sub": "데이터센터 리츠",
+   "sub_en": "Data Center REITs"
+  },
+  "DLTR": {
+   "en": "Dollar Tree",
+   "ko": "달러트리",
+   "ko_src": "ai",
+   "sector": "필수 소비재",
+   "sub": "생활용품 유통",
+   "sub_en": "Consumer Staples Merchandise Retail"
+  },
+  "DOC": {
+   "en": "Healthpeak Properties",
+   "ko": "헬스피크프로퍼티",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "의료 리츠",
+   "sub_en": "Health Care REITs"
+  },
+  "DOV": {
+   "en": "Dover Corporation",
+   "ko": "도버",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "DOW": {
+   "en": "Dow Inc.",
+   "ko": "다우 케미컬",
+   "ko_src": "wikidata",
+   "sector": "소재",
+   "sub": "기초 화학",
+   "sub_en": "Commodity Chemicals"
+  },
+  "DPZ": {
+   "en": "Domino's",
+   "ko": "도미노피자",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "식당",
+   "sub_en": "Restaurants"
+  },
+  "DRI": {
+   "en": "Darden Restaurants",
+   "ko": "다든레스토랑",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "식당",
+   "sub_en": "Restaurants"
+  },
+  "DTE": {
+   "en": "DTE Energy",
+   "ko": "DTE에너지",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "DUK": {
+   "en": "Duke Energy",
+   "ko": "듀크에너지",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "DVA": {
+   "en": "DaVita",
+   "ko": "다비타",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 서비스",
+   "sub_en": "Health Care Services"
+  },
+  "DVN": {
+   "en": "Devon Energy",
+   "ko": "데본에너지",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 · 가스 탐사 · 생산",
+   "sub_en": "Oil & Gas Exploration & Production"
+  },
+  "DXCM": {
+   "en": "Dexcom",
+   "ko": "덱스콤",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "EBAY": {
+   "en": "eBay Inc.",
+   "ko": "이베이",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "종합 유통",
+   "sub_en": "Broadline Retail"
+  },
+  "ECHO": {
+   "en": "EchoStar",
+   "ko": "에코스타",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "무선 통신 서비스",
+   "sub_en": "Wireless Telecommunication Services"
+  },
+  "ECL": {
+   "en": "Ecolab",
+   "ko": "에코랩",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "특수 화학",
+   "sub_en": "Specialty Chemicals"
+  },
+  "ED": {
+   "en": "Consolidated Edison",
+   "ko": "컨솔리데이티드에디슨",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "EFX": {
+   "en": "Equifax",
+   "ko": "에퀴팩스",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "연구 및 컨설팅",
+   "sub_en": "Research & Consulting Services"
+  },
+  "EG": {
+   "en": "Everest Group",
+   "ko": "에버레스트그룹",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "재보험",
+   "sub_en": "Reinsurance"
+  },
+  "EIX": {
+   "en": "Edison International",
+   "ko": "에디슨인터내셔널",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "EL": {
+   "en": "Estée Lauder Companies (The)",
+   "ko": "에스티 로더",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "개인 관리 제품",
+   "sub_en": "Personal Care Products"
+  },
+  "ELV": {
+   "en": "Elevance Health",
+   "ko": "엘리번스 헬스",
+   "ko_src": "fix",
+   "sector": "헬스케어",
+   "sub": "관리형 의료",
+   "sub_en": "Managed Health Care"
+  },
+  "EME": {
+   "en": "Emcor",
+   "ko": "엠코",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "건설 · 엔지니어링",
+   "sub_en": "Construction & Engineering"
+  },
+  "EMR": {
+   "en": "Emerson Electric",
+   "ko": "에머슨 일렉트릭",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "전기 부품 · 장비",
+   "sub_en": "Electrical Components & Equipment"
+  },
+  "EOG": {
+   "en": "EOG Resources",
+   "full": true,
+   "ko": "EOG 리소시스",
+   "sector": "에너지",
+   "sub": "석유 · 가스 탐사 · 생산",
+   "sub_en": "Oil & Gas Exploration & Production"
+  },
+  "EQIX": {
+   "en": "Equinix",
+   "full": true,
+   "ko": "에퀴닉스",
+   "sector": "부동산",
+   "sub": "데이터센터 리츠",
+   "sub_en": "Data Center REITs"
+  },
+  "EQT": {
+   "en": "EQT Corporation",
+   "ko": "EQT",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 · 가스 탐사 · 생산",
+   "sub_en": "Oil & Gas Exploration & Production"
+  },
+  "ERIE": {
+   "en": "Erie Indemnity",
+   "ko": "에리인덴미티",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "보험중개",
+   "sub_en": "Insurance Brokers"
+  },
+  "ES": {
+   "en": "Eversource Energy",
+   "ko": "에버소스 에너지",
+   "ko_src": "fix",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "ESS": {
+   "en": "Essex Property Trust",
+   "ko": "에섹스프로퍼티트러스트",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "다세대 주거 리츠",
+   "sub_en": "Multi-Family Residential REITs"
+  },
+  "ETN": {
+   "en": "Eaton Corporation",
+   "ko": "이튼",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "전기 부품 · 장비",
+   "sub_en": "Electrical Components & Equipment"
+  },
+  "ETR": {
+   "en": "Entergy",
+   "ko": "엔터지",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "EVRG": {
+   "en": "Evergy",
+   "ko": "에버지",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "EW": {
+   "en": "Edwards Lifesciences",
+   "ko": "에드워즈라이프사이언스",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "EXC": {
+   "en": "Exelon",
+   "ko": "엑셀론",
+   "ko_src": "wikidata",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "EXE": {
+   "en": "Expand Energy",
+   "ko": "익스팬드에너지",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 · 가스 탐사 · 생산",
+   "sub_en": "Oil & Gas Exploration & Production"
+  },
+  "EXPD": {
+   "en": "Expeditors International",
+   "ko": "익스페디터스인터내셔널",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "항공 화물 · 물류",
+   "sub_en": "Air Freight & Logistics"
+  },
+  "EXPE": {
+   "en": "Expedia Group",
+   "ko": "익스피디아 그룹",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "호텔 · 리조트 · 크루즈",
+   "sub_en": "Hotels, Resorts & Cruise Lines"
+  },
+  "EXR": {
+   "en": "Extra Space Storage",
+   "ko": "엑스트라스페이스스토리지",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "자주식 부동산",
+   "sub_en": "Self-Storage REITs"
+  },
+  "F": {
+   "en": "Ford Motor Company",
+   "ko": "포드",
+   "ko_src": "fix",
+   "sector": "경기 소비재",
+   "sub": "자동차 제조",
+   "sub_en": "Automobile Manufacturers"
+  },
+  "FANG": {
+   "en": "Diamondback Energy",
+   "ko": "다이아몬드백에너지",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 · 가스 탐사 · 생산",
+   "sub_en": "Oil & Gas Exploration & Production"
+  },
+  "FAST": {
+   "en": "Fastenal",
+   "ko": "패스널",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "무역 및 유통",
+   "sub_en": "Trading Companies & Distributors"
+  },
+  "FCX": {
+   "en": "Freeport-McMoRan",
+   "ko": "프리포트 맥모란",
+   "ko_src": "wikidata",
+   "sector": "소재",
+   "sub": "구리",
+   "sub_en": "Copper"
+  },
+  "FDS": {
+   "en": "FactSet",
+   "ko": "팩트셋 리서치 시스템즈",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "금융 거래소 · 데이터",
+   "sub_en": "Financial Exchanges & Data"
+  },
+  "FDX": {
+   "en": "FedEx",
+   "ko": "페덱스",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "항공 화물 · 물류",
+   "sub_en": "Air Freight & Logistics"
+  },
+  "FDXF": {
+   "en": "FedEx Freight",
+   "ko": "페덱스프레이트",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "육상 화물 운송",
+   "sub_en": "Cargo Ground Transportation"
+  },
+  "FE": {
+   "en": "FirstEnergy",
+   "ko": "퍼스트에너지",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "FERG": {
+   "en": "Ferguson Enterprises",
+   "ko": "퍼거슨엔터프라이즈",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "무역 및 유통",
+   "sub_en": "Trading Companies & Distributors"
+  },
+  "FFIV": {
+   "en": "F5, Inc.",
+   "ko": "F5",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "통신 장비",
+   "sub_en": "Communications Equipment"
+  },
+  "FICO": {
+   "en": "Fair Isaac",
+   "ko": "페어아이작",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "FIS": {
+   "en": "Fidelity National Information Services",
+   "ko": "피델리티내셔널인포메이션서비스",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "결제 서비스",
+   "sub_en": "Transaction & Payment Processing Services"
+  },
+  "FISV": {
+   "en": "Fiserv",
+   "ko": "파이서브",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "결제 서비스",
+   "sub_en": "Transaction & Payment Processing Services"
+  },
+  "FITB": {
+   "en": "Fifth Third Bancorp",
+   "ko": "피프스서드뱅코프",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "지역 은행",
+   "sub_en": "Regional Banks"
+  },
+  "FIX": {
+   "en": "Comfort Systems USA",
+   "ko": "컴포트시스템즈",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "건설 · 엔지니어링",
+   "sub_en": "Construction & Engineering"
+  },
+  "FLEX": {
+   "en": "Flex Ltd.",
+   "ko": "플렉스",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "전자 위탁생산",
+   "sub_en": "Electronic Manufacturing Services"
+  },
+  "FOX": {
+   "en": "Fox Corporation (Class B)",
+   "ko": "폭스 (B주)",
+   "ko_src": "fix",
+   "sector": "커뮤니케이션",
+   "sub": "방송",
+   "sub_en": "Broadcasting"
+  },
+  "FOXA": {
+   "en": "Fox Corporation (Class A)",
+   "ko": "폭스 (A주)",
+   "ko_src": "fix",
+   "sector": "커뮤니케이션",
+   "sub": "방송",
+   "sub_en": "Broadcasting"
+  },
+  "FRT": {
+   "en": "Federal Realty Investment Trust",
+   "ko": "페더럴리얼티인베스트먼트트러스트",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "소매 부동산",
+   "sub_en": "Retail REITs"
+  },
+  "FSLR": {
+   "en": "First Solar",
+   "ko": "퍼스트 솔라",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "FTNT": {
+   "en": "Fortinet",
+   "ko": "포티넷",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "시스템 소프트웨어",
+   "sub_en": "Systems Software"
+  },
+  "FTV": {
+   "en": "Fortive",
+   "ko": "포티브",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "GD": {
+   "en": "General Dynamics",
+   "ko": "제너럴 다이내믹스",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "GDDY": {
+   "en": "GoDaddy",
+   "ko": "고대디",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "인터넷 서비스 · 인프라",
+   "sub_en": "Internet Services & Infrastructure"
+  },
+  "GE": {
+   "en": "GE Aerospace",
+   "full": true,
+   "ko": "GE 에어로스페이스",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "GEHC": {
+   "en": "GE HealthCare",
+   "ko": "GE 헬스케어",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "GEN": {
+   "en": "Gen Digital",
+   "ko": "젠 디지털",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "시스템 소프트웨어",
+   "sub_en": "Systems Software"
+  },
+  "GEV": {
+   "en": "GE Vernova",
+   "ko": "GE버노바",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "중전기",
+   "sub_en": "Heavy Electrical Equipment"
+  },
+  "GILD": {
+   "en": "Gilead Sciences",
+   "ko": "길리어드 사이언스",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_en": "Biotechnology"
+  },
+  "GIS": {
+   "en": "General Mills",
+   "ko": "제너럴 밀스",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "포장 식품 · 육류",
+   "sub_en": "Packaged Foods & Meats"
+  },
+  "GL": {
+   "en": "Globe Life",
+   "ko": "글로브라이프",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "생명 · 건강보험",
+   "sub_en": "Life & Health Insurance"
+  },
+  "GLW": {
+   "en": "Corning Inc.",
+   "ko": "코닝",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "전자 부품",
+   "sub_en": "Electronic Components"
+  },
+  "GM": {
+   "en": "General Motors",
+   "ko": "제너럴 모터스",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "자동차 제조",
+   "sub_en": "Automobile Manufacturers"
+  },
+  "GNRC": {
+   "en": "Generac",
+   "ko": "제너랙",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "중전기",
+   "sub_en": "Heavy Electrical Equipment"
+  },
+  "GOOG": {
+   "en": "Alphabet Inc. (Class C)",
+   "ko": "알파벳 (C주)",
+   "ko_src": "fix",
+   "sector": "커뮤니케이션",
+   "sub": "인터랙티브 미디어 · 서비스",
+   "sub_en": "Interactive Media & Services"
+  },
+  "GOOGL": {
+   "en": "Alphabet Inc. (Class A)",
+   "full": true,
+   "ko": "알파벳(구글)",
+   "sector": "커뮤니케이션",
+   "sub": "인터랙티브 미디어 · 서비스",
+   "sub_en": "Interactive Media & Services"
+  },
+  "GPC": {
+   "en": "Genuine Parts Company",
+   "ko": "제뉴인 파츠",
+   "ko_src": "fix",
+   "sector": "경기 소비재",
+   "sub": "유통",
+   "sub_en": "Distributors"
+  },
+  "GPN": {
+   "en": "Global Payments",
+   "ko": "글로벌페이먼츠",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "결제 서비스",
+   "sub_en": "Transaction & Payment Processing Services"
+  },
+  "GRMN": {
+   "en": "Garmin",
+   "ko": "가르민",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "소비자 전자",
+   "sub_en": "Consumer Electronics"
+  },
+  "GS": {
+   "en": "Goldman Sachs",
+   "ko": "골드만삭스",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "투자은행 · 증권",
+   "sub_en": "Investment Banking & Brokerage"
+  },
+  "GWW": {
+   "en": "W. W. Grainger",
+   "ko": "W.W. 그레인저",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "HAL": {
+   "en": "Halliburton",
+   "ko": "할리버튼",
+   "ko_src": "wikidata",
+   "sector": "에너지",
+   "sub": "석유 · 가스 장비 · 서비스",
+   "sub_en": "Oil & Gas Equipment & Services"
+  },
+  "HAS": {
+   "en": "Hasbro",
+   "ko": "해즈브로",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "여가 제품",
+   "sub_en": "Leisure Products"
+  },
+  "HBAN": {
+   "en": "Huntington Bancshares",
+   "ko": "헌팅턴 뱅크셰어스",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "지역 은행",
+   "sub_en": "Regional Banks"
+  },
+  "HCA": {
+   "en": "HCA Healthcare",
+   "ko": "HCA헬스케어",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 시설",
+   "sub_en": "Health Care Facilities"
+  },
+  "HD": {
+   "en": "Home Depot (The)",
+   "full": true,
+   "ko": "홈디포",
+   "sector": "경기 소비재",
+   "sub": "홈인테리어 소매",
+   "sub_en": "Home Improvement Retail"
+  },
+  "HIG": {
+   "en": "Hartford (The)",
+   "ko": "하트퍼드",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "재산 · 손해보험",
+   "sub_en": "Property & Casualty Insurance"
+  },
+  "HII": {
+   "en": "Huntington Ingalls Industries",
+   "ko": "헌팅턴 잉걸스 인더스트리",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "HLT": {
+   "en": "Hilton Worldwide",
+   "ko": "힐튼 월드와이드",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "호텔 · 리조트 · 크루즈",
+   "sub_en": "Hotels, Resorts & Cruise Lines"
+  },
+  "HON": {
+   "en": "Honeywell Technologies",
+   "ko": "허니웰",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "산업 지주",
+   "sub_en": "Industrial Conglomerates"
+  },
+  "HONA": {
+   "en": "Honeywell Aerospace",
+   "ko": "허니웰에어로스페이스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "HOOD": {
+   "en": "Robinhood Markets",
+   "full": true,
+   "ko": "로빈후드",
+   "sector": "금융",
+   "sub": "투자은행 · 증권",
+   "sub_en": "Investment Banking & Brokerage"
+  },
+  "HPE": {
+   "en": "Hewlett Packard Enterprise",
+   "ko": "휴렛 팩커드 엔터프라이즈",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "기술 하드웨어",
+   "sub_en": "Technology Hardware, Storage & Peripherals"
+  },
+  "HPQ": {
+   "en": "HP Inc.",
+   "ko": "HP",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "기술 하드웨어",
+   "sub_en": "Technology Hardware, Storage & Peripherals"
+  },
+  "HRL": {
+   "en": "Hormel Foods",
+   "ko": "호멜",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "포장 식품 · 육류",
+   "sub_en": "Packaged Foods & Meats"
+  },
+  "HSIC": {
+   "en": "Henry Schein",
+   "ko": "헨리 샤인",
+   "ko_src": "fix",
+   "sector": "헬스케어",
+   "sub": "의료 유통",
+   "sub_en": "Health Care Distributors"
+  },
+  "HST": {
+   "en": "Host Hotels & Resorts",
+   "ko": "호스트호텔앤드리조트",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "호텔 · 리조트 리츠",
+   "sub_en": "Hotel & Resort REITs"
+  },
+  "HSY": {
+   "en": "Hershey Company (The)",
+   "ko": "허쉬",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "포장 식품 · 육류",
+   "sub_en": "Packaged Foods & Meats"
+  },
+  "HUBB": {
+   "en": "Hubbell Incorporated",
+   "ko": "허벨",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "HUM": {
+   "en": "Humana",
+   "ko": "휴매나",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "관리형 의료",
+   "sub_en": "Managed Health Care"
+  },
+  "HWM": {
+   "en": "Howmet Aerospace",
+   "ko": "하우멧 에어로스페이스",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "IBKR": {
+   "en": "Interactive Brokers",
+   "ko": "인터랙티브 브로커스",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "투자은행 · 증권",
+   "sub_en": "Investment Banking & Brokerage"
+  },
+  "IBM": {
+   "en": "IBM",
+   "full": true,
+   "ko": "IBM",
+   "sector": "기술",
+   "sub": "IT 컨설팅 · 서비스",
+   "sub_en": "IT Consulting & Other Services"
+  },
+  "ICE": {
+   "en": "Intercontinental Exchange",
+   "ko": "인터컨티넨탈 익스체인지",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "금융 거래소 · 데이터",
+   "sub_en": "Financial Exchanges & Data"
+  },
+  "IDXX": {
+   "en": "Idexx Laboratories",
+   "ko": "아이덱스 래버러토리스",
+   "ko_src": "fix",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "IEX": {
+   "en": "IDEX Corporation",
+   "ko": "아이덱스 코퍼레이션",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "IFF": {
+   "en": "International Flavors & Fragrances",
+   "ko": "인터내셔널 플레버스 앤 프래그런스",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "특수 화학",
+   "sub_en": "Specialty Chemicals"
+  },
+  "ILMN": {
+   "en": "Illumina, Inc.",
+   "ko": "일루미나",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "라이프 사이언스 도구 · 서비스",
+   "sub_en": "Life Sciences Tools & Services"
+  },
+  "INCY": {
+   "en": "Incyte",
+   "ko": "인사이트",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_en": "Biotechnology"
+  },
+  "INTC": {
+   "en": "Intel",
+   "full": true,
+   "ko": "인텔",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "INTU": {
+   "en": "Intuit",
+   "ko": "인튜이트",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "INVH": {
+   "en": "Invitation Homes",
+   "ko": "인비테이션 홈즈",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "단독주택 부동산",
+   "sub_en": "Single-Family Residential REITs"
+  },
+  "IP": {
+   "en": "International Paper",
+   "ko": "인터내셔널페이퍼",
+   "ko_src": "wikidata",
+   "sector": "소재",
+   "sub": "종이 · 플라스틱 포장재",
+   "sub_en": "Paper & Plastic Packaging Products & Materials"
+  },
+  "IQV": {
+   "en": "IQVIA",
+   "ko": "아이큐비아",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "라이프 사이언스 도구 · 서비스",
+   "sub_en": "Life Sciences Tools & Services"
+  },
+  "IR": {
+   "en": "Ingersoll Rand",
+   "ko": "잉거솔 랜트",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "IRM": {
+   "en": "Iron Mountain",
+   "ko": "아이언 마운틴",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "기타 전문 리츠",
+   "sub_en": "Other Specialized REITs"
+  },
+  "ISRG": {
+   "en": "Intuitive Surgical",
+   "ko": "인튜이티브 서지컬",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "IT": {
+   "en": "Gartner",
+   "ko": "가트너",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "IT 컨설팅 · 서비스",
+   "sub_en": "IT Consulting & Other Services"
+  },
+  "ITW": {
+   "en": "Illinois Tool Works",
+   "ko": "일리노이스 툴 웍스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "IVZ": {
+   "en": "Invesco",
+   "ko": "인베스코",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "J": {
+   "en": "Jacobs Solutions",
+   "ko": "제이콥스 솔루션스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "건설 · 엔지니어링",
+   "sub_en": "Construction & Engineering"
+  },
+  "JBHT": {
+   "en": "J.B. Hunt",
+   "ko": "제이비헌트",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "육상 화물 운송",
+   "sub_en": "Cargo Ground Transportation"
+  },
+  "JBL": {
+   "en": "Jabil",
+   "ko": "자빌",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "전자 위탁생산",
+   "sub_en": "Electronic Manufacturing Services"
+  },
+  "JCI": {
+   "en": "Johnson Controls",
+   "ko": "존슨 컨트롤스",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "건자재",
+   "sub_en": "Building Products"
+  },
+  "JKHY": {
+   "en": "Jack Henry & Associates",
+   "ko": "잭 헨리",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "결제 서비스",
+   "sub_en": "Transaction & Payment Processing Services"
+  },
+  "JNJ": {
+   "en": "Johnson & Johnson",
+   "full": true,
+   "ko": "존슨앤드존슨",
+   "sector": "헬스케어",
+   "sub": "제약",
+   "sub_en": "Pharmaceuticals"
+  },
+  "JPM": {
+   "en": "JPMorgan Chase",
+   "full": true,
+   "ko": "JP모건",
+   "sector": "금융",
+   "sub": "종합 은행",
+   "sub_en": "Diversified Banks"
+  },
+  "KDP": {
+   "en": "Keurig Dr Pepper",
+   "ko": "큐리그 닥터페퍼",
+   "ko_src": "fix",
+   "sector": "필수 소비재",
+   "sub": "음료",
+   "sub_en": "Soft Drinks & Non-alcoholic Beverages"
+  },
+  "KEY": {
+   "en": "KeyCorp",
+   "ko": "키코프",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "지역 은행",
+   "sub_en": "Regional Banks"
+  },
+  "KEYS": {
+   "en": "Keysight Technologies",
+   "ko": "키사이트",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기",
+   "sub_en": "Electronic Equipment & Instruments"
+  },
+  "KHC": {
+   "en": "Kraft Heinz",
+   "ko": "크래프트 하인즈",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "포장 식품 · 육류",
+   "sub_en": "Packaged Foods & Meats"
+  },
+  "KIM": {
+   "en": "Kimco Realty",
+   "ko": "킴코 리얼티",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "소매 부동산",
+   "sub_en": "Retail REITs"
+  },
+  "KKR": {
+   "en": "KKR & Co.",
+   "ko": "KKR",
+   "ko_src": "fix",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "KLAC": {
+   "en": "KLA Corporation",
+   "ko": "KLA",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "반도체 소재",
+   "sub_en": "Semiconductor Materials & Equipment"
+  },
+  "KMB": {
+   "en": "Kimberly-Clark",
+   "ko": "킴벌리-클라크",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "가정용품",
+   "sub_en": "Household Products"
+  },
+  "KMI": {
+   "en": "Kinder Morgan",
+   "ko": "킨더 모건",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 · 가스 저장 · 수송",
+   "sub_en": "Oil & Gas Storage & Transportation"
+  },
+  "KO": {
+   "en": "Coca-Cola Company (The)",
+   "full": true,
+   "ko": "코카콜라",
+   "sector": "필수 소비재",
+   "sub": "음료",
+   "sub_en": "Soft Drinks & Non-alcoholic Beverages"
+  },
+  "KR": {
+   "en": "Kroger",
+   "ko": "크로거",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "식품 소매",
+   "sub_en": "Food Retail"
+  },
+  "L": {
+   "en": "Loews Corporation",
+   "ko": "로우스 코퍼레이션",
+   "ko_src": "fix",
+   "sector": "금융",
+   "sub": "종합 보험",
+   "sub_en": "Multi-line Insurance"
+  },
+  "LDOS": {
+   "en": "Leidos",
+   "ko": "라이도스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "종합 지원 서비스",
+   "sub_en": "Diversified Support Services"
+  },
+  "LEN": {
+   "en": "Lennar",
+   "ko": "레너",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "주택 건설",
+   "sub_en": "Homebuilding"
+  },
+  "LH": {
+   "en": "Labcorp",
+   "ko": "랩코프",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 서비스",
+   "sub_en": "Health Care Services"
+  },
+  "LHX": {
+   "en": "L3Harris",
+   "ko": "L3해리스",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "LII": {
+   "en": "Lennox International",
+   "ko": "레녹스 인터내셔널",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "건자재",
+   "sub_en": "Building Products"
+  },
+  "LIN": {
+   "en": "Linde plc",
+   "full": true,
+   "ko": "린데",
+   "sector": "소재",
+   "sub": "산업 가스",
+   "sub_en": "Industrial Gases"
+  },
+  "LITE": {
+   "en": "Lumentum",
+   "ko": "루멘텀",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "통신 장비",
+   "sub_en": "Communications Equipment"
+  },
+  "LLY": {
+   "en": "Lilly (Eli)",
+   "full": true,
+   "ko": "일라이 릴리",
+   "sector": "헬스케어",
+   "sub": "제약",
+   "sub_en": "Pharmaceuticals"
+  },
+  "LMT": {
+   "en": "Lockheed Martin",
+   "ko": "록히드 마틴",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "LNT": {
+   "en": "Alliant Energy",
+   "ko": "얼라이언트 에너지",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "LOW": {
+   "en": "Lowe's",
+   "ko": "로우스",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "홈인테리어 소매",
+   "sub_en": "Home Improvement Retail"
+  },
+  "LRCX": {
+   "en": "Lam Research",
+   "full": true,
+   "ko": "램리서치",
+   "sector": "기술",
+   "sub": "반도체 소재",
+   "sub_en": "Semiconductor Materials & Equipment"
+  },
+  "LULU": {
+   "en": "Lululemon Athletica",
+   "ko": "룰루레몬",
+   "ko_src": "fix",
+   "sector": "경기 소비재",
+   "sub": "의류 · 액세서리 · 명품",
+   "sub_en": "Apparel, Accessories & Luxury Goods"
+  },
+  "LUV": {
+   "en": "Southwest Airlines",
+   "ko": "사우스웨스트 항공",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "여객 항공",
+   "sub_en": "Passenger Airlines"
+  },
+  "LVS": {
+   "en": "Las Vegas Sands",
+   "ko": "라스베이거스 샌즈",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "카지노 · 게임",
+   "sub_en": "Casinos & Gaming"
+  },
+  "LYB": {
+   "en": "LyondellBasell",
+   "ko": "라이온델 바셀",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "특수 화학",
+   "sub_en": "Specialty Chemicals"
+  },
+  "LYV": {
+   "en": "Live Nation Entertainment",
+   "ko": "라이브 네이션",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "영화 · 엔터테인먼트",
+   "sub_en": "Movies & Entertainment"
+  },
+  "MA": {
+   "en": "Mastercard",
+   "full": true,
+   "ko": "마스터카드",
+   "sector": "금융",
+   "sub": "결제 서비스",
+   "sub_en": "Transaction & Payment Processing Services"
+  },
+  "MAA": {
+   "en": "Mid-America Apartment Communities",
+   "ko": "미드아메리카 아파트 커뮤니티",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "다세대 주거 리츠",
+   "sub_en": "Multi-Family Residential REITs"
+  },
+  "MAR": {
+   "en": "Marriott International",
+   "ko": "매리엇 인터내셔널",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "호텔 · 리조트 · 크루즈",
+   "sub_en": "Hotels, Resorts & Cruise Lines"
+  },
+  "MAS": {
+   "en": "Masco",
+   "ko": "마스코",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "건자재",
+   "sub_en": "Building Products"
+  },
+  "MCD": {
+   "en": "McDonald's",
+   "full": true,
+   "ko": "맥도날드",
+   "sector": "경기 소비재",
+   "sub": "식당",
+   "sub_en": "Restaurants"
+  },
+  "MCHP": {
+   "en": "Microchip Technology",
+   "ko": "마이크로칩 테크놀로지",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "MCK": {
+   "en": "McKesson",
+   "ko": "맥케슨",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "의료 유통",
+   "sub_en": "Health Care Distributors"
+  },
+  "MCO": {
+   "en": "Moody's Corporation",
+   "ko": "무디스",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "금융 거래소 · 데이터",
+   "sub_en": "Financial Exchanges & Data"
+  },
+  "MDLZ": {
+   "en": "Mondelez International",
+   "ko": "몬덜리즈 인터내셔널",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "포장 식품 · 육류",
+   "sub_en": "Packaged Foods & Meats"
+  },
+  "MDT": {
+   "en": "Medtronic",
+   "ko": "메드트로닉",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "MET": {
+   "en": "MetLife",
+   "ko": "메트라이프",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "생명 · 건강보험",
+   "sub_en": "Life & Health Insurance"
+  },
+  "META": {
+   "en": "Meta Platforms",
+   "full": true,
+   "ko": "메타",
+   "sector": "커뮤니케이션",
+   "sub": "인터랙티브 미디어 · 서비스",
+   "sub_en": "Interactive Media & Services"
+  },
+  "MGM": {
+   "en": "MGM Resorts",
+   "ko": "MGM 리조트 인터내셔널",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "카지노 · 게임",
+   "sub_en": "Casinos & Gaming"
+  },
+  "MKC": {
+   "en": "McCormick & Company",
+   "ko": "맥코믹",
+   "ko_src": "ai",
+   "sector": "필수 소비재",
+   "sub": "포장 식품 · 육류",
+   "sub_en": "Packaged Foods & Meats"
+  },
+  "MLM": {
+   "en": "Martin Marietta Materials",
+   "ko": "마틴 메리타",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "건설 자재",
+   "sub_en": "Construction Materials"
+  },
+  "MMM": {
+   "en": "3M",
+   "ko": "3M",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "산업 지주",
+   "sub_en": "Industrial Conglomerates"
+  },
+  "MNST": {
+   "en": "Monster Beverage",
+   "ko": "몬스터 베버리지",
+   "ko_src": "fix",
+   "sector": "필수 소비재",
+   "sub": "음료",
+   "sub_en": "Soft Drinks & Non-alcoholic Beverages"
+  },
+  "MO": {
+   "en": "Altria",
+   "ko": "알트리아",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "담배",
+   "sub_en": "Tobacco"
+  },
+  "MOS": {
+   "en": "Mosaic Company (The)",
+   "ko": "모자이크",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "비료 · 농약",
+   "sub_en": "Fertilizers & Agricultural Chemicals"
+  },
+  "MPC": {
+   "en": "Marathon Petroleum",
+   "ko": "마라톤 페트롤리엄",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 정제 · 마케팅",
+   "sub_en": "Oil & Gas Refining & Marketing"
+  },
+  "MPWR": {
+   "en": "Monolithic Power Systems",
+   "ko": "모놀리식 파워 시스템스",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "MRK": {
+   "en": "Merck & Co.",
+   "ko": "머크",
+   "ko_src": "fix",
+   "sector": "헬스케어",
+   "sub": "제약",
+   "sub_en": "Pharmaceuticals"
+  },
+  "MRNA": {
+   "en": "Moderna",
+   "ko": "모더나",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_en": "Biotechnology"
+  },
+  "MRSH": {
+   "en": "Marsh McLennan",
+   "ko": "마시 맥클레넌",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "보험중개",
+   "sub_en": "Insurance Brokers"
+  },
+  "MRVL": {
+   "en": "Marvell Technology",
+   "ko": "마벨 테크놀로지 그룹",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "MS": {
+   "en": "Morgan Stanley",
+   "ko": "모건 스탠리",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "투자은행 · 증권",
+   "sub_en": "Investment Banking & Brokerage"
+  },
+  "MSCI": {
+   "en": "MSCI",
+   "ko": "MSCI",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "금융 거래소 · 데이터",
+   "sub_en": "Financial Exchanges & Data"
+  },
+  "MSFT": {
+   "en": "Microsoft",
+   "full": true,
+   "ko": "마이크로소프트",
+   "sector": "기술",
+   "sub": "시스템 소프트웨어",
+   "sub_en": "Systems Software"
+  },
+  "MSI": {
+   "en": "Motorola Solutions",
+   "ko": "모토로라 솔루션스",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "통신 장비",
+   "sub_en": "Communications Equipment"
+  },
+  "MTB": {
+   "en": "M&T Bank",
+   "ko": "M&T 뱅크",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "지역 은행",
+   "sub_en": "Regional Banks"
+  },
+  "MTD": {
+   "en": "Mettler Toledo",
+   "ko": "메틀러 톨레도",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "라이프 사이언스 도구 · 서비스",
+   "sub_en": "Life Sciences Tools & Services"
+  },
+  "MU": {
+   "en": "Micron Technology",
+   "full": true,
+   "ko": "마이크론",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "NCLH": {
+   "en": "Norwegian Cruise Line Holdings",
+   "ko": "노르웨이지안 크루즈 라인",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "호텔 · 리조트 · 크루즈",
+   "sub_en": "Hotels, Resorts & Cruise Lines"
+  },
+  "NDAQ": {
+   "en": "Nasdaq, Inc.",
+   "ko": "나스닥",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "금융 거래소 · 데이터",
+   "sub_en": "Financial Exchanges & Data"
+  },
+  "NDSN": {
+   "en": "Nordson Corporation",
+   "ko": "노드슨",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "NEE": {
+   "en": "NextEra Energy",
+   "full": true,
+   "ko": "넥스트에라 에너지",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "NEM": {
+   "en": "Newmont",
+   "full": true,
+   "ko": "뉴몬트",
+   "sector": "소재",
+   "sub": "금",
+   "sub_en": "Gold"
+  },
+  "NFLX": {
+   "en": "Netflix",
+   "full": true,
+   "ko": "넷플릭스",
+   "sector": "커뮤니케이션",
+   "sub": "영화 · 엔터테인먼트",
+   "sub_en": "Movies & Entertainment"
+  },
+  "NI": {
+   "en": "NiSource",
+   "ko": "니소스",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "NKE": {
+   "en": "Nike, Inc.",
+   "ko": "나이키",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "의류 · 액세서리 · 명품",
+   "sub_en": "Apparel, Accessories & Luxury Goods"
+  },
+  "NOC": {
+   "en": "Northrop Grumman",
+   "ko": "노스럽 그러먼",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "NOW": {
+   "en": "ServiceNow",
+   "ko": "서비스나우",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "시스템 소프트웨어",
+   "sub_en": "Systems Software"
+  },
+  "NRG": {
+   "en": "NRG Energy",
+   "ko": "NRG 에너지",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "독립 발전 · 에너지 트레이딩",
+   "sub_en": "Independent Power Producers & Energy Traders"
+  },
+  "NSC": {
+   "en": "Norfolk Southern",
+   "ko": "노퍽 서던 철도",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "철도 운송",
+   "sub_en": "Rail Transportation"
+  },
+  "NTAP": {
+   "en": "NetApp",
+   "ko": "넷앱",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "기술 하드웨어",
+   "sub_en": "Technology Hardware, Storage & Peripherals"
+  },
+  "NTRS": {
+   "en": "Northern Trust",
+   "ko": "노던 트러스트",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "NUE": {
+   "en": "Nucor",
+   "ko": "누코",
+   "ko_src": "wikidata",
+   "sector": "소재",
+   "sub": "철강",
+   "sub_en": "Steel"
+  },
+  "NVDA": {
+   "en": "Nvidia",
+   "full": true,
+   "ko": "엔비디아",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "NVR": {
+   "en": "NVR, Inc.",
+   "ko": "NVR",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "주택 건설",
+   "sub_en": "Homebuilding"
+  },
+  "NWS": {
+   "en": "News Corp (Class B)",
+   "ko": "뉴스 코프 (B주)",
+   "ko_src": "fix",
+   "sector": "커뮤니케이션",
+   "sub": "출판",
+   "sub_en": "Publishing"
+  },
+  "NWSA": {
+   "en": "News Corp (Class A)",
+   "ko": "뉴스 코프 (A주)",
+   "ko_src": "fix",
+   "sector": "커뮤니케이션",
+   "sub": "출판",
+   "sub_en": "Publishing"
+  },
+  "NXPI": {
+   "en": "NXP Semiconductors",
+   "ko": "NXP 반도체",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "O": {
+   "en": "Realty Income",
+   "ko": "리얼티 인컴",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "소매 부동산",
+   "sub_en": "Retail REITs"
+  },
+  "ODFL": {
+   "en": "Old Dominion",
+   "ko": "올드 도미니언",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "육상 화물 운송",
+   "sub_en": "Cargo Ground Transportation"
+  },
+  "OKE": {
+   "en": "Oneok",
+   "ko": "원오크",
+   "ko_src": "fix",
+   "sector": "에너지",
+   "sub": "석유 · 가스 저장 · 수송",
+   "sub_en": "Oil & Gas Storage & Transportation"
+  },
+  "OKTA": {
+   "en": "Okta, Inc.",
+   "ko": "옥타",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "OMC": {
+   "en": "Omnicom Group",
+   "ko": "옴니콤 그룹",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "광고",
+   "sub_en": "Advertising"
+  },
+  "ON": {
+   "en": "ON Semiconductor",
+   "ko": "온세미",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "ORCL": {
+   "en": "Oracle Corporation",
+   "full": true,
+   "ko": "오라클",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "ORLY": {
+   "en": "O'Reilly Automotive",
+   "ko": "오릴리 오토모티브",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "자동차 유통",
+   "sub_en": "Automotive Retail"
+  },
+  "OTIS": {
+   "en": "Otis Worldwide",
+   "ko": "오티스",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "OXY": {
+   "en": "Occidental Petroleum",
+   "ko": "옥시덴탈 페트롤리엄",
+   "ko_src": "fix",
+   "sector": "에너지",
+   "sub": "석유 · 가스 탐사 · 생산",
+   "sub_en": "Oil & Gas Exploration & Production"
+  },
+  "P": {
+   "en": "Everpure",
+   "ko": "에버퓨어",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "기술 하드웨어",
+   "sub_en": "Technology Hardware, Storage & Peripherals"
+  },
+  "PANW": {
+   "en": "Palo Alto Networks",
+   "ko": "팰러앨토 네트웍스",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "시스템 소프트웨어",
+   "sub_en": "Systems Software"
+  },
+  "PAYX": {
+   "en": "Paychex",
+   "ko": "페이체크스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "인사 · 고용 서비스",
+   "sub_en": "Human Resource & Employment Services"
+  },
+  "PCAR": {
+   "en": "Paccar",
+   "ko": "파카 그룹",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "건설 · 중장비",
+   "sub_en": "Construction Machinery & Heavy Transportation Equipment"
+  },
+  "PCG": {
+   "en": "PG&E Corporation",
+   "ko": "PG&E",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "PEG": {
+   "en": "Public Service Enterprise Group",
+   "ko": "퍼블릭 서비스 엔터프라이즈",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "PEP": {
+   "en": "PepsiCo",
+   "ko": "펩시코",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "음료",
+   "sub_en": "Soft Drinks & Non-alcoholic Beverages"
+  },
+  "PFE": {
+   "en": "Pfizer",
+   "ko": "화이자",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "제약",
+   "sub_en": "Pharmaceuticals"
+  },
+  "PFG": {
+   "en": "Principal Financial Group",
+   "ko": "프린시펄 파이낸셜",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "생명 · 건강보험",
+   "sub_en": "Life & Health Insurance"
+  },
+  "PG": {
+   "en": "Procter & Gamble",
+   "full": true,
+   "ko": "P&G",
+   "sector": "필수 소비재",
+   "sub": "개인 관리 제품",
+   "sub_en": "Personal Care Products"
+  },
+  "PGR": {
+   "en": "Progressive Corporation",
+   "ko": "프로그레시브",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "재산 · 손해보험",
+   "sub_en": "Property & Casualty Insurance"
+  },
+  "PH": {
+   "en": "Parker Hannifin",
+   "ko": "파커 하니핀",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "PHM": {
+   "en": "PulteGroup",
+   "ko": "펄트그룹",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "주택 건설",
+   "sub_en": "Homebuilding"
+  },
+  "PKG": {
+   "en": "Packaging Corporation of America",
+   "ko": "패키징 코퍼레이션 오브 아메리카",
+   "ko_src": "fix",
+   "sector": "소재",
+   "sub": "종이 · 플라스틱 포장재",
+   "sub_en": "Paper & Plastic Packaging Products & Materials"
+  },
+  "PLD": {
+   "en": "Prologis",
+   "full": true,
+   "ko": "프롤로지스",
+   "sector": "부동산",
+   "sub": "산업 리츠",
+   "sub_en": "Industrial REITs"
+  },
+  "PLTR": {
+   "en": "Palantir Technologies",
+   "ko": "팔란티어 테크놀로지스",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "PM": {
+   "en": "Philip Morris International",
+   "full": true,
+   "ko": "필립모리스",
+   "sector": "필수 소비재",
+   "sub": "담배",
+   "sub_en": "Tobacco"
+  },
+  "PNC": {
+   "en": "PNC Financial Services",
+   "ko": "PNC 파이낸셜 서비시즈",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "종합 은행",
+   "sub_en": "Diversified Banks"
+  },
+  "PNR": {
+   "en": "Pentair",
+   "ko": "펜테어",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "PNW": {
+   "en": "Pinnacle West Capital",
+   "ko": "피나클 웨스트",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "PODD": {
+   "en": "Insulet Corporation",
+   "ko": "인슐렛",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "PPG": {
+   "en": "PPG Industries",
+   "ko": "PPG 인더스트리",
+   "ko_src": "wikidata",
+   "sector": "소재",
+   "sub": "특수 화학",
+   "sub_en": "Specialty Chemicals"
+  },
+  "PPL": {
+   "en": "PPL Corporation",
+   "ko": "PPL",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "PRU": {
+   "en": "Prudential Financial",
+   "ko": "푸르덴셜 파이낸셜",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "생명 · 건강보험",
+   "sub_en": "Life & Health Insurance"
+  },
+  "PSA": {
+   "en": "Public Storage",
+   "ko": "퍼블릭 스토리지",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "자주식 부동산",
+   "sub_en": "Self-Storage REITs"
+  },
+  "PSX": {
+   "en": "Phillips 66",
+   "ko": "필립스 66",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 정제 · 마케팅",
+   "sub_en": "Oil & Gas Refining & Marketing"
+  },
+  "PTC": {
+   "en": "PTC Inc.",
+   "ko": "PTC",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "PWR": {
+   "en": "Quanta Services",
+   "ko": "퀀타 서비스",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "건설 · 엔지니어링",
+   "sub_en": "Construction & Engineering"
+  },
+  "PYPL": {
+   "en": "PayPal",
+   "ko": "페이팔",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "결제 서비스",
+   "sub_en": "Transaction & Payment Processing Services"
+  },
+  "Q": {
+   "en": "Qnity Electronics",
+   "ko": "큐니티",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "반도체 소재",
+   "sub_en": "Semiconductor Materials & Equipment"
+  },
+  "QCOM": {
+   "en": "Qualcomm",
+   "ko": "퀄컴",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "RCL": {
+   "en": "Royal Caribbean Group",
+   "ko": "로열 캐리비안",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "호텔 · 리조트 · 크루즈",
+   "sub_en": "Hotels, Resorts & Cruise Lines"
+  },
+  "RDDT": {
+   "en": "Reddit",
+   "ko": "레딧",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "인터랙티브 미디어 · 서비스",
+   "sub_en": "Interactive Media & Services"
+  },
+  "REG": {
+   "en": "Regency Centers",
+   "ko": "레전시 센터스",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "소매 부동산",
+   "sub_en": "Retail REITs"
+  },
+  "REGN": {
+   "en": "Regeneron Pharmaceuticals",
+   "ko": "리제네론 파마슈티컬스",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_en": "Biotechnology"
+  },
+  "RF": {
+   "en": "Regions Financial Corporation",
+   "ko": "리전스 파이낸셜",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "지역 은행",
+   "sub_en": "Regional Banks"
+  },
+  "RJF": {
+   "en": "Raymond James Financial",
+   "ko": "레이몬드 제임스",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "투자은행 · 증권",
+   "sub_en": "Investment Banking & Brokerage"
+  },
+  "RL": {
+   "en": "Ralph Lauren Corporation",
+   "ko": "랠프 로런",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "의류 · 액세서리 · 명품",
+   "sub_en": "Apparel, Accessories & Luxury Goods"
+  },
+  "RMD": {
+   "en": "ResMed",
+   "ko": "레즈메드",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "ROK": {
+   "en": "Rockwell Automation",
+   "ko": "로크웰 오토메이션",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "전기 부품 · 장비",
+   "sub_en": "Electrical Components & Equipment"
+  },
+  "ROL": {
+   "en": "Rollins, Inc.",
+   "ko": "롤린스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "환경 · 시설 서비스",
+   "sub_en": "Environmental & Facilities Services"
+  },
+  "ROP": {
+   "en": "Roper Technologies",
+   "ko": "로퍼 테크놀로지스",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기",
+   "sub_en": "Electronic Equipment & Instruments"
+  },
+  "ROST": {
+   "en": "Ross Stores",
+   "ko": "로스 스토어스",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "의류 유통",
+   "sub_en": "Apparel Retail"
+  },
+  "RSG": {
+   "en": "Republic Services",
+   "ko": "리퍼블릭 서비스",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "환경 · 시설 서비스",
+   "sub_en": "Environmental & Facilities Services"
+  },
+  "RTX": {
+   "en": "RTX Corporation",
+   "ko": "RTX",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "RVTY": {
+   "en": "Revvity",
+   "ko": "레비티",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "SBAC": {
+   "en": "SBA Communications",
+   "ko": "SBA 커뮤니케이션스",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "통신 타워 부동산",
+   "sub_en": "Telecom Tower REITs"
+  },
+  "SBUX": {
+   "en": "Starbucks",
+   "ko": "스타벅스",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "식당",
+   "sub_en": "Restaurants"
+  },
+  "SCHW": {
+   "en": "Charles Schwab Corporation",
+   "ko": "찰스 슈왑",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "투자은행 · 증권",
+   "sub_en": "Investment Banking & Brokerage"
+  },
+  "SHW": {
+   "en": "Sherwin-Williams",
+   "ko": "셔윈윌리암스",
+   "ko_src": "wikidata",
+   "sector": "소재",
+   "sub": "특수 화학",
+   "sub_en": "Specialty Chemicals"
+  },
+  "SJM": {
+   "en": "J.M. Smucker Company (The)",
+   "ko": "J.M. 스무커",
+   "ko_src": "ai",
+   "sector": "필수 소비재",
+   "sub": "포장 식품 · 육류",
+   "sub_en": "Packaged Foods & Meats"
+  },
+  "SKYD": {
+   "en": "Skydance",
+   "ko": "스카이댄스",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "영화 · 엔터테인먼트",
+   "sub_en": "Movies & Entertainment"
+  },
+  "SLB": {
+   "en": "Schlumberger",
+   "full": true,
+   "ko": "SLB",
+   "sector": "에너지",
+   "sub": "석유 · 가스 장비 · 서비스",
+   "sub_en": "Oil & Gas Equipment & Services"
+  },
+  "SMCI": {
+   "en": "Supermicro",
+   "ko": "슈퍼마이크로",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "기술 하드웨어",
+   "sub_en": "Technology Hardware, Storage & Peripherals"
+  },
+  "SNA": {
+   "en": "Snap-on",
+   "ko": "스냅온",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "SNDK": {
+   "en": "Sandisk",
+   "ko": "샌디스크",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "기술 하드웨어",
+   "sub_en": "Technology Hardware, Storage & Peripherals"
+  },
+  "SNPS": {
+   "en": "Synopsys",
+   "ko": "시놉시스",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "SO": {
+   "en": "Southern Company",
+   "full": true,
+   "ko": "서던 컴퍼니",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "SOLV": {
+   "en": "Solventum",
+   "ko": "솔벤툼",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 기술",
+   "sub_en": "Health Care Technology"
+  },
+  "SPG": {
+   "en": "Simon Property Group",
+   "ko": "시몬 프로퍼티",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "소매 부동산",
+   "sub_en": "Retail REITs"
+  },
+  "SPGI": {
+   "en": "S&P Global",
+   "ko": "S&P 글로벌",
+   "ko_src": "fix",
+   "sector": "금융",
+   "sub": "금융 거래소 · 데이터",
+   "sub_en": "Financial Exchanges & Data"
+  },
+  "SRE": {
+   "en": "Sempra",
+   "ko": "셈프라",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "STE": {
+   "en": "Steris",
+   "ko": "스테리스",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "STLD": {
+   "en": "Steel Dynamics",
+   "ko": "스틸 다이내믹스",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "철강",
+   "sub_en": "Steel"
+  },
+  "STT": {
+   "en": "State Street Corporation",
+   "ko": "스테이트 스트리트",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "STX": {
+   "en": "Seagate Technology",
+   "ko": "시게이트",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "기술 하드웨어",
+   "sub_en": "Technology Hardware, Storage & Peripherals"
+  },
+  "STZ": {
+   "en": "Constellation Brands",
+   "ko": "컨스텔레이션브랜드",
+   "ko_src": "ai",
+   "sector": "필수 소비재",
+   "sub": "주류 · 양조",
+   "sub_en": "Distillers & Vintners"
+  },
+  "SW": {
+   "en": "Smurfit Westrock",
+   "ko": "스머핏 웨스트록",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "종이 · 플라스틱 포장재",
+   "sub_en": "Paper & Plastic Packaging Products & Materials"
+  },
+  "SWK": {
+   "en": "Stanley Black & Decker",
+   "ko": "스탠리 블랙앤데커",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "SWKS": {
+   "en": "Skyworks Solutions",
+   "ko": "스카이웍스 솔루션스",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "SYF": {
+   "en": "Synchrony Financial",
+   "ko": "싱크로니 파이낸셜",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "소비자 금융",
+   "sub_en": "Consumer Finance"
+  },
+  "SYK": {
+   "en": "Stryker Corporation",
+   "ko": "스트라이커",
+   "ko_src": "fix",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "SYY": {
+   "en": "Sysco",
+   "ko": "시스코(Sysco)",
+   "ko_src": "fix",
+   "sector": "필수 소비재",
+   "sub": "식품 유통",
+   "sub_en": "Food Distributors"
+  },
+  "T": {
+   "en": "AT&T",
+   "ko": "AT&T",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "통합 통신 서비스",
+   "sub_en": "Integrated Telecommunication Services"
+  },
+  "TDG": {
+   "en": "TransDigm Group",
+   "ko": "트랜스디그",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "TDY": {
+   "en": "Teledyne Technologies",
+   "ko": "텔레다인 테크놀로지스",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기",
+   "sub_en": "Electronic Equipment & Instruments"
+  },
+  "TECH": {
+   "en": "Bio-Techne",
+   "ko": "바이오테크니",
+   "ko_src": "fix",
+   "sector": "헬스케어",
+   "sub": "라이프 사이언스 도구 · 서비스",
+   "sub_en": "Life Sciences Tools & Services"
+  },
+  "TEL": {
+   "en": "TE Connectivity",
+   "ko": "TE 커넥티비티",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "전자 위탁생산",
+   "sub_en": "Electronic Manufacturing Services"
+  },
+  "TER": {
+   "en": "Teradyne",
+   "ko": "테라다인",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "반도체 소재",
+   "sub_en": "Semiconductor Materials & Equipment"
+  },
+  "TFC": {
+   "en": "Truist Financial",
+   "ko": "트루이스트 파이낸셜",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "종합 은행",
+   "sub_en": "Diversified Banks"
+  },
+  "TGT": {
+   "en": "Target Corporation",
+   "ko": "타깃",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "생활용품 유통",
+   "sub_en": "Consumer Staples Merchandise Retail"
+  },
+  "TJX": {
+   "en": "TJX Companies",
+   "ko": "TJX",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "의류 유통",
+   "sub_en": "Apparel Retail"
+  },
+  "TKO": {
+   "en": "TKO Group Holdings",
+   "ko": "TKO 그룹",
+   "ko_src": "fix",
+   "sector": "커뮤니케이션",
+   "sub": "영화 · 엔터테인먼트",
+   "sub_en": "Movies & Entertainment"
+  },
+  "TMO": {
+   "en": "Thermo Fisher Scientific",
+   "ko": "써모 피셔 사이언티픽",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "라이프 사이언스 도구 · 서비스",
+   "sub_en": "Life Sciences Tools & Services"
+  },
+  "TMUS": {
+   "en": "T-Mobile US",
+   "ko": "T-모바일 US",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "무선 통신 서비스",
+   "sub_en": "Wireless Telecommunication Services"
+  },
+  "TPL": {
+   "en": "Texas Pacific Land Corporation",
+   "ko": "텍사스 퍼시픽 랜드",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 · 가스 탐사 · 생산",
+   "sub_en": "Oil & Gas Exploration & Production"
+  },
+  "TPR": {
+   "en": "Tapestry, Inc.",
+   "ko": "테이프스트리",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "의류 · 액세서리 · 명품",
+   "sub_en": "Apparel, Accessories & Luxury Goods"
+  },
+  "TRGP": {
+   "en": "Targa Resources",
+   "ko": "타르가 리소시스",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 · 가스 저장 · 수송",
+   "sub_en": "Oil & Gas Storage & Transportation"
+  },
+  "TRMB": {
+   "en": "Trimble Inc.",
+   "ko": "트림블",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "TROW": {
+   "en": "T. Rowe Price",
+   "ko": "티. 로우 프라이스",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "자산관리 · 수탁 은행",
+   "sub_en": "Asset Management & Custody Banks"
+  },
+  "TRV": {
+   "en": "Travelers Companies (The)",
+   "ko": "트래블러스",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "재산 · 손해보험",
+   "sub_en": "Property & Casualty Insurance"
+  },
+  "TSCO": {
+   "en": "Tractor Supply",
+   "ko": "트랙터 서플라이",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "기타 전문 유통",
+   "sub_en": "Other Specialty Retail"
+  },
+  "TSLA": {
+   "en": "Tesla, Inc.",
+   "full": true,
+   "ko": "테슬라",
+   "sector": "경기 소비재",
+   "sub": "자동차 제조",
+   "sub_en": "Automobile Manufacturers"
+  },
+  "TSN": {
+   "en": "Tyson Foods",
+   "ko": "타이슨 푸드",
+   "ko_src": "wikidata",
+   "sector": "필수 소비재",
+   "sub": "포장 식품 · 육류",
+   "sub_en": "Packaged Foods & Meats"
+  },
+  "TT": {
+   "en": "Trane Technologies",
+   "ko": "트레인 테크놀로지스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "건자재",
+   "sub_en": "Building Products"
+  },
+  "TTWO": {
+   "en": "Take-Two Interactive",
+   "ko": "테이크투 인터랙티브",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "인터랙티브 홈 엔터테인먼트",
+   "sub_en": "Interactive Home Entertainment"
+  },
+  "TWLO": {
+   "en": "Twilio",
+   "ko": "트윌리오",
+   "ko_src": "fix",
+   "sector": "기술",
+   "sub": "시스템 소프트웨어",
+   "sub_en": "Systems Software"
+  },
+  "TXN": {
+   "en": "Texas Instruments",
+   "ko": "텍사스 인스트루먼트",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "반도체",
+   "sub_en": "Semiconductors"
+  },
+  "TXT": {
+   "en": "Textron",
+   "ko": "텍스트론",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "항공 · 방위산업",
+   "sub_en": "Aerospace & Defense"
+  },
+  "TYL": {
+   "en": "Tyler Technologies",
+   "ko": "타일러 테크놀로지스",
+   "ko_src": "ai",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "UAL": {
+   "en": "United Airlines Holdings",
+   "ko": "유나이티드 항공",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "여객 항공",
+   "sub_en": "Passenger Airlines"
+  },
+  "UBER": {
+   "en": "Uber",
+   "ko": "우버",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "여객 육상 운송",
+   "sub_en": "Passenger Ground Transportation"
+  },
+  "UDR": {
+   "en": "UDR, Inc.",
+   "ko": "UDR",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "다세대 주거 리츠",
+   "sub_en": "Multi-Family Residential REITs"
+  },
+  "UHS": {
+   "en": "Universal Health Services",
+   "ko": "유니버설 헬스 서비스",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 시설",
+   "sub_en": "Health Care Facilities"
+  },
+  "ULTA": {
+   "en": "Ulta Beauty",
+   "ko": "울타 뷰티",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "기타 전문 유통",
+   "sub_en": "Other Specialty Retail"
+  },
+  "UNH": {
+   "en": "UnitedHealth Group",
+   "ko": "유나이티드헬스 그룹",
+   "ko_src": "fix",
+   "sector": "헬스케어",
+   "sub": "관리형 의료",
+   "sub_en": "Managed Health Care"
+  },
+  "UNP": {
+   "en": "Union Pacific Corporation",
+   "ko": "유니온 퍼시픽",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "철도 운송",
+   "sub_en": "Rail Transportation"
+  },
+  "UPS": {
+   "en": "United Parcel Service",
+   "ko": "UPS",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "항공 화물 · 물류",
+   "sub_en": "Air Freight & Logistics"
+  },
+  "URI": {
+   "en": "United Rentals",
+   "ko": "유나이티드 렌탈스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "무역 및 유통",
+   "sub_en": "Trading Companies & Distributors"
+  },
+  "USB": {
+   "en": "U.S. Bancorp",
+   "ko": "U.S. 뱅코프",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "종합 은행",
+   "sub_en": "Diversified Banks"
+  },
+  "V": {
+   "en": "Visa Inc.",
+   "full": true,
+   "ko": "비자",
+   "sector": "금융",
+   "sub": "결제 서비스",
+   "sub_en": "Transaction & Payment Processing Services"
+  },
+  "VEEV": {
+   "en": "Veeva Systems",
+   "ko": "비바 시스템스",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 기술",
+   "sub_en": "Health Care Technology"
+  },
+  "VICI": {
+   "en": "Vici Properties",
+   "ko": "비시 프로퍼티스",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "호텔 · 리조트 리츠",
+   "sub_en": "Hotel & Resort REITs"
+  },
+  "VLO": {
+   "en": "Valero Energy",
+   "ko": "발레로 에너지",
+   "ko_src": "wikidata",
+   "sector": "에너지",
+   "sub": "석유 정제 · 마케팅",
+   "sub_en": "Oil & Gas Refining & Marketing"
+  },
+  "VLTO": {
+   "en": "Veralto",
+   "ko": "베랄토",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "환경 · 시설 서비스",
+   "sub_en": "Environmental & Facilities Services"
+  },
+  "VMC": {
+   "en": "Vulcan Materials Company",
+   "ko": "벌컨 머티리얼스",
+   "ko_src": "ai",
+   "sector": "소재",
+   "sub": "건설 자재",
+   "sub_en": "Construction Materials"
+  },
+  "VMRK": {
+   "en": "Vivmark Residential",
+   "ko": "비브마크 레지덴셜",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "다세대 주거 리츠",
+   "sub_en": "Multi-Family Residential REITs"
+  },
+  "VRSK": {
+   "en": "Verisk Analytics",
+   "ko": "베리스크 애널리틱스",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "연구 및 컨설팅",
+   "sub_en": "Research & Consulting Services"
+  },
+  "VRSN": {
+   "en": "Verisign",
+   "ko": "베리사인",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "인터넷 서비스 · 인프라",
+   "sub_en": "Internet Services & Infrastructure"
+  },
+  "VRT": {
+   "en": "Vertiv",
+   "full": true,
+   "ko": "버티브",
+   "sector": "산업재",
+   "sub": "전기 부품 · 장비",
+   "sub_en": "Electrical Components & Equipment"
+  },
+  "VRTX": {
+   "en": "Vertex Pharmaceuticals",
+   "ko": "버텍스 파마슈티컬",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "바이오 기술",
+   "sub_en": "Biotechnology"
+  },
+  "VST": {
+   "en": "Vistra Corp.",
+   "full": true,
+   "ko": "비스트라",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "VTR": {
+   "en": "Ventas",
+   "ko": "벤타스",
+   "ko_src": "ai",
+   "sector": "부동산",
+   "sub": "의료 리츠",
+   "sub_en": "Health Care REITs"
+  },
+  "VTRS": {
+   "en": "Viatris",
+   "ko": "비아트리스",
+   "ko_src": "wikidata",
+   "sector": "헬스케어",
+   "sub": "제약",
+   "sub_en": "Pharmaceuticals"
+  },
+  "VYLR": {
+   "en": "Vylor",
+   "ko": "바이러",
+   "ko_src": "ai",
+   "sector": "필수 소비재",
+   "sub": "농산물 · 서비스",
+   "sub_en": "Agricultural Products & Services"
+  },
+  "VZ": {
+   "en": "Verizon",
+   "ko": "버라이즌 커뮤니케이션스",
+   "ko_src": "wikidata",
+   "sector": "커뮤니케이션",
+   "sub": "통합 통신 서비스",
+   "sub_en": "Integrated Telecommunication Services"
+  },
+  "WAB": {
+   "en": "Wabtec",
+   "ko": "웹텍",
+   "ko_src": "wikidata",
+   "sector": "산업재",
+   "sub": "건설 · 중장비",
+   "sub_en": "Construction Machinery & Heavy Transportation Equipment"
+  },
+  "WAT": {
+   "en": "Waters Corporation",
+   "ko": "워터스",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "라이프 사이언스 도구 · 서비스",
+   "sub_en": "Life Sciences Tools & Services"
+  },
+  "WDAY": {
+   "en": "Workday, Inc.",
+   "ko": "워크데이",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "응용 소프트웨어",
+   "sub_en": "Application Software"
+  },
+  "WDC": {
+   "en": "Western Digital",
+   "ko": "웨스턴 디지털",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "기술 하드웨어",
+   "sub_en": "Technology Hardware, Storage & Peripherals"
+  },
+  "WEC": {
+   "en": "WEC Energy Group",
+   "ko": "WEC 에너지 그룹",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "전기 유틸리티",
+   "sub_en": "Electric Utilities"
+  },
+  "WELL": {
+   "en": "Welltower",
+   "full": true,
+   "ko": "웰타워",
+   "sector": "부동산",
+   "sub": "의료 리츠",
+   "sub_en": "Health Care REITs"
+  },
+  "WFC": {
+   "en": "Wells Fargo",
+   "ko": "웰스 파고",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "종합 은행",
+   "sub_en": "Diversified Banks"
+  },
+  "WM": {
+   "en": "Waste Management",
+   "ko": "웨이스트 매니지먼트",
+   "ko_src": "fix",
+   "sector": "산업재",
+   "sub": "환경 · 시설 서비스",
+   "sub_en": "Environmental & Facilities Services"
+  },
+  "WMB": {
+   "en": "Williams Companies",
+   "ko": "윌리엄스 컴퍼니",
+   "ko_src": "ai",
+   "sector": "에너지",
+   "sub": "석유 · 가스 저장 · 수송",
+   "sub_en": "Oil & Gas Storage & Transportation"
+  },
+  "WMT": {
+   "en": "Walmart",
+   "full": true,
+   "ko": "월마트",
+   "sector": "필수 소비재",
+   "sub": "생활용품 유통",
+   "sub_en": "Consumer Staples Merchandise Retail"
+  },
+  "WRB": {
+   "en": "W. R. Berkley Corporation",
+   "ko": "W. R. 버클레이",
+   "ko_src": "ai",
+   "sector": "금융",
+   "sub": "재산 · 손해보험",
+   "sub_en": "Property & Casualty Insurance"
+  },
+  "WSM": {
+   "en": "Williams-Sonoma, Inc.",
+   "ko": "윌리엄스-소노마",
+   "ko_src": "ai",
+   "sector": "경기 소비재",
+   "sub": "가구 소매",
+   "sub_en": "Homefurnishing Retail"
+  },
+  "WST": {
+   "en": "West Pharmaceutical Services",
+   "ko": "웨스트 파마슈티컬 서비스",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 용품",
+   "sub_en": "Health Care Supplies"
+  },
+  "WTW": {
+   "en": "Willis Towers Watson",
+   "ko": "윌리스 타워스 왓슨",
+   "ko_src": "wikidata",
+   "sector": "금융",
+   "sub": "보험중개",
+   "sub_en": "Insurance Brokers"
+  },
+  "WY": {
+   "en": "Weyerhaeuser",
+   "ko": "와이어하우저",
+   "ko_src": "wikidata",
+   "sector": "부동산",
+   "sub": "목재 부동산",
+   "sub_en": "Timber REITs"
+  },
+  "WYNN": {
+   "en": "Wynn Resorts",
+   "ko": "윈 리조트",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "카지노 · 게임",
+   "sub_en": "Casinos & Gaming"
+  },
+  "XEL": {
+   "en": "Xcel Energy",
+   "ko": "엑셀 에너지",
+   "ko_src": "ai",
+   "sector": "유틸리티",
+   "sub": "종합 공업",
+   "sub_en": "Multi-Utilities"
+  },
+  "XOM": {
+   "en": "ExxonMobil",
+   "full": true,
+   "ko": "엑슨모빌",
+   "sector": "에너지",
+   "sub": "종합 석유 · 가스",
+   "sub_en": "Integrated Oil & Gas"
+  },
+  "XYL": {
+   "en": "Xylem Inc.",
+   "ko": "자일럼",
+   "ko_src": "ai",
+   "sector": "산업재",
+   "sub": "산업 기계 · 부품 · 자재",
+   "sub_en": "Industrial Machinery & Supplies & Components"
+  },
+  "XYZ": {
+   "en": "Block, Inc.",
+   "ko": "블록",
+   "ko_src": "fix",
+   "sector": "금융",
+   "sub": "결제 서비스",
+   "sub_en": "Transaction & Payment Processing Services"
+  },
+  "YUM": {
+   "en": "Yum! Brands",
+   "ko": "얌! 브랜드",
+   "ko_src": "wikidata",
+   "sector": "경기 소비재",
+   "sub": "식당",
+   "sub_en": "Restaurants"
+  },
+  "ZBH": {
+   "en": "Zimmer Biomet",
+   "ko": "짐머 바이오메트",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "의료 장비",
+   "sub_en": "Health Care Equipment"
+  },
+  "ZBRA": {
+   "en": "Zebra Technologies",
+   "ko": "지브라 테크놀로지스",
+   "ko_src": "wikidata",
+   "sector": "기술",
+   "sub": "전자 장비 · 계측기",
+   "sub_en": "Electronic Equipment & Instruments"
+  },
+  "ZTS": {
+   "en": "Zoetis",
+   "ko": "조에티스",
+   "ko_src": "ai",
+   "sector": "헬스케어",
+   "sub": "제약",
+   "sub_en": "Pharmaceuticals"
+  }
+ }
+}

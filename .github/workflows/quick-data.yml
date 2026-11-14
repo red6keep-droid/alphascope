@@ -1,0 +1,112 @@
+name: Quick stock data (간단 정보 853종목)
+
+# 간단 정보 데이터 — 미국 S&P 500 + 한국 코스피 200 · 코스닥 150, 종목마다 파일 하나 (2026-11-14, 기획 비공개 기획/회원-내-종목-기획.md 6-3-1 · 6-3-2).
+#   - 평일 17:40 KST 하루 한 번(한국 장 마감 뒤 · 미국은 지난밤 종가). 분은 :40 — 운영지침 11절 다른 쓰기 시각(:00 · :15 · :30 · :45 · :07 · :22 · :37 · :52 · :10)과 겹치지 않게.
+#   - AI 0 · Blogger 0 · 그림 0. 야후 일봉 묶음 9번(100개씩) + Finnhub 실적 달력 주 1회 15번 + DART 공시 목록 하루 약 20번.
+#   - 결과는 기록을 남기지 않는 브랜치 quick-data 에 통째로(force) — 저장소가 커지지 않는다. gh-pages(keep_files)와 섞지 않는다.
+#     커밋 둘: ① 데이터 ② version.json 에 ①의 커밋 번호. 브라우저는 @quick-data/version.json(purge) → @<커밋>/us/AAPL.json 으로 읽는다.
+#   - 게시 = 저장소 변수 QUICK_PUBLISH=true. 없으면 그림자 모드(수집 · 계산만 하고 올리지 않음, 결과는 아티팩트).
+#   - 받은 종목이 명단의 90% 밖이면 collect_quick.py 가 종료 코드 3 → 올리지 않고 전날 데이터 그대로.
+
+on:
+  schedule:
+    - cron: '40 8 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'quick-data 브랜치에 올리기 (끄면 그림자 모드)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: quick-data
+  cancel-in-progress: false
+
+env:
+  DO_PUBLISH: ${{ (github.event_name == 'schedule' && vars.QUICK_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+
+jobs:
+  quick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install
+        run: pip install -r experiments/nvda-report/requirements.txt
+
+      # 미국 기사 이름 찾기 재료 — 이미 모은 기사(비공개 상태 저장소 · gh-pages). 못 받으면 기사 줄만 빈다
+      - name: Collected news titles
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p /tmp/news
+          git fetch -q origin gh-pages && git show FETCH_HEAD:news_store_home.json > /tmp/news/home.json || true
+          if [ -n "$STATE_DEPLOY_KEY" ]; then
+            mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+            ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+            git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+            git remote add state git@github.com:red6keep-droid/alphascope-state.git
+            git fetch -q state nvda-state && git show FETCH_HEAD:experiments/nvda-report/output/state/radar/news.json > /tmp/news/radar.json || true
+            git fetch -q state report-state && git show FETCH_HEAD:experiments/daily-report/output/state/news_stories.json > /tmp/news/daily.json || true
+          fi
+          ls -la /tmp/news
+
+      # 전날 데이터 — 오늘 못 받은 종목은 전날 파일 그대로 · 실적일 · 공시 저장값(_cache)
+      - name: Previous quick-data
+        run: |
+          mkdir -p /tmp/prev
+          if git fetch -q origin quick-data 2>/dev/null; then git archive FETCH_HEAD | tar -x -C /tmp/prev; echo "전날 데이터 $(ls /tmp/prev/us | wc -l) · $(ls /tmp/prev/kr | wc -l)"; else echo "전날 데이터 없음 (첫 실행)"; fi
+
+      - name: Collect
+        id: collect
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: |
+          set +e
+          python experiments/stock-quick/collect_quick.py --out /tmp/qd --prev /tmp/prev --news /tmp/news/*.json
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          [ $code -eq 3 ] && { echo "받은 종목 부족 — 올리지 않는다"; exit 0; }
+          exit $code
+
+      - name: Upload (shadow)
+        if: env.DO_PUBLISH != 'true' && steps.collect.outputs.code == '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: quick-data
+          path: /tmp/qd
+          retention-days: 3
+
+      - name: Publish to quick-data (no history)
+        if: env.DO_PUBLISH == 'true' && steps.collect.outputs.code == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd /tmp/qd
+          git init -q && git checkout -q --orphan quick-data
+          git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m "quick data $(date -u +%F)"
+          SHA=$(git rev-parse HEAD)
+          python -c "import json,sys;p='version.json';v=json.load(open(p));v['commit']=sys.argv[1];json.dump(v,open(p,'w'),ensure_ascii=False)" "$SHA"
+          git add version.json && git commit -q -m "version $SHA"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:quick-data
+          echo "올림: 데이터 $SHA"
+          curl -sS -f "https://purge.jsdelivr.net/gh/${{ github.repository }}@quick-data/version.json" || echo "purge 실패 — 최대 12시간 뒤 갱신"
+
+      - name: Notify failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 간단 정보 데이터 (853종목)\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
