@@ -211,7 +211,7 @@
   Chart.prototype.draw = function () {
     var self = this, cv = this.cv, W = Math.floor(this.root.clientWidth); if (!W) return;
     if (this.n > this.maxN()) { this.n = Math.min(this.maxN(), this.bars.length); this.end = Math.max(this.end, this.n); }
-    var lowerH = this.on.lower === 'none' ? 0 : this.full ? 90 : 72, priceH = 264, gap = lowerH ? 26 : 0;   // gap = 거래량 범례 줄
+    var lowerH = this.on.lower === 'none' || !this.full ? 0 : 90, priceH = 264, gap = lowerH ? 26 : 0;   // gap = 거래량 범례 줄
     if (this.full) {
       var rest = window.innerHeight - this.wrap.getBoundingClientRect().top - this.restore.offsetHeight - 16;
       priceH = Math.max(200, Math.floor(rest - TOPS - lowerH - gap - XH));
@@ -240,11 +240,13 @@
     };
     B.forEach(function (b, j) {
       var p = j ? B[j - 1][0] : (self.bars[s - 1] || [''])[0]; if (!p) return;
+      if (!self.full && (self.unit === 'D' || self.unit === 'W')) return;   // 작은 화면 = 달 표시 없이 날짜만
       if (self.unit === 'D' || self.unit === 'W') {
         if (b[0].slice(0, 4) !== p.slice(0, 4)) add(j, b[0].slice(0, 4) + '년', true, 50);
         else if (b[0].slice(0, 7) !== p.slice(0, 7)) add(j, +b[0].slice(5, 7) + '월', true, 50);
       } else if (b[0].slice(0, 4) !== p.slice(0, 4)) add(j, b[0].slice(0, 4) + '년', true, 50);
     });
+    if (!this.full && this.unit === 'W') B.forEach(function (b, j) { if (j) add(j, b[0].slice(5).replace('-', '/'), false, 62); });
     if (this.unit === 'D') B.forEach(function (b, j) {
       if (!j) return; var a = new Date(B[j - 1][0] + 'T00:00:00Z'), c = new Date(b[0] + 'T00:00:00Z');
       if ((c - a) / 864e5 > 1 && c.getUTCDay() <= 2) add(j, b[0].slice(5).replace('-', '/'), false, 62);
@@ -333,7 +335,7 @@
       }
     }
     // 날짜 축
-    g.fillStyle = '#F1F5F9'; g.fillRect(0, H - XH, W, XH);
+    if (this.full) { g.fillStyle = '#F1F5F9'; g.fillRect(0, H - XH, W, XH); }   // 작은 화면 = 회색 면 없음
     g.font = FS + 'px ' + font; g.textAlign = 'center';
     labs.forEach(function (l) { g.font = (l[2] ? '600 ' : '') + FS + 'px ' + font; g.fillStyle = l[2] ? INK : NOTE; g.fillText(l[1], Math.min(Math.max(l[0], 20), pw - 20), H - XH / 2 + 0.5); });
     // 누른 날 — 검은 점선 십자선 + 위 · 아래 날짜 칸 + 오른쪽 가격 칸
@@ -351,7 +353,10 @@
     // 머리 — 현재가 · 전날 대비 금액 · % (늘 최신), 오늘 거래량, 시가 · 고가 · 저가 · 종가(누른 날이면 그날)
     var dch = prevL ? last[4] - prevL[4] : 0, dp = prevL ? dch / prevL[4] * 100 : 0, cc = dch > 0 ? UP : dch < 0 ? DN : INK;
     this.price.innerHTML = '<b style="font-size:20px;line-height:28px;color:' + INK + ';">' + fmt(last[4], this.dec) + '</b> <span style="font-size:14px;color:' + cc + ';">' + tri(dch) + fmt(Math.abs(dch), this.dec) + ' ' + sgnPct(dp) + '</span>';
-    this.sub.innerHTML = '거래량 <span style="color:' + INK + ';">' + fmt(last[5], 0) + '</span>';
+    var volTxt = '거래량 <span style="color:' + INK + ';">' + fmt(last[5], 0) + '</span>';
+    if (this.full) this.sub.innerHTML = volTxt;
+    else this.price.innerHTML += ' <span style="font-size:13px;color:' + NOTE + ';">' + volTxt + '</span>';   // 작은 화면 = 증감 옆 한 줄
+    this.sub.style.display = this.full ? '' : 'none'; this.ohlc.style.display = this.full ? '' : 'none';   // 작은 화면 = 시가 · 고가 · 저가 · 종가 없음
     var ob = this.bars[sel === null ? this.bars.length - 1 : sel], obp = this.bars[(sel === null ? this.bars.length - 1 : sel) - 1], ref = obp ? obp[4] : ob[1];
     this.ohlc.innerHTML = [['시가', 1], ['고가', 2], ['저가', 3], ['종가', 4]].map(function (k) {
       var v = ob[k[1]], c = v > ref ? UP : v < ref ? DN : INK;
@@ -386,7 +391,6 @@
     // 닫은 것 다시 켜기
     var rs = [];
     if (!this.maOn) rs.push(['ma', '+ 이동평균']);
-    if (this.on.lower === 'none' && !this.full) rs.push(['vol', '+ 거래량']);
     this.restore.innerHTML = ''; this.restore.style.display = rs.length ? 'flex' : 'none';
     rs.forEach(function (r) {
       var b = el('button', 'font:inherit;font-size:13px;line-height:19px;padding:2px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;color:' + NOTE + ';cursor:pointer;', r[1]);
