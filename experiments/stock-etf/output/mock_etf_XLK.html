@@ -1861,7 +1861,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     var lastW = 0, again = function () { var w = root.clientWidth; if (w && w !== lastW) { lastW = w; requestAnimationFrame(function () { self.draw(); }); } };
     if (window.ResizeObserver) new ResizeObserver(again).observe(root);
     else window.addEventListener('resize', function () { self.draw(); });
-    window.addEventListener('resize', function () { if (self.full) requestAnimationFrame(function () { self.draw(); }); });   // 폰을 돌리면 높이 · 가로 화면 배치 다시
+    window.addEventListener('resize', function () { if (self.full) requestAnimationFrame(function () { self.topBar(); self.draw(); }); });   // 폰을 돌리면 높이 · 가로 화면 배치 다시
   }
   Chart.prototype.build = function () {
     var self = this;
@@ -1894,7 +1894,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   };
   Chart.prototype.menuDraw = function () {
     var self = this, m = this.menuBox;
-    var pick = function (b, on, col) { b.style.background = '#fff'; b.style.borderColor = on ? col : '#E2E8F0'; b.style.color = on ? col : NOTE; b.style.fontWeight = on ? '600' : '400'; return b; };   // 켜짐 = 테두리 · 글자 색 + 굵게 (2026-11-14 사용자) m.innerHTML = ''; m.style.cssText = '';
+    var pick = function (b, on, col) { b.style.background = '#fff'; b.style.borderColor = on ? col : '#E2E8F0'; b.style.color = on ? col : NOTE; b.style.fontWeight = on ? '600' : '400'; return b; };   // 켜짐 = 테두리 · 글자 색 + 굵게 (2026-11-14 사용자)
+    m.innerHTML = ''; m.style.cssText = '';   // 다시 그릴 때 비우기 — 11-14 주석에 묻혀 버튼이 쌓이던 것
     if (this.full && this.menu) {
       m.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 8px;';
       var u = this.unit === 'D' ? '일' : this.unit === 'W' ? '주' : '';
@@ -1904,11 +1905,12 @@ html.as-lock, html.as-lock body { overflow: hidden; }
       });
       var bb = pick(btn('볼린저 밴드', false), this.on.boll, INK); bb.onclick = function () { self.on.boll = !self.on.boll; self.topBar(); self.draw(); }; m.appendChild(bb);
       m.appendChild(el('span', 'flex-basis:100%;height:0;'));
-      [['vol', '거래량'], ['macd', 'MACD'], ['rsi', 'RSI'], ['none', '없음']].forEach(function (x) {
+      if (!this.isLand()) [['vol', '거래량'], ['macd', 'MACD'], ['rsi', 'RSI'], ['none', '없음']].forEach(function (x) {   // 가로 폰 = 아래 칸이 없으니 버튼도 없음
         var b = pick(btn('아래 : ' + x[1], false), self.on.lower === x[0], INK); b.onclick = function () { self.on.lower = x[0]; self.topBar(); self.draw(); }; m.appendChild(b);
       });
     }
   };
+  Chart.prototype.isLand = function () { return this.full && window.innerWidth > window.innerHeight && window.innerHeight < 500; };   // 가로로 돌린 폰만(태블릿 가로는 높이가 넉넉해 아래 칸을 둔다 — 2026-11-14 태블릿에서 `아래 :` 버튼이 안 먹던 것)
   Chart.prototype.toggleFull = function () {
     if (!this.full) {
       this.ph = document.createComment('candle');
@@ -1933,7 +1935,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
       this.full = true; this.on.ma[200] = this.on.ma[200] || false; this.n = Math.min(this.unit === 'D' ? 120 : VIEW[this.unit] * 2, this.bars.length);
     } else {
       this.ph.parentNode.insertBefore(this.root, this.ph); this.root.style.minHeight = this.minH || ''; this.ph.remove(); this.ov.remove(); document.documentElement.style.overflow = '';
-      this.full = false; this.menu = false; this.n = Math.min(VIEW[this.unit], this.bars.length); this.end = this.bars.length;
+      this.full = false; this.menu = false; this.on.boll = false; this.on.ma[200] = false; this.on.lower = 'vol';   // 닫으면 지표 = 기본(작은 그래프엔 지표 없음, 2026-11-14 사용자) this.n = Math.min(VIEW[this.unit], this.bars.length); this.end = this.bars.length;
     }
     this.cross = null; this.topBar(); this.draw();
   };
@@ -2012,7 +2014,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     var box = getComputedStyle(this.root.parentNode), padR = Math.round(parseFloat(box.paddingRight) || 0), padB = this.full ? 0 : Math.round(parseFloat(box.paddingBottom) || 0);
     this.wrap.style.marginRight = -padR + 'px'; this.root.style.marginBottom = -padB + 'px'; W += padR;
     if (this.n > this.maxN()) { this.n = Math.min(this.maxN(), this.bars.length); this.end = Math.max(this.end, this.n); }
-    var land = this.full && window.innerWidth > window.innerHeight;   // 가로로 돌린 전체 화면 = 아래 칸 없음 · 머리 한 줄 · 화면에 꽉 (2026-11-14 사용자)
+    var land = this.isLand();   // 가로로 돌린 전체 화면 = 아래 칸 없음 · 머리 한 줄 · 화면에 꽉 (2026-11-14 사용자)
     var maRows = 1;
     if (this.full) {   // 이동평균 값 줄(누를 때) 이 몇 줄이 되는지 — 최신 값 길이로 미리 (누를 때마다 그래프가 움직이지 않게)
       var mc = this._mc || (this._mc = document.createElement('canvas').getContext('2d')), xw = 0, lim = W - 4, li = this.bars.length - 1;
