@@ -3110,5 +3110,217 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-14T12:46:32.757118+00:00",
   "n_src": 900
+ },
+ "9a2034b63080": {
+  "lines": [
+   "엔비디아 주주 2곳의 젠슨 황 복귀 촉구 공개 서한 발표",
+   "알티미터 캐피털과 아트레이데스 매니지먼트의 엔비디아 지분 보유 공개"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "INVESTOR_CALLS",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T18:29:14.798826+00:00",
+  "n_src": 900
+ },
+ "90e0a44e38f7": {
+  "lines": [
+   "엔비디아 경영진 혼란과 민주당 의회의 AI 수요 변화 전망"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "AI_CAPEX",
+    "dir": "uncertain",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T18:29:14.798826+00:00",
+  "n_src": 900
+ },
+ "3f887a4ae919": {
+  "lines": [
+   "브룩필드와 블랙스톤의 미국 야외 산업용 보관 부지 투자 확대"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLRE",
+    "issue": "REAL_ESTATE",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T18:29:14.798826+00:00",
+  "n_src": 900
+ },
+ "e62244f38033": {
+  "lines": [
+   "테이크투인터랙티브의 락스타게임즈 11월 19일 그랜드 테프트 오토 VI 출시 예정",
+   "그랜드 테프트 오토 VI 개발 비용 10억 달러 초과 (예상)",
+   "센서타워 11월 13일 기준 사전 주문 1200만 건 추산 (예상)",
+   "모건스탠리 2027년 3월까지 4000만 장 판매 전망"
+  ],
+  "tags": [
+   null,
+   null,
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T18:29:18.033340+00:00",
+  "n_src": 900
+ },
+ "cafdcfb9c10c": {
+  "lines": [
+   "11월 9일 기준 전국 난방유 평균 가격 갤런당 약 5.91달러 기록",
+   "전국 난방유 평균 가격 전년 동기 대비 59% 상승",
+   "메인주 난방유 평균 가격 갤런당 약 약 5.83달러 기록",
+   "메인주 난방유 평균 가격 전년 동기 대비 약 75% 급등"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "OIL_ENERGY",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "OIL_ENERGY",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T18:29:18.033340+00:00",
+  "n_src": 900
+ },
+ "8e6bc56f8d35": {
+  "lines": [
+   "고용주와 직원의 평균 총 가족 의료보험료 2만 8303달러 기록",
+   "평균 총 가족 의료보험료 전년 대비 5% 상승",
+   "직원 10명 이상이고 의료혜택 제공하는 기업의 약 약 40% 건강저축계좌 연계형 요금제 보유"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T18:29:18.033340+00:00",
+  "n_src": 900
+ },
+ "c3b558a2b152": {
+  "lines": [
+   "버크셔해서웨이 주가 4분기 19.1% 상승하며 사상 최고치 경신",
+   "버크셔해서웨이 A주 11회, B주 10회 사상 최고치 마감 기록",
+   "S&P 500 지수 1.2% 하락과 대비되는 버크셔 주가 강세",
+   "버크셔해서웨이 B주 연초 이후 S&P 500 대비 7.5%p 초과 수익"
+  ],
+  "tags": [
+   null,
+   null,
+   null,
+   null
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-14T18:29:20.663947+00:00",
+  "n_src": 900
+ },
+ "544569cde872": {
+  "lines": [
+   "갭(Gap) 엔터테인먼트 총괄 책임자(CEO) 직책 신설 및 파라마운트 출신 임원 영입",
+   "갭(Gap) 엔터테인먼트 스튜디오 투자 확대 및 콘텐츠 라이선싱 플랫폼 구축"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-14T18:29:20.663947+00:00",
+  "n_src": 900
  }
 }

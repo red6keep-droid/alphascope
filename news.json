@@ -1,17 +1,143 @@
 {
-  "updated_at": "2026-11-14 12:46:32 UTC",
+  "updated_at": "2026-11-14 18:29:20 UTC",
   "items": [
     {
-      "title": "Flight disruptions continue after FAA lifts ground stop, some college football games delayed",
+      "title": "Nationwide ground stop followed contractor upgrade to L3Harris telecommunication system: DOT’s Duffy",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/14/faa-ground-stop-flights-resume-delays.html",
-      "published": "2026-11-14 12:30:58",
+      "published": "2026-11-14 18:17:18",
       "title_ko": "FAA 운항 중단 해제 후에도 항공편 차질 지속, 일부 대학 미식축구 경기 연기",
       "summary_ko": "",
       "lines": [
         "연방항공청의 이륙 중단 조치 이후 항공편 운항 재개",
         "토요일 3000편 이상 취소 및 1000편 가까이 지연 발생",
         "금요일 9000편 이상 취소 및 7000편 이상 지연 기록"
+      ]
+    },
+    {
+      "title": "Nvidia board urged to consider 'potential return of Jensen Huang' by two major investors",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/nvidia-investors-jensen-huang-return-board-letter.html",
+      "published": "2026-11-14 17:46:06",
+      "title_ko": "두 대형 투자자의 엔비디아 이사회 향한 '젠슨 황 복귀 검토' 촉구",
+      "summary_ko": "6월 30일 기준 약 21억 3천만 달러어치 주식을 공시한 두 엔비디아 투자자가 젠슨 황 사임 후 신중한 리더십 탐색 촉구",
+      "lines": [
+        "엔비디아 주주 2곳의 젠슨 황 복귀 촉구 공개 서한 발표",
+        "알티미터 캐피털과 아트레이데스 매니지먼트의 엔비디아 지분 보유 공개"
+      ]
+    },
+    {
+      "title": "앤트로픽 IPO 및 자금 조달",
+      "title_ko": "앤트로픽 IPO 및 자금 조달",
+      "summary_ko": "엔비디아 관련 악재에도 불구하고 앤트로픽의 IPO는 다음 주 예정대로 진행되며 흥행이 예상",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=b5oQu_60ZdU",
+      "published": "2026-11-14 15:53:09",
+      "kind": "media",
+      "tag": "기업 사건",
+      "direction": "positive",
+      "n_channels": 3,
+      "lines": [
+        "에드 루들로 발언 : 앤트로픽 IPO는 다음 주 예정대로 진행될 예정",
+        "에드 루들로 발언 : 앤트로픽은 엔비디아 장비 구매에 수억 달러 규모 연계",
+        "에드 루들로 발언 : 앤트로픽 IPO는 스페이스엑스 규모를 넘어설 것으로 예상"
+      ]
+    },
+    {
+      "title": "빅테크 AI 투자 및 데이터센터 수요",
+      "title_ko": "빅테크 AI 투자 및 데이터센터 수요",
+      "summary_ko": "데이터센터 건설이 일부 축소되더라도 수요가 공급을 압도하여 빅테크의 펀더멘털은 여전히 강세임",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=BAO66IFCp-w",
+      "published": "2026-11-14 15:45:33",
+      "kind": "media",
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "neutral",
+      "n_channels": 1,
+      "lines": [
+        "출연자 발언 : 데이터센터 약 10%에서 20% 안팎 무산 가능성",
+        "출연자 발언 : 수요가 공급의 4배에 달해 컴퓨팅 가치 상승",
+        "출연자 발언 : 빅테크 성장 속도 다소 둔화되나 버블 우려는 없음",
+        "출연자 발언 : 하이퍼스케일러들의 강력한 현금 창출력 지속"
+      ]
+    },
+    {
+      "title": "Trump doesn’t plan to raise Nvidia, spy issue during China trip: U.S. officials",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/trump-nvidia-huang-china.html",
+      "published": "2026-11-14 15:36:47",
+      "title_ko": "트럼프, 중국 방문 시 엔비디아 및 스파이 문제 제기 계획 없어: 미국 관료들",
+      "summary_ko": "중국인 스파이 의심 인물을 포함한 여러 스캔들 보도 이후 엔비디아 CEO 젠슨 황이 이번 주 사임",
+      "lines": [
+        "트럼프 미 대통령의 중국 방문",
+        "일론 머스크의 아시아태평양경제협력체 정상회의 동행 예정"
+      ]
+    },
+    {
+      "title": "How Rockstar's 'GTA VI' release could reshape gaming, streaming and even paid time off",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/gta-6-grand-theft-auto-launch.html",
+      "published": "2026-11-14 14:54:22",
+      "title_ko": "'그랜드 테프트 오토 VI' 11월 19일 출시 예정",
+      "summary_ko": "크리에이터, 스트리밍, 음악, 직장 휴가, 음식 배달, 관광 분야에 영향 예상",
+      "lines": [
+        "테이크투인터랙티브의 락스타게임즈 11월 19일 그랜드 테프트 오토 VI 출시 예정",
+        "그랜드 테프트 오토 VI 개발 비용 10억 달러 초과 (예상)",
+        "센서타워 11월 13일 기준 사전 주문 1200만 건 추산 (예상)",
+        "모건스탠리 2027년 3월까지 4000만 장 판매 전망"
+      ]
+    },
+    {
+      "title": "Heating oil prices are up 59% from last winter. The spike is 'crushing folks,' Maine nonprofit says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/heating-oil-price-spike-household-budgets.html",
+      "published": "2026-11-14 14:30:01",
+      "title_ko": "난방용 등유 가격 지난 겨울 대비 59% 급등… 메인주 비영리단체 \"주민들 짓밟히고 있어\"",
+      "summary_ko": "지속되는 인플레이션으로 가계 예산이 압박을 받는 가운데 일부 주민들이 겨울 시작 전 긴급 지원 요청",
+      "lines": [
+        "11월 9일 기준 전국 난방유 평균 가격 갤런당 약 5.91달러 기록",
+        "전국 난방유 평균 가격 전년 동기 대비 59% 상승",
+        "메인주 난방유 평균 가격 갤런당 약 약 5.83달러 기록",
+        "메인주 난방유 평균 가격 전년 동기 대비 약 75% 급등"
+      ]
+    },
+    {
+      "title": "Juice your growth and save on taxes in this workplace investment account",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/hsa-investing-tax-benefits.html",
+      "published": "2026-11-14 14:08:17",
+      "title_ko": "직장인 투자 계좌로 성장을 높이고 세금을 절약하는 법",
+      "summary_ko": "2027년 등록 시즌이 이어지면서 많은 고용주들이 건강저축계좌가 포함된 고액 공제 의료 혜택 플랜 도입",
+      "lines": [
+        "고용주와 직원의 평균 총 가족 의료보험료 2만 8303달러 기록",
+        "평균 총 가족 의료보험료 전년 대비 5% 상승",
+        "직원 10명 이상이고 의료혜택 제공하는 기업의 약 약 40% 건강저축계좌 연계형 요금제 보유"
+      ]
+    },
+    {
+      "title": "Berkshire breaks out to record high with fourth-quarter rally reaching 19%",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/berkshire-breaks-out-to-record-high-with-fourth-quarter-rally-reaching-19percent.html",
+      "published": "2026-11-14 14:02:39",
+      "title_ko": "버크셔, 4분기 19% 랠리와 함께 사상 최고치 경신",
+      "summary_ko": "버크셔 해서웨이의 주가가 4거래일 연속 사상 최고치 마감을 기록하며 강세 주간 마감",
+      "lines": [
+        "버크셔해서웨이 주가 4분기 19.1% 상승하며 사상 최고치 경신",
+        "버크셔해서웨이 A주 11회, B주 10회 사상 최고치 마감 기록",
+        "S&P 500 지수 1.2% 하락과 대비되는 버크셔 주가 강세",
+        "버크셔해서웨이 B주 연초 이후 S&P 500 대비 7.5%p 초과 수익"
+      ]
+    },
+    {
+      "title": "Retailers are turning to entertainment to win shoppers’ attention",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/retailers-invest-entertainment.html",
+      "published": "2026-11-14 13:00:01",
+      "title_ko": "소매업체들이 쇼퍼들의 이목을 사로잡기 위해 엔터테인먼트로 눈을 돌리고 있다",
+      "summary_ko": "소매업체들이 청중 주목 경쟁 가속화로 엔터테인먼트 스튜디오에 투자 및 구축 증가",
+      "lines": [
+        "갭(Gap) 엔터테인먼트 총괄 책임자(CEO) 직책 신설 및 파라마운트 출신 임원 영입",
+        "갭(Gap) 엔터테인먼트 스튜디오 투자 확대 및 콘텐츠 라이선싱 플랫폼 구축"
       ]
     },
     {
@@ -27,107 +153,22 @@
       ]
     },
     {
-      "title": "Eric Trump-backed robot soldier startup can't pay staff after founder borrowed $4.6 million from company to buy home",
+      "title": "FAA 전국 항공기 운항 중단",
+      "title_ko": "FAA 전국 항공기 운항 중단",
+      "summary_ko": "미 연방항공청이 통신 장애로 미국 전역의 항공기 운항을 일시 중단",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/foundation-payroll-ceo-loan.html",
-      "published": "2026-11-14 12:00:01",
-      "title_ko": "에릭 트럼프가 지원한 로봇 군인 스타트업, 창업자가 주택 매입 위해 460만 달러 대출받아 직원 임금 체불",
-      "summary_ko": "",
-      "lines": [
-        "로봇 스타트업 재단퓨처인더스트리스의 자금 부족으로 직원 급여 미지급",
-        "CEO 산카에트 파탁의 주택 구입용 460만 달러 회사 대출"
-      ]
-    },
-    {
-      "title": "Microsoft apologizes for massive outage that took down Outlook and other 365 services",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/12/microsoft-outage-outlook-aws-google.html",
-      "published": "2026-11-14 08:11:28",
-      "title_ko": "마이크로소프트 아웃룩 접속 장애 발생, AWS와 구글 사용자도 문제 보고",
-      "summary_ko": "아마존 웹 서비스와 구글 사용자들도 목요일에 서비스 중단을 보고",
-      "lines": [
-        "목요일 마이크로소프트 접속 장애 발생",
-        "아마존 웹 서비스와 구글 이용자들의 장애 신고 접수"
-      ]
-    },
-    {
-      "title": "Trump doesn’t plan to raise Nvidia, spy issue during China trip: U.S. officials",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/trump-nvidia-huang-china.html",
-      "published": "2026-11-14 01:34:11",
-      "title_ko": "트럼프, 중국 방문 시 엔비디아 및 스파이 문제 제기 계획 없어: 미국 관료들",
-      "summary_ko": "중국인 스파이 의심 인물을 포함한 여러 스캔들 보도 이후 엔비디아 CEO 젠슨 황이 이번 주 사임",
-      "lines": [
-        "트럼프 미 대통령의 중국 방문",
-        "일론 머스크의 아시아태평양경제협력체 정상회의 동행 예정"
-      ]
-    },
-    {
-      "title": "SpaceX launches Starship in key test flight of massive rocket",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/spacex-launches-starship-in-key-test-flight-of-massive-rocket.html",
-      "published": "2026-11-14 01:18:51",
-      "title_ko": "스페이스X, 대형 로켓의 핵심 시험 비행에서 스타십 발사",
-      "summary_ko": "이번 시험 비행은 텍사스주 스타베이스 발사장애서 슈퍼 헤비 부스터와 상단 우주선을 모두 회수하려는 스페이스X의 첫 시도",
-      "lines": [
-        "스페이스엑스의 스타십 로켓 시험비행 실시",
-        "부스터 및 상단 회수 시도 실패",
-        "미국 연방항공청의 전국적 운항 중단 조치 발령"
-      ]
-    },
-    {
-      "title": "Nvidia is done with Jensen Huang. The fallout in Washington is just beginning",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/nvidia-jensen-huang-washington-congress.html",
-      "published": "2026-11-13 23:54:36",
-      "title_ko": "엔비디아는 젠슨 황과 끝났고, 워싱턴의 여파는 이제 시작이다",
-      "summary_ko": "1월 민주당 통제권 이전 전 젠슨 황 의회 출석 요구",
-      "lines": [
-        "젠슨 황 엔비디아 CEO 목요일 사임 발표",
-        "공화당 주도 의회 젠슨 황 청문회 소환 및 소환장 발부 방침"
-      ]
-    },
-    {
-      "title": "Lutnick faces questions over Nvidia spy scandal. His sons' firm has deep ties to the chipmaker",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html",
-      "published": "2026-11-13 23:42:18",
-      "title_ko": "러트닉, 엔비디아 스파이 스캔들 관련 질의 직면, 두 아들 회사는 칩 제조사와 깊은 연관",
-      "summary_ko": "젠슨 황의 엔비디아 최고경영자 사임으로 하워드 러트닉 상무장관과 가족의 금융 연관성에 대한 감시가 재점화",
-      "lines": [
-        "캔터 피츠제럴드의 엔비디아 보유 주식 약 50% 감소",
-        "캔터 피츠제럴드의 엔비디아 목표가 350달러 유지"
-      ]
-    },
-    {
-      "title": "Nvidia stock suffers longest weekly losing streak since 2012 as market value sinks by $1.7 trillion",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/nvidia-stock-jensen-affair-ai.html",
-      "published": "2026-11-13 22:18:43",
-      "title_ko": "엔비디아 주가 시가총액 1조 7,000억 달러 증발하며 2012년 이후 최장기 주간 하락세 기록",
-      "summary_ko": "젠슨 황 사임이 엔비디아 시장 부진 가중",
-      "lines": [
-        "엔비디아 주가의 2012년 이후 최장기 주간 하락 기록",
-        "엔비디아 시가총액 1조 7000억 달러 감소",
-        "젠슨 황 엔비디아 최고경영자 사임",
-        "콜레트 크레스 재무최고책임자의 임시 최고경영자 임명"
-      ]
-    },
-    {
-      "title": "뉴욕 증시 및 반도체주 변동성",
-      "title_ko": "뉴욕 증시 및 반도체주 변동성",
-      "summary_ko": "엔비디아 관련 불확실성과 기술주 매도세로 인해 주요 지수와 반도체 주가가 약세를 보임",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=vAh4jhtnWS4",
-      "published": "2026-11-13 20:11:49",
+      "link": "https://www.youtube.com/watch?v=jC65yN8WIzs",
+      "published": "2026-11-13 23:29:36",
       "kind": "media",
-      "tag": "수급 · 시장 구조",
+      "tag": "지정학",
       "direction": "negative",
       "n_channels": 2,
       "lines": [
-        "찰리 팔레트 발언 : 필라델피아 반도체 지수 4.5% 하락 기록",
-        "찰리 팔레트 발언 : 엔비디아 주가 3.1% 하락 및 시가총액 4조 달러 하회",
-        "노라 앨린단 발언 : 시장이 엔비디아 상황의 파급력을 재평가하면서 변동성 확대"
+        "FAA 장관 발언 : 통신 장애로 미 전역 공항 이륙 일시 중단",
+        "국토안보부 장관 발언 : 9/11 테러나 사이버 공격은 아님",
+        "필 레보 기자 발언 : 운항 재개 시점은 아직 불확실함",
+        "FAA 장관 발언 : 대통령 보고 및 전 정부 차원의 대응 진행 중",
+        "필 레보 기자 발언 : 동부 지역 AI 기반 스마트 시스템 도입과 연관성은 조사 중"
       ]
     }
   ]
