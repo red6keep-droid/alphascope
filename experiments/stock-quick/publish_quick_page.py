@@ -14,13 +14,14 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EXP = os.path.dirname(HERE)
-sys.path[:0] = [HERE, EXP, os.path.join(EXP, "stock-radar")]
+sys.path[:0] = [HERE, EXP, os.path.join(EXP, "stock-radar"), os.path.join(EXP, "kr-stocks")]
 import publish_pages as PP  # noqa: E402
 import universe as U  # noqa: E402
+import universe_kr as K  # noqa: E402
 import candle_chart as CC  # noqa: E402
 
-KEY = "stock-quick"
-TITLE = "간단 종목 정보"
+KEY = "stock"        # 주소 /p/stock.html?s=코드 — 독자 주소창에 내부 말(quick)이 보이지 않게 (2026-11-14 사용자: 독자 화면에 `간단 정보` 말 금지)
+TITLE = "종목 주가"   # 종목을 불러오면 JS 가 `스타벅스 SBUX 주가` 로 바꾼다 — 이 이름은 불러오기 전 · 못 불러왔을 때만
 URL = f"{U.BLOG}/p/{KEY}.html"
 DATA = os.path.join(HERE, "data")
 BODY = os.path.join(HERE, "output", "stock_quick_page.html")
@@ -30,7 +31,7 @@ def body():
     js = open(os.path.join(HERE, "quick_page.js"), encoding="utf-8").read()
     if "</script" in js:
         sys.exit("quick_page.js 안에 </script — 본문이 끊긴다")
-    return (f'<div id="as-quick" data-list="{U.LIST_URL}"></div>\n'
+    return (f'<div id="as-quick" data-list-us="{U.LIST_URL}" data-list-kr="{K.LIST_URL}"></div>\n'
             f'<script>\n{js}\n</script>\n' + CC.SCRIPT)   # 봉차트 스크립트는 끼워 넣은 뒤 — 문서를 다 읽을 때 [data-candle] 을 찾는다
 
 
@@ -41,7 +42,7 @@ def main():
     os.makedirs(os.path.dirname(BODY), exist_ok=True)
     os.makedirs(DATA, exist_ok=True)
     open(BODY, "w", encoding="utf-8").write(body())
-    PP.targets = lambda only=None: [(KEY, TITLE, "stock quick", URL, BODY)]
+    PP.targets = lambda only=None: [(KEY, TITLE, "stock", URL, BODY)]
     PP.HASHES = os.path.join(DATA, "page_hashes.json")
     PP.PAGES_LIVE = os.path.join(DATA, "pages_live.json")
     PP._body = lambda path: open(path, encoding="utf-8").read()

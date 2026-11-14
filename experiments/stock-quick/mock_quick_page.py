@@ -7,6 +7,7 @@ output/quick-data/ 에 예시 종목 조각만 복사하고, 종목마다 목업
 """
 
 import argparse
+import json
 import os
 import shutil
 import sys
@@ -36,13 +37,21 @@ def main():
         if os.path.exists(os.path.join(a.data, fn)):
             shutil.copy(os.path.join(a.data, fn), os.path.join(dst, fn))
     js = open(os.path.join(HERE, "quick_page.js"), encoding="utf-8").read()
+    ref = json.load(open(os.path.join(EXP, "ref", "quick_ref.json"), encoding="utf-8"))
+
+    def reader_title(d, code):
+        """독자가 보는 제목 그대로 — 불러오면 JS 가 바꾸는 이름(`스타벅스 SBUX 주가` · `크래프톤 주가`), 없는 코드는 페이지 기본 이름 `종목 주가`."""
+        if d == "us" and code in ref["us"]:
+            return f'{ref["us"][code]["ko"]} {code} 주가'
+        e = next((v for k, v in ref["kr"].items() if k.startswith(code + ".")), None) if d == "kr" else None
+        return f'{e["ko"]} 주가' if e else "종목 주가"
     for d, code in SAMPLES:
         src = os.path.join(a.data, d, code + ".html")
         if os.path.exists(src):
             shutil.copy(src, os.path.join(dst, d, code + ".html"))
-        body = (f'<div id="as-quick" data-local="quick-data/" data-default="{code}" data-list="/stock-radar/output/mock_list.html"></div>'
+        body = (f'<div id="as-quick" data-local="quick-data/" data-default="{code}" data-list-us="/stock-radar/output/mock_list.html" data-list-kr="/kr-stocks/output/mock_list.html"></div>'
                 f'<script>{js}</script>' + CC.SCRIPT)   # 발행 본문(publish_quick_page.body)과 같은 순서
-        p = dk.write_mock(body, os.path.join(OUT, f"mock_qpage_{code}.html"), f"간단 정보 ({code})")
+        p = dk.write_mock(body, os.path.join(OUT, f"mock_qpage_{code}.html"), reader_title(d, code))
         print("만듦:", p)
 
 
