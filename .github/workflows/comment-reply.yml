@@ -113,7 +113,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: comment-reply-log
-          path: experiments/comment-reply/output/
+          path: |   # 공개 저장소의 아티팩트는 누구나 받는다 — 처리한 댓글 기록(state.json)은 빼고 로그만 (2026-11-14 보안 점검)
+            experiments/comment-reply/output/
+            !experiments/comment-reply/output/state.json
 
       - name: Notify failure
         if: failure()

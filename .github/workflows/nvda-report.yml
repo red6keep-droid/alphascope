@@ -221,7 +221,7 @@ jobs:
       - name: Deploy forecast proof + hypo.json to gh-pages
         if: env.DO_PUBLISH == 'true' && needs.check.outputs.mode != 'refresh' && hashFiles('deploy-forecast/hypo.json') != ''
         continue-on-error: true
-        uses: peaceiris/actions-gh-pages@v4.1.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./deploy-forecast
@@ -260,7 +260,7 @@ jobs:
 
       - name: Deploy chart image to gh-pages branch
         if: needs.check.outputs.mode != 'refresh' && hashFiles('deploy/images/*.webp') != ''
-        uses: peaceiris/actions-gh-pages@v4.1.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./deploy
@@ -351,7 +351,7 @@ jobs:
       - name: Deploy home stocks.json to gh-pages branch
         if: env.DO_PUBLISH == 'true' && hashFiles('deploy-home/stocks.json') != ''
         continue-on-error: true
-        uses: peaceiris/actions-gh-pages@v4.1.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./deploy-home
