@@ -838,7 +838,7 @@ def _why_pop(pid, title, rows, total, sigs=(), as_of=None, page=None):
             out += _pop_sub(f'{CAL_ICON}{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>', sep=bool(out)) + "".join(art_gap(_pop_li(_sig_html(r["name"], r["state"]), html=True), k) for k, r in enumerate(xs))   # 신호 줄 사이도 21 (2026-11-14 사용자: 이슈 날짜 팝업 기준)
     if sigs and as_of:   # 기준 날짜 — 종목 페이지가 있으면 링크 `10.30 종목 페이지 ›` (2026-11-11 사용자: `우리 신호 = … 값` 은 독자가 모른다)
         st = f'display:inline-flex;align-items:center;gap:2px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};'
-        out += (f'<a href="{dk.esc(page)}" style="{dk.FOLD_BTN}display:inline-flex;margin:16px 0 0;text-decoration:none;font-weight:400;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page   # 인물 발언 팝업 `○○ 발언 더 보기` 와 같은 외곽선 버튼 (P503)
+        out += (f'<a href="{dk.esc(page)}" style="{dk.FOLD_BTN}display:inline-flex;margin:16px 0 0;text-decoration:none;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page   # 인물 발언 팝업 `○○ 발언 더 보기` 와 같은 외곽선 버튼 (P503) — 굵기도 같게 14 굵게 (2026-11-14 사용자: 팝업 버튼 하나)
                 else f'<span style="{st}">{SIG_NAME} 기준 : {md(as_of)}</span>')
     return f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(title)}" hidden>{_pop_first(out)}</div>'
 
