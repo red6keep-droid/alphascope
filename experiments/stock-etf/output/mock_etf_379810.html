@@ -1983,7 +1983,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     B.forEach(function (b) { look(b[2]); look(b[3]); });
     for (var i = s; i < this.end; i++) { for (var n in this.on.ma) if (maShow(n)) look(this.ma[n][i]); if (this.on.boll) { look(this.bb.up[i]); look(this.bb.lo[i]); } }
     // 오른쪽 가격 칸 폭 — 전체 화면 66 고정, 작은 화면 = 가장 긴 숫자 + 왼쪽 9 · 오른쪽 3 (2026-11-14 사용자 "0 기준 우측 여백 최대한 좁게")
-    var TX = this.full ? 10 : 9, TFS = this.full ? FS : 10, AFS = TFS;   // 작은 화면 = 종가 칸 · 오른쪽 눈금 · 아래 날짜 모두 10 (2026-11-14 사용자)
+    var TX = this.full ? 10 : 9, TFS = this.full ? FS : 11, AFS = this.full ? FS : 10;   // 작은 화면: 종가 칸 · 누른 날 검은 칸 11, 오른쪽 눈금 · 아래 날짜 · 최고 · 최저 10 (2026-11-14 사용자)
     if (this.full) this.axisW = AXIS_W;
     else {
       var mw = 0; g.font = AFS + 'px ' + font; ticks(lo, hi, 5).forEach(function (t) { mw = Math.max(mw, g.measureText(fmt(t, self.dec)).width); });
@@ -2059,7 +2059,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
       [[hiI, B[hiI][2], '최고', -1], [loI, B[loI][3], '최저', 1]].forEach(function (m) {
         var x = X(s + m[0]), y = Y(m[1]) + m[3] * 4, d = (last[4] / m[1] - 1) * 100;
         g.fillStyle = d > 0 ? UP : d < 0 ? DN : INK; g.beginPath(); g.arc(x, y, 2.5, 0, 6.3); g.fill();   // 증감 색 (2026-11-14 사용자)
-        g.font = FS + 'px ' + font; var txt = m[2] + '  ' + fmt(m[1], self.dec) + ' (' + sgnPct(d) + ')', tw = g.measureText(txt).width;
+        g.font = AFS + 'px ' + font; var txt = m[2] + '  ' + fmt(m[1], self.dec) + ' (' + sgnPct(d) + ')', tw = g.measureText(txt).width;
         var tx = Math.min(Math.max(x - tw / 2, 2), pw - tw - 2);
         g.textAlign = 'left'; g.fillText(txt, Math.round(tx), Math.round(y + m[3] * 12) + 0.5);
       });
@@ -2112,12 +2112,12 @@ html.as-lock, html.as-lock body { overflow: hidden; }
       g.beginPath(); g.moveTo(0, Math.round(cy) + 0.5); g.lineTo(pw, Math.round(cy) + 0.5); g.stroke(); g.setLineDash([]);
       tag(cy, fmt(vOf(cy), self.dec), INK);
       var dl = this.dateText(this.bars[sel][0], true);
-      g.font = AFS + 'px ' + font; var dw = Math.ceil(g.measureText(dl).width) + 14, dx = Math.round(Math.min(Math.max(X(sel) - dw / 2, 0), pw - dw));
+      g.font = TFS + 'px ' + font; var dw = Math.ceil(g.measureText(dl).width) + 14, dx = Math.round(Math.min(Math.max(X(sel) - dw / 2, 0), pw - dw));
       [[H - XH, XH], [0, TOPS]].forEach(function (r) { g.fillStyle = INK; g.fillRect(dx, r[0], dw, r[1]); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(dl, dx + dw / 2, r[0] + r[1] / 2 + 0.5); });
     }
     // 머리 — 현재가 · 전날 대비 금액 · % (늘 최신), 오늘 거래량, 시가 · 고가 · 저가 · 종가(누른 날이면 그날)
     var dch = prevL ? last[4] - prevL[4] : 0, dp = prevL ? dch / prevL[4] * 100 : 0, cc = dch > 0 ? UP : dch < 0 ? DN : INK;
-    this.price.innerHTML = '<b style="font-size:20px;line-height:28px;color:' + INK + ';">' + fmt(last[4], this.dec) + '</b> <span style="font-size:14px;color:' + cc + ';">' + tri(dch) + fmt(Math.abs(dch), this.dec) + ' ' + sgnPct(dp) + '</span>';
+    this.price.innerHTML = '<b style="' + (this.full ? 'font-size:20px;line-height:28px;color:' + INK : 'font-size:15px;line-height:21px;color:' + cc) + ';">' + fmt(last[4], this.dec) + '</b> <span style="font-size:14px;color:' + cc + ';">' + tri(dch) + fmt(Math.abs(dch), this.dec) + ' ' + sgnPct(dp) + '</span>';
     var volTxt = '거래량 <span style="color:' + INK + ';">' + fmt(last[5], 0) + '</span>';
     if (this.full) this.sub.innerHTML = volTxt;
     else this.price.innerHTML += ' <span style="font-size:13px;color:' + NOTE + ';">' + volTxt + '</span>';   // 작은 화면 = 증감 옆 한 줄
@@ -2129,7 +2129,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     }).join('');
     // 왼쪽 위 = 이동평균 범례(숫자 = 선 색) + 닫기 — 누르면 그날 이동평균 값 표
     var mas = [5, 20, 60, 120, 200].filter(function (n) { return maShow(n); });
-    if (sel !== null && mas.length) {
+    if (sel !== null && mas.length && this.full) {   // 누른 날 이동평균 값 표 = 전체 화면만 (2026-11-14 사용자)
       this.legend.style.top = (TOPS + 2) + 'px'; this.legend.style.display = 'block';
       this.legend.innerHTML = mas.map(function (n) { var v = self.ma[n][sel]; return '<div style="display:flex;gap:10px;"><span style="min-width:26px;">' + n + '</span><span style="color:' + MA_COL[n] + ';font-variant-numeric:tabular-nums;">' + (v === null ? '-' : fmt(v, self.dec)) + '</span></div>'; }).join('');
     } else if (mas.length) {
