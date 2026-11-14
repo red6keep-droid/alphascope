@@ -230,7 +230,7 @@
     B.forEach(function (b) { look(b[2]); look(b[3]); });
     for (var i = s; i < this.end; i++) { for (var n in this.on.ma) if (maShow(n)) look(this.ma[n][i]); if (this.on.boll) { look(this.bb.up[i]); look(this.bb.lo[i]); } }
     // 오른쪽 가격 칸 폭 — 전체 화면 66 고정, 작은 화면 = 가장 긴 숫자 + 왼쪽 9 · 오른쪽 3 (2026-11-14 사용자 "0 기준 우측 여백 최대한 좁게")
-    var TX = this.full ? 10 : 9, TFS = this.full ? FS : 10, AFS = this.full ? FS : 12;   // 작은 화면: TFS = 종가 칸 글자 10 · AFS = 오른쪽 눈금 12 (2026-11-14 사용자)
+    var TX = this.full ? 10 : 9, TFS = this.full ? FS : 10, AFS = TFS;   // 작은 화면 = 종가 칸 · 오른쪽 눈금 · 아래 날짜 모두 10 (2026-11-14 사용자)
     if (this.full) this.axisW = AXIS_W;
     else {
       var mw = 0; g.font = AFS + 'px ' + font; ticks(lo, hi, 5).forEach(function (t) { mw = Math.max(mw, g.measureText(fmt(t, self.dec)).width); });
@@ -348,8 +348,8 @@
     }
     // 날짜 축
     if (this.full) { g.fillStyle = '#F1F5F9'; g.fillRect(0, H - XH, W, XH); }   // 작은 화면 = 회색 면 없음
-    g.font = FS + 'px ' + font; g.textAlign = 'center';
-    labs.forEach(function (l) { g.font = (l[2] ? '600 ' : '') + FS + 'px ' + font; g.fillStyle = l[2] ? INK : NOTE; g.fillText(l[1], Math.min(Math.max(l[0], 20), pw - 20), H - XH / 2 + 0.5); });
+    g.font = AFS + 'px ' + font; g.textAlign = 'center';
+    labs.forEach(function (l) { g.font = (l[2] ? '600 ' : '') + AFS + 'px ' + font; g.fillStyle = l[2] ? INK : NOTE; g.fillText(l[1], Math.min(Math.max(l[0], 20), pw - 20), H - XH / 2 + 0.5); });
     // 누른 날 — 검은 점선 십자선 + 위 · 아래 날짜 칸 + 오른쪽 가격 칸
     var cr = this.cross, sel = cr && cr.i >= s && cr.i < this.end ? cr.i : null;
     if (sel !== null) {
@@ -359,7 +359,7 @@
       g.beginPath(); g.moveTo(0, Math.round(cy) + 0.5); g.lineTo(pw, Math.round(cy) + 0.5); g.stroke(); g.setLineDash([]);
       tag(cy, fmt(vOf(cy), self.dec), INK);
       var dl = this.dateText(this.bars[sel][0], true);
-      g.font = FS + 'px ' + font; var dw = Math.ceil(g.measureText(dl).width) + 14, dx = Math.round(Math.min(Math.max(X(sel) - dw / 2, 0), pw - dw));
+      g.font = AFS + 'px ' + font; var dw = Math.ceil(g.measureText(dl).width) + 14, dx = Math.round(Math.min(Math.max(X(sel) - dw / 2, 0), pw - dw));
       [[H - XH, XH], [0, TOPS]].forEach(function (r) { g.fillStyle = INK; g.fillRect(dx, r[0], dw, r[1]); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(dl, dx + dw / 2, r[0] + r[1] / 2 + 0.5); });
     }
     // 머리 — 현재가 · 전날 대비 금액 · % (늘 최신), 오늘 거래량, 시가 · 고가 · 저가 · 종가(누른 날이면 그날)
