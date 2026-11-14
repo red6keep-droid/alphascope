@@ -132,8 +132,8 @@ def samples():
     t, b = pick("issue_store/output/mock_issue_watch.html", lambda p, ti, b: p.startswith("iwday") and "dashed" in b)
     s.append(("A6", "이슈 날짜 팝업", "이슈 모니터링 날짜 줄 (다른 창 작업 중 · 커밋 전 목업)", "기준 팝업 — 방향 묶음 소제목(아이콘 + 19 굵게 방향 색) · 점선 구분 · 줄 사이 21",
               frame(box(t, b, "news-pop", "rt-pop-body news-pop-body"))))
-    items = "".join(f'<li><span class="sharing-platform-button" role="button">{svg}<span class="platform-sharing-text">{n}</span></span></li>' for n, svg in SHARE_ICONS.items())
-    s.append(("A7", "공유 팝업", "글 제목 옆 공유 버튼", "짧은 창 400 · 버튼 네 개 · 내용 시작 26",
+    items = "".join(f'<li{" class=share-main" if n == "링크 복사" else ""}><span class="sharing-platform-button" role="button">{svg}<span class="platform-sharing-text">{n}</span></span></li>' for n, svg in SHARE_ICONS.items())
+    s.append(("A7", "공유 팝업", "글 제목 옆 공유 버튼", "짧은 창 400 · 링크 복사 = 맨 위 한 줄 큰 버튼(48 · 16 굵게) · 아래 페이스북 · X · 카카오톡 같은 폭",
               frame(box("공유", f'<ul class="share-buttons">{items}</ul>', "share-pop", "share-pop-body"), 420)))
     G = '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="10" fill="#4285F4"/></svg>'
     acct = ('<p class="as-acct-note">댓글에 쓰는 구글 계정으로 로그인합니다.</p>'

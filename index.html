@@ -1195,6 +1195,11 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .title-share:hover { border-color: #111; }
 /* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
 .share-pop .share-buttons { justify-content: flex-start !important; }
+/* 링크 복사 강조 (2026-11-14 사용자): 맨 위 한 줄 가득 · 높이 48 · 16 굵게 · 흰 바탕 · 진한 테두리. 나머지(페이스북 · X · 카카오톡)는 그 아래 같은 폭 셋 */
+.share-pop .share-buttons li.share-main { flex: 1 0 100%; }
+.share-pop .share-buttons li.share-main .sharing-platform-button { display: flex; width: 100%; justify-content: center; gap: 8px; padding: 11px 16px; font-size: 16px; line-height: 24px; background: #fff; border-color: #B5BAC0; color: #111; }
+.share-pop .share-buttons li:not(.share-main) { flex: 1 1 0; min-width: 0; }
+.share-pop .share-buttons li:not(.share-main) .sharing-platform-button { display: flex; width: 100%; justify-content: center; padding: 8px 6px; }
 /* 제목 아래 날짜 줄(October 11, 2026) 삭제 (2026-10-12 사용자) */
 .post-timestamp { display: none !important; }
 /* 글 보기: 첫 제목 위 여백 70% 줄임 (2026-10-12 사용자) — 위 32+40 → 10+12 */
@@ -4572,6 +4577,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             var btnEl = li.querySelector('.sharing-platform-button') || li;
             [].slice.call(btnEl.querySelectorAll('svg')).forEach(function (v) { v.parentNode.removeChild(v); });
             btnEl.insertAdjacentHTML('afterbegin', ICONS[kindOf(li)]);
+            if (kindOf(li) === 'link') li.classList.add('share-main');   /* 링크 복사 = 맨 위 한 줄 큰 버튼 (2026-11-14 사용자: "링크 복사를 크게 강조") */
             list.appendChild(li);
           });
           pop.querySelector('.share-pop-body').appendChild(list);
