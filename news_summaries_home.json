@@ -2966,13 +2966,149 @@
  },
  "11b76f57c271": {
   "lines": [
-   "바이낸스에서 63억 달러 규모의 암호화폐 탈취 발생"
+   "북한 연계 해킹 그룹의 바이낸스에서 63억 달러 규모 암호화폐 탈취"
   ],
   "tags": [
-   null
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "CRYPTO",
+    "dir": "negative",
+    "stage": "done"
+   }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T01:46:06.150213+00:00",
+  "at": "2026-11-14T12:46:32.757118+00:00",
+  "n_src": 900,
+  "retry": true
+ },
+ "90efe7abd3ca": {
+  "lines": [
+   "연방항공청의 이륙 중단 조치 이후 항공편 운항 재개",
+   "토요일 3000편 이상 취소 및 1000편 가까이 지연 발생",
+   "금요일 9000편 이상 취소 및 7000편 이상 지연 기록"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "REGULATION",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T12:46:31.500916+00:00",
+  "n_src": 900
+ },
+ "0ff364750688": {
+  "lines": [
+   "연구원과 전직 기자 및 공직자와 엔지니어 등 7명이 2021년 앤스로픽 공동 창립",
+   "11월 19일 거래 시작 예정인 기업공개 추진"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T12:46:31.500916+00:00",
+  "n_src": 900
+ },
+ "e4dfe4f27195": {
+  "lines": [
+   "로봇 스타트업 재단퓨처인더스트리스의 자금 부족으로 직원 급여 미지급",
+   "CEO 산카에트 파탁의 주택 구입용 460만 달러 회사 대출"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T12:46:31.500916+00:00",
+  "n_src": 900
+ },
+ "b777df82a2fc": {
+  "lines": [
+   "콜레트 크레스 임시 CEO 겸 최고재무책임자의 2013년 입사"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T12:46:32.757118+00:00",
+  "n_src": 900
+ },
+ "e324a24b50f1": {
+  "lines": [
+   "에콰도르의 1억 2000만 달러 규모 생물다양성 채권 발행"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T12:46:32.757118+00:00",
   "n_src": 900
  }
 }

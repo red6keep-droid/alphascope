@@ -1,16 +1,53 @@
 {
-  "updated_at": "2026-11-14 01:46:07 UTC",
+  "updated_at": "2026-11-14 12:46:32 UTC",
   "items": [
     {
-      "title": "FAA lifts ground stop after four hours, but flight cancellations will stretch into the weekend",
+      "title": "Flight disruptions continue after FAA lifts ground stop, some college football games delayed",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/faa-ground-stop.html",
-      "published": "2026-11-14 01:44:39",
-      "title_ko": "'다수' 항공 교통 관제 시설에 영향을 미치는 통신 문제를 이유로 FAA가 전국적인 운항 중단 조치 발령",
-      "summary_ko": "연방항공청, 비상 상황 및 안전 이유로 금요일 오후 전국 운항 중단 발행",
+      "link": "https://www.cnbc.com/2026/11/14/faa-ground-stop-flights-resume-delays.html",
+      "published": "2026-11-14 12:30:58",
+      "title_ko": "FAA 운항 중단 해제 후에도 항공편 차질 지속, 일부 대학 미식축구 경기 연기",
+      "summary_ko": "",
       "lines": [
-        "연방항공청의 전국 항공기 운항 일시중지 발령",
-        "관제 센터 통신 및 레이더 문제 발생"
+        "연방항공청의 이륙 중단 조치 이후 항공편 운항 재개",
+        "토요일 3000편 이상 취소 및 1000편 가까이 지연 발생",
+        "금요일 9000편 이상 취소 및 7000편 이상 지연 기록"
+      ]
+    },
+    {
+      "title": "Meet the seven co-founders of Anthropic",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/meet-the-seven-co-founders-of-anthropic.html",
+      "published": "2026-11-14 12:15:01",
+      "title_ko": "앤스로픽의 공동 창업자 7명을 만나다",
+      "summary_ko": "",
+      "lines": [
+        "연구원과 전직 기자 및 공직자와 엔지니어 등 7명이 2021년 앤스로픽 공동 창립",
+        "11월 19일 거래 시작 예정인 기업공개 추진"
+      ]
+    },
+    {
+      "title": "Eric Trump-backed robot soldier startup can't pay staff after founder borrowed $4.6 million from company to buy home",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/foundation-payroll-ceo-loan.html",
+      "published": "2026-11-14 12:00:01",
+      "title_ko": "에릭 트럼프가 지원한 로봇 군인 스타트업, 창업자가 주택 매입 위해 460만 달러 대출받아 직원 임금 체불",
+      "summary_ko": "",
+      "lines": [
+        "로봇 스타트업 재단퓨처인더스트리스의 자금 부족으로 직원 급여 미지급",
+        "CEO 산카에트 파탁의 주택 구입용 460만 달러 회사 대출"
+      ]
+    },
+    {
+      "title": "Microsoft apologizes for massive outage that took down Outlook and other 365 services",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/12/microsoft-outage-outlook-aws-google.html",
+      "published": "2026-11-14 08:11:28",
+      "title_ko": "마이크로소프트 아웃룩 접속 장애 발생, AWS와 구글 사용자도 문제 보고",
+      "summary_ko": "아마존 웹 서비스와 구글 사용자들도 목요일에 서비스 중단을 보고",
+      "lines": [
+        "목요일 마이크로소프트 접속 장애 발생",
+        "아마존 웹 서비스와 구글 이용자들의 장애 신고 접수"
       ]
     },
     {
@@ -77,43 +114,6 @@
       ]
     },
     {
-      "title": "What's ahead for AI financing after Nvidia CEO Jensen Huang departs",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/nvidia-jensen-huang-resignation-ai-financing.html",
-      "published": "2026-11-13 21:19:04",
-      "title_ko": "엔비디아 CEO 젠슨 황 사임 후 AI 자금 조달의 향방",
-      "summary_ko": "투자자들 신용시장과 네오클라우드 노출 주시 속 젠슨 황 사임",
-      "lines": [
-        "최고경영자 젠슨 황 목요일 사임",
-        "최고재무책임자 콜레트 크레스 임시 최고경영자 선임"
-      ]
-    },
-    {
-      "title": "AI risks are the biggest threat to the financial system, Fed survey finds",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/ai-risks-financial-system-federal-reserve.html",
-      "published": "2026-11-13 21:18:30",
-      "title_ko": "AI 리스크가 금융 시스템의 가장 큰 위협이라고 연준 설문조사 결과 밝혀져",
-      "summary_ko": "월가 AI 하이퍼스케일러 우려 및 데이터센터 급증 경계 속 보고서 발표",
-      "lines": [
-        "연방준비제도 설문조사 결과 금융시스템 최대 위협 요소로 인공지능 지목",
-        "인공지능 관련 부채와 주식시장 밸류에이션 및 보안 위험 부각"
-      ]
-    },
-    {
-      "title": "10-year Treasury yield moves to 5.17% as traders weigh producer price report",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/treasury-yields-fed-rates.html",
-      "published": "2026-11-13 21:08:20",
-      "title_ko": "10년물 국채 금리 5.17%로 상승, 트레이더들은 생산자물가 보고서 주시",
-      "summary_ko": "연방준비제도의 12월 금리 인상에 대한 투자자들의 기대감이 강화되면서 국채 금리가 상승",
-      "lines": [
-        "10년 만기 미 국채 수익률의 5.17% 기록",
-        "10월 생산자물가지수의 전월 대비 0.3% 상승 (예상)",
-        "2년 만기 미 국채 수익률의 4.855% 기록"
-      ]
-    },
-    {
       "title": "뉴욕 증시 및 반도체주 변동성",
       "title_ko": "뉴욕 증시 및 반도체주 변동성",
       "summary_ko": "엔비디아 관련 불확실성과 기술주 매도세로 인해 주요 지수와 반도체 주가가 약세를 보임",
@@ -128,40 +128,6 @@
         "찰리 팔레트 발언 : 필라델피아 반도체 지수 4.5% 하락 기록",
         "찰리 팔레트 발언 : 엔비디아 주가 3.1% 하락 및 시가총액 4조 달러 하회",
         "노라 앨린단 발언 : 시장이 엔비디아 상황의 파급력을 재평가하면서 변동성 확대"
-      ]
-    },
-    {
-      "title": "우크라이나 종전 협상 및 트릴라터럴 회담",
-      "title_ko": "우크라이나 종전 협상 및 트릴라터럴 회담",
-      "summary_ko": "미국, 러시아, 우크라이나 간의 삼자 회담이 재개되고 포로 교환이 합의되는 등 외교적 움직임이 감지 중",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=vO_kT_4MIiY",
-      "published": "2026-11-13 13:54:47",
-      "kind": "media",
-      "tag": "지정학",
-      "direction": "neutral",
-      "n_channels": 2,
-      "lines": [
-        "올리버 크룩 발언 : 아부다비, 모스크바, 더블린을 거쳐 미국, 러시아, 우크라이나 간 트릴라터럴 회담이 재개된 것은 중요한",
-        "올리버 크룩 발언 : 러-우 양측이 1,000명 이상의 포로 교환에 합의했으나 전쟁 종료에 가까워진 것은 아님",
-        "올리버 크룩 발언 : 기존 삼자 포맷에서 다자 포맷으로 전환되며 유럽국가들도 협상 테이블에 참여할 압박을 받게 됨"
-      ]
-    },
-    {
-      "title": "미국 금리 인상 베팅 강화 및 국채 금리 변동",
-      "title_ko": "미국 금리 인상 베팅 강화 및 국채 금리 변동",
-      "summary_ko": "견조한 고용 및 인플레이션 지표 여파로 연준의 매파적 기조가 강화되며 국채 금리와 금리 인상 전망이 자극을 받고 있음",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=vO_kT_4MIiY",
-      "published": "2026-11-13 13:54:47",
-      "kind": "media",
-      "tag": "금리 · 연준",
-      "direction": "negative",
-      "n_channels": 1,
-      "lines": [
-        "진행자 발언 : 투자자들이 중요한 PPI 데이터를 앞두고 금리 인상 베팅을 강화하는 중",
-        "마이클 퍼베스 발언 : 연준이 중립금리가 예상보다 높다는 점을 깨닫고 조정 과정을 거치는 것으로 봄",
-        "마이클 퍼베스 발언 : 단기적으로 고배당 주식 등 금리 민감 섹터에 긴장감이 존재할 것으로 예상"
       ]
     }
   ]
