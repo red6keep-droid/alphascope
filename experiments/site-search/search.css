@@ -15,10 +15,11 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 /* 닫기 = 회색 원 안 × (32) · 검색어 지우기 = 작은 회색 원 안 흰 × (20, 글자가 있을 때만) — 2026-11-12 사용자 */
 .as-x, .as-clear { flex: none; display: inline-flex; border: 0; background: none; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .as-x[hidden], .as-clear[hidden] { display: none; }
-.as-x svg { width: 32px; height: 32px; }
-.as-x circle { fill: #EEF0F3; stroke: none; }
-.as-x path { fill: none; stroke: #4B5563; stroke-width: 2; stroke-linecap: round; }
-.as-x:hover circle { fill: #E2E5EA; }
+.as-x { align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; }   /* 닫기 = 테두리 네모 32 — 모든 닫기 통일 (2026-11-14 사용자: "닫기 버튼은 네모 박스", 11-12 회색 원 폐지) */
+.as-x svg { width: 30px; height: 30px; }
+.as-x circle { display: none; }
+.as-x path { fill: none; stroke: #111; stroke-width: 2; stroke-linecap: round; }
+.as-x:hover { border-color: #111; }
 .as-clear svg { width: 20px; height: 20px; }
 .as-clear circle { fill: #B5BAC0; stroke: none; }
 .as-clear path { fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; }
@@ -122,7 +123,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-chat { position: fixed; right: 20px; bottom: 20px; z-index: 150; width: 400px; height: min(680px, calc(100vh - 40px)); display: flex; flex-direction: column;
   background: var(--bg, #fff); border: 1px solid var(--border-strong, #E2E8F0); border-radius: 16px; box-shadow: 0 16px 48px rgba(15, 23, 42, .22);
   font-family: var(--sans); color: var(--ink, #0F172A); overflow: hidden; }
-/* 머리 닫기 = 검색 창과 같은 회색 원 32 안 × (.as-x) — 모든 닫기 통일 (2026-11-12 사용자) */
+/* 머리 닫기 = 검색 창과 같은 테두리 네모 32 (.as-x) — 모든 닫기 통일 (2026-11-14 사용자) */
 .as-chat > header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 10px 16px; border-bottom: 1px solid var(--border, #F0F0F0); font-size: 16px; }
 /* 머리 제목 = 로고 그림(22 × 20, 313:286) + `AlphaScope`(로고 글꼴 Noto Sans KR 900 · 18) + `에 물어보기`(16 보통) (2026-11-12 사용자) */
 .as-chat-title { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; font-size: 16px; line-height: 24px; color: #111; }
