@@ -73,8 +73,7 @@ def svg(sym, d, vh, uid, vert):
     line = " ".join(f"{x:.1f},{y:.1f}" for x, y, _ in pts)
     area = f"M{pts[0][0]:.1f},{by:.1f} L" + " L".join(f"{x:.1f},{y:.1f}" for x, y, _ in pts) + f" L{pts[-1][0]:.1f},{by:.1f} Z"
     hi = min(pts, key=lambda p: p[1]); lo = max(pts, key=lambda p: p[1])
-    col = day_col(d)
-    dots = "".join(f'<circle cx="{p[0]:.1f}" cy="{p[1]:.1f}" r="3" fill="#fff" stroke="{col}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' for p in (hi, lo))
+    dots = "".join(f'<circle cx="{p[0]:.1f}" cy="{p[1]:.1f}" r="3" fill="#fff" stroke="{c}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' for p, c in ((hi, UP), (lo, DN)))
     s = (f'<svg viewBox="0 0 {VW} {vh}" style="display:block;width:100%;height:auto;" aria-hidden="true">{grid(sym, vh, vert)}'
          f'<defs><clipPath id="u{uid}"><rect x="0" y="0" width="{VW}" height="{by:.1f}"/></clipPath>'
          f'<clipPath id="d{uid}"><rect x="0" y="{by:.1f}" width="{VW}" height="{vh - by:.1f}"/></clipPath>'
@@ -93,7 +92,7 @@ def day_col(d):
 
 
 def mark(p, kind, vh, col, val):
-    """최고 · 최저 글자(HTML) — 색 = 그날 등락 색 하나(종가 · 퍼센트와 같게, 2026-11-14 사용자).
+    """최고 · 최저 글자(HTML) — 최고 = 빨강 · 최저 = 파랑, 글자 · 숫자 · 점 모두 (2026-11-14 사용자 정정: 한때 등락 색 하나로 했다가 되돌림).
     최고는 점 위, 최저는 점 아래. 좌우 끝 가까우면 상자 끝에서 EDGE 만큼 띄운다.
     최고 글자가 오른쪽 위 숫자 줄 자리(가로 50% 넘고 위 40 안)에 오면 점 왼쪽 옆으로 비킨다."""
     x, y = p[0] / VW * 100, p[1] / vh * 100
@@ -122,8 +121,7 @@ def head(d):
 def chart_box(sym, d, kind, uid):
     vh, vert = VARIANTS[kind]
     s, hi, lo = svg(sym, d, vh, uid, vert)
-    col = day_col(d)
-    return f'<div class="hc-box">{s}{head(d)}{mark(hi, "최고", vh, col, d["h"])}{mark(lo, "최저", vh, col, d["l"])}</div>'
+    return f'<div class="hc-box">{s}{head(d)}{mark(hi, "최고", vh, UP, d["h"])}{mark(lo, "최저", vh, DN, d["l"])}</div>'
 
 
 def card(sym, d, kind):
@@ -135,12 +133,9 @@ def card(sym, d, kind):
             f'<div class="report-block"><div class="report-columns"><ul><li>{SUMMARY[sym]}</li></ul></div></div></a></div>')
 
 
-VARIANTS = {"B1": (150, False), "B2": (150, True), "B3": (172, False), "B4": (172, True)}   # (상자 높이 viewBox, 세로 눈금)
+VARIANTS = {"B1": (150, False)}   # 2026-11-14 사용자 B1 확정 (B2 세로 눈금 · B3 · B4 높은 상자는 뺌)   # (상자 높이 viewBox, 세로 눈금)
 SPECS = [
     ("B1", "가로 눈금", "상자 크기 = 지금 그림과 같음(2.27 : 1). 배경에 가로 눈금 3줄"),
-    ("B2", "가로 · 세로 눈금", "B1 에 한 시간마다 세로 눈금을 더함(한국 시간 정시)"),
-    ("B3", "가로 눈금 + 상자 조금 높게", "상자 높이 +15%(2 : 1) — 위 숫자 줄 · 아래 최저 글자 자리를 비우고도 선이 덜 납작함. 카드가 약 20px 길어짐"),
-    ("B4", "가로 · 세로 눈금 + 상자 조금 높게", "B3 에 세로 눈금"),
 ]
 
 CSS = """
@@ -210,9 +205,9 @@ def main():
     html = ('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             '<title>홈 카드 그래프</title>' + home_css() + f"<style>{CSS}</style></head>"
             '<body data-pv-view="home" style="background:#F3F4F6;"><div class="hc-page">'
-            '<div class="hc-bar"><h1>홈 카드 그래프 · B 기준</h1></div>'
+            '<div class="hc-bar"><h1>홈 카드 그래프 · B1</h1></div>'
             '<p style="font-size:14px;line-height:21px;color:#6B7280;margin:10px 0 0;">실제 홈 카드 그대로(아이콘 · 제목 · 날짜 · 요약 한 줄)이고, 그래프 상자는 지금 그림과 같은 크기입니다. '
-            '글자 = 전날 대비 14 · 종가 16 · 최고 · 최저 12, 색은 모두 그날 등락 색 하나. 자료 = 11월 13일 실제 5분봉(미국은 한국 시간 11월 14일 아침 마감).</p>'
+            '글자 = 전날 대비 14 · 종가 16 · 최고 · 최저 12. 전날 대비 · 종가 = 그날 등락 색, 최고 = 빨강 · 최저 = 파랑. 자료 = 11월 13일 실제 5분봉(미국은 한국 시간 11월 14일 아침 마감).</p>'
             + "".join(secs) + f"</div><script>{JS}</script></body></html>")
     out = os.path.join(OUT, "mock_home_card_day.html")
     with open(out, "w", encoding="utf-8") as f:
