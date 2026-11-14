@@ -3144,7 +3144,7 @@
  },
  "90e0a44e38f7": {
   "lines": [
-   "엔비디아 경영진 혼란과 민주당 의회의 AI 수요 변화 전망"
+   "엔비디아 경영진 혼란과 민주당의 의회 통제로 인한 AI 수요 변화 전망"
   ],
   "tags": [
    {
@@ -3157,12 +3157,14 @@
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T18:29:14.798826+00:00",
-  "n_src": 900
+  "at": "2026-11-14T21:46:28.169451+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "3f887a4ae919": {
   "lines": [
-   "브룩필드와 블랙스톤의 미국 야외 산업용 보관 부지 투자 확대"
+   "블랙스톤과 브룩필드의 미국 산업용 야외 보관 부지 투자",
+   "AI 인프라 확장에 따른 중장비 수요 증가"
   ],
   "tags": [
    {
@@ -3170,13 +3172,22 @@
     "tickers": [],
     "sector": "XLRE",
     "issue": "REAL_ESTATE",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLRE",
+    "issue": "AI_CAPEX",
     "dir": "positive",
     "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T18:29:14.798826+00:00",
-  "n_src": 900
+  "at": "2026-11-14T21:46:28.900626+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "e62244f38033": {
   "lines": [
@@ -3322,5 +3333,61 @@
   "model": "groq:qwen/qwen3.8-27b",
   "at": "2026-11-14T18:29:20.663947+00:00",
   "n_src": 900
+ },
+ "daadbbb0bd00": {
+  "lines": [
+   "스타십 15차 시험 비행에서 상단부 회수 성공",
+   "텍사스 스타베이스 발사대의 기계식 팔을 이용한 로켓 회수"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T21:46:28.169451+00:00",
+  "n_src": 900
+ },
+ "10ab3d931d5f": {
+  "lines": [
+   "S&P 500 주간 2.5% 상승 기록",
+   "나스닥 지수 주간 2.3% 상승"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-14T21:46:28.169451+00:00",
+  "n_src": 334
  }
 }

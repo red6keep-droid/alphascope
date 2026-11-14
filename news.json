@@ -1,11 +1,35 @@
 {
-  "updated_at": "2026-11-14 18:29:20 UTC",
+  "updated_at": "2026-11-14 21:46:28 UTC",
   "items": [
+    {
+      "title": "SpaceX catches upper stage of Starship rocket in historic first",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/spacex-plans-to-try-first-ever-catch-of-starship-rocket-from-orbit.html",
+      "published": "2026-11-14 21:40:27",
+      "title_ko": "스페이스X, 역사상 최초로 스타십 로켓 상단 회수 성공",
+      "summary_ko": "스타십 테스트 비행 15차는 로켓 부스터와 상단 모두를 회수하려 시도한 첫 사례",
+      "lines": [
+        "스타십 15차 시험 비행에서 상단부 회수 성공",
+        "텍사스 스타베이스 발사대의 기계식 팔을 이용한 로켓 회수"
+      ]
+    },
+    {
+      "title": "Nvidia's leadership crisis rattles the AI trade. Here's how we're adjusting our portfolio",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/11/14/nvidias-leadership-crisis-rattles-wall-street-how-were-adjusting.html",
+      "published": "2026-11-14 18:48:39",
+      "title_ko": "엔비디아의 리더십 위기가 AI 트레이드를 흔들다, 포트폴리오 조정 방법",
+      "summary_ko": "S&P 500 지수는 주간 2.5% 상승을 기록했고 나스닥 지수는 2.3% 상승",
+      "lines": [
+        "S&P 500 주간 2.5% 상승 기록",
+        "나스닥 지수 주간 2.3% 상승"
+      ]
+    },
     {
       "title": "Nationwide ground stop followed contractor upgrade to L3Harris telecommunication system: DOT’s Duffy",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/14/faa-ground-stop-flights-resume-delays.html",
-      "published": "2026-11-14 18:17:18",
+      "published": "2026-11-14 18:32:47",
       "title_ko": "FAA 운항 중단 해제 후에도 항공편 차질 지속, 일부 대학 미식축구 경기 연기",
       "summary_ko": "",
       "lines": [
@@ -36,7 +60,7 @@
       "kind": "media",
       "tag": "기업 사건",
       "direction": "positive",
-      "n_channels": 3,
+      "n_channels": 2,
       "lines": [
         "에드 루들로 발언 : 앤트로픽 IPO는 다음 주 예정대로 진행될 예정",
         "에드 루들로 발언 : 앤트로픽은 엔비디아 장비 구매에 수억 달러 규모 연계",
@@ -52,7 +76,7 @@
       "published": "2026-11-14 15:45:33",
       "kind": "media",
       "tag": "AI 투자 · 반도체 수요",
-      "direction": "neutral",
+      "direction": "positive",
       "n_channels": 1,
       "lines": [
         "출연자 발언 : 데이터센터 약 10%에서 20% 안팎 무산 가능성",
@@ -71,6 +95,18 @@
       "lines": [
         "트럼프 미 대통령의 중국 방문",
         "일론 머스크의 아시아태평양경제협력체 정상회의 동행 예정"
+      ]
+    },
+    {
+      "title": "Rising rents draw Wall Street money to industrial outdoor storage lot investments across the U.S.",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/real-estate-rental-income-industrial-storage-market.html",
+      "published": "2026-11-14 15:14:57",
+      "title_ko": "임대료 상승으로 월스트리트 자금이 미국 전역의 야외 산업용 보관 부지 투자로 몰려들고 있다",
+      "summary_ko": "브룩필드와 블랙스톤을 포함한 월스트리트 거물들이 미국 전역의 산업용 야외 보관 부동산 투자 유치",
+      "lines": [
+        "블랙스톤과 브룩필드의 미국 산업용 야외 보관 부지 투자",
+        "AI 인프라 확장에 따른 중장비 수요 증가"
       ]
     },
     {
@@ -115,44 +151,6 @@
       ]
     },
     {
-      "title": "Berkshire breaks out to record high with fourth-quarter rally reaching 19%",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/berkshire-breaks-out-to-record-high-with-fourth-quarter-rally-reaching-19percent.html",
-      "published": "2026-11-14 14:02:39",
-      "title_ko": "버크셔, 4분기 19% 랠리와 함께 사상 최고치 경신",
-      "summary_ko": "버크셔 해서웨이의 주가가 4거래일 연속 사상 최고치 마감을 기록하며 강세 주간 마감",
-      "lines": [
-        "버크셔해서웨이 주가 4분기 19.1% 상승하며 사상 최고치 경신",
-        "버크셔해서웨이 A주 11회, B주 10회 사상 최고치 마감 기록",
-        "S&P 500 지수 1.2% 하락과 대비되는 버크셔 주가 강세",
-        "버크셔해서웨이 B주 연초 이후 S&P 500 대비 7.5%p 초과 수익"
-      ]
-    },
-    {
-      "title": "Retailers are turning to entertainment to win shoppers’ attention",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/retailers-invest-entertainment.html",
-      "published": "2026-11-14 13:00:01",
-      "title_ko": "소매업체들이 쇼퍼들의 이목을 사로잡기 위해 엔터테인먼트로 눈을 돌리고 있다",
-      "summary_ko": "소매업체들이 청중 주목 경쟁 가속화로 엔터테인먼트 스튜디오에 투자 및 구축 증가",
-      "lines": [
-        "갭(Gap) 엔터테인먼트 총괄 책임자(CEO) 직책 신설 및 파라마운트 출신 임원 영입",
-        "갭(Gap) 엔터테인먼트 스튜디오 투자 확대 및 콘텐츠 라이선싱 플랫폼 구축"
-      ]
-    },
-    {
-      "title": "Meet the seven co-founders of Anthropic",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/meet-the-seven-co-founders-of-anthropic.html",
-      "published": "2026-11-14 12:15:01",
-      "title_ko": "앤스로픽의 공동 창업자 7명을 만나다",
-      "summary_ko": "",
-      "lines": [
-        "연구원과 전직 기자 및 공직자와 엔지니어 등 7명이 2021년 앤스로픽 공동 창립",
-        "11월 19일 거래 시작 예정인 기업공개 추진"
-      ]
-    },
-    {
       "title": "FAA 전국 항공기 운항 중단",
       "title_ko": "FAA 전국 항공기 운항 중단",
       "summary_ko": "미 연방항공청이 통신 장애로 미국 전역의 항공기 운항을 일시 중단",
@@ -161,7 +159,7 @@
       "published": "2026-11-13 23:29:36",
       "kind": "media",
       "tag": "지정학",
-      "direction": "negative",
+      "direction": "neutral",
       "n_channels": 2,
       "lines": [
         "FAA 장관 발언 : 통신 장애로 미 전역 공항 이륙 일시 중단",
