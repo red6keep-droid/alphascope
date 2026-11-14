@@ -76,6 +76,7 @@ def is_char(tok):
     return bool(re.fullmatch(r"\{(.+?)\}", tok or "")) and tok[1:-1] in CHARS
 
 
+BASIS = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:0 0 8px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;"
 NOTE = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:24px 0 0;padding:12px 0 0 {dk.ALIGN_PX}px;border-top:1px solid #E2E8F0;word-break:keep-all;"
 
 
@@ -252,7 +253,9 @@ def render(md, links, next_href="#"):
             continue
         elif ln.strip() == "---" or not ln.strip():
             pass
-        elif ln.startswith("※") or ln.startswith("자료:"):
+        elif ln.startswith("※"):   # 본문 안 근거 안내 — 그래프 위 작은 회색 한두 줄, 구분선 없이 (2026-11-14 사용자: 그래프가 어떻게 나왔는지 짧게)
+            out.append(f'<p data-course-basis="1" style="{BASIS}">{inline(ln, links)}</p>')
+        elif ln.startswith("자료:"):
             out.append(f'<p style="{NOTE}">{inline(ln, links)}</p>')
         elif ln.startswith("(") and ln.endswith(")"):
             out.append(f'<p style="margin:-4px 0 16px;padding-left:{dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">{inline(ln, links)}</p>')
