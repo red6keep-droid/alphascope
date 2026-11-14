@@ -88,7 +88,7 @@
     this.btns = el('div', 'display:flex;gap:6px;flex:none;');
     this.top.appendChild(this.price); this.top.appendChild(this.btns);
     this.sub = el('div', 'font-size:13px;line-height:19px;color:' + NOTE + ';margin:0 0 2px;font-variant-numeric:tabular-nums;');
-    this.ohlc = el('div', 'display:grid;grid-template-columns:repeat(4,auto);justify-content:space-between;gap:0 8px;font-size:13px;line-height:19px;margin:0 0 6px;font-variant-numeric:tabular-nums;');
+    this.ohlc = el('div', 'white-space:nowrap;overflow:hidden;font-size:13px;line-height:19px;margin:0 0 6px;font-variant-numeric:tabular-nums;');
     this.menuBox = el('div', '');
     this.wrap = el('div', 'position:relative;');
     this.cv = el('canvas', 'display:block;width:100%;touch-action:pan-y;cursor:crosshair;');
@@ -125,18 +125,28 @@
     // 일 → 주 → 월 → 분기 → 년 → 일 한 버튼 (2026-11-13 · 11-14 사용자)
     var cyc = btn(UNIT_KO[this.unit], false); cyc.style.minWidth = '44px'; cyc.setAttribute('aria-label', '일봉 · 주봉 · 월봉 · 분기봉 · 년봉 바꾸기');
     cyc.onclick = function () { self.unit = UNITS[(UNITS.indexOf(self.unit) + 1) % UNITS.length]; self.build(); self.draw(); }; t.appendChild(cyc);
-    if (this.full) { var ind = btn('지표', this.menu); ind.onclick = function () { self.menu = !self.menu; self.topBar(); self.draw(); }; t.appendChild(ind); }
-    var fs = el('button', 'font:inherit;width:32px;height:30px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;',
-      this.full ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.6" stroke-linecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>'
-                : '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4v4M14 2l-4 4M6 2H2v4M2 2l4 4M10 14h4v-4M14 14l-4-4M6 14H2v-4M2 14l4-4"/></svg>');   // 네 방향 화살표 (2026-11-14 사용자 C안)
-    fs.setAttribute('aria-label', this.full ? '닫기' : '전체 화면');
+    var IB = 'font:inherit;width:32px;height:30px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+    if (this.full) {   // 지표 = 글자 대신 아이콘 버튼(조절 막대 셋), 열려 있으면 검은 바탕 (2026-11-14 사용자)
+      var ind = el('button', IB + 'border:1px solid ' + (this.menu ? '#111' : '#E2E8F0') + ';background:' + (this.menu ? '#111' : '#fff') + ';',
+        '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="' + (this.menu ? '#fff' : '#111') + '" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12M2 8h12M2 12h12"/><circle cx="5" cy="4" r="1.6" fill="' + (this.menu ? '#111' : '#fff') + '"/><circle cx="11" cy="8" r="1.6" fill="' + (this.menu ? '#111' : '#fff') + '"/><circle cx="7" cy="12" r="1.6" fill="' + (this.menu ? '#111' : '#fff') + '"/></svg>');
+      ind.setAttribute('aria-label', '지표'); ind.onclick = function () { self.menu = !self.menu; self.topBar(); self.draw(); }; t.appendChild(ind);
+      return this.menuDraw();
+    }
+    var fs = el('button', IB + 'border:1px solid #E2E8F0;background:#fff;',
+      '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4v4M14 2l-4 4M6 2H2v4M2 2l4 4M10 14h4v-4M14 14l-4-4M6 14H2v-4M2 14l4-4"/></svg>');   // 네 방향 화살표 (2026-11-14 사용자 C안)
+    fs.setAttribute('aria-label', '전체 화면');
     fs.onclick = function () { self.toggleFull(); }; t.appendChild(fs);
-    var m = this.menuBox; m.innerHTML = ''; m.style.cssText = '';
+    this.menuDraw();
+  };
+  Chart.prototype.menuDraw = function () {
+    var self = this, m = this.menuBox; m.innerHTML = ''; m.style.cssText = '';
     if (this.full && this.menu) {
       m.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 8px;';
       var u = this.unit === 'D' ? '일' : this.unit === 'W' ? '주' : '';
       [5, 20, 60, 120, 200].forEach(function (n) {
-        var b = btn(n + u, !!self.on.ma[n] && self.maOn); b.onclick = function () { self.maOn = true; self.on.ma[n] = !self.on.ma[n]; self.topBar(); self.draw(); }; m.appendChild(b);
+        var b = btn(n + u, false), onMa = !!self.on.ma[n] && self.maOn;
+        if (onMa) { b.style.borderColor = MA_COL[n]; b.style.color = MA_COL[n]; b.style.fontWeight = '600'; } else b.style.color = NOTE;   // 켜면 선 색 테두리 · 글자 (2026-11-14 사용자)
+        b.onclick = function () { self.maOn = true; self.on.ma[n] = !self.on.ma[n]; self.topBar(); self.draw(); }; m.appendChild(b);
       });
       var bb = btn('볼린저 밴드', this.on.boll); bb.onclick = function () { self.on.boll = !self.on.boll; self.topBar(); self.draw(); }; m.appendChild(bb);
       m.appendChild(el('span', 'flex-basis:100%;height:0;'));
@@ -150,7 +160,12 @@
       this.ph = document.createComment('candle');
       this.root.parentNode.insertBefore(this.ph, this.root);
       this.ov = el('div', 'position:fixed;inset:0;z-index:2147483000;background:#fff;display:flex;flex-direction:column;padding:12px 12px max(12px,env(safe-area-inset-bottom));box-sizing:border-box;overflow:auto;');
-      this.ov.appendChild(el('div', 'font-size:17px;line-height:24px;font-weight:700;color:#111;margin:0 0 6px;', this.d.name));
+      var head = el('div', 'display:flex;align-items:center;gap:8px;margin:0 0 6px;'), self = this;
+      head.appendChild(el('div', 'flex:1;min-width:0;font-size:17px;line-height:24px;font-weight:700;color:#111;', this.d.name));
+      var cx = el('button', 'flex:none;width:30px;height:30px;border-radius:50%;background:#F1F5F9;border:0;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;',
+        '<svg width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="#6B7280" stroke-width="1.4" stroke-linecap="round"><path d="M2 2l6 6M8 2L2 8"/></svg>');   // 회색 원 닫기(범례 닫기와 같은 꼴, 큰 것 30) — 종목 이름 줄 (2026-11-14 사용자)
+      cx.setAttribute('aria-label', '닫기'); cx.onclick = function () { self.toggleFull(); }; head.appendChild(cx);
+      this.ov.appendChild(head);
       this.ov.appendChild(this.root);
       document.body.appendChild(this.ov); document.documentElement.style.overflow = 'hidden';
       this.full = true; this.on.ma[200] = this.on.ma[200] || false; this.n = Math.min(this.unit === 'D' ? 120 : VIEW[this.unit] * 2, this.bars.length);
@@ -215,7 +230,7 @@
   Chart.prototype.draw = function () {
     var self = this, cv = this.cv, W = Math.floor(this.root.clientWidth); if (!W) return;
     // 작은 화면 = 그림을 카드 오른쪽 · 아래 안쪽 여백만큼 넓혀 종가 칸이 카드 외곽선에 붙게 (2026-11-14 사용자)
-    var box = getComputedStyle(this.root.parentNode), padR = this.full ? 0 : Math.round(parseFloat(box.paddingRight) || 0), padB = this.full ? 0 : Math.round(parseFloat(box.paddingBottom) || 0);
+    var box = getComputedStyle(this.root.parentNode), padR = Math.round(parseFloat(box.paddingRight) || 0), padB = this.full ? 0 : Math.round(parseFloat(box.paddingBottom) || 0);
     this.wrap.style.marginRight = -padR + 'px'; this.root.style.marginBottom = -padB + 'px'; W += padR;
     if (this.n > this.maxN()) { this.n = Math.min(this.maxN(), this.bars.length); this.end = Math.max(this.end, this.n); }
     var lowerH = this.on.lower === 'none' || !this.full ? 0 : 90, priceH = 264, gap = lowerH ? 26 : 0;   // gap = 거래량 범례 줄
@@ -235,9 +250,8 @@
     for (var i = s; i < this.end; i++) { for (var n in this.on.ma) if (maShow(n)) look(this.ma[n][i]); if (this.on.boll) { look(this.bb.up[i]); look(this.bb.lo[i]); } }
     // 오른쪽 가격 칸 폭 — 전체 화면 66 고정, 작은 화면 = 가장 긴 숫자 + 왼쪽 9 · 오른쪽 3 (2026-11-14 사용자 "0 기준 우측 여백 최대한 좁게")
     var TX = this.full ? 10 : 9, TFS = this.full ? FS : 11, AFS = this.full ? FS : 10;   // 작은 화면: 종가 칸 · 누른 날 검은 칸 11, 오른쪽 눈금 · 아래 날짜 · 최고 · 최저 10 (2026-11-14 사용자)
-    if (this.full) this.axisW = AXIS_W;
-    else {
-      var mw = 0; g.font = AFS + 'px ' + font; ticks(lo, hi, 5).forEach(function (t) { mw = Math.max(mw, g.measureText(fmt(t, self.dec)).width); });
+    {   // 전체 화면도 숫자 폭에 맞춤 (2026-11-14 사용자 "작은 것처럼")
+      var mw = 0; g.font = AFS + 'px ' + font; ticks(lo, hi, this.full ? 6 : 5).forEach(function (t) { mw = Math.max(mw, g.measureText(fmt(t, self.dec)).width); });
       g.font = '600 ' + TFS + 'px ' + font; [lo, hi, this.bars[this.end - 1][4]].forEach(function (v) { mw = Math.max(mw, g.measureText(fmt(v, self.dec)).width); });
       this.axisW = TX + Math.ceil(mw) + 3;
     }
@@ -245,7 +259,7 @@
     var avg = this.d.avg, avgIn = avg && avg.price >= lo - (hi - lo) * 0.3 && avg.price <= hi + (hi - lo) * 0.3;
     if (avgIn) look(avg.price);
     if (this.log && lo <= 0) this.log = false;
-    var useLog = this.full && this.log;   // 작은 화면 = Linear · Log 버튼 없음
+    var useLog = false;   // 작은 화면 = Linear · Log 버튼 없음
     var T = useLog ? Math.log : function (v) { return v; }, iT = useLog ? Math.exp : function (v) { return v; };
     var tlo = T(lo), thi = T(hi), y0p = TOPS + 22, y1p = TOPS + priceH - 22;
     var Y = function (v) { return Math.round(y0p + (thi - T(v)) / ((thi - tlo) || 1) * (y1p - y0p)) + 0.5; };
@@ -370,13 +384,12 @@
     var dch = prevL ? last[4] - prevL[4] : 0, dp = prevL ? dch / prevL[4] * 100 : 0, cc = dch > 0 ? UP : dch < 0 ? DN : INK;
     this.price.innerHTML = '<b style="' + (this.full ? 'font-size:20px;line-height:28px;color:' + INK : 'font-size:15px;line-height:21px;color:' + cc) + ';">' + fmt(last[4], this.dec) + '</b> <span style="font-size:14px;color:' + cc + ';">' + tri(dch) + fmt(Math.abs(dch), this.dec) + ' ' + sgnPct(dp) + '</span>';
     var volTxt = '거래량 <span style="color:' + INK + ';">' + fmt(last[5], 0) + '</span>';
-    if (this.full) this.sub.innerHTML = volTxt;
-    else this.price.innerHTML += ' <span style="font-size:13px;color:' + NOTE + ';">' + volTxt + '</span>';   // 작은 화면 = 증감 옆 한 줄
-    this.sub.style.display = this.full ? '' : 'none'; this.ohlc.style.display = this.full ? '' : 'none';   // 작은 화면 = 시가 · 고가 · 저가 · 종가 없음
+    this.price.innerHTML += ' <span style="font-size:13px;color:' + NOTE + ';">' + volTxt + '</span>';   // 거래량 = 증감 옆 한 줄 (전체 화면도, 2026-11-14 사용자)   // 작은 화면 = 증감 옆 한 줄
+    this.sub.style.display = 'none'; this.ohlc.style.display = this.full ? '' : 'none';   // 작은 화면 = 시가 · 고가 · 저가 · 종가 없음
     var ob = this.bars[sel === null ? this.bars.length - 1 : sel], obp = this.bars[(sel === null ? this.bars.length - 1 : sel) - 1], ref = obp ? obp[4] : ob[1];
     this.ohlc.innerHTML = [['시가', 1], ['고가', 2], ['저가', 3], ['종가', 4]].map(function (k) {
       var v = ob[k[1]], c = v > ref ? UP : v < ref ? DN : INK;
-      return '<span style="white-space:nowrap;"><span style="color:' + NOTE + ';">' + k[0] + '</span> <span style="color:' + c + ';">' + fmt(v, self.dec) + '</span></span>';
+      return '<span style="white-space:nowrap;margin-right:14px;"><span style="color:' + NOTE + ';">' + k[0] + '</span> <span style="color:' + c + ';">' + fmt(v, self.dec) + '</span></span>';
     }).join('');
     // 왼쪽 위 = 이동평균 범례(숫자 = 선 색) + 닫기 — 누르면 그날 이동평균 값 표
     var mas = [5, 20, 60, 120, 200].filter(function (n) { return maShow(n); });
@@ -394,7 +407,7 @@
       this.legend.querySelector('[data-x]').onclick = function () { self.maOn = true; self.topBar(); self.draw(); };
     } else { this.legend.style.display = 'none'; }
     this.scaleB.innerHTML = (this.log ? 'Log' : 'Linear') + ' <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#111" stroke-width="1.3" stroke-linecap="round" style="vertical-align:0;"><path d="M2 4l3 3 3-3"/></svg>';
-    this.scaleB.setAttribute('aria-label', '가격축 일반 · 로그 바꾸기'); this.scaleB.style.right = '4px'; this.scaleB.style.display = this.full ? '' : 'none';
+    this.scaleB.setAttribute('aria-label', '가격축 일반 · 로그 바꾸기'); this.scaleB.style.right = '4px'; this.scaleB.style.display = 'none';   // Linear · Log 버튼 = 없음 (2026-11-14 사용자, 전체 화면도)
     // 최신으로 (넘겨본 뒤에만)
     this.latest.style.display = this.end < this.bars.length ? 'flex' : 'none';
     this.latest.style.left = (pw - 36) + 'px'; this.latest.style.top = (TOPS + priceH - 34) + 'px';
