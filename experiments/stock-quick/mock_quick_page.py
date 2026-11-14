@@ -20,7 +20,7 @@ import candle_chart as CC  # noqa: E402
 
 OUT = os.path.join(HERE, "output")
 # 예시 — 미국 간단 · 미국 이름 고친 것 · 한국(게임 · 해운 · 조선 = 업계 고침표 · 화학 = 업계 카드 없음) · 1년 안 된 종목 · 없는 코드
-SAMPLES = [("us", "UBER"), ("us", "SBUX"), ("us", "GPC"), ("kr", "259960"), ("kr", "011200"), ("kr", "010140"), ("kr", "009830"),
+SAMPLES = [("us", "UBER"), ("us", "SBUX"), ("us", "GPC"), ("kr", "259960"), ("kr", "011200"), ("kr", "010140"), ("kr", "009830"), ("kr", "004370"),
            ("us", "FDXF"), ("us", "ZZZZ")]
 
 
