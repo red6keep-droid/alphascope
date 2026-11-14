@@ -1,6 +1,6 @@
 """주식 강좌 목업 — 비공개 문서 저장소의 강좌 초안(마크다운)을 블로그 글 보기 모양으로 (2026-11-10 사용자: 목업에 구현).
 
-    python experiments/course/render_course.py            # D:/alphascope-docs/doc/기획/강좌/*.md → output/mock_*.html
+    python experiments/course/render_course.py            # 문서 저장소 doc/기획/강좌/*.md → output/mock_*.html (맥 ~/Desktop · Windows D:/ 자동)
     python experiments/course/render_course.py <초안 폴더>
 
 - 초안은 공개 저장소에 두지 않는다. 이 스크립트는 읽기만 하고, output/ 은 .gitignore (발행 전 글이 새지 않게).
@@ -11,6 +11,7 @@
     ==형광펜==  ++밑줄++  !!강조색!!  `> 💬 핵심 문장` = 말풍선(글마다 하나)  `- [v] 항목` = ✅ 체크 목록  이모지는 글에 직접
   빨강 · 파랑은 쓰지 않는다 — 사이트에서 빨강 = 오름 · 파랑 = 내림이라 강조색과 헷갈린다. 강조색 = 청록, 형광펜 = 노랑
 """
+import base64
 import glob
 import html
 import os
@@ -20,7 +21,9 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import design_kit as dk  # noqa: E402
 
-SRC = sys.argv[1] if len(sys.argv) > 1 else "D:/alphascope-docs/doc/기획/강좌"
+# 초안 폴더 — 집(맥) · 회사(Windows) 어디서든 (2026-11-14 사용자: 집 · 회사 오가며 작업). 인자로 주면 그 폴더
+_SRC_CANDIDATES = [os.path.expanduser("~/Desktop/alphascope-docs/doc/기획/강좌"), "D:/alphascope-docs/doc/기획/강좌"]
+SRC = sys.argv[1] if len(sys.argv) > 1 else next((p for p in _SRC_CANDIDATES if os.path.isdir(p)), _SRC_CANDIDATES[-1])
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
 SERIES = "주식 초보들이 경험하는 일반적인 착각"
 
@@ -47,6 +50,32 @@ DECO = {   # 강좌 글 꾸밈 — 색 · 모양은 여기 한 곳 (auto-blogspo
     "tail": "width:0;height:0;margin:-37px auto 0;border:12px solid transparent;border-top-color:#ECFDF5;border-bottom:0;",
     "check": f"list-style:none;margin:0 0 20px;padding:14px 16px;background:#F8FAFC;border-radius:12px;font-size:{dk.BODY};line-height:{dk.LH_BODY};color:#333;",
 }
+# 캐릭터 그림 (2026-11-14 사용자 시트 → cut_chars.py). 초안에 `{상승이-놀람}` 처럼 적으면 그 자리에 그림 — 이모지 자리 셋(강조 줄 · 대결 · 말풍선 아래) 모두
+# 상승이 = 신호 보고 산 사람 · 하락이 = 아무 날 산 사람 · 중심이 = 질문 · 설명하는 안내역
+CHARS = {
+    "상승이-매수": "up_buy", "상승이-놀람": "up_surprised", "상승이-식은땀": "up_sweat",
+    "하락이-못마땅": "down_grumpy", "하락이-밝게": "down_happy",
+    "중심이-고민": "mid_think", "중심이-설명": "mid_explain",
+}
+CHAR_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chars")
+CHAR_PX = {"line": 113, "vs": 150, "bubble": 125}   # 강조 줄 · 대결 · 말풍선 아래 — 2026-11-14 사용자: 캐릭터 부각, 30% 키움(72 · 96 · 80 → 94 · 125 · 104) 뒤 20% 더(→ 113 · 150 · 125)
+
+
+def char(tok, where):
+    """`{이름-상황}` → 그림(목업은 data URI, 발행 때 gh-pages 주소로). 이모지면 그대로."""
+    m = re.fullmatch(r"\{(.+?)\}", tok or "")
+    if not m or m.group(1) not in CHARS:
+        return tok
+    with open(os.path.join(CHAR_DIR, CHARS[m.group(1)] + ".webp"), "rb") as f:
+        src = "data:image/webp;base64," + base64.b64encode(f.read()).decode()
+    px = CHAR_PX[where]
+    return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:block;width:{px}px;height:{px}px;margin:0 auto;">'
+
+
+def is_char(tok):
+    return bool(re.fullmatch(r"\{(.+?)\}", tok or "")) and tok[1:-1] in CHARS
+
+
 NOTE = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:24px 0 0;padding:12px 0 0 {dk.ALIGN_PX}px;border-top:1px solid #E2E8F0;word-break:keep-all;"
 
 
@@ -119,7 +148,7 @@ def versus(items, links):
                     f'<div style="width:100%;box-sizing:border-box;flex:1 1 auto;display:flex;align-items:center;justify-content:center;padding:12px 10px;border-radius:16px;background:{bg};'
                     f'text-align:center;font-size:16px;line-height:24px;font-weight:700;color:{fg};word-break:keep-all;">{inline(say.strip(), links)}</div>'
                     f'<div style="width:0;height:0;border:10px solid transparent;border-top-color:{bg};border-bottom:0;"></div>'
-                    f'<div aria-hidden="true" style="margin:2px 0 0;font-size:52px;line-height:60px;">{who}</div>'
+                    f'<div aria-hidden="true" style="margin:2px 0 0;font-size:52px;line-height:60px;">{char(who, "vs")}</div>'
                     '<div style="display:flex;align-items:center;gap:6px;margin:4px 0 0;font-size:15px;line-height:22px;font-weight:700;color:#111;word-break:keep-all;text-align:center;">'
                     f'<span style="flex:none;width:10px;height:10px;border-radius:5px;background:{CHART_COLORS[k % len(CHART_COLORS)]};"></span>{inline(name.strip(), links)}</div></div>')
     vs = '<div aria-hidden="true" style="flex:none;align-self:center;font-size:14px;line-height:20px;font-weight:800;color:#9CA3AF;">VS</div>'
@@ -179,10 +208,10 @@ def render(md, links, next_href="#"):
         elif ln.startswith("> 💬"):   # `> 💬 문장` 또는 `> 💬🧐 문장`(꼬리 아래 캐릭터 지정)
             who, _, said = ln[2:].strip().partition(" ")
             out.append(f'<div style="{DECO["bubble"]}">{dk.tint(inline(said.strip(), links))}</div><div style="{DECO["tail"]}"></div>'
-                       f'<div aria-hidden="true" style="{DECO["bubble_char"]}">{who[1:] or "🧐"}</div>')
-        elif ln.startswith("> ") and is_emoji(ln[2:].split(" ")[0]):
+                       f'<div aria-hidden="true" style="{DECO["bubble_char"]}">{char(who[1:], "bubble") or "🧐"}</div>')
+        elif ln.startswith("> ") and (is_emoji(ln[2:].split(" ")[0]) or is_char(ln[2:].split(" ")[0])):
             who, _, said = ln[2:].strip().partition(" ")
-            out.append(f'<div data-course-char="1" style="{DECO["char"]}"><span aria-hidden="true" style="{DECO["char_icon"]}">{who}</span>'
+            out.append(f'<div data-course-char="1" style="{DECO["char"]}"><span aria-hidden="true" style="{DECO["char_icon"]}">{char(who, "line")}</span>'
                        f'<span style="{DECO["char_text"]}">{dk.tint(inline(said.strip(), links))}</span></div>')
         elif ln.strip() == "[대결]":
             i += 1
@@ -244,8 +273,8 @@ def render(md, links, next_href="#"):
     return title, dk.align_titles(dk.WRAP_OPEN + "".join(out) + dk.WRAP_CLOSE)
 
 
-HEAD_LABEL = "강좌"   # 머리 줄(글 제목 자리)에 보일 메뉴 이름 (2026-11-10 사용자: 여기에 타이틀 쓰지 말고 메뉴명). 글 제목 · 검색 제목은 그대로
-LIST_URL = "https://alpha-scope.blogspot.com/search/label/%EA%B0%95%EC%A2%8C"   # 머리 줄 화살표 · [목록] = 강좌 글 목록
+HEAD_LABEL = "주식 공부"   # 머리 줄(글 제목 자리)에 보일 메뉴 이름 (2026-11-10 사용자: 여기에 타이틀 쓰지 말고 메뉴명; 2026-11-14 이름 강좌 → 주식 공부). 글 제목 · 검색 제목은 그대로
+LIST_URL = "https://alpha-scope.blogspot.com/p/study.html"   # 머리 줄 화살표 · [목록] = 주식 공부 목록 페이지 (2026-11-14 계획, 아직 없음 — 커리큘럼 문서 4절)
 
 
 def title_block(title):
