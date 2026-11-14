@@ -11,6 +11,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(_HERE, ".."))
 sys.path.insert(0, os.path.join(_HERE, "..", "nvda-report"))
 import design_kit as _dk  # noqa: E402
+import candle_chart as CDL  # noqa: E402 — 페이지 안 봉차트 (2026-11-14 일괄 적용)
 import chart_price as CP  # noqa: E402
 import render_html as R  # noqa: E402
 import universe_kr as U  # noqa: E402
@@ -109,6 +110,10 @@ def chart_url(sym, day=""):
 
 
 def sec_chart(s):
+    """가격 그래프 — 페이지 안 실제 봉차트(candle_chart, 2026-11-14 사용자 일괄 적용). 일봉이 없을 때만 옛 그림(PNG)."""
+    block = CDL.page_block(s["name"], BARS.get(s["sym"]) or [], 0) if BARS.get(s["sym"]) else ""
+    if block:
+        return block
     if not s.get("chart"):
         return ""
     url = chart_url(s["sym"], s.get("day", ""))

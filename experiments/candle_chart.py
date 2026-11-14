@@ -40,3 +40,18 @@ def card(name, bars, dec=0, avg=None, title="가격 흐름"):
     head = f'{dk.CHART_TITLE_M}{dk.esc(title)}</span>' if title else ""
     return (head + f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px;">'
             f'<div data-candle="{data}" style="min-height:300px;"></div></span></span>')
+
+
+MOCK_AVG = 0.97   # 목업에만 보이는 `내 평단` 예시 = 마지막 종가의 97% (실제 페이지엔 없다 — 회원 본인 화면에서만, 회원 기능 때)
+GAP = '<div style="height:20px;"></div>'   # 차트와 탭 사이 20 (2026-11-14 사용자)
+
+
+def page_block(name, bars, dec=0):
+    """종목 페이지 맨 위 봉차트 한 덩이 (2026-11-14 사용자: ETF 에서 다듬은 차트를 모든 종목 페이지에 일괄).
+    목업 = `내 평단` 예시가 있는 차트, 발행 본문 = 없는 차트 — render_pages · render_kr 의 mock-only / real-only 표시로 가른다. 자료가 모자라면 ""."""
+    real = card(name, bars, dec, title="")
+    if not real:
+        return ""
+    last = bars[-1]["close"]
+    mock = card(name, bars, dec, avg={"price": round(last * MOCK_AVG, dec), "label": "내 평단"}, title="")
+    return ("<!--mock-only-->" + mock + GAP + "<!--/mock-only--><!--real-only-->" + real + GAP + "<!--/real-only-->" + SCRIPT)

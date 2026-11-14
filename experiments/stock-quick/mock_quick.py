@@ -20,6 +20,7 @@ EXP = os.path.dirname(HERE)
 sys.path.insert(0, EXP)
 sys.path.insert(0, os.path.join(EXP, "daily-report"))
 import design_kit as dk  # noqa: E402
+import candle_chart as CDL  # noqa: E402 — 맨 위 봉차트 (2026-11-14 일괄 적용)
 import cards as C  # noqa: E402
 
 OUT = os.path.join(HERE, "output")
@@ -218,10 +219,10 @@ def page_us_full(smp):
     extra = {"stocks": {sym: st}, "revenue": {"series": {sym: rev} if rev else {}}, "capex": {sym: cash} if cash else {}, "peer_earnings": {}, "edgar": {}}
     analyze_tabs.build(s, snap, extra)
     s["expect"]["move"] = None   # 옵션(시장 예상 흔들림) = 정식 종목만 — 매일 받아야 뜻이 있다
-    tab_today = (line + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500")
+    tab_today = (R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500")
                  + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s))
     stamp_html = dk.price_stamp(s["day"], "US")
-    body = (stamp_html + RP.lead(s) + R._section("오늘", tab_today, line=False, tab="오늘")
+    body = (stamp_html + RP.lead(s) + CDL.page_block(smp["name"], b, 2) + R._section("오늘", tab_today, line=False, tab="오늘")   # 봉차트 = 탭 위 (정식 종목 · ETF 와 같게, 2026-11-14 일괄 적용)
             + R._section("매수의견", RP.card_opinions(s) or dk.muted("애널리스트 의견이 아직 없습니다."), tab="매수의견")
             + R._section("실적", RP.sec_expect(s) + RP.sec_calendar(s, ("earnings",), open_first=False), tab="실적")
             + R._section("업계상황", flow or dk.muted("업계 자료가 없습니다."), tab="업계상황")
@@ -288,17 +289,7 @@ def page_kr_full(smp):
     code = sym.split(".")[0]
     with open(os.path.join(tmp, f"{code}.html"), encoding="utf-8") as f:
         body = f.read()
-    import re as _re
-    # 종목 봉차트 그림(정식 종목만 만든다) 자리 → 오늘 탭 머리 + 브라우저가 그리는 1년 선 그래프 (미국 간단 정보와 같게)
-    b = snap["bars"][sym][-252:]
-    bmap = {x["day"]: x["close"] for x in snap["bars"].get(K.BENCH) or []}
-    bc = [bmap.get(x["day"]) for x in b]
-    bc = [v if v is not None else next(y for y in bc if y is not None) for v in bc]
-    c = [x["close"] for x in b]
-    series = [(smp["name"], [(v / c[0] - 1) * 100 for v in c], C.UP if c[-1] >= c[0] else C.DOWN, "solid"),
-              (K.BENCH_NAME, [(v / bc[0] - 1) * 100 for v in bc], "#94A3B8", "dash")]
-    line = dk.trend_card("1년 전 대비 등락", dk.month_ticks([x["day"] for x in b]), series, pct)
-    body = _re.sub(r'<a href="[^"]*radar-[^"]*-' + code + r'-stock-price[^"]*".*?</a>', lambda m: render_kr.R._section("오늘", line, line=False, tab="오늘"), body, count=1, flags=_re.S)
+    # 맨 위 차트 = render_kr.sec_chart 가 넣는 페이지 안 봉차트 그대로 (2026-11-14 일괄 적용 — 옛 1년 선 그래프로 바꾸던 자리)
     return body, f'{smp["name"]} {code} 간단 정보'
 
 

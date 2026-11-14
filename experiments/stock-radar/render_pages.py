@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.join(_HERE, ".."))
 sys.path.insert(0, os.path.join(_HERE, "..", "nvda-report"))
 
 import design_kit as _dk  # noqa: E402
+import candle_chart as CDL  # noqa: E402 — 페이지 안 봉차트 (2026-11-14 일괄 적용)
 import people_section  # noqa: E402  — 인물 발언 구획 (2026-11-07 사용자, 목업)
 import media_feed  # noqa: E402
 import news_store  # noqa: E402  — 공용 뉴스 처리 (헤드라인 · 요약 줄 고르기)
@@ -255,7 +256,10 @@ def chart_ref(sym):
 
 
 def sec_chart(s):
-    """가격 그래프 — NVDA 리포트 sec_chart 와 같은 자리 · 모양 (본문 맨 앞 요약 아래, 확대 보기)."""
+    """가격 그래프 — 페이지 안 실제 봉차트(candle_chart, 2026-11-14 사용자 일괄 적용 — ETF 와 같은 차트 · 자리). 일봉이 없을 때만 옛 그림(PNG)."""
+    block = CDL.page_block(s["name"], BARS.get(s["sym"]) or [], 2) if BARS.get(s["sym"]) else ""
+    if block:
+        return block
     if not s.get("chart"):
         return ""
     url = chart_url(s["sym"], s.get("day", ""))
