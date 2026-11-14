@@ -336,6 +336,7 @@ def us_pages(snap, live, fund):
     R = RP.R
     snap = dict(snap, caps=dict(snap.get("caps") or {}), earnings=dict(snap.get("earnings") or {}))
     pages = {}
+    crash = RP.CW.compute(snap["bars"], "us", [t[0] for t in E.US])   # 급락장에서 어땠나? — 종목 페이지와 같은 계산 · 카드 (2026-11-14 사용자)
     for sym, name, tracks, _a in E.US:
         b0 = snap["bars"].get(sym) or []
         if len(b0) < 30:
@@ -360,7 +361,7 @@ def us_pages(snap, live, fund):
             industry = "반도체" in tracks or sym in US_SECTOR   # 업종 하나를 담는 ETF 만 업계상황 탭 (지수형은 업계가 하나가 아니다)
             s["sector_flow"], s["bollinger"] = (analyze.sector_flow(snap, sym) if industry else None), analyze.bollinger(b)
             s["overheat"], s["drawdown"] = analyze.overheat(b, s["tech"]), analyze.drawdown(b, s["year_range"], snap, sym)
-            s.update(peer_moves=[], in_top=False, rank=None, industry_us=None, mom_12_1=None)
+            s.update(peer_moves=[], in_top=False, rank=None, industry_us=None, mom_12_1=None, crash=RP.CW.for_stock(crash, sym))
             days = [x["day"] for x in b][-252:]
             f = fund.get(sym) or {}
             s["industry_us"] = industry_us.build(sym, fred) if industry else None
@@ -372,7 +373,7 @@ def us_pages(snap, live, fund):
             hold = tab_holdings(f)
             body = (dk.price_stamp(s["day"], "US") + RP.lead(s)
                     + candle(name, b0, 2)   # 차트 = 탭 위 (2026-11-13 사용자)
-                    + R._section("오늘", today, line=False, tab="오늘")
+                    + R._section("오늘", today, line=False, tab="오늘") + RP.sec_crash(s)
                     + (R._section("업계상황", ind, tab="업계상황") if ind else "")   # 한국 ETF 와 같은 자리 (2026-11-14)
                     + (R._section("구성", hold, tab="구성") if hold else "")
                     + R._section("기본 정보", tab_basic(sym, f, b0), tab="기본 정보")
@@ -523,8 +524,10 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
     market = analyze_kr.flows(flows, snap["bars"].get(K.BENCH)) or {}
     market["overnight"] = analyze_kr.overnight(snap, day)
     mr = analyze_kr.A.market_regime({"bars": {analyze_kr.NC.REGIME_BENCHMARK: snap["bars"].get(K.BENCH) or []}})
+    crash = render_kr.RP.CW.compute(snap["bars"], "kr", syms)   # 급락장에서 어땠나? — 종목 페이지와 같은 계산 · 카드 (2026-11-14 사용자)
     for s in stocks:   # 순위 · 모멘텀 순위 없음 (mom_rank 가 없으면 카드가 빠진다)
-        s.update(market_regime=mr, sector_flow=analyze_kr.sector_flow(snap, s["sym"]), fx=market.get("fx"), crash=None, rank=None, in_top=False)
+        s.update(market_regime=mr, sector_flow=analyze_kr.sector_flow(snap, s["sym"]), fx=market.get("fx"), crash=render_kr.RP.CW.for_stock(crash, s["sym"]),
+                 rank=None, in_top=False)
     a = {"day": day, "fetched_at": snap.get("fetched_at"), "stocks": stocks, "market": market, "crash": {}}
     kbench = {x["day"]: x["close"] for x in snap["bars"].get(K.BENCH) or []}
 

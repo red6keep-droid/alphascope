@@ -392,7 +392,7 @@ def body(s, bars_s, related_links, extra_today=""):
     return RP.wrap(f'<div data-quick-title="{dk.esc(U.page_title(s["sym"]).replace(" · 실적 일정", ""))}">'   # wrap = 정식과 같은 틀 · 제목 정렬 · 합니다체
             + dk.report_stamp(dk.kst_close_day(s["day"], "US"), WHEN, close="새벽 마감")
             + RP.lead(s) + CC.card(s["name"], bars_s, 2, title="") + '<div style="height:20px;"></div>'
-            + R._section("오늘", today, line=False, tab="오늘")
+            + R._section("오늘", today, line=False, tab="오늘") + RP.sec_crash(s)   # 급락일에 버텼을 때만 (정식과 같은 자리 · 같은 카드)
             + (R._section("매수의견", op, tab="매수의견") if op else "")
             + (R._section("실적", ea, tab="실적") if ea else "")
             + R._section("업계상황", ind, tab="업계상황")
@@ -441,6 +441,7 @@ def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=No
     RP.NOW = datetime.datetime.now(datetime.timezone.utc)
     RP.PICK_SINCE = R.pick_window(bars_all.get(U.BENCH) or [], RP.NY, now=RP.NOW)[1]
     mr, ms = analyze.market_regime(snap), analyze.market_shock(snap)
+    crash = RP.CW.compute(bars_all, "us", quick)   # 급락장에서 어땠나? — 정식과 같은 계산(지수 −2% 넘은 날 버텼나), 일봉만 (2026-11-14 사용자)
     out, fails = {}, 0
     for sym in quick:
         try:
@@ -451,7 +452,7 @@ def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=No
             s["sector_flow"], s["bollinger"] = analyze.sector_flow(snap, sym), analyze.bollinger(b)
             s["overheat"], s["drawdown"] = analyze.overheat(b, s["tech"]), analyze.drawdown(b, s["year_range"], snap, sym)
             s["peer_moves"] = analyze.peer_moves(snap, sym, s["day"])
-            s.update(in_top=False, rank=None, mom_12_1=None, crash=None)
+            s.update(in_top=False, rank=None, mom_12_1=None, crash=RP.CW.for_stock(crash, sym))
             analyze_tabs.build(s, snap, extra)
             s["industry_us"] = industry_us.build(sym, fred_data)
             out[sym] = body(s, b, related(sym, ref_us[sym]) if related else [], extra_today(sym) if extra_today else "")
