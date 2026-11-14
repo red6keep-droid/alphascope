@@ -167,7 +167,7 @@ def post_body_of_page(page_html):
     return b.decode_contents() if b is not None else ""
 
 
-def build(card, body_html, title, url, day=None):
+def build(card, body_html, title, url, day=None, intraday=None):
     spec = CARDS[card]
     soup = BeautifulSoup(body_html, "html.parser")
     sec = report_sections(soup)
@@ -177,7 +177,7 @@ def build(card, body_html, title, url, day=None):
             nodes = prune_radar(sec[name]) if (card == "radar" and name == "발언") else sec[name]
             sections[name] = "".join(str(n) for n in nodes if isinstance(n, Tag))
     body_text = _ws(soup.get_text(" "))
-    return {
+    out = {
         "id": spec["id"],
         "label": spec["label"],
         "title": title,
@@ -187,6 +187,12 @@ def build(card, body_html, title, url, day=None):
         "chart": chart_of(soup) if spec["chart"] else None,
         "sections": sections,
     }
+    if intraday and spec["chart"]:   # 홈 증시 카드 하루 그래프 재료 (2026-11-14 사용자) — 못 받으면 키 없음 → 홈은 옛 그림(chart)
+        import intraday as ID
+        d = ID.fetch(intraday, out["date"], us=intraday != "^KS11")
+        if d:
+            out["intraday"] = d
+    return out
 
 
 def main(argv=None):
@@ -199,6 +205,7 @@ def main(argv=None):
     ap.add_argument("--url")
     ap.add_argument("--day")
     ap.add_argument("--out", required=True)
+    ap.add_argument("--intraday", help="하루 그래프 지수 (^GSPC · ^KS11) — 5분봉을 받아 카드 JSON 에 싣는다 (2026-11-14)")
     a = ap.parse_args(argv)
     if not a.body and not a.page:
         ap.error("--body 또는 --page")
@@ -219,7 +226,7 @@ def main(argv=None):
     if not body.strip():
         print(f"[cards] {a.card}: 본문 비어 있음 — 쓰지 않는다")
         return 2
-    data = build(a.card, body, title, url, day)
+    data = build(a.card, body, title, url, day, a.intraday)
     if not data["sections"]:
         print(f"[cards] {a.card}: 구획을 하나도 못 찾음 — 쓰지 않는다 (홈은 피드로 돈다)")
         return 2
@@ -227,7 +234,7 @@ def main(argv=None):
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False)
     size = os.path.getsize(a.out)
-    print(f"[cards] {a.card}: {a.out} {size:,}B · 날짜 {data['date']} · 구획 {list(data['sections'])} · 그래프 {'있음' if data['chart'] else '없음'}")
+    print(f"[cards] {a.card}: {a.out} {size:,}B · 날짜 {data['date']} · 구획 {list(data['sections'])} · 그래프 {'있음' if data['chart'] else '없음'} · 하루 그래프 {'있음' if data.get('intraday') else '없음'}")
     return 0
 
 

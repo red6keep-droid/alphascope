@@ -180,7 +180,7 @@ jobs:
       - name: Home card report.json
         if: hashFiles('experiments/daily-report/output/post_meta.json') != ''
         continue-on-error: true
-        run: python experiments/daily-report/home_card.py --card report --body experiments/daily-report/output/published_body.html --meta experiments/daily-report/output/post_meta.json --out deploy-cards/cards/report.json
+        run: python experiments/daily-report/home_card.py --card report --body experiments/daily-report/output/published_body.html --meta experiments/daily-report/output/post_meta.json --out deploy-cards/cards/report.json --intraday "^GSPC"   # 하루 그래프 5분봉 (2026-11-14)
 
       - name: Deploy report.json to gh-pages
         id: cards_deploy
