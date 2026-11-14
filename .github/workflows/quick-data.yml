@@ -1,11 +1,15 @@
 name: Quick stock data (간단 정보 853종목)
 
-# 간단 정보 데이터 — 미국 S&P 500 + 한국 코스피 200 · 코스닥 150, 종목마다 파일 하나 (2026-11-14, 기획 비공개 기획/회원-내-종목-기획.md 6-3-1 · 6-3-2).
+# 간단 정보 — 미국 S&P 500 + 한국 코스피 200 · 코스닥 150, 종목마다 화면 조각 하나 (2026-11-14, 기획 비공개 기획/회원-내-종목-기획.md 6-3-1 · 6-3-2 · 6-6).
+#   - 화면 = 정식 종목 렌더러 그대로(experiments/stock-quick/full_us.py · full_kr.py — 2026-11-14 사용자 "TIGER 2차전지처럼 · 정식과 거의 차이 없게").
+#     빠지는 것 = 옵션 · 뉴스 · 방송 · 소송. 상세 값은 주기에 맞춰 하루 상한만큼(첫 주에 나눠 채움).
 #   - 평일 17:40 KST 하루 한 번(한국 장 마감 뒤 · 미국은 지난밤 종가). 분은 :40 — 운영지침 11절 다른 쓰기 시각(:00 · :15 · :30 · :45 · :07 · :22 · :37 · :52 · :10)과 겹치지 않게.
-#   - AI 0 · Blogger 0 · 그림 0. 야후 일봉 묶음 9번(100개씩) + Finnhub 실적 달력 주 1회 15번 + DART 공시 목록 하루 약 20번.
-#   - 결과는 기록을 남기지 않는 브랜치 quick-data 에 통째로(force) — 저장소가 커지지 않는다. gh-pages(keep_files)와 섞지 않는다.
-#     커밋 둘: ① 데이터 ② version.json 에 ①의 커밋 번호. 브라우저는 @quick-data/version.json(purge) → @<커밋>/us/AAPL.json 으로 읽는다.
-#   - 게시 = 저장소 변수 QUICK_PUBLISH=true. 없으면 그림자 모드(수집 · 계산만 하고 올리지 않음, 결과는 아티팩트).
+#   - AI 0 · Blogger 0 · 그림 0. 야후: 일봉 묶음 약 10번 + 상세 하루 상한(미국 90 · 한국 60종목) + 고점 회복 묶음 2번. Finnhub 실적 달력 주 1회 약 17번(첫 실행 약 120번).
+#     SEC companyfacts 하루 100곳 · DART 하루 30곳(새 보고서만) + 기업개황 60곳 + 공시 목록 약 20번. FRED 하루 한 번.
+#   - 결과 = 기록을 남기지 않는 브랜치 quick-us · quick-kr 에 통째로(force) — 저장소가 커지지 않는다. 시장별로 나눈 것은 한 묶음이 jsDelivr 150MB 안에 들게.
+#     커밋 둘: ① 데이터 ② version.json 에 ①의 커밋 번호. 브라우저는 @quick-us/version.json(purge) → @<커밋>/us/UBER.html 로 읽는다.
+#   - 정식 자료(비교 묶음 · 자금 흐름 · 시장 일정 · 모은 기사)는 비공개 상태 저장소에서 읽기만. 간단 종목 저장값은 비공개 quick-state(다시 모을 수 있는 캐시라 기록 없이 덮어씀).
+#   - 게시 = 저장소 변수 QUICK_PUBLISH=true. 없으면 그림자 모드(만들기만 하고 올리지 않음, 표본만 아티팩트). 저장값은 그림자 모드에서도 남긴다(첫 주 채우기가 이어지게).
 #   - 받은 종목이 명단의 90% 밖이면 collect_quick.py 가 종료 코드 3 → 올리지 않고 전날 데이터 그대로.
 
 on:
@@ -14,7 +18,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: 'quick-data 브랜치에 올리기 (끄면 그림자 모드)'
+        description: 'quick-us · quick-kr 브랜치에 올리기 (끄면 그림자 모드)'
         type: boolean
         default: false
 
@@ -31,7 +35,7 @@ env:
 jobs:
   quick:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
 
@@ -43,65 +47,100 @@ jobs:
       - name: Install
         run: pip install -r experiments/nvda-report/requirements.txt
 
-      # 미국 기사 이름 찾기 재료 — 이미 모은 기사(비공개 상태 저장소 · gh-pages). 못 받으면 기사 줄만 빈다
-      - name: Collected news titles
+      # 정식 자료 — 읽기만: 미국 상세 값(radar/detail_cache · 비교 묶음) · 시장 일정(calendar.jsonl) · 모은 기사 · 한국 자금 흐름 · 고점 회복 · 시총(kr-state).
+      # 간단 종목 저장값 = quick-state. 못 받으면 그 카드만 빈다
+      - name: State (private alphascope-state, read)
         env:
           STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
         run: |
-          mkdir -p /tmp/news
+          mkdir -p /tmp/news /tmp/radar /tmp/qcache
           git fetch -q origin gh-pages && git show FETCH_HEAD:news_store_home.json > /tmp/news/home.json || true
-          if [ -n "$STATE_DEPLOY_KEY" ]; then
-            mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
-            ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
-            git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
-            git remote add state git@github.com:red6keep-droid/alphascope-state.git
-            git fetch -q state nvda-state && git show FETCH_HEAD:experiments/nvda-report/output/state/radar/news.json > /tmp/news/radar.json || true
-            git fetch -q state report-state && git show FETCH_HEAD:experiments/daily-report/output/state/news_stories.json > /tmp/news/daily.json || true
+          [ -z "$STATE_DEPLOY_KEY" ] && { echo "STATE_DEPLOY_KEY 없음 — 정식 자료 없이"; exit 0; }
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
+          if git fetch -q --no-tags state nvda-state:refs/remotes/state/nvda-state; then   # 한국 렌더러(us_calendar)가 이 이름으로 읽는다
+            S=refs/remotes/state/nvda-state; P=experiments/nvda-report/output/state
+            git show $S:$P/radar/news.json > /tmp/news/radar.json || true
+            git show $S:$P/radar/detail_cache.json > /tmp/radar/detail_cache.json || rm -f /tmp/radar/detail_cache.json
+            git show $S:$P/calendar.jsonl > /tmp/calendar.jsonl || true
           fi
-          ls -la /tmp/news
+          git fetch -q state report-state && git show FETCH_HEAD:experiments/daily-report/output/state/news_stories.json > /tmp/news/daily.json || true
+          if git fetch -q state kr-state; then git archive FETCH_HEAD experiments/kr-stocks/data | tar -x && echo "한국 정식 상태: $(ls experiments/kr-stocks/data | wc -l)개"; fi
+          if git fetch -q state quick-state; then git archive FETCH_HEAD | tar -x -C /tmp/qcache && echo "저장값: $(du -sh /tmp/qcache | cut -f1)"; else echo "저장값 없음 (첫 실행)"; fi
+          ls -la /tmp/news /tmp/radar
 
-      # 전날 데이터 — 오늘 못 받은 종목은 전날 파일 그대로 · 실적일 · 공시 저장값(_cache)
-      - name: Previous quick-data
+      # 전날 데이터 — 오늘 못 받은 종목은 전날 파일 · 조각 그대로
+      - name: Previous quick-us · quick-kr
         run: |
           mkdir -p /tmp/prev
-          if git fetch -q origin quick-data 2>/dev/null; then git archive FETCH_HEAD | tar -x -C /tmp/prev; echo "전날 데이터 $(ls /tmp/prev/us | wc -l) · $(ls /tmp/prev/kr | wc -l)"; else echo "전날 데이터 없음 (첫 실행)"; fi
+          for m in us kr; do   # 브랜치 안 = version.json + us/ (또는 kr/) → /tmp/prev/us/…
+            if git fetch -q origin quick-$m 2>/dev/null; then git archive FETCH_HEAD $m | tar -x -C /tmp/prev; echo "전날 $m $(ls /tmp/prev/$m | wc -l)"; else echo "전날 $m 없음 (첫 실행)"; fi
+          done
 
-      - name: Collect
+      - name: Collect · render
         id: collect
         env:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: |
           set +e
-          python experiments/stock-quick/collect_quick.py --out /tmp/qd --prev /tmp/prev --news /tmp/news/*.json
+          python experiments/stock-quick/collect_quick.py --out /tmp/qd --cache /tmp/qcache --prev /tmp/prev \
+            --radar /tmp/radar --calendar /tmp/calendar.jsonl --news /tmp/news/*.json
           code=$?
           echo "code=$code" >> "$GITHUB_OUTPUT"
           [ $code -eq 3 ] && { echo "받은 종목 부족 — 올리지 않는다"; exit 0; }
           exit $code
 
-      - name: Upload (shadow)
+      # 저장값은 게시 여부와 상관없이 남긴다 — 하루 상한으로 나눠 채우는 것이 이어지게. 다시 모을 수 있는 캐시라 기록 없이 덮어쓴다(저장소가 커지지 않게)
+      - name: Save quick-state (private, no history)
+        if: always() && steps.collect.outcome == 'success'
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          [ -z "$STATE_DEPLOY_KEY" ] && exit 0
+          cd /tmp/qcache
+          git init -q && git checkout -q --orphan quick-state
+          git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git add -A && git commit -q -m "quick state $(date -u +%F) [skip ci]"
+          git push -q -f git@github.com:red6keep-droid/alphascope-state.git HEAD:quick-state
+          echo "저장값 $(du -sh . | cut -f1)"
+
+      - name: Upload sample (shadow)
         if: env.DO_PUBLISH != 'true' && steps.collect.outputs.code == '0'
-        uses: actions/upload-artifact@v4
+        run: |
+          mkdir -p /tmp/sample/us /tmp/sample/kr
+          cp /tmp/qd/us/version.json /tmp/qd/us/UBER.* /tmp/qd/us/SBUX.* /tmp/sample/us/ 2>/dev/null || true
+          cp /tmp/qd/kr/version.json /tmp/qd/kr/259960.* /tmp/qd/kr/010140.* /tmp/sample/kr/ 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: env.DO_PUBLISH != 'true' && steps.collect.outputs.code == '0'
         with:
-          name: quick-data
-          path: /tmp/qd
+          name: quick-sample
+          path: /tmp/sample
           retention-days: 3
 
-      - name: Publish to quick-data (no history)
+      - name: Publish quick-us · quick-kr (no history)
         if: env.DO_PUBLISH == 'true' && steps.collect.outputs.code == '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd /tmp/qd
-          git init -q && git checkout -q --orphan quick-data
-          git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A && git commit -q -m "quick data $(date -u +%F)"
-          SHA=$(git rev-parse HEAD)
-          python -c "import json,sys;p='version.json';v=json.load(open(p));v['commit']=sys.argv[1];json.dump(v,open(p,'w'),ensure_ascii=False)" "$SHA"
-          git add version.json && git commit -q -m "version $SHA"
-          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:quick-data
-          echo "올림: 데이터 $SHA"
-          curl -sS -f "https://purge.jsdelivr.net/gh/${{ github.repository }}@quick-data/version.json" || echo "purge 실패 — 최대 12시간 뒤 갱신"
+          for m in us kr; do
+            mkdir -p /tmp/pub-$m/$m && cp -r /tmp/qd/$m/. /tmp/pub-$m/$m/ && mv /tmp/pub-$m/$m/version.json /tmp/pub-$m/version.json
+            cd /tmp/pub-$m
+            git init -q && git checkout -q --orphan quick-$m
+            git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A && git commit -q -m "quick $m $(date -u +%F)"
+            SHA=$(git rev-parse HEAD)
+            python -c "import json,sys;p='version.json';v=json.load(open(p));v['commit']=sys.argv[1];json.dump(v,open(p,'w'),ensure_ascii=False)" "$SHA"
+            git add version.json && git commit -q -m "version $SHA"
+            git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:quick-$m
+            echo "올림: quick-$m 데이터 $SHA · $(du -sh $m | cut -f1)"
+            curl -sS -f "https://purge.jsdelivr.net/gh/${{ github.repository }}@quick-$m/version.json" || echo "purge 실패 — 최대 12시간 뒤 갱신"
+            cd /tmp
+          done
 
       - name: Notify failure
         if: failure()
@@ -109,4 +148,4 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
-          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 간단 정보 데이터 (853종목)\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 간단 정보 (853종목)\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

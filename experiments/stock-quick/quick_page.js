@@ -1,7 +1,9 @@
 /* 간단 정보 고정 페이지 `stock-quick` — 주소 뒤 종목 코드(?s=UBER · ?s=259960)로 카드 조각을 받아 끼워 넣는다 (2026-11-14, 기획 6-3-1 · 6-6).
-   카드 HTML 은 매일 파이썬이 만든다(experiments/stock-quick/render_quick.py) → 기록 없는 브랜치 quick-data.
-   읽는 순서: @quick-data/version.json(매일 purge) → 커밋 번호 → @<커밋>/us/UBER.html. 커밋 번호 주소는 내용이 안 바뀌어 캐시를 지울 일이 없다.
-   jsDelivr 가 안 되면 GitHub 원본 주소로 한 번 더. 방문자 한 명 = 요청 2번 · 압축 약 8KB.
+   카드 HTML 은 매일 파이썬이 정식 종목 렌더러로 만든다(experiments/stock-quick/full_us.py · full_kr.py) → 기록 없는 브랜치 quick-us · quick-kr.
+   읽는 순서: @quick-us/version.json(매일 purge) → 커밋 번호 → @<커밋>/us/UBER.html. 커밋 번호 주소는 내용이 안 바뀌어 캐시를 지울 일이 없다.
+   **동기로 받는다** — 본문을 읽는 그 자리에서 끼워 넣어야 테마의 탭 · 봉차트 · 툴팁(페이지를 열 때 한 번 도는 스크립트)이 일반 글처럼 붙는다
+   (2026-11-14 목업: 비동기로 나중에 끼우면 탭이 안 생기고 봉차트가 빈 칸). 방문자 한 명 = 요청 2번 · 압축 약 33KB.
+   jsDelivr 가 안 되면 GitHub 원본 주소로 한 번 더, 그것도 안 되면 안내 한 줄.
    목업(로컬): <div id="as-quick" data-local="quick-data/" data-default="UBER"> — 커밋 번호 없이 같은 폴더에서 읽는다. */
 (function () {
   var root = document.getElementById('as-quick');
@@ -19,13 +21,23 @@
       ' <a href="' + LIST + '" style="color:#111;">전체 종목 목록</a>에서 찾아 주세요.</p>';
   }
   if (!s) { msg('종목을 고르지 않았습니다.'); return; }
-  var path = (/^\d{6}$/.test(s) ? 'kr/' : 'us/') + s + '.html';
+  var kr = /^\d{6}$/.test(s);
+  var branch = kr ? 'quick-kr' : 'quick-us';
+  var path = (kr ? 'kr/' : 'us/') + s + '.html';
 
-  function get(url) {
-    return fetch(url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); });
+  function getSync(url) {
+    try {
+      var x = new XMLHttpRequest();
+      x.open('GET', url, false);
+      x.send(null);
+      if (x.status >= 200 && x.status < 300) return x.responseText;
+    } catch (e) { /* 막히면 다음 주소 */ }
+    return null;
   }
   function show(html) {
     root.innerHTML = html;
+    var go = root.querySelector('[data-redirect]');
+    if (go && !local) { try { location.replace(go.getAttribute('data-redirect')); } catch (e) { /* 버튼이 남는다 */ } }   // 정식 종목 = 종목 분석 페이지로
     var nm = root.querySelector('[data-quick-title]');
     if (nm) {
       document.title = nm.getAttribute('data-quick-title') + ' | ' + document.title.split(' | ').pop();
@@ -33,15 +45,16 @@
       if (h) h.textContent = nm.getAttribute('data-quick-title');
     }
   }
-  function fail() { msg('이 종목의 간단 정보를 불러오지 못했습니다. 잠시 뒤 다시 열어 보거나,'); }
 
-  root.innerHTML = '<p style="font-size:15px;color:#6B7280;margin:12px 0;padding-left:6px;">불러오는 중…</p>';
-  if (local) { get(local + path).then(show).catch(fail); return; }
-  get(CDN + 'quick-data/version.json')
-    .then(function (t) { var v = JSON.parse(t); if (!v.commit) throw new Error('no commit'); return get(CDN + v.commit + '/' + path); })
-    .then(show)
-    .catch(function () {
-      // jsDelivr 가 안 되거나 옛 커밋이 지워졌을 때 — GitHub 원본(브랜치 최신)으로 한 번 더
-      get(RAW + 'quick-data/' + path).then(show).catch(fail);
-    });
+  var html = null;
+  if (local) {
+    html = getSync(local + path);
+  } else {
+    var v = null;
+    try { v = JSON.parse(getSync(CDN + branch + '/version.json') || 'null'); } catch (e) { v = null; }
+    if (v && v.commit) html = getSync(CDN + v.commit + '/' + path);
+    if (!html) html = getSync(RAW + branch + '/' + path);   // jsDelivr 가 안 되거나 옛 커밋이 지워졌을 때 — GitHub 원본(브랜치 최신)
+  }
+  if (html) show(html);
+  else msg('이 종목의 간단 정보를 불러오지 못했습니다. 잠시 뒤 다시 열어 보거나,');
 })();
