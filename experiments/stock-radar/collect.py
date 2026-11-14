@@ -105,6 +105,14 @@ def run():
     extra = sorted({U.BENCH, "^VIX", "SMH", *SECTOR_ETFS})
     peers = sorted({p for v in U.PEERS.values() for p in v} - set(syms))   # 함께 보는 회사 중 64종목 밖 — `함께 움직이는 종목은?` 오늘 등락 (2026-11-01 사용자 P263). 페이지는 만들지 않는다
     etfs = sorted(set(etf_universe.US_SYMS) - set(syms) - set(extra) - set(peers))   # 맨 뒤 — 늦은 봉 예비(15개) 자리를 종목이 먼저 쓰게
+    try:   # ETF 비중 1위 종목 — ETF 페이지 `함께 움직이는 종목은?` 비교 선 (2026-11-14, 같은 묶음 요청에 얹음 · 페이지는 만들지 않는다)
+        with open(os.path.join(BASE, "data", "etf_fund.json"), encoding="utf-8") as f:
+            fund = json.load(f)
+        fund = fund.get("funds", fund) if isinstance(fund, dict) else {}
+        tops = {str(v["top"][0][0]).replace(".", "-") for v in fund.values() if isinstance(v, dict) and v.get("top")}
+        etfs += sorted(tops - set(syms) - set(extra) - set(peers) - set(etfs))
+    except (OSError, ValueError, KeyError, IndexError, TypeError):
+        pass
     bars = _bars(syms + extra + peers + etfs)
     # 시총 · 실적일은 바뀌는 주기에 맞춰서만 (detail_cache, 2026-11-12 사용자) — 시총 = 새 거래일마다, 실적일 = 주 1회 · 발표 14일 안이면 매일 · 발표 지난 뒤 처음.
     # 하루 네 번 실행이 같은 날 값을 다시 받던 것 (64종목 × 2 × 4)
