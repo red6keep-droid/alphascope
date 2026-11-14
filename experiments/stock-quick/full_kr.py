@@ -310,13 +310,13 @@ def sec_expect(s):
 
 
 def opinions_tab(s):
-    if not s.get("analysts"):
+    if not s.get("analysts") and not s.get("broker"):
         return ""
     R.picks_card, keep = full_us._no_picks, R.picks_card
     try:
         closes = [b["close"] for b in (render_kr.BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]]
         return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), None, render_kr.won, lambda: render_kr.together_items(s),
-                                m0=render_kr.man_won, m2=render_kr.won, closes=closes)
+                                m0=render_kr.man_won, m2=render_kr.won, closes=closes, broker=s.get("broker"))   # 증권사 목표가(텔레그램, 2026-11-14)
     finally:
         R.picks_card = keep
 
@@ -375,6 +375,7 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
     # render_kr.write_all 의 준비 부분 그대로 (파일 쓰기 · 목록 페이지 · 방송 읽기 빼고)
     render_kr.KR_PRICES.clear()
     render_kr.KR_PRICES.update({x["code"]: (x["name"], x.get("ret_1d")) for x in stocks if x.get("ret_1d") is not None})
+    render_kr.attach_broker(stocks)   # 증권사 목표가 — 한국 정식 실행이 kr-state 에 남긴 broker_tg.json 을 읽기만
     macro_rows = render_kr.us_calendar()
     for x in stocks:
         x["company"] = extra["company"].get(x["code"]) or {}

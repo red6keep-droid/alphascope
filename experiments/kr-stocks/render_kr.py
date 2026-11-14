@@ -23,6 +23,8 @@ import collect_kr_earn_dart  # noqa: E402 — 실적 발표일(DART 잠정실적
 import re  # noqa: E402
 from collections import Counter  # noqa: E402
 from html import unescape as html_unescape  # noqa: E402
+sys.path.insert(0, os.path.join(_HERE, "..", "broker-research"))
+import collect_tg as TG  # noqa: E402 — 증권사 목표가(증권사 공식 텔레그램 리서치 채널, 2026-11-14)
 import analyze_tabs as AT  # noqa: E402 — 미국 종목 `실적과 기대` 판정(card_revenue · card_eps · card_capex)을 그대로 — stock-radar
 import render_pages as RP  # noqa: E402 — 미국 종목 카드 그리기(이익 줄 · 이익률 그래프 · 돈을 어디에 쓰나, 2026-11-04) — 통화 · 출처 글만 KR_MONEY 로
 
@@ -936,11 +938,23 @@ def _picks(s):
     return [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
 
 
+def attach_broker(stocks, path=None):
+    """`증권사 목표가 변경은?` 재료 — 증권사 공식 텔레그램 리서치 채널에서 모은 목표가(broker-research/collect_tg, 2026-11-14 사용자).
+    기록 파일이 없으면(수집 전) s["broker"] = None → 카드 없음(예전과 같음). 파일이 있으면 최근 30일 목록(없으면 `없음` 카드, 미국과 같게)."""
+    p = path or TG.OUT
+    if not os.path.exists(p):
+        return
+    data = TG.load(p)
+    for s in stocks:
+        s["broker"] = TG.for_code(s["code"], s.get("close"), data=data)
+
+
 def card_picks(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 미국과 같은 공용 R.opinions_cards (2026-11-01 사용자 P197, 옛 한 장 `애널리스트 · 방송 의견은?`). 원화 · 지금 가격 대비."""
     ps = [p for p in PICKS if p["market"] == "KR" and p["ticker"].split(".")[0] == s["code"]]
     closes = [b["close"] for b in (BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]]   # 요약 문단 주가 배경 (P296)
-    card = lambda ps_: R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won, closes=closes)   # noqa: E731 — 애널리스트 · 방송 두 카드 + 함께 보기 (P197) · 맨 위 요약 문단 (P295 · P296)
+    card = lambda ps_: R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps_, won, lambda: together_items(s), m0=man_won, m2=won, closes=closes,
+                                        broker=s.get("broker"))   # noqa: E731 — 증권사 목표가(텔레그램, 2026-11-14) — None 이면 카드 없음 — 애널리스트 · 방송 두 카드 + 함께 보기 (P197) · 맨 위 요약 문단 (P295 · P296)
     real = card(ps)
     if s["code"] != MOCK_PICKS_CODE or len(ps) >= 5:
         return real
@@ -1015,6 +1029,7 @@ def verdict_items(s):
         "news": SG.news_item(_week_news(s)),   # 뉴스 · 방송 분위기 (P218)
         "analysts": SG.item("analysts", (R.analysts_verdict({"status": {"analysts": s.get("analysts") or []}, "headline": {"close": s.get("close")}}) or (None,))[0]),
         "picks": SG.item("picks", R.picks_word(_picks(s))) if _picks(s) else None,
+        "broker": SG.item("broker", R.broker_word(s.get("broker") or [])),   # 증권사 목표가 변경 — 미국과 같은 줄 (2026-11-14)
     }
     return got
 
@@ -1722,6 +1737,7 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
             s["company"] = (extra.get("company") or {}).get(s["code"]) or {}   # 기업 정보 탭 — DART 기업개황 (P84)
             build_expect(s, extra, group)
             s["_revenue_rows"] = ((extra.get("revenue") or {}).get("series") or {}).get(s["sym"]) or []   # 매출 출처(DART · Yahoo) 표시용
+        attach_broker(a["stocks"])
         macro_rows = us_calendar()
         for s in a["stocks"]:
             try:

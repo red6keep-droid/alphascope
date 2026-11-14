@@ -1533,7 +1533,9 @@ def _broker_rows(cs, close, money):
         out += (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
                 f'<span style="display:block;color:#111;line-height:35px;">{head}</span>'
                 + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};">{tgt}</span>' if tgt else "")
-                + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{int(d[5:7]):02d}.{int(d[8:]):02d} 발표</span></span>')
+                + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{int(d[5:7]):02d}.{int(d[8:]):02d} 발표'
+                + (f' · <a href="{_esc(c["url"])}" style="color:inherit;text-decoration:none;" target="_blank" rel="nofollow noopener">원문 보기</a>' if c.get("url") else "")   # 한국 = 증권사 텔레그램 글 (2026-11-14)
+                + '</span></span>')
     return f'<span data-broker="1" style="display:block;">{out}</span>'
 
 
