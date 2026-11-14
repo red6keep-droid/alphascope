@@ -74,7 +74,7 @@ def svg(sym, d, top, bot, uid):
 
 def mark(p, kind, avoid=None, val=None):
     """최고 · 최저 글자(HTML) — 최고는 점 위, 최저는 점 아래. 좌우 끝 가까우면 점 안쪽으로 붙인다.
-    avoid = 겹치면 안 되는 왼쪽 위 숫자 영역(가로 %, 세로 %) — 최고 글자가 그 안이면 점 오른쪽 옆으로 옮긴다."""
+    avoid = 겹치면 안 되는 오른쪽 위 숫자 영역(가로 시작 %, 세로 %) — 최고 글자가 그 안이면 점 왼쪽 옆으로 옮긴다."""
     x, y = p[0] / VW * 100, p[1] / VH * 100
     col = UP if kind == "최고" else DN
     if x < 18:
@@ -84,8 +84,8 @@ def mark(p, kind, avoid=None, val=None):
     else:
         hx, tx = f"left:{x:.1f}%;", "-50%"
     ty = "calc(-100% - 5px)" if kind == "최고" else "5px"
-    if avoid and kind == "최고" and x < avoid[0] and y < avoid[1] + 14:
-        hx, tx, ty = f"left:{x:.1f}%;", "8px", "-50%"
+    if avoid and kind == "최고" and x > avoid[0] and y < avoid[1] + 14:   # 오른쪽 위 숫자 자리 → 점 왼쪽 옆
+        hx, tx, ty = f"right:{100 - x:.1f}%;", "-8px", "-50%"
     return (f'<span class="hc-mark" style="{hx}top:{y:.1f}%;transform:translate({tx},{ty});color:{col};">'
             f'<span class="hc-k">{kind}</span> {fmt(val if val is not None else p[2])}</span>')
 
@@ -95,17 +95,17 @@ def head(d, inside=False):
     ch = c - pc
     col = UP if ch > 0 else DN if ch < 0 else INK
     tri = "▲" if ch > 0 else "▼" if ch < 0 else ""
-    sign = "+" if ch > 0 else "−" if ch < 0 else ""
     cls = "hc-head in" if inside else "hc-head"
-    return (f'<div class="{cls}"><span class="hc-num">{fmt(c)}</span>'
-            f'<span class="hc-chg" style="color:{col};">{tri}{fmt(abs(ch))} ({sign}{abs(ch / pc * 100):.2f}%)</span></div>')
+    # 2026-11-14 사용자: 오른쪽 정렬 · 앞(왼쪽) = 전날 대비 삼각형 + 퍼센트만(포인트 · 부호 없음) · 뒤(오른쪽) = 종가, 종가도 같은 색
+    return (f'<div class="{cls}" style="color:{col};"><span class="hc-chg">{tri}{abs(ch / pc * 100):.2f}%</span>'
+            f'<span class="hc-num">{fmt(c)}</span></div>')
 
 
 def chart_box(sym, d, kind, uid):
     """kind: A 종가만(겹침) · B 종가 + 최고 · 최저(겹침) · C 숫자 줄 위 + 최고 · 최저 점 · D 숫자 줄 위 + 아래 칸"""
     if kind in ("A", "B"):
         s, hi, lo = svg(sym, d, .40, .86, uid)
-        marks = (mark(hi, "최고", avoid=(48, 30), val=d["h"]) + mark(lo, "최저", val=d["l"])) if kind == "B" else ""
+        marks = (mark(hi, "최고", avoid=(52, 30), val=d["h"]) + mark(lo, "최저", val=d["l"])) if kind == "B" else ""
         return f'<div class="hc-box">{s}{head(d, inside=True)}{marks}</div>'
     if kind == "C":
         s, hi, lo = svg(sym, d, .20, .80, uid)
@@ -126,18 +126,18 @@ def card(sym, d, kind):
 
 
 SPECS = [
-    ("A", "종가만 — 그래프 위에 겹침", "그래프 상자 왼쪽 위에 종가 · 전날 대비. 최고 · 최저는 넣지 않음. 카드 높이 = 지금과 같음"),
-    ("B", "종가 + 최고 · 최저 — 그래프 위에 겹침", "A 에 최고 · 최저 점 글자를 더함. 최고 점이 종가 글자 자리에 오면 점 오른쪽 옆으로 비킨다. 카드 높이 = 지금과 같음"),
-    ("C", "종가 줄은 그래프 위 + 최고 · 최저 점", "종가 · 전날 대비를 그래프 상자 밖 위 줄로 빼서 그래프를 가리지 않음. 최고 · 최저는 점 옆. 카드가 숫자 한 줄만큼 길어짐"),
+    ("A", "종가만 — 그래프 위에 겹침", "그래프 상자 오른쪽 위에 전날 대비 · 종가. 최고 · 최저는 넣지 않음. 카드 높이 = 지금과 같음"),
+    ("B", "종가 + 최고 · 최저 — 그래프 위에 겹침", "A 에 최고 · 최저 점 글자를 더함. 최고 점이 숫자 자리에 오면 점 왼쪽 옆으로 비킨다. 카드 높이 = 지금과 같음"),
+    ("C", "종가 줄은 그래프 위 + 최고 · 최저 점", "전날 대비 · 종가를 그래프 상자 밖 위 줄(오른쪽 정렬)로 빼서 그래프를 가리지 않음. 최고 · 최저는 점 옆. 카드가 숫자 한 줄만큼 길어짐"),
     ("D", "종가 줄은 그래프 위 + 최고 · 최저는 아래 한 줄", "그래프 안엔 글자 없음(선 · 점만). 최고 · 최저는 상자 아래 한 줄. 카드가 두 줄만큼 길어짐"),
 ]
 
 CSS = """
-:root { --hc-num: 20px; --hc-chg: 14px; --hc-mark: 12px; }
+:root { --hc-num: 20px; --hc-chg: 13px; --hc-mark: 12px; }   /* 전날 대비 13 · 최고 · 최저 12 (2026-11-14 사용자) */
 .hc-box { position: relative; border: 1px solid #eee; border-radius: 8px; overflow: hidden; background: #fff; }
-.hc-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 8px; margin: 0 0 -8px; font-family: var(--num); font-variant-numeric: tabular-nums; }
-.hc-head.in { position: absolute; left: 10px; top: 8px; margin: 0; }
-.hc-num { font-size: var(--hc-num); line-height: calc(var(--hc-num) + 6px); font-weight: 700; color: #111; }
+.hc-head { display: flex; justify-content: flex-end; align-items: baseline; flex-wrap: wrap; gap: 0 8px; margin: 0 0 -8px; font-family: var(--num); font-variant-numeric: tabular-nums; }
+.hc-head.in { position: absolute; right: 10px; top: 8px; margin: 0; }
+.hc-num { font-size: var(--hc-num); line-height: calc(var(--hc-num) + 6px); font-weight: 700; }
 .hc-chg { font-size: var(--hc-chg); line-height: calc(var(--hc-chg) + 6px); font-weight: 700; }
 .hc-mark { position: absolute; white-space: nowrap; font-family: var(--num); font-size: var(--hc-mark); line-height: calc(var(--hc-mark) + 6px); font-weight: 700; font-variant-numeric: tabular-nums; }
 .hc-k { color: #6B7280; font-weight: 400; }
@@ -176,8 +176,7 @@ def controls():
     def grp(label, var, vals, cur):
         bs = "".join(f'<button type="button" data-var="{var}" data-v="{v}px" aria-pressed="{"true" if v == cur else "false"}">{v}</button>' for v in vals)
         return f'<span>{label} {bs}</span>'
-    return ('<div class="hc-ctl">' + grp("종가", "--hc-num", (18, 20, 22, 24), 20) + grp("전날 대비", "--hc-chg", (13, 14, 15), 14)
-            + grp("최고 · 최저", "--hc-mark", (11, 12, 13), 12) + "</div>")
+    return ('<div class="hc-ctl">' + grp("종가", "--hc-num", (18, 20, 22, 24), 20) + "</div>")   # 전날 대비 13 · 최고 · 최저 12 는 정해짐 (2026-11-14 사용자)
 
 
 def home_css():
@@ -203,7 +202,7 @@ def main():
             '<body data-pv-view="home" style="background:#F3F4F6;"><div class="hc-page">'
             '<div class="hc-bar"><h1>홈 증시 카드 하루 그래프</h1>' + controls() + '</div>'
             '<p style="font-size:14px;line-height:21px;color:#6B7280;margin:10px 0 0;">실제 홈 카드 그대로(아이콘 · 제목 · 날짜 · 요약 한 줄)이고, 그래프 상자는 지금 그림과 같은 크기입니다. '
-            '위 버튼으로 글자 크기를 바꿔 보세요. 자료 = 11월 13일 실제 5분봉(미국은 한국 시간 11월 14일 아침 마감).</p>'
+            '위 버튼으로 종가 글자 크기를 바꿔 보세요(전날 대비 13 · 최고 · 최저 12 고정). 자료 = 11월 13일 실제 5분봉(미국은 한국 시간 11월 14일 아침 마감).</p>'
             + "".join(secs) + f"</div><script>{JS}</script></body></html>")
     out = os.path.join(OUT, "mock_home_card_day.html")
     with open(out, "w", encoding="utf-8") as f:
