@@ -356,7 +356,7 @@ def _col_frame_right(bars_html, axis_names, height, top, scale, ticks, min_w, fm
         plot = plot.replace(bars_html, f'<span style="position:absolute;top:0;bottom:0;left:0;right:0;margin:0 auto;max-width:{cap}px;">{bars_html}</span>', 1)
         xm = f"2px auto 6px;max-width:{cap}px"
     inner = f'{plot}<span style="display:flex;font-size:{AXIS_FS};line-height:21px;color:{NOTE};margin:{xm};">{xl}</span>'
-    hint = (f'<span data-scroll-hint="1" data-lhint="1" style="display:block;text-align:left;font-size:{TINY};line-height:{LH_TINY};color:{FAINT};margin:{LEGEND_TOP}px 0 4px;">‹ {SCROLL_HINT}</span>'
+    hint = (f'<span data-scroll-hint="1" data-lhint="1" style="display:block;text-align:left;font-size:{LEGEND_FS};line-height:{LH_TINY};color:{FAINT};margin:{LEGEND_TOP}px 0 4px;">‹ {SCROLL_HINT}</span>'
             if min_w > CHART_PHONE_W else "")
     shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
              'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>') if hint else ""
@@ -437,7 +437,7 @@ def legend_top(chart_html, legend_html):
         lm = _LEGEND_RE.match(legend_html or "")
         chips = (lm.group(1) if lm else legend_html or "").replace("margin:0 0 0 12px;", "margin:0;").replace("margin:0 12px 0 0;", "margin:0;")
         top = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;'
-               f'font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:{LEGEND_TOP}px 0 4px;padding-left:{LEGEND_LEFT}px;">'
+               f'font-size:{LEGEND_FS};line-height:{LH_CARD};color:{NOTE};margin:{LEGEND_TOP}px 0 4px;padding-left:{LEGEND_LEFT}px;">'
                f'{hint}<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;column-gap:12px;margin-left:auto;">{chips}</span></span>')
         return top + chart_html + '<span style="display:block;height:4px;"></span>'
     lm = _LEGEND_RE.match(legend_html or "")
@@ -454,12 +454,13 @@ def legend_top(chart_html, legend_html):
     else:
         body = f'<span style="text-align:left;">{chips}</span>{hint}'
     top = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;'
-           f'font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:{LEGEND_TOP}px 0 4px;padding-left:{LEGEND_LEFT}px;">{body}</span>')
+           f'font-size:{LEGEND_FS};line-height:{LH_CARD};color:{NOTE};margin:{LEGEND_TOP}px 0 4px;padding-left:{LEGEND_LEFT}px;">{body}</span>')
     return top + chart_html + '<span style="display:block;height:4px;"></span>'
 
 
 SCROLL_SHADE_UP = 8   # 그림자를 그래프 위로 더 (안내 줄 쪽)
 SCROLL_HINT = "넘겨 보기"   # 옛 `밀어서 보기` (2026-10-26 사용자)
+LEGEND_FS = "13px"   # 그래프 범례 · `넘겨 보기` · 범례 단위 — 안내 14 보다 1 작게 (2026-11-14 사용자 "범례는 한 포인트 줄여", 가로축 이름 13 · 세로축 숫자는 그대로)
 FAINT = "#9CA3AF"   # 블로그 푸터 설명글의 흐린 글씨(테마 --gray-350) — `넘겨 보기` (같은 날 사용자)
 
 
@@ -1782,9 +1783,17 @@ def tv_chart_fold(symbol, tz, key):
 
 # ── 그래프 색 (2026-11-05 사용자 M75 — 디자인 가이드라인 8-0 그래프 색) ──
 CHART_UP, CHART_DN = "#ED8E87", "#82B1F0"   # ① 증감 값(부호가 뜻: 등락률 · 순매수 · 전달 대비 증감) — 오름 빨강 · 내림 파랑
-CHART_MAIN = "#F5B971"   # ② 주인공 수준 값(부호 없는 크기: PER · 금리 · 환율 · 거래대금 · 비중) — 주황
+CHART_MAIN = "#F59E0B"   # 2026-11-14 사용자 "주황을 진하게" (옛 #F5B971). 5% 더(#E9960A)는 취소 ② 주인공 수준 값(부호 없는 크기: PER · 금리 · 환율 · 거래대금 · 비중) — 주황
 CHART_CMP = "#CBD5E1"   # ③ 비교 대상 · ④ 기준선 — 회색 (선이면 점선)
-CHART_SERIES = ("#F5B971", "#5FBFAF", "#BFA2E8")   # ⑤ 여러 계열(외국인 · 기관 · 개인처럼 나란히) — 주황 · 청록 · 연보라. 회색 · 빨강 · 파랑과 헷갈리지 않게
+CHART_SERIES = (CHART_MAIN, "#14B8A6", "#A78BFA")   # 2026-11-14 사용자: 주황을 진하게 했으니 청록 · 보라도 같이 진하게 (옛 #5FBFAF · #BFA2E8). 5% 더는 취소   # ⑤ 여러 계열(외국인 · 기관 · 개인처럼 나란히) — 주황 · 청록 · 연보라. 회색 · 빨강 · 파랑과 헷갈리지 않게
+CHART_MAIN_TEXT = "#D97706"   # 주황 글자(최신 가로축 이름 등) — 선 · 면 주황보다 한 단계 진하게, 흰 바탕에서 읽히게 (2026-11-14 사용자: "날짜가 흐릿해 알아볼 수 없다")
+
+
+def tone_text(col):
+    """그래프 색을 글자에 쓸 때 — 주황만 진한 글자 주황으로 바꾼다."""
+    return CHART_MAIN_TEXT if str(col).upper() == CHART_MAIN else col
+
+
 TREND_H = 150   # 선 그래프 그림 높이 (막대 그래프 CHART_H 와 같게)
 
 
@@ -1803,7 +1812,7 @@ def _trend_ticks(lo, hi, n=4):
     return out
 
 
-def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False, ends_only=False, end_right=True):   # 선 굵기 · 점선 · 끝 값 = 종목 페이지 line_chart 와 같게(2 · 1 · 6 5 · 13/17 · 점 3/2 · 최신 점 5/4 — 정수 px, 2026-11-07 0-5)
+def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False, ends_only=False, end_right=True, small_end=False):   # 선 굵기 · 점선 · 끝 값 = 종목 페이지 line_chart 와 같게(2 · 1 · 6 5 · 13/17 · 점 3/2 · 최신 점 5/4 — 정수 px, 2026-11-07 0-5)
     """흐름을 보는 선 그래프 흰 카드 (2026-11-05 사용자 M67 · M70 · M71 · M72 · M76).
     labels = 가로축 이름(오래된 것 → 최신, 최신 오른쪽 P164). series = [(이름, 값 목록(None 허용), 색, 모양)] 모양 = "solid" · "dash"(비교 대상 · 기준선) · "step" · "stepdash"(계단 점선 — 기준금리).
     첫 계열이 주인공. 점선 계열은 범례에서 `비교 대상 : 이름`.
@@ -1817,12 +1826,12 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
     t0, t1 = ticks[0], ticks[-1]
     sparse = n <= 24 and not ends_only   # ends_only = 점이 적어도 카드 폭에 다 넣고 숫자는 계열마다 끝 값만 (2026-11-11 사용자: 증시 전망 비교 그래프 "수치는 마지막에만")
     top, bot = (26, 8) if sparse else (14, 6)
-    H = height + (12 if sparse else 0)
+    H = height + (14 if sparse else 0)   # 그림 칸 = 130 — 촘촘한 선(150 − 20) · R.line_chart 와 같게 (2026-11-14 그래프 통일, 옛 12 = 128)
     y = lambda v: top + (t1 - v) / (t1 - t0) * (H - top - bot)   # noqa: E731
     tf = (lambda t: f"{t:,.0f}") if all(float(t).is_integer() for t in ticks) else (lambda t: fmt(t).lstrip("+"))   # 축 숫자엔 + 부호 없이 (M78)
     axis_w = int(max(text_px(tf(t), 12) for t in ticks) + 10)
     axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{NOTE};">{esc(tf(t))}</span>' for t in ticks)
-    dashed = lambda kind: kind in ("dash", "stepdash")   # noqa: E731 — 선을 점선으로 그릴지
+    dashed = lambda kind: False   # noqa: E731 — 점선 폐지: 비교 대상 · 기준선도 실선 1 (2026-11-14 사용자 "점선은 다 삭제, 실선 1픽셀"). kind "dash" 는 이제 '비교 대상' 뜻만
     cmp = lambda kind: kind in ("dash", "stepdash", "thin")   # noqa: E731 — 비교 대상인지(끝 값 · 점 없음 · 범례 `비교 대상 :`). thin = 얇은 실선 비교 (2026-11-13 사용자: "점선 두 개는 눈이 아프다")
 
     def path_d(pts, X, kind):
@@ -1846,7 +1855,9 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
             if len(pts) < 2:
                 continue
             dash = ' stroke-dasharray="6 5"' if dashed(kind) else ""
-            lines_ += f'<path d="{path_d(pts, X, kind)}" fill="none" stroke="{col}" stroke-width="{2 if k == 0 or not cmp(kind) else 1}" stroke-linejoin="round" stroke-linecap="round"{dash}/>'
+            flat = cmp(kind) and len({v for _, v in pts}) == 1   # 평평한 비교선 = 그림 끝(세로축 숫자 앞)까지 (2026-11-14 사용자)
+            d = f"M0,{y(pts[0][1]):.1f}H{W}" if flat else path_d(pts, X, kind)
+            lines_ += f'<path d="{d}" fill="none" stroke="{col}" stroke-width="{2 if k == 0 or not cmp(kind) else 1}" stroke-linejoin="round" stroke-linecap="round"{dash}/>'
             if cmp(kind):
                 continue
             for i, v in pts:
@@ -1862,7 +1873,7 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
                         ly += 15
                     used.append(ly)
                     labs += (f'<text x="{X(i) + 5 + 8:.1f}" y="{ly:.1f}" text-anchor="start" font-size="13" font-weight="700" '
-                             f'fill="{"#111" if k == 0 else NOTE}">{esc(txt)}</text>')
+                             f'fill="#111">{esc(txt)}</text>')   # 값 글자 = 모두 검정 (2026-11-14 사용자 "값은 다 블랙")
                 continue
             for yy, txt, col, k, last in sorted(items):
                 ly = yy - 8
@@ -1870,10 +1881,12 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
                     ly += 15
                 used.append(ly)
                 labs += (f'<text x="{X(i):.1f}" y="{ly:.1f}" text-anchor="middle" font-size="{13 if last else 12}" font-weight="{700 if last else 400}" '
-                         f'fill="{"#111" if last and k == 0 else NOTE}">{esc(txt)}</text>')
+                         f'fill="#111">{esc(txt)}</text>')
         nl = max(len(lb.split("\n")) for lb in labels)   # 분기 이름 `25년` / `3분기` 두 줄
-        xl = "".join(f'<text x="{X(i):.1f}" y="{H + 18 + 16 * j}" text-anchor="middle" font-size="12" fill="{"#111" if i == n - 1 else NOTE}">{esc(t)}</text>'
+        c0 = series[0][2]   # 최신 가로축 이름 = 선 색 + 위 3px 점 — 가이드라인 9절 · R.line_chart 와 같게 (2026-11-14 그래프 통일, 옛 검정 · 점 없음)
+        xl = "".join(f'<text x="{X(i):.1f}" y="{H + 18 + 16 * j}" text-anchor="middle" font-size="12" fill="{tone_text(c0) if i == n - 1 else NOTE}">{esc(t)}</text>'
                      for i, lb in enumerate(labels) if lb for j, t in enumerate(lb.split("\n")))
+        xl += f'<circle cx="{X(n - 1):.1f}" cy="{H + 1}" r="1.5" fill="{c0}"/>'
         SH = H + 10 + 16 * nl
         svg = f'<svg width="{W}" height="{SH}" viewBox="0 0 {W} {SH}" style="display:block;direction:ltr;">{g}{lines_}{dots}{labs}{xl}</svg>'
         scroll = (f'<span data-lscroll="1" style="display:block;overflow-x:auto;direction:rtl;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-right:{axis_w}px;">'
@@ -1886,13 +1899,16 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
         X = lambda i: i / (n - 1) * 1000   # noqa: E731
         P = lambda i: i / (n - 1) * 100   # noqa: E731
         grid = "".join(f'<line x1="0" x2="1000" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="{GRID_LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>' for t in ticks)
-        paths, ends = "", []
+        paths, ends, flats = "", [], ""
         for k, (nm, xs, col, kind) in reversed(list(enumerate(series))):   # 주인공 선이 맨 위에
             pts = [(i, v) for i, v in enumerate(xs) if v is not None]
             if len(pts) < 2:
                 continue
+            if cmp(kind) and len({v for _, v in pts}) == 1 and not ends_only:   # 평평한 비교선(기준선 · 평균) = 눈금선처럼 끝까지 (2026-11-14 사용자: "중간에 멈추지 말고")
+                flats += f'<span aria-hidden="true" style="position:absolute;left:0;right:{axis_w - 4 if end_right else axis_w + 10}px;top:{y(pts[0][1]) - 0.5:.1f}px;height:1px;background:{col};"></span>'
+                continue
             dash = ' stroke-dasharray="6 5"' if dashed(kind) else ""
-            paths += (f'<path d="{path_d(pts, X, kind)}" fill="none" stroke="{col}" stroke-width="{2 if k == 0 else 1}" stroke-linejoin="round" stroke-linecap="round"{dash} '
+            paths += (f'<path d="{path_d(pts, X, kind)}" fill="none" stroke="{col}" stroke-width="{2 if k == 0 or not cmp(kind) else 1}" stroke-linejoin="round" stroke-linecap="round"{dash} '
                       f'vector-effect="non-scaling-stroke"/>')
             if not cmp(kind) or ends_only:   # ends_only = 비교 대상(점선)도 끝 값 (증시 전망 비교 그래프 S&P 500)
                 ends.append((k, pts[-1][0], pts[-1][1], col))
@@ -1905,18 +1921,19 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
                 for i, v in pts[:-1]:
                     dots += (f'<span style="position:absolute;left:calc({P(i):.2f}% - 3px);top:{y(v) - 3:.1f}px;width:6px;height:6px;box-sizing:border-box;border-radius:50%;'
                              f'background:#fff;border:2px solid {col};"></span>')
-        end_w = max([text_px(fmt(e[2]), 13) for e in ends] + [0]) + 8 if end_right else 0   # 끝 점 오른쪽 숫자 칸 (점 ~ 숫자 8)
+        end_w = max([text_px(fmt(e[2]), 13) for e in ends] + [0]) + 13 if end_right else 0   # 큰 끝 점 반지름 5 + 점 ~ 숫자 8   # 끝 점 오른쪽 숫자 칸 (점 ~ 숫자 8)
         for k, i, v, col in sorted(ends, key=lambda e: y(e[2])):   # 끝 값 숫자 — 위에서부터, 겹치면 아래로
             yy = y(v)
             ly = yy - (8.5 if end_right else 22)   # end_right = 점과 같은 높이, 점 오른쪽 (2026-11-11 사용자: 큰손 선물 그래프 "마지막 수치는 점보다 우측")
             while any(abs(ly - u) < 17 for u in used):
                 ly += 17
             used.append(ly)
-            dots += (f'<span style="position:absolute;left:calc({P(i):.2f}% - 4px);top:{yy - 4:.1f}px;width:8px;height:8px;box-sizing:border-box;border-radius:50%;'
-                     f'background:#fff;border:2px solid {col};"></span>')
-            pos = f"left:calc({P(i):.2f}% + 8px);" if end_right else f"right:calc({100 - P(i):.2f}% + 6px);"
+            er, eb = (4, 2) if small_end else (7, 4)   # small_end = 옛 작은 끝 점(8 · 2) — 지그재그가 심한 1년 그래프(브렌트유)에서 큰 점이 선을 가린다 (2026-11-14 사용자)
+            dots += (f'<span style="position:absolute;left:calc({P(i):.2f}% - {er}px);top:{yy - er:.1f}px;width:{2 * er}px;height:{2 * er}px;box-sizing:border-box;border-radius:50%;'
+                     f'background:#fff;border:{eb}px solid {col};"></span>')   # 끝 점 = 점 있는 선 최신 점과 같은 크기(r 5 · 테두리 4) (2026-11-14 사용자, 옛 8 · 2)
+            pos = f"left:calc({P(i):.2f}% + {9 if small_end else 13}px);" if end_right else f"right:calc({100 - P(i):.2f}% + 6px);"
             labs += (f'<span style="position:absolute;{pos}top:{ly:.1f}px;font-size:13px;line-height:17px;font-weight:700;white-space:nowrap;'
-                     f'color:{"#111" if k == 0 else NOTE};">{esc(fmt(v))}</span>')
+                     f'color:#111;">{esc(fmt(v))}</span>')   # 값 글자 = 모두 검정 (2026-11-14 사용자)
         xl = ""
         for i, lb in enumerate(labels):
             if not lb:
@@ -1928,7 +1945,7 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
             grid = ""
             long_grid = "".join(f'<span aria-hidden="true" style="position:absolute;left:0;right:{axis_w - 4}px;top:{y(t) - 0.5:.1f}px;height:1px;background:{GRID_LINE};"></span>' for t in ticks)
         plot = (f'<span style="display:block;position:relative;padding-right:{axis_w + 10 + end_w}px;">'   # 끝 점 ~ 세로축 숫자 10px (M76: 너무 붙었다) · end_right 면 숫자 칸만큼 더
-                f'{long_grid}<span style="display:block;position:relative;height:{H}px;">'
+                f'{long_grid}{flats}<span style="display:block;position:relative;height:{H}px;">'
                 f'<svg viewBox="0 0 1000 {H}" preserveAspectRatio="none" width="100%" height="{H}" aria-hidden="true" style="display:block;overflow:visible;">{grid}{paths}</svg>'
                 f'{dots}{labs}</span>{axis}'
                 f'<span style="display:block;position:relative;height:26px;margin-top:2px;">{xl}</span></span>')
@@ -1941,7 +1958,7 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
         chips += f'<span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">{line}{esc(name)}</span>'
     if legend_note:
         chips += f'<span style="white-space:nowrap;">{esc(legend_note)}</span>'
-    top_row = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};'
+    top_row = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;font-size:{LEGEND_FS};line-height:{LH_CARD};color:{NOTE};'
                f'margin:{LEGEND_TOP}px 0 4px;padding-left:{LEGEND_LEFT}px;">{hint}'
                f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;column-gap:12px;margin-left:auto;">{chips}</span></span>')   # `‹ 넘겨 보기` 왼쪽 · 범례 오른쪽 (P164)
     if bare:   # 흰 카드 없이 범례 + 그림만 — 다른 카드 안 그래프 덩어리에 넣을 때

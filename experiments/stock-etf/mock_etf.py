@@ -66,8 +66,7 @@ def weight_rows(items):
     mx = max(w for _, w in items) or 1
     rows = []
     for name, w in items:
-        bar = (f'<span style="display:inline-block;width:72px;height:8px;border-radius:4px;background:#E2E8F0;vertical-align:middle;margin-right:8px;overflow:hidden;">'
-               f'<span style="display:block;width:{w / mx * 100:.0f}%;height:8px;background:#94A3B8;"></span></span>')
+        bar = dk.hbar(w, mx, dk.CHART_MAIN, "72px")   # 줄 막대 = dk.hbar(10 · 모서리 3 · 바탕 #F1F5F9), 비중 = 주인공 크기 주황 (2026-11-14 그래프 통일, 옛 8 · 4 · 회색)
         rows.append((name, f'{bar}<span style="font-variant-numeric:tabular-nums;">{w:.1f}%</span>', ""))
     return dk.ccard(rows).replace('data-cards="1" ', "")
 
@@ -137,8 +136,8 @@ def us_page(meta):
     bmap = {x["day"]: x["close"] for x in bars[U.BENCH]}
     bc = [bmap.get(d) for d in days]
     bc = [x if x is not None else next(y for y in bc if y is not None) for x in bc]
-    series = [(meta["name"], [(x / c[0] - 1) * 100 for x in c], C.UP if c[-1] >= c[0] else C.DOWN, "solid"),
-              ("S&P 500", [(x / bc[0] - 1) * 100 for x in bc], "#94A3B8", "dash")]
+    series = [(meta["name"], [(x / c[0] - 1) * 100 for x in c], dk.CHART_MAIN, "solid"),   # 그래프 색 = 주인공 주황 (2026-11-14 그래프 통일, 옛 오름 · 내림 색)
+              ("S&P 500", [(x / bc[0] - 1) * 100 for x in bc], dk.CHART_CMP, "dash")]
     line = dk.trend_card("1년 전 대비 등락", dk.month_ticks(days), series, Q.pct)
     tab_today = (line + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), meta["name"], "S&P 500")
                  + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s))

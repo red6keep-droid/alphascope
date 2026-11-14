@@ -118,8 +118,7 @@ def weight_rows(items):
     mx = max(w for _, w in items) or 1
     rows = []
     for name, w in items:
-        bar = (f'<span style="display:inline-block;width:72px;height:8px;border-radius:4px;background:#E2E8F0;vertical-align:middle;margin-right:8px;overflow:hidden;">'
-               f'<span style="display:block;width:{w / mx * 100:.0f}%;height:8px;background:#94A3B8;"></span></span>')
+        bar = dk.hbar(w, mx, dk.CHART_MAIN, "72px")   # 줄 막대 = dk.hbar(10 · 모서리 3 · 바탕 #F1F5F9), 비중 = 주인공 크기 주황 (2026-11-14 그래프 통일, 옛 8 · 4 · 회색)
         rows.append((name, f'{bar}<span style="font-variant-numeric:tabular-nums;">{w:.1f}%</span>', ""))
     return dk.ccard(rows).replace('data-cards="1" ', "")
 

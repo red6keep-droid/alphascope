@@ -1612,7 +1612,7 @@ def compare_of(px, base_day, lines):
     return {"base": b, "days": days, "lines": out} if len(out) >= 2 and len(days) >= 2 else None
 
 
-CMP_COLORS = (dk.CHART_MAIN, "#5FBFAF")   # 주인공 주황 · 업종 청록 — S&P 500 은 비교 대상 회색 점선 (dk.CHART_CMP)
+CMP_COLORS = (dk.CHART_MAIN, dk.CHART_SERIES[1])   # 주인공 주황 · 업종 청록 — S&P 500 은 비교 대상 회색 점선 (dk.CHART_CMP)
 
 
 def _compare_chart(fc, st):

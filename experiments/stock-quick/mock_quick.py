@@ -162,8 +162,8 @@ def page(s, df, bdf):
 
     # 1년 가격 선 그래프 — 비교 = 시장 지수, 1년 전 = 0
     base, bb0 = c[0], bc[0]
-    series = [(s["name"], [(x / base - 1) * 100 for x in c], C.UP if c[-1] >= base else C.DOWN, "solid"),
-              (bname, [(x / bb0 - 1) * 100 for x in bc], "#94A3B8", "dash")]
+    series = [(s["name"], [(x / base - 1) * 100 for x in c], dk.CHART_MAIN, "solid"),   # 그래프 색 = 주인공 주황 (2026-11-14 그래프 통일, 옛 오름 · 내림 색)
+              (bname, [(x / bb0 - 1) * 100 for x in bc], dk.CHART_CMP, "dash")]
     parts.append(dk.section("1년 흐름", dk.trend_card("1년 전 대비 등락", dk.month_ticks(days), series, pct)))   # 1년 일별 = 끝 값만 · 점 없음 (ends_only 는 40일 전망 그래프용 날마다 점)
     parts.append(dk.muted("간단 정보는 가격 자료만 다룹니다. 뉴스 · 의견 · 소송은 종목 분석 페이지에서 다룹니다."))
     parts.append(dk.related_buttons(s["peers"] + [("전체 종목 목록", "mock_all_stocks.html")]))
@@ -206,8 +206,8 @@ def page_us_full(smp):
     bmap = {x["day"]: x["close"] for x in bars[U.BENCH]}
     bc = [bmap.get(d) for d in days[-252:]]
     bc = [x if x is not None else next(y for y in bc if y is not None) for x in bc]
-    series = [(smp["name"], [(x / c[0] - 1) * 100 for x in c], C.UP if c[-1] >= c[0] else C.DOWN, "solid"),
-              ("S&P 500", [(x / bc[0] - 1) * 100 for x in bc], "#94A3B8", "dash")]
+    series = [(smp["name"], [(x / c[0] - 1) * 100 for x in c], dk.CHART_MAIN, "solid"),   # 그래프 색 = 주인공 주황 (2026-11-14 그래프 통일, 옛 오름 · 내림 색)
+              ("S&P 500", [(x / bc[0] - 1) * 100 for x in bc], dk.CHART_CMP, "dash")]
     line = dk.trend_card("1년 전 대비 등락", dk.month_ticks(days[-252:]), series, pct)
     # 상세 칸 — 정식 종목과 같은 카드, 받는 주기만 드물게(detail_cache 주기: 의견 · 이익 예상 주 1회 · 실적 뒤, 기업 90일). 공매도 · 옵션은 간단 종목에서 뺀다 (2026-11-12 사용자)
     import collect_extra as CE

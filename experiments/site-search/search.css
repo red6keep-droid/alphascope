@@ -72,13 +72,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-line-unit { text-align: right; font-size: 12px; line-height: 18px; color: #6B7280; margin-bottom: 2px; }
 .as-line-box { position: relative; padding-right: 34px; }
 .as-line-plot { position: relative; }
-.as-dot { position: absolute; box-sizing: border-box; border-radius: 50%; background: #fff; border: 2px solid #F5B971; }
-.as-val { position: absolute; transform: translateX(-50%); white-space: nowrap; font-family: var(--num); font-size: 12px; line-height: 14px; color: #6B7280; }
+.as-dot { position: absolute; box-sizing: border-box; border-radius: 50%; background: #fff; border: 2px solid #F59E0B; }   /* 주황 = dk.CHART_MAIN (2026-11-14 진하게) */
+.as-val { position: absolute; transform: translateX(-50%); white-space: nowrap; font-family: var(--num); font-size: 12px; line-height: 14px; color: #111; }   /* 값 글자 = 모두 검정 (2026-11-14 그래프 통일) */
 .as-val.as-last { font-size: 13px; font-weight: 700; color: #111; }
 .as-val.as-end { transform: none; }   /* 마지막 날 = 점 오른쪽 (가운데 맞춤 없음) */
 .as-line-x { position: relative; height: 40px; margin-top: 6px; }
 .as-line-x span { position: absolute; top: 0; transform: translateX(-50%); text-align: center; white-space: nowrap; font-size: 12px; line-height: 16px; color: #6B7280; }
-.as-line-x span.as-last { color: #111; }
+.as-line-x span.as-last { color: #D97706; }   /* 최신 가로축 이름 = 진한 주황 (dk.CHART_MAIN_TEXT, 가이드라인 9절) */
 .as-line-y { position: absolute; right: 0; top: 0; width: 30px; }
 .as-line-y span { position: absolute; right: 0; font-family: var(--num); font-size: 12px; line-height: 18px; color: #6B7280; }
 .as-news, .as-posts { list-style: none; margin: 0; padding: 0; }

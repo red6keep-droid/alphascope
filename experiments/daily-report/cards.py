@@ -21,7 +21,7 @@ FOLD_LEFT = dk.FOLD_LEFT + 8
 INLINE_W = 316
 CHART_H, CHART_LBL = 150, 16
 LEGEND_CHIP, LEGEND_INDENT = 9, 10
-PASTEL_UP, PASTEL_DN, GRAY_BAR, AMBER = "#ED8E87", "#82B1F0", "#CBD5E1", "#F5B971"
+PASTEL_UP, PASTEL_DN, GRAY_BAR, AMBER = "#ED8E87", "#82B1F0", "#CBD5E1", dk.CHART_MAIN   # 주황 = 그래프 색 표 (2026-11-14 진하게)
 
 
 def esc(t):
@@ -138,7 +138,7 @@ def legend_chips(items, keep=False):
     items = items if keep else dk.legend_items(items)   # keep = 막대 색이 '대상 · 비교' 가 아니라 하루를 나눈 조각(시가 갭 · 장중 · 하루)인 그래프   # 오름 · 내림 칩 삭제 · 회색 = `비교 대상 : …` (2026-10-27 사용자, 모든 그래프)
     chips = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
                      f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{c};"></span>{esc(nm)}</span>' for nm, c in items)
-    return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{dk.MICRO};line-height:{dk.LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
+    return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{dk.LEGEND_FS};line-height:{dk.LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
 
 
 def col_chart(groups, colors, label_colors, height=CHART_H, fmt=None, right=True):   # 기본 = 오른쪽 모양 (P166)

@@ -136,9 +136,9 @@
   function cur(s) { return s.m === 'us' ? '달러' : '원'; }
 
   /* 분기 매출 = 시간 순서 값 → 선 그래프 (가이드라인 9절 `선 그래프` · dk.trend_card 점이 적을 때와 같은 모양, 2026-11-12 사용자: "우리가 쓰는 그래프 스타일").
-     주인공 주황 #F5B971 선 2 · 속 빈 점 3/2 · 최신 점 5/4 · 최신 값만 13 굵게 #111(나머지 12 보통 회색) · 최신 가로축 이름 #111 · 세로축 = 오른쪽 12px · 가로 눈금선 #ECF0F5.
+     주인공 주황 #F59E0B 선 2 · 속 빈 점 3/2 · 최신 점 5/4 · 값 글자 모두 #111(최신만 13 굵게) · 최신 가로축 이름 진한 주황 #D97706 (2026-11-14 그래프 통일) · 세로축 = 오른쪽 12px · 가로 눈금선 #ECF0F5.
      점이 적으면(250px 아래) 카드 폭에 고르게 편다 — 선은 SVG(굵기 고정), 점 · 숫자 · 이름은 % 위치 */
-  var CHART_MAIN = '#F5B971', GRID_LINE = '#ECF0F5', NOTE = '#6B7280';
+  var CHART_MAIN = '#F59E0B', GRID_LINE = '#ECF0F5', NOTE = '#6B7280';
   function niceStep(span) {
     var raw = span / 3 || 1, e = Math.pow(10, Math.floor(Math.log10(raw)));
     return [1, 2, 5, 10].map(function (m) { return m * e; }).filter(function (v) { return raw <= v; })[0];

@@ -78,7 +78,7 @@ def table(lines, links):
                    f'font-size:17px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div>")
 
 
-CHART_COLORS = ["#F59E0B", "#0F766E", "#9AD1C8"]   # 계열 색 — 첫 계열(신호 쪽) 주황 · 둘째(아무 날 = 비교 기준) 청록 · 옅은 청록. 빨강 · 파랑은 안 씀(오름 · 내림 색)
+CHART_COLORS = [dk.CHART_MAIN, dk.CHART_CMP, dk.CHART_SERIES[1]]   # 2026-11-14 그래프 통일: 그래프 색 표 — 신호 쪽 주황 · 비교 기준(아무 날) 회색 · 셋째 청록 (옛 #F59E0B · #0F766E · #9AD1C8). 빨강 · 파랑은 안 씀(오름 · 내림 색)
 
 
 def chart(lines, links, title=""):
@@ -96,7 +96,7 @@ def chart(lines, links, title=""):
             bars += ('<span style="display:flex;align-items:center;gap:10px;margin:6px 0 0;">'
                      f'<span style="flex:none;width:118px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};white-space:nowrap;">{html.escape(head[k + 1])}</span>'
                      '<span style="flex:1 1 0;min-width:0;display:block;">'
-                     f'<span style="display:block;width:{w}%;min-width:4px;height:16px;border-radius:4px;background:{CHART_COLORS[k % len(CHART_COLORS)]};"></span></span>'
+                     f'<span style="display:block;width:{w}%;min-width:4px;height:10px;border-radius:3px;background:{CHART_COLORS[k % len(CHART_COLORS)]};"></span></span>'
                      f'<span style="flex:none;width:64px;text-align:right;font-size:17px;line-height:24px;font-weight:700;white-space:nowrap;">{dk.tint(html.escape(c))}</span></span>')
         out.append(f'<div style="padding:14px 0;{"border-top:1px solid #E2E8F0;" if out else ""}">'
                    f'<span style="display:block;font-size:17px;line-height:24px;font-weight:700;color:#111;">{inline(r[0], links)}</span>{bars}</div>')

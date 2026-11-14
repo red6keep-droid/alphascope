@@ -482,7 +482,7 @@ def _legend_chips(items):
     items = _dk.legend_items(items)   # 오름 · 내림 칩 삭제 · 회색 = `비교 대상 : …` (2026-10-27 사용자, 모든 그래프)
     chips = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 0 0;white-space:nowrap;">'
                      f'<span style="display:inline-block;width:{LEGEND_CHIP}px;height:{LEGEND_CHIP}px;border-radius:2px;background:{c};"></span>{_esc(nm)}</span>' for nm, c in items)
-    return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{MICRO};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
+    return f'<span style="display:block;box-sizing:border-box;padding-left:{LEGEND_INDENT}px;font-size:{_dk.LEGEND_FS};line-height:{LH_CARD};color:{NOTE};margin:0 0 10px;">{chips}</span>'
 
 
 def _chart_label_px(bars):
@@ -641,7 +641,7 @@ def year_range_in(y, money, tip, high_days=None):
 # 최신 값 13px 굵게 · 나머지 12px 보통(세로 눈금 숫자와 같게) · 두 선 중 위에 있는 쪽 숫자는 위, 아래 쪽은 아래 · 비교 선을 먼저 그려 이 종목 선이 위.
 # 최신 가로축 이름 = 이 종목 색 + 글자 위 3px 강조점.
 LINE_W, LINE_W2, DOT_R, DOT_SW, LAST_R, LAST_SW = 2, 1, 3, 2, 5, 4   # 정수 px (2026-11-07 사용자: "정수로 바꿔줘" — 옛 비교 선 1.25 · 점 테두리 1.5 · 최신 점 반지름 4.5)
-LINE_H, LINE_STEP, LINE_GRAY = 230, 46, _dk.CHART_CMP   # 비교 선 = 그래프 색 표 ③ 회색 점선 (가이드라인 8-0 · 0-5, 2026-11-06 사용자, 옛 #9CA3AF)
+LINE_H, LINE_STEP, LINE_GRAY = 212, 46, _dk.CHART_CMP   # 230 → 212: 그림 칸 130 = dk.trend_card 와 같게 (2026-11-14 그래프 통일) · 비교 선 = 그래프 색 표 ③ 회색 점선 (가이드라인 8-0 · 0-5, 2026-11-06 사용자, 옛 #9CA3AF)
 LINE_THIS = _dk.CHART_MAIN   # 선 그래프 이 종목 선 = 그래프 색 표 ② 주황 (2026-11-06 사용자: "주황으로 해" — 옛 파랑 #5B8DEF 는 하락 색과 헷갈림, P161)
 LINE_FIT_W = 250   # 360px 폰에서 그래프 칸 폭(실측 250~257) — 점들이 이 안에 들어가면 넘겨 보기 없이 카드 폭에 고르게 편다 (2026-10-31 사용자: 짧으면 한쪽으로 몰렸다)
 
@@ -686,7 +686,7 @@ def line_chart(labels, series, fmt, unit=""):
     lines = dots = labs = ""
     for k, (nm, xs, col, dash) in reversed(list(enumerate(series))):   # 비교 선 먼저 — 이 종목 선이 위에 덮는다
         pts = [(i, x(i), y(v)) for i, v in enumerate(xs) if v is not None]
-        sw = f'stroke="{col}" stroke-width="{LINE_W if k == 0 else LINE_W2}" stroke-linecap="round"' + (' stroke-dasharray="6 5"' if dash else "")
+        sw = f'stroke="{col}" stroke-width="{LINE_W if k == 0 else LINE_W2}" stroke-linecap="round"'   # 비교 선 = 실선 1 (2026-11-14 사용자: 점선 폐지)
         if fit:   # % 좌표는 polyline 이 못 받는다 — 구간마다 선
             lines += "".join(f'<line x1="{a[1]}" y1="{a[2]:.1f}" x2="{b[1]}" y2="{b[2]:.1f}" {sw}/>' for a, b in zip(pts, pts[1:]))
         else:
@@ -702,18 +702,18 @@ def line_chart(labels, series, fmt, unit=""):
                 if oy is not None and abs(py - oy) < 15:
                     ly = (min(py, oy) - 3) if (other is not None and xs[i] >= other) else (max(py, oy) + 12)
                 labs += (f'<text x="{px}" dx="{LAST_R + 8}" y="{ly:.1f}" text-anchor="start" font-size="{13 if big else 12}" font-weight="{700 if big else 400}" '
-                         f'fill="{col}">{_esc(fmt(xs[i]))}</text>')
+                         f'fill="#111">{_esc(fmt(xs[i]))}</text>')   # 값 글자 = 모두 검정 — dk.trend_card 와 같게 (2026-11-14 사용자 "값은 다 블랙")
                 continue
             dots += f'<circle cx="{px}" cy="{py:.1f}" r="{LAST_R if big else DOT_R}" fill="#fff" stroke="{col}" stroke-width="{LAST_SW if big else DOT_SW}"/>'
             other = comp[i] if k == 0 else main[i]
             up = (xs[i] >= other) if other is not None else (k == 0)
             labs += (f'<text x="{px}" y="{py - 10 if up else py + 20:.1f}" text-anchor="middle" font-size="{13 if big else 12}" font-weight="{700 if big else 400}" '
-                     f'fill="{col}">{_esc(fmt(xs[i]))}</text>')
+                     f'fill="#111">{_esc(fmt(xs[i]))}</text>')
     c0 = series[0][2]
 
     def xl_text(i, lb):
         parts = lb.split("\n")
-        col = c0 if i == n - 1 else NOTE
+        col = _dk.tone_text(c0) if i == n - 1 else NOTE   # 주황 글자 = 진한 주황 (2026-11-14)
         base = LINE_H - 8 - 16 * (len(parts) - 1)
         return "".join(f'<text x="{x(i)}" y="{base + 16 * j}" text-anchor="middle" font-size="12" fill="{col}">{_esc(t)}</text>' for j, t in enumerate(parts))
     xl = "".join(xl_text(i, lb) for i, lb in enumerate(labels))
@@ -732,9 +732,9 @@ def line_chart(labels, series, fmt, unit=""):
                   f'<span style="display:inline-block;vertical-align:top;direction:ltr;">{svg}</span></span>')   # vertical-align — 줄 아래 빈틈(약 7px) 없이
     chips = "".join(f'<span style="display:inline-flex;align-items:center;gap:5px;margin-left:12px;white-space:nowrap;">'
                     f'<svg width="22" height="10" aria-hidden="true"><line x1="1" x2="21" y1="5" y2="5" stroke="{col}" stroke-width="{LINE_W if i == 0 else LINE_W2}"'
-                    + (' stroke-dasharray="4 3"' if dash else "") + f'/><circle cx="11" cy="5" r="3" fill="#fff" stroke="{col}" stroke-width="{DOT_SW}"/></svg>{_esc(nm)}</span>'
+                    + f'/><circle cx="11" cy="5" r="3" fill="#fff" stroke="{col}" stroke-width="{DOT_SW}"/></svg>{_esc(nm)}</span>'
                     for i, (nm, _, col, dash) in enumerate(series))
-    head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 2px;font-size:{TINY};line-height:20px;color:{NOTE};">'
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 2px;font-size:{_dk.LEGEND_FS};line-height:20px;color:{NOTE};">'
             + ("" if fit else f'<span data-lhint="1" style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span>')   # 넘길 것이 없으면 안내 없음 (넓은 폰은 테마 JS 가 숨김)
             + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;margin-left:auto;">{chips}</span></span>'
             + (f'<span style="display:block;text-align:right;margin:0 0 6px;font-size:12px;line-height:18px;color:{NOTE};">(단위: {_esc(unit)})</span>' if unit else ""))
@@ -1383,8 +1383,8 @@ def line_tabs(cid, labels, series, fmt, unit="", overlay=None, int_ticks=False):
     if lo < 0 < hi:
         g += f'<line x1="0" x2="{W}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="#CBD5E1" stroke-width="1"/>'
     # 처음 = 모든 선 제 색 · 점 있음 · 숫자 없음. 버튼을 누르면 그 선만 색 · 점 · 숫자, 나머지는 회색 가는 선(점 없음). 버튼 = 흰 작은 외곽선 버튼(가이드 2-3), 누르면 선 색 테두리 · 글자 · 연한 바탕
-    body, css = "", (f"#{cid} .t{{display:none}} #{cid} .h label{{border:1px solid #B5BAC0;color:#111;background:#fff}} "
-                     f"#{cid} .h label:hover{{border-color:#111}} ")
+    body, css = "", (f"#{cid} .t{{display:none}} #{cid} .h label{{border:1px solid #D5DAE0;color:#111;background:#fff}} "
+                     f"#{cid} .h label:hover{{border-color:#111}} #{cid} .h label{{display:inline-flex}} #{cid} .h label.o{{display:none}} ")
     for k, (nm, xs, col, kf, ky) in enumerate(allser):
         css += f"#{cid} .l{k}{{stroke:{col};stroke-width:{LINE_W}}} "
         pts = [(i, x(i), ky(v)) for i, v in enumerate(xs) if v is not None]
@@ -1397,10 +1397,11 @@ def line_tabs(cid, labels, series, fmt, unit="", overlay=None, int_ticks=False):
             last = j == len(pts) - 1
             body += f'<circle class="d d{k}" cx="{px}" cy="{py:.1f}" r="{LAST_R if last else DOT_R}" fill="#fff" stroke="{col}" stroke-width="{LAST_SW if last else DOT_SW}"/>'
             body += (f'<text class="t t{k}" x="{px}" y="{py - 10 if py > top + 16 else py + 20:.1f}" text-anchor="middle" font-size="{13 if last else 12}" '
-                     f'font-weight="{700 if last else 400}" fill="{col}">{_esc(kf(xs[i]))}</text>')   # 한 선만 보이니 숫자는 위에, 맨 위에 닿으면 아래
+                     f'font-weight="{700 if last else 400}" fill="#111">{_esc(kf(xs[i]))}</text>')   # 한 선만 보이니 숫자는 위에, 맨 위에 닿으면 아래
         css += (f"#{cid}-{k}:checked~.g .l{{stroke:{LT_GRAY};stroke-width:{LINE_W2}}} #{cid}-{k}:checked~.g .d{{display:none}} "   # 누르면 다른 선은 회색 · 점 없음 (뒤 규칙이 덮는다)
                 f"#{cid}-{k}:checked~.g .l{k}{{stroke:{col};stroke-width:{LINE_W}}} #{cid}-{k}:checked~.g .d{k},#{cid}-{k}:checked~.g .t{k}{{display:inline}} "
-                f"#{cid}-{k}:checked~.g .xl,#{cid}-{k}:checked~.g .xd{{fill:{col}}} #{cid}-{k}:checked~.h .c{k}{{border-color:{col};color:{col};background:{col}1A}} ")
+                f"#{cid}-{k}:checked~.g .xl{{fill:{_dk.tone_text(col)}}} #{cid}-{k}:checked~.g .xd{{fill:{col}}} "
+                f"#{cid}-{k}:checked~.h label.c{k}{{display:none}} #{cid}-{k}:checked~.h label.o{k}{{display:inline-flex;border-color:{col};color:{_dk.tone_text(col)};background:{col}1A}} ")   # 누른 버튼 = 처음으로 돌아가는 라벨(.o)로 바뀐다 — 한 번 더 누르면 모든 선 제 색 (2026-11-14 사용자)
     xl = ""
     for i, lb in enumerate(labels):
         parts = lb.split("\n")
@@ -1419,13 +1420,17 @@ def line_tabs(cid, labels, series, fmt, unit="", overlay=None, int_ticks=False):
         shade = ('<span data-sh="l" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:14px;pointer-events:none;transition:opacity .15s;'
                  'background:radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.18),rgba(15,23,42,0));opacity:1;"></span>')
     radios = "".join(f'<input type="radio" name="{cid}" id="{cid}-{k}" style="display:none;">' for k in range(len(allser)))   # 처음엔 아무것도 안 눌림
-    btns = "".join(f'<label for="{cid}-{k}" class="c{k}" style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:13px;line-height:19px;font-weight:700;white-space:nowrap;cursor:pointer;">'
+    radios += f'<input type="radio" name="{cid}" id="{cid}-x" style="display:none;">'   # 처음 상태(모든 선 제 색)로 돌아가는 자리 — 누른 버튼을 한 번 더 누르면 이것이 눌린다
+    btn_st = "align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:13px;line-height:19px;font-weight:700;white-space:nowrap;cursor:pointer;"
+    btns = "".join(f'<label for="{cid}-{k}" class="c{k}" style="{btn_st}">'
+                   f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{col};"></span>{_esc(nm)}</label>'
+                   f'<label for="{cid}-x" class="o o{k}" style="{btn_st}">'   # 눌린 모양 — 누르면 처음으로 (display 는 CSS 가 정한다)
                    f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{col};"></span>{_esc(nm)}</label>' for k, (nm, _, col, _, _) in enumerate(allser))   # 색 점 = 선 색
     # 첫 줄 = `‹ 넘겨 보기` 왼쪽(공통 선 그래프와 같게) · 단위 오른쪽, 둘째 줄 = 버튼 오른쪽 정렬 — 폰에서 넘겨 보기 / 버튼 / 단위 세 줄이던 것을 두 줄로 (2026-11-04 사용자)
     row1 = (("" if fit else f'<span data-lhint="1" style="white-space:nowrap;">‹ {_dk.SCROLL_HINT}</span>')
             + (f'<span style="white-space:nowrap;margin-left:auto;font-size:12px;line-height:18px;">(단위: {_esc(unit)})</span>' if unit else ""))
     head = (f'<span class="h" style="display:block;padding:{_dk.CHART_CARD_PAD + 3}px 12px 0;">'
-            + (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px;font-size:{TINY};line-height:20px;color:{NOTE};">{row1}</span>' if row1 else "")
+            + (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px;font-size:{_dk.LEGEND_FS};line-height:20px;color:{NOTE};">{row1}</span>' if row1 else "")
             + f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;margin:0 0 6px;">{btns}</span></span>')
     graph = (f'<span class="g" style="display:block;position:relative;padding:0 12px 10px;">{scroll}{shade}'
              f'<span style="position:absolute;top:0;right:12px;width:{axis_w - 4}px;height:{H}px;text-align:right;">{axis}</span></span>')
@@ -3050,7 +3055,7 @@ def sec_checklist(a):
 # ---------------------------------------------------------------- 실적과 기대 탭 (가이드라인 2-7 · 1-4-1, 2026-10-18)
 # 시장 지표 · 재무 두 탭을 합쳤다. 1층 = 질문 카드 넷(상태 카드 틀), 펼치면 첫 줄 문단 · 비교 그래프 · 근거 줄, 맨 아래 `자세한 지표 보기`(옛 두 탭의 칸 전부).
 
-_AMBER, _PEER_LBL = "#F5B971", "기술주 15개 (중앙값)"
+_AMBER, _PEER_LBL = _dk.CHART_MAIN, "기술주 15개 (중앙값)"
 
 
 def _ok(b):
