@@ -277,11 +277,62 @@ def load_live(market):
 
 # ── 미국 ──
 
+US_SECTOR = {"XLK": ("XLK", "기술")}   # 업종 ETF 자신 = 그 업종 자금 흐름 (반도체 ETF 는 universe 업종 `반도체` = SMH)
+US_BASE = {"SOXL": "SOXX", "TQQQ": "QQQ", "SQQQ": "QQQ"}   # 레버리지 · 인버스 → 같은 지수 1배 ETF
+TOP_MIN = 3.0   # 비중 1위가 이보다 작으면(러셀 2000 · 프리미엄 인컴) 그 종목 하나가 ETF 를 말하지 않는다
+
+
+def us_move_card(sym, snap, f, s):
+    """미국 ETF `함께 움직이는 종목은?` (2026-11-14 사용자 "제안대로" — 한국 ETF move_card 와 같은 카드 · 같은 답).
+    비교 = 레버리지 · 인버스면 같은 지수 1배 ETF, 아니면 담은 비중 1위 종목(TOP_MIN% 이상, 일봉이 있을 때). 없으면(채권 · 금 · 고르게 담은 ETF) 카드 없음."""
+    peer = None
+    if sym in US_BASE:
+        peer = (US_BASE[sym], E.BY_SYM[US_BASE[sym]][1])
+    else:
+        for tk, nm, w in f.get("top") or []:
+            tk = str(tk).replace(".", "-")
+            if w >= TOP_MIN and len(snap["bars"].get(tk) or []) >= 20:
+                peer = (tk, NAME_KO.get(tk, nm))
+            break
+    b = (snap["bars"].get(sym) or [])[-MOVE_DAYS:]
+    if not peer or len(b) < 20:
+        return ""
+    days = [x["day"] for x in b]
+    m = {x["day"]: x["close"] for x in snap["bars"].get(peer[0]) or []}
+
+    def norm(vals):
+        first = next((v for v in vals if v is not None), None)
+        return [None if v is None else (v / first - 1) * 100 for v in vals] if first else None
+    pv = norm([m.get(d) for d in days])
+    if not pv or sum(x is not None for x in pv) < 20:
+        return ""
+    name = E.BY_SYM[sym][1]
+    series = [(name, norm([x["close"] for x in b]), dk.CHART_MAIN, "solid"), (peer[1], pv, dk.CHART_SERIES[1], "thin")]
+    chart = dk.trend_card("최근 3개월 등락 (%)", dk.month_ticks(days, every=1), series, pct)
+    pb = snap["bars"].get(peer[0]) or []
+    peer_ret = (pb[-1]["close"] / pb[-2]["close"] - 1) * 100 if len(pb) >= 2 and pb[-1]["day"] == days[-1] and pb[-2]["close"] else None
+    if peer_ret is None:
+        return ""
+    state, theme = ("올랐음", "positive") if peer_ret >= 0.5 else ("내렸음", "negative") if peer_ret <= -0.5 else ("비슷함", "neutral")
+    when = dk.kst_close_day(days[-1], "US") + " 새벽"   # 독자 = 한국 시간 (2026-11-14 날짜 규칙)
+    who = "같은 지수를 1배로 따라가는 " + peer[1] if sym in US_BASE else f"가장 많이 담은 {peer[1]}"
+    sent = f"{when} {dk.josa(who, '은')} {_sgn(peer_ret)}%였고, {dk.josa(name, '은')} {_sgn(s['ret_1d'])}%였습니다."
+    sys.path.insert(0, os.path.join(EXP, "nvda-report"))
+    import render_html as R
+    col = {"positive": C.UP, "negative": C.DOWN}.get(theme, "#111")
+    return R._state_card("함께 움직이는 종목은?", state, theme, col, [(sent, "plain"), (chart, "html")], "", fold=True, opened=True)
+
+
 def us_pages(snap, live, fund):
     sys.path.insert(0, os.path.join(EXP, "stock-radar"))
     import universe as U
     import analyze
+    import industry_us
     import render_pages as RP
+    try:
+        fred = industry_us.load()   # 미국 종목 실행(main.py)이 같은 날 받아 둔 FRED — 없으면 업계 통계 카드 없이
+    except Exception:  # noqa: BLE001
+        fred = {}
     R = RP.R
     snap = dict(snap, caps=dict(snap.get("caps") or {}), earnings=dict(snap.get("earnings") or {}))
     pages = {}
@@ -293,8 +344,12 @@ def us_pages(snap, live, fund):
         if sym not in U.BY_SYM:   # 정식 계산이 이름 · 업종 칸을 읽는다 — 이 실행 안에서만
             U.CANDIDATES.append((sym, name, E.slug(sym), "반도체" if "반도체" in tracks else "기술"))
             U.BY_SYM[sym] = U.CANDIDATES[-1]
-            if "반도체" not in tracks:
+            if sym in US_SECTOR:
+                U.SECTOR_OVERRIDE[sym] = US_SECTOR[sym]
+            elif "반도체" not in tracks:
                 U.SECTOR_OVERRIDE[sym] = (U.BENCH, "S&P 500")   # 넓은 지수 ETF 의 업종 대비 = 시장 그 자체
+        if "반도체" in tracks:
+            industry_us.SYM_BIZ[sym] = "semi"   # 업계 통계 = 반도체 업계(FRED) — 한국 테마 ETF 의 업계상황 탭과 같게 (2026-11-14)
         snap["caps"].setdefault(sym, None)
         snap["earnings"].setdefault(sym, [])
         try:
@@ -302,17 +357,23 @@ def us_pages(snap, live, fund):
             b = s.pop("_bars")
             s["tech"] = analyze.technical(b, snap, sym)
             s["market_regime"], s["market_shock"] = analyze.market_regime(snap), analyze.market_shock(snap)
-            s["sector_flow"], s["bollinger"] = None, analyze.bollinger(b)
+            industry = "반도체" in tracks or sym in US_SECTOR   # 업종 하나를 담는 ETF 만 업계상황 탭 (지수형은 업계가 하나가 아니다)
+            s["sector_flow"], s["bollinger"] = (analyze.sector_flow(snap, sym) if industry else None), analyze.bollinger(b)
             s["overheat"], s["drawdown"] = analyze.overheat(b, s["tech"]), analyze.drawdown(b, s["year_range"], snap, sym)
             s.update(peer_moves=[], in_top=False, rank=None, industry_us=None, mom_12_1=None)
             days = [x["day"] for x in b][-252:]
-            today = (R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), name, "S&P 500")
-                     + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s))
             f = fund.get(sym) or {}
+            s["industry_us"] = industry_us.build(sym, fred) if industry else None
+            mv = us_move_card(sym, snap, f, s)
+            today = (R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), name, "S&P 500")
+                     + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s)
+                     + (f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{mv}</div>' if mv else "") + RP.sec_states(s))
+            ind = RP.sec_industry_tab(s) if (s["sector_flow"] or s["industry_us"]) else ""
             hold = tab_holdings(f)
             body = (dk.price_stamp(s["day"], "US") + RP.lead(s)
                     + candle(name, b0, 2)   # 차트 = 탭 위 (2026-11-13 사용자)
                     + R._section("오늘", today, line=False, tab="오늘")
+                    + (R._section("업계상황", ind, tab="업계상황") if ind else "")   # 한국 ETF 와 같은 자리 (2026-11-14)
                     + (R._section("구성", hold, tab="구성") if hold else "")
                     + R._section("기본 정보", tab_basic(sym, f, b0), tab="기본 정보")
                     + related(sym, live))
