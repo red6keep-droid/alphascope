@@ -236,11 +236,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .menu-quick { display: none; }   /* 폰 · 태블릿에서만 (아래 900px 규칙) */
 /* 서랍 메뉴의 닫기 버튼·뒤 가림막 — JS가 만든다. 데스크톱에서는 쓰지 않는다 */
 .nav-close {
-  display: none; position: absolute; top: 16px; right: 16px;
-  width: 36px; height: 36px; align-items: center; justify-content: center;
-  border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600);
+  display: none; position: absolute; top: 18px; right: 18px;
+  width: 32px; height: 32px; align-items: center; justify-content: center; padding: 0;
+  border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111;
 }
-.nav-close svg { width: 16px; height: 16px; }
+.nav-close:hover { border-color: #111; }
+.nav-close svg { width: 14px; height: 14px; }   /* 서랍 닫기도 테두리 네모 32 (닫기 버튼 통일, 2026-11-14 사용자). 옛 36 — 가운데 자리는 그대로(16 + 18) */
 .nav-overlay { position: fixed; inset: 0; z-index: 49; background: transparent; }   /* 헤더(50) 아래 — 서랍은 헤더 안에 있어 55로 두면 가림막이 서랍을 덮어 메뉴가 눌리지 않았다 (2026-10-13 사용자: "메뉴를 클릭시 목록 화면으로 이동되지 않는다")   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
@@ -1194,6 +1195,14 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .title-share:hover { border-color: #111; }
 /* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
 .share-pop .share-buttons { justify-content: flex-start !important; }
+/* 링크 복사 강조 (2026-11-14 사용자): 맨 위 한 줄 가득 · 높이 48 · 16 굵게 · 흰 바탕 · 진한 테두리 */
+.share-pop .share-buttons li.share-main { flex: 1 0 100%; }
+.share-pop .share-buttons li.share-main .sharing-platform-button { display: flex; width: 100%; justify-content: center; gap: 8px; padding: 11px 16px; font-size: 16px; line-height: 24px; background: #fff; border-color: #B5BAC0; color: #111; }
+.share-pop .share-buttons { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px; }   /* 채널 = 링크 복사 아래 4칸 격자, 칸 = 로고 22 위 · 이름 12 보통 아래 (2026-11-14 사용자) */
+.share-pop .share-buttons li.share-main { grid-column: 1 / -1; }
+.share-pop .share-buttons li:not(.share-main) { min-width: 0; }
+.share-pop .share-buttons li:not(.share-main) .sharing-platform-button { display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 4px; padding: 10px 4px 8px; font-size: 12px; line-height: 18px; font-weight: 400; }
+.share-pop .share-buttons li:not(.share-main) svg { width: 22px !important; height: 22px !important; }
 /* 제목 아래 날짜 줄(October 11, 2026) 삭제 (2026-10-12 사용자) */
 .post-timestamp { display: none !important; }
 /* 글 보기: 첫 제목 위 여백 70% 줄임 (2026-10-12 사용자) — 위 32+40 → 10+12 */
@@ -1226,7 +1235,8 @@ body.item-view .post-outer-container { padding-top: 13px; }
    테마 JS가 .rt-pop 을 만든다. 닫기: × 버튼 · 바깥 누르기 · Esc. 줄바꿈(&#10;)은 창 안에서 줄을 바꾼다 */
 .post-body [data-tip] { outline: none; cursor: pointer; }
 .post-body [data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 50%; }
-.rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.45); }
+.rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: transparent; }
+.rt-pop::before, .as-search-layer::before { content: ""; position: fixed; top: -100px; right: 0; bottom: -100px; left: 0; z-index: -1; background: rgba(15,23,42,.45); pointer-events: none; }   /* 가림막 = 화면보다 위아래 100 더 — 폰 브라우저 아래 주소 줄 · 도구 줄 자리까지 덮는다(inset:0 만으로는 아래가 밝게 남았다, 2026-11-14 사용자). 누르면 팝업 바깥(.rt-pop) 누르기로 닫힌다 */
 html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업이 열린 동안 뒤 본문이 스크롤되지 않게 (2026-11-07 사용자 P350) */
 .rt-pop[hidden] { display: none; }
 .rt-pop-box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
@@ -1235,14 +1245,17 @@ html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업�
 .rt-pop-head::after { content: ""; position: absolute; left: 20px; right: 12px; bottom: 0; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색 (2026-10-18 사용자). 폭은 제목 왼쪽 선(20px) ~ 닫기 버튼 오른쪽 선(12px)까지 (같은 날 사용자) */
 .rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
 .rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 25px; color: #111; word-break: keep-all; overflow-wrap: anywhere; }   /* 줄바꿈 = 띄어쓰기 기준 (2026-11-07 사용자 P375) */
-.rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 35px; color: #333; word-break: keep-all; }
+.rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 28px; color: #333; word-break: keep-all; }   /* 팝업 글 = 이슈 날짜 팝업과 같은 19/28, 폰도 같다 (2026-11-14 사용자: 35 → 28) */
 /* 툴팁 내용 행간 = 본문 35px(2026-11-06 34 → 35, 19/35 홀짝 맞춤) (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
-.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; padding-left: 8px; }   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
-.rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
+.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 21px 0 11px; padding-left: 7px; }   /* 줄 사이 보이는 간격 = 이슈 날짜 팝업(행간 28 · 여백 21)과 같게 — 행간 35 라 여백 14 · 들여쓰기 7 (2026-11-14 사용자) */   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
+.rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 12px; border-radius: 50%; background: #111; }   /* 행간 28 가운데 · 점 색 #111 = 다른 팝업과 같게 (2026-11-14 사용자) */
 .rt-pop-li > span:last-child { min-width: 0; }
-.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
+.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 21px; }   /* 묶음 사이 21 = 이슈 날짜 팝업 기사 사이 (2026-11-14 사용자) */
+.rt-pop-body > .rt-pop-p:first-child, .rt-pop-body > .rt-pop-li:first-child { margin-top: 14px; }   /* 툴팁 내용 시작 = 구분선 아래 26(위 12 + 14), 이슈 날짜 팝업과 같다 (2026-11-14 사용자) */
+.share-pop .share-buttons { margin-top: 14px; }   /* 공유 · 계정 내용 시작 = 구분선 아래 26 (위 12 + 14), 이슈 날짜 팝업 기준 (2026-11-14 사용자) */
+.as-acct .rt-pop-body > :first-child { margin-top: 14px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
 .rt-pop-p b { color: #111; }
-.rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 14px; line-height: 20px; color: #7A7A7A; }   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 (2026-10-20 사용자) */
+.rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 13px; line-height: 19px; color: #6B7280; }   /* 팝업 맨 아래 작은 글자 = 원문 보기 링크와 같은 13/19 #6B7280 (2026-11-14 사용자) */   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 (2026-10-20 사용자) */
 /* 기사 번역 안내 (2026-10-19 사용자) — 기사 제목은 원문, 옆 '번역 방법' 14px 회색 밑줄 글자 버튼. 누르면 브라우저 번역법 팝업(툴팁 팝업과 같은 상자).
    구글 번역 주소로 여는 방식은 한국에서 막혀 있어 뺐다 (같은 날) */
 /* 뉴스 팝업 (2026-11-05 batch 8 ⑤ ⑥ ⑦) — 툴팁 팝업 상자 그대로, 글만 16px · 행간 26. 분야 칩은 눌린 것만 검정 */
@@ -1292,7 +1305,9 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .img-pop-scroll { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 0 16px; }
 .img-pop-scroll img { display: block; flex: none; max-width: none; height: auto; border-radius: 8px; background: #fff; }
 .img-pop-hint { flex: none; padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); font-size: 14px; line-height: 20px; color: rgba(255,255,255,.8); text-align: center; }
-.rt-pop-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 20px; line-height: 28px; cursor: pointer; }
+.rt-pop-close { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 0; cursor: pointer; }
+.rt-pop-close::before { content: ""; width: 14px; height: 14px; background: currentColor; -webkit-mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 3l8 8M11 3l-8 8'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 3l8 8M11 3l-8 8'/%3E%3C/svg%3E") center / contain no-repeat; }
+.rt-pop-close:hover { border-color: #111; }   /* 닫기 = 테두리 네모 32 · #E2E8F0 · 모서리 8 · 흰 바탕 · #111 × 선 2 — 모든 닫기 통일(2026-11-14 사용자: "닫기 버튼은 네모 박스", 11-12 회색 원 폐지). 글자 × 는 font-size 0 으로 숨기고 그림만 */
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
@@ -1590,8 +1605,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-title { font-size: 28px; line-height: 36px; }
   .post-body { font-size: 16px; line-height: 32px; }
   .rt-pop-title { font-size: 16px; line-height: 21px; }
-  .rt-pop-body { font-size: 16px; line-height: 32px; }
-  .rt-pop-close { font-size: 17px; line-height: 24px; }
   .post-body .rt-tab { font-size: 16px; line-height: 21.5px; }
   .post-body .rt-subtab { font-size: 16px; line-height: 21px; }
   .post-body .rt-seg { font-size: 16px; line-height: 21px; }
@@ -1620,7 +1633,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-body [style*="line-height:34px"], .post-body [style*="line-height: 34px"] { line-height: 32px !important; }
   .post-body li[style*="line-height:34px"] > span[style*="height:2px"][style*="margin-top:16px"] { margin-top: 15px !important; }
   .post-body li[style*="line-height:34px"] > span[style*="height:3px"][style*="margin-top:15px"] { margin-top: 14px !important; }
-  .report-columns li::before, .kv-row--block li::before, .rt-pop-dot { margin-top: 14px; }
+  .report-columns li::before, .kv-row--block li::before { margin-top: 14px; }
   :root { --sans: 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; --report-font: 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
   .logo-word { font-family: 'Noto Sans KR', sans-serif; }
   .post-body [style*="font-family"]:not([style*="monospace"]) { font-family: var(--report-font) !important; }
@@ -1634,14 +1647,15 @@ body.no-dashboard .main-content { padding-top: 32px; }
 .as-search-btn svg, .as-search-form svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 html.as-lock, html.as-lock body { overflow: hidden; }
 
-.as-search-layer { position: fixed; inset: 0; z-index: 200; background: rgba(15, 23, 42, .45); overflow-y: auto; }
+.as-search-layer { position: fixed; inset: 0; z-index: 200; background: transparent; overflow-y: auto; }   /* 가림막은 ::before (팝업과 같이, 2026-11-14 사용자) */
 .as-search-layer[hidden], .as-chat[hidden], .as-chat-fab[hidden] { display: none; }
 .as-search-box { max-width: 760px; margin: 0 auto; min-height: 120px; background: var(--bg, #fff); border-radius: 0 0 16px 16px; padding: 18px 24px 28px;
   box-shadow: 0 12px 40px rgba(15, 23, 42, .18); font-family: var(--sans); color: var(--ink, #0F172A); }
 .as-search-form { display: flex; align-items: center; gap: 10px; border-bottom: 2px solid var(--ink, #0F172A); padding: 6px 0 10px; }
 .as-search-form input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; font-size: 20px; background: transparent; color: inherit; }
 .as-search-form input::-webkit-search-cancel-button { display: none; }
-.as-x { border: 0; background: none; color: #6B7280; font: inherit; font-size: 14px; cursor: pointer; padding: 6px 4px; }
+.as-x { flex: none; display: inline-flex; border: 0; background: none; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.as-x { align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; } .as-x svg { width: 30px; height: 30px; } .as-x circle { display: none; } .as-x path { fill: none; stroke: #111; stroke-width: 2; stroke-linecap: round; } .as-x:hover { border-color: #111; }   /* 검색 · 질문하기 닫기 = 테두리 네모 32 (팝업 닫기와 같게, 2026-11-14 사용자) — 옛 `닫기` 글자 */
 .as-search-out { padding-top: 16px; }
 .as-hint { color: #6B7280; font-size: 14px; margin: 12px 0 0; }
 
@@ -1659,7 +1673,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-mkt.as-us { background: var(--badge-blue, #4963CA); }
 .as-mkt.as-kr { background: var(--badge-teal, #0F766E); }
 .as-day { margin-left: auto; color: #6B7280; font-size: 13px; }
-.as-say { margin: 4px 0 8px; font-size: 16px; line-height: 1.7; }
+.as-say { margin: 4px 0 8px; font-size: 16px; line-height: 27px; }
 .as-say b, .as-v, .as-grid b, .as-bars b { font-family: var(--num); }
 .as-up { color: var(--up, #E53E3E); }
 .as-dn { color: var(--down, #1A73E8); }
@@ -1671,7 +1685,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-k { color: #475569; flex: none; }
 .as-v { text-align: right; word-break: keep-all; }
 .as-v small, .as-news small { color: #94A3B8; }
-.as-note { color: #6B7280; font-size: 13px; line-height: 1.6; margin: 6px 0; }
+.as-note { color: #6B7280; font-size: 13px; line-height: 21px; margin: 6px 0; }
 .as-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .as-grid div { background: var(--surface-sub, #F8FAFC); border-radius: 8px; padding: 8px 4px; text-align: center; }
 .as-grid span { display: block; font-size: 12px; color: #6B7280; }
@@ -1682,13 +1696,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-bars div:last-child i { background: var(--ink, #0F172A); }
 .as-bars span { color: #6B7280; }
 .as-news, .as-posts { list-style: none; margin: 0; padding: 0; }
-.as-news li { padding: 5px 0; font-size: 15px; line-height: 1.6; }
+.as-news li { padding: 5px 0; font-size: 15px; line-height: 24px; }
 .as-news li > span { color: #6B7280; font-family: var(--num); font-size: 13px; margin-right: 8px; }
 .as-more { display: inline-block; margin-top: 10px; font-size: 14px; font-weight: 700; color: var(--ink, #0F172A); text-decoration: none; }
 .as-more:hover { text-decoration: underline; }
-.as-notice { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; font-size: 15px; line-height: 1.6; }
-.as-empty { background: var(--surface-sub, #F8FAFC); border-radius: 10px; padding: 14px; font-size: 15px; line-height: 1.7; margin-bottom: 12px; }
-.as-basis { display: flex; gap: 6px; margin: 8px 0 0; color: #6B7280; font-size: 13px; line-height: 1.6; }
+.as-notice { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; font-size: 15px; line-height: 24px; }
+.as-empty { background: var(--surface-sub, #F8FAFC); border-radius: 10px; padding: 14px; font-size: 15px; line-height: 26px; margin-bottom: 12px; }
+.as-basis { display: flex; gap: 6px; margin: 8px 0 0; color: #6B7280; font-size: 13px; line-height: 21px; }
 .as-basis span { flex: none; }
 .as-related { margin-top: 18px; }
 .as-posts li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border, #F0F0F0); font-size: 15px; }
@@ -1706,7 +1720,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   font-family: var(--sans); color: var(--ink, #0F172A); overflow: hidden; }
 .as-chat > header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border, #F0F0F0); font-size: 16px; }
 .as-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--surface-sub, #F8FAFC); }
-.as-msg { max-width: 100%; font-size: 15px; line-height: 1.6; }
+.as-msg { max-width: 100%; font-size: 15px; line-height: 24px; }
 .as-msg p { margin: 0 0 8px; }
 .as-me { align-self: flex-end; background: var(--ink, #0F172A); color: #fff; border-radius: 14px 14px 4px 14px; padding: 8px 12px; max-width: 80%; }
 .as-bot { align-self: stretch; }
@@ -1750,9 +1764,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-login-btn img, .as-login-btn .as-ini { width: 26px; height: 26px; border-radius: 50%; display: block; object-fit: cover; }
 .as-login-btn .as-ini { display: flex; align-items: center; justify-content: center; background: #94A3B8; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 26px; }
 .as-login-btn:hover { border-color: #94A3B8; }
-.as-acct .rt-pop-box { max-width: 400px; }
-.as-acct-x { position: absolute; top: 14px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: #EEF0F3; color: #4B5563; cursor: pointer; }   /* 닫기 = 회색 원 32 (가이드라인 닫기 통일) */
-.as-acct-x:hover { background: #E2E5EA; }
+.as-acct .rt-pop-box, .share-pop .rt-pop-box { max-width: 400px; }   /* 짧은 창(계정 · 공유) = 400 (2026-11-14 사용자) */
+.as-acct-x { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; cursor: pointer; }   /* 계정 닫기 = 다른 팝업과 같은 테두리 네모 32 (2026-11-14 사용자) */
+.as-acct-x:hover { border-color: #111; }
 .as-acct-x svg { width: 14px; height: 14px; display: block; }
 .as-acct-note { margin: 0 0 14px; font-size: 14px; line-height: 20px; color: #6B7280; word-break: keep-all; }
 .as-acct-me { display: flex; align-items: center; gap: 10px; margin: 2px 0 14px; font-size: 16px; line-height: 24px; color: #111; }
@@ -3500,8 +3514,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var media = it.kind === 'media';
           homePop.querySelector('.rt-pop-title').textContent = it.title;
           var body = homePop.querySelector('.rt-pop-body'); body.textContent = '';
-          it.lines.forEach(function (ln) {
-            var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:11px 0;';   /* 행간 28 · 항목 여백 11 (P359) */
+          it.lines.forEach(function (ln, i) {
+            var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:' + (i ? 21 : 14) + 'px 0 11px;padding-left:7px;';   /* 행간 28 · 첫 줄 위 14 · 줄 사이 21 · 들여쓰기 7 = 이슈 날짜 팝업 기준 (2026-11-14 사용자, design_kit.pop_li_margin) */
             var dot = el('span'); dot.style.cssText = 'flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;';
             /* 발언자 = 내용 뒤 작은 회색 `- 이름`, 이름 없으면 `- 방송 의견` (P353, design_kit.speaker_split 과 같은 규칙) */
             var m = /^\s*([^:：]{0,30}?)\s*(진행자 발언|기자 보도|발언|진행자|앵커|보도|발표)\s*[:：]\s*(.+)$/.exec(ln), who = '';   /* 접두 꼴 넓힘 (P377) */
@@ -4513,10 +4527,10 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             li.appendChild(b); list.appendChild(li);
           }
           function flash(b, msg) { var t = b.querySelector('.platform-sharing-text'), o = t.textContent; t.textContent = msg; setTimeout(function () { t.textContent = o; }, 1500); }
-          var order = { link: 0, facebook: 1, x: 2, kakao: 3 };
+          var order = { link: 0, facebook: 1, x: 2, kakao: 3, telegram: 4, band: 5, threads: 6, more: 7 };   /* 채널 7개 + 링크 복사 (2026-11-14 사용자, 목업 A7-2) */
           function kindOf(li) {
             var t = ((li.textContent || '') + ' ' + (li.innerHTML.match(/sharing-\w+/g) || []).join(' ')).toLowerCase();
-            return /카카오|kakao/.test(t) ? 'kakao' : /facebook|페이스북/.test(t) ? 'facebook' : /twitter|(^|\s)x(\s|$)/.test(t) ? 'x' : 'link';
+            return /카카오|kakao/.test(t) ? 'kakao' : /텔레그램|telegram/.test(t) ? 'telegram' : /밴드|band/.test(t) ? 'band' : /스레드|threads/.test(t) ? 'threads' : /더 보기/.test(t) ? 'more' : /facebook|페이스북/.test(t) ? 'facebook' : /twitter|(^|\s)x(\s|$)/.test(t) ? 'x' : 'link';
           }
           /* 아이콘 네 개를 직접 그린다 — 블로거 기본 아이콘은 이 테마에서 안 그려진다. 링크는 선, 나머지는 채운 로고 (2026-10-23 사용자) */
           var SV = function (inner, stroke) { return '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" style="flex:none;width:20px;height:20px;' + (stroke ? 'fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;' : 'fill:currentColor;stroke:none;') + '">' + inner + '</svg>'; };
@@ -4524,7 +4538,11 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             link: SV('<path d="M10 13a5 5 0 0 0 7.100.1l3-3a5 5 0 0 0-7.100-7.100l-1.700 1.700"/><path d="M14 11a5 5 0 0 0-7.100-.1l-3 3a5 5 0 0 0 7.100 7.100l1.700-1.700"/>', true),
             facebook: SV('<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.990 4.388 10.954 10.125 11.854v-8.385H7.078v-3.470h3.047V9.430c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.830c-1.491 0-1.956.925-1.956 1.874v2.250h3.328l-.532 3.470h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>'),
             x: SV('<path d="M18.901 1.153h3.680l-8.040 9.190L24 22.846h-7.406l-5.800-7.584-6.638 7.584H.474l8.600-9.830L0 1.154h7.594l5.243 6.932ZM17.610 20.644h2.039L6.486 3.240H4.298Z"/>'),
-            kakao: SV('<path d="M12 3c5.799 0 10.500 3.664 10.500 8.185 0 4.520-4.701 8.184-10.500 8.184a13.500 13.500 0 0 1-1.727-.110l-4.408 2.883c-.501.265-.678.236-.482-.486l.998-3.770C2.682 16.700 1.500 14.536 1.500 11.185 1.500 6.664 6.201 3 12 3Z"/>')
+            kakao: SV('<path d="M12 3c5.799 0 10.500 3.664 10.500 8.185 0 4.520-4.701 8.184-10.500 8.184a13.500 13.500 0 0 1-1.727-.110l-4.408 2.883c-.501.265-.678.236-.482-.486l.998-3.770C2.682 16.700 1.500 14.536 1.500 11.185 1.500 6.664 6.201 3 12 3Z"/>'),
+            telegram: SV('<path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>'),   /* 텔레그램 · 스레드 = Simple Icons 13.21.0 공식 모양, 밴드 = 밴드 앱 아이콘 모양 선 그림(공개 묶음에 없다) (2026-11-14 사용자) */
+            threads: SV('<path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/>'),
+            band: '<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true" focusable="false" style="flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M16.2 27.9V8.4a3.9 3.9 0 0 0-3.9-3.9a3.9 3.9 0 0 0-3.9 3.9v19.5"/><path d="M16.2 14.387A15.602 15.602 0 1 1 8.4 27.9"/><path d="M16.2 19.18a11.7 11.7 0 1 1-3.9 8.72V8.4"/><circle cx="24" cy="27.9" r="7.8"/></svg>',
+            more: SV('<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>', true)
           };
           var present = {};
           [].slice.call(list.children).forEach(function (li) { present[kindOf(li)] = 1; });
@@ -4543,7 +4561,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           }
           /* 카카오톡: 카카오 개발자 앱의 JavaScript 키가 있으면 카카오톡 공유창, 없으면 기기 공유창(모바일에서 카카오톡 선택) → 그것도 없으면 주소 복사.
              키는 아래 KAKAO_JS_KEY 에 (사이트 도메인도 카카오 개발자 콘솔에 등록) */
-          var KAKAO_JS_KEY = '';
+          var KAKAO_JS_KEY = '069e629f7c7a8e72eef36026283f1967';
           mkItem('카카오톡', ICONS.kakao,
             function (b) {
               function fallback() {
@@ -4561,11 +4579,18 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               if (window.Kakao) { send(); return; }
               var sc = document.createElement('script'); sc.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js'; sc.onload = send; sc.onerror = fallback; document.head.appendChild(sc);
             });
-          /* 모든 버튼의 아이콘을 위 것으로 통일하고 순서는 링크 · 페이스북 · X · 카카오톡 */
+          /* 텔레그램 · 밴드 · 스레드 = 각 서비스 공유 주소(키 없음) · 더 보기 = 휴대폰 기본 공유 창, 지원하는 기기(폰)에서만 (2026-11-14 사용자) */
+          function popup(u) { window.open(u, '_blank', 'noopener,width=640,height=560'); }
+          mkItem('텔레그램', ICONS.telegram, function () { popup('https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareTitle)); });
+          mkItem('밴드', ICONS.band, function () { popup('https://band.us/plugin/share?body=' + encodeURIComponent(shareTitle + '\n' + shareUrl) + '&route=' + encodeURIComponent(location.hostname)); });
+          mkItem('스레드', ICONS.threads, function () { popup('https://www.threads.net/intent/post?text=' + encodeURIComponent(shareTitle + ' ' + shareUrl)); });
+          if (navigator.share && matchMedia('(pointer: coarse)').matches) mkItem('더 보기', ICONS.more, function () { navigator.share({ title: shareTitle, url: shareUrl }).catch(function () {}); });
+          /* 모든 버튼의 아이콘을 위 것으로 통일하고 순서는 링크 · 페이스북 · X · 카카오톡 · 텔레그램 · 밴드 · 스레드 · 더 보기 */
           [].slice.call(list.children).sort(function (a, b) { return order[kindOf(a)] - order[kindOf(b)]; }).forEach(function (li) {
             var btnEl = li.querySelector('.sharing-platform-button') || li;
             [].slice.call(btnEl.querySelectorAll('svg')).forEach(function (v) { v.parentNode.removeChild(v); });
             btnEl.insertAdjacentHTML('afterbegin', ICONS[kindOf(li)]);
+            if (kindOf(li) === 'link') li.classList.add('share-main');   /* 링크 복사 = 맨 위 한 줄 큰 버튼 (2026-11-14 사용자: "링크 복사를 크게 강조") */
             list.appendChild(li);
           });
           pop.querySelector('.share-pop-body').appendChild(list);
@@ -6181,7 +6206,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           layer.innerHTML = '<div class="as-search-box" role="dialog" aria-modal="true" aria-label="검색">'
             + '<form class="as-search-form" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
             + '<input type="search" name="q" placeholder="종목 이름이나 궁금한 것 (예: 엔비디아 실적)" autocomplete="off" enterkeyhint="search">'
-            + '<button type="button" class="as-x" aria-label="검색 닫기">닫기</button></form>'
+            + '<button type="button" class="as-x" aria-label="검색 닫기"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9"/></svg></button></form>'
             + '<div class="as-search-out">' + chips('as-chips') + '<p class="as-hint">주가 · 등락 · 실적 · EPS · 기술 지표 · 회사 정보를 바로 답하고, 관련 글을 함께 보여 줍니다.</p></div></div>';
           document.body.appendChild(layer);
           var form = layer.querySelector('form'), input = form.q, out = layer.querySelector('.as-search-out');
@@ -6225,7 +6250,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           pane.className = 'as-chat';
           pane.hidden = true;
           pane.setAttribute('aria-label', '질문하기');
-          pane.innerHTML = '<header><b>AlphaScope에 물어보기</b><button type="button" class="as-x" aria-label="닫기">닫기</button></header>'
+          pane.innerHTML = '<header><b>AlphaScope에 물어보기</b><button type="button" class="as-x" aria-label="닫기"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9"/></svg></button></header>'
             + '<div class="as-log" aria-live="polite"></div>'
             + '<form><input name="q" placeholder="예: 삼성전자 실적 알려줘" autocomplete="off" enterkeyhint="send"><button type="submit">보내기</button></form>'
             + '<footer>AI가 아니라 AlphaScope가 모은 자료로 답합니다 · 투자 권유가 아닙니다</footer>';

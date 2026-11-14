@@ -2044,6 +2044,14 @@ def news_pop_id(prefix, key):
 
 
 POP_LH, POP_ITEM_GAP = 28, 11   # 팝업 요약 줄 행간 · 항목 여백 (P359)
+# 팝업 간격 = 이슈 날짜 팝업(이란 전쟁 뉴스) 기준 (2026-11-14 사용자: "간격은 이슈 팝업 날짜 기준으로 전부 맞춰줘"):
+#   내용 시작 = 제목 아래 구분선 ~ 첫 줄 26(테마 위 안쪽 여백 12 + 14) · 글머리 줄 사이 21(11 + 10) · 소제목 ~ 첫 줄 11 · 들여쓰기 7
+POP_FIRST_GAP, POP_LINE_GAP, POP_LI_PAD = 14, POP_ITEM_GAP + 10, 7
+
+
+def pop_li_margin(i):
+    """i 번째(0부터) 글머리 줄 바깥 여백 — 첫 줄 위 14, 둘째 줄부터 위 21 · 아래 11 (위아래 여백이 겹쳐 줄 사이 21)."""
+    return f"{POP_FIRST_GAP if i == 0 else POP_LINE_GAP}px 0 {POP_ITEM_GAP}px"
 
 
 def _link_src(source, kind):
@@ -2056,8 +2064,8 @@ def news_pop_body(pid, title, lines, when="", source="", kind="방송", url=None
     """팝업 글 = 요약 줄 → 관련 종목(있으면) → 작은 원문 링크. 머리 줄(시각 · 매체)과 `같은 뉴스` 칸은 없다 (2026-11-07 사용자 P352 · P354).
     when · n_channels 는 옛 호출 호환용 — 쓰지 않는다. related = [(이름, 등락%)]."""
     # 줄 안 행간 35 → 28 (20%), 글머리표 사이 보이는 간격은 그대로 — 줄어든 행간 7px 만큼 항목 여백 4 → 11 (2026-11-07 사용자 P359)
-    li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{POP_ITEM_GAP}px 0;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
-                 f'<span style="min-width:0;font-size:{BODY};line-height:{POP_LH}px;color:#333;word-break:keep-all;">{speaker_html(ln, headline_style=False)}</span></span>' for ln in lines)
+    li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{pop_li_margin(i)};padding-left:{POP_LI_PAD}px;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
+                 f'<span style="min-width:0;font-size:{BODY};line-height:{POP_LH}px;color:#333;word-break:keep-all;">{speaker_html(ln, headline_style=False)}</span></span>' for i, ln in enumerate(lines))
     link = ""
     if url:
         link = (f'<span style="display:block;text-align:right;margin:14px 0 0;"><a href="{esc(url)}" target="_blank" rel="noopener" data-trhelp="skip" '
@@ -2216,6 +2224,22 @@ ICON_GLYPHS = {
     "scale": '<path d="M8 2v12M4.5 14h7"/><path d="M2.5 5h11"/><path d="M4 5 2 9.5h4L4 5zM12 5l-2 4.5h4L12 5z"/>',
     "clock": '<circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.2 1.4"/>',
     "person": '<circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4"/>',
+    # 수혜 테마 (2026-11-14 사용자: "수혜주는 계속 쓸 거라 테마 아이콘을 만들어 두자" — Hot Issue `수혜주는?` 테마 이름 앞, 기본형 회색 원)
+    "t_air": '<path d="M8 1.8c.6 0 .9.6.9 1.3v3.4l4.6 2.7v1.4L8.9 9.3v2.6l1.6 1.3v1.1L8 13.6l-2.5.7v-1.1l1.6-1.3V9.3L2.5 10.6V9.2l4.6-2.7V3.1c0-.7.3-1.3.9-1.3z"/>',
+    "t_travel": '<rect x="2.5" y="5" width="11" height="8.5" rx="1.5"/><path d="M6 5V3.3h4V5M5.5 5v8.5M10.5 5v8.5"/>',
+    "t_chem": '<path d="M6 2h4M6.6 2v4.4L3 12.6a1.1 1.1 0 0 0 1 1.7h8a1.1 1.1 0 0 0 1-1.7L9.4 6.4V2"/><path d="M4.6 10h6.8"/>',
+    "t_build": '<rect x="2" y="3.5" width="12" height="9" rx="1"/><path d="M2 8h12M8 3.5V8M5 8v4.5M11 8v4.5"/>',   # 벽돌 두 줄 (안전모 = 종, 크레인 = 교수대, 세 줄 벽돌 = 자판처럼 보였다)
+    "t_defense": '<path d="M8 1.8l5 2v4c0 3.2-2.1 5.3-5 6.4-2.9-1.1-5-3.2-5-6.4v-4z"/><path d="M5.8 8l1.6 1.6L10.4 6.6"/>',
+    "t_oil": '<path d="M8 2c2.2 2.9 4 5.2 4 7.5a4 4 0 0 1-8 0C4 7.2 5.8 4.9 8 2z"/>',
+    "t_refine": '<path d="M2 14V8.6l3.3-2v2l3.3-2v2l2.4-1.4V2h2.2v12M2 14h12"/>',
+    "t_ship": '<path d="M2 10h12l-1.8 3.5H3.8z"/><path d="M4 10V6.5h8V10M7 6.5V4h2v2.5"/>',
+    "t_car": '<path d="M2 11.5V8.4L3.8 5h8.4L14 8.4v3.1M2 8.4h12"/><circle cx="5" cy="11.5" r="1.5"/><circle cx="11" cy="11.5" r="1.5"/>',
+    "t_phone": '<rect x="4.5" y="1.5" width="7" height="13" rx="1.5"/><path d="M7 12h2"/>',
+    "t_shop": '<path d="M3 5.5h10l-.8 8.5H3.8z"/><path d="M5.8 5.5v-1a2.2 2.2 0 0 1 4.4 0v1"/>',
+    "t_steel": '<path d="M3 2.5h10v2.2H9.2v6.6H13v2.2H3v-2.2h3.8V4.7H3z"/>',
+    "t_solar": '<circle cx="8" cy="8" r="2.8"/><path d="M8 1.5V3M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>',
+    "t_chip": '<rect x="4" y="4" width="8" height="8" rx="1"/><path d="M6.5 2v2M9.5 2v2M6.5 12v2M9.5 12v2M2 6.5h2M2 9.5h2M12 6.5h2M12 9.5h2"/>',
+    "t_tool": '<circle cx="8" cy="8" r="2"/><path d="M8 1.8v2M8 12.2v2M1.8 8h2M12.2 8h2M3.6 3.6 5 5M11 11l1.4 1.4M3.6 12.4 5 11M11 5l1.4-1.4"/><circle cx="8" cy="8" r="4.3"/>',
 }
 SOFT_ICON_BG, SOFT_ICON_INK, SOFT_ICON_SIZE = "#E5E7EB", "#4B5563", 22   # 기본형 = 회색 면 원 + 진회색 그림 (증시 전망 팝업 소제목 P505)
 

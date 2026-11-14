@@ -65,9 +65,9 @@ def _row(it):
         body = dk.news_pop_body(pid, it["headline"], lines)   # 링크는 아래 버튼 줄이 맡는다
         src = it.get("publisher") if not it.get("primary") and it.get("publisher") != "googlenews" else ""
         # 버튼 줄 = 양쪽 (P372): 왼쪽 `빌 애크먼 발언 더 보기` = 공식 더 보기 버튼(흰 바탕 · 회색 외곽선), 오른쪽 `원문 보기` 작은 글자 링크
-        btns = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0 0;">'
-                f'<a href="{dk.esc(_person_url(it))}" style="{dk.FOLD_BTN}display:inline-flex;text-decoration:none;">{dk.esc(it["name_ko"])} 발언 더 보기</a>'
-                + (f'<a href="{dk.esc(it["url"])}" target="_blank" rel="noopener" data-trhelp="skip" style="font-size:13px;line-height:19px;color:{dk.SUB};text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">'
+        btns = (f'<span style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px;margin:16px 0 0;">'   # 좁으면 `원문 보기`가 다음 줄 오른쪽으로 — 버튼 글자는 한 줄 (2026-11-14 사용자: 폰에서 두 줄로 꺾이던 것)
+                f'<a href="{dk.esc(_person_url(it))}" style="{dk.FOLD_BTN}display:inline-flex;text-decoration:none;white-space:nowrap;">{dk.esc(it["name_ko"])} 발언 더 보기</a>'
+                + (f'<a href="{dk.esc(it["url"])}" target="_blank" rel="noopener" data-trhelp="skip" style="margin-left:auto;font-size:13px;line-height:19px;color:{dk.SUB};text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">'
                    f'원문 보기{f" ({dk.esc(src)})" if src else ""} {dk.LINK_ICON}</a>' if it.get("url") else "") + "</span>")
         row = dk.news_pop_wrap(row, pid) + body[:-len("</div>")] + btns + "</div>"
     return row

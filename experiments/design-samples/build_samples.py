@@ -36,6 +36,10 @@ SOFT_USES = [
     ("person", "(예비) 인물"),
     ("scale", "(예비) 전망"),
 ]
+# 수혜 테마 그림 (2026-11-14 사용자) — Hot Issue `수혜주는?` 테마 이름 앞. 이름 = mock_issue_watch.THEME_ICON
+THEME_USES = [("t_air", "항공"), ("t_travel", "여행 · 크루즈"), ("t_chem", "화학"), ("t_build", "중동 재건 · 건설"), ("t_defense", "방산"),
+              ("t_oil", "석유 생산"), ("t_refine", "정유"), ("t_ship", "해운"), ("t_car", "자동차"), ("t_phone", "전자 · 스마트폰"),
+              ("t_shop", "소매 · 의류"), ("t_steel", "철강"), ("t_solar", "태양광 · 미국 공장"), ("t_chip", "AI 반도체"), ("t_tool", "반도체 장비")]
 
 
 def home_icons():
@@ -86,6 +90,8 @@ def main():
     new = row('<span style="display:inline-block;background:#B91C1C;color:#fff;font-weight:700;border-radius:3px;padding:1px 4px;line-height:12px;font-size:11px;">N</span>',
               "N", "가끔 바뀌는 칸이 지난번과 달라진 날")
     body = (sec("아이콘 · 기본형", "회색 면 원 22(#E5E7EB) 안 진회색 선 그림(#4B5563, 원의 0.55 · 선 1.6). 소제목 · 구획 제목 앞. 색을 쓰지 않는다 — 뜻이 아니라 칸 구분.", soft + soft_demo)
+            + sec("아이콘 · 기본형 — 수혜 테마", "Hot Issue `수혜주는?` 테마 이름(16 굵게) 앞, 글자와 6. 같은 기본형 회색 원 22 · 그림 12. 오른쪽 = 3배 확대(그림 확인용).",
+                  "".join(row(dk.soft_icon(k), k, f'{u} <span style="display:inline-block;vertical-align:middle;margin-left:8px;">{dk.soft_icon(k, 66)}</span>') for k, u in THEME_USES))
             + sec("아이콘 · 강조형", "색 면 네모(24 · 모서리 6, 목록 줄 18 · 모서리 4~5) 안 흰 선 그림(크기의 2/3). 강조 카드 · 질문 줄 · 홈 카드 제목 앞, 글자와 8. 색 = 그 기능 하나의 색.", solid)
             + sec("안내 아이콘", "글과 같은 색의 외곽선 원. 면 없음.", guide)
             + sec("라벨 · 외곽선 라벨 (dk.pill)", "1px 테두리 · 모서리 4 · 14px 보통 · 안쪽 3 5 2. 글 앞뒤에 붙으면 세로 가운데, 라벨과 글 5 · 라벨끼리 2.", pills)

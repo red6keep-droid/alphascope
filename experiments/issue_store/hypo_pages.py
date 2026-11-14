@@ -756,14 +756,18 @@ def _pop_li(text, meta="", talk=False, html=False, label=""):
             f'{text if html else dk.esc(text)}{_talk_mark().replace("top:-1px;", "top:-2px;", 1) if talk else ""}{_src_tail(meta)}</span></span>')   # 팝업 문장 안 `논의중` = 1px 더 올림 — 잉크 실측 상자 가운데가 한글보다 0.75px 아래 (P504)
 
 
-POP_LI_PAD = 7   # 팝업 줄 왼쪽 들여쓰기 (P519, 2026-11-11 사용자)
+POP_LI_PAD = dk.POP_LI_PAD   # 팝업 줄 왼쪽 들여쓰기 7 (P519, 2026-11-11 사용자) — 공용 값
 POP_SUB_GAP, POP_SUB_FIRST = 31, 14   # 팝업 소제목 위 여백 — 첫 소제목은 팝업 제목 바로 아래라 40% 줄임 (P506 · P509, 2026-11-11 사용자: 모든 팝업 같은 규칙)
 
 
 def _pop_first(html):
-    """팝업 글 맨 앞이 소제목이면 그 위 여백만 POP_SUB_FIRST 로."""
+    """팝업 글 맨 앞이 소제목이면 그 위 여백만 POP_SUB_FIRST 로, 글머리 줄이면 그 줄 위만 dk.POP_FIRST_GAP 로."""
     head = f'<span style="display:block;margin:{POP_SUB_GAP}px 0 0;'
-    return f'<span style="display:block;margin:{POP_SUB_FIRST}px 0 0;' + html[len(head):] if html.startswith(head) else html
+    if html.startswith(head):
+        return f'<span style="display:block;margin:{POP_SUB_FIRST}px 0 0;' + html[len(head):]
+    li = f"margin:{dk.POP_ITEM_GAP}px 0;"   # 글머리 줄로 시작하면 그 줄 위만 14 — 이슈 날짜 팝업과 같은 내용 시작 26 (2026-11-14 사용자)
+    lead = _re.match(r'(<span data-news-pop="[^"]*"[^>]*>)?<span style="display:flex;[^"]*?' + _re.escape(li), html)
+    return html[:lead.end() - len(li)] + f"margin:{dk.pop_li_margin(0)};" + html[lead.end():] if lead else html
 
 
 def _art_li(r, talk=None, label=""):
@@ -831,10 +835,10 @@ def _why_pop(pid, title, rows, total, sigs=(), as_of=None, page=None):
     for hz, span in WHY_HZ:
         xs = [r for r in sigs if r["hz"] == hz]
         if xs:
-            out += _pop_sub(f'{CAL_ICON}{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>', sep=bool(out)) + "".join(_pop_li(_sig_html(r["name"], r["state"]), html=True) for r in xs)
+            out += _pop_sub(f'{CAL_ICON}{hz} <span style="font-weight:400;color:{dk.SUB};">· {span}</span>', sep=bool(out)) + "".join(art_gap(_pop_li(_sig_html(r["name"], r["state"]), html=True), k) for k, r in enumerate(xs))   # 신호 줄 사이도 21 (2026-11-14 사용자: 이슈 날짜 팝업 기준)
     if sigs and as_of:   # 기준 날짜 — 종목 페이지가 있으면 링크 `10.30 종목 페이지 ›` (2026-11-11 사용자: `우리 신호 = … 값` 은 독자가 모른다)
         st = f'display:inline-flex;align-items:center;gap:2px;margin:14px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};'
-        out += (f'<a href="{dk.esc(page)}" style="{dk.FOLD_BTN}display:inline-flex;margin:16px 0 0;text-decoration:none;font-weight:400;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page   # 인물 발언 팝업 `○○ 발언 더 보기` 와 같은 외곽선 버튼 (P503)
+        out += (f'<a href="{dk.esc(page)}" style="{dk.FOLD_BTN}display:inline-flex;margin:16px 0 0;text-decoration:none;">{SIG_NAME} 기준 : {md(as_of)} 종목 페이지{_CHEV_R}</a>' if page   # 인물 발언 팝업 `○○ 발언 더 보기` 와 같은 외곽선 버튼 (P503) — 굵기도 같게 14 굵게 (2026-11-14 사용자: 팝업 버튼 하나)
                 else f'<span style="{st}">{SIG_NAME} 기준 : {md(as_of)}</span>')
     return f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(title)}" hidden>{_pop_first(out)}</div>'
 
@@ -986,7 +990,7 @@ def open_line(fc, log):
     rows.sort(key=lambda r: r.get("day") or "", reverse=True)
     top = rows[0]
     pid = dk.news_pop_id("whyopen", fc.get("slug"))
-    pop = "".join(_art_li(r, talk=False) for r in rows)   # `논의중` 라벨 없음 — 향방미정이 이미 정해지지 않은 일 (2026-11-11 사용자)
+    pop = _pop_first("".join(art_gap(_art_li(r, talk=False), k) for k, r in enumerate(rows)))   # 줄 사이 21 · 내용 시작 26 (2026-11-14 사용자: 이슈 날짜 팝업 기준)   # `논의중` 라벨 없음 — 향방미정이 이미 정해지지 않은 일 (2026-11-11 사용자)
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{OPEN_TITLE}" hidden>{pop}</div>'
     chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{CHEV14}</span>'
     return (f'<div data-why-open="1" data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="display:flex;align-items:center;gap:8px;margin:0 0 {OPEN_GAP}px;padding:0 {dk.ALIGN_PX}px 0 0;cursor:pointer;">'
@@ -1737,12 +1741,12 @@ def day_why_html(x, fc):
             pop += pop_group_head(side_info_title(names[d][1]), kinds.get(d, "flat"), first=not pop)
             pop += "".join(art_gap(_art_li(r), k) for k, r in enumerate(rs))
     if w.get("open"):
-        pop += "".join(_art_li(r, talk=False, label=open_pill()) for r in w["open"])
+        pop += "".join(art_gap(_art_li(r, talk=False, label=open_pill()), k + bool(pop)) for k, r in enumerate(w["open"]))   # 앞 기사 줄에 이어지면 첫 줄부터 21 (2026-11-14 사용자: 이슈 날짜 팝업 기준)
     for hz, span in WHY_HZ:
         cs = [c for c in w.get("changes") or [] if c["hz"] == hz]
         if cs:
             pop += _pop_sub(f'{CAL_ICON}{SIG_NAME} {hz} <span style="font-weight:400;color:{dk.SUB};">· 바뀐 것</span>', sep=bool(pop))
-            pop += "".join(_pop_li(_sig_html(c["name"], f'{c["from"]} → {c["to"]}' if c.get("from") else c["to"]), html=True) for c in cs)
+            pop += "".join(art_gap(_pop_li(_sig_html(c["name"], f'{c["from"]} → {c["to"]}' if c.get("from") else c["to"]), html=True), k) for k, c in enumerate(cs))   # 줄 사이 21
     body = f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(md(x["day"]) + " " + WHY_WORD)}" hidden>{_pop_first(pop)}</div>'
     if pick:
         line = (f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{label}{_one_line(dk.esc(pick["t"]), grow=False, color=TL_WHY_INK)}'

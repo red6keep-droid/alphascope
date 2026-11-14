@@ -91,6 +91,7 @@ KR_KEYS = {"EWY", "091160.KS"}   # 한국 장 = 미국보다 하루 먼저 닫�
 EXTRA_LINKS = [("에너지 업종 약세", "XLE", -1), ("항공 강세 (연료비 ↓)", "JETS", +1)]   # 공급 복귀 사슬(OIL_SUPPLY_RETURN)에서   # 공급 복귀 사슬에서 — 그림자 스캔 11-09 · 11-10 에 움직인 둘
 CASE_COLS = [("유가", "CL=F"), ("S&P 500", "^GSPC"), ("한국 (EWY)", "EWY"), ("에너지", "XLE"), ("방산", "ITA")]
 Z_CLEAR, Z_SOME, BASE = 2.0, 1.0, 60
+WIN = 5   # 독자 카드의 시장 기간 = 5거래일 = 뉴스 바늘 `최근 일주일` (2026-11-14 사용자: 기간을 하나로)
 # 지표 묶음 — 한 줄로 세면 서로 다른 이유(11-05 반도체 급락)로 움직인 주식이 유가 쪽 신호를 가린다 (2026-11-13 실측: 유가 쪽 3개 모두 종전 방향, 주식 쪽 3개 반대)
 GROUPS = [("유가", ("CL_F", "XLE", "JETS")), ("주식", ("XLK", "EWY", "ITA")), ("안전 자산", ("_VIX", "GC_F"))]   # `쪽` 없이 (2026-11-13 사용자)
 
@@ -144,7 +145,68 @@ CFG = {
                    stages={"종전": [("발언", r"완화|허가|승인"), ("허가 · 승인", r"허가|승인|허용|면제"), ("규제 해제", r"해제|철회|폐지")],
                            "확전": [("검토 · 보도", r"검토|추진|보도|위협"), ("발표", r"발표|명단|거래 제한|규정"), ("시행", r"시행|발효|금지|차단"), ("확대", r"확대|추가 제한|동맹국|강화")]}),
 }
+# 뉴스 타임라인 기준 가격 (2026-11-14 사용자: 증시 전망처럼 날마다 기준이 되는 가격) — 이슈가 가장 먼저 움직이는 값 하나.
+#   이란 = 브렌트유(호르무즈 · 공급, 이 페이지 그래프도 브렌트), 관세 = S&P 500(관세 그래프와 같음), 수출 통제 = 미국 반도체 지수
+TL_REF = {"IRAN": ("브렌트유", "BZ=F", "{:,.1f}달러"), "TARIFF": ("S&P 500", "^GSPC", "{:,.0f}"), "EXPORT": ("반도체 지수", "^SOX", "{:,.0f}")}
 C = {}   # 지금 그리는 이슈 설정 (use() 가 채운다)
+
+# `종전되면 · 확전되면 주가는?` — 쪽마다 흔한 설명(사슬 갈림) + 사건표 사례 (2026-11-14 사용자: 독자가 궁금한 건 확전 때 · 종전 때 주가)
+#   chain = 흔한 설명을 가져올 사슬(None = 없음) · kinds = 사건표 분류 · inc / exc = 제목 낱말 · note = 표 아래 안내
+IF_SIDES = {
+    "IRAN": {"종전": dict(chain="CEASEFIRE", kinds=("휴전 · 종전",), inc=None, exc=None,
+                         note="3번뿐이라 ‘보통 이렇다’고 말할 수는 없습니다. 03.31 과 04.08 은 20거래일이 겹칩니다. 04.08 휴전 뒤 전쟁은 다시 이어졌습니다(10월 해협 공격 · 11.07 타격)."),
+             "확전": dict(chain="WAR", kinds=("전쟁 · 테러",), inc=r"이란|이라크|이스라엘|사우디|리비아|하마스", exc=None,
+                         note="중동에서 전쟁이 시작되거나 커진 날입니다. 사건마다 규모가 달라 ‘보통 이렇다’고 말할 수는 없습니다.")},
+    "TARIFF": {"종전": dict(chain=None, kinds=("관세 · 무역",), inc=r"유예|합의|휴전|타결", exc=None,
+                           note="완화 사례는 1번뿐입니다. 기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다."),
+               "확전": dict(chain="TARIFF", kinds=("관세 · 무역",), inc=None, exc=r"유예|합의|휴전|타결",
+                           note="기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다.")},
+    "EXPORT": {"종전": dict(chain=None, kinds=(), inc=None, exc=None, note=""),
+               "확전": dict(chain="REGULATION", kinds=("규제 (수출 · 반독점)",), inc=r"수출|BIS|H20|규제 강화", exc=None,
+                           note="기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다.")},
+}
+# `종전되면 · 확전되면 수혜주는?` — 시장에서 흔히 꼽는 종목 (2026-11-14 사용자: "확전되면 수혜주, 종전되면 수혜주를 예를 들어").
+#   종목 고르기 = Claude 설계(흔한 설명 · 교과서 · 언론), 알파스코프의 추천이 아니다(법 기준: 매수 추천 금지). (이름, 야후 기호, 흔히 드는 이유)
+#   2026-11-14 둘째 (사용자: "테마를 먼저, 그 테마의 주도주를 하나씩 · 유가가 움직이면 따라 나오는 수혜주는 왜 빠졌나 · 한국 · 미국이 섞였나"):
+#   테마 = (이름, 경로, 흔한 이유, 미국 후보, 한국 후보). 경로 = 이 테마가 좋아지는 길 — "유가 하락" · "유가 상승" 은 이번 주 유가 움직임과 맞대어 본다.
+#   주도주 = 후보 중 시가총액 1위(나라마다 하나, 자동 — 사람이 고르지 않는다). 테마 값 = 후보 전체 시장 대비 평균(미국 = S&P 500 · 한국 = 코스피 대비).
+#   후보 = Claude 설계(흔한 설명 · 언론), 알파스코프의 추천이 아니다(법 기준: 매수 추천 금지).
+OIL_PATH = {"유가 하락": -1, "유가 상승": +1}
+THEME_ICON = {"항공": "t_air", "여행 · 크루즈": "t_travel", "화학": "t_chem", "중동 재건 · 건설": "t_build", "방산": "t_defense", "석유 생산": "t_oil",
+              "정유": "t_refine", "해운": "t_ship", "자동차": "t_car", "전자 · 스마트폰": "t_phone", "소매 · 의류": "t_shop", "철강": "t_steel",
+              "태양광 · 미국 공장": "t_solar", "AI 반도체": "t_chip", "반도체 장비": "t_tool"}   # 테마 이름 앞 기본형 회색 원 (design_kit.ICON_GLYPHS t_*, 2026-11-14 사용자 — 수혜주는 계속 쓰니 아이콘을 만들어 둔다)
+THEME_SEP_EXTRA = 15   # 테마 사이 구분선 아래(다음 테마 이름 위) +15 (2026-11-14 사용자: "화학 위 구분선 여백 15픽셀 더")
+STAGE_Q = {"IRAN": "전쟁 진행 상황", "TARIFF": "관세 진행 상황", "EXPORT": "수출 통제 진행 상황"}   # 옛 `실제로 어디까지 갔나?` (2026-11-14 사용자: "전쟁 진행 상황 이렇게 줄여줘")
+BENEFIT = {
+    "IRAN": {"종전": [("항공", "유가 하락", "연료비 부담 줄어듦 · 중동 노선 회복", [("델타항공", "DAL"), ("유나이티드항공", "UAL"), ("아메리칸항공", "AAL")],
+                       [("대한항공", "003490.KS"), ("진에어", "272450.KS")]),
+                      ("여행 · 크루즈", "유가 하락", "연료비 · 여행 수요 회복", [("로열캐리비안", "RCL"), ("카니발", "CCL")], [("하나투어", "039130.KS")]),
+                      ("화학", "유가 하락", "원료(나프타) 값 내림", [("다우", "DOW"), ("라이온델바젤", "LYB")], [("LG화학", "051910.KS"), ("롯데케미칼", "011170.KS")]),
+                      ("중동 재건 · 건설", "재건 공사", "전쟁 뒤 재건 · 플랜트 발주", [("플루어", "FLR")], [("현대건설", "000720.KS"), ("삼성E&A", "028050.KS")])],
+             "확전": [("방산", "무기 수요", "무기 · 탄약 수요 늘어남", [("록히드마틴", "LMT"), ("RTX", "RTX"), ("노스롭그루먼", "NOC")],
+                       [("한화에어로스페이스", "012450.KS"), ("LIG넥스원", "079550.KS"), ("현대로템", "064350.KS")]),
+                      ("석유 생산", "유가 상승", "파는 원유 값 오름", [("엑슨모빌", "XOM"), ("셰브런", "CVX"), ("코노코필립스", "COP")], []),
+                      ("정유", "유가 상승", "재고 값 · 정제 마진 오름", [("발레로", "VLO"), ("매러선 페트롤리엄", "MPC")], [("SK이노베이션", "096770.KS"), ("에쓰오일", "010950.KS")]),
+                      ("해운", "운임 상승", "해협을 돌아가는 항로로 운임 오름", [("프론트라인", "FRO")], [("HMM", "011200.KS"), ("팬오션", "028670.KS")])]},
+    "TARIFF": {"종전": [("자동차", "관세 부담 줄어듦", "미국으로 들여오는 차 · 부품 관세 내림", [("GM", "GM"), ("포드", "F")], [("현대차", "005380.KS"), ("기아", "000270.KS")]),
+                        ("전자 · 스마트폰", "관세 부담 줄어듦", "중국 · 아시아 생산품 관세 내림", [("애플", "AAPL")], [("LG전자", "066570.KS")]),
+                        ("소매 · 의류", "관세 부담 줄어듦", "수입해 파는 물건 값 내림", [("월마트", "WMT"), ("나이키", "NKE"), ("타깃", "TGT")], [])],
+               "확전": [("철강", "수입 경쟁 줄어듦", "수입 철강이 비싸짐", [("뉴코", "NUE"), ("스틸 다이내믹스", "STLD"), ("클리블랜드클리프스", "CLF")], []),
+                        ("태양광 · 미국 공장", "수입 경쟁 줄어듦", "미국 안에서 만드는 회사가 유리", [("퍼스트솔라", "FSLR")], [("한화솔루션", "009830.KS")])]},
+    "EXPORT": {"종전": [("AI 반도체", "중국 판매 재개", "중국에 팔 수 있는 칩이 늘어남", [("엔비디아", "NVDA"), ("AMD", "AMD")], [("SK하이닉스", "000660.KS")]),
+                        ("반도체 장비", "중국 판매 재개", "중국 공장에 장비 공급", [("어플라이드머티리얼즈", "AMAT"), ("램리서치", "LRCX"), ("KLA", "KLAC")],
+                         [("한미반도체", "042700.KS")])],
+               "확전": []},   # 강화 때 흔히 꼽는 수혜 테마가 뚜렷하지 않다 — 피해 쪽만 주로 거론 → 빈 탭은 그렇게 말한다
+}
+# 테마 아래 회색 한 줄 = 왜 좋아지나 명사형 몇 마디 (2026-11-14 사용자: 경로 · 숫자 없이, 문장 말고 `연료비 감소` 처럼)
+THEME_WHY = {"항공": "연료비 감소", "여행 · 크루즈": "연료비 감소 · 여행 수요 회복", "화학": "원료(나프타) 값 하락", "중동 재건 · 건설": "재건 공사 발주",
+             "방산": "무기 · 탄약 주문 증가", "석유 생산": "원유 값 상승", "정유": "재고 값 · 정제 마진 상승", "해운": "우회 항로 · 운임 상승",
+             "자동차": "차 · 부품 관세 인하", "전자 · 스마트폰": "아시아 생산품 관세 인하", "소매 · 의류": "수입품 값 하락",
+             "철강": "수입 철강 경쟁 감소", "태양광 · 미국 공장": "미국 생산 회사 유리",
+             "AI 반도체": "중국 칩 판매 재개", "반도체 장비": "중국 장비 판매 재개"}   # 명사형 짧게 (2026-11-14 사용자: 합니다체 문장 X)
+BENEFIT_NONE = "강화 때 흔히 꼽는 수혜 테마는 뚜렷하지 않습니다. 주로 피해 쪽(AI 반도체 · 장비)이 거론됩니다."
+FORK_WORDS = [("되돌림 — 전쟁 사슬로 돌아감", "되돌림 — 유가 오름 · 위험 회피로 돌아감"), ("유가 · 물가 경로로 금리 사슬로 넘어감", "유가 · 물가를 거쳐 금리 걱정으로 이어짐"),
+              ("경기 사슬로", "경기 걱정으로 이어짐"), ("사슬로 넘어감", "다른 걱정으로 이어짐")]   # `사슬` = 내부 말
 
 
 def use(iss):
@@ -262,15 +324,17 @@ def history(px, chain_id, rows, n=10):
     cal = cal[cal.index <= end].index[-n:]
     out = []
     for d in cal:
-        links = link_rows(px, chain_id, end=d)
+        links = link_rows(px, chain_id, end=d, n=WIN)   # 칸 하나 = 그날까지 5거래일 — 위 카드 답과 같은 기간 (2026-11-14)
         g = group_state(links)
         at = dt.datetime.combine((d + pd.Timedelta(days=1)).date(), dt.time(8, 0), tzinfo=KST)   # 뉴욕 종가 = 한국 다음 날 아침
         n48, base, hot = news_level(rows, at)
         st, _ = state_of(n48, base, g)
-        r48 = [r for r in rows if at - dt.timedelta(hours=48) < r["t"] <= at]
-        side = _zone_word(ev_net(events(r48))) if r48 else "방향미정"   # 그날 48시간 사건 방향 (기사 수 X)
+        r7 = [r for r in rows if at - dt.timedelta(days=GAUGE_DAYS) < r["t"] <= at]
+        evs = events(r7)
+        _ai_apply(evs)   # 판정 캐시만 — 여기서 AI 를 부르지 않는다
+        side = _zone_word(ev_net(evs)) if r7 else "방향미정"   # 그날까지 7일 사건 방향 = 바늘과 같은 셈
         out.append({"day": d.strftime("%Y-%m-%d"), "state": st, "n48": n48, "hot": hot, "side": side,
-                    "groups": {gname: w for gname, w, *_ in g}})
+                    "groups": {gname: w for gname, w, *_ in g}, "gside": {x["g"]: (x["side"], x["strong"]) for x in group_side(links)}})
     return out
 
 
@@ -318,25 +382,42 @@ def daily_counts(rows, days):
     return c
 
 
+def counts_24h(rows, now, n=14):
+    """지금 시각에서 24시간씩 끊어 센 기사 수 — 열쇠 = 그 24시간이 끝나는 날짜(KST), 옛 것 → 최근.
+    옛 셈(달력 하루)은 마지막 점이 `오늘 0시 ~ 지금` 몇 분치라 늘 뚝 떨어졌다 (2026-11-14 사용자: 오늘 0시가 왜 거의 0인가)."""
+    c = {}
+    for i in range(n - 1, -1, -1):
+        hi = now - dt.timedelta(hours=24 * i)
+        lo = hi - dt.timedelta(hours=24)
+        k = {"종전": 0, "확전": 0, "방향 미정": 0}
+        for r in rows:
+            if lo < r["t"] <= hi:
+                k[r["side"]] += 1
+        c[hi.astimezone(KST).date().isoformat()] = k
+    return c
+
+
 def prices():
     import yfinance as yf
-    syms = sorted(set(LINK_SYM.values()) | {s for c in CFG.values() for _, s in c["case_cols"]} | {"BZ=F", "EWY", "^GSPC"})
+    syms = sorted(set(LINK_SYM.values()) | {s for c in CFG.values() for _, s in c["case_cols"]} | {"BZ=F", "EWY", "^GSPC", "^KS11"}
+                  | {s for b in BENEFIT.values() for ths in b.values() for th in ths for _, s in th[3] + th[4]})
     df = yf.download(syms, start="2002-10-01", progress=False, auto_adjust=True, threads=False)["Close"]
     df.index = pd.to_datetime(df.index).tz_localize(None).normalize()
     return df
 
 
-def z10(s, end=None):
-    """signal_scan.scan 과 같은 셈 — 10거래일 로그 누적 ÷ (직전 60거래일 하루 σ × √10). VIX 도 비율(pct). end = 모든 지표가 있는 마지막 날."""
+def z10(s, end=None, n=10):
+    """signal_scan.scan 과 같은 셈 — n거래일 로그 누적 ÷ (직전 60거래일 하루 σ × √n). VIX 도 비율(pct). end = 모든 지표가 있는 마지막 날.
+    n = 10(운영자 상자 · 옛 셈) · WIN 5(독자 카드 — 위 뉴스 바늘 `최근 일주일` 과 같은 기간, 2026-11-14 사용자: 카드끼리 기간이 달라 위아래가 안 맞아 보였다)."""
     s = s.dropna()
     s = s[s > 0]
     if end is not None:
         s = s[s.index <= end]
     ch = np.log(s).diff()
     sd = ch.rolling(BASE, min_periods=int(BASE * 0.8)).std().shift(1)
-    z = ch.iloc[-10:].sum() / (sd.iloc[-11] * np.sqrt(10))
-    pct = (s.iloc[-1] / s.iloc[-11] - 1) * 100
-    return float(z), float(pct), s.index[-11], s.index[-1]
+    z = ch.iloc[-n:].sum() / (sd.iloc[-n - 1] * np.sqrt(n))
+    pct = (s.iloc[-1] / s.iloc[-n - 1] - 1) * 100
+    return float(z), float(pct), s.index[-n - 1], s.index[-1]
 
 
 def chain_links(chain_id):
@@ -354,7 +435,7 @@ def last_day(px, chain_id):
     return min(px[LINK_SYM[f]].dropna().index[-1] for _, f, _ in chain_links(chain_id) if LINK_SYM.get(f) in px and f not in KR_KEYS)
 
 
-def link_rows(px, chain_id, end=None):
+def link_rows(px, chain_id, end=None, n=10):
     links = chain_links(chain_id)
     out = []
     if end is None:
@@ -363,18 +444,21 @@ def link_rows(px, chain_id, end=None):
         sym = LINK_SYM.get(f)
         if not sym or sym not in px:
             continue
-        z, pct, d0, d1 = z10(px[sym], end)
+        z, pct, d0, d1 = z10(px[sym], end, n)
         sz = sg * z
         state = "뚜렷하게" if sz >= Z_CLEAR else "조금" if sz >= Z_SOME else "반대로" if sz <= -Z_SOME else "평소 범위"
         out.append({"key": f, "name": LINK_NAME[f], "why": nm, "sg": sg, "z": z, "pct": pct, "state": state, "d0": d0, "d1": d1, "extra": (nm, f, sg) in EXTRA_LINKS})
     return out
 
 
-def cases(px, kinds):
+def cases(px, kinds, inc=None, exc=None):
+    """inc · exc = 사건 제목에 들어가야 할 · 빠져야 할 낱말 (이 이슈와 같은 종류만 — 이란 확전 = 중동 사건)."""
     ev = pd.read_csv(os.path.join(_HERE, "events_curated.csv"))
     ev = ev[ev["subkind"].isin(kinds)]
-    if C.get("case_re"):
-        ev = ev[ev["title"].str.contains(C["case_re"], na=False)]
+    if inc:
+        ev = ev[ev["title"].str.contains(inc, na=False)]
+    if exc:
+        ev = ev[~ev["title"].str.contains(exc, na=False)]
     out = []
     for _, e in ev.iterrows():
         cal = px["^GSPC"].dropna().index
@@ -394,10 +478,10 @@ def cases(px, kinds):
 CASE_EXP = {"유가": -1, "S&P 500": +1, "한국 (EWY)": +1, "에너지": -1, "방산": -1}   # 흔한 설명의 방향 (chains.CEASEFIRE + 공급 복귀)
 
 
-def case_gap(rows):
+def case_gap(rows, exp=None):
     """흔한 설명과 사례가 어긋난 지표 — 그날 움직임이 있는 사례 모두에서 반대였으면 한 줄 (위 표 `흔한 설명은 내림` 과 아래 표가 다르게 보이는 자리)."""
     out = []
-    for nm, sg in CASE_EXP.items():
+    for nm, sg in (CASE_EXP if exp is None else exp).items():
         v = [r[nm][0] for r in rows if r.get(nm) and r[nm][0] is not None]
         if len(v) >= 2 and all(x * sg < 0 for x in v):
             out.append(f'{nm}은 흔한 설명({"내림" if sg < 0 else "오름"})과 달리 {len(v)}번 모두 그날 {"올랐습니다" if sg < 0 else "내렸습니다"}')
@@ -438,6 +522,33 @@ def group_state(links):
                 "반대로 움직이는 중" if rev >= need else "평소 범위")
         out.append((g, word, ok, len(rs), rs))
     return out
+
+
+def group_side(links):
+    """묶음마다 어느 쪽으로 움직였나 — 종전 쪽 · 확전 쪽 둘 다 센다 (2026-11-14 사용자: 시장 카드가 종전 쪽만 재서 위 뉴스 바늘 `확전` 과 말이 안 맞았다).
+    묶음 안 2개 이상(지표 하나뿐이면 1개)이 한쪽으로 평소의 1배 넘게 → 그 쪽. strong = 그 쪽에 2배 넘는 지표가 있음."""
+    by = {r["key"]: r for r in links}
+    out = []
+    for g, keys in GROUPS:
+        rs = [by[k] for k in keys if k in by]
+        need = min(2, len(rs))
+        w = [r for r in rs if r["sg"] * r["z"] >= Z_SOME]
+        b = [r for r in rs if r["sg"] * r["z"] <= -Z_SOME]
+        side = W() if len(w) >= need and len(w) > len(b) else R() if len(b) >= need and len(b) > len(w) else "평소 범위"
+        pick = w if side == W() else b if side == R() else []
+        out.append({"g": g, "side": side, "k": len(pick), "n": len(rs), "rs": rs, "strong": any(abs(r["z"]) >= Z_CLEAR for r in pick)})
+    return out
+
+
+def market_side(gs):
+    """묶음 판정을 하나로 — 움직인 묶음이 모두 같은 쪽이면 그 쪽, 서로 다르면 `엇갈림`, 없으면 `평소 범위`."""
+    sides = {x["side"] for x in gs if x["side"] != "평소 범위"}
+    return sides.pop() if len(sides) == 1 else "엇갈림" if sides else "평소 범위"
+
+
+def news_side(word):
+    """바늘 말(`확전 뚜렷` · `종전` · `방향미정`) → 쪽 이름 또는 None."""
+    return C["good"] if word.startswith(C["good"]) else C["bad"] if word.startswith(C["bad"]) else None
 
 
 def state_of(news48, base48, groups):
@@ -561,7 +672,7 @@ def oil_chart(px):
             j = next((i for i, d in enumerate(days) if d > k), None)
             if j is not None:
                 labels[j] = v
-    gr = dk.trend_card("브렌트유 (달러, 올해)", labels, [("브렌트유", [round(v, 1) for v in s], dk.CHART_MAIN, "solid")], lambda v: f"{v:.0f}")   # 점이 많아 날마다 동그라미 없이 끝 값만
+    gr = dk.trend_card("브렌트유 (달러, 올해)", labels, [("브렌트유", [round(v, 1) for v in s], dk.CHART_MAIN, "solid")], lambda v: f"{v:.0f}", small_end=True)   # 점이 많아 날마다 동그라미 없이 끝 값만
     pk = s[s.index >= "2026-03-02"]
     peak, peak_d = float(pk.max()), pk.idxmax().strftime("%Y-%m-%d")
     now = float(s.iloc[-1])
@@ -827,7 +938,7 @@ def _more_btn_css():
             f"font:inherit;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:600;color:#333;cursor:pointer;")   # H._waiting 더 보기 버튼과 같은 값
 
 
-def news_timeline(evs, days_desc):
+def news_timeline(evs, days_desc, px=None):
     """날짜별 한 줄 = 그날 가장 많이 보도된 사건. 줄을 누르면 그날 사건 전부(많이 보도된 순) 팝업.
     처음 TL_SHOWN 일 + `지난 n일 더 보기 (남은 m일)` 10일씩 · 맨 끝에만 `접기` (증시 전망 타임라인과 같은 규칙, 끝 묶음 1~2일은 앞 묶음에 합침)."""
     by = {}
@@ -836,24 +947,50 @@ def news_timeline(evs, days_desc):
     days = [d for d in days_desc if by.get(d)]
     pops = ""
     node = (f'<span style="display:inline-block;width:{H.TL_DOT}px;height:{H.TL_DOT}px;box-sizing:border-box;border:2px solid {H.TL_LINE};border-radius:50%;background:#fff;"></span>')
+    ref_nm, ref_sym, ref_fmt = TL_REF[C["iss"]["id"]]
+    ref = px[ref_sym].dropna() if px is not None and ref_sym in px else None
 
-    def row(d, last):
+    def price(d):
+        """날짜 옆 기준 가격 = 그날 소식 뒤 첫 종가(한국 시간 다음 날 아침 도착하는 미국 종가) · 전날 대비 ▲▼ — 주말 · 휴장 · 아직 안 닫힌 날은 비움."""
+        if ref is None:
+            return ""
+        t = pd.Timestamp(d)
+        if t not in ref.index:
+            return ""
+        i = ref.index.get_loc(t)
+        if i == 0:
+            return ""
+        c, p = float(ref.iloc[i]), float(ref.iloc[i - 1])
+        if c == p:   # 전날 값을 그대로 채운 줄(선물 자료가 아직 안 들어온 날) — 0.0% 로 보이지 않게 비움
+            return ""
+        chg = (c / p - 1) * 100
+        val = dk.emph_tri(dk.arrow(chg, 1, "%").replace("font-weight:700;", "font-weight:400;"), H.TL_TRI) if round(chg, 1) != 0 else '<span style="color:#111;">0.0%</span>'
+        return (f'<span style="font-weight:400;color:{dk.SUB};white-space:nowrap;">{dk.esc(ref_nm)}</span>'
+                f'<span style="font-weight:400;color:#111;white-space:nowrap;">{dk.esc(ref_fmt.format(c))}</span>'
+                f'<span style="white-space:nowrap;">{val}</span>')
+
+    def row(d, last, first=False):
+        """증시 전망 타임라인(H._waiting · day_why_html)과 같은 꼴 (2026-11-14 사용자): 날짜 굵게 한 줄 → 아래 근거 한 줄 = 쪽 라벨 + 한 줄 글(말줄임) + ›.
+        라벨은 줄바꿈 없이 글 앞, 논의중은 글 뒤 작은 표시(H._talk_mark). 줄 전체 = 그날 팝업."""
         es = sorted(by[d], key=ev_rank)   # 그날 대표 = 실제 일 · 높은 단계 먼저 (옛: 가장 많이 옮겨진 기사)
         top = es[0]
         pid = dk.news_pop_id("iwday", d)
-        lab = side_pill(top["side"]) + (dk.pill("논의중", "neutral", bare=True) if top["talk"] else "")
-        content = (f'<div data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="cursor:pointer;padding:0 0 {0 if last else H.TL_DAY_GAP}px;">'
-                   f'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:16px;line-height:24px;">'
-                   f'<b style="color:#111;">{H.md(d)}</b></div>'
-                   f'<div style="margin:2px 0 0;font-size:16px;line-height:26px;color:#111;word-break:keep-all;">{tail_chev(top["title"])}</div>'
-                   f'<div style="margin:6px 0 0;line-height:1;">{dk.pill_row(lab)}</div></div>')
-        return H._tl_row(node, 24, 0, content, False, last), _day_pop(pid, d, es)
+        pad = 12 - dk.VP
+        lab = side_pill(top["side"]).replace("vertical-align:middle;", f"vertical-align:middle;flex:none;margin-right:{dk.PILL_GAP}px;", 1)
+        talk = H._talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if top["talk"] else ""
+        chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{H.CHEV14}</span>'
+        content = (f'<div data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="cursor:pointer;">'
+                   f'<div style="display:flex;align-items:center;gap:8px;padding:{0 if first else pad}px 0 {pad}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;"><span style="white-space:nowrap;">{H.md(d)}</span>{price(d)}</div>'
+                   f'<div style="display:flex;align-items:center;gap:4px;margin:-4px 0 {pad}px;">'
+                   f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{lab}{H._one_line(dk.esc(top["title"]), grow=False, color=H.TL_WHY_INK)}{talk}</span>{chev}</div>'
+                   + ("" if last else f'<div style="height:{H.TL_DAY_GAP}px;"></div>') + '</div>')
+        return H._tl_row(node, int(dk.LH_CARD.rstrip("px")), 0 if first else pad, content, False, last), _day_pop(pid, d, es)
 
     shown = days if len(days) <= TL_SHOWN + 2 else days[:TL_SHOWN]   # 1~2일 숨기려고 버튼을 두지 않는다
     rest = days[len(shown):]
     out = ""
     for i, d in enumerate(shown):
-        h, p = row(d, i == len(shown) - 1 and not rest)
+        h, p = row(d, i == len(shown) - 1 and not rest, first=i == 0)
         out += h
         pops += p
     if rest:
@@ -986,6 +1123,12 @@ def ai_judge(evs, today):
             del cache[k2]
         os.makedirs(os.path.dirname(AI_CACHE), exist_ok=True)
         json.dump(cache, open(AI_CACHE, "w", encoding="utf-8"), ensure_ascii=False)
+    return _ai_apply(evs)
+
+
+def _ai_apply(evs):
+    """캐시에 있는 AI 판정만 사건에 붙인다 (AI 호출 없음) — 지난 2주 칸 셈이 같은 판정을 쓰게."""
+    cache = _ai_cache()
     inv = {C["good"]: "종전", C["bad"]: "확전", "없음": "방향 미정"}
     n = 0
     for e in evs:
@@ -1074,7 +1217,7 @@ def _sp(html):
 
 def _ttl(t):
     """카드 안 그래프 · 표 제목 — 그래프 제목과 같은 `※` + 16/24 굵게."""
-    return f'<div style="margin:6px 0 6px;font-size:16px;line-height:24px;font-weight:700;color:#111;">※ {dk.esc(t)}</div>'
+    return f'{dk.CHART_TITLE_M}{dk.esc(t)}</span>'   # 공용 그래프 제목 (가이드라인 9절 간격 · 7-3, 2026-11-14 사용자 "그래프 스타일은 디자인 규칙에 맞게")
 
 
 def q_news(iran, counts, days, r48):
@@ -1088,7 +1231,8 @@ def q_news(iran, counts, days, r48):
     t, w = sum(x["side"] == "종전" for x in r2w), sum(x["side"] == "확전" for x in r2w)
     cap = sorted(c for c in iran["capped"] if c in days)
     note = "같은 소식을 여러 곳이 옮긴 기사도 모두 센 숫자라, 관심의 크기만 보여 줍니다."   # 방향은 바늘 · `어디까지 왔나?` 가 사건 단위로 (2026-11-13 사용자: 복사 기사 수 ≠ 중요도)
-    tip = ("출처 : 알파스코프 뉴스 모음(CNBC) + 구글 뉴스 한국어 검색, 방송은 아직 안 셈\n평소 = 직전 4주 동안 48시간마다 나온 기사 수의 평균")
+    tip = ("출처 : 알파스코프 뉴스 모음(CNBC) + 구글 뉴스 한국어 검색, 방송은 아직 안 셈\n평소 = 직전 4주 동안 48시간마다 나온 기사 수의 평균\n"
+           "그래프 점 하나 = 지금 시각에서 24시간씩 끊어 센 기사 수, 마지막 점 = 최근 24시간")
     lines = [(first, "plain"), (news_chart(counts, NOW_LABEL[0], base / 2 if base else None), "html"), (note, "note")]
     return qc.question_card("얼마나 화제인가?", ans, th, ink, lines, tip=tip), r2w   # 펼침은 `어디까지 왔나?` 로 옮김
 
@@ -1130,33 +1274,39 @@ def news_col(word):
 
 
 def _hist_grid(hist):
-    """줄 = 뉴스 · 유가 · 주식 · 안전 자산, 칸 = 거래일(왼쪽 옛날 → 오른쪽 최근, 가이드라인 시간 축). 칸 색 = 그날 상태."""
+    """줄 = 뉴스 · 유가 · 주식 · 안전 자산, 칸 = 거래일(왼쪽 옛날 → 오른쪽 최근, 가이드라인 시간 축). 칸 색 = 그날 상태.
+    그래프 규칙에 맞춤 (2026-11-14 사용자 "강조 카드 안 그래프 스타일은 디자인 규칙에 맞게"): 흰 카드 안쪽 = dk.trend_card 와 같은 값(위 10 + 범례 5 · 좌우 12 · 아래 0),
+    범례 = 그래프 위 오른쪽(칩 9 · 모서리 2 · 칩 사이 12 · 13px), 칸 = 줄 막대 꼴(높이 10 · 모서리 3 · 빈 칸 #F1F5F9), 가로축 이름 13 · 줄 칸 26."""
     def cell(c):
-        return f'<span style="flex:1 1 0;min-width:0;height:18px;border-radius:3px;background:{c};"></span>'
-    rows = [("뉴스", [HIST_COL[news_col(h.get("side", "방향미정"))] if h.get("hot") else HIST_COL["calm"] for h in hist])]   # 뉴스가 늘어난 날 = 그날 48시간 기사 방향 색
+        return f'<span style="flex:1 1 0;min-width:0;height:10px;border-radius:3px;background:{c};"></span>'
+    gs, gl, bs, bl = TS.ZONES[4][3], TS.ZONES[3][3], TS.ZONES[0][3], TS.ZONES[1][3]
+
+    def ncol(word):   # 뉴스 = 그날까지 7일 바늘 말 (`뚜렷` = 진함)
+        s = news_side(word)
+        return HIST_COL["mixed"] if s is None else (gs if "뚜렷" in word else gl) if s == C["good"] else (bs if "뚜렷" in word else bl)
+
+    def mcol(side, strong):   # 시장 묶음 = 그날까지 5거래일 쪽 (2배 넘는 지표 있음 = 진함)
+        return HIST_COL["calm"] if side == "평소 범위" else (gs if strong else gl) if side == C["good"] else (bs if strong else bl)
+    rows = [("뉴스", [ncol(h.get("side", "방향미정")) for h in hist])]   # 양쪽 다 색 (2026-11-14 — 옛 칸은 시장을 종전 쪽만 칠했다)
     for g, _ in GROUPS:
-        cs = []
-        for h in hist:
-            w = h["groups"].get(g, "")
-            cs.append(HIST_COL["strong"] if w == f"{W()} 방향으로 움직이는 중" else HIST_COL["some"] if w == f"{W()} 방향으로 조금"
-                      else HIST_COL["rev"] if "반대" in w else HIST_COL["calm"])
-        rows.append((g, cs))
+        rows.append((g, [mcol(*h["gside"].get(g, ("평소 범위", False))) for h in hist]))
     lab_w = 64
     out = ""
     for i, (nm, cs) in enumerate(rows):
-        out += (f'<span style="display:flex;align-items:center;gap:6px;margin:{0 if i == 0 else 6}px 0 0;">'
-                f'<span style="flex:none;width:{lab_w}px;font-size:14px;line-height:20px;color:#111;white-space:nowrap;">{dk.esc(nm)}</span>'
+        out += (f'<span style="display:flex;align-items:center;gap:6px;margin:{0 if i == 0 else 4}px 0 0;">'
+                f'<span style="flex:none;width:{lab_w}px;font-size:{dk.TINY};line-height:20px;color:#111;white-space:nowrap;">{dk.esc(nm)}</span>'
                 f'<span style="flex:1;display:flex;gap:2px;">{"".join(cell(c) for c in cs)}</span></span>')
     n = len(hist)
-    ax = (f'<span style="display:flex;justify-content:space-between;margin:6px 0 0 {lab_w + 6}px;font-size:{dk.AXIS_FS};line-height:19px;color:{dk.SUB};">'
+    ax = (f'<span style="display:flex;justify-content:space-between;align-items:flex-start;height:26px;margin:{dk.AXIS_PAD - 10}px 0 0 {lab_w + 6}px;font-size:{dk.AXIS_FS};line-height:20px;color:{dk.NOTE};">'
           f'<span>{H.md(hist[0]["day"])}</span><span>{H.md(hist[n // 2]["day"])}</span><span>{H.md(hist[-1]["day"])}</span></span>')
-    key = lambda c, t: (f'<span style="display:inline-flex;align-items:center;gap:4px;white-space:nowrap;">'
-                        f'<span style="width:10px;height:10px;border-radius:2px;background:{c};"></span>{t}</span>')
+    chip = lambda c, t: (f'<span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">'   # noqa: E731
+                         f'<span style="width:{dk.LEGEND_CHIP}px;height:{dk.LEGEND_CHIP}px;border-radius:2px;background:{c};"></span>{dk.esc(t)}</span>')
     used = {c for _, cs in rows for c in cs}
-    leg = (f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px 10px;margin:8px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};">'
-           + "".join(key(c, t) for c, t in legend_items() if c in used or t == "평소") + '</span>')   # 범례 오른쪽 (가이드라인)
-    return (f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD + 2}px 12px {dk.CHART_CARD_PAD}px;">'
-            f'{out}{ax}{leg}</span></span>')
+    leg = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:flex-end;column-gap:12px;font-size:{dk.LEGEND_FS};line-height:{dk.LH_CARD};color:{dk.NOTE};'
+           f'margin:{dk.LEGEND_TOP}px 0 6px;padding-left:{dk.LEGEND_LEFT}px;">'
+           + "".join(chip(c, t) for c, t in legend_items() if c in used or t == "평소") + '</span>')   # 범례 = 그래프 위 오른쪽 (가이드라인 9절)
+    return (f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">'
+            f'{leg}{out}{ax}</span></span>')
 
 
 def legend_items():
@@ -1187,6 +1337,78 @@ def q_history(hist):
     return qc.question_card("지난 2주는?", ans, "neutral", "#111", lines, tip=tip)
 
 
+def gauge_word(evs, today):
+    d7 = (today - dt.timedelta(days=GAUGE_DAYS - 1)).isoformat()
+    return _zone_word(ev_net([e for e in evs if e["first"].astimezone(KST).date().isoformat() >= d7]))
+
+
+def _excl(t):
+    return (f'<div style="display:flex;align-items:flex-start;gap:4px;margin:4px 0 0;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
+            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{H.EXCL_ICON}</span><span>{dk.esc(t)}</span></div>')
+
+
+def _side_box(side):
+    """기술 지표 채운 상자(tech_signals.box) — 좋은 쪽 = 빨강 상자 · 나쁜 쪽 = 파랑 · 평소 = 회색, 기호 없이 글자만."""
+    kind = "up" if side == C["good"] else "down" if side == C["bad"] else "flat"
+    return TS.box(kind, side if kind != "flat" else "평소", dk.esc, sym=False)
+
+
+def _align_table(gs):
+    """시장 지표 = 기술 지표 표 꼴 (2026-11-14 사용자: "일반 독자가 꼼꼼히 볼 수치가 아니라 가볍게 보는 수치 — 기술 지표 느낌으로").
+    묶음 = 기술 지표 묶음 제목(18 굵게) + 오른쪽 묶음 상자, 줄 = 이름 15 + 회색 13 `종전되면 흔히 내림` · 오른쪽 등락(보통 굵기) + 상자. 평소의 몇 배는 툴팁 기준으로만."""
+    th = "uncertain" if market_side(gs) != "평소 범위" else "neutral"
+    line = dk.darken(dk.lighten(dk.lighten(dk.CARD_DIR[th][1]), 0.3), 0.02)   # 질문 카드 줄 구분선과 같은 색
+    out = ""
+    for x in gs:
+        head = (f'<span style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;line-height:26px;">'
+                f'<span>{dk.esc(x["g"])}</span></span>')   # 묶음 · 줄 상자(종전 · 확전 · 평소) 삭제 — 회색 `종전되면 흔히 내림` 과 반복돼 헷갈린다 (2026-11-14 사용자)
+        trs = []
+        for r in x["rs"]:
+            exp = "내림" if r["sg"] < 0 else "오름"
+            sz = r["sg"] * r["z"]
+            way = W() if sz >= Z_SOME else R() if sz <= -Z_SOME else "평소 범위"
+            pct = f'{"+" if r["pct"] >= 0 else "−"}{abs(r["pct"]):.1f}%'
+            trs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{dk.esc(r["name"])}'
+                       f'<span style="margin-left:4px;font-size:{TS.WHY_FS};line-height:19px;color:{dk.SUB};">{W()}되면 흔히 {exp}</span></span>'
+                       f'<span style="flex:none;display:inline-flex;align-items:center;gap:8px;">{pct}{_side_box(way)}</span>')   # 줄마다 종전 · 확전 · 평소 상자 (2026-11-14 사용자: 묶음 제목 상자만 빼고 줄에는 붙임)
+        out += head + TS._table(trs, line)
+    return f'<span style="display:block;margin-top:-12px;">{out}</span>'
+
+
+def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
+    """시장도 같은 쪽인가? — 옛 `지금은` · `시장이 먼저 움직이나?` · `지난 2주는?` 셋을 하나로 (2026-11-14 사용자: 위 바늘은 확전인데 아래 카드는 종전 방향이라 헷갈림).
+    기간 = 최근 일주일(뉴스 7일 · 시장 5거래일), 시장 지표도 양쪽을 다 센다. 뉴스와 시장이 다르면 `엇갈림` 이라고 말한다."""
+    g, b = C["good"], C["bad"]
+    ns, mk = news_side(word), market_side(gs)
+    if mk == "평소 범위":
+        ans = "시장은 평소 범위"
+    elif mk == "엇갈림":
+        ans = "시장 안에서 엇갈림"
+    elif ns is None:
+        ans = f"시장만 {mk} 쪽"
+    else:
+        ans = f"같은 쪽 ({mk})" if ns == mk else "엇갈림"
+    d0, d1 = links[0]["d0"], links[0]["d1"]
+    nd = f"{ns} 소식이 더 많았습니다" if ns else f"{g} · {b} 소식이 엇갈렸습니다"
+    mv = [f"{josa(x['g'], ('이', '가'))} {x['side']} 쪽으로" for x in gs if x["side"] != "평소 범위"]
+    calm = [x["g"] for x in gs if x["side"] == "평소 범위"]
+    md = (" · ".join(mv) + " 움직였습니다." if mv else "") + ((" " if mv else "") + f"{josa(' · '.join(calm), ('은', '는'))} 평소 범위입니다." if calm else "")
+    verdict = ("" if mk == "평소 범위" or ns is None else " 뉴스와 시장이 같은 쪽을 가리킵니다." if ns == mk else " 뉴스와 시장이 서로 다른 쪽을 가리킵니다.")
+    first = f"최근 일주일 뉴스는 {nd}. 같은 기간({H.md(d0.strftime('%Y-%m-%d'))} → {H.md(d1.strftime('%Y-%m-%d'))} 종가) 시장은 " + md + verdict
+    lines = [(first, "plain"), (_align_table(gs), "html")]
+    lines += [(_ttl("날마다 어느 쪽이었나") + _hist_grid(hist), "html"),
+              ("칸 하나 = 그날까지 일주일입니다. 미국 종가 기준이라 날짜는 뉴욕 날짜입니다.", "note")]
+    lines += ([(oil_gr, "html")] if oil_gr else []) + ([(oil_line, "note")] if oil_line else [])
+    lines.append((_excl(f"{asof} 기준입니다."), "html"))
+    tip = ("뉴스 = 위 바늘과 같은 셈(최근 7일 소식, 실제로 일어난 일 1 · 발언 0.5).\n"
+           f"시장 = {W()}되면 움직인다고 흔히 설명하는 지표를 묶음별로 — 묶음 안 2개 이상이 한쪽으로 평소보다 크게 움직이면 그 쪽.\n"
+           "평소의 몇 배 = 이 지표가 보통 5거래일에 움직이는 폭(직전 60거래일 기준)의 몇 배인지, 1배 넘으면 그 쪽.\n"
+           "흔한 설명 = 시장에서 흔히 쓰는 설명(교과서 · 언론), 알파스코프의 주장이 아님.\n"
+           "예측이 아니라 지금까지 일어난 일입니다.")
+    th, ink = _theme(mk not in ("평소 범위",))
+    return qc.question_card("시장도 같은 쪽인가?", ans, th, ink, lines, tip=tip), ans
+
+
 def q_now(st, kind, iran, groups, sides48, asof):
     """`지금은` = 다른 질문 카드와 같은 접는 강조 카드, 줄 = 왼쪽 구분 · 오른쪽 값 (2026-11-13 사용자: 강조 카드처럼 좌 구분명 · 우 값, 접는 방향)."""
     th, ink = ("uncertain", VIOLET) if kind in ("uncertain", "area") else ("neutral", "#111")
@@ -1203,9 +1425,76 @@ def q_now(st, kind, iran, groups, sides48, asof):
     return qc.question_card("지금은", short(st), th, ink, lines, tip=tip)
 
 
+STAGE_RAW = {}   # 차례 규칙 전 가장 높은 단계 — 운영자 상자용
+
+
+def _stage_hits(evs, side):
+    hit = {}
+    for e in evs:
+        st = stage_of(e) if e["side"] == side else None
+        if st is not None and (st not in hit or e["first"] > hit[st]["first"]):
+            hit[st] = e
+    return hit
+
+
+def _reach(hit):
+    """단계는 차례대로만 오른다 — 아래 단계가 없으면 위 단계는 세지 않는다 (2026-11-14: 합의 없이 `LNG 운반선 통항` 하나로 `이행` 에 올랐다)."""
+    r = -1
+    while r + 1 in hit:
+        r += 1
+    return r if r >= 0 else None
+
+
+def _ladder(side, reach, hit):
+    """쪽마다 한 줄 진행 막대 — 칸 = 단계, 오른 칸까지 색, 아래 단계 이름. 그 아래 도달한 단계의 가장 최근 일.
+    막대 = 줄 막대 꼴(가이드라인 9절: 높이 10 · 모서리 3 · 빈 칸 #F1F5F9 · 부호 있는 값 = 연빨강 · 연파랑 dk.BAR_PASTEL), 단계 이름 = 가로축 이름 13 (2026-11-14 사용자)."""
+    lad = C["stages"][side]
+    col = dk.BAR_PASTEL["positive" if side == "종전" else "negative"][0]
+    ink = dk.UP if side == "종전" else dk.DOWN
+    segs = ""
+    for i, (nm, _) in enumerate(lad):
+        on = reach is not None and i <= reach
+        segs += (f'<span style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px;">'
+                 f'<span style="height:10px;border-radius:3px;background:{col if on else "#F1F5F9"};"></span>'
+                 f'<span style="font-size:{dk.AXIS_FS};line-height:20px;text-align:center;word-break:keep-all;color:{"#111" if on else dk.NOTE};font-weight:{700 if on and i == reach else 400};">{dk.esc(nm)}</span></span>')
+    where = f"‘{lad[reach][0]}’ 단계까지" if reach is not None else "아직 단계에 오른 일이 없습니다"
+    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 8px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;">'
+            f'<b style="flex:none;color:{ink};">{dk.esc(SIDE_LABEL[side])}</b><span style="text-align:right;word-break:keep-all;">{dk.esc(where)}</span></span>')   # `‘협상 제안’ 단계까지` = 오른쪽 정렬 (2026-11-14 사용자)
+    e = hit.get(reach) if reach is not None else None
+    last = (f'<span style="display:block;margin:6px 0 0;font-size:{dk.TINY};line-height:20px;color:{dk.SUB};word-break:keep-all;">'
+            f'<b style="font-weight:600;color:#333;">{H.md(e["first"].astimezone(KST).date().isoformat())}</b> {dk.esc(e["title"])}</span>') if e else ""
+    return head + f'<span style="display:flex;gap:2px;">{segs}</span>' + last
+
+
 def q_stage(evs):
-    """사건은 어디까지 왔나? — 최근 2주 사건을 단계 사다리(종전 쪽 · 확전 쪽)에 놓고, 단계마다 가장 최근 일 하나.
-    같은 일을 몇 곳이 옮겼는지 무관 · 발언 · 논의는 첫 단계로만 (2026-11-13 사용자: 복사 수보다 사건의 논리 · 연속 반응)."""
+    """종전 · 확전, 실제로 어디까지 갔나? — 최근 2주 사건을 쪽마다 단계 사다리에 놓고 한 줄 진행 막대로 (2026-11-14 사용자: 1~6 줄 · `없음` 줄은 이해하기 어렵다).
+    답 = 양쪽 다. 같은 일을 몇 곳이 옮겼는지 무관 · 발언 · 논의는 첫 단계로만 · 단계는 차례대로만."""
+    g, b = C["good"], C["bad"]
+    hits = {s: _stage_hits(evs, s) for s in ("종전", "확전")}
+    reach = {s: _reach(hits[s]) for s in hits}
+    STAGE_RAW.update({s: (max(hits[s]) if hits[s] else None) for s in hits})
+    sh = lambda s: C["stages"][s][reach[s]][0].split(" · ")[0] if reach[s] is not None else "없음"   # noqa: E731
+    ans = (f'<span style="display:inline-block;text-align:right;white-space:nowrap;">{dk.esc(g + " " + sh("종전"))}<br>{dk.esc(b + " " + sh("확전"))}</span>')   # 두 줄 (2026-11-14 사용자 "줄바꿈")
+    word = lambda s: f"‘{C['stages'][s][reach[s]][0]}’ 단계까지" if reach[s] is not None else "아직 단계에 오른 일 없이"   # noqa: E731
+    first = f"최근 2주 동안 {josa(g, ('은', '는'))} {word('종전')}, {josa(b, ('은', '는'))} {word('확전')} 갔습니다."
+    cand = [(hits[s][i]["first"], s, i) for s in hits if reach[s] is not None for i in range(reach[s] + 1)]
+    if cand:
+        t, s, i = max(cand)
+        first += f" 가장 최근은 {H.md(t.astimezone(KST).date().isoformat())} {SIDE_LABEL[s]} ‘{C['stages'][s][i][0]}’ 입니다."
+    box = (_ttl("단계별 진행")   # 그래프 제목은 흰 카드 밖 (가이드라인 7-3) · 흰 카드 = 공용 꼴(MULTI · 양쪽 5 내밈 · 위 10 + 5 · 좌우 12 · 아래 10)
+           + f'<span style="{dk.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD + dk.LEGEND_TOP}px 12px {dk.CHART_CARD_PAD}px;">'
+           + _ladder("종전", reach["종전"], hits["종전"])
+           + '<span style="display:block;height:1px;background:#E2E8F0;margin:14px 0;"></span>'
+           + _ladder("확전", reach["확전"], hits["확전"]) + '</span></span>')
+    lines = [(first, "plain"), (box, "html"),
+             ("같은 일을 여러 곳이 보도해도 한 번만 셉니다. 발언 · 논의는 첫 단계로만 셉니다. 단계는 차례대로만 오릅니다.", "note")]
+    tip = ("단계 = 그 일이 실제로 어디까지 갔는지.\n아래 단계가 없으면 위 단계 소식이 있어도 세지 않습니다.\n"
+           "막대 아래 = 도달한 단계의 가장 최근 일.\n기사 제목으로 나눈 것이라 틀릴 수 있습니다.")
+    return qc.question_card(STAGE_Q[C["iss"]["id"]], ans, "neutral", "#111", lines, tip=tip, opened=True)
+
+
+def q_stage_old(evs):
+    """옛 사다리 줄 꼴 (2026-11-13) — 2026-11-14 q_stage 로 바뀜, 비교용으로 남김."""
     g, b = C["good"], C["bad"]
     reach, lines, latest = {}, [], None
     for side, lab in (("종전", g), ("확전", b)):
@@ -1239,6 +1528,274 @@ def q_stage(evs):
     return qc.question_card("사건은 어디까지 왔나?", ans, "neutral", "#111", lines, tip=tip, opened=True)
 
 
+def _fork(t):
+    for a, b in FORK_WORDS:
+        t = t.replace(a, b)
+    return re.sub(r"(\S+) 사슬로", r"\1 걱정으로 이어짐", t)   # 남은 `실적 사슬로` 등
+
+
+def side_cases(px):
+    """쪽마다 사건표 사례 (IF_SIDES) — 아래 접는 줄 · 수혜주 카드가 같이 쓴다."""
+    cfg = IF_SIDES[C["iss"]["id"]]
+    return {side: (cases(px, s["kinds"], s["inc"], s["exc"]) if s["kinds"] else []) for side, s in cfg.items()}
+
+
+SEG_JS = ("<script>document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-segbox] .rt-seg');if(!b)return;"
+          "var w=b.closest('[data-segbox]');w.querySelectorAll(':scope>.rt-segs .rt-seg').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});"
+          "w.querySelectorAll(':scope>[data-segp]').forEach(function(p){p.hidden=p.dataset.segp!==b.dataset.seg;});});</script>")
+
+
+def seg_tabs(panes):
+    """카드 · 접는 줄 안 전환 버튼 — 테마 `.rt-segs` · `.rt-seg`(가이드라인 서브탭 · 전환 버튼 19/25) 모양, 누르면 그 쪽 내용만 (2026-11-14 사용자: 종전되면 · 확전되면을 탭으로)."""
+    if len(panes) == 1:   # 한 쪽뿐(수출 통제 = 완화 사례 없음)이면 버튼 하나는 그리지 않는다
+        return panes[0][1]
+    tone = lambda lab: "up" if lab.startswith(C["good"]) else "down"   # noqa: E731 — 탭 색은 순서가 아니라 쪽으로(확전이 앞서면 확전 탭이 첫째)
+    btns = "".join(f'<button type="button" class="rt-seg" data-seg="{i}" data-tone="{tone(lab)}" aria-pressed="{"true" if i == 0 else "false"}">{dk.esc(lab)}</button>'
+                   for i, (lab, _) in enumerate(panes))
+    body = "".join(f'<div data-segp="{i}"{" hidden" if i else ""}>{html}</div>' for i, (_, html) in enumerate(panes))
+    css = (_UL + _ULC).format(v=".post-body .iw-seg")   # E1 밑줄 탭 — 글자 폭 탭 + 오른쪽 끝까지 바닥선, 고른 쪽 색 글자 + 2px 색 밑줄 (2026-11-14 사용자 결정)
+    return f'<style>{css}</style><div class="iw-seg" data-segbox="1"><div class="rt-segs" style="margin:0 0 10px {dk.ALIGN_PX}px;">{btns}</div>{body}</div>'
+
+
+def _cnt(xs, verb):
+    """`n번 중 k번 올랐고` — 표에 0.0% 로 보이는 날은 오른 날로 세지 않는다. 사례 하나면 그냥 `올랐고`."""
+    k = sum(round(x, 1) > 0 for x in xs)
+    neg = verb.replace("올랐", "오르지 않았").replace("올라 있었", "올라 있지 않았")
+    if len(xs) == 1:
+        return verb if k else neg
+    return f"{len(xs)}번 모두 {verb}" if k == len(xs) else f"{len(xs)}번 중 한 번도 {neg}" if k == 0 else f"{len(xs)}번 중 {k}번 {verb}"
+
+
+def if_fold(chain_id, scs):
+    """종전되면 · 확전되면 주가는? — 원래 자리(아래쪽 접는 줄 묶음 = `과거 기록에서 비슷한 때는?` 자리)로 되돌리고 안은 전환 버튼 두 쪽 (2026-11-14 사용자).
+    쪽마다: 첫 문장(S&P 500 그날 · 20거래일 뒤) → 흔한 설명 갈림 → 지난 사례 표 → 안내."""
+    cfg = IF_SIDES[C["iss"]["id"]]
+    base_side = "종전" if C["watch"] == C["good"] else "확전"   # CFG case_exp 가 재는 쪽
+    panes = []
+    for side in ("종전", "확전"):
+        s, cs = cfg[side], scs[side]
+        forks = CH.CHAINS[s["chain"]]["forks"] if s["chain"] else []
+        lab = SIDE_LABEL[side]
+        if not cs and not forks:
+            continue
+        v = [r["S&P 500"] for r in cs if r.get("S&P 500") and r["S&P 500"][0] is not None]
+        v20 = [x[1] for x in v if x[1] is not None]
+        lead = (f"지난 {lab} 사례에서 S&P 500 은 그날 " + _cnt([x[0] for x in v], "올랐고")
+                + (", 20거래일 뒤에는 " + _cnt(v20, "올라 있었습니다") if v20 else "") + ".") if v else f"알파스코프 사건표에 {lab} 사례가 아직 없습니다."
+        html = H._plain_rows(lead, [], lines=False)
+        if forks:
+            html += _ttl_plain("시장에서 흔히 하는 설명") + H._plain_rows("", [(_fork(a), "", _fork(c)) for a, c in forks])
+        if cs:
+            exp = CASE_EXP if side == base_side else {k: -x for k, x in CASE_EXP.items()}
+            html += (_ttl_plain(f"지난 {lab} 때 실제로는") + f'<div style="padding:0 {dk.ALIGN_PX}px;">{cases_card(cs)}</div>'
+                     + H._plain_rows("", [], note=s["note"] + case_gap(cs, exp)))
+        panes.append((f"{lab}되면", html))
+    if not panes:
+        return ""
+    note = H._plain_rows("", [], note="흔한 설명은 교과서 · 언론의 설명이고, 사례는 지난 기록입니다. 이번에 그대로 된다는 뜻은 아닙니다.")
+    return H._fold_group(H._fold_row(f"과거 기록에서 {C['good']} · {C['bad']} 때 주가는?", seg_tabs(panes) + note)) + SEG_JS   # 과거 기록임을 제목에 (증시 전망 `과거 기록에서 비슷한 때는?` 과 같은 말, 2026-11-14 사용자)
+
+
+def _ttl_plain(t):
+    return f'<div style="margin:14px 0 4px;padding:0 {dk.ALIGN_PX}px;font-size:16px;line-height:24px;font-weight:700;color:#111;">※ {dk.esc(t)}</div>'
+
+
+def _day_move(ser, day):
+    """사건 날(미국 날짜) 이후 첫 거래일의 하루 등락 — 한국 종목은 미국 저녁 사건이 다음 날 반영되므로 그 시장의 첫 거래일로 (목업 근사)."""
+    ser = ser.dropna()
+    t = pd.Timestamp(day)
+    i = ser.index.searchsorted(t)
+    if i < 1 or i >= len(ser) or (ser.index[i] - t).days > 4:
+        return None
+    return (ser.iloc[i] / ser.iloc[i - 1] - 1) * 100
+
+
+def _pp(v):
+    return f'{"+" if v >= 0 else "−"}{abs(v):.1f}%p'
+
+
+def _pp_html(v):
+    """줄 값 = 시장 대비 %p — 증감 색 + 굵게 (arrow 와 같은 꼴, fix_colons 가 ▲ · ▼ 로)."""
+    if round(v, 1) == 0:
+        return '<span style="font-weight:700;white-space:nowrap;">0.0%p</span>'
+    return f'<span style="color:{dk.UP if v > 0 else dk.DOWN};font-weight:700;white-space:nowrap;">{_pp(v)}</span>'
+
+
+MCAP_CACHE = os.path.join(OUT, "_mcap_cache.json")   # 주도주 = 시가총액 1위 — 목업은 7일 캐시 (운영 = 상태 저장소, 주 1회)
+
+
+def mcaps(syms):
+    """야후 시가총액 (나라 안에서만 비교 — 원 · 달러 섞지 않는다)."""
+    try:
+        cache = json.load(open(MCAP_CACHE, encoding="utf-8"))
+    except (OSError, ValueError):
+        cache = {}
+    old = (dt.date.today() - dt.timedelta(days=7)).isoformat()
+    todo = [s for s in syms if s not in cache or cache[s]["day"] < old]
+    if todo:
+        import yfinance as yf
+        for s in todo:
+            try:
+                cache[s] = {"day": dt.date.today().isoformat(), "cap": float(yf.Ticker(s).fast_info["marketCap"] or 0)}
+            except Exception as e:  # noqa: BLE001
+                print(f"[mcap] {s} 못 받음: {type(e).__name__}")
+        os.makedirs(OUT, exist_ok=True)
+        json.dump(cache, open(MCAP_CACHE, "w", encoding="utf-8"), ensure_ascii=False)
+    return {s: cache.get(s, {}).get("cap", 0) for s in syms}
+
+
+def _ex5(px, sym):
+    """최근 5거래일 시장 대비 %p — 미국 = S&P 500 · 한국 = 코스피."""
+    if sym not in px:
+        return None
+    s, m = px[sym].dropna(), px["^KS11" if sym.endswith(".KS") else "^GSPC"].dropna()
+    if len(s) <= WIN or len(m) <= WIN:
+        return None
+    return (s.iloc[-1] / s.iloc[-WIN - 1] - 1) * 100 - (m.iloc[-1] / m.iloc[-WIN - 1] - 1) * 100
+
+
+def _beat(px, sym, cs):
+    """지난 같은 사례 그날 그 나라 시장보다 셌던 횟수 (n, k)."""
+    s, m = px[sym].dropna(), px["^KS11" if sym.endswith(".KS") else "^GSPC"].dropna()
+    n = k = 0
+    for c in cs:
+        r, rm = _day_move(s, c["day"]), _day_move(m, c["day"])
+        if r is None or rm is None:
+            continue
+        n += 1
+        k += round(r - rm, 1) > 0
+    return n, k
+
+
+LEADER_LOGO = 24   # 주도주 로고 20 → 24 (2026-11-14 사용자: 수혜주는 중요 — 왼쪽 이름 18(본문 19 보다 1 작게) · 로고 키움 · 종목 사이 구분선)
+LEADER_PAD = 13    # 주도주 줄 · 테마 머리 아래 ~ 구분선 — 선 사이 종목 위아래 같게, 줄 전체가 종목 상세 링크라 누르기 쉽게 (26 + 26 = 52)
+THEME_GAP = 20     # 테마 구획 사이 — 앞 구획 마지막 종목 아래 구분선 ~ 다음 테마 머리 20 (2026-11-14 사용자 `구분선 기준 20`)
+
+
+# 가상 로고 (목업만) — 우리 로고 사본(ref/ticker_logos.json)이 아직 없는 종목. 발행 전 fetch_ticker_logos.py 로 실제 로고를 받는다 (2026-11-14 사용자: 회색 글자 배지 대신 로고처럼)
+VIRTUAL_LOGO = {"AAL": ("#0078D2", "AA"), "272450.KS": ("#7AB800", "J"), "039130.KS": ("#5B2C83", "H"), "FLR": ("#0033A0", "F"),
+                "079550.KS": ("#00468C", "LIG"), "FRO": ("#003A70", "F"), "CLF": ("#0A2240", "C")}
+LOGO_ZOOM = {"003490.KS": 1.6}   # 그림이 원 안에 작게 든 로고 — 대한항공 태극이 지름의 57% 라 키워 꽉 채움 (2026-11-14 사용자)
+
+
+def _logo(sym, nm):
+    """주도주 이름 앞 로고 20 (2026-11-14 사용자: 나라 라벨 대신 티커 로고). 우리 gh-pages 로고가 없으면 dk 는 티커 두 글자 배지 —
+    한국 종목은 숫자(`03`)가 되므로 이름 첫 글자 배지로."""
+    sz = LEADER_LOGO
+    if sym in VIRTUAL_LOGO and sym.upper() not in dk._logo_files():
+        bg, t = VIRTUAL_LOGO[sym]
+        fs = 12 if len(t) <= 1 else 10 if len(t) == 2 else 8
+        return (f'<span aria-hidden="true" style="display:inline-block;flex:none;width:{sz}px;height:{sz}px;line-height:{sz}px;border-radius:50%;margin-right:8px;'
+                f'background:{bg};color:#fff;font-size:{fs}px;font-weight:800;letter-spacing:-0.3px;text-align:center;">{dk.esc(t)}</span>')
+    if sym in LOGO_ZOOM and sym.upper() in dk._logo_files():
+        img = dk.ticker_logo(sym, sz).replace("vertical-align:-4px;", "").replace("margin-right:6px;", "").replace("border-radius:50%;", "", 1)
+        img = img.replace("object-fit:cover;", f"object-fit:cover;transform:scale({LOGO_ZOOM[sym]});", 1)
+        return f'<span style="display:inline-flex;flex:none;width:{sz}px;height:{sz}px;border-radius:50%;overflow:hidden;margin-right:8px;">{img}</span>'
+    if sym.upper() in dk._logo_files() or not sym.endswith(".KS"):
+        return dk.ticker_logo(sym, LEADER_LOGO).replace("vertical-align:-4px;", "").replace("margin-right:6px;", "margin-right:8px;")
+    return (f'<span aria-hidden="true" style="display:inline-block;flex:none;width:{LEADER_LOGO}px;height:{LEADER_LOGO}px;line-height:{LEADER_LOGO}px;border-radius:50%;margin-right:8px;'
+            f'background:#E2E8F0;color:#334155;font-size:12px;font-weight:700;text-align:center;">{dk.esc(nm[:1])}</span>')
+
+
+def _good_red(html):
+    """수혜주 카드 글자 속 좋은 쪽 말(종전 · 완화) = 빨강 (2026-11-14 사용자 "종전이라는 말은 다 빨간색") — 글자 마디만, 속성 · 툴팁은 그대로."""
+    w = C["good"]
+    red = lambda t: re.sub(r">([^<]*)<", lambda m: ">" + m.group(1).replace(w, f'<span style="color:{dk.UP};">{w}</span>') + "<", t)   # noqa: E731
+    parts = re.split(r"(<button\b.*?</button>)", html, flags=re.S)   # 탭 버튼 글자는 탭 색을 따른다 (D 시안 — 고른 쪽 색 · 흰 글자)
+    return "".join(p if p.startswith("<button") else red(p) for p in parts)
+
+
+def _theme_block(th, first, oil5, last=False):
+    """테마 한 묶음 — 머리 줄(테마 이름 굵게 · 오른쪽 테마 평균 시장 대비) + 회색 줄(경로 · 이유) + 주도주 줄(나라 라벨 · 이름 · 시장 대비 · 지난 사례)."""
+    A = dk.ALIGN_PX
+    path = th["path"]
+    if path in OIL_PATH and oil5 is not None:
+        same = (oil5 > 0) == (OIL_PATH[path] > 0)
+        path += f" 경로 · 이번 주 유가 {_pct_html(oil5)}, " + ("같은 방향" if same else "반대 방향")
+    else:
+        path = dk.esc(path + " 경로")
+    ic = dk.soft_icon(THEME_ICON[th["name"]]) if th["name"] in THEME_ICON else ""
+    # 구획 = 테마 머리 → 구분선 → 종목 → 구분선 → 종목 (2026-11-14 사용자: 머리 아래에도 구분선, 선 사이 종목은 위아래 여백 같게 · 테마 구획 사이 20)
+    line = f'<div style="height:0;margin:0 {A}px;border-top:1px solid #E2E8F0;"></div>'
+    head = (f'<div style="padding:{14 - dk.VP if first else THEME_GAP}px {A}px {LEADER_PAD}px;">'
+            f'<span style="display:flex;align-items:center;gap:6px;min-width:0;font-size:{dk.NAME};line-height:{dk.LH_CARD};"><b style="flex:none;color:#111;">{dk.esc(th["name"])}</b>'
+            f'<span aria-hidden="true" style="flex:none;width:0;height:12px;margin:0 2px;border-left:1px solid #E2E8F0;"></span>'
+            f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:{dk.TINY};color:{dk.SUB};">{dk.esc(THEME_WHY.get(th["name"], th["why"]))}</span>'
+            '</span></div>')   # 이유 = 테마 이름 같은 줄, 앞에 세로 구분선 · 테마 증감은 삭제(손으로 고른 종목 평균이라 ETF 처럼 읽혔다)
+    rows = ""
+    for ld in th["leaders"]:
+        rows += line + dk.stock_row_link(f'<span style="display:block;padding:{LEADER_PAD}px {A}px;">'
+                 f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:16px;line-height:26px;">'
+                 f'<span style="display:inline-flex;align-items:center;color:#111;min-width:0;font-size:18px;">{_logo(ld["sym"], ld["nm"])}<span>{dk.esc(ld["nm"])}</span></span>'
+                 f'{_pp_html(ld["ex"])}</span></span>', ld["sym"])   # 줄 전체 = 종목 상세 페이지(가이드라인 10절 줄 전체 링크) · `지난 사례` 줄 삭제
+    return head + rows + line + (f'<div style="height:{14 - dk.VP}px;"></div>' if last else "")   # 마지막 종목 아래도 구분선, 다음 구획 머리까지 = 선 기준 20 (2026-11-14 사용자)
+
+
+def _pct_html(v):
+    return (f'<span style="color:{dk.UP if v > 0 else dk.DOWN};font-weight:700;white-space:nowrap;">{"+" if v > 0 else "−"}{abs(v):.1f}%</span>'
+            if round(v, 1) else '<span style="font-weight:700;">0.0%</span>')
+
+
+def bene_card(px, scs):
+    """종전되면 · 확전되면 수혜주는? — 테마 먼저(시장 대비 평균) → 테마마다 주도주(시가총액 1위, 미국 · 한국 하나씩) (2026-11-14 사용자 둘째).
+    유가 경로 테마는 이번 주 유가 움직임과 맞대어 `이 쪽` · `반대 쪽`. 추천이 아니다."""
+    lst = BENEFIT[C["iss"]["id"]]
+    g, b = C["good"], C["bad"]
+    cl = px["CL=F"].dropna() if "CL=F" in px else None
+    oil5 = (cl.iloc[-1] / cl.iloc[-WIN - 1] - 1) * 100 if cl is not None and len(cl) > WIN else None
+    caps = mcaps(sorted({s for side in lst.values() for th in side for lst2 in (th[3], th[4]) for _, s in lst2}))
+    avg, panes = {}, []
+    for side in ("종전", "확전"):
+        lab = SIDE_LABEL[side]
+        ths = []
+        for name, path, why, us, kr in lst.get(side, []):
+            exs = [e for e in (_ex5(px, s) for _, s in us + kr) if e is not None]
+            leaders = []
+            for mk, cands in (("미국", us), ("한국", kr)):
+                cands = [(nm, s) for nm, s in cands if s in px and _ex5(px, s) is not None]
+                if not cands:
+                    continue
+                nm, s = max(cands, key=lambda c: caps.get(c[1], 0))
+                n, k = _beat(px, s, scs.get(side, []))
+                leaders.append({"mk": mk, "nm": nm, "sym": s, "ex": _ex5(px, s), "n": n, "k": k})
+            ths.append({"name": name, "path": path, "why": why, "avg": sum(exs) / len(exs) if exs else None, "n": len(exs), "leaders": leaders})
+        vals = [t["avg"] for t in ths if t["avg"] is not None]
+        if vals:
+            avg[side] = sum(vals) / len(vals)
+        if ths:
+            ths.sort(key=lambda t: -t["avg"] if t["avg"] is not None else 1e9)   # 최근 일주일 시장 대비 가장 센 테마가 맨 위 (2026-11-14 사용자) — `n개 가운데 가장 셌던 것은 …` 문장은 삭제
+            html = "".join(_theme_block(t, i == 0, oil5, i == len(ths) - 1) for i, t in enumerate(ths))
+        else:
+            html = H._plain_rows(BENEFIT_NONE if C["iss"]["id"] == "EXPORT" else f"{lab} 때 흔히 꼽는 수혜 테마가 뚜렷하지 않습니다.", [])
+        panes.append((f"{lab}되면", html))
+    if len(avg) == 2:
+        d = avg["종전"] - avg["확전"]
+        ans = "비슷함" if abs(d) < 1 else f"이번 주 {josa(g if d > 0 else b, ('이', '가'))} 앞섬"   # 2026-11-14 사용자 `이번 주 종전이 앞섬`
+        th_, ink_ = ("neutral", "#111") if abs(d) < 1 else ("positive", dk.UP) if d > 0 else ("negative", dk.DOWN)   # 카드 색 = 앞선 쪽 색(종전 = 빨강 카드 · 확전 = 파랑) (2026-11-14 사용자)
+        first = (f"최근 일주일 시장 대비로 {g} 수혜 테마는 평균 {_pp(avg['종전'])}, {b} 수혜 테마는 {_pp(avg['확전'])} 움직였습니다. "
+                 + ("두 쪽이 비슷했습니다." if abs(d) < 1 else f"{g if d > 0 else b} 쪽 테마가 더 셌습니다."))
+    elif avg:
+        side = next(iter(avg))
+        ans = f"{SIDE_LABEL[side]} 쪽 시장 대비 {_pp(avg[side])}"
+        th_, ink_ = "neutral", "#111"
+        first = f"최근 일주일 {SIDE_LABEL[side]} 수혜 테마는 시장보다 평균 {_pp(avg[side])} 움직였습니다."
+    else:
+        return ""
+    if oil5 is not None and C["iss"]["id"] == "IRAN":
+        first += f" 같은 기간 유가(WTI)는 {_pp(oil5).replace('%p', '%')}입니다."
+    if len(avg) == 2 and avg["확전"] - avg["종전"] >= 1:   # 이번 주 앞선 쪽 탭이 첫째 — 확전이 앞서면 `확전되면` 이 앞 · 처음 열림 (2026-11-14 사용자)
+        panes = panes[::-1]
+    lines = [(first, "plain"), (seg_tabs(panes) + SEG_JS, "html")]   # 카드 끝 `알파스코프의 추천이 아닙니다` 줄 삭제 — 면책은 블로그 공통 푸터 하나(꼬리말 금지), 툴팁엔 남김 (2026-11-14)
+    tip = ("수혜 테마 = 그 일이 생기면 좋아진다고 시장에서 흔히 꼽는 테마(교과서 · 언론), 알파스코프의 주장 · 추천이 아님.\n"
+           "주도주 = 테마 안 시가총액 1위, 미국 · 한국 하나씩. 오른쪽 = 최근 5거래일 그 나라 시장 대비(미국 = S&P 500 · 한국 = 코스피).")   # 테마 평균 · 셌던 때 줄 삭제 (2026-11-14 사용자)
+    if th_ != "neutral":
+        lab = g if th_ == "positive" else b
+        ans = f'<span style="color:{ink_};">{dk.esc(ans).replace(lab, f"<span>{lab}</span>")}</span>'
+    row_line = dk.darken(dk.lighten(dk.lighten(qc.CARD_DIR[th_][1]), 0.3), 0.02)   # 테마 사이 구분선 = 그 카드 색의 줄 구분선(question_card bd_row 와 같은 셈) — 회색 #E2E8F0 아님 (2026-11-14 사용자)
+    lines[1] = (lines[1][0].replace("border-top:1px solid #E2E8F0;", f"border-top:1px solid {row_line};").replace("border-left:1px solid #E2E8F0;", f"border-left:1px solid {row_line};"), "html")
+    return _good_red(qc.question_card("수혜주는?", ans, th_, ink_, lines, tip=tip))   # 옛 `종전되면 · 확전되면 수혜주는?` (2026-11-14 사용자: "그냥 수혜주는")
+
+
 def q_related(today_rows, r2w):
     """관련 뉴스 = 접는 강조 카드 안 방향 막대 (오늘 · 최근 2주). 타임라인은 카드 아래 그대로."""
     return qc.question_card("관련 뉴스", f"오늘 {len(today_rows)}건", "neutral", "#111", [(side_bars(today_rows, r2w), "html")])
@@ -1263,7 +1820,7 @@ def bottom(chain_id, cs):
     past = (H._plain_rows(f"알파스코프 사건표의 {C['case_name']} 날 {len(cs)}번입니다. 그날 종가와 20거래일 뒤 종가를 전날 종가와 비교했습니다.", [])
             + f'<div style="padding:0 {dk.ALIGN_PX}px;">{cases_card(cs)}</div>'
             + H._plain_rows("", [], note=C["case_note"] + case_gap(cs))) if cs else ""
-    grp = H._fold_group(H._fold_row(f"{W()}되면 흔히 하는 설명은?", forks) + (H._fold_row("과거 기록에서 비슷한 때는?", past) if past else ""))
+    grp = ""   # 접는 줄 둘은 `종전되면 · 확전되면 주가는?` 카드로 올림 (2026-11-14) — forks · past 는 비교용으로 계산만
     note = C["bridge"]
     return grp + (f'<div data-why-note="1" style="display:flex;align-items:flex-start;gap:4px;margin:12px 0 0;padding:0 {dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
                   f'<span style="flex:none;display:flex;align-items:center;height:19px;">{H.EXCL_ICON}</span><span>{dk.esc(note)}</span></div>')
@@ -1316,7 +1873,7 @@ def build():
     for cur in watch:
         use(cur)
         pages[C["slug"] if PUBLIC else C["file"]] = page(cur, watch, items, px, now, today, days, sums, logs)
-        logs[cur["id"]] = {"day": today.isoformat(), "made": now.isoformat(), "rules": RULES, "state": cur["state"], "n48": cur["n48"],
+        logs[cur["id"]] = {"day": today.isoformat(), "made": now.isoformat(), "rules": RULES, "state": cur["state"], "align": cur.get("align"), "n48": cur["n48"],
                            "base48": cur["base48"], "hot": cur["hot"], "groups": {g: w for g, w, *_ in cur["groups"]},
                            "gauge": _zone_word(ev_net(events([r for r in cur["rows"] if r["t"].astimezone(KST).date() >= today - dt.timedelta(days=GAUGE_DAYS - 1)]))),
                            "history": logs.get(cur["id"])}
@@ -1330,8 +1887,8 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
     links, groups, st, kind = cur["links"], cur["groups"], cur["state"], cur["kind"]
     hist = history(px, cur["chain"], cur["rows"])
     logs[cur["id"]] = hist
-    counts = daily_counts(cur["rows"], days)   # 오늘(진행 중)까지 — 옛 `다 지난 날만` 은 오늘 급증이 문장에만 있고 그래프엔 없었다 (2026-11-13 사용자)
-    NOW_LABEL[0] = f"오늘 {now.astimezone(KST):%H}시"
+    counts = counts_24h(cur["rows"], now)   # 지금에서 24시간씩 — 마지막 점도 꽉 찬 24시간 (2026-11-14 사용자: 오늘 0시가 뚝 떨어짐)
+    NOW_LABEL[0] = f"지금 {now.astimezone(KST):%H}시"
     chart_gr, chart_line = oil_chart(px) if C["chart"] is None else year_chart(px, *C["chart"])
     cs = cases(px, cur["cases"])
 
@@ -1344,14 +1901,21 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
     evs = sorted(events(r14), key=lambda e: e["first"], reverse=True)   # 최근 2주 사건 — 바늘 · 어디까지 왔나 · 막대 · 타임라인이 같이 쓴다
     n_ai = ai_judge(evs, today)   # AI 판정(하루 한 번)이 붙은 사건 수 — 없는 사건은 글자 패턴
     gauge = gauge_card(evs, today)
-    head = q_now(st, kind, cur, groups, (sum(r["side"] == "종전" for r in r48), sum(r["side"] == "확전" for r in r48)), asof)
+    links5 = link_rows(px, cur["chain"], n=WIN)
+    gs5 = group_side(links5)
+    c_align, align = q_align(gauge_word(evs, today), links5, gs5, chart_gr, chart_line, hist, asof)
+    cur["align"] = align
 
     c_news, r2w = q_news(cur, counts, days, r48)
     today_evs = [e for e in evs if e["first"].astimezone(KST).date() == today]
-    qcards = f'<div style="margin:0 0 8px;">{head + q_stage(evs) + c_news + q_market(links, groups, chart_gr, chart_line) + q_history(hist)}</div>'
+    # 순서 = 독자 질문 순 (2026-11-14 사용자) — 바늘 → 시장도 같은 쪽? → 어디까지 갔나? → 되면 수혜주는? · `되면 주가는?` 은 아래 접는 줄
+    scs = side_cases(px)
+    bene = bene_card(px, scs)
+    BENE_HTML[cur["id"]] = bene   # 탭 모양 시안 페이지(seg_variants)가 같은 카드를 쓴다
+    qcards = f'<div style="margin:0 0 8px;">{c_align + q_stage(evs) + bene}</div>'   # 수혜주 카드 = 단계 카드 아래 (2026-11-14 사용자)
 
-    sec_list = (dk.section("관련 뉴스", side_bars(today_evs, evs), line=False)
-                + f'<div style="margin:0 0 24px;padding:0 0 {TL_BOTTOM}px;">{news_timeline(evs, days[::-1])}</div>')   # 아래 +5 = padding — margin 은 아래 접는 줄 묶음 위 28 과 겹쳐(collapse) 늘지 않았다 (2026-11-13 사용자)
+    sec_list = (dk.section("관련 뉴스", c_news + side_bars(today_evs, evs), line=False)   # `얼마나 화제인가?` = 방향이 아닌 관심의 크기 → 위 방향 카드들 사이에서 뉴스 구획으로
+                + f'<div style="margin:0 0 24px;padding:0 0 {TL_BOTTOM}px;">{news_timeline(evs, days[::-1], px)}</div>')   # 아래 +5 = padding — margin 은 아래 접는 줄 묶음 위 28 과 겹쳐(collapse) 늘지 않았다 (2026-11-13 사용자)
 
     op_rows = [
         ("규칙", RULES), ("모으기", f"키워드 /{cur['pat']}/ — 공용 뉴스(CNBC 8일 보관) {cur['n_store']}건 + 구글 뉴스 한국어(하루씩, 42일) {cur['n_gn']}건, 겹침 제거. 100건 상한 닿은 날 {', '.join(sorted(cur['capped'])) or '없음'}"),
@@ -1364,6 +1928,8 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
         ("상태 규칙", f"뉴스 늘어남 = 48시간 ≥ 3 · 평소 2배 / 시장 = 묶음 안 2개 이상(지표 하나뿐인 묶음은 1개) {W()} 방향 1σ, 하나는 2σ"),
         ("전망 기준(최근 10거래일 최대)", f"{C['bridge_sym']} vs S&P 500 " + bridge_now(px)),
         ("사례", f"사건표 {', '.join(cur['cases'])}" + (f" · 제목 /{C['case_re']}/" if C.get("case_re") else "") + f" → {len(cs)}건"),
+        ("단계 차례 규칙", f"차례 규칙 전 가장 높은 단계 = 종전 {STAGE_RAW.get('종전')} · 확전 {STAGE_RAW.get('확전')} (0부터) — 화면은 빈 단계에서 멈춤"),
+        ("시장 기간", f"독자 카드 = {WIN}거래일 ({links5[0]['d0']:%m-%d} → {links5[0]['d1']:%m-%d}) · 10거래일 판정(옛) = {short(st)}"),
     ]
     if cur["id"] == "IRAN":
         op_rows += [
@@ -1374,9 +1940,67 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
             ("놓친 등록", "11-04 유가 −8.3% · XLE vs S&P −6.3%p 3.9σ = 틀 R 기준 넘음. 자동 등록(11-11~) 전이라 미등록. 거슬러 등록하지 않음"),
         ]
     op = "" if PUBLIC else H.operator_box(op_rows)
-    body = (top + q + gauge + qcards + sec_list + op + bottom(cur["chain"], cs) + (H.RELATED if PUBLIC else ""))
+    body = (top + q + gauge + qcards + sec_list + op + if_fold(cur["chain"], scs) + bottom(cur["chain"], cs) + (H.RELATED if PUBLIC else ""))   # `주가는?` = 원래 아래 접는 줄 자리 (2026-11-14 사용자)
     body = body.replace('data-cards="1" ', "")   # data-cards 는 테마(엔비디아 탭) JS 가 글 머리로 옮긴다 — 이 페이지 카드는 제자리에
-    return dk.fix_colons(f'<div data-head-title="{HEAD_TITLE}" data-seo-lead="{dk.esc(HEAD_TITLE + " — " + cur["q"] + " 지금 " + st)}">{body}</div>')
+    return dk.fix_colons(f'<div data-head-title="{HEAD_TITLE}" data-seo-lead="{dk.esc(HEAD_TITLE + " — " + cur["q"] + " 뉴스와 시장 " + align)}">{body}</div>')
+
+
+BENE_HTML = {}
+# 2026-11-14 사용자 둘째: "탭은 D 로, D 에서 더 세부 시안 — 종전되면 내용을 흰 카드(강조 카드 안 그래프 흰 카드)에 넣고 그 위에서 탭 모양 여러 가지".
+# 공통 = 고른 쪽 색이 바뀌는 탭(종전 연빨강 · 확전 연파랑) + 내용 = 흰 카드(흰 바탕 · 모서리 8 · 양쪽 5 내밈 · 테두리 EMPH_WHITE_BD, 안 줄 선 #E2E8F0).
+_RED, _BLUE = ("#FEF2F2", "#FCA5A5", "#B91C1C"), ("#EFF6FF", "#93C5FD", "#1D4ED8")   # 바탕 · 테두리 · 글자 = 외곽선 라벨 긍정 · 부정 색 (8절)
+_WC = ("{v} [data-segp]{{background:#fff;border:1px solid " + dk.EMPH_WHITE_BD + ";border-radius:8px;margin:0 " + str(dk.CHART_CARD_X) + "px;padding:4px 6px 0}}"
+       "{v} [data-segp] [style*='border-top:1px solid']{{border-top-color:#E2E8F0!important}}"
+       "{v} .rt-segs{{margin-left:0!important;margin-right:0!important}}")
+_SEL = ("{v} .rt-seg[data-tone='up'][aria-pressed=true]{{background:" + _RED[0] + "!important;border-color:" + _RED[1] + "!important;color:" + _RED[2] + "!important}}"
+        "{v} .rt-seg[data-tone='down'][aria-pressed=true]{{background:" + _BLUE[0] + "!important;border-color:" + _BLUE[1] + "!important;color:" + _BLUE[2] + "!important}}")
+_BTN2 = ("{v} .rt-segs{{display:flex!important;gap:6px!important;padding:0!important;background:none!important;margin-bottom:8px!important}}"
+         "{v} .rt-seg{{flex:1 1 0;border:1px solid #E2E8F0!important;background:#fff!important;border-radius:8px!important;box-shadow:none!important}}")
+# 2026-11-14 사용자 셋째: 지금 페이지(수혜주 구분선 구획) 기준으로 다시 — 본 페이지엔 D1(양쪽 색 두 칸 버튼) 우선 적용,
+# 시안 = `탭 오른쪽 아래로 구분선이 이어지는` 밑줄 탭 여러 가지(E). 흰 카드 없음.
+_LINE = "rgba(15,23,42,.10)"   # 탭 바닥선 — 색 카드 위에서도 보이는 옅은 선
+_UL = ("{v} .rt-segs{{display:flex!important;gap:20px!important;padding:0 " + str(dk.ALIGN_PX) + "px!important;margin:0 0 12px!important;background:none!important;border-radius:0!important;border-bottom:1px solid " + _LINE + "}}"
+       "{v} .rt-seg{{padding:8px 2px 9px!important;border-radius:0!important;background:none!important;box-shadow:none!important;margin-bottom:-1px;border-bottom:2px solid transparent!important}}")
+_ULC = ("{v} .rt-seg[data-tone='up'][aria-pressed=true]{{color:" + _RED[2] + "!important;border-bottom-color:" + _RED[2] + "!important}}"
+        "{v} .rt-seg[data-tone='down'][aria-pressed=true]{{color:" + _BLUE[2] + "!important;border-bottom-color:" + _BLUE[2] + "!important}}")
+SEG_VARIANTS = [   # (열쇠, 이름, 설명, CSS 틀 — {v} = 시안 칸)
+    ("D1", "D1. 양쪽 색 두 칸 버튼 (지금 페이지에 적용)", "고른 쪽 = 연빨강(종전) · 연파랑(확전) 바탕 + 테두리 + 색 글자. 비교 기준.", _BTN2 + _SEL),
+    ("E1", "E1. 밑줄 탭 — 기본", "글자 폭 탭 두 개를 왼쪽에 두고, 바닥 1px 선이 오른쪽 끝까지 이어진다. 고른 쪽 = 색 글자 + 2px 색 밑줄.", _UL + _ULC),
+    ("E2", "E2. 밑줄 탭 — 굵은 밑줄", "E1 과 같고 밑줄만 3px · 탭 사이 28. 고른 쪽이 더 또렷하다.",
+     _UL + _ULC + "{v} .rt-segs{{gap:28px!important}}{v} .rt-seg{{border-bottom-width:3px!important;padding-bottom:8px!important}}"),
+    ("E3", "E3. 밑줄 탭 — 고른 탭 연한 바탕", "고른 탭에 위 모서리 둥근 연빨강 · 연파랑 바탕을 깔고 밑줄. 버튼 느낌이 조금 남는다.",
+     _UL + _ULC + "{v} .rt-segs{{gap:4px!important}}{v} .rt-seg{{padding:8px 14px 9px!important;border-radius:8px 8px 0 0!important}}"
+     "{v} .rt-seg[data-tone='up'][aria-pressed=true]{{background:" + _RED[0] + "!important}}{v} .rt-seg[data-tone='down'][aria-pressed=true]{{background:" + _BLUE[0] + "!important}}"),
+    ("E4", "E4. 폴더 탭 — 고른 탭만 테두리, 바닥선이 그 아래서 끊김",
+     "고른 탭 = 위 · 양옆 색 테두리 + 흰 바탕, 그 아래만 바닥선이 비어 내용과 이어진다. 오른쪽으로는 바닥선이 끝까지.",
+     _UL + "{v} .rt-segs{{gap:4px!important}}{v} .rt-seg{{padding:8px 16px 9px!important;border:1px solid transparent!important;border-bottom:0!important;border-radius:8px 8px 0 0!important;margin-bottom:-1px}}"
+     "{v} .rt-seg[aria-pressed=true]{{background:#fff!important;padding-bottom:10px!important}}"
+     "{v} .rt-seg[data-tone='up'][aria-pressed=true]{{border-color:" + _RED[1] + "!important;color:" + _RED[2] + "!important}}"
+     "{v} .rt-seg[data-tone='down'][aria-pressed=true]{{border-color:" + _BLUE[1] + "!important;color:" + _BLUE[2] + "!important}}"),
+    ("E5", "E5. 바닥선도 고른 쪽 색", "E1 에 더해 오른쪽으로 이어지는 바닥선이 고른 쪽 연한 색(연빨강 · 연파랑)으로 바뀐다.",
+     _UL + _ULC + "{v} [data-segbox]:has(.rt-seg[data-tone='up'][aria-pressed=true])>.rt-segs{{border-bottom-color:" + _RED[1] + "!important}}"
+     "{v} [data-segbox]:has(.rt-seg[data-tone='down'][aria-pressed=true])>.rt-segs{{border-bottom-color:" + _BLUE[1] + "!important}}"),
+    ("E6", "E6. 밑줄 탭 — 색 점", "E1 글자 앞에 쪽 색 점(8). 안 고른 쪽도 점 색은 연하게 남아 두 쪽 색이 늘 보인다.",
+     _UL + _ULC + "{v} .rt-seg::before{{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 6px 2px 0;vertical-align:middle}}"
+     "{v} .rt-seg[data-tone='up']::before{{background:" + _RED[1] + "}}{v} .rt-seg[data-tone='down']::before{{background:" + _BLUE[1] + "}}"
+     "{v} .rt-seg[data-tone='up'][aria-pressed=true]::before{{background:" + _RED[2] + "}}{v} .rt-seg[data-tone='down'][aria-pressed=true]::before{{background:" + _BLUE[2] + "}}"),
+]
+
+
+def seg_variants():
+    """탭 모양 시안 — 실제 `수혜주는?` 카드(이란)를 시안마다 하나씩, 열린 채로. 버튼을 눌러 바뀌는 것까지 볼 수 있다."""
+    card = BENE_HTML.get("IRAN", "")
+    if not card:
+        return ""
+    card = card.replace('<details data-acc="1">', '<details data-acc="1" open>', 1)
+    card = card.replace('class="iw-seg" ', '')   # 본 페이지 D1 스타일이 시안 CSS 를 덮지 않게
+    out = ('<p style="margin:16px 6px 24px;font-size:14px;line-height:21px;color:#6B7280;">Hot Issue `수혜주는?` 카드 안 종전되면 · 확전되면 탭 모양 시안입니다. '
+           '지금 페이지(D1 양쪽 색 두 칸 버튼)와 비교해, 탭 오른쪽으로 바닥선이 이어지는 밑줄 탭 E1~E6 을 그렸습니다. 버튼을 눌러 확전 쪽도 볼 수 있습니다.</p>')
+    for k, nm, desc, css in SEG_VARIANTS:
+        css = css.format(v=f".post-body .v{k}")
+        out += (f'<style>{css}</style><h2 style="{dk.H2}margin:32px 0 4px;">{dk.esc(nm)}</h2>'
+                f'<p style="margin:0 6px 12px;font-size:14px;line-height:21px;color:#6B7280;">{dk.esc(desc)}</p><div class="v{k}">{card}</div>')
+    return out
 
 
 if __name__ == "__main__":
@@ -1390,3 +2014,5 @@ if __name__ == "__main__":
             pass
     for fn, body in build().items():
         print(dk.write_mock(body, os.path.join(OUT, fn), HEAD_TITLE))
+    if not PUBLIC:
+        print(dk.write_mock(dk.fix_colons(f'<div data-head-title="탭 모양 시안">{seg_variants()}</div>'), os.path.join(OUT, "mock_seg_tabs.html"), "탭 모양 시안"))
