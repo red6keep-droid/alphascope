@@ -108,6 +108,7 @@
     var lastW = 0, again = function () { var w = root.clientWidth; if (w && w !== lastW) { lastW = w; requestAnimationFrame(function () { self.draw(); }); } };
     if (window.ResizeObserver) new ResizeObserver(again).observe(root);
     else window.addEventListener('resize', function () { self.draw(); });
+    window.addEventListener('resize', function () { if (self.full) requestAnimationFrame(function () { self.draw(); }); });   // 폰을 돌리면 높이 · 가로 화면 배치 다시
   }
   Chart.prototype.build = function () {
     var self = this;
@@ -160,29 +161,51 @@
       this.ph = document.createComment('candle');
       this.root.parentNode.insertBefore(this.ph, this.root);
       this.ov = el('div', 'position:fixed;inset:0;z-index:2147483000;background:#fff;display:flex;flex-direction:column;padding:12px 12px max(12px,env(safe-area-inset-bottom));box-sizing:border-box;overflow:auto;');
-      var head = el('div', 'display:flex;align-items:center;gap:8px;margin:0 0 6px;'), self = this;
+      var head = el('div', 'display:flex;align-items:center;gap:8px;margin:0 0 16px;'), self = this;   // 아래 여백 6 → 16 (2026-11-14 사용자)
+      // 종목 로고 = 페이지 제목의 로고(테마가 만든 .title-logo — 사진 또는 글자 원)를 그대로, 없으면 이름 첫 글자 원 (2026-11-14 사용자)
+      var src = document.querySelector('.post-title .title-logo'), lg;
+      if (src) {
+        var cs = getComputedStyle(src); lg = src.cloneNode(true);
+        lg.style.cssText = 'flex:none;width:24px;height:24px;border-radius:50%;margin:0;vertical-align:0;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;object-fit:cover;' +
+          'background:' + cs.backgroundColor + ';color:' + cs.color + ';font-size:11px;line-height:24px;font-weight:700;';
+      } else lg = el('span', 'flex:none;width:24px;height:24px;border-radius:50%;background:#F1F5F9;color:#111;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;', (this.d.name || '').charAt(0));
+      head.appendChild(lg);
       head.appendChild(el('div', 'flex:1;min-width:0;font-size:17px;line-height:24px;font-weight:700;color:#111;', this.d.name));
       var cx = el('button', 'flex:none;width:30px;height:30px;border-radius:50%;background:#F1F5F9;border:0;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;',
         '<svg width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="#6B7280" stroke-width="1.4" stroke-linecap="round"><path d="M2 2l6 6M8 2L2 8"/></svg>');   // 회색 원 닫기(범례 닫기와 같은 꼴, 큰 것 30) — 종목 이름 줄 (2026-11-14 사용자)
       cx.setAttribute('aria-label', '닫기'); cx.onclick = function () { self.toggleFull(); }; head.appendChild(cx);
       this.ov.appendChild(head);
-      this.ov.appendChild(this.root);
+      this.ov.appendChild(this.root); this.minH = this.root.style.minHeight; this.root.style.minHeight = '0';   // 카드의 min-height 300 이 가로 화면에서 스크롤을 만들던 것
       document.body.appendChild(this.ov); document.documentElement.style.overflow = 'hidden';
       this.full = true; this.on.ma[200] = this.on.ma[200] || false; this.n = Math.min(this.unit === 'D' ? 120 : VIEW[this.unit] * 2, this.bars.length);
     } else {
-      this.ph.parentNode.insertBefore(this.root, this.ph); this.ph.remove(); this.ov.remove(); document.documentElement.style.overflow = '';
+      this.ph.parentNode.insertBefore(this.root, this.ph); this.root.style.minHeight = this.minH || ''; this.ph.remove(); this.ov.remove(); document.documentElement.style.overflow = '';
       this.full = false; this.menu = false; this.n = Math.min(VIEW[this.unit], this.bars.length); this.end = this.bars.length;
     }
     this.cross = null; this.topBar(); this.draw();
   };
   Chart.prototype.bind = function () {
     // 옆으로 밀기 = 넘겨보기 · 두 손가락 = 확대 · 축소 · 짧게 누르기 = 그날 십자선(다시 누르면 끔) · 꾹 누르고 움직이기 = 십자선이 따라감
-    var self = this, cv = this.cv, pts = {}, start = null, moved = false, timer = null, crossMode = false;
+    var self = this, cv = this.cv, pts = {}, start = null, moved = false, timer = null, crossMode = false, vel = 0, lastX = 0, lastT = 0, fling = 0;
+    // 손을 뗀 뒤 관성으로 흘러가다 천천히 멈춤 — 폰 세로 스크롤과 비슷한 감속(1ms 마다 속도 × 0.997) (2026-11-14 사용자)
+    function stopFling() { if (fling) cancelAnimationFrame(fling); fling = 0; }
+    function startFling(v) {
+      var slot = (cv.getBoundingClientRect().width - (self.axisW || AXIS_W)) / self.n, pos = self.end, t0 = 0;
+      function step(ts) {
+        if (!t0) { t0 = ts; fling = requestAnimationFrame(step); return; }
+        var dt = Math.min(32, ts - t0); t0 = ts; v *= Math.pow(0.997, dt); pos -= v * dt / slot;
+        var lo = self.n, hi = self.bars.length; if (pos < lo || pos > hi) { pos = Math.max(lo, Math.min(hi, pos)); v = 0; }
+        var e2 = Math.round(pos); if (e2 !== self.end) { self.end = e2; self.draw(); }
+        fling = Math.abs(v) > 0.02 ? requestAnimationFrame(step) : 0;
+      }
+      fling = requestAnimationFrame(step);
+    }
     function at(e) {
       var r = cv.getBoundingClientRect(), pw = r.width - (self.axisW || AXIS_W);
       return { i: Math.max(0, Math.min(self.n - 1, Math.floor((e.clientX - r.left) / (pw / self.n)))) + self.end - self.n, y: e.clientY - r.top };
     }
     cv.addEventListener('pointerdown', function (e) {
+      stopFling(); vel = 0; lastX = e.clientX; lastT = e.timeStamp;
       pts[e.pointerId] = e.clientX; cv.setPointerCapture(e.pointerId); moved = false;
       var ids = Object.keys(pts);
       clearTimeout(timer);
@@ -201,6 +224,7 @@
       } else if (start && start.x !== undefined) {
         var dx = e.clientX - start.x;
         if (Math.abs(dx) > 4) { moved = true; clearTimeout(timer); }
+        var dtm = e.timeStamp - lastT; if (dtm > 0) { vel = 0.8 * ((e.clientX - lastX) / dtm) + 0.2 * vel; lastX = e.clientX; lastT = e.timeStamp; }
         self.end = Math.max(self.n, Math.min(self.bars.length, start.end - Math.round(dx / slot)));
       }
       if (moved) self.cross = null;
@@ -210,7 +234,9 @@
     function up(e) {
       clearTimeout(timer);
       if (!moved && !crossMode && e.type === 'pointerup' && e.pointerType !== 'mouse') { var a = at(e); self.cross = self.cross && self.cross.i === a.i ? null : a; }
+      var flingV = moved && !crossMode && e.type === 'pointerup' && !(start && start.pinch) && Object.keys(pts).length === 1 && e.timeStamp - lastT < 80 ? vel : 0;
       crossMode = false;
+      if (Math.abs(flingV) > 0.25) startFling(flingV);
       delete pts[e.pointerId]; start = Object.keys(pts).length ? { x: pts[Object.keys(pts)[0]], end: self.end } : null; self.draw();
     }
     cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
@@ -233,10 +259,12 @@
     var box = getComputedStyle(this.root.parentNode), padR = Math.round(parseFloat(box.paddingRight) || 0), padB = this.full ? 0 : Math.round(parseFloat(box.paddingBottom) || 0);
     this.wrap.style.marginRight = -padR + 'px'; this.root.style.marginBottom = -padB + 'px'; W += padR;
     if (this.n > this.maxN()) { this.n = Math.min(this.maxN(), this.bars.length); this.end = Math.max(this.end, this.n); }
-    var lowerH = this.on.lower === 'none' || !this.full ? 0 : 90, priceH = 264, gap = lowerH ? 26 : 0;   // gap = 거래량 범례 줄
+    var land = this.full && window.innerWidth > window.innerHeight;   // 가로로 돌린 전체 화면 = 아래 칸 없음 · 머리 한 줄 · 화면에 꽉 (2026-11-14 사용자)
+    var TOPS = this.full ? 37 : 22;   // 전체 화면 = 이동평균 범례와 최고 글자 사이 15 더 (2026-11-14 사용자)
+    var lowerH = this.on.lower === 'none' || !this.full || land ? 0 : 90, priceH = 264, gap = lowerH ? 36 : 0;   // gap = 거래량 범례 줄(범례와 막대 사이 10 더, 2026-11-14 사용자)
     if (this.full) {
       var rest = window.innerHeight - this.wrap.getBoundingClientRect().top - this.restore.offsetHeight - 16;
-      priceH = Math.max(200, Math.floor(rest - TOPS - lowerH - gap - XH));
+      priceH = Math.max(80, Math.floor(rest - TOPS - lowerH - gap - XH));   // 최소 200 → 80 — 가로 화면에서 아래가 잘리던 것
     }
     var H = TOPS + priceH + gap + lowerH + XH, dpr = window.devicePixelRatio || 1;
     cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + 'px';
@@ -249,9 +277,10 @@
     B.forEach(function (b) { look(b[2]); look(b[3]); });
     for (var i = s; i < this.end; i++) { for (var n in this.on.ma) if (maShow(n)) look(this.ma[n][i]); if (this.on.boll) { look(this.bb.up[i]); look(this.bb.lo[i]); } }
     // 오른쪽 가격 칸 폭 — 전체 화면 66 고정, 작은 화면 = 가장 긴 숫자 + 왼쪽 9 · 오른쪽 3 (2026-11-14 사용자 "0 기준 우측 여백 최대한 좁게")
-    var TX = this.full ? 10 : 9, TFS = this.full ? FS : 11, AFS = this.full ? FS : 10;   // 작은 화면: 종가 칸 · 누른 날 검은 칸 11, 오른쪽 눈금 · 아래 날짜 · 최고 · 최저 10 (2026-11-14 사용자)
+    var TX = this.full ? 10 : 9, TFS = this.full ? FS : 11, AFS = this.full ? FS : 10, KFS = this.full ? 11 : 10;   // KFS = 오른쪽 가격 눈금(전체 화면 13 → 11, 2026-11-14 사용자)
+      // 작은 화면: 종가 칸 · 누른 날 검은 칸 11, 오른쪽 눈금 · 아래 날짜 · 최고 · 최저 10 (2026-11-14 사용자)
     {   // 전체 화면도 숫자 폭에 맞춤 (2026-11-14 사용자 "작은 것처럼")
-      var mw = 0; g.font = AFS + 'px ' + font; ticks(lo, hi, this.full ? 6 : 5).forEach(function (t) { mw = Math.max(mw, g.measureText(fmt(t, self.dec)).width); });
+      var mw = 0; g.font = KFS + 'px ' + font; ticks(lo, hi, this.full ? 6 : 5).forEach(function (t) { mw = Math.max(mw, g.measureText(fmt(t, self.dec)).width); });
       g.font = '600 ' + TFS + 'px ' + font; [lo, hi, this.bars[this.end - 1][4]].forEach(function (v) { mw = Math.max(mw, g.measureText(fmt(v, self.dec)).width); });
       this.axisW = TX + Math.ceil(mw) + 3;
     }
@@ -284,7 +313,7 @@
     if (this.unit === 'M') B.forEach(function (b, j) { if (/-(04|07|10)$/.test(b[0].slice(0, 7))) add(j, +b[0].slice(5, 7) + '월', false, 46); });
     labs.forEach(function (l) { g.strokeStyle = GRID; g.lineWidth = 1; g.beginPath(); g.moveTo(Math.round(l[0]) + 0.5, TOPS); g.lineTo(Math.round(l[0]) + 0.5, H - XH); g.stroke(); });
     // 가로 격자 · 오른쪽 눈금
-    g.font = AFS + 'px ' + font; g.textBaseline = 'middle';
+    g.font = KFS + 'px ' + font; g.textBaseline = 'middle';
     var tagB = this.bars[this.end - 1], tagY = tagB ? Y(tagB[4]) : -99;
     var tk = ticks(lo, hi, this.full ? 6 : 5);
     tk.forEach(function (t) {
@@ -378,19 +407,20 @@
       tag(cy, fmt(vOf(cy), self.dec), INK);
       var dl = this.dateText(this.bars[sel][0], true);
       g.font = TFS + 'px ' + font; var dw = Math.ceil(g.measureText(dl).width) + 14, dx = Math.round(Math.min(Math.max(X(sel) - dw / 2, 0), pw - dw));
-      [[H - XH, XH], [0, TOPS]].forEach(function (r) { g.fillStyle = INK; g.fillRect(dx, r[0], dw, r[1]); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(dl, dx + dw / 2, r[0] + r[1] / 2 + 0.5); });
+      [[H - XH, XH], [TOPS - 22, 22]].forEach(function (r) { g.fillStyle = INK; g.fillRect(dx, r[0], dw, r[1]); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(dl, dx + dw / 2, r[0] + r[1] / 2 + 0.5); });
     }
     // 머리 — 현재가 · 전날 대비 금액 · % (늘 최신), 오늘 거래량, 시가 · 고가 · 저가 · 종가(누른 날이면 그날)
     var dch = prevL ? last[4] - prevL[4] : 0, dp = prevL ? dch / prevL[4] * 100 : 0, cc = dch > 0 ? UP : dch < 0 ? DN : INK;
     this.price.innerHTML = '<b style="' + (this.full ? 'font-size:20px;line-height:28px;color:' + INK : 'font-size:15px;line-height:21px;color:' + cc) + ';">' + fmt(last[4], this.dec) + '</b> <span style="font-size:14px;color:' + cc + ';">' + tri(dch) + fmt(Math.abs(dch), this.dec) + ' ' + sgnPct(dp) + '</span>';
     var volTxt = '거래량 <span style="color:' + INK + ';">' + fmt(last[5], 0) + '</span>';
     this.price.innerHTML += ' <span style="font-size:13px;color:' + NOTE + ';">' + volTxt + '</span>';   // 거래량 = 증감 옆 한 줄 (전체 화면도, 2026-11-14 사용자)   // 작은 화면 = 증감 옆 한 줄
-    this.sub.style.display = 'none'; this.ohlc.style.display = this.full ? '' : 'none';   // 작은 화면 = 시가 · 고가 · 저가 · 종가 없음
+    this.sub.style.display = 'none'; this.ohlc.style.display = this.full && !land ? '' : 'none';   // 가로 화면 = 시가 · 고가 · 저가 · 종가도 거래량 옆 한 줄(아래)   // 작은 화면 = 시가 · 고가 · 저가 · 종가 없음
     var ob = this.bars[sel === null ? this.bars.length - 1 : sel], obp = this.bars[(sel === null ? this.bars.length - 1 : sel) - 1], ref = obp ? obp[4] : ob[1];
     this.ohlc.innerHTML = [['시가', 1], ['고가', 2], ['저가', 3], ['종가', 4]].map(function (k) {
       var v = ob[k[1]], c = v > ref ? UP : v < ref ? DN : INK;
       return '<span style="white-space:nowrap;margin-right:14px;"><span style="color:' + NOTE + ';">' + k[0] + '</span> <span style="color:' + c + ';">' + fmt(v, self.dec) + '</span></span>';
     }).join('');
+    if (land) this.price.innerHTML += ' <span style="font-size:13px;margin-left:10px;">' + this.ohlc.innerHTML + '</span>';
     // 왼쪽 위 = 이동평균 범례(숫자 = 선 색) + 닫기 — 누르면 그날 이동평균 값 표
     var mas = [5, 20, 60, 120, 200].filter(function (n) { return maShow(n); });
     if (sel !== null && mas.length && this.full) {   // 누른 날 이동평균 값 표 = 전체 화면만 (2026-11-14 사용자)
