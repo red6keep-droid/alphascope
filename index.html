@@ -1230,10 +1230,13 @@ html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업�
 .rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 25px; color: #111; word-break: keep-all; overflow-wrap: anywhere; }   /* 줄바꿈 = 띄어쓰기 기준 (2026-11-07 사용자 P375) */
 .rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 35px; color: #333; word-break: keep-all; }
 /* 툴팁 내용 행간 = 본문 35px(2026-11-06 34 → 35, 19/35 홀짝 맞춤) (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
-.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; padding-left: 8px; }   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
+.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 14px 0; padding-left: 7px; }   /* 줄 사이 보이는 간격 = 이슈 날짜 팝업(행간 28 · 여백 21)과 같게 — 행간 35 라 여백 14 · 들여쓰기 7 (2026-11-14 사용자) */   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
 .rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
 .rt-pop-li > span:last-child { min-width: 0; }
-.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
+.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 14px; }   /* 12 → 14 (2026-11-14 사용자: 이슈 날짜 팝업 기준) */
+.rt-pop-body > .rt-pop-p:first-child, .rt-pop-body > .rt-pop-li:first-child { margin-top: 11px; }   /* 툴팁 내용 시작 = 구분선 아래 첫 글자까지 이슈 날짜 팝업과 같게(위 12 + 11, 행간 35 의 반쪽 여백 포함) (2026-11-14 사용자) */
+.share-pop .share-buttons { margin-top: 14px; }   /* 공유 · 계정 내용 시작 = 구분선 아래 26 (위 12 + 14), 이슈 날짜 팝업 기준 (2026-11-14 사용자) */
+.as-acct .rt-pop-body > :first-child { margin-top: 14px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
 .rt-pop-p b { color: #111; }
 .rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 14px; line-height: 20px; color: #7A7A7A; }   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 (2026-10-20 사용자) */
 /* 기사 번역 안내 (2026-10-19 사용자) — 기사 제목은 원문, 옆 '번역 방법' 14px 회색 밑줄 글자 버튼. 누르면 브라우저 번역법 팝업(툴팁 팝업과 같은 상자).
@@ -3493,8 +3496,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var media = it.kind === 'media';
           homePop.querySelector('.rt-pop-title').textContent = it.title;
           var body = homePop.querySelector('.rt-pop-body'); body.textContent = '';
-          it.lines.forEach(function (ln) {
-            var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:11px 0;';   /* 행간 28 · 항목 여백 11 (P359) */
+          it.lines.forEach(function (ln, i) {
+            var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:' + (i ? 21 : 14) + 'px 0 11px;padding-left:7px;';   /* 행간 28 · 첫 줄 위 14 · 줄 사이 21 · 들여쓰기 7 = 이슈 날짜 팝업 기준 (2026-11-14 사용자, design_kit.pop_li_margin) */
             var dot = el('span'); dot.style.cssText = 'flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;';
             /* 발언자 = 내용 뒤 작은 회색 `- 이름`, 이름 없으면 `- 방송 의견` (P353, design_kit.speaker_split 과 같은 규칙) */
             var m = /^\s*([^:：]{0,30}?)\s*(진행자 발언|기자 보도|발언|진행자|앵커|보도|발표)\s*[:：]\s*(.+)$/.exec(ln), who = '';   /* 접두 꼴 넓힘 (P377) */

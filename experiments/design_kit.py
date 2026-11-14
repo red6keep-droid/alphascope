@@ -2044,6 +2044,14 @@ def news_pop_id(prefix, key):
 
 
 POP_LH, POP_ITEM_GAP = 28, 11   # 팝업 요약 줄 행간 · 항목 여백 (P359)
+# 팝업 간격 = 이슈 날짜 팝업(이란 전쟁 뉴스) 기준 (2026-11-14 사용자: "간격은 이슈 팝업 날짜 기준으로 전부 맞춰줘"):
+#   내용 시작 = 제목 아래 구분선 ~ 첫 줄 26(테마 위 안쪽 여백 12 + 14) · 글머리 줄 사이 21(11 + 10) · 소제목 ~ 첫 줄 11 · 들여쓰기 7
+POP_FIRST_GAP, POP_LINE_GAP, POP_LI_PAD = 14, POP_ITEM_GAP + 10, 7
+
+
+def pop_li_margin(i):
+    """i 번째(0부터) 글머리 줄 바깥 여백 — 첫 줄 위 14, 둘째 줄부터 위 21 · 아래 11 (위아래 여백이 겹쳐 줄 사이 21)."""
+    return f"{POP_FIRST_GAP if i == 0 else POP_LINE_GAP}px 0 {POP_ITEM_GAP}px"
 
 
 def _link_src(source, kind):
@@ -2056,8 +2064,8 @@ def news_pop_body(pid, title, lines, when="", source="", kind="방송", url=None
     """팝업 글 = 요약 줄 → 관련 종목(있으면) → 작은 원문 링크. 머리 줄(시각 · 매체)과 `같은 뉴스` 칸은 없다 (2026-11-07 사용자 P352 · P354).
     when · n_channels 는 옛 호출 호환용 — 쓰지 않는다. related = [(이름, 등락%)]."""
     # 줄 안 행간 35 → 28 (20%), 글머리표 사이 보이는 간격은 그대로 — 줄어든 행간 7px 만큼 항목 여백 4 → 11 (2026-11-07 사용자 P359)
-    li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{POP_ITEM_GAP}px 0;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
-                 f'<span style="min-width:0;font-size:{BODY};line-height:{POP_LH}px;color:#333;word-break:keep-all;">{speaker_html(ln, headline_style=False)}</span></span>' for ln in lines)
+    li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{pop_li_margin(i)};padding-left:{POP_LI_PAD}px;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
+                 f'<span style="min-width:0;font-size:{BODY};line-height:{POP_LH}px;color:#333;word-break:keep-all;">{speaker_html(ln, headline_style=False)}</span></span>' for i, ln in enumerate(lines))
     link = ""
     if url:
         link = (f'<span style="display:block;text-align:right;margin:14px 0 0;"><a href="{esc(url)}" target="_blank" rel="noopener" data-trhelp="skip" '
