@@ -1831,6 +1831,10 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     this.unit = 'D'; this.full = false; this.log = false; this.maOn = true;
     this.on = { ma: { 5: true, 20: true, 60: true, 120: true }, boll: false, lower: 'vol' };
     root.innerHTML = '';
+    // 꾹 눌러도 글자 선택 · 파란 선택 화면 · 길게 누르기 메뉴가 안 뜨게 (2026-11-14 사용자)
+    ['userSelect', 'webkitUserSelect'].forEach(function (k) { root.style[k] = 'none'; });
+    root.style.webkitTouchCallout = 'none'; root.style.webkitTapHighlightColor = 'transparent';
+    root.addEventListener('contextmenu', function (e) { if (e.target.tagName === 'CANVAS') e.preventDefault(); });
     // 머리 — 1줄: 현재가 · 전날 대비 금액 · % | 버튼, 2줄: 오늘 거래량, 3줄: 시가 · 고가 · 저가 · 종가(누른 날이면 그날)
     this.top = el('div', 'display:flex;align-items:center;gap:6px;margin:0 0 4px;');
     this.price = el('div', 'flex:1;min-width:0;white-space:nowrap;font-variant-numeric:tabular-nums;');
