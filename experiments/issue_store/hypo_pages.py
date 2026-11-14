@@ -1890,7 +1890,8 @@ def crowd_line(fc):
     if n <= CROWD_MAX:
         return ""
     # 개수 + 무엇이 겹쳤는지만 (2026-11-08 사용자: 셋 · 다섯이 겹쳐도 독자는 무엇이 겹쳤는지 알아야 한다 — 해석 문장은 뺌)
-    evs = " · ".join(f'{o.get("day", "")} {_re.sub(r"(?<! )\(", " (", o["event"])}'.strip() for o in overlaps_of(fc))
+    paren = lambda t: _re.sub(r"(?<! )\(", " (", t)   # noqa: E731 — 괄호 앞 한 칸. f-string 안 역슬래시는 파이썬 3.10 에서 문법 오류라 밖으로 (2026-11-14)
+    evs = " · ".join(f'{o.get("day", "")} {paren(o["event"])}'.strip() for o in overlaps_of(fc))
     return dk.muted(f"큰 사건 {n}개가 겹쳤습니다 : {evs}")
 
 
