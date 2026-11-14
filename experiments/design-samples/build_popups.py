@@ -97,25 +97,26 @@ def frame(inner, h=720, page=True, body_cls="", extra_css=""):
     return f'<iframe srcdoc="{html.escape(doc, quote=True)}" style="width:390px;height:{h}px;border:1px solid #CBD5E1;border-radius:12px;background:#fff;flex:none;"></iframe>'
 
 
+# 공유 아이콘 = 테마 index.html ICONS 그대로(링크 · 페이스북 · X · 카카오톡) + Simple Icons 13.21.0(텔레그램 · 스레드) + 밴드 앱 아이콘 모양 선 그림(arcticons:band — 밴드는 공개 묶음에 없다). 단색 currentColor (10-23 사용자)
 SHARE_ICONS = {
-    "링크 복사": '<svg viewBox="0 0 24 24" width="20" height="20" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;"><path d="M10 13a5 5 0 0 0 7.1.1l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.1-.1l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7"/></svg>',
-    "Facebook": '<svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="11" fill="currentColor"/></svg>',
-    "X": '<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M18.9 1.2h3.7l-8 9.2L24 22.8h-7.4l-5.8-7.6-6.6 7.6H.5l8.6-9.8L0 1.2h7.6l5.2 6.9Z"/></svg>',
-    "카카오톡": '<svg viewBox="0 0 24 24" width="20" height="20"><ellipse cx="12" cy="11" rx="10.5" ry="8.2" fill="currentColor"/></svg>',
+    '링크 복사': '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M10 13a5 5 0 0 0 7.100.1l3-3a5 5 0 0 0-7.100-7.100l-1.700 1.700"/><path d="M14 11a5 5 0 0 0-7.100-.1l-3 3a5 5 0 0 0 7.100 7.100l1.700-1.700"/></svg>',
+    'Facebook': '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="flex:none;width:20px;height:20px;fill:currentColor;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.990 4.388 10.954 10.125 11.854v-8.385H7.078v-3.470h3.047V9.430c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.830c-1.491 0-1.956.925-1.956 1.874v2.250h3.328l-.532 3.470h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>',
+    'X': '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="flex:none;width:20px;height:20px;fill:currentColor;"><path d="M18.901 1.153h3.680l-8.040 9.190L24 22.846h-7.406l-5.800-7.584-6.638 7.584H.474l8.600-9.830L0 1.154h7.594l5.243 6.932ZM17.610 20.644h2.039L6.486 3.240H4.298Z"/></svg>',
+    '카카오톡': '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="flex:none;width:20px;height:20px;fill:currentColor;"><path d="M12 3c5.799 0 10.500 3.664 10.500 8.185 0 4.520-4.701 8.184-10.500 8.184a13.500 13.500 0 0 1-1.727-.110l-4.408 2.883c-.501.265-.678.236-.482-.486l.998-3.770C2.682 16.700 1.500 14.536 1.500 11.185 1.500 6.664 6.201 3 12 3Z"/></svg>',
 }
 
 
-SHARE_MORE = [   # 단색 그림 (테마 아이콘과 같이 currentColor)
-    ("텔레그램", '<path fill="currentColor" d="M21.6 3.2 2.9 10.4c-1.3.5-1.3 1.2-.2 1.6l4.8 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.3-2.3 4.8 3.6c.9.5 1.5.2 1.7-.8l3.1-14.7c.3-1.3-.5-1.9-1.4-1.5ZM9 13.6l9.4-5.9c.5-.3.9-.1.5.2l-8 7.3-.3 3.4L9 13.6Z"/>'),
-    ("밴드", '<rect x="2" y="2" width="20" height="20" rx="6" fill="currentColor"/><path d="M8.5 6.5v9.2a3.3 3.3 0 1 0 3.3-3.3H8.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>'),
-    ("스레드", '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M17.5 8.5C16.6 5.6 14.6 4 12 4 7.6 4 5 7.3 5 12s2.6 8 7 8c3.6 0 6-2 6-4.8 0-2.6-2.1-4-5.2-4-2.4 0-3.8 1.1-3.8 2.6 0 1.4 1.2 2.3 2.8 2.3 2.7 0 4-2.2 3.6-6.6"/>'),
-    ("더 보기", '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></g>'),
+SHARE_MORE = [
+    ('텔레그램', '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="flex:none;width:20px;height:20px;fill:currentColor;"><path fill="currentColor" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>'),
+    ('밴드', '<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true" style="flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M16.2 27.9V8.4a3.9 3.9 0 0 0-3.9-3.9a3.9 3.9 0 0 0-3.9 3.9v19.5"/><path d="M16.2 14.387A15.602 15.602 0 1 1 8.4 27.9"/><path d="M16.2 19.18a11.7 11.7 0 1 1-3.9 8.72V8.4"/><circle cx="24" cy="27.9" r="7.8"/></svg>'),
+    ('스레드', '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="flex:none;width:20px;height:20px;fill:currentColor;"><path fill="currentColor" d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/></svg>'),
+    ('더 보기', '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>'),
 ]
 SHARE7_CSS = """
 .share-pop .share-buttons { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .share-pop .share-buttons li.share-main { grid-column: 1 / -1; }
 .share-pop .share-buttons li.share-main .sharing-platform-button { display: flex; width: 100%; justify-content: center; gap: 8px; padding: 11px 16px; font-size: 16px; line-height: 24px; background: #fff; border-color: #B5BAC0; color: #111; }
-.share-pop .share-buttons li:not(.share-main) .sharing-platform-button { display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 4px; padding: 10px 4px 8px; font-size: 13px; line-height: 19px; }
+.share-pop .share-buttons li:not(.share-main) .sharing-platform-button { display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 4px; padding: 10px 4px 8px; font-size: 12px; line-height: 18px; font-weight: 400; }
 .share-pop .share-buttons li:not(.share-main) svg { width: 22px; height: 22px; }
 """
 
@@ -151,10 +152,10 @@ def samples():
     s.append(("A7", "공유 팝업", "글 제목 옆 공유 버튼", "짧은 창 400 · 링크 복사 = 맨 위 한 줄 큰 버튼(48 · 16 굵게) · 아래 페이스북 · X · 카카오톡 같은 폭",
               frame(box("공유", f'<ul class="share-buttons">{items}</ul>', "share-pop", "share-pop-body"), 420)))
     # A7-2 = 채널 7개 안 (2026-11-14 사용자 "목업에 전부 넣어줘") — 아직 테마에 없다. 링크 복사 큰 버튼 아래 4칸 격자, 칸 = 아이콘 위 · 이름 아래
-    more = [(n, svg) for n, svg in SHARE_ICONS.items() if n != "링크 복사"] + [(n, f'<svg viewBox="0 0 24 24" width="22" height="22">{g}</svg>') for n, g in SHARE_MORE]
+    more = [(n, svg) for n, svg in SHARE_ICONS.items() if n != "링크 복사"] + SHARE_MORE
     tiles = "".join(f'<li><span class="sharing-platform-button" role="button">{svg}<span class="platform-sharing-text">{n}</span></span></li>' for n, svg in more)
     main = f'<li class="share-main"><span class="sharing-platform-button" role="button">{SHARE_ICONS["링크 복사"]}<span class="platform-sharing-text">링크 복사</span></span></li>'
-    s.append(("A7-2", "공유 팝업 · 채널 7개 안", "목업만 (테마 전)", "링크 복사 큰 버튼 아래 4칸 격자 · 칸 = 아이콘 22 위 · 이름 13 아래 · `더 보기`(휴대폰 기본 공유)는 폰에서만",
+    s.append(("A7-2", "공유 팝업 · 채널 7개 안", "목업만 (테마 전)", "링크 복사 큰 버튼 아래 4칸 격자 · 칸 = 실제 로고 22 위 · 이름 12 보통 아래 · `더 보기`(휴대폰 기본 공유)는 폰에서만",
               frame(box("공유", f'<ul class="share-buttons">{main}{tiles}</ul>', "share-pop", "share-pop-body"), 460, extra_css=SHARE7_CSS)))
     G = '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="10" fill="#4285F4"/></svg>'
     acct = ('<p class="as-acct-note">댓글에 쓰는 구글 계정으로 로그인합니다.</p>'
