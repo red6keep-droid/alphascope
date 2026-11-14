@@ -81,7 +81,7 @@ def lead(s):
     r = s["ret_1d"]
     move = f"전날보다 {abs(r):.2f}% {'올랐다' if r > 0 else '내렸다'}" if abs(r) >= 0.005 else "전날과 같았다"
     close = f"${s['close']:,.2f}"
-    first = f"{_md(s['day'])} {s['name']}({s['sym']}) 종가는 {_dk.josa(close, '로')} {move}."   # `$347.73로` → `으로` (P69)
+    first = f"{_dk.kst_close_day(s['day'], 'US')} 새벽 {s['name']}({s['sym']}) 종가는 {_dk.josa(close, '로')} {move}."   # `$347.73로` → `으로` (P69)
     nr = s.get("normal_range")
     if nr:
         first += (" 실적 발표에 처음 반응한 날이었다." if nr["earnings_day"] else
@@ -364,7 +364,7 @@ def sec_pairs(s):
     theme, col = {"엇갈림": ("uncertain", R.SOON), "같이 올랐음": ("positive", R.UP), "같이 내렸음": ("negative", R.DOWN)}.get(state, ("neutral", R.MUTED))
     lines = []
     if moves:
-        day = _md(s["day"])
+        day = _dk.kst_close_day(s["day"], "US") + " 새벽"   # 독자 = 한국 시간 (2026-11-14 사용자)
         lines.append((f"오늘({day}) 함께 보는 회사는 " + ", ".join(f"{U.peer_name(p)} {_sgn(r)}%" for p, _, r in moves)   # 쉼표 — ` · ` 로 이으면 짧은 덩어리를 이름까지 통째로 칠한다(_dk.tint)
                       + f"였고, {_dk.josa(s['name'], '은')} {_sgn(s['ret_1d'])}%였다.", "plain"))
         rows = [(U.peer_name(p), role, r, "us") for p, role, r in moves] + [(s["name"], "", s["ret_1d"], "me")]
@@ -1121,7 +1121,7 @@ def _josa(t):
 
 def detail_body(s, today, news=None):
     """NVDA 리포트 순서 : 맨 위 요약 → 그래프 → 가격 카드(펼치면 1층 · 2층) → 상태 카드. 갱신 날짜 줄은 뺐다 — 요약 첫 마디에 날짜가 있다 (2026-10-18 사용자)."""
-    return wrap(_dk.report_stamp(_md(s["day"]) + "(미국 시간)", "한국 시간 아침 7시 30분 무렵") + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_regime(s) + sec_tech(s) + sec_pairs(s) + sec_states(s) + sec_targets(s)
+    return wrap(_dk.price_stamp(s["day"], "US") + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_regime(s) + sec_tech(s) + sec_pairs(s) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
                 + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
                 + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
@@ -1150,7 +1150,7 @@ def list_lead(a):
     top = [s for s in a["stocks"] if s["in_top"]]
     up = sum(1 for s in top if s["ret_1d"] > 0)
     first = top[0]
-    text = (f"{_md(a['day'])} 종가 기준 미국 시가총액 1위는 {first['name']}({first['sym']}), {cap_text(first['cap'])}이다. "
+    text = (f"{_dk.kst_close_day(a['day'], 'US')} 새벽 마감 기준 미국 시가총액 1위는 {first['name']}({first['sym']}), {cap_text(first['cap'])}이다. "
             f"상위 10개 중 {up}개가 오르고 {len(top) - up}개가 내렸다.")
     return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_esc(text)}</p>'
 
@@ -1184,7 +1184,7 @@ def list_body(a):
     tip = ("미국 S&P 500 종목 가운데 회사 전체 값(주가 × 주식 수)이 가장 큰 10개\n"
            f"· 오늘 1위 : {top[0]['name']} {cap_text(top[0]['cap'])}\n"
            f"· 나누는 법 : 11위 밖으로 {U.SWAP_DAYS}거래일 연속 밀리면 후보 중 가장 높았던 종목과 바꾼다")
-    body = (_dk.report_stamp(_md(a["day"]) + "(미국 시간)", "한국 시간 아침 7시 30분 무렵")   # 맨 위 안내 상자 = 상세 페이지와 같게 (2026-11-07 0-1, 옛 `마지막 갱신` 회색 한 줄)
+    body = (_dk.price_stamp(a["day"], "US")   # 맨 위 안내 상자 = 상세 페이지와 같게 (2026-11-07 0-1, 옛 `마지막 갱신` 회색 한 줄)
             + list_lead(a) + R.title_with_sort("시가총액 순위", tip, "us-cap10") + card(top, "us-cap10")
             + _dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest))
             + etf_section("us")   # ETF 구획 (2026-11-12 사용자) — 발행된 ETF 페이지만, 목업은 전부

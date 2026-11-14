@@ -2820,7 +2820,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         var LIVE_URL = GH + 'live.json', LIVE_BARS_URL = GH + 'live_bars.json', LIVE_KEY = 'as_live_kr';
         var LIVE_ENABLED = false;   /* 한국 장중 가격 · 장중 차트 끔 (2026-11-12 사용자: 우리는 종목 리포트 블로그 — 장중 가격에 얽매이지 말자, 종가 기준). kr-live 수집도 멈춤. 켜려면 true + kr-live.yml 되살리기 */
         var mktDay = { us: '', kr: '' };   /* 시장별 종가 날짜 — stocks.json · kr.json 의 day (2026-11-12) */
-        function dayKo(day) { var p = String(day || '').split(/[-.]/); return p.length === 3 ? Number(p[1]) + '월 ' + Number(p[2]) + '일 기준' : ''; }   /* 날짜 표기 통일 `11월 11일 기준` (2026-11-12 사용자) */
+        function dayKo(day, part) { var p = String(day || '').split(/[-.]/); return p.length === 3 ? Number(p[1]) + '월 ' + Number(p[2]) + '일 ' + (part || '기준') : ''; }   /* 날짜 표기 `11월 14일 아침` — 독자는 한국 시간 기준, 날짜 뒤 = 아침 · 오후 (2026-11-14 사용자: `미국 시간` 헷갈림. 옛 `11월 11일 기준` 11-12) */
+        function closeKo(day, mkt) { if (!day) return ''; if (mkt !== 'us') return dayKo(day, '오후'); var d = new Date(String(day).slice(0, 10) + 'T00:00:00Z'); if (isNaN(d)) return ''; d.setUTCDate(d.getUTCDate() + 1); return dayKo(d.toISOString().slice(0, 10), '아침'); }   /* 시장 종가일 → 한국 시간: 미국 장은 한국 다음 날 새벽에 끝남 = 다음 날 아침, 한국 = 그날 오후 */
+        function genKo(iso) { var t = Date.parse(iso || ''); if (!(t > 0)) return ''; var k = new Date(t + 9 * 3600000); return dayKo(k.toISOString().slice(0, 10), k.getUTCHours() < 12 ? '아침' : '오후'); }   /* 만든 시각(UTC) → 한국 날짜 + 아침 · 오후 */
         function nyDay(iso) { var t = Date.parse(iso || ''); return t > 0 ? new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(t)) : ''; }   /* 미국 리포트 = 뉴욕 날짜(장 마감 뒤 실행) = 종가 날짜 */
         var liveOn = false, liveData = null, liveTimer = null;
         try { liveOn = LIVE_ENABLED && localStorage.getItem(LIVE_KEY) === '1'; } catch (e) {}
@@ -2851,7 +2853,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           if (th) th.textContent = priceHead();
           var thc = document.getElementById('rank-th-chart');
           if (thc) thc.hidden = rankMarket !== 'kr' || !LIVE_ENABLED;
-          [].slice.call(document.querySelectorAll('[data-day-note]')).forEach(function (n) { n.textContent = dayKo(mktDay[n.getAttribute('data-day-note') === 'rank' ? rankMarket : picksMarket]); });
+          [].slice.call(document.querySelectorAll('[data-day-note]')).forEach(function (n) { var m = n.getAttribute('data-day-note') === 'rank' ? rankMarket : picksMarket; n.textContent = closeKo(mktDay[m], m); });
         }
         function renderKR() { if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); syncLiveUI(); }
         function fetchLive() {
@@ -3204,8 +3206,10 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             box.appendChild(more);
           }
           ntDays[market] = mktDay[market] || n.day;   /* 머리 날짜 = 그 시장 종가 날짜(통일, 2026-11-12) — 급락일은 카드 안 `마지막 급락일` */
-          var days = Object.keys(ntDays).map(function (k) { return ntDays[k]; }).filter(Boolean).sort();
-          if (days.length) setDate('notable-card', ntMd(days[days.length - 1]) + ' 기준');
+          var days = Object.keys(ntDays).filter(function (k) { return ntDays[k]; }).map(function (k) {   /* 한국 시간으로 바꿔 가장 늦은 것 — 미국 = 다음 날 아침, 한국 = 그날 오후 (2026-11-14) */
+            var d = new Date(String(ntDays[k]).slice(0, 10) + 'T00:00:00Z'); if (k === 'us') d.setUTCDate(d.getUTCDate() + 1); return [d.toISOString().slice(0, 10) + (k === 'us' ? '0' : '1'), k];
+          }).sort();
+          if (days.length) { var lastNt = days[days.length - 1][1]; setDate('notable-card', closeKo(ntDays[lastNt], lastNt)); }
         }
 
         fetch(KR_URL + '?v=' + Date.now())
@@ -3234,7 +3238,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             if (q.url) { d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', q.url); }
             box.appendChild(d);
           });
-          if (j.generated) setDate('hypo-card', ntMd(new Date(Date.parse(j.generated) + 9 * 3600000).toISOString().slice(0, 10)) + ' 기준');   /* 한국 날짜 — generated 는 UTC 라 아침 실행이 하루 앞으로 보였다 (2026-11-12) */
+          if (j.generated) setDate('hypo-card', genKo(j.generated));   /* 한국 날짜 — generated 는 UTC 라 아침 실행이 하루 앞으로 보였다 (2026-11-12) */
         }
         fetch(GH + 'hypo.json?v=' + Date.now())
           .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
@@ -3967,7 +3971,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         /* 카드 그리기 — p = { title, href, day, sec, chart, body } (JSON 경로 · 피드 경로 공통) */
         function renderCard(card, p) {
           var title = p.title, href = p.href, sec = p.sec, body = p.body;
-          setDate(card.id, dayKo(card.id === 'report-card' && p.gen ? nyDay(p.gen) : p.day));   /* `11월 11일 기준` — 미국 리포트는 종가 날짜(뉴욕), 나머지는 글 날짜 (2026-11-12 사용자: 한글로 통일) */
+          setDate(card.id, p.gen ? genKo(p.gen) : dayKo(p.day, card.id === 'kr-report-card' ? '오후' : '아침'));   /* `11월 11일 기준` — 미국 리포트는 종가 날짜(뉴욕), 나머지는 글 날짜 (2026-11-12 사용자: 한글로 통일) */
 
           /* 카드를 누르면 그 글로 간다 */
           var a = document.getElementById(card.id);

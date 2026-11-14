@@ -49,8 +49,6 @@ NAME_KO = {"NVDA": "엔비디아", "MU": "마이크론", "AVGO": "브로드컴",
            "ORCL": "오라클", "NFLX": "넷플릭스", "COST": "코스트코", "WMT": "월마트", "PLTR": "팔란티어", "CSCO": "시스코", "IBM": "IBM", "CRM": "세일즈포스",
            "XOM": "엑슨모빌", "UNH": "유나이티드헬스", "HD": "홈디포", "PG": "P&G", "KO": "코카콜라", "PEP": "펩시코", "ABBV": "애브비", "MRK": "머크", "CVX": "셰브론",
            "GS": "골드만삭스", "CAT": "캐터필러", "AMGN": "암젠", "MCD": "맥도날드", "COIN": "코인베이스", "ROKU": "로쿠", "SHOP": "쇼피파이", "HOOD": "로빈후드"}
-STAMP_US = "ETF 정보입니다. 가격은 매 거래일, 구성은 주 1회 갱신됩니다."
-STAMP_PRICE = "ETF 정보입니다. 가격은 매 거래일 갱신됩니다."
 MOCK_ONLY = ("<!--mock-only-->", "<!--/mock-only-->")   # 한국 render_kr 과 같은 표시 — 목업에만
 REAL_ONLY = ("<!--real-only-->", "<!--/real-only-->")   # 발행 본문에만
 
@@ -240,11 +238,6 @@ def related(sym, live, href=None):
     return MOCK_ONLY[0] + buttons(allx) + MOCK_ONLY[1] + REAL_ONLY[0] + buttons(pub) + REAL_ONLY[1]
 
 
-def stamp(day_text, text):
-    """맨 위 안내 상자 — 종목 페이지 report_stamp 와 같은 모양, 문구만 ETF 용."""
-    return dk.report_stamp(day_text, "").replace(" · 매 거래일 장을 마감한 뒤 발행되는 리포트입니다. ()", " · " + text)
-
-
 def pct(v):
     return f"{v:+.1f}%".replace("-", "−")
 
@@ -318,7 +311,7 @@ def us_pages(snap, live, fund):
                      + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s))
             f = fund.get(sym) or {}
             hold = tab_holdings(f)
-            body = (stamp(RP._md(s["day"]) + "(미국 시간)", STAMP_US if hold else STAMP_PRICE) + RP.lead(s)
+            body = (dk.price_stamp(s["day"], "US") + RP.lead(s)
                     + candle(name, b0, 2)   # 차트 = 탭 위 (2026-11-13 사용자)
                     + R._section("오늘", today, line=False, tab="오늘")
                     + (R._section("구성", hold, tab="구성") if hold else "")
@@ -505,8 +498,6 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
                 twin = next((t[0] for t in E.US if t[2] == E.BY_SYM[sym][2]), None) if "미국" in E.BY_SYM[sym][1] else None
                 f = dict(us_fund.get(twin) or {}) if twin else {}
                 hold = tab_holdings(f, f"같은 지수를 따라가는 미국 상장 {twin} 기준입니다.") if twin else ""
-            note = STAMP_US if hold else STAMP_PRICE
-            body = re.sub(r"매 거래일 장을 마감한 뒤 발행되는 리포트입니다\. \([^)]*\)", note, body, count=1)
             ind = (render_kr.card_sector_flow(s) + render_kr.card_industry_mood(s) + render_kr.card_industry_work(s) + render_kr.card_industry_money(s))
             basic = {"family": KR_FAMILY.get(E.BY_SYM[sym][1].split(" ")[0]), "fee": kf.get("fee"), "aum_krw": kf.get("aum_krw"), "since": kf.get("since"),
                      "source": kf.get("source") if (kf.get("fee") is not None or kf.get("aum_krw")) else None}

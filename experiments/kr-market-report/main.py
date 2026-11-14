@@ -1482,7 +1482,7 @@ def index_tech_card(r):
 def body(r):
     parts = [
         _dk.WRAP_OPEN,
-        _dk.report_stamp(_md(r["day"]), "오후 4시 10분 무렵"),   # 시계 줄 — 종목 페이지와 같게 (2026-11-05 사용자 M62)
+        _dk.price_stamp(r["day"], "KR"),   # 시계 줄 — 종목 페이지와 같게 (2026-11-05 사용자 M62)
         seo_lead(r),
         price_chart(r["day"], r["kospi_bars"]),   # 요약 바로 아래 (데일리의 S&P 500 그래프 자리)
         index_strip(r),   # 지수 가로 카드 = 오늘 탭 바로 아래, 막대 그래프 위 (2026-11-08 사용자 — 미국과 같은 자리, 옛 P446 막대 아래)

@@ -74,11 +74,6 @@ def earnings(sym):
         return None
 
 
-def stamp(day_text, text):
-    """맨 위 안내 상자 — 종목 페이지 report_stamp 와 같은 모양, 문구만 간단 정보용."""
-    return dk.report_stamp(day_text, "").replace(" · 매 거래일 장을 마감한 뒤 발행되는 리포트입니다. ()", " · " + text)
-
-
 def kday(d):
     return f"{d.month}월 {d.day}일"
 
@@ -101,7 +96,7 @@ def page(s, df, bdf):
     last = datetime.date.fromisoformat(days[-1])
     d1 = ret(c, 1)
 
-    parts = [stamp(kday(last) + ("(미국 시간)" if m == "US" else ""), "가격 자료만으로 만든 간단 정보입니다. 매 거래일 장을 마감한 뒤 한 번 갱신됩니다.")]
+    parts = [dk.price_stamp(last, m)]
     lead = (f'{kday(last)} {s["name"]}({s["sym"].split(".")[0]}) 종가는 {money(c[-1], m)}로 전날보다 '
             f'<span style="color:{color(d1)};white-space:nowrap;">{pct(d1)}</span> {"올랐" if d1 > 0 else "내렸" if d1 < 0 else "같았"}습니다. '
             f'업종은 {s["sector"]} · 세부 업종은 {s["sub"]}입니다.')
@@ -225,7 +220,7 @@ def page_us_full(smp):
     s["expect"]["move"] = None   # 옵션(시장 예상 흔들림) = 정식 종목만 — 매일 받아야 뜻이 있다
     tab_today = (line + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500")
                  + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s))
-    stamp_html = stamp(RP._md(s["day"]) + "(미국 시간)", "간단 정보입니다. 가격은 매 거래일, 실적 · 의견은 주 1회 갱신됩니다.")
+    stamp_html = dk.price_stamp(s["day"], "US")
     body = (stamp_html + RP.lead(s) + R._section("오늘", tab_today, line=False, tab="오늘")
             + R._section("매수의견", RP.card_opinions(s) or dk.muted("애널리스트 의견이 아직 없습니다."), tab="매수의견")
             + R._section("실적", RP.sec_expect(s) + RP.sec_calendar(s, ("earnings",), open_first=False), tab="실적")
@@ -294,7 +289,6 @@ def page_kr_full(smp):
     with open(os.path.join(tmp, f"{code}.html"), encoding="utf-8") as f:
         body = f.read()
     import re as _re
-    body = _re.sub(r"매 거래일 장을 마감한 뒤 발행되는 리포트입니다\. \([^)]*\)", "간단 정보입니다. 가격은 매 거래일, 실적 · 의견은 주 1회 갱신됩니다.", body, count=1)
     # 종목 봉차트 그림(정식 종목만 만든다) 자리 → 오늘 탭 머리 + 브라우저가 그리는 1년 선 그래프 (미국 간단 정보와 같게)
     b = snap["bars"][sym][-252:]
     bmap = {x["day"]: x["close"] for x in snap["bars"].get(K.BENCH) or []}
@@ -380,7 +374,7 @@ def all_stocks(data):
     panes = []
     for market, items, tail in (("US", LIST_US, "(미국 시간)"), ("KR", LIST_KR, "")):
         rows, last = _market_rows(data, items, market)
-        part = [stamp(kday(datetime.date.fromisoformat(last)) + tail, "AlphaScope 가 다루는 모든 종목입니다.")] if last else []
+        part = [dk.price_stamp(last, market)] if last else []
         for sector, rs in rows.items():
             part.append(dk.section(sector, dk.ccard(rs).replace('data-cards="1" ', '')))   # data-cards 는 테마가 탭 카드로 옮긴다 — 목록 표엔 쓰지 않음
         panes.append(f'<div data-mk-pane="{market}"{" hidden" if market == "KR" else ""}>{"".join(part)}</div>')

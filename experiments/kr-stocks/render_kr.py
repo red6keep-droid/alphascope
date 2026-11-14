@@ -1262,7 +1262,7 @@ def detail_body(s, a):
     `업종` 탭 = 업종 재료 · 체감 경기 · 경영 분석
     (2026-10-25 사용자: 미국 종목 페이지처럼 탭 — 실적과 기대 · 캘린더는 다음 단계)."""
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
-            + _dk.report_stamp(_md(s["day"]), "오후 4시 10분 무렵") + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
+            + _dk.price_stamp(s["day"], "KR") + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
             + RP.sec_crash(s, media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])) if MEDIA else None)   # 급락장에서 어땠나? — 코스피가 2% 넘게 내린 날 버틴 종목 (2026-11-04)
             + ((lambda n: _dk.keep_tone(R._section("뉴스", n, tab="오늘")) if n else "")(sec_today(s)))   # 뉴스는 헤드라인체 그대로 · 최근 7일 0건이면 구획 숨김 (2026-11-08)
             + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
@@ -1694,7 +1694,7 @@ def list_body(a):
     tip = ("한국 유가증권시장 보통주 가운데 회사 전체 값(주가 × 주식 수)이 가장 큰 10개. 우선주 · 코스닥은 뺀다\n"
            f"· 오늘 1위 : {top[0]['name']} {cap_text(top[0]['cap'])}\n"
            f"· 나누는 법 : 11위 밖으로 {U.SWAP_DAYS}거래일 연속 밀리면 후보 중 가장 높았던 종목과 바꾼다")
-    body = (_dk.report_stamp(_md(a["day"]), "오후 4시 10분 무렵")   # 맨 위 안내 상자 = 상세 페이지와 같게 (2026-11-07 0-1)
+    body = (_dk.price_stamp(a["day"], "KR")   # 맨 위 안내 상자 = 상세 페이지와 같게 (2026-11-07 0-1)
             + list_lead(a) + R.title_with_sort("시가총액 순위", tip, "kr-cap10") + card(top, "kr-cap10")
             + (_dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest)) if rest else "")
             + etf_section()   # ETF 구획 (2026-11-12 사용자) — 발행된 ETF 페이지만, 목업은 전부

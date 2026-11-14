@@ -386,8 +386,7 @@ def sec_seo_lead(input_data, analysis):
     day = ""
     if as_of:
         try:
-            _, m, d = str(as_of).split("-")[:3]
-            day = f"{int(m)}월 {int(d)}일 "
+            day = dk.kst_close_day(as_of, "US") + " 새벽 "   # 독자 = 한국 시간 (2026-11-14 사용자, 옛 뉴욕 날짜)
         except ValueError:
             day = ""
     indices = (input_data.get("market") or {}).get("indices") or {}
@@ -815,6 +814,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     a = analysis or {}
     parts = [
         dk.WRAP_OPEN,
+        (dk.price_stamp(a["as_of"], "US") if a.get("as_of") else ""),   # 맨 위 안내 상자 = 종목 페이지와 같게 — 종가 리포트 · 발행 시각 (2026-11-14 사용자)
         sec_seo_lead(input_data, analysis),   # 검색 결과 요약 — 보이는 첫 요소, data-lead 보다 앞 (2026-10-18)
         # S&P 500 그래프가 커버 이미지 자리 (2026-10-18 사용자, 엔비디아처럼). 그래프가 없는 날만 AI 커버
         sec_chart(output_dir) or _cover_image(cover_url),

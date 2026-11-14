@@ -3445,8 +3445,7 @@ def seo_lead(a):
     if h.get("close") is None:
         return ""
     try:
-        d = datetime.date.fromisoformat(a["day"])
-        day = f"{d.month}월 {d.day}일 "
+        day = _dk.kst_close_day(a["day"], "US") + " 새벽 "   # 독자 = 한국 시간 (2026-11-14 사용자, 옛 뉴욕 날짜)
     except (KeyError, ValueError):
         day = ""
     r = h.get("ret_1d") or 0
@@ -3477,6 +3476,7 @@ def build_body(a, n):
         # data-design="2": 테마의 옛 글 보정 규칙(div 14px → 17px !important)에서 이 글을 제외한다 (2026-10-11 — 안내 글이 17px로 커지던 원인)
         f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:{_dk.BODY};line-height:{_dk.LH_BODY};color:#333;">',   # 행간 24px (2026-10-12 사용자, 소수점 금지 — 2026-10-12 사용자)
         # 기준 거래일 안내 줄 삭제 (2026-10-12 사용자) — 날짜는 글 제목에 있다
+        (_dk.price_stamp(a["day"], "US") if a.get("day") else ""),   # 맨 위 안내 상자 = 종목 페이지와 같게 (2026-11-14 사용자 — 고정 페이지라 날짜가 제목에 없다)
         seo_lead(a),   # 글 맨 앞 요약 (검색 결과 문구, 2026-10-18)
         sec_chart(a=a), sec_headline(a, n), sec_targets(a),   # 쉬운 말 줄은 가격 카드 펼침 안 (2026-10-16 사용자)   # 그래프는 탭 위, 평균 카드는 가격 카드 아래 (2026-10-13 사용자)
         # 목표가는 상태 카드 아래 (아코디언) — 제목 없이 본문 머리에 (2026-10-11 사용자: 오늘 한 줄 타이틀 삭제)

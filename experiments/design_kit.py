@@ -1672,14 +1672,30 @@ def direction_bars(today, week, empty_text=""):
     return box + f'{bar("오늘", today or {})}{gap}{bar("최근 7일", week or {})}</div>'
 
 
-def report_stamp(day_text, when_text):
+def kst_close_day(day, market):
+    """시장 종가일 → 독자가 보는 한국 날짜 `11월 14일` (2026-11-14 사용자: 독자는 한국 시간 기준 — `미국 시간` 표기 헷갈림).
+    미국 장은 한국 시간 다음 날 새벽(5 · 6시)에 끝나므로 미국 = 종가일 + 1일."""
+    import datetime as _dt
+    d = _dt.date.fromisoformat(str(day)[:10]) + _dt.timedelta(days=1 if market == "US" else 0)
+    return f"{d.month}월 {d.day}일"
+
+
+def price_stamp(day, market):
+    """가격 페이지(종목 · ETF · 간단 정보 · 목록 · 증시 리포트) 맨 위 안내 상자 — 실시간 가격이 아니라 종가로 만든 리포트라는 것 (2026-11-14 사용자 통일).
+    한국 = `11월 13일 종가 기준 · … (오후 4시 10분 무렵)`, 미국 = `11월 14일 새벽 마감 기준 · … (아침 7시 30분 무렵)` — 날짜 · 시각 모두 한국 시간."""
+    if market == "US":
+        return report_stamp(kst_close_day(day, "US"), "아침 7시 30분 무렵", close="새벽 마감")
+    return report_stamp(kst_close_day(day, "KR"), "오후 4시 10분 무렵")
+
+
+def report_stamp(day_text, when_text, close="종가"):
     """종목 페이지 제목 바로 아래 안내 — 어느 날 종가 기준인지 · 매 거래일 장 마감 뒤 발행된다는 것 (2026-11-05 사용자: 장중 가격을 볼 수 있게 되니 종가 리포트라는 점을 알리자).
     연한 회색 박스 안 · 장중 차트 안내 문구는 뺐다 (2026-11-06 사용자 P316). 제목 글자(검색어)는 건드리지 않고 본문 첫 줄에 둔다. 날짜는 `어제` 같은 상대어 대신 실제 날짜."""
     ico = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" '
            'style="flex:none;margin-top:2px;"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.4 1.6"/></svg>')
     return (f'<p data-report-stamp="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 14px;padding:10px 12px;background:#F3F4F6;border-radius:8px;'
             f'font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">{ico}'
-            f'<span>{day_text} 종가 기준 · 매 거래일 장을 마감한 뒤 발행되는 리포트입니다. ({when_text})</span></p>')
+            f'<span>{day_text} {close} 기준 · 매 거래일 장을 마감한 뒤 발행되는 리포트입니다. ({when_text})</span></p>')
 
 
 def intraday_chart_fold(code, bars_url, precision=0):

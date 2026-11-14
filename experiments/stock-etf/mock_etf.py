@@ -144,7 +144,7 @@ def us_page(meta):
                  + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_states(s))
     f = fund(sym)
     hold = tab_holdings(f)
-    body = (Q.stamp(RP._md(s["day"]) + "(미국 시간)", "ETF 정보입니다. 가격은 매 거래일, 구성은 주 1회 갱신됩니다.") + RP.lead(s)
+    body = (dk.price_stamp(s["day"], "US") + RP.lead(s)
             + R._section("오늘", tab_today, line=False, tab="오늘")
             + (R._section("구성", hold, tab="구성") if hold else "")
             + R._section("기본 정보", tab_basic(meta, f), tab="기본 정보")
@@ -167,9 +167,6 @@ def kr_page(meta):
         body = body[:tabs[1].start()]
     elif m is None:
         print("[etf] 한국 탭 머리를 못 찾음 — 전체를 둔다")
-    body = body.replace("간단 정보입니다. 가격은 매 거래일, 실적 · 의견은 주 1회 갱신됩니다.", "ETF 정보입니다. 가격은 매 거래일, 구성은 주 1회 갱신됩니다.")
-    if not ("미국" in meta["name"] and any(t[2] == meta["tracks"] for t in E.US)):   # 구성 탭이 없는 한국 ETF — 안내도 가격만
-        body = body.replace("가격은 매 거래일, 구성은 주 1회 갱신됩니다.", "가격은 매 거래일 갱신됩니다.")
     us_twin = next((t for t in E.US if t[2] == meta["tracks"]), None)
     f = {"top": [], "sectors": []}
     note = ""
