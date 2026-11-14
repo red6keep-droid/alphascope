@@ -484,7 +484,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         nm = (POP_DOT if r["key"] in POPULAR_KEYS else "") + _h.escape(r["name"])
         trs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{nm}'   # 폭이 모자라는 날(긴 이름 + 괄호 글)은 설명 끝이 … 로 — 줄바꿈 없음 (P108)
                    + (f'<span style="margin-left:4px;font-size:{WHY_FS};line-height:19px;color:#6B7280;">{what}</span>' if what else "") + '</span>'   # 괄호 글(과매도)과 같은 13px 회색 (P109)
-                   f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<b style="font-weight:700;">{_h.escape(r["text"])}</b>{bx}</span>')   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
+                   f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<span>{_h.escape(r["text"])}</span>{bx}</span>')   # 값 굵기 보통 (2026-11-14 사용자 "기술지표 우측 값 볼드 빼줘")   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
     lines.append((_sub("기술지표") + _table(trs, line), "html"))
     COLW = f"display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;min-width:{BOX_W + 58}px;"   # 숫자 + 라벨 한 칸 — 인베스팅닷컴처럼 값마다 상승 · 하락 (P103, 옛 ▲ · ▼)
 
@@ -506,7 +506,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         kind = "flat" if cr["days_ago"] > CROSS_FRESH else "up" if cr["dir"] > 0 else "down"
         top_rows.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{POP_DOT}{cr["kind"]}'
                         f'<span style="margin-left:4px;{note}">{cr["pair"][0]} · {cr["pair"][1]}일선</span></span>'
-                        f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;"><b style="font-weight:700;">{cr["days_ago"]}일 전</b>{box(kind, UPW if kind == "up" else DNW if kind == "down" else MID, _h.escape)}</span>')
+                        f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;"><span>{cr["days_ago"]}일 전</span>{box(kind, UPW if kind == "up" else DNW if kind == "down" else MID, _h.escape)}</span>')
     mrs = top_rows + [f'<span style="{HEAD}">기간</span><span style="display:inline-flex;gap:6px;{HEAD}"><span style="{COLW}">단순</span><span style="{COLW}">지수</span></span>']
     for m in sig["ma"]:
         mrs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{m["n"]}일<span style="margin-left:4px;font-size:{WHY_FS};line-height:19px;color:#6B7280;">{MA_WHAT.get(m["n"], "")}</span></span>'
