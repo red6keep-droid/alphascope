@@ -1893,19 +1893,19 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     this.menuDraw();
   };
   Chart.prototype.menuDraw = function () {
-    var self = this, m = this.menuBox; m.innerHTML = ''; m.style.cssText = '';
+    var self = this, m = this.menuBox;
+    var pick = function (b, on, col) { b.style.background = '#fff'; b.style.borderColor = on ? col : '#E2E8F0'; b.style.color = on ? col : NOTE; b.style.fontWeight = on ? '600' : '400'; return b; };   // 켜짐 = 테두리 · 글자 색 + 굵게 (2026-11-14 사용자) m.innerHTML = ''; m.style.cssText = '';
     if (this.full && this.menu) {
       m.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 8px;';
       var u = this.unit === 'D' ? '일' : this.unit === 'W' ? '주' : '';
       [5, 20, 60, 120, 200].forEach(function (n) {
-        var b = btn(n + u, false), onMa = !!self.on.ma[n] && self.maOn;
-        if (onMa) { b.style.borderColor = MA_COL[n]; b.style.color = MA_COL[n]; b.style.fontWeight = '600'; } else b.style.color = NOTE;   // 켜면 선 색 테두리 · 글자 (2026-11-14 사용자)
+        var b = pick(btn(n + u, false), !!self.on.ma[n] && self.maOn, MA_COL[n]);   // 켜면 선 색 테두리 · 글자 (2026-11-14 사용자)
         b.onclick = function () { self.maOn = true; self.on.ma[n] = !self.on.ma[n]; self.topBar(); self.draw(); }; m.appendChild(b);
       });
-      var bb = btn('볼린저 밴드', this.on.boll); bb.onclick = function () { self.on.boll = !self.on.boll; self.topBar(); self.draw(); }; m.appendChild(bb);
+      var bb = pick(btn('볼린저 밴드', false), this.on.boll, INK); bb.onclick = function () { self.on.boll = !self.on.boll; self.topBar(); self.draw(); }; m.appendChild(bb);
       m.appendChild(el('span', 'flex-basis:100%;height:0;'));
       [['vol', '거래량'], ['macd', 'MACD'], ['rsi', 'RSI'], ['none', '없음']].forEach(function (x) {
-        var b = btn('아래 : ' + x[1], self.on.lower === x[0]); b.onclick = function () { self.on.lower = x[0]; self.topBar(); self.draw(); }; m.appendChild(b);
+        var b = pick(btn('아래 : ' + x[1], false), self.on.lower === x[0], INK); b.onclick = function () { self.on.lower = x[0]; self.topBar(); self.draw(); }; m.appendChild(b);
       });
     }
   };
@@ -2013,7 +2013,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     this.wrap.style.marginRight = -padR + 'px'; this.root.style.marginBottom = -padB + 'px'; W += padR;
     if (this.n > this.maxN()) { this.n = Math.min(this.maxN(), this.bars.length); this.end = Math.max(this.end, this.n); }
     var land = this.full && window.innerWidth > window.innerHeight;   // 가로로 돌린 전체 화면 = 아래 칸 없음 · 머리 한 줄 · 화면에 꽉 (2026-11-14 사용자)
-    var TOPS = this.full ? 50 : 22;   // 전체 화면 위 띠 = 범례 줄 20 + 누른 날 검은 날짜 칸 22 (범례 아래로 내림, 2026-11-14 사용자)   // 전체 화면 = 이동평균 범례와 최고 글자 사이 15 더 (2026-11-14 사용자)
+    var maRows = 1;
+    if (this.full) {   // 이동평균 값 줄(누를 때) 이 몇 줄이 되는지 — 최신 값 길이로 미리 (누를 때마다 그래프가 움직이지 않게)
+      var mc = this._mc || (this._mc = document.createElement('canvas').getContext('2d')), xw = 0, lim = W - 4, li = this.bars.length - 1;
+      mc.font = '13px ' + getComputedStyle(this.root).fontFamily;
+      [5, 20, 60, 120, 200].forEach(function (k) { if (!(self.maOn && self.on.ma[k])) return; var v = self.ma[k][li]; var w = mc.measureText(k + ' ' + (v === null ? '-' : fmt(v, self.dec))).width + 14; if (xw && xw + w > lim) { maRows++; xw = 0; } xw += w; });
+    }
+    var TOPS = this.full ? 30 + 20 * maRows : 22;   // 전체 화면 위 띠 = 범례 줄 20 + 누른 날 검은 날짜 칸 22 (범례 아래로 내림, 2026-11-14 사용자)   // 전체 화면 = 이동평균 범례와 최고 글자 사이 15 더 (2026-11-14 사용자)
     var lowerH = this.on.lower === 'none' || !this.full || land ? 0 : 90, priceH = 264, gap = lowerH ? 31 : 0;   // 36 → 31 (2026-11-14 사용자) gap = 거래량 범례 줄(범례와 막대 사이 10 더, 2026-11-14 사용자)
     if (this.full) {
       var rest = window.innerHeight - this.wrap.getBoundingClientRect().top - this.restore.offsetHeight - 16;
@@ -2103,12 +2109,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     // 최고 · 최저 — 점 + `최고 235,000 (−26.13%)` (현재가가 그보다 몇 % 아래 · 위인지)
     if (B.length) {
       var hiI = 0, loI = 0; B.forEach(function (b, j) { if (b[2] > B[hiI][2]) hiI = j; if (b[3] < B[loI][3]) loI = j; });
+      self._hl = [];
       [[hiI, B[hiI][2], '최고', -1], [loI, B[loI][3], '최저', 1]].forEach(function (m) {
         var x = X(s + m[0]), y = Y(m[1]) + m[3] * 4, d = (last[4] / m[1] - 1) * 100;
         g.fillStyle = m[2] === '최고' ? UP : DN; g.beginPath(); g.arc(x, y, 2.5, 0, 6.3); g.fill();   // 증감 색 (2026-11-14 사용자)
         g.font = AFS + 'px ' + font; var txt = m[2] + '  ' + fmt(m[1], self.dec) + ' (' + sgnPct(d) + ')', tw = g.measureText(txt).width;
         var tx = Math.min(Math.max(x - tw / 2, 2), pw - tw - 2);
         g.textAlign = 'left'; g.fillText(txt, Math.round(tx), Math.round(y + m[3] * 12) + 0.5);
+        self._hl.push([tx, y + m[3] * 12, tw]);
       });
     }
     // 내 평단 — 보라 점선 + `내 평단 15,893 ▲3.10%`(차이 = 증감 색)
@@ -2118,10 +2126,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
       g.font = '12px ' + font; g.textAlign = 'left';
       var lab = (avg.label || '내 평단') + ' ' + fmt(avg.price, self.dec) + ' ', dtx = tri(diff) + Math.abs(diff).toFixed(2) + '%' + (avgIn ? '' : avg.price > hi ? ' ↑' : ' ↓');
       var w1 = Math.ceil(g.measureText(lab).width), w2 = Math.ceil(g.measureText(dtx).width), ly2 = Math.round(ya + (avgIn ? -9 : 0));
-      if (avgIn) w2 = 0;   // 증감 표시 없음 — `내 평단 15,893` 검은 글자만 (2026-11-14 사용자), 화면 밖일 때만 ↑ · ↓
-      g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(2, ly2 - 9, w1 + w2 + 6, 18);
-      g.fillStyle = INK; g.fillText(lab, 5, ly2);
-      if (!avgIn) g.fillText(avg.price > hi ? '↑' : '↓', 5 + w1, ly2);
+      var ly0 = ly2, lx = 5, hit = function (x, y) { return (self._hl || []).some(function (r) { return x < r[0] + r[2] && x + w1 + w2 + 6 > r[0] && Math.abs(y - r[1]) < 15; }); };
+      if (hit(lx, ly2) && avgIn) ly2 = Math.round(ya + 10);   // 최고 · 최저 글자와 겹치면 선 아래로
+      if (hit(lx, ly2)) { ly2 = ly0; lx = Math.max(2, pw - w1 - w2 - 8); }   // 그래도 겹치면 선 위 오른쪽 끝
+   // 증감 표시 없음 — `내 평단 15,893` 검은 글자만 (2026-11-14 사용자), 화면 밖일 때만 ↑ · ↓
+      g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(lx - 3, ly2 - 9, w1 + w2 + 6, 18);
+      g.fillStyle = VIO; g.fillText(lab, lx, ly2);   // 보라 글자 + 증감 색 (2026-11-14 사용자 되돌림)
+      g.fillStyle = diff > 0 ? UP : diff < 0 ? DN : INK; g.fillText(dtx, lx + w1, ly2);
     }
     // 오른쪽 가격 칸 = 보이는 맨 오른쪽 봉 종가(삼각형 머리), 색 = 그 봉의 전날 대비
     if (tagB) { var tp = this.bars[this.end - 2]; tag(tagY, fmt(tagB[4], self.dec), !tp || tagB[4] >= tp[4] ? UP : DN); }
@@ -2164,7 +2175,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
       // 위 날짜 칸 = 범례 줄 아래(전체 화면). 그날 이동평균 값 줄이 너무 길어(가격 100만 원대 · 선 5개) 두 줄이 되면 위 칸은 빼고 아래 칸만
       var maW = 0; g.font = '13px ' + font; [5, 20, 60, 120, 200].forEach(function (n) { if (maShow(n) && self.ma[n][sel] !== null) maW += g.measureText(n + ' ' + fmt(self.ma[n][sel], self.dec)).width + 14; });
       g.font = TFS + 'px ' + font;
-      var boxes = [[H - XH, XH]]; if (!this.full) boxes.push([0, TOPS]); else if (maW <= pw) boxes.push([TOPS - 24, 22]);
+      var boxes = [[H - XH, XH], this.full ? [TOPS - 24, 22] : [0, TOPS]];   // 작은 화면은 누르는 동안 이동평균 범례를 숨겨 위 칸과 겹치지 않게
       boxes.forEach(function (r) { g.fillStyle = INK; g.fillRect(dx, r[0], dw, r[1]); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(dl, dx + dw / 2, r[0] + r[1] / 2 + 0.5); });
     }
     // 머리 — 현재가 · 전날 대비 금액 · % (늘 최신), 오늘 거래량, 시가 · 고가 · 저가 · 종가(누른 날이면 그날)
@@ -2187,6 +2198,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     if (sel !== null && mas.length && this.full) {   // 누른 날 이동평균 값 표 = 전체 화면만 (2026-11-14 사용자)
       this.legend.style.top = '0px'; this.legend.style.display = 'flex'; this.legend.style.maxWidth = '100%';   // 그날 이동평균 값 = 가로 한 줄(넘치면 다음 줄) (2026-11-14 사용자)
       this.legend.innerHTML = mas.map(function (n) { var v = self.ma[n][sel]; return '<span style="white-space:nowrap;margin-right:14px;"><span style="color:' + NOTE + ';">' + n + '</span> <span style="color:' + MA_COL[n] + ';font-variant-numeric:tabular-nums;">' + (v === null ? '-' : fmt(v, self.dec)) + '</span></span>'; }).join('');
+    } else if (sel !== null && !this.full) { this.legend.style.display = 'none';   // 작은 화면 누르는 동안 = 범례 숨김(위 검은 날짜 칸 자리)
     } else if (mas.length) {
       this.legend.style.top = '0px'; this.legend.style.display = 'flex'; this.legend.style.maxWidth = '70%';
       this.legend.innerHTML = '<span style="color:' + INK + ';margin-right:5px;">이동평균</span>' + mas.map(function (n) { return '<span style="color:' + MA_COL[n] + ';margin-right:4px;">' + n + '</span>'; }).join('') +
