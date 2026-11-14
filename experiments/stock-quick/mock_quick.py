@@ -2,6 +2,9 @@
 
     python experiments/stock-quick/mock_quick.py      # output/mock_quick_<종목>.html · output/mock_all_stocks.html
 
+**목업 화면은 2026-11-14 지웠다** (사용자 "실제 운영 방식 목업만 남기고 나머지 삭제") — 지금 목업 = mock_quick_page.py(mock_qpage_*, 운영과 같은 고정 페이지 + 조각).
+이 파일은 ETF 목업(stock-etf/mock_etf.py)이 page_us_full · page_kr_full 을 빌려 쓰므로 남긴다. 직접 돌리지 말 것(옛 시안이 다시 생긴다).
+
 실제 적용 때는 고정 페이지 하나(stock-quick?s=코드)를 테마 JS 가 search/<시장>-lite.json 으로 그린다.
 목업은 같은 화면을 파이썬으로 미리 그린다 — 카드 · 막대 · 범위 막대 · 선 그래프는 종목 페이지 · 데일리와 같은 공용 부품(design_kit · daily-report/cards).
 자료 = yfinance 1년 일봉 묶음 + 실적일(회사 캘린더). AI 0.

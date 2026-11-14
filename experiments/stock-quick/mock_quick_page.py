@@ -40,7 +40,7 @@ def main():
         src = os.path.join(a.data, d, code + ".html")
         if os.path.exists(src):
             shutil.copy(src, os.path.join(dst, d, code + ".html"))
-        body = (f'<div id="as-quick" data-local="quick-data/" data-default="{code}" data-list="mock_all_stocks.html"></div>'
+        body = (f'<div id="as-quick" data-local="quick-data/" data-default="{code}" data-list="/stock-radar/output/mock_list.html"></div>'
                 f'<script>{js}</script>' + CC.SCRIPT)   # 발행 본문(publish_quick_page.body)과 같은 순서
         p = dk.write_mock(body, os.path.join(OUT, f"mock_qpage_{code}.html"), f"간단 정보 ({code})")
         print("만듦:", p)
