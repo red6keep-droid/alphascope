@@ -128,7 +128,7 @@
     if (this.full) { var ind = btn('지표', this.menu); ind.onclick = function () { self.menu = !self.menu; self.topBar(); self.draw(); }; t.appendChild(ind); }
     var fs = el('button', 'font:inherit;width:32px;height:30px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;',
       this.full ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.6" stroke-linecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>'
-                : '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg>');
+                : '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4v4M14 2l-4 4M6 2H2v4M2 2l4 4M10 14h4v-4M14 14l-4-4M6 14H2v-4M2 14l4-4"/></svg>');   // 네 방향 화살표 (2026-11-14 사용자 C안)
     fs.setAttribute('aria-label', this.full ? '닫기' : '전체 화면');
     fs.onclick = function () { self.toggleFull(); }; t.appendChild(fs);
     var m = this.menuBox; m.innerHTML = ''; m.style.cssText = '';
