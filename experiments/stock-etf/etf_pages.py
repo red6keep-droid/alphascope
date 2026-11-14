@@ -271,7 +271,8 @@ def candle(name, bars, dec):
         return ""
     last = bars[-1]["close"]
     mock = CC.card(name, bars, dec, avg={"price": round(last * MOCK_AVG, dec), "label": "내 평단"}, title="")
-    return E_MOCK[0] + mock + E_MOCK[1] + E_REAL[0] + real + E_REAL[1] + CC.SCRIPT   # ETF 전용 표시 — 한국 ETF 본문은 render_kr 를 거치며 mock-only 를 먼저 지운다
+    gap = '<div style="height:20px;"></div>'   # 차트와 탭 사이 20 더 (2026-11-14 사용자)
+    return E_MOCK[0] + mock + gap + E_MOCK[1] + E_REAL[0] + real + gap + E_REAL[1] + CC.SCRIPT   # ETF 전용 표시 — 한국 ETF 본문은 render_kr 를 거치며 mock-only 를 먼저 지운다
 
 
 def load_live(market):

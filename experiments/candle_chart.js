@@ -115,7 +115,7 @@
     this.topBar();
   };
   Chart.prototype.minN = function () { return Math.min(10, this.bars.length); };
-  Chart.prototype.maxN = function () { return Math.max(this.minN(), Math.floor((this.root.clientWidth - AXIS_W) / MIN_SLOT)); };
+  Chart.prototype.maxN = function () { return Math.max(this.minN(), Math.floor((this.root.clientWidth - (this.axisW || AXIS_W)) / MIN_SLOT)); };
   Chart.prototype.topBar = function () {
     var self = this, t = this.btns; t.innerHTML = '';
     // 일 → 주 → 월 → 분기 → 년 → 일 한 버튼 (2026-11-13 · 11-14 사용자)
@@ -160,7 +160,7 @@
     // 옆으로 밀기 = 넘겨보기 · 두 손가락 = 확대 · 축소 · 짧게 누르기 = 그날 십자선(다시 누르면 끔) · 꾹 누르고 움직이기 = 십자선이 따라감
     var self = this, cv = this.cv, pts = {}, start = null, moved = false, timer = null, crossMode = false;
     function at(e) {
-      var r = cv.getBoundingClientRect(), pw = r.width - AXIS_W;
+      var r = cv.getBoundingClientRect(), pw = r.width - (self.axisW || AXIS_W);
       return { i: Math.max(0, Math.min(self.n - 1, Math.floor((e.clientX - r.left) / (pw / self.n)))) + self.end - self.n, y: e.clientY - r.top };
     }
     cv.addEventListener('pointerdown', function (e) {
@@ -175,7 +175,7 @@
       if (!(e.pointerId in pts)) { if (e.pointerType === 'mouse') { self.cross = at(e); self.draw(); } return; }
       pts[e.pointerId] = e.clientX;
       if (crossMode) { self.cross = at(e); self.draw(); return; }
-      var ids = Object.keys(pts), slot = (cv.getBoundingClientRect().width - AXIS_W) / self.n;
+      var ids = Object.keys(pts), slot = (cv.getBoundingClientRect().width - (self.axisW || AXIS_W)) / self.n;
       if (ids.length === 2 && start.pinch) {
         var d = Math.abs(pts[ids[0]] - pts[ids[1]]) || 1;
         self.n = Math.max(self.minN(), Math.min(self.maxN(), self.bars.length, Math.round(start.n * start.pinch / d))); self.end = Math.max(self.end, self.n); moved = true;
@@ -219,18 +219,27 @@
     var H = TOPS + priceH + gap + lowerH + XH, dpr = window.devicePixelRatio || 1;
     cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + 'px';
     var g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-    var font = getComputedStyle(this.root).fontFamily, pw = W - AXIS_W, s = this.end - this.n, B = this.bars.slice(s, this.end), slot = pw / this.n;
-    var X = function (i) { return Math.floor((i - s) * slot + slot / 2) + 0.5; };
+    var font = getComputedStyle(this.root).fontFamily, s = this.end - this.n, B = this.bars.slice(s, this.end), pw, slot, X;
     var last = this.bars[this.bars.length - 1], prevL = this.bars[this.bars.length - 2];
     var maShow = function (n) { return self.maOn && self.on.ma[n]; };
     // 가격 범위 = 봉 + 켜진 선 (+ 최고 · 최저 글자 자리 위아래 22)
     var lo = Infinity, hi = -Infinity, look = function (v) { if (v !== null && v !== undefined) { lo = Math.min(lo, v); hi = Math.max(hi, v); } };
     B.forEach(function (b) { look(b[2]); look(b[3]); });
     for (var i = s; i < this.end; i++) { for (var n in this.on.ma) if (maShow(n)) look(this.ma[n][i]); if (this.on.boll) { look(this.bb.up[i]); look(this.bb.lo[i]); } }
+    // 오른쪽 가격 칸 폭 — 전체 화면 66 고정, 작은 화면 = 가장 긴 숫자 + 왼쪽 9 · 오른쪽 3 (2026-11-14 사용자 "0 기준 우측 여백 최대한 좁게")
+    var TX = this.full ? 10 : 9, TFS = this.full ? FS : 12;   // TFS = 종가 칸 글자(작은 화면 12)
+    if (this.full) this.axisW = AXIS_W;
+    else {
+      var mw = 0; g.font = FS + 'px ' + font; ticks(lo, hi, 5).forEach(function (t) { mw = Math.max(mw, g.measureText(fmt(t, self.dec)).width); });
+      g.font = '600 ' + TFS + 'px ' + font; [lo, hi, this.bars[this.end - 1][4]].forEach(function (v) { mw = Math.max(mw, g.measureText(fmt(v, self.dec)).width); });
+      this.axisW = TX + Math.ceil(mw) + 3;
+    }
+    pw = W - this.axisW; slot = pw / this.n; X = function (i) { return Math.floor((i - s) * slot + slot / 2) + 0.5; };
     var avg = this.d.avg, avgIn = avg && avg.price >= lo - (hi - lo) * 0.3 && avg.price <= hi + (hi - lo) * 0.3;
     if (avgIn) look(avg.price);
     if (this.log && lo <= 0) this.log = false;
-    var T = this.log ? Math.log : function (v) { return v; }, iT = this.log ? Math.exp : function (v) { return v; };
+    var useLog = this.full && this.log;   // 작은 화면 = Linear · Log 버튼 없음
+    var T = useLog ? Math.log : function (v) { return v; }, iT = useLog ? Math.exp : function (v) { return v; };
     var tlo = T(lo), thi = T(hi), y0p = TOPS + 22, y1p = TOPS + priceH - 22;
     var Y = function (v) { return Math.round(y0p + (thi - T(v)) / ((thi - tlo) || 1) * (y1p - y0p)) + 0.5; };
     var vOf = function (y) { return iT(thi - (y - y0p) / (y1p - y0p) * (thi - tlo)); };
@@ -246,10 +255,10 @@
         else if (b[0].slice(0, 7) !== p.slice(0, 7)) add(j, +b[0].slice(5, 7) + '월', true, 50);
       } else if (b[0].slice(0, 4) !== p.slice(0, 4)) add(j, b[0].slice(0, 4) + '년', true, 50);
     });
-    if (!this.full && this.unit === 'W') B.forEach(function (b, j) { if (j) add(j, b[0].slice(5).replace('-', '/'), false, 62); });
+    if (!this.full && this.unit === 'W') B.forEach(function (b, j) { if (j) add(j, b[0].slice(5).replace('-', '.'), false, 62); });
     if (this.unit === 'D') B.forEach(function (b, j) {
       if (!j) return; var a = new Date(B[j - 1][0] + 'T00:00:00Z'), c = new Date(b[0] + 'T00:00:00Z');
-      if ((c - a) / 864e5 > 1 && c.getUTCDay() <= 2) add(j, b[0].slice(5).replace('-', '/'), false, 62);
+      if ((c - a) / 864e5 > 1 && c.getUTCDay() <= 2) add(j, b[0].slice(5).replace('-', '.'), false, 62);
     });
     if (this.unit === 'M') B.forEach(function (b, j) { if (/-(04|07|10)$/.test(b[0].slice(0, 7))) add(j, +b[0].slice(5, 7) + '월', false, 46); });
     labs.forEach(function (l) { g.strokeStyle = GRID; g.lineWidth = 1; g.beginPath(); g.moveTo(Math.round(l[0]) + 0.5, TOPS); g.lineTo(Math.round(l[0]) + 0.5, H - XH); g.stroke(); });
@@ -261,12 +270,12 @@
       var y = Y(t); if (y < TOPS || y > TOPS + priceH) return;
       g.strokeStyle = GRID; g.lineWidth = 1; g.beginPath(); g.moveTo(0, y); g.lineTo(pw, y); g.stroke();
       if (Math.abs(y - tagY) < 14) return;
-      g.fillStyle = NOTE; g.textAlign = 'left'; g.fillText(fmt(t, self.dec), pw + 10, y);
+      g.fillStyle = NOTE; g.textAlign = 'left'; g.fillText(fmt(t, self.dec), pw + TX, y);
     });
     g.strokeStyle = '#E2E8F0'; g.beginPath(); g.moveTo(pw + 0.5, TOPS); g.lineTo(pw + 0.5, H - XH); g.stroke();
     var tag = function (y, txt, bg) {
       y = Math.round(y); g.fillStyle = bg; g.beginPath(); g.moveTo(pw + 1, y); g.lineTo(pw + 8, y - 10); g.lineTo(W, y - 10); g.lineTo(W, y + 10); g.lineTo(pw + 8, y + 10); g.closePath(); g.fill();
-      g.fillStyle = '#fff'; g.font = '600 ' + FS + 'px ' + font; g.textAlign = 'left'; g.fillText(txt, pw + 10, y + 0.5); g.font = FS + 'px ' + font;
+      g.fillStyle = '#fff'; g.font = '600 ' + TFS + 'px ' + font; g.textAlign = 'left'; g.fillText(txt, pw + TX, y + 0.5); g.font = FS + 'px ' + font;
     };
     // 볼린저 · 이동평균
     var line = function (arr, col, w) {
@@ -293,7 +302,7 @@
       var hiI = 0, loI = 0; B.forEach(function (b, j) { if (b[2] > B[hiI][2]) hiI = j; if (b[3] < B[loI][3]) loI = j; });
       [[hiI, B[hiI][2], '최고', -1], [loI, B[loI][3], '최저', 1]].forEach(function (m) {
         var x = X(s + m[0]), y = Y(m[1]) + m[3] * 4, d = (last[4] / m[1] - 1) * 100;
-        g.fillStyle = INK; g.beginPath(); g.arc(x, y, 2.5, 0, 6.3); g.fill();
+        g.fillStyle = d > 0 ? UP : d < 0 ? DN : INK; g.beginPath(); g.arc(x, y, 2.5, 0, 6.3); g.fill();   // 증감 색 (2026-11-14 사용자)
         g.font = FS + 'px ' + font; var txt = m[2] + '  ' + fmt(m[1], self.dec) + ' (' + sgnPct(d) + ')', tw = g.measureText(txt).width;
         var tx = Math.min(Math.max(x - tw / 2, 2), pw - tw - 2);
         g.textAlign = 'left'; g.fillText(txt, Math.round(tx), Math.round(y + m[3] * 12) + 0.5);
@@ -374,7 +383,7 @@
       this.legend.querySelector('[data-x]').onclick = function () { self.maOn = false; self.draw(); };
     } else { this.legend.style.display = 'none'; }
     this.scaleB.innerHTML = (this.log ? 'Log' : 'Linear') + ' <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#111" stroke-width="1.3" stroke-linecap="round" style="vertical-align:0;"><path d="M2 4l3 3 3-3"/></svg>';
-    this.scaleB.setAttribute('aria-label', '가격축 일반 · 로그 바꾸기'); this.scaleB.style.right = '4px';
+    this.scaleB.setAttribute('aria-label', '가격축 일반 · 로그 바꾸기'); this.scaleB.style.right = '4px'; this.scaleB.style.display = this.full ? '' : 'none';
     // 최신으로 (넘겨본 뒤에만)
     this.latest.style.display = this.end < this.bars.length ? 'flex' : 'none';
     this.latest.style.left = (pw - 36) + 'px'; this.latest.style.top = (TOPS + priceH - 34) + 'px';
