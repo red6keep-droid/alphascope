@@ -332,7 +332,7 @@ def body(s, a, peers, by, related_links, extra_today=""):
     return render_kr.wrap(f'<div data-quick-title="{dk.esc(title)}"><span data-kr-code="{s["code"]}" hidden></span>'
             + dk.report_stamp(dk.kst_close_day(s["day"], "KR"), WHEN)
             + render_kr.lead(s) + CC.card(s["name"], render_kr.BARS.get(s["sym"]) or [], 0, title="") + '<div style="height:20px;"></div>'   # 봉차트 하나만 — 정식 page_block 은 목업 · 발행 두 벌 + 스크립트(조각엔 페이지 본문 스크립트 하나로)
-            + R._section("오늘", today, line=False, tab="오늘")
+            + R._section("오늘", today, line=False, tab="오늘") + render_kr.RP.sec_crash(s)   # 급락일에 버텼을 때만
             + (R._section("매수의견", op, tab="매수의견") if op else "")
             + (R._section("실적", ea, tab="실적") if ea else "")
             + R._section("업계상황", render_kr.sec_industry_tab(s), tab="업계상황")
@@ -369,8 +369,10 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
     day = max(x["day"] for x in stocks)
     market = analyze_kr.flows(flows, bars_all.get(K.BENCH)) or {}
     mr = analyze_kr.A.market_regime({"bars": {analyze_kr.NC.REGIME_BENCHMARK: bars_all.get(K.BENCH) or []}})
+    crash = render_kr.RP.CW.compute(bars_all, "kr", quick)   # 급락장에서 어땠나? — 정식과 같은 계산, 일봉만 (2026-11-14 사용자)
     for x in stocks:
-        x.update(market_regime=mr, sector_flow=analyze_kr.sector_flow(snap, x["sym"]), fx=market.get("fx"), crash=None, rank=None, in_top=False, pairs={})
+        x.update(market_regime=mr, sector_flow=analyze_kr.sector_flow(snap, x["sym"]), fx=market.get("fx"), crash=render_kr.RP.CW.for_stock(crash, x["sym"]),
+                 rank=None, in_top=False, pairs={})
     a = {"day": day, "stocks": stocks, "market": market, "crash": {}}
     # render_kr.write_all 의 준비 부분 그대로 (파일 쓰기 · 목록 페이지 · 방송 읽기 빼고)
     render_kr.KR_PRICES.clear()
