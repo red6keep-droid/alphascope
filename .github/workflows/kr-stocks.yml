@@ -205,7 +205,7 @@ jobs:
           cp experiments/kr-market-report/output/images/kospi-price-*.webp deploy-kr/images/ 2>/dev/null || echo "코스피 그래프 없음"
       - name: Deploy KOSPI chart to gh-pages
         if: steps.gate.outputs.go == 'true' && hashFiles('deploy-kr/images/*.webp') != ''
-        uses: peaceiris/actions-gh-pages@v4.1.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./deploy-kr
@@ -262,7 +262,7 @@ jobs:
       - name: Deploy kr.json to gh-pages
         if: steps.gate.outputs.go == 'true' && hashFiles('deploy-home/kr.json') != ''
         continue-on-error: true
-        uses: peaceiris/actions-gh-pages@v4.1.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./deploy-home

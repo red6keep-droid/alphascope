@@ -145,7 +145,7 @@ jobs:
 
       - name: Deploy cover image to gh-pages branch
         if: hashFiles('deploy/images/*.webp') != '' || hashFiles('deploy/images/*.png') != ''
-        uses: peaceiris/actions-gh-pages@v4.1.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./deploy
@@ -186,7 +186,7 @@ jobs:
         id: cards_deploy
         if: hashFiles('deploy-cards/cards/report.json') != ''
         continue-on-error: true
-        uses: peaceiris/actions-gh-pages@v4.1.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./deploy-cards
@@ -197,7 +197,7 @@ jobs:
         id: cards_deploy_retry
         if: steps.cards_deploy.outcome == 'failure'
         continue-on-error: true
-        uses: peaceiris/actions-gh-pages@v4.1.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./deploy-cards
