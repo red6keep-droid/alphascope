@@ -95,14 +95,25 @@ def inline(t, links):
     return re.sub(r"\[([^\]]+)\]\(([^)]+)\)", link, t)
 
 
+# 표 칸(세로 줄) 색 — 머리 줄 이름으로 정한다 (2026-11-14 사용자, 1편 표). 아주 연하게, 칸 구분만
+#   `아무 날` = 연한 파랑 · 그 말대로 산 사람 칸(`2010년대` · `2020년 이후`) = 연한 빨강 · 덜 중요한 칸(`발표 건수`) = 연한 회색 바탕 + 회색 글자
+COL_TONES = {   # 이름 → (머리 줄 바탕, 칸 바탕, 칸 글자 색 또는 "")
+    "아무 날": ("#E6EFFB", "#F5F9FF", ""),
+    "2010년대": ("#FBE7E7", "#FFF7F7", ""),
+    "2020년 이후": ("#FBE7E7", "#FFF7F7", ""),
+    "발표 건수": ("#EEF2F6", "#F8FAFC", "#6B7280"),
+}
+
+
 def table(lines, links):
     rows = [[c.strip() for c in ln.strip().strip("|").split("|")] for ln in lines if not re.match(r"^\s*\|?\s*-{3}", ln)]
     head, body = rows[0], rows[1:]
     # 강좌 표 — 화면 폭을 꽉 채우고(오른쪽 빈 칸 없이) 머리 줄에 청록 바탕 (2026-11-12 사용자). 칸 폭은 고르게, 좁으면 표만 가로 스크롤
-    th = "".join(f'<th style="border:1px solid #CFE9E3;padding:8px 10px;background:#ECFDF5;text-align:{"left" if k == 0 else "right"};white-space:nowrap;'
+    tone = [COL_TONES.get(re.sub(r"[*`]", "", h).strip()) for h in head]
+    th = "".join(f'<th style="border:1px solid #CFE9E3;padding:8px 10px;background:{tone[k][0] if tone[k] else "#ECFDF5"};text-align:{"left" if k == 0 else "right"};white-space:nowrap;'
                  f'font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#134E4A;font-weight:700;">{inline(h, links)}</th>' for k, h in enumerate(head))
     trs = "".join("<tr>" + "".join(f'<td style="border:1px solid #E2E8F0;padding:8px 10px;white-space:nowrap;text-align:{"left" if k == 0 else "right"};'
-                                   f'{"color:#111;font-weight:600;" if k == 0 else ""}">{inline(c, links)}</td>' for k, c in enumerate(r)) + "</tr>" for r in body)
+                                   f'{"color:#111;font-weight:600;" if k == 0 else ""}{f"background:{tone[k][1]};" if tone[k] else ""}{f"color:{tone[k][2]};" if tone[k] and tone[k][2] else ""}">{inline(c, links)}</td>' for k, c in enumerate(r)) + "</tr>" for r in body)
     # display:table — 테마가 글 안 표를 display:block 으로 바꿔 칸이 폭을 채우지 못한다(오른쪽이 비던 까닭)
     return dk.tint(f'<div data-course-table="1" style="overflow-x:auto;margin:0 0 12px;"><table style="display:table;border-collapse:collapse;width:100%;min-width:100%;margin:0;'
                    f'font-size:17px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div>")
@@ -127,7 +138,7 @@ def chart(lines, links, title=""):
                      f'<span style="flex:none;width:118px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};white-space:nowrap;">{html.escape(head[k + 1])}</span>'
                      '<span style="flex:1 1 0;min-width:0;display:block;">'
                      f'<span style="display:block;width:{w}%;min-width:4px;height:10px;border-radius:3px;background:{CHART_COLORS[k % len(CHART_COLORS)]};"></span></span>'
-                     f'<span style="flex:none;width:64px;text-align:right;font-size:17px;line-height:24px;font-weight:700;white-space:nowrap;">{dk.tint(html.escape(c))}</span></span>')
+                     f'<span style="flex:none;width:64px;text-align:right;font-size:15px;line-height:22px;font-weight:700;white-space:nowrap;">{dk.tint(html.escape(c))}</span></span>')   # 값 글자 17 → 15 (2026-11-14 사용자: 2 줄임)
         out.append(f'<div style="padding:14px 0;{"border-top:1px solid #E2E8F0;" if out else ""}">'
                    f'<span style="display:block;font-size:17px;line-height:24px;font-weight:700;color:#111;">{inline(r[0], links)}</span>{bars}</div>')
     head_html = (f'<span style="display:block;padding:12px 0 0;font-size:15px;line-height:22px;font-weight:700;color:#134E4A;">{html.escape(title)}</span>' if title else "")
