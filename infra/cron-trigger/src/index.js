@@ -29,6 +29,7 @@ function nyTime(d) {
 }
 
 const WEEKDAY = (ny) => !["Sat", "Sun"].includes(ny.weekday); // 뉴욕 월~금 = 미국장이 열린 날
+const KST_TUE_SAT = (k) => !["Sun", "Mon"].includes(k.weekday); // 한국 화~토 아침 = 미국 월~금 장 마감 뒤
 
 function kstTime(d) {
   const p = Object.fromEntries(
@@ -49,6 +50,11 @@ const KST_JOBS = {
   // 한국 종목 페이지 · 한국 증시 리포트 (2026-10-27) — 한국장 마감 15:30 뒤. GitHub cron(07:10 UTC)이 10-26 에 7시간 늦었다.
   // 둘 다 도는 날은 concurrency 로 줄 서고, 뒤 실행은 페이지 해시 같음 · 리포트 이미 게시됨으로 쓰지 않는다. 휴장일은 fresh.txt 가 막는다.
   "16:10": [{ workflow: "kr-stocks.yml", when: WEEKDAY }],
+  // 간단 종목(853종목) — 미국 = 장 마감 뒤 아침(뉴스 06:40 → 화면 08:20, 정식 07:30 실행이 07:56~59 에 끝난 뒤), 한국 = 장 마감 뒤 17:40 (2026-11-15 사용자).
+  // GitHub cron 도 그대로 — 둘 다 도는 날은 워크플로 check 잡이 '최근 6시간 안 같은 실행 성공' 을 보고 뒤 실행을 건너뛴다(뉴스 AI 두 번 X).
+  "06:40": [{ workflow: "quick-news.yml", when: KST_TUE_SAT }],
+  "08:20": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "us" }, when: KST_TUE_SAT }],
+  "17:40": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "kr" }, when: WEEKDAY }],
   "13:00": [{ workflow: "nvda-report.yml" }], // 낮 갱신 — 종목 페이지만 다시 그린다 (check.mode=refresh, 2026-11-04 P290). GitHub cron 04:00 UTC 는 예비
 };
 
@@ -93,6 +99,8 @@ const NAMES = {
   "media-daily.yml": "방송 이슈 (미디어 데일리)",
   "news.yml": "뉴스 갱신 (하루 2회)",
   "update.yml": "홈 시세 갱신",
+  "quick-news.yml": "간단 종목 뉴스",
+  "quick-data.yml": "간단 종목 주가 (853종목)",
 };
 const WATCH_AFTER_MIN = 60;
 const name = (wf) => NAMES[wf] || wf;

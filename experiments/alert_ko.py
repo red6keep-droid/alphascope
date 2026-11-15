@@ -18,6 +18,8 @@ NAMES = {
     "Update News (2x daily)": "뉴스 갱신 (하루 2회)",
     "Update 10 Stock Data (15m)": "홈 시세 갱신 (15분)",
     "Comment Reply": "댓글 답장",
+    "Quick stock news (간단 종목 뉴스 · 그림자)": "간단 종목 뉴스",
+    "Quick stock data (간단 정보 853종목)": "간단 종목 주가 (853종목)",
     "Court Survey": "소송 조사",
     "Gemini Model Check": "Gemini 모델 점검",
     "Trump Trend": "트럼프 트렌드 (종료)",

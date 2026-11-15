@@ -15,6 +15,8 @@ name: Quick stock data (간단 정보 853종목)
 #   - 게시 = 저장소 변수 QUICK_PUBLISH=true. 없으면 그림자 모드(만들기만 하고 올리지 않음, 표본만 아티팩트). 저장값은 그림자 모드에서도 남긴다(첫 주 채우기가 이어지게).
 #   - 받은 종목이 명단의 90% 밖이면 collect_quick.py 가 종료 코드 3 → 올리지 않고 전날 데이터 그대로.
 
+run-name: "Quick stock data (간단 정보 853종목) · ${{ github.event_name == 'schedule' && (github.event.schedule == '20 23 * * 1-5' && 'us' || 'kr') || inputs.market || 'all' }}"   # 끝 = 시장 — 중복 건너뛰기가 같은 시장만 센다
+
 on:
   schedule:
     - cron: '20 23 * * 1-5'   # 미국 — UTC 월~금 23:20 = KST 화~토 08:20 (정식 07:30 실행이 07:56~59 에 끝난 뒤 · 야후 겹침 없게. 옛 17:40 은 한국 낮 내내 하루 늦었다)
@@ -28,9 +30,13 @@ on:
       market:
         description: '새로 만들 시장 (all · us · kr)'
         default: 'all'
+      scheduled:
+        description: 'Cloudflare Worker 용 — 정기 실행처럼(게시 변수 · 중복 건너뛰기) (사람은 끄고 쓴다)'
+        default: 'false'
 
 permissions:
   contents: write
+  actions: read   # 중복 건너뛰기(check)가 실행 목록을 읽는다
 
 concurrency:
   group: quick-data
@@ -41,10 +47,33 @@ env:
   OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}   # 운영 기록 — 대시보드 AI 칸에 잡히게 (2026-11-15)
   OPS_CF_KV_NAMESPACE_ID: ${{ secrets.OPS_CF_KV_NAMESPACE_ID }}
   OPS_CF_API_TOKEN: ${{ secrets.OPS_CF_API_TOKEN }}
-  DO_PUBLISH: ${{ (github.event_name == 'schedule' && vars.QUICK_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+  DO_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == 'true') && vars.QUICK_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
 
 jobs:
+  # 같은 날 두 번 막기 — Cloudflare Worker(infra/cron-trigger)와 GitHub cron 이 둘 다 건다(GitHub cron 은 자주 늦거나 빠진다).
+  # 정기 실행(schedule · Worker 의 scheduled=true)만: 최근 6시간 안에 이 워크플로가 이미 성공했으면 건너뛴다. 사람이 거는 실행은 늘 돈다 (2026-11-15 사용자)
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.dup.outputs.skip }}
+    steps:
+      - id: dup
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == 'true' }}
+        run: |
+          skip=false
+          if [ "$SCHEDULED" = true ]; then
+            since=$(date -u -d '6 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+            n=$(gh run list -R "$GITHUB_REPOSITORY" --workflow quick-data.yml --status success -L 20 --json createdAt,databaseId,displayTitle \
+                -q "[.[] | select(.createdAt >= \"$since\" and .databaseId != $GITHUB_RUN_ID and (.displayTitle | endswith(\"· $MARKET\")))] | length" || echo 0)
+            [ "${n:-0}" -gt 0 ] && skip=true
+          fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"; echo "종목 주가 중복 건너뛰기: $skip"
+
   quick:
+    needs: check
+    if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 80   # 첫 주: 상세 값 채우기 35분 + 기업 소개 · 전용 페이지(하루 50쪽 약 5분) (2026-11-15)
     steps:
