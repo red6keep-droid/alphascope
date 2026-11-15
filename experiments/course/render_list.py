@@ -1,6 +1,7 @@
 """주식 공부 목록 페이지(/p/study.html) — 과정별 편 목록 (2026-11-15 사용자: 목록 페이지도 목업에).
 
-    .venv/bin/python experiments/course/render_list.py      # output/mock_study_list.html
+    .venv/bin/python experiments/course/render_list.py              # output/mock_study_list.html
+    .venv/bin/python experiments/course/render_list.py --publish    # Blogger 고정 페이지 /p/study.html 만들기 · 고치기 (바뀐 것만, 2026-11-15 사용자)
 
 - 커리큘럼 문서 4절: 맨 위 캐릭터 그림(banner/study_head.webp, 사용자 그림) + 한 줄 소개 → 과정 카드 → 편 목록. 나온 편 = 줄 전체 링크, 안 나온 편 = 회색 `준비 중`.
 - 나온 편 주소 = published.json (publish_course.py 가 발행 때 씀). 편 목록 = 아래 COURSES (커리큘럼 문서 2절). 편이 나올 때만 갱신.
@@ -102,9 +103,34 @@ def page(urls):
             + dk.WRAP_OPEN + head + cards + dk.WRAP_CLOSE)
 
 
+KEY, TITLE = "study", "주식 공부"   # 주소 /p/study.html — 처음 만들 때 영문 이름으로 정해진다
+
+
+def publish(urls, dry=False):
+    """고정 페이지 게시 — 종목 분석 게시기(stock-radar/publish_pages.publish)를 그대로(429 백오프 · 해시가 같으면 건너뜀). 그림 = gh-pages images/study/."""
+    root = os.path.dirname(os.path.dirname(HERE))
+    sys.path[:0] = [os.path.join(root, "experiments", "stock-radar"), os.path.join(root, "experiments", "daily-report")]
+    import publish_course as PC
+    import publish_pages as PP
+    import universe as U
+    RC.IMG_BASE = PC.IMG_BASE
+    PC._env()
+    body = os.path.join(HERE, "output", "study_page.html")
+    open(body, "w", encoding="utf-8").write(page(urls))
+    data = os.path.join(HERE, "output")   # 발행 기록(해시) — git 제외 폴더
+    os.makedirs(data, exist_ok=True)
+    PP.targets = lambda only=None: [(KEY, TITLE, KEY, f"{U.BLOG}/p/{KEY}.html", body)]
+    PP.HASHES = os.path.join(data, "page_hashes.json")
+    PP.PAGES_LIVE = os.path.join(data, "pages_live.json")
+    PP._body = lambda path: open(path, encoding="utf-8").read()
+    return PP.publish(dry=dry)
+
+
 def main():
     p = os.path.join(HERE, "published.json")
     urls = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else {}
+    if "--publish" in sys.argv or "--dry" in sys.argv:
+        sys.exit(0 if publish(urls, dry="--dry" in sys.argv) else 1)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     path = dk.write_mock(page(urls), OUT, "주식 공부")
     if path:
