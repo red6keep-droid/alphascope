@@ -8,6 +8,7 @@ name: Quick stock data (간단 정보 853종목)
 #     SEC companyfacts 하루 100곳 · DART 하루 30곳(새 보고서만) + 기업개황 60곳 + 공시 목록 약 20번. FRED 하루 한 번.
 #   - 결과 = 기록을 남기지 않는 브랜치 quick-us · quick-kr 에 통째로(force) — 저장소가 커지지 않는다. 시장별로 나눈 것은 한 묶음이 jsDelivr 150MB 안에 들게.
 #     커밋 둘: ① 데이터 ② version.json 에 ①의 커밋 번호. 브라우저는 @quick-us/version.json(purge) → @<커밋>/us/UBER.html 로 읽는다.
+#   - 예비 = Cloudflare Pages alpha-scope.pages.dev(2026-11-15 사용자, 블로그 red6 계정): 같은 조각을 매일 배포, 브라우저는 Pages 먼저 → jsDelivr → GitHub 원본.
 #   - 정식 자료(비교 묶음 · 자금 흐름 · 시장 일정 · 모은 기사)는 비공개 상태 저장소에서 읽기만. 간단 종목 저장값은 비공개 quick-state(다시 모을 수 있는 캐시라 기록 없이 덮어씀).
 #   - 게시 = 저장소 변수 QUICK_PUBLISH=true. 없으면 그림자 모드(만들기만 하고 올리지 않음, 표본만 아티팩트). 저장값은 그림자 모드에서도 남긴다(첫 주 채우기가 이어지게).
 #   - 받은 종목이 명단의 90% 밖이면 collect_quick.py 가 종료 코드 3 → 올리지 않고 전날 데이터 그대로.
@@ -121,6 +122,23 @@ jobs:
           name: quick-sample
           path: /tmp/sample
           retention-days: 3
+
+      # Cloudflare Pages alpha-scope.pages.dev — jsDelivr 예비이자 먼저 읽는 곳 (2026-11-15 사용자: 용량 · 전송량 덜기, 이사 아님).
+      # 블로그 Cloudflare 계정(red6)만 — 계정 ID 고정, 토큰 = Pages 쓰기 권한만. 독자가 보는 페이지가 아직 없어 그림자 모드에서도 올린다(확인용).
+      # 배포 하나 = 사이트 전체: us/ · kr/ · _headers(CORS · 검색 제외) · robots.txt · 404.html. 바뀐 파일만 올라간다. 실패해도 jsDelivr 길은 그대로.
+      - name: Publish Cloudflare Pages (spare)
+        if: steps.collect.outputs.code == '0'
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_PAGES_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: a8718df7edc5f8f6ce88e75b6545e5cb
+        run: |
+          [ -z "$CLOUDFLARE_API_TOKEN" ] && { echo "CF_PAGES_API_TOKEN 없음 — Pages 건너뜀"; exit 0; }
+          mkdir -p /tmp/cfp && cp -r /tmp/qd/us /tmp/qd/kr /tmp/cfp/ && cp -a experiments/stock-quick/pages_static/. /tmp/cfp/
+          echo "Pages 파일 $(find /tmp/cfp -type f | wc -l)개 · $(du -sh /tmp/cfp | cut -f1)"
+          npx --yes wrangler@4.162.0 pages deploy /tmp/cfp --project-name alpha-scope --branch main --commit-dirty=true
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://alpha-scope.pages.dev/us/UBER")
+          echo "확인 us/UBER → $code"; [ "$code" = 200 ] || echo "::warning::Pages 확인 실패 ($code) — 독자는 jsDelivr 로 읽는다"
 
       - name: Publish quick-us · quick-kr (no history)
         if: env.DO_PUBLISH == 'true' && steps.collect.outputs.code == '0'
