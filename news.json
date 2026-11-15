@@ -1,11 +1,37 @@
 {
-  "updated_at": "2026-11-15 01:18:56 UTC",
+  "updated_at": "2026-11-15 12:46:30 UTC",
   "items": [
+    {
+      "title": "Anthropic’s IPO lands as the embattled AI trade looks for a much-needed bright spot",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/15/anthropic-ipo-is-make-or-break-for-the-technology-industry.html",
+      "published": "2026-11-15 12:00:01",
+      "title_ko": "앤스로픽의 IPO는 흔들리는 AI 거래가 절실히 필요한 밝은 빛을 찾는 중에 이루어져",
+      "summary_ko": "기술 산업에서 AI 연구소에 막대한 투자를 하며 긍정적 모멘텀을 모색 중",
+      "lines": [
+        "앤트로픽 나스닥 상장 목요일 예정",
+        "아마존 초기 투자자 참여",
+        "공모가 70달러에서 78달러 전망"
+      ]
+    },
+    {
+      "title": "Megaspeed says Alice Huang left in 2025 as it launches internal probe into reports about its business",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/15/megaspeed-alice-huang-probe-nvidia-scandal.html",
+      "published": "2026-11-15 08:34:46",
+      "title_ko": "메가스피드, 사업 관련 보도에 대한 자체 조사 착수하며 앨리스 황이 2025년에 떠났다고 밝혀",
+      "summary_ko": "싱가포르 기반 클라우드 컴퓨팅 기업은 엔비디아의 젠슨 황과 전 임원 간의 보도로 감시 강화 직면",
+      "lines": [
+        "앨리스 황 2025년 8월 퇴사",
+        "젠슨 황 11월 12일 사임",
+        "메가스피드 내부 조사 착수"
+      ]
+    },
     {
       "title": "Nationwide ground stop followed contractor upgrade to L3Harris telecommunication system: DOT’s Duffy",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/14/faa-ground-stop-flights-resume-delays.html",
-      "published": "2026-11-14 23:21:21",
+      "published": "2026-11-15 02:53:59",
       "title_ko": "FAA 운항 중단 해제 후에도 항공편 차질 지속, 일부 대학 미식축구 경기 연기",
       "summary_ko": "",
       "lines": [
@@ -24,6 +50,19 @@
       "lines": [
         "스타십 15차 시험 비행에서 상단부 회수 성공",
         "텍사스 스타베이스 발사대의 기계식 팔을 이용한 로켓 회수"
+      ]
+    },
+    {
+      "title": "'Root cause’ of nationwide ground stop is unknown, FAA says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/root-cause-of-nationwide-ground-stop-is-unknown-faa-says.html",
+      "published": "2026-11-14 22:54:47",
+      "title_ko": "전국 항공기 운항 중단의 근본 원인은 불명확하다고 연방항공청은 밝혀",
+      "summary_ko": "라우터와 네트워킹 장비가 문제에 연관되었을 가능성 제기",
+      "lines": [
+        "미국 전역 항공편 운항 중단의 정확한 원인 미확정",
+        "라우터와 네트워킹 장비가 기술적 장애와 연관된 상태",
+        "연방항공청장의 발표에 따른 항공기 운항 중단 조치"
       ]
     },
     {
@@ -51,18 +90,6 @@
       "lines": [
         "S&P 500 주간 2.5% 상승 기록",
         "나스닥 지수 주간 2.3% 상승"
-      ]
-    },
-    {
-      "title": "Nvidia board urged to consider 'potential return of Jensen Huang' by two major investors",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/nvidia-investors-jensen-huang-return-board-letter.html",
-      "published": "2026-11-14 17:46:06",
-      "title_ko": "두 대형 투자자의 엔비디아 이사회 향한 '젠슨 황 복귀 검토' 촉구",
-      "summary_ko": "6월 30일 기준 약 21억 3천만 달러어치 주식을 공시한 두 엔비디아 투자자가 젠슨 황 사임 후 신중한 리더십 탐색 촉구",
-      "lines": [
-        "엔비디아 주주 2곳의 젠슨 황 복귀 촉구 공개 서한 발표",
-        "알티미터 캐피털과 아트레이데스 매니지먼트의 엔비디아 지분 보유 공개"
       ]
     },
     {
@@ -101,32 +128,20 @@
       ]
     },
     {
-      "title": "마이크로소프트 IT 시스템 중단 사태",
-      "title_ko": "마이크로소프트 IT 시스템 중단 사태",
-      "summary_ko": "마이크로소프트의 서비스 중단으로 트레이더들이 업무에 차질을 빚고 휴식 시간을 가짐",
+      "title": "엔비디아 대중국 수출 통제 및 조사",
+      "title_ko": "엔비디아 대중국 수출 통제 및 조사",
+      "summary_ko": "미국 법무부와 의회가 엔비디아의 기술 유출 및 대중국 수출 통제 위반 여부를 조사 중",
       "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=RY69c67XJpQ",
-      "published": "2026-11-14 16:19:48",
+      "link": "https://www.youtube.com/watch?v=b5oQu_60ZdU",
+      "published": "2026-11-14 15:53:09",
       "kind": "media",
-      "tag": "수급 · 시장 구조",
-      "direction": "neutral",
-      "n_channels": 1,
+      "tag": "규제 · 산업정책",
+      "direction": "negative",
+      "n_channels": 2,
       "lines": [
-        "블룸버그 : 마이크로소프트 장애로 트레이더들이 전화와 팩스로 복귀",
-        "참여자들 : 시스템 중단 기간을 커피와 운동을 즐기는 휴식일로 삼음",
-        "버거킹 : 트러블슈팅 담당자들에게 와퍼를 먹으며 쉬라고 트윗함"
-      ]
-    },
-    {
-      "title": "Trump doesn’t plan to raise Nvidia, spy issue during China trip: U.S. officials",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/trump-nvidia-huang-china.html",
-      "published": "2026-11-14 15:36:47",
-      "title_ko": "트럼프, 중국 방문 시 엔비디아 및 스파이 문제 제기 계획 없어: 미국 관료들",
-      "summary_ko": "중국인 스파이 의심 인물을 포함한 여러 스캔들 보도 이후 엔비디아 CEO 젠슨 황이 이번 주 사임",
-      "lines": [
-        "트럼프 미 대통령의 중국 방문",
-        "일론 머스크의 아시아태평양경제협력체 정상회의 동행 예정"
+        "에드 루들로 발언 : 미 법무부의 방첩 조사 대상에 젠슨 황과 앨리스 황의 관계 포함",
+        "에드 루들로 발언 : 미 의회는 엔비디아 법무팀과 상무부 대표로 청문회 요청 확대",
+        "에드 루들로 발언 : 금지된 수출 칩이 중국 본토로 유입되었는지 여부 조사 중"
       ]
     },
     {
@@ -153,20 +168,6 @@
         "그랜드 테프트 오토 VI 개발 비용 10억 달러 초과 (예상)",
         "센서타워 11월 13일 기준 사전 주문 1200만 건 추산 (예상)",
         "모건스탠리 2027년 3월까지 4000만 장 판매 전망"
-      ]
-    },
-    {
-      "title": "Heating oil prices are up 59% from last winter. The spike is 'crushing folks,' Maine nonprofit says",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/heating-oil-price-spike-household-budgets.html",
-      "published": "2026-11-14 14:30:01",
-      "title_ko": "난방용 등유 가격 지난 겨울 대비 59% 급등… 메인주 비영리단체 \"주민들 짓밟히고 있어\"",
-      "summary_ko": "지속되는 인플레이션으로 가계 예산이 압박을 받는 가운데 일부 주민들이 겨울 시작 전 긴급 지원 요청",
-      "lines": [
-        "11월 9일 기준 전국 난방유 평균 가격 갤런당 약 5.91달러 기록",
-        "전국 난방유 평균 가격 전년 동기 대비 59% 상승",
-        "메인주 난방유 평균 가격 갤런당 약 약 5.83달러 기록",
-        "메인주 난방유 평균 가격 전년 동기 대비 약 75% 급등"
       ]
     }
   ]

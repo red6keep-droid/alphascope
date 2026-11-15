@@ -3443,5 +3443,135 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-15T01:18:56.361711+00:00",
   "n_src": 900
+ },
+ "3effc3d40526": {
+  "lines": [
+   "앤트로픽 나스닥 상장 목요일 예정",
+   "아마존 초기 투자자 참여",
+   "공모가 70달러에서 78달러 전망"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "AMZN"
+    ],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-15T12:46:29.433162+00:00",
+  "n_src": 900
+ },
+ "9a8a0a7e5148": {
+  "lines": [
+   "앨리스 황 2025년 8월 퇴사",
+   "젠슨 황 11월 12일 사임",
+   "메가스피드 내부 조사 착수"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-15T12:46:29.433162+00:00",
+  "n_src": 900
+ },
+ "b3730a3128e5": {
+  "lines": [
+   "디지털 노마드 국가 순위 헝가리 5위 기록"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-15T12:46:29.433162+00:00",
+  "n_src": 900
+ },
+ "c93d4f671850": {
+  "lines": [
+   "미국 전역 항공편 운항 중단의 정확한 원인 미확정",
+   "라우터와 네트워킹 장비가 기술적 장애와 연관된 상태",
+   "연방항공청장의 발표에 따른 항공기 운항 중단 조치"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-15T12:46:30.351328+00:00",
+  "n_src": 900
  }
 }
