@@ -80,7 +80,7 @@ def is_char(tok):
 # 소품 아이콘 (2026-11-15 사용자 시트 → cut_icons.py). 초안은 지금처럼 이모지를 적고, 아래 표에 있는 이모지는 그림으로 바꾼다 — 없는 이모지는 그대로
 ICONS = {
     "🎬": "theater", "🤔": "question", "📏": "ruler", "📉": "chart", "📈": "chart", "📊": "chart",
-    "⚖": "scale", "🔍": "magnifier", "💡": "bulb", "🗺": "map", "✅": "check", "🎣": "hook", "✌": "calendars", "📅": "calendars",
+    "⚖": "scale", "🔍": "magnifier", "💡": "bulb", "🗺": "map", "✅": "check", "🎣": "hook", "✌": "calendars", "📅": "calendars", "📝": "memo",
 }
 ICON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons")
 ICON_PX = {"h2": 36, "check": 22}   # 소제목 · 체크 목록 글머리. 소제목 = 바탕 없이 네모 아이콘 36 (2026-11-15 사용자: 동그라미 안 28 은 잘려 보임 → 동그라미 없앰)
