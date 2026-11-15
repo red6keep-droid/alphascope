@@ -1577,7 +1577,7 @@ def _stock_now(fc, st):
     price = ""
     if q:
         col = dk.UP if q["chg"] > 0 else dk.DOWN if q["chg"] < 0 else "#111"
-        tri = "▲ " if q["chg"] > 0 else "▼ " if q["chg"] < 0 else ""
+        tri = dk.tri_span(q["chg"] > 0, int(dk.NAME[:-2])) if q["chg"] else ""   # 삼각형 = 글자 80% 정수 px · 위로 1 · 숫자와 2 (가이드 5절, 2026-11-15 사용자: 그대로 크기라 규칙 밖)
         price = (f'<b style="flex:none;color:#111;">{_won_or_usd(fc, q["close"])}</b>'
                  f'<span style="flex:none;color:{col};font-weight:600;">{tri}{abs(q["chg"]):.2f}%</span>')
     inner = (f'<span style="flex:none;display:flex;">{_logo_for(sym, fc.get("subject", ""), 22).replace("margin-right:6px;", "")}</span>'
@@ -1643,7 +1643,9 @@ def _compare_chart(fc, st):
     labels = [md(d) if i in at else "" for i, d in enumerate(days)]
     series = [(nm, vals, CMP_COLORS[i] if i < 2 and nm != "S&P 500" else dk.CHART_CMP, "solid" if i < 2 and nm != "S&P 500" else "dash")
               for i, (nm, vals) in enumerate(cp["lines"])]
-    gr = dk.trend_card(f'{md(cp["base"])} 종가 대비 (%)', labels, series, lambda v: f"{v:+.1f}%".replace("-", "−"), ends_only=True)
+    # 제목 = 그래프 이름 (2026-11-15 사용자: 종목 줄 `▼ 4.76%`(전날 대비)와 그래프 끝 `▲ 0.5%`(급등 전날부터)가 같은 값처럼 읽혀 헷갈림 — 옛 `11.11 종가 대비 (%)`)
+    shock = SHOCK.get(1 if (fc.get("gap") or 0) > 0 else -1) if fc.get("kind") == "after" and fc.get("gap") else ""
+    gr = dk.trend_card(f'{shock} 전날({md(cp["base"])})부터 움직인 폭 (%)' if shock else f'{md(cp["base"])} 종가부터 움직인 폭 (%)', labels, series, lambda v: f"{v:+.1f}%".replace("-", "−"), ends_only=True)
     if not gr:
         return ""
     gr = gr.replace(f"margin:0 {dk.CHART_CARD_X}px;", "margin:0;", 1)

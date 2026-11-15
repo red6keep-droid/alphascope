@@ -1846,7 +1846,7 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
     axis_w = int(max(text_px(tf(t), 12) for t in ticks) + 10)
     axis = "".join(f'<span style="position:absolute;right:0;top:{y(t) - 9:.0f}px;white-space:nowrap;font-size:12px;line-height:18px;color:{NOTE};">{esc(tf(t))}</span>' for t in ticks)
     dashed = lambda kind: False   # noqa: E731 — 점선 폐지: 비교 대상 · 기준선도 실선 1 (2026-11-14 사용자 "점선은 다 삭제, 실선 1픽셀"). kind "dash" 는 이제 '비교 대상' 뜻만
-    cmp = lambda kind: kind in ("dash", "stepdash", "thin")   # noqa: E731 — 비교 대상인지(끝 값 · 점 없음 · 범례 `비교 대상 :`). thin = 얇은 실선 비교 (2026-11-13 사용자: "점선 두 개는 눈이 아프다")
+    cmp = lambda kind: kind in ("dash", "stepdash", "thin", "guide")   # noqa: E731 — guide = 기준선(끝 값 없음 · 범례 이름 그대로, 2026-11-15 증시 전망 비교 그래프) — 비교 대상인지(끝 값 · 점 없음 · 범례 `비교 대상 :`). thin = 얇은 실선 비교 (2026-11-13 사용자: "점선 두 개는 눈이 아프다")
 
     def path_d(pts, X, kind):
         d = f"M{X(pts[0][0]):.1f},{y(pts[0][1]):.1f}"
@@ -1924,7 +1924,7 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
             dash = ' stroke-dasharray="6 5"' if dashed(kind) else ""
             paths += (f'<path d="{path_d(pts, X, kind)}" fill="none" stroke="{col}" stroke-width="{2 if k == 0 or not cmp(kind) else 1}" stroke-linejoin="round" stroke-linecap="round"{dash} '
                       f'vector-effect="non-scaling-stroke"/>')
-            if not cmp(kind) or ends_only:   # ends_only = 비교 대상(점선)도 끝 값 (증시 전망 비교 그래프 S&P 500)
+            if not cmp(kind) or (ends_only and kind != "guide"):   # ends_only = 비교 대상(점선)도 끝 값 (증시 전망 비교 그래프 S&P 500)
                 ends.append((k, pts[-1][0], pts[-1][1], col))
         dots, labs, used = "", "", []
         if ends_only:   # 날마다 작은 동그라미 (2026-11-11 사용자: "일자별로 동그라미는 있어야") — 실선 계열만, 끝 점은 아래에서 크게. 점 = 6 · 테두리 2 (sparse 의 r 3 · 선 2 와 같은 크기)
@@ -1967,7 +1967,7 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
     for k, (nm, _, col, kind) in enumerate(series):
         if legend_plain and k == 0:   # 기준선 두 개 선(증시 전망) — 주인공 선 = 그래프 제목과 같은 말이라 칩을 뺀다 (2026-11-15 사용자: 범례가 `넘겨 보기` 와 같은 줄)
             continue
-        name = f"비교 대상 : {nm}" if cmp(kind) and not legend_plain else nm   # 기준선은 비교 대상이 아니라 기준 — `상승 기준` · `하락 기준` 그대로
+        name = f"비교 대상 : {nm}" if cmp(kind) and not legend_plain and kind != "guide" else nm   # 기준선은 비교 대상이 아니라 기준 — `상승 기준` · `하락 기준` 그대로
         dot = "" if cmp(kind) or not sparse else f'<circle cx="9" cy="5" r="3" fill="#fff" stroke="{col}" stroke-width="2"/>'
         line = (f'<svg width="18" height="10" aria-hidden="true"><line x1="1" x2="17" y1="5" y2="5" stroke="{col}" stroke-width="{1 if cmp(kind) else 2}"'
                 + (' stroke-dasharray="4 3"' if dashed(kind) else "") + f' stroke-linecap="round"/>{dot}</svg>')
