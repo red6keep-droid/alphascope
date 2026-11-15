@@ -1251,7 +1251,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 
   <!-- 주식 공부 배너 (2026-11-15 사용자) — 시총 TOP 10 아래 전폭(11-15 사용자: 리포트 카드 아래 → 시총 TOP 10 아래). 미국 · 한국 화면 모두. 그림 = 사용자 제작(experiments/course/banner) -->
   <section class="study-banner" aria-label="주식 공부">
-    <a href="/p/study.html"><img src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp" width="1110" height="344" loading="lazy" decoding="async" alt="주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다"/></a>
+    <a href="/search/label/%EC%A3%BC%EC%8B%9D%20%EA%B3%B5%EB%B6%80"><img src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp" width="1110" height="344" loading="lazy" decoding="async" alt="주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다"/></a>
   </section>
 
   </div><!-- /home-cards -->
@@ -4142,6 +4142,14 @@ window.asTitleBack = function (ev, fallback) {
   else if (kind === 'home' || (kind === 'back' && (fromHome || !lu))) setNav('홈으로', homeUrl);
   else if (kind === 'back') setNav('목록으로', lu.getAttribute('data-list-url'));
   else if (lu) navs.forEach(function (a) { a.href = lu.getAttribute('data-list-url'); });
+  /* 머리 줄 글자를 메뉴 이름으로 (2026-11-15 주식 공부 발행: 본문 [data-head-label] — 글 제목은 본문 맨 위 큰 제목, 머리 줄은 `주식 공부`).
+     글 제목(검색 · 공유 · <title>)은 그대로, 화면의 머리 줄 글자만. 제목 칸 정리 스크립트가 끝난 뒤에도 한 번 더(load) */
+  var hl = document.querySelector('.post-body [data-head-label]');
+  if (hl) {
+    var setHead = function () { var l = document.querySelector('.post-title-label') || document.querySelector('.post-title'); if (l) l.textContent = hl.getAttribute('data-head-label'); };
+    setHead();
+    window.addEventListener('load', setHead);
+  }
   [].slice.call(document.querySelectorAll('.post-nav-top')).forEach(function (b) {
     b.addEventListener('click', function () {
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
