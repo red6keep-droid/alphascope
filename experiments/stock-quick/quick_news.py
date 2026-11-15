@@ -120,7 +120,7 @@ def main():
         sys.exit("FINNHUB_API_KEY 없음")
 
     now = datetime.datetime.now(datetime.timezone.utc)
-    hours = HOURS * 2 if now.astimezone(datetime.timezone(datetime.timedelta(hours=9))).weekday() == 0 else HOURS   # 월요일 = 토요일 실행 뒤 48시간(토 오후 ~ 일요일 뉴스) — 일요일엔 실행이 없다 (2026-11-15 사용자)
+    hours = HOURS * 3 if now.astimezone(datetime.timezone(datetime.timedelta(hours=9))).weekday() == 1 else HOURS   # 화요일(KST 06:40) = 토요일 아침 실행 뒤 72시간(주말 · 월요일 미국 장) — 일 · 월 아침엔 실행이 없다 (2026-11-15 사용자)
     cut = now - datetime.timedelta(hours=hours)
     keep = (now - datetime.timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
     store = {k: v for k, v in _load(news_p, {}).items() if v.get("published_at", "") >= keep}
