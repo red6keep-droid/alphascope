@@ -1302,7 +1302,7 @@ def lead(r):
     if r.get("top"):
         tu = sum(1 for s in r["top"] if s["ret_1d"] > 0)
         sents.append(f"시총 상위 10개는 {_share_word(tu, len(r['top']))}.")
-    head = f'<div style="color:#111;font-weight:700;padding-left:{_dk.ALIGN_PX}px;">{_dk.esc(one)}</div>'
+    head = f'<div data-home-summary="1" style="color:#111;font-weight:700;padding-left:{_dk.ALIGN_PX}px;">{_dk.esc(one)}</div>'   # 홈 한국 증시 카드가 읽는 한 줄 결론 (2026-11-15 — 미국 카드처럼 결론, 옛 = 검색용 요약 첫 문장 숫자)
     para = (f'<div style="margin:0 0 6px;padding-left:{_dk.ALIGN_PX}px;word-break:keep-all;">'
             + " ".join(_dk.tint(_dk.esc(x)) for x in sents) + "</div>")
     return f'<div data-cards="1"><div style="margin:16px 0 8px;line-height:{_dk.LH_BODY};">{head}</div></div>' + para

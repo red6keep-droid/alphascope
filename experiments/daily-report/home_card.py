@@ -89,7 +89,12 @@ def report_sections(soup):
     if ins is not None:
         out["(종합)"] = [ins]
     seo = soup.select_one("[data-seo-lead]")
-    if seo is not None:
+    head = soup.select_one("[data-home-summary]")
+    if head is not None:   # 한국 증시 리포트 한 줄 결론 (2026-11-15) — 홈 한국 카드(테마 map '(요약)')가 미국 카드처럼 결론을 싣는다. 옛 글은 아래 검색용 요약 첫 문장
+        p = BeautifulSoup("<p></p>", "html.parser").p
+        p.string = _ws(head.get_text())
+        out["(요약)"] = [p]
+    elif seo is not None:
         st = _ws(seo.get_text())
         se = st.find("다. ")
         p = BeautifulSoup("<p></p>", "html.parser").p
