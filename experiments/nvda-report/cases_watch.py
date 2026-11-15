@@ -25,7 +25,20 @@ import db
 ENTRIES_URL = "https://www.courtlistener.com/api/rest/v4/docket-entries/"
 
 # "<구절> set for M/D/YYYY" — 구절이 결정 성격이면 일정으로 채택
-SET_FOR_RE = re.compile(r"([^.;]{0,120}?)\b(?:set|reset|continued) for\s+(\d{1,2})/(\d{1,2})/(\d{4})", re.I)
+# 날짜 표기 둘: `set for 11/19/2026`(캘리포니아 북부 등) · `set for November 10, 2026`(뉴저지 등 — 2026-11-15 코인베이스 사건 문서에서 확인, 예전엔 못 잡았다)
+_MONTHS = {m: i for i, m in enumerate("january february march april may june july august september october november december".split(), 1)}
+SET_FOR_RE = re.compile(r"([^.;]{0,120}?)\b(?:set|reset|continued) for\s+(?:(\d{1,2})/(\d{1,2})/(\d{4})|([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4}))", re.I)
+
+
+def _set_for_day(m):
+    """SET_FOR_RE 일치 → date 또는 None."""
+    try:
+        if m.group(2):
+            return datetime.date(int(m.group(4)), int(m.group(2)), int(m.group(3)))
+        mon = next((i for name, i in _MONTHS.items() if name.startswith(m.group(5).lower()[:3]) and m.group(5).lower() == name[:len(m.group(5))]), None)
+        return datetime.date(int(m.group(7)), mon, int(m.group(6))) if mon else None
+    except ValueError:
+        return None
 MILESTONES = [  # (구절 패턴, 한국어 라벨) — 위에서부터 첫 일치
     (re.compile(r"trial", re.I), "재판"),
     (re.compile(r"summary judgment", re.I), "약식판결 심리"),
@@ -99,13 +112,22 @@ def _headers():
 
 
 def fetch_entries(docket_id, headers):
-    r = requests.get(ENTRIES_URL, params={"docket": docket_id, "order_by": "-date_filed"}, headers=headers,
-                     timeout=config.COURTLISTENER_TIMEOUT)
-    if r.status_code == 429:
-        print(f"  [court] 429 — docket {docket_id} 건너뜀")
-        return []
-    r.raise_for_status()
-    return r.json().get("results", [])
+    """사건 문서 목록. CourtListener 한도 = **1분에 5번** (2026-11-15 실측: `Rate limit exceeded: 5/min. Expected available in 36 seconds`).
+    429 면 서버가 알려 준 시간(retry-after)만큼 기다렸다 다시 — 예전엔 바로 건너뛰어 6번째 사건부터 한 번도 못 읽었다(17건 중 12건)."""
+    import time
+    for attempt in range(3):
+        r = requests.get(ENTRIES_URL, params={"docket": docket_id, "order_by": "-date_filed"}, headers=headers,
+                         timeout=config.COURTLISTENER_TIMEOUT)
+        if r.status_code != 429:
+            r.raise_for_status()
+            return r.json().get("results", [])
+        wait = min(int(r.headers.get("retry-after") or 30) + 2, 70)
+        if attempt == 2:
+            break
+        print(f"  [court] 429 — docket {docket_id} {wait}초 뒤 다시")
+        time.sleep(wait)
+    print(f"  [court] 429 — docket {docket_id} 건너뜀 (두 번 기다려도 한도)")
+    return []
 
 
 def entry_text(e):
@@ -133,11 +155,8 @@ def milestones_from(entries, today):
             label = next((ko for pat, ko in MILESTONES if pat.search(phrase)), None)
             if not label:
                 continue
-            try:
-                day = datetime.date(int(m.group(4)), int(m.group(2)), int(m.group(3)))
-            except ValueError:
-                continue
-            if day <= today or label in found:
+            day = _set_for_day(m)
+            if not day or day <= today or label in found:
                 continue
             found[label] = (day.isoformat(), e.get("entry_number"), e.get("date_filed"))
     return found

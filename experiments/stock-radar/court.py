@@ -26,6 +26,7 @@ DATA = os.path.join(_HERE, "data", "court.json")
 SURVEY_MD = os.path.join(_HERE, "court_survey.md")       # 조사 결과 · 진행 기록 — 한 번 하는 일이라 끊겨도 이어 간다 (2026-11-01 사용자)
 SURVEY_JSON = os.path.join(_HERE, "court_survey.json")   # 종목마다 끝나는 즉시 저장, 다시 돌리면 끝난 종목은 건너뜀
 SEARCH_URL = "https://www.courtlistener.com/api/rest/v4/search/"
+GAP = 13   # 사건 조회 사이 초 — 한도 1분에 5번(12초에 1번)보다 조금 길게
 
 # 법원 당사자 이름 검색어 (사건명에 실제로 쓰이는 이름 — 옛 이름 포함). 정규식은 사건명 `A v. B` 의 B(피고) 쪽 확인용
 PARTY = {
@@ -144,18 +145,22 @@ def fetch(day=None):
         print("[court] COURTLISTENER_TOKEN 없음 — 전에 받은 일정만")
         return store
     today = datetime.date.fromisoformat(day) if day else datetime.date.today()
-    n = 0
+    n = tried = 0
+    missed = []
     for sym, cases in watch().items():
         for c in cases:
             key = str(c["docket_id"])
-            if n:
-                time.sleep(3)   # 사건 사이 간격 — 짧게 몰리면 CourtListener 가 429 로 막는다 (2026-11-10, 17건)
+            if tried:
+                time.sleep(GAP)   # 사건 사이 간격 — CourtListener 한도 1분에 5번 (2026-11-15 실측). 옛 3초는 6번째 사건부터 전부 429 였다
+            tried += 1
             try:
                 entries = CW.fetch_entries(key, headers)
             except Exception as e:  # noqa: BLE001
                 print(f"[court] {sym} {c['name']} 조회 실패: {str(e)[:100]}")
+                missed.append(f"{sym} {c['name'][:24]}")
                 continue
             if not entries:
+                missed.append(f"{sym} {c['name'][:24]}")
                 continue
             ms = CW.milestones_from(entries, today)
             store[key] = {"sym": sym, "name": c["name"], "dates": sorted(({"label": k, "day": v[0]} for k, v in ms.items()), key=lambda x: x["day"]),
@@ -163,7 +168,10 @@ def fetch(day=None):
             n += 1
     os.makedirs(os.path.dirname(DATA), exist_ok=True)
     json.dump(store, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    print(f"[court] 추적 사건 {n}건 읽음")
+    total = sum(len(v) for v in watch().values())
+    print(f"[court] 추적 사건 {n}/{total}건 읽음" + (f" · 못 읽음 {len(missed)}: {', '.join(missed)}" if missed else ""))
+    if missed and len(missed) * 2 > total:
+        print(f"::warning::[court] 소송 일정 절반 넘게 못 읽음 ({len(missed)}/{total}) — 한도 · 토큰 확인")
     return store
 
 
