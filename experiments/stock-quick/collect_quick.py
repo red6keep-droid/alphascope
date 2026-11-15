@@ -50,6 +50,9 @@ def load_env():
         for line in open(p, encoding="utf-8"):
             if "=" in line and not line.lstrip().startswith("#"):
                 k, v = line.rstrip("\n").split("=", 1)
+                v = v.strip()
+                if not v.startswith(("'", '"')):
+                    v = re.split(r"\s+#", v, 1)[0]   # 줄 끝 메모(` # …`) 떼기 — python-dotenv 와 같게 (2026-11-15: 메모까지 붙은 Gemini 키로 400)
                 os.environ.setdefault(k.strip(), v.strip().strip('"\''))
 
 
