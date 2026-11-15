@@ -76,6 +76,27 @@ def is_char(tok):
     return bool(re.fullmatch(r"\{(.+?)\}", tok or "")) and tok[1:-1] in CHARS
 
 
+# 소품 아이콘 (2026-11-15 사용자 시트 → cut_icons.py). 초안은 지금처럼 이모지를 적고, 아래 표에 있는 이모지는 그림으로 바꾼다 — 없는 이모지는 그대로
+ICONS = {
+    "🎬": "theater", "🤔": "question", "📏": "ruler", "📉": "chart", "📈": "chart", "📊": "chart",
+    "⚖": "scale", "🔍": "magnifier", "💡": "bulb", "🗺": "map", "✅": "check", "🎣": "hook", "✌": "calendars", "📅": "calendars",
+}
+ICON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons")
+ICON_PX = {"h2": 28, "check": 22}   # 소제목 동그라미(40) 안 · 체크 목록 글머리
+
+
+def icon_html(tok, where):
+    """이모지 → 소품 그림(목업은 data URI, 발행 때 gh-pages 주소로). 표에 없으면 이모지 그대로."""
+    name = ICONS.get((tok or "").replace("\ufe0f", ""))
+    if not name:
+        return tok
+    with open(os.path.join(ICON_DIR, name + ".webp"), "rb") as f:
+        src = "data:image/webp;base64," + base64.b64encode(f.read()).decode()
+    px = ICON_PX[where]
+    va = "" if where == "h2" else "vertical-align:-5px;margin-right:4px;"
+    return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:{"block" if where == "h2" else "inline-block"};width:{px}px;height:{px}px;{va}">'
+
+
 BASIS = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:0 0 8px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;"
 NOTE = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:24px 0 0;padding:12px 0 0 {dk.ALIGN_PX}px;border-top:1px solid #E2E8F0;word-break:keep-all;"
 
@@ -216,7 +237,7 @@ def render(md, links, next_href="#"):
             if note_mode:
                 out.append(f'<div data-course-note="1" style="{DECO["note_h2"]}">{inline(rest, links)}</div>')   # h2 가 아니라 div — 테마가 h2 글자 크기를 키운다
             else:
-                out.append(f'<h2 style="{DECO["h2"]}"><span aria-hidden="true" style="{DECO["h2_icon"]}">{icon}</span><span>{inline(rest, links)}</span></h2>')
+                out.append(f'<h2 style="{DECO["h2"]}"><span aria-hidden="true" style="{DECO["h2_icon"]}">{icon_html(icon, "h2")}</span><span>{inline(rest, links)}</span></h2>')
         elif ln.startswith("> 💬"):   # `> 💬 문장` 또는 `> 💬🧐 문장`(꼬리 아래 캐릭터 지정)
             who, _, said = ln[2:].strip().partition(" ")
             out.append(f'<div style="{DECO["bubble"]}">{dk.tint(inline(said.strip(), links))}</div><div style="{DECO["tail"]}"></div>'
@@ -240,7 +261,7 @@ def render(md, links, next_href="#"):
             while i < len(lines) and lines[i].startswith("- [v] "):
                 items.append(lines[i][6:].strip())
                 i += 1
-            out.append(f'<ul style="{DECO["check"]}">' + "".join(f'<li style="margin:4px 0;">✅ {dk.tint(inline(x, links))}</li>' for x in items) + "</ul>")
+            out.append(f'<ul style="{DECO["check"]}">' + "".join(f'<li style="margin:4px 0;">{icon_html("✅", "check")} {dk.tint(inline(x, links))}</li>' for x in items) + "</ul>")
             continue
         elif ln.startswith("|"):
             blk = []
