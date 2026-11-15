@@ -81,16 +81,9 @@ def pick():
     print(f"[links] 후보 {n}/{len(have)}종목 · 쌍 {sum(len(v['pairs']) for v in have.values())} · AI {calls}번")
 
 
-def validate():
-    import numpy as np
+def prices(syms):
     import pandas as pd
     import yfinance as yf
-    import validate_daily as V
-    ref = load_ref()
-    cand = json.load(open(CAND, encoding="utf-8"))
-    ks = [k for k, v in cand.items() if v["pairs"]]
-    us = sorted({p["t"] for k in ks for p in cand[k]["pairs"]})
-    syms = ks + us + ["^KS11", "^KQ11"]
     t0 = time.time()
     px = {}
     for i in range(0, len(syms), 150):
@@ -105,19 +98,34 @@ def validate():
         time.sleep(2)
     px = pd.DataFrame(px)
     print(f"[links] 일봉 {px.shape[1]}/{len(syms)} · {time.time() - t0:.0f}초")
+    return px
+
+
+def one_test(V, px, k, ps, rng):
+    """미국 짝(들) 밤사이 수익 평균 → 한국 종목 다음 1 · 5거래일(그 시장 지수 대비). validate_daily.test 그대로."""
+    bench = "^KQ11" if k.endswith(".KQ") else "^KS11"
+    idx = px[bench].pct_change(fill_method=None).dropna() * 100
+    sig = (px[ps].pct_change(fill_method=None).mean(axis=1) * 100).dropna()
+    sig.index = V.us_to_kr_signal_day(sig.index, idx.index)
+    sig = sig[~sig.index.duplicated(keep="last")]
+    tgt = (px[k].pct_change(fill_method=None) * 100 - idx).dropna()
+    return V.test(k, "links", sig, tgt, (1, 5), +1, rng)
+
+
+def validate():
+    import validate_daily as V
+    cand = json.load(open(CAND, encoding="utf-8"))
+    ks = [k for k, v in cand.items() if v["pairs"]]
+    us = sorted({p["t"] for k in ks for p in cand[k]["pairs"]})
+    t0 = time.time()
+    px = prices(ks + us + ["^KS11", "^KQ11"])
     rng = random.Random(SEED)
     res = []
     for n_done, k in enumerate(ks):
         ps = [p["t"] for p in cand[k]["pairs"] if p["t"] in px]
-        bench = "^KQ11" if k.endswith(".KQ") else "^KS11"
-        if not ps or k not in px or bench not in px:
+        if not ps or k not in px:
             continue
-        idx = px[bench].pct_change(fill_method=None).dropna() * 100
-        sig = (px[ps].pct_change(fill_method=None).mean(axis=1) * 100).dropna()
-        sig.index = V.us_to_kr_signal_day(sig.index, idx.index)
-        sig = sig[~sig.index.duplicated(keep="last")]
-        tgt = (px[k].pct_change(fill_method=None) * 100 - idx).dropna()
-        r = V.test(k, "links", sig, tgt, (1, 5), +1, rng)
+        r = one_test(V, px, k, ps, rng)
         r["pairs"] = ps
         res.append(r)
         if n_done % 25 == 0:
@@ -138,15 +146,53 @@ def validate():
     print(f"[links] 검증 {len(out)}종목 · 통과(원 기준) {sum(v['pass_raw'] for v in out.values())} · 통과(BH 포함) {sum(v['pass'] for v in out.values())} · {time.time() - t0:.0f}초")
 
 
+def validate_each():
+    """짝 하나씩 (2026-11-15 사용자 "①부터") — 묶음 평균은 강한 짝 덕에 약한 짝도 같이 통과했다(SK하이닉스 ← MSFT 등).
+    기준(결과 보기 전): 짝 하나의 신호로 같은 검정(+ 방향 · 플라시보 p<0.05 · 앞뒤 절반) + 짝 전체(278개) BH q<0.10. 화면 = 통과한 짝만."""
+    import validate_daily as V
+    cand = json.load(open(CAND, encoding="utf-8"))
+    pairs = [(k, p) for k, v in cand.items() for p in v["pairs"]]
+    t0 = time.time()
+    px = prices(sorted({k for k, _ in pairs}) + sorted({p["t"] for _, p in pairs}) + ["^KS11", "^KQ11"])
+    rng = random.Random(SEED)
+    res = []
+    for i, (k, p) in enumerate(pairs):
+        if k not in px or p["t"] not in px:
+            continue
+        r = one_test(V, px, k, [p["t"]], rng)
+        res.append((k, p, r))
+        if i % 40 == 0:
+            print(f"[links] 짝 검증 {i}/{len(pairs)} · {time.time() - t0:.0f}초")
+    qs = V.bh([min((h.get("p", 1.0) for h in r["h"].values() if "p" in h), default=1.0) for _, _, r in res])
+    links = {}
+    for (k, p, r), q in zip(res, qs):
+        h1 = r["h"].get(1) or {}
+        best = min((h for h in r["h"] if "p" in r["h"][h]), key=lambda h: r["h"][h]["p"], default=None)
+        e = links.setdefault(k, {"pairs": [], "tested": []})
+        row = {"t": p["t"], "rel": p["rel"], "why": p["why"], "spread1": h1.get("spread"), "n": h1.get("n"), "p1": h1.get("p"),
+               "best_h": best, "q": q, "from": r["from"], "pass_raw": r["pass"], "pass": bool(r["pass"] and q < Q_MAX)}
+        e["tested"].append(row)
+        if row["pass"]:
+            e["pairs"].append(p["t"])
+    for e in links.values():
+        e["pass"] = bool(e["pairs"])
+    json.dump({"built": time.strftime("%Y-%m-%d"), "rule": f"짝 하나씩 · p<0.05 · 앞뒤 절반 · 짝 {len(res)}개 BH q<{Q_MAX} · 코스닥은 코스닥 지수 대비", "links": links},
+              open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+    print(f"[links] 짝 {len(res)}개 · 통과 짝 {sum(r['pass'] for e in links.values() for r in e['tested'])} · 통과 종목 {sum(e['pass'] for e in links.values())} · {time.time() - t0:.0f}초")
+
+
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     from dotenv import load_dotenv
     load_dotenv(os.path.join(EXP, "..", ".env"))
     ap = argparse.ArgumentParser()
     ap.add_argument("--pick", action="store_true")
-    ap.add_argument("--validate", action="store_true")
+    ap.add_argument("--validate", action="store_true", help="종목마다 짝 묶음 평균 (1차)")
+    ap.add_argument("--each", action="store_true", help="짝 하나씩 (화면 기준)")
     a = ap.parse_args()
     if a.pick:
         pick()
     if a.validate:
         validate()
+    if a.each:
+        validate_each()
