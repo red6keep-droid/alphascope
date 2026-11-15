@@ -1282,7 +1282,8 @@ def detail_body(s, a):
     `업종` 탭 = 업종 재료 · 체감 경기 · 경영 분석
     (2026-10-25 사용자: 미국 종목 페이지처럼 탭 — 실적과 기대 · 캘린더는 다음 단계)."""
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
-            + _dk.price_stamp(s["day"], "KR") + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s)   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30)
+            + _dk.price_stamp(s["day"], "KR") + lead(s) + sec_chart(s)
+            + R._section("오늘", R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s), line=False, tab="오늘")   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30) · `오늘` 탭 표시를 직접 단다 — 뉴스 구획(최근 7일 0건이면 숨김)에만 기대면 오늘 탭이 사라졌다(2026-11-15 삼성바이오로직스, 간단 종목 full_kr 와 같은 방식)
             + RP.sec_crash(s, media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])) if MEDIA else None)   # 급락장에서 어땠나? — 코스피가 2% 넘게 내린 날 버틴 종목 (2026-11-04)
             + ((lambda n: _dk.keep_tone(R._section("뉴스", n, tab="오늘")) if n else "")(sec_today(s)))   # 뉴스는 헤드라인체 그대로 · 최근 7일 0건이면 구획 숨김 (2026-11-08)
             + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
