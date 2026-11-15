@@ -25,7 +25,7 @@ def cut(im, k):
     x0, y0 = (k % 4) * CELL, (k // 4) * CELL
     c = im.crop((x0, y0, x0 + CELL, y0 + CELL))
     c = c.crop(c.getchannel("A").getbbox())   # 원본이 이미 투명 바탕 — 그림만 남게
-    side = max(c.size)
+    side = round(max(c.size) * 1.08)   # 둘레 4% 투명 여백 — 외곽선이 그림 가장자리에 붙어 잘려 보이지 않게
     canvas = Image.new("RGBA", (side, side), (0, 0, 0, 0))
     canvas.paste(c, ((side - c.width) // 2, (side - c.height) // 2), c)
     return canvas.resize((SIZE, SIZE), Image.LANCZOS)

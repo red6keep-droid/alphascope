@@ -70,7 +70,7 @@ def char(tok, where):
     with open(os.path.join(CHAR_DIR, CHARS[m.group(1)] + ".webp"), "rb") as f:
         src = "data:image/webp;base64," + base64.b64encode(f.read()).decode()
     px = CHAR_PX[where]
-    return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:block;width:{px}px;height:{px}px;margin:0 auto;">'
+    return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:block;width:{px}px;height:{px}px;max-width:none;border-radius:0;margin:0 auto;">'
 
 
 def is_char(tok):
@@ -87,7 +87,7 @@ ICON_PX = {"h2": 36, "check": 22}   # 소제목 · 체크 목록 글머리. 소�
 
 
 def icon_html(tok, where):
-    """이모지 → 소품 그림(목업은 data URI, 발행 때 gh-pages 주소로). 표에 없으면 이모지 그대로."""
+    """border-radius:0 — 테마 `.post-body img { border-radius:12px }` 가 작은 아이콘 모서리를 둥글게 깎는다 (2026-11-15 사용자: 잘리지 않게, 네모 그대로). 이모지 → 소품 그림(목업은 data URI, 발행 때 gh-pages 주소로). 표에 없으면 이모지 그대로."""
     name = ICONS.get((tok or "").replace("\ufe0f", ""))
     if not name:
         return tok
@@ -95,7 +95,7 @@ def icon_html(tok, where):
         src = "data:image/webp;base64," + base64.b64encode(f.read()).decode()
     px = ICON_PX[where]
     va = "" if where == "h2" else "vertical-align:-5px;margin-right:4px;"
-    return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:{"block" if where == "h2" else "inline-block"};width:{px}px;height:{px}px;{va}">'
+    return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:{"block" if where == "h2" else "inline-block"};width:{px}px;height:{px}px;max-width:none;border-radius:0;{va}">'
 
 
 BASIS = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:0 0 8px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;"
