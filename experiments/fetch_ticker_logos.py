@@ -103,7 +103,8 @@ def main():
                 print(f"{sym}: SVG 가 아니거나 위험한 요소가 있어 버림")
                 missing.append(sym)
                 continue
-            data = re.sub(r"^\s*<!--.*?-->\s*", "", svg, flags=re.S).encode("utf-8")   # 원본 주석 — 출처는 ref 에 남긴다
+            svg = re.sub(r"^\s*<!--.*?-->\s*", "", svg, flags=re.S)   # 원본 주석 — 출처는 ref 에 남긴다
+            data = svg.replace('fill="#F0F3FA" d="M0 0h56v56H0z"', 'fill="#FFFFFF" d="M0 0h56v56H0z"', 1).encode("utf-8")   # 원본의 연회청 바탕 네모만 흰색 — 그림은 그대로 (2026-11-15 사용자, 화면 흰 바탕 + 외곽선과 맞춤)
         elif ext == "png" and data.startswith(b"\xff\xd8\xff"):
             ext = "jpg"   # 출처의 META · JPM · ABBV · PG 는 이름만 .png 인 JPEG — 실제 형식대로 저장 (2026-11-07 P374)
         elif ext == "png" and not data.startswith(bytes([0x89]) + b"PNG"):
