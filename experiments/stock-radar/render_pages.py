@@ -5,6 +5,7 @@
 """
 
 import datetime
+import json
 from zoneinfo import ZoneInfo
 import os
 import re
@@ -350,8 +351,29 @@ def _kr_links(sym):
     for ksym, (us, _why) in UK.PAIRS.items():
         if sym in us and ksym in UK.BY_SYM and ksym in UK.PAIR_RECORD:
             sp, _n, ok, _y0 = UK.PAIR_RECORD[ksym]
-            out.append((UK.name(ksym), sp, ok, [U.peer_name(x) for x in us]))
+            out.append((UK.name(ksym), sp, ok, [U.peer_name(x) for x in us], None))
+    # 한국 간단 종목(316) — AI 후보 · 짝 하나씩 검증 통과만 (ref/kr_us_links.json, stock-quick/kr_us_links.py --each, 2026-11-15 사용자). 정식 35개는 위 기록 그대로
+    for ksym, nm, r in kr_us_links_for(sym):
+        if ksym not in UK.PAIRS:
+            out.append((nm, r["spread1"], True, [U.peer_name(sym)], r.get("n")))
     return sorted(out, key=lambda x: (not x[2], -x[1]))
+
+
+_LINKS = None
+
+
+def kr_us_links_for(us_sym):
+    """검증 통과한 (한국 코드, 한국 이름, 기록) — 이 미국 종목과 짝인 것. 파일이 없으면 []."""
+    global _LINKS
+    if _LINKS is None:
+        try:
+            ref_dir = os.path.join(_HERE, "..", "ref")
+            links = json.load(open(os.path.join(ref_dir, "kr_us_links.json"), encoding="utf-8"))["links"]
+            names = {k: e.get("ko") or k for k, e in json.load(open(os.path.join(ref_dir, "quick_ref.json"), encoding="utf-8"))["kr"].items()}
+            _LINKS = [(k, names.get(k, k), r) for k, e in links.items() for r in e.get("tested") or [] if r.get("pass") and r.get("spread1") is not None]
+        except (OSError, ValueError, KeyError):
+            _LINKS = []
+    return [x for x in _LINKS if x[2]["t"] == us_sym]
 
 
 def sec_pairs(s):
@@ -379,8 +401,9 @@ def sec_pairs(s):
     ok = [x for x in links if x[2]][:4]
     if ok:   # 한국 연결 종목 — 검증 통과한 것만, 다음 날 시가 차이
         lines.append((f'{_dk.CHART_TITLE_M}한국 연결 종목 <span style="font-weight:400;font-size:{R.TINY};color:{R.NOTE};">(다음 날 시가)</span></span>', "html"))
-        for k, (nm, sp, _ok, us) in enumerate(ok):
-            lines.append(("row", nm, f"{_sgn(sp)}%p", f"{_dk.josa(' · '.join(us), '이')} 많이 오른 밤과 내린 밤의 차이", False, k == 0))
+        for k, (nm, sp, _ok, us, n) in enumerate(ok):
+            short = f" · 기록 {max(1, round(n / 250))}년" if n and n < 750 else ""   # 3년 안 되는 기록은 기간을 같이 (GE버노바 2024 상장 등)
+            lines.append(("row", nm, f"{_sgn(sp)}%p", f"{_dk.josa(' · '.join(us), '이')} 많이 오른 밤과 내린 밤의 차이{short}", False, k == 0))
     R.add_small_note(lines, "±0.5% 넘게 움직인 회사만 오른 곳 · 내린 곳으로 셉니다.")   # 옛 툴팁의 기준을 카드 작은 글씨로 — 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
