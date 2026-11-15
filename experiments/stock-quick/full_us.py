@@ -3,7 +3,8 @@
 기획 6-6: 정식 카드 가운데 막히는 줄(옵션 · 뉴스 · 방송 · 소송)만 빼고 다 — 상세 값은 바뀌는 주기에 맞춰 드물게 받아 저장해 둔다.
 ETF 페이지(stock-etf/etf_pages.us_pages)와 같은 방식: 종목을 이 실행 안에서만 정식 명단(universe)에 얹고, 정식 계산(analyze · analyze_tabs)과
 정식 카드(render_pages)를 그대로 부른다. 정식과 다른 것:
-  - 탭 = 오늘 · 매수의견(애널리스트 · 증권사) · 실적 · 업계상황 · 기업. 뉴스 · 중요 이슈 · 방송 의견 · 뉴스 의견 · 시장 예상 흔들림(옵션) · 소송 · 한국 연결 종목은 없다.
+  - 탭 = 오늘 · 매수의견(애널리스트 · 증권사) · 실적 · 업계상황 · 기업. 방송 의견 · 시장 예상 흔들림(옵션) · 소송 · 한국 연결 종목은 없다.
+    뉴스 · 중요 이슈 · 뉴스 의견 = quick-news(Finnhub, 15:10) 분류 결과가 있을 때 정식 함수 그대로 (2026-11-15 3단계).
   - 함께 보는 회사 = 사람이 고른 목록 대신 같은 업종에서 1년 등락이 가장 비슷하게 움직인 3곳(상관 계산).
   - 업계 카드(FRED) = 세부 업종(GICS)이 분명히 맞는 업계만 (SUB_BIZ).
   - 기업 소개 문단(연차보고서로 쓴 고정 문구) 없음 — 기본 정보 줄만.
@@ -373,26 +374,29 @@ def earnings_tab(s):
 
 def opinions_tab(s):
     cells = s.get("analysts") or []
-    if not cells and not s.get("broker"):
+    if not cells and not s.get("broker") and not (RP.NEWS and RP._news_opinions(s)):
         return ""
     R.picks_card, keep = _no_picks, R.picks_card   # 방송 의견 카드 = 간단 정보에 없다 (6-6)
     try:
         return R.opinions_cards(s["name"], cells, s.get("close"), None, lambda v: f"${v:,.2f}", lambda: RP.together_items(s),
-                                broker=s.get("broker") or [], news_ops=None, closes=[b["close"] for b in (RP.BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]])
+                                broker=s.get("broker") or [], news_ops=RP._news_opinions(s) if RP.NEWS else None, closes=[b["close"] for b in (RP.BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]])
     finally:
         R.picks_card = keep
 
 
 def body(s, bars_s, related_links, extra_today=""):
-    """정식 detail_body 와 같은 순서 — 머리(안내 · 요약) → 봉차트 → 오늘 탭 → 매수의견 · 실적 · 업계상황 · 기업 → 함께 보는 페이지."""
+    """정식 detail_body 와 같은 순서 — 머리(안내 · 요약) → 봉차트 → 오늘 탭 → 매수의견 · 실적 · 업계상황 · 기업 → 함께 보는 페이지.
+    뉴스(RP.NEWS = quick-news 분류 결과)가 있으면 오늘 탭 끝 = 정식과 같은 `중요 이슈` · `뉴스`(sec_today_tab, 급락 카드 포함) — `이름이 나온 기사` 카드는 뺀다 (2026-11-15 3단계)."""
+    news_mode = bool(RP.NEWS)
     today = (R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500")
-             + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_pairs(s) + RP.sec_states(s) + extra_today)
+             + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_pairs(s) + RP.sec_states(s) + ("" if news_mode else extra_today))
     op, ea = opinions_tab(s), earnings_tab(s)
     ind = RP.sec_industry_tab(s)
     return RP.wrap(f'<div data-quick-title="{dk.esc(U.page_title(s["sym"]).replace(" · 실적 일정", ""))}">'   # wrap = 정식과 같은 틀 · 제목 정렬 · 합니다체
             + dk.report_stamp(dk.kst_close_day(s["day"], "US"), WHEN, close="새벽 마감")
             + RP.lead(s) + CC.card(s["name"], bars_s, 2, title="") + '<div style="height:20px;"></div>'
-            + R._section("오늘", today, line=False, tab="오늘") + RP.sec_crash(s)   # 급락일에 버텼을 때만 (정식과 같은 자리 · 같은 카드)
+            + R._section("오늘", today, line=False, tab="오늘")
+            + (RP.sec_today_tab(s, RP.NEWS) if news_mode else RP.sec_crash(s))   # 급락일에 버텼을 때만 (정식과 같은 자리 · 같은 카드) — 뉴스 있으면 sec_today_tab 이 급락 카드까지
             + (R._section("매수의견", op, tab="매수의견") if op else "")
             + (R._section("실적", ea, tab="실적") if ea else "")
             + R._section("업계상황", ind, tab="업계상황")
@@ -411,8 +415,18 @@ def full_group(radar_dir):
     return group, {s: rev[s] for s in group if s in rev}, {s: {"eps": cache.get(s, "eps")} for s in group if cache.get(s, "eps")}
 
 
-def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=None, related=None, radar_dir=None, extra_today=None):
-    """간단 종목(정식 아님) 화면 조각 {sym: html}. ref_us = quick_ref.json 의 us. related(sym, e) → [(글, 주소)]. extra_today(sym) → 오늘 탭 끝 카드(이름이 나온 기사)."""
+def load_news(qnews_dir):
+    """quick-news.yml 이 비공개 quick-news-state 에 남긴 분류 결과(news.json) · 팝업 요약(summaries.json → {item_id: [줄]}). 없으면 ({}, {})."""
+    if not qnews_dir:
+        return {}, {}
+    news = _load(os.path.join(qnews_dir, "news.json"), {})
+    summ = {k: v.get("lines") or [] for k, v in _load(os.path.join(qnews_dir, "summaries.json"), {}).items()}
+    return news, summ
+
+
+def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=None, related=None, radar_dir=None, extra_today=None, news=None, summaries=None):
+    """간단 종목(정식 아님) 화면 조각 {sym: html}. ref_us = quick_ref.json 의 us. related(sym, e) → [(글, 주소)]. extra_today(sym) → 오늘 탭 끝 카드(이름이 나온 기사, 뉴스 없을 때만).
+    news · summaries = load_news — 있으면 정식과 같은 중요 이슈 · 뉴스 · 뉴스 의견 (방송 · 인물 발언 재료는 없다)."""
     quick = [s for s, e in ref_us.items() if not e.get("full") and len(bars_all.get(s) or []) >= 30 and (only is None or s in only)]
     # 이 실행 안에서만 정식 명단에 얹는다 (ETF 페이지와 같은 방식)
     groups = {}
@@ -439,6 +453,7 @@ def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=No
              "revenue": {"series": {**grev, **(sec.get("rev") or {})}}, "capex": sec.get("cash") or {}, "peer_earnings": {}, "edgar": {}}
     RP.BARS = bars_all
     RP.NOW = datetime.datetime.now(datetime.timezone.utc)
+    RP.NEWS, RP.SUMMARY, RP.MEDIA, RP.PICKS = news or {}, summaries or {}, [], []   # 방송 = 간단 정보에 없다 (6-6)
     RP.PICK_SINCE = R.pick_window(bars_all.get(U.BENCH) or [], RP.NY, now=RP.NOW)[1]
     mr, ms = analyze.market_regime(snap), analyze.market_shock(snap)
     crash = RP.CW.compute(bars_all, "us", quick)   # 급락장에서 어땠나? — 정식과 같은 계산(지수 −2% 넘은 날 버텼나), 일봉만 (2026-11-14 사용자)
