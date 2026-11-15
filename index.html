@@ -773,6 +773,12 @@ body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
 .eb-dot { height: 12px; padding: 0 2px; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
 .eb-dot::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, .35); transition: background .25s; }   /* 점 5×5 (2026-11-10 사용자) */
 .eb-dot[aria-selected="true"]::before { background: #fff; }   /* 바탕색이 바뀌므로 파랑 대신 흰색 */
+/* 일정이 없을 때 = 주식 공부 배너 (2026-11-15 사용자: "D-Day 가 없으면 이거를 넣어줘") — 사용자 그림 1110 × 291(폰 칸 370 × 97 의 3배), 그림 바탕 #48427F 를 띠 바탕으로 이어 붙인다.
+   그림 높이 = 칸 높이(폰 97 · 태블릿 122 · PC 115), 넓은 화면은 양옆 바탕색. PC 는 재설계 전 임시.
+   그림 글자 왼쪽 끝 = 아래 카드 제목 아이콘(.report-icon) 왼쪽 끝 — 카드 안쪽 27 − 그림 속 글자 여백 1 = 26 오른쪽으로, 오른쪽 26 은 잘림(장식 원만) (2026-11-15 사용자) */
+.eb-slide.eb-study { padding: 0; justify-content: flex-start; }
+.eb-study img { display: block; flex: none; width: 100%; margin-left: 26px; height: auto; max-width: 465px; aspect-ratio: 1110 / 291; border-radius: 0; }
+@media (min-width: 901px) { .eb-study img { max-width: 438px; } }   /* PC 칸 높이 115 */
 @media (max-width: 680px) {
   .eb-slide { gap: 10px; padding: 20px 4px 28px; }   /* 높이 81 → 97 (20%, 2026-11-10 사용자) */
   .eb-slide .stock-avatar { width: 36px; height: 36px; font-size: 14px; }
@@ -782,6 +788,7 @@ body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
   .eb-title { font-size: 15px; line-height: 23px; }
   .eb-when { font-size: 13px; line-height: 21px; }
   .eb-more { margin-right: 4px; }
+  .eb-study img { max-width: 370px; }   /* 폰 칸 높이 97 = 370 × 291 / 1110 */
   .eb-more-text { display: none; }   /* 폰은 글자도 없음 — 화살표는 삭제 (2026-11-10 사용자) */
 }
 @media (prefers-reduced-motion: reduce) { .eb-track, .eb-dot::before { transition: none; } }
@@ -3159,16 +3166,33 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           ebStop();
           if (document.querySelectorAll('#event-banner .eb-dot').length > 1) ebTimer = setInterval(function () { ebGo(ebIndex + 1); }, EVENT_MS);
         }
+        var eventLoaded = { us: false, kr: false };
+        var STUDY_BG = '#48427F';
+        function studySlide() {   /* 일정이 없을 때 주식 공부 배너 (2026-11-15 사용자) — 홈 아래 주식 공부 배너와 같은 곳으로 */
+          var a = el('a', 'eb-slide eb-study'); a.href = '/search/label/%EC%A3%BC%EC%8B%9D%20%EA%B3%B5%EB%B6%80';
+          var im = document.createElement('img');
+          im.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/top_banner.webp?v=2';
+          im.width = 1110; im.height = 291; im.alt = '주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'; im.decoding = 'async';
+          a.appendChild(im);
+          return a;
+        }
         function setEvents(market, list) {
           eventFeeds[market] = list || [];
+          eventLoaded[market] = true;
           var box = document.getElementById('event-banner');
           var track = box && box.querySelector('[data-hook="event-slides"]');
           var dotBox = box && box.querySelector('[data-hook="event-dots"]');
           if (!track || !dotBox) return;
           var picks = pickEvents(), today = kstToday();
           track.textContent = ''; dotBox.textContent = '';
-          box.hidden = !picks.length;
-          if (!picks.length) { ebStop(); return; }
+          if (!picks.length) {   /* 일정이 없으면 주식 공부 배너 — 그 화면의 일정 파일을 다 받은 뒤에만(먼저 온 다른 시장 파일로 잠깐 깜빡이지 않게) */
+            ebStop(); ebIndex = 0; track.style.transform = '';
+            var ready = HOME_MKT ? eventLoaded[HOME_MKT] : (eventLoaded.us && eventLoaded.kr);
+            box.hidden = !ready;
+            if (ready) { box.style.setProperty('--eb-bg', STUDY_BG); track.appendChild(studySlide()); dotBox.hidden = true; }
+            return;
+          }
+          box.hidden = false;
           picks.forEach(function (x, i) {
             track.appendChild(eventSlide(x, today));
             var d = el('button', 'eb-dot'); d.type = 'button'; d.setAttribute('aria-label', (i + 1) + '번째 일정');
