@@ -43,8 +43,8 @@ def home_cards(logs, made=None):
         c = IW.CFG[iss["id"]]
         g = row.get("gauge") or "방향미정"
         kind = "positive" if c["good"] in g else "negative" if c["bad"] in g else "neutral"
-        out.append({"id": iss["id"], "name": iss["name"], "url": f"/p/{c['slug']}.html", "gauge": "향방미정" if g == "방향미정" else g,
-                    "kind": kind, "hot": bool(row.get("hot"))})
+        out.append({"id": iss["id"], "name": iss["name"], "q": iss.get("q") or iss["name"], "url": f"/p/{c['slug']}.html",   # q = 이슈 페이지 질문 제목(줄 = 질문, 증시 전망 카드처럼 · 2026-11-16 사용자)
+                    "gauge": "향방미정" if g == "방향미정" else g, "kind": kind, "hot": bool(row.get("hot"))})
     return {"generated": made or _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="minutes"), "issues": out}
 
 
