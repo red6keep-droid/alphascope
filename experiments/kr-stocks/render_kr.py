@@ -226,7 +226,8 @@ def sec_pairs(s, a=None):
     state = pairs_state(s)
     theme, col = {"엇갈림": ("uncertain", R.SOON), "올랐음": ("positive", UP), "내렸음": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
     day = (moves or [adr or sox])[0]["day"]
-    lines = [(f"밤사이(미국 {_md(day)} 종가) 연관 종목은 " + ", ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)   # 쉼표 — ` · ` 로 이으면 짧은 덩어리를 이름까지 통째로 칠한다(_dk.tint), 미국 페이지와 같게 (2026-11-06 사용자)
+    us_kst = _dk.kst_close_day(day, "US") + " 새벽"   # 독자 = 한국 시간 (2026-11-14 날짜 규칙) — 미국 종가 = 다음 날 새벽, 간단 카드와 같은 말 (2026-11-15 사용자)
+    lines = [(f"밤사이({us_kst} 마감) 연관 종목은 " + ", ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)   # 쉼표 — ` · ` 로 이으면 짧은 덩어리를 이름까지 통째로 칠한다(_dk.tint), 미국 페이지와 같게 (2026-11-06 사용자)
               + f"였고, 오늘 {_dk.josa(s['name'], '은')} {_sgn(s['ret_1d'])}%였다.", "plain")]
     # 숫자 줄 목록 → 가운데 0 가로 막대 두 묶음 (2026-10-27 사용자 P27: "퍼센트만 쭉 있어 빨리 안 읽힌다, 삼성전자 · 지수와 비교 그래프")
     why = [w.strip() for w in (p.get("why") or "").split("·")]
@@ -241,7 +242,7 @@ def sec_pairs(s, a=None):
     if vb is not None:
         kr.append(("KOSPI", "", s["ret_1d"] - vb, "bench"))
     # `그 뒤 미국 종가 … 다음 한국장 전 참고` 줄은 뺐다 — 정기 실행(16:10 KST)엔 그 미국장이 아직 안 끝나 늦게 돌 때만 나오고, 무슨 값인지 읽히지 않았다 (2026-10-28 사용자 P58)
-    lines.append((R.pair_bars([(f"밤사이 미국 ({_md(day)} 종가)", us), (f"오늘 한국 ({_md(s['day'])})", kr)]), "html"))
+    lines.append((R.pair_bars([(f"밤사이 미국 ({us_kst})", us), (f"오늘 한국 ({_md(s['day'])})", kr)]), "html"))
     # 같은 묶음 한국 종목의 오늘 등락 — 미국 부분과 같은 막대 (2026-10-31 사용자 P153: 제목 `함께 움직이는 종목은?`, 기업 탭의 `함께 움직이는 종목` 을 여기로)
     by = {x["sym"]: x for x in (a or {}).get("stocks") or []}
     group = [(x[1], "", by[x[0]]["ret_1d"], "us") for x in _mates(s) if x[0] in by and by[x[0]].get("ret_1d") is not None]
