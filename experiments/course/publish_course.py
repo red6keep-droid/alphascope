@@ -47,7 +47,7 @@ def _env():
 def upload_images():
     """chars/*.webp · icons/*.webp · banner/*.webp(홈 배너 · 목록 맨 위 그림) → gh-pages images/study/ — 내용이 같으면 커밋 안 함."""
     src = sorted(glob.glob(os.path.join(HERE, "chars", "*.webp")) + glob.glob(os.path.join(HERE, "icons", "*.webp"))
-                 + glob.glob(os.path.join(HERE, "banner", "*.webp")))
+                 + glob.glob(os.path.join(HERE, "banner", "*.webp")) + glob.glob(os.path.join(HERE, "banner", "share_*.jpg")))   # share_*.jpg = 공유 썸네일(카카오톡 · og:image, 2026-11-15)
     subprocess.run(["git", "-C", ROOT, "fetch", "-q", "origin", BRANCH], check=True)
     with tempfile.TemporaryDirectory() as tmp:
         wt = os.path.join(tmp, "ghp")
@@ -79,7 +79,7 @@ def build(files, urls):
     for k, f in enumerate(files):
         nxt = links[os.path.basename(files[k + 1])] if k + 1 < len(files) else "#"
         title, body = RC.render(open(f, encoding="utf-8").read(), links, nxt)
-        body = (f'<span data-head-label="{RC.HEAD_LABEL}" hidden></span><span data-list-url="{RC.LIST_URL}" data-nav="back" hidden></span>'
+        body = (RC.share_tag() + f'<span data-head-label="{RC.HEAD_LABEL}" hidden></span><span data-list-url="{RC.LIST_URL}" data-nav="back" hidden></span>'
                 + RC.title_block(title) + body)
         series, _, ep = title.partition(" — ")
         post_title = ep if " — " in title and not ep.startswith("들어가며") else series.split(" #")[0]

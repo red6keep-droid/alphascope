@@ -99,7 +99,7 @@ def page(urls):
     # 접기 표시 — 사파리 기본 삼각형 숨김 · 펼치면 화살표 위로 (글 안 style 한 줄, 테마 붙여넣기 없이)
     cards = ('<style>details[data-course]>summary::-webkit-details-marker{display:none}'
              'details[data-course] .study-fold svg{transition:transform .15s}details[data-course][open] .study-fold svg{transform:rotate(180deg)}</style>' + cards)
-    return (f'<span data-head-label="{RC.HEAD_LABEL}" hidden></span><span data-nav="home" hidden></span>'
+    return (RC.share_tag() + f'<span data-head-label="{RC.HEAD_LABEL}" hidden></span><span data-nav="home" hidden></span>'
             + dk.WRAP_OPEN + head + cards + dk.WRAP_CLOSE)
 
 

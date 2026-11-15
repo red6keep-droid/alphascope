@@ -5,6 +5,13 @@
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
     <title><data:view.title.escaped/></title>
     <b:include data='blog' name='all-head-content'/>
+    <!-- 공유 썸네일 (2026-11-15 사용자): 본문에 그림이 없는 페이지는 공통 로고. 그림이 있으면 Blogger 가 첫 그림을 og:image 로 단다(주식 공부 = 본문 맨 앞 숨은 썸네일 data-share-img) -->
+    <b:if cond='!data:view.featuredImage'>
+      <meta content='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/share_logo.png' property='og:image'/>
+      <meta content='1200' property='og:image:width'/>
+      <meta content='600' property='og:image:height'/>
+      <meta content='summary_large_image' name='twitter:card'/>
+    </b:if>
     <!-- 검색 (2026-10-13 사용자): Google Search Console 소유 확인. 블로거 설정의 검색 설명이 비어 있으면 홈 · 목록에 기본 설명을 단다. 글 · 페이지에는 블로거가 설명을 달지 않는다(2026-11-10 확인) -->
     <meta content='GWtZLHo2CgnmBBgSxQQg0BKY_xKZJTSba7BBOZ6e4Ts' name='google-site-verification'/>
     <!-- 네이버 서치어드바이저 소유 확인 (2026-10-15 사용자). 블로거는 루트에 HTML 파일을 못 올려 메타 태그 방식 -->
@@ -4626,7 +4633,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               function send() {
                 try {
                   if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY);
-                  window.Kakao.Share.sendDefault({ objectType: 'text', text: shareTitle, link: { mobileWebUrl: shareUrl, webUrl: shareUrl } });
+                  /* 썸네일 카드 (2026-11-15 사용자): 본문의 data-share-img(주식 공부 = 전용 썸네일) → 없으면 공통 로고. 1200×600 */
+                  var si = document.querySelector('img[data-share-img]');
+                  var shareImg = si ? si.getAttribute('src') : 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/share_logo.png';
+                  var shareDesc = ((document.querySelector('meta[name="description"]') || {}).content || '').slice(0, 80);
+                  var lk = { mobileWebUrl: shareUrl, webUrl: shareUrl };
+                  window.Kakao.Share.sendDefault({ objectType: 'feed',
+                    content: { title: shareTitle, description: shareDesc, imageUrl: shareImg, imageWidth: 1200, imageHeight: 600, link: lk },
+                    buttons: [{ title: '자세히 보기', link: lk }] });
                 } catch (err) { fallback(); }
               }
               if (window.Kakao) { send(); return; }
