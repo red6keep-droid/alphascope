@@ -134,7 +134,7 @@ def _check(lines, src):
     return out[:MAX_LINES], tags[:MAX_LINES]
 
 
-def summarize(items, cache_path, lead_cache=None, label="summary", max_items=None):
+def summarize(items, cache_path, lead_cache=None, label="summary", max_items=None, chain="news", batch=None):
     """items = [{"item_id", "title", "url", "snippet"(RSS 요약, 없을 수 있음)}] → {item_id: [줄]}. 캐시에 있으면 그대로.
     lead_cache = 첫 문단 캐시 파일(깃 밖). None 이면 기사를 열지 않고 snippet 만 쓴다."""
     cache = _load(cache_path) if cache_path else {}
@@ -149,7 +149,7 @@ def summarize(items, cache_path, lead_cache=None, label="summary", max_items=Non
     news_store._env()
     from llm_chain import LLMPool, usage_line
     try:
-        pool = LLMPool("news", label=label)
+        pool = LLMPool(chain, label=label)   # 종목 주가(간단 종목) = news-quick (2026-11-15)
     except RuntimeError as e:
         print(f"[summary] {e} — 요약 없이")
         return out
@@ -160,8 +160,9 @@ def summarize(items, cache_path, lead_cache=None, label="summary", max_items=Non
         except Exception as e:  # noqa: BLE001
             print(f"[summary] 첫 문단 실패 — RSS 요약만 : {str(e)[:80]}")
     ok = 0
-    for i in range(0, len(need), BATCH):
-        part = need[i:i + BATCH]
+    size = batch or BATCH
+    for i in range(0, len(need), size):
+        part = need[i:i + size]
         src = {x["item_id"]: (leads.get(x.get("url")) or x.get("snippet") or "")[:SRC_MAX] for x in part}
         payload = {"items": [{"id": x["item_id"], "title": x["title"], "text": src[x["item_id"]]} for x in part]}
         want = {x["item_id"] for x in part}
@@ -190,7 +191,7 @@ def summarize(items, cache_path, lead_cache=None, label="summary", max_items=Non
             ok += bool(lines)
         if cache_path:
             _save(cache_path, cache)
-        print(f"[summary] {min(i + BATCH, len(need))}/{len(need)} ({pool.last_model})", flush=True)
+        print(f"[summary] {min(i + size, len(need))}/{len(need)} ({pool.last_model})", flush=True)
     print(f"[summary] 요약 {ok}/{len(need)} · {usage_line()}" + (f" · 말투 바로잡음 {len(HEDGED)}줄" if HEDGED else ""))
     for ln, hw in HEDGED[:5]:
         print(f"[summary]   {'·'.join(hw)} : {ln}")

@@ -72,8 +72,10 @@ def hedge(ko, src):
         if h == "fwd":
             fwd = True
         elif h == "approx":
-            near = ko[max(0, m.start() - 3):m.start()] + ko[m.end():m.end() + 6]
-            if not KO_APPROX.search(near):
+            before = ko[max(0, m.start() - 3):m.start()]
+            near = before + ko[m.end():m.end() + 6]
+            # `약` 은 숫자 바로 앞에서 따로 본다 — 앞뒤를 이어 붙인 글에 `약\s*$`(끝)를 대면 끝이 숫자 뒤가 되어 `약 10%` 에 또 `약` 을 붙였다 (2026-11-15 `약 약 10%`)
+            if not (KO_APPROX.search(near) or re.search(r"약\s*$", before)):
                 approx_at.append(m.start())
     for i in sorted(approx_at, reverse=True):
         ko = ko[:i] + "약 " + ko[i:]
