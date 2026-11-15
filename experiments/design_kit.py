@@ -2090,6 +2090,54 @@ def news_pop_body(pid, title, lines, when="", source="", kind="방송", url=None
     return (f'<div data-news-pop-body="{esc(pid)}" data-news-pop-title="{esc(title)}" hidden>{li}{related_box(related)}{link}</div>')
 
 
+# ── 한 줄 소식 = 키워드 버튼 → 팝업 (2026-11-15 사용자) ──
+# 요약이 두 줄 못 되는 기사는 목록에 싣지 않는다(11-10). 버리는 대신 이슈(키워드)별로 묶어 목록 아래 버튼 줄로:
+#   버튼 `실적 · 가이던스 4` → 팝업에 한 줄씩(누를 수 없음, 줄 끝 회색 매체 이름) + 맨 아래 출처 버튼(줄과 같은 순서, 원문으로).
+# 이유(실측 11-15): 엔비디아는 한 줄짜리가 하루 21건(두 줄 이상 12건) — 그대로 실으면 목록이 세 배. 빼면 뉴스 있는 간단 종목의 절반(120 중 62)이 빈 화면.
+# 새 AI 0 — 키워드 = 기사마다 이미 붙은 이슈 코드(ISSUE_KO), 줄 = 이미 만든 한 줄 문장.
+BRIEF_MAX = 10        # 키워드 하나에 보이는 줄
+BRIEF_BTN = (f"display:inline-flex;align-items:center;gap:5px;cursor:pointer;background:#fff;border:1px solid #E2E8F0;border-radius:8px;"
+             f"padding:8px 12px;font-size:14px;line-height:20px;color:#111;white-space:nowrap;")   # 높이 38 = 블로그 안 버튼 높이(가이드라인 10절)
+
+
+def brief_chips(items, key, name=""):
+    """items = [{"issue", "line", "source", "url", "at"}] (최신순) → 키워드 버튼 줄 + 숨긴 팝업 글. 없으면 "".
+    key = 글 안에서 겹치지 않는 머리(종목 코드 등). name = 팝업 제목 앞에 붙는 이름(종목)."""
+    groups = {}
+    for x in items:
+        line = re.sub(r"\s+", " ", str(x.get("line") or "")).strip()
+        if not line:
+            continue
+        g = groups.setdefault(x.get("issue") if x.get("issue") in ISSUE_KO else "OTHER", [])
+        if all(line != y["line"] for y in g):
+            g.append(dict(x, line=line))
+    if not groups:
+        return ""
+    order = sorted(groups, key=lambda k: (k == "OTHER", -len(groups[k])))
+    btns, bodies = [], []
+    for k in order:
+        rows, label = groups[k][:BRIEF_MAX], ISSUE_KO.get(k, "그 밖")
+        pid = news_pop_id("bf", f"{key}:{k}")
+        btns.append(f'<span role="button" tabindex="0" data-news-pop="{esc(pid)}" style="{BRIEF_BTN}">{esc(label)} <span style="color:{SUB};">{len(groups[k])}</span></span>')
+        li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{pop_li_margin(i)};padding-left:{POP_LI_PAD}px;">'
+                     f'<span style="flex:none;width:16px;font-size:13px;line-height:{POP_LH}px;color:{NOTE};text-align:right;">{i + 1}</span>'   # 점 대신 번호 — 아래 출처 버튼의 번호와 짝
+                     f'<span style="min-width:0;font-size:{BODY};line-height:{POP_LH}px;color:#333;word-break:keep-all;">{esc(r["line"])}</span></span>'
+                     for i, r in enumerate(rows))
+        src = "".join(f'<a href="{esc(r["url"])}" target="_blank" rel="nofollow noopener" data-trhelp="skip" '
+                      f'style="display:inline-flex;align-items:center;gap:5px;border:1px solid #E2E8F0;border-radius:8px;padding:5px 10px;font-size:13px;line-height:19px;'
+                      f'color:{SUB};text-decoration:none;white-space:nowrap;"><span style="color:{NOTE};">{i + 1}</span>{esc(r.get("source") or "원문")} {LINK_ICON}</a>'
+                      for i, r in enumerate(rows) if r.get("url"))
+        foot = (f'<span style="display:block;margin:16px 0 0;padding-top:12px;border-top:1px solid #E2E8F0;">'
+                f'<span style="display:block;font-size:13px;line-height:19px;color:{NOTE};margin:0 0 8px;">출처</span>'
+                f'<span style="display:flex;flex-wrap:wrap;gap:6px;">{src}</span></span>') if src else ""
+        title = f"{name} {label}".strip()
+        bodies.append(f'<div data-news-pop-body="{esc(pid)}" data-news-pop-title="{esc(title)}" hidden>{li}{foot}</div>')
+    n = sum(len(v) for v in groups.values())
+    return (f'<div data-brief="1" style="margin:16px 0 8px;padding:0 {ALIGN_PX}px;">'
+            f'<div style="font-size:14px;line-height:20px;color:{NOTE};margin:0 0 8px;">한 줄 소식 {n}건</div>'
+            f'<div style="display:flex;flex-wrap:wrap;gap:8px;">{"".join(btns)}</div>{"".join(bodies)}</div>')
+
+
 def news_pop_wrap(item_html, pid):
     """한 줄 전체를 눌러 팝업 (가이드라인 10-9 줄 전체 링크) — 테마 JS 가 closest('[data-news-pop]') 로 잡는다."""
     return f'<div data-news-pop="{esc(pid)}" style="cursor:pointer;">{item_html}</div>'

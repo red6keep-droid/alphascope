@@ -822,7 +822,7 @@ def sec_today(s):
     if not ev:
         # 최근 7일 방송이 아예 없으면 뉴스 구획을 숨긴다 · 오늘 0건 안내는 카드의 막대 자리(아이콘 없음) (2026-11-08 사용자)
         return (bars + MOCK_NEWS) if bars else ""   # 목업에서만 샘플 카드로 바뀐다 (P26)
-    return bars + R.sec_events({"events": ev[:MAX_NEWS], "events_overflow": ev[MAX_NEWS:MAX_NEWS + 12]})
+    return bars + R.sec_events({"events": ev[:MAX_NEWS], "events_overflow": ev[MAX_NEWS:MAX_NEWS + 12], "brief_events": ev, "brief_key": s["code"], "brief_name": s["name"]})   # 한 줄 소식 키워드 (2026-11-15)
 
 
 def mock_news():
