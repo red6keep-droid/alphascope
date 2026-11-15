@@ -299,7 +299,7 @@ def pairs_card(s, peers, by):
         ups, downs = sum(1 for x in rets if x >= 0.5), sum(1 for x in rets if x <= -0.5)
         state = "엇갈림" if ups and downs else "올랐음" if ups else "내렸음" if downs else "비슷함"
         us_day = dk.kst_close_day(links[0][0]["day"], "US") + " 새벽"   # 독자 = 한국 시간 (2026-11-14 날짜 규칙) — 미국 종가 = 다음 날 새벽
-        lines.append((f"밤사이({us_day} 마감) 미국 연결 종목은 " + ", ".join(f"{US_KO.get(m['sym'], m['sym'])} {render_kr._sgn(m['ret'])}%" for m, _ in links)
+        lines.append((f"밤사이({us_day} 마감) 미국 연관 종목은 " + ", ".join(f"{US_KO.get(m['sym'], m['sym'])} {render_kr._sgn(m['ret'])}%" for m, _ in links)
                       + f"였고, 오늘 {dk.josa(s['name'], '은')} {render_kr._sgn(s['ret_1d'])}%였다.", "plain"))
         kr = [(s["name"], "", s["ret_1d"], "me")] + ([("KOSPI", "", s["ret_1d"] - vb, "bench")] if vb is not None else [])
         lines.append((R.pair_bars([(f"밤사이 미국 ({us_day})", [(US_KO.get(m["sym"], m["sym"]), why, m["ret"], "us") for m, why in links]),
@@ -315,9 +315,13 @@ def pairs_card(s, peers, by):
     if moves:
         rows = [(K.name(p), "", r, "us") for p, r in moves] + ([] if links else [(s["name"], "", s["ret_1d"], "me")] + ([("KOSPI", "", s["ret_1d"] - vb, "bench")] if vb is not None else []))
         lines.append((R.pair_bars([(f"함께 움직여 온 한국 종목 ({day})" if links else f"함께 움직여 온 종목 ({day})", rows)]), "html"))
+    if links:   # 연관 종목 기록(고정값) = 미국 페이지와 같은 작은 표 (2026-11-15 사용자)
+        recs = [(r["t"], US_KO.get(r["t"], r["t"]), ", ".join(x for x in (r.get("why") or "", render_kr.RP.rec_years(r.get("n"))) if x), r["spread1"])
+                for r in LINKS.get(s["sym"]) or [] if r["t"] in {m["sym"] for m, _ in links}]
+        lines.append((render_kr.RP.link_record_table("미국 연관 종목 기록", recs, theme), "html"))
     R.add_small_note(lines, ("함께 움직여 온 종목은 같은 업종에서 최근 1년 하루 등락이 가장 비슷한 종목입니다. " if moves else "")
                      + "±0.5% 넘게 움직인 종목만 오른 곳 · 내린 곳으로 셉니다.")
-    tip = "미국 연결 종목은 사업으로 이어진 미국 종목 가운데, 그 종목이 크게 움직인 밤 다음 날 이 종목도 같은 쪽으로 열려 온 것만 골랐습니다." if links else ""   # 카드 작은 글씨 → 툴팁 (2026-11-15 사용자)
+    tip = "미국 연관 종목은 사업으로 이어진 미국 종목 가운데, 그 종목이 크게 움직인 밤 다음 날 이 종목도 같은 쪽으로 열려 온 것만 골랐습니다." if links else ""   # 카드 작은 글씨 → 툴팁 (2026-11-15 사용자)
     card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=tip, fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
