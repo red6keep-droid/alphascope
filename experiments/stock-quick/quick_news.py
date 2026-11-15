@@ -6,7 +6,7 @@
   1. Finnhub company-news 종목마다 1번(1.1초 간격 — 분당 60 한도)  2. 최근 HOURS 시간 · 아직 없는 기사 · 종목당 PER_STOCK 건(최신)
   3. 첫 문단 = Finnhub 링크 → 원문(3개 동시, 막는 사이트는 건너뜀), 못 받으면 Finnhub 요약 글 — **실행 중에만 쓰고 저장하지 않는다**(운영지침 4-3)
   4. 공용 분류 news_store.classify (정식 종목과 같은 지시문 · 검사 · 결과 모양, 25건 묶음 · 묶음에 나온 회사만)
-  5. 화면에 낼 기사(관련도 1 이상 · 사실 문장 있음, 종목당 SUMMARY_PER 건)만 공용 요약 news_summary.summarize (8건 묶음)
+  5. 화면에 낼 기사(관련도 1 이상 · 사실 문장 있음, 종목당 SUMMARY_PER 건)만 공용 요약 news_summary.summarize (5건 묶음)
 저장 (--state, 워크플로 = 비공개 상태 저장소 quick-news-state, 기록 없이 덮어씀): news.json(분류 결과, KEEP_DAYS) · summaries.json(팝업 다섯 줄)
 화면 연결은 3단계(종목 주가 조각) — 이 파일은 받아 두기만 한다(그림자).
 
@@ -165,7 +165,7 @@ def main():
     for k, v in new.items():
         lead = res[k][1]
         n_lead += bool(lead)
-        v["snippet"] = (lead or v.pop("_summary", "") or "")[:news_store.SNIPPET]
+        v["snippet"] = (lead or v.pop("_summary", "") or "")[:news_summary.SRC_MAX]   # 900자 — 분류는 news_store 가 SNIPPET(500)으로 잘라 쓰고, 요약은 900자 다 (11-15: 500자로 넘겨 두 줄 이상 요약이 42% 뿐이었다)
         v.pop("_summary", None)
     print(f"[quick-news] 첫 문단 {n_lead}/{len(new)} · 요약 글로 대신 {sum(1 for k, v in new.items() if not res[k][1] and v['snippet'])} · {time.time() - t1:.0f}초")
     store.update(new)
@@ -195,7 +195,7 @@ def main():
             continue
         per[top] = per.get(top, 0) + 1
         pick.append({"item_id": v["item_id"], "title": v["title"], "url": v["url"], "snippet": v.get("snippet") or ""})
-    out = news_summary.summarize(pick, cache_path=summ_p, lead_cache=None, label="quick-summary", max_items=SUMMARY_MAX, chain="news-quick", batch=8)
+    out = news_summary.summarize(pick, cache_path=summ_p, lead_cache=None, label="quick-summary", max_items=SUMMARY_MAX, chain="news-quick", batch=5)   # 8건이면 3.1 lite 가 자주 항목 불일치 → 대체 모델로 호출 낭비 (11-15 실측)
     two = sum(1 for x in pick if len(out.get(x["item_id"]) or []) >= 2)
     cls = [v for k, v in store.items() if k in new]
     print(f"[quick-news] 분류됨 {sum(1 for v in cls if v.get('ai_model'))}/{len(cls)} · 관련도 2 이상 {sum(1 for v in cls if any(x.get('relevance', 0) >= 2 for x in v.get('scores') or []))}"
