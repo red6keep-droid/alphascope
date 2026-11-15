@@ -156,5 +156,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   .as-search-form input { font-size: 17px; }
   .as-grid { grid-template-columns: repeat(3, 1fr); }
   .as-chat { inset: 0; width: auto; height: auto; border-radius: 0; border: 0; }
+  /* 폰: 입력칸 16 — 아이폰은 16 보다 작은 입력칸을 누르면 화면을 확대해서 창 오른쪽(보내기 버튼)이 밖으로 밀렸다 (2026-11-15 사용자: "질문하기를 누르면 보내기 버튼이 화면 밖으로").
+     높이는 search.js 가 키보드 위 보이는 높이(visualViewport)에 맞춘다 */
+  .as-chat input { font-size: 16px; }
   .as-chat-fab { right: 16px; bottom: 16px; padding: 11px 15px; }
 }
