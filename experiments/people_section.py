@@ -14,7 +14,7 @@ import design_kit as dk
 KST = datetime.timezone(datetime.timedelta(hours=9))
 PATH = os.environ.get("PEOPLE_MENTIONS_JSON") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "people-radar", "output", "state", "people_mentions.json")
 ALL_URL = "https://alpha-scope.blogspot.com/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8"   # 라벨 `인물 발언` 목록 — 발행 때 최신 글 주소로
-SHOWN = 5   # 5건 + 10건씩 더 보기 (2026-11-07 사용자 P340, 옛 3)
+SHOWN = 3   # 3건 + 더 보기 (2026-11-15 사용자 "세 개까지만", 옛 5 — P340)
 TOPIC_KO = {"Trade": "무역", "Fed": "연준 · 금리", "Tax": "세금", "Energy": "에너지", "Immigration": "이민", "Regulation": "규제",
             "Geopolitics": "지정학", "Company": "기업", "Stock Call": "종목 의견", "Position": "매매", "Sector Call": "업종 의견",
             "Macro Warning": "거시 경고", "Market Outlook": "시장 전망", "Policy": "정책 의견", "Product": "제품", "Investment": "투자",
@@ -81,8 +81,7 @@ def _list(ids, items):
         return ""
     out = dk.more_list(rows, "인물 발언", SHOWN, indent=dk.ALIGN_PX)
     out += _credit([items[i] for i in ids if i in items and items[i].get("avatar")])   # CC 사진 출처 표기 의무 (2026-11-08 민간인 사진)
-    out += (f'<p style="margin:0 0 8px;padding:0 {dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};">'
-            f'<a href="{ALL_URL}" style="color:#111;font-weight:700;text-decoration:none;">주요 인물 발언 전체 보기 ›</a></p>')
+    # 더 보기 아래 `주요 인물 발언 전체 보기 ›` 링크는 뺐다 — 글 끝 `함께 보는 페이지` 의 같은 링크와 겹친다 (2026-11-15 사용자)
     return out
 
 
