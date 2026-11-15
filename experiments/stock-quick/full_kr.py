@@ -315,10 +315,10 @@ def pairs_card(s, peers, by):
     if moves:
         rows = [(K.name(p), "", r, "us") for p, r in moves] + ([] if links else [(s["name"], "", s["ret_1d"], "me")] + ([("KOSPI", "", s["ret_1d"] - vb, "bench")] if vb is not None else []))
         lines.append((R.pair_bars([(f"함께 움직여 온 한국 종목 ({day})" if links else f"함께 움직여 온 종목 ({day})", rows)]), "html"))
-    R.add_small_note(lines, ("미국 연결 종목은 사업으로 이어진 미국 종목 가운데, 그 종목이 크게 움직인 밤 다음 날 이 종목도 같은 쪽으로 열려 온 것만 골랐습니다. " if links else "")
-                     + ("함께 움직여 온 종목은 같은 업종에서 최근 1년 하루 등락이 가장 비슷한 종목입니다. " if moves else "")
+    R.add_small_note(lines, ("함께 움직여 온 종목은 같은 업종에서 최근 1년 하루 등락이 가장 비슷한 종목입니다. " if moves else "")
                      + "±0.5% 넘게 움직인 종목만 오른 곳 · 내린 곳으로 셉니다.")
-    card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", fold=True)
+    tip = "미국 연결 종목은 사업으로 이어진 미국 종목 가운데, 그 종목이 크게 움직인 밤 다음 날 이 종목도 같은 쪽으로 열려 온 것만 골랐습니다." if links else ""   # 카드 작은 글씨 → 툴팁 (2026-11-15 사용자)
+    card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=tip, fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
