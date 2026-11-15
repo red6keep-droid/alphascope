@@ -7,7 +7,7 @@
     <b:include data='blog' name='all-head-content'/>
     <!-- 공유 썸네일 (2026-11-15 사용자): 본문에 그림이 없는 페이지는 공통 로고. 그림이 있으면 Blogger 가 첫 그림을 og:image 로 단다(주식 공부 = 본문 맨 앞 숨은 썸네일 data-share-img) -->
     <b:if cond='!data:view.featuredImage'>
-      <meta content='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/share_logo.png' property='og:image'/>
+      <meta content='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png' property='og:image'/>
       <meta content='1200' property='og:image:width'/>
       <meta content='600' property='og:image:height'/>
       <meta content='summary_large_image' name='twitter:card'/>
@@ -4635,7 +4635,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
                   if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY);
                   /* 썸네일 카드 (2026-11-15 사용자): 본문의 data-share-img(주식 공부 = 전용 썸네일) → 없으면 공통 로고. 1200×600 */
                   var si = document.querySelector('img[data-share-img]');
-                  var shareImg = si ? si.getAttribute('src') : 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/share_logo.png';
+                  var shareImg = si ? si.getAttribute('src') : 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png';
                   var shareDesc = ((document.querySelector('meta[name="description"]') || {}).content || '').slice(0, 80);
                   var lk = { mobileWebUrl: shareUrl, webUrl: shareUrl };
                   window.Kakao.Share.sendDefault({ objectType: 'feed',
