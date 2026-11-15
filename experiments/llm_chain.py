@@ -64,6 +64,11 @@ STEPS = {
                "attempts": 2},   # 503 재시도 2회만 — 하루 20회 한도를 재시도로 태우지 않게, 바로 gemini-lite 로 (2026-10-16)
     "gemini-lite": {"kind": "gemini", "env": "GEMINI_API_KEY", "model": GEMINI_LITE_MODEL, "timeout": 300,
                     "attempts": 4},   # 같은 키 · 다른 모델 — 3.5-flash 가 503 이거나 하루 한도여도 보통 바로 답한다 (2026-10-16)
+    # 2026-11-15 할당량 화면(AI-모델-현황 7-1): 3.1 lite 하루 500 — 3.5 lite 와 따로 셈, 품질 같은 급(같은 조건 표시 여부 94% · 방향 92%, 7-2)
+    "gemini-lite31": {"kind": "gemini", "env": "GEMINI_API_KEY", "model": "gemini-3.1-flash-lite", "timeout": 300, "attempts": 4},
+    # Gemma 4 26B 하루 14,400 · 분당 토큰 1만 6천 — 생각 단계 최소 필수(없으면 255초 생각만 하고 답 없음), JSON 형식 지정 대신 답에서 뽑는다. 500 이 잦다 (7-1 · 7-2)
+    "gemma-26b": {"kind": "gemini", "env": "GEMINI_API_KEY", "model": "gemma-4-26b-a4b-it", "timeout": 300, "attempts": 3,
+                  "gen": {"thinkingConfig": {"thinkingLevel": "minimal"}}, "no_json_mime": True},
     "groq": {"kind": "openai", "env": "GROQ_API_KEY", "url": "https://api.groq.com/openai/v1/chat/completions",
              "model": "openai/gpt-oss-120b", "min_interval": 60, "timeout": 120,
              "params": {"reasoning_effort": "low", "max_completion_tokens": 8000}},   # 분당 8,000토큰 → 호출 간격 60초
@@ -114,6 +119,8 @@ CHAINS = {
     # 급하지 않은 한 번짜리 일 — lite 의 남는 몫만 (2026-11-15 사용자: 종목 주가 기업 소개 768종목, 하루 25회 상한).
     # Groq 는 아침마다 하루 토큰이 차는 날이 있어 넘기지 않고, 하루 한도면 그대로 멈춰 다음 날 이어서 (설계 순서 3-2 의 예외 — 운영지침에 기록)
     "json-lite-only": ["gemini-lite"],
+    # 종목 주가(간단 종목) 뉴스 — 3.1 lite 먼저(거의 빈 몫), 넘치면 3.5 lite, 그다음 Gemma 4 26B. flash · Groq 로 넘기지 않는다 (2026-11-15 사용자, 853종목 뉴스 계획)
+    "news-quick": ["gemini-lite31", "gemini-lite", "gemma-26b"],
     "news-alt": ["gemini-lite", "groq", "groq-qwen", "nvidia-deepseek"],
 }
 
@@ -291,7 +298,8 @@ class LLMPool:
         return self._pick_key(model)
 
     def _gemini(self, step, prompt, temperature, max_tokens):
-        gen = {"responseMimeType": "application/json"}
+        gen = {} if step.get("no_json_mime") else {"responseMimeType": "application/json"}
+        gen.update(step.get("gen") or {})   # 단계별 설정 (Gemma 생각 단계 최소)
         if temperature is not None:
             gen["temperature"] = temperature
         if max_tokens:
@@ -343,7 +351,7 @@ class LLMPool:
             try:
                 USAGE[self._step]["tok"] += int((r.json().get("usageMetadata") or {}).get("totalTokenCount") or 0)
                 cand = r.json()["candidates"][0]
-                text = "".join(p.get("text", "") for p in cand["content"]["parts"])
+                text = "".join(p.get("text", "") for p in cand["content"]["parts"] if not p.get("thought"))   # 생각(thought) 부분은 답이 아니다
                 return text
             except Exception as e:  # noqa: BLE001  — 안전 차단 등으로 본문이 없는 응답
                 last = f"빈 응답: {str(e)[:80]} {r.text[:120]}"

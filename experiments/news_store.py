@@ -253,16 +253,17 @@ def _leads(items, cache_path):
         return out
 
 
-def classify(store, save, lead_cache=None, label="radar-news", hours=CLASSIFY_HOURS):
+def classify(store, save, lead_cache=None, label="radar-news", hours=CLASSIFY_HOURS, chains=("news", "news-alt"), batch=None, item_companies=False, max_calls=None):
     """새 기사 · 문장 탈락 기사만 분류 (ai_model 이 없는 것). 두 사슬(news · news-alt, 둘 다 lite 먼저 · 예비 Groq 순서만 다름)을 배치마다 번갈아 쓴다.
     save(store) = 부르는 쪽의 저장 함수 (배치마다 부른다). lead_cache = 첫 문단 캐시 파일 (깃에 넣지 않는 곳, None 이면 기사를 열지 않는다).
-    hours = 이보다 오래된 미분류 기사는 보내지 않는다 — 기본 CLASSIFY_HOURS(24), 미국 데일리는 48 (2026-11-05 사용자: 뉴스 기사는 48시간, 시차 때문에 안전하게)."""
+    hours = 이보다 오래된 미분류 기사는 보내지 않는다 — 기본 CLASSIFY_HOURS(24), 미국 데일리는 48 (2026-11-05 사용자: 뉴스 기사는 48시간, 시차 때문에 안전하게).
+    chains · batch · item_companies · max_calls = 종목 주가(간단 종목) 뉴스용 (2026-11-15): 사슬 news-quick 하나 · 25건 묶음 · 묶음에 나온 회사만 목록에(452종목 전체를 넣지 않게) · 호출 상한."""
     _env()
     from llm_chain import LLMPool, usage_line
     head = open(PROMPT, encoding="utf-8").read()
     companies = {s: f"{EN[s]} ({U.name(s)})" for s, *_ in U.CANDIDATES}
     try:
-        pools = [LLMPool("news", label=label), LLMPool("news-alt", label=label)]
+        pools = [LLMPool(c, label=label) for c in chains]
     except RuntimeError as e:
         print(f"[news] {e} — 분류 없이 둔다(판단 유보)")
         return store
@@ -282,10 +283,15 @@ def classify(store, save, lead_cache=None, label="radar-news", hours=CLASSIFY_HO
             if time.time() > deadline:
                 print(f"[news] 시간 예산 {MAX_MINUTES}분 — 남은 {len(todo) - i}건은 다음 실행에서")
                 break
-            pool = pools[n % 2]
-            size = QWEN_BATCH if pool.first_step == "groq-qwen" else BATCH   # gpt-oss 가 하루 한도로 빠지면 두 사슬 모두 Qwen 크기로
+            if max_calls and n >= max_calls:
+                print(f"[news] 호출 상한 {max_calls}번 — 남은 {len(todo) - i}건은 다음 실행에서")
+                break
+            pool = pools[n % len(pools)]
+            size = batch or (QWEN_BATCH if pool.first_step == "groq-qwen" else BATCH)   # gpt-oss 가 하루 한도로 빠지면 두 사슬 모두 Qwen 크기로
+            part = todo[i:i + size]
+            comp = {t: companies[t] for x in part for t in (x.get("queries") or []) if t in companies} if item_companies else companies
             try:
-                res = _call(pool, head, companies, todo[i:i + size], leads)
+                res = _call(pool, head, comp, part, leads)
             except RuntimeError as e:
                 print(f"[news] 분류 실패 — 남은 {len(todo) - i}건은 다음 실행에서 : {e}")
                 break
