@@ -1,0 +1,106 @@
+"""주식 공부 목록 페이지(/p/study.html) — 과정별 편 목록 (2026-11-15 사용자: 목록 페이지도 목업에).
+
+    .venv/bin/python experiments/course/render_list.py      # output/mock_study_list.html
+
+- 커리큘럼 문서 4절: 맨 위 캐릭터 셋 + 한 줄 소개 → 과정 카드 → 편 목록. 나온 편 = 줄 전체 링크, 안 나온 편 = 회색 `준비 중`.
+- 나온 편 주소 = published.json (publish_course.py 가 발행 때 씀). 편 목록 = 아래 COURSES (커리큘럼 문서 2절). 편이 나올 때만 갱신.
+- 번호 칸은 글 본문 번호 목록과 같은 규칙(기준선에서 시작 · 32px).
+"""
+import html
+import json
+import os
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import render_course as RC  # noqa: E402
+
+dk = RC.dk
+OUT = os.path.join(HERE, "output", "mock_study_list.html")
+INTRO = "주식에서 흔히 듣는 말, 데이터로 확인해 봤습니다"
+
+# (과정 이름, 한 줄 소개, [(번호, 편 제목, 초안 파일 이름 또는 None)])
+COURSES = [
+    ("초보가 흔히 하는 착각", "많이 듣는 말을 하나씩 꺼내, 아무 날에 산 사람과 비교해 확인합니다.", [
+        ("0", "들어가며", "착각-00-들어가며.md"),
+        ("1", "실적이 좋다는데 왜 주가는 떨어질까?", "착각-01-실적.md"),
+        ("2", "고점에 물리면 얼마나 오래 가나?", None),
+        ("3", "크게 빠진 날 팔면 안 되는 때, 괜찮은 때", None),
+        ("4", "판 값에 다시 사려다 더 비싸게 사는 이유", None),
+        ("5", "분할 매수, 하단을 기다리면 더 싸게 모일까?", None),
+        ("6", "과열이면 떨어진다고요?", None),
+        ("7", "볼린저 하단에서 샀는데 왜 더 떨어질까?", None),
+        ("8", "골든크로스는 2010년대엔 틀리고 2020년대엔 맞았다", None),
+        ("9", "동전 던지기에도 파동은 생긴다", None),
+        ("10", "마치며, 지표는 방향이 아니라 크기를 잰다", None),
+    ]),
+    ("숫자 읽는 법", "AlphaScope 페이지에 나오는 숫자를 어떻게 읽는지 알려 드립니다.", [
+        ("1", "평소 하루에 얼마나 움직이나", None),
+        ("2", "볼린저 밴드 읽는 법", None),
+        ("3", "공시(8-K)는 무엇을 보면 되나", None),
+        ("4", "증시 전망은 어떻게 맞았다고 하나", None),
+    ]),
+    ("책 속 주장, 데이터로 확인하기", "주식책에 나오는 주장 하나를 골라 실제 주가로 확인합니다.", [
+        ("1", "『차트 패턴』 쌍바닥 뒤에 사면 정말 오를까?", None),
+        ("2", "『급등의 법칙』 거래량이 몰리면 오를까?", None),
+        ("3", "『잘 잃어야 잘 번다』 손절하면 덜 잃을까?", None),
+        ("4", "『파동 눌림목 매매법』 눌림에서 사면 나을까?", None),
+        ("5", "『시장의 사이클과 바닥에서 매수하는 방법』 바닥 신호는 맞을까?", None),
+        ("6", "『추세추종 절대수익』 52주 신고가에 사면 나을까?", None),
+    ]),
+]
+CHEV = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" '
+        'stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5 10.5 8 6 12.5"/></svg>')
+
+
+def course_card(k, name, intro, eps, urls):
+    done = sum(1 for _, _, f in eps if f and urls.get(f))
+    rows = []
+    for n, t, f in eps:
+        url = urls.get(f) if f else None
+        num = f'<span style="flex:none;width:32px;font-size:15px;line-height:24px;color:{"#0F766E" if url else "#9CA3AF"};font-weight:700;">{n}</span>'
+        if url:
+            rows.append(f'<a href="{html.escape(url)}" data-row-link="1" style="display:flex;align-items:center;gap:0;padding:12px {dk.ALIGN_PX}px;border-top:1px solid #E2E8F0;text-decoration:none;color:inherit;">'
+                        f'{num}<span style="flex:1 1 auto;min-width:0;font-size:17px;line-height:26px;font-weight:700;color:#111;word-break:keep-all;">{html.escape(t)}</span>'
+                        f'<span style="flex:none;margin-left:8px;color:#6B7280;">{CHEV}</span></a>')
+        else:
+            rows.append(f'<div style="display:flex;align-items:center;padding:12px {dk.ALIGN_PX}px;border-top:1px solid #E2E8F0;">'
+                        f'{num}<span style="flex:1 1 auto;min-width:0;font-size:17px;line-height:26px;color:#9CA3AF;word-break:keep-all;">{html.escape(t)}</span>'
+                        '<span style="flex:none;margin-left:8px;font-size:13px;line-height:18px;font-weight:700;color:#9CA3AF;white-space:nowrap;">준비 중</span></div>')
+    state = f"{len(eps)}편 중 {done}편" if done else f"{len(eps)}편 준비 중"
+    return (f'<section data-course="{k + 1}" style="margin:0 0 20px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;">'
+            f'<div style="padding:16px {dk.ALIGN_PX + 10}px 14px;">'
+            f'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px;">'
+            f'<span style="font-size:14px;line-height:20px;font-weight:700;color:#0F766E;">{k + 1}과정</span>'
+            f'<span style="font-size:13px;line-height:18px;color:{dk.NOTE};">{state}</span></div>'
+            f'<h2 style="margin:0 0 6px;font-size:21px;line-height:30px;font-weight:800;color:#111;word-break:keep-all;">{html.escape(name)}</h2>'
+            f'<p style="margin:0;font-size:15px;line-height:24px;color:#4B5563;word-break:keep-all;">{html.escape(intro)}</p></div>'
+            f'<div style="padding:0 10px;">{"".join(rows)}</div></section>')
+
+
+def page(urls):
+    chars = "".join(f'<img src="{RC.img_src(RC.CHAR_DIR, c)}" alt="" width="84" height="84" style="display:block;width:84px;height:84px;max-width:none;border-radius:0;">'
+                    for c in ("up_surprised", "mid_explain", "down_happy"))
+    head = (f'<div data-study-head="1" style="padding:24px {dk.ALIGN_PX}px 8px;margin:0 0 16px;text-align:center;">'
+            f'<div aria-hidden="true" style="display:flex;justify-content:center;align-items:flex-end;gap:4px;margin:0 0 12px;">{chars}</div>'
+            '<h1 style="margin:0 0 6px;font-size:26px;line-height:36px;font-weight:800;color:#111;">주식 공부</h1>'
+            f'<p data-seo-lead="1" style="margin:0;font-size:17px;line-height:26px;color:#333;word-break:keep-all;">{INTRO}</p></div>')
+    cards = "".join(course_card(k, *c, urls) for k, c in enumerate(COURSES))
+    return (f'<span data-head-label="{RC.HEAD_LABEL}" hidden></span><span data-nav="home" hidden></span>'
+            + dk.WRAP_OPEN + head + cards + dk.WRAP_CLOSE)
+
+
+def main():
+    p = os.path.join(HERE, "published.json")
+    urls = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else {}
+    os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    path = dk.write_mock(page(urls), OUT, "주식 공부")
+    if path:
+        pg = open(path, encoding="utf-8").read().replace("</body>", RC.MOCK_HEAD_JS + "</body>", 1)
+        open(path, "w", encoding="utf-8").write(pg)
+    print(f"[주식 공부 목록] → {path}")
+
+
+if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    main()

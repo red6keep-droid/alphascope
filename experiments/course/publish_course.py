@@ -116,6 +116,9 @@ def main(dry):
         found = NP.find_post_id(t, max_results=50)
         url = NP.update_post(found["id"], t, body, LABELS)
         print(f"[갱신] {t} → {url}")
+    import json
+    with open(os.path.join(HERE, "published.json"), "w", encoding="utf-8") as f:   # 목록 페이지(render_list.py)가 읽는다 — 나온 편 = 링크
+        json.dump(urls, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":
