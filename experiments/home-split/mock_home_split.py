@@ -76,6 +76,10 @@ def split_html(src, mkt, files=FILES):
     if os.path.exists(hp):
         with open(hp, encoding="utf-8") as f:
             html = html.replace("<head>", "<head>\n<script>window.PV_HYPO = " + f.read().replace("</", "<\\/") + ";</script>", 1)
+    ip = os.path.join(ROOT, "experiments", "issue_store", "output", "issue", "issues.json")   # Hot Issue 카드 자료 = issue_watch_daily 결과 (2026-11-16)
+    if os.path.exists(ip):
+        with open(ip, encoding="utf-8") as f:
+            html = html.replace("<head>", "<head>\n<script>window.PV_ISSUES = " + f.read().replace("</", "<\\/") + ";</script>", 1)
     if mkt == "kr":   # 한국 홈 주요 뉴스 — 수집 전이라 테마는 숨김. 목업만 가짜 한국 뉴스로 미국 홈과 같은 꼴을 본다 (2026-11-15 사용자: 한국 홈도 뉴스 넣을 것)
         html = html.replace("</body>", KR_NEWS_JS + "</body>", 1)
     # 주식 공부 배너 — gh-pages 에 올리기 전에는 로컬 그림을 그대로 넣어 본다 (2026-11-15)

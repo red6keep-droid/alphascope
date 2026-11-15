@@ -211,6 +211,7 @@ jobs:
           # AI 판정은 하루 한 번 = 본 실행만 (2026-11-13 사용자: 매시간 말고 하루 한 번 묶어서). 갱신 실행은 저장된 판정만
           if [ "${{ needs.check.outputs.mode }}" != "refresh" ]; then AI="--ai"; else AI=""; fi
           python experiments/issue_store/issue_watch_daily.py --state "$STATE_DIR" $AI
+          mkdir -p deploy-forecast && cp experiments/issue_store/output/issue/issues.json deploy-forecast/issues.json 2>/dev/null || true   # 홈 Hot Issue 카드 자료 — 아래 hypo.json 배포와 같이 gh-pages 로 (07:30 본 실행, 2026-11-16 사용자)
           if [ "$DO_PUBLISH" = "true" ]; then
             python experiments/issue_store/publish_issue.py --state "$STATE_DIR"
           else
