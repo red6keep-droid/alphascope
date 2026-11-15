@@ -838,7 +838,7 @@ def sec_today_tab(s, news):
             dc["today"][sc["direction"]] = dc["today"].get(sc["direction"], 0) + 1
     top = sorted((e for e in events if e["rel"] >= 2 and e["has_fact"]), key=lambda e: e["published_at"], reverse=True)
     top = sorted(top, key=lambda e: -e["rel"])[:MAX_ISSUES]   # 관련도 높은 순, 같으면 최근 순
-    issues = [(f"{R.rr.AREA_KO.get(e['area'], e['area'])} {_dk.headline(e['fact'])}", e.get("url")) for e in top if e["has_fact"]]   # (글, 기사 주소) — 줄을 누르면 그 기사가 열린다 (2026-10-23 사용자)   # 명사형 헤드라인체 (데일리 · NVDA 중요 이슈와 같게)
+    issues = [(f"{R.rr.AREA_KO.get(e['area'], e['area'])} {_dk.headline(e['fact'])}", e.get("url"), e) for e in top if e["has_fact"]]   # 셋째 칸 = 기사 — 줄을 누르면 요약 팝업 (2026-11-15 사용자)   # (글, 기사 주소) — 줄을 누르면 그 기사가 열린다 (2026-10-23 사용자)   # 명사형 헤드라인체 (데일리 · NVDA 중요 이슈와 같게)
     today = _today_list(s, events)
     a = {"events": today[:MAX_EVENTS], "events_overflow": today[MAX_EVENTS:MAX_EVENTS + 12], "direction_counts": dc,
          "brief_events": today, "brief_key": s["sym"], "brief_name": s["name"]}   # 한 줄 소식 키워드 버튼 — 목록 상한 밖 기사까지 (2026-11-15 사용자)
