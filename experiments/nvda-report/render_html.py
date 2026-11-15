@@ -2650,13 +2650,25 @@ def _thin(e):
     return bool(e.get("pop_key")) and not e.get("pop_unchecked") and len([x for x in (e.get("pop_lines") or []) if x]) < 2
 
 
+def _brief(a):
+    """목록에서 뺀 한 줄짜리(_thin) → 키워드 버튼 줄 (2026-11-15 사용자, design_kit.brief_chips). 줄 = 요약 한 줄, 없으면 사실 문장."""
+    pool = a.get("brief_events") or (list(a.get("events") or []) + list(a.get("events_overflow") or []))   # brief_events = 목록 상한 밖까지 전부
+    thin = sorted((e for e in pool if _thin(e)), key=lambda e: str(e.get("published_at") or ""), reverse=True)
+    items = [{"issue": e.get("issue"), "line": next((x for x in e.get("pop_lines") or [] if x), None) or e.get("fact") or "",
+              "source": rr.SOURCE_KO.get(e.get("pop_source") or "", e.get("pop_source") or "") if (e.get("pop_kind") or "방송") == "기사" else e.get("channel", ""),
+              "url": e.get("url")} for e in thin]
+    return _dk.brief_chips(items, a.get("brief_key") or "ev", a.get("brief_name") or "")
+
+
 def sec_events(a):
+    brief = ""
     if a["events"] or a.get("events_overflow"):
+        brief = _brief(a)
         a = dict(a, events=[e for e in a["events"] if not _thin(e)], events_overflow=[e for e in a.get("events_overflow") or [] if not _thin(e)])
         if not a["events"] and a["events_overflow"]:
             a["events"], a["events_overflow"] = a["events_overflow"][:1], a["events_overflow"][1:]
         if not a["events"]:
-            return _muted("오늘은 요약할 만한 뉴스가 없습니다.")
+            return brief or _muted("오늘은 요약할 만한 뉴스가 없습니다.")
     if not a["events"]:
         return _muted("오늘은 임계값을 넘은 이벤트가 없습니다. 공시·기사·가격·옵션·예상 실적 어느 쪽도 기준에 걸리지 않았다는 뜻입니다.")
     cards = [e for e in a["events"] if e.get("emphasis")]
@@ -2665,6 +2677,7 @@ def sec_events(a):
     # 처음 5건(강조 카드 포함) + `뉴스 n건 더 보기` 10건씩 (2026-11-07 사용자 P340, 옛: 8건 + `그 외 n건` 한 번에 전부). 좌우 = 좌측 기준선 6px (P38)
     rest = plain + [dict(e, emphasis=False) for e in a["events_overflow"]]
     out = "".join(_event_html(e) for e in cards) + _dk.more_list([_event_html(e) for e in rest], "뉴스", max(0, _dk.MORE_SHOWN - len(cards)), indent=_dk.ALIGN_PX, first_top=NEWS_FIRST_TOP)
+    out += brief   # 한 줄 소식 키워드 버튼 — 목록 아래
     if a.get("analyst_target_only"):
         out += _muted(f"목표가만 바뀐 애널리스트 {len(a['analyst_target_only'])}건 (등급 변경 아님): "
                       + " · ".join(t["title"] for t in a["analyst_target_only"][:6]))

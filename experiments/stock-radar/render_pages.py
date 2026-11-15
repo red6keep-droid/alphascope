@@ -840,7 +840,8 @@ def sec_today_tab(s, news):
     top = sorted(top, key=lambda e: -e["rel"])[:MAX_ISSUES]   # 관련도 높은 순, 같으면 최근 순
     issues = [(f"{R.rr.AREA_KO.get(e['area'], e['area'])} {_dk.headline(e['fact'])}", e.get("url")) for e in top if e["has_fact"]]   # (글, 기사 주소) — 줄을 누르면 그 기사가 열린다 (2026-10-23 사용자)   # 명사형 헤드라인체 (데일리 · NVDA 중요 이슈와 같게)
     today = _today_list(s, events)
-    a = {"events": today[:MAX_EVENTS], "events_overflow": today[MAX_EVENTS:MAX_EVENTS + 12], "direction_counts": dc}
+    a = {"events": today[:MAX_EVENTS], "events_overflow": today[MAX_EVENTS:MAX_EVENTS + 12], "direction_counts": dc,
+         "brief_events": today, "brief_key": s["sym"], "brief_name": s["name"]}   # 한 줄 소식 키워드 버튼 — 목록 상한 밖 기사까지 (2026-11-15 사용자)
     issue_html = R.sec_narrative(a, {"today": issues}) if issues else _dk.muted("최근 7일 동안 이 종목을 주로 다룬 큰 소식이 없습니다.")
     return sec_crash(s, dc["today"]) + _dk.keep_tone(R._section("중요 이슈", issue_html, tab="오늘")   # 뉴스 · 중요 이슈는 합니다체로 바꾸지 않는다 (2026-10-18 사용자)
                          + (R._section("뉴스", R.sec_direction_bars(dict(a, empty_text="오늘은 이 종목을 다룬 뉴스가 없습니다.")) + (R.sec_events(a) if today else ""), line=False, tab="오늘")
