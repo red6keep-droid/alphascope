@@ -1098,7 +1098,7 @@ def _now_plain(fc, st):
     rows, chart = _now_block(fc, st, parts=True)
     # 첫 줄(자 이름 · 값 · `종가 대비 · 꽤 오름`)은 그래프 제목과 겹쳐 지우고 값만 그래프 제목 오른쪽에 한 줄로 (P428, 2026-11-08 사용자). 나머지 줄(회복 폭 · 불안 지수)은 그대로
     first, rest = (rows[0], rows[1:]) if rows else (None, [])
-    out = _plain_rows("", [(n, fmt_tri(v), note) for n, v, note in rest], inset=True) if rest else ""
+    out = _plain_rows("", [(n, fmt_tri(v), note) for n, v, note in rest], inset=True, sub_inline=True) if rest else ""
     if chart:
         if first and first[1]:
             head_start = chart.find(dk.CHART_TITLE_M)
@@ -1313,16 +1313,17 @@ def _brand(html, size):
     return html.replace(R.BRAND, R.brand_mark(int(str(size).rstrip("px"))), 1)
 
 
-def _plain_rows(lead, rows, note="", lines=True, inset=False):
+def _plain_rows(lead, rows, note="", lines=True, inset=False, sub_inline=False):
     """접는 줄 안 내용 — 글자는 왼쪽 기준선 6(제목 점과 같은 선, P424) · 오른쪽도 6(좌우 같게, P461), 구분선은 끝까지. 굵게 없음 · 증감 숫자 = ▲ · ▼ + 색 (P423 · P424, 2026-11-08 사용자)."""
     A, R = (IN_L, IN_R) if inset else (dk.ALIGN_PX, dk.ALIGN_PX)   # inset = 아이콘 접는 줄 안
     out = f'<p style="margin:0 0 4px;padding:0 {R}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{_brand(tri_text(dk.esc(lead)), dk.NAME)}</p>' if lead else ""
     for i, (name, val, sub) in enumerate(rows):
         out += (f'<div style="padding:{14 - dk.VP}px {R}px {14 - dk.VP}px {A}px;{"border-top:1px solid #E2E8F0;" if i and lines else ""}">'
                 f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:{dk.NAME};line-height:{dk.LH_CARD};">'
-                f'<span style="color:#111;word-break:keep-all;">{dk.esc(name)}</span>'
+                f'<span style="color:#111;word-break:keep-all;">{dk.esc(name)}'
+                + (f'<span style="margin-left:6px;font-size:{dk.TINY};color:{dk.SUB};">{dk.esc(sub)}</span>' if sub and sub_inline else "") + '</span>'   # sub_inline = 작은 회색 말을 이름 옆 같은 줄 (`불안 지수 (VIX) 높음`, 2026-11-15 사용자)
                 + (f'<span style="flex:none;max-width:55%;text-align:right;color:#111;word-break:keep-all;">{val if str(val).startswith("<") else tri_text(dk.esc(val))}</span>' if val else "") + '</span>'
-                + (f'<span style="display:block;margin-top:2px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">{dk.esc(sub)}</span>' if sub else "")
+                + (f'<span style="display:block;margin-top:2px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">{dk.esc(sub)}</span>' if sub and not sub_inline else "")
                 + '</div>')
     if note:
         out += f'<span style="display:block;margin:4px 0 0;padding:0 {R}px 0 {A}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">{dk.esc(note)}</span>'
@@ -1393,7 +1394,7 @@ def _fold_row(title, html, label="", side="", icon=""):
 
 
 # 아이콘 접는 줄 안 글자(값 줄 · 그래프 제목 · 안내 · 종목 줄) = 왼쪽 아이콘 중심 세로선 · 오른쪽 접기 버튼 중심 세로선, 그래프 폭은 그대로 6 ~ 버튼 끝 (2026-11-15 사용자 — 옛 같은 날 34 들여쓰기는 그래프까지 좁혀 되돌림)
-IN_L = dk.ALIGN_PX + dk.SOFT_ICON_SIZE // 2   # 6 + 11 = 17
+IN_L = dk.ALIGN_PX + dk.SOFT_ICON_SIZE // 2 - 5   # 아이콘 중심선 17 에서 5 더 왼쪽 = 12 (같은 날 사용자: 여백 5 좁혀)
 IN_R = round(dk.FOLD_BOX / 2)                 # 31 의 가운데 15.5 → 정수 16
 
 
