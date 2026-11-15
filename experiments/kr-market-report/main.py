@@ -1276,8 +1276,91 @@ def _updown(v):
     return "오르고" if v > 0 else "내리고" if v < 0 else "제자리이고"
 
 
+LEAD_CACHE = os.path.join(OUT, "state", "kr_lead.json")   # 날짜 → AI 한 줄 결론 (같은 날 다시 돌려도 다시 부르지 않는다)
+LEAD_PROMPT = """너는 한국 증시 마감 리포트의 첫 문장을 쓴다. 아래 사실(JSON)만 근거로, 오늘 코스피가 왜 그렇게 움직였는지 한국어 한 문장으로 써라.
+- 원인은 사실에 있는 것만: 강한 · 약한 업종, 외국인 매매, 시가총액 상위 종목, 뉴스 제목. 사실에 없는 원인을 지어내지 마라.
+- 원인이 분명하지 않으면 어느 업종이 지수를 이끌거나 끌어내렸는지를 쓴다.
+- 숫자 · 퍼센트 · 날짜를 쓰지 마라. 전망 · 추천 · 평가 말(호재, 기대, 우려 해소, 매수 기회 등)을 쓰지 마라.
+- 방향은 코스피 방향(kospi_dir)과 같아야 한다. 문체는 '-습니다' 로 끝나는 한 문장, 70자 안팎.
+JSON 하나로만 답한다: {"line": "<한 문장>"}
+
+사실: """
+
+
+def _kr_headlines(n=8):
+    """최근 24시간 한국 증시 방송 이슈 제목 (AI 재료) — 뉴스 탭과 같은 출처(media_feed), AI 0. 못 읽으면 []."""
+    try:
+        RH = _daily_render()
+        mf = RH.media_feed
+        rows = [x for x in RH.kr_news.rows_now() if mf.is_korea(x)]
+        since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M")
+        return [x.get("topic") or x.get("title") for x in _kr_content(mf.issues(rows, since), n) if x.get("topic") or x.get("title")]
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr-report] 결론용 뉴스 제목 못 읽음: {str(e)[:80]}")
+        return []
+
+
+def _lead_ok(line, up):
+    """한 문장 · 숫자 없음 · 방향이 코스피와 같음 · 평가 말 없음 — 아니면 None (파이썬 문장으로)."""
+    line = " ".join(str(line or "").split())
+    if not (20 <= len(line) <= 110) or not line.endswith("다.") or re.search(r"\d|%", line):
+        return None
+    if re.search(r"호재|악재|기대감|우려 해소|매수 기회|추천|유망|전망", line):
+        return None
+    has_up, has_down = re.search(r"오르|올랐|상승|강세|반등", line), re.search(r"내리|내렸|하락|약세|떨어|밀렸", line)
+    if (up and not has_up) or (not up and not has_down):
+        return None
+    return line
+
+
+def ai_one(r):
+    """한 줄 결론을 AI 가 원인까지 (2026-11-15 사용자: 미국 카드처럼). 하루 1회 · 같은 날 저장값 · 검사 탈락이면 None → 파이썬 문장.
+    사슬 kr-lead = 3.1 lite → 3.5 lite → DeepSeek (flash 하루 20회는 미국 리포트 몫)."""
+    k, q = r["idx"].get(U.BENCH), r["idx"].get(U.KOSDAQ)
+    if not k:
+        return None
+    cache = {}
+    try:
+        cache = json.load(open(LEAD_CACHE, encoding="utf-8"))
+    except (OSError, ValueError):
+        pass
+    if r["day"] in cache:
+        return cache[r["day"]] or None
+    sec = r.get("sectors") or []
+    f = (r.get("market") or {}).get("foreign") or {}
+    top = sorted(r.get("top") or [], key=lambda s: -abs(s.get("ret_1d") or 0))
+    facts = {"kospi_dir": "상승" if k["ret"] > 0 else "하락", "kosdaq_dir": ("상승" if q["ret"] > 0 else "하락") if q else None,
+             "outside_normal": [INDEX[x] for x in r["idx"] if (r["idx"][x].get("normal") or {}).get("outside")],
+             "strong_sectors": [x["theme"] for x in sec[:3] if (x.get("ret_1d") or 0) > 0], "weak_sectors": [x["theme"] for x in sec[::-1][:3] if (x.get("ret_1d") or 0) < 0],
+             "foreign": ({"side": "순매수" if f["today"] > 0 else "순매도", "streak_days": f.get("streak", 1)} if f.get("day") == r["day"] else None),
+             "top10_up": sum(1 for s in r.get("top") or [] if (s.get("ret_1d") or 0) > 0), "top10_n": len(r.get("top") or []),
+             "big_movers": [{"name": s["name"], "dir": "상승" if s["ret_1d"] > 0 else "하락"} for s in top[:3] if abs(s.get("ret_1d") or 0) >= 2],
+             "news_titles": _kr_headlines()}
+    line = None
+    try:
+        sys.path.insert(0, os.path.join(_HERE, ".."))
+        from llm_chain import LLMPool
+        pool = LLMPool("kr-lead", label="kr-lead")
+        for _ in range(2):   # 검사 탈락이면 한 번 더
+            out = pool.generate_json(LEAD_PROMPT + json.dumps(facts, ensure_ascii=False), temperature=0.3, max_tokens=400)
+            raw = (out or {}).get("line") if isinstance(out, dict) else None
+            line = _lead_ok(raw, k["ret"] > 0)
+            if line:
+                break
+            print(f"[kr-report] 한 줄 결론 검사 탈락: {str(raw)[:120]}")
+        print(f"[kr-report] 한 줄 결론 ({pool.last_model}): {line or '검사 탈락 — 파이썬 문장'}")
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr-report] 한 줄 결론 AI 실패 — 파이썬 문장: {str(e)[:100]}")
+    if line:   # 탈락 · 실패는 저장하지 않는다(다시 돌리면 한 번 더 시도)
+        os.makedirs(os.path.dirname(LEAD_CACHE), exist_ok=True)
+        cache = {d: v for d, v in cache.items() if d >= (datetime.date.fromisoformat(r["day"]) - datetime.timedelta(days=30)).isoformat()}
+        cache[r["day"]] = line
+        json.dump(cache, open(LEAD_CACHE, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    return line
+
+
 def lead(r):
-    """P447 한 줄 결론(굵게) + 해설 한 문단 — 미국 sec_lead · _text_flow 자리. AI 없이 파이썬 문장 틀. 결론은 숫자 없이, 숫자는 문단에."""
+    """P447 한 줄 결론(굵게) + 해설 한 문단 — 미국 sec_lead · _text_flow 자리. 결론 = AI 가 원인까지 한 문장(ai_one, 2026-11-15) · 실패면 파이썬 문장 틀. 결론은 숫자 없이, 숫자는 문단에."""
     k, q = r["idx"].get(U.BENCH), r["idx"].get(U.KOSDAQ)
     if not k:
         return ""
@@ -1290,6 +1373,7 @@ def lead(r):
     outs = [INDEX[x] for x in r["idx"] if (r["idx"][x].get("normal") or {}).get("outside")]
     if outs:
         one = one[:-5] + f"였고, {' · '.join(outs)} 움직임은 평소 범위를 벗어났습니다."
+    one = ai_one(r) or one   # AI 가 원인까지 쓴 한 문장 — 실패 · 검사 탈락이면 위 파이썬 문장 (2026-11-15 사용자)
     sents = [f"코스피는 {k['close']:,.2f}로 {_s(k['ret'])}" + (f", 코스닥은 {q['close']:,.2f}로 {_s(q['ret'])} 마감했습니다." if q else " 마감했습니다.")]
     sec = r.get("sectors") or []
     if len(sec) >= 2:
@@ -1487,7 +1571,7 @@ def body(r):
         price_chart(r["day"], r["kospi_bars"]),   # 요약 바로 아래 (데일리의 S&P 500 그래프 자리)
         index_strip(r),   # 지수 가로 카드 = 오늘 탭 바로 아래, 막대 그래프 위 (2026-11-08 사용자 — 미국과 같은 자리, 옛 P446 막대 아래)
         head_chart(r),   # 제목 글자 없이 그래프만 (2026-10-26 사용자, M19)
-        lead(r),   # 한 줄 결론 + 해설 문단 (P447, AI 없음)
+        lead(r),   # 한 줄 결론(AI, 하루 1회 · 실패면 파이썬) + 해설 문단 (P447)
         _dk.section(TAB_TODAY, C.cards_grid(open_card(r) + mood_card(r) + index_tech_card(r)), tab=TAB_TODAY),   # `평소와 달랐나?` 는 분위기 카드 안으로 (P448) · 기술지표 카드 (P449)
         news_section(),   # 뉴스 탭 = 오늘 바로 다음 (미국과 같은 자리, M81)
         _dk.section(TAB_STOCKS, C.cards_grid(group_section(r) + sector_card(r) + mega_card(r) + (mega_sample(r) if MOCK_SAMPLE else "") + notable_card(r)), tab=TAB_STOCKS),   # 미국 종목 카드처럼 질문 카드 6개, 테마가 먼저 (M46 · M84)

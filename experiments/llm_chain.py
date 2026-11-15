@@ -121,6 +121,8 @@ CHAINS = {
     "json-lite-only": ["gemini-lite"],
     # 종목 주가(간단 종목) 뉴스 — 3.1 lite 먼저(거의 빈 몫), 넘치면 3.5 lite, 그다음 Gemma 4 26B. flash · Groq 로 넘기지 않는다 (2026-11-15 사용자, 853종목 뉴스 계획)
     "news-quick": ["gemini-lite31", "gemini-lite", "gemma-26b"],
+    # 한국 증시 리포트 한 줄 결론 — 하루 1회, 서술이라 예비는 DeepSeek(예비 중 서술 품질 1위). flash 하루 20회는 미국 리포트 몫 (2026-11-15 사용자)
+    "kr-lead": ["gemini-lite31", "gemini-lite", "nvidia-deepseek"],
     "news-alt": ["gemini-lite", "groq", "groq-qwen", "nvidia-deepseek"],
 }
 
