@@ -2134,7 +2134,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
     # 질문 앞 = 증시 전망 저울 아이콘(배경 = 홈 `시장 흐름과 종목` 아이콘 청록 #0E7490, P457) 24 · 모서리 6 · 그림 16, P456). 한 줄 높이(1lh = 22/28 · 폰 20/26)를 아이콘 · 날짜 칸이 물려받아 첫 줄 가운데, 둘째 줄은 아이콘 아래로 들어가지 않는다
     icon = f'<span style="display:flex;flex:none;align-items:center;height:1lh;">{scale_icon(24)}</span>'
     # 개별 종목 전망(자동 등록 target=stock)만 티커 로고 · 저울 없음, 거시 · 업종 전망은 종목명이 있어도 로고 없이 저울만 (2026-11-11 사용자 — 옛 11-10 `질문에 종목명이 있으면 로고`)
-    title_html = title_for(fc)
+    title_html = title_for(fc, 25)   # 질문 줄 종목 로고 22 → 25 (2026-11-15 사용자: 15% 크게 · 정수). 목록 줄 18 · 현재 증시 종목 줄 22 는 그대로
     if is_stock_fc(fc):
         icon = ""
     back = _back_of(fc)   # 세부 전망 페이지 — 질문 앞 보라 `세부전망` 라벨 + 날짜 아래 작은 `이전전망 ›` 버튼 (P481, 2026-11-08 사용자: 세부 전망은 전망이 있어야 있는 것)
