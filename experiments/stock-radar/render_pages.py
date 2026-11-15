@@ -1206,14 +1206,20 @@ SUMMARY_MAX = 40   # 하루 새로 요약하는 기사 상한 — Groq 하루 �
 def summarize_shown(a, news):
     """목록에 실리는 기사(최근 24시간 · 관련도 1 이상 · 사실 문장 있음)만 요약 — 이미 요약한 기사는 캐시. 실패해도 페이지는 나간다(요약 줄 하나 + 원문)."""
     import news_summary
-    seen, items = set(), []
+    seen, per = set(), []
     since = _since()
     for s in a["stocks"]:
-        for e in _news_for(s, news)[0]:
+        rows = []
+        evs = sorted(_news_for(s, news)[0], key=lambda e: _ts(e["published_at"]), reverse=True)
+        for e in sorted(evs, key=lambda e: -e["rel"]):
             k = e.get("pop_key")
             if e["kind"] == "news" and k and k not in seen and _ts(e["published_at"]) >= since:
                 seen.add(k)
-                items.append({"item_id": k, "title": e["title"], "url": e.get("url"), "snippet": e.get("detail") or ""})
+                rows.append({"item_id": k, "title": e["title"], "url": e.get("url"), "snippet": e.get("detail") or ""})
+        per.append(rows)
+    # 종목마다 돌아가며 한 건씩 (관련도 높은 순 → 최근 순) — 상한 40건을 앞 종목이 다 쓰면 뒤 종목(코스트코 등)은 요약이 하나도 없어
+    # 목록이 통째로 비었다 (2026-11-15 사용자). 이미 요약된 기사는 상한을 쓰지 않으니 순서만 바뀐다
+    items = [r for i in range(max(map(len, per), default=0)) for rows in per if i < len(rows) for r in [rows[i]]]
     try:
         # 첫 문단 = 분류 단계(collect_news.LEAD_CACHE)가 이 실행에서 이미 받아 둔 파일을 그대로 (2026-11-15).
         # 옛: 따로 data/leads.json — 같은 기사를 처음부터 다시 받으려다 구글 뉴스가 이미 막은 뒤라 매 실행 40건 중 0건, 요약은 제목만 보고 만들어졌다
