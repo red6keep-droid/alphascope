@@ -62,13 +62,23 @@ CHAR_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chars")
 CHAR_PX = {"line": 113, "vs": 150, "bubble": 125}   # 강조 줄 · 대결 · 말풍선 아래 — 2026-11-14 사용자: 캐릭터 부각, 30% 키움(72 · 96 · 80 → 94 · 125 · 104) 뒤 20% 더(→ 113 · 150 · 125)
 
 
+IMG_BASE = None   # 발행 때 publish_course.py 가 gh-pages 주소로 채운다(…/images/study/). None = 목업(data URI)
+
+
+def img_src(folder, name):
+    """그림 주소 — 목업은 data URI, 발행은 IMG_BASE + 파일 이름 (캐릭터 · 아이콘 파일 이름은 겹치지 않는다)."""
+    if IMG_BASE:
+        return IMG_BASE + name + ".webp"
+    with open(os.path.join(folder, name + ".webp"), "rb") as f:
+        return "data:image/webp;base64," + base64.b64encode(f.read()).decode()
+
+
 def char(tok, where):
     """`{이름-상황}` → 그림(목업은 data URI, 발행 때 gh-pages 주소로). 이모지면 그대로."""
     m = re.fullmatch(r"\{(.+?)\}", tok or "")
     if not m or m.group(1) not in CHARS:
         return tok
-    with open(os.path.join(CHAR_DIR, CHARS[m.group(1)] + ".webp"), "rb") as f:
-        src = "data:image/webp;base64," + base64.b64encode(f.read()).decode()
+    src = img_src(CHAR_DIR, CHARS[m.group(1)])
     px = CHAR_PX[where]
     return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:block;width:{px}px;height:{px}px;max-width:none;border-radius:0;margin:0 auto;">'
 
@@ -91,8 +101,7 @@ def icon_html(tok, where):
     name = ICONS.get((tok or "").replace("\ufe0f", ""))
     if not name:
         return tok
-    with open(os.path.join(ICON_DIR, name + ".webp"), "rb") as f:
-        src = "data:image/webp;base64," + base64.b64encode(f.read()).decode()
+    src = img_src(ICON_DIR, name)
     px = ICON_PX[where]
     va = "" if where == "h2" else "vertical-align:-5px;margin-right:4px;"
     return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:{"block" if where == "h2" else "inline-block"};width:{px}px;height:{px}px;max-width:none;border-radius:0;{va}">'
@@ -201,13 +210,18 @@ def next_card(text, href, links):
     head = re.sub(r"\*\*(.+?)\*\*", r"\1", head)
     chev = ('<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
             '<path d="M6 3.5 10.5 8 6 12.5"/></svg>')
-    return (f'<a href="{html.escape(href)}" data-next="1" style="display:flex;align-items:center;gap:12px;margin:36px 0 8px;padding:16px 16px 16px 18px;'
+    ready = bool(href) and href != "#"   # 다음 편이 아직 없으면 누르지 않는 카드 + `준비 중` (2026-11-15 발행: 1편 다음 카드가 # 로 가던 것)
+    tag = "a" if ready else "div"
+    href_attr = f' href="{html.escape(href)}"' if ready else ""
+    if not ready:
+        chev = '<span style="font-size:13px;line-height:18px;font-weight:700;color:#6B7280;white-space:nowrap;">준비 중</span>'
+    return (f'<{tag}{href_attr} data-next="1" style="display:flex;align-items:center;gap:12px;margin:36px 0 8px;padding:16px 16px 16px 18px;'
             'background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;text-decoration:none;color:inherit;">'   # 사이트 회색 카드(design_kit CARD)와 같은 색 · 테두리 · 모서리 (2026-11-10 사용자)
             '<span style="flex:1 1 auto;min-width:0;">'
             '<span style="display:block;font-size:13px;line-height:18px;font-weight:700;color:#6B7280;margin:0 0 4px;">다음 편</span>'
             f'<span style="display:block;font-size:18px;line-height:27px;font-weight:700;color:#111;word-break:keep-all;">{inline(head, links)}</span>'
             + (f'<span style="display:block;margin-top:6px;font-size:15px;line-height:24px;color:#333;word-break:keep-all;">{inline(teaser, links)}</span>' if teaser else "")
-            + f'</span><span style="flex:none;color:#6B7280;">{chev}</span></a>')
+            + f'</span><span style="flex:none;color:#6B7280;">{chev}</span></{tag}>')
 
 
 def render(md, links, next_href="#"):
@@ -316,7 +330,7 @@ def render(md, links, next_href="#"):
 
 
 HEAD_LABEL = "주식 공부"   # 머리 줄(글 제목 자리)에 보일 메뉴 이름 (2026-11-10 사용자: 여기에 타이틀 쓰지 말고 메뉴명; 2026-11-14 이름 강좌 → 주식 공부). 글 제목 · 검색 제목은 그대로
-LIST_URL = "https://alpha-scope.blogspot.com/p/study.html"   # 머리 줄 화살표 · [목록] = 주식 공부 목록 페이지 (2026-11-14 계획, 아직 없음 — 커리큘럼 문서 4절)
+LIST_URL = "https://alpha-scope.blogspot.com/search/label/%EC%A3%BC%EC%8B%9D%20%EA%B3%B5%EB%B6%80"   # 머리 줄 화살표 · 목록 = `주식 공부` 라벨 목록 (2026-11-15 첫 발행: 목록 고정 페이지 /p/study.html 은 아직 — 생기면 여기 · 테마 배너 주소를 함께 바꾼다)
 
 
 def title_block(title):
