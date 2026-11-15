@@ -3068,7 +3068,14 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         function send() {
           try {
             if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY);
-            window.Kakao.Share.sendDefault({ objectType: 'text', text: shareTitle, link: { mobileWebUrl: shareUrl, webUrl: shareUrl } });
+            /* 썸네일 카드 (2026-11-15 사용자): 본문의 data-share-img(주식 공부 = 전용 썸네일) → 없으면 공통 로고. 1200×600 */
+            var si = document.querySelector('img[data-share-img]');
+            var shareImg = si ? si.getAttribute('src') : 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/share_logo.png';
+            var shareDesc = ((document.querySelector('meta[name="description"]') || {}).content || '').slice(0, 80);
+            var lk = { mobileWebUrl: shareUrl, webUrl: shareUrl };
+            window.Kakao.Share.sendDefault({ objectType: 'feed',
+              content: { title: shareTitle, description: shareDesc, imageUrl: shareImg, imageWidth: 1200, imageHeight: 600, link: lk },
+              buttons: [{ title: '자세히 보기', link: lk }] });
           } catch (err) { fallback(); }
         }
         if (window.Kakao) { send(); return; }

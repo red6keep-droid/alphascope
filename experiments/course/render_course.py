@@ -331,6 +331,16 @@ def render(md, links, next_href="#"):
     return title, dk.align_titles(dk.WRAP_OPEN + "".join(out) + dk.WRAP_CLOSE)
 
 
+SHARE_IMG = "share_study.jpg"   # 공유 썸네일 1200×600 (banner/, 2026-11-15 사용자: 주식 공부 글 · 목록은 이 그림, 다른 페이지는 공통 로고)
+
+
+def share_tag():
+    """본문 맨 앞 숨은 그림 — Blogger 가 첫 그림을 og:image(주소 붙여넣기 미리보기)로 쓰고, 테마 카카오톡 버튼이 data-share-img 를 썸네일로 쓴다. 발행 때만(IMG_BASE 있을 때)."""
+    if not IMG_BASE:
+        return ""
+    return f'<img data-share-img="1" src="{IMG_BASE}{SHARE_IMG}" alt="" width="1200" height="600" hidden style="display:none">'
+
+
 HEAD_LABEL = "주식 공부"   # 머리 줄(글 제목 자리)에 보일 메뉴 이름 (2026-11-10 사용자: 여기에 타이틀 쓰지 말고 메뉴명; 2026-11-14 이름 강좌 → 주식 공부). 글 제목 · 검색 제목은 그대로
 LIST_URL = "https://alpha-scope.blogspot.com/p/study.html"   # 머리 줄 화살표 · 목록 = 주식 공부 목록 고정 페이지(render_list.py --publish) — 옛 `주식 공부` 라벨 검색 (2026-11-15 사용자: 새 목록 페이지로 안 갔다)
 
