@@ -1008,7 +1008,12 @@ def pc_type_css(css):
     # 글꼴 — 나눔바른고딕. 테마의 글꼴 변수와 리포트 본문 인라인 글꼴(design_kit.WRAP_OPEN)을 바꾼다. 숫자 칸(--num, Inter)은 그대로
     out.append(f"  :root {{ --sans: {PC_FONT}; --report-font: {PC_FONT}; }}")
     out.append("  .logo-word { font-family: 'Noto Sans KR', sans-serif; }")   # 로고 글자는 그대로
-    out.append("  .post-body [style*=\"font-family\"]:not([style*=\"monospace\"]) { font-family: var(--report-font) !important; }")
+    out.append("  .post-body [style*=\"font-family\"]:not([style*=\"monospace\"]):not([data-brand-font]) { font-family: var(--report-font) !important; }")
+    # 브랜드 `AlphaScope`(render_html.brand_mark · 강조 카드 질문) = 로고 글꼴 그대로 (2026-11-15 사용자: "로고에 있는 서체로") ·
+    # 문장 속 브랜드는 둘레 글자 − 2 — 둘레가 PC 크기로 줄면 브랜드도 PC 둘레 − 2 (data-brand-font = 둘레 px)
+    out.append("  .post-body [data-brand-font] { font-family: 'Noto Sans KR', sans-serif !important; }")
+    for n in POST_INLINE_SIZES:
+        out.append(f'  .post-body [data-brand-font="{n}"] {{ font-size: {round(_pc_size(n)) - 3}px !important; }}')
     out.append(f"  body {{ -webkit-text-stroke: {PC_STROKE}; }}")
     face = ("@font-face {{ font-family: 'AS Barun'; font-weight: {w}; font-display: swap; "
             "src: url({u}NanumBarunGothicWeb{s}.woff) format('woff'); }}")

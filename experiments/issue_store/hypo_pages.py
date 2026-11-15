@@ -704,7 +704,7 @@ WHY_WORD = "관련 주식 정보"   # 옛 `근거` (P488, 2026-11-11 사용자)
 WHY_HEAD_FS, WHY_HEAD_LH = 17, 28   # 갈래 카드 `근거` 제목 = 고리 줄 이름과 같은 17 (2026-11-11 사용자)
 CHAIN_FS = 17   # 갈래 카드 고리 줄 이름(`급락 폭의 4분의 1 회복`) — 카드 줄 18 에서 한 단계 작게 (2026-11-11 사용자)
 WHY_FS, WHY_LH = 16, 26
-SIG_NAME = "알파스코프 신호"   # 독자 문장에서 `우리 신호` 대신 (2026-11-11 사용자: 독자는 `우리`가 누군지 모른다)
+SIG_NAME = "AlphaScope 신호"   # 독자 문장에서 `우리 신호` 대신 (2026-11-11 사용자: 독자는 `우리`가 누군지 모른다)
 WHY_NOTE = "전망에 따른 주식 정보를 모은 것입니다. 판단하거나 어느 쪽이 맞을지 고른 것은 아닙니다."   # P498, 2026-11-11 사용자 문구
 EXCL_ICON = ('<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" style="flex:none;display:block;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>')   # 느낌표 = INFO_ICON(i) 뒤집은 모양
@@ -1303,10 +1303,19 @@ def _binom_p(k, n, p):
     return min(1.0, sum(pr(i) for i in range(n + 1) if pr(i) <= pk * (1 + 1e-9)))
 
 
+def _brand(html, size):
+    """문장 속 `AlphaScope` → 로고 꼴(render_html.brand_mark, 둘레 − 3) — 16px 이상 문장만, 출처 · 작은 안내 · 툴팁은 글자 그대로 (2026-11-15 사용자)."""
+    import os
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "nvda-report"))
+    import render_html as R
+    return html.replace(R.BRAND, R.brand_mark(int(str(size).rstrip("px"))), 1)
+
+
 def _plain_rows(lead, rows, note="", lines=True):
     """접는 줄 안 내용 — 글자는 왼쪽 기준선 6(제목 점과 같은 선, P424) · 오른쪽도 6(좌우 같게, P461), 구분선은 끝까지. 굵게 없음 · 증감 숫자 = ▲ · ▼ + 색 (P423 · P424, 2026-11-08 사용자)."""
     A = dk.ALIGN_PX
-    out = f'<p style="margin:0 0 4px;padding:0 {A}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{tri_text(dk.esc(lead))}</p>' if lead else ""
+    out = f'<p style="margin:0 0 4px;padding:0 {A}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{_brand(tri_text(dk.esc(lead)), dk.NAME)}</p>' if lead else ""
     for i, (name, val, sub) in enumerate(rows):
         out += (f'<div style="padding:{14 - dk.VP}px {A}px {14 - dk.VP}px {A}px;{"border-top:1px solid #E2E8F0;" if i and lines else ""}">'
                 f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:{dk.NAME};line-height:{dk.LH_CARD};">'

@@ -937,8 +937,10 @@ def write_mock(body, path, title):
              '<button class="sharing-button touch-icon-button"></button><div class="share-buttons-container"><ul class="share-buttons hidden">'
              + "".join(f'<li><span class="sharing-platform-button"><span class="platform-sharing-text">{n}</span></span></li>'
                        for n in ("링크 가져오기", "Facebook", "X", "Pinterest", "이메일", "다른 앱")) + '</ul></div></div></div></div>')
+    # 테마가 불러오는 웹 글꼴(Google Fonts — Noto Sans KR 400 · 700 · 900 = 로고 글꼴)도 같이 — 빠져 있어 목업만 시스템 글꼴로 그려졌다 (2026-11-15 브랜드 표기 확인)
+    fonts = "".join(re.findall(r"<link[^>]+fonts\.googleapis\.com/css2[^>]+>", idx)).replace("&amp;", "&")
     page = ('<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-            f'<title>{esc(title)} — 목업</title><style>{css.group(1)}</style></head>'
+            f'<title>{esc(title)} — 목업</title>{fonts}<style>{css.group(1)}</style></head>'
             '<body class="item-view no-dashboard"><main class="main-content"><div class="post-shell"><article class="post-outer-container"><div class="post">'
             f'<h3 class="post-title">{esc(title)}</h3><div class="post-body entry-content">{body}</div>{share}</div></article>{nav}</div></main>'
             f'<script>{js.group(1)}</script></body></html>')

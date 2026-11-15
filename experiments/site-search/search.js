@@ -343,7 +343,7 @@
     // ④ 알파스코프 신호 — 종목 페이지 판정 가운데 질문 방향과 같은 쪽 (증시 전망 갈래 근거와 같은 나눔: 단기 · 중기)
     if (W.sig && W.sig.rows && W.sig.rows.length) {
       var want = down ? -1 : 1, same = W.sig.rows.filter(function (r) { return r[2] === want; }), opp = W.sig.rows.filter(function (r) { return r[2] === -want; });
-      out += '<div class="as-sec"><h4>' + ico('tech') + (down ? '하락' : '상승') + ' 쪽 알파스코프 신호 <small>(' + md(W.sig.d) + ' 종목 페이지)</small></h4>';
+      out += '<div class="as-sec"><h4>' + ico('tech') + (down ? '하락' : '상승') + ' 쪽 AlphaScope 신호 <small>(' + md(W.sig.d) + ' 종목 페이지)</small></h4>';
       if (same.length) {
         ['단기', '중기'].forEach(function (hz) {
           var rs = same.filter(function (r) { return r[3] === hz; });
