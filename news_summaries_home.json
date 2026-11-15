@@ -3389,5 +3389,59 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-14T21:46:28.169451+00:00",
   "n_src": 334
+ },
+ "7cd4b72a2ec5": {
+  "lines": [
+   "다음 주 뉴욕 미술품 경매 총매출 24억 달러 예상",
+   "소더비 경매 단독 매출 11억 달러 상회 전망",
+   "블라키에르-아리에타 컬렉션 추정가 4억 5000만 달러",
+   "빈센트 반 고흐 작품 추정가 1억 8000만 달러",
+   "폴 세잔 작품 추정가 1억 2000만 달러"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-15T01:18:56.361711+00:00",
+  "n_src": 900
  }
 }
