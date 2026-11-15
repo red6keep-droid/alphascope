@@ -1047,6 +1047,19 @@ def ticker_logo(sym, size=20):
             f'letter-spacing:0;white-space:nowrap;overflow:hidden;">{txt}</span>')
 
 
+def name_logo(sym, name="", size=24):
+    """이름 앞 로고 — 이슈 페이지 수혜주 줄(mock_issue_watch._logo)과 같은 꼴: 우리 gh-pages 로고, 없으면 미국은 티커 두 글자 · 한국은 이름 첫 글자 원(숫자 코드 배지 X).
+    flex 줄 안에 넣는다(세로 가운데는 줄이 맞춤). 2026-11-15 사용자: 한국 연결 종목 줄도 수혜주처럼."""
+    s = str(sym or "").strip().upper()
+    kr = s.endswith((".KS", ".KQ"))
+    if s in _logo_files() or (s and not kr):
+        return ticker_logo(s, size).replace("display:inline-block;", "display:inline-block;flex:none;", 1).replace("vertical-align:-4px;", "").replace("margin-right:6px;", "margin-right:8px;")
+    if not name:
+        return ""
+    return (f'<span aria-hidden="true" style="display:inline-block;flex:none;width:{size}px;height:{size}px;line-height:{size}px;border-radius:50%;margin-right:8px;'
+            f'background:#E2E8F0;color:#334155;font-size:12px;font-weight:700;text-align:center;">{esc(str(name)[:1])}</span>')
+
+
 def link_icon(url, label):
     if not url:
         return ""

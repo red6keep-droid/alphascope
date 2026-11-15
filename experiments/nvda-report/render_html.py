@@ -2020,12 +2020,13 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
             # ("row", 이름, 값, 뜻[, 값이 HTML]) — 다섯째가 참이면 값을 이스케이프 · 색칠 없이 그대로 (값 안에 보통 굵기 조각을 섞을 때, 2026-10-21 테마 페이지)
             _, name, value, note, *rest = item
             raw = bool(rest and rest[0])
+            pre = rest[2] if len(rest) > 2 and rest[2] else ""   # 일곱째 = 이름 앞 로고 HTML(_dk.name_logo) — 이름 · 뜻 두 줄의 세로 가운데 (2026-11-15 사용자: 한국 연결 종목도 수혜주처럼 로고)
             bdt = "transparent" if len(rest) > 1 and rest[1] else bd_row   # 여섯째가 참이면 위 구분선만 없애고 여백은 그대로 (2026-10-25 사용자: 막대 카드 바로 아래 줄)
             vhtml = value if raw else _tint(_esc(value))
             vplain = re.sub(r"<[^>]+>", "", str(value)) if raw else str(value)
             multi = "\n" in vplain
             fits = _est_w(name, 17) + _est_w(f"({note})", 14) + _est_w(vplain, 17) <= INLINE_W
-            inline = bool(note) and not multi and not below_notes and (fits or inline_notes)   # below_notes: 괄호 없이 늘 이름 아래 줄 (2026-10-21 테마 페이지). 설명을 괄호로 이름 옆에 (2026-10-17 사용자). inline_notes=True 면 길어도 모두 괄호 — 줄이 바뀐다
+            inline = bool(note) and not multi and not below_notes and (fits or inline_notes) and not pre   # 로고 줄은 늘 이름 아래 뜻(로고가 두 줄 가운데)   # below_notes: 괄호 없이 늘 이름 아래 줄 (2026-10-21 테마 페이지). 설명을 괄호로 이름 옆에 (2026-10-17 사용자). inline_notes=True 면 길어도 모두 괄호 — 줄이 바뀐다
             if multi:   # 값이 여러 줄이면 설명은 이름 아래 왼쪽 — 줄 수를 늘리지 않는다 (2026-10-17 사용자: 모바일에서 여러 단 쓰지 말 것)
                 vals = vhtml.replace(chr(10), "<br>")
                 return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
@@ -2039,9 +2040,12 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
                         f'<span style="{lw}color:#111;">{_esc(name)} <span style="font-size:{TINY};color:{NOTE};">({_note_tint(note)})</span></span>'
                         f'<span style="flex:none;text-align:right;font-weight:{STATE_VAL_W};white-space:nowrap;">{vhtml}</span></span></li>')
             nt = f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};white-space:normal;">{_note_tint(note)}</span>' if note else ""
+            nblock = f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{_esc(name)}</span>{nt}</span>'
+            if pre:
+                nblock = f'<span style="flex:1 1 auto;min-width:0;display:flex;align-items:center;">{pre}{nblock}</span>'
             return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'   # 뜻 줄을 이름 칸 안에 두어 오른쪽 값이 두 줄의 세로 가운데 (2026-10-18 사용자)
                     f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-                    f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{_esc(name)}</span>{nt}</span><span style="flex:none;text-align:right;font-weight:{STATE_VAL_W};word-break:keep-all;">{vhtml.replace(chr(10), "<br>")}</span></span></li>')
+                    f'{nblock}<span style="flex:none;text-align:right;font-weight:{STATE_VAL_W};word-break:keep-all;">{vhtml.replace(chr(10), "<br>")}</span></span></li>')
         if kind == "html":   # 그래프 · 자세한 지표 보기 같은 HTML 조각 (실적과 기대 탭, 2026-10-18)
             return f'<li style="list-style:none;margin:6px 0 12px;">{text}</li>'
         if kind == "rich":   # plain 과 같은 줄인데 글 안에 굵게 · 색 HTML 이 들어 있다 (방송 의견 문장, 2026-10-29 사용자 P95)
