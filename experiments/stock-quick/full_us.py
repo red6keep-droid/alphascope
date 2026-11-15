@@ -5,7 +5,8 @@ ETF 페이지(stock-etf/etf_pages.us_pages)와 같은 방식: 종목을 이 실�
 정식 카드(render_pages)를 그대로 부른다. 정식과 다른 것:
   - 탭 = 오늘 · 매수의견(애널리스트 · 증권사) · 실적 · 업계상황 · 기업. 방송 의견 · 시장 예상 흔들림(옵션) · 소송 · 한국 연결 종목은 없다.
     뉴스 · 중요 이슈 · 뉴스 의견 = quick-news(Finnhub, 15:10) 분류 결과가 있을 때 정식 함수 그대로 (2026-11-15 3단계).
-  - 함께 보는 회사 = 사람이 고른 목록 대신 같은 업종에서 1년 등락이 가장 비슷하게 움직인 3곳(상관 계산).
+  - 함께 보는 회사 = 사람이 고른 목록 대신 같은 업종에서 1년 등락이 가장 비슷하게 움직인 3곳(상관 계산). 그 회사들 실적 일정 카드도 정식처럼.
+  - SEC 공시(Form 4 · 8-K) = 정식 collect_extra.edgar 그대로, 8일만 받아 저장(edgar_us.json).
   - 업계 카드(FRED) = 세부 업종(GICS)이 분명히 맞는 업계만 (SUB_BIZ).
   - 기업 소개 문단(연차보고서로 쓴 고정 문구) 없음 — 기본 정보 줄만.
 재료 (AI 0 · Blogger 0 · 그림 0):
@@ -284,6 +285,28 @@ def history(cache_dir, syms):
     return {"stats": c["stats"]}
 
 
+EDGAR_DAYS = 8   # 화면은 7일(_news_for) — 정식처럼 30일을 받으면 첫 실행 Form 4 가 네 배
+
+
+def edgar(cache_dir, syms):
+    """SEC 공시(임원 거래 Form 4 · 수시 공시 8-K) — 정식 collect_extra.edgar 그대로, 받은 공시는 저장해 다시 안 받는다. 실패하면 지난 값 (2026-11-15 사용자)."""
+    import collect_extra
+    import expect as EX
+    path = os.path.join(cache_dir, "edgar_us.json")
+    have = _load(path, {})
+    t0 = time.time()
+    try:
+        tickers = EX._sec("https://www.sec.gov/files/company_tickers.json")
+        cik = {v["ticker"].replace(".", "-"): str(v["cik_str"]).zfill(10) for v in tickers.values()}
+        got = collect_extra.edgar(have, cik, syms=sorted(syms), days=EDGAR_DAYS)
+        _save(path, got)
+    except Exception as e:  # noqa: BLE001
+        print(f"[quick-us] SEC 공시 실패 — 지난 값: {str(e)[:100]}")
+        got = have
+    print(f"[quick-us] SEC 공시 {len(got)}건 · {sum(1 for v in got.values() if v['form'] == '4')}건 Form 4 · {time.time() - t0:.0f}초")
+    return got
+
+
 def fred(cache_dir):
     industry_us.CACHE = os.path.join(cache_dir, "fred_us.json")
     try:
@@ -365,7 +388,7 @@ def sec_expect(s):
 
 
 def earnings_tab(s):
-    cal = RP.sec_calendar(s, ("earnings", "macro"), open_first=False)
+    cal = RP.sec_calendar(s, ("earnings", "peers", "macro"), open_first=False)   # 함께 보는 회사 일정 = 상관 3곳의 실적일(Finnhub 달력, 이미 받음) (2026-11-15 사용자)
     ex = sec_expect(s)
     if not ex and not cal:
         return ""
@@ -424,7 +447,7 @@ def load_news(qnews_dir):
     return news, summ
 
 
-def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=None, related=None, radar_dir=None, extra_today=None, news=None, summaries=None):
+def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=None, related=None, radar_dir=None, extra_today=None, news=None, summaries=None, filings=None):
     """간단 종목(정식 아님) 화면 조각 {sym: html}. ref_us = quick_ref.json 의 us. related(sym, e) → [(글, 주소)]. extra_today(sym) → 오늘 탭 끝 카드(이름이 나온 기사, 뉴스 없을 때만).
     news · summaries = load_news — 있으면 정식과 같은 중요 이슈 · 뉴스 · 뉴스 의견 (방송 · 인물 발언 재료는 없다)."""
     quick = [s for s, e in ref_us.items() if not e.get("full") and len(bars_all.get(s) or []) >= 30 and (only is None or s in only)]
@@ -448,9 +471,9 @@ def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=No
         analyze_tabs._macro_rows = macro
     group, grev, geps = full_group(radar_dir)
     analyze_tabs.peer_group = lambda snap: group   # 비교 묶음 = 정식과 같은 `시총 상위 20개`(정식 종목) — 간단 종목 시총은 쓰지 않는다
-    snap = {"bars": bars_all, "caps": {}, "earnings": {s: earn.get(s) or [] for s in quick}, "history": hist}
+    snap = {"bars": bars_all, "caps": {}, "earnings": {**{s: v for s, v in earn.items() if v}, **{s: earn.get(s) or [] for s in quick}}, "history": hist}   # 정식 종목 실적일도 — 함께 보는 회사가 정식 종목일 때
     extra = {"stocks": {**geps, **{s: {f: (det.get(s) or {}).get(f) for f in DETAIL_FIELDS} for s in quick}},
-             "revenue": {"series": {**grev, **(sec.get("rev") or {})}}, "capex": sec.get("cash") or {}, "peer_earnings": {}, "edgar": {}}
+             "revenue": {"series": {**grev, **(sec.get("rev") or {})}}, "capex": sec.get("cash") or {}, "peer_earnings": {}, "edgar": filings or {}}
     RP.BARS = bars_all
     RP.NOW = datetime.datetime.now(datetime.timezone.utc)
     RP.NEWS, RP.SUMMARY, RP.MEDIA, RP.PICKS = news or {}, summaries or {}, [], []   # 방송 = 간단 정보에 없다 (6-6)

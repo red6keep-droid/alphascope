@@ -348,10 +348,11 @@ def main():
         hist = FU.history(cache, q_us)
         fred = FU.fred(cache)
         macro = FU.macro_rows_from(a.calendar) if a.calendar else None
+        filings = FU.edgar(cache, q_us)
         qn, qs = FU.load_news(a.qnews)
         print(f"[quick] 간단 종목 뉴스 {len(qn)}건 · 요약 {len(qs)}건" + ("" if qn else " — 없음, `이름이 나온 기사` 카드로"))
         for s, h in FU.build(ref["us"], bars_us, earn, det, sec, hist, fred, macro=macro, only=set(us_syms),
-                             related=lambda s, e: rel(s, e, "US"), radar_dir=a.radar or None, extra_today=xtra, news=qn, summaries=qs).items():
+                             related=lambda s, e: rel(s, e, "US"), radar_dir=a.radar or None, extra_today=xtra, news=qn, summaries=qs, filings=filings).items():
             pages[("us", s)] = h
     except Exception as e:  # noqa: BLE001 — 한 시장이 통째로 실패해도 다른 시장 · 가격 파일은 나간다
         print(f"::warning::[quick] 미국 화면 실패: {e!r}")
