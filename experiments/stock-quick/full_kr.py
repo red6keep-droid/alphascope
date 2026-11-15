@@ -41,6 +41,20 @@ BUDGET = {"detail": 60, "dart": 40, "company": 60, "hist": 100}
 DETAIL_FIELDS = ("analysts", "eps")
 MARKET = sorted({K.BENCH, K.KOSDAQ, *K.SECTOR_ETF_LIST})
 
+
+def _links():
+    """미국 연결 종목 — AI 후보 · 짝 하나씩 검증 통과만 (ref/kr_us_links.json, kr_us_links.py --each, 2026-11-15 사용자). {한국 코드: [기록]}, 차이 큰 순."""
+    try:
+        d = json.load(open(os.path.join(EXP, "ref", "kr_us_links.json"), encoding="utf-8"))["links"]
+    except (OSError, ValueError, KeyError):
+        return {}
+    return {k: sorted((r for r in e.get("tested") or [] if r.get("pass")), key=lambda r: -(r.get("spread1") or 0)) for k, e in d.items() if e.get("pass")}
+
+
+LINKS = _links()
+LINK_US = sorted({r["t"] for rows in LINKS.values() for r in rows})
+US_KO = {s: e.get("ko") or s for s, e in (full_us._load(os.path.join(EXP, "ref", "quick_ref.json"), {}).get("us") or {}).items()}
+
 # 업종 원자료(industry_en) → 업계 자료를 빌려 올 한국 정식 종목. 그 업종 종목 대부분에 맞는 것만 (2026-11-14 Claude) — 나머지는 업계 카드 없이
 IND_REP = {
     "Semiconductors": "000660.KS",
@@ -96,7 +110,7 @@ _load, _save = full_us._load, full_us._save
 def bars(syms):
     import collect_kr
     out = {}
-    allsyms = list(dict.fromkeys(list(syms) + MARKET))
+    allsyms = list(dict.fromkeys(list(syms) + MARKET + LINK_US))   # 미국 연결 종목 — 밤사이 움직임 (약 60종목, 묶음 하나)
     for i in range(0, len(allsyms), 100):
         try:
             out.update(collect_kr._bars(allsyms[i:i + 100]))
@@ -271,23 +285,39 @@ def full_group():
 # ---------------------------------------------------------------- 화면
 
 def pairs_card(s, peers, by):
-    """`함께 움직이는 종목은?` — 같은 업종에서 1년 등락이 가장 비슷한 종목들의 오늘 등락 (미국 간단 정보와 같은 판정 · 같은 막대)."""
+    """`함께 움직이는 종목은?` — ① 밤사이 미국 연결 종목(검증 통과한 짝이 있을 때만, 정식 한국 `미국과 연결` 과 같은 판정 · 막대)
+    ② 같은 업종에서 1년 등락이 가장 비슷한 한국 종목들의 오늘 등락 (미국 간단 정보와 같은 판정 · 같은 막대)."""
     moves = [(p, by[p]) for p in peers if by.get(p) is not None]
-    if not moves:
+    links = s.get("us_links") or []
+    if not moves and not links:
         return ""
-    rets = [r for _, r in moves]
-    ups, downs = sum(1 for x in rets if x >= 0.5), sum(1 for x in rets if x <= -0.5)
-    state = "엇갈림" if ups and downs else "같이 올랐음" if ups else "같이 내렸음" if downs else "비슷함"
-    theme, col = {"엇갈림": ("uncertain", R.SOON), "같이 올랐음": ("positive", R.UP), "같이 내렸음": ("negative", R.DOWN)}.get(state, ("neutral", R.MUTED))
     day = render_kr._md(s["day"])
-    lines = [(f"오늘({day}) 함께 움직여 온 종목은 " + ", ".join(f"{K.name(p)} {render_kr._sgn(r)}%" for p, r in moves)
-              + f"였고, {dk.josa(s['name'], '은')} {render_kr._sgn(s['ret_1d'])}%였다.", "plain")]
-    rows = [(K.name(p), "", r, "us") for p, r in moves] + [(s["name"], "", s["ret_1d"], "me")]
     vb = s["tech"].get("vs_bench")
-    if vb is not None:
-        rows.append(("KOSPI", "", s["ret_1d"] - vb, "bench"))
-    lines.append((R.pair_bars([(f"함께 움직여 온 종목 ({day})", rows)]), "html"))
-    R.add_small_note(lines, "같은 업종에서 최근 1년 하루 등락이 가장 비슷하게 움직인 종목입니다. ±0.5% 넘게 움직인 종목만 오른 곳 · 내린 곳으로 셉니다.")
+    lines = []
+    if links:   # 판정 = 밤사이 미국 (정식 pairs_state 와 같은 말)
+        rets = [m["ret"] for m, _ in links]
+        ups, downs = sum(1 for x in rets if x >= 0.5), sum(1 for x in rets if x <= -0.5)
+        state = "엇갈림" if ups and downs else "올랐음" if ups else "내렸음" if downs else "비슷함"
+        us_day = dk.kst_close_day(links[0][0]["day"], "US") + " 새벽"   # 독자 = 한국 시간 (2026-11-14 날짜 규칙) — 미국 종가 = 다음 날 새벽
+        lines.append((f"밤사이({us_day} 마감) 미국 연결 종목은 " + ", ".join(f"{US_KO.get(m['sym'], m['sym'])} {render_kr._sgn(m['ret'])}%" for m, _ in links)
+                      + f"였고, 오늘 {dk.josa(s['name'], '은')} {render_kr._sgn(s['ret_1d'])}%였다.", "plain"))
+        kr = [(s["name"], "", s["ret_1d"], "me")] + ([("KOSPI", "", s["ret_1d"] - vb, "bench")] if vb is not None else [])
+        lines.append((R.pair_bars([(f"밤사이 미국 ({us_day})", [(US_KO.get(m["sym"], m["sym"]), why, m["ret"], "us") for m, why in links]),
+                                   (f"오늘 한국 ({day})", kr)]), "html"))
+    else:
+        rets = [r for _, r in moves]
+        ups, downs = sum(1 for x in rets if x >= 0.5), sum(1 for x in rets if x <= -0.5)
+        state = "엇갈림" if ups and downs else "같이 올랐음" if ups else "같이 내렸음" if downs else "비슷함"
+        lines.append((f"오늘({day}) 함께 움직여 온 종목은 " + ", ".join(f"{K.name(p)} {render_kr._sgn(r)}%" for p, r in moves)
+                      + f"였고, {dk.josa(s['name'], '은')} {render_kr._sgn(s['ret_1d'])}%였다.", "plain"))
+    theme, col = {"엇갈림": ("uncertain", R.SOON), "같이 올랐음": ("positive", R.UP), "같이 내렸음": ("negative", R.DOWN),
+                  "올랐음": ("positive", R.UP), "내렸음": ("negative", R.DOWN)}.get(state, ("neutral", R.MUTED))
+    if moves:
+        rows = [(K.name(p), "", r, "us") for p, r in moves] + ([] if links else [(s["name"], "", s["ret_1d"], "me")] + ([("KOSPI", "", s["ret_1d"] - vb, "bench")] if vb is not None else []))
+        lines.append((R.pair_bars([(f"함께 움직여 온 한국 종목 ({day})" if links else f"함께 움직여 온 종목 ({day})", rows)]), "html"))
+    R.add_small_note(lines, ("미국 연결 종목은 사업으로 이어진 미국 종목 가운데, 그 종목이 크게 움직인 밤 다음 날 이 종목도 같은 쪽으로 열려 온 것만 골랐습니다. " if links else "")
+                     + ("함께 움직여 온 종목은 같은 업종에서 최근 1년 하루 등락이 가장 비슷한 종목입니다. " if moves else "")
+                     + "±0.5% 넘게 움직인 종목만 오른 곳 · 내린 곳으로 셉니다.")
     card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
@@ -391,6 +421,9 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
     render_kr.BARS = bars_all
     render_kr.PICK_SINCE = R.pick_window(bars_all.get(K.BENCH) or [], render_kr.media_feed.KST, now=render_kr.NOW)[1]
     render_kr.MEDIA, render_kr.MEDIA_WEEK, render_kr.PICKS = [], [], []
+    snap_us = {"us_bars": {t: bars_all[t] for t in LINK_US if bars_all.get(t)}}
+    for x in stocks:   # 밤사이 미국 연결 종목 — 정식 analyze_kr.us_move 그대로(한국 날짜보다 앞선 마지막 미국 종가)
+        x["us_links"] = [(m, r.get("why") or "") for r in LINKS.get(x["sym"]) or [] for m in [analyze_kr.us_move(r["t"], snap_us, x["day"])[0]] if m]
     by = {x["sym"]: x.get("ret_1d") for x in stocks}
     for s in peers:
         for p in peers[s]:

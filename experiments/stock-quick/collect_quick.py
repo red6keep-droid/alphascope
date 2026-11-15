@@ -310,7 +310,7 @@ def main():
     kr_syms = [m["sym"] for m in metas if m["m"] == "KR"]
     bars_us = FU.bars(us_syms) if us_syms else {}
     bars_kr = FK.bars(kr_syms) if kr_syms else {}
-    bars_all = {**bars_us, **bars_kr}
+    bars_all = {**bars_kr, **bars_us}   # 한국 쪽에 미국 연결 종목 일봉이 같이 오므로 미국 수집(예비 사슬)이 이기게
     secs = round(time.time() - t0)
     got = {m["sym"]: series(bars_all.get(m["sym"])) for m in metas if len(bars_all.get(m["sym"]) or []) >= 2}
     newest = {}
