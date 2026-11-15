@@ -379,6 +379,64 @@ def kr_us_links_for(us_sym):
     return [x for x in _LINKS if x[2]["t"] == us_sym]
 
 
+_KR_PX = None
+
+
+def _kr_px():
+    """한국 연결 종목 · 코스피 · 코스닥 최근 일봉 {sym: [(day, close)]} — 실행마다 한 번(묶음 하나). 못 받으면 {} = 한국 막대 없이."""
+    global _KR_PX
+    if _KR_PX is None:
+        _KR_PX = {}
+        try:
+            import importlib.util
+            import yfinance as yf
+            spec = importlib.util.spec_from_file_location("universe_kr", os.path.join(_HERE, "..", "kr-stocks", "universe_kr.py"))
+            UK = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(UK)
+            kr_us_links_for("")
+            syms = sorted(set(UK.PAIRS) | {k for k, _, _ in (_LINKS or [])}) + ["^KS11", "^KQ11"]
+            df = yf.download(syms, period="1mo", interval="1d", auto_adjust=True, group_by="ticker", progress=False, threads=True)
+            for x in syms:
+                try:
+                    c = df[x]["Close"].dropna()
+                except KeyError:
+                    continue
+                _KR_PX[x] = [(d.strftime("%Y-%m-%d"), float(v)) for d, v in c.items() if v > 0]
+            print(f"[radar] 한국 연결 종목 일봉 {len(_KR_PX)}/{len(syms)}")
+        except Exception as e:  # noqa: BLE001
+            print(f"[radar] 한국 연결 종목 일봉 실패 — 한국 막대 없이: {str(e)[:100]}")
+    return _KR_PX
+
+
+def _kr_ret(px, sym, day):
+    rows = px.get(sym) or []
+    i = next((j for j in range(len(rows) - 1, 0, -1) if rows[j][0] == day), None)
+    return (rows[i][1] / rows[i - 1][1] - 1) * 100 if i else None
+
+
+def _kr_link_bars(s, ok):
+    """가장 최근 짝 = 한국 마지막 거래일과 그 전 마지막 미국 거래일(이 종목) — 미국 페이지가 도는 아침엔 오늘 한국장이 아직 안 열려, 지난 짝을 보인다.
+    `미국 ○일 새벽 마감 (이 종목) → 다음 한국장 ○일 (연결 종목 · 코스피)`, 한국 날짜가 안 맞는 종목은 뺀다."""
+    px = _kr_px()
+    days = [px[k][-1][0] for *_, k in ok if px.get(k)]
+    if not days:
+        return ""
+    kday = max(days)
+    b = BARS.get(s["sym"]) or []
+    i = next((j for j in range(len(b) - 1, 0, -1) if b[j]["day"] < kday), None)
+    if not i or not b[i - 1].get("adj"):
+        return ""
+    us_ret = (b[i]["adj"] / b[i - 1]["adj"] - 1) * 100
+    kr = [(nm, "", r, "us") for nm, _sp, _ok, _us, _n, k in ok for r in [_kr_ret(px, k, kday)] if r is not None]
+    if not kr:
+        return ""
+    kospi = _kr_ret(px, "^KS11", kday)
+    kr += [("KOSPI", "", kospi, "bench")] if kospi is not None else []
+    us_kst = _dk.kst_close_day(b[i]["day"], "US")
+    return R.pair_bars([(f"미국 {us_kst} 새벽 마감", [(s["name"], "", us_ret, "me")]),
+                        (f"{'그날' if us_kst == _md(kday) else '다음'} 한국장 {_md(kday)}", kr)])   # 평일 = 그날 아침 한국장, 주말 · 휴일 끼면 다음 한국장
+
+
 def sec_pairs(s):
     """`함께 움직이는 종목은?` — 한국 페이지와 같은 자리 · 같은 막대 (2026-11-01 사용자 P263: 한국과 비슷한 포맷).
     ① 함께 보는 회사(경쟁 · 공급 · 고객, universe.PEERS)의 오늘 등락 + 이 종목 · S&P 500 ② 한국 연결 종목 = 한국 페이지 `밤사이 미국` 짝을 거꾸로, 검증 기록(다음 날 시가).
@@ -402,12 +460,12 @@ def sec_pairs(s):
             rows.append(("S&P 500", "", s["ret_1d"] - vs, "bench"))
         lines.append((R.pair_bars([(f"함께 보는 회사 ({day})", rows)]), "html"))
     ok = [x for x in links if x[2]][:4]
-    if ok:   # 한국 연결 종목 — 검증 통과한 것만, 다음 날 시가 차이
-        lines.append((f'{_dk.CHART_TITLE_M}한국 연결 종목 <span style="font-weight:400;font-size:{R.TINY};color:{R.NOTE};">(다음 날 시가)</span></span>', "html"))
-        for k, (nm, sp, _ok, us, n, ksym) in enumerate(ok):
-            short = f" · 기록 {max(1, round(n / 250))}년" if n and n < 750 else ""   # 3년 안 되는 기록은 기간을 같이 (GE버노바 2024 상장 등)
-            lines.append(("row", nm, f"{_sgn(sp)}%p", f"{_dk.josa(' · '.join(us), '이')} 많이 오른 밤과 내린 밤의 차이{short}", False, k == 0,
-                          _dk.name_logo(ksym, nm)))   # 이름 앞 로고 = 이슈 수혜주 줄과 같은 꼴 (2026-11-15 사용자)
+    kr_bars = _kr_link_bars(s, ok) if ok else ""
+    if kr_bars:   # 한국 연결 종목 = 막대 — 가장 최근 짝(이 종목 밤사이 → 다음 한국장). 검증 기록(고정값)은 고른 근거라 툴팁으로 (2026-11-15 사용자 "전부 그래프로")
+        lines.append((kr_bars, "html"))
+    ok = ok if kr_bars else []
+    if not moves and not ok:
+        return ""
     R.add_small_note(lines, "±0.5% 넘게 움직인 회사만 오른 곳 · 내린 곳으로 셉니다.")   # 옛 툴팁의 기준을 카드 작은 글씨로 — 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     tip = "한국 연결 종목은 사업으로 이어진 한국 종목 가운데, 이 종목이 크게 움직인 밤 다음 날 같은 쪽으로 열려 온 것만 골랐습니다." if ok else ""   # 한국 간단 카드 툴팁과 같은 말 (2026-11-15 사용자)
     card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=tip, fold=True)
