@@ -409,7 +409,8 @@ def sec_pairs(s):
             lines.append(("row", nm, f"{_sgn(sp)}%p", f"{_dk.josa(' · '.join(us), '이')} 많이 오른 밤과 내린 밤의 차이{short}", False, k == 0,
                           _dk.name_logo(ksym, nm)))   # 이름 앞 로고 = 이슈 수혜주 줄과 같은 꼴 (2026-11-15 사용자)
     R.add_small_note(lines, "±0.5% 넘게 움직인 회사만 오른 곳 · 내린 곳으로 셉니다.")   # 옛 툴팁의 기준을 카드 작은 글씨로 — 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
-    card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", fold=True)
+    tip = "한국 연결 종목은 사업으로 이어진 한국 종목 가운데, 이 종목이 크게 움직인 밤 다음 날 같은 쪽으로 열려 온 것만 골랐습니다." if ok else ""   # 한국 간단 카드 툴팁과 같은 말 (2026-11-15 사용자)
+    card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=tip, fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
 
