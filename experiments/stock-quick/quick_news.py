@@ -120,14 +120,15 @@ def main():
         sys.exit("FINNHUB_API_KEY 없음")
 
     now = datetime.datetime.now(datetime.timezone.utc)
-    cut = now - datetime.timedelta(hours=HOURS)
+    hours = HOURS * 2 if now.astimezone(datetime.timezone(datetime.timedelta(hours=9))).weekday() == 0 else HOURS   # 월요일 = 토요일 실행 뒤 48시간(토 오후 ~ 일요일 뉴스) — 일요일엔 실행이 없다 (2026-11-15 사용자)
+    cut = now - datetime.timedelta(hours=hours)
     keep = (now - datetime.timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
     store = {k: v for k, v in _load(news_p, {}).items() if v.get("published_at", "") >= keep}
     seen = {_key(v["title"]): k for k, v in store.items()}
 
     # 1 · 2. 기사 목록
     fails, got, new = [], 0, {}
-    day_from, day_to = (now - datetime.timedelta(days=1)).date().isoformat(), now.date().isoformat()
+    day_from, day_to = cut.date().isoformat(), now.date().isoformat()
     for i, s in enumerate(syms):
         if i:
             time.sleep(GAP)
@@ -179,7 +180,7 @@ def main():
         return
 
     # 4. 분류 (snippet 이 있는 이번 기사 + 지난 실행에서 탈락한 것)
-    news_store.classify(store, save, lead_cache=None, label="quick-news", hours=HOURS, chains=("news-quick",), batch=25, item_companies=True, max_calls=a.max_calls)
+    news_store.classify(store, save, lead_cache=None, label="quick-news", hours=hours, chains=("news-quick",), batch=25, item_companies=True, max_calls=a.max_calls)
     save(store)
 
     # 5. 요약 — 화면에 낼 기사만, 종목당 SUMMARY_PER 건 (관련도 높은 것 · 최신)
