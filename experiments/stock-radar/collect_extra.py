@@ -198,12 +198,13 @@ def peer_earnings(have):
     return {"built": datetime.date.today().isoformat(), "dates": dates}
 
 
-def edgar(have, cik):
-    """임원 거래(Form 4) · 수시 공시(8-K) 최근 30일 — NVDA collect_edgar 의 파서 · 제목 · 방향 규칙을 그대로. 한 번 읽은 공시는 다시 받지 않는다."""
+def edgar(have, cik, syms=None, days=EDGAR_DAYS):
+    """임원 거래(Form 4) · 수시 공시(8-K) 최근 days 일 — NVDA collect_edgar 의 파서 · 제목 · 방향 규칙을 그대로. 한 번 읽은 공시는 다시 받지 않는다.
+    syms = 종목 목록(없으면 정식 명단) — 간단 종목(stock-quick/full_us.edgar)도 같은 함수 (2026-11-15)."""
     import collect_edgar as CE
-    keep = {k: v for k, v in (have or {}).items() if v["filed"] >= (datetime.date.today() - datetime.timedelta(days=EDGAR_DAYS)).isoformat()}
-    cut = (datetime.date.today() - datetime.timedelta(days=EDGAR_DAYS)).isoformat()
-    for sym, *_ in U.CANDIDATES:
+    cut = (datetime.date.today() - datetime.timedelta(days=days)).isoformat()
+    keep = {k: v for k, v in (have or {}).items() if v["filed"] >= cut}
+    for sym in (syms if syms is not None else [c[0] for c in U.CANDIDATES]):
         if sym in U.REPORT_TYPE or sym not in cik:
             continue
         try:
@@ -241,7 +242,7 @@ def edgar(have, cik):
                 row.update(title=("수시 공시 8-K · " + ", ".join(f"Item {x} {CE.ITEM_KO.get(x, '')}".strip() for x in items)) if items else "수시 공시 8-K",
                            direction="neutral", area="Earnings" if "2.02" in items else "Corporate", emphasis=True)
             keep[key] = row
-    print(f"[extra] 공시 {len(keep)}건 (최근 {EDGAR_DAYS}일 · Form 4 {sum(1 for v in keep.values() if v['form'] == '4')})")
+    print(f"[extra] 공시 {len(keep)}건 (최근 {days}일 · Form 4 {sum(1 for v in keep.values() if v['form'] == '4')})")
     return keep
 
 
