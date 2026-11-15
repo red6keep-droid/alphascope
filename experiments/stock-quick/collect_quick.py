@@ -231,6 +231,7 @@ def main():
     ap.add_argument("--radar", default="", help="미국 정식 상태(nvda-state radar/) — 비교 묶음 `시총 상위 20개`")
     ap.add_argument("--calendar", default="", help="엔비디아 리포트 calendar.jsonl — 시장 일정")
     ap.add_argument("--limit", type=int, default=0, help="시험용 — 시장마다 앞 N종목만")
+    ap.add_argument("--only", default="", help="시험용 — 이 종목들만(쉼표, 예: UBER,259960.KS)")
     a = ap.parse_args()
 
     ref = json.load(open(os.path.join(EXP, "ref", "quick_ref.json"), encoding="utf-8"))
@@ -244,6 +245,9 @@ def main():
                       "sub": e.get("sub_ours") or e.get("sub"), "full": e.get("full"), "dir": "kr", "file": sym.split(".")[0]})
     if a.limit:
         metas = [m for m in metas if m["m"] == "US"][:a.limit] + [m for m in metas if m["m"] == "KR"][:a.limit]
+    only = {x.strip() for x in a.only.split(",") if x.strip()}
+    if only:
+        metas = [m for m in metas if m["sym"] in only]
     out, cache = a.out, a.cache
     if os.path.exists(out):
         shutil.rmtree(out)
@@ -325,6 +329,13 @@ def main():
     rel = lambda s, e, mk: RQ.related({"s": s, "sec": e.get("sector"), "m": mk}, full)  # noqa: E731
     xtra = lambda s: RQ.extra_cards(files[s]) if s in files else ""  # noqa: E731
     pages = {}
+    try:   # 기업 소개 두 문장 — 하루 상한만큼 만들고(Gemini lite 하루 25회까지), 만든 것은 정식 렌더러 ABOUT 표에 (2026-11-15 사용자). 실패해도 화면은 나간다
+        import company_intro as CI
+        if not a.limit:
+            CI.run(cache, ref, only=only or None)
+        print(f"[quick] 기업 소개 {CI.apply(cache)}종목")
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::[quick] 기업 소개 건너뜀: {e!r}")
     try:
         q_us = [s for s in us_syms if not ref["us"][s].get("full")]
         bar_day = (bars_all.get("SPY") or [{}])[-1].get("day") or str(datetime.date.today())

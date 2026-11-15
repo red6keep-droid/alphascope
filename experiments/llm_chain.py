@@ -111,6 +111,9 @@ CHAINS = {
     # 분류 일치도 lite 75/80 · Qwen 56 · gpt-oss 51 (10-14 · 10-16 비교). 하루 약 30 ~ 40회(10건 묶음). flash 로는 넘어가지 않는다(flash 호출 0 증가).
     # 뒤 예비는 배치마다 qwen · gpt-oss 순서를 번갈아 (lite 하루 한도 · 실패 때 Groq 기다림을 반으로)
     "news": ["gemini-lite", "groq-qwen", "groq", "nvidia-deepseek"],
+    # 급하지 않은 한 번짜리 일 — lite 의 남는 몫만 (2026-11-15 사용자: 종목 주가 기업 소개 768종목, 하루 25회 상한).
+    # Groq 는 아침마다 하루 토큰이 차는 날이 있어 넘기지 않고, 하루 한도면 그대로 멈춰 다음 날 이어서 (설계 순서 3-2 의 예외 — 운영지침에 기록)
+    "json-lite-only": ["gemini-lite"],
     "news-alt": ["gemini-lite", "groq", "groq-qwen", "nvidia-deepseek"],
 }
 

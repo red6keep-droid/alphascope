@@ -1,0 +1,574 @@
+/* 만든 파일 — 고치지 말 것: experiments/stock-quick/publish_quick_shells.py --bundle (quick_page.js + candle_chart.SCRIPT) */
+/* 종목 고정 페이지 `stock`(독자에게 보이는 이름 = 종목 주가, 2026-11-14 사용자: 독자 화면에 `간단 정보` 말 금지) — 주소 뒤 종목 코드(?s=UBER · ?s=259960)로 카드 조각을 받아 끼워 넣는다 (2026-11-14, 기획 6-3-1 · 6-6).
+   카드 HTML 은 매일 파이썬이 정식 종목 렌더러로 만든다(experiments/stock-quick/full_us.py · full_kr.py) → 기록 없는 브랜치 quick-us · quick-kr.
+   읽는 순서: Cloudflare Pages alpha-scope.pages.dev/us/UBER(2026-11-15 예비 추가, 먼저) → jsDelivr @quick-us/version.json(매일 purge) → 커밋 번호 → @<커밋>/us/UBER.html → GitHub 원본.
+   커밋 번호 주소는 내용이 안 바뀌어 캐시를 지울 일이 없다.
+   **동기로 받는다** — 본문을 읽는 그 자리에서 끼워 넣어야 테마의 탭 · 봉차트 · 툴팁(페이지를 열 때 한 번 도는 스크립트)이 일반 글처럼 붙는다
+   (2026-11-14 목업: 비동기로 나중에 끼우면 탭이 안 생기고 봉차트가 빈 칸). 방문자 한 명 = 요청 2번 · 압축 약 33KB.
+   jsDelivr 가 안 되면 GitHub 원본 주소로 한 번 더, 그것도 안 되면 안내 한 줄.
+   목업(로컬): <div id="as-quick" data-local="quick-data/" data-default="UBER"> — 커밋 번호 없이 같은 폴더에서 읽는다. */
+(function () {
+  var root = document.getElementById('as-quick');
+  if (!root) return;
+  var CDN = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@';
+  var RAW = 'https://raw.githubusercontent.com/red6keep-droid/alphascope/';
+  var PAGES = 'https://alpha-scope.pages.dev/';   // 먼저 읽는 곳 — 안 되면 jsDelivr → GitHub 원본
+  var LIST_US = root.getAttribute('data-list-us') || '/p/us-market-cap-top10.html';
+  var LIST_KR = root.getAttribute('data-list-kr') || '/p/kr-market-cap-top10.html';
+  var local = root.getAttribute('data-local');
+  var q = '';
+  try { q = new URLSearchParams(location.search).get('s') || ''; } catch (e) { q = ''; }
+  var s = (q || root.getAttribute('data-default') || '').toUpperCase().replace(/\.(KS|KQ)$/, '').replace(/[^A-Z0-9\-]/g, '').slice(0, 12);
+
+  // 안내 — 독자에게 보이는 말. 상황마다 다르게: 종목을 안 고름 · 우리가 다루지 않는 코드 · 잠시 못 불러옴 (2026-11-14 사용자)
+  function msg(t) {
+    root.innerHTML = '<p style="font-size:17px;line-height:30px;color:#333;margin:12px 0;padding-left:6px;word-break:keep-all;">' + t + '</p>' +
+      '<p style="font-size:17px;line-height:30px;margin:0 0 12px;padding-left:6px;">' +
+      '<a href="' + LIST_US + '" style="color:#111;">미국 종목 목록</a> · <a href="' + LIST_KR + '" style="color:#111;">한국 종목 목록</a></p>';
+  }
+  if (!s) { msg('보고 싶은 종목을 종목 목록에서 골라 주세요.'); return; }
+  var kr = /^\d{6}$/.test(s);
+  var branch = kr ? 'quick-kr' : 'quick-us';
+  var path = (kr ? 'kr/' : 'us/') + s + '.html';
+
+  var notFound = false;   // 자료 서버가 응답했는데 그 종목 파일이 없다 = 우리가 다루지 않는 코드
+  function getSync(url) {
+    try {
+      var x = new XMLHttpRequest();
+      x.open('GET', url, false);
+      x.send(null);
+      if (x.status >= 200 && x.status < 300) return x.responseText;
+      if (x.status === 404) notFound = true;
+    } catch (e) { /* 막히면 다음 주소 */ }
+    return null;
+  }
+  function show(html) {
+    root.innerHTML = html;
+    var go = root.querySelector('[data-redirect]');
+    if (go && !local) { try { location.replace(go.getAttribute('data-redirect')); } catch (e) { /* 버튼이 남는다 */ } }   // 정식 종목 = 종목 분석 페이지로
+    var nm = root.querySelector('[data-quick-title]');
+    if (nm) {
+      document.title = nm.getAttribute('data-quick-title') + ' | ' + document.title.split(' | ').pop();
+      var h = document.querySelector('.post-title, h1');
+      if (h) h.textContent = nm.getAttribute('data-quick-title');
+    }
+  }
+
+  // 일반 주소 /p/stock.html?s=코드 로 왔고 그 종목 전용 페이지가 있으면 그리로 (2026-11-15 사용자: 전용 주소라야 검색 · 공유가 종목별로 잡힌다).
+  // 주소표 = Pages /shells.json (publish_quick_shells.py 가 매일). 전용 페이지(data-default 가 있는 곳)에서는 부르지 않는다.
+  if (!local && q && !root.getAttribute('data-default')) {
+    try {
+      var map = JSON.parse(getSync(PAGES + 'shells.json') || '{}');
+      if (map[s] && map[s].indexOf(location.pathname) < 0) { location.replace(map[s]); return; }
+    } catch (e) { /* 주소표가 없으면 이 페이지에서 그대로 */ }
+    notFound = false;
+  }
+
+  var html = null;
+  if (local) {
+    html = getSync(local + path);
+  } else {
+    // ① Cloudflare Pages(jsDelivr 예비, 2026-11-15 사용자) — 배포하면 바로 새 파일이라 커밋 번호 단계가 없다. 확장자 없이(.html 이면 308 한 번 더)
+    html = getSync(PAGES + path.replace(/\.html$/, ''));
+    notFound = false;   // Pages 에 없는 것(첫 배포 전 등)만으로 `찾지 못했다`고 하지 않는다 — 아래 jsDelivr 결과로 판단
+  }
+  if (!html && !local) {
+    var v = null;
+    try { v = JSON.parse(getSync(CDN + branch + '/version.json') || 'null'); } catch (e) { v = null; }
+    if (v && v.commit) html = getSync(CDN + v.commit + '/' + path);
+    if (!html) html = getSync(RAW + branch + '/' + path);   // jsDelivr 가 안 되거나 옛 커밋이 지워졌을 때 — GitHub 원본(브랜치 최신)
+  }
+  if (html) show(html);
+  else if (notFound) msg('종목 코드 ' + s + '에 해당하는 종목을 찾지 못했습니다. 미국 S&amp;P 500 · 코스피 200 · 코스닥 150 종목을 다룹니다. 종목 목록에서 찾아 주세요.');
+  else msg('지금 종목 자료를 불러오지 못했습니다. 잠시 뒤 다시 열어 주세요.');
+})();
+
+;
+/* AlphaScope 봉차트 — 페이지 안에서 직접 그리는 실제 차트 (2026-11-13 사용자: "그림 말고 실제 차트 · 넘겨보기 · 주봉 · 손가락 확대 · 전체 화면 · 볼린저 · MACD").
+   [data-candle] 요소마다 하나. 자료 = data-candle 속성의 JSON {name, dec, bars:[[날짜,시,고,저,종,거래량],...], avg?:{price,label}}.
+   새 수집 · AI 0 — 페이지를 만들 때 이미 받은 일봉을 넣고, 주 · 월 · 분기 · 년봉과 지표는 브라우저가 계산한다.
+   2026-11-14 사용자 "네이버랑 똑같이" (A6 B1 B3 B5 B6 B10 B11 C1 C3 C4 D3 D5 D6 D8 D11 D12):
+     일 → 주 → 월 → 분기 → 년 순환 · 이동평균 범례(5 20 60 120, 숫자 = 선 색) + 닫기 · 일반/로그 축 · 보합 봉 회색 십자 · 최고 · 최저(현재가 대비 %) ·
+     최신으로 버튼 · 세로 격자 · 거래량 범례 + 닫기 · 거래량 눈금 · 날짜 축(MM/DD, 달이 바뀌면 `N월` 굵게) ·
+     머리 = 현재가 · 전날 대비 금액 · % · 오늘 거래량 · 시가 · 고가 · 저가 · 종가 · 누르면 위 · 아래 날짜 칸 · 이동평균 값 표 · 그날 거래량.
+   매수 · 매도 같은 판단 말은 그리지 않는다(지표 교차 표시 없음). 테마로 옮길 수 있게 한 번만 돈다. */
+(function () {
+  if (window.__asCandle) return;
+  window.__asCandle = 1;
+  var VIO = '#6D28D9', UP = '#d93025', DN = '#1a73e8', UPL = '#F2A9A3', DNL = '#9DC2F2', FLAT = '#9CA3AF', GRID = '#ECF0F5', NOTE = '#6B7280', INK = '#111';
+  var MA_COL = { 5: '#5BB450', 20: '#E5534B', 60: '#F08C2E', 120: '#9B59D0', 200: '#E879A6' };   // 네이버와 같은 색 (2026-11-14 사용자)
+  var UNITS = ['D', 'W', 'M', 'Q', 'Y'], UNIT_KO = { D: '일', W: '주', M: '월', Q: '분기', Y: '년' };
+  var VIEW = { D: 60, W: 52, M: 36, Q: 24, Y: 15 }, MIN_SLOT = 7, AXIS_W = 66, FS = 13, TOPS = 22, XH = 22;   // MIN_SLOT = 봉 한 칸 최소 폭(몸통 5) · TOPS = 위 띠(범례 · 축 방식 · 위 날짜 칸)
+
+  function qkey(s) { return s.slice(0, 4) + 'Q' + (Math.floor((+s.slice(5, 7) - 1) / 3) + 1); }
+  function agg(d, u) {
+    if (u === 'D') return d;
+    var out = [], cur = null, key = function (s) {
+      if (u === 'M') return s.slice(0, 7);
+      if (u === 'Q') return qkey(s);
+      if (u === 'Y') return s.slice(0, 4);
+      var t = new Date(s + 'T00:00:00Z'), w = (t.getUTCDay() + 6) % 7; t.setUTCDate(t.getUTCDate() - w); return t.toISOString().slice(0, 10);
+    };
+    d.forEach(function (b) {
+      var k = key(b[0]);
+      if (!cur || cur.k !== k) { cur = { k: k, b: b.slice() }; out.push(cur.b); }
+      else { cur.b[0] = b[0]; cur.b[2] = Math.max(cur.b[2], b[2]); cur.b[3] = Math.min(cur.b[3], b[3]); cur.b[4] = b[4]; cur.b[5] += b[5]; }
+    });
+    return out;
+  }
+  function sma(c, n) { var o = [], s = 0; for (var i = 0; i < c.length; i++) { s += c[i]; if (i >= n) s -= c[i - n]; o.push(i >= n - 1 ? s / n : null); } return o; }
+  function ema(c, n) { var o = [], k = 2 / (n + 1), e = null; for (var i = 0; i < c.length; i++) { e = e === null ? c[i] : c[i] * k + e * (1 - k); o.push(i >= n - 1 ? e : null); } return o; }
+  function boll(c, n, m) {
+    var mid = sma(c, n), up = [], lo = [];
+    for (var i = 0; i < c.length; i++) {
+      if (mid[i] === null) { up.push(null); lo.push(null); continue; }
+      var s = 0; for (var j = i - n + 1; j <= i; j++) s += (c[j] - mid[i]) * (c[j] - mid[i]);
+      var sd = Math.sqrt(s / n); up.push(mid[i] + m * sd); lo.push(mid[i] - m * sd);
+    }
+    return { mid: mid, up: up, lo: lo };
+  }
+  function macd(c) {
+    var a = ema(c, 12), b = ema(c, 26), line = c.map(function (_, i) { return a[i] === null || b[i] === null ? null : a[i] - b[i]; });
+    var first = line.findIndex(function (v) { return v !== null; }), sig = line.map(function () { return null; });
+    if (first >= 0) { var s = ema(line.slice(first), 9); s.forEach(function (v, i) { sig[first + i] = v; }); }
+    return { line: line, sig: sig, hist: line.map(function (v, i) { return v === null || sig[i] === null ? null : v - sig[i]; }) };
+  }
+  function rsi(c, n) {
+    var o = [null], g = 0, l = 0;
+    for (var i = 1; i < c.length; i++) {
+      var ch = c[i] - c[i - 1], up = Math.max(ch, 0), dn = Math.max(-ch, 0);
+      if (i <= n) { g += up; l += dn; o.push(i === n ? 100 - 100 / (1 + (g / n) / ((l / n) || 1e-9)) : null); if (i === n) { g /= n; l /= n; } }
+      else { g = (g * (n - 1) + up) / n; l = (l * (n - 1) + dn) / n; o.push(100 - 100 / (1 + g / (l || 1e-9))); }
+    }
+    return o;
+  }
+  function fmt(v, dec) { return v.toLocaleString('ko-KR', { minimumFractionDigits: dec, maximumFractionDigits: dec }); }
+  function sgnPct(v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + '%'; }
+  function tri(v) { return v > 0 ? '▲' : v < 0 ? '▼' : ''; }
+  function fmtVol(v) { return v >= 1e6 ? (v / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'm' : v >= 1e3 ? Math.round(v / 1e3) + 'k' : String(Math.round(v)); }
+  function ticks(lo, hi, n) {
+    var span = hi - lo || Math.abs(hi) || 1, raw = span / n, p = Math.pow(10, Math.floor(Math.log10(raw))), st = [1, 2, 2.5, 5, 10].map(function (k) { return k * p; }).find(function (k) { return k >= raw; });
+    var o = []; for (var t = Math.ceil(lo / st) * st; t <= hi + 1e-9; t += st) o.push(+t.toFixed(10)); return o;
+  }
+  function el(tag, css, html) { var e = document.createElement(tag); if (css) e.style.cssText = css; if (html !== undefined) e.innerHTML = html; return e; }
+  function btn(txt, on) {
+    return el('button', 'font:inherit;font-size:14px;line-height:20px;padding:4px 10px;border-radius:6px;cursor:pointer;border:1px solid ' + (on ? '#111' : '#E2E8F0') +
+      ';background:' + (on ? '#111' : '#fff') + ';color:' + (on ? '#fff' : '#111') + ';', txt);
+  }
+  var X_SVG = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"><path d="M2 2l6 6M8 2L2 8"/></svg>';
+  var CHIP = 'display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#F1F5F9;border:0;padding:0;cursor:pointer;margin-left:6px;';
+
+  function Chart(root) {
+    var self = this;
+    this.root = root; this.d = JSON.parse(root.getAttribute('data-candle')); this.dec = this.d.dec || 0;
+    this.unit = 'D'; this.full = false; this.log = false; this.maOn = true;
+    this.on = { ma: { 5: true, 20: true, 60: true, 120: true }, boll: false, lower: 'vol' };
+    root.innerHTML = '';
+    // 꾹 눌러도 글자 선택 · 파란 선택 화면 · 길게 누르기 메뉴가 안 뜨게 (2026-11-14 사용자)
+    ['userSelect', 'webkitUserSelect'].forEach(function (k) { root.style[k] = 'none'; });
+    root.style.webkitTouchCallout = 'none'; root.style.webkitTapHighlightColor = 'transparent';
+    root.addEventListener('contextmenu', function (e) { if (e.target.tagName === 'CANVAS') e.preventDefault(); });
+    // 머리 — 1줄: 현재가 · 전날 대비 금액 · % | 버튼, 2줄: 오늘 거래량, 3줄: 시가 · 고가 · 저가 · 종가(누른 날이면 그날)
+    this.top = el('div', 'display:flex;align-items:center;gap:6px;margin:0 0 4px;');
+    this.price = el('div', 'flex:1;min-width:0;white-space:nowrap;font-variant-numeric:tabular-nums;');
+    this.btns = el('div', 'display:flex;gap:6px;flex:none;');
+    this.top.appendChild(this.price); this.top.appendChild(this.btns);
+    this.sub = el('div', 'font-size:13px;line-height:19px;color:' + NOTE + ';margin:0 0 2px;font-variant-numeric:tabular-nums;');
+    this.ohlc = el('div', 'font-size:13px;line-height:19px;margin:0 0 6px;font-variant-numeric:tabular-nums;');
+    this.menuBox = el('div', '');
+    this.wrap = el('div', 'position:relative;');
+    this.cv = el('canvas', 'display:block;width:100%;touch-action:pan-y;cursor:crosshair;');
+    this.legend = el('div', 'position:absolute;left:0;top:0;font-size:13px;line-height:20px;color:' + INK + ';display:flex;align-items:center;flex-wrap:wrap;max-width:70%;pointer-events:auto;');
+    this.scaleB = el('button', 'position:absolute;right:0;top:0;font:inherit;font-size:13px;line-height:20px;border:0;background:transparent;color:' + INK + ';cursor:pointer;padding:0 2px;');
+    this.latest = el('button', 'position:absolute;width:30px;height:28px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.12);',
+      '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l4 4-4 4M8 3l4 4-4 4"/></svg>');
+    this.latest.setAttribute('aria-label', '최신으로');
+    this.volLeg = el('div', 'position:absolute;left:0;font-size:13px;line-height:20px;color:' + INK + ';display:flex;align-items:center;');
+    this.restore = el('div', 'display:flex;gap:6px;margin:6px 0 0;');
+    [this.cv, this.legend, this.scaleB, this.latest, this.volLeg].forEach(function (e) { self.wrap.appendChild(e); });
+    [this.top, this.sub, this.ohlc, this.menuBox, this.wrap, this.restore].forEach(function (e) { root.appendChild(e); });
+    this.scaleB.onclick = function () { self.log = !self.log; self.draw(); };
+    this.latest.onclick = function () { self.end = self.bars.length; self.cross = null; self.draw(); };
+    this.build();
+    this.bind();
+    var lastW = 0, again = function () { var w = root.clientWidth; if (w && w !== lastW) { lastW = w; requestAnimationFrame(function () { self.draw(); }); } };
+    if (window.ResizeObserver) new ResizeObserver(again).observe(root);
+    else window.addEventListener('resize', function () { self.draw(); });
+    window.addEventListener('resize', function () { if (self.full) requestAnimationFrame(function () { self.topBar(); self.draw(); }); });   // 폰을 돌리면 높이 · 가로 화면 배치 다시
+  }
+  Chart.prototype.build = function () {
+    var self = this;
+    this.bars = agg(this.d.bars, this.unit);
+    var c = this.bars.map(function (b) { return b[4]; });
+    this.ma = {}; [5, 20, 60, 120, 200].forEach(function (n) { self.ma[n] = sma(c, n); });
+    this.bb = boll(c, 20, 2); this.mc = macd(c); this.rs = rsi(c, 14);
+    this.n = Math.min(VIEW[this.unit], this.bars.length); this.end = this.bars.length; this.cross = null;
+    this.topBar();
+  };
+  Chart.prototype.minN = function () { return Math.min(10, this.bars.length); };
+  Chart.prototype.maxN = function () { return Math.max(this.minN(), Math.floor((this.root.clientWidth - (this.axisW || AXIS_W)) / MIN_SLOT)); };
+  Chart.prototype.topBar = function () {
+    var self = this, t = this.btns; t.innerHTML = '';
+    // 일 → 주 → 월 → 분기 → 년 → 일 한 버튼 (2026-11-13 · 11-14 사용자)
+    var cyc = btn(UNIT_KO[this.unit], false); cyc.style.minWidth = '44px'; cyc.style.borderColor = '#94A3B8';   // 늘 무언가 골라져 있는 버튼 = 테두리만 살짝 진하게 (2026-11-14 사용자) cyc.setAttribute('aria-label', '일봉 · 주봉 · 월봉 · 분기봉 · 년봉 바꾸기');
+    cyc.onclick = function () { self.unit = UNITS[(UNITS.indexOf(self.unit) + 1) % UNITS.length]; self.build(); self.draw(); }; t.appendChild(cyc);
+    var IB = 'font:inherit;width:32px;height:30px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+    if (this.full) {   // 지표 = 글자 대신 아이콘 버튼(조절 막대 셋), 열려 있으면 검은 바탕 (2026-11-14 사용자)
+      var ind = el('button', IB + 'border:1px solid ' + (this.menu ? '#111' : '#E2E8F0') + ';background:' + (this.menu ? '#111' : '#fff') + ';',
+        '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="' + (this.menu ? '#fff' : '#111') + '" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12M2 8h12M2 12h12"/><circle cx="5" cy="4" r="1.6" fill="' + (this.menu ? '#111' : '#fff') + '"/><circle cx="11" cy="8" r="1.6" fill="' + (this.menu ? '#111' : '#fff') + '"/><circle cx="7" cy="12" r="1.6" fill="' + (this.menu ? '#111' : '#fff') + '"/></svg>');
+      ind.setAttribute('aria-label', '지표'); ind.onclick = function () { self.menu = !self.menu; self.topBar(); self.draw(); }; t.appendChild(ind);
+      return this.menuDraw();
+    }
+    var fs = el('button', IB + 'border:1px solid #E2E8F0;background:#fff;',
+      '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4v4M14 2l-4 4M6 2H2v4M2 2l4 4M10 14h4v-4M14 14l-4-4M6 14H2v-4M2 14l4-4"/></svg>');   // 네 방향 화살표 (2026-11-14 사용자 C안)
+    fs.setAttribute('aria-label', '전체 화면');
+    fs.onclick = function () { self.toggleFull(); }; t.appendChild(fs);
+    this.menuDraw();
+  };
+  Chart.prototype.menuDraw = function () {
+    var self = this, m = this.menuBox;
+    var pick = function (b, on, col) { b.style.background = '#fff'; b.style.borderColor = on ? col : '#E2E8F0'; b.style.color = on ? col : NOTE; b.style.fontWeight = on ? '600' : '400'; return b; };   // 켜짐 = 테두리 · 글자 색 + 굵게 (2026-11-14 사용자)
+    m.innerHTML = ''; m.style.cssText = '';   // 다시 그릴 때 비우기 — 11-14 주석에 묻혀 버튼이 쌓이던 것
+    if (this.full && this.menu) {
+      m.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 8px;';
+      var u = this.unit === 'D' ? '일' : this.unit === 'W' ? '주' : '';
+      [5, 20, 60, 120, 200].forEach(function (n) {
+        var b = pick(btn(n + u, false), !!self.on.ma[n] && self.maOn, MA_COL[n]);   // 켜면 선 색 테두리 · 글자 (2026-11-14 사용자)
+        b.onclick = function () { self.maOn = true; self.on.ma[n] = !self.on.ma[n]; self.topBar(); self.draw(); }; m.appendChild(b);
+      });
+      var bb = pick(btn('볼린저 밴드', false), this.on.boll, INK); bb.onclick = function () { self.on.boll = !self.on.boll; self.topBar(); self.draw(); }; m.appendChild(bb);
+      m.appendChild(el('span', 'flex-basis:100%;height:0;'));
+      if (!this.isLand()) [['vol', '거래량'], ['macd', 'MACD'], ['rsi', 'RSI'], ['none', '없음']].forEach(function (x) {   // 가로 폰 = 아래 칸이 없으니 버튼도 없음
+        var b = pick(btn('아래 : ' + x[1], false), self.on.lower === x[0], INK); b.onclick = function () { self.on.lower = x[0]; self.topBar(); self.draw(); }; m.appendChild(b);
+      });
+    }
+  };
+  Chart.prototype.isLand = function () { return this.full && window.innerWidth > window.innerHeight && window.innerHeight < 500; };   // 가로로 돌린 폰만(태블릿 가로는 높이가 넉넉해 아래 칸을 둔다 — 2026-11-14 태블릿에서 `아래 :` 버튼이 안 먹던 것)
+  Chart.prototype.toggleFull = function () {
+    if (!this.full) {
+      this.ph = document.createComment('candle');
+      this.root.parentNode.insertBefore(this.ph, this.root);
+      this.ov = el('div', 'position:fixed;inset:0;z-index:2147483000;background:#fff;display:flex;flex-direction:column;padding:12px 12px max(12px,env(safe-area-inset-bottom));box-sizing:border-box;overflow:auto;');
+      var head = el('div', 'display:flex;align-items:center;gap:8px;margin:0 0 16px;'), self = this;   // 아래 여백 6 → 16 (2026-11-14 사용자)
+      // 종목 로고 = 페이지 제목의 로고(테마가 만든 .title-logo — 사진 또는 글자 원)를 그대로, 없으면 이름 첫 글자 원 (2026-11-14 사용자)
+      var src = document.querySelector('.post-title .title-logo'), lg;
+      if (src) {
+        var cs = getComputedStyle(src); lg = src.cloneNode(true);
+        lg.style.cssText = 'flex:none;width:24px;height:24px;border-radius:50%;margin:0;vertical-align:0;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;object-fit:cover;' +
+          'background:' + cs.backgroundColor + ';color:' + cs.color + ';font-size:11px;line-height:24px;font-weight:700;';
+      } else lg = el('span', 'flex:none;width:24px;height:24px;border-radius:50%;background:#F1F5F9;color:#111;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;', (this.d.name || '').charAt(0));
+      head.appendChild(lg);
+      head.appendChild(el('div', 'flex:1;min-width:0;font-size:17px;line-height:24px;font-weight:700;color:#111;', this.d.name));
+      var cx = el('button', 'flex:none;width:30px;height:30px;border-radius:50%;background:#F1F5F9;border:0;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;',
+        '<svg width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="#6B7280" stroke-width="1.4" stroke-linecap="round"><path d="M2 2l6 6M8 2L2 8"/></svg>');   // 회색 원 닫기(범례 닫기와 같은 꼴, 큰 것 30) — 종목 이름 줄 (2026-11-14 사용자)
+      cx.setAttribute('aria-label', '닫기'); cx.onclick = function () { self.toggleFull(); }; head.appendChild(cx);
+      this.ov.appendChild(head);
+      this.ov.appendChild(this.root); this.minH = this.root.style.minHeight; this.root.style.minHeight = '0';   // 카드의 min-height 300 이 가로 화면에서 스크롤을 만들던 것
+      document.body.appendChild(this.ov); document.documentElement.style.overflow = 'hidden';
+      this.full = true; this.on.ma[200] = this.on.ma[200] || false; this.n = Math.min(this.unit === 'D' ? 120 : VIEW[this.unit] * 2, this.bars.length);
+    } else {
+      this.ph.parentNode.insertBefore(this.root, this.ph); this.root.style.minHeight = this.minH || ''; this.ph.remove(); this.ov.remove(); document.documentElement.style.overflow = '';
+      this.full = false; this.menu = false; this.on.boll = false; this.on.ma[200] = false; this.on.lower = 'vol';   // 닫으면 지표 = 기본(작은 그래프엔 지표 없음, 2026-11-14 사용자) this.n = Math.min(VIEW[this.unit], this.bars.length); this.end = this.bars.length;
+    }
+    this.cross = null; this.topBar(); this.draw();
+  };
+  Chart.prototype.bind = function () {
+    // 옆으로 밀기 = 넘겨보기 · 두 손가락 = 확대 · 축소 · 짧게 누르기 = 그날 십자선(다시 누르면 끔) · 꾹 누르고 움직이기 = 십자선이 따라감
+    var self = this, cv = this.cv, pts = {}, start = null, moved = false, timer = null, crossMode = false, vel = 0, lastX = 0, lastT = 0, fling = 0;
+    // 손을 뗀 뒤 관성으로 흘러가다 천천히 멈춤 — 폰 세로 스크롤과 비슷한 감속(1ms 마다 속도 × 0.997) (2026-11-14 사용자)
+    function stopFling() { if (fling) cancelAnimationFrame(fling); fling = 0; }
+    function startFling(v) {
+      var slot = (cv.getBoundingClientRect().width - (self.axisW || AXIS_W)) / self.n, pos = self.end, t0 = 0;
+      function step(ts) {
+        if (!t0) { t0 = ts; fling = requestAnimationFrame(step); return; }
+        var dt = Math.min(32, ts - t0); t0 = ts; v *= Math.pow(0.997, dt); pos -= v * dt / slot;
+        var lo = self.n, hi = self.bars.length; if (pos < lo || pos > hi) { pos = Math.max(lo, Math.min(hi, pos)); v = 0; }
+        var e2 = Math.round(pos); if (e2 !== self.end) { self.end = e2; self.draw(); }
+        fling = Math.abs(v) > 0.02 ? requestAnimationFrame(step) : 0;
+      }
+      fling = requestAnimationFrame(step);
+    }
+    function at(e) {
+      var r = cv.getBoundingClientRect(), pw = r.width - (self.axisW || AXIS_W);
+      return { i: Math.max(0, Math.min(self.n - 1, Math.floor((e.clientX - r.left) / (pw / self.n)))) + self.end - self.n, y: e.clientY - r.top };
+    }
+    cv.addEventListener('pointerdown', function (e) {
+      stopFling(); vel = 0; lastX = e.clientX; lastT = e.timeStamp;
+      pts[e.pointerId] = e.clientX; cv.setPointerCapture(e.pointerId); moved = false;
+      var ids = Object.keys(pts);
+      clearTimeout(timer);
+      if (ids.length === 2) { start = { pinch: Math.abs(pts[ids[0]] - pts[ids[1]]), n: self.n, end: self.end }; crossMode = false; self.cross = null; return; }
+      start = { x: e.clientX, end: self.end };
+      if (e.pointerType !== 'mouse') timer = setTimeout(function () { if (!moved) { crossMode = true; self.cross = at(e); self.draw(); } }, 280);
+    });
+    cv.addEventListener('pointermove', function (e) {
+      if (!(e.pointerId in pts)) { if (e.pointerType === 'mouse') { self.cross = at(e); self.draw(); } return; }
+      pts[e.pointerId] = e.clientX;
+      if (crossMode) { self.cross = at(e); self.draw(); return; }
+      var ids = Object.keys(pts), slot = (cv.getBoundingClientRect().width - (self.axisW || AXIS_W)) / self.n;
+      if (ids.length === 2 && start.pinch) {
+        var d = Math.abs(pts[ids[0]] - pts[ids[1]]) || 1;
+        self.n = Math.max(self.minN(), Math.min(self.maxN(), self.bars.length, Math.round(start.n * start.pinch / d))); self.end = Math.max(self.end, self.n); moved = true;
+      } else if (start && start.x !== undefined) {
+        var dx = e.clientX - start.x;
+        if (Math.abs(dx) > 4) { moved = true; clearTimeout(timer); }
+        var dtm = e.timeStamp - lastT; if (dtm > 0) { vel = 0.8 * ((e.clientX - lastX) / dtm) + 0.2 * vel; lastX = e.clientX; lastT = e.timeStamp; }
+        self.end = Math.max(self.n, Math.min(self.bars.length, start.end - Math.round(dx / slot)));
+      }
+      if (moved) self.cross = null;
+      self.draw();
+    });
+    cv.addEventListener('touchmove', function (e) { if (crossMode) e.preventDefault(); }, { passive: false });
+    function up(e) {
+      clearTimeout(timer);
+      if (!moved && !crossMode && e.type === 'pointerup' && e.pointerType !== 'mouse') { var a = at(e); self.cross = self.cross && self.cross.i === a.i ? null : a; }
+      var flingV = moved && !crossMode && e.type === 'pointerup' && !(start && start.pinch) && Object.keys(pts).length === 1 && e.timeStamp - lastT < 80 ? vel : 0;
+      crossMode = false;
+      if (Math.abs(flingV) > 0.25) startFling(flingV);
+      delete pts[e.pointerId]; start = Object.keys(pts).length ? { x: pts[Object.keys(pts)[0]], end: self.end } : null; self.draw();
+    }
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    cv.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && !(e.pointerId in pts)) { self.cross = null; self.draw(); } });
+    cv.addEventListener('wheel', function (e) {
+      if (!self.full && !e.ctrlKey) return;
+      e.preventDefault(); self.n = Math.max(self.minN(), Math.min(self.maxN(), self.bars.length, Math.round(self.n * (e.deltaY > 0 ? 1.15 : 0.87)))); self.end = Math.max(self.end, self.n); self.draw();
+    }, { passive: false });
+  };
+  Chart.prototype.dateText = function (s, full) {
+    if (this.unit === 'Y') return s.slice(0, 4) + '년';
+    if (this.unit === 'Q') return s.slice(0, 4) + '년 ' + qkey(s).slice(5) + '분기';
+    if (this.unit === 'M') return s.slice(0, 4) + '-' + s.slice(5, 7);
+    if (this.unit === 'W') { var x = new Date(s + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() - (x.getUTCDay() + 6) % 7); return x.toISOString().slice(0, 10) + ' 주'; }
+    return full ? s : s.slice(5).replace('-', '/');
+  };
+  Chart.prototype.draw = function () {
+    var self = this, cv = this.cv, W = Math.floor(this.root.clientWidth); if (!W) return;
+    // 작은 화면 = 그림을 카드 오른쪽 · 아래 안쪽 여백만큼 넓혀 종가 칸이 카드 외곽선에 붙게 (2026-11-14 사용자)
+    var box = getComputedStyle(this.root.parentNode), padR = Math.round(parseFloat(box.paddingRight) || 0), padB = this.full ? 0 : Math.round(parseFloat(box.paddingBottom) || 0);
+    this.wrap.style.marginRight = -padR + 'px'; this.root.style.marginBottom = -padB + 'px'; W += padR;
+    if (this.n > this.maxN()) { this.n = Math.min(this.maxN(), this.bars.length); this.end = Math.max(this.end, this.n); }
+    var land = this.isLand();   // 가로로 돌린 전체 화면 = 아래 칸 없음 · 머리 한 줄 · 화면에 꽉 (2026-11-14 사용자)
+    var maRows = 1;
+    if (this.full) {   // 이동평균 값 줄(누를 때) 이 몇 줄이 되는지 — 최신 값 길이로 미리 (누를 때마다 그래프가 움직이지 않게)
+      var mc = this._mc || (this._mc = document.createElement('canvas').getContext('2d')), xw = 0, lim = W - 4, li = this.bars.length - 1;
+      mc.font = '13px ' + getComputedStyle(this.root).fontFamily;
+      [5, 20, 60, 120, 200].forEach(function (k) { if (!(self.maOn && self.on.ma[k])) return; var v = self.ma[k][li]; var w = mc.measureText(k + ' ' + (v === null ? '-' : fmt(v, self.dec))).width + 14; if (xw && xw + w > lim) { maRows++; xw = 0; } xw += w; });
+    }
+    var TOPS = this.full ? 30 + 20 * maRows : 22;   // 전체 화면 위 띠 = 범례 줄 20 + 누른 날 검은 날짜 칸 22 (범례 아래로 내림, 2026-11-14 사용자)   // 전체 화면 = 이동평균 범례와 최고 글자 사이 15 더 (2026-11-14 사용자)
+    var lowerH = this.on.lower === 'none' || !this.full || land ? 0 : 90, priceH = 264, gap = lowerH ? 31 : 0;   // 36 → 31 (2026-11-14 사용자) gap = 거래량 범례 줄(범례와 막대 사이 10 더, 2026-11-14 사용자)
+    if (this.full) {
+      var rest = window.innerHeight - this.wrap.getBoundingClientRect().top - this.restore.offsetHeight - 16;
+      priceH = Math.max(80, Math.floor(rest - TOPS - lowerH - gap - XH));   // 최소 200 → 80 — 가로 화면에서 아래가 잘리던 것
+    }
+    var H = TOPS + priceH + gap + lowerH + XH, dpr = window.devicePixelRatio || 1;
+    cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + 'px';
+    var g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    var font = getComputedStyle(this.root).fontFamily, s = this.end - this.n, B = this.bars.slice(s, this.end), pw, slot, X;
+    var last = this.bars[this.bars.length - 1], prevL = this.bars[this.bars.length - 2];
+    var maShow = function (n) { return self.maOn && self.on.ma[n]; };
+    // 가격 범위 = 봉 + 켜진 선 (+ 최고 · 최저 글자 자리 위아래 22)
+    var lo = Infinity, hi = -Infinity, look = function (v) { if (v !== null && v !== undefined) { lo = Math.min(lo, v); hi = Math.max(hi, v); } };
+    B.forEach(function (b) { look(b[2]); look(b[3]); });
+    for (var i = s; i < this.end; i++) { for (var n in this.on.ma) if (maShow(n)) look(this.ma[n][i]); if (this.on.boll) { look(this.bb.up[i]); look(this.bb.lo[i]); } }
+    // 오른쪽 가격 칸 폭 — 전체 화면 66 고정, 작은 화면 = 가장 긴 숫자 + 왼쪽 9 · 오른쪽 3 (2026-11-14 사용자 "0 기준 우측 여백 최대한 좁게")
+    var TX = this.full ? 10 : 9, TFS = this.full ? FS : 11, AFS = this.full ? FS : 10, KFS = this.full ? 11 : 10;   // KFS = 오른쪽 가격 눈금(전체 화면 13 → 11, 2026-11-14 사용자)
+      // 작은 화면: 종가 칸 · 누른 날 검은 칸 11, 오른쪽 눈금 · 아래 날짜 · 최고 · 최저 10 (2026-11-14 사용자)
+    {   // 전체 화면도 숫자 폭에 맞춤 (2026-11-14 사용자 "작은 것처럼")
+      var mw = 0; g.font = KFS + 'px ' + font; ticks(lo, hi, this.full ? 6 : 5).forEach(function (t) { mw = Math.max(mw, g.measureText(fmt(t, self.dec)).width); });
+      g.font = '600 ' + TFS + 'px ' + font; [lo, hi, this.bars[this.end - 1][4]].forEach(function (v) { mw = Math.max(mw, g.measureText(fmt(v, self.dec)).width); });
+      this.axisW = TX + Math.ceil(mw) + 3;
+    }
+    pw = W - this.axisW; slot = pw / this.n; X = function (i) { return Math.floor((i - s) * slot + slot / 2) + 0.5; };
+    var avg = this.d.avg, avgIn = avg && avg.price >= lo - (hi - lo) * 0.3 && avg.price <= hi + (hi - lo) * 0.3;
+    if (avgIn) look(avg.price);
+    if (this.log && lo <= 0) this.log = false;
+    var useLog = false;   // 작은 화면 = Linear · Log 버튼 없음
+    var T = useLog ? Math.log : function (v) { return v; }, iT = useLog ? Math.exp : function (v) { return v; };
+    var tlo = T(lo), thi = T(hi), y0p = TOPS + (this.full ? 28 : 22), y1p = TOPS + priceH - 32;   // 아래 = 최저 글자 밑 여백 10 더 · 전체 화면 위 = 최고 글자를 검은 날짜 칸 아래로 (2026-11-14 사용자)
+    var Y = function (v) { return Math.round(y0p + (thi - T(v)) / ((thi - tlo) || 1) * (y1p - y0p)) + 0.5; };
+    var vOf = function (y) { return iT(thi - (y - y0p) / (y1p - y0p) * (thi - tlo)); };
+    // 날짜 축 칸 — 달이 바뀌는 첫 봉 `N월`(1월은 `YYYY년`) 굵게, 사이엔 주의 첫 봉 `MM/DD` (일봉) — 세로 격자도 이 자리
+    var labs = [], placed = [], add = function (j, txt, bold, minGap) {
+      var x = X(s + j); if (placed.some(function (p) { return Math.abs(p - x) < minGap; })) return; placed.push(x); labs.push([x, txt, bold]);
+    };
+    B.forEach(function (b, j) {
+      var p = j ? B[j - 1][0] : (self.bars[s - 1] || [''])[0]; if (!p) return;
+      if (!self.full && (self.unit === 'D' || self.unit === 'W')) return;   // 작은 화면 = 달 표시 없이 날짜만
+      if (self.unit === 'D' || self.unit === 'W') {
+        if (b[0].slice(0, 4) !== p.slice(0, 4)) add(j, b[0].slice(0, 4) + '년', true, 50);
+        else if (b[0].slice(0, 7) !== p.slice(0, 7)) add(j, +b[0].slice(5, 7) + '월', true, 50);
+      } else if (b[0].slice(0, 4) !== p.slice(0, 4)) add(j, b[0].slice(0, 4) + '년', true, 50);
+    });
+    if (!this.full && this.unit === 'W') B.forEach(function (b, j) { if (j) add(j, b[0].slice(5).replace('-', '.'), false, 62); });
+    if (this.unit === 'D') B.forEach(function (b, j) {
+      if (!j) return; var a = new Date(B[j - 1][0] + 'T00:00:00Z'), c = new Date(b[0] + 'T00:00:00Z');
+      if ((c - a) / 864e5 > 1 && c.getUTCDay() <= 2) add(j, b[0].slice(5).replace('-', '.'), false, 62);
+    });
+    if (this.unit === 'M') B.forEach(function (b, j) { if (/-(04|07|10)$/.test(b[0].slice(0, 7))) add(j, +b[0].slice(5, 7) + '월', false, 46); });
+    labs.forEach(function (l) { g.strokeStyle = GRID; g.lineWidth = 1; g.beginPath(); g.moveTo(Math.round(l[0]) + 0.5, TOPS); g.lineTo(Math.round(l[0]) + 0.5, H - XH); g.stroke(); });
+    // 가로 격자 · 오른쪽 눈금
+    g.font = KFS + 'px ' + font; g.textBaseline = 'middle';
+    var tagB = this.bars[this.end - 1], tagY = tagB ? Y(tagB[4]) : -99;
+    var tk = ticks(lo, hi, this.full ? 6 : 5);
+    tk.forEach(function (t) {
+      var y = Y(t); if (y < TOPS || y > TOPS + priceH) return;
+      g.strokeStyle = GRID; g.lineWidth = 1; g.beginPath(); g.moveTo(0, y); g.lineTo(pw, y); g.stroke();
+      if (Math.abs(y - tagY) < 14) return;
+      g.fillStyle = NOTE; g.textAlign = 'left'; g.fillText(fmt(t, self.dec), pw + TX, y);
+    });
+    g.strokeStyle = '#E2E8F0'; g.beginPath(); g.moveTo(pw + 0.5, TOPS); g.lineTo(pw + 0.5, H - XH); g.stroke();
+    var tag = function (y, txt, bg) {
+      y = Math.round(y); g.fillStyle = bg; g.beginPath(); g.moveTo(pw + 1, y); g.lineTo(pw + 8, y - 10); g.lineTo(W, y - 10); g.lineTo(W, y + 10); g.lineTo(pw + 8, y + 10); g.closePath(); g.fill();
+      g.fillStyle = '#fff'; g.font = '600 ' + TFS + 'px ' + font; g.textAlign = 'left'; g.fillText(txt, pw + TX, y + 0.5); g.font = FS + 'px ' + font;
+    };
+    // 볼린저 · 이동평균
+    var line = function (arr, col, w) {
+      g.strokeStyle = col; g.lineWidth = w; g.beginPath(); var on = false;
+      for (var i = s; i < self.end; i++) { var v = arr[i]; if (v === null || v === undefined) { on = false; continue; } if (!on) { g.moveTo(X(i), Y(v)); on = true; } else g.lineTo(X(i), Y(v)); }
+      g.stroke();
+    };
+    g.save(); g.beginPath(); g.rect(0, TOPS, pw, priceH); g.clip();
+    if (this.on.boll) { line(this.bb.up, '#94A3B8', 1); line(this.bb.lo, '#94A3B8', 1); line(this.bb.mid, '#CBD5E1', 1); }
+    [200, 120, 60, 20, 5].forEach(function (k) { if (maShow(k)) line(self.ma[k], MA_COL[k], 1); });
+    // 봉 — 보합(시가 = 종가)은 회색 십자
+    var bw = Math.max(5, Math.min(Math.floor(slot) - 2, Math.floor(slot * 0.7))); if (bw % 2 === 0) bw -= 1;
+    B.forEach(function (b, j) {
+      var i = s + j, x = X(i), flat = b[4] === b[1], col = flat ? FLAT : b[4] > b[1] ? UP : DN;
+      g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(x, Y(b[2])); g.lineTo(x, Y(b[3])); g.stroke();
+      if (flat) { g.beginPath(); g.moveTo(Math.round(x - bw / 2), Y(b[4])); g.lineTo(Math.round(x + bw / 2) + 1, Y(b[4])); g.stroke(); return; }
+      var y0 = Y(Math.max(b[1], b[4])), y1 = Y(Math.min(b[1], b[4]));
+      g.fillRect(Math.round(x - bw / 2), Math.round(y0), bw, Math.max(1, Math.round(y1 - y0)));
+    });
+    g.restore();
+    // 최고 · 최저 — 점 + `최고 235,000 (−26.13%)` (현재가가 그보다 몇 % 아래 · 위인지)
+    if (B.length) {
+      var hiI = 0, loI = 0; B.forEach(function (b, j) { if (b[2] > B[hiI][2]) hiI = j; if (b[3] < B[loI][3]) loI = j; });
+      self._hl = [];
+      [[hiI, B[hiI][2], '최고', -1], [loI, B[loI][3], '최저', 1]].forEach(function (m) {
+        var x = X(s + m[0]), y = Y(m[1]) + m[3] * 4, d = (last[4] / m[1] - 1) * 100;
+        g.fillStyle = m[2] === '최고' ? UP : DN; g.beginPath(); g.arc(x, y, 2.5, 0, 6.3); g.fill();   // 증감 색 (2026-11-14 사용자)
+        g.font = AFS + 'px ' + font; var txt = m[2] + '  ' + fmt(m[1], self.dec) + ' (' + sgnPct(d) + ')', tw = g.measureText(txt).width;
+        var tx = Math.min(Math.max(x - tw / 2, 2), pw - tw - 2);
+        g.textAlign = 'left'; g.fillText(txt, Math.round(tx), Math.round(y + m[3] * 12) + 0.5);
+        self._hl.push([tx, y + m[3] * 12, tw]);
+      });
+    }
+    // 내 평단 — 보라 점선 + `내 평단 15,893 ▲3.10%`(차이 = 증감 색)
+    if (avg) {
+      var ya = avgIn ? Y(avg.price) : (avg.price > hi ? TOPS + 8 : TOPS + priceH - 8), diff = (last[4] / avg.price - 1) * 100;
+      if (avgIn) { g.strokeStyle = VIO; g.lineWidth = 1; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(0, ya); g.lineTo(pw, ya); g.stroke(); g.setLineDash([]); }
+      g.font = '12px ' + font; g.textAlign = 'left';
+      var lab = (avg.label || '내 평단') + ' ' + fmt(avg.price, self.dec) + ' ', dtx = tri(diff) + Math.abs(diff).toFixed(2) + '%' + (avgIn ? '' : avg.price > hi ? ' ↑' : ' ↓');
+      var w1 = Math.ceil(g.measureText(lab).width), w2 = Math.ceil(g.measureText(dtx).width), ly2 = Math.round(ya + (avgIn ? -9 : 0));
+      var ly0 = ly2, lx = 5, hit = function (x, y) { return (self._hl || []).some(function (r) { return x < r[0] + r[2] && x + w1 + w2 + 6 > r[0] && Math.abs(y - r[1]) < 15; }); };
+      if (hit(lx, ly2) && avgIn) ly2 = Math.round(ya + 10);   // 최고 · 최저 글자와 겹치면 선 아래로
+      if (hit(lx, ly2)) { ly2 = ly0; lx = Math.max(2, pw - w1 - w2 - 8); }   // 그래도 겹치면 선 위 오른쪽 끝
+   // 증감 표시 없음 — `내 평단 15,893` 검은 글자만 (2026-11-14 사용자), 화면 밖일 때만 ↑ · ↓
+      g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(lx - 3, ly2 - 9, w1 + w2 + 6, 18);
+      g.fillStyle = VIO; g.fillText(lab, lx, ly2);   // 보라 글자 + 증감 색 (2026-11-14 사용자 되돌림)
+      g.fillStyle = diff > 0 ? UP : diff < 0 ? DN : INK; g.fillText(dtx, lx + w1, ly2);
+    }
+    // 오른쪽 가격 칸 = 보이는 맨 오른쪽 봉 종가(삼각형 머리), 색 = 그 봉의 전날 대비
+    if (tagB) { var tp = this.bars[this.end - 2]; tag(tagY, fmt(tagB[4], self.dec), !tp || tagB[4] >= tp[4] ? UP : DN); }
+    // 거래량 칸 — 범례(`거래량 987,136` + 닫기) · 막대 · 오른쪽 눈금(250k · 1.5m)
+    var top2 = TOPS + priceH + gap;
+    if (lowerH) {
+      g.strokeStyle = '#E2E8F0'; g.beginPath(); g.moveTo(0, TOPS + priceH + 0.5); g.lineTo(W, TOPS + priceH + 0.5); g.stroke();
+      g.font = FS + 'px ' + font;
+      if (this.on.lower === 'vol') {
+        var vm = Math.max.apply(null, B.map(function (b) { return b[5]; })) || 1, vt = ticks(0, vm, 3).filter(function (v) { return v > 0; });
+        var YV = function (v) { return Math.round(top2 + lowerH - v / vm * (lowerH - 4)) + 0.5; };
+        vt.forEach(function (v) { g.strokeStyle = GRID; g.beginPath(); g.moveTo(0, YV(v)); g.lineTo(pw, YV(v)); g.stroke(); g.fillStyle = NOTE; g.textAlign = 'left'; g.fillText(fmtVol(v), pw + 10, YV(v)); });
+        B.forEach(function (b, j) { var x = X(s + j), h = Math.round(b[5] / vm * (lowerH - 4)); g.fillStyle = b[4] > b[1] ? UPL : b[4] < b[1] ? DNL : '#D1D5DB'; g.fillRect(Math.round(x - bw / 2), top2 + lowerH - h, bw, h); });
+      } else {
+        var ser = this.on.lower === 'macd' ? [this.mc.line, this.mc.sig, this.mc.hist] : [this.rs], l2 = Infinity, h2 = -Infinity;
+        for (var i2 = s; i2 < this.end; i2++) ser.forEach(function (a) { if (a[i2] !== null) { l2 = Math.min(l2, a[i2]); h2 = Math.max(h2, a[i2]); } });
+        if (this.on.lower === 'rsi') { l2 = 0; h2 = 100; }
+        if (l2 === Infinity) { l2 = -1; h2 = 1; }
+        var Y2 = function (v) { return Math.round(top2 + 2 + (h2 - v) / (h2 - l2 || 1) * (lowerH - 4)) + 0.5; };
+        (this.on.lower === 'rsi' ? [30, 70] : [0]).forEach(function (r) { g.strokeStyle = '#CBD5E1'; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(0, Y2(r)); g.lineTo(pw, Y2(r)); g.stroke(); g.setLineDash([]); g.fillStyle = NOTE; g.textAlign = 'left'; g.fillText(String(r), pw + 10, Y2(r)); });
+        if (this.on.lower === 'macd') for (var i3 = s; i3 < this.end; i3++) { var hv = this.mc.hist[i3]; if (hv === null) continue; var yb0 = Y2(0), yb1 = Y2(hv); g.fillStyle = hv >= 0 ? UPL : DNL; g.fillRect(Math.round(X(i3) - bw / 2), Math.min(yb0, yb1), bw, Math.max(1, Math.abs(yb1 - yb0))); }
+        var line2 = function (arr, col) { g.strokeStyle = col; g.lineWidth = 1; g.beginPath(); var on = false; for (var i = s; i < self.end; i++) { var v = arr[i]; if (v === null) { on = false; continue; } if (!on) { g.moveTo(X(i), Y2(v)); on = true; } else g.lineTo(X(i), Y2(v)); } g.stroke(); };
+        if (this.on.lower === 'macd') { line2(this.mc.line, '#F08C2E'); line2(this.mc.sig, '#9B59D0'); } else line2(this.rs, '#5FBFAF');
+      }
+    }
+    // 날짜 축
+    if (this.full) { g.fillStyle = '#F1F5F9'; g.fillRect(0, H - XH, W, XH); }   // 작은 화면 = 회색 면 없음
+    g.font = AFS + 'px ' + font; g.textAlign = 'center';
+    labs.forEach(function (l) { g.font = (l[2] ? '600 ' : '') + AFS + 'px ' + font; g.fillStyle = l[2] ? INK : NOTE; g.fillText(l[1], Math.min(Math.max(l[0], 20), pw - 20), H - XH / 2 + 0.5); });
+    // 누른 날 — 검은 점선 십자선 + 위 · 아래 날짜 칸 + 오른쪽 가격 칸
+    var cr = this.cross, sel = cr && cr.i >= s && cr.i < this.end ? cr.i : null;
+    if (sel !== null) {
+      g.strokeStyle = INK; g.lineWidth = 1; g.setLineDash([2, 3]);
+      g.beginPath(); g.moveTo(X(sel), TOPS); g.lineTo(X(sel), H - XH); g.stroke();
+      var cy = Math.max(TOPS + 6, Math.min(TOPS + priceH - 6, cr.y));
+      g.beginPath(); g.moveTo(0, Math.round(cy) + 0.5); g.lineTo(pw, Math.round(cy) + 0.5); g.stroke(); g.setLineDash([]);
+      tag(cy, fmt(vOf(cy), self.dec), INK);
+      var dl = this.dateText(this.bars[sel][0], true);
+      g.font = TFS + 'px ' + font; var dw = Math.ceil(g.measureText(dl).width) + 14, dx = Math.round(Math.min(Math.max(X(sel) - dw / 2, 0), pw - dw));
+      // 위 날짜 칸 = 범례 줄 아래(전체 화면). 그날 이동평균 값 줄이 너무 길어(가격 100만 원대 · 선 5개) 두 줄이 되면 위 칸은 빼고 아래 칸만
+      var maW = 0; g.font = '13px ' + font; [5, 20, 60, 120, 200].forEach(function (n) { if (maShow(n) && self.ma[n][sel] !== null) maW += g.measureText(n + ' ' + fmt(self.ma[n][sel], self.dec)).width + 14; });
+      g.font = TFS + 'px ' + font;
+      var boxes = [[H - XH, XH], this.full ? [TOPS - 24, 22] : [0, TOPS]];   // 작은 화면은 누르는 동안 이동평균 범례를 숨겨 위 칸과 겹치지 않게
+      boxes.forEach(function (r) { g.fillStyle = INK; g.fillRect(dx, r[0], dw, r[1]); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(dl, dx + dw / 2, r[0] + r[1] / 2 + 0.5); });
+    }
+    // 머리 — 현재가 · 전날 대비 금액 · % (늘 최신), 오늘 거래량, 시가 · 고가 · 저가 · 종가(누른 날이면 그날)
+    var dch = prevL ? last[4] - prevL[4] : 0, dp = prevL ? dch / prevL[4] * 100 : 0, cc = dch > 0 ? UP : dch < 0 ? DN : INK;
+    this.price.innerHTML = '<b style="' + (this.full ? 'font-size:20px;line-height:28px;color:' + INK : 'font-size:15px;line-height:21px;color:' + cc) + ';">' + fmt(last[4], this.dec) + '</b> <span style="font-size:14px;color:' + cc + ';">' + tri(dch) + fmt(Math.abs(dch), this.dec) + ' ' + sgnPct(dp) + '</span>';
+    var head0 = this.price.innerHTML, volS = function (txt) { return ' <span style="font-size:13px;color:' + NOTE + ';">거래량 <span style="color:' + INK + ';">' + txt + '</span></span>'; };
+    this.price.innerHTML = head0 + volS(fmt(last[5], 0));
+    // 넘침 대비(가격 100만 원대 · 거래량 큰 종목): ① 거래량을 `51.8만` · `1.2억` 으로 ② 그래도 넘치면 거래량만 다음 줄
+    var volShort = last[5] >= 1e8 ? (last[5] / 1e8).toFixed(1) + '억' : last[5] >= 1e4 ? (last[5] / 1e4).toFixed(1) + '만' : fmt(last[5], 0), volDown = false;
+    if (!land && this.price.scrollWidth > this.price.clientWidth + 1) { this.price.innerHTML = head0 + volS(volShort); if (this.price.scrollWidth > this.price.clientWidth + 1) { this.price.innerHTML = head0; volDown = true; } }   // 거래량 = 증감 옆 한 줄 (전체 화면도, 2026-11-14 사용자)   // 작은 화면 = 증감 옆 한 줄
+    this.sub.innerHTML = volDown ? volS(volShort).trim() : ''; this.sub.style.display = volDown ? '' : 'none'; this.ohlc.style.display = this.full && !land ? '' : 'none';   // 가로 화면 = 시가 · 고가 · 저가 · 종가도 거래량 옆 한 줄(아래)   // 작은 화면 = 시가 · 고가 · 저가 · 종가 없음
+    var ob = this.bars[sel === null ? this.bars.length - 1 : sel], obp = this.bars[(sel === null ? this.bars.length - 1 : sel) - 1], ref = obp ? obp[4] : ob[1];
+    this.ohlc.innerHTML = [['시가', 1], ['고가', 2], ['저가', 3], ['종가', 4]].map(function (k) {
+      var v = ob[k[1]], c = v > ref ? UP : v < ref ? DN : INK;
+      return '<span style="white-space:nowrap;margin-right:14px;"><span style="color:' + NOTE + ';">' + k[0] + '</span> <span style="color:' + c + ';">' + fmt(v, self.dec) + '</span></span>';
+    }).join('');
+    if (land) this.price.innerHTML += ' <span style="font-size:13px;margin-left:10px;">' + this.ohlc.innerHTML + '</span>';
+    // 왼쪽 위 = 이동평균 범례(숫자 = 선 색) + 닫기 — 누르면 그날 이동평균 값 표
+    var mas = [5, 20, 60, 120, 200].filter(function (n) { return maShow(n); });
+    if (sel !== null && mas.length && this.full) {   // 누른 날 이동평균 값 표 = 전체 화면만 (2026-11-14 사용자)
+      this.legend.style.top = '0px'; this.legend.style.display = 'flex'; this.legend.style.maxWidth = '100%';   // 그날 이동평균 값 = 가로 한 줄(넘치면 다음 줄) (2026-11-14 사용자)
+      this.legend.innerHTML = mas.map(function (n) { var v = self.ma[n][sel]; return '<span style="white-space:nowrap;margin-right:14px;"><span style="color:' + NOTE + ';">' + n + '</span> <span style="color:' + MA_COL[n] + ';font-variant-numeric:tabular-nums;">' + (v === null ? '-' : fmt(v, self.dec)) + '</span></span>'; }).join('');
+    } else if (sel !== null && !this.full) { this.legend.style.display = 'none';   // 작은 화면 누르는 동안 = 범례 숨김(위 검은 날짜 칸 자리)
+    } else if (mas.length) {
+      this.legend.style.top = '0px'; this.legend.style.display = 'flex'; this.legend.style.maxWidth = '70%';
+      this.legend.innerHTML = '<span style="color:' + INK + ';margin-right:5px;">이동평균</span>' + mas.map(function (n) { return '<span style="color:' + MA_COL[n] + ';margin-right:4px;">' + n + '</span>'; }).join('') +
+        '<button type="button" aria-label="이동평균 끄기" data-x="ma" style="' + CHIP + '">' + X_SVG + '</button>';
+      this.legend.querySelector('[data-x]').onclick = function () { self.maOn = false; self.draw(); };
+    } else if (!this.maOn) {   // 닫은 자리에 `+ 이동평균` (2026-11-14 사용자 — 옛 자리는 차트 아래)
+      this.legend.style.top = '0px'; this.legend.style.display = 'flex';
+      this.legend.innerHTML = '<button type="button" data-x="ma" style="font:inherit;font-size:13px;line-height:19px;padding:0 8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;color:' + NOTE + ';cursor:pointer;">+ 이동평균</button>';
+      this.legend.querySelector('[data-x]').onclick = function () { self.maOn = true; self.topBar(); self.draw(); };
+    } else { this.legend.style.display = 'none'; }
+    this.scaleB.innerHTML = (this.log ? 'Log' : 'Linear') + ' <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#111" stroke-width="1.3" stroke-linecap="round" style="vertical-align:0;"><path d="M2 4l3 3 3-3"/></svg>';
+    this.scaleB.setAttribute('aria-label', '가격축 일반 · 로그 바꾸기'); this.scaleB.style.right = '4px'; this.scaleB.style.display = 'none';   // Linear · Log 버튼 = 없음 (2026-11-14 사용자, 전체 화면도)
+    // 최신으로 (넘겨본 뒤에만)
+    this.latest.style.display = this.end < this.bars.length ? 'flex' : 'none';
+    this.latest.style.left = (pw - 36) + 'px'; this.latest.style.top = (TOPS + priceH - 34) + 'px';
+    // 거래량 범례 — 누르면 그날 거래량
+    if (lowerH && this.on.lower === 'vol') {
+      var vb = this.bars[sel === null ? this.end - 1 : sel];
+      this.volLeg.style.display = 'flex'; this.volLeg.style.top = (TOPS + priceH + 3) + 'px';
+      this.volLeg.innerHTML = '<span style="color:' + NOTE + ';margin-right:5px;">거래량</span><span style="font-variant-numeric:tabular-nums;">' + fmt(vb[5], 0) + '</span><button type="button" aria-label="거래량 끄기" data-x="vol" style="' + CHIP + '">' + X_SVG + '</button>';
+      this.volLeg.querySelector('[data-x]').onclick = function () { self.on.lower = 'none'; self.topBar(); self.draw(); };
+    } else if (lowerH) {
+      this.volLeg.style.display = 'flex'; this.volLeg.style.top = (TOPS + priceH + 3) + 'px';
+      this.volLeg.innerHTML = '<span style="color:' + NOTE + ';">' + (this.on.lower === 'macd' ? 'MACD' : 'RSI') + '</span>';
+    } else this.volLeg.style.display = 'none';
+    // 닫은 것 다시 켜기
+    var rs = [];
+    this.restore.innerHTML = ''; this.restore.style.display = rs.length ? 'flex' : 'none';
+    rs.forEach(function (r) {
+      var b = el('button', 'font:inherit;font-size:13px;line-height:19px;padding:2px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;color:' + NOTE + ';cursor:pointer;', r[1]);
+      b.onclick = function () { if (r[0] === 'ma') self.maOn = true; else self.on.lower = 'vol'; self.topBar(); self.draw(); };
+      self.restore.appendChild(b);
+    });
+  };
+  function init() { document.querySelectorAll('[data-candle]').forEach(function (r) { if (!r.__c) r.__c = new Chart(r); }); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+

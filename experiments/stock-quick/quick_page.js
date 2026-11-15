@@ -53,6 +53,16 @@
     }
   }
 
+  // 일반 주소 /p/stock.html?s=코드 로 왔고 그 종목 전용 페이지가 있으면 그리로 (2026-11-15 사용자: 전용 주소라야 검색 · 공유가 종목별로 잡힌다).
+  // 주소표 = Pages /shells.json (publish_quick_shells.py 가 매일). 전용 페이지(data-default 가 있는 곳)에서는 부르지 않는다.
+  if (!local && q && !root.getAttribute('data-default')) {
+    try {
+      var map = JSON.parse(getSync(PAGES + 'shells.json') || '{}');
+      if (map[s] && map[s].indexOf(location.pathname) < 0) { location.replace(map[s]); return; }
+    } catch (e) { /* 주소표가 없으면 이 페이지에서 그대로 */ }
+    notFound = false;
+  }
+
   var html = null;
   if (local) {
     html = getSync(local + path);
