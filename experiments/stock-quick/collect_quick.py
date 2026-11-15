@@ -224,6 +224,35 @@ def dart_list(cache_path, codes):
     return cache
 
 
+PAGES_BASE = os.environ.get("QUICK_PAGES_BASE", "https://alpha-scope.pages.dev")
+
+
+def carry(d, names, prev, out):
+    """쉬는 시장 조각(d/ 아래 종목 .json · .html + bench · version)을 그대로 옮긴다 — 지난 결과(--prev) 먼저, 없으면 Pages 에서 받는다. 옮긴 종목 수."""
+    dst = os.path.join(out, d)
+    src = os.path.join(prev, d) if prev else ""
+    if src and os.path.isdir(src) and len(os.listdir(src)) > 10:
+        shutil.copytree(src, dst, dirs_exist_ok=True)
+        return sum(1 for n in names if os.path.exists(os.path.join(dst, n + ".html")))
+    import concurrent.futures
+    import requests
+
+    def get(fn):
+        try:
+            r = requests.get(f"{PAGES_BASE}/{d}/{fn}", timeout=30)
+            if r.status_code == 200:
+                open(os.path.join(dst, fn), "wb").write(r.content)
+                return fn
+        except Exception:  # noqa: BLE001
+            pass
+        return None
+    fns = [n + ext for n in names for ext in (".json", ".html")] + ["bench.json", "version.json"]
+    with concurrent.futures.ThreadPoolExecutor(8) as ex:
+        got = {x for x in ex.map(get, fns) if x}
+    print(f"[quick] {d} 조각 Pages 에서 {len(got)}/{len(fns)} 파일")
+    return sum(1 for n in names if n + ".html" in got)
+
+
 def main():
     load_env()
     ap = argparse.ArgumentParser()
@@ -231,6 +260,8 @@ def main():
     ap.add_argument("--cache", required=True, help="저장값 폴더(워크플로 = 비공개 상태 저장소 quick-state)")
     ap.add_argument("--prev", default="", help="전날 결과(us/ · kr/)")
     ap.add_argument("--news", nargs="*", default=[])
+    ap.add_argument("--market", choices=("all", "us", "kr"), default="all",
+                    help="이 시장만 새로 만든다 — 나머지 시장 조각은 --prev(없으면 Pages)에서 그대로 옮긴다. 미국 = 아침 08:20(정식과 같은 종가), 한국 = 17:40 (2026-11-15 사용자)")
     ap.add_argument("--qnews", default="", help="간단 종목 뉴스 상태(quick-news-state: news.json · summaries.json) — 있으면 미국 오늘 탭에 중요 이슈 · 뉴스")
     ap.add_argument("--radar", default="", help="미국 정식 상태(nvda-state radar/) — 비교 묶음 `시총 상위 20개`")
     ap.add_argument("--calendar", default="", help="엔비디아 리포트 calendar.jsonl — 시장 일정")
@@ -259,14 +290,26 @@ def main():
         os.makedirs(os.path.join(out, d), exist_ok=True)
     os.makedirs(cache, exist_ok=True)
     prev = a.prev if a.prev and os.path.isdir(a.prev) else ""
+    if a.market != "all" and not only:
+        other = "kr" if a.market == "us" else "us"
+        names = [m["file"] for m in metas if m["dir"] == other]
+        got_n = carry(other, names, prev, out)
+        if got_n >= len(names) * MIN_SHARE:
+            metas = [m for m in metas if m["dir"] == a.market]
+            print(f"[quick] {a.market} 만 새로 · {other} 조각 {got_n}/{len(names)} 옮김")
+        else:   # 옮길 것이 모자라면(첫 실행 · 그림자 모드라 지난 결과가 없음) 그 시장도 새로 만든다 — 빈 시장이 배포되지 않게
+            print(f"[quick] {other} 조각 {got_n}/{len(names)} 뿐 — 두 시장 다 새로")
+            shutil.rmtree(os.path.join(out, other))
+            os.makedirs(os.path.join(out, other), exist_ok=True)
+    active = {m["dir"] for m in metas}
 
     import full_us as FU
     import full_kr as FK
     t0 = time.time()
     us_syms = [m["sym"] for m in metas if m["m"] == "US"]
     kr_syms = [m["sym"] for m in metas if m["m"] == "KR"]
-    bars_us = FU.bars(us_syms)
-    bars_kr = FK.bars(kr_syms)
+    bars_us = FU.bars(us_syms) if us_syms else {}
+    bars_kr = FK.bars(kr_syms) if kr_syms else {}
     bars_all = {**bars_us, **bars_kr}
     secs = round(time.time() - t0)
     got = {m["sym"]: series(bars_all.get(m["sym"])) for m in metas if len(bars_all.get(m["sym"]) or []) >= 2}
@@ -284,15 +327,17 @@ def main():
             d0 = datetime.date.fromisoformat(dates[0])
             bench[mk] = {"s": bs, "n": bn, "d": dates[-1], "chg": changes(c, dates), "d0": dates[0],
                          "dd": [(datetime.date.fromisoformat(x) - d0).days for x in dates], "px": [r4(x) for x in c]}
-    for d in ("us", "kr"):
+    for d in active:   # 쉬는 시장의 bench.json 은 옮겨 온 것 그대로
         json.dump(bench, open(os.path.join(out, d, "bench.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 
     # 덧붙일 것 — 실적일 · 기사 · 공시
-    earn = FU.earnings(cache, set(us_syms), first_key("FINNHUB_API_KEY"))
+    earn = FU.earnings(cache, set(us_syms), first_key("FINNHUB_API_KEY")) if us_syms else {}
     titles = load_titles(a.news)
     cut = str(datetime.date.today() - datetime.timedelta(days=NEWS_DAYS))
-    disc = dart_list(os.path.join(cache, "dart_list.json"), {m["file"] for m in metas if m["m"] == "KR"})
-    json.dump(disc, open(os.path.join(cache, "dart_list.json"), "w", encoding="utf-8"), ensure_ascii=False)
+    disc = {"days": {}}
+    if kr_syms:
+        disc = dart_list(os.path.join(cache, "dart_list.json"), {m["file"] for m in metas if m["m"] == "KR"})
+        json.dump(disc, open(os.path.join(cache, "dart_list.json"), "w", encoding="utf-8"), ensure_ascii=False)
     disc_by = {}
     for day in sorted(disc["days"], reverse=True):
         for it in disc["days"][day]:
@@ -341,6 +386,8 @@ def main():
     except Exception as e:  # noqa: BLE001
         print(f"::warning::[quick] 기업 소개 건너뜀: {e!r}")
     try:
+        if not us_syms:
+            raise LookupError("미국은 이번 실행에서 쉼")
         q_us = [s for s in us_syms if not ref["us"][s].get("full")]
         bar_day = (bars_all.get("SPY") or [{}])[-1].get("day") or str(datetime.date.today())
         det = FU.details(cache, q_us, bar_day, earn)
@@ -354,9 +401,13 @@ def main():
         for s, h in FU.build(ref["us"], bars_us, earn, det, sec, hist, fred, macro=macro, only=set(us_syms),
                              related=lambda s, e: rel(s, e, "US"), radar_dir=a.radar or None, extra_today=xtra, news=qn, summaries=qs, filings=filings).items():
             pages[("us", s)] = h
+    except LookupError as e:
+        print(f"[quick] {e}")
     except Exception as e:  # noqa: BLE001 — 한 시장이 통째로 실패해도 다른 시장 · 가격 파일은 나간다
         print(f"::warning::[quick] 미국 화면 실패: {e!r}")
     try:
+        if not kr_syms:
+            raise LookupError("한국은 이번 실행에서 쉼")
         q_kr = [s for s in kr_syms if not ref["kr"][s].get("full")]
         flows = FU._load(os.path.join(EXP, "kr-stocks", "data", "flows.json"), {})
         hist_full = FU._load(os.path.join(EXP, "kr-stocks", "data", "history.json"), {})
@@ -366,11 +417,14 @@ def main():
         for c, h in FK.build(ref["kr"], bars_kr, flows, hist_full, det, dd, hq, only=set(kr_syms),
                              related=lambda s, e: rel(s, e, "KR"), extra_today=xtra).items():
             pages[("kr", c)] = h
+    except LookupError as e:
+        print(f"[quick] {e}")
     except Exception as e:  # noqa: BLE001
         print(f"::warning::[quick] 한국 화면 실패: {e!r}")
     for sym, (name, _sec, url) in full.items():   # 정식 종목 = 종목 분석으로 넘기는 조각
         d = "kr" if sym.endswith((".KS", ".KQ")) else "us"
-        pages[(d, sym.split(".")[0])] = RQ.redirect(name, url)
+        if d in active:
+            pages[(d, sym.split(".")[0])] = RQ.redirect(name, url)
     reused = 0
     for m in metas:   # 오늘 화면을 못 만든 종목 = 전날 조각 그대로
         key = (m["dir"], m["file"])
@@ -381,7 +435,7 @@ def main():
         open(os.path.join(out, d, k + ".html"), "w", encoding="utf-8").write(h)
 
     total = len(metas)
-    for d in ("us", "kr"):
+    for d in sorted(active):
         n = [m for m in metas if m["dir"] == d]
         hs = [os.path.getsize(os.path.join(out, d, x)) for x in os.listdir(os.path.join(out, d)) if x.endswith(".html")]
         version = {"built": datetime.datetime.now(KST).isoformat(timespec="minutes"), "date": newest, "n": len(n),
