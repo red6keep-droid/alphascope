@@ -47,6 +47,13 @@ def split_html(src, mkt, files=FILES):
     if os.path.exists(hp):
         with open(hp, encoding="utf-8") as f:
             html = html.replace("<head>", "<head>\n<script>window.PV_HYPO = " + f.read().replace("</", "<\\/") + ";</script>", 1)
+    # 주식 공부 배너 — gh-pages 에 올리기 전에는 로컬 그림을 그대로 넣어 본다 (2026-11-15)
+    bp = os.path.join(ROOT, "experiments", "course", "banner", "home_banner.webp")
+    if os.path.exists(bp):
+        import base64
+        with open(bp, "rb") as f:
+            html = html.replace("https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp",
+                                "data:image/webp;base64," + base64.b64encode(f.read()).decode())
     if not (n1 and n2):
         sys.exit(f"바꿀 자리를 못 찾음 (body {n1} · 메뉴 {n2}) — preview.html 구조 확인")
     return html

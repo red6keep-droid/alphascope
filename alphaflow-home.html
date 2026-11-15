@@ -803,9 +803,15 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 /* 카드 순서: 리포트 → 시총 TOP 10 (주요 지수 · 섹터 현황은 2026-10-20 삭제). PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭 (2026-10-15 사용자) */
 @media (min-width: 901px) {
   .home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .home-cards > .briefing, .home-cards > .rankings, .home-cards > .event-banner { grid-column: 1 / -1; }   /* 일정 배너도 전폭 (2026-10-28) */
+  .home-cards > .briefing, .home-cards > .rankings, .home-cards > .event-banner, .home-cards > .study-banner { grid-column: 1 / -1; }   /* 일정 배너도 전폭 (2026-10-28) */   /* 주식 공부 배너도 전폭 (2026-11-15) */
 }
 /* 테마 · 관심 종목 · 섹터 종목 탭 카드 (2026-10-21 사용자) — 탭 줄 오른쪽 끝 기준일, 관심 종목 묶음은 탭 아래 작은 알약 줄 */
+/* 주식 공부 배너 (2026-11-15 사용자: 사용자가 만든 그림 한 장 그대로) — 전폭 카드 모서리 12 · 그림 = 카드 전체, 누르면 주식 공부 목록.
+   그림 안 글자를 검색 · 낭독기가 읽게 alt + 숨긴 글자. 그림 1110×344(비율 고정, 폭에 맞춰 줄어듦) · WebP 24KB · jsDelivr 1회 요청 */
+.study-banner { margin: 0; }
+.study-banner a { display: block; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 22.5px -5px rgba(0,0,0,.029), 0 8px 9px -6px rgba(0,0,0,.029); -webkit-tap-highlight-color: transparent; }
+.study-banner img { display: block; width: 100%; height: auto; aspect-ratio: 1110 / 344; border-radius: 0; }
+.study-banner a:active { opacity: .85; }
 .picks-section .tabs { align-items: flex-end; }
 .picks-day { padding: 8px 16px 0; font-family: var(--num); font-size: 14px; line-height: 20px; color: var(--gray-400); text-align: right; }   /* 기준일 — 탭 아래 오른쪽 한 줄 (탭 줄에 두면 폰에서 잘린다) */
 .picks-day:empty { display: none; }
@@ -1143,6 +1149,11 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       </div>
 
     </div>
+  </section>
+
+  <!-- 주식 공부 배너 (2026-11-15 사용자) — 리포트 카드 묶음 바로 아래 전폭. 미국 · 한국 화면 모두. 그림 = 사용자 제작(experiments/course/banner) -->
+  <section class="study-banner" aria-label="주식 공부">
+    <a href="/p/study.html"><img src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp" width="1110" height="344" loading="lazy" decoding="async" alt="주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다"/></a>
   </section>
 
   <!-- 주요 지수 · 섹터 현황 카드는 삭제 — 미국 증시 리포트에 나온다 (2026-10-20 사용자) -->
