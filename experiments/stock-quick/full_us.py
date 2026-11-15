@@ -3,7 +3,8 @@
 기획 6-6: 정식 카드 가운데 막히는 줄(옵션 · 뉴스 · 방송 · 소송)만 빼고 다 — 상세 값은 바뀌는 주기에 맞춰 드물게 받아 저장해 둔다.
 ETF 페이지(stock-etf/etf_pages.us_pages)와 같은 방식: 종목을 이 실행 안에서만 정식 명단(universe)에 얹고, 정식 계산(analyze · analyze_tabs)과
 정식 카드(render_pages)를 그대로 부른다. 정식과 다른 것:
-  - 탭 = 오늘 · 매수의견(애널리스트 · 증권사) · 실적 · 업계상황 · 기업. 방송 의견 · 시장 예상 흔들림(옵션) · 소송 · 한국 연결 종목은 없다.
+  - 탭 = 오늘 · 매수의견(애널리스트 · 증권사) · 실적 · 업계상황 · 기업. 시장 예상 흔들림(옵션) · 소송 · 한국 연결 종목은 없다.
+    방송 의견 · 방송 줄 · 인물 발언 = 그 종목 자료가 있을 때만(방송 줄은 이 종목이 중심인 방송만, 업종 이슈 X) (2026-11-15 사용자).
     뉴스 · 중요 이슈 · 뉴스 의견 = quick-news(Finnhub, 15:10) 분류 결과가 있을 때 정식 함수 그대로 (2026-11-15 3단계).
   - 함께 보는 회사 = 사람이 고른 목록 대신 같은 업종에서 1년 등락이 가장 비슷하게 움직인 3곳(상관 계산). 그 회사들 실적 일정 카드도 정식처럼.
   - SEC 공시(Form 4 · 8-K) = 정식 collect_extra.edgar 그대로, 8일만 받아 저장(edgar_us.json).
@@ -397,11 +398,14 @@ def earnings_tab(s):
 
 def opinions_tab(s):
     cells = s.get("analysts") or []
-    if not cells and not s.get("broker") and not (RP.NEWS and RP._news_opinions(s)):
+    ps = RP._picks(s) if RP.PICKS else []   # 방송에서 이 종목을 짚은 의견 — 있을 때만 카드 (2026-11-15 사용자 "있을 때만")
+    if not cells and not s.get("broker") and not ps and not (RP.NEWS and RP._news_opinions(s)):
         return ""
-    R.picks_card, keep = _no_picks, R.picks_card   # 방송 의견 카드 = 간단 정보에 없다 (6-6)
+    keep = R.picks_card
+    if not ps:
+        R.picks_card = _no_picks   # 방송 의견이 없으면 카드 자체를 뺀다 (빈 답 금지)
     try:
-        return R.opinions_cards(s["name"], cells, s.get("close"), None, lambda v: f"${v:,.2f}", lambda: RP.together_items(s),
+        return R.opinions_cards(s["name"], cells, s.get("close"), ps or None, lambda v: f"${v:,.2f}", lambda: RP.together_items(s),
                                 broker=s.get("broker") or [], news_ops=RP._news_opinions(s) if RP.NEWS else None, closes=[b["close"] for b in (RP.BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]])
     finally:
         R.picks_card = keep
@@ -436,6 +440,23 @@ def full_group(radar_dir):
     group = set(sorted(caps, key=lambda s: -caps[s])[:U.PEER_GROUP_N])
     rev = ((cache.blob("revenue", 10 ** 6) or {}).get("series")) or {}
     return group, {s: rev[s] for s in group if s in rev}, {s: {"eps": cache.get(s, "eps")} for s in group if cache.get(s, "eps")}
+
+
+def media_inputs():
+    """방송 이슈(24시간) · 방송 의견(최근 5거래일) — 정식 write_all 과 같은 읽기(Firestore, 읽기 전용 키 YTB_FIRESTORE_KEY). 키가 없거나 실패하면 ([], []) = 그 칸 없이."""
+    import os as _os
+    if not (_os.environ.get("YTB_FIRESTORE_KEY") or _os.environ.get("MEDIA_FEED_JSON")):
+        print("[quick-us] 방송 자료 키 없음 — 방송 줄 · 방송 의견 없이")
+        return [], []
+    MF = RP.media_feed
+    try:
+        vids = MF.load(RP.NOW.astimezone(MF.KST).strftime("%Y-%m-%d"), days=R.PICK_DAYS - 1)
+        iss, ps = MF.issues(MF.rows(vids), RP._since()), MF.picks(vids, RP.PICK_SINCE)
+        print(f"[quick-us] 방송 영상 {len(vids)} · 이슈 {len(iss)} · 종목 의견 {len(ps)}")
+        return iss, ps
+    except Exception as e:  # noqa: BLE001
+        print(f"[quick-us] 방송 자료 실패 — 없이: {str(e)[:100]}")
+        return [], []
 
 
 def load_news(qnews_dir):
@@ -476,8 +497,12 @@ def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=No
              "revenue": {"series": {**grev, **(sec.get("rev") or {})}}, "capex": sec.get("cash") or {}, "peer_earnings": {}, "edgar": filings or {}}
     RP.BARS = bars_all
     RP.NOW = datetime.datetime.now(datetime.timezone.utc)
-    RP.NEWS, RP.SUMMARY, RP.MEDIA, RP.PICKS = news or {}, summaries or {}, [], []   # 방송 = 간단 정보에 없다 (6-6)
+    RP.NEWS, RP.SUMMARY = news or {}, summaries or {}
     RP.PICK_SINCE = R.pick_window(bars_all.get(U.BENCH) or [], RP.NY, now=RP.NOW)[1]
+    RP.MEDIA, RP.PICKS = media_inputs()
+    MF = RP.media_feed
+    keep_for_page = MF.for_page
+    MF.for_page = lambda rs, sym: MF.for_ticker(rs, sym, U.name(sym))   # 방송 줄 = 이 종목이 중심인 방송만 — 정식의 `업종 이슈면 업종 종목 전부` 는 간단 종목 수십 곳에 같은 줄이 깔려 뺀다 (2026-11-15 사용자 "있을 때만")
     mr, ms = analyze.market_regime(snap), analyze.market_shock(snap)
     crash = RP.CW.compute(bars_all, "us", quick)   # 급락장에서 어땠나? — 정식과 같은 계산(지수 −2% 넘은 날 버텼나), 일봉만 (2026-11-14 사용자)
     out, fails = {}, 0
@@ -497,5 +522,8 @@ def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=No
         except Exception as e:  # noqa: BLE001 — 한 종목 실패가 나머지를 막지 않게
             fails += 1
             print(f"[quick-us] {sym} 화면 실패: {e!r}")
-    print(f"[quick-us] 화면 {len(out)}/{len(quick)} · 실패 {fails}")
+    n_media = sum(1 for s in out if MF.for_page(RP.MEDIA, s))
+    MF.for_page = keep_for_page
+    print(f"[quick-us] 화면 {len(out)}/{len(quick)} · 실패 {fails} · 방송 줄 {n_media}종목 · 방송 의견 {len({p['ticker'] for p in RP.PICKS if p['market'] == 'US'} & set(out))}종목"
+          f" · 인물 발언 {sum(1 for s in out if RP.people_section.for_stock(s))}종목")
     return out

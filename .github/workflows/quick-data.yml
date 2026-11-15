@@ -71,6 +71,9 @@ jobs:
           git fetch -q state report-state && git show FETCH_HEAD:experiments/daily-report/output/state/news_stories.json > /tmp/news/daily.json || true
           if git fetch -q state kr-state; then git archive FETCH_HEAD experiments/kr-stocks/data | tar -x && echo "한국 정식 상태: $(ls experiments/kr-stocks/data | wc -l)개"; fi
           if git fetch -q state quick-state; then git archive FETCH_HEAD | tar -x -C /tmp/qcache && echo "저장값: $(du -sh /tmp/qcache | cut -f1)"; else echo "저장값 없음 (첫 실행)"; fi
+          # 인물 발언 — 인물 레이더가 radar-state 에 남긴 파일(정식 nvda-report 와 같은 자리). 그 종목을 지목한 발언이 있을 때만 구획 (2026-11-15 사용자)
+          mkdir -p experiments/people-radar/output/state
+          { git fetch -q --no-tags state radar-state && git show FETCH_HEAD:experiments/people-radar/output/state/people_mentions.json > experiments/people-radar/output/state/people_mentions.json && echo "인물 발언 파일 받음"; } || { rm -f experiments/people-radar/output/state/people_mentions.json; echo "인물 발언 파일 없음"; }
           # 간단 종목 뉴스(quick-news.yml 15:10 이 남긴 분류 · 요약) — 있으면 미국 오늘 탭에 정식과 같은 중요 이슈 · 뉴스 · 뉴스 의견 (2026-11-15 3단계). 없으면 `이름이 나온 기사` 카드
           mkdir -p /tmp/qnews && { git fetch -q state quick-news-state && git archive FETCH_HEAD | tar -x -C /tmp/qnews && echo "간단 종목 뉴스: $(ls /tmp/qnews | tr '\n' ' ')"; } || echo "간단 종목 뉴스 없음"
           ls -la /tmp/news /tmp/radar
@@ -89,6 +92,7 @@ jobs:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}   # 방송 줄 · 방송 의견 (media_feed, 정식과 같은 읽기 전용 키) — 없으면 그 칸 없이
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 기업 소개(company_intro) — Gemini lite 하루 25회까지, 한도면 다음 날 (2026-11-15 사용자)
         run: |
           set +e
