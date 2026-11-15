@@ -3578,21 +3578,24 @@
  },
  "921b12fcef3f": {
   "lines": [
-   "엔비디아와 앤스로픽의 인공지능 관련 시장 집중 조명 예정"
+   "엔비디아와 앤스로픽의 인공지능 관련 시장 집중"
   ],
   "tags": [
    {
-    "scope": "sector",
-    "tickers": [],
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
     "sector": "SMH",
     "issue": "AI_CAPEX",
     "dir": "neutral",
-    "stage": "talk"
+    "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T19:06:22.142362+00:00",
-  "n_src": 309
+  "at": "2026-11-15T21:46:06.999443+00:00",
+  "n_src": 309,
+  "retry": true
  },
  "abbe913370fd": {
   "lines": [
@@ -3659,21 +3662,15 @@
  },
  "6eed0b95e9ae": {
   "lines": [
-   "리비안과 루시드 및 스카우트 모터스 최고경영자들의 민주당 의회 승리 후 연방 정부 전기차 지원 기대 부재"
+   "리비안과 루시드 및 스카우트 최고경영자들의 연방 전기차 지원 미의존 방침"
   ],
   "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "talk"
-   }
+   null
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T19:06:23.289025+00:00",
-  "n_src": 900
+  "at": "2026-11-15T21:46:06.999443+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "1c324a85ab91": {
   "lines": [
@@ -3683,7 +3680,8 @@
    null
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T19:06:23.289025+00:00",
-  "n_src": 900
+  "at": "2026-11-15T21:46:06.999443+00:00",
+  "n_src": 900,
+  "retry": true
  }
 }
