@@ -1812,7 +1812,7 @@ def _trend_ticks(lo, hi, n=4):
     return out
 
 
-def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False, ends_only=False, end_right=True, small_end=False):   # 선 굵기 · 점선 · 끝 값 = 종목 페이지 line_chart 와 같게(2 · 1 · 6 5 · 13/17 · 점 3/2 · 최신 점 5/4 — 정수 px, 2026-11-07 0-5)
+def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=False, ends_only=False, end_right=True, small_end=False, legend_plain=False):   # 선 굵기 · 점선 · 끝 값 = 종목 페이지 line_chart 와 같게(2 · 1 · 6 5 · 13/17 · 점 3/2 · 최신 점 5/4 — 정수 px, 2026-11-07 0-5)
     """흐름을 보는 선 그래프 흰 카드 (2026-11-05 사용자 M67 · M70 · M71 · M72 · M76).
     labels = 가로축 이름(오래된 것 → 최신, 최신 오른쪽 P164). series = [(이름, 값 목록(None 허용), 색, 모양)] 모양 = "solid" · "dash"(비교 대상 · 기준선) · "step" · "stepdash"(계단 점선 — 기준금리).
     첫 계열이 주인공. 점선 계열은 범례에서 `비교 대상 : 이름`.
@@ -1950,15 +1950,17 @@ def trend_card(title, labels, series, fmt, legend_note="", height=TREND_H, bare=
                 f'{dots}{labs}</span>{axis}'
                 f'<span style="display:block;position:relative;height:26px;margin-top:2px;">{xl}</span></span>')
     chips = ""
-    for nm, _, col, kind in series:
-        name = f"비교 대상 : {nm}" if cmp(kind) else nm
+    for k, (nm, _, col, kind) in enumerate(series):
+        if legend_plain and k == 0:   # 기준선 두 개 선(증시 전망) — 주인공 선 = 그래프 제목과 같은 말이라 칩을 뺀다 (2026-11-15 사용자: 범례가 `넘겨 보기` 와 같은 줄)
+            continue
+        name = f"비교 대상 : {nm}" if cmp(kind) and not legend_plain else nm   # 기준선은 비교 대상이 아니라 기준 — `상승 기준` · `하락 기준` 그대로
         dot = "" if cmp(kind) or not sparse else f'<circle cx="9" cy="5" r="3" fill="#fff" stroke="{col}" stroke-width="2"/>'
         line = (f'<svg width="18" height="10" aria-hidden="true"><line x1="1" x2="17" y1="5" y2="5" stroke="{col}" stroke-width="{1 if cmp(kind) else 2}"'
                 + (' stroke-dasharray="4 3"' if dashed(kind) else "") + f' stroke-linecap="round"/>{dot}</svg>')
         chips += f'<span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">{line}{esc(name)}</span>'
     if legend_note:
         chips += f'<span style="white-space:nowrap;">{esc(legend_note)}</span>'
-    top_row = (f'<span data-chart-top="1" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:12px;font-size:{LEGEND_FS};line-height:{LH_CARD};color:{NOTE};'
+    top_row = (f'<span data-chart-top="1" style="display:flex;flex-wrap:{"nowrap" if legend_plain else "wrap"};justify-content:space-between;align-items:center;column-gap:12px;font-size:{LEGEND_FS};line-height:{LH_CARD};color:{NOTE};'
                f'margin:{LEGEND_TOP}px 0 4px;padding-left:{LEGEND_LEFT}px;">{hint}'
                f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;column-gap:12px;margin-left:auto;">{chips}</span></span>')   # `‹ 넘겨 보기` 왼쪽 · 범례 오른쪽 (P164)
     if bare:   # 흰 카드 없이 범례 + 그림만 — 다른 카드 안 그래프 덩어리에 넣을 때

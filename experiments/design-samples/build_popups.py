@@ -38,6 +38,17 @@ def pick(rel, pred):
     raise SystemExit(f"샘플 없음: {rel}")
 
 
+def pick_any(rels, pred):
+    """앞에서부터 있는 파일 중 조건에 맞는 첫 팝업 — 샘플 종목이 목록에서 빠져도 멈추지 않게."""
+    for rel in rels:
+        if (EXP / rel).exists():
+            t = (EXP / rel).read_text(encoding="utf-8")
+            for pid, title, b in bodies(t):
+                if pred(pid, title, b):
+                    return title, b
+    raise SystemExit(f"샘플 없음: {rels[0]} 외 {len(rels) - 1}개")
+
+
 def respace(b):
     """종목 페이지 출력물은 다시 돌리지 않았다 — 뉴스 요약 줄의 옛 여백(11 위아래 · 들여쓰기 0)을 지금 코드 값(dk.pop_li_margin · POP_LI_PAD)으로 바꿔 넣는다."""
     import sys
@@ -120,7 +131,8 @@ def samples():
     t, b = tip("stock-radar/output/mock_NVDA.html", 4)
     s.append(("A1", "툴팁 팝업", "카드 제목 옆 ? 아이콘 · 모든 리포트", "테마 JS 가 data-tip 글을 줄마다 나눠 그린다 · 글 19/28 · 묶음 사이 21 · 맨 아래 출처 13",
               frame(box(t, b))))
-    t, b = pick("kr-stocks/output/mock_035720.html", lambda p, ti, b: p.startswith("ev") and "grid-template-columns:1fr 1fr" in b)
+    t, b = pick_any(["kr-stocks/output/mock_035720.html"] + sorted(str(x.relative_to(EXP)) for d in ("kr-stocks", "stock-radar") for x in (EXP / d / "output").glob("mock_*.html")),
+                    lambda p, ti, b: p.startswith("ev"))   # 옛 조건 = 관련 종목 두 칸 격자(1fr 1fr) — 지금 종목 페이지 뉴스 팝업엔 그 칸이 없어 뉴스 팝업이면 된다 (2026-11-15)   # 카카오가 한국 목록에서 빠지면 다른 종목 페이지의 같은 뉴스 팝업 (2026-11-15)
     b = respace(b)
     s.append(("A2", "뉴스 요약 팝업", "뉴스 줄 누르기 · 종목 · 데일리 · 홈", "요약 줄 19/28 · 줄 사이 21 · 관련 종목 칸 · 원문 보기 13",
               frame(box(t, b, "news-pop", "rt-pop-body news-pop-body"))))

@@ -197,7 +197,16 @@ def mockups():
     return sorted(out, key=lambda x: -x[2])
 
 
-def row(d, f, t, show_dir=False, stars=(), restore=False, names=None):
+def design_mtime():
+    """공통 디자인이 마지막으로 바뀐 시각 — 테마(index.html) · 공통 부품(design_kit.py). 이보다 먼저 만든 목업 = `옛 버전`
+    (2026-11-15 사용자: 목업과 블로그가 늘 같아야 — 다시 그리기 = .venv/bin/python experiments/rebuild_mocks.py)."""
+    return max(os.path.getmtime(x) for x in (os.path.join(os.path.dirname(BASE), "index.html"), os.path.join(BASE, "design_kit.py")) if os.path.exists(x))
+
+
+OLD_TAG = '<span class="old">옛 버전</span>'
+
+
+def row(d, f, t, show_dir=False, stars=(), restore=False, names=None, ref=0):
     """큰 검은 글씨 = 목업 이름(종목 이름 · 전망 질문 · 페이지 제목), 작은 회색 = 묶음 이름 · 파일 이름 · 수정 시각 (2026-11-13 사용자)"""
     href = f"/{quote(d)}/output/{quote(f)}"
     when = datetime.fromtimestamp(t).strftime("%m-%d %H:%M")
@@ -209,10 +218,10 @@ def row(d, f, t, show_dir=False, stars=(), restore=False, names=None):
     on = f"{d}/{f}" in stars
     if restore:   # 쓰지 않는 목업 화면 — 별 대신 복원
         return (f'<div class="row"><a class="go" href="{href}">'
-                f'<span class="name">{name}</span><span class="sub">{html.escape(sub)}</span></a>'
+                f'<span class="name">{name}</span><span class="sub">{OLD_TAG if t < ref and not restore else ""}{html.escape(sub)}</span></a>'
                 f'<button class="back" data-k="{key}" aria-label="목업 목록으로 복원">복원</button></div>')
     return (f'<div class="row"><a class="go" href="{href}">'
-            f'<span class="name">{name}</span><span class="sub">{html.escape(sub)}</span></a>'
+            f'<span class="name">{name}</span><span class="sub">{OLD_TAG if t < ref and not restore else ""}{html.escape(sub)}</span></a>'
             f'<button class="star{" on" if on else ""}" data-k="{key}" aria-label="즐겨찾기">{"★" if on else "☆"}</button>'
             f'<button class="mv" data-k="{key}" aria-label="쓰지 않는 목업으로 옮기기">쓰지 않음</button></div>')
 
@@ -239,6 +248,8 @@ def index_page(archive=False):
     items = old if archive else [x for x in items if f"{x[0]}/{x[1]}" not in arch]
     by_key = {f"{d}/{f}": (d, f, t) for d, f, t in items}
     names = display_names(every)
+    ref = design_mtime()
+    n_old = sum(1 for x in items if x[2] < ref)
     groups = {}
     for d, f, t in items:
         groups.setdefault(d, []).append((d, f, t))
@@ -253,11 +264,11 @@ def index_page(archive=False):
     else:
         fav = [by_key[k] for k in stars if k in by_key]   # 누른 순서대로
         if fav:
-            parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names) for x in fav), "</section>"]
-        parts += ['<section><h2>최근 바뀐 목업</h2>', *(row(*x, show_dir=True, stars=stars, names=names) for x in items[:RECENT_N]), "</section>"]
+            parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref) for x in fav), "</section>"]
+        parts += ['<section><h2>최근 바뀐 목업</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref) for x in items[:RECENT_N]), "</section>"]
         for d in sorted(groups, key=lambda k: -groups[k][0][2]):   # 최근에 손댄 폴더가 위
             parts.append(f'<details><summary>{html.escape(LABELS.get(d, d))} <span class="n">{len(groups[d])}</span></summary>')
-            parts += [row(*x, stars=stars, names=names) for x in groups[d]]
+            parts += [row(*x, stars=stars, names=names, ref=ref) for x in groups[d]]
             parts.append("</details>")
         if old or ARCHIVED_LINKS:
             parts.append(f'<a class="big" href="/archive">쓰지 않는 목업 <span>{len(old) + len(ARCHIVED_LINKS)}개 ›</span></a>')
@@ -273,7 +284,7 @@ summary{{padding:14px;font-weight:600;cursor:pointer}} .n{{color:#8a919c;font-we
 details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
 .row{{display:flex;align-items:stretch;min-height:48px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}}
 .go{{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:10px 4px 10px 14px;color:inherit;text-decoration:none}}
-.go:active{{background:#eef2f8}} .name{{color:#1d2127;font-size:16px;font-weight:600;word-break:keep-all;overflow-wrap:anywhere}} .sub{{color:#8a919c;font-size:12px;word-break:break-all}}
+.go:active{{background:#eef2f8}} .name{{color:#1d2127;font-size:16px;font-weight:600;word-break:keep-all;overflow-wrap:anywhere}} .sub{{color:#8a919c;font-size:12px;word-break:break-all}} .old{{display:inline-block;margin-right:6px;padding:0 5px;border-radius:4px;background:#FEF3C7;color:#92400E;font-size:11px;font-weight:600}}
 .star{{flex:0 0 48px;border:0;background:none;font-size:22px;color:#c3c8d0;cursor:pointer;padding:0}} .star.on{{color:#f5a623}}
 .mv{{display:none;flex:0 0 auto;border:0;border-left:1px solid #eef0f3;background:none;font-size:13px;color:#5b6370;cursor:pointer;padding:0 14px;white-space:nowrap}}
 body.edit .mv{{display:block}}
@@ -284,7 +295,7 @@ body.edit .edit-btn{{background:#1d2127;border-color:#1d2127;color:#fff}}
 .big{{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:0 14px;margin:0 0 16px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;color:inherit;text-decoration:none;font-weight:600}}
 .big span{{color:#8a919c;font-weight:400;font-size:13px}} .big.dark{{background:#1d2127;border-color:#1d2127;color:#fff}} .big.dark span{{color:#c3c8d0}}
 </style></head><body>
-<div class="top"><h1>{"쓰지 않는 목업" if archive else "목업 목록"}</h1>{"" if archive else EDIT_BTN}</div><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록</div>
+<div class="top"><h1>{"쓰지 않는 목업" if archive else "목업 목록"}</h1>{"" if archive else EDIT_BTN}</div><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록{"" if archive or not n_old else f" · 옛 버전 {n_old}개(공통 디자인보다 먼저 만듦 — rebuild_mocks.py 로 다시 그림)"}</div>
 {''.join(parts)}
 <script>
 const ds = [...document.querySelectorAll('details')];
