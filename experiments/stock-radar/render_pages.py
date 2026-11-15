@@ -595,7 +595,7 @@ def sec_drawdown(s):
 
 def related(s):
     """함께 보는 리포트 (가이드라인 10-5 4) — HTML 링크라 검색엔진이 따라간다."""
-    links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL)] + ([] if s["sym"] == "NVDA" else [("엔비디아 NVDA 주가", U.page_url("NVDA"))])   # 엔비디아도 고정 페이지 (2026-11-01 사용자)
+    links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL), _dk.REPORT_LINKS["us"]]   # 엔비디아 고정 링크 정리 — 엔비디아도 일반 종목 (2026-11-15 사용자), 그 자리 = 미국 증시 리포트
     links.append(("주요 인물 발언 전체 보기", people_section.ALL_URL))   # 인물 발언 전체 목록 (2026-11-08 사용자) — 발언 카드 맨 아래 링크와 같은 주소
     return R.related_buttons(links)   # 전부 나가는 버튼 (2026-10-31 사용자 P160, 옛 점 글머리표 링크)
 
@@ -1193,7 +1193,7 @@ def list_body(a):
             + _dk.fold(f"후보 11~{len(top) + len(rest)}위 보기", card(rest))
             + etf_section("us")   # ETF 구획 (2026-11-12 사용자) — 발행된 ETF 페이지만, 목업은 전부
             + _dk.muted("종목 이름을 누르면 상세 페이지로 갑니다.")
-            + R.related_buttons([("엔비디아 NVDA 주가", U.page_url("NVDA"))]))   # 함께 보는 페이지 — 한국 목록 · 상세 페이지처럼 (2026-11-07)
+            + R.related_buttons(_dk.report_links("us", "kr_top")))   # 함께 보는 페이지 — 한국 목록 · 상세 페이지처럼 (2026-11-07) · 엔비디아 고정 링크 정리 (2026-11-15 사용자)
     return wrap(body + home_marker())
 
 
