@@ -1,6 +1,114 @@
 {
-  "updated_at": "2026-11-15 12:46:30 UTC",
+  "updated_at": "2026-11-15 19:06:23 UTC",
   "items": [
+    {
+      "title": "'We slept here': Flight delays linger but schedule is back on track for Monday",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/15/flight-delays-ground-faa-stop.html",
+      "published": "2026-11-15 18:22:23",
+      "title_ko": "'여기서 잤습니다': 항공편 지연 지속되지만 월요일 일정은 정상 궤도 복귀",
+      "summary_ko": "연방항공청이 4시간 넘게 전국 출항을 중단한 지 이틀 후에도 항공편 차질이 이어짐",
+      "lines": [
+        "연방항공청의 전국 항공기 이륙 중단 조치 2일 후 항공편 운항 차질 지속",
+        "플라이트어웨어 데이터 기준 미국 항공편 1600편 이상 취소 및 4000편 이상 지연 발생"
+      ]
+    },
+    {
+      "title": "DOT Sec. Duffy ties router in southern Arkansas to issues that led to nationwide ground stop",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/faa-ground-stop-flights-resume-delays.html",
+      "published": "2026-11-15 18:15:14",
+      "title_ko": "FAA 운항 중단 해제 후에도 항공편 차질 지속, 일부 대학 미식축구 경기 연기",
+      "summary_ko": "",
+      "lines": [
+        "연방항공청의 이륙 중단 조치 이후 항공편 운항 재개",
+        "토요일 3000편 이상 취소 및 1000편 가까이 지연 발생",
+        "금요일 9000편 이상 취소 및 7000편 이상 지연 기록"
+      ]
+    },
+    {
+      "title": "Bessent calls for ‘dramatic shakeup’ at Nvidia, urges outside CEO",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/15/bessent-nvidia-ceo-lutnick-megaspeed.html",
+      "published": "2026-11-15 18:10:18",
+      "title_ko": "베센트, 엔비디아의 '극적인 개편' 촉구하며 외부 CEO 요구",
+      "summary_ko": "중국으로의 반도체 우회 유출 의혹과 관련해 하워드 루트닉 부서를 비판",
+      "lines": [
+        "스콧 베센트 재무장관의 엔비디아 최고경영자 사임 이후 대대적 개편 촉구",
+        "베센트 장관의 엔비디아 이사회 외부 출신 최고경영자 선임 요구"
+      ]
+    },
+    {
+      "title": "Trump breaks silence about FAA nationwide ground stop, blames Biden administration",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/15/trump-breaks-silence-on-faa-nationwide-ground-stop-blames-biden-.html",
+      "published": "2026-11-15 16:56:40",
+      "title_ko": "트럼프, FAA 전국 운항 중단에 침묵 깨고 바이든 행정부 탓해",
+      "summary_ko": "전국 운항 중단으로 항공 여행이 차질을 빚은 후 의회에 더 많은 예산 승인을 촉구",
+      "lines": [
+        "도널드 트럼프 대통령의 연방항공청 전국 이륙 중단 사태 관련 바이든 행정부 비판",
+        "트럼프 대통령의 노후 관제 시스템 현대화를 위한 의회 예산 승인 촉구"
+      ]
+    },
+    {
+      "title": "FAA 항공 시스템 마비 및 인프라 예산 집행",
+      "title_ko": "FAA 항공 시스템 마비 및 인프라 예산 집행",
+      "summary_ko": "항공 시스템 마비 사태 이후 FAA 예산 집행과 시스템 현대화를 위한 초당적 협력 가능성이 제기",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=jBV8DeEuL-I",
+      "published": "2026-11-15 15:13:25",
+      "kind": "media",
+      "tag": "기업 사건",
+      "direction": "neutral",
+      "n_channels": 1,
+      "lines": [
+        "금요일 발생한 FAA 그라운드 스톱으로 항공 시스템 안전성 우려 제기",
+        "교통부 장관은 추가 자금 요청과 함께 단계별 원인 규명 진행",
+        "항공 관제 시스템 현대화를 위한 공화당과 민주당의 초당적 협력 기대"
+      ]
+    },
+    {
+      "title": "Social Security and the blue wave: What could happen to payroll taxes and senior tax breaks",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/15/social-security-tax-changes-midterm-election.html",
+      "published": "2026-11-15 14:30:01",
+      "title_ko": "사회보장제도와 블루 웨이브: 급여세와 고령자 세제 혜택에 일어날 수 있는 일",
+      "summary_ko": "2년 내 고령자 공제 혜택 만료 예정",
+      "lines": [
+        "민주당의 고소득자 대상 소셜시큐리티 급여세 부과 촉구",
+        "65세 이상 성인 대상 세액 공제 제도의 2년 뒤 만료 예정",
+        "소셜시큐리티 은퇴 급여 삭감 방지를 위한 의회의 6년 내 법 개정 시한"
+      ]
+    },
+    {
+      "title": "FAA 예산 증액 및 재정 조정법",
+      "title_ko": "FAA 예산 증액 및 재정 조정법",
+      "summary_ko": "교통부 장관의 FAA 예산 요구와 국방 예산이 연말 재정 조정법을 통해 처리될 가능성이 제기",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=lmaz-aNBn_o",
+      "published": "2026-11-15 14:08:33",
+      "kind": "media",
+      "tag": "재정 · 정치",
+      "direction": "neutral",
+      "n_channels": 1,
+      "lines": [
+        "션 더피 교통부 장관 발언 : 항공 교통 관제 시스템 개선을 위해 300억 달러 예산 지원 요청",
+        "마이크 존슨 하원의장 발언 : 연말 처리를 위해 공격적인 입법 패키지에 해당 예산을 추가할 예정",
+        "헨리에타 트레이스 발언 : 국방 예산과 FAA 예산이 제3차 재정 조정안을 통해 처리될 확률 30% 안팎으로 (발언자 추정)"
+      ]
+    },
+    {
+      "title": "I'm a psychologist who studies couples—5 signs you've fallen into a common rut: 'It builds through small habits that each look harmless'",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/make-it/2026/11/15/couples-coexisting-without-connecting.html",
+      "published": "2026-11-15 13:48:01",
+      "title_ko": "커플을 연구하는 심리학자입니다, 흔한 매너리즘에 빠졌다는 5가지 징후: '각각은 무해해 보이는 작은 습관들을 통해 쌓인다'",
+      "summary_ko": "오늘날 커플들이 접촉 없는 공존에 취약하다고 심리학자 마크 트래버스가 언급",
+      "lines": [
+        "마크 트래버스의 현대 부부 관계 내 공존 질환 언급",
+        "셰리 터클의 소통 부재 및 대화 능력 저하 지적"
+      ]
+    },
     {
       "title": "Anthropic’s IPO lands as the embattled AI trade looks for a much-needed bright spot",
       "source": "CNBC",
@@ -15,32 +123,6 @@
       ]
     },
     {
-      "title": "Megaspeed says Alice Huang left in 2025 as it launches internal probe into reports about its business",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/15/megaspeed-alice-huang-probe-nvidia-scandal.html",
-      "published": "2026-11-15 08:34:46",
-      "title_ko": "메가스피드, 사업 관련 보도에 대한 자체 조사 착수하며 앨리스 황이 2025년에 떠났다고 밝혀",
-      "summary_ko": "싱가포르 기반 클라우드 컴퓨팅 기업은 엔비디아의 젠슨 황과 전 임원 간의 보도로 감시 강화 직면",
-      "lines": [
-        "앨리스 황 2025년 8월 퇴사",
-        "젠슨 황 11월 12일 사임",
-        "메가스피드 내부 조사 착수"
-      ]
-    },
-    {
-      "title": "Nationwide ground stop followed contractor upgrade to L3Harris telecommunication system: DOT’s Duffy",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/faa-ground-stop-flights-resume-delays.html",
-      "published": "2026-11-15 02:53:59",
-      "title_ko": "FAA 운항 중단 해제 후에도 항공편 차질 지속, 일부 대학 미식축구 경기 연기",
-      "summary_ko": "",
-      "lines": [
-        "연방항공청의 이륙 중단 조치 이후 항공편 운항 재개",
-        "토요일 3000편 이상 취소 및 1000편 가까이 지연 발생",
-        "금요일 9000편 이상 취소 및 7000편 이상 지연 기록"
-      ]
-    },
-    {
       "title": "SpaceX catches upper stage of Starship rocket in historic first",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/14/spacex-plans-to-try-first-ever-catch-of-starship-rocket-from-orbit.html",
@@ -50,124 +132,6 @@
       "lines": [
         "스타십 15차 시험 비행에서 상단부 회수 성공",
         "텍사스 스타베이스 발사대의 기계식 팔을 이용한 로켓 회수"
-      ]
-    },
-    {
-      "title": "'Root cause’ of nationwide ground stop is unknown, FAA says",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/root-cause-of-nationwide-ground-stop-is-unknown-faa-says.html",
-      "published": "2026-11-14 22:54:47",
-      "title_ko": "전국 항공기 운항 중단의 근본 원인은 불명확하다고 연방항공청은 밝혀",
-      "summary_ko": "라우터와 네트워킹 장비가 문제에 연관되었을 가능성 제기",
-      "lines": [
-        "미국 전역 항공편 운항 중단의 정확한 원인 미확정",
-        "라우터와 네트워킹 장비가 기술적 장애와 연관된 상태",
-        "연방항공청장의 발표에 따른 항공기 운항 중단 조치"
-      ]
-    },
-    {
-      "title": "$180 million Van Gogh tests the art market and collector confidence",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/180-million-van-gogh-tests-the-art-market-and-collector-confidence-.html",
-      "published": "2026-11-14 22:34:07",
-      "title_ko": "1억 8,000만 달러의 반 고흐 작품, 미술 시장과 수집가 신뢰도 시험대 올라",
-      "summary_ko": "뉴욕 미술 경매 총액 20억 달러 상회 전망",
-      "lines": [
-        "다음 주 뉴욕 미술품 경매 총매출 24억 달러 예상",
-        "소더비 경매 단독 매출 11억 달러 상회 전망",
-        "블라키에르-아리에타 컬렉션 추정가 4억 5000만 달러",
-        "빈센트 반 고흐 작품 추정가 1억 8000만 달러",
-        "폴 세잔 작품 추정가 1억 2000만 달러"
-      ]
-    },
-    {
-      "title": "Nvidia's leadership crisis rattles the AI trade. Here's how we're adjusting our portfolio",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/11/14/nvidias-leadership-crisis-rattles-wall-street-how-were-adjusting.html",
-      "published": "2026-11-14 18:48:39",
-      "title_ko": "엔비디아의 리더십 위기가 AI 트레이드를 흔들다, 포트폴리오 조정 방법",
-      "summary_ko": "S&P 500 지수는 주간 2.5% 상승을 기록했고 나스닥 지수는 2.3% 상승",
-      "lines": [
-        "S&P 500 주간 2.5% 상승 기록",
-        "나스닥 지수 주간 2.3% 상승"
-      ]
-    },
-    {
-      "title": "미국 전역 공항 4시간 셧다운",
-      "title_ko": "미국 전역 공항 4시간 셧다운",
-      "summary_ko": "FAA의 레거시 시스템 데이터 과부하로 4시간 동안 전면 셧다운이 발생해 수천 편의 항공편이 지연",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=zIZ53YV7ToY",
-      "published": "2026-11-14 16:42:31",
-      "kind": "media",
-      "tag": "수급 · 시장 구조",
-      "direction": "neutral",
-      "n_channels": 1,
-      "lines": [
-        "FAA 시스템 데이터 과부하로 통신 및 레이더 장애 발생",
-        "4시간 동안 전국 항공편 운항 중단",
-        "트럼프 행정부의 항공 교통 관제 시스템 업그레이드 긴급 예산 요청",
-        "추수감사절 연휴 전 정상화 예상"
-      ]
-    },
-    {
-      "title": "앤트로픽 IPO 임박",
-      "title_ko": "앤트로픽 IPO 임박",
-      "summary_ko": "AI 스타트업 앤트로픽의 IPO가 6배 초과 청약을 기록하며 순항 중",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=zIZ53YV7ToY",
-      "published": "2026-11-14 16:42:31",
-      "kind": "media",
-      "tag": "실적 · 가이던스",
-      "direction": "positive",
-      "n_channels": 1,
-      "lines": [
-        "앤트로픽 IPO 6배 초과 청약 기록",
-        "AI 소프트웨어 및 인프라 수요 지속",
-        "다음 주 상장 거래 예정"
-      ]
-    },
-    {
-      "title": "엔비디아 대중국 수출 통제 및 조사",
-      "title_ko": "엔비디아 대중국 수출 통제 및 조사",
-      "summary_ko": "미국 법무부와 의회가 엔비디아의 기술 유출 및 대중국 수출 통제 위반 여부를 조사 중",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=b5oQu_60ZdU",
-      "published": "2026-11-14 15:53:09",
-      "kind": "media",
-      "tag": "규제 · 산업정책",
-      "direction": "negative",
-      "n_channels": 2,
-      "lines": [
-        "에드 루들로 발언 : 미 법무부의 방첩 조사 대상에 젠슨 황과 앨리스 황의 관계 포함",
-        "에드 루들로 발언 : 미 의회는 엔비디아 법무팀과 상무부 대표로 청문회 요청 확대",
-        "에드 루들로 발언 : 금지된 수출 칩이 중국 본토로 유입되었는지 여부 조사 중"
-      ]
-    },
-    {
-      "title": "Rising rents draw Wall Street money to industrial outdoor storage lot investments across the U.S.",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/real-estate-rental-income-industrial-storage-market.html",
-      "published": "2026-11-14 15:14:57",
-      "title_ko": "임대료 상승으로 월스트리트 자금이 미국 전역의 야외 산업용 보관 부지 투자로 몰려들고 있다",
-      "summary_ko": "브룩필드와 블랙스톤을 포함한 월스트리트 거물들이 미국 전역의 산업용 야외 보관 부동산 투자 유치",
-      "lines": [
-        "블랙스톤과 브룩필드의 미국 산업용 야외 보관 부지 투자",
-        "AI 인프라 확장에 따른 중장비 수요 증가"
-      ]
-    },
-    {
-      "title": "How Rockstar's 'GTA VI' release could reshape gaming, streaming and even paid time off",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/gta-6-grand-theft-auto-launch.html",
-      "published": "2026-11-14 14:54:22",
-      "title_ko": "'그랜드 테프트 오토 VI' 11월 19일 출시 예정",
-      "summary_ko": "크리에이터, 스트리밍, 음악, 직장 휴가, 음식 배달, 관광 분야에 영향 예상",
-      "lines": [
-        "테이크투인터랙티브의 락스타게임즈 11월 19일 그랜드 테프트 오토 VI 출시 예정",
-        "그랜드 테프트 오토 VI 개발 비용 10억 달러 초과 (예상)",
-        "센서타워 11월 13일 기준 사전 주문 1200만 건 추산 (예상)",
-        "모건스탠리 2027년 3월까지 4000만 장 판매 전망"
       ]
     }
   ]
