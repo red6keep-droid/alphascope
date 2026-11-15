@@ -279,7 +279,13 @@ def render(md, links, next_href="#"):
                 items.append(re.sub(r"^(- |\d+\. )", "", lines[i]).strip())
                 i += 1
             tag = "ol" if ordered else "ul"
-            if note_mode:
+            if ordered and not note_mode:
+                # 번호를 직접 그린다 — list-style outside 는 번호를 글 시작점 왼쪽에 매달아 `10.` 이 본문 기준선(ALIGN_PX) 밖으로 나갔다 (2026-11-15 사용자: 연재 순서).
+                # 번호 칸 = 기준선에서 시작 · 폭 32 · 왼쪽 맞춤, 줄바꿈된 글은 번호 칸 오른쪽에 맞춘다
+                out.append(f'<ol style="list-style:none;margin:0 0 16px;padding:0 0 0 {dk.ALIGN_PX}px;font-size:{dk.BODY};line-height:{dk.LH_BODY};color:#333;">' + "".join(
+                    f'<li style="display:flex;margin:0 0 6px;padding:0;"><span style="flex:none;width:32px;">{k + 1}.</span>'
+                    f'<span style="flex:1 1 auto;min-width:0;word-break:keep-all;">{dk.tint(inline(x, links))}</span></li>' for k, x in enumerate(items)) + "</ol>")
+            elif note_mode:
                 out.append(f'<{tag} style="{DECO["note_li"]}">' + "".join(f'<li style="margin:0 0 4px;">{gray(inline(x, links))}</li>' for x in items) + f"</{tag}>")
             else:
                 out.append(f'<{tag} style="{LI}">' + "".join(f'<li style="margin:0 0 6px;">{dk.tint(inline(x, links))}</li>' for x in items) + f"</{tag}>")
