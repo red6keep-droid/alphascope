@@ -437,20 +437,29 @@ def _kr_link_bars(s, ok):
                         (f"{'그날' if us_kst == _md(kday) else '다음'} 한국장 {_md(kday)}", kr)])   # 평일 = 그날 아침 한국장, 주말 · 휴일 끼면 다음 한국장
 
 
-def _kr_link_table(ok, theme="neutral"):
-    """한국 연결 종목 기록 — tech_signals 표(줄 15px · 이름 옆 13px 회색 · 값 보통 굵기 · 첫 줄 위만 구분선)와 같은 꼴, 로고 16px."""
+def link_record_table(title, recs, theme="neutral"):
+    """연관 종목 기록(고정값) — tech_signals 표(줄 15px · 이름 옆 13px 회색 · 값 보통 굵기 무채색 · 첫 줄 위만 구분선)와 같은 꼴, 로고 16px.
+    recs = [(로고 티커, 이름, 회색 설명, 기록 %p)]. 미국 페이지(한국 연관 종목) · 한국 페이지(미국 연관 종목) 공용 (2026-11-15 사용자: 증권사처럼 연관 종목은 보여 준다, 작게)."""
     import tech_signals as TS
     rows = []
-    for nm, sp, _ok, us, n, ksym in ok:
-        when = f"기록 {max(1, round(n / 250))}년" if n and n < 750 else ""
-        what = " · ".join(us) + (f", {when}" if when else "")
-        rows.append(f'<span style="display:inline-flex;align-items:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{_dk.name_logo(ksym, nm, 16)}{_esc(nm)}'
+    for ksym, nm, what, sp in recs:
+        rows.append(f'<span style="display:inline-flex;align-items:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{_dk.name_logo(ksym, nm, 16) if ksym else ""}{_esc(nm)}'
                     f'<span style="margin-left:4px;font-size:{TS.WHY_FS};line-height:19px;color:#6B7280;overflow:hidden;text-overflow:ellipsis;">{_esc(what)}</span></span>'
                     f'<span style="flex:none;color:#111;font-weight:400;">{f"{sp:.1f}".replace("-", "−")}%p</span>')   # 고정 기록 = 색 · ▲▼ 없이 (▲▼ 는 방향 신호 뜻) — `+` 를 붙이면 페이지 처리가 ▲ 빨강으로 바꾼다, 통과 기록은 모두 양수
     line = _dk.darken(_dk.lighten(_dk.lighten(_dk.CARD_DIR[theme][1]), 0.3), 0.02)   # 카드 줄 구분선과 같은 색 (기술지표 표와 같은 셈)
     head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;">'
-            f'<span>한국 연결 종목 기록</span><span style="font-size:{TS.WHY_FS};line-height:19px;font-weight:400;color:#6B7280;">크게 오른 밤 − 내린 밤, 다음 날 시가</span></span>')   # 기술지표 묶음 제목(_sub) 꼴, 오른쪽 글은 회색(보라 = 많이 보는 지표 뜻이라 안 씀)
+            f'<span>{_esc(title)}</span><span style="font-size:{TS.WHY_FS};line-height:19px;font-weight:400;color:#6B7280;">크게 오른 밤 − 내린 밤, 다음 날 시가</span></span>')   # 기술지표 묶음 제목(_sub) 꼴, 오른쪽 글은 회색(보라 = 많이 보는 지표 뜻이라 안 씀)
     return head + TS._table(rows, line)
+
+
+def rec_years(n):
+    """3년 안 되는 기록은 `기록 n년` (GE버노바 2024 상장 등), 아니면 ""."""
+    return f"기록 {max(1, round(n / 250))}년" if n and n < 750 else ""
+
+
+def _kr_link_table(ok, theme="neutral"):
+    recs = [(ksym, nm, " · ".join(us) + (f", {rec_years(n)}" if rec_years(n) else ""), sp) for nm, sp, _ok, us, n, ksym in ok]
+    return link_record_table("한국 연관 종목 기록", recs, theme)
 
 
 def sec_pairs(s):
@@ -482,7 +491,7 @@ def sec_pairs(s):
     if ok:   # 검증 기록(고정값) = 기술지표 카드 표처럼 작은 글씨 · 작은 로고, 강조 없이 (2026-11-15 사용자)
         lines.append((_kr_link_table(ok, theme), "html"))
     R.add_small_note(lines, "±0.5% 넘게 움직인 회사만 오른 곳 · 내린 곳으로 셉니다.")   # 옛 툴팁의 기준을 카드 작은 글씨로 — 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
-    tip = "한국 연결 종목은 사업으로 이어진 한국 종목 가운데, 이 종목이 크게 움직인 밤 다음 날 같은 쪽으로 열려 온 것만 골랐습니다." if ok else ""   # 한국 간단 카드 툴팁과 같은 말 (2026-11-15 사용자)
+    tip = "한국 연관 종목은 사업으로 이어진 한국 종목 가운데, 이 종목이 크게 움직인 밤 다음 날 같은 쪽으로 열려 온 것만 골랐습니다." if ok else ""   # 한국 간단 카드 툴팁과 같은 말 (2026-11-15 사용자)
     card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=tip, fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 

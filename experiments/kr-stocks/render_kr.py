@@ -173,7 +173,7 @@ def lead_fact(s):
     if mv and max(abs(m["ret"]) for m in mv) >= 2:
         top = sorted(mv, key=lambda m: -abs(m["ret"]))[:3]
         cands.append((4.5 + min(max(abs(m["ret"]) for m in top), 10) / 4, "pairs",
-                      "밤사이 미국 연결 종목은 " + " · ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in top) + "였다."))
+                      "밤사이 미국 연관 종목은 " + " · ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in top) + "였다."))
     c = s.get("crash") or {}
     if c.get("recent") and c.get("held") and c.get("index_ret") is not None and c.get("ret") is not None:
         cands.append((5, "crash", f"{c.get('index', '코스피')}가 {_sgn(c['index_ret'])}% 내린 {_md(c['day'])}에도 {_sgn(c['ret'])}%로 버텼다."))
@@ -190,7 +190,7 @@ def pair_tip(s):
     why = p.get("why") or ""
     lines = ["이 종목과 같은 재료로 움직이는 미국 종목(과 같은 회사의 미국 상장 ADR). 미국 종가는 한국 장이 열리기 전(한국 시간 새벽)에 나오므로 '밤사이' 미국 움직임 뒤 오늘 한국장의 반응을 나란히 둔다"]
     if why and p.get("moves"):
-        lines.append(f"· 연결 이유 : {why}")
+        lines.append(f"· 연관 이유 : {why}")
     return "\n".join(lines)   # `기록상` 연결 · ADR · SOX 줄은 뺐다 (2026-11-01 가이드라인 1절 4-2)
 
 
@@ -226,7 +226,7 @@ def sec_pairs(s, a=None):
     state = pairs_state(s)
     theme, col = {"엇갈림": ("uncertain", R.SOON), "올랐음": ("positive", UP), "내렸음": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
     day = (moves or [adr or sox])[0]["day"]
-    lines = [(f"밤사이(미국 {_md(day)} 종가) 연결 종목은 " + ", ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)   # 쉼표 — ` · ` 로 이으면 짧은 덩어리를 이름까지 통째로 칠한다(_dk.tint), 미국 페이지와 같게 (2026-11-06 사용자)
+    lines = [(f"밤사이(미국 {_md(day)} 종가) 연관 종목은 " + ", ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)   # 쉼표 — ` · ` 로 이으면 짧은 덩어리를 이름까지 통째로 칠한다(_dk.tint), 미국 페이지와 같게 (2026-11-06 사용자)
               + f"였고, 오늘 {_dk.josa(s['name'], '은')} {_sgn(s['ret_1d'])}%였다.", "plain")]
     # 숫자 줄 목록 → 가운데 0 가로 막대 두 묶음 (2026-10-27 사용자 P27: "퍼센트만 쭉 있어 빨리 안 읽힌다, 삼성전자 · 지수와 비교 그래프")
     why = [w.strip() for w in (p.get("why") or "").split("·")]
@@ -247,6 +247,10 @@ def sec_pairs(s, a=None):
     group = [(x[1], "", by[x[0]]["ret_1d"], "us") for x in _mates(s) if x[0] in by and by[x[0]].get("ret_1d") is not None]
     if group:
         lines.append((R.pair_bars([(f"같은 묶음 한국 종목 ({_md(s['day'])})", group)]), "html"))
+    rec = U.PAIR_RECORD.get(s["sym"])
+    if rec and rec[2] and moves:   # 연관 종목 기록(고정값, 검증 통과만) = 미국 페이지와 같은 작은 표 — 짝 묶음 평균 기록이라 한 줄 (2026-11-15 사용자: 증권사처럼 연관 종목은 보여 준다)
+        syms = [m["sym"] for m in moves]
+        lines.append((RP.link_record_table("미국 연관 종목 기록", [(syms[0] if len(syms) == 1 else None, " · ".join(_us_name(x) for x in syms), RP.rec_years(rec[1]), rec[0])], theme), "html"))
     return R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=pair_tip(s), fold=True)   # 답은 밤사이 미국 기준 그대로(검증 통과한 신호)
 
 
@@ -794,7 +798,7 @@ def related(s=None, links=None):
         for m in (s.get("pairs") or {}).get("moves") or []:
             if m["sym"] in USU.BY_SYM:
                 url = USU.NVDA_REPORTS_URL if m["sym"] in USU.REPORT_TYPE else USU.page_url(m["sym"])
-                links.append((f"{USU.name(m['sym'])} {m['sym']} 주가 (미국과 연결)", url))
+                links.append((f"{USU.name(m['sym'])} {m['sym']} 주가 (미국 연관 종목)", url))
     return R.related_buttons(links)   # 전부 나가는 버튼 (2026-10-31 사용자 P160, 옛 점 글머리표 링크)
 
 
@@ -999,7 +1003,7 @@ def _sched(s):
     usn = lambda x: USU.name(x) if x in USU.BY_SYM else x   # noqa: E731
     up = [u for u in (cc.get("peers") or {}).get("upcoming_all") or [] if left(u["day"]) <= SCHED_DAYS]
     if up:
-        out.append((f"{usn(up[0]['symbol'])} 실적 발표 ({R._md_short(up[0]['day'])})", f"{left(up[0]['day'])}일 뒤", "실적", "미국 연결 종목 일정은?"))
+        out.append((f"{usn(up[0]['symbol'])} 실적 발표 ({R._md_short(up[0]['day'])})", f"{left(up[0]['day'])}일 뒤", "실적", "미국 연관 종목 일정은?"))
     mu = (cc.get("macro") or {}).get("upcoming") or []
     if mu:
         out.append((f"{_macro_name(mu[0]['kind'], mu[0].get('label', ''))} ({R._md_short(mu[0]['day'])})", f"{left(mu[0]['day'])}일 뒤", "실적", "시장 전체를 흔들 일정은?", mu[0]["kind"]))
@@ -1170,7 +1174,7 @@ def cal_pair_card(s, c):
     days = CC.LIST_DAYS
     usn = lambda x: USU.name(x) if x in USU.BY_SYM else x   # noqa: E731
     if not up:
-        return [(f"앞으로 {days}일 안에 실적을 발표하는 {nm}의 미국 연결 종목이 없다.", "plain")], "", "없음", None
+        return [(f"앞으로 {days}일 안에 실적을 발표하는 {nm}의 미국 연관 종목이 없다.", "plain")], "", "없음", None
     syms = [x for x in dict.fromkeys(u["symbol"] for u in up) if c["effect"].get(x, {}).get("median")]
     names = " · ".join(usn(u["symbol"]) + "(" + R._md_short(u["day"]) + ")" for u in up)
     first = f"앞으로 {days}일 안에 {_dk.josa(names, '가')} 실적을 발표한다. {_dk.josa(nm, '와')} 같은 재료로 움직이는 미국 종목이다."
@@ -1181,11 +1185,11 @@ def cal_pair_card(s, c):
     lines = [(first, "plain")]
     if syms and c.get("normal"):
         chart = R._chart_card([(usn(x), [c["effect"][x]["median"], c["normal"]]) for x in syms], [lambda v: R._AMBER, R._gray], [R._note_fg, R._note_fg],
-                              [(f"미국과 연결 회사 발표 다음 날 {nm}", R._AMBER), (f"{nm} 보통 날", R._GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
+                              [(f"미국 연관 회사 발표 다음 날 {nm}", R._AMBER), (f"{nm} 보통 날", R._GRAY_BAR)], fmt=lambda v: f"±{v:.1f}")
         lines.append((f'{_dk.CHART_TITLE_M}발표 다음 날 {_esc(nm)} 움직임 (%)</span>{chart}', "html"))
     for u in up:
         e = c["effect"].get(u["symbol"]) or {}
-        lines.append(("row", f"{usn(u['symbol'])} ({u['symbol']})", R._md_short(u["day"]), "미국과 연결" + (f" · 다음 날 {nm} 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else "")))
+        lines.append(("row", f"{usn(u['symbol'])} ({u['symbol']})", R._md_short(u["day"]), "미국 연관" + (f" · 다음 날 {nm} 보통 ±{e['median']:.1f}% ({e['n']}번)" if e.get("median") else "")))
     left = (datetime.date.fromisoformat(up[0]["day"]) - datetime.date.fromisoformat(s["day"])).days
     return lines, "", f"{len(up)}곳", left   # 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
@@ -1210,7 +1214,7 @@ def sec_calendar(s, keys=("earnings", "peers", "macro"), open_first=True):
     옛 `일정` 탭, 지금은 `실적` 탭 안(sec_earnings_tab, P196) — keys 로 고른 카드만. 카드 밖 `전체 일정 보기` 는 없앴다(P197, 연결 종목 카드 안으로)."""
     cc = s.get("calendar_cards") or {}
     out, first = "", open_first
-    for title, key, fn in (("다음 실적 발표는?", "earnings", cal_earn_card), ("미국 연결 종목 일정은?", "peers", cal_pair_card), ("시장 전체를 흔들 일정은?", "macro", cal_macro_card)):   # 일정 탭 질문엔 `일정` (P156)
+    for title, key, fn in (("다음 실적 발표는?", "earnings", cal_earn_card), ("미국 연관 종목 일정은?", "peers", cal_pair_card), ("시장 전체를 흔들 일정은?", "macro", cal_macro_card)):   # 일정 탭 질문엔 `일정` (P156)
         c = cc.get(key)
         if key not in keys or not c:
             continue
