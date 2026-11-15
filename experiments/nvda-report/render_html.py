@@ -2687,14 +2687,25 @@ def _bundles(a):
     return out
 
 
+EMPHASIS_MAX = 2   # 강조(색) 카드 상한 — 가장 최근 2장만, 나머지는 일반 줄 (2026-11-15 사용자: 테슬라 9줄 중 5장이 카드라 강조 뜻이 약했다)
+
+
+def _cap_emphasis(a):
+    allev = list(a.get("events") or []) + list(a.get("events_overflow") or [])
+    keep = {id(e) for e in sorted((e for e in allev if e.get("emphasis") and not _thin(e)), key=lambda e: str(e.get("published_at") or ""), reverse=True)[:EMPHASIS_MAX]}   # 목록에 남는 기사 중에서 (한 줄짜리는 묶음으로 가니 빼고 센다)
+    fix = lambda xs: [e if not e.get("emphasis") or id(e) in keep else dict(e, emphasis=False) for e in xs or []]  # noqa: E731
+    return dict(a, events=fix(a.get("events")), events_overflow=fix(a.get("events_overflow")))
+
+
 def sec_events(a):
+    a = _cap_emphasis(a)
     if a["events"] or a.get("events_overflow"):
         bundles = _bundles(a)   # 한 줄짜리 묶음 = 기사 한 줄처럼, 다른 기사와 시각순으로 섞는다 (2026-11-15 사용자)
         keep = [e for e in a["events"] if not _thin(e)]
         over = [e for e in a.get("events_overflow") or [] if not _thin(e)]
         if bundles:
-            cards = [e for e in keep if e.get("emphasis")]
-            mixed = sorted([e for e in keep if not e.get("emphasis")] + over + bundles, key=lambda e: str(e.get("published_at") or ""), reverse=True)
+            cards = [e for e in keep + over if e.get("emphasis")]   # 강조 카드(상한 2장)는 더 보기 안에 있었어도 맨 위로
+            mixed = sorted([e for e in keep + over if not e.get("emphasis")] + bundles, key=lambda e: str(e.get("published_at") or ""), reverse=True)
             room = max(0, len(keep) - len(cards)) or max(0, _dk.MORE_SHOWN - len(cards))
             keep, over = cards + mixed[:room], mixed[room:]
         a = dict(a, events=keep, events_overflow=over)
@@ -3478,23 +3489,42 @@ def sec_calendar(a):
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' + fold
 
 
+def _issue_pop(e):
+    """중요 이슈 줄의 팝업 (pid, 숨긴 글) — 뉴스 줄과 같은 news_pop_body. 요약이 두 줄 못 되면 사실 문장 + 요약 줄로 채운다(원문으로 바로 가지 않게).
+    줄이 하나도 없으면 None."""
+    lines = [x for x in (e.get("pop_lines") or []) if x]
+    if len(lines) < 2:
+        lines = list(dict.fromkeys(x for x in (_dk.headline(e["fact"]) if e.get("fact") else "", e.get("detail") or "") if x))
+    if not lines:
+        return None
+    pid = _dk.news_pop_id("is", e.get("pop_key") or e.get("url") or lines[0])
+    title = re.sub(r"<[^>]+>", "", e.get("headline") or e.get("title") or lines[0])
+    src = rr.SOURCE_KO.get(e.get("pop_source") or e.get("source") or "", e.get("pop_source") or e.get("source") or "")
+    return pid, _dk.news_pop_body(pid, html_mod.unescape(title), lines, source=src if src != "googlenews" else "", kind="기사", url=e.get("url"))
+
+
 def sec_narrative(a, n):
     if not n or not n.get("today"):
         return _muted("어제 이후 새로 바뀐 중요 소식이 없습니다." if not a["events"] or (n is not None and not n.get("today")) else "서술을 만들지 못했습니다. 수치 섹션만 참고하세요.")   # 같은 줄을 매일 반복하지 않는다 (2026-10-17 사용자)
     areas = "|".join(re.escape(v) for v in rr.AREA_KO.values())
     # 줄 = 글 또는 (글, 기사 주소) — 주소가 있으면 줄을 누르면 그 기사가 새 창으로 열린다 (2026-10-23 사용자: 종목 페이지 중요 이슈)
-    pairs = [(t, None) if isinstance(t, str) else (t[0], t[1]) for t in n["today"]]
-    lines = [(re.sub(rf"^({areas})\s+(?!·)", r"\1 · ", t), u) for t, u in pairs]   # 영역 머리 뒤 구분점 보정
+    # 셋째 칸 = 그 기사(이벤트) — 있으면 줄을 누르면 원문 대신 뉴스 줄과 같은 요약 팝업 (2026-11-15 사용자: 중요 이슈만 원문으로 바로 가던 것)
+    pairs = [(t, None, None) if isinstance(t, str) else (t[0], t[1], t[2] if len(t) > 2 else None) for t in n["today"]]
+    lines = [(re.sub(rf"^({areas})\s+(?!·)", r"\1 · ", t), u, ev) for t, u, ev in pairs]   # 영역 머리 뒤 구분점 보정
     # 엔비디아 리포트: 첫 줄은 "events 중 가장 위 기사"를 옮긴 줄(prompts/narrate.txt)이라, 영역 머리가 맞으면 그 기사 주소를 단다.
     # 둘째 · 셋째 줄은 일정 · 점검표라 기사가 없다 (2026-10-23 사용자: 중요 이슈를 누르면 기사가 열리게)
     if lines and lines[0][1] is None:
         m = re.match(rf"^({areas}) · ", lines[0][0])
         top = next((e for e in (a.get("events") or [])[:5] if m and rr.AREA_KO.get(e["area"], e["area"]) == m.group(1) and e.get("url")), None)
         if top:
-            lines[0] = (lines[0][0], top["url"])
-    def _issue(t, u):
+            lines[0] = (lines[0][0], top["url"], top)
+
+    def _issue(t, u, ev):
+        pop = _issue_pop(ev) if ev else None
+        if pop:   # 줄 전체를 눌러 팝업 — 원문은 팝업 안 작은 `원문 보기` 로만
+            return _dk.news_pop_wrap(_esc(t), pop[0]) + pop[1]
         return (f'<a href="{_esc(u)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">{_esc(t)}</a>' if u else _esc(t))
-    lis = "".join(_dot_li(_issue(t, u), size=3, lh=_dk.LH_BODY, margin=_dk.LI_MARGIN) for t, u in lines)   # 18px 글 → 3px 점 (2026-10-12 사용자)
+    lis = "".join(_dot_li(_issue(t, u, ev), size=3, lh=_dk.LH_BODY, margin=_dk.LI_MARGIN) for t, u, ev in lines)   # 18px 글 → 3px 점 (2026-10-12 사용자)
     # 카드 없이 본문 글머리표 — 제목 아래 구분선은 _section 이 긋는다 (2026-10-13 사용자: "중요 이슈 카드 디자인 삭제하고 타이틀 아래 구분선")
     return _dk.dot_ul([lis])
 
