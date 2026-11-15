@@ -11,6 +11,7 @@ import datetime
 import html as html_mod
 import json
 import os
+import re
 import sys
 
 import config
@@ -259,8 +260,26 @@ def _signal_item(p, s, cards):
         if targets:
             subs.append(_sub("대상 : " + _esc(" · ".join(targets))))
     pills = [dk.pill(dk.ISSUE_KO.get(s.get("issue") or "OTHER", "그 밖"), bare=True), _dir_pill(s["direction"]), dk.pill(f"강도 {s['intensity']}", bare=True)]   # 분야 라벨 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339, 옛: 인물 주제)
+    # 누르면 요약 팝업 — 종목 페이지 인물 발언(people_section)과 같은 재료 · 같은 팝업 (2026-11-15 사용자: 인물 발언 목록만 원문으로 바로 넘어가던 것).
+    # 한 줄(요약만)이면 싣지 않는다 — 뉴스와 같은 규칙(11-10). 수집 · 기록은 그대로.
+    import stock_mentions
+    lines = stock_mentions._pop_lines(s, c)
+    if len(lines) < 2:
+        return ""
+    pid = dk.news_pop_id("rp", s["lead"]["id"])
+    src = pub if pub and pub != "googlenews" and s["source_kind"] != "primary" else ""
+    body = dk.news_pop_body(pid, h, lines, source=src, kind="발언", url=url)   # 원문은 팝업 안 작은 `원문 보기 (매체)` 링크로만
     # 공용 뉴스 카드 (design_kit.news_item) — 라벨 줄 오른쪽에 시각 · 출처 · 보도 수 (2026-10-25 사용자)
-    return dk.news_item(h_html, url, detail, subs, " ".join(pills), meta)
+    # 팝업 표시는 li 에 단다(_pop_li) — 홈 인물 발언 카드(index.html radarRows)가 li 첫 칸을 헤드라인으로 읽으므로 감싸지 않는다
+    return f"<!--pop:{pid}-->" + dk.news_item(h_html, url, detail, subs, " ".join(pills), meta) + body
+
+
+_POP_LI = re.compile(r'<li style="([^"]*)"><!--pop:([\w-]+)-->')
+
+
+def _pop_li(html):
+    """`<li style=…><!--pop:id-->` → `<li data-news-pop="id" style=…cursor:pointer;>` — 줄 전체를 눌러 팝업 (가이드라인 10-9, 테마 JS 가 closest('[data-news-pop]'))."""
+    return _POP_LI.sub(lambda m: f'<li data-news-pop="{m.group(2)}" style="{m.group(1)}cursor:pointer;">', html)
 
 
 # ── 구획 ────────────────────────────────────────────────────────────────
@@ -295,7 +314,7 @@ def sec_people(r, cards):
             # 펼친 목록의 첫 기사 위에도 구분선 (2026-10-21 사용자: 기사 영역은 더 보기를 펼쳐도 선이 이어져야 한다)
             ml = dk.item_rules(more, indent=dk.ALIGN_PX).replace(f"padding:2px {dk.ALIGN_PX}px ", f"padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px ", 1).replace("line-height:" + dk.LH_BODY + ";", "line-height:" + dk.LH_BODY + ";box-shadow:inset 0 1px 0 #E2E8F0;", 1)
             page.append(dk.fold(f"{p['name_ko']} 발언 {len(more)}건 더 보기", ml).replace("margin-top:8px;margin-bottom:8px;", "margin:0 0 8px;", 1))
-        out.append(f'<div data-person-page="{p["speaker"]}">{"".join(page)}</div>')
+        out.append(f'<div data-person-page="{p["speaker"]}">{_pop_li("".join(page))}</div>')
     return "".join(out)
 
 

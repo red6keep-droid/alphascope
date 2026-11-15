@@ -60,6 +60,8 @@ def _row(it):
     if it.get("avatar"):   # 왼쪽 얼굴 동그라미 (2026-11-07 사용자 P368)
         row = f'<div style="display:flex;gap:12px;align-items:flex-start;">{it["avatar"]}<div style="flex:1 1 auto;min-width:0;">{row}</div></div>'
     lines = it.get("pop") or []
+    if len(lines) < 2:   # 한 줄(요약만)은 싣지 않는다 — 뉴스와 같은 규칙(11-10), 원문으로 바로 가는 줄을 없앤다 (2026-11-15 사용자)
+        return ""
     if len(lines) >= 2:   # 누르면 짧은 팝업 (P366): 발언 요약 · 닿는 곳 · 새로운가 · 다음 날짜
         pid = dk.news_pop_id("pp", it["id"])
         body = dk.news_pop_body(pid, it["headline"], lines)   # 링크는 아래 버튼 줄이 맡는다
