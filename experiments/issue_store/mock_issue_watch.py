@@ -914,7 +914,8 @@ def _day_pop(pid, day, evs):
 
 TL_MORE_STEP = H.MORE_STEP   # 더 보기 한 번에 10일 — 증시 전망 `지난 경과 더 보기` 와 같은 버튼 · 같은 개수 (2026-11-13 사용자)
 TL_BOTTOM = 5   # 타임라인 아래 더 띄움 (2026-11-13 사용자 "5픽셀 정도 더")
-TL_TITLE_BELOW = 10   # `News Timeline` 제목 아래 +10 (2026-11-13 사용자) — 증시 전망 Timeline 제목 아래 11 에 더함
+TL_TITLE_MORE = 3   # `News Timeline` 제목 ~ 첫 날짜 = 쪽 라벨 줄 ~ 다음 날짜(아래 10 + 날짜 사이 15 + 위 10 = 35)보다 3 넓게 = 38 (2026-11-15 사용자, Chrome 실측) — 옛 11 + 10 = 21
+TL_TITLE_BELOW = 2 * (12 - dk.VP) + H.TL_DAY_GAP + TL_TITLE_MORE
 
 
 def tail_chev(text):
@@ -929,7 +930,7 @@ def tl_lead():
     """증시 전망 timeline_lead 와 같은 머리 — 시계 아이콘을 레일 마디로, 오른쪽 `News Timeline`. 아래 날짜 점까지 점선이 이어진다 (2026-11-13 사용자: 아이콘과 점이 끊겨 있었다)."""
     big = H.CLOCK.replace('width="16" height="16"', f'width="{H.TL_TITLE_ICON}" height="{H.TL_TITLE_ICON}"', 1)
     icon = f'<span style="display:inline-flex;color:{dk.SUB};">{big}</span>'
-    title = (f'<div data-tl-title="1" style="padding:0 0 {11 + TL_TITLE_BELOW}px;font-size:{H.TL_TITLE_FS}px;line-height:{H.TL_TITLE_ICON + 4}px;font-weight:700;color:#111;">News Timeline</div>')
+    title = (f'<div data-tl-title="1" style="padding:0 0 {TL_TITLE_BELOW}px;font-size:{H.TL_TITLE_FS}px;line-height:{H.TL_TITLE_ICON + 4}px;font-weight:700;color:#111;">News Timeline</div>')
     return f'<div style="height:{28 + H.TL_TITLE_GAP}px;"></div>' + H._tl_row(icon, H.TL_TITLE_ICON + 4, 0, title, True, False)
 
 
@@ -956,6 +957,10 @@ def news_timeline(evs, days_desc, px=None):
             return ""
         t = pd.Timestamp(d)
         if t not in ref.index:
+            # 주말 · 공휴일(값이 없는 지난 평일) = `휴장` — 뉴스만 있는 날이 값 빠진 것처럼 보이지 않게 (2026-11-15 사용자). 아직 안 닫힌 날(마지막 종가 뒤 평일)은 그대로 비움.
+            if len(ref) and (t.weekday() >= 5 or t < ref.index[-1]):
+                why = {5: "토요일", 6: "일요일"}.get(t.weekday(), "공휴일")   # 왜 쉬는지까지 — `토요일 휴장` · `일요일 휴장` · 평일은 `공휴일 휴장` (2026-11-15 사용자), 기준 가격 이름은 뺌(시장 전체가 쉬는 날)
+                return f'<span style="font-weight:400;color:{dk.SUB};white-space:nowrap;">{why} 휴장</span>'
             return ""
         i = ref.index.get_loc(t)
         if i == 0:
