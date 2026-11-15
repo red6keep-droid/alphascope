@@ -45,6 +45,7 @@ JOBS = [
     ("증시 전망 · 한국 근거", ["experiments/issue_store/mock_kr_why.py"]),
     ("증시 전망 · 홈 카드", ["experiments/issue_store/home_mock.py"]),
     ("Hot Issue", ["experiments/issue_store/mock_issue_watch.py"]),
+    ("Hot Issue · 종목 이슈", ["experiments/issue_store/mock_stock_issue.py"]),   # 엔비디아 CEO 사임 시안 (2026-11-15)
     ("디자인 샘플 · 그래프", ["experiments/design-samples/build_graphs.py"]),
     ("디자인 샘플 · 팝업", ["experiments/design-samples/build_popups.py"]),
     ("디자인 샘플 · 아이콘 라벨", ["experiments/design-samples/build_samples.py"]),

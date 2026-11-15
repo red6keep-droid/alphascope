@@ -114,6 +114,16 @@ def scale_icon(size=24):
     return (f'<span style="display:inline-flex;align-items:center;justify-content:center;width:{size}px;height:{size}px;border-radius:{round(size / 4)}px;background:#0E7490;color:#fff;" aria-hidden="true">'
             f'<svg viewBox="0 0 16 16" width="{g}" height="{g}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">'
             '<path d="M8 2v12M4.5 14h7"/><path d="M2.5 5h11"/><path d="M4 5 2 9.5h4L4 5zM12 5l-2 4.5h4L12 5z"/></svg></span>')
+def gauge_icon(size=24):
+    """Hot Issue 아이콘 — 저울 대신 반원 게이지(뉴스 바늘 `최근 일주일 뉴스는 어느 쪽?` 을 줄인 그림: 세 칸 반원 + 바늘 + 가운데 점) (2026-11-15 사용자).
+    상자 = 저울 아이콘과 같은 청록 #0E7490 사각 · 모서리 = 크기/4 · 그림 = 크기의 2/3 (강조형 아이콘, 가이드라인 8절)."""
+    g = round(size * 2 / 3)
+    return (f'<span style="display:inline-flex;align-items:center;justify-content:center;width:{size}px;height:{size}px;border-radius:{round(size / 4)}px;background:#0E7490;color:#fff;" aria-hidden="true">'
+            f'<svg viewBox="0 0 16 16" width="{g}" height="{g}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">'
+            '<path d="M2.00 10.40A6 6 0 0 1 4.31 5.67M5.18 5.10A6 6 0 0 1 10.82 5.10M11.69 5.67A6 6 0 0 1 14.00 10.40"/>'
+            '<path d="M8 10.4L6.08 6.78"/><circle cx="8" cy="10.4" r="1.2" fill="currentColor" stroke="none"/></svg></span>')
+
+
 # 상세 하단 버튼 · 머리 줄 화살표 = 전망 목록 (2026-11-09 사용자: 홈이 아니라 목록으로) — 테마가 data-nav="list" · data-title-back 을 읽는다
 
 # ---------------------------------------------------------------- 용어 · 색
@@ -1464,7 +1474,8 @@ def _day_cols(e, unit="%", subj=""):
         label = label[len(subj) + 1:]
     calm = start or label == "지켜보는 중"
     r = None if start else e.get("shown", e.get("rel"))
-    val = (dk.emph_tri(dk.arrow(r, 1, unit).replace("font-weight:700;", "font-weight:400;"), TL_TRI) if r is not None and round(r, 1) != 0 else "")   # ▲ · ▼ 16 → 14 (10% 작게, 정수, P497)
+    val = (f'<span style="color:{dk.UP if r > 0 else dk.DOWN};font-weight:400;white-space:nowrap;">{dk.tri_span(r > 0, 16)}{abs(r):.1f}{unit}</span>'
+           if r is not None and round(r, 1) != 0 else "")   # 삼각형 = 가이드 5절(글자 16 의 80% = 13 · 위로 1 · 숫자와 2, dk.tri_span) — 옛 P497 14 + 띄어쓰기 (2026-11-15 사용자 "증시 전망 타임라인도 맞춰줘")
     ink = dk.VIOLET if e.get("key") in RESULT else ("#111" if calm else INK[e["dir"]])   # 판정(맞음 · 틀림 · 제자리 · 보류 · 무효) = 보라 (P469, 2026-11-08 사용자) — 방향 색 X
     lab = f'<span style="color:{ink};{"" if e.get("key") in RESULT else "font-weight:400;"}white-space:nowrap;">{dk.esc(label)}</span>'   # `○○ 조짐` 도 보통 굵기, 판정만 굵게 (P483, 2026-11-11 사용자)
     # 옛 `(세부 전망으로 이어감 ›)` 괄호 링크(P453)는 뺐다 — 바로 위 끝 줄 `세부 전망으로 이어집니다 ›`(P465)와 겹쳐서 (P466, 2026-11-08 사용자)
@@ -1689,7 +1700,7 @@ TL_LINE = "#CBD5E1"   # 타임라인 세로 점선 = 비교 · 기준선 회색 
 TL_RAIL = 20          # 왼쪽 레일 폭 = 맨 위 시계 아이콘 20 (2026-11-11 — 옛 16)
 TL_WHY_INK = dk.SUB   # 타임라인 근거 줄 = 회색(세 톤 셋째 #6B7280, 2026-11-11 사용자: "논의중 회색 글씨 컬러로") — 옛 시험 #4B5563
 _TL_WHY_INK_OLD = "#4B5563"   # 타임라인 근거 줄 — 시험: #333 이 검정과 거의 같아 보여 이 줄만 #4B5563 (2026-11-11 사용자 "이 줄만 먼저"), 연한 검정 톤 결정 전
-TL_TRI = 14           # 타임라인 증감 ▲ · ▼ 크기 (P497)
+TL_TRI = 13           # 타임라인 증감 ▲ · ▼ 크기 = 글자 16 의 80% (가이드 5절, 2026-11-15 — 옛 P497 14). 그리기는 dk.tri_span(…, 16)
 TL_DOT = 8            # 지난 날 점
 TL_DAY_GAP = 15       # 날짜 줄 묶음 사이 더 띄움 (2026-11-11 사용자)
 

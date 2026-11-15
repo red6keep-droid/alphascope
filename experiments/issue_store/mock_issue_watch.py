@@ -969,7 +969,9 @@ def news_timeline(evs, days_desc, px=None):
         if c == p:   # 전날 값을 그대로 채운 줄(선물 자료가 아직 안 들어온 날) — 0.0% 로 보이지 않게 비움
             return ""
         chg = (c / p - 1) * 100
-        val = dk.emph_tri(dk.arrow(chg, 1, "%").replace("font-weight:700;", "font-weight:400;"), H.TL_TRI) if round(chg, 1) != 0 else '<span style="color:#111;">0.0%</span>'
+        # 삼각형 = 가이드 5절(그 자리 글자 16 의 80% = 13 · 위로 1 · 숫자와 2, dk.tri_span) — 옛: 14 + 띄어쓰기 한 칸 (2026-11-15 사용자 "삼각형 가이드 맞춰줘")
+        val = (f'<span style="color:{dk.UP if chg > 0 else dk.DOWN};font-weight:400;white-space:nowrap;">{dk.tri_span(chg > 0, int(dk.NAME.rstrip("px")))}{abs(chg):.1f}%</span>'
+               if round(chg, 1) != 0 else '<span style="color:#111;">0.0%</span>')
         return (f'<span style="font-weight:400;color:{dk.SUB};white-space:nowrap;">{dk.esc(ref_nm)}</span>'
                 f'<span style="font-weight:400;color:#111;white-space:nowrap;">{dk.esc(ref_fmt.format(c))}</span>'
                 f'<span style="white-space:nowrap;">{val}</span>')
@@ -1450,6 +1452,9 @@ def _reach(hit):
     return r if r >= 0 else None
 
 
+LADDER_LAST_TOP = 6 + 5   # 단계 이름 줄 ~ 아래 `11.12 …` 최근 일 줄 — 6 에서 +5 (2026-11-15 사용자: 너무 붙어 있다)
+
+
 def _ladder(side, reach, hit):
     """쪽마다 한 줄 진행 막대 — 칸 = 단계, 오른 칸까지 색, 아래 단계 이름. 그 아래 도달한 단계의 가장 최근 일.
     막대 = 줄 막대 꼴(가이드라인 9절: 높이 10 · 모서리 3 · 빈 칸 #F1F5F9 · 부호 있는 값 = 연빨강 · 연파랑 dk.BAR_PASTEL), 단계 이름 = 가로축 이름 13 (2026-11-14 사용자)."""
@@ -1466,7 +1471,7 @@ def _ladder(side, reach, hit):
     head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 8px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;">'
             f'<b style="flex:none;color:{ink};">{dk.esc(SIDE_LABEL[side])}</b><span style="text-align:right;word-break:keep-all;">{dk.esc(where)}</span></span>')   # `‘협상 제안’ 단계까지` = 오른쪽 정렬 (2026-11-14 사용자)
     e = hit.get(reach) if reach is not None else None
-    last = (f'<span style="display:block;margin:6px 0 0;font-size:{dk.TINY};line-height:20px;color:{dk.SUB};word-break:keep-all;">'
+    last = (f'<span style="display:block;margin:{LADDER_LAST_TOP}px 0 0;font-size:{dk.TINY};line-height:20px;color:{dk.SUB};word-break:keep-all;">'
             f'<b style="font-weight:600;color:#333;">{H.md(e["first"].astimezone(KST).date().isoformat())}</b> {dk.esc(e["title"])}</span>') if e else ""
     return head + f'<span style="display:flex;gap:2px;">{segs}</span>' + last
 
@@ -1844,7 +1849,7 @@ def bridge_now(px):
 
 def title_h2(iss):
     """증시 전망 질문 줄과 같은 꼴 — 저울 아이콘 + 질문, 아래 줄 오른쪽 `게시 : 11.13` (forecast_body 의 q)."""
-    icon = f'<span style="display:flex;flex:none;align-items:center;height:1lh;">{H.scale_icon(24)}</span>'
+    icon = f'<span style="display:flex;flex:none;align-items:center;height:1lh;">{H.gauge_icon(24)}</span>'   # 저울 → 반원 게이지 (2026-11-15 사용자: Hot Issue 는 뉴스 바늘 모양)
     date = (f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:29px;line-height:{dk.LH_TINY};">'
             f'<span style="display:flex;flex:none;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:{dk.TINY};font-weight:400;color:{dk.SUB};">'
             f'<span style="white-space:nowrap;">게시 : <span style="color:#111;">{H.md(iss["since"])}</span></span></span></span>')
