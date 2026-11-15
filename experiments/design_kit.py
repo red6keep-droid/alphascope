@@ -2092,7 +2092,7 @@ def news_pop_body(pid, title, lines, when="", source="", kind="방송", url=None
 
 # ── 한 줄짜리 묶음 = 기사 한 줄처럼 (2026-11-15 사용자) ──
 # 요약이 두 줄 못 되는 기사는 목록에 싣지 않는다(11-10). 버리는 대신 같은 이슈끼리 2 ~ 4줄씩 묶어 일반 기사 줄과 똑같은 모양으로 목록에 섞는다:
-#   굵은 제목 = 첫 줄 · 요약 줄 = 둘째 줄 · 라벨(이슈 · 방향) · 시각 · `매체 외 n곳`. 누르면 팝업에 묶인 줄 전부(번호) + 맨 아래 번호 붙은 출처 버튼(원문, 새 창).
+#   굵은 제목 = 첫 줄 · 요약 줄 = 둘째 줄 · 라벨(이슈 · 방향) · 시각 · `매체 외 n곳`. 누르면 일반 뉴스 팝업과 같은 모양(제목 + 나머지 줄 글머리표 + 작은 회색 `원문 보기 : 매체 · 매체`).
 # 이유(실측 11-15): 엔비디아는 한 줄짜리가 하루 21건(두 줄 이상 12건), 빼면 뉴스 있는 간단 종목의 절반(120 중 62)이 빈 화면. 새 AI 0 — 이미 만든 한 줄 문장 · 이슈 코드.
 # (같은 날 먼저 만든 `한 줄 소식` 키워드 버튼 줄은 사용자 뜻과 달라 없앴다)
 BUNDLE_MAX = 4        # 묶음 하나의 줄 수 상한 (2 ~ 4)
@@ -2107,19 +2107,17 @@ def bundle_sizes(n, cap=BUNDLE_MAX):
 
 
 def bundle_pop_body(pid, title, rows):
-    """묶음 팝업 글 — rows = [{"line", "source", "url"}]. 번호 + 한 줄(누를 수 없음) → 구분선 → `출처` + 번호 붙은 버튼(줄과 같은 번호)."""
-    li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{pop_li_margin(i)};padding-left:{POP_LI_PAD}px;">'
-                 f'<span style="flex:none;width:16px;font-size:13px;line-height:{POP_LH}px;color:{NOTE};text-align:right;">{i + 1}</span>'
-                 f'<span style="min-width:0;font-size:{BODY};line-height:{POP_LH}px;color:#333;word-break:keep-all;">{esc(r["line"])}</span></span>'
-                 for i, r in enumerate(rows))
-    src = "".join(f'<a href="{esc(r["url"])}" target="_blank" rel="nofollow noopener" data-trhelp="skip" '
-                  f'style="display:inline-flex;align-items:center;gap:5px;border:1px solid #E2E8F0;border-radius:8px;padding:5px 10px;font-size:13px;line-height:19px;'
-                  f'color:{SUB};text-decoration:none;white-space:nowrap;"><span style="color:{NOTE};">{i + 1}</span>{esc(r.get("source") or "원문")} {LINK_ICON}</a>'
-                  for i, r in enumerate(rows) if r.get("url"))
-    foot = (f'<span style="display:block;margin:16px 0 0;padding-top:12px;border-top:1px solid #E2E8F0;">'
-            f'<span style="display:block;font-size:13px;line-height:19px;color:{NOTE};margin:0 0 8px;">출처</span>'
-            f'<span style="display:flex;flex-wrap:wrap;gap:6px;">{src}</span></span>') if src else ""
-    return f'<div data-news-pop-body="{esc(pid)}" data-news-pop-title="{esc(title)}" hidden>{li}{foot}</div>'
+    """묶음 팝업 글 = 일반 뉴스 팝업(news_pop_body)과 같은 모양 — 제목 + 글머리표 줄 + 오른쪽 작은 회색 원문 링크 (2026-11-15 사용자: "일반 뉴스 팝업이랑 똑같이").
+    rows = [{"line", "source", "url"}] — 첫 줄은 제목이라 본문에서 반복하지 않는다. 원문 링크는 묶인 기사 순서대로 매체 이름을 ` · ` 로 이어 붙인다."""
+    body = news_pop_body(pid, title, [r["line"] for r in rows[1:]])
+    links = " · ".join(f'<a href="{esc(r["url"])}" target="_blank" rel="noopener" data-trhelp="skip" '
+                       f'style="color:{SUB};text-decoration:underline;text-underline-offset:3px;">{esc(r.get("source") or "원문")}</a>'
+                       for r in rows if r.get("url"))
+    if links:
+        link = (f'<span style="display:block;text-align:right;margin:14px 0 0;font-size:13px;line-height:19px;color:{SUB};">'
+                f'원문 보기 ({links}) {LINK_ICON}</span>')   # 일반 팝업의 `원문 보기` 와 같은 13/19 · SUB · 밑줄 — 매체가 여럿이라 이름을 순서대로
+        body = body[:-len("</div>")] + link + "</div>"
+    return body
 
 
 def news_pop_wrap(item_html, pid):

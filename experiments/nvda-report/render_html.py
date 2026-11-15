@@ -2551,7 +2551,7 @@ def _event_html(e):
     tip_t = _esc(f"{src}: {e['title'][:90]}" if doc else f"{src} 원문").replace(chr(34), "&quot;")
     trhelp = ' data-trhelp="skip"' if e.get("media") else ""   # 방송 줄(media_feed)은 한국어 주제 + 유튜브 영상 — 영문 기사용 `번역 방법` 을 붙이지 않는다
     inner = _dk.news_item(head, e.get("url"), detail, subs, labels, meta, f' title="{tip_t}"{trhelp}', count_html=count)
-    if e.get("bundle"):   # 한 줄짜리 묶음 — 팝업에 묶인 줄 전부 + 번호 붙은 출처 버튼 (2026-11-15 사용자)
+    if e.get("bundle"):   # 한 줄짜리 묶음 — 일반 뉴스 팝업과 같은 모양, 제목 줄은 본문에서 반복 안 함 (2026-11-15 사용자)
         pid = _dk.news_pop_id("bd", e["pop_key"])
         inner = _dk.news_pop_wrap(inner, pid) + _dk.bundle_pop_body(pid, e["title"], e["bundle"])
     elif len(e.get("pop_lines") or []) >= 2:   # 누르면 요약 다섯 줄 팝업 — 방송(P337) · 기사(P341), 데일리 뉴스 탭과 같게. 원문은 팝업 안 작은 링크
