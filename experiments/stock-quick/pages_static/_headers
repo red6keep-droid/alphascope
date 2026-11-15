@@ -1,0 +1,7 @@
+# Cloudflare Pages `alpha-scope.pages.dev` — jsDelivr 예비 (2026-11-15 사용자). 종목 주가 조각을 블로그 페이지(blogspot)가 읽는다.
+# 다른 주소에서 읽으므로 CORS 허용 · 검색 제외(블로그와 중복 문서가 되지 않게) · 브라우저는 매번 확인(배포하면 바로 새 파일).
+/*
+  Access-Control-Allow-Origin: *
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff

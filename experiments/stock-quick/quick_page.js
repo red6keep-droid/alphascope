@@ -1,6 +1,7 @@
 /* 종목 고정 페이지 `stock`(독자에게 보이는 이름 = 종목 주가, 2026-11-14 사용자: 독자 화면에 `간단 정보` 말 금지) — 주소 뒤 종목 코드(?s=UBER · ?s=259960)로 카드 조각을 받아 끼워 넣는다 (2026-11-14, 기획 6-3-1 · 6-6).
    카드 HTML 은 매일 파이썬이 정식 종목 렌더러로 만든다(experiments/stock-quick/full_us.py · full_kr.py) → 기록 없는 브랜치 quick-us · quick-kr.
-   읽는 순서: @quick-us/version.json(매일 purge) → 커밋 번호 → @<커밋>/us/UBER.html. 커밋 번호 주소는 내용이 안 바뀌어 캐시를 지울 일이 없다.
+   읽는 순서: Cloudflare Pages alpha-scope.pages.dev/us/UBER(2026-11-15 예비 추가, 먼저) → jsDelivr @quick-us/version.json(매일 purge) → 커밋 번호 → @<커밋>/us/UBER.html → GitHub 원본.
+   커밋 번호 주소는 내용이 안 바뀌어 캐시를 지울 일이 없다.
    **동기로 받는다** — 본문을 읽는 그 자리에서 끼워 넣어야 테마의 탭 · 봉차트 · 툴팁(페이지를 열 때 한 번 도는 스크립트)이 일반 글처럼 붙는다
    (2026-11-14 목업: 비동기로 나중에 끼우면 탭이 안 생기고 봉차트가 빈 칸). 방문자 한 명 = 요청 2번 · 압축 약 33KB.
    jsDelivr 가 안 되면 GitHub 원본 주소로 한 번 더, 그것도 안 되면 안내 한 줄.
@@ -10,6 +11,7 @@
   if (!root) return;
   var CDN = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@';
   var RAW = 'https://raw.githubusercontent.com/red6keep-droid/alphascope/';
+  var PAGES = 'https://alpha-scope.pages.dev/';   // 먼저 읽는 곳 — 안 되면 jsDelivr → GitHub 원본
   var LIST_US = root.getAttribute('data-list-us') || '/p/us-market-cap-top10.html';
   var LIST_KR = root.getAttribute('data-list-kr') || '/p/kr-market-cap-top10.html';
   var local = root.getAttribute('data-local');
@@ -55,6 +57,11 @@
   if (local) {
     html = getSync(local + path);
   } else {
+    // ① Cloudflare Pages(jsDelivr 예비, 2026-11-15 사용자) — 배포하면 바로 새 파일이라 커밋 번호 단계가 없다. 확장자 없이(.html 이면 308 한 번 더)
+    html = getSync(PAGES + path.replace(/\.html$/, ''));
+    notFound = false;   // Pages 에 없는 것(첫 배포 전 등)만으로 `찾지 못했다`고 하지 않는다 — 아래 jsDelivr 결과로 판단
+  }
+  if (!html && !local) {
     var v = null;
     try { v = JSON.parse(getSync(CDN + branch + '/version.json') || 'null'); } catch (e) { v = null; }
     if (v && v.commit) html = getSync(CDN + v.commit + '/' + path);
