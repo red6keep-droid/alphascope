@@ -438,18 +438,39 @@ def _kr_link_bars(s, ok):
 
 
 def link_record_table(title, recs, theme="neutral"):
-    """연관 종목 기록(고정값) — tech_signals 표(줄 15px · 이름 옆 13px 회색 · 값 보통 굵기 무채색 · 첫 줄 위만 구분선)와 같은 꼴, 로고 16px.
-    recs = [(로고 티커, 이름, 회색 설명, 기록 %p)]. 미국 페이지(한국 연관 종목) · 한국 페이지(미국 연관 종목) 공용 (2026-11-15 사용자: 증권사처럼 연관 종목은 보여 준다, 작게)."""
+    """연관 종목 기록(고정값) — 제목 = 그래프 제목 꼴(※ · 16/24 굵게 + 괄호 작은 회색), 줄 = tech_signals 표(15px · 이름 옆 13px 회색) · 로고 16 · 값 ▲ + 증감 색.
+    줄 사이 = 표보다 5 넓게(누르는 줄 — 줄 전체가 그 종목 페이지 링크, 가이드라인 10-9). recs = [(티커, 이름, 회색 설명, 기록 %p)].
+    미국 페이지(한국 연관 종목) · 한국 페이지(미국 연관 종목) 공용 (2026-11-15 사용자)."""
     import tech_signals as TS
-    rows = []
-    for ksym, nm, what, sp in recs:
-        rows.append(f'<span style="display:inline-flex;align-items:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{_dk.name_logo(ksym, nm, 16) if ksym else ""}{_esc(nm)}'
-                    f'<span style="margin-left:4px;font-size:{TS.WHY_FS};line-height:19px;color:#6B7280;overflow:hidden;text-overflow:ellipsis;">{_esc(what)}</span></span>'
-                    f'<span style="flex:none;color:#111;font-weight:400;">{f"{sp:.1f}".replace("-", "−")}%p</span>')   # 고정 기록 = 색 · ▲▼ 없이 (▲▼ 는 방향 신호 뜻) — `+` 를 붙이면 페이지 처리가 ▲ 빨강으로 바꾼다, 통과 기록은 모두 양수
     line = _dk.darken(_dk.lighten(_dk.lighten(_dk.CARD_DIR[theme][1]), 0.3), 0.02)   # 카드 줄 구분선과 같은 색 (기술지표 표와 같은 셈)
-    head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;">'
-            f'<span>{_esc(title)}</span><span style="font-size:{TS.WHY_FS};line-height:19px;font-weight:400;color:#6B7280;">크게 오른 밤 − 내린 밤, 다음 날 시가</span></span>')   # 기술지표 묶음 제목(_sub) 꼴, 오른쪽 글은 회색(보라 = 많이 보는 지표 뜻이라 안 씀)
-    return head + TS._table(rows, line)
+    out = (f'{_dk.CHART_TITLE_M}{_esc(title)} <span style="font-weight:400;font-size:{R.TINY};color:{R.NOTE};">(크게 오른 밤 − 내린 밤, 다음 날 시가)</span></span>')
+    for i, (sym, nm, what, sp) in enumerate(recs):
+        row = (f'<span style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:{(9 if i == 0 else 5) + 3}px 0 7px;'   # 표(5 · 5)보다 위 3 · 아래 2 → 줄 사이 +5 (2026-11-15 사용자)
+               f'border-top:1px solid {line if i == 0 else "transparent"};font-size:{TS.TABLE_FS};line-height:{TS.TABLE_LH};color:#111;">'
+               f'<span style="display:inline-flex;align-items:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{_dk.name_logo(sym, nm, 16) if sym else ""}{_esc(nm)}'
+               f'<span style="margin-left:4px;font-size:{TS.WHY_FS};line-height:19px;color:#6B7280;overflow:hidden;text-overflow:ellipsis;">{_esc(what)}</span></span>'
+               f'<span style="flex:none;font-weight:400;">{f"{sp:+.1f}".replace("-", "−")}%p</span></span>')   # `+1.9%p` → 페이지 증감 처리가 ▲ + 빨강 (다른 증감 숫자와 같게, 2026-11-15 사용자: 삼각형 붙여)
+        href = _rec_href(sym)
+        out += row.replace("<span ", f'<span data-row-link="1" data-href="{_esc(href)}" ', 1) if href else row   # 줄 전체 = 그 종목 페이지 (가이드라인 10-9)
+    return out
+
+
+_UK = None
+
+
+def _rec_href(sym):
+    """연관 종목 줄 링크 — 미국 정식(stocks.json) · 한국 정식(universe_kr.page_url). 간단 종목은 전용 페이지가 발행되면(QUICK_PUBLISH) 붙인다."""
+    global _UK
+    if not sym:
+        return None
+    if not sym.endswith((".KS", ".KQ")):
+        return _dk.stock_href(sym)
+    if _UK is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("universe_kr_links", os.path.join(_HERE, "..", "kr-stocks", "universe_kr.py"))
+        _UK = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_UK)
+    return _UK.page_url(sym) if sym in _UK.BY_SYM else None
 
 
 def rec_years(n):
