@@ -4,9 +4,15 @@
   <head>
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
     <title><data:view.title.escaped/></title>
+    <!-- 홈 · 목록 페이지는 Blogger 가 목록 속 글 그림을 og:image 로 먼저 단다 → 로고를 그보다 앞에 (카카오 · 페이스북은 첫 그림, 2026-11-15) -->
+    <b:if cond='data:view.isMultipleItems'>
+      <meta content='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png' property='og:image'/>
+      <meta content='1200' property='og:image:width'/>
+      <meta content='600' property='og:image:height'/>
+    </b:if>
     <b:include data='blog' name='all-head-content'/>
     <!-- 공유 썸네일 (2026-11-15 사용자): 본문에 그림이 없는 페이지는 공통 로고. 그림이 있으면 Blogger 가 첫 그림을 og:image 로 단다(주식 공부 = 본문 맨 앞 숨은 썸네일 data-share-img) -->
-    <b:if cond='!data:view.featuredImage'>
+    <b:if cond='!data:view.featuredImage and !data:view.isMultipleItems'>
       <meta content='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png' property='og:image'/>
       <meta content='1200' property='og:image:width'/>
       <meta content='600' property='og:image:height'/>
