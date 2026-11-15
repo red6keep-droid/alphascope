@@ -68,25 +68,36 @@ def course_card(k, name, intro, eps, urls):
                         f'{num}<span style="flex:1 1 auto;min-width:0;font-size:17px;line-height:26px;color:#9CA3AF;word-break:keep-all;">{html.escape(t)}</span>'
                         '<span style="flex:none;margin-left:8px;font-size:13px;line-height:18px;font-weight:700;color:#9CA3AF;white-space:nowrap;">준비 중</span></div>')
     state = f"{len(eps)}편 중 {done}편" if done else f"{len(eps)}편 준비 중"
-    return (f'<section data-course="{k + 1}" style="margin:0 0 20px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;">'
-            f'<div style="padding:16px {dk.ALIGN_PX + 10}px 14px;">'
-            f'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px;">'
+    # 접기 (2026-11-15 사용자): 과정 이름 줄 오른쪽 접기 버튼 · 0편(들어가며)부터 편 목록 전체가 접힌다. details 라 JS 없이 접히고 접힌 글도 검색엔진이 읽는다.
+    # 처음 상태 = 나온 편이 있는 과정만 펼침(지금 1과정), 준비 중뿐인 과정은 접힘. 카드 머리(과정 · 제목 · 소개) 전체가 누르는 자리
+    btn = ('<span class="study-fold" aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;'
+           'border:1px solid #E2E8F0;border-radius:6px;background:#fff;color:#111;box-sizing:border-box;">'
+           '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+           '<path d="M4 6l4 4 4-4"/></svg></span>')
+    return (f'<details data-course="{k + 1}"{" open" if done else ""} style="margin:0 0 20px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;">'
+            f'<summary style="display:block;list-style:none;cursor:pointer;padding:16px {dk.ALIGN_PX + 10}px 14px;">'
+            f'<span style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px;">'
             f'<span style="font-size:14px;line-height:20px;font-weight:700;color:#0F766E;">{k + 1}과정</span>'
-            f'<span style="font-size:13px;line-height:18px;color:{dk.NOTE};">{state}</span></div>'
-            f'<h2 style="margin:0 0 6px;font-size:21px;line-height:30px;font-weight:800;color:#111;word-break:keep-all;">{html.escape(name)}</h2>'
-            f'<p style="margin:0;font-size:15px;line-height:24px;color:#4B5563;word-break:keep-all;">{html.escape(intro)}</p></div>'
-            f'<div style="padding:0 10px;">{"".join(rows)}</div></section>')
+            f'<span style="display:flex;align-items:center;gap:8px;"><span style="font-size:13px;line-height:18px;color:{dk.NOTE};">{state}</span>{btn}</span></span>'
+            f'<span style="display:block;margin:0 0 6px;font-size:21px;line-height:30px;font-weight:800;color:#111;word-break:keep-all;">{html.escape(name)}</span>'
+            f'<span style="display:block;font-size:15px;line-height:24px;color:#4B5563;word-break:keep-all;">{html.escape(intro)}</span></summary>'
+            f'<div style="padding:0 10px;">{"".join(rows)}</div></details>')
+
 
 
 def page(urls):
-    # 맨 위 그림 = 사용자 그림 한 장(중심이 음악 · 상승이 · 하락이 책 읽기, 2026-11-15) — 요청 1회. 폭에 맞춰 줄고 PC 는 360 까지
-    art = (f'<img src="{RC.img_src(os.path.join(HERE, "banner"), "study_head")}" alt="" width="918" height="482" '
-           'style="display:block;width:100%;max-width:360px;height:auto;aspect-ratio:918 / 482;margin:0 auto;border-radius:0;">')
-    head = (f'<div data-study-head="1" style="padding:24px {dk.ALIGN_PX}px 8px;margin:0 0 16px;text-align:center;">'
+    # 맨 위 그림 = 사용자 그림 한 장(중심이 음악 · 상승이 · 하락이 책 읽기, 2026-11-15) — 요청 1회.
+    # 크기 252 × 132 (11-15 사용자: 30% 작게 — 폰 약 360 → 252, 정수 px 라 높이 132 · 비율 차이는 contain 으로)
+    art = (f'<img src="{RC.img_src(os.path.join(HERE, "banner"), "study_head")}" alt="" width="252" height="132" '
+           'style="display:block;width:252px;height:132px;max-width:100%;object-fit:contain;margin:0 auto;border-radius:0;">')
+    head = (f'<div data-study-head="1" style="padding:19px {dk.ALIGN_PX}px 8px;margin:0 0 16px;text-align:center;">'
             f'<div aria-hidden="true" style="margin:0 0 12px;">{art}</div>'
             '<h1 style="margin:0 0 6px;font-size:26px;line-height:36px;font-weight:800;color:#111;">주식 공부</h1>'
             f'<p data-seo-lead="1" style="margin:0;font-size:17px;line-height:26px;color:#333;word-break:keep-all;">{INTRO}</p></div>')
     cards = "".join(course_card(k, *c, urls) for k, c in enumerate(COURSES))
+    # 접기 표시 — 사파리 기본 삼각형 숨김 · 펼치면 화살표 위로 (글 안 style 한 줄, 테마 붙여넣기 없이)
+    cards = ('<style>details[data-course]>summary::-webkit-details-marker{display:none}'
+             'details[data-course] .study-fold svg{transition:transform .15s}details[data-course][open] .study-fold svg{transform:rotate(180deg)}</style>' + cards)
     return (f'<span data-head-label="{RC.HEAD_LABEL}" hidden></span><span data-nav="home" hidden></span>'
             + dk.WRAP_OPEN + head + cards + dk.WRAP_CLOSE)
 
