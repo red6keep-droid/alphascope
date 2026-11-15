@@ -31,12 +31,29 @@ def save_log(rec_dir, iid, row):
         f.write("".join(json.dumps(x, ensure_ascii=False) + "\n" for x in lines))
 
 
-def home_cards(logs, made=None):
+def stock_issues(rec):
+    """종목 이슈(mock_stock_issue, 지금은 젠슨 황 사임 하나) — Hot Issue 틀 그대로, 쪽 · 단계 = 글자 패턴(AI 0). 본문 · 기록 · 홈 카드 줄.
+    2026-11-16 사용자 "젠슨 황 이슈 진행해" — 자동 열고 닫기(목업 설계안)는 아직, 이 이슈만 손으로 연 것."""
+    import datetime as _dt
+    import mock_stock_issue as MS
+    c = MS.collect()
+    slug = IW.CFG[MS.ISS["id"]]["slug"]
+    body = MS.page(c, public=True)
+    with open(os.path.join(OUT, f"{slug}.html"), "w", encoding="utf-8") as f:
+        f.write(body)
+    row = {"day": c["today"].isoformat(), "made": c["now"].isoformat(), "state": None, "n48": c["cur"]["n48"], "base48": c["cur"]["base48"],
+           "hot": c["cur"]["hot"], "gauge": c["word"]}
+    save_log(rec, MS.ISS["id"], row)
+    print(f"[issue-watch] {slug}: {len(body):,}자 · {MS.ISS['id']} 48시간 {row['n48']}건 · 바늘 {row['gauge']}")
+    return MS.ISS, row
+
+
+def home_cards(logs, made=None, extra=()):
     """홈 `Hot Issue` 카드 자료(gh-pages issues.json) — 이슈마다 이름 · 페이지 · 최근 일주일 뉴스 쪽(바늘 말) · 평소보다 뉴스 많음. AI 0 (2026-11-16 사용자).
     바늘 말 색 = 좋은 쪽(종전 · 완화) 빨강 positive · 나쁜 쪽(확전 · 강화) 파랑 negative · 방향미정 = `향방미정` 회색."""
     import datetime as _dt
     out = []
-    for iss in IW.ISSUES:
+    for iss in list(IW.ISSUES) + [x for x in extra if x]:   # extra = 종목 이슈(젠슨 황 등) — 시장 이슈 뒤
         row = logs.get(iss["id"]) or {}
         if not row:
             continue
@@ -68,7 +85,14 @@ def main():
     for iid, row in IW.build.logs.items():
         save_log(rec, iid, row)
         print(f"[issue-watch] {iid}: {row['state']} · 48시간 {row['n48']}건 · 바늘 {row['gauge']}")
-    hc = home_cards(IW.build.logs)
+    logs, extra = dict(IW.build.logs), []
+    try:   # 종목 이슈가 실패해도 시장 이슈 3장 · 홈 카드는 나간다
+        iss, row = stock_issues(rec)
+        logs[iss["id"]] = row
+        extra.append(iss)
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::[issue-watch] 종목 이슈 실패: {e!r}")
+    hc = home_cards(logs, extra=extra)
     with open(os.path.join(OUT, "issues.json"), "w", encoding="utf-8") as f:   # 홈 카드 — 워크플로가 deploy-forecast/ 로 옮겨 gh-pages 에 (07:30 본 실행)
         json.dump(hc, f, ensure_ascii=False)
     print(f"[issue-watch] 홈 카드 {len(hc['issues'])}개")

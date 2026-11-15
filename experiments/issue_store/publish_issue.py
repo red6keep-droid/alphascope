@@ -21,7 +21,8 @@ OUT = os.path.join(HERE, "output", "issue")
 
 def targets():
     out = []
-    for iss in IW.ISSUES:
+    import mock_stock_issue as MS   # 종목 이슈(젠슨 황 사임) — CFG 를 IW 에 끼운다 (2026-11-16 사용자)
+    for iss in list(IW.ISSUES) + [MS.ISS]:
         slug = IW.CFG[iss["id"]]["slug"]
         path = os.path.join(OUT, f"{slug}.html")
         if os.path.exists(path):
