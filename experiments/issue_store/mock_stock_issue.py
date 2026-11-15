@@ -135,7 +135,8 @@ def collect():
     return dict(now=now, today=today, days=days, cur=cur, px=px, counts=counts, r48=r48, evs=evs, word=word)
 
 
-def page(c):
+def page(c, public=False):
+    """public=True = 블로그 발행(issue_watch_daily, 2026-11-16 사용자 "젠슨 황 이슈 진행해") — 운영자 상자 · 아직 없는 닫힘 규칙 안내는 뺀다."""
     now, today, days, cur, px, counts, r48, evs, word = (c[k] for k in ("now", "today", "days", "cur", "px", "counts", "r48", "evs", "word"))
     q = IW.title_h2(ISS)
     # 이 이슈를 연 증시 전망 = 이미 끝난 과거 기록 → 맨 아래 작은 구분선 줄 (2026-11-15 사용자: "끝났고 더 이어지지도 않으니 크게 안 해도 된다" — 옛: 제목 아래 보라 카드)
@@ -161,7 +162,7 @@ def page(c):
         ("AI(운영 때)", "Hot Issue 판정과 같은 방식(json-backup-first, 20건 묶음, 이슈당 하루 최대 5회, 07:30 한 번)"),
         ("주가 기준", f"{SYM_NM} − {SECTOR_NM}, 최근 5거래일 · 사건 뒤({EVENT_BASE} 종가부터), ±3%p = 종목 전망 기준 STOCK_AMIN"),
     ])
-    body = q + gauge + qcards + sec_list + op + tail + link
+    body = q + gauge + qcards + sec_list + ("" if public else op + tail) + link
     body = body.replace('data-cards="1" ', "")
     return dk.fix_colons(f'<div data-head-title="{IW.HEAD_TITLE}" data-seo-lead="{dk.esc(IW.HEAD_TITLE + " — " + ISS["q"] + " 뉴스와 주가 " + align)}">{body}</div>')
 
