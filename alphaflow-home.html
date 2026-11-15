@@ -1258,7 +1258,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 
   <!-- 주식 공부 배너 (2026-11-15 사용자) — 시총 TOP 10 아래 전폭(11-15 사용자: 리포트 카드 아래 → 시총 TOP 10 아래). 미국 · 한국 화면 모두. 그림 = 사용자 제작(experiments/course/banner) -->
   <section class="study-banner" aria-label="주식 공부">
-    <a href="/search/label/%EC%A3%BC%EC%8B%9D%20%EA%B3%B5%EB%B6%80"><img src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp" width="1110" height="344" loading="lazy" decoding="async" alt="주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다"/></a>
+    <a href="/p/study.html"><img src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp" width="1110" height="344" loading="lazy" decoding="async" alt="주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다"/></a>
   </section>
 
   </div><!-- /home-cards -->
@@ -1736,7 +1736,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   var eventLoaded = { us: false, kr: false };
   var STUDY_BG = '#48427F';
   function studySlide() {   /* 일정이 없을 때 주식 공부 배너 (2026-11-15 사용자) — 홈 아래 주식 공부 배너와 같은 곳으로 */
-    var a = el('a', 'eb-slide eb-study'); a.href = '/search/label/%EC%A3%BC%EC%8B%9D%20%EA%B3%B5%EB%B6%80';
+    var a = el('a', 'eb-slide eb-study'); a.href = '/p/study.html';
     var im = document.createElement('img');
     im.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/top_banner.webp?v=2';
     im.width = 1110; im.height = 291; im.alt = '주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'; im.decoding = 'async';

@@ -332,7 +332,7 @@ def render(md, links, next_href="#"):
 
 
 HEAD_LABEL = "주식 공부"   # 머리 줄(글 제목 자리)에 보일 메뉴 이름 (2026-11-10 사용자: 여기에 타이틀 쓰지 말고 메뉴명; 2026-11-14 이름 강좌 → 주식 공부). 글 제목 · 검색 제목은 그대로
-LIST_URL = "https://alpha-scope.blogspot.com/search/label/%EC%A3%BC%EC%8B%9D%20%EA%B3%B5%EB%B6%80"   # 머리 줄 화살표 · 목록 = `주식 공부` 라벨 목록 (2026-11-15 첫 발행: 목록 고정 페이지 /p/study.html 은 아직 — 생기면 여기 · 테마 배너 주소를 함께 바꾼다)
+LIST_URL = "https://alpha-scope.blogspot.com/p/study.html"   # 머리 줄 화살표 · 목록 = 주식 공부 목록 고정 페이지(render_list.py --publish) — 옛 `주식 공부` 라벨 검색 (2026-11-15 사용자: 새 목록 페이지로 안 갔다)
 
 
 def title_block(title):
