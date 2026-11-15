@@ -2111,7 +2111,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 
         <!-- 주식 공부 배너 (2026-11-15 사용자) — 시총 TOP 10 아래 전폭(11-15 사용자: 리포트 카드 아래 → 시총 TOP 10 아래). 미국 · 한국 화면 모두. 그림 = 사용자 제작(experiments/course/banner) -->
         <section class='study-banner' aria-label='주식 공부'>
-          <a href='/search/label/%EC%A3%BC%EC%8B%9D%20%EA%B3%B5%EB%B6%80'><img src='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp' width='1110' height='344' loading='lazy' decoding='async' alt='주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'/></a>
+          <a href='/p/study.html'><img src='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp' width='1110' height='344' loading='lazy' decoding='async' alt='주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'/></a>
         </section>
 
         </div><!-- /home-cards -->
@@ -2164,7 +2164,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
                       <a class='post-nav-list' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;주식 공부&quot;)'/>
                       <b:comment>주식 공부 = 댓글 · TOP 사이 가운데 `주식 공부 목록` 버튼 (2026-11-15 사용자) — 다른 글의 검은 목록 버튼은 숨긴 채</b:comment>
-                      <a class='post-nav-list post-nav-study' href='/search/label/%EC%A3%BC%EC%8B%9D%20%EA%B3%B5%EB%B6%80'>주식 공부 목록</a>
+                      <a class='post-nav-list post-nav-study' href='/p/study.html'>주식 공부 목록</a>
                     <b:elseif cond='data:view.isPage or data:post.labels any (l =&gt; l.name == &quot;미디어 데일리&quot;)'/>
                       <b:comment>인물 발언 = 인물 발언 목록 · 미디어 데일리(방송) = 홈으로 — 둘 다 미국 증시 리포트 목록으로 가던 것 (2026-11-11 사용자)</b:comment>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
@@ -3182,7 +3182,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         var eventLoaded = { us: false, kr: false };
         var STUDY_BG = '#48427F';
         function studySlide() {   /* 일정이 없을 때 주식 공부 배너 (2026-11-15 사용자) — 홈 아래 주식 공부 배너와 같은 곳으로 */
-          var a = el('a', 'eb-slide eb-study'); a.href = '/search/label/%EC%A3%BC%EC%8B%9D%20%EA%B3%B5%EB%B6%80';
+          var a = el('a', 'eb-slide eb-study'); a.href = '/p/study.html';
           var im = document.createElement('img');
           im.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/top_banner.webp?v=2';
           im.width = 1110; im.height = 291; im.alt = '주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'; im.decoding = 'async';
