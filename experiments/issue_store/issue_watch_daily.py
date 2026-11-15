@@ -31,6 +31,23 @@ def save_log(rec_dir, iid, row):
         f.write("".join(json.dumps(x, ensure_ascii=False) + "\n" for x in lines))
 
 
+def home_cards(logs, made=None):
+    """홈 `Hot Issue` 카드 자료(gh-pages issues.json) — 이슈마다 이름 · 페이지 · 최근 일주일 뉴스 쪽(바늘 말) · 평소보다 뉴스 많음. AI 0 (2026-11-16 사용자).
+    바늘 말 색 = 좋은 쪽(종전 · 완화) 빨강 positive · 나쁜 쪽(확전 · 강화) 파랑 negative · 방향미정 = `향방미정` 회색."""
+    import datetime as _dt
+    out = []
+    for iss in IW.ISSUES:
+        row = logs.get(iss["id"]) or {}
+        if not row:
+            continue
+        c = IW.CFG[iss["id"]]
+        g = row.get("gauge") or "방향미정"
+        kind = "positive" if c["good"] in g else "negative" if c["bad"] in g else "neutral"
+        out.append({"id": iss["id"], "name": iss["name"], "url": f"/p/{c['slug']}.html", "gauge": "향방미정" if g == "방향미정" else g,
+                    "kind": kind, "hot": bool(row.get("hot"))})
+    return {"generated": made or _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="minutes"), "issues": out}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--state", required=True, help="상태 저장소 폴더 (워크플로 STATE_DIR)")
@@ -51,6 +68,10 @@ def main():
     for iid, row in IW.build.logs.items():
         save_log(rec, iid, row)
         print(f"[issue-watch] {iid}: {row['state']} · 48시간 {row['n48']}건 · 바늘 {row['gauge']}")
+    hc = home_cards(IW.build.logs)
+    with open(os.path.join(OUT, "issues.json"), "w", encoding="utf-8") as f:   # 홈 카드 — 워크플로가 deploy-forecast/ 로 옮겨 gh-pages 에 (07:30 본 실행)
+        json.dump(hc, f, ensure_ascii=False)
+    print(f"[issue-watch] 홈 카드 {len(hc['issues'])}개")
 
 
 if __name__ == "__main__":

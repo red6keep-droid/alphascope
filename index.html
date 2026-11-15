@@ -403,6 +403,16 @@ body.menu-open { overflow: hidden; }
 #hypo-card .kv-row.plain-row { display: block; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; overflow-wrap: anywhere; }
 #hypo-card .kv-row.plain-row + .kv-row.plain-row { border-top: 1px solid #E2E8F0; padding-top: 12px; margin-top: 8px; }
 #hypo-card .hypo-empty { padding: 14px 0 16px; font-size: 16px; line-height: 24px; color: #7A7A7A; }
+/* 홈 Hot Issue 카드 (2026-11-16 사용자) — 증시 전망 카드와 같은 줄: 이슈 이름(18 · 행간 34) + 바늘 말 라벨(좋은 쪽 종전 · 완화 빨강, 나쁜 쪽 확전 · 강화 파랑, 향방미정 회색 = 뉴스 긍정 · 부정 라벨 색) + `최근 일주일 뉴스` · 평소보다 많음. 자료 = gh-pages issues.json (issue_watch_daily, 07:30), 없으면 카드 숨김 */
+#issue-col { grid-column: 1 / -1; }
+#issue-col[hidden] { display: none; }
+#issue-card { padding: 0 16px; gap: 0; }
+#issue-card .kv-rows { padding: 12px 0 14px; }
+#issue-card .kv-row.plain-row { display: block; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; overflow-wrap: anywhere; }
+#issue-card .kv-row.plain-row + .kv-row.plain-row { border-top: 1px solid #E2E8F0; padding-top: 12px; margin-top: 8px; }
+.news-tag.issue-tag.positive { border-color: #FCA5A5; background: #FEF2F2; color: #B91C1C; }
+.news-tag.issue-tag.negative { border-color: #93C5FD; background: #EFF6FF; color: #1D4ED8; }
+.news-tag.issue-tag.neutral { color: #64748B; }
 #radar-card { padding: 0 16px; gap: 0; }
 /* 인물 발언 · 미디어 데일리 줄 = 글자만 (2026-10-24 사용자: 라벨 · 강도 · 관심도 · 구분선 · 굵게 모두 뺌). 18 · 행간 34 · 보통 굵기, 줄 사이 위아래 4 */
 #radar-card .kv-row.plain-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 7px; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; }
@@ -1618,6 +1628,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .section-title { font-size: 18.5px; line-height: 23.5px; }
   .report-title { font-size: 18.5px; line-height: 23.5px; }
   #hypo-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
+  #issue-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
   #radar-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
   .kv-value { font-size: 16px; line-height: 21px; }
   .kv-stat-value { font-size: 16px; line-height: 23.5px; }
@@ -1997,6 +2008,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
                 <div class='kv-rows' data-hook='hypo-rows'><div class='kv-row'><span class='kv-name'>불러오는 중…</span></div></div>
               </a>
               </div>
+
+        <div class='report-col' id='issue-col' hidden='hidden'>
+        <h3 class='report-title' data-row-link='1' data-href='/p/issue-iran.html'><span class='report-icon' style='background:#0E7490;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M2 10.5a6 6 0 0 1 12 0'/><path d='M8 10.5 5.5 6.5'/><circle cx='8' cy='10.5' r='1.4' fill='currentColor' stroke='none'/></svg></span>Hot Issue<span class='report-card-date' data-date='issue-card'></span></h3>
+        <a class='report-card' id='issue-card' href='/p/issue-iran.html'>
+          <div class='kv-rows' data-hook='issue-rows'></div>
+        </a>
+        </div>
 
               <!-- 주목할 종목 (2026-11-04 사용자 H28: 한국 증시 · 주요 인물 발언처럼 독립 카드) — 지수(S&P 500 · 코스피)가 2% 넘게 내린 날 올랐거나 2%p 넘게 덜 내린 종목, 이름 뒤 `주목` 라벨.
                    stocks.json · kr.json 의 notable (experiments/stock-radar/home_feed.py · kr-stocks/home_feed_kr.py, 하루 1회 종가 기준, 급락일이 아닌 날은 마지막 급락일).
@@ -3331,6 +3349,33 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
           .then(renderHypo)
           .catch(function () { renderHypo(null); });
+
+        /* ================================================= Hot Issue (issues.json, 2026-11-16 사용자) — experiments/issue_store/issue_watch_daily.py 가 07:30 본 실행에 gh-pages 에 올린다.
+           j = { generated, issues: [{ id, name, url, gauge, kind, hot }] }. 줄 = 이슈 이름 + 바늘 말 라벨 + `최근 일주일 뉴스`(평소보다 많으면 덧붙임). 자료가 없으면 카드 숨김(빈 카드 X) */
+        function renderIssues(j) {
+          var col = document.getElementById('issue-col'), box = document.querySelector('[data-hook="issue-rows"]');
+          if (!col || !box) return;
+          var rows = (j && j.issues) || [];
+          if (!rows.length) { col.hidden = true; return; }
+          col.hidden = false;
+          box.textContent = '';
+          rows.forEach(function (q) {
+            var d = el('div', 'kv-row plain-row', q.name);
+            var labels = el('div', 'news-labels');
+            labels.appendChild(el('span', 'news-tag issue-tag ' + (q.kind || 'neutral'), q.gauge || '향방미정'));
+            labels.appendChild(el('span', 'news-sub', '최근 일주일 뉴스' + (q.hot ? ' · 평소보다 많음' : '')));
+            d.appendChild(labels);
+            if (q.url) { d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', q.url); }
+            box.appendChild(d);
+          });
+          var card = document.getElementById('issue-card'), ht = document.querySelector('#issue-col .report-title');
+          if (rows[0].url) { if (card) card.href = rows[0].url; if (ht) ht.setAttribute('data-href', rows[0].url); }
+          if (j.generated) setDate('issue-card', genKo(j.generated));
+        }
+        fetch(GH + 'issues.json?v=' + Date.now())
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(renderIssues)
+          .catch(function () { renderIssues(null); });
 
         fetch(DATA_URL + '?v=' + Date.now())
           .then(function (r) { return r.json(); })
