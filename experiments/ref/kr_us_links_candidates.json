@@ -1,0 +1,2988 @@
+{
+"000100.KS": {
+"pairs": [
+{
+"t": "JNJ",
+"rel": "같은 수요",
+"why": "글로벌 제약사 신약 개발"
+},
+{
+"t": "PFE",
+"rel": "같은 수요",
+"why": "글로벌 제약사 신약 개발"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000120.KS": {
+"pairs": [
+{
+"t": "UPS",
+"rel": "같은 수요",
+"why": "글로벌 물류 네트워크"
+},
+{
+"t": "FDX",
+"rel": "같은 수요",
+"why": "글로벌 물류 네트워크"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000150.KS": {
+"pairs": [
+{
+"t": "CAT",
+"rel": "같은 수요",
+"why": "건설 기계 시장 수요"
+},
+{
+"t": "DE",
+"rel": "같은 수요",
+"why": "건설 및 농기계 시장"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000240.KS": {
+"pairs": [
+{
+"t": "ETN",
+"rel": "같은 수요",
+"why": "전력 기기 및 배터리 부품"
+},
+{
+"t": "PH",
+"rel": "같은 수요",
+"why": "전기 제어 부품 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000250.KQ": {
+"pairs": [
+{
+"t": "ABT",
+"rel": "같은 수요",
+"why": "안과용 의약품 시장"
+},
+{
+"t": "ZBH",
+"rel": "같은 수요",
+"why": "의료기기 및 제약 시장"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000270.KS": {
+"pairs": [
+{
+"t": "TSLA",
+"rel": "같은 수요",
+"why": "전기차 시장 경쟁 및 수요"
+},
+{
+"t": "GM",
+"rel": "같은 수요",
+"why": "글로벌 자동차 시장 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000500.KS": {
+"pairs": [
+{
+"t": "ETN",
+"rel": "같은 수요",
+"why": "전력망 인프라 전선 수요"
+},
+{
+"t": "EMR",
+"rel": "같은 수요",
+"why": "산업용 전력 설비 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000660.KS": {
+"pairs": [
+{
+"t": "NVDA",
+"rel": "고객",
+"why": "HBM 메모리 공급"
+},
+{
+"t": "MSFT",
+"rel": "고객",
+"why": "데이터센터 서버용 메모리"
+},
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 제조 장비 도입"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000720.KS": {
+"pairs": [
+{
+"t": "CAT",
+"rel": "같은 수요",
+"why": "글로벌 건설 인프라 수요"
+},
+{
+"t": "DE",
+"rel": "같은 수요",
+"why": "건설 기계 및 인프라"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000810.KS": {
+"pairs": [
+{
+"t": "AIG",
+"rel": "같은 수요",
+"why": "글로벌 손해보험 시장"
+},
+{
+"t": "CB",
+"rel": "같은 수요",
+"why": "글로벌 손해보험 시장"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000880.KS": {
+"pairs": [
+{
+"t": "RTX",
+"rel": "공급",
+"why": "항공우주 엔진 부품 공급"
+},
+{
+"t": "GE",
+"rel": "공급",
+"why": "항공 엔진 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"000990.KS": {
+"pairs": [
+{
+"t": "ADI",
+"rel": "같은 수요",
+"why": "아날로그 반도체 파운드리"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"001040.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"001120.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"001430.KS": {
+"pairs": [
+{
+"t": "CAT",
+"rel": "공급",
+"why": "건설기계용 특수강 공급"
+},
+{
+"t": "DE",
+"rel": "공급",
+"why": "농기계용 특수강 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"001440.KS": {
+"pairs": [
+{
+"t": "ETN",
+"rel": "공급",
+"why": "전력망 인프라 케이블 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"001450.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"001740.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"001800.KS": {
+"pairs": [
+{
+"t": "MDLZ",
+"rel": "같은 수요",
+"why": "글로벌 제과 시장 경쟁"
+},
+{
+"t": "KHC",
+"rel": "같은 수요",
+"why": "글로벌 식품 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"001820.KS": {
+"pairs": [
+{
+"t": "TSLA",
+"rel": "공급",
+"why": "전기차용 전장 콘덴서 공급"
+},
+{
+"t": "AAPL",
+"rel": "공급",
+"why": "스마트폰용 MLCC 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"002380.KS": {
+"pairs": [
+{
+"t": "GE",
+"rel": "공급",
+"why": "항공기 엔진 소재 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"002790.KS": {
+"pairs": [
+{
+"t": "EL",
+"rel": "같은 수요",
+"why": "글로벌 화장품 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"003230.KS": {
+"pairs": [
+{
+"t": "WMT",
+"rel": "고객",
+"why": "미국 대형마트 라면 납품"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"003380.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"003490.KS": {
+"pairs": [
+{
+"t": "BA",
+"rel": "공급",
+"why": "항공기 기체 부품 공급"
+},
+{
+"t": "GE",
+"rel": "공급",
+"why": "항공기 엔진 유지보수"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"003540.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"003550.KS": {
+"pairs": [
+{
+"t": "AAPL",
+"rel": "고객",
+"why": "전자부품 및 소재 공급"
+},
+{
+"t": "TSLA",
+"rel": "고객",
+"why": "전기차 부품 및 소재 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"003670.KS": {
+"pairs": [
+{
+"t": "GM",
+"rel": "고객",
+"why": "전기차 배터리 소재 공급"
+},
+{
+"t": "ALB",
+"rel": "공급",
+"why": "배터리 핵심 원료 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"003690.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"004020.KS": {
+"pairs": [
+{
+"t": "F",
+"rel": "고객",
+"why": "자동차용 강판 공급"
+},
+{
+"t": "GM",
+"rel": "고객",
+"why": "자동차용 강판 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"004170.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"004370.KS": {
+"pairs": [
+{
+"t": "WMT",
+"rel": "고객",
+"why": "미국 대형마트 라면 공급"
+},
+{
+"t": "COST",
+"rel": "고객",
+"why": "미국 창고형 할인점 입점"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"004800.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"004990.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"005070.KS": {
+"pairs": [
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "이차전지 양극재 소재 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"005290.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "같은 수요",
+"why": "반도체 공정 소재 및 장비"
+},
+{
+"t": "LRCX",
+"rel": "같은 수요",
+"why": "반도체 식각 공정 소재"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"005380.KS": {
+"pairs": [
+{
+"t": "TSLA",
+"rel": "같은 수요",
+"why": "전기차 시장 경쟁 및 수요"
+},
+{
+"t": "F",
+"rel": "같은 수요",
+"why": "미국 자동차 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"005440.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"005490.KS": {
+"pairs": [
+{
+"t": "CAT",
+"rel": "공급",
+"why": "건설기계용 철강재 공급"
+},
+{
+"t": "GM",
+"rel": "공급",
+"why": "자동차용 강판 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"005830.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"005850.KS": {
+"pairs": [
+{
+"t": "GM",
+"rel": "고객",
+"why": "자동차 램프 및 부품 공급"
+},
+{
+"t": "F",
+"rel": "고객",
+"why": "자동차 램프 및 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"005930.KS": {
+"pairs": [
+{
+"t": "AAPL",
+"rel": "고객",
+"why": "스마트폰 및 부품 공급"
+},
+{
+"t": "NVDA",
+"rel": "같은 수요",
+"why": "HBM 메모리 수요"
+},
+{
+"t": "AMD",
+"rel": "같은 수요",
+"why": "HBM 메모리 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"005940.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"006040.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"006120.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"006260.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"006280.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"006360.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"006400.KS": {
+"pairs": [
+{
+"t": "GM",
+"rel": "고객",
+"why": "전기차 배터리 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"006730.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"006800.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"007070.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"007310.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"007340.KS": {
+"pairs": [
+{
+"t": "F",
+"rel": "고객",
+"why": "자동차 부품 공급"
+},
+{
+"t": "GM",
+"rel": "고객",
+"why": "자동차 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"007390.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"007660.KS": {
+"pairs": [
+{
+"t": "NVDA",
+"rel": "고객",
+"why": "AI 가속기용 PCB 공급"
+},
+{
+"t": "CSCO",
+"rel": "고객",
+"why": "네트워크 장비용 PCB 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"007810.KS": {
+"pairs": [
+{
+"t": "AAPL",
+"rel": "고객",
+"why": "스마트폰 기판 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"008770.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"008930.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"009150.KS": {
+"pairs": [
+{
+"t": "AAPL",
+"rel": "고객",
+"why": "스마트폰 카메라 모듈 공급"
+},
+{
+"t": "TSLA",
+"rel": "고객",
+"why": "전장용 MLCC 공급"
+},
+{
+"t": "NVDA",
+"rel": "고객",
+"why": "AI 서버용 기판 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"009420.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"009540.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"009830.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"009970.KS": {
+"pairs": [
+{
+"t": "LULU",
+"rel": "고객",
+"why": "의류 OEM 주요 고객사"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"010060.KS": {
+"pairs": [
+{
+"t": "FSLR",
+"rel": "같은 수요",
+"why": "태양광 폴리실리콘 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"010120.KS": {
+"pairs": [
+{
+"t": "GEV",
+"rel": "같은 수요",
+"why": "전력망 인프라 투자 수요"
+},
+{
+"t": "ETN",
+"rel": "같은 수요",
+"why": "전력 기기 시장 동반 성장"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"010130.KS": {
+"pairs": [
+{
+"t": "FCX",
+"rel": "같은 수요",
+"why": "비철금속 제련 원자재 가격"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"010140.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"010170.KQ": {
+"pairs": [
+{
+"t": "CSCO",
+"rel": "같은 수요",
+"why": "광통신망 인프라 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"010950.KS": {
+"pairs": [
+{
+"t": "XOM",
+"rel": "같은 수요",
+"why": "국제 유가 및 정제 마진"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"011070.KS": {
+"pairs": [
+{
+"t": "AAPL",
+"rel": "고객",
+"why": "아이폰 카메라 모듈 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"011170.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"011200.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"011210.KS": {
+"pairs": [
+{
+"t": "F",
+"rel": "고객",
+"why": "자동차 부품 및 엔진 공급"
+},
+{
+"t": "GM",
+"rel": "고객",
+"why": "자동차 부품 및 엔진 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"011780.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"011790.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"012330.KS": {
+"pairs": [
+{
+"t": "F",
+"rel": "고객",
+"why": "자동차 모듈 및 부품 공급"
+},
+{
+"t": "GM",
+"rel": "고객",
+"why": "자동차 모듈 및 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"012750.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"014620.KQ": {
+"pairs": [
+{
+"t": "SLB",
+"rel": "같은 수요",
+"why": "에너지 플랜트 배관 수요"
+},
+{
+"t": "HAL",
+"rel": "같은 수요",
+"why": "에너지 플랜트 배관 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"014680.KS": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 공정용 과산화수소"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"015760.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"016360.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"017670.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"017800.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"018260.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"018670.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"018880.KS": {
+"pairs": [
+{
+"t": "F",
+"rel": "고객",
+"why": "자동차 공조 부품 공급"
+},
+{
+"t": "GM",
+"rel": "고객",
+"why": "자동차 공조 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"020150.KS": {
+"pairs": [
+{
+"t": "TSLA",
+"rel": "같은 수요",
+"why": "전기차 배터리 동박 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"020560.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"021240.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"022100.KS": {
+"pairs": [
+{
+"t": "AMZN",
+"rel": "고객",
+"why": "물류 자동화 시스템 고객"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"023160.KQ": {
+"pairs": [
+{
+"t": "XOM",
+"rel": "같은 수요",
+"why": "에너지 플랜트 배관 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"023530.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"023590.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"024110.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"026960.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"028050.KS": {
+"pairs": [
+{
+"t": "XOM",
+"rel": "고객",
+"why": "석유화학 플랜트 건설 수주"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"028260.KS": {
+"pairs": [
+{
+"t": "AMZN",
+"rel": "고객",
+"why": "물류센터 건설 및 설비"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"028300.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"028670.KS": {
+"pairs": [
+{
+"t": "ADM",
+"rel": "고객",
+"why": "곡물 해상 운송 서비스"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"029780.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"030000.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"030200.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"030530.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 장비 부품 공급"
+},
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "반도체 장비 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"031210.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"031330.KQ": {
+"pairs": [
+{
+"t": "MU",
+"rel": "공급",
+"why": "메모리 반도체 유통"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"031980.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 후공정 장비 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"032190.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"032500.KQ": {
+"pairs": [
+{
+"t": "CSCO",
+"rel": "공급",
+"why": "통신 장비 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"032640.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"032820.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"032830.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"033100.KQ": {
+"pairs": [
+{
+"t": "ETN",
+"rel": "같은 수요",
+"why": "전력망 인프라 투자 확대"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"033640.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 후공정 장비 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"033780.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"033790.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"034020.KS": {
+"pairs": [
+{
+"t": "GEV",
+"rel": "같은 수요",
+"why": "원자력 및 발전 설비 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"034220.KS": {
+"pairs": [
+{
+"t": "AAPL",
+"rel": "고객",
+"why": "아이폰용 OLED 패널 공급"
+},
+{
+"t": "META",
+"rel": "고객",
+"why": "VR 기기용 디스플레이 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"034730.KS": {
+"pairs": [
+{
+"t": "PLTR",
+"rel": "지분",
+"why": "AI 데이터 분석 협력 및 지분"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"035250.KS": {
+"pairs": [
+{
+"t": "LVS",
+"rel": "같은 수요",
+"why": "글로벌 카지노 레저 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"035420.KS": {
+"pairs": [
+{
+"t": "GOOGL",
+"rel": "같은 수요",
+"why": "검색 및 광고 시장 경쟁"
+},
+{
+"t": "MSFT",
+"rel": "같은 수요",
+"why": "AI 검색 및 클라우드 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"035720.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"035760.KQ": {
+"pairs": [
+{
+"t": "DIS",
+"rel": "같은 수요",
+"why": "OTT 콘텐츠 및 미디어 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"035900.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"036460.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"036540.KQ": {
+"pairs": [
+{
+"t": "MU",
+"rel": "고객",
+"why": "반도체 후공정 패키징"
+},
+{
+"t": "AMD",
+"rel": "고객",
+"why": "반도체 후공정 패키징"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"036570.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"036810.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 장비 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"036830.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"036930.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "같은 수요",
+"why": "반도체 증착 장비 경쟁"
+},
+{
+"t": "LRCX",
+"rel": "같은 수요",
+"why": "반도체 식각 장비 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"038500.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"039030.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 레이저 장비 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"039200.KQ": {
+"pairs": [
+{
+"t": "LLY",
+"rel": "같은 수요",
+"why": "알츠하이머 치료제 개발"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"039490.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"041510.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"041830.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"041960.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"042660.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"042700.KS": {
+"pairs": [
+{
+"t": "NVDA",
+"rel": "같은 수요",
+"why": "HBM 제조용 장비 수요"
+},
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 후공정 장비 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"043260.KQ": {
+"pairs": [
+{
+"t": "MSFT",
+"rel": "고객",
+"why": "서버용 전원 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"044490.KQ": {
+"pairs": [
+{
+"t": "GE",
+"rel": "공급",
+"why": "풍력 및 발전기용 단조 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"047040.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"047050.KS": {
+"pairs": [
+{
+"t": "ADM",
+"rel": "같은 수요",
+"why": "글로벌 곡물 트레이딩 및 유통"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"048410.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"050890.KQ": {
+"pairs": [
+{
+"t": "CSCO",
+"rel": "같은 수요",
+"why": "통신 네트워크 장비 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"051600.KS": {
+"pairs": [
+{
+"t": "GEV",
+"rel": "공급",
+"why": "발전 설비 유지보수 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"051900.KS": {
+"pairs": [
+{
+"t": "EL",
+"rel": "같은 수요",
+"why": "글로벌 화장품 시장 경쟁"
+},
+{
+"t": "PG",
+"rel": "같은 수요",
+"why": "생활용품 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"051910.KS": {
+"pairs": [
+{
+"t": "ALB",
+"rel": "같은 수요",
+"why": "이차전지 소재 및 리튬 시장"
+},
+{
+"t": "DD",
+"rel": "같은 수요",
+"why": "화학 소재 및 산업용 소재"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"052690.KS": {
+"pairs": [
+{
+"t": "GEV",
+"rel": "공급",
+"why": "원자력 및 발전소 설계 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"053610.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 후공정 장비 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"053800.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"055550.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"056090.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"056190.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 제조 장비 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"058470.KQ": {
+"pairs": [
+{
+"t": "QCOM",
+"rel": "고객",
+"why": "반도체 테스트 소켓 공급"
+},
+{
+"t": "NVDA",
+"rel": "고객",
+"why": "반도체 테스트 소켓 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"058610.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"059090.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 세라믹 부품 공급"
+},
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "반도체 세라믹 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"060370.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"062040.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"064290.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 검사 장비 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"064350.KS": {
+"pairs": [
+{
+"t": "GE",
+"rel": "공급",
+"why": "방산 및 철도 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"064400.KS": {
+"pairs": [
+{
+"t": "MSFT",
+"rel": "고객",
+"why": "클라우드 및 AI 솔루션 협력"
+},
+{
+"t": "AMZN",
+"rel": "고객",
+"why": "클라우드 인프라 구축 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"064760.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 식각 공정 부품 공급"
+},
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "반도체 식각 장비 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"065350.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"066570.KS": {
+"pairs": [
+{
+"t": "AMZN",
+"rel": "고객",
+"why": "가전 및 전장 부품 공급"
+},
+{
+"t": "MSFT",
+"rel": "고객",
+"why": "클라우드 및 AI 가전 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"066970.KS": {
+"pairs": [
+{
+"t": "TSLA",
+"rel": "고객",
+"why": "전기차 배터리 양극재 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"067310.KQ": {
+"pairs": [
+{
+"t": "MU",
+"rel": "고객",
+"why": "반도체 후공정 패키징 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"068270.KS": {
+"pairs": [
+{
+"t": "AMGN",
+"rel": "같은 수요",
+"why": "바이오시밀러 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"068760.KQ": {
+"pairs": [
+{
+"t": "PFE",
+"rel": "같은 수요",
+"why": "바이오 의약품 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"069620.KS": {
+"pairs": [
+{
+"t": "ABBV",
+"rel": "같은 수요",
+"why": "보툴리눔 톡신 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"069960.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"071050.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"071970.KS": {
+"pairs": [
+{
+"t": "CAT",
+"rel": "같은 수요",
+"why": "건설기계 엔진 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"073240.KS": {
+"pairs": [
+{
+"t": "F",
+"rel": "고객",
+"why": "자동차 타이어 공급"
+},
+{
+"t": "GM",
+"rel": "고객",
+"why": "자동차 타이어 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"074600.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 쿼츠 부품 공급"
+},
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "반도체 쿼츠 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"077360.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 패키징 소재 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"078600.KQ": {
+"pairs": [
+{
+"t": "TSLA",
+"rel": "고객",
+"why": "전기차 배터리 음극재 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"078930.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"080220.KQ": {
+"pairs": [
+{
+"t": "MU",
+"rel": "같은 수요",
+"why": "메모리 반도체 시장 동향"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"081660.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"082740.KS": {
+"pairs": [
+{
+"t": "CAT",
+"rel": "고객",
+"why": "선박용 엔진 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"082920.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"083450.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 스크러버 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"083650.KQ": {
+"pairs": [
+{
+"t": "GEV",
+"rel": "같은 수요",
+"why": "발전소 설비 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"084370.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "같은 수요",
+"why": "반도체 증착 장비 수요"
+},
+{
+"t": "LRCX",
+"rel": "같은 수요",
+"why": "반도체 식각 장비 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"085620.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"085660.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"086280.KS": {
+"pairs": [
+{
+"t": "F",
+"rel": "고객",
+"why": "자동차 물류 서비스"
+},
+{
+"t": "GM",
+"rel": "고객",
+"why": "자동차 물류 서비스"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"086450.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"086520.KQ": {
+"pairs": [
+{
+"t": "ALB",
+"rel": "같은 수요",
+"why": "이차전지 소재 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"086790.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"087010.KQ": {
+"pairs": [
+{
+"t": "LLY",
+"rel": "고객",
+"why": "비만 치료제 기술 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"088350.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"089030.KQ": {
+"pairs": [
+{
+"t": "MU",
+"rel": "고객",
+"why": "메모리 테스트 장비 공급"
+},
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 검사 장비 부품"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"089860.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"089970.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"090360.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"090430.KS": {
+"pairs": [
+{
+"t": "EL",
+"rel": "같은 수요",
+"why": "글로벌 화장품 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"090710.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"092870.KQ": {
+"pairs": [
+{
+"t": "MU",
+"rel": "고객",
+"why": "메모리 테스터 장비 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"093370.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"095340.KQ": {
+"pairs": [
+{
+"t": "NVDA",
+"rel": "같은 수요",
+"why": "AI 반도체 테스트 소켓 수요"
+},
+{
+"t": "INTC",
+"rel": "같은 수요",
+"why": "CPU 테스트 소켓 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"095610.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "같은 수요",
+"why": "반도체 증착 장비 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"096530.KQ": {
+"pairs": [
+{
+"t": "TMO",
+"rel": "같은 수요",
+"why": "진단 키트 및 장비 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"096770.KS": {
+"pairs": [
+{
+"t": "F",
+"rel": "고객",
+"why": "전기차 배터리 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"097230.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"097950.KS": {
+"pairs": [
+{
+"t": "COST",
+"rel": "고객",
+"why": "식품 및 가공식품 납품"
+},
+{
+"t": "WMT",
+"rel": "고객",
+"why": "식품 및 가공식품 납품"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"098460.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "같은 수요",
+"why": "반도체 검사 장비 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"099320.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"100790.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"101490.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 노광 공정용 블랭크 마스크 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"102710.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 공정용 프로세스 케미칼 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"103140.KS": {
+"pairs": [
+{
+"t": "CAT",
+"rel": "같은 수요",
+"why": "산업용 구리 소재 및 방산 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"103590.KS": {
+"pairs": [
+{
+"t": "GEV",
+"rel": "같은 수요",
+"why": "전력망 인프라 및 변압기 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"105560.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"108490.KQ": {
+"pairs": [
+{
+"t": "ROK",
+"rel": "같은 수요",
+"why": "산업용 로봇 및 자동화 솔루션"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"111770.KS": {
+"pairs": [
+{
+"t": "LULU",
+"rel": "고객",
+"why": "의류 OEM 생산 고객사"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"112610.KS": {
+"pairs": [
+{
+"t": "NEE",
+"rel": "같은 수요",
+"why": "풍력 발전 타워 및 재생에너지 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"115180.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"119850.KQ": {
+"pairs": [
+{
+"t": "BE",
+"rel": "같은 수요",
+"why": "비상 발전기 및 연료전지 시장"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"120110.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"121600.KQ": {
+"pairs": [
+{
+"t": "ALB",
+"rel": "같은 수요",
+"why": "이차전지 도전재 소재 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"122640.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 장비 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"122870.KQ": {
+"pairs": [
+{
+"t": "AAPL",
+"rel": "고객",
+"why": "애플뮤직 음원 유통"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"124500.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"126340.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"127120.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"128940.KS": {
+"pairs": [
+{
+"t": "MRK",
+"rel": "고객",
+"why": "의약품 라이선스 아웃"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"131290.KQ": {
+"pairs": [
+{
+"t": "INTC",
+"rel": "고객",
+"why": "반도체 검사 장비 공급"
+},
+{
+"t": "MU",
+"rel": "고객",
+"why": "메모리 테스트 소켓 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"131970.KQ": {
+"pairs": [
+{
+"t": "NVDA",
+"rel": "같은 수요",
+"why": "시스템 반도체 테스트 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"137400.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "이차전지 제조 장비 부품"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"138040.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"138930.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"139130.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"139480.KS": {
+"pairs": [
+{
+"t": "WMT",
+"rel": "같은 수요",
+"why": "대형 오프라인 유통업"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"140410.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"140860.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 계측 장비 공급"
+},
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "반도체 계측 장비 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"141080.KQ": {
+"pairs": [
+{
+"t": "AMGN",
+"rel": "같은 수요",
+"why": "항체 약물 접합체 개발"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"145020.KQ": {
+"pairs": [
+{
+"t": "ABBV",
+"rel": "같은 수요",
+"why": "보툴리눔 톡신 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"160190.KQ": {
+"pairs": [
+{
+"t": "ROK",
+"rel": "같은 수요",
+"why": "산업용 모터 및 자동화"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"161390.KS": {
+"pairs": [
+{
+"t": "F",
+"rel": "고객",
+"why": "자동차 타이어 공급"
+},
+{
+"t": "GM",
+"rel": "고객",
+"why": "자동차 타이어 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"161580.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "디스플레이 장비 부품"
+},
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "반도체 장비 부품"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"161890.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"166090.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 식각 부품 공급"
+},
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "반도체 식각 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"171090.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "같은 수요",
+"why": "OLED 증착 장비 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"175330.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"178320.KQ": {
+"pairs": [
+{
+"t": "CSCO",
+"rel": "고객",
+"why": "통신 장비 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"180640.KS": {
+"pairs": [
+{
+"t": "DAL",
+"rel": "같은 수요",
+"why": "항공 여객 수요 동조화"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"181710.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"183300.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 세정 코팅 서비스"
+},
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "반도체 세정 코팅 서비스"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"189300.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"192820.KS": {
+"pairs": [
+{
+"t": "EL",
+"rel": "고객",
+"why": "화장품 제조 및 공급"
+},
+{
+"t": "PG",
+"rel": "고객",
+"why": "화장품 제조 및 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"195940.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"196170.KQ": {
+"pairs": [
+{
+"t": "MRK",
+"rel": "고객",
+"why": "피하주사 제형 변경 기술 라이선스"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"204270.KQ": {
+"pairs": [
+{
+"t": "AAPL",
+"rel": "고객",
+"why": "스마트폰 커버글라스 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"204320.KS": {
+"pairs": [
+{
+"t": "F",
+"rel": "고객",
+"why": "자동차 부품 공급"
+},
+{
+"t": "GM",
+"rel": "고객",
+"why": "자동차 부품 공급"
+},
+{
+"t": "TSLA",
+"rel": "고객",
+"why": "전기차 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"207940.KS": {
+"pairs": [
+{
+"t": "BMY",
+"rel": "고객",
+"why": "바이오 의약품 위탁 생산"
+},
+{
+"t": "MRK",
+"rel": "고객",
+"why": "바이오 의약품 위탁 생산"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"213420.KQ": {
+"pairs": [
+{
+"t": "AAPL",
+"rel": "고객",
+"why": "OLED 소재 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"214150.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"214370.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"214450.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"218410.KQ": {
+"pairs": [
+{
+"t": "QCOM",
+"rel": "고객",
+"why": "5G 통신용 질화갈륨 전력증폭기 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"222080.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"222800.KQ": {
+"pairs": [
+{
+"t": "MU",
+"rel": "고객",
+"why": "메모리 모듈용 PCB 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"225570.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"226950.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"229640.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"232140.KQ": {
+"pairs": [
+{
+"t": "MU",
+"rel": "고객",
+"why": "메모리 반도체 검사장비 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"237690.KQ": {
+"pairs": [
+{
+"t": "MRK",
+"rel": "고객",
+"why": "올리고핵산 치료제 원료 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"240810.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "같은 수요",
+"why": "반도체 증착 장비 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"241560.KS": {
+"pairs": [
+{
+"t": "CAT",
+"rel": "같은 수요",
+"why": "건설 기계 글로벌 수요"
+},
+{
+"t": "DE",
+"rel": "같은 수요",
+"why": "농기계 및 건설 장비 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"241710.KQ": {
+"pairs": [
+{
+"t": "EL",
+"rel": "고객",
+"why": "화장품 제조 위탁 생산"
+},
+{
+"t": "PG",
+"rel": "고객",
+"why": "글로벌 뷰티 브랜드 제조"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"247540.KQ": {
+"pairs": [
+{
+"t": "TSLA",
+"rel": "고객",
+"why": "전기차 배터리 양극재 공급"
+},
+{
+"t": "F",
+"rel": "고객",
+"why": "전기차 배터리 소재 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"251270.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"251970.KQ": {
+"pairs": [
+{
+"t": "EL",
+"rel": "고객",
+"why": "화장품 용기 공급"
+},
+{
+"t": "PG",
+"rel": "고객",
+"why": "생활용품 패키징 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"252990.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 테스트 프로브 카드"
+},
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "반도체 검사 장비 부품"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"253590.KQ": {
+"pairs": [
+{
+"t": "MU",
+"rel": "고객",
+"why": "메모리 반도체 검사 장비"
+},
+{
+"t": "INTC",
+"rel": "고객",
+"why": "반도체 후공정 테스트 장비"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"257720.KQ": {
+"pairs": [
+{
+"t": "AMZN",
+"rel": "고객",
+"why": "K-뷰티 유통 플랫폼"
+},
+{
+"t": "WMT",
+"rel": "고객",
+"why": "K-뷰티 제품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"259960.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"263750.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"267250.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"267260.KS": {
+"pairs": [
+{
+"t": "GEV",
+"rel": "같은 수요",
+"why": "전력망 인프라 투자 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"267270.KS": {
+"pairs": [
+{
+"t": "CAT",
+"rel": "같은 수요",
+"why": "글로벌 건설 기계 수요"
+},
+{
+"t": "DE",
+"rel": "같은 수요",
+"why": "건설 및 농기계 시장 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"271560.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"272210.KS": {
+"pairs": [
+{
+"t": "RTX",
+"rel": "같은 수요",
+"why": "방산 시스템 및 부품 수요"
+},
+{
+"t": "LMT",
+"rel": "같은 수요",
+"why": "글로벌 방위산업 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"277810.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"278470.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"279570.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"281740.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 전구체 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"281820.KS": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 장비 부품 공급"
+},
+{
+"t": "LRCX",
+"rel": "공급",
+"why": "반도체 식각 장비 부품"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"282330.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"290650.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"293490.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"294870.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"295310.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"298040.KS": {
+"pairs": [
+{
+"t": "GEV",
+"rel": "같은 수요",
+"why": "전력망 및 변압기 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"298380.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"302440.KS": {
+"pairs": [
+{
+"t": "PFE",
+"rel": "고객",
+"why": "백신 위탁 생산 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"307950.KS": {
+"pairs": [
+{
+"t": "MSFT",
+"rel": "공급",
+"why": "차량용 클라우드 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"310210.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"316140.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"319400.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"319660.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "같은 수요",
+"why": "반도체 전공정 장비 시장"
+},
+{
+"t": "LRCX",
+"rel": "같은 수요",
+"why": "반도체 식각 장비 시장"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"322000.KS": {
+"pairs": [
+{
+"t": "FSLR",
+"rel": "같은 수요",
+"why": "태양광 모듈 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"323280.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "PCB 자동화 설비 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"323410.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"326030.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"327260.KQ": {
+"pairs": [
+{
+"t": "AVGO",
+"rel": "공급",
+"why": "통신용 패키지 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"328130.KQ": {
+"pairs": [
+{
+"t": "GEHC",
+"rel": "고객",
+"why": "의료 AI 솔루션 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"329180.KS": {
+"pairs": [
+{
+"t": "GEV",
+"rel": "공급",
+"why": "선박용 엔진 부품 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"336260.KS": {
+"pairs": [
+{
+"t": "BE",
+"rel": "같은 수요",
+"why": "수소 연료전지 시장 동반 성장"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"347700.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"347850.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"352820.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"353200.KS": {
+"pairs": [
+{
+"t": "INTC",
+"rel": "고객",
+"why": "반도체 패키지 기판 공급"
+},
+{
+"t": "AMD",
+"rel": "고객",
+"why": "서버용 반도체 기판 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"356860.KQ": {
+"pairs": [
+{
+"t": "MU",
+"rel": "고객",
+"why": "메모리 모듈용 PCB 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"357780.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"361610.KS": {
+"pairs": [
+{
+"t": "GM",
+"rel": "고객",
+"why": "전기차 배터리 분리막 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"373220.KS": {
+"pairs": [
+{
+"t": "GM",
+"rel": "고객",
+"why": "전기차 배터리 셀 공급"
+},
+{
+"t": "TSLA",
+"rel": "고객",
+"why": "전기차 배터리 셀 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"375500.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"377300.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"383220.KS": {
+"pairs": [
+{
+"t": "TPR",
+"rel": "같은 수요",
+"why": "글로벌 패션 소비 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"388210.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"388720.KQ": {
+"pairs": [
+{
+"t": "TSLA",
+"rel": "고객",
+"why": "자동차 제조 로봇 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"402340.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"403870.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "같은 수요",
+"why": "반도체 전공정 장비 수요"
+},
+{
+"t": "LRCX",
+"rel": "같은 수요",
+"why": "반도체 식각 장비 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"415640.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"417200.KQ": {
+"pairs": [
+{
+"t": "TSLA",
+"rel": "고객",
+"why": "전기차용 울트라커패시터"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"420770.KQ": {
+"pairs": [
+{
+"t": "AMAT",
+"rel": "공급",
+"why": "반도체 검사 장비 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"425420.KQ": {
+"pairs": [
+{
+"t": "INTC",
+"rel": "고객",
+"why": "반도체 테스트 소켓 공급"
+},
+{
+"t": "MU",
+"rel": "고객",
+"why": "메모리 테스트 소켓 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"437730.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"439260.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"440110.KQ": {
+"pairs": [
+{
+"t": "WDC",
+"rel": "같은 수요",
+"why": "SSD 컨트롤러 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"443060.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"445680.KQ": {
+"pairs": [
+{
+"t": "TMO",
+"rel": "공급",
+"why": "생명과학 연구 장비 공급"
+},
+{
+"t": "DHR",
+"rel": "공급",
+"why": "바이오 분석 장비 공급"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"450080.KS": {
+"pairs": [
+{
+"t": "TSLA",
+"rel": "같은 수요",
+"why": "전기차 배터리 소재 수요"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"454910.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"456160.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"457190.KS": {
+"pairs": [
+{
+"t": "ALB",
+"rel": "같은 수요",
+"why": "전고체 배터리 소재 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"458870.KQ": {
+"pairs": [
+{
+"t": "GEHC",
+"rel": "같은 수요",
+"why": "디지털 헬스케어 모니터링"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"462870.KS": {
+"pairs": [
+{
+"t": "TTWO",
+"rel": "같은 수요",
+"why": "글로벌 게임 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"466100.KQ": {
+"pairs": [
+{
+"t": "VRT",
+"rel": "같은 수요",
+"why": "로봇 및 자동화 인프라"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"475150.KS": {
+"pairs": [
+{
+"t": "NEE",
+"rel": "같은 수요",
+"why": "신재생 에너지 발전 사업"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"476060.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"476830.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"483650.KS": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+},
+"489790.KS": {
+"pairs": [
+{
+"t": "AXON",
+"rel": "같은 수요",
+"why": "보안 및 영상 감시 솔루션"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"490470.KQ": {
+"pairs": [
+{
+"t": "SNPS",
+"rel": "공급",
+"why": "반도체 설계 자동화 협력"
+},
+{
+"t": "CDNS",
+"rel": "공급",
+"why": "반도체 설계 솔루션 협력"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"491000.KQ": {
+"pairs": [
+{
+"t": "ISRG",
+"rel": "같은 수요",
+"why": "수술용 로봇 시장 경쟁"
+}
+],
+"model": "gemini-3.1-flash-lite"
+},
+"950160.KQ": {
+"pairs": [],
+"model": "gemini-3.1-flash-lite"
+}
+}
