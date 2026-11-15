@@ -103,7 +103,10 @@ def q_price(px, word):
     tip = (f"주가 = {SYM_NM}에서 같은 업종 지수({SECTOR_NM}) 움직임을 뺀 값 — 업종 전체가 같이 움직인 몫은 빼고 이 회사 일만.\n"
            "업종보다 3%p 넘게 더 빠지면 악화 쪽, 더 오르면 수습 쪽 (증시 전망 종목 기준과 같은 선).\n"
            "사건 뒤 전체 = 사건 전 마지막 종가(증시 전망 기준일)부터.\n예측이 아니라 지금까지 일어난 일입니다.")
-    th, ink = IW._theme(mk is not None)
+    # 카드 색 = 답 방향 (가이드라인 7-1: 답에 보라 금지) — 같은 쪽(악화) = 파랑 · 같은 쪽(수습) = 빨강 카드, 엇갈림 · 업종과 비슷 = 회색.
+    # 옛: 움직임이 있으면 보라(IW._theme) → `같은 쪽 (악화)` 가 보라 카드에 파랑 쪽 말이라 왜 보라인지 안 읽혔다 (2026-11-15 사용자)
+    side = mk if (ns is None or ns == mk) else None
+    th, ink = {"수습": ("positive", dk.UP), "악화": ("negative", dk.DOWN)}.get(side, ("neutral", "#111"))
     lines = [(first, "rich")] + rows + [(IW._excl(f"미국 {H.md(d1.strftime('%Y-%m-%d'))} 종가 기준입니다."), "html")]
     return IW._good_red(qc.question_card("주가도 같은 쪽인가?", ans, th, ink, lines, tip=tip)), ans, g5
 

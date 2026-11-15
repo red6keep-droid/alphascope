@@ -913,6 +913,7 @@ def _day_pop(pid, day, evs):
 
 
 TL_MORE_STEP = H.MORE_STEP   # 더 보기 한 번에 10일 — 증시 전망 `지난 경과 더 보기` 와 같은 버튼 · 같은 개수 (2026-11-13 사용자)
+TL_TRI_PX = 12   # News Timeline 날짜 줄 ▲ · ▼ = 13 에서 1 작게 (2026-11-15 사용자: 가격 옆 삼각형이 커 보인다 — 5절 80% 의 예외, 숫자와 2 · 위로 1 은 그대로)
 TL_BOTTOM = 5   # 타임라인 아래 더 띄움 (2026-11-13 사용자 "5픽셀 정도 더")
 TL_TITLE_MORE = 3   # `News Timeline` 제목 ~ 첫 날짜 = 쪽 라벨 줄 ~ 다음 날짜(아래 10 + 날짜 사이 15 + 위 10 = 35)보다 3 넓게 = 38 (2026-11-15 사용자, Chrome 실측) — 옛 11 + 10 = 21
 TL_TITLE_BELOW = 2 * (12 - dk.VP) + H.TL_DAY_GAP + TL_TITLE_MORE
@@ -970,7 +971,7 @@ def news_timeline(evs, days_desc, px=None):
             return ""
         chg = (c / p - 1) * 100
         # 삼각형 = 가이드 5절(그 자리 글자 16 의 80% = 13 · 위로 1 · 숫자와 2, dk.tri_span) — 옛: 14 + 띄어쓰기 한 칸 (2026-11-15 사용자 "삼각형 가이드 맞춰줘")
-        val = (f'<span style="color:{dk.UP if chg > 0 else dk.DOWN};font-weight:400;white-space:nowrap;">{dk.tri_span(chg > 0, int(dk.NAME.rstrip("px")))}{abs(chg):.1f}%</span>'
+        val = (f'<span style="color:{dk.UP if chg > 0 else dk.DOWN};font-weight:400;white-space:nowrap;">{dk.tri_span(chg > 0, TL_TRI_PX / 0.8)}{abs(chg):.1f}%</span>'
                if round(chg, 1) != 0 else '<span style="color:#111;">0.0%</span>')
         return (f'<span style="font-weight:400;color:{dk.SUB};white-space:nowrap;">{dk.esc(ref_nm)}</span>'
                 f'<span style="font-weight:400;color:#111;white-space:nowrap;">{dk.esc(ref_fmt.format(c))}</span>'
@@ -1412,7 +1413,10 @@ def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
            "평소의 몇 배 = 이 지표가 보통 5거래일에 움직이는 폭(직전 60거래일 기준)의 몇 배인지, 1배 넘으면 그 쪽.\n"
            "흔한 설명 = 시장에서 흔히 쓰는 설명(교과서 · 언론), AlphaScope의 주장이 아님.\n"
            "예측이 아니라 지금까지 일어난 일입니다.")
-    th, ink = _theme(mk not in ("평소 범위",))
+    # 카드 색 = 답 방향 (가이드라인 7-1: 답에 보라 금지, 2026-11-15 사용자) — 같은 쪽 · 시장만 한쪽 = 그 쪽 색(좋은 쪽 빨강 · 나쁜 쪽 파랑),
+    # 엇갈림 · 시장 안에서 엇갈림 · 평소 범위 = 회색. 옛: 움직임이 있으면 보라(_theme)
+    side = mk if (mk in (g, b) and (ns is None or ns == mk)) else None
+    th, ink = ("positive", dk.UP) if side == g else ("negative", dk.DOWN) if side == b else ("neutral", "#111")
     return qc.question_card("시장도 같은 쪽인가?", ans, th, ink, lines, tip=tip), ans
 
 
