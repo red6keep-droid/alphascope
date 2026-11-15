@@ -1057,7 +1057,7 @@ def name_logo(sym, name="", size=24):
     if not name:
         return ""
     return (f'<span aria-hidden="true" style="display:inline-block;flex:none;width:{size}px;height:{size}px;line-height:{size}px;border-radius:50%;margin-right:8px;'
-            f'background:#E2E8F0;color:#334155;font-size:12px;font-weight:700;text-align:center;">{esc(str(name)[:1])}</span>')
+            f'background:#E2E8F0;color:#334155;font-size:{max(8, size // 2)}px;font-weight:700;text-align:center;">{esc(str(name)[:1])}</span>')
 
 
 def link_icon(url, label):
