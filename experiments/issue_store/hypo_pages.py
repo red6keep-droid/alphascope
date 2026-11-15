@@ -1097,7 +1097,7 @@ def _now_plain(fc, st):
     rows, chart = _now_block(fc, st, parts=True)
     # 첫 줄(자 이름 · 값 · `종가 대비 · 꽤 오름`)은 그래프 제목과 겹쳐 지우고 값만 그래프 제목 오른쪽에 한 줄로 (P428, 2026-11-08 사용자). 나머지 줄(회복 폭 · 불안 지수)은 그대로
     first, rest = (rows[0], rows[1:]) if rows else (None, [])
-    out = _plain_rows("", [(n, fmt_tri(v), note) for n, v, note in rest]) if rest else ""
+    out = _plain_rows("", [(n, fmt_tri(v), note) for n, v, note in rest], inset=True) if rest else ""
     if chart:
         if first and first[1]:
             head_start = chart.find(dk.CHART_TITLE_M)
@@ -1106,7 +1106,7 @@ def _now_plain(fc, st):
                 title = chart[head_start + len(dk.CHART_TITLE_M):end]
                 # 값 = 제목 바로 옆 · 대상 이름을 붙여 (2026-11-15 사용자: `에너지 vs 시장` 옆 4.6%p 가 에너지 것인지 시장 것인지 헷갈림 → `에너지 ▲ 4.6%p`, 옛 P428 오른쪽 끝)
                 subj = fc["ruler_short"].split(" vs ", 1)[0] if " vs " in fc["ruler_short"] else ""
-                line = (f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:baseline;column-gap:8px;margin:0 0 {dk.CHART_TITLE_GAP}px;">'
+                line = (f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:baseline;column-gap:8px;margin:0 0 {dk.CHART_TITLE_GAP}px;padding:0 {IN_R - dk.ALIGN_PX}px 0 {IN_L - dk.ALIGN_PX}px;">'
                         f'{dk.CHART_TITLE}{title}</span><span style="flex:none;white-space:nowrap;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:400;color:#111;">'
                         + (f'{dk.esc(subj)} ' if subj else '') + f'{fmt_tri(first[1])}</span></span>')
                 chart = chart[:head_start] + line + chart[end + len("</span>"):]
@@ -1312,25 +1312,25 @@ def _brand(html, size):
     return html.replace(R.BRAND, R.brand_mark(int(str(size).rstrip("px"))), 1)
 
 
-def _plain_rows(lead, rows, note="", lines=True):
+def _plain_rows(lead, rows, note="", lines=True, inset=False):
     """접는 줄 안 내용 — 글자는 왼쪽 기준선 6(제목 점과 같은 선, P424) · 오른쪽도 6(좌우 같게, P461), 구분선은 끝까지. 굵게 없음 · 증감 숫자 = ▲ · ▼ + 색 (P423 · P424, 2026-11-08 사용자)."""
-    A = dk.ALIGN_PX
-    out = f'<p style="margin:0 0 4px;padding:0 {A}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{_brand(tri_text(dk.esc(lead)), dk.NAME)}</p>' if lead else ""
+    A, R = (IN_L, IN_R) if inset else (dk.ALIGN_PX, dk.ALIGN_PX)   # inset = 아이콘 접는 줄 안
+    out = f'<p style="margin:0 0 4px;padding:0 {R}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{_brand(tri_text(dk.esc(lead)), dk.NAME)}</p>' if lead else ""
     for i, (name, val, sub) in enumerate(rows):
-        out += (f'<div style="padding:{14 - dk.VP}px {A}px {14 - dk.VP}px {A}px;{"border-top:1px solid #E2E8F0;" if i and lines else ""}">'
+        out += (f'<div style="padding:{14 - dk.VP}px {R}px {14 - dk.VP}px {A}px;{"border-top:1px solid #E2E8F0;" if i and lines else ""}">'
                 f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:{dk.NAME};line-height:{dk.LH_CARD};">'
                 f'<span style="color:#111;word-break:keep-all;">{dk.esc(name)}</span>'
                 + (f'<span style="flex:none;max-width:55%;text-align:right;color:#111;word-break:keep-all;">{val if str(val).startswith("<") else tri_text(dk.esc(val))}</span>' if val else "") + '</span>'
                 + (f'<span style="display:block;margin-top:2px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">{dk.esc(sub)}</span>' if sub else "")
                 + '</div>')
     if note:
-        out += f'<span style="display:block;margin:4px 0 0;padding:0 {A}px 0 {A}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">{dk.esc(note)}</span>'
+        out += f'<span style="display:block;margin:4px 0 0;padding:0 {R}px 0 {A}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};word-break:keep-all;">{dk.esc(note)}</span>'
     return out
 
 
 def _plain_sec(title, lead, rows, note="", lines=True, icon=""):
     """카드 없이 구분선 구획 — 제목(아래 선) · 첫 문장 · 구분선 줄(이름 굵게 + 오른쪽 값 · 아래 작은 회색) · 작은 안내 (2026-11-07 사용자: `더 궁금한 것` 제목 삭제, 두 카드를 카드 말고 구분선으로)."""
-    out = _plain_rows(lead, rows, note, lines)
+    out = _plain_rows(lead, rows, note, lines, inset=bool(icon))
     if icon:   # 기본형 아이콘 접는 줄 (2026-11-15 사용자: 아래 접는 줄 모두 회색 원 아이콘)
         return _fold_row(title, out, icon=icon)
     # 제목 줄 = 위 · 아래 구분선 사이 제목(21, 구획 제목 22 보다 1 작게) + 오른쪽 공식 접기 버튼, 누르면 내용 (2026-11-07 사용자). 위 선은 묶음(_fold_group)이 긋고 각 줄은 아래 선만
@@ -1370,9 +1370,9 @@ def _reasons_card(fc):
         return ""
     note = ("기사 주제 · 우리 기록에서 모은 것입니다. 원인을 판단한 것은 아닙니다. 기사 · 애널리스트 줄은 전망 카드의 근거에 있습니다." if side
             else "기사 · 애널리스트 · 우리 기록에서 모은 것입니다. 원인을 판단한 것은 아닙니다.")
-    body = _plain_rows("", rows, note=note)
+    body = _plain_rows("", rows, note=note, inset=True)
     if fc.get("stock_page"):
-        body += (f'<a href="{dk.esc(fc["stock_page"])}" style="display:block;margin:8px 0 0;padding:0 {dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
+        body += (f'<a href="{dk.esc(fc["stock_page"])}" style="display:block;margin:8px 0 0;padding:0 {IN_R}px 0 {IN_L}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
                  f'color:#333;text-decoration:underline;text-underline-offset:3px;">{dk.esc(fc["subject"])} 종목 페이지 ›</a>')
     return _fold_row("무엇이 이유로 꼽혔나?", body, icon="news").replace('<details data-acc="1"', '<details data-acc="1" open', 1)   # 독자가 가장 먼저 묻는 것 — 펼친 채로
 
@@ -1388,10 +1388,12 @@ def _fold_row(title, html, label="", side="", icon=""):
             + f'<span class="fc-fsec-t" style="flex:1 1 auto;min-width:0;font-size:16px;line-height:26px;font-weight:400;color:#111;">{dk.esc(title)}</span>'
             + (f'<span style="flex:none;margin-right:8px;font-size:13px;line-height:19px;color:{dk.SUB};white-space:nowrap;">{dk.esc(side)}</span>' if side else "")   # 접기 버튼 앞 작은 회색 (`11.10 종가`, 2026-11-11 사용자)
             + f'{dk.fold_btn()}</summary>'
-            f'<div style="padding:4px 0 {16 - dk.VP}px {FOLD_ICON_IN if icon else 0}px;">{html}</div></details>')   # 아이콘 줄 = 안 내용 전부(값 줄 · 그래프 제목 · 그래프 · 안내)를 제목 글자 세로선에 (2026-11-15 사용자)
+            f'<div style="padding:4px 0 {16 - dk.VP}px;">{html}</div></details>')
 
 
-FOLD_ICON_IN = dk.SOFT_ICON_SIZE + 6   # 아이콘 22 + 글자와 6 = 28 — 안 내용의 왼쪽 6 과 더해 제목 글자 시작선(6 + 28 = 34)
+# 아이콘 접는 줄 안 글자(값 줄 · 그래프 제목 · 안내 · 종목 줄) = 왼쪽 아이콘 중심 세로선 · 오른쪽 접기 버튼 중심 세로선, 그래프 폭은 그대로 6 ~ 버튼 끝 (2026-11-15 사용자 — 옛 같은 날 34 들여쓰기는 그래프까지 좁혀 되돌림)
+IN_L = dk.ALIGN_PX + dk.SOFT_ICON_SIZE // 2   # 6 + 11 = 17
+IN_R = round(dk.FOLD_BOX / 2)                 # 31 의 가운데 15.5 → 정수 16
 
 
 FOLD_CSS = '<style>.fc-fsec[open]>summary .fc-fsec-t{font-weight:700 !important;}</style>'   # 접는 줄을 펼치면 제목 굵게 (P429, 2026-11-08 사용자)
@@ -1590,7 +1592,7 @@ def _stock_now(fc, st):
              f'<span style="flex:none;font-size:13px;line-height:19px;color:{dk.SUB};">{dk.esc(sym)}</span>{price}'
              f'<span style="flex:1 1 auto;"></span>'
              f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{CHEV14}</span>')
-    style = (f'display:flex;align-items:center;gap:8px;margin:4px 0 12px;padding:0 {dk.ALIGN_PX}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};'
+    style = (f'display:flex;align-items:center;gap:8px;margin:4px 0 12px;padding:0 {IN_R}px 0 {IN_L}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};'
              f'color:#111;text-decoration:none;white-space:nowrap;overflow:hidden;')
     if fc.get("stock_page"):
         return f'<a data-stock-now="1" href="{dk.esc(fc["stock_page"])}" aria-label="{dk.esc(fc.get("subject", ""))} 종목 페이지" style="{style}">{inner}</a>'
@@ -1654,6 +1656,7 @@ def _compare_chart(fc, st):
     if not gr:
         return ""
     gr = gr.replace(f"margin:0 {dk.CHART_CARD_X}px;", "margin:0;", 1)
+    gr = gr.replace(dk.CHART_TITLE_M, dk.CHART_TITLE_M.replace("margin:0 0", f"padding:0 {IN_R - dk.ALIGN_PX}px 0 {IN_L - dk.ALIGN_PX}px;margin:0 0", 1), 1)   # 제목 글자만 아이콘 중심선 (그래프는 그대로)
     return f'<div data-compare="1" style="margin:4px 0 16px;padding:0 0 0 {dk.ALIGN_PX}px;">{gr}</div>'
 
 
