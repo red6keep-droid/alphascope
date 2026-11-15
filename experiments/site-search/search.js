@@ -118,8 +118,8 @@
     if (v == null) return '—';
     /* 증감 = ▲ · ▼ + 절댓값 + 증감 색, 0 은 부호 없이 (2026-11-12 사용자: "증감 표시는 삼각형으로" — 옛 + · −). 삼각형 = 숫자의 80% · 위로 1 (.as-tri) */
     var n = Math.abs(v).toFixed(Math.abs(v) >= 100 ? 0 : 1) + '%';
-    if (plain) return (v > 0 ? '▲ ' : v < 0 ? '▼ ' : '') + n;
-    return '<span class="' + (v > 0 ? 'as-up' : v < 0 ? 'as-dn' : '') + '">' + (v ? '<span class="as-tri">' + (v > 0 ? '▲' : '▼') + '</span> ' : '') + n + '</span>';
+    if (plain) return (v > 0 ? '▲\u00a0' : v < 0 ? '▼\u00a0' : '') + n;
+    return '<span class="' + (v > 0 ? 'as-up' : v < 0 ? 'as-dn' : '') + '">' + (v ? '<span class="as-tri">' + (v > 0 ? '▲' : '▼') + '</span>\u00a0' : '') + n + '</span>';
   }
   function josa(word, a, b) {   // 받침 있으면 a(은 · 으로), 없으면 b(는 · 로)
     var ch = word.charCodeAt(word.length - 1);
@@ -343,7 +343,7 @@
     // ④ 알파스코프 신호 — 종목 페이지 판정 가운데 질문 방향과 같은 쪽 (증시 전망 갈래 근거와 같은 나눔: 단기 · 중기)
     if (W.sig && W.sig.rows && W.sig.rows.length) {
       var want = down ? -1 : 1, same = W.sig.rows.filter(function (r) { return r[2] === want; }), opp = W.sig.rows.filter(function (r) { return r[2] === -want; });
-      out += '<div class="as-sec"><h4>' + ico('tech') + (down ? '하락' : '상승') + ' 쪽 알파스코프 신호 <small>(' + md(W.sig.d) + ' 종목 페이지)</small></h4>';
+      out += '<div class="as-sec"><h4>' + ico('tech') + (down ? '하락' : '상승') + ' 쪽 AlphaScope 신호 <small>(' + md(W.sig.d) + ' 종목 페이지)</small></h4>';
       if (same.length) {
         ['단기', '중기'].forEach(function (hz) {
           var rs = same.filter(function (r) { return r[3] === hz; });
@@ -569,7 +569,17 @@
       if (chip) ask(chip.getAttribute('data-q'));
       if (e.target.closest('.as-x')) { pane.hidden = true; fab.hidden = false; }
     });
-    function open(q) { pane.hidden = false; fab.hidden = true; loadIndex().catch(function () {}); form.q.focus(); if (q) ask(q); }
+    /* 폰: 키보드가 올라오면 창을 보이는 영역(visualViewport)에 맞춘다 — inset:0 만으로는 키보드 뒤로 보내기 줄이 숨거나 밀렸다 (2026-11-15 사용자) */
+    var vv = window.visualViewport;
+    function fit() {
+      if (pane.hidden || !vv || window.innerWidth > 680) { pane.style.top = pane.style.height = pane.style.bottom = ''; return; }
+      pane.style.top = vv.offsetTop + 'px';
+      pane.style.height = vv.height + 'px';
+      pane.style.bottom = 'auto';
+      log.scrollTop = log.scrollHeight;
+    }
+    if (vv) { vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit); }
+    function open(q) { pane.hidden = false; fab.hidden = true; loadIndex().catch(function () {}); fit(); form.q.focus({ preventScroll: true }); if (q) ask(q); }
     fab.addEventListener('click', function () { open(); });
     return { open: open };
   }

@@ -1636,7 +1636,16 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .report-columns li::before, .kv-row--block li::before { margin-top: 14px; }
   :root { --sans: 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; --report-font: 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
   .logo-word { font-family: 'Noto Sans KR', sans-serif; }
-  .post-body [style*="font-family"]:not([style*="monospace"]) { font-family: var(--report-font) !important; }
+  .post-body [style*="font-family"]:not([style*="monospace"]):not([data-brand-font]) { font-family: var(--report-font) !important; }
+  .post-body [data-brand-font] { font-family: 'Noto Sans KR', sans-serif !important; }
+  .post-body [data-brand-font="17"] { font-size: 13px !important; }
+  .post-body [data-brand-font="18"] { font-size: 13px !important; }
+  .post-body [data-brand-font="19"] { font-size: 13px !important; }
+  .post-body [data-brand-font="20"] { font-size: 14px !important; }
+  .post-body [data-brand-font="21"] { font-size: 15px !important; }
+  .post-body [data-brand-font="22"] { font-size: 15px !important; }
+  .post-body [data-brand-font="26"] { font-size: 19px !important; }
+  .post-body [data-brand-font="28"] { font-size: 21px !important; }
   body { -webkit-text-stroke: 0.25px; }
 }
 

@@ -1257,7 +1257,7 @@ def sec_company(s):
     평가 · 전망 · 추천은 없다. DART 칸이 없으면 그 줄만 뺀다."""
     c = s.get("company") or {}
     about = U.ABOUT.get(s["code"], "")
-    out = f'<p style="margin:0 0 12px;padding:0 {_dk.ALIGN_PX}px;color:#111;line-height:33px;word-break:keep-all;">{_esc(about)}</p>' if about else ""
+    out = f'<p style="{_dk.TAB_LEAD_GAP}color:#111;line-height:33px;word-break:keep-all;">{_esc(about)}</p>' if about else ""
     url = c.get("hm_url") or ""
     href = url if url.startswith("http") else f"https://{url}" if url else ""
     rows = [("정식 이름", _esc(c.get("corp_name", ""))), ("영문 이름", _esc(c.get("corp_name_eng", ""))), ("대표", _esc(c.get("ceo_nm", ""))),

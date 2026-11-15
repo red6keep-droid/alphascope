@@ -834,7 +834,28 @@ def analysts_card(cells, close, m0=None, m2=None, opened=False):
     return _state_card("애널리스트 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance"), fold=True, opened=opened)
 
 
-TOGETHER_Q = "Alpha Scope 신호는?"   # 옛 흰 카드 `Alpha Scope 데이터로 함께 보기` → 강조 카드 (P206) → 로고 + `Alpha Scope 전망은?` (P208) → `신호는?` (2026-11-01 사용자 P267: 앞날 예측으로 읽혀서 — 판정을 모은 카드)
+BRAND = "AlphaScope"   # 독자에게 보이는 브랜드 표기 = 로고와 같은 영문 붙여 쓰기 (2026-11-15 사용자: 옛 `Alpha Scope` · `알파스코프` 대신)
+BRAND_FONT = "font-family:'Noto Sans KR',sans-serif;font-weight:900;letter-spacing:-0.2px;"   # 로고 글꼴 = 테마 .logo-word (Noto Sans KR Black, SIL OFL) — 제목 · 카드 질문 자리
+def brand_mark(around):
+    """문장 속 `AlphaScope` — 블로그 로고 + 로고 글꼴(Noto Sans KR 900), 글자 = 둘레 − 3 (2026-11-15 사용자: "문장 안에서 AlphaScope 를 쓸 때만 · 앞에 로고 · 2포인트 작게" → 같은 날 "1포인트 더").
+    around = 둘레 글자 px. 로고 높이 = 브랜드 글자 × 1.12 정수(옛 카드 제목 17 : 19 비율), 폭 = 313:286.
+    data-brand-font = 둘레 px — PC 테마가 둘레를 줄이면 브랜드도 PC 둘레 − 2 (build_theme.pc_type_css), PC 글꼴 강제에서도 빠진다."""
+    fs = around - 3   # 둘레 − 2 → − 3 (2026-11-15 사용자: "1포인트 더 줄여")
+    h = round(fs * 1.12)
+    w = round(h * 313 / 286)
+    svg = BLOG_LOGO.replace('width="18" height="16"', f'width="{w}" height="{h}"', 1).replace("display:block;", "display:inline-block;vertical-align:-3px;margin-right:4px;", 1)
+    return f'<span style="white-space:nowrap;">{svg}<span data-brand-font="{around}" style="{BRAND_FONT}font-size:{fs}px;">{BRAND}</span></span>'
+
+
+BRAND_TITLE = f'<span data-brand-font="title" style="{BRAND_FONT}">{BRAND}</span>'   # 제목 · 카드 자리 = 크기 그대로, 글꼴만 로고 글꼴
+
+
+def brand_html(text, around):
+    """글 안 `AlphaScope` 를 문장 속 로고 꼴로 (나머지 글자는 그대로 이스케이프)."""
+    return _esc(text).replace(BRAND, brand_mark(around), 1)
+
+
+TOGETHER_Q = "AlphaScope 신호는?"   # 옛 흰 카드 `Alpha Scope 데이터로 함께 보기` → 강조 카드 (P206) → 로고 + `Alpha Scope 전망은?` (P208) → `신호는?` (2026-11-01 사용자 P267: 앞날 예측으로 읽혀서 — 판정을 모은 카드)
 TOGETHER_WORDS = ((1, "상승", UP), (-1, "하락", DOWN), (0, "중립", "#111"))
 TOGETHER_LINE = "rgba(15,23,42,.08)"   # 강조 카드 색 위 줄 구분선 (흰 바탕을 뺀 뒤, P207)
 HOT_KIND = {"호재": "up", "리스크": "down"}   # 엇갈림 · 불확실 = 회색 라벨 (P218)
@@ -969,8 +990,8 @@ def together_card(t):
            "· 세지 않는 것 : 업계 현황(배경) · 과열 신호 · 호재 · 리스크 · 일정\n· 이 블로그의 추천이 아니다")
     card = _state_card(TOGETHER_Q, plain, theme, col, lines, "", tip=tip, fold=True, state_rich=rich)
     logo = BLOG_LOGO.replace("display:block;", "display:inline-block;vertical-align:-3px;margin-right:6px;", 1).replace('width="18" height="16"', 'width="21" height="19"', 1)   # 로고 20% 크게 = 18 × 16 → 21 × 19 (정수, 비율 313:286 유지)
-    brand = TOGETHER_Q.rsplit(" ", 1)[0]   # `Alpha Scope` 영문 = 질문 글자(18)보다 1px 작게 · 굵게 (2026-11-01 사용자 P231)
-    return card.replace(_esc(brand), logo + f'<span style="font-size:17px;line-height:31px;font-weight:700;">{_esc(brand)}</span>', 1)   # 제목 앞 블로그 로고 (P208)
+    brand = TOGETHER_Q.rsplit(" ", 1)[0]   # `AlphaScope` = 질문 글자(18)보다 1px 작게 (P231) — 크기 · 로고는 그대로, 글꼴만 로고 글꼴 (2026-11-15 사용자: "강조 카드는 기존대로, 로고 서체로")
+    return card.replace(_esc(brand), logo + f'<span data-brand-font="title" style="{BRAND_FONT}font-size:17px;line-height:31px;">{_esc(brand)}</span>', 1)   # 제목 앞 블로그 로고 (P208)
 
 
 def horizon_head(text, first=False):
@@ -1143,7 +1164,7 @@ def picks_word(ps):
 PICK_BOX = {"매수": "up", "매도": "down"}   # 줄 머리 의견 라벨 — 기술지표 라벨 모양, 보유 · 관망은 회색(flat) (P201)
 
 
-TOGETHER_TITLE = "Alpha Scope 데이터로 함께 보기"   # 방송 의견 아래 — 같은 종목의 우리 판정을 방향별로 (2026-10-31 사용자 P142, 기록 계획 A5-5)
+TOGETHER_TITLE = "AlphaScope 데이터로 함께 보기"   # 방송 의견 아래 — 같은 종목의 우리 판정을 방향별로 (2026-10-31 사용자 P142, 기록 계획 A5-5)
 
 
 # 함께 보기 안쪽 카드 (2026-10-31 사용자 P168): 상승 쪽 · 하락 쪽 · 중립을 각자 카드로 감싼다. 바깥 강조 카드와 같은 색이면 한 단계 진하게
@@ -1188,7 +1209,7 @@ def together_block(items, outer=None, title=True, votes=None):
                     f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;font-weight:{400 if d == 0 else STATE_VAL_W};color:{col};">{_esc(st.lstrip("▲▼ "))}'
                     f'{TS.box(kind, word, _esc)}</span></span>')   # 대답 → 라벨. 나가는 아이콘은 뺐다 (2026-11-01 사용자 P204). 중립 대답은 보통 굵기 · 조금 빠진 검정 (P173)
     head = title
-    title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 16px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE)}</span>') if head else ""   # title=False = 강조 카드 안 줄 목록만 (P206)
+    title = (f'<span style="display:flex;justify-content:center;align-items:center;gap:6px;margin:0 0 16px;font-weight:700;color:#111;font-size:{_dk.EMPH_Q};">{BLOG_LOGO}{_esc(TOGETHER_TITLE).replace(BRAND, BRAND_TITLE, 1)}</span>') if head else ""   # title=False = 강조 카드 안 줄 목록만 (P206)
     pad_top = _dk.CHART_CARD_PAD + (12 if head else 0)
     if not head:   # 강조 카드 안 — 흰 바탕 · 테두리 없이 줄만 (2026-11-01 사용자 P207)
         return f'<span data-together="1" style="display:block;margin:6px 0 0;">{out}</span>'
@@ -1260,9 +1281,11 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
     import signal_groups as SG
     nm = _esc(name)
     sents, dirs = [], {}
-    up_w = lambda w: f'<b style="font-weight:700;color:{UP};">▲ {w}</b>'   # noqa: E731
-    dn_w = lambda w: f'<b style="font-weight:700;color:{DOWN};">▼ {w}</b>'   # noqa: E731
-    # ① 전문가 — 애널리스트 다수 의견 → 밝다 · 어둡다 · 지켜보자 · 갈린다
+    up_w = lambda w: f'<b style="font-weight:700;color:{UP};white-space:nowrap;">▲ {w}</b>'   # noqa: E731
+    dn_w = lambda w: f'<b style="font-weight:700;color:{DOWN};white-space:nowrap;">▼ {w}</b>'   # noqa: E731 — ▲ · ▼ 와 말은 한 덩어리로 줄바꿈 (2026-11-15 사용자: 삼각형 뒤에서 줄이 꺾이면 안 된다)
+    # 문장 셋 (2026-11-15 사용자 "너무 많이 줄였는데 3줄 정도"): ① 애널리스트 + 평균 목표가 ② 증권사 + 방송 · 뉴스 ③ 주가 + Alpha Scope 신호
+    # 브랜드를 숨기지 않는다 — `가격 흐름(Alpha Scope 신호)` → `Alpha Scope 신호는 중립이다` (같은 날 사용자)
+    # ① 전문가 — 애널리스트 다수 의견 + 평균 목표가 자리
     cells = cells or []
     rc = next((c["value"] for c in cells if c.get("key") == "rating_counts"), None) or {}
     n_a = sum(rc.values())
@@ -1270,80 +1293,74 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
     if n_a:
         buy = (rc.get("strongBuy", 0) + rc.get("buy", 0)) / n_a * 100
         sell = (rc.get("sell", 0) + rc.get("strongSell", 0)) / n_a * 100
-        hold = 100 - buy - sell
-        # 말은 블로그 신호 용어 한 자로만 — ▲ 상승 · ▼ 하락 · 중립 · 반반, 없음은 조용하다 (2026-11-04 사용자 P298 "일관성" → P299 "밝게 본다 말고 상승 추세로 보인다")
+        nmj = _esc(_dk.josa(name, "을"))
+        # (이어 쓰는 꼴, 끝맺는 꼴) — 말은 블로그 신호 용어 한 자로만 (P298 · P299)
         if buy >= 70:
-            dirs["애널리스트"], first = 1, f"전문가들은 {nm}을 {up_w('상승 추세')}로 보고 있다."
+            dirs["애널리스트"], an = 1, (f"전문가들은 {nmj} {up_w('상승 추세')}로 보고", f"전문가들은 {nmj} {up_w('상승 추세')}로 보고 있다.")
         elif buy > 50:
-            dirs["애널리스트"], first = 1, f"전문가들은 {nm}을 {up_w('상승 추세')}로 보지만 한목소리는 아니다."
+            dirs["애널리스트"], an = 1, (f"전문가들은 {nmj} {up_w('상승 추세')}로 보지만 한목소리는 아니고", f"전문가들은 {nmj} {up_w('상승 추세')}로 보지만 한목소리는 아니다.")
         elif sell > 50:
-            dirs["애널리스트"], first = -1, f"전문가들은 {nm}을 {dn_w('하락 추세')}로 보고 있다."
+            dirs["애널리스트"], an = -1, (f"전문가들은 {nmj} {dn_w('하락 추세')}로 보고", f"전문가들은 {nmj} {dn_w('하락 추세')}로 보고 있다.")
         else:
-            dirs["애널리스트"], first = 0, f"전문가들은 {nm}을 상승으로 보는 쪽과 하락으로 보는 쪽이 반반이다."
-        first = first.replace(f"{nm}을", _esc(_dk.josa(name, "을")))
+            dirs["애널리스트"], an = 0, ("전문가 의견은 상승 쪽과 하락 쪽이 반반이고", "전문가 의견은 상승 쪽과 하락 쪽이 반반이다.")
         gap = (pm / close - 1) * 100 if pm and close else None
         if gap is not None:
             where = ("보다 한참 위에" if gap >= 15 else "보다 조금 위에" if gap >= 5 else "와 거의 같은 자리에" if gap > -5 else "보다 아래에")
-            first += f" 전문가들이 보는 적정 가격(평균 목표가)은 지금 주가{where} 있다."
-        sents.append(first)
-    # 증권사 — 목표가를 올리는 중인지 (30일)
+            sents.append(f"{an[0]}, 평균 목표가는 지금 주가{where} 있다.")
+        else:
+            sents.append(an[1])
+    # ② 증권사(30일) + 방송 · 뉴스(5거래일)
+    br = None
     if broker:
         n = {k: sum(1 for c in broker if broker_move(c) == k) for k in MOVE_ORDER}
         dirs["증권사"] = SG.vote([{"상향": 1, "하향": -1}.get(broker_move(c), 0) for c in broker])
-        if n["상향"] > n["하향"]:
-            sents.append(f"최근 증권사들은 목표가를 올리며 {up_w('상승 추세')}로 보는 곳이 더 많다.")
-        elif n["하향"] > n["상향"]:
-            sents.append(f"최근 증권사들은 목표가를 내리며 {dn_w('하락 추세')}로 보는 곳이 더 많다.")
-        else:
-            sents.append("최근 증권사들은 목표가를 올리는 곳과 내리는 곳이 반반이다.")
-    # ② 방송 · 뉴스 분위기 (5거래일)
+        br = ("최근 증권사들은 목표가를 올리는 곳이 더 많" if n["상향"] > n["하향"] else "최근 증권사들은 목표가를 내리는 곳이 더 많" if n["하향"] > n["상향"]
+              else "최근 증권사들은 목표가를 올리는 곳과 내리는 곳이 반반이")
     ev = [{"매수": 1, "매도": -1}.get(p["action"], 0) for p in ps or []] + [{"positive": 1, "negative": -1}.get(x.get("direction"), 0) for x in news_ops or []]
     where = "방송과 뉴스" if news_ops is not None else "방송"
+    md = None
     if ps is None and news_ops is None:
         pass   # 방송 · 뉴스를 보지 않는 화면(간단 정보, 2026-11-14) — `조용하다`고 말하면 틀린 말이 된다
     elif not ev:
-        sents.append(f"{where}에서는 요즘 {nm} 이야기가 조용하다.")
+        md = f"{where}에서는 요즘 {nm} 이야기가 조용하다."
     else:
         up, dn, mid = ev.count(1), ev.count(-1), ev.count(0)
         dirs["방송 · 뉴스"] = SG.vote(ev)
         many = len(ev) >= 5
         if up > dn and up >= mid:
-            sents.append(f"{where}에서도 {up_w('상승')} 쪽 의견이 {'많다' if many else '간간이 나온다'}.")
+            md = f"{where}에서도 {up_w('상승')} 쪽 의견이 {'많다' if many else '간간이 나온다'}."
         elif dn > up and dn >= mid:
-            sents.append(f"{where}에서는 {dn_w('하락')} 쪽 의견이 {'많다' if many else '간간이 나온다'}.")
+            md = f"{where}에서는 {dn_w('하락')} 쪽 의견이 {'많다' if many else '간간이 나온다'}."
         elif mid > up and mid > dn:
-            sents.append(f"{where}에서는 {'말은 많지만' if many else '이야기가 조금 있지만'} 상승도 하락도 아닌 '지켜보자'가 대부분이다.")
+            md = f"{where}에서는 {'말은 많지만' if many else '이야기가 조금 있지만'} 상승도 하락도 아닌 '지켜보자'가 대부분이다."
         else:
-            sents.append(f"{where}에서는 상승 쪽 의견과 하락 쪽 의견이 반반이다.")
-    # ③ 정리 — 주가 흐름 + 주변 분위기 vs 가격 흐름(Alpha Scope 신호)
+            md = f"{where}에서는 상승 쪽 의견과 하락 쪽 의견이 반반이다."
+    if br and md:
+        sents.append(f"{br}고, {md}")
+    elif br or md:
+        sents.append(f"{br}다." if br else md)
+    # ③ AlphaScope 신호 + 주가 흐름 — 의견과 신호가 갈리면 그 뜻을 같은 문장 뒤에. 브랜드가 문장 맨 앞이라 앞에 색 글자가 붙지 않는다
     cs = [c for c in (closes or []) if c is not None]
     r5 = (cs[-1] / cs[0] - 1) * 100 if len(cs) >= 2 and cs[0] else None
-    price = (f"주가는 최근 며칠 {up_w('올랐고')}" if r5 is not None and r5 > 1 else f"주가는 최근 며칠 {dn_w('내렸고')}" if r5 is not None and r5 < -1
-             else "주가는 최근 며칠 크게 움직이지 않았고" if r5 is not None else "")
+    # 주가 말 — 브랜드를 문장 앞에 두고 주가는 뒤에 이어 쓴다 (2026-11-15 사용자: "AlphaScope 앞에 색 글자가 붙어 거슬린다, 내용은 그대로")
+    price = (f"주가는 최근 며칠 {up_w('올랐다')}" if r5 is not None and r5 > 1 else f"주가는 최근 며칠 {dn_w('내렸다')}" if r5 is not None and r5 < -1
+             else "주가는 최근 며칠 크게 움직이지 않았다" if r5 is not None else "")
     rows = [x for x in items or [] if x and x[1]]
     sg = SG.horizon_votes(rows)["단기"][0] if rows else None
     outside = [d for d in dirs.values() if d is not None]
     o = SG.vote(outside) if outside else None
-    split = o == 0 and 1 in outside and -1 in outside
-    mood = ({1: f"주변 의견은 {up_w('상승')} 쪽", -1: f"주변 의견은 {dn_w('하락')} 쪽"}.get(o, "주변 의견은 상승 쪽과 하락 쪽이 반반") if o is not None else "")
-    flow = ({1: f"가격 흐름(Alpha Scope 신호)도 {up_w('상승')}이다", -1: f"가격 흐름(Alpha Scope 신호)은 아직 {dn_w('하락')}이다", 0: "가격 흐름(Alpha Scope 신호)은 중립이다"}.get(sg, "") if sg is not None else "")
-    if mood or flow:
-        if o == 1 and sg == 1:
-            tail = f"{mood}이며, {flow}. 의견과 가격이 같은 쪽을 보는 구간이다."
-        elif o == 1 and sg == -1:
-            tail = f"{mood}이지만, {flow}. 의견이 가격보다 앞서 있는 구간이다."
-        elif o == -1 and sg == 1:
-            tail = f"{mood}이지만, {flow.replace('신호)도', '신호)는')}. 의견과 가격이 엇갈리는 구간이다."
-        elif o == -1 and sg == -1:
-            tail = f"{mood}이며, {flow.replace('신호)은 아직', '신호)도')}. 의견도 가격도 하락 쪽인 구간이다."
-        elif mood and flow:
-            tail = f"{mood}이며, {flow.replace('신호)도 ', '신호)은 ')}."
-        else:
-            tail = (mood + "이다." if mood else flow + ".")
-        sents.append("정리하면, " + (price + ", " if price else "") + tail)
+    if sg is not None:
+        sig = {1: up_w("상승"), -1: dn_w("하락"), 0: "중립"}[sg]
+        # (이어 쓰는 꼴, 끝맺는 꼴) — 갈림 말은 신호 바로 뒤에 붙여 `가격`이 주가로 읽히지 않게 한다 (옛 `의견이 가격보다 앞서` 를 주가 말 뒤에 두면 주가와 엇갈려 읽혔다)
+        mid, end = {(1, 1): ("으로 의견과 같은 쪽이고", "으로 의견과 같은 쪽이다"), (1, -1): ("으로 의견이 신호보다 앞서 있고", "으로 의견이 신호보다 앞서 있는 구간이다"),
+                    (-1, 1): ("으로 의견과 엇갈리고", "으로 의견과 엇갈리는 구간이다"), (-1, -1): ("으로 의견과 같은 하락 쪽이고", "으로 의견과 같은 하락 쪽이다")}.get((o, sg), ("이고", "이다"))
+        head = f"{brand_mark(19)} 신호는 {'아직 ' if sg == -1 and o == 1 else ''}{sig}"
+        sents.append(f"{head}{mid}, {price}." if price else f"{head}{end}.")   # AlphaScope 신호는 아직 ▼ 하락으로 의견이 신호보다 앞서 있고, 주가는 최근 며칠 ▲ 올랐다.
+    elif price:
+        sents.append(price + ".")
     if not sents:
         return ""
-    return f'<p data-op-summary="1" style="{_dk.SEO_LEAD}">{_dk.emph_tri(" ".join(sents), _dk.PRICE_TRI, every=True)}</p>'   # ▲ · ▼ = 글자 19 의 80% (2026-11-08 사용자)
+    return f'<p data-op-summary="1" style="{_dk.SEO_LEAD}{_dk.TAB_LEAD_GAP}">{_dk.emph_tri(" ".join(sents), _dk.PRICE_TRI, every=True)}</p>'   # ▲ · ▼ = 글자 19 의 80% (2026-11-08 사용자)
 
 
 

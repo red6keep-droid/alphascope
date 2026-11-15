@@ -35,7 +35,8 @@ DECO = {   # 강좌 글 꾸밈 — 색 · 모양은 여기 한 곳 (auto-blogspo
     "accent": "color:#0F766E;font-weight:700;",
     # 소제목 = 왼쪽 막대 대신 동그란 바탕 + 이모지 (2026-11-12 사용자: 세로 막대 말고 재밌는 아이콘). 이모지는 초안 `## 💡 제목` 맨 앞에 적는다
     "h2": "display:flex;align-items:center;gap:10px;margin:40px 0 16px;font-size:22px;line-height:32px;font-weight:700;color:#111;word-break:keep-all;",
-    "h2_icon": "flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:20px;background:#ECFDF5;font-size:22px;line-height:40px;",
+    # 2026-11-15 사용자: 동그라미 바탕 없앰 — 소품 아이콘(네모 그림)만, 칸 = 아이콘 크기(36) 그대로라 모서리가 잘리지 않게
+    "h2_icon": "flex:none;display:flex;align-items:center;justify-content:center;width:36px;height:36px;font-size:22px;line-height:36px;overflow:visible;",
     # 캐릭터 강조 = `> 🤷 문장` (💬 말고 다른 이모지로 시작하는 인용 줄) — 큰 캐릭터 + 굵은 한 문장 (2026-11-12 사용자)
     "char": "display:flex;align-items:center;gap:14px;margin:24px 0;padding:16px 18px;border-radius:16px;background:#FEF9E7;",
     "char_icon": "flex:none;font-size:44px;line-height:52px;",
@@ -69,11 +70,32 @@ def char(tok, where):
     with open(os.path.join(CHAR_DIR, CHARS[m.group(1)] + ".webp"), "rb") as f:
         src = "data:image/webp;base64," + base64.b64encode(f.read()).decode()
     px = CHAR_PX[where]
-    return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:block;width:{px}px;height:{px}px;margin:0 auto;">'
+    return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:block;width:{px}px;height:{px}px;max-width:none;border-radius:0;margin:0 auto;">'
 
 
 def is_char(tok):
     return bool(re.fullmatch(r"\{(.+?)\}", tok or "")) and tok[1:-1] in CHARS
+
+
+# 소품 아이콘 (2026-11-15 사용자 시트 → cut_icons.py). 초안은 지금처럼 이모지를 적고, 아래 표에 있는 이모지는 그림으로 바꾼다 — 없는 이모지는 그대로
+ICONS = {
+    "🎬": "theater", "🤔": "question", "📏": "ruler", "📉": "chart", "📈": "chart", "📊": "chart",
+    "⚖": "scale", "🔍": "magnifier", "💡": "bulb", "🗺": "map", "✅": "check", "🎣": "hook", "✌": "calendars", "📅": "calendars", "📝": "memo",
+}
+ICON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons")
+ICON_PX = {"h2": 36, "check": 22}   # 소제목 · 체크 목록 글머리. 소제목 = 바탕 없이 네모 아이콘 36 (2026-11-15 사용자: 동그라미 안 28 은 잘려 보임 → 동그라미 없앰)
+
+
+def icon_html(tok, where):
+    """border-radius:0 — 테마 `.post-body img { border-radius:12px }` 가 작은 아이콘 모서리를 둥글게 깎는다 (2026-11-15 사용자: 잘리지 않게, 네모 그대로). 이모지 → 소품 그림(목업은 data URI, 발행 때 gh-pages 주소로). 표에 없으면 이모지 그대로."""
+    name = ICONS.get((tok or "").replace("\ufe0f", ""))
+    if not name:
+        return tok
+    with open(os.path.join(ICON_DIR, name + ".webp"), "rb") as f:
+        src = "data:image/webp;base64," + base64.b64encode(f.read()).decode()
+    px = ICON_PX[where]
+    va = "" if where == "h2" else "vertical-align:-5px;margin-right:4px;"
+    return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:{"block" if where == "h2" else "inline-block"};width:{px}px;height:{px}px;max-width:none;border-radius:0;{va}">'
 
 
 BASIS = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:0 0 8px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;"
@@ -216,7 +238,7 @@ def render(md, links, next_href="#"):
             if note_mode:
                 out.append(f'<div data-course-note="1" style="{DECO["note_h2"]}">{inline(rest, links)}</div>')   # h2 가 아니라 div — 테마가 h2 글자 크기를 키운다
             else:
-                out.append(f'<h2 style="{DECO["h2"]}"><span aria-hidden="true" style="{DECO["h2_icon"]}">{icon}</span><span>{inline(rest, links)}</span></h2>')
+                out.append(f'<h2 style="{DECO["h2"]}"><span aria-hidden="true" style="{DECO["h2_icon"]}">{icon_html(icon, "h2")}</span><span>{inline(rest, links)}</span></h2>')
         elif ln.startswith("> 💬"):   # `> 💬 문장` 또는 `> 💬🧐 문장`(꼬리 아래 캐릭터 지정)
             who, _, said = ln[2:].strip().partition(" ")
             out.append(f'<div style="{DECO["bubble"]}">{dk.tint(inline(said.strip(), links))}</div><div style="{DECO["tail"]}"></div>'
@@ -240,7 +262,7 @@ def render(md, links, next_href="#"):
             while i < len(lines) and lines[i].startswith("- [v] "):
                 items.append(lines[i][6:].strip())
                 i += 1
-            out.append(f'<ul style="{DECO["check"]}">' + "".join(f'<li style="margin:4px 0;">✅ {dk.tint(inline(x, links))}</li>' for x in items) + "</ul>")
+            out.append(f'<ul style="{DECO["check"]}">' + "".join(f'<li style="margin:4px 0;">{icon_html("✅", "check")} {dk.tint(inline(x, links))}</li>' for x in items) + "</ul>")
             continue
         elif ln.startswith("|"):
             blk = []
@@ -257,7 +279,13 @@ def render(md, links, next_href="#"):
                 items.append(re.sub(r"^(- |\d+\. )", "", lines[i]).strip())
                 i += 1
             tag = "ol" if ordered else "ul"
-            if note_mode:
+            if ordered and not note_mode:
+                # 번호를 직접 그린다 — list-style outside 는 번호를 글 시작점 왼쪽에 매달아 `10.` 이 본문 기준선(ALIGN_PX) 밖으로 나갔다 (2026-11-15 사용자: 연재 순서).
+                # 번호 칸 = 기준선에서 시작 · 폭 32 · 왼쪽 맞춤, 줄바꿈된 글은 번호 칸 오른쪽에 맞춘다
+                out.append(f'<ol style="list-style:none;margin:0 0 16px;padding:0 0 0 {dk.ALIGN_PX}px;font-size:{dk.BODY};line-height:{dk.LH_BODY};color:#333;">' + "".join(
+                    f'<li style="display:flex;margin:0 0 6px;padding:0;"><span style="flex:none;width:32px;">{k + 1}.</span>'
+                    f'<span style="flex:1 1 auto;min-width:0;word-break:keep-all;">{dk.tint(inline(x, links))}</span></li>' for k, x in enumerate(items)) + "</ol>")
+            elif note_mode:
                 out.append(f'<{tag} style="{DECO["note_li"]}">' + "".join(f'<li style="margin:0 0 4px;">{gray(inline(x, links))}</li>' for x in items) + f"</{tag}>")
             else:
                 out.append(f'<{tag} style="{LI}">' + "".join(f'<li style="margin:0 0 6px;">{dk.tint(inline(x, links))}</li>' for x in items) + f"</{tag}>")

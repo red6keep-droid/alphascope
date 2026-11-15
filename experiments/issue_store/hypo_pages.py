@@ -704,7 +704,7 @@ WHY_WORD = "관련 주식 정보"   # 옛 `근거` (P488, 2026-11-11 사용자)
 WHY_HEAD_FS, WHY_HEAD_LH = 17, 28   # 갈래 카드 `근거` 제목 = 고리 줄 이름과 같은 17 (2026-11-11 사용자)
 CHAIN_FS = 17   # 갈래 카드 고리 줄 이름(`급락 폭의 4분의 1 회복`) — 카드 줄 18 에서 한 단계 작게 (2026-11-11 사용자)
 WHY_FS, WHY_LH = 16, 26
-SIG_NAME = "알파스코프 신호"   # 독자 문장에서 `우리 신호` 대신 (2026-11-11 사용자: 독자는 `우리`가 누군지 모른다)
+SIG_NAME = "AlphaScope 신호"   # 독자 문장에서 `우리 신호` 대신 (2026-11-11 사용자: 독자는 `우리`가 누군지 모른다)
 WHY_NOTE = "전망에 따른 주식 정보를 모은 것입니다. 판단하거나 어느 쪽이 맞을지 고른 것은 아닙니다."   # P498, 2026-11-11 사용자 문구
 EXCL_ICON = ('<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" style="flex:none;display:block;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>')   # 느낌표 = INFO_ICON(i) 뒤집은 모양
@@ -1051,6 +1051,7 @@ def _scenario_card(sc, v, tag=None, extra=None, compact=False, mkt=False, why=""
     return html
 
 
+THIN_CHEV_L = 21   # 얇은 카드 답 글자(`해당 없음`) ~ 화살표 여백 — 답 글자 오른쪽 끝 = 펼친 카드 답(`실현됨`) 오른쪽 끝 같은 세로선 (2026-11-15 사용자, 실측 445 → 428, 옛 4)
 THIN_CHEV_R = 8   # 얇은 카드 화살표 오른쪽 여백 — 펼친 카드 접기 버튼 화살표 가운데와 같은 x (P526, 2026-11-11 실측: 468 → 461)
 THIN_CHEV = dk.ACC_CHEV.replace('width="16" height="16"', f'width="{dk.FOLD_ICON}" height="{dk.FOLD_ICON}"', 1)
 TAG_W = 50   # `전망A · B` 이름표 폭 (P478) — 띄어쓰기를 뺀 굵은 14 `전망B` 글자 + 왼쪽 7 + 테두리 2 + 여유 3 (2026-11-08 사용자: 띄어쓰기 없이, 옛 54)
@@ -1087,7 +1088,7 @@ def _thin(html, theme):
     html = html.replace('<span style="flex:1 1 auto;min-width:0;font-weight:', '<span class="fc-th-t" style="flex:1 1 auto;min-width:0;font-weight:', 1)
     html = html.replace('<span style="flex:none;white-space:nowrap;font-weight:', '<span class="fc-th-a" style="flex:none;white-space:nowrap;font-weight:', 1)
     fold = f'<span style="display:inline-flex;flex:none;align-items:center;justify-content:center;width:{dk.FOLD_BOX}px;height:{dk.FOLD_BOX}px;'
-    chev = (f'<span class="fc-th-chev" style="display:none;flex:none;margin-left:4px;margin-right:{THIN_CHEV_R}px;color:{DIM_TEXT};">' + THIN_CHEV + '</span>')   # 접기 버튼 화살표와 같은 크기 · 같은 세로선(P526)   # 접기 네모 대신 화살표만
+    chev = (f'<span class="fc-th-chev" style="display:none;flex:none;margin-left:{THIN_CHEV_L}px;margin-right:{THIN_CHEV_R}px;color:{DIM_TEXT};">' + THIN_CHEV + '</span>')   # 접기 버튼 화살표와 같은 크기 · 같은 세로선(P526)   # 접기 네모 대신 화살표만
     html = html.replace(fold, chev + fold.replace('<span style=', '<span class="fc-th-fold" style=', 1), 1)
     return html
 
@@ -1103,8 +1104,11 @@ def _now_plain(fc, st):
             if head_start >= 0:
                 end = chart.find("</span>", head_start + len(dk.CHART_TITLE_M))
                 title = chart[head_start + len(dk.CHART_TITLE_M):end]
-                line = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 {dk.CHART_TITLE_GAP}px;">'
-                        f'{dk.CHART_TITLE}{title}</span><span style="flex:none;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:400;">{fmt_tri(first[1])}</span></span>')
+                # 값 = 제목 바로 옆 · 대상 이름을 붙여 (2026-11-15 사용자: `에너지 vs 시장` 옆 4.6%p 가 에너지 것인지 시장 것인지 헷갈림 → `에너지 ▲ 4.6%p`, 옛 P428 오른쪽 끝)
+                subj = fc["ruler_short"].split(" vs ", 1)[0] if " vs " in fc["ruler_short"] else ""
+                line = (f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:baseline;column-gap:8px;margin:0 0 {dk.CHART_TITLE_GAP}px;">'
+                        f'{dk.CHART_TITLE}{title}</span><span style="flex:none;white-space:nowrap;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:400;color:#111;">'
+                        + (f'{dk.esc(subj)} ' if subj else '') + f'{fmt_tri(first[1])}</span></span>')
                 chart = chart[:head_start] + line + chart[end + len("</span>"):]
         # 그래프 폭 = 왼쪽 글자 기준선 6 ~ 접기 버튼 오른쪽 끝 (P438, 2026-11-08 사용자) — 흰 카드의 양쪽 −5 넓힘(CHART_CARD_X)은 여기서 끈다
         chart = chart.replace(f"margin:0 {dk.CHART_CARD_X}px;", "margin:0;", 1)
@@ -1140,7 +1144,7 @@ def _now_block(fc, st, parts=False):
             guides = [(f"{REV[s][0]} 기준", [g * 0.5] * n, "#FCA5A5" if s < 0 else "#93C5FD", "dash"), (f"{DIR_WORD[s]} 지속 기준", [g + s * L] * n, "#93C5FD" if s < 0 else "#FCA5A5", "dash")]
         if fc.get("baseline") is not None:
             guides.append((fc.get("baseline_label", "평소"), [fc["baseline"]] * n, dk.CHART_CMP, "dash"))
-        gr = dk.trend_card(f'{fc["ruler_short"]} ({unit})', labels, [(fc["ruler_short"], vals, dk.CHART_MAIN, "solid")] + guides, lambda v: fmt_v(v, unit))
+        gr = dk.trend_card(f'{fc["ruler_short"]} ({unit})', labels, [(fc["ruler_short"], vals, dk.CHART_MAIN, "solid")] + guides, lambda v: fmt_v(v, unit), legend_plain=True)   # 범례 = 기준선만 · `넘겨 보기` 와 한 줄 (2026-11-15 사용자)
         lines.append((f'<span data-end-chart="1" style="display:block;margin:0 0 -{END_PULL}px;">{gr}</span>', "html"))
     if parts:   # 카드 없이 쓸 때 (P425) — (값 줄, 그래프)
         return [(x[1], x[2], x[3]) for x in lines if x[0] == "row"], (gr if days and sum(v is not None for v in vals) >= 2 else "")
@@ -1299,10 +1303,19 @@ def _binom_p(k, n, p):
     return min(1.0, sum(pr(i) for i in range(n + 1) if pr(i) <= pk * (1 + 1e-9)))
 
 
+def _brand(html, size):
+    """문장 속 `AlphaScope` → 로고 꼴(render_html.brand_mark, 둘레 − 3) — 16px 이상 문장만, 출처 · 작은 안내 · 툴팁은 글자 그대로 (2026-11-15 사용자)."""
+    import os
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "nvda-report"))
+    import render_html as R
+    return html.replace(R.BRAND, R.brand_mark(int(str(size).rstrip("px"))), 1)
+
+
 def _plain_rows(lead, rows, note="", lines=True):
     """접는 줄 안 내용 — 글자는 왼쪽 기준선 6(제목 점과 같은 선, P424) · 오른쪽도 6(좌우 같게, P461), 구분선은 끝까지. 굵게 없음 · 증감 숫자 = ▲ · ▼ + 색 (P423 · P424, 2026-11-08 사용자)."""
     A = dk.ALIGN_PX
-    out = f'<p style="margin:0 0 4px;padding:0 {A}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{tri_text(dk.esc(lead))}</p>' if lead else ""
+    out = f'<p style="margin:0 0 4px;padding:0 {A}px 0 {A}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;word-break:keep-all;">{_brand(tri_text(dk.esc(lead)), dk.NAME)}</p>' if lead else ""
     for i, (name, val, sub) in enumerate(rows):
         out += (f'<div style="padding:{14 - dk.VP}px {A}px {14 - dk.VP}px {A}px;{"border-top:1px solid #E2E8F0;" if i and lines else ""}">'
                 f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:{dk.NAME};line-height:{dk.LH_CARD};">'
