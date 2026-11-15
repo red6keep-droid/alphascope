@@ -231,6 +231,7 @@ def main():
     ap.add_argument("--cache", required=True, help="저장값 폴더(워크플로 = 비공개 상태 저장소 quick-state)")
     ap.add_argument("--prev", default="", help="전날 결과(us/ · kr/)")
     ap.add_argument("--news", nargs="*", default=[])
+    ap.add_argument("--qnews", default="", help="간단 종목 뉴스 상태(quick-news-state: news.json · summaries.json) — 있으면 미국 오늘 탭에 중요 이슈 · 뉴스")
     ap.add_argument("--radar", default="", help="미국 정식 상태(nvda-state radar/) — 비교 묶음 `시총 상위 20개`")
     ap.add_argument("--calendar", default="", help="엔비디아 리포트 calendar.jsonl — 시장 일정")
     ap.add_argument("--limit", type=int, default=0, help="시험용 — 시장마다 앞 N종목만")
@@ -347,8 +348,10 @@ def main():
         hist = FU.history(cache, q_us)
         fred = FU.fred(cache)
         macro = FU.macro_rows_from(a.calendar) if a.calendar else None
+        qn, qs = FU.load_news(a.qnews)
+        print(f"[quick] 간단 종목 뉴스 {len(qn)}건 · 요약 {len(qs)}건" + ("" if qn else " — 없음, `이름이 나온 기사` 카드로"))
         for s, h in FU.build(ref["us"], bars_us, earn, det, sec, hist, fred, macro=macro, only=set(us_syms),
-                             related=lambda s, e: rel(s, e, "US"), radar_dir=a.radar or None, extra_today=xtra).items():
+                             related=lambda s, e: rel(s, e, "US"), radar_dir=a.radar or None, extra_today=xtra, news=qn, summaries=qs).items():
             pages[("us", s)] = h
     except Exception as e:  # noqa: BLE001 — 한 시장이 통째로 실패해도 다른 시장 · 가격 파일은 나간다
         print(f"::warning::[quick] 미국 화면 실패: {e!r}")

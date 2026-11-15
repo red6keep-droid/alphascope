@@ -71,6 +71,8 @@ jobs:
           git fetch -q state report-state && git show FETCH_HEAD:experiments/daily-report/output/state/news_stories.json > /tmp/news/daily.json || true
           if git fetch -q state kr-state; then git archive FETCH_HEAD experiments/kr-stocks/data | tar -x && echo "한국 정식 상태: $(ls experiments/kr-stocks/data | wc -l)개"; fi
           if git fetch -q state quick-state; then git archive FETCH_HEAD | tar -x -C /tmp/qcache && echo "저장값: $(du -sh /tmp/qcache | cut -f1)"; else echo "저장값 없음 (첫 실행)"; fi
+          # 간단 종목 뉴스(quick-news.yml 15:10 이 남긴 분류 · 요약) — 있으면 미국 오늘 탭에 정식과 같은 중요 이슈 · 뉴스 · 뉴스 의견 (2026-11-15 3단계). 없으면 `이름이 나온 기사` 카드
+          mkdir -p /tmp/qnews && { git fetch -q state quick-news-state && git archive FETCH_HEAD | tar -x -C /tmp/qnews && echo "간단 종목 뉴스: $(ls /tmp/qnews | tr '\n' ' ')"; } || echo "간단 종목 뉴스 없음"
           ls -la /tmp/news /tmp/radar
 
       # 전날 데이터 — 오늘 못 받은 종목은 전날 파일 · 조각 그대로
@@ -91,7 +93,7 @@ jobs:
         run: |
           set +e
           python experiments/stock-quick/collect_quick.py --out /tmp/qd --cache /tmp/qcache --prev /tmp/prev \
-            --radar /tmp/radar --calendar /tmp/calendar.jsonl --news /tmp/news/*.json
+            --radar /tmp/radar --calendar /tmp/calendar.jsonl --news /tmp/news/*.json --qnews /tmp/qnews
           code=$?
           echo "code=$code" >> "$GITHUB_OUTPUT"
           [ $code -eq 3 ] && { echo "받은 종목 부족 — 올리지 않는다"; exit 0; }

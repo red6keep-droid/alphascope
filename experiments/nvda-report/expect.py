@@ -128,8 +128,12 @@ def collect_revenue(conn):
 
 def _eps(t):
     tr, rv = t.eps_trend, t.eps_revisions
+    if tr is None or "+1y" not in tr.index:
+        return None
     row = tr.loc["+1y"]
-    out = {k: float(row[k]) for k in ("current", "7daysAgo", "30daysAgo", "60daysAgo", "90daysAgo") if row.get(k) == row.get(k)}
+    out = {k: float(row[k]) for k in ("current", "7daysAgo", "30daysAgo", "60daysAgo", "90daysAgo") if row.get(k) is not None and row.get(k) == row.get(k)}
+    if "current" not in out:   # 애널리스트 예상이 없는 회사(한국 소형주 등) — Yahoo 가 칸 없는 빈 표를 준다. 빈 값 = 며칠 뒤 다시 (옛: KeyError 'current' 가 `실패` 로 찍힘, 11-14 한국 간단 15건)
+        return None
     if rv is not None and "+1y" in rv.index:
         out["up30"], out["down30"] = int(rv.loc["+1y"].get("upLast30days") or 0), int(rv.loc["+1y"].get("downLast30days") or 0)
     try:   # +1y 가 끝나는 날 = Yahoo 다음 결산일(0y 끝) + 1년 — 화면에 `2028년 1월 결산` (2026-11-02 사용자 P277: `내년` 이 달력 내년으로 읽힌다)
@@ -176,7 +180,9 @@ def collect_daily(conn, day):
     for s in PEERS:
         t = yf.Ticker(s)
         try:
-            eps[s] = _eps(t)
+            e_ = _eps(t)
+            if e_:
+                eps[s] = e_
         except Exception as e:   # noqa: BLE001
             print(f"[expect] {s} 예상치 실패 : {e}")
         try:
