@@ -1292,7 +1292,7 @@ def _history_card(fc):
         except ValueError:
             vw = wordify(str(val), L)
         rows.append((wordify(f"{when} {name}".strip(), L), f"{vw} ({val})", h.get("alike_note", "가장 비슷했던 때 · 그 뒤 한 달")))
-    return _plain_sec("과거 기록에서 비슷한 때는?", lead, rows, "기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다.")
+    return _plain_sec("과거 기록에서 비슷한 때는?", lead, rows, "기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다.", icon="clock")
 
 
 def _binom_p(k, n, p):
@@ -1328,9 +1328,11 @@ def _plain_rows(lead, rows, note="", lines=True):
     return out
 
 
-def _plain_sec(title, lead, rows, note="", lines=True):
+def _plain_sec(title, lead, rows, note="", lines=True, icon=""):
     """카드 없이 구분선 구획 — 제목(아래 선) · 첫 문장 · 구분선 줄(이름 굵게 + 오른쪽 값 · 아래 작은 회색) · 작은 안내 (2026-11-07 사용자: `더 궁금한 것` 제목 삭제, 두 카드를 카드 말고 구분선으로)."""
     out = _plain_rows(lead, rows, note, lines)
+    if icon:   # 기본형 아이콘 접는 줄 (2026-11-15 사용자: 아래 접는 줄 모두 회색 원 아이콘)
+        return _fold_row(title, out, icon=icon)
     # 제목 줄 = 위 · 아래 구분선 사이 제목(21, 구획 제목 22 보다 1 작게) + 오른쪽 공식 접기 버튼, 누르면 내용 (2026-11-07 사용자). 위 선은 묶음(_fold_group)이 긋고 각 줄은 아래 선만
     return (f'<details data-acc="1" class="fc-fsec" style="margin:0;border-bottom:1px solid #E2E8F0;">'
             f'<summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:0;padding:8px 0 8px {dk.ALIGN_PX}px;">'
@@ -1372,7 +1374,7 @@ def _reasons_card(fc):
     if fc.get("stock_page"):
         body += (f'<a href="{dk.esc(fc["stock_page"])}" style="display:block;margin:8px 0 0;padding:0 {dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
                  f'color:#333;text-decoration:underline;text-underline-offset:3px;">{dk.esc(fc["subject"])} 종목 페이지 ›</a>')
-    return _fold_row("무엇이 이유로 꼽혔나?", body).replace('<details data-acc="1"', '<details data-acc="1" open', 1)   # 독자가 가장 먼저 묻는 것 — 펼친 채로
+    return _fold_row("무엇이 이유로 꼽혔나?", body, icon="news").replace('<details data-acc="1"', '<details data-acc="1" open', 1)   # 독자가 가장 먼저 묻는 것 — 펼친 채로
 
 
 def _fold_row(title, html, label="", side="", icon=""):
@@ -1386,7 +1388,10 @@ def _fold_row(title, html, label="", side="", icon=""):
             + f'<span class="fc-fsec-t" style="flex:1 1 auto;min-width:0;font-size:16px;line-height:26px;font-weight:400;color:#111;">{dk.esc(title)}</span>'
             + (f'<span style="flex:none;margin-right:8px;font-size:13px;line-height:19px;color:{dk.SUB};white-space:nowrap;">{dk.esc(side)}</span>' if side else "")   # 접기 버튼 앞 작은 회색 (`11.10 종가`, 2026-11-11 사용자)
             + f'{dk.fold_btn()}</summary>'
-            f'<div style="padding:4px 0 {16 - dk.VP}px;">{html}</div></details>')
+            f'<div style="padding:4px 0 {16 - dk.VP}px {FOLD_ICON_IN if icon else 0}px;">{html}</div></details>')   # 아이콘 줄 = 안 내용 전부(값 줄 · 그래프 제목 · 그래프 · 안내)를 제목 글자 세로선에 (2026-11-15 사용자)
+
+
+FOLD_ICON_IN = dk.SOFT_ICON_SIZE + 6   # 아이콘 22 + 글자와 6 = 28 — 안 내용의 왼쪽 6 과 더해 제목 글자 시작선(6 + 28 = 34)
 
 
 FOLD_CSS = '<style>.fc-fsec[open]>summary .fc-fsec-t{font-weight:700 !important;}</style>'   # 접는 줄을 펼치면 제목 굵게 (P429, 2026-11-08 사용자)
@@ -1550,7 +1555,7 @@ def _shock_size(fc):
     if g is None:
         return ""
     col = dk.UP if g > 0 else dk.DOWN
-    out = f' · <span style="color:{col};">{"▲" if g > 0 else "▼"} {abs(g):.1f}{dk.esc(fc.get("unit", "%"))}</span>'   # 굵게 빼기 (P495)
+    out = f' · <span style="color:{col};white-space:nowrap;">{dk.tri_span(g > 0, int(dk.TINY[:-2]))}{abs(g):.1f}{dk.esc(fc.get("unit", "%"))}</span>'   # 굵게 빼기 (P495) · 삼각형 = 가이드 5절 글자 80% · 위 1 · 간격 2 (2026-11-15 사용자)
     return out + (f' · 평소의 <span style="color:#111;">{abs(z):.1f}배</span>' if z else "")
 
 
