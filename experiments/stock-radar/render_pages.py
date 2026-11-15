@@ -539,7 +539,7 @@ def sec_company(s):
     + 기본 정보(야후 회사 개요). 평가 · 전망 · 추천 없음. 칸이 없으면 그 줄만 뺀다."""
     c = s.get("company") or {}
     about = U.ABOUT.get(s["sym"], "")
-    intro = f'<p style="margin:0 0 12px;padding:0 {_dk.ALIGN_PX}px;color:#111;line-height:33px;word-break:keep-all;">{_esc(about)}</p>' if about else ""   # 한국 sec_company 와 같은 모양
+    intro = f'<p style="{_dk.TAB_LEAD_GAP}color:#111;line-height:33px;word-break:keep-all;">{_esc(about)}</p>' if about else ""   # 한국 sec_company 와 같은 모양
     if not c.get("name"):
         return intro or _dk.muted("기업 정보를 아직 받지 못했습니다.")
     url = c.get("website") or ""
@@ -1214,7 +1214,9 @@ def summarize_shown(a, news):
                 seen.add(k)
                 items.append({"item_id": k, "title": e["title"], "url": e.get("url"), "snippet": e.get("detail") or ""})
     try:
-        news_summary.summarize(items, cache_path=SUMMARY_PATH, lead_cache=os.path.join(_HERE, "data", "leads.json"), label="radar-summary", max_items=SUMMARY_MAX)
+        # 첫 문단 = 분류 단계(collect_news.LEAD_CACHE)가 이 실행에서 이미 받아 둔 파일을 그대로 (2026-11-15).
+        # 옛: 따로 data/leads.json — 같은 기사를 처음부터 다시 받으려다 구글 뉴스가 이미 막은 뒤라 매 실행 40건 중 0건, 요약은 제목만 보고 만들어졌다
+        news_summary.summarize(items, cache_path=SUMMARY_PATH, lead_cache=os.path.join(_HERE, "data", "article_cache.json"), label="radar-summary", max_items=SUMMARY_MAX)
     except Exception as e:  # noqa: BLE001
         print(f"[radar] 기사 요약 실패 — 요약 줄 하나로 : {str(e)[:100]}")
     print(f"[radar] 팝업 대상 기사 {len(items)}건")
