@@ -1027,6 +1027,9 @@ def _logo_files():
     return _logos
 
 
+LOGO_VER = "2"   # 로고 파일을 바꾸면 올린다 — 브라우저가 옛 로고를 7일 간 들고 있다 (2026-11-15: 바탕 네모 흰색으로 바꿈)
+
+
 def ticker_logo(sym, size=20):
     """종목 이름 앞 둥근 로고 (2026-10-13 사용자: "각각의 종목명에도 티커 아이콘").
     2026-10-21: 제3자 핫링크(financialmodelingprep)를 빼고 티커 두 글자 배지로 바꿨다 (D4-6).
@@ -1037,7 +1040,7 @@ def ticker_logo(sym, size=20):
         return ""
     rec = _logo_files().get(sym)
     if rec:
-        return (f'<img src="{LOGO_BASE}{esc(rec["file"])}" alt="" width="{size}" height="{size}" loading="lazy" '
+        return (f'<img src="{LOGO_BASE}{esc(rec["file"])}?v={LOGO_VER}" alt="" width="{size}" height="{size}" loading="lazy" '
                 f'style="display:inline-block;width:{size}px;height:{size}px;border-radius:50%;vertical-align:-4px;margin-right:6px;'
                 f'background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;">')   # 모든 로고 = 흰 바탕 + 회색 외곽선 — 바탕 없는 로고를 회색으로 채우니 크기가 제각각으로 보였다 (2026-11-15 사용자, 옛: 회색 바탕 · 흰 로고만 외곽선 11-11)
     txt = sym.replace("-", "").replace(".", "")[:2]
