@@ -35,7 +35,8 @@ DECO = {   # 강좌 글 꾸밈 — 색 · 모양은 여기 한 곳 (auto-blogspo
     "accent": "color:#0F766E;font-weight:700;",
     # 소제목 = 왼쪽 막대 대신 동그란 바탕 + 이모지 (2026-11-12 사용자: 세로 막대 말고 재밌는 아이콘). 이모지는 초안 `## 💡 제목` 맨 앞에 적는다
     "h2": "display:flex;align-items:center;gap:10px;margin:40px 0 16px;font-size:22px;line-height:32px;font-weight:700;color:#111;word-break:keep-all;",
-    "h2_icon": "flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:20px;background:#ECFDF5;font-size:22px;line-height:40px;",
+    # 2026-11-15 사용자: 동그라미 바탕 없앰 — 소품 아이콘(네모 그림)만, 칸 = 아이콘 크기(36) 그대로라 모서리가 잘리지 않게
+    "h2_icon": "flex:none;display:flex;align-items:center;justify-content:center;width:36px;height:36px;font-size:22px;line-height:36px;overflow:visible;",
     # 캐릭터 강조 = `> 🤷 문장` (💬 말고 다른 이모지로 시작하는 인용 줄) — 큰 캐릭터 + 굵은 한 문장 (2026-11-12 사용자)
     "char": "display:flex;align-items:center;gap:14px;margin:24px 0;padding:16px 18px;border-radius:16px;background:#FEF9E7;",
     "char_icon": "flex:none;font-size:44px;line-height:52px;",
@@ -82,7 +83,7 @@ ICONS = {
     "⚖": "scale", "🔍": "magnifier", "💡": "bulb", "🗺": "map", "✅": "check", "🎣": "hook", "✌": "calendars", "📅": "calendars",
 }
 ICON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons")
-ICON_PX = {"h2": 36, "check": 22}   # 소제목 · 체크 목록 글머리. 소제목 = 네모 아이콘 36 을 동그라미(40) 바탕 위에 겹쳐 올림 — 동그라미 안에 맞춰 넣지 않는다, 모서리가 밖으로 나와도 됨 (2026-11-15 사용자: 28 은 동그라미에 갇혀 잘려 보임)
+ICON_PX = {"h2": 36, "check": 22}   # 소제목 · 체크 목록 글머리. 소제목 = 바탕 없이 네모 아이콘 36 (2026-11-15 사용자: 동그라미 안 28 은 잘려 보임 → 동그라미 없앰)
 
 
 def icon_html(tok, where):
