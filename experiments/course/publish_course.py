@@ -45,9 +45,9 @@ def _env():
 
 
 def upload_images():
-    """chars/*.webp · icons/*.webp · banner/home_banner.webp → gh-pages images/study/ — 내용이 같으면 커밋 안 함."""
+    """chars/*.webp · icons/*.webp · banner/*.webp(홈 배너 · 목록 맨 위 그림) → gh-pages images/study/ — 내용이 같으면 커밋 안 함."""
     src = sorted(glob.glob(os.path.join(HERE, "chars", "*.webp")) + glob.glob(os.path.join(HERE, "icons", "*.webp"))
-                 + [os.path.join(HERE, "banner", "home_banner.webp")])
+                 + glob.glob(os.path.join(HERE, "banner", "*.webp")))
     subprocess.run(["git", "-C", ROOT, "fetch", "-q", "origin", BRANCH], check=True)
     with tempfile.TemporaryDirectory() as tmp:
         wt = os.path.join(tmp, "ghp")

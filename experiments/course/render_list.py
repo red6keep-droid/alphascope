@@ -2,7 +2,7 @@
 
     .venv/bin/python experiments/course/render_list.py      # output/mock_study_list.html
 
-- 커리큘럼 문서 4절: 맨 위 캐릭터 셋 + 한 줄 소개 → 과정 카드 → 편 목록. 나온 편 = 줄 전체 링크, 안 나온 편 = 회색 `준비 중`.
+- 커리큘럼 문서 4절: 맨 위 캐릭터 그림(banner/study_head.webp, 사용자 그림) + 한 줄 소개 → 과정 카드 → 편 목록. 나온 편 = 줄 전체 링크, 안 나온 편 = 회색 `준비 중`.
 - 나온 편 주소 = published.json (publish_course.py 가 발행 때 씀). 편 목록 = 아래 COURSES (커리큘럼 문서 2절). 편이 나올 때만 갱신.
 - 번호 칸은 글 본문 번호 목록과 같은 규칙(기준선에서 시작 · 32px).
 """
@@ -79,10 +79,11 @@ def course_card(k, name, intro, eps, urls):
 
 
 def page(urls):
-    chars = "".join(f'<img src="{RC.img_src(RC.CHAR_DIR, c)}" alt="" width="84" height="84" style="display:block;width:84px;height:84px;max-width:none;border-radius:0;">'
-                    for c in ("up_surprised", "mid_explain", "down_happy"))
+    # 맨 위 그림 = 사용자 그림 한 장(중심이 음악 · 상승이 · 하락이 책 읽기, 2026-11-15) — 요청 1회. 폭에 맞춰 줄고 PC 는 360 까지
+    art = (f'<img src="{RC.img_src(os.path.join(HERE, "banner"), "study_head")}" alt="" width="918" height="482" '
+           'style="display:block;width:100%;max-width:360px;height:auto;aspect-ratio:918 / 482;margin:0 auto;border-radius:0;">')
     head = (f'<div data-study-head="1" style="padding:24px {dk.ALIGN_PX}px 8px;margin:0 0 16px;text-align:center;">'
-            f'<div aria-hidden="true" style="display:flex;justify-content:center;align-items:flex-end;gap:4px;margin:0 0 12px;">{chars}</div>'
+            f'<div aria-hidden="true" style="margin:0 0 12px;">{art}</div>'
             '<h1 style="margin:0 0 6px;font-size:26px;line-height:36px;font-weight:800;color:#111;">주식 공부</h1>'
             f'<p data-seo-lead="1" style="margin:0;font-size:17px;line-height:26px;color:#333;word-break:keep-all;">{INTRO}</p></div>')
     cards = "".join(course_card(k, *c, urls) for k, c in enumerate(COURSES))
