@@ -89,7 +89,7 @@ def arrow(v, digits=2, unit="%"):
 
 
 EMPH_TRI = 14   # 강조 카드 답 앞 ▲ · ▼ — 답 글자 18 의 80% = 14.4 → 14 (2026-11-08 사용자: 삼각형 20% 작게, tech_signals._tri_small 과 같은 방식)
-_EMPH_TRI_RE = re.compile(r"(^|>)([▲▼])")
+_EMPH_TRI_RE = re.compile(r"(^|>)([▲▼])( ?)")   # 뒤 띄어쓰기 = 줄바꿈 없는 칸 (2026-11-15 사용자: 삼각형은 뒤 말과 같이 줄바꿈)
 
 
 PRICE_TRI = 15   # 가격 카드 머리 줄 등락 `▲ 2.36%` 의 ▲ · ▼ — 가격 글자 19 의 80% = 15.2 → 15 (2026-11-08 사용자: 답 삼각형과 똑같이)
@@ -102,7 +102,7 @@ def emph_tri(html, px=None, every=False):
     s = str(html or "")
     if "data-tri" in s:
         return s
-    out = _EMPH_TRI_RE.sub(lambda m: f'{m.group(1)}<span data-tri="1" style="font-size:{px}px;vertical-align:1px;">{m.group(2)}</span>', s, count=0 if every else 1)
+    out = _EMPH_TRI_RE.sub(lambda m: f'{m.group(1)}<span data-tri="1" style="font-size:{px}px;vertical-align:1px;">{m.group(2)}</span>{chr(160) if m.group(3) else ""}', s, count=0 if every else 1)
     return f"<span>{out}</span>" if out != s else s   # 답 칸이 inline-flex 라 통째로 감싼다 — 안 감싸면 ▲ 뒤 공백이 flex 항목 사이에서 사라짐
 
 
@@ -136,6 +136,7 @@ def section(title, html, summary="", line=None, tab=None, aside="", one_line=Fal
 
 
 ALIGN_PX = 6   # 좌측 기준선 — 카드 밖 구획 제목 · 글의 왼쪽 시작선 = 홈 실시간 뉴스 글자 (폰: 화면 가장자리 20 = 본문 영역 14 + 6, 2026-10-24 사용자). 옛 13(카드 안 글자, 2026-10-23)을 대체
+TAB_LEAD_GAP = f"margin:20px 0 27px;padding:0 0 0 {ALIGN_PX}px;"   # 탭 맨 위 문장(매수의견 요약 · 기업 소개) — 탭 바 아래 위 여백 20(+10 → +5 → +5 더, 사용자 "탭 밑에 문장이 있을 때는 이 정도 여백이 디자인 규칙"), 아래 카드까지 27(옛 12 + 15), 좌우 = 맨 앞 요약(data-seo-lead)과 같게 왼쪽 6 · 오른쪽 0. 문장 아래 카드가 오면 늘 이 간격 (2026-11-15 사용자)
 
 
 def align_titles(html, px=ALIGN_PX):
@@ -848,12 +849,17 @@ def _tri_in_text(t, px, colored, bold=False):
     return "".join(p if p.startswith("<") else _tri_sub(p, px, paint=not colored, bold=bold) for p in _TAG.split(t))
 
 
+_TRI_GAP = re.compile(r"([▲▼](?:</span>|</b>)*) (?=\S)")   # 삼각형(과 그것을 감싼 닫는 태그) 뒤 띄어쓰기
+_TRI_END = re.compile(r"[▲▼](?:</span>|</b>)*$")
+
+
 def fix_colons(html):
     """보이는 글의 ":" · "·" 는 앞뒤를 한 칸씩 띄운다 ("·" 는 2026-10-13 사용자) — "라벨 : 값" (2026-10-11 사용자: 꼭 반드시, 모든 페이지 일괄).
     글자 노드와 툴팁·제목 속성(data-tip · title · aria-label)만 고친다. style · script 안, 시각·비율(숫자:숫자), 주소(://)는 건드리지 않는다.
     각 리포트의 build_body 마지막에 한 번 건다 — LLM 서술도 같이 고쳐진다. 줄표 ` — ` 도 여기서 쉼표로 (_no_dash).
     숫자 앞 빼기(−3)는 그린 줄(MINUS_BAR)로, 툴팁 속 빼기는 엔 대시(–)로 (2026-10-26 사용자)."""
     out, skip, svg, sent = [], False, False, False
+    tri_end = False   # 앞 글자 노드가 ▲ · ▼ 로 끝났나 — 다음 노드 첫 띄어쓰기도 붙인다(`<span>▲</span> 올랐습니다`)
     stack = []   # (태그 이름, 증감 색 여부, 글자 px, 그래프 안) — 삼각형 크기 · 그래프 건너뛰기용
     for part in _TAG.split(html):
         if part.startswith("<") and part.endswith(">"):
@@ -885,7 +891,7 @@ def fix_colons(html):
                 svg = True
             elif low.startswith("</svg"):
                 svg = False
-            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _MINUS_NUM.sub("–", (_tri_plain if m.group(1).startswith("data-tip") else (lambda x: x))(_sign_text(_space_dots(_space_colons(_no_dash(m.group(2)))), False))) + m.group(3), part))   # 툴팁 글은 HTML 을 못 넣어 엔 대시로 · 툴팁 증감 = `▲ 1.2%` 글자 (2026-11-12)
+            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _MINUS_NUM.sub("–", (_tri_plain if m.group(1).startswith("data-tip") else (lambda x: x))(_sign_text(_space_dots(_space_colons(_no_dash(m.group(2)))), False))).replace("▲ ", "▲\u00a0").replace("▼ ", "▼\u00a0") + m.group(3), part))   # 툴팁 글은 HTML 을 못 넣어 엔 대시로 · 툴팁 증감 = `▲ 1.2%` 글자 (2026-11-12)
         elif skip:
             out.append(part)
         else:
@@ -893,6 +899,12 @@ def fix_colons(html):
             top = stack[-1] if stack else ("", None, BODY_PX, False)
             if not svg and not top[3]:
                 t = _tri_in_text(t, top[2], bool(top[1]), sent)   # 증감 색 숫자 → 삼각형, 그래프 안은 그대로 (2026-11-12 사용자)
+            if not svg:   # ▲ · ▼ 와 뒤 말은 한 덩어리로 줄바꿈 — 삼각형 뒤 띄어쓰기 = 줄바꿈 없는 칸 (2026-11-15 사용자: "삼각형은 항상 문장하고 같이 줄바꿈")
+                t = _TRI_GAP.sub(lambda m: m.group(1) + "\u00a0", t)
+                if tri_end and t.startswith(" "):
+                    t = "\u00a0" + t[1:]
+                if t.strip():
+                    tri_end = bool(_TRI_END.search(t))
             out.append(t if svg else _minus_bar(t))   # 숫자 앞 − 는 그린 줄로 (MINUS_BAR) — SVG <text> 안은 HTML 을 못 넣어 글자 그대로 (2026-11-01: 매출 선 그래프 음수 값이 그림을 깼다, P233)
     return "".join(out)
 

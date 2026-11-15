@@ -1281,8 +1281,8 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
     import signal_groups as SG
     nm = _esc(name)
     sents, dirs = [], {}
-    up_w = lambda w: f'<b style="font-weight:700;color:{UP};">▲ {w}</b>'   # noqa: E731
-    dn_w = lambda w: f'<b style="font-weight:700;color:{DOWN};">▼ {w}</b>'   # noqa: E731
+    up_w = lambda w: f'<b style="font-weight:700;color:{UP};white-space:nowrap;">▲ {w}</b>'   # noqa: E731
+    dn_w = lambda w: f'<b style="font-weight:700;color:{DOWN};white-space:nowrap;">▼ {w}</b>'   # noqa: E731 — ▲ · ▼ 와 말은 한 덩어리로 줄바꿈 (2026-11-15 사용자: 삼각형 뒤에서 줄이 꺾이면 안 된다)
     # 문장 셋 (2026-11-15 사용자 "너무 많이 줄였는데 3줄 정도"): ① 애널리스트 + 평균 목표가 ② 증권사 + 방송 · 뉴스 ③ 주가 + Alpha Scope 신호
     # 브랜드를 숨기지 않는다 — `가격 흐름(Alpha Scope 신호)` → `Alpha Scope 신호는 중립이다` (같은 날 사용자)
     # ① 전문가 — 애널리스트 다수 의견 + 평균 목표가 자리
@@ -1339,26 +1339,28 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
         sents.append(f"{br}고, {md}")
     elif br or md:
         sents.append(f"{br}다." if br else md)
-    # ③ 주가 흐름 + Alpha Scope 신호 — 의견과 신호가 갈리면 그 뜻을 같은 문장 뒤에
+    # ③ AlphaScope 신호 + 주가 흐름 — 의견과 신호가 갈리면 그 뜻을 같은 문장 뒤에. 브랜드가 문장 맨 앞이라 앞에 색 글자가 붙지 않는다
     cs = [c for c in (closes or []) if c is not None]
     r5 = (cs[-1] / cs[0] - 1) * 100 if len(cs) >= 2 and cs[0] else None
-    price = (f"주가는 최근 며칠 {up_w('올랐고')}" if r5 is not None and r5 > 1 else f"주가는 최근 며칠 {dn_w('내렸고')}" if r5 is not None and r5 < -1
-             else "주가는 최근 며칠 크게 움직이지 않았고" if r5 is not None else "")
+    # 주가 말 — 브랜드를 문장 앞에 두고 주가는 뒤에 이어 쓴다 (2026-11-15 사용자: "AlphaScope 앞에 색 글자가 붙어 거슬린다, 내용은 그대로")
+    price = (f"주가는 최근 며칠 {up_w('올랐다')}" if r5 is not None and r5 > 1 else f"주가는 최근 며칠 {dn_w('내렸다')}" if r5 is not None and r5 < -1
+             else "주가는 최근 며칠 크게 움직이지 않았다" if r5 is not None else "")
     rows = [x for x in items or [] if x and x[1]]
     sg = SG.horizon_votes(rows)["단기"][0] if rows else None
     outside = [d for d in dirs.values() if d is not None]
     o = SG.vote(outside) if outside else None
     if sg is not None:
         sig = {1: up_w("상승"), -1: dn_w("하락"), 0: "중립"}[sg]
-        tail = {(1, 1): "으로, 의견과 가격이 같은 쪽을 보는 구간이다", (1, -1): "으로, 의견이 가격보다 앞서 있는 구간이다",
-                (-1, 1): "으로, 의견과 가격이 엇갈리는 구간이다", (-1, -1): "으로, 의견도 가격도 하락 쪽인 구간이다"}.get((o, sg))
-        sig_s = f"{brand_mark(19)} 신호는 {'아직 ' if sg == -1 and o == 1 else ''}{sig}{tail or '이다'}."
-        sents.append((price + ", " if price else "") + sig_s)
+        # (이어 쓰는 꼴, 끝맺는 꼴) — 갈림 말은 신호 바로 뒤에 붙여 `가격`이 주가로 읽히지 않게 한다 (옛 `의견이 가격보다 앞서` 를 주가 말 뒤에 두면 주가와 엇갈려 읽혔다)
+        mid, end = {(1, 1): ("으로 의견과 같은 쪽이고", "으로 의견과 같은 쪽이다"), (1, -1): ("으로 의견이 신호보다 앞서 있고", "으로 의견이 신호보다 앞서 있는 구간이다"),
+                    (-1, 1): ("으로 의견과 엇갈리고", "으로 의견과 엇갈리는 구간이다"), (-1, -1): ("으로 의견과 같은 하락 쪽이고", "으로 의견과 같은 하락 쪽이다")}.get((o, sg), ("이고", "이다"))
+        head = f"{brand_mark(19)} 신호는 {'아직 ' if sg == -1 and o == 1 else ''}{sig}"
+        sents.append(f"{head}{mid}, {price}." if price else f"{head}{end}.")   # AlphaScope 신호는 아직 ▼ 하락으로 의견이 신호보다 앞서 있고, 주가는 최근 며칠 ▲ 올랐다.
     elif price:
-        sents.append(price[:-1] + "다.")
+        sents.append(price + ".")
     if not sents:
         return ""
-    return f'<p data-op-summary="1" style="{_dk.SEO_LEAD}">{_dk.emph_tri(" ".join(sents), _dk.PRICE_TRI, every=True)}</p>'   # ▲ · ▼ = 글자 19 의 80% (2026-11-08 사용자)
+    return f'<p data-op-summary="1" style="{_dk.SEO_LEAD}{_dk.TAB_LEAD_GAP}">{_dk.emph_tri(" ".join(sents), _dk.PRICE_TRI, every=True)}</p>'   # ▲ · ▼ = 글자 19 의 80% (2026-11-08 사용자)
 
 
 
