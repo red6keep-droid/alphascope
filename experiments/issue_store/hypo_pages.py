@@ -115,13 +115,12 @@ def scale_icon(size=24):
             f'<svg viewBox="0 0 16 16" width="{g}" height="{g}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">'
             '<path d="M8 2v12M4.5 14h7"/><path d="M2.5 5h11"/><path d="M4 5 2 9.5h4L4 5zM12 5l-2 4.5h4L12 5z"/></svg></span>')
 def gauge_icon(size=24):
-    """Hot Issue 아이콘 — 저울 대신 반원 게이지(뉴스 바늘 `최근 일주일 뉴스는 어느 쪽?` 을 줄인 그림: 세 칸 반원 + 바늘 + 가운데 점) (2026-11-15 사용자).
+    """Hot Issue 아이콘 — 저울 대신 반원 게이지(뉴스 바늘 `최근 일주일 뉴스는 어느 쪽?` 을 줄인 그림: 반원 + 바늘 + 가운데 점) (2026-11-15 사용자).
     상자 = 저울 아이콘과 같은 청록 #0E7490 사각 · 모서리 = 크기/4 · 그림 = 크기의 2/3 (강조형 아이콘, 가이드라인 8절)."""
     g = round(size * 2 / 3)
     return (f'<span style="display:inline-flex;align-items:center;justify-content:center;width:{size}px;height:{size}px;border-radius:{round(size / 4)}px;background:#0E7490;color:#fff;" aria-hidden="true">'
             f'<svg viewBox="0 0 16 16" width="{g}" height="{g}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">'
-            '<path d="M2.00 10.40A6 6 0 0 1 4.31 5.67M5.18 5.10A6 6 0 0 1 10.82 5.10M11.69 5.67A6 6 0 0 1 14.00 10.40"/>'
-            '<path d="M8 10.4L6.08 6.78"/><circle cx="8" cy="10.4" r="1.2" fill="currentColor" stroke="none"/></svg></span>')
+            '<path d="M2 10.5a6 6 0 0 1 12 0"/><path d="M8 10.5 5.5 6.5"/><circle cx="8" cy="10.5" r="1.4" fill="currentColor" stroke="none"/></svg></span>')   # 한 줄 반원 + 바늘 + 가운데 점 — 옛 세 칸 반원은 24 상자(그림 16)에서 틈이 1px 아래라 선이 깨져 보였다 (2026-11-15 사용자)
 
 
 # 상세 하단 버튼 · 머리 줄 화살표 = 전망 목록 (2026-11-09 사용자: 홈이 아니라 목록으로) — 테마가 data-nav="list" · data-title-back 을 읽는다
