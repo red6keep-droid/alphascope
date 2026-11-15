@@ -467,7 +467,8 @@ def judge(fc, days, rel, cond=None, vix=None):
                 log.append(_entry(day, "hit" if ok else "miss", result["word"], dd,
                                   f'{what}. 우리가 고른 ‘{pick}’이 {"맞았" if ok else "틀렸"}습니다.', r, THEME[dd]))
                 break
-            ahead = f' ‘{b1["name"]}’까지 {max(0.0, (R_HIT - recov) * abs(gap)):.1f}{unit} 더 {REV[s][1]}하면, ‘{b2["name"]}’까지 {max(0.0, L - ext):.1f}{unit} 더 {"오르면" if s > 0 else "빠지면"}입니다.'
+            # 조건 → 갈래 차례로 두 번 (2026-11-15 사용자: 옛 `‘반등’까지 4.4%p 더 회복하면, ‘하락 지속’까지 1.2%p 더 빠지면입니다` 가 어색)
+            ahead = f' {max(0.0, (R_HIT - recov) * abs(gap)):.1f}{unit} 더 {REV[s][1]}하면 ‘{b1["name"]}’, {max(0.0, L - ext):.1f}{unit} 더 {"오르면" if s > 0 else "빠지면"} ‘{b2["name"]}’입니다.'
             if recov >= R_EARLY:
                 log.append(_entry(day, "lean", f'{b1["name"]} {LEAN}', b1["dir"], f'{SHOCK[s]} 폭의 {recov * 100:.0f}%({recov_word(recov)})를 {REV[s][1]}했습니다. ‘{b1["name"]}’ 쪽으로 기울고 있습니다.{ahead}', r))
             elif ext >= L * EARLY:
