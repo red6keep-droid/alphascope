@@ -82,7 +82,7 @@ ICONS = {
     "⚖": "scale", "🔍": "magnifier", "💡": "bulb", "🗺": "map", "✅": "check", "🎣": "hook", "✌": "calendars", "📅": "calendars",
 }
 ICON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons")
-ICON_PX = {"h2": 28, "check": 22}   # 소제목 동그라미(40) 안 · 체크 목록 글머리
+ICON_PX = {"h2": 36, "check": 22}   # 소제목 · 체크 목록 글머리. 소제목 = 네모 아이콘 36 을 동그라미(40) 바탕 위에 겹쳐 올림 — 동그라미 안에 맞춰 넣지 않는다, 모서리가 밖으로 나와도 됨 (2026-11-15 사용자: 28 은 동그라미에 갇혀 잘려 보임)
 
 
 def icon_html(tok, where):
