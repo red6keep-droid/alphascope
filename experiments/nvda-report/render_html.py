@@ -2551,7 +2551,10 @@ def _event_html(e):
     tip_t = _esc(f"{src}: {e['title'][:90]}" if doc else f"{src} 원문").replace(chr(34), "&quot;")
     trhelp = ' data-trhelp="skip"' if e.get("media") else ""   # 방송 줄(media_feed)은 한국어 주제 + 유튜브 영상 — 영문 기사용 `번역 방법` 을 붙이지 않는다
     inner = _dk.news_item(head, e.get("url"), detail, subs, labels, meta, f' title="{tip_t}"{trhelp}', count_html=count)
-    if len(e.get("pop_lines") or []) >= 2:   # 누르면 요약 다섯 줄 팝업 — 방송(P337) · 기사(P341), 데일리 뉴스 탭과 같게. 원문은 팝업 안 작은 링크
+    if e.get("bundle"):   # 한 줄짜리 묶음 — 팝업에 묶인 줄 전부 + 번호 붙은 출처 버튼 (2026-11-15 사용자)
+        pid = _dk.news_pop_id("bd", e["pop_key"])
+        inner = _dk.news_pop_wrap(inner, pid) + _dk.bundle_pop_body(pid, e["title"], e["bundle"])
+    elif len(e.get("pop_lines") or []) >= 2:   # 누르면 요약 다섯 줄 팝업 — 방송(P337) · 기사(P341), 데일리 뉴스 탭과 같게. 원문은 팝업 안 작은 링크
         pid = _dk.news_pop_id("ev", e["pop_key"])
         kind = e.get("pop_kind") or "방송"
         title = head if kind == "기사" else e["title"]
@@ -2650,25 +2653,55 @@ def _thin(e):
     return bool(e.get("pop_key")) and not e.get("pop_unchecked") and len([x for x in (e.get("pop_lines") or []) if x]) < 2
 
 
-def _brief(a):
-    """목록에서 뺀 한 줄짜리(_thin) → 키워드 버튼 줄 (2026-11-15 사용자, design_kit.brief_chips). 줄 = 요약 한 줄, 없으면 사실 문장."""
+def _bundles(a):
+    """목록에서 뺀 한 줄짜리(_thin)를 같은 이슈끼리 2 ~ 4줄씩 묶어 `기사 한 건` 모양의 이벤트로 (2026-11-15 사용자, design_kit 묶음 규칙).
+    줄 = 요약 한 줄(없으면 사실 문장). 제목 = 첫 줄 · 요약 줄 = 둘째 줄 · 방향 = 묶인 줄이 모두 같으면 그 방향, 섞이면 중립 · 시각 = 가장 최근 · 출처 = `매체 외 n곳`.
+    이슈에 한 줄만 남으면 `그 밖` 으로 모으고, 전체가 한 줄뿐이면 싣지 않는다."""
     pool = a.get("brief_events") or (list(a.get("events") or []) + list(a.get("events_overflow") or []))   # brief_events = 목록 상한 밖까지 전부
-    thin = sorted((e for e in pool if _thin(e)), key=lambda e: str(e.get("published_at") or ""), reverse=True)
-    items = [{"issue": e.get("issue"), "line": next((x for x in e.get("pop_lines") or [] if x), None) or e.get("fact") or "",
-              "source": rr.SOURCE_KO.get(e.get("pop_source") or "", e.get("pop_source") or "") if (e.get("pop_kind") or "방송") == "기사" else e.get("channel", ""),
-              "url": e.get("url")} for e in thin]
-    return _dk.brief_chips(items, a.get("brief_key") or "ev", a.get("brief_name") or "")
+    groups, seen = {}, set()
+    for e in sorted((e for e in pool if _thin(e)), key=lambda e: str(e.get("published_at") or ""), reverse=True):
+        line = " ".join(str(next((x for x in e.get("pop_lines") or [] if x), None) or e.get("fact") or "").split())
+        if not line or line in seen:
+            continue
+        seen.add(line)
+        src = rr.SOURCE_KO.get(e.get("pop_source") or "", e.get("pop_source") or "") if (e.get("pop_kind") or "방송") == "기사" else e.get("channel", "")
+        groups.setdefault(e.get("issue") if e.get("issue") in _dk.ISSUE_KO else "OTHER", []).append(
+            {"line": line, "source": src, "url": e.get("url"), "at": e.get("published_at"), "direction": e.get("direction"), "area": e.get("area"), "media": e.get("media")})
+    lone = [r for k, v in groups.items() if k != "OTHER" and len(v) == 1 for r in v]   # 이슈에 한 줄뿐 → 그 밖으로
+    groups = {k: v for k, v in groups.items() if k == "OTHER" or len(v) > 1}
+    if lone:
+        groups["OTHER"] = sorted(groups.get("OTHER", []) + lone, key=lambda r: str(r["at"] or ""), reverse=True)
+    out = []
+    for k, rows in groups.items():
+        i = 0
+        for n in _dk.bundle_sizes(len(rows)):
+            part, i = rows[i:i + n], i + n
+            srcs = list(dict.fromkeys(r["source"] for r in part if r["source"]))
+            dirs = {r["direction"] for r in part}
+            out.append({"kind": "news", "bundle": part, "issue": k, "area": part[0]["area"], "direction": part[0]["direction"] if len(dirs) == 1 else "neutral",   # 방향이 섞인 묶음은 중립
+                        "title": part[0]["line"], "fact": part[0]["line"], "headline": part[0]["line"], "detail": part[1]["line"],
+                        "source": (srcs[0] + (f" 외 {len(srcs) - 1}곳" if len(srcs) > 1 else "")) if srcs else "", "url": None,
+                        "published_at": max(str(r["at"] or "") for r in part), "emphasis": False, "has_fact": True,
+                        "pop_key": f"{a.get('brief_key') or 'ev'}:{k}:{i}", "pop_lines": [r["line"] for r in part], "pop_kind": "묶음",
+                        "media": all(r.get("media") for r in part)})
+    return out
 
 
 def sec_events(a):
-    brief = ""
     if a["events"] or a.get("events_overflow"):
-        brief = _brief(a)
-        a = dict(a, events=[e for e in a["events"] if not _thin(e)], events_overflow=[e for e in a.get("events_overflow") or [] if not _thin(e)])
+        bundles = _bundles(a)   # 한 줄짜리 묶음 = 기사 한 줄처럼, 다른 기사와 시각순으로 섞는다 (2026-11-15 사용자)
+        keep = [e for e in a["events"] if not _thin(e)]
+        over = [e for e in a.get("events_overflow") or [] if not _thin(e)]
+        if bundles:
+            cards = [e for e in keep if e.get("emphasis")]
+            mixed = sorted([e for e in keep if not e.get("emphasis")] + over + bundles, key=lambda e: str(e.get("published_at") or ""), reverse=True)
+            room = max(0, len(keep) - len(cards)) or max(0, _dk.MORE_SHOWN - len(cards))
+            keep, over = cards + mixed[:room], mixed[room:]
+        a = dict(a, events=keep, events_overflow=over)
         if not a["events"] and a["events_overflow"]:
             a["events"], a["events_overflow"] = a["events_overflow"][:1], a["events_overflow"][1:]
         if not a["events"]:
-            return brief or _muted("오늘은 요약할 만한 뉴스가 없습니다.")
+            return _muted("오늘은 요약할 만한 뉴스가 없습니다.")
     if not a["events"]:
         return _muted("오늘은 임계값을 넘은 이벤트가 없습니다. 공시·기사·가격·옵션·예상 실적 어느 쪽도 기준에 걸리지 않았다는 뜻입니다.")
     cards = [e for e in a["events"] if e.get("emphasis")]
@@ -2677,7 +2710,6 @@ def sec_events(a):
     # 처음 5건(강조 카드 포함) + `뉴스 n건 더 보기` 10건씩 (2026-11-07 사용자 P340, 옛: 8건 + `그 외 n건` 한 번에 전부). 좌우 = 좌측 기준선 6px (P38)
     rest = plain + [dict(e, emphasis=False) for e in a["events_overflow"]]
     out = "".join(_event_html(e) for e in cards) + _dk.more_list([_event_html(e) for e in rest], "뉴스", max(0, _dk.MORE_SHOWN - len(cards)), indent=_dk.ALIGN_PX, first_top=NEWS_FIRST_TOP)
-    out += brief   # 한 줄 소식 키워드 버튼 — 목록 아래
     if a.get("analyst_target_only"):
         out += _muted(f"목표가만 바뀐 애널리스트 {len(a['analyst_target_only'])}건 (등급 변경 아님): "
                       + " · ".join(t["title"] for t in a["analyst_target_only"][:6]))
