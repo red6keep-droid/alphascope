@@ -8,6 +8,7 @@ name: Quick stock data (간단 정보 853종목)
 #     SEC companyfacts 하루 100곳 · DART 하루 30곳(새 보고서만) + 기업개황 60곳 + 공시 목록 약 20번. FRED 하루 한 번.
 #   - 결과 = 기록을 남기지 않는 브랜치 quick-us · quick-kr 에 통째로(force) — 저장소가 커지지 않는다. 시장별로 나눈 것은 한 묶음이 jsDelivr 150MB 안에 들게.
 #     커밋 둘: ① 데이터 ② version.json 에 ①의 커밋 번호. 브라우저는 @quick-us/version.json(purge) → @<커밋>/us/UBER.html 로 읽는다.
+#   - 종목 전용 페이지(publish_quick_shells.py) · 기업 소개(company_intro.py, Gemini lite 하루 25회까지) — 2026-11-15 사용자.
 #   - 예비 = Cloudflare Pages alpha-scope.pages.dev(2026-11-15 사용자, 블로그 red6 계정): 같은 조각을 매일 배포, 브라우저는 Pages 먼저 → jsDelivr → GitHub 원본.
 #   - 정식 자료(비교 묶음 · 자금 흐름 · 시장 일정 · 모은 기사)는 비공개 상태 저장소에서 읽기만. 간단 종목 저장값은 비공개 quick-state(다시 모을 수 있는 캐시라 기록 없이 덮어씀).
 #   - 게시 = 저장소 변수 QUICK_PUBLISH=true. 없으면 그림자 모드(만들기만 하고 올리지 않음, 표본만 아티팩트). 저장값은 그림자 모드에서도 남긴다(첫 주 채우기가 이어지게).
@@ -36,7 +37,7 @@ env:
 jobs:
   quick:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 80   # 첫 주: 상세 값 채우기 35분 + 기업 소개 · 전용 페이지(하루 50쪽 약 5분) (2026-11-15)
     steps:
       - uses: actions/checkout@v5
 
@@ -86,6 +87,7 @@ jobs:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 기업 소개(company_intro) — Gemini lite 하루 25회까지, 한도면 다음 날 (2026-11-15 사용자)
         run: |
           set +e
           python experiments/stock-quick/collect_quick.py --out /tmp/qd --cache /tmp/qcache --prev /tmp/prev \
@@ -94,6 +96,32 @@ jobs:
           echo "code=$code" >> "$GITHUB_OUTPUT"
           [ $code -eq 3 ] && { echo "받은 종목 부족 — 올리지 않는다"; exit 0; }
           exit $code
+
+      - name: Upload sample (shadow)
+        if: env.DO_PUBLISH != 'true' && steps.collect.outputs.code == '0'
+        run: |
+          mkdir -p /tmp/sample/us /tmp/sample/kr
+          cp /tmp/qd/us/version.json /tmp/qd/us/UBER.* /tmp/qd/us/SBUX.* /tmp/sample/us/ 2>/dev/null || true
+          cp /tmp/qd/kr/version.json /tmp/qd/kr/259960.* /tmp/qd/kr/010140.* /tmp/sample/kr/ 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: env.DO_PUBLISH != 'true' && steps.collect.outputs.code == '0'
+        with:
+          name: quick-sample
+          path: /tmp/sample
+          retention-days: 3
+
+      # 종목 전용 고정 페이지 (2026-11-15 사용자: /p/stock.html?s= 하나로는 Blogger 대표 주소가 ?s= 를 떼어 검색 · 공유가 종목별로 안 잡힌다).
+      # 소개가 있는 종목만 · 새 페이지 하루 50 · 고쳐 쓰기 100 · 4초 간격 · 429 면 멈춤. 본문은 작은 불러오기 코드라 스크립트를 고쳐도 다시 안 쓴다.
+      # 주소표(/tmp/qd/shells.json) → Pages /shells.json — /p/stock.html?s= 가 전용 페이지로 넘긴다
+      - name: Shell pages (Blogger, 종목 전용 페이지)
+        id: shells
+        if: env.DO_PUBLISH == 'true' && steps.collect.outputs.code == '0'
+        continue-on-error: true
+        env:
+          BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+          BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+          BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+        run: python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --publish --map /tmp/qd/shells.json
 
       # 저장값은 게시 여부와 상관없이 남긴다 — 하루 상한으로 나눠 채우는 것이 이어지게. 다시 모을 수 있는 캐시라 기록 없이 덮어쓴다(저장소가 커지지 않게)
       - name: Save quick-state (private, no history)
@@ -110,19 +138,6 @@ jobs:
           git push -q -f git@github.com:red6keep-droid/alphascope-state.git HEAD:quick-state
           echo "저장값 $(du -sh . | cut -f1)"
 
-      - name: Upload sample (shadow)
-        if: env.DO_PUBLISH != 'true' && steps.collect.outputs.code == '0'
-        run: |
-          mkdir -p /tmp/sample/us /tmp/sample/kr
-          cp /tmp/qd/us/version.json /tmp/qd/us/UBER.* /tmp/qd/us/SBUX.* /tmp/sample/us/ 2>/dev/null || true
-          cp /tmp/qd/kr/version.json /tmp/qd/kr/259960.* /tmp/qd/kr/010140.* /tmp/sample/kr/ 2>/dev/null || true
-      - uses: actions/upload-artifact@v4
-        if: env.DO_PUBLISH != 'true' && steps.collect.outputs.code == '0'
-        with:
-          name: quick-sample
-          path: /tmp/sample
-          retention-days: 3
-
       # Cloudflare Pages alpha-scope.pages.dev — jsDelivr 예비이자 먼저 읽는 곳 (2026-11-15 사용자: 용량 · 전송량 덜기, 이사 아님).
       # 블로그 Cloudflare 계정(red6)만 — 계정 ID 고정, 토큰 = Pages 쓰기 권한만. 독자가 보는 페이지가 아직 없어 그림자 모드에서도 올린다(확인용).
       # 배포 하나 = 사이트 전체: us/ · kr/ · _headers(CORS · 검색 제외) · robots.txt · 404.html. 바뀐 파일만 올라간다. 실패해도 jsDelivr 길은 그대로.
@@ -134,7 +149,10 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: a8718df7edc5f8f6ce88e75b6545e5cb
         run: |
           [ -z "$CLOUDFLARE_API_TOKEN" ] && { echo "CF_PAGES_API_TOKEN 없음 — Pages 건너뜀"; exit 0; }
+          python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --bundle   # js/quick.js = quick_page.js + 봉차트 (전용 페이지가 받는 스크립트)
+          git diff --quiet -- experiments/stock-quick/pages_static/js/quick.js || echo "::warning::저장소의 js/quick.js 가 옛것 — jsDelivr 예비가 옛 스크립트를 낸다. --bundle 로 다시 만들어 커밋"
           mkdir -p /tmp/cfp && cp -r /tmp/qd/us /tmp/qd/kr /tmp/cfp/ && cp -a experiments/stock-quick/pages_static/. /tmp/cfp/
+          [ -f /tmp/qd/shells.json ] && cp /tmp/qd/shells.json /tmp/cfp/shells.json
           echo "Pages 파일 $(find /tmp/cfp -type f | wc -l)개 · $(du -sh /tmp/cfp | cut -f1)"
           npx --yes wrangler@4.162.0 pages deploy /tmp/cfp --project-name alpha-scope --branch main --commit-dirty=true
           code=$(curl -s -o /dev/null -w "%{http_code}" "https://alpha-scope.pages.dev/us/UBER")
