@@ -213,15 +213,17 @@ def next_card(text, href, links):
     ready = bool(href) and href != "#"   # 다음 편이 아직 없으면 누르지 않는 카드 + `준비 중` (2026-11-15 발행: 1편 다음 카드가 # 로 가던 것)
     tag = "a" if ready else "div"
     href_attr = f' href="{html.escape(href)}"' if ready else ""
+    # 준비 중 = 편 제목 문장 끝에 붙는 라벨(사이트 공용 알약 neutral), 오른쪽 화살표 자리는 비운다 (2026-11-15 사용자). 다음 편이 발행되면 ready → 라벨이 빠지고 링크 + 화살표
+    soon = "" if ready else dk.pill("준비 중", "neutral")
     if not ready:
-        chev = '<span style="font-size:13px;line-height:18px;font-weight:700;color:#6B7280;white-space:nowrap;">준비 중</span>'
+        chev = ""
     return (f'<{tag}{href_attr} data-next="1" style="display:flex;align-items:center;gap:12px;margin:36px 0 8px;padding:16px 16px 16px 18px;'
             'background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;text-decoration:none;color:inherit;">'   # 사이트 회색 카드(design_kit CARD)와 같은 색 · 테두리 · 모서리 (2026-11-10 사용자)
             '<span style="flex:1 1 auto;min-width:0;">'
             '<span style="display:block;font-size:13px;line-height:18px;font-weight:700;color:#6B7280;margin:0 0 4px;">다음 편</span>'
-            f'<span style="display:block;font-size:18px;line-height:27px;font-weight:700;color:#111;word-break:keep-all;">{inline(head, links)}</span>'
+            f'<span style="display:block;font-size:18px;line-height:27px;font-weight:700;color:#111;word-break:keep-all;">{inline(head, links)}{soon}</span>'
             + (f'<span style="display:block;margin-top:6px;font-size:15px;line-height:24px;color:#333;word-break:keep-all;">{inline(teaser, links)}</span>' if teaser else "")
-            + f'</span><span style="flex:none;color:#6B7280;">{chev}</span></{tag}>')
+            + '</span>' + (f'<span style="flex:none;color:#6B7280;">{chev}</span>' if chev else "") + f'</{tag}>')
 
 
 def render(md, links, next_href="#"):

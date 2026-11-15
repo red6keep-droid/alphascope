@@ -1821,7 +1821,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 
 /* 글 끝 — 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터. 검은 `목록` · `홈으로` 버튼은 숨김(주소는 위쪽 뒤로 가기가 읽는다), 버튼 줄 위아래 구분선 없음 */
 .post-shell .post-nav .post-nav-list { display: none !important; }
-.post-shell .post-nav .post-nav-list.post-nav-study { display: inline-flex !important; padding: 9px 16px; }   /* 주식 공부 글만 가운데 `주식 공부 목록` — 댓글 · TOP 사이, 높이 40 = 양옆 글자 버튼과 같게 · 양옆 16(폰 375 에서 세 버튼이 한 줄) (2026-11-15 사용자) */
+.post-shell .post-nav .post-nav-list.post-nav-study { display: inline-flex !important; padding: 9px 25px; }   /* 주식 공부 글만 가운데 `주식 공부 목록` — 댓글 · TOP 사이, 높이 40 = 양옆 글자 버튼과 같게 · 양옆 16 → 25(가로 15% 넓게, 실측 폭 약 117 → 135, 폰 375 에서 세 버튼이 한 줄 그대로) (2026-11-15 사용자) */
 .post-shell .post-nav, .post-shell.ends-text .post-nav { border-top: 0 !important; border-bottom: 1px solid #E2E8F0 !important; padding-top: 0 !important; padding-bottom: 12px !important; }   /* 버튼 줄 아래 구분선 — 버튼 글자 → 선 20(버튼 안쪽 8 + 12), 그 아래 푸터 · 열린 댓글 (2026-11-12 사용자) */
 .post-nav-cm { color: #6B7280; }   /* 댓글이 없거나 아직 개수를 모를 때 = 회색(글자 · 말풍선 아이콘 모두 currentColor) — 안 고른 칸 색과 같다 (2026-11-12 사용자) */
 .post-nav-cm.has-cm { color: #111; }   /* 댓글이 하나라도 있으면 검정 */
