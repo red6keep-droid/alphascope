@@ -16,9 +16,13 @@ on:
       limit:
         description: '시험용 — 앞 N종목만 (0 = 전부)'
         default: '0'
+      scheduled:
+        description: 'Cloudflare Worker 용 — 정기 실행처럼(중복 건너뛰기) (사람은 끄고 쓴다)'
+        default: 'false'
 
 permissions:
   contents: read
+  actions: read   # 중복 건너뛰기(check)가 실행 목록을 읽는다
 
 env:   # 운영 기록(Cloudflare KV) — 운영 대시보드 AI 칸에 이 실행의 모델별 호출 수가 잡히게 (2026-11-15: 빠져 있어 lite 사용량이 적게 보였다)
   OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
@@ -30,7 +34,30 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # 같은 날 두 번 막기 — Cloudflare Worker(infra/cron-trigger)와 GitHub cron 이 둘 다 건다(GitHub cron 은 자주 늦거나 빠진다).
+  # 정기 실행(schedule · Worker 의 scheduled=true)만: 최근 6시간 안에 이 워크플로가 이미 성공했으면 건너뛴다. 사람이 거는 실행은 늘 돈다 (2026-11-15 사용자)
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.dup.outputs.skip }}
+    steps:
+      - id: dup
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == 'true' }}
+        run: |
+          skip=false
+          if [ "$SCHEDULED" = true ]; then
+            since=$(date -u -d '6 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+            n=$(gh run list -R "$GITHUB_REPOSITORY" --workflow quick-news.yml --status success -L 20 --json createdAt,databaseId \
+                -q "[.[] | select(.createdAt >= \"$since\" and .databaseId != $GITHUB_RUN_ID)] | length" || echo 0)
+            [ "${n:-0}" -gt 0 ] && skip=true
+          fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"; echo "간단 종목 뉴스 중복 건너뛰기: $skip"
+
   news:
+    needs: check
+    if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
