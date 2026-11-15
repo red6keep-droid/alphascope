@@ -285,7 +285,7 @@ body.menu-open { overflow: hidden; }
   gap: 27px;
   max-width: calc(var(--shell) + var(--gutter) * 2);   /* 좌우 여백을 빼고 콘텐츠가 정확히 --shell (2026-10-15 사용자: PC 콘텐츠 1280) */
   margin: 0 auto;
-  padding: 36px var(--gutter) 40px;   /* 위: 헤더 → 홈 제목 글자 보이는 35 (20 + 15, 2026-10-13 사용자) · 아래: 마지막 콘텐츠 아래 40 */
+  padding: 36px var(--gutter) 16px;   /* 위: 헤더 → 홈 제목 글자 보이는 35 (20 + 15, 2026-10-13 사용자) · 아래: 마지막 콘텐츠 아래 40 → 16 (푸터 위 여백 58 → 23, 60% 줄임, 2026-11-15 사용자) */
 }
 
 /* section heading */
@@ -677,14 +677,14 @@ img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/C
 .news-item.load-status { color: var(--gray-400); }
 .news-item[hidden] { display: none; }
 /* 뉴스 더 보기 = 외곽선 있는 버튼(기본 .fold-btn), 버튼 위 구분선 없음 (2026-10-24 사용자). 옛: 윗선만 있는 줄 (2026-10-20) */
-.news-section .fold-btn { margin-top: 6px; }
+.news-section .fold-btn { margin-top: 6px; margin-bottom: 15px; }   /* 뉴스 더 보기 아래 +10 → +15 — 푸터와 사이 (2026-11-15 사용자) */
 
 /* ==========================================================================
    6. footer  (위 주요 뉴스 흐르는 띠는 삭제 — 2026-11-10 사용자)
    ========================================================================== */
 
 .site-footer {
-  padding: 18px var(--gutter) 19px;   /* 위 36 → 18 · 아래 38 → 19 (각 50%, 2026-11-11 사용자) — 옛 아래 48 → 38 (11-10) */
+  padding: 7px var(--gutter) 19px;   /* 위 36 → 18 → 7 (11-15 사용자: 푸터 위 60% 줄임, 본문 아래 16 과 합쳐 23) · 아래 38 → 19 (각 50%, 2026-11-11 사용자) — 옛 아래 48 → 38 (11-10) */
   text-align: center;
   background: var(--bg);
 }
@@ -740,7 +740,7 @@ body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
   flex-direction: column;
   gap: var(--card-gap);   /* 카드 사이 = 화면 좌우 여백 (2026-10-24 사용자: PC 40 · 중간 24 · 폰 10). 옛 20 (2026-10-15) */
   margin-top: -36px;   /* main-content 위 여백까지 회색으로 — 헤더 바로 아래부터 */
-  padding: var(--card-gap) 0 40px;   /* 맨 위 카드 위 = 카드 사이 (2026-10-15 사용자) */
+  padding: var(--card-gap) 0 20px;   /* 맨 위 카드 위 = 카드 사이 (2026-10-15 사용자) · 맨 아래 카드(주식 공부 배너) 아래 40 → 20 (50%, 2026-11-15 사용자) */
   background: #F3F4F6;
   box-shadow: 0 0 0 100vmax #F3F4F6;   /* 화면 전체 폭으로 — 가로 스크롤 없이 */
   clip-path: inset(0 -100vmax);
@@ -847,9 +847,15 @@ body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
 /* 카드 순서: 리포트 → 시총 TOP 10 (주요 지수 · 섹터 현황은 2026-10-20 삭제). PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭 (2026-10-15 사용자) */
 @media (min-width: 901px) {
   .home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .home-cards > .briefing, .home-cards > .rankings, .home-cards > .event-banner { grid-column: 1 / -1; }   /* 일정 배너도 전폭 (2026-10-28) */
+  .home-cards > .briefing, .home-cards > .rankings, .home-cards > .event-banner, .home-cards > .study-banner { grid-column: 1 / -1; }   /* 일정 배너도 전폭 (2026-10-28) */   /* 주식 공부 배너도 전폭 (2026-11-15) */
 }
 /* 테마 · 관심 종목 · 섹터 종목 탭 카드 (2026-10-21 사용자) — 탭 줄 오른쪽 끝 기준일, 관심 종목 묶음은 탭 아래 작은 알약 줄 */
+/* 주식 공부 배너 (2026-11-15 사용자: 사용자가 만든 그림 한 장 그대로) — 전폭 카드 모서리 12 · 그림 = 카드 전체, 누르면 주식 공부 목록.
+   그림 안 글자를 검색 · 낭독기가 읽게 alt. 그림 1110×344(비율 고정, 폭에 맞춰 줄어듦) · WebP 24KB · jsDelivr 1회 요청 */
+.study-banner { margin: 0; }
+.study-banner a { display: block; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 22.5px -5px rgba(0,0,0,.029), 0 8px 9px -6px rgba(0,0,0,.029); -webkit-tap-highlight-color: transparent; }
+.study-banner img { display: block; width: 100%; height: auto; aspect-ratio: 1110 / 344; border-radius: 0; }
+.study-banner a:active { opacity: .85; }
 .picks-section .tabs { align-items: flex-end; }
 .picks-day { padding: 8px 16px 0; font-family: var(--num); font-size: 14px; line-height: 20px; color: var(--gray-400); text-align: right; }   /* 기준일 — 탭 아래 오른쪽 한 줄 (탭 줄에 두면 폰에서 잘린다) */
 .picks-day:empty { display: none; }
@@ -1748,6 +1754,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   .as-search-form input { font-size: 17px; }
   .as-grid { grid-template-columns: repeat(3, 1fr); }
   .as-chat { inset: 0; width: auto; height: auto; border-radius: 0; border: 0; }
+  /* 폰: 입력칸 16 — 아이폰은 16 보다 작은 입력칸을 누르면 화면을 확대해서 창 오른쪽(보내기 버튼)이 밖으로 밀렸다 (2026-11-15 사용자: "질문하기를 누르면 보내기 버튼이 화면 밖으로").
+     높이는 search.js 가 키보드 위 보이는 높이(visualViewport)에 맞춘다 */
+  .as-chat input { font-size: 16px; }
   .as-chat-fab { right: 16px; bottom: 16px; padding: 11px 15px; }
 }
 /* ==========================================================================
@@ -2081,6 +2090,11 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           <button type='button' class='fold-btn' id='rank-toggle' aria-expanded='false' hidden='hidden'><span>종목 더 보기</span>
             <svg class='acc-chev' viewBox='0 0 16 16' width='16' height='16' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></button>
           </div>
+        </section>
+
+        <!-- 주식 공부 배너 (2026-11-15 사용자) — 시총 TOP 10 아래 전폭(11-15 사용자: 리포트 카드 아래 → 시총 TOP 10 아래). 미국 · 한국 화면 모두. 그림 = 사용자 제작(experiments/course/banner) -->
+        <section class='study-banner' aria-label='주식 공부'>
+          <a href='/search/label/%EC%A3%BC%EC%8B%9D%20%EA%B3%B5%EB%B6%80'><img src='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp' width='1110' height='344' loading='lazy' decoding='async' alt='주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'/></a>
         </section>
 
         </div><!-- /home-cards -->
@@ -5709,6 +5723,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         else if (kind === 'home' || (kind === 'back' && (fromHome || !lu))) setNav('홈으로', homeUrl);
         else if (kind === 'back') setNav('목록으로', lu.getAttribute('data-list-url'));
         else if (lu) navs.forEach(function (a) { a.href = lu.getAttribute('data-list-url'); });
+        /* 머리 줄 글자를 메뉴 이름으로 (2026-11-15 주식 공부 발행: 본문 [data-head-label] — 글 제목은 본문 맨 위 큰 제목, 머리 줄은 `주식 공부`).
+           글 제목(검색 · 공유 · <title>)은 그대로, 화면의 머리 줄 글자만. 제목 칸 정리 스크립트가 끝난 뒤에도 한 번 더(load) */
+        var hl = document.querySelector('.post-body [data-head-label]');
+        if (hl) {
+          var setHead = function () { var l = document.querySelector('.post-title-label') || document.querySelector('.post-title'); if (l) l.textContent = hl.getAttribute('data-head-label'); };
+          setHead();
+          window.addEventListener('load', setHead);
+        }
         [].slice.call(document.querySelectorAll('.post-nav-top')).forEach(function (b) {
           b.addEventListener('click', function () {
             try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
