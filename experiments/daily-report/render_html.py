@@ -287,6 +287,10 @@ def _cover_image(cover_url):
     return f'<img src="{src}" alt="데일리 브리핑 커버 이미지" style="width:100%;max-width:1024px;border-radius:8px;margin:0 0 16px 0;display:block;">'
 
 
+SHARE_IMG = ('<img data-share-img="1" src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png" '
+             'alt="" width="1200" height="600" hidden style="display:none">')   # 본문 맨 앞 숨은 공통 로고 — Blogger 대표 이미지(목록 썸네일 · og:image)가 표 속 회사 로고가 되지 않게 (2026-11-16 사용자, 주식 공부 share_tag 와 같은 방식)
+
+
 PARA_GAP = int(dk.LH_BODY[:-2])   # 문단 사이 = 빈 줄 하나 (본문 행간)
 
 
@@ -812,6 +816,7 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     a = analysis or {}
     parts = [
         dk.WRAP_OPEN,
+        SHARE_IMG,   # 첫 그림 = 공통 로고 (대표 이미지)
         (dk.price_stamp(a["as_of"], "US") if a.get("as_of") else ""),   # 맨 위 안내 상자 = 종목 페이지와 같게 — 종가 리포트 · 발행 시각 (2026-11-14 사용자)
         sec_seo_lead(input_data, analysis),   # 검색 결과 요약 — 보이는 첫 요소, data-lead 보다 앞 (2026-10-18)
         # S&P 500 그래프가 커버 이미지 자리 (2026-10-18 사용자, 엔비디아처럼). 그래프가 없는 날만 AI 커버

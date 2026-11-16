@@ -1558,9 +1558,14 @@ def index_tech_card(r):
 
 
 
+SHARE_IMG = ('<img data-share-img="1" src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png" '
+             'alt="" width="1200" height="600" hidden style="display:none">')   # 본문 맨 앞 숨은 공통 로고 — Blogger 대표 이미지(목록 썸네일 · og:image)가 표 속 회사 로고가 되지 않게 (2026-11-16 사용자, 주식 공부 share_tag 와 같은 방식)
+
+
 def body(r):
     parts = [
         _dk.WRAP_OPEN,
+        SHARE_IMG,   # 첫 그림 = 공통 로고 (대표 이미지)
         _dk.price_stamp(r["day"], "KR"),   # 시계 줄 — 종목 페이지와 같게 (2026-11-05 사용자 M62)
         seo_lead(r),
         price_chart(r["day"], r["kospi_bars"]),   # 요약 바로 아래 (데일리의 S&P 500 그래프 자리)
