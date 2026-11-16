@@ -3682,5 +3682,95 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-16T01:23:10.148582+00:00",
   "n_src": 900
+ },
+ "a25cede273f9": {
+  "lines": [
+   "엔비디아 CEO 사임 이후 복귀 요구 청원 16만 건 돌파"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T08:12:39.349697+00:00",
+  "n_src": 900
+ },
+ "9e42e9292b1c": {
+  "lines": [
+   "유럽 은행들의 3분기 실적 발표 속 AI 활용 업무 자동화 진행"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "EARNINGS",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T08:12:39.349697+00:00",
+  "n_src": 900
+ },
+ "fd6ebbed2fe0": {
+  "lines": [
+   "시진핑·푸틴·트럼프 3자 정상회담 목요일 선전 개최 확인"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T08:12:39.349697+00:00",
+  "n_src": 900
+ },
+ "1822d018c565": {
+  "lines": [
+   "10월 중국 소매판매 전년 동기 대비 0.4% 증가 (예상)",
+   "10월 중국 산업생산 전년 동기 대비 4.8% 증가 (예상)"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GROWTH_JOBS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GROWTH_JOBS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T08:12:40.048851+00:00",
+  "n_src": 900
+ },
+ "8e3e565beb02": {
+  "lines": [],
+  "tags": [],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T08:12:40.048851+00:00",
+  "n_src": 316
  }
 }

@@ -1,16 +1,43 @@
 {
-  "updated_at": "2026-11-16 01:23:10 UTC",
+  "updated_at": "2026-11-16 08:12:40 UTC",
   "items": [
+    {
+      "title": "China’s slowdown deepens in October as industrial output, retail sales, investment miss estimates",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/china-retail-sales-october-industrial-output-investment.html",
+      "published": "2026-11-16 03:53:59",
+      "title_ko": "중국 10월 산업생산·소매판매·투자 예상치 밑돌며 경기 둔화 심화",
+      "summary_ko": "외부 수요 의존도 심화로 국내 모멘텀이 약화되면서 충격에 취약한 상태",
+      "lines": [
+        "10월 중국 소매판매 전년 동기 대비 0.4% 증가 (예상)",
+        "10월 중국 산업생산 전년 동기 대비 4.8% 증가 (예상)"
+      ]
+    },
     {
       "title": "Japan's economy unexpectedly contracts in third-quarter as elevated energy costs bite",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/16/japan-q3-gdp-energy-oil-prices.html",
-      "published": "2026-11-16 01:02:48",
+      "published": "2026-11-16 02:56:24",
       "title_ko": "일본 경제, 치솟은 에너지 비용 타격으로 3분기에 예기치 않게 위축",
       "summary_ko": "9월 가계 에너지 보조금 만료",
       "lines": [
         "이란 전쟁 영향의 에너지 가격 상승으로 일본 3분기 경제 연율 0.1% 위축",
         "LSEG 집계 기준 일본 은행의 12월 25베이시스포인트 금리 인상 확률 75.6% (예상)"
+      ]
+    },
+    {
+      "title": "$180 million Van Gogh tests the art market and collector confidence",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/14/180-million-van-gogh-tests-the-art-market-and-collector-confidence-.html",
+      "published": "2026-11-16 02:22:04",
+      "title_ko": "1억 8,000만 달러의 반 고흐 작품, 미술 시장과 수집가 신뢰도 시험대 올라",
+      "summary_ko": "뉴욕 미술 경매 총액 20억 달러 상회 전망",
+      "lines": [
+        "다음 주 뉴욕 미술품 경매 총매출 24억 달러 예상",
+        "소더비 경매 단독 매출 11억 달러 상회 전망",
+        "블라키에르-아리에타 컬렉션 추정가 4억 5000만 달러",
+        "빈센트 반 고흐 작품 추정가 1억 8000만 달러",
+        "폴 세잔 작품 추정가 1억 2000만 달러"
       ]
     },
     {
@@ -45,6 +72,18 @@
       ]
     },
     {
+      "title": "Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html",
+      "published": "2026-11-15 19:58:21",
+      "title_ko": "러트닉, 엔비디아 스파이 스캔들 관련 질의 직면, 두 아들 회사는 칩 제조사와 깊은 연관",
+      "summary_ko": "젠슨 황의 엔비디아 최고경영자 사임으로 하워드 러트닉 상무장관과 가족의 금융 연관성에 대한 감시가 재점화",
+      "lines": [
+        "캔터 피츠제럴드의 엔비디아 보유 주식 약 50% 감소",
+        "캔터 피츠제럴드의 엔비디아 목표가 350달러 유지"
+      ]
+    },
+    {
       "title": "DOT Sec. Duffy ties router in southern Arkansas to issues that led to nationwide ground stop",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/14/faa-ground-stop-flights-resume-delays.html",
@@ -55,18 +94,6 @@
         "연방항공청의 이륙 중단 조치 이후 항공편 운항 재개",
         "토요일 3000편 이상 취소 및 1000편 가까이 지연 발생",
         "금요일 9000편 이상 취소 및 7000편 이상 지연 기록"
-      ]
-    },
-    {
-      "title": "Bessent calls for ‘dramatic shakeup’ at Nvidia, urges outside CEO",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/15/bessent-nvidia-ceo-lutnick-megaspeed.html",
-      "published": "2026-11-15 18:10:18",
-      "title_ko": "베센트, 엔비디아의 '극적인 개편' 촉구하며 외부 CEO 요구",
-      "summary_ko": "중국으로의 반도체 우회 유출 의혹과 관련해 하워드 루트닉 부서를 비판",
-      "lines": [
-        "스콧 베센트 재무장관의 엔비디아 최고경영자 사임 이후 대대적 개편 촉구",
-        "베센트 장관의 엔비디아 이사회 외부 출신 최고경영자 선임 요구"
       ]
     },
     {
@@ -99,19 +126,6 @@
       ]
     },
     {
-      "title": "Social Security and the blue wave: What could happen to payroll taxes and senior tax breaks",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/15/social-security-tax-changes-midterm-election.html",
-      "published": "2026-11-15 14:30:01",
-      "title_ko": "사회보장제도와 블루 웨이브: 급여세와 고령자 세제 혜택에 일어날 수 있는 일",
-      "summary_ko": "2년 내 고령자 공제 혜택 만료 예정",
-      "lines": [
-        "민주당의 고소득자 대상 소셜시큐리티 급여세 부과 촉구",
-        "65세 이상 성인 대상 세액 공제 제도의 2년 뒤 만료 예정",
-        "소셜시큐리티 은퇴 급여 삭감 방지를 위한 의회의 6년 내 법 개정 시한"
-      ]
-    },
-    {
       "title": "FAA 예산 증액 및 재정 조정법",
       "title_ko": "FAA 예산 증액 및 재정 조정법",
       "summary_ko": "교통부 장관의 FAA 예산 요구와 국방 예산이 연말 재정 조정법을 통해 처리될 가능성이 제기",
@@ -126,31 +140,6 @@
         "션 더피 교통부 장관 발언 : 항공 교통 관제 시스템 개선을 위해 300억 달러 예산 지원 요청",
         "마이크 존슨 하원의장 발언 : 연말 처리를 위해 공격적인 입법 패키지에 해당 예산을 추가할 예정",
         "헨리에타 트레이스 발언 : 국방 예산과 FAA 예산이 제3차 재정 조정안을 통해 처리될 확률 30% 안팎으로 (발언자 추정)"
-      ]
-    },
-    {
-      "title": "I'm a psychologist who studies couples—5 signs you've fallen into a common rut: 'It builds through small habits that each look harmless'",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/11/15/couples-coexisting-without-connecting.html",
-      "published": "2026-11-15 13:48:01",
-      "title_ko": "커플을 연구하는 심리학자입니다, 흔한 매너리즘에 빠졌다는 5가지 징후: '각각은 무해해 보이는 작은 습관들을 통해 쌓인다'",
-      "summary_ko": "오늘날 커플들이 접촉 없는 공존에 취약하다고 심리학자 마크 트래버스가 언급",
-      "lines": [
-        "마크 트래버스의 현대 부부 관계 내 공존 질환 언급",
-        "셰리 터클의 소통 부재 및 대화 능력 저하 지적"
-      ]
-    },
-    {
-      "title": "Anthropic’s IPO lands as the embattled AI trade looks for a much-needed bright spot",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/15/anthropic-ipo-is-make-or-break-for-the-technology-industry.html",
-      "published": "2026-11-15 12:00:01",
-      "title_ko": "앤스로픽의 IPO는 흔들리는 AI 거래가 절실히 필요한 밝은 빛을 찾는 중에 이루어져",
-      "summary_ko": "기술 산업에서 AI 연구소에 막대한 투자를 하며 긍정적 모멘텀을 모색 중",
-      "lines": [
-        "앤트로픽 나스닥 상장 목요일 예정",
-        "아마존 초기 투자자 참여",
-        "공모가 70달러에서 78달러 전망"
       ]
     }
   ]
