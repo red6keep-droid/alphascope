@@ -1,7 +1,7 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-16T17:28:17Z",
+ "generated": "2026-11-16T22:32:42Z",
  "list_url": "https://alpha-scope.blogspot.com/p/forecast-list.html",
  "open": [
   {
@@ -41,6 +41,19 @@
     "반등"
    ],
    "event": "11.10 기아 급락",
+   "market": "kr"
+  },
+  {
+   "no": 1,
+   "eh": "EH-2026-008",
+   "title": "한국전력 급락, 반등할까 더 빠질까?",
+   "url": "https://alpha-scope.blogspot.com/p/forecast-2026-008.html",
+   "posted": "11.16",
+   "tags": [
+    "한국 종목",
+    "반등"
+   ],
+   "event": "11.13 한국전력 급락",
    "market": "kr"
   }
  ],
