@@ -140,6 +140,15 @@ def build_am(day_kst, report_input):
         signals.append({"name": "VIX", "text": f"VIX {vix['value']}", "dir": "flat", "date": vix.get("date")})
 
     calendar = (report_input or {}).get("calendar")
+    # 관전 포인트 후보 맨 앞 = 한국장 시작 줄(Q16): 지난밤 가장 크게 움직인 업종 · 대형주. 숫자는 close 와 같다
+    nxt = _event_rows(calendar, day_kst)
+    if session == "open":
+        pct = lambda x: f"{x:+.2f}%".replace("-", "−")
+        top_s = max((x for x in sectors if x["chg_pct"] is not None), key=lambda x: abs(x["chg_pct"]), default=None)
+        top_m = next((m for m in movers if m["chg_pct"] is not None), None)
+        parts = ([f"{top_s['name']} 업종 {pct(top_s['chg_pct'])}"] if top_s else []) + ([f"{top_m['name']} {pct(top_m['chg_pct'])}"] if top_m else [])
+        if parts:
+            nxt.insert(0, {"time": "09:00", "what": "지난밤 미국 " + " · ".join(parts) + " 뒤 한국장 첫 반응", "market": "KR"})
     return {
         "v": V, "date": day_kst, "slot": "am", "market": "US", "session": session, "trade_date": data.get("trade_date"),
         "close": {"indices": indices, "sectors": sectors, "movers": movers},
@@ -147,7 +156,7 @@ def build_am(day_kst, report_input):
         "hypotheses": _hypotheses(hypo, "us"),
         "news": _news(news),
         # 아침 편 관전 포인트 = 오늘 한국장. 한국 일정 재료는 아직 없어 오늘 밤(KST) 미국 일정을 같이 준다.
-        "next_session": {"market": "KR", "items": _event_rows(calendar, day_kst)},
+        "next_session": {"market": "KR", "items": nxt},
         "calendar": calendar,   # pm 묶음이 다시 쓴다
         "links": {"report": f"{SITE}/search/label/%EB%AF%B8%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8",
                   "forecast": (hypo or {}).get("list_url")},

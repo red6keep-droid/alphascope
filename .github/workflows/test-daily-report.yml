@@ -194,9 +194,17 @@ jobs:
         continue-on-error: true
         run: python experiments/daily-report/home_card.py --card report --body experiments/daily-report/output/published_body.html --meta experiments/daily-report/output/post_meta.json --out deploy-cards/cards/report.json --intraday "^GSPC"   # 하루 그래프 5분봉 (2026-11-14)
 
+      # 알파스코프 시황 해설 묶음 briefing/{날짜}-am.json (2026-11-16 사용자) — 수집기가 08:10 KST 에 읽어 해설을 쓴다.
+      # 공개 파일 + 이 실행의 일정 · VIX 만 묶는다(AI 0). 아래 report.json 푸시에 얹는다 — gh-pages 쓰기 추가 없음.
+      # 실패하면 파일이 없고 수집기는 방송 재료만으로 쓴다(News-doc 요청-알파스코프-시황-해설.md 4절)
+      - name: Market briefing (am)
+        if: hashFiles('experiments/daily-report/output/post_meta.json') != ''
+        continue-on-error: true
+        run: python experiments/market-commentary/build_briefing.py --slot am --report-input experiments/daily-report/output/report_input.json --out-dir deploy-cards
+
       - name: Deploy report.json to gh-pages
         id: cards_deploy
-        if: hashFiles('deploy-cards/cards/report.json') != ''
+        if: hashFiles('deploy-cards/cards/report.json') != '' || hashFiles('deploy-cards/briefing/*.json') != ''
         continue-on-error: true
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
         with:
