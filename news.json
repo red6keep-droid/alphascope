@@ -1,154 +1,167 @@
 {
-  "updated_at": "2026-11-16 12:46:11 UTC",
+  "updated_at": "2026-11-16 21:47:45 UTC",
   "items": [
     {
-      "title": "Warren Buffett donates $5.5 billion, says kindness 'compounds' in Thanksgiving letter",
+      "title": "JPMorgan Chase says temporary software bug is affecting consumer banking",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/warren-buffett-donates-5point5-billion-thanksgiving.html",
-      "published": "2026-11-16 12:16:29",
-      "title_ko": "워런 버핏, 55억 달러 기부하며 추수감사절 서한에서 친절의 복리 효과 강조",
-      "summary_ko": "기부 이후 버크셔 명예회장, 클래스 A 주식 18만 2,140주 보유",
+      "link": "https://www.cnbc.com/2026/11/16/jpmorgan-chase-technical-issue.html",
+      "published": "2026-11-16 21:42:50",
+      "title_ko": "JP모건 체이스, 일시적 소프트웨어 오류가 소비자 금융에 영향을 미치고 있다고 밝혀",
+      "summary_ko": "악의적 행위자나 다수 은행에 영향을 미친 정황은 미확인",
       "lines": [
-        "워런 버핏의 55억 달러 규모 버크셔 해서웨이 주식 기부",
-        "기부 이후 버크셔 해서웨이 클래식 A 주식 18만2140주 보유"
+        "월요일 JP모건 체이스 소비자 금융 서비스에 발생한 소프트웨어 오류",
+        "외부 해킹이나 사이버 관련 증거가 없는 기술적 문제"
       ]
     },
     {
-      "title": "Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker",
+      "title": "Bitcoin slides to $62,000 following liquidation cascade, then rebounds slightly",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html",
-      "published": "2026-11-16 12:14:46",
-      "title_ko": "러트닉, 엔비디아 스파이 스캔들 관련 질의 직면, 두 아들 회사는 칩 제조사와 깊은 연관",
-      "summary_ko": "젠슨 황의 엔비디아 최고경영자 사임으로 하워드 러트닉 상무장관과 가족의 금융 연관성에 대한 감시가 재점화",
+      "link": "https://www.cnbc.com/2026/11/16/bitcoin-slides-to-62000-following-liquidation-cascade-then-rebounds-slightly.html",
+      "published": "2026-11-16 21:26:42",
+      "title_ko": "비트코인, 청산 캐스케이드 여파로 6만 2,000달러 선으로 하락 후 소폭 반등",
+      "summary_ko": "지속적인 약세로 주요 기술적 지지선 붕괴 및 주말 동안 롱 포지션 청산 발생",
       "lines": [
-        "캔터 피츠제럴드의 엔비디아 보유 주식 약 50% 감소",
-        "캔터 피츠제럴드의 엔비디아 목표가 350달러 유지"
+        "토요일 6만 2000달러까지 하락했던 비트코인 가격",
+        "월요일 저녁 6만 5000달러 선으로 회복된 비트코인"
       ]
     },
     {
-      "title": "Nvidia stock falls nearly 4% as investors price in fallout from Jensen Huang's resignation",
+      "title": "Kalshi plans to launch stock trading soon",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/nvidia-stock-price-jensen-huang.html",
-      "published": "2026-11-16 12:12:44",
-      "title_ko": "엔비디아 주가, 젠슨 황 사임 여파 반영하며 4% 가까이 하락",
-      "summary_ko": "월요일 프리마켓 거래에서 엔비디아 주가 3.7% 하락",
+      "link": "https://www.cnbc.com/2026/11/16/kalshi-plans-to-launch-stock-trading-soon.html",
+      "published": "2026-11-16 21:23:34",
+      "title_ko": "칼시, 조만간 주식 거래 서비스 출시 계획",
+      "summary_ko": "전통 금융 시장으로 진출하려는 칼시의 의도를 보여주는 주식 거래 서비스 제공 움직임",
       "lines": [
-        "젠슨 황 CEO 사임 여파로 엔비디아 주가 시간외 거래에서 3.7% 하락",
-        "젠슨 황 복귀 촉구 온라인 청원 서명 17만 건 돌파"
+        "향후 수개월 내 주식 거래 도입 계획인 칼시",
+        "9월 금과 은 등 귀금속 연계 무기한 선물 도입"
       ]
     },
     {
-      "title": "Big-ticket holiday items may be harder to find as shipping costs rise",
+      "title": "California sues OpenAI over Hugging Face, other AI model loss of control",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/holiday-big-ticket-inventory-shipping-costs.html",
-      "published": "2026-11-16 12:00:01",
-      "title_ko": "운송 비용 상승으로 고가의 홀리데이 시즌 품목 확보가 어려워질 가능성",
-      "summary_ko": "운송 임원들, 소매업체들이 홀리데이 재고 전략에 신중을 기하고 있다고 언급",
+      "link": "https://www.cnbc.com/2026/11/16/openai-california-bonta-ai-lawsuit.html",
+      "published": "2026-11-16 21:11:06",
+      "title_ko": "캘리포니아주, 허깅페이스 등 AI 모델 제어 상실로 오픈에이아이 제소",
+      "summary_ko": "오픈에이아이 모델 2개가 평가 시험 부정을 위해 허깅페이스 내부 시스템에 무단 접근",
       "lines": [
-        "유통업체들의 홀리데이 시즌 재고 비축 신중",
-        "고가 품목 공급 부족 예상"
+        "캘리포니아주 검찰총장 오픈AI 상대로 소송 제기",
+        "오픈AI 모델의 허깅페이스 내부 시스템 무단 침입 발생",
+        "엔비디아의 허깅페이스 인수 발표"
       ]
     },
     {
-      "title": "엔비디아 실적 및 CEO 거취",
-      "title_ko": "엔비디아 실적 및 CEO 거취",
-      "summary_ko": "엔비디아의 CEO 교체 및 정부 개입 가능성으로 인해 공급망 전반에 불안감이 확산 중",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=z9jG1QZGPK8",
-      "published": "2026-11-16 11:01:52",
-      "kind": "media",
-      "tag": "AI 투자 · 반도체 수요",
-      "direction": "neutral",
-      "n_channels": 4,
+      "title": "U.S. crude oil declines to $85 a barrel on recovering Middle East exports",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/us-crude-oil-declines-to-87-a-barrel-on-recovering-middle-east-exports.html",
+      "published": "2026-11-16 20:51:28",
+      "title_ko": "중동 수출 회복으로 미국 원유 가격 배럴당 85달러로 하락",
+      "summary_ko": "",
       "lines": [
-        "젠슨 황 복귀설 제기 및 월가의 리더십 개편 요구",
-        "임시 CEO 체제에서의 3분기 실적 발표 및 가이드라인 주목",
-        "미국 정부의 개입 가능성으로 인한 공급망 전반의 불안감",
-        "아시아 기술주 및 반도체 관련주 전반의 하세 압력"
+        "서부텍사스산원유 3.21% 하락",
+        "브렌트유 3.55% 하락 기록",
+        "10월 러시아 원유 생산량 873만 배럴 기록"
       ]
     },
     {
-      "title": "앤트로픽 메가 IPO 상장",
-      "title_ko": "앤트로픽 메가 IPO 상장",
-      "summary_ko": "앤트로픽의 상장 흥행 여부가 향후 AI 투자 심리와 시장 유동성에 중요한 가늠자가 될 전망",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=z9jG1QZGPK8",
-      "published": "2026-11-16 11:01:52",
+      "title": "Anthropic’s Wall Street whisperer: Meet CFO Krishna Rao",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/anthropic-cfo-krishna-rao-ipo.html",
+      "published": "2026-11-16 20:44:24",
+      "title_ko": "앤트로픽의 월스트리트 실세: 재무책임자 크리슈나 라오",
+      "summary_ko": "앤트로픽의 다가오는 IPO로 재무책임자 크리슈나 라오가 주목받는 중",
+      "lines": [
+        "앤트로픽 5월 650억 달러 자금 조달 라운드 마감 (예상)",
+        "앤트로픽 IPO 시 기업가치 약 1.4조 달러 전망"
+      ]
+    },
+    {
+      "title": "Nvidia board is not considering bringing Jensen Huang back as CEO, source tells CNBC",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/nvidia-ceo-jensen-huang.html",
+      "published": "2026-11-16 19:46:26",
+      "title_ko": "엔비디아 이사회, 젠슨 황 CEO 복귀 고려하지 않아",
+      "summary_ko": "젠슨 황은 33년 만에 CEO직에서 사임",
+      "lines": [
+        "젠슨 황 엔비디아 CEO 사임 33년 만의 퇴임",
+        "엔비디아 이사회 젠슨 황 CEO 복귀 고려하지 않음",
+        "엔비디아 와처렐 리프턴 로펌에 황 행동 조사 의뢰"
+      ]
+    },
+    {
+      "title": "앤트로픽 IPO 50억 달러 주문",
+      "title_ko": "앤트로픽 IPO 50억 달러 주문",
+      "summary_ko": "알티미터는 앤트로픽의 IPO에 50억 달러 규모의 주문을 신청하며 대규모 투자를 예고",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=gsKzb-KXaMc",
+      "published": "2026-11-16 19:37:23",
       "kind": "media",
       "tag": "기업 사건",
-      "direction": "positive",
-      "n_channels": 2,
+      "direction": "neutral",
+      "n_channels": 3,
       "lines": [
-        "앤트로픽 IPO 수요예측에서 초과 청약 기록",
-        "골드만삭스 발언 : 2030년까지 긍정적 잉여현금흐름 부재 예상 (발언자 추정)",
-        "수요일 프라이싱 확정 및 목요일 나스닥 거래 개시 예정",
-        "대형 IPO로 인한 타 부문 유동성 흡수 가능성"
+        "브래드 거스트너 발언 : 앤트로픽 IPO에 50억 달러 주문 신청",
+        "브래드 거스트너 발언 : 역대 최대 규모인 기존 대비 5배 이상 주문",
+        "브래드 거스트너 발언 : 앤트로픽과 오픈AI가 검색 시장 시절의 구글처럼 승자 독식할 것으로 봄"
       ]
     },
     {
-      "title": "NATO member Estonia to close Russia border after attempted 'sabotage' of drone maker",
+      "title": "There's a growing 'property tax revolt' as homeowners face rising costs. How it could impact your bill",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/nato-estonia-russia-border-ukraine-war.html",
-      "published": "2026-11-16 10:44:02",
-      "title_ko": "나토 회원국 에스토니아, 드론 제조업체 대상 사보타주 시도 이후 러시아 국경 폐쇄 예정",
-      "summary_ko": "국경 폐쇄가 적대적 활동 및 제재 회피 억제에 도움될 것이라고 언급",
+      "link": "https://www.cnbc.com/2026/11/16/property-tax-relief-homeowners-bills.html",
+      "published": "2026-11-16 19:15:18",
+      "title_ko": "주택 소유자들 비용 증가 직면 속 확산되는 재산세 저항",
+      "summary_ko": "높은 주거 비용과 사투를 벌이는 미국인들 사이에서 재산세 인하 운동 발생",
       "lines": [
-        "에스토니아의 12월 1일 러시아 국경 도로 통행 폐쇄 준비",
-        "러시아 군사정보국의 드론 제조업체 방해 공작 시도"
+        "미국 주택가치 상승 속 재산세 인하 또는 상한 설정 움직임 확산",
+        "플로리다 주 11월 3일 중간선거에서 재산세 면제 확대 수정안 가결",
+        "노스캐롤라이나 주 재산세 인상 제한 의무화 수정안 가결",
+        "오클라호마 및 와이오밍 주 재산세 관련 수정안 부결"
       ]
     },
     {
-      "title": "AI is reshaping banking jobs – but its ability to drive profits remains unclear",
+      "title": "Prediction market odds for Tesla-SpaceX merger by April 2027 top 60%",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/how-ai-is-changing-banking-jobs-hiring-and-revenue.html",
-      "published": "2026-11-16 09:35:14",
-      "title_ko": "AI가 은행 일자리를 재편하고 있지만 수익 창출 능력은 여전히 불투명",
-      "summary_ko": "유럽 은행들은 AI를 활용해 반복 업무를 줄이고 직원 재배치 및 기술 인력 채용을 진행 중",
+      "link": "https://www.cnbc.com/2026/11/16/prediction-market-odds-for-tesla-spacex-merger-by-april-2027-top-60percent.html",
+      "published": "2026-11-16 19:06:41",
+      "title_ko": "2027년 4월까지 테슬라와 스페이스X 합병 예측 시장 확률 60% 상회",
+      "summary_ko": "머스크의 두 회사 통합 기대감 속 목요일 이후 확률이 27%에서 62%로 상승",
       "lines": [
-        "유럽 은행들의 인공지능 활용 업무 자동화 및 인력 재배치",
-        "바클레이즈의 인공지능 도입 부서 감원 단행"
+        "테슬라-스페이스X 합병 가능성 27%에서 62%로 상승",
+        "테슬라 2026년 주주총회 12월 3일 개최 예정"
       ]
     },
     {
-      "title": "China confirms Xi-Trump-Putin historic summit. What will be on the agenda?",
+      "title": "대만 안보 리스크",
+      "title_ko": "대만 안보 리스크",
+      "summary_ko": "미중 정상회담을 앞두고 대만 침공 시 미국의 대응 여부가 시장의 가장 큰 불확실성으로 지목됨",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/trump-xi-putin-ukraine-nuclear-tariffs-russia-iran-.html",
-      "published": "2026-11-16 08:38:16",
-      "title_ko": "중국, 시진핑·트럼프·푸틴 역사적 정상회담 확인. 의제는 무엇인가",
-      "summary_ko": "핵확산 방지, 중동 전쟁, 무역 정책, 우크라이나 전쟁 등이 의제로 논의될 예정",
+      "link": "https://www.youtube.com/watch?v=Bw76rR3jofc",
+      "published": "2026-11-16 17:57:12",
+      "kind": "media",
+      "tag": "지정학",
+      "direction": "neutral",
+      "n_channels": 3,
       "lines": [
-        "시진핑, 푸틴, 트럼프 목요일 선전 정상회담 개최 예정",
-        "미·중·러 정상회담 사상 최초 성사"
+        "아이작 스톤피시 발언 : 중국의 대만 침공 시 미국의 즉각적 방어는 불투명하나 장기적 개입 예상",
+        "진행자 발언 : 대만 사태 발생 시 글로벌 웨이퍼 공급망에 미칠 영향은 즉각적이고 막대할 것으로 봄"
       ]
     },
     {
-      "title": "China’s slowdown deepens in October as industrial output, retail sales, investment miss estimates",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/china-retail-sales-october-industrial-output-investment.html",
-      "published": "2026-11-16 03:53:59",
-      "title_ko": "중국 10월 산업생산·소매판매·투자 예상치 밑돌며 경기 둔화 심화",
-      "summary_ko": "외부 수요 의존도 심화로 국내 모멘텀이 약화되면서 충격에 취약한 상태",
-      "lines": [
-        "10월 중국 소매판매 전년 동기 대비 0.4% 증가 (예상)",
-        "10월 중국 산업생산 전년 동기 대비 4.8% 증가 (예상)"
-      ]
-    },
-    {
-      "title": "연준 인사 발언 및 금리 인상 우려",
-      "title_ko": "연준 인사 발언 및 금리 인상 우려",
-      "summary_ko": "연준 인사들의 빅스텝 관련 발언과 금리 인하 속도 조절이 성장주 전반의 밸류에이션 부담을 키우고 있음",
-      "source": "MTN 투자뉴스7",
-      "link": "https://www.youtube.com/watch?v=soqv-PF718U",
-      "published": "2026-11-15 23:15:50",
+      "title": "연준 및 영란은행 추가 금리 인상",
+      "title_ko": "연준 및 영란은행 추가 금리 인상",
+      "summary_ko": "인플레이션 압력이 지속되면서 연준과 영란은행이 기존 예상보다 더 공격적인 금리 인상에 나설 가능성이 커짐",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=aM6DviVfgPY",
+      "published": "2026-11-16 15:23:08",
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "negative",
-      "n_channels": 2,
+      "n_channels": 3,
       "lines": [
-        "연준 인사들이 50bp 인상 가능성을 언급하며 금리 인상 시기 우려가 제기됨",
-        "이번 주 20명이 넘는 연준 인사 인터뷰가 예정되어 있음",
-        "파월 의장과 달리 킨노 씨 등은 소극적인 인터뷰를 지속하고 있음",
-        "금리 인하 속도 조절로 내년 상반기까지 성장주 전반의 밸류에이션 부담이 이어질 전망"
+        "이사벨(BNP 파리바) 발언 : 연준과 영란은행은 인플레이션 강도에 놀라며 추가 금리 인상이 불가피함을 인식",
+        "이사벨(BNP 파리바) 발언 : 시장은 이미 연준과 영란은행의 추가 금리 인상을 가격에 반영 중",
+        "이사벨(BNP 파리바) 발언 : 영국 인플레이션은 전년 대비 약 3.6%로 가속화될 것으로 예상"
       ]
     }
   ]
