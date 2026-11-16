@@ -34,7 +34,6 @@ UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36")
 GAP = 2.0          # 초 — 요청 사이 최소 간격
 TIMEOUT = 30
-TOP_N = 10
 
 MIRAE = "https://investments.miraeasset.com/tigeretf"
 SAMSUNG = "https://www.samsungfund.com"
@@ -131,11 +130,11 @@ def _is_stock(code, name):
 
 
 def _pack(rows, at, source, url, fee=None, since=None, aum=None):
-    """rows = [(코드, 이름, 비중 %)] — 현금 · 선물 빼고 비중 큰 순 10개."""
+    """rows = [(코드, 이름, 비중 %)] — 현금 · 선물 빼고 비중 큰 순 전부 (2026-11-16 사용자: 상위 10개 상한 폐지 — 화면은 5개 펼침 + 나머지 접기, CLAUDE.md `상한으로 조용히 버리지 않기`)."""
     stocks = [(c, n, w) for c, n, w in rows if _is_stock(c, n)]
     stocks.sort(key=lambda r: -(r[2] or 0))
     out = {"at": at, "source": source, "url": url,
-           "top": [[_code(c), n, round(w, 2)] for c, n, w in stocks[:TOP_N] if w is not None],
+           "top": [[_code(c), n, round(w, 2)] for c, n, w in stocks if w is not None],
            "n": len(stocks)}
     if fee is not None:
         out["fee"] = fee
@@ -186,10 +185,10 @@ def _mirae(sym):
         c = (r.get("memItemcode") or "").strip()
         return c if c and c != "0" else r.get("code")
     items = [(own_code(r), r.get("memItemname"), _num(r.get("stockRate"))) for r in rows]
-    if any(r.get("memItemgb") == "2" for r in rows[:TOP_N]):
+    if any(r.get("memItemgb") == "2" for r in rows):
         # 해외 종목은 JSON 에 티커가 없다(memItemcode "0", code = ISIN) — 표(엑셀과 같은 목록) 첫 쪽에서 이름 → 티커
         tbl = _get(f"{MIRAE}/ko/product/search/detail/pdfListAjax.ajax",
-                   params={"ksdFund": ksd, "pageIndex": 1, "firstIndex": 0, "listCnt": TOP_N + 5}, referer=page, as_json=False)
+                   params={"ksdFund": ksd, "pageIndex": 1, "firstIndex": 0, "listCnt": 1000}, referer=page, as_json=False)
         tick = {}
         for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", tbl, re.S):
             td = [html_lib.unescape(re.sub(r"<[^>]+>|\s+", " ", x)).strip() for x in re.findall(r"<td[^>]*>(.*?)</td>", tr, re.S)]
@@ -280,7 +279,8 @@ def fetch_all(syms, cache_path, max_age_days=7):
     for sym in syms:
         old = cache.get(sym)
         stamp = old and (old.get("got") or old.get("at"))
-        if stamp and (today - datetime.date.fromisoformat(stamp)).days < max_age_days:
+        cut = old and len(old.get("top") or []) < (old.get("n") or 0)   # 옛 상위 10개 상한으로 받은 것 — 한 번 전체로 다시 (2026-11-16)
+        if stamp and not cut and (today - datetime.date.fromisoformat(stamp)).days < max_age_days:
             continue
         tried += 1
         try:
@@ -333,7 +333,7 @@ if __name__ == "__main__":
             print(f"{code6(sym)} {name:<24} 실패: {str(e)[:120]}")
             continue
         top3 = " · ".join(f"{n} {w}" for _, n, w in d["top"][:3]) or "(주식 없음)"
-        s10 = sum(w for *_, w in d["top"])
+        s10 = sum(w for *_, w in d["top"][:10])
         aum = f"{d['aum_krw'] / 1e8:,.0f}억" if d.get("aum_krw") else "-"
         print(f"{code6(sym)} {name:<24} {d['source']:<9} {d['at']} n={d['n']:<4} 상위10합={s10:5.1f}  "
               f"보수={d.get('fee', '-')} 상장={d.get('since', '-')} 순자산={aum} | {top3}")
