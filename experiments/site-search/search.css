@@ -161,3 +161,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   .as-chat input { font-size: 16px; }
   .as-chat-fab { right: 16px; bottom: 16px; padding: 11px 15px; }
 }
+
+/* 검색어 미리보기 (2026-11-16 사용자: 한 글자부터) — 맞는 종목 전부, 칸 안에서 스크롤 · 이름 굵게 · 오른쪽 시장 · 티커 */
+.as-suggest { list-style: none; margin: 8px 0 0; padding: 4px 0; max-height: 320px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: 10px;
+  background: var(--bg, #fff); box-shadow: 0 6px 20px rgba(15, 23, 42, .10); -webkit-overflow-scrolling: touch; }
+.as-suggest[hidden] { display: none; }
+.as-suggest li { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; font-size: 16px; line-height: 24px; color: var(--ink, #0F172A); }
+.as-suggest li + li { border-top: 1px solid #F1F5F9; }
+.as-suggest li:hover, .as-suggest li.on { background: var(--surface-sub, #F8FAFC); }
+.as-sg-n { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.as-sg-t { margin-left: auto; flex: none; font-size: 13px; color: #6B7280; }
+.as-chat form + .as-suggest { position: absolute; left: 12px; right: 12px; bottom: 64px; margin: 0; z-index: 2; }
