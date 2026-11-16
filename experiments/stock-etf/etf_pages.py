@@ -135,12 +135,13 @@ def _hold_name(sym, raw):
 
 ROW_GAP = 20   # 구성 줄 사이 보이는 여백 — 구분선 없이 (2026-11-16 사용자 "종목과 종목 사이 구분선 삭제 · 간격 20")
 BAR_H = 8      # 구성 막대 두께 10 → 8 (같은 날 사용자 "20% 더 작게")
-VAL_PX = 17    # 구성 비중 % 글자 19 → 17 (같은 날 사용자 "2포인트 작게")
-NAME_MAX = 150   # 이름 칸 최대 px — 320 본문에서 막대 칸이 100 넘게 남게. 넘는 이름은 끝 말줄임
+VAL_PX = 16    # 구성 비중 % 글자 19 → 17 → 16 (같은 날 사용자 "2포인트 작게" · "1포인트 더 작게")
+BAR_FRAC = 0.7   # 막대 = 막대 칸의 70% (같은 날 사용자 "막대 가로 30% 줄여" — 긴 이름 롯데에너지머티리얼즈가 잘리던 것)
+NAME_MAX = 190   # 이름 칸 최대 px — 이름은 자르지 않는다(가장 긴 한국 종목 이름 10자 ≈ 136 + 로고 28). 넘는 이름(긴 영문)만 끝 말줄임
 
 
-def _text_px(t, latin=10, wide=17):
-    """16px 굵은 글자 폭 추정 — 한글 · 한자 17, 그 밖 10 (Apple SD Gothic Neo 실측 근사, 숫자 9)."""
+def _text_px(t, latin=9, wide=14):
+    """16px 보통 굵기 글자 폭 추정 — 한글 14, 그 밖 9 (Chrome 320 실측: 롯데에너지머티리얼즈 10자 ≈ 136px, 2026-11-16)."""
     return sum(wide if ord(ch) > 0x2E80 else latin for ch in str(t)) + 2
 
 
@@ -157,11 +158,11 @@ def weight_card(items):
         return f'<span style="display:inline-flex;align-items:center;">{logo}{dk.esc(name)}</span>'
     vals = [f"{w:.1f}%" for _, _, w in items]
     # 칸 폭 = 숫자(px) — 줄마다 모든 이름을 숨겨 겹치는 dk.bar_widths 는 줄 수의 제곱(503줄 = 본문 1.2MB)이라. 이름 = 로고 28 + 글자 폭 추정, 최대 NAME_MAX
-    widths = (min(NAME_MAX, (28 if any(sy for sy, _, _ in items) else 0) + max(_text_px(n) for _, n, _ in items)), max(_text_px(v, 9) for v in vals))
-    widths = (widths[0], widths[1] * VAL_PX // 19)   # 값 글자 19 → 17 만큼 칸도
+    widths = (min(NAME_MAX, (28 if any(sy for sy, _, _ in items) else 0) + max(_text_px(n) for _, n, _ in items)), max(_text_px(v, 10) for v in vals))
+    widths = (widths[0], widths[1] * VAL_PX // 19)   # 값 글자 19 → 16 만큼 칸도
     rows = []
     for i, ((sym, name, w), v) in enumerate(zip(items, vals)):
-        row = dk.bar_row(nm(sym, name), w / mx, dk.CHART_MAIN, v, widths, first=i == 0, sep=False, bar_h=BAR_H, val_px=VAL_PX, pad=ROW_GAP // 2, lh="20px")
+        row = dk.bar_row(nm(sym, name), w / mx, dk.CHART_MAIN, v, widths, first=i == 0, sep=False, bar_h=BAR_H, val_px=VAL_PX, pad=ROW_GAP // 2, lh="20px", name_w=400, bar_frac=BAR_FRAC)
         rows.append(dk.stock_row_link(row, sym))
     box = dk.MULTI + f"padding-top:{ROW_GAP // 2}px;"   # 카드 가장자리 ~ 첫 줄 = 줄 사이 반쪽 + 위 여백 → 보이는 20
     if len(rows) <= SHOWN:
