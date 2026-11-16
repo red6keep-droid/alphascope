@@ -136,7 +136,7 @@ def build_am(day_kst, report_input):
         signals.append({"name": "업종 폭", "text": f"11개 업종 중 오름 {ups} · 내림 {downs}",
                         "dir": "up" if ups > downs else "down" if downs > ups else "flat"})
     vix = ((report_input or {}).get("macro") or {}).get("vix") or {}
-    if vix.get("value") is not None:
+    if vix.get("value") is not None:   # 수준만 있고 전날 대비가 없어 방향을 못 정함 → flat (근거 건수에 안 셈)
         signals.append({"name": "VIX", "text": f"VIX {vix['value']}", "dir": "flat", "date": vix.get("date")})
 
     calendar = (report_input or {}).get("calendar")
@@ -168,7 +168,9 @@ def build_pm(day_kst, kr_path):
         cps = [by_sym[x]["cp"] for x in g.get("syms") or [] if x in by_sym and by_sym[x].get("cp") is not None]
         if cps:
             sectors.append({"name": g.get("sector"), "chg_pct": _r(sum(cps) / len(cps)), "n": len(cps)})
-    signals = [{"name": f.get("title"), "text": f"{f.get('state')} — {f.get('sub')}", "dir": KIND_DIR.get(f.get("kind"), "flat")}
+    # dir = 주가 쪽 방향(Q10): 밤사이 미국 EWY 상승 · 외국인 순매수 · 원화 강세 = up. 시장 열기(거래대금)는 방향이 아니라 늘 flat
+    signals = [{"name": f.get("title"), "text": f"{f.get('state')} — {f.get('sub')}",
+                "dir": "flat" if f.get("title") == "시장 열기" else KIND_DIR.get(f.get("kind"), "flat")}
                for f in kr.get("flows") or []]
 
     am = _get_json(f"{RAW}/briefing/{day_kst}-am.json") or {}
