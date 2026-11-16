@@ -120,7 +120,7 @@ def main():
 
     if args.test_comment:
         post = blogger.get_latest_post()
-        reply = generate_reply.generate_reply(post["title"], args.test_comment, "테스트 사용자")
+        reply = generate_reply.generate_reply(post["title"], args.test_comment)
         print(format_message("preview", {"id": "test", "name": "테스트 사용자", "text": args.test_comment}, post, reply))
         return
 
@@ -165,7 +165,7 @@ def main():
             if c["post_id"] not in posts:
                 posts[c["post_id"]] = blogger.get_post(c["post_id"])
             post = posts[c["post_id"]]
-            reply = generate_reply.generate_reply(post.get("title", ""), c["text"], c["name"])
+            reply = generate_reply.generate_reply(post.get("title", ""), c["text"])   # 작성자 이름은 AI 로 보내지 않는다 (2026-11-16 사용자, 개인정보처리방침 · 운영지침 D8-6)
             spam = reply.strip().upper() == "SPAM"
             if not args.send:
                 print("=" * 60)

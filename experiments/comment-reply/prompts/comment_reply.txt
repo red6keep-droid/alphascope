@@ -12,7 +12,6 @@
 
 입력:
 - post_title: 댓글이 달린 게시글 제목
-- comment_author: 댓글 작성자 이름
 - comment: 댓글 본문
 
 답글 작성 지침:
