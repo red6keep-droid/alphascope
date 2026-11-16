@@ -133,6 +133,9 @@ def _hold_name(sym, raw):
     return NAME_KO.get(sym) or (sym if re.fullmatch(r"[A-Z][A-Z\-]{0,5}", sym) else raw)
 
 
+ROW_GAP = 20   # 구성 줄 사이 보이는 여백 — 구분선 없이 (2026-11-16 사용자 "종목과 종목 사이 구분선 삭제 · 간격 20")
+BAR_H = 8      # 구성 막대 두께 10 → 8 (같은 날 사용자 "20% 더 작게")
+VAL_PX = 17    # 구성 비중 % 글자 19 → 17 (같은 날 사용자 "2포인트 작게")
 NAME_MAX = 150   # 이름 칸 최대 px — 320 본문에서 막대 칸이 100 넘게 남게. 넘는 이름은 끝 말줄임
 
 
@@ -155,11 +158,16 @@ def weight_card(items):
     vals = [f"{w:.1f}%" for _, _, w in items]
     # 칸 폭 = 숫자(px) — 줄마다 모든 이름을 숨겨 겹치는 dk.bar_widths 는 줄 수의 제곱(503줄 = 본문 1.2MB)이라. 이름 = 로고 28 + 글자 폭 추정, 최대 NAME_MAX
     widths = (min(NAME_MAX, (28 if any(sy for sy, _, _ in items) else 0) + max(_text_px(n) for _, n, _ in items)), max(_text_px(v, 9) for v in vals))
+    widths = (widths[0], widths[1] * VAL_PX // 19)   # 값 글자 19 → 17 만큼 칸도
     rows = []
     for i, ((sym, name, w), v) in enumerate(zip(items, vals)):
-        row = dk.bar_row(nm(sym, name), w / mx, dk.CHART_MAIN, v, widths, first=i in (0, SHOWN))
+        row = dk.bar_row(nm(sym, name), w / mx, dk.CHART_MAIN, v, widths, first=i == 0, sep=False, bar_h=BAR_H, val_px=VAL_PX, pad=ROW_GAP // 2, lh="20px")
         rows.append(dk.stock_row_link(row, sym))
-    return dk.card_of(rows, fold_at=SHOWN if len(rows) > SHOWN else None, noun="종목")
+    box = dk.MULTI + f"padding-top:{ROW_GAP // 2}px;"   # 카드 가장자리 ~ 첫 줄 = 줄 사이 반쪽 + 위 여백 → 보이는 20
+    if len(rows) <= SHOWN:
+        return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{box}padding-bottom:{ROW_GAP // 2}px;">{"".join(rows)}</span></div>'
+    out = dk.fold_card("".join(rows[:SHOWN]), "".join(rows[SHOWN:]), f"종목 {len(rows) - SHOWN}개 더 보기", box=box)
+    return out.replace('<span data-grid="2" style="display:block;border-top:1px solid #E2E8F0;">', '<span data-grid="2" style="display:block;">', 1)   # 펼친 줄 위 구분선도 없음 (버튼 위 선만)
 
 
 def tab_holdings(f, src_note="", link=None, name=""):
@@ -279,7 +287,7 @@ def compare_card(sym, bars_all, kfund):
         name = E.BY_SYM[p][1]
         nm = dk.esc(name) + (f' <span style="font-weight:400;font-size:14px;color:{dk.NOTE};">(이 ETF)</span>' if p == sym else "")
         sub = " · ".join(bits) + (f" · 따라가는 지수 {dk.esc(E.BY_SYM[p][2])}" if E.BY_SYM[p][2] != E.BY_SYM[sym][2] else "")
-        val = f'<span style="font-weight:400;font-size:14px;color:{dk.NOTE};">1년</span> {_R()._arrow(r1, 1)}'   # 증감 = ▲▼ + 색 (가이드라인 5절), 설명 글자는 숫자 앞
+        val = _R()._arrow(r1, 1)   # 1년 수익률 — 기간은 제목 괄호에 (2026-11-16 사용자), 증감 = ▲▼ + 색 (가이드라인 5절)
         rows.append((nm, val, f'<span style="font-size:14px;color:{dk.NOTE};">{sub}</span>' if sub else "", p))
     if len(rows) < 2:
         return ""
@@ -291,8 +299,10 @@ def compare_card(sym, bars_all, kfund):
             row = row.replace("<span ", f'<span data-row-link="1" data-href="{dk.esc(E.page_url(p))}" ', 1)
         parts.append(row)
     card = f'<div style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(parts)}</span></div>'
-    return dk.section("비슷한 ETF와 비교하면?", card
-                      + dk.muted("같은 것을 담는 한국 상장 ETF 입니다. 1년 등락은 분배금을 빼고 계산했습니다."), tab="기본 정보")
+    # 제목 = 그래프 제목 꼴 ※ (구획 h2 · 밑줄 없이), 구성 탭 안 (2026-11-16 사용자 "구성에 넣고 아래 구분선 삭제, 당구장 표시 안내로")
+    title = (f'<div style="margin:28px 0 {dk.CHART_TITLE_GAP}px;padding-left:{dk.ALIGN_PX}px;">{dk.CHART_TITLE}비슷한 ETF와 비교하면? '
+             f'<span style="font-weight:400;font-size:{dk.TINY};color:{dk.NOTE};">(1년 수익률)</span></span></div>')
+    return title + card + dk.muted("같은 것을 담는 한국 상장 ETF 입니다. 1년 수익률은 분배금을 빼고 계산했습니다.")
 
 
 def related(sym, live, href=None):
@@ -643,9 +653,10 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
             ind = (render_kr.card_sector_flow(s) + render_kr.card_industry_mood(s) + render_kr.card_industry_work(s) + render_kr.card_industry_money(s))
             basic = {"family": KR_FAMILY.get(E.BY_SYM[sym][1].split(" ")[0]), "fee": kf.get("fee"), "aum_krw": kf.get("aum_krw"), "since": kf.get("since"), "n": kf.get("n"),
                      "source": kf.get("source") if (kf.get("fee") is not None or kf.get("aum_krw")) else None}
+            cmp = compare_card(sym, snap["bars"], kfund)   # 구성 탭 끝 (2026-11-16 사용자), 구성 탭이 없는 ETF(레버리지 · 인버스)는 기본 정보 끝
             body += ((render_kr.R._section("업계상황", f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{ind}</div>', tab="업계상황") if ind else "")
-                     + (render_kr.R._section("구성", hold, tab="구성") if hold else "")
-                     + render_kr.R._section("기본 정보", tab_basic(sym, basic, snap["bars"].get(sym)) + compare_card(sym, snap["bars"], kfund), tab="기본 정보") + related(sym, live) + ("</div>" if cut else ""))   # 잘라낸 본문의 바깥 틀 닫기
+                     + (render_kr.R._section("구성", hold + cmp, tab="구성") if hold else "")
+                     + render_kr.R._section("기본 정보", tab_basic(sym, basic, snap["bars"].get(sym)) + ("" if hold else cmp), tab="기본 정보") + related(sym, live) + ("</div>" if cut else ""))   # 잘라낸 본문의 바깥 틀 닫기
             pages[code] = (E.page_title(sym), body)
         except Exception as e:  # noqa: BLE001
             print(f"::warning::[etf] {sym} 페이지 실패: {e!r}")

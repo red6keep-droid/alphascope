@@ -1491,25 +1491,26 @@ def _sized(html, others, align="left"):
     return f'<span style="display:grid;flex:none;text-align:{align};"><span style="grid-area:1/1;">{html}</span>{ghost}</span>'
 
 
-def bar_row(name_html, frac, color, value_html, widths, sub="", first=False):
+def bar_row(name_html, frac, color, value_html, widths, sub="", first=False, sep=True, bar_h=10, val_px=None, pad=None, lh=None):
     """막대 줄 (2026-10-12 사용자: 막대는 가장 긴 이름 + 14px 뒤에서 왼쪽 정렬, 모든 막대 같은 길이).
     이름 칸(고정 폭) · 14px · 막대(남은 폭) · 값 칸(고정 폭, 오른쪽 정렬). sub 는 줄 아래 전체 폭 14px 보조 줄.
     widths = bar_widths(...) 목록(줄마다 숨겨 겹쳐 폭을 맞춘다) 또는 (이름 px, 값 px) 숫자 — 줄이 수백 개인 카드(ETF 구성 503종목)는
-    숨긴 글자가 줄 수의 제곱으로 불어나 숫자 폭을 쓴다(넘치면 이름 끝 말줄임, 2026-11-16)."""
+    숨긴 글자가 줄 수의 제곱으로 불어나 숫자 폭을 쓴다(넘치면 이름 끝 말줄임, 2026-11-16).
+    sep=False · bar_h · val_px · pad · lh = 구분선 없는 막대 카드(ETF 구성, 2026-11-16 사용자: 구분선 없음 · 막대 8 · 값 17 · 줄 사이 20)."""
     ln, lv = widths
     value_html = small_chg(value_html)   # 증감 18px (2026-10-13 사용자)
     pct = max(0.0, min(1.0, frac)) * 100
     sub_html = f'<span style="display:block;color:{SUB};font-weight:400;font-size:{TINY};line-height:{LH_TINY};white-space:normal;">{sub_line(sub)}</span>' if sub else ""
     if isinstance(ln, int):
-        name_cell = f'<span style="flex:0 0 {ln}px;min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:700;color:#111;font-size:{NAME};">{paren(name_html)}</span>'
-        val_cell = f'<span style="flex:0 0 {lv}px;margin-left:10px;text-align:right;font-weight:700;">{value_html}</span>'
+        name_cell = f'<span style="flex:0 0 {ln}px;min-width:0;display:flex;align-items:center;overflow:hidden;text-overflow:ellipsis;font-weight:700;color:#111;font-size:{NAME};">{paren(name_html)}</span>'
+        val_cell = f'<span style="flex:0 0 {lv}px;margin-left:10px;text-align:right;font-weight:700;{f"font-size:{val_px}px;" if val_px else ""}">{value_html}</span>'
     else:
         lv = [small_chg(x) for x in lv]
         name_cell = f'<span style="font-weight:700;color:#111;font-size:{NAME};display:flex;">{_sized(paren(name_html), [paren(x) for x in ln])}</span>'
         val_cell = f'<span style="margin-left:10px;font-weight:700;display:flex;">{_sized(value_html, lv, "right")}</span>'
-    return (f'<span style="display:block;padding:{SEP_GAP - VP - 1}px 12px;line-height:{LH_CARD};{"" if first else MULTI_SEP}">'
+    return (f'<span style="display:block;padding:{SEP_GAP - VP - 1 if pad is None else pad}px 12px;line-height:{lh or LH_CARD};{"" if first or not sep else MULTI_SEP}">'
             f'<span style="display:flex;align-items:center;white-space:nowrap;">{name_cell}'
-            f'<span style="flex:1 1 0;min-width:24px;margin-left:{BAR_GAP};height:10px;background:#F1F5F9;border-radius:3px;overflow:hidden;">'
+            f'<span style="flex:1 1 0;min-width:24px;margin-left:{BAR_GAP};height:{bar_h}px;background:#F1F5F9;border-radius:3px;overflow:hidden;">'
             f'<span style="display:block;height:100%;width:{pct:.0f}%;background:{color};"></span></span>'
             f'{val_cell}</span>{sub_html}</span> ')
 
