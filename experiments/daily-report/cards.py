@@ -323,11 +323,7 @@ def flat_rows(rows_html, line):
 def more_details(label, more_html, theme="neutral"):
     """`○○ n개 더 보기` 버튼 + 펼칠 내용 — 테마 JS(details[data-fold])가 내용을 버튼 위로 옮기고 글자를 `접기`로 바꾼다.
     버튼 = 카드 머리 접기 버튼과 같은 모양, 카드 폭 가득 (P417)."""
-    bg, bd = dk.CARD_DIR[theme]
-    hue = dk.FOLD_HUE.get(bd.upper())
-    ink = dk.mix("#111111", hue, 0.2) if hue else "#111"
-    btn = (f"display:flex;align-items:center;justify-content:center;gap:4px;width:100%;height:{dk.FOLD_BOX}px;box-sizing:border-box;"
-           f"background:{dk.lighten(bg)};border:1px solid {bd};border-radius:{dk.FOLD_RADIUS}px;color:{ink};font-size:14px;line-height:20px;font-weight:700;white-space:nowrap;")
+    btn = dk.emph_more_style(theme)   # 강조 카드 안 더 보기 버튼 꼴 — 종목 페이지 목표가 · 의견 · 기사 더 보기와 한 곳에서 (2026-11-16)
     return (f'<details data-acc="1" data-fold="1" data-label="{esc(label)}"><summary style="cursor:pointer;list-style:none;display:block;padding-top:{MORE_GAP_TOP}px;">'
             f'<span data-qmore="1" style="{btn}"><span data-fold-label="1">{esc(label)}</span>{dk.ACC_CHEV}</span></summary>{more_html}</details>')
 

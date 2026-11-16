@@ -1222,12 +1222,22 @@ PICK_REASON_LH = "26px"   # 방송 의견 이유 문장 행간 — 24 × 1.1 →
 PICKS_SHOWN = 3   # 방송 의견은 3건까지 펼쳐 두고 나머지는 접기 (2026-10-31 사용자 P158)
 
 
-def picks_rows_folded(ps, close, money):
-    """의견 줄 — 4건 이상이면 3건 + `의견 n건 더 보기` 접기 (P158)."""
+def picks_rows_folded(ps, close, money, theme="neutral"):
+    """의견 줄 — 5건 + `의견 n건 더 보기` 10건씩, 버튼 = 강조 카드 안 버튼(_dk.emph_more_style) (2026-11-16 사용자, 옛 P158 3건 + 한 번에 펼치는 흰 버튼)."""
     ps = sorted(ps, key=lambda p: PICK_ORDER.index(p["action"]))   # 매수 → 보유 → 관망 → 매도 — 접힌 쪽까지 같은 순서 (P201)
-    if len(ps) <= PICKS_SHOWN:
-        return picks_rows(ps, close, money)
-    return picks_rows(ps[:PICKS_SHOWN], close, money) + _dk.fold(f"의견 {len(ps) - PICKS_SHOWN}건 더 보기", picks_rows(ps[PICKS_SHOWN:], close, money))
+    return emph_more([picks_rows([p], close, money, start=i) for i, p in enumerate(ps)], "의견", theme)
+
+
+def emph_more(rows_html, noun, theme, end=False):
+    """강조 카드 안 줄 목록 — 5건 + 10건씩 더 보기 · 끝까지 펴면 접기 (더 보기 기준 P340), 버튼 = 카드 색(가이드라인: 강조 카드 안 더 보기는 이 버튼).
+    줄은 제 여백 · 구분선을 가진 조각. end = 이 목록이 카드의 마지막이면 버튼 아래 ~ 카드 끝을 좌우 여백 14 로 (emph_more_end)."""
+    html = _dk.more_list(rows_html, noun, li_style="margin:0;padding:0;", btn_theme=theme)
+    return f'<span data-qmore-end="1" style="display:block;">{html}</span>' if end and len(rows_html) > _dk.MORE_SHOWN else html
+
+
+def emph_more_end(card_html):
+    """더 보기 버튼이 카드 끝이면 그 li 아래 여백 12 → 5 (버튼 아래 ~ 카드 끝 = 좌우 여백 14 — daily-report cards.end_fix 와 같은 셈, Chrome 실측 값)."""
+    return card_html.replace('<li style="list-style:none;margin:6px 0 12px;"><span data-qmore-end="1"', '<li style="list-style:none;margin:6px 0 5px;"><span data-qmore-end="1"', 1)
 
 
 def pick_window(bars, tz, n=PICK_SHOW_DAYS, now=None):
@@ -1251,7 +1261,7 @@ def picks_card(name, ps, close, money, span=PICK_SPAN, together=""):
     theme, col = pick_theme(state)
     if isinstance(together, list):   # 함께 보기 줄 — 이 카드 색을 알아야 안쪽 카드 색을 정한다 (P168)
         together = together_block(together, theme)
-    lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 방송에서 나왔다.", "rich"), (picks_rows_folded(ps, close, money) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
+    lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 방송에서 나왔다.", "rich"), (picks_rows_folded(ps, close, money, pick_theme(picks_word(ps))[0]) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
     add_small_note(lines, f"유튜브 경제 방송의 최근 {span} 의견입니다.")   # 2026-11-16 사용자: 세는 법(같은 영상 · 같은 사람 한 번) 문장 삭제 · 줄임   # 옛 툴팁의 모은 기준을 카드 작은 글씨로 — 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     word = picks_word(ps)   # 숫자 없이 가장 많은 의견 하나 (2026-11-01 사용자 P207, 옛 `매수 3 · 관망 2`)
     return _state_card("방송 의견은?", word, pick_theme(word)[0], PICK_THEME.get(word, ("", "#111"))[1], lines, "", fold=True)   # 보유 · 관망 · 엇갈림 = 검정 글씨 (P201)
@@ -1480,7 +1490,7 @@ def picks_count(ps):
 PICK_LINE = "border-top:1px solid rgba(15,23,42,.10);"   # 강조 카드 색 위에서도 보이는 연한 구분선
 
 
-def picks_rows(ps, close, money):
+def picks_rows(ps, close, money, start=0):
     """방송 의견 줄 — 줄마다 제목 줄 `[매수] 방송 이름(굵게) (9분 지점) | 말한 사람(소속)` / 이유 / 작은 글씨 게시 시각 · (목표가) · 영상에서 보기.
     (2026-11-01 사용자 P200: 방송 이름을 제목으로 먼저, 세로 구분선 뒤 말한 사람 · P201: 맨 앞 의견 라벨 — 옛 의견별 묶음 머리 `매수 의견` 은 뺐다)
     흰 카드 없이 줄 사이 구분선만 (P92).
@@ -1488,7 +1498,7 @@ def picks_rows(ps, close, money):
     import tech_signals as TS   # 의견 라벨 = 기술지표 라벨 모양 (P201)
     rows = [p for k in PICK_ORDER for p in [x for x in ps if x["action"] == k][:6]]   # 매수 → 보유 → 관망 → 매도 순. 의견별 묶음 머리(`매수 의견`)는 줄마다 라벨이 대신한다 (P201)
     out = ""
-    for i, p in enumerate(rows):
+    for i, p in enumerate(rows, start):   # start = 목록 안 차례(더 보기 목록은 줄마다 따로 그린다 — 첫 줄만 위 구분선 없음)
         who = re.sub(r"\s+\(", "(", p["speaker"] or p["channel"])   # `톰 리 (펀드스트랫)` → `톰 리(펀드스트랫)`
         nm, par, org = who.partition("(")
         who_html = _esc(nm) + (f'({_esc(org)}' if par else "") + ("" if p["own"] else " 보고서")
@@ -1588,9 +1598,9 @@ def broker_card(name, cs, close, money, days=BROKER_DAYS):
     theme, col = MOVE_THEME.get(word, ("neutral", "#111"))
     cnt = " · ".join(f'<b style="font-weight:700;color:{MOVE_THEME.get(k, ("", "#111"))[1]};">{k} {n[k]}건</b>' for k in MOVE_ORDER if n[k])
     # 처음 5건 + `목표가 n건 더 보기` 10건씩 — 더 보기 기준(P340, 2026-11-16 사용자: 옛 3건 + 한 번에 펼치는 접기가 더 보기 버튼과 달랐다). 줄 모양 · 구분선은 그대로
-    body = f'<div data-broker="1">{_dk.more_list([_broker_row(i, c, close, money) for i, c in enumerate(cs)], "목표가", li_style="margin:0;padding:0;")}</div>'
+    body = emph_more([_broker_row(i, c, close, money) for i, c in enumerate(cs)], "목표가", theme, end=True)   # 강조 카드 안 버튼 = 카드 색 (2026-11-16 사용자: 흰 버튼은 강조 카드 안에 쓰지 않는다)
     lines = [(f"최근 {days}일 증권사가 {_esc(name)} 목표가를 {len(cs)}건 냈다. {cnt}.", "rich"), (body, "html")]
-    return _state_card("증권사 목표가 변경은?", word, theme, col, lines, "", fold=True)
+    return emph_more_end(_state_card("증권사 목표가 변경은?", word, theme, col, lines, "", fold=True))
 
 
 TONE_ORDER = ("긍정", "부정", "중립")
@@ -1598,10 +1608,10 @@ TONE_THEME = {"긍정": ("positive", UP), "부정": ("negative", DOWN)}
 TONE_OF = {"positive": "긍정", "negative": "부정"}
 
 
-def _news_op_rows(ns):
+def _news_op_rows(ns, start=0):
     import tech_signals as TS
     out = ""
-    for i, x in enumerate(ns):
+    for i, x in enumerate(ns, start):
         tone = TONE_OF.get(x["direction"], "중립")
         head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box({"긍정": "up", "부정": "down"}.get(tone, "flat"), tone, _esc, sym=tone in TONE_THEME, fit=True)}</span>'
                 f'<b style="font-weight:700;">{_esc(x["source"])}</b>')
@@ -1626,15 +1636,13 @@ def news_opinion_card(name, ns, span=PICK_SPAN):
     word = _move_word(n, TONE_ORDER)
     theme, col = TONE_THEME.get(word, ("neutral", "#111"))
     cnt = " · ".join(f'<b style="font-weight:700;color:{TONE_THEME.get(k, ("", "#111"))[1]};">{k} {n[k]}건</b>' for k in TONE_ORDER if n[k])
-    body = _news_op_rows(ns[:PICKS_SHOWN])
-    if len(ns) > PICKS_SHOWN:
-        body += _dk.fold(f"기사 {len(ns) - PICKS_SHOWN}건 더 보기", _news_op_rows(ns[PICKS_SHOWN:]))
+    body = emph_more([_news_op_rows([x], start=i) for i, x in enumerate(ns)], "기사", theme, end=True)   # 5건 + 10건씩 · 강조 카드 안 버튼 (2026-11-16 사용자)
     lines = [(f"최근 {span} {_esc(_dk.josa(name, '을'))} 다룬 의견 기사가 {len(ns)}건 나왔다. {cnt}.", "rich"), (body, "html")]
     tip = (f"해설 · 투자 의견 기사(모틀리 풀 · 시킹 알파 같은 매체, `왜 지금 사야 하나` 같은 제목) 가운데 이 종목을 다룬 것. 최근 {span}\n"
            "· 나누는 법 : 기사가 이 종목에 좋게 쓰면 긍정, 나쁘게 쓰면 부정 (AI 분류)\n"
            f"· 지금 : 긍정 {n['긍정']}건 · 부정 {n['부정']}건 · 중립 {n['중립']}건\n· 이 블로그의 추천이 아니다")
     word = {"긍정": "▲ 긍정", "부정": "▼ 부정"}.get(word, word)   # 이 카드에서만 ▲ · ▼ (2026-11-02 사용자 P282 — 다른 뉴스 긍정 · 부정은 그대로)
-    return _state_card("뉴스 의견은?", word, theme, col, lines, "", tip=_dk.with_src(tip, src), fold=True)
+    return emph_more_end(_state_card("뉴스 의견은?", word, theme, col, lines, "", tip=_dk.with_src(tip, src), fold=True))
 
 
 def dd_cur(x, st):
