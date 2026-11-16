@@ -1,0 +1,86 @@
+name: KR RSS probe (한국 간단 종목 뉴스 매체 시험)
+
+# 한국 간단 종목 뉴스 — 언론사 RSS 제목 모으기 시험 (2026-11-16 사용자 "그렇게 해", 기록 alphascope-docs 검증/한국-간단종목-RSS-매체-조사.md).
+#   - 2시간마다(:53 — 다른 실행 시각과 안 겹침) 12개 매체 RSS 21개 주소를 받아 제목 · 매체 · 링크 · 발행 시각만 모은다. 피드가 3시간치뿐인 매체가 있어 2시간 간격.
+#   - AI 0 · Blogger · gh-pages 쓰기 0 · 화면 0. 결과 = 비공개 상태 저장소 kr-rss-state(기록 없이 덮어씀).
+#   - STOP_AFTER(KST 날짜) 뒤에는 정기 실행이 아무것도 안 하고 끝난다 — 5일 시험. 사람이 거는 실행은 늘 돈다(--report 로 숫자 보기).
+#   - 매체 끄기: 저장소 변수 KR_RSS_OFF = "매체,매체" (삭제 요청 등).
+
+on:
+  schedule:
+    - cron: '53 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      report:
+        description: '모은 것으로 하루 기준 숫자만 보기(새로 받지 않음)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  STOP_AFTER: '2026-11-21'
+
+concurrency:
+  group: kr-rss-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Stop after trial
+        id: gate
+        run: |
+          today=$(TZ=Asia/Seoul date +%F)
+          if [ "${{ github.event_name }}" = schedule ] && [[ "$today" > "$STOP_AFTER" ]]; then echo "시험 끝($STOP_AFTER) — 건너뜀"; echo "go=false" >> "$GITHUB_OUTPUT"; else echo "go=true" >> "$GITHUB_OUTPUT"; fi
+
+      - uses: actions/checkout@v5
+        if: steps.gate.outputs.go == 'true'
+
+      - name: Set up Python
+        if: steps.gate.outputs.go == 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: State (private kr-rss-state, read)
+        if: steps.gate.outputs.go == 'true'
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p /tmp/kr
+          [ -z "$STATE_DEPLOY_KEY" ] && { echo "::error::STATE_DEPLOY_KEY 없음 — 모은 것을 남길 곳이 없다"; exit 1; }
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
+          if git fetch -q state kr-rss-state; then git archive FETCH_HEAD | tar -x -C /tmp/kr && echo "저장값: $(wc -l < /tmp/kr/titles.jsonl) 줄"; else echo "저장값 없음 (첫 실행)"; fi
+
+      - name: Collect titles
+        id: run
+        if: steps.gate.outputs.go == 'true' && !inputs.report
+        env:
+          KR_RSS_OFF: ${{ vars.KR_RSS_OFF }}
+        run: python experiments/stock-quick/kr_rss_probe.py --state /tmp/kr
+
+      - name: Report
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          [ -f /tmp/kr/titles.jsonl ] || { echo "모은 것 없음"; exit 0; }
+          python experiments/stock-quick/kr_rss_probe.py --state /tmp/kr --report | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Save kr-rss-state (private, no history)
+        if: steps.run.outcome == 'success'
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          cd /tmp/kr
+          git init -q && git checkout -q --orphan kr-rss-state
+          git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git add -A && git commit -q -m "kr rss $(date -u +%FT%H) [skip ci]"
+          git push -q -f git@github.com:red6keep-droid/alphascope-state.git HEAD:kr-rss-state
+          echo "저장 $(du -sh . | cut -f1)"
