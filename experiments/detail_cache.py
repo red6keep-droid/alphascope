@@ -65,14 +65,16 @@ class DetailCache:
         self.stocks.setdefault(sym, {})[field] = {"v": value, "day": self.today.isoformat(), "bar": bar}
         return True
 
-    def due(self, sym, field, bar=None, earn_days=(), next_earn=None):
-        """이번 실행에 새로 받아야 하나. bar = 이번 마지막 거래일, earn_days = 지난 실적 발표일들, next_earn = 다음 실적일."""
+    def due(self, sym, field, bar=None, earn_days=(), next_earn=None, daily=()):
+        """이번 실행에 새로 받아야 하나. bar = 이번 마지막 거래일, earn_days = 지난 실적 발표일들, next_earn = 다음 실적일.
+        daily = 이 실행에서 새 거래일마다 받을 칸 — 미국 정식의 의견 · 이익 예상(증권사 등급 · 목표가 변경은 거의 매일 나온다, 2026-11-16 사용자).
+        간단 종목 · 한국 정식은 넘기지 않아 옛 주기 그대로(야후 호출 수 — 정식 빈 값 비율을 본 뒤 정한다)."""
         x = (self.stocks.get(sym) or {}).get(field)
         if not x:
             return True
         age = (self.today - datetime.date.fromisoformat(x["day"])).days
         after_earn = any(x["day"] < d <= self.today.isoformat() for d in earn_days or ())   # 받은 뒤에 실적 발표가 있었다
-        if field in ("options", "caps"):
+        if field in ("options", "caps") or field in daily:
             return bar is not None and x.get("bar") != bar
         if field in ("analysts", "eps"):
             spread = zlib.crc32(sym.encode()) % 5 == self.today.weekday()   # 종목마다 정해진 요일 — 한 날에 몰리지 않게
