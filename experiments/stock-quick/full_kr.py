@@ -3,7 +3,8 @@
 full_us.py 와 같은 원칙 — 정식 계산(analyze_kr) · 정식 카드(render_kr)를 그대로 부르고, 막히는 줄(방송 뉴스 · 방송 의견 · 미국과 연결 짝)만 뺀다.
 11-12 목업(mock_quick.page_kr_full)과 같은 화면을 853종목 매일 실행으로.
   - 탭 = 오늘 · 매수의견(애널리스트 — 값이 있을 때만) · 실적(분기 매출 · 이익 예상 · 돈을 어디에 쓰나 + 시장 일정) · 업계상황 · 기업.
-  - 실적 발표일 카드는 없다 — 한국은 예정일이 미리 나오는 회사가 드물다(실측 3/25, 기획 6-3-2 ⑥).
+  - 실적 탭 일정 = 정식과 같은 세 카드(2026-11-16 사용자): 다음 실적 발표는?(DART 잠정실적 1년 전 같은 분기로 어림 `무렵` — 예정일을 미리 알리는 회사가 드물다, 기획 6-3-2 ⑥)
+    · 미국 연관 종목 일정은?(검증 통과 짝만, Finnhub 달력은 미국 간단 실행 것) · 시장 전체를 흔들 일정은?.
   - 함께 움직이는 종목 = 같은 업종에서 1년 등락이 가장 비슷하게 움직인 3곳(상관 계산, full_us.corr_peers). 정식의 `미국과 연결`(검증한 짝)은 빌려 오지 않는다.
   - 업계 카드 = 업종 원자료(로고 메타데이터 industry_en)가 분명한 업종만 정식 대표 종목의 업계 자료로 잇는다(IND_REP). 원자료가 틀린 종목은 KR_FIX.
 재료 (AI 0 · Blogger 0 · 그림 0):
@@ -269,6 +270,54 @@ def history(cache_dir, syms):
     return {"stats": c["stats"], "bench": K.BENCH}
 
 
+def earn_kr(cache_dir, ref_kr, syms, key=None):
+    """한국 실적 발표일 = DART 잠정실적 첫 공시일 — 정식(collect_kr_earn_dart)과 같은 판정, 간단 종목 몫은 cache_dir/kr/dart_earn.json (2026-11-16 사용자).
+    처음 = 최근 3년(카드는 2년 움직임 · 1년 전 같은 분기로 다음 날짜 어림), 그 뒤 = 회사마다 7일에 한 번, 어림한 다음 발표일 앞 14일 ~ 뒤 3일 안이면 매일.
+    정식 종목 몫(kr-state data/dart_earn.json)과 합쳐 렌더러가 쓰는 표(collect_kr_earn_dart._cache)에 넣는다. → 이번에 살핀 회사 수"""
+    import collect_kr_earn_dart as KE
+    path = os.path.join(cache_dir, "kr", "dart_earn.json")
+    c = _load(path, {"days": {}, "checked": {}})
+    full = _load(KE.OUT, {"days": {}})
+    today = datetime.date.today()
+    key = key or KE._key()
+
+    def due(code):
+        t = c["checked"].get(code)
+        if not t:
+            return True
+        if (today - datetime.date.fromisoformat(t)).days >= 7:
+            return True
+        est = [datetime.date.fromisoformat(d) + datetime.timedelta(days=364) for d in c["days"].get(code) or []]
+        return t < str(today) and any(-3 <= (e - today).days <= 14 for e in est)
+
+    codes = {code_of(s): ref_kr[s].get("corp") for s in syms if ref_kr.get(s, {}).get("corp")}
+    todo = sorted((k for k in codes if due(k)), key=lambda k: c["checked"].get(k) or "")
+    n = calls = 0
+    if key:
+        end = today.strftime("%Y%m%d")
+        for code in todo:
+            prev = c["days"].get(code) or []
+            bgn = ((datetime.date.fromisoformat(prev[-1]) - datetime.timedelta(days=KE.GAP_DAYS)) if prev else today - datetime.timedelta(days=3 * 365)).strftime("%Y%m%d")
+            try:
+                new = KE.first_prelim(KE.filings(key, codes[code], bgn, end))
+            except Exception as e:  # noqa: BLE001 — 이 회사만 다음 실행에
+                print(f"[quick-kr] {code} 잠정실적 실패: {str(e)[:80]}")
+                continue
+            keep = []
+            for d in sorted(set(prev) | set(new)):   # 이어 붙일 때 40일 규칙을 다시 (정식 run 과 같다)
+                if keep and (datetime.date.fromisoformat(d) - datetime.date.fromisoformat(keep[-1])).days < KE.GAP_DAYS:
+                    continue
+                keep.append(d)
+            c["days"][code], c["checked"][code] = keep, str(today)
+            n += 1
+        _save(path, c)
+    else:
+        print("[quick-kr] DART_API_KEY 없음 — 실적일은 지난 값")
+    KE._cache = {"days": {**c["days"], **(full.get("days") or {})}}   # 정식 종목은 정식 실행 값이 이긴다
+    print(f"[quick-kr] 잠정실적 날짜 살핀 회사 {n} · 날짜 있는 회사 {sum(1 for v in c['days'].values() if v)}/{len(codes)}")
+    return n
+
+
 def full_group():
     """비교 묶음 `시총 상위 20개` 재료 — 한국 정식 실행 상태(kr-stocks/data: detail_cache 시총 · 이익 예상, dart_fin 매출)를 읽기만."""
     data = os.path.join(KRD, "data")
@@ -359,7 +408,7 @@ def body(s, a, peers, by, related_links, extra_today=""):
     today = (R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + render_kr.price_card(s) + render_kr.sec_regime(s)
              + render_kr.sec_tech(s) + pairs_card(s, peers, by) + render_kr.sec_states(s) + extra_today)
     op = opinions_tab(s)
-    cal = render_kr.sec_calendar(s, ("macro",), open_first=False)
+    cal = render_kr.sec_calendar(s, ("earnings", "peers", "macro"), open_first=False)   # 정식과 같은 세 카드 (2026-11-16 사용자 — 옛: 시장 일정만)
     ex = sec_expect(s)
     ea = ex + (R.group_title("주요 일정") + cal if cal else "")
     title = f"{s['name']} 주가"
@@ -374,7 +423,7 @@ def body(s, a, peers, by, related_links, extra_today=""):
             + R.related_buttons(related_links) + "</div>")
 
 
-def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=None, related=None, extra_today=None, caps=None):
+def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=None, related=None, extra_today=None, caps=None, us_earn=None):
     """간단 종목(정식 아님) 화면 조각 {코드: html}."""
     quick = [s for s, e in ref_kr.items() if not e.get("full") and len(bars_all.get(s) or []) >= 30 and (only is None or s in only)]
     groups = {}
@@ -396,7 +445,7 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
     snap = {"bars": bars_all, "caps": {}, "fetched_at": datetime.datetime.now().isoformat(timespec="minutes")}
     extra = {"stocks": {**geps, **{s: {f: (det.get(s) or {}).get(f) for f in DETAIL_FIELDS} for s in quick}},
              "revenue": {"series": {**grev, **dart_data["revenue"]}}, "capex": dart_data["capex"], "company": dart_data["company"],
-             "earnings": {}, "pair_earnings": {}}
+             "earnings": {}, "pair_earnings": {t: (us_earn or {}).get(t) or [] for t in LINK_US}}   # 미국 연관 종목 실적일 = 미국 간단 실행이 받은 Finnhub 달력(earn_us.json) 그대로 (2026-11-16)
     stocks = [x for x in (analyze_kr.stock(s, snap, hist, flows) for s in quick) if x]
     if not stocks:
         return {}
@@ -414,6 +463,10 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
     render_kr.KR_PRICES.update({x["code"]: (x["name"], x.get("ret_1d")) for x in stocks if x.get("ret_1d") is not None})
     render_kr.attach_broker(stocks)   # 증권사 목표가 — 한국 정식 실행이 kr-state 에 남긴 broker_tg.json 을 읽기만
     macro_rows = render_kr.us_calendar()
+    render_kr.US_NAMES.update(US_KO)   # 미국 연관 종목 일정 카드 — 정식 명단 밖 미국 종목도 한글 이름
+    for x in stocks:   # `미국 연관 종목 일정은?` = 검증 통과한 짝(LINKS)만 — 정식 PAIRS 자리에 (analyze 뒤라 오늘 탭 판정에는 안 섞인다)
+        if LINKS.get(x["sym"]):
+            K.PAIRS[x["sym"]] = ([r["t"] for r in LINKS[x["sym"]]], "")
     for x in stocks:
         x["company"] = extra["company"].get(x["code"]) or {}
         render_kr.build_expect(x, extra, group)

@@ -396,8 +396,10 @@ def main():
         dd = FK.dart(cache, q_kr)
         hq = FK.history(cache, q_kr)
         caps = kr_caps(cache, ref["kr"], bars_kr, kr_syms)
+        FK.earn_kr(cache, ref["kr"], q_kr, key=first_key("DART_API_KEY"))
+        us_earn = (FU._load(os.path.join(cache, "earn_us.json"), {}) or {}).get("rows") or {}   # 미국 간단 실행(아침)이 받아 둔 실적 달력 — 새로 부르지 않는다
         for c, h in FK.build(ref["kr"], bars_kr, flows, hist_full, det, dd, hq, only=set(kr_syms),
-                             related=lambda s, e: rel(s, e, "KR"), extra_today=xtra, caps=caps).items():
+                             related=lambda s, e: rel(s, e, "KR"), extra_today=xtra, caps=caps, us_earn=us_earn).items():
             pages[("kr", c)] = h
     except LookupError as e:
         print(f"[quick] {e}")
