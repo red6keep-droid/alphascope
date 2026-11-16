@@ -10,6 +10,10 @@
 - 상한 · 자르기 없음: 읽는 쪽이 수집기 하루 2번뿐이라 크기가 문제 되지 않고, 무엇을 쓸지는 수집기가 고른다(조용히 버리지 않기).
 - am = 미국 마감(한국 아침 07:30 KST 무렵, 미국 데일리 리포트 실행 끝), pm = 한국 마감(16:30 KST 무렵, 한국 증시 리포트 실행 끝).
 - pm 의 미국 일정은 그날 am 묶음의 calendar 를 다시 쓴다(한국 실행에는 일정 수집이 없다 — 일정 API 를 두 번 부르지 않음).
+- 월요일 am(Q18, 2026-11-16): 미국 리포트가 월요일 아침엔 안 돌므로 토요일 실행이 월요일 묶음도 같이 만든다
+  (`ahead: true`, generated = 토요일). 금요일 미국 마감 숫자 + 월요일 밤 미국 일정 + 월요일 한국장 시작 줄.
+  토요일 am 묶음은 한국장이 쉬므로 장 시작 줄이 없다.
+- next_session 줄마다 kind: open(한국장 시작 줄, Q17) · event(일정). event 는 us_day(미국 날짜)도 준다.
 
 사용:
   python build_briefing.py --slot am --report-input experiments/daily-report/output/report_input.json --out-dir deploy-briefing
@@ -80,8 +84,16 @@ def _kst_time(day, kind):
     return k.strftime("%H:%M") + (" (다음 날)" if k.date() > d else "")
 
 
+def _prev_weekday(d):
+    """d 직전 평일(미국 장 날짜 후보). 휴장은 data.json trade_date 와 대조해 session 으로 걸러진다."""
+    d -= datetime.timedelta(days=1)
+    while d.weekday() >= 5:
+        d -= datetime.timedelta(days=1)
+    return d
+
+
 def _event_rows(calendar, day):
-    """calendar(14일) 중 그 미국 날짜의 일정 → [{time, what}] (KST)."""
+    """calendar(14일) 중 그 미국 날짜의 일정 → [{time, what, market, kind: event, us_day}] (time 은 KST)."""
     out = []
     for r in (calendar or {}).get("items") or []:
         if r.get("day") != day:
@@ -90,9 +102,9 @@ def _event_rows(calendar, day):
         if kind == "EARNINGS":
             sym = r.get("symbol", "")
             out.append({"time": "장 마감 뒤" if r.get("after_close") else "장 시작 전",
-                        "what": f"{US_NAME.get(sym, sym)} 실적 발표", "market": "US"})
+                        "what": f"{US_NAME.get(sym, sym)} 실적 발표", "market": "US", "kind": "event", "us_day": day})
         elif kind in EVENT_NAME:
-            out.append({"time": _kst_time(day, kind), "what": EVENT_NAME[kind], "market": "US"})
+            out.append({"time": _kst_time(day, kind), "what": EVENT_NAME[kind], "market": "US", "kind": "event", "us_day": day})
     return out
 
 
@@ -116,11 +128,12 @@ def _hypotheses(hypo, market):
     return rows
 
 
-def build_am(day_kst, report_input):
-    data = _load(None, "data.json") or {}
-    hypo = _load(None, "hypo.json")
-    news = _load(None, "news.json")
-    us_day = (datetime.date.fromisoformat(day_kst) - datetime.timedelta(days=1)).isoformat()   # 지난밤 미국 장 날짜
+def build_am(day_kst, report_input, data=None, hypo=None, news=None):
+    data = data if data is not None else (_load(None, "data.json") or {})
+    hypo = hypo if hypo is not None else _load(None, "hypo.json")
+    news = news if news is not None else _load(None, "news.json")
+    d = datetime.date.fromisoformat(day_kst)
+    us_day = _prev_weekday(d).isoformat()   # 직전 미국 장 날짜 (월요일 → 금요일)
     session = "open" if data.get("trade_date") == us_day else "closed"
 
     indices = [{"name": i.get("name"), "close": _r(i.get("p")), "chg_pct": _r(i.get("cp"))} for i in data.get("indices") or []]
@@ -142,13 +155,15 @@ def build_am(day_kst, report_input):
     calendar = (report_input or {}).get("calendar")
     # 관전 포인트 후보 맨 앞 = 한국장 시작 줄(Q16): 지난밤 가장 크게 움직인 업종 · 대형주. 숫자는 close 와 같다
     nxt = _event_rows(calendar, day_kst)
-    if session == "open":
+    if session == "open" and d.weekday() < 5:   # 토요일 am 은 한국장이 쉰다 → 장 시작 줄 없음
         pct = lambda x: f"{x:+.2f}%".replace("-", "−")
         top_s = max((x for x in sectors if x["chg_pct"] is not None), key=lambda x: abs(x["chg_pct"]), default=None)
         top_m = next((m for m in movers if m["chg_pct"] is not None), None)
         parts = ([f"{top_s['name']} 업종 {pct(top_s['chg_pct'])}"] if top_s else []) + ([f"{top_m['name']} {pct(top_m['chg_pct'])}"] if top_m else [])
         if parts:
-            nxt.insert(0, {"time": "09:00", "what": "지난밤 미국 " + " · ".join(parts) + " 뒤 한국장 첫 반응", "market": "KR"})
+            when = "지난밤 미국 " if us_day == (d - datetime.timedelta(days=1)).isoformat() else "지난 금요일 미국 "
+            nxt.insert(0, {"time": "09:00", "what": when + " · ".join(parts) + " 뒤 한국장 첫 반응",
+                           "market": "KR", "kind": "open"})
     return {
         "v": V, "date": day_kst, "slot": "am", "market": "US", "session": session, "trade_date": data.get("trade_date"),
         "close": {"indices": indices, "sectors": sectors, "movers": movers},
@@ -206,23 +221,29 @@ def main():
     a = ap.parse_args()
 
     day = a.date or datetime.datetime.now(KST).date().isoformat()
+    outs = []
     if a.slot == "am":
         ri = None
         if a.report_input and os.path.exists(a.report_input):
             with open(a.report_input, encoding="utf-8") as f:
                 ri = json.load(f)
-        out = build_am(day, ri)
+        data, hypo, news = _load(None, "data.json") or {}, _load(None, "hypo.json"), _load(None, "news.json")
+        outs.append(build_am(day, ri, data, hypo, news))
+        if datetime.date.fromisoformat(day).weekday() == 5:   # 토요일 실행 → 월요일 am 묶음도 (Q18)
+            monday = (datetime.date.fromisoformat(day) + datetime.timedelta(days=2)).isoformat()
+            outs.append(dict(build_am(monday, ri, data, hypo, news), ahead=True))
     else:
-        out = build_pm(day, a.kr)
-    out["generated"] = datetime.datetime.now(KST).isoformat(timespec="seconds")
-
-    body = json.dumps(out, ensure_ascii=False, separators=(",", ":"))
-    path = os.path.join(a.out_dir, "briefing", f"{day}-{a.slot}.json")
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(body)
-    print(f"[묶음] {path} {len(body.encode('utf-8')):,}B session={out['session']} "
-          f"뉴스 {len(out['news'])} · 일정 {len(out['next_session']['items'])} · 신호 {len(out['signals'])}")
+        outs.append(build_pm(day, a.kr))
+    now = datetime.datetime.now(KST).isoformat(timespec="seconds")
+    for out in outs:
+        out["generated"] = now
+        body = json.dumps(out, ensure_ascii=False, separators=(",", ":"))
+        path = os.path.join(a.out_dir, "briefing", f"{out['date']}-{a.slot}.json")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(body)
+        print(f"[묶음] {path} {len(body.encode('utf-8')):,}B session={out['session']} "
+              f"뉴스 {len(out['news'])} · 일정 {len(out['next_session']['items'])} · 신호 {len(out['signals'])}")
     return 0
 
 
