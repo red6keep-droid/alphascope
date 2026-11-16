@@ -325,3 +325,112 @@ jobs:
           fi
           git push state "$COMMIT:refs/heads/kr-state"
           echo "저장: $COMMIT"
+
+  # 증시 전망 — 한국 장 마감 뒤 한 번 더 (2026-11-16 사용자: 한국 전망 타임라인이 다음 날 07:30 까지 멈춰 있었다).
+  # 07:30 nvda-report 의 `Forecast pages` 단계와 같은 일 — 판정 · 기록 · 자동 등록(한국 오늘 봉) · 바뀐 페이지만 게시 · 증명 · hypo.json. AI 0.
+  # 위 한국 종목 잡(kr-state 수급 · 판정 기록 저장) 뒤에 돈다 — 한국 근거(kr_why)가 오늘 것을 읽는다. 그 잡이 실패해도 돈다(전날 kr-state 로).
+  # 상태 = nvda-state(forecast/ · records/forecasts · hypotheses · why/). 잡 concurrency 를 nvda-report 와 같은 이름으로 — 같은 브랜치에 동시에 쓰지 않게 줄 세운다.
+  # 게시 게이트 = 아침 전망과 같은 NVDA_PUBLISH. 수동 실행은 publish 를 켰을 때만 이 잡이 돈다(상태 브랜치에 시험 기록을 남기지 않게).
+  forecast-kr:
+    needs: [when, kr-stocks]
+    if: always() && needs.when.outputs.skip != 'true' && needs.kr-stocks.result != 'cancelled' && (github.event_name == 'schedule' || inputs.scheduled == true || inputs.publish == true)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: nvda-report
+      cancel-in-progress: false
+    env:
+      STATE_DIR: experiments/nvda-report/output/state
+      FC_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.NVDA_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+      # 시세 예비 사슬 (experiments/price_source.py) — 없는 키는 그 단계를 건너뛴다
+      POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+      TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
+      FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+      ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: State repo (private alphascope-state)
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 방송 줄(kr_why) — 위 잡과 같은 날짜 파일 캐시를 이어 받는다(읽기만, 이 잡은 저장하지 않음 · 같은 키)
+      - name: Media feed day key
+        id: mfkey
+        run: echo "d=$(TZ=Asia/Seoul date +%F)" >> "$GITHUB_OUTPUT"
+      - name: Restore media feed cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/alphascope-media
+          key: media-feed-${{ github.workflow }}-${{ steps.mfkey.outputs.d }}
+          restore-keys: media-feed-${{ github.workflow }}-
+
+      - name: Install dependencies
+        run: |
+          pip install -r experiments/nvda-report/requirements.txt
+          pip install -r experiments/daily-report/requirements.txt
+
+      # 줄 세운 뒤에 받는다 — 앞선 nvda-report 실행이 방금 쓴 것 위에 쌓는다
+      - name: Load state (nvda-state · kr-state)
+        run: |
+          if git fetch state nvda-state:refs/nvda-state 2>/dev/null; then
+            mkdir -p "$STATE_DIR"
+            git archive refs/nvda-state "$STATE_DIR" | tar -x && echo "상태 불러옴"
+          else
+            echo "::error::nvda-state 없음 — 전망은 아침 실행이 처음 만든다"; exit 1
+          fi
+          git fetch --no-tags state kr-state:refs/remotes/state/kr-state 2>/dev/null || echo "kr-state 없음 — 한국 전망 근거는 방송 · 미국 줄만"
+
+      - name: Forecast pages (증시 전망 · 한국 마감 뒤)
+        id: fc
+        run: |
+          mkdir -p experiments/issue_store/output
+          [ -f "$STATE_DIR/forecast/page_hashes.json" ] && cp "$STATE_DIR/forecast/page_hashes.json" experiments/issue_store/output/forecast_page_hashes.json || true
+          python experiments/issue_store/forecast_daily.py --state "$STATE_DIR"
+          if [ "$FC_PUBLISH" = "true" ]; then
+            python experiments/issue_store/publish_forecast.py
+          else
+            python experiments/issue_store/publish_forecast.py --dry
+          fi
+          mkdir -p "$STATE_DIR/forecast" deploy-forecast/proof
+          [ -f experiments/issue_store/output/forecast_page_hashes.json ] && cp experiments/issue_store/output/forecast_page_hashes.json "$STATE_DIR/forecast/page_hashes.json" || true
+          cp experiments/issue_store/output/forecast/proof/*.json deploy-forecast/proof/ 2>/dev/null || true
+          cp experiments/issue_store/output/forecast/hypo.json deploy-forecast/hypo.json 2>/dev/null || true
+
+      # 새로 등록된 한국 전망의 증명 파일 · 홈 `증시 전망` 카드 — 아침 실행과 같은 자리(gh-pages, keep_files)
+      - name: Deploy forecast proof + hypo.json to gh-pages
+        if: env.FC_PUBLISH == 'true' && hashFiles('deploy-forecast/hypo.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-forecast
+          publish_branch: gh-pages
+          keep_files: true
+
+      # 전망 판정까지 끝났으면 저장 — nvda-state 위에 이어 쌓기(force 없음). 받은 상태 전체를 그대로 다시 올리고 바뀐 전망 파일만 달라진다
+      - name: Save state (nvda-state branch)
+        if: always() && steps.fc.outcome != 'skipped'
+        run: |
+          [ -f "$STATE_DIR/items.jsonl" ] || { echo "저장할 상태 없음"; exit 0; }
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          export GIT_INDEX_FILE="$(mktemp -u)"
+          git add -f "$STATE_DIR"
+          TREE="$(git write-tree)"
+          unset GIT_INDEX_FILE
+          PARENT="$(git rev-parse --verify -q refs/nvda-state)"
+          if [ "$TREE" = "$(git rev-parse "$PARENT^{tree}")" ]; then echo "변경 없음"; exit 0; fi
+          COMMIT="$(git commit-tree "$TREE" -p "$PARENT" -m "Update forecast state (KR close) [skip ci]")"
+          git push state "$COMMIT:refs/heads/nvda-state"
+          echo "저장: $COMMIT"
