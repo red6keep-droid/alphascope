@@ -43,6 +43,15 @@ import tech_signals as ts  # noqa: E402
 sys.path.insert(0, HERE)
 import render_quick as RQ  # noqa: E402
 
+_LAP = [time.time(), time.time()]
+
+
+def lap(name):
+    """단계별 걸린 시간 — 11-16 17:40 실행이 출력 없이 80분 상한에 걸려 어디서 멈췄는지 몰랐다 (2026-11-16)"""
+    now = time.time()
+    print(f"[quick] ⏱ {name} {now - _LAP[1]:.0f}초 (누적 {(now - _LAP[0]) / 60:.1f}분)", flush=True)
+    _LAP[1] = now
+
 
 def load_env():
     p = os.path.join(ROOT, ".env")
@@ -296,6 +305,7 @@ def main():
     bars_kr = FK.bars(kr_syms) if kr_syms else {}
     bars_all = {**bars_kr, **bars_us}   # 한국 쪽에 미국 연결 종목 일봉이 같이 오므로 미국 수집(예비 사슬)이 이기게
     secs = round(time.time() - t0)
+    lap("일봉")
     got = {m["sym"]: series(bars_all.get(m["sym"])) for m in metas if len(bars_all.get(m["sym"]) or []) >= 2}
     newest = {}
     for m in metas:
@@ -324,6 +334,7 @@ def main():
         json.dump(disc, open(os.path.join(cache, "dart_list.json"), "w", encoding="utf-8"), ensure_ascii=False)
     import collect_kr_dart as KD
     disc_by = KD.filings_by_code(disc)
+    lap("실적일 · 기사 · 공시 목록")
 
     fresh = carried = missing = 0
     stats = {"short": 0, "halted": 0, "earn": 0, "news": 0, "disc": 0}
@@ -355,6 +366,7 @@ def main():
         files[m["sym"]] = f
         json.dump(f, open(path, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 
+    lap("가격 파일")
     # 화면 조각 — 정식 렌더러 그대로 (full_us · full_kr)
     rel = lambda s, e, mk: RQ.related({"s": s, "sec": e.get("sector"), "m": mk}, full)  # noqa: E731
     xtra = lambda s: RQ.extra_cards(files[s]) if s in files else ""  # noqa: E731
@@ -366,22 +378,28 @@ def main():
         print(f"[quick] 기업 소개 {CI.apply(cache)}종목")
     except Exception as e:  # noqa: BLE001
         print(f"::warning::[quick] 기업 소개 건너뜀: {e!r}")
+    lap("기업 소개")
     try:
         if not us_syms:
             raise LookupError("미국은 이번 실행에서 쉼")
         q_us = [s for s in us_syms if not ref["us"][s].get("full")]
         bar_day = (bars_all.get("SPY") or [{}])[-1].get("day") or str(datetime.date.today())
         det = FU.details(cache, q_us, bar_day, earn)
+        lap("미국 상세 값")
         sec = FU.sec_tables(cache, q_us)
+        lap("미국 SEC 표")
         hist = FU.history(cache, q_us)
         fred = FU.fred(cache)
         macro = FU.macro_rows_from(a.calendar) if a.calendar else None
+        lap("미국 기록 · FRED · 일정")
         filings = FU.edgar(cache, q_us)
+        lap("미국 SEC 공시")
         qn, qs = FU.load_news(a.qnews)
         print(f"[quick] 간단 종목 뉴스 {len(qn)}건 · 요약 {len(qs)}건" + ("" if qn else " — 없음, `이름이 나온 기사` 카드로"))
         for s, h in FU.build(ref["us"], bars_us, earn, det, sec, hist, fred, macro=macro, only=set(us_syms),
                              related=lambda s, e: rel(s, e, "US"), radar_dir=a.radar or None, extra_today=xtra, news=qn, summaries=qs, filings=filings).items():
             pages[("us", s)] = h
+        lap("미국 화면")
     except LookupError as e:
         print(f"[quick] {e}")
     except Exception as e:  # noqa: BLE001 — 한 시장이 통째로 실패해도 다른 시장 · 가격 파일은 나간다
@@ -393,14 +411,19 @@ def main():
         flows = FU._load(os.path.join(EXP, "kr-stocks", "data", "flows.json"), {})
         hist_full = FU._load(os.path.join(EXP, "kr-stocks", "data", "history.json"), {})
         det = FK.details(cache, q_kr)
+        lap("한국 상세 값")
         dd = FK.dart(cache, q_kr)
+        lap("한국 DART")
         hq = FK.history(cache, q_kr)
         caps = kr_caps(cache, ref["kr"], bars_kr, kr_syms)
+        lap("한국 기록 · 시총")
         FK.earn_kr(cache, ref["kr"], q_kr, key=first_key("DART_API_KEY"))
+        lap("한국 잠정실적 날짜")
         us_earn = (FU._load(os.path.join(cache, "earn_us.json"), {}) or {}).get("rows") or {}   # 미국 간단 실행(아침)이 받아 둔 실적 달력 — 새로 부르지 않는다
         for c, h in FK.build(ref["kr"], bars_kr, flows, hist_full, det, dd, hq, only=set(kr_syms),
                              related=lambda s, e: rel(s, e, "KR"), extra_today=xtra, caps=caps, us_earn=us_earn).items():
             pages[("kr", c)] = h
+        lap("한국 화면")
     except LookupError as e:
         print(f"[quick] {e}")
     except Exception as e:  # noqa: BLE001
