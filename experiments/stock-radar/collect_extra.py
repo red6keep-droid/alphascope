@@ -140,6 +140,7 @@ def _options(t, spot, day, next_earn):
 
 
 FIELDS = ("analysts", "eps", "short", "options", "company")   # 종목별 상세 칸 — detail_cache 주기로 받는다
+DAILY = ("analysts", "eps")   # 새 거래일마다(같은 날 실행 4번은 한 번만) — 옛 3~7일이면 증권사 등급 · 목표가 변경이 며칠 늦게 떴다 (2026-11-16 사용자)
 
 
 def _one(args, only=None):
@@ -298,7 +299,7 @@ def run(snap):
     day = max(b[-1]["day"] for b in snap["bars"].values() if b)
     sys.path.insert(0, os.path.join(BASE, ".."))
     import detail_cache as DC
-    cache = DC.shared(os.path.join(BASE, "data"))   # 칸마다 바뀌는 주기에만 새로 받는다 (2026-11-12 사용자) — 옵션 = 새 거래일, 의견 · 이익 예상 = 주 1회(종목별 요일) · 실적 뒤, 공매도 14일, 기업 정보 90일
+    cache = DC.shared(os.path.join(BASE, "data"))   # 칸마다 바뀌는 주기에만 새로 받는다 (2026-11-12 사용자) — 옵션 · 의견 · 이익 예상 = 새 거래일(11-16), 공매도 14일, 기업 정보 90일
     out = {"day": day, "revenue": have.get("revenue")}
     jobs, plan = [], {}
     for sym, *_ in U.CANDIDATES:
@@ -307,7 +308,7 @@ def run(snap):
             continue
         past = [e["day"] for e in snap["earnings"].get(sym) or [] if e["day"] <= day]
         nxt = next((e["day"] for e in snap["earnings"].get(sym) or [] if e["day"] >= day), None)
-        due = tuple(f for f in FIELDS if cache.due(sym, f, bar=day, earn_days=past, next_earn=nxt))
+        due = tuple(f for f in FIELDS if cache.due(sym, f, bar=day, earn_days=past, next_earn=nxt, daily=DAILY))
         plan[sym] = due
         if due:
             jobs.append(((sym, bars[-1]["close"], day, nxt), due))
@@ -318,7 +319,7 @@ def run(snap):
         g = got.get(sym) or {}
         for f in due:
             v = {"options": g.get("options"), "iv": g.get("iv"), "straddle": g.get("straddle")} if f == "options" else g.get(f)
-            cache.put(sym, f, None if f == "options" and not (g.get("options") or g.get("iv")) else v, bar=day if f == "options" else None)
+            cache.put(sym, f, None if f == "options" and not (g.get("options") or g.get("iv")) else v, bar=day if f == "options" or f in DAILY else None)
         cache.reused += len(FIELDS) - len(due)
         st = {f: cache.get(sym, f) for f in FIELDS if f != "options"}
         o = cache.get(sym, "options") or {}
