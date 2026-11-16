@@ -346,3 +346,25 @@ def rows_fold(rows_html, n_show, label, theme="neutral"):
     # 버튼 아래 ~ 카드 끝 = 좌우 여백 14 — 질문 카드 li 아래 12 · ul −9 · 카드 아래 패딩이 겹쳐 21 이 되던 것을 −7 (Chrome 360px 실측)
     return (f'<span data-qmore-end="1" style="display:block;">{"".join(rows_html[:n_show])}'
             + more_details(label, f'<span style="display:block;">{"".join(rows_html[n_show:])}</span>', theme) + "</span>")
+
+
+def link_list_card(title, state, items, note, noun, shown=5):
+    """원문 링크 목록 질문 카드 — 최근 공시는?(한국 정식 · 간단) · 이름이 나온 기사는?(미국 간단).
+    items = [(제목, 주소, 날짜 글, 출처 글)] 전부 싣고 앞 shown 줄만 펼침, 나머지는 `○○ n건 더 보기` (2026-11-16 사용자 — 상한으로 버리지 않기, 옛 3건 자르기)."""
+    if not items:
+        return ""
+    rows = [dk.crow(f'<a href="{esc(u)}" target="_blank" rel="noopener" style="color:#111;text-decoration:none;font-weight:400;">{esc(t)}</a>',
+                    esc(d), sub=esc(src) if src else "", first=not i) for i, (t, u, d, src) in enumerate(items)]
+    lines = [(rows_fold(rows, shown, f"{noun} {len(items) - shown}건 더 보기"), "html"), (note, "note")]
+    return question_card(title, state, "neutral", "#111", lines)
+
+
+def _kday(iso):
+    y, m, d = iso[:10].split("-")
+    return f"{int(m)}월 {int(d)}일"
+
+
+def disclosure_card(disc):
+    """`최근 공시는?` — 한국 정식 · 간단 종목 오늘 탭 끝. disc = [{t, d: YYYY-MM-DD, u}] 최근 7일(새것 먼저), 없으면 ""."""
+    return link_list_card("최근 공시는?", _kday(disc[0]["d"]) if disc else "", [(x["t"], x["u"], _kday(x["d"]), "") for x in disc or []],
+                          "금융감독원 전자공시(DART)에 올라온 최근 7일 공시입니다. 누르면 원문으로 갑니다.", "공시")

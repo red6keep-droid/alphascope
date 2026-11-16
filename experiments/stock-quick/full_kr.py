@@ -374,7 +374,7 @@ def body(s, a, peers, by, related_links, extra_today=""):
             + R.related_buttons(related_links) + "</div>")
 
 
-def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=None, related=None, extra_today=None):
+def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=None, related=None, extra_today=None, caps=None):
     """간단 종목(정식 아님) 화면 조각 {코드: html}."""
     quick = [s for s, e in ref_kr.items() if not e.get("full") and len(bars_all.get(s) or []) >= 30 and (only is None or s in only)]
     groups = {}
@@ -406,7 +406,8 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
     crash = render_kr.RP.CW.compute(bars_all, "kr", quick)   # 급락장에서 어땠나? — 정식과 같은 계산, 일봉만 (2026-11-14 사용자)
     for x in stocks:
         x.update(market_regime=mr, sector_flow=analyze_kr.sector_flow(snap, x["sym"]), fx=market.get("fx"), crash=render_kr.RP.CW.for_stock(crash, x["sym"]),
-                 rank=None, in_top=False, pairs={})
+                 rank=None, in_top=False, pairs={},
+                 cap=((caps or {}).get(x["sym"]) or {}).get("cap"), cap_rank=((caps or {}).get(x["sym"]) or {}).get("rank"))   # 기업 탭 시가총액 줄 (2026-11-16 사용자, collect_quick.kr_caps)
     a = {"day": day, "stocks": stocks, "market": market, "crash": {}}
     # render_kr.write_all 의 준비 부분 그대로 (파일 쓰기 · 목록 페이지 · 방송 읽기 빼고)
     render_kr.KR_PRICES.clear()

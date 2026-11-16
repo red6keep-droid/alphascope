@@ -35,7 +35,7 @@ UA = {"User-Agent": "AlphaScope-quick/0.1"}
 KST = datetime.timezone(datetime.timedelta(hours=9))
 BENCH = {"US": ("^GSPC", "S&P 500"), "KOSPI": ("^KS11", "코스피"), "KOSDAQ": ("^KQ11", "코스닥")}
 MIN_SHARE = 0.9
-NEWS_DAYS, NEWS_MAX = 7, 3
+NEWS_DAYS = 7   # 옛 NEWS_MAX = 3 자르기 없앰 — 화면이 전부 싣고 5건 펼침 (2026-11-16 사용자)
 sys.path.insert(0, EXP)
 sys.path.insert(0, os.path.join(EXP, "stock-radar"))
 sys.path.insert(0, os.path.join(EXP, "kr-stocks"))
@@ -174,54 +174,38 @@ def news_for(name_en, titles, cut):
     if nm in AMBIG or len(nm) < 4:
         return []
     pat = re.compile(r"\b" + re.escape(nm) + r"\b")
-    return [t for t in titles if t["d"] >= cut and pat.search(t["t"])][:NEWS_MAX]
+    return [t for t in titles if t["d"] >= cut and pat.search(t["t"])]
 
 
-# ── 한국 공시 (DART 공시 목록) ─────────────────────────────────────
-SKIP_DISC = re.compile(r"소유상황보고서|임원ㆍ주요주주|주식등의대량보유|최대주주등소유주식|자기주식취득결과보고서|증권발행실적보고서|기업설명회")
+# ── 한국 공시 (DART 공시 목록) — 정식 한국 실행과 같은 함수 (kr-stocks/collect_kr_dart.filings, 2026-11-16) ──
+def kr_caps(cache, ref_kr, bars_kr, kr_syms):
+    """한국 시가총액 · 순위 — 정식 · 간단 모두 같은 셈(DART 보통주 발행 주식 수 × 종가, 2026-11-16 사용자).
+    순위 = 우리 명단(코스피200 · 코스닥150 · 정식) 보통주 안에서 큰 순 → 화면은 RANK_SHOW 위까지만 순위, 그 밖은 금액만(명단 밖 큰 회사가 끼어들 수 있어서).
+    전체 명단을 이번 실행에서 받았을 때만 kr/cap_rank.json 을 새로 쓴다 — 정식 한국 실행이 읽어 같은 순위를 쓴다. → {sym: {"cap", "rank"}}"""
+    import collect_kr_dart as KD
+    try:
+        n = KD.shares(os.path.join(cache, "kr", "dart_shares.json"), {s: ref_kr[s].get("corp") for s in kr_syms}, key=first_key("DART_API_KEY"), tag="quick")
+    except Exception as e:  # noqa: BLE001 — 시가총액 줄만 빠진다
+        print(f"::warning::[quick] 발행 주식 수 건너뜀: {e!r}")
+        return {}
+    caps = {s: n[s] * bars_kr[s][-1]["close"] for s in n if bars_kr.get(s) and bars_kr[s][-1].get("close")}
+    whole = len(caps) >= 0.9 * len(ref_kr)
+    rank = KD.cap_ranks(caps) if whole else {}
+    out = {s: {"cap": v, "rank": rank.get(s) if (rank.get(s) or 999) <= RANK_SHOW else None} for s, v in caps.items()}
+    if whole:
+        day = max(b[-1]["day"] for s, b in bars_kr.items() if s in caps)
+        json.dump({"day": day, "show": RANK_SHOW, "caps": {s: {"cap": round(v), "rank": out[s]["rank"]} for s, v in caps.items()}},
+                  open(os.path.join(cache, "kr", "cap_rank.json"), "w", encoding="utf-8"), ensure_ascii=False)
+    print(f"[quick] 한국 시가총액 {len(caps)}/{len(ref_kr)}종목 · 순위 {'매김' if whole else '못 매김(명단 일부만)'}")
+    return out
+
+
+RANK_SHOW = 100   # 이 위까지만 `한국 n위` — 명단(코스피200 · 코스닥150)이 큰 회사를 거의 다 담는 범위
 
 
 def dart_list(cache_path, codes):
-    cache = json.load(open(cache_path, encoding="utf-8")) if os.path.exists(cache_path) else {"days": {}}
-    key = first_key("DART_API_KEY")
-    today = datetime.datetime.now(KST).date()
-    want = [today - datetime.timedelta(days=i) for i in range(NEWS_DAYS + 1)]
-    calls = 0
-    for day in want:
-        ds = day.strftime("%Y%m%d")
-        if ds in cache["days"] and day < today - datetime.timedelta(days=1):
-            continue   # 이틀 지난 날은 다 받은 것으로 — 오늘 · 어제만 다시
-        if not key:
-            break
-        rows, page = [], 1
-        while True:
-            try:
-                j = requests.get("https://opendart.fss.or.kr/api/list.json", timeout=60,
-                                 params={"crtfc_key": key, "bgn_de": ds, "end_de": ds, "page_no": page, "page_count": 100}).json()
-                calls += 1
-            except Exception as e:  # noqa: BLE001
-                print(f"[quick] DART 목록 {ds} 실패: {str(e)[:80]}")
-                rows = None
-                break
-            if j.get("status") not in ("000", "013"):   # 013 = 자료 없음
-                print(f"[quick] DART 목록 {ds}: {j.get('status')} {j.get('message')}")
-                rows = None
-                break
-            for it in j.get("list", []) or []:
-                sc = it.get("stock_code") or ""
-                if sc in codes and not SKIP_DISC.search(it.get("report_nm", "")):
-                    rows.append({"c": sc, "t": re.sub(r"\s+", " ", it["report_nm"]).strip(), "no": it["rcept_no"], "d": it["rcept_dt"]})
-            if page >= int(j.get("total_page") or 1):
-                break
-            page += 1
-            time.sleep(0.3)
-        if rows is not None:
-            cache["days"][ds] = rows
-    keep = {d.strftime("%Y%m%d") for d in want}
-    cache["days"] = {k: v for k, v in cache["days"].items() if k in keep}
-    cache["calls"] = calls
-    print(f"[quick] DART 공시 목록 {calls}번 · 우리 종목 공시 {sum(len(v) for v in cache['days'].values())}건(7일)")
-    return cache
+    import collect_kr_dart as KD
+    return KD.filings(cache_path, codes, key=first_key("DART_API_KEY"), days=NEWS_DAYS, tag="quick")
 
 
 PAGES_BASE = os.environ.get("QUICK_PAGES_BASE", "https://alpha-scope.pages.dev")
@@ -338,10 +322,8 @@ def main():
     if kr_syms:
         disc = dart_list(os.path.join(cache, "dart_list.json"), {m["file"] for m in metas if m["m"] == "KR"})
         json.dump(disc, open(os.path.join(cache, "dart_list.json"), "w", encoding="utf-8"), ensure_ascii=False)
-    disc_by = {}
-    for day in sorted(disc["days"], reverse=True):
-        for it in disc["days"][day]:
-            disc_by.setdefault(it["c"], []).append(it)
+    import collect_kr_dart as KD
+    disc_by = KD.filings_by_code(disc)
 
     fresh = carried = missing = 0
     stats = {"short": 0, "halted": 0, "earn": 0, "news": 0, "disc": 0}
@@ -364,8 +346,7 @@ def main():
             f["earn"] = {"date": nxt["day"], "hour": nxt.get("when") or ""} if nxt else None
             f["news"] = [] if m.get("full") else news_for(m["en"], titles, cut)
         else:
-            f["disc"] = [{"t": x["t"], "d": f"{x['d'][:4]}-{x['d'][4:6]}-{x['d'][6:]}",
-                          "u": f"https://dart.fss.or.kr/dsaf001/main.do?rcpNo={x['no']}"} for x in disc_by.get(m["file"], [])[:NEWS_MAX]]
+            f["disc"] = disc_by.get(m["file"], [])
         for k in ("short", "halted"):
             stats[k] += f.get("status") == k
         stats["earn"] += bool(f.get("earn"))
@@ -414,8 +395,9 @@ def main():
         det = FK.details(cache, q_kr)
         dd = FK.dart(cache, q_kr)
         hq = FK.history(cache, q_kr)
+        caps = kr_caps(cache, ref["kr"], bars_kr, kr_syms)
         for c, h in FK.build(ref["kr"], bars_kr, flows, hist_full, det, dd, hq, only=set(kr_syms),
-                             related=lambda s, e: rel(s, e, "KR"), extra_today=xtra).items():
+                             related=lambda s, e: rel(s, e, "KR"), extra_today=xtra, caps=caps).items():
             pages[("kr", c)] = h
     except LookupError as e:
         print(f"[quick] {e}")
