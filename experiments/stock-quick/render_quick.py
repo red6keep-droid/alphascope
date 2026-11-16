@@ -56,17 +56,12 @@ def full_index(ref):
 
 def extra_cards(f):
     """오늘 탭 끝 — 최근 공시는?(한국, DART 7일) · 이름이 나온 기사는?(미국, 이미 모은 기사 제목 7일). 없으면 ""(빈 답 금지). 기획 6-3-2 ③."""
-    q = []
-    if f.get("disc"):
-        rows = [("row", f'<span><a href="{esc(x["u"])}" target="_blank" rel="noopener" style="color:#111;text-decoration:none;">{esc(x["t"])}</a></span>',
-                 kday(x["d"]), "") for x in f["disc"]]
-        q.append(C.question_card("최근 공시는?", kday(f["disc"][0]["d"]), "neutral", "#111",
-                                 rows + [("금융감독원 전자공시(DART)에 올라온 최근 7일 공시입니다. 누르면 원문으로 갑니다.", "note")]))
+    q = [C.disclosure_card(f.get("disc"))]   # 전부 싣고 5건 펼침 (2026-11-16 사용자 — 옛 3건 자르기 없앰)
     if f.get("news"):
-        rows = [("row", f'<span><a href="{esc(x["u"])}" target="_blank" rel="noopener" style="color:#111;text-decoration:none;">{esc(x["t"])}</a></span>',
-                 kday(x["d"]) if x.get("d") else "", x.get("src") or "") for x in f["news"]]
-        q.append(C.question_card("이름이 나온 기사는?", kday(f["news"][0]["d"]) if f["news"][0].get("d") else "최근 7일", "neutral", "#111",
-                                 rows + [("최근 7일 기사 제목에 회사 이름이 나온 것입니다. 이 회사가 주인공이 아닌 기사도 섞일 수 있습니다.", "note")]))
+        q.append(C.link_list_card("이름이 나온 기사는?", kday(f["news"][0]["d"]) if f["news"][0].get("d") else "최근 7일",
+                                  [(x["t"], x["u"], kday(x["d"]) if x.get("d") else "", x.get("src") or "") for x in f["news"]],
+                                  "최근 7일 기사 제목에 회사 이름이 나온 것입니다. 이 회사가 주인공이 아닌 기사도 섞일 수 있습니다.", "기사"))
+    q = [x for x in q if x]
     return C.cards_grid("".join(q)) if q else ""
 
 

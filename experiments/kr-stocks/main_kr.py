@@ -53,6 +53,11 @@ if __name__ == "__main__":
             collect_kr_earn_dart.run()
         except (Exception, SystemExit) as e:  # noqa: BLE001
             print(f"[kr] DART 실적일 실패: {str(e)[:120]}")
+        try:   # 최근 공시는? (오늘 탭 끝, 간단 종목과 같은 카드 — 2026-11-16 사용자). 오늘 · 어제 목록만 다시, 실패하면 지난 캐시
+            import collect_kr_dart
+            collect_kr_dart._save(collect_kr_dart.FILINGS, collect_kr_dart.filings(collect_kr_dart.FILINGS, {c[0].split(".")[0] for c in collect_kr.U.CANDIDATES}))
+        except Exception as e:  # noqa: BLE001
+            print(f"::warning::[kr] DART 공시 목록 실패 (지난 캐시로): {e!r}")
     if not cached:   # 기록 먼저, 렌더링 나중 (2026-11-07, 데이터-기록-계획 3부 10-1 의 5) — 카드 판정 · 애널리스트 · 방송 의견 → data/records (kr-state, A5-4)
         try:
             record(a)

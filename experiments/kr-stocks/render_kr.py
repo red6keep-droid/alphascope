@@ -814,6 +814,8 @@ BARS = {}           # 종목별 일봉 (snap["bars"]) — 의견 탭 맨 위 `�
 PICK_SINCE = ""     # 방송 의견 컷 (ISO UTC) = 코스피 일봉 기준 최근 5거래일의 첫날 0시 KST (R.pick_window, P290)
 NOW = None          # 페이지를 만드는 시각 (UTC) — write_all 이 정한다. 목업은 RADAR_NOW(ISO)
 MEDIA = []          # 방송 이슈 (media_feed.issues — 같은 이슈는 이미 한 줄로) — write_all 이 한 번 읽는다
+CAP_RANK = {}       # {sym: {"cap", "rank"}} — 간단 실행이 남긴 cap_rank.json(정식 실행은 quick-state 에서 읽기만, 2026-11-16). 없으면 순위 없이 금액만
+DISC = {}           # {종목 코드: [{t, d, u}]} — 최근 7일 DART 공시 (data/dart_list.json, 2026-11-16 사용자: 간단과 같은 `최근 공시는?`)
 MEDIA_WEEK = []     # 최근 7일 방송 이슈 — 뉴스 방향 막대 `최근 7일` (P143)
 
 
@@ -1271,8 +1273,9 @@ def sec_company(s):
             ("결산", f"{int(c['acc_mt'])}월" if (c.get("acc_mt") or "").isdigit() else ""),
             ("상장", f"{U.market(s['sym'])} · 종목 코드 {s['code']}"),
             ("업종", _esc(" · ".join([U.sector(s["sym"])] + list(U.groups(s["sym"])))))]
-    if s.get("rank"):
-        rows.append(("시가총액", f"한국 {s['rank']}위 ({cap_text(s.get('cap'))})"))
+    cr = s["cap_rank"] if "cap_rank" in s else CAP_RANK.get(s["sym"], {}).get("rank")   # 순위 = 정식 · 간단 350종목 보통주 안 (간단 실행 cap_rank.json, 2026-11-16 사용자) — 옛 정식 34종목 안 순위는 명단 밖 큰 회사를 빼고 셌다
+    if s.get("cap"):
+        rows.append(("시가총액", f"한국 {cr}위 ({cap_text(s['cap'])})" if cr else cap_text(s["cap"])))
     nps = _nps_row(s["code"])
     if nps:   # 국민연금 지분율 (2026-11-13 사용자 P545) — 공공데이터 국민연금공단, 이용허락 제한 없음
         val, sub = nps
@@ -1282,13 +1285,33 @@ def sec_company(s):
     return out
 
 
+def _load_disc_caps():
+    """정식 실행 — 최근 공시(data/dart_list.json, collect_kr_dart.filings) · 시가총액 순위(data/cap_rank.json, 간단 실행이 quick-state 에 남긴 것). 없으면 그 줄만 빠진다."""
+    import collect_kr_dart as KD
+    d = os.path.join(_HERE, "data")
+    DISC.clear()
+    DISC.update(KD.filings_by_code(KD._load(os.path.join(d, "dart_list.json"))))
+    CAP_RANK.clear()
+    CAP_RANK.update((KD._load(os.path.join(d, "cap_rank.json")) or {}).get("caps") or {})
+    print(f"[kr] 최근 공시 {sum(len(v) for v in DISC.values())}건 · 시가총액 순위 {sum(1 for v in CAP_RANK.values() if v.get('rank'))}종목")
+
+
+def sec_disc(s):
+    """`최근 공시는?` — 간단 종목과 같은 카드(daily-report/cards.disclosure_card), 최근 7일 전부 · 5건 펼침. 없으면 ""."""
+    if os.path.join(_HERE, "..", "daily-report") not in sys.path:
+        sys.path.append(os.path.join(_HERE, "..", "daily-report"))
+    import cards as _C
+    c = _C.disclosure_card(DISC.get(s["code"]))
+    return _C.cards_grid(c) if c else ""
+
+
 def detail_body(s, a):
     """탭 위 = 요약 · 그래프. `오늘` 탭 = 가격 카드 · 미국과 연결(펼침) · 상태 카드 · 방송 뉴스 (미국 종목 페이지처럼 테마가 첫 카드부터 오늘 탭으로 옮긴다).
     `업종` 탭 = 업종 재료 · 체감 경기 · 경영 분석
     (2026-10-25 사용자: 미국 종목 페이지처럼 탭 — 실적과 기대 · 캘린더는 다음 단계)."""
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
             + _dk.price_stamp(s["day"], "KR") + lead(s) + sec_chart(s)
-            + R._section("오늘", R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s), line=False, tab="오늘")   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30) · `오늘` 탭 표시를 직접 단다 — 뉴스 구획(최근 7일 0건이면 숨김)에만 기대면 오늘 탭이 사라졌다(2026-11-15 삼성바이오로직스, 간단 종목 full_kr 와 같은 방식)
+            + R._section("오늘", R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s) + sec_disc(s), line=False, tab="오늘")   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30) · `오늘` 탭 표시를 직접 단다 — 뉴스 구획(최근 7일 0건이면 숨김)에만 기대면 오늘 탭이 사라졌다(2026-11-15 삼성바이오로직스, 간단 종목 full_kr 와 같은 방식)
             + RP.sec_crash(s, media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])) if MEDIA else None)   # 급락장에서 어땠나? — 코스피가 2% 넘게 내린 날 버틴 종목 (2026-11-04)
             + ((lambda n: _dk.keep_tone(R._section("뉴스", n, tab="오늘")) if n else "")(sec_today(s)))   # 뉴스는 헤드라인체 그대로 · 최근 7일 0건이면 구획 숨김 (2026-11-08)
             + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
@@ -1751,6 +1774,7 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
             except Exception as e:  # noqa: BLE001 — 캘린더가 실패해도 페이지는 만든다
                 print(f"[kr] {s['sym']} 캘린더 실패: {e}")
     global MEDIA, NOW, BARS, PICK_SINCE
+    _load_disc_caps()
     NOW = (datetime.datetime.fromisoformat(os.environ["RADAR_NOW"].replace("Z", "+00:00")) if os.environ.get("RADAR_NOW")
            else datetime.datetime.now(datetime.timezone.utc))   # 목업은 RADAR_NOW(ISO)로 시각을 고정 — 미국 종목 페이지와 같은 변수 (2026-11-01, 방송 의견이 목업에서 사라지지 않게)
     BARS = (snap or {}).get("bars") or {}

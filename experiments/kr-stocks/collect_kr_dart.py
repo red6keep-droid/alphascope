@@ -182,6 +182,122 @@ def run():
     return out
 
 
+# ── 최근 공시 목록 · 발행 주식 수 — 한국 정식 · 간단 종목이 같이 쓴다 (2026-11-16 사용자) ──
+KST = datetime.timezone(datetime.timedelta(hours=9))
+FILINGS = os.path.join(BASE, "data", "dart_list.json")   # 정식 실행 = kr-state, 간단 실행 = quick-state 에 따로
+SHARES = os.path.join(BASE, "data", "dart_shares.json")
+SKIP_DISC = re.compile(r"소유상황보고서|임원ㆍ주요주주|주식등의대량보유|최대주주등소유주식|자기주식취득결과보고서|증권발행실적보고서|기업설명회")
+SHARES_DAYS = 90   # 발행 주식 수는 증자 · 소각 때만 바뀐다 — 90일마다 다시
+
+
+def filings(cache_path, codes, key=None, days=7, tag="kr"):
+    """최근 days 일 공시 목록(공시 검색 list.json — 하루 전체를 쪽마다 받아 우리 종목만 남긴다). 이틀 지난 날은 다시 안 받는다.
+    → {"days": {YYYYMMDD: [{c: 종목 코드, t: 보고서 이름, no: 접수 번호, d: 접수일}]}, "calls": n}"""
+    cache = _load(cache_path) or {"days": {}}
+    cache.setdefault("days", {})
+    key = key if key is not None else _key()
+    today = datetime.datetime.now(KST).date()
+    want = [today - datetime.timedelta(days=i) for i in range(days + 1)]
+    calls = 0
+    for day in want:
+        ds = day.strftime("%Y%m%d")
+        if ds in cache["days"] and day < today - datetime.timedelta(days=1):
+            continue   # 이틀 지난 날은 다 받은 것으로 — 오늘 · 어제만 다시
+        if not key:
+            break
+        rows, page = [], 1
+        while True:
+            try:
+                j = requests.get(f"{API}/list.json", timeout=60,
+                                 params={"crtfc_key": key, "bgn_de": ds, "end_de": ds, "page_no": page, "page_count": 100}).json()
+                calls += 1
+            except Exception as e:  # noqa: BLE001
+                print(f"[{tag}] DART 목록 {ds} 실패: {str(e)[:80]}")
+                rows = None
+                break
+            if j.get("status") not in ("000", "013"):   # 013 = 자료 없음
+                print(f"[{tag}] DART 목록 {ds}: {j.get('status')} {j.get('message')}")
+                rows = None
+                break
+            for it in j.get("list", []) or []:
+                sc = it.get("stock_code") or ""
+                if sc in codes and not SKIP_DISC.search(it.get("report_nm", "")):
+                    rows.append({"c": sc, "t": re.sub(r"\s+", " ", it["report_nm"]).strip(), "no": it["rcept_no"], "d": it["rcept_dt"]})
+            if page >= int(j.get("total_page") or 1):
+                break
+            page += 1
+            time.sleep(0.3)
+        if rows is not None:
+            cache["days"][ds] = rows
+    keep = {d.strftime("%Y%m%d") for d in want}
+    cache["days"] = {k: v for k, v in cache["days"].items() if k in keep}
+    cache["calls"] = calls
+    print(f"[{tag}] DART 공시 목록 {calls}번 · 우리 종목 공시 {sum(len(v) for v in cache['days'].values())}건({days}일)")
+    return cache
+
+
+def filings_by_code(cache):
+    """{종목 코드: [{t, d: YYYY-MM-DD, u}]} 새것 먼저 — 화면 `최근 공시는?` 재료. 자르지 않는다."""
+    out = {}
+    for day in sorted((cache or {}).get("days", {}), reverse=True):
+        for it in cache["days"][day]:
+            d = it["d"]
+            out.setdefault(it["c"], []).append({"t": it["t"], "d": f"{d[:4]}-{d[4:6]}-{d[6:]}",
+                                                "u": f"https://dart.fss.or.kr/dsaf001/main.do?rcpNo={it['no']}"})
+    return out
+
+
+def _num(v):
+    v = re.sub(r"[^\d]", "", str(v or ""))
+    return int(v) if v else None
+
+
+def shares(cache_path, corps, key=None, tag="kr"):
+    """보통주 발행 주식 총수(주식의 총수 현황 stockTotqySttus) — 시가총액 = 이 수 × 종가(한국거래소 시가총액과 같은 셈, 자기주식 포함).
+    corps = {sym: DART 회사 번호}. 가장 최근 정기 보고서부터 찾는다(1 · 3분기 보고서는 칸이 비어 오는 회사가 많아 반기 · 사업보고서로 넘어감).
+    캐시 {sym: {"n": 주식 수, "at": 받은 날, "rp": "2026-11012"}} — SHARES_DAYS 마다 다시, 못 찾은 회사는 7일 뒤 다시. → {sym: 주식 수}"""
+    cache = _load(cache_path)
+    key = key if key is not None else _key()
+    today = datetime.date.today()
+    y = today.year
+    order = [(y, "11014"), (y, "11012"), (y, "11013"), (y - 1, "11011"), (y - 1, "11014"), (y - 1, "11012")]
+    calls = got = 0
+    for sym, corp in sorted(corps.items()):
+        e = cache.get(sym) or {}
+        age = (today - datetime.date.fromisoformat(e["at"])).days if e.get("at") else None
+        if age is not None and age < (SHARES_DAYS if e.get("n") else RETRY_DAYS):
+            continue
+        if not key or not corp:
+            continue
+        found = None
+        for yr, rc in order:
+            try:
+                j = requests.get(f"{API}/stockTotqySttus.json", timeout=30,
+                                 params={"crtfc_key": key, "corp_code": corp, "bsns_year": str(yr), "reprt_code": rc}).json()
+                calls += 1
+            except Exception as ex:  # noqa: BLE001
+                print(f"[{tag}] {sym} 주식 수 실패: {str(ex)[:80]}")
+                break
+            time.sleep(0.2)
+            row = next((x for x in j.get("list") or [] if (x.get("se") or "").strip() == "보통주"), None) if j.get("status") == "000" else None
+            n = _num(row.get("istc_totqy")) if row else None
+            if n:
+                found = {"n": n, "at": today.isoformat(), "rp": f"{yr}-{rc}"}
+                break
+        cache[sym] = found or {"n": e.get("n"), "at": today.isoformat(), "rp": e.get("rp"), "miss": True}   # 못 찾으면 옛 값 유지
+        got += bool(found)
+    _save(cache_path, cache)
+    out = {s: v["n"] for s, v in cache.items() if v.get("n") and s in corps}
+    print(f"[{tag}] DART 발행 주식 수 호출 {calls}번 · 새로 {got} · 쓸 수 있는 {len(out)}/{len(corps)}종목")
+    return out
+
+
+def cap_ranks(caps):
+    """{sym: 시가총액} → {sym: 순위} — 보통주만(우선주 = 코드 끝자리가 0 이 아닌 것), 코스피 · 코스닥 함께 큰 순."""
+    ranked = sorted((s for s, v in caps.items() if v and s.split(".")[0].endswith("0")), key=lambda s: -caps[s])
+    return {s: i for i, s in enumerate(ranked, 1)}
+
+
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     s = run()
