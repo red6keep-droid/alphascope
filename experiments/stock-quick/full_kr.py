@@ -388,17 +388,48 @@ def sec_expect(s):
         lines, tip = render_kr._rename(fn(c), s["name"])
         tip = tip.replace("SEC EDGAR", "금융감독원 전자공시(OpenDART)").replace("(억 달러)", "(억 원)")
         theme, col = R.EXPECT_THEME.get(c["state"], ("neutral", R.MUTED))
-        out += R._state_card(title, c["state"], theme, col, list(lines), "", tip=tip, fold=True, opened=not out)
+        lines = render_kr.report_head(s, list(lines)) if key == "revenue" else list(lines)   # 잠정실적 숫자 — 정식과 같은 줄 (2026-11-16 사용자)
+        out += R._state_card(title, c["state"], theme, col, lines, "", tip=tip, fold=True, opened=not out)
+    out += render_kr.report_balance_card(s) if out else ""   # 회사 살림은 튼튼한가? — 정식과 같은 카드. 사업 부문 · 수주(AI)는 정식만
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
 
 
+MEDIA_OK = False   # 방송 자료를 실제로 읽었나 — 읽었을 때만 방송 줄 · 방송 의견(없으면 `없음` 카드). 못 읽었으면 그 칸 없이 (2026-11-16 사용자: 한국 간단에도 방송)
+
+
+def media_inputs():
+    """방송 이슈(24시간 · 7일) · 방송 의견(최근 5거래일) — 한국 정식 write_all 과 같은 읽기(읽기 전용 키 YTB_FIRESTORE_KEY, 수집기 Storage feed 파일). AI 0.
+    키가 없거나 실패하면 빈 값 = 방송 칸 없이."""
+    global MEDIA_OK
+    MEDIA_OK = False
+    MF = render_kr.media_feed
+    render_kr.MEDIA, render_kr.MEDIA_WEEK, render_kr.PICKS = [], [], []
+    if not (os.environ.get("YTB_FIRESTORE_KEY") or os.environ.get("MEDIA_FEED_JSON") or os.environ.get("QUICK_MEDIA_LOCAL")):   # QUICK_MEDIA_LOCAL = 목업(PC 의 gcloud 기본 인증으로 읽기)
+        print("[quick-kr] 방송 자료 키 없음 — 방송 줄 · 방송 의견 없이")
+        return
+    try:
+        now = render_kr.NOW
+        vids = MF.load(now.astimezone(MF.KST).strftime("%Y-%m-%d"), days=render_kr.PICK_DAYS - 1)
+        rows = MF.rows(vids)
+        render_kr.MEDIA = MF.issues(rows, (now - datetime.timedelta(hours=render_kr.TODAY_HOURS)).strftime("%Y-%m-%dT%H:%M"))
+        render_kr.MEDIA_WEEK = MF.issues(rows, (now - datetime.timedelta(days=7)).strftime("%Y-%m-%dT%H:%M"))
+        render_kr.PICKS = MF.picks(vids, render_kr.PICK_SINCE)
+        MEDIA_OK = True
+        print(f"[quick-kr] 방송 영상 {len(vids)} · 이슈 {len(render_kr.MEDIA)} · 종목 의견 {len(render_kr.PICKS)}")
+    except Exception as e:  # noqa: BLE001
+        print(f"[quick-kr] 방송 자료 실패 — 없이: {str(e)[:100]}")
+
+
 def opinions_tab(s):
-    if not s.get("analysts") and not s.get("broker"):
+    ps = render_kr._picks(s) if MEDIA_OK else []
+    if not s.get("analysts") and not s.get("broker") and not ps:
         return ""
-    R.picks_card, keep = full_us._no_picks, R.picks_card
+    keep = R.picks_card
+    if not MEDIA_OK:
+        R.picks_card = full_us._no_picks   # 방송 자료를 못 읽었으면 카드 없이 — 읽었는데 없으면 정식처럼 `없음` 카드
     try:
         closes = [b["close"] for b in (render_kr.BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]]
-        return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), None, render_kr.won, lambda: render_kr.together_items(s),
+        return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps if MEDIA_OK else None, render_kr.won, lambda: render_kr.together_items(s),
                                 m0=render_kr.man_won, m2=render_kr.won, closes=closes, broker=s.get("broker"))   # 증권사 목표가(텔레그램, 2026-11-14)
     finally:
         R.picks_card = keep
@@ -416,14 +447,15 @@ def body(s, a, peers, by, related_links, extra_today=""):
             + dk.report_stamp(dk.kst_close_day(s["day"], "KR"), WHEN)
             + render_kr.lead(s) + CC.card(s["name"], render_kr.BARS.get(s["sym"]) or [], 0, title="") + '<div style="height:20px;"></div>'   # 봉차트 하나만 — 정식 page_block 은 목업 · 발행 두 벌 + 스크립트(조각엔 페이지 본문 스크립트 하나로)
             + R._section("오늘", today, line=False, tab="오늘") + render_kr.RP.sec_crash(s)   # 급락일에 버텼을 때만
+            + ((lambda n: dk.keep_tone(R._section("뉴스", n, tab="오늘")) if n else "")(render_kr.sec_today(s) if MEDIA_OK else ""))   # 방송 뉴스 — 정식과 같은 구획, 최근 7일 0건이면 숨김
             + (R._section("매수의견", op, tab="매수의견") if op else "")
             + (R._section("실적", ea, tab="실적") if ea else "")
             + R._section("업계상황", render_kr.sec_industry_tab(s), tab="업계상황")
-            + R._section("기업", render_kr.sec_company(s), tab="기업")
+            + R._section("기업", render_kr.sec_company(s), tab="기업")   # `최근 공시는?` 뺐다 — 정식과 같게 (2026-11-16 사용자)
             + R.related_buttons(related_links) + "</div>")
 
 
-def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=None, related=None, extra_today=None, caps=None, us_earn=None):
+def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=None, related=None, extra_today=None, caps=None, us_earn=None, disc=None):
     """간단 종목(정식 아님) 화면 조각 {코드: html}."""
     quick = [s for s, e in ref_kr.items() if not e.get("full") and len(bars_all.get(s) or []) >= 30 and (only is None or s in only)]
     groups = {}
@@ -478,7 +510,7 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
     render_kr.NOW = datetime.datetime.now(datetime.timezone.utc)
     render_kr.BARS = bars_all
     render_kr.PICK_SINCE = R.pick_window(bars_all.get(K.BENCH) or [], render_kr.media_feed.KST, now=render_kr.NOW)[1]
-    render_kr.MEDIA, render_kr.MEDIA_WEEK, render_kr.PICKS = [], [], []
+    media_inputs()   # 방송 줄 · 방송 의견 — 그 종목 자료가 있을 때 줄, 의견은 없으면 `없음` 카드 (2026-11-16 사용자)
     snap_us = {"us_bars": {t: bars_all[t] for t in LINK_US if bars_all.get(t)}}
     for x in stocks:   # 밤사이 미국 연결 종목 — 정식 analyze_kr.us_move 그대로(한국 날짜보다 앞선 마지막 미국 종가)
         x["us_links"] = [(m, r.get("why") or "") for r in LINKS.get(x["sym"]) or [] for m in [analyze_kr.us_move(r["t"], snap_us, x["day"])[0]] if m]
@@ -490,6 +522,7 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
     out, fails = {}, 0
     for x in stocks:
         try:
+            x["disc"] = disc(x["sym"]) if disc else []
             out[x["code"]] = body(x, a, list(peers.get(x["sym"]) or {}), by, related(x["sym"], ref_kr[x["sym"]]) if related else [],
                                   extra_today(x["sym"]) if extra_today else "")
         except Exception as e:  # noqa: BLE001

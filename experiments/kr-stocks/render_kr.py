@@ -816,6 +816,8 @@ NOW = None          # 페이지를 만드는 시각 (UTC) — write_all 이 정�
 MEDIA = []          # 방송 이슈 (media_feed.issues — 같은 이슈는 이미 한 줄로) — write_all 이 한 번 읽는다
 US_NAMES = {}       # 정식 명단 밖 미국 종목 한글 이름 — 간단 실행(full_kr)이 채운다
 CAP_RANK = {}       # {sym: {"cap", "rank"}} — 간단 실행이 남긴 cap_rank.json(정식 실행은 quick-state 에서 읽기만, 2026-11-16). 없으면 순위 없이 금액만
+PRELIM = {}         # {종목 코드: 잠정실적} — dart_prelim (2026-11-16 사용자: 공시 원문 대신 실적 카드에)
+BIZ = {}            # {접수번호: 사업 부문 · 수주잔고} — dart_biz, 정식만
 DISC = {}           # {종목 코드: [{t, d, u}]} — 최근 7일 DART 공시 (data/dart_list.json, 2026-11-16 사용자: 간단과 같은 `최근 공시는?`)
 MEDIA_WEEK = []     # 최근 7일 방송 이슈 — 뉴스 방향 막대 `최근 7일` (P143)
 
@@ -874,6 +876,7 @@ def _rename(x, name):
 def build_expect(s, extra, group):
     """`실적과 기대` 재료 — 미국 종목과 같은 판정(stock-radar analyze_tabs). 비교 묶음 = 한국 시총 상위 20개."""
     s["expect"] = {}
+    s["_fin_rows"] = (extra.get("capex") or {}).get(s["sym"]) or []   # DART 분기 줄(재무상태표 포함) — 잠정실적 · 살림 카드 (2026-11-16)
     s["analysts"] = AT.analysts(s["sym"], extra)   # 애널리스트 등급 · 목표가 — 미국과 같은 칸 (2026-10-31 사용자: `애널리스트 · 방송 의견은?`)
     # 돈을 어디에 쓰나 = OpenDART 손익 · 현금흐름 표(collect_kr_fin → extra["capex"], 2026-11-04) — 매출 카드의 이익 줄 · 이익률 그래프도 같은 표에서
     for k, f in (("revenue", AT.card_revenue), ("eps", AT.card_eps), ("capex", lambda sym, extra, group: AT.card_capex(sym, extra))):
@@ -920,8 +923,39 @@ def sec_expect(s, open_first=True):
         else:
             lines, tip, state = [("이번 실행에서 재료를 받지 못했다. 다음 실행에서 다시 받는다.", "plain")], "", "판단 유보"
         theme, col = R.EXPECT_THEME.get(state, ("neutral", R.MUTED))
-        out += R._state_card(title, state, theme, col, list(lines), "", tip=tip, fold=True, opened=open_first and i == 0)
+        lines = list(lines)
+        if key == "revenue":
+            lines = report_head(s, lines)
+        out += R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=open_first and i == 0)
+        if key == "revenue":
+            out += report_biz_cards(s)
+    out += report_balance_card(s)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>'
+
+
+def report_head(s, lines):
+    """`회사는 돈을 더 벌고 있나?` 맨 위 — 분기보고서보다 먼저 나온 잠정실적 숫자, 보고서가 나왔으면 작은 글씨 한 줄 (2026-11-16 사용자, 정식 · 간단 공통)."""
+    import report_cards as RC
+    head, note = RC.prelim_lines(PRELIM.get(s["code"]), s.get("_fin_rows") or [])
+    lines = head + lines
+    if note:
+        R.add_small_note(lines, note)
+    return lines
+
+
+def report_biz_cards(s):
+    """정식만 — 어디서 돈을 버나? · 일감은 얼마나 쌓였나? (분기보고서 `매출 및 수주상황`, dart_biz). 읽은 보고서가 없으면 ""."""
+    if not BIZ:
+        return ""
+    import dart_biz
+    import report_cards as RC
+    biz = dart_biz.series(BIZ, s["code"])
+    return RC.segment_card(s["name"], biz) + RC.backlog_card(s["name"], biz, s.get("_fin_rows") or [])
+
+
+def report_balance_card(s):
+    import report_cards as RC
+    return RC.balance_card(s["name"], s.get("_fin_rows") or [])
 
 
 def sec_earnings_tab(s):
@@ -1294,6 +1328,10 @@ def _load_disc_caps():
     DISC.update(KD.filings_by_code(KD._load(os.path.join(d, "dart_list.json"))))
     CAP_RANK.clear()
     CAP_RANK.update((KD._load(os.path.join(d, "cap_rank.json")) or {}).get("caps") or {})
+    PRELIM.clear()
+    PRELIM.update(KD._load(os.path.join(d, "dart_prelim.json")) or {})
+    BIZ.clear()
+    BIZ.update(KD._load(os.path.join(d, "dart_biz.json")) or {})
     print(f"[kr] 최근 공시 {sum(len(v) for v in DISC.values())}건 · 시가총액 순위 {sum(1 for v in CAP_RANK.values() if v.get('rank'))}종목")
 
 
@@ -1312,13 +1350,13 @@ def detail_body(s, a):
     (2026-10-25 사용자: 미국 종목 페이지처럼 탭 — 실적과 기대 · 캘린더는 다음 단계)."""
     body = (f'<span data-kr-code="{s["code"]}" hidden></span>'   # 제목에 종목 코드를 쓰지 않으므로 테마가 로고(KR_<코드>)를 이 표시로 찾는다 (2026-10-25)
             + _dk.price_stamp(s["day"], "KR") + lead(s) + sec_chart(s)
-            + R._section("오늘", R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s) + sec_disc(s), line=False, tab="오늘")   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30) · `오늘` 탭 표시를 직접 단다 — 뉴스 구획(최근 7일 0건이면 숨김)에만 기대면 오늘 탭이 사라졌다(2026-11-15 삼성바이오로직스, 간단 종목 full_kr 와 같은 방식)
+            + R._section("오늘", R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + price_card(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s, a) + sec_states(s), line=False, tab="오늘")   # 기술 지표 카드는 가격 카드 바로 아래 (2026-10-30) · `오늘` 탭 표시를 직접 단다 — 뉴스 구획(최근 7일 0건이면 숨김)에만 기대면 오늘 탭이 사라졌다(2026-11-15 삼성바이오로직스, 간단 종목 full_kr 와 같은 방식)
             + RP.sec_crash(s, media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])) if MEDIA else None)   # 급락장에서 어땠나? — 코스피가 2% 넘게 내린 날 버틴 종목 (2026-11-04)
             + ((lambda n: _dk.keep_tone(R._section("뉴스", n, tab="오늘")) if n else "")(sec_today(s)))   # 뉴스는 헤드라인체 그대로 · 최근 7일 0건이면 구획 숨김 (2026-11-08)
             + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
             + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
             + R._section("업계상황", sec_industry_tab(s), tab="업계상황")   # 업종 → 업계 상황 (P151) → 붙여 쓴 업계상황 (2026-10-31 사용자 P167)
-            + R._section("기업", sec_company(s), tab="기업")   # 기업정보 → 기업 (2026-10-31 P145: 탭은 짧게 — 360px 폰에서 다섯째 탭이 잘렸다)
+            + R._section("기업", sec_company(s), tab="기업")   # `최근 공시는?` 뺐다 (2026-11-16 사용자: 실적 공시 숫자는 실적 탭 카드에 담았고, 나머지는 제목뿐이라 맥락이 없다) · 기업정보 → 기업 (2026-10-31 P145: 탭은 짧게 — 360px 폰에서 다섯째 탭이 잘렸다)
             + related(s) + list_marker(U.LIST_URL))
     return wrap(body)
 

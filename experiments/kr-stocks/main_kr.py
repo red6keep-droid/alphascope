@@ -58,6 +58,17 @@ if __name__ == "__main__":
             collect_kr_dart._save(collect_kr_dart.FILINGS, collect_kr_dart.filings(collect_kr_dart.FILINGS, {c[0].split(".")[0] for c in collect_kr.U.CANDIDATES}))
         except Exception as e:  # noqa: BLE001
             print(f"::warning::[kr] DART 공시 목록 실패 (지난 캐시로): {e!r}")
+        try:   # 잠정실적 숫자(공시 원문, AI 0) · 보고서 `매출 및 수주상황`(Gemini lite, 정식만 하루 30건) — 실적 탭 카드 (2026-11-16 사용자). 실패하면 지난 캐시
+            import collect_kr_dart
+            import collect_kr_fin
+            import dart_biz
+            import dart_prelim
+            codes = [c[0].split(".")[0] for c in collect_kr.U.CANDIDATES]
+            cmap = collect_kr_dart.corp_codes(collect_kr_dart._key())
+            dart_prelim.run(codes, cmap, collect_kr_dart.filings_by_code(collect_kr_dart._load(collect_kr_dart.FILINGS)))
+            dart_biz.run(codes, cmap, collect_kr_dart._load(collect_kr_fin.CACHE))
+        except Exception as e:  # noqa: BLE001
+            print(f"::warning::[kr] 잠정실적 · 사업 부문 실패 (지난 캐시로): {e!r}")
     if not cached:   # 기록 먼저, 렌더링 나중 (2026-11-07, 데이터-기록-계획 3부 10-1 의 5) — 카드 판정 · 애널리스트 · 방송 의견 → data/records (kr-state, A5-4)
         try:
             record(a)

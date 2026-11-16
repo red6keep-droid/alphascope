@@ -137,6 +137,8 @@ def _section(title, html, summary="", line=None, tab=None):
     안내글 대신 제목 옆 요약을 쓴다 (2026-10-11 사용자: 안내글은 삭제하고 타이틀 옆에 요약)."""
     if line is None:
         line = not _NO_LINE_START.match(html or "")
+    if tab in SMALL_ROW_TABS and html:
+        html = small_rows(html)
     return _h2(title, line=line, summary=summary, tab=tab) + (html or "")
 
 
@@ -803,7 +805,7 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
 def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, broker=None, news_ops=None, closes=None):
     """`의견` 탭 (2026-11-01 사용자 P197) — 옛 한 장 `애널리스트 · 방송 의견은?`(P90)을 강조 카드 둘로 나눈다: `애널리스트 의견은?` · `방송 의견은?`.
     접힌 머리에서 두 답(예: 매수 · 매도)을 따로 보고, 누르면 그쪽 내용만 펼친다 — 둘 다 접힌 채로. 함께 보기는 두 카드 아래 따로 흰 카드.
-    두 카드는 의견이 없어도 늘 둔다 — 답 `없음` (2026-11-01 사용자 P199: 방송 의견이 없다고 카드가 사라지면 안 된다).
+    두 카드는 의견이 없어도 늘 둔다 — 답 `없음` (2026-11-01 사용자 P199, 2026-11-16 다시 확인: 방송 의견이 없다고 카드가 사라지면 안 된다).
     cells = 애널리스트 칸(analyze_tabs.analysts 모양), money = 방송 목표가 표기, m0 · m2 = 애널리스트 목표가 표기(없으면 달러), together = 함께 보기 줄을 만드는 함수."""
     # 애널리스트 → 증권사 → 방송 → 뉴스 (P275). broker · news_ops 가 None 이면(한국 — 아직 자료 없음) 그 카드는 없다
     cards = analysts_card(cells, close, m0, m2, opened=True)   # 탭 첫 강조 카드는 펼침 (2026-11-01 사용자 P216)
@@ -1241,8 +1243,8 @@ def pick_window(bars, tz, n=PICK_SHOW_DAYS, now=None):
 def picks_card(name, ps, close, money, span=PICK_SPAN, together=""):
     """`방송 의견은?` (2026-10-29 사용자 P85 → P88 · P89 · P92 → 2026-11-01 P197: 의견 탭에서 `애널리스트 의견은?` 아래, 옛 `방송에서 나온 의견은?`).
     ps = media_feed.picks 줄(이 종목 것만, 최근 span = 5거래일). 답 = 의견이 한 가지면 그 말(색 = PICK_THEME), 갈리면 `매수 · 보유`(회색).
-    문장 = `삼성전자에 대한 매수 의견이 1건 나왔다.` 펼치면 의견별 제목(`매수 의견`) 아래 줄마다 말한 사람(소속) / 이유 / 채널 · 게시 시각 · (목표가) · 영상에서 보기, 줄 사이 구분선. 의견이 없어도 카드는 둔다 — 답 `없음` (2026-11-01 사용자 P199)."""
-    if not ps:
+    문장 = `삼성전자에 대한 매수 의견이 1건 나왔다.` 펼치면 의견별 제목(`매수 의견`) 아래 줄마다 말한 사람(소속) / 이유 / 채널 · 게시 시각 · (목표가) · 영상에서 보기, 줄 사이 구분선. 의견이 없어도 카드는 둔다 — 답 `없음` (2026-11-01 사용자 P199, 2026-11-16 다시 확인)."""
+    if not ps:   # 의견이 없어도 카드는 둔다 — 답 `없음` (P199). 2026-11-16 낮에 `없으면 빼기`로 바꿨다가 같은 날 사용자가 되돌림: "전부 다 남겨줘, 없어도"
         return _state_card("방송 의견은?", "없음", "neutral", MUTED, [(f"최근 {span} 방송에서 나온 {_esc(name)} 의견이 없다.", "plain")], "",
                            fold=True)   # 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     state = picks_state(ps)   # `매수 4 · 보유 1` (P163)
@@ -1250,7 +1252,7 @@ def picks_card(name, ps, close, money, span=PICK_SPAN, together=""):
     if isinstance(together, list):   # 함께 보기 줄 — 이 카드 색을 알아야 안쪽 카드 색을 정한다 (P168)
         together = together_block(together, theme)
     lines = [(f"{_esc(name)}에 대한 {picks_sentence(ps, rich=True)} 방송에서 나왔다.", "rich"), (picks_rows_folded(ps, close, money) + together, "html")]   # 기간 · `블로그 의견 아님` 안내는 뺐다 (P92) — 기간은 툴팁에   # together = 함께 보기 (P142)
-    add_small_note(lines, f"유튜브 경제 방송 요약에서 모은 최근 {span} 의견입니다. 같은 영상 · 같은 사람은 한 번만 셉니다.")   # 옛 툴팁의 모은 기준을 카드 작은 글씨로 — 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
+    add_small_note(lines, f"유튜브 경제 방송의 최근 {span} 의견입니다.")   # 2026-11-16 사용자: 세는 법(같은 영상 · 같은 사람 한 번) 문장 삭제 · 줄임   # 옛 툴팁의 모은 기준을 카드 작은 글씨로 — 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     word = picks_word(ps)   # 숫자 없이 가장 많은 의견 하나 (2026-11-01 사용자 P207, 옛 `매수 3 · 관망 2`)
     return _state_card("방송 의견은?", word, pick_theme(word)[0], PICK_THEME.get(word, ("", "#111"))[1], lines, "", fold=True)   # 보유 · 관망 · 엇갈림 = 검정 글씨 (P201)
 
@@ -1371,6 +1373,7 @@ def line_tabs(cid, labels, series, fmt, unit="", overlay=None, int_ticks=False):
     series = [(이름, 값 목록(None 허용), 색)]. 눈금은 모든 선의 범위로 고정(버튼을 바꿔도 안 출렁임). 모양 · 넘겨 보기 · 그림자는 line_chart 와 같다.
     cid = 페이지 안에서 하나뿐인 id (종목 · 그래프). 디자인 가이드 8절 `버튼 선 그래프`.
     overlay = (이름, 값 목록, 색, fmt) — 단위가 다른 선 하나를 제 범위(최저~최고)로 같은 칸에 겹친다(의견 건수 위의 종가, P294). 눈금은 series 것만, 숫자는 버튼을 눌렀을 때 제 fmt 로."""
+    cid = re.sub(r"[^A-Za-z0-9_-]", "-", cid)   # CSS 선택자 #id 에 점이 들어가면 규칙이 통째로 안 맞는다 — 한국 `lt-259960.KS-cash` 그래프가 숫자 · 회색 선이 다 겹쳐 깨졌다 (2026-11-16 사용자)
     n = len(labels)
     vals = [v for _, xs, _ in series for v in xs if v is not None]
     if not vals or n < 2:
@@ -1490,7 +1493,7 @@ def picks_rows(ps, close, money):
         nm, par, org = who.partition("(")
         who_html = _esc(nm) + (f'({_esc(org)}' if par else "") + ("" if p["own"] else " 보고서")
         head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(PICK_BOX.get(p["action"], "flat"), p["action"], _esc, sym=p["action"] in PICK_BOX, fit=True)}</span>'
-                f'<b style="font-weight:700;">{_esc(p["channel"])}</b>'
+                f'<b style="font-weight:700;font-size:17px;">{_esc(p["channel"])}</b>'   # 방송 이름 = 증권사 이름과 같은 17px 굵게 (2026-11-16 사용자, 옛 19)
                 + (f'{PICK_VBAR}<span style="font-weight:400;font-size:17px;">{who_html}</span>' if p["speaker"] else ""))   # 말한 사람 = 방송 이름(19)보다 2px 작게 (2026-11-01 사용자 P230 → P242)   # 의견 라벨 → 방송 이름 → 세로 구분선 → 말한 사람 (P200 · P201, 장면 시각 괄호는 뺐다 P202)
         tgt = _pick_target(p, close, money)
         meta = _pick_when(p["published_at"]) + (f" · {tgt}" if tgt else "")   # 채널은 제목 줄로 올렸다 (P200)
@@ -1528,32 +1531,30 @@ def broker_move(c):
     return "유지"
 
 
-def _broker_rows(cs, close, money):
+def _broker_row(i, c, close, money):
+    """증권사 목표가 변경 한 줄 — i == 0 이면 위 구분선 없이."""
     import tech_signals as TS
-    out = ""
-    for i, c in enumerate(cs):
-        mv = broker_move(c)
-        g0, g1 = _grade_ko(c.get("from")), _grade_ko(c.get("to"))
-        grade = (f"{g1} 의견 새로 냄" if c.get("action") == "init" and g1 else f"{g0} → {g1}" if g0 and g1 and g0 != g1 else f"{g1} 유지" if g1 else "")
-        head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(MOVE_BOX.get(mv, "flat"), mv, _esc, fit=True)}</span>'
-                f'<b style="font-weight:700;">{_esc(c.get("firm") or "증권사")}</b>'
-                + (f'{PICK_VBAR}<span style="font-weight:400;font-size:17px;">{_esc(grade)}</span>' if grade else ""))
-        pt, pp = c.get("pt"), c.get("pt_prior")
-        money0 = lambda v: re.sub(r"\.00\b", "", money(v))   # noqa: E731 — 목표가는 대개 정수 ($420.00 → $420)
-        tgt = ""
-        if pt:   # 새 목표가 = 올리면 굵게 상승 색, 내리면 굵게 하락 색 (2026-11-02 사용자 P276)
-            new = _esc(money0(pt)) if not pp or pp == pt else f'<b style="font-weight:700;color:{UP if pt > pp else DOWN};">{_esc(money0(pt))}</b>'
-            tgt = f"목표가 {_esc(money0(pp))} → {new}" if pp and pp != pt else f"목표가 {new}"
-            if close:
-                tgt += f" (오늘 종가 대비 {(pt / close - 1) * 100:+.1f}%)".replace("-", "−")
-        d = c["at"][:10]
-        out += (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
-                f'<span style="display:block;color:#111;line-height:35px;">{head}</span>'
-                + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};">{tgt}</span>' if tgt else "")
-                + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{int(d[5:7]):02d}.{int(d[8:]):02d} 발표'
-                + (f' · <a href="{_esc(c["url"])}" style="color:inherit;text-decoration:none;" target="_blank" rel="nofollow noopener">원문 보기</a>' if c.get("url") else "")   # 한국 = 증권사 텔레그램 글 (2026-11-14)
-                + '</span></span>')
-    return f'<span data-broker="1" style="display:block;">{out}</span>'
+    mv = broker_move(c)
+    g0, g1 = _grade_ko(c.get("from")), _grade_ko(c.get("to"))
+    grade = (f"{g1} 의견 새로 냄" if c.get("action") == "init" and g1 else f"{g0} → {g1}" if g0 and g1 and g0 != g1 else f"{g1} 유지" if g1 else "")
+    head = (f'<span style="display:inline-flex;vertical-align:1px;margin-right:8px;">{TS.box(MOVE_BOX.get(mv, "flat"), mv, _esc, fit=True)}</span>'
+            f'<span style="font-weight:700;font-size:17px;">{_esc(c.get("firm") or "증권사")}</span>'   # 증권사 이름 = 옆 `매수 유지` 와 같은 17px · 굵게 (2026-11-16 사용자, 같은 날 앞선 `굵게 빼기` 를 바꿈)
+            + (f'{PICK_VBAR}<span style="font-weight:400;font-size:17px;">{_esc(grade)}</span>' if grade else ""))
+    pt, pp = c.get("pt"), c.get("pt_prior")
+    money0 = lambda v: re.sub(r"\.00\b", "", money(v))   # noqa: E731 — 목표가는 대개 정수 ($420.00 → $420)
+    tgt = ""
+    if pt:   # 새 목표가 = 올리면 굵게 상승 색, 내리면 굵게 하락 색 (2026-11-02 사용자 P276)
+        new = _esc(money0(pt)) if not pp or pp == pt else f'<b style="font-weight:700;color:{UP if pt > pp else DOWN};">{_esc(money0(pt))}</b>'
+        tgt = f"목표가 {_esc(money0(pp))} → {new}" if pp and pp != pt else f"목표가 {new}"
+        if close:
+            tgt += f" (오늘 종가 대비 {(pt / close - 1) * 100:+.1f}%)".replace("-", "−")
+    d = c["at"][:10]
+    return (f'<span style="display:block;{"" if i == 0 else PICK_LINE}padding:{2 if i == 0 else 20}px 0 20px;">'
+            f'<span style="display:block;color:#111;line-height:35px;">{head}</span>'
+            + (f'<span style="display:block;margin-top:4px;color:#111;font-weight:400;font-size:18px;line-height:{PICK_REASON_LH};">{tgt}</span>' if tgt else "")
+            + f'<span style="display:block;margin-top:8px;font-size:{TINY};line-height:20px;color:{NOTE};font-weight:400;">{int(d[5:7]):02d}.{int(d[8:]):02d} 발표'
+            + (f' · <a href="{_esc(c["url"])}" style="color:inherit;text-decoration:none;" target="_blank" rel="nofollow noopener">원문 보기</a>' if c.get("url") else "")   # 한국 = 증권사 텔레그램 글 (2026-11-14)
+            + '</span></span>')
 
 
 def _move_word(n, order):
@@ -1586,11 +1587,9 @@ def broker_card(name, cs, close, money, days=BROKER_DAYS):
     word = _move_word(n, MOVE_ORDER)
     theme, col = MOVE_THEME.get(word, ("neutral", "#111"))
     cnt = " · ".join(f'<b style="font-weight:700;color:{MOVE_THEME.get(k, ("", "#111"))[1]};">{k} {n[k]}건</b>' for k in MOVE_ORDER if n[k])
-    body = _broker_rows(cs[:PICKS_SHOWN], close, money)
-    if len(cs) > PICKS_SHOWN:
-        body += _dk.fold(f"목표가 {len(cs) - PICKS_SHOWN}건 더 보기", _broker_rows(cs[PICKS_SHOWN:], close, money))
+    # 처음 5건 + `목표가 n건 더 보기` 10건씩 — 더 보기 기준(P340, 2026-11-16 사용자: 옛 3건 + 한 번에 펼치는 접기가 더 보기 버튼과 달랐다). 줄 모양 · 구분선은 그대로
+    body = f'<div data-broker="1">{_dk.more_list([_broker_row(i, c, close, money) for i, c in enumerate(cs)], "목표가", li_style="margin:0;padding:0;")}</div>'
     lines = [(f"최근 {days}일 증권사가 {_esc(name)} 목표가를 {len(cs)}건 냈다. {cnt}.", "rich"), (body, "html")]
-    add_small_note(lines, "등급이나 목표가를 올리면 상향, 내리면 하향, 그대로 다시 내면 유지로 셉니다.")   # 옛 툴팁의 나누는 법을 카드 작은 글씨로 — 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     return _state_card("증권사 목표가 변경은?", word, theme, col, lines, "", fold=True)
 
 
@@ -2003,6 +2002,32 @@ def _dir_state(title, state):
 
 
 STATE_VAL_W = _dk.STATE_VAL_W   # 600 (P260) — 공용 값
+# 근거 줄(그래프 아래 이름 | 값 · 회색 뜻) 글자 — 지금 18/30 · 뜻 14/20. 2026-11-16 사용자 표본: 기술지표 표 글자(15/23 · 13/19)로 줄이기 — 목업 한 장만(mock_row15)
+ROW_FS, ROW_LH, ROW_NOTE_FS, ROW_NOTE_LH, ROW_MULTI_FS = _dk.EMPH_Q, _dk.LH_EMPH_Q, TINY, "20px", _dk.NAME
+# 실적 · 업계상황 탭의 근거 줄 = 기술지표 표 글자 15/23 · 뜻 13/19 (2026-11-16 사용자: 그래프 아래 줄을 기술지표 폰트로, 이 두 탭만) — _section 이 두 탭을 감쌀 때 바꾼다
+SMALL_ROW_TABS = ("실적", "업계상황")
+_ROW_LI = re.compile(r'(<li data-row="1" style="[^"]*?)font-size:' + re.escape(_dk.EMPH_Q) + ';line-height:' + re.escape(_dk.LH_EMPH_Q) + ';')
+_ROW_NOTE = re.compile(r'(<span data-row-note="1" style="[^"]*?)font-size:' + re.escape(TINY) + r';(line-height:20px;)?')
+_ROW_MULTI = re.compile(r'(<li data-row="1"[^>]*>(?:(?!</li>).)*?font-weight:\d+;)font-size:' + re.escape(_dk.NAME) + ';', re.S)
+
+
+def src_line(note, url, label):
+    """카드 끝 출처 한 줄 — 느낌표 13 + 13/19 회색(_dk.excl_note 꼴), 보고서 이름만 굵게 · 링크 (2026-11-16 사용자: 옛 `출처 | DART 분기보고서 ›` 근거 줄)."""
+    return (f'<div style="display:flex;align-items:flex-start;gap:4px;margin:12px 0 0;font-size:13px;line-height:19px;color:{NOTE};word-break:keep-all;">'
+            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{_dk.EXCL_ICON}</span>'
+            f'<span>출처 : {_esc(note)} <a href="{_esc(url)}" target="_blank" rel="noopener" style="color:inherit;font-weight:700;text-decoration:none;white-space:nowrap;">{_esc(label)} ›</a></span></div>')
+
+
+def small_rows(html):
+    """근거 줄(_state_card row) 글자를 기술지표 표 크기로 — 실적 · 업계상황 탭 (SMALL_ROW_TABS)."""
+    html = _ROW_LI.sub(lambda m: m.group(1) + f"font-size:{_ts_fs()[0]};line-height:{_ts_fs()[1]};", html)
+    html = _ROW_NOTE.sub(lambda m: m.group(1) + f"font-size:{_ts_fs()[2]};" + (f"line-height:{_ts_fs()[3]};" if m.group(2) else ""), html)
+    return _ROW_MULTI.sub(lambda m: m.group(1) + f"font-size:{_ts_fs()[0]};", html)
+
+
+def _ts_fs():
+    import tech_signals as TS
+    return TS.TABLE_FS, TS.TABLE_LH, TS.WHY_FS, "19px"
 
 
 def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=False, inline_notes=False, opened=False, below_notes=False, state_rich=""):
@@ -2029,21 +2054,21 @@ def _state_card(title, state, theme, color, lines, new_html="", tip="", fold=Fal
             inline = bool(note) and not multi and not below_notes and (fits or inline_notes) and not pre   # 로고 줄은 늘 이름 아래 뜻(로고가 두 줄 가운데)   # below_notes: 괄호 없이 늘 이름 아래 줄 (2026-10-21 테마 페이지). 설명을 괄호로 이름 옆에 (2026-10-17 사용자). inline_notes=True 면 길어도 모두 괄호 — 줄이 바뀐다
             if multi:   # 값이 여러 줄이면 설명은 이름 아래 왼쪽 — 줄 수를 늘리지 않는다 (2026-10-17 사용자: 모바일에서 여러 단 쓰지 말 것)
                 vals = vhtml.replace(chr(10), "<br>")
-                return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
+                return (f'<li data-row="1" style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{ROW_FS};line-height:{ROW_LH};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'   # 오른쪽 값은 세로 가운데 (2026-10-18 사용자, 2-4 C-6)
-                        f'<span style="flex:none;color:#111;">{_esc(name)}<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};">{_note_tint(note)}</span></span>'
-                        f'<span style="min-width:0;text-align:right;font-weight:{STATE_VAL_W};font-size:{_dk.NAME};word-break:keep-all;">{vals}</span></span></li>')   # 섹터 목록 값은 한 단계 작게 16px (2026-10-17 사용자)
+                        f'<span style="flex:none;color:#111;">{_esc(name)}<span data-row-note="1" style="display:block;margin-top:2px;font-size:{ROW_NOTE_FS};line-height:{ROW_NOTE_LH};color:{NOTE};">{_note_tint(note)}</span></span>'
+                        f'<span style="min-width:0;text-align:right;font-weight:{STATE_VAL_W};font-size:{ROW_MULTI_FS};word-break:keep-all;">{vals}</span></span></li>')   # 섹터 목록 값은 한 단계 작게 16px (2026-10-17 사용자)
             if inline:
                 lw = "flex:1 1 auto;min-width:0;word-break:keep-all;" if not fits else "flex:none;white-space:nowrap;"   # 안 들어가면 왼쪽 칸 안에서 줄바꿈
-                return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'
+                return (f'<li data-row="1" style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{ROW_FS};line-height:{ROW_LH};">'
                         f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
-                        f'<span style="{lw}color:#111;">{_esc(name)} <span style="font-size:{TINY};color:{NOTE};">({_note_tint(note)})</span></span>'
+                        f'<span style="{lw}color:#111;">{_esc(name)} <span data-row-note="1" style="font-size:{ROW_NOTE_FS};color:{NOTE};">({_note_tint(note)})</span></span>'
                         f'<span style="flex:none;text-align:right;font-weight:{STATE_VAL_W};white-space:nowrap;">{vhtml}</span></span></li>')
-            nt = f'<span style="display:block;margin-top:2px;font-size:{TINY};line-height:20px;color:{NOTE};white-space:normal;">{_note_tint(note)}</span>' if note else ""
+            nt = f'<span data-row-note="1" style="display:block;margin-top:2px;font-size:{ROW_NOTE_FS};line-height:{ROW_NOTE_LH};color:{NOTE};white-space:normal;">{_note_tint(note)}</span>' if note else ""
             nblock = f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{_esc(name)}</span>{nt}</span>'
             if pre:
                 nblock = f'<span style="flex:1 1 auto;min-width:0;display:flex;align-items:center;">{pre}{nblock}</span>'
-            return (f'<li style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{_dk.EMPH_Q};line-height:{_dk.LH_EMPH_Q};">'   # 뜻 줄을 이름 칸 안에 두어 오른쪽 값이 두 줄의 세로 가운데 (2026-10-18 사용자)
+            return (f'<li data-row="1" style="list-style:none;margin:0;padding:10px 0;border-top:1px solid {bdt};font-size:{ROW_FS};line-height:{ROW_LH};">'   # 뜻 줄을 이름 칸 안에 두어 오른쪽 값이 두 줄의 세로 가운데 (2026-10-18 사용자)
                     f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
                     f'{nblock}<span style="flex:none;text-align:right;font-weight:{STATE_VAL_W};word-break:keep-all;">{vhtml.replace(chr(10), "<br>")}</span></span></li>')
         if kind == "html":   # 그래프 · 자세한 지표 보기 같은 HTML 조각 (실적과 기대 탭, 2026-10-18)
@@ -2975,7 +3000,10 @@ def analysts_block(a, m0=None, m2=None, sep="#E2E8F0"):
     card = lambda body: (f'<span style="{MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px;">{body}</span></span>')   # noqa: E731 — 다른 그래프 흰 카드와 같게
     if n:
         bar = _dk.legend_bar("", [(nm, rc.get(k, 0), bg, fg) for k, nm, bg, fg in RATING_PASTEL])
-        out += f'{_dk.CHART_TITLE_M}애널리스트 {n}명의 의견</span>' + card(bar)
+        asof = (cells.get("asof") or {}).get("value")   # 받은 날 — 매일 바뀌지 않는다(간단 종목 7일 · 정식 거래일마다). 증권사 줄 `11.05 발표` 와 같은 꼴로 오른쪽 (2026-11-16 사용자)
+        right = (f'<span style="flex:none;font-weight:400;font-size:{TINY};line-height:20px;color:{NOTE};">{int(asof[5:7]):02d}.{int(asof[8:10]):02d} 기준</span>' if asof else "")
+        title = f'<span>{_dk.CHART_MARK}애널리스트 {n}명의 의견</span>{right}' if right else f'{_dk.CHART_MARK}애널리스트 {n}명의 의견'
+        out += (f'<span style="{_dk._CHART_TITLE_STYLE}margin:0 0 {_dk.CHART_TITLE_GAP}px;{"display:flex;justify-content:space-between;align-items:baseline;gap:12px;" if right else ""}">{title}</span>' + card(bar))
     gauge = target_gauge(cells, close, m0, m2, wrap=False)
     if gauge:
         title = "목표가 범위"

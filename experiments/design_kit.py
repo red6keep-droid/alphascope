@@ -2203,14 +2203,17 @@ except Exception:  # noqa: BLE001
 MORE_SHOWN, MORE_STEP = 5, 10
 
 
-def more_list(items_html, noun="뉴스", shown=MORE_SHOWN, step=MORE_STEP, indent=0, first_top=2, sub=False):
+def more_list(items_html, noun="뉴스", shown=MORE_SHOWN, step=MORE_STEP, indent=0, first_top=2, sub=False, li_style=None):
+    """li_style = 줄이 제 여백 · 구분선을 이미 가진 목록(증권사 목표가 변경 줄)이면 li 꼴을 이것으로, 글자 크기도 줄에 맡긴다 (2026-11-16)."""
     items_html = [h for h in items_html if h]
     if not items_html:
         return ""
     bottom = RULE_GAP - (VP if sub else NEWS_VP)
-    lis = "".join(f'<li{" hidden" if i >= shown else ""} style="margin:0;padding:{(RULE_GAP - NEWS_VP) if i else first_top}px {indent}px {bottom}px;line-height:{LH_BODY};{"box-shadow:inset 0 1px 0 #E2E8F0;" if i else ""}">{h}</li>'
+    lis = "".join(f'<li{" hidden" if i >= shown else ""} style="{li_style}">{h}</li>' if li_style is not None else
+                  f'<li{" hidden" if i >= shown else ""} style="margin:0;padding:{(RULE_GAP - NEWS_VP) if i else first_top}px {indent}px {bottom}px;line-height:{LH_BODY};{"box-shadow:inset 0 1px 0 #E2E8F0;" if i else ""}">{h}</li>'
                   for i, h in enumerate(items_html))
-    out = f'<ul data-more-list="1" data-shown="{shown}" data-step="{step}" data-noun="{esc(noun)}" style="margin:0 0 8px;padding:0;list-style:none;font-size:{SMALL};">{lis}</ul>'
+    fs = "" if li_style is not None else f"font-size:{SMALL};"
+    out = f'<ul data-more-list="1" data-shown="{shown}" data-step="{step}" data-noun="{esc(noun)}" style="margin:0 0 8px;padding:0;list-style:none;{fs}">{lis}</ul>'
     rest = len(items_html) - shown
     if rest > 0:
         out += (f'<button type="button" data-more-btn="1" style="{FOLD_BTN}width:100%;margin:0 0 8px;">'
