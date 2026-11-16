@@ -162,7 +162,7 @@ def weight_card(items):
     widths = (widths[0], widths[1] * VAL_PX // 19)   # 값 글자 19 → 16 만큼 칸도
     rows = []
     for i, ((sym, name, w), v) in enumerate(zip(items, vals)):
-        row = dk.bar_row(nm(sym, name), w / mx, dk.CHART_MAIN, v, widths, first=i == 0, sep=False, bar_h=BAR_H, val_px=VAL_PX, pad=ROW_GAP // 2, lh="20px", name_w=400, bar_frac=BAR_FRAC)
+        row = dk.bar_row(nm(sym, name), w / mx, dk.CHART_MAIN, v, widths, first=i == 0, sep=False, bar_h=BAR_H, val_px=VAL_PX, pad=ROW_GAP // 2, lh="20px", name_w=400, bar_frac=BAR_FRAC, val_gap=5)
         rows.append(dk.stock_row_link(row, sym))
     box = dk.MULTI + f"padding-top:{ROW_GAP // 2}px;"   # 카드 가장자리 ~ 첫 줄 = 줄 사이 반쪽 + 위 여백 → 보이는 20
     if len(rows) <= SHOWN:
@@ -171,7 +171,7 @@ def weight_card(items):
     return out.replace('<span data-grid="2" style="display:block;border-top:1px solid #E2E8F0;">', '<span data-grid="2" style="display:block;">', 1)   # 펼친 줄 위 구분선도 없음 (버튼 위 선만)
 
 
-def tab_holdings(f, src_note="", link=None, name=""):
+def tab_holdings(f, src_note="", link=None, name="", at_note=""):
     """구성 탭 (2026-11-16 사용자 "구성 쪽을 우리 디자인 규칙에 맞도록") — 기업 탭과 같은 틀: 탭 맨 위 문장(dk.TAB_LEAD_GAP) · 비중 막대 카드 · 출처 안내 줄.
     한국 ETF = 운용사 구성 전부(n종목), 미국 ETF = 야후가 주는 상위 10종목뿐(그 밖은 야후에 없다 — 외부 한도).
     link = (글자, 주소) — src_note 안의 `@링크@` 자리를 출처 링크로. 구획 제목마다 data-tab (테마는 표시 없는 h2 를 첫 탭으로 옮긴다)."""
@@ -192,9 +192,14 @@ def tab_holdings(f, src_note="", link=None, name=""):
         top10 = sum(w for *_, w in items)
         lead = f"{who} 비중이 큰 {len(items)}종목에 전체의 {top10:.0f}%를 담고 있습니다."
     note = dk.muted(src_note) if src_note else ""
-    if link and note:
+    if link and note:   # 운용사 출처 = 카드 아래 오른쪽 정렬 (2026-11-16 사용자)
         note = note.replace("@링크@", f'<a href="{dk.esc(link[1])}" style="color:inherit;text-decoration:underline;" target="_blank" rel="nofollow noopener">{dk.esc(link[0])}</a>')
-    out = f'<p style="{dk.TAB_LEAD_GAP}color:#111;line-height:33px;word-break:keep-all;">{dk.esc(lead)}</p>' + weight_card(items) + note
+        note = note.replace(dk.GUIDE_IND, "text-align:right;", 1)
+    lead_html = f'<p style="{dk.TAB_LEAD_GAP}color:#111;line-height:33px;word-break:keep-all;">{dk.esc(lead)}</p>'
+    if at_note:   # 기준일 = 카드 오른쪽 위 작은 회색 (2026-11-16 사용자) — 문장 → 카드 27 은 그대로(문장 아래 8 + 기준일 19 + 0)
+        lead_html = (lead_html.replace(dk.TAB_LEAD_GAP, dk.TAB_LEAD_GAP.replace(" 27px;", " 8px;"), 1)
+                     + f'<div style="text-align:right;color:{dk.NOTE};font-size:13px;line-height:19px;margin:0 0 6px;">{dk.esc(at_note)}</div>')
+    out = lead_html + weight_card(items) + note
     if f.get("sectors") and f["sectors"][0][1] < 99:
         out += dk.section("업종 비중은?", weight_card([("", n, w) for n, w in f["sectors"]]), tab="구성")
     return out
@@ -645,8 +650,8 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
             hold = ""
             if kf.get("top") and not lev:
                 at = kf.get("at") or ""
-                src = f"{int(at[5:7])}월 {int(at[8:10])}일 기준입니다. 출처 : @링크@" if at else ""
-                hold = tab_holdings({"top": kf["top"], "sectors": [], "n": kf.get("n")}, src, (kf.get("source") or "운용사", kf.get("url") or ""), E.BY_SYM[sym][1])
+                hold = tab_holdings({"top": kf["top"], "sectors": [], "n": kf.get("n")}, "출처 : @링크@", (kf.get("source") or "운용사", kf.get("url") or ""), E.BY_SYM[sym][1],
+                                    at_note=f"{int(at[5:7])}월 {int(at[8:10])}일 기준" if at else "")   # 기준일 = 카드 오른쪽 위, 출처 = 카드 아래 오른쪽 (2026-11-16 사용자)
             elif not lev:   # 운용사 자료가 없을 때만 예전 길 — 같은 지수 미국 ETF 구성
                 twin = next((t[0] for t in E.US if t[2] == E.BY_SYM[sym][2]), None) if "미국" in E.BY_SYM[sym][1] else None
                 f = dict(us_fund.get(twin) or {}) if twin else {}
