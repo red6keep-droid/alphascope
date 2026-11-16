@@ -7,6 +7,7 @@
 - 재료는 **사이트에 이미 공개한 것만**: gh-pages data.json(미국 지수 · 대형주 · 업종) · kr.json(한국) · hypo.json(증시 전망)
   · news.json(뉴스 요약 줄) + 데일리 리포트 입력의 일정(calendar) · VIX.
   issues.json(이슈 모니터링)은 관리자 미리보기 단계라 넣지 않는다.
+- 상한 · 자르기 없음: 읽는 쪽이 수집기 하루 2번뿐이라 크기가 문제 되지 않고, 무엇을 쓸지는 수집기가 고른다(조용히 버리지 않기).
 - am = 미국 마감(한국 아침 07:30 KST 무렵, 미국 데일리 리포트 실행 끝), pm = 한국 마감(16:30 KST 무렵, 한국 증시 리포트 실행 끝).
 - pm 의 미국 일정은 그날 am 묶음의 calendar 를 다시 쓴다(한국 실행에는 일정 수집이 없다 — 일정 API 를 두 번 부르지 않음).
 
@@ -29,7 +30,6 @@ KST = ZoneInfo("Asia/Seoul")
 NY = ZoneInfo("America/New_York")
 RAW = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages"
 SITE = "https://alpha-scope.blogspot.com"
-MAX_BYTES = 50_000
 UA = {"User-Agent": "alpha-scope/market-briefing"}
 
 # 일정 이름 (collect_calendar.py kind) · 발표 시각(뉴욕 기준)
@@ -96,15 +96,15 @@ def _event_rows(calendar, day):
     return out
 
 
-def _news(news, limit=12):
+def _news(news):
     rows = []
     for x in (news or {}).get("items") or []:
         t = x.get("title_ko") or x.get("title")
         if not t:
             continue
-        rows.append({"title": t, "lines": (x.get("lines") or [])[:3], "source": x.get("source") or "",
+        rows.append({"title": t, "lines": x.get("lines") or [], "source": x.get("source") or "",
                      "published": x.get("published") or ""})
-    return rows[:limit]
+    return rows
 
 
 def _hypotheses(hypo, market):
@@ -142,7 +142,7 @@ def build_am(day_kst, report_input):
     calendar = (report_input or {}).get("calendar")
     return {
         "v": V, "date": day_kst, "slot": "am", "market": "US", "session": session, "trade_date": data.get("trade_date"),
-        "close": {"indices": indices, "sectors": sectors, "movers": movers[:6]},
+        "close": {"indices": indices, "sectors": sectors, "movers": movers},
         "signals": signals,
         "hypotheses": _hypotheses(hypo, "us"),
         "news": _news(news),
@@ -175,7 +175,7 @@ def build_pm(day_kst, kr_path):
     return {
         "v": V, "date": day_kst, "slot": "pm", "market": "KR", "session": session, "trade_date": kr.get("day"),
         # 한국 지수 종가는 kr.json 에 없다 — 시가총액 상위 35종목 등락 · 업종 평균으로 준다
-        "close": {"indices": [], "sectors": sectors, "movers": movers[:6]},
+        "close": {"indices": [], "sectors": sectors, "movers": movers},
         "signals": signals,
         "hypotheses": _hypotheses(hypo, "kr"),
         "news": [],
@@ -206,12 +206,6 @@ def main():
     out["generated"] = datetime.datetime.now(KST).isoformat(timespec="seconds")
 
     body = json.dumps(out, ensure_ascii=False, separators=(",", ":"))
-    if len(body.encode("utf-8")) > MAX_BYTES:   # 넘치면 뉴스부터, 그래도 넘치면 14일 일정을 뺀다(다음 장 일정은 남김)
-        out["news"] = out["news"][:5]
-        body = json.dumps(out, ensure_ascii=False, separators=(",", ":"))
-        if len(body.encode("utf-8")) > MAX_BYTES:
-            out.pop("calendar", None)
-            body = json.dumps(out, ensure_ascii=False, separators=(",", ":"))
     path = os.path.join(a.out_dir, "briefing", f"{day}-{a.slot}.json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
