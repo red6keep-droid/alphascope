@@ -39,6 +39,7 @@ import full_us  # noqa: E402
 R = render_kr.R
 WHEN = full_us.WHEN
 BUDGET = {"detail": 60, "dart": 40, "company": 60, "hist": 100}
+DART_MINUTES = 20   # 매출 · 손익 받기 시간 상한 — DART 가 느린 날에도 실행이 끝나 저장값을 남기게 (2026-11-16)
 DETAIL_FIELDS = ("analysts", "eps")
 MARKET = sorted({K.BENCH, K.KOSDAQ, *K.SECTOR_ETF_LIST})
 
@@ -198,15 +199,25 @@ def dart(cache_dir, syms):
         todo = sorted((s for s in syms if code_of(s) in codes and (not prog.get(s) or (today - datetime.date.fromisoformat(prog[s])).days >= 7)),
                       key=lambda s: prog.get(s) or "")[:BUDGET["dart"]]
         if key and todo:
-            K.CANDIDATES[:] = [(s, "", "", "", []) for s in todo]
-            try:
-                D.run()     # 매출 — 새 보고서만
-                FIN.run()   # 손익 · 현금흐름 — 새 보고서만
-            except Exception as e:  # noqa: BLE001
-                print(f"[quick-kr] DART 실패 — 지난 값: {str(e)[:120]}")
-            for s in todo:
+            # 5곳씩 나눠 받고 DART_MINUTES 를 넘기면 남은 회사는 다음 실행에 — 11-16 DART 가 느려(손익 표 호출당 약 6초, 11-14 의 3~4배)
+            # 40곳에 83분이 걸려 실행 전체가 상한에 취소됐고, 취소된 실행은 저장값을 못 남겨 다음 실행이 같은 일을 처음부터 했다 (2026-11-16)
+            t0, done = time.time(), []
+            for i in range(0, len(todo), 5):
+                if time.time() - t0 > DART_MINUTES * 60:
+                    print(f"[quick-kr] DART {DART_MINUTES}분 넘음 — {len(todo) - len(done)}곳은 다음 실행에", flush=True)
+                    break
+                part = todo[i:i + 5]
+                K.CANDIDATES[:] = [(s, "", "", "", []) for s in part]
+                try:
+                    D.run()     # 매출 — 새 보고서만 (회사마다 저장)
+                    FIN.run()   # 손익 · 현금흐름 — 새 보고서만
+                except Exception as e:  # noqa: BLE001
+                    print(f"[quick-kr] DART 실패 — 지난 값: {str(e)[:120]}")
+                done += part
+            for s in done:
                 prog[s] = str(today)
             _save(os.path.join(cache_dir, "kr", "dart_done.json"), prog)
+            todo = done
         K.CANDIDATES[:] = [(s, "", "", "", []) for s in syms]
         rev = rev_rows(_load(D.CACHE, {}), codes, syms)
         _k = D._key

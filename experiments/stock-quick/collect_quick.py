@@ -193,7 +193,7 @@ def kr_caps(cache, ref_kr, bars_kr, kr_syms):
     전체 명단을 이번 실행에서 받았을 때만 kr/cap_rank.json 을 새로 쓴다 — 정식 한국 실행이 읽어 같은 순위를 쓴다. → {sym: {"cap", "rank"}}"""
     import collect_kr_dart as KD
     try:
-        n = KD.shares(os.path.join(cache, "kr", "dart_shares.json"), {s: ref_kr[s].get("corp") for s in kr_syms}, key=first_key("DART_API_KEY"), tag="quick")
+        n = KD.shares(os.path.join(cache, "kr", "dart_shares.json"), {s: ref_kr[s].get("corp") for s in kr_syms}, key=first_key("DART_API_KEY"), tag="quick", minutes=8)
     except Exception as e:  # noqa: BLE001 — 시가총액 줄만 빠진다
         print(f"::warning::[quick] 발행 주식 수 건너뜀: {e!r}")
         return {}
