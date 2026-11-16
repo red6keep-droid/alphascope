@@ -18,6 +18,7 @@ import design_kit as dk  # noqa: E402  — 디자인-가이드라인.md 공통 �
 import people_section  # noqa: E402  — 인물 발언 구획 (2026-11-07 사용자, 목업)
 
 dk.TIP_SRC = "Yahoo Finance"   # 툴팁 기본 데이터 출처. 금리 · 경제 일정이 들어간 툴팁만 with_src (2026-10-20 사용자)
+import candle_chart as CDL  # noqa: E402  — 본문 맨 위 봉차트 = 종목 페이지와 같은 실제 차트 (2026-11-16)
 import cards  # noqa: E402  — 질문 카드 · 막대 그래프 (2026-10-18 재설계)
 import sections as sx  # noqa: E402  — 독자 질문 D1 ~ D6 · K1 ~ K3 구획 (doc/기획/데일리-리포트-기획.md 6절)
 import market as mk  # noqa: E402  — 시장 탭 질문 카드 8개 (2026-11-07 사용자: 시장 탭도 질문 · 답 형태로)
@@ -273,7 +274,10 @@ def sec_chart(output_dir):
         return ""
     with open(path, encoding="utf-8") as f:
         c = json.load(f)
-    url = _esc(c["url"])
+    real = CDL.card("S&P 500", c.get("bars") or [], 2, title="")   # 종목 페이지와 같은 실제 봉차트 (2026-11-16 사용자: "상세 페이지는 그림 파일 말고 우리가 진짜 하는 차트") — 일 · 주 · 월 · 지표는 브라우저 계산
+    if real:
+        return real + CDL.GAP + CDL.SCRIPT + dk.tv_chart_fold("AMEX:SPY", "America/New_York", "SPY")
+    url = _esc(c["url"])   # 옛 chart.json(자료 없음)만 그림
     return (f'<a href="{url}" data-zoom="1" target="_blank" rel="noopener" title="그래프 확대 보기" aria-label="그래프 확대 보기" '
             f'style="position:relative;display:block;margin:0 0 16px;max-width:1024px;">'
             f'<img src="{url}" alt="S&amp;P 500 {c.get("window", 30)}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'

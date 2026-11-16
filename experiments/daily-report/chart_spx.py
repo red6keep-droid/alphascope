@@ -36,7 +36,7 @@ def _repo_slug():
 def load_bars(as_of=None):
     import yfinance as yf
 
-    df = yf.Ticker(SYMBOL).history(period="1y", interval="1d", auto_adjust=True)
+    df = yf.Ticker(SYMBOL).history(period="2y", interval="1d", auto_adjust=True)   # 1y → 2y (2026-11-16 사용자: 본문 그래프 = 종목 페이지 봉차트, candle_chart.DAYS 2년 남짓) — 같은 요청 한 번, 기간만
     bars = []
     for ts, r in df.iterrows():
         day = ts.strftime("%Y-%m-%d")
@@ -44,7 +44,8 @@ def load_bars(as_of=None):
             continue
         if any(v != v for v in (r["Open"], r["High"], r["Low"], r["Close"])):   # NaN
             continue
-        bars.append(dict(day=day, open=float(r["Open"]), high=float(r["High"]), low=float(r["Low"]), close=float(r["Close"])))
+        bars.append(dict(day=day, open=float(r["Open"]), high=float(r["High"]), low=float(r["Low"]), close=float(r["Close"]),
+                         volume=float(r["Volume"]) if r.get("Volume") == r.get("Volume") else 0.0))   # 거래량 = 봉차트 아래 막대
     return bars
 
 
@@ -173,6 +174,7 @@ def run(day, as_of=None, output_dir=OUTPUT_DIR):
     draw(bars, path)
     url = f"https://cdn.jsdelivr.net/gh/{_repo_slug()}@gh-pages/{image_ref}"
     info = {"image_ref": image_ref, "url": url, "window": len(bars[-WINDOW:]), "last_day": bars[-1]["day"]}
+    info["bars"] = bars   # 본문 봉차트 자료 (render_html.sec_chart → candle_chart.card, 2026-11-16 사용자: "상세 페이지는 그림 말고 실제 차트")
     with open(os.path.join(output_dir, "chart.json"), "w", encoding="utf-8") as f:
         json.dump(info, f, ensure_ascii=False)
     with open(os.path.join(output_dir, "chart_ref.txt"), "w", encoding="utf-8") as f:
