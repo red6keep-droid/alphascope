@@ -17,7 +17,7 @@ KEY_ENV = "YTB_FIRESTORE_KEY"   # 서비스 계정 키 JSON 전체 (GitHub Secre
 TITLE_NAME = "미디어 데일리"   # 옛 "미디어 데일리 · 방송이 본 미국장" (2026-10-23 사용자: 뒤를 삭제). 같은 날 글 찾기는 주소(slug)의 날짜라 옛 제목 글도 찾는다
 SLUG_NAME = "media daily"          # 주소 고정용 영문 제목 "media daily YYYY-MM-DD" → /media-daily-YYYY-MM-DD.html
 LABELS = ["미디어 데일리", "미국 증시", "자동 리포트"]
-TEST_MODE = True                   # 첫 발행 2~4주 `테스트 중` 라벨 (운영지침 2-2)
+TEST_MODE = False   # 2026-11-16 사용자: 테스트 끝 — `테스트 중` 라벨 정리(애드센스 준비)                   # 첫 발행 2~4주 `테스트 중` 라벨 (운영지침 2-2)
 
 # 1차(08:00) 재료 컷 — createdAt 이 이 시각(KST)까지. 2차(10:15 갱신)는 컷 없음
 PHASE1_CUTOFF = (7, 55)

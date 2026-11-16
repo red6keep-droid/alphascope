@@ -30,9 +30,10 @@ def _reply_of(value):
     return reply
 
 
-def generate_reply(post_title, comment_content, comment_author=""):
+def generate_reply(post_title, comment_content):
+    """작성자 이름 · 사진 · 이메일은 넣지 않는다 — 글 제목 · 댓글 본문만 (2026-11-16 사용자, 개인정보처리방침 3절 · 운영지침 D8-6)."""
     prompt = _load_prompt() + "\n\n" + json.dumps(
-        {"post_title": post_title, "comment_author": comment_author, "comment": comment_content},
+        {"post_title": post_title, "comment": comment_content},
         ensure_ascii=False,
     )
     pool = LLMPool("comment", label="comment-reply")   # Gemini 는 맨 뒤 — 리포트 한도를 남긴다 (2026-10-14)
