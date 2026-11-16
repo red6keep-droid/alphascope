@@ -86,18 +86,160 @@ SECTOR_CATEGORY = {"OIL_ENERGY": ("에너지",), "CRYPTO": ("가상자산",),
 LABEL = "방송"   # 뉴스 줄의 세 번째 라벨 — 기사가 아니라 방송 내용(의견 포함)이라는 표시
 
 
+def _creds(scopes=None):
+    """수집기 읽기 전용 서비스 계정(YTB_FIRESTORE_KEY) — Firestore · Storage 같은 키. 없으면 None(gcloud 기본 인증)."""
+    raw = os.environ.get(MC.KEY_ENV, "").strip()
+    if not raw:
+        return None
+    from google.oauth2 import service_account
+    info = json.loads(raw) if raw.startswith("{") else json.load(open(raw, encoding="utf-8"))
+    return service_account.Credentials.from_service_account_info(info, scopes=scopes)
+
+
 def _client():
     from google.cloud import firestore
-    raw = os.environ.get(MC.KEY_ENV, "").strip()
-    if raw:
-        from google.oauth2 import service_account
-        info = json.loads(raw) if raw.startswith("{") else json.load(open(raw, encoding="utf-8"))
-        return firestore.Client(project=MC.FIRESTORE_PROJECT, credentials=service_account.Credentials.from_service_account_info(info))
-    return firestore.Client(project=MC.FIRESTORE_PROJECT)
+    return firestore.Client(project=MC.FIRESTORE_PROJECT, credentials=_creds())
+
+
+# 방송 요약 읽기 = 수집기 Storage 파일 (2026-11-16 수집기 안내 News-doc/블로그-Firestore-읽기-줄이기.md).
+# 수집기 Firestore 하루 읽기가 무료 몫 5만을 넘었다(11-14 7.9만) — 블로그가 30일치(약 2,500문서)를 부를 때마다 통째로 읽은 탓으로 본다.
+# 수집기가 묶음 날짜(edition)별 JSON 을 비공개 버킷에 올린다:
+#   feed/index.json                 {"updatedAt", "editions": {날짜: {"count", "updatedAt"}}, "channelsUpdatedAt"}
+#   feed/editions/YYYY-MM-DD.json   {"edition", "updatedAt", "count", "items": [summaries 문서 + "id"]} — 시각은 ISO 글자
+#   feed/channels.json              {"updatedAt", "items": [channels 문서 + "id"]}
+# 블로그는 Firestore 를 읽지 않는다. 받는 순서:
+#  ① 한 실행(프로세스) 안 = edition 별로 한 번만 (_MEM). 데일리 kr_news · render_html 처럼 두 곳이 불러도 한 번.
+#  ② 날짜별 파일 캐시(MEDIA_CACHE_DIR, 기본 ~/.cache/alphascope-media) — index.json 의 그 날짜 updatedAt 과 같으면 받지 않는다.
+#     오늘 · 어제도 바뀌었을 때만 받는다. 저장소 밖 폴더(`git add -A` 에 안 섞이게), Actions 는 actions/cache 로 남긴다. MEDIA_CACHE_DIR=off 면 안 씀.
+#  ③ Storage 를 못 받으면(권한 주기 전 · 네트워크) 예비 = 옛 방식: 그제 이전은 날짜 파일, 나머지는 Firestore 쿼리. 그것도 못 하면 방송 줄 없이.
+FEED_BUCKET = "ytb-v1-b96d5.firebasestorage.app"
+FEED_PREFIX = "feed"
+_MEM = {}               # edition → 영상 목록 (이 프로세스 안)
+_INDEX = {}             # feed/index.json (이 프로세스 안 한 번) — "v" 키에 값, 못 받으면 None
+_SESSION = []
+CACHE_KEEP_DAYS = 45    # 이보다 오래된 날짜 파일은 지운다 (가장 긴 PICK_DAYS 30일 + 여유)
+
+
+def _feed(path):
+    """버킷의 JSON 한 개. 없거나 못 받으면 None. google-cloud-storage 를 따로 깔지 않고 Storage JSON API 를 google-auth 세션으로 부른다."""
+    try:
+        if not _SESSION:
+            import google.auth
+            from google.auth.transport.requests import AuthorizedSession
+            scope = ["https://www.googleapis.com/auth/devstorage.read_only"]
+            _SESSION.append(AuthorizedSession(_creds(scope) or google.auth.default(scopes=scope)[0]))
+        from urllib.parse import quote
+        r = _SESSION[0].get(f"https://storage.googleapis.com/storage/v1/b/{FEED_BUCKET}/o/{quote(path, safe='')}?alt=media", timeout=30)
+        if r.status_code != 200:
+            print(f"[media_feed] Storage {path} 못 받음: HTTP {r.status_code}")
+            return None
+        return r.json()
+    except Exception as e:  # noqa: BLE001 — 키 없음 · 네트워크
+        print(f"[media_feed] Storage {path} 못 받음: {type(e).__name__} {str(e)[:80]}")
+        return None
+
+
+def _feed_index():
+    if "v" not in _INDEX:
+        d = _feed(f"{FEED_PREFIX}/index.json")
+        _INDEX["v"] = d if isinstance(d, dict) and isinstance(d.get("editions"), dict) else None
+    return _INDEX["v"]
+
+
+def _cache_dir():
+    d = os.environ.get("MEDIA_CACHE_DIR", "").strip()
+    if d.lower() == "off":
+        return None
+    return d or os.path.join(os.path.expanduser("~"), ".cache", "alphascope-media")
+
+
+def _jsonable(r):
+    """Firestore 시각(DatetimeWithNanoseconds) → ISO 글자. Storage 파일 · 예비 Firestore · 날짜 파일의 모양을 같게 한다 —
+    정렬이 str(publishedAt) 이라 datetime(`2026-11-15 10:00`)과 글자(`2026-11-15T10:00`)가 섞이면 순서가 틀어진다."""
+    if isinstance(r, dict):
+        return {k: _jsonable(v) for k, v in r.items()}
+    if isinstance(r, list):
+        return [_jsonable(v) for v in r]
+    return r.isoformat() if isinstance(r, (datetime.datetime, datetime.date)) else r
+
+
+def _cache_read(cdir, ed):
+    """날짜 파일 → {"updatedAt", "items"}. updatedAt None = 예비 Firestore 로 받은 것(그제 이전만 쓴다). 없으면 None."""
+    try:
+        with open(os.path.join(cdir, f"{ed}.json"), encoding="utf-8") as f:
+            d = json.load(f)
+    except (OSError, ValueError):
+        return None
+    return d if isinstance(d, dict) and isinstance(d.get("items"), list) else None
+
+
+def _cache_write(cdir, ed, items, updated_at=None):
+    try:
+        os.makedirs(cdir, exist_ok=True)
+        tmp = os.path.join(cdir, f"{ed}.json.tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump({"updatedAt": updated_at, "items": items}, f, ensure_ascii=False)
+        os.replace(tmp, os.path.join(cdir, f"{ed}.json"))
+    except OSError as e:
+        print(f"[media_feed] 캐시 쓰기 실패 {ed}: {str(e)[:80]}")
+
+
+def _cache_prune(cdir, today):
+    cut = (today - datetime.timedelta(days=CACHE_KEEP_DAYS)).isoformat()
+    try:
+        for fn in os.listdir(cdir):
+            if fn.endswith(".json") and fn[:10] < cut:
+                os.remove(os.path.join(cdir, fn))
+    except OSError:
+        pass
+
+
+def _firestore_editions(need):
+    """예비 — Storage 를 못 받을 때만. edition → 영상 목록. 실패하면 예외."""
+    from google.cloud.firestore_v1.base_query import FieldFilter
+    fresh = {ed: [] for ed in need}
+    for i in range(0, len(need), 30):   # Firestore `in` 은 30개까지
+        for doc in _client().collection("summaries").where(filter=FieldFilter("edition", "in", need[i:i + 30])).stream():
+            r = _jsonable(doc.to_dict() or {})
+            r["id"] = doc.id
+            if r.get("edition") in fresh:
+                fresh[r["edition"]].append(r)
+    return fresh
+
+
+_CHECKED = set()        # 이 프로세스에서 개수를 이미 맞춰 본 edition
+
+
+def _check_recent(editions, got, today):
+    """최근 묶음(어제 · 오늘 · 오후면 내일)이 늦은 파일인지 — Firestore 개수 세기(count, 묶음 하나에 1 읽기)와 받은 요약 수를 맞춰 본다.
+    수집기는 실행이 끝날 때 파일을 한꺼번에 발행하고(worker/collector.py finally), 발행에 실패해도 수집은 성공으로 끝난다.
+    그러면 목차는 정상인데 파일이 옛것 — 개수가 다르면 그 묶음을 got 에서 빼 Firestore 로 읽게 한다(약 70 ~ 110 읽기, 그런 때만).
+    시간 기준(몇 시간 그대로면)은 밤처럼 수집이 원래 없는 때도 걸려 쓰지 않았다 (2026-11-16 사용자). 개수 세기를 못 하면 파일을 그대로 쓴다.
+    → (확인한 묶음 수, 늦은 묶음 수)"""
+    lo = (today - datetime.timedelta(days=1)).isoformat()
+    recent = [ed for ed in editions if ed >= lo and ed in got and ed not in _CHECKED]
+    if not recent:
+        return 0, 0
+    late = 0
+    try:
+        from google.cloud.firestore_v1.base_query import FieldFilter
+        col = _client().collection("summaries")
+        for ed in recent:
+            n_fs = col.where(filter=FieldFilter("edition", "==", ed)).count().get()[0][0].value
+            _CHECKED.add(ed)
+            if n_fs != len(got[ed]):
+                print(f"[media_feed] {ed} 묶음 파일이 늦음: 파일 {len(got[ed])}개 · Firestore {n_fs}개, 이 묶음만 Firestore 로")
+                del got[ed]
+                _MEM.pop(ed, None)
+                late += 1
+    except Exception as e:  # noqa: BLE001 — 권한 · 네트워크: 파일을 그대로 쓴다
+        print(f"[media_feed] 최근 묶음 개수 확인 실패, 파일 그대로: {type(e).__name__} {str(e)[:80]}")
+    return len(recent), late
 
 
 def load(day, days=7):
-    """edition(KST 묶음 날짜)이 day 부터 days 일 전까지인 영상 목록. 실패하면 []."""
+    """edition(KST 묶음 날짜)이 day 부터 days 일 전까지인 영상 목록. 실패하면 [].
+    수집기 Storage 파일을 받는다 — 날짜 파일 캐시의 updatedAt 이 index.json 과 같으면 받지 않는다(위 주석)."""
     path = os.environ.get("MEDIA_FEED_JSON")
     if path:
         with open(path, encoding="utf-8") as f:
@@ -105,37 +247,91 @@ def load(day, days=7):
         return d["items"] if isinstance(d, dict) else d
     d0 = datetime.date.fromisoformat(day)
     editions = [(d0 - datetime.timedelta(days=i)).isoformat() for i in range(days + 1)]
-    try:
-        from google.cloud.firestore_v1.base_query import FieldFilter
-        docs = _client().collection("summaries").where(filter=FieldFilter("edition", "in", editions)).stream()
-        out = []
-        for doc in docs:
-            r = doc.to_dict() or {}
-            r["id"] = doc.id
-            out.append(r)
-        print(f"[media_feed] 영상 {len(out)}개 ({editions[-1]} ~ {editions[0]})")
-        return out
-    except Exception as e:  # noqa: BLE001 — 키 없음 · 패키지 없음 · 네트워크: 방송 줄 없이 간다
-        print(f"[media_feed] 읽기 실패 — 방송 줄 없이: {str(e)[:120]}")
-        return []
+    now = datetime.datetime.now(KST)
+    today = now.date()
+    cur = (now + datetime.timedelta(hours=12)).date()   # 수집기 edition_day — 묶음은 낮 12시에 바뀐다(전날 12:00 ~ 오늘 11:59 = 오늘)
+    if d0 == today and cur > d0:
+        editions.insert(0, cur.isoformat())   # 오후 실행: 12시 뒤에 받은 영상은 `내일` 묶음 — 옛 코드는 이걸 안 읽어 21:45 홈 뉴스 · 16:10 한국 종목이 그날 오후 방송을 놓쳤다 (2026-11-16 확인)
+    settled = (today - datetime.timedelta(days=2)).isoformat()   # 예비(Firestore) 때 날짜 파일을 믿는 범위 (그제 이전)
+    cdir = _cache_dir()
+    got = {ed: _MEM[ed] for ed in editions if ed in _MEM}
+    n_mem, n_file, n_dl, n_none, n_read, n_chk, n_late = len(got), 0, 0, 0, 0, 0, 0
+    need = [ed for ed in editions if ed not in got]
+    index = _feed_index() if need else None
+    if index is not None:
+        for ed in need:
+            meta = index["editions"].get(ed)
+            if not meta:   # 수집 기록이 없는 날 (주말 · 발행 전)
+                got[ed] = _MEM[ed] = []
+                n_none += 1
+                continue
+            uat = meta.get("updatedAt")
+            c = _cache_read(cdir, ed) if cdir else None
+            if c is not None and uat and c.get("updatedAt") == uat:
+                got[ed] = _MEM[ed] = c["items"]
+                n_file += 1
+                continue
+            d = _feed(f"{FEED_PREFIX}/editions/{ed}.json")
+            if isinstance(d, dict) and isinstance(d.get("items"), list):
+                items = _jsonable(d["items"])
+                got[ed] = _MEM[ed] = items
+                n_dl += 1
+                if cdir:
+                    _cache_write(cdir, ed, items, uat)
+            elif c is not None:   # 받기 실패 — 옛 날짜 파일이라도 (조금 늦은 내용이 빈칸보다 낫다)
+                got[ed] = _MEM[ed] = c["items"]
+                n_file += 1
+        n_chk, n_late = _check_recent(editions, got, today)
+        need = [ed for ed in editions if ed not in got]   # 여기 남은 것 = 파일 받기 실패 · 캐시 없음 · 파일이 늦은 최근 묶음 → Firestore 로
+    elif need:   # 예비 — 옛 방식: 그제 이전은 날짜 파일(updatedAt 상관없이)
+        for ed in need:
+            c = _cache_read(cdir, ed) if cdir and ed <= settled else None
+            if c is not None:
+                got[ed] = _MEM[ed] = c["items"]
+                n_file += 1
+        need = [ed for ed in editions if ed not in got]
+    if need:
+        try:
+            fresh = _firestore_editions(need)
+            for ed, items in fresh.items():
+                got[ed] = _MEM[ed] = items
+                n_read += len(items)
+                if cdir and ed <= settled:
+                    _cache_write(cdir, ed, items, None)   # updatedAt 없음 — Storage 가 돌아오면 다시 받는다
+        except Exception as e:  # noqa: BLE001 — 키 없음 · 패키지 없음 · 네트워크: 방송 줄 없이 간다(받은 날짜만)
+            print(f"[media_feed] 예비 Firestore 읽기 실패, 방송 줄 없이: {str(e)[:120]}")
+            if not got:
+                return []
+    if cdir and (n_dl or n_read):
+        _cache_prune(cdir, today)
+    out = [dict(r) for ed in editions for r in got.get(ed, [])]   # 얕은 복사 — 부르는 쪽이 고쳐도 _MEM 은 그대로
+    print(f"[media_feed] 영상 {len(out)}개 ({editions[-1]} ~ {editions[0]}) / Storage 받기 {n_dl}일 · 날짜 파일 {n_file}일"
+          f" · 실행 안 재사용 {n_mem}일 · 기록 없는 날 {n_none}일 · 최근 묶음 개수 확인 {n_chk}일 · 파일 늦음 {n_late}일 · Firestore 읽기 {n_read}개")
+    return out
 
 
 _GROUPS = None
 
 
 def channel_groups():
-    """채널 ID → 묶음 — 'required'(필수) · 'kr'(한국 증시 채널) · 'main'(미국 일반). 수집기 Firestore `channels` 표의 required · limitGroup 을 읽는다.
-    사용자가 수집기에서 채널을 더하거나 묶음을 바꾸면 여기는 손대지 않아도 따라온다 (2026-10-25: 한국 증시 채널 6개 추가). 못 읽으면 {} (모두 main)."""
+    """채널 ID → 묶음 — 'required'(필수) · 'kr'(한국 증시 채널) · 'main'(미국 일반). 수집기 채널 표의 required · limitGroup 을 읽는다.
+    사용자가 수집기에서 채널을 더하거나 묶음을 바꾸면 여기는 손대지 않아도 따라온다 (2026-10-25: 한국 증시 채널 6개 추가). 못 읽으면 {} (모두 main).
+    읽는 곳 = Storage feed/channels.json (2026-11-16), 못 받으면 예비로 Firestore `channels`."""
     global _GROUPS
     if _GROUPS is None:
         _GROUPS = {}
         if not os.environ.get("MEDIA_FEED_JSON"):
-            try:
-                for d in _client().collection("channels").stream():
-                    c = d.to_dict() or {}
-                    _GROUPS[d.id] = "required" if c.get("required") else (c.get("limitGroup") or "main")
-            except Exception as e:  # noqa: BLE001
-                print(f"[media_feed] 채널 표 읽기 실패 — 모두 미국 일반으로: {str(e)[:80]}")
+            d = _feed(f"{FEED_PREFIX}/channels.json")
+            if isinstance(d, dict) and isinstance(d.get("items"), list):
+                rows = [(c.get("id"), c) for c in d["items"] if isinstance(c, dict) and c.get("id")]
+            else:
+                rows = []
+                try:
+                    rows = [(x.id, x.to_dict() or {}) for x in _client().collection("channels").stream()]
+                except Exception as e:  # noqa: BLE001
+                    print(f"[media_feed] 채널 표 읽기 실패, 모두 미국 일반으로: {str(e)[:80]}")
+            for cid, c in rows:
+                _GROUPS[cid] = "required" if c.get("required") else (c.get("limitGroup") or "main")
     return _GROUPS
 
 

@@ -122,6 +122,18 @@ jobs:
         with:
           python-version: '3.12'
 
+      # 방송 요약 날짜 파일 캐시 (experiments/media_feed.py, 2026-11-16 수집기 요청 News-doc/블로그-Firestore-읽기-줄이기.md).
+      # 그제 이전 edition 만 들어 있다 — 실행마다 Firestore 는 오늘 · 어제 묶음만 읽는다. 키 = 워크플로 · KST 날짜(하루 한 번 저장, 날짜가 바뀌면 전날 것을 이어 받는다)
+      - name: Media feed day key
+        id: mfkey
+        run: echo "d=$(TZ=Asia/Seoul date +%F)" >> "$GITHUB_OUTPUT"
+      - name: Restore media feed cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/alphascope-media
+          key: media-feed-${{ github.workflow }}-${{ steps.mfkey.outputs.d }}
+          restore-keys: media-feed-${{ github.workflow }}-
+
       # 수집 · 그래프는 nvda-report 의 의존성(yfinance · matplotlib · requests), 게시는 daily-report 의 publish_blogger(google-auth)
       - name: Install dependencies
         run: |
