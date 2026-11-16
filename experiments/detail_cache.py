@@ -50,6 +50,8 @@ class DetailCache:
     # ---------------------------------------------------------------- 칸 값
     def get(self, sym, field):
         x = (self.stocks.get(sym) or {}).get(field)
+        if x and field == "analysts" and isinstance(x["v"], dict):   # 애널리스트 등급 = 받은 날 기준 — 화면이 `11.10 기준`으로 적는다 (2026-11-16 사용자)
+            return dict(x["v"], asof=x["day"])
         return x["v"] if x else None
 
     def age(self, sym, field):

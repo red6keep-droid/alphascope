@@ -399,14 +399,14 @@ def earnings_tab(s):
 
 def opinions_tab(s):
     cells = s.get("analysts") or []
-    ps = RP._picks(s) if RP.PICKS else []   # 방송에서 이 종목을 짚은 의견 — 있을 때만 카드 (2026-11-15 사용자 "있을 때만")
+    ps = RP._picks(s) if RP.PICKS else []   # 방송에서 이 종목을 짚은 의견
     if not cells and not s.get("broker") and not ps and not (RP.NEWS and RP._news_opinions(s)):
         return ""
     keep = R.picks_card
-    if not ps:
-        R.picks_card = _no_picks   # 방송 의견이 없으면 카드 자체를 뺀다 (빈 답 금지)
+    if not ps and not MEDIA_OK:
+        R.picks_card = _no_picks   # 방송 자료를 못 읽었으면 카드 없이 — 읽었는데 없으면 정식처럼 `없음` 카드 (2026-11-16 사용자, 옛 11-15 "있을 때만")
     try:
-        return R.opinions_cards(s["name"], cells, s.get("close"), ps or None, lambda v: f"${v:,.2f}", lambda: RP.together_items(s),
+        return R.opinions_cards(s["name"], cells, s.get("close"), ps if (ps or MEDIA_OK) else None, lambda v: f"${v:,.2f}", lambda: RP.together_items(s),
                                 broker=s.get("broker") or [], news_ops=RP._news_opinions(s) if RP.NEWS else None, closes=[b["close"] for b in (RP.BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]])
     finally:
         R.picks_card = keep
@@ -443,10 +443,13 @@ def full_group(radar_dir):
     return group, {s: rev[s] for s in group if s in rev}, {s: {"eps": cache.get(s, "eps")} for s in group if cache.get(s, "eps")}
 
 
+MEDIA_OK = False   # 방송 자료를 실제로 읽었나 — 읽었을 때만 `방송 의견 없음` 카드를 둔다(안 읽고 없다고 말하지 않는다, 2026-11-16 사용자: 없어도 `없음` 카드)
+
+
 def media_inputs():
     """방송 이슈(24시간) · 방송 의견(최근 5거래일) — 정식 write_all 과 같은 읽기(Firestore, 읽기 전용 키 YTB_FIRESTORE_KEY). 키가 없거나 실패하면 ([], []) = 그 칸 없이."""
     import os as _os
-    if not (_os.environ.get("YTB_FIRESTORE_KEY") or _os.environ.get("MEDIA_FEED_JSON")):
+    if not (_os.environ.get("YTB_FIRESTORE_KEY") or _os.environ.get("MEDIA_FEED_JSON") or _os.environ.get("QUICK_MEDIA_LOCAL")):   # QUICK_MEDIA_LOCAL = 목업(PC 의 gcloud 기본 인증으로 읽기)
         print("[quick-us] 방송 자료 키 없음 — 방송 줄 · 방송 의견 없이")
         return [], []
     MF = RP.media_feed
@@ -454,6 +457,8 @@ def media_inputs():
         vids = MF.load(RP.NOW.astimezone(MF.KST).strftime("%Y-%m-%d"), days=R.PICK_DAYS - 1)
         iss, ps = MF.issues(MF.rows(vids), RP._since()), MF.picks(vids, RP.PICK_SINCE)
         print(f"[quick-us] 방송 영상 {len(vids)} · 이슈 {len(iss)} · 종목 의견 {len(ps)}")
+        global MEDIA_OK
+        MEDIA_OK = True
         return iss, ps
     except Exception as e:  # noqa: BLE001
         print(f"[quick-us] 방송 자료 실패 — 없이: {str(e)[:100]}")

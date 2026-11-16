@@ -193,6 +193,8 @@ def analysts(sym, extra):
     cells = [{"key": k, "value": a[k]} for k in ("pt_mean", "pt_median", "pt_high", "pt_low") if a.get(k)]
     if a.get("rating_counts"):
         cells.append({"key": "rating_counts", "value": a["rating_counts"]})
+        if a.get("asof"):   # 받은 날(detail_cache) — 의견 그래프 제목 오른쪽 `11.10 기준`
+            cells.append({"key": "asof", "value": a["asof"]})
     return cells
 
 

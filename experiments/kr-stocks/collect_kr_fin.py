@@ -44,7 +44,26 @@ ITEMS = {
     "stock_in": (("CF",), ("ifrs-full_ProceedsFromIssuingShares",), r"^(주식의?발행|유상증자)", "cum"),
     "lease": (("CF",), ("ifrs-full_PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities",), r"^리스부채의?(상환|지급)", "cum"),
     "cash": (("BS",), ("ifrs-full_CashAndCashEquivalents",), r"^현금및현금성자산", "inst"),
+    # 재무상태표 잔액 — `회사 살림은 튼튼한가?` (2026-11-16 사용자: 분기보고서에서 쓸 만한 것을 카드로). 같은 응답이라 호출 0
+    "liab": (("BS",), ("ifrs-full_Liabilities",), r"^부채총계$", "inst"),
+    "equity": (("BS",), ("ifrs-full_Equity",), r"^자본총계$", "inst"),
+    "inv": (("BS",), ("ifrs-full_Inventories",), r"^재고자산$", "inst"),
+    "recv": (("BS",), ("ifrs-full_CurrentTradeReceivables", "dart_ShortTermTradeReceivable", "ifrs-full_TradeAndOtherCurrentReceivables"), r"^(매출채권|매출채권및기타(유동)?채권)", "inst"),
 }
+# 여러 줄을 더하는 잔액 — 빌린 돈(차입금 · 사채, 리스 빼고) · 미리 받은 돈(계약부채) · 바로 쓸 수 있는 돈(현금 · 단기 예금 · 단기 투자). 표준 ID 먼저, 없으면 이름(ID 가 표준이 아닌 줄만)
+SUMS = {
+    "borrow": ({"ifrs-full_ShorttermBorrowings", "ifrs-full_CurrentPortionOfLongtermBorrowings", "ifrs-full_CurrentBorrowingsAndCurrentPortionOfNoncurrentBorrowings",
+                "ifrs-full_LongtermBorrowings", "ifrs-full_NoncurrentPortionOfNoncurrentBondsIssued", "ifrs-full_NoncurrentPortionOfNoncurrentLoansReceived",
+                "ifrs-full_BondsIssued", "ifrs-full_CurrentPortionOfNoncurrentBondsIssued", "ifrs-full_NoncurrentPortionOfNoncurrentBorrowings",
+                "ifrs-full_CurrentPortionOfNoncurrentBorrowings", "dart_ShortTermBorrowings", "dart_LongTermBorrowingsGross", "dart_BondsIssued",
+                "dart_CurrentPortionOfBonds", "dart_CurrentPortionOfLongTermBorrowings"},
+               r"^(단기차입금|장기차입금|사채|유동성장기부채|유동성사채|유동성장기차입금|유동성차입금|차입금|사채및차입금|유동성사채및단기차입금)$"),
+    "contract": ({"ifrs-full_CurrentContractLiabilities", "ifrs-full_ContractLiabilities", "ifrs-full_NoncurrentContractLiabilities"}, r"^(유동|비유동)?(계약부채|초과청구공사)$"),
+    "liquid": ({"ifrs-full_CashAndCashEquivalents", "ifrs-full_ShorttermDepositsNotClassifiedAsCashEquivalents", "dart_ShortTermDepositsNotClassifiedAsCashEquivalents",
+                "ifrs-full_CurrentFinancialAssetsAtFairValueThroughProfitOrLoss"}, r"^(현금및현금성자산|단기금융상품|단기예금)$"),
+}
+FIN_VER = 2   # 2 = 재무상태표 줄(SUMS · liab ~ recv)까지 — 옛 보고서(1)는 한 번 다시 받는다 (하루 BACKFILL 회사 상한)
+BACKFILL = 40
 ABS_KEYS = {"capex", "div", "buyback", "stock_in", "lease"}   # 유출 · 유입 금액 — 부호 없이
 ZERO_IF_REPORTED = {"div", "buyback", "stock_in", "lease", "debt_in", "debt_out"}   # 보고서는 있는데 줄이 없으면 0 (미국 ZERO_WHEN_ABSENT 와 같은 뜻)
 # 차입 · 사채 줄 (현금흐름표 재무활동) — 이름으로만. 이자 · 리스 · 재무활동 합계 줄은 뺀다
@@ -97,6 +116,30 @@ def _debt(rows):
     return out if hit else {}
 
 
+def _sums(rows):
+    """SUMS 잔액 — {이름: 합 또는 None}. 같은 ID 가 두 번(연결 · 별도 섞임) 나오면 한 번만."""
+    out = {}
+    for k, (ids, pat) in SUMS.items():
+        seen, tot, hit = set(), 0.0, False
+        for x in rows:
+            if x.get("sj_div") != "BS":
+                continue
+            aid, nm = x.get("account_id") or "", _norm(x.get("account_nm"))
+            std = aid.startswith(("ifrs-full_", "dart_"))
+            if (aid in ids) if std else re.search(pat, nm):
+                key = aid if std else nm
+                v = D._amount(x.get("thstrm_amount"))
+                if key in seen or v is None:
+                    continue
+                seen.add(key)
+                tot += v
+                hit = True
+        out[k] = tot if hit else None
+    if out.get("borrow") is None and any(x.get("sj_div") == "BS" for x in rows):
+        out["borrow"] = 0.0   # 재무상태표는 있는데 차입 줄이 없다 = 빌린 돈 0 (크래프톤처럼 사채 · 차입이 없는 회사)
+    return out
+
+
 def _report(key, corp, year, rc):
     """보고서 하나 → {"v": {항목: [thstrm, add]}, "debt": {...}, "rcept": 접수번호, "fs": CFS|OFS} 또는 {"none": 오늘, "status": 코드}."""
     last = None
@@ -110,8 +153,10 @@ def _report(key, corp, year, rc):
                 x = _pick(rows, item)
                 if x:
                     v[k] = [D._amount(x.get("thstrm_amount")), D._amount(x.get("thstrm_add_amount"))]
+            for k, x in _sums(rows).items():
+                v[k] = [x, None]
             if v:
-                return {"v": v, "debt": _debt(rows), "rcept": rows[0].get("rcept_no"), "fs": fs}
+                return {"v": v, "debt": _debt(rows), "rcept": rows[0].get("rcept_no"), "fs": fs, "ver": FIN_VER}
         if last not in ("013", "000"):   # 013 = 자료 없음 → 별도 재무제표로. 그 밖(키 · 한도 오류)은 바로 멈춘다
             break
         time.sleep(0.2)
@@ -132,6 +177,8 @@ def _rows(mine, today):
             v, prev = rep["v"], (reps.get(prev_rc) if prev_rc else None)
             prev_ok = i == 0 or (prev is not None and "v" in prev)   # 1분기는 앞 보고서가 필요 없다
             row = {"start": f"{year}-{('01-01', '04-01', '07-01', '10-01')[i]}", "end": f"{year}-{mmdd}", "cq": f"{year}Q{i + 1}"}
+            for k in SUMS:   # 잔액 — 그 분기 끝 값 그대로
+                row[k] = (v.get(k) or [None])[0]
             for k, (_, _, _, kind) in ITEMS.items():
                 a = v.get(k)
                 if kind == "inst":
@@ -179,7 +226,7 @@ def run():
     key = D._key()
     today = datetime.date.today()
     cache = D._load(CACHE)
-    calls = 0
+    calls = backfilled = 0
     if key:
         codes = D.corp_codes(key)
         for sym, *_ in U.CANDIDATES:
@@ -187,13 +234,20 @@ def run():
             if not corp:
                 continue
             mine = cache.setdefault(corp, {})
+            old = any("v" in r and r.get("ver", 1) < FIN_VER for r in mine.values() if isinstance(r, dict))
+            if old and backfilled >= BACKFILL:
+                old = False   # 오늘 몫을 다 썼다 — 옛 보고서는 다음 실행에
+            backfilled += old
             for year in range(today.year - D.YEARS + 1, today.year + 1):
                 for rc, mmdd in D.REPORTS:
                     if datetime.date.fromisoformat(f"{year}-{mmdd}") >= today:
                         continue
                     k = f"{year}-{rc}"
                     got = mine.get(k)
-                    if got and ("v" in got or got["none"] >= (today - datetime.timedelta(days=RETRY_DAYS)).isoformat()):
+                    due = datetime.date.fromisoformat(f"{year}-{mmdd}") + datetime.timedelta(days=90 if rc == "11011" else 45)   # 법정 제출 기한
+                    near = -5 <= (today - due).days <= 20   # 기한 앞뒤엔 매일 다시 묻는다 — 11-12 에 `없음` 이 남아 삼성전자 · NAVER 3분기가 11-19 까지 빠질 뻔했다 (2026-11-16)
+                    if got and ("v" in got and (got.get("ver", 1) >= FIN_VER or not old)
+                                or "v" not in got and got["none"] >= ((today if near else today - datetime.timedelta(days=RETRY_DAYS))).isoformat()):
                         continue
                     mine[k] = _report(key, corp, year, rc)
                     calls += 1
@@ -209,7 +263,7 @@ def run():
         if rows:
             out[sym] = rows
     n_cf = sum(1 for v in out.values() if any(r.get("ocf") is not None for r in v[-4:]))
-    print(f"[dart-fin] 호출 {calls}번 · 손익 · 현금흐름 표 {len(out)}종목 (최근 4분기 영업현금흐름 {n_cf}종목)")
+    print(f"[dart-fin] 호출 {calls}번 · 재무상태표 다시 받은 회사 {backfilled} · 손익 · 현금흐름 표 {len(out)}종목 (최근 4분기 영업현금흐름 {n_cf}종목)")
     return out
 
 

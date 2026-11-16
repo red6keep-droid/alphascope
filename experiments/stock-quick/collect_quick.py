@@ -420,8 +420,20 @@ def main():
         FK.earn_kr(cache, ref["kr"], q_kr, key=first_key("DART_API_KEY"))
         lap("한국 잠정실적 날짜")
         us_earn = (FU._load(os.path.join(cache, "earn_us.json"), {}) or {}).get("rows") or {}   # 미국 간단 실행(아침)이 받아 둔 실적 달력 — 새로 부르지 않는다
+        try:   # 잠정실적 숫자 — 7일 공시 목록에 잠정실적 줄이 보인 회사만 원문 1회, 캐시에 없는 회사는 처음 한 번 목록(하루 60곳). AI 0 (2026-11-16 사용자)
+            import dart_prelim
+            cmap = (FU._load(os.path.join(cache, "kr", "dart_corp.json"), {}) or {}).get("map") or {}
+            render_kr_mod = sys.modules.get("render_kr")
+            pre = dart_prelim.run([s.split(".")[0] for s in q_kr], cmap, disc_by, cache_path=os.path.join(cache, "kr", "dart_prelim.json"))
+            if render_kr_mod:
+                render_kr_mod.PRELIM.clear()
+                render_kr_mod.PRELIM.update(pre)
+        except Exception as e:  # noqa: BLE001
+            print(f"::warning::[quick] 잠정실적 건너뜀: {e!r}")
+        lap("한국 잠정실적 숫자")
         for c, h in FK.build(ref["kr"], bars_kr, flows, hist_full, det, dd, hq, only=set(kr_syms),
-                             related=lambda s, e: rel(s, e, "KR"), extra_today=xtra, caps=caps, us_earn=us_earn).items():
+                             related=lambda s, e: rel(s, e, "KR"), extra_today=None, caps=caps, us_earn=us_earn,
+                             disc=lambda s: (files.get(s) or {}).get("disc") or []).items():   # 최근 공시 = 기업 탭 끝 (2026-11-16 사용자, 옛 오늘 탭 끝)
             pages[("kr", c)] = h
         lap("한국 화면")
     except LookupError as e:

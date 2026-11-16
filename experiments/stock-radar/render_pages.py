@@ -1071,7 +1071,7 @@ def card_capex(c, L=US_MONEY):
     if c.get("debt") is not None:
         lines.append(("row", "장기 부채", M(c["debt"]), f"{R._fd(c['end'])} 기준"))
     if c.get("src"):
-        lines.append(("row", "출처", f'<a href="{_esc(c["src"])}" target="_blank" rel="noopener" style="color:inherit;">{L["src"]} {_esc(c.get("form") or L["form"])} ›</a>', L["src_note"], True))
+        lines.append((R.src_line(L["src_note"], c["src"], f'{L["src"]} {c.get("form") or L["form"]}'), "html"))   # 출처 = 느낌표 회색 한 줄, 보고서 이름만 굵게 링크 (2026-11-16 사용자)
     # 긴 용어 풀이 툴팁 (2026-11-03 사용자: "너무 헷갈리니 매출 · 순이익 · 영업으로 번 돈 · 잉여 현금 · 설비 투자 · 배당 · 현금을 예를 들어 아주 자세히") — 가이드라인 2-6 길이 규칙의 예외.
     # 예는 한 회사의 한 분기(억 달러)로 숫자를 이어 간다 : 매출 100 → 순이익 20 → 영업으로 번 돈 30 → 설비 투자 12 → 잉여 현금 18 → 배당 · 자사주 10 → 현금 잔액 58. 매출 카드 툴팁의 예와 같은 숫자
     tip = (f"회사가 번 돈을 어디에 쓰고, 모자란 돈을 어떻게 끌어오는지, 회사가 {L['stmt']} 그대로. 용어가 헷갈리기 쉬워 한 회사의 한 분기를 예로 든다({L['unit']})\n"

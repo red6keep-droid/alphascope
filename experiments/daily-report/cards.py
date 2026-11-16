@@ -353,8 +353,13 @@ def link_list_card(title, state, items, note, noun, shown=5):
     items = [(제목, 주소, 날짜 글, 출처 글)] 전부 싣고 앞 shown 줄만 펼침, 나머지는 `○○ n건 더 보기` (2026-11-16 사용자 — 상한으로 버리지 않기, 옛 3건 자르기)."""
     if not items:
         return ""
-    rows = [dk.crow(f'<a href="{esc(u)}" target="_blank" rel="noopener" style="color:#111;text-decoration:none;font-weight:400;">{esc(t)}</a>',
-                    esc(d), sub=esc(src) if src else "", first=not i) for i, (t, u, d, src) in enumerate(items)]
+    def link(it):
+        t, u = it[0], it[1]
+        if len(it) > 4 and it[4]:   # 같은 글 안 카드로 — (탭, 카드 제목). 실적 공시는 원문 대신 실적 탭 카드로 (2026-11-16 사용자)
+            tab, card = it[4]
+            return f'<span role="link" tabindex="0" data-goto-tab="{esc(tab)}" data-goto-card="{esc(card)}" style="color:#111;cursor:pointer;font-weight:400;">{esc(t)}</span>'
+        return f'<a href="{esc(u)}" target="_blank" rel="noopener" style="color:#111;text-decoration:none;font-weight:400;">{esc(t)}</a>'
+    rows = [dk.crow(link(it), esc(it[2]), sub=esc(it[3]) if it[3] else "", first=not i) for i, it in enumerate(items)]
     lines = [(rows_fold(rows, shown, f"{noun} {len(items) - shown}건 더 보기"), "html"), (note, "note")]
     return question_card(title, state, "neutral", "#111", lines)
 
@@ -364,7 +369,13 @@ def _kday(iso):
     return f"{int(m)}월 {int(d)}일"
 
 
+_EARN_FILING = re.compile(r"(분기보고서|반기보고서|사업보고서|영업\(잠정\)실적)")
+
+
 def disclosure_card(disc):
-    """`최근 공시는?` — 한국 정식 · 간단 종목 오늘 탭 끝. disc = [{t, d: YYYY-MM-DD, u}] 최근 7일(새것 먼저), 없으면 ""."""
-    return link_list_card("최근 공시는?", _kday(disc[0]["d"]) if disc else "", [(x["t"], x["u"], _kday(x["d"]), "") for x in disc or []],
-                          "금융감독원 전자공시(DART)에 올라온 최근 7일 공시입니다. 누르면 원문으로 갑니다.", "공시")
+    """`최근 공시는?` — 한국 정식 · 간단 종목 기업 탭 끝(2026-11-16 사용자, 옛 오늘 탭 끝). disc = [{t, d: YYYY-MM-DD, u}] 최근 7일(새것 먼저), 없으면 "".
+    실적 공시(분기 · 반기 · 사업보고서 · 잠정실적)는 원문 대신 실적 탭 `회사는 돈을 더 벌고 있나?` 로 — 숫자를 그 카드에 담았다."""
+    items = [(x["t"], x["u"], _kday(x["d"]), "실적 탭에 담았습니다" if _EARN_FILING.search(x["t"]) else "",
+              ("실적", "회사는 돈을 더 벌고 있나?") if _EARN_FILING.search(x["t"]) else None) for x in disc or []]
+    return link_list_card("최근 공시는?", _kday(disc[0]["d"]) if disc else "", items,
+                          "금융감독원 전자공시(DART)에 올라온 최근 7일 공시입니다. 실적 공시는 실적 탭으로, 나머지는 원문으로 갑니다.", "공시")
