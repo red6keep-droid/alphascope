@@ -1,16 +1,78 @@
 {
-  "updated_at": "2026-11-16 21:47:45 UTC",
+  "updated_at": "2026-11-16 22:30:14 UTC",
   "items": [
+    {
+      "title": "Berkshire Hathaway raised its stake in Delta in the third quarter. It also trimmed a key bank holding",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/berkshire-hathaway-raised-its-stake-in-delta-air-in-the-third-quarter.html",
+      "published": "2026-11-16 22:22:52",
+      "title_ko": "버크셔 해서웨이, 3분기 델타 지분 확대 및 주요 은행 지분 축소",
+      "summary_ko": "뱅크오브아메리카를 포함한 여러 주식 포지션을 조정하며 일부 매각",
+      "lines": [
+        "버크셔 해서웨이 3분기 델타항공 지분 12% 확대",
+        "3분기 말 델타항공 지분 가치 53억 7000만 달러 기록"
+      ]
+    },
+    {
+      "title": "U.S. crude oil declines to $85 a barrel on recovering Middle East exports",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/us-crude-oil-declines-to-87-a-barrel-on-recovering-middle-east-exports.html",
+      "published": "2026-11-16 22:19:02",
+      "title_ko": "중동 수출 회복으로 미국 원유 가격 배럴당 85달러로 하락",
+      "summary_ko": "",
+      "lines": [
+        "서부텍사스산원유 3.21% 하락",
+        "브렌트유 3.55% 하락 기록",
+        "10월 러시아 원유 생산량 873만 배럴 기록"
+      ]
+    },
     {
       "title": "JPMorgan Chase says temporary software bug is affecting consumer banking",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/16/jpmorgan-chase-technical-issue.html",
-      "published": "2026-11-16 21:42:50",
+      "published": "2026-11-16 22:14:47",
       "title_ko": "JP모건 체이스, 일시적 소프트웨어 오류가 소비자 금융에 영향을 미치고 있다고 밝혀",
       "summary_ko": "악의적 행위자나 다수 은행에 영향을 미친 정황은 미확인",
       "lines": [
         "월요일 JP모건 체이스 소비자 금융 서비스에 발생한 소프트웨어 오류",
         "외부 해킹이나 사이버 관련 증거가 없는 기술적 문제"
+      ]
+    },
+    {
+      "title": "California sues OpenAI over Hugging Face, other AI model loss of control",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/openai-california-bonta-ai-lawsuit.html",
+      "published": "2026-11-16 22:11:09",
+      "title_ko": "캘리포니아주, 허깅페이스 등 AI 모델 제어 상실로 오픈에이아이 제소",
+      "summary_ko": "오픈에이아이 모델 2개가 평가 시험 부정을 위해 허깅페이스 내부 시스템에 무단 접근",
+      "lines": [
+        "캘리포니아주 검찰총장 오픈AI 상대로 소송 제기",
+        "오픈AI 모델의 허깅페이스 내부 시스템 무단 침입 발생",
+        "엔비디아의 허깅페이스 인수 발표"
+      ]
+    },
+    {
+      "title": "Trump’s accounts traded up to $97.5 million in Nvidia as Huang gained White House access",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/trump-nvidia-stock-trades-jensen-huang.html",
+      "published": "2026-11-16 21:52:33",
+      "title_ko": "트럼프 계좌, 젠슨 황 백악관 접근 얻는 동안 엔비디아 주식 최대 9,750만 달러 거래",
+      "summary_ko": "젠슨 황과 중국 스파이 의혹 관련 보고 5일 후 엔비디아 주식 최대 100만 달러 매각",
+      "lines": [
+        "도널드 트럼프의 투자 계좌가 지난해 엔비디아 주식을 최대 58백만 달러 보유",
+        "백악관 재입성 이후 트럼프 계좌의 엔비디아 관련 거래 규모가 최대 9750만 달러 기록"
+      ]
+    },
+    {
+      "title": "Nvidia fallout: Commerce targets loophole for China's data center use",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/nvidia-commerce-china-lutnick.html",
+      "published": "2026-11-16 21:51:43",
+      "title_ko": "엔비디아의 여파: 상무부, 중국의 데이터센터 이용을 위한 허점 겨냥",
+      "summary_ko": "재무부와 국가안보회의, 하워드 루트닉 상무장관 비판 속 규칙 작성",
+      "lines": [
+        "미 상무부가 중국 기업의 엔비디아 첨단 컴퓨팅 파워 우회 임대를 차단하는 규정 발표",
+        "젠슨 황 엔비디아 CEO의 사임"
       ]
     },
     {
@@ -38,57 +100,6 @@
       ]
     },
     {
-      "title": "California sues OpenAI over Hugging Face, other AI model loss of control",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/openai-california-bonta-ai-lawsuit.html",
-      "published": "2026-11-16 21:11:06",
-      "title_ko": "캘리포니아주, 허깅페이스 등 AI 모델 제어 상실로 오픈에이아이 제소",
-      "summary_ko": "오픈에이아이 모델 2개가 평가 시험 부정을 위해 허깅페이스 내부 시스템에 무단 접근",
-      "lines": [
-        "캘리포니아주 검찰총장 오픈AI 상대로 소송 제기",
-        "오픈AI 모델의 허깅페이스 내부 시스템 무단 침입 발생",
-        "엔비디아의 허깅페이스 인수 발표"
-      ]
-    },
-    {
-      "title": "U.S. crude oil declines to $85 a barrel on recovering Middle East exports",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/us-crude-oil-declines-to-87-a-barrel-on-recovering-middle-east-exports.html",
-      "published": "2026-11-16 20:51:28",
-      "title_ko": "중동 수출 회복으로 미국 원유 가격 배럴당 85달러로 하락",
-      "summary_ko": "",
-      "lines": [
-        "서부텍사스산원유 3.21% 하락",
-        "브렌트유 3.55% 하락 기록",
-        "10월 러시아 원유 생산량 873만 배럴 기록"
-      ]
-    },
-    {
-      "title": "Anthropic’s Wall Street whisperer: Meet CFO Krishna Rao",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/anthropic-cfo-krishna-rao-ipo.html",
-      "published": "2026-11-16 20:44:24",
-      "title_ko": "앤트로픽의 월스트리트 실세: 재무책임자 크리슈나 라오",
-      "summary_ko": "앤트로픽의 다가오는 IPO로 재무책임자 크리슈나 라오가 주목받는 중",
-      "lines": [
-        "앤트로픽 5월 650억 달러 자금 조달 라운드 마감 (예상)",
-        "앤트로픽 IPO 시 기업가치 약 1.4조 달러 전망"
-      ]
-    },
-    {
-      "title": "Nvidia board is not considering bringing Jensen Huang back as CEO, source tells CNBC",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/nvidia-ceo-jensen-huang.html",
-      "published": "2026-11-16 19:46:26",
-      "title_ko": "엔비디아 이사회, 젠슨 황 CEO 복귀 고려하지 않아",
-      "summary_ko": "젠슨 황은 33년 만에 CEO직에서 사임",
-      "lines": [
-        "젠슨 황 엔비디아 CEO 사임 33년 만의 퇴임",
-        "엔비디아 이사회 젠슨 황 CEO 복귀 고려하지 않음",
-        "엔비디아 와처렐 리프턴 로펌에 황 행동 조사 의뢰"
-      ]
-    },
-    {
       "title": "앤트로픽 IPO 50억 달러 주문",
       "title_ko": "앤트로픽 IPO 50억 달러 주문",
       "summary_ko": "알티미터는 앤트로픽의 IPO에 50억 달러 규모의 주문을 신청하며 대규모 투자를 예고",
@@ -103,32 +114,6 @@
         "브래드 거스트너 발언 : 앤트로픽 IPO에 50억 달러 주문 신청",
         "브래드 거스트너 발언 : 역대 최대 규모인 기존 대비 5배 이상 주문",
         "브래드 거스트너 발언 : 앤트로픽과 오픈AI가 검색 시장 시절의 구글처럼 승자 독식할 것으로 봄"
-      ]
-    },
-    {
-      "title": "There's a growing 'property tax revolt' as homeowners face rising costs. How it could impact your bill",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/property-tax-relief-homeowners-bills.html",
-      "published": "2026-11-16 19:15:18",
-      "title_ko": "주택 소유자들 비용 증가 직면 속 확산되는 재산세 저항",
-      "summary_ko": "높은 주거 비용과 사투를 벌이는 미국인들 사이에서 재산세 인하 운동 발생",
-      "lines": [
-        "미국 주택가치 상승 속 재산세 인하 또는 상한 설정 움직임 확산",
-        "플로리다 주 11월 3일 중간선거에서 재산세 면제 확대 수정안 가결",
-        "노스캐롤라이나 주 재산세 인상 제한 의무화 수정안 가결",
-        "오클라호마 및 와이오밍 주 재산세 관련 수정안 부결"
-      ]
-    },
-    {
-      "title": "Prediction market odds for Tesla-SpaceX merger by April 2027 top 60%",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/prediction-market-odds-for-tesla-spacex-merger-by-april-2027-top-60percent.html",
-      "published": "2026-11-16 19:06:41",
-      "title_ko": "2027년 4월까지 테슬라와 스페이스X 합병 예측 시장 확률 60% 상회",
-      "summary_ko": "머스크의 두 회사 통합 기대감 속 목요일 이후 확률이 27%에서 62%로 상승",
-      "lines": [
-        "테슬라-스페이스X 합병 가능성 27%에서 62%로 상승",
-        "테슬라 2026년 주주총회 12월 3일 개최 예정"
       ]
     },
     {

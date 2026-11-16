@@ -1,40 +1,4 @@
 {
- "e33d7f6b8276": {
-  "lines": [
-   "젠슨 황이 1993년 공동 설립한 엔비디아의 핵심 인물로 자리매김",
-   "엔비디아가 글로벌 최고 가치 기업 중 하나로 성장"
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-09T21:48:26.400859+00:00",
-  "n_src": 153
- },
- "5b022f4240fc": {
-  "lines": [
-   "10월 CPI 헤드라인 수치 0.3% 상승 전망",
-   "10월 근원 CPI 수치 0.2% 상승 전망"
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-09T21:48:26.400859+00:00",
-  "n_src": 109
- },
- "f79a2376468d": {
-  "lines": [
-   "칠드런스 플레이스, 챕터 11 파산보호 신청",
-   "12월 9일까지 새 소유주 입찰 접수 예정"
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-09T21:48:26.400859+00:00",
-  "n_src": 124
- },
- "4148c5070368": {
-  "lines": [
-   "펩시코, 북미 지역 약 1,000명 감원 계획",
-   "북미 사업 부진 대응 및 본토 시장 매출 회복 목적"
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-09T21:48:26.400859+00:00",
-  "n_src": 133
- },
  "c6fdad5d65b9": {
   "lines": [
    "트럼프 대통령, 2020년 대선 패배 정당성 의문 제기",
@@ -3927,7 +3891,7 @@
  },
  "e37abfc0f60f": {
   "lines": [
-   "로버트 패틴슨 신임 제임스 본드 캐스팅"
+   "로버트 패틴슨이 차기 제임스 본드 배우로 캐스팅"
   ],
   "tags": [
    {
@@ -3940,8 +3904,9 @@
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T21:46:39.635517+00:00",
-  "n_src": 900
+  "at": "2026-11-16T22:30:12.119916+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "5382338fb58f": {
   "lines": [
@@ -4009,11 +3974,25 @@
   "n_src": 900
  },
  "c889827fe017": {
-  "lines": [],
-  "tags": [],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-16T21:46:44.071750+00:00",
-  "n_src": 361
+  "lines": [
+   "일라이릴리의 비만치료제 외 분야 신규 계약 체결"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "LLY"
+    ],
+    "sector": "XLV",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T22:30:14.151847+00:00",
+  "n_src": 361,
+  "retry": true
  },
  "92c77f149bab": {
   "lines": [
@@ -4150,5 +4129,107 @@
   "model": "groq:qwen/qwen3.8-27b",
   "at": "2026-11-16T21:47:45.394995+00:00",
   "n_src": 308
+ },
+ "3871cc67e044": {
+  "lines": [
+   "유나이티드항공 월요일 출발 항공편 시스템 장애 발생"
+  ],
+  "tags": [
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T22:30:10.508946+00:00",
+  "n_src": 900
+ },
+ "6757fc86f70b": {
+  "lines": [
+   "버크셔 해서웨이 3분기 델타항공 지분 12% 확대",
+   "3분기 말 델타항공 지분 가치 53억 7000만 달러 기록"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T22:30:10.508946+00:00",
+  "n_src": 900
+ },
+ "81e420a7570a": {
+  "lines": [
+   "오픈에이아이 안전성 평가 위해 독립 평가사 4곳과 계약 체결"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T22:30:10.508946+00:00",
+  "n_src": 900
+ },
+ "f5b40b49f970": {
+  "lines": [
+   "도널드 트럼프의 투자 계좌가 지난해 엔비디아 주식을 최대 58백만 달러 보유",
+   "백악관 재입성 이후 트럼프 계좌의 엔비디아 관련 거래 규모가 최대 9750만 달러 기록"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T22:30:12.119916+00:00",
+  "n_src": 900
+ },
+ "e23b92262f9e": {
+  "lines": [
+   "미 상무부가 중국 기업의 엔비디아 첨단 컴퓨팅 파워 우회 임대를 차단하는 규정 발표",
+   "젠슨 황 엔비디아 CEO의 사임"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T22:30:12.119916+00:00",
+  "n_src": 900
  }
 }
