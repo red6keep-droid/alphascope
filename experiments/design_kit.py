@@ -1030,6 +1030,15 @@ def _logo_files():
 LOGO_VER = "2"   # 로고 파일을 바꾸면 올린다 — 브라우저가 옛 로고를 7일 간 들고 있다 (2026-11-15: 바탕 네모 흰색으로 바꿈)
 
 
+# 로고 없는 종목 배지 바탕 = 차분한 세 가지를 돌려 쓴다 (2026-11-16 사용자 "회색은 좀 그래, 너무 튀지 않게 세 가지 정도"). (바탕, 글자)
+# 증감(빨강 · 파랑) · 주인공(주황) · 일정(보라)과 겹치지 않는 색. 같은 종목 = 늘 같은 색(티커 · 코드 글자 코드 합 % 3) — 테마 JS(제목 배지)도 같은 셈
+BADGE_COLORS = (("#D7EFEA", "#0F6B5E"), ("#E4EDD8", "#46602A"), ("#F0E7D6", "#7A5A22"))   # 청록 · 올리브 · 모래
+
+
+def badge_color(key):
+    return BADGE_COLORS[sum(ord(c) for c in str(key or "")) % len(BADGE_COLORS)]
+
+
 def ticker_logo(sym, size=20):
     """종목 이름 앞 둥근 로고 (2026-10-13 사용자: "각각의 종목명에도 티커 아이콘").
     2026-10-21: 제3자 핫링크(financialmodelingprep)를 빼고 티커 두 글자 배지로 바꿨다 (D4-6).
@@ -1045,8 +1054,9 @@ def ticker_logo(sym, size=20):
                 f'background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;">')   # 모든 로고 = 흰 바탕 + 회색 외곽선 — 바탕 없는 로고를 회색으로 채우니 크기가 제각각으로 보였다 (2026-11-15 사용자, 옛: 회색 바탕 · 흰 로고만 외곽선 11-11)
     txt = sym.replace("-", "").replace(".", "")[:2]
     fs = max(8, int(size * 0.42))
+    bg, fg = badge_color(sym.split(".")[0])
     return (f'<span aria-hidden="true" style="display:inline-block;width:{size}px;height:{size}px;line-height:{size}px;border-radius:50%;'
-            f'vertical-align:-4px;margin-right:6px;background:#E2E8F0;color:#334155;font-size:{fs}px;font-weight:700;text-align:center;'
+            f'vertical-align:-4px;margin-right:6px;background:{bg};color:{fg};font-size:{fs}px;font-weight:700;text-align:center;'
             f'letter-spacing:0;white-space:nowrap;overflow:hidden;">{txt}</span>')
 
 
@@ -1059,8 +1069,9 @@ def name_logo(sym, name="", size=24):
         return ticker_logo(s, size).replace("display:inline-block;", "display:inline-block;flex:none;", 1).replace("vertical-align:-4px;", "").replace("margin-right:6px;", "margin-right:8px;")
     if not name:
         return ""
+    bg, fg = badge_color(s.split(".")[0] if s else name)
     return (f'<span aria-hidden="true" style="display:inline-block;flex:none;width:{size}px;height:{size}px;line-height:{size}px;border-radius:50%;margin-right:8px;'
-            f'background:#E2E8F0;color:#334155;font-size:{max(8, size // 2)}px;font-weight:700;text-align:center;">{esc(str(name)[:1])}</span>')
+            f'background:{bg};color:{fg};font-size:{max(8, size // 2)}px;font-weight:700;text-align:center;">{esc(str(name)[:1])}</span>')
 
 
 def link_icon(url, label):
