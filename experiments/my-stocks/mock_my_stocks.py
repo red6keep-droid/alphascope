@@ -365,16 +365,17 @@ MOCK_JS = ("<script>(function(){function go(){var b=document.querySelector('[dat
 
 def picker_js(st):
     """종목 칸 찾기 (2026-11-12 사용자: 이름을 치면 종목을 찾아 주기). 실제 블로그는 검색 창이 이미 읽는 색인(search/us.json · kr.json, jsDelivr)을 그대로 쓴다 —
-    새 파일 · 새 요청 없음. 목업은 같은 색인(이름 · 코드 · 별명 a)을 페이지에 넣어 흉내. 2글자부터 · 최대 6개 · 입력 칸 위로 펼침(칸이 화면 아래 고정이라)."""
+    새 파일 · 새 요청 없음. 목업은 같은 색인(이름 · 코드 · 별명 a)을 페이지에 넣어 흉내. 한 글자부터 · 맞는 것 전부(칸 안 스크롤, 2026-11-16 사용자 — 검색 창 미리보기와 같은 규칙) · 입력 칸 위로 펼침(칸이 화면 아래 고정이라).
+    실제 블로그에 붙일 때는 search.js 의 ASSearch.attachSuggest(정식 · 간단 종목 전부 names.json)를 쓴다."""
     rows = [{"n": x["n"], "c": x["s"].split(".")[0], "m": x["m"], "a": [str(v).lower() for v in x.get("a", [])],
              "l": dk.ticker_logo(x["s"], 22)} for x in st.values()]
     data = json.dumps(rows, ensure_ascii=False).replace("</", "<\\/")
     return ("<script>(function(){var S=" + data + ";"
             "function norm(t){return String(t||'').toLowerCase().replace(/\\s+/g,'');}"
             "function find(q){q=norm(q);if(q.length<1)return[];var out=[];S.forEach(function(x){var hit=norm(x.n).indexOf(q)>=0||x.c.toLowerCase().indexOf(q)===0||x.a.some(function(a){return norm(a).indexOf(q)===0;});"
-            "if(hit)out.push(x);});out.sort(function(a,b){return (norm(a.n).indexOf(q)===0?0:1)-(norm(b.n).indexOf(q)===0?0:1);});return out.slice(0,6);}"
+            "if(hit)out.push(x);});out.sort(function(a,b){return (norm(a.n).indexOf(q)===0?0:1)-(norm(b.n).indexOf(q)===0?0:1)||norm(a.n).length-norm(b.n).length;});return out;}"
             "document.querySelectorAll('[data-ms-stock]').forEach(function(inp){var box=document.createElement('div');"
-            "box.style.cssText='position:absolute;left:0;bottom:calc(100% + 4px);z-index:5;min-width:240px;background:#fff;border:1px solid #E2E8F0;border-radius:10px;box-shadow:0 6px 20px rgba(15,23,42,.12);overflow:hidden;display:none;';"
+            "box.style.cssText='position:absolute;left:0;bottom:calc(100% + 4px);z-index:5;min-width:240px;max-height:320px;overflow-y:auto;background:#fff;border:1px solid #E2E8F0;border-radius:10px;box-shadow:0 6px 20px rgba(15,23,42,.12);display:none;';"
             "inp.parentNode.appendChild(box);"
             "function close(){box.style.display='none';}"
             "inp.addEventListener('input',function(){var r=find(inp.value);box.innerHTML='';if(!r.length){close();return;}"

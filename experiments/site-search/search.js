@@ -46,6 +46,105 @@
     return doc;
   }
 
+  /* ---------- 검색어 미리보기 (2026-11-16 사용자: "삼" 한 글자만 써도 종목이 미리 뜨게 — 종목 검색 입력창 전부) ----------
+     목록 = 정식 · 간단 종목 전부의 이름 · 티커 · 주소(names.json, 간단 실행이 매일 Cloudflare Pages 에). 값은 없다 — 즉답은 위 색인.
+     못 받으면 즉답 색인의 정식 종목만으로 띄운다. 맞는 것 전부 — 목록 칸 안에서 스크롤(상한으로 버리지 않기) */
+  var NAMES_URL = 'https://alpha-scope.pages.dev/names.json';
+  var namesP = null;
+  function loadNames() {
+    if (!namesP) {
+      namesP = (window.AS_SEARCH_NAMES ? Promise.resolve(window.AS_SEARCH_NAMES) : fetchJson(NAMES_URL))
+        .then(function (d) { return d.stocks || []; })
+        .catch(function () {   // 예비 = 즉답 색인(정식 종목)
+          namesP = null;
+          return loadIndex().then(function (doc) {
+            return doc.stocks.map(function (x) { return { n: x.n, t: x.s.split('.')[0], m: x.m, u: x.u, f: 1, a: x.a }; });
+          });
+        })
+        .then(function (rows) {
+          rows.forEach(function (r) {
+            r._n = norm(r.n);
+            r._k = [r._n, norm(r.t)].concat(r.e ? [norm(r.e)] : [], (r.a || []).map(norm));
+          });
+          return rows;
+        });
+    }
+    return namesP;
+  }
+  function norm(t) { return String(t || '').toLowerCase().replace(/[\s·.,\-()]/g, ''); }
+  /* 맞추기: 한글 이름은 어디든 들어 있으면(삼 → 삼성전자 · 대한삼성…), 티커 · 코드 · 영문 · 줄임말은 앞에서부터.
+     순서: 이름이 그 글자로 시작 → 시가총액 큰 순(한국) → 종목 분석 페이지가 있는 종목 → 이름 짧은 순 */
+  function suggest(rows, q) {
+    q = norm(q);
+    if (!q) return [];
+    var hit = rows.filter(function (r) {
+      return r._n.indexOf(q) >= 0 || r._k.some(function (k, i) { return i > 0 && k.indexOf(q) === 0; });
+    });
+    return hit.sort(function (a, b) {
+      var pa = a._n.indexOf(q) === 0 ? 0 : 1, pb = b._n.indexOf(q) === 0 ? 0 : 1;
+      return pa - pb || (b.c || 0) - (a.c || 0) || (b.f || 0) - (a.f || 0) || a._n.length - b._n.length;
+    });
+  }
+  /* 입력창 하나에 미리보기 목록을 단다 — onPick(종목) 은 고른 뒤 할 일. 모든 종목 검색 입력창이 이것을 쓴다 */
+  function attachSuggest(input, onPick) {
+    var box = document.createElement('ul');
+    box.className = 'as-suggest';
+    box.setAttribute('role', 'listbox');
+    box.hidden = true;
+    input.setAttribute('aria-autocomplete', 'list');
+    var at = input.form || input;   // 입력창이 폼 안(가로 줄)이면 폼 바로 아래에
+    at.parentNode.insertBefore(box, at.nextSibling);
+    var items = [], cur = -1;
+    function close() { box.hidden = true; cur = -1; }
+    function mark(i) {
+      cur = i;
+      [].forEach.call(box.children, function (li, k) { li.classList.toggle('on', k === i); });
+      if (i >= 0 && box.children[i]) box.children[i].scrollIntoView({ block: 'nearest' });
+    }
+    function show() {
+      var q = input.value;
+      if (!norm(q)) { close(); return; }
+      loadNames().then(function (rows) {
+        if (input.value !== q) return;   // 그사이 더 쳤으면 버린다
+        items = suggest(rows, q);
+        if (!items.length) { close(); return; }
+        box.innerHTML = items.map(function (r, i) {
+          return '<li role="option" data-i="' + i + '"><span class="as-sg-n">' + esc(r.n) + '</span><span class="as-sg-t">'
+            + (r.m === 'us' ? '미국' : '한국') + ' · ' + esc(r.t) + '</span></li>';
+        }).join('');
+        box.hidden = false;
+        cur = -1;
+      });
+    }
+    input.addEventListener('input', show);
+    input.addEventListener('focus', show);
+    input.addEventListener('keydown', function (e) {
+      if (box.hidden) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); mark(Math.min(cur + 1, items.length - 1)); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); mark(Math.max(cur - 1, -1)); }
+      else if (e.key === 'Enter' && cur >= 0) { e.preventDefault(); var r = items[cur]; close(); onPick(r); }
+      else if (e.key === 'Escape') { e.stopPropagation(); close(); }
+    });
+    box.addEventListener('mousedown', function (e) { e.preventDefault(); });   // 누르는 동안 입력창 포커스 유지
+    box.addEventListener('click', function (e) {
+      var li = e.target.closest('li[data-i]');
+      if (!li) return;
+      var r = items[+li.getAttribute('data-i')];
+      close();
+      onPick(r);
+    });
+    input.addEventListener('blur', function () { setTimeout(close, 150); });
+    return { close: close };
+  }
+  /* 즉답 색인에 없는 종목(간단 종목)을 질문에서 찾는다 — 가장 긴 이름부터. 페이지 버튼으로 안내 */
+  function pageMatches(rows, q) {
+    var f = norm(q), got = [];
+    rows.slice().sort(function (a, b) { return b._n.length - a._n.length; }).forEach(function (r) {
+      if (r._n.length >= 2 && f.indexOf(r._n) >= 0 && !got.some(function (g) { return g._n.indexOf(r._n) >= 0; })) got.push(r);
+    });
+    return got;
+  }
+
   /* ---------- 판별 ---------- */
   var INTENTS = [   // [이름, 낱말] — 여러 개 걸리면 모두 보인다
     ['price', /주가|현재가|얼마|가격|종가|시세|price/],
@@ -485,6 +584,12 @@
     document.body.appendChild(layer);
     var form = layer.querySelector('form'), input = form.q, out = layer.querySelector('.as-search-out'), clr = layer.querySelector('.as-clear');
     function syncClear() { clr.hidden = !input.value; }
+    var sg = attachSuggest(input, function (r) {   // 고른 종목: 즉답 색인에 있으면 즉답, 없으면(간단 종목) 그 종목 페이지로
+      loadIndex().then(function (doc) {
+        if (doc.stocks.some(function (x) { return x.s.split('.')[0] === r.t && x.m === r.m; })) run(r.n);
+        else location.href = r.u;
+      }, function () { location.href = r.u; });
+    });
     input.addEventListener('input', syncClear);
     clr.addEventListener('click', function () { input.value = ''; syncClear(); input.focus(); });
 
@@ -494,10 +599,21 @@
       input.value = q;
       syncClear();
       out.innerHTML = '<p class="as-note">찾는 중…</p>';
+      sg.close();
       loadIndex().then(function (doc) {
         var a = answer(doc, q, false);
         out.innerHTML = '<section class="as-answer">' + a.html + '</section><section class="as-related"></section>';
         fillRelated(out.querySelector('.as-related'), q, a.stocks);
+        if (!a.stocks.length && !a.c.market) {   // 즉답 색인 밖 종목(간단 종목) — 그 종목 페이지로 (2026-11-16)
+          loadNames().then(function (rows) {
+            var hit = pageMatches(rows, q);
+            if (hit.length && input.value.trim() === q) {
+              out.querySelector('.as-answer').innerHTML = hit.map(function (r) {
+                return outBtn(r.n + ' 주가', r.u, (r.m === 'us' ? '미국' : '한국') + ' · ' + r.t);
+              }).join('');
+            }
+          }, function () {});
+        }
       }, function () {
         out.innerHTML = '<p class="as-note">종목 자료를 불러오지 못했습니다.</p><section class="as-related"></section>';
         fillRelated(out.querySelector('.as-related'), q, []);
@@ -537,6 +653,7 @@
     document.body.appendChild(fab);
     document.body.appendChild(pane);
     var log = pane.querySelector('.as-log'), form = pane.querySelector('form');
+    attachSuggest(form.q, function (r) { form.q.value = r.n + ' '; form.q.focus(); });   // 질문하기도 같은 미리보기 — 고르면 이름을 넣고 이어 쓰게
 
     function say(who, html) {
       var b = document.createElement('div');
@@ -608,6 +725,6 @@
     var cq = new URLSearchParams(location.search).get('chat');   // 목업 시험용: ?chat=삼성전자 실적 — 질문하기 창을 그 질문으로 연다
     if (cq && chat) chat.open(cq);
   }
-  window.ASSearch = { classify: classify, findStocks: findStocks, answer: answer, loadIndex: loadIndex };
+  window.ASSearch = { classify: classify, findStocks: findStocks, answer: answer, loadIndex: loadIndex, loadNames: loadNames, suggest: suggest, attachSuggest: attachSuggest };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
