@@ -194,7 +194,7 @@ def tab_holdings(f, src_note="", link=None, name="", at_note=""):
     note = dk.muted(src_note) if src_note else ""
     if link and note:   # 운용사 출처 = 카드 아래 오른쪽 정렬 (2026-11-16 사용자)
         note = note.replace("@링크@", f'<a href="{dk.esc(link[1])}" style="color:inherit;text-decoration:underline;" target="_blank" rel="nofollow noopener">{dk.esc(link[0])}</a>')
-        note = note.replace(dk.GUIDE_IND, "text-align:right;", 1)
+        note = note.replace(dk.GUIDE_IND, "text-align:right;", 1).replace(dk.INFO_ICON, "", 1)   # 아이콘 없이 (2026-11-16 사용자)
     lead_html = f'<p style="{dk.TAB_LEAD_GAP}color:#111;line-height:33px;word-break:keep-all;">{dk.esc(lead)}</p>'
     if at_note:   # 기준일 = 카드 오른쪽 위 작은 회색 (2026-11-16 사용자) — 문장 → 카드 27 은 그대로(문장 아래 8 + 기준일 19 + 0)
         lead_html = (lead_html.replace(dk.TAB_LEAD_GAP, dk.TAB_LEAD_GAP.replace(" 27px;", " 8px;"), 1)
@@ -308,7 +308,7 @@ def compare_card(sym, bars_all, kfund):
     # 제목 = 그래프 제목 꼴 ※ (구획 h2 · 밑줄 없이), 구성 탭 안 (2026-11-16 사용자 "구성에 넣고 아래 구분선 삭제, 당구장 표시 안내로")
     title = (f'<div style="margin:28px 0 {dk.CHART_TITLE_GAP}px;padding-left:{dk.ALIGN_PX}px;">{dk.CHART_TITLE}비슷한 ETF와 비교하면? '
              f'<span style="font-weight:400;font-size:{dk.TINY};color:{dk.NOTE};">(1년 수익률)</span></span></div>')
-    return title + card + dk.muted("같은 것을 담는 한국 상장 ETF 입니다. 1년 수익률은 분배금을 빼고 계산했습니다.")
+    return title + card + dk.muted("같은 것을 담는 한국 상장 ETF 입니다. 1년 수익률은 분배금을 빼고 계산했습니다.").replace(dk.INFO_ICON, "", 1)   # 아이콘 없이 (2026-11-16 사용자)
 
 
 def related(sym, live, href=None):
