@@ -113,33 +113,81 @@ def funds(market, syms):
 
 # ── 카드 ──
 
-def weight_rows(items):
-    """비중 줄 — 이름 · 막대 · %. 막대 길이 = 그 표 안 최대 비중 대비."""
-    mx = max(w for _, w in items) or 1
+SHOWN = 5   # 구성 줄 — 5개 펼침 + 나머지 `종목 n개 더 보기` (CLAUDE.md 독자 화면 목록 규칙, 2026-11-16 사용자: 구성 디자인 규칙대로)
+
+
+def _hold_sym(code):
+    """구성 줄의 종목 코드 → 우리 키. 한국 6자리 = 로고 · 페이지 목록에서 .KS / .KQ 를 찾는다, 미국 = 티커 그대로."""
+    c = str(code or "").strip().upper()
+    if c.isdigit() and len(c) == 6:
+        known = dk._logo_files()
+        pages = dk.stock_pages()
+        return next((c + x for x in (".KS", ".KQ") if c + x in known or c + x in pages), c + ".KS")
+    return c.replace(".", "-")
+
+
+def _hold_name(sym, raw):
+    """이름 — 한국 종목은 운용사 표기 그대로, 미국 종목은 한글 이름이 있으면 그것, 없으면 티커(긴 영문 회사명은 막대를 밀어낸다)."""
+    if sym.endswith((".KS", ".KQ")):
+        return raw
+    return NAME_KO.get(sym) or (sym if re.fullmatch(r"[A-Z][A-Z\-]{0,5}", sym) else raw)
+
+
+NAME_MAX = 150   # 이름 칸 최대 px — 320 본문에서 막대 칸이 100 넘게 남게. 넘는 이름은 끝 말줄임
+
+
+def _text_px(t, latin=10, wide=17):
+    """16px 굵은 글자 폭 추정 — 한글 · 한자 17, 그 밖 10 (Apple SD Gothic Neo 실측 근사, 숫자 9)."""
+    return sum(wide if ord(ch) > 0x2E80 else latin for ch in str(t)) + 2
+
+
+def weight_card(items):
+    """비중 막대 카드 — 이름 앞 로고(dk.name_logo) · 막대(가장 긴 이름 + 14 뒤에서 시작, 모두 같은 길이, dk.bar_row) · 비중 %.
+    items = [(우리 키, 이름, 비중)]. 막대 길이 = 이 카드 안 최대 비중 대비, 색 = 부호 없는 크기 주황(가이드라인 9절).
+    줄 전체 = 그 종목 페이지(있을 때, 가이드라인 10-9). 5개 펼침 + 나머지 카드 안 접기."""
+    if not items:
+        return ""
+    mx = max(w for _, _, w in items) or 1
+
+    def nm(sym, name):
+        logo = dk.name_logo(sym, name, 20) if sym else ""
+        return f'<span style="display:inline-flex;align-items:center;">{logo}{dk.esc(name)}</span>'
+    vals = [f"{w:.1f}%" for _, _, w in items]
+    # 칸 폭 = 숫자(px) — 줄마다 모든 이름을 숨겨 겹치는 dk.bar_widths 는 줄 수의 제곱(503줄 = 본문 1.2MB)이라. 이름 = 로고 28 + 글자 폭 추정, 최대 NAME_MAX
+    widths = (min(NAME_MAX, (28 if any(sy for sy, _, _ in items) else 0) + max(_text_px(n) for _, n, _ in items)), max(_text_px(v, 9) for v in vals))
     rows = []
-    for name, w in items:
-        bar = dk.hbar(w, mx, dk.CHART_MAIN, "72px")   # 줄 막대 = dk.hbar(10 · 모서리 3 · 바탕 #F1F5F9), 비중 = 주인공 크기 주황 (2026-11-14 그래프 통일, 옛 8 · 4 · 회색)
-        rows.append((name, f'{bar}<span style="font-variant-numeric:tabular-nums;">{w:.1f}%</span>', ""))
-    return dk.ccard(rows).replace('data-cards="1" ', "")
+    for i, ((sym, name, w), v) in enumerate(zip(items, vals)):
+        row = dk.bar_row(nm(sym, name), w / mx, dk.CHART_MAIN, v, widths, first=i in (0, SHOWN))
+        rows.append(dk.stock_row_link(row, sym))
+    return dk.card_of(rows, fold_at=SHOWN if len(rows) > SHOWN else None, noun="종목")
 
 
-def tab_holdings(f, src_note="", link=None):
-    """link = (글자, 주소) — src_note 안의 `@링크@` 자리를 출처 링크로 (muted 는 글자를 이스케이프한다)."""
-    """구획 제목마다 data-tab — 테마는 표시 없는 h2 를 첫 탭(오늘)으로 옮긴다 (2026-11-12 목업에서 `어떤 ETF 인가?` 가 오늘 탭에 나온 것)."""
+def tab_holdings(f, src_note="", link=None, name=""):
+    """구성 탭 (2026-11-16 사용자 "구성 쪽을 우리 디자인 규칙에 맞도록") — 기업 탭과 같은 틀: 탭 맨 위 문장(dk.TAB_LEAD_GAP) · 비중 막대 카드 · 출처 안내 줄.
+    한국 ETF = 운용사 구성 전부(n종목), 미국 ETF = 야후가 주는 상위 10종목뿐(그 밖은 야후에 없다 — 외부 한도).
+    link = (글자, 주소) — src_note 안의 `@링크@` 자리를 출처 링크로. 구획 제목마다 data-tab (테마는 표시 없는 h2 를 첫 탭으로 옮긴다)."""
     if not f or not f.get("top"):
         return ""
-    names = []
-    for s, n, w in f["top"]:
-        nm = NAME_KO.get(s, n)
-        chip = nm != s and not str(s).isdigit()   # 한국 종목(6자리 코드)은 이름만 — 코드 칩은 미국 티커에만
-        names.append((dk.esc(nm) + (f' <span style="font-size:14px;color:#6B7280;">{dk.esc(s)}</span>' if chip else ""), w))
-    top_sum = sum(w for _, w in names)
-    note = dk.muted(f"상위 10종목이 전체의 {top_sum:.0f}%입니다." + (" " + src_note if src_note else ""))
-    if link:
-        note = note.replace("@링크@", f'<a href="{dk.esc(link[1])}" style="color:inherit;text-decoration:underline;">{dk.esc(link[0])}</a>')
-    out = dk.section("무엇을 담고 있나?", weight_rows(names) + note, tab="구성")
+    items = []
+    for code, raw, w in f["top"]:
+        sym = _hold_sym(code)
+        items.append((sym, _hold_name(sym, raw), float(w)))
+    n_all = f.get("n") or 0
+    whole = n_all and len(items) >= n_all   # 전체 목록을 받았나 (한국 운용사 자료)
+    k = min(SHOWN, len(items))
+    top_k = sum(w for *_, w in items[:k])
+    who = dk.josa(name, "은") if name else "이 ETF 는"
+    if whole:
+        lead = f"{who} {n_all}종목을 담고 있습니다. 비중이 큰 {k}종목이 전체의 {top_k:.0f}%입니다."
+    else:
+        top10 = sum(w for *_, w in items)
+        lead = f"{who} 비중이 큰 {len(items)}종목에 전체의 {top10:.0f}%를 담고 있습니다."
+    note = dk.muted(src_note) if src_note else ""
+    if link and note:
+        note = note.replace("@링크@", f'<a href="{dk.esc(link[1])}" style="color:inherit;text-decoration:underline;" target="_blank" rel="nofollow noopener">{dk.esc(link[0])}</a>')
+    out = f'<p style="{dk.TAB_LEAD_GAP}color:#111;line-height:33px;word-break:keep-all;">{dk.esc(lead)}</p>' + weight_card(items) + note
     if f.get("sectors") and f["sectors"][0][1] < 99:
-        out += dk.section("업종 비중은?", weight_rows([tuple(x) for x in f["sectors"]]), tab="구성")
+        out += dk.section("업종 비중은?", weight_card([("", n, w) for n, w in f["sectors"]]), tab="구성")
     return out
 
 
@@ -162,28 +210,44 @@ def trade_value(bars, n=20):
     return sum(xs) / len(xs) if len(xs) >= n // 2 else None
 
 
+INFO_NAME_W = 98   # 기본 정보 이름 칸 — `따라가는 지수`(7자, 14px) 한 줄. 기업 탭 _info_rows 는 68(4자 이름)
+
+
+def info_rows(rows):
+    """이름 · 값 줄 묶음(흰 카드) — 기업 탭 기본 정보(render_kr._info_rows · render_pages.sec_company)와 같은 모양: 구분선 없이 14/22, 이름 회색 · 값 검정."""
+    out = "".join(f'<span style="display:flex;gap:12px;padding:3px 12px;font-size:{dk.TINY};line-height:22px;">'
+                  f'<span style="flex:0 0 {INFO_NAME_W}px;color:{dk.NOTE};white-space:nowrap;">{dk.esc(k)}</span>'
+                  f'<span style="flex:1 1 auto;min-width:0;color:#111;word-break:keep-all;overflow-wrap:anywhere;">{v}</span></span>' for k, v in rows if v)
+    pad = dk.SEP_GAP - dk.VP - 1 - 3
+    return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{dk.MULTI}padding:{pad}px 0;display:block;">{out}</span></div>'
+
+
 def tab_basic(sym, f, bars=None):
-    rows = [("따라가는 지수", dk.esc(E.BY_SYM[sym][2]), "")]
-    fam = (f or {}).get("family")
-    if fam:
-        rows.append(("운용사", dk.esc(FAMILY_KO.get(fam.split(" ")[0], fam)), ""))
-    if (f or {}).get("fee") is not None:
-        rows.append(("1년 보수", fee_text(f["fee"]), ""))
-    if (f or {}).get("aum"):
-        rows.append(("순자산", _big_usd(f["aum"]), ""))
-    if (f or {}).get("aum_krw"):
-        rows.append(("순자산", _big_krw(f["aum_krw"]), ""))
+    """기본 정보 탭 (2026-11-16 사용자 "기본 정보도 우리 디자인에 맞도록") — 기업 탭과 같은 틀: 탭 맨 위 소개 문장(따라가는 지수 + 풀이) · 흰 카드 이름 · 값 줄.
+    옛 `어떤 ETF 인가?` 제목 · 줄 카드 · 맨 아래 풀이 안내 줄 → 소개 문장으로."""
+    f = f or {}
+    name, idx = E.BY_SYM[sym][1], E.BY_SYM[sym][2]
+    why = E.EXPLAIN.get(idx, "")
+    if idx == "운용사 직접 운용":
+        lead = f"{dk.josa(name, '은')} 정해진 지수 없이 운용사가 종목을 고릅니다."
+    else:
+        lead = f"{dk.josa(name, '은')} {dk.josa(idx, '을')} 따라갑니다." + (f" {why}" if why else "")
+    kr = sym.endswith(".KS")
+    fam = f.get("family")
     tv = trade_value(bars) if bars else None
-    if tv:   # 사고팔기 쉬운가 (2026-11-13 P549) — 이미 받은 일봉만
-        rows.append(("하루 평균 거래대금", _big_krw(tv) if sym.endswith(".KS") else _big_usd(tv), "최근 20거래일"))
-    if (f or {}).get("since"):
-        rows.append(("상장일", f["since"].replace("-", ". ") + ".", ""))
-    if (f or {}).get("yield"):
-        rows.append(("분배금 수익률(1년)", f'{f["yield"] * 100:.2f}%', ""))
-    why = E.EXPLAIN.get(E.BY_SYM[sym][2])
-    src = (f or {}).get("source")
-    note = (why or "") + (f" 보수 · 순자산 출처 : {src}." if src else "")
-    return dk.section("어떤 ETF 인가?", dk.ccard(rows).replace('data-cards="1" ', "") + (dk.muted(note.strip()) if note.strip() else ""), tab="기본 정보")
+    sub = lambda t: f'<span style="display:block;color:{dk.NOTE};">{dk.esc(t)}</span>'   # noqa: E731 — 값 아래 회색 한 줄 (기업 탭 국민연금 줄과 같은 꼴)
+    rows = [("따라가는 지수", dk.esc(idx) if idx != "운용사 직접 운용" else "없음 (운용사가 직접 고름)"),
+            ("운용사", dk.esc(FAMILY_KO.get(fam.split(" ")[0], fam)) if fam else ""),
+            ("1년 보수", fee_text(f["fee"]) if f.get("fee") is not None else ""),
+            ("순자산", _big_usd(f["aum"]) if f.get("aum") else _big_krw(f["aum_krw"]) if f.get("aum_krw") else ""),
+            ("담은 종목", f"{f['n']:,}종목" if f.get("n") else ""),
+            ("하루 거래대금", ((_big_krw(tv) if kr else _big_usd(tv)) + sub("최근 20거래일 평균")) if tv else ""),   # 사고팔기 쉬운가 (2026-11-13 P549) — 이미 받은 일봉만
+            ("분배금 수익률", f'{f["yield"] * 100:.2f}%' + sub("최근 1년") if f.get("yield") else ""),
+            ("상장일", f["since"].replace("-", ". ") + "." if f.get("since") else ""),
+            ("상장", f"코스피 · 종목 코드 {E.key(sym)}" if kr else f"티커 {sym}")]
+    src = f.get("source")
+    note = dk.muted(f"보수 · 순자산 · 담은 종목은 {src} 자료입니다.") if src else ""
+    return f'<p style="{dk.TAB_LEAD_GAP}color:#111;line-height:33px;word-break:keep-all;">{dk.esc(lead)}</p>' + info_rows(rows) + note
 
 
 def theme_of(sym):
@@ -213,12 +277,21 @@ def compare_card(sym, bars_all, kfund):
         if f.get("aum_krw"):
             bits.append(f"순자산 {_big_krw(f['aum_krw'])}")
         name = E.BY_SYM[p][1]
-        nm = f"<b>{dk.esc(name)}</b>" if p == sym else f'<a href="{dk.esc(E.page_url(p))}" style="color:#111;">{dk.esc(name)}</a>'
+        nm = dk.esc(name) + (f' <span style="font-weight:400;font-size:14px;color:{dk.NOTE};">(이 ETF)</span>' if p == sym else "")
         sub = " · ".join(bits) + (f" · 따라가는 지수 {dk.esc(E.BY_SYM[p][2])}" if E.BY_SYM[p][2] != E.BY_SYM[sym][2] else "")
-        rows.append((nm, f"1년 {pct(r1)}", f'<span style="font-size:14px;color:#6B7280;">{sub}</span>' if sub else ""))
+        val = f'<span style="font-weight:400;font-size:14px;color:{dk.NOTE};">1년</span> {_R()._arrow(r1, 1)}'   # 증감 = ▲▼ + 색 (가이드라인 5절), 설명 글자는 숫자 앞
+        rows.append((nm, val, f'<span style="font-size:14px;color:{dk.NOTE};">{sub}</span>' if sub else "", p))
     if len(rows) < 2:
         return ""
-    return dk.section("비슷한 ETF와 비교하면?", dk.ccard(rows).replace('data-cards="1" ', "")
+    short = dk.short_values([r[:3] for r in rows])
+    parts = []
+    for i, (nm, val, sub, p) in enumerate(rows):
+        row = dk.crow(nm, val, sub, first=i == 0, short=short)
+        if p != sym:   # 다른 ETF 줄 전체 = 그 ETF 페이지 (가이드라인 10-9) — 이 ETF 줄은 링크 없이
+            row = row.replace("<span ", f'<span data-row-link="1" data-href="{dk.esc(E.page_url(p))}" ', 1)
+        parts.append(row)
+    card = f'<div style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(parts)}</span></div>'
+    return dk.section("비슷한 ETF와 비교하면?", card
                       + dk.muted("같은 것을 담는 한국 상장 ETF 입니다. 1년 등락은 분배금을 빼고 계산했습니다."), tab="기본 정보")
 
 
@@ -235,6 +308,12 @@ def related(sym, live, href=None):
     if pub == allx:
         return buttons(allx)
     return MOCK_ONLY[0] + buttons(allx) + MOCK_ONLY[1] + REAL_ONLY[0] + buttons(pub) + REAL_ONLY[1]
+
+
+def _R():
+    sys.path.insert(0, os.path.join(EXP, "nvda-report"))
+    import render_html as R
+    return R
 
 
 def pct(v):
@@ -370,7 +449,7 @@ def us_pages(snap, live, fund):
                      + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s)
                      + (f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{mv}</div>' if mv else "") + RP.sec_states(s))
             ind = RP.sec_industry_tab(s) if (s["sector_flow"] or s["industry_us"]) else ""
-            hold = tab_holdings(f)
+            hold = tab_holdings(f, name=name)
             body = (dk.price_stamp(s["day"], "US") + RP.lead(s)
                     + candle(name, b0, 2)   # 차트 = 탭 위 (2026-11-13 사용자)
                     + R._section("오늘", today, line=False, tab="오늘") + RP.sec_crash(s)
@@ -556,13 +635,13 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
             if kf.get("top") and not lev:
                 at = kf.get("at") or ""
                 src = f"{int(at[5:7])}월 {int(at[8:10])}일 기준입니다. 출처 : @링크@" if at else ""
-                hold = tab_holdings({"top": kf["top"], "sectors": []}, src, (kf.get("source") or "운용사", kf.get("url") or ""))
+                hold = tab_holdings({"top": kf["top"], "sectors": [], "n": kf.get("n")}, src, (kf.get("source") or "운용사", kf.get("url") or ""), E.BY_SYM[sym][1])
             elif not lev:   # 운용사 자료가 없을 때만 예전 길 — 같은 지수 미국 ETF 구성
                 twin = next((t[0] for t in E.US if t[2] == E.BY_SYM[sym][2]), None) if "미국" in E.BY_SYM[sym][1] else None
                 f = dict(us_fund.get(twin) or {}) if twin else {}
-                hold = tab_holdings(f, f"같은 지수를 따라가는 미국 상장 {twin} 기준입니다.") if twin else ""
+                hold = tab_holdings(f, f"같은 지수를 따라가는 미국 상장 {twin} 구성입니다.", name=E.BY_SYM[sym][1]) if twin else ""
             ind = (render_kr.card_sector_flow(s) + render_kr.card_industry_mood(s) + render_kr.card_industry_work(s) + render_kr.card_industry_money(s))
-            basic = {"family": KR_FAMILY.get(E.BY_SYM[sym][1].split(" ")[0]), "fee": kf.get("fee"), "aum_krw": kf.get("aum_krw"), "since": kf.get("since"),
+            basic = {"family": KR_FAMILY.get(E.BY_SYM[sym][1].split(" ")[0]), "fee": kf.get("fee"), "aum_krw": kf.get("aum_krw"), "since": kf.get("since"), "n": kf.get("n"),
                      "source": kf.get("source") if (kf.get("fee") is not None or kf.get("aum_krw")) else None}
             body += ((render_kr.R._section("업계상황", f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{ind}</div>', tab="업계상황") if ind else "")
                      + (render_kr.R._section("구성", hold, tab="구성") if hold else "")
@@ -632,7 +711,7 @@ def _list_rows(market, bars, syms):
         r = (c / p - 1) * 100 if p else 0.0
         pcol = C.UP if r > 0 else C.DOWN if r < 0 else "#111"
         price = f"${c:,.2f}" if market == "us" else f"{c:,.0f}원"
-        logo = dk.ticker_logo(sym) if market == "us" else ""   # 한국 ETF 는 로고 없이 (한국 목록의 배지는 종목 코드용)
+        logo = dk.ticker_logo(sym) if market == "us" or sym in dk._logo_files() else ""   # 한국 ETF = 운용사 로고 사본이 있을 때만 (2026-11-16, 숫자 코드 배지는 쓰지 않는다)
         left = (f'{logo}<a href="{dk.esc(E.page_url(sym))}" style="color:#111;text-decoration:none;">{dk.esc(E.BY_SYM[sym][1])}</a>'
                 f'<span style="display:block;padding-left:{26 if logo else 0}px;font-size:{dk.MICRO};line-height:20px;font-weight:400;color:{dk.NOTE};">'
                 f'{dk.esc(E.key(sym))} · {dk.esc(E.BY_SYM[sym][2])}</span>')

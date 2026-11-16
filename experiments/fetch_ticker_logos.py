@@ -8,7 +8,8 @@
 운영지침 4-6 (2026-10-22 사용자 결정으로 바꿈): 로고는 종목 식별 용도로만, 원래 모양 그대로, 우리 gh-pages 사본만 쓴다.
 없는 종목 · 삭제 요청이 온 종목은 design_kit.ticker_logo 가 티커 두 글자 배지로 그린다 (REMOVED 에 넣고 다시 돌린다).
 
-    python experiments/fetch_ticker_logos.py   # 그 뒤 gh-pages 에 images/logos/* 복사 · 푸시
+    python experiments/fetch_ticker_logos.py         # 그 뒤 gh-pages 에 images/logos/* 복사 · 푸시
+    python experiments/fetch_ticker_logos.py --etf   # ETF 로고만(운용사 로고 사본, 받기 없음) — 2026-11-16
 """
 
 import datetime
@@ -115,13 +116,43 @@ def main():
         with open(os.path.join(OUT, f"{fname}.{ext}"), "wb") as f:
             f.write(data)
         meta[sym] = {"file": f"{fname}.{ext}", "source": f"{REPO}@{COMMIT[:7]}", "fetched": today}
+    etf_logos(meta)
+    _save(meta)
+    print(f"로고 {len(meta)}개 받음 · 없음 {len(missing)}: {missing}")
+
+
+def etf_logos(meta):
+    """ETF 로고 = 운용사 로고 사본 (2026-11-16 사용자 "ETF 는 왜 티커 로고가 없어?"). 이미 받은 운용사(상장 계열사) 파일을 ETF 이름으로 복사한다 — 새로 받는 것 없음.
+    파일 이름 = 테마가 찾는 이름(etf_universe.logo_name): 한국 KR_<코드>, 미국 티커. 운용사 사본이 없는 ETF(뱅가드 등)는 배지 그대로."""
+    import shutil
+    sys.path.insert(0, BASE)
+    import etf_universe as E
+    n = 0
+    for sym in E.US_SYMS + E.KR_SYMS:
+        src = meta.get(E.issuer_logo(sym) or "")
+        if not src:
+            continue
+        ext = src["file"].rsplit(".", 1)[1]
+        fname = f"{E.logo_name(sym)}.{ext}"
+        shutil.copyfile(os.path.join(OUT, src["file"]), os.path.join(OUT, fname))
+        meta[sym] = {"file": fname, "source": f"운용사 로고 = {E.issuer_logo(sym)} 사본 ({src['source']})", "fetched": src["fetched"]}
+        n += 1
+    print(f"ETF 로고 {n}개 (운용사 로고 사본)")
+
+
+def _save(meta):
     os.makedirs(os.path.dirname(META), exist_ok=True)
     with open(META, "w", encoding="utf-8") as f:
         json.dump({"_note": "종목 로고 — 식별 용도. 각 로고는 해당 회사의 상표. 출처 MrChartist/global-stock-logos (TradingView 로고 서비스)",
                    "logos": dict(sorted(meta.items()))}, f, ensure_ascii=False, indent=1)
-    print(f"로고 {len(meta)}개 받음 · 없음 {len(missing)}: {missing}")
 
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    main()
+    if "--etf" in sys.argv:   # 받기 없이 ETF 사본만 — 기존 기록에 더한다
+        with open(META, encoding="utf-8") as f:
+            m = json.load(f)["logos"]
+        etf_logos(m)
+        _save(m)
+    else:
+        main()

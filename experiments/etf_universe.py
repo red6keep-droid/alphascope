@@ -108,6 +108,25 @@ def page_title(sym):
     return f"{nm} 주가" if sym.endswith(".KS") or sym in nm.split() else f"{nm} {sym} 주가"   # `인베스코 QQQ` 처럼 이름에 티커가 있으면 한 번만
 
 
+# ETF 로고 = 운용사 로고 (2026-11-16 사용자 "ETF 는 왜 티커 로고가 없어?" → Claude 설계: 증권사 앱 관행대로 상품 브랜드의 운용사 로고).
+# 우리 로고 사본(ref/ticker_logos.json, MrChartist/global-stock-logos) 중 운용사 · 그 금융 계열사가 상장사인 것만 — 이름 첫 낱말 → 그 상장사 키.
+# 뱅가드 · 반에크 · 디렉시온 · 프로셰어즈 · 아크는 비상장이라 사본이 없다 → 두 글자 배지 그대로(운영지침 4-6).
+ISSUER_LOGO = {"KODEX": "032830.KS",    # 삼성자산운용 — 삼성생명(모회사) 로고 = 삼성 금융 공통 CI
+               "TIGER": "006800.KS",    # 미래에셋자산운용 — 미래에셋증권 로고 = 미래에셋 그룹 CI
+               "ACE": "071050.KS",      # 한국투자신탁운용 — 한국금융지주 로고 = 한국투자 CI
+               "아이셰어즈": "BLK", "SPDR": "STT", "인베스코": "IVZ", "슈왑": "SCHW", "JP모건": "JPM"}
+
+
+def issuer_logo(sym):
+    """ETF → 운용사 로고 키 (없으면 None)."""
+    return ISSUER_LOGO.get(BY_SYM[sym][1].split(" ")[0])
+
+
+def logo_name(sym):
+    """gh-pages images/logos 안 ETF 로고 파일 이름(확장자 없이) — 테마가 제목에서 찾는 이름: 한국 = KR_<코드>(본문 data-kr-code), 미국 = 티커."""
+    return f"KR_{key(sym)}" if sym.endswith(".KS") else sym
+
+
 def same_tracks(sym):
     """같은 것을 따라가는 다른 ETF (함께 보는 페이지)."""
     return [t[0] for t in US + KR if t[2] == BY_SYM[sym][2] and t[0] != sym]
