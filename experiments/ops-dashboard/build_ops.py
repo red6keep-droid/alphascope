@@ -59,10 +59,13 @@ WORKFLOWS = [
 ]
 COMMENT_WF = "comment-reply.yml"
 
-# 하루 한도 (doc/운영/AI-모델-현황.md 7절). kind = req(요청 수) · tok(토큰)
+# 하루 한도 (doc/운영/AI-모델-현황.md 7 · 7-1절). kind = req(요청 수) · tok(토큰). 단계 이름 = llm_chain.STEPS 키 (운영 기록 usage 의 키)
+# llm_chain 에 새 단계를 넣으면 여기에도 한 줄 — 빠뜨려도 운영 기록에 나온 단계는 아래 ai_tab 이 `한도 표 없음` 줄로 따로 보여 준다
 MODELS = [
     ("Gemini flash", "gemini", "req", 20, "pt"),
-    ("Gemini lite", "gemini-lite", "req", 500, "pt"),
+    ("Gemini 3.5 lite", "gemini-lite", "req", 500, "pt"),
+    ("Gemini 3.1 lite", "gemini-lite31", "req", 500, "pt"),      # 2026-11-15 news-quick · kr-lead 첫 자리 (3.5 lite 와 따로 셈)
+    ("Gemma 4 26B", "gemma-26b", "req", 14_400, "pt"),            # 2026-11-15 news-quick 셋째. 실제 상한은 분당 토큰 1만 6천
     ("Groq gpt-oss", "groq", "tok", 200_000, "24h"),
     ("Groq Qwen", "groq-qwen", "tok", 200_000, "24h"),
     ("NVIDIA DeepSeek", "nvidia-deepseek", "req", 0, "24h"),
@@ -542,9 +545,12 @@ def ai_tab(now, recs2, I):
                 kind = (re.match(r"(검사 탈락|전부 실패|Gemini 실패|예비|대체|한도)", k) or [None, "그 밖"])[1]
                 events[kind] += n
     rows, heads, hot = [], [], []
-    names = [m[0] for m in MODELS]
+    known = {m[1] for m in MODELS}
+    extra = sorted({step for step, _ in used if step not in known})   # 운영 기록엔 있는데 MODELS 에 없는 단계 — 버리지 않고 한도 없이 보여 준다
+    models = MODELS + [(step, step, "req", 0, "24h") for step in extra]
+    names = [m[0] for m in models]
     vals = []
-    for name, step, kind, limit, w in MODELS:
+    for name, step, kind, limit, w in models:
         u = used[(step, w)]
         n = u[kind]
         if kind == "tok":
@@ -553,6 +559,7 @@ def ai_tab(now, recs2, I):
         else:
             v = f"{n:,} / {limit:,}회" if limit else f"{n:,}회"
             sub = (f"전체 {limit:,}회 · 쓴 {n:,}회 · 여유 {max(limit - n, 0):,}회 · 태평양 자정부터" if limit
+                   else "한도 표 없음 · build_ops MODELS 에 추가 필요 · 최근 24시간" if step in extra
                    else "하루 한도 표시 없음 · 예비 자리 · 최근 24시간")
         if u["old"] and kind == "tok":
             sub += " · 토큰 기록 전 실행 있음"
