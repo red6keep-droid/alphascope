@@ -252,7 +252,7 @@ def _num(v):
     return int(v) if v else None
 
 
-def shares(cache_path, corps, key=None, tag="kr"):
+def shares(cache_path, corps, key=None, tag="kr", minutes=None):
     """보통주 발행 주식 총수(주식의 총수 현황 stockTotqySttus) — 시가총액 = 이 수 × 종가(한국거래소 시가총액과 같은 셈, 자기주식 포함).
     corps = {sym: DART 회사 번호}. 가장 최근 정기 보고서부터 찾는다(1 · 3분기 보고서는 칸이 비어 오는 회사가 많아 반기 · 사업보고서로 넘어감).
     캐시 {sym: {"n": 주식 수, "at": 받은 날, "rp": "2026-11012"}} — SHARES_DAYS 마다 다시, 못 찾은 회사는 7일 뒤 다시. → {sym: 주식 수}"""
@@ -262,7 +262,11 @@ def shares(cache_path, corps, key=None, tag="kr"):
     y = today.year
     order = [(y, "11014"), (y, "11012"), (y, "11013"), (y - 1, "11011"), (y - 1, "11014"), (y - 1, "11012")]
     calls = got = 0
+    t0 = time.time()
     for sym, corp in sorted(corps.items()):
+        if minutes and time.time() - t0 > minutes * 60:   # 시간 상한(간단 종목) — 남은 회사는 다음 실행에, 받은 것은 저장 (2026-11-16)
+            print(f"[{tag}] 발행 주식 수 {minutes}분 넘음 — 나머지는 다음 실행에")
+            break
         e = cache.get(sym) or {}
         age = (today - datetime.date.fromisoformat(e["at"])).days if e.get("at") else None
         if age is not None and age < (SHARES_DAYS if e.get("n") else RETRY_DAYS):
