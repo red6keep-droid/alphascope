@@ -2203,8 +2203,23 @@ except Exception:  # noqa: BLE001
 MORE_SHOWN, MORE_STEP = 5, 10
 
 
-def more_list(items_html, noun="뉴스", shown=MORE_SHOWN, step=MORE_STEP, indent=0, first_top=2, sub=False, li_style=None):
-    """li_style = 줄이 제 여백 · 구분선을 이미 가진 목록(증권사 목표가 변경 줄)이면 li 꼴을 이것으로, 글자 크기도 줄에 맡긴다 (2026-11-16)."""
+EMPH_MORE_GAP = 12   # 강조 카드 안 더 보기 버튼 — 마지막 줄 ~ 버튼 (daily-report cards.MORE_GAP_TOP 과 같다)
+
+
+def emph_more_style(theme="neutral"):
+    """강조 카드 **안** 더 보기 버튼 꼴 = 카드 머리 접기 버튼(emph_fold_btn)을 카드 폭으로 늘린 것 (2026-11-08 사용자 P417, 미국 증시 리포트 `평소 범위 안 n개 더 보기`).
+    바탕 = 카드 바탕 20% 밝게 · 외곽선 = 카드 테두리 · 둥글기 7 · 높이 31 · 글자 · 화살표 = 검정에 카드 색 20%.
+    규칙(2026-11-16 사용자: "강조 카드 안에는 이 버튼을 써야 한다") — 강조 카드 안 더 보기는 흰 버튼(FOLD_BTN) 말고 이것."""
+    bg, bd = CARD_DIR[theme]
+    hue = FOLD_HUE.get(bd.upper())
+    ink = mix("#111111", hue, 0.2) if hue else "#111"
+    return (f"display:flex;align-items:center;justify-content:center;gap:4px;width:100%;height:{FOLD_BOX}px;box-sizing:border-box;"
+            f"background:{lighten(bg)};border:1px solid {bd};border-radius:{FOLD_RADIUS}px;color:{ink};font-size:14px;line-height:20px;font-weight:700;white-space:nowrap;")
+
+
+def more_list(items_html, noun="뉴스", shown=MORE_SHOWN, step=MORE_STEP, indent=0, first_top=2, sub=False, li_style=None, btn_theme=None):
+    """li_style = 줄이 제 여백 · 구분선을 이미 가진 목록(증권사 목표가 변경 줄)이면 li 꼴을 이것으로, 글자 크기도 줄에 맡긴다 (2026-11-16).
+    btn_theme = 강조 카드 안 목록이면 그 카드 테마 — 버튼이 emph_more_style 꼴(카드 색), 목록 · 버튼 아래 여백 0(카드 끝 여백은 카드가 맞춘다)."""
     items_html = [h for h in items_html if h]
     if not items_html:
         return ""
@@ -2213,9 +2228,12 @@ def more_list(items_html, noun="뉴스", shown=MORE_SHOWN, step=MORE_STEP, inden
                   f'<li{" hidden" if i >= shown else ""} style="margin:0;padding:{(RULE_GAP - NEWS_VP) if i else first_top}px {indent}px {bottom}px;line-height:{LH_BODY};{"box-shadow:inset 0 1px 0 #E2E8F0;" if i else ""}">{h}</li>'
                   for i, h in enumerate(items_html))
     fs = "" if li_style is not None else f"font-size:{SMALL};"
-    out = f'<ul data-more-list="1" data-shown="{shown}" data-step="{step}" data-noun="{esc(noun)}" style="margin:0 0 8px;padding:0;list-style:none;{fs}">{lis}</ul>'
+    out = f'<ul data-more-list="1" data-shown="{shown}" data-step="{step}" data-noun="{esc(noun)}" style="margin:0 0 {0 if btn_theme else 8}px;padding:0;list-style:none;{fs}">{lis}</ul>'
     rest = len(items_html) - shown
-    if rest > 0:
+    if rest > 0 and btn_theme:
+        out += (f'<button type="button" data-more-btn="1" data-qmore="1" style="{emph_more_style(btn_theme)}cursor:pointer;padding:0;font-family:inherit;margin:{EMPH_MORE_GAP}px 0 0;">'
+                f'<span>{esc(noun)} {min(step, rest)}건 더 보기</span>{ACC_CHEV}</button>')
+    elif rest > 0:
         out += (f'<button type="button" data-more-btn="1" style="{FOLD_BTN}width:100%;margin:0 0 8px;">'
                 f'<span>{esc(noun)} {min(step, rest)}건 더 보기</span> {ACC_CHEV}</button>')
     return out
