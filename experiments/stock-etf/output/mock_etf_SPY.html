@@ -4685,7 +4685,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var b = document.createElement('span'); b.className = 'title-logo title-badge'; b.setAttribute('aria-hidden', 'true');
           b.textContent = kr ? h.textContent.trim().charAt(0) : sym.replace(/[^A-Z]/g, '').slice(0, 2);
           /* 배지 바탕 = 차분한 세 가지 돌려 쓰기 (2026-11-16 사용자 "회색은 좀 그래") — design_kit.badge_color 와 같은 셈(티커 · 코드 글자 코드 합 % 3) */
-          (function () { var key = kr ? kr[1] : sym.split('.')[0], n = 0, C = [['#D7EFEA', '#0F6B5E'], ['#E4EDD8', '#46602A'], ['#F0E7D6', '#7A5A22']];
+          (function () { var key = kr ? kr[1] : sym.split('.')[0], n = 0, C = [['#2F6F68', '#FFFFFF'], ['#5B6B3A', '#FFFFFF'], ['#86683A', '#FFFFFF']];
             for (var i = 0; i < key.length; i++) n += key.charCodeAt(i); b.style.background = C[n % 3][0]; b.style.color = C[n % 3][1]; })();   /* 크기 · 여백은 테마 CSS .post-title .title-logo (build_theme.py) */
           host.insertBefore(b, host.firstChild);
           /* 2026-10-22 사용자: 로고는 신뢰도 — 우리 gh-pages 사본이 있으면 배지 자리를 로고로 바꾼다. 없으면 배지 그대로 (운영지침 4-6) */
