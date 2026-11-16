@@ -1,11 +1,42 @@
 {
-  "updated_at": "2026-11-15 21:46:07 UTC",
+  "updated_at": "2026-11-16 01:23:10 UTC",
   "items": [
+    {
+      "title": "Japan's economy unexpectedly contracts in third-quarter as elevated energy costs bite",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/japan-q3-gdp-energy-oil-prices.html",
+      "published": "2026-11-16 01:02:48",
+      "title_ko": "일본 경제, 치솟은 에너지 비용 타격으로 3분기에 예기치 않게 위축",
+      "summary_ko": "9월 가계 에너지 보조금 만료",
+      "lines": [
+        "이란 전쟁 영향의 에너지 가격 상승으로 일본 3분기 경제 연율 0.1% 위축",
+        "LSEG 집계 기준 일본 은행의 12월 25베이시스포인트 금리 인상 확률 75.6% (예상)"
+      ]
+    },
+    {
+      "title": "연준의 AI 자산 평가 및 긴축 경고",
+      "title_ko": "연준의 AI 자산 평가 및 긴축 경고",
+      "summary_ko": "연준이 AI 열풍에 따른 자산가치 고평가와 헤지펀드 레버리지 위험을 경고하며 긴축 기조 강화를 시사",
+      "source": "증시각도기",
+      "link": "https://www.youtube.com/watch?v=bN_KFx1_uaM",
+      "published": "2026-11-15 23:19:26",
+      "kind": "media",
+      "tag": "금리 · 연준",
+      "direction": "negative",
+      "n_channels": 1,
+      "lines": [
+        "연준 발언 : AI 열풍 속 주식 자산가치 평가 높은 수준",
+        "연준 발언 : 헤지펀드 레버리지 2013년 집계 이후 최고치 도달",
+        "베스 햄맥 발언 : 물가 2% 목표 위해 긴축적 통화정책 기조 강화 필요",
+        "베스 햄맥 발언 : 작고 잦은 폭으로 꾸준한 금리 인상 방식 선호",
+        "필립 제퍼슨 발언 : AI 생산성 기여도 아직 제한적이나 잠재력 존재"
+      ]
+    },
     {
       "title": "'We slept here': Flight delays linger but schedule is back on track for Monday",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/15/flight-delays-ground-faa-stop.html",
-      "published": "2026-11-15 18:22:23",
+      "published": "2026-11-15 22:33:26",
       "title_ko": "'여기서 잤습니다': 항공편 지연 지속되지만 월요일 일정은 정상 궤도 복귀",
       "summary_ko": "연방항공청이 4시간 넘게 전국 출항을 중단한 지 이틀 후에도 항공편 차질이 이어짐",
       "lines": [
@@ -120,18 +151,6 @@
         "앤트로픽 나스닥 상장 목요일 예정",
         "아마존 초기 투자자 참여",
         "공모가 70달러에서 78달러 전망"
-      ]
-    },
-    {
-      "title": "SpaceX catches upper stage of Starship rocket in historic first",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/spacex-plans-to-try-first-ever-catch-of-starship-rocket-from-orbit.html",
-      "published": "2026-11-14 23:10:14",
-      "title_ko": "스페이스X, 역사상 최초로 스타십 로켓 상단 회수 성공",
-      "summary_ko": "스타십 테스트 비행 15차는 로켓 부스터와 상단 모두를 회수하려 시도한 첫 사례",
-      "lines": [
-        "스타십 15차 시험 비행에서 상단부 회수 성공",
-        "텍사스 스타베이스 발사대의 기계식 팔을 이용한 로켓 회수"
       ]
     }
   ]
