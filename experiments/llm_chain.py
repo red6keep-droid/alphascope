@@ -149,9 +149,11 @@ def event(kind, detail):
 
 def _slack_worthy(k):
     """Slack 에 보낼 줄 — Gemini 문제만 (2026-11-07 사용자: "예비 키가 다 에러 나도 상관없다, Gemini 까지 왔는데 Gemini 도 에러 나면 심각하니 그때만").
-    보냄: Gemini 단계 실패 · Gemini 하루 한도(PerDay) · 사슬 전부 실패(맨 뒤 Gemini 까지 실패). 안 보냄: 예비 · 대체 전환, Groq · NVIDIA 실패 · 검사 탈락,
-    Gemini 분당 한도(기다렸다 다시 해서 대부분 성공). 로그 · 사용량 줄에는 전부 남는다."""
-    if k.startswith(("Gemini 실패", "전부 실패")):
+    보냄: Gemini 하루 한도(PerDay) · 사슬 전부 실패(맨 뒤 Gemini 까지 실패 — 줄에 단계별 원인이 다 들어 있다).
+    안 보냄: 예비 · 대체 전환, Groq · NVIDIA 실패 · 검사 탈락, Gemini 분당 한도(기다렸다 다시 해서 대부분 성공),
+    중간 단계 Gemini 실패(다음 모델이 받아 성공 — 2026-11-16 사용자: gemini-lite 가 첫째인 news 사슬에서 형식 오류 · 항목 불일치마다
+    실행당 한 통씩 알림이 와 '발행 문제냐'로 보였다). 로그 · 사용량 줄 · 운영 기록에는 전부 남는다."""
+    if k.startswith("전부 실패"):
         return True
     return k.startswith("한도") and "PerDay" in k
 
@@ -439,7 +441,7 @@ class LLMPool:
             except Exception as e:  # noqa: BLE001
                 USAGE[name]["fail"] += 1
                 errors.append(f"{name}: {str(e)[:160]}")
-                if step["kind"] == "gemini":   # Slack 은 Gemini 실패만 (2026-11-07 사용자)
+                if step["kind"] == "gemini":   # 기록만 — Slack 은 사슬 전부 실패일 때 (2026-11-16 사용자)
                     event("Gemini 실패", f"{self.label} {name}: {str(e)[:120]}")
                 print(f"[{self.label}] {name} 실패 — {str(e)[:160]}")
                 continue
