@@ -500,14 +500,19 @@ def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=No
     RP.NOW = datetime.datetime.now(datetime.timezone.utc)
     RP.NEWS, RP.SUMMARY = news or {}, summaries or {}
     RP.PICK_SINCE = R.pick_window(bars_all.get(U.BENCH) or [], RP.NY, now=RP.NOW)[1]
+    t_m = time.time()
     RP.MEDIA, RP.PICKS = media_inputs()
+    print(f"[quick-us] 방송 자료 읽기 {time.time() - t_m:.0f}초", flush=True)
     MF = RP.media_feed
     keep_for_page = MF.for_page
     MF.for_page = lambda rs, sym: MF.for_ticker(rs, sym, U.name(sym))   # 방송 줄 = 이 종목이 중심인 방송만 — 정식의 `업종 이슈면 업종 종목 전부` 는 간단 종목 수십 곳에 같은 줄이 깔려 뺀다 (2026-11-15 사용자 "있을 때만")
     mr, ms = analyze.market_regime(snap), analyze.market_shock(snap)
     crash = RP.CW.compute(bars_all, "us", quick)   # 급락장에서 어땠나? — 정식과 같은 계산(지수 −2% 넘은 날 버텼나), 일봉만 (2026-11-14 사용자)
     out, fails = {}, 0
-    for sym in quick:
+    t0 = time.time()
+    for i, sym in enumerate(quick):
+        if i and i % 50 == 0:   # 진행 표시 — 11-16 실행이 출력 없이 80분 상한에 걸렸다
+            print(f"[quick-us] 화면 {i}/{len(quick)} · {time.time() - t0:.0f}초", flush=True)
         try:
             s = analyze.stock(sym, snap)
             b = s.pop("_bars")

@@ -75,7 +75,7 @@ jobs:
     needs: check
     if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 80   # 첫 주: 상세 값 채우기 35분 + 기업 소개 · 전용 페이지(하루 50쪽 약 5분) (2026-11-15)
+    timeout-minutes: 120   # 11-16 17:40 첫 전체(두 시장) 실행이 80분에 걸려 취소 — 단계별 시간(⏱ 줄)을 본 뒤 다시 줄인다. 옛 80 = 상세 값 채우기 35분 + 기업 소개 · 전용 페이지 약 5분 (2026-11-16)
     steps:
       - uses: actions/checkout@v5
 
@@ -144,6 +144,7 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}   # 방송 줄 · 방송 의견 (media_feed, 정식과 같은 읽기 전용 키) — 없으면 그 칸 없이
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 기업 소개(company_intro) — Gemini lite 하루 25회까지, 한도면 다음 날 (2026-11-15 사용자)
+          PYTHONUNBUFFERED: '1'   # 출력 바로 — 11-16 실행이 상한에 걸려 취소될 때 버퍼에 있던 로그가 한 줄도 안 남았다
         run: |
           set +e
           python experiments/stock-quick/collect_quick.py --out /tmp/qd --cache /tmp/qcache --prev /tmp/prev \
