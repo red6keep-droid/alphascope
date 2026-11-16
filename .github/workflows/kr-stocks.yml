@@ -259,6 +259,13 @@ jobs:
           python "$KR_DIR/home_feed_kr.py"
           mkdir -p deploy-home && cp "$KR_DIR/output/home/kr.json" deploy-home/kr.json
 
+      # 알파스코프 시황 해설 묶음 briefing/{날짜}-pm.json (2026-11-16 사용자) — 수집기가 20:30 KST 에 읽어 해설을 쓴다.
+      # 방금 만든 kr.json + 공개 파일만 묶는다(AI 0). 아래 kr.json 푸시에 얹는다 — gh-pages 쓰기 추가 없음. 실패하면 수집기는 방송만으로 쓴다
+      - name: Market briefing (pm)
+        if: steps.gate.outputs.go == 'true' && hashFiles('deploy-home/kr.json') != ''
+        continue-on-error: true
+        run: python experiments/market-commentary/build_briefing.py --slot pm --kr deploy-home/kr.json --out-dir deploy-home
+
       # 홈 한국 증시 카드 재료 cards/kr-report.json (H31, 2026-11-05) — 아래 kr.json 푸시에 같이 얹는다(푸시 추가 없음).
       # 글 주소는 publish_report.py 가 output/post_meta.json 에 남긴다(게시한 날 · 이미 게시된 날 모두). 실패해도 홈은 피드로 돈다
       - name: Home card kr-report.json
