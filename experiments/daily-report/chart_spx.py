@@ -2,7 +2,7 @@
 (2026-10-18 사용자: "다른 리포트처럼 상단에 S&P 500 그래프, 클릭하면 확대").
 
 - 입력: yfinance ^GSPC 일봉 1년 (이동평균 200일까지 · 볼린저용). 기준일(analysis.as_of) 이후 바는 자른다.
-- 출력: output/images/spx-price-YYYY-MM-DD.png · output/chart.json {image_ref, url, window} · output/chart_ref.txt (워크플로가 CDN 확인)
+- 출력: output/chart.json {bars, window, last_day} — 본문 봉차트(candle_chart) 자료. 2026-11-16 부터 그림은 만들지 않는다(draw 는 옛 그림 확인용으로만 남김)
 - 그림 글자는 영문 · 숫자만 (CI 우분투에 한글 폰트가 없다). 그리는 코드는 엔비디아 쪽 사본 — 모양을 바꿀 때는 두 곳을 같이 본다.
 - 게시 경로: 워크플로가 output/images/*.png 를 gh-pages 에 올리고 jsDelivr 캐시를 비운다 (커버 이미지와 같은 경로).
 """
@@ -164,22 +164,16 @@ def draw(bars, path, symbol="S&P 500"):
 
 
 def run(day, as_of=None, output_dir=OUTPUT_DIR):
-    """그래프(WebP)를 만들고 chart.json 을 쓴다. 실패하면 None — 리포트는 그래프 없이 나간다."""
+    """본문 봉차트 자료(chart.json {bars, window, last_day})만 쓴다 — 그림(WebP)은 그리지 · 올리지 않는다 (2026-11-16 사용자: 상세 페이지는 실제 차트, 대표 이미지 없이).
+    실패 · 일봉 부족이면 None → main 이 게시를 멈춘다."""
     bars = load_bars(as_of)
-    if len(bars) < 2:
-        print("[chart] 일봉 부족 — 그래프 생략")
+    if len(bars) < 20:
+        print("[chart] 일봉 부족 — 봉차트 없음")
         return None
-    image_ref = f"images/spx-price-{day}.webp"
-    path = os.path.join(output_dir, image_ref)
-    draw(bars, path)
-    url = f"https://cdn.jsdelivr.net/gh/{_repo_slug()}@gh-pages/{image_ref}"
-    info = {"image_ref": image_ref, "url": url, "window": len(bars[-WINDOW:]), "last_day": bars[-1]["day"]}
-    info["bars"] = bars   # 본문 봉차트 자료 (render_html.sec_chart → candle_chart.card, 2026-11-16 사용자: "상세 페이지는 그림 말고 실제 차트")
+    info = {"window": len(bars[-WINDOW:]), "last_day": bars[-1]["day"], "bars": bars}
     with open(os.path.join(output_dir, "chart.json"), "w", encoding="utf-8") as f:
         json.dump(info, f, ensure_ascii=False)
-    with open(os.path.join(output_dir, "chart_ref.txt"), "w", encoding="utf-8") as f:
-        f.write(image_ref + "\n")
-    print(f"[chart] {path} · {url}")
+    print(f"[chart] 봉차트 자료 {len(bars)}일 · 마지막 {bars[-1]['day']}")
     return info
 
 

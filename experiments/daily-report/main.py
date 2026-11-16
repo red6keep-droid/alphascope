@@ -241,14 +241,13 @@ def main():
         print(f"::warning::나우캐스트 스냅샷 저장 실패 (게시는 계속): {e!r}")
 
     chart_ok = bool(make_chart(input_data))
-    image_ok, cover_url = make_cover(input_data)
+    # 커버 이미지는 만들지 않는다 (2026-11-16 사용자: 종목 페이지처럼 대표 이미지 없이 — 맨 위 = 봉차트). make_cover 는 남겨 둠(다시 켤 때)
+    image_ok, cover_url = False, None
     # 그래프(chart_spx)가 커버 자리라 커버는 그래프가 없는 날만 쓰인다 (render_html.build_body). 커버 생성 실패가 그래프 있는 날의 게시까지
     # 막던 단일 실패점을 풀었다 — 둘 다 없을 때만 멈춘다 (2026-10-21, 운영지침 D6-2; "이미지 없이 게시하지 않는다"는 그대로)
-    if should_publish and not image_ok and not chart_ok:
-        print("[게시 중단] 그래프도 커버 이미지도 없습니다. 이미지 없이 게시하지 않습니다.")
+    if should_publish and not chart_ok:   # 운영지침 D6-2 (2026-11-16): 맨 위 봉차트 자료가 없으면 게시하지 않는다
+        print("[게시 중단] S&P 500 봉차트 자료가 없습니다.")
         sys.exit(1)
-    if should_publish and not image_ok:
-        print("::warning::커버 이미지 생성 실패 — 그래프가 있어 그대로 진행합니다.")
 
     print("=" * 50)
     print("[5/6] HTML 렌더링")

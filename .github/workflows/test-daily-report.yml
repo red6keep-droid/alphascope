@@ -145,15 +145,9 @@ jobs:
         if: steps.check.outputs.already_published != 'true'
         run: |
           mkdir -p deploy/images
-          cp experiments/daily-report/output/images/*.webp deploy/images/ 2>/dev/null || true   # 커버 + S&P 500 그래프(둘 다 WebP)
-          if ! compgen -G "experiments/daily-report/output/images/[0-9]*.webp" > /dev/null; then
-            echo "::warning::생성된 커버 이미지가 없습니다."
-          fi
-          # S&P 500 가격 그래프 (chart_spx.py, 2026-10-18) — 2026-11-12 부터 WebP, 위 복사에 같이 들어간다
-          if ! compgen -G "experiments/daily-report/output/images/spx-price-*.webp" > /dev/null; then
-            echo "::warning::S&P 500 그래프가 없습니다 (글은 커버 이미지로 나갑니다)."
-          fi
-          ls -la deploy/images/ || true
+          # 2026-11-16 사용자: 커버 이미지 · S&P 500 그림 그래프는 만들지 않는다(본문 맨 위 = 봉차트, 운영지침 D6-2). 혹시 남은 그림만 올린다 — 보통은 비어 아래 배포 단계가 건너뛴다
+          cp experiments/daily-report/output/images/*.webp deploy/images/ 2>/dev/null || true
+          ls -la deploy/images/ 2>/dev/null || echo "올릴 그림 없음"
 
       - name: Deploy cover image to gh-pages branch
         if: hashFiles('deploy/images/*.webp') != '' || hashFiles('deploy/images/*.png') != ''
@@ -169,7 +163,7 @@ jobs:
         run: |
           IMAGE_REF=$(cat experiments/daily-report/output/image_ref.txt)
           if [ -z "$IMAGE_REF" ]; then
-            echo "::warning::커버 이미지 ref가 없습니다."; exit 0
+            echo "커버 이미지 없음 — 2026-11-16 부터 만들지 않는다"; exit 0
           fi
           # 푸시 직후 퍼지는 옛 커밋을 다시 붙잡는다(11-10 07:00 404) — 기다리며 내용까지 맞춰 본다. 끝내 실패하면 게시 막음
           bash .github/scripts/jsd_purge.sh "${IMAGE_REF}" "deploy/${IMAGE_REF}"

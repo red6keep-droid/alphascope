@@ -275,15 +275,9 @@ def sec_chart(output_dir):
     with open(path, encoding="utf-8") as f:
         c = json.load(f)
     real = CDL.card("S&P 500", c.get("bars") or [], 2, title="")   # 종목 페이지와 같은 실제 봉차트 (2026-11-16 사용자: "상세 페이지는 그림 파일 말고 우리가 진짜 하는 차트") — 일 · 주 · 월 · 지표는 브라우저 계산
-    if real:
-        return real + CDL.GAP + CDL.SCRIPT + dk.tv_chart_fold("AMEX:SPY", "America/New_York", "SPY")
-    url = _esc(c["url"])   # 옛 chart.json(자료 없음)만 그림
-    return (f'<a href="{url}" data-zoom="1" target="_blank" rel="noopener" title="그래프 확대 보기" aria-label="그래프 확대 보기" '
-            f'style="position:relative;display:block;margin:0 0 16px;max-width:1024px;">'
-            f'<img src="{url}" alt="S&amp;P 500 {c.get("window", 30)}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'
-            f'<span style="position:absolute;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
-            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{ZOOM_ICON}</span></a>'
-            + dk.tv_chart_fold("AMEX:SPY", "America/New_York", "SPY"))   # 장중 차트 접힘 줄 — 종목 페이지 · 한국 증시 리포트와 같은 자리 · 같은 버튼, 미국 정규장에만 보임 (2026-11-07 사용자). S&P 500 지수 대신 따라가는 ETF(SPY) — 무료 위젯이 지수 자료를 막는 경우가 있다
+    if not real:
+        return ""
+    return real + CDL.GAP + CDL.SCRIPT + dk.tv_chart_fold("AMEX:SPY", "America/New_York", "SPY")   # 장중 차트 접힘 줄 — 종목 페이지 · 한국 증시 리포트와 같은 자리, 미국 정규장에만 보임 (2026-11-07 사용자)
 
 
 def _cover_image(cover_url):

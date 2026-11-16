@@ -264,22 +264,13 @@ ZOOM_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"
 
 
 def price_chart(day, bars):
-    """코스피 30거래일 봉 + 5 · 20 · 60일선 + 볼린저 PNG — 데일리 sec_chart 와 같은 모양 (누르면 확대, data-zoom). 실패하면 그래프 없이."""
-    real = CDL.card("코스피", bars, 2, title="")   # 종목 페이지와 같은 실제 봉차트 (2026-11-16 사용자: "상세 페이지는 그림 파일 말고 우리가 진짜 하는 차트") — 자료 = kr-stocks 가 이미 받은 2년 일봉
-    if real:
-        return real + CDL.GAP + CDL.SCRIPT
-    ref = f"images/kospi-price-{day}.webp"
-    try:
-        CS.draw([b for b in bars if b.get("open")], os.path.join(OUT, ref), symbol="KOSPI")   # 그림 글자는 영문만 (CI 에 한글 폰트 없음)
-    except Exception as e:  # noqa: BLE001
-        print(f"[kr-report] 코스피 그래프 실패: {str(e)[:80]}")
+    """코스피 봉차트 — 종목 페이지와 같은 실제 차트 (2026-11-16 사용자: "상세 페이지는 그림 파일 말고 우리가 진짜 하는 차트"). 자료 = kr-stocks 가 이미 받은 2년 일봉.
+    옛 30거래일 그림(WebP)은 만들지 않는다. 일봉이 모자라면 그래프 없이."""
+    real = CDL.card("코스피", bars, 2, title="")
+    if not real:
+        print("[kr-report] 코스피 일봉 부족 — 봉차트 없이")
         return ""
-    url = _dk.esc(f"https://cdn.jsdelivr.net/gh/{CS._repo_slug()}@{IMAGE_BRANCH}/{ref}")
-    return (f'<a href="{url}" data-zoom="1" target="_blank" rel="noopener" title="그래프 확대 보기" aria-label="그래프 확대 보기" '
-            f'style="position:relative;display:block;margin:0 0 16px;max-width:1024px;">'
-            f'<img src="{url}" alt="코스피 {CS.WINDOW}거래일 봉차트" style="width:100%;display:block;border:1px solid #eee;border-radius:8px;"/>'
-            f'<span style="position:absolute;right:8px;bottom:8px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
-            f'background:rgba(255,255,255,.92);border:1px solid #E2E8F0;border-radius:8px;color:#111;">{ZOOM_ICON}</span></a>')   # 코스피 장중 차트 접힘 줄 삭제 (2026-11-12 사용자: 종가 기준 — kr-live 수집 멈춤)
+    return real + CDL.GAP + CDL.SCRIPT
 
 
 def head_chart(r):
