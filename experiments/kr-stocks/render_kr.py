@@ -814,6 +814,7 @@ BARS = {}           # 종목별 일봉 (snap["bars"]) — 의견 탭 맨 위 `�
 PICK_SINCE = ""     # 방송 의견 컷 (ISO UTC) = 코스피 일봉 기준 최근 5거래일의 첫날 0시 KST (R.pick_window, P290)
 NOW = None          # 페이지를 만드는 시각 (UTC) — write_all 이 정한다. 목업은 RADAR_NOW(ISO)
 MEDIA = []          # 방송 이슈 (media_feed.issues — 같은 이슈는 이미 한 줄로) — write_all 이 한 번 읽는다
+US_NAMES = {}       # 정식 명단 밖 미국 종목 한글 이름 — 간단 실행(full_kr)이 채운다
 CAP_RANK = {}       # {sym: {"cap", "rank"}} — 간단 실행이 남긴 cap_rank.json(정식 실행은 quick-state 에서 읽기만, 2026-11-16). 없으면 순위 없이 금액만
 DISC = {}           # {종목 코드: [{t, d, u}]} — 최근 7일 DART 공시 (data/dart_list.json, 2026-11-16 사용자: 간단과 같은 `최근 공시는?`)
 MEDIA_WEEK = []     # 최근 7일 방송 이슈 — 뉴스 방향 막대 `최근 7일` (P143)
@@ -1003,7 +1004,7 @@ def _sched(s):
     e = cc.get("earnings")
     if e and 0 <= e["left"] <= SCHED_DAYS:
         out.append((f"실적 발표 ({R._md_short(e['day'])}{' 무렵' if e.get('est') else ''})", f"{e['left']}일 뒤", "실적", "다음 실적 발표는?", "earn"))   # 다섯째 = 관련 기사 종류 (P265)
-    usn = lambda x: USU.name(x) if x in USU.BY_SYM else x   # noqa: E731
+    usn = lambda x: USU.name(x) if x in USU.BY_SYM else US_NAMES.get(x, x)   # noqa: E731 — 간단 종목의 연관 미국 종목은 정식 명단 밖일 수 있다(full_kr 가 채움)
     up = [u for u in (cc.get("peers") or {}).get("upcoming_all") or [] if left(u["day"]) <= SCHED_DAYS]
     if up:
         out.append((f"{usn(up[0]['symbol'])} 실적 발표 ({R._md_short(up[0]['day'])})", f"{left(up[0]['day'])}일 뒤", "실적", "미국 연관 종목 일정은?"))
@@ -1175,7 +1176,7 @@ def cal_pair_card(s, c):
     """미국 연결 종목 일정 — 옛 카드 밖 `전체 일정 보기` 범위(LIST_DAYS 60일)까지 카드 안에 (2026-11-01 사용자 P197: 마이크론 12월 발표가 카드에 없고 밖 목록에만 있었다)."""
     nm, up = s["name"], c.get("upcoming_all") or c["upcoming"]
     days = CC.LIST_DAYS
-    usn = lambda x: USU.name(x) if x in USU.BY_SYM else x   # noqa: E731
+    usn = lambda x: USU.name(x) if x in USU.BY_SYM else US_NAMES.get(x, x)   # noqa: E731 — 간단 종목의 연관 미국 종목은 정식 명단 밖일 수 있다(full_kr 가 채움)
     if not up:
         return [(f"앞으로 {days}일 안에 실적을 발표하는 {nm}의 미국 연관 종목이 없다.", "plain")], "", "없음", None
     syms = [x for x in dict.fromkeys(u["symbol"] for u in up) if c["effect"].get(x, {}).get("median")]
