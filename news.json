@@ -1,6 +1,126 @@
 {
-  "updated_at": "2026-11-16 08:12:40 UTC",
+  "updated_at": "2026-11-16 12:46:11 UTC",
   "items": [
+    {
+      "title": "Warren Buffett donates $5.5 billion, says kindness 'compounds' in Thanksgiving letter",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/warren-buffett-donates-5point5-billion-thanksgiving.html",
+      "published": "2026-11-16 12:16:29",
+      "title_ko": "워런 버핏, 55억 달러 기부하며 추수감사절 서한에서 친절의 복리 효과 강조",
+      "summary_ko": "기부 이후 버크셔 명예회장, 클래스 A 주식 18만 2,140주 보유",
+      "lines": [
+        "워런 버핏의 55억 달러 규모 버크셔 해서웨이 주식 기부",
+        "기부 이후 버크셔 해서웨이 클래식 A 주식 18만2140주 보유"
+      ]
+    },
+    {
+      "title": "Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html",
+      "published": "2026-11-16 12:14:46",
+      "title_ko": "러트닉, 엔비디아 스파이 스캔들 관련 질의 직면, 두 아들 회사는 칩 제조사와 깊은 연관",
+      "summary_ko": "젠슨 황의 엔비디아 최고경영자 사임으로 하워드 러트닉 상무장관과 가족의 금융 연관성에 대한 감시가 재점화",
+      "lines": [
+        "캔터 피츠제럴드의 엔비디아 보유 주식 약 50% 감소",
+        "캔터 피츠제럴드의 엔비디아 목표가 350달러 유지"
+      ]
+    },
+    {
+      "title": "Nvidia stock falls nearly 4% as investors price in fallout from Jensen Huang's resignation",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/nvidia-stock-price-jensen-huang.html",
+      "published": "2026-11-16 12:12:44",
+      "title_ko": "엔비디아 주가, 젠슨 황 사임 여파 반영하며 4% 가까이 하락",
+      "summary_ko": "월요일 프리마켓 거래에서 엔비디아 주가 3.7% 하락",
+      "lines": [
+        "젠슨 황 CEO 사임 여파로 엔비디아 주가 시간외 거래에서 3.7% 하락",
+        "젠슨 황 복귀 촉구 온라인 청원 서명 17만 건 돌파"
+      ]
+    },
+    {
+      "title": "Big-ticket holiday items may be harder to find as shipping costs rise",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/holiday-big-ticket-inventory-shipping-costs.html",
+      "published": "2026-11-16 12:00:01",
+      "title_ko": "운송 비용 상승으로 고가의 홀리데이 시즌 품목 확보가 어려워질 가능성",
+      "summary_ko": "운송 임원들, 소매업체들이 홀리데이 재고 전략에 신중을 기하고 있다고 언급",
+      "lines": [
+        "유통업체들의 홀리데이 시즌 재고 비축 신중",
+        "고가 품목 공급 부족 예상"
+      ]
+    },
+    {
+      "title": "엔비디아 실적 및 CEO 거취",
+      "title_ko": "엔비디아 실적 및 CEO 거취",
+      "summary_ko": "엔비디아의 CEO 교체 및 정부 개입 가능성으로 인해 공급망 전반에 불안감이 확산 중",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=z9jG1QZGPK8",
+      "published": "2026-11-16 11:01:52",
+      "kind": "media",
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "neutral",
+      "n_channels": 4,
+      "lines": [
+        "젠슨 황 복귀설 제기 및 월가의 리더십 개편 요구",
+        "임시 CEO 체제에서의 3분기 실적 발표 및 가이드라인 주목",
+        "미국 정부의 개입 가능성으로 인한 공급망 전반의 불안감",
+        "아시아 기술주 및 반도체 관련주 전반의 하세 압력"
+      ]
+    },
+    {
+      "title": "앤트로픽 메가 IPO 상장",
+      "title_ko": "앤트로픽 메가 IPO 상장",
+      "summary_ko": "앤트로픽의 상장 흥행 여부가 향후 AI 투자 심리와 시장 유동성에 중요한 가늠자가 될 전망",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=z9jG1QZGPK8",
+      "published": "2026-11-16 11:01:52",
+      "kind": "media",
+      "tag": "기업 사건",
+      "direction": "positive",
+      "n_channels": 2,
+      "lines": [
+        "앤트로픽 IPO 수요예측에서 초과 청약 기록",
+        "골드만삭스 발언 : 2030년까지 긍정적 잉여현금흐름 부재 예상 (발언자 추정)",
+        "수요일 프라이싱 확정 및 목요일 나스닥 거래 개시 예정",
+        "대형 IPO로 인한 타 부문 유동성 흡수 가능성"
+      ]
+    },
+    {
+      "title": "NATO member Estonia to close Russia border after attempted 'sabotage' of drone maker",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/nato-estonia-russia-border-ukraine-war.html",
+      "published": "2026-11-16 10:44:02",
+      "title_ko": "나토 회원국 에스토니아, 드론 제조업체 대상 사보타주 시도 이후 러시아 국경 폐쇄 예정",
+      "summary_ko": "국경 폐쇄가 적대적 활동 및 제재 회피 억제에 도움될 것이라고 언급",
+      "lines": [
+        "에스토니아의 12월 1일 러시아 국경 도로 통행 폐쇄 준비",
+        "러시아 군사정보국의 드론 제조업체 방해 공작 시도"
+      ]
+    },
+    {
+      "title": "AI is reshaping banking jobs – but its ability to drive profits remains unclear",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/how-ai-is-changing-banking-jobs-hiring-and-revenue.html",
+      "published": "2026-11-16 09:35:14",
+      "title_ko": "AI가 은행 일자리를 재편하고 있지만 수익 창출 능력은 여전히 불투명",
+      "summary_ko": "유럽 은행들은 AI를 활용해 반복 업무를 줄이고 직원 재배치 및 기술 인력 채용을 진행 중",
+      "lines": [
+        "유럽 은행들의 인공지능 활용 업무 자동화 및 인력 재배치",
+        "바클레이즈의 인공지능 도입 부서 감원 단행"
+      ]
+    },
+    {
+      "title": "China confirms Xi-Trump-Putin historic summit. What will be on the agenda?",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/16/trump-xi-putin-ukraine-nuclear-tariffs-russia-iran-.html",
+      "published": "2026-11-16 08:38:16",
+      "title_ko": "중국, 시진핑·트럼프·푸틴 역사적 정상회담 확인. 의제는 무엇인가",
+      "summary_ko": "핵확산 방지, 중동 전쟁, 무역 정책, 우크라이나 전쟁 등이 의제로 논의될 예정",
+      "lines": [
+        "시진핑, 푸틴, 트럼프 목요일 선전 정상회담 개최 예정",
+        "미·중·러 정상회담 사상 최초 성사"
+      ]
+    },
     {
       "title": "China’s slowdown deepens in October as industrial output, retail sales, investment miss estimates",
       "source": "CNBC",
@@ -14,132 +134,21 @@
       ]
     },
     {
-      "title": "Japan's economy unexpectedly contracts in third-quarter as elevated energy costs bite",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/japan-q3-gdp-energy-oil-prices.html",
-      "published": "2026-11-16 02:56:24",
-      "title_ko": "일본 경제, 치솟은 에너지 비용 타격으로 3분기에 예기치 않게 위축",
-      "summary_ko": "9월 가계 에너지 보조금 만료",
-      "lines": [
-        "이란 전쟁 영향의 에너지 가격 상승으로 일본 3분기 경제 연율 0.1% 위축",
-        "LSEG 집계 기준 일본 은행의 12월 25베이시스포인트 금리 인상 확률 75.6% (예상)"
-      ]
-    },
-    {
-      "title": "$180 million Van Gogh tests the art market and collector confidence",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/180-million-van-gogh-tests-the-art-market-and-collector-confidence-.html",
-      "published": "2026-11-16 02:22:04",
-      "title_ko": "1억 8,000만 달러의 반 고흐 작품, 미술 시장과 수집가 신뢰도 시험대 올라",
-      "summary_ko": "뉴욕 미술 경매 총액 20억 달러 상회 전망",
-      "lines": [
-        "다음 주 뉴욕 미술품 경매 총매출 24억 달러 예상",
-        "소더비 경매 단독 매출 11억 달러 상회 전망",
-        "블라키에르-아리에타 컬렉션 추정가 4억 5000만 달러",
-        "빈센트 반 고흐 작품 추정가 1억 8000만 달러",
-        "폴 세잔 작품 추정가 1억 2000만 달러"
-      ]
-    },
-    {
-      "title": "연준의 AI 자산 평가 및 긴축 경고",
-      "title_ko": "연준의 AI 자산 평가 및 긴축 경고",
-      "summary_ko": "연준이 AI 열풍에 따른 자산가치 고평가와 헤지펀드 레버리지 위험을 경고하며 긴축 기조 강화를 시사",
-      "source": "증시각도기",
-      "link": "https://www.youtube.com/watch?v=bN_KFx1_uaM",
-      "published": "2026-11-15 23:19:26",
+      "title": "연준 인사 발언 및 금리 인상 우려",
+      "title_ko": "연준 인사 발언 및 금리 인상 우려",
+      "summary_ko": "연준 인사들의 빅스텝 관련 발언과 금리 인하 속도 조절이 성장주 전반의 밸류에이션 부담을 키우고 있음",
+      "source": "MTN 투자뉴스7",
+      "link": "https://www.youtube.com/watch?v=soqv-PF718U",
+      "published": "2026-11-15 23:15:50",
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "negative",
-      "n_channels": 1,
+      "n_channels": 2,
       "lines": [
-        "연준 발언 : AI 열풍 속 주식 자산가치 평가 높은 수준",
-        "연준 발언 : 헤지펀드 레버리지 2013년 집계 이후 최고치 도달",
-        "베스 햄맥 발언 : 물가 2% 목표 위해 긴축적 통화정책 기조 강화 필요",
-        "베스 햄맥 발언 : 작고 잦은 폭으로 꾸준한 금리 인상 방식 선호",
-        "필립 제퍼슨 발언 : AI 생산성 기여도 아직 제한적이나 잠재력 존재"
-      ]
-    },
-    {
-      "title": "'We slept here': Flight delays linger but schedule is back on track for Monday",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/15/flight-delays-ground-faa-stop.html",
-      "published": "2026-11-15 22:33:26",
-      "title_ko": "'여기서 잤습니다': 항공편 지연 지속되지만 월요일 일정은 정상 궤도 복귀",
-      "summary_ko": "연방항공청이 4시간 넘게 전국 출항을 중단한 지 이틀 후에도 항공편 차질이 이어짐",
-      "lines": [
-        "연방항공청의 전국 항공기 이륙 중단 조치 2일 후 항공편 운항 차질 지속",
-        "플라이트어웨어 데이터 기준 미국 항공편 1600편 이상 취소 및 4000편 이상 지연 발생"
-      ]
-    },
-    {
-      "title": "Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html",
-      "published": "2026-11-15 19:58:21",
-      "title_ko": "러트닉, 엔비디아 스파이 스캔들 관련 질의 직면, 두 아들 회사는 칩 제조사와 깊은 연관",
-      "summary_ko": "젠슨 황의 엔비디아 최고경영자 사임으로 하워드 러트닉 상무장관과 가족의 금융 연관성에 대한 감시가 재점화",
-      "lines": [
-        "캔터 피츠제럴드의 엔비디아 보유 주식 약 50% 감소",
-        "캔터 피츠제럴드의 엔비디아 목표가 350달러 유지"
-      ]
-    },
-    {
-      "title": "DOT Sec. Duffy ties router in southern Arkansas to issues that led to nationwide ground stop",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/14/faa-ground-stop-flights-resume-delays.html",
-      "published": "2026-11-15 18:15:14",
-      "title_ko": "FAA 운항 중단 해제 후에도 항공편 차질 지속, 일부 대학 미식축구 경기 연기",
-      "summary_ko": "",
-      "lines": [
-        "연방항공청의 이륙 중단 조치 이후 항공편 운항 재개",
-        "토요일 3000편 이상 취소 및 1000편 가까이 지연 발생",
-        "금요일 9000편 이상 취소 및 7000편 이상 지연 기록"
-      ]
-    },
-    {
-      "title": "Trump breaks silence about FAA nationwide ground stop, blames Biden administration",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/15/trump-breaks-silence-on-faa-nationwide-ground-stop-blames-biden-.html",
-      "published": "2026-11-15 16:56:40",
-      "title_ko": "트럼프, FAA 전국 운항 중단에 침묵 깨고 바이든 행정부 탓해",
-      "summary_ko": "전국 운항 중단으로 항공 여행이 차질을 빚은 후 의회에 더 많은 예산 승인을 촉구",
-      "lines": [
-        "도널드 트럼프 대통령의 연방항공청 전국 이륙 중단 사태 관련 바이든 행정부 비판",
-        "트럼프 대통령의 노후 관제 시스템 현대화를 위한 의회 예산 승인 촉구"
-      ]
-    },
-    {
-      "title": "FAA 항공 시스템 마비 및 인프라 예산 집행",
-      "title_ko": "FAA 항공 시스템 마비 및 인프라 예산 집행",
-      "summary_ko": "항공 시스템 마비 사태 이후 FAA 예산 집행과 시스템 현대화를 위한 초당적 협력 가능성이 제기",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=jBV8DeEuL-I",
-      "published": "2026-11-15 15:13:25",
-      "kind": "media",
-      "tag": "기업 사건",
-      "direction": "neutral",
-      "n_channels": 1,
-      "lines": [
-        "금요일 발생한 FAA 그라운드 스톱으로 항공 시스템 안전성 우려 제기",
-        "교통부 장관은 추가 자금 요청과 함께 단계별 원인 규명 진행",
-        "항공 관제 시스템 현대화를 위한 공화당과 민주당의 초당적 협력 기대"
-      ]
-    },
-    {
-      "title": "FAA 예산 증액 및 재정 조정법",
-      "title_ko": "FAA 예산 증액 및 재정 조정법",
-      "summary_ko": "교통부 장관의 FAA 예산 요구와 국방 예산이 연말 재정 조정법을 통해 처리될 가능성이 제기",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=lmaz-aNBn_o",
-      "published": "2026-11-15 14:08:33",
-      "kind": "media",
-      "tag": "재정 · 정치",
-      "direction": "neutral",
-      "n_channels": 1,
-      "lines": [
-        "션 더피 교통부 장관 발언 : 항공 교통 관제 시스템 개선을 위해 300억 달러 예산 지원 요청",
-        "마이크 존슨 하원의장 발언 : 연말 처리를 위해 공격적인 입법 패키지에 해당 예산을 추가할 예정",
-        "헨리에타 트레이스 발언 : 국방 예산과 FAA 예산이 제3차 재정 조정안을 통해 처리될 확률 30% 안팎으로 (발언자 추정)"
+        "연준 인사들이 50bp 인상 가능성을 언급하며 금리 인상 시기 우려가 제기됨",
+        "이번 주 20명이 넘는 연준 인사 인터뷰가 예정되어 있음",
+        "파월 의장과 달리 킨노 씨 등은 소극적인 인터뷰를 지속하고 있음",
+        "금리 인하 속도 조절로 내년 상반기까지 성장주 전반의 밸류에이션 부담이 이어질 전망"
       ]
     }
   ]

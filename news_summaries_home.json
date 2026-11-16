@@ -3705,25 +3705,29 @@
  },
  "9e42e9292b1c": {
   "lines": [
-   "유럽 은행들의 3분기 실적 발표 속 AI 활용 업무 자동화 진행"
+   "유럽 은행들의 인공지능 활용 업무 자동화 및 인력 재배치",
+   "바클레이즈의 인공지능 도입 부서 감원 단행"
   ],
   "tags": [
    {
     "scope": "sector",
     "tickers": [],
     "sector": "XLF",
-    "issue": "EARNINGS",
-    "dir": "neutral",
+    "issue": "AI_CAPEX",
+    "dir": "positive",
     "stage": "done"
-   }
+   },
+   null
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T08:12:39.349697+00:00",
-  "n_src": 900
+  "at": "2026-11-16T12:46:10.047521+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "fd6ebbed2fe0": {
   "lines": [
-   "시진핑·푸틴·트럼프 3자 정상회담 목요일 선전 개최 확인"
+   "시진핑, 푸틴, 트럼프 목요일 선전 정상회담 개최 예정",
+   "미·중·러 정상회담 사상 최초 성사"
   ],
   "tags": [
    {
@@ -3733,11 +3737,20 @@
     "issue": "GEOPOLITICS",
     "dir": "positive",
     "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "positive",
+    "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T08:12:39.349697+00:00",
-  "n_src": 900
+  "at": "2026-11-16T12:46:11.523758+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "1822d018c565": {
   "lines": [
@@ -3772,5 +3785,140 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-16T08:12:40.048851+00:00",
   "n_src": 316
+ },
+ "2464beb2d26b": {
+  "lines": [
+   "워런 버핏의 55억 달러 규모 버크셔 해서웨이 주식 기부",
+   "기부 이후 버크셔 해서웨이 클래식 A 주식 18만2140주 보유"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T12:46:08.195335+00:00",
+  "n_src": 900
+ },
+ "b987f5a2c424": {
+  "lines": [
+   "마리아 캔트웰 상원의원의 하워드 러트닉 상무장관 앞 대중국 AI 칩 판매 중단 촉구 서한 발송"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T12:46:08.195335+00:00",
+  "n_src": 900
+ },
+ "86306f7ca140": {
+  "lines": [
+   "젠슨 황 CEO 사임 여파로 엔비디아 주가 시간외 거래에서 3.7% 하락",
+   "젠슨 황 복귀 촉구 온라인 청원 서명 17만 건 돌파"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T12:46:08.195335+00:00",
+  "n_src": 900
+ },
+ "48d8a47d9a93": {
+  "lines": [
+   "유통업체들의 홀리데이 시즌 재고 비축 신중",
+   "고가 품목 공급 부족 예상"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T12:46:10.047521+00:00",
+  "n_src": 900
+ },
+ "f16b38de07b4": {
+  "lines": [
+   "에스토니아의 12월 1일 러시아 국경 도로 통행 폐쇄 준비",
+   "러시아 군사정보국의 드론 제조업체 방해 공작 시도"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T12:46:10.047521+00:00",
+  "n_src": 900
+ },
+ "af833fbb8243": {
+  "lines": [
+   "AI 기업 순환 자금 조달 규모 1조 달러 돌파"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "AI_CAPEX",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-16T12:46:11.523758+00:00",
+  "n_src": 900
  }
 }
