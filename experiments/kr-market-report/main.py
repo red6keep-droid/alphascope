@@ -23,6 +23,7 @@ import collect_kr  # noqa: E402
 import collect_kr_extra  # noqa: E402
 import collect_kr_earn_dart as ED  # noqa: E402 — 실적 발표일 = DART 잠정실적 (2026-10-31)
 import render_kr as RK  # noqa: E402 — sys.path 에 nvda-report · stock-radar 를 더한다
+import candle_chart as CDL  # noqa: E402 — 본문 맨 위 봉차트 = 종목 페이지와 같은 실제 차트 (2026-11-16)
 import universe_kr as U  # noqa: E402
 import people_section  # noqa: E402 — `주요 인물 발언 전체 보기` 주소 (experiments 폴더, render_kr 가 sys.path 에 둔다)
 
@@ -264,6 +265,9 @@ ZOOM_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"
 
 def price_chart(day, bars):
     """코스피 30거래일 봉 + 5 · 20 · 60일선 + 볼린저 PNG — 데일리 sec_chart 와 같은 모양 (누르면 확대, data-zoom). 실패하면 그래프 없이."""
+    real = CDL.card("코스피", bars, 2, title="")   # 종목 페이지와 같은 실제 봉차트 (2026-11-16 사용자: "상세 페이지는 그림 파일 말고 우리가 진짜 하는 차트") — 자료 = kr-stocks 가 이미 받은 2년 일봉
+    if real:
+        return real + CDL.GAP + CDL.SCRIPT
     ref = f"images/kospi-price-{day}.webp"
     try:
         CS.draw([b for b in bars if b.get("open")], os.path.join(OUT, ref), symbol="KOSPI")   # 그림 글자는 영문만 (CI 에 한글 폰트 없음)
