@@ -43,12 +43,13 @@
 
 | 순서 | 공급자 | 모델 | 키 | 비고 |
 |---|---|---|---|---|
-| 1 | Cloudflare Workers AI | `@cf/leonardo/lucid-origin` 1200×630 | `OPS_CF_ACCOUNT_ID` · `CF_AI_TOKEN`(Workers AI 권한만) | 11-17 비교에서 가장 실사 · 가짜 간판 적음, 한 장 3~14초. 하루 무료 1만 뉴런 — 한 장 뉴런 값은 대시보드로 확인 전 |
-| 2 | Cloudflare Workers AI | `@cf/black-forest-labs/flux-1-schnell` 8단계 | 같음 | 정사각 1024 → 가운데 자름. 가짜 간판 글자 · 랜드마크가 잘 나옴 |
+| 1 | Cloudflare Workers AI | `@cf/leonardo/lucid-origin` 1200×630 | `OPS_CF_ACCOUNT_ID` · `CF_AI_TOKEN`(Workers AI 권한만) | 11-17 비교에서 가장 실사 · 가짜 간판 적음, 한 장 3~14초. **한 장 약 2,600 뉴런**(11-17 대시보드 16,300 = Lucid 6 + FLUX 6, 가격표 칸당 636 + 단계당 12) |
+| 2 | Cloudflare Workers AI | `@cf/black-forest-labs/flux-1-schnell` 8단계 | 같음 | 정사각 1024 → 가운데 자름. 가짜 간판 글자 · 랜드마크가 잘 나옴. 한 장 약 96 뉴런(4칸 × 4.8 + 8단계 × 9.6) |
 | 3 | Hugging Face | FLUX.1-schnell | `HF_TOKEN` | 무료 크레딧 |
 | 4 | — | 기본 배너 `static/default/{분위기}.webp` | — | 11-17 Lucid 그림 5장 |
 
 Pollinations 는 배너에 쓰지 않는다 — 11-17 무료가 IP 당 45초 1장 + 워터마크(402 FREE_LIMIT). 장면 설명은 파이썬 틀(AI 글 모델 0).
+Workers AI 하루 한도 (무료 계정): 1만 뉴런, **00:00 UTC = 09:00 KST 리셋** — 저녁 21:00 배너와 다음 날 아침 08:40 배너가 같은 하루에 든다. 운영 2 × 2,600 = 5,200 → 여유 약 4,800 = **시험은 하루 Lucid 1장까지**, 조합 미리 보기는 FLUX 로만. 넘으면 그날 요청이 429(코드 3036)로 거절될 뿐 정지 · 청구 없음(무료 플랜) — 배너는 FLUX → HF → 기본 배너로 내려간다. 11-17 비교 실행으로 16,300(163%) 써서 11-18 09:00 KST 까지 거절.
 배너 글자 폰트 = 강원교육튼튼(강원특별자치도교육청, 판매만 금지 · 출처 표기 권장, `fonts/GangwonEdu-LICENSE.txt`) — 배너 그림에만, 블로그 본문 · 테마와 무관.
 
 ---
