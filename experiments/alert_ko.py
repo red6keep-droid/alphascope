@@ -20,6 +20,7 @@ NAMES = {
     "Comment Reply": "댓글 답장",
     "Quick stock news (간단 종목 뉴스 · 그림자)": "간단 종목 뉴스",
     "Quick stock data (간단 정보 853종목)": "간단 종목 주가 (853종목)",
+    "Home IP fetch": "집 IP 받기 (미래에셋 · 버리)",
     "Court Survey": "소송 조사",
     "Gemini Model Check": "Gemini 모델 점검",
     "Trump Trend": "트럼프 트렌드 (종료)",

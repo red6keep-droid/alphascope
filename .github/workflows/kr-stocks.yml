@@ -168,6 +168,8 @@ jobs:
           fi
           # 캘린더 탭의 미국 경제 일정(FOMC · 물가 · 고용) — 엔비디아 리포트가 쌓는 calendar.jsonl (render_kr.us_calendar, 2026-10-25)
           git fetch state nvda-state:refs/remotes/state/nvda-state 2>/dev/null || echo "nvda-state 없음 — 미국 일정 없이"
+          # 집 IP 실행(home-ip.yml, 14:30 KST)이 받아 둔 미래에셋 TIGER 구성 — GitHub 주소로는 403 (2026-11-17)
+          if git fetch -q state homeip-state:refs/remotes/state/homeip-state 2>/dev/null; then git archive refs/remotes/state/homeip-state experiments/home-ip/data | tar -x && echo "집 IP 자료 불러옴: $(ls experiments/home-ip/data | tr '\n' ' ')"; else echo "homeip-state 없음 — 미래에셋 구성은 지난 값"; fi
           # 기업 탭 시가총액 순위 — 간단 실행이 정식 · 간단 350종목으로 매긴 것(quick-state kr/cap_rank.json, 2026-11-16 사용자). 없으면 순위 없이 금액만
           if git fetch -q state quick-state:refs/remotes/state/quick-state 2>/dev/null && git show refs/remotes/state/quick-state:kr/cap_rank.json > "$KR_DIR/data/cap_rank.json" 2>/dev/null; then echo "시가총액 순위 불러옴"; else rm -f "$KR_DIR/data/cap_rank.json"; echo "시가총액 순위 없음 — 금액만"; fi
 

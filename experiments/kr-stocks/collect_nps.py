@@ -118,6 +118,7 @@ def run(force=False):
         print(f"[nps] {d['checked']} 에 확인함 — 건너뜀 (주 1회)")
         return d
     first = not d.get("major")
+    failed = False
     since = today.year - BACKFILL_YEARS
     for cat, pat, key, parse, feed_name in (("QUA", T_Q, "major", parse_q, FEED_Q), ("YEA", T_Y, "annual", parse_y, FEED_Y)):
         new, err = 0, ""
@@ -140,6 +141,7 @@ def run(force=False):
         except Exception as e:  # noqa: BLE001
             err = f"게시판 목록 실패: {str(e)[:120]}"
             print(f"::warning::[nps] {err}")
+        failed = failed or bool(err)
         latest = max(d[key].values(), key=lambda x: x["end"], default=None)
         if latest:   # 다음 새 자료 기한 — 분기 = 다음 분기 끝 + 45일, 연간 = 다음 해 말 + 10개월(지난 공시가 9~10월)
             end = datetime.date.fromisoformat(latest["end"])
@@ -154,7 +156,9 @@ def run(force=False):
         feed_log.feed(feed_name, ok=not err and latest is not None, label=latest["label"] if latest else "", data_date=latest["end"] if latest else "",
                       got_new=new > 0, error=err or ("받은 공시 없음" if latest is None else ""), every_days=CHECK_DAYS, expect_new=expect,
                       detail=f"{len(d[key])}건 보관 · 이번에 {new}건 새로")
-    d["checked"] = today.isoformat()
+    # 실패한 날은 확인한 날로 치지 않는다 — 주 1회 규칙에 막혀 일주일 동안 다시 안 받던 것 (11-16 실패 → 11-23 까지 대기, 2026-11-17 사용자)
+    if not failed:
+        d["checked"] = today.isoformat()
     save(d)
     return d
 

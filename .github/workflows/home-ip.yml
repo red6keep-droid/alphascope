@@ -1,0 +1,143 @@
+name: Home IP fetch
+
+# 집 IP(집 공유기 VPN)로만 열리는 곳을 하루 한 번 받는다 (2026-11-17 사용자) — 미래에셋 TIGER 구성 · 마이클 버리 substack RSS.
+# GitHub 실행기(해외 데이터센터 주소)는 두 곳 모두 403, 집 IP 는 200 (11-17 시험, red9keep/News-sub trial run 44086583552).
+# 받은 것은 비공개 상태 저장소 homeip-state 브랜치(experiments/home-ip/data/) → 한국 종목(16:10) · 인물 발언(08:00)이 읽기만 한다.
+#
+# 유튜브 수집(red9keep/News-sub collect.yml)이 같은 공유기 VPN 을 쓴다. 공유기 L2TP 는 동시 접속을 못 버틴다(같은 시험: 둘째 접속이 곧 끊김).
+# 저장소가 달라 concurrency 그룹으로 줄 세울 수 없으므로 ① 유튜브 수집이 없는 14:30 KST 에 걸고(그쪽 회차: 07:30~11:57 · 17:00~20:50 · 21:20~07:55)
+# ② VPN 을 열기 전에 News-sub 의 collect · trial 실행이 도는 중인지 공개 API 로 보고, 돌면 끝날 때까지(최대 25분) 기다린다. 끝내 안 비면 그날은 건너뛴다.
+# 집 IP 로 가는 요청은 home_ip.py 에 적힌 곳만(국민연금 · 야후 · DART · 구글 뉴스는 넣지 않는다 — 유튜브 수집 IP 차단 위험).
+# 정시는 Cloudflare Worker(infra/cron-trigger KST_JOBS 14:30)가 건다. 아래 cron 은 예비 — 오늘 이미 받았으면 건너뛴다.
+on:
+  schedule:
+    - cron: '20 6 * * *'   # 15:20 KST 예비
+  workflow_dispatch:
+    inputs:
+      scheduled:
+        description: '바깥 예약기용 (사람은 끄고 쓴다)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: home-ip
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-24.04   # 유튜브 수집과 같은 러너(vpn-up.sh swanctl 판은 26.04 도 통과)
+    timeout-minutes: 40
+    env:
+      OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
+      OPS_CF_KV_NAMESPACE_ID: ${{ secrets.OPS_CF_KV_NAMESPACE_ID }}
+      OPS_CF_API_TOKEN: ${{ secrets.OPS_CF_API_TOKEN }}
+      HOMEIP_DIR: experiments/home-ip/data
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: State repo (private alphascope-state)
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
+
+      - name: Load state (homeip-state)
+        id: load
+        run: |
+          mkdir -p "$HOMEIP_DIR"
+          if git fetch -q state homeip-state:refs/homeip-state 2>/dev/null; then
+            git archive refs/homeip-state "$HOMEIP_DIR" | tar -x && echo "불러옴: $(ls "$HOMEIP_DIR" | tr '\n' ' ')"
+            last=$(TZ=Asia/Seoul git log -1 --format=%cd --date=format-local:%Y-%m-%d refs/homeip-state)
+          else
+            echo "homeip-state 없음 (첫 실행)"; last=""
+          fi
+          today=$(TZ=Asia/Seoul date +%F)
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$last" = "$today" ]; then
+            echo "오늘($today) 이미 받음 — 예비 실행 건너뜀"; echo "done=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 유튜브 수집이 VPN 을 쓰는 중이면 기다린다 — 동시에 붙으면 한쪽이 끊긴다
+      - name: Wait for YouTube collector (News-sub)
+        id: wait
+        if: steps.load.outputs.done != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 26); do
+            busy=0
+            for st in in_progress queued; do
+              n=$(curl -s -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/repos/red9keep/News-sub/actions/runs?status=$st&per_page=20" \
+                | python3 -c "import json,sys; d=json.load(sys.stdin); print(sum(1 for r in d.get('workflow_runs',[]) if r.get('path','').split('@')[0] in ('.github/workflows/collect.yml','.github/workflows/trial.yml')))" 2>/dev/null || echo 0)
+              busy=$((busy + n))
+            done
+            if [ "$busy" = 0 ]; then echo "유튜브 수집 비어 있음 → VPN 연결"; echo "free=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+            echo "유튜브 수집 도는 중($busy) — 1분 뒤 다시 ($i/26)"; sleep 60
+          done
+          echo "::warning::유튜브 수집이 25분 넘게 안 끝나 오늘은 건너뜀"
+
+      - uses: actions/setup-python@v5
+        if: steps.load.outputs.done != 'true'
+        with:
+          python-version: '3.12'
+
+      - name: Install
+        if: steps.load.outputs.done != 'true'
+        run: pip install -q requests
+
+      - name: 집 공유기 VPN 연결
+        id: vpn
+        if: steps.wait.outputs.free == 'true'
+        continue-on-error: true
+        # Ubuntu 26.04 sudo 는 -E 를 무시한다 — 필요한 변수만 직접 넘긴다 (News-sub collect.yml 과 같게)
+        run: sudo env VPN_SERVER="$VPN_SERVER" VPN_PSK="$VPN_PSK" VPN_USER="$VPN_USER" VPN_PASSWORD="$VPN_PASSWORD" GITHUB_OUTPUT="$GITHUB_OUTPUT" bash scripts/vpn/vpn-up.sh
+        env:
+          VPN_SERVER: ${{ secrets.VPN_SERVER }}
+          VPN_PSK: ${{ secrets.VPN_PSK }}
+          VPN_USER: ${{ secrets.VPN_USER }}
+          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
+
+      - name: Fetch via home IP
+        if: steps.load.outputs.done != 'true'
+        env:
+          HOME_SOURCE_ADDRESS: ${{ steps.vpn.outputs.ok == 'true' && steps.vpn.outputs.ip || '' }}
+          PYTHONUNBUFFERED: '1'
+        run: |
+          if [ "${{ steps.wait.outputs.free }}" != "true" ]; then
+            python experiments/home-ip/fetch_home_ip.py --skip "유튜브 수집이 25분 넘게 돌아 건너뜀"
+          elif [ -z "$HOME_SOURCE_ADDRESS" ]; then
+            python experiments/home-ip/fetch_home_ip.py --skip "집 IP(VPN) 연결 실패"
+          else
+            python experiments/home-ip/fetch_home_ip.py
+            TZ=Asia/Seoul date +%F > "$HOMEIP_DIR/last_run.txt"   # 받은 날 — 내용이 같아도 커밋이 생겨 예비 cron 이 다시 안 돈다
+          fi
+
+      - name: VPN 끊기
+        if: always() && steps.vpn.outcome != 'skipped'
+        run: sudo bash scripts/vpn/vpn-down.sh
+
+      - name: Save state (homeip-state)
+        if: always() && steps.load.outputs.done != 'true'
+        run: |
+          git config user.name "alphascope-bot"
+          git config user.email "bot@users.noreply.github.com"
+          export GIT_INDEX_FILE="$(mktemp -u)"
+          for f in "$HOMEIP_DIR"/*; do [ -f "$f" ] && git add -f "$f"; done
+          if [ -z "$(git ls-files)" ]; then unset GIT_INDEX_FILE; echo "저장할 것 없음"; exit 0; fi
+          TREE="$(git write-tree)"
+          unset GIT_INDEX_FILE
+          if PARENT="$(git rev-parse --verify -q refs/homeip-state)"; then
+            if [ "$TREE" = "$(git rev-parse "$PARENT^{tree}")" ]; then echo "변경 없음"; exit 0; fi
+            COMMIT="$(git commit-tree "$TREE" -p "$PARENT" -m "Update home-ip state [skip ci]")"
+          else
+            COMMIT="$(git commit-tree "$TREE" -m "Update home-ip state [skip ci]")"
+          fi
+          git push state "$COMMIT:refs/heads/homeip-state"
+          echo "저장: $COMMIT"
