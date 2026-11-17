@@ -37,7 +37,19 @@
 | 1 | Pollinations.ai `flux` → `turbo` | 없음 | 모델마다 2회 시도 (`experiments/daily-report/generate_image.py`) |
 | 2 | Hugging Face FLUX.1-schnell | `HF_TOKEN` | 10-21 ~ 26 사이 2회 이쪽으로 넘어감 |
 
-이미지 프롬프트(영문 한 줄)는 데일리 리포트 Gemini 응답 안에 같이 나온다 — 별도 호출 없음.
+이미지 프롬프트(영문 한 줄)는 데일리 리포트 Gemini 응답 안에 같이 나온다 — 별도 호출 없음. (데일리 커버는 2026-11-16 끔)
+
+**시황 해설 배너** (2026-11-17, `experiments/market-commentary/banner.py`, 하루 최대 2장 · am · pm):
+
+| 순서 | 공급자 | 모델 | 키 | 비고 |
+|---|---|---|---|---|
+| 1 | Cloudflare Workers AI | `@cf/leonardo/lucid-origin` 1200×630 | `OPS_CF_ACCOUNT_ID` · `CF_AI_TOKEN`(Workers AI 권한만) | 11-17 비교에서 가장 실사 · 가짜 간판 적음, 한 장 3~14초. 하루 무료 1만 뉴런 — 한 장 뉴런 값은 대시보드로 확인 전 |
+| 2 | Cloudflare Workers AI | `@cf/black-forest-labs/flux-1-schnell` 8단계 | 같음 | 정사각 1024 → 가운데 자름. 가짜 간판 글자 · 랜드마크가 잘 나옴 |
+| 3 | Hugging Face | FLUX.1-schnell | `HF_TOKEN` | 무료 크레딧 |
+| 4 | — | 기본 배너 `static/default/{분위기}.webp` | — | 11-17 Lucid 그림 5장 |
+
+Pollinations 는 배너에 쓰지 않는다 — 11-17 무료가 IP 당 45초 1장 + 워터마크(402 FREE_LIMIT). 장면 설명은 파이썬 틀(AI 글 모델 0).
+배너 글자 폰트 = 강원교육튼튼(강원특별자치도교육청, 판매만 금지 · 출처 표기 권장, `fonts/GangwonEdu-LICENSE.txt`) — 배너 그림에만, 블로그 본문 · 테마와 무관.
 
 ---
 
