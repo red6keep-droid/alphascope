@@ -8,11 +8,12 @@
     소재 = 그날 가장 크게 움직인 업종 → 7갈래 (날짜로 갈래 안 장면을 돌림) · 분위기 = 대표 지수 등락 5단계 · 장소 = am 미국 · pm 한국.
 - 그림 사슬: Workers AI Lucid Origin → Workers AI FLUX schnell → Hugging Face FLUX schnell → 기본 배너(static/default/{분위기}.webp).
     Pollinations 는 쓰지 않는다 (11-17 무료 = IP 당 45초 1장 + 워터마크).
-- 글자 = Pillow + 강원교육튼튼(fonts/GangwonEduPower.ttf, 강원특별자치도교육청 — 판매 · 유료 양도만 금지, 출처 표기 권장) · 작은 글씨 Pretendard(OFL). 숫자 없음. 칸: 알약(브랜드 · 날짜 · 편) / 배너 제목 2줄 / 키워드 줄 / 오늘 볼 것 3칸 / `AI 생성 이미지`.
-    글은 수집기 `banner` 칸(News-doc 20절 Q25)에서. 없으면 알약 · 표시만 (머리글 · 본문은 글에 다 있다).
-    칸에 안 들어가면 글자를 줄이고(최소 크기), 그래도 넘치면 그 칸을 그리지 않고 로그에 남긴다 — 글 본문에는 전부 있다.
+- 배치 = 주요 제목(흰색) · 강조 제목(방향 색) · 시장 요약 한 줄 + 작은 `AI 생성 이미지` (11-17 사용자 사양, 옛 알약 · 볼 것 3칸 없음).
+- 글자 = Pillow + 강원교육튼튼(fonts/GangwonEduPower.ttf, 강원특별자치도교육청 — 판매 · 유료 양도만 금지, 출처 표기 권장). 숫자 없음. 칸: 알약(브랜드 · 날짜 · 편) / 배너 제목 2줄 / 키워드 줄 / 오늘 볼 것 3칸 / `AI 생성 이미지`.
+    글은 수집기 `banner` 칸: titles = 제목 후보 [[주요, 강조], …] 좋은 것부터 → 사양 크기에 들어가는 첫 후보, 다 길면 줄임. keys = 시장 요약.
+    후보가 없으면 글 제목(그날 주제)의 숫자 없는 앞 구절. 글이 길면 칸에 들어갈 때까지 줄인다 — 빼지 않음 (2026-11-17 사용자).
 - 규칙(운영지침 4-6): 로고 · 간판 · 랜드마크(거래소 정면 · 황소상) 없음, 사람은 멀리 · 뒷모습, `AI 생성 이미지` 표시.
-- 출력 = {out}/images/commentary-{날짜}-{am|pm}.webp (1200×630, 약 60~90KB). 이름에 날짜가 있어 30일 정리(image_prune.py) 대상.
+- 출력 = {out}/images/commentary-{날짜}-{am|pm}.webp (900×350 — 11-17 사용자 배치 사양, 그림은 1200×630 으로 받아 줄임). 이름에 날짜가 있어 30일 정리(image_prune.py) 대상.
 - 비밀 값: CF_ACCOUNT_ID · CF_AI_TOKEN · HF_TOKEN 환경 변수. 출력 · 로그에 쓰지 않는다 (오류는 상태 코드 + 응답 앞 160자).
 """
 import argparse
@@ -21,20 +22,14 @@ import datetime as dt
 import io
 import json
 import os
+import re
 import sys
 
 import requests
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-FONTS = {   # 이름 → (굵게, 보통). 강원교육튼튼 = 굵기 하나(ExtraBold) — 두 칸 다 같은 파일 (2026-11-17 사용자 "강원교육튼튼 적용 가능해?")
-    "pretendard": (os.path.join(BASE, "fonts", "Pretendard-Bold.otf"), os.path.join(BASE, "fonts", "Pretendard-Regular.otf")),
-    "gangwon": (os.path.join(BASE, "fonts", "GangwonEduPower.ttf"), os.path.join(BASE, "fonts", "Pretendard-Regular.otf")),
-}
-# 기본 = 강원교육튼튼 (2026-11-17 사용자) — 배너 그림 글자에만. 블로그 본문 · 테마 폰트와 무관. 작은 표시 글씨는 Pretendard 보통
-FONT_BOLD, FONT_REG = FONTS.get(os.environ.get("BANNER_FONT", "gangwon"), FONTS["gangwon"])
-if not os.path.exists(FONT_BOLD):   # 파일이 없으면 Pretendard 로 (배너가 빠지지 않게)
-    FONT_BOLD, FONT_REG = FONTS["pretendard"]
+FONT_FILE = os.path.join(BASE, "fonts", "GangwonEduPower.ttf")   # 강원교육튼튼 하나만 — 배너 그림 글자에만, 블로그 본문 · 테마 폰트와 무관 (2026-11-17 사용자)
 DEFAULT_DIR = os.path.join(BASE, "static", "default")
 REPO_SLUG = os.environ.get("GITHUB_REPOSITORY", "red6keep-droid/alphascope")
 W, H = 1200, 630
@@ -190,8 +185,12 @@ def background(sc, use_ai=True):
 
 # ── 글자 얹기 ───────────────────────────────────────────────────────
 
-def _font(bold, px):
-    return ImageFont.truetype(FONT_BOLD if bold else FONT_REG, px)
+def _font(bold, px):   # bold 인자는 옛 호출 자리 — 폰트는 하나
+    try:
+        return ImageFont.truetype(FONT_FILE, px)
+    except OSError:   # 파일이 없으면 Pillow 기본 글꼴(한글 안 나옴) — 로그로 알림
+        log("폰트 파일 없음 — 기본 글꼴")
+        return ImageFont.load_default(px)
 
 
 def _shrink(d, text, bold, px, min_px, room):
@@ -200,85 +199,141 @@ def _shrink(d, text, bold, px, min_px, room):
     return px if d.textlength(text, font=_font(bold, px)) <= room else None
 
 
+# 배너 배치 (2026-11-17 사용자 사양 "미국 증시 · 편집 가능한 썸네일") — 900×350, 사진 상자 917×463 왼쪽 위(넘치는 곳은 잘림).
+# 폰트는 사양(Gayathri · Noto Sans KR) 대신 정한 강원교육튼튼, 색은 사양 그대로 + 강조 제목만 방향 색(오름 #F34032 · 내림 파랑, 사이트 증감 색 규칙).
+OUT_W, OUT_H = 900, 350
+PHOTO_W, PHOTO_H = 917, 463
+CANVAS_BG = (6, 18, 26)                      # #06121A
+LEFT = 68
+MAX_TEXT_W = OUT_W - LEFT - 40               # 글자가 넘지 않을 오른쪽 끝 (792)
+LINE_H = 1.25
+MAIN = {"top": 76, "px": 79, "spacing": 2.0, "color": (245, 246, 248)}      # 주요 제목 #F5F6F8, 그림자 0 2 3 rgba(0,0,0,.55)
+EMPH = {"top": 150, "px": 80, "spacing": 2.5}                               # 강조 제목 — 색은 방향
+SUMMARY = {"top": 260, "px": 32, "spacing": 0.2, "color": (218, 225, 234)}  # 시장 요약 #DAE1EA
+BIG_PX, BIG_SPACING = round(EMPH["px"] * 1.3), EMPH["spacing"] * 1.3   # 짧은 제목 한 줄 = 30% 크게 (104px, 11-17 사용자)
+# 글자 수 제한 (수집기 Q25, 튼튼체 실측 — 한글 한 자 80px ≈ 76 · 104px ≈ 100 · 32px ≈ 30, 띄어쓰기 ≈ 0.27자):
+#   띄어쓰기는 빼고 센다 — 두 줄 제목 줄마다 한글 10자 · 두 줄 합쳐 7자 안팎이면 저절로 한 줄 104px · 시장 요약 한글 20자(가운뎃점 별도)
+EMPH_COLOR = {"strong_up": (243, 64, 50), "up": (243, 64, 50), "flat": (245, 246, 248),
+              "down": (84, 156, 255), "plunge": (84, 156, 255)}
+
+
+def _spaced_w(text, font, sp):
+    return sum(font.getlength(c) for c in text) + sp * max(len(text) - 1, 0)
+
+
+def _spaced(d, x, cy, text, font, sp, fill):
+    for c in text:
+        d.text((x, cy), c, font=font, fill=fill, anchor="lm")
+        x += font.getlength(c) + sp
+
+
+def _cover(bg, w, h):
+    iw, ih = bg.size
+    s = max(w / iw, h / ih)
+    im = bg.resize((round(iw * s), round(ih * s)), Image.LANCZOS)
+    l, t = (im.width - w) // 2, (im.height - h) // 2
+    return im.crop((l, t, l + w, t + h))
+
+
 def compose(bg, sc, banner):
-    shade = Image.new("L", (W, H))
+    """사진 + 글자. 짧은 글은 사양 크기 그대로(키우지 않음), 긴 글은 칸에 들어갈 때까지 줄인다(빼지 않음, 2026-11-17 사용자)."""
+    canvas = Image.new("RGB", (OUT_W, OUT_H), CANVAS_BG)
+    canvas.paste(_cover(bg.convert("RGB"), PHOTO_W, PHOTO_H), (0, 0))
+    # 글자 쪽(왼쪽)만 옅게 어둡게 — 밝은 사진(크게 오른 날)에서도 읽히게
+    shade = Image.new("L", (OUT_W, OUT_H))
     sd = ImageDraw.Draw(shade)
-    for x in range(W):
-        sd.line([(x, 0), (x, H)], fill=int(205 * max(0.0, 1 - x / (W * 0.78))))
-    im = Image.composite(Image.new("RGB", (W, H), (8, 14, 30)), bg, shade.filter(ImageFilter.GaussianBlur(6)))
-    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(ov)
-    acc = ACCENT[sc["mood"]]
-    day = dt.date.fromisoformat(sc["date"])
+    for x in range(OUT_W):
+        sd.line([(x, 0), (x, OUT_H)], fill=int(150 * max(0.0, 1 - x / (OUT_W * 0.72))))
+    im = Image.composite(Image.new("RGB", (OUT_W, OUT_H), CANVAS_BG), canvas, shade).convert("RGBA")
     banner = banner if isinstance(banner, dict) else {}
+    txt = Image.new("RGBA", (OUT_W, OUT_H), (0, 0, 0, 0))
+    shadow = Image.new("RGBA", (OUT_W, OUT_H), (0, 0, 0, 0))
+    d, ds = ImageDraw.Draw(txt), ImageDraw.Draw(shadow)
 
-    # ① 알약 — 화면 제목 줄과 같은 말 (`11.17 미국 증시시황`, 19절)
-    pill = f"알파스코프 시황 해설   |   {day.month}.{day.day:02d} ({WEEKDAY[day.weekday()]}) {'미국' if sc['slot'] == 'am' else '한국'} 증시시황"
-    pf = _font(True, 24)
-    pw = d.textlength(pill, font=pf)
-    d.rounded_rectangle((48, 40, 48 + pw + 48, 92), 26, fill=(10, 20, 45, 200), outline=(255, 255, 255, 90), width=2)
-    d.text((72, 64), pill, font=pf, fill=(235, 240, 250), anchor="lm")
+    # ① 제목 — 후보(titles, 좋은 것부터) 중 사양 크기 그대로 들어가는 첫 후보. 다 길면 가장 덜 줄여도 되는 후보를 칸에 들어갈 때까지 줄임(빼지 않음)
+    cands = []
+    for c in (banner.get("titles") or []) + ([banner["lines"]] if banner.get("lines") else []):
+        ln = [str(x).strip() for x in (c if isinstance(c, list) else [c]) if str(x).strip()][:2]
+        if ln:
+            cands.append(ln)
+    best = None
+    for ln in cands:
+        styles = [MAIN, EMPH] if len(ln) == 2 else [EMPH]
+        scale = min([1.0] + [MAX_TEXT_W / _spaced_w(t, _font(True, st["px"]), st["spacing"]) for t, st in zip(ln, styles)])
+        if best is None or scale > best[1] + 1e-9:
+            best = (ln, scale, styles)
+        if scale >= 1.0:
+            break
+    big = _font(True, BIG_PX)
+    one = " ".join(best[0]) if best else ""
+    if best and _spaced_w(one, big, BIG_SPACING) <= MAX_TEXT_W:
+        # 짧은 제목 = 한 줄 · 30% 크게(104px), 제목 칸 가운데. 두 줄이 왔으면 앞은 흰색 · 뒤는 방향 색 (2026-11-17 사용자)
+        lines = best[0]
+        if len(cands) > 1:
+            log(f"제목 후보 {len(cands)}개 중 {cands.index(lines) + 1}번째: {lines}")
+        cy = (MAIN["top"] + EMPH["top"] + EMPH["px"] * LINE_H) / 2
+        parts = [(lines[0] + " ", MAIN["color"]), (lines[1], EMPH_COLOR[sc["mood"]])] if len(lines) == 2 else [(lines[0], EMPH_COLOR[sc["mood"]])]
+        x = LEFT
+        for t, color in parts:
+            if color == MAIN["color"]:
+                _spaced(ds, x, cy + 2, t, big, BIG_SPACING, (0, 0, 0, 140))
+            _spaced(d, x, cy, t, big, BIG_SPACING, color)
+            x += _spaced_w(t, big, BIG_SPACING) + BIG_SPACING
+        log(f"짧은 제목 — 한 줄 {BIG_PX}px")
+        best = None
+    if best:
+        lines, scale, styles = best
+        if len(cands) > 1:
+            log(f"제목 후보 {len(cands)}개 중 {cands.index(lines) + 1}번째: {lines}")
+        gap = (EMPH["top"] - MAIN["top"]) * scale
+        tops = [MAIN["top"], MAIN["top"] + gap] if len(lines) == 2 else [MAIN["top"] + gap / 2]
+        for ln, st, top in zip(lines, styles, tops):
+            px = max(12, int(st["px"] * scale))
+            f = _font(True, px)
+            cy = top + px * LINE_H / 2
+            color = st.get("color") or EMPH_COLOR[sc["mood"]]
+            if st is MAIN:
+                _spaced(ds, LEFT, cy + 2, ln, f, st["spacing"] * scale, (0, 0, 0, 140))
+            _spaced(d, LEFT, cy, ln, f, st["spacing"] * scale, color)
+        if scale < 1:
+            log(f"제목 줄임 ×{scale:.2f} ({int(EMPH['px'] * scale)}px)")
 
-    # ② 배너 제목 2줄 — 둘째 줄 = 방향 색
-    lines = [str(x).strip() for x in (banner.get("lines") or []) if str(x).strip()][:2]
-    if lines:
-        px = min(_shrink(d, ln, True, 74, 52, W * 0.66) or 0 for ln in lines)
-        if px:
-            for i, ln in enumerate(lines):
-                d.text((48, 120 + i * (px + 16)), ln, font=_font(True, px),
-                       fill="white" if i == 0 and len(lines) > 1 else acc, stroke_width=2, stroke_fill=(0, 0, 0, 120))
-        else:
-            log(f"배너 제목이 길어 그리지 않음: {lines}")
-
-    # ③ 키워드 줄 — 방향 낱말은 노랑
+    # ② 시장 요약 — keys 를 ' · ' 로 잇고, 길면 칸에 들어갈 때까지 줄임(빼지 않음)
     keys = [str(k).strip() for k in (banner.get("keys") or []) if str(k).strip()]
     if keys:
-        kf = _font(True, 32)
-        total = d.textlength(" · ".join(keys), font=kf)
-        if total <= W - 100:
-            x = 52
-            for i, k in enumerate(keys):
-                if i:
-                    d.text((x, 318), " · ", font=kf, fill=(235, 238, 245))
-                    x += d.textlength(" · ", font=kf)
-                head, _, tail = k.rpartition(" ")
-                if tail in DIR_WORDS and head:
-                    d.text((x, 318), head + " ", font=kf, fill=(235, 238, 245))
-                    x += d.textlength(head + " ", font=kf)
-                    d.text((x, 318), tail, font=kf, fill=(255, 214, 64))
-                    x += d.textlength(tail, font=kf)
-                else:
-                    d.text((x, 318), k, font=kf, fill=(255, 214, 64) if k in DIR_WORDS else (235, 238, 245))
-                    x += d.textlength(k, font=kf)
-        else:
-            log(f"키워드 줄이 길어 그리지 않음: {keys}")
+        line = " · ".join(keys)
+        px = SUMMARY["px"]
+        while px > 12 and _spaced_w(line, _font(True, px), SUMMARY["spacing"]) > MAX_TEXT_W:
+            px -= 1
+        _spaced(d, LEFT, SUMMARY["top"] + SUMMARY["px"] * LINE_H / 2, line, _font(True, px), SUMMARY["spacing"], SUMMARY["color"])
+        if px < SUMMARY["px"]:
+            log(f"요약 줄임 {SUMMARY['px']} → {px}px")
 
-    # ④ 오늘 볼 것 3칸
-    pts = [p for p in (banner.get("points") or []) if isinstance(p, dict) and p.get("what")][:3]
-    if pts:
-        top, h = 400, 130
-        cw = (W - 40 - 250) / len(pts)
-        px = min(_shrink(d, str(p["what"]), True, 27, 18, cw - 96) or 0 for p in pts)
-        if px:
-            d.rounded_rectangle((40, top, W - 40, top + h), 22, fill=(10, 22, 50, 190), outline=(120, 160, 255, 110), width=2)
-            d.rounded_rectangle((60, top + 22, 230, top + h - 22), 18, fill=acc + (235,))
-            lf = _font(True, 30)
-            d.text((145, top + h / 2 - 20), "오늘", font=lf, fill="white", anchor="mm")
-            d.text((145, top + h / 2 + 18), "볼 것", font=lf, fill="white", anchor="mm")
-            for i, p in enumerate(pts):
-                cx = 250 + i * cw
-                if i:
-                    d.line([(cx, top + 26), (cx, top + h - 26)], fill=(255, 255, 255, 70), width=2)
-                d.ellipse((cx + 24, top + 30, cx + 60, top + 66), fill=acc + (255,))
-                d.text((cx + 42, top + 48), str(i + 1), font=_font(True, 22), fill="white", anchor="mm")
-                d.text((cx + 76, top + 30), str(p.get("when", "")), font=_font(True, 24), fill=(255, 214, 64))
-                d.text((cx + 76, top + 66 + (27 - px) / 2), str(p["what"]), font=_font(True, px), fill="white")
-        else:
-            log(f"볼 것 칸이 길어 그리지 않음: {[p['what'] for p in pts]}")
+    # ③ 표시 (운영지침 4-6) — 오른쪽 아래 작게
+    d.text((OUT_W - 14, OUT_H - 12), "AI 생성 이미지", font=_font(False, 14), fill=(220, 225, 232, 200), anchor="rs")
+    im = Image.alpha_composite(im, shadow.filter(ImageFilter.GaussianBlur(1.5)))
+    return Image.alpha_composite(im, txt).convert("RGB")
 
-    # ⑤ 표시 (운영지침 4-6)
-    d.text((48, H - 34), "AI 생성 이미지 · 알파스코프", font=_font(False, 18), fill=(200, 205, 215), anchor="lm")
-    return Image.alpha_composite(im.convert("RGBA"), ov).convert("RGB")
+
+def banner_text(column, sc=None):
+    """배너 글 — 제목은 반드시 있다(사진만 나가지 않게, 2026-11-17 사용자). AI 0.
+    제목 순서: ① 수집기 banner.titles(좋은 것부터) · lines ② 글 제목(그날 주제)의 숫자 없는 앞 구절 ③ 글 제목 전체 ④ 편 이름 `11.17 미국 증시시황`."""
+    column = column or {}
+    b = dict(column.get("banner") or {})
+    if not b.get("titles") and not b.get("lines"):
+        title = str(column.get("title") or "").split(" — ")[-1].strip()
+        parts = [p.strip() for p in re.split(r"[,，]", title) if p.strip() and not re.search(r"\d", p)]
+        if parts:
+            b["titles"] = [[parts[0]]]
+            log(f"제목 후보 없음 — 글 제목 앞 구절: {parts[0]}")
+        elif title:
+            b["titles"] = [[title]]
+            log(f"제목 후보 없음 — 글 제목 전체: {title}")
+        elif sc:
+            day = dt.date.fromisoformat(sc["date"])
+            b["titles"] = [[f"{day.month}.{day.day:02d} {'미국' if sc['slot'] == 'am' else '한국'} 증시시황"]]
+            log("글 제목도 없음 — 편 이름으로")
+    return b
 
 
 # ── 한 번에 ─────────────────────────────────────────────────────────
@@ -288,7 +343,7 @@ def make(briefing, column=None, out_dir=".", use_ai=True):
     try:
         sc = scene(briefing)
         bg, source = background(sc, use_ai)
-        im = compose(bg, sc, (column or {}).get("banner"))
+        im = compose(bg, sc, banner_text(column, sc))
         ref = f"images/commentary-{sc['date']}-{sc['slot']}.webp"
         path = os.path.join(out_dir, ref)
         os.makedirs(os.path.dirname(path), exist_ok=True)
