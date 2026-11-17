@@ -67,6 +67,25 @@ def _flow_rows(m):
     return rows
 
 
+def _figures(m):
+    """시장 숫자 칸 — 시황 해설 pm 묶음 close.figures (수집기 Q20, 2026-11-17). 이미 계산한 값만, 날짜를 같이 준다(ECOS 는 하루 늦는 날이 있다).
+    {name, v, unit, day, chg_1d?}. 기관 일별 순매수는 받지 않아 없다(월별만)."""
+    out = []
+    f = (m or {}).get("foreign")
+    if f:
+        out.append({"name": "외국인 순매수 코스피", "v": round(f["today"]), "unit": "억원", "day": f["day"]})
+        if f.get("kosdaq_today") is not None:
+            out.append({"name": "외국인 순매수 코스닥", "v": round(f["kosdaq_today"]), "unit": "억원", "day": f["day"]})
+        out.append({"name": "외국인 순매수 코스피 20거래일 누적", "v": round(f["cum20"]), "unit": "억원", "day": f["day"]})
+        out.append({"name": "외국인 코스피 연속 " + ("순매수" if f["streak_sign"] > 0 else "순매도"), "v": f["streak"], "unit": "거래일", "day": f["day"]})
+    rt, fx = (m or {}).get("rates") or {}, (m or {}).get("fx") or {}
+    for name, x, unit, nd in (("원/달러 환율", fx.get("usdkrw"), "원", 1), ("국고채 3년 금리", rt.get("ktb3"), "%", 3)):
+        if x:
+            out.append({"name": name, "v": round(x["v"], nd), "unit": unit, "day": x["day"],
+                        "chg_1d": round(x["chg_1d"], nd) if x.get("chg_1d") is not None else None})
+    return out
+
+
 def _events(a, extra, live):
     """홈 맨 위 일정 배너 (2026-10-28 사용자) — 미국 home_feed.events 와 같은 모양. 고정 페이지가 있는 종목만, 가까운 날 · 큰 시총 순."""
     end = (datetime.date.fromisoformat(a["day"]) + datetime.timedelta(days=EVENT_DAYS)).isoformat()
@@ -98,7 +117,7 @@ def build(a, extra=None):
         sectors.setdefault(s["sector"], []).append(s["code"])
     sector_rows = [{"sector": k, "syms": v[:3]} for k, v in sectors.items()]
     return {"updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"), "day": a["day"], "currency": "KRW",
-            "list_url": U.LIST_URL, "indices": a.get("indices") or [], "stocks": stocks, "watch": watch, "sectors": sector_rows, "flows": _flow_rows(a.get("market")),
+            "list_url": U.LIST_URL, "indices": a.get("indices") or [], "stocks": stocks, "watch": watch, "sectors": sector_rows, "flows": _flow_rows(a.get("market")), "figures": _figures(a.get("market")),
             "events": _events(a, extra if extra is not None else collect_kr_extra.load(), live),
             "notable": HF.notable(a, live, {s: (U.code(s), U.BY_SYM[s][1], U.BY_SYM[s][2]) for s in U.BY_SYM}, lambda s: U.code(s) in live),   # 주목할 종목 — 코스피가 2% 넘게 내린 날 (2026-11-04)
             "source": "시세 Yahoo Finance · 자금 흐름 한국은행 ECOS"}
