@@ -98,7 +98,7 @@ def build(a, extra=None):
         sectors.setdefault(s["sector"], []).append(s["code"])
     sector_rows = [{"sector": k, "syms": v[:3]} for k, v in sectors.items()]
     return {"updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"), "day": a["day"], "currency": "KRW",
-            "list_url": U.LIST_URL, "stocks": stocks, "watch": watch, "sectors": sector_rows, "flows": _flow_rows(a.get("market")),
+            "list_url": U.LIST_URL, "indices": a.get("indices") or [], "stocks": stocks, "watch": watch, "sectors": sector_rows, "flows": _flow_rows(a.get("market")),
             "events": _events(a, extra if extra is not None else collect_kr_extra.load(), live),
             "notable": HF.notable(a, live, {s: (U.code(s), U.BY_SYM[s][1], U.BY_SYM[s][2]) for s in U.BY_SYM}, lambda s: U.code(s) in live),   # 주목할 종목 — 코스피가 2% 넘게 내린 날 (2026-11-04)
             "source": "시세 Yahoo Finance · 자금 흐름 한국은행 ECOS"}
