@@ -1,0 +1,48 @@
+name: Banner Workers AI Test
+
+# 시황 배너 비교 (2026-11-17) — Cloudflare Workers AI 로 목업 6장면을 그려 artifact 로만 남긴다.
+# 블로그 · gh-pages · 상태 브랜치에 쓰지 않는다. 수동 실행만(스케줄 없음).
+# 필요한 비밀 값: OPS_CF_ACCOUNT_ID(이미 있음) · CF_AI_TOKEN(Workers AI 권한만 있는 새 토큰).
+# 한도: Workers AI 하루 1만 뉴런 — 모델당 6장, 실행당 최대 3모델.
+
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: '모델 (쉼표): flux-1-schnell, lucid-origin, phoenix-1.0'
+        type: string
+        required: false
+        default: 'flux-1-schnell,lucid-origin'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: banner-cf-test
+  cancel-in-progress: false
+
+jobs:
+  draw:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install
+        run: pip install requests pillow
+      - name: Draw banners (Workers AI)
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
+          CF_AI_TOKEN: ${{ secrets.CF_AI_TOKEN }}
+          MODELS: ${{ inputs.models }}
+        run: python experiments/market-commentary/banner_cf.py --models "$MODELS"
+      - name: Upload banners
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: banner-cf
+          path: experiments/market-commentary/output/banner-cf/
+          retention-days: 14
+          if-no-files-found: warn
