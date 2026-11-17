@@ -1975,6 +1975,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           </div>
           <div class='menu-row'><a class='nav-item' data-latest='데일리 브리핑' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>미국 증시 리포트</a><a class='menu-past' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>지난 리포트</a></div>
           <div class='menu-row'><a class='nav-item' data-latest='한국 증시 리포트' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>한국 증시 리포트</a><a class='menu-past' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>지난 리포트</a></div>
+          <div class='menu-row'><a class='nav-item' href='/p/stock-lists.html'>종목 목록</a></div>
           <div class='menu-row'><a class='nav-item' href='/p/us-market-cap-top10.html'>미국 시가총액 상위 10 종목</a></div>
           <div class='menu-row'><a class='nav-item' href='/p/kr-market-cap-top10.html'>한국 시가총액 상위 10 종목</a></div>
           <div class='menu-row'><a class='nav-item' href='/p/forecast-list.html'>증시 전망</a></div>
@@ -2797,7 +2798,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     <nav aria-label='주요 페이지' class='as-tabbar'>
       <a data-tab='home' href='/'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 11l8-7 8 7'/><path d='M6 10v10h12V10'/></svg><span>홈</span></a>
       <a data-tab='report' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 19h16'/><path d='M6 16l4-5 3 3 5-7'/></svg><span>증시 리포트</span></a>
-      <a data-tab='stock' href='/p/us-market-cap-top10.html'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 20h16'/><path d='M7.5 16v-5M12 16V6M16.5 16v-8'/></svg><span>종목</span></a>
+      <a data-tab='stock' href='/p/stock-lists.html'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 20h16'/><path d='M7.5 16v-5M12 16V6M16.5 16v-8'/></svg><span>종목</span></a>
       <a data-tab='forecast' href='/p/forecast-list.html'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='1.8'><path d='M12 3v18M7.5 21h9'/><path d='M4 7h16'/><path d='M6 7l-3 7h6zM18 7l-3 7h6z'/></svg><span>증시 전망</span></a>
       <a data-tab='people' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2'><rect height='11' rx='3' width='6' x='9' y='3'/><path d='M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7'/></svg><span>인물 발언</span></a>
     </nav>
@@ -5209,6 +5210,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var krMark = h.classList.contains('post-title') && document.querySelector('.post-body [data-kr-code]');   /* 새 제목 "삼성전자 주가" — 코드는 본문 숨은 표시에서 (2026-10-25 사용자: 제목에서 숫자 빼기, 홈 수정 H21) */
           if (!kr && krMark) kr = [null, krMark.getAttribute('data-kr-code')];
           if (!sym && !kr) return;
+          /* 최근 본 종목 (2026-11-17 사용자, 하단 메뉴 `종목` 페이지 관심 탭 1단계) — 종목 고정 페이지(/p/)의 글 보기 제목에서 읽은 코드만, 이 브라우저에만 10개. 서버로 보내지 않는다 */
+          if (h.classList.contains('post-title') && document.body.classList.contains('item-view') && /^\/p\//.test(location.pathname)) {
+            try {
+              var rk = { m: kr ? 'kr' : 'us', t: kr ? kr[1] : sym.split('.')[0] };
+              var rs = JSON.parse(localStorage.getItem('as-recent') || '[]').filter(function (x) { return x && !(x.m === rk.m && x.t === rk.t); });
+              rs.unshift(rk); localStorage.setItem('as-recent', JSON.stringify(rs.slice(0, 10)));
+            } catch (e) {}
+          }
           var host = h.querySelector('.post-title-text') || h.querySelector('a') || h;   /* 제목 글자 칸이 있으면 그 안 맨 앞 — 로고가 첫 글자 앞에 붙는다 */
           /* 2026-10-21: 제3자 로고 핫링크(financialmodelingprep) 중단 — 운영지침 4-6. 티커 두 글자 둥근 배지(리포트 design_kit.ticker_logo 와 같은 모양) */
           var b = document.createElement('span'); b.className = 'title-logo title-badge'; b.setAttribute('aria-hidden', 'true');
@@ -6070,13 +6079,16 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         if (!lab && path.indexOf('/search/label/') === 0) lab = dec(path.slice(14));
         var LBL = {us: '데일리 브리핑', kr: '한국 증시 리포트'}, PEOPLE = '인물 발언';
         var pref = ''; try { pref = localStorage.getItem('as-home-mkt') || ''; } catch (e) {}
-        var isKr = path === '/p/korea.html' || /-\d{6}-stock\.html$/.test(path) || path === '/p/kr-market-cap-top10.html' || lab === LBL.kr;
-        var isUs = path === '/' || (/-stock\.html$/.test(path) && !isKr) || path === '/p/us-market-cap-top10.html' || lab === LBL.us;
+        /* 종목 목록 페이지(/p/stock-lists.html?m=) · 종목 주가 페이지(/p/stock.html?s=) 도 그 나라 (2026-11-17 사용자: 종목 페이지는 들어온 나라 하나만) */
+        var qm = (/[?&]m=(us|kr)\b/.exec(location.search) || [])[1], qs = (/[?&]s=([^&]*)/.exec(location.search) || [])[1] || '';
+        var lists = path === '/p/stock-lists.html', quick = path === '/p/stock.html';
+        var isKr = path === '/p/korea.html' || /-\d{6}-stock\.html$/.test(path) || path === '/p/kr-market-cap-top10.html' || lab === LBL.kr || (lists && qm === 'kr') || (quick && /^\d{6}$/.test(qs));
+        var isUs = path === '/' || (/-stock\.html$/.test(path) && !isKr) || path === '/p/us-market-cap-top10.html' || lab === LBL.us || (lists && qm === 'us') || (quick && qs && !isKr);
         var mk = isKr ? 'kr' : isUs ? 'us' : (pref === 'kr' ? 'kr' : 'us');
         var href = {home: mk === 'kr' ? '/p/korea.html' : '/', report: '/search/label/' + encodeURIComponent(LBL[mk]),
-                    stock: '/p/' + mk + '-market-cap-top10.html', forecast: '/p/forecast-list.html' + (mk === 'kr' ? '#tab-1' : ''), people: '/search/label/' + encodeURIComponent(PEOPLE)};
+                    stock: '/p/stock-lists.html?m=' + mk, forecast: '/p/forecast-list.html' + (mk === 'kr' ? '#tab-1' : ''), people: '/search/label/' + encodeURIComponent(PEOPLE)};
         var cur = (path === '/' || path === '/p/korea.html') ? 'home' : (lab === LBL.us || lab === LBL.kr) ? 'report'
-                : (/-stock\.html$/.test(path) || /market-cap-top10\.html$/.test(path)) ? 'stock' : /^\/p\/forecast-/.test(path) ? 'forecast' : lab === PEOPLE ? 'people' : '';
+                : (/-stock\.html$/.test(path) || /market-cap-top10\.html$/.test(path) || lists || quick || /-etf\.html$/.test(path)) ? 'stock' : /^\/p\/forecast-/.test(path) ? 'forecast' : lab === PEOPLE ? 'people' : '';
         var bar = document.querySelector('.as-tabbar');
         if (bar) [].forEach.call(bar.querySelectorAll('a[data-tab]'), function (a) {
           var k = a.getAttribute('data-tab');

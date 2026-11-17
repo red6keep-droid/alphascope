@@ -884,7 +884,7 @@ __FOOTER_BLOCK__
     <nav aria-label='주요 페이지' class='as-tabbar'>
       <a data-tab='home' href='/'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 11l8-7 8 7'/><path d='M6 10v10h12V10'/></svg><span>홈</span></a>
       <a data-tab='report' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 19h16'/><path d='M6 16l4-5 3 3 5-7'/></svg><span>증시 리포트</span></a>
-      <a data-tab='stock' href='/p/us-market-cap-top10.html'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 20h16'/><path d='M7.5 16v-5M12 16V6M16.5 16v-8'/></svg><span>종목</span></a>
+      <a data-tab='stock' href='/p/stock-lists.html'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 20h16'/><path d='M7.5 16v-5M12 16V6M16.5 16v-8'/></svg><span>종목</span></a>
       <a data-tab='forecast' href='/p/forecast-list.html'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='1.8'><path d='M12 3v18M7.5 21h9'/><path d='M4 7h16'/><path d='M6 7l-3 7h6zM18 7l-3 7h6z'/></svg><span>증시 전망</span></a>
       <a data-tab='people' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2'><rect height='11' rx='3' width='6' x='9' y='3'/><path d='M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7'/></svg><span>인물 발언</span></a>
     </nav>
@@ -979,6 +979,7 @@ def nav_items():
     # 주소는 '/' 로 시작 (2026-11-09): 폰 화면(?m=1)에서 homepageUrl 이 `/?m=1` 이라 `/?m=1p/...` 로 붙어 메뉴 · 목록이 모두 홈으로 갔다
     return """          <div class='menu-row'><a class='nav-item' data-latest='데일리 브리핑' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>미국 증시 리포트</a><a class='menu-past' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>지난 리포트</a></div>
           <div class='menu-row'><a class='nav-item' data-latest='한국 증시 리포트' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>한국 증시 리포트</a><a class='menu-past' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>지난 리포트</a></div>
+          <div class='menu-row'><a class='nav-item' href='/p/stock-lists.html'>종목 목록</a></div>
           <div class='menu-row'><a class='nav-item' href='/p/us-market-cap-top10.html'>미국 시가총액 상위 10 종목</a></div>
           <div class='menu-row'><a class='nav-item' href='/p/kr-market-cap-top10.html'>한국 시가총액 상위 10 종목</a></div>
           <div class='menu-row'><a class='nav-item' href='/p/forecast-list.html'>증시 전망</a></div>

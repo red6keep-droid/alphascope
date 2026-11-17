@@ -215,6 +215,19 @@ jobs:
           BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
         run: python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --publish --map /tmp/qd/shells.json
 
+      # 하단 메뉴 `종목` 페이지 목록 파일 (2026-11-17 사용자 "1단계 구현", 기획 비공개 기획/종목-탭-그룹-목록-기획.md) — /tmp/qd/<시장>/_lists.json.
+      # 같은 폴더라 아래 Pages 배포(/us/_lists.json) · quick-us · quick-kr 브랜치에 그대로 실린다 — 새 푸시 · 수집 · AI 0. 미국 시가총액 = 저장값 주식 수 × 종가.
+      # 정식 검색 색인(gh-pages search/)은 S&P 500 · 코스피 200 · 코스닥 150 밖 정식 종목(테마 묶음) · ETF 용. 실패해도 다른 단계는 그대로(페이지는 전날 파일).
+      - name: Stock lists (종목 페이지 목록 파일)
+        if: steps.collect.outputs.code == '0'
+        continue-on-error: true
+        run: |
+          mkdir -p /tmp/search
+          { git fetch -q --depth 1 origin gh-pages && for m in us kr; do git show FETCH_HEAD:search/$m.json > /tmp/search/$m.json; done; } || echo "::warning::검색 색인 못 받음 — 정식 밖 종목 · ETF 없이"
+          SHELLS=/tmp/qd/shells.json
+          [ -f "$SHELLS" ] || { curl -sf https://alpha-scope.pages.dev/shells.json -o /tmp/shells.json && SHELLS=/tmp/shells.json; } || SHELLS=""
+          python experiments/stock-lists/build_lists.py --qd /tmp/qd --cache /tmp/qcache --search /tmp/search ${SHELLS:+--shells $SHELLS}
+
       # 저장값은 게시 여부와 상관없이 남긴다 — 하루 상한으로 나눠 채우는 것이 이어지게. 다시 모을 수 있는 캐시라 기록 없이 덮어쓴다(저장소가 커지지 않게)
       - name: Save quick-state (private, no history)
         if: always() && steps.collect.outcome == 'success'
