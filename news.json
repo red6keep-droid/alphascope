@@ -1,165 +1,156 @@
 {
-  "updated_at": "2026-11-17 12:46:25 UTC",
+  "updated_at": "2026-11-17 21:46:35 UTC",
   "items": [
     {
-      "title": "Disney beats fourth-quarter estimates, targets $3 billion in savings through cost-cutting efforts",
+      "title": "Jensen Huang scandal fuels bipartisan push to block AI chip sales to China",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/17/disney-dis-earnings-q-2026.html",
-      "published": "2026-11-17 12:14:17",
-      "title_ko": "디즈니, 4분기 실적 예상치 상회 및 비용 절감 통해 30억 달러 절감 목표",
-      "summary_ko": "여러 차례의 대규모 해고 이후 조쉬 다마로 최고경영자의 전략에 대한 투자자들의 관심 집중",
+      "link": "https://www.cnbc.com/2026/11/17/congress-ai-china-jensen-huang-chips.html",
+      "published": "2026-11-17 21:31:21",
+      "title_ko": "젠슨 황 스캔들, 중국에 대한 AI 반도체 판매 차단 초당적 압박 촉발",
+      "summary_ko": "의원들, 국방수권법에 반도체 관련 수출 통제 법안 포함 추진",
       "lines": [
-        "디즈니의 4분기 실적과 매출의 예상치 상회",
-        "2029 회계연도까지 30억 달러 비용 절감 목표 설정"
+        "미 의회, AI 칩 수출 통제 법안 국방수권법 포함 추진",
+        "젠슨 황 스파이 연루 의혹, 대중국 칩 수출 제한 여론 강화",
+        "국방수권법 12월 의회 심의 예정"
       ]
     },
     {
-      "title": "Nike hosts first investor day in 9 years as it tries to rightsize its business",
+      "title": "Widespread outages hit banks, air travel, the NSA and Apple, disrupting seemingly everything",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/17/nike-investor-day-elliott-hill.html",
-      "published": "2026-11-17 12:00:01",
-      "title_ko": "나이키, 사업 개편 시도하며 9년 만에 첫 투자자의 날 개최",
-      "summary_ko": "기업 회생이 작동하고 있음을 투자자들에게 증명하기 위한 행사이 개최",
+      "link": "https://www.cnbc.com/2026/11/17/apple-microsoft-faa-jpmorgan-outages.html",
+      "published": "2026-11-17 21:24:20",
+      "title_ko": "은행, 항공 여행, 국가안보국, 애플을 강타한 광범위한 서비스 중단 사태",
+      "summary_ko": "AI 시대 상호 연결된 기술의 위험성을 보여주는 대규모 시스템 장애 발생",
       "lines": [
-        "나이키 9년 만의 첫 투자자의 날 개최",
-        "나이키 회계연도 1분기 순이익 및 매출 감소",
-        "나이키 회계연도 2027년 매출 한 자릿수 후반 감소 전망"
+        "NSA, 애플, 마이크로소프트 등 주요 기관 및 기업 광범위 장애 발생",
+        "국가정보국장, 이번 장애 사이버 공격 또는 국가 주도 음모 아님 확인"
       ]
     },
     {
-      "title": "Nvidia has lost $2 trillion in value. Here's what options traders expect from earnings",
+      "title": "Nvidia closes lower ahead of earnings as company reels from Huang resignation",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/17/nvidia-has-lost-2-trillion-in-value-heres-what-options-traders-expect-from-earnings.html",
-      "published": "2026-11-17 11:42:28",
-      "title_ko": "엔비디아, 가치 2조 달러 증발. 옵션 거래자들이 실적에 기대하는 것은",
-      "summary_ko": "엔비디아 옵션이 평소보다 더 큰 변동성을 가격에 반영 중",
+      "link": "https://www.cnbc.com/2026/11/17/nvidia-stock-earnings-jensen-huang-resignation.html",
+      "published": "2026-11-17 21:05:24",
+      "title_ko": "엔비디아, 황젠쉰 사임 여파 속 실적 발표 앞두고 하락 마감",
+      "summary_ko": "투자자들, 전임 CEO 젠슨 황의 사임에 따른 후폭풍 저울질",
       "lines": [
-        "엔비디아 옵션 시장 변동성 4월 이후 최고치 기록",
-        "엔비디아 실적 발표 앞두고 옵션 거래자 7% 주가 반응 예상",
-        "엔비디아 내재 변동성 68 도달"
+        "젠슨 황 전 엔비디아 CEO의 사임 후 첫 공개 입장 발표",
+        "이사회의 행동 조사 협조 및 CEO 복귀 의사 표명",
+        "실적 발표를 앞두고 화요일 엔비디아 주가 하락 마감"
       ]
     },
     {
-      "title": "Iran escalates threats as third U.S. carrier arrives in Middle East, tanker struck in Hormuz",
+      "title": "FAA pauses installation of new routers after ground stop",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/17/iran-war-trump-hormuz-oil-.html",
-      "published": "2026-11-17 11:22:54",
-      "title_ko": "이란, 세 번째 미 항공모함 중동 도착 및 호르무즈 유조선 피격 속 위협 고조",
-      "summary_ko": "세 번째 미국 항공모함이 걸프만에 도착하며 군사적 긴장 고조 우려 자극",
+      "link": "https://www.cnbc.com/2026/11/17/faa-ground-stop-routers.html",
+      "published": "2026-11-17 20:53:24",
+      "title_ko": "연방항공청, 운항 중단 사태 이후 신규 라우터 설치 일시 중단",
+      "summary_ko": "기술적 문제로 인해 연방항공청이 금요일 전국적인 운항 중단 조치 발령",
       "lines": [
-        "미국 세 번째 항공모함 중동 걸프 지역 도착",
-        "이란 혁명수비대 해군 호르무즈 해협 폐쇄 경고"
+        "연방항공청의 신규 라우터 설치 중단 발표",
+        "금요일 기술적 문제로 발생한 전국 항공기 운항 중단",
+        "남아크 Arkansas에 설치된 과부하 라우터가 시스템 마비 원인으로 지목"
       ]
     },
     {
-      "title": "South Korea will suspend all aircraft operation for 35 minutes and markets will open late. Here’s why",
+      "title": "Home Depot names Richard McPhail as new CEO, beats earnings expectations",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/17/south-korea-suspend-aircraft-exam-markets.html",
-      "published": "2026-11-17 10:49:36",
-      "title_ko": "한국, 35분간 모든 항공기 운항 중단 및 증시 지연 개장 예정. 그 이유는",
-      "summary_ko": "목요일 대학수학능력시험 기간 동안 소음을 최소화하기 위한 조치",
+      "link": "https://www.cnbc.com/2026/11/17/home-depot-hd-q3-earnings-2026.html",
+      "published": "2026-11-17 20:01:12",
+      "title_ko": "홈디포, 리처드 맥페일을 새 CEO로 임명하고 실적 기대치 상회",
+      "summary_ko": "홈디포, 다음 주부터 적용되는 신임 최고경영자로 리처드 맥페일 지명",
       "lines": [
-        "대학 수학능력시험 영어 듣기 평가 시간 동안 전국 항공기 이스착륙 35분간 금지",
-        "국토교통부 발표에 따른 영향 항공기 총 130편",
-        "시험 시간 중 공중 비행 항공기는 상온 3킬로미터 이상 고도 유지 의무"
+        "홈디포 최고재무책임자 리처드 맥페일 신임 최고경영자 선임",
+        "앤마리 캠벨 미국 점포·운영 총괄 수석부사장 사장 겸 최고운영책임자 승진",
+        "조던 브로기 최고재무책임자 내정",
+        "테드 데커 최고경영자 사임 및 이사회 의장 유지"
       ]
     },
     {
-      "title": "Data center policy dominated the midterms. The 'Virginia of Europe' is the latest battleground",
+      "title": "Trump has arrived in Asia. Here’s what he said about Iran and Deutsche Bank",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/17/spain-data-center-decree-election.html",
-      "published": "2026-11-17 10:25:54",
-      "title_ko": "데이터 센터 정책, 중간선거를 압도하다. '유럽의 버지니아'가 최신 격전지",
-      "summary_ko": "데이터 센터 정책이 핵심 선거 이슈로 부상해 수십억 달러 규모의 투자 잠재적 손실 우려",
+      "link": "https://www.cnbc.com/2026/11/17/trump-iran-asia-trip-china.html",
+      "published": "2026-11-17 19:16:20",
+      "title_ko": "트럼프 아시아 방문 도착 및 이란과 도이체방크 관련 발언",
+      "summary_ko": "트럼프, 이란 경고 및 세금 유출 보도 대응",
       "lines": [
-        "스페인 정부의 데이터 센터 규제 강화 추진",
-        "아마존과 마이크로소프트 및 블랙스톤 산하 큐티에스 투자 영향권 포함"
+        "도널드 트럼프 미국 대통령의 아시아 순방 시작",
+        "필리핀 마닐라 도착 및 기자회견 진행"
       ]
     },
     {
-      "title": "Trump’s accounts traded up to $97.5 million in Nvidia as Huang gained White House access",
+      "title": "AI 인프라 투자 지속성",
+      "title_ko": "AI 인프라 투자 지속성",
+      "summary_ko": "미국이 AI 경쟁에서 뒤처지는 것은 국가적 재앙이 될 것이므로 지속적인 인프라 투자가 필수적",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/16/trump-nvidia-stock-trades-jensen-huang.html",
-      "published": "2026-11-17 10:08:32",
-      "title_ko": "트럼프 계좌, 젠슨 황 백악관 접근 얻는 동안 엔비디아 주식 최대 9,750만 달러 거래",
-      "summary_ko": "젠슨 황과 중국 스파이 의혹 관련 보고 5일 후 엔비디아 주식 최대 100만 달러 매각",
-      "lines": [
-        "도널드 트럼프의 투자 계좌가 지난해 엔비디아 주식을 최대 58백만 달러 보유",
-        "백악관 재입성 이후 트럼프 계좌의 엔비디아 관련 거래 규모가 최대 9750만 달러 기록"
-      ]
-    },
-    {
-      "title": "Deutsche Bank shares sink as whistleblowers reveal Epstein payments, Trump tax leak, Russia bets",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/17/deutsche-bank-leak-epstein-trump.html",
-      "published": "2026-11-17 09:23:40",
-      "title_ko": "도이체방크 주가, 내부고발자가 엡스타인 지급·트럼프 세금 유출·러시아 베팅 폭로하며 급락",
-      "summary_ko": "",
-      "lines": [
-        "도이체방크 내부 고발 약 1500만 건 유출",
-        "제프리 엡스타인 연계 의심 거래 5억 8200만 달러 처리"
-      ]
-    },
-    {
-      "title": "엔트로픽 IPO 및 수급 영향",
-      "title_ko": "엔트로픽 IPO 및 수급 영향",
-      "summary_ko": "엔트로픽 상장을 앞둔 자금 이동과 외국인 매도세가 시장에 영향을 미치고 있음",
-      "source": "SBS Biz 증시인사이트",
-      "link": "https://www.youtube.com/watch?v=-IukO9q1Abw",
-      "published": "2026-11-17 09:00:13",
+      "link": "https://www.youtube.com/watch?v=pol0PUvekFo",
+      "published": "2026-11-17 19:03:40",
       "kind": "media",
-      "tag": "기업 사건",
-      "direction": "neutral",
-      "n_channels": 4,
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "positive",
+      "n_channels": 2,
       "lines": [
-        "손창현 팀장 발언 : 금요일 엔트로픽 상장 후 외국인 매수 전환 가능성 존재",
-        "이주현 대표 발언 : 자금을 빨아가는 엔트로픽 IPO 등이 일단 끝나야 함"
+        "앤디 재시 발언 : 미국이 AI 규범과 규칙 설정에서 타국에 뒤처지는 것은 재앙적인 실수로 봄",
+        "앤디 재시 발언 : AI 데이터센터 투자 둔화 우려에도 불구하고 국가 경쟁력 차원에서 지속적인 투자 필요"
       ]
     },
     {
-      "title": "U.S. companies from Nvidia to Apple face a growing China dilemma",
+      "title": "미국 의회 대중국 AI 칩 수출 통제 강화",
+      "title_ko": "미국 의회 대중국 AI 칩 수출 통제 강화",
+      "summary_ko": "미국 의회가 대중국 첨단 AI 칩 수출 통제 강화를 추진하면서 양국 관계가 더욱 긴장될 수 있음",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/17/us-tech-firms-china-ties-political-pressure.html",
-      "published": "2026-11-17 08:52:45",
-      "title_ko": "엔비디아에서 애플까지 미국 기업들, 커지는 중국 딜레마 직면",
-      "summary_ko": "미국과 중국 시장을 항해하는 기업들의 위험이 더욱 커진 상황",
-      "lines": [
-        "젠슨 황 엔비디아 CEO 사임",
-        "트럼프 행정부 중국 기업 첨단 칩 원격 접근 규제 강화"
-      ]
-    },
-    {
-      "title": "앤트로픽 상장 임박 및 부의 양극화",
-      "title_ko": "앤트로픽 상장 임박 및 부의 양극화",
-      "summary_ko": "역대 최대 규모의 앤트로픽 IPO로 극소수 부유층의 막대한 차익이 부각되며 정치권의 증세 압박 우려가 커짐",
-      "source": "Mad Money",
-      "link": "https://www.youtube.com/watch?v=7s7kh1Y2vtY",
-      "published": "2026-11-17 00:37:27",
-      "kind": "media",
-      "tag": "기업 사건",
-      "direction": "neutral",
-      "n_channels": 3,
-      "lines": [
-        "블룸버그 보도 : 베벌리힐스 벤처캐피털 앤트로픽 초기 투자로 약 70억 달러 가치 및 약 1,500% 수익 예상",
-        "진행자 발언 : 초대형 IPO로 인한 부의 편중이 심화되며 민주당 집권 시 부유세 및 자본이득세 인상 가능성 증가",
-        "진행자 발언 : 일반 투자자들은 벤처 투자 초기 단계의 막대한 수익을 누리기 어려운 구조적 한계 지적"
-      ]
-    },
-    {
-      "title": "미국 상무부 제3국 AI 칩 수출 규제 강화",
-      "title_ko": "미국 상무부 제3국 AI 칩 수출 규제 강화",
-      "summary_ko": "미 상무부가 중국 기업들의 제3국 데이터 센터를 통한 첨단 AI 칩 우회 사용을 차단하는 임시 규정을 발표",
-      "source": "증시각도기",
-      "link": "https://www.youtube.com/watch?v=tXq_SjCHvek",
-      "published": "2026-11-16 23:22:42",
+      "link": "https://www.youtube.com/watch?v=4QMblB7AYg4",
+      "published": "2026-11-17 19:01:50",
       "kind": "media",
       "tag": "규제 · 산업정책",
       "direction": "negative",
+      "n_channels": 4,
+      "lines": [
+        "미국 의회 대중국 첨단 AI 칩 수출 통제 강화 추진",
+        "선전의 엔비디아 칩 밀수 시장에서 블랙웰 B300 서버 칩 가격 급등",
+        "블랙웰 B300 서버 칩 세트 가격 약 300만 달러 기록"
+      ]
+    },
+    {
+      "title": "트럼프 대통령 아시아 순방 및 정상회담",
+      "title_ko": "트럼프 대통령 아시아 순방 및 정상회담",
+      "summary_ko": "트럼프 대통령의 아시아 순방 중 미중 정상회담이 양국 관계 개선의 계기가 될 것으로 기대",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=bM0JZboNVAo",
+      "published": "2026-11-17 18:27:33",
+      "kind": "media",
+      "tag": "지정학",
+      "direction": "neutral",
       "n_channels": 3,
       "lines": [
-        "진행자 발언 : 상무부 중국 기업들의 제3국 데이터 센터 통한 엔비디아 첨단 칩 사용 포착해 규제 진입",
-        "진행자 발언 : 싱가포르 말레이시아 태국 인도네시아 브라질 데이터 센터 사업자 미국 첨단 AI 칩 구매 시 미 정부 허가 필요",
-        "진행자 발언 : 엔비디아 내부자 전 임원 발언 기준 대중국 우회 수요 차단 시 총수요 20% 이상 감소 예상 (발언자 추정)"
+        "제임스 스타브리디스 전 사령관 발언 : 미중 정상회담은 양국 경제 수장 간의 소통 측면에서 긍정적",
+        "제임스 스타브리디스 전 사령관 발언 : 정상회담에서 핵무기, 무역, AI 군비 통제 등이 주요 의제로 다뤄질 것으로 예상"
+      ]
+    },
+    {
+      "title": "U.S. officially loses measles elimination status amid ongoing outbreaks",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/17/us-measles-elimination-status.html",
+      "published": "2026-11-17 18:10:16",
+      "title_ko": "미국, 지속적인 발병 속 홍역 퇴치 지위 공식 상실",
+      "summary_ko": "범미보건기구 국장, 12개월 연속 전파 이후 미국 내 홍역 풍토병화 최종 판정",
+      "lines": [
+        "미국의 홍역 퇴치 공식 지위 상실",
+        "범미주보건기구의 홍역 풍토병화 최종 결정",
+        "12개월 연속 바이러스 전파 확인"
+      ]
+    },
+    {
+      "title": "Chase Home Lending CEO says he plans to 'go on offense' against non-bank lenders",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/17/chase-home-lending-ceo-says-hes-going-on-offense.html",
+      "published": "2026-11-17 18:06:18",
+      "title_ko": "JP모건 홈 렌딩 CEO, 비은행 대출 기관 상대로 '공세 전환' 계획 밝혀",
+      "summary_ko": "체이스 홈 렌딩 최고경영자 션 그제빈, 채용 진행 및 시장 점유율 확대 의지 표명",
+      "lines": [
+        "30년 고정 주택담보대출 평균 금리 7.5% 기록 (예상)",
+        "전년 대비 전체 모기지 수요 39% 감소",
+        "체이스 홈 랜딩의 시장 점유율 확대 계획 발표"
       ]
     }
   ]

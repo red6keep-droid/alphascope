@@ -1,207 +1,4 @@
 {
- "fd3b6dfa58e8": {
-  "lines": [
-   "빌트의 지역 사업장 및 행사장의 고객 유치 신규 플랫폼 출시"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T12:46:40.128523+00:00",
-  "n_src": 138
- },
- "75272258a8aa": {
-  "lines": [
-   "앤스로픽의 나스닥 상장을 위한 기업공개 공모가 70달러에서 78달러 설정",
-   "일론 머스크의 스페이스엑스 상장 약 5개월 뒤 진행되는 앤스로픽 기업공개"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T12:46:40.128523+00:00",
-  "n_src": 112
- },
- "fc17e32685e9": {
-  "lines": [
-   "엔비디아 젠슨 황 최고경영자의 중국인 스파이 연루 의혹 제기"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T12:46:40.128523+00:00",
-  "n_src": 144
- },
- "4361cc392d06": {
-  "lines": [
-   "트럼프 대통령의 화요일 아부다비 회담 앞둔 우크라이나 평화 협상 낙관 시그널"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T12:46:40.128523+00:00",
-  "n_src": 135
- },
- "8c4ece9448a7": {
-  "lines": [
-   "공화당 중간선거 패배 원인을 두고 밴스, 루비오, 디샌티스의 의견 대립",
-   "트럼프의 차기 대권 주자들 간의 책임 공방 발생"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T12:46:48.657751+00:00",
-  "n_src": 146
- },
- "ce843df64832": {
-  "lines": [
-   "이란 전쟁 완화 기대감으로 브렌트유 90달러 하회",
-   "8월 이후 처음으로 90달러 아래로 하락",
-   "트럼프 대통령의 월요일 분쟁 종식 예상 발언"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T12:46:48.657751+00:00",
-  "n_src": 156
- },
- "35f61d976c54": {
-  "lines": [
-   "중국의 상품 무역 흑자 2년 연속 1조 달러 상회",
-   "10월 기준 무역 흑자 1조 달러 돌파",
-   "중국산 저가 상품 공급 과잉에 따른 교역 상대국들의 불만 고조"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T12:46:48.657751+00:00",
-  "n_src": 164
- },
- "456d44c6ca1c": {
-  "lines": [
-   "위고비와 제바운드 등 GLP-1 약물과 시력 상실 위험 연관성 경고",
-   "체중 관리 및 당뇨병 치료용 GLP-1 약물 사용과 희귀 안질환 증가 위험 발견",
-   "미국 식품의약국의 관련 증거 확인"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T12:46:48.657751+00:00",
-  "n_src": 157
- },
- "91d19827d4ec": {
-  "lines": [
-   "프랑스의 슈퍼마켓 냉장고 사이버 공격 주체로 이란 이슬람혁명수비대 사이버 부대 지목",
-   "프랑스 정부의 해당 사이버 공격 관련 제재 검토 착수"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T12:46:51.078083+00:00",
-  "n_src": 151
- },
- "cfd647cb340b": {
-  "lines": [
-   "엔비디아 이사회의 젠슨 황 CEO 관련 조사 착수",
-   "중국 정보기관 연계 여성과의 관계 인정에 따른 법무법인 왁텔 립튼 선임"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:32.256251+00:00",
-  "n_src": 900
- },
- "d8530ee65ead": {
-  "lines": [
-   "앤스로픽의 기업공개 추진 및 대규모 자금 조달 예정",
-   "탈중앙화 가상자산 거래소 하이퍼리퀴드 등에서의 앤스로픽 계약 주가 98달러 기록"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:32.256251+00:00",
-  "n_src": 900
- },
- "8625966f767d": {
-  "lines": [
-   "미국 10년물 국채 금리의 5% 상회 기록",
-   "10월 소비자물가지수 발표 및 420억 달러 규모의 국채 입찰 진행"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:32.256251+00:00",
-  "n_src": 900
- },
- "2f6d039f0271": {
-  "lines": [
-   "아마존 링의 실내 순찰용 드론 및 로봇 공개",
-   "250달러 가격의 링 드론 캠 출시"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:32.256251+00:00",
-  "n_src": 900
- },
- "413ad23659f8": {
-  "lines": [
-   "2013년 6월 오바마 미국 대통령과 시진핑 중국 국가주석의 비공식 정상회담 개최",
-   "미국과 중국의 AI 패권 경쟁 속 국가 안보와 경제적 경쟁력 위협 대두"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:33.456336+00:00",
-  "n_src": 900
- },
- "e406afff14a1": {
-  "lines": [
-   "미국 뉴욕 연방준비은행의 가계 부채 보고서 발표",
-   "HELOC 잔액 18개 분기 연속 증가세 기록"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:33.456336+00:00",
-  "n_src": 900
- },
- "028fe8b39e84": {
-  "lines": [
-   "존 물레나르 미 하원 중국특별위원회 위원장의 엔비디아 CEO 관련 질의",
-   "중국 스파이 연루 의혹에 대한 의회의 진상 조사 요구"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:33.456336+00:00",
-  "n_src": 900
- },
- "486fe38249fd": {
-  "lines": [
-   "알파벳 주가의 사상 최대 일일 낙폭 기록 이후 1.5% 반등",
-   "알파벳의 13개 분기 연속 두 자리 수 매출 성장 기록"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:33.456336+00:00",
-  "n_src": 900
- },
- "7868890a3a0f": {
-  "lines": [
-   "뉴욕 연방준비은행의 가계 부채 보고서 화요일 발표",
-   "신용카드 부채 총액 1조 2,900억 달러로 역대 최고 기록",
-   "전체 가계 부채 규모 19조 1,000억 달러 기록",
-   "소비자당 평균 신용카드 잔액 6,678달러 집계"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:34.988117+00:00",
-  "n_src": 900
- },
- "f2669eff1e1e": {
-  "lines": [
-   "토마스 매시 공화당 하원의원의 피트 헤그세스 국방장관 탄핵안 발의",
-   "탄핵소추안 총 8개 조항 포함",
-   "헤그세스 장관의 6개월 만의 펜타곤 기자회견 개최",
-   "이란 전쟁 지휘 및 군사 작전 관련 탄핵안 제기"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:34.988117+00:00",
-  "n_src": 900
- },
- "8008ccdff6b0": {
-  "lines": [
-   "미국 노동통계국의 10월 소비자물가지수 화요일 발표",
-   "10월 소비자물가지수 전월 대비 0.4% 상승",
-   "휘발유 가격 상승세 완화 및 식품·주택 부문 물가 압력 지속"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:34.988117+00:00",
-  "n_src": 900
- },
- "a1db6cbc2eb8": {
-  "lines": [
-   "앤스로픽의 기업공개 일정 11월 19일 예정",
-   "완전희석 기준 기업가치 1조 4,000억 달러 상회 전망"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T20:00:34.988117+00:00",
-  "n_src": 900
- },
- "4d81acf983c6": {
-  "lines": [
-   "백악관의 관세 정책 유지 방침 표명",
-   "중간선거 이후 공화당에 대한 유권자 반발 발생"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T21:46:29.760043+00:00",
-  "n_src": 900
- },
  "a6eb50e5937f": {
   "lines": [
    "인베스팅 클럽의 옴스트레치 평일 오후 업데이트 발행",
@@ -211,46 +8,6 @@
   "at": "2026-11-11T01:29:08.335348+00:00",
   "n_src": 361,
   "retry": true
- },
- "b913f5db039e": {
-  "lines": [
-   "코어위브의 3분기 매출 168% 급증",
-   "코어위브의 순손실 7억 900만 달러 기록",
-   "화요일 실적 발표와 함께 2026년 가이던스 상향 조정"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T21:46:29.760043+00:00",
-  "n_src": 900
- },
- "d5d552974a84": {
-  "lines": [
-   "화요일 파슬의 3분기 영업이익 2530만 달러 기록",
-   "파슬의 순매출 0.4% 증가한 2억 7120만 달러 달성",
-   "파슬 CEO 프랑코 포글리아토의 턴어라운드 전략 추진"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T21:46:29.760043+00:00",
-  "n_src": 900
- },
- "fc7785a99e50": {
-  "lines": [
-   "구글·틱톡·우버·뉴욕타임스 경력의 전직 구글 채용 담당자 파라 샤르기",
-   "네트워킹 과정에서 '자기소개' 질문 대응의 중요성"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T21:46:30.893559+00:00",
-  "n_src": 900
- },
- "b6b86d124d0e": {
-  "lines": [
-   "공화당 하원의원들의 비공개 투표",
-   "오하이오주 짐 조던 하원 법사위원장의 공화당 원내대표 선출",
-   "106대 73의 득표 결과",
-   "스티브 스칼리스 하원 원내대표를 상대로 한 승리"
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-10T21:46:30.893559+00:00",
-  "n_src": 900
  },
  "d56066ffc373": {
   "lines": [
@@ -4207,9 +3964,18 @@
  },
  "d97ed0c1bbfd": {
   "lines": [
-   "도널드 트럼프 미국 대통령의 아시아 순방 시작과 마닐라 도착"
+   "도널드 트럼프 미국 대통령의 아시아 순방 시작",
+   "필리핀 마닐라 도착 및 기자회견 진행"
   ],
   "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   },
    {
     "scope": "market",
     "tickers": [],
@@ -4220,8 +3986,9 @@
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:21.343388+00:00",
-  "n_src": 900
+  "at": "2026-11-17T21:46:35.186379+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "9a6087f7ddac": {
   "lines": [
@@ -4494,6 +4261,343 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-17T12:46:25.401373+00:00",
+  "n_src": 900
+ },
+ "54df06262303": {
+  "lines": [
+   "미 의회, AI 칩 수출 통제 법안 국방수권법 포함 추진",
+   "젠슨 황 스파이 연루 의혹, 대중국 칩 수출 제한 여론 강화",
+   "국방수권법 12월 의회 심의 예정"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-17T21:46:25.002608+00:00",
+  "n_src": 900
+ },
+ "32c2628ba7ee": {
+  "lines": [
+   "NSA, 애플, 마이크로소프트 등 주요 기관 및 기업 광범위 장애 발생",
+   "국가정보국장, 이번 장애 사이버 공격 또는 국가 주도 음모 아님 확인"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "AAPL"
+    ],
+    "sector": "XLK",
+    "issue": "OTHER",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "AAPL"
+    ],
+    "sector": "XLK",
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-17T21:46:25.002608+00:00",
+  "n_src": 900
+ },
+ "1e87f45bb066": {
+  "lines": [],
+  "tags": [],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-17T21:46:25.002608+00:00",
+  "n_src": 900
+ },
+ "6d0c63fb754b": {
+  "lines": [
+   "젠슨 황 전 엔비디아 CEO의 사임 후 첫 공개 입장 발표",
+   "이사회의 행동 조사 협조 및 CEO 복귀 의사 표명",
+   "실적 발표를 앞두고 화요일 엔비디아 주가 하락 마감"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-17T21:46:31.515480+00:00",
+  "n_src": 900
+ },
+ "a12e13fe5b6b": {
+  "lines": [
+   "연방항공청의 신규 라우터 설치 중단 발표",
+   "금요일 기술적 문제로 발생한 전국 항공기 운항 중단",
+   "남아크 Arkansas에 설치된 과부하 라우터가 시스템 마비 원인으로 지목"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-17T21:46:31.515480+00:00",
+  "n_src": 900
+ },
+ "258fb4d0be96": {
+  "lines": [
+   "기술주에서 방어주로의 자금 이동 현상 발생"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-17T21:46:31.515480+00:00",
+  "n_src": 323
+ },
+ "444fca867a9a": {
+  "lines": [
+   "변동성 지수 4거래일 연속 상승"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-17T21:46:33.335480+00:00",
+  "n_src": 301
+ },
+ "437b927dac9f": {
+  "lines": [
+   "홈디포 최고재무책임자 리처드 맥페일 신임 최고경영자 선임",
+   "앤마리 캠벨 미국 점포·운영 총괄 수석부사장 사장 겸 최고운영책임자 승진",
+   "조던 브로기 최고재무책임자 내정",
+   "테드 데커 최고경영자 사임 및 이사회 의장 유지"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "HD"
+    ],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "HD"
+    ],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "HD"
+    ],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "HD"
+    ],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-17T21:46:33.335480+00:00",
+  "n_src": 900
+ },
+ "9bcfcc1b3fd6": {
+  "lines": [
+   "칼시 상품선물거래위원회 요청에 따라 트럼프 관련 일부 언급 계약 거래 중단"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-17T21:46:33.335480+00:00",
+  "n_src": 900
+ },
+ "5e39bb37b737": {
+  "lines": [
+   "미국의 홍역 퇴치 공식 지위 상실",
+   "범미주보건기구의 홍역 풍토병화 최종 결정",
+   "12개월 연속 바이러스 전파 확인"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-17T21:46:35.186379+00:00",
+  "n_src": 900
+ },
+ "d26a7d48dbc9": {
+  "lines": [
+   "30년 고정 주택담보대출 평균 금리 7.5% 기록 (예상)",
+   "전년 대비 전체 모기지 수요 39% 감소",
+   "체이스 홈 랜딩의 시장 점유율 확대 계획 발표"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "RATES_FED",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-17T21:46:35.186379+00:00",
   "n_src": 900
  }
 }
