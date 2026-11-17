@@ -258,27 +258,8 @@ jobs:
             [ -f "experiments/stock-radar/data/$f" ] && cp "experiments/stock-radar/data/$f" "$STATE_DIR/radar/$f"
           done
 
-      # ① 아래 가격 그래프 (chart_price.py → output/images/nvda-price-{day}.webp). daily-report 커버 이미지와 같은 경로
-      - name: Prepare chart image for deploy
-        if: needs.check.outputs.mode != 'refresh'
-        run: |
-          mkdir -p deploy/images
-          if compgen -G "experiments/nvda-report/output/images/*.webp" > /dev/null; then
-            cp experiments/nvda-report/output/images/*.webp deploy/images/
-            ls -la deploy/images/
-          else
-            echo "::warning::가격 그래프가 없습니다 — 글은 그래프 없이 나간다."
-          fi
-          # 종목 그래프(radar-*.webp)는 여기 넣지 않는다 — 아래 radar-images 단계 (2026-10-20 휘발성)
-
-      - name: Deploy chart image to gh-pages branch
-        if: needs.check.outputs.mode != 'refresh' && hashFiles('deploy/images/*.webp') != ''
-        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./deploy
-          publish_branch: gh-pages
-          keep_files: true
+      # 옛 엔비디아 날짜 글의 가격 그림(nvda-price-{day}.webp)을 gh-pages 에 올리던 단계 · 캐시 비우기는 2026-11-17 뺐다 —
+      # 날짜 글은 11-01 끝나 아무 글도 그 그림을 안 쓰는데 하루 1장씩 gh-pages 에 쌓였다(사용자 "그림 단계만 먼저 빼줘"). 남은 그림은 30일 정리(image_prune.py)가 지운다.
 
       # 종목 그래프 — radar-images 브랜치를 그날 그림만으로 새로 만들어 덮어쓴다(부모 커밋 없음 = 이력 없음, 2026-10-20 사용자: 이미지는 휘발성).
       # gh-pages(keep_files)에 두면 매일 수십 장이 커밋 이력에 쌓인다. 페이지 <img> 주소는 render_pages.chart_url (@radar-images).
@@ -295,16 +276,6 @@ jobs:
           COMMIT="$(git commit-tree "$TREE" -m "Stock charts $(date -u +%F) [skip ci]")"
           git push --force origin "$COMMIT:refs/heads/radar-images"
           echo "종목 그래프 $(git ls-tree "$SUB" | wc -l)장 → radar-images (이력 없이 덮어씀)"
-
-      - name: Purge and verify jsDelivr cache
-        if: needs.check.outputs.mode != 'refresh' && hashFiles('experiments/nvda-report/output/image_ref.txt') != ''
-        run: |
-          IMAGE_REF=$(cat experiments/nvda-report/output/image_ref.txt)
-          [ -z "$IMAGE_REF" ] && { echo "::warning::그래프 ref 없음"; exit 0; }
-          curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}" || true
-          sleep 5
-          curl -sS -f -o /dev/null "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/${IMAGE_REF}" \
-            && echo "그래프 CDN 확인: ${IMAGE_REF}" || echo "::warning::CDN에서 아직 안 보임: ${IMAGE_REF}"
 
       # 엔비디아 날짜별 글 게시(publish.py)는 2026-11-01 그만뒀다 — 엔비디아는 아래 종목 고정 페이지(nvidia-nvda-stock)로. 지난 글은 블로그에 그대로
 
