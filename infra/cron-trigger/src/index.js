@@ -84,6 +84,9 @@ const JOBS = {
 // 분을 리포트 · 시세 시각(:00 · :15 · :20 · :30)에서 비켜 둔다 — 모두 gh-pages 에 push 해서, 같은 분에 돌면 한쪽 push 가 거부된다.
 const REPEAT = [
   // 뉴스 2시간마다는 2026-10-25 KST_JOBS 하루 두 번으로 옮겼다 (피드가 며칠에 몇 개라 33번 연속 새 기사 0)
+  // 한국 간단 종목 뉴스 매체 시험(RSS 제목) — 2시간마다 UTC 짝수 시 :10. GitHub cron 이 24시간에 2번만 돌았다 (2026-11-17 사용자 "Worker로 옮기고").
+  // 시험 끝(11-21 KST) 뒤엔 걸지 않는다. gh-pages 에 안 써서 다른 실행과 push 겹침 없음.
+  { workflow: "kr-rss-probe.yml", inputs: { scheduled: "true" }, when: (u) => u.m === 10 && u.h % 2 === 0 && u.day <= "2026-11-21" },
 ];
 
 // 알림 (2026-11-12 사용자: "실패됐을 때 나한테 알림이 와야") — 11-12 GitHub 토큰 만료로 13:00 · 16:10 · 21:45 실행이
@@ -101,6 +104,7 @@ const NAMES = {
   "update.yml": "홈 시세 갱신",
   "quick-news.yml": "간단 종목 뉴스",
   "quick-data.yml": "간단 종목 주가 (853종목)",
+  "kr-rss-probe.yml": "한국 간단 종목 뉴스 매체 시험",
 };
 const WATCH_AFTER_MIN = 60;
 const name = (wf) => NAMES[wf] || wf;
@@ -152,7 +156,7 @@ async function dispatch(workflow, token, inputs = { scheduled: "true" }) {
 function dueAt(at) {
   const ny = nyTime(at);
   const kst = kstTime(at);
-  const utc = { h: at.getUTCHours(), m: at.getUTCMinutes() };
+  const utc = { h: at.getUTCHours(), m: at.getUTCMinutes(), day: at.toISOString().slice(0, 10) };
   return [
     ...(JOBS[ny.hm] || []).filter((j) => !j.when || j.when(ny)),
     ...(KST_JOBS[kst.hm] || []).filter((j) => !j.when || j.when(kst)),
