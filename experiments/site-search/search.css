@@ -5,7 +5,7 @@
 .as-search-btn svg, .as-search-form svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 html.as-lock, html.as-lock body { overflow: hidden; }
 
-.as-search-layer { position: fixed; inset: 0; z-index: 200; background: rgba(15, 23, 42, .45); overflow-y: auto; }
+.as-search-layer { position: fixed; inset: 0; z-index: 200; background: transparent; overflow-y: auto; }   /* 가림막은 ::before (팝업과 같이, 2026-11-14 사용자) */
 .as-search-layer[hidden], .as-chat[hidden], .as-chat-fab[hidden] { display: none; }
 .as-search-box { max-width: 760px; margin: 0 auto; min-height: 120px; background: var(--bg, #fff); border-radius: 0 0 16px 16px; padding: 18px 24px 28px;
   box-shadow: 0 12px 40px rgba(15, 23, 42, .18); font-family: var(--sans); color: var(--ink, #0F172A); }

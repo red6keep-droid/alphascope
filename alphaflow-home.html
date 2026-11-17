@@ -203,11 +203,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .menu-quick { display: none; }   /* 폰 · 태블릿에서만 (아래 900px 규칙) */
 /* 서랍 메뉴의 닫기 버튼·뒤 가림막 — JS가 만든다. 데스크톱에서는 쓰지 않는다 */
 .nav-close {
-  display: none; position: absolute; top: 16px; right: 16px;
-  width: 36px; height: 36px; align-items: center; justify-content: center;
-  border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600);
+  display: none; position: absolute; top: 18px; right: 18px;
+  width: 32px; height: 32px; align-items: center; justify-content: center; padding: 0;
+  border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111;
 }
-.nav-close svg { width: 16px; height: 16px; }
+.nav-close:hover { border-color: #111; }
+.nav-close svg { width: 14px; height: 14px; }   /* 서랍 닫기도 테두리 네모 32 (닫기 버튼 통일, 2026-11-14 사용자). 옛 36 — 가운데 자리는 그대로(16 + 18) */
 .nav-overlay { position: fixed; inset: 0; z-index: 49; background: transparent; }   /* 헤더(50) 아래 — 서랍은 헤더 안에 있어 55로 두면 가림막이 서랍을 덮어 메뉴가 눌리지 않았다 (2026-10-13 사용자: "메뉴를 클릭시 목록 화면으로 이동되지 않는다")   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
@@ -215,7 +216,7 @@ body.menu-open { overflow: hidden; }
 .nav-switch { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 7px 12px 7px 8px; border: 1px solid var(--border-strong); border-radius: 999px; background: #fff; color: #111; font-size: 14px; font-weight: 700; line-height: 20px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: border-color .15s ease, background-color .15s ease; }
 .nav-switch:hover { border-color: #94A3B8; background: #F8FAFC; }
 /* 높이 36 = 메뉴 아이콘 테두리 36 과 같게 (국기 23 + 위아래 5.5 + 테두리 1). 국기 26 → 23 으로 10% 줄임(2026-11-11 사용자) */
-.nav-switch svg { width: 18px; height: 18px; flex: none; display: block; border-radius: 50%; }   /* 국기 23 → 18 · 글자 14/20 · 높이 36 그대로 (2026-11-11 사용자) */
+.nav-switch svg { width: 18px; height: 18px; flex: none; display: block; border-radius: 50%; }   /* 국기 23 → 18 (20%) · 글자 15/22 → 14/20 · 위아래 안쪽 5.5 → 7 · 왼쪽 8 = 스위치 높이 36 그대로 (2026-11-11 사용자) */
 /* 바로 보이는 메뉴 · 서랍 메뉴 나누기 (2026-11-10 사용자: "미국, 한국만 메뉴, 증시 전망은 메뉴 아이콘 안으로").
    서랍 메뉴 링크 가운데 data-bar 가 붙은 것만 로고 오른쪽 줄에 복사하고 body.has-bar 를 붙인다(JS). 그때는 PC 에서도 메뉴 아이콘 · 서랍을 쓴다.
    data-bar 가 하나도 없으면(지금 테마) 예전 그대로: PC 는 메뉴 전부 줄로, 폰은 전부 복사 */
@@ -563,6 +564,9 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
   position: relative;
 }
 .stock-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }   /* 로고가 머리글자를 덮는다 (2026-10-22) */
+/* LIGHT_LOGOS_START */
+img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/CVX.svg"], img[src$="/EOG.svg"], img[src$="/GE.svg"], img[src$="/GOOGL.svg"], img[src$="/KR_000660.svg"], img[src$="/KR_009540.svg"], img[src$="/KR_010130.svg"], img[src$="/KR_012450.svg"], img[src$="/KR_017670.svg"], img[src$="/KR_042660.svg"], img[src$="/KR_042700.svg"], img[src$="/KR_068270.svg"], img[src$="/KR_086790.svg"], img[src$="/KR_196170.svg"], img[src$="/KR_247540.svg"], img[src$="/KR_329180.svg"], img[src$="/KR_402340.svg"], img[src$="/META.jpg"], img[src$="/MSFT.svg"], img[src$="/PG.jpg"], img[src$="/SMR.svg"], img[src$="/SO.svg"], img[src$="/TXN.svg"] { outline: 1px solid #E2E8F0; outline-offset: -1px; }   /* 흰 바탕 로고 외곽선 — logo_edge_check.py 가 쓴다 (2026-11-11 사용자) */
+/* LIGHT_LOGOS_END */
 .stock-avatar.has-logo { background: #F1F5F9 !important; }
 .stock-label { display: flex; flex-direction: column; min-width: 0; }
 .stock-name {
@@ -688,6 +692,15 @@ a.stock-cell:hover .stock-name { text-decoration: underline; }
 .footer-more svg { transition: transform .15s; }
 .footer-disclaimer[open] .footer-more svg { transform: rotate(180deg); }
 .footer-disclaimer > p { margin: 4px 0 0; }
+/* 상세 화면(글 · 고정 페이지) = 작은 푸터 (2026-11-12 사용자 "푸터는 홈에만?" → Claude 안: 면책은 투자 정보를 보는 화면에 있어야 한다) —
+   제목 `ALPHASCOPE 주식 리포트` 는 빼고, 면책 첫 문장(접지 않음) 한 줄 + 오른쪽 더 보기 버튼(AI 고지 · 외부 의견 안내는 접힌 채) + 저작권 줄. 홈 · 목록은 그대로 */
+body.item-view .footer-name { display: none; }
+body.item-view .footer-disclaimer summary { display: flex; align-items: flex-start; gap: 8px; }
+body.item-view .footer-title { order: 2; flex: none; margin: 0; }
+body.item-view .footer-more { margin-left: 0; }
+body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
+body.item-view .footer-copy { display: none; }   /* 상세 화면은 저작권 줄 삭제 (2026-11-15 사용자) */
+body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 11 도 함께 — 줄 19 + 11 = 30 만큼 푸터가 짧아진다 */
 .footer-copy {
   margin: 0;
   font-family: var(--num);
@@ -1313,8 +1326,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
        2026-10-24 사용자: 첫 문장만 보이고 화살표(더 보기)로 나머지를 연다. "면책 사항 :" 이름표는 뺐다(법적 의무 아님).
        첫 줄에 "권유하지 않습니다"까지 둔다 — 투자 권유 아님은 접지 않는다(운영지침 5절). 접힌 글도 HTML 에 있어 검색엔진이 읽는다(details, JS 없음).
        같은 날 사용자: "코드가 계산" 은 첫 문장과 중복이라 뺌, AI 는 목록 대신 한 줄(AI 기본법 생성형 AI 고지), "늦거나 틀릴 수" → 참고용 한 문장. 문구 확정(사용자): "해설 문장 일부는 AI 가 씁니다." · "모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다." -->
-  <details class="footer-disclaimer">
-    <summary><span class="footer-title">ALPHASCOPE 주식 리포트<span class="footer-more" role="img" aria-label="더 보기"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></span></span><span class="footer-lead">ALPHASCOPE 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.</span></summary>
+  <details class='footer-disclaimer'>
+    <summary><span class='footer-title'><span class='footer-name'>ALPHASCOPE 주식 리포트</span><span class='footer-more' role='img' aria-label='더 보기'><svg viewBox='0 0 16 16' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></span></span><span class='footer-lead'>ALPHASCOPE 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.</span></summary>
     <p>해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다.
     개별 투자 상담을 하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다.
     종목 로고는 각 회사의 상표이며, 종목을 구분하는 용도로만 쓰고 해당 회사와 제휴 관계가 없습니다.</p>
@@ -2195,8 +2208,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var media = it.kind === 'media';
     homePop.querySelector('.rt-pop-title').textContent = it.title;
     var body = homePop.querySelector('.rt-pop-body'); body.textContent = '';
-    it.lines.forEach(function (ln) {
-      var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:11px 0;';   /* 행간 28 · 항목 여백 11 (P359) */
+    it.lines.forEach(function (ln, i) {
+      var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:' + (i ? 21 : 14) + 'px 0 11px;padding-left:7px;';   /* 행간 28 · 첫 줄 위 14 · 줄 사이 21 · 들여쓰기 7 = 이슈 날짜 팝업 기준 (2026-11-14 사용자, design_kit.pop_li_margin) */
       var dot = el('span'); dot.style.cssText = 'flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;';
       /* 발언자 = 내용 뒤 작은 회색 `- 이름`, 이름 없으면 `- 방송 의견` (P353, design_kit.speaker_split 과 같은 규칙) */
       var m = /^\s*([^:：]{0,30}?)\s*(진행자 발언|기자 보도|발언|진행자|앵커|보도|발표)\s*[:：]\s*(.+)$/.exec(ln), who = '';   /* 접두 꼴 넓힘 (P377) */
@@ -2899,6 +2912,121 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     }).catch(function () {});
   })();
 
+  /* ============================================================ 로그인 · 계정 · 관리자 줄 (2026-11-13 사용자: "상단 메뉴 앞에 로그인 버튼", "관리자 페이지는 우측 메뉴 버튼 아래")
+     헤더 `.as-login-btn` — 로그인 전 = 사람 아이콘, 누르면 계정 창(구글 로그인 흰 버튼). 로그인 뒤 = 내 사진, 누르면 계정 창(이름 · [운영 현황] · 로그아웃).
+     방문자 요청 0: Firebase 로그인 도구(gstatic)는 계정 창을 열 때 · 이 기기에서 로그인해 둔 표시(as-signed)가 있을 때만 불러온다.
+     구글 로그인 창은 계정 창의 버튼을 누를 때 연다 — 도구를 그 전에 불러 두어야 폰 브라우저가 팝업을 막지 않는다.
+     블로그 주인(UID)이면 as-admin 표시 → 메뉴 맨 아래 `운영 현황` 줄 + 계정 창 버튼. 누르면 ID 토큰을 운영 Worker /fb-login 으로 POST(주소에 넣지 않음).
+     주소 끝 #ops 도 표시를 남긴다(예비 입구). 로그아웃하면 두 표시를 지운다. */
+  (function () {
+    var btn = document.querySelector('.as-login-btn'), row = document.querySelector('#primary-menu .menu-admin');
+    var OPS = 'https://alphascope-ops-console.red6keep.workers.dev';
+    var SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
+    var CFG = { apiKey: 'AIzaSyDY59SYxDKvQAAOxwbxYwZexolbx_5B-q0', authDomain: 'alphascope-352e9.firebaseapp.com', projectId: 'alphascope-352e9', appId: '1:143644264576:web:96972235fa5e8ac58c3e65', owner: 'u1vln4bbDgSgWQDe2F2FaNs81D43' };   /* 댓글 CFG 와 같은 공개 값 */
+    function flag(k, v) { try { if (v === undefined) return localStorage.getItem(k) === '1'; if (v) localStorage.setItem(k, '1'); else localStorage.removeItem(k); } catch (e) {} return false; }
+    try { if (location.hash === '#ops') { flag('as-admin', true); history.replaceState(null, '', location.pathname + location.search); } } catch (e) {}
+    function showRow() { if (row) row.hidden = !flag('as-admin'); }
+    showRow();
+    var fb = null, au = null, user = null, readyP = null, pop = null, from = null;
+    var ICON = btn ? btn.innerHTML : '';
+    function gProvider(fb) { var p = new fb.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' }); return p; }   /* 매번 계정 고르는 창 — 계정이 둘 이상이면 마지막 계정으로 바로 들어가던 것 (2026-11-13 사용자) */
+    function load(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+    function ready() {
+      if (readyP) return readyP;
+      readyP = (window.firebase && window.firebase.auth ? Promise.resolve()
+        : (window.firebase ? Promise.resolve() : load(SDK + 'firebase-app-compat.js')).then(function () { return load(SDK + 'firebase-auth-compat.js'); }))
+        .then(function () {
+          fb = window.firebase;
+          if (!fb.apps.length) fb.initializeApp({ apiKey: CFG.apiKey, authDomain: CFG.authDomain, projectId: CFG.projectId, appId: CFG.appId });
+          au = fb.auth(); au.languageCode = 'ko';
+          return new Promise(function (ok) { var first = true; au.onAuthStateChanged(function (u) { setUser(u); if (first) { first = false; ok(); } }); });
+        });
+      readyP.catch(function () { readyP = null; });
+      return readyP;
+    }
+    function mk(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+    function face(u) {
+      if (u.photoURL) { var im = document.createElement('img'); im.alt = ''; im.referrerPolicy = 'no-referrer'; im.src = u.photoURL; return im; }
+      return mk('span', 'as-ini', (u.displayName || '?').charAt(0));
+    }
+    function setUser(u) {
+      user = u || null;
+      flag('as-signed', !!user);
+      flag('as-admin', !!user && user.uid === CFG.owner);
+      showRow();
+      if (btn) { btn.innerHTML = ''; if (user) { btn.appendChild(face(user)); btn.setAttribute('aria-label', '내 계정'); } else { btn.innerHTML = ICON; btn.setAttribute('aria-label', '로그인'); } }
+      if (pop && !pop.hidden) paint();
+    }
+    /* 운영 현황 — 토큰을 POST(form) 로 Worker 에 */
+    function goOps() {
+      if (!user || user.uid !== CFG.owner) { location.href = OPS + '/'; return Promise.resolve(); }
+      return user.getIdToken(true).then(function (t) {
+        var f = document.createElement('form'); f.method = 'POST'; f.action = OPS + '/fb-login'; f.style.display = 'none';
+        var i = document.createElement('input'); i.type = 'hidden'; i.name = 'id_token'; i.value = t; f.appendChild(i);
+        document.body.appendChild(f); f.submit();
+      });
+    }
+    /* 계정 창 — 툴팁 팝업(.rt-pop)과 같은 상자, 닫기 = 회색 원 */
+    var G = '<svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 0 1 0-3.4V5H.9a9 9 0 0 0 0 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.5 1.4l2.6-2.6A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>';
+    function close() { if (pop) pop.hidden = true; if (from) from.focus(); }
+    function paint() {
+      var body = pop.querySelector('.rt-pop-body'), title = pop.querySelector('.rt-pop-title');
+      body.textContent = '';
+      var err = mk('p', 'as-acct-err');
+      if (!user) {
+        title.textContent = '로그인';
+        body.appendChild(mk('p', 'as-acct-note', '댓글에 쓰는 구글 계정으로 로그인합니다.'));
+        var lg = mk('button', 'as-acct-btn'); lg.type = 'button'; lg.innerHTML = G + '<span>Google 계정으로 로그인</span>';
+        lg.disabled = !au;
+        if (!au) ready().then(function () { lg.disabled = false; }, function () { err.textContent = '로그인 도구를 불러오지 못했어요. 잠시 뒤에 다시 시도해 주세요.'; });
+        lg.addEventListener('click', function () {
+          lg.disabled = true; err.textContent = '';
+          au.signInWithPopup(gProvider(fb)).then(function (r) { setUser(r.user); }, function (e) {
+            var m = String((e && (e.code || e.message)) || '');
+            if (/popup-blocked/.test(m)) err.textContent = '로그인 창이 열리지 않았어요. 브라우저의 팝업 차단을 잠시 풀고 다시 눌러 주세요.';
+            else if (/unauthorized-domain|operation-not-allowed/.test(m)) err.textContent = '지금은 로그인을 준비하고 있어요. 잠시 뒤에 다시 시도해 주세요.';
+            else if (!/popup-closed|cancelled-popup/.test(m)) err.textContent = '로그인하지 못했어요. 잠시 뒤에 다시 시도해 주세요.';
+          }).then(function () { lg.disabled = false; });
+        });
+        body.appendChild(lg);
+      } else {
+        title.textContent = '내 계정';
+        var me = mk('div', 'as-acct-me'); me.appendChild(face(user)); me.appendChild(mk('span', null, user.uid === CFG.owner ? 'AlphaScope 운영자' : (user.displayName || '이름 없음')));
+        body.appendChild(me);
+        if (user.uid === CFG.owner) {
+          var ob = mk('button', 'as-acct-btn', '운영 현황'); ob.type = 'button';
+          ob.addEventListener('click', function () { ob.disabled = true; goOps().catch(function () { location.href = OPS + '/'; }); });
+          body.appendChild(ob);
+        }
+        var out = mk('button', 'as-acct-btn', '로그아웃'); out.type = 'button';
+        out.addEventListener('click', function () { out.disabled = true; au.signOut().then(function () { setUser(null); close(); }, function () { out.disabled = false; }); });
+        body.appendChild(out);
+      }
+      body.appendChild(err);
+    }
+    function open() {
+      if (!pop) {
+        pop = mk('div', 'rt-pop as-acct'); pop.hidden = true;
+        pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-labelledby="as-acct-title"><div class="rt-pop-head"><div class="rt-pop-title" id="as-acct-title"></div>' +
+          '<button type="button" class="as-acct-x" aria-label="닫기"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8"/></svg></button></div><div class="rt-pop-body"></div></div>';
+        document.body.appendChild(pop);
+        pop.querySelector('.as-acct-x').addEventListener('click', close);
+        pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
+        document.addEventListener('keydown', function (e) { if (pop && !pop.hidden && e.key === 'Escape') close(); });
+      }
+      paint(); pop.hidden = false; pop.querySelector('.as-acct-x').focus();
+      if (!au) ready().then(function () { if (!pop.hidden) paint(); }, function () {});
+    }
+    if (btn) btn.addEventListener('click', function () { from = btn; open(); });
+    /* 로그인해 둔 기기 · 관리자 표시가 있으면 미리 불러 사진 · 상태를 맞춘다 (방문자는 표시가 없어 불러오지 않는다) */
+    if (flag('as-signed') || flag('as-admin')) ready().catch(function () {});
+    /* 메뉴 `운영 현황` 줄 — 로그인돼 있으면 바로, 아니면 계정 창(로그인 버튼) */
+    if (row) row.querySelector('a').addEventListener('click', function (ev) {
+      ev.preventDefault();
+      ready().then(function () { if (user && user.uid === CFG.owner) return goOps(); from = btn; open(); }, function () { location.href = OPS + '/'; });
+    });
+  })();
+
   /* ============================================================ 모바일 메뉴 (2026-10-12 사용자: 메뉴를 누르면 오른쪽에서 열리는 서랍) */
 
   var toggle = document.querySelector('.nav-toggle');
@@ -3094,10 +3222,10 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       li.appendChild(b); list.appendChild(li);
     }
     function flash(b, msg) { var t = b.querySelector('.platform-sharing-text'), o = t.textContent; t.textContent = msg; setTimeout(function () { t.textContent = o; }, 1500); }
-    var order = { link: 0, facebook: 1, x: 2, kakao: 3 };
+    var order = { link: 0, facebook: 1, x: 2, kakao: 3, telegram: 4, band: 5, threads: 6, more: 7 };   /* 채널 7개 + 링크 복사 (2026-11-14 사용자, 목업 A7-2) */
     function kindOf(li) {
       var t = ((li.textContent || '') + ' ' + (li.innerHTML.match(/sharing-\w+/g) || []).join(' ')).toLowerCase();
-      return /카카오|kakao/.test(t) ? 'kakao' : /facebook|페이스북/.test(t) ? 'facebook' : /twitter|(^|\s)x(\s|$)/.test(t) ? 'x' : 'link';
+      return /카카오|kakao/.test(t) ? 'kakao' : /텔레그램|telegram/.test(t) ? 'telegram' : /밴드|band/.test(t) ? 'band' : /스레드|threads/.test(t) ? 'threads' : /더 보기/.test(t) ? 'more' : /facebook|페이스북/.test(t) ? 'facebook' : /twitter|(^|\s)x(\s|$)/.test(t) ? 'x' : 'link';
     }
     /* 아이콘 네 개를 직접 그린다 — 블로거 기본 아이콘은 이 테마에서 안 그려진다. 링크는 선, 나머지는 채운 로고 (2026-10-23 사용자) */
     var SV = function (inner, stroke) { return '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" style="flex:none;width:20px;height:20px;' + (stroke ? 'fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;' : 'fill:currentColor;stroke:none;') + '">' + inner + '</svg>'; };
@@ -3105,7 +3233,11 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       link: SV('<path d="M10 13a5 5 0 0 0 7.100.1l3-3a5 5 0 0 0-7.100-7.100l-1.700 1.700"/><path d="M14 11a5 5 0 0 0-7.100-.1l-3 3a5 5 0 0 0 7.100 7.100l1.700-1.700"/>', true),
       facebook: SV('<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.990 4.388 10.954 10.125 11.854v-8.385H7.078v-3.470h3.047V9.430c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.830c-1.491 0-1.956.925-1.956 1.874v2.250h3.328l-.532 3.470h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>'),
       x: SV('<path d="M18.901 1.153h3.680l-8.040 9.190L24 22.846h-7.406l-5.800-7.584-6.638 7.584H.474l8.600-9.830L0 1.154h7.594l5.243 6.932ZM17.610 20.644h2.039L6.486 3.240H4.298Z"/>'),
-      kakao: SV('<path d="M12 3c5.799 0 10.500 3.664 10.500 8.185 0 4.520-4.701 8.184-10.500 8.184a13.500 13.500 0 0 1-1.727-.110l-4.408 2.883c-.501.265-.678.236-.482-.486l.998-3.770C2.682 16.700 1.500 14.536 1.500 11.185 1.500 6.664 6.201 3 12 3Z"/>')
+      kakao: SV('<path d="M12 3c5.799 0 10.500 3.664 10.500 8.185 0 4.520-4.701 8.184-10.500 8.184a13.500 13.500 0 0 1-1.727-.110l-4.408 2.883c-.501.265-.678.236-.482-.486l.998-3.770C2.682 16.700 1.500 14.536 1.500 11.185 1.500 6.664 6.201 3 12 3Z"/>'),
+      telegram: SV('<path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>'),   /* 텔레그램 · 스레드 = Simple Icons 13.21.0 공식 모양, 밴드 = 밴드 앱 아이콘 모양 선 그림(공개 묶음에 없다) (2026-11-14 사용자) */
+      threads: SV('<path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/>'),
+      band: '<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true" focusable="false" style="flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M16.2 27.9V8.4a3.9 3.9 0 0 0-3.9-3.9a3.9 3.9 0 0 0-3.9 3.9v19.5"/><path d="M16.2 14.387A15.602 15.602 0 1 1 8.4 27.9"/><path d="M16.2 19.18a11.7 11.7 0 1 1-3.9 8.72V8.4"/><circle cx="24" cy="27.9" r="7.8"/></svg>',
+      more: SV('<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>', true)
     };
     var present = {};
     [].slice.call(list.children).forEach(function (li) { present[kindOf(li)] = 1; });
@@ -3124,7 +3256,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     }
     /* 카카오톡: 카카오 개발자 앱의 JavaScript 키가 있으면 카카오톡 공유창, 없으면 기기 공유창(모바일에서 카카오톡 선택) → 그것도 없으면 주소 복사.
        키는 아래 KAKAO_JS_KEY 에 (사이트 도메인도 카카오 개발자 콘솔에 등록) */
-    var KAKAO_JS_KEY = '';
+    var KAKAO_JS_KEY = '069e629f7c7a8e72eef36026283f1967';
     mkItem('카카오톡', ICONS.kakao,
       function (b) {
         function fallback() {
@@ -3149,11 +3281,18 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
         if (window.Kakao) { send(); return; }
         var sc = document.createElement('script'); sc.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js'; sc.onload = send; sc.onerror = fallback; document.head.appendChild(sc);
       });
-    /* 모든 버튼의 아이콘을 위 것으로 통일하고 순서는 링크 · 페이스북 · X · 카카오톡 */
+    /* 텔레그램 · 밴드 · 스레드 = 각 서비스 공유 주소(키 없음) · 더 보기 = 휴대폰 기본 공유 창, 지원하는 기기(폰)에서만 (2026-11-14 사용자) */
+    function popup(u) { window.open(u, '_blank', 'noopener,width=640,height=560'); }
+    mkItem('텔레그램', ICONS.telegram, function () { popup('https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareTitle)); });
+    mkItem('밴드', ICONS.band, function () { popup('https://band.us/plugin/share?body=' + encodeURIComponent(shareTitle + '\n' + shareUrl) + '&route=' + encodeURIComponent(location.hostname)); });
+    mkItem('스레드', ICONS.threads, function () { popup('https://www.threads.net/intent/post?text=' + encodeURIComponent(shareTitle + ' ' + shareUrl)); });
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) mkItem('더 보기', ICONS.more, function () { navigator.share({ title: shareTitle, url: shareUrl }).catch(function () {}); });
+    /* 모든 버튼의 아이콘을 위 것으로 통일하고 순서는 링크 · 페이스북 · X · 카카오톡 · 텔레그램 · 밴드 · 스레드 · 더 보기 */
     [].slice.call(list.children).sort(function (a, b) { return order[kindOf(a)] - order[kindOf(b)]; }).forEach(function (li) {
       var btnEl = li.querySelector('.sharing-platform-button') || li;
       [].slice.call(btnEl.querySelectorAll('svg')).forEach(function (v) { v.parentNode.removeChild(v); });
       btnEl.insertAdjacentHTML('afterbegin', ICONS[kindOf(li)]);
+      if (kindOf(li) === 'link') li.classList.add('share-main');   /* 링크 복사 = 맨 위 한 줄 큰 버튼 (2026-11-14 사용자: "링크 복사를 크게 강조") */
       list.appendChild(li);
     });
     pop.querySelector('.share-pop-body').appendChild(list);
@@ -3197,6 +3336,15 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     /* 최대 3줄 (2026-11-10 사용자) — 이미 게시된 글의 4줄 이상도 앞 3줄만. 렌더러(dk.related_buttons)도 3개로 자른다 */
     [].slice.call(r.querySelectorAll('a[data-row-link]')).slice(3).forEach(function (x) { x.parentNode.removeChild(x); });
   });
+  /* 글 끝 순서 = 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터 (2026-11-12 사용자 여정 테스트) — 버튼 줄 · 댓글 칸을 마지막 함께 보는 페이지 뒤로 */
+  var rels = [].slice.call(shell.querySelectorAll('.post-shell > [data-related].is-moved'));
+  if (rels.length) {
+    var last = rels[rels.length - 1], cm = shell.querySelector('.post-shell > .comments');
+    rels[0].parentNode.insertBefore(rels[0], nav);
+    rels.slice(1).forEach(function (r) { last.parentNode.insertBefore(r, nav); });
+    shell.classList.add('rel-first');
+    if (cm) nav.parentNode.insertBefore(cm, nav.nextSibling);
+  }
 })();
 
 /* ============================================================ 목록 버튼 위 구분선 (2026-10-12 사용자: "콘텐츠 영역에서 하단이 텍스트로 끝날 때만 구분선, 목록 버튼과 콘텐츠 사이 40픽셀")
@@ -3378,6 +3526,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   function shown() { return total !== null ? total : items.length; }
   function setCount() {
     toggle.querySelector('.cm-label').textContent = '댓글' + (loaded && (total !== null || !more) ? ' ' + shown() : '');
+    toggle.classList.toggle('has-cm', loaded && shown() > 0);   /* 댓글이 있을 때만 검정 — 없거나 아직 못 읽었으면 회색 (2026-11-12 사용자) */
     var rest = total !== null ? Math.max(total - items.length, 0) : 0;
     moreBtn.hidden = !more;
     moreBtn.textContent = '이전 댓글 ' + (rest ? rest + '개 ' : '') + '더 보기';
@@ -3807,25 +3956,37 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   'use strict';
   var root = document.querySelector('.post-body');
   if (!root) return;
-  var pop = null, last = null;
-  function close() { if (pop) pop.hidden = true; if (last) last.focus(); }
+  /* 팝업 위 팝업 (2026-11-11 사용자 P516): 팝업 안의 [data-news-pop](예: 증시 전망 `관련 주식 정보` 목록의 기사 줄)을 누르면 위에 한 겹 더 띄우고,
+     닫으면(× · 바깥 · Esc) 맨 위 한 겹만 닫혀 아래 목록 팝업으로 돌아간다. 겹마다 상자를 따로 둔다(pool) */
+  var stack = [], pool = [];
+  function closeTop() { var t = stack.pop(); if (!t) return; t.p.hidden = true; if (t.from && t.from.focus) t.from.focus(); }
+  function make(depth) {
+    var p = document.createElement('div'); p.className = 'rt-pop news-pop'; p.hidden = true; p.style.zIndex = String(1000 + depth);
+    p.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true">' +
+      '<div class="rt-pop-head"><div class="rt-pop-title"></div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
+      '<div class="rt-pop-body news-pop-body"></div></div>';
+    document.body.appendChild(p);
+    p.querySelector('.rt-pop-close').addEventListener('click', closeTop);
+    p.addEventListener('click', function (e) {
+      if (e.target === p) { closeTop(); return; }
+      var a = e.target.closest('[data-news-pop]');
+      if (!a || !p.contains(a)) return;
+      e.preventDefault(); e.stopPropagation();
+      open(a.getAttribute('data-news-pop'), a);
+    });
+    return p;
+  }
+  document.addEventListener('keydown', function (e) { if (stack.length && e.key === 'Escape') closeTop(); });
   function open(id, from) {
     var src = root.querySelector('[data-news-pop-body="' + id + '"]');
     if (!src) return;
-    if (!pop) {
-      pop = document.createElement('div'); pop.className = 'rt-pop news-pop'; pop.hidden = true;
-      pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-labelledby="news-pop-title">' +
-        '<div class="rt-pop-head"><div class="rt-pop-title" id="news-pop-title"></div><button type="button" class="rt-pop-close" aria-label="닫기">×</button></div>' +
-        '<div class="rt-pop-body news-pop-body"></div></div>';
-      document.body.appendChild(pop);
-      pop.querySelector('.rt-pop-close').addEventListener('click', close);
-      pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
-      document.addEventListener('keydown', function (e) { if (!pop.hidden && e.key === 'Escape') close(); });
-    }
-    last = from;
+    var depth = stack.length, pop = pool[depth] || (pool[depth] = make(depth));
     pop.querySelector('.rt-pop-title').textContent = src.getAttribute('data-news-pop-title') || '';
+    pop.querySelector('.rt-pop-box').setAttribute('aria-label', src.getAttribute('data-news-pop-title') || '');
     var body = pop.querySelector('.rt-pop-body'); body.innerHTML = src.innerHTML; body.scrollTop = 0;
+    [].slice.call(body.querySelectorAll('[data-news-pop]')).forEach(function (a) { a.setAttribute('aria-haspopup', 'dialog'); });
     pop.hidden = false;
+    stack.push({ p: pop, from: from });
     pop.querySelector('.rt-pop-close').focus();
   }
   root.addEventListener('click', function (e) {
@@ -4229,7 +4390,7 @@ window.asTitleBack = function (ev, fallback) {
   /* 목록 버튼이 갈 곳을 본문이 정할 때 (2026-10-18 사용자: 종목 고정 페이지 하단에도 엔비디아 글과 같은 목록 · TOP) —
      본문의 [data-list-url] 이 있으면 그 주소로. 고정 페이지는 라벨이 없어 테마 기본값(데일리 목록)으로 가던 것을 바로잡는다 */
   var lu = document.querySelector('.post-body [data-list-url]');
-  var navs = [].slice.call(document.querySelectorAll('.post-nav-list'));
+  var navs = [].slice.call(document.querySelectorAll('.post-nav-list:not(.post-nav-study)'));   /* 주식 공부 목록 버튼은 이름 · 주소 고정 (2026-11-15) */
   var setNav = function (text, href) { navs.forEach(function (a) { a.textContent = text; a.href = href; }); };
   /* 고정 페이지 버튼은 갈 곳 이름으로 (2026-10-29 사용자 P94): 본문 [data-nav] —
      home = 늘 `홈으로`(시총 목록 · 읽는 법) · back = 종목 상세: 홈에서 왔으면 `홈으로`, 시총 목록 · 검색 · 외부 · 직접 입력이면 `목록으로`(그 시장 시총 목록).
@@ -4410,6 +4571,57 @@ window.asTitleBack = function (ev, fallback) {
   });
 })();
 
+
+/* ============================================================ 하단 고정 메뉴 · 오늘 리포트 링크 (2026-11-12 사용자 여정 테스트 확정, 목업 experiments/mock_server.py /j)
+   나라 = 지금 페이지(한국 홈 · 한국 종목 · 한국 시총 목록 · 한국 증시 리포트 = 한국, 미국 쪽 = 미국), 그 밖엔 고른 홈(as-home-mkt). 홈 · 증시 리포트 · 종목 칸이 나라를 따라간다.
+   [data-latest] 링크(하단 증시 리포트 · 인물 발언, 서랍 오늘 리포트)는 누를 때만 그 라벨의 최신 글을 블로그 피드에서 찾아 간다 — 못 찾으면 목록 주소 그대로.
+   방문자 수와 무관: 피드는 누를 때 한 번뿐이다(페이지를 열 때는 부르지 않는다) */
+(function () {
+  'use strict';
+  var path = location.pathname, dec = function (x) { try { return decodeURIComponent(x); } catch (e) { return x; } };
+  var nl = document.querySelector('.post-nav-list'), lab = '';
+  if (nl) lab = dec(((nl.getAttribute('href') || '').split('/search/label/')[1] || '').split('?')[0]);
+  if (!lab && path.indexOf('/search/label/') === 0) lab = dec(path.slice(14));
+  var LBL = {us: '데일리 브리핑', kr: '한국 증시 리포트'}, PEOPLE = '인물 발언';
+  var pref = ''; try { pref = localStorage.getItem('as-home-mkt') || ''; } catch (e) {}
+  var isKr = path === '/p/korea.html' || /-\d{6}-stock\.html$/.test(path) || path === '/p/kr-market-cap-top10.html' || lab === LBL.kr;
+  var isUs = path === '/' || (/-stock\.html$/.test(path) && !isKr) || path === '/p/us-market-cap-top10.html' || lab === LBL.us;
+  var mk = isKr ? 'kr' : isUs ? 'us' : (pref === 'kr' ? 'kr' : 'us');
+  var href = {home: mk === 'kr' ? '/p/korea.html' : '/', report: '/search/label/' + encodeURIComponent(LBL[mk]),
+              stock: '/p/' + mk + '-market-cap-top10.html', forecast: '/p/forecast-list.html' + (mk === 'kr' ? '#tab-1' : ''), people: '/search/label/' + encodeURIComponent(PEOPLE)};
+  var cur = (path === '/' || path === '/p/korea.html') ? 'home' : (lab === LBL.us || lab === LBL.kr) ? 'report'
+          : (/-stock\.html$/.test(path) || /market-cap-top10\.html$/.test(path)) ? 'stock' : /^\/p\/forecast-/.test(path) ? 'forecast' : lab === PEOPLE ? 'people' : '';
+  var bar = document.querySelector('.as-tabbar');
+  if (bar) [].forEach.call(bar.querySelectorAll('a[data-tab]'), function (a) {
+    var k = a.getAttribute('data-tab');
+    a.setAttribute('href', href[k]);
+    if (k === 'report') a.setAttribute('data-latest', LBL[mk]);
+    if (k === 'people') a.setAttribute('data-latest', PEOPLE);
+    if (k === cur) { a.classList.add('on'); a.setAttribute('aria-current', 'page'); }
+  });
+  /* 서랍 — 지금 보는 메뉴 표시 */
+  var here = cur === 'report' ? lab : cur === 'people' ? PEOPLE : '';
+  [].forEach.call(document.querySelectorAll('.menu-items .menu-row .nav-item, .menu-items .menu-grp .nav-item'), function (a) {
+    var h = a.getAttribute('href') || '';
+    if ((here && a.getAttribute('data-latest') === here) || (!a.hasAttribute('data-latest') && h === path)) a.classList.add('is-here');
+  });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[data-latest]');
+    if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault(); e.stopPropagation();
+    var fallback = a.href, done = false;
+    function go(u) { if (done) return; done = true; location.href = u || fallback; }
+    setTimeout(function () { go(fallback); }, 2500);
+    fetch('/feeds/posts/summary/-/' + encodeURIComponent(a.getAttribute('data-latest')) + '?alt=json&max-results=1')
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        var en = j && j.feed && j.feed.entry && j.feed.entry[0];
+        var l = en && (en.link || []).filter(function (x) { return x.rel === 'alternate'; })[0];
+        go(l && l.href);
+      })
+      .catch(function () { go(fallback); });
+  }, true);
+})();
 </script>
 </body>
 </html>
