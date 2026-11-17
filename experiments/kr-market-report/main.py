@@ -445,7 +445,7 @@ def _top_row(s, r, first):
     pcol = UP if s["ret_1d"] > 0 else DOWN if s["ret_1d"] < 0 else "#111"
     left = (f'<span style="display:inline-block;width:26px;color:{NOTE};font-weight:700;">{s["rank"]}</span>{RK.badge(s["sym"])}{_dk.esc(s["name"])}'
             f'<span style="display:block;padding-left:52px;font-size:{_dk.MICRO};line-height:20px;font-weight:400;color:{NOTE};">{_dk.tint(" · ".join(x for x in sub if x))}</span>')   # 보조 줄 증감 색 (M6)
-    right = f'<span style="color:{pcol};">{RK.won(s["close"])}</span><br>{R._arrow(s["ret_1d"])}'
+    right = f'{R._arrow(s["ret_1d"])}<br><span style="color:{pcol};">{RK.won(s["close"])}</span>'   # 증감 위 · 가격 아래 (2026-11-17 사용자 규칙, 가이드라인 4절)
     row = R._row_html(left, right, first=first).replace(" 12px;", f" {_dk.ALIGN_PX}px;", 1)   # 카드 없이 구분선만 — 글자 시작선은 카드 밖 기준선 (M2)
     return row.replace("<span", f'<span data-row-link="1" data-href="{_dk.esc(U.page_url(s["sym"]))}" data-ret="{s["ret_1d"]:.4f}"', 1)
 

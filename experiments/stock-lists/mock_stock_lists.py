@@ -133,24 +133,31 @@ def row_html(r, i, sub=None, right_sub=None, rank=None, chips=""):
     """종목 줄 — 지금 목록 페이지 줄(list_row)과 같은 짜임: [순위] 로고 이름(굵게 16) / 회색 보조 줄 · 오른쪽 가격 / 등락. 줄 전체 = 종목 페이지."""
     sub = sub if sub is not None else f"{code(r)} · {r['sec']}"
     rk = (f'<span style="flex:none;width:26px;color:{dk.NOTE};font-weight:700;font-size:15px;line-height:24px;">{rank}</span>' if rank else "")
-    left = (f'<span style="display:flex;align-items:flex-start;min-width:0;flex:1 1 auto;">{rk}'
-            f'<span style="flex:none;display:flex;height:24px;align-items:center;">{dk.ticker_logo(r["s"], 22).replace("vertical-align:-4px;", "vertical-align:0;")}</span>'
+    # 로고 22 → 44, 이름 · 보조 줄 두 줄의 세로 가운데 (2026-11-17 사용자 "로고 2배 · 오른쪽 글자와 미들 정렬")
+    left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;">{rk}'
+            f'<span style="flex:none;display:flex;align-items:center;">{dk.ticker_logo(r["s"], LOGO_PX).replace("vertical-align:-4px;", "vertical-align:0;")}</span>'
             f'<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{esc(r["n"])}</span>'
             f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};white-space:nowrap;">{sub}</span>{chips}</span></span>')
-    rs = right_sub if right_sub is not None else pct_html(r["r"])
+    rs = right_sub if right_sub is not None else pct_html(r["r"], CHG_PX)
     right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">'
-             f'<span style="font-size:15px;line-height:24px;color:#111;">{esc(price_text(r))}</span>'
-             f'<span style="font-size:15px;line-height:{dk.LH_TINY};">{rs}</span></span>')
-    return (f'<span data-row-link="1" data-href="{attr(r["u"])}" data-sym="{attr(r["s"])}" style="{dk.MULTI_ROW}{"" if i == 0 else dk.MULTI_SEP}align-items:flex-start;">'
+             f'<span style="font-size:{CHG_PX}px;line-height:24px;">{rs}</span>'
+             f'<span style="font-size:15px;line-height:{dk.LH_TINY};color:#111;">{esc(price_text(r))}</span></span>')   # 증감 위 · 가격 아래 (2026-11-17 사용자 규칙)
+    return (f'<span data-row-link="1" data-href="{attr(r["u"])}" data-sym="{attr(r["s"])}" style="{ROW_STYLE}{f"padding-top:{ROW_TOP}px;" if i == 0 else dk.MULTI_SEP}align-items:flex-start;">'
             f'{left}{right}</span>')
 
 
+LIST_BOX = "display:block;margin:0 0 8px;border-bottom:1px solid #E2E8F0;"   # 카드 없이 구분선 목록 — 맨 위 선 없음 · 줄 사이 · 맨 끝 선 (2026-11-17 사용자 "카드로 하지 말고 그냥 구분선으로", 가이드라인 구분선 목록 = dk.rule_rows 와 같은 틀)
+ROW_TOP = dk.RULE_GAP - 1 - dk.VP - 3   # 첫 줄 위 = 24 − 3 = 21 (2026-11-17 사용자: 처음엔 첫 종목 자리 유지, 이어 "타이슨 푸드도 같이 3픽셀 더")
+ROW_PAD = ROW_TOP - 5                    # 구분선 위아래 = 21 − 5 = 16 (2026-11-17 사용자: −5 뒤 전체 −3)
+ROW_STYLE = dk.MULTI_ROW.replace(f"padding:{dk.SEP_GAP - dk.VP - 1}px 12px;", f"padding:{ROW_PAD}px {dk.ALIGN_PX}px;")   # 좌우 = 왼쪽 기준선 6
+
+
 def list_card(items, render, empty=""):
-    """앞에서 10개만, 다 펼침 (TOP)."""
+    """앞에서 10개만, 다 펼침 (TOP). 카드가 아니라 구분선 목록 (2026-11-17 사용자)."""
     if not items:
         return empty
     shown = "".join(render(x, i) for i, x in enumerate(items[:TOP]))
-    return f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{shown}</span></div>'
+    return f'<div data-cards="1" style="margin:0 0 8px;"><span data-list="1" style="{LIST_BOX}">{shown}</span></div>'
 
 
 
@@ -178,16 +185,16 @@ def info_card(title, text, extra=""):
 def move_tab(rows, m, stats):
     xs = [r for r in rows.values() if r["m"] == m and r["r"] is not None]
     groups = [
-        ("많이 오름", sorted([r for r in xs if r["r"] >= UP_PCT], key=lambda r: -r["r"]), sorted(xs, key=lambda r: -r["r"]),
-         f"오늘 {UP_PCT:.0f}% 넘게 오른 종목이 없습니다. 가장 많이 오른 10개입니다.", None),
-        ("많이 내림", sorted([r for r in xs if r["r"] <= DOWN_PCT], key=lambda r: r["r"]), sorted(xs, key=lambda r: r["r"]),
-         f"오늘 {abs(DOWN_PCT):.0f}% 넘게 내린 종목이 없습니다. 가장 많이 내린 10개입니다.", None),
+        ("상승 종목", sorted([r for r in xs if r["r"] >= UP_PCT], key=lambda r: -r["r"]), sorted(xs, key=lambda r: -r["r"]),
+         f"{UP_PCT:.0f}% 넘게 오른 종목이 없어 많이 오른 순입니다.", None),
+        ("하락 종목", sorted([r for r in xs if r["r"] <= DOWN_PCT], key=lambda r: r["r"]), sorted(xs, key=lambda r: r["r"]),
+         f"{abs(DOWN_PCT):.0f}% 넘게 내린 종목이 없어 많이 내린 순입니다.", None),
         ("거래 급증", sorted([r for r in xs if (r["v"] or 0) >= VOL_X], key=lambda r: -r["v"]), sorted([r for r in xs if r["v"]], key=lambda r: -r["v"]),
-         "평소 거래량의 2배를 넘은 종목이 없습니다. 거래가 가장 많이 늘어난 10개입니다.",
-         lambda r: f'<span style="color:#333;">평소의 {r["v"]:.1f}배</span> · {pct_html(r["r"], 15, False)}'),
+         "평소의 2배를 넘은 종목이 없어 많이 늘어난 순입니다.",
+         lambda r: f'<span style="color:#333;">평소의 {r["v"]:.1f}배</span> · {pct_html(r["r"], CHG_PX, False)}'),
         ("52주 최고가 근처", sorted([r for r in xs if r["h"] is not None and r["h"] >= NEAR_HI], key=lambda r: -r["h"]),
          sorted([r for r in xs if r["h"] is not None], key=lambda r: -r["h"]),
-         "52주 최고가에 2% 안으로 다가선 종목이 없습니다. 가장 가까운 10개입니다.",
+         "최고가 2% 안 종목이 없어 가까운 순입니다.",
          lambda r: '<span style="color:#333;">최고가</span>' if r["h"] >= 0 else f'<span style="color:#333;">최고가까지 {abs(r["h"]):.1f}%</span>'),
     ]
     bodies = []
@@ -197,9 +204,8 @@ def move_tab(rows, m, stats):
         if hit:
             bodies.append(list_card(hit, render))
         else:
-            bodies.append(note(empty_text) + list_card(fallback, render))
-    basis = ("등락률 · 거래량은 마지막 종가 기준입니다. 거래 급증 = 오늘 거래량 ÷ 지난 20거래일 평균, "
-             "52주 최고가 근처 = 지난 1년 가장 높은 종가에서 2% 안. 미국 S&P 500 · 한국 코스피 200 · 코스닥 150 종목을 봅니다.")
+            bodies.append(list_card(fallback, render) + note(empty_text))   # 탭 · 묶음 줄 바로 아래엔 정보 없음 — 안내는 목록 아래 (2026-11-17 사용자)
+    basis = "마지막 종가 기준 · 거래 급증 = 20일 평균의 2배 이상"   # 짧게 (2026-11-17 사용자 "읽어볼 사람 거의 없어, 짤막하게")
     return pills(f"move-{m}", [g[0] for g in groups], joined=True) + panels(f"move-{m}", bodies) + note(basis)
 
 
@@ -216,15 +222,12 @@ def theme_tab(rows, m):
     groups = [(n, xs) for n, xs in groups if xs]
     bodies = []
     for n, xs in groups:
-        up = sum(1 for r in xs if (r["r"] or 0) > 0)
-        avg = sum(r["r"] or 0 for r in xs) / len(xs)
-        head = (f'<p style="font-size:15px;line-height:24px;color:#333;margin:0 0 10px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;">'
-                f'{len(xs)}종목 중 {up}개 오름 · 평균 {pct_html(avg, 15, False)}</p>')
+        # `n종목 중 n개 오름 · 평균` 줄 삭제 — 탭 · 묶음 줄 아래 바로 목록 (2026-11-17 사용자)
         link = ""
         if m == "us" and n in ("반도체", "데이터 센터"):
             link = (f'<a href="{BLOG}/p/theme-ai-capex.html" style="display:block;margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:15px;line-height:24px;'
                     f'color:#111;font-weight:700;text-decoration:none;">AI 투자 자금 흐름 보기 →</a>')
-        bodies.append(head + list_card(sorted(xs, key=lambda r: -(r["r"] or -99)), lambda r, i: row_html(r, i)) + link)
+        bodies.append(list_card(sorted(xs, key=lambda r: -(r["r"] or -99)), lambda r, i: row_html(r, i)) + link)
     return pills(f"theme-{m}", [n for n, _ in groups], joined=True) + panels(f"theme-{m}", bodies)
 
 
@@ -252,20 +255,58 @@ def cap_tab(rows, m):
 
 def etf_tab(etf, m):
     xs = etf[m]
-    return list_card(xs, lambda r, i: row_html(r, i, sub=esc(r["sec"]))) + note("지수 · 업종을 따라가는 상품입니다. 줄을 누르면 ETF 페이지로 갑니다.")
+    return list_card(xs, lambda r, i: row_html(r, i, sub=esc(r["sec"]))) + note("지수 · 업종을 따라가는 상품")
 
 
-def watch_rows(rows, syms, edit=True):
+GRIP = ('<span data-sl-grip aria-label="끌어서 순서 바꾸기" style="display:none;flex:none;align-self:center;width:32px;height:32px;margin:0 -6px 0 0;align-items:center;justify-content:center;'
+        'color:#9CA3AF;cursor:grab;touch-action:none;"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M4 6.5h12M4 10h12M4 13.5h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>')
+RM = ('<button type="button" data-sl-rm aria-label="{name} 빼기" style="display:none;flex:none;align-self:center;width:24px;height:24px;margin:0 10px 0 0;padding:0;border:0;border-radius:50%;'
+      'background:#E5484D;color:#fff;cursor:pointer;"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M7 12h10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>')
+LOGO_PX = 35   # 종목 줄 로고 (2026-11-17 사용자: 22 의 2배 = 44 → 20% 작게 = 35)
+CHG_PX = 16    # 오른쪽 윗줄 증감 글자 15 → 16 (2026-11-17 사용자 "한 포인트 더"), 삼각형 = 80% → 13
+WATCH_MAX = 100   # 미국 · 한국 합쳐 100개 (2026-11-17 사용자 "200개 담는 사람이 누가 있다고 · 100개까지만"). 안내 문장은 두지 않고, 넘칠 때만 알림
+
+
+def watch_rows(rows, syms):
+    """관심 줄 = 다른 탭 줄과 같은 모양. 편집 모드에서만 왼쪽 빼기(−) · 오른쪽 끌기(≡)가 나오고 가격 칸이 숨는다."""
     out = []
     for i, s in enumerate(syms):
         r = rows[s]
-        h = row_html(r, i, sub=f"{code(r)} · {r['sec']}")   # 실적 발표일 칩 삭제 (2026-11-17 사용자)
-        if edit:   # 편집 = 줄 왼쪽에 빼기 버튼(편집일 때만 보임)
-            rm = (f'<button type="button" data-sl-rm aria-label="{attr(r["n"])} 빼기" hidden style="flex:none;width:28px;height:28px;margin:0 8px 0 0;border:0;border-radius:50%;'
-                  f'background:{dk.DOWN};color:#fff;font-size:18px;line-height:28px;cursor:pointer;">−</button>')
-            h = h.replace('align-items:flex-start;">', 'align-items:flex-start;">' + rm, 1)
-        out.append(h)
+        h = row_html(r, i, sub=f"{code(r)} · {r['sec']}")
+        h = h.replace('align-items:flex-start;">', 'align-items:flex-start;">' + RM.format(name=attr(r["n"])), 1)
+        h = h.replace('<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;', '<span data-sl-price style="flex:none;display:flex;flex-direction:column;align-items:flex-end;', 1)
+        out.append(h[:-len("</span>")] + GRIP + "</span>")
     return out
+
+
+PLUS_ICON = ('<span aria-hidden="true" style="flex:none;display:inline-flex;width:22px;height:22px;border-radius:50%;background:#E5E7EB;align-items:center;justify-content:center;">'
+             '<svg viewBox="0 0 12 12" width="12" height="12"><path d="M6 1.5v9M1.5 6h9" stroke="#4B5563" stroke-width="1.6" stroke-linecap="round"/></svg></span>')
+
+
+def watch_member(rows, syms, m, all_rows):
+    """관심 탭(로그인) — 탭 바로 아래는 목록뿐 (2026-11-17 사용자: 탭 밑에 정보 없음, 종목 수 · 편집 버튼 · 나라 안내 · 200개 안내 삭제).
+    편집 모드 들어가기 = ① 줄을 길게 누르기(0.5초) ② 목록 맨 끝 줄 오른쪽 `편집`. 맨 끝 줄 왼쪽 = `종목 추가`(검색 팝업에서 바로 담기).
+    편집 모드 = 줄 왼쪽 빼기 · 오른쪽 끌어서 순서 바꾸기, 화면 맨 아래 고정 바 `전체 삭제` · `완료`(하단 메뉴 자리를 잠시 덮음)."""
+    lst = f'<div data-cards="1"{"" if syms else " hidden"} style="margin:0 0 8px;"><span data-list="1" data-sl-list style="{LIST_BOX}">{"".join(watch_rows(rows, syms))}</span></div>'
+    foot = (f'<div data-sl-foot style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px {dk.ALIGN_PX}px 12px;">'
+            f'<button type="button" data-sl-add style="display:inline-flex;align-items:center;gap:8px;padding:8px 0;border:0;background:none;font:inherit;font-size:16px;line-height:24px;font-weight:700;color:#111;cursor:pointer;">{PLUS_ICON}종목 추가</button>'
+            f'<button type="button" data-sl-edit style="padding:8px 0 8px 12px;border:0;background:none;font:inherit;font-size:15px;line-height:22px;color:{dk.NOTE};cursor:pointer;">편집</button></div>')
+    big = f'<svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true" style="display:block;margin:0 0 8px;"><path d="{STAR_PATH}" fill="none" stroke="{STAR}" stroke-width="1.6" stroke-linejoin="round"/></svg>'
+    find_btn = f'<button type="button" data-sl-add style="{dk.FOLD_BTN}width:100%;box-sizing:border-box;margin:14px 0 0;font:inherit;font-size:15px;line-height:22px;font-weight:700;">종목 검색해서 담기</button>'
+    empty = info_card("아직 담은 종목이 없습니다",
+                      f'종목을 검색해서 바로 담거나, 종목 페이지 제목 옆 <span style="color:{STAR};">☆</span> 를 누르면 여기에 모입니다.', find_btn
+                      ).replace("<div style=\"font-size:17px", big + "<div style=\"font-size:17px", 1)
+    bar = ('<div data-sl-bar role="toolbar" aria-label="관심 종목 편집">'
+           '<button type="button" data-sl-clear class="sl-bar-btn">전체 삭제</button>'
+           '<button type="button" data-sl-done class="sl-bar-btn sl-bar-main">완료</button></div>')
+    # 검색 자료(목업) — 실제 = 블로그 검색 색인(gh-pages search/<시장>.json + 간단 종목 목록 _lists.json), 팝업을 열 때 한 번 받음
+    data = [{"s": r["s"], "n": r["n"], "c": code(r), "sec": r["sec"], "m": r["m"], "p": price_text(r), "r": r["r"], "k": r.get("cap") or 0} for r in all_rows.values()]
+    held = [s for s in WATCH if s in all_rows]
+    cfg = {"m": m, "max": WATCH_MAX, "held": held if syms else [s for s in held if all_rows[s]["m"] != m], "recent": RECENT,
+           "row": ROW_STYLE, "logo": LOGO_PX, "top": ROW_TOP, "pad": ROW_PAD, "sep": dk.MULTI_SEP, "rm": RM, "grip": GRIP, "note": dk.NOTE, "up": dk.UP, "down": dk.DOWN, "muted": dk.MUTED, "star": STAR, "starPath": STAR_PATH}
+    js = ('<script type="application/json" id="sl-data">' + json.dumps({"cfg": cfg, "rows": data}, ensure_ascii=False).replace("</", "<\\/") + "</script>")
+    return (f'<div data-sl-watch="1">{lst}<div data-sl-has{"" if syms else " hidden"}>{foot}</div>'
+            f'<div data-sl-empty{"" if not syms else " hidden"}>{empty}</div></div>{bar}{js}')
 
 
 def watch_tab(rows, state, m):
@@ -275,23 +316,12 @@ def watch_tab(rows, state, m):
         login = (f'<a data-mock="1" style="{LOGIN_BTN}margin:14px 0 8px;">{G_LOGO}구글 계정으로 로그인</a>'
                  f'<p style="font-size:13px;line-height:19px;color:{dk.NOTE};text-align:center;margin:0;">댓글에 쓰는 로그인과 같습니다.</p>')
         return (info_card("관심 종목을 모아 보세요",
-                          f'종목 페이지 제목 옆 <span style="color:{STAR};">★</span> 를 누르면 여기에 모입니다. 로그인하면 폰 · PC 어디서나 같은 목록을 봅니다.', login)
+                          f'종목 페이지 제목 옆 <span style="color:{STAR};">★</span> 를 누르거나 종목을 검색해서 담으면 여기에 모입니다. 로그인하면 폰 · PC 어디서나 같은 목록을 봅니다.', login)
                 + dk.h2("이 기기에서 최근 본 종목", one_line=True)
                 + list_card(recent, lambda r, i: row_html(r, i, sub=f"{code(r)} · {r['sec']}"))
-                + note("최근 본 종목은 이 브라우저에만 남고 서버로 보내지 않습니다."))
-    if state == "empty":
-        big = f'<svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true" style="display:block;margin:0 0 8px;"><path d="{STAR_PATH}" fill="none" stroke="{STAR}" stroke-width="1.6" stroke-linejoin="round"/></svg>'
-        return info_card("아직 담은 종목이 없습니다",
-                         f'종목 페이지 제목 옆 <span style="color:{STAR};">☆</span> 를 누르면 여기에 모입니다. '
-                         '<b>오늘 움직임 · 테마 · 업종</b> 탭에서 종목을 둘러보세요.').replace("<div style=\"font-size:17px", big + "<div style=\"font-size:17px", 1)
-    syms = [s for s in WATCH if s in rows and rows[s]["m"] == m]
-    edit_btn = ('<button type="button" data-sl-edit style="flex:none;padding:4px 12px;border:1px solid #E2E8F0;border-radius:8px;background:#fff;'
-                'font:inherit;font-size:14px;line-height:20px;font-weight:700;color:#111;cursor:pointer;">편집</button>')
-    head = (f'<div style="display:flex;align-items:center;gap:8px;margin:0 0 12px;">'
-            f'<span style="flex:none;margin-left:auto;font-size:14px;color:{dk.NOTE};">{len(syms)}종목</span>{edit_btn}</div>')
-    card = f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(watch_rows(rows, syms))}</span></div>'   # 담은 순 하나 — 정렬 버튼 삭제 (2026-11-17 사용자)
-    return (head + card
-            + note(f"{'한국' if m == 'us' else '미국'} 종목은 {'한국' if m == 'us' else '미국'} 화면에서 보입니다. 미국 · 한국 합쳐 200개까지 담을 수 있습니다."))
+                + note("이 브라우저에만 남습니다"))
+    syms = [] if state == "empty" else [s for s in WATCH if s in rows and rows[s]["m"] == m]
+    return watch_member(rows, syms, m, rows)
 
 
 # ── 페이지 ───────────────────────────────────────────────────────────
@@ -302,7 +332,33 @@ TOAST_CSS = (".sl-toast{position:fixed;left:50%;transform:translateX(-50%);botto
 PAGE_CSS = ("<style>[data-sl-panel][hidden]{display:none !important;}"
             ".sl-top{display:flex;align-items:center;gap:8px;margin:0 0 6px;padding-left:6px;}"
             ".sl-day{font-size:14px;line-height:20px;color:#6B7280;}"
-            "[data-sl-editing] [data-sl-rm]{display:inline-block !important;}"
+            "[data-sl-watch] [data-row-link]{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}"
+            "[data-sl-editing] [data-sl-watch] [data-sl-rm]{display:inline-block !important;}"
+            "[data-sl-editing] [data-sl-watch] [data-sl-grip]{display:inline-flex !important;}"
+            "[data-sl-editing] [data-sl-watch] [data-sl-price]{display:none !important;}"
+            "[data-sl-editing] [data-sl-watch] [data-row-link]{cursor:default;}"
+            "[data-sl-editing] [data-sl-foot]{visibility:hidden;}"
+            "[data-sl-watch] .sl-drag{background:#F8FAFC;box-shadow:0 4px 14px rgba(15,23,42,.12);position:relative;z-index:2;}"
+            "[data-sl-bar]{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;gap:10px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #E2E8F0;box-sizing:border-box;}"
+            "[data-sl-editing] [data-sl-bar]{display:flex;}"
+            ".sl-bar-btn{flex:1 1 0;height:48px;border-radius:8px;border:1px solid #CBD5E1;background:#fff;color:#111;font:inherit;font-size:16px;line-height:24px;font-weight:700;cursor:pointer;}"
+            ".sl-bar-main{background:#111;border-color:#111;color:#fff;}"
+            "[data-sl-editing] .sl-toast{bottom:calc(84px + env(safe-area-inset-bottom)) !important;}"
+            ".sl-pop{position:fixed;left:0;right:0;top:-100px;bottom:-100px;z-index:1000;display:flex;justify-content:center;align-items:center;padding:100px 16px;box-sizing:border-box;background:rgba(15,23,42,.45);}"
+            ".sl-pop.sl-top-pop{align-items:flex-start;padding-top:calc(100px + 6vh);}"
+            ".sl-pop>div{width:100%;max-width:520px;max-height:min(640px,80vh);display:flex;flex-direction:column;background:#fff;border-radius:12px;overflow:hidden;}"
+            ".sl-pop.sl-short>div{max-width:400px;}"
+            ".sl-pop-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 12px 12px 18px;border-bottom:1px solid #E2E8F0;font-size:19px;line-height:28px;font-weight:700;color:#111;}"
+            ".sl-x{flex:none;width:32px;height:32px;border:1px solid #E2E8F0;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}"
+            ".sl-x:hover{border-color:#111;}"
+            ".sl-pop-body{flex:1 1 auto;overflow:auto;padding:14px 18px 18px;}"
+            ".sl-q{width:100%;box-sizing:border-box;height:44px;border:1px solid #CBD5E1;border-radius:8px;padding:0 12px 0 38px;font:inherit;font-size:16px;color:#111;background:#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='8.5' cy='8.5' r='5.5' fill='none' stroke='%239CA3AF' stroke-width='1.8'/%3E%3Cpath d='M13 13l4 4' stroke='%239CA3AF' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat 12px 50%/18px;outline:none;}"
+            ".sl-q:focus{border-color:#111;}"
+            ".sl-res-h{font-size:15px;line-height:22px;font-weight:700;color:#111;margin:18px 0 4px;}"
+            ".sl-res{display:flex;align-items:center;gap:10px;padding:12px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;}"
+            ".sl-res+.sl-res{border-top:1px solid #E2E8F0;}"
+            ".sl-res-star{flex:none;width:32px;height:32px;display:flex;align-items:center;justify-content:center;margin-left:auto;color:#9CA3AF;}"
+            ".sl-res-star[aria-pressed=\"true\"]{color:" + STAR + ";}"
             ".sl-joined{gap:0 !important;padding:0 !important;margin:0 0 12px;}"
             ".sl-joined .seg{flex:1 0 auto;padding:6px 14px;border:1px solid #E2E8F0;border-radius:0;background:#fff;color:var(--gray-600);font-weight:400;text-align:center;}"
             ".sl-joined .seg+.seg{border-left:0;}.sl-joined .seg:first-child{border-radius:7px 0 0 7px;}.sl-joined .seg:last-child{border-radius:0 7px 7px 0;}"
@@ -315,12 +371,93 @@ document.querySelectorAll('[data-sl-pills]').forEach(function(row){var k=row.get
  row.querySelectorAll('[data-sl-pill]').forEach(function(b){b.addEventListener('click',function(){var i=b.getAttribute('data-sl-pill');
   row.querySelectorAll('[data-sl-pill]').forEach(function(x){x.setAttribute('aria-selected',x===b?'true':'false');});
   document.querySelectorAll('[data-sl-panel^="'+k+':"]').forEach(function(p){p.hidden=p.getAttribute('data-sl-panel')!==k+':'+i;});});});});
-document.querySelectorAll('[data-sl-edit]').forEach(function(b){b.addEventListener('click',function(){var on=document.body.toggleAttribute('data-sl-editing');b.textContent=on?'완료':'편집';});});
-document.addEventListener('click',function(e){var x=e.target.closest&&e.target.closest('[data-sl-rm]');if(!x)return;e.preventDefault();e.stopPropagation();
- var sym=x.closest('[data-sym]').getAttribute('data-sym');document.querySelectorAll('[data-sym="'+sym+'"]').forEach(function(r){r.remove();});},true);
 document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-mock]');if(a)e.preventDefault();});
 var td=document.querySelector('[data-sl-title-day]'),meta=document.querySelector('.post-title .post-title-meta')||document.querySelector('.post-title');
 if(td&&meta){var sp=document.createElement('span');sp.className='sl-title-day';sp.textContent=td.getAttribute('data-sl-title-day');meta.insertBefore(sp,meta.firstChild);}
+})();</script>"""
+
+
+# 관심 탭 편집 · 검색 담기 (2026-11-17 사용자: 편집 버튼 없이 편집 모드 · 순서 바꾸기 · 전체 삭제 · 검색해서 바로 담기 · 100개)
+WATCH_JS = """<script>(function(){
+var W=document.querySelector('[data-sl-watch]'),D=document.getElementById('sl-data');if(!W||!D)return;
+var J=JSON.parse(D.textContent),C=J.cfg,BY={};J.rows.forEach(function(r){BY[r.s]=r;});
+var held=C.held.slice(),L=W.querySelector('[data-sl-list]'),body=document.body;
+function rowsEl(){return [].slice.call(L.children);}
+function mine(){return rowsEl().map(function(x){return x.getAttribute('data-sym');});}
+function all(){var a=held.slice();mine().forEach(function(s){if(a.indexOf(s)<0)a.push(s);});return a;}
+function seps(){rowsEl().forEach(function(x,i){x.style.borderTop=i?'1px solid #E2E8F0':'0';x.style.paddingTop=(i?C.pad:C.top)+'px';});var n=rowsEl().length;
+ L.parentNode.hidden=!n;W.querySelector('[data-sl-has]').hidden=!n;W.querySelector('[data-sl-empty]').hidden=!!n;if(!n)edit(false);}
+function edit(on){if(on)body.setAttribute('data-sl-editing','');else body.removeAttribute('data-sl-editing');}
+function toast(msg){var o=document.querySelector('.sl-toast');if(o)o.remove();var d=document.createElement('div');d.className='sl-toast';d.innerHTML='<span>'+msg+'</span>';body.appendChild(d);setTimeout(function(){d.remove();},2600);}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function badge(r,z){z=z||22;return '<span aria-hidden="true" style="display:inline-block;width:'+z+'px;height:'+z+'px;border-radius:50%;margin-right:6px;line-height:'+z+'px;background:#2F6F68;color:#fff;font-size:'+Math.max(9,Math.round(z*.42))+'px;font-weight:700;text-align:center;">'+esc(/^[0-9]/.test(r.c)?r.n.slice(0,1):r.c.replace(/[-.]/g,'').slice(0,2))+'</span>';}
+function pct(v){if(v==null)return '<span style="color:'+C.muted+';">—</span>';var col=v>0?C.up:v<0?C.down:C.muted,t=v>0?'▲':v<0?'▼':'';
+ return '<span style="color:'+col+';font-weight:700;white-space:nowrap;">'+(t?'<span style="font-size:13px;vertical-align:1px;margin-right:2px;">'+t+'</span>':'')+Math.abs(v).toFixed(2)+'%</span>';}
+function rowHtml(r){return '<span data-row-link="1" data-href="#" data-sym="'+esc(r.s)+'" style="'+C.row+'align-items:flex-start;">'+C.rm.replace('{name}',esc(r.n))+
+ '<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;"><span style="flex:none;display:flex;align-items:center;">'+badge(r,C.logo)+'</span>'+
+ '<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r.n)+'</span>'+
+ '<span style="display:block;font-size:14px;line-height:20px;color:'+C.note+';white-space:nowrap;">'+esc(r.c)+' · '+esc(r.sec)+'</span></span></span>'+
+ '<span data-sl-price style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;"><span style="font-size:16px;line-height:24px;">'+pct(r.r)+'</span><span style="font-size:15px;line-height:20px;color:#111;">'+esc(r.p)+'</span></span>'+C.grip+'</span>';}
+function add(s){var r=BY[s];if(!r)return false;var a=all();if(a.indexOf(s)>=0)return true;
+ if(a.length>=C.max){toast('관심 종목은 '+C.max+'개까지 담을 수 있습니다');return false;}
+ if(r.m===C.m){L.insertAdjacentHTML('beforeend',rowHtml(r));seps();}else{held.push(s);}
+ toast(r.m===C.m?'관심 종목에 담았습니다':(r.m==='kr'?'한국':'미국')+' 화면 관심 종목에 담았습니다');return true;}
+function drop(s){held=held.filter(function(x){return x!==s;});var e=L.querySelector('[data-sym="'+s+'"]');if(e)e.remove();seps();}
+
+/* ① 길게 누르기(0.5초) = 편집 모드 */
+var T=0,sx=0,sy=0,eat=false;
+W.addEventListener('pointerdown',function(e){if(body.hasAttribute('data-sl-editing'))return;var row=e.target.closest('[data-sl-list] [data-row-link]');if(!row)return;
+ sx=e.clientX;sy=e.clientY;clearTimeout(T);T=setTimeout(function(){T=0;eat=true;row.classList.remove('is-pressed');edit(true);if(navigator.vibrate)navigator.vibrate(12);},500);});
+W.addEventListener('pointermove',function(e){if(T&&(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8)){clearTimeout(T);T=0;}});
+['pointerup','pointercancel','pointerleave'].forEach(function(k){W.addEventListener(k,function(){if(T){clearTimeout(T);T=0;}});});
+W.addEventListener('contextmenu',function(e){if(e.target.closest('[data-sl-list]'))e.preventDefault();});
+/* 편집 중 · 길게 누른 직후 = 줄 이동 막기, 빼기 버튼 */
+document.addEventListener('click',function(e){var t=e.target;
+ if(eat&&t.closest('[data-sl-list]')){eat=false;e.preventDefault();e.stopPropagation();return;}eat=false;
+ var x=t.closest('[data-sl-rm]');if(x){e.preventDefault();e.stopPropagation();drop(x.closest('[data-sym]').getAttribute('data-sym'));return;}
+ if(body.hasAttribute('data-sl-editing')&&t.closest('[data-sl-list] [data-row-link]')){e.preventDefault();e.stopPropagation();}},true);
+/* ② 목록 끝 `편집` */
+W.querySelectorAll('[data-sl-edit]').forEach(function(b){b.addEventListener('click',function(){edit(true);});});
+document.querySelector('[data-sl-done]').addEventListener('click',function(){edit(false);});
+
+/* 끌어서 순서 바꾸기(≡) */
+L.addEventListener('pointerdown',function(e){var g=e.target.closest('[data-sl-grip]');if(!g||!body.hasAttribute('data-sl-editing'))return;e.preventDefault();
+ var row=g.closest('[data-row-link]');row.classList.add('sl-drag');try{g.setPointerCapture(e.pointerId);}catch(_){}
+ function mv(ev){var after=null,rs=rowsEl();for(var i=0;i<rs.length;i++){if(rs[i]===row)continue;var b=rs[i].getBoundingClientRect();if(ev.clientY<b.top+b.height/2){after=rs[i];break;}}
+  if(after!==row.nextSibling||!after){L.insertBefore(row,after);seps();}}
+ function up(){row.classList.remove('sl-drag');g.removeEventListener('pointermove',mv);g.removeEventListener('pointerup',up);g.removeEventListener('pointercancel',up);}
+ g.addEventListener('pointermove',mv);g.addEventListener('pointerup',up);g.addEventListener('pointercancel',up);});
+
+/* 팝업 공통 틀 (가이드라인 팝업: 흰 상자 12 · 가림막 · 닫기 네모 32 · 바깥 · Esc) */
+var X='<svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M2 2l10 10M12 2 2 12" stroke="#111" stroke-width="2" stroke-linecap="round"/></svg>';
+function pop(title,inner,cls){var o=document.createElement('div');o.className='sl-pop '+(cls||'');
+ o.innerHTML='<div role="dialog" aria-modal="true"><div class="sl-pop-head"><span>'+title+'</span><button type="button" class="sl-x" aria-label="닫기">'+X+'</button></div><div class="sl-pop-body">'+inner+'</div></div>';
+ function close(){o.remove();document.removeEventListener('keydown',k);}function k(e){if(e.key==='Escape')close();}
+ o.addEventListener('click',function(e){if(e.target===o||e.target.closest('.sl-x'))close();});document.addEventListener('keydown',k);body.appendChild(o);o.close=close;return o;}
+
+/* 전체 삭제 = 확인 창 */
+document.querySelector('[data-sl-clear]').addEventListener('click',function(){var n=rowsEl().length;if(!n)return;
+ var o=pop('관심 종목을 모두 뺄까요?','<p style="margin:0 0 18px;font-size:16px;line-height:26px;color:#333;word-break:keep-all;">이 화면 관심 종목 '+n+'개가 목록에서 빠집니다.</p>'+
+  '<div style="display:flex;gap:10px;"><button type="button" class="sl-bar-btn" data-c>취소</button><button type="button" class="sl-bar-btn sl-bar-main" data-ok>모두 빼기</button></div>','sl-short');
+ o.querySelector('[data-c]').onclick=o.close;o.querySelector('[data-ok]').onclick=function(){mine().forEach(drop);o.close();toast('관심 종목을 모두 뺐습니다');};});
+
+/* 종목 추가 = 검색 팝업, 줄 누르면 ☆ ↔ ★ */
+function star(on){return '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="'+C.starPath+'" fill="'+(on?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';}
+function res(r){var on=all().indexOf(r.s)>=0;return '<div class="sl-res" data-s="'+esc(r.s)+'">'+badge(r)+'<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r.n)+'</span>'+
+ '<span style="display:block;font-size:14px;line-height:20px;color:'+C.note+';white-space:nowrap;">'+esc(r.c)+' · '+esc(r.sec)+(r.m!==C.m?' · '+(r.m==='kr'?'한국':'미국'):'')+'</span></span>'+
+ '<span class="sl-res-star" role="button" aria-pressed="'+on+'" aria-label="'+(on?'관심 종목에서 빼기':'관심 종목에 담기')+'">'+star(on)+'</span></div>';}
+function find(q){q=q.trim().toLowerCase();if(!q)return null;var a=[],b=[];J.rows.forEach(function(r){var n=r.n.toLowerCase(),c=r.c.toLowerCase();
+ if(n.indexOf(q)===0||c.indexOf(q)===0)a.push(r);else if(n.indexOf(q)>0||c.indexOf(q)>0)b.push(r);});
+ var k=function(x,y){return ((x.m===C.m?0:1)-(y.m===C.m?0:1))||(y.k-x.k);};return a.sort(k).concat(b.sort(k)).slice(0,30);}
+W.querySelectorAll('[data-sl-add]').forEach(function(b){b.addEventListener('click',function(){
+ var o=pop('관심 종목 추가','<input class="sl-q" type="search" placeholder="종목 이름 · 코드" autocomplete="off" enterkeyhint="search"><div data-out></div>','sl-top-pop'),q=o.querySelector('.sl-q'),out=o.querySelector('[data-out]');
+ function draw(){var xs=find(q.value);if(xs===null){var rc=C.recent.map(function(s){return BY[s];}).filter(function(r){return r&&r.m===C.m;});
+   out.innerHTML=rc.length?'<div class="sl-res-h">최근 본 종목</div>'+rc.map(res).join(''):'';return;}
+  out.innerHTML=xs.length?'<div style="height:6px;"></div>'+xs.map(res).join(''):'<p style="margin:18px 0 0;font-size:15px;line-height:22px;color:'+C.note+';">찾는 종목이 없습니다.</p>';}
+ q.addEventListener('input',draw);draw();setTimeout(function(){q.focus();},30);
+ out.addEventListener('click',function(e){var r=e.target.closest('.sl-res');if(!r)return;var s=r.getAttribute('data-s'),on=all().indexOf(s)>=0;
+  if(on){drop(s);toast('관심 종목에서 뺐습니다');}else add(s);
+  var now=all().indexOf(s)>=0,st=r.querySelector('.sl-res-star');st.setAttribute('aria-pressed',now);st.innerHTML=star(now);});});});
 })();</script>"""
 
 
@@ -349,7 +486,7 @@ def page(rows, etf, state, m, stats, tab):
 def write(body, name, title="종목"):
     path = dk.write_mock(dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE), os.path.join(OUT, name), title)
     if path:
-        pg = open(path, encoding="utf-8").read().replace("</body>", PAGE_JS + "</body>", 1)
+        pg = open(path, encoding="utf-8").read().replace("</body>", PAGE_JS + WATCH_JS + "</body>", 1)
         open(path, "w", encoding="utf-8").write(pg)
     print(f"[종목 목록] {name}")
 

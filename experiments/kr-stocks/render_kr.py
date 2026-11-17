@@ -1771,7 +1771,7 @@ def list_row(s, first):
     left = (f'<span style="display:inline-block;width:26px;color:{NOTE};font-weight:700;">{s["rank"]}</span>{badge(s["sym"])}'
             f'<a href="{_esc(U.page_url(s["sym"]))}" style="color:#111;text-decoration:none;">{_esc(s["name"])}</a>'
             f'<span style="display:block;padding-left:52px;font-size:{_dk.MICRO};line-height:20px;font-weight:400;color:{NOTE};">{_esc(s["code"])} · {cap_text(s["cap"])}</span>')
-    right = f'<span style="color:{pcol};">{won(s["close"])}</span><br>{R._arrow(r)}'
+    right = f'{R._arrow(r)}<br><span style="color:{pcol};">{won(s["close"])}</span>'   # 증감 위 · 가격 아래 (2026-11-17 사용자 규칙, 가이드라인 4절)
     return _row_html(left, right, first=first).replace("<span", f'<span data-row-link="1" data-ret="{r:.4f}"', 1)
 
 
