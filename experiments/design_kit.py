@@ -1651,6 +1651,31 @@ def stock_href(sym):
     return stock_pages().get(str(sym or "").strip().upper())
 
 
+_QUICK_URL = "https://alpha-scope.pages.dev/shells.json"   # 간단 종목 전용 페이지 주소표 {UBER · 259960: 주소} — quick-data 가 발행 뒤 올린다
+_quick_pages = None
+
+
+def quick_href(sym):
+    """간단 종목 전용 페이지 주소 — 발행된 쪽만(주소표에 있는 것). 환경변수 QUICK_SHELLS_JSON(파일)이 있으면 그것. 못 읽으면 None(링크 없이, 안전).
+    2026-11-17 사용자: 연관 종목 기록 표의 간단 종목 줄도 링크. 주소표는 그날 발행 뒤 올라가므로 새 쪽은 다음 실행부터 링크."""
+    global _quick_pages
+    if _quick_pages is None:
+        _quick_pages = {}
+        try:
+            path = os.environ.get("QUICK_SHELLS_JSON")
+            if path and os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    _quick_pages = json.load(f)
+            else:
+                import urllib.request
+                with urllib.request.urlopen(urllib.request.Request(_QUICK_URL, headers={"User-Agent": "alphascope"}), timeout=15) as r:
+                    _quick_pages = json.loads(r.read().decode("utf-8"))
+        except Exception as e:  # noqa: BLE001
+            print(f"[design_kit] 간단 종목 주소표 없음 — 링크 없이: {str(e)[:80]}")
+    u = _quick_pages.get(str(sym or "").strip().upper().split(".")[0])
+    return u if isinstance(u, str) and u.startswith(STOCK_BLOG + "/p/") else None
+
+
 def stock_link(sym, text_html, color=True):
     """종목 글자 → 상세 페이지 링크. color=True: 기사 속 종목(파란색 · 보통 굵기), False: 글자 색 그대로(카드 · 목록 줄).
     페이지가 없으면 text_html 그대로 (기사 속은 검정)."""

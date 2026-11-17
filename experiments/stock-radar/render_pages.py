@@ -459,18 +459,18 @@ _UK = None
 
 
 def _rec_href(sym):
-    """연관 종목 줄 링크 — 미국 정식(stocks.json) · 한국 정식(universe_kr.page_url). 간단 종목은 전용 페이지가 발행되면(QUICK_PUBLISH) 붙인다."""
+    """연관 종목 줄 링크 — 미국 정식(stocks.json) · 한국 정식(universe_kr.page_url), 없으면 간단 종목 전용 페이지(발행된 것만, dk.quick_href — 2026-11-17)."""
     global _UK
     if not sym:
         return None
     if not sym.endswith((".KS", ".KQ")):
-        return _dk.stock_href(sym)
+        return _dk.stock_href(sym) or _dk.quick_href(sym)
     if _UK is None:
         import importlib.util
         spec = importlib.util.spec_from_file_location("universe_kr_links", os.path.join(_HERE, "..", "kr-stocks", "universe_kr.py"))
         _UK = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(_UK)
-    return _UK.page_url(sym) if sym in _UK.BY_SYM else None
+    return _UK.page_url(sym) if sym in _UK.BY_SYM else _dk.quick_href(sym)
 
 
 def rec_years(n):
