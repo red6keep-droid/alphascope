@@ -276,13 +276,23 @@ def fetch_all(syms, cache_path, max_age_days=7):
         cache = {}
     today = datetime.date.today()
     got, tried, fails = 0, 0, []
+    home = _home_mirae()
     for sym in syms:
         old = cache.get(sym)
         stamp = old and (old.get("got") or old.get("at"))
         cut = old and len(old.get("top") or []) < (old.get("n") or 0)   # 옛 상위 10개 상한으로 받은 것 — 한 번 전체로 다시 (2026-11-16)
+        h = home.get(sym) if home is not None else None
+        if h and h.get("got") and (not stamp or h["got"] > stamp):   # 집 IP 실행(14:30)이 더 새로 받은 미래에셋 구성 — 그대로 옮긴다
+            cache[sym] = h
+            got += 1
+            continue
         if stamp and not cut and (today - datetime.date.fromisoformat(stamp)).days < max_age_days:
             continue
         tried += 1
+        if home is not None and _is_tiger(sym):   # GitHub 주소로는 403 — 직접 요청하지 않는다 (2026-11-17)
+            fails.append(f"{sym.split('.')[0]} 집 IP 받기 결과 없음")
+            print(f"[etf] {sym} 미래에셋 구성은 집 IP 실행(home-ip.yml) 결과만 — 아직 없음 (지난 값 유지)")
+            continue
         try:
             new = fetch(sym)
             new["got"] = today.isoformat()
@@ -299,6 +309,32 @@ def fetch_all(syms, cache_path, max_age_days=7):
             json.dump(cache, f, ensure_ascii=False)
         print(f"[etf] 한국 구성 {got}개 새로 받음 → {cache_path}")
     return cache
+
+
+def _home_mirae():
+    """GitHub 실행이면 집 IP 실행이 받아 둔 미래에셋 구성({sym: …}, 없으면 {}), 로컬이면 None(직접 받는다).
+    미래에셋은 GitHub 실행기(해외 데이터센터) 주소를 403 으로 막는다 — 11-17 시험 (home_ip.py)."""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        import home_ip
+    except ImportError:
+        return None
+    if not home_ip.on_github():
+        return None
+    try:
+        with open(home_ip.path(home_ip.MIRAE_FILE), encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def _is_tiger(sym):
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    import etf_universe as E
+    try:
+        return brand(E.BY_SYM[sym][1]) == "TIGER"
+    except (KeyError, ValueError):
+        return False
 
 
 def _feed(cache, syms, got, fails, every):

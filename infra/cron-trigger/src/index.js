@@ -55,7 +55,10 @@ const KST_JOBS = {
   "06:40": [{ workflow: "quick-news.yml", when: KST_TUE_SAT }],
   "08:20": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "us" }, when: KST_TUE_SAT }],
   "17:40": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "kr" }, when: WEEKDAY }],
-  "13:00": [{ workflow: "nvda-report.yml" }], // 낮 갱신 — 종목 페이지만 다시 그린다 (check.mode=refresh, 2026-11-04 P290). GitHub cron 04:00 UTC 는 예비
+  "13:00": [{ workflow: "nvda-report.yml" }],
+  // 집 IP 받기(미래에셋 TIGER 구성 · 버리 RSS, 집 공유기 VPN) — 유튜브 수집(News-sub)이 VPN 을 안 쓰는 12~17시 (2026-11-17 사용자).
+  // 공유기 L2TP 는 동시 접속을 못 버텨, 워크플로가 News-sub 실행이 도는 중이면 기다린다. 매일.
+  "14:30": [{ workflow: "home-ip.yml" }], // 낮 갱신 — 종목 페이지만 다시 그린다 (check.mode=refresh, 2026-11-04 P290). GitHub cron 04:00 UTC 는 예비
 };
 
 const JOBS = {
@@ -105,6 +108,7 @@ const NAMES = {
   "quick-news.yml": "간단 종목 뉴스",
   "quick-data.yml": "간단 종목 주가 (853종목)",
   "kr-rss-probe.yml": "한국 간단 종목 뉴스 매체 시험",
+  "home-ip.yml": "집 IP 받기 (미래에셋 · 버리)",
 };
 const WATCH_AFTER_MIN = 60;
 const name = (wf) => NAMES[wf] || wf;

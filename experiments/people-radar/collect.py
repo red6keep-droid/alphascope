@@ -13,6 +13,7 @@ import datetime
 import email.utils
 import hashlib
 import html as html_mod
+import os
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -96,10 +97,27 @@ def _row(collector, speaker, attribution, title, url, published, body=None, publ
 
 # ── 1차 수집기 ───────────────────────────────────────────────────────────
 
+def _home_feed(url):
+    """집 IP 로만 열리는 RSS(버리 substack — GitHub 주소는 403)는 집 IP 실행(home-ip.yml, 14:30 KST)이 받아 둔 파일을 읽는다 (2026-11-17).
+    GitHub 실행이 아니거나 그 주소가 아니면 None → 평소처럼 직접 받는다."""
+    try:
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        import home_ip
+    except ImportError:
+        return None
+    if url not in home_ip.FEEDS or not home_ip.on_github():
+        return None
+    b = home_ip.feed_bytes(url)
+    if b is None:
+        raise RuntimeError("집 IP 받기(home-ip.yml) 결과 없음")
+    return b
+
+
 def c_rss(speaker, url, attribution):
     publisher = re.sub(r"^www\.", "", url.split("/")[2])
     out = []
-    for it in _rss_items(_get(url).content):
+    content = _home_feed(url)
+    for it in _rss_items(content if content is not None else _get(url).content):
         if it["title"] and it["link"] and it["published"]:
             out.append(_row("rss", speaker, attribution, it["title"], it["link"], it["published"],
                             body=it["body"], publisher=publisher))

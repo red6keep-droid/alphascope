@@ -94,6 +94,8 @@ jobs:
           for b in trump-state report-state radar-state media-state; do
             git fetch --no-tags state "$b:refs/remotes/state/$b" 2>/dev/null && echo "$b 받음" || echo "$b 없음"
           done
+          # 집 IP 실행(home-ip.yml, 14:30 KST)이 받아 둔 버리 substack RSS — GitHub 주소로는 403 (2026-11-17)
+          if git fetch -q --no-tags state homeip-state:refs/remotes/state/homeip-state 2>/dev/null; then git archive refs/remotes/state/homeip-state experiments/home-ip/data | tar -x && echo "집 IP 자료 불러옴"; else echo "homeip-state 없음 — 버리 RSS 는 이번에 빠짐"; fi
           if git rev-parse --verify -q refs/remotes/state/radar-state > /dev/null; then
             git archive refs/remotes/state/radar-state "$STATE_DIR" | tar -x
             echo "발언 이력 불러옴: $(wc -l < "$STATE_DIR/statements.jsonl" 2>/dev/null || echo 0)행"
