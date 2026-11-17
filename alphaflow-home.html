@@ -4509,6 +4509,7 @@ window.asTitleBack = function (ev, fallback) {
     [].slice.call(document.querySelectorAll('.is-pressed')).forEach(function (x) { x.classList.remove('is-pressed'); });
   }
   window.addEventListener('pageshow', stopNav);   /* 뒤로 가기(bfcache)로 돌아왔을 때 막대 · 눌림이 남지 않게 */
+  window.asStartNav = startNav;   /* 하단 증시 리포트 · 인물 발언(data-latest)도 같은 로딩 표시 (2026-11-17 사용자 \"로딩 화면이 있어야\") */
 
   function samePageOrNewTab(a, e) {
     var h = a.getAttribute('href') || '';
@@ -4593,21 +4594,33 @@ window.asTitleBack = function (ev, fallback) {
     var h = a.getAttribute('href') || '';
     if ((here && a.getAttribute('data-latest') === here) || (!a.hasAttribute('data-latest') && h === path)) a.classList.add('is-here');
   });
-  document.addEventListener('click', function (e) {
-    var a = e.target.closest && e.target.closest('a[data-latest]');
-    if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    e.preventDefault(); e.stopPropagation();
-    var fallback = a.href, done = false;
-    function go(u) { if (done) return; done = true; location.href = u || fallback; }
-    setTimeout(function () { go(fallback); }, 2500);
-    fetch('/feeds/posts/summary/-/' + encodeURIComponent(a.getAttribute('data-latest')) + '?alt=json&max-results=1')
+  /* 최신 글 찾기 = 손가락이 닿는 순간 시작(누를 때 기다림을 줄인다), 찾는 동안 맨 위 진행 막대 · 0.4초 넘으면 가운데 돌기(startNav).
+     6초 안에 못 찾으면 목록 주소로 — 폰 통신에서 피드가 2.5초를 넘겨 미국 리포트가 목록으로 가던 것 (2026-11-17 사용자) */
+  var pre = {};
+  function latest(lbl) {
+    if (!pre[lbl]) pre[lbl] = fetch('/feeds/posts/summary/-/' + encodeURIComponent(lbl) + '?alt=json&max-results=1')
       .then(function (r) { return r.json(); })
       .then(function (j) {
         var en = j && j.feed && j.feed.entry && j.feed.entry[0];
         var l = en && (en.link || []).filter(function (x) { return x.rel === 'alternate'; })[0];
-        go(l && l.href);
+        return l ? l.href : '';
       })
-      .catch(function () { go(fallback); });
+      .catch(function () { delete pre[lbl]; return ''; });
+    return pre[lbl];
+  }
+  document.addEventListener('pointerdown', function (e) {
+    var a = e.target.closest && e.target.closest('a[data-latest]');
+    if (a && !e.button) latest(a.getAttribute('data-latest'));
+  }, { passive: true });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[data-latest]');
+    if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault(); e.stopPropagation();
+    if (window.asStartNav) window.asStartNav();
+    var fallback = a.href, done = false;
+    function go(u) { if (done) return; done = true; location.href = u || fallback; }
+    setTimeout(function () { go(fallback); }, 6000);
+    latest(a.getAttribute('data-latest')).then(go);
   }, true);
 })();
 </script>
