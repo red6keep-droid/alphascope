@@ -16,6 +16,7 @@
     .venv/bin/python experiments/stock-quick/publish_quick_shells.py --cache DIR --publish [--map OUT.json]  # Blogger 에 (워크플로)
 """
 import argparse
+import datetime
 import difflib
 import hashlib
 import html as html_mod
@@ -89,20 +90,206 @@ def info_line(sym, e):
     return " · ".join(p for p in parts if p)
 
 
-def body(sym, e, intro):
-    """서버 글 — 기업 소개 · 상장 · 업종. 방문 때 불러오기 코드가 #as-quick 안을 그날 조각으로 바꾼다."""
+# ── 검색용 사실 요약 (2026-11-17 사용자 A안) ─────────────────────────────────────────────
+# 검색엔진은 스크립트 없이 읽는 본문만 확실히 본다(네이버는 스크립트를 거의 안 돌린다). 그날 주가처럼 날마다 바뀌는 값은
+# 넣지 않는다 — 768쪽을 날마다 고쳐 써야 하고(UPDATE_CAP 100), 검색엔진도 날마다 다시 읽지 않아 낡은 값이 남는다.
+# 분기에 한 번 바뀌는 것만: 최근 분기 실적 · 다음 실적 발표일 · 같은 업종 종목 분석 · 연관 종목. 해시가 같으면 다시 쓰지 않는다.
+# 링크는 정식 종목 페이지만(주소가 바뀌지 않는다) — 간단 종목 이름은 글자로만(전용 페이지가 생길 때마다 해시가 바뀌지 않게).
+Q_MONTHS = {"11013": (1, 3), "11012": (4, 6), "11014": (7, 9), "11011": (10, 12)}
+
+
+def _money(v, kr):
+    if kr:
+        if abs(v) >= 1e12:
+            jo, eok = divmod(round(abs(v) / 1e8), 10000)
+            return ("−" if v < 0 else "") + (f"{jo:,}조 {eok:,}억 원" if eok else f"{jo:,}조 원")
+        return f"{v / 1e8:,.0f}억 원".replace("-", "−")
+    return f"{v / 1e8:,.0f}억 달러".replace("-", "−")
+
+
+def _chg(new, old):
+    """1년 전보다 — 흑자 · 적자가 바뀌면 말로, 아니면 %."""
+    if new is None or old is None or old == 0:
+        return ""
+    if old < 0 <= new:
+        return "1년 전 적자에서 흑자로 돌아섰습니다"
+    if new < 0 <= old:
+        return "1년 전 흑자에서 적자로 돌아섰습니다"
+    if new < 0 and old < 0:   # 두 해 다 적자 — 적자 폭이 줄었나 늘었나
+        return f"적자 폭이 1년 전보다 {'줄었' if new > old else '늘었'}습니다"
+    p = (new - old) / abs(old) * 100
+    return f"1년 전보다 {abs(p):.0f}% {'늘었' if p >= 0 else '줄었'}습니다"
+
+
+def _quarter_line(span, rev, rev_old, op, op_old, kr):
+    """`2026년 7~9월 분기 매출은 148억 달러로 1년 전보다 20% 늘었습니다. 영업이익은 …` — 실적 탭 첫 문장과 같은 말."""
+    (y, m1, m2) = span
+    out = f"{y}년 {m1}~{m2}월 분기 매출은 "
+    c = _chg(rev, rev_old)
+    out += f"{dk.josa(_money(rev, kr), '로')} {c}." if c else f"{_money(rev, kr)}입니다."
+    if op is not None:
+        word = "영업이익" if op >= 0 else "영업손실"
+        c = _chg(op, op_old)
+        out += f" {word}은 " + (f"{dk.josa(_money(abs(op), kr), '로')} {c}." if c else f"{_money(abs(op), kr)}입니다.")
+    return out
+
+
+def _us_quarter(sym, sec):
+    rows = (sec.get("rev") or {}).get(sym) or []
+    if not rows:
+        return ""
+    last = rows[-1]
+    old = next((r for r in rows if r.get("cq") == f"{int(last['cq'][:4]) - 1}{last['cq'][4:]}"), None)
+    cash = {c.get("cq"): c for c in (sec.get("cash") or {}).get(sym) or []}
+    op = (cash.get(last["cq"]) or {}).get("opinc")
+    op_old = (cash.get(old["cq"]) or {}).get("opinc") if old else None
+    s, en = last["start"], last["end"]
+    rev_old = old["rev"] if old else (last["rev"] / (1 + last["yoy"] / 100) if last.get("yoy") is not None else None)
+    return _quarter_line((int(en[:4]), int(s[5:7]), int(en[5:7])), last["rev"], rev_old, op, op_old, False)
+
+
+def _kr_quarter(code, cache_kr):
+    """정기보고서(dart_fin_all) 와 잠정실적(dart_prelim) 중 더 최근 분기 — 같으면 정기보고서. 4분기 = 사업보고서 연간 − 3분기 누적."""
+    corp = (cache_kr["corp"].get("map") or {}).get(code)
+    fa = cache_kr["fin_all"].get(corp) or {}
+
+    def q(key):
+        v = (fa.get(key) or {}).get("v")
+        if not v:
+            return None
+        rev, op = (v.get("rev") or [None])[0], (v.get("opinc") or [None])[0]
+        if key.endswith("11011"):   # 사업보고서 = 연간 → 3분기 누적을 뺀다
+            q3 = (fa.get(key[:5] + "11014") or {}).get("v") or {}
+            r3, o3 = (q3.get("rev") or [None, None])[1], (q3.get("opinc") or [None, None])[1]
+            rev = rev - r3 if rev is not None and r3 is not None else None
+            op = op - o3 if op is not None and o3 is not None else None
+        return (rev, op) if rev is not None else None
+
+    best = None
+    for key in sorted(fa, key=lambda k: (k[:4], Q_MONTHS.get(k[5:], (0, 0))[1]), reverse=True):
+        got = q(key)
+        if got:
+            y, (m1, m2) = int(key[:4]), Q_MONTHS[key[5:]]
+            old = q(f"{y - 1}-{key[5:]}") or (None, None)
+            best = ((y, m1, m2), got[0], old[0], got[1], old[1])
+            break
+    p = cache_kr["prelim"].get(code) or {}
+    if p.get("period") and p.get("rows", {}).get("rev"):
+        s, en = p["period"]
+        span = (int(en[:4]), int(s[5:7]), int(en[5:7]))
+        if not best or (span[0], span[2]) > (best[0][0], best[0][2]):
+            r, o = p["rows"]["rev"], (p["rows"].get("opinc") or {})
+            best = (span, r.get("q"), r.get("yoy_v"), o.get("q"), o.get("yoy_v"))
+    return _quarter_line(best[0], *best[1:], True) if best and best[1] is not None else ""
+
+
+def _next_earn(sym, cache, today):
+    """다음 실적 발표일 — 미국 = 회사 발표 예정일(earn_us), 한국 = 1년 전 같은 분기 잠정실적 날 + 364일 `무렵`(화면과 같은 어림)."""
+    if sym.endswith((".KS", ".KQ")):
+        days = (cache["kr"]["earn"].get("days") or {}).get(file_of(sym)) or []
+        est = sorted(d for d in (str(datetime.date.fromisoformat(x) + datetime.timedelta(days=364)) for x in days) if d >= today)
+        if est and (datetime.date.fromisoformat(est[0]) - datetime.date.fromisoformat(today)).days <= 100:
+            return (est[0], True)
+        # 어림이 한 분기를 건너뛴다 = 그 분기는 잠정실적을 안 내는 회사(4분기를 3월 사업보고서로 대신하는 곳이 많다, 316종목 중 약 50곳)
+        # → 법정 제출 기한(12월 결산: 분기 45일 · 사업보고서 90일). `4월 무렵` 처럼 틀린 날을 쓰지 않는다.
+        y = int(today[:4])
+        dl = sorted(d for yy in (y, y + 1) for d in (f"{yy}-03-31", f"{yy}-05-15", f"{yy}-08-14", f"{yy}-11-14") if d >= today)[0]
+        return (dl, "deadline")
+    rows = (cache["earn_us"].get("rows") or {}).get(sym) or []
+    nxt = sorted(r["day"] for r in rows if r.get("day", "") >= today)
+    return (nxt[0], False) if nxt else None
+
+
+def _fd(d):
+    return f"{int(d[:4])}년 {int(d[5:7])}월 {int(d[8:10])}일"
+
+
+def load_facts(cache_dir):
+    """발행 단계가 한 번 읽는 캐시 묶음 (비공개 quick-state)."""
+    j = lambda *p: CI._load(os.path.join(cache_dir, *p), {})  # noqa: E731
+    return {"sec": j("sec_us.json"), "earn_us": j("earn_us.json"),
+            "kr": {"corp": j("kr", "dart_corp.json"), "fin_all": j("kr", "dart_fin_all.json"), "prelim": j("kr", "dart_prelim.json"), "earn": j("kr", "dart_earn.json")},
+            "links": (CI._load(os.path.join(EXP, "ref", "kr_us_links.json"), {}).get("links") or {})}
+
+
+def _full_pages(ref):
+    """정식 종목 {sym: (이름, 업종, 세부 업종, 주소)} — 링크는 이것만."""
+    import universe as U
+    import universe_kr as K
+    out = {}
+    for m, mod in (("us", U), ("kr", K)):
+        for s, e in (ref.get(m) or {}).items():
+            if e.get("full") and s in mod.BY_SYM:
+                out[s] = (e.get("ko") or s, e.get("sector"), e.get("sub_ours") or e.get("sub"), mod.page_url(s))
+    return out
+
+
+def _name(ref, s):
+    e = (ref.get("kr" if s.endswith((".KS", ".KQ")) else "us") or {}).get(s) or {}
+    return e.get("ko") or s
+
+
+def facts(sym, e, ref, fx, today=None):
+    """검색용 사실 요약 [(제목, 글 html)] — 없는 것은 그 줄만 뺀다(빈 답 금지)."""
+    today = today or datetime.date.today().isoformat()
+    kr = sym.endswith((".KS", ".KQ"))
+    name = e.get("ko") or sym
+    rows = []
+    qline = _kr_quarter(file_of(sym), fx["kr"]) if kr else _us_quarter(sym, fx["sec"])
+    nx = _next_earn(sym, fx, today)
+    earn = ""
+    if qline:
+        earn = dk.esc(qline)
+    if nx:
+        nxt = (f"다음 실적은 법정 제출 기한인 {_fd(nx[0])}까지 나옵니다." if nx[1] == "deadline"
+               else f"다음 실적 발표는 {_fd(nx[0])} 무렵입니다." if nx[1] else f"다음 실적 발표는 {_fd(nx[0])} 예정입니다.")
+        earn += (" " if earn else "") + dk.esc(nxt)
+    if earn:
+        rows.append((f"{name} 실적은?", earn))
+    full = fx.setdefault("_full", _full_pages(ref))
+    same = [(n, u) for s, (n, sec, sub, u) in full.items() if s != sym and s.endswith((".KS", ".KQ")) == kr and sub and sub == (e.get("sub_ours") or e.get("sub"))]
+    label = e.get("sub_ours") or e.get("sub")
+    if not same:
+        same = [(n, u) for s, (n, sec, sub, u) in full.items() if s != sym and s.endswith((".KS", ".KQ")) == kr and sec and sec == e.get("sector")]
+        label = e.get("sector")
+    if same:
+        rows.append((f"같은 업종({label}) 종목은?", " · ".join(f'<a href="{u}">{dk.esc(n)} 종목 분석</a>' for n, u in same)))
+    if kr:
+        pairs = (fx["links"].get(sym) or {}).get("pairs") or []
+        side = "미국 연관 종목"
+    else:
+        pairs = sorted(k for k, v in fx["links"].items() if sym in (v.get("pairs") or []))
+        side = "한국 연관 종목"
+    if pairs:
+        cell = lambda s: f'<a href="{full[s][3]}">{dk.esc(full[s][0])}</a>' if s in full else dk.esc(_name(ref, s))  # noqa: E731
+        rows.append((f"함께 움직이는 {'미국' if kr else '한국'} 종목은?",
+                     f"{side}: " + " · ".join(cell(s) for s in pairs) + dk.esc(" — 지난 기록에서 미국 장이 크게 움직인 다음 날 한국 장이 같은 쪽으로 움직인 짝입니다.")))
+    # `이 페이지에서 보는 것` 같은 공통 안내 줄은 넣지 않는다 — 모든 쪽에 같은 글이라 닮음만 올린다(509종목 측정: 넣으면 47.5% · 빼면 34.9%, 지금 40.8%)
+    return rows
+
+
+def facts_html(rows):
+    h2 = f"margin:24px 0 8px;padding-left:{dk.ALIGN_PX}px;font-size:17px;line-height:26px;font-weight:700;color:#111;"
+    p = f"margin:0 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:15px;line-height:24px;color:#333;word-break:keep-all;"
+    return "".join(f'<h2 style="{h2}">{dk.esc(t)}</h2><p style="{p}">{b}</p>' for t, b in rows)
+
+
+def body(sym, e, intro, fx=None, ref=None):
+    """서버 글 — 기업 소개 · 상장 · 업종 + 검색용 사실 요약(fx 가 있을 때). 방문 때 불러오기 코드가 #as-quick 안을 그날 조각으로 바꾼다."""
     import universe as U
     import universe_kr as K
     server = (f'<p data-seo-lead="1" style="{dk.SEO_LEAD}padding-left:{dk.ALIGN_PX}px;">{dk.esc(intro)}</p>'
               f'<p style="margin:0 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:14px;line-height:22px;color:{dk.NOTE};">{dk.esc(info_line(sym, e))}</p>')
+    if fx is not None:
+        server += facts_html(facts(sym, e, ref or {}, fx))
     root = (f'<div id="as-quick" data-default="{file_of(sym)}" data-list-us="{U.LIST_URL}" data-list-kr="{K.LIST_URL}">'
             f'{dk.formal(server)}</div>\n')
     return root + LOADER
 
 
-def server_text(sym, e, intro):
+def server_text(sym, e, intro, fx=None, ref=None):
     """닮음 측정용 — 검색엔진이 스크립트 없이 읽는 글(제목 + 서버 글)."""
-    t = html_mod.unescape(re.sub(r"<script.*?</script>", " ", body(sym, e, intro), flags=re.S))
+    t = html_mod.unescape(re.sub(r"<script.*?</script>", " ", body(sym, e, intro, fx, ref), flags=re.S))
     return title(sym, e) + " " + re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", t)).strip()
 
 
@@ -137,10 +324,11 @@ def publish(cache, ref, intros, new_cap=NEW_CAP, update_cap=UPDATE_CAP, dry=Fals
     blog_id = PB._blog_id(creds, os.environ.get("BLOG_URL", PB.DEFAULT_BLOG_URL))
     headers = {"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"}
     base = f"{PB.BLOGGER_API}/blogs/{blog_id}/pages"
+    fx = load_facts(cache)
     made = updated = same = waiting = failed = 0
     stopped = False
     for s, e in targets(ref, intros):
-        content, t = body(s, e, intros[s]), title(s, e)
+        content, t = body(s, e, intros[s], fx, ref), title(s, e)
         h = hashlib.sha256((t + "\n" + content).encode("utf-8")).hexdigest()[:16]
         rec = done.get(s)
         if rec and rec.get("hash") == h:
@@ -195,13 +383,17 @@ def mock(cache, ref, intros, only):
     out = os.path.join(HERE, "output")
     os.makedirs(out, exist_ok=True)
     rows = []
+    fx = load_facts(cache)
     for s, e in targets(ref, intros):
         if s not in only:
             continue
-        b = body(s, e, intros[s]).replace(f'data-default="{file_of(s)}"', f'data-default="{file_of(s)}" data-local="quick-data/"')
+        # 검색엔진이 스크립트 없이 읽는 글 — 불러오기 코드 없이 (2026-11-17 A안 목업)
+        seo = body(s, e, intros[s], fx, ref).replace(LOADER, "")
+        dk.write_mock(seo, os.path.join(out, f"mock_shell_{file_of(s)}_seo.html"), title(s, e))
+        b = body(s, e, intros[s], fx, ref).replace(f'data-default="{file_of(s)}"', f'data-default="{file_of(s)}" data-local="quick-data/"')
         b = b.replace(LOADER, '<script src="quick-data/js/quick.js"></script>')
         p = dk.write_mock(b, os.path.join(out, f"mock_shell_{file_of(s)}.html"), title(s, e))
-        rows.append((s, title(s, e), f"/p/{slug(s, e)}.html", server_text(s, e, intros[s]), p))
+        rows.append((s, title(s, e), f"/p/{slug(s, e)}.html", server_text(s, e, intros[s], fx, ref), p))
     return rows
 
 
@@ -225,7 +417,10 @@ def main():
             print(f"{s} · {t} · {u}\n   서버 글: {txt}\n   목업: {p}")
     if a.measure:
         texts = {s: server_text(s, e, intros[s]) for s, e in targets(ref, intros)}
-        print(f"[shells] 서버 글 닮음 평균 {similarity(texts)}% (종목 {len(texts)})")
+        print(f"[shells] 서버 글 닮음 평균 — 지금 {similarity(texts)}% (종목 {len(texts)})")
+        fx = load_facts(a.cache)
+        texts = {s: server_text(s, e, intros[s], fx, ref) for s, e in targets(ref, intros)}
+        print(f"[shells] 서버 글 닮음 평균 — 사실 요약 넣은 뒤 {similarity(texts)}% · 평균 글자 수 {sum(map(len, texts.values())) // max(len(texts), 1)}")
     if a.publish or a.dry:
         done = publish(a.cache, ref, intros, dry=a.dry)
         if a.map:
