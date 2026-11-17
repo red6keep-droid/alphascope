@@ -35,25 +35,29 @@ concurrency:
 
 jobs:
   # 같은 날 두 번 막기 — Cloudflare Worker(infra/cron-trigger)와 GitHub cron 이 둘 다 건다(GitHub cron 은 자주 늦거나 빠진다).
-  # 정기 실행(schedule · Worker 의 scheduled=true)만: 최근 6시간 안에 이 워크플로가 이미 성공했으면 건너뛴다. 사람이 거는 실행은 늘 돈다 (2026-11-15 사용자)
+  # 정기 실행만 확인한다. 사람이 거는 실행은 늘 돈다 (2026-11-15 사용자). 확인 = .github/scripts/run_guard.py (2026-11-17: 06:40 예비가 13:09 에 와
+  # `최근 6시간` 밖이라 AI 까지 18분 다시 돌았다 — 예비는 그 cron 의 예정 시각 기준, `한 것` = 본 잡(news)이 성공했거나 도는 중인 실행만)
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       skip: ${{ steps.dup.outputs.skip }}
     steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/scripts/run_guard.py
+          sparse-checkout-cone-mode: false
       - id: dup
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == 'true' }}
+          SCHEDULE: ${{ github.event.schedule }}
         run: |
-          skip=false
           if [ "$SCHEDULED" = true ]; then
-            since=$(date -u -d '6 hours ago' +%Y-%m-%dT%H:%M:%SZ)
-            n=$(gh run list -R "$GITHUB_REPOSITORY" --workflow quick-news.yml --status success -L 20 --json createdAt,databaseId \
-                -q "[.[] | select(.createdAt >= \"$since\" and .databaseId != $GITHUB_RUN_ID)] | length" || echo 0)
-            [ "${n:-0}" -gt 0 ] && skip=true
+            python3 .github/scripts/run_guard.py --workflow quick-news.yml --job news
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"; echo "사람이 건 실행 → 돈다"
           fi
-          echo "skip=$skip" >> "$GITHUB_OUTPUT"; echo "간단 종목 뉴스 중복 건너뛰기: $skip"
 
   news:
     needs: check

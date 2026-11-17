@@ -15,12 +15,18 @@ name: Quick stock data (간단 정보 853종목)
 #   - 게시 = 저장소 변수 QUICK_PUBLISH=true. 없으면 그림자 모드(만들기만 하고 올리지 않음, 표본만 아티팩트). 저장값은 그림자 모드에서도 남긴다(첫 주 채우기가 이어지게).
 #   - 받은 종목이 명단의 90% 밖이면 collect_quick.py 가 종료 코드 3 → 올리지 않고 전날 데이터 그대로.
 
-run-name: "Quick stock data (간단 정보 853종목) · ${{ github.event_name == 'schedule' && (github.event.schedule == '20 23 * * 1-5' && 'us' || 'kr') || inputs.market || 'all' }}"   # 끝 = 시장 — 중복 건너뛰기가 같은 시장만 센다
+run-name: "Quick stock data (간단 정보 853종목) · ${{ github.event_name == 'workflow_run' && (github.event.workflow_run.name == 'KR Stocks' && 'kr' || 'us') || github.event_name == 'schedule' && (github.event.schedule == '20 23 * * 1-5' && 'us' || 'kr') || inputs.market || 'all' }}"   # 끝 = 시장 — 중복 건너뛰기가 같은 시장만 센다
 
 on:
   schedule:
     - cron: '20 23 * * 1-5'   # 미국 — UTC 월~금 23:20 = KST 화~토 08:20 (정식 07:30 실행이 07:56~59 에 끝난 뒤 · 야후 겹침 없게. 옛 17:40 은 한국 낮 내내 하루 늦었다)
     - cron: '40 8 * * 1-5'    # 한국 — KST 월~금 17:40
+  # 이어 붙이기 (2026-11-17 사용자 "기준일이 제각각"): 정식 실행이 끝나면 바로 — 한국 = KR Stocks(16:10, 약 16:25 끝) 뒤, 미국 = NVDA Report(07:30, 약 08:00~08:11 끝) 뒤.
+  # 17:40 시작 · 46~81분이라 한국 쪽이 19시까지 날짜가 섞였다. 위 cron · Worker(08:20 · 17:40)는 예비로 남는다 — 이어 붙인 실행이 했으면 check 가 건너뛴다.
+  # 어느 실행 뒤에 붙을지는 check 잡이 가린다(정식 본 잡이 성공 · 시간 창 · 요일). 야후 겹침 없게 5분 쉰 뒤 시작.
+  workflow_run:
+    workflows: ["KR Stocks", "NVDA Report"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       publish:
@@ -43,33 +49,62 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  MARKET: ${{ github.event_name == 'schedule' && (github.event.schedule == '20 23 * * 1-5' && 'us' || 'kr') || inputs.market || 'all' }}
+  MARKET: ${{ github.event_name == 'workflow_run' && (github.event.workflow_run.name == 'KR Stocks' && 'kr' || 'us') || github.event_name == 'schedule' && (github.event.schedule == '20 23 * * 1-5' && 'us' || 'kr') || inputs.market || 'all' }}
   OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}   # 운영 기록 — 대시보드 AI 칸에 잡히게 (2026-11-15)
   OPS_CF_KV_NAMESPACE_ID: ${{ secrets.OPS_CF_KV_NAMESPACE_ID }}
   OPS_CF_API_TOKEN: ${{ secrets.OPS_CF_API_TOKEN }}
-  DO_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == 'true') && vars.QUICK_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+  DO_PUBLISH: ${{ ((github.event_name == 'schedule' || github.event_name == 'workflow_run' || inputs.scheduled == 'true') && vars.QUICK_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
 
 jobs:
-  # 같은 날 두 번 막기 — Cloudflare Worker(infra/cron-trigger)와 GitHub cron 이 둘 다 건다(GitHub cron 은 자주 늦거나 빠진다).
-  # 정기 실행(schedule · Worker 의 scheduled=true)만: 최근 6시간 안에 이 워크플로가 이미 성공했으면 건너뛴다. 사람이 거는 실행은 늘 돈다 (2026-11-15 사용자)
+  # 같은 날 두 번 막기 — Cloudflare Worker(infra/cron-trigger) · GitHub cron(예비) · 정식 실행 뒤 이어 붙이기가 모두 건다.
+  # 정기 실행만 확인한다. 사람이 거는 실행은 늘 돈다 (2026-11-15 사용자). 확인 = .github/scripts/run_guard.py (2026-11-17: 6시간 넘게 늦은 예비를 못 막던 것 고침 —
+  # 예비는 그 cron 의 예정 시각 기준, `한 것` = 본 잡(quick)이 성공했거나 도는 중인 실행만)
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       skip: ${{ steps.dup.outputs.skip }}
     steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/scripts/run_guard.py
+          sparse-checkout-cone-mode: false
+      # 이어 붙이기 문 — 정식 실행의 본 잡이 성공했고, 그 시장의 정기 시간 창 안일 때만 (수동 · 낮 갱신 · 늦은 예비 · 휴장 건너뜀 뒤에는 붙지 않는다)
+      - id: chain
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UP_ID: ${{ github.event.workflow_run.id }}
+          UP_OK: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          go=false
+          H=$(TZ=Asia/Seoul date +%-H); W=$(TZ=Asia/Seoul date +%u)   # W: 1=월 … 7=일
+          if [ "$MARKET" = kr ]; then JOB=kr-stocks; [ "$W" -le 5 ] && [ "$H" -ge 15 ] && [ "$H" -le 21 ] && go=true
+          else JOB=nvda-report; [ "$W" -ge 2 ] && [ "$W" -le 6 ] && [ "$H" -ge 6 ] && [ "$H" -le 10 ] && go=true; fi
+          if [ "$go" = true ]; then
+            ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$UP_ID/jobs?per_page=50" -q "[.jobs[] | select(.name == \"$JOB\" and .conclusion == \"success\")] | length" || echo 0)
+            [ "$UP_OK" = success ] && [ "${ok:-0}" -gt 0 ] || go=false
+          fi
+          echo "go=$go" >> "$GITHUB_OUTPUT"
+          echo "이어 붙이기 · 시장 $MARKET · KST ${H}시 요일 $W · 정식 결과 $UP_OK · 본 잡($JOB) 성공 ${ok:-?} → $go"
       - id: dup
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == 'true' }}
+          SCHEDULED: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_run' || inputs.scheduled == 'true' }}
+          SCHEDULE: ${{ github.event.schedule }}
         run: |
-          skip=false
-          if [ "$SCHEDULED" = true ]; then
-            since=$(date -u -d '6 hours ago' +%Y-%m-%dT%H:%M:%SZ)
-            n=$(gh run list -R "$GITHUB_REPOSITORY" --workflow quick-data.yml --status success -L 20 --json createdAt,databaseId,displayTitle \
-                -q "[.[] | select(.createdAt >= \"$since\" and .databaseId != $GITHUB_RUN_ID and (.displayTitle | endswith(\"· $MARKET\")))] | length" || echo 0)
-            [ "${n:-0}" -gt 0 ] && skip=true
+          if [ "${{ github.event_name }}" = workflow_run ] && [ "${{ steps.chain.outputs.go }}" != true ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"; echo "이어 붙일 실행이 아님 → 건너뜀"; exit 0
           fi
-          echo "skip=$skip" >> "$GITHUB_OUTPUT"; echo "종목 주가 중복 건너뛰기: $skip"
+          if [ "$SCHEDULED" = true ]; then
+            python3 .github/scripts/run_guard.py --workflow quick-data.yml --job quick --title-suffix "· $MARKET"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"; echo "사람이 건 실행 → 돈다"
+          fi
+      # 정식 실행이 막 야후를 다 쓴 참 — 5분 쉬고 시작 (2026-11-17 영향 표 약속)
+      - name: Rest before Yahoo
+        if: github.event_name == 'workflow_run' && steps.dup.outputs.skip != 'true'
+        run: sleep 300
 
   quick:
     needs: check

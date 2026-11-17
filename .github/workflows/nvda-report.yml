@@ -232,6 +232,7 @@ jobs:
 
       # 공개 등록 증명(proof/{slug}.json — 커밋 시각 = 미리 적었다는 증명, 내용은 등록 때 고정) · 홈 `증시 전망` 카드 자료(hypo.json)
       - name: Deploy forecast proof + hypo.json to gh-pages
+        id: fc_deploy
         if: env.DO_PUBLISH == 'true' && needs.check.outputs.mode != 'refresh' && hashFiles('deploy-forecast/hypo.json') != ''
         continue-on-error: true
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정(태그는 바뀔 수 있다, 2026-11-14 보안 점검)
@@ -240,6 +241,15 @@ jobs:
           publish_dir: ./deploy-forecast
           publish_branch: gh-pages
           keep_files: true
+
+      # 홈 증시 전망 · Hot Issue 카드 캐시 비우기 + 새 파일 확인 (2026-11-17 사용자) — 비우기가 없어 jsDelivr 가 11-17 오후까지
+      # issues.json 은 11-16 07:40 판, hypo.json 은 새벽 02:28 판을 내줬다(카드 `11월 16일 아침`). 홈의 ?v= 는 jsDelivr 가 무시한다.
+      - name: Purge hypo.json · issues.json cache
+        if: steps.fc_deploy.outcome == 'success'
+        continue-on-error: true
+        run: |
+          bash .github/scripts/jsd_purge.sh hypo.json deploy-forecast/hypo.json || true
+          [ -f deploy-forecast/issues.json ] && bash .github/scripts/jsd_purge.sh issues.json deploy-forecast/issues.json || true
 
       # 시총 TOP 10 고정 페이지 20개 (experiments/stock-radar, 2026-10-18 첫 발행). 엔비디아 DB(일정) · 그래프 코드를 같이 쓰므로 이 실행 안에서 돈다.
       # 이어서 쌓는 파일(뉴스 분류 · 변동성 이력 · 순위 교체 상태)만 nvda-state 의 radar/ 에 둔다. 일봉 snapshot 은 매번 새로 받는다.
