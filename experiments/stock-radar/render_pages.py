@@ -1301,7 +1301,7 @@ def list_row(s, first):
     left = (f'<span style="display:inline-block;width:26px;color:{NOTE};font-weight:700;">{s["rank"]}</span>{_dk.ticker_logo(s["sym"])}'
             f'<a href="{_esc(detail_url(s))}" style="color:#111;text-decoration:none;">{_esc(s["name"])}</a>'
             f'<span style="display:block;padding-left:52px;font-size:{_dk.MICRO};line-height:20px;font-weight:400;color:{NOTE};">{_esc(s["sym"])} · {cap_text(s["cap"])}</span>')   # 순위 26 + 로고 26 만큼 들여 이름 글자에 맞춘다
-    right = f'<span style="color:{pcol};">${s["close"]:,.2f}</span><br>{R._arrow(r)}'
+    right = f'{R._arrow(r)}<br><span style="color:{pcol};">${s["close"]:,.2f}</span>'   # 증감 위 · 가격 아래 (2026-11-17 사용자 규칙, 가이드라인 4절)
     # 줄 전체가 상세로 가는 터치 영역 — 테마 터치 장치가 [data-row-link] 를 읽는다 (2026-10-19 사용자: 이름만이 아니라 한 행을 터치)
     return R._row_html(left, right, first=first).replace("<span", f'<span data-row-link="1" data-ret="{r:.4f}"', 1)
 

@@ -733,7 +733,7 @@ def _list_rows(market, bars, syms):
         left = (f'{logo}<a href="{dk.esc(E.page_url(sym))}" style="color:#111;text-decoration:none;">{dk.esc(E.BY_SYM[sym][1])}</a>'
                 f'<span style="display:block;padding-left:{26 if logo else 0}px;font-size:{dk.MICRO};line-height:20px;font-weight:400;color:{dk.NOTE};">'
                 f'{dk.esc(E.key(sym))} · {dk.esc(E.BY_SYM[sym][2])}</span>')
-        items.append((left, f'<span style="color:{pcol};">{price}</span><br>{R._arrow(r)}', r))
+        items.append((left, f'{R._arrow(r)}<br><span style="color:{pcol};">{price}</span>', r))   # 증감 위 · 가격 아래 (2026-11-17 사용자 규칙, 가이드라인 4절)
     if not items:
         return ""
 

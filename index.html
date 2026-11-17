@@ -896,6 +896,7 @@ body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 1
 @media (max-width: 600px) {   /* 폰: 전일 대비는 종가 아래 줄, 머리글은 줄바꿈 — 업종 · 1위 종목 · 종가 세 칸이 한 화면에 들게 */
   .picks-section .rank-table th, .picks-section .rank-table td { white-space: normal; }
   .picks-section .cell-price small { display: block; margin-left: 0; }
+  .picks-section .cell-price { display: inline-flex; flex-direction: column-reverse; align-items: flex-end; }   /* 두 줄 = 증감 위 · 가격 아래 (2026-11-17 사용자 규칙) */
 }   /* 3칸 표는 폰 폭에 맞춘다 — 시총 TOP 10 의 min-width 760 을 물려받으면 종가 · 업종 칸이 오른쪽으로 밀려 안 보였다 */
 /* 종목명은 늘 한 줄, 업종 글자도 한 줄 — 업종 · 종가 칸 좌우 여백 8 → 4, 업종 글자 13px로 자리를 만든다. 폭 374px 이하 폰에서만 업종이 공백 자리에서 두 줄 (2026-10-25 사용자: "종목명이 두 줄로 가면 안 된다") */
 .picks-section .stock-name { white-space: nowrap; }

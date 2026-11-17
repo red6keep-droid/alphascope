@@ -8,11 +8,11 @@
     소재 = 그날 가장 크게 움직인 업종 → 7갈래 (날짜로 갈래 안 장면을 돌림) · 분위기 = 대표 지수 등락 5단계 · 장소 = am 미국 · pm 한국.
 - 그림 사슬: Workers AI Lucid Origin → Workers AI FLUX schnell → Hugging Face FLUX schnell → 기본 배너(static/default/{분위기}.webp).
     Pollinations 는 쓰지 않는다 (11-17 무료 = IP 당 45초 1장 + 워터마크).
-- 배치 = 주요 제목(흰색) · 강조 제목(방향 색) · 시장 요약 한 줄 + 작은 `AI 생성 이미지` (11-17 사용자 사양, 옛 알약 · 볼 것 3칸 없음).
+- 배치 = 주요 제목(흰색) · 강조 제목(방향 색) · 시장 요약 한 줄 (11-17 사용자 사양, 옛 알약 · 볼 것 3칸 없음). `AI 생성 이미지` 는 그림에 쓰지 않고 img alt 에 (11-17 사용자).
 - 글자 = Pillow + 강원교육튼튼(fonts/GangwonEduPower.ttf, 강원특별자치도교육청 — 판매 · 유료 양도만 금지, 출처 표기 권장). 숫자 없음. 칸: 알약(브랜드 · 날짜 · 편) / 배너 제목 2줄 / 키워드 줄 / 오늘 볼 것 3칸 / `AI 생성 이미지`.
     글은 수집기 `banner` 칸: titles = 제목 후보 [[주요, 강조], …] 좋은 것부터 → 사양 크기에 들어가는 첫 후보, 다 길면 줄임. keys = 시장 요약.
     후보가 없으면 글 제목(그날 주제)의 숫자 없는 앞 구절. 글이 길면 칸에 들어갈 때까지 줄인다 — 빼지 않음 (2026-11-17 사용자).
-- 규칙(운영지침 4-6): 로고 · 간판 · 랜드마크(거래소 정면 · 황소상) 없음, 사람은 멀리 · 뒷모습, `AI 생성 이미지` 표시.
+- 규칙(운영지침 4-6): 로고 · 간판 · 랜드마크(거래소 정면 · 황소상) 없음, 사람은 멀리 · 뒷모습, `AI 생성 이미지` 는 alt 에.
 - 출력 = {out}/images/commentary-{날짜}-{am|pm}.webp (900×350 — 11-17 사용자 배치 사양, 그림은 1200×630 으로 받아 줄임). 이름에 날짜가 있어 30일 정리(image_prune.py) 대상.
 - 비밀 값: CF_ACCOUNT_ID · CF_AI_TOKEN · HF_TOKEN 환경 변수. 출력 · 로그에 쓰지 않는다 (오류는 상태 코드 + 응답 앞 160자).
 """
@@ -309,8 +309,7 @@ def compose(bg, sc, banner):
         if px < SUMMARY["px"]:
             log(f"요약 줄임 {SUMMARY['px']} → {px}px")
 
-    # ③ 표시 (운영지침 4-6) — 오른쪽 아래 작게
-    d.text((OUT_W - 14, OUT_H - 12), "AI 생성 이미지", font=_font(False, 14), fill=(220, 225, 232, 200), anchor="rs")
+    # ③ `AI 생성 이미지` 글자는 그리지 않는다 (2026-11-17 사용자: 글자에 가려지는 단순 배경이라 의미 없음) — 표시는 img alt 에 (운영지침 4-6)
     im = Image.alpha_composite(im, shadow.filter(ImageFilter.GaussianBlur(1.5)))
     return Image.alpha_composite(im, txt).convert("RGB")
 
