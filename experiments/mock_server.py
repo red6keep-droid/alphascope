@@ -69,6 +69,42 @@ ARCHIVE_SEED = [
 ]
 
 
+# 목업 = 기능 단위 세 칸 (2026-11-17 사용자: "목업이 너무 많아, 과거 거랑 뒤섞여 — 내가 항상 지우고 옮겨야 돼?" → 아니다, 표가 정한다).
+# 발행 예정 = 아직 블로그에 없는 기능(남은 일 한 줄) · 발행된 화면 = 블로그에 있는 기능의 목업(접어 둠) · 어느 표에도 없는 파일 = 자동으로 `쓰지 않는 목업`.
+# 기능이 발행되면 Claude 가 PLAN → LIVE 로 옮긴다(사용자 몫 아님). 새 목업 묶음을 만들면 같은 커밋에서 PLAN 에 한 줄.
+PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
+    ("종목 목록 (하단 메뉴 `종목`)", "코드 끝(92f08a01) → main → 간단 종목 실행 뒤 목록 파일 확인 → 고정 페이지 만들기 → 테마 붙여넣기", ["stock-lists/*"]),
+    ("간단 종목 853 (종목을 누르면 나오는 페이지)", "발행 중 — 전용 페이지 하루 50쪽씩(11-17 기준 95쪽), 기업 소개 다 차는 날 약 11-20 · 한국 간단 뉴스 2차는 방식 미정", ["stock-quick/*"]),
+    ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
+    ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
+    ("검색 `왜 떨어졌어` · 질문하기", "질문하기 버튼 꺼 둠 — 켤지 사용자 결정", ["site-search/mock_why_demo*"]),
+    ("홈 · 전체 메뉴 · 공통 디자인", "테마 붙여넣기 때 반영 (11-17 메뉴 Hot Issue · 아이콘 빨강 포함)", ["home-split/*", "design-samples/*", "site-search/mock_search*"]),
+]
+PLAN_NOMOCK = [   # 목업 파일이 이 PC 에 없는 발행 예정 기능 — 줄만 보인다
+    ("시황 해설 (하루 2편 · 배너)", "품질 단계 ② 모델 가린 비교(11-17 · 18) → ③ 연속성 → ready 는 사용자 결정 · 배너 목업은 banner_layout_mock.py"),
+]
+LIVE = [   # 블로그에 있는 기능 — 목업은 접어서 아래에
+    ("미국 종목 페이지", ["stock-radar/*"]), ("한국 종목 페이지", ["kr-stocks/*"]), ("ETF 페이지", ["stock-etf/*"]),
+    ("미국 증시 리포트", ["daily-report/*"]), ("한국 증시 리포트", ["kr-market-report/*"]), ("주요 인물 발언", ["people-radar/*"]),
+    ("테마", ["theme-monitor/*"]), ("주식 공부", ["course/*"]), ("운영 현황 (관리자)", ["ops-dashboard/*"]),
+    ("Hot Issue", ["issue_store/mock_issue_*"]),
+    ("증시 전망", ["issue_store/mock_forecast*", "issue_store/forecast*", "issue_store/mock_kr_why-forecast*"]),
+]
+
+
+def stage_of(d, f):
+    """('plan', 번호) · ('live', 번호) · None(= 자동 보관)."""
+    from fnmatch import fnmatch
+    k = f"{d}/{f}"
+    for i, (_, _, pats) in enumerate(PLAN):
+        if any(fnmatch(k, p) for p in pats):
+            return ("plan", i)
+    for i, (_, pats) in enumerate(LIVE):
+        if any(fnmatch(k, p) for p in pats):
+            return ("live", i)
+    return None
+
+
 def load_prefs():
     try:
         with open(PREFS, encoding="utf-8") as fh:
@@ -244,7 +280,7 @@ def index_page(archive=False):
     with _lock:
         prefs = load_prefs()
     stars = prefs["star"]
-    arch = set(prefs["archive"])
+    arch = set(prefs["archive"]) | {f"{d}/{f}" for d, f, _ in items if stage_of(d, f) is None}   # 표에 없는 파일 = 자동 보관
     old = [x for x in items if f"{x[0]}/{x[1]}" in arch]
     items = old if archive else [x for x in items if f"{x[0]}/{x[1]}" not in arch]
     by_key = {f"{d}/{f}": (d, f, t) for d, f, t in items}
@@ -266,11 +302,25 @@ def index_page(archive=False):
         fav = [by_key[k] for k in stars if k in by_key]   # 누른 순서대로
         if fav:
             parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref) for x in fav), "</section>"]
-        parts += ['<section><h2>최근 바뀐 목업</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref) for x in items[:RECENT_N]), "</section>"]
-        for d in sorted(groups, key=lambda k: -groups[k][0][2]):   # 최근에 손댄 폴더가 위
-            parts.append(f'<details><summary>{html.escape(LABELS.get(d, d))} <span class="n">{len(groups[d])}</span></summary>')
-            parts += [row(*x, stars=stars, names=names, ref=ref) for x in groups[d]]
+        plan, live = {}, {}
+        for x in items:
+            s = stage_of(x[0], x[1])
+            (plan if s[0] == "plan" else live).setdefault(s[1], []).append(x)
+        parts.append('<h2 class="zone">발행 예정</h2>')
+        for i, (name, todo, _) in enumerate(PLAN):
+            rows = plan.get(i, [])
+            parts.append(f'<details{" open" if i == 0 else ""}><summary>{html.escape(name)} <span class="n">{len(rows)}</span><span class="todo">{html.escape(todo)}</span></summary>')
+            parts += [row(*x, stars=stars, names=names, ref=ref) for x in rows]
             parts.append("</details>")
+        for name, todo in PLAN_NOMOCK:
+            parts.append(f'<div class="nomock"><b>{html.escape(name)}</b><span class="todo">{html.escape(todo)}</span></div>')
+        parts.append('<h2 class="zone">발행된 화면</h2>')
+        for i, (name, _) in enumerate(LIVE):
+            rows = live.get(i, [])
+            if rows:
+                parts.append(f'<details><summary>{html.escape(name)} <span class="n">{len(rows)}</span></summary>')
+                parts += [row(*x, stars=stars, names=names, ref=ref) for x in rows]
+                parts.append("</details>")
         if old or ARCHIVED_LINKS:
             parts.append(f'<a class="big" href="/archive">쓰지 않는 목업 <span>{len(old) + len(ARCHIVED_LINKS)}개 ›</span></a>')
     now = datetime.now().strftime("%m-%d %H:%M:%S")
@@ -281,7 +331,8 @@ body{{margin:0;padding:16px;font:16px/1.4 -apple-system,"Apple SD Gothic Neo",sa
 h1{{font-size:20px;margin:0 0 4px}} .meta{{color:#8a919c;font-size:13px;margin-bottom:16px}}
 h2{{font-size:15px;color:#5b6370;margin:0 0 8px}} section{{margin-bottom:20px}}
 details{{background:#fff;border:1px solid #e3e6eb;border-radius:10px;margin-bottom:10px}}
-summary{{padding:14px;font-weight:600;cursor:pointer}} .n{{color:#8a919c;font-weight:400;font-size:14px}}
+summary{{padding:14px;font-weight:600;cursor:pointer}} .todo{{display:block;margin-top:4px;color:#5b6370;font-size:13px;font-weight:400;line-height:1.45}}
+h2.zone{{font-size:17px;color:#1d2127;margin:24px 0 10px}} .nomock{{background:#fff;border:1px dashed #c9ced6;border-radius:10px;padding:14px;margin-bottom:10px}} .n{{color:#8a919c;font-weight:400;font-size:14px}}
 details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
 .row{{display:flex;align-items:stretch;min-height:48px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}}
 .go{{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:10px 4px 10px 14px;color:inherit;text-decoration:none}}
