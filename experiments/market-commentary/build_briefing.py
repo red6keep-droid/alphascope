@@ -203,7 +203,9 @@ def build_pm(day_kst, kr_path):
         # 코스피 · 코스닥 종가 = kr.json indices(2026-11-17, 수집기 14절 장 날짜 첫 줄) — 봉 날짜가 장 날짜와 같은 것만. 옛 kr.json 이면 빈 칸
         "close": {"indices": [{"name": i.get("name"), "close": _r(i.get("close")), "chg_pct": _r(i.get("chg_pct"))}
                               for i in kr.get("indices") or [] if i.get("day") == kr.get("day")],
-                  "sectors": sectors, "movers": movers},
+                  "sectors": sectors, "movers": movers,
+                  # 외국인 순매수(코스피 · 코스닥 · 20일 누적 · 연속) · 원/달러 · 국고채 3년 — kr.json figures 그대로, 칸마다 day(ECOS 는 하루 늦는 날이 있어 거르지 않고 날짜로 알림, 수집기 Q20)
+                  "figures": kr.get("figures") or []},
         "signals": signals,
         "hypotheses": _hypotheses(hypo, "kr"),
         "news": [],
