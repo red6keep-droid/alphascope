@@ -879,7 +879,7 @@ body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 1
 /* 카드 순서: 리포트 → 시총 TOP 10 (주요 지수 · 섹터 현황은 2026-10-20 삭제). PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭 (2026-10-15 사용자) */
 @media (min-width: 901px) {
   .home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .home-cards > .briefing, .home-cards > .rankings, .home-cards > .event-banner, .home-cards > .study-banner { grid-column: 1 / -1; }   /* 일정 배너도 전폭 (2026-10-28) */   /* 주식 공부 배너도 전폭 (2026-11-15) */
+  .home-cards > .briefing, .home-cards > .rankings, .home-cards > .event-banner, .home-cards > .study-banner, .home-cards > .home-base { grid-column: 1 / -1; }   /* 일정 배너도 전폭 (2026-10-28) */   /* 주식 공부 배너도 전폭 (2026-11-15) */
 }
 /* 테마 · 관심 종목 · 섹터 종목 탭 카드 (2026-10-21 사용자) — 탭 줄 오른쪽 끝 기준일, 관심 종목 묶음은 탭 아래 작은 알약 줄 */
 /* 주식 공부 배너 (2026-11-15 사용자: 사용자가 만든 그림 한 장 그대로) — 전폭 카드 모서리 12 · 그림 = 카드 전체, 누르면 주식 공부 목록.
@@ -891,6 +891,8 @@ body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 1
 .picks-section .tabs { align-items: flex-end; }
 .picks-day { padding: 8px 16px 0; font-family: var(--num); font-size: 14px; line-height: 20px; color: var(--gray-400); text-align: right; }   /* 기준일 — 탭 아래 오른쪽 한 줄 (탭 줄에 두면 폰에서 잘린다) */
 .picks-day:empty { display: none; }
+.home-base { margin: 0 0 calc(8px - var(--card-gap)); font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; text-align: right; }   /* 홈 기준 줄 — 카드 날짜와 같은 모양, 아래 카드와 8 (2026-11-17 사용자) */
+.home-base[hidden] { display: none; }
 .pick-panel[hidden] { display: none; }
 .picks-section .rank-table { min-width: 0; width: 100%; }
 @media (max-width: 600px) {   /* 폰: 전일 대비는 종가 아래 줄, 머리글은 줄바꿈 — 업종 · 1위 종목 · 종가 세 칸이 한 화면에 들게 */
@@ -1957,6 +1959,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           <div class='eb-viewport'><div class='eb-track' data-hook='event-slides'></div></div>
           <div class='eb-dots' data-hook='event-dots'></div>
         </section>
+        <!-- 홈 기준 줄 (2026-11-17 사용자) — 시장별 기준일 한 줄. 카드 날짜는 이 기준과 다를 때만 보인다 (JS syncBase) -->
+        <p class='home-base' hidden='hidden' id='home-base'></p>
         <section class='briefing' aria-labelledby='briefing-title'>
           <!-- 홈 맨 위 '미국 증시 데일리 브리핑 — 날짜' 줄은 두지 않는다 — 리포트 제목마다 발행 날짜 (2026-10-13 사용자) -->
           <div class='briefing-body'>
@@ -2942,6 +2946,25 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var thc = document.getElementById('rank-th-chart');
           if (thc) thc.hidden = rankMarket !== 'kr' || !LIVE_ENABLED;
           [].slice.call(document.querySelectorAll('[data-day-note]')).forEach(function (n) { var m = n.getAttribute('data-day-note') === 'rank' ? rankMarket : picksMarket; n.textContent = closeKo(mktDay[m], m); });
+          syncBase();
+        }
+        /* 홈 기준 줄 (2026-11-17 사용자 "콘텐츠 기준일이 제각각 · 혼란스럽다") — 맨 위 한 줄 `미국 11월 17일 아침 · 한국 11월 16일 오후 기준`.
+           기준 = 시장별 종가 날짜(stocks.json · kr.json 의 day, 한국 시간으로). 카드 · 구획 날짜는 그 기준과 같으면 숨기고, 다를 때만 보인다
+           (지난 급락일 · 아직 안 바뀐 카드처럼 독자가 알아야 할 때만 날짜가 눈에 띄게). 기준을 모르는 동안(자료 못 받음)은 카드 날짜를 그대로 둔다 */
+        function syncBase() {
+          var b = { us: closeKo(mktDay.us, 'us'), kr: closeKo(mktDay.kr, 'kr') };
+          var line = document.getElementById('home-base');
+          if (line) {
+            var parts = [];
+            if (b.us) parts.push('미국 ' + b.us);
+            if (b.kr) parts.push('한국 ' + b.kr);
+            line.textContent = parts.length ? parts.join(' · ') + ' 기준' : '';
+            line.hidden = !parts.length;
+          }
+          [].slice.call(document.querySelectorAll('.report-card-date[data-date], [data-day-note]')).forEach(function (n) {
+            var t = n.textContent;
+            n.hidden = !!t && (t === b.us || t === b.kr);
+          });
         }
         function renderKR() { if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); syncLiveUI(); }
         function fetchLive() {
@@ -3992,6 +4015,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function setDate(id, text) {
           var d = document.querySelector('.report-card-date[data-date="' + id + '"]');
           if (d) d.textContent = text;
+          syncBase();   /* 기준과 같은 날짜면 숨김 (2026-11-17) */
         }
 
         /* 급등주 — 새 디자인은 카드 행(data-pick 속성)에서, 옛 글은 표의 세 칸에서 종목 / 가격 / 등락률을 읽는다 (2026-10-11) */
