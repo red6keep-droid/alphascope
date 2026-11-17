@@ -200,8 +200,10 @@ def build_pm(day_kst, kr_path):
     am = _get_json(f"{RAW}/briefing/{day_kst}-am.json") or {}
     return {
         "v": V, "date": day_kst, "slot": "pm", "market": "KR", "session": session, "trade_date": kr.get("day"),
-        # 한국 지수 종가는 kr.json 에 없다 — 시가총액 상위 35종목 등락 · 업종 평균으로 준다
-        "close": {"indices": [], "sectors": sectors, "movers": movers},
+        # 코스피 · 코스닥 종가 = kr.json indices(2026-11-17, 수집기 14절 장 날짜 첫 줄) — 봉 날짜가 장 날짜와 같은 것만. 옛 kr.json 이면 빈 칸
+        "close": {"indices": [{"name": i.get("name"), "close": _r(i.get("close")), "chg_pct": _r(i.get("chg_pct"))}
+                              for i in kr.get("indices") or [] if i.get("day") == kr.get("day")],
+                  "sectors": sectors, "movers": movers},
         "signals": signals,
         "hypotheses": _hypotheses(hypo, "kr"),
         "news": [],

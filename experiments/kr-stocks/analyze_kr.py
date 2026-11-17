@@ -489,7 +489,19 @@ def run(snap, flow_data=None, hist=None):
             s["wti"] = market.get("wti")
     for s in stocks:
         s["crash"] = CW.for_stock(crash, s["sym"])
-    return {"day": day, "fetched_at": snap["fetched_at"], "stocks": stocks, "market": market, "crash": crash}
+    return {"day": day, "fetched_at": snap["fetched_at"], "stocks": stocks, "market": market, "crash": crash, "indices": indices(snap)}
+
+
+def indices(snap):
+    """코스피 · 코스닥 종가 · 전일 대비 — 이미 받는 봉(^KS11 · ^KQ11)으로 계산만, 수집 추가 없음.
+    kr.json → 시황 해설 pm 묶음 close.indices (수집기 14절 '장 날짜 첫 줄', 2026-11-17). 봉 날짜를 같이 줘 받는 쪽이 그날 값인지 본다."""
+    out = []
+    for sym, name in ((U.BENCH, "코스피"), (U.KOSDAQ, "코스닥")):
+        b = [x for x in snap["bars"].get(sym) or [] if x.get("close")]
+        if len(b) < 2:
+            continue
+        out.append({"name": name, "day": b[-1]["day"], "close": round(b[-1]["close"], 2), "chg_pct": round((b[-1]["close"] / b[-2]["close"] - 1) * 100, 2)})
+    return out
 
 
 if __name__ == "__main__":
