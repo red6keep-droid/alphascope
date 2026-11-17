@@ -144,7 +144,7 @@ jobs:
       - name: Purge radar.json cache
         if: hashFiles('deploy-cards/cards/radar.json') != '' && steps.cards_deploy_retry.outcome != 'failure'
         continue-on-error: true
-        run: curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/cards/radar.json" || true
+        run: bash .github/scripts/jsd_purge.sh cards/radar.json deploy-cards/cards/radar.json || true   # 기다렸다 비우기 + 새 파일 확인 (2026-11-17 — 푸시 직후 바로 비우면 옛 커밋을 다시 붙잡는다)
 
       - name: Notify card deploy failure
         if: steps.cards_deploy_retry.outcome == 'failure'

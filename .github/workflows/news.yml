@@ -7,16 +7,43 @@ on:
 
 permissions:
   contents: write
+  actions: read   # 예비 중복 확인(check)이 실행 목록을 읽는다
 
 concurrency:
   group: news-update
-  cancel-in-progress: true
+  cancel-in-progress: false   # 2026-11-17: true 면 늦게 온 예비가 도는 정시 실행을 취소했다 — 줄 세우고 예비는 check 가 건너뛴다
 
 env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # 운영 알림 (experiments/notify.py · 워크플로 실패, 2026-10-21)
 
 jobs:
+  # GitHub 예비(schedule)만 확인 — 같은 칸(06:45 · 21:45)을 Worker 실행이 이미 했으면 건너뛴다 (2026-11-17: 06:45 예비가 07:29 에 와 다시 받고 다시 올렸다).
+  # Worker · 사람 실행(workflow_dispatch)은 늘 돈다. 확인 = .github/scripts/run_guard.py
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      skip: ${{ steps.dup.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v5
+        if: github.event_name == 'schedule'
+        with:
+          sparse-checkout: .github/scripts/run_guard.py
+          sparse-checkout-cone-mode: false
+      - id: dup
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          if [ "${{ github.event_name }}" = schedule ]; then
+            python3 .github/scripts/run_guard.py --workflow news.yml --job run-fetch
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
   run-fetch:
+    needs: check
+    if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -70,7 +97,8 @@ jobs:
           keep_files: true
 
       - name: Purge jsDelivr cache
-        run: curl -sS -f https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/news.json
+        continue-on-error: true
+        run: bash .github/scripts/jsd_purge.sh news.json deploy/news.json   # 기다렸다 비우기 + 새 파일 확인 (2026-11-17 — 푸시 직후 바로 비우면 옛 커밋을 다시 붙잡는다). 5번 안에 안 되면 경고만
 
       - name: Notify failure
         if: failure()
