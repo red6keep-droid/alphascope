@@ -193,6 +193,14 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .title-share:hover { border-color: #111; }
 /* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
 .share-pop .share-buttons { justify-content: flex-start !important; }
+/* 링크 복사 강조 (2026-11-14 사용자): 맨 위 한 줄 가득 · 높이 48 · 16 굵게 · 흰 바탕 · 진한 테두리 */
+.share-pop .share-buttons li.share-main { flex: 1 0 100%; }
+.share-pop .share-buttons li.share-main .sharing-platform-button { display: flex; width: 100%; justify-content: center; gap: 8px; padding: 11px 16px; font-size: 16px; line-height: 24px; background: #fff; border-color: #B5BAC0; color: #111; }
+.share-pop .share-buttons { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px; }   /* 채널 = 링크 복사 아래 4칸 격자, 칸 = 로고 22 위 · 이름 12 보통 아래 (2026-11-14 사용자) */
+.share-pop .share-buttons li.share-main { grid-column: 1 / -1; }
+.share-pop .share-buttons li:not(.share-main) { min-width: 0; }
+.share-pop .share-buttons li:not(.share-main) .sharing-platform-button { display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 4px; padding: 10px 4px 8px; font-size: 12px; line-height: 18px; font-weight: 400; }
+.share-pop .share-buttons li:not(.share-main) svg { width: 22px !important; height: 22px !important; }
 /* 제목 아래 날짜 줄(October 11, 2026) 삭제 (2026-10-12 사용자) */
 .post-timestamp { display: none !important; }
 /* 글 보기: 첫 제목 위 여백 70% 줄임 (2026-10-12 사용자) — 위 32+40 → 10+12 */
@@ -225,7 +233,8 @@ body.item-view .post-outer-container { padding-top: 13px; }
    테마 JS가 .rt-pop 을 만든다. 닫기: × 버튼 · 바깥 누르기 · Esc. 줄바꿈(&#10;)은 창 안에서 줄을 바꾼다 */
 .post-body [data-tip] { outline: none; cursor: pointer; }
 .post-body [data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 50%; }
-.rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.45); }
+.rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: transparent; }
+.rt-pop::before, .as-search-layer::before { content: ""; position: fixed; top: -100px; right: 0; bottom: -100px; left: 0; z-index: -1; background: rgba(15,23,42,.45); pointer-events: none; }   /* 가림막 = 화면보다 위아래 100 더 — 폰 브라우저 아래 주소 줄 · 도구 줄 자리까지 덮는다(inset:0 만으로는 아래가 밝게 남았다, 2026-11-14 사용자). 누르면 팝업 바깥(.rt-pop) 누르기로 닫힌다 */
 html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업이 열린 동안 뒤 본문이 스크롤되지 않게 (2026-11-07 사용자 P350) */
 .rt-pop[hidden] { display: none; }
 .rt-pop-box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
@@ -234,14 +243,17 @@ html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업�
 .rt-pop-head::after { content: ""; position: absolute; left: 20px; right: 12px; bottom: 0; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색 (2026-10-18 사용자). 폭은 제목 왼쪽 선(20px) ~ 닫기 버튼 오른쪽 선(12px)까지 (같은 날 사용자) */
 .rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
 .rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 25px; color: #111; word-break: keep-all; overflow-wrap: anywhere; }   /* 줄바꿈 = 띄어쓰기 기준 (2026-11-07 사용자 P375) */
-.rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 35px; color: #333; word-break: keep-all; }
+.rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 28px; color: #333; word-break: keep-all; }   /* 팝업 글 = 이슈 날짜 팝업과 같은 19/28, 폰도 같다 (2026-11-14 사용자: 35 → 28) */
 /* 툴팁 내용 행간 = 본문 35px(2026-11-06 34 → 35, 19/35 홀짝 맞춤) (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
-.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; padding-left: 8px; }   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
-.rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
+.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 21px 0 11px; padding-left: 7px; }   /* 줄 사이 보이는 간격 = 이슈 날짜 팝업(행간 28 · 여백 21)과 같게 — 행간 35 라 여백 14 · 들여쓰기 7 (2026-11-14 사용자) */   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
+.rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 12px; border-radius: 50%; background: #111; }   /* 행간 28 가운데 · 점 색 #111 = 다른 팝업과 같게 (2026-11-14 사용자) */
 .rt-pop-li > span:last-child { min-width: 0; }
-.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
+.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 21px; }   /* 묶음 사이 21 = 이슈 날짜 팝업 기사 사이 (2026-11-14 사용자) */
+.rt-pop-body > .rt-pop-p:first-child, .rt-pop-body > .rt-pop-li:first-child { margin-top: 14px; }   /* 툴팁 내용 시작 = 구분선 아래 26(위 12 + 14), 이슈 날짜 팝업과 같다 (2026-11-14 사용자) */
+.share-pop .share-buttons { margin-top: 14px; }   /* 공유 · 계정 내용 시작 = 구분선 아래 26 (위 12 + 14), 이슈 날짜 팝업 기준 (2026-11-14 사용자) */
+.as-acct .rt-pop-body > :first-child { margin-top: 14px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
 .rt-pop-p b { color: #111; }
-.rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 14px; line-height: 20px; color: #7A7A7A; }   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 (2026-10-20 사용자) */
+.rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 13px; line-height: 19px; color: #6B7280; }   /* 팝업 맨 아래 작은 글자 = 원문 보기 링크와 같은 13/19 #6B7280 (2026-11-14 사용자) */   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 (2026-10-20 사용자) */
 /* 기사 번역 안내 (2026-10-19 사용자) — 기사 제목은 원문, 옆 '번역 방법' 14px 회색 밑줄 글자 버튼. 누르면 브라우저 번역법 팝업(툴팁 팝업과 같은 상자).
    구글 번역 주소로 여는 방식은 한국에서 막혀 있어 뺐다 (같은 날) */
 /* 뉴스 팝업 (2026-11-05 batch 8 ⑤ ⑥ ⑦) — 툴팁 팝업 상자 그대로, 글만 16px · 행간 26. 분야 칩은 눌린 것만 검정 */
@@ -291,7 +303,9 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .img-pop-scroll { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 0 16px; }
 .img-pop-scroll img { display: block; flex: none; max-width: none; height: auto; border-radius: 8px; background: #fff; }
 .img-pop-hint { flex: none; padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); font-size: 14px; line-height: 20px; color: rgba(255,255,255,.8); text-align: center; }
-.rt-pop-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 20px; line-height: 28px; cursor: pointer; }
+.rt-pop-close { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 0; cursor: pointer; }
+.rt-pop-close::before { content: ""; width: 14px; height: 14px; background: currentColor; -webkit-mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 3l8 8M11 3l-8 8'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 3l8 8M11 3l-8 8'/%3E%3C/svg%3E") center / contain no-repeat; }
+.rt-pop-close:hover { border-color: #111; }   /* 닫기 = 테두리 네모 32 · #E2E8F0 · 모서리 8 · 흰 바탕 · #111 × 선 2 — 모든 닫기 통일(2026-11-14 사용자: "닫기 버튼은 네모 박스", 11-12 회색 원 폐지). 글자 × 는 font-size 0 으로 숨기고 그림만 */
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
@@ -394,12 +408,12 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .post-nav { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
 .post-nav .post-nav-list { grid-column: 2; }
 .post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
-  font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* `TOP` 글자 16 → 14 (P517, 2026-11-11 사용자) — 화살표 원 22 그대로 */
 .post-nav-top:hover { color: var(--accent); }
 .post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
 .post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
 .post-nav-cm { grid-column: 1; grid-row: 1; justify-self: start; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; padding: 8px 0; background: none; border: 0;
-  font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 댓글 = 왼쪽 끝 글자 버튼, 말풍선 · 댓글 — TOP 과 거울 (2026-11-10 사용자) */
+  font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 글자 16 → 14 = TOP 과 같게 (2026-11-11 사용자) · 댓글 = 왼쪽 끝 글자 버튼, 말풍선 · 댓글 — TOP 과 거울 (2026-11-10 사용자) */
 .post-nav-cm:hover { color: var(--accent); }   /* TOP 과 같은 규칙 — 열린 상태 색은 두지 않는다(빨강 = ▲상승과 겹침) */
 .post-nav .post-nav-list, .post-nav .post-nav-top { grid-row: 1; }
 /* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px (테마 JS .ends-text, 2026-10-12 사용자) */
@@ -467,10 +481,10 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
 .post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
 .post-shell > [data-related].is-moved { margin-top: 65px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 40 → 55 → 65 (2026-11-11 사용자: 15 더 · 10 더, 옛 2026-11-10 본문 → 버튼 줄과 같은 40) */
-.post-shell > [data-related].is-moved > div:first-child { font-size: 14px !important; line-height: 20px !important; padding-bottom: 8px !important; }   /* 제목 = 푸터 제목과 같은 14/20 굵게 (2026-11-11 사용자, 옛 16/26) */
+.post-shell > [data-related].is-moved > div:first-child { font-size: 14px !important; line-height: 20px !important; padding-bottom: 8px !important; color: #6B7280 !important; }   /* 제목 = 푸터 제목과 같은 14/20 굵게 (2026-11-11 사용자, 옛 16/26) */
 .post-shell > [data-related].is-moved > a { font-size: 14px !important; line-height: 20px !important; padding-top: 9px !important; padding-bottom: 9px !important; }   /* 줄 = 14/20 · 위아래 9 (옛 16/26 · 12) — 이미 게시된 글의 인라인 값을 덮는다 (2026-11-11 사용자) */
 body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
-body.item-view .site-footer { padding-top: 38px; }   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
+body.item-view .site-footer { padding-top: 19px; }   /* 38 → 19 (50%, 2026-11-11 사용자) */   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
 .comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
@@ -572,7 +586,20 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
   <head>
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
     <title><data:view.title.escaped/></title>
+    <!-- 홈 · 목록 페이지는 Blogger 가 목록 속 글 그림을 og:image 로 먼저 단다 → 로고를 그보다 앞에 (카카오 · 페이스북은 첫 그림, 2026-11-15) -->
+    <b:if cond='data:view.isMultipleItems'>
+      <meta content='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png' property='og:image'/>
+      <meta content='1200' property='og:image:width'/>
+      <meta content='600' property='og:image:height'/>
+    </b:if>
     <b:include data='blog' name='all-head-content'/>
+    <!-- 공유 썸네일 (2026-11-15 사용자): 본문에 그림이 없는 페이지는 공통 로고. 그림이 있으면 Blogger 가 첫 그림을 og:image 로 단다(주식 공부 = 본문 맨 앞 숨은 썸네일 data-share-img) -->
+    <b:if cond='!data:view.featuredImage and !data:view.isMultipleItems'>
+      <meta content='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png' property='og:image'/>
+      <meta content='1200' property='og:image:width'/>
+      <meta content='600' property='og:image:height'/>
+      <meta content='summary_large_image' name='twitter:card'/>
+    </b:if>
     <!-- 검색 (2026-10-13 사용자): Google Search Console 소유 확인. 블로거 설정의 검색 설명이 비어 있으면 홈 · 목록에 기본 설명을 단다. 글 · 페이지에는 블로거가 설명을 달지 않는다(2026-11-10 확인) -->
     <meta content='GWtZLHo2CgnmBBgSxQQg0BKY_xKZJTSba7BBOZ6e4Ts' name='google-site-verification'/>
     <!-- 네이버 서치어드바이저 소유 확인 (2026-10-15 사용자). 블로거는 루트에 HTML 파일을 못 올려 메타 태그 방식 -->
@@ -614,6 +641,67 @@ __CSS__
 __BLOGGER_CSS__
 
 __SEARCH_CSS__
+/* ==========================================================================
+   하단 고정 메뉴 · 전체 메뉴 · 글 끝 순서 (2026-11-12 사용자 여정 테스트 → 확정. 목업 = experiments/mock_server.py /j · /icons, 가이드라인 2절)
+   ========================================================================== */
+/* 전체 메뉴(서랍) — 미국 · 한국 홈 두 버튼, 메뉴 줄 = 이름(오늘) + 오른쪽 작은 `지난 …`, 테마 묶음만 타이틀 */
+.menu-items .menu-mk { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.menu-items .menu-mk .nav-item { flex-direction: row; align-items: center; justify-content: center; height: 40px; padding: 0 !important; border: 1px solid #E2E8F0 !important; border-radius: 8px; font-size: 15px !important; line-height: 20px !important; font-weight: 400; color: #111; }
+.menu-items .menu-mk .nav-item[aria-current="page"] { border-color: #111 !important; font-weight: 700; color: #111; }
+.menu-items .menu-mk .nav-item::after, .menu-items .menu-mk .nav-item[aria-current="page"]::after { content: '\\00a0홈'; display: inline !important; position: static !important; width: auto !important; height: auto !important; background: none !important; border: 0 !important; transform: none !important; }
+.menu-items .menu-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
+.menu-items .menu-row .nav-item { flex: 1 1 auto; min-width: 0; border-bottom: 0 !important; padding: 14px 12px 14px 20px !important; font-size: 16px !important; line-height: 24px !important; font-weight: 600; color: #111; white-space: normal; }
+.menu-items .menu-past { flex: none; display: flex; align-items: center; padding: 0 20px 0 12px; color: #6B7280; font-size: 13px; line-height: 18px; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.menu-items .menu-grp { padding: 6px 0 8px; border-bottom: 1px solid var(--border); }
+.menu-items .menu-grp-t { padding: 12px 20px 4px; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; }
+.menu-items .menu-grp .nav-item { border-bottom: 0 !important; padding: 11px 20px 11px 32px !important; font-size: 15px !important; line-height: 22px !important; font-weight: 400; color: #333; }
+.menu-items .menu-row .nav-item:active, .menu-items .menu-grp .nav-item:active, .menu-items .menu-past:active { background: #F1F5F9; }
+.menu-items .nav-item.is-here { background: #F8FAFC; box-shadow: inset 3px 0 0 #111; font-weight: 700; }   /* 지금 보는 메뉴 — 빨강은 ▲상승과 겹쳐 안 씀 */
+.menu-items .menu-admin[hidden] { display: none; }   /* 관리자 줄 — .menu-row 의 flex 가 hidden 을 이기지 않게 (2026-11-13) */
+/* 로그인 · 계정 (2026-11-13 사용자) — 헤더 메뉴 버튼 앞, 메뉴 버튼과 같은 36 상자. 로그인 뒤엔 상자 안에 내 사진 26 원 */
+.as-login-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; border: 1px solid var(--border-strong); border-radius: 8px; background: #fff; color: var(--gray-600); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.as-login-btn svg { width: 20px; height: 20px; display: block; }
+.as-login-btn img, .as-login-btn .as-ini { width: 26px; height: 26px; border-radius: 50%; display: block; object-fit: cover; }
+.as-login-btn .as-ini { display: flex; align-items: center; justify-content: center; background: #94A3B8; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 26px; }
+.as-login-btn:hover { border-color: #94A3B8; }
+.as-acct .rt-pop-box, .share-pop .rt-pop-box { max-width: 400px; }   /* 짧은 창(계정 · 공유) = 400 (2026-11-14 사용자) */
+.as-acct-x { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; cursor: pointer; }   /* 계정 닫기 = 다른 팝업과 같은 테두리 네모 32 (2026-11-14 사용자) */
+.as-acct-x:hover { border-color: #111; }
+.as-acct-x svg { width: 14px; height: 14px; display: block; }
+.as-acct-note { margin: 0 0 14px; font-size: 14px; line-height: 20px; color: #6B7280; word-break: keep-all; }
+.as-acct-me { display: flex; align-items: center; gap: 10px; margin: 2px 0 14px; font-size: 16px; line-height: 24px; color: #111; }
+.as-acct-me img, .as-acct-me .as-ini { width: 32px; height: 32px; border-radius: 50%; flex: none; object-fit: cover; }
+.as-acct-me .as-ini { display: flex; align-items: center; justify-content: center; background: #94A3B8; color: #fff; font-weight: 700; font-size: 14px; }
+.as-acct-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin: 8px 0 0; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 흰 버튼 = 가이드라인 10절 .cm-login */
+.as-acct-btn:hover { border-color: #111; }
+.as-acct-btn[disabled] { opacity: .5; cursor: default; }
+.as-acct-err { margin: 10px 0 0; font-size: 14px; line-height: 20px; color: #B91C1C; text-align: center; }
+.as-acct-err:empty { display: none; }
+
+/* 하단 고정 메뉴 — 폰 · 태블릿(900 이하)만. 칸 56 + 아래 여백 15, 선택 = 색 #111 + 칸 바탕 #F1F5F9 · 아래 모서리 10. 선 굵기는 화면 px 그대로(non-scaling-stroke) */
+.as-tabbar { display: none; }
+@media (max-width: 900px) {
+  .as-tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 44; display: grid; grid-template-columns: repeat(5, 1fr); box-sizing: border-box;
+    height: calc(71px + env(safe-area-inset-bottom)); padding-bottom: calc(15px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid #E2E8F0; }
+  .as-tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #6B7280; text-decoration: none; font-size: 11px; line-height: 14px; -webkit-tap-highlight-color: transparent; }
+  .as-tabbar a.on { color: #111; background: #F1F5F9; border-radius: 0 0 10px 10px; }
+  .as-tabbar a:active { background: #F1F5F9; }
+  .as-tabbar svg { width: 22px; height: 22px; display: block; }
+  .as-tabbar svg * { vector-effect: non-scaling-stroke; }
+  body { padding-bottom: calc(71px + env(safe-area-inset-bottom)); }
+  .a2hs { bottom: calc(81px + env(safe-area-inset-bottom)); }   /* 홈 화면 추가 안내 = 하단 메뉴 위 10 */
+}
+
+/* 글 끝 — 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터. 검은 `목록` · `홈으로` 버튼은 숨김(주소는 위쪽 뒤로 가기가 읽는다), 버튼 줄 위아래 구분선 없음 */
+.post-shell .post-nav .post-nav-list { display: none !important; }
+.post-shell .post-nav .post-nav-list.post-nav-study { display: inline-flex !important; padding: 9px 25px; }   /* 주식 공부 글만 가운데 `주식 공부 목록` — 댓글 · TOP 사이, 높이 40 = 양옆 글자 버튼과 같게 · 양옆 16 → 25(가로 15% 넓게, 실측 폭 약 117 → 135, 폰 375 에서 세 버튼이 한 줄 그대로) (2026-11-15 사용자) */
+.post-shell .post-nav, .post-shell.ends-text .post-nav { border-top: 0 !important; border-bottom: 1px solid #E2E8F0 !important; padding-top: 0 !important; padding-bottom: 12px !important; }   /* 버튼 줄 아래 구분선 — 버튼 글자 → 선 20(버튼 안쪽 8 + 12), 그 아래 푸터 · 열린 댓글 (2026-11-12 사용자) */
+.post-nav-cm { color: #6B7280; }   /* 댓글이 없거나 아직 개수를 모를 때 = 회색(글자 · 말풍선 아이콘 모두 currentColor) — 안 고른 칸 색과 같다 (2026-11-12 사용자) */
+.post-nav-cm.has-cm { color: #111; }   /* 댓글이 하나라도 있으면 검정 */
+.post-nav-cm.has-cm:hover { color: var(--accent); }
+.post-shell.ends-text:not(.rel-first) .post-nav { margin-top: 40px !important; }
+.post-shell.rel-first > [data-related].is-moved { margin-top: 40px !important; }
+.post-shell.rel-first .post-nav { margin-top: 24px !important; }
 ]]></b:skin>
 
     <b:template-skin><![CDATA[
@@ -656,10 +744,14 @@ __SEARCH_CSS__
 
         <nav class='menu-items' id='primary-menu'>
           <b:comment>메뉴 = 미국 · 한국(data-bar · data-flag → 로고 오른쪽 국기 스위치) · 증시 전망(서랍만) — H35 목업 그대로 (2026-11-10 사용자). 옛 홈 · 미국 증시 리포트 · 시총 TOP 10 메뉴는 뺐다(홈 카드 · 글 아래 함께 보는 페이지로 간다)</b:comment>
+          <b:comment>전체 메뉴 (2026-11-12 사용자 여정 테스트 확정, 목업 experiments/mock_server.py /j): 맨 위 미국 · 한국 홈(data-bar — 국기 스위치가 읽는다, 글자 `미국` · `한국` 그대로 · ` 홈` 은 CSS),
+            그 아래 메뉴 이름 = 오늘 화면(data-latest = 라벨의 최신 글로, 테마 JS) · 오른쪽 작은 `지난 …` = 목록. 타이틀은 하위 이름만으로 뜻이 안 통하는 테마 묶음에만.</b:comment>
+          <div class='menu-mk'>
           <a class='nav-item' data-bar='1' data-flag='us' href='/'>
             <b:attr cond='data:view.isHomepage' name='aria-current' value='page'/>미국</a>
           <a class='nav-item' data-bar='1' data-flag='kr' href='/p/__KR_HOME_SLUG__.html'>
             <b:attr cond='data:view.isPage and data:view.title == &quot;__KR_HOME_TITLE__&quot;' name='aria-current' value='page'/>한국</a>
+          </div>
 __NAV_ITEMS__
         </nav>
       </div>
@@ -674,6 +766,9 @@ __NAV_ITEMS__
         <!-- 알림 · 검색 버튼 삭제 (2026-10-25 사용자, 홈 수정 H1 · H2) — 헤더 오른쪽은 메뉴 버튼만 -->
         <!-- 검색 즉답 아이콘 (2026-11-11 사용자 "진행해", 목업 experiments/site-search) — search.js 가 국기 스위치 줄 맨 앞으로 옮긴다 -->
         <button aria-label='검색 (단축키 /)' class='as-search-btn' data-as-search='' type='button'><svg aria-hidden='true' viewBox='0 0 24 24'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg></button>
+
+        <!-- 로그인 · 계정 버튼 (2026-11-13 사용자 "상단 메뉴 앞에 로그인 버튼") — 로그인 전 = 사람 아이콘, 로그인 뒤 = 내 사진. 누르면 계정 창(테마 JS). 방문자 요청 0: Firebase 는 누를 때 · 로그인해 둔 기기에서만 불러온다 -->
+        <button aria-label='로그인' class='as-login-btn' type='button'><svg aria-hidden='true' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8.5' r='3.5'/><path d='M5 19.5c.9-3.3 3.6-5 7-5s6.1 1.7 7 5'/></svg></button>
 
         <button class='nav-toggle' type='button' aria-controls='primary-menu' aria-expanded='false'>
           <svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
@@ -785,6 +880,15 @@ __BLOG_INCLUDABLES__
 
 __FOOTER_BLOCK__
 
+    <!-- 하단 고정 메뉴 (2026-11-12 사용자 여정 테스트 확정) — 주소 · 지금 칸은 테마 JS 가 채운다(나라 = 지금 페이지 · 고른 홈) -->
+    <nav aria-label='주요 페이지' class='as-tabbar'>
+      <a data-tab='home' href='/'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 11l8-7 8 7'/><path d='M6 10v10h12V10'/></svg><span>홈</span></a>
+      <a data-tab='report' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 19h16'/><path d='M6 16l4-5 3 3 5-7'/></svg><span>증시 리포트</span></a>
+      <a data-tab='stock' href='/p/us-market-cap-top10.html'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 20h16'/><path d='M7.5 16v-5M12 16V6M16.5 16v-8'/></svg><span>종목</span></a>
+      <a data-tab='forecast' href='/p/forecast-list.html'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='1.8'><path d='M12 3v18M7.5 21h9'/><path d='M4 7h16'/><path d='M6 7l-3 7h6zM18 7l-3 7h6z'/></svg><span>증시 전망</span></a>
+      <a data-tab='people' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2'><rect height='11' rx='3' width='6' x='9' y='3'/><path d='M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7'/></svg><span>인물 발언</span></a>
+    </nav>
+
     <!-- =================================================================
          보관용 위젯 — 화면에는 나오지 않지만 레이아웃 모드에서 관리 가능
          ================================================================= -->
@@ -871,9 +975,18 @@ MEDIA_LABEL = "미디어 데일리"
 
 
 def nav_items():
-    # 서랍 메뉴 = 미국 · 한국(템플릿에 직접) + 증시 전망 (H35, 2026-11-10 사용자). 옛 `미국 증시 리포트`(라벨 목록) · `시총 TOP 10` 메뉴는 뺐다.
+    # 전체 메뉴 줄 (2026-11-12 사용자 여정 테스트 확정, 2026-11-17 index.html 에서 옮김) — 미국 · 한국 홈 버튼은 템플릿(.menu-mk)에 직접.
     # 주소는 '/' 로 시작 (2026-11-09): 폰 화면(?m=1)에서 homepageUrl 이 `/?m=1` 이라 `/?m=1p/...` 로 붙어 메뉴 · 목록이 모두 홈으로 갔다
-    return "          <a class='nav-item' href='/p/{0}.html'>{1}</a>".format(FORECAST_SLUG, FORECAST_NAME)
+    return """          <div class='menu-row'><a class='nav-item' data-latest='데일리 브리핑' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>미국 증시 리포트</a><a class='menu-past' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>지난 리포트</a></div>
+          <div class='menu-row'><a class='nav-item' data-latest='한국 증시 리포트' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>한국 증시 리포트</a><a class='menu-past' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>지난 리포트</a></div>
+          <div class='menu-row'><a class='nav-item' href='/p/us-market-cap-top10.html'>미국 시가총액 상위 10 종목</a></div>
+          <div class='menu-row'><a class='nav-item' href='/p/kr-market-cap-top10.html'>한국 시가총액 상위 10 종목</a></div>
+          <div class='menu-row'><a class='nav-item' href='/p/forecast-list.html'>증시 전망</a></div>
+          <div class='menu-row'><a class='nav-item' data-latest='인물 발언' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>주요 인물 발언</a><a class='menu-past' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>지난 발언</a></div>
+          <div class='menu-row'><a class='nav-item' data-latest='미디어 데일리' href='/search/label/%EB%AF%B8%EB%94%94%EC%96%B4%20%EB%8D%B0%EC%9D%BC%EB%A6%AC'>방송 브리핑</a><a class='menu-past' href='/search/label/%EB%AF%B8%EB%94%94%EC%96%B4%20%EB%8D%B0%EC%9D%BC%EB%A6%AC'>지난 브리핑</a></div>
+          <div class='menu-grp'><div class='menu-grp-t'>테마</div><a class='nav-item' href='/p/theme-ai-capex.html'>AI 투자 자금 방향</a><a class='nav-item' href='/p/theme-fed-rate-cut-expectations.html'>연준 금리 인하 기대</a><a class='nav-item' href='/p/theme-insider-trading.html'>임원 기관 매매 동향</a></div>
+          <b:comment>관리자 줄 (2026-11-13 사용자) — 블로그 주인이 구글 로그인한 기기에서만 보인다(localStorage as-admin, 방문자 요청 0). 누르면 Firebase ID 토큰을 운영 Worker 로 POST</b:comment>
+          <div class='menu-row menu-admin' hidden='hidden'><a class='nav-item' href='https://alphascope-ops-console.red6keep.workers.dev/'>운영 현황</a></div>"""
 
 
 TOP10_SLUG, TOP10_NAME = "us-market-cap-top10", "시총 TOP 10"
@@ -934,7 +1047,8 @@ PC_PARA_LH = 2.0           # 네이버 블로그 본문 문단 line-height:2.0
 PC_FONT = "'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif"
 PC_STROKE = "0.25px"       # 한 단계 두껍게 (Medium 대신)
 BARUN = "https://hangeul.pstatic.net/hangeul_static/webfont/NanumBarunGothic/"   # 네이버 한글 글꼴 공식 배포
-PC_FIXED = {".post-title": (28, 36)}   # 글 제목 28 · 36 (네이버 뉴스 기사 제목, 같은 날)
+PC_FIXED = {".post-title": (28, 36)}
+PC_KEEP = {".rt-pop-body"}   # 폰에서도 줄이지 않는 규칙 — 팝업 글은 폰도 19/28 하나 (2026-11-14 사용자, e8247c68 · 2026-11-17 index.html 에서 옮김)   # 글 제목 28 · 36 (네이버 뉴스 기사 제목, 같은 날)
 POST_INLINE_SIZES = (17, 18, 19, 20, 21, 22, 26, 28)   # 리포트 렌더러가 본문에 인라인으로 넣는 16 초과 크기
 POST_INLINE_LH = {27: 19, 28: 22, 32: 18, 34: 19}       # 렌더러 인라인 행간 → 그 행간을 쓰는 글자 크기
 
@@ -985,7 +1099,7 @@ def pc_type_css(css):
     walk(css, False)
     out = []
     for sel, (size, lh, imp) in rules.items():
-        if size <= 16:
+        if size <= 16 or sel in PC_KEEP:
             continue
         bang = " !important" if imp else ""
         if sel in PC_FIXED:
@@ -1007,7 +1121,7 @@ def pc_type_css(css):
             out.append(f'  .post-body li[style*="line-height:{n}px"] > span[style*="height:{dot}px"][style*="margin-top:{(n - dot) // 2}px"]'
                        f' {{ margin-top: {round((new_lh - dot) / 2)}px !important; }}')
     # 테마의 3px 점 — 본문 행간(17 × 1.56 = 26.5)의 첫 줄 가운데
-    out.append(f"  .report-columns li::before, .kv-row--block li::before, .rt-pop-dot {{ margin-top: {round((round(PC_BODY * PC_PARA_LH * 2) / 2 - 3) / 2)}px; }}")
+    out.append(f"  .report-columns li::before, .kv-row--block li::before {{ margin-top: {round((round(PC_BODY * PC_PARA_LH * 2) / 2 - 3) / 2)}px; }}")
     # 글꼴 — 나눔바른고딕. 테마의 글꼴 변수와 리포트 본문 인라인 글꼴(design_kit.WRAP_OPEN)을 바꾼다. 숫자 칸(--num, Inter)은 그대로
     out.append(f"  :root {{ --sans: {PC_FONT}; --report-font: {PC_FONT}; }}")
     out.append("  .logo-word { font-family: 'Noto Sans KR', sans-serif; }")   # 로고 글자는 그대로
