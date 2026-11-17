@@ -39,8 +39,8 @@ def rounded(d, box, r, fill, outline=None, width=1):
     d.rounded_rectangle(box, r, fill=fill, outline=outline, width=width)
 
 
-def compose(s):
-    bg = Image.open(os.path.join(SRC, f"{s['bg']}.webp")).convert("RGB").resize((W, H))
+def compose(s, src=SRC, tag=""):
+    bg = Image.open(os.path.join(src, f"{s['bg']}.webp")).convert("RGB").resize((W, H))
     # 왼쪽을 어둡게 (글자 쪽) — 오른쪽은 그림이 보이게
     shade = Image.new("L", (W, H))
     sd = ImageDraw.Draw(shade)
@@ -97,11 +97,17 @@ def compose(s):
     d.text((48, H - 34), "AI 생성 이미지 · 알파스코프", font=f(REG, 18), fill=(200, 205, 215), anchor="lm")
     im = Image.alpha_composite(im.convert("RGBA"), ov).convert("RGB")
     os.makedirs(OUT, exist_ok=True)
-    p = os.path.join(OUT, f"{s['bg']}-text.webp")
+    p = os.path.join(OUT, f"{s['bg']}{tag}-text.webp")
     im.save(p, "WEBP", quality=85)
     print(f"[배너] {p} · {os.path.getsize(p) / 1024:.0f}KB")
+
+
+CF = os.path.join(BASE, "output", "banner-cf")   # banner-cf-test.yml artifact 를 받은 곳 (2026-11-17 비교)
 
 
 if __name__ == "__main__":
     for s in SAMPLES:
         compose(s)
+        for m in ("flux-1-schnell", "lucid-origin"):
+            if os.path.exists(os.path.join(CF, m, f"{s['bg']}.webp")):
+                compose(s, os.path.join(CF, m), f"-{m}")

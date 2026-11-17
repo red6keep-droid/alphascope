@@ -1,18 +1,30 @@
 name: Banner Workers AI Test
 
-# 시황 배너 비교 (2026-11-17) — Cloudflare Workers AI 로 목업 6장면을 그려 artifact 로만 남긴다.
+# 시황 배너 시험 (2026-11-17) — Cloudflare Workers AI 로 그려 artifact 로만 남긴다.
 # 블로그 · gh-pages · 상태 브랜치에 쓰지 않는다. 수동 실행만(스케줄 없음).
-# 필요한 비밀 값: OPS_CF_ACCOUNT_ID(이미 있음) · CF_AI_TOKEN(Workers AI 권한만 있는 새 토큰).
-# 한도: Workers AI 하루 1만 뉴런 — 모델당 6장, 실행당 최대 3모델.
+#   mode=compare : 목업 6장면을 모델별로 (banner_cf.py) — 모델당 6장, 최대 3모델
+#   mode=banner  : 운영 모듈(banner.py)로 그날 묶음 파일 배너 1장 (Lucid Origin → FLUX schnell → HF → 기본 배너)
+# 필요한 비밀 값: OPS_CF_ACCOUNT_ID(있음) · CF_AI_TOKEN(Workers AI 권한만) · HF_TOKEN(있음, 예비).
+# 한도: Workers AI 하루 1만 뉴런.
 
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: 'compare = 모델 비교 · banner = 운영 모듈 1장'
+        type: choice
+        options: [banner, compare]
+        default: banner
       models:
-        description: '모델 (쉼표): flux-1-schnell, lucid-origin, phoenix-1.0'
+        description: '(compare) 모델 (쉼표): flux-1-schnell, lucid-origin, phoenix-1.0'
         type: string
         required: false
         default: 'flux-1-schnell,lucid-origin'
+      briefing:
+        description: '(banner) 묶음 파일 이름 (비우면 오늘 KST am)'
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -31,13 +43,28 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install
-        run: pip install requests pillow
-      - name: Draw banners (Workers AI)
+        run: pip install requests pillow huggingface_hub
+      - name: Draw banners (compare)
+        if: inputs.mode == 'compare'
         env:
           CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
           CF_AI_TOKEN: ${{ secrets.CF_AI_TOKEN }}
           MODELS: ${{ inputs.models }}
         run: python experiments/market-commentary/banner_cf.py --models "$MODELS"
+      - name: Draw banner (production module)
+        if: inputs.mode == 'banner'
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
+          CF_AI_TOKEN: ${{ secrets.CF_AI_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          BRIEFING: ${{ inputs.briefing }}
+        run: |
+          NAME="${BRIEFING:-$(TZ=Asia/Seoul date +%F)-am.json}"
+          case "$NAME" in *[!A-Za-z0-9.-]*) echo "이름이 이상합니다"; exit 1;; esac
+          python experiments/market-commentary/banner.py \
+            --briefing "https://raw.githubusercontent.com/${{ github.repository }}/gh-pages/briefing/$NAME" \
+            --column experiments/market-commentary/static/sample_column.json \
+            --out experiments/market-commentary/output/banner-cf
       - name: Upload banners
         if: always()
         uses: actions/upload-artifact@v4
