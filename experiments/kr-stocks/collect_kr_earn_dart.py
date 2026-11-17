@@ -89,6 +89,7 @@ def run(codes=None):
 
 
 _cache = None
+SKIP_DAYS = 100   # 다음 분기 실적은 길어야 약 3달 뒤 — 어림이 이보다 멀면 한 분기를 건너뛴 것
 
 
 def load():
@@ -107,9 +108,19 @@ def next_date(code, ynext, day):
     """다음 실적 발표일 — (날짜, 어림 여부). 잠정실적은 미리 알리지 않으므로 1년 전 같은 분기 공시일 + 52주(같은 요일)를 어림으로 둔다.
     야후 날짜(대개 확정실적 · 컨퍼런스콜)가 그 어림과 7일 안이면 야후, 아니면 어림(삼성전자 · LG전자처럼 분기 초 잠정이 3주쯤 이르다)."""
     est = next((e for e in ((datetime.date.fromisoformat(d) + datetime.timedelta(days=364)).isoformat() for d in past(code)) if e > day), None)
+    if est and (datetime.date.fromisoformat(est) - datetime.date.fromisoformat(day)).days > SKIP_DAYS:
+        # 어림이 한 분기를 건너뛰었다 = 지난해 그 분기엔 잠정실적을 안 냈다(4분기를 3월 사업보고서로 대신하는 회사가 많다).
+        # 삼성중공업 화면이 `4월 29일 무렵으로 164일` 이었다 (2026-11-17 사용자). 야후 날짜가 있으면 그것, 없으면 None — 화면 카드는 법정 기한(deadline)으로.
+        est = None
     if ynext and (not est or abs((datetime.date.fromisoformat(ynext) - datetime.date.fromisoformat(est)).days) <= 7):
         return ynext, False
     return (est, True) if est else (ynext, False)
+
+
+def deadline(day):
+    """다음 정기보고서 법정 제출 기한(12월 결산) — 1 · 3분기 45일, 반기 45일(8-14), 사업보고서 90일. day 보다 뒤인 첫 날."""
+    y = int(day[:4])
+    return min(d for yy in (y, y + 1) for d in (f"{yy}-03-31", f"{yy}-05-15", f"{yy}-08-14", f"{yy}-11-14") if d > day)
 
 
 def reaction_day(code, days, d):
