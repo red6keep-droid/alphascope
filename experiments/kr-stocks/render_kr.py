@@ -166,7 +166,7 @@ def lead_fact(s):
     한국만: 밤사이 미국 연결 종목 · 코스피 급락일에 버팀. 파이썬 값만 · 평가 · 예측 · 매수 · 매도 말 없음."""
     cands = []
     e = (s.get("calendar_cards") or {}).get("earnings")
-    if e:
+    if e and not e.get("deadline"):   # 법정 기한은 발표일이 아니다 — 요약 문장에 쓰지 않는다
         cands += RP.fact_earnings(e["left"], _md(e["day"]) + (" 무렵" if e.get("est") else ""))
     cands += RP.fact_year(s, won) + RP.fact_month(s, "코스피")
     mv = [m for m in (s.get("pairs") or {}).get("moves") or [] if m.get("ret") is not None and abs(m["ret"]) >= 1]
@@ -1036,7 +1036,7 @@ def _sched(s):
     left = lambda d: (datetime.date.fromisoformat(d) - d0).days   # noqa: E731
     out = []
     e = cc.get("earnings")
-    if e and 0 <= e["left"] <= SCHED_DAYS:
+    if e and not e.get("deadline") and 0 <= e["left"] <= SCHED_DAYS:
         out.append((f"실적 발표 ({R._md_short(e['day'])}{' 무렵' if e.get('est') else ''})", f"{e['left']}일 뒤", "실적", "다음 실적 발표는?", "earn"))   # 다섯째 = 관련 기사 종류 (P265)
     usn = lambda x: USU.name(x) if x in USU.BY_SYM else US_NAMES.get(x, x)   # noqa: E731 — 간단 종목의 연관 미국 종목은 정식 명단 밖일 수 있다(full_kr 가 채움)
     up = [u for u in (cc.get("peers") or {}).get("upcoming_all") or [] if left(u["day"]) <= SCHED_DAYS]
@@ -1150,8 +1150,11 @@ def build_calendar(s, snap, extra, macro_rows):
     past = [d for d in collect_kr_earn_dart.past(s["code"]) if two_y <= d <= day]
     moves = [{"day": d, "ret": _signed_ret(bars, collect_kr_earn_dart.reaction_day(s["code"], days, d))} for d in past]
     moves = [m for m in moves if m["ret"] is not None][-8:]
+    dl = False
+    if not nxt and past:   # 잠정실적을 안 낸 분기 + 야후 날짜도 없음 → 법정 제출 기한 (2026-11-17, 홈 · 증시 리포트 일정 목록엔 안 넣는다 — next_date 가 None)
+        nxt, dl = collect_kr_earn_dart.deadline(day), True
     if nxt:
-        cards["earnings"] = {"day": nxt, "est": est, "left": (datetime.date.fromisoformat(nxt) - datetime.date.fromisoformat(day)).days, "bars": moves,
+        cards["earnings"] = {"day": nxt, "est": est, "deadline": dl, "left": (datetime.date.fromisoformat(nxt) - datetime.date.fromisoformat(day)).days, "bars": moves,
                              "next_day": bool(nxt_day), "median": statistics.median(abs(m["ret"]) for m in moves) if moves else None, "normal": normal}
     pairs = (U.PAIRS.get(s["sym"]) or ([], ""))[0]
     if pairs:
@@ -1190,15 +1193,19 @@ def cal_earn_card(s, c):
     nm = s["name"]
     r = c["median"] / c["normal"] if c.get("median") and c.get("normal") else None
     when = f"{R._md_short(c['day'])} 무렵" if c.get("est") else R._md_short(c["day"])
-    first = f"{nm}의 다음 실적 발표는 {_dk.josa(when, '로')} {c['left']}일 남았다."
+    if c.get("deadline"):   # 지난해 이 분기엔 잠정실적이 없었다 — 날짜를 지어내지 않고 법정 제출 기한 (2026-11-17 사용자)
+        first = f"{nm}의 다음 실적은 법정 제출 기한인 {R._md_short(c['day'])}까지 나온다. 지난해 같은 분기에는 잠정실적을 따로 내지 않았다."
+    else:
+        first = f"{nm}의 다음 실적 발표는 {_dk.josa(when, '로')} {c['left']}일 남았다."
     if r:
         first += f" 지난 {len(c['bars'])}번 실적이 반영된 날 주가는 보통 ±{c['median']:.1f}% 움직여 평소 하루(±{c['normal']:.1f}%)의 약 {r:.1f}배였다."
-    lines = [(first + R.small_note("일정이 변동될 수 있습니다."), "plain")]   # 옛 `(Yahoo Finance 일정이라 바뀔 수 있음)` (P70)
+    lines = [(first + ("" if c.get("deadline") else R.small_note("일정이 변동될 수 있습니다.")), "plain")]   # 법정 기한은 바뀌는 날이 아니다   # 옛 `(Yahoo Finance 일정이라 바뀔 수 있음)` (P70)
     if c["bars"]:
         chart = R._col_chart([(f"{b['day'][2:4]}.{b['day'][5:7]}", [b["ret"]]) for b in c["bars"]], [R._sign_bg], [R._sign_fg], height=130, right=True)   # 최신이 왼쪽 (2026-10-28 사용자 P71 · P79)
         lines.append((f'{_dk.CHART_TITLE_M}최근 {len(c["bars"])}번 실적이 반영된 날 (%)</span>'   # 옛 `실적 발표 날` — 미국과 같은 이름 (2026-10-31)
                       f'<span style="{R.MULTI}margin:0 {_dk.CHART_CARD_X}px;"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 4px;">{chart}</span></span>', "html"))
-    lines.append(("row", "발표일", when, "작년 같은 분기 공시일로 어림" if c.get("est") else "회사 발표 일정"))
+    lines.append(("row", "제출 기한", R._md_short(c["day"]), "정기보고서 법정 기한") if c.get("deadline")
+                 else ("row", "발표일", when, "작년 같은 분기 공시일로 어림" if c.get("est") else "회사 발표 일정"))
     if c.get("median"):
         lines.append(("row", "반영된 날 보통", f"±{c['median']:.1f}%", f"지난 {len(c['bars'])}번 중앙값"))
     if c.get("normal"):

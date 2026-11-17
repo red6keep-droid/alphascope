@@ -188,13 +188,13 @@ def _next_earn(sym, cache, today):
     if sym.endswith((".KS", ".KQ")):
         days = (cache["kr"]["earn"].get("days") or {}).get(file_of(sym)) or []
         est = sorted(d for d in (str(datetime.date.fromisoformat(x) + datetime.timedelta(days=364)) for x in days) if d >= today)
-        if est and (datetime.date.fromisoformat(est[0]) - datetime.date.fromisoformat(today)).days <= 100:
+        import collect_kr_earn_dart as KE
+        if est and (datetime.date.fromisoformat(est[0]) - datetime.date.fromisoformat(today)).days <= KE.SKIP_DAYS:
             return (est[0], True)
         # 어림이 한 분기를 건너뛴다 = 그 분기는 잠정실적을 안 내는 회사(4분기를 3월 사업보고서로 대신하는 곳이 많다, 316종목 중 약 50곳)
         # → 법정 제출 기한(12월 결산: 분기 45일 · 사업보고서 90일). `4월 무렵` 처럼 틀린 날을 쓰지 않는다.
-        y = int(today[:4])
-        dl = sorted(d for yy in (y, y + 1) for d in (f"{yy}-03-31", f"{yy}-05-15", f"{yy}-08-14", f"{yy}-11-14") if d >= today)[0]
-        return (dl, "deadline")
+        import collect_kr_earn_dart as KE   # 화면 카드와 같은 기한 (2026-11-17)
+        return (KE.deadline(today), "deadline")
     rows = (cache["earn_us"].get("rows") or {}).get(sym) or []
     nxt = sorted(r["day"] for r in rows if r.get("day", "") >= today)
     return (nxt[0], False) if nxt else None
