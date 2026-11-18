@@ -1,7 +1,7 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-18T07:28:55Z",
+ "generated": "2026-11-18T22:32:19Z",
  "list_url": "https://alpha-scope.blogspot.com/p/forecast-list.html",
  "open": [
   {
@@ -15,7 +15,8 @@
     "반도체"
    ],
    "event": "11.17 엔비디아 실적",
-   "market": "us"
+   "market": "us",
+   "lean": 0
   },
   {
    "no": 1,
@@ -28,7 +29,8 @@
     "조정"
    ],
    "event": "11.12 브로드컴 급등",
-   "market": "us"
+   "market": "us",
+   "lean": 1
   },
   {
    "no": 1,
@@ -41,7 +43,8 @@
     "반등"
    ],
    "event": "11.10 기아 급락",
-   "market": "kr"
+   "market": "kr",
+   "lean": -1
   },
   {
    "no": 1,
@@ -54,7 +57,8 @@
     "반등"
    ],
    "event": "11.13 한국전력 급락",
-   "market": "kr"
+   "market": "kr",
+   "lean": 0
   }
  ],
  "done_count": {
