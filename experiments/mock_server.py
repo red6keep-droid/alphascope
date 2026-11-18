@@ -13,6 +13,10 @@
   블로그 주소 링크(종목 페이지 · 리포트 · 인물 발언 · 증시 전망)를 다른 목업으로 이어 준다. 목업 파일은 건드리지 않는다(보낼 때만) — 목업을 다시 그리면 여정도 최신.
 - 2026-11-13 사용자: 목업 목록 오른쪽 위 수정(연필) 아이콘을 누르면 목업 줄마다 `쓰지 않음` — 잘 안 보는 목업을 사용자가 직접 `/archive` 로 옮긴다.
   `/archive` 에서는 줄마다 `복원`. 파일은 지우지 않는다(처음엔 삭제로 만들었다가 같은 날 사용자 정정: 삭제가 아니라 이동).
+- 2026-11-18 사용자: "목업이 너무 많아 못 찾겠다 — 네가 만들거나 고친 목업은 N 라벨 붙여 맨 위로". Claude 가 목업을 만들거나 고치면
+      python experiments/mock_server.py --new "stock-lists/mock_stock-lists-guest-kr.html" "stock-lists/mock_stock-lists-member.html" --note "무엇을 바꿨나 한 줄"
+  로 표시한다(파일 패턴 가능, 서버가 꺼져 있어도 됨). 목록 맨 위 `N 새로 바뀐 목업` 에 메모와 함께 모이고, 그 목업을 한 번 열면 표시가 사라진다.
+  rebuild_mocks 다시 그리기처럼 내용이 그대로인 갱신은 표시하지 않는다. 기록 = .mock_prefs.json "new".
 """
 import html
 import re
@@ -27,7 +31,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import quote, unquote, urlparse
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8800
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 8800
 
 # 폴더 이름 → 인덱스에 보일 이름. 없는 폴더는 폴더 이름 그대로.
 LABELS = {
@@ -49,6 +53,7 @@ LABELS = {
     "ops-dashboard": "운영 대시보드",   # 관리자 전용 운영 페이지 목업 (2026-11-13 사용자)
     "home-thumb": "홈 증시 카드 그래프",   # 홈 미국 · 한국 증시 카드 그래프 시안 (2026-11-14 사용자)
     "course": "주식 공부",   # 0편 · 1편 글 목업 (2026-11-15 사용자: 목업 목록에 추가)
+    "stock-lists": "종목 목록",   # 하단 메뉴 `종목` 탭 목록 (2026-11-17 사용자)
     "stock-title": "종목 제목 줄",   # 제목 꼬리 13/19 · 공유 버튼 = 회색 기준 상자 오른쪽 (2026-11-11 사용자)
 }
 RECENT_N = 12
@@ -111,7 +116,7 @@ def load_prefs():
             p = json.load(fh)
     except (OSError, ValueError):
         p = {}
-    return {"star": p.get("star", []), "archive": p.get("archive", list(ARCHIVE_SEED))}
+    return {"star": p.get("star", []), "archive": p.get("archive", list(ARCHIVE_SEED)), "new": p.get("new", {})}
 
 
 def save_prefs(p):
@@ -171,8 +176,8 @@ def page_titles(raw):
 HINTS = {"list": "목록", "auto": "자동 등록", "eh": "실제 등록", "tabs": "상황 탭", "typical": "대표 상황",
          "cases": "경우의 수", "why": "근거", "week": "일주일", "kr": "한국", "us": "미국", "nvda": "엔비디아",
          "map": "지도", "timeline": "타임라인", "long": "긴", "empty": "빈 화면", "full": "가득 찬 화면",
-         "guest": "로그인 전", "g5": "C5 청록", "point": "포인트 색", "search": "검색 창", "demo": "예시", "tariff": "관세", "export": "수출 통제"}
-SKIP_TOKENS = {"radar", "mock", "forecast", "my", "stocks", "issue", "watch", "home", "split", "report", "body"}
+         "guest": "로그인 전", "member": "로그인", "live": "실제 자료", "star": "☆ 담기", "g5": "C5 청록", "point": "포인트 색", "search": "검색 창", "demo": "예시", "tariff": "관세", "export": "수출 통제"}
+SKIP_TOKENS = {"radar", "mock", "forecast", "my", "stocks", "issue", "watch", "home", "split", "report", "body", "stock", "lists"}
 
 
 def file_hint(f):
@@ -243,14 +248,19 @@ def design_mtime():
 OLD_TAG = '<span class="old">옛 버전</span>'
 
 
-def row(d, f, t, show_dir=False, stars=(), restore=False, names=None, ref=0):
+NEW_TAG = '<span class="nb">N</span>'
+
+
+def row(d, f, t, show_dir=False, stars=(), restore=False, names=None, ref=0, new=None, note=""):
     """큰 검은 글씨 = 목업 이름(종목 이름 · 전망 질문 · 페이지 제목), 작은 회색 = 묶음 이름 · 파일 이름 · 수정 시각 (2026-11-13 사용자)"""
     href = f"/{quote(d)}/output/{quote(f)}"
     when = datetime.fromtimestamp(t).strftime("%m-%d %H:%M")
     title = (names or {}).get((d, f)) or f[:-5]
     label = ((names or {}).get(("label", d, f)) or LABELS.get(d, d)) if show_dir else ""
     sub = " · ".join(x for x in (label, f[:-5], when) if x)
-    name = html.escape(title)
+    name = (NEW_TAG if new and f"{d}/{f}" in new else "") + html.escape(title)
+    if note:
+        sub = note + " · " + sub
     key = html.escape(f"{d}/{f}")
     on = f"{d}/{f}" in stars
     if restore:   # 쓰지 않는 목업 화면 — 별 대신 복원
@@ -299,9 +309,15 @@ def index_page(archive=False):
         if not items and not ARCHIVED_LINKS:
             parts.append('<div class="meta">쓰지 않는 목업이 없습니다</div>')
     else:
+        newd = prefs["new"]
+        every_key = {f"{d}/{f}": (d, f, t) for d, f, t in every}
+        fresh = sorted((k for k in newd if k in every_key), key=lambda k: -newd[k].get("t", 0))
+        if fresh:   # Claude 가 만들거나 고친 목업 — 열면 사라짐 (2026-11-18 사용자)
+            parts += [f'<section><div class="newh"><h2>{NEW_TAG}새로 바뀐 목업 <span class="n">{len(fresh)}</span></h2><button class="clr">모두 확인</button></div>',
+                      *(row(*every_key[k], show_dir=True, stars=stars, names=names, ref=ref, new=newd, note=newd[k].get("note", "")) for k in fresh), "</section>"]
         fav = [by_key[k] for k in stars if k in by_key]   # 누른 순서대로
         if fav:
-            parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref) for x in fav), "</section>"]
+            parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref, new=newd) for x in fav), "</section>"]
         plan, live = {}, {}
         for x in items:
             s = stage_of(x[0], x[1])
@@ -310,7 +326,7 @@ def index_page(archive=False):
         for i, (name, todo, _) in enumerate(PLAN):
             rows = plan.get(i, [])
             parts.append(f'<details{" open" if i == 0 else ""}><summary>{html.escape(name)} <span class="n">{len(rows)}</span><span class="todo">{html.escape(todo)}</span></summary>')
-            parts += [row(*x, stars=stars, names=names, ref=ref) for x in rows]
+            parts += [row(*x, stars=stars, names=names, ref=ref, new=newd) for x in rows]
             parts.append("</details>")
         for name, todo in PLAN_NOMOCK:
             parts.append(f'<div class="nomock"><b>{html.escape(name)}</b><span class="todo">{html.escape(todo)}</span></div>')
@@ -319,7 +335,7 @@ def index_page(archive=False):
             rows = live.get(i, [])
             if rows:
                 parts.append(f'<details><summary>{html.escape(name)} <span class="n">{len(rows)}</span></summary>')
-                parts += [row(*x, stars=stars, names=names, ref=ref) for x in rows]
+                parts += [row(*x, stars=stars, names=names, ref=ref, new=newd) for x in rows]
                 parts.append("</details>")
         if old or ARCHIVED_LINKS:
             parts.append(f'<a class="big" href="/archive">쓰지 않는 목업 <span>{len(old) + len(ARCHIVED_LINKS)}개 ›</span></a>')
@@ -337,6 +353,8 @@ details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
 .row{{display:flex;align-items:stretch;min-height:48px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}}
 .go{{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:10px 4px 10px 14px;color:inherit;text-decoration:none}}
 .go:active{{background:#eef2f8}} .name{{color:#1d2127;font-size:16px;font-weight:600;word-break:keep-all;overflow-wrap:anywhere}} .sub{{color:#8a919c;font-size:12px;word-break:break-all}} .old{{display:inline-block;margin-right:6px;padding:0 5px;border-radius:4px;background:#FEF3C7;color:#92400E;font-size:11px;font-weight:600}}
+.nb{{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-right:6px;border-radius:4px;background:#E5484D;color:#fff;font-size:12px;font-weight:700;vertical-align:2px}}
+.newh{{display:flex;justify-content:space-between;align-items:center}} .clr{{border:0;background:none;color:#5b6370;font-size:13px;cursor:pointer;padding:6px 0 6px 12px}}
 .star{{flex:0 0 48px;border:0;background:none;font-size:22px;color:#c3c8d0;cursor:pointer;padding:0}} .star.on{{color:#f5a623}}
 .mv{{display:none;flex:0 0 auto;border:0;border-left:1px solid #eef0f3;background:none;font-size:13px;color:#5b6370;cursor:pointer;padding:0 14px;white-space:nowrap}}
 body.edit .mv{{display:block}}
@@ -351,6 +369,8 @@ body.edit .edit-btn{{background:#1d2127;border-color:#1d2127;color:#fff}}
 {''.join(parts)}
 <script>
 const ds = [...document.querySelectorAll('details')];
+const clr = document.querySelector('.clr');
+if (clr) clr.addEventListener('click', async () => {{ await fetch('/seen?k=*', {{method: 'POST'}}); location.reload(); }});
 document.querySelectorAll('.back').forEach(b => b.addEventListener('click', async () => {{
   await fetch('/archive?k=' + encodeURIComponent(b.dataset.k), {{method: 'POST'}}); location.reload();
 }}));
@@ -853,14 +873,17 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         u = urlparse(self.path)
-        if u.path not in ("/star", "/archive"):
+        if u.path not in ("/star", "/archive", "/seen"):
             self.send_error(404)
             return
         key = u.path[1:]
         k = unquote(dict(x.split("=", 1) for x in u.query.split("&") if "=" in x).get("k", ""))
         with _lock:
             p = load_prefs()
-            p[key] = [x for x in p[key] if x != k] if k in p[key] else p[key] + [k]
+            if key == "seen":   # N 표시 지우기 — k = * 이면 전부
+                p["new"] = {} if k == "*" else {x: v for x, v in p["new"].items() if x != k}
+            else:
+                p[key] = [x for x in p[key] if x != k] if k in p[key] else p[key] + [k]
             save_prefs(p)
         self.send_response(204)
         self.end_headers()
@@ -892,6 +915,7 @@ class Handler(SimpleHTTPRequestHandler):
             return
         fp = os.path.join(BASE, *seg)
         if len(seg) == 3 and fp.endswith(".html") and os.path.isfile(fp):
+            mark_seen(f"{seg[0]}/{seg[2]}")
             with open(fp, encoding="utf-8", errors="replace") as fh:
                 page = fh.read()
             if journey:
@@ -917,6 +941,29 @@ class Handler(SimpleHTTPRequestHandler):
         pass
 
 
+def mark_seen(k):
+    """목업을 한 번 열면 N 표시를 지운다 (2026-11-18 사용자)."""
+    with _lock:
+        p = load_prefs()
+        if k in p["new"]:
+            del p["new"][k]
+            save_prefs(p)
+
+
+def mark_new(pats, note):
+    """--new 패턴… --note 메모 — Claude 가 만들거나 고친 목업에 N 표시. 서버가 꺼져 있어도 기록만 남긴다."""
+    from fnmatch import fnmatch
+    import time
+    keys = [f"{d}/{f}" for d, f, _ in mockups()]
+    hit = [k for k in keys if any(fnmatch(k, x) for x in pats)]
+    with _lock:
+        p = load_prefs()
+        for k in hit:
+            p["new"][k] = {"t": time.time(), "note": note}
+        save_prefs(p)
+    print(f"N 표시 {len(hit)}개: " + ", ".join(hit) if hit else f"맞는 목업 없음: {pats}")
+
+
 def lan_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -927,6 +974,11 @@ def lan_ip():
 
 
 if __name__ == "__main__":
+    if "--new" in sys.argv:
+        a = sys.argv[sys.argv.index("--new") + 1:]
+        note = a[a.index("--note") + 1] if "--note" in a else ""
+        mark_new([x for x in (a[:a.index("--note")] if "--note" in a else a)], note)
+        sys.exit(0)
     try:
         host = subprocess.run(["scutil", "--get", "LocalHostName"], capture_output=True, text=True).stdout.strip()
     except OSError:

@@ -65,7 +65,11 @@ EN = {"NVDA": "Nvidia", "AAPL": "Apple", "GOOGL": "Alphabet Google", "MSFT": "Mi
       "COP": "ConocoPhillips", "SLB": "SLB Schlumberger", "EOG": "EOG Resources", "COIN": "Coinbase", "MSTR": "Strategy MicroStrategy",
       "HOOD": "Robinhood", "MARA": "Marathon Digital MARA", "CRCL": "Circle Internet",
       "VST": "Vistra", "SMR": "NuScale Power",
-      "IONQ": "IonQ", "RGTI": "Rigetti Computing", "QBTS": "D-Wave Quantum", "QUBT": "Quantum Computing Inc", "IBM": "IBM"}
+      "IONQ": "IonQ", "RGTI": "Rigetti Computing", "QBTS": "D-Wave Quantum", "QUBT": "Quantum Computing Inc", "IBM": "IBM",
+      # 2026-11-19 추가 12개 — 반도체 · AI 정식 (universe.CANDIDATES)
+      "QCOM": "Qualcomm", "MRVL": "Marvell Technology", "ARM": "Arm Holdings", "SKHY": "SK Hynix", "SNDK": "SanDisk",
+      "WDC": "Western Digital", "STX": "Seagate", "KLAC": "KLA Corp", "TER": "Teradyne", "DELL": "Dell Technologies",
+      "SMCI": "Super Micro Computer", "HPE": "Hewlett Packard Enterprise"}
 
 
 def _env():

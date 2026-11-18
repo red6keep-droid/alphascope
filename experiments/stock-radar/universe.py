@@ -76,22 +76,49 @@ CANDIDATES = [
     ("QBTS", "디웨이브 퀀텀", "d-wave-quantum-qbts-stock", "기술"),     # 양자 어닐링
     ("QUBT", "퀀텀 컴퓨팅", "quantum-computing-qubt-stock", "기술"),
     ("IBM", "IBM", "ibm-stock", "기술"),                           # 양자 컴퓨터 로드맵을 가진 대형주
+    # 2026-11-19 사용자: 반도체 · AI 핵심 종목은 정식으로 ("이런 건 핵심 종목이니까") — 테마를 하는 일로 넷(AI 칩 · 메모리 · 칩 생산 · 반도체 장비) + AI 서버.
+    # 주소 = 간단 종목 주소 규칙(publish_quick_shells.slug) 그대로 — 델은 이미 발행된 간단 페이지 주소를 정식이 이어받는다
+    ("QCOM", "퀄컴", "qualcomm-qcom-stock", "반도체"),
+    ("MRVL", "마벨 테크놀로지", "marvell-technology-mrvl-stock", "반도체"),
+    ("ARM", "ARM", "arm-stock", "반도체"),                          # 칩 설계 지식재산 · 영국 ADR(나스닥)
+    ("SKHY", "SK하이닉스 ADR", "sk-hynix-skhy-stock", "반도체"),    # SK하이닉스 미국 ADR · 2026-07-10 나스닥 상장 · 1주 = 보통주 1/10
+    ("SNDK", "샌디스크", "sandisk-sndk-stock", "반도체"),
+    ("WDC", "웨스턴 디지털", "western-digital-wdc-stock", "기술"),
+    ("STX", "시게이트", "seagate-technology-stx-stock", "기술"),
+    ("KLAC", "KLA", "kla-klac-stock", "반도체"),
+    ("TER", "테라다인", "teradyne-ter-stock", "반도체"),
+    ("DELL", "델", "dell-technologies-dell-stock", "기술"),          # AI 서버
+    ("SMCI", "슈퍼마이크로", "supermicro-smci-stock", "기술"),        # AI 서버
+    ("HPE", "HPE", "hewlett-packard-hpe-stock", "기술"),             # AI 서버 · 네트워크
 ]
 
 # 홈 `관심 종목` 카드 묶음 (2026-10-21 사용자: "홈에 관심 종목 카드 · 섹터 상위 종목 카드, 타고 가서 개별 종목을 볼 수 있게").
 # 10-12 사용자 확정의 "이슈 종목" 네 묶음 + 시총 TOP 10 밖 반도체. 순서 = 카드 탭 순서. 섹터 상위 카드는 CANDIDATES 의 섹터 · 시총으로 만든다(home_feed.py)
-WATCH = [
-    ("반도체", ["TSM", "ASML", "LRCX", "AMAT", "MU", "AMD", "INTC"]),
-    ("데이터 센터", ["ORCL", "ANET", "VRT", "EQIX", "CEG", "CRWV"]),
+WATCH = [   # 2026-11-19 사용자 확정: 반도체 하나를 하는 일로 넷으로 나누고, AI 서버(델 · 슈퍼마이크로 · HPE)는 데이터 센터로
+    ("AI 칩", ["NVDA", "AMD", "AVGO", "QCOM", "MRVL", "ARM"]),               # 칩 설계
+    ("메모리", ["MU", "SKHY", "SNDK", "WDC", "STX"]),                        # D램 · 낸드 · 저장 장치
+    ("칩 생산", ["TSM", "INTC"]),                                           # 파운드리
+    ("반도체 장비", ["ASML", "AMAT", "LRCX", "KLAC", "TER"]),
+    ("데이터 센터", ["ORCL", "ANET", "VRT", "EQIX", "CEG", "CRWV", "DELL", "SMCI", "HPE"]),
     ("우주항공", ["SPCX", "RKLB"]),
     ("경기 방어주", ["KO", "PG", "PM", "COST"]),
     ("가상자산", ["COIN", "MSTR", "HOOD", "MARA", "CRCL"]),   # 2026-10-25 사용자
     ("에너지", ["XOM", "CVX", "COP", "SLB", "EOG", "VST", "SMR"]),          # 2026-10-25 사용자
     ("양자 컴퓨터", ["IONQ", "RGTI", "QBTS", "QUBT", "IBM"]),   # 2026-10-25 사용자
 ]
+WATCH_NEXT = WATCH   # 목업 스크립트가 읽던 이름
+WATCH_ALIAS = {"반도체": ["AI 칩", "메모리", "칩 생산", "반도체 장비"]}   # 옛 묶음 이름 → 새 묶음들 (방송 업종 이슈 `반도체` 를 네 묶음 종목 전부에, media_feed)
+
+SAME_CO_KR = {"SKHY": ("SK하이닉스 한국 상장 주식", "sk-hynix-000660-stock")}   # 같은 회사 한국 상장 — 한국 페이지 주소(universe_kr slug), 반대쪽 = universe_kr.SAME_CO_US (2026-11-19 사용자 "꼭 연결")
+
+
+def any_page_url(sym):
+    """정식이면 그 주소, 아니면 None (SK하이닉스 ↔ SKHY 연결, 2026-11-18)."""
+    return page_url(sym) if sym in BY_SYM else None
+
 
 TOP_N = 10
-TOP_EXCLUDE = {"TSM", "ASML", "SPCX"}   # 시총 TOP 10 · 순위에서 뺀다 — 규칙(S&P 500 편입 · 외국 ADR 제외) 밖. TSMC · 스페이스X 는 실제 시총 10위 안 (10-12)
+TOP_EXCLUDE = {"TSM", "ASML", "SPCX", "ARM", "SKHY"}   # 시총 TOP 10 · 순위에서 뺀다 — 규칙(S&P 500 편입 · 외국 ADR 제외) 밖. TSMC · 스페이스X 는 실제 시총 10위 안 (10-12)
 PEER_GROUP_N = 20   # 비교 묶음 `시총 상위 20개` = 순위 대상 가운데 시총 상위 20개 (후보가 20개를 넘은 뒤에도 같은 뜻으로, 2026-10-20)
 NEW_PAGES_PER_RUN = 10   # 하루(실행 한 번)에 새로 만드는 고정 페이지 상한 (2026-10-20 사용자: "하루에 조금씩 만들어 나가자")
 SWAP_DAYS = 5      # 11위 밖으로 5거래일 연속 밀리면 빠진다 (10-10)

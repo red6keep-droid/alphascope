@@ -32,6 +32,8 @@ import design_kit as dk  # noqa: E402
 import taxonomy  # noqa: E402
 import universe as U  # noqa: E402
 import universe_kr as UK  # noqa: E402
+sys.path.insert(0, HERE)
+import build_lists as BL  # noqa: E402  업종 11개로 맞추기(sector11) — 실제 목록 파일과 같은 셈
 
 OUT = os.path.join(HERE, "output")
 BLOG = "https://alpha-scope.blogspot.com"
@@ -51,7 +53,9 @@ LOGIN_BTN = ("display:flex;align-items:center;justify-content:center;gap:10px;wi
              "font-size:17px;line-height:24px;font-weight:700;text-decoration:none;cursor:pointer;background:#fff;color:#111;border:1px solid #CBD5E1;")
 
 # 예시 관심 종목(담은 순) · 최근 본 종목 — 실제는 Firestore watch/{uid} · 브라우저 저장
-WATCH = ["NVDA", "005930.KS", "TSLA", "000660.KS", "IONQ", "PLTR", "373220.KS", "AAPL"]
+# 예시 관심 종목 — 미국 7업종 · 한국 4업종 (경우 단추는 업종 탭 확정 뒤 삭제, 2026-11-18)
+WATCH = ["NVDA", "AAPL", "MSFT", "TSLA", "AMZN", "JPM", "LLY", "XOM", "META", "GOOGL", "CAT", "IONQ", "PLTR",
+         "005930.KS", "000660.KS", "035420.KS", "005380.KS", "105560.KS", "373220.KS", "012450.KS"]
 RECENT = ["NVDA", "AAPL", "005930.KS", "TSLA"]
 
 
@@ -76,14 +80,14 @@ def load():
             d = json.loads(git_show(f"{br}:{m}/{f}"))
             if d.get("status") == "halted" or not d.get("c"):
                 continue
-            rows[d["s"]] = {"s": d["s"], "n": d["n"], "m": m, "sec": d.get("sec") or "기타", "f": bool(d.get("full")),
+            rows[d["s"]] = {"s": d["s"], "n": d["n"], "m": m, "sec": BL.sector11(d.get("sec")), "f": bool(d.get("full")),
                             "c": d["c"], "r": (d.get("chg") or {}).get("1d"), "v": d.get("vol_ratio"), "h": d.get("off_hi"), "d": d["d"], "cap": None}
     etf = {"us": [], "kr": []}
     for m in ("us", "kr"):
         idx = json.loads(git_show(f"origin/gh-pages:search/{m}.json") or b"{}")
         for s in idx.get("stocks", []):
             p = s["p"]
-            row = rows.get(s["s"]) or {"s": s["s"], "n": s["n"], "m": m, "sec": s.get("sec") or "기타", "f": True, "c": p["c"], "r": p.get("chg"),
+            row = rows.get(s["s"]) or {"s": s["s"], "n": s["n"], "m": m, "sec": BL.sector11(s.get("sec")), "f": True, "c": p["c"], "r": p.get("chg"),
                                        "v": round(p["v"] / p["va"], 2) if p.get("va") else None,
                                        "h": round((p["c"] / p["h52"][0] - 1) * 100, 2) if p.get("h52") else None, "d": p["d"], "cap": None}
             row["f"], row["u"], row["ne"] = True, s["u"], s.get("ne")
@@ -102,6 +106,24 @@ def load():
     return rows, etf
 
 
+def extra_rows(rows, syms):
+    """목록 파일에 아직 없는 새 정식 후보(SKHY · ARM, 2026-11-18) — 목업만 야후 일봉 2개로 종가 · 등락을 채운다. 실패하면 뺀다(운영은 정식 수집이 채움)."""
+    import urllib.request
+    base = max(r["d"] for r in rows.values() if r["m"] == "us")   # 기준일은 목록 파일 날짜 그대로 (야후 최신 날이 페이지 날짜를 끌어올리지 않게)
+    for sym in syms:
+        if sym in rows:
+            continue
+        try:
+            req = urllib.request.Request(f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?range=5d&interval=1d", headers={"User-Agent": "Mozilla/5.0"})
+            res = json.load(urllib.request.urlopen(req, timeout=8))["chart"]["result"][0]
+            cl = [c for c in res["indicators"]["quote"][0]["close"] if c]
+            rows[sym] = {"s": sym, "n": (U.name(sym) if sym in U.BY_SYM else sym), "m": "us", "sec": "기술", "f": True, "c": round(cl[-1], 2),
+                         "r": round((cl[-1] / cl[-2] - 1) * 100, 2), "v": None, "h": None, "d": base, "cap": None, "u": f"{BLOG}/p/stock.html?s={sym}"}
+        except Exception as e:   # noqa: BLE001
+            print(f"[종목 목록] {sym} 가격 못 받음 — 목업에서 뺌 ({e})")
+    return rows
+
+
 # ── 화면 조각 ────────────────────────────────────────────────────────
 def pct_html(v, px=15, bold=True):
     if v is None:
@@ -110,6 +132,10 @@ def pct_html(v, px=15, bold=True):
     tri = "▲" if v > 0 else "▼" if v < 0 else ""
     t = f'<span style="font-size:{round(px * 0.8)}px;vertical-align:1px;margin-right:2px;">{tri}</span>' if tri else ""
     return f'<span style="color:{col};white-space:nowrap;{"font-weight:700;" if bold else ""}">{t}{abs(v):.2f}%</span>'
+
+
+def dir_col(v):
+    return dk.UP if v and v > 0 else dk.DOWN if v and v < 0 else "#111"
 
 
 def price_text(r):
@@ -129,19 +155,24 @@ def code(r):
     return r["s"].split(".")[0]
 
 
+def sub_of(r, tail):
+    """종목 줄 회색 보조 줄 — 한국 종목은 종목 코드(숫자)를 넣지 않는다 (2026-11-18 사용자). 미국은 티커 · tail."""
+    return tail if r["m"] == "kr" else (f"{code(r)} · {tail}" if tail else code(r))
+
+
 def row_html(r, i, sub=None, right_sub=None, rank=None, chips=""):
     """종목 줄 — 지금 목록 페이지 줄(list_row)과 같은 짜임: [순위] 로고 이름(굵게 16) / 회색 보조 줄 · 오른쪽 가격 / 등락. 줄 전체 = 종목 페이지."""
-    sub = sub if sub is not None else f"{code(r)} · {r['sec']}"
+    sub = sub if sub is not None else sub_of(r, r['sec'])
     rk = (f'<span style="flex:none;width:26px;color:{dk.NOTE};font-weight:700;font-size:15px;line-height:24px;">{rank}</span>' if rank else "")
     # 로고 22 → 44, 이름 · 보조 줄 두 줄의 세로 가운데 (2026-11-17 사용자 "로고 2배 · 오른쪽 글자와 미들 정렬")
     left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;">{rk}'
-            f'<span style="flex:none;display:flex;align-items:center;">{dk.ticker_logo(r["s"], LOGO_PX).replace("vertical-align:-4px;", "vertical-align:0;")}</span>'
+            f'<span style="flex:none;display:flex;align-items:center;">{dk.ticker_logo(r["s"], LOGO_PX).replace("vertical-align:-4px;", "vertical-align:0;").replace("margin-right:6px;", f"margin-right:{LOGO_GAP}px;")}</span>'
             f'<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{esc(r["n"])}</span>'
             f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};white-space:nowrap;">{sub}</span>{chips}</span></span>')
     rs = right_sub if right_sub is not None else pct_html(r["r"], CHG_PX)
     right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">'
              f'<span style="font-size:{CHG_PX}px;line-height:24px;">{rs}</span>'
-             f'<span style="font-size:15px;line-height:{dk.LH_TINY};color:#111;">{esc(price_text(r))}</span></span>')   # 증감 위 · 가격 아래 (2026-11-17 사용자 규칙)
+             f'<span style="font-size:15px;line-height:{dk.LH_TINY};color:{dir_col(r["r"])};">{esc(price_text(r))}</span></span>')   # 증감 위 · 가격 아래 (2026-11-17 사용자 규칙), 가격 = 증감과 같은 색 (2026-11-18 사용자)
     return (f'<span data-row-link="1" data-href="{attr(r["u"])}" data-sym="{attr(r["s"])}" style="{ROW_STYLE}{f"padding-top:{ROW_TOP}px;" if i == 0 else dk.MULTI_SEP}align-items:flex-start;">'
             f'{left}{right}</span>')
 
@@ -181,6 +212,100 @@ def info_card(title, text, extra=""):
                     f'<div style="font-size:15px;line-height:24px;color:#333;margin:4px 0 0;word-break:keep-all;">{text}</div>{extra}')
 
 
+# ── 히트맵 (테마 · 업종 탭 묶음 고르기, 2026-11-18 사용자 "네모난 히트맵이 상단에, 누르면 그 종목들") ──
+# 칸 크기 = 묶음 시가총액 합의 제곱근(작은 묶음도 눌릴 크기로 남게 — 원값이면 반도체 하나가 판을 덮는다). 시가총액 값이 절반 넘게 없는 묶음(목업의 미국 업종)은 종목 수.
+# 칸 색 = 묶음 전 종목 하루 등락 단순 평균(10개 목록 밖 종목도 포함), 빨강 오름 · 파랑 내림 4단계 + 보합 회색. 글자 = 이름 · ▲▼ 평균. 칸은 하나도 버리지 않는다.
+HEAT_W, HEAT_GAP = 360, 2   # 판 기준 너비(폰) — 칸 위치는 % 로 써서 실제 너비에 맞춰 늘어난다
+# 색 = D안(사이트 강조 카드 바탕 계열) + 세기 4단계 조금 (2026-11-18 사용자 "D안, 컬러 대비 조금만" · 시안 mock_heat_colors.py)
+# 글자(이름 · 숫자) = 칸과 같은 방향 색 — 파랑 칸엔 파랑 글자, 빨강 칸엔 빨강 글자 (2026-11-18 사용자). 가장 진한 칸은 한 톤 짙은 글자(대비).
+HEAT_UP = ["#FFF7EE", "#FFECE0", "#FDDDD0", "#F9CBBD"]
+HEAT_DN = ["#EFF6FF", "#E2EEFE", "#D0E3FD", "#BCD6FB"]
+HEAT_FLAT = "#F8FAFC"
+HEAT_FG_UP, HEAT_FG_DN = [dk.UP, dk.UP, dk.UP, "#B3261E"], [dk.DOWN, dk.DOWN, dk.DOWN, "#1558B0"]
+
+
+def heat_color(v):
+    """(바탕, 글자) — 0.1% 미만 보합 · 1 · 2 · 3% 경계."""
+    if v is None or abs(v) < 0.1:
+        return HEAT_FLAT, "#333"
+    k = 0 if abs(v) < 1 else 1 if abs(v) < 2 else 2 if abs(v) < 3 else 3
+    return (HEAT_UP if v > 0 else HEAT_DN)[k], (HEAT_FG_UP if v > 0 else HEAT_FG_DN)[k]
+
+
+def squarify(vals, x, y, w, h):
+    """squarified treemap — vals 는 큰 순, 합 = w*h 로 맞춘 넓이. [(x, y, w, h)]."""
+    out, i = [], 0
+    while i < len(vals):
+        short = min(w, h)
+        row, best = [vals[i]], None
+        def worst(r):
+            sm = sum(r)
+            return max(max(short * short * v / (sm * sm), (sm * sm) / (short * short * v)) for v in r)
+        best = worst(row)
+        j = i + 1
+        while j < len(vals):
+            cand = row + [vals[j]]
+            wc = worst(cand)
+            if wc > best:
+                break
+            row, best, j = cand, wc, j + 1
+        sm = sum(row)
+        if w >= h:   # 왼쪽에 세로 줄
+            cw = sm / h
+            yy = y
+            for v in row:
+                out.append((x, yy, cw, v / cw)); yy += v / cw
+            x, w = x + cw, w - cw
+        else:        # 위에 가로 줄
+            rh = sm / w
+            xx = x
+            for v in row:
+                out.append((xx, y, v / rh, rh)); xx += v / rh
+            y, h = y + rh, h - rh
+        i = j
+    return out
+
+
+def heat_size(xs):
+    caps = [r["cap"] for r in xs if r.get("cap")]
+    if len(caps) * 2 >= len(xs):
+        return sum(caps) ** 0.5, "cap"
+    return float(len(xs)), "n"
+
+
+def heatmap(key, groups, color=None, label=None):
+    """groups = [(이름, 종목 줄들)] → (판 HTML, 큰 순으로 다시 놓은 groups). 칸 = 기존 알약과 같은 data-sl-pill(같은 탭 전환 JS)."""
+    sized = []
+    for n, xs in groups:
+        sz, how = heat_size(xs)
+        rs = [r["r"] for r in xs if r["r"] is not None]
+        sized.append((sz, n, xs, sum(rs) / len(rs) if rs else None, how))
+    if len({t[4] for t in sized}) > 1:   # 한 판 안에서 잣대를 섞지 않는다
+        sized = [(float(len(xs)), n, xs, a, "n") for _, n, xs, a, _ in sized]
+    floor = 0.04 * sum(t[0] for t in sized)   # 칸 최소 = 판의 4% — 2종목짜리 업종이 가는 선으로 보였다 (2026-11-18)
+    sized = [(max(t[0], floor),) + t[1:] for t in sized]
+    sized.sort(key=lambda t: -t[0])
+    H = 240 if len(sized) <= 8 else 300
+    tot = sum(t[0] for t in sized)
+    rects = squarify([t[0] * HEAT_W * H / tot for t in sized], 0, 0, HEAT_W, H)
+    cells = []
+    for i, ((_, n, xs, avg, _), (x, y, w, h)) in enumerate(zip(sized, rects)):
+        bg, fg = (color or heat_color)(avg)   # 색 시안 비교(mock_heat_colors.py)는 color · label 을 바꿔 끼운다
+        pct = label(avg) if label else "" if avg is None else f'{"▲" if avg > 0 else "▼" if avg < 0 else ""}{abs(avg):.2f}%'
+        big = w >= 90 and h >= 64
+        name_px = 15 if big else 13
+        show_pct = h >= 40 and w >= 40
+        inner = (f'<span class="hm-n" style="font-size:{name_px}px;line-height:{name_px + 5}px;">{esc(n)}</span>'
+                 + (f'<span class="hm-p" style="font-size:{name_px - 1}px;line-height:{name_px + 3}px;">{pct}</span>' if show_pct else ""))
+        pos = (f"left:{x / HEAT_W * 100:.3f}%;top:{y / H * 100:.3f}%;width:{w / HEAT_W * 100:.3f}%;height:{h / H * 100:.3f}%;")
+        cells.append(f'<button type="button" class="hm-c" data-sl-pill="{i}" aria-selected="{"true" if i == 0 else "false"}" '
+                     f'aria-label="{attr(n)} {attr(pct)}" style="{pos}background:{bg};color:{fg};--hm-fg:{fg};">{inner}</button>')
+    how = sized[0][4] if sized else "cap"
+    board = (f'<div class="hm" data-sl-pills="{key}" data-sl-heat style="height:{H}px;">{"".join(cells)}</div>')
+    basis = "칸 크기 = 시가총액" if how == "cap" else "칸 크기 = 종목 수"
+    return board, [(n, xs) for _, n, xs, _, _ in sized], f"{basis} · 색 = 묶음 평균 등락(마지막 종가)"
+
+
 # ── 탭 ──────────────────────────────────────────────────────────────
 def move_tab(rows, m, stats):
     xs = [r for r in rows.values() if r["m"] == m and r["r"] is not None]
@@ -191,11 +316,12 @@ def move_tab(rows, m, stats):
          f"{abs(DOWN_PCT):.0f}% 넘게 내린 종목이 없어 많이 내린 순입니다.", None),
         ("거래 급증", sorted([r for r in xs if (r["v"] or 0) >= VOL_X], key=lambda r: -r["v"]), sorted([r for r in xs if r["v"]], key=lambda r: -r["v"]),
          "평소의 2배를 넘은 종목이 없어 많이 늘어난 순입니다.",
-         lambda r: f'<span style="color:#333;">평소의 {r["v"]:.1f}배</span> · {pct_html(r["r"], CHG_PX, False)}'),
+         lambda r: f'<span style="color:{dk.NOTE};font-size:{dk.TINY};">평소의 {r["v"]:.1f}배 · </span>{pct_html(r["r"], CHG_PX)}'),   # 말 = 회색 보조 줄과 같은 크기 · 색, 증감 = 다른 탭처럼 굵게 (2026-11-18 사용자)
         ("52주 최고가 근처", sorted([r for r in xs if r["h"] is not None and r["h"] >= NEAR_HI], key=lambda r: -r["h"]),
          sorted([r for r in xs if r["h"] is not None], key=lambda r: -r["h"]),
          "최고가 2% 안 종목이 없어 가까운 순입니다.",
-         lambda r: '<span style="color:#333;">최고가</span>' if r["h"] >= 0 else f'<span style="color:#333;">최고가까지 {abs(r["h"]):.1f}%</span>'),
+         lambda r: f'<span style="color:{dk.UP};font-weight:700;font-size:{CHG_PX}px;">최고가</span>' if r["h"] >= 0
+         else f'<span style="color:{dk.NOTE};font-size:{dk.TINY};">최고가까지 </span><b style="color:{dk.DOWN};font-size:{CHG_PX}px;">{abs(r["h"]):.1f}%</b>'),   # 말 = 보조 줄 크기 · 색, 최고가 · 남은 % = 증감 숫자 크기 굵게 (2026-11-18 사용자)   # 최고가 = 빨강 굵게, 남은 % = 파랑 굵게, 크기 = 보조 줄 (2026-11-18 사용자)
     ]
     bodies = []
     for name, hit, fallback, empty_text, rsub in groups:
@@ -211,7 +337,7 @@ def move_tab(rows, m, stats):
 
 def theme_groups(m):
     if m == "us":
-        g = [(n, syms) for n, syms in U.WATCH]
+        g = [(n, syms) for n, syms in U.WATCH_NEXT]   # 다음 테마 구성 목업 (2026-11-18)
         g += [(t["name"], t["members"]) for t in taxonomy.THEMES.values()]
         return g
     return [(n.replace(" · ", "·"), syms) for n, syms in UK.WATCH]
@@ -220,15 +346,16 @@ def theme_groups(m):
 def theme_tab(rows, m):
     groups = [(n, [rows[s] for s in syms if s in rows]) for n, syms in theme_groups(m)]
     groups = [(n, xs) for n, xs in groups if xs]
+    board, groups, basis = heatmap(f"theme-{m}", groups)
     bodies = []
     for n, xs in groups:
         # `n종목 중 n개 오름 · 평균` 줄 삭제 — 탭 · 묶음 줄 아래 바로 목록 (2026-11-17 사용자)
         link = ""
-        if m == "us" and n in ("반도체", "데이터 센터"):
+        if m == "us" and n in ("AI 칩", "메모리", "칩 생산", "반도체 장비", "데이터 센터"):   # 반도체를 넷으로 나눔 (2026-11-19)
             link = (f'<a href="{BLOG}/p/theme-ai-capex.html" style="display:block;margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:15px;line-height:24px;'
                     f'color:#111;font-weight:700;text-decoration:none;">AI 투자 자금 흐름 보기 →</a>')
         bodies.append(list_card(sorted(xs, key=lambda r: -(r["r"] or -99)), lambda r, i: row_html(r, i)) + link)
-    return pills(f"theme-{m}", [n for n, _ in groups], joined=True) + panels(f"theme-{m}", bodies)
+    return board + panels(f"theme-{m}", bodies) + note(basis)   # 히트맵이 묶음 줄 자리 (2026-11-18 사용자)
 
 
 def sector_tab(rows, m):
@@ -236,19 +363,20 @@ def sector_tab(rows, m):
     for r in rows.values():
         if r["m"] == m:
             by.setdefault(r["sec"], []).append(r)
-    order = sorted(by, key=lambda k: -len(by[k]))
+    board, groups, basis = heatmap(f"sec-{m}", [(k, by[k]) for k in by])
+    order = [n for n, _ in groups]
     bodies = []
     for k in order:
         xs = sorted(by[k], key=lambda r: -(r["cap"] or 0))
-        bodies.append(list_card(xs, lambda r, i: row_html(r, i, sub=f"{code(r)}" + (f" · {cap_text(r)}" if r.get("cap") else ""))))
-    return pills(f"sec-{m}", order, joined=True) + panels(f"sec-{m}", bodies)
+        bodies.append(list_card(xs, lambda r, i: row_html(r, i, sub=sub_of(r, cap_text(r) if r.get("cap") else ""))))
+    return board + panels(f"sec-{m}", bodies) + note(basis)
 
 
 def cap_tab(rows, m):
     xs = sorted([r for r in rows.values() if r["m"] == m and r.get("cap")], key=lambda r: -r["cap"])
     page = f"{BLOG}/p/{m}-market-cap-top10.html"
     nm = "미국" if m == "us" else "한국"
-    return (list_card(xs, lambda r, i: row_html(r, i, sub=f"{code(r)} · {cap_text(r)}", rank=i + 1))
+    return (list_card(xs, lambda r, i: row_html(r, i, sub=sub_of(r, cap_text(r)), rank=i + 1))
             + f'<a href="{page}" style="display:block;margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:15px;line-height:24px;color:#111;font-weight:700;text-decoration:none;">'
               f'{nm} 시가총액 상위 10 종목 페이지 →</a>')
 
@@ -260,10 +388,12 @@ def etf_tab(etf, m):
 
 GRIP = ('<span data-sl-grip aria-label="끌어서 순서 바꾸기" style="display:none;flex:none;align-self:center;width:32px;height:32px;margin:0 -6px 0 0;align-items:center;justify-content:center;'
         'color:#9CA3AF;cursor:grab;touch-action:none;"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M4 6.5h12M4 10h12M4 13.5h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>')
-RM = ('<button type="button" data-sl-rm aria-label="{name} 빼기" style="display:none;flex:none;align-self:center;width:24px;height:24px;margin:0 10px 0 0;padding:0;border:0;border-radius:50%;'
-      'background:#E5484D;color:#fff;cursor:pointer;"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M7 12h10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>')
+# 빼기 = 흰 바탕 + 연한 빨강 테두리 선 1 + 빨강 − (2026-11-18 사용자 "빨간 채움 말고 흰 바탕 라인으로, 너무 세지 않게" — 옛 #E5484D 채움 · 흰 −)
+RM = ('<button type="button" data-sl-rm aria-label="{name} 빼기" style="display:none;flex:none;align-self:center;width:24px;height:24px;margin:0 10px 0 0;padding:0;border:1px solid #F3A6A3;border-radius:50%;box-sizing:border-box;'
+      'background:#fff;cursor:pointer;"><svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true"><path d="M7 11h8" stroke="#E5484D" stroke-width="1.6" stroke-linecap="round"/></svg></button>')
+LOGO_GAP = 11  # 로고 ~ 종목 이름 6 → 11 (2026-11-18 사용자 "5픽셀 정도 여백")
 LOGO_PX = 35   # 종목 줄 로고 (2026-11-17 사용자: 22 의 2배 = 44 → 20% 작게 = 35)
-CHG_PX = 16    # 오른쪽 윗줄 증감 글자 15 → 16 (2026-11-17 사용자 "한 포인트 더"), 삼각형 = 80% → 13
+CHG_PX = 17    # 오른쪽 윗줄 증감 글자 15 → 16 (2026-11-17 사용자 "한 포인트 더") → 17 (2026-11-18 사용자 "1포인트 더"), 삼각형 = 80% → 14
 WATCH_MAX = 100   # 미국 · 한국 합쳐 100개 (2026-11-17 사용자 "200개 담는 사람이 누가 있다고 · 100개까지만"). 안내 문장은 두지 않고, 넘칠 때만 알림
 
 
@@ -272,7 +402,7 @@ def watch_rows(rows, syms):
     out = []
     for i, s in enumerate(syms):
         r = rows[s]
-        h = row_html(r, i, sub=f"{code(r)} · {r['sec']}")
+        h = row_html(r, i)
         h = h.replace('align-items:flex-start;">', 'align-items:flex-start;">' + RM.format(name=attr(r["n"])), 1)
         h = h.replace('<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;', '<span data-sl-price style="flex:none;display:flex;flex-direction:column;align-items:flex-end;', 1)
         out.append(h[:-len("</span>")] + GRIP + "</span>")
@@ -303,9 +433,9 @@ def watch_member(rows, syms, m, all_rows):
     data = [{"s": r["s"], "n": r["n"], "c": code(r), "sec": r["sec"], "m": r["m"], "p": price_text(r), "r": r["r"], "k": r.get("cap") or 0} for r in all_rows.values()]
     held = [s for s in WATCH if s in all_rows]
     cfg = {"m": m, "max": WATCH_MAX, "held": held if syms else [s for s in held if all_rows[s]["m"] != m], "recent": RECENT,
-           "row": ROW_STYLE, "logo": LOGO_PX, "top": ROW_TOP, "pad": ROW_PAD, "sep": dk.MULTI_SEP, "rm": RM, "grip": GRIP, "note": dk.NOTE, "up": dk.UP, "down": dk.DOWN, "muted": dk.MUTED, "star": STAR, "starPath": STAR_PATH}
+           "row": ROW_STYLE, "logo": LOGO_PX, "top": ROW_TOP, "pad": ROW_PAD, "sep": dk.MULTI_SEP, "rm": RM, "grip": GRIP, "note": dk.NOTE, "up": dk.UP, "down": dk.DOWN, "muted": dk.MUTED, "star": STAR, "starPath": STAR_PATH, "chg": CHG_PX, "gap": LOGO_GAP}
     js = ('<script type="application/json" id="sl-data">' + json.dumps({"cfg": cfg, "rows": data}, ensure_ascii=False).replace("</", "<\\/") + "</script>")
-    return (f'<div data-sl-watch="1">{lst}<div data-sl-has{"" if syms else " hidden"}>{foot}</div>'
+    return (f'<div data-sl-watch="1"><div data-sl-comp></div>{lst}<div data-sl-has{"" if syms else " hidden"}>{foot}</div>'
             f'<div data-sl-empty{"" if not syms else " hidden"}>{empty}</div></div>{bar}{js}')
 
 
@@ -318,7 +448,7 @@ def watch_tab(rows, state, m):
         return (info_card("관심 종목을 모아 보세요",
                           f'종목 페이지 제목 옆 <span style="color:{STAR};">★</span> 를 누르거나 종목을 검색해서 담으면 여기에 모입니다. 로그인하면 폰 · PC 어디서나 같은 목록을 봅니다.', login)
                 + dk.h2("이 기기에서 최근 본 종목", one_line=True)
-                + list_card(recent, lambda r, i: row_html(r, i, sub=f"{code(r)} · {r['sec']}"))
+                + list_card(recent, lambda r, i: row_html(r, i))
                 + note("이 브라우저에만 남습니다"))
     syms = [] if state == "empty" else [s for s in WATCH if s in rows and rows[s]["m"] == m]
     return watch_member(rows, syms, m, rows)
@@ -364,6 +494,14 @@ PAGE_CSS = ("<style>[data-sl-panel][hidden]{display:none !important;}"
             ".sl-joined .seg+.seg{border-left:0;}.sl-joined .seg:first-child{border-radius:7px 0 0 7px;}.sl-joined .seg:last-child{border-radius:0 7px 7px 0;}"
             ".sl-joined .seg:only-child{border-radius:7px;}"
             ".sl-joined .seg[aria-selected=\"true\"]{background:#fff;color:#111;font-weight:700;box-shadow:inset 0 0 0 1px #111;}"
+            ".hm{position:relative;margin:0 0 14px;background:#fff;}"
+            ".hm-c{position:absolute;box-sizing:border-box;margin:0;padding:4px;border:" + str(HEAT_GAP) + "px solid #fff;border-radius:6px;font:inherit;cursor:pointer;"
+            "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;overflow:hidden;text-align:center;-webkit-tap-highlight-color:transparent;}"
+            ".hm-n{display:block;max-width:100%;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}"
+            ".hm-p{display:block;font-weight:400;white-space:nowrap;}"
+            ".hm-c[aria-selected=\"true\"]{box-shadow:inset 0 0 0 1.5px var(--hm-fg);}"   # 고른 칸 = 칸 글자와 같은 방향 색 테두리 1.5 (2026-11-18 사용자 2안 · 굵기 1.5, 옛 검정 2)
+            ".hm-c:active{filter:brightness(.94);}"
+            ".cp-pills{margin:0 0 12px;}"
             ".sl-title-day{flex:none;font-size:14px;line-height:20px;font-weight:400;color:#6B7280;white-space:nowrap;letter-spacing:0;}" + TOAST_CSS + "</style>")
 
 PAGE_JS = """<script>(function(){
@@ -385,19 +523,32 @@ var held=C.held.slice(),L=W.querySelector('[data-sl-list]'),body=document.body;
 function rowsEl(){return [].slice.call(L.children);}
 function mine(){return rowsEl().map(function(x){return x.getAttribute('data-sym');});}
 function all(){var a=held.slice();mine().forEach(function(s){if(a.indexOf(s)<0)a.push(s);});return a;}
-function seps(){rowsEl().forEach(function(x,i){x.style.borderTop=i?'1px solid #E2E8F0':'0';x.style.paddingTop=(i?C.pad:C.top)+'px';});var n=rowsEl().length;
+/* 업종 탭 (2026-11-18 사용자): 오늘 움직임과 같은 묶음 줄 `전체 · 기술 · 경기 소비재 …`(담은 개수 많은 순). 칸 나누기 시안은 지저분해 접음.
+   누르면 그 업종 종목만, 담기 · 빼기 때마다 다시 그린다 */
+var cur='';
+function secOf(x){var r=BY[x.getAttribute('data-sym')];return r?r.sec:'기타';}
+function comp(){var box=W.querySelector('[data-sl-comp]'),cnt={},ks=[],n=rowsEl().length;
+ rowsEl().forEach(function(x){var k=secOf(x);if(!cnt[k]){cnt[k]=0;ks.push(k);}cnt[k]++;});
+ ks.sort(function(a,b){return cnt[b]-cnt[a];});if(cur&&!cnt[cur])cur='';
+ if(!n){box.innerHTML='';return;}
+ function pill(k,t){return '<button class="seg" type="button" data-comp="'+esc(k)+'" aria-selected="'+(cur===k)+'">'+t+'</button>';}
+ box.innerHTML='<div class="seg-row sl-joined cp-pills">'+pill('','전체')+ks.map(function(k){return pill(k,esc(k));}).join('')+'</div>';}
+function seps(){comp();var vis=rowsEl().filter(function(x){var on=!cur||secOf(x)===cur;x.style.display=on?'flex':'none';return on;});
+ vis.forEach(function(x,i){x.style.borderTop=i?'1px solid #E2E8F0':'0';x.style.paddingTop=(i?C.pad:C.top)+'px';});var n=rowsEl().length;
  L.parentNode.hidden=!n;W.querySelector('[data-sl-has]').hidden=!n;W.querySelector('[data-sl-empty]').hidden=!!n;if(!n)edit(false);}
+W.addEventListener('click',function(e){var b=e.target.closest('[data-comp]');if(!b)return;cur=b.getAttribute('data-comp');seps();});
+seps();
 function edit(on){if(on)body.setAttribute('data-sl-editing','');else body.removeAttribute('data-sl-editing');}
 function toast(msg){var o=document.querySelector('.sl-toast');if(o)o.remove();var d=document.createElement('div');d.className='sl-toast';d.innerHTML='<span>'+msg+'</span>';body.appendChild(d);setTimeout(function(){d.remove();},2600);}
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function badge(r,z){z=z||22;return '<span aria-hidden="true" style="display:inline-block;width:'+z+'px;height:'+z+'px;border-radius:50%;margin-right:6px;line-height:'+z+'px;background:#2F6F68;color:#fff;font-size:'+Math.max(9,Math.round(z*.42))+'px;font-weight:700;text-align:center;">'+esc(/^[0-9]/.test(r.c)?r.n.slice(0,1):r.c.replace(/[-.]/g,'').slice(0,2))+'</span>';}
 function pct(v){if(v==null)return '<span style="color:'+C.muted+';">—</span>';var col=v>0?C.up:v<0?C.down:C.muted,t=v>0?'▲':v<0?'▼':'';
- return '<span style="color:'+col+';font-weight:700;white-space:nowrap;">'+(t?'<span style="font-size:13px;vertical-align:1px;margin-right:2px;">'+t+'</span>':'')+Math.abs(v).toFixed(2)+'%</span>';}
+ return '<span style="color:'+col+';font-weight:700;white-space:nowrap;">'+(t?'<span style="font-size:'+Math.round(C.chg*.8)+'px;vertical-align:1px;margin-right:2px;">'+t+'</span>':'')+Math.abs(v).toFixed(2)+'%</span>';}
 function rowHtml(r){return '<span data-row-link="1" data-href="#" data-sym="'+esc(r.s)+'" style="'+C.row+'align-items:flex-start;">'+C.rm.replace('{name}',esc(r.n))+
- '<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;"><span style="flex:none;display:flex;align-items:center;">'+badge(r,C.logo)+'</span>'+
+ '<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;"><span style="flex:none;display:flex;align-items:center;">'+badge(r,C.logo).replace('margin-right:6px','margin-right:'+C.gap+'px')+'</span>'+
  '<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r.n)+'</span>'+
- '<span style="display:block;font-size:14px;line-height:20px;color:'+C.note+';white-space:nowrap;">'+esc(r.c)+' · '+esc(r.sec)+'</span></span></span>'+
- '<span data-sl-price style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;"><span style="font-size:16px;line-height:24px;">'+pct(r.r)+'</span><span style="font-size:15px;line-height:20px;color:#111;">'+esc(r.p)+'</span></span>'+C.grip+'</span>';}
+ '<span style="display:block;font-size:14px;line-height:20px;color:'+C.note+';white-space:nowrap;">'+(r.m==='kr'?'':esc(r.c)+' · ')+esc(r.sec)+'</span></span></span>'+
+ '<span data-sl-price style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;"><span style="font-size:'+C.chg+'px;line-height:24px;">'+pct(r.r)+'</span><span style="font-size:15px;line-height:20px;color:'+(r.r>0?C.up:r.r<0?C.down:'#111')+';">'+esc(r.p)+'</span></span>'+C.grip+'</span>';}
 function add(s){var r=BY[s];if(!r)return false;var a=all();if(a.indexOf(s)>=0)return true;
  if(a.length>=C.max){toast('관심 종목은 '+C.max+'개까지 담을 수 있습니다');return false;}
  if(r.m===C.m){L.insertAdjacentHTML('beforeend',rowHtml(r));seps();}else{held.push(s);}
@@ -444,7 +595,7 @@ document.querySelector('[data-sl-clear]').addEventListener('click',function(){va
 /* 종목 추가 = 검색 팝업, 줄 누르면 ☆ ↔ ★ */
 function star(on){return '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="'+C.starPath+'" fill="'+(on?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';}
 function res(r){var on=all().indexOf(r.s)>=0;return '<div class="sl-res" data-s="'+esc(r.s)+'">'+badge(r)+'<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r.n)+'</span>'+
- '<span style="display:block;font-size:14px;line-height:20px;color:'+C.note+';white-space:nowrap;">'+esc(r.c)+' · '+esc(r.sec)+(r.m!==C.m?' · '+(r.m==='kr'?'한국':'미국'):'')+'</span></span>'+
+ '<span style="display:block;font-size:14px;line-height:20px;color:'+C.note+';white-space:nowrap;">'+(r.m==='kr'?'':esc(r.c)+' · ')+esc(r.sec)+(r.m!==C.m?' · '+(r.m==='kr'?'한국':'미국'):'')+'</span></span>'+
  '<span class="sl-res-star" role="button" aria-pressed="'+on+'" aria-label="'+(on?'관심 종목에서 빼기':'관심 종목에 담기')+'">'+star(on)+'</span></div>';}
 function find(q){q=q.trim().toLowerCase();if(!q)return null;var a=[],b=[];J.rows.forEach(function(r){var n=r.n.toLowerCase(),c=r.c.toLowerCase();
  if(n.indexOf(q)===0||c.indexOf(q)===0)a.push(r);else if(n.indexOf(q)>0||c.indexOf(q)>0)b.push(r);});
@@ -483,7 +634,7 @@ def page(rows, etf, state, m, stats, tab):
     return hash_js + PAGE_CSS + body
 
 
-def write(body, name, title="종목"):
+def write(body, name, title="종목 모아보기"):   # 옛 `종목` (2026-11-18 사용자 "제목을 좀 더")
     path = dk.write_mock(dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE), os.path.join(OUT, name), title)
     if path:
         pg = open(path, encoding="utf-8").read().replace("</body>", PAGE_JS + WATCH_JS + "</body>", 1)
@@ -533,6 +684,7 @@ def star_mock(src_rel, name, state):
 def main():
     os.makedirs(OUT, exist_ok=True)
     rows, etf = load()
+    extra_rows(rows, [x for _, syms in U.WATCH_NEXT for x in syms])
     print(f"[종목 목록] 종목 미국 {sum(r['m'] == 'us' for r in rows.values())} · 한국 {sum(r['m'] == 'kr' for r in rows.values())} · ETF {len(etf['us'])} + {len(etf['kr'])}"
           f" · 시총 값 미국 {sum(1 for r in rows.values() if r['m'] == 'us' and r['cap'])} · 한국 {sum(1 for r in rows.values() if r['m'] == 'kr' and r['cap'])}")
     stats = []

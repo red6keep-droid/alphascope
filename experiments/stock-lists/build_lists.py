@@ -26,6 +26,19 @@ import universe_kr as UK  # noqa: E402
 
 SKIP = {"version.json", "bench.json", "_lists.json"}
 
+# 업종 = GICS 11개만 (taxonomy 세 층). 정식 검색 색인의 옛 분류(`반도체` · `결제` …)는 업종으로 올린다 — 간단 명단 밖 정식 종목(TSMC · ASML)이
+# `반도체` 업종 칸을 따로 만들어 홈 `업종 종목` 반도체에 2종목만 보였다 (2026-11-18 사용자 "반도체는 딸랑 두 개뿐이야?")
+SECTOR_NAMES = set(taxonomy.SECTORS.values())
+SECTOR_ALIAS = {name: taxonomy.SECTORS[parent] for name, parent in taxonomy.SUB_INDUSTRIES.values()}
+SECTOR_ALIAS.update({"결제": "금융", "빅테크": "기술", "소비 · 플랫폼": "경기 소비재"})
+
+
+def sector11(name):
+    """업종 이름 → GICS 11 중 하나. 모르는 이름은 `기타` (목록이 업종 칸을 새로 만들지 않게)."""
+    if name in SECTOR_NAMES:
+        return name
+    return SECTOR_ALIAS.get(name or "", "기타")
+
 
 def _load(path, default=None):
     try:
@@ -66,7 +79,7 @@ def build(m, qd, cache, search, shells, logos):
         if not d or not d.get("c") or d.get("status") == "halted":
             continue
         code = f[:-5]
-        rows[d["s"]] = {"t": code, "n": d.get("n") or code, "s": d.get("sec") or "기타", "p": d["c"], "r": _r((d.get("chg") or {}).get("1d")),
+        rows[d["s"]] = {"t": code, "n": d.get("n") or code, "s": sector11(d.get("sec")), "p": d["c"], "r": _r((d.get("chg") or {}).get("1d")),
                         "v": _r(d.get("vol_ratio")), "h": _r(d.get("off_hi")), "d": d.get("d"), "u": _path(shells.get(code))}
     # 정식 검색 색인 — 정식 주소 · 시가총액, 간단 명단 밖 정식 종목은 줄을 새로
     idx = _load(os.path.join(search, f"{m}.json"), {}) or {}
@@ -74,7 +87,7 @@ def build(m, qd, cache, search, shells, logos):
         p = s.get("p") or {}
         row = rows.get(s["s"])
         if row is None and p.get("c"):
-            row = rows[s["s"]] = {"t": s["s"].split(".")[0], "n": s["n"], "s": s.get("sec") or "기타", "p": p["c"], "r": _r(p.get("chg")),
+            row = rows[s["s"]] = {"t": s["s"].split(".")[0], "n": s["n"], "s": sector11(s.get("sec")), "p": p["c"], "r": _r(p.get("chg")),
                                   "v": _r(p["v"] / p["va"]) if p.get("va") and p.get("v") else None,
                                   "h": _r((p["c"] / p["h52"][0] - 1) * 100) if p.get("h52") else None, "d": p.get("d")}
         if row is not None:

@@ -727,6 +727,9 @@ def sec_drawdown(s):
 def related(s):
     """함께 보는 리포트 (가이드라인 10-5 4) — HTML 링크라 검색엔진이 따라간다."""
     links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL), _dk.REPORT_LINKS["us"]]   # 엔비디아 고정 링크 정리 — 엔비디아도 일반 종목 (2026-11-15 사용자), 그 자리 = 미국 증시 리포트
+    if s.get("sym") in U.SAME_CO_KR:   # 같은 회사 한국 상장 주식 — 맨 앞 (2026-11-19 사용자: SKHY ↔ SK하이닉스 꼭 연결)
+        label, slug = U.SAME_CO_KR[s["sym"]]
+        links.insert(0, (f"{label} 주가", f"{U.BLOG}/p/{slug}.html"))
     links.append(("주요 인물 발언 전체 보기", people_section.ALL_URL))   # 인물 발언 전체 목록 (2026-11-08 사용자) — 발언 카드 맨 아래 링크와 같은 주소
     return R.related_buttons(links)   # 전부 나가는 버튼 (2026-10-31 사용자 P160, 옛 점 글머리표 링크)
 
