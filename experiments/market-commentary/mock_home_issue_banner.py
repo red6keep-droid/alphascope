@@ -1,5 +1,7 @@
 """홈 Hot Issue · 증시 전망 카드 = 좌우로 넘어가는 배너 (2026-11-18 사용자).
 
+** 적용 끝 (11-18) — 테마(alphaflow-home.html · index.html)에 들어가 이 스크립트는 더 돌리지 않는다(고리 코드가 바뀌어 돌면 멈춤). 홈 모습 = mock_home_commentary.py C안 · home-split. 시안 기록용. **
+
     python experiments/market-commentary/mock_home_issue_banner.py   # → output/mock_home_issue_banner.html (비교) + 시안별 미국 홈
 
 바탕 = 홈 증시시황 C안(mock_home_commentary.build) 그대로, 미국 증시 카드 여백 · Hot Issue · 증시 전망 카드만 바꾼다.

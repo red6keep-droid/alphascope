@@ -243,13 +243,8 @@ def build(src, mkt, variant, img):
         html = html.replace("</head>", LONG_CSS + "</head>", 1)
         html = html.replace("</body>", ORDER_JS + "</body>", 1)
         o = OPTS.get(variant)
-        if o:
-            if ISSUE_OLD not in html:
-                sys.exit("Hot Issue 줄 코드를 못 찾음")
-            html = html.replace(ISSUE_OLD, ISSUE_NEW[o["issue"]], 1)
-            html = html.replace("</head>", "<style>" + PILL_CSS[o["pill"]] + "</style>" + ISSUE_CSS + (ROLL_CSS if o.get("roll") else "") + "</head>", 1)
-            if o.get("roll"):
-                html = html.replace("</body>", ROLL_JS + "</body>", 1)
+        if o:   # Hot Issue · 증시 전망 줄 롤링(위아래)은 11-18 좌우 배너로 바뀌어 테마에 들어갔다(alphaflow-home.html) — 여기서는 편 이름 상자만
+            html = html.replace("</head>", "<style>" + PILL_CSS[o["pill"]] + "</style></head>", 1)
     html = html.replace("<head>", "<head>\n" + SAMPLE_JS, 1)
     html = re.sub(r"<title>.*?</title>", f"<title>홈 증시시황 {variant.upper()} — {'미국' if mkt == 'us' else '한국'}</title>", html, count=1, flags=re.S)
     with open(os.path.join(OUT, files[mkt]), "w", encoding="utf-8") as f:
