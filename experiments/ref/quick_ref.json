@@ -4531,8 +4531,8 @@
   },
   "DELL": {
    "en": "Dell Technologies",
+   "full": true,
    "ko": "델",
-   "ko_src": "wikidata",
    "sector": "기술",
    "sub": "기술 하드웨어",
    "sub_en": "Technology Hardware, Storage & Peripherals"
@@ -5299,8 +5299,8 @@
   },
   "HPE": {
    "en": "Hewlett Packard Enterprise",
-   "ko": "휴렛 팩커드 엔터프라이즈",
-   "ko_src": "wikidata",
+   "full": true,
+   "ko": "HPE",
    "sector": "기술",
    "sub": "기술 하드웨어",
    "sub_en": "Technology Hardware, Storage & Peripherals"
@@ -5627,8 +5627,8 @@
   },
   "KLAC": {
    "en": "KLA Corporation",
+   "full": true,
    "ko": "KLA",
-   "ko_src": "wikidata",
    "sector": "기술",
    "sub": "반도체 소재",
    "sub_en": "Semiconductor Materials & Equipment"
@@ -6003,8 +6003,8 @@
   },
   "MRVL": {
    "en": "Marvell Technology",
-   "ko": "마벨 테크놀로지 그룹",
-   "ko_src": "wikidata",
+   "full": true,
+   "ko": "마벨 테크놀로지",
    "sector": "기술",
    "sub": "반도체",
    "sub_en": "Semiconductors"
@@ -6547,8 +6547,8 @@
   },
   "QCOM": {
    "en": "Qualcomm",
+   "full": true,
    "ko": "퀄컴",
-   "ko_src": "wikidata",
    "sector": "기술",
    "sub": "반도체",
    "sub_en": "Semiconductors"
@@ -6731,8 +6731,8 @@
   },
   "SMCI": {
    "en": "Supermicro",
+   "full": true,
    "ko": "슈퍼마이크로",
-   "ko_src": "wikidata",
    "sector": "기술",
    "sub": "기술 하드웨어",
    "sub_en": "Technology Hardware, Storage & Peripherals"
@@ -6747,8 +6747,8 @@
   },
   "SNDK": {
    "en": "Sandisk",
+   "full": true,
    "ko": "샌디스크",
-   "ko_src": "wikidata",
    "sector": "기술",
    "sub": "기술 하드웨어",
    "sub_en": "Technology Hardware, Storage & Peripherals"
@@ -6827,8 +6827,8 @@
   },
   "STX": {
    "en": "Seagate Technology",
+   "full": true,
    "ko": "시게이트",
-   "ko_src": "wikidata",
    "sector": "기술",
    "sub": "기술 하드웨어",
    "sub_en": "Technology Hardware, Storage & Peripherals"
@@ -6931,8 +6931,8 @@
   },
   "TER": {
    "en": "Teradyne",
+   "full": true,
    "ko": "테라다인",
-   "ko_src": "wikidata",
    "sector": "기술",
    "sub": "반도체 소재",
    "sub_en": "Semiconductor Materials & Equipment"
@@ -7339,8 +7339,8 @@
   },
   "WDC": {
    "en": "Western Digital",
+   "full": true,
    "ko": "웨스턴 디지털",
-   "ko_src": "wikidata",
    "sector": "기술",
    "sub": "기술 하드웨어",
    "sub_en": "Technology Hardware, Storage & Peripherals"

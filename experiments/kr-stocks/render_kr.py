@@ -227,7 +227,14 @@ def sec_pairs(s, a=None):
     theme, col = {"엇갈림": ("uncertain", R.SOON), "올랐음": ("positive", UP), "내렸음": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
     day = (moves or [adr or sox])[0]["day"]
     us_kst = _dk.kst_close_day(day, "US") + " 새벽"   # 독자 = 한국 시간 (2026-11-14 날짜 규칙) — 미국 종가 = 다음 날 새벽, 간단 카드와 같은 말 (2026-11-15 사용자)
-    lines = [(f"밤사이({us_kst} 마감) 연관 종목은 " + ", ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)   # 쉼표 — ` · ` 로 이으면 짧은 덩어리를 이름까지 통째로 칠한다(_dk.tint), 미국 페이지와 같게 (2026-11-06 사용자)
+    lines = []
+    if s["sym"] in U.SAME_CO_US:   # 같은 회사 미국 상장 주식 바로 가기 — 카드 첫 줄 (2026-11-18 사용자)
+        t, label = U.SAME_CO_US[s["sym"]]
+        url = USU.any_page_url(t)
+        if url:
+            lines.append((f'<a href="{url}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;text-decoration:none;color:#111;font-weight:700;">'
+                          f'<span>{label} <span style="color:{NOTE};font-weight:400;">{t}</span></span><span aria-hidden="true">›</span></a>', "html"))
+    lines += [(f"밤사이({us_kst} 마감) 연관 종목은 " + ", ".join(f"{_us_name(m['sym'])} {_sgn(m['ret'])}%" for m in moves)   # 쉼표 — ` · ` 로 이으면 짧은 덩어리를 이름까지 통째로 칠한다(_dk.tint), 미국 페이지와 같게 (2026-11-06 사용자)
               + f"였고, 오늘 {_dk.josa(s['name'], '은')} {_sgn(s['ret_1d'])}%였다.", "plain")]
     # 숫자 줄 목록 → 가운데 0 가로 막대 두 묶음 (2026-10-27 사용자 P27: "퍼센트만 쭉 있어 빨리 안 읽힌다, 삼성전자 · 지수와 비교 그래프")
     why = [w.strip() for w in (p.get("why") or "").split("·")]
@@ -795,6 +802,11 @@ def sec_states(s):
 def related(s=None, links=None):
     """함께 보는 페이지 — links 를 주면 그 목록으로 (한국 증시 리포트가 자기 자신을 빼고 쓴다)."""
     links = list(links) if links else [("한국 증시 리포트", U.REPORT_URL), ("한국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("미국 시가총액 상위 10개 종목 주가", U.US_LIST_URL)]
+    if s and s["sym"] in U.SAME_CO_US:   # 같은 회사 미국 상장 주식 — 맨 앞 (2026-11-18 사용자: SK하이닉스 ↔ SKHY 꼭 연결)
+        t, label = U.SAME_CO_US[s["sym"]]
+        url = USU.any_page_url(t)
+        if url:
+            links.insert(0, (f"{label} {t} 주가", url))
     if s:
         for m in (s.get("pairs") or {}).get("moves") or []:
             if m["sym"] in USU.BY_SYM:

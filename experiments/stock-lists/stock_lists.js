@@ -127,7 +127,7 @@
     if (!gs.length) return note('묶음을 불러오지 못했습니다.');
     var bodies = gs.map(function (g) {
       var xs = g[1].slice().sort(byDesc(function (r) { return r.r; }));
-      var link = (m === 'us' && (g[0] === '반도체' || g[0] === '데이터 센터'))
+      var link = (m === 'us' && ['AI 칩', '메모리', '칩 생산', '반도체 장비', '데이터 센터'].indexOf(g[0]) >= 0)   // 반도체를 넷으로 나눔 (2026-11-19)
         ? '<a href="/p/theme-ai-capex.html" style="display:block;margin:4px 0 12px;padding-left:6px;font-size:15px;line-height:24px;color:#111;font-weight:700;text-decoration:none;">AI 투자 자금 흐름 보기 →</a>' : '';
       return card(xs, function (r, i) { return row(r, i); }) + link;
     });

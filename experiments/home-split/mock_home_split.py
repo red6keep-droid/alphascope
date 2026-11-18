@@ -7,6 +7,7 @@
   (2) 상단 메뉴 = 미국 · 한국 · 증시 전망 (목업에서는 미국 · 한국이 서로의 목업 파일로 간다)
 적용 때: 메뉴는 build_theme.py 의 Blogger 메뉴, data-home-mkt 는 테마가 홈(/) = us · 고정 페이지 /p/korea.html = kr 로 붙인다.
 """
+import json
 import os
 import re
 import subprocess
@@ -60,6 +61,38 @@ def _kr_news_js():
 KR_NEWS_JS = _kr_news_js()
 
 
+_PICKS = []
+
+
+def next_picks():
+    if _PICKS:
+        return _PICKS[0]
+    _PICKS.append(_next_picks())
+    return _PICKS[0]
+
+
+def _next_picks():
+    """홈 stocks.json 흉내 — 종목 = WATCH_NEXT 전부, 값 = 종목 모아보기 목업과 같은 실제 값(mock_stock_lists.load + extra_rows)."""
+    sys.path[:0] = [os.path.join(ROOT, "experiments", "stock-lists")]
+    try:
+        import mock_stock_lists as ML
+    except SystemExit:
+        return None
+    rows, _ = ML.load()
+    syms = [x for _, g in ML.U.WATCH_NEXT for x in g]
+    ML.extra_rows(rows, syms)
+    stocks = []
+    for x in dict.fromkeys(syms):
+        r = rows.get(x)
+        if not r:
+            continue
+        slug = (r.get("u") or "").split("/p/")[-1].replace(".html", "") if "/p/" in (r.get("u") or "") else ""
+        stocks.append({"s": x, "name": r["n"], "sector": r["sec"], "p": r["c"], "cp": r["r"], "page": bool(slug), "slug": slug, "mc": r.get("cap") or 0})
+    have = {x["s"] for x in stocks}
+    day = max(r["d"] for r in rows.values() if r["m"] == "us")
+    return {"day": day, "stocks": stocks, "watch": [{"group": g, "syms": [x for x in s if x in have]} for g, s in ML.U.WATCH_NEXT], "sectors": [], "events": []}
+
+
 def split_html(src, mkt, files=FILES):
     """preview.html → 홈 나누기 화면(mkt = us | kr). 다른 목업(검색 · 질문하기 등)도 이걸 써서 지금 홈 기준으로 맞춘다 (2026-11-10)"""
     html = src
@@ -80,6 +113,26 @@ def split_html(src, mkt, files=FILES):
     if os.path.exists(ip):
         with open(ip, encoding="utf-8") as f:
             html = html.replace("<head>", "<head>\n<script>window.PV_ISSUES = " + f.read().replace("</", "<\\/") + ";</script>", 1)
+    # 업종 종목 탭 자료 = 간단 종목 실행이 올린 목록 파일(원격 브랜치 quick-us · quick-kr 의 _lists.json, `git fetch origin quick-us quick-kr` 뒤) (2026-11-18)
+    lists = {}
+    for m in ("us", "kr"):
+        r = subprocess.run(["git", "show", f"origin/quick-{m}:{m}/_lists.json"], capture_output=True, cwd=ROOT)
+        if r.returncode == 0:   # 업종 이름은 build_lists.sector11 로 다시 맞춘다 — 원격 파일이 고치기 전 판이어도 목업은 고친 뒤 모습 (2026-11-18)
+            import json as _j
+            sys.path.insert(0, os.path.join(ROOT, "experiments", "stock-lists"))
+            sys.path[:0] = [os.path.join(ROOT, "experiments"), os.path.join(ROOT, "experiments", "stock-radar"), os.path.join(ROOT, "experiments", "kr-stocks")]
+            import build_lists as BL
+            d = _j.loads(r.stdout.decode("utf-8"))
+            for x in d.get("rows", []):
+                x["s"] = BL.sector11(x.get("s"))
+            lists[m] = _j.dumps(d, ensure_ascii=False)
+    if lists:
+        html = html.replace("<head>", "<head>\n<script>window.PV_LISTS = {" + ",".join(f'"{m}":{t}' for m, t in lists.items()).replace("</", "<\\/") + "};</script>", 1)
+    # 테마 종목 = 다음 테마 구성(universe.WATCH_NEXT) · 값 = 목록 파일 실제 값 (2026-11-18 사용자: 반도체를 하는 일로 넷 · 새 정식 후보)
+    picks = next_picks()
+    if picks:
+        html = html.replace("<head>", "<head>\n<script>window.__PICKS = " + json.dumps(picks, ensure_ascii=False).replace("</", "<\\/") + ";</script>", 1)
+        html = html.replace("else if (u.indexOf('stocks.json') >= 0) body = PV_PICKS;", "else if (u.indexOf('stocks.json') >= 0) body = (window.__PICKS || PV_PICKS);", 1)
     if mkt == "kr":   # 한국 홈 주요 뉴스 — 수집 전이라 테마는 숨김. 목업만 가짜 한국 뉴스로 미국 홈과 같은 꼴을 본다 (2026-11-15 사용자: 한국 홈도 뉴스 넣을 것)
         html = html.replace("</body>", KR_NEWS_JS + "</body>", 1)
     # 주식 공부 배너 — gh-pages 에 올리기 전에는 로컬 그림을 그대로 넣어 본다 (2026-11-15)

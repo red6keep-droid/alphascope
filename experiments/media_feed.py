@@ -365,11 +365,13 @@ def rows(items):
 
 def _groups_of(sym):
     g = {c[3] for c in UNI.CANDIDATES if c[0] == sym}
-    return g | {nm for nm, syms in UNI.WATCH if sym in syms}
+    g |= {nm for nm, syms in UNI.WATCH if sym in syms}
+    return g | {old for old, news in getattr(UNI, "WATCH_ALIAS", {}).items() if g & set(news)}   # 옛 묶음 이름(`반도체`)도 — 새 네 묶음 종목이 반도체 이슈를 받게 (2026-11-19)
 
 
 def _members(group):
-    return {c[0] for c in UNI.CANDIDATES if c[3] == group} | next((set(syms) for nm, syms in UNI.WATCH if nm == group), set())
+    names = [group] + getattr(UNI, "WATCH_ALIAS", {}).get(group, [])
+    return {c[0] for c in UNI.CANDIDATES if c[3] == group} | {x for nm, syms in UNI.WATCH if nm in names for x in syms}
 
 
 def sector_groups(r):
