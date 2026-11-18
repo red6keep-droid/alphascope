@@ -281,7 +281,7 @@ def run(state_dir=None):
     with open(os.path.join(OUT, f"{H.LIST_SLUG}.html"), "w", encoding="utf-8") as f:
         f.write(H.list_body_tabs(groups, states))
     with open(os.path.join(OUT, "hypo.json"), "w", encoding="utf-8") as f:
-        json.dump(H.home_card(opened, dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), done_n), f, ensure_ascii=False, indent=1)
+        json.dump(H.home_card(opened, dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), done_n, states), f, ensure_ascii=False, indent=1)   # states = 홈 배너 그림 방향(lean)
     for r, fc in pub:
         st = states.get(fc["slug"]) or {}
         print(f'[forecast] {fc["slug"]}: {st.get("log", [{}])[-1].get("label")} · 값 {st.get("rel")} · 빈 날 {len(st.get("missing", []))}')

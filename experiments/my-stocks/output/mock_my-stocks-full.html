@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>보유 종목 — 목업</title><style>/*
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>보유 종목 — 목업</title><link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Inter:wght@400;600;700;800&display=swap' rel='stylesheet'/><style>/*
 <Variable name="keycolor" description="Main Color" type="color" default="#FF3333" value="#FF3333"/>
 <Group description="Page Text">
   <Variable name="body.text.color" description="Text color" type="color" default="#0F172A" value="#0F172A"/>
@@ -207,11 +207,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .menu-quick { display: none; }   /* 폰 · 태블릿에서만 (아래 900px 규칙) */
 /* 서랍 메뉴의 닫기 버튼·뒤 가림막 — JS가 만든다. 데스크톱에서는 쓰지 않는다 */
 .nav-close {
-  display: none; position: absolute; top: 16px; right: 16px;
-  width: 36px; height: 36px; align-items: center; justify-content: center;
-  border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600);
+  display: none; position: absolute; top: 18px; right: 18px;
+  width: 32px; height: 32px; align-items: center; justify-content: center; padding: 0;
+  border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111;
 }
-.nav-close svg { width: 16px; height: 16px; }
+.nav-close:hover { border-color: #111; }
+.nav-close svg { width: 14px; height: 14px; }   /* 서랍 닫기도 테두리 네모 32 (닫기 버튼 통일, 2026-11-14 사용자). 옛 36 — 가운데 자리는 그대로(16 + 18) */
 .nav-overlay { position: fixed; inset: 0; z-index: 49; background: transparent; }   /* 헤더(50) 아래 — 서랍은 헤더 안에 있어 55로 두면 가림막이 서랍을 덮어 메뉴가 눌리지 않았다 (2026-10-13 사용자: "메뉴를 클릭시 목록 화면으로 이동되지 않는다")   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
@@ -255,7 +256,7 @@ body.menu-open { overflow: hidden; }
   gap: 27px;
   max-width: calc(var(--shell) + var(--gutter) * 2);   /* 좌우 여백을 빼고 콘텐츠가 정확히 --shell (2026-10-15 사용자: PC 콘텐츠 1280) */
   margin: 0 auto;
-  padding: 36px var(--gutter) 40px;   /* 위: 헤더 → 홈 제목 글자 보이는 35 (20 + 15, 2026-10-13 사용자) · 아래: 마지막 콘텐츠 아래 40 */
+  padding: 36px var(--gutter) 16px;   /* 위: 헤더 → 홈 제목 글자 보이는 35 (20 + 15, 2026-10-13 사용자) · 아래: 마지막 콘텐츠 아래 40 → 16 (푸터 위 여백 58 → 23, 60% 줄임, 2026-11-15 사용자) */
 }
 
 /* section heading */
@@ -345,6 +346,13 @@ body.menu-open { overflow: hidden; }
 .report-block { display: flex; flex-direction: column; gap: 8px; }
 .report-chart { display: block; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px; }   /* 홈 미국 · 한국 증시 카드 그래프 (2026-10-21 사용자). 확대 없음 — 눌러도 카드처럼 상세 리포트로 (2026-11-10 사용자) */
 .report-chart[hidden] { display: none; }
+.day-chart { position: relative; border: 1px solid #eee; border-radius: 8px; overflow: hidden; background: #fff; }   /* 홈 증시 카드 하루 그래프 (2026-11-14 사용자, B1) — 글자 = HTML, 크기 고정 */
+.day-chart svg { display: block; width: 100%; height: auto; }
+.day-head { position: absolute; right: 10px; top: 13px; display: flex; align-items: baseline; gap: 0 8px; font-family: var(--num); font-variant-numeric: tabular-nums; }
+.day-chg { font-size: 14px; line-height: 20px; font-weight: 700; }
+.day-num { font-size: 16px; line-height: 22px; font-weight: 700; }
+.day-mark { position: absolute; white-space: nowrap; font-family: var(--num); font-size: 12px; line-height: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.day-mark .k { font-weight: 400; }
 /* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
 /* #radar-col 전폭 규칙은 뺐다 (2026-11-08 H34): 넷째 카드 `증시 전망` 이 들어와 미국 · 한국 / 인물 · 증시 전망 2 × 2 */
 /* 홈 증시 전망 카드 (2026-11-08 H34) — 줄 = 전망 질문(18 · 행간 34 · 보통 굵기, 인물 발언 줄과 같게) + 분류 라벨 · 게시일. 국면 · 문장은 전망 페이지에서. 자료 = gh-pages hypo.json (forecast_daily, 하루 1회) */
@@ -353,6 +361,16 @@ body.menu-open { overflow: hidden; }
 #hypo-card .kv-row.plain-row { display: block; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; overflow-wrap: anywhere; }
 #hypo-card .kv-row.plain-row + .kv-row.plain-row { border-top: 1px solid #E2E8F0; padding-top: 12px; margin-top: 8px; }
 #hypo-card .hypo-empty { padding: 14px 0 16px; font-size: 16px; line-height: 24px; color: #7A7A7A; }
+/* 홈 Hot Issue 카드 (2026-11-16 사용자) — 증시 전망 카드와 같은 줄: 이슈 이름(18 · 행간 34) + 바늘 말 라벨(좋은 쪽 종전 · 완화 빨강, 나쁜 쪽 확전 · 강화 파랑, 향방미정 회색 = 뉴스 긍정 · 부정 라벨 색) + `최근 일주일 뉴스` · 평소보다 많음. 자료 = gh-pages issues.json (issue_watch_daily, 07:30), 없으면 카드 숨김 */
+#issue-col { grid-column: 1 / -1; }
+#issue-col[hidden] { display: none; }
+#issue-card { padding: 0 16px; gap: 0; }
+#issue-card .kv-rows { padding: 12px 0 14px; }
+#issue-card .kv-row.plain-row { display: block; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; overflow-wrap: anywhere; }
+#issue-card .kv-row.plain-row + .kv-row.plain-row { border-top: 1px solid #E2E8F0; padding-top: 12px; margin-top: 8px; }
+.news-tag.issue-tag.positive { border-color: #FCA5A5; background: #FEF2F2; color: #B91C1C; }
+.news-tag.issue-tag.negative { border-color: #93C5FD; background: #EFF6FF; color: #1D4ED8; }
+.news-tag.issue-tag.neutral { color: #64748B; }
 #radar-card { padding: 0 16px; gap: 0; }
 /* 인물 발언 · 미디어 데일리 줄 = 글자만 (2026-10-24 사용자: 라벨 · 강도 · 관심도 · 구분선 · 굵게 모두 뺌). 18 · 행간 34 · 보통 굵기, 줄 사이 위아래 4 */
 #radar-card .kv-row.plain-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 7px; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; }
@@ -640,14 +658,14 @@ img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/C
 .news-item.load-status { color: var(--gray-400); }
 .news-item[hidden] { display: none; }
 /* 뉴스 더 보기 = 외곽선 있는 버튼(기본 .fold-btn), 버튼 위 구분선 없음 (2026-10-24 사용자). 옛: 윗선만 있는 줄 (2026-10-20) */
-.news-section .fold-btn { margin-top: 6px; }
+.news-section .fold-btn { margin-top: 6px; margin-bottom: 15px; }   /* 뉴스 더 보기 아래 +10 → +15 — 푸터와 사이 (2026-11-15 사용자) */
 
 /* ==========================================================================
    6. footer  (위 주요 뉴스 흐르는 띠는 삭제 — 2026-11-10 사용자)
    ========================================================================== */
 
 .site-footer {
-  padding: 18px var(--gutter) 19px;   /* 위 36 → 18 · 아래 38 → 19 (각 50%, 2026-11-11 사용자) — 옛 아래 48 → 38 (11-10) */
+  padding: 7px var(--gutter) 19px;   /* 위 36 → 18 → 7 (11-15 사용자: 푸터 위 60% 줄임, 본문 아래 16 과 합쳐 23) · 아래 38 → 19 (각 50%, 2026-11-11 사용자) — 옛 아래 48 → 38 (11-10) */
   text-align: center;
   background: var(--bg);
 }
@@ -685,6 +703,8 @@ body.item-view .footer-disclaimer summary { display: flex; align-items: flex-sta
 body.item-view .footer-title { order: 2; flex: none; margin: 0; }
 body.item-view .footer-more { margin-left: 0; }
 body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
+body.item-view .footer-copy { display: none; }   /* 상세 화면은 저작권 줄 삭제 (2026-11-15 사용자) */
+body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 11 도 함께 — 줄 19 + 11 = 30 만큼 푸터가 짧아진다 */
 .footer-copy {
   margin: 0;
   font-family: var(--num);
@@ -703,7 +723,7 @@ body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
   flex-direction: column;
   gap: var(--card-gap);   /* 카드 사이 = 화면 좌우 여백 (2026-10-24 사용자: PC 40 · 중간 24 · 폰 10). 옛 20 (2026-10-15) */
   margin-top: -36px;   /* main-content 위 여백까지 회색으로 — 헤더 바로 아래부터 */
-  padding: var(--card-gap) 0 40px;   /* 맨 위 카드 위 = 카드 사이 (2026-10-15 사용자) */
+  padding: var(--card-gap) 0 20px;   /* 맨 위 카드 위 = 카드 사이 (2026-10-15 사용자) · 맨 아래 카드(주식 공부 배너) 아래 40 → 20 (50%, 2026-11-15 사용자) */
   background: #F3F4F6;
   box-shadow: 0 0 0 100vmax #F3F4F6;   /* 화면 전체 폭으로 — 가로 스크롤 없이 */
   clip-path: inset(0 -100vmax);
@@ -736,6 +756,12 @@ body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
 .eb-dot { height: 12px; padding: 0 2px; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
 .eb-dot::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, .35); transition: background .25s; }   /* 점 5×5 (2026-11-10 사용자) */
 .eb-dot[aria-selected="true"]::before { background: #fff; }   /* 바탕색이 바뀌므로 파랑 대신 흰색 */
+/* 일정이 없을 때 = 주식 공부 배너 (2026-11-15 사용자: "D-Day 가 없으면 이거를 넣어줘") — 사용자 그림 1110 × 291(폰 칸 370 × 97 의 3배), 그림 바탕 #48427F 를 띠 바탕으로 이어 붙인다.
+   그림 높이 = 칸 높이(폰 97 · 태블릿 122 · PC 115), 넓은 화면은 양옆 바탕색. PC 는 재설계 전 임시.
+   그림 글자 왼쪽 끝 = 아래 카드 제목 아이콘(.report-icon) 왼쪽 끝 — 카드 안쪽 27 − 그림 속 글자 여백 1 = 26 오른쪽으로, 오른쪽 26 은 잘림(장식 원만) (2026-11-15 사용자) */
+.eb-slide.eb-study { padding: 0; justify-content: flex-start; }
+.eb-study img { display: block; flex: none; width: 100%; margin-left: 26px; height: auto; max-width: 465px; aspect-ratio: 1110 / 291; border-radius: 0; }
+@media (min-width: 901px) { .eb-study img { max-width: 438px; } }   /* PC 칸 높이 115 */
 @media (max-width: 680px) {
   .eb-slide { gap: 10px; padding: 20px 4px 28px; }   /* 높이 81 → 97 (20%, 2026-11-10 사용자) */
   .eb-slide .stock-avatar { width: 36px; height: 36px; font-size: 14px; }
@@ -745,6 +771,7 @@ body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
   .eb-title { font-size: 15px; line-height: 23px; }
   .eb-when { font-size: 13px; line-height: 21px; }
   .eb-more { margin-right: 4px; }
+  .eb-study img { max-width: 370px; }   /* 폰 칸 높이 97 = 370 × 291 / 1110 */
   .eb-more-text { display: none; }   /* 폰은 글자도 없음 — 화살표는 삭제 (2026-11-10 사용자) */
 }
 @media (prefers-reduced-motion: reduce) { .eb-track, .eb-dot::before { transition: none; } }
@@ -810,9 +837,15 @@ body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
 /* 카드 순서: 리포트 → 시총 TOP 10 (주요 지수 · 섹터 현황은 2026-10-20 삭제). PC(901px 이상)는 2열 — 리포트 · 랭킹은 전폭 (2026-10-15 사용자) */
 @media (min-width: 901px) {
   .home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .home-cards > .briefing, .home-cards > .rankings, .home-cards > .event-banner { grid-column: 1 / -1; }   /* 일정 배너도 전폭 (2026-10-28) */
+  .home-cards > .briefing, .home-cards > .rankings, .home-cards > .event-banner, .home-cards > .study-banner { grid-column: 1 / -1; }   /* 일정 배너도 전폭 (2026-10-28) */   /* 주식 공부 배너도 전폭 (2026-11-15) */
 }
 /* 테마 · 관심 종목 · 섹터 종목 탭 카드 (2026-10-21 사용자) — 탭 줄 오른쪽 끝 기준일, 관심 종목 묶음은 탭 아래 작은 알약 줄 */
+/* 주식 공부 배너 (2026-11-15 사용자: 사용자가 만든 그림 한 장 그대로) — 전폭 카드 모서리 12 · 그림 = 카드 전체, 누르면 주식 공부 목록.
+   그림 안 글자를 검색 · 낭독기가 읽게 alt. 그림 1110×344(비율 고정, 폭에 맞춰 줄어듦) · WebP 24KB · jsDelivr 1회 요청 */
+.study-banner { margin: 0; }
+.study-banner a { display: block; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 22.5px -5px rgba(0,0,0,.029), 0 8px 9px -6px rgba(0,0,0,.029); -webkit-tap-highlight-color: transparent; }
+.study-banner img { display: block; width: 100%; height: auto; aspect-ratio: 1110 / 344; border-radius: 0; }
+.study-banner a:active { opacity: .85; }
 .picks-section .tabs { align-items: flex-end; }
 .picks-day { padding: 8px 16px 0; font-family: var(--num); font-size: 14px; line-height: 20px; color: var(--gray-400); text-align: right; }   /* 기준일 — 탭 아래 오른쪽 한 줄 (탭 줄에 두면 폰에서 잘린다) */
 .picks-day:empty { display: none; }
@@ -821,6 +854,7 @@ body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
 @media (max-width: 600px) {   /* 폰: 전일 대비는 종가 아래 줄, 머리글은 줄바꿈 — 업종 · 1위 종목 · 종가 세 칸이 한 화면에 들게 */
   .picks-section .rank-table th, .picks-section .rank-table td { white-space: normal; }
   .picks-section .cell-price small { display: block; margin-left: 0; }
+  .picks-section .cell-price { display: inline-flex; flex-direction: column-reverse; align-items: flex-end; }   /* 두 줄 = 증감 위 · 가격 아래 (2026-11-17 사용자 규칙) */
 }   /* 3칸 표는 폰 폭에 맞춘다 — 시총 TOP 10 의 min-width 760 을 물려받으면 종가 · 업종 칸이 오른쪽으로 밀려 안 보였다 */
 /* 종목명은 늘 한 줄, 업종 글자도 한 줄 — 업종 · 종가 칸 좌우 여백 8 → 4, 업종 글자 13px로 자리를 만든다. 폭 374px 이하 폰에서만 업종이 공백 자리에서 두 줄 (2026-10-25 사용자: "종목명이 두 줄로 가면 안 된다") */
 .picks-section .stock-name { white-space: nowrap; }
@@ -1002,6 +1036,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 .home-cards .section-head .head-right .mkt-tabs { margin: 0; }
 .section-title { min-width: 0; }
 .live-note { font-size: 12px; color: var(--gray-500); }
+.day-note { font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 구획 제목 줄 오른쪽 `11월 11일 기준` — 홈 카드 날짜와 같은 모양 (2026-11-12 사용자: 종가 기준이니 날짜 표기, 한글로 통일) */
 .live-note.on { color: #0E7490; font-weight: 600; }
 .live-note .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #0E7490; margin-right: 5px; vertical-align: 1px; animation: livepulse 1.6s ease-in-out infinite; }
 @keyframes livepulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
@@ -1149,6 +1184,7 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title-text { flex: 1 1 auto; min-width: 0; display: flex; align-items: flex-start; gap: 5px; }   /* 로고(왼쪽 따로) + 글자 칸 — 줄바꿈된 둘째 줄은 로고 아래가 아니라 첫 글자 선에 맞는다 (2026-10-23 사용자) */
 .post-title-label { flex: 1 1 auto; min-width: 0; }
 .post-title-text .title-logo { flex: none; margin-right: 0; vertical-align: top; margin-top: calc((1lh - var(--logo-size, 32px)) / 2); }   /* 로고는 첫 줄 글자 높이의 가운데에 — 가운데 정렬 아님 (2026-10-23 사용자) */
+.post-title-text .title-badge { line-height: inherit; }   /* 글자 배지(한국 종목 · ETF `T`)는 line-height:1 이라 1lh 가 배지 글자 크기가 되어 위로 떴다 → 제목 줄 높이를 물려받아 첫 줄 가운데 (2026-11-13 사용자 P537 "미들 정렬") */
 .post-title-meta { flex: none; margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
 .post-title-meta .title-share { margin-left: 0; }
 .title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
@@ -1156,6 +1192,14 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .title-share:hover { border-color: #111; }
 /* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
 .share-pop .share-buttons { justify-content: flex-start !important; }
+/* 링크 복사 강조 (2026-11-14 사용자): 맨 위 한 줄 가득 · 높이 48 · 16 굵게 · 흰 바탕 · 진한 테두리 */
+.share-pop .share-buttons li.share-main { flex: 1 0 100%; }
+.share-pop .share-buttons li.share-main .sharing-platform-button { display: flex; width: 100%; justify-content: center; gap: 8px; padding: 11px 16px; font-size: 16px; line-height: 24px; background: #fff; border-color: #B5BAC0; color: #111; }
+.share-pop .share-buttons { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px; }   /* 채널 = 링크 복사 아래 4칸 격자, 칸 = 로고 22 위 · 이름 12 보통 아래 (2026-11-14 사용자) */
+.share-pop .share-buttons li.share-main { grid-column: 1 / -1; }
+.share-pop .share-buttons li:not(.share-main) { min-width: 0; }
+.share-pop .share-buttons li:not(.share-main) .sharing-platform-button { display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 4px; padding: 10px 4px 8px; font-size: 12px; line-height: 18px; font-weight: 400; }
+.share-pop .share-buttons li:not(.share-main) svg { width: 22px !important; height: 22px !important; }
 /* 제목 아래 날짜 줄(October 11, 2026) 삭제 (2026-10-12 사용자) */
 .post-timestamp { display: none !important; }
 /* 글 보기: 첫 제목 위 여백 70% 줄임 (2026-10-12 사용자) — 위 32+40 → 10+12 */
@@ -1188,7 +1232,8 @@ body.item-view .post-outer-container { padding-top: 13px; }
    테마 JS가 .rt-pop 을 만든다. 닫기: × 버튼 · 바깥 누르기 · Esc. 줄바꿈(&#10;)은 창 안에서 줄을 바꾼다 */
 .post-body [data-tip] { outline: none; cursor: pointer; }
 .post-body [data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 50%; }
-.rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.45); }
+.rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: transparent; }
+.rt-pop::before, .as-search-layer::before { content: ""; position: fixed; top: -100px; right: 0; bottom: -100px; left: 0; z-index: -1; background: rgba(15,23,42,.45); pointer-events: none; }   /* 가림막 = 화면보다 위아래 100 더 — 폰 브라우저 아래 주소 줄 · 도구 줄 자리까지 덮는다(inset:0 만으로는 아래가 밝게 남았다, 2026-11-14 사용자). 누르면 팝업 바깥(.rt-pop) 누르기로 닫힌다 */
 html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업이 열린 동안 뒤 본문이 스크롤되지 않게 (2026-11-07 사용자 P350) */
 .rt-pop[hidden] { display: none; }
 .rt-pop-box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
@@ -1197,14 +1242,17 @@ html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업�
 .rt-pop-head::after { content: ""; position: absolute; left: 20px; right: 12px; bottom: 0; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색 (2026-10-18 사용자). 폭은 제목 왼쪽 선(20px) ~ 닫기 버튼 오른쪽 선(12px)까지 (같은 날 사용자) */
 .rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
 .rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 25px; color: #111; word-break: keep-all; overflow-wrap: anywhere; }   /* 줄바꿈 = 띄어쓰기 기준 (2026-11-07 사용자 P375) */
-.rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 35px; color: #333; word-break: keep-all; }
+.rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 28px; color: #333; word-break: keep-all; }   /* 팝업 글 = 이슈 날짜 팝업과 같은 19/28, 폰도 같다 (2026-11-14 사용자: 35 → 28) */
 /* 툴팁 내용 행간 = 본문 35px(2026-11-06 34 → 35, 19/35 홀짝 맞춤) (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
-.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 9px 0; padding-left: 8px; }   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
-.rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }
+.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 21px 0 11px; padding-left: 7px; }   /* 줄 사이 보이는 간격 = 이슈 날짜 팝업(행간 28 · 여백 21)과 같게 — 행간 35 라 여백 14 · 들여쓰기 7 (2026-11-14 사용자) */   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
+.rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 12px; border-radius: 50%; background: #111; }   /* 행간 28 가운데 · 점 색 #111 = 다른 팝업과 같게 (2026-11-14 사용자) */
 .rt-pop-li > span:last-child { min-width: 0; }
-.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 12px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
+.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 21px; }   /* 묶음 사이 21 = 이슈 날짜 팝업 기사 사이 (2026-11-14 사용자) */
+.rt-pop-body > .rt-pop-p:first-child, .rt-pop-body > .rt-pop-li:first-child { margin-top: 14px; }   /* 툴팁 내용 시작 = 구분선 아래 26(위 12 + 14), 이슈 날짜 팝업과 같다 (2026-11-14 사용자) */
+.share-pop .share-buttons { margin-top: 14px; }   /* 공유 · 계정 내용 시작 = 구분선 아래 26 (위 12 + 14), 이슈 날짜 팝업 기준 (2026-11-14 사용자) */
+.as-acct .rt-pop-body > :first-child { margin-top: 14px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
 .rt-pop-p b { color: #111; }
-.rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 14px; line-height: 20px; color: #7A7A7A; }   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 (2026-10-20 사용자) */
+.rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 13px; line-height: 19px; color: #6B7280; }   /* 팝업 맨 아래 작은 글자 = 원문 보기 링크와 같은 13/19 #6B7280 (2026-11-14 사용자) */   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 (2026-10-20 사용자) */
 /* 기사 번역 안내 (2026-10-19 사용자) — 기사 제목은 원문, 옆 '번역 방법' 14px 회색 밑줄 글자 버튼. 누르면 브라우저 번역법 팝업(툴팁 팝업과 같은 상자).
    구글 번역 주소로 여는 방식은 한국에서 막혀 있어 뺐다 (같은 날) */
 /* 뉴스 팝업 (2026-11-05 batch 8 ⑤ ⑥ ⑦) — 툴팁 팝업 상자 그대로, 글만 16px · 행간 26. 분야 칩은 눌린 것만 검정 */
@@ -1254,7 +1302,9 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .img-pop-scroll { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 0 16px; }
 .img-pop-scroll img { display: block; flex: none; max-width: none; height: auto; border-radius: 8px; background: #fff; }
 .img-pop-hint { flex: none; padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); font-size: 14px; line-height: 20px; color: rgba(255,255,255,.8); text-align: center; }
-.rt-pop-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 20px; line-height: 28px; cursor: pointer; }
+.rt-pop-close { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 0; cursor: pointer; }
+.rt-pop-close::before { content: ""; width: 14px; height: 14px; background: currentColor; -webkit-mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 3l8 8M11 3l-8 8'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 3l8 8M11 3l-8 8'/%3E%3C/svg%3E") center / contain no-repeat; }
+.rt-pop-close:hover { border-color: #111; }   /* 닫기 = 테두리 네모 32 · #E2E8F0 · 모서리 8 · 흰 바탕 · #111 × 선 2 — 모든 닫기 통일(2026-11-14 사용자: "닫기 버튼은 네모 박스", 11-12 회색 원 폐지). 글자 × 는 font-size 0 으로 숨기고 그림만 */
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
@@ -1275,6 +1325,7 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
+.post-body .rt-sub[data-mid] { margin: 20px 0 22px; }   /* 중간 서브탭(앞에 보이는 내용이 있을 때) = 위 +20 · 아래 +10 (2026-11-13 사용자, 공통) */
 .post-body .rt-subtab { flex: none; padding: 6px 11px; font: inherit; font-size: 19px; line-height: 25px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
 /* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.
@@ -1536,6 +1587,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .section-title { font-size: 18.5px; line-height: 23.5px; }
   .report-title { font-size: 18.5px; line-height: 23.5px; }
   #hypo-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
+  #issue-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
   #radar-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
   .kv-value { font-size: 16px; line-height: 21px; }
   .kv-stat-value { font-size: 16px; line-height: 23.5px; }
@@ -1551,8 +1603,6 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-title { font-size: 28px; line-height: 36px; }
   .post-body { font-size: 16px; line-height: 32px; }
   .rt-pop-title { font-size: 16px; line-height: 21px; }
-  .rt-pop-body { font-size: 16px; line-height: 32px; }
-  .rt-pop-close { font-size: 17px; line-height: 24px; }
   .post-body .rt-tab { font-size: 16px; line-height: 21.5px; }
   .post-body .rt-subtab { font-size: 16px; line-height: 21px; }
   .post-body .rt-seg { font-size: 16px; line-height: 21px; }
@@ -1581,10 +1631,19 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-body [style*="line-height:34px"], .post-body [style*="line-height: 34px"] { line-height: 32px !important; }
   .post-body li[style*="line-height:34px"] > span[style*="height:2px"][style*="margin-top:16px"] { margin-top: 15px !important; }
   .post-body li[style*="line-height:34px"] > span[style*="height:3px"][style*="margin-top:15px"] { margin-top: 14px !important; }
-  .report-columns li::before, .kv-row--block li::before, .rt-pop-dot { margin-top: 14px; }
+  .report-columns li::before, .kv-row--block li::before { margin-top: 14px; }
   :root { --sans: 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; --report-font: 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
   .logo-word { font-family: 'Noto Sans KR', sans-serif; }
-  .post-body [style*="font-family"]:not([style*="monospace"]) { font-family: var(--report-font) !important; }
+  .post-body [style*="font-family"]:not([style*="monospace"]):not([data-brand-font]) { font-family: var(--report-font) !important; }
+  .post-body [data-brand-font] { font-family: 'Noto Sans KR', sans-serif !important; }
+  .post-body [data-brand-font="17"] { font-size: 13px !important; }
+  .post-body [data-brand-font="18"] { font-size: 13px !important; }
+  .post-body [data-brand-font="19"] { font-size: 13px !important; }
+  .post-body [data-brand-font="20"] { font-size: 14px !important; }
+  .post-body [data-brand-font="21"] { font-size: 15px !important; }
+  .post-body [data-brand-font="22"] { font-size: 15px !important; }
+  .post-body [data-brand-font="26"] { font-size: 19px !important; }
+  .post-body [data-brand-font="28"] { font-size: 21px !important; }
   body { -webkit-text-stroke: 0.25px; }
 }
 
@@ -1595,14 +1654,24 @@ body.no-dashboard .main-content { padding-top: 32px; }
 .as-search-btn svg, .as-search-form svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 html.as-lock, html.as-lock body { overflow: hidden; }
 
-.as-search-layer { position: fixed; inset: 0; z-index: 200; background: rgba(15, 23, 42, .45); overflow-y: auto; }
+.as-search-layer { position: fixed; inset: 0; z-index: 200; background: transparent; overflow-y: auto; }   /* 가림막은 ::before (팝업과 같이, 2026-11-14 사용자) */
 .as-search-layer[hidden], .as-chat[hidden], .as-chat-fab[hidden] { display: none; }
 .as-search-box { max-width: 760px; margin: 0 auto; min-height: 120px; background: var(--bg, #fff); border-radius: 0 0 16px 16px; padding: 18px 24px 28px;
   box-shadow: 0 12px 40px rgba(15, 23, 42, .18); font-family: var(--sans); color: var(--ink, #0F172A); }
 .as-search-form { display: flex; align-items: center; gap: 10px; border-bottom: 2px solid var(--ink, #0F172A); padding: 6px 0 10px; }
 .as-search-form input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; font-size: 20px; background: transparent; color: inherit; }
 .as-search-form input::-webkit-search-cancel-button { display: none; }
-.as-x { border: 0; background: none; color: #6B7280; font: inherit; font-size: 14px; cursor: pointer; padding: 6px 4px; }
+/* 닫기 = 회색 원 안 × (32) · 검색어 지우기 = 작은 회색 원 안 흰 × (20, 글자가 있을 때만) — 2026-11-12 사용자 */
+.as-x, .as-clear { flex: none; display: inline-flex; border: 0; background: none; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.as-x[hidden], .as-clear[hidden] { display: none; }
+.as-x { align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; }   /* 닫기 = 테두리 네모 32 — 모든 닫기 통일 (2026-11-14 사용자: "닫기 버튼은 네모 박스", 11-12 회색 원 폐지) */
+.as-x svg { width: 30px; height: 30px; }
+.as-x circle { display: none; }
+.as-x path { fill: none; stroke: #111; stroke-width: 2; stroke-linecap: round; }
+.as-x:hover { border-color: #111; }
+.as-clear svg { width: 20px; height: 20px; }
+.as-clear circle { fill: #B5BAC0; stroke: none; }
+.as-clear path { fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; }
 .as-search-out { padding-top: 16px; }
 .as-hint { color: #6B7280; font-size: 14px; margin: 12px 0 0; }
 
@@ -1620,65 +1689,115 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-mkt.as-us { background: var(--badge-blue, #4963CA); }
 .as-mkt.as-kr { background: var(--badge-teal, #0F766E); }
 .as-day { margin-left: auto; color: #6B7280; font-size: 13px; }
-.as-say { margin: 4px 0 8px; font-size: 16px; line-height: 1.7; }
+.as-say { margin: 4px 0 8px; font-size: 16px; line-height: 27px; }
 .as-say b, .as-v, .as-grid b, .as-bars b { font-family: var(--num); }
 .as-up { color: var(--up, #E53E3E); }
 .as-dn { color: var(--down, #1A73E8); }
+/* 증감 삼각형 = 옆 숫자의 80% 정수 px · 위로 1 (회원 목업 · 가격 카드 PRICE_TRI 와 같은 방식, 2026-11-12 사용자) */
+.as-tri { position: relative; top: -1px; font-size: 13px; }               /* 문장 16 → 13 */
+.as-grid .as-tri { font-size: 12px; }                                    /* 기간별 등락 15 → 12 */
+.as-bot .as-say .as-tri, .as-bot .as-msg .as-tri { font-size: 12px; }   /* 질문하기 문장 15 → 12 */
+.as-bot .as-grid .as-tri { font-size: 10px; }                            /* 질문하기 기간별 등락 13 → 10 */
 .as-sec { border-top: 1px solid var(--border, #F0F0F0); margin-top: 10px; padding-top: 10px; }
 .as-sec.as-first { border-top: 0; margin-top: 0; padding-top: 0; }   /* 검색한 내용이 카드 첫 칸 — 머리 바로 아래 (2026-11-10) */
-.as-sec h4, .as-related h4 { margin: 0 0 6px; font-size: 14px; color: #475569; font-weight: 700; }
+.as-sec h4 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 15px; line-height: 22px; color: #111; font-weight: 700; }   /* 증시 전망 팝업 소제목과 같은 글씨 15/22 */
+.as-sec h4 small { font-size: 13px; font-weight: 400; color: #6B7280; }   /* 같은 기간 비교 (최근 1주) */
+.as-lv, .as-open { font-style: normal; font-size: 12px; line-height: 18px; padding: 0 5px; border: 1px solid #E2E8F0; border-radius: 4px; color: #6B7280; white-space: nowrap; }   /* 업종 기사 · 향방미정 = 회색 외곽선 라벨 (증시 전망 `논의중` 과 같은 꼴) */
+.as-hz { margin: 6px 0 2px; font-size: 13px; line-height: 19px; color: #6B7280; font-weight: 700; }   /* 알파스코프 신호 단기 · 중기 */
+.as-ico { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #E5E7EB; color: #4B5563; }   /* 기본형 아이콘 (가이드라인 8절) */
+.as-ico svg { width: 12px; height: 12px; display: block; }
+.as-related h4 { margin: 0 0 6px; font-size: 14px; color: #475569; font-weight: 700; }
 .as-related h4 small { font-weight: 400; color: #94A3B8; }
 .as-row { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 15px; }
 .as-k { color: #475569; flex: none; }
 .as-v { text-align: right; word-break: keep-all; }
 .as-v small, .as-news small { color: #94A3B8; }
-.as-note { color: #6B7280; font-size: 13px; line-height: 1.6; margin: 6px 0; }
+.as-note { color: #6B7280; font-size: 13px; line-height: 21px; margin: 6px 0; }
 .as-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .as-grid div { background: var(--surface-sub, #F8FAFC); border-radius: 8px; padding: 8px 4px; text-align: center; }
-.as-grid span { display: block; font-size: 12px; color: #6B7280; }
-.as-grid b { font-size: 15px; }
-.as-bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-items: end; margin: 6px 0 4px; }
-.as-bars div { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; }
-.as-bars i { display: block; width: 60%; background: #CBD5E1; border-radius: 3px 3px 0 0; }
-.as-bars div:last-child i { background: var(--ink, #0F172A); }
-.as-bars span { color: #6B7280; }
+.as-grid div > span { display: block; font-size: 12px; color: #6B7280; }   /* 칸 이름만 — 증감 삼각형(.as-tri)은 숫자와 한 줄 */
+.as-grid b { font-size: 15px; white-space: nowrap; }
+/* 분기 매출 선 그래프 = 가이드라인 9절 선 그래프(dk.trend_card) — 주황 선 2 · 속 빈 점 · 최신 값만 13 굵게 #111 · 세로축 오른쪽 12 · 단위는 머리 12 (2026-11-12 사용자) */
+.as-line { margin: 10px 0 6px; }
+.as-line-unit { text-align: right; font-size: 12px; line-height: 18px; color: #6B7280; margin-bottom: 2px; }
+.as-line-box { position: relative; padding-right: 34px; }
+.as-line-plot { position: relative; }
+.as-dot { position: absolute; box-sizing: border-box; border-radius: 50%; background: #fff; border: 2px solid #F59E0B; }   /* 주황 = dk.CHART_MAIN (2026-11-14 진하게) */
+.as-val { position: absolute; transform: translateX(-50%); white-space: nowrap; font-family: var(--num); font-size: 12px; line-height: 14px; color: #111; }   /* 값 글자 = 모두 검정 (2026-11-14 그래프 통일) */
+.as-val.as-last { font-size: 13px; font-weight: 700; color: #111; }
+.as-val.as-end { transform: none; }   /* 마지막 날 = 점 오른쪽 (가운데 맞춤 없음) */
+.as-line-x { position: relative; height: 40px; margin-top: 6px; }
+.as-line-x span { position: absolute; top: 0; transform: translateX(-50%); text-align: center; white-space: nowrap; font-size: 12px; line-height: 16px; color: #6B7280; }
+.as-line-x span.as-last { color: #D97706; }   /* 최신 가로축 이름 = 진한 주황 (dk.CHART_MAIN_TEXT, 가이드라인 9절) */
+.as-line-y { position: absolute; right: 0; top: 0; width: 30px; }
+.as-line-y span { position: absolute; right: 0; font-family: var(--num); font-size: 12px; line-height: 18px; color: #6B7280; }
 .as-news, .as-posts { list-style: none; margin: 0; padding: 0; }
-.as-news li { padding: 5px 0; font-size: 15px; line-height: 1.6; }
+.as-news li { padding: 5px 0; font-size: 15px; line-height: 24px; }
 .as-news li > span { color: #6B7280; font-family: var(--num); font-size: 13px; margin-right: 8px; }
 .as-more { display: inline-block; margin-top: 10px; font-size: 14px; font-weight: 700; color: var(--ink, #0F172A); text-decoration: none; }
 .as-more:hover { text-decoration: underline; }
-.as-notice { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; font-size: 15px; line-height: 1.6; }
-.as-empty { background: var(--surface-sub, #F8FAFC); border-radius: 10px; padding: 14px; font-size: 15px; line-height: 1.7; margin-bottom: 12px; }
-.as-basis { display: flex; gap: 6px; margin: 8px 0 0; color: #6B7280; font-size: 13px; line-height: 1.6; }
+.as-notice { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; font-size: 15px; line-height: 24px; }
+.as-empty { background: var(--surface-sub, #F8FAFC); border-radius: 10px; padding: 14px; font-size: 15px; line-height: 26px; margin-bottom: 12px; }
+.as-basis { display: flex; gap: 6px; margin: 8px 0 0; color: #6B7280; font-size: 13px; line-height: 21px; }
 .as-basis span { flex: none; }
-.as-related { margin-top: 18px; }
+.as-related { margin-top: 22px; }
+.as-related h4 { font-size: 16px; line-height: 26px; color: #111; margin: 0 0 8px; }
+.as-related .as-h-next { margin-top: 18px; }
+/* 종목 페이지 = 흰 버튼(가이드라인 10절 `.cm-login`: 흰 바탕 · 1px #B5BAC0 · 모서리 8 · #111 16/24 굵게 · 안쪽 11 12 · 가운데 · 폭 전체, 올리면 테두리 #111) */
+.as-go { display: flex; align-items: center; justify-content: center; margin-top: 14px; padding: 11px 12px; border: 1px solid #B5BAC0; border-radius: 8px;
+  background: #fff; color: #111 !important; font-size: 16px; line-height: 24px; font-weight: 700; text-decoration: none; }
+.as-go:hover { border-color: #111; }
+/* 안내 한 줄 = 느낌표 13 + 13/19 회색, 왼쪽 정렬, 아이콘 = 첫 줄 가운데 (증시 전망 근거 안내 why_note 와 같은 꼴) */
+.as-go-note { display: flex; align-items: flex-start; gap: 4px; margin: 8px 0 0; color: #6B7280; font-size: 13px; line-height: 19px; word-break: keep-all; }
+.as-go-note > span:first-child { flex: none; display: flex; align-items: center; height: 19px; }
+.as-go-note svg { display: block; }
+/* 함께 보는 페이지 = 블로그 안 다른 페이지 버튼(가이드라인 10절 R.out_btn: 흰 · #E2E8F0 · 모서리 8 · 14 굵게 · 안쪽 8 12 · 높이 38 · 아이콘 16 오른쪽) */
+.as-out { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 38px; box-sizing: border-box; padding: 8px 12px; margin: 0 0 8px;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111; font-size: 14px; line-height: 20px; font-weight: 400; text-decoration: none; }   /* 굵게 빼기 (2026-11-12 사용자) */
+.as-out:hover { border-color: #111; }
+.as-out small { display: block; font-weight: 400; color: #7A7A7A; font-size: 13px; line-height: 18px; }
+.as-out svg { flex: none; width: 16px; height: 16px; fill: none; stroke: #7A7A7A; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .as-posts li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border, #F0F0F0); font-size: 15px; }
 .as-posts a { color: var(--ink, #0F172A); text-decoration: none; }
 .as-posts a:hover { text-decoration: underline; }
 .as-posts span { color: #94A3B8; font-family: var(--num); font-size: 13px; flex: none; }
 
-/* 질문하기 */
-.as-chat-fab { position: fixed; right: 20px; bottom: 20px; z-index: 150; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px;
-  background: var(--ink, #0F172A); color: #fff; padding: 12px 18px; font: inherit; font-family: var(--sans); font-size: 15px; font-weight: 700;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, .25); cursor: pointer; }
-.as-chat-fab svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+/* 질문하기 — 포인트 = 청록 그라데이션(C5): 질문하기 버튼 · 내 질문 말풍선 · 보내기 · 입력칸 테두리. 옛 주황 #F5B971 + 검정 글자는 안 어울림 (2026-11-12 사용자) */
+:root { --as-point: linear-gradient(135deg, #0E7490 0%, #0369A1 100%); --as-point-ink: #fff; --as-point-icon: currentColor; --as-point-line: transparent;
+  --as-point-edge: linear-gradient(135deg, #0E7490 0%, #0369A1 100%); }   /* 포인트 = C5 청록 → 바다 파랑 그라데이션 + 흰 글자(대비 5.4:1 이상) (2026-11-12 사용자, 시안 mock_point_gradient.html) */
+.as-chat-fab { position: fixed; right: 20px; bottom: 20px; z-index: 150; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--as-point-line); border-radius: 999px;
+  background: var(--as-point); color: var(--as-point-ink); padding: 12px 18px; font: inherit; font-family: var(--sans); font-size: 15px; font-weight: 700;
+  box-shadow: 0 8px 24px rgba(3, 105, 161, .30); cursor: pointer; }
+.as-chat-fab svg { width: 20px; height: 20px; fill: none; stroke: var(--as-point-icon); stroke-width: 1.5; stroke-linejoin: round; }   /* 반짝임 선 1.5 (2026-11-12 사용자) */
 .as-chat { position: fixed; right: 20px; bottom: 20px; z-index: 150; width: 400px; height: min(680px, calc(100vh - 40px)); display: flex; flex-direction: column;
   background: var(--bg, #fff); border: 1px solid var(--border-strong, #E2E8F0); border-radius: 16px; box-shadow: 0 16px 48px rgba(15, 23, 42, .22);
   font-family: var(--sans); color: var(--ink, #0F172A); overflow: hidden; }
-.as-chat > header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border, #F0F0F0); font-size: 16px; }
+/* 머리 닫기 = 검색 창과 같은 테두리 네모 32 (.as-x) — 모든 닫기 통일 (2026-11-14 사용자) */
+.as-chat > header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 10px 16px; border-bottom: 1px solid var(--border, #F0F0F0); font-size: 16px; }
+/* 머리 제목 = 로고 그림(22 × 20, 313:286) + `AlphaScope`(로고 글꼴 Noto Sans KR 900 · 18) + `에 물어보기`(16 보통) (2026-11-12 사용자) */
+.as-chat-title { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; font-size: 16px; line-height: 24px; color: #111; }
+.as-chat-logo { width: 22px; height: 20px; flex: none; display: block; }
+.as-chat-word { font-family: 'Noto Sans KR', sans-serif; font-weight: 900; font-size: 18px; letter-spacing: -0.2px; color: #000; margin-right: 1px; }
 .as-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--surface-sub, #F8FAFC); }
-.as-msg { max-width: 100%; font-size: 15px; line-height: 1.6; }
+.as-msg { max-width: 100%; font-size: 15px; line-height: 24px; }
 .as-msg p { margin: 0 0 8px; }
-.as-me { align-self: flex-end; background: var(--ink, #0F172A); color: #fff; border-radius: 14px 14px 4px 14px; padding: 8px 12px; max-width: 80%; }
+.as-me { align-self: flex-end; background: var(--as-point); color: var(--as-point-ink); border: 1px solid var(--as-point-line); border-radius: 14px 14px 4px 14px; padding: 8px 12px; max-width: 80%; }
 .as-bot { align-self: stretch; }
 .as-bot > p { background: var(--surface, #fff); border: 1px solid var(--border-strong, #E2E8F0); border-radius: 14px 14px 14px 4px; padding: 10px 12px; }
 .as-bot .as-card { margin-bottom: 0; padding: 12px 14px; }
+.as-bot .as-card header { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #E2E8F0; }   /* 종목 이름 아래 구분선 — 이름 ~ 선 12 · 선 ~ 첫 구획 16 (2026-11-12 사용자: 옛 여백 20 → 구분선 추가) */
 .as-bot .as-card h3 { font-size: 16px; }
 .as-bot .as-grid b { font-size: 13px; }
+/* 종목 페이지 버튼 = 질문하기 안에서는 낮게 · 한 단계 작게: 안쪽 위아래 11 → 7(높이 48 → 38) · 글자 16/24 → 15/22 (2026-11-12 사용자) */
+.as-bot .as-go { padding: 7px 12px; font-size: 15px; line-height: 22px; font-weight: 600; }   /* 굵기 700 → 600 (2026-11-12 사용자) */
+.as-bot .as-today { margin-top: 25px; }   /* `오늘 주가` 위 여유 +15 — 위 칸 끝 ~ 구분선 10 → 25 (2026-11-12 사용자) */
+.as-bot .as-go-note { margin-top: 22px; margin-bottom: 4px; }   /* 종목 페이지 버튼 아래 +10 (12 → 22, 2026-11-12 사용자) */   /* 버튼 ~ 안내 8 → 12, 안내 ~ 카드 아래 12 → 16 (2026-11-12 사용자: "딱 붙어있다") */
 .as-bot .as-related { margin-top: 8px; background: var(--surface, #fff); border-radius: 12px; padding: 10px 12px; }
-.as-chat form { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--border, #F0F0F0); }
-.as-chat input { flex: 1; min-width: 0; border: 1px solid var(--border-strong, #E2E8F0); border-radius: 999px; padding: 9px 14px; font: inherit; font-size: 15px; }
-.as-chat form button { border: 0; border-radius: 999px; background: var(--ink, #0F172A); color: #fff; padding: 0 16px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.as-chat form { display: flex; gap: 8px; padding: 10px 12px 20px; border-top: 1px solid var(--border, #F0F0F0); }   /* 보내기 줄 ~ 아래 안내 20 (2026-11-12 사용자) */
+.as-chat input { flex: 1; min-width: 0; border: 1px solid transparent; border-radius: 999px; padding: 9px 14px; font: inherit; font-size: 15px; outline: none;
+  background: linear-gradient(#fff, #fff) padding-box, var(--as-point-edge) border-box; }   /* 입력칸 테두리 = 포인트 그라데이션 1px (2026-11-12 사용자) */
+.as-chat input:focus { box-shadow: 0 0 0 3px rgba(3, 105, 161, .14); }
+.as-chat form button { border: 1px solid var(--as-point-line); border-radius: 999px; background: var(--as-point); color: var(--as-point-ink); padding: 0 16px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
 .as-chat footer { padding: 0 12px 10px; font-size: 12px; color: #94A3B8; text-align: center; }
 
 @media (max-width: 680px) {
@@ -1686,8 +1805,22 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   .as-search-form input { font-size: 17px; }
   .as-grid { grid-template-columns: repeat(3, 1fr); }
   .as-chat { inset: 0; width: auto; height: auto; border-radius: 0; border: 0; }
+  /* 폰: 입력칸 16 — 아이폰은 16 보다 작은 입력칸을 누르면 화면을 확대해서 창 오른쪽(보내기 버튼)이 밖으로 밀렸다 (2026-11-15 사용자: "질문하기를 누르면 보내기 버튼이 화면 밖으로").
+     높이는 search.js 가 키보드 위 보이는 높이(visualViewport)에 맞춘다 */
+  .as-chat input { font-size: 16px; }
   .as-chat-fab { right: 16px; bottom: 16px; padding: 11px 15px; }
 }
+
+/* 검색어 미리보기 (2026-11-16 사용자: 한 글자부터) — 맞는 종목 전부, 칸 안에서 스크롤 · 이름 굵게 · 오른쪽 시장 · 티커 */
+.as-suggest { list-style: none; margin: 8px 0 0; padding: 4px 0; max-height: 320px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: 10px;
+  background: var(--bg, #fff); box-shadow: 0 6px 20px rgba(15, 23, 42, .10); -webkit-overflow-scrolling: touch; }
+.as-suggest[hidden] { display: none; }
+.as-suggest li { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; font-size: 16px; line-height: 24px; color: var(--ink, #0F172A); }
+.as-suggest li + li { border-top: 1px solid #F1F5F9; }
+.as-suggest li:hover, .as-suggest li.on { background: var(--surface-sub, #F8FAFC); }
+.as-sg-n { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.as-sg-t { margin-left: auto; flex: none; font-size: 13px; color: #6B7280; }
+.as-chat form + .as-suggest { position: absolute; left: 12px; right: 12px; bottom: 64px; margin: 0; z-index: 2; }
 /* ==========================================================================
    하단 고정 메뉴 · 전체 메뉴 · 글 끝 순서 (2026-11-12 사용자 여정 테스트 → 확정. 목업 = experiments/mock_server.py /j · /icons, 가이드라인 2절)
    ========================================================================== */
@@ -1704,6 +1837,26 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .menu-items .menu-grp .nav-item { border-bottom: 0 !important; padding: 11px 20px 11px 32px !important; font-size: 15px !important; line-height: 22px !important; font-weight: 400; color: #333; }
 .menu-items .menu-row .nav-item:active, .menu-items .menu-grp .nav-item:active, .menu-items .menu-past:active { background: #F1F5F9; }
 .menu-items .nav-item.is-here { background: #F8FAFC; box-shadow: inset 3px 0 0 #111; font-weight: 700; }   /* 지금 보는 메뉴 — 빨강은 ▲상승과 겹쳐 안 씀 */
+.menu-items .menu-admin[hidden] { display: none; }   /* 관리자 줄 — .menu-row 의 flex 가 hidden 을 이기지 않게 (2026-11-13) */
+/* 로그인 · 계정 (2026-11-13 사용자) — 헤더 메뉴 버튼 앞, 메뉴 버튼과 같은 36 상자. 로그인 뒤엔 상자 안에 내 사진 26 원 */
+.as-login-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; border: 1px solid var(--border-strong); border-radius: 8px; background: #fff; color: var(--gray-600); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.as-login-btn svg { width: 20px; height: 20px; display: block; }
+.as-login-btn img, .as-login-btn .as-ini { width: 26px; height: 26px; border-radius: 50%; display: block; object-fit: cover; }
+.as-login-btn .as-ini { display: flex; align-items: center; justify-content: center; background: #94A3B8; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 26px; }
+.as-login-btn:hover { border-color: #94A3B8; }
+.as-acct .rt-pop-box, .share-pop .rt-pop-box { max-width: 400px; }   /* 짧은 창(계정 · 공유) = 400 (2026-11-14 사용자) */
+.as-acct-x { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; cursor: pointer; }   /* 계정 닫기 = 다른 팝업과 같은 테두리 네모 32 (2026-11-14 사용자) */
+.as-acct-x:hover { border-color: #111; }
+.as-acct-x svg { width: 14px; height: 14px; display: block; }
+.as-acct-note { margin: 0 0 14px; font-size: 14px; line-height: 20px; color: #6B7280; word-break: keep-all; }
+.as-acct-me { display: flex; align-items: center; gap: 10px; margin: 2px 0 14px; font-size: 16px; line-height: 24px; color: #111; }
+.as-acct-me img, .as-acct-me .as-ini { width: 32px; height: 32px; border-radius: 50%; flex: none; object-fit: cover; }
+.as-acct-me .as-ini { display: flex; align-items: center; justify-content: center; background: #94A3B8; color: #fff; font-weight: 700; font-size: 14px; }
+.as-acct-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin: 8px 0 0; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 흰 버튼 = 가이드라인 10절 .cm-login */
+.as-acct-btn:hover { border-color: #111; }
+.as-acct-btn[disabled] { opacity: .5; cursor: default; }
+.as-acct-err { margin: 10px 0 0; font-size: 14px; line-height: 20px; color: #B91C1C; text-align: center; }
+.as-acct-err:empty { display: none; }
 
 /* 하단 고정 메뉴 — 폰 · 태블릿(900 이하)만. 칸 56 + 아래 여백 15, 선택 = 색 #111 + 칸 바탕 #F1F5F9 · 아래 모서리 10. 선 굵기는 화면 px 그대로(non-scaling-stroke) */
 .as-tabbar { display: none; }
@@ -1721,6 +1874,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 
 /* 글 끝 — 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터. 검은 `목록` · `홈으로` 버튼은 숨김(주소는 위쪽 뒤로 가기가 읽는다), 버튼 줄 위아래 구분선 없음 */
 .post-shell .post-nav .post-nav-list { display: none !important; }
+.post-shell .post-nav .post-nav-list.post-nav-study { display: inline-flex !important; padding: 9px 25px; }   /* 주식 공부 글만 가운데 `주식 공부 목록` — 댓글 · TOP 사이, 높이 40 = 양옆 글자 버튼과 같게 · 양옆 16 → 25(가로 15% 넓게, 실측 폭 약 117 → 135, 폰 375 에서 세 버튼이 한 줄 그대로) (2026-11-15 사용자) */
 .post-shell .post-nav, .post-shell.ends-text .post-nav { border-top: 0 !important; border-bottom: 1px solid #E2E8F0 !important; padding-top: 0 !important; padding-bottom: 12px !important; }   /* 버튼 줄 아래 구분선 — 버튼 글자 → 선 20(버튼 안쪽 8 + 12), 그 아래 푸터 · 열린 댓글 (2026-11-12 사용자) */
 .post-nav-cm { color: #6B7280; }   /* 댓글이 없거나 아직 개수를 모를 때 = 회색(글자 · 말풍선 아이콘 모두 currentColor) — 안 고른 칸 색과 같다 (2026-11-12 사용자) */
 .post-nav-cm.has-cm { color: #111; }   /* 댓글이 하나라도 있으면 검정 */
@@ -1863,8 +2017,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
            신호 · 의견 · 주목할 종목은 전날 종가 기준 그대로. 미국 종목은 종가만(한국 독자 기준, 새벽 장중 시세 불필요).
            `장중 차트` 버튼은 누를 때만 우리 15분봉(live_bars.json)을 그 줄 아래에 그린다 — TradingView 무료 위젯은 KRX 종목을 막아 쓰지 않는다. */
         var LIVE_URL = GH + 'live.json', LIVE_BARS_URL = GH + 'live_bars.json', LIVE_KEY = 'as_live_kr';
+        var LIVE_ENABLED = false;   /* 한국 장중 가격 · 장중 차트 끔 (2026-11-12 사용자: 우리는 종목 리포트 블로그 — 장중 가격에 얽매이지 말자, 종가 기준). kr-live 수집도 멈춤. 켜려면 true + kr-live.yml 되살리기 */
+        var mktDay = { us: '', kr: '' };   /* 시장별 종가 날짜 — stocks.json · kr.json 의 day (2026-11-12) */
+        function dayKo(day, part) { var p = String(day || '').split(/[-.]/); return p.length === 3 ? Number(p[1]) + '월 ' + Number(p[2]) + '일 ' + (part || '기준') : ''; }   /* 날짜 표기 `11월 14일 아침` — 독자는 한국 시간 기준, 날짜 뒤 = 아침 · 오후 (2026-11-14 사용자: `미국 시간` 헷갈림. 옛 `11월 11일 기준` 11-12) */
+        function closeKo(day, mkt) { if (!day) return ''; if (mkt !== 'us') return dayKo(day, '오후'); var d = new Date(String(day).slice(0, 10) + 'T00:00:00Z'); if (isNaN(d)) return ''; d.setUTCDate(d.getUTCDate() + 1); return dayKo(d.toISOString().slice(0, 10), '아침'); }   /* 시장 종가일 → 한국 시간: 미국 장은 한국 다음 날 새벽에 끝남 = 다음 날 아침, 한국 = 그날 오후 */
+        function genKo(iso) { var t = Date.parse(iso || ''); if (!(t > 0)) return ''; var k = new Date(t + 9 * 3600000); return dayKo(k.toISOString().slice(0, 10), k.getUTCHours() < 12 ? '아침' : '오후'); }   /* 만든 시각(UTC) → 한국 날짜 + 아침 · 오후 */
+        function nyDay(iso) { var t = Date.parse(iso || ''); return t > 0 ? new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(t)) : ''; }   /* 미국 리포트 = 뉴욕 날짜(장 마감 뒤 실행) = 종가 날짜 */
         var liveOn = false, liveData = null, liveTimer = null;
-        try { liveOn = localStorage.getItem(LIVE_KEY) === '1'; } catch (e) {}
+        try { liveOn = LIVE_ENABLED && localStorage.getItem(LIVE_KEY) === '1'; } catch (e) {}
         function liveRow(r) { return (liveOn && liveData && liveData.stocks && isKR(r) && liveData.stocks[r.s]) || null; }
         function liveOpen() { return !!(liveOn && liveData && liveData.session === 'open'); }
         function pOf(r) { var l = liveRow(r); return l && l.p != null ? l.p : r.p; }
@@ -1880,7 +2040,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function syncLiveUI() {   /* 토글 · 기준 표시는 그 카드가 한국일 때만 */
           [].slice.call(document.querySelectorAll('[data-live-switch]')).forEach(function (lab) {
             var kr = (lab.getAttribute('data-live-switch') === 'rank' ? rankMarket : picksMarket) === 'kr';
-            lab.hidden = !kr; lab.querySelector('input').checked = liveOn;
+            lab.hidden = !kr || !LIVE_ENABLED; lab.querySelector('input').checked = liveOn;
           });
           [].slice.call(document.querySelectorAll('[data-live-note]')).forEach(function (n) {
             var kr = (n.getAttribute('data-live-note') === 'rank' ? rankMarket : picksMarket) === 'kr';
@@ -1891,7 +2051,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var th = document.getElementById('rank-th-price');
           if (th) th.textContent = priceHead();
           var thc = document.getElementById('rank-th-chart');
-          if (thc) thc.hidden = rankMarket !== 'kr';
+          if (thc) thc.hidden = rankMarket !== 'kr' || !LIVE_ENABLED;
+          [].slice.call(document.querySelectorAll('[data-day-note]')).forEach(function (n) { var m = n.getAttribute('data-day-note') === 'rank' ? rankMarket : picksMarket; n.textContent = closeKo(mktDay[m], m); });
         }
         function renderKR() { if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); syncLiveUI(); }
         function fetchLive() {
@@ -1991,7 +2152,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var src = kr ? ((krHome && krHome.stocks) || []).filter(function (s) { return s.top; }) : stocks;   /* 한국 TOP 10 = 유가증권 보통주 가운데 시총 10개 (home_feed_kr 의 top, 기획 11-2) */
           var th = document.getElementById('rank-th-price');
           if (th) th.textContent = priceHead();   /* 장중 가격이 켜진 장중엔 현재가 (2026-11-05) · 미국은 data.json 장 상태 (2026-11-10) */
-          var thc = document.getElementById('rank-th-chart'); if (thc) thc.hidden = !kr;
+          var thc = document.getElementById('rank-th-chart'); if (thc) thc.hidden = !kr || !LIVE_ENABLED;
 
           if (!src.length) {
             var tr = el('tr');
@@ -2052,7 +2213,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             tr.appendChild(tdTurn);
 
 
-            if (kr) tr.appendChild(chartTd('rank', s));   /* 장중 차트 (2026-11-05) */
+            if (kr && LIVE_ENABLED) tr.appendChild(chartTd('rank', s));   /* 장중 차트 (2026-11-05) */
             if (folded) { tr.className = 'rank-more'; tr.hidden = !rankOpen; }
             body.appendChild(tr);
             if (kr && openChart.rank === s.s && !(folded && !rankOpen)) body.appendChild(chartRow('rank', s, 7));
@@ -2153,16 +2314,33 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           ebStop();
           if (document.querySelectorAll('#event-banner .eb-dot').length > 1) ebTimer = setInterval(function () { ebGo(ebIndex + 1); }, EVENT_MS);
         }
+        var eventLoaded = { us: false, kr: false };
+        var STUDY_BG = '#48427F';
+        function studySlide() {   /* 일정이 없을 때 주식 공부 배너 (2026-11-15 사용자) — 홈 아래 주식 공부 배너와 같은 곳으로 */
+          var a = el('a', 'eb-slide eb-study'); a.href = '/p/study.html';
+          var im = document.createElement('img');
+          im.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/top_banner.webp?v=2';
+          im.width = 1110; im.height = 291; im.alt = '주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'; im.decoding = 'async';
+          a.appendChild(im);
+          return a;
+        }
         function setEvents(market, list) {
           eventFeeds[market] = list || [];
+          eventLoaded[market] = true;
           var box = document.getElementById('event-banner');
           var track = box && box.querySelector('[data-hook="event-slides"]');
           var dotBox = box && box.querySelector('[data-hook="event-dots"]');
           if (!track || !dotBox) return;
           var picks = pickEvents(), today = kstToday();
           track.textContent = ''; dotBox.textContent = '';
-          box.hidden = !picks.length;
-          if (!picks.length) { ebStop(); return; }
+          if (!picks.length) {   /* 일정이 없으면 주식 공부 배너 — 그 화면의 일정 파일을 다 받은 뒤에만(먼저 온 다른 시장 파일로 잠깐 깜빡이지 않게) */
+            ebStop(); ebIndex = 0; track.style.transform = '';
+            var ready = HOME_MKT ? eventLoaded[HOME_MKT] : (eventLoaded.us && eventLoaded.kr);
+            box.hidden = !ready;
+            if (ready) { box.style.setProperty('--eb-bg', STUDY_BG); track.appendChild(studySlide()); dotBox.hidden = true; }
+            return;
+          }
+          box.hidden = false;
           picks.forEach(function (x, i) {
             track.appendChild(eventSlide(x, today));
             var d = el('button', 'eb-dot'); d.type = 'button'; d.setAttribute('aria-label', (i + 1) + '번째 일정');
@@ -2243,14 +2421,16 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             });
             box.appendChild(more);
           }
-          ntDays[market] = n.day;
-          var days = Object.keys(ntDays).map(function (k) { return ntDays[k]; }).filter(Boolean).sort();
-          if (days.length) setDate('notable-card', ntMd(days[days.length - 1]) + ' 기준');
+          ntDays[market] = mktDay[market] || n.day;   /* 머리 날짜 = 그 시장 종가 날짜(통일, 2026-11-12) — 급락일은 카드 안 `마지막 급락일` */
+          var days = Object.keys(ntDays).filter(function (k) { return ntDays[k]; }).map(function (k) {   /* 한국 시간으로 바꿔 가장 늦은 것 — 미국 = 다음 날 아침, 한국 = 그날 오후 (2026-11-14) */
+            var d = new Date(String(ntDays[k]).slice(0, 10) + 'T00:00:00Z'); if (k === 'us') d.setUTCDate(d.getUTCDate() + 1); return [d.toISOString().slice(0, 10) + (k === 'us' ? '0' : '1'), k];
+          }).sort();
+          if (days.length) { var lastNt = days[days.length - 1][1]; setDate('notable-card', closeKo(ntDays[lastNt], lastNt)); }
         }
 
         fetch(KR_URL + '?v=' + Date.now())
           .then(function (r) { return r.json(); })
-          .then(function (json) { krHome = json; setEvents('kr', json.events); renderNotable('kr', json.notable); if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); syncLiveUI(); })
+          .then(function (json) { krHome = json; mktDay.kr = json.day || ''; setEvents('kr', json.events); renderNotable('kr', json.notable); if (rankMarket === 'kr') renderRankings(); if (picksMarket === 'kr') renderPicks(); syncLiveUI(); })
           .catch(function () { renderNotable('kr', null); });
 
         /* ================================================= 증시 전망 (hypo.json, 2026-11-08 사용자 H34) — experiments/issue_store/forecast_daily.py 가 하루 1회 gh-pages 에 올린다.
@@ -2259,8 +2439,11 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var box = document.querySelector('[data-hook="hypo-rows"]');
           if (!box) return;
           box.textContent = '';
+          if (HOME_MKT === 'kr') { var hc = document.getElementById('hypo-card'), ht = document.querySelector('#hypo-col .report-title');
+            if (hc) hc.href = '/p/forecast-list.html#tab-1'; if (ht) ht.setAttribute('data-href', '/p/forecast-list.html#tab-1'); }
           if (!j) { box.appendChild(el('div', 'hypo-empty', LOAD_FAILED)); return; }
-          var rows = j.open || [];
+          /* 미국 · 한국 화면이면 그 나라 전망만 (2026-11-12 사용자 홈 나누기) — market 없는 옛 자료는 미국. 한국 화면 카드는 목록 한국 탭(#tab-1)으로 */
+          var rows = (j.open || []).filter(function (q) { return !HOME_MKT || (q.market || 'us') === HOME_MKT; });
           if (!rows.length) { box.appendChild(el('div', 'hypo-empty', '지금 지켜보는 전망이 없습니다')); }
           rows.forEach(function (q) {
             var d = el('div', 'kv-row plain-row', q.title);
@@ -2271,12 +2454,39 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             if (q.url) { d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', q.url); }
             box.appendChild(d);
           });
-          if (j.generated) setDate('hypo-card', ntMd(String(j.generated).slice(0, 10)) + ' 기준');
+          if (j.generated) setDate('hypo-card', genKo(j.generated));   /* 한국 날짜 — generated 는 UTC 라 아침 실행이 하루 앞으로 보였다 (2026-11-12) */
         }
         fetch(GH + 'hypo.json?v=' + Date.now())
           .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
           .then(renderHypo)
           .catch(function () { renderHypo(null); });
+
+              /* ================================================= Hot Issue (issues.json, 2026-11-16 사용자) — experiments/issue_store/issue_watch_daily.py 가 07:30 본 실행에 gh-pages 에 올린다.
+                 j = { generated, issues: [{ id, name, url, gauge, kind, hot }] }. 줄 = 이슈 이름 + 바늘 말 라벨 + `최근 일주일 뉴스`(평소보다 많으면 덧붙임). 자료가 없으면 카드 숨김(빈 카드 X) */
+              function renderIssues(j) {
+                var col = document.getElementById('issue-col'), box = document.querySelector('[data-hook="issue-rows"]');
+                if (!col || !box) return;
+                var rows = (j && j.issues) || [];
+                if (!rows.length) { col.hidden = true; return; }
+                col.hidden = false;
+                box.textContent = '';
+                rows.forEach(function (q) {
+                  var d = el('div', 'kv-row plain-row', q.q || q.name);   /* 줄 = 이슈 페이지 질문 제목(증시 전망 카드처럼) */
+                  var labels = el('div', 'news-labels');
+                  labels.appendChild(el('span', 'news-tag issue-tag ' + (q.kind || 'neutral'), q.gauge || '향방미정'));
+                  labels.appendChild(el('span', 'news-sub', '최근 일주일 뉴스' + (q.hot ? ' · 평소보다 많음' : '')));
+                  d.appendChild(labels);
+                  if (q.url) { d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', q.url); }
+                  box.appendChild(d);
+                });
+                var card = document.getElementById('issue-card'), ht = document.querySelector('#issue-col .report-title');
+                if (rows[0].url) { if (card) card.href = rows[0].url; if (ht) ht.setAttribute('data-href', rows[0].url); }
+                if (j.generated) setDate('issue-card', genKo(j.generated));
+              }
+              fetch(GH + 'issues.json?v=' + Date.now())
+                .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+                .then(renderIssues)
+                .catch(function () { renderIssues(null); });
 
         fetch(DATA_URL + '?v=' + Date.now())
           .then(function (r) { return r.json(); })
@@ -2382,7 +2592,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             var tr = el('tr');
             var tdName = el('td', 'col-name'); tdName.appendChild(feedCell(r)); tr.appendChild(tdName);
             var tdPrice = el('td'); tdPrice.appendChild(feedPrice(r)); tr.appendChild(tdPrice);
-            if (isKR(r)) tr.appendChild(chartTd('watch', r));   /* 장중 차트 (2026-11-05) */
+            if (isKR(r) && LIVE_ENABLED) tr.appendChild(chartTd('watch', r));   /* 장중 차트 (2026-11-05) */
             body.appendChild(tr);   /* 테마 종목은 더 보기 없이 묶음 종목 전부 (2026-10-25 사용자) */
             if (isKR(r) && openChart.watch === r.s) body.appendChild(chartRow('watch', r, 3));
           });
@@ -2416,7 +2626,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             tr.appendChild(tdName);
             var tdSector = el('td', 'col-sector'); tdSector.appendChild(el('span', 'cell-sector', x.sector)); tr.appendChild(tdSector);   /* 종목 → 업종 → 종가 (2026-10-25 사용자) */
             var tdPrice = el('td'); tdPrice.appendChild(feedPrice(top)); tr.appendChild(tdPrice);
-            if (isKR(top)) tr.appendChild(chartTd('sector', top));   /* 장중 차트 (2026-11-05) */
+            if (isKR(top) && LIVE_ENABLED) tr.appendChild(chartTd('sector', top));   /* 장중 차트 (2026-11-05) */
             body.appendChild(tr);   /* 업종 줄은 접기 없이 전부 (2026-10-25 사용자: 시장 흐름과 종목의 더 보기 버튼 전부 삭제) */
             if (isKR(top) && openChart.sector === top.s) body.appendChild(chartRow('sector', top, 4));
           });
@@ -2446,6 +2656,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             feedWatch = json.watch || [];
             feedSectors = json.sectors || [];
             setEvents('us', json.events);
+            mktDay.us = json.day || ''; syncLiveUI();
             setPicksDay(json.day);
             renderNotable('us', json.notable);   /* 주목할 종목 (H28) */
             renderWatchTabs(); renderWatch(); renderSectorTop();
@@ -2525,8 +2736,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var media = it.kind === 'media';
           homePop.querySelector('.rt-pop-title').textContent = it.title;
           var body = homePop.querySelector('.rt-pop-body'); body.textContent = '';
-          it.lines.forEach(function (ln) {
-            var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:11px 0;';   /* 행간 28 · 항목 여백 11 (P359) */
+          it.lines.forEach(function (ln, i) {
+            var row = el('span'); row.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin:' + (i ? 21 : 14) + 'px 0 11px;padding-left:7px;';   /* 행간 28 · 첫 줄 위 14 · 줄 사이 21 · 들여쓰기 7 = 이슈 날짜 팝업 기준 (2026-11-14 사용자, design_kit.pop_li_margin) */
             var dot = el('span'); dot.style.cssText = 'flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;';
             /* 발언자 = 내용 뒤 작은 회색 `- 이름`, 이름 없으면 `- 방송 의견` (P353, design_kit.speaker_split 과 같은 규칙) */
             var m = /^\s*([^:：]{0,30}?)\s*(진행자 발언|기자 보도|발언|진행자|앵커|보도|발표)\s*[:：]\s*(.+)$/.exec(ln), who = '';   /* 접두 꼴 넓힘 (P377) */
@@ -2936,6 +3147,63 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           if (!src || !src.getAttribute('src')) return;
           fillChartSrc(hook, src.getAttribute('src'), src.getAttribute('alt'));
         }
+        /* 홈 증시 카드 하루(장중) 그래프 (2026-11-14 사용자, 시안 B1 — 목업 design-samples/mock_home_card_day).
+           재료 = 카드 JSON intraday {sym, prev, close, h, l, m:[장 시작부터 분], c:[값]} (home_card.py --intraday, 5분봉). 없거나 모자라면 false → 옛 그림.
+           선 = 전날 종가 위 빨강 · 아래 파랑 + 옅은 면, 점선 = 전날 종가, 배경 가로 눈금 3줄. 글자는 모두 HTML:
+           오른쪽 위 = ▲▼ 전날 대비 %(14) · 종가(16), 둘 다 그날 등락 색 / 최고(빨강) · 최저(파랑) 12 — 점 옆, 상자 끝에서 10 띄움 */
+        function fillDayChart(hook, d) {
+          var im = document.querySelector('[data-hook="' + hook + '"]');
+          if (!im || !d || !d.m || !d.c || d.c.length < 20 || d.m.length !== d.c.length) return false;
+          var W = 340, H = 150, T = 52, B = 32, S = 390, UP = '#d93025', DN = '#1a73e8';
+          var pc = +d.prev, close = +d.close;
+          var lo = Math.min.apply(null, d.c.concat([pc])), hi = Math.max.apply(null, d.c.concat([pc]));
+          if (!(hi > lo) || !(pc > 0)) return false;
+          function X(m) { return 2 + Math.min(m, S) / S * (W - 4); }
+          function Y(v) { return T + (hi - v) / (hi - lo) * (H - T - B); }
+          function f1(n) { return n.toFixed(1); }
+          function money(n) { return (+n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+          var pts = d.m.map(function (m, i) { return [X(m), Y(d.c[i])]; });
+          var top = pts[0], bot = pts[0];
+          pts.forEach(function (p) { if (p[1] < top[1]) top = p; if (p[1] > bot[1]) bot = p; });
+          var by = Y(pc), id = 'dc-' + hook;
+          var line = pts.map(function (p) { return f1(p[0]) + ',' + f1(p[1]); }).join(' ');
+          var area = 'M' + f1(pts[0][0]) + ',' + f1(by) + ' L' + line.split(' ').join(' L') + ' L' + f1(pts[pts.length - 1][0]) + ',' + f1(by) + ' Z';
+          var ns = ' vector-effect="non-scaling-stroke"';
+          var grid = [1, 2, 3].map(function (k) { return '<line x1="0" x2="' + W + '" y1="' + f1(H * k / 4) + '" y2="' + f1(H * k / 4) + '" stroke="#EEF1F5" stroke-width="1"' + ns + '/>'; }).join('');
+          function half(c, clip) {
+            return '<g clip-path="url(#' + clip + ')"><path d="' + area + '" fill="url(#g' + clip + ')"/><polyline points="' + line + '" fill="none" stroke="' + c + '" stroke-width="1.8" stroke-linejoin="round"' + ns + '/></g>';
+          }
+          var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + grid +
+            '<defs><clipPath id="' + id + 'u"><rect x="0" y="0" width="' + W + '" height="' + f1(by) + '"/></clipPath>' +
+            '<clipPath id="' + id + 'd"><rect x="0" y="' + f1(by) + '" width="' + W + '" height="' + f1(H - by) + '"/></clipPath>' +
+            '<linearGradient id="g' + id + 'u" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + UP + '" stop-opacity=".22"/><stop offset="1" stop-color="' + UP + '" stop-opacity=".02"/></linearGradient>' +
+            '<linearGradient id="g' + id + 'd" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + DN + '" stop-opacity=".22"/><stop offset="1" stop-color="' + DN + '" stop-opacity=".02"/></linearGradient></defs>' +
+            half(UP, id + 'u') + half(DN, id + 'd') +
+            '<line x1="0" x2="' + W + '" y1="' + f1(by) + '" y2="' + f1(by) + '" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="2 3"' + ns + '/>' +
+            '<circle cx="' + f1(top[0]) + '" cy="' + f1(top[1]) + '" r="3" fill="#fff" stroke="' + UP + '" stroke-width="1.5"' + ns + '/>' +
+            '<circle cx="' + f1(bot[0]) + '" cy="' + f1(bot[1]) + '" r="3" fill="#fff" stroke="' + DN + '" stroke-width="1.5"' + ns + '/></svg>';
+          function mark(p, kind, col, val) {
+            var x = p[0] / W * 100, y = p[1] / H * 100, hx, tx, ty = kind === '최고' ? 'calc(-100% - 5px)' : '5px';
+            if (x < 20) { hx = 'left:10px;'; tx = '0'; }
+            else if (x > 80) { hx = 'right:10px;'; tx = '0'; }
+            else { hx = 'left:' + f1(x) + '%;'; tx = '-50%'; }
+            if (kind === '최고' && x > 50 && p[1] - 23 < 39) { hx = 'right:' + f1(100 - x) + '%;'; tx = '-8px'; ty = '-50%'; }   /* 오른쪽 위 숫자 자리 → 점 왼쪽 옆 */
+            return '<span class="day-mark" style="' + hx + 'top:' + f1(y) + '%;transform:translate(' + tx + ',' + ty + ');color:' + col + ';"><span class="k">' + kind + '</span> ' + money(val) + '</span>';
+          }
+          var ch = close - pc, col = ch > 0 ? UP : ch < 0 ? DN : '#111', tri = ch > 0 ? '▲' : ch < 0 ? '▼' : '';
+          var pct = Math.abs(ch / pc * 100).toFixed(2) + '%';
+          var old = im.parentNode.querySelector('.day-chart');
+          if (old) old.parentNode.removeChild(old);
+          var box = document.createElement('div');
+          box.className = 'day-chart';
+          box.setAttribute('role', 'img');
+          box.setAttribute('aria-label', (d.sym === '^KS11' ? '코스피' : 'S&P 500') + ' 하루 그래프: 종가 ' + money(close) + ', 전날보다 ' + pct + (ch < 0 ? ' 하락' : ch > 0 ? ' 상승' : ''));
+          box.innerHTML = svg + '<div class="day-head" style="color:' + col + ';"><span class="day-chg">' + tri + pct + '</span><span class="day-num">' + money(close) + '</span></div>' +
+            mark(top, '최고', UP, d.h) + mark(bot, '최저', DN, d.l);
+          im.hidden = true;
+          im.parentNode.insertBefore(box, im);
+          return true;
+        }
         function fillChartSrc(hook, src, alt) {   /* 카드 재료 JSON 의 chart {src, alt} (H31) */
           var im = document.querySelector('[data-hook="' + hook + '"]');
           if (!im || !src) return;
@@ -2968,7 +3236,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
                 var d = new DOMParser().parseFromString('<body>' + j.sections[k], 'text/html');
                 sec[k] = [].slice.call(d.body.children);
               });
-              return { title: j.title, href: j.url, day: j.date || '', sec: sec, chart: j.chart || null, body: '' };
+              return { title: j.title, href: j.url, day: j.date || '', gen: j.generated || '', sec: sec, chart: j.chart || null, intraday: j.intraday || null, body: '' };
             });
         }
 
@@ -3003,7 +3271,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         /* 카드 그리기 — p = { title, href, day, sec, chart, body } (JSON 경로 · 피드 경로 공통) */
         function renderCard(card, p) {
           var title = p.title, href = p.href, sec = p.sec, body = p.body;
-          setDate(card.id, String(p.day || '').split('.').slice(-2).join('.'));   /* 홈 카드 날짜는 연도 없이 10.23 (2026-10-24 사용자) */
+          setDate(card.id, p.gen ? genKo(p.gen) : dayKo(p.day, card.id === 'kr-report-card' ? '오후' : '아침'));   /* `11월 11일 기준` — 미국 리포트는 종가 날짜(뉴욕), 나머지는 글 날짜 (2026-11-12 사용자: 한글로 통일) */
 
           /* 카드를 누르면 그 글로 간다 */
           var a = document.getElementById(card.id);
@@ -3014,7 +3282,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           if (head && href) { head.setAttribute('data-row-link', '1'); head.setAttribute('data-href', href); }
 
           if (!sec) throw new Error('unparsable');
-          if (card.chart) { if (p.chart) fillChartSrc(card.chart, p.chart.src, p.chart.alt); else fillChart(card.chart, body); }
+          if (card.chart && !fillDayChart(card.chart, p.intraday)) { if (p.chart) fillChartSrc(card.chart, p.chart.src, p.chart.alt); else fillChart(card.chart, body); }   /* 하루 그래프 먼저, 없으면 옛 그림 (2026-11-14) */
 
           if (card.fill) card.fill(sec);
           Object.keys(card.map).forEach(function (hook) {
@@ -3169,6 +3437,121 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             if (oldPager) oldPager.parentNode.replaceChild(pager, oldPager); else grid.parentNode.insertBefore(pager, grid.nextSibling);
             sync();
           }).catch(function () {});
+        })();
+
+        /* ============================================================ 로그인 · 계정 · 관리자 줄 (2026-11-13 사용자: "상단 메뉴 앞에 로그인 버튼", "관리자 페이지는 우측 메뉴 버튼 아래")
+           헤더 `.as-login-btn` — 로그인 전 = 사람 아이콘, 누르면 계정 창(구글 로그인 흰 버튼). 로그인 뒤 = 내 사진, 누르면 계정 창(이름 · [운영 현황] · 로그아웃).
+           방문자 요청 0: Firebase 로그인 도구(gstatic)는 계정 창을 열 때 · 이 기기에서 로그인해 둔 표시(as-signed)가 있을 때만 불러온다.
+           구글 로그인 창은 계정 창의 버튼을 누를 때 연다 — 도구를 그 전에 불러 두어야 폰 브라우저가 팝업을 막지 않는다.
+           블로그 주인(UID)이면 as-admin 표시 → 메뉴 맨 아래 `운영 현황` 줄 + 계정 창 버튼. 누르면 ID 토큰을 운영 Worker /fb-login 으로 POST(주소에 넣지 않음).
+           주소 끝 #ops 도 표시를 남긴다(예비 입구). 로그아웃하면 두 표시를 지운다. */
+        (function () {
+          var btn = document.querySelector('.as-login-btn'), row = document.querySelector('#primary-menu .menu-admin');
+          var OPS = 'https://alphascope-ops-console.red6keep.workers.dev';
+          var SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
+          var CFG = { apiKey: 'AIzaSyDY59SYxDKvQAAOxwbxYwZexolbx_5B-q0', authDomain: 'alphascope-352e9.firebaseapp.com', projectId: 'alphascope-352e9', appId: '1:143644264576:web:96972235fa5e8ac58c3e65', owner: 'u1vln4bbDgSgWQDe2F2FaNs81D43' };   /* 댓글 CFG 와 같은 공개 값 */
+          function flag(k, v) { try { if (v === undefined) return localStorage.getItem(k) === '1'; if (v) localStorage.setItem(k, '1'); else localStorage.removeItem(k); } catch (e) {} return false; }
+          try { if (location.hash === '#ops') { flag('as-admin', true); history.replaceState(null, '', location.pathname + location.search); } } catch (e) {}
+          function showRow() { if (row) row.hidden = !flag('as-admin'); }
+          showRow();
+          var fb = null, au = null, user = null, readyP = null, pop = null, from = null;
+          var ICON = btn ? btn.innerHTML : '';
+          function gProvider(fb) { var p = new fb.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' }); return p; }   /* 매번 계정 고르는 창 — 계정이 둘 이상이면 마지막 계정으로 바로 들어가던 것 (2026-11-13 사용자) */
+          function load(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+          function ready() {
+            if (readyP) return readyP;
+            readyP = (window.firebase && window.firebase.auth ? Promise.resolve()
+              : (window.firebase ? Promise.resolve() : load(SDK + 'firebase-app-compat.js')).then(function () { return load(SDK + 'firebase-auth-compat.js'); }))
+              .then(function () {
+                fb = window.firebase;
+                if (!fb.apps.length) fb.initializeApp({ apiKey: CFG.apiKey, authDomain: CFG.authDomain, projectId: CFG.projectId, appId: CFG.appId });
+                au = fb.auth(); au.languageCode = 'ko';
+                return new Promise(function (ok) { var first = true; au.onAuthStateChanged(function (u) { setUser(u); if (first) { first = false; ok(); } }); });
+              });
+            readyP.catch(function () { readyP = null; });
+            return readyP;
+          }
+          function mk(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+          function face(u) {
+            if (u.photoURL) { var im = document.createElement('img'); im.alt = ''; im.referrerPolicy = 'no-referrer'; im.src = u.photoURL; return im; }
+            return mk('span', 'as-ini', (u.displayName || '?').charAt(0));
+          }
+          function setUser(u) {
+            user = u || null;
+            flag('as-signed', !!user);
+            flag('as-admin', !!user && user.uid === CFG.owner);
+            showRow();
+            if (btn) { btn.innerHTML = ''; if (user) { btn.appendChild(face(user)); btn.setAttribute('aria-label', '내 계정'); } else { btn.innerHTML = ICON; btn.setAttribute('aria-label', '로그인'); } }
+            if (pop && !pop.hidden) paint();
+          }
+          /* 운영 현황 — 토큰을 POST(form) 로 Worker 에 */
+          function goOps() {
+            if (!user || user.uid !== CFG.owner) { location.href = OPS + '/'; return Promise.resolve(); }
+            return user.getIdToken(true).then(function (t) {
+              var f = document.createElement('form'); f.method = 'POST'; f.action = OPS + '/fb-login'; f.style.display = 'none';
+              var i = document.createElement('input'); i.type = 'hidden'; i.name = 'id_token'; i.value = t; f.appendChild(i);
+              document.body.appendChild(f); f.submit();
+            });
+          }
+          /* 계정 창 — 툴팁 팝업(.rt-pop)과 같은 상자, 닫기 = 회색 원 */
+          var G = '<svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 0 1 0-3.4V5H.9a9 9 0 0 0 0 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.5 1.4l2.6-2.6A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>';
+          function close() { if (pop) pop.hidden = true; if (from) from.focus(); }
+          function paint() {
+            var body = pop.querySelector('.rt-pop-body'), title = pop.querySelector('.rt-pop-title');
+            body.textContent = '';
+            var err = mk('p', 'as-acct-err');
+            if (!user) {
+              title.textContent = '로그인';
+              body.appendChild(mk('p', 'as-acct-note', '댓글에 쓰는 구글 계정으로 로그인합니다.'));
+              var lg = mk('button', 'as-acct-btn'); lg.type = 'button'; lg.innerHTML = G + '<span>Google 계정으로 로그인</span>';
+              lg.disabled = !au;
+              if (!au) ready().then(function () { lg.disabled = false; }, function () { err.textContent = '로그인 도구를 불러오지 못했어요. 잠시 뒤에 다시 시도해 주세요.'; });
+              lg.addEventListener('click', function () {
+                lg.disabled = true; err.textContent = '';
+                au.signInWithPopup(gProvider(fb)).then(function (r) { setUser(r.user); }, function (e) {
+                  var m = String((e && (e.code || e.message)) || '');
+                  if (/popup-blocked/.test(m)) err.textContent = '로그인 창이 열리지 않았어요. 브라우저의 팝업 차단을 잠시 풀고 다시 눌러 주세요.';
+                  else if (/unauthorized-domain|operation-not-allowed/.test(m)) err.textContent = '지금은 로그인을 준비하고 있어요. 잠시 뒤에 다시 시도해 주세요.';
+                  else if (!/popup-closed|cancelled-popup/.test(m)) err.textContent = '로그인하지 못했어요. 잠시 뒤에 다시 시도해 주세요.';
+                }).then(function () { lg.disabled = false; });
+              });
+              body.appendChild(lg);
+            } else {
+              title.textContent = '내 계정';
+              var me = mk('div', 'as-acct-me'); me.appendChild(face(user)); me.appendChild(mk('span', null, user.uid === CFG.owner ? 'AlphaScope 운영자' : (user.displayName || '이름 없음')));
+              body.appendChild(me);
+              if (user.uid === CFG.owner) {
+                var ob = mk('button', 'as-acct-btn', '운영 현황'); ob.type = 'button';
+                ob.addEventListener('click', function () { ob.disabled = true; goOps().catch(function () { location.href = OPS + '/'; }); });
+                body.appendChild(ob);
+              }
+              var out = mk('button', 'as-acct-btn', '로그아웃'); out.type = 'button';
+              out.addEventListener('click', function () { out.disabled = true; au.signOut().then(function () { setUser(null); close(); }, function () { out.disabled = false; }); });
+              body.appendChild(out);
+            }
+            body.appendChild(err);
+          }
+          function open() {
+            if (!pop) {
+              pop = mk('div', 'rt-pop as-acct'); pop.hidden = true;
+              pop.innerHTML = '<div class="rt-pop-box" role="dialog" aria-modal="true" aria-labelledby="as-acct-title"><div class="rt-pop-head"><div class="rt-pop-title" id="as-acct-title"></div>' +
+                '<button type="button" class="as-acct-x" aria-label="닫기"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8"/></svg></button></div><div class="rt-pop-body"></div></div>';
+              document.body.appendChild(pop);
+              pop.querySelector('.as-acct-x').addEventListener('click', close);
+              pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
+              document.addEventListener('keydown', function (e) { if (pop && !pop.hidden && e.key === 'Escape') close(); });
+            }
+            paint(); pop.hidden = false; pop.querySelector('.as-acct-x').focus();
+            if (!au) ready().then(function () { if (!pop.hidden) paint(); }, function () {});
+          }
+          if (btn) btn.addEventListener('click', function () { from = btn; open(); });
+          /* 로그인해 둔 기기 · 관리자 표시가 있으면 미리 불러 사진 · 상태를 맞춘다 (방문자는 표시가 없어 불러오지 않는다) */
+          if (flag('as-signed') || flag('as-admin')) ready().catch(function () {});
+          /* 메뉴 `운영 현황` 줄 — 로그인돼 있으면 바로, 아니면 계정 창(로그인 버튼) */
+          if (row) row.querySelector('a').addEventListener('click', function (ev) {
+            ev.preventDefault();
+            ready().then(function () { if (user && user.uid === CFG.owner) return goOps(); from = btn; open(); }, function () { location.href = OPS + '/'; });
+          });
         })();
 
         /* ============================================================ 모바일 메뉴 (2026-10-12 사용자: 메뉴를 누르면 오른쪽에서 열리는 서랍) */
@@ -3366,10 +3749,10 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             li.appendChild(b); list.appendChild(li);
           }
           function flash(b, msg) { var t = b.querySelector('.platform-sharing-text'), o = t.textContent; t.textContent = msg; setTimeout(function () { t.textContent = o; }, 1500); }
-          var order = { link: 0, facebook: 1, x: 2, kakao: 3 };
+          var order = { link: 0, facebook: 1, x: 2, kakao: 3, telegram: 4, band: 5, threads: 6, more: 7 };   /* 채널 7개 + 링크 복사 (2026-11-14 사용자, 목업 A7-2) */
           function kindOf(li) {
             var t = ((li.textContent || '') + ' ' + (li.innerHTML.match(/sharing-\w+/g) || []).join(' ')).toLowerCase();
-            return /카카오|kakao/.test(t) ? 'kakao' : /facebook|페이스북/.test(t) ? 'facebook' : /twitter|(^|\s)x(\s|$)/.test(t) ? 'x' : 'link';
+            return /카카오|kakao/.test(t) ? 'kakao' : /텔레그램|telegram/.test(t) ? 'telegram' : /밴드|band/.test(t) ? 'band' : /스레드|threads/.test(t) ? 'threads' : /더 보기/.test(t) ? 'more' : /facebook|페이스북/.test(t) ? 'facebook' : /twitter|(^|\s)x(\s|$)/.test(t) ? 'x' : 'link';
           }
           /* 아이콘 네 개를 직접 그린다 — 블로거 기본 아이콘은 이 테마에서 안 그려진다. 링크는 선, 나머지는 채운 로고 (2026-10-23 사용자) */
           var SV = function (inner, stroke) { return '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" style="flex:none;width:20px;height:20px;' + (stroke ? 'fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;' : 'fill:currentColor;stroke:none;') + '">' + inner + '</svg>'; };
@@ -3377,7 +3760,11 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             link: SV('<path d="M10 13a5 5 0 0 0 7.100.1l3-3a5 5 0 0 0-7.100-7.100l-1.700 1.700"/><path d="M14 11a5 5 0 0 0-7.100-.1l-3 3a5 5 0 0 0 7.100 7.100l1.700-1.700"/>', true),
             facebook: SV('<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.990 4.388 10.954 10.125 11.854v-8.385H7.078v-3.470h3.047V9.430c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.830c-1.491 0-1.956.925-1.956 1.874v2.250h3.328l-.532 3.470h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>'),
             x: SV('<path d="M18.901 1.153h3.680l-8.040 9.190L24 22.846h-7.406l-5.800-7.584-6.638 7.584H.474l8.600-9.830L0 1.154h7.594l5.243 6.932ZM17.610 20.644h2.039L6.486 3.240H4.298Z"/>'),
-            kakao: SV('<path d="M12 3c5.799 0 10.500 3.664 10.500 8.185 0 4.520-4.701 8.184-10.500 8.184a13.500 13.500 0 0 1-1.727-.110l-4.408 2.883c-.501.265-.678.236-.482-.486l.998-3.770C2.682 16.700 1.500 14.536 1.500 11.185 1.500 6.664 6.201 3 12 3Z"/>')
+            kakao: SV('<path d="M12 3c5.799 0 10.500 3.664 10.500 8.185 0 4.520-4.701 8.184-10.500 8.184a13.500 13.500 0 0 1-1.727-.110l-4.408 2.883c-.501.265-.678.236-.482-.486l.998-3.770C2.682 16.700 1.500 14.536 1.500 11.185 1.500 6.664 6.201 3 12 3Z"/>'),
+            telegram: SV('<path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>'),   /* 텔레그램 · 스레드 = Simple Icons 13.21.0 공식 모양, 밴드 = 밴드 앱 아이콘 모양 선 그림(공개 묶음에 없다) (2026-11-14 사용자) */
+            threads: SV('<path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/>'),
+            band: '<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true" focusable="false" style="flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M16.2 27.9V8.4a3.9 3.9 0 0 0-3.9-3.9a3.9 3.9 0 0 0-3.9 3.9v19.5"/><path d="M16.2 14.387A15.602 15.602 0 1 1 8.4 27.9"/><path d="M16.2 19.18a11.7 11.7 0 1 1-3.9 8.72V8.4"/><circle cx="24" cy="27.9" r="7.8"/></svg>',
+            more: SV('<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>', true)
           };
           var present = {};
           [].slice.call(list.children).forEach(function (li) { present[kindOf(li)] = 1; });
@@ -3396,7 +3783,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           }
           /* 카카오톡: 카카오 개발자 앱의 JavaScript 키가 있으면 카카오톡 공유창, 없으면 기기 공유창(모바일에서 카카오톡 선택) → 그것도 없으면 주소 복사.
              키는 아래 KAKAO_JS_KEY 에 (사이트 도메인도 카카오 개발자 콘솔에 등록) */
-          var KAKAO_JS_KEY = '';
+          var KAKAO_JS_KEY = '069e629f7c7a8e72eef36026283f1967';
           mkItem('카카오톡', ICONS.kakao,
             function (b) {
               function fallback() {
@@ -3408,17 +3795,31 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               function send() {
                 try {
                   if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY);
-                  window.Kakao.Share.sendDefault({ objectType: 'text', text: shareTitle, link: { mobileWebUrl: shareUrl, webUrl: shareUrl } });
+                  /* 썸네일 카드 (2026-11-15 사용자): 본문의 data-share-img(주식 공부 = 전용 썸네일) → 없으면 공통 로고. 1200×600 */
+                  var si = document.querySelector('img[data-share-img]');
+                  var shareImg = si ? si.getAttribute('src') : 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png';
+                  var shareDesc = ((document.querySelector('meta[name="description"]') || {}).content || '').slice(0, 80);
+                  var lk = { mobileWebUrl: shareUrl, webUrl: shareUrl };
+                  window.Kakao.Share.sendDefault({ objectType: 'feed',
+                    content: { title: shareTitle, description: shareDesc, imageUrl: shareImg, imageWidth: 1200, imageHeight: 600, link: lk },
+                    buttons: [{ title: '자세히 보기', link: lk }] });
                 } catch (err) { fallback(); }
               }
               if (window.Kakao) { send(); return; }
               var sc = document.createElement('script'); sc.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js'; sc.onload = send; sc.onerror = fallback; document.head.appendChild(sc);
             });
-          /* 모든 버튼의 아이콘을 위 것으로 통일하고 순서는 링크 · 페이스북 · X · 카카오톡 */
+          /* 텔레그램 · 밴드 · 스레드 = 각 서비스 공유 주소(키 없음) · 더 보기 = 휴대폰 기본 공유 창, 지원하는 기기(폰)에서만 (2026-11-14 사용자) */
+          function popup(u) { window.open(u, '_blank', 'noopener,width=640,height=560'); }
+          mkItem('텔레그램', ICONS.telegram, function () { popup('https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareTitle)); });
+          mkItem('밴드', ICONS.band, function () { popup('https://band.us/plugin/share?body=' + encodeURIComponent(shareTitle + '\n' + shareUrl) + '&route=' + encodeURIComponent(location.hostname)); });
+          mkItem('스레드', ICONS.threads, function () { popup('https://www.threads.net/intent/post?text=' + encodeURIComponent(shareTitle + ' ' + shareUrl)); });
+          if (navigator.share && matchMedia('(pointer: coarse)').matches) mkItem('더 보기', ICONS.more, function () { navigator.share({ title: shareTitle, url: shareUrl }).catch(function () {}); });
+          /* 모든 버튼의 아이콘을 위 것으로 통일하고 순서는 링크 · 페이스북 · X · 카카오톡 · 텔레그램 · 밴드 · 스레드 · 더 보기 */
           [].slice.call(list.children).sort(function (a, b) { return order[kindOf(a)] - order[kindOf(b)]; }).forEach(function (li) {
             var btnEl = li.querySelector('.sharing-platform-button') || li;
             [].slice.call(btnEl.querySelectorAll('svg')).forEach(function (v) { v.parentNode.removeChild(v); });
             btnEl.insertAdjacentHTML('afterbegin', ICONS[kindOf(li)]);
+            if (kindOf(li) === 'link') li.classList.add('share-main');   /* 링크 복사 = 맨 위 한 줄 큰 버튼 (2026-11-14 사용자: "링크 복사를 크게 강조") */
             list.appendChild(li);
           });
           pop.querySelector('.share-pop-body').appendChild(list);
@@ -3597,6 +3998,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 
         /* ---------------------------------------------------------------- 로그인 (Firebase Auth, 펼칠 때 불러온다) */
         var authP = null;
+        function gProvider(fb) { var p = new fb.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' }); return p; }   /* 매번 계정 고르는 창 (2026-11-13 사용자) */
         function script(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = function () { no(new Error('load ' + src)); }; document.head.appendChild(s); }); }
         function auth() {
           if (authP) return authP;
@@ -3607,7 +4009,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             var a = fb.auth(); a.languageCode = 'ko';
             return {
               onAuth: function (cb) { a.onAuthStateChanged(function (u) { cb(u ? { uid: u.uid, name: u.displayName || '이름 없음', photo: u.photoURL || '' } : null); }); },
-              login: function () { return a.signInWithPopup(new fb.auth.GoogleAuthProvider()); },
+              login: function () { return a.signInWithPopup(gProvider(fb)); },
               logout: function () { return a.signOut(); },
               token: function (force) { return a.currentUser ? a.currentUser.getIdToken(!!force) : Promise.reject(new Error('UNAUTHENTICATED')); }
             };
@@ -3664,7 +4066,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function setOpen(open) {
           box.classList.toggle('is-open', open); panel.hidden = !open; toggle.setAttribute('aria-expanded', String(open));
           if (open) loadOnce();   /* 열면 그때 읽는다 (H30) */
-          if (open && !api) auth().then(function (a) { api = a; a.onAuth(function (u) { me = u; renderWrite(); renderList(); }); }, function (e) { showErr(write, errText(e)); });
+          if (open && !api) auth().then(function (a) { api = a; a.onAuth(function (u) { me = u; try { if (u) { localStorage.setItem('as-signed', '1'); if (OWNER && u.uid === OWNER) localStorage.setItem('as-admin', '1'); } } catch (e) {} renderWrite(); renderList(); });   /* 주인 로그인 = 메뉴에 관리자 줄 (2026-11-13, index.html 메뉴) */ }, function (e) { showErr(write, errText(e)); });
         }
         toggle.addEventListener('click', function () { setOpen(panel.hidden); });
 
@@ -3848,10 +4250,21 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var krMark = h.classList.contains('post-title') && document.querySelector('.post-body [data-kr-code]');   /* 새 제목 "삼성전자 주가" — 코드는 본문 숨은 표시에서 (2026-10-25 사용자: 제목에서 숫자 빼기, 홈 수정 H21) */
           if (!kr && krMark) kr = [null, krMark.getAttribute('data-kr-code')];
           if (!sym && !kr) return;
+          /* 최근 본 종목 (2026-11-17 사용자, 하단 메뉴 `종목` 페이지 관심 탭 1단계) — 종목 고정 페이지(/p/)의 글 보기 제목에서 읽은 코드만, 이 브라우저에만 10개. 서버로 보내지 않는다 */
+          if (h.classList.contains('post-title') && document.body.classList.contains('item-view') && /^\/p\//.test(location.pathname)) {
+            try {
+              var rk = { m: kr ? 'kr' : 'us', t: kr ? kr[1] : sym.split('.')[0] };
+              var rs = JSON.parse(localStorage.getItem('as-recent') || '[]').filter(function (x) { return x && !(x.m === rk.m && x.t === rk.t); });
+              rs.unshift(rk); localStorage.setItem('as-recent', JSON.stringify(rs.slice(0, 10)));
+            } catch (e) {}
+          }
           var host = h.querySelector('.post-title-text') || h.querySelector('a') || h;   /* 제목 글자 칸이 있으면 그 안 맨 앞 — 로고가 첫 글자 앞에 붙는다 */
           /* 2026-10-21: 제3자 로고 핫링크(financialmodelingprep) 중단 — 운영지침 4-6. 티커 두 글자 둥근 배지(리포트 design_kit.ticker_logo 와 같은 모양) */
           var b = document.createElement('span'); b.className = 'title-logo title-badge'; b.setAttribute('aria-hidden', 'true');
-          b.textContent = kr ? h.textContent.trim().charAt(0) : sym.replace(/[^A-Z]/g, '').slice(0, 2);   /* 크기 · 여백은 테마 CSS .post-title .title-logo (build_theme.py) */
+          b.textContent = kr ? h.textContent.trim().charAt(0) : sym.replace(/[^A-Z]/g, '').slice(0, 2);
+                /* 배지 바탕 = 차분한 세 가지 돌려 쓰기 (2026-11-16 사용자 "회색은 좀 그래") — design_kit.badge_color 와 같은 셈(티커 · 코드 글자 코드 합 % 3) */
+                (function () { var key = kr ? kr[1] : sym.split('.')[0], n = 0, C = [['#2F6F68', '#FFFFFF'], ['#5B6B3A', '#FFFFFF'], ['#86683A', '#FFFFFF']];
+                  for (var i = 0; i < key.length; i++) n += key.charCodeAt(i); b.style.background = C[n % 3][0]; b.style.color = C[n % 3][1]; })();   /* 크기 · 여백은 테마 CSS .post-title .title-logo (build_theme.py) */
           host.insertBefore(b, host.firstChild);
           /* 2026-10-22 사용자: 로고는 신뢰도 — 우리 gh-pages 사본이 있으면 배지 자리를 로고로 바꾼다. 없으면 배지 그대로 (운영지침 4-6) */
           var img = document.createElement('img'); img.alt = ''; img.className = 'title-logo';
@@ -4288,7 +4701,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var sb = document.createElement('div'); sb.className = 'rt-sub';
           function sel2(i) { subs.forEach(function (s, j) { s.b.setAttribute('aria-selected', String(i === j)); s.nodes.forEach(function (n, k) { n.hidden = (i !== j) || k === 0; }); }); }
           subs.forEach(function (s, i) { var b = document.createElement('button'); b.className = 'rt-subtab'; b.type = 'button'; setLabel(b, s.name); b.onclick = function () { sel2(i); }; sb.appendChild(b); s.b = b; });
-          st.p.insertBefore(sb, subs[0].nodes[0]);
+          var pv = subs[0].nodes[0].previousElementSibling; while (pv && (pv.hidden || pv.style.display === 'none')) pv = pv.previousElementSibling; if (pv) sb.setAttribute('data-mid', '1');   /* 앞에 보이는 내용이 있으면 중간 서브탭 — 위 +20 · 아래 +10 (2026-11-13 사용자) */ st.p.insertBefore(sb, subs[0].nodes[0]);
           sel2(0);
         });
       })();
@@ -4512,7 +4925,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         /* 목록 버튼이 갈 곳을 본문이 정할 때 (2026-10-18 사용자: 종목 고정 페이지 하단에도 엔비디아 글과 같은 목록 · TOP) —
            본문의 [data-list-url] 이 있으면 그 주소로. 고정 페이지는 라벨이 없어 테마 기본값(데일리 목록)으로 가던 것을 바로잡는다 */
         var lu = document.querySelector('.post-body [data-list-url]');
-        var navs = [].slice.call(document.querySelectorAll('.post-nav-list'));
+        var navs = [].slice.call(document.querySelectorAll('.post-nav-list:not(.post-nav-study)'));   /* 주식 공부 목록 버튼은 이름 · 주소 고정 (2026-11-15) */
         var setNav = function (text, href) { navs.forEach(function (a) { a.textContent = text; a.href = href; }); };
         /* 고정 페이지 버튼은 갈 곳 이름으로 (2026-10-29 사용자 P94): 본문 [data-nav] —
            home = 늘 `홈으로`(시총 목록 · 읽는 법) · back = 종목 상세: 홈에서 왔으면 `홈으로`, 시총 목록 · 검색 · 외부 · 직접 입력이면 `목록으로`(그 시장 시총 목록).
@@ -4527,6 +4940,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         else if (kind === 'home' || (kind === 'back' && (fromHome || !lu))) setNav('홈으로', homeUrl);
         else if (kind === 'back') setNav('목록으로', lu.getAttribute('data-list-url'));
         else if (lu) navs.forEach(function (a) { a.href = lu.getAttribute('data-list-url'); });
+        /* 머리 줄 글자를 메뉴 이름으로 (2026-11-15 주식 공부 발행: 본문 [data-head-label] — 글 제목은 본문 맨 위 큰 제목, 머리 줄은 `주식 공부`).
+           글 제목(검색 · 공유 · <title>)은 그대로, 화면의 머리 줄 글자만. 제목 칸 정리 스크립트가 끝난 뒤에도 한 번 더(load) */
+        var hl = document.querySelector('.post-body [data-head-label]');
+        if (hl) {
+          var setHead = function () { var l = document.querySelector('.post-title-label') || document.querySelector('.post-title'); if (l) l.textContent = hl.getAttribute('data-head-label'); };
+          setHead();
+          window.addEventListener('load', setHead);
+        }
         [].slice.call(document.querySelectorAll('.post-nav-top')).forEach(function (b) {
           b.addEventListener('click', function () {
             try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
@@ -4638,6 +5059,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           [].slice.call(document.querySelectorAll('.is-pressed')).forEach(function (x) { x.classList.remove('is-pressed'); });
         }
         window.addEventListener('pageshow', stopNav);   /* 뒤로 가기(bfcache)로 돌아왔을 때 막대 · 눌림이 남지 않게 */
+        window.asStartNav = startNav;   /* 하단 증시 리포트 · 인물 발언(data-latest)도 같은 로딩 표시 (2026-11-17 사용자 \"로딩 화면이 있어야\") */
 
         function samePageOrNewTab(a, e) {
           var h = a.getAttribute('href') || '';
@@ -4698,13 +5120,16 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         if (!lab && path.indexOf('/search/label/') === 0) lab = dec(path.slice(14));
         var LBL = {us: '데일리 브리핑', kr: '한국 증시 리포트'}, PEOPLE = '인물 발언';
         var pref = ''; try { pref = localStorage.getItem('as-home-mkt') || ''; } catch (e) {}
-        var isKr = path === '/p/korea.html' || /-\d{6}-stock\.html$/.test(path) || path === '/p/kr-market-cap-top10.html' || lab === LBL.kr;
-        var isUs = path === '/' || (/-stock\.html$/.test(path) && !isKr) || path === '/p/us-market-cap-top10.html' || lab === LBL.us;
+        /* 종목 목록 페이지(/p/stock-lists.html?m=) · 종목 주가 페이지(/p/stock.html?s=) 도 그 나라 (2026-11-17 사용자: 종목 페이지는 들어온 나라 하나만) */
+        var qm = (/[?&]m=(us|kr)\b/.exec(location.search) || [])[1], qs = (/[?&]s=([^&]*)/.exec(location.search) || [])[1] || '';
+        var lists = path === '/p/stock-lists.html', quick = path === '/p/stock.html';
+        var isKr = path === '/p/korea.html' || /-\d{6}-stock\.html$/.test(path) || path === '/p/kr-market-cap-top10.html' || lab === LBL.kr || (lists && qm === 'kr') || (quick && /^\d{6}$/.test(qs));
+        var isUs = path === '/' || (/-stock\.html$/.test(path) && !isKr) || path === '/p/us-market-cap-top10.html' || lab === LBL.us || (lists && qm === 'us') || (quick && qs && !isKr);
         var mk = isKr ? 'kr' : isUs ? 'us' : (pref === 'kr' ? 'kr' : 'us');
         var href = {home: mk === 'kr' ? '/p/korea.html' : '/', report: '/search/label/' + encodeURIComponent(LBL[mk]),
-                    stock: '/p/' + mk + '-market-cap-top10.html', forecast: '/p/forecast-list.html', people: '/search/label/' + encodeURIComponent(PEOPLE)};
+                    stock: '/p/stock-lists.html?m=' + mk, forecast: '/p/forecast-list.html' + (mk === 'kr' ? '#tab-1' : ''), people: '/search/label/' + encodeURIComponent(PEOPLE)};
         var cur = (path === '/' || path === '/p/korea.html') ? 'home' : (lab === LBL.us || lab === LBL.kr) ? 'report'
-                : (/-stock\.html$/.test(path) || /market-cap-top10\.html$/.test(path)) ? 'stock' : /^\/p\/forecast-/.test(path) ? 'forecast' : lab === PEOPLE ? 'people' : '';
+                : (/-stock\.html$/.test(path) || /market-cap-top10\.html$/.test(path) || lists || quick || /-etf\.html$/.test(path)) ? 'stock' : /^\/p\/forecast-/.test(path) ? 'forecast' : lab === PEOPLE ? 'people' : '';
         var bar = document.querySelector('.as-tabbar');
         if (bar) [].forEach.call(bar.querySelectorAll('a[data-tab]'), function (a) {
           var k = a.getAttribute('data-tab');
@@ -4719,21 +5144,33 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var h = a.getAttribute('href') || '';
           if ((here && a.getAttribute('data-latest') === here) || (!a.hasAttribute('data-latest') && h === path)) a.classList.add('is-here');
         });
-        document.addEventListener('click', function (e) {
-          var a = e.target.closest && e.target.closest('a[data-latest]');
-          if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-          e.preventDefault(); e.stopPropagation();
-          var fallback = a.href, done = false;
-          function go(u) { if (done) return; done = true; location.href = u || fallback; }
-          setTimeout(function () { go(fallback); }, 2500);
-          fetch('/feeds/posts/summary/-/' + encodeURIComponent(a.getAttribute('data-latest')) + '?alt=json&max-results=1')
+        /* 최신 글 찾기 = 손가락이 닿는 순간 시작(누를 때 기다림을 줄인다), 찾는 동안 맨 위 진행 막대 · 0.4초 넘으면 가운데 돌기(startNav).
+           6초 안에 못 찾으면 목록 주소로 — 폰 통신에서 피드가 2.5초를 넘겨 미국 리포트가 목록으로 가던 것 (2026-11-17 사용자) */
+        var pre = {};
+        function latest(lbl) {
+          if (!pre[lbl]) pre[lbl] = fetch('/feeds/posts/summary/-/' + encodeURIComponent(lbl) + '?alt=json&max-results=1')
             .then(function (r) { return r.json(); })
             .then(function (j) {
               var en = j && j.feed && j.feed.entry && j.feed.entry[0];
               var l = en && (en.link || []).filter(function (x) { return x.rel === 'alternate'; })[0];
-              go(l && l.href);
+              return l ? l.href : '';
             })
-            .catch(function () { go(fallback); });
+            .catch(function () { delete pre[lbl]; return ''; });
+          return pre[lbl];
+        }
+        document.addEventListener('pointerdown', function (e) {
+          var a = e.target.closest && e.target.closest('a[data-latest]');
+          if (a && !e.button) latest(a.getAttribute('data-latest'));
+        }, { passive: true });
+        document.addEventListener('click', function (e) {
+          var a = e.target.closest && e.target.closest('a[data-latest]');
+          if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          e.preventDefault(); e.stopPropagation();
+          if (window.asStartNav) window.asStartNav();
+          var fallback = a.href, done = false;
+          function go(u) { if (done) return; done = true; location.href = u || fallback; }
+          setTimeout(function () { go(fallback); }, 6000);
+          latest(a.getAttribute('data-latest')).then(go);
         }, true);
       })();
-      </script><script>(function(){function go(){var b=document.querySelector('[data-head-label]');if(b){var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');if(l)l.textContent=b.getAttribute('data-head-label');}document.querySelectorAll('[data-mock]').forEach(function(e){e.addEventListener('click',function(ev){ev.preventDefault();});});document.querySelectorAll('[data-ms-open]').forEach(function(btn){btn.addEventListener('click',function(){var k=btn.getAttribute('data-ms-open');document.querySelectorAll('[data-ms-panel]').forEach(function(p){p.hidden=p.getAttribute('data-ms-panel')!==k||!p.hidden;});});});document.querySelectorAll('[data-ms-close]').forEach(function(b){b.addEventListener('click',function(){var p=b.closest('[data-ms-panel]');if(p)p.hidden=true;});});document.querySelectorAll('[data-ms-panel^=edit]').forEach(function(p){var segs=p.querySelectorAll('[data-ms-seg]');function pick(k){segs.forEach(function(x){x.classList.toggle('on',x.getAttribute('data-ms-seg')===k);});p.querySelectorAll('[data-ms-sub]').forEach(function(x){x.hidden=x.getAttribute('data-ms-sub')!==k;});}segs.forEach(function(x){x.addEventListener('click',function(){pick(x.getAttribute('data-ms-seg'));});});pick('buy');var pv=p.querySelector('[data-ms-preview]'),bq=p.querySelector('[data-ms-bq]'),bp=p.querySelector('[data-ms-bp]');function num(v){return parseFloat(String(v||'').replace(/,/g,''))||0;}function upd(){var q=num(pv.getAttribute('data-q')),a=num(pv.getAttribute('data-a')),c=pv.getAttribute('data-cur'),nq=num(bq.value),np=num(bp.value);var f=function(v){return c==='$'?'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):Math.round(v).toLocaleString('ko-KR')+' 원';};if(nq>0&&np>0){var tq=q+nq;pv.textContent='저장하면 '+tq.toLocaleString('ko-KR')+'주 · 새 평균 '+f((q*a+nq*np)/tq);}else pv.textContent='지금 '+q.toLocaleString('ko-KR')+'주 · 평균 '+f(a);}[bq,bp].forEach(function(x){x.addEventListener('input',upd);});upd();});}if(document.readyState==='complete')go();else window.addEventListener('load',go);})();</script><script>(function(){var S=[{"n": "엔비디아", "c": "NVDA", "m": "us", "a": ["nvda", "nvidia", "엔디비아", "엔비", "엔비디아"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/NVDA.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "애플", "c": "AAPL", "m": "us", "a": ["aapl", "apple", "애플"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/AAPL.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "알파벳(구글)", "c": "GOOGL", "m": "us", "a": ["alphabet", "goog", "googl", "구글", "알파벳", "알파벳(구글)"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/GOOGL.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "마이크로소프트", "c": "MSFT", "m": "us", "a": ["microsoft", "msft", "마소", "마이크로소프트"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MSFT.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "아마존", "c": "AMZN", "m": "us", "a": ["amazon.com,", "amzn", "아마존"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/AMZN.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "메타", "c": "META", "m": "us", "a": ["facebook", "meta", "메타", "페이스북"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/META.jpg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "브로드컴", "c": "AVGO", "m": "us", "a": ["avgo", "broadcom", "브로드컴", "브컴"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/AVGO.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "테슬라", "c": "TSLA", "m": "us", "a": ["tesla,", "tsla", "테슬", "테슬라"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/TSLA.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "버크셔 해서웨이", "c": "BRK-B", "m": "us", "a": ["berkshire", "brk-b", "brk.b", "brkb", "버크셔", "버크셔해서웨이"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/BRK-B.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "일라이 릴리", "c": "LLY", "m": "us", "a": ["eli", "lly", "일라이릴리"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/LLY.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "마이크론", "c": "MU", "m": "us", "a": ["micron", "mu", "마이크론"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MU.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "월마트", "c": "WMT", "m": "us", "a": ["walmart", "wmt", "월마트"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/WMT.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "JP모건", "c": "JPM", "m": "us", "a": ["jpm", "jpmorgan", "jp모건", "제이피모건"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/JPM.jpg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "AMD", "c": "AMD", "m": "us", "a": ["advanced", "amd", "에이엠디"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/AMD.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "비자", "c": "V", "m": "us", "a": ["v", "visa", "비자"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/V.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "엑슨모빌", "c": "XOM", "m": "us", "a": ["exxonmobil", "xom", "엑슨모빌"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/XOM.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "존슨앤드존슨", "c": "JNJ", "m": "us", "a": ["jnj", "johnson", "존슨앤드존슨"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/JNJ.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "마스터카드", "c": "MA", "m": "us", "a": ["ma", "mastercard", "마스터카드"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MA.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "애브비", "c": "ABBV", "m": "us", "a": ["abbv", "abbvie", "애브비"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/ABBV.jpg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "인텔", "c": "INTC", "m": "us", "a": ["intc", "intel", "인텔"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/INTC.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "TSMC", "c": "TSM", "m": "us", "a": ["taiwan", "tsm", "tsmc"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/TSM.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "ASML", "c": "ASML", "m": "us", "a": ["asml"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/ASML.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "램리서치", "c": "LRCX", "m": "us", "a": ["lam", "lrcx", "램리서치"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/LRCX.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "어플라이드 머티어리얼즈", "c": "AMAT", "m": "us", "a": ["amat", "applied", "어플라이드머티어리얼즈"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/AMAT.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "오라클", "c": "ORCL", "m": "us", "a": ["oracle", "orcl", "오라클"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/ORCL.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "아리스타 네트웍스", "c": "ANET", "m": "us", "a": ["anet", "arista", "아리스타네트웍스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/ANET.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "버티브", "c": "VRT", "m": "us", "a": ["vertiv", "vrt", "버티브"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/VRT.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "에퀴닉스", "c": "EQIX", "m": "us", "a": ["eqix", "equinix,", "에퀴닉스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/EQIX.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "컨스텔레이션 에너지", "c": "CEG", "m": "us", "a": ["ceg", "constellation", "컨스텔레이션에너지"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/CEG.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "코어위브", "c": "CRWV", "m": "us", "a": ["coreweave,", "crwv", "코어위브"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/CRWV.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "스페이스X", "c": "SPCX", "m": "us", "a": ["space", "spcx", "스페이스x"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/SPCX.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "로켓랩", "c": "RKLB", "m": "us", "a": ["rklb", "rocket", "로켓랩"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/RKLB.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "코카콜라", "c": "KO", "m": "us", "a": ["ko", "the", "코카콜라"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KO.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "P&G", "c": "PG", "m": "us", "a": ["p&g", "pg", "the"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/PG.jpg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "필립모리스", "c": "PM", "m": "us", "a": ["philip", "pm", "필립모리스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/PM.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "넷플릭스", "c": "NFLX", "m": "us", "a": ["netflix,", "nflx", "넷플릭스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/NFLX.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "디즈니", "c": "DIS", "m": "us", "a": ["dis", "the", "디즈니"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/DIS.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "홈디포", "c": "HD", "m": "us", "a": ["hd", "the", "홈디포"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/HD.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "맥도날드", "c": "MCD", "m": "us", "a": ["mcd", "mcdonald's", "맥도날드"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MCD.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "캐터필러", "c": "CAT", "m": "us", "a": ["cat", "caterpillar", "캐터필러"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/CAT.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "GE 에어로스페이스", "c": "GE", "m": "us", "a": ["ge", "ge에어로스페이스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/GE.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "코스트코", "c": "COST", "m": "us", "a": ["cost", "costco", "코스트코"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/COST.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "셰브론", "c": "CVX", "m": "us", "a": ["chevron", "cvx", "셰브론"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/CVX.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "린데", "c": "LIN", "m": "us", "a": ["lin", "linde", "린데"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/LIN.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "뉴몬트", "c": "NEM", "m": "us", "a": ["nem", "newmont", "뉴몬트"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/NEM.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "웰타워", "c": "WELL", "m": "us", "a": ["well", "welltower", "웰타워"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/WELL.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "프롤로지스", "c": "PLD", "m": "us", "a": ["pld", "prologis,", "프롤로지스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/PLD.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "넥스트에라 에너지", "c": "NEE", "m": "us", "a": ["nee", "nextera", "넥스트에라에너지"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/NEE.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "서던 컴퍼니", "c": "SO", "m": "us", "a": ["so", "the", "서던컴퍼니"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/SO.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "코노코필립스", "c": "COP", "m": "us", "a": ["conocophillips", "cop", "코노코필립스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/COP.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "SLB", "c": "SLB", "m": "us", "a": ["slb"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/SLB.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "EOG 리소시스", "c": "EOG", "m": "us", "a": ["eog", "eog리소시스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/EOG.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "코인베이스", "c": "COIN", "m": "us", "a": ["coin", "coinbase", "코인베이스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/COIN.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "스트래티지", "c": "MSTR", "m": "us", "a": ["mstr", "strategy", "스트래티지"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MSTR.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "로빈후드", "c": "HOOD", "m": "us", "a": ["hood", "robinhood", "로빈후드"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/HOOD.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "마라 홀딩스", "c": "MARA", "m": "us", "a": ["mara", "마라홀딩스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MARA.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "서클", "c": "CRCL", "m": "us", "a": ["circle", "crcl", "서클"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/CRCL.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "비스트라", "c": "VST", "m": "us", "a": ["vistra", "vst", "비스트라"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/VST.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "뉴스케일 파워", "c": "SMR", "m": "us", "a": ["nuscale", "smr", "뉴스케일파워"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/SMR.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "아이온큐", "c": "IONQ", "m": "us", "a": ["ionq", "ionq,", "아이온큐"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/IONQ.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "리게티 컴퓨팅", "c": "RGTI", "m": "us", "a": ["rgti", "rigetti", "리게티컴퓨팅"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/RGTI.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "디웨이브 퀀텀", "c": "QBTS", "m": "us", "a": ["d-wave", "qbts", "디웨이브퀀텀"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/QBTS.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "퀀텀 컴퓨팅", "c": "QUBT", "m": "us", "a": ["quantum", "qubt", "퀀텀컴퓨팅"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/QUBT.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "IBM", "c": "IBM", "m": "us", "a": ["ibm", "international"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/IBM.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "삼성전자", "c": "005930", "m": "kr", "a": ["005930", "005930.ks", "samsung", "삼성", "삼성전자", "삼전"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_005930.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "SK하이닉스", "c": "000660", "m": "kr", "a": ["000660", "000660.ks", "sk", "sk하닉", "sk하이닉스", "하닉", "하이닉스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_000660.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "SK스퀘어", "c": "402340", "m": "kr", "a": ["402340", "402340.ks", "sk", "sk스퀘어"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_402340.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "한미반도체", "c": "042700", "m": "kr", "a": ["042700", "042700.ks", "hanmi", "한미반도체"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_042700.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "LG전자", "c": "066570", "m": "kr", "a": ["066570", "066570.ks", "lg", "lg전자", "엘지전자"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_066570.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "LG에너지솔루션", "c": "373220", "m": "kr", "a": ["373220", "373220.ks", "lg", "lg에너지솔루션", "lg엔솔", "엔솔", "엘지엔솔"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_373220.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "삼성SDI", "c": "006400", "m": "kr", "a": ["006400", "006400.ks", "samsung", "삼성sdi"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_006400.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "포스코퓨처엠", "c": "003670", "m": "kr", "a": ["003670", "003670.ks", "posco", "포스코퓨처엠"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_003670.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "LG화학", "c": "051910", "m": "kr", "a": ["051910", "051910.ks", "lg", "lg화학", "엘지화학"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_051910.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "에코프로비엠", "c": "247540", "m": "kr", "a": ["247540", "247540.kq", "ecopro", "에코비엠", "에코프로비엠"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_247540.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "에코프로", "c": "086520", "m": "kr", "a": ["086520", "086520.kq", "ecopro", "에코프로"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_086520.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "현대차", "c": "005380", "m": "kr", "a": ["005380", "005380.ks", "hyundai", "현대자동차", "현대차", "현차"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_005380.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "기아", "c": "000270", "m": "kr", "a": ["000270", "000270.ks", "kia", "기아"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_000270.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "삼성바이오로직스", "c": "207940", "m": "kr", "a": ["207940", "207940.ks", "samsung", "삼바", "삼성바이오로직스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_207940.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "셀트리온", "c": "068270", "m": "kr", "a": ["068270", "068270.ks", "celltrion,", "셀트리온"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_068270.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "알테오젠", "c": "196170", "m": "kr", "a": ["196170", "196170.kq", "alteogen", "알테오젠"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_196170.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "KB금융", "c": "105560", "m": "kr", "a": ["105560", "105560.ks", "kb", "kb금융"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_105560.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "신한지주", "c": "055550", "m": "kr", "a": ["055550", "055550.ks", "shinhan", "신한지주"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_055550.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "하나금융지주", "c": "086790", "m": "kr", "a": ["086790", "086790.ks", "hana", "하나금융지주"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_086790.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "삼성생명", "c": "032830", "m": "kr", "a": ["032830", "032830.ks", "samsung", "삼성생명"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_032830.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "삼성화재", "c": "000810", "m": "kr", "a": ["000810", "000810.ks", "samsung", "삼성화재"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_000810.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "카카오뱅크", "c": "323410", "m": "kr", "a": ["323410", "323410.ks", "kakaobank", "카카오뱅크"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_323410.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "NAVER", "c": "035420", "m": "kr", "a": ["035420", "035420.ks", "naver"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_035420.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "카카오", "c": "035720", "m": "kr", "a": ["035720", "035720.ks", "kakao", "카카오"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_035720.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "SK텔레콤", "c": "017670", "m": "kr", "a": ["017670", "017670.ks", "sk", "sk텔레콤"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_017670.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "한화에어로스페이스", "c": "012450", "m": "kr", "a": ["012450", "012450.ks", "hanwha", "한화에어로스페이스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_012450.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "HD현대중공업", "c": "329180", "m": "kr", "a": ["329180", "329180.ks", "hd", "hd현대중공업"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_329180.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "한화오션", "c": "042660", "m": "kr", "a": ["042660", "042660.ks", "hanwha", "한화오션"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_042660.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "HD한국조선해양", "c": "009540", "m": "kr", "a": ["009540", "009540.ks", "hd", "hd한국조선해양"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_009540.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "현대로템", "c": "064350", "m": "kr", "a": ["064350", "064350.ks", "hyundai-rotem", "현대로템"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_064350.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "두산에너빌리티", "c": "034020", "m": "kr", "a": ["034020", "034020.ks", "doosan", "두산에너빌리티"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_034020.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "삼성물산", "c": "028260", "m": "kr", "a": ["028260", "028260.ks", "samsung", "삼성물산"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_028260.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "POSCO홀딩스", "c": "005490", "m": "kr", "a": ["005490", "005490.ks", "posco", "posco홀딩스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_005490.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "고려아연", "c": "010130", "m": "kr", "a": ["010130", "010130.ks", "korea", "고려아연"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_010130.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}, {"n": "한국전력", "c": "015760", "m": "kr", "a": ["015760", "015760.ks", "korea", "한국전력", "한전"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_015760.svg\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#F1F5F9;object-fit:cover;\">"}];function norm(t){return String(t||'').toLowerCase().replace(/\s+/g,'');}function find(q){q=norm(q);if(q.length<1)return[];var out=[];S.forEach(function(x){var hit=norm(x.n).indexOf(q)>=0||x.c.toLowerCase().indexOf(q)===0||x.a.some(function(a){return norm(a).indexOf(q)===0;});if(hit)out.push(x);});out.sort(function(a,b){return (norm(a.n).indexOf(q)===0?0:1)-(norm(b.n).indexOf(q)===0?0:1);});return out.slice(0,6);}document.querySelectorAll('[data-ms-stock]').forEach(function(inp){var box=document.createElement('div');box.style.cssText='position:absolute;left:0;bottom:calc(100% + 4px);z-index:5;min-width:240px;background:#fff;border:1px solid #E2E8F0;border-radius:10px;box-shadow:0 6px 20px rgba(15,23,42,.12);overflow:hidden;display:none;';inp.parentNode.appendChild(box);function close(){box.style.display='none';}inp.addEventListener('input',function(){var r=find(inp.value);box.innerHTML='';if(!r.length){close();return;}r.forEach(function(x,i){var b=document.createElement('button');b.type='button';b.style.cssText='display:flex;align-items:center;width:100%;gap:0;padding:10px 12px;background:#fff;border:0;'+(i?'border-top:1px solid #F1F5F9;':'')+'text-align:left;cursor:pointer;font-size:16px;line-height:24px;color:#111;';b.innerHTML=x.l+'<span style=\'font-weight:700;\'>'+x.n+'</span><span style=\'margin-left:auto;padding-left:10px;font-size:14px;color:#6B7280;\'>'+(x.m==='us'?'미국':'한국')+' · '+x.c+'</span>';b.addEventListener('mousedown',function(e){e.preventDefault();inp.value=x.n;close();var pr=inp.closest('div').querySelector('[data-ms-price]');if(pr)pr.placeholder=x.m==='us'?'$':'원';});box.appendChild(b);});box.style.display='block';});inp.addEventListener('blur',close);});})();</script></body></html>
+      </script><script>(function(){function go(){var b=document.querySelector('[data-head-label]');if(b){var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');if(l)l.textContent=b.getAttribute('data-head-label');}document.querySelectorAll('[data-mock]').forEach(function(e){e.addEventListener('click',function(ev){ev.preventDefault();});});document.querySelectorAll('[data-ms-open]').forEach(function(btn){btn.addEventListener('click',function(){var k=btn.getAttribute('data-ms-open');document.querySelectorAll('[data-ms-panel]').forEach(function(p){p.hidden=p.getAttribute('data-ms-panel')!==k||!p.hidden;});});});document.querySelectorAll('[data-ms-close]').forEach(function(b){b.addEventListener('click',function(){var p=b.closest('[data-ms-panel]');if(p)p.hidden=true;});});document.querySelectorAll('[data-ms-panel^=edit]').forEach(function(p){var segs=p.querySelectorAll('[data-ms-seg]');function pick(k){segs.forEach(function(x){x.classList.toggle('on',x.getAttribute('data-ms-seg')===k);});p.querySelectorAll('[data-ms-sub]').forEach(function(x){x.hidden=x.getAttribute('data-ms-sub')!==k;});}segs.forEach(function(x){x.addEventListener('click',function(){pick(x.getAttribute('data-ms-seg'));});});pick('buy');var pv=p.querySelector('[data-ms-preview]'),bq=p.querySelector('[data-ms-bq]'),bp=p.querySelector('[data-ms-bp]');function num(v){return parseFloat(String(v||'').replace(/,/g,''))||0;}function upd(){var q=num(pv.getAttribute('data-q')),a=num(pv.getAttribute('data-a')),c=pv.getAttribute('data-cur'),nq=num(bq.value),np=num(bp.value);var f=function(v){return c==='$'?'$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):Math.round(v).toLocaleString('ko-KR')+' 원';};if(nq>0&&np>0){var tq=q+nq;pv.textContent='저장하면 '+tq.toLocaleString('ko-KR')+'주 · 새 평균 '+f((q*a+nq*np)/tq);}else pv.textContent='지금 '+q.toLocaleString('ko-KR')+'주 · 평균 '+f(a);}[bq,bp].forEach(function(x){x.addEventListener('input',upd);});upd();});}if(document.readyState==='complete')go();else window.addEventListener('load',go);})();</script><script>(function(){var S=[{"n": "엔비디아", "c": "NVDA", "m": "us", "a": ["nvda", "nvidia", "엔디비아", "엔비", "엔비디아"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/NVDA.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "애플", "c": "AAPL", "m": "us", "a": ["aapl", "apple", "애플"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/AAPL.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "알파벳(구글)", "c": "GOOGL", "m": "us", "a": ["alphabet", "goog", "googl", "구글", "알파벳", "알파벳(구글)"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/GOOGL.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "마이크로소프트", "c": "MSFT", "m": "us", "a": ["microsoft", "msft", "마소", "마이크로소프트"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MSFT.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "아마존", "c": "AMZN", "m": "us", "a": ["amazon.com,", "amzn", "아마존"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/AMZN.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "메타", "c": "META", "m": "us", "a": ["facebook", "meta", "메타", "페이스북"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/META.jpg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "브로드컴", "c": "AVGO", "m": "us", "a": ["avgo", "broadcom", "브로드컴", "브컴"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/AVGO.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "테슬라", "c": "TSLA", "m": "us", "a": ["tesla,", "tsla", "테슬", "테슬라"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/TSLA.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "버크셔 해서웨이", "c": "BRK-B", "m": "us", "a": ["berkshire", "brk-b", "brk.b", "brkb", "버크셔", "버크셔해서웨이"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/BRK-B.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "일라이 릴리", "c": "LLY", "m": "us", "a": ["eli", "lly", "일라이릴리"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/LLY.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "마이크론", "c": "MU", "m": "us", "a": ["micron", "mu", "마이크론"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MU.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "월마트", "c": "WMT", "m": "us", "a": ["walmart", "wmt", "월마트"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/WMT.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "JP모건", "c": "JPM", "m": "us", "a": ["jpm", "jpmorgan", "jp모건", "제이피모건"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/JPM.jpg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "AMD", "c": "AMD", "m": "us", "a": ["advanced", "amd", "에이엠디"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/AMD.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "비자", "c": "V", "m": "us", "a": ["v", "visa", "비자"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/V.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "엑슨모빌", "c": "XOM", "m": "us", "a": ["exxonmobil", "xom", "엑슨모빌"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/XOM.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "존슨앤드존슨", "c": "JNJ", "m": "us", "a": ["jnj", "johnson", "존슨앤드존슨"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/JNJ.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "마스터카드", "c": "MA", "m": "us", "a": ["ma", "mastercard", "마스터카드"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MA.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "애브비", "c": "ABBV", "m": "us", "a": ["abbv", "abbvie", "애브비"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/ABBV.jpg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "인텔", "c": "INTC", "m": "us", "a": ["intc", "intel", "인텔"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/INTC.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "TSMC", "c": "TSM", "m": "us", "a": ["taiwan", "tsm", "tsmc"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/TSM.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "ASML", "c": "ASML", "m": "us", "a": ["asml"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/ASML.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "램리서치", "c": "LRCX", "m": "us", "a": ["lam", "lrcx", "램리서치"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/LRCX.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "어플라이드 머티어리얼즈", "c": "AMAT", "m": "us", "a": ["amat", "applied", "어플라이드머티어리얼즈"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/AMAT.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "오라클", "c": "ORCL", "m": "us", "a": ["oracle", "orcl", "오라클"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/ORCL.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "아리스타 네트웍스", "c": "ANET", "m": "us", "a": ["anet", "arista", "아리스타네트웍스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/ANET.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "버티브", "c": "VRT", "m": "us", "a": ["vertiv", "vrt", "버티브"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/VRT.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "에퀴닉스", "c": "EQIX", "m": "us", "a": ["eqix", "equinix,", "에퀴닉스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/EQIX.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "컨스텔레이션 에너지", "c": "CEG", "m": "us", "a": ["ceg", "constellation", "컨스텔레이션에너지"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/CEG.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "코어위브", "c": "CRWV", "m": "us", "a": ["coreweave,", "crwv", "코어위브"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/CRWV.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "스페이스X", "c": "SPCX", "m": "us", "a": ["space", "spcx", "스페이스x"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/SPCX.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "로켓랩", "c": "RKLB", "m": "us", "a": ["rklb", "rocket", "로켓랩"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/RKLB.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "코카콜라", "c": "KO", "m": "us", "a": ["ko", "the", "코카콜라"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KO.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "P&G", "c": "PG", "m": "us", "a": ["p&g", "pg", "the"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/PG.jpg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "필립모리스", "c": "PM", "m": "us", "a": ["philip", "pm", "필립모리스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/PM.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "넷플릭스", "c": "NFLX", "m": "us", "a": ["netflix,", "nflx", "넷플릭스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/NFLX.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "디즈니", "c": "DIS", "m": "us", "a": ["dis", "the", "디즈니"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/DIS.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "홈디포", "c": "HD", "m": "us", "a": ["hd", "the", "홈디포"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/HD.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "맥도날드", "c": "MCD", "m": "us", "a": ["mcd", "mcdonald's", "맥도날드"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MCD.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "캐터필러", "c": "CAT", "m": "us", "a": ["cat", "caterpillar", "캐터필러"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/CAT.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "GE 에어로스페이스", "c": "GE", "m": "us", "a": ["ge", "ge에어로스페이스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/GE.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "코스트코", "c": "COST", "m": "us", "a": ["cost", "costco", "코스트코"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/COST.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "셰브론", "c": "CVX", "m": "us", "a": ["chevron", "cvx", "셰브론"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/CVX.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "린데", "c": "LIN", "m": "us", "a": ["lin", "linde", "린데"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/LIN.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "뉴몬트", "c": "NEM", "m": "us", "a": ["nem", "newmont", "뉴몬트"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/NEM.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "웰타워", "c": "WELL", "m": "us", "a": ["well", "welltower", "웰타워"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/WELL.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "프롤로지스", "c": "PLD", "m": "us", "a": ["pld", "prologis,", "프롤로지스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/PLD.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "넥스트에라 에너지", "c": "NEE", "m": "us", "a": ["nee", "nextera", "넥스트에라에너지"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/NEE.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "서던 컴퍼니", "c": "SO", "m": "us", "a": ["so", "the", "서던컴퍼니"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/SO.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "코노코필립스", "c": "COP", "m": "us", "a": ["conocophillips", "cop", "코노코필립스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/COP.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "SLB", "c": "SLB", "m": "us", "a": ["slb"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/SLB.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "EOG 리소시스", "c": "EOG", "m": "us", "a": ["eog", "eog리소시스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/EOG.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "코인베이스", "c": "COIN", "m": "us", "a": ["coin", "coinbase", "코인베이스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/COIN.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "스트래티지", "c": "MSTR", "m": "us", "a": ["mstr", "strategy", "스트래티지"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MSTR.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "로빈후드", "c": "HOOD", "m": "us", "a": ["hood", "robinhood", "로빈후드"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/HOOD.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "마라 홀딩스", "c": "MARA", "m": "us", "a": ["mara", "마라홀딩스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/MARA.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "서클", "c": "CRCL", "m": "us", "a": ["circle", "crcl", "서클"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/CRCL.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "비스트라", "c": "VST", "m": "us", "a": ["vistra", "vst", "비스트라"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/VST.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "뉴스케일 파워", "c": "SMR", "m": "us", "a": ["nuscale", "smr", "뉴스케일파워"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/SMR.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "아이온큐", "c": "IONQ", "m": "us", "a": ["ionq", "ionq,", "아이온큐"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/IONQ.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "리게티 컴퓨팅", "c": "RGTI", "m": "us", "a": ["rgti", "rigetti", "리게티컴퓨팅"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/RGTI.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "디웨이브 퀀텀", "c": "QBTS", "m": "us", "a": ["d-wave", "qbts", "디웨이브퀀텀"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/QBTS.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "퀀텀 컴퓨팅", "c": "QUBT", "m": "us", "a": ["quantum", "qubt", "퀀텀컴퓨팅"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/QUBT.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "IBM", "c": "IBM", "m": "us", "a": ["ibm", "international"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/IBM.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "삼성전자", "c": "005930", "m": "kr", "a": ["005930", "005930.ks", "samsung", "삼성", "삼성전자", "삼전"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_005930.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "SK하이닉스", "c": "000660", "m": "kr", "a": ["000660", "000660.ks", "sk", "sk하닉", "sk하이닉스", "하닉", "하이닉스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_000660.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "SK스퀘어", "c": "402340", "m": "kr", "a": ["402340", "402340.ks", "sk", "sk스퀘어"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_402340.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "한미반도체", "c": "042700", "m": "kr", "a": ["042700", "042700.ks", "hanmi", "한미반도체"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_042700.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "LG전자", "c": "066570", "m": "kr", "a": ["066570", "066570.ks", "lg", "lg전자", "엘지전자"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_066570.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "LG에너지솔루션", "c": "373220", "m": "kr", "a": ["373220", "373220.ks", "lg", "lg에너지솔루션", "lg엔솔", "엔솔", "엘지엔솔"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_373220.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "삼성SDI", "c": "006400", "m": "kr", "a": ["006400", "006400.ks", "samsung", "삼성sdi"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_006400.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "포스코퓨처엠", "c": "003670", "m": "kr", "a": ["003670", "003670.ks", "posco", "포스코퓨처엠"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_003670.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "LG화학", "c": "051910", "m": "kr", "a": ["051910", "051910.ks", "lg", "lg화학", "엘지화학"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_051910.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "에코프로비엠", "c": "247540", "m": "kr", "a": ["247540", "247540.kq", "ecopro", "에코비엠", "에코프로비엠"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_247540.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "에코프로", "c": "086520", "m": "kr", "a": ["086520", "086520.kq", "ecopro", "에코프로"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_086520.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "현대차", "c": "005380", "m": "kr", "a": ["005380", "005380.ks", "hyundai", "현대자동차", "현대차", "현차"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_005380.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "기아", "c": "000270", "m": "kr", "a": ["000270", "000270.ks", "kia", "기아"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_000270.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "삼성바이오로직스", "c": "207940", "m": "kr", "a": ["207940", "207940.ks", "samsung", "삼바", "삼성바이오로직스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_207940.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "셀트리온", "c": "068270", "m": "kr", "a": ["068270", "068270.ks", "celltrion,", "셀트리온"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_068270.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "알테오젠", "c": "196170", "m": "kr", "a": ["196170", "196170.kq", "alteogen", "알테오젠"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_196170.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "KB금융", "c": "105560", "m": "kr", "a": ["105560", "105560.ks", "kb", "kb금융"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_105560.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "신한지주", "c": "055550", "m": "kr", "a": ["055550", "055550.ks", "shinhan", "신한지주"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_055550.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "하나금융지주", "c": "086790", "m": "kr", "a": ["086790", "086790.ks", "hana", "하나금융지주"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_086790.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "삼성생명", "c": "032830", "m": "kr", "a": ["032830", "032830.ks", "samsung", "삼성생명"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_032830.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "삼성화재", "c": "000810", "m": "kr", "a": ["000810", "000810.ks", "samsung", "삼성화재"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_000810.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "카카오뱅크", "c": "323410", "m": "kr", "a": ["323410", "323410.ks", "kakaobank", "카카오뱅크"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_323410.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "NAVER", "c": "035420", "m": "kr", "a": ["035420", "035420.ks", "naver"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_035420.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "카카오", "c": "035720", "m": "kr", "a": ["035720", "035720.ks", "kakao", "카카오"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_035720.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "SK텔레콤", "c": "017670", "m": "kr", "a": ["017670", "017670.ks", "sk", "sk텔레콤"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_017670.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "한화에어로스페이스", "c": "012450", "m": "kr", "a": ["012450", "012450.ks", "hanwha", "한화에어로스페이스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_012450.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "HD현대중공업", "c": "329180", "m": "kr", "a": ["329180", "329180.ks", "hd", "hd현대중공업"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_329180.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "한화오션", "c": "042660", "m": "kr", "a": ["042660", "042660.ks", "hanwha", "한화오션"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_042660.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "HD한국조선해양", "c": "009540", "m": "kr", "a": ["009540", "009540.ks", "hd", "hd한국조선해양"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_009540.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "현대로템", "c": "064350", "m": "kr", "a": ["064350", "064350.ks", "hyundai-rotem", "현대로템"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_064350.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "두산에너빌리티", "c": "034020", "m": "kr", "a": ["034020", "034020.ks", "doosan", "두산에너빌리티"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_034020.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "삼성물산", "c": "028260", "m": "kr", "a": ["028260", "028260.ks", "samsung", "삼성물산"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_028260.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "POSCO홀딩스", "c": "005490", "m": "kr", "a": ["005490", "005490.ks", "posco", "posco홀딩스"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_005490.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "고려아연", "c": "010130", "m": "kr", "a": ["010130", "010130.ks", "korea", "고려아연"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_010130.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}, {"n": "한국전력", "c": "015760", "m": "kr", "a": ["015760", "015760.ks", "korea", "한국전력", "한전"], "l": "<img src=\"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_015760.svg?v=2\" alt=\"\" width=\"22\" height=\"22\" loading=\"lazy\" style=\"display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:-4px;margin-right:6px;background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;\">"}];function norm(t){return String(t||'').toLowerCase().replace(/\s+/g,'');}function find(q){q=norm(q);if(q.length<1)return[];var out=[];S.forEach(function(x){var hit=norm(x.n).indexOf(q)>=0||x.c.toLowerCase().indexOf(q)===0||x.a.some(function(a){return norm(a).indexOf(q)===0;});if(hit)out.push(x);});out.sort(function(a,b){return (norm(a.n).indexOf(q)===0?0:1)-(norm(b.n).indexOf(q)===0?0:1)||norm(a.n).length-norm(b.n).length;});return out;}document.querySelectorAll('[data-ms-stock]').forEach(function(inp){var box=document.createElement('div');box.style.cssText='position:absolute;left:0;bottom:calc(100% + 4px);z-index:5;min-width:240px;max-height:320px;overflow-y:auto;background:#fff;border:1px solid #E2E8F0;border-radius:10px;box-shadow:0 6px 20px rgba(15,23,42,.12);display:none;';inp.parentNode.appendChild(box);function close(){box.style.display='none';}inp.addEventListener('input',function(){var r=find(inp.value);box.innerHTML='';if(!r.length){close();return;}r.forEach(function(x,i){var b=document.createElement('button');b.type='button';b.style.cssText='display:flex;align-items:center;width:100%;gap:0;padding:10px 12px;background:#fff;border:0;'+(i?'border-top:1px solid #F1F5F9;':'')+'text-align:left;cursor:pointer;font-size:16px;line-height:24px;color:#111;';b.innerHTML=x.l+'<span style=\'font-weight:700;\'>'+x.n+'</span><span style=\'margin-left:auto;padding-left:10px;font-size:14px;color:#6B7280;\'>'+(x.m==='us'?'미국':'한국')+' · '+x.c+'</span>';b.addEventListener('mousedown',function(e){e.preventDefault();inp.value=x.n;close();var pr=inp.closest('div').querySelector('[data-ms-price]');if(pr)pr.placeholder=x.m==='us'?'$':'원';});box.appendChild(b);});box.style.display='block';});inp.addEventListener('blur',close);});})();</script></body></html>

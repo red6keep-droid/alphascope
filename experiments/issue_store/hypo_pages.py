@@ -2446,11 +2446,23 @@ def list_body(pairs, states=None, done=(), score=None):
 
 # ---------------------------------------------------------------- 홈 카드 JSON (국면 한 마디는 넣지 않는다 — 2026-11-07 사용자, 제목 · 라벨 · 게시일만)
 
-def home_card(pairs, generated="", done_count=0):
+LEAN_KEYS = ("lean", "lean_x", "priced_in")   # 방향이 있는 국면 — `○○ 조짐이 보임` · 선반영 중. 그 밖(지켜보는 중 등) = 0
+
+
+def lean_of(state):
+    """홈 증시 전망 배너 그림(상승 · 하락 · 횡보)의 방향 = 그날 타임라인 마지막 국면의 dir (2026-11-18 사용자: "기울기는 그날 방향, 계기판처럼")."""
+    log = (state or {}).get("log") or []
+    e = log[-1] if log else {}
+    d = e.get("dir") or 0 if e.get("key") in LEAN_KEYS else 0
+    return 1 if d > 0 else (-1 if d < 0 else 0)
+
+
+def home_card(pairs, generated="", done_count=0, states=None):
     out = {"id": "hypo-card", "label": CARD_NAME, "generated": generated, "list_url": page_url(LIST_SLUG), "open": [], "done_count": done_count}
     for reg, fc in pairs:   # market = 홈 미국 · 한국 화면이 제 나라 전망만 거른다 (2026-11-12 사용자 홈 나누기)
         out["open"].append({"no": fc["no"], "eh": reg["id"], "title": fc["title"], "url": page_url(fc["slug"]),
-                            "posted": fc["posted"], "tags": fc.get("tags", []), "event": fc["event"], "market": mkt_of(fc)})
+                            "posted": fc["posted"], "tags": fc.get("tags", []), "event": fc["event"], "market": mkt_of(fc),
+                            "lean": lean_of((states or {}).get(fc["slug"]))})   # 홈 배너 그림 방향 (2026-11-18)
     return out
 
 
