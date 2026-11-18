@@ -1902,7 +1902,7 @@ function fcEv(q){var m=String(q.event||'').match(/^(\d+\.\d+)\s+(.*?)\s*(급등|
 window.IB_HYPO=function(rows,date){if(window.IB_DUMMY)rows=IB_DUMMY;   /* 목업: 더미 세 장 */
  ibMount('hypo-col','hypo-card','증시 전망','#7C3AED',date,rows.map(function(q){var ev=fcEv(q),lead=ev.word==='실적'?(ev.who+' 실적'):'',ln=q.lean!=null?q.lean:(LEAN_SAMPLE[q.eh]||0);
   return '<a class="ib-slide" href="'+e(q.url||'#')+'"><p class="ib-q">'+ibSplit(q.title,lead)+'</p>'+ART[String(ln)]+'</a>';}));};
-var ART={"1": "<svg class=\"ib-art\" viewBox=\"0 0 100 56\" aria-hidden=\"true\"><polyline points=\"19,44 38,24 54,34 81,10\" fill=\"none\" stroke=\"#B91C1C\" stroke-opacity=\".3\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"81\" cy=\"10\" r=\"4\" fill=\"#B91C1C\"/></svg>", "0": "<svg class=\"ib-art\" viewBox=\"0 0 100 56\" aria-hidden=\"true\"><polyline points=\"16,30 37,20 54,36 84,26\" fill=\"none\" stroke=\"#475569\" stroke-opacity=\".3\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"84\" cy=\"26\" r=\"4\" fill=\"#475569\"/></svg>", "-1": "<svg class=\"ib-art\" viewBox=\"0 0 100 56\" aria-hidden=\"true\"><polyline points=\"19,10 38,30 54,20 81,44\" fill=\"none\" stroke=\"#1D4ED8\" stroke-opacity=\".3\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"81\" cy=\"44\" r=\"4\" fill=\"#1D4ED8\"/></svg>"};var LEAN_SAMPLE={"EH-2026-002": 0, "EH-2026-007": 1, "EH-2026-005": -1, "EH-2026-008": 0};var IB_DUMMY=[{"title": "엔비디아 실적 뒤 반도체는?", "event": "11.17 엔비디아 실적", "lean": 1, "url": "#"}, {"title": "브로드컴 급등, 조정 올까 더 오를까?", "event": "11.12 브로드컴 급등", "lean": -1, "url": "#"}, {"title": "기아 급락, 반등할까 더 빠질까?", "event": "11.10 기아 급락", "lean": 0, "url": "#"}];</script></head>
+var ART={"1": "<svg class=\"ib-art\" viewBox=\"0 0 100 56\" aria-hidden=\"true\"><polyline points=\"19,44 38,24 54,34 81,10\" fill=\"none\" stroke=\"#B91C1C\" stroke-opacity=\".3\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"81\" cy=\"10\" r=\"4\" fill=\"#B91C1C\"/></svg>", "0": "<svg class=\"ib-art\" viewBox=\"0 0 100 56\" aria-hidden=\"true\"><polyline points=\"15,30 36,20 54,36 86,26\" fill=\"none\" stroke=\"#475569\" stroke-opacity=\".3\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"86\" cy=\"26\" r=\"4\" fill=\"#475569\"/></svg>", "-1": "<svg class=\"ib-art\" viewBox=\"0 0 100 56\" aria-hidden=\"true\"><polyline points=\"19,10 38,30 54,20 81,44\" fill=\"none\" stroke=\"#1D4ED8\" stroke-opacity=\".3\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"81\" cy=\"44\" r=\"4\" fill=\"#1D4ED8\"/></svg>"};var LEAN_SAMPLE={"EH-2026-002": 0, "EH-2026-007": 1, "EH-2026-005": -1, "EH-2026-008": 0};var IB_DUMMY=[{"title": "엔비디아 실적 뒤 반도체는?", "event": "11.17 엔비디아 실적", "lean": 1, "url": "#"}, {"title": "브로드컴 급등, 조정 올까 더 오를까?", "event": "11.12 브로드컴 급등", "lean": -1, "url": "#"}, {"title": "기아 급락, 반등할까 더 빠질까?", "event": "11.10 기아 급락", "lean": 0, "url": "#"}];</script></head>
 <body data-pv-view="home" data-home-mkt="us">
 
 <header class="navbar">
@@ -3584,7 +3584,7 @@ var ART={"1": "<svg class=\"ib-art\" viewBox=\"0 0 100 56\" aria-hidden=\"true\"
   }
   /* 업종 종목 (2026-11-18 사용자, 옛 섹터 대표주 = 업종별 1 · 2 · 3위): 테마 종목과 같은 꼴 — 업종 알약 줄 + 그 업종의 우리 종목 전부(간단 종목 포함), 처음 3개 · 나머지 더 보기.
      자료 = 종목 모아보기가 읽는 목록 파일 <시장>/_lists.json(간단 종목 실행이 매일 씀). 이 탭을 처음 열 때만 받는다(Pages → jsDelivr, 시장마다 1번 · 압축 약 18KB) */
-  var PICK_SHOWN = 3, watchOpen = false, secOpen = false, secTab = 0, listsDoc = {}, listsBusy = {};
+  var PICK_SHOWN = 3, SEC_MAX = 10, watchOpen = false, secOpen = false, secTab = 0, listsDoc = {}, listsBusy = {};
   function loadLists(m) {
     if (listsDoc[m] || listsBusy[m]) return;
     if (window.PV_LISTS && window.PV_LISTS[m]) { listsDoc[m] = window.PV_LISTS[m]; return; }   /* 목업 · 미리보기 */
@@ -3624,7 +3624,7 @@ var ART={"1": "<svg class=\"ib-art\" viewBox=\"0 0 100 56\" aria-hidden=\"true\"
         tabsBox.appendChild(b);
       });
     }
-    var rows = groups[order[secTab]].slice().sort(pickCmp());
+    var rows = groups[order[secTab]].slice().sort(pickCmp()).slice(0, SEC_MAX);   /* 펼쳐도 10개까지 (2026-11-18 사용자 "너무 많다, 나머지는 검색") — CLAUDE.md `상한으로 버리지 않기`의 사용자 지정 예외 */
     body.textContent = '';
     rows.forEach(function (r, i) {
       var tr = el('tr');
