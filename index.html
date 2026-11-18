@@ -4120,7 +4120,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var pc = +d.prev, close = +d.close;
           var lo = Math.min.apply(null, d.c.concat([pc])), hi = Math.max.apply(null, d.c.concat([pc]));
           if (!(hi > lo) || !(pc > 0)) return false;
-          function X(m) { return 2 + Math.min(m, S) / S * (W - 4); }
+          function X(m) { return Math.min(m, S) / S * W; }   /* 양 끝 = 카드 테두리에 딱 (2026-11-18 사용자, 옛 좌우 2 여백 삭제) */
           function Y(v) { return T + (hi - v) / (hi - lo) * (H - T - B); }
           function f1(n) { return n.toFixed(1); }
           function money(n) { return (+n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
