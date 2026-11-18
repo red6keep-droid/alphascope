@@ -55,6 +55,7 @@ JOBS = [
     ("주식 공부", ["experiments/course/render_course.py"]),
     ("주식 공부 · 목록", ["experiments/course/render_list.py"]),
     ("홈 나누기", ["experiments/home-split/mock_home_split.py"]),   # 테마 미리보기(build_theme --preview) → 미국 · 한국 홈 — 주식 공부 배너 포함 (2026-11-15)
+    ("홈 증시시황 C안", ["experiments/market-commentary/mock_home_commentary.py"]),   # 테마(index.html) 복사 → 미국 · 한국 홈 C안 (2026-11-17, 11-18 JOBS 추가)
 ]
 
 
