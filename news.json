@@ -1,74 +1,129 @@
 {
-  "updated_at": "2026-11-18 12:46:46 UTC",
+  "updated_at": "2026-11-18 21:46:39 UTC",
   "items": [
     {
-      "title": "Nvidia’s Kress faces a divided workforce as some employees push for Huang’s return",
+      "title": "Anthropic prices IPO at $83 per share, above expected range, source tells CNBC",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/18/nvidia-kress-jensen-huang-return.html",
-      "published": "2026-11-18 12:34:24",
-      "title_ko": "엔비디아의 크레스, 황의 복귀를 요구하는 일부 직원들로 인해 분열된 인력 직면",
-      "summary_ko": "엔비디아의 임시 CEO 콜레트 크레스가 투자자들을 안심시킨 후 직원들을 진정시켜야 하는 상황",
+      "link": "https://www.cnbc.com/2026/11/18/anthropic-ipo-ai-offering-price.html",
+      "published": "2026-11-18 21:42:35",
+      "title_ko": "앤스로픽, 주당 83달러로 예상 범위 웃도는 IPO 가격 책정",
+      "summary_ko": "앤스로픽 주식, 목요일 나스닥에서 티커 기호 ANT로 거래 시작 예정",
       "lines": [
-        "콜레트 크레스 엔비디아 임시 CEO의 첫 실적 발표 컨퍼런스 콜 진행",
-        "엔비디아 전체 직원 대상 타운홀 미팅 개최 예정"
+        "앤트로픽 공모가 83달러 확정 (예상)",
+        "나스닥 거래 개시일 목요일 예정",
+        "목표 발행 주식수 8억 2500만 주",
+        "조달 자금 약 685억 달러 규모",
+        "기존 목표치 상회하는 1조 4000억 달러 이상 기업가치 전망"
       ]
     },
     {
-      "title": "Mortgage demand turns lower, as interest rates shoot back up to the highest level in three weeks.",
+      "title": "Nvidia interim CEO Kress tells employees ‘let’s move forward’ at first all-hands meeting since Jensen Huang exit",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/18/mortgage-demand-turns-lower-as-interest-rates-shoot-back-up-to-the-highest-level-in-three-weeks.html",
-      "published": "2026-11-18 12:34:10",
-      "title_ko": "금리 3주 내 최고치로 치솟으면서 모기지 수요 하락",
-      "summary_ko": "지난주 모기지 금리가 급등하면서 주택 구입 및 리파이낸싱 대출 수요가 감소한 상황",
+      "link": "https://www.cnbc.com/2026/11/18/nvidia-interim-ceo-kress-addresses-staff-after-jensen-huang-exit-.html",
+      "published": "2026-11-18 21:40:21",
+      "title_ko": "엔비디아 임시 CEO 크레스, 젠슨 황 사임 후 첫 전 직원 회의서 전진 독려",
+      "summary_ko": "젠슨 황 사임 후 첫 전사 회의에서 직원들 전진 독려 및 임금 인상 제안",
       "lines": [
-        "전주 대비 모기지 신청 볼륨 2.3% 감소",
-        "30년 고정 모기지 평균 계약 금리 7.35%로 상승"
+        "엔비디아 임시 최고경영자 콜레트 크레스 임원진과 전체 회의 개최",
+        "젠슨 황 사임 후 첫 전 직원 미팅 진행",
+        "신임 이사회 의장 하비 존스 및 주요 임원 참석"
       ]
     },
     {
-      "title": "Trump arrives in China for historic meeting with Xi, Putin",
+      "title": "One of AI's most notorious 'doomers' stands to make billions in Anthropic's IPO",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/18/trump-xi-putin-china-apec.html",
-      "published": "2026-11-18 12:24:24",
-      "title_ko": "트럼프, 시진핑·푸틴과의 역사적인 회담 위해 중국 도착",
+      "link": "https://www.cnbc.com/2026/11/18/jaan-tallinn-anthropic-ipo-series-a-investment.html",
+      "published": "2026-11-18 21:28:04",
+      "title_ko": "AI 파멸론자 중 한 명, 앤트로픽 IPO로 수십억 달러 벌어들일 전망",
+      "summary_ko": "에스토니아 출신 테크억만장자, 앤트로픽 기업공개로 거액 수익 예상",
+      "lines": [
+        "에스토니아 출신 기술 억만장자 앤트로픽 초기 투자 참여",
+        "과거 1억 2400만 달러 규모 시리즈 A 투자 주도",
+        "앤트로픽 나스닥 상장 예정"
+      ]
+    },
+    {
+      "title": "CEO turned informant: How the FDA built a case against executives promising cheap medications",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/18/fda-canarx-case-informant.html",
+      "published": "2026-11-18 21:07:14",
+      "title_ko": "제보자로 변신한 CEO: FDA가 저가 약속한 임원들 상대로 소송 구축한 과정",
+      "summary_ko": "대체 자금 조달 프로그램에 대한 FDA의 전례 없는 형사 사건은 동료 CEO의 협조로 성사됨",
+      "lines": [
+        "미국 식품의약품안전청의 불법 처방약 수입 관련 형사 사건 기소",
+        "캐나다 헬스케어 기업 간부 존 토마스 하워드의 11월 8일 체포 및 밀수 등 혐의 기소"
+      ]
+    },
+    {
+      "title": "Nvidia sinks after earnings, dragging down neoclouds CoreWeave, Iren",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/18/nvidia-stock-earnings.html",
+      "published": "2026-11-18 21:06:49",
+      "title_ko": "엔비디아, 실적 발표 후 하락… 네오클라우드 코어위브·아이렌 동반 하락",
+      "summary_ko": "엔비디아 실적 발표는 혼란스러운 시기에 이루어짐",
+      "lines": [
+        "엔비디아의 수요일 주가 2.89% 하락 기록",
+        "코어위브의 주가 4.13% 하락 및 아이렌의 3.61% 하락",
+        "엔비디아의 3분기 매출 1158억 4000만 달러 발표 (예상)",
+        "엔비디아의 4분기 매출 가이던스 1300억 달러 제시"
+      ]
+    },
+    {
+      "title": "Nvidia reverses, metals crash ahead of Anthropic IPO",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/18/nvidia-reverses-metals-crash-ahead-of-anthropic-ipo-options-action-live.html",
+      "published": "2026-11-18 20:10:07",
+      "title_ko": "엔비디아 하락 반전, 앤스로픽 IPO 앞두고 금속 가격 폭락",
+      "summary_ko": "대규모 변동성에 옵션 거래자들 앤스로픽 IPO 연관성 주시",
+      "lines": [
+        "엔비디아 주가의 164달러에서 152달러 아래로의 변동 (예상)",
+        "구리 선물 가격의 5% 급락으로 4월 이후 최저치 기록"
+      ]
+    },
+    {
+      "title": "Fed officials expect more rate hikes, worry about AI impact on inflation, minutes show",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/18/fed-minutes-october-2026.html",
+      "published": "2026-11-18 19:41:59",
+      "title_ko": "연준 위원들, 추가 금리 인상 예상 및 인플레이션에 미칠 AI 영향 우려",
+      "summary_ko": "연방준비제도, 기준금리 3.75%-4% 동결 의사록 공개",
+      "lines": [
+        "연방준비제도 10월 정책 회의 기준금리 3.75%-4% 동결 (예상)",
+        "연방준비제도 당국자들의 추가 금리 인상 필요성 언급 및 인플레이션 위험 요인 지적",
+        "인공지능 수요의 물가 상승 압력 위험 요인 부각"
+      ]
+    },
+    {
+      "title": "Vance scraps schedule to address tech outages as Trump admin insists incidents aren't linked",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/18/trump-tech-outages-nsa-faa-microsoft.html",
+      "published": "2026-11-18 19:17:27",
+      "title_ko": "밴스, 기술적 장애 대응 위해 일정 취소… 트럼프 행정부, 연관성 부인",
+      "summary_ko": "최근 장애에 전국적 운항 중단 및 마이크로소프트 아웃룩 장애 포함",
+      "lines": [
+        "부통령 JD 밴스의 딜북 서밋 일정 취소",
+        "미국 정부의 전국적 기술 장애 관련 회의 참석",
+        "트럼프 행정부 당국자의 기술 장애 사이버 공격 아님 발표"
+      ]
+    },
+    {
+      "title": "Jeffries wins Democratic House speaker race, on track to make history in January",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/18/jeffries-house-speaker-congress.html",
+      "published": "2026-11-18 18:32:39",
+      "title_ko": "제프리스, 민주당 하원의장 경선 승리… 1월 역사적 투표 앞둬",
       "summary_ko": "",
       "lines": [
-        "도널드 트럼프 미국 대통령의 수요일 중국 선전 도착",
-        "시진핑 주석과 블라디미르 푸틴 러시아 대통령과의 삼자 회담 목요일 개최 예정",
-        "마코 루비오 국무장관과 스콧 베센트 재무장관 등의 환영 만찬 참석"
-      ]
-    },
-    {
-      "title": "Target posts best sales growth in five years, raises guidance",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/18/target-tgt-q3-2026-earnings.html",
-      "published": "2026-11-18 12:17:33",
-      "title_ko": "타겟, 5년 만에 최고 매출 성장 기록 및 전망치 상향",
-      "summary_ko": "턴어라운드 노력을 지속하는 가운데 3분기 매출 예상을 상회하고 가이던스를 상향 조정한 타겟",
-      "lines": [
-        "타겟의 3분기 순매출 7.1% 성장 및 동일 성장률 5.6% 기록 (예상)",
-        "동일 매장 방문객 수 5% 증가",
-        "연간 순매출 성장률 전망치 6% 안팎으로 상향 조정",
-        "연간 영업이익률 전망치 약 6.2% 제시"
-      ]
-    },
-    {
-      "title": "IEA chief sees no 'credible pathway' back to pre-war normality in the Strait of Hormuz",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/18/iea-strait-hormuz-energy-risk.html",
-      "published": "2026-11-18 12:00:01",
-      "title_ko": "IEA 수장, 호르무즈 해협의 전쟁 이전 정상 상태로의 신뢰할 수 있는 경로 없다고 진단",
-      "summary_ko": "이란 전쟁으로 인해 에너지 및 상품 통로로서의 호르무즈 해협에 대한 신뢰가 붕괴되었다는 경고",
-      "lines": [
-        "호르무즈 해협의 공급 통로 신뢰도 하락 경고",
-        "전쟁 이전 정상 상태 복귀 가능성 부인"
+        "하킴 제프리스의 민주당 하원 의장 후보 선출",
+        "민주당의 의장 후보 투표 결과 251대 11 기록",
+        "내년 1월 하원 의장 선출을 위한 본회의 투표 예정"
       ]
     },
     {
       "title": "Lowe's posts strong online sales, raises outlook despite slow housing market",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/18/lowes-low-q3-2026-earnings.html",
-      "published": "2026-11-18 11:47:59",
+      "published": "2026-11-18 18:27:52",
       "title_ko": "로우스, 침체된 주택 시장에도 강력한 온라인 매출 기록 및 전망치 상향 조정",
       "summary_ko": "분기 동안 온라인 매출 강세를 기록하며 연간 가이던스를 상향 조정한 로우스",
       "lines": [
@@ -78,88 +133,37 @@
       ]
     },
     {
-      "title": "China’s military seeks Nvidia’s advanced chips for AI capabilities, commission says",
+      "title": "미중 정상회담 및 지정학",
+      "title_ko": "미중 정상회담 및 지정학",
+      "summary_ko": "트럼프 대통령의 중국 방문과 정상회담을 통해 관세 및 공급망 관련 휴전 논의가 진행될 예정",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/18/nvidia-chips-china-military-ai.html",
-      "published": "2026-11-18 10:45:01",
-      "title_ko": "중국 군부, AI 역량을 위해 엔비디아의 첨단 칩을 모색한다고 위원회가 밝혀",
-      "summary_ko": "중국계 스캔들 의혹 속 CEO 사임으로 흔들린 엔비디아와 관련된 의회 위원회 조사 결과",
-      "lines": [
-        "중국 인민해방군, 엔비디아 고성능 칩 확보 추진",
-        "젠슨 황 엔비디아 CEO 사임"
-      ]
-    },
-    {
-      "title": "U.S. soldier taken into military custody over suspected spying for Russia",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/18/us-soldier-military-custody-spy-russia.html",
-      "published": "2026-11-18 10:41:05",
-      "title_ko": "미국 군인, 러시아 간첩 혐의로 군 구금에 들어가",
-      "summary_ko": "간첩 및 국가 안보 혐의로 지난주 영국에서 체포된 고위 군인",
-      "lines": [
-        "러시아 스파이 혐의 미군 병사 영국서 체포",
-        "체포된 미군 장교 나토 신속대응군 소속 근무"
-      ]
-    },
-    {
-      "title": "Cantor Fitzgerald's Nvidia business interests targeted in Democrats' Lutnick probe",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/18/nvidia-lutnick-china-ai-megaspeed-cantor-fitzgerald.html",
-      "published": "2026-11-18 09:45:01",
-      "title_ko": "민주당의 러트닉 조사에서 캔터 피츠제럴드의 엔비디아 사업 이해관계가 타깃이 돼",
-      "summary_ko": "민주당의 하원 및 상원 통제 확보 이후 발표된 의회 조사",
-      "lines": [
-        "미 의회 민주당 상하원 장악 속 러트닉 상무장관 조사 착수",
-        "민주당 의원들 러트닉 아들들의 엔비디아 사업 이해충돌 조사"
-      ]
-    },
-    {
-      "title": "미국 대중국 반도체 수출 통제 강화",
-      "title_ko": "미국 대중국 반도체 수출 통제 강화",
-      "summary_ko": "미국의 첨단 AI 반도체 우회 수출 제한 등 규제 강화로 반도체 업종 투자 심리가 악화됨",
-      "source": "KB증권 모닝미팅",
-      "link": "https://www.youtube.com/watch?v=BafZSl_r8eQ",
-      "published": "2026-11-18 00:19:28",
-      "kind": "media",
-      "tag": "규제 · 산업정책",
-      "direction": "negative",
-      "n_channels": 3,
-      "lines": [
-        "임정훈 연구원 발언 : 미국 산업 안보국 신규 규칙 발표로 제3국 통한 우회 수출 제한",
-        "김지우 연구원 발언 : 이미 언론에 예고된 바 있어 증시에 미치는 영향은 제한적"
-      ]
-    },
-    {
-      "title": "앤트로픽 IPO 및 AI 스타트업 파급",
-      "title_ko": "앤트로픽 IPO 및 AI 스타트업 파급",
-      "summary_ko": "앤트로픽의 성공적인 IPO 임박이 AI 벤처 생태계와 M&A 시장에 자금 순환을 이끌어낼 것으로 기대",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=Mdueja53I_E",
-      "published": "2026-11-17 21:18:15",
-      "kind": "media",
-      "tag": "기업 사건",
-      "direction": "neutral",
-      "n_channels": 2,
-      "lines": [
-        "로라 리피 발언 : 앤트로픽 IPO 성공 시 자본 재순환 및 인수합병 가능성 확대 예상",
-        "로라 리피 발언 : 앤트로픽 인재 유지율 다른 주요 기업보다 훨씬 높음",
-        "로라 리피 발언 : 벤처 캐피털 투자자 아마존 구글 등 주요 플레이어 참여"
-      ]
-    },
-    {
-      "title": "트럼프 대통령 아시아 순방 및 정상회담",
-      "title_ko": "트럼프 대통령 아시아 순방 및 정상회담",
-      "summary_ko": "트럼프 대통령의 아시아 순방 중 미중 정상회담이 양국 관계 개선의 계기가 될 것으로 기대",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=bM0JZboNVAo",
-      "published": "2026-11-17 18:27:33",
+      "link": "https://www.youtube.com/watch?v=WThwZvY4uSE",
+      "published": "2026-11-18 17:58:12",
       "kind": "media",
       "tag": "지정학",
       "direction": "neutral",
-      "n_channels": 2,
+      "n_channels": 4,
       "lines": [
-        "제임스 스타브리디스 전 사령관 발언 : 미중 정상회담은 양국 경제 수장 간의 소통 측면에서 긍정적",
-        "제임스 스타브리디스 전 사령관 발언 : 정상회담에서 핵무기, 무역, AI 군비 통제 등이 주요 의제로 다뤄질 것으로 예상"
+        "니콜라스 번스 전 대사 발언 : 미중 양국 관세 및 공급망 휴전 가능성 논의 중",
+        "니콜라스 번스 전 대사 발언 : 트럼프 대통령의 중국 핵무기 증강 문제 제기는 중요함",
+        "니콜라스 번스 전 대사 발언 : 우크라이나 제외한 3자 회담은 미국에 외교적 부담으로 작용할 수 있음"
+      ]
+    },
+    {
+      "title": "엔비디아 대중국 수출 통제 조사",
+      "title_ko": "엔비디아 대중국 수출 통제 조사",
+      "summary_ko": "미 의회는 엔비디아의 대중국 수출 통제 준수 여부와 국가 안보 리스크에 대해 강도 높은 조사를 예고",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=iHflr6nKXdE",
+      "published": "2026-11-18 17:45:21",
+      "kind": "media",
+      "tag": "규제 · 산업정책",
+      "direction": "negative",
+      "n_channels": 4,
+      "lines": [
+        "톰 틸리스 상원의원 발언 : 엔비디아의 대중국 사업 관련 의회 청문회 및 조사 필요",
+        "랜드 폴 상원의원 발언 : 엔비디아의 대중국 수출 통제 준수 여부와 국가 안보 리스크 우려",
+        "아담 호지 발언 : 엔비디아는 현재 국가 안보 리스크와 관련해 엄중한 상황에 직면"
       ]
     }
   ]

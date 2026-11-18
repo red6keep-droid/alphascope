@@ -1,199 +1,4 @@
 {
- "4482bc3c74e5": {
-  "lines": [
-   "닛산, 연간 판매 전망 두 번째 하향",
-   "중국 개발 차량 수출 확대 계획 발표"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "EARNINGS",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T12:46:47.287859+00:00",
-  "n_src": 900
- },
- "230c6116294d": {
-  "lines": [
-   "미국 육군 상급 군인 영국서 러시아 간첩 혐의 체포"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "GEOPOLITICS",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T12:46:47.287859+00:00",
-  "n_src": 900
- },
- "4adcecd39d3e": {
-  "lines": [
-   "엔비디아 다른 기업들에 수천억 달러 규모 재정 약속 체결"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "AI_CAPEX",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T21:46:22.982657+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "9eaff884d4a0": {
-  "lines": [
-   "안젤라 알소브룩스와 론 와이든 의원의 보건복지부 장관 서한 발송",
-   "임상시험 및 식품의약국 승인 관련 예측 시장 계약에 대한 우려 제기"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T19:51:51.632292+00:00",
-  "n_src": 900
- },
- "592e66788189": {
-  "lines": [
-   "메타의 인프라 책임자 산토쉬 자나르단 2027년 퇴사 예정",
-   "전 아마존웹서비스 임원 데이비드 브라운의 인프라 책임자 승계"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "META"
-    ],
-    "sector": "XLC",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "talk"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "META"
-    ],
-    "sector": "XLC",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T19:51:51.632292+00:00",
-  "n_src": 900
- },
- "da9e419ec94a": {
-  "lines": [
-   "애플 2026년 랠리 30% 상승 및 사상 최고가 기록",
-   "수요일 전반 거래 시간 동안 애플 옵션 약 약 90만 건 거래"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "AAPL"
-    ],
-    "sector": "XLK",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "AAPL"
-    ],
-    "sector": "XLK",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T19:51:55.706426+00:00",
-  "n_src": 900
- },
- "c3d57e6b25d1": {
-  "lines": [
-   "윈 리조트 연초 이후 주가 27% 이상 하락"
-  ],
-  "tags": [
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T19:51:55.706426+00:00",
-  "n_src": 900
- },
- "16dadfebd335": {
-  "lines": [
-   "코어위브 수요일 주가 26% 급등",
-   "코어위브 3분기 호실적 발표 및 연간 가이던스 상향"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "SMH",
-    "issue": "EARNINGS",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T19:51:55.706426+00:00",
-  "n_src": 900
- },
  "8ed0c79ac0a1": {
   "lines": [
    "아메리칸항공의 뉴욕-시카고 노선 퍼스트클래스 신선식품 재도입",
@@ -222,79 +27,6 @@
   "n_src": 900,
   "retry": true
  },
- "65274679228c": {
-  "lines": [
-   "미 상품선물거래위원회의 칼시 이벤트 계약 자체 인증 조사 착수"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T19:51:58.148724+00:00",
-  "n_src": 900
- },
- "b61c3675cf53": {
-  "lines": [
-   "블루퍼스트 국내선 일등석 공개",
-   "2024년 12월 블루퍼스트 출시 예정"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T21:46:24.982994+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "fd6c8945165f": {
-  "lines": [
-   "캐나다 의약품 유통사 임원들 불법 수입 혐의 기소",
-   "캐나다 회사 캐나릭스 최고재무책임자 일요일 체포"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T21:46:22.982657+00:00",
-  "n_src": 900
- },
  "776bc90552c6": {
   "lines": [
    "코스트코 특별 배당 발표"
@@ -315,60 +47,6 @@
   "at": "2026-11-12T02:31:05.091987+00:00",
   "n_src": 311,
   "retry": true
- },
- "3a7234e850d1": {
-  "lines": [
-   "관세로 인한 투자 비용 상승",
-   "미국 연방준비제도 내년 소비재 가격 인상 전망"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "TARIFF_TRADE",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "INFLATION",
-    "dir": "negative",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T21:46:24.982994+00:00",
-  "n_src": 900
- },
- "e4db49d81e89": {
-  "lines": [
-   "지난 4십년간 과세 대상 급여 비중 하락",
-   "세수가 GDP와 보조를 맞췄을 경우 2059년까지 전액 지급 가능"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-11T21:46:24.982994+00:00",
-  "n_src": 900
  },
  "4e54d5748085": {
   "lines": [
@@ -4521,6 +4199,315 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-18T12:46:46.102988+00:00",
+  "n_src": 900
+ },
+ "92cdbaff4de0": {
+  "lines": [
+   "앤트로픽 공모가 83달러 확정 (예상)",
+   "나스닥 거래 개시일 목요일 예정",
+   "목표 발행 주식수 8억 2500만 주",
+   "조달 자금 약 685억 달러 규모",
+   "기존 목표치 상회하는 1조 4000억 달러 이상 기업가치 전망"
+  ],
+  "tags": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:33.646201+00:00",
+  "n_src": 900
+ },
+ "879c59d879df": {
+  "lines": [
+   "엔비디아 임시 최고경영자 콜레트 크레스 임원진과 전체 회의 개최",
+   "젠슨 황 사임 후 첫 전 직원 미팅 진행",
+   "신임 이사회 의장 하비 존스 및 주요 임원 참석"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:33.646201+00:00",
+  "n_src": 900
+ },
+ "69a85382a6c6": {
+  "lines": [
+   "에스토니아 출신 기술 억만장자 앤트로픽 초기 투자 참여",
+   "과거 1억 2400만 달러 규모 시리즈 A 투자 주도",
+   "앤트로픽 나스닥 상장 예정"
+  ],
+  "tags": [
+   null,
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:33.646201+00:00",
+  "n_src": 900
+ },
+ "3da9c50c1b19": {
+  "lines": [
+   "미국 식품의약품안전청의 불법 처방약 수입 관련 형사 사건 기소",
+   "캐나다 헬스케어 기업 간부 존 토마스 하워드의 11월 8일 체포 및 밀수 등 혐의 기소"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:35.835967+00:00",
+  "n_src": 900
+ },
+ "ef28fb89fd52": {
+  "lines": [
+   "엔비디아의 수요일 주가 2.89% 하락 기록",
+   "코어위브의 주가 4.13% 하락 및 아이렌의 3.61% 하락",
+   "엔비디아의 3분기 매출 1158억 4000만 달러 발표 (예상)",
+   "엔비디아의 4분기 매출 가이던스 1300억 달러 제시"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:35.835967+00:00",
+  "n_src": 900
+ },
+ "a4a855012e76": {
+  "lines": [
+   "엔비디아 주가의 164달러에서 152달러 아래로의 변동 (예상)",
+   "구리 선물 가격의 5% 급락으로 4월 이후 최저치 기록"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLB",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:35.835967+00:00",
+  "n_src": 900
+ },
+ "c9bcd104c52a": {
+  "lines": [],
+  "tags": [],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:37.540510+00:00",
+  "n_src": 900
+ },
+ "c50ef9f1c5c7": {
+  "lines": [],
+  "tags": [],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:37.540510+00:00",
+  "n_src": 361
+ },
+ "3a261481b746": {
+  "lines": [
+   "연방준비제도 10월 정책 회의 기준금리 3.75%-4% 동결 (예상)",
+   "연방준비제도 당국자들의 추가 금리 인상 필요성 언급 및 인플레이션 위험 요인 지적",
+   "인공지능 수요의 물가 상승 압력 위험 요인 부각"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "INFLATION",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "INFLATION",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:37.540510+00:00",
+  "n_src": 900
+ },
+ "be113688fd9a": {
+  "lines": [
+   "부통령 JD 밴스의 딜북 서밋 일정 취소",
+   "미국 정부의 전국적 기술 장애 관련 회의 참석",
+   "트럼프 행정부 당국자의 기술 장애 사이버 공격 아님 발표"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:39.309792+00:00",
+  "n_src": 900
+ },
+ "9ebb9a6aefb3": {
+  "lines": [
+   "하킴 제프리스의 민주당 하원 의장 후보 선출",
+   "민주당의 의장 후보 투표 결과 251대 11 기록",
+   "내년 1월 하원 의장 선출을 위한 본회의 투표 예정"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-18T21:46:39.309792+00:00",
   "n_src": 900
  }
 }
