@@ -5,6 +5,8 @@
    - 목록은 탭 · 묶음마다 10개까지, 접기 없음(2026-11-17 사용자). 줄 전체 = 종목 페이지(테마의 [data-row-link] 장치).
    - 관심 탭(1단계) = 이 기기에서 최근 본 종목(테마가 종목 페이지를 열 때 브라우저에 남기는 as-recent). 로그인 · ☆ 담기는 2단계.
    - 기준일 = 제목 줄 오른쪽(공유 버튼 앞).
+   - 2026-11-18 목업 확정분(mock_stock_lists.py)을 옮김 (2026-11-19 사용자 "진행해"): 로고 ~ 이름 11 · 증감 17(삼각형 14) · 가격 = 증감 색 · 한국 보조 줄에 종목 코드 숫자 없음
+     · 오늘 움직임 오른쪽 말 = 보조 줄 크기 회색 + 숫자 굵게 · 테마 · 업종 묶음 고르기 = 히트맵(칸 크기 = 시가총액 합의 제곱근, 색 = 묶음 평균 등락 4단계).
    목업(로컬): <div id="as-lists" data-local="lists/"> — 같은 폴더의 lists/<시장>/_lists.json 을 읽는다. */
 (function () {
   'use strict';
@@ -20,6 +22,8 @@
   var LIST = 'display:block;margin:0 0 8px;border-bottom:1px solid #E2E8F0;';   // 카드 없이 구분선 목록 (2026-11-17 사용자) — 맨 위 선 없음 · 줄 사이 · 맨 끝
   var ROW = 'display:flex;justify-content:space-between;gap:12px;padding:16px 6px;white-space:nowrap;line-height:24px;align-items:flex-start;';   // 구분선 위아래 16(24 − 5 − 3), 첫 줄 위만 21(24 − 3) (2026-11-17 사용자), 좌우 = 왼쪽 기준선 6
   var SEP = 'border-top:1px solid #E2E8F0;';
+  var GAP = 11, CHG = 17;                        // 로고 ~ 이름 6 → 11 · 증감 15 → 16 → 17 (2026-11-18 사용자)
+  var NOTE_PX = 14;                              // 보조 줄 글자(dk.TINY)
   var BADGE = [['#2F6F68', '#FFFFFF'], ['#5B6B3A', '#FFFFFF'], ['#86683A', '#FFFFFF']];   // design_kit.BADGE_COLORS
 
   var m = '';
@@ -42,8 +46,10 @@
     if (v == null) return '<span style="color:' + C_MUTED + ';">—</span>';
     var col = v > 0 ? C_UP : v < 0 ? C_DOWN : C_MUTED, tri = v > 0 ? '▲' : v < 0 ? '▼' : '';
     return '<span style="color:' + col + ';white-space:nowrap;' + (bold === false ? '' : 'font-weight:700;') + '">' +
-      (tri ? '<span style="font-size:13px;vertical-align:1px;margin-right:2px;">' + tri + '</span>' : '') + Math.abs(v).toFixed(2) + '%</span>';
+      (tri ? '<span style="font-size:' + Math.round(CHG * 0.8) + 'px;vertical-align:1px;margin-right:2px;">' + tri + '</span>' : '') + Math.abs(v).toFixed(2) + '%</span>';
   }
+  function dirCol(v) { return v > 0 ? C_UP : v < 0 ? C_DOWN : '#111'; }   // 가격 = 증감과 같은 색 (2026-11-18 사용자)
+  function subOf(r, tail) { return m === 'kr' ? esc(tail || '') : (tail ? esc(r.t) + ' · ' + esc(tail) : esc(r.t)); }   // 한국 = 종목 코드 숫자 넣지 않음 (2026-11-18 사용자)
   function capText(c) {
     if (!c) return '';
     if (m === 'us') return c >= 1e12 ? (c / 1e12).toFixed(2) + '조 달러' : Math.round(c / 1e8).toLocaleString('ko-KR') + '억 달러';
@@ -52,7 +58,7 @@
   }
   function logo(r) {
     var Z = 35;   // 로고 22 → 44 → 20% 작게 35, 이름 · 보조 줄 두 줄의 세로 가운데 (2026-11-17 사용자 "로고 2배 · 미들 정렬")
-    var st = 'display:inline-block;width:' + Z + 'px;height:' + Z + 'px;border-radius:50%;vertical-align:0;margin-right:6px;';
+    var st = 'display:inline-block;width:' + Z + 'px;height:' + Z + 'px;border-radius:50%;vertical-align:0;margin-right:' + GAP + 'px;';
     if (r.lg) return '<img src="' + LOGO + esc(r.lg) + '?v=' + LOGO_VER + '" alt="" width="' + Z + '" height="' + Z + '" loading="lazy" style="' + st + 'background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;">';
     var k = String(r.t), n = 0; for (var i = 0; i < k.length; i++) n += k.charCodeAt(i);
     var c = BADGE[n % BADGE.length];
@@ -63,14 +69,14 @@
   function row(r, i, o) {
     o = o || {};
     var rank = o.rank ? '<span style="flex:none;width:26px;color:' + NOTE + ';font-weight:700;font-size:15px;line-height:24px;">' + o.rank + '</span>' : '';
-    var sub = o.sub != null ? o.sub : esc(r.t) + ' · ' + esc(r.s);
+    var sub = o.sub != null ? o.sub : subOf(r, r.s);
     var left = '<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;">' + rank +
       '<span style="flex:none;display:flex;align-items:center;">' + logo(r) + '</span>' +
       '<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(r.n) + '</span>' +
-      '<span style="display:block;font-size:14px;line-height:20px;color:' + NOTE + ';white-space:nowrap;">' + sub + '</span></span></span>';
+      '<span style="display:block;font-size:' + NOTE_PX + 'px;line-height:20px;color:' + NOTE + ';white-space:nowrap;">' + sub + '</span></span></span>';
     var right = '<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">' +
-      '<span style="font-size:16px;line-height:24px;">' + (o.right != null ? o.right : pct(r.r)) + '</span>' +   // 증감 15 → 16 (2026-11-17 사용자)
-      '<span style="font-size:15px;line-height:20px;color:#111;">' + esc(price(r)) + '</span></span>';   // 증감 위 · 가격 아래 (2026-11-17 사용자 규칙)
+      '<span style="font-size:' + CHG + 'px;line-height:24px;">' + (o.right != null ? o.right : pct(r.r)) + '</span>' +
+      '<span style="font-size:15px;line-height:20px;color:' + dirCol(r.r) + ';">' + esc(price(r)) + '</span></span>';   // 증감 위 · 가격 아래 (2026-11-17 사용자 규칙)
     return '<span data-row-link="1" data-href="' + esc(href(r)) + '" style="' + ROW + (i ? SEP : 'padding-top:21px;') + '">' + left + right + '</span>';   // 테마 줄 장치가 data-href 로 이동
   }
   function card(items, render) {
@@ -101,6 +107,60 @@
     });
   }
 
+  /* 히트맵 — 테마 · 업종 묶음 고르기 (2026-11-18 사용자 "네모난 히트맵이 상단에, 누르면 그 종목들"). 칸 = 알약과 같은 data-sl-pill(같은 탭 전환).
+     칸 크기 = 묶음 시가총액 합의 제곱근(시총 값이 절반 넘게 없으면 종목 수, 한 판 안에서 잣대를 섞지 않음) · 최소 판의 4% · 큰 순.
+     색 = 묶음 전 종목 하루 등락 단순 평균, 0.1% 미만 보합 · 1 · 2 · 3% 경계 4단계, 글자 = 같은 방향 색. 칸은 하나도 버리지 않는다. */
+  var HEAT_W = 360;
+  var HEAT_UP = ['#FFF7EE', '#FFECE0', '#FDDDD0', '#F9CBBD'], HEAT_DN = ['#EFF6FF', '#E2EEFE', '#D0E3FD', '#BCD6FB'], HEAT_FLAT = '#F8FAFC';
+  var HEAT_FG_UP = [C_UP, C_UP, C_UP, '#B3261E'], HEAT_FG_DN = [C_DOWN, C_DOWN, C_DOWN, '#1558B0'];
+  function heatColor(v) {
+    if (v == null || Math.abs(v) < 0.1) return [HEAT_FLAT, '#333'];
+    var a = Math.abs(v), k = a < 1 ? 0 : a < 2 ? 1 : a < 3 ? 2 : 3;
+    return v > 0 ? [HEAT_UP[k], HEAT_FG_UP[k]] : [HEAT_DN[k], HEAT_FG_DN[k]];
+  }
+  function squarify(vals, x, y, w, h) {   // squarified treemap — vals 는 큰 순, 합 = w*h
+    var out = [], i = 0;
+    while (i < vals.length) {
+      var shortSide = Math.min(w, h), row = [vals[i]];
+      var worst = function (r) { var sm = 0, mx = 0; r.forEach(function (v) { sm += v; }); r.forEach(function (v) { mx = Math.max(mx, shortSide * shortSide * v / (sm * sm), (sm * sm) / (shortSide * shortSide * v)); }); return mx; };
+      var best = worst(row), j = i + 1;
+      while (j < vals.length) { var cand = row.concat([vals[j]]), wc = worst(cand); if (wc > best) break; row = cand; best = wc; j++; }
+      var sm = row.reduce(function (t, v) { return t + v; }, 0);
+      if (w >= h) { var cw = sm / h, yy = y; row.forEach(function (v) { out.push([x, yy, cw, v / cw]); yy += v / cw; }); x += cw; w -= cw; }
+      else { var rh = sm / w, xx = x; row.forEach(function (v) { out.push([xx, y, v / rh, rh]); xx += v / rh; }); y += rh; h -= rh; }
+      i = j;
+    }
+    return out;
+  }
+  function heatmap(key, groups) {   // groups = [[이름, 종목 줄들]] → {board, groups(큰 순), basis}
+    var sized = groups.map(function (g) {
+      var caps = g[1].filter(function (r) { return r.c; }).map(function (r) { return r.c; });
+      var rs = g[1].filter(function (r) { return r.r != null; }).map(function (r) { return r.r; });
+      var byCap = caps.length * 2 >= g[1].length;
+      return { sz: byCap ? Math.sqrt(caps.reduce(function (t, v) { return t + v; }, 0)) : g[1].length, how: byCap ? 'cap' : 'n',
+        n: g[0], xs: g[1], avg: rs.length ? rs.reduce(function (t, v) { return t + v; }, 0) / rs.length : null };
+    });
+    if (sized.some(function (t) { return t.how !== sized[0].how; })) sized.forEach(function (t) { t.sz = t.xs.length; t.how = 'n'; });
+    var tot0 = sized.reduce(function (t, x) { return t + x.sz; }, 0), floor = 0.04 * tot0;   // 칸 최소 = 판의 4% (2026-11-18)
+    sized.forEach(function (t) { t.sz = Math.max(t.sz, floor); });
+    sized.sort(function (a, b) { return b.sz - a.sz; });
+    var H = sized.length <= 8 ? 240 : 300, tot = sized.reduce(function (t, x) { return t + x.sz; }, 0);
+    var rects = squarify(sized.map(function (t) { return t.sz * HEAT_W * H / tot; }), 0, 0, HEAT_W, H);
+    var cells = sized.map(function (t, i) {
+      var q = rects[i], w = q[2], h = q[3], c = heatColor(t.avg);
+      var p = t.avg == null ? '' : (t.avg > 0 ? '▲' : t.avg < 0 ? '▼' : '') + Math.abs(t.avg).toFixed(2) + '%';
+      var big = w >= 90 && h >= 64, px = big ? 15 : 13;
+      var inner = '<span class="hm-n" style="font-size:' + px + 'px;line-height:' + (px + 5) + 'px;">' + esc(t.n) + '</span>' +
+        (h >= 40 && w >= 40 ? '<span class="hm-p" style="font-size:' + (px - 1) + 'px;line-height:' + (px + 3) + 'px;">' + p + '</span>' : '');
+      var pos = 'left:' + (q[0] / HEAT_W * 100).toFixed(3) + '%;top:' + (q[1] / H * 100).toFixed(3) + '%;width:' + (w / HEAT_W * 100).toFixed(3) + '%;height:' + (h / H * 100).toFixed(3) + '%;';
+      return '<button type="button" class="hm-c" data-sl-pill="' + i + '" aria-selected="' + (i ? 'false' : 'true') + '" aria-label="' + esc(t.n + ' ' + p) + '" style="' +
+        pos + 'background:' + c[0] + ';color:' + c[1] + ';--hm-fg:' + c[1] + ';">' + inner + '</button>';
+    });
+    return { board: '<div class="hm" data-sl-pills="' + key + '" data-sl-heat style="height:' + H + 'px;">' + cells.join('') + '</div>',
+      groups: sized.map(function (t) { return [t.n, t.xs]; }),
+      basis: (sized.length && sized[0].how === 'cap' ? '칸 크기 = 시가총액' : '칸 크기 = 종목 수') + ' · 색 = 묶음 평균 등락(마지막 종가)' };
+  }
+
   function byDesc(f) { return function (a, b) { return (f(b) == null ? -1e18 : f(b)) - (f(a) == null ? -1e18 : f(a)); }; }
 
   function move(rows) {
@@ -109,9 +169,10 @@
       ['상승 종목', function (r) { return r.r >= UP; }, function (r) { return r.r; }, UP + '% 넘게 오른 종목이 없어 많이 오른 순입니다.', null],
       ['하락 종목', function (r) { return r.r <= DOWN; }, function (r) { return -r.r; }, (-DOWN) + '% 넘게 내린 종목이 없어 많이 내린 순입니다.', null],
       ['거래 급증', function (r) { return (r.v || 0) >= VOL; }, function (r) { return r.v; }, '평소의 2배를 넘은 종목이 없어 많이 늘어난 순입니다.',
-        function (r) { return '<span style="color:#333;">평소의 ' + r.v.toFixed(1) + '배</span> · ' + pct(r.r, false); }],
+        function (r) { return '<span style="color:' + NOTE + ';font-size:' + NOTE_PX + 'px;">평소의 ' + r.v.toFixed(1) + '배 · </span>' + pct(r.r); }],   // 말 = 보조 줄 크기 · 색, 증감 = 굵게 (2026-11-18 사용자)
       ['52주 최고가 근처', function (r) { return r.h != null && r.h >= NEAR; }, function (r) { return r.h; }, '최고가 2% 안 종목이 없어 가까운 순입니다.',
-        function (r) { return '<span style="color:#333;">' + (r.h >= 0 ? '최고가' : '최고가까지 ' + Math.abs(r.h).toFixed(1) + '%') + '</span>'; }]
+        function (r) { return r.h >= 0 ? '<span style="color:' + C_UP + ';font-weight:700;">최고가</span>'
+          : '<span style="color:' + NOTE + ';font-size:' + NOTE_PX + 'px;">최고가까지 </span><b style="color:' + C_DOWN + ';">' + Math.abs(r.h).toFixed(1) + '%</b>'; }]   // 최고가 = 빨강 굵게, 남은 % = 파랑 굵게 (2026-11-18 사용자)
     ];
     var bodies = G.map(function (g) {
       var pool = xs.filter(function (r) { return g[2](r) != null; }).sort(byDesc(g[2]));
@@ -125,26 +186,28 @@
   function theme(doc, by) {
     var gs = (doc.themes || []).map(function (g) { return [g[0], g[1].map(function (t) { return by[t]; }).filter(Boolean)]; }).filter(function (g) { return g[1].length; });
     if (!gs.length) return note('묶음을 불러오지 못했습니다.');
+    var hm = heatmap('theme', gs);
+    gs = hm.groups;
     var bodies = gs.map(function (g) {
       var xs = g[1].slice().sort(byDesc(function (r) { return r.r; }));
       var link = (m === 'us' && ['AI 칩', '메모리', '칩 생산', '반도체 장비', '데이터 센터'].indexOf(g[0]) >= 0)   // 반도체를 넷으로 나눔 (2026-11-19)
         ? '<a href="/p/theme-ai-capex.html" style="display:block;margin:4px 0 12px;padding-left:6px;font-size:15px;line-height:24px;color:#111;font-weight:700;text-decoration:none;">AI 투자 자금 흐름 보기 →</a>' : '';
       return card(xs, function (r, i) { return row(r, i); }) + link;
     });
-    return pills('theme', gs.map(function (g) { return g[0]; })) + panels('theme', bodies);
+    return hm.board + panels('theme', bodies) + note(hm.basis);   // 히트맵이 묶음 줄 자리 (2026-11-18 사용자)
   }
   function sector(rows) {
     var by = {};
     rows.forEach(function (r) { (by[r.s] = by[r.s] || []).push(r); });
-    var order = Object.keys(by).sort(function (a, b) { return by[b].length - by[a].length; });
-    var bodies = order.map(function (k) {
-      return card(by[k].sort(byDesc(function (r) { return r.c; })), function (r, i) { return row(r, i, { sub: esc(r.t) + (r.c ? ' · ' + capText(r.c) : '') }); });
+    var hm = heatmap('sec', Object.keys(by).map(function (k) { return [k, by[k]]; }));
+    var bodies = hm.groups.map(function (g) {
+      return card(g[1].slice().sort(byDesc(function (r) { return r.c; })), function (r, i) { return row(r, i, { sub: subOf(r, r.c ? capText(r.c) : '') }); });
     });
-    return pills('sec', order) + panels('sec', bodies);
+    return hm.board + panels('sec', bodies) + note(hm.basis);
   }
   function caps(rows) {
     var xs = rows.filter(function (r) { return r.c; }).sort(byDesc(function (r) { return r.c; }));
-    return card(xs, function (r, i) { return row(r, i, { rank: i + 1, sub: esc(r.t) + ' · ' + capText(r.c) }); }) +
+    return card(xs, function (r, i) { return row(r, i, { rank: i + 1, sub: subOf(r, capText(r.c)) }); }) +
       '<a href="/p/' + m + '-market-cap-top10.html" style="display:block;margin:4px 0 12px;padding-left:6px;font-size:15px;line-height:24px;color:#111;font-weight:700;text-decoration:none;">' +
       (m === 'us' ? '미국' : '한국') + ' 시가총액 상위 10 종목 페이지 →</a>';
   }
