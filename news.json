@@ -1,11 +1,96 @@
 {
-  "updated_at": "2026-11-19 12:46:38 UTC",
+  "updated_at": "2026-11-19 21:46:37 UTC",
   "items": [
     {
-      "title": "Walmart hikes outlook as top execs tell CNBC the retailer is gaining market share ahead of holidays",
+      "title": "Commerce approved sales of more than 879,000 AI chips to Chinese companies, Rep. Mast says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/19/nvidia-amd-china-chip-sales-congress.html",
+      "published": "2026-11-19 21:43:30",
+      "title_ko": "상무부, 중국 기업에 87만 9천 개 이상의 AI 칩 판매 승인했다고 매스트 의원 밝혀",
+      "summary_ko": "의원들, 젠슨 황 스캔들 이후 중국 대상 칩 판매 수출 통제 강화 법안 추진",
+      "lines": [
+        "상무부의 대중국 AI 칩 판매 승인",
+        "알리바바와 텐센트 대상 87만9000개 이상 칩 승인"
+      ]
+    },
+    {
+      "title": "Intuit to sell Mailchimp to Bending Spoons for $3.68 billion",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/19/intuit-mailchimp-sale-bending-spoons.html",
+      "published": "2026-11-19 21:40:31",
+      "title_ko": "인튜이트, 벤딩 스푼스에 메일침프 36억 8천만 달러에 매각",
+      "summary_ko": "",
+      "lines": [
+        "인튜이트의 벤딩 스푼스에 36억 8000만 달러 규모 메일침프 매각 합의",
+        "메일침프 매각 거래 2027년 초 완료 예정"
+      ]
+    },
+    {
+      "title": "Anthropic IPO: Investors who flip the stock may face brokerage penalty",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/19/anthropic-ipo-flipping-rules.html",
+      "published": "2026-11-19 21:16:41",
+      "title_ko": "앤스로픽 IPO: 주식 조기 매도 투자자에 대한 브로커리지 페널티 부과 가능성",
+      "summary_ko": "증권사들은 앤스로픽 지분을 너무 빨리 매각하는 투자자들에게 향후 IPO 참여 제한을 둘 수 있음",
+      "lines": [
+        "앤스로픽 기업공개에 찰스슈바브와 피델리티 등 주요 증권사 참여 예정",
+        "찰스슈바브를 제외한 일부 증권사의 조기 매도 제한 정책 적용 가능성"
+      ]
+    },
+    {
+      "title": "AMD dives on short-seller report of alleged China exposure",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/19/amd-falls-on-short-seller-report-of-alleged-china-exposure.html",
+      "published": "2026-11-19 21:14:46",
+      "title_ko": "AMD, 중국 연루 의혹 공매도 보고서에 하락",
+      "summary_ko": "한 공매도 투자자가 AMD의 펌웨어가 블랙리스트에 오른 중국 기업에서 발견되었다고 주장한 후 AMD는 7% 이상 하락 마감했으며 회사는 미국법을 준수한다고 밝힘",
+      "lines": [
+        "공매도 보고서의 중국향 매출 및 펌웨어 관련 의혹 제기 여파로 AMD 주가 7.72% 하락",
+        "미국 법규 준수 입장 표명과 중국 및 홍콩 매출 비중 20% 상회 (예상)"
+      ]
+    },
+    {
+      "title": "Palo Alto stock jumps on earnings beat and company's big bet on securing open-weight models",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/19/palo-alto-networks-earnings-applied-compute.html",
+      "published": "2026-11-19 21:00:57",
+      "title_ko": "팔로알토 주가, 실적 호조 및 오픈웨이트 모델 보안에 대한 대규모 투신에 급등",
+      "summary_ko": "팔로알토 네트워크스는 예상보다 양호한 1분기 실적을 발표하고 AI 스타트업 어플라이드 컴퓨트와 45억 달러 규모의 계약을 체결",
+      "lines": [
+        "팔로알토 네트웍스의 1분기 호실적 발표 및 연간 실적 전망 상향",
+        "인공지능 스타트업 어플라이드 컴퓨트 인수를 위한 45억 달러 규모 계약 체결 (예상)",
+        "사이버보안 지출 증가와 실적 호조 영향으로 팔로알토 주가 6% 상승 (예상)"
+      ]
+    },
+    {
+      "title": "3-step method to influence people and win them over, from a Stanford expert: ‘Your voice is like a muscle’",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/make-it/2026/11/19/matt-abrahams-persuasive-speaking-tips.html",
+      "published": "2026-11-19 20:17:36",
+      "title_ko": "스탠퍼드 전문가가 말하는 사람들의 마음을 사로잡고 설득하는 3단계 방법: '목소리는 근육과 같다'",
+      "summary_ko": "스탠퍼드대학교 커뮤니케이션 강사 매트 아브라함스는 현재와 미래의 리더들에게 목소리를 더 매력적이고 설득력 있게 훈련하는 방법을 교육",
+      "lines": [
+        "스탠퍼드대 매트 아브라함스, 음성 훈련으로 설득력 높이는 법 강의",
+        "엔비디아 임시 CEO 코렛 크레스가 관련 주제 논의"
+      ]
+    },
+    {
+      "title": "S&P 500 heads for 6th straight decline. Plus, J&J advances two key products",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/investingclub/2026/11/19/sp-500-heads-for-6th-straight-decline-plus-jj-advances-two-key-products.html",
+      "published": "2026-11-19 20:10:21",
+      "title_ko": "S&P 500 지수 6거래일 연속 하락, 존슨앤드존슨 주요 제품 2종 개발 진척",
+      "summary_ko": "투자 클럽은 거래 마감 1시간 전 실행 가능한 오후 업데이트인 홈스트레치를 매주 평일 공개",
+      "lines": [
+        "S&P 500, 6거래일 연속 하락 전망",
+        "존슨앤존슨, 주요 제품 2종 개발 진행"
+      ]
+    },
+    {
+      "title": "Walmart hikes outlook as CEO tells CNBC retailer aims to keep prices low despite soaring fuel costs",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/19/walmart-wmt-q3-2026-earnings.html",
-      "published": "2026-11-19 12:37:47",
+      "published": "2026-11-19 19:58:30",
       "title_ko": "월마트, 연휴 앞두고 시장 점유율 확대 언급하며 실적 전망 상향",
       "summary_ko": "회계연도 3분기 매장 충족 픽업 및 배송에서 강세 기록",
       "lines": [
@@ -14,126 +99,54 @@
       ]
     },
     {
-      "title": "Anthropic IPO could create thousands of multimillionaire employees",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/anthropic-ipo-could-create-thousands-of-multimillionaire-employees.html",
-      "published": "2026-11-19 12:30:01",
-      "title_ko": "앤트로픽 IPO로 수천 명의 수백만 장자 직원 탄생할 수 있어",
-      "summary_ko": "SEC 서류와 투자자들에 따르면 앤트로픽의 평균 직원은 오늘 회사의 IPO 이후 4,000만 달러 이상의 가치를 가질 수 있음",
+      "title": "AI 컴퓨팅 인프라 투자",
+      "title_ko": "AI 컴퓨팅 인프라 투자",
+      "summary_ko": "앤트로픽은 다양한 가속기 플랫폼을 활용한 효율적인 컴퓨팅 전략으로 시장 변화에 대응함",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=oaPu57EKffo",
+      "published": "2026-11-19 16:15:48",
+      "kind": "media",
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "positive",
+      "n_channels": 5,
       "lines": [
-        "앤스로픽 주가 83달러 및 기업가치 1조 4천억 달러 전망",
-        "앤스로픽 임직원 400명 이상 자산 1억 달러 상회 전망"
+        "크리슈나 라오 CFO 발언 : 향후 컴퓨팅 인프라에 9,000억 달러 규모의 장기 투자 계획",
+        "크리슈나 라오 CFO 발언 : 컴퓨팅 자원 효율성을 극대화하여 전체 용량의 75%를 R&D에 할당 중",
+        "크리슈나 라오 CFO 발언 : 엔비디아, 아마존, 구글, AMD 등 다양한 플랫폼을 활용한 유연한 컴퓨팅 전략 유지"
       ]
     },
     {
-      "title": "Nvidia interim CEO Kress tells employees ‘let’s move forward’ at first all-hands meeting since Jensen Huang exit",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/18/nvidia-interim-ceo-kress-addresses-staff-after-jensen-huang-exit-.html",
-      "published": "2026-11-19 12:04:29",
-      "title_ko": "엔비디아 임시 CEO 크레스, 젠슨 황 사임 후 첫 전 직원 회의서 전진 독려",
-      "summary_ko": "젠슨 황 사임 후 첫 전사 회의에서 직원들 전진 독려 및 임금 인상 제안",
+      "title": "AI 산업 성장 및 엔비디아 영향",
+      "title_ko": "AI 산업 성장 및 엔비디아 영향",
+      "summary_ko": "앤트로픽의 상장이 AI 산업의 성장성을 재확인시키며 엔비디아에 집중된 시장의 관심을 분산시킬 것으로 보인",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=Lb3d-p3sUSs",
+      "published": "2026-11-19 15:56:00",
+      "kind": "media",
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "positive",
+      "n_channels": 3,
       "lines": [
-        "엔비디아 임시 최고경영자 콜레트 크레스 임원진과 전체 회의 개최",
-        "젠슨 황 사임 후 첫 전 직원 미팅 진행",
-        "신임 이사회 의장 하비 존스 및 주요 임원 참석"
+        "출연자 발언 : AI 산업은 경제 성장의 핵심 동력으로 자리매김",
+        "출연자 발언 : 앤트로픽 상장 이슈가 엔비디아에 쏠린 시장의 관심을 일시적으로 분산시키는 효과"
       ]
     },
     {
-      "title": "Denmark ratifies Trump security deal over Greenland after months of diplomatic tensions",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/greenland-denmark-trump-security-military-bases.html",
-      "published": "2026-11-19 12:02:08",
-      "title_ko": "수개월 간의 외교적 갈등 끝에 그린란드 관련 트럼프 안보 협정 비준한 덴마크",
-      "summary_ko": "도널드 트럼프 대통령이 국가 안보를 이유로 미국이 그린란드를 통제해야 한다고 반복적으로 주장한 후 수개월간의 갈등 끝에 이루어짐",
-      "lines": [
-        "덴마크 의회 그린란드 미국 안보 협정 비준",
-        "미국 워싱턴 그린란드 군사 주둔 확대 허용"
-      ]
-    },
-    {
-      "title": "Data center electricity use could double by 2030, IEA says",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/data-center-electricity-demand-iea.html",
-      "published": "2026-11-19 11:34:24",
-      "title_ko": "IEA, 2030년까지 데이터센터 전력 사용량 두 배로 증가할 수 있다고 밝혀",
-      "summary_ko": "IEA에 따르면 AI 붐이 전 세계 전력망에 압박을 가하면서 데이터센터의 전 세계 전력 사용량이 2030년까지 두 배로 증가할 수 있음",
-      "lines": [
-        "2030년 데이터센터 전력 소비량 두 배 증가 전망",
-        "국제에너지기구 데이터센터 연간 전력 소비 1000테라와트시 예상"
-      ]
-    },
-    {
-      "title": "APEC final day in photos: Trump, Xi and Putin shake hands; Takaichi kept at a distance",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/trump-xi-putin-photos-us-china-russia-trilateral-.html",
-      "published": "2026-11-19 10:54:07",
-      "title_ko": "APEC 마지막 날 사진: 트럼프, 시진핑, 푸틴 악수; 다카이치는 거리를 둠",
-      "summary_ko": "미국과 러시아 및 중국 정상의 회동 개최",
-      "lines": [
-        "미국 러시아 중국 아시아태평양경제협력체 정상회의 참석",
-        "국제통화기금 총재 인공지능과 에너지 충격 글로벌 인플레이션 가속 지적"
-      ]
-    },
-    {
-      "title": "연준 10월 FOMC 의사록 추가 인상 공감",
-      "title_ko": "연준 10월 FOMC 의사록 추가 인상 공감",
-      "summary_ko": "연준 10월 FOMC 의사록에서 참석자 대부분이 향후 추가 금리 인상 필요성에 공감",
-      "source": "매경TV 뉴스",
-      "link": "https://www.youtube.com/watch?v=QHQHOD7YzWA",
-      "published": "2026-11-19 10:27:23",
+      "title": "연준 위원들 향후 금리 인상 시사",
+      "title_ko": "연준 위원들 향후 금리 인상 시사",
+      "summary_ko": "최근 공개된 연준 의사록에서 거의 모든 위원들이 향후 몇 달 내 추가 금리 인상에 동의한 것으로 나타났",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=bitiU61OIkU",
+      "published": "2026-11-19 12:49:31",
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "negative",
-      "n_channels": 8,
+      "n_channels": 7,
       "lines": [
-        "연준 발언 : 10월 FOMC 의사록에서 참석자 대부분 물가 목표 2% 위해 향후 몇 달간 추가 금리 인상 필요성 공감",
-        "연준 발언 : 일부 위원 인플레이션 악화 시 50bp 인상 가능성 제기"
-      ]
-    },
-    {
-      "title": "Takaichi gets chilly reception in China on first Japan leader visit since 2019",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/japan-china-trump-takaichi-taiwan-.html",
-      "published": "2026-11-19 07:38:29",
-      "title_ko": "다카이치, 2019년 이후 첫 일본 정상 방중에서 중국의 싸늘한 환대 받아",
-      "summary_ko": "다카이치는 대만 분쟁으로 경색된 관계를 회복하려는 베이징의 의지가 제한적인 가운데 아펙 정상회의 참석차 방문하여 차분한 환영을 받음",
-      "lines": [
-        "다카이치 일본 총리 아태경제협력체 정상회의 참석차 중국 방문",
-        "중국 측 공항 영접에 현직 대신 은퇴한 외교관 참석"
-      ]
-    },
-    {
-      "title": "대중국 반도체 수출 통제 및 기술 규제",
-      "title_ko": "대중국 반도체 수출 통제 및 기술 규제",
-      "summary_ko": "국가 안보와 AI 우위 유지를 위해 미국이 대중국 반도체 및 기술 통제를 계속 유지해야 함",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=9HIXLD5JkWM",
-      "published": "2026-11-18 19:11:25",
-      "kind": "media",
-      "tag": "규제 · 산업정책",
-      "direction": "negative",
-      "n_channels": 2,
-      "lines": [
-        "마이클 오핸런 발언 : 트럼프 대통령이 대중국 반도체 통제 유지 예상",
-        "미국 연구원 발언 : 첨단 반도체 및 리소그래피 장비 중심의 기술 통제 필요",
-        "마이클 오핸런 발언 : 대만 문제 등 안보를 위해 AI 분야 우위 유지 중요"
-      ]
-    },
-    {
-      "title": "미중 정상회담 및 지정학",
-      "title_ko": "미중 정상회담 및 지정학",
-      "summary_ko": "트럼프 대통령의 중국 방문과 정상회담을 통해 관세 및 공급망 관련 휴전 논의가 진행될 예정",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=WThwZvY4uSE",
-      "published": "2026-11-18 17:58:12",
-      "kind": "media",
-      "tag": "지정학",
-      "direction": "neutral",
-      "n_channels": 2,
-      "lines": [
-        "니콜라스 번스 전 대사 발언 : 미중 양국 관세 및 공급망 휴전 가능성 논의 중",
-        "니콜라스 번스 전 대사 발언 : 트럼프 대통령의 중국 핵무기 증강 문제 제기는 중요함",
-        "니콜라스 번스 전 대사 발언 : 우크라이나 제외한 3자 회담은 미국에 외교적 부담으로 작용할 수 있음"
+        "연준 의사록 공개 : 거의 모든 위원 향후 몇 달 내 금리 인상 동의",
+        "국채 금리 상승세 기록",
+        "블룸버그 달러 지수 안정세 진입",
+        "키트 러너 발언 : 예상치 못한 대규모 금리 인상이 시장의 주요 리스크"
       ]
     }
   ]
