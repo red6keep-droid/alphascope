@@ -176,7 +176,7 @@ def stage_prepare(a):
 
     deploy = os.path.join(OUT, "deploy")
     ref = f"images/commentary-{key}.webp"
-    if not a.column_json and _exists(f"{RAW}/{ref}"):   # 앞 실행(정시 · 예비 겹침)이 이미 그려 올렸으면 다시 그리지 않는다 — Workers AI 하루 1만 뉴런 지키기
+    if not a.column_json and not a.redraw and _exists(f"{RAW}/{ref}"):   # 앞 실행(정시 · 예비 겹침)이 이미 그려 올렸으면 다시 그리지 않는다 — Workers AI 하루 1만 뉴런 지키기
         info = {"ref": None, "url": f"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/{ref}", "source": "gh-pages 기존"}
         log(f"배너 이미 있음 — 다시 안 그림 ({ref})")
     else:
@@ -257,6 +257,7 @@ def main():
     ap.add_argument("--briefing-json", help="시험: 묶음 파일 (gh-pages 대신)")
     ap.add_argument("--no-ai", action="store_true", help="배너를 AI 없이 기본 그림으로")
     ap.add_argument("--banner-failed", action="store_true", help="publish: 배너 CDN 확인 실패 — 배너 빼고 낸다")
+    ap.add_argument("--redraw", action="store_true", help="prepare: 그 편 배너가 gh-pages 에 있어도 다시 그린다(사람이 손으로 부를 때만, Workers AI 1장)")
     ap.add_argument("--replace", action="store_true", help="publish: 같은 편이 이미 나갔으면 그 글을 고쳐 쓴다(사람이 손으로 부를 때만)")
     a = ap.parse_args()
     a.date = a.date or kst_now().date().isoformat()

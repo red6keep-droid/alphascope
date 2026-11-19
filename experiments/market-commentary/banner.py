@@ -205,7 +205,8 @@ OUT_W, OUT_H = 900, 350
 PHOTO_W, PHOTO_H = 917, 463
 CANVAS_BG = (6, 18, 26)                      # #06121A
 LEFT = 68
-MAX_TEXT_W = OUT_W - LEFT - 40               # 글자가 넘지 않을 오른쪽 끝 (792)
+MAX_TEXT_W = OUT_W - LEFT - 40               # 시장 요약 글자가 넘지 않을 오른쪽 끝 (792)
+TITLE_MAX_W = 620   # 제목 글자 폭 상한 — 10자 제목이 오른쪽 끝까지 꽉 차 커 보이던 것(11-19 첫 발행), 넘는 제목만 줄인다 · 짧은 제목은 그대로 (2026-11-19 사용자 시안 c)
 LINE_H = 1.25
 MAIN = {"top": 76, "px": 79, "spacing": 2.0, "color": (245, 246, 248)}      # 주요 제목 #F5F6F8, 그림자 0 2 3 rgba(0,0,0,.55)
 EMPH = {"top": 150, "px": 80, "spacing": 2.5}                               # 강조 제목 — 색은 방향
@@ -237,11 +238,12 @@ def _cover(bg, w, h):
     return im.crop((l, t, l + w, t + h))
 
 
-def compose(bg, sc, banner, emph_rgb=None, emph_glow=EMPH_GLOW, shade_max=SHADE_MAX, photo_dim=PHOTO_DIM):
+def compose(bg, sc, banner, emph_rgb=None, emph_glow=EMPH_GLOW, shade_max=SHADE_MAX, photo_dim=PHOTO_DIM, text_max=None):
     """사진 + 글자. 짧은 글은 사양 크기 그대로(키우지 않음), 긴 글은 칸에 들어갈 때까지 줄인다(빼지 않음, 2026-11-17 사용자).
     읽히게 (2026-11-19 사용자 "강조 제목이 배경 때문에 잘 안 보인다" → 시안 4번): emph_rgb = 강조 제목 색 바꿈 · emph_glow = 강조 제목 뒤 어두운 번짐 진하기(0 ~ 255) ·
     shade_max = 왼쪽 어둡게 정도 · photo_dim = 사진 전체를 이만큼 어둡게(0 ~ 1). 기본값 = 확정값."""
     emph_col = emph_rgb or EMPH_COLOR[sc["mood"]]
+    MAX_W = text_max or TITLE_MAX_W   # 제목 글자가 넘지 않을 폭 — 시장 요약은 MAX_TEXT_W 그대로
     glow = Image.new("RGBA", (OUT_W, OUT_H), (0, 0, 0, 0))
     dg = ImageDraw.Draw(glow)
     canvas = Image.new("RGB", (OUT_W, OUT_H), CANVAS_BG)
@@ -270,14 +272,14 @@ def compose(bg, sc, banner, emph_rgb=None, emph_glow=EMPH_GLOW, shade_max=SHADE_
     best = None
     for ln in cands:
         styles = [MAIN, EMPH] if len(ln) == 2 else [EMPH]
-        scale = min([1.0] + [MAX_TEXT_W / _spaced_w(t, _font(True, st["px"]), st["spacing"]) for t, st in zip(ln, styles)])
+        scale = min([1.0] + [MAX_W / _spaced_w(t, _font(True, st["px"]), st["spacing"]) for t, st in zip(ln, styles)])
         if best is None or scale > best[1] + 1e-9:
             best = (ln, scale, styles)
         if scale >= 1.0:
             break
     big = _font(True, BIG_PX)
     one = " ".join(best[0]) if best else ""
-    if best and _spaced_w(one, big, BIG_SPACING) <= MAX_TEXT_W:
+    if best and _spaced_w(one, big, BIG_SPACING) <= MAX_W:
         # 짧은 제목 = 한 줄 · 30% 크게(104px), 제목 칸 가운데. 두 줄이 왔으면 앞은 흰색 · 뒤는 방향 색 (2026-11-17 사용자)
         lines = best[0]
         if len(cands) > 1:
