@@ -187,9 +187,7 @@ def stage_prepare(a):
         b = BN.banner_text(col)
         first = (b.get("titles") or [[]])[0] if b.get("titles") else (b.get("lines") or [])
         alt = "AI 생성 이미지 — " + " ".join(first) if first else alt
-    from story_render import LISTS_URL
-    lists_live = _exists(LISTS_URL)   # 종목 모아보기 페이지가 아직 없으면 표를 3줄로 자르지 않고 전부 싣는다
-    log(f"종목 모아보기 페이지 {'있음 — 표 3줄 + 버튼' if lists_live else '없음 — 표 전부 싣고 접기'}")
+    lists_live = True   # 종목 모아보기 페이지는 11-19 발행 뒤 늘 있다 — 확인 요청을 하지 않는다(GitHub 실행기에서는 블로그가 확인 요청에 정상 답을 주지 않아 '없음'으로 잘못 판단, 11-19 첫 발행)
     from story_render import MOOD_BASE
     mood_ok = _exists(MOOD_BASE + "market-up.webp")   # 장 분위기 아이콘이 gh-pages 에 아직 없으면 아이콘 없이 낸다(깨진 그림 대신)
     title, html, meta = render(col, briefing, banner_url=banner_url, banner_alt=alt, lists_live=lists_live, lists=read_lists(slot),
@@ -213,7 +211,7 @@ def already(creds, blog_id, key):
     r.raise_for_status()
     for p in r.json().get("items", []):
         if f'data-commentary="{key}"' in (p.get("content") or ""):
-            return p.get("url")
+            return p
     return None
 
 
@@ -226,14 +224,21 @@ def stage_publish(a):
     post = json.load(open(pj, encoding="utf-8"))
     html = open(os.path.join(OUT, "body.html"), encoding="utf-8").read()
     if post.get("banner_ref") and a.banner_failed:   # CDN 확인 실패 — 깨진 그림 대신 배너 없이
-        html = re.sub(r'<figure style="margin:0 0 16px;"><img [^>]*></figure>', "", html, count=1)
+        html = re.sub(r'<figure[^>]*><img [^>]*></figure>', "", html, count=1)   # 배너 figure 모양이 바뀌어도(화면 끝까지 data-bleed) 지워지게
         log("배너 CDN 확인 실패 — 배너 없이 낸다")
     blog_url = os.environ.get("BLOG_URL", PB.DEFAULT_BLOG_URL)
     creds = PB._credentials()
     blog_id = PB._blog_id(creds, blog_url)
-    url = already(creds, blog_id, post["key"])
-    if url:
-        log(f"{post['key']} 이미 발행됨 — {url}")
+    old = already(creds, blog_id, post["key"])
+    if old and not a.replace:
+        log(f"{post['key']} 이미 발행됨 — {old.get('url')}")
+        return 0
+    if old:   # 고쳐 쓰기 (사람이 --replace 로 부를 때만) — 주소 · 라벨은 그대로, 제목 · 본문만 새로
+        r = PB._write("put", f"{PB.BLOGGER_API}/blogs/{blog_id}/posts/{old['id']}",
+                      headers={"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"},
+                      json={"kind": "blogger#post", "id": old["id"], "title": post["title"], "content": html, "labels": old.get("labels") or post["labels"]}, timeout=60)
+        r.raise_for_status()
+        log(f"{post['key']} 고쳐 씀 — {old.get('url')}")
         return 0
     url = PB.publish(post["title"], html, labels=post["labels"], blog_url=blog_url)
     json.dump({**post, "url": url, "published_at": kst_now().isoformat(timespec="seconds")},
@@ -252,6 +257,7 @@ def main():
     ap.add_argument("--briefing-json", help="시험: 묶음 파일 (gh-pages 대신)")
     ap.add_argument("--no-ai", action="store_true", help="배너를 AI 없이 기본 그림으로")
     ap.add_argument("--banner-failed", action="store_true", help="publish: 배너 CDN 확인 실패 — 배너 빼고 낸다")
+    ap.add_argument("--replace", action="store_true", help="publish: 같은 편이 이미 나갔으면 그 글을 고쳐 쓴다(사람이 손으로 부를 때만)")
     a = ap.parse_args()
     a.date = a.date or kst_now().date().isoformat()
     sys.exit(stage_prepare(a) if a.stage == "prepare" else stage_publish(a))
