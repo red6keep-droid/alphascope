@@ -16,65 +16,346 @@ import design_kit as dk  # noqa: E402
 OUT = os.path.join(BASE, "output", "mock_story.html")
 BLOG = "https://alphascope.blogspot.com/"
 
-# 수집기 columns/{날짜}-{slot} 새 칸 (17절 안 + 18절 블로그 부탁: sectors[].chg_pct 숫자)
+# 새 틀 목업 재료 (2026-11-19 사용자 "요약하되 맥락이 이어지게") — 수집기 11-18 저녁 시험 글의 사실만으로 블로그가 손으로 다시 쓴 것.
+# 수집기에 부탁한 꼴(요청 27절): 한눈에 보기 3문장 · 변수마다 3문장(일 → 시장에 왜 → 남은 것) · `**결과**` · `==원인 · 변수==` · takeaway.
 SAMPLE = {
-    "format": "story", "date": "2026-11-17", "slot": "am",
-    "title": "앤트로픽 IPO와 엔비디아 악재에 기술주 급락, 나스닥 2.47% 하락",   # Q22: 주제만
-    "summary": "앤트로픽 IPO를 앞둔 유동성 쏠림 우려와 엔비디아 리더십 악재가 겹치며 기술주 중심 하락세다.",
-    "overview": ("11월 16일 뉴욕 증시는 앤트로픽 IPO를 앞둔 자금 이동과 엔비디아를 둘러싼 경영진 불확실성에 기술주를 중심으로 하락했다. "
-                 "미국 상무부의 대중국 반도체 우회 수출 규제 강화 움직임도 투자 심리를 위축시켰다. "
-                 "인플레이션 경계감과 지정학적 리스크가 더해진 가운데 시장의 시선은 오늘 밤 발표될 엔비디아 실적으로 쏠린다."),
-    "indexLine": "11월 16일(월) 미국장: S&P 500 1.91% 하락 · 나스닥 종합 2.47% 하락 · 다우존스 1.40% 하락 · 러셀 2000 1.69% 하락",
-    "market": ("기술 업종이 2.39% 내리며 가장 큰 하락 폭을 기록했고 에너지와 커뮤니케이션도 각각 1.91%, 1.72% 떨어졌다. "
-               "종목별로는 알파벳이 3.52% 급락했으며 엔비디아와 아마존도 각각 2.95%, 2.49% 하락했다. "
-               "반면 소재 업종은 0.59% 올랐고 유틸리티와 필수소비재도 각각 0.43%, 0.33% 상승하며 방어주 위주의 흐름을 보였다. "
-               "이는 위험 회피 심리가 강해지며 기술주에 쏠렸던 자금이 상대적으로 안정적인 업종으로 옮겨갔음을 보여준다."),
-    "drivers": [
-        {"heading": "앤트로픽 IPO 기대와 유동성 쏠림 우려",
-         "body": ("앤트로픽의 대규모 IPO 상장을 앞두고 시장 자금이 집중될 것이라는 전망이 제기되었다. "
-                  "브래드 거스트너(알티미터 캐피털)는 앤트로픽 IPO에 역대 최대 규모인 50억 달러의 주문을 신청했다고 밝혔다. "
-                  "에릭 프리먼(노던 트러스트)은 앤트로픽 IPO가 전체 AI 생태계의 수요를 가늠할 척도가 될 것으로 보았다. "
-                  "반면 브라이언 모이니한(뱅크오브아메리카)은 앤트로픽 IPO로 관심이 쏠리면서 일반 기업들의 상장 일정이 순연되고 있다고 설명했다. "
-                  "이 같은 대형 상장 이벤트가 기술주 전반의 유동성을 흡수할 수 있다는 경계감이 시장에 형성되어 있다.")},
-        {"heading": "엔비디아 경영진 리스크와 규제 강화",
-         "body": ("뉴욕타임스는 마코 루비오 국무장관이 안보 관련 경고 메모를 전달했다고 보도했다. "
-                  "닐 캠플링 애널리스트는 이사회가 당장 대규모 경영진 교체에 나설 가능성은 낮지만 리더십 공백에 따른 불확실성이 크다고 평가했다. "
-                  "동시에 미국 상무부는 제3국을 통한 대중국 AI 칩 우회 수출을 차단하는 규정 개정을 검토하며 반도체주를 압박했다. "
-                  "오는 12월 상원 은행위원회에서 엔비디아 관련 청문회가 열릴 예정이다.")},
-        {"heading": "인플레이션 압력과 연준 금리 경로 경계",
-         "body": ("예상보다 높은 인플레이션 데이터 발표 이후 연준의 금리 운용에 대한 경계감이 부상했다. "
-                  "BNP 파리바는 연준이 인플레이션 강도에 놀라며 추가 금리 인상이 불가피함을 인식하고 있다고 설명했다. "
-                  "베스 해막(클리블랜드 연은 총재)은 인플레이션 심리 고착화를 막기 위해 점진적인 금리 인상으로 긴축을 유지해야 한다고 주장했다. "
-                  "케빈 워시(연준 이사)는 AI 도입에 따른 생산성 향상이 인플레이션 압박을 빠르게 상쇄하지 못할 수 있음을 지적했다. "
-                  "기업들의 비용 전가 움직임으로 인해 물가 상승 압력이 광범위하게 지속되는 상태다.")},
-    ],
-    "sectors": [
-        {"name": "기술", "chg_pct": -2.39, "check": "엔비디아 실적 발표 후 반응"},
-        {"name": "에너지", "chg_pct": -1.91, "check": "국제 유가 하락세 지속 여부"},
-        {"name": "커뮤니케이션", "chg_pct": -1.72, "check": "알파벳 등 대형 기술주 수급"},
-        {"name": "소재", "chg_pct": 0.59, "check": "방어적 매수세 유입 지속 여부"},
-    ],
-    "pointsTitle": "오늘 한국장 관전 포인트",
-    "points": [
-        "09:00 — 지난밤 미국 기술 업종 2.39% 하락 · 알파벳 3.52% 하락 뒤 한국장 첫 반응",
-        "오늘 밤 미국 장 마감 뒤 — 엔비디아 실적 발표, AI 인프라 수요와 데이터센터 매출 전망 확인",
-    ],
-    "oneLine": "앤트로픽 IPO 유동성 흡수 우려와 엔비디아 리더십 악재가 겹치며 기술주 중심으로 위험 회피 장세가 펼쳐진 상태다.",
-    "tickers": ["GOOGL", "NVDA", "AMZN"],
-    "model": "gemini:gemini-4-hydrogen",
-    "banner": {"titles": [["기술주 내림 뒤", "엔비디아 실적 기다림"], ["기술주 급락", "실적 대기"]], "keys": ["미국 기술 업종 약세", "반도체 관망", "한국장 첫 반응"]},
+ "format": "story",
+ "date": "2026-11-18",
+ "slot": "pm",
+ "title": "엔비디아 실적 안도에 반도체 반등, 코스피 5,000선 회복",
+ "summary": "엔비디아 호실적에 반도체주가 반등하며 코스피가 5,000선을 회복했습니다.",
+ "overview": "나흘 연속 내리며 5,000선을 내줬던 코스피가 **엔비디아 호실적에 힘입어 하루 만에 5,000선을 되찾았습니다**. ==AI 수요가 꺾이지 않았다는 확인==이 삼성전자와 SK하이닉스로 매수세를 불러왔고, ==한중 FTA 후속 협상 타결== 소식이 오름폭을 키웠습니다. 다만 반등을 이끈 것은 반도체 한 축이어서, 오늘 밤 앤트로픽 상장과 미국의 대중국 수출 통제에 미국 기술주가 어떻게 반응하는지가 다음 장의 관건입니다.",
+ "drivers": [
+  {
+   "heading": "반도체 반등과 외국인 수급",
+   "body": "앤트로픽 상장에 자금이 쏠릴 것이라는 우려로 나흘 내리 밀렸던 시장을 돌려세운 것은 **엔비디아의 3분기 매출 1,158억 달러와 4분기 전망 약 1,300억 달러**였습니다. AI 투자가 이어진다는 숫자가 확인되자, ==고점보다 평균 55% 낮아진 삼성전자와 SK하이닉스에 과도한 우려가 반영됐다는 시각==(이창민 KB증권 연구원)에 힘이 실렸습니다. 그러나 올해 외국인 순매도의 85%가 두 종목에 몰려 있고, ==MSCI 지수 비중 상한을 넘을 때마다 매도가 나오는 구조==(하나증권)는 그대로 남아 있습니다."
+  },
+  {
+   "heading": "한중 정상회담과 교류 확대",
+   "body": "반도체가 지수를 끌어올린 날, 오름폭을 넓힌 것은 한중 관계였습니다. 이재명 대통령과 시진핑 주석의 세 번째 정상회담에서 **한중 FTA 서비스 · 투자 후속 협상이 실질 타결**됐고, ==중국이 영화와 게임에 최혜국 대우를 주고 관광 · 유통 · 건설 시장을 더 열기로== 하면서 관련 업종에 기대가 붙었습니다. 다만 정식 서명과 발효가 남아 있어, 실제 한한령 해제를 확인하기 전까지는 신중해야 한다는 시각(이지현 이지스 대표)도 함께 나왔습니다."
+  }
+ ],
+ "takeaway": "기술주와 일부 대형주에만 매수세가 몰렸고, 헬스케어와 소재로는 번지지 않았습니다.",
+ "sectors": [
+  {
+   "name": "기술",
+   "chg_pct": 3.64,
+   "check": "수출 통제와 앤트로픽 상장 영향"
+  },
+  {
+   "name": "헬스케어",
+   "chg_pct": -2.39,
+   "check": "대형 바이오주 하락세 진정 여부"
+  },
+  {
+   "name": "금융",
+   "chg_pct": 1.51,
+   "check": "미국 금융망 장애 여파와 금리"
+  },
+  {
+   "name": "소재",
+   "chg_pct": -1.46,
+   "check": "화학·비철금속 약세 진정 여부"
+  }
+ ],
+ "pointsTitle": "오늘 밤 미국장 관전 포인트",
+ "points": [
+  "앤트로픽 나스닥 상장 — 공모 흥행과 자금 쏠림 여부",
+  "미국 대중국 반도체 수출 통제 — 중국 대응과 기술주 영향"
+ ],
+ "oneLine": "엔비디아 호실적에 힘입어 반도체주가 반등하며 코스피가 5,000선 위로 올라섰습니다.",
+ "tickers": [
+  "NVDA",
+  "066570",
+  "402340",
+  "000660",
+  "005930",
+  "032830",
+  "005380",
+  "207940",
+  "068270",
+  "051910",
+  "006400"
+ ],
+ "banner": {
+  "titles": [
+   [
+    "엔비디아 호실적에",
+    "반도체와 지수 반등"
+   ],
+   [
+    "반도체주 강세 힘입어",
+    "국내 증시 동반 상승"
+   ]
+  ],
+  "keys": [
+   "기술 업종 강세",
+   "헬스케어 약세",
+   "국내 지수 반등"
+  ]
+ }
 }
-# 묶음 close (briefing/2026-11-17-am.json 숫자) — 지수 칸 · 종목 이름 · 기준 줄
-BRIEFING = {"trade_date": "2026-11-16", "close": {
-    "indices": [{"name": "S&P 500", "close": 7416.59, "chg_pct": -1.91}, {"name": "나스닥 종합", "close": 24509.76, "chg_pct": -2.47},
-                {"name": "다우존스", "close": 51608.17, "chg_pct": -1.40}, {"name": "러셀 2000", "close": 2742.94, "chg_pct": -1.69}],
-    "movers": [{"name": "알파벳", "ticker": "GOOGL", "chg_pct": -3.52}, {"name": "엔비디아", "ticker": "NVDA", "chg_pct": -2.95},
-               {"name": "아마존", "ticker": "AMZN", "chg_pct": -2.49}]}}
+# 묶음 close (briefing/2026-11-18-pm.json 숫자 그대로) — 지수 칸 · 업종 표 · 종목 표
+BRIEFING = {
+ "trade_date": "2026-11-18",
+ "close": {
+  "indices": [
+   {
+    "name": "코스피",
+    "close": 5067.44,
+    "chg_pct": 1.99
+   },
+   {
+    "name": "코스닥",
+    "close": 662.81,
+    "chg_pct": 1.96
+   }
+  ],
+  "sectors": [
+   {
+    "name": "기술",
+    "chg_pct": 3.64
+   },
+   {
+    "name": "산업재",
+    "chg_pct": -0.15
+   },
+   {
+    "name": "경기 소비재",
+    "chg_pct": 1.6
+   },
+   {
+    "name": "헬스케어",
+    "chg_pct": -2.39
+   },
+   {
+    "name": "금융",
+    "chg_pct": 1.51
+   },
+   {
+    "name": "커뮤니케이션",
+    "chg_pct": 0.05
+   },
+   {
+    "name": "소재",
+    "chg_pct": -1.46
+   },
+   {
+    "name": "유틸리티",
+    "chg_pct": 0.0
+   }
+  ],
+  "movers": [
+   {
+    "name": "LG전자",
+    "ticker": "066570",
+    "chg_pct": 5.96
+   },
+   {
+    "name": "삼성생명",
+    "ticker": "032830",
+    "chg_pct": 5.37
+   },
+   {
+    "name": "SK스퀘어",
+    "ticker": "402340",
+    "chg_pct": 4.42
+   },
+   {
+    "name": "SK하이닉스",
+    "ticker": "000660",
+    "chg_pct": 4.19
+   },
+   {
+    "name": "삼성바이오로직스",
+    "ticker": "207940",
+    "chg_pct": -3.39
+   },
+   {
+    "name": "현대차",
+    "ticker": "005380",
+    "chg_pct": 3.09
+   },
+   {
+    "name": "LG화학",
+    "ticker": "051910",
+    "chg_pct": -3.03
+   },
+   {
+    "name": "삼성화재",
+    "ticker": "000810",
+    "chg_pct": 2.85
+   },
+   {
+    "name": "셀트리온",
+    "ticker": "068270",
+    "chg_pct": -2.58
+   },
+   {
+    "name": "삼성SDI",
+    "ticker": "006400",
+    "chg_pct": -2.36
+   },
+   {
+    "name": "삼성전자",
+    "ticker": "005930",
+    "chg_pct": 2.31
+   },
+   {
+    "name": "삼성물산",
+    "ticker": "028260",
+    "chg_pct": 2.07
+   },
+   {
+    "name": "에코프로",
+    "ticker": "086520",
+    "chg_pct": 2.07
+   },
+   {
+    "name": "HD한국조선해양",
+    "ticker": "009540",
+    "chg_pct": -1.72
+   },
+   {
+    "name": "한미반도체",
+    "ticker": "042700",
+    "chg_pct": 1.45
+   },
+   {
+    "name": "한화에어로스페이스",
+    "ticker": "012450",
+    "chg_pct": 1.44
+   },
+   {
+    "name": "고려아연",
+    "ticker": "010130",
+    "chg_pct": -1.36
+   },
+   {
+    "name": "알테오젠",
+    "ticker": "196170",
+    "chg_pct": -1.21
+   },
+   {
+    "name": "두산에너빌리티",
+    "ticker": "034020",
+    "chg_pct": 1.06
+   },
+   {
+    "name": "에코프로비엠",
+    "ticker": "247540",
+    "chg_pct": 0.94
+   },
+   {
+    "name": "하나금융지주",
+    "ticker": "086790",
+    "chg_pct": -0.72
+   },
+   {
+    "name": "신한지주",
+    "ticker": "055550",
+    "chg_pct": -0.57
+   },
+   {
+    "name": "HD현대중공업",
+    "ticker": "329180",
+    "chg_pct": -0.39
+   },
+   {
+    "name": "SK텔레콤",
+    "ticker": "017670",
+    "chg_pct": -0.36
+   },
+   {
+    "name": "한화오션",
+    "ticker": "042660",
+    "chg_pct": -0.33
+   },
+   {
+    "name": "카카오",
+    "ticker": "035720",
+    "chg_pct": 0.32
+   },
+   {
+    "name": "KB금융",
+    "ticker": "105560",
+    "chg_pct": -0.26
+   },
+   {
+    "name": "포스코퓨처엠",
+    "ticker": "003670",
+    "chg_pct": 0.24
+   },
+   {
+    "name": "카카오뱅크",
+    "ticker": "323410",
+    "chg_pct": -0.24
+   },
+   {
+    "name": "NAVER",
+    "ticker": "035420",
+    "chg_pct": 0.18
+   },
+   {
+    "name": "LG에너지솔루션",
+    "ticker": "373220",
+    "chg_pct": -0.16
+   },
+   {
+    "name": "현대로템",
+    "ticker": "064350",
+    "chg_pct": 0.15
+   },
+   {
+    "name": "기아",
+    "ticker": "000270",
+    "chg_pct": 0.11
+   },
+   {
+    "name": "POSCO홀딩스",
+    "ticker": "005490",
+    "chg_pct": 0.0
+   },
+   {
+    "name": "한국전력",
+    "ticker": "015760",
+    "chg_pct": 0.0
+   }
+  ]
+ }
+}
+
+
+SAMPLES = os.path.join(BASE, "samples")   # 수집기 최신 시험 글 · 묶음 (git 제외 — 수집기가 시험 글을 비공개로 둠). 없으면 위 SAMPLE(11-17)
+
+
+def latest_samples():
+    """samples/{날짜}-{am|pm}.column.json + .briefing.json 중 가장 새 날짜 → {slot: (column, briefing, key)}."""
+    import json
+    if not os.path.isdir(SAMPLES):
+        return {}
+    keys = sorted({f[:-len(".column.json")] for f in os.listdir(SAMPLES) if f.endswith(".column.json")})
+    out = {}
+    for k in keys:
+        b = os.path.join(SAMPLES, f"{k}.briefing.json")
+        if os.path.exists(b):
+            out[k[-2:]] = (json.load(open(os.path.join(SAMPLES, f"{k}.column.json"), encoding="utf-8")), json.load(open(b, encoding="utf-8")), k)
+    return out
+
+
+def banner_for(col, br):
+    """배너 = 발행기와 같은 banner.make, AI 없이 기본 그림(목업은 Workers AI 를 쓰지 않는다)."""
+    import banner as BN
+    info = BN.make(br, col, out_dir=os.path.join(BASE, "output", "story-mock"), use_ai=False)
+    return ("story-mock/" + info["ref"]) if info else None
 
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     from story_render import render, titles
-    _, h, _m = render(SAMPLE, BRIEFING, banner_url="story-mock/banner-am.webp", banner_alt="AI 생성 이미지 — 기술주 내림 뒤 엔비디아 실적 기다림")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    import json
+    lf = os.path.join(BASE, "..", "stock-lists", "output", "lists", "kr" if SAMPLE["slot"] == "pm" else "us", "_lists.json")   # 종목 모아보기 목업이 쓰는 로컬 목록 파일
+    lists = {str(r.get("t") or "").upper(): r for r in json.load(open(lf, encoding="utf-8"))["rows"]} if os.path.exists(lf) else {}
+    _, h, _m = render(SAMPLE, BRIEFING, lists=lists, banner_url=banner_for(SAMPLE, dict(BRIEFING, date=SAMPLE["date"], slot=SAMPLE["slot"])), banner_alt="AI 생성 이미지")
     print(dk.write_mock(h, OUT, titles(SAMPLE)[0]) or "index.html 없음 — 목업 못 만듦")

@@ -2348,6 +2348,7 @@ ICON_GLYPHS = {
     "calendar": '<rect x="2.5" y="3.5" width="11" height="10" rx="1.5"/><path d="M2.5 7h11M5.5 2v3M10.5 2v3"/>',
     "news": '<path d="M3 3h8v10H4a1 1 0 0 1-1-1V3z"/><path d="M11 6h2v6a1 1 0 0 1-1 1"/><path d="M5 6h4M5 9h4"/>',
     "trend": '<path d="M2 11.5l4-4 3 3 5-6"/><path d="M10.5 4.5H14v3.5"/>',
+    "trend_down": '<path d="M2 4.5l4 4 3-3 5 6"/><path d="M10.5 11.5H14V8"/>',   # `trend` 를 위아래로 뒤집은 것 (hypo_pages GLYPH 와 같음, 시황 해설 내린 업종 앞 — 검색 창 JS 는 쓰지 않음)
     "pulse": '<path d="M1.5 8.5h3l1.5-4 3 8 1.5-4h4"/>',
     "bars": '<path d="M2.5 13.5h11M4.5 11V8M8 11V5M11.5 11V3"/>',
     "volume": '<path d="M3 13V10M6 13V7M9 13V9M12 13V5"/>',
@@ -2376,13 +2377,32 @@ ICON_GLYPHS = {
     "t_chip": '<rect x="4" y="4" width="8" height="8" rx="1"/><path d="M6.5 2v2M9.5 2v2M6.5 12v2M9.5 12v2M2 6.5h2M2 9.5h2M12 6.5h2M12 9.5h2"/>',
     "t_tool": '<circle cx="8" cy="8" r="2"/><path d="M8 1.8v2M8 12.2v2M1.8 8h2M12.2 8h2M3.6 3.6 5 5M11 11l1.4 1.4M3.6 12.4 5 11M11 5l1.4-1.4"/><circle cx="8" cy="8" r="4.3"/>',
 }
+# 업종 그림 (2026-11-19 사용자 "업종과 맞는 아이콘") — 국제 업종 분류 11개. 수혜 테마 그림과 겹치는 것은 그대로 쓰고(기술 칩 · 경기소비재 가방 · 산업재 톱니 · 에너지 기름방울), 없는 7개를 새로 그림
+ICON_GLYPHS.update({
+    "s_fin": '<path d="M2 6.2 8 2.5l6 3.7"/><path d="M2.5 13.5h11M4 7v4.5M6.7 7v4.5M9.3 7v4.5M12 7v4.5"/>',   # 금융 = 기둥 건물(은행)
+    "s_health": '<path d="M6.3 2.5h3.4v3.8h3.8v3.4H9.7v3.8H6.3V9.7H2.5V6.3h3.8z"/>',   # 헬스케어 = 십자
+    "s_estate": '<path d="M2.5 7.5 8 3l5.5 4.5"/><path d="M4 6.5v7h8v-7"/><path d="M6.5 13.5V10h3v3.5"/>',   # 부동산 = 집
+    "s_comm": '<path d="M3 3.5h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7l-3 2.5v-2.5H3a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z"/>',   # 커뮤니케이션 = 말풍선
+    "s_staples": '<path d="M2 6.5h12l-1.4 7H3.4z"/><path d="M5 6.5 7 2.5M11 6.5 9 2.5M6 9v2.5M10 9v2.5"/>',   # 필수소비재 = 장바구니
+    "s_util": '<path d="M9 1.8 3.8 9h4l-1 5.2L12.2 7h-4z"/>',   # 유틸리티 = 번개(전기)
+    "s_material": '<path d="M8 2 13.5 5v6L8 14 2.5 11V5z"/><path d="M2.5 5 8 8l5.5-3M8 8v6"/>',   # 소재 = 상자(원자재)
+})
+SECTOR_ICON = {"기술": "t_chip", "금융": "s_fin", "헬스케어": "s_health", "부동산": "s_estate", "커뮤니케이션": "s_comm",
+               "필수소비재": "s_staples", "경기소비재": "t_shop", "유틸리티": "s_util", "소재": "s_material", "산업재": "t_tool", "에너지": "t_oil"}   # 이름은 띄어쓰기 없이 찾는다 (`경기 소비재` = `경기소비재`)
+
+
+def sector_icon_name(name):
+    return SECTOR_ICON.get(str(name or "").replace(" ", ""))
+
+
 SOFT_ICON_BG, SOFT_ICON_INK, SOFT_ICON_SIZE = "#E5E7EB", "#4B5563", 22   # 기본형 = 회색 면 원 + 진회색 그림 (증시 전망 팝업 소제목 P505)
 
 
-def soft_icon(name, size=SOFT_ICON_SIZE):
-    """기본형 아이콘 — 회색 면 원(#E5E7EB) 안 진회색 선 그림(#4B5563), 그림 = 원의 0.55. 소제목 · 구획 제목 앞, 글자와 6."""
+def soft_icon(name, size=SOFT_ICON_SIZE, bg=SOFT_ICON_BG, ink=SOFT_ICON_INK):
+    """기본형 아이콘 — 회색 면 원(#E5E7EB) 안 진회색 선 그림(#4B5563), 그림 = 원의 0.55. 소제목 · 구획 제목 앞, 글자와 6.
+    bg · ink = 색 바탕 카드 안에서 그 카드 색을 진하게 (증시 전망 팝업 방향 소제목 · 시황 해설 `한눈에 보기`)."""
     g = round(size * 0.55)
-    return (f'<span aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:{size}px;height:{size}px;border-radius:50%;background:{SOFT_ICON_BG};color:{SOFT_ICON_INK};">'
+    return (f'<span aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:{size}px;height:{size}px;border-radius:50%;background:{bg};color:{ink};">'
             f'<svg viewBox="0 0 16 16" width="{g}" height="{g}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;">{ICON_GLYPHS[name]}</svg></span>')
 
 
