@@ -6966,7 +6966,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               else location.href = r.u;
             }, function () { location.href = r.u; });
           });
-          input.addEventListener('input', syncClear);
+          input.addEventListener('input', function () { syncClear(); if (!input.value) out.innerHTML = out0; });   // 키보드로 검색어를 다 지워도 ⓧ 와 같게 = 결과 지우고 처음 화면 (2026-11-19 사용자)
           var out0 = out.innerHTML;   // 처음 화면(예시 검색어 · 안내) — 검색어 지우기를 누르면 결과도 이것으로 되돌린다 (2026-11-19 사용자)
           clr.addEventListener('click', function () { input.value = ''; syncClear(); sg.close(); out.innerHTML = out0; input.focus(); });
 
