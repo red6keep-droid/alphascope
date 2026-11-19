@@ -87,12 +87,8 @@ def para(html):
     return f'<p style="margin:0 0 14px;padding:0 0 0 {dk.ALIGN_PX}px;word-break:keep-all;">{html}</p>'
 
 
-IDX_CELL_PCT = 44   # 넘기는 지수 칸 폭 = 보이는 폭의 44% → 두 칸(88%) + 셋째 칸 12% 걸침
-IDX_SLIDE_CSS = ("[data-idx-slide]>div::-webkit-scrollbar{display:none}"
-                 "[data-idx-slide]::before,[data-idx-slide]::after{content:'';position:absolute;top:0;bottom:0;width:32px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:1}"
-                 "[data-idx-slide]::before{left:0;background:linear-gradient(to right,#fff,rgba(255,255,255,0))}"
-                 "[data-idx-slide]::after{right:0;background:linear-gradient(to left,#fff,rgba(255,255,255,0))}"
-                 "[data-idx-slide][data-more*=l]::before,[data-idx-slide][data-more*=r]::after{opacity:1}")
+IDX_CELL_PCT = 44   # 넘기는 지수 칸 폭 = 본문 폭의 44% → 두 칸(88%) + 셋째 칸 12% 걸침
+IDX_SLIDE_CSS = "[data-idx-slide]>div::-webkit-scrollbar{display:none}"   # 스크롤 막대만 숨김 — 넘기는 쪽 흐린 그림자는 두지 않는다 (2026-11-19 사용자 "뿌옇게 하는 장치 삭제")
 
 
 def index_row(indices):
@@ -116,14 +112,14 @@ def index_row(indices):
         inner = "".join(f'<span data-idx-cell="1" style="display:block;flex:1 1 0;min-width:0;box-sizing:border-box;background:#fff;{pad}{"" if k == 0 else f"border-left:1px solid {line};"}">{c}</span>'
                         for k, c in enumerate(cells))
         return (f'<div data-cards="1" style="margin:0 0 8px;"><span style="display:flex;border:1px solid {bd};border-radius:8px;overflow:hidden;">{inner}</span></div>')
-    # 넘기는 줄 (2026-11-19 사용자 "하위 탭 넘기기와 같은 형식"): 큰 카드 하나 안에 넉 칸 · 칸 = 보이는 폭의 44% — 처음에 두 칸 + 셋째 칸이 오른쪽에 살짝 걸쳐
-    # 넘길 것이 남은 쪽에 흐린 그림자 32(탭 줄 .rt-tabs-wrap[data-more] 와 같은 모양). 그림자 CSS 는 글 머리 <style>, 켜고 끄기는 아래 짧은 스크립트(없어도 처음 오른쪽 그림자는 보임)
-    inner = "".join(f'<span data-idx-cell="1" style="display:block;flex:0 0 {IDX_CELL_PCT}%;min-width:0;box-sizing:border-box;background:#fff;{pad}scroll-snap-align:start;'
+    # 넘기는 줄 (2026-11-19 사용자 "가로로 긴 카드 한 장이 좌우로" — 종목 모아보기 업종 아래 탭 줄처럼): 넉 칸이 붙은 긴 카드 한 장(바깥 테두리 · 모서리 = 카드)이
+    # 통째로 움직인다. 칸 폭 = 본문 폭의 44% → 처음 두 칸 + 셋째 칸이 오른쪽에 걸치고 카드 오른쪽 끝은 화면 밖(걸친 칸이 넘길 수 있다는 표시 — 흐린 그림자는 두지 않는다)
+    w = f"min(calc((100vw - {2 * SIDE_PX}px) * {IDX_CELL_PCT / 100}), 220px)"   # 폰 = 본문 폭(화면 − 좌우 14)의 44% · PC 는 220 상한(PC 는 나중에 따로)
+    inner = "".join(f'<span data-idx-cell="1" style="display:block;flex:0 0 auto;width:{w};box-sizing:border-box;background:#fff;{pad}scroll-snap-align:start;'
                     f'{"" if k == 0 else f"border-left:1px solid {line};"}">{c}</span>' for k, c in enumerate(cells))
-    js = ("<script>(function(){var w=document.currentScript.previousElementSibling,b=w.firstElementChild;function m(){var x=b.scrollLeft,r=b.scrollWidth-b.clientWidth-x,v='';"
-          "if(x>1)v+='l';if(r>1)v+='r';w.setAttribute('data-more',v);}b.addEventListener('scroll',m,{passive:true});window.addEventListener('resize',m);m();})();</script>")
-    return (f'<div data-cards="1" data-idx-slide="1" data-more="r" style="position:relative;margin:0 0 8px;border:1px solid {bd};border-radius:8px;overflow:hidden;">'
-            f'<div style="display:flex;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;">{inner}</div></div>' + js)
+    return (f'<div data-cards="1" data-idx-slide="1" style="margin:0 0 8px;">'
+            f'<div style="overflow-x:auto;margin:0 -{SIDE_PX}px;padding:0 {SIDE_PX}px;scroll-padding:0 {SIDE_PX}px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
+            f'<span style="display:flex;width:max-content;border:1px solid {bd};border-radius:8px;overflow:hidden;">{inner}</span></div></div>')
 
 
 GROUP_GAP = 10   # 묶음(구획 · 변수 1 · 2 · 3) 사이 +10 (2026-11-19 사용자) — 구획 제목 위 28 → 38, 둘째 변수부터 소제목 위 24 → 34
@@ -396,7 +392,8 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
             wrap_up = take_away(sents[-1])
     mk = ""
     if wrap_up:   # 정리 문장 = 구획 제목 바로 아래 (2026-11-19 사용자). 글씨 = 주식 공부와 같이 굵게
-        mk += soft_card(prose(wrap_up), margin=f"0 0 {CARD_GAP}px", bg=TAKE_BG, left=14 + 5 + 3,   # 글 앞 여백 +5 +3 = 22 (2026-11-19 사용자)
+        plain = emph(directional(dk.tint(dk.esc(dk.formal(wrap_up)))), False)   # 종목 링크 · 보라 없이 전부 녹색 글씨 (2026-11-19 사용자)
+        mk += soft_card(plain, margin=f"0 0 {CARD_GAP}px", bg=TAKE_BG, left=14 + 5 + 3,   # 글 앞 여백 +5 +3 = 22 (2026-11-19 사용자)
                           style=f"font-size:{FLOW_FS};line-height:{FLOW_LH};font-weight:700;color:{TAKE_INK};")
     if secs:   # 업종 = 흰 카드 줄(구분선 17), 제목 줄 없음 (2026-11-19 사용자 "많이 오른 업종 같은 타이틀 삭제")
         rows = [(sector_name(x, emph(dk.esc(checks.get(x["name"]) or ""), False)), chg(x["chg_pct"]), "", 78) for x in secs]   # 왼쪽 78% — 볼 것이 이름 옆 한 줄에 들어갈 자리
