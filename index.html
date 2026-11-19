@@ -6850,7 +6850,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             }, function () { location.href = r.u; });
           });
           input.addEventListener('input', syncClear);
-          clr.addEventListener('click', function () { input.value = ''; syncClear(); input.focus(); });
+          var out0 = out.innerHTML;   // 처음 화면(예시 검색어 · 안내) — 검색어 지우기를 누르면 결과도 이것으로 되돌린다 (2026-11-19 사용자)
+          clr.addEventListener('click', function () { input.value = ''; syncClear(); sg.close(); out.innerHTML = out0; input.focus(); });
 
           function run(q) {
             q = q.trim();
