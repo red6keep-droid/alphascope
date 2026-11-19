@@ -92,6 +92,8 @@ def main():
     body = (sec("아이콘 · 기본형", "회색 면 원 22(#E5E7EB) 안 진회색 선 그림(#4B5563, 원의 0.55 · 선 1.6). 소제목 · 구획 제목 앞. 색을 쓰지 않는다 — 뜻이 아니라 칸 구분.", soft + soft_demo)
             + sec("아이콘 · 기본형 — 수혜 테마", "Hot Issue `수혜주는?` 테마 이름(16 굵게) 앞, 글자와 6. 같은 기본형 회색 원 22 · 그림 12. 오른쪽 = 3배 확대(그림 확인용).",
                   "".join(row(dk.soft_icon(k), k, f'{u} <span style="display:inline-block;vertical-align:middle;margin-left:8px;">{dk.soft_icon(k, 66)}</span>') for k, u in THEME_USES))
+            + sec("아이콘 · 기본형 — 업종", "시황 해설 `업종과 주요 종목` 업종 줄 앞(종목 로고와 같은 35 · 이름과 11). 같은 기본형 회색 원 · 그림 = 원의 0.55. 국제 업종 분류 11개 (dk.SECTOR_ICON, 2026-11-19 사용자). 오른쪽 = 66 확대.",
+                  "".join(row(dk.soft_icon(k, 35), k, f'{u} <span style="display:inline-block;vertical-align:middle;margin-left:8px;">{dk.soft_icon(k, 66)}</span>') for u, k in dk.SECTOR_ICON.items()))
             + sec("아이콘 · 강조형", "색 면 네모(24 · 모서리 6, 목록 줄 18 · 모서리 4~5) 안 흰 선 그림(크기의 2/3). 강조 카드 · 질문 줄 · 홈 카드 제목 앞, 글자와 8. 색 = 그 기능 하나의 색.", solid)
             + sec("안내 아이콘", "글과 같은 색의 외곽선 원. 면 없음.", guide)
             + sec("라벨 · 외곽선 라벨 (dk.pill)", "1px 테두리 · 모서리 4 · 14px 보통 · 안쪽 3 5 2. 글 앞뒤에 붙으면 세로 가운데, 라벨과 글 5 · 라벨끼리 2.", pills)

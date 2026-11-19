@@ -65,6 +65,21 @@ def _exists(url):
         return False
 
 
+def read_lists(slot):
+    """종목 모아보기 목록 파일(간단 종목 실행이 매일 올림) — 종목 줄 가격 · 로고 · 업종 · 주소. 읽는 순서 = stock_lists.js 와 같다. 실패해도 글은 낸다(배지 · 가격 없이)."""
+    m = "us" if slot == "am" else "kr"
+    for url in (f"https://alpha-scope.pages.dev/{m}/_lists.json",
+                f"https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@quick-{m}/{m}/_lists.json"):
+        try:
+            rows = (_get_json(url) or {}).get("rows") or []
+            if rows:
+                log(f"종목 목록 {len(rows)}줄 — {url}")
+                return {str(r.get("t") or "").upper(): r for r in rows}
+        except Exception as e:  # noqa: BLE001
+            log(f"종목 목록 못 받음 {url}: {e}")
+    return {}
+
+
 def read_column(key):
     """수집기 Firestore columns/{key} — media_feed 와 같은 읽기 전용 키(YTB_FIRESTORE_KEY). 읽기 1건."""
     import media_feed
@@ -85,7 +100,7 @@ def check(col, briefing, day, slot):
         bad.append(f"format {col.get('format')!r} — story 만 낸다")
     if col.get("date") != day or col.get("slot") != slot:
         bad.append(f"날짜 · 편이 다름 {col.get('date')}-{col.get('slot')}")
-    for k in ("title", "overview", "market", "oneLine"):
+    for k in ("title", "overview"):   # market · oneLine 은 화면에 쓰지 않는다 (2026-11-19 새 틀: 숫자는 묶음 표 · 핵심 한 줄은 머리글과 같은 말) — 비어도 낸다
         if not str(col.get(k) or "").strip():
             bad.append(f"빈 칸 {k}")
     if not [d for d in col.get("drivers") or [] if d.get("heading") and d.get("body")]:
@@ -172,7 +187,10 @@ def stage_prepare(a):
         b = BN.banner_text(col)
         first = (b.get("titles") or [[]])[0] if b.get("titles") else (b.get("lines") or [])
         alt = "AI 생성 이미지 — " + " ".join(first) if first else alt
-    title, html, meta = render(col, briefing, banner_url=banner_url, banner_alt=alt)
+    from story_render import LISTS_URL
+    lists_live = _exists(LISTS_URL)   # 종목 모아보기 페이지가 아직 없으면 표를 3줄로 자르지 않고 전부 싣는다
+    log(f"종목 모아보기 페이지 {'있음 — 표 3줄 + 버튼' if lists_live else '없음 — 표 전부 싣고 접기'}")
+    title, html, meta = render(col, briefing, banner_url=banner_url, banner_alt=alt, lists_live=lists_live, lists=read_lists(slot))
     post = {"key": key, "title": title, "labels": meta["labels"], "banner_ref": info["ref"] if info else None,
             "banner_source": info["source"] if info else None, "linked": meta["linked"], "model": col.get("model"), "rev": col.get("rev")}
     open(os.path.join(OUT, "body.html"), "w", encoding="utf-8").write(html)
