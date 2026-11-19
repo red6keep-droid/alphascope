@@ -58,7 +58,7 @@
         .catch(function () {   // 예비 = 즉답 색인(정식 종목)
           namesP = null;
           return loadIndex().then(function (doc) {
-            return doc.stocks.map(function (x) { return { n: x.n, t: x.s.split('.')[0], m: x.m, u: x.u, f: 1, a: x.a }; });
+            return doc.stocks.map(function (x) { return { n: x.n, t: x.s.split('.')[0], m: x.m, u: x.u, f: 1, a: x.a, lg: x.lg }; });
           });
         })
         .then(function (rows) {
@@ -109,7 +109,7 @@
         items = suggest(rows, q);
         if (!items.length) { close(); return; }
         box.innerHTML = items.map(function (r, i) {
-          return '<li role="option" data-i="' + i + '"><span class="as-sg-n">' + esc(r.n) + '</span><span class="as-sg-t">'
+          return '<li role="option" data-i="' + i + '">' + logoOf(r.lg, r.t, r.m, r.n, 'as-sg-lg') + '<span class="as-sg-n">' + esc(r.n) + '</span><span class="as-sg-t">'
             + (r.m === 'us' ? '미국' : '한국') + ' · ' + esc(r.t) + '</span></li>';
         }).join('');
         box.hidden = false;
@@ -235,13 +235,14 @@
   var GO_ICON = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>';   // 페이지 이동 아이콘 = dk.OUT_ICON (시황 `전체 보기` 버튼과 같은 그림, 2026-11-19 사용자)
   var LOGO_BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/', LOGO_VER = '2';
   var BADGE_BG = ['#2F6F68', '#5B6B3A', '#86683A'];
-  function logoBadge(s) {
-    if (s.lg) return '<img class="as-logo" src="' + LOGO_BASE + esc(s.lg) + '?v=' + LOGO_VER + '" alt="" width="28" height="28">';
-    var key = s.s.split('.')[0], sum = 0;
+  function logoOf(lg, key, m, name, cls) {   // cls = 'as-logo'(카드 28) · 'as-sg-lg'(미리보기 20)
+    if (lg) return '<img class="' + cls + '" src="' + LOGO_BASE + esc(lg) + '?v=' + LOGO_VER + '" alt="" loading="lazy">';
+    var sum = 0;
     for (var i = 0; i < key.length; i++) sum += key.charCodeAt(i);
-    var txt = s.m === 'us' ? key.replace(/[-.]/g, '').slice(0, 2) : String(s.n || '').slice(0, 1);
-    return '<span class="as-logo as-logo-b" aria-hidden="true" style="background:' + BADGE_BG[sum % 3] + '">' + esc(txt) + '</span>';
+    var txt = m === 'us' ? key.replace(/[-.]/g, '').slice(0, 2) : String(name || '').slice(0, 1);
+    return '<span class="' + cls + ' as-logo-b" aria-hidden="true" style="background:' + BADGE_BG[sum % 3] + '">' + esc(txt) + '</span>';
   }
+  function logoBadge(s) { return logoOf(s.lg, s.s.split('.')[0], s.m, s.n, 'as-logo'); }
   function label(s) { return esc(s.n) + ' <span class="as-tk">' + esc(s.s.replace(/\.(KS|KQ)$/, '')) + '</span>'; }
   function row(k, v) { return '<div class="as-row"><span class="as-k">' + k + '</span><span class="as-v">' + v + '</span></div>'; }
   function cur(s) { return s.m === 'us' ? '달러' : '원'; }

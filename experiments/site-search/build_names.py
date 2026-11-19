@@ -34,7 +34,9 @@ def _load(p, default):
         return default
 
 
-def build(ref, shells, caps):
+def build(ref, shells, caps, logos=None):
+    """logos = ref/ticker_logos.json 의 logos — 미리보기 줄 앞 작은 로고(2026-11-19 사용자). 없는 종목은 화면이 원 배지로."""
+    logos = logos or {}
     out = []
     for m, rows in (("us", ref.get("us") or {}), ("kr", ref.get("kr") or {})):
         for sym, e in rows.items():
@@ -54,11 +56,18 @@ def build(ref, shells, caps):
                 row["f"] = 1
             if ALIAS.get(sym):
                 row["a"] = ALIAS[sym]   # 줄임말(삼전 · 하닉) — 즉답 색인과 같은 표
+            lg = (logos.get(sym.upper()) or {}).get("file")
+            if lg:
+                row["lg"] = lg
             out.append(row)
     for sym, *_ in U.CANDIDATES + K.CANDIDATES:   # 명단(quick_ref) 밖 정식 종목도 — 빠짐 없이
         m = "kr" if sym.endswith((".KS", ".KQ")) else "us"
         if not any(r["t"] == sym.split(".")[0] and r["m"] == m for r in out):
-            out.append({"n": (U if m == "us" else K).name(sym), "t": sym.split(".")[0], "m": m, "u": (U if m == "us" else K).page_url(sym), "f": 1})
+            row = {"n": (U if m == "us" else K).name(sym), "t": sym.split(".")[0], "m": m, "u": (U if m == "us" else K).page_url(sym), "f": 1}
+            lg = (logos.get(sym.upper()) or {}).get("file")
+            if lg:
+                row["lg"] = lg
+            out.append(row)
     return out
 
 
@@ -73,12 +82,13 @@ def main():
     ref = _load(os.path.join(EXP, "ref", "quick_ref.json"), {})
     shells = _load(a.shells, {}) if a.shells else {}
     caps = (_load(os.path.join(a.cache, "kr", "cap_rank.json"), {}) or {}).get("caps") or {} if a.cache else {}
-    rows = build(ref, shells, caps)
+    logos = (_load(os.path.join(EXP, "ref", "ticker_logos.json"), {}) or {}).get("logos") or {}
+    rows = build(ref, shells, caps, logos)
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
     json.dump({"built": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="minutes"), "stocks": rows},
               open(a.out, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"[names] 종목 {len(rows)}개(미국 {sum(r['m'] == 'us' for r in rows)} · 한국 {sum(r['m'] == 'kr' for r in rows)}) · "
-          f"전용 페이지 {sum(1 for r in rows if '/p/stock.html?s=' not in r['u'])} · {os.path.getsize(a.out) / 1024:.0f}KB → {a.out}")
+          f"전용 페이지 {sum(1 for r in rows if '/p/stock.html?s=' not in r['u'])} · 로고 {sum(1 for r in rows if r.get('lg'))} · {os.path.getsize(a.out) / 1024:.0f}KB → {a.out}")
 
 
 if __name__ == "__main__":
