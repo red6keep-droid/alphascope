@@ -550,7 +550,7 @@ function secOf(x){var r=BY[x.getAttribute('data-sym')];return r?r.sec:'기타';}
 function comp(){var box=W.querySelector('[data-sl-comp]'),cnt={},ks=[],n=rowsEl().length;
  rowsEl().forEach(function(x){var k=secOf(x);if(!cnt[k]){cnt[k]=0;ks.push(k);}cnt[k]++;});
  ks.sort(function(a,b){return cnt[b]-cnt[a];});if(cur&&!cnt[cur])cur='';
- if(!n){box.innerHTML='';return;}
+ if(ks.length<2){cur='';box.innerHTML='';return;}   /* 업종 둘 이상일 때만 (2026-11-19 사용자) */
  function pill(k,t){return '<button class="seg" type="button" data-comp="'+esc(k)+'" aria-selected="'+(cur===k)+'">'+t+'</button>';}
  box.innerHTML='<div class="seg-row sl-joined cp-pills">'+pill('','전체')+ks.map(function(k){return pill(k,esc(k));}).join('')+'</div>';}
 function seps(){comp();var vis=rowsEl().filter(function(x){var on=!cur||secOf(x)===cur;x.style.display=on?'flex':'none';return on;});

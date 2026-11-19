@@ -415,6 +415,11 @@ body[data-home-mkt="us"] [data-hook="notable-kr"], body[data-home-mkt="kr"] [dat
 body[data-home-mkt] #notable-col { grid-column: auto; }
 body[data-home-mkt] .nt-grid { grid-template-columns: minmax(0, 1fr); }
 body[data-home-mkt="kr"] .news-section { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 */
+/* 실적 한 줄 자리 — 일정이 없는 날 주요 뉴스 줄 (2026-11-19 사용자). 같은 한 줄 칸(높이 54) · 같은 바탕색 돌림 · 같은 점 */
+#event-banner .eb-news { gap: 8px; }
+#event-banner .eb-news .eb-tag { flex: none; font-size: 12px; line-height: 19px; padding: 0 6px; border-radius: 4px; background: rgba(255, 255, 255, .2); color: #fff; font-weight: 700; }
+#event-banner .eb-news .eb-headline { flex: 1 1 auto; min-width: 0; font-size: 15px; line-height: 24px; font-weight: 700; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0; }
 /* 홈 증시시황 C안 (2026-11-17 사용자 결정 · 11-19 적용) — 맨 위 시황 배너 = 그 편 시황 글 맨 위 배너 그림 그대로(gh-pages images/commentary-날짜-편.webp, 새로 그리지 않음).
    좌우 꽉 · 모서리 직선 · 로고 줄에 붙임. 편 이름 상자 = 제목 글자 왼쪽 끝(그림 가로 8.1%) · 제목 윗선(25.4%, 두 줄 제목 실측)에서 5 위, 검정 네모 */
 .home-cards > .cm-wide { grid-column: 1 / -1; }
@@ -1747,6 +1752,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 /* 카드 머리 로고 28 = 이름 19px 보다 조금 크게 (2026-11-19 사용자, 옛 시장 라벨 .as-mkt 한국 · 미국) — 흰 바탕 + 회색 외곽선 = dk.ticker_logo 와 같게 */
 .as-logo { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #fff; object-fit: cover; outline: 1px solid #E2E8F0; outline-offset: -1px; }
 .as-logo-b { display: inline-block; line-height: 28px; text-align: center; color: #fff; font-size: 12px; font-weight: 700; outline: 0; overflow: hidden; white-space: nowrap; }
+.as-sg-lg { flex: none; width: 20px; height: 20px; margin-right: -2px; border-radius: 50%; background: #fff; object-fit: cover; outline: 1px solid #E2E8F0; outline-offset: -1px; }   /* 미리보기 줄 앞 로고 20 · 이름과 8(줄 사이 10 − 2) (2026-11-19 사용자) */
+.as-sg-lg.as-logo-b { line-height: 20px; font-size: 10px; }
 .as-day { margin-left: auto; color: #6B7280; font-size: 13px; }
 .as-say { margin: 4px 0 8px; font-size: 16px; line-height: 27px; }
 .as-say b, .as-v, .as-grid b, .as-bars b { font-family: var(--num); }
@@ -1812,7 +1819,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 /* 종목 페이지 = 흰 버튼(가이드라인 10절 `.cm-login`: 흰 바탕 · 1px #B5BAC0 · 모서리 8 · #111 16/24 굵게 · 안쪽 11 12 · 가운데 · 폭 전체, 올리면 테두리 #111) */
 .as-go { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; padding: 7px 12px; border: 1px solid #B5BAC0; border-radius: 8px;
   background: #fff; color: #111 !important; font-size: 16px; line-height: 24px; font-weight: 700; text-decoration: none; }
-.as-go svg { flex: none; display: block; }   /* 글자 + 이동 아이콘 가운데 정렬 · 사이 8, 높이 46 → 38(안쪽 11 → 7, 2026-11-19 사용자 "8픽셀 줄여") */
+.as-go svg { flex: none; display: block; width: 14px; height: 14px; position: relative; top: 1px; }   /* 글자 + 이동 아이콘 가운데 정렬 · 사이 8, 높이 46 → 38(안쪽 11 → 7, 2026-11-19 사용자 "8픽셀 줄여"). 아이콘 16 → 14 · 1 내림 = 글자 잉크 가운데(같은 날 사용자) */
 .as-go:hover { border-color: #111; }
 /* 안내 한 줄 = 느낌표 13 + 13/19 회색, 왼쪽 정렬, 아이콘 = 첫 줄 가운데 (증시 전망 근거 안내 why_note 와 같은 꼴) */
 .as-go-note { display: flex; align-items: flex-start; gap: 4px; margin: 8px 0 0; color: #6B7280; font-size: 13px; line-height: 19px; word-break: keep-all; }
@@ -2424,6 +2431,42 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           a.appendChild(im);
           return a;
         }
+      /* 일정이 없는 날 = 주요 뉴스 줄 롤링 (2026-11-19 사용자 "실적 날짜가 없으면 주요 뉴스를 롤링, 미국도 같은 규칙").
+       미국 = 홈 주요 뉴스와 같은 news.json · 한국 = 한국 증시 리포트 뉴스 탭과 같은 재료(한국 증시 방송 이슈, kr-news.json).
+       최근 24시간 · 최신 5줄. 줄을 누르면 미국 = 홈 아래 주요 뉴스로 · 한국 = 한국 증시 리포트(최신 글). 줄이 없으면 칸을 숨긴다 */
+    var NEWS_STRIP_N = 5, KR_NEWS_URL = GH + 'kr-news.json', stripNewsCache = {};
+    function newsStrip(box, track, dotBox) {
+      var mk = HOME_MKT || 'us';
+      var p = stripNewsCache[mk] || (stripNewsCache[mk] = fetch((mk === 'kr' ? KR_NEWS_URL : NEWS_URL) + '?v=' + Math.floor(Date.now() / 6e5))
+        .then(function (r) { return r.json(); }));
+      p.then(function (j) {
+        if (pickEvents().length) return;   /* 그 사이 일정이 왔으면 일정이 먼저 */
+        var since = Date.now() - 24 * 3600e3;
+        var items = (j.items || []).filter(function (it) {
+          var s = String(it.published || it.at || '').replace(' ', 'T'), t = s ? Date.parse(/[Z+]/.test(s.slice(10)) ? s : s + 'Z') : 0;   /* 두 파일 모두 UTC 시각 */
+          return (it.title_ko || it.title) && (!t || t >= since);
+        }).slice(0, NEWS_STRIP_N);
+        if (!items.length) { box.hidden = true; return; }
+        track.textContent = ''; dotBox.textContent = '';
+        items.forEach(function (it, i) {
+          var a = el('a', 'eb-slide eb-news');
+          if (mk === 'kr') { a.href = '/search/label/' + encodeURIComponent('한국 증시 리포트'); a.setAttribute('data-latest', '한국 증시 리포트'); }
+          else {
+            a.href = '#news-list';
+            a.addEventListener('click', function (e) { var n = document.querySelector('.news-section'); if (n) { e.preventDefault(); n.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+          }
+          a.appendChild(el('span', 'eb-tag', 'News'));   /* 라벨 = 미국 · 한국 모두 영어 `News`, 한국 `방송` 라벨 따로 두지 않음 (2026-11-19 사용자) */
+          a.appendChild(el('span', 'eb-headline', it.title_ko || it.title));
+          track.appendChild(a);
+          var d = el('button', 'eb-dot'); d.type = 'button'; d.setAttribute('aria-label', (i + 1) + '번째 뉴스');
+          d.addEventListener('click', function () { ebGo(i); ebStart(); });
+          dotBox.appendChild(d);
+        });
+        dotBox.hidden = items.length < 2;
+        box.hidden = false; ebIndex = 0; ebGo(0); ebStart();
+      }).catch(function () { box.hidden = true; });
+    }
+
         function setEvents(market, list) {
           eventFeeds[market] = list || [];
           eventLoaded[market] = true;
@@ -2437,7 +2480,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             ebStop(); ebIndex = 0; track.style.transform = '';
             var ready = HOME_MKT ? eventLoaded[HOME_MKT] : (eventLoaded.us && eventLoaded.kr);
             box.hidden = !ready;
-            if (ready) { box.style.setProperty('--eb-bg', STUDY_BG); track.appendChild(studySlide()); dotBox.hidden = true; }
+            if (ready) newsStrip(box, track, dotBox);   /* 일정이 없으면 주요 뉴스 줄 롤링 (2026-11-19 사용자, 옛: 주식 공부 배너 — 홈 아래에 따로 있음) */
             return;
           }
           box.hidden = false;
@@ -5446,7 +5489,7 @@ function secOf(x){var r=BY[x.getAttribute('data-sym')];return r?r.sec:'기타';}
 function comp(){var box=W.querySelector('[data-sl-comp]'),cnt={},ks=[],n=rowsEl().length;
  rowsEl().forEach(function(x){var k=secOf(x);if(!cnt[k]){cnt[k]=0;ks.push(k);}cnt[k]++;});
  ks.sort(function(a,b){return cnt[b]-cnt[a];});if(cur&&!cnt[cur])cur='';
- if(!n){box.innerHTML='';return;}
+ if(ks.length<2){cur='';box.innerHTML='';return;}   /* 업종 둘 이상일 때만 (2026-11-19 사용자) */
  function pill(k,t){return '<button class="seg" type="button" data-comp="'+esc(k)+'" aria-selected="'+(cur===k)+'">'+t+'</button>';}
  box.innerHTML='<div class="seg-row sl-joined cp-pills">'+pill('','전체')+ks.map(function(k){return pill(k,esc(k));}).join('')+'</div>';}
 function seps(){comp();var vis=rowsEl().filter(function(x){var on=!cur||secOf(x)===cur;x.style.display=on?'flex':'none';return on;});
