@@ -153,8 +153,8 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title {
   margin: 0 0 10px;
   font-weight: 700;
-  font-size: 35px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") */
-  line-height: 49px;   /* 홀짝 — 줄 높이 − 글자 = 짝수 (2026-11-07 가이드라인 3절) */
+  font-size: 34px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") → −1 (2026-11-19 사용자: 상단 종목명 한 포인트 작게, 모든 글 공통) */
+  line-height: 48px;   /* 홀짝 — 줄 높이 − 글자 = 짝수 (2026-11-07 가이드라인 3절) */
   letter-spacing: -.6px;
   color: var(--ink);
 }
@@ -562,7 +562,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .post-outer-container { padding: 24px; }
   body.item-view .post-outer-container { padding-top: 13px; }   /* 카드 위 → 제목 글자 보이는 20 (2026-10-12 사용자) */
-  .post-title { font-size: 27px; line-height: 37px; }
+  .post-title { font-size: 26px; line-height: 36px; }   /* −1 (2026-11-19 사용자) */
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
@@ -571,7 +571,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
   body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 26px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) → −5 (2026-10-25 사용자: 상세 제목 줄 위 여백) */
-  .post-title { font-size: 23px; line-height: 33px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
+  .post-title { font-size: 22px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) → 22 (−1, 2026-11-19 사용자: 상단 종목명 한 포인트 작게) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
   .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
   .post-body { font-size: 19px; line-height: 35px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
   .post-body [data-sent] { display: inline; }   /* 모바일: 문장 줄바꿈 없이 이어 흐른다 — 문단(빈 줄)만 남는다 (2026-10-16 사용자) */
