@@ -230,6 +230,18 @@
     return n >= 1e12 ? (n / 1e12).toFixed(n >= 1e13 ? 0 : 1) + '조' : Math.round(n / 1e8).toLocaleString('ko-KR') + '억';
   }
   function moveWord(v) { return v > 0 ? '올랐습니다' : v < 0 ? '내렸습니다' : '같았습니다'; }
+  /* 카드 머리 = 시장 라벨(한국 · 미국) 대신 종목 로고 28px (2026-11-19 사용자 "티커 로고를 조금 크게"). 우리 gh-pages 로고(색인 lg),
+     없으면 dk.name_logo 와 같은 원 배지 — 미국 = 티커 두 글자 · 한국 = 이름 첫 글자, 바탕 = dk.BADGE_COLORS(코드 글자 합 % 3) */
+  var GO_ICON = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>';   // 페이지 이동 아이콘 = dk.OUT_ICON (시황 `전체 보기` 버튼과 같은 그림, 2026-11-19 사용자)
+  var LOGO_BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/', LOGO_VER = '2';
+  var BADGE_BG = ['#2F6F68', '#5B6B3A', '#86683A'];
+  function logoBadge(s) {
+    if (s.lg) return '<img class="as-logo" src="' + LOGO_BASE + esc(s.lg) + '?v=' + LOGO_VER + '" alt="" width="28" height="28">';
+    var key = s.s.split('.')[0], sum = 0;
+    for (var i = 0; i < key.length; i++) sum += key.charCodeAt(i);
+    var txt = s.m === 'us' ? key.replace(/[-.]/g, '').slice(0, 2) : String(s.n || '').slice(0, 1);
+    return '<span class="as-logo as-logo-b" aria-hidden="true" style="background:' + BADGE_BG[sum % 3] + '">' + esc(txt) + '</span>';
+  }
   function label(s) { return esc(s.n) + ' <span class="as-tk">' + esc(s.s.replace(/\.(KS|KQ)$/, '')) + '</span>'; }
   function row(k, v) { return '<div class="as-row"><span class="as-k">' + k + '</span><span class="as-v">' + v + '</span></div>'; }
   function cur(s) { return s.m === 'us' ? '달러' : '원'; }
@@ -482,18 +494,20 @@
     if (c.why) {   // 왜 떨어졌어 → 전제 확인 · 같은 기간 비교 · 같은 기간 소식 (오늘 주가 칸은 첫 문장과 겹쳐 두지 않는다)
       body += '<p class="as-note as-why-note">AlphaScope는 등락 이유를 짐작해서 답하지 않습니다. 증시 전망과 같은 기준으로 꼽힌 이유와 숫자를 모았습니다.</p>' + whyPart(s, c, doc);
     } else {
-    if (priceFirst) body += PART.price(s, compact);
+    /* 검색어가 가리킨 구획 = .as-hit — 기본 글자 · 구분명 보라, 값 보라 굵게, 굵은 값 검정 · 증감 색 그대로 (2026-11-19 사용자). 이름만 친 요약에는 칠하지 않는다 */
+    var askPrice = list.indexOf('price') >= 0;
+    if (priceFirst) body += askPrice ? '<div class="as-hit">' + PART.price(s, compact) + '</div>' : PART.price(s, compact);
     asked.concat(extra).forEach(function (k, i) {
-      body += '<div class="as-sec' + (!priceFirst && i === 0 ? ' as-first' : '') + '"><h4>' + ico(k) + TITLE[k] + '</h4>' + PART[k](s, c) + '</div>';
+      body += '<div class="as-sec' + (!priceFirst && i === 0 ? ' as-first' : '') + (i < asked.length ? ' as-hit' : '') + '"><h4>' + ico(k) + TITLE[k] + '</h4>' + PART[k](s, c) + '</div>';
     });
-    if (!priceFirst) body += '<div class="as-sec as-today"><h4>' + ico('price') + '오늘 주가</h4>' + PART.price(s, compact) + '</div>';
+    if (!priceFirst) body += '<div class="as-sec as-today' + (askPrice ? ' as-hit' : '') + '"><h4>' + ico('price') + '오늘 주가</h4>' + PART.price(s, compact) + '</div>';
     }
     return '<article class="as-card">'
       /* 질문하기(compact) = 시장 라벨 · 티커 · 종목 코드 없이 이름만 (2026-11-12 사용자: "한국 라벨 빼 · 옆에 숫자 빼") */
-      + '<header>' + (compact ? '' : '<span class="as-mkt as-' + s.m + '">' + (s.m === 'us' ? '미국' : '한국') + '</span>') + '<h3>' + (compact ? esc(s.n) : label(s)) + '</h3><span class="as-day">' + md(s.p.d) + ' 종가 기준</span></header>'
+      + '<header>' + (compact ? '' : logoBadge(s)) + '<h3>' + (compact ? esc(s.n) : label(s)) + '</h3><span class="as-day">' + md(s.p.d) + ' 종가 기준</span></header>'
       + body
       /* 독자가 실제로 가야 할 곳 = 종목 페이지 → 카드 끝 흰 버튼(가이드라인 10절 흰 버튼: 외곽선 · 검은 글씨, 2026-11-12 사용자 — 처음 검은 버튼에서 바꿈) */
-      + '<a class="as-go" href="' + esc(s.u) + '">' + esc(s.n) + ' 종목 페이지 보기</a>'
+      + '<a class="as-go" href="' + esc(s.u) + '"><span>' + esc(s.n) + ' 종목 페이지 보기</span>' + GO_ICON + '</a>'
       + '<p class="as-go-note"><span>' + EXCL + '</span><span>주가 차트 · 실적 · 애널리스트 의견 · 기술 지표 · 뉴스를 한 페이지에 모았습니다.</span></p></article>';
   }
 

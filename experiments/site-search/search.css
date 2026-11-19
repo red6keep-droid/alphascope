@@ -36,9 +36,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-card header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 .as-card h3 { margin: 0; font-size: 19px; font-weight: 700; }
 .as-tk { color: #6B7280; font-family: var(--num); font-weight: 500; font-size: .85em; }
-.as-mkt { font-size: 12px; font-weight: 700; color: #fff; border-radius: 4px; padding: 2px 6px; }
-.as-mkt.as-us { background: var(--badge-blue, #4963CA); }
-.as-mkt.as-kr { background: var(--badge-teal, #0F766E); }
+/* 카드 머리 로고 28 = 이름 19px 보다 조금 크게 (2026-11-19 사용자, 옛 시장 라벨 .as-mkt 한국 · 미국) — 흰 바탕 + 회색 외곽선 = dk.ticker_logo 와 같게 */
+.as-logo { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #fff; object-fit: cover; outline: 1px solid #E2E8F0; outline-offset: -1px; }
+.as-logo-b { display: inline-block; line-height: 28px; text-align: center; color: #fff; font-size: 12px; font-weight: 700; outline: 0; overflow: hidden; white-space: nowrap; }
 .as-day { margin-left: auto; color: #6B7280; font-size: 13px; }
 .as-say { margin: 4px 0 8px; font-size: 16px; line-height: 27px; }
 .as-say b, .as-v, .as-grid b, .as-bars b { font-family: var(--num); }
@@ -63,6 +63,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-k { color: #475569; flex: none; }
 .as-v { text-align: right; word-break: keep-all; }
 .as-v small, .as-news small { color: #94A3B8; }
+/* 검색어가 가리킨 구획(.as-hit) = 보라 #6D28D9 (2026-11-19 사용자, 가이드라인 5절 보라 · 검색 카드 전용 예외): 문장의 기본 글자 · 줄 구분명 = 보라 보통, 줄 값 = 보라 굵게,
+   문장 속 굵은 값 = 검정 · 증감(▲▼ %) = 증감 색 · 티커 · 괄호 작은 글씨 = 회색 그대로. 구획 제목 · 안내 줄 · 그래프는 칠하지 않는다 */
+.as-hit .as-say, .as-hit .as-k, .as-hit .as-v { color: #6D28D9; }
+.as-hit .as-v { font-weight: 700; }
+.as-hit .as-say b { color: #111; }
+.as-hit .as-v small { font-weight: 400; }
+.as-hit .as-say [class=""] { color: #111; }   /* 보합 0% = 검정 (증감 색 없음) */
 .as-note { color: #6B7280; font-size: 13px; line-height: 21px; margin: 6px 0; }
 .as-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .as-grid div { background: var(--surface-sub, #F8FAFC); border-radius: 8px; padding: 8px 4px; text-align: center; }
@@ -95,8 +102,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-related h4 { font-size: 16px; line-height: 26px; color: #111; margin: 0 0 8px; }
 .as-related .as-h-next { margin-top: 18px; }
 /* 종목 페이지 = 흰 버튼(가이드라인 10절 `.cm-login`: 흰 바탕 · 1px #B5BAC0 · 모서리 8 · #111 16/24 굵게 · 안쪽 11 12 · 가운데 · 폭 전체, 올리면 테두리 #111) */
-.as-go { display: flex; align-items: center; justify-content: center; margin-top: 14px; padding: 11px 12px; border: 1px solid #B5BAC0; border-radius: 8px;
+.as-go { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; padding: 7px 12px; border: 1px solid #B5BAC0; border-radius: 8px;
   background: #fff; color: #111 !important; font-size: 16px; line-height: 24px; font-weight: 700; text-decoration: none; }
+.as-go svg { flex: none; display: block; }   /* 글자 + 이동 아이콘 가운데 정렬 · 사이 8, 높이 46 → 38(안쪽 11 → 7, 2026-11-19 사용자 "8픽셀 줄여") */
 .as-go:hover { border-color: #111; }
 /* 안내 한 줄 = 느낌표 13 + 13/19 회색, 왼쪽 정렬, 아이콘 = 첫 줄 가운데 (증시 전망 근거 안내 why_note 와 같은 꼴) */
 .as-go-note { display: flex; align-items: flex-start; gap: 4px; margin: 8px 0 0; color: #6B7280; font-size: 13px; line-height: 19px; word-break: keep-all; }

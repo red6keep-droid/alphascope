@@ -26,6 +26,18 @@ import universe_kr as UK  # noqa: E402
 import etf_universe as E  # noqa: E402
 
 BLOG = "https://alpha-scope.blogspot.com"
+_LOGOS = None
+
+
+def logo_file(sym):
+    """검색 카드 머리 로고 (2026-11-19 사용자: `한국 · 미국` 자리에 티커 로고, 조금 크게) — 우리 gh-pages 로고 파일 이름. 없으면 None(화면이 배지로)."""
+    global _LOGOS
+    if _LOGOS is None:
+        try:
+            _LOGOS = (load(os.path.join(EXP, "ref", "ticker_logos.json")) or {}).get("logos") or {}
+        except (OSError, ValueError):
+            _LOGOS = {}
+    return (_LOGOS.get(str(sym).upper()) or {}).get("file")
 OUT = os.path.join(HERE, "output", "search_index.json")
 
 # 사람들이 실제로 치는 줄임말 · 영문 — 이름 · 티커 · 종목 코드 · 회사 영문 첫 단어는 자동으로 들어간다
@@ -216,6 +228,7 @@ def us_stocks(today, state_dir=None):
              "rev": rev_block(us_x["revenue"]["series"].get(sym)), "ne": next_earn(us_snap["earnings"].get(sym), today),
              "news": us_news(news, sym), "why": why_block(sym, bars, news, os.path.join(EXP, "stock-radar", "data"), state_dir)}
         s.update(eps_block(x))
+        s["lg"] = logo_file(sym)
         if co:
             s["co"] = {"nm": co.get("name"), "ceo": (co.get("ceo") or "").replace("  ", " "), "hq": ", ".join(v for v in (co.get("city"), co.get("state"), co.get("country")) if v),
                        "web": co.get("website"), "emp": co.get("employees"), "ex": co.get("exchange"), "listed": co.get("listed")}
@@ -239,6 +252,7 @@ def kr_stocks(today):
              "p": price_block(bars), "t": tech_block(bars, "kr"), "cap": kr_snap["caps"].get(sym),
              "rev": rev_block(kr_x["revenue"]["series"].get(sym)), "ne": next_earn(kr_x["earnings"].get(sym), today), "news": []}
         s.update(eps_block(kr_x["stocks"].get(sym, {})))
+        s["lg"] = logo_file(sym)
         if co:
             est = co.get("est_dt") or ""
             s["co"] = {"nm": co.get("corp_name"), "ceo": co.get("ceo_nm"), "hq": " ".join((co.get("adres") or "").split()),
