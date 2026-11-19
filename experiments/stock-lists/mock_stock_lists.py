@@ -18,6 +18,7 @@
 """
 import html
 import json
+import re
 import os
 import subprocess
 import sys
@@ -207,6 +208,19 @@ def note(t):
     return f'<p style="font-size:13px;line-height:19px;color:{dk.NOTE};margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;">{esc(t)}</p>'
 
 
+def empty_box(title, text, extra=""):
+    """관심 탭 안내(로그인 전 · 담은 종목 없음) — 카드 없이 가운데 정렬, 제목 17/26 레귤러 · 문장 15/24, 글자 전부 회색 (2026-11-19 사용자)."""
+    return (f'<div style="text-align:center;padding:32px {dk.ALIGN_PX}px 24px;">'
+            f'<div style="font-size:17px;line-height:26px;font-weight:400;color:{dk.NOTE};">{esc(title)}</div>'
+            f'<div style="font-size:15px;line-height:24px;color:{dk.NOTE};margin:4px 0 0;word-break:keep-all;">{text}</div>{extra}</div>')
+
+
+def recent_head():
+    """`이 기기에서 최근 본 종목` — 기본형 아이콘(시계, 회색 원 22) + 소제목 15/22 굵게, 글자와 6 (가이드라인 8절) · 아래 구분선 #E2E8F0 (2026-11-19 사용자). 접기 버튼은 넣었다가 뺐다(같은 날 사용자)."""
+    return (f'<div style="display:flex;align-items:center;gap:6px;margin:8px 0 0;padding:0 0 12px {dk.ALIGN_PX}px;border-bottom:1px solid #E2E8F0;font-size:15px;line-height:22px;font-weight:700;color:#111;">'
+            f'{dk.soft_icon("clock")}이 기기에서 최근 본 종목</div>')
+
+
 def info_card(title, text, extra=""):
     return dk.dcard(f'<div style="font-size:17px;line-height:26px;font-weight:700;color:#111;">{esc(title)}</div>'
                     f'<div style="font-size:15px;line-height:24px;color:#333;margin:4px 0 0;word-break:keep-all;">{text}</div>{extra}')
@@ -374,11 +388,7 @@ def sector_tab(rows, m):
 
 def cap_tab(rows, m):
     xs = sorted([r for r in rows.values() if r["m"] == m and r.get("cap")], key=lambda r: -r["cap"])
-    page = f"{BLOG}/p/{m}-market-cap-top10.html"
-    nm = "미국" if m == "us" else "한국"
-    return (list_card(xs, lambda r, i: row_html(r, i, sub=sub_of(r, cap_text(r)), rank=i + 1))
-            + f'<a href="{page}" style="display:block;margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:15px;line-height:24px;color:#111;font-weight:700;text-decoration:none;">'
-              f'{nm} 시가총액 상위 10 종목 페이지 →</a>')
+    return list_card(xs, lambda r, i: row_html(r, i, sub=sub_of(r, cap_text(r)), rank=i + 1))   # `시가총액 상위 10 종목 페이지 →` 줄 삭제 — 여기서 다 본다 (2026-11-19 사용자)
 
 
 def etf_tab(etf, m):
@@ -409,6 +419,8 @@ def watch_rows(rows, syms):
     return out
 
 
+SEARCH_ICON = ('<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
+               'style="flex:none;display:block;"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>')   # 테마 헤더 검색 아이콘과 같은 꼴 (2026-11-19 사용자 "종목 검색해서 담기 앞에 돋보기")
 PLUS_ICON = ('<span aria-hidden="true" style="flex:none;display:inline-flex;width:22px;height:22px;border-radius:50%;background:#E5E7EB;align-items:center;justify-content:center;">'
              '<svg viewBox="0 0 12 12" width="12" height="12"><path d="M6 1.5v9M1.5 6h9" stroke="#4B5563" stroke-width="1.6" stroke-linecap="round"/></svg></span>')
 
@@ -421,11 +433,10 @@ def watch_member(rows, syms, m, all_rows):
     foot = (f'<div data-sl-foot style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px {dk.ALIGN_PX}px 12px;">'
             f'<button type="button" data-sl-add style="display:inline-flex;align-items:center;gap:8px;padding:8px 0;border:0;background:none;font:inherit;font-size:16px;line-height:24px;font-weight:700;color:#111;cursor:pointer;">{PLUS_ICON}종목 추가</button>'
             f'<button type="button" data-sl-edit style="padding:8px 0 8px 12px;border:0;background:none;font:inherit;font-size:15px;line-height:22px;color:{dk.NOTE};cursor:pointer;">편집</button></div>')
-    big = f'<svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true" style="display:block;margin:0 0 8px;"><path d="{STAR_PATH}" fill="none" stroke="{STAR}" stroke-width="1.6" stroke-linejoin="round"/></svg>'
-    find_btn = f'<button type="button" data-sl-add style="{dk.FOLD_BTN}width:100%;box-sizing:border-box;margin:14px 0 0;font:inherit;font-size:15px;line-height:22px;font-weight:700;">종목 검색해서 담기</button>'
-    empty = info_card("아직 담은 종목이 없습니다",
-                      f'종목을 검색해서 바로 담거나, 종목 페이지 제목 옆 <span style="color:{STAR};">☆</span> 를 누르면 여기에 모입니다.', find_btn
-                      ).replace("<div style=\"font-size:17px", big + "<div style=\"font-size:17px", 1)
+    # 빈 상태 = 카드 없이 가운데 정렬 · 글자 전부 회색 · 제목 레귤러 · 큰 별 없음(문장 속 ★ 만) · 버튼 앞 돋보기 (2026-11-19 사용자)
+    find_btn = f'<button type="button" data-sl-add style="{dk.FOLD_BTN}width:100%;box-sizing:border-box;margin:16px 0 0;font:inherit;font-size:15px;line-height:22px;font-weight:700;">{SEARCH_ICON}종목 검색해서 담기</button>'
+    empty = empty_box("담은 종목이 없습니다",
+                      f'종목을 검색해서 바로 담거나, 종목 페이지 제목 옆 <span style="color:{STAR};">★</span> 를 누르면 여기에 모입니다.', find_btn)
     bar = ('<div data-sl-bar role="toolbar" aria-label="관심 종목 편집">'
            '<button type="button" data-sl-clear class="sl-bar-btn">전체 삭제</button>'
            '<button type="button" data-sl-done class="sl-bar-btn sl-bar-main">완료</button></div>')
@@ -443,13 +454,11 @@ def watch_tab(rows, state, m):
     """관심 탭 — state: guest · empty · member. 들어온 나라(m) 종목만 (2026-11-17 사용자: 한 나라만, 나라는 홈 국기 버튼으로 들어온 쪽)."""
     if state == "guest":
         recent = [rows[s] for s in RECENT if s in rows and rows[s]["m"] == m]
-        login = (f'<a data-mock="1" style="{LOGIN_BTN}margin:14px 0 8px;">{G_LOGO}구글 계정으로 로그인</a>'
-                 f'<p style="font-size:13px;line-height:19px;color:{dk.NOTE};text-align:center;margin:0;">댓글에 쓰는 로그인과 같습니다.</p>')
-        return (info_card("관심 종목을 모아 보세요",
+        login = f'<a data-mock="1" style="{LOGIN_BTN}margin:16px 0 0;">{G_LOGO}구글 계정으로 로그인</a>'   # `댓글에 쓰는 로그인과 같습니다` 삭제 (2026-11-19 사용자)
+        return (empty_box("관심 종목을 모아 보세요",
                           f'종목 페이지 제목 옆 <span style="color:{STAR};">★</span> 를 누르거나 종목을 검색해서 담으면 여기에 모입니다. 로그인하면 폰 · PC 어디서나 같은 목록을 봅니다.', login)
-                + dk.h2("이 기기에서 최근 본 종목", one_line=True)
-                + list_card(recent, lambda r, i: row_html(r, i))
-                + note("이 브라우저에만 남습니다"))
+                + recent_head()
+                + list_card(recent, lambda r, i: row_html(r, i)).replace(f"padding-top:{ROW_TOP}px;", "", 1))   # 제목 아래 구분선이 있어 첫 줄 위도 16 = 아래와 같게 (2026-11-19 사용자)   # `이 브라우저에만 남습니다` 삭제 (2026-11-19 사용자)
     syms = [] if state == "empty" else [s for s in WATCH if s in rows and rows[s]["m"] == m]
     return watch_member(rows, syms, m, rows)
 
@@ -634,10 +643,22 @@ def page(rows, etf, state, m, stats, tab):
     return hash_js + PAGE_CSS + body
 
 
+def tab_star():
+    """관심 탭 이름 앞 노란 별 — 실제 페이지(stock_lists.js tabStar · publish_stock_lists_page CSS)를 그대로 떼어 붙인다 (2026-11-19 사용자: 모든 목업에 같게)."""
+    js = open(os.path.join(HERE, "stock_lists.js"), encoding="utf-8").read()
+    pub = open(os.path.join(HERE, "publish_stock_lists_page.py"), encoding="utf-8").read()
+    m = re.search(r"  \(function tabStar\(\) \{.*?\n  \}\)\(\);", js, re.S)
+    c = re.search(r'"(\.post-body \.rt-tab \.sl-tab-star\{[^"]*)"', pub)
+    if not (m and c):
+        print("[종목 목록] 관심 탭 별 코드를 못 찾음 — 목업에 별 없음")
+        return ""
+    return f"<style>{c.group(1)}</style><script>\n{m.group(0)}\n</script>"
+
+
 def write(body, name, title="종목 모아보기"):   # 옛 `종목` (2026-11-18 사용자 "제목을 좀 더")
     path = dk.write_mock(dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE), os.path.join(OUT, name), title)
     if path:
-        pg = open(path, encoding="utf-8").read().replace("</body>", PAGE_JS + WATCH_JS + "</body>", 1)
+        pg = open(path, encoding="utf-8").read().replace("</body>", PAGE_JS + WATCH_JS + tab_star() + "</body>", 1)
         open(path, "w", encoding="utf-8").write(pg)
     print(f"[종목 목록] {name}")
 
