@@ -468,8 +468,8 @@ body[data-home-mkt="kr"] .news-section { display: none; }   /* 한국 뉴스 자
 .cm-wide { position: relative; margin: calc(-1 * var(--card-gap)) calc(50% - 50vw) 0; background: #06121A; }
 .cm-wide a { display: block; position: relative; border-radius: 0; -webkit-tap-highlight-color: transparent; }
 .cm-wide a:active { opacity: .85; }
-.cm-wide img { display: block; width: 100%; height: auto; aspect-ratio: 900 / 350; border-radius: 0; }
-.cm-pill { position: absolute; left: 8.1%; bottom: calc(74.6% + 5px); padding: 2px 8px; border-radius: 0; background: rgba(6,18,26,.72);
+.cm-wide img { display: block; width: 100%; height: auto; aspect-ratio: 900 / 374; border-radius: 0; }   /* 배너 900×374 (11-19 사용자 시안 C, 옛 350) */
+.cm-pill { position: absolute; left: 8.0%; bottom: calc(74.9% + 5px); padding: 2px 8px; border-radius: 0; background: rgba(6,18,26,.72);
   color: #fff; font-size: 11px; line-height: 16px; font-weight: 600; }
 /* 실적 발표 배너를 한 줄로(같은 일정 배너, 모양만): 로고 24 · 종목 이름 · 실적 발표 · D-n, 날짜 · 시각 줄은 숨김. 높이 54 */
 #event-banner.cm-strip .eb-slide { gap: 8px; padding: 15px 72px 15px 7px; }
@@ -2083,7 +2083,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         <div class='home-cards'>
         <!-- 일정 배너 (2026-10-28 사용자: 홈 맨 위 실적 발표 등 롤링 배너 3개, 누르면 그 종목 상세 화면 캘린더 탭. 2026-10-29 시안: 전폭 남색 · 가운데 점).
              stocks.json · kr.json 의 events (고정 페이지가 있는 종목만) 중 오늘 이후 가까운 6개. 일정이 없으면 배너를 숨긴다 -->
-        <section class='cm-wide' id='cm-banner' aria-label='증시 시황' hidden='hidden'><a href='/search/label/%EC%A6%9D%EC%8B%9C%20%EC%8B%9C%ED%99%A9'><img alt='' width='900' height='350'/><span class='cm-pill'></span></a></section>
+        <section class='cm-wide' id='cm-banner' aria-label='증시 시황' hidden='hidden'><a href='/search/label/%EC%A6%9D%EC%8B%9C%20%EC%8B%9C%ED%99%A9'><img alt='' width='900' height='374'/><span class='cm-pill'></span></a></section>
         <section class='event-banner cm-strip' id='event-banner' aria-roledescription='carousel' aria-label='다가오는 실적 발표' hidden='hidden'>
           <div class='eb-viewport'><div class='eb-track' data-hook='event-slides'></div></div>
           <div class='eb-dots' data-hook='event-dots'></div>

@@ -333,7 +333,7 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
     body = [style + f'<p data-title-basis="1" data-commentary="{dk.esc(col["date"])}-{slot}" style="margin:0 0 14px;font-size:13px;line-height:19px;color:#6B7280;">{basis}</p>']
     if banner_url:
         body.append(f'<figure data-bleed="1" style="margin:0 -{SIDE_PX}px 16px;"><img src="{dk.esc(banner_url)}" alt="{dk.esc(banner_alt or "AI 생성 이미지")}" '
-                    f'width="900" height="350" style="display:block;width:100%;height:auto;border-radius:0;"></figure>')   # 테마 글 그림 모서리 12 를 끔
+                    f'width="900" height="374" style="display:block;width:100%;height:auto;border-radius:0;"></figure>')   # 테마 글 그림 모서리 12 를 끔
     head_txt = emph(directional(dk.tint(dk.esc(col["title"]))), False)   # 캐릭터는 넣지 않는다 (2026-11-19 사용자 "유아틱 · 전문가스러워야") — 대신 장 분위기 아이콘
     mood = mood_of(indices) if mood_base else None
     head_ink = MOOD_INK[mood] if mood else INK   # 아이콘이 없으면 보라 그대로
