@@ -213,8 +213,10 @@ SUMMARY = {"top": 260, "px": 32, "spacing": 0.2, "color": (218, 225, 234)}  # �
 BIG_PX, BIG_SPACING = round(EMPH["px"] * 1.3), EMPH["spacing"] * 1.3   # 짧은 제목 한 줄 = 30% 크게 (104px, 11-17 사용자)
 # 글자 수 제한 (수집기 Q25, 튼튼체 실측 — 한글 한 자 80px ≈ 76 · 104px ≈ 100 · 32px ≈ 30, 띄어쓰기 ≈ 0.27자):
 #   띄어쓰기는 빼고 센다 — 두 줄 제목 줄마다 한글 10자 · 두 줄 합쳐 7자 안팎이면 저절로 한 줄 104px · 시장 요약 한글 20자(가운뎃점 별도)
-EMPH_COLOR = {"strong_up": (243, 64, 50), "up": (243, 64, 50), "flat": (245, 246, 248),
-              "down": (84, 156, 255), "plunge": (84, 156, 255)}
+# 강조 제목 색 (2026-11-19 사용자 시안 4번 확정): 오름 = 주황이 살짝 도는 밝은 빨강 #FF6840 · 내림 = 하늘색이 섞인 밝은 파랑 #4AB0FF (옛 #F34032 · #549CFF — 사진에 묻힘)
+EMPH_COLOR = {"strong_up": (255, 104, 64), "up": (255, 104, 64), "flat": (245, 246, 248),
+              "down": (74, 176, 255), "plunge": (74, 176, 255)}
+EMPH_GLOW, SHADE_MAX, PHOTO_DIM = 200, 190, 0.15   # 강조 제목 뒤 어두운 번짐 · 왼쪽 어둡게(옛 150) · 사진 전체 15% 어둡게 — 글자가 사진에 묻히지 않게 (같은 날 4번)
 
 
 def _spaced_w(text, font, sp):
@@ -235,15 +237,24 @@ def _cover(bg, w, h):
     return im.crop((l, t, l + w, t + h))
 
 
-def compose(bg, sc, banner):
-    """사진 + 글자. 짧은 글은 사양 크기 그대로(키우지 않음), 긴 글은 칸에 들어갈 때까지 줄인다(빼지 않음, 2026-11-17 사용자)."""
+def compose(bg, sc, banner, emph_rgb=None, emph_glow=EMPH_GLOW, shade_max=SHADE_MAX, photo_dim=PHOTO_DIM):
+    """사진 + 글자. 짧은 글은 사양 크기 그대로(키우지 않음), 긴 글은 칸에 들어갈 때까지 줄인다(빼지 않음, 2026-11-17 사용자).
+    읽히게 (2026-11-19 사용자 "강조 제목이 배경 때문에 잘 안 보인다" → 시안 4번): emph_rgb = 강조 제목 색 바꿈 · emph_glow = 강조 제목 뒤 어두운 번짐 진하기(0 ~ 255) ·
+    shade_max = 왼쪽 어둡게 정도 · photo_dim = 사진 전체를 이만큼 어둡게(0 ~ 1). 기본값 = 확정값."""
+    emph_col = emph_rgb or EMPH_COLOR[sc["mood"]]
+    glow = Image.new("RGBA", (OUT_W, OUT_H), (0, 0, 0, 0))
+    dg = ImageDraw.Draw(glow)
     canvas = Image.new("RGB", (OUT_W, OUT_H), CANVAS_BG)
-    canvas.paste(_cover(bg.convert("RGB"), PHOTO_W, PHOTO_H), (0, 0))
+    photo = _cover(bg.convert("RGB"), PHOTO_W, PHOTO_H)
+    if photo_dim:
+        from PIL import ImageEnhance
+        photo = ImageEnhance.Brightness(photo).enhance(1 - photo_dim)
+    canvas.paste(photo, (0, 0))
     # 글자 쪽(왼쪽)만 옅게 어둡게 — 밝은 사진(크게 오른 날)에서도 읽히게
     shade = Image.new("L", (OUT_W, OUT_H))
     sd = ImageDraw.Draw(shade)
     for x in range(OUT_W):
-        sd.line([(x, 0), (x, OUT_H)], fill=int(150 * max(0.0, 1 - x / (OUT_W * 0.72))))
+        sd.line([(x, 0), (x, OUT_H)], fill=int(shade_max * max(0.0, 1 - x / (OUT_W * 0.72))))
     im = Image.composite(Image.new("RGB", (OUT_W, OUT_H), CANVAS_BG), canvas, shade).convert("RGBA")
     banner = banner if isinstance(banner, dict) else {}
     txt = Image.new("RGBA", (OUT_W, OUT_H), (0, 0, 0, 0))
@@ -272,11 +283,13 @@ def compose(bg, sc, banner):
         if len(cands) > 1:
             log(f"제목 후보 {len(cands)}개 중 {cands.index(lines) + 1}번째: {lines}")
         cy = (MAIN["top"] + EMPH["top"] + EMPH["px"] * LINE_H) / 2
-        parts = [(lines[0] + " ", MAIN["color"]), (lines[1], EMPH_COLOR[sc["mood"]])] if len(lines) == 2 else [(lines[0], EMPH_COLOR[sc["mood"]])]
+        parts = [(lines[0] + " ", MAIN["color"]), (lines[1], emph_col)] if len(lines) == 2 else [(lines[0], emph_col)]
         x = LEFT
         for t, color in parts:
             if color == MAIN["color"]:
                 _spaced(ds, x, cy + 2, t, big, BIG_SPACING, (0, 0, 0, 140))
+            elif emph_glow:
+                _spaced(dg, x, cy + 2, t, big, BIG_SPACING, (0, 0, 0, emph_glow))
             _spaced(d, x, cy, t, big, BIG_SPACING, color)
             x += _spaced_w(t, big, BIG_SPACING) + BIG_SPACING
         log(f"짧은 제목 — 한 줄 {BIG_PX}px")
@@ -291,9 +304,11 @@ def compose(bg, sc, banner):
             px = max(12, int(st["px"] * scale))
             f = _font(True, px)
             cy = top + px * LINE_H / 2
-            color = st.get("color") or EMPH_COLOR[sc["mood"]]
+            color = st.get("color") or emph_col
             if st is MAIN:
                 _spaced(ds, LEFT, cy + 2, ln, f, st["spacing"] * scale, (0, 0, 0, 140))
+            elif emph_glow:
+                _spaced(dg, LEFT, cy + 2, ln, f, st["spacing"] * scale, (0, 0, 0, emph_glow))
             _spaced(d, LEFT, cy, ln, f, st["spacing"] * scale, color)
         if scale < 1:
             log(f"제목 줄임 ×{scale:.2f} ({int(EMPH['px'] * scale)}px)")
@@ -311,6 +326,9 @@ def compose(bg, sc, banner):
 
     # ③ `AI 생성 이미지` 글자는 그리지 않는다 (2026-11-17 사용자: 글자에 가려지는 단순 배경이라 의미 없음) — 표시는 img alt 에 (운영지침 4-6)
     im = Image.alpha_composite(im, shadow.filter(ImageFilter.GaussianBlur(1.5)))
+    if emph_glow:   # 강조 제목 뒤 넓은 어두운 번짐 — 두 번 겹쳐 진하게
+        g = glow.filter(ImageFilter.GaussianBlur(10))
+        im = Image.alpha_composite(Image.alpha_composite(im, g), g)
     return Image.alpha_composite(im, txt).convert("RGB")
 
 

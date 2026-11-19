@@ -190,7 +190,10 @@ def stage_prepare(a):
     from story_render import LISTS_URL
     lists_live = _exists(LISTS_URL)   # 종목 모아보기 페이지가 아직 없으면 표를 3줄로 자르지 않고 전부 싣는다
     log(f"종목 모아보기 페이지 {'있음 — 표 3줄 + 버튼' if lists_live else '없음 — 표 전부 싣고 접기'}")
-    title, html, meta = render(col, briefing, banner_url=banner_url, banner_alt=alt, lists_live=lists_live, lists=read_lists(slot))
+    from story_render import MOOD_BASE
+    mood_ok = _exists(MOOD_BASE + "market-up.webp")   # 장 분위기 아이콘이 gh-pages 에 아직 없으면 아이콘 없이 낸다(깨진 그림 대신)
+    title, html, meta = render(col, briefing, banner_url=banner_url, banner_alt=alt, lists_live=lists_live, lists=read_lists(slot),
+                               mood_base=MOOD_BASE if mood_ok else None)
     post = {"key": key, "title": title, "labels": meta["labels"], "banner_ref": info["ref"] if info else None,
             "banner_source": info["source"] if info else None, "linked": meta["linked"], "model": col.get("model"), "rev": col.get("rev")}
     open(os.path.join(OUT, "body.html"), "w", encoding="utf-8").write(html)
