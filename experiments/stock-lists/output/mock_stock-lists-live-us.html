@@ -1184,8 +1184,8 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title {
   margin: 0 0 10px;
   font-weight: 700;
-  font-size: 35px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") */
-  line-height: 49px;   /* 홀짝 — 줄 높이 − 글자 = 짝수 (2026-11-07 가이드라인 3절) */
+  font-size: 34px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") → −1 (2026-11-19 사용자: 상단 종목명 한 포인트 작게, 모든 글 공통) */
+  line-height: 48px;   /* 홀짝 — 줄 높이 − 글자 = 짝수 (2026-11-07 가이드라인 3절) */
   letter-spacing: -.6px;
   color: var(--ink);
 }
@@ -1442,6 +1442,7 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
   font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* `TOP` 글자 16 → 14 (P517, 2026-11-11 사용자) — 화살표 원 22 그대로 */
 .post-nav-top:hover { color: var(--accent); }
+.post-nav-top.is-short { visibility: hidden; }   /* 페이지가 화면 2배보다 짧으면 숨김 — 자리는 남긴다 (테마 JS, 2026-11-19 사용자) */
 .post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
 .post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
 .post-nav-cm { grid-column: 1; grid-row: 1; justify-self: start; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; padding: 8px 0; background: none; border: 0;
@@ -1592,7 +1593,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .post-outer-container { padding: 24px; }
   body.item-view .post-outer-container { padding-top: 13px; }   /* 카드 위 → 제목 글자 보이는 20 (2026-10-12 사용자) */
-  .post-title { font-size: 27px; line-height: 37px; }
+  .post-title { font-size: 26px; line-height: 36px; }   /* −1 (2026-11-19 사용자) */
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
@@ -1601,7 +1602,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
   body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 26px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) → −5 (2026-10-25 사용자: 상세 제목 줄 위 여백) */
-  .post-title { font-size: 23px; line-height: 33px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
+  .post-title { font-size: 22px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) → 22 (−1, 2026-11-19 사용자: 상단 종목명 한 포인트 작게) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
   .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
   .post-body { font-size: 19px; line-height: 35px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
   .post-body [data-sent] { display: inline; }   /* 모바일: 문장 줄바꿈 없이 이어 흐른다 — 문단(빈 줄)만 남는다 (2026-10-16 사용자) */
@@ -1633,7 +1634,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .eb-title { font-size: 16px; line-height: 23px; }
   .theme-name { font-size: 16px; line-height: 23px; }
   .post-card-title { font-size: 17px; }
-  .post-title { font-size: 28px; line-height: 36px; }
+  .post-title { font-size: 27px; line-height: 35px; }   /* −1 (2026-11-19 사용자) */
   .post-body { font-size: 16px; line-height: 32px; }
   .rt-pop-title { font-size: 16px; line-height: 21px; }
   .post-body .rt-tab { font-size: 16px; line-height: 21.5px; }
@@ -2126,9 +2127,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   }
   function caps(rows) {
     var xs = rows.filter(function (r) { return r.c; }).sort(byDesc(function (r) { return r.c; }));
-    return card(xs, function (r, i) { return row(r, i, { rank: i + 1, sub: subOf(r, capText(r.c)) }); }) +
-      '<a href="/p/' + m + '-market-cap-top10.html" style="display:block;margin:4px 0 12px;padding-left:6px;font-size:15px;line-height:24px;color:#111;font-weight:700;text-decoration:none;">' +
-      (m === 'us' ? '미국' : '한국') + ' 시가총액 상위 10 종목 페이지 →</a>';
+    return card(xs, function (r, i) { return row(r, i, { rank: i + 1, sub: subOf(r, capText(r.c)) }); });   // `시가총액 상위 10 종목 페이지 →` 줄 삭제 — 여기서 다 본다 (2026-11-19 사용자)
   }
   function etf(doc) {
     return card(doc.etf || [], function (r, i) { return row(r, i, { sub: esc(r.s) }); }) + note('지수 · 업종을 따라가는 상품');
@@ -2137,9 +2136,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     var seen = [];
     try { seen = JSON.parse(localStorage.getItem('as-recent') || '[]') || []; } catch (e) { seen = []; }
     var xs = seen.filter(function (x) { return x && x.m === m && by[x.t]; }).map(function (x) { return by[x.t]; });
-    var head = '<h3 style="font-size:17px;line-height:24px;font-weight:700;color:#111;margin:0 0 10px;padding-left:6px;">이 기기에서 최근 본 종목</h3>';
+    /* 제목 = 기본형 아이콘(시계, 회색 원 22 = dk.soft_icon('clock')) + 소제목 15/22 굵게, 글자와 6 (가이드라인 8절) · `이 브라우저에만 남습니다` 삭제 · 제목 아래 구분선 (2026-11-19 사용자)
+       접기 버튼은 넣었다가 뺐다 (2026-11-19 사용자) */
+    var head = '<h3 style="display:flex;align-items:center;gap:6px;font-size:15px;line-height:22px;font-weight:700;color:#111;margin:8px 0 0;padding:0 0 12px 6px;border-bottom:1px solid #E2E8F0;">' +
+      '<span aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#E5E7EB;color:#4B5563;">' +
+      '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.2 1.4"/></svg></span>' +
+      '이 기기에서 최근 본 종목</h3>';
     if (!xs.length) return head + line('아직 본 종목이 없습니다. 종목 페이지를 열면 여기에 최근 본 순서로 남습니다.');
-    return head + card(xs, function (r, i) { return row(r, i); }) + note('이 브라우저에만 남습니다');
+    return head + card(xs, function (r, i) { return row(r, i); }).replace('padding-top:21px;', '');   // 제목 아래 구분선이 있어 첫 줄 위도 다른 줄처럼 16 = 아래와 같게 (2026-11-19 사용자)
   }
   function dayText(d) {
     var x = new Date(d + 'T00:00:00Z');
@@ -2187,8 +2191,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     stamp(doc.d);
   }
   function fail() {
-    var t = '<p style="font-size:17px;line-height:30px;color:#333;margin:12px 0;padding-left:6px;word-break:keep-all;">잠시 목록을 불러오지 못했습니다. ' +
-      '<a href="/p/' + m + '-market-cap-top10.html" style="color:#111;">' + (m === 'us' ? '미국' : '한국') + ' 시가총액 상위 10 종목</a>을 먼저 보세요.</p>';
+    var t = '<p style="font-size:17px;line-height:30px;color:#333;margin:12px 0;padding-left:6px;word-break:keep-all;">잠시 목록을 불러오지 못했습니다. 잠시 뒤 다시 열어 주세요.</p>';   // 옛 안내 = 시총 상위 10 페이지로 — 그 페이지를 없애며 뺌 (2026-11-19 사용자)
     ['watch', 'move', 'theme', 'sector', 'cap', 'etf'].forEach(function (k) { put(k, t); });
   }
 
@@ -2292,7 +2295,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           JNJ: 'johnson-johnson-jnj-stock', MA: 'mastercard-ma-stock', ABBV: 'abbvie-abbv-stock', INTC: 'intel-intc-stock' };
         var BLOG_HOME = 'https://alpha-scope.blogspot.com/';
         function pageFor(ticker) {
-          return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
+          return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
         }
 
         function metaFor(ticker) {
@@ -2331,7 +2334,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         /* 미국 · 한국 화면 (H35, 2026-11-10 사용자) — body[data-home-mkt] 가 있으면 그 시장만. 없으면 '' = 지금 홈(두 시장) */
         var HOME_MKT = (document.body && document.body.getAttribute('data-home-mkt')) || '';
         var krHome = null, rankMarket = HOME_MKT || 'us', picksMarket = HOME_MKT || 'us';
-        if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/kr-market-cap-top10.html'; }
+        if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'; }
         var KR_URL = GH + 'kr.json';
 
         /* ===== 장중 가격 (2026-11-05 사용자) — 한국 종목 live.json (experiments/kr-stocks/collect_kr_live.py, 장중 10분마다, 야후 약 20분 지연).
@@ -2453,7 +2456,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           av.appendChild(img);
           return av;
         }
-        function krPage(r) { return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html'); }
+        function krPage(r) { return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : ((krHome && krHome.list_url) || BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'); }
         var activeSort = 'cap';   /* 시총 TOP 10 이라 기본은 시가총액 순 (2026-10-18) */
         /* data.json 에 시총(mc)이 없던 때의 순서 — fetch_stocks.TICKERS 와 같은 2026-10-18 장 마감 순위 */
         var CAP_ORDER = ['NVDA', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'AVGO', 'TSLA', 'BRK-B', 'LLY'];
@@ -2726,7 +2729,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             c.appendChild(el('span', 'nt-ex', '지수보다 ' + ntPct(r.ex, '%p')));
             d.appendChild(c);
             var href = r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html#tab-' + encodeURIComponent('오늘')
-              : (market === 'kr' ? ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html') : BLOG_HOME + 'p/us-market-cap-top10.html');
+              : (market === 'kr' ? ((krHome && krHome.list_url) || BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1') : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1');
             d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', href);
             list.appendChild(d);
           });
@@ -2880,7 +2883,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function feedPage(r) {
           if (isKR(r)) return krPage(r);
           if (r.s === 'NVDA') return pageFor('NVDA');
-          return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
+          return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
         }
         function feedCell(r) {
           var cell = el('a', 'stock-cell');
@@ -5354,6 +5357,23 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
           });
         });
+        /* 짧은 화면엔 TOP 을 숨긴다 (2026-11-19 사용자: "세로 길이가 짧으면 쓸 이유가 없다") — 페이지 전체 높이가 화면 높이의 2배보다 짧으면 숨김.
+           자리는 남긴다(visibility) — 가운데 목록 · 왼쪽 댓글 버튼이 흔들리지 않게. 탭 · 접기 · 댓글을 열면 길이가 바뀌어 다시 잰다 */
+        var tops = [].slice.call(document.querySelectorAll('.post-nav-top'));
+        if (tops.length) {
+          var topCheck = function () {
+            var h = Math.max(document.documentElement.scrollHeight, document.body ? document.body.scrollHeight : 0);
+            var short = h < window.innerHeight * 2;
+            tops.forEach(function (b) { b.classList.toggle('is-short', short); });
+          };
+          var topLater = function () { setTimeout(topCheck, 0); setTimeout(topCheck, 400); };
+          topCheck();
+          window.addEventListener('load', topCheck);
+          window.addEventListener('resize', topCheck);
+          document.addEventListener('click', topLater, true);   /* 탭 · 접기 · 더 보기 · 댓글 열기 — 무엇이든 누른 뒤 다시 잰다 */
+          document.addEventListener('toggle', topLater, true);   /* <details> 펼침 */
+          setTimeout(topCheck, 1500);   /* 목록 · 그래프를 늦게 채우는 페이지(종목 모아보기 등) */
+        }
       })();
 
       /* ============================================================ 홈 화면 추가 안내 (2026-10-13 사용자, 디자인 가이드 10-4)

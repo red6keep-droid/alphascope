@@ -207,9 +207,7 @@
   }
   function caps(rows) {
     var xs = rows.filter(function (r) { return r.c; }).sort(byDesc(function (r) { return r.c; }));
-    return card(xs, function (r, i) { return row(r, i, { rank: i + 1, sub: subOf(r, capText(r.c)) }); }) +
-      '<a href="/p/' + m + '-market-cap-top10.html" style="display:block;margin:4px 0 12px;padding-left:6px;font-size:15px;line-height:24px;color:#111;font-weight:700;text-decoration:none;">' +
-      (m === 'us' ? '미국' : '한국') + ' 시가총액 상위 10 종목 페이지 →</a>';
+    return card(xs, function (r, i) { return row(r, i, { rank: i + 1, sub: subOf(r, capText(r.c)) }); });   // `시가총액 상위 10 종목 페이지 →` 줄 삭제 — 여기서 다 본다 (2026-11-19 사용자)
   }
   function etf(doc) {
     return card(doc.etf || [], function (r, i) { return row(r, i, { sub: esc(r.s) }); }) + note('지수 · 업종을 따라가는 상품');
@@ -218,9 +216,14 @@
     var seen = [];
     try { seen = JSON.parse(localStorage.getItem('as-recent') || '[]') || []; } catch (e) { seen = []; }
     var xs = seen.filter(function (x) { return x && x.m === m && by[x.t]; }).map(function (x) { return by[x.t]; });
-    var head = '<h3 style="font-size:17px;line-height:24px;font-weight:700;color:#111;margin:0 0 10px;padding-left:6px;">이 기기에서 최근 본 종목</h3>';
+    /* 제목 = 기본형 아이콘(시계, 회색 원 22 = dk.soft_icon('clock')) + 소제목 15/22 굵게, 글자와 6 (가이드라인 8절) · `이 브라우저에만 남습니다` 삭제 · 제목 아래 구분선 (2026-11-19 사용자)
+       접기 버튼은 넣었다가 뺐다 (2026-11-19 사용자) */
+    var head = '<h3 style="display:flex;align-items:center;gap:6px;font-size:15px;line-height:22px;font-weight:700;color:#111;margin:8px 0 0;padding:0 0 12px 6px;border-bottom:1px solid #E2E8F0;">' +
+      '<span aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#E5E7EB;color:#4B5563;">' +
+      '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.2 1.4"/></svg></span>' +
+      '이 기기에서 최근 본 종목</h3>';
     if (!xs.length) return head + line('아직 본 종목이 없습니다. 종목 페이지를 열면 여기에 최근 본 순서로 남습니다.');
-    return head + card(xs, function (r, i) { return row(r, i); }) + note('이 브라우저에만 남습니다');
+    return head + card(xs, function (r, i) { return row(r, i); }).replace('padding-top:21px;', '');   // 제목 아래 구분선이 있어 첫 줄 위도 다른 줄처럼 16 = 아래와 같게 (2026-11-19 사용자)
   }
   function dayText(d) {
     var x = new Date(d + 'T00:00:00Z');
@@ -268,8 +271,7 @@
     stamp(doc.d);
   }
   function fail() {
-    var t = '<p style="font-size:17px;line-height:30px;color:#333;margin:12px 0;padding-left:6px;word-break:keep-all;">잠시 목록을 불러오지 못했습니다. ' +
-      '<a href="/p/' + m + '-market-cap-top10.html" style="color:#111;">' + (m === 'us' ? '미국' : '한국') + ' 시가총액 상위 10 종목</a>을 먼저 보세요.</p>';
+    var t = '<p style="font-size:17px;line-height:30px;color:#333;margin:12px 0;padding-left:6px;word-break:keep-all;">잠시 목록을 불러오지 못했습니다. 잠시 뒤 다시 열어 주세요.</p>';   // 옛 안내 = 시총 상위 10 페이지로 — 그 페이지를 없애며 뺌 (2026-11-19 사용자)
     ['watch', 'move', 'theme', 'sector', 'cap', 'etf'].forEach(function (k) { put(k, t); });
   }
 
