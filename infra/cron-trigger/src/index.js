@@ -58,6 +58,10 @@ const KST_JOBS = {
   "13:00": [{ workflow: "nvda-report.yml" }],
   // 집 IP 받기(미래에셋 TIGER 구성 · 버리 RSS, 집 공유기 VPN) — 유튜브 수집(News-sub)이 VPN 을 안 쓰는 12~17시 (2026-11-17 사용자).
   // 공유기 L2TP 는 동시 접속을 못 버텨, 워크플로가 News-sub 실행이 도는 중이면 기다린다. 매일.
+  // 시황 해설 발행(2026-11-19 사용자) — 수집기가 08:10 · 20:30 에 쓰고 08:30 · 20:40 마감, 블로그는 08:40 · 21:00 에 ready 글만 공개 발행. 매일
+  // (수집기가 재료 없는 날은 skip 문서 → 발행기가 조용히 끝). 배너를 gh-pages 에 올린다 — :40 · :00 에 다른 gh-pages 푸시 실행 없음.
+  "08:40": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "am" } }],
+  "21:00": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "pm" } }],
   "14:30": [{ workflow: "home-ip.yml" }], // 낮 갱신 — 종목 페이지만 다시 그린다 (check.mode=refresh, 2026-11-04 P290). GitHub cron 04:00 UTC 는 예비
 };
 
@@ -109,6 +113,7 @@ const NAMES = {
   "quick-data.yml": "간단 종목 주가 (853종목)",
   "kr-rss-probe.yml": "한국 간단 종목 뉴스 매체 시험",
   "home-ip.yml": "집 IP 받기 (미래에셋 · 버리)",
+  "commentary.yml": "증시 시황 발행 (아침 · 저녁)",
 };
 const WATCH_AFTER_MIN = 60;
 const name = (wf) => NAMES[wf] || wf;
