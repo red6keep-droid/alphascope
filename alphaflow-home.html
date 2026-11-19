@@ -1207,7 +1207,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
              줄을 누르면 그 종목 `오늘` 탭(#tab-오늘)의 `급락장에서 어땠나?` 카드. 5개 펼침 + 나머지 접기. 다섯째 카드라 전폭(미국 · 한국 두 칸) -->
         <div class="report-col" id="notable-col">
         <h3 class="report-title"><span class="report-icon" style="background:#B45309;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11.5l4-4 3 3 5-6"/><path d="M10.5 4.5H14v3.5"/></svg></span>주목할 종목<span class="report-card-date" data-date="notable-card"></span></h3>
-        <a class="report-card" id="notable-card" href="/p/us-market-cap-top10.html">
+        <a class="report-card" id="notable-card" href="/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1">
           <div class="nt-grid">
             <div class="nt-mkt" data-hook="notable-us"><div class="nt-note">불러오는 중…</div></div>
             <div class="nt-mkt" data-hook="notable-kr"><div class="nt-note">불러오는 중…</div></div>
@@ -1457,7 +1457,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     JNJ: 'johnson-johnson-jnj-stock', MA: 'mastercard-ma-stock', ABBV: 'abbvie-abbv-stock', INTC: 'intel-intc-stock' };
   var BLOG_HOME = 'https://alpha-scope.blogspot.com/';
   function pageFor(ticker) {
-    return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
+    return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
   }
 
   function metaFor(ticker) {
@@ -1496,7 +1496,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   /* 미국 · 한국 화면 (H35, 2026-11-10 사용자) — body[data-home-mkt] 가 있으면 그 시장만. 없으면 '' = 지금 홈(두 시장) */
   var HOME_MKT = (document.body && document.body.getAttribute('data-home-mkt')) || '';
   var krHome = null, rankMarket = HOME_MKT || 'us', picksMarket = HOME_MKT || 'us';
-  if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/kr-market-cap-top10.html'; }
+  if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'; }
   var KR_URL = GH + 'kr.json';
 
   /* ===== 장중 가격 (2026-11-05 사용자) — 한국 종목 live.json (experiments/kr-stocks/collect_kr_live.py, 장중 10분마다, 야후 약 20분 지연).
@@ -1618,7 +1618,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     av.appendChild(img);
     return av;
   }
-  function krPage(r) { return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html'); }
+  function krPage(r) { return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : ((krHome && krHome.list_url) || BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'); }
   var activeSort = 'cap';   /* 시총 TOP 10 이라 기본은 시가총액 순 (2026-10-18) */
   /* data.json 에 시총(mc)이 없던 때의 순서 — fetch_stocks.TICKERS 와 같은 2026-10-18 장 마감 순위 */
   var CAP_ORDER = ['NVDA', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'AVGO', 'TSLA', 'BRK-B', 'LLY'];
@@ -1891,7 +1891,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       c.appendChild(el('span', 'nt-ex', '지수보다 ' + ntPct(r.ex, '%p')));
       d.appendChild(c);
       var href = r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html#tab-' + encodeURIComponent('오늘')
-        : (market === 'kr' ? ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html') : BLOG_HOME + 'p/us-market-cap-top10.html');
+        : (market === 'kr' ? ((krHome && krHome.list_url) || BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1') : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1');
       d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', href);
       list.appendChild(d);
     });
@@ -2045,7 +2045,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   function feedPage(r) {
     if (isKR(r)) return krPage(r);
     if (r.s === 'NVDA') return pageFor('NVDA');
-    return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
+    return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
   }
   function feedCell(r) {
     var cell = el('a', 'stock-cell');

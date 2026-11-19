@@ -1484,6 +1484,7 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
   font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* `TOP` 글자 16 → 14 (P517, 2026-11-11 사용자) — 화살표 원 22 그대로 */
 .post-nav-top:hover { color: var(--accent); }
+.post-nav-top.is-short { visibility: hidden; }   /* 페이지가 화면 2배보다 짧으면 숨김 — 자리는 남긴다 (테마 JS, 2026-11-19 사용자) */
 .post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
 .post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
 .post-nav-cm { grid-column: 1; grid-row: 1; justify-self: start; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; padding: 8px 0; background: none; border: 0;
@@ -2010,8 +2011,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           <div class='menu-row'><a class='nav-item' data-latest='데일리 브리핑' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>미국 증시 리포트</a><a class='menu-past' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>지난 리포트</a></div>
           <div class='menu-row'><a class='nav-item' data-latest='한국 증시 리포트' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>한국 증시 리포트</a><a class='menu-past' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>지난 리포트</a></div>
           <div class='menu-row'><a class='nav-item' href='/p/stock-lists.html'>종목 목록</a></div>
-          <div class='menu-row'><a class='nav-item' href='/p/us-market-cap-top10.html'>미국 시가총액 상위 10 종목</a></div>
-          <div class='menu-row'><a class='nav-item' href='/p/kr-market-cap-top10.html'>한국 시가총액 상위 10 종목</a></div>
+          <div class='menu-row'><a class='nav-item' href='/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'>미국 시가총액 상위 10 종목</a></div>
+          <div class='menu-row'><a class='nav-item' href='/p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'>한국 시가총액 상위 10 종목</a></div>
           <div class='menu-row'><a class='nav-item' href='/p/forecast-list.html'>증시 전망</a></div>
           <div class='menu-grp'><div class='menu-grp-t'>Hot Issue</div><a class='nav-item' href='/p/issue-iran.html'>이란 전쟁</a><a class='nav-item' href='/p/issue-tariff.html'>관세</a><a class='nav-item' href='/p/issue-export.html'>반도체 수출 통제</a><a class='nav-item' href='/p/issue-nvidia-ceo.html'>엔비디아 CEO 사임</a></div>
           <div class='menu-row'><a class='nav-item' data-latest='인물 발언' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>주요 인물 발언</a><a class='menu-past' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>지난 발언</a></div>
@@ -2127,7 +2128,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
                    줄을 누르면 그 종목 `오늘` 탭(#tab-오늘)의 `급락장에서 어땠나?` 카드. 5개 펼침 + 나머지 접기. 다섯째 카드라 전폭(미국 · 한국 두 칸) -->
               <div class='report-col' id='notable-col'>
               <h3 class='report-title'><span class='report-icon' style='background:#B45309;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M2 11.5l4-4 3 3 5-6'/><path d='M10.5 4.5H14v3.5'/></svg></span>주목할 종목<span class='report-card-date' data-date='notable-card'></span></h3>
-              <a class='report-card' id='notable-card' href='/p/us-market-cap-top10.html'>
+              <a class='report-card' id='notable-card' href='/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'>
                 <div class='nt-grid'>
                   <div class='nt-mkt' data-hook='notable-us'><div class='nt-note'>불러오는 중…</div></div>
                   <div class='nt-mkt' data-hook='notable-kr'><div class='nt-note'>불러오는 중…</div></div>
@@ -2970,7 +2971,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           JNJ: 'johnson-johnson-jnj-stock', MA: 'mastercard-ma-stock', ABBV: 'abbvie-abbv-stock', INTC: 'intel-intc-stock' };
         var BLOG_HOME = 'https://alpha-scope.blogspot.com/';
         function pageFor(ticker) {
-          return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
+          return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
         }
 
         function metaFor(ticker) {
@@ -3009,7 +3010,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         /* 미국 · 한국 화면 (H35, 2026-11-10 사용자) — body[data-home-mkt] 가 있으면 그 시장만. 없으면 '' = 지금 홈(두 시장) */
         var HOME_MKT = (document.body && document.body.getAttribute('data-home-mkt')) || '';
         var krHome = null, rankMarket = HOME_MKT || 'us', picksMarket = HOME_MKT || 'us';
-        if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/kr-market-cap-top10.html'; }
+        if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'; }
         var KR_URL = GH + 'kr.json';
 
         /* ===== 장중 가격 (2026-11-05 사용자) — 한국 종목 live.json (experiments/kr-stocks/collect_kr_live.py, 장중 10분마다, 야후 약 20분 지연).
@@ -3131,7 +3132,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           av.appendChild(img);
           return av;
         }
-        function krPage(r) { return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html'); }
+        function krPage(r) { return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : ((krHome && krHome.list_url) || BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'); }
         var activeSort = 'cap';   /* 시총 TOP 10 이라 기본은 시가총액 순 (2026-10-18) */
         /* data.json 에 시총(mc)이 없던 때의 순서 — fetch_stocks.TICKERS 와 같은 2026-10-18 장 마감 순위 */
         var CAP_ORDER = ['NVDA', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'AVGO', 'TSLA', 'BRK-B', 'LLY'];
@@ -3404,7 +3405,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             c.appendChild(el('span', 'nt-ex', '지수보다 ' + ntPct(r.ex, '%p')));
             d.appendChild(c);
             var href = r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html#tab-' + encodeURIComponent('오늘')
-              : (market === 'kr' ? ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html') : BLOG_HOME + 'p/us-market-cap-top10.html');
+              : (market === 'kr' ? ((krHome && krHome.list_url) || BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1') : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1');
             d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', href);
             list.appendChild(d);
           });
@@ -3558,7 +3559,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function feedPage(r) {
           if (isKR(r)) return krPage(r);
           if (r.s === 'NVDA') return pageFor('NVDA');
-          return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
+          return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
         }
         function feedCell(r) {
           var cell = el('a', 'stock-cell');
@@ -6032,6 +6033,23 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
           });
         });
+        /* 짧은 화면엔 TOP 을 숨긴다 (2026-11-19 사용자: "세로 길이가 짧으면 쓸 이유가 없다") — 페이지 전체 높이가 화면 높이의 2배보다 짧으면 숨김.
+           자리는 남긴다(visibility) — 가운데 목록 · 왼쪽 댓글 버튼이 흔들리지 않게. 탭 · 접기 · 댓글을 열면 길이가 바뀌어 다시 잰다 */
+        var tops = [].slice.call(document.querySelectorAll('.post-nav-top'));
+        if (tops.length) {
+          var topCheck = function () {
+            var h = Math.max(document.documentElement.scrollHeight, document.body ? document.body.scrollHeight : 0);
+            var short = h < window.innerHeight * 2;
+            tops.forEach(function (b) { b.classList.toggle('is-short', short); });
+          };
+          var topLater = function () { setTimeout(topCheck, 0); setTimeout(topCheck, 400); };
+          topCheck();
+          window.addEventListener('load', topCheck);
+          window.addEventListener('resize', topCheck);
+          document.addEventListener('click', topLater, true);   /* 탭 · 접기 · 더 보기 · 댓글 열기 — 무엇이든 누른 뒤 다시 잰다 */
+          document.addEventListener('toggle', topLater, true);   /* <details> 펼침 */
+          setTimeout(topCheck, 1500);   /* 목록 · 그래프를 늦게 채우는 페이지(종목 모아보기 등) */
+        }
       })();
 
       /* ============================================================ 홈 화면 추가 안내 (2026-10-13 사용자, 디자인 가이드 10-4)
@@ -6798,8 +6816,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         var LINKS = {
           us: ['미국 증시 리포트', BLOG + '/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'],
           kr: ['한국 증시 리포트', BLOG + '/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'],
-          us_top: ['미국 시가총액 상위 10개 종목 주가', BLOG + '/p/us-market-cap-top10.html'],
-          kr_top: ['한국 시가총액 상위 10개 종목 주가', BLOG + '/p/kr-market-cap-top10.html'],
+          us_top: ['미국 시가총액 상위 10개 종목 주가', BLOG + '/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'],
+          kr_top: ['한국 시가총액 상위 10개 종목 주가', BLOG + '/p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'],
         };
         var OUT_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg>';
         function outBtn(name, url, sub) {

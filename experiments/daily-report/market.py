@@ -114,7 +114,7 @@ def mega_card(a, prev=None):
 
 
 BLOG = "https://alpha-scope.blogspot.com"
-US_LIST_URL = f"{BLOG}/p/us-market-cap-top10.html"
+US_LIST_URL = f"{BLOG}/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"   # 시총 상위 10 페이지 → 종목 모아보기 시가총액 탭 (2026-11-19 사용자)
 
 
 def notable_card():

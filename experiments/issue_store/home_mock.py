@@ -75,7 +75,7 @@ def build(card):
     nav = re.search(r'<header class="navbar">.*?<div class="header-bar"></div>', home, re.S).group(0)
     nav = nav.replace('<a class="nav-item" href="/search/label/데일리%20브리핑">미국 증시</a>',
                       '<a class="nav-item" href="/search/label/데일리%20브리핑">미국 증시</a>\n      <a class="nav-item" href="/search/label/트럼프%20트렌드">트럼프 트렌드</a>\n'
-                      f'      <a class="nav-item" href="{LIST_URL}">증시 전망</a>\n      <a class="nav-item" href="/p/us-market-cap-top10.html">시총 TOP 10</a>')
+                      f'      <a class="nav-item" href="{LIST_URL}">증시 전망</a>\n      <a class="nav-item" href="/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1">시총 TOP 10</a>')
     nav = nav.replace('href="/"', 'href="#"').replace("aria-current=\"page\"", "aria-current=\"page\"")
     footer = re.search(r"<footer class=\"site-footer\">.*?</footer>", home, re.S).group(0)
     us = chart_card("https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/spx-price-2026-11-06.png", "S&P 500 30거래일 봉차트",

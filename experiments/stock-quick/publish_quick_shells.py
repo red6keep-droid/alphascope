@@ -282,7 +282,7 @@ def body(sym, e, intro, fx=None, ref=None):
               f'<p style="margin:0 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:14px;line-height:22px;color:{dk.NOTE};">{dk.esc(info_line(sym, e))}</p>')
     if fx is not None:
         server += facts_html(facts(sym, e, ref or {}, fx))
-    root = (f'<div id="as-quick" data-default="{file_of(sym)}" data-list-us="{U.LIST_URL}" data-list-kr="{K.LIST_URL}">'
+    root = (f'<div id="as-quick" data-default="{file_of(sym)}" data-list-us="{U.STOCKS_URL}" data-list-kr="{K.STOCKS_URL}">'
             f'{dk.formal(server)}</div>\n')
     return root + LOADER
 

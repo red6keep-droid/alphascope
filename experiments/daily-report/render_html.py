@@ -803,7 +803,7 @@ def sec_status(analysis, report, prev=None):
 
 KR_REPORT_URL = f"{mk.BLOG}/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"   # 한국 증시 리포트 라벨 목록 (kr-stocks universe_kr.REPORT_URL 과 같다)
 RELATED_LINKS = [("미국 시가총액 상위 10개 종목 주가", mk.US_LIST_URL), ("한국 증시 리포트", KR_REPORT_URL),
-                 ("한국 시가총액 상위 10개 종목 주가", f"{mk.BLOG}/p/kr-market-cap-top10.html"),
+                 ("한국 시가총액 상위 10개 종목 주가", f"{mk.BLOG}/p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"),
                  ("주요 인물 발언 전체 보기", people_section.ALL_URL)]   # 함께 보는 페이지 (2026-11-08 사용자: 미국 증시 리포트에도, 인물 발언 전체 보기 포함)
 
 

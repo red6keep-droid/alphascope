@@ -726,7 +726,7 @@ def sec_drawdown(s):
 
 def related(s):
     """함께 보는 리포트 (가이드라인 10-5 4) — HTML 링크라 검색엔진이 따라간다."""
-    links = [("미국 시가총액 상위 10개 종목 주가", U.LIST_URL), _dk.REPORT_LINKS["us"]]   # 엔비디아 고정 링크 정리 — 엔비디아도 일반 종목 (2026-11-15 사용자), 그 자리 = 미국 증시 리포트
+    links = [("미국 시가총액 상위 10개 종목 주가", U.STOCKS_URL), _dk.REPORT_LINKS["us"]]   # 엔비디아 고정 링크 정리 — 엔비디아도 일반 종목 (2026-11-15 사용자), 그 자리 = 미국 증시 리포트
     if s.get("sym") in U.SAME_CO_KR:   # 같은 회사 한국 상장 주식 — 맨 앞 (2026-11-19 사용자: SKHY ↔ SK하이닉스 꼭 연결)
         label, slug = U.SAME_CO_KR[s["sym"]]
         links.insert(0, (f"{label} 주가", f"{U.BLOG}/p/{slug}.html"))
@@ -1266,7 +1266,7 @@ def detail_body(s, today, news=None):
                 + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
                 + R._section("업계상황", sec_industry_tab(s), tab="업계상황")   # 한국과 같은 탭 (2026-10-31 사용자)
                 + R._section("기업", sec_company(s), tab="기업")   # 한국과 같은 탭 (2026-10-31 사용자)
-                + related(s) + list_marker(U.LIST_URL))   # 출처 · 투자 권유 꼬리말은 뺐다 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자)
+                + related(s) + list_marker(U.STOCKS_URL))   # 출처 · 투자 권유 꼬리말은 뺐다 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자)
 
 
 # ---------------------------------------------------------------- 소송 일정 (P270)

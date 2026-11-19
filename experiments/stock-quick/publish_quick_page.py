@@ -31,7 +31,7 @@ def body():
     js = open(os.path.join(HERE, "quick_page.js"), encoding="utf-8").read()
     if "</script" in js:
         sys.exit("quick_page.js 안에 </script — 본문이 끊긴다")
-    return (f'<div id="as-quick" data-list-us="{U.LIST_URL}" data-list-kr="{K.LIST_URL}"></div>\n'
+    return (f'<div id="as-quick" data-list-us="{U.STOCKS_URL}" data-list-kr="{K.STOCKS_URL}"></div>\n'
             f'<script>\n{js}\n</script>\n' + CC.SCRIPT)   # 봉차트 스크립트는 끼워 넣은 뒤 — 문서를 다 읽을 때 [data-candle] 을 찾는다
 
 
