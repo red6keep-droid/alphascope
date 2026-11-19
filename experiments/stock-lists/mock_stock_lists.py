@@ -664,7 +664,7 @@ def write(body, name, title="종목 모아보기"):   # 옛 `종목` (2026-11-18
 
 
 # ── 종목 상세 ☆ ──────────────────────────────────────────────────────
-STAR_JS = """<style>.sl-star{display:inline-flex;flex:none;align-items:center;justify-content:center;width:22px;height:22px;margin:-1px 0 0 5px;vertical-align:middle;padding:0;border:0;background:none;cursor:pointer;color:#9CA3AF;-webkit-tap-highlight-color:transparent;}
+STAR_JS = """<style>/* 별 아래 끝 = 종목 이름 글자 아래선 (2026-11-19 사용자: 별이 위로 떠 보임 — 3배 캡처 실측 3px 아래로 → 2px 다시 올림 = 1px, 사용자) */.sl-star{display:inline-flex;flex:none;align-items:center;justify-content:center;width:22px;height:22px;margin:0 0 0 5px;position:relative;top:1px;vertical-align:middle;padding:0;border:0;background:none;cursor:pointer;color:#9CA3AF;-webkit-tap-highlight-color:transparent;}
 .sl-star svg{width:22px;height:22px;display:block;}.sl-star[aria-pressed="true"]{color:%(star)s;}
 .sl-sheet{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;background:rgba(15,23,42,.4);}
 .sl-sheet>div{width:100%%;max-width:480px;box-sizing:border-box;background:#fff;border-radius:14px 14px 0 0;padding:22px 18px calc(18px + env(safe-area-inset-bottom));}
