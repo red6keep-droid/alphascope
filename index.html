@@ -457,6 +457,25 @@ body[data-home-mkt="us"] [data-hook="notable-kr"], body[data-home-mkt="kr"] [dat
 body[data-home-mkt] #notable-col { grid-column: auto; }
 body[data-home-mkt] .nt-grid { grid-template-columns: minmax(0, 1fr); }
 body[data-home-mkt="kr"] .news-section { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 */
+/* 홈 증시시황 C안 (2026-11-17 사용자 결정 · 11-19 적용) — 맨 위 시황 배너 = 그 편 시황 글 맨 위 배너 그림 그대로(gh-pages images/commentary-날짜-편.webp, 새로 그리지 않음).
+   좌우 꽉 · 모서리 직선 · 로고 줄에 붙임. 편 이름 상자 = 제목 글자 왼쪽 끝(그림 가로 8.1%) · 제목 윗선(25.4%, 두 줄 제목 실측)에서 5 위, 검정 네모 */
+.home-cards > .cm-wide { grid-column: 1 / -1; }
+.cm-wide { position: relative; margin: calc(-1 * var(--card-gap)) calc(50% - 50vw) 0; background: #06121A; }
+.cm-wide a { display: block; position: relative; border-radius: 0; -webkit-tap-highlight-color: transparent; }
+.cm-wide a:active { opacity: .85; }
+.cm-wide img { display: block; width: 100%; height: auto; aspect-ratio: 900 / 350; border-radius: 0; }
+.cm-pill { position: absolute; left: 8.1%; bottom: calc(74.6% + 5px); padding: 2px 8px; border-radius: 0; background: rgba(6,18,26,.72);
+  color: #fff; font-size: 11px; line-height: 16px; font-weight: 600; }
+/* 실적 발표 배너를 한 줄로(같은 일정 배너, 모양만): 로고 24 · 종목 이름 · 실적 발표 · D-n, 날짜 · 시각 줄은 숨김. 높이 54 */
+#event-banner.cm-strip .eb-slide { gap: 8px; padding: 15px 72px 15px 7px; }
+#event-banner.cm-strip .stock-avatar { width: 24px; height: 24px; font-size: 10px; }
+#event-banner.cm-strip .eb-text { flex-direction: row; align-items: center; gap: 8px; }
+#event-banner.cm-strip .eb-kicker, #event-banner.cm-strip .eb-title-line { display: contents; }
+#event-banner.cm-strip .eb-name { order: 1; min-width: 0; font-size: 15px; line-height: 24px; font-weight: 700; letter-spacing: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#event-banner.cm-strip .eb-title { order: 2; font-size: 14px; line-height: 24px; font-weight: 500; color: rgba(255, 255, 255, .85); }
+#event-banner.cm-strip .eb-dday { order: 3; font-size: 12px; line-height: 19px; padding: 0 6px; align-self: center; }
+#event-banner.cm-strip .eb-when, #event-banner.cm-strip .eb-more { display: none; }
+#event-banner.cm-strip .eb-dots { top: 0; bottom: 0; right: 8px; left: auto; align-items: center; }
 #radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
@@ -2043,7 +2062,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         <div class='home-cards'>
         <!-- 일정 배너 (2026-10-28 사용자: 홈 맨 위 실적 발표 등 롤링 배너 3개, 누르면 그 종목 상세 화면 캘린더 탭. 2026-10-29 시안: 전폭 남색 · 가운데 점).
              stocks.json · kr.json 의 events (고정 페이지가 있는 종목만) 중 오늘 이후 가까운 6개. 일정이 없으면 배너를 숨긴다 -->
-        <section class='event-banner' id='event-banner' aria-roledescription='carousel' aria-label='다가오는 실적 발표' hidden='hidden'>
+        <section class='cm-wide' id='cm-banner' aria-label='증시 시황' hidden='hidden'><a href='/search/label/%EC%A6%9D%EC%8B%9C%20%EC%8B%9C%ED%99%A9'><img alt='' width='900' height='350'/><span class='cm-pill'></span></a></section>
+        <section class='event-banner cm-strip' id='event-banner' aria-roledescription='carousel' aria-label='다가오는 실적 발표' hidden='hidden'>
           <div class='eb-viewport'><div class='eb-track' data-hook='event-slides'></div></div>
           <div class='eb-dots' data-hook='event-dots'></div>
         </section>
@@ -2083,12 +2103,11 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 
               <!-- 엔비디아 리포트 카드는 삭제 (2026-10-20 사용자). 2026-11-01 부터 엔비디아도 종목 고정 페이지(nvidia-nvda-stock) -->
 
-              <!-- 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 인물마다 가장 강한 발언 한 줄 — 발언 글자만 세 줄, 라벨 · 강도 · 구분선 없음 (2026-10-24 사용자) -->
-              <div class='report-col' id='radar-col'>
-              <h3 class='report-title'><span class='report-icon' style='background:#0F766E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='5.5' r='2.5'/><path d='M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4'/></svg></span>주요 인물 발언<span class='report-card-date' data-date='radar-card'></span></h3>
-              <a class='report-card' id='radar-card' href='/search/label/인물%20발언'>
-                <div class='kv-rows' data-hook='radar-rows'><div class='kv-row'><span class='kv-name'>리포트를 불러오는 중…</span></div></div>
-              </a>
+              <div class='report-col' id='issue-col' hidden='hidden'>
+                <div class='ib' role='region' aria-roledescription='carousel' aria-label='Hot Issue'>
+                  <div class='ib-head'><span class='ib-box' style='background:#E53E3E;'>Hot Issue</span><span class='ib-dots' aria-hidden='true'></span><span class='report-card-date' data-date='issue-card'></span></div>
+                  <div class='ib-view'><div class='ib-track' data-hook='issue-rows'><span class='ib-slide ib-note'>불러오는 중…</span></div></div>
+                </div>
               </div>
 
               <!-- 증시 전망 (2026-11-08 사용자 H34) — 큰 사건마다 두 갈래 전망을 미리 적고 날마다 확인. 줄 = 지켜보는 전망(최대 3) 질문 · 라벨 · 게시일, 줄을 누르면 그 전망 페이지, 제목 · 카드 바탕은 목록 -->
@@ -2099,11 +2118,12 @@ html.as-lock, html.as-lock body { overflow: hidden; }
                 </div>
               </div>
 
-              <div class='report-col' id='issue-col' hidden='hidden'>
-                <div class='ib' role='region' aria-roledescription='carousel' aria-label='Hot Issue'>
-                  <div class='ib-head'><span class='ib-box' style='background:#E53E3E;'>Hot Issue</span><span class='ib-dots' aria-hidden='true'></span><span class='report-card-date' data-date='issue-card'></span></div>
-                  <div class='ib-view'><div class='ib-track' data-hook='issue-rows'><span class='ib-slide ib-note'>불러오는 중…</span></div></div>
-                </div>
+              <!-- 인물 발언 레이더 (2026-10-20 사용자: 홈 카드 추가). 인물마다 가장 강한 발언 한 줄 — 발언 글자만 세 줄, 라벨 · 강도 · 구분선 없음 (2026-10-24 사용자) -->
+              <div class='report-col' id='radar-col'>
+              <h3 class='report-title'><span class='report-icon' style='background:#0F766E;' aria-hidden='true'><svg viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='8' cy='5.5' r='2.5'/><path d='M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4'/></svg></span>주요 인물 발언<span class='report-card-date' data-date='radar-card'></span></h3>
+              <a class='report-card' id='radar-card' href='/search/label/인물%20발언'>
+                <div class='kv-rows' data-hook='radar-rows'><div class='kv-row'><span class='kv-name'>리포트를 불러오는 중…</span></div></div>
+              </a>
               </div>
 
               <!-- 주목할 종목 (2026-11-04 사용자 H28: 한국 증시 · 주요 인물 발언처럼 독립 카드) — 지수(S&P 500 · 코스피)가 2% 넘게 내린 날 올랐거나 2%p 넘게 덜 내린 종목, 이름 뒤 `주목` 라벨.
@@ -2987,6 +3007,39 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         /* 한국 탭 (2026-10-24 사용자) — kr.json (experiments/kr-stocks/home_feed_kr.py, 한국 장 마감 뒤 하루 1회). 두 카드가 각자 미국 · 한국을 고른다 */
         /* 미국 · 한국 화면 (H35, 2026-11-10 사용자) — body[data-home-mkt] 가 있으면 그 시장만. 없으면 '' = 지금 홈(두 시장) */
         var HOME_MKT = (document.body && document.body.getAttribute('data-home-mkt')) || '';
+
+  /* 홈 증시시황 배너 (C안, 2026-11-19 적용) — 미국 홈 = 아침 편(am) · 한국 홈 = 저녁 편(pm) · 두 시장 홈 = 둘 중 최근 편.
+     그림 = 그 편 시황 글 맨 위 배너(gh-pages images/commentary-날짜-편.webp) 그대로. 발행 시각(08:40 · 21:00)이 지난 편부터 최근 순으로 그림을 찾고,
+     4일 안에 없으면 카드를 숨긴다(쉬는 날 · 발행 전). 누르면 그 편 라벨(증시 시황 + 미국 · 한국 증시) 최신 글로(data-latest, 누를 때만 피드). */
+  (function () {
+    var sec = document.getElementById('cm-banner');
+    if (!sec) return;
+    var img = sec.querySelector('img'), a = sec.querySelector('a'), pill = sec.querySelector('.cm-pill');
+    var BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/commentary-';
+    var ED = { am: { at: 8 * 60 + 40, name: '미국 증시시황', lab: '증시 시황/미국 증시' }, pm: { at: 21 * 60, name: '한국 증시시황', lab: '증시 시황/한국 증시' } };
+    var slots = HOME_MKT === 'us' ? ['am'] : HOME_MKT === 'kr' ? ['pm'] : ['pm', 'am'];
+    var kst = new Date(Date.now() + 9 * 3600000), mins = kst.getUTCHours() * 60 + kst.getUTCMinutes(), list = [];
+    for (var d = 0; d < 4; d++) {
+      var t = new Date(kst.getTime() - d * 86400000);
+      var day = t.getUTCFullYear() + '-' + ('0' + (t.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + t.getUTCDate()).slice(-2);
+      slots.forEach(function (s) { if (d > 0 || mins >= ED[s].at) list.push({ day: day, slot: s }); });
+    }
+    var i = 0;
+    function next() {
+      if (i >= list.length) { sec.hidden = true; return; }
+      var c = list[i++], e = ED[c.slot];
+      img.onload = function () {
+        pill.textContent = e.name;
+        img.alt = e.name + ' 배너 (AI 생성 이미지)';
+        a.setAttribute('data-latest', e.lab);
+        a.setAttribute('href', '/search/label/' + encodeURIComponent('증시 시황'));
+        sec.hidden = false;
+      };
+      img.onerror = next;
+      img.src = BASE + c.day + '-' + c.slot + '.webp';
+    }
+    next();
+  })();
         var krHome = null, rankMarket = HOME_MKT || 'us', picksMarket = HOME_MKT || 'us';
         if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'; }
         var KR_URL = GH + 'kr.json';
@@ -2998,7 +3051,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         var LIVE_URL = GH + 'live.json', LIVE_BARS_URL = GH + 'live_bars.json', LIVE_KEY = 'as_live_kr';
         var LIVE_ENABLED = false;   /* 한국 장중 가격 · 장중 차트 끔 (2026-11-12 사용자: 우리는 종목 리포트 블로그 — 장중 가격에 얽매이지 말자, 종가 기준). kr-live 수집도 멈춤. 켜려면 true + kr-live.yml 되살리기 */
         var mktDay = { us: '', kr: '' };   /* 시장별 종가 날짜 — stocks.json · kr.json 의 day (2026-11-12) */
-        function dayKo(day, part) { var p = String(day || '').split(/[-.]/); return p.length === 3 ? Number(p[1]) + '월 ' + Number(p[2]) + '일 ' + (part || '기준') : ''; }   /* 날짜 표기 `11월 14일 아침` — 독자는 한국 시간 기준, 날짜 뒤 = 아침 · 오후 (2026-11-14 사용자: `미국 시간` 헷갈림. 옛 `11월 11일 기준` 11-12) */
+        function dayKo(day, part) { var p = String(day || '').split(/[-.]/); return p.length === 3 ? ('0' + Number(p[1])).slice(-2) + '.' + ('0' + Number(p[2])).slice(-2) + ' ' + (part || '기준') : ''; }   /* 날짜 표기 `11월 14일 아침` — 독자는 한국 시간 기준, 날짜 뒤 = 아침 · 오후 (2026-11-14 사용자: `미국 시간` 헷갈림. 옛 `11월 11일 기준` 11-12) */
         function closeKo(day, mkt) { if (!day) return ''; if (mkt !== 'us') return dayKo(day, '오후'); var d = new Date(String(day).slice(0, 10) + 'T00:00:00Z'); if (isNaN(d)) return ''; d.setUTCDate(d.getUTCDate() + 1); return dayKo(d.toISOString().slice(0, 10), '아침'); }   /* 시장 종가일 → 한국 시간: 미국 장은 한국 다음 날 새벽에 끝남 = 다음 날 아침, 한국 = 그날 오후 */
         function genKo(iso) { var t = Date.parse(iso || ''); if (!(t > 0)) return ''; var k = new Date(t + 9 * 3600000); return dayKo(k.toISOString().slice(0, 10), k.getUTCHours() < 12 ? '아침' : '오후'); }   /* 만든 시각(UTC) → 한국 날짜 + 아침 · 오후 */
         function nyDay(iso) { var t = Date.parse(iso || ''); return t > 0 ? new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(t)) : ''; }   /* 미국 리포트 = 뉴욕 날짜(장 마감 뒤 실행) = 종가 날짜 */
@@ -3265,7 +3318,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var t = el('span', 'eb-text');
           var k = el('span', 'eb-kicker');
           k.appendChild(el('span', 'eb-name', kr ? e.name : e.s + ' ' + e.name));   /* 한국 종목 코드는 숫자라 이름만 */
-          k.appendChild(el('span', 'eb-dday' + (left > 0 ? ' is-ahead' : ''), left === 0 ? 'D-DAY' : 'D-' + left));
+          k.appendChild(el('span', 'eb-dday' + (left > 0 ? ' is-ahead' : ''), left === 0 ? 'D-Day' : 'D-' + left));
           t.appendChild(k);
           var line = el('span', 'eb-title-line');   /* 발표 시점은 '실적 발표' 오른쪽 (2026-10-29 사용자) */
           line.appendChild(el('span', 'eb-title', '실적 발표'));
@@ -6201,7 +6254,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
            6초 안에 못 찾으면 목록 주소로 — 폰 통신에서 피드가 2.5초를 넘겨 미국 리포트가 목록으로 가던 것 (2026-11-17 사용자) */
         var pre = {};
         function latest(lbl) {
-          if (!pre[lbl]) pre[lbl] = fetch('/feeds/posts/summary/-/' + encodeURIComponent(lbl) + '?alt=json&max-results=1')
+          if (!pre[lbl]) pre[lbl] = fetch('/feeds/posts/summary/-/' + encodeURIComponent(lbl).replace(/%2F/g, '/') + '?alt=json&max-results=1')
             .then(function (r) { return r.json(); })
             .then(function (j) {
               var en = j && j.feed && j.feed.entry && j.feed.entry[0];
