@@ -22,6 +22,11 @@ on:
         type: boolean
         required: false
         default: false
+      redraw:
+        description: '배너를 다시 그리기 (그 편 배너가 이미 있어도, Workers AI 1장)'
+        type: boolean
+        required: false
+        default: false
       replace:
         description: '이미 나간 같은 편 글을 새 화면으로 고쳐 쓰기 (publish 와 같이 켠다)'
         type: boolean
@@ -78,7 +83,7 @@ jobs:
           CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
           CF_AI_TOKEN: ${{ secrets.CF_AI_TOKEN }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: python experiments/market-commentary/publish_commentary.py prepare --slot "${{ steps.slot.outputs.slot }}"
+        run: python experiments/market-commentary/publish_commentary.py prepare --slot "${{ steps.slot.outputs.slot }}" ${{ inputs.redraw && '--redraw' || '' }}
 
       - name: Deploy banner to gh-pages
         id: banner_deploy
