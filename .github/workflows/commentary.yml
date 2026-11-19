@@ -22,6 +22,11 @@ on:
         type: boolean
         required: false
         default: false
+      replace:
+        description: '이미 나간 같은 편 글을 새 화면으로 고쳐 쓰기 (publish 와 같이 켠다)'
+        type: boolean
+        required: false
+        default: false
       scheduled:
         description: '외부 cron(Cloudflare Worker)용 — 스케줄 실행과 똑같이 동작 (사람은 끄고 쓴다)'
         type: boolean
@@ -121,6 +126,7 @@ jobs:
         run: |
           FLAG=""
           [ "${{ steps.banner_cdn.outputs.failed }}" = "true" ] && FLAG="--banner-failed"
+          [ "${{ inputs.replace }}" = "true" ] && FLAG="$FLAG --replace"
           python experiments/market-commentary/publish_commentary.py publish --slot "${{ steps.slot.outputs.slot }}" $FLAG
 
       - name: Upload artifacts
