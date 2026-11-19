@@ -31,6 +31,7 @@ CSS = ("<style>[data-sl-panel][hidden]{display:none !important;}"
        ".sl-joined .seg+.seg{border-left:0;}.sl-joined .seg:first-child{border-radius:7px 0 0 7px;}.sl-joined .seg:last-child{border-radius:0 7px 7px 0;}"
        ".sl-joined .seg:only-child{border-radius:7px;}"
        ".sl-joined .seg[aria-selected=\"true\"]{background:#fff;color:#111;font-weight:700;box-shadow:inset 0 0 0 1px #111;}"
+       ".post-body .rt-tab .sl-tab-star{display:inline-block;width:16px;height:16px;margin:0 4px 0 0;vertical-align:-2px;}"   # 관심 탭 앞 별 (2026-11-19 사용자) — 채운 노랑 = 종목 제목 옆 담긴 별과 같은 색
        ".sl-title-day{flex:none;font-size:14px;line-height:20px;font-weight:400;color:#6B7280;white-space:nowrap;letter-spacing:0;}"
        "#sl-day{margin:0 0 8px;padding-left:6px;text-align:right;}"
        # 히트맵(테마 · 업종 묶음 고르기) — mock_stock_lists.PAGE_CSS 의 .hm 과 같게 (2026-11-18 사용자)
