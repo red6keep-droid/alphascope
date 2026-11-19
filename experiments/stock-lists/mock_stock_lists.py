@@ -633,7 +633,8 @@ W.querySelectorAll('[data-sl-add]').forEach(function(b){b.addEventListener('clic
 
 
 def day_text(d, m):
-    return dk.kst_close_day(d, "US" if m == "us" else "KR") + (" 새벽 마감 기준" if m == "us" else " 종가 기준")
+    """증시 시황 기준 줄과 같은 꼴 `11.19 한국 종가` · `11.18 미국 종가`(미국 = 미국 장 날짜) (2026-11-19 사용자)."""
+    return f"{int(d[5:7])}.{d[8:10]} {'미국' if m == 'us' else '한국'} 종가"
 
 
 def page(rows, etf, state, m, stats, tab):

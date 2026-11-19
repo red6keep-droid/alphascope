@@ -2205,9 +2205,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
       '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.2 1.4"/></svg></span>' +
       '이 기기에서 최근 본 종목</h3>' + card(xs, function (r, i) { return row(r, i); }).replace('padding-top:21px;', '');
   }
+  function a2hsDone() {   // 홈 화면에 추가한 사람 = 홈 화면 앱으로 열었거나(standalone), 설치 창에서 설치함(테마가 as-a2hs-until 을 10년 뒤로 적음). 브라우저 데이터를 지우면 표시도 지워져 안내가 다시 나온다 (2026-11-19 사용자)
+    try { if ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true) return true; } catch (e) {}
+    try { return Number(localStorage.getItem('as-a2hs-until') || 0) > Date.now() + 365 * 864e5; } catch (e) { return false; }
+  }
   function saveNote() {   // 저장 안내 = 목록 아래 작은 회색 + 아주 작은 `홈 화면에 추가`(테마 window.asA2hs 가 있을 때만). 앱 안 브라우저는 다른 말
+    if (a2hsDone()) return '';
     var t = INAPP ? '관심 종목은 이 앱 안에서만 저장됩니다. 브라우저에서 열면 더 오래 남습니다.' : '관심 종목은 이 브라우저에만 저장됩니다. 홈 화면에 추가해 두면 더 오래 남습니다.';
-    return '<p style="font-size:13px;line-height:19px;color:' + NOTE + ';margin:4px 0 12px;padding-left:6px;word-break:keep-all;">' + esc(t) +
+    return '<p data-sl-save style="font-size:13px;line-height:19px;color:' + NOTE + ';margin:4px 0 12px;padding-left:6px;word-break:keep-all;">' + esc(t) +
       '<button type="button" data-sl-a2hs hidden style="display:inline-block;margin:0 0 0 6px;padding:0 7px;border:1px solid #CBD5E1;border-radius:6px;background:#fff;font:inherit;font-size:12px;line-height:18px;font-weight:700;color:#111;vertical-align:baseline;cursor:pointer;">홈 화면에 추가</button></p>';
   }
   function watch(by) {
@@ -2330,12 +2335,12 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     /* `홈 화면에 추가` — 테마 홈 화면 추가 안내가 있을 때만(폰 · 홈 화면 앱 아님) */
     function a2hs() { var b = W.querySelector('[data-sl-a2hs]'); if (!b || !window.asA2hs || INAPP) return; b.hidden = false; b.onclick = function () { window.asA2hs(); }; }
     if (document.readyState === 'complete') a2hs(); else window.addEventListener('load', a2hs);
+    window.addEventListener('appinstalled', function () { var n = W.querySelector('[data-sl-save]'); if (n) n.remove(); });   // 이 화면에서 설치하면 바로 안내를 거둔다
   }
-  function dayText(d) {
-    var x = new Date(d + 'T00:00:00Z');
-    if (isNaN(x)) return '';
-    if (m === 'us') x = new Date(x.getTime() + 864e5);   // 미국 종가 = 한국 다음 날 새벽 (design_kit.kst_close_day)
-    return (x.getUTCMonth() + 1) + '월 ' + x.getUTCDate() + '일' + (m === 'us' ? ' 새벽 마감 기준' : ' 종가 기준');
+  function dayText(d) {   // 날짜 = 증시 시황 기준 줄과 같은 꼴 `11.19 한국 종가` · `11.18 미국 종가`(미국 = 미국 장 날짜) (2026-11-19 사용자 "증시 시황 날짜 표기로 통일", story_render basis)
+    var x = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d || ''));
+    if (!x) return '';
+    return Number(x[2]) + '.' + x[3] + (m === 'us' ? ' 미국 종가' : ' 한국 종가');
   }
   function stamp(d) {
     var t = dayText(d);
