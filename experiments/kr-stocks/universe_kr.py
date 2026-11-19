@@ -80,7 +80,8 @@ LIST_SLUG = "kr-market-cap-top10"
 LIST_TITLE = "한국 시가총액 상위 10개 종목 주가"
 LIST_SLUG_TITLE = "kr market cap top10"   # 처음 만들 때 이 제목으로 → 주소 고정, 바로 한글 제목으로 바꾼다
 LIST_URL = f"{BLOG}/p/{LIST_SLUG}.html"
-US_LIST_URL = f"{BLOG}/p/us-market-cap-top10.html"
+US_LIST_URL = f"{BLOG}/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"   # 독자 링크 = 종목 모아보기 시가총액 탭 (2026-11-19 사용자)
+STOCKS_URL = f"{BLOG}/p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"   # 독자 링크용 — LIST_URL(시총 상위 10 페이지)은 그 페이지 발행 · 삭제 때만
 REPORT_LABEL = "한국 증시 리포트"   # 장 마감 뒤 리포트 (experiments/kr-market-report, 2026-10-26)
 REPORT_URL = f"{BLOG}/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"   # 임시 링크(라벨 목록) — 발행 때 최신 글 주소로 바꾼다 (엔비디아와 같은 방식)
 

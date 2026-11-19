@@ -171,6 +171,7 @@ def slug_title(sym):
 
 
 LIST_URL = f"{BLOG}/p/{LIST_SLUG}.html"
+STOCKS_URL = f"{BLOG}/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"   # 독자 링크 = 종목 모아보기 시가총액 탭 (2026-11-19 사용자) — LIST_URL(시총 상위 10 페이지)은 그 페이지 발행 · 삭제 때만
 
 
 # 함께 보는 회사 (캘린더 `함께 보는 회사 실적은?`) — 종목마다 한 번 정한다 (2026-10-18 Claude 설계, 사용자 "AI 없이 올릴 수 있는 것까지").

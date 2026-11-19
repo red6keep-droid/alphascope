@@ -13,8 +13,8 @@
   var CDN = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@';
   var RAW = 'https://raw.githubusercontent.com/red6keep-droid/alphascope/';
   var PAGES = 'https://alpha-scope.pages.dev/';   // 먼저 읽는 곳 — 안 되면 jsDelivr → GitHub 원본
-  var LIST_US = root.getAttribute('data-list-us') || '/p/us-market-cap-top10.html';
-  var LIST_KR = root.getAttribute('data-list-kr') || '/p/kr-market-cap-top10.html';
+  var LIST_US = root.getAttribute('data-list-us') || '/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
+  var LIST_KR = root.getAttribute('data-list-kr') || '/p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
   var local = root.getAttribute('data-local');
   var q = '';
   try { q = new URLSearchParams(location.search).get('s') || ''; } catch (e) { q = ''; }

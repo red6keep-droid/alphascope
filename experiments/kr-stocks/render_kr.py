@@ -801,7 +801,7 @@ def sec_states(s):
 
 def related(s=None, links=None):
     """함께 보는 페이지 — links 를 주면 그 목록으로 (한국 증시 리포트가 자기 자신을 빼고 쓴다)."""
-    links = list(links) if links else [("한국 증시 리포트", U.REPORT_URL), ("한국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("미국 시가총액 상위 10개 종목 주가", U.US_LIST_URL)]
+    links = list(links) if links else [("한국 증시 리포트", U.REPORT_URL), ("한국 시가총액 상위 10개 종목 주가", U.STOCKS_URL), ("미국 시가총액 상위 10개 종목 주가", U.US_LIST_URL)]
     if s and s["sym"] in U.SAME_CO_US:   # 같은 회사 미국 상장 주식 — 맨 앞 (2026-11-18 사용자: SK하이닉스 ↔ SKHY 꼭 연결)
         t, label = U.SAME_CO_US[s["sym"]]
         url = USU.any_page_url(t)
@@ -1376,7 +1376,7 @@ def detail_body(s, a):
             + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
             + R._section("업계상황", sec_industry_tab(s), tab="업계상황")   # 업종 → 업계 상황 (P151) → 붙여 쓴 업계상황 (2026-10-31 사용자 P167)
             + R._section("기업", sec_company(s), tab="기업")   # `최근 공시는?` 뺐다 (2026-11-16 사용자: 실적 공시 숫자는 실적 탭 카드에 담았고, 나머지는 제목뿐이라 맥락이 없다) · 기업정보 → 기업 (2026-10-31 P145: 탭은 짧게 — 360px 폰에서 다섯째 탭이 잘렸다)
-            + related(s) + list_marker(U.LIST_URL))
+            + related(s) + list_marker(U.STOCKS_URL))
     return wrap(body)
 
 

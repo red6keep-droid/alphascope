@@ -2310,8 +2310,8 @@ REPORT_LINKS = {
     "kr": ("한국 증시 리포트", f"{BLOG_URL}/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"),   # 라벨 `한국 증시 리포트`
     "people": ("주요 인물 발언 전체 보기", f"{BLOG_URL}/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8"),   # 라벨 `인물 발언` (people_section.ALL_URL 과 같음)
     "forecast": ("증시 전망", f"{BLOG_URL}/p/forecast-list.html"),
-    "us_top": ("미국 시가총액 상위 10개 종목 주가", f"{BLOG_URL}/p/us-market-cap-top10.html"),
-    "kr_top": ("한국 시가총액 상위 10개 종목 주가", f"{BLOG_URL}/p/kr-market-cap-top10.html"),
+    "us_top": ("미국 시가총액 상위 10개 종목 주가", f"{BLOG_URL}/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"),
+    "kr_top": ("한국 시가총액 상위 10개 종목 주가", f"{BLOG_URL}/p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"),
 }
 
 

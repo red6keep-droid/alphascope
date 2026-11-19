@@ -1578,7 +1578,7 @@ def body(r):
         flow_tab(r),
         market_tab(r),
         _dk.section(TAB_CAL, C.cards_grid(cal_card(r) + earn_card(r)), tab=TAB_CAL),
-        RK.related(links=[("한국 시가총액 상위 10개 종목 주가", U.LIST_URL), ("미국 증시 리포트", DAILY_URL), ("미국 시가총액 상위 10개 종목 주가", U.US_LIST_URL),
+        RK.related(links=[("한국 시가총액 상위 10개 종목 주가", U.STOCKS_URL), ("미국 증시 리포트", DAILY_URL), ("미국 시가총액 상위 10개 종목 주가", U.US_LIST_URL),
                            ("주요 인물 발언 전체 보기", people_section.ALL_URL)]),   # 인물 발언 전체 목록도 함께 보는 페이지에 (2026-11-08 사용자)
         _dk.WRAP_CLOSE,   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터
     ]

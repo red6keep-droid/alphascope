@@ -539,8 +539,8 @@
   var LINKS = {
     us: ['미국 증시 리포트', BLOG + '/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'],
     kr: ['한국 증시 리포트', BLOG + '/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'],
-    us_top: ['미국 시가총액 상위 10개 종목 주가', BLOG + '/p/us-market-cap-top10.html'],
-    kr_top: ['한국 시가총액 상위 10개 종목 주가', BLOG + '/p/kr-market-cap-top10.html'],
+    us_top: ['미국 시가총액 상위 10개 종목 주가', BLOG + '/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'],
+    kr_top: ['한국 시가총액 상위 10개 종목 주가', BLOG + '/p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'],
   };
   var OUT_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg>';
   function outBtn(name, url, sub) {

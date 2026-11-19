@@ -19,7 +19,7 @@ import design_kit as dk  # noqa: E402
 import universe as U  # noqa: E402
 import universe_kr as K  # noqa: E402
 
-LIST_URL = {"US": U.LIST_URL, "KR": K.LIST_URL}   # 전체 종목 목록(all-stocks)이 생기기 전까지 시장별 종목 목록
+LIST_URL = {"US": U.STOCKS_URL, "KR": K.STOCKS_URL}   # 전체 종목 목록(all-stocks)이 생기기 전까지 시장별 종목 목록
 
 
 def esc(t):
