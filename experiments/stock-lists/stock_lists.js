@@ -241,6 +241,20 @@
     if (document.readyState === 'complete') go(); else window.addEventListener('load', go);
   }
 
+  /* 관심 탭 이름 앞 별 (2026-11-19 사용자) — 탭은 테마가 h2 글자로 만들므로(글자만) 만들어진 뒤 버튼 앞에 그림을 꽂는다.
+     글자(textContent)는 그대로라 #tab-관심 이름 찾기에 영향 없음. 별 모양 · 색 = 종목 제목 옆 담긴 별(mock_stock_lists STAR · STAR_PATH) */
+  (function tabStar() {
+    var tries = 0;
+    function go() {
+      var hit = [].filter.call(document.querySelectorAll('.post-body .rt-tab'), function (b) { return b.textContent === '관심'; })[0];
+      if (!hit) { if (++tries < 20) setTimeout(go, 150); return; }
+      if (hit.querySelector('.sl-tab-star')) return;
+      hit.insertAdjacentHTML('afterbegin', '<svg class="sl-tab-star" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">' +
+        '<path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z" fill="#F5B400" stroke="#F5B400" stroke-width="1.8" stroke-linejoin="round"/></svg>');
+    }
+    if (document.readyState === 'complete') go(); else window.addEventListener('load', go);
+  })();
+
   function render(doc) {
     var rows = doc.rows || [], by = {};
     rows.concat(doc.etf || []).forEach(function (r) { by[r.t] = r; });
