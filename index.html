@@ -3002,7 +3002,6 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         }
         /* 종목 로고 (2026-10-22 사용자: 로고는 신뢰도) — 우리 gh-pages 사본만 (운영지침 4-6, experiments/fetch_ticker_logos.py).
            머리글자 원 위에 로고를 얹고, 로고가 없는 종목(ETF · 삭제 요청)은 불러오기 실패 때 로고를 지워 머리글자 원이 남는다 */
-        var GO_ICON = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>';   // 페이지 이동 아이콘 = dk.OUT_ICON (시황 `전체 보기` 버튼과 같은 그림, 2026-11-19 사용자)
         var LOGO_BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/';
         function stockAvatar(ticker, color) {
           var av = el('span', 'stock-avatar', initials(ticker));
@@ -6625,6 +6624,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function moveWord(v) { return v > 0 ? '올랐습니다' : v < 0 ? '내렸습니다' : '같았습니다'; }
         /* 카드 머리 = 시장 라벨(한국 · 미국) 대신 종목 로고 28px (2026-11-19 사용자 "티커 로고를 조금 크게"). 우리 gh-pages 로고(색인 lg),
            없으면 dk.name_logo 와 같은 원 배지 — 미국 = 티커 두 글자 · 한국 = 이름 첫 글자, 바탕 = dk.BADGE_COLORS(코드 글자 합 % 3) */
+        var GO_ICON = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>';   // 페이지 이동 아이콘 = dk.OUT_ICON (시황 `전체 보기` 버튼과 같은 그림, 2026-11-19 사용자)
         var LOGO_BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/', LOGO_VER = '2';
         var BADGE_BG = ['#2F6F68', '#5B6B3A', '#86683A'];
         function logoOf(lg, key, m, name, cls) {   // cls = 'as-logo'(카드 28) · 'as-sg-lg'(미리보기 20)
