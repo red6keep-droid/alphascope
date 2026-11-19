@@ -1,210 +1,4 @@
 {
- "8ed0c79ac0a1": {
-  "lines": [
-   "아메리칸항공의 뉴욕-시카고 노선 퍼스트클래스 신선식품 재도입",
-   "2019년 이후 해당 노선 퍼스트클래스 신선식품 서비스 중단"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-12T02:31:04.315107+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "776bc90552c6": {
-  "lines": [
-   "코스트코 특별 배당 발표"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "COST"
-    ],
-    "sector": "XLP",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-12T02:31:05.091987+00:00",
-  "n_src": 311,
-  "retry": true
- },
- "4e54d5748085": {
-  "lines": [
-   "엔비디아 이사회의 젠슨 황 CEO 해임 준비 보도"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-12T02:31:02.583505+00:00",
-  "n_src": 368
- },
- "9d0d46181104": {
-  "lines": [
-   "시간외 거래에서 엔비디아 주가 9% 이상 하락",
-   "젠슨 황의 사내 불륜 의혹 제기",
-   "이사회의 젠슨 황 거취 결정 회의 개최 예정"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-12T02:31:02.583505+00:00",
-  "n_src": 900
- },
- "83cce1e2eac8": {
-  "lines": [
-   "미국 중간선거 결과에 따른 미·인도 무역협정 타결 기대감 증대",
-   "11월 외국인 투자자들의 인도 시장 복귀"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "TARIFF_TRADE",
-    "dir": "positive",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-12T02:31:02.583505+00:00",
-  "n_src": 900
- },
- "c47cddbcf095": {
-  "lines": [
-   "민주당 스콧 콜롬 후보의 미시시피주 상원의원 선거 승리",
-   "1982년 이후 미시시피주 최초의 민주당 소속 상원의원 탄생",
-   "남북전쟁 재건 시대 이후 미시시피주 최초의 흑인 상원의원 배출"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-12T02:31:04.315107+00:00",
-  "n_src": 900
- },
- "44087d608320": {
-  "lines": [
-   "미국 의원들의 엔비디아 CEO 젠슨 황 사퇴 촉구",
-   "중국 스파이 연루 의혹 관련 하원 의원들의 소환장 발부 추진"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "talk"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-12T02:31:04.315107+00:00",
-  "n_src": 900
- },
  "299426b57f03": {
   "lines": [
    "앨리스 황이 엔비디아 최대 경쟁사 화웨이 관련 기업 지분 보유",
@@ -4508,6 +4302,237 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-18T21:46:39.309792+00:00",
+  "n_src": 900
+ },
+ "51c5886a825b": {
+  "lines": [
+   "월마트 3분기 실적 예상치 상회 및 연간 실적 전망 상향",
+   "월마트 글로벌 전자상거래 매출 17% 증가"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "WMT"
+    ],
+    "sector": "XLP",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "WMT"
+    ],
+    "sector": "XLP",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:31.708924+00:00",
+  "n_src": 900
+ },
+ "53a0250bb8d5": {
+  "lines": [
+   "패밀리 오피스 3분기 주식 비중 36.4%로 확대"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:31.708924+00:00",
+  "n_src": 900
+ },
+ "f6260030e1e5": {
+  "lines": [
+   "앤스로픽 주가 83달러 및 기업가치 1조 4천억 달러 전망",
+   "앤스로픽 임직원 400명 이상 자산 1억 달러 상회 전망"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "talk",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:31.708924+00:00",
+  "n_src": 900
+ },
+ "fb9b219e0042": {
+  "lines": [
+   "덴마크 의회 그린란드 미국 안보 협정 비준",
+   "미국 워싱턴 그린란드 군사 주둔 확대 허용"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:36.150429+00:00",
+  "n_src": 900
+ },
+ "d5ba42fbe1ea": {
+  "lines": [
+   "2030년 데이터센터 전력 소비량 두 배 증가 전망",
+   "국제에너지기구 데이터센터 연간 전력 소비 1000테라와트시 예상"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLU",
+    "issue": "OIL_ENERGY",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLU",
+    "issue": "OIL_ENERGY",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:36.150429+00:00",
+  "n_src": 900
+ },
+ "4e7dae822fd0": {
+  "lines": [
+   "미국 러시아 중국 아시아태평양경제협력체 정상회의 참석",
+   "국제통화기금 총재 인공지능과 에너지 충격 글로벌 인플레이션 가속 지적"
+  ],
+  "tags": [
+   null,
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "INFLATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:36.150429+00:00",
+  "n_src": 900
+ },
+ "795407703f90": {
+  "lines": [
+   "미국·중국·러시아 정상의 선전 회동 개최"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:37.314171+00:00",
+  "n_src": 900
+ },
+ "9086ca40964e": {
+  "lines": [
+   "노바티스의 주요 신약 최고 매출 전망치 180억 달러 상향"
+  ],
+  "tags": [
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:37.314171+00:00",
+  "n_src": 900
+ },
+ "f451ee32b4d5": {
+  "lines": [
+   "미국·러시아·중국 정상의 아시아태평양경제협력체 부대 행사 회동"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:37.314171+00:00",
+  "n_src": 900
+ },
+ "f40c45200895": {
+  "lines": [
+   "다카이치 일본 총리 아태경제협력체 정상회의 참석차 중국 방문",
+   "중국 측 공항 영접에 현직 대신 은퇴한 외교관 참석"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:38.333781+00:00",
+  "n_src": 900
+ },
+ "564866e14a73": {
+  "lines": [
+   "일론 머스크 우크라이나 대통령의 스타쉴드 관련 발언 반박"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "TSLA"
+    ],
+    "sector": "XLY",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-19T12:46:38.333781+00:00",
   "n_src": 900
  }
 }
