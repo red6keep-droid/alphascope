@@ -134,7 +134,7 @@ def stage_prepare(a):
         if os.path.isfile(p):
             os.remove(p)
 
-    if not a.column_json:
+    if not a.column_json and os.environ.get("IS_SCHEDULED") == "true":   # 정시 · 예비 실행만 — 사람이 손으로 돌릴 땐 시각 상관없이 준비
         h, mi = LATE[slot]
         now = kst_now()
         if now.date().isoformat() == day and (now.hour, now.minute) > (h, mi):
