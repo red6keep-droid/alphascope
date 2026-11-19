@@ -1486,6 +1486,12 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
   font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* `TOP` 글자 16 → 14 (P517, 2026-11-11 사용자) — 화살표 원 22 그대로 */
 .post-nav-top:hover { color: var(--accent); }
+.as-star { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 22px; height: 22px; margin: 0 0 0 5px; position: relative; top: 1px; vertical-align: middle; padding: 0; border: 0; background: none; cursor: pointer; color: #9CA3AF; -webkit-tap-highlight-color: transparent; }   /* 종목 제목 옆 관심 종목 ☆ 22 · 이름과 5 · 아래선 = 글자 아래선(+1, 2026-11-19 사용자) — 담기면 채운 노랑 */
+.as-star svg { width: 22px; height: 22px; display: block; }
+.as-star[aria-pressed="true"] { color: #F5B400; }
+.as-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 60; display: flex; gap: 14px; align-items: center; padding: 12px 16px; background: #111; color: #fff; border-radius: 10px; font-size: 15px; line-height: 22px; box-shadow: 0 6px 20px rgba(0,0,0,.2); white-space: nowrap; }
+.as-toast a { color: #FCD34D; font-weight: 700; text-decoration: none; }
+@media (max-width: 900px) { .as-toast { bottom: calc(85px + env(safe-area-inset-bottom)); } }   /* 하단 메뉴 위 */
 .post-nav-top.is-short { visibility: hidden; }   /* 페이지가 화면 2배보다 짧으면 숨김 — 자리는 남긴다 (테마 JS, 2026-11-19 사용자) */
 .post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
 .post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
@@ -5366,6 +5372,33 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               rs.unshift(rk); localStorage.setItem('as-recent', JSON.stringify(rs.slice(0, 10)));
             } catch (e) {}
           }
+          /* 관심 종목 ☆ (2026-11-19 사용자 "적용해") — 종목 고정 페이지 제목의 이름 뒤(회색 꼬리 앞). 로그인 없이 이 브라우저(localStorage as-watch)에 담고 뺀다.
+             as-watch = [{m, t}] 담은 순서, 미국 · 한국 합쳐 100개 — 종목 모아보기 관심 탭(stock_lists.js)이 같은 칸을 읽는다 */
+          if (h.classList.contains('post-title') && document.body.classList.contains('item-view') && !/^\/\d{4}\/\d{2}\//.test(location.pathname) && !h.querySelector('.as-star')) {
+            (function () {
+              var wk = { m: kr ? 'kr' : 'us', t: kr ? kr[1] : sym.split('.')[0] };
+              function load() { try { var a = JSON.parse(localStorage.getItem('as-watch') || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+              function has() { return load().some(function (x) { return x && x.m === wk.m && x.t === wk.t; }); }
+              var P = 'M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z';
+              var sb = document.createElement('button'); sb.type = 'button'; sb.className = 'as-star';
+              function draw() { var on = has(); sb.setAttribute('aria-pressed', String(on)); sb.setAttribute('aria-label', on ? '관심 종목에서 빼기' : '관심 종목에 담기');
+                sb.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + P + '" fill="' + (on ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'; }
+              function toast(msg, link) { var o = document.querySelector('.as-toast'); if (o) o.remove(); var d = document.createElement('div'); d.className = 'as-toast';
+                d.innerHTML = '<span>' + msg + '</span>' + (link ? '<a href="/p/stock-lists.html?m=' + wk.m + '#tab-%EA%B4%80%EC%8B%AC">관심 목록 보기</a>' : ''); document.body.appendChild(d); setTimeout(function () { d.remove(); }, 3000); }
+              sb.addEventListener('click', function (e) {
+                e.preventDefault(); e.stopPropagation();
+                var a = load().filter(function (x) { return x && !(x.m === wk.m && x.t === wk.t); }), on = has();
+                if (!on && a.length >= 100) { toast('관심 종목은 100개까지 담을 수 있습니다'); return; }
+                if (!on) a.push(wk);
+                try { localStorage.setItem('as-watch', JSON.stringify(a)); } catch (err) { toast('이 브라우저에서는 저장할 수 없습니다'); return; }
+                if (!on) { try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (err) {} }
+                draw(); toast(on ? '관심 종목에서 뺐습니다' : '관심 종목에 담았습니다', !on);
+              });
+              draw();
+              var lab = h.querySelector('.post-title-label'), sub = lab && lab.querySelector('.post-title-sub');
+              if (sub) lab.insertBefore(sb, sub); else if (lab) lab.appendChild(sb); else h.appendChild(sb);
+            })();
+          }
           var host = h.querySelector('.post-title-text') || h.querySelector('a') || h;   /* 제목 글자 칸이 있으면 그 안 맨 앞 — 로고가 첫 글자 앞에 붙는다 */
           /* 2026-10-21: 제3자 로고 핫링크(financialmodelingprep) 중단 — 운영지침 4-6. 티커 두 글자 둥근 배지(리포트 design_kit.ticker_logo 와 같은 모양) */
           var b = document.createElement('span'); b.className = 'title-logo title-badge'; b.setAttribute('aria-hidden', 'true');
@@ -6101,8 +6134,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         var inapp = /NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp|; wv\)/i.test(ua);
         var mode = force || (standalone ? '' : kakao ? 'kakao' : inapp ? 'inapp' : ios ? 'ios' : android ? 'android' : '');
         if (!mode) return;
+        var auto = true;   /* 저절로 띄우기 — 닫은 지 14일 안이면 끔. 버튼(window.asA2hs)으로 여는 것은 늘 된다 (2026-11-19 사용자: 관심 종목 `홈 화면에 추가` 버튼) */
         if (!force) {
-          try { if (Date.now() < Number(localStorage.getItem(KEY) || 0)) return; } catch (e) {}
+          try { if (Date.now() < Number(localStorage.getItem(KEY) || 0)) auto = false; } catch (e) {}
         }
 
         function quiet(days) { try { localStorage.setItem(KEY, String(Date.now() + days * DAY)); } catch (e) {} }
@@ -6155,7 +6189,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         };
 
         document.body.appendChild(box);
-        setTimeout(function () { box.hidden = false; }, force ? 0 : 2500);
+        if (auto) setTimeout(function () { box.hidden = false; }, force ? 0 : 2500);
+        /* 버튼으로 열기 — 안내 상자를 띄우고 바로 `홈 화면에 추가` 단계로(안드로이드 설치 창 · 아이폰 방법 · 카카오 바깥 브라우저). 홈 화면 앱 · PC 에서는 없다(mode 없음) */
+        window.asA2hs = function () { box.hidden = false; var b = box.querySelector('.a2hs-btn'); if (b && !b.hidden) b.click(); };
       })();
       /* ================================================================ 터치 장치 (2026-10-19 사용자, 가이드라인 10-9)
          1) 행 · 카드 전체가 그 안의 첫 링크로 간다 — 시총 TOP 10 줄 · 뉴스 · 글 목록 카드 · 본문의 [data-row-link] 줄.

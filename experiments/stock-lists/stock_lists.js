@@ -3,7 +3,7 @@
    - 나라 = 주소 ?m=us|kr(하단 메뉴가 붙임) → 고른 홈(as-home-mkt, 헤더 국기 스위치가 적음) → 미국. 페이지 안 나라 버튼 없음 (2026-11-17 사용자).
    - 목록 파일 = 간단 종목 실행이 매일 올리는 <시장>/_lists.json (build_lists.py). 읽는 순서 Cloudflare Pages → jsDelivr(quick-<시장> 브랜치) → GitHub 원본. 방문자 1명 = 요청 1번 · 압축 약 18KB.
    - 목록은 탭 · 묶음마다 10개까지, 접기 없음(2026-11-17 사용자). 줄 전체 = 종목 페이지(테마의 [data-row-link] 장치).
-   - 관심 탭(1단계) = 이 기기에서 최근 본 종목(테마가 종목 페이지를 열 때 브라우저에 남기는 as-recent). 로그인 · ☆ 담기는 2단계.
+   - 관심 탭 = 이 브라우저에 담은 종목(as-watch, 종목 페이지 제목 옆 ☆ · 검색해서 담기), 없으면 최근 본 종목(as-recent). 로그인 · 서버 없음 (2026-11-19 사용자).
    - 기준일 = 제목 줄 오른쪽(공유 버튼 앞).
    - 2026-11-18 목업 확정분(mock_stock_lists.py)을 옮김 (2026-11-19 사용자 "진행해"): 로고 ~ 이름 11 · 증감 17(삼각형 14) · 가격 = 증감 색 · 한국 보조 줄에 종목 코드 숫자 없음
      · 오늘 움직임 오른쪽 말 = 보조 줄 크기 회색 + 숫자 굵게 · 테마 · 업종 묶음 고르기 = 히트맵(칸 크기 = 시가총액 합의 제곱근, 색 = 묶음 평균 등락 4단계).
@@ -212,18 +212,164 @@
   function etf(doc) {
     return card(doc.etf || [], function (r, i) { return row(r, i, { sub: esc(r.s) }); }) + note('지수 · 업종을 따라가는 상품');
   }
-  function watch(by) {
+  /* ===== 관심 탭 (2026-11-19 사용자 "적용해") — 로그인 없이 이 브라우저에만 저장(localStorage as-watch). 목업 mock_stock_lists.py 확정분.
+     as-watch = [{m:'us'|'kr', t:티커}] 담은 순서 그대로, 미국 · 한국 합쳐 100개. 종목 페이지 제목 옆 ☆(테마 JS)도 같은 칸을 쓴다.
+     이 화면 = 들어온 나라(m) 종목만. 담은 것이 없으면 빈 화면 + 이 기기에서 최근 본 종목(as-recent). 서버 · 로그인 · AI 0. */
+  var WKEY = 'as-watch', WMAX = 100;
+  var INAPP = /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp|; wv\)/i.test(navigator.userAgent);
+  function wLoad() {
+    try { var a = JSON.parse(localStorage.getItem(WKEY) || '[]'); return Array.isArray(a) ? a.filter(function (x) { return x && x.t && (x.m === 'us' || x.m === 'kr'); }) : []; }
+    catch (e) { return []; }
+  }
+  function wSave(a) { try { localStorage.setItem(WKEY, JSON.stringify(a)); } catch (e) {} }
+  function wKeep() { try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {} }   // 저장 공간이 모자랄 때 지우지 말아 달라는 요청
+  var RM = '<button type="button" data-sl-rm aria-label="빼기" style="display:none;flex:none;align-self:center;width:24px;height:24px;margin:0 10px 0 0;padding:0;border:1px solid #F3A6A3;border-radius:50%;box-sizing:border-box;background:#fff;cursor:pointer;"><svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true"><path d="M7 11h8" stroke="#E5484D" stroke-width="1.6" stroke-linecap="round"/></svg></button>';
+  var GRIP = '<span data-sl-grip aria-label="끌어서 순서 바꾸기" style="display:none;flex:none;align-self:center;width:32px;height:32px;margin:0 -6px 0 0;align-items:center;justify-content:center;color:#9CA3AF;cursor:grab;touch-action:none;"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M4 6.5h12M4 10h12M4 13.5h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>';
+  var PLUS = '<span aria-hidden="true" style="flex:none;display:inline-flex;width:22px;height:22px;border-radius:50%;background:#E5E7EB;align-items:center;justify-content:center;"><svg viewBox="0 0 12 12" width="12" height="12"><path d="M6 1.5v9M1.5 6h9" stroke="#4B5563" stroke-width="1.6" stroke-linecap="round"/></svg></span>';
+  var LOUPE = '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="flex:none;display:block;"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
+  var STAR_PATH = 'M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z';
+  function wRow(r) {   // 다른 탭 줄과 같은 모양 + 편집 모드의 빼기(−) · 끌기(≡)
+    var h = row(r, 1).replace('<span data-row-link="1"', '<span data-row-link="1" data-sym="' + esc(r.t) + '"');
+    h = h.replace('">', '">' + RM.replace('aria-label="빼기"', 'aria-label="' + esc(r.n) + ' 빼기"'));
+    h = h.replace('<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">', '<span data-sl-price style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">');
+    return h.slice(0, -'</span>'.length) + GRIP + '</span>';
+  }
+  function recentHtml(by) {
     var seen = [];
     try { seen = JSON.parse(localStorage.getItem('as-recent') || '[]') || []; } catch (e) { seen = []; }
     var xs = seen.filter(function (x) { return x && x.m === m && by[x.t]; }).map(function (x) { return by[x.t]; });
-    /* 제목 = 기본형 아이콘(시계, 회색 원 22 = dk.soft_icon('clock')) + 소제목 15/22 굵게, 글자와 6 (가이드라인 8절) · `이 브라우저에만 남습니다` 삭제 · 제목 아래 구분선 (2026-11-19 사용자)
-       접기 버튼은 넣었다가 뺐다 (2026-11-19 사용자) */
-    var head = '<h3 style="display:flex;align-items:center;gap:6px;font-size:15px;line-height:22px;font-weight:700;color:#111;margin:8px 0 0;padding:0 0 12px 6px;border-bottom:1px solid #E2E8F0;">' +
+    if (!xs.length) return '';
+    /* 제목 = 기본형 아이콘(시계, 회색 원 22) + 15/22 굵게, 글자와 6 (가이드라인 8절) · 제목 아래 구분선 · 첫 줄 위아래 16 (2026-11-19 사용자) */
+    return '<h3 style="display:flex;align-items:center;gap:6px;font-size:15px;line-height:22px;font-weight:700;color:#111;margin:8px 0 0;padding:0 0 12px 6px;border-bottom:1px solid #E2E8F0;">' +
       '<span aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#E5E7EB;color:#4B5563;">' +
       '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.2 1.4"/></svg></span>' +
-      '이 기기에서 최근 본 종목</h3>';
-    if (!xs.length) return head + line('아직 본 종목이 없습니다. 종목 페이지를 열면 여기에 최근 본 순서로 남습니다.');
-    return head + card(xs, function (r, i) { return row(r, i); }).replace('padding-top:21px;', '');   // 제목 아래 구분선이 있어 첫 줄 위도 다른 줄처럼 16 = 아래와 같게 (2026-11-19 사용자)
+      '이 기기에서 최근 본 종목</h3>' + card(xs, function (r, i) { return row(r, i); }).replace('padding-top:21px;', '');
+  }
+  function saveNote() {   // 저장 안내 = 목록 아래 작은 회색 + 아주 작은 `홈 화면에 추가`(테마 window.asA2hs 가 있을 때만). 앱 안 브라우저는 다른 말
+    var t = INAPP ? '관심 종목은 이 앱 안에서만 저장됩니다. 브라우저에서 열면 더 오래 남습니다.' : '관심 종목은 이 브라우저에만 저장됩니다. 홈 화면에 추가해 두면 더 오래 남습니다.';
+    return '<p style="font-size:13px;line-height:19px;color:' + NOTE + ';margin:4px 0 12px;padding-left:6px;word-break:keep-all;">' + esc(t) +
+      '<button type="button" data-sl-a2hs hidden style="display:inline-block;margin:0 0 0 6px;padding:0 7px;border:1px solid #CBD5E1;border-radius:6px;background:#fff;font:inherit;font-size:12px;line-height:18px;font-weight:700;color:#111;vertical-align:baseline;cursor:pointer;">홈 화면에 추가</button></p>';
+  }
+  function watch(by) {
+    var mine = wLoad().filter(function (x) { return x.m === m && by[x.t]; }).map(function (x) { return by[x.t]; });
+    var empty = '<div style="text-align:center;padding:32px 6px 24px;"><div style="font-size:17px;line-height:26px;font-weight:400;color:' + NOTE + ';">담은 종목이 없습니다</div>' +
+      '<div style="font-size:15px;line-height:24px;color:' + NOTE + ';margin:4px 0 0;word-break:keep-all;">종목을 검색해서 바로 담거나, 종목 페이지 제목 옆 <span style="color:#F5B400;">★</span> 를 누르면 여기에 모입니다.</div>' +
+      '<button type="button" data-sl-add style="cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;padding:8px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;color:#111;width:100%;box-sizing:border-box;margin:16px 0 0;font:inherit;font-size:15px;line-height:22px;font-weight:700;">' + LOUPE + '종목 검색해서 담기</button></div>';
+    var foot = '<div data-sl-foot style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 6px 12px;">' +
+      '<button type="button" data-sl-add style="display:inline-flex;align-items:center;gap:8px;padding:8px 0;border:0;background:none;font:inherit;font-size:16px;line-height:24px;font-weight:700;color:#111;cursor:pointer;">' + PLUS + '종목 추가</button>' +
+      '<button type="button" data-sl-edit style="padding:8px 0 8px 12px;border:0;background:none;font:inherit;font-size:15px;line-height:22px;color:' + NOTE + ';cursor:pointer;">편집</button></div>';
+    var bar = '<div data-sl-bar role="toolbar" aria-label="관심 종목 편집"><button type="button" data-sl-clear class="sl-bar-btn">전체 삭제</button><button type="button" data-sl-done class="sl-bar-btn sl-bar-main">완료</button></div>';
+    return '<div data-sl-watch="1"><div data-sl-comp></div>' +
+      '<div data-sl-has' + (mine.length ? '' : ' hidden') + '><div data-cards="1" style="margin:0 0 8px;"><span data-list="1" data-sl-list style="' + LIST + '">' + mine.map(wRow).join('') + '</span></div>' + foot + '</div>' +
+      '<div data-sl-empty' + (mine.length ? ' hidden' : '') + '>' + empty + recentHtml(by) + '</div>' + saveNote() + '</div>' + bar;
+  }
+  function watchBind(by) {
+    var W = document.querySelector('[data-sl-watch]');
+    if (!W || W.getAttribute('data-bound')) return;
+    W.setAttribute('data-bound', '1');
+    var L = W.querySelector('[data-sl-list]'), body = document.body, cur = '';
+    function rowsEl() { return [].slice.call(L.children); }
+    function save() {   // 이 나라 줄 순서대로 + 다른 나라 것은 그대로 뒤에
+      var here = rowsEl().map(function (x) { return { m: m, t: x.getAttribute('data-sym') }; });
+      wSave(here.concat(wLoad().filter(function (x) { return x.m !== m; })));
+    }
+    function secOf(x) { var r = by[x.getAttribute('data-sym')]; return (r && r.s) || '기타'; }
+    function comp() {   // 업종 묶음 줄 `전체 · 기술 · …` (담은 개수 많은 순) — 목업과 같다
+      var bx = W.querySelector('[data-sl-comp]'), cnt = {}, ks = [], n = rowsEl().length;
+      rowsEl().forEach(function (x) { var k = secOf(x); if (!cnt[k]) { cnt[k] = 0; ks.push(k); } cnt[k]++; });
+      ks.sort(function (a, b) { return cnt[b] - cnt[a]; }); if (cur && !cnt[cur]) cur = '';
+      if (!n) { bx.innerHTML = ''; return; }
+      function pill(k, t) { return '<button class="seg" type="button" data-comp="' + esc(k) + '" aria-selected="' + (cur === k) + '">' + t + '</button>'; }
+      bx.innerHTML = '<div class="seg-row sl-joined">' + pill('', '전체') + ks.map(function (k) { return pill(k, esc(k)); }).join('') + '</div>';
+    }
+    function seps() {
+      comp();
+      var vis = rowsEl().filter(function (x) { var on = !cur || secOf(x) === cur; x.style.display = on ? 'flex' : 'none'; return on; });
+      vis.forEach(function (x, i) { x.style.borderTop = i ? '1px solid #E2E8F0' : '0'; x.style.paddingTop = (i ? 16 : 21) + 'px'; });
+      var n = rowsEl().length;
+      W.querySelector('[data-sl-has]').hidden = !n; W.querySelector('[data-sl-empty]').hidden = !!n;
+      if (!n) edit(false);
+    }
+    W.addEventListener('click', function (e) { var b = e.target.closest('[data-comp]'); if (!b) return; cur = b.getAttribute('data-comp'); seps(); });
+    function edit(on) { if (on) body.setAttribute('data-sl-editing', ''); else body.removeAttribute('data-sl-editing'); }
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.rt-tab')) edit(false); }, true);   // 다른 탭으로 가면 편집 끝
+    function toast(msg) { var o = document.querySelector('.sl-toast'); if (o) o.remove(); var d = document.createElement('div'); d.className = 'sl-toast'; d.innerHTML = '<span>' + msg + '</span>'; body.appendChild(d); setTimeout(function () { d.remove(); }, 2600); }
+    function held(t) { return wLoad().some(function (x) { return x.m === m && x.t === t; }); }
+    function add(t) {
+      var r = by[t]; if (!r || held(t)) return;
+      if (wLoad().length >= WMAX) { toast('관심 종목은 ' + WMAX + '개까지 담을 수 있습니다'); return; }
+      L.insertAdjacentHTML('beforeend', wRow(r)); save(); wKeep(); seps(); toast('관심 종목에 담았습니다');
+    }
+    function drop(t) { var x = L.querySelector('[data-sym="' + t + '"]'); if (x) x.remove(); save(); seps(); }
+    seps();
+    /* 길게 누르기(0.5초) · 목록 끝 `편집` = 편집 모드 */
+    var T = 0, sx = 0, sy = 0, eat = false;
+    W.addEventListener('pointerdown', function (e) {
+      if (body.hasAttribute('data-sl-editing')) return; var r = e.target.closest('[data-sl-list] [data-row-link]'); if (!r) return;
+      sx = e.clientX; sy = e.clientY; clearTimeout(T);
+      T = setTimeout(function () { T = 0; eat = true; r.classList.remove('is-pressed'); edit(true); if (navigator.vibrate) navigator.vibrate(12); }, 500);
+    });
+    W.addEventListener('pointermove', function (e) { if (T && (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8)) { clearTimeout(T); T = 0; } });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (k) { W.addEventListener(k, function () { if (T) { clearTimeout(T); T = 0; } }); });
+    W.addEventListener('contextmenu', function (e) { if (e.target.closest('[data-sl-list]')) e.preventDefault(); });
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      if (eat && t.closest('[data-sl-list]')) { eat = false; e.preventDefault(); e.stopPropagation(); return; } eat = false;
+      var x = t.closest('[data-sl-rm]'); if (x) { e.preventDefault(); e.stopPropagation(); drop(x.closest('[data-sym]').getAttribute('data-sym')); return; }
+      if (body.hasAttribute('data-sl-editing') && t.closest('[data-sl-list] [data-row-link]')) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+    [].forEach.call(W.querySelectorAll('[data-sl-edit]'), function (b) { b.addEventListener('click', function () { edit(true); }); });
+    document.querySelector('[data-sl-done]').addEventListener('click', function () { edit(false); });
+    /* 끌어서 순서 바꾸기(≡) */
+    L.addEventListener('pointerdown', function (e) {
+      var g = e.target.closest('[data-sl-grip]'); if (!g || !body.hasAttribute('data-sl-editing')) return; e.preventDefault();
+      var r = g.closest('[data-row-link]'); r.classList.add('sl-drag'); try { g.setPointerCapture(e.pointerId); } catch (_) {}
+      function mv(ev) { var after = null, rs = rowsEl(); for (var i = 0; i < rs.length; i++) { if (rs[i] === r) continue; var b = rs[i].getBoundingClientRect(); if (ev.clientY < b.top + b.height / 2) { after = rs[i]; break; } }
+        if (after !== r.nextSibling || !after) { L.insertBefore(r, after); seps(); } }
+      function up() { r.classList.remove('sl-drag'); save(); g.removeEventListener('pointermove', mv); g.removeEventListener('pointerup', up); g.removeEventListener('pointercancel', up); }
+      g.addEventListener('pointermove', mv); g.addEventListener('pointerup', up); g.addEventListener('pointercancel', up);
+    });
+    /* 팝업 틀 (가이드라인 팝업: 흰 상자 12 · 가림막 · 닫기 네모 32 · 바깥 · Esc) */
+    var X = '<svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><path d="M2 2l10 10M12 2 2 12" stroke="#111" stroke-width="2" stroke-linecap="round"/></svg>';
+    function pop(title, inner, cls) {
+      var o = document.createElement('div'); o.className = 'sl-pop ' + (cls || '');
+      o.innerHTML = '<div role="dialog" aria-modal="true"><div class="sl-pop-head"><span>' + title + '</span><button type="button" class="sl-x" aria-label="닫기">' + X + '</button></div><div class="sl-pop-body">' + inner + '</div></div>';
+      function close() { o.remove(); document.removeEventListener('keydown', k); } function k(e) { if (e.key === 'Escape') close(); }
+      o.addEventListener('click', function (e) { if (e.target === o || e.target.closest('.sl-x')) close(); }); document.addEventListener('keydown', k); body.appendChild(o); o.close = close; return o;
+    }
+    document.querySelector('[data-sl-clear]').addEventListener('click', function () {
+      var n = rowsEl().length; if (!n) return;
+      var o = pop('관심 종목을 모두 뺄까요?', '<p style="margin:0 0 18px;font-size:16px;line-height:26px;color:#333;word-break:keep-all;">이 화면 관심 종목 ' + n + '개가 목록에서 빠집니다.</p>' +
+        '<div style="display:flex;gap:10px;"><button type="button" class="sl-bar-btn" data-c>취소</button><button type="button" class="sl-bar-btn sl-bar-main" data-ok>모두 빼기</button></div>', 'sl-short');
+      o.querySelector('[data-c]').onclick = o.close;
+      o.querySelector('[data-ok]').onclick = function () { L.innerHTML = ''; save(); seps(); o.close(); toast('관심 종목을 모두 뺐습니다'); };
+    });
+    /* 종목 추가 = 검색 팝업(이 나라 목록 파일 안에서), 줄 누르면 ☆ ↔ ★ */
+    function star(on) { return '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="' + STAR_PATH + '" fill="' + (on ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'; }
+    function res(r) { var on = held(r.t);
+      return '<div class="sl-res" data-s="' + esc(r.t) + '"><span style="flex:none;display:flex;align-items:center;">' + logo(r).replace(/width="35" height="35"/, 'width="28" height="28"').replace(/width:35px;height:35px/g, 'width:28px;height:28px').replace(/line-height:35px/, 'line-height:28px') + '</span>' +
+        '<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(r.n) + '</span>' +
+        '<span style="display:block;font-size:14px;line-height:20px;color:' + NOTE + ';white-space:nowrap;">' + subOf(r, r.s) + '</span></span>' +
+        '<span class="sl-res-star" role="button" aria-pressed="' + on + '" aria-label="' + (on ? '관심 종목에서 빼기' : '관심 종목에 담기') + '">' + star(on) + '</span></div>'; }
+    var pool = Object.keys(by).map(function (k) { return by[k]; });
+    function find(q) { q = q.trim().toLowerCase(); if (!q) return null; var a = [], b = [];
+      pool.forEach(function (r) { var n = String(r.n).toLowerCase(), c = String(r.t).toLowerCase(); if (n.indexOf(q) === 0 || c.indexOf(q) === 0) a.push(r); else if (n.indexOf(q) > 0 || c.indexOf(q) > 0) b.push(r); });
+      var k = function (x, y) { return (y.c || 0) - (x.c || 0); }; return a.sort(k).concat(b.sort(k)).slice(0, 30); }
+    W.addEventListener('click', function (e) {
+      if (!e.target.closest('[data-sl-add]')) return;
+      var o = pop('관심 종목 추가', '<input class="sl-q" type="search" placeholder="종목 이름 · 코드" autocomplete="off" enterkeyhint="search"><div data-out></div>', 'sl-top-pop'), q = o.querySelector('.sl-q'), out = o.querySelector('[data-out]');
+      function draw() { var xs = find(q.value);
+        if (xs === null) { var rc = []; try { rc = (JSON.parse(localStorage.getItem('as-recent') || '[]') || []).filter(function (x) { return x && x.m === m && by[x.t]; }).map(function (x) { return by[x.t]; }); } catch (_) {}
+          out.innerHTML = rc.length ? '<div class="sl-res-h">최근 본 종목</div>' + rc.map(res).join('') : ''; return; }
+        out.innerHTML = xs.length ? '<div style="height:6px;"></div>' + xs.map(res).join('') : '<p style="margin:18px 0 0;font-size:15px;line-height:22px;color:' + NOTE + ';">찾는 종목이 없습니다.</p>'; }
+      q.addEventListener('input', draw); draw(); setTimeout(function () { q.focus(); }, 30);
+      out.addEventListener('click', function (ev) { var r = ev.target.closest('.sl-res'); if (!r) return; var t = r.getAttribute('data-s');
+        if (held(t)) { drop(t); toast('관심 종목에서 뺐습니다'); } else add(t);
+        var now = held(t), st = r.querySelector('.sl-res-star'); st.setAttribute('aria-pressed', now); st.innerHTML = star(now); });
+    });
+    /* `홈 화면에 추가` — 테마 홈 화면 추가 안내가 있을 때만(폰 · 홈 화면 앱 아님) */
+    function a2hs() { var b = W.querySelector('[data-sl-a2hs]'); if (!b || !window.asA2hs || INAPP) return; b.hidden = false; b.onclick = function () { window.asA2hs(); }; }
+    if (document.readyState === 'complete') a2hs(); else window.addEventListener('load', a2hs);
   }
   function dayText(d) {
     var x = new Date(d + 'T00:00:00Z');
@@ -268,6 +414,7 @@
     put('cap', caps(rows));
     put('etf', etf(doc));
     bind();
+    watchBind(by);
     stamp(doc.d);
   }
   function fail() {

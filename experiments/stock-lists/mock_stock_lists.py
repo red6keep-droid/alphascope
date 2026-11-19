@@ -3,12 +3,12 @@
     python experiments/stock-lists/mock_stock_lists.py   → output/mock_stock-lists-*.html · mock_stock-star-*.html (목업 서버 `stock-lists` 묶음)
 
 화면:
-  mock_stock-lists-guest-us.html    로그인 전 · 미국 · `오늘 움직임` 탭으로 열림(관심 종목이 없으면 첫 탭 = 오늘 움직임)
-  mock_stock-lists-guest-kr.html    로그인 전 · 한국 · `테마` 탭
-  mock_stock-lists-member.html      로그인 · 관심 종목 담음 → `관심` 탭(담은 순 · 등락 순 · 편집)
-  mock_stock-lists-member-empty.html 로그인 · 아직 안 담음
-  mock_stock-star-member.html       종목 상세(엔비디아) 제목 옆 ☆ — 누르면 담기 · 알림 줄
-  mock_stock-star-guest.html        종목 상세(SK하이닉스) 로그인 전 ☆ — 누르면 로그인 안내
+  mock_stock-lists-watch.html       관심 종목 담음 · 미국 → `관심` 탭(담은 순 · 업종 묶음 · 편집 · 아래 브라우저 저장 안내)
+  mock_stock-lists-watch-kr.html    관심 종목 담음 · 한국
+  mock_stock-lists-empty.html       아직 안 담음 · 미국 → 빈 화면 + 이 기기에서 최근 본 종목 (목업은 `관심` 탭으로 열림)
+  mock_stock-star-us.html           종목 상세(엔비디아) 제목 옆 ☆ — 누르면 바로 담기 · 알림 줄
+  mock_stock-star-kr.html           종목 상세(SK하이닉스) 같은 동작
+관심 종목 = 로그인 없이 이 브라우저(localStorage)에만 저장 (2026-11-19 사용자). 로그인 · 서버 보관은 나중 — 그 전에는 로그인 안내 문구를 넣지 않는다.
 별(☆)은 종목 상세 페이지 제목의 종목 이름 바로 뒤(회색 `주가 실적 일정` 앞)에만 둔다(2026-11-17 사용자). 목록 줄에는 없다 — 줄 전체가 링크라 잘못 누르기 쉽다. 빼기는 관심 탭 `편집`.
 
 데이터 = 실제 값, 인터넷 · AI 0:
@@ -404,6 +404,21 @@ RM = ('<button type="button" data-sl-rm aria-label="{name} 빼기" style="displa
 LOGO_GAP = 11  # 로고 ~ 종목 이름 6 → 11 (2026-11-18 사용자 "5픽셀 정도 여백")
 LOGO_PX = 35   # 종목 줄 로고 (2026-11-17 사용자: 22 의 2배 = 44 → 20% 작게 = 35)
 CHG_PX = 17    # 오른쪽 윗줄 증감 글자 15 → 16 (2026-11-17 사용자 "한 포인트 더") → 17 (2026-11-18 사용자 "1포인트 더"), 삼각형 = 80% → 14
+# 저장 안내 = 목록 아래 작은 회색 (2026-11-19 사용자: 로그인 없이 브라우저에 임시 저장). 서버 보관(로그인)이 생기면 `계정에 보관하려면 로그인하세요` 를 더한다 — 그 전엔 넣지 않는다
+SAVE_NOTE = "관심 종목은 이 브라우저에만 저장됩니다. 홈 화면에 추가해 두면 더 오래 남습니다."
+A2HS_BTN = ("display:inline-block;margin:0 0 0 6px;padding:0 7px;border:1px solid #CBD5E1;border-radius:6px;background:#fff;"
+            "font:inherit;font-size:12px;line-height:18px;font-weight:700;color:#111;vertical-align:baseline;cursor:pointer;-webkit-tap-highlight-color:transparent;")
+
+
+def save_note():
+    """저장 안내 + 아주 작은 `홈 화면에 추가` 버튼 (2026-11-19 사용자 "최대한 작게") — 12/18 굵게 · 외곽선 · 높이 20.
+    누르면 테마의 홈 화면 추가 안내(window.asA2hs: 안드로이드 설치 창 · 아이폰 방법)를 바로 연다. 이미 홈 화면 앱이거나 PC 면 버튼을 숨긴다(asA2hs 없음)."""
+    return (f'<p style="font-size:13px;line-height:19px;color:{dk.NOTE};margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;">{esc(SAVE_NOTE)}'
+            f'<button type="button" data-sl-a2hs hidden style="{A2HS_BTN}">홈 화면에 추가</button></p>'
+            "<script>(function(){function go(){var b=document.querySelector('[data-sl-a2hs]');if(!b||!window.asA2hs)return;b.hidden=false;"
+            "b.onclick=function(){window.asA2hs();};}if(document.readyState==='complete')go();else window.addEventListener('load',go);})();</script>")
+
+
 WATCH_MAX = 100   # 미국 · 한국 합쳐 100개 (2026-11-17 사용자 "200개 담는 사람이 누가 있다고 · 100개까지만"). 안내 문장은 두지 않고, 넘칠 때만 알림
 
 
@@ -446,19 +461,15 @@ def watch_member(rows, syms, m, all_rows):
     cfg = {"m": m, "max": WATCH_MAX, "held": held if syms else [s for s in held if all_rows[s]["m"] != m], "recent": RECENT,
            "row": ROW_STYLE, "logo": LOGO_PX, "top": ROW_TOP, "pad": ROW_PAD, "sep": dk.MULTI_SEP, "rm": RM, "grip": GRIP, "note": dk.NOTE, "up": dk.UP, "down": dk.DOWN, "muted": dk.MUTED, "star": STAR, "starPath": STAR_PATH, "chg": CHG_PX, "gap": LOGO_GAP}
     js = ('<script type="application/json" id="sl-data">' + json.dumps({"cfg": cfg, "rows": data}, ensure_ascii=False).replace("</", "<\\/") + "</script>")
+    # 이 기기에서 최근 본 종목 = 담은 종목이 없을 때만 (2026-11-19 사용자: 관심 종목이 있으면 같이 안 보인다)
+    recent = [all_rows[x] for x in RECENT if x in all_rows and all_rows[x]["m"] == m]
+    recent_html = (recent_head() + list_card(recent, lambda r, i: row_html(r, i)).replace(f"padding-top:{ROW_TOP}px;", "", 1)) if recent else ""
     return (f'<div data-sl-watch="1"><div data-sl-comp></div>{lst}<div data-sl-has{"" if syms else " hidden"}>{foot}</div>'
-            f'<div data-sl-empty{"" if not syms else " hidden"}>{empty}</div></div>{bar}{js}')
+            f'<div data-sl-empty{"" if not syms else " hidden"}>{empty}{recent_html}</div>{save_note()}</div>{bar}{js}')
 
 
 def watch_tab(rows, state, m):
-    """관심 탭 — state: guest · empty · member. 들어온 나라(m) 종목만 (2026-11-17 사용자: 한 나라만, 나라는 홈 국기 버튼으로 들어온 쪽)."""
-    if state == "guest":
-        recent = [rows[s] for s in RECENT if s in rows and rows[s]["m"] == m]
-        login = f'<a data-mock="1" style="{LOGIN_BTN}margin:16px 0 0;">{G_LOGO}구글 계정으로 로그인</a>'   # `댓글에 쓰는 로그인과 같습니다` 삭제 (2026-11-19 사용자)
-        return (empty_box("관심 종목을 모아 보세요",
-                          f'종목 페이지 제목 옆 <span style="color:{STAR};">★</span> 를 누르거나 종목을 검색해서 담으면 여기에 모입니다. 로그인하면 폰 · PC 어디서나 같은 목록을 봅니다.', login)
-                + recent_head()
-                + list_card(recent, lambda r, i: row_html(r, i)).replace(f"padding-top:{ROW_TOP}px;", "", 1))   # 제목 아래 구분선이 있어 첫 줄 위도 16 = 아래와 같게 (2026-11-19 사용자)   # `이 브라우저에만 남습니다` 삭제 (2026-11-19 사용자)
+    """관심 탭 — state: empty(아직 안 담음) · watch(담음). 들어온 나라(m) 종목만 (2026-11-17 사용자). 로그인 화면 없음 — 브라우저 저장 (2026-11-19 사용자)."""
     syms = [] if state == "empty" else [s for s in WATCH if s in rows and rows[s]["m"] == m]
     return watch_member(rows, syms, m, rows)
 
@@ -666,11 +677,9 @@ def write(body, name, title="종목 모아보기"):   # 옛 `종목` (2026-11-18
 # ── 종목 상세 ☆ ──────────────────────────────────────────────────────
 STAR_JS = """<style>/* 별 아래 끝 = 종목 이름 글자 아래선 (2026-11-19 사용자: 별이 위로 떠 보임 — 3배 캡처 실측 3px 아래로 → 2px 다시 올림 = 1px, 사용자) */.sl-star{display:inline-flex;flex:none;align-items:center;justify-content:center;width:22px;height:22px;margin:0 0 0 5px;position:relative;top:1px;vertical-align:middle;padding:0;border:0;background:none;cursor:pointer;color:#9CA3AF;-webkit-tap-highlight-color:transparent;}
 .sl-star svg{width:22px;height:22px;display:block;}.sl-star[aria-pressed="true"]{color:%(star)s;}
-.sl-sheet{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;background:rgba(15,23,42,.4);}
-.sl-sheet>div{width:100%%;max-width:480px;box-sizing:border-box;background:#fff;border-radius:14px 14px 0 0;padding:22px 18px calc(18px + env(safe-area-inset-bottom));}
 %(toast)s</style>
 <script>(function(){
-var STATE='%(state)s',on=false,P='%(path)s';
+var LINK='%(link)s',on=false,P='%(path)s';   /* 로그인 없이 바로 담기 — 실제는 이 브라우저 localStorage (2026-11-19 사용자) */
 var t=document.querySelector('.pr-sticky .post-title')||document.querySelector('.post-title');if(!t)return;
 var b=document.createElement('button');b.type='button';b.className='sl-star';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','관심 종목에 담기');
 function draw(){b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+P+'" fill="'+(on?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
@@ -678,26 +687,18 @@ function draw(){b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d
 draw();
 var lab=t.querySelector('.post-title-label'),sub=lab&&lab.querySelector('.post-title-sub');if(sub)lab.insertBefore(b,sub);else if(lab)lab.appendChild(b);else t.appendChild(b);
 function toast(msg,link){var o=document.querySelector('.sl-toast');if(o)o.remove();var d=document.createElement('div');d.className='sl-toast';
- d.innerHTML='<span>'+msg+'</span>'+(link?'<a href="mock_stock-lists-member.html#tab-0">관심 목록 보기</a>':'');document.body.appendChild(d);setTimeout(function(){d.remove();},3000);}
+ d.innerHTML='<span>'+msg+'</span>'+(link?'<a href="'+LINK+'#tab-0">관심 목록 보기</a>':'');document.body.appendChild(d);setTimeout(function(){d.remove();},3000);}
 b.addEventListener('click',function(){
- if(STATE==='guest'){var s=document.createElement('div');s.className='sl-sheet';
-  s.innerHTML='<div><div style="font-size:18px;line-height:26px;font-weight:700;color:#111;">관심 종목은 로그인하면 담을 수 있습니다</div>'+
-  '<div style="font-size:15px;line-height:24px;color:#333;margin:6px 0 16px;">담은 종목은 하단 메뉴 <b>종목</b> → <b>관심</b> 탭에 모입니다. 폰 · PC 어디서나 같은 목록입니다.</div>'+
-  '<a href="#" data-x style="%(btn)s">%(glogo)s구글 계정으로 로그인</a>'+
-  '<button type="button" data-x style="display:block;width:100%%;margin:10px 0 0;padding:10px;border:0;background:none;font:inherit;font-size:15px;color:#6B7280;cursor:pointer;">닫기</button></div>';
-  s.addEventListener('click',function(e){if(e.target===s||e.target.closest('[data-x]')){e.preventDefault();s.remove();}});document.body.appendChild(s);return;}
  on=!on;draw();toast(on?'관심 종목에 담았습니다':'관심 종목에서 뺐습니다',on);});
 })();</script>"""
 
 
-def star_mock(src_rel, name, state):
+def star_mock(src_rel, name, link):
     src = os.path.join(EXP, src_rel)
     if not os.path.exists(src):
         print(f"[종목 목록] {src_rel} 없음 — {name} 건너뜀")
         return
-    pg = open(src, encoding="utf-8").read()
-    add = STAR_JS % {"star": STAR, "state": state, "path": STAR_PATH, "btn": LOGIN_BTN, "glogo": G_LOGO, "toast": TOAST_CSS}
-    pg = pg.replace("</body>", add + "</body>", 1)
+    pg = open(src, encoding="utf-8").read()   # ☆ 는 이제 테마 JS 가 그린다(2026-11-19 적용) — 종목 목업을 그대로 복사, 따로 끼우지 않음
     open(os.path.join(OUT, name), "w", encoding="utf-8").write(pg)
     print(f"[종목 목록] {name} (← {src_rel})")
 
@@ -709,13 +710,15 @@ def main():
     print(f"[종목 목록] 종목 미국 {sum(r['m'] == 'us' for r in rows.values())} · 한국 {sum(r['m'] == 'kr' for r in rows.values())} · ETF {len(etf['us'])} + {len(etf['kr'])}"
           f" · 시총 값 미국 {sum(1 for r in rows.values() if r['m'] == 'us' and r['cap'])} · 한국 {sum(1 for r in rows.values() if r['m'] == 'kr' and r['cap'])}")
     stats = []
-    write(page(rows, etf, "guest", "us", stats, 1), "mock_stock-lists-guest-us.html")
-    write(page(rows, etf, "guest", "kr", stats, 2), "mock_stock-lists-guest-kr.html")
-    write(page(rows, etf, "member", "us", [], 0), "mock_stock-lists-member.html")
-    write(page(rows, etf, "member", "kr", [], 0), "mock_stock-lists-member-kr.html")
-    write(page(rows, etf, "empty", "us", [], 0), "mock_stock-lists-member-empty.html")
-    star_mock("stock-radar/output/mock_NVDA.html", "mock_stock-star-member.html", "member")
-    star_mock("kr-stocks/output/mock_000660.html", "mock_stock-star-guest.html", "guest")
+    write(page(rows, etf, "watch", "us", [], 0), "mock_stock-lists-watch.html")
+    write(page(rows, etf, "watch", "kr", [], 0), "mock_stock-lists-watch-kr.html")
+    write(page(rows, etf, "empty", "us", stats, 0), "mock_stock-lists-empty.html")
+    star_mock("stock-radar/output/mock_NVDA.html", "mock_stock-star-us.html", "mock_stock-lists-watch.html")
+    star_mock("kr-stocks/output/mock_000660.html", "mock_stock-star-kr.html", "mock_stock-lists-watch-kr.html")
+    for old in ("mock_stock-lists-guest-us.html", "mock_stock-lists-guest-kr.html", "mock_stock-lists-member.html", "mock_stock-lists-member-kr.html",
+                "mock_stock-lists-member-empty.html", "mock_stock-star-member.html", "mock_stock-star-guest.html"):   # 로그인 전제 옛 목업 (2026-11-19 브라우저 저장으로 바꿈)
+        if os.path.exists(os.path.join(OUT, old)):
+            os.remove(os.path.join(OUT, old))
     for m, n, k in stats:
         print(f"  {m} {n}: {k}종목")
 
