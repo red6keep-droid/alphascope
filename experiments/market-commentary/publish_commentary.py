@@ -182,6 +182,13 @@ def stage_prepare(a):
     else:
         info = BN.make(briefing, col, deploy, use_ai=not a.no_ai)   # deploy/images/commentary-{key}.webp
     banner_url = info["url"] if info else None
+    if banner_url:   # 그림 내용으로 만든 버전을 주소 끝에 — 같은 주소로 다시 그려도(--redraw) 휴대폰이 옛 그림(브라우저 저장 7일)을 쓰지 않게 (2026-11-19 사용자 "배너 글씨가 안 바뀌었다")
+        try:
+            import hashlib
+            raw = open(info["path"], "rb").read() if info.get("path") else urllib.request.urlopen(f"{RAW}/{ref}", timeout=30).read()
+            banner_url += "?v=" + hashlib.md5(raw).hexdigest()[:8]
+        except Exception as e:  # noqa: BLE001 — 버전이 없어도 그림은 나간다
+            log(f"배너 버전 표시 못 붙임: {str(e)[:80]}")
     alt = "AI 생성 이미지"
     if info:
         b = BN.banner_text(col)
