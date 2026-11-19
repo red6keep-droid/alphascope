@@ -326,6 +326,190 @@ BRIEFING = {
 }
 
 
+# 미국장(아침 편) 새 틀 목업 재료 (2026-11-19 사용자 "미국 시황도 샘플로") — 수집기 11-18 아침 시험 글의 사실만으로 블로그가 손으로 다시 쓴 것(요청 28절 꼴)
+SAMPLE_US = {
+ "format": "story",
+ "date": "2026-11-18",
+ "slot": "am",
+ "title": "대중 AI 칩 규제와 실적 경계에 3대 지수 일제히 하락",
+ "summary": "미국의 대중 AI 칩 규제와 실적 경계에 뉴욕 3대 지수가 일제히 하락했습니다.",
+ "overview": "미국의 대중국 AI 반도체 원격 접근 제한이 나오자 **11개 업종이 모두 내리며 3대 지수가 일제히 하락했습니다**. ==해외 데이터센터를 거친 우회 경로까지 막는 규정==이 반도체 공급망 전반에 경계심을 키웠고, 시스템 장애를 겪은 마이크로소프트와 금융주 약세가 낙폭을 더했습니다. 다만 장 마감 뒤 엔비디아가 시장 예상을 웃돈 3분기 실적을 내놓아, 오늘 한국장에서는 이 호실적이 반도체주 첫 반응에 얼마나 반영되는지가 관건입니다.",
+ "drivers": [
+  {
+   "heading": "AI 칩 원격 접근 제한",
+   "body": "미국 상무부가 **동남아시아 등 해외 데이터센터를 통한 중국의 첨단 AI 반도체 원격 접근을 차단하는 새 규정**을 내놓으면서 정규장의 반도체주가 눌렸습니다. 중국의 내년 예상 연산 능력 가운데 약 3분의 1이 해외 데이터센터 임대와 맞물려 있어, ==엔비디아의 아시아 매출과 데이터센터 투자 속도에 미칠 영향==에 관심이 모였습니다. 피에르 페라구는 중국 매출 비중이 약 10%에 그쳐 ==최근 매도세가 과도하다==고 본 반면, 스티브 아이즈먼(전 뉴버거 버먼 포트폴리오 매니저)은 우회 경로가 막히면 ==데이터센터 매출의 15~20%가 영향을 받을 수 있다==고 경고했습니다."
+  },
+  {
+   "heading": "고금리 경계와 연준 경로",
+   "body": "반도체 규제가 기술주를 누른 날, 증시 전반의 부담을 키운 것은 금리였습니다. 미국 10월 소매판매가 전월 대비 0.2% 늘며 소비가 이어지자 **미국 10년물 국채 금리가 5% 안팎의 높은 수준을 유지**했습니다. 물가와 소비가 쉽게 꺾이지 않으면서 ==12월 금리 인상 가능성==을 보는 시각(장재철 피나클 경제 연구소 대표)과 ==점진적인 금리 인하==를 예상하는 시각이 엇갈렸습니다."
+  }
+ ],
+ "takeaway": "모든 업종이 내린 가운데 금융과 헬스케어의 낙폭이 컸고, 매수세는 브로드컴 등 일부 종목으로만 선별적으로 들어왔습니다.",
+ "sectors": [],
+ "pointsTitle": "오늘 한국장 관전 포인트",
+ "points": [
+  "지난밤 미국 금융 업종 1.82% 하락 · 마이크로소프트 2.65% 하락 뒤 한국장 첫 반응",
+  "엔비디아 실적 뒤 반도체주 — 3분기 호실적이 국내 주가로 이어지는지"
+ ],
+ "oneLine": "미국의 대중국 AI 칩 원격 접근 제한과 전산망 장애 여파로 11개 업종이 모두 내렸고, 장 마감 뒤 엔비디아는 예상을 웃돈 3분기 실적을 발표했습니다.",
+ "tickers": [
+  "NVDA",
+  "MSFT",
+  "AVGO",
+  "GOOGL",
+  "LLY",
+  "TSLA"
+ ],
+ "banner": {
+  "titles": [
+   [
+    "대중 칩 규제에 약세",
+    "엔비디아 호실적 확인"
+   ],
+   [
+    "뉴욕 전 업종 하락",
+    "반도체주 반응 주목"
+   ],
+   [
+    "AI 칩 규제 여파",
+    "엔비디아 실적 소화"
+   ]
+  ],
+  "keys": [
+   "미국 금융 업종 약세",
+   "뉴욕 기술주 하락"
+  ]
+ }
+}
+# 묶음 close (briefing/2026-11-18-am.json 숫자 그대로)
+BRIEFING_US = {
+ "trade_date": "2026-11-17",
+ "close": {
+  "indices": [
+   {
+    "name": "S&P 500",
+    "close": 7340.53,
+    "chg_pct": -1.07
+   },
+   {
+    "name": "나스닥 종합",
+    "close": 24328.38,
+    "chg_pct": -0.77
+   },
+   {
+    "name": "다우존스",
+    "close": 50759.42,
+    "chg_pct": -1.68
+   },
+   {
+    "name": "러셀 2000",
+    "close": 2701.87,
+    "chg_pct": -1.51
+   }
+  ],
+  "sectors": [
+   {
+    "name": "금융",
+    "chg_pct": -1.82
+   },
+   {
+    "name": "헬스케어",
+    "chg_pct": -1.74
+   },
+   {
+    "name": "부동산",
+    "chg_pct": -1.71
+   },
+   {
+    "name": "커뮤니케이션",
+    "chg_pct": -1.46
+   },
+   {
+    "name": "필수소비재",
+    "chg_pct": -1.36
+   },
+   {
+    "name": "유틸리티",
+    "chg_pct": -1.36
+   },
+   {
+    "name": "소재",
+    "chg_pct": -1.22
+   },
+   {
+    "name": "경기소비재",
+    "chg_pct": -0.89
+   },
+   {
+    "name": "기술",
+    "chg_pct": -0.68
+   },
+   {
+    "name": "산업재",
+    "chg_pct": -0.55
+   },
+   {
+    "name": "에너지",
+    "chg_pct": -0.52
+   }
+  ],
+  "movers": [
+   {
+    "name": "마이크로소프트",
+    "ticker": "MSFT",
+    "chg_pct": -2.65
+   },
+   {
+    "name": "브로드컴",
+    "ticker": "AVGO",
+    "chg_pct": 2.43
+   },
+   {
+    "name": "알파벳",
+    "ticker": "GOOGL",
+    "chg_pct": -1.52
+   },
+   {
+    "name": "일라이 릴리",
+    "ticker": "LLY",
+    "chg_pct": -1.17
+   },
+   {
+    "name": "버크셔 해서웨이",
+    "ticker": "BRK-B",
+    "chg_pct": -0.91
+   },
+   {
+    "name": "메타",
+    "ticker": "META",
+    "chg_pct": -0.86
+   },
+   {
+    "name": "애플",
+    "ticker": "AAPL",
+    "chg_pct": -0.5
+   },
+   {
+    "name": "엔비디아",
+    "ticker": "NVDA",
+    "chg_pct": -0.44
+   },
+   {
+    "name": "아마존",
+    "ticker": "AMZN",
+    "chg_pct": -0.37
+   },
+   {
+    "name": "테슬라",
+    "ticker": "TSLA",
+    "chg_pct": 0.13
+   }
+  ]
+ }
+}
+OUT_US = os.path.join(BASE, "output", "mock_story_us.html")
+
+
 SAMPLES = os.path.join(BASE, "samples")   # 수집기 최신 시험 글 · 묶음 (git 제외 — 수집기가 시험 글을 비공개로 둠). 없으면 위 SAMPLE(11-17)
 
 
@@ -355,7 +539,11 @@ if __name__ == "__main__":
     from story_render import render, titles
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     import json
-    lf = os.path.join(BASE, "..", "stock-lists", "output", "lists", "kr" if SAMPLE["slot"] == "pm" else "us", "_lists.json")   # 종목 모아보기 목업이 쓰는 로컬 목록 파일
-    lists = {str(r.get("t") or "").upper(): r for r in json.load(open(lf, encoding="utf-8"))["rows"]} if os.path.exists(lf) else {}
-    _, h, _m = render(SAMPLE, BRIEFING, lists=lists, banner_url=banner_for(SAMPLE, dict(BRIEFING, date=SAMPLE["date"], slot=SAMPLE["slot"])), banner_alt="AI 생성 이미지")
-    print(dk.write_mock(h, OUT, titles(SAMPLE)[0]) or "index.html 없음 — 목업 못 만듦")
+    import shutil   # 목업 = output/story-mock/mood/ 에 복사해 상대 주소로(태블릿 목업 서버에서도 보이게). 발행 = gh-pages images/commentary/mood/
+    shutil.copytree(os.path.join(BASE, "static", "mood"), os.path.join(BASE, "output", "story-mock", "mood"), dirs_exist_ok=True)
+    mood = "story-mock/mood/"
+    for col, br, out in ((SAMPLE, BRIEFING, OUT), (SAMPLE_US, BRIEFING_US, OUT_US)):   # 한국장(저녁 편) · 미국장(아침 편)
+        lf = os.path.join(BASE, "..", "stock-lists", "output", "lists", "kr" if col["slot"] == "pm" else "us", "_lists.json")   # 종목 모아보기 목업이 쓰는 로컬 목록 파일
+        lists = {str(r.get("t") or "").upper(): r for r in json.load(open(lf, encoding="utf-8"))["rows"]} if os.path.exists(lf) else {}
+        _, h, _m = render(col, br, lists=lists, mood_base=mood, banner_url=banner_for(col, dict(br, date=col["date"], slot=col["slot"])), banner_alt="AI 생성 이미지")
+        print(dk.write_mock(h, out, titles(col)[0]) or "index.html 없음 — 목업 못 만듦")

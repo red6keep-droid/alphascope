@@ -87,27 +87,49 @@ def para(html):
     return f'<p style="margin:0 0 14px;padding:0 0 0 {dk.ALIGN_PX}px;word-break:keep-all;">{html}</p>'
 
 
+IDX_CELL_PCT = 44   # 넘기는 지수 칸 폭 = 보이는 폭의 44% → 두 칸(88%) + 셋째 칸 12% 걸침
+IDX_SLIDE_CSS = ("[data-idx-slide]>div::-webkit-scrollbar{display:none}"
+                 "[data-idx-slide]::before,[data-idx-slide]::after{content:'';position:absolute;top:0;bottom:0;width:32px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:1}"
+                 "[data-idx-slide]::before{left:0;background:linear-gradient(to right,#fff,rgba(255,255,255,0))}"
+                 "[data-idx-slide]::after{right:0;background:linear-gradient(to left,#fff,rgba(255,255,255,0))}"
+                 "[data-idx-slide][data-more*=l]::before,[data-idx-slide][data-more*=r]::after{opacity:1}")
+
+
 def index_row(indices):
-    """지수 칸 — `한눈에 보기` 위, 본문 폭에 딱 맞게(오른쪽에 빈 자리 없이, 2026-11-19 사용자). 한 줄에 2칸: 한국 2칸 = 한 줄 · 미국 4칸 = 두 줄(줄 사이 6)."""
+    """지수 칸 — `한눈에 보기` 위, 본문 폭에 딱 맞게 한 화면에 2칸 (2026-11-19 사용자).
+    한국 2칸 = 그대로 한 줄. 미국 4칸 = 옆으로 넘기는 줄 — 처음엔 S&P 500 · 나스닥 두 칸 + 다우존스가 오른쪽에 살짝 걸침, 넘기면 다우존스 · 러셀 2000.
+    이름(괄호 풀이 포함) = 검정 · 종가 · 증감 = 증감 색(보합 검정) (같은 날 사용자)."""
     cells = []
     for x in indices:
         if x.get("close") is None or x.get("chg_pct") is None:
             continue
-        cells.append(f'<span data-idx-cell="1" style="display:block;flex:1 1 0;min-width:0;box-sizing:border-box;background:#fff;padding:{14 - dk.VP}px 12px;">'
-                     f'<span style="display:block;font-weight:700;color:#111;font-size:{dk.NAME};line-height:{dk.LH_CARD};white-space:nowrap;">{dk.paren(dk.esc(INDEX_NAMES.get(x["name"], x["name"])))}</span>'
-                     f'<span style="display:block;margin-top:4px;line-height:25px;white-space:nowrap;"><span style="font-size:{dk.NAME};color:#111;">{x["close"]:,.2f}</span> '
-                     f'<span style="font-size:{dk.CHG_SIZE};">{chg(x["chg_pct"])}</span></span></span>')
+        ink = dk.UP if x["chg_pct"] > 0 else dk.DOWN if x["chg_pct"] < 0 else "#111"
+        cells.append(f'<span style="font-weight:700;color:#111;font-size:{dk.NAME};line-height:{dk.LH_CARD};white-space:nowrap;display:block;">{dk.paren(dk.esc(INDEX_NAMES.get(x["name"], x["name"])))}</span>'
+                     f'<span style="display:block;margin-top:4px;line-height:25px;white-space:nowrap;"><span style="font-size:{dk.NAME};color:{ink};">{x["close"]:,.2f}</span> '
+                     f'<span style="font-size:{dk.CHG_SIZE};">{chg(x["chg_pct"])}</span></span>')
     if not cells:
         return ""
-    rows = [cells[k:k + 2] for k in range(0, len(cells), 2)]
-    return ('<div data-cards="1" style="margin:0 0 8px;">'
-            + "".join(f'<span style="display:flex;margin:{6 if k else 0}px 0 0;">{dk.dir_cells(r, ["neutral"] * len(r))}</span>' for k, r in enumerate(rows)) + '</div>')
+    n = len(cells)
+    bd, line = dk.CARD_DIR["neutral"][1], dk.card_line("neutral")
+    pad = f"padding:{14 - dk.VP}px 12px;"
+    if n <= 2:
+        inner = "".join(f'<span data-idx-cell="1" style="display:block;flex:1 1 0;min-width:0;box-sizing:border-box;background:#fff;{pad}{"" if k == 0 else f"border-left:1px solid {line};"}">{c}</span>'
+                        for k, c in enumerate(cells))
+        return (f'<div data-cards="1" style="margin:0 0 8px;"><span style="display:flex;border:1px solid {bd};border-radius:8px;overflow:hidden;">{inner}</span></div>')
+    # 넘기는 줄 (2026-11-19 사용자 "하위 탭 넘기기와 같은 형식"): 큰 카드 하나 안에 넉 칸 · 칸 = 보이는 폭의 44% — 처음에 두 칸 + 셋째 칸이 오른쪽에 살짝 걸쳐
+    # 넘길 것이 남은 쪽에 흐린 그림자 32(탭 줄 .rt-tabs-wrap[data-more] 와 같은 모양). 그림자 CSS 는 글 머리 <style>, 켜고 끄기는 아래 짧은 스크립트(없어도 처음 오른쪽 그림자는 보임)
+    inner = "".join(f'<span data-idx-cell="1" style="display:block;flex:0 0 {IDX_CELL_PCT}%;min-width:0;box-sizing:border-box;background:#fff;{pad}scroll-snap-align:start;'
+                    f'{"" if k == 0 else f"border-left:1px solid {line};"}">{c}</span>' for k, c in enumerate(cells))
+    js = ("<script>(function(){var w=document.currentScript.previousElementSibling,b=w.firstElementChild;function m(){var x=b.scrollLeft,r=b.scrollWidth-b.clientWidth-x,v='';"
+          "if(x>1)v+='l';if(r>1)v+='r';w.setAttribute('data-more',v);}b.addEventListener('scroll',m,{passive:true});window.addEventListener('resize',m);m();})();</script>")
+    return (f'<div data-cards="1" data-idx-slide="1" data-more="r" style="position:relative;margin:0 0 8px;border:1px solid {bd};border-radius:8px;overflow:hidden;">'
+            f'<div style="display:flex;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;">{inner}</div></div>' + js)
 
 
 GROUP_GAP = 10   # 묶음(구획 · 변수 1 · 2 · 3) 사이 +10 (2026-11-19 사용자) — 구획 제목 위 28 → 38, 둘째 변수부터 소제목 위 24 → 34
 H2_TOP = 28 + GROUP_GAP
 BIG_TOP = H2_TOP + 5   # `장을 움직인 변수` · `업종과 주요 종목` 큰 제목 위 +5 = 43 (2026-11-19 사용자)
-INK = "#5F2CB7"   # 이 글의 보라 글씨(종목 링크 · 색 강조) = #7C3AED 를 5% 진하게 세 번(#7637E1 → #7034D6 → #6A31CB) 뒤 10% 더 → #5F2CB7 (2026-11-19 사용자). 아이콘 · 바탕 보라는 그대로
+INK = "#5012BB"   # 이 글의 보라 글씨(종목 링크 · 색 강조 · 머리글) — #7C3AED 에서 여러 번 진하게(#7637E1 → #7034D6 → #6A31CB → #5F2CB7) 뒤, 10% 진하게 + 채도 0.61 → 0.82 로 선명하게. 흰 바탕 대비 9.8(본문 #333 은 12.6) — 색 글씨가 검은 글씨와 같은 무게로 보이는 자리 (2026-11-19 사용자). 아이콘 · 바탕 보라는 그대로
 FLOW_ICON = ("bars", "#059669")   # `업종과 주요 종목` = 강조형 네모(장을 움직인 변수와 같은 꼴), 녹색 = 정리 문장 녹색 카드(#ECFDF5)와 같은 계열 (2026-11-19 사용자)
 OVERVIEW_ICON = ("pie", "#DDD6FE", dk.VIOLET)   # `한눈에 보기` = 기본형 원을 보라 카드보다 진하게 (증시 전망 팝업 방향 소제목처럼, 2026-11-19 사용자)
 DRIVER_ICON = ("pulse", "#7C3AED")   # `장을 움직인 변수` = 강조형 보라 네모 (옛 `한눈에 보기` 아이콘, 2026-11-19 사용자)
@@ -117,6 +139,32 @@ FLOW_FS, FLOW_LH = "18px", "32px"   # `지수 · 업종 흐름` 문장 = 본문 
 LISTS_URL = f"{BLOG}p/stock-lists.html"   # 종목 모아보기 — 업종 탭(히트맵) · 오늘 움직임 탭으로 보낸다 (2026-11-19 사용자)
 TOP_N = 3   # 시황 글에는 3줄만, 나머지는 종목 모아보기로 (사용자 결정 — 잘린 줄이 가는 곳 = 그 페이지 탭)
 SIDE_PX = 14   # 폰 본문 좌우 여백 — 배너를 화면 끝까지 (2026-11-19 사용자 "카드 말고 좌우 꽉 차게")
+
+
+def tinted(sec, color):
+    """구획 제목 글자 색 = 앞 강조형 아이콘 색 (2026-11-19 사용자: 장을 움직인 변수 보라 · 업종과 주요 종목 녹색)."""
+    return re.sub(r'(<h2[^>]*? style="[^"]*?)color:#111;', lambda m: m.group(1) + f"color:{color};", sec, count=1)
+
+
+# 머리글 앞 장 분위기 아이콘 (2026-11-19 사용자가 그린 그림 셋, static/mood/ 96px 무손실 WebP · 각 3KB 안팎) — 캐릭터 대신
+# 고르기 = 대표 지수(첫 칸: 코스피 · S&P 500) 등락: +0.3% 이상 상승 마감 · −0.3% 이하 하락 마감 · 그 사이 혼조 마감.
+# 기준 실측(최근 10년): 혼조 = 코스피 27% · S&P 500 35% (±0.5% 면 미국 절반이 혼조라 너무 잦다). 사람이 고르지 않는다
+MOOD_BASE = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/commentary/mood/"
+MOOD_CUT = 0.3
+MOOD_NAME = {"up": "상승 마감", "flat": "혼조 마감", "down": "하락 마감"}
+MOOD_GAP = 15   # 아이콘 ~ 머리글 글자 (10 → 15, 2026-11-19 사용자)
+MOOD_TOP = 11   # 줄 가운데에서 아래로 11 — 글자 윗선 맞춤(3) 뒤 사용자 "5 내려" · "3 더 내려" (2026-11-19)
+MOOD_PX = 34   # 머리글 22/32 첫 줄 가운데 · 글자와 10 — 28 에서 20% 크게(33.6 → 34, 2026-11-19 사용자). 줄 높이 32 칸 안 가운데라 위아래 1 씩 넘친다
+# 머리글 글자 색 = 아이콘 방향 색 (2026-11-19 사용자): 블로그가 늘 쓰는 증감 색 진하기(dk.UP #d93025 · dk.DOWN #1a73e8, 흰 바탕 대비 4.5 이상) · 혼조 = 거의 검정.
+# 아이콘 화살표 색(#FF6768 · #2A8FFF · #A7A7A7)을 그대로 쓰는 시안은 흐려서(대비 2.4 ~ 3.3) 버림
+MOOD_INK = {"up": dk.UP, "down": dk.DOWN, "flat": "#222"}
+
+
+def mood_of(indices):
+    cp = next((x["chg_pct"] for x in indices if x.get("chg_pct") is not None), None)
+    if cp is None:
+        return None
+    return "up" if cp >= MOOD_CUT else "down" if cp <= -MOOD_CUT else "flat"
 
 
 def iconed(sec, icon):   # 아이콘 ~ 글자 = h2 gap 10 + 1 = 11 (옛 −4 → 6, 2026-11-19 사용자 +5)
@@ -170,9 +218,10 @@ def emph(html, on=True):
     `**말**` = 굵게 #111 = 결과(무슨 일이 일어났나) · `==말==` = 보라 글씨(굵지 않게) = 원인 · 변수. 다른 칸에 온 표시는 지운다.
     증감 색 · 종목 링크를 먼저 칠한 뒤 바꾼다(dk.tint 는 태그가 든 덩어리를 건너뛰므로). 굵게 안의 종목 링크도 굵게."""
     if not on:
-        return TONE_MARK.sub(r"\1", EMPH_MARK.sub(r"\1", html))
+        return TONE_MARK.sub(r"\1", EMPH_MARK.sub(r"\1", html)).replace("**", "").replace("==", "")
     html = EMPH_MARK.sub(lambda m: '<b style="font-weight:700;color:#111;">' + m.group(1).replace("font-weight:400;", "font-weight:700;") + "</b>", html)
-    return TONE_MARK.sub(lambda m: f'<span style="color:{TONE_INK};">{m.group(1)}</span>', html)
+    html = TONE_MARK.sub(lambda m: f'<span style="color:{TONE_INK};">{m.group(1)}</span>', html)
+    return html.replace("**", "").replace("==", "")   # 짝이 안 맞아 남은 표시는 지운다(글자로 보이지 않게)
 
 
 def points(items, link, pad=dk.ALIGN_PX):
@@ -243,8 +292,8 @@ def stock_row(x, row, slot, first):
 
 
 def card_btn(label, href, pad):
-    """카드 안 맨 아래 줄 = 다른 페이지로 가는 줄 (2026-11-19 사용자 "버튼을 카드 안으로") — 구분선 위 · 14 굵게 · 글자 + 나가는 아이콘을 오른쪽 끝에 모음(사용자 "우측 정렬"), 줄 전체가 링크."""
-    return (f'<a href="{dk.esc(href)}" data-row-link="1" style="display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:{pad}px 12px;'
+    """카드 안 맨 아래 줄 = 다른 페이지로 가는 줄 (2026-11-19 사용자 "버튼을 카드 안으로") — 구분선 위 · 14 굵게 · 글자 + 나가는 아이콘을 가운데 정렬(사용자, 옛 오른쪽 정렬), 줄 전체가 링크."""
+    return (f'<a href="{dk.esc(href)}" data-row-link="1" style="display:flex;justify-content:center;align-items:center;gap:8px;padding:{pad}px 12px;'
             f'border-top:1px solid #E2E8F0;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:700;color:#111;text-decoration:none;"><span>{dk.esc(label)}</span>{dk.OUT_ICON}</a>')
 
 
@@ -261,8 +310,9 @@ def sector_name(x, check):
             f'<span style="min-width:0;">{dk.esc(x["name"])}{sub}</span></span>')
 
 
-def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, lists=None):
+def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, lists=None, mood_base=MOOD_BASE):
     """→ (저장 제목, 본문 HTML, meta). 수집기 칸이 비면 그 구획만 뺀다.
+    mood_base = 장 분위기 아이콘 폴더 주소(None = 아이콘 없이 — 발행기가 그림이 아직 안 올라간 걸 알면 None).
     lists = 종목 모아보기 목록 파일 rows 를 티커로 찾는 표 {티커: 줄} — 종목 줄 가격 · 로고 · 업종 · 주소. 없으면 배지 · 가격 없이.
     lists_live = 종목 모아보기 페이지가 떠 있나. 떠 있으면 업종 · 종목 표는 3줄 + 그 페이지로 가는 버튼, 아니면 전부 싣고 5줄 뒤 접기(버릴 곳이 없으므로)."""
     col, br = column, briefing or {}
@@ -281,13 +331,22 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
     basis = f'{tm}.{tdd:02d} {"미국" if slot == "am" else "한국"} 종가'   # 제목 줄 오른쪽 기준 줄 (테마가 [data-title-basis] 를 옮김)
     # 제목 줄(.pr-sticky) 아래 구분선 · 여백 14 를 이 글에서만 없앤다 — 배너가 제목 줄에 바로 붙게 (2026-11-19 사용자). 테마는 그대로
     # 표시 = 머리글의 data-headline (이 글에만 있음). data-commentary 는 테마가 기준 줄을 제목 줄로 옮길 때 사라져 쓰지 못한다
-    style = '<style>body:has([data-headline]) .pr-sticky{border-bottom:0;margin-bottom:0;}</style>'
+    # + 고정 제목 줄의 흰 바탕을 좌우 본문 여백(14)만큼 화면 끝까지 — 꽉 찬 배너가 스크롤로 밑을 지날 때 양옆 틈으로 비치지 않게 (같은 날 사용자)
+    style = ('<style>body:has([data-headline]) .pr-sticky{border-bottom:0;margin-bottom:0;'
+             f'box-shadow:-{SIDE_PX}px 0 0 var(--surface,#fff),{SIDE_PX}px 0 0 var(--surface,#fff);}}' + IDX_SLIDE_CSS + '</style>')
     body = [style + f'<p data-title-basis="1" data-commentary="{dk.esc(col["date"])}-{slot}" style="margin:0 0 14px;font-size:13px;line-height:19px;color:#6B7280;">{basis}</p>']
     if banner_url:
         body.append(f'<figure data-bleed="1" style="margin:0 -{SIDE_PX}px 16px;"><img src="{dk.esc(banner_url)}" alt="{dk.esc(banner_alt or "AI 생성 이미지")}" '
                     f'width="900" height="350" style="display:block;width:100%;height:auto;border-radius:0;"></figure>')   # 테마 글 그림 모서리 12 를 끔
-    body.append(f'<h2 data-headline="1" style="margin:0 0 17px;padding:5px 0 0 {dk.ALIGN_PX}px;font-size:22px;line-height:32px;font-weight:700;color:#111;'
-                f'word-break:keep-all;">{emph(directional(dk.tint(dk.esc(col["title"]))), False)}</h2>')
+    head_txt = emph(directional(dk.tint(dk.esc(col["title"]))), False)   # 캐릭터는 넣지 않는다 (2026-11-19 사용자 "유아틱 · 전문가스러워야") — 대신 장 분위기 아이콘
+    mood = mood_of(indices) if mood_base else None
+    head_ink = MOOD_INK[mood] if mood else INK   # 아이콘이 없으면 보라 그대로
+    if mood:   # 아이콘 = 첫 줄 가운데(줄 높이 32 칸 안), 둘째 줄은 아이콘 아래로 들어가지 않는다
+        head_txt = (f'<span style="display:flex;align-items:flex-start;gap:{MOOD_GAP}px;"><span style="flex:none;display:flex;align-items:center;height:32px;">'
+                    f'<img src="{dk.esc(mood_base)}market-{mood}.webp" alt="{MOOD_NAME[mood]}" title="{MOOD_NAME[mood]}" width="{MOOD_PX}" height="{MOOD_PX}" '
+                    f'style="display:block;position:relative;top:{MOOD_TOP}px;width:{MOOD_PX}px;height:{MOOD_PX}px;border-radius:0;"></span><span style="min-width:0;">{head_txt}</span></span>')
+    body.append(f'<h2 data-headline="1" style="margin:0 0 22px;padding:10px 0 0 {dk.ALIGN_PX}px;font-size:22px;line-height:32px;font-weight:700;color:{head_ink};'
+                f'word-break:keep-all;">{head_txt}</h2>')
     # 같은 말 되풀이 없애기 (2026-11-19 사용자): 머리글 = 주제 한 번. 요약 문장(summary) · 핵심 한 줄(oneLine)은 화면에 올리지 않는다(머리글과 같은 말).
     # 글 머리 문단 표시(data-seo-lead · data-lead)는 `한눈에 보기` 문단이 맡는다. 한눈에 보기가 없는 글만 요약 문장을 올린다.
     lead_attr = 'data-seo-lead="1" data-lead="1" '
@@ -312,7 +371,7 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
             return h if i == 1 else h.replace("margin:24px 0 10px;", f"margin:{24 + GROUP_GAP}px 0 10px;", 1)
         drv = "".join(sub(i, x)
                       + para(prose(x["body"], True)) for i, x in enumerate(drivers, 1))
-        body.append(iconed(dk.section("장을 움직인 변수", drv), dk.solid_icon(*DRIVER_ICON)).replace(f"margin:{H2_TOP}px 0 11px;", f"margin:{BIG_TOP}px 0 11px;", 1))
+        body.append(tinted(iconed(dk.section("장을 움직인 변수", drv, line=False), dk.solid_icon(*DRIVER_ICON)), DRIVER_ICON[1]).replace(f"margin:{H2_TOP}px 0 11px;", f"margin:{BIG_TOP}px 0 11px;", 1))
 
     # 지수 · 업종 흐름 = 숫자는 문장이 아니라 표 (2026-11-19 사용자 "숫자 나열 문장은 표로"). 묶음 숫자로 파이썬이 그린다 — 수집기 market 문단은 쓰지 않는다.
     # 업종 = 묶음 전체(크게 움직인 것부터, 5줄 + 접기) · 보조 줄 = 수집기 sectors[].check(다음 장에서 볼 것, 있는 업종만). 종목 = 묶음 movers 전체(크게 움직인 것부터, 5줄 + 접기).
@@ -337,7 +396,7 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
             wrap_up = take_away(sents[-1])
     mk = ""
     if wrap_up:   # 정리 문장 = 구획 제목 바로 아래 (2026-11-19 사용자). 글씨 = 주식 공부와 같이 굵게
-        mk += soft_card(prose(wrap_up), margin=f"0 0 {CARD_GAP}px", bg=TAKE_BG, left=14 + 5,   # 글 앞 여백 +5 (2026-11-19 사용자)
+        mk += soft_card(prose(wrap_up), margin=f"0 0 {CARD_GAP}px", bg=TAKE_BG, left=14 + 5 + 3,   # 글 앞 여백 +5 +3 = 22 (2026-11-19 사용자)
                           style=f"font-size:{FLOW_FS};line-height:{FLOW_LH};font-weight:700;color:{TAKE_INK};")
     if secs:   # 업종 = 흰 카드 줄(구분선 17), 제목 줄 없음 (2026-11-19 사용자 "많이 오른 업종 같은 타이틀 삭제")
         rows = [(sector_name(x, emph(dk.esc(checks.get(x["name"]) or ""), False)), chg(x["chg_pct"]), "", 78) for x in secs]   # 왼쪽 78% — 볼 것이 이름 옆 한 줄에 들어갈 자리
@@ -353,7 +412,7 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
         mk += white_card(inner + (tail("오늘 움직인 종목 전체 보기", "오늘 움직임") if lists_live else ""))
     if mk:
         # 제목 = 내용대로 `업종과 주요 종목`(옛 `지수 · 업종 흐름` — 지수 칸은 한눈에 보기 위로 갔다) · 크기 = 장을 움직인 변수와 같은 구획 제목(22/28, 폰 20/26) (2026-11-19 사용자)
-        body.append(iconed(dk.section("업종과 주요 종목", mk, line=False), dk.solid_icon(*FLOW_ICON)).replace(f"margin:{H2_TOP}px 0 11px;", f"margin:{BIG_TOP}px 0 11px;", 1))
+        body.append(tinted(iconed(dk.section("업종과 주요 종목", mk, line=False), dk.solid_icon(*FLOW_ICON)), FLOW_ICON[1]).replace(f"margin:{H2_TOP}px 0 11px;", f"margin:{BIG_TOP}px 0 11px;", 1))
 
     if col.get("points"):   # 회색 카드 — 핵심 한 줄은 뺐다(머리글과 같은 말)
         nb, nd = dk.CARD_DIR["neutral"]
