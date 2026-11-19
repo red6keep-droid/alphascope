@@ -39,6 +39,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 /* 카드 머리 로고 28 = 이름 19px 보다 조금 크게 (2026-11-19 사용자, 옛 시장 라벨 .as-mkt 한국 · 미국) — 흰 바탕 + 회색 외곽선 = dk.ticker_logo 와 같게 */
 .as-logo { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #fff; object-fit: cover; outline: 1px solid #E2E8F0; outline-offset: -1px; }
 .as-logo-b { display: inline-block; line-height: 28px; text-align: center; color: #fff; font-size: 12px; font-weight: 700; outline: 0; overflow: hidden; white-space: nowrap; }
+.as-sg-lg { flex: none; width: 20px; height: 20px; margin-right: -2px; border-radius: 50%; background: #fff; object-fit: cover; outline: 1px solid #E2E8F0; outline-offset: -1px; }   /* 미리보기 줄 앞 로고 20 · 이름과 8(줄 사이 10 − 2) (2026-11-19 사용자) */
+.as-sg-lg.as-logo-b { line-height: 20px; font-size: 10px; }
 .as-day { margin-left: auto; color: #6B7280; font-size: 13px; }
 .as-say { margin: 4px 0 8px; font-size: 16px; line-height: 27px; }
 .as-say b, .as-v, .as-grid b, .as-bars b { font-family: var(--num); }
