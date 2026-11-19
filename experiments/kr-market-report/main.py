@@ -390,6 +390,18 @@ def _prev_run_kst():
     return {"links": set(), "at": t.strftime("%Y-%m-%dT%H:%M")}
 
 
+def _home_news(media):
+    """홈 실적 한 줄 자리 — 일정이 없는 날 주요 뉴스 줄 롤링의 한국 재료 (2026-11-19 사용자). 뉴스 탭과 같은 방송 이슈(최근 순) 제목만 output/kr_news.json 에.
+    워크플로가 홈 파일 묶음(deploy-home)에 얹어 gh-pages kr-news.json 으로 — 푸시 추가 없음. 홈은 24시간 안 · 최신 5줄만 쓴다. AI · 수집 0"""
+    try:
+        items = [{"title": str(x.get("topic") or "").strip(), "channel": x.get("channel"), "at": str(x.get("published_at") or "")[:19],
+                  "dir": x.get("direction")} for x in media[:30] if str(x.get("topic") or "").strip()]
+        with open(os.path.join(OUT, "kr_news.json"), "w", encoding="utf-8") as f:
+            json.dump({"generated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "items": items}, f, ensure_ascii=False)
+    except Exception as e:  # noqa: BLE001 — 홈 줄은 덤, 리포트를 막지 않는다
+        print(f"[kr-report] 홈 뉴스 파일 못 씀: {str(e)[:120]}")
+
+
 def news_section():
     """뉴스 탭 (2026-11-07 사용자 M80 · M81 · M82) — 미국 증시 리포트 뉴스 탭과 같은 코드(render_html.news_tab · news_pick.build):
     분야 칩 → 방향 막대(오늘 · 최근 7일) → 주요 뉴스 5줄(같은 사건 `n곳`) → 칩별 목록 · 팝업(방송 요약 다섯 줄 · 관련 종목).
@@ -407,6 +419,7 @@ def news_section():
             media = _kr_content(mf.issues(rows, since), 10 ** 6)
             if media:
                 break
+        _home_news(media)
         series, names = {}, {}
         for x in media:   # 관련 종목 = 그날 한국 등락 (팝업 · 주요 뉴스 점수 `관련 자산 움직임`)
             for t in x.get("tickers") or []:
