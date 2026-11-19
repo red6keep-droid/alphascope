@@ -18,7 +18,7 @@ EXP = os.path.dirname(HERE)
 sys.path[:0] = [HERE, EXP, os.path.join(EXP, "stock-radar")]
 
 KEY = "stock-lists"   # 주소 /p/stock-lists.html — 처음 만들 때 제목 = 이 글자(Blogger 가 제목으로 주소를 정한다), 바로 TITLE 로 바꾼다
-TITLE = "종목"
+TITLE = "종목 모아보기"   # 옛 `종목` (2026-11-18 사용자 "제목을 좀 더", 목업 mock_stock_lists.write 와 같게)
 OUT = os.path.join(HERE, "output")
 BODY = os.path.join(OUT, "stock_lists_page.html")
 TABS = [("watch", "관심"), ("move", "오늘 움직임"), ("theme", "테마"), ("sector", "업종"), ("cap", "시가총액"), ("etf", "ETF")]
@@ -32,7 +32,15 @@ CSS = ("<style>[data-sl-panel][hidden]{display:none !important;}"
        ".sl-joined .seg:only-child{border-radius:7px;}"
        ".sl-joined .seg[aria-selected=\"true\"]{background:#fff;color:#111;font-weight:700;box-shadow:inset 0 0 0 1px #111;}"
        ".sl-title-day{flex:none;font-size:14px;line-height:20px;font-weight:400;color:#6B7280;white-space:nowrap;letter-spacing:0;}"
-       "#sl-day{margin:0 0 8px;padding-left:6px;text-align:right;}</style>")
+       "#sl-day{margin:0 0 8px;padding-left:6px;text-align:right;}"
+       # 히트맵(테마 · 업종 묶음 고르기) — mock_stock_lists.PAGE_CSS 의 .hm 과 같게 (2026-11-18 사용자)
+       ".hm{position:relative;margin:0 0 14px;background:#fff;}"
+       ".hm-c{position:absolute;box-sizing:border-box;margin:0;padding:4px;border:2px solid #fff;border-radius:6px;font:inherit;cursor:pointer;"
+       "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;overflow:hidden;text-align:center;-webkit-tap-highlight-color:transparent;}"
+       ".hm-n{display:block;max-width:100%;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}"
+       ".hm-p{display:block;font-weight:400;white-space:nowrap;}"
+       ".hm-c[aria-selected=\"true\"]{box-shadow:inset 0 0 0 1.5px var(--hm-fg);}"
+       ".hm-c:active{filter:brightness(.94);}</style>")
 
 
 def body(local=""):
