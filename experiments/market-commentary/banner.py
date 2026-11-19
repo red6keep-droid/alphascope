@@ -40,7 +40,10 @@ HF_MODEL = "black-forest-labs/FLUX.1-schnell"
 
 MASTER = ("cinematic editorial photograph for a premium business magazine, 35mm lens, natural light, realistic, "
           "wide establishing shot, people seen from a distance or from behind with faces not in focus, "
-          "no recognizable landmarks, no brand logos, no readable signs, no text, no letters, no numbers, no watermark")
+          "no recognizable landmarks, no brand logos, no signboards, no company names, no lettering on buildings, "
+          "no readable signs, no text, no letters, no numbers, no watermark")
+# 간판 · 글자 없음은 장면 바로 뒤에 긍정 표현으로도 — 그림 AI 는 설명 뒷부분 · 부정 표현을 약하게 따른다 (2026-11-19 사용자: 11-19 저녁 배경 건물에 `Forma` 간판)
+CLEAN = "plain unbranded buildings with blank facades, every surface free of signage and lettering"
 SUBJECT = {   # 7갈래 × 장면 몇 개 — 날짜로 돌린다
     "finance": ["a financial district street between glass skyscrapers with office workers walking",
                 "a trading floor with rows of monitors and people working, seen from behind"],
@@ -119,7 +122,7 @@ def scene(briefing):
     variants = SUBJECT[sub]
     text = variants[day.toordinal() % len(variants)]
     return {"slot": slot, "date": day.isoformat(), "mood": mood, "subject": sub, "index": idx.get("name"),
-            "chg_pct": idx.get("chg_pct"), "prompt": f"{text} {PLACE[slot]}, {MOOD[mood]}, {MASTER}"}
+            "chg_pct": idx.get("chg_pct"), "prompt": f"{text} {PLACE[slot]}, {CLEAN}, {MOOD[mood]}, {MASTER}"}
 
 
 # ── 그림 받기 ───────────────────────────────────────────────────────
