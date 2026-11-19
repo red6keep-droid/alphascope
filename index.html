@@ -1340,6 +1340,7 @@ body.item-view .navbar { position: static; }
 /* 종목 페이지 공유 버튼 = 제목 아래 회색 기준 상자 오른쪽 (2026-11-11 사용자) — 31 상자 · 아이콘 19(28 · 16 → 10% 30 · 18 → 2% 더, 같은 날 사용자), 위아래 −6 · 오른쪽 −6 이라 상자(위아래 10 + 글 19 = 39) 높이는 그대로, 상자 세로 가운데 */
 body.item-view .post-body [data-report-stamp].has-share .title-share { width: 31px; height: 31px; margin: -6px -6px -6px auto; align-self: center; }
 body.item-view .post-body [data-report-stamp].has-share .title-share svg { width: 19px; height: 19px; }
+body.item-view .post-title-meta .post-title-basis { font-size: 13px; line-height: 19px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; }   /* 시황 해설 기준 날짜 = 제목 줄 오른쪽 · 공유 버튼 앞, 13/19 = 기준 상자 글씨 (2026-11-19 사용자) */
 body.detail-nav .navbar { display: none; }
 body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
@@ -4860,6 +4861,18 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         if (!stamp || !share) return;
         stamp.appendChild(share);
         stamp.classList.add('has-share');
+      })();
+
+      /* ============================================================ 시황 해설 기준 날짜 = 제목 줄 오른쪽 · 공유 버튼 앞 (2026-11-19 사용자: "기준 줄을 타이틀 줄 우측에, 공유도 타이틀 우측에")
+         본문의 [data-title-basis](`11월 16일 미국장 종가 기준`)를 제목 줄 .post-title-meta 의 공유 버튼 앞으로 옮긴다. 회색 기준 상자(data-report-stamp)가 없는 글이라 공유 버튼은 제목 줄에 그대로 남는다.
+         테마를 붙이기 전에는 본문 맨 위 작은 회색 줄로 보인다 */
+      (function () {
+        'use strict';
+        var b = document.querySelector('.post-body [data-title-basis]'), meta = document.querySelector('.post-title .post-title-meta');
+        if (!b || !meta) return;
+        var s = document.createElement('span'); s.className = 'post-title-basis'; s.textContent = b.textContent.trim();
+        meta.insertBefore(s, meta.querySelector('.title-share'));
+        b.parentNode.removeChild(b);
       })();
 
       /* ============================================================ `함께 보는 페이지` 자리 (2026-11-10 사용자: 홈 · TOP 버튼 줄 아래로)
