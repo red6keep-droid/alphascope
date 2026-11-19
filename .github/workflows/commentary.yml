@@ -1,0 +1,138 @@
+name: Market Commentary
+
+# 증시 시황(AlphaScope 시황 해설) 발행 (2026-11-19 사용자 "발행기 만들어", 처음부터 공개).
+# 수집기(News-sub)가 columns/{날짜}-{am|pm} 에 글을 쓰고(08:10 · 20:30, 마감 08:30 · 20:40), 이 워크플로가 ready 글만 읽어 발행한다.
+# 블로그 AI 0. 순서 = 읽기 · 검사 · 배너(Workers AI 1장) → 배너 gh-pages → CDN 확인 → Blogger 공개 발행.
+# 정시 = Cloudflare Worker(infra/cron-trigger KST 08:40 · 21:00). GitHub cron 은 예비 — 이미 발행됐으면 publish 단계가 건너뛴다,
+# 발행 시각이 한참 지난 글(아침 12:00 · 저녁 23:59 KST 뒤)은 내지 않는다.
+
+on:
+  schedule:
+    - cron: '10 0 * * *'    # KST 09:10 아침 편 예비
+    - cron: '30 12 * * *'   # KST 21:30 저녁 편 예비
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'am = 아침(미국 마감) · pm = 저녁(한국 마감)'
+        type: choice
+        options: [am, pm]
+        default: am
+      publish:
+        description: 'Blogger 에 실제 발행 (끄면 준비 · 배너만, 결과는 artifact)'
+        type: boolean
+        required: false
+        default: false
+      scheduled:
+        description: '외부 cron(Cloudflare Worker)용 — 스케줄 실행과 똑같이 동작 (사람은 끄고 쓴다)'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: commentary
+  cancel-in-progress: false
+
+env:
+  IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled }}
+  PYTHONIOENCODING: utf-8
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r experiments/daily-report/requirements.txt
+
+      - name: Slot
+        id: slot
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            # 00:10 UTC = 아침 편 예비, 12:30 UTC = 저녁 편 예비
+            if [ "$(date -u +%H)" -lt 6 ]; then echo "slot=am" >> "$GITHUB_OUTPUT"; else echo "slot=pm" >> "$GITHUB_OUTPUT"; fi
+          else
+            echo "slot=${{ inputs.slot }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 수집기 글 읽기(Firestore 1건) · 검사 · 배너 1장 · 본문. 검사에 걸리면 exit 1 → 아래 Notify failure 가 Slack
+      - name: Prepare (read · check · banner · body)
+        env:
+          YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}
+          CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
+          CF_AI_TOKEN: ${{ secrets.CF_AI_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python experiments/market-commentary/publish_commentary.py prepare --slot "${{ steps.slot.outputs.slot }}"
+
+      - name: Deploy banner to gh-pages
+        id: banner_deploy
+        if: hashFiles('experiments/market-commentary/output/publish/deploy/images/*.webp') != '' && (env.IS_SCHEDULED == 'true' || inputs.publish)
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./experiments/market-commentary/output/publish/deploy
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Deploy banner to gh-pages (retry)
+        id: banner_deploy_retry
+        if: steps.banner_deploy.outcome == 'failure'
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./experiments/market-commentary/output/publish/deploy
+          publish_branch: gh-pages
+          keep_files: true
+
+      # 푸시 직후 jsDelivr 가 옛 커밋을 붙잡는 일(11-10 표지 404) — 내용까지 맞춰 본다. 끝내 다르면 배너 없이 낸다(글은 막지 않음)
+      - name: Purge and verify banner on CDN
+        id: banner_cdn
+        if: hashFiles('experiments/market-commentary/output/publish/banner_ref.txt') != '' && (env.IS_SCHEDULED == 'true' || inputs.publish)
+        run: |
+          REF=$(cat experiments/market-commentary/output/publish/banner_ref.txt)
+          if [ "${{ steps.banner_deploy.outcome }}" = "failure" ] && [ "${{ steps.banner_deploy_retry.outcome }}" != "success" ]; then
+            echo "failed=true" >> "$GITHUB_OUTPUT"; echo "::warning::배너 gh-pages 올리기 실패 — 배너 없이 발행"; exit 0
+          fi
+          if bash .github/scripts/jsd_purge.sh "$REF" "experiments/market-commentary/output/publish/deploy/$REF"; then
+            echo "failed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "failed=true" >> "$GITHUB_OUTPUT"; echo "::warning::배너 CDN 확인 실패 — 배너 없이 발행"
+          fi
+
+      - name: Publish to Blogger
+        if: hashFiles('experiments/market-commentary/output/publish/post.json') != '' && (env.IS_SCHEDULED == 'true' || inputs.publish)
+        env:
+          BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+          BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+          BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+        run: |
+          FLAG=""
+          [ "${{ steps.banner_cdn.outputs.failed }}" = "true" ] && FLAG="--banner-failed"
+          python experiments/market-commentary/publish_commentary.py publish --slot "${{ steps.slot.outputs.slot }}" $FLAG
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-${{ steps.slot.outputs.slot }}
+          path: experiments/market-commentary/output/publish/
+          if-no-files-found: ignore
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 증시 시황 발행 실패 (${{ steps.slot.outputs.slot }}) — 검사에 걸렸거나 발행 오류. 글은 나가지 않았습니다\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

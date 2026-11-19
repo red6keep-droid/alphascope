@@ -29,6 +29,23 @@ import urllib.error
 import urllib.request
 from zoneinfo import ZoneInfo
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "kr-stocks"))
+from universe_kr import EXAM_DAYS  # noqa: E402  수능일 목록(해마다 한 줄) — 장 시각 원본 하나
+
+
+def kr_open_time(d):
+    """한국장 여는 시각 — 수능일 · 새해 첫 거래일은 10:00, 그 밖 09:00 (2026-11-19 사용자 "09:00 은 항상 고정 글이야?").
+    새해 첫 거래일 = 1월 2일부터 첫 평일(1월 1일 휴장). 1월 초 다른 휴장일은 없다고 본다."""
+    if d.isoformat() in EXAM_DAYS:
+        return "10:00"
+    if d.month == 1 and d.day >= 2 and d.weekday() < 5:
+        first = datetime.date(d.year, 1, 2)
+        while first.weekday() >= 5:
+            first += datetime.timedelta(days=1)
+        if d == first:
+            return "10:00"
+    return "09:00"
+
 V = 1
 KST = ZoneInfo("Asia/Seoul")
 NY = ZoneInfo("America/New_York")
@@ -162,7 +179,7 @@ def build_am(day_kst, report_input, data=None, hypo=None, news=None):
         parts = ([f"{top_s['name']} 업종 {pct(top_s['chg_pct'])}"] if top_s else []) + ([f"{top_m['name']} {pct(top_m['chg_pct'])}"] if top_m else [])
         if parts:
             when = "지난밤 미국 " if us_day == (d - datetime.timedelta(days=1)).isoformat() else "지난 금요일 미국 "
-            nxt.insert(0, {"time": "09:00", "what": when + " · ".join(parts) + " 뒤 한국장 첫 반응",
+            nxt.insert(0, {"time": kr_open_time(d), "what": when + " · ".join(parts) + " 뒤 한국장 첫 반응",
                            "market": "KR", "kind": "open"})
     return {
         "v": V, "date": day_kst, "slot": "am", "market": "US", "session": session, "trade_date": data.get("trade_date"),

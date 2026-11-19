@@ -39,7 +39,7 @@
 
 이미지 프롬프트(영문 한 줄)는 데일리 리포트 Gemini 응답 안에 같이 나온다 — 별도 호출 없음. (데일리 커버는 2026-11-16 끔)
 
-**시황 해설 배너** (2026-11-17, `experiments/market-commentary/banner.py`, 하루 최대 2장 · am · pm):
+**시황 해설 배너** (2026-11-17, `experiments/market-commentary/banner.py`, 하루 최대 2장 · am · pm): — 11-19 운영 연결: `commentary.yml`(Worker KST 08:40 · 21:00, 예비 GitHub cron 09:10 · 21:30)이 `publish_commentary.py` 에서 부른다. 예비 실행이 겹쳐도 gh-pages 에 그 편 배너가 이미 있으면 다시 그리지 않는다 → 하루 2장(5,200 뉴런) 그대로. 한도를 넘으면 FLUX → HF → 기본 배너로 내려간다.
 
 | 순서 | 공급자 | 모델 | 키 | 비고 |
 |---|---|---|---|---|

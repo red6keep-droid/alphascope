@@ -3399,6 +3399,18 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   stamp.classList.add('has-share');
 })();
 
+/* ============================================================ 시황 해설 기준 날짜 = 제목 줄 오른쪽 · 공유 버튼 앞 (2026-11-19 사용자: "기준 줄을 타이틀 줄 우측에, 공유도 타이틀 우측에")
+   본문의 [data-title-basis](`11월 16일 미국장 종가 기준`)를 제목 줄 .post-title-meta 의 공유 버튼 앞으로 옮긴다. 회색 기준 상자(data-report-stamp)가 없는 글이라 공유 버튼은 제목 줄에 그대로 남는다.
+   테마를 붙이기 전에는 본문 맨 위 작은 회색 줄로 보인다 */
+(function () {
+  'use strict';
+  var b = document.querySelector('.post-body [data-title-basis]'), meta = document.querySelector('.post-title .post-title-meta');
+  if (!b || !meta) return;
+  var s = document.createElement('span'); s.className = 'post-title-basis'; s.textContent = b.textContent.trim();
+  meta.insertBefore(s, meta.querySelector('.title-share'));
+  b.parentNode.removeChild(b);
+})();
+
 /* ============================================================ `함께 보는 페이지` 자리 (2026-11-10 사용자: 홈 · TOP 버튼 줄 아래로)
    렌더러는 본문 맨 끝에 [data-related] 를 둔다 — 이미 게시된 글까지 테마가 버튼 줄(+ 댓글 판) 아래로 옮긴다.
    본문 끝 구분선 판정(아래 .ends-text)보다 먼저 옮겨야 옮긴 뒤 본문 끝으로 정한다 */
