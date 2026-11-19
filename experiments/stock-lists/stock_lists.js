@@ -278,7 +278,7 @@
       var bx = W.querySelector('[data-sl-comp]'), cnt = {}, ks = [], n = rowsEl().length;
       rowsEl().forEach(function (x) { var k = secOf(x); if (!cnt[k]) { cnt[k] = 0; ks.push(k); } cnt[k]++; });
       ks.sort(function (a, b) { return cnt[b] - cnt[a]; }); if (cur && !cnt[cur]) cur = '';
-      if (!n) { bx.innerHTML = ''; return; }
+      if (ks.length < 2) { cur = ''; bx.innerHTML = ''; return; }   // 업종이 둘 이상일 때만 묶음 줄 — 하나뿐이면 `전체`와 같은 목록 (2026-11-19 사용자)
       function pill(k, t) { return '<button class="seg" type="button" data-comp="' + esc(k) + '" aria-selected="' + (cur === k) + '">' + t + '</button>'; }
       bx.innerHTML = '<div class="seg-row sl-joined">' + pill('', '전체') + ks.map(function (k) { return pill(k, esc(k)); }).join('') + '</div>';
     }
