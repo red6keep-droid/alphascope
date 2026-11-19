@@ -522,7 +522,7 @@ PAGE_CSS = ("<style>[data-sl-panel][hidden]{display:none !important;}"
             ".hm-c[aria-selected=\"true\"]{box-shadow:inset 0 0 0 1.5px var(--hm-fg);}"   # 고른 칸 = 칸 글자와 같은 방향 색 테두리 1.5 (2026-11-18 사용자 2안 · 굵기 1.5, 옛 검정 2)
             ".hm-c:active{filter:brightness(.94);}"
             ".cp-pills{margin:0 0 12px;}"
-            ".sl-title-day{flex:none;font-size:14px;line-height:20px;font-weight:400;color:#6B7280;white-space:nowrap;letter-spacing:0;}" + TOAST_CSS + "</style>")
+            ".sl-title-day{flex:none;font-size:13px;line-height:19px;font-weight:400;color:#6B7280;white-space:nowrap;letter-spacing:0;}" + TOAST_CSS + "</style>")
 
 PAGE_JS = """<script>(function(){
 document.querySelectorAll('[data-sl-pills]').forEach(function(row){var k=row.getAttribute('data-sl-pills');
