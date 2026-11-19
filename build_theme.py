@@ -411,6 +411,12 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
   font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* `TOP` 글자 16 → 14 (P517, 2026-11-11 사용자) — 화살표 원 22 그대로 */
 .post-nav-top:hover { color: var(--accent); }
+.as-star { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 22px; height: 22px; margin: 0 0 0 5px; position: relative; top: 1px; vertical-align: middle; padding: 0; border: 0; background: none; cursor: pointer; color: #9CA3AF; -webkit-tap-highlight-color: transparent; }   /* 종목 제목 옆 관심 종목 ☆ 22 · 이름과 5 · 아래선 = 글자 아래선(+1, 2026-11-19 사용자) — 담기면 채운 노랑 */
+.as-star svg { width: 22px; height: 22px; display: block; }
+.as-star[aria-pressed="true"] { color: #F5B400; }
+.as-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 60; display: flex; gap: 14px; align-items: center; padding: 12px 16px; background: #111; color: #fff; border-radius: 10px; font-size: 15px; line-height: 22px; box-shadow: 0 6px 20px rgba(0,0,0,.2); white-space: nowrap; }
+.as-toast a { color: #FCD34D; font-weight: 700; text-decoration: none; }
+@media (max-width: 900px) { .as-toast { bottom: calc(85px + env(safe-area-inset-bottom)); } }   /* 하단 메뉴 위 */
 .post-nav-top.is-short { visibility: hidden; }   /* 페이지가 화면 2배보다 짧으면 숨김 — 자리는 남긴다 (테마 JS, 2026-11-19 사용자) */
 .post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
 .post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
