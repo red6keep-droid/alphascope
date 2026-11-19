@@ -474,6 +474,8 @@ def us_pages(snap, live, fund):
                     + (R._section("구성", hold, tab="구성") if hold else "")
                     + R._section("기본 정보", tab_basic(sym, f, b0), tab="기본 정보")
                     + related(sym, live))
+            if sym in E.BY_SYM[sym][1].split():   # `인베스코 QQQ` 처럼 티커가 이름의 일부 — 테마가 제목 티커를 꼬리로 옮기지 않게 (2026-11-19 사용자: 제목 옆 티커는 작은 회색 꼬리로)
+                body = '<span data-title-keep-ticker="1" hidden></span>' + body
             pages[E.key(sym)] = (E.page_title(sym), RP.wrap(body))
         except Exception as e:  # noqa: BLE001 — 한 ETF 실패가 나머지를 막지 않게
             print(f"::warning::[etf] {sym} 페이지 실패: {e!r}")
