@@ -277,6 +277,8 @@ jobs:
         run: |
           python "$KR_DIR/home_feed_kr.py"
           mkdir -p deploy-home && cp "$KR_DIR/output/home/kr.json" deploy-home/kr.json
+          # 홈 실적 한 줄 자리 — 일정 없는 날 주요 뉴스 롤링의 한국 재료 (2026-11-19 사용자). 리포트 뉴스 탭과 같은 방송 이슈 제목, 같은 푸시에 얹는다
+          [ -f experiments/kr-market-report/output/kr_news.json ] && cp experiments/kr-market-report/output/kr_news.json deploy-home/kr-news.json || true
 
       # 알파스코프 시황 해설 묶음 briefing/{날짜}-pm.json (2026-11-16 사용자) — 수집기가 20:30 KST 에 읽어 해설을 쓴다.
       # 방금 만든 kr.json + 공개 파일만 묶는다(AI 0). 아래 kr.json 푸시에 얹는다 — gh-pages 쓰기 추가 없음. 실패하면 수집기는 방송만으로 쓴다
@@ -316,6 +318,7 @@ jobs:
           # 푸시 직후 퍼지는 jsDelivr 가 아직 옛 커밋을 보고 전날 파일을 다시 붙잡는다(11-05 stocks.json) — 잠깐 기다린다
           sleep 10
           curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr.json" || true
+          [ -f deploy-home/kr-news.json ] && curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr-news.json" || true
           [ -f deploy-home/search/kr.json ] && curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/search/kr.json" || true
           # 홈 카드는 옛 글로 연결되면 안 된다(11-10 미국 카드) — 내용 확인까지
           [ -f deploy-home/cards/kr-report.json ] && bash .github/scripts/jsd_purge.sh cards/kr-report.json deploy-home/cards/kr-report.json || true

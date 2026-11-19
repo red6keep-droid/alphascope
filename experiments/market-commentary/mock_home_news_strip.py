@@ -55,7 +55,7 @@ STRIP_JS = r"""
           a.href = '#news-list';
           a.addEventListener('click', function (e) { var n = document.querySelector('.news-section'); if (n) { e.preventDefault(); n.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
         }
-        a.appendChild(el('span', 'eb-tag', mk === 'kr' ? '방송' : 'News'));   /* 라벨 영어 `News` (2026-11-19 사용자) */
+        a.appendChild(el('span', 'eb-tag', 'News'));   /* 라벨 = 미국 · 한국 모두 영어 `News`, 한국 `방송` 라벨 따로 두지 않음 (2026-11-19 사용자) */
         a.appendChild(el('span', 'eb-headline', it.title_ko || it.title));
         track.appendChild(a);
         var d = el('button', 'eb-dot'); d.type = 'button'; d.setAttribute('aria-label', (i + 1) + '번째 뉴스');
@@ -77,11 +77,13 @@ def us_news():
 
 def build(src, mkt, news, kr_news):
     html = src
-    if STUDY_LINE not in html:
-        sys.exit("주식 공부 줄을 못 찾음 — 테마가 바뀌었나")
-    html = html.replace(STUDY_LINE, NEWS_LINE, 1)
-    i = html.index("  function setEvents(market, list) {")
-    html = html[:i] + STRIP_JS + html[i:]
+    themed = "function newsStrip(" in html   # 11-19 테마에 들어간 뒤 = 테마 코드 그대로(목업은 자료만 흉내)
+    if not themed:
+        if STUDY_LINE not in html:
+            sys.exit("주식 공부 줄을 못 찾음 — 테마가 바뀌었나")
+        html = html.replace(STUDY_LINE, NEWS_LINE, 1)
+        i = html.index("  function setEvents(market, list) {")
+        html = html[:i] + STRIP_JS + html[i:]
     # 미리보기 가짜 자료: 일정 비우기 · 뉴스 = 실제 news.json / 한국 방송 사본
     html = html.replace("    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;",
                         "    else if (u.indexOf('kr-news.json') >= 0) body = window.PV_KR_NEWS;\n    else if (u.indexOf('news.json') >= 0) body = window.PV_US_NEWS;", 1)
@@ -91,7 +93,8 @@ def build(src, mkt, news, kr_news):
     html = re.sub(r"(var PV_PICKS = )", r"\1", html)
     html = html.replace("window.PV_EVENT_HREF = function", "PV_PICKS.events = []; PV_KR.events = [];\n  window.PV_EVENT_HREF = function", 1)
     html = re.sub(r"<body([^>]*)>", lambda m: f"<body{m.group(1)} data-home-mkt=\"{mkt}\">", html, count=1)
-    html = html.replace("</head>", STRIP_CSS + "</head>", 1)
+    if not themed:
+        html = html.replace("</head>", STRIP_CSS + "</head>", 1)
     html = re.sub(r"<title>.*?</title>", f"<title>홈 · {'미국' if mkt == 'us' else '한국'} · 일정 없는 날 뉴스 줄</title>", html, count=1, flags=re.S)
     out = os.path.join(OUT, f"mock_home_news_strip_{mkt}.html")
     open(out, "w", encoding="utf-8").write(html)
