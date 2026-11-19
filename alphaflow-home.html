@@ -338,7 +338,7 @@ body.menu-open { overflow: hidden; }
   color: inherit;
 }
 /* 카드 머리: 어느 연재인지와 그 글의 날짜. 날짜는 피드에서 채운다. */
-.report-card-date { margin-left: auto; margin-right: 8px; font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) */
+.report-card-date { margin-left: auto; margin-right: 8px; font-family: var(--num); font-size: 13px; font-weight: 400; line-height: 19px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) · 14/20 → 13/19 = 증시 시황 기준 줄 글씨 (2026-11-19 사용자) */
 .report-block { display: flex; flex-direction: column; gap: 8px; }
 .report-chart { display: block; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px; }   /* 홈 미국 · 한국 증시 카드 그래프 (2026-10-21 사용자). 확대 없음 — 눌러도 카드처럼 상세 리포트로 (2026-11-10 사용자) */
 .report-chart[hidden] { display: none; }
@@ -1088,7 +1088,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 .home-cards .section-head .head-right .mkt-tabs { margin: 0; }
 .section-title { min-width: 0; }
 .live-note { font-size: 12px; color: var(--gray-500); }
-.day-note { font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 구획 제목 줄 오른쪽 `11월 11일 기준` — 홈 카드 날짜와 같은 모양 (2026-11-12 사용자: 종가 기준이니 날짜 표기, 한글로 통일) */
+.day-note { font-family: var(--num); font-size: 13px; font-weight: 400; line-height: 19px; color: #7A7A7A; white-space: nowrap; }   /* 구획 제목 줄 오른쪽 `11월 11일 기준` — 홈 카드 날짜와 같은 모양 (2026-11-12 사용자: 종가 기준이니 날짜 표기, 한글로 통일) */
 .live-note.on { color: #0E7490; font-weight: 600; }
 .live-note .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #0E7490; margin-right: 5px; vertical-align: 1px; animation: livepulse 1.6s ease-in-out infinite; }
 @keyframes livepulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
