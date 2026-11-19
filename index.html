@@ -3400,7 +3400,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         }
       /* 일정이 없는 날 = 주요 뉴스 줄 롤링 (2026-11-19 사용자 "실적 날짜가 없으면 주요 뉴스를 롤링, 미국도 같은 규칙").
        미국 = 홈 주요 뉴스와 같은 news.json · 한국 = 한국 증시 리포트 뉴스 탭과 같은 재료(한국 증시 방송 이슈, kr-news.json).
-       최근 24시간 · 최신 5줄. 줄을 누르면 미국 = 홈 아래 주요 뉴스로 · 한국 = 한국 증시 리포트(최신 글). 줄이 없으면 칸을 숨긴다 */
+       최근 24시간 · 최신 5줄. 줄을 누르면 요약이 있으면 홈 주요 뉴스와 같은 팝업, 없으면 미국 = 홈 아래 주요 뉴스로 · 한국 = 한국 증시 리포트(최신 글). 줄이 없으면 칸을 숨긴다 */
     var NEWS_STRIP_N = 5, KR_NEWS_URL = GH + 'kr-news.json', stripNewsCache = {};
     function newsStrip(box, track, dotBox) {
       var mk = HOME_MKT || 'us';
@@ -3417,7 +3417,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         track.textContent = ''; dotBox.textContent = '';
         items.forEach(function (it, i) {
           var a = el('a', 'eb-slide eb-news');
-          if (mk === 'kr') { a.href = '/search/label/' + encodeURIComponent('한국 증시 리포트'); a.setAttribute('data-latest', '한국 증시 리포트'); }
+          /* 누르면 홈 주요 뉴스와 같은 팝업(요약 줄 · 원문/영상 링크) — 요약이 두 줄 넘는 줄만 (2026-11-20 사용자 "다른 뉴스들처럼 팝업"). 한국 = 방송 요약 다섯 줄 · 영상 링크 */
+          var pop = (it.lines || []).length >= 2 ? { title: it.title_ko || it.title, lines: it.lines, link: it.link || it.url, source: it.source || it.channel, kind: it.kind || (mk === 'kr' ? 'media' : '') } : null;
+          if (pop) {
+            a.href = '#'; a.setAttribute('aria-haspopup', 'dialog');
+            a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); homeNewsPop(pop, a); });
+          }
+          else if (mk === 'kr') { a.href = '/search/label/' + encodeURIComponent('한국 증시 리포트'); a.setAttribute('data-latest', '한국 증시 리포트'); }
           else {
             a.href = '#news-list';
             a.addEventListener('click', function (e) { var n = document.querySelector('.news-section'); if (n) { e.preventDefault(); n.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });

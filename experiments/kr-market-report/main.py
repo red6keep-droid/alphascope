@@ -395,7 +395,9 @@ def _home_news(media):
     워크플로가 홈 파일 묶음(deploy-home)에 얹어 gh-pages kr-news.json 으로 — 푸시 추가 없음. 홈은 24시간 안 · 최신 5줄만 쓴다. AI · 수집 0"""
     try:
         items = [{"title": str(x.get("topic") or "").strip(), "channel": x.get("channel"), "at": str(x.get("published_at") or "")[:19],
-                  "dir": x.get("direction")} for x in media[:30] if str(x.get("topic") or "").strip()]
+                  "dir": x.get("direction"), "kind": "media", "source": x.get("channel"), "link": x.get("url"),
+                  "lines": [str(l).strip() for l in (x.get("lines") or []) if str(l).strip()]}   # 홈 팝업 = 방송 요약 줄 · 영상 링크 (2026-11-20 사용자 "다른 뉴스처럼 팝업")
+                 for x in media[:30] if str(x.get("topic") or "").strip()]
         with open(os.path.join(OUT, "kr_news.json"), "w", encoding="utf-8") as f:
             json.dump({"generated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "items": items}, f, ensure_ascii=False)
     except Exception as e:  # noqa: BLE001 — 홈 줄은 덤, 리포트를 막지 않는다
