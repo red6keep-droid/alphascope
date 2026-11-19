@@ -3240,7 +3240,26 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   window.addEventListener('resize', function () { if (!hasBar && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 */
 })();
 
-/* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
+/* ============================================================ 시황 해설 글 제목 줄 = ` : ` 앞(`11.19 증시 시황`)만 (2026-11-19 사용자 — 발행 글 제목 줄에 그날 주제까지 길게 나오던 것).
+         저장 제목 `11.19 증시 시황 : 그날 주제`는 검색 · 목록용으로 그대로, 그날 주제는 본문 머리글([data-headline])이 보여 준다. 목록 카드 제목은 그대로 */
+      (function () {
+        'use strict';
+        function trim() {
+          if (!document.querySelector('.post-body [data-headline]')) return;
+          var h = document.querySelector('.post-outer-container .post-title') || document.querySelector('.post-title');
+          if (!h) return;
+          /* 제목 줄을 고정 머리 · 공유 버튼으로 묶는 다른 스크립트가 먼저 돌았어도 되게 — ` : ` 가 든 글자 조각만 찾아 자른다 */
+          var w = document.createTreeWalker(h, NodeFilter.SHOW_TEXT, null), n;
+          while ((n = w.nextNode())) {
+            var i = n.nodeValue.indexOf(' : ');
+            if (i > 0) { n.nodeValue = n.nodeValue.slice(0, i).replace(/\s+$/, ''); return; }
+          }
+        }
+        trim();
+        document.addEventListener('DOMContentLoaded', trim);
+      })();
+
+      /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
    "엔비디아 NVDA 주가 2026년 10월 19일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양 · 오른쪽 정렬은 테마 CSS (2026-10-18 사용자: 날짜는 우측 정렬, 줄표 삭제).
    옛 글 "엔비디아 리포트 — 2026년 10월 11일" 도 줄표를 떼고 날짜만 감싼다. */
 (function () {
