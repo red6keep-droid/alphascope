@@ -1,7 +1,7 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-18T22:32:19Z",
+ "generated": "2026-11-19T08:17:12Z",
  "list_url": "https://alpha-scope.blogspot.com/p/forecast-list.html",
  "open": [
   {
@@ -58,7 +58,7 @@
    ],
    "event": "11.13 한국전력 급락",
    "market": "kr",
-   "lean": 0
+   "lean": -1
   }
  ],
  "done_count": {
