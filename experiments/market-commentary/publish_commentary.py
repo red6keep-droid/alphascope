@@ -33,6 +33,9 @@ KST = datetime.timezone(datetime.timedelta(hours=9))
 RAW = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages"
 OUT = os.path.join(BASE, "output", "publish")
 LATE = {"am": (12, 0), "pm": (23, 59)}   # 이 시각(KST) 뒤엔 그 편을 내지 않는다
+# 저녁 편은 그날 이 시각(KST) 뒤에 저장된 글만 낸다 (2026-11-20 사용자, News-doc 33절) — 한국장 마감 재료 없이 낮에 미리 써진 rev
+# (11-20 12:58 rev 1)가 17:00 · 21:00 에 나가지 않게. 수집기는 저장할 때마다 createdAt 을 서버 시각으로 새로 찍는다(= 그 rev 를 쓴 시각)
+PM_MIN_WRITTEN = (16, 30)
 
 # 검사 낱말 — 수집기도 거르지만 독자에게 나가기 전 마지막 한 번 (요청 문서 12절 Q13 · Q14, 메모 no-buy-sell-labels-computed)
 ADVICE = re.compile(r"(?:매수|매도|사|팔|담으)세요|(?:매수|매도|투자|손절)하(?:세요|십시오|라)|비중을? ?(?:늘리|줄이)(?:세요|십시오)|추천합니다|권합니다|권유합니다|지금이 기회")
@@ -164,7 +167,18 @@ def stage_prepare(a):
     if status != "ready":
         log(f"columns/{key} status {status!r} — 내지 않음" + (f" (이유: {col.get('reason')})" if col.get("reason") else ""))
         return 0
-    log(f"columns/{key} 읽음 — rev {col.get('rev')} · 모델 {col.get('model')} · 요청 {col.get('calls')}")
+    written = col.get("createdAt")
+    if isinstance(written, datetime.datetime) and written.tzinfo is None:
+        written = written.replace(tzinfo=datetime.timezone.utc)   # Firestore 시각은 UTC
+    log(f"columns/{key} 읽음 — rev {col.get('rev')} · 저장 {written.astimezone(KST):%m-%d %H:%M} KST" if isinstance(written, datetime.datetime)
+        else f"columns/{key} 읽음 — rev {col.get('rev')} · 저장 시각 없음")
+    log(f"  모델 {col.get('model')} · 요청 {col.get('calls')}")
+    if slot == "pm" and not a.column_json and os.environ.get("IS_SCHEDULED") == "true":   # 정시 · 예비만 — 사람이 손으로 돌릴 땐 막지 않음
+        h, mi = PM_MIN_WRITTEN
+        floor = datetime.datetime.fromisoformat(day).replace(hour=h, minute=mi, tzinfo=KST)
+        if not isinstance(written, datetime.datetime) or written < floor:
+            log(f"{key} — {h:02d}:{mi:02d} KST 전에 저장된 글(rev {col.get('rev')})이라 내지 않음 · 마감 뒤 수집기 1차를 기다림")
+            return 0
 
     briefing = (json.load(open(a.briefing_json, encoding="utf-8")) if a.briefing_json
                 else _get_json(f"{RAW}/briefing/{key}.json"))
