@@ -55,7 +55,7 @@ if __name__ == "__main__":
     for s in a["stocks"]:
         analyze_tabs.build(s, snap, extra)
         s["industry_us"] = industry_us.build(s["sym"], fred)
-    if not cached:   # 소송 일정 — 추적 사건 법원 문서 (P270, 실패해도 페이지는 만든다)
+    if not cached and os.environ.get("RADAR_COURT") != "0":   # 소송 일정 — 추적 사건 법원 문서 (P270, 실패해도 페이지는 만든다). 워크플로는 게시 뒤 단계에서(RADAR_COURT=0, 2026-11-20)
         import court
         try:
             court.fetch(a["day"])

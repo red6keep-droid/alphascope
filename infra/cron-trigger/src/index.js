@@ -57,6 +57,8 @@ const KST_JOBS = {
   "15:50": [{ workflow: "kr-stocks.yml", when: WEEKDAY, retry: { job: "kr-stocks", inputs: { scheduled: "true" } } }],
   // 간단 종목(853종목) — 미국 = 장 마감 뒤 아침(뉴스 06:40 → 화면 08:20, 정식 07:30 실행이 07:56~59 에 끝난 뒤), 한국 = 장 마감 뒤 17:40 (2026-11-15 사용자).
   // GitHub cron 도 그대로 — 둘 다 도는 날은 워크플로 check 잡이 '최근 6시간 안 같은 실행 성공' 을 보고 뒤 실행을 건너뛴다(뉴스 AI 두 번 X).
+  // 미국 종목 뉴스 먼저 분류 (2026-11-20 사용자) — 장 마감 뒤 엔비디아 실행이 남은 기사만 분류하게. 화~토(= 미국 월~금). 늦게 오면 워크플로가 건너뜀
+  "04:30": [{ workflow: "radar-news-early.yml", inputs: { scheduled: "true" }, when: KST_TUE_SAT }],
   "06:20": [{ workflow: "quick-news.yml", when: KST_TUE_SAT }],   // 옛 06:40 (2026-11-20 사용자 — 미국 실행 한 줄로, 엔비디아 실행과 lite 분당 한도 안 겹치게)
   "08:20": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "us" }, when: KST_TUE_SAT }],
   "16:40": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "kr" }, when: WEEKDAY }],   // 옛 17:40 (2026-11-20 사용자) — 15:50 한국 종목 뒤 이어 붙이기의 예비
@@ -125,6 +127,7 @@ const NAMES = {
   "kr-rss-probe.yml": "한국 간단 종목 뉴스 매체 시험",
   "home-ip.yml": "집 IP 받기 (미래에셋 · 버리)",
   "commentary.yml": "증시 시황 발행 (아침 · 저녁)",
+  "radar-news-early.yml": "미국 종목 뉴스 먼저 분류",
 };
 const WATCH_AFTER_MIN = 60;
 const RETRY_AGAIN_MIN = 170;   // 한 번 더 본다(18:40) — 다시 건 실행도 실패했으면 알림, 100분 때 아직 돌다가 그 뒤 끊겼으면 그때 다시 건다

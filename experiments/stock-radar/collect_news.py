@@ -31,6 +31,7 @@ NEWS = os.path.join(BASE, "data", "news.json")
 LEAD_CACHE = os.path.join(BASE, "data", "article_cache.json")   # 깃 · 상태 브랜치에 넣지 않는다 (기사 원문 조각)
 PER_STOCK = 15
 KEEP_DAYS = 8
+BUSY_STOP = 3   # 503 · 429 가 이만큼 연달아 오면 그날 수집 멈춤
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 
 
@@ -67,14 +68,21 @@ def collect(store):
     store = {k: v for k, v in store.items() if v["published_at"] >= cut}
     seen = {_key(v["title"]): k for k, v in store.items()}
     new = 0
+    busy = 0   # 연달아 받은 503 · 429 — 구글 뉴스가 이 IP 를 막은 날은 계속 막힌다(11-17: 503 64건, 수집 8분에 새 기사 0)
     for sym, *_ in U.CANDIDATES:
         if sym in U.REPORT_TYPE:
             continue   # 엔비디아는 엔비디아 리포트가 자기 수집 · 분류로 더 깊게 다룬다 — 여기서 또 모아 분류하지 않는다 (2026-10-25 사용자)
         time.sleep(1)   # 종목당 1회, 사이 1초 — 기획(알파-종목-리포트 341)대로. 49회 연속 요청을 피한다 (2026-10-21)
         try:
             items = fetch(sym)
+            busy = 0
         except Exception as e:   # noqa: BLE001
             print(f"[news] {sym} 받기 실패 : {e}")
+            code = getattr(getattr(e, "response", None), "status_code", None)
+            busy = busy + 1 if code in (429, 503) else 0
+            if busy >= BUSY_STOP:   # 그날은 멈추고 받은 것 · 지난 기사로 (2026-11-20 사용자 ⑥)
+                print(f"[news] 구글 뉴스가 {busy}번 연달아 거절({code}) — 오늘 수집은 여기서 멈춤")
+                break
             continue
         for x in items:
             k = _key(x["title"])
