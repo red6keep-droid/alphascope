@@ -56,7 +56,7 @@ const KST_JOBS = {
   // GitHub cron 도 그대로 — 둘 다 도는 날은 워크플로 check 잡이 '최근 6시간 안 같은 실행 성공' 을 보고 뒤 실행을 건너뛴다(뉴스 AI 두 번 X).
   "06:40": [{ workflow: "quick-news.yml", when: KST_TUE_SAT }],
   "08:20": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "us" }, when: KST_TUE_SAT }],
-  "17:40": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "kr" }, when: WEEKDAY }],
+  "16:40": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "kr" }, when: WEEKDAY }],   // 옛 17:40 (2026-11-20 사용자) — 15:50 한국 종목 뒤 이어 붙이기의 예비
   "13:00": [{ workflow: "nvda-report.yml" }],
   // 집 IP 받기(미래에셋 TIGER 구성 · 버리 RSS, 집 공유기 VPN) — 유튜브 수집(News-sub)이 VPN 을 안 쓰는 12~17시 (2026-11-17 사용자).
   // 공유기 L2TP 는 동시 접속을 못 버텨, 워크플로가 News-sub 실행이 도는 중이면 기다린다. 매일.
@@ -180,7 +180,18 @@ function dueAt(at) {
   ];
 }
 
-// 감시 — at 에 걸었어야 할 실행이 그 뒤로 있었나. 돌고 있으면 통과(긴 실행), 하나라도 성공이면 통과.
+// 본 일을 한 실행인가 — 확인 잡(when · check)만 돌고 본 잡이 건너뛴 실행은 GitHub 에 `성공`으로 남는다(예비 중복 · 이어 붙이기가 이미 함 · 수능일 게이트).
+// → 'ok'(본 잡 성공) · 'skipped'(확인 잡만) · 'unknown'(못 읽음 — 잘못 알리지 않게 통과로 본다)
+const GUARD_JOBS = new Set(["when", "check"]);
+async function realRun(r, env) {
+  const jr = await gh(`/actions/runs/${r.id}/jobs?per_page=50`, env.GITHUB_TOKEN);
+  if (jr.status !== 200) return "unknown";
+  return ((await jr.json()).jobs || []).some((x) => !GUARD_JOBS.has(x.name) && x.conclusion === "success") ? "ok" : "skipped";
+}
+
+// 감시 — at 에 걸었어야 할 실행이 그 뒤로 있었나. 돌고 있으면 통과(긴 실행), 본 잡이 성공한 실행이 있으면 통과.
+// 건너뛴 실행뿐이면 그 전 6시간 안에 같은 일을 한 실행(이어 붙이기 · 사람 실행 포함)이 있었나 본다 (2026-11-20 사용자 D — 옛: 건너뜀도 성공으로 봐 실패를 놓칠 수 있었다)
+const LOOKBACK_H = 6;
 async function watch(at, env) {
   const jobs = dueAt(at).filter((j) => j.watch !== false);
   const since = new Date(at.getTime() - 5 * 60 * 1000).toISOString().slice(0, 19) + "Z";
@@ -190,8 +201,21 @@ async function watch(at, env) {
     if (res.status !== 200) { lines.push(`• ${name(wf)} — 확인 못 함: ${reason(res.status)}`); continue; }
     const runs = ((await res.json()).workflow_runs || []).filter((r) => r.event === "workflow_dispatch" || r.event === "schedule");
     if (!runs.length) { lines.push(`• ${name(wf)} — ${WATCH_AFTER_MIN}분이 지나도 실행이 없습니다`); continue; }
-    if (runs.some((r) => r.status !== "completed" || r.conclusion === "success")) continue;
-    lines.push(`• ${name(wf)} — 실패했습니다\n🔗 ${runs[0].html_url}`);
+    if (runs.some((r) => r.status !== "completed")) continue;
+    const succ = runs.filter((r) => r.conclusion === "success").slice(0, 5);
+    if (!succ.length) { lines.push(`• ${name(wf)} — 실패했습니다\n🔗 ${runs[0].html_url}`); continue; }
+    let ok = false;
+    for (const r of succ) { if ((await realRun(r, env)) !== "skipped") { ok = true; break; } }
+    if (ok) continue;
+    const from = new Date(at.getTime() - LOOKBACK_H * 3600 * 1000).toISOString().slice(0, 19) + "Z";
+    const rb = await gh(`/actions/workflows/${wf}/runs?created=%3E%3D${from}&status=success&per_page=20`, env.GITHUB_TOKEN);
+    if (rb.status === 200) {
+      const seen = new Set(succ.map((r) => r.id));
+      for (const r of ((await rb.json()).workflow_runs || []).filter((x) => !seen.has(x.id)).slice(0, 5)) {
+        if ((await realRun(r, env)) !== "skipped") { ok = true; break; }
+      }
+    } else ok = true;   // 확인 못 하면 잘못 알리지 않는다
+    if (!ok) lines.push(`• ${name(wf)} — 실행은 본 일을 건너뛰었고, 그 전 ${LOOKBACK_H}시간 안에 같은 일을 한 실행도 없습니다\n🔗 ${succ[0].html_url}`);
   }
   if (lines.length) {
     const t = kstTime(at).hm;
