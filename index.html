@@ -3059,7 +3059,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           if (!sec) return;
           var img = sec.querySelector('img'), a = sec.querySelector('a'), pill = sec.querySelector('.cm-pill');
           var BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/commentary-';
-          var ED = { am: { at: 8 * 60 + 40, name: '미국 증시시황', lab: '증시 시황/미국 증시' }, pm: { at: 21 * 60, name: '한국 증시시황', lab: '증시 시황/한국 증시' } };
+          var ED = { am: { at: 8 * 60 + 40, name: '미국 증시시황', lab: '증시 시황/미국 증시' }, pm: { at: 17 * 60, name: '한국 증시시황', lab: '증시 시황/한국 증시' } };
           var slots = HOME_MKT === 'us' ? ['am'] : HOME_MKT === 'kr' ? ['pm'] : ['pm', 'am'];
           var kst = new Date(Date.now() + 9 * 3600000), mins = kst.getUTCHours() * 60 + kst.getUTCMinutes(), list = [];
           for (var d = 0; d < 4; d++) {
