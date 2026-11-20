@@ -121,7 +121,8 @@ jobs:
     needs: when
     if: needs.when.outputs.skip != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # 40 → 55 (2026-11-20 사용자): 그날 수집이 33.7분(평소 9분) 걸려 16:50 에 마지막 단계(캐시 지우기)에서 끊기고 forecast-kr 도 건너뜀
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v5
 
@@ -193,7 +194,8 @@ jobs:
 
       - name: Collect · analyze · render
         id: run_kr
-        run: python "$KR_DIR/main_kr.py"
+        # -u = 출력 즉시 찍기 (2026-11-20): 버퍼에 모였다 끝에 한꺼번에 찍혀 어느 줄에서 느렸는지 로그 시각으로 가를 수 없었다
+        run: python -u "$KR_DIR/main_kr.py"
 
       # 한국 증시 리포트 — 방금 받은 자료(data/*.json)로 그리기만. 날짜 붙은 코스피 그래프는 아래 gh-pages 에 남긴다(지난 글이 씀)
       - name: Render KR market report
