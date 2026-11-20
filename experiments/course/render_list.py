@@ -27,7 +27,7 @@ COURSES = [
         ("1", "실적이 좋다는데 왜 주가는 떨어질까?", "착각-01-실적.md"),
         ("2", "고점에 물리면 얼마나 오래 가나?", "착각-02-물림.md"),
         ("3", "크게 빠진 날 팔면, 언제 특히 비쌌나?", "착각-03-공포매도.md"),
-        ("4", "판 값에 다시 사려다 더 비싸게 사는 이유", None),
+        ("4", "판 값에 다시 사려다 더 비싸게 사는 이유", "착각-04-되사기.md"),   # 블로그 목록은 published.json 에 주소가 생길 때만 링크
         ("5", "분할 매수, 하단을 기다리면 더 싸게 모일까?", None),
         ("6", "과열이면 떨어진다고요?", None),
         ("7", "볼린저 하단에서 샀는데 왜 더 떨어질까?", None),
@@ -134,7 +134,9 @@ def main():
         sys.exit(0 if publish(urls, dry="--dry" in sys.argv) else 1)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     # 목업 안 편 링크 = 같은 폴더의 글 목업(지금 렌더러 기준) — 블로그 주소면 고치기 전 발행본이 열린다 (2026-11-20 사용자: 목업에서 확인)
-    urls = {k: f"mock_{os.path.splitext(k)[0]}.html" for k in urls}
+    # 발행 전 초안도 글 목업이 있으면 링크 (2026-11-20 사용자: 목업에서 빠지지 않게)
+    files = {f for c in COURSES for _, _, f in c[2] if f} | set(urls)
+    urls = {k: f"mock_{os.path.splitext(k)[0]}.html" for k in files if os.path.exists(os.path.join(HERE, "output", f"mock_{os.path.splitext(k)[0]}.html"))}
     path = dk.write_mock(page(urls), OUT, TITLE)
     if path:
         pg = open(path, encoding="utf-8").read().replace("</body>", RC.MOCK_HEAD_JS + "</body>", 1)
