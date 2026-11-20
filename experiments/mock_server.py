@@ -80,6 +80,7 @@ ARCHIVE_SEED = [
 PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
     ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
     ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
+    ("종목 새 카드 `발표 때 예상을 넘었나?` · `같은 업종 안 주가 순위는?`", "목업 확인 → 매출 예상 매일 기록 · 업종 순위 코드 (블로그에 아직 없음)", ["stock-radar/mock_earnmom_*"]),
     ("검색 `왜 떨어졌어` · 질문하기", "질문하기 버튼 꺼 둠 — 켤지 사용자 결정", ["site-search/mock_why_demo*"]),
 ]
 PLAN_NOMOCK = [   # 목업 파일이 이 PC 에 없는 발행 예정 기능 — 줄만 보인다
@@ -98,7 +99,7 @@ LIVE = [
     ("주요 인물 발언", ["people-radar/radar_mock.html"]), ("테마", ["theme-monitor/mock_theme-ai-capex.html"]),
     ("Hot Issue", ["issue_store/mock_issue_watch.html"]),
     ("증시 전망", ["issue_store/mock_forecast-list-eh.html", "issue_store/mock_forecast-2.html", "issue_store/mock_forecast-nvda-2026q3.html"]),
-    ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_착각-01-실적.html"]),
+    ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_착각-03-공포매도.html"]),   # 목록 + 가장 최근 편 (2026-11-20 3편 발행)
     ("검색", ["site-search/mock_search.html"]),
     ("디자인 기준표 (그래프 · 팝업 · 아이콘)", ["design-samples/*"]),
     ("운영 현황 (관리자)", ["ops-dashboard/*"]),
