@@ -392,11 +392,11 @@ jobs:
   # 위 한국 종목 잡(kr-state 수급 · 판정 기록 저장) 뒤에 돈다 — 한국 근거(kr_why)가 오늘 것을 읽는다. 그 잡이 실패해도 돈다(전날 kr-state 로).
   # 상태 = nvda-state(forecast/ · records/forecasts · hypotheses · why/). 잡 concurrency 를 nvda-report 와 같은 이름으로 — 같은 브랜치에 동시에 쓰지 않게 줄 세운다.
   # 게시 게이트 = 아침 전망과 같은 NVDA_PUBLISH. 수동 실행은 publish 를 켰을 때만 이 잡이 돈다(상태 브랜치에 시험 기록을 남기지 않게).
-  forecast-kr:
+  forecast-kr:   # 증시 전망 + 핫 이슈 낮 갱신 (2026-11-20 사용자 ①)
     needs: [when, kr-stocks]
     if: always() && needs.when.outputs.skip != 'true' && needs.kr-stocks.result != 'cancelled' && (github.event_name == 'schedule' || inputs.scheduled == true || inputs.publish == true)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25   # 20 → 25 (핫 이슈 단계 상한 8분)
     concurrency:
       group: nvda-report
       cancel-in-progress: false
@@ -485,6 +485,37 @@ jobs:
         if: steps.fc_deploy.outcome == 'success'
         continue-on-error: true
         run: bash .github/scripts/jsd_purge.sh hypo.json deploy-forecast/hypo.json || true
+
+      # 핫 이슈 — 한국 마감 뒤 한 번 더 (2026-11-20 사용자 ①: 한국 화면 핫 이슈가 13:02 판 그대로 다음 날 07:40 까지였다).
+      # 13:00 낮 갱신과 같은 일 = AI 없이(판정은 07:30 본 실행이 하루 한 번) 구글 뉴스 한국어 검색 6번 + 시세(코스피 마감 포함) → 이슈 페이지 바뀐 것만 · 홈 Hot Issue 카드(issues.json).
+      # 전망을 올린 뒤에 둔다(전망이 늦지 않게, 약 1분). 기록 · 캐시는 $STATE_DIR/records/issues → 아래 상태 저장. 실패해도 다른 단계는 그대로
+      - name: Issue watch pages (핫 이슈 · 한국 마감 뒤)
+        id: iw
+        if: "!cancelled() && steps.fc.outcome != 'skipped'"
+        continue-on-error: true
+        timeout-minutes: 8
+        run: |
+          python experiments/issue_store/issue_watch_daily.py --state "$STATE_DIR"
+          mkdir -p deploy-issue && cp experiments/issue_store/output/issue/issues.json deploy-issue/issues.json 2>/dev/null || true
+          if [ "$FC_PUBLISH" = "true" ]; then
+            python experiments/issue_store/publish_issue.py --state "$STATE_DIR"
+          else
+            python experiments/issue_store/publish_issue.py --state "$STATE_DIR" --dry
+          fi
+      - name: Deploy issues.json to gh-pages
+        id: iw_deploy
+        if: env.FC_PUBLISH == 'true' && steps.iw.outcome == 'success' && hashFiles('deploy-issue/issues.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-issue
+          publish_branch: gh-pages
+          keep_files: true
+      - name: Purge issues.json cache
+        if: steps.iw_deploy.outcome == 'success'
+        continue-on-error: true
+        run: bash .github/scripts/jsd_purge.sh issues.json deploy-issue/issues.json || true
 
       # 전망 판정까지 끝났으면 저장 — nvda-state 위에 이어 쌓기(force 없음). 받은 상태 전체를 그대로 다시 올리고 바뀐 전망 파일만 달라진다
       - name: Save state (nvda-state branch)
