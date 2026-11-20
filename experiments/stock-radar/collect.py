@@ -18,6 +18,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import price_source  # noqa: E402  — yfinance 예비 사슬 (2026-10-21)
 import etf_universe  # noqa: E402  — 회원 `내 종목` ETF, 가격만 (2026-11-12)
+import taxonomy  # noqa: E402  — 기록용 세부 업종 ETF 20개, 가격만 (2026-11-20 flow_records)
 
 SECTOR_ETFS = ("XLK", "XLF", "XLE", "XLV", "XLP", "XLY", "XLI", "XLB", "XLU", "XLRE", "XLC")   # NVDA 리포트 config.SECTOR_ETFS 와 같은 11개
 HIST_MAX_AGE_DAYS = 7
@@ -104,7 +105,7 @@ def run():
     syms = [c[0] for c in U.CANDIDATES]
     extra = sorted({U.BENCH, "^VIX", "SMH", *SECTOR_ETFS})
     peers = sorted({p for v in U.PEERS.values() for p in v} - set(syms))   # 함께 보는 회사 중 64종목 밖 — `함께 움직이는 종목은?` 오늘 등락 (2026-11-01 사용자 P263). 페이지는 만들지 않는다
-    etfs = sorted(set(etf_universe.US_SYMS) - set(syms) - set(extra) - set(peers))   # 맨 뒤 — 늦은 봉 예비(15개) 자리를 종목이 먼저 쓰게
+    etfs = sorted((set(etf_universe.US_SYMS) | set(taxonomy.RECORD_SUBS)) - set(syms) - set(extra) - set(peers))   # 세부 업종 ETF(2026-11-20 돈의 흐름 기록, 페이지 없음)도 같은 묶음 요청에 · 맨 뒤 — 늦은 봉 예비(15개) 자리를 종목이 먼저 쓰게
     try:   # ETF 비중 1위 종목 — ETF 페이지 `함께 움직이는 종목은?` 비교 선 (2026-11-14, 같은 묶음 요청에 얹음 · 페이지는 만들지 않는다)
         with open(os.path.join(BASE, "data", "etf_fund.json"), encoding="utf-8") as f:
             fund = json.load(f)

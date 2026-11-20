@@ -268,6 +268,19 @@ jobs:
             [ -f "experiments/stock-radar/data/$f" ] && cp "experiments/stock-radar/data/$f" "$STATE_DIR/radar/$f"
           done
 
+      # 돈이 어디로 가나 — 업종 11 · 세부 업종 20 · 시장의 하루 한 줄 기록 (experiments/flow_records.py, 2026-11-20 사용자 "스마트 머니 · 순환매 … 진행해줘").
+      # 화면 · AI 없음. 위 레이더가 받은 일봉만 읽고, 야후 ETF 순자산 32개만 새로 받는다(지난 값은 다시 못 받아 오늘부터 쌓는다).
+      # 장 마감 뒤 본 실행만(갱신 실행은 같은 날 봉). 기록 = $STATE_DIR/radar/records/flows/{연도}.jsonl — 아래 Save state 가 nvda-state 에 커밋. 실패해도 넘어간다
+      - name: Flow records (업종 · 세부 업종 돈의 흐름 기록)
+        if: needs.check.outputs.mode != 'refresh'
+        continue-on-error: true
+        run: |
+          if [ -f experiments/stock-radar/data/snapshot.json ]; then
+            python experiments/flow_records.py --state "$STATE_DIR/radar"
+          else
+            echo "::warning::레이더 일봉 파일 없음 — 오늘 돈의 흐름 기록 없음"
+          fi
+
       # 옛 엔비디아 날짜 글의 가격 그림(nvda-price-{day}.webp)을 gh-pages 에 올리던 단계 · 캐시 비우기는 2026-11-17 뺐다 —
       # 날짜 글은 11-01 끝나 아무 글도 그 그림을 안 쓰는데 하루 1장씩 gh-pages 에 쌓였다(사용자 "그림 단계만 먼저 빼줘"). 남은 그림은 30일 정리(image_prune.py)가 지운다.
 

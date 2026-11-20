@@ -31,6 +31,33 @@ SUB_INDUSTRIES = {   # 세부 업종 ETF → (이름, 속한 업종 ETF)
     "SMH": ("반도체", "XLK"),
 }
 
+# 기록용 세부 업종 (2026-11-20 사용자 "스마트 머니 · 떠오르는 업종 · 순환매 … 진행해줘") — 돈이 어디로 가나를 매일 쌓는 대상(experiments/flow_records.py).
+# 업종 11개로는 안 보이는 움직임(보안 · 소프트웨어 · 은행 · 바이오 …)을 대표 ETF 하나씩으로 본다. 고른 기준(Claude): 미국 상장 · 한 세부 업종만 담음 · 거래 많음 · 야후에서 가격과 순자산이 받아짐(11-20 확인).
+# **화면은 아직 SUB_INDUSTRIES(반도체 하나)만 읽는다** — 여기 늘려도 데일리 순위 표 · 종목 모아보기는 그대로. 화면에 올릴 때 SUB_INDUSTRIES 로 옮긴다.
+# 한 번 넣은 줄은 빼지 않는다(기록이 끊긴다). 유틸리티 · 부동산 · 필수 소비재 · 커뮤니케이션은 세부 업종 ETF 가 업종 ETF 와 거의 같이 움직여 두지 않았다.
+RECORD_SUBS = {   # 세부 업종 ETF → (이름, 속한 업종 ETF)
+    "SMH": ("반도체", "XLK"),
+    "IGV": ("소프트웨어", "XLK"),
+    "CIBR": ("사이버 보안", "XLK"),
+    "SKYY": ("클라우드", "XLK"),
+    "KBE": ("은행", "XLF"),
+    "KRE": ("지역 은행", "XLF"),
+    "KIE": ("보험", "XLF"),
+    "IAI": ("증권 · 거래소", "XLF"),
+    "XBI": ("바이오", "XLV"),
+    "IHI": ("의료 기기", "XLV"),
+    "IHE": ("제약", "XLV"),
+    "XOP": ("석유 · 가스 개발", "XLE"),
+    "OIH": ("유전 서비스", "XLE"),
+    "ITA": ("항공 우주 · 방산", "XLI"),
+    "IYT": ("운송", "XLI"),
+    "JETS": ("항공사", "XLI"),
+    "ITB": ("주택 건설", "XLY"),
+    "XRT": ("소매", "XLY"),
+    "GDX": ("금 채굴", "XLB"),
+    "XME": ("금속 · 광산", "XLB"),
+}
+
 THEMES = {   # 테마 키 → 이름 · 구성 종목 · 한 줄 풀이(독자용) — 구성은 이미 모으는 가격만(새 수집 없이)
     "hyperscaler": {
         "name": "하이퍼스케일러",
@@ -46,4 +73,6 @@ def sector_name(etf):
         return SECTORS[etf]
     if etf in SUB_INDUSTRIES:
         return SUB_INDUSTRIES[etf][0]
+    if etf in RECORD_SUBS:
+        return RECORD_SUBS[etf][0]
     return etf
