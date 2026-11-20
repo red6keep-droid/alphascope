@@ -19,7 +19,10 @@
   var indexP = null;
   function fetchJson(u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
   function fetchIndex() {
-    var got = INDEX_FILES.map(function (f) { return fetchJson(INDEX_BASE + f).catch(function () { return null; }); });
+    /* ?v=시간 — jsDelivr 가 브라우저에 7일(max-age=604800) 캐시를 주어, 한 번 연 사람은 일주일 옛 값을 봤다(2026-11-20 엔비디아 11.13 가격).
+       색인은 하루 2~3번 바뀌므로 한 시간 단위로 새로 받고, 그 시간 안에는 브라우저 캐시를 쓴다 */
+    var v = '?v=' + Math.floor(Date.now() / 3600000);
+    var got = INDEX_FILES.map(function (f) { return fetchJson(INDEX_BASE + f + v).catch(function () { return null; }); });
     return Promise.all(got).then(function (docs) {
       docs = docs.filter(Boolean);
       if (!docs.length) throw new Error('index');
