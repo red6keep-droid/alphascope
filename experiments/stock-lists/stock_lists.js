@@ -2,7 +2,8 @@
    본문(publish_stock_lists_page.py)에 탭 뼈대(h2 data-tab 여섯 개 + 빈 칸)가 있고, 테마가 페이지를 열 때 그 h2 로 탭을 만든다. 이 스크립트는 목록 파일을 받아 빈 칸을 채운다.
    - 나라 = 주소 ?m=us|kr(하단 메뉴가 붙임) → 고른 홈(as-home-mkt, 헤더 국기 스위치가 적음) → 미국. 페이지 안 나라 버튼 없음 (2026-11-17 사용자).
    - 목록 파일 = 간단 종목 실행이 매일 올리는 <시장>/_lists.json (build_lists.py). 읽는 순서 Cloudflare Pages → jsDelivr(quick-<시장> 브랜치) → GitHub 원본. 방문자 1명 = 요청 1번 · 압축 약 18KB.
-   - 목록은 탭 · 묶음마다 10개까지, 접기 없음(2026-11-17 사용자). 줄 전체 = 종목 페이지(테마의 [data-row-link] 장치).
+   - 목록은 탭 · 묶음마다 10개 펼침 + 나머지 전부 `n개 더 보기` 접기 (2026-11-20 사용자: 하락 12위 SK텔레콤 −13%가 시황엔 있고 여기선 잘려 안 보임.
+     옛 11-17 `10개까지, 접기 없음`은 CLAUDE.md `상위 n개만으로 버리지 않는다`와 어긋나 바꿈). 나머지 줄은 버튼을 누를 때 그린다(줄 수천 개를 처음부터 만들지 않게). 줄 전체 = 종목 페이지(테마의 [data-row-link] 장치).
    - 관심 탭 = 이 브라우저에 담은 종목(as-watch, 종목 페이지 제목 옆 ☆ · 검색해서 담기), 없으면 최근 본 종목(as-recent). 로그인 · 서버 없음 (2026-11-19 사용자).
    - 기준일 = 제목 줄 오른쪽(공유 버튼 앞).
    - 2026-11-18 목업 확정분(mock_stock_lists.py)을 옮김 (2026-11-19 사용자 "진행해"): 로고 ~ 이름 11 · 증감 17(삼각형 14) · 가격 = 증감 색 · 한국 보조 줄에 종목 코드 숫자 없음
@@ -79,11 +80,37 @@
       '<span style="font-size:15px;line-height:20px;color:' + dirCol(r.r) + ';">' + esc(price(r)) + '</span></span>';   // 증감 위 · 가격 아래 (2026-11-17 사용자 규칙)
     return '<span data-row-link="1" data-href="' + esc(href(r)) + '" style="' + ROW + (i ? SEP : 'padding-top:21px;') + '">' + left + right + '</span>';   // 테마 줄 장치가 data-href 로 이동
   }
+  var MORE = [];   // 접힌 나머지 줄 [items, render] — 버튼을 누를 때 그린다
+  var MORE_BTN = 'cursor:pointer;display:flex;width:100%;justify-content:center;align-items:center;gap:6px;padding:12px;margin:0;border:0;' + SEP +
+    'background:none;color:#111;font:inherit;font-size:14px;line-height:20px;font-weight:700;';   // = design_kit.FOLD_IN_CARD (카드 안 `n개 더 보기 ⌄`)
+  var CHEV = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;transition:transform .15s;"><path d="M4 6l4 4 4-4"/></svg>';
   function card(items, render) {
     if (!items.length) return '';
+    var more = '';
+    if (items.length > TOP) {
+      MORE.push([items, render]);
+      more = '<span data-sl-rest="' + (MORE.length - 1) + '" style="display:none;"></span>' +
+        '<button type="button" data-sl-more="' + (MORE.length - 1) + '" data-label="' + (items.length - TOP) + '개 더 보기" style="' + MORE_BTN + '"><span>' +
+        (items.length - TOP) + '개 더 보기</span>' + CHEV + '</button>';
+    }
     return '<div data-cards="1" style="margin:0 0 8px;"><span data-list="1" style="' + LIST + '">' +
-      items.slice(0, TOP).map(render).join('') + '</span></div>';
+      items.slice(0, TOP).map(render).join('') + more + '</span></div>';
   }
+  root.addEventListener('click', function (e) {   // n개 더 보기 ⌄ ↔ 접기 ⌃ — 펼친 줄은 버튼 위, 버튼은 늘 맨 아래
+    var b = e.target.closest && e.target.closest('[data-sl-more]');
+    if (!b) return;
+    var k = b.getAttribute('data-sl-more'), rest = b.parentNode.querySelector('[data-sl-rest="' + k + '"]');
+    if (!rest) return;
+    var open = rest.style.display === 'none';
+    if (open && !rest.innerHTML) {
+      var x = MORE[+k];
+      rest.innerHTML = x[0].slice(TOP).map(function (r, i) { return x[1](r, TOP + i); }).join('');
+    }
+    rest.style.display = open ? 'block' : 'none';
+    b.firstChild.textContent = open ? '접기' : b.getAttribute('data-label');
+    b.lastChild.style.transform = open ? 'rotate(180deg)' : '';
+    if (!open) { var top = b.closest('[data-cards]'); if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ block: 'start' }); }
+  });
   /* 묶음 줄 = 홈 `테마 종목` 아래 줄(#watch-tabs) 모양 — CSS 는 본문 <style> 의 .sl-joined */
   function pills(key, names) {
     return '<div class="seg-row sl-joined" role="tablist" data-sl-pills="' + key + '">' + names.map(function (n, i) {

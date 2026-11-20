@@ -195,6 +195,34 @@ def build_am(day_kst, report_input, data=None, hypo=None, news=None):
     }
 
 
+LISTS_URLS = ("https://alpha-scope.pages.dev/{m}/_lists.json",
+              "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@quick-{m}/{m}/_lists.json")
+SECTOR11 = {"기술", "커뮤니케이션", "경기 소비재", "필수 소비재", "헬스케어", "금융", "산업재", "소재", "에너지", "유틸리티", "부동산"}
+
+
+def read_lists_doc(m):
+    """종목 모아보기 목록 파일(간단 종목 실행이 매일 올림, build_lists.py) — 읽는 순서 = stock_lists.js 와 같다. 못 받으면 None."""
+    for url in LISTS_URLS:
+        doc = _get_json(url.format(m=m))
+        if doc and doc.get("rows"):
+            return doc
+    return None
+
+
+def sectors_from_lists(doc, day):
+    """업종 등락 = 종목 모아보기 `업종` 탭 지도와 같은 셈 (2026-11-20 사용자 "업종 숫자가 서로 다르다").
+    목록 파일의 그날 종목 전체(한국 약 350) · 같은 업종 분류(GICS 11) · 단순 평균(stock_lists.js heatmap avg).
+    옛 셈 = kr.json 업종 묶음의 대형주 1~3개 평균 → 커뮤니케이션이 SK텔레콤 하나에 끌려 −6.63%(업종 탭 −3.08%), 경기 소비재 = 현대차 · 기아 둘(−4.14%, 업종 탭 −1.44%).
+    목록 파일 날짜가 장 날짜와 다르면 None (부르는 쪽이 옛 셈으로). `기타`(분류 못 한 종목)는 업종이 아니라 뺀다."""
+    if not doc or not day or doc.get("d") != day:
+        return None
+    by = {}
+    for r in doc.get("rows") or []:
+        if r.get("r") is not None and r.get("s") in SECTOR11:
+            by.setdefault(r["s"], []).append(r["r"])
+    return [{"name": k, "chg_pct": _r(sum(v) / len(v)), "n": len(v)} for k, v in by.items()] or None
+
+
 def build_pm(day_kst, kr_path):
     kr = _load(kr_path, "kr.json") or {}
     hypo = _load(None, "hypo.json")
@@ -204,11 +232,15 @@ def build_pm(day_kst, kr_path):
     movers = sorted(({"name": s.get("name"), "ticker": s.get("s"), "chg_pct": _r(s.get("cp"))} for s in stocks),
                     key=lambda m: -abs(m["chg_pct"] or 0))
     by_sym = {s.get("s"): s for s in stocks}
-    sectors = []
-    for g in kr.get("sectors") or []:
-        cps = [by_sym[x]["cp"] for x in g.get("syms") or [] if x in by_sym and by_sym[x].get("cp") is not None]
-        if cps:
-            sectors.append({"name": g.get("sector"), "chg_pct": _r(sum(cps) / len(cps)), "n": len(cps)})
+    sectors = sectors_from_lists(read_lists_doc("kr"), kr.get("day"))
+    sectors_basis = "lists"
+    if not sectors:   # 목록 파일이 아직 그날 것이 아니면(간단 종목 실행 17:01 전) 옛 셈 — 발행기가 글을 낼 때 목록 파일로 다시 셈한다
+        sectors, sectors_basis = [], "kr-top"
+        for g in kr.get("sectors") or []:
+            cps = [by_sym[x]["cp"] for x in g.get("syms") or [] if x in by_sym and by_sym[x].get("cp") is not None]
+            if cps:
+                sectors.append({"name": g.get("sector"), "chg_pct": _r(sum(cps) / len(cps)), "n": len(cps)})
+    print(f"[묶음] 업종 {len(sectors)}개 — {'종목 모아보기 목록 전체 평균' if sectors_basis == 'lists' else '대형주 묶음 평균(목록 파일 아직 없음)'}")
     # dir = 주가 쪽 방향(Q10): 밤사이 미국 EWY 상승 · 외국인 순매수 · 원화 강세 = up. 시장 열기(거래대금)는 방향이 아니라 늘 flat
     signals = [{"name": f.get("title"), "text": f"{f.get('state')} — {f.get('sub')}",
                 "dir": "flat" if f.get("title") == "시장 열기" else KIND_DIR.get(f.get("kind"), "flat")}
@@ -220,7 +252,7 @@ def build_pm(day_kst, kr_path):
         # 코스피 · 코스닥 종가 = kr.json indices(2026-11-17, 수집기 14절 장 날짜 첫 줄) — 봉 날짜가 장 날짜와 같은 것만. 옛 kr.json 이면 빈 칸
         "close": {"indices": [{"name": i.get("name"), "close": _r(i.get("close")), "chg_pct": _r(i.get("chg_pct"))}
                               for i in kr.get("indices") or [] if i.get("day") == kr.get("day")],
-                  "sectors": sectors, "movers": movers,
+                  "sectors": sectors, "sectors_basis": sectors_basis, "movers": movers,
                   # 외국인 순매수(코스피 · 코스닥 · 20일 누적 · 연속) · 원/달러 · 국고채 3년 — kr.json figures 그대로, 칸마다 day(ECOS 는 하루 늦는 날이 있어 거르지 않고 날짜로 알림, 수집기 Q20)
                   "figures": kr.get("figures") or []},
         "signals": signals,

@@ -216,6 +216,16 @@ def stage_prepare(a):
         b = BN.banner_text(col)
         first = (b.get("titles") or [[]])[0] if b.get("titles") else (b.get("lines") or [])
         alt = "AI 생성 이미지 — " + " ".join(first) if first else alt
+    if slot == "pm" and briefing and (briefing.get("close") or {}).get("sectors_basis") != "lists":
+        # 묶음을 만들 때(16:40 무렵) 목록 파일이 아직 없었으면 지금 목록 파일로 업종 표를 다시 셈 — 업종 탭과 같은 숫자 (2026-11-20 사용자).
+        # 검사(check)는 위에서 수집기 글과 묶음 원래 숫자로 이미 끝났다. 여기선 화면 표만 바꾼다
+        import build_briefing as BB
+        secs = BB.sectors_from_lists(BB.read_lists_doc("kr"), briefing.get("trade_date"))
+        if secs:
+            briefing["close"]["sectors"], briefing["close"]["sectors_basis"] = secs, "lists"
+            log(f"업종 표 = 종목 모아보기 목록 전체 평균 ({len(secs)}개)")
+        else:
+            log("업종 표 = 묶음 그대로(대형주 묶음 평균) — 그날 목록 파일 없음")
     lists_live = True   # 종목 모아보기 페이지는 11-19 발행 뒤 늘 있다 — 확인 요청을 하지 않는다(GitHub 실행기에서는 블로그가 확인 요청에 정상 답을 주지 않아 '없음'으로 잘못 판단, 11-19 첫 발행)
     from story_render import MOOD_BASE
     mood_ok = _exists(MOOD_BASE + "market-up.webp")   # 장 분위기 아이콘이 gh-pages 에 아직 없으면 아이콘 없이 낸다(깨진 그림 대신)
