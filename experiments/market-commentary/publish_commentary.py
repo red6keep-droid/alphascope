@@ -151,8 +151,9 @@ def stage_prepare(a):
 
     if not a.column_json and os.environ.get("IS_SCHEDULED") == "true":   # 정시 · 예비 실행만 — 사람이 손으로 돌릴 땐 시각 상관없이 준비
         h, mi = LATE[slot]
-        now = kst_now()
-        if now.date().isoformat() == day and (now.hour, now.minute) > (h, mi):
+        # 그 편 날짜의 마감 시각과 비교 — 자정을 넘겨 온 예비(11-19 저녁 예비가 11-20 05:53)도 막는다
+        deadline = datetime.datetime.fromisoformat(day).replace(hour=h, minute=mi, tzinfo=KST)
+        if kst_now() > deadline:
             log(f"{key} — 발행 시각이 지나 내지 않음 ({h:02d}:{mi:02d} KST 뒤)")
             return 0
     col = json.load(open(a.column_json, encoding="utf-8")) if a.column_json else read_column(key)
