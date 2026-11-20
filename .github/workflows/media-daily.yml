@@ -34,9 +34,15 @@ on:
         type: boolean
         required: false
         default: false
+      records_only:
+        description: '방송 기록만 — AI 서술 · 한국장 칸 갱신 건너뜀 (11:55 예비 · 수집기 매드머니 알림 Q36, 2026-11-20)'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
+  actions: write   # 매드머니 새 회차를 기록하면 인물 발언 갱신(people-radar mode=madmoney)을 건다 (2026-11-20)
 
 concurrency:
   group: media-daily
@@ -110,12 +116,14 @@ jobs:
           echo "phase=$PHASE publish=$DO_PUBLISH edition=${EDITION:-today}"
           # 미디어 데일리 글은 2026-10-30 부터 내지 않는다 (사용자: 방송 이슈는 종목 페이지 · 미국 데일리 · 한국 증시 리포트로 전부 나눈다 — 상한 없이 48시간 · 5건 펼침 + 접기).
           # 파이프라인은 그림자로 계속 돌린다 — 기록(records/issues · verdicts, media-state)과 artifact 는 남긴다. 아래 '한국장 칸 갱신' 은 그대로 DO_PUBLISH 를 따른다.
-          python main.py --phase "$PHASE" --state output/state $ED_ARG
+          LLM_ARG=""
+          if [ "${{ inputs.records_only }}" = "true" ]; then LLM_ARG="--no-llm"; fi   # 글을 내지 않으므로 서술 AI 가 필요 없다
+          python main.py --phase "$PHASE" --state output/state $ED_ARG $LLM_ARG
 
       # 오늘 데일리 글의 한국장 탭 `한국장에 영향을 줄 만한 소식` 만 갱신 (2026-10-25 사용자) — 한국 아침 방송은 데일리(07:00)보다 늦게 올라온다.
       # 게시 실행일 때만 · 지난 날짜(edition 입력)는 건너뜀 · 실패해도 미디어 데일리는 그대로 (continue-on-error)
       - name: Update daily Korea news
-        if: env.DO_PUBLISH == 'true' && inputs.edition == ''
+        if: env.DO_PUBLISH == 'true' && inputs.edition == '' && inputs.records_only != true
         continue-on-error: true
         run: python experiments/daily-report/kr_news.py
 
@@ -137,6 +145,49 @@ jobs:
             COMMIT="$(git commit-tree "$TREE" -m "Update media-daily records [skip ci]")"
           fi
           git push state "$COMMIT:refs/heads/media-state"   # force 없음
+
+      # 그날(KST) 매드머니 회차를 이번 실행에서 처음 기록했으면 인물 발언 갱신을 건다 (2026-11-20 사용자: 그날 회차는 그날 글에).
+      # 매드머니는 KST 09:30 ~ 10:30 게시 → 10:15 · 11:55(예비) · 수집기 알림(News-doc 39절 Q36) 실행 가운데 처음 기록한 실행이 한 번 건다.
+      # 인물 발언 쪽도 오늘 아침 글이 없거나 이미 실렸으면 스스로 끝난다. GITHUB_TOKEN 으로 건 workflow_dispatch 는 새 실행을 만든다.
+      - name: Chain people-radar (Mad Money)
+        if: env.IS_SCHEDULED == 'true' && inputs.edition == '' && steps.run_media.outcome == 'success'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          Y="$(TZ=Asia/Seoul date +%Y)"
+          F="$STATE_DIR/records/issues/$Y.jsonl"
+          OLD="$(mktemp)"
+          git show "refs/remotes/state/media-state:$F" > "$OLD" 2>/dev/null || true
+          NEW_IDS="$(python - "$F" "$OLD" <<'PY'
+          import datetime, json, sys
+          kst = datetime.timezone(datetime.timedelta(hours=9))
+          today = datetime.datetime.now(kst).strftime("%Y-%m-%d")
+          def ids(text):
+              out = set()
+              for line in text.splitlines():
+                  try:
+                      r = json.loads(line)
+                  except ValueError:
+                      continue
+                  p = r.get("published") or ""
+                  if r.get("source") == "ytb" and r.get("channel") == "CNBC Mad Money" and p:
+                      d = datetime.datetime.strptime(p[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=datetime.timezone.utc).astimezone(kst)
+                      if d.strftime("%Y-%m-%d") == today:
+                          out.add(str(r.get("id")))
+              return out
+          def read(path):
+              try:
+                  return open(path, encoding="utf-8").read()
+              except OSError:
+                  return ""
+          print(len(ids(read(sys.argv[1])) - ids(read(sys.argv[2]))))
+          PY
+          )"
+          echo "오늘 매드머니 새 기록 ${NEW_IDS}줄"
+          if [ "${NEW_IDS:-0}" -gt 0 ]; then
+            gh workflow run people-radar.yml -R "${{ github.repository }}" --ref main -f mode=madmoney -f scheduled=true && echo "인물 발언 매드머니 갱신 걸음"
+          fi
 
       - name: Upload report artifact
         if: always()

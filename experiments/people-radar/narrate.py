@@ -183,15 +183,24 @@ def translate_subtopics(radar, pool):
     return cache
 
 
-def narrate(radar_path=None, out_path=None):
+def narrate(radar_path=None, out_path=None, reuse=None):
+    """reuse = 앞 실행의 narrative.json — 그 카드(신호 id 같음)는 다시 쓰지 않고, 새 신호만 AI 로 (매드머니 갱신, 2026-11-20)."""
     radar_path = radar_path or os.path.join(config.OUTPUT_DIR, "radar.json")
     out_path = out_path or os.path.join(config.OUTPUT_DIR, "narrative.json")
     with open(radar_path, encoding="utf-8") as f:
         radar = json.load(f)
-    src = _source(radar)
+    src = _source(radar) if not reuse else [x for x in _source(radar) if x["id"] not in (reuse.get("cards") or {})]
+    kept = {k: v for k, v in ((reuse or {}).get("cards") or {}).items()}
     if not src:
+        if kept:
+            with open(out_path, "w", encoding="utf-8") as f:
+                json.dump(reuse, f, ensure_ascii=False, indent=1)
+            print(f"[narrate] 새 신호 없음 — 앞 실행 카드 {len(kept)}개 그대로")
+            return reuse
         print("[narrate] 신호 0개 — 서술 생략")
         return None
+    if kept:
+        print(f"[narrate] 앞 실행 카드 {len(kept)}개 그대로 · 새 신호 {len(src)}개만 서술")
     pool = LLMPool(config.NARRATE_CHAIN, label="people-narrate", skip_when_day_out=config.SKIP_WHEN_DAY_OUT)
     got = {}
     for i in range(0, len(src), NARRATE_BATCH):
@@ -201,7 +210,7 @@ def narrate(radar_path=None, out_path=None):
                                           validate=lambda v, c=chunk: _validate(v, c)))
         except RuntimeError as e:
             print(f"[narrate] 묶음 {i // NARRATE_BATCH + 1} 실패: {str(e)[:160]}")
-    if not got:
+    if not got and not kept:
         print("[narrate] 실패 — 카드는 원문 제목으로")
         return None
     rest = [x for x in src if x["id"] not in got]
@@ -211,11 +220,11 @@ def narrate(radar_path=None, out_path=None):
                                           validate=lambda v: _validate(v, rest, min_ratio=0.01)))
         except RuntimeError as e:
             print(f"[narrate] 다시 쓰기 실패 {len(rest)}건 — 원문 제목으로: {str(e)[:120]}")
-    out = {"model": pool.last_model, "cards": got}
+    out = {"model": pool.last_model or (reuse or {}).get("model"), "cards": {**kept, **got}}
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
     translate_subtopics(radar, pool)
-    print(f"[narrate] 카드 {len(got)}/{len(src)} · {pool.last_model} → {out_path} · {usage_line()}")
+    print(f"[narrate] 카드 {len(got)}/{len(src)}" + (f" (+ 앞 실행 {len(kept)})" if kept else "") + f" · {pool.last_model} → {out_path} · {usage_line()}")
     return out
 
 

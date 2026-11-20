@@ -24,7 +24,8 @@ import prices
 
 RELEVANCE_EVENT_MIN = 2   # trump-trend 와 같다
 WINDOW_HOURS = 24
-MADMONEY_WINDOW_HOURS = 40   # 매드머니(크레이머)는 하루 전 방송이 들어온다 — 미국 동부 18시 방송 · 유튜브 게시가 다음 날 KST 08시 실행 때 24시간을 막 넘기는 날이 있다 (2026-11-11 사용자 A안)
+# 매드머니(크레이머) = **그날(KST) 올라온 회차만** (2026-11-20 사용자: 그날 회차는 그날 글에). 뉴욕 18시 방송 → 유튜브 KST 09:30 ~ 10:30 게시라
+# 08:00 아침 글엔 없고, 방송 분배가 기록한 뒤 `main.py --madmoney-only` 갱신이 같은 글에 붙인다. 어제 회차는 어제 글에 이미 실렸다 (옛 11-11 A안 40시간 창 폐지)
 TREND_DAYS = 7
 
 
@@ -40,11 +41,21 @@ def _ago(**kw):
     return (_now() - datetime.timedelta(**kw)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def _labeled(conn, since, until=None):
-    q = """SELECT * FROM statements WHERE analyzed_at IS NOT NULL AND noise_reason IS NULL
-             AND ai_market_relevance >= ? AND (published_at >= ? OR (collector = 'madmoney' AND published_at >= ?))"""
-    wide = (datetime.datetime.strptime(since, "%Y-%m-%dT%H:%M:%SZ") - datetime.timedelta(hours=MADMONEY_WINDOW_HOURS - WINDOW_HOURS)).strftime("%Y-%m-%dT%H:%M:%SZ")
-    args = [RELEVANCE_EVENT_MIN, since, wide if until is None else since]
+def _kst_midnight():
+    """기준 시각(_now)의 한국 날짜 0시를 UTC 문자열로."""
+    k = _now().astimezone(datetime.timezone(datetime.timedelta(hours=9)))
+    return (k.replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(hours=9)).replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _labeled(conn, since, until=None, today=False):
+    """since ~ until 의 분류된 발언. today(오늘 글 창)면 매드머니만 since 대신 기준 시각의 한국 날짜 0시부터 — 그날 회차만."""
+    q = """SELECT * FROM statements WHERE analyzed_at IS NOT NULL AND noise_reason IS NULL AND ai_market_relevance >= ?"""
+    if today:
+        q += " AND ((collector != 'madmoney' AND published_at >= ?) OR (collector = 'madmoney' AND published_at >= ?))"
+        args = [RELEVANCE_EVENT_MIN, since, _kst_midnight()]
+    else:
+        q += " AND published_at >= ?"
+        args = [RELEVANCE_EVENT_MIN, since]
     if until:
         q += " AND published_at < ?"
         args.append(until)
@@ -405,13 +416,13 @@ def market_context():
 
 
 def build(conn, path=None):
-    signals = build_signals(_labeled(conn, _ago(hours=WINDOW_HOURS)))
+    signals = build_signals(_labeled(conn, _ago(hours=WINDOW_HOURS), today=True))
     people = by_person(signals)
     pend = conn.execute("""SELECT COUNT(*) FROM statements WHERE published_at >= ? AND noise_reason IS NULL AND analyzed_at IS NULL
                              AND (source_kind='primary' OR (group_id=id AND is_statement=1 AND dup_of_primary IS NULL))""",
                         (_ago(hours=WINDOW_HOURS),)).fetchone()[0]
     out = {
-        "generated_at": db.now_iso(), "window_hours": WINDOW_HOURS,
+        "generated_at": _now().strftime("%Y-%m-%dT%H:%M:%SZ"), "window_hours": WINDOW_HOURS,   # 기준 시각 — 매드머니 갱신(PEOPLE_NOW = 아침 기준)도 아침 값을 그대로 이어 쓴다
         "event_count": len(signals), "people_count": len(people),
         "only_reports": bool(signals) and all(s["source_kind"] == "secondary" for s in signals),
         "pending": pend,
