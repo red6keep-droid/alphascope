@@ -151,16 +151,24 @@ def table(lines, links, top=30):
     rows = [[c.strip() for c in ln.strip().strip("|").split("|")] for ln in lines if not re.match(r"^\s*\|?\s*-{3}", ln)]
     head, body = rows[0], rows[1:]
     role = [None if k == 0 else COL_ROLE.get(re.sub(r"[*`]", "", h).strip()) for k, h in enumerate(head)]
+    # 폰에서 넘겨 보기 (2026-11-20 사용자: "표는 넘겨 보기로"): 첫 칸(행 이름)은 왼쪽에 고정(sticky) · 칸 4개 이상이면 폭 좁을 때만 `옆으로 넘겨 보기 ›` 안내
+    stick = lambda bg: f"position:sticky;left:0;z-index:1;background:{bg};box-shadow:1px 0 0 #E2E8F0;"
     th = "".join(f'<th style="padding:{TABLE["head_pad"]};background:{TABLE["head_bg"]};border-bottom:{TABLE["head_line"]};text-align:{"left" if k == 0 else "right"};white-space:nowrap;'
+                 f'{stick(TABLE["head_bg"]) if k == 0 else ""}'
                  f'font-size:13px;line-height:18px;font-weight:700;color:{ROLE_STYLE[role[k]][2]};">{inline(h, links)}</th>' for k, h in enumerate(head))
     td = lambda k, c: (f'<td style="padding:{TABLE["pad"]};border-bottom:{TABLE["row_line"]};white-space:nowrap;text-align:{"left" if k == 0 else "right"};'
-                       + ("font-weight:600;color:#111;" if k == 0 else (f"background:{ROLE_STYLE[role[k]][0]};" if ROLE_STYLE[role[k]][0] else "") + ROLE_STYLE[role[k]][1])
+                       + ("font-weight:600;color:#111;" + stick("#fff") if k == 0 else (f"background:{ROLE_STYLE[role[k]][0]};" if ROLE_STYLE[role[k]][0] else "") + ROLE_STYLE[role[k]][1])
                        + f'">{inline(c, links)}</td>')
     trs = "".join("<tr>" + "".join(td(k, c) for k, c in enumerate(r)) + "</tr>" for r in body)
-    # display:table — 테마가 글 안 표를 display:block 으로 바꿔 칸이 폭을 채우지 못한다(오른쪽이 비던 까닭). 좁으면 표만 가로 스크롤
+    hint = ""
+    if len(head) >= 4:
+        hint = ('<style>@media (min-width:600px){[data-swipe-hint]{display:none!important}}</style>'
+                f'<div data-swipe-hint="1" style="margin:0 0 4px;text-align:right;font-size:12px;line-height:16px;color:{dk.MUTED};">옆으로 넘겨 보기 ›</div>')
+    # display:table — 테마가 글 안 표를 display:block 으로 바꿔 칸이 폭을 채우지 못한다(오른쪽이 비던 까닭)
     # 표 영역 ↔ 본문 글 사이 30px (2026-11-20 사용자: 20 → 30). 위에 표 제목(※ 작은 굵은 글씨)이 있으면 위 여백은 제목이 가짐
-    return dk.tint(f'<div data-course-table="1" style="overflow-x:auto;margin:{top}px 0 30px;"><table style="display:table;border-collapse:collapse;width:100%;min-width:100%;margin:0;'
-                   f'font-size:17px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div>")
+    return dk.tint(f'<div data-course-table="1" style="margin:{top}px 0 30px;">{hint}<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">'
+                   '<table style="display:table;border-collapse:separate;border-spacing:0;width:100%;min-width:100%;margin:0;'
+                   f'font-size:17px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div></div>")
 
 
 CHART_COLORS = [dk.CHART_MAIN, dk.CHART_CMP, dk.CHART_SERIES[1]]   # 2026-11-14 그래프 통일: 그래프 색 표 — 신호 쪽 주황 · 비교 기준(아무 날) 회색 · 셋째 청록 (옛 #F59E0B · #0F766E · #9AD1C8). 빨강 · 파랑은 안 씀(오름 · 내림 색)
