@@ -49,7 +49,8 @@ const KST_JOBS = {
   "10:15": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "2" }, when: WEEKDAY }],
   // 한국 종목 페이지 · 한국 증시 리포트 (2026-10-27) — 한국장 마감 15:30 뒤. GitHub cron(07:10 UTC)이 10-26 에 7시간 늦었다.
   // 둘 다 도는 날은 concurrency 로 줄 서고, 뒤 실행은 페이지 해시 같음 · 리포트 이미 게시됨으로 쓰지 않는다. 휴장일은 fresh.txt 가 막는다.
-  "16:10": [{ workflow: "kr-stocks.yml", when: WEEKDAY }],
+  // 15:50 (2026-11-20 사용자, 옛 16:10): 마감 15:30 + 야후 지연 시세 20분. 워크플로 맨 앞 wait_close.py 가 종가 확정을 보고 늦으면 16:10 까지 기다린다
+  "15:50": [{ workflow: "kr-stocks.yml", when: WEEKDAY }],
   // 간단 종목(853종목) — 미국 = 장 마감 뒤 아침(뉴스 06:40 → 화면 08:20, 정식 07:30 실행이 07:56~59 에 끝난 뒤), 한국 = 장 마감 뒤 17:40 (2026-11-15 사용자).
   // GitHub cron 도 그대로 — 둘 다 도는 날은 워크플로 check 잡이 '최근 6시간 안 같은 실행 성공' 을 보고 뒤 실행을 건너뛴다(뉴스 AI 두 번 X).
   "06:40": [{ workflow: "quick-news.yml", when: KST_TUE_SAT }],
