@@ -2,8 +2,8 @@
 
 매드머니 자막은 유튜브 수집기 → 방송 분배(media-daily, 평일 KST 10:15)가 이슈 · 방향 · 종목 · 이슈 코드를 붙여
 우리 방송 기록(상태 저장소 media-state, records/issues, source=ytb)에 쌓는다. 여기서는 그 기록을 읽기만 한다 — AI 0, 구글 뉴스 0.
-- 인물 발언은 KST 08:00 에 돈다. 그 시각엔 전날 밤(미국 동부 18시 = KST 08시) 방송이 아직 없어 **하루 전 방송**이 들어간다 (사용자 A안).
-  그래서 집계 창을 매드머니만 MADMONEY_WINDOW_HOURS 로 넓힌다 (aggregate._labeled).
+- 인물 발언은 KST 08:00 에 돈다. 그 시각엔 그날 회차(미국 동부 18시 방송 → 유튜브 KST 09:30 ~ 10:30)가 아직 없다.
+  2026-11-20 사용자: 그날 회차는 그날 글에 — 방송 분배가 기록하면 `main.py --madmoney-only` 가 같은 글에 붙인다. 집계 창은 그날(KST) 회차만 (aggregate._labeled today).
 - 영상 한 편 × 이슈 한 줄 = 발언 한 행. 라벨은 방송 기록 것을 그대로 옮긴다 (트럼프 Truth Social 이 trump-state 라벨을 쓰는 것과 같은 방식).
 """
 

@@ -257,7 +257,8 @@ def _insert(conn, rows, since):
     return new
 
 
-def collect(conn, only=None):
+def collect(conn, only=None, sources=None):
+    """only = 인물 키 집합, sources = 소스 이름 집합(예: {"madmoney"} — 매드머니 갱신은 구글 뉴스를 다시 받지 않는다, 2026-11-20)."""
     since = (datetime.datetime.now(datetime.timezone.utc)
              - datetime.timedelta(hours=config.COLLECT_SINCE_HOURS)).strftime("%Y-%m-%dT%H:%M:%SZ")
     summary = []   # (인물, 소스, 받은 수, 창 안, 신규 | 오류)
@@ -268,6 +269,8 @@ def collect(conn, only=None):
         if p.get("news"):
             jobs.append(("google_news", lambda q=p["news"]: c_google_news(key, q)))
         for name, job in jobs:
+            if sources and name not in sources:
+                continue
             try:
                 rows = job()
             except Exception as e:  # noqa: BLE001
