@@ -183,7 +183,7 @@ def table(lines, links, top=30, title=""):
                        + ("font-weight:600;color:#111;" + stick("#fff") if k == 0 else (f"background:{ROLE_STYLE[role[k]][0]};" if ROLE_STYLE[role[k]][0] else "") + ROLE_STYLE[role[k]][1])
                        + f'">{inline(c, links)}</td>')
     trs = "".join("<tr>" + "".join(td(k, c) for k, c in enumerate(r)) + "</tr>" for r in body)
-    swipe = len(head) >= 4
+    swipe = True   # 칸 수와 상관없이 — 화면보다 넓을 때만 안내 · 그림자가 보인다(TABLE_JS), 3칸 표도 작은 폰에서 넘치면 같게 (2026-11-20 사용자)
     hint = (f'<span data-swipe-hint="1" style="{SWIPE_HINT}">옆으로 넘겨 보기 ›</span>' if swipe else "")
     # 표 제목 · 넘겨 보기 = 한 줄(제목 왼쪽 · 안내 오른쪽), 한 줄에 안 들어가면 안내가 윗줄로(wrap-reverse) (2026-11-20 사용자)
     cap = ""
@@ -197,7 +197,7 @@ def table(lines, links, top=30, title=""):
     return dk.tint(f'<div data-course-table="1" style="margin:{30 if title else top}px 0 30px;">{css}{cap}<div style="position:relative;">'
                    f'<div data-tscroll="1" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">'
                    '<table style="display:table;border-collapse:separate;border-spacing:0;width:100%;min-width:100%;margin:0;'
-                   f'font-size:17px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div>{shade}</div></div>")
+                   f'font-size:16px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div>{shade}</div></div>")
 
 
 CHART_COLORS = [dk.CHART_MAIN, dk.CHART_CMP, dk.CHART_SERIES[1]]   # 2026-11-14 그래프 통일: 그래프 색 표 — 신호 쪽 주황 · 비교 기준(아무 날) 회색 · 셋째 청록 (옛 #F59E0B · #0F766E · #9AD1C8). 빨강 · 파랑은 안 씀(오름 · 내림 색)
