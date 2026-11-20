@@ -83,7 +83,7 @@ jobs:
   # 수능일 Worker (2026-11-17): Worker 실행(15:50)은 schedule 문자열이 없어 위 게이트를 지나 마감(16:30) 전에 돌 뻔했다 → 16:50 KST 까지 기다린 뒤 돈다.
   when:
     runs-on: ubuntu-latest
-    timeout-minutes: 75   # 수능일 Worker 실행이 15:50 → 16:50 을 기다린다
+    timeout-minutes: 90   # 수능일 Worker 실행이 15:50 → 16:50 대기 + 종가 확인 최대 20분
     outputs:
       skip: ${{ steps.exam.outputs.skip == 'true' || steps.dup.outputs.skip == 'true' }}
     steps:
@@ -91,6 +91,7 @@ jobs:
         with:
           sparse-checkout: |
             experiments/kr-stocks/universe_kr.py
+            experiments/kr-stocks/wait_close.py
             .github/scripts/run_guard.py
           sparse-checkout-cone-mode: false
       - id: exam
@@ -116,6 +117,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SCHEDULE: ${{ github.event.schedule }}
         run: python3 .github/scripts/run_guard.py --workflow kr-stocks.yml --job kr-stocks
+      # 종가 확정 확인 (2026-11-20 사용자): 15:50 시작 — 야후 지연 시세에 오늘 마감(15:30) 거래가 떴나 보고, 아직이면 2분마다 16:10 까지.
+      # 본 잡이 아니라 여기서 기다린다 — 본 잡 시간 제한 55분은 수집 · 게시에만 (11-20 수집 34분 + 게시 7분 날 대기 20분까지 넣으면 61분 → 끊김).
+      # 정시 실행만(수동 · 다시 돌리기는 이미 늦은 시각이라 바로). 휴장일은 기다리지 않는다. 실패해도 본 잡은 돈다
+      - name: Wait for KR close (야후 종가 확정)
+        if: env.IS_SCHEDULED == 'true' && steps.exam.outputs.skip != 'true' && steps.dup.outputs.skip != 'true'
+        continue-on-error: true
+        timeout-minutes: 25
+        run: python3 experiments/kr-stocks/wait_close.py
 
   kr-stocks:
     needs: when
@@ -125,14 +134,6 @@ jobs:
     timeout-minutes: 55
     steps:
       - uses: actions/checkout@v5
-
-      # 종가 확정 확인 (2026-11-20 사용자): 15:50 시작 — 야후 지연 시세에 오늘 마감(15:30) 거래가 떴나 보고, 아직이면 2분마다 16:10 까지.
-      # 정시 실행만(수동 · 다시 돌리기는 이미 늦은 시각이라 바로). 휴장일은 기다리지 않는다. 실패해도 수집은 한다
-      - name: Wait for KR close (야후 종가 확정)
-        if: env.IS_SCHEDULED == 'true'
-        continue-on-error: true
-        timeout-minutes: 25
-        run: python3 experiments/kr-stocks/wait_close.py
 
       # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
       - name: State repo (private alphascope-state)
