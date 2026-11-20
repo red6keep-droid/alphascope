@@ -15,6 +15,7 @@ import argparse
 import json
 import os
 import sys
+import urllib.request
 from urllib.parse import urlparse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -67,6 +68,44 @@ def themes(m):
     else:
         g = [[n.replace(" · ", "·"), list(syms)] for n, syms in UK.WATCH]
     return [[n, [s.split(".")[0] for s in syms]] for n, syms in g]
+
+
+DATA_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/data.json"   # 미국 데일리 실행(07:30)이 올리는 지수 · 대형주 · 업종 ETF
+
+
+def _get(url):
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "alpha-scope/lists"}), timeout=20) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except Exception as e:  # noqa: BLE001
+        print(f"[lists] 못 받음 {url.rsplit('/', 1)[-1]}: {e}")
+        return None
+
+
+def sector_etf(day, data=None):
+    """미국 업종 11개 = 섹터 ETF(XLK · XLF …) 등락 {업종 이름: %} — 증시 시황 아침 편 업종 줄(build_briefing.build_am)과 같은 값 (2026-11-20 사용자).
+    업종 탭 지도 색 · 숫자가 이것을 쓴다(옛 = 종목 단순 평균 → 11-19 기술 −1.50 · 시황 −2.75). 장 날짜가 목록과 다르거나 못 받으면 {} (화면은 단순 평균)."""
+    names = {n.replace(" ", ""): n for n in SECTOR_NAMES}   # data.json `경기소비재` → 목록 `경기 소비재`
+    if data is None and day:
+        # 먼저 시황 아침 편 묶음(briefing/{미국 장 다음 날}-am.json) — 시황 업종 줄 그 숫자. data.json 은 묶음 뒤에도 고쳐져(11-20 10:49) 0.01 씩 어긋난다
+        import datetime
+        key = (datetime.date.fromisoformat(day) + datetime.timedelta(days=1)).isoformat()   # 금요일 장 → 토요일 묶음(토요일 실행이 만든다)
+        br = _get(DATA_URL.replace("data.json", f"briefing/{key}-am.json"))
+        if br and br.get("trade_date") == day and (br.get("close") or {}).get("sectors"):
+            out = {names[x["name"].replace(" ", "")]: x["chg_pct"] for x in br["close"]["sectors"]
+                   if x.get("chg_pct") is not None and (x.get("name") or "").replace(" ", "") in names}
+            if out:
+                print(f"[lists] 업종 ETF = 시황 묶음 {key}-am ({len(out)}개)")
+                return out
+    if data is None:
+        data = _get(DATA_URL)
+        if not data:
+            return {}
+    if not day or data.get("trade_date") != day:
+        print(f"[lists] data.json 날짜 {data.get('trade_date')} ≠ 목록 {day} — 업종 ETF 없이")
+        return {}
+    return {names[s["name"].replace(" ", "")]: _r(s["cp"]) for s in data.get("sectors") or []
+            if s.get("cp") is not None and (s.get("name") or "").replace(" ", "") in names}
 
 
 def build(m, qd, cache, search, shells, logos):
@@ -125,8 +164,13 @@ def build(m, qd, cache, search, shells, logos):
                 x["lg"] = lg["file"]
             etf.append({k: v for k, v in x.items() if v is not None})
     day = max((r.get("d") or "" for r in rows.values()), default="")
-    return {"m": m, "d": day, "rows": sorted(out, key=lambda r: -(r.get("c") or 0)), "themes": themes(m), "etf": etf,
-            "note": "종목 페이지 목록용 — experiments/stock-lists/build_lists.py"}
+    doc = {"m": m, "d": day, "rows": sorted(out, key=lambda r: -(r.get("c") or 0)), "themes": themes(m), "etf": etf,
+           "note": "종목 페이지 목록용 — experiments/stock-lists/build_lists.py"}
+    if m == "us":
+        sec = sector_etf(day)
+        if sec:
+            doc["sec_etf"] = sec
+    return doc
 
 
 def main():

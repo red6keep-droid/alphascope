@@ -159,13 +159,13 @@
     }
     return out;
   }
-  function heatmap(key, groups) {   // groups = [[이름, 종목 줄들]] → {board, groups(큰 순), basis}
+  function heatmap(key, groups, fix) {   // groups = [[이름, 종목 줄들]] → {board, groups(큰 순), basis}. fix = {묶음 이름: 등락} — 있으면 평균 대신 그 값(미국 업종 = 섹터 ETF)
     var sized = groups.map(function (g) {
       var caps = g[1].filter(function (r) { return r.c; }).map(function (r) { return r.c; });
       var rs = g[1].filter(function (r) { return r.r != null; }).map(function (r) { return r.r; });
       var byCap = caps.length * 2 >= g[1].length;
       return { sz: byCap ? Math.sqrt(caps.reduce(function (t, v) { return t + v; }, 0)) : g[1].length, how: byCap ? 'cap' : 'n',
-        n: g[0], xs: g[1], avg: rs.length ? rs.reduce(function (t, v) { return t + v; }, 0) / rs.length : null };
+        n: g[0], xs: g[1], avg: fix && fix[g[0]] != null ? fix[g[0]] : rs.length ? rs.reduce(function (t, v) { return t + v; }, 0) / rs.length : null };
     });
     if (sized.some(function (t) { return t.how !== sized[0].how; })) sized.forEach(function (t) { t.sz = t.xs.length; t.how = 'n'; });
     var tot0 = sized.reduce(function (t, x) { return t + x.sz; }, 0), floor = 0.04 * tot0;   // 칸 최소 = 판의 4% (2026-11-18)
@@ -185,7 +185,8 @@
     });
     return { board: '<div class="hm" data-sl-pills="' + key + '" data-sl-heat style="height:' + H + 'px;">' + cells.join('') + '</div>',
       groups: sized.map(function (t) { return [t.n, t.xs]; }),
-      basis: (sized.length && sized[0].how === 'cap' ? '칸 크기 = 시가총액' : '칸 크기 = 종목 수') + ' · 색 = 묶음 평균 등락(마지막 종가)' };
+      basis: (sized.length && sized[0].how === 'cap' ? '칸 크기 = 시가총액' : '칸 크기 = 종목 수') +
+        (fix ? ' · 색 = 업종 ETF 등락(마지막 종가)' : ' · 색 = 묶음 평균 등락(마지막 종가)') };
   }
 
   function byDesc(f) { return function (a, b) { return (f(b) == null ? -1e18 : f(b)) - (f(a) == null ? -1e18 : f(a)); }; }
@@ -223,10 +224,10 @@
     });
     return hm.board + panels('theme', bodies) + note(hm.basis);   // 히트맵이 묶음 줄 자리 (2026-11-18 사용자)
   }
-  function sector(rows) {
+  function sector(rows, etfs) {   // etfs = 목록 파일 sec_etf(미국만, 업종 11개 ETF 등락) — 증시 시황 업종 줄과 같은 숫자 (2026-11-20 사용자)
     var by = {};
     rows.forEach(function (r) { (by[r.s] = by[r.s] || []).push(r); });
-    var hm = heatmap('sec', Object.keys(by).map(function (k) { return [k, by[k]]; }));
+    var hm = heatmap('sec', Object.keys(by).map(function (k) { return [k, by[k]]; }), etfs && Object.keys(etfs).length ? etfs : null);
     var bodies = hm.groups.map(function (g) {
       return card(g[1].slice().sort(byDesc(function (r) { return r.c; })), function (r, i) { return row(r, i, { sub: subOf(r, r.c ? capText(r.c) : '') }); });
     });
@@ -442,7 +443,7 @@
     put('watch', watch(by));
     put('move', move(rows));
     put('theme', theme(doc, by));
-    put('sector', sector(rows));
+    put('sector', sector(rows, doc.sec_etf));
     put('cap', caps(rows));
     put('etf', etf(doc));
     bind();
