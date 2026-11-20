@@ -823,7 +823,7 @@ __DASHBOARD__
                       <a class='post-nav-list' href='/__PEOPLE_LIST_PATH__'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;주식 공부&quot;)'/>
                       <b:comment>주식 공부 = 댓글 · TOP 사이 가운데 `주식 공부 목록` 버튼 (2026-11-15 사용자) — 다른 글의 검은 목록 버튼은 숨긴 채</b:comment>
-                      <a class='post-nav-list post-nav-study' href='/p/study.html'>주식 공부 목록</a>
+                      <a class='post-nav-list post-nav-study' href='/p/study.html'>주식 제대로 알기 목록</a>
                     <b:elseif cond='data:view.isPage or data:post.labels any (l =&gt; l.name == &quot;__MEDIA_LABEL__&quot;)'/>
                       <b:comment>인물 발언 = 인물 발언 목록 · 미디어 데일리(방송) = 홈으로 — 둘 다 미국 증시 리포트 목록으로 가던 것 (2026-11-11 사용자)</b:comment>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>

@@ -1350,8 +1350,8 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
   </section>
 
   <!-- 주식 공부 배너 (2026-11-15 사용자) — 시총 TOP 10 아래 전폭(11-15 사용자: 리포트 카드 아래 → 시총 TOP 10 아래). 미국 · 한국 화면 모두. 그림 = 사용자 제작(experiments/course/banner) -->
-  <section class="study-banner" aria-label="주식 공부">
-    <a href="/p/study.html"><img src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp" width="1110" height="344" loading="lazy" decoding="async" alt="주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다"/></a>
+  <section class="study-banner" aria-label="주식 제대로 알기">
+    <a href="/p/study.html"><img src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/home_banner.webp" width="1110" height="344" loading="lazy" decoding="async" alt="주식 제대로 알기. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다"/></a>
   </section>
 
   </div><!-- /home-cards -->
@@ -1864,7 +1864,7 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
     var a = el('a', 'eb-slide eb-study'); a.href = '/p/study.html';
     var im = document.createElement('img');
     im.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/top_banner.webp?v=2';
-    im.width = 1110; im.height = 291; im.alt = '주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'; im.decoding = 'async';
+    im.width = 1110; im.height = 291; im.alt = '주식 제대로 알기. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'; im.decoding = 'async';
     a.appendChild(im);
     return a;
   }
@@ -4660,7 +4660,7 @@ window.asTitleBack = function (ev, fallback) {
      글 제목(검색 · 공유 · <title>)은 그대로, 화면의 머리 줄 글자만. 제목 칸 정리 스크립트가 끝난 뒤에도 한 번 더(load) */
   var hl = document.querySelector('.post-body [data-head-label]');
   if (hl) {
-    var setHead = function () { var l = document.querySelector('.post-title-label') || document.querySelector('.post-title'); if (l) l.textContent = hl.getAttribute('data-head-label'); };
+    var setHead = function () { var l = document.querySelector('.post-title-label') || document.querySelector('.post-title'); if (l) { l.textContent = hl.getAttribute('data-head-label'); var sub = hl.getAttribute('data-head-sub'); if (sub) { var s = document.createElement('span'); s.textContent = ' - ' + sub; s.style.cssText = 'font-size:11px;font-weight:500;opacity:.6;margin-left:3px;letter-spacing:0;vertical-align:baseline;'; l.appendChild(s); } } };   /* data-head-sub = 머리 줄 옆 아주 작은 글씨(주식 제대로 알기 - 주식공부, 2026-11-20 사용자) */
     setHead();
     window.addEventListener('load', setHead);
   }
