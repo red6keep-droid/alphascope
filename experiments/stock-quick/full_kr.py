@@ -38,8 +38,11 @@ import full_us  # noqa: E402
 
 R = render_kr.R
 WHEN = full_us.WHEN
-BUDGET = {"detail": 60, "dart": 40, "company": 60, "hist": 100}
-DART_MINUTES = 20   # 매출 · 손익 받기 시간 상한 — DART 가 느린 날에도 실행이 끝나 저장값을 남기게 (2026-11-16)
+BUDGET = {"detail": 60, "dart": int(os.environ.get("QUICK_DART_BUDGET") or 40), "company": 60, "hist": 100}
+DART_MINUTES = int(os.environ.get("QUICK_DART_MINUTES") or 20)   # 매출 · 손익 받기 시간 상한 — DART 가 느린 날에도 실행이 끝나 저장값을 남기게 (2026-11-16)
+# 화면 실행(장 마감 뒤)은 DART 를 새로 받지 않고 저장값만 (2026-11-20 사용자: 한국 간단 종목이 DART 21~30분 때문에 18시께 바뀜).
+# 받기는 새벽 실행(quick-dart.yml → dart_fill.py)이 하고 같은 quick-state 에 남긴다. QUICK_DART_FETCH=0 = 받지 않음
+DART_FETCH = os.environ.get("QUICK_DART_FETCH", "1") != "0"
 DETAIL_FIELDS = ("analysts", "eps")
 MARKET = sorted({K.BENCH, K.KOSDAQ, *K.SECTOR_ETF_LIST})
 
@@ -198,6 +201,8 @@ def dart(cache_dir, syms):
         today = datetime.date.today()
         todo = sorted((s for s in syms if code_of(s) in codes and (not prog.get(s) or (today - datetime.date.fromisoformat(prog[s])).days >= 7)),
                       key=lambda s: prog.get(s) or "")[:BUDGET["dart"]]
+        if not DART_FETCH:
+            todo = []   # 화면 실행 — 새벽 실행이 받아 둔 저장값만
         if key and todo:
             # 5곳씩 나눠 받고 DART_MINUTES 를 넘기면 남은 회사는 다음 실행에 — 11-16 DART 가 느려(손익 표 호출당 약 6초, 11-14 의 3~4배)
             # 40곳에 83분이 걸려 실행 전체가 상한에 취소됐고, 취소된 실행은 저장값을 못 남겨 다음 실행이 같은 일을 처음부터 했다 (2026-11-16)
@@ -230,7 +235,7 @@ def dart(cache_dir, syms):
         comp.setdefault("day", {})
         old = sorted((s for s in syms if code_of(s) in codes and (not comp["day"].get(code_of(s)) or (today - datetime.date.fromisoformat(comp["day"][code_of(s)])).days >= 90)),
                      key=lambda s: comp["day"].get(code_of(s)) or "")[:BUDGET["company"]]
-        if key and old:
+        if key and old and DART_FETCH:
             import requests
             for s in old:
                 c = code_of(s)

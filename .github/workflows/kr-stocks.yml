@@ -203,6 +203,10 @@ jobs:
 
       - name: Collect · analyze · render
         id: run_kr
+        # 수집 단계 상한 30분 (2026-11-20 사용자): 바깥 호출이 늘어져도 본 잡(55분)이 게시 전에 끊기지 않게 — 넘으면 이 단계 실패로 게시 안 함(지난 화면 그대로)
+        timeout-minutes: 30
+        env:
+          KR_BIZ_AFTER: '1'   # 보고서 AI 읽기(dart_biz)는 게시 뒤 단계로
         # -u = 출력 즉시 찍기 (2026-11-20): 버퍼에 모였다 끝에 한꺼번에 찍혀 어느 줄에서 느렸는지 로그 시각으로 가를 수 없었다
         run: python -u "$KR_DIR/main_kr.py"
 
@@ -225,7 +229,7 @@ jobs:
 
       # 시황 해설 묶음을 먼저 올린다 (2026-11-20 사용자 · News-doc 31절 Q31): 수집기가 저녁 편 1차를 16:40 에 쓴다.
       # 페이지 · ETF 게시(약 6분)를 기다리지 않고 수집 직후 올려 16:21 쯤 — 옛 순서는 16:27. 실행 시각(16:10)은 그대로
-      # (15:50 은 Yahoo 한국 시세 지연으로 마감 값이 덜 들어올 수 있어 종목 · ETF · 리포트 숫자가 틀어질 위험).
+      # (15:50 시작은 2026-11-20 사용자 — Yahoo 한국 시세 지연(약 20분)은 when 잡의 wait_close.py 가 종가 확정을 확인해 막는다).
       # kr.json 을 미리 한 번 만들어 묶음만 뽑는다(home_feed_kr 는 output/home/kr.json 만 쓴다 — 아래 Home kr.json 이 다시 만든다).
       # gh-pages 푸시 하루 +1. 실패하면 아래 원래 자리(Market briefing (pm))가 kr.json 푸시에 얹어 올린다
       - name: Market briefing early (pm)
@@ -357,7 +361,16 @@ jobs:
           # 홈 카드는 옛 글로 연결되면 안 된다(11-10 미국 카드) — 내용 확인까지
           [ -f deploy-home/cards/kr-report.json ] && bash .github/scripts/jsd_purge.sh cards/kr-report.json deploy-home/cards/kr-report.json || true
 
-      # 상태 저장 — snapshot · flows 는 매번 새로 받으므로 빼고, 이어서 쌓는 것만
+      # 보고서 `매출 및 수주상황` 읽기 (Gemini lite, 정식 하루 30건) — 게시 뒤로 옮김 (2026-11-20 사용자). 결과는 data/ 캐시 → 아래 상태 저장 → 다음 실행 화면
+      - name: Business reports (AI, after publish)
+        if: "!cancelled() && steps.run_kr.outcome == 'success'"
+        continue-on-error: true
+        timeout-minutes: 12
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: python "$KR_DIR/biz_after.py"
+
+      # 상태 저장 — snapshot 은 매번 새로 받으므로 빼고, 이어서 쌓는 것 · 마지막 자금 흐름(flows.json)
       - name: Save state (kr-state branch)
         if: always()
         run: |

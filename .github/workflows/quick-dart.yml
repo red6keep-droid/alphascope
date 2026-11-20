@@ -1,0 +1,93 @@
+name: Quick DART (간단 종목 한국 DART 새벽 받기)
+
+# 간단 종목(한국 316종목) DART 매출 · 손익 · 현금흐름 · 기업개황 받기만 — 새벽에 (2026-11-20 사용자 "①~⑥ 전부 적용").
+#   - 옛: 장 마감 뒤 화면 실행(quick-data kr)이 매일 DART 를 21~30분 받아(손익 표 호출당 5~6초) 한국 간단 종목 · 종목 모아보기가 18시께 바뀌었다.
+#     이제 화면 실행은 QUICK_DART_FETCH=0 으로 저장값만 읽고, 받기는 여기서. 같은 함수(full_kr.dart) · 같은 저장값(비공개 quick-state).
+#   - 매일 KST 03:25. 새벽이라 상한을 넉넉히(45분 · 하루 80곳 — 처음 채우기가 빨리 끝나게). AI 0 · Blogger 0 · gh-pages 0 · 야후 0.
+#   - DART 호출: 회사 하나 약 30번(보고서 15건 × 매출 · 손익) → 80곳이면 약 2,400번. DART 하루 2만 번 한도.
+#   - 같은 저장값을 간단 종목 실행과 덮어쓰므로 같은 줄(concurrency quick-data)에 선다. GitHub 예비가 늦게 와(06시 뒤) 미국 간단 종목(08:20)과
+#     겹칠 수 있으면 건너뛴다 — 다음 새벽에 이어서.
+
+on:
+  schedule:
+    - cron: '25 18 * * *'   # UTC 18:25 = KST 03:25
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quick-data
+  cancel-in-progress: false
+
+jobs:
+  dart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - name: Too late?
+        id: late
+        run: |
+          H=$(TZ=Asia/Seoul date +%-H)
+          if [ "${{ github.event_name }}" = schedule ] && { [ "$H" -lt 2 ] || [ "$H" -ge 6 ]; }; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"; echo "KST ${H}시 — 새벽 창(02~06시) 밖이라 건너뜀 (간단 종목 실행과 겹치지 않게)"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v5
+        if: steps.late.outputs.skip != 'true'
+
+      - name: Set up Python
+        if: steps.late.outputs.skip != 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install
+        if: steps.late.outputs.skip != 'true'
+        run: pip install -r experiments/nvda-report/requirements.txt
+
+      - name: Load quick-state (private)
+        if: steps.late.outputs.skip != 'true'
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p /tmp/qcache ~/.ssh
+          printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
+          git fetch -q state quick-state && git archive FETCH_HEAD | tar -x -C /tmp/qcache
+          echo "저장값 $(du -sh /tmp/qcache | cut -f1)"
+
+      - name: DART fill
+        id: fill
+        if: steps.late.outputs.skip != 'true'
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+          QUICK_DART_MINUTES: '45'
+          QUICK_DART_BUDGET: '80'
+          PYTHONUNBUFFERED: '1'
+        run: python experiments/stock-quick/dart_fill.py --cache /tmp/qcache
+
+      # 저장값 덮어쓰기 — 간단 종목 실행과 같은 방식(기록 없이). 받는 중 시간 상한에 걸려도 회사마다 저장한 것은 남긴다
+      - name: Save quick-state (private, no history)
+        if: always() && steps.late.outputs.skip != 'true' && steps.fill.outcome != 'skipped'
+        run: |
+          cd /tmp/qcache
+          git init -q && git checkout -q --orphan quick-state
+          git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git add -A && git commit -q -m "quick state (dart) $(date -u +%F) [skip ci]"
+          git push -q -f git@github.com:red6keep-droid/alphascope-state.git HEAD:quick-state
+          echo "저장값 $(du -sh . | cut -f1)"
+
+      - name: Notify failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 간단 종목 한국 DART 새벽 받기 (화면은 지난 값으로 나감)\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

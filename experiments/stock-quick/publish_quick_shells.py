@@ -304,17 +304,17 @@ def similarity(texts, pairs=400, seed=7):
     return round(100 * sum(difflib.SequenceMatcher(None, texts[a], texts[b]).ratio() for a, b in allp) / len(allp), 1)
 
 
-def targets(ref, intros):
-    """소개가 있는 간단 종목만 — 정식 종목(full)은 종목 분석 페이지가 있다."""
+def targets(ref, intros, markets=("us", "kr")):
+    """소개가 있는 간단 종목만 — 정식 종목(full)은 종목 분석 페이지가 있다. markets = 이 실행이 맡는 시장(한국 실행은 한국 페이지만, 2026-11-20)."""
     out = []
-    for m in ("us", "kr"):
+    for m in markets:
         for s, e in sorted((ref.get(m) or {}).items()):
             if not e.get("full") and intros.get(s):
                 out.append((s, e))
     return out
 
 
-def publish(cache, ref, intros, new_cap=NEW_CAP, update_cap=UPDATE_CAP, dry=False):
+def publish(cache, ref, intros, new_cap=NEW_CAP, update_cap=UPDATE_CAP, dry=False, markets=("us", "kr")):
     import requests
     import publish_blogger as PB
     import publish_pages as PP   # _call(429 백오프) · _norm 그대로
@@ -327,7 +327,7 @@ def publish(cache, ref, intros, new_cap=NEW_CAP, update_cap=UPDATE_CAP, dry=Fals
     fx = load_facts(cache)
     made = updated = same = waiting = failed = 0
     stopped = False
-    for s, e in targets(ref, intros):
+    for s, e in targets(ref, intros, markets):
         content, t = body(s, e, intros[s], fx, ref), title(s, e)
         h = hashlib.sha256((t + "\n" + content).encode("utf-8")).hexdigest()[:16]
         rec = done.get(s)
@@ -406,6 +406,8 @@ def main():
     ap.add_argument("--publish", action="store_true")
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--map", default="")
+    ap.add_argument("--market", choices=("all", "us", "kr"), default="all",
+                    help="이 실행이 맡는 시장 — 한국 장 마감 실행이 미국 페이지(알파벳 순 10~24분)를 고치느라 늦지 않게 (2026-11-20 사용자)")
     a = ap.parse_args()
     ref = CI._load(os.path.join(EXP, "ref", "quick_ref.json"), {})
     CI.apply(a.cache)
@@ -422,7 +424,7 @@ def main():
         texts = {s: server_text(s, e, intros[s], fx, ref) for s, e in targets(ref, intros)}
         print(f"[shells] 서버 글 닮음 평균 — 사실 요약 넣은 뒤 {similarity(texts)}% · 평균 글자 수 {sum(map(len, texts.values())) // max(len(texts), 1)}")
     if a.publish or a.dry:
-        done = publish(a.cache, ref, intros, dry=a.dry)
+        done = publish(a.cache, ref, intros, dry=a.dry, markets=("us", "kr") if a.market == "all" else (a.market,))
         if a.map:
             print(f"[shells] 주소표 {write_map(done, a.map)}쪽 → {a.map}")
 

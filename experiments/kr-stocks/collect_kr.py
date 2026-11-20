@@ -193,6 +193,18 @@ def history():
 
 # ── 자금 흐름 (ECOS) ──────────────────────────────────────────────────
 
+# 월 · 분기 표 시간 상한 (2026-11-20 사용자): 11-20 수집이 33.7분(평소 6~9분) — 관세청 호출이 60초씩 기다리다 실패하는 등 바깥 호출이 늘어져
+# 본 잡이 시간 제한에 끊겼다. run_flows 시작부터 SLOW_BUDGET_S 가 지나면 남은 월 · 분기 표는 부르지 않고 지난번 값(data/flows.json)으로 채운다.
+# 일별 자금 흐름(외국인 순매수 등)은 상한 없이 받는다(그날 숫자). 호출 하나당 기다림도 짧게: ECOS 30 → 15초, 관세청 60 → 15초
+SLOW_BUDGET_S = 6 * 60
+_DEADLINE = [None]   # run_flows 가 정한다 — 지나면 _ecos · _customs 가 바로 건너뜀
+SLOW_KEYS = ("more_d", "more_q", "more_m", "industry", "bsi", "fin_q", "loan_q")   # 칸마다 지난 값으로 채울 수 있는 묶음
+
+
+def _late():
+    return _DEADLINE[0] is not None and time.time() > _DEADLINE[0]
+
+
 def _customs(hs_list, years=3):
     """관세청 품목별 수출 (공공데이터포털 15100475 · 이용허락범위 제한 없음, 2026-10-31) — HS 품목들의 월 수출금액(달러) 합, 최근 years 해.
     국가 코드 없이 부르면 나라별 · 월별 줄 + 총계가 온다 → 월마다 나라별 줄을 더한다. 한 번에 1년만. 키 DATA_GO_KR_API_KEY 가 없으면 빈 목록."""
@@ -212,9 +224,12 @@ def _customs(hs_list, years=3):
     mon = {}
     for hs in hs_list:
         for y in range(y1 - years + 1, y1 + 1):
+            if _late():
+                print("[kr] 관세청 — 시간 상한, 지난 값으로")
+                return []
             try:
                 r = requests.get("https://apis.data.go.kr/1220000/nitemtrade/getNitemtradeList",
-                                 params={"serviceKey": k, "strtYymm": f"{y}01", "endYymm": f"{y}12", "hsSgn": hs}, timeout=60)
+                                 params={"serviceKey": k, "strtYymm": f"{y}01", "endYymm": f"{y}12", "hsSgn": hs}, timeout=15)
                 root = ET.fromstring(r.content)
                 if root.findtext("header/resultCode") != "00":
                     print(f"[kr] 관세청 {hs}/{y}: {(root.findtext('header/resultMsg') or '')[:60]}")
@@ -223,6 +238,10 @@ def _customs(hs_list, years=3):
                     ym = it.findtext("year") or ""
                     if len(ym) == 7 and ym[4] == ".":
                         mon[f"{ym[:4]}-{ym[5:]}"] = mon.get(f"{ym[:4]}-{ym[5:]}", 0.0) + float(it.findtext("expDlr") or 0)
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                # 한 번 늘어지면 그날은 계속 늘어진다(11-20) — 나머지 해 · 품목을 부르지 않고 지난 값으로 (월 자료라 하루 늦어도 같음)
+                print(f"[kr] 관세청 {hs}/{y} 시간 초과 · 연결 실패 — 나머지 건너뛰고 지난 값으로: {str(e)[:80]}")
+                return []
             except Exception as e:   # noqa: BLE001
                 print(f"[kr] 관세청 {hs}/{y} 실패: {str(e)[:80]}")
             time.sleep(0.3)
@@ -231,8 +250,10 @@ def _customs(hs_list, years=3):
 
 def _ecos(key, stat, cycle, start, end, item, n=2000):
     """item 은 항목 코드 하나, 또는 항목이 둘인 표는 "ITEM1/ITEM2" (예: 기업경기조사 전산업/업황실적)."""
+    if _late():
+        raise RuntimeError("시간 상한 — 지난 값으로")
     url = f"{ECOS}/StatisticSearch/{key}/json/kr/1/{n}/{stat}/{cycle}/{start}/{end}/{item}"
-    r = requests.get(url, timeout=30)
+    r = requests.get(url, timeout=15)
     r.raise_for_status()
     j = r.json()
     if "StatisticSearch" not in j:
@@ -247,6 +268,13 @@ def run_flows():
         print("[kr] ECOS_API_KEY 없음 — 자금 흐름 건너뜀")
         return None
     today = datetime.date.today()
+    t_flows = time.time()
+    _DEADLINE[0] = None
+    try:
+        with open(FLOWS, encoding="utf-8") as f:
+            prev = json.load(f)   # 지난번 받은 것 — 이번에 못 받은 월 · 분기 칸을 채운다
+    except (OSError, ValueError):
+        prev = {}
     d0 = (today - datetime.timedelta(days=800)).strftime("%Y%m%d")
     d1 = today.strftime("%Y%m%d")
     out = {"fetched_at": datetime.datetime.now(KST).strftime("%Y-%m-%d %H:%M %Z"), "daily": {}, "investor_m": {}, "funds_m": {}, "source": "한국은행 ECOS (자료: 한국거래소 · 금융투자협회)"}
@@ -277,6 +305,7 @@ def run_flows():
         rows = _ecos(key, stat, "M", m0, m1, item)
         out["funds_m"][key_name] = [{"month": f"{x['TIME'][:4]}-{x['TIME'][4:]}", "v": float(x["DATA_VALUE"])} for x in rows if x.get("DATA_VALUE") not in (None, "")]
         time.sleep(0.3)
+    _DEADLINE[0] = t_flows + SLOW_BUDGET_S   # 여기부터 월 · 분기 표 — 상한이 지나면 지난 값 (일별 · 투자자별 · 증시자금은 위에서 이미 받음)
     out["more_q"] = {}
     q0, q1 = f"{today.year - 4}Q1", f"{today.year}Q4"
     for stat, cyc, items in ECOS_QUARTERLY:
@@ -381,6 +410,16 @@ def run_flows():
                 out["more_d"][key_name] = [{"day": o["date"], "v": float(o["value"])} for o in j.get("observations", []) if o["value"] not in (".", "")]
             except Exception as e:   # noqa: BLE001
                 print(f"[kr] FRED {sid} 실패: {str(e)[:80]}")
+    _DEADLINE[0] = None
+    kept = []
+    for sec in SLOW_KEYS:   # 못 받은 칸(실패 · 시간 상한) = 지난 값
+        for k_, v in ((prev.get(sec) or {}).items()):
+            if not (out.setdefault(sec, {}).get(k_)):
+                out[sec][k_] = v
+                kept.append(f"{sec}/{k_}")
+    if kept:
+        print(f"[kr] 월 · 분기 표 {len(kept)}칸 지난 값으로 — {', '.join(kept[:12])}{' …' if len(kept) > 12 else ''}")
+    print(f"[kr] 자금 흐름 · 경제 지표 {(time.time() - t_flows) / 60:.1f}분")
     os.makedirs(DATA, exist_ok=True)
     with open(FLOWS, "w", encoding="utf-8") as f:
         json.dump(out, f)

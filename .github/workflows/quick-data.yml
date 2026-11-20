@@ -7,6 +7,7 @@ name: Quick stock data (간단 정보 853종목)
 #     쉬는 시장 조각은 지난 결과(없으면 Pages)에서 그대로 옮긴다 — 옮길 것이 모자라면 두 시장 다 새로(collect_quick --market). 분은 :40 — 운영지침 11절 다른 쓰기 시각(:00 · :15 · :30 · :45 · :07 · :22 · :37 · :52 · :10)과 겹치지 않게.
 #   - AI 0 · Blogger 0 · 그림 0. 야후: 일봉 묶음 약 10번 + 상세 하루 상한(미국 90 · 한국 60종목) + 고점 회복 묶음 2번. Finnhub 실적 달력 주 1회 약 17번(첫 실행 약 120번).
 #     SEC companyfacts 하루 100곳 · DART 하루 30곳(새 보고서만) + 기업개황 60곳 + 공시 목록 약 20번. FRED 하루 한 번.
+#     (2026-11-20 사용자) DART 매출 · 손익 · 기업개황 받기는 새벽 quick-dart.yml 로 옮김 — 여기선 저장값만(QUICK_DART_FETCH=0). 공시 목록 · 주식 수는 그대로.
 #   - 결과 = 기록을 남기지 않는 브랜치 quick-us · quick-kr 에 통째로(force) — 저장소가 커지지 않는다. 시장별로 나눈 것은 한 묶음이 jsDelivr 150MB 안에 들게.
 #     커밋 둘: ① 데이터 ② version.json 에 ①의 커밋 번호. 브라우저는 @quick-us/version.json(purge) → @<커밋>/us/UBER.html 로 읽는다.
 #   - 종목 전용 페이지(publish_quick_shells.py) · 기업 소개(company_intro.py, Gemini lite 하루 25회까지) — 2026-11-15 사용자.
@@ -82,11 +83,18 @@ jobs:
           if [ "$MARKET" = kr ]; then JOB=kr-stocks; [ "$W" -le 5 ] && [ "$H" -ge 15 ] && [ "$H" -le 21 ] && go=true
           else JOB=nvda-report; [ "$W" -ge 2 ] && [ "$W" -le 6 ] && [ "$H" -ge 6 ] && [ "$H" -le 10 ] && go=true; fi
           if [ "$go" = true ]; then
-            ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$UP_ID/jobs?per_page=50" -q "[.jobs[] | select(.name == \"$JOB\" and .conclusion == \"success\")] | length" || echo 0)
-            [ "$UP_OK" = success ] && [ "${ok:-0}" -gt 0 ] || go=false
+            if [ "$MARKET" = kr ]; then
+              # 한국 = 본 잡의 `Deploy kr.json to gh-pages` 단계가 성공했으면 붙는다 — 그 뒤(캐시 비우기 등)에서 끊긴 날에도 (2026-11-20 사용자:
+              # 그날 16:51 시간 초과로 본 잡이 취소돼 이어 붙이기가 안 걸리고 17:40 예비 → 18:34)
+              ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$UP_ID/jobs?per_page=50" -q "[.jobs[] | select(.name == \"$JOB\") | .steps[] | select((.name | startswith(\"Deploy kr.json\")) and .conclusion == \"success\")] | length" || echo 0)
+              [ "${ok:-0}" -gt 0 ] || go=false
+            else
+              ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$UP_ID/jobs?per_page=50" -q "[.jobs[] | select(.name == \"$JOB\" and .conclusion == \"success\")] | length" || echo 0)
+              [ "$UP_OK" = success ] && [ "${ok:-0}" -gt 0 ] || go=false
+            fi
           fi
           echo "go=$go" >> "$GITHUB_OUTPUT"
-          echo "이어 붙이기 · 시장 $MARKET · KST ${H}시 요일 $W · 정식 결과 $UP_OK · 본 잡($JOB) 성공 ${ok:-?} → $go"
+          echo "이어 붙이기 · 시장 $MARKET · KST ${H}시 요일 $W · 정식 결과 $UP_OK · 본 잡($JOB) 성공 기준 ${ok:-?} → $go"
       - id: dup
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -101,10 +109,10 @@ jobs:
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"; echo "사람이 건 실행 → 돈다"
           fi
-      # 정식 실행이 막 야후를 다 쓴 참 — 5분 쉬고 시작 (2026-11-17 영향 표 약속)
+      # 정식 실행이 막 야후를 다 쓴 참 — 쉬고 시작 (2026-11-17 영향 표 약속 5분 → 2026-11-20 사용자 1분: 한국 쪽 야후는 약 1분뿐, 거절 0건)
       - name: Rest before Yahoo
         if: github.event_name == 'workflow_run' && steps.dup.outputs.skip != 'true'
-        run: sleep 300
+        run: sleep 60
 
   quick:
     needs: check
@@ -179,6 +187,7 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}   # 방송 줄 · 방송 의견 (media_feed, 정식과 같은 읽기 전용 키) — 없으면 그 칸 없이
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 기업 소개(company_intro) — Gemini lite 하루 25회까지, 한도면 다음 날 (2026-11-15 사용자)
+          QUICK_DART_FETCH: '0'   # DART 매출 · 손익 · 기업개황 받기는 새벽 quick-dart.yml — 여기선 저장값만 (2026-11-20 사용자, 한국 21~30분 줄임)
           PYTHONUNBUFFERED: '1'   # 출력 바로 — 11-16 실행이 상한에 걸려 취소될 때 버퍼에 있던 로그가 한 줄도 안 남았다
         run: |
           set +e
@@ -218,6 +227,32 @@ jobs:
           [ -f "$SHELLS" ] || { curl -sf https://alpha-scope.pages.dev/shells.json -o /tmp/shells.json && SHELLS=/tmp/shells.json; } || SHELLS=""
           python experiments/stock-lists/build_lists.py --qd /tmp/qd --cache /tmp/qcache --search /tmp/search ${SHELLS:+--shells $SHELLS}
 
+      # Cloudflare Pages alpha-scope.pages.dev — jsDelivr 예비이자 먼저 읽는 곳 (2026-11-15 사용자: 용량 · 전송량 덜기, 이사 아님).
+      # 순서 (2026-11-20 사용자): 독자가 먼저 읽는 곳이라 목록 파일 바로 뒤 — 옛 자리는 Blogger 페이지 정리(10~24분) 뒤라 한국 화면이 그만큼 늦었다.
+      # 블로그 Cloudflare 계정(red6)만 — 계정 ID 고정, 토큰 = Pages 쓰기 권한만. 독자가 보는 페이지가 아직 없어 그림자 모드에서도 올린다(확인용).
+      # 배포 하나 = 사이트 전체: us/ · kr/ · _headers(CORS · 검색 제외) · robots.txt · 404.html. 바뀐 파일만 올라간다. 실패해도 jsDelivr 길은 그대로.
+      - name: Publish Cloudflare Pages (spare)
+        if: "!cancelled() && steps.collect.outputs.code == '0'"
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_PAGES_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: a8718df7edc5f8f6ce88e75b6545e5cb
+        run: |
+          [ -z "$CLOUDFLARE_API_TOKEN" ] && { echo "CF_PAGES_API_TOKEN 없음 — Pages 건너뜀"; exit 0; }
+          python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --bundle   # js/quick.js = quick_page.js + 봉차트 (전용 페이지가 받는 스크립트)
+          git diff --quiet -- experiments/stock-quick/pages_static/js/quick.js || echo "::warning::저장소의 js/quick.js 가 옛것 — jsDelivr 예비가 옛 스크립트를 낸다. --bundle 로 다시 만들어 커밋"
+          mkdir -p /tmp/cfp && cp -r /tmp/qd/us /tmp/qd/kr /tmp/cfp/ && cp -a experiments/stock-quick/pages_static/. /tmp/cfp/
+          # 배포 = 사이트 전체 교체 — 전용 페이지 주소표(shells.json)가 빠지면 /p/stock.html?s= 가 전용 페이지로 못 넘긴다.
+          # 이 단계는 페이지 정리 앞이라 아직 오늘 주소표가 없다 → 지금 Pages 에 있는 것을 그대로 싣고, 정리 뒤 바뀌었으면 아래 단계가 다시 올린다
+          if [ -f /tmp/qd/shells.json ]; then cp /tmp/qd/shells.json /tmp/cfp/shells.json
+          else curl -sf https://alpha-scope.pages.dev/shells.json -o /tmp/cfp/shells.json || { rm -f /tmp/cfp/shells.json; echo "::warning::주소표 못 받음 — 이번 배포에 shells.json 없음"; }; fi
+          # 검색어 미리보기 목록(정식 · 간단 종목 이름 · 티커 · 주소, 약 110KB) — 블로그 검색 창이 처음 열 때 한 번 읽는다 (2026-11-16 사용자)
+          python experiments/site-search/build_names.py --cache /tmp/qcache --shells /tmp/cfp/shells.json --out /tmp/cfp/names.json || echo "::warning::검색어 미리보기 목록 실패 — 검색 창은 정식 종목만 미리 보인다"
+          echo "Pages 파일 $(find /tmp/cfp -type f | wc -l)개 · $(du -sh /tmp/cfp | cut -f1)"
+          npx --yes wrangler@4.162.0 pages deploy /tmp/cfp --project-name alpha-scope --branch main --commit-dirty=true
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://alpha-scope.pages.dev/us/UBER")
+          echo "확인 us/UBER → $code"; [ "$code" = 200 ] || echo "::warning::Pages 확인 실패 ($code) — 독자는 jsDelivr 로 읽는다"
+
       # 순서 (2026-11-20 사용자): 독자 화면이 읽는 데이터를 Blogger 페이지 정리(약 16분) 앞에 올린다 — 한국 17:16 → 17:01쯤.
       # 목록 파일은 그래서 전날 페이지 목록(pages.dev shells.json)을 쓴다 — 그날 처음 전용 페이지가 생긴 종목만 목록 링크가 하루 늦게 붙음(받아들임).
       # 페이지 정리 · 상태 저장(페이지 해시가 cache 에 남음) · Pages 예비는 이 뒤 — 이 단계가 실패해도 지금처럼 돈다(!cancelled)
@@ -249,7 +284,21 @@ jobs:
           BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
           BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
           BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
-        run: python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --publish --map /tmp/qd/shells.json
+        run: python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --publish --map /tmp/qd/shells.json --market "$MARKET"   # 이 실행의 시장만 (2026-11-20)
+
+      # 페이지 정리로 주소표가 바뀌었으면(새 전용 페이지) Pages 에 다시 — 바뀐 파일(shells.json · names.json)만 올라간다
+      - name: Publish Cloudflare Pages (shells.json)
+        if: "!cancelled() && steps.collect.outputs.code == '0' && steps.shells.outcome == 'success'"
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_PAGES_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: a8718df7edc5f8f6ce88e75b6545e5cb
+        run: |
+          [ -z "$CLOUDFLARE_API_TOKEN" ] || [ ! -d /tmp/cfp ] || [ ! -f /tmp/qd/shells.json ] && { echo "건너뜀 (토큰 · 앞 배포 · 주소표 없음)"; exit 0; }
+          if cmp -s /tmp/qd/shells.json /tmp/cfp/shells.json; then echo "주소표 그대로 — 다시 안 올림"; exit 0; fi
+          cp /tmp/qd/shells.json /tmp/cfp/shells.json
+          python experiments/site-search/build_names.py --cache /tmp/qcache --shells /tmp/cfp/shells.json --out /tmp/cfp/names.json || true
+          npx --yes wrangler@4.162.0 pages deploy /tmp/cfp --project-name alpha-scope --branch main --commit-dirty=true
 
       # 저장값은 게시 여부와 상관없이 남긴다 — 하루 상한으로 나눠 채우는 것이 이어지게. 다시 모을 수 있는 캐시라 기록 없이 덮어쓴다(저장소가 커지지 않게)
       - name: Save quick-state (private, no history)
@@ -265,28 +314,6 @@ jobs:
           git add -A && git commit -q -m "quick state $(date -u +%F) [skip ci]"
           git push -q -f git@github.com:red6keep-droid/alphascope-state.git HEAD:quick-state
           echo "저장값 $(du -sh . | cut -f1)"
-
-      # Cloudflare Pages alpha-scope.pages.dev — jsDelivr 예비이자 먼저 읽는 곳 (2026-11-15 사용자: 용량 · 전송량 덜기, 이사 아님).
-      # 블로그 Cloudflare 계정(red6)만 — 계정 ID 고정, 토큰 = Pages 쓰기 권한만. 독자가 보는 페이지가 아직 없어 그림자 모드에서도 올린다(확인용).
-      # 배포 하나 = 사이트 전체: us/ · kr/ · _headers(CORS · 검색 제외) · robots.txt · 404.html. 바뀐 파일만 올라간다. 실패해도 jsDelivr 길은 그대로.
-      - name: Publish Cloudflare Pages (spare)
-        if: "!cancelled() && steps.collect.outputs.code == '0'"
-        continue-on-error: true
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_PAGES_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: a8718df7edc5f8f6ce88e75b6545e5cb
-        run: |
-          [ -z "$CLOUDFLARE_API_TOKEN" ] && { echo "CF_PAGES_API_TOKEN 없음 — Pages 건너뜀"; exit 0; }
-          python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --bundle   # js/quick.js = quick_page.js + 봉차트 (전용 페이지가 받는 스크립트)
-          git diff --quiet -- experiments/stock-quick/pages_static/js/quick.js || echo "::warning::저장소의 js/quick.js 가 옛것 — jsDelivr 예비가 옛 스크립트를 낸다. --bundle 로 다시 만들어 커밋"
-          mkdir -p /tmp/cfp && cp -r /tmp/qd/us /tmp/qd/kr /tmp/cfp/ && cp -a experiments/stock-quick/pages_static/. /tmp/cfp/
-          [ -f /tmp/qd/shells.json ] && cp /tmp/qd/shells.json /tmp/cfp/shells.json
-          # 검색어 미리보기 목록(정식 · 간단 종목 이름 · 티커 · 주소, 약 110KB) — 블로그 검색 창이 처음 열 때 한 번 읽는다 (2026-11-16 사용자)
-          python experiments/site-search/build_names.py --cache /tmp/qcache --shells /tmp/qd/shells.json --out /tmp/cfp/names.json || echo "::warning::검색어 미리보기 목록 실패 — 검색 창은 정식 종목만 미리 보인다"
-          echo "Pages 파일 $(find /tmp/cfp -type f | wc -l)개 · $(du -sh /tmp/cfp | cut -f1)"
-          npx --yes wrangler@4.162.0 pages deploy /tmp/cfp --project-name alpha-scope --branch main --commit-dirty=true
-          code=$(curl -s -o /dev/null -w "%{http_code}" "https://alpha-scope.pages.dev/us/UBER")
-          echo "확인 us/UBER → $code"; [ "$code" = 200 ] || echo "::warning::Pages 확인 실패 ($code) — 독자는 jsDelivr 로 읽는다"
 
       - name: Notify failure
         if: failure()
