@@ -19,6 +19,11 @@ on:
     # 낮 갱신 — 종목 페이지만 다시 그린다 (2026-11-04 사용자 P290: 아침 실행 뒤 들어온 방송 의견이 다음 날까지 안 보였다).
     # 04:00 UTC = 13:00 KST, 미국 장 밖. check 가 `오늘 본 실행 끝남` 이면 mode=refresh (13:00 UTC 넘으면 skip — 장중 값 게시 금지)
     - cron: '0 4 * * *'
+  # 이어 붙이기 (2026-11-20 사용자 "미국 실행 한 줄로"): 미국 증시 리포트(16:40 NY)가 글을 게시하면 바로 — 옛 17:30 NY 고정 시각은 예비로 남는다.
+  # 붙을지는 check 잡이 가린다(리포트의 `Publish to Blogger` 단계 성공 · KST 05~10시). 오전에 이미 돌았으면 예비는 건너뛴다(아래 모드)
+  workflow_run:
+    workflows: ["Test Daily Report"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       narrate:
@@ -39,6 +44,7 @@ on:
 
 permissions:
   contents: write
+  actions: read   # 이어 붙이기 확인 — 리포트 실행의 단계 결과를 읽는다
 
 concurrency:
   group: nvda-report
@@ -67,8 +73,8 @@ env:
   STATE_DIR: experiments/nvda-report/output/state
   # GitHub cron은 자주 늦거나 빠진다(2026-10-13 하루치 전부 누락). 같은 시각에 Cloudflare Worker가
   # scheduled=true 로 workflow_dispatch를 건다 — 그 실행도 스케줄로 취급한다 (infra/cron-trigger).
-  IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
-  DO_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.NVDA_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+  IS_SCHEDULED: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_run' || inputs.scheduled == true }}
+  DO_PUBLISH: ${{ ((github.event_name == 'schedule' || github.event_name == 'workflow_run' || inputs.scheduled == true) && vars.NVDA_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
 
 jobs:
   # 스케줄(외부 cron 포함)은 GitHub cron과 외부 cron이 하루 두 번 넘게 걸 수 있다. 실행 모드(check.mode):
@@ -105,13 +111,26 @@ jobs:
       - name: Check if today's run already finished
         id: check
         if: env.IS_SCHEDULED == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UP_ID: ${{ github.event.workflow_run.id }}
         run: |
+          H=$(TZ=Asia/Seoul date +%-H)
+          if [ "${{ github.event_name }}" = workflow_run ]; then
+            # 리포트가 오늘 글을 게시한 실행 뒤에만 (이미 게시돼 건너뛴 재시도 · 낮 실행 뒤에는 붙지 않음)
+            ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$UP_ID/jobs?per_page=50" -q '[.jobs[] | select(.name == "daily-report") | .steps[] | select(.name == "Publish to Blogger" and .conclusion == "success")] | length' || echo 0)
+            if [ "${ok:-0}" -eq 0 ] || [ "$H" -lt 5 ] || [ "$H" -gt 10 ]; then
+              echo "이어 붙일 실행이 아님 (리포트 게시 ${ok:-?} · KST ${H}시) → 건너뜀"; echo "mode=skip" >> "$GITHUB_OUTPUT"; exit 0
+            fi
+            echo "리포트 게시 뒤 이어 붙임 (KST ${H}시)"
+          fi
           MODE=full
           if git fetch -q state nvda-state 2>/dev/null; then
             LAST=$(git log -1 --format=%ct FETCH_HEAD)
             SINCE=$(TZ=Asia/Seoul date -d "$(TZ=Asia/Seoul date +%F) 05:00" +%s)
             if [ "$LAST" -ge "$SINCE" ]; then
-              if [ "$(date -u +%H)" -lt 13 ]; then MODE=refresh; else MODE=skip; fi   # 13:00 UTC 전 = 미국 장 전(프리마켓 포함)만 갱신
+              if [ "$H" -lt 11 ]; then MODE=skip   # 오전 = 리포트 뒤 이어 붙인 실행이 이미 함 → 07:30 예비는 건너뜀 (2026-11-20, 옛: 갱신으로 한 번 더 돌았다)
+              elif [ "$(date -u +%H)" -lt 13 ]; then MODE=refresh; else MODE=skip; fi   # 13:00 UTC 전 = 미국 장 전(프리마켓 포함)만 갱신
             fi
           fi
           echo "실행 모드: $MODE"

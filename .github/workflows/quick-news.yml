@@ -10,7 +10,7 @@ name: Quick stock news (간단 종목 뉴스 · 그림자)
 
 on:
   schedule:
-    - cron: '40 21 * * 1-5'   # UTC 월~금 21:40 = KST 화~토 06:40 (미국 월~금 장 마감 뒤). :40 = 운영지침 11절 다른 쓰기 시각과 안 겹침
+    - cron: '20 21 * * 1-5'   # UTC 월~금 21:20 = KST 화~토 06:20 (2026-11-20 사용자, 옛 06:40 — 엔비디아 실행이 06:47 로 당겨져 Gemini lite 분당 한도가 겹치지 않게 먼저 끝냄)
   workflow_dispatch:
     inputs:
       limit:
