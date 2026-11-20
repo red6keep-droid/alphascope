@@ -35,6 +35,7 @@ SLUGS = {   # 초안 파일 이름 → 영문 주소 이름 (한 번 정하면 �
     "착각-01-실적.md": "stock myths 01 good earnings stock falls",
     "착각-02-물림.md": "stock myths 02 how long underwater after buying",
     "착각-03-공포매도.md": "stock myths 03 selling on big drop days",
+    "착각-04-되사기.md": "stock myths 04 buying back at sell price",
 }
 
 
