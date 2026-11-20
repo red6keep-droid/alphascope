@@ -212,6 +212,28 @@ jobs:
             else echo "오늘 봉 없음(휴장일 또는 지연) — 게시하지 않는다. 강제하려면 force=true"; fi
           fi
 
+      # 시황 해설 묶음을 먼저 올린다 (2026-11-20 사용자 · News-doc 31절 Q31): 수집기가 저녁 편 1차를 16:40 에 쓴다.
+      # 페이지 · ETF 게시(약 6분)를 기다리지 않고 수집 직후 올려 16:21 쯤 — 옛 순서는 16:27. 실행 시각(16:10)은 그대로
+      # (15:50 은 Yahoo 한국 시세 지연으로 마감 값이 덜 들어올 수 있어 종목 · ETF · 리포트 숫자가 틀어질 위험).
+      # kr.json 을 미리 한 번 만들어 묶음만 뽑는다(home_feed_kr 는 output/home/kr.json 만 쓴다 — 아래 Home kr.json 이 다시 만든다).
+      # gh-pages 푸시 하루 +1. 실패하면 아래 원래 자리(Market briefing (pm))가 kr.json 푸시에 얹어 올린다
+      - name: Market briefing early (pm)
+        if: steps.gate.outputs.go == 'true'
+        continue-on-error: true
+        run: |
+          python "$KR_DIR/home_feed_kr.py"
+          python experiments/market-commentary/build_briefing.py --slot pm --kr "$KR_DIR/output/home/kr.json" --out-dir deploy-brief
+      - name: Deploy briefing early to gh-pages
+        id: brief_push
+        if: steps.gate.outputs.go == 'true' && hashFiles('deploy-brief/briefing/*.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-brief
+          publish_branch: gh-pages
+          keep_files: true
+
       # 그래프 — kr-images 브랜치를 그날 그림만으로 새로 만들어 덮어쓴다 (이력 없음, 2026-10-20 사용자: 이미지는 휘발성)
       - name: Deploy charts (kr-images branch, no history)
         if: steps.gate.outputs.go == 'true' && hashFiles('experiments/kr-stocks/output/images/radar-*.webp') != ''
@@ -280,10 +302,11 @@ jobs:
           # 홈 실적 한 줄 자리 — 일정 없는 날 주요 뉴스 롤링의 한국 재료 (2026-11-19 사용자). 리포트 뉴스 탭과 같은 방송 이슈 제목, 같은 푸시에 얹는다
           [ -f experiments/kr-market-report/output/kr_news.json ] && cp experiments/kr-market-report/output/kr_news.json deploy-home/kr-news.json || true
 
-      # 알파스코프 시황 해설 묶음 briefing/{날짜}-pm.json (2026-11-16 사용자) — 수집기가 20:30 KST 에 읽어 해설을 쓴다.
-      # 방금 만든 kr.json + 공개 파일만 묶는다(AI 0). 아래 kr.json 푸시에 얹는다 — gh-pages 쓰기 추가 없음. 실패하면 수집기는 방송만으로 쓴다
+      # 알파스코프 시황 해설 묶음 briefing/{날짜}-pm.json (2026-11-16 사용자) — 수집기가 읽어 저녁 편을 쓴다.
+      # 방금 만든 kr.json + 공개 파일만 묶는다(AI 0). 아래 kr.json 푸시에 얹는다. 실패하면 수집기는 방송만으로 쓴다
+      # 11-20 부터는 위 먼저 올리기(brief_push)가 실패한 날만 — 같은 파일을 두 번 덮어 generated 가 바뀌지 않게
       - name: Market briefing (pm)
-        if: steps.gate.outputs.go == 'true' && hashFiles('deploy-home/kr.json') != ''
+        if: steps.gate.outputs.go == 'true' && hashFiles('deploy-home/kr.json') != '' && steps.brief_push.outcome != 'success'
         continue-on-error: true
         run: python experiments/market-commentary/build_briefing.py --slot pm --kr deploy-home/kr.json --out-dir deploy-home
 

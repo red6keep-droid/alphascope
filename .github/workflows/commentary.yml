@@ -3,7 +3,8 @@ name: Market Commentary
 # 증시 시황(AlphaScope 시황 해설) 발행 (2026-11-19 사용자 "발행기 만들어", 처음부터 공개).
 # 수집기(News-sub)가 columns/{날짜}-{am|pm} 에 글을 쓰고(08:10 · 20:30, 마감 08:30 · 20:40), 이 워크플로가 ready 글만 읽어 발행한다.
 # 블로그 AI 0. 순서 = 읽기 · 검사 · 배너(Workers AI 1장) → 배너 gh-pages → CDN 확인 → Blogger 공개 발행.
-# 정시 = Cloudflare Worker(infra/cron-trigger KST 08:40 · 21:00). GitHub cron 은 예비 — 이미 발행됐으면 publish 단계가 건너뛴다,
+# 정시 = Cloudflare Worker(infra/cron-trigger KST 08:40 · 17:00 저녁 1차(평일) · 21:00). GitHub cron 은 예비 — 이미 발행됐으면 publish 단계가 건너뛴다
+# (단 수집기 rev 가 올랐으면 같은 주소에 고쳐 쓴다 — 저녁 편 17:00 1차 → 21:00 rev 2, 2026-11-20 사용자 News-doc 31절),
 # 발행 시각이 한참 지난 글(아침 12:00 · 저녁 23:59 KST 뒤)은 내지 않는다.
 
 on:

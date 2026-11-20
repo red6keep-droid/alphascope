@@ -343,7 +343,7 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
     # + 고정 제목 줄의 흰 바탕을 좌우 본문 여백(14)만큼 화면 끝까지 — 꽉 찬 배너가 스크롤로 밑을 지날 때 양옆 틈으로 비치지 않게 (같은 날 사용자)
     style = ('<style>body:has([data-headline]) .pr-sticky{border-bottom:0;margin-bottom:0;'
              f'box-shadow:-{SIDE_PX}px 0 0 var(--surface,#fff),{SIDE_PX}px 0 0 var(--surface,#fff);}}' + IDX_SLIDE_CSS + '</style>')
-    body = [style + f'<p data-title-basis="1" data-commentary="{dk.esc(col["date"])}-{slot}" style="margin:0 0 14px;font-size:13px;line-height:19px;color:#6B7280;">{basis}</p>']
+    body = [style + f'<p data-title-basis="1" data-commentary="{dk.esc(col["date"])}-{slot}" data-rev="{dk.esc(str(col.get("rev") or ""))}" style="margin:0 0 14px;font-size:13px;line-height:19px;color:#6B7280;">{basis}</p>']
     if banner_url:
         body.append(f'<figure data-bleed="1" style="margin:0 -{SIDE_PX}px 16px;"><img src="{dk.esc(banner_url)}" alt="{dk.esc(banner_alt or "AI 생성 이미지")}" '
                     f'width="900" height="374" style="display:block;width:100%;height:auto;border-radius:0;"></figure>')   # 테마 글 그림 모서리 12 를 끔

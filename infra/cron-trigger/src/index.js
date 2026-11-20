@@ -62,6 +62,9 @@ const KST_JOBS = {
   // (수집기가 재료 없는 날은 skip 문서 → 발행기가 조용히 끝). 배너를 gh-pages 에 올린다 — :40 · :00 에 다른 gh-pages 푸시 실행 없음.
   "08:40": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "am" } }],
   "21:00": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "pm" } }],
+  // 저녁 편 1차 (2026-11-20 사용자, News-doc 31절): 수집기가 16:40 에 1차, 20:30 에 rev 2. 블로그는 17:00 에 1차를 내고
+  // 21:00 실행이 rev 가 올랐으면 같은 주소에 고쳐 쓴다(publish_commentary.py). 한국장 날만. :00 에 다른 gh-pages 푸시 없음(한국 종목 16:28 끝 · 간단 17:40)
+  "17:00": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "pm" }, when: WEEKDAY }],
   "14:30": [{ workflow: "home-ip.yml" }], // 낮 갱신 — 종목 페이지만 다시 그린다 (check.mode=refresh, 2026-11-04 P290). GitHub cron 04:00 UTC 는 예비
 };
 

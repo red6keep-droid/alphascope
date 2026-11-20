@@ -245,10 +245,21 @@ def stage_publish(a):
     creds = PB._credentials()
     blog_id = PB._blog_id(creds, blog_url)
     old = already(creds, blog_id, post["key"])
-    if old and not a.replace:
-        log(f"{post['key']} 이미 발행됨 — {old.get('url')}")
+    newer = False
+    if old:   # 수집기 2차(rev 가 오름) — 저녁 편 17:00 1차 뒤 21:00 에 저녁 방송을 보탠 rev 2 (2026-11-20 사용자, News-doc 31절)
+        m = re.search(r'data-rev="(\d+)"', old.get("content") or "")
+        old_rev = int(m.group(1)) if m else None
+        try:
+            new_rev = int(post.get("rev"))
+        except (TypeError, ValueError):
+            new_rev = None
+        newer = old_rev is not None and new_rev is not None and new_rev > old_rev   # 표시 없는 옛 글은 고치지 않는다
+        if newer:
+            log(f"{post['key']} rev {old_rev} → {new_rev} — 같은 주소에 고쳐 쓴다")
+    if old and not a.replace and not newer:
+        log(f"{post['key']} 이미 발행됨 (rev 같음) — {old.get('url')}")
         return 0
-    if old:   # 고쳐 쓰기 (사람이 --replace 로 부를 때만) — 주소 · 라벨은 그대로, 제목 · 본문만 새로
+    if old:   # 고쳐 쓰기 (rev 가 올랐거나 사람이 --replace 로 부를 때) — 주소 · 라벨은 그대로, 제목 · 본문만 새로
         r = PB._write("put", f"{PB.BLOGGER_API}/blogs/{blog_id}/posts/{old['id']}",
                       headers={"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"},
                       json={"kind": "blogger#post", "id": old["id"], "title": post["title"], "content": html, "labels": old.get("labels") or post["labels"]}, timeout=60)
