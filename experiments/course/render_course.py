@@ -43,7 +43,7 @@ DECO = {   # 강좌 글 꾸밈 — 색 · 모양은 여기 한 곳 (auto-blogspo
     "char_text": "flex:1 1 auto;min-width:0;font-size:20px;line-height:30px;font-weight:700;color:#111;word-break:keep-all;",
     "bubble_char": "margin:2px 0 28px;text-align:center;font-size:44px;line-height:52px;",   # 말풍선 꼬리 아래 캐릭터
     # 안내 구획 = `## 📌 제목` (한계 · 밝혀 둘 것) — 아이콘 없이 작은 회색 글씨 (2026-11-12 사용자: 안내성 글은 작게 · 회색 · 딱딱하게)
-    "note_h2": f"margin:36px 0 8px;padding:16px 0 0 {dk.ALIGN_PX}px;border-top:1px solid #E2E8F0;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:700;color:{dk.NOTE};",
+    "note_h2": f"margin:36px 0 8px;padding:16px 0 0 {dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:700;color:{dk.NOTE};",
     "note_li": f"font-size:{dk.TINY};line-height:22px;color:{dk.NOTE};margin:0 0 16px;padding-left:{dk.ALIGN_PX + 18}px;word-break:keep-all;",
     "note_p": f"font-size:{dk.TINY};line-height:22px;color:{dk.NOTE};margin:0 0 10px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;",
     "bubble": "position:relative;max-width:560px;margin:28px auto 36px;padding:18px 22px;border-radius:20px;background:#ECFDF5;"
@@ -111,6 +111,7 @@ def icon_html(tok, where):
     return f'<img src="{src}" alt="" width="{px}" height="{px}" style="display:{"block" if where == "h2" else "inline-block"};width:{px}px;height:{px}px;max-width:none;border-radius:0;{va}">'
 
 
+NOTE_UL = f"list-style:none;font-size:{dk.TINY};line-height:22px;color:{dk.NOTE};margin:0 0 16px;padding-left:{dk.ALIGN_PX + 3}px;word-break:keep-all;"   # 점 왼쪽 = 옛 disc 점 자리(본문 시작선 + 3)
 BASIS = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:0 0 8px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;"
 NOTE = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};margin:24px 0 0;padding:12px 0 0 {dk.ALIGN_PX}px;border-top:1px solid #E2E8F0;word-break:keep-all;"
 
@@ -135,40 +136,60 @@ def inline(t, links):
 # 표 규칙 = B6 (2026-11-20 사용자 확정, 시안 B · B1~B8 중): 세로줄 없이 가로줄만 · 머리 줄 연회색 면 + 아래 굵은 검은 줄 ·
 # 그 말대로 산 쪽(시기 · 결과) 칸 = 아주 연한 녹색 면 + 굵은 검정 · 아무 날 칸 = 아주 연한 보라 면 + 회색 글자 · 그 밖 칸 = 면 없음.
 # 칸 역할은 머리 줄 이름으로 정한다 — 새 편 표도 같은 이름을 쓰면 자동. 옛 모양(청록 머리 · 세로줄 · 연빨강 · 연파랑)은 11-20 에 바꿈
-TABLE = {"head_bg": "#F3F4F6", "head_line": "2px solid #111", "row_line": "1px solid #E2E8F0", "pad": "10px 8px", "head_pad": "8px 8px"}
+# 2026-11-20 사용자 2차(3편 발행 뒤): 머리 줄 아래 굵은 줄 2 → 1.5 · 모든 칸(머리 · 첫 칸 포함) 가운데 정렬 · 세로선 없음(첫 칸 고정 칸의 세로선도 뺌) ·
+# 가로줄은 색 칸 위에서도 보이게 반투명 · 글자 색 = 칸 바탕 색이 섞인 검정(녹색 칸 = 녹색 섞인 검정, 아무 날 = 보라 섞인 검정, 아무 날도 굵게)
+TABLE = {"head_bg": "#F3F4F6", "head_line": "1.5px solid #111", "row_line": "1px solid rgba(15,23,42,.11)", "pad": "10px 8px", "head_pad": "8px 8px"}
 COL_ROLE = {   # 머리 줄 이름 → 역할
     "아무 날": "any", "아무 날 산 사람": "any",
     "2010년대": "main", "2020년 이후": "main", "다음 날 하루": "main", "그때 산 사람": "main", "실적 보고 산 사람": "main",
 }
+MAIN_FG, ANY_FG = "#15402A", "#33245E"   # 녹색 섞인 검정 · 보라 섞인 검정 (2026-11-20 사용자)
 ROLE_STYLE = {   # 역할 → (칸 바탕, 칸 글자, 머리 글자 색)
-    "main": ("#F0FDF4", "font-weight:700;color:#111;", "#111"),
-    "any": ("#F5F3FF", f"color:{dk.NOTE};", dk.NOTE),
+    "main": ("#F0FDF4", f"font-weight:700;color:{MAIN_FG};", MAIN_FG),
+    "any": ("#F5F3FF", f"font-weight:700;color:{ANY_FG};", ANY_FG),
     None: ("", "color:#333;", "#111"),
 }
+TABLE_TITLE = "margin:0;font-size:15px;line-height:22px;font-weight:700;color:#111;word-break:keep-all;"   # 표 제목 = 그래프 상자 제목과 같은 15/22 (2026-11-20 사용자: 13 → 15)
+SWIPE_HINT = f"margin:0 0 0 auto;font-size:12px;line-height:22px;color:{dk.NOTE};white-space:nowrap;"   # `옆으로 넘겨 보기 ›` 회색 #9CA3AF → 안내 회색 #6B7280 (2026-11-20 사용자: 더 진하게)
+# 넘겨 보기 그림자 = 그래프 넘겨 보기 그림자(design_kit data-sh)와 같은 꼴, 오른쪽 · 넘길 것이 남았을 때만 (2026-11-20 사용자: 잘 모를 수 있으니 그림자)
+TABLE_SHADE = ('<span data-tshade="1" aria-hidden="true" style="position:absolute;top:0;bottom:0;right:0;width:14px;pointer-events:none;z-index:2;transition:opacity .15s;'
+               'background:radial-gradient(farthest-side at 100% 50%,rgba(15,23,42,.18),rgba(15,23,42,0));"></span>')
+TABLE_JS = ("<script>(function(){function u(w){var b=w.querySelector('[data-tscroll]');if(!b||!b.clientWidth)return;var m=b.scrollWidth-b.clientWidth,"
+            "h=w.querySelector('[data-swipe-hint]'),s=w.querySelector('[data-tshade]');if(h)h.style.display=m>1?'':'none';if(s)s.style.opacity=(m-b.scrollLeft>1)?'1':'0';}"
+            "function all(){var ws=document.querySelectorAll('[data-course-table]');for(var i=0;i<ws.length;i++){var w=ws[i],b=w.querySelector('[data-tscroll]');u(w);"
+            "if(b&&!b._t){b._t=1;b.addEventListener('scroll',(function(x){return function(){u(x);};})(w),{passive:true});}}}"
+            "if(document.readyState!=='loading')all();else document.addEventListener('DOMContentLoaded',all);window.addEventListener('load',all);"
+            "window.addEventListener('resize',function(){setTimeout(all,30);});})();</script>")
 
 
-def table(lines, links, top=30):
+def table(lines, links, top=30, title=""):
     rows = [[c.strip() for c in ln.strip().strip("|").split("|")] for ln in lines if not re.match(r"^\s*\|?\s*-{3}", ln)]
     head, body = rows[0], rows[1:]
     role = [None if k == 0 else COL_ROLE.get(re.sub(r"[*`]", "", h).strip()) for k, h in enumerate(head)]
-    # 폰에서 넘겨 보기 (2026-11-20 사용자: "표는 넘겨 보기로"): 첫 칸(행 이름)은 왼쪽에 고정(sticky) · 칸 4개 이상이면 폭 좁을 때만 `옆으로 넘겨 보기 ›` 안내
-    stick = lambda bg: f"position:sticky;left:0;z-index:1;background:{bg};box-shadow:1px 0 0 #E2E8F0;"
-    th = "".join(f'<th style="padding:{TABLE["head_pad"]};background:{TABLE["head_bg"]};border-bottom:{TABLE["head_line"]};text-align:{"left" if k == 0 else "right"};white-space:nowrap;'
+    # 폰에서 넘겨 보기 (2026-11-20 사용자: "표는 넘겨 보기로"): 첫 칸(행 이름)은 왼쪽에 고정(sticky, 세로선 없음) · 칸 4개 이상이면 넘칠 때만 `옆으로 넘겨 보기 ›` + 오른쪽 그림자
+    stick = lambda bg: f"position:sticky;left:0;z-index:1;background:{bg};"
+    th = "".join(f'<th style="padding:{TABLE["head_pad"]};background:{TABLE["head_bg"]};border-bottom:{TABLE["head_line"]};text-align:center;white-space:nowrap;'
                  f'{stick(TABLE["head_bg"]) if k == 0 else ""}'
                  f'font-size:13px;line-height:18px;font-weight:700;color:{ROLE_STYLE[role[k]][2]};">{inline(h, links)}</th>' for k, h in enumerate(head))
-    td = lambda k, c: (f'<td style="padding:{TABLE["pad"]};border-bottom:{TABLE["row_line"]};white-space:nowrap;text-align:{"left" if k == 0 else "right"};'
+    td = lambda k, c: (f'<td style="padding:{TABLE["pad"]};border-bottom:{TABLE["row_line"]};white-space:nowrap;text-align:center;'
                        + ("font-weight:600;color:#111;" + stick("#fff") if k == 0 else (f"background:{ROLE_STYLE[role[k]][0]};" if ROLE_STYLE[role[k]][0] else "") + ROLE_STYLE[role[k]][1])
                        + f'">{inline(c, links)}</td>')
     trs = "".join("<tr>" + "".join(td(k, c) for k, c in enumerate(r)) + "</tr>" for r in body)
-    hint = ""
-    if len(head) >= 4:
-        hint = ('<style>@media (min-width:600px){[data-swipe-hint]{display:none!important}}</style>'
-                f'<div data-swipe-hint="1" style="margin:0 0 4px;text-align:right;font-size:12px;line-height:16px;color:{dk.MUTED};">옆으로 넘겨 보기 ›</div>')
+    swipe = len(head) >= 4
+    hint = (f'<span data-swipe-hint="1" style="{SWIPE_HINT}">옆으로 넘겨 보기 ›</span>' if swipe else "")
+    # 표 제목 · 넘겨 보기 = 한 줄(제목 왼쪽 · 안내 오른쪽), 한 줄에 안 들어가면 안내가 윗줄로(wrap-reverse) (2026-11-20 사용자)
+    cap = ""
+    if title or hint:
+        cap = (f'<div data-course-table-title="1" style="display:flex;flex-wrap:wrap-reverse;align-items:baseline;column-gap:12px;margin:0 0 8px;padding-left:{dk.ALIGN_PX}px;">'
+               + (f'<p style="{TABLE_TITLE}">※ {inline(title, links)}</p>' if title else "") + hint + "</div>")
+    shade = TABLE_SHADE if swipe else ""
+    css = '<style>@media (min-width:600px){[data-swipe-hint],[data-tshade]{display:none!important}}</style>' if swipe else ""   # JS 없이도 넓은 화면엔 안 보임
     # display:table — 테마가 글 안 표를 display:block 으로 바꿔 칸이 폭을 채우지 못한다(오른쪽이 비던 까닭)
-    # 표 영역 ↔ 본문 글 사이 30px (2026-11-20 사용자: 20 → 30). 위에 표 제목(※ 작은 굵은 글씨)이 있으면 위 여백은 제목이 가짐
-    return dk.tint(f'<div data-course-table="1" style="margin:{top}px 0 30px;">{hint}<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">'
+    # 표 영역 ↔ 본문 글 사이 30px (2026-11-20 사용자: 20 → 30). 표 제목이 있으면 제목 위 30
+    return dk.tint(f'<div data-course-table="1" style="margin:{30 if title else top}px 0 30px;">{css}{cap}<div style="position:relative;">'
+                   f'<div data-tscroll="1" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">'
                    '<table style="display:table;border-collapse:separate;border-spacing:0;width:100%;min-width:100%;margin:0;'
-                   f'font-size:17px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div></div>")
+                   f'font-size:17px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div>{shade}</div></div>")
 
 
 CHART_COLORS = [dk.CHART_MAIN, dk.CHART_CMP, dk.CHART_SERIES[1]]   # 2026-11-14 그래프 통일: 그래프 색 표 — 신호 쪽 주황 · 비교 기준(아무 날) 회색 · 셋째 청록 (옛 #F59E0B · #0F766E · #9AD1C8). 빨강 · 파랑은 안 씀(오름 · 내림 색)
@@ -251,6 +272,7 @@ def render(md, links, next_href="#"):
     md = md.split("### 발행 전 확인")[0]
     lines = [ln for ln in md.splitlines() if not ln.startswith("> 초안")]
     title, out, i, lead_done = "", [], 0, False
+    table_title = ""   # 표 바로 위 굵은 한 줄(**…**) = 표 제목 — 표가 받아 넘겨 보기 안내와 한 줄로
     note_mode, chart_next, take_mode = False, None, False   # take_mode: `## 🔍` 정리 구획 안(체크 목록 바탕 노랑)
     gray = lambda h: h.replace('color:#111;', f'color:{dk.NOTE};')   # 안내 구획 안 굵은 글씨도 회색
     while i < len(lines):
@@ -307,8 +329,8 @@ def render(md, links, next_href="#"):
             while i < len(lines) and lines[i].startswith("|"):
                 blk.append(lines[i])
                 i += 1
-            cap_before = bool(out) and out[-1].startswith('<p data-course-table-title')
-            out.append(chart(blk, links, chart_next) if chart_next is not None else table(blk, links, 0 if cap_before else 30))
+            out.append(chart(blk, links, chart_next) if chart_next is not None else table(blk, links, 30, table_title))
+            table_title = ""
             chart_next = None
             continue
         elif re.match(r"^(- |\d+\. )", ln):
@@ -324,6 +346,11 @@ def render(md, links, next_href="#"):
                 out.append(f'<ol style="list-style:none;margin:0 0 16px;padding:0 0 0 {dk.ALIGN_PX}px;font-size:{dk.BODY};line-height:{dk.LH_BODY};color:#333;">' + "".join(
                     f'<li style="display:flex;margin:0 0 6px;padding:0;"><span style="flex:none;width:32px;">{k + 1}.</span>'
                     f'<span style="flex:1 1 auto;min-width:0;word-break:keep-all;">{dk.tint(inline(x, links))}</span></li>' for k, x in enumerate(items)) + "</ol>")
+            elif note_mode and not ordered:
+                # `자료 및 한계` 글머리 = 직접 그린 점 3px · 점 ~ 글 8 (기본 disc 점 ~ 글 12 에서 30% 줄임) · 점 자리는 그대로 (2026-11-20 사용자)
+                out.append(f'<ul style="{NOTE_UL}">' + "".join(
+                    f'<li style="display:flex;align-items:flex-start;gap:8px;margin:0 0 4px;"><span aria-hidden="true" style="flex:none;width:3px;height:3px;border-radius:50%;background:{dk.NOTE};margin-top:9px;"></span>'
+                    f'<span style="flex:1 1 auto;min-width:0;">{gray(inline(x, links))}</span></li>' for x in items) + "</ul>")
             elif note_mode:
                 out.append(f'<{tag} style="{DECO["note_li"]}">' + "".join(f'<li style="margin:0 0 4px;">{gray(inline(x, links))}</li>' for x in items) + f"</{tag}>")
             else:
@@ -346,7 +373,7 @@ def render(md, links, next_href="#"):
             nxt_ln = next((x for x in lines[i + 1:] if x.strip()), "")
             cap = re.fullmatch(r"\*\*(.+)\*\*", " ".join(para).strip())
             if cap and not note_mode and nxt_ln.startswith("|") and chart_next is None:   # 표 제목 = ※ + 작은 굵은 글씨, 위 30 · 표와 8 (2026-11-20 사용자)
-                out.append(f'<p data-course-table-title="1" style="margin:30px 0 8px;padding-left:{dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:700;color:#111;word-break:keep-all;">※ {inline(cap.group(1), links)}</p>')
+                table_title = cap.group(1)   # 표가 제목 줄을 그린다 (넘겨 보기 안내와 한 줄, 2026-11-20 사용자)
             elif note_mode:
                 out.append(f'<p style="{DECO["note_p"]}">{gray(inline(" ".join(para), links))}</p>')
             elif not lead_done:   # 첫 문단 = 맨 위 요약 (0편은 부제 구획 다음)
@@ -355,6 +382,8 @@ def render(md, links, next_href="#"):
             else:
                 out.append(f'<p style="{P}">{txt}</p>')
         i += 1
+    if any("data-tshade" in x for x in out):
+        out.append(TABLE_JS)   # 넘겨 보기 안내 · 그림자 = 넘칠 때만, 끝까지 넘기면 그림자 끔
     return title, dk.align_titles(dk.WRAP_OPEN + "".join(out) + dk.WRAP_CLOSE)
 
 
